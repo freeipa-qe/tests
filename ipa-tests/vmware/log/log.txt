@@ -1,0 +1,79 @@
+Shutting down ntpd: [60G[[0;31mFAILED[0;39m]
+31 Jan 09:30:41 ntpdate[21895]: adjust time server 172.16.27.22 offset 0.170417 sec
+
+Stopping the previously existing ipa server VM if it's running
+
+Thu Jan 31 09:30:41 PST 2008
+cfg file seems to exist, running
+Using:
+vmname=ipaqavm 
+vmxfile=/vmware/fc7-ipa-server/FC7-IPA-Server.vmx
+vmhost=tigger.dsqa.sjc2.redhat.com
+tarfile=/vmware/fc7-ipa-server.tar.gz
+tarroot=/vmware
+taronnfs=0
+tarballmount=emc-cge0.sjc2.redhat.com:/dirsec/archives-mp1/archives /mnt/archives
+vmip=10.14.0.110
+STOPPING /vmware/fc7-ipa-server/FC7-IPA-Server.vmx on tigger.dsqa.sjc2.redhat.com
+
+Extracting the IPA server VM image
+
+Thu Jan 31 09:30:46 PST 2008
+cfg file seems to exist, running
+Using:
+vmname=ipaqavm 
+vmxfile=/vmware/fc7-ipa-server/FC7-IPA-Server.vmx
+vmhost=tigger.dsqa.sjc2.redhat.com
+tarfile=/vmware/fc7-ipa-server.tar.gz
+tarroot=/vmware
+taronnfs=0
+tarballmount=emc-cge0.sjc2.redhat.com:/dirsec/archives-mp1/archives /mnt/archives
+vmip=10.14.0.110
+STOPPING /vmware/fc7-ipa-server/FC7-IPA-Server.vmx on tigger.dsqa.sjc2.redhat.com
+cfg file seems to exist, running
+Using:
+vmname=ipaqavm 
+vmxfile=/vmware/fc7-ipa-server/FC7-IPA-Server.vmx
+vmhost=tigger.dsqa.sjc2.redhat.com
+tarfile=/vmware/fc7-ipa-server.tar.gz
+tarroot=/vmware
+taronnfs=0
+tarballmount=emc-cge0.sjc2.redhat.com:/dirsec/archives-mp1/archives /mnt/archives
+vmip=10.14.0.110
+STOPPING /vmware/fc7-ipa-server/FC7-IPA-Server.vmx on tigger.dsqa.sjc2.redhat.com
+VM not running
+Extracting /vmware/fc7-ipa-server.tar.gz to /vmware on host tigger.dsqa.sjc2.redhat.com
+./fc7-ipa-server/
+./fc7-ipa-server/vmware-1.log
+./fc7-ipa-server/FC7-IPA-Server.vmx
+./fc7-ipa-server/vmware.log
+./fc7-ipa-server/vmware-0.log
+./fc7-ipa-server/nvram
+./fc7-ipa-server/FC7-IPA-Server.vmsd
+./fc7-ipa-server/FC7-IPA-Server.vmdk
+./fc7-ipa-server/vmware-2.log
+
+Starting the now fresh IPA server
+
+Thu Jan 31 09:32:07 PST 2008
+cfg file seems to exist, running
+Using:
+vmname=ipaqavm 
+vmxfile=/vmware/fc7-ipa-server/FC7-IPA-Server.vmx
+vmhost=tigger.dsqa.sjc2.redhat.com
+tarfile=/vmware/fc7-ipa-server.tar.gz
+taronnfs=0
+tarballmount=emc-cge0.sjc2.redhat.com:/dirsec/archives-mp1/archives /mnt/archives
+vmip=10.14.0.110
+STARTING /vmware/fc7-ipa-server/FC7-IPA-Server.vmx on tigger.dsqa.sjc2.redhat.com
+trying to ping to 10.14.0.110
+Thu Jan 31 09:33:16 PST 2008
+ipaqavm seems to be responding to pings now
+sleeping 1 min to allow ssh to come up
+trying to ping to 10.14.0.110
+Thu Jan 31 09:33:16 PST 2008
+ipaqavm seems to be responding to pings now
+continuing with IPA Server install
+
+Starting the now fresh IPA server
+
