@@ -52,7 +52,7 @@ email_result()
 		. ./server.cfg
 		echo "The YUM REPO should be at:" >> /tmp/$date-email.txt
 		echo "$resulturl/$OS/$PRO/$date/ipa.repo" >> /tmp/$date-email.txt
-		find ./cfgs/ -type f | while read cfg; do
+		find ./cfgs/ -type f -maxdepth 1 | while read cfg; do
 			. $cfg
 			echo "for $OS $PRO the YUM REPO will be at:" >> /tmp/$date-email.txt
 			echo "$resulturl/$OS/$PRO/$date/ipa.repo" >> /tmp/$date-email.txt
@@ -227,7 +227,7 @@ cd $pwd
 # Okay, now doing FC7 64-bit
 
 # Setup IPA server VM
-find ./cfgs/ -type f | while read cfg; do 
+find ./cfgs/ -type f -maxdepth 1 | while read cfg; do 
 	. $cfg
 	echo "" | tee -a $logdir/log.txt
 	echo "Stoping the VM specified in ./$cfg" | tee -a $logdir/log.txt

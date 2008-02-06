@@ -1,9 +1,9 @@
 
-31 Jan 03:01:01 ntpdate[20634]: adjust time server 172.16.27.22 offset 0.388490 sec
+ 6 Feb 09:53:50 ntpdate[15856]: adjust time server 172.16.27.22 offset 0.143633 sec
 
 Stoping the VM specified in ./server.cfg
 
-Thu Jan 31 03:01:01 PST 2008
+Wed Feb  6 09:53:50 PST 2008
 cfg file seems to exist, running
 Using:
 vmname=ipaqavm 
@@ -18,7 +18,7 @@ STOPPING /vmware/fc7-ipa-server/FC7-IPA-Server.vmx on tigger
 
 Extracting the VM image from the server specified in ./server.cfg
 
-Thu Jan 31 03:01:09 PST 2008
+Wed Feb  6 09:54:09 PST 2008
 cfg file seems to exist, running
 Using:
 vmname=ipaqavm 
@@ -55,7 +55,7 @@ Extracting /vmware/fc7-ipa-server.tar.gz to /vmware on host tigger
 
 Starting the image that was just extracted
 
-Thu Jan 31 03:02:35 PST 2008
+Wed Feb  6 09:55:36 PST 2008
 cfg file seems to exist, running
 Using:
 vmname=ipaqavm 
@@ -70,14 +70,14 @@ STARTING /vmware/fc7-ipa-server/FC7-IPA-Server.vmx on tigger
 Pinging the server specified in server.cfg until it is up
 
 trying to ping to 10.14.0.110
-Thu Jan 31 03:03:44 PST 2008
+Wed Feb  6 09:56:40 PST 2008
 ipaqavm seems to be responding to pings now
 sleeping 1 min to allow ssh to come up
 
 Pinging again to ensure that the VM is up
 
 trying to ping to 10.14.0.110
-Thu Jan 31 03:04:44 PST 2008
+Wed Feb  6 09:57:40 PST 2008
 ipaqavm seems to be responding to pings now
 continuing with IPA Server Build
 
@@ -87,7 +87,7 @@ Please see ipa_install_log.txt for output of install_ipa.bash
 
 Stoping the VM specified in ././cfgs/fc7.cfg
 
-Thu Jan 31 03:09:15 PST 2008
+Wed Feb  6 10:02:00 PST 2008
 cfg file seems to exist, running
 Using:
 vmname=ipaf7-64vm 
@@ -99,10 +99,11 @@ taronnfs=0
 tarballmount=emc-cge0.sjc2.redhat.com:/dirsec/archives-mp1/archives /mnt/archives
 vmip=10.14.0.130
 STOPPING /vmware/ipaf7-64vm/ipaf7-64vm.vmx on tigger
+VM not running
 
 Extracting the VM image from the server specified in ././cfgs/fc7.cfg
 
-Thu Jan 31 03:09:21 PST 2008
+Wed Feb  6 10:02:04 PST 2008
 cfg file seems to exist, running
 Using:
 vmname=ipaf7-64vm 
@@ -139,7 +140,7 @@ Extracting /vmware/ipaf7-64vm.tar.gz to /vmware on host tigger
 
 Starting the image that was just extracted
 
-Thu Jan 31 03:11:16 PST 2008
+Wed Feb  6 10:04:37 PST 2008
 cfg file seems to exist, running
 Using:
 vmname=ipaf7-64vm 
@@ -154,14 +155,18 @@ STARTING /vmware/ipaf7-64vm/ipaf7-64vm.vmx on tigger
 Pinging the server specified in ./cfgs/fc7.cfg until it is up
 
 trying to ping to 10.14.0.130
-Thu Jan 31 03:12:24 PST 2008
+Wed Feb  6 10:05:46 PST 2008
+trying to ping to 10.14.0.130
+Wed Feb  6 10:06:56 PST 2008
+trying to ping to 10.14.0.130
+Wed Feb  6 10:08:07 PST 2008
 ipaf7-64vm seems to be responding to pings now
 sleeping 1 min to allow ssh to come up
 
 Pinging again to ensure that the VM is up
 
 trying to ping to 10.14.0.130
-Thu Jan 31 03:13:24 PST 2008
+Wed Feb  6 10:09:07 PST 2008
 ipaf7-64vm seems to be responding to pings now
 continuing with IPA Server Build
 
@@ -182,7 +187,7 @@ STOPPING /vmware/ipaf7-64vm/ipaf7-64vm.vmx on tigger
 
 Stoping the VM specified in ./server.cfg
 
-Thu Jan 31 03:18:53 PST 2008
+Wed Feb  6 10:14:30 PST 2008
 cfg file seems to exist, running
 Using:
 vmname=ipaqavm 
