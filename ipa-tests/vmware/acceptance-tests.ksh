@@ -1,4 +1,4 @@
-#!/bin/ksh
+#!/bin/bash
 # This script will run aginst all of the machines defined in the configurations files stored in ./cfg
 # A cfg file can contain the following keys:
 
@@ -27,6 +27,30 @@ fi
 		
 # Making a new dir for logs
 mkdir -p $resultloc/$date
+
+start_host()
+{
+	ssh root@$VMHOST "/usr/bin/vmrun start $VMXFILE"
+}
+
+stop_host()
+{
+	ssh root@$VMHOST "/usr/bin/vmrun stop $VMXFILE"
+}
+
+extract_host()
+{
+	# Mounting nfs share
+	if [ $TARONNFS -ne 0 ]; then
+        	echo "Mounting $TARBALLMOUNT on host $VMHOST"
+	        mntlocation=$(echo $TARBALLMOUNT | awk '{print $2}')
+        	ssh root@$VMHOST "mkdir -p $mntlocation;umount -l $mntlocation >> /dev/null;mount $TARBALLMOUNT"
+	fi
+
+	# Extracting tarball
+       	echo "Extracting $TARFILE to $TARROOT on host $VMHOST"
+        ssh root@$VMHOST "cd $TARROOT;tar xvfz $TARFILE"
+}
 
 email_result()
 {
@@ -75,143 +99,32 @@ email_result()
 	exit
 }
 
-press_any_key()
+runhost()
 {
-    echo ""
-    echo "Press any key to continue..."
-#    read tmp
-    echo ""
-    echo ""
-    echo ""
-    #clear
-    return 0
-}
-
-echo "WARNING: This test will destroy all of the VM's that it uses because it "
-echo " recreates them all"
-echo " Hit CTRL-C now if this is not okay? - "
-press_any_key
-
-# set the initial result
-result="GOOD"
-
-# Fix date
-/etc/init.d/ntpd stop | tee $logdir/log.txt
-/usr/sbin/ntpdate $ntpserver | tee -a $logdir/log.txt 
-ret=$?
-if [ $ret != 0 ]; then
-        # ntp update didn't work the first time, lets try it again.
-        /usr/sbin/ntpdate $ntpserver | tee -a $logdir/log.txt
-        ret=$?
-fi
-
-# Setup IPA server VM
-. ./server.cfg
-serverip=$VMIP
-export serverip 
-echo "" | tee -a $logdir/log.txt
-echo "Stopping the previously existing ipa server VM if it's running" | tee -a $logdir/log.txt
-echo "" | tee -a $logdir/log.txt 
-date | tee -a $logdir/log.txt
-./stop-vm.ksh ./server.cfg | tee -a $logdir/log.txt
-echo "" | tee -a $logdir/log.txt
-echo "Extracting the IPA server VM image" | tee -a $logdir/log.txt
-echo "" | tee -a $logdir/log.txt 
-date | tee -a $logdir/log.txt
-./extract-vm.ksh ./server.cfg | tee -a $logdir/log.txt
-echo "" | tee -a $logdir/log.txt
-echo "Starting the now fresh IPA server" | tee -a $logdir/log.txt
-echo "" | tee -a $logdir/log.txt 
-
-date | tee -a $logdir/log.txt
-./start-vm.ksh ./server.cfg | tee -a $logdir/log.txt
-while true; do
-	sleep 60
-	echo "trying to ping to $VMIP" | tee -a $logdir/log.txt
-	date | tee -a $logdir/log.txt
-	ping -c 1 $VMIP
-	ret=$?
-	if [ $ret = 0 ]; then
-		echo "$VMNAME seems to be responding to pings now" | tee -a $logdir/log.txt
-		break;
-	fi
-	sleep 30
-done 
-echo "sleeping 1 min to allow ssh to come up" | tee -a $logdir/log.txt
-#sleep 60
-# Pinging again to wait for the VMWARE clock sync bug 
-while true; do
-	echo "trying to ping to $VMIP" | tee -a $logdir/log.txt
-	date | tee -a $logdir/log.txt
-	ping -c 1 $VMIP
-	ret=$?
-	if [ $ret = 0 ]; then
-		echo "$VMNAME seems to be responding to pings now" | tee -a $logdir/log.txt
-		echo "continuing with IPA Server install" | tee -a $logdir/log.txt
-		break;
-	fi
-done 
-# Install IPA onto the server
-#  First, fix the install-ipa.bash file
-echo "" | tee -a $logdir/log.txt
-echo "Starting the now fresh IPA server" | tee -a $logdir/log.txt
-echo "" | tee -a $logdir/log.txt 
-
-vmfqdn=`host $VMNAME | awk {'print $1'}`
-fc7repo="$fc7repobase/$OS/$PRO/ipa.repo"
-sed s=fc7repo=$fc7repo=g < ././install_ipa.bash-base | sed s=VMNAME=$vmfqdn=g |  sed s=ntpserver=$ntpserver=g > ./install_ipa.bash
-chmod 755 ./install_ipa.bash
-scp ./install_ipa.bash root@$VMIP:/tmp/. | tee -a $logdir/log.txt
-ssh root@$VMIP " rm -f $installog;set -x;/tmp/install_ipa.bash &> $installog" | tee -a $logdir/log.txt
-rm -f $installog
-scp root@$VMIP:$installog /tmp/. | tee -a $logdir/log.txt
-if [ ! -d $resultloc/$date ]; then mkdir -p $resultloc/$date; fi
-cp -af $installog $resultloc/$date/$serverlog | tee -a $logdir/log.txt
-grep -v NOERROR $installog | grep ERROR 
-ret=$?
-if [ $ret == 0 ]; then
-	echo "ERROR - A error was detected installing IPA server onto $VMNAME, see $installog for details";
-	result="BAD";
-	server="BAD"
-#	exit;
-else
-	server="GOOD"
-fi
-
-export server
-export result
-
-if [ "$result" != GOOD ]; then
-	email_result $result;
-fi
-
-# Setup and test client VM's
-echo "show find's result"
-find ./cfgs/*.cfg -type f
-find ./cfgs/*.cfg -type f | while read cfgfile; do
-	echo "Starting work on $cfgfile" | tee -a $logdir/log.txt	
+	echo "Starting work on $workfile" | tee -a $logdir/log.txt	
 	#setting bash file to default, this may be changed by the host cfg file
 	BASHFILE=rhelgeneric.ksh
 	# This next line is where all of the VMHOST and related keys get overwritten.
-	. $cfgfile
+	. $workfile
 	echo "" | tee -a $logdir/log.txt
-	echo "Stoping client from $cfgfile" | tee -a $logdir/log.txt
+	echo "Stoping client from $workfile" | tee -a $logdir/log.txt
 	echo "" | tee -a $logdir/log.txt 
 	date | tee -a $logdir/log.txt
-	./stop-vm.ksh $cfgfile | tee -a $logdir/log.txt
+	stop_host
+	#./stop-vm.ksh $workfile | tee -a $logdir/log.txt
+	#ssh root@$VMHOST "/usr/bin/vmrun stop $VMXFILE"
 	echo "" | tee -a $logdir/log.txt
-	echo "Extract client from $cfgfile" | tee -a $logdir/log.txt
+	echo "Extract client from $workfile" | tee -a $logdir/log.txt
 	echo "" | tee -a $logdir/log.txt 
 	date | tee -a $logdir/log.txt
-	./extract-vm.ksh $cfgfile | tee -a $logdir/log.txt
+	extract_host
 	echo "" | tee -a $logdir/log.txt
-	echo "Starting client from $cfgfile" | tee -a $logdir/log.txt
+	echo "Starting client from $workfile" | tee -a $logdir/log.txt
 	echo "" | tee -a $logdir/log.txt 
 	date | tee -a $logdir/log.txt
-	./start-vm.ksh $cfgfile | tee -a $logdir/log.txt
-
+	start_host
 	while true; do
-		sleep 60
+		sleep 6
 		echo "trying to ping to $VMIP" | tee -a $logdir/log.txt
 		date | tee -a $logdir/log.txt
 		ping -c 1 $VMIP
@@ -262,12 +175,139 @@ find ./cfgs/*.cfg -type f | while read cfgfile; do
 	fi
 
 	echo "" | tee -a $logdir/log.txt
-	echo "Stopping client from $cfgfile" | tee -a $logdir/log.txt
+	echo "Stopping client from $workfile" | tee -a $logdir/log.txt
 	echo "" | tee -a $logdir/log.txt 
 	date | tee -a $logdir/log.txt
-	./stop-vm.ksh $cfgfile | tee -a $logdir/log.txt
+	stop_host
+#	./stop-vm.ksh $workfile | tee -a $logdir/log.txt
+}
+press_any_key()
+{
+    echo ""
+    echo "Press any key to continue..."
+#    read tmp
+    echo ""
+    echo ""
+    echo ""
+    #clear
+    return 0
+}
 
-done
+echo "WARNING: This test will destroy all of the VM's that it uses because it "
+echo " recreates them all"
+echo " Hit CTRL-C now if this is not okay? - "
+press_any_key
+
+# set the initial result
+result="GOOD"
+
+# Fix date
+/etc/init.d/ntpd stop | tee $logdir/log.txt
+/usr/sbin/ntpdate $ntpserver | tee -a $logdir/log.txt 
+ret=$?
+if [ $ret != 0 ]; then
+        # ntp update didn't work the first time, lets try it again.
+        /usr/sbin/ntpdate $ntpserver | tee -a $logdir/log.txt
+        ret=$?
+fi
+
+# Setup IPA server VM
+. ./server.cfg
+serverip=$VMIP
+export serverip 
+echo "" | tee -a $logdir/log.txt
+echo "Stopping the previously existing ipa server VM if it's running" | tee -a $logdir/log.txt
+echo "" | tee -a $logdir/log.txt 
+date | tee -a $logdir/log.txt
+stop_host
+#./stop-vm.ksh ./server.cfg | tee -a $logdir/log.txt
+echo "" | tee -a $logdir/log.txt
+echo "Extracting the IPA server VM image" | tee -a $logdir/log.txt
+echo "" | tee -a $logdir/log.txt 
+date | tee -a $logdir/log.txt
+extract_host
+#./extract-vm.ksh ./server.cfg | tee -a $logdir/log.txt
+echo "" | tee -a $logdir/log.txt
+echo "Starting the now fresh IPA server" | tee -a $logdir/log.txt
+echo "" | tee -a $logdir/log.txt 
+
+date | tee -a $logdir/log.txt
+start_host
+#./start-vm.ksh ./server.cfg | tee -a $logdir/log.txt
+while true; do
+	sleep 60
+	echo "trying to ping to $VMIP" | tee -a $logdir/log.txt
+	date | tee -a $logdir/log.txt
+	ping -c 1 $VMIP
+	ret=$?
+	if [ $ret = 0 ]; then
+		echo "$VMNAME seems to be responding to pings now" | tee -a $logdir/log.txt
+		break;
+	fi
+	sleep 30
+done 
+echo "sleeping 1 min to allow ssh to come up" | tee -a $logdir/log.txt
+sleep 60
+# Pinging again to wait for the VMWARE clock sync bug 
+while true; do
+	echo "trying to ping to $VMIP" | tee -a $logdir/log.txt
+	date | tee -a $logdir/log.txt
+#	ping -c 1 $VMIP
+ret=0
+	ret=$?
+	if [ $ret = 0 ]; then
+		echo "$VMNAME seems to be responding to pings now" | tee -a $logdir/log.txt
+		echo "continuing with IPA Server install" | tee -a $logdir/log.txt
+		break;
+	fi
+done 
+# Install IPA onto the server
+#  First, fix the install-ipa.bash file
+echo "" | tee -a $logdir/log.txt
+echo "Starting the now fresh IPA server" | tee -a $logdir/log.txt
+echo "" | tee -a $logdir/log.txt 
+
+vmfqdn=`host $VMNAME | awk {'print $1'}`
+fc7repo="$fc7repobase/$OS/$PRO/ipa.repo"
+sed s=fc7repo=$fc7repo=g < ././install_ipa.bash-base | sed s=VMNAME=$vmfqdn=g |  sed s=ntpserver=$ntpserver=g > ./install_ipa.bash
+chmod 755 ./install_ipa.bash
+scp ./install_ipa.bash root@$VMIP:/tmp/. | tee -a $logdir/log.txt
+ssh root@$VMIP " rm -f $installog;set -x;/tmp/install_ipa.bash &> $installog" | tee -a $logdir/log.txt
+rm -f $installog
+scp root@$VMIP:$installog /tmp/. | tee -a $logdir/log.txt
+if [ ! -d $resultloc/$date ]; then mkdir -p $resultloc/$date; fi
+cp -af $installog $resultloc/$date/$serverlog | tee -a $logdir/log.txt
+grep -v NOERROR $installog | grep ERROR 
+ret=$?
+if [ $ret == 0 ]; then
+	echo "ERROR - A error was detected installing IPA server onto $VMNAME, see $installog for details";
+	result="BAD";
+	server="BAD"
+#	exit;
+else
+	server="GOOD"
+fi
+
+export server
+export result
+
+if [ "$result" != GOOD ]; then
+	email_result $result;
+fi
+
+# Setup and test client VM's
+# For some reason, this doesn't work.
+#find ./cfgs/*.cfg -type f -maxdepth 1 | while read workfile;do 
+#	runhost;
+#done
+
+# Now using the less flexible method
+workfile="./cfgs/fc7-x86_64.cfg"
+runhost
+workfile="./cfgs/fc7.cfg"
+runhost
+workfile="./cfgs/rhel5-x86_64.cfg"
+runhost
 
 # Install IPA
 # Download repo
@@ -278,7 +318,7 @@ echo "" | tee -a $logdir/log.txt
 echo "Stopping the previously existing ipa server VM if it's running" | tee -a $logdir/log.txt
 echo "" | tee -a $logdir/log.txt 
 date | tee -a $logdir/log.txt
-./stop-vm.ksh ./server.cfg | tee -a $logdir/log.txt
+stop_host
 
 if [ "$result" == GOOD ]; then
 	email_result GOOD;

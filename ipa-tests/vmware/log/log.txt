@@ -1,79 +1,116 @@
 Shutting down ntpd: [60G[[0;31mFAILED[0;39m]
-31 Jan 09:30:41 ntpdate[21895]: adjust time server 172.16.27.22 offset 0.170417 sec
+ 6 Feb 14:26:17 ntpdate[16544]: adjust time server 172.16.27.22 offset 0.035858 sec
 
 Stopping the previously existing ipa server VM if it's running
 
-Thu Jan 31 09:30:41 PST 2008
-cfg file seems to exist, running
-Using:
-vmname=ipaqavm 
-vmxfile=/vmware/fc7-ipa-server/FC7-IPA-Server.vmx
-vmhost=tigger.dsqa.sjc2.redhat.com
-tarfile=/vmware/fc7-ipa-server.tar.gz
-tarroot=/vmware
-taronnfs=0
-tarballmount=emc-cge0.sjc2.redhat.com:/dirsec/archives-mp1/archives /mnt/archives
-vmip=10.14.0.110
-STOPPING /vmware/fc7-ipa-server/FC7-IPA-Server.vmx on tigger.dsqa.sjc2.redhat.com
+Wed Feb  6 14:26:17 PST 2008
 
 Extracting the IPA server VM image
 
-Thu Jan 31 09:30:46 PST 2008
-cfg file seems to exist, running
-Using:
-vmname=ipaqavm 
-vmxfile=/vmware/fc7-ipa-server/FC7-IPA-Server.vmx
-vmhost=tigger.dsqa.sjc2.redhat.com
-tarfile=/vmware/fc7-ipa-server.tar.gz
-tarroot=/vmware
-taronnfs=0
-tarballmount=emc-cge0.sjc2.redhat.com:/dirsec/archives-mp1/archives /mnt/archives
-vmip=10.14.0.110
-STOPPING /vmware/fc7-ipa-server/FC7-IPA-Server.vmx on tigger.dsqa.sjc2.redhat.com
-cfg file seems to exist, running
-Using:
-vmname=ipaqavm 
-vmxfile=/vmware/fc7-ipa-server/FC7-IPA-Server.vmx
-vmhost=tigger.dsqa.sjc2.redhat.com
-tarfile=/vmware/fc7-ipa-server.tar.gz
-tarroot=/vmware
-taronnfs=0
-tarballmount=emc-cge0.sjc2.redhat.com:/dirsec/archives-mp1/archives /mnt/archives
-vmip=10.14.0.110
-STOPPING /vmware/fc7-ipa-server/FC7-IPA-Server.vmx on tigger.dsqa.sjc2.redhat.com
-VM not running
-Extracting /vmware/fc7-ipa-server.tar.gz to /vmware on host tigger.dsqa.sjc2.redhat.com
-./fc7-ipa-server/
-./fc7-ipa-server/vmware-1.log
-./fc7-ipa-server/FC7-IPA-Server.vmx
-./fc7-ipa-server/vmware.log
-./fc7-ipa-server/vmware-0.log
-./fc7-ipa-server/nvram
-./fc7-ipa-server/FC7-IPA-Server.vmsd
-./fc7-ipa-server/FC7-IPA-Server.vmdk
-./fc7-ipa-server/vmware-2.log
+Wed Feb  6 14:26:21 PST 2008
 
 Starting the now fresh IPA server
 
-Thu Jan 31 09:32:07 PST 2008
-cfg file seems to exist, running
-Using:
-vmname=ipaqavm 
-vmxfile=/vmware/fc7-ipa-server/FC7-IPA-Server.vmx
-vmhost=tigger.dsqa.sjc2.redhat.com
-tarfile=/vmware/fc7-ipa-server.tar.gz
-taronnfs=0
-tarballmount=emc-cge0.sjc2.redhat.com:/dirsec/archives-mp1/archives /mnt/archives
-vmip=10.14.0.110
-STARTING /vmware/fc7-ipa-server/FC7-IPA-Server.vmx on tigger.dsqa.sjc2.redhat.com
+Wed Feb  6 14:27:39 PST 2008
 trying to ping to 10.14.0.110
-Thu Jan 31 09:33:16 PST 2008
+Wed Feb  6 14:28:46 PST 2008
+trying to ping to 10.14.0.110
+Wed Feb  6 14:30:26 PST 2008
 ipaqavm seems to be responding to pings now
 sleeping 1 min to allow ssh to come up
 trying to ping to 10.14.0.110
-Thu Jan 31 09:33:16 PST 2008
+Wed Feb  6 14:31:26 PST 2008
 ipaqavm seems to be responding to pings now
 continuing with IPA Server install
 
 Starting the now fresh IPA server
 
+Starting work on ./cfgs/fc7-x86_64.cfg
+
+Stoping client from ./cfgs/fc7-x86_64.cfg
+
+Wed Feb  6 14:37:36 PST 2008
+
+Extract client from ./cfgs/fc7-x86_64.cfg
+
+Wed Feb  6 14:37:38 PST 2008
+
+Starting client from ./cfgs/fc7-x86_64.cfg
+
+Wed Feb  6 14:39:41 PST 2008
+trying to ping to 10.14.0.130
+Wed Feb  6 14:39:55 PST 2008
+trying to ping to 10.14.0.130
+Wed Feb  6 14:41:11 PST 2008
+trying to ping to 10.14.0.130
+Wed Feb  6 14:42:27 PST 2008
+ipaf7-64vm seems to be responding to pings now
+sleeping 1 min to allow ssh to come up
+pinging 10.14.0.130 for good measure
+Wed Feb  6 14:43:27 PST 2008
+ipaf7-64vm seems to be responding to pings now
+
+Stopping client from ./cfgs/fc7-x86_64.cfg
+
+Wed Feb  6 14:46:48 PST 2008
+Starting work on ./cfgs/fc7.cfg
+
+Stoping client from ./cfgs/fc7.cfg
+
+Wed Feb  6 14:46:52 PST 2008
+
+Extract client from ./cfgs/fc7.cfg
+
+Wed Feb  6 14:46:54 PST 2008
+
+Starting client from ./cfgs/fc7.cfg
+
+Wed Feb  6 14:48:34 PST 2008
+trying to ping to 10.14.0.99
+Wed Feb  6 14:48:49 PST 2008
+trying to ping to 10.14.0.99
+Wed Feb  6 14:50:05 PST 2008
+trying to ping to 10.14.0.99
+Wed Feb  6 14:51:21 PST 2008
+ipaf7vm seems to be responding to pings now
+sleeping 1 min to allow ssh to come up
+pinging 10.14.0.99 for good measure
+Wed Feb  6 14:52:21 PST 2008
+ipaf7vm seems to be responding to pings now
+
+Stopping client from ./cfgs/fc7.cfg
+
+Wed Feb  6 14:56:18 PST 2008
+Starting work on ./cfgs/rhel5-x86_64.cfg
+
+Stoping client from ./cfgs/rhel5-x86_64.cfg
+
+Wed Feb  6 14:56:22 PST 2008
+
+Extract client from ./cfgs/rhel5-x86_64.cfg
+
+Wed Feb  6 14:56:24 PST 2008
+
+Starting client from ./cfgs/rhel5-x86_64.cfg
+
+Wed Feb  6 14:58:45 PST 2008
+trying to ping to 10.14.0.132
+Wed Feb  6 14:59:00 PST 2008
+trying to ping to 10.14.0.132
+Wed Feb  6 15:00:16 PST 2008
+trying to ping to 10.14.0.132
+Wed Feb  6 15:01:32 PST 2008
+iparhel5-64vm seems to be responding to pings now
+sleeping 1 min to allow ssh to come up
+pinging 10.14.0.132 for good measure
+Wed Feb  6 15:02:32 PST 2008
+iparhel5-64vm seems to be responding to pings now
+
+Stopping client from ./cfgs/rhel5-x86_64.cfg
+
+Wed Feb  6 15:04:30 PST 2008
+
+Stopping the previously existing ipa server VM if it's running
+
+Wed Feb  6 15:04:33 PST 2008
+error detected in one or more of the client logs. changing code to BAD

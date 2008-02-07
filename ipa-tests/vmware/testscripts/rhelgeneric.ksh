@@ -29,7 +29,9 @@ fi
 /etc/init.d/ntpd stop
 
 # Getting IPA repo file
-cd /etc/yum.repos.d;wget fc7repo
+if [ $OS == "FC6" ||  $OS == "FC7" || $OS == "FC8" ]; then
+	cd /etc/yum.repos.d;wget fc7repo;
+fi
 
 # updating
 /etc/init.d/yum-updatesd stop
