@@ -154,7 +154,7 @@ runhost()
 	installog=`echo /tmp/client-$VMNAME-log.txt`
 	rm -f /tmp/$date.bash
 	fc7repo="$fc7repobase/$OS/$PRO/ipa.repo"
-	sed s=fc7repo=$fc7repo=g < ./testscripts/$BASHFILE | sed s=VMNAME=$vmfqdn=g |  sed s=ntpserver=$ntpserver=g | sed s=serverip=$serverip=g> /tmp/$date.bash
+	sed s=fc7repo=$fc7repo=g < ./testscripts/$BASHFILE | sed s=VMNAME=$vmfqdn=g |  sed s=ntpserver=$ntpserver=g | sed s=oshere=$OS=g | sed s=serverip=$serverip=g> /tmp/$date.bash
 	chmod 755 /tmp/$date.bash
 	scp /tmp/$date.bash root@$VMIP:/tmp/. | tee -a $logdir/log.txt
 	ssh root@$VMIP " rm -f $installog;set -x;/tmp/$date.bash &> $installog" | tee -a $logdir/log.txt
