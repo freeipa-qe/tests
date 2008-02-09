@@ -34,7 +34,13 @@ if [ -f /var/run/yum.pid ]; then
 		kill $p
 	done
 fi
-cd /etc/yum.repos.d;wget fc7repo
+
+OS=oshere
+# Getting IPA repo file
+if [ $OS == "FC6" ||  $OS == "FC7" || $OS == "FC8" ]; then
+	cd /etc/yum.repos.d;wget fc7repo
+fi
+
 killall yum
 yum -y update policycoreutils selinux-policy
 ret=$?

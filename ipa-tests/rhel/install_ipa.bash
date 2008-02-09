@@ -74,8 +74,8 @@ if [ $ret != 0 ]; then
 	exit;
 fi
 # Setup ipa server
-# ipaqavm.dsqa.sjc2.redhat.com will be replaced wth the fqdn of this machine as reported by dns
-/usr/sbin/ipa-server-install -U --hostname=ipaqavm.dsqa.sjc2.redhat.com -r DSQA.SJC2.REDHAT.COM -p Secret123 -P Secret123 -a Secret123 --setup-bind -u admin -d
+# iparhel5-64vm.dsqa.sjc2.redhat.com will be replaced wth the fqdn of this machine as reported by dns
+/usr/sbin/ipa-server-install -U --hostname=iparhel5-64vm.dsqa.sjc2.redhat.com -r DSQA.SJC2.REDHAT.COM -p Secret123 -P Secret123 -a Secret123 --setup-bind -u admin -d
 ret=$?
 if [ $ret != 0 ]; then 
 	echo "ERROR - ipa-server-install did not work";
@@ -114,7 +114,7 @@ if [ $ret != 0 ]; then
         exit;
 fi
 
-dig ipaqavm.dsqa.sjc2.redhat.com @127.0.0.1
+dig iparhel5-64vm.dsqa.sjc2.redhat.com @127.0.0.1
 ret=$?
 if [ $ret != 0 ]; then
         echo "ERROR - lookup of myself failed";

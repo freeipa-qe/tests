@@ -269,7 +269,7 @@ echo "" | tee -a $logdir/log.txt
 
 vmfqdn=`host $VMNAME | awk {'print $1'}`
 fc7repo="$fc7repobase/$OS/$PRO/ipa.repo"
-sed s=fc7repo=$fc7repo=g < ././install_ipa.bash-base | sed s=VMNAME=$vmfqdn=g |  sed s=ntpserver=$ntpserver=g > ./install_ipa.bash
+sed s=fc7repo=$fc7repo=g < ././install_ipa.bash-base | sed s=VMNAME=$vmfqdn=g | sed s=oshere=$OS=g | sed s=ntpserver=$ntpserver=g > ./install_ipa.bash
 chmod 755 ./install_ipa.bash
 scp ./install_ipa.bash root@$VMIP:/tmp/. | tee -a $logdir/log.txt
 ssh root@$VMIP " rm -f $installog;set -x;/tmp/install_ipa.bash &> $installog" | tee -a $logdir/log.txt
