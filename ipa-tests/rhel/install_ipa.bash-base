@@ -41,6 +41,14 @@ if [ $OS == "FC6" ||  $OS == "FC7" || $OS == "FC8" ]; then
 	cd /etc/yum.repos.d;wget fc7repo
 fi
 
+# uninstalling krb5-workstation because it conflicts with krb5-server
+rpm -e krb5-workstation
+ret=$?
+if [ $ret != 0 ]; then 
+	echo "ERROR, rpm -e krb5-workstation failed, please see log."
+	exit;
+fi
+
 killall yum
 yum -y update policycoreutils selinux-policy
 ret=$?
@@ -73,12 +81,12 @@ if [ $ret != 0 ]; then
 fi
 
 # Checking to make sure that mod_auth_kerb contains ipa
-rpm -q mod_auth_kerb | grep ipa
-ret=$?
-if [ $ret != 0 ]; then 
-	echo "ERROR - mod_auth doesn't appear to be the right version";
-	exit;
-fi
+#rpm -q mod_auth_kerb | grep ipa
+#ret=$?
+#if [ $ret != 0 ]; then 
+#	echo "ERROR - mod_auth doesn't appear to be the right version";
+#	exit;
+#fi
 # Setup ipa server
 # VMNAME will be replaced wth the fqdn of this machine as reported by dns
 /usr/sbin/ipa-server-install -U --hostname=VMNAME -r DSQA.SJC2.REDHAT.COM -p Secret123 -P Secret123 -a Secret123 --setup-bind -u admin -d
@@ -92,6 +100,40 @@ fi
 /usr/sbin/ntpdate ntpserver
 /etc/init.d/ntpd start
 
+# Create the replace.pl script for use in the DNS server setup
+echo '#!/usr/bin/perl
+my $file = "";
+my $string = "";
+my $replace = 0;
+foreach $num (0 .. $#ARGV) {
+        ($a1, $a2) = split(/=/, $ARGV[$num]);
+        if ( $a1 =~ "file" ) { $file = $a2;}
+        if ( $a1 =~ "string" ) { $string = $a2;}
+        if ( $a1 =~ "replace" ) { $replace = $a2;}
+#        print "$ARGV[$num]\n";
+}
+my $match = 0;
+open (LIST, "$file") or die "\nERROR\nunable to open file $file\n";
+while (<LIST>)
+{
+        chomp $_;
+        if ( $_ =~ /$string/ ) 
+        {
+                $match = $match + 1;
+
+        #       print "\n\nmatch is $match replace is $replace\n\n";
+                if ( "$replace" =~ "$match" )
+                {
+                        print "#$string\n";
+                } else {
+                        print "$_\n";
+                }
+        } else {
+                print "$_\n";
+        }
+}' > /bin/replace.pl
+
+
 # testing bind
 mv /etc/resolv.conf /etc/resolv.conf-old
 echo 'nameserver 127.0.0.1' > /etc/resolv.conf
@@ -104,6 +146,9 @@ echo 'nameserver 127.0.0.1' > /etc/resolv.conf
 #fi
 # adding forwarders to bind
 sed -i s/dump-file/'forwarders { 172.16.27.23; 172.16.52.28; }; dump-file'/g  /etc/named.conf
+/bin/replace.pl replace=5 string='};' file=/etc/named.conf | sed s/'type hint'/'#type hint'/g | sed s/'file "named.ca";'/'#file "named.ca";'/g | sed s/'zone "." IN {'/'#zone "." IN {'/g > /etc/named.conf.new
+mv /etc/named.conf /etc/named.conf.old
+mv /etc/named.conf.new /etc/named.conf
 /etc/init.d/named restart
 # Is it running?
 ps -ef | grep named | grep -v grep | grep named
