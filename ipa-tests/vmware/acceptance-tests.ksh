@@ -83,7 +83,7 @@ email_result()
 	fi
 
 	# Compose email
-	echo "Subject: $code result of IPA QA run" > /tmp/$date-email.txt
+	echo "Subject: Fedora - $code result of IPA QA run" > /tmp/$date-email.txt
 	echo "To: $email" >> /tmp/$date-email.txt
 	echo "" >> /tmp/$date-email.txt
 	echo " Result was $code, please see:" >> /tmp/$date-email.txt
