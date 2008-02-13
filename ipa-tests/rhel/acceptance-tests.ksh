@@ -156,11 +156,11 @@ runhost()
 	fc7repo="$fc7repobase/$OS/$PRO/ipa.repo"
 	sed s=fc7repo=$fc7repo=g < ./testscripts/$BASHFILE | sed s=VMNAME=$vmfqdn=g |  sed s=ntpserver=$ntpserver=g | sed s=oshere=$OS=g | sed s=serverip=$serverip=g> /tmp/$date.bash
 	chmod 755 /tmp/$date.bash
-	scp /tmp/$date.bash root@$VMIP:/tmp/. | tee -a $logdir/log.txt
+	scp -o GSSAPIAuthentication=no /tmp/$date.bash root@$VMIP:/tmp/. | tee -a $logdir/log.txt
 	ssh root@$VMIP " rm -f $installog;set -x;/tmp/$date.bash &> $installog" | tee -a $logdir/log.txt
 	rm -f $installog
 	if [ ! -d $resultloc/$date ]; then mkdir -p $resultloc/$date; fi
-	scp root@$VMIP:$installog /tmp/. | tee -a $logdir/log.txt
+	scp -o GSSAPIAuthentication=no root@$VMIP:$installog /tmp/. | tee -a $logdir/log.txt
 	grep -v NOERROR $installog | grep ERROR 
 	ret=$?
 	if [ $ret == 0 ]; then
@@ -271,10 +271,10 @@ vmfqdn=`host $VMNAME | awk {'print $1'}`
 fc7repo="$fc7repobase/$OS/$PRO/ipa.repo"
 sed s=fc7repo=$fc7repo=g < ././install_ipa.bash-base | sed s=VMNAME=$vmfqdn=g | sed s=oshere=$OS=g | sed s=ntpserver=$ntpserver=g > ./install_ipa.bash
 chmod 755 ./install_ipa.bash
-scp ./install_ipa.bash root@$VMIP:/tmp/. | tee -a $logdir/log.txt
+scp -o GSSAPIAuthentication=no ./install_ipa.bash root@$VMIP:/tmp/. | tee -a $logdir/log.txt
 ssh root@$VMIP " rm -f $installog;set -x;/tmp/install_ipa.bash &> $installog" | tee -a $logdir/log.txt
 rm -f $installog
-scp root@$VMIP:$installog /tmp/. | tee -a $logdir/log.txt
+scp -o GSSAPIAuthentication=no root@$VMIP:$installog /tmp/. | tee -a $logdir/log.txt
 if [ ! -d $resultloc/$date ]; then mkdir -p $resultloc/$date; fi
 cp -af $installog $resultloc/$date/$serverlog | tee -a $logdir/log.txt
 grep -v NOERROR $installog | grep ERROR 
@@ -302,11 +302,13 @@ fi
 #done
 
 # Now using the less flexible method
+#workfile="./cfgs/ipaqa14-x86_64.cfg"
+#runhost
+workfile="./cfgs/ipaqa15-i386.cfg"
+runhost
 workfile="./cfgs/fc7-x86_64.cfg"
 runhost
 workfile="./cfgs/fc7.cfg"
-runhost
-workfile="./cfgs/rhel5-x86_64.cfg"
 runhost
 
 # Install IPA

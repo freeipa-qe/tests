@@ -30,7 +30,7 @@ fi
 
 OS=oshere
 # Getting IPA repo file
-if [ $OS == "FC6" ||  $OS == "FC7" || $OS == "FC8" ]; then
+if [ "$OS" == "FC6" ]||[ "$OS" == "FC7" ]||[ "$OS" == "FC8" ]; then
 	cd /etc/yum.repos.d;wget fc7repo;
 fi
 
@@ -88,8 +88,8 @@ if [ $ret != 0 ]; then
 		/usr/sbin/ntpdate serverip
 		ret=$?
 		if [ $ret != 0 ]; then
-			echo "ERROR - could not set the time/date to the IPA server, nothing else is going to work...";
-			exit;
+			echo "PROBLEM - could not set the time/date to the IPA server, nothing else is going to work...";
+#			exit;
 		fi
 	fi
 fi

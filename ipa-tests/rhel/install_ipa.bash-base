@@ -37,16 +37,20 @@ fi
 
 OS=oshere
 # Getting IPA repo file
-if [ $OS == "FC6" ||  $OS == "FC7" || $OS == "FC8" ]; then
+if [ "$OS" == "FC6" ]||[ "$OS" == "FC7" ]||[ "$OS" == "FC8" ]; then
 	cd /etc/yum.repos.d;wget fc7repo
 fi
 
 # uninstalling krb5-workstation because it conflicts with krb5-server
-rpm -e krb5-workstation
+rpm -q krb5-workstation
 ret=$?
-if [ $ret != 0 ]; then 
-	echo "ERROR, rpm -e krb5-workstation failed, please see log."
-	exit;
+if [ $ret == 0 ]; then 
+	rpm -e krb5-workstation
+	ret=$?
+	if [ $ret != 0 ]; then 
+		echo "ERROR, rpm -e krb5-workstation failed, please see log."
+		exit;
+	fi
 fi
 
 killall yum
@@ -68,7 +72,7 @@ if [ $ret != 0 ]; then
 	fi
 fi
 
-yum -y install ipa-server ipa-admintools bind caching-nameserver expect 
+yum -y install ipa-server ipa-admintools bind caching-nameserver expect krb5-workstation  
 ret=$?
 if [ $ret != 0 ]; then 
 	echo "WARNING - The first try on IPA install didn't work, trying again"
@@ -113,7 +117,7 @@ foreach $num (0 .. $#ARGV) {
 #        print "$ARGV[$num]\n";
 }
 my $match = 0;
-open (LIST, "$file") or die "\nERROR\nunable to open file $file\n";
+open (LIST, "$file") or die "\nPROBLEM\nunable to open file $file\n";
 while (<LIST>)
 {
         chomp $_;
@@ -132,7 +136,7 @@ while (<LIST>)
                 print "$_\n";
         }
 }' > /bin/replace.pl
-
+chmod 755 /bin/replace.pl
 
 # testing bind
 mv /etc/resolv.conf /etc/resolv.conf-old
