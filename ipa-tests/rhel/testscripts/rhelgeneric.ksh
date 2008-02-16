@@ -127,7 +127,18 @@ fi
 
 /usr/sbin/ntpdate serverip
 
+
 # Joining client to IPA Server
+echo "Test case 2548"
+/usr/sbin/ipa-client-install --domain=BAD.IPA.DOMAIN.REDHAT.COM --server=4.2.2.2 --unattended
+ret=$?
+if [ $ret == 0 ]; then
+        echo "ERROR - ipa-client-install worked when it was fed bad info";
+        exit;
+fi
+
+# Joining client to IPA Server
+echo "Test case 2399"
 /usr/sbin/ipa-client-install --domain=DSQA.SJC2.REDHAT.COM --server=serverip --unattended
 ret=$?
 if [ $ret != 0 ]; then
@@ -189,6 +200,27 @@ expect eof' > /tmp/ipaadduser.exp
 ret=$?
 if [ $ret != 0 ]; then
         echo "ERROR - ipa-adduser failed";
+        exit;
+fi
+
+# Changing the password for clienttestuser1 so that the accouny is usable
+echo 'set timeout -1
+spawn /usr/kerberos/bin/kpasswd clienttestuser1
+match_max 100000
+expect -exact "Password for clienttestuser1@DSQA.SJC2.REDHAT.COM: "
+send -- "newpW1\r"
+expect -exact "\r
+Enter new password: "
+send -- "Secret123\r"
+expect -exact "\r
+Enter it again: "
+send -- "Secret123\r"
+expect eof' > /tmp/testusernewpass.exp
+
+/usr/bin/expect /tmp/testusernewpass.exp
+ret=$?
+if [ $ret != 0 ]; then
+	echo "ERROR - kpasswd for user clienttestuser1 failed";
         exit;
 fi
 
@@ -260,36 +292,6 @@ fi
 
 /usr/sbin/ntpdate serverip
 
-# testing user invalidation
-/usr/sbin/ipa-deluser clienttestuser1
-ret=$?
-if [ $ret != 0 ]; then
-        echo "ERROR - invalidation of clienttestuser1 failed";
-fi
-
-/usr/sbin/ntpdate serverip
-
-#/usr/sbin/ipa-deluser -d clienttestuser1
-/usr/sbin/ipa-finduser clienttestuser1 > /tmp/finduser.txt
-grep -v No\ entries /tmp/finduser.txt | grep clienttestuser1
-ret=$?
-if [ $ret == 0 ]; then
-        echo "ERROR - remove of clienttestuser1 really seemed to have failed";
-fi
-
-# Admin things work, now lets try binding as a client user
-/usr/kerberos/bin/kdestroy
-echo 'set timeout -1
-set send_slow {1 .1}
-spawn /usr/kerberos/bin/kinit testuser
-match_max 100000
-expect "Password for testuser"
-sleep 1
-send -s -- "Secret123\r"
-expect eof ' > /tmp/kinit.exp
-
-/usr/sbin/ntpdate serverip
-
 /usr/bin/expect /tmp/kinit.exp
 ret=$?
 if [ $ret != 0 ]; then
@@ -310,12 +312,71 @@ if [ $ret != 0 ]; then
         echo "ERROR - testuser cannot find him/herself with ipa-finduser";
 fi
 
+echo "Generating list to be used for test 2563"
+echo 'mobile 3456782345
+postalcode 94044-1223
+displayname joe*test
+initials jt
+loginshell /bin/bash
+telephonenumber 1234567890
+facsimiletelephonenumber +34 7777777777
+street fake
+roomnumber 12
+carlicense b33222344456
+employeetype evil' > /tmp/varlist.txt
+
+/usr/sbin/ntpdate serverip
+
+echo "Running test 2563"
+cat /tmp/varlist.txt | while read line; do 
+	key=$(echo $line | awk '{print $1'}); 
+	val=$(echo $line | awk '{print $2'});
+	/usr/sbin/ipa-moduser --setattr $key="$val" clienttestuser1
+	ret=$?
+	if [ $ret != 0 ]; then
+	        echo "ERROR - modification of $key to $val on clientuser1 as clientuser1 did not work";
+		exit;
+	fi
+	# checking to see if it worked
+	/usr/sbin/ipa-finduser -a -n clienttestuser1 | grep $key | grep $val
+	if [ $ret != 0 ]; then
+	        echo "ERROR - modification of $key to $val on clientuser1 as clientuser1 got accepted by ipa-moduser, but did not take";
+		exit;
+	fi
+done
+
 /usr/kerberos/bin/kdestroy
 ret=$?
 if [ $ret != 0 ]; then
-        echo "ERROR - kdestroy from ipa-finduser did not work";
+        echo "ERROR - kdestroy from clienttestuser1 did not work";
+	exit;
 fi
 
+echo "rebinding as admin to delete clientuser1"
+/usr/bin/expect /tmp/kinit.exp
+
+# testing user invalidation
+/usr/sbin/ipa-deluser clienttestuser1
+ret=$?
+if [ $ret != 0 ]; then
+        echo "ERROR - invalidation of clienttestuser1 failed";
+fi
+
+/usr/sbin/ntpdate serverip
+
+/usr/sbin/ipa-finduser clienttestuser1 > /tmp/finduser.txt
+grep -v No\ entries /tmp/finduser.txt | grep clienttestuser1
+ret=$?
+if [ $ret == 0 ]; then
+        echo "ERROR - remove of clienttestuser1 really seemed to have failed";
+fi
+
+/usr/kerberos/bin/kdestroy
+ret=$?
+if [ $ret != 0 ]; then
+        echo "ERROR - kdestroy from admin did not work";
+	exit;
+fi
 
 # Removing client to IPA Server
 #/usr/sbin/ipa-client-install --uninstall --unattended=UNATTENDED
