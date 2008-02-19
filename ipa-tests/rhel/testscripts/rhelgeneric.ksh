@@ -180,7 +180,7 @@ fi
 
 # Testing ipa-adduser
 echo 'set timeout -1
-spawn /usr/sbin/ipa-adduser clienttestuser1
+spawn /usr/sbin/ipa-adduser clientuser1
 match_max 100000
 expect "First name: "
 send -- "new\r"
@@ -203,11 +203,11 @@ if [ $ret != 0 ]; then
         exit;
 fi
 
-# Changing the password for clienttestuser1 so that the accouny is usable
+# Changing the password for clientuser1 so that the accouny is usable
 echo 'set timeout -1
-spawn /usr/kerberos/bin/kpasswd clienttestuser1
+spawn /usr/kerberos/bin/kpasswd clientuser1
 match_max 100000
-expect -exact "Password for clienttestuser1@DSQA.SJC2.REDHAT.COM: "
+expect -exact "Password for clientuser1@DSQA.SJC2.REDHAT.COM: "
 send -- "newpW1\r"
 expect -exact "\r
 Enter new password: "
@@ -220,7 +220,7 @@ expect eof' > /tmp/testusernewpass.exp
 /usr/bin/expect /tmp/testusernewpass.exp
 ret=$?
 if [ $ret != 0 ]; then
-	echo "ERROR - kpasswd for user clienttestuser1 failed";
+	echo "ERROR - kpasswd for user clientuser1 failed";
         exit;
 fi
 
@@ -254,40 +254,40 @@ fi
 
 /usr/sbin/ntpdate serverip
 
-# Test add clienttestuser1 to test-group
-/usr/sbin/ipa-modgroup -a clienttestuser1 test-group
+# Test add clientuser1 to test-group
+/usr/sbin/ipa-modgroup -a clientuser1 test-group
 ret=$?
 if [ $ret != 0 ]; then
-        echo "ERROR - add of clienttestuser1 to test-group failed";
+        echo "ERROR - add of clientuser1 to test-group failed";
 fi
 
 /usr/sbin/ntpdate serverip
 
 # Did the ipa-groupmod really work?
 /usr/sbin/ipa-findgroup test-group > /tmp/findgroup.txt
-/bin/grep clienttestuser1 /tmp/findgroup.txt
+/bin/grep clientuser1 /tmp/findgroup.txt
 ret=$?
 if [ $ret != 0 ]; then
-        echo "ERROR - add of clienttestuser1 to test-group really did fail";
+        echo "ERROR - add of clientuser1 to test-group really did fail";
 fi
 
 /usr/sbin/ntpdate serverip
 
-# Test delete clienttestuser1 fromo test-group
-/usr/sbin/ipa-modgroup -r clienttestuser1 test-group
+# Test delete clientuser1 fromo test-group
+/usr/sbin/ipa-modgroup -r clientuser1 test-group
 ret=$?
 if [ $ret != 0 ]; then
-        echo "ERROR - add of clienttestuser1 to test-group failed";
+        echo "ERROR - add of clientuser1 to test-group failed";
 fi
 
 /usr/sbin/ntpdate serverip
 
 # Did the removal ipa-groupmod really work?
 /usr/sbin/ipa-findgroup test-group > /tmp/findgroup.txt
-/bin/grep clienttestuser1 /tmp/findgroup.txt
+/bin/grep clientuser1 /tmp/findgroup.txt
 ret=$?
 if [ $ret == 0 ]; then
-        echo "ERROR - remove of clienttestuser1 from test-group really did fail";
+        echo "ERROR - remove of clientuser1 from test-group really did fail";
 fi
 
 /usr/sbin/ntpdate serverip
@@ -331,14 +331,14 @@ echo "Running test 2563"
 cat /tmp/varlist.txt | while read line; do 
 	key=$(echo $line | awk '{print $1'}); 
 	val=$(echo $line | awk '{print $2'});
-	/usr/sbin/ipa-moduser --setattr $key="$val" clienttestuser1
+	/usr/sbin/ipa-moduser --setattr $key="$val" clientuser1
 	ret=$?
 	if [ $ret != 0 ]; then
 	        echo "ERROR - modification of $key to $val on clientuser1 as clientuser1 did not work";
 		exit;
 	fi
 	# checking to see if it worked
-	/usr/sbin/ipa-finduser -a -n clienttestuser1 | grep $key | grep $val
+	/usr/sbin/ipa-finduser -a -n clientuser1 | grep $key | grep $val
 	if [ $ret != 0 ]; then
 	        echo "ERROR - modification of $key to $val on clientuser1 as clientuser1 got accepted by ipa-moduser, but did not take";
 		exit;
@@ -348,7 +348,7 @@ done
 /usr/kerberos/bin/kdestroy
 ret=$?
 if [ $ret != 0 ]; then
-        echo "ERROR - kdestroy from clienttestuser1 did not work";
+        echo "ERROR - kdestroy from clientuser1 did not work";
 	exit;
 fi
 
@@ -356,19 +356,19 @@ echo "rebinding as admin to delete clientuser1"
 /usr/bin/expect /tmp/kinit.exp
 
 # testing user invalidation
-/usr/sbin/ipa-deluser clienttestuser1
+/usr/sbin/ipa-deluser clientuser1
 ret=$?
 if [ $ret != 0 ]; then
-        echo "ERROR - invalidation of clienttestuser1 failed";
+        echo "ERROR - invalidation of clientuser1 failed";
 fi
 
 /usr/sbin/ntpdate serverip
 
-/usr/sbin/ipa-finduser clienttestuser1 > /tmp/finduser.txt
-grep -v No\ entries /tmp/finduser.txt | grep clienttestuser1
+/usr/sbin/ipa-finduser clientuser1 > /tmp/finduser.txt
+grep -v No\ entries /tmp/finduser.txt | grep clientuser1
 ret=$?
 if [ $ret == 0 ]; then
-        echo "ERROR - remove of clienttestuser1 really seemed to have failed";
+        echo "ERROR - remove of clientuser1 really seemed to have failed";
 fi
 
 /usr/kerberos/bin/kdestroy
