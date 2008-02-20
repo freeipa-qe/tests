@@ -3,12 +3,12 @@
 set -x
 # Fix date
 /etc/init.d/ntpd stop
-/usr/sbin/ntpdate homer.sfbay.redhat.com
+/usr/sbin/ntpdate kerberos.sjc.redhat.com
 ret=$?
 if [ $ret != 0 ]; then 
 	# ntp update didn't work the first time, lets try it again.
 	sleep 60
-	/usr/sbin/ntpdate homer.sfbay.redhat.com
+	/usr/sbin/ntpdate kerberos.sjc.redhat.com
 	ret=$?
 	if [ $ret != 0 ]; then 
 		sleep 10
@@ -83,7 +83,7 @@ if [ $ret != 0 ]; then
 fi
 
 /etc/init.d/ntpd stop
-/usr/sbin/ntpdate homer.sfbay.redhat.com
+/usr/sbin/ntpdate kerberos.sjc.redhat.com
 /etc/init.d/ntpd start
 
 # testing bind
