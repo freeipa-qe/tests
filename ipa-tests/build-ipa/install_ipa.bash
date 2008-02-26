@@ -32,18 +32,19 @@ if [ -f /var/run/yum.pid ]; then
 	ypid=`cat /var/run/yum.pid`
 	kill $ypid
 	sleep 5
-	kill -9 /var/run/yum.pid
+	kill -9 $ypid
 	if [ -f /var/run/yum.pid ]; then
 		rm -f /var/run/yum.pid
 	fi
 fi
 
 rpm -e --allmatches fedora-ds-base fedora-ds-base-devel
-yum -y install mercurial rpm-build openldap-devel krb5-devel nss-devel mozldap-devel openssl-devel fedora-ds-base-devel gcc python-devel createrepo autoconf automake libtool libcap-devel 
+yum -y install mercurial rpm-build openldap-devel krb5-devel nss-devel mozldap-devel openssl-devel fedora-ds-base-devel gcc python-devel createrepo autoconf automake libtool libcap-devel TurboGears selinux-policy-devel
 ret=$?
 if [ $ret != 0 ]; then 
+	ps -fax
 	sleep 60
-	yum -y install mercurial rpm-build openldap-devel krb5-devel nss-devel mozldap-devel openssl-devel fedora-ds-base-devel gcc python-devel createrepo autoconf automake libtool libcap-devel 
+	yum -y install mercurial rpm-build openldap-devel krb5-devel nss-devel mozldap-devel openssl-devel fedora-ds-base-devel gcc python-devel createrepo autoconf automake libtool libcap-devel TurboGears selinux-policy-devel
 	ret=$?
 	if [ $ret != 0 ]; then 
 		echo "The YUM stuff didn't work, but we have decided that we don't care now as the build stuff is installed in the VM"
