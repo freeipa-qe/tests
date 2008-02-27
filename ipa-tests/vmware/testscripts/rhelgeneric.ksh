@@ -130,13 +130,16 @@ fi
 
 # Joining client to IPA Server
 echo "Test case 2548"
-echo "ERROR Test 2548 fails. Disabled for now"
-/usr/sbin/ipa-client-install --domain=BAD.IPA.DOMAIN.REDHAT.COM --server=4.2.2.2 --unattended
+/usr/sbin/ipa-client-install --domain=BAD.IPA.DOMAIN.REDHAT.COM --server=4.2.2.2 --unattended &> /tmp/neg.txt
 ret=$?
 if [ $ret == 0 ]; then
         echo "ERROR - ipa-client-install worked when it was fed bad info";
-#        exit;
+	out=$(cat /tmp/neg.txt)
+	echo "output from neg testing was $out"
+        exit;
 fi
+#out=$(cat /tmp/neg.txt | sed s/ERROR/ERR\ OR/g )
+#echo "output from test 2548 was $out"
 
 # Joining client to IPA Server
 echo "Test case 2399"
