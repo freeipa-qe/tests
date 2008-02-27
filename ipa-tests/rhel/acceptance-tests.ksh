@@ -157,7 +157,7 @@ runhost()
 	sed s=fc7repo=$fc7repo=g < ./testscripts/$BASHFILE | sed s=VMNAME=$vmfqdn=g |  sed s=ntpserver=$ntpserver=g | sed s=oshere=$OS=g | sed s=serverip=$serverip=g> /tmp/$date.bash
 	chmod 755 /tmp/$date.bash
 	scp -o GSSAPIAuthentication=no /tmp/$date.bash root@$VMIP:/tmp/. | tee -a $logdir/log.txt
-	ssh root@$VMIP " rm -f $installog;set -x;/tmp/$date.bash &> $installog" | tee -a $logdir/log.txt
+	#ssh root@$VMIP " rm -f $installog;set -x;/tmp/$date.bash &> $installog" | tee -a $logdir/log.txt
 	rm -f $installog
 	if [ ! -d $resultloc/$date ]; then mkdir -p $resultloc/$date; fi
 	scp -o GSSAPIAuthentication=no root@$VMIP:$installog /tmp/. | tee -a $logdir/log.txt
@@ -306,10 +306,10 @@ fi
 #runhost
 workfile="./cfgs/ipaqa15-i386.cfg"
 runhost
-workfile="./cfgs/fc7-x86_64.cfg"
-runhost
-workfile="./cfgs/fc7.cfg"
-runhost
+#workfile="./cfgs/fc7-x86_64.cfg"
+#runhost
+#workfile="./cfgs/fc7.cfg"
+#runhost
 
 # Install IPA
 # Download repo
