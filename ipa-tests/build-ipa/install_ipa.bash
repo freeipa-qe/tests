@@ -39,6 +39,20 @@ if [ -f /var/run/yum.pid ]; then
 fi
 
 rpm -e --allmatches fedora-ds-base fedora-ds-base-devel
+# updating
+/etc/init.d/yum-updatesd stop
+yum -R 1 -y update
+ret=$?
+if [ $ret != 0 ]; then
+        echo "WARNING - The first try on updating Fedora didn't work, trying again"
+        sleep 60
+        yum -R 1 -y update
+        ret=$?
+        if [ $ret != 0 ]; then 
+                echo "ERROR - yum install of freeipa failed";
+                exit;
+        fi
+fi
 yum -y install mercurial rpm-build openldap-devel krb5-devel nss-devel mozldap-devel openssl-devel fedora-ds-base-devel gcc python-devel createrepo autoconf automake libtool libcap-devel TurboGears selinux-policy-devel
 ret=$?
 if [ $ret != 0 ]; then 
