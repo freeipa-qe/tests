@@ -39,7 +39,7 @@ email_result()
 	fi
 
 	# Compose email
-	echo "Subject: $code IPA nightly build" > /tmp/$date-email.txt
+	echo "Subject: RHEL daily mirror download $code" > /tmp/$date-email.txt
 	echo "To: $email" >> /tmp/$date-email.txt
 	echo "" >> /tmp/$date-email.txt
 	echo " Result was $code, please see:" >> /tmp/$date-email.txt
@@ -52,18 +52,17 @@ email_result()
 		. ./server.cfg
 		echo "The YUM REPO should be at:" >> /tmp/$date-email.txt
 		echo "$resulturl/$OS/$PRO/$date/ipa.repo" >> /tmp/$date-email.txt
+		echo "      getlog - $resulturl/$OS/$PRO/$date/getlog.txt" >> /tmp/$date-email.txt
 		find ./cfgs/ -type f -maxdepth 1 | while read cfg; do
 			. $cfg
 			echo "for $OS $PRO the YUM REPO will be at:" >> /tmp/$date-email.txt
 			echo "$resulturl/$OS/$PRO/$date/ipa.repo" >> /tmp/$date-email.txt
-			echo "          Buildlog should be at:" >> /tmp/$date-email.txt
-                        echo "          $resulturl/$OS/$PRO/$date/ipa_install_log.txt" >> /tmp/$date-email.txt
+                        echo "      getlog - $resulturl/$OS/$PRO/$date/ipa_install_log.txt" >> /tmp/$date-email.txt
 		done
 	else
 		echo "No new yum repo for you, the build seemed to fail" >> /tmp/$date-email.txt
 	fi
 	echo "" >> /tmp/$date-email.txt
-	echo "The last good YUM repo file of freeIPA is avalible at $resulturl/ipa.repo" >> /tmp/$date-email.txt
 	/usr/sbin/sendmail $email < /tmp/$date-email.txt
 }
 
@@ -218,8 +217,8 @@ echo "baseurl=$resulturl/$date/dist" >> $resultloc/$date/ipa.repo
 echo '#mirrorlist=http://mirrors.fedoraproject.org/mirrorlist?repo=fedora-$releasever&arch=$basearch' >> $resulloc/$date/ipa.repo
 echo "enabled=1" >> $resultloc/$date/ipa.repo
 echo "gpgcheck=0" >> $resultloc/$date/ipa.repo
-cat $resultloc/$date/ipa.repo > $resultloc/ipa.repo
-cat $resultloc/$date/ipa.repo > $oldresult/ipa.repo
+#cat $resultloc/$date/ipa.repo > $resultloc/ipa.repo
+#cat $resultloc/$date/ipa.repo > $oldresult/ipa.repo
 
 resultloc=$oldresult
 resulturl=$oldurl
@@ -292,7 +291,7 @@ find ./cfgs/ -type f -maxdepth 1 | while read cfg; do
 	originalresultloc=$resultloc
 	resultloc="$resultloc/$OS/$PRO"
 	mkdir -p $resultloc/$date | tee -a $logdir/log.txt
-	cp $installog $resultloc/$date/. | tee -a $logdir/log.txt
+	cp $installog $resultloc/$OS/$PRO/$date/getlog.txt | tee -a $logdir/log.txt
 
 	grep ERROR $installog
 	ret=$?
@@ -325,7 +324,7 @@ find ./cfgs/ -type f -maxdepth 1 | while read cfg; do
 	echo "#mirrorlist=http://mirrors.fedoraproject.org/mirrorlist?repo=fedora-$releasever&arch=$basearch" >> $resulloc/$date/ipa.repo
 	echo "enabled=1" >> $resultloc/$date/ipa.repo
 	echo "gpgcheck=0" >> $resultloc/$date/ipa.repo
-	cat $resultloc/$date/ipa.repo > $resultloc/ipa.repo
+#	cat $resultloc/$date/ipa.repo > $resultloc/ipa.repo
 	resultloc=$originalresultloc
 
 	resulturl=$oldurl

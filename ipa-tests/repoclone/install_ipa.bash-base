@@ -38,7 +38,8 @@ if [ -f /var/run/yum.pid ]; then
 	fi
 fi
 
-rpm -e --allmatches fedora-ds-base fedora-ds-base-devel
+
+rpm -e --allmatches fedora-ds-base fedora-ds-base-devel 
 # updating
 /etc/init.d/yum-updatesd stop
 yum -R 1 -y update
@@ -53,12 +54,12 @@ if [ $ret != 0 ]; then
                 exit;
         fi
 fi
-yum -y install mercurial rpm-build openldap-devel krb5-devel nss-devel mozldap-devel openssl-devel fedora-ds-base-devel gcc python-devel createrepo autoconf automake libtool libcap-devel TurboGears selinux-policy-devel
+yum -y install yum-utils createrepo
 ret=$?
 if [ $ret != 0 ]; then 
 	ps -fax
 	sleep 60
-	yum -y install mercurial rpm-build openldap-devel krb5-devel nss-devel mozldap-devel openssl-devel fedora-ds-base-devel gcc python-devel createrepo autoconf automake libtool libcap-devel TurboGears selinux-policy-devel
+	yum -y install yum-utils createrepo
 	ret=$?
 	if [ $ret != 0 ]; then 
 		echo "The YUM stuff didn't work, but we have decided that we don't care now as the build stuff is installed in the VM"
@@ -67,41 +68,33 @@ if [ $ret != 0 ]; then
 	fi
 fi
 
-# get the IPA repo
-cd
-mkdir ipa
-cd ipa
-hg clone ipamercurial
+# Fixing yumdownloader
+sed -i s/'po1.epoch, po1.ver, po1.rel'/'po1.epoch, po1.version, po1.release'/g /usr/lib/python2.4/site-packages/yum/packages.py
 ret=$?
 if [ $ret != 0 ]; then 
-	echo "ERROR - ipa-server checkout did not work";
+	echo "ERROR - fixing of packages.py failed";
+	exit;
+fi
+sed -i s/'po2.epoch, po2.ver, po2.rel'/'po2.epoch, po2.version, po2.release'/g /usr/lib/python2.4/site-packages/yum/packages.py
+ret=$?
+if [ $ret != 0 ]; then 
+	echo "ERROR - fixing of packages.py failed";
 	exit;
 fi
 
-cd freeipa
-make dist
-ret=$?
+# Getting the daily files
+mkdir -p /root/dist
 if [ $ret != 0 ]; then 
-	echo "ERROR - make dist of IPA did not work";
+	echo "ERROR - create of repo dir failed";
+	exit;
+fi
+cd /root/dist;/usr/bin/yumdownloader --resolve ipa-server ipa-client ipa-admintools selinux-policy-targeted selinux-policy krb5-libs krb5-workstation
+if [ $ret != 0 ]; then 
+	echo "ERROR - yumdownload of repo dir failed";
 	exit;
 fi
 
-# Make a yum repo of the data
-cd dist
-if [ -d ./rpms ]; then
-	mv ./rpms/* .
-fi
-if [ -d ./srpms ]; then
-	mv ./srpms/* .
-fi
-wget http://freeipa.com/downloads/devel/rpms/F7/i386/PyKerberos-0.1735-1.fc7.i386.rpm
-wget http://freeipa.com/downloads/devel/rpms/F7/i386/PyKerberos-0.1735-2.fc7.i386.rpm
-wget http://freeipa.com/downloads/devel/rpms/F7/i386/mod_auth_kerb-5.3-4.ipa.i386.rpm
-wget http://freeipa.com/downloads/devel/rpms/F7/i386/mod_nss-1.0.7-2.fc7.i386.rpm
-wget http://freeipa.com/downloads/devel/rpms/F7/i386/pyasn1-0.0.7a-2.fc7.noarch.rpm
-wget http://freeipa.com/downloads/devel/rpms/F7/i386/pyasn1-0.0.7a-1.noarch.rpm
-cd ..
-createrepo ./dist
+cd /root;createrepo ./dist
 ret=$?
 if [ $ret != 0 ]; then 
 	echo "ERROR - create of yum repo failed";
