@@ -57,7 +57,7 @@ email_result()
 			. $cfg
 			echo "for $OS $PRO the YUM REPO will be at:" >> /tmp/$date-email.txt
 			echo "$resulturl/$OS/$PRO/$date/ipa.repo" >> /tmp/$date-email.txt
-                        echo "      getlog - $resulturl/$OS/$PRO/$date/ipa_install_log.txt" >> /tmp/$date-email.txt
+                        echo "      getlog - $resulturl/$OS/$PRO/$date/getlog.txt" >> /tmp/$date-email.txt
 		done
 	else
 		echo "No new yum repo for you, the build seemed to fail" >> /tmp/$date-email.txt
@@ -187,11 +187,10 @@ scp ./install_ipa.bash root@$VMNAME:/tmp/.
 ssh root@$VMNAME " rm -f $installog;set -x;/tmp/install_ipa.bash &> $installog" | tee -a $logdir/log.txt
 rm -f $installog
 scp root@$VMNAME:$installog /tmp/. | tee -a $logdir/log.txt
-cp $installog $resultloc/$date/. | tee -a $logdir/log.txt
+cp $installog $resultloc/$date/getlog.txt | tee -a $logdir/log.txt
 grep ERROR $installog
 ret=$?
 if [ $ret == 0 ]; then
-	echo "ERROR - A error was detected installing IPA server onto $VMNAME, see $installog for details";
 	echo "ERROR - A error was detected installing IPA server onto $VMNAME, see $installog for details" >>  $logdir/log.txt;
 	email_result BAD fc7-32;
 	exit;
@@ -224,6 +223,8 @@ resultloc=$oldresult
 resulturl=$oldurl
 cd $pwd
 # Okay, now doing FC7 64-bit
+
+exitnow=0;
 
 # Setup IPA server VM
 find ./cfgs/ -type f -maxdepth 1 | while read cfg; do 
@@ -290,7 +291,7 @@ find ./cfgs/ -type f -maxdepth 1 | while read cfg; do
 	# Making a new dir for logs
 	originalresultloc=$resultloc
 	resultloc="$resultloc/$OS/$PRO"
-	mkdir -p $resultloc/$date | tee -a $logdir/log.txt
+	mkdir -p $resultloc/$date/$OS/$PRO/$date | tee -a $logdir/log.txt
 	cp $installog $resultloc/$OS/$PRO/$date/getlog.txt | tee -a $logdir/log.txt
 
 	grep ERROR $installog
@@ -298,6 +299,7 @@ find ./cfgs/ -type f -maxdepth 1 | while read cfg; do
 	if [ $ret == 0 ]; then
 		echo "ERROR - A error was detected installing IPA server onto $VMNAME, see $installog for details";
 		email_result BAD fc7-64;
+		exitnow=1;
 		exit;
 	fi
 
@@ -307,6 +309,7 @@ find ./cfgs/ -type f -maxdepth 1 | while read cfg; do
 	if [ $ret != 0 ]; then
 		echo "ERROR - Unable to download the dist repo from $VMNAME";
 		email_result BAD fc7-64;
+		exitnow=1;
 		exit;
 	fi
 
@@ -338,6 +341,9 @@ find ./cfgs/ -type f -maxdepth 1 | while read cfg; do
 
 done
 
+if [ $exitnow != 0 ]; then
+	exit;
+fi
 # stopping the server
 . ./server.cfg
 cfg="server.cfg"
