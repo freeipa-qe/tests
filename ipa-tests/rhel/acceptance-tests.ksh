@@ -124,7 +124,7 @@ runhost()
 	date | tee -a $logdir/log.txt
 	start_host
 	while true; do
-		sleep 6
+		sleep 16
 		echo "trying to ping to $VMIP" | tee -a $logdir/log.txt
 		date | tee -a $logdir/log.txt
 		ping -c 1 $VMIP
@@ -133,10 +133,10 @@ runhost()
 			echo "$VMNAME seems to be responding to pings now" | tee -a $logdir/log.txt
 			break;
 		fi
-		sleep 60
+		sleep 16
 	done 
 	echo "sleeping 1 min to allow ssh to come up" | tee -a $logdir/log.txt
-	sleep 60
+	sleep 30
 	while true; do
 		echo "pinging $VMIP for good measure" | tee -a $logdir/log.txt
 		date | tee -a $logdir/log.txt
@@ -157,7 +157,7 @@ runhost()
 	sed s=fc7repo=$fc7repo=g < ./testscripts/$BASHFILE | sed s=VMNAME=$vmfqdn=g |  sed s=ntpserver=$ntpserver=g | sed s=oshere=$OS=g | sed s=serverip=$serverip=g> /tmp/$date.bash
 	chmod 755 /tmp/$date.bash
 	scp -o GSSAPIAuthentication=no /tmp/$date.bash root@$VMIP:/tmp/. | tee -a $logdir/log.txt
-	#ssh root@$VMIP " rm -f $installog;set -x;/tmp/$date.bash &> $installog" | tee -a $logdir/log.txt
+	ssh root@$VMIP " rm -f $installog;set -x;/tmp/$date.bash &> $installog" | tee -a $logdir/log.txt
 	rm -f $installog
 	if [ ! -d $resultloc/$date ]; then mkdir -p $resultloc/$date; fi
 	scp -o GSSAPIAuthentication=no root@$VMIP:$installog /tmp/. | tee -a $logdir/log.txt
@@ -235,7 +235,7 @@ date | tee -a $logdir/log.txt
 start_host
 #./start-vm.ksh ./server.cfg | tee -a $logdir/log.txt
 while true; do
-	sleep 60
+	sleep 6
 	echo "trying to ping to $VMIP" | tee -a $logdir/log.txt
 	date | tee -a $logdir/log.txt
 	ping -c 1 $VMIP
@@ -247,7 +247,7 @@ while true; do
 	sleep 30
 done 
 echo "sleeping 1 min to allow ssh to come up" | tee -a $logdir/log.txt
-sleep 60
+sleep 30
 # Pinging again to wait for the VMWARE clock sync bug 
 while true; do
 	echo "trying to ping to $VMIP" | tee -a $logdir/log.txt
@@ -306,10 +306,10 @@ fi
 #runhost
 workfile="./cfgs/ipaqa15-i386.cfg"
 runhost
-#workfile="./cfgs/fc7-x86_64.cfg"
-#runhost
-#workfile="./cfgs/fc7.cfg"
-#runhost
+workfile="./cfgs/fc7-x86_64.cfg"
+runhost
+workfile="./cfgs/fc7.cfg"
+runhost
 
 # Install IPA
 # Download repo
