@@ -36,6 +36,7 @@ if [ -f /var/run/yum.pid ]; then
 fi
 cd /etc/yum.repos.d;wget http://apoc.dsdev.sjc.redhat.com/tet/results//FC7/i386/ipa.repo
 killall yum
+yum -R 1 -y install yum-fastestmirror
 yum -R 1 -y update policycoreutils selinux-policy
 ret=$?
 if [ $ret != 0 ]; then 
@@ -70,8 +71,9 @@ fi
 rpm -q mod_auth_kerb | grep ipa
 ret=$?
 if [ $ret != 0 ]; then 
-	echo "ERROR - mod_auth doesn't appear to be the right version";
-	exit;
+	echo "mod auth appears to be wrong, but we will ignore that for now";
+#	echo "ERROR - mod_auth doesn't appear to be the right version";
+#	exit;
 fi
 # Setup ipa server
 # ipaqavm.dsqa.sjc2.redhat.com will be replaced wth the fqdn of this machine as reported by dns

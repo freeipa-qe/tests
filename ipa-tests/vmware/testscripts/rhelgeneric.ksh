@@ -32,6 +32,7 @@ OS=oshere
 # Getting IPA repo file
 if [ "$OS" == "FC6" ]||[ "$OS" == "FC7" ]||[ "$OS" == "FC8" ]; then
 	cd /etc/yum.repos.d;wget fc7repo;
+	yum -R 1 -y install yum-fastestmirror;
 fi
 
 # updating
