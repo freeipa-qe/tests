@@ -98,8 +98,15 @@ echo 'nameserver 127.0.0.1' > /etc/resolv.conf
 #	echo "ERROR - bind not running";
 #	exit;
 #fi
+
+# checking to make sure the named.conf file got created
+if [ ! -f /etc/named.conf ]; then
+	echo "ERROR - named.conf did not get created by the ipa installer!"
+	exit;
+fi
+
 # adding forwarders to bind
-sed -i s/dump-file/'forwarders { 172.16.27.23; 172.16.52.28; }; dump-file'/g  /etc/named.conf
+sed -i s/dump-file/'forwarders { 10.14.63.2; }; dump-file'/g  /etc/named.conf
 /etc/init.d/named restart
 # Is it running?
 ps -ef | grep named | grep -v grep | grep named

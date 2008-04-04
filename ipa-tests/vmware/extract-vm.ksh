@@ -49,5 +49,10 @@ if [ $TARONNFS -ne 0 ]; then
 fi
 
 # Extracting tarball
-	echo "Extracting $TARFILE to $TARROOT on host $VMHOST"
+echo "Extracting $TARFILE to $TARROOT on host $VMHOST"
+if [ $VIRSH = 1 ]; then
+        echo "stoping virsh of $VMXFILE"
+	ssh root@$VMHOST "cd $TARROOT;cp -af $TARFILE ."
+else
 	ssh root@$VMHOST "cd $TARROOT;tar xvfz $TARFILE"
+fi
