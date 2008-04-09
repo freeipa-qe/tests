@@ -30,12 +30,22 @@ mkdir -p $resultloc/$date
 
 start_host()
 {
-	ssh root@$VMHOST "/usr/bin/vmrun start $VMXFILE"
+	if [ $VIRSH = 1 ]; then
+	        echo "starting virsh mode"
+        	ssh root@$VMHOST "/usr/bin/virsh -c qemu:///system start $VMXFILE"
+	else
+		ssh root@$VMHOST "/usr/bin/vmrun start $VMXFILE"
+	fi
 }
 
 stop_host()
 {
-	ssh root@$VMHOST "/usr/bin/vmrun stop $VMXFILE"
+	if [ $VIRSH = 1 ]; then
+	        echo "starting virsh mode"
+        	ssh root@$VMHOST "/usr/bin/virsh -c qemu:///system destroy $VMXFILE"
+	else
+		ssh root@$VMHOST "/usr/bin/vmrun stop $VMXFILE"
+	fi
 }
 
 extract_host()
@@ -49,7 +59,13 @@ extract_host()
 
 	# Extracting tarball
        	echo "Extracting $TARFILE to $TARROOT on host $VMHOST"
-        ssh root@$VMHOST "cd $TARROOT;tar xvfz $TARFILE"
+	if [ $VIRSH = 1 ]; then
+	        echo "copying $VMXFILE to $TARROOT on $VMHOST"
+        	ssh root@$VMHOST "cd $TARROOT;cp -af $TARFILE ."
+	else
+	        echo "extracting $VMXFILE to $TARROOT on $VMHOST"
+	        ssh root@$VMHOST "cd $TARROOT;tar xvfz $TARFILE"
+	fi
 }
 
 email_result()
