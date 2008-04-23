@@ -40,5 +40,5 @@ vmip=$VMIP"
 
 # Stopping VM
 echo "STOPPING $VMXFILE on $VMHOST"
-ssh root@$VMHOST "if [ \$(/usr/bin/vmrun list | grep $VMXFILE) != \"\" ]; then /usr/bin/vmrun stop $VMXFILE; else echo VM not running; fi"
+ssh root@$VMHOST "if [ \"\$(/usr/bin/vmrun list | grep $VMXFILE)\" != \"\" ]; then /usr/bin/vmrun stop $VMXFILE; else echo VM not running; fi"
 

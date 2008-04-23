@@ -38,6 +38,10 @@ if [ -f /var/run/yum.pid ]; then
 	fi
 fi
 
+if [ -f /etc/yum.repos.d/ipa.repo ]; then
+	rm -f /etc/yum.repos.d/ipa*;
+fi
+
 rpm -e --allmatches fedora-ds-base fedora-ds-base-devel
 # updating
 /etc/init.d/yum-updatesd stop
@@ -69,6 +73,7 @@ fi
 
 # get the IPA repo
 cd
+rm -Rf ipa
 mkdir ipa
 cd ipa
 git clone ipamercurial
@@ -79,7 +84,7 @@ if [ $ret != 0 ]; then
 fi
 
 cd freeipa
-make dist
+make local-dist
 ret=$?
 if [ $ret != 0 ]; then 
 	echo "ERROR - make dist of IPA did not work";

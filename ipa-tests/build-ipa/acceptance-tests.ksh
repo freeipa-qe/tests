@@ -12,6 +12,9 @@ pwd=$(pwd)
 
 . ./env.cfg
 
+# This var is set to be detected by the email script so that it does not send out multiple emails
+export exitnow=0
+
 email_result()
 {
 #	This sub will email the results of the test to $email
@@ -20,6 +23,10 @@ email_result()
 	code=$1
 	section=$2
 		
+	env
+	if [ $exitnow != 0 ]; then
+		exit;
+	fi
 	if [ ! -d $logdir/$date ]; then
 		mkdir -p $logdir/$date;
 	fi
@@ -61,10 +68,15 @@ email_result()
 		done
 	else
 		echo "No new yum repo for you, the build seemed to fail" >> /tmp/$date-email.txt
+		echo ""
+		echo "waiting"
+		echo ""
+		sleep 60
 	fi
 	echo "" >> /tmp/$date-email.txt
 	echo "The last good YUM repo file of freeIPA is avalible at $resulturl/ipa.repo" >> /tmp/$date-email.txt
 	/usr/sbin/sendmail $email < /tmp/$date-email.txt
+	exit
 }
 
 press_any_key()
@@ -185,7 +197,7 @@ vmfqdn=`host $VMNAME | awk {'print $1'}`
 sed s=ipamercurial=$ipamercurial=g < ././install_ipa.bash-base | sed s=VMNAME=$vmfqdn=g | sed s=ntpserver=$ntpserver=g > ./install_ipa.bash
 chmod 755 ./install_ipa.bash
 scp ./install_ipa.bash root@$VMNAME:/tmp/.
-ssh root@$VMNAME " rm -f $installog;set -x;/tmp/install_ipa.bash &> $installog" | tee -a $logdir/log.txt
+#ssh root@$VMNAME " rm -f $installog;set -x;/tmp/install_ipa.bash &> $installog" | tee -a $logdir/log.txt
 rm -f $installog
 scp root@$VMNAME:$installog /tmp/. | tee -a $logdir/log.txt
 cp $installog $resultloc/$date/. | tee -a $logdir/log.txt
@@ -194,16 +206,17 @@ ret=$?
 if [ $ret == 0 ]; then
 	echo "ERROR - A error was detected installing IPA server onto $VMNAME, see $installog for details";
 	echo "ERROR - A error was detected installing IPA server onto $VMNAME, see $installog for details" >>  $logdir/log.txt;
+	export exitnow=1;
 	email_result BAD fc7-32;
 	exit;
 fi
-
 # Download repo
 scp root@$VMNAME:/tmp/dist.tgz /tmp/. | tee -a $logdir/log.txt
 ret=$?
 if [ $ret != 0 ]; then
 	echo "ERROR - Unable to download the dist repo from $VMNAME";
 	echo "ERROR - Unable to download the dist repo from $VMNAME" >>  $logdir/log.txt;
+	export exitnow=1;
 	email_result BAD fc7-32;
 	exit;
 fi
@@ -285,7 +298,7 @@ find ./cfgs/ -type f -maxdepth 1 | while read cfg; do
 	sed s=ipamercurial=$ipamercurial=g < ././install_ipa.bash-base | sed s=VMNAME=$vmfqdn=g | sed s=ntpserver=$ntpserver=g > ./install_ipa.bash
 	chmod 755 ./install_ipa.bash
 	scp ./install_ipa.bash root@$VMNAME:/tmp/.
-	ssh root@$VMNAME " rm -f $installog;set -x;/tmp/install_ipa.bash &> $installog" | tee -a $logdir/log.txt
+	#ssh root@$VMNAME " rm -f $installog;set -x;/tmp/install_ipa.bash &> $installog" | tee -a $logdir/log.txt
 	rm -f $installog
 	scp root@$VMNAME:$installog /tmp/. | tee -a $logdir/log.txt
 	# Making a new dir for logs
@@ -298,6 +311,7 @@ find ./cfgs/ -type f -maxdepth 1 | while read cfg; do
 	ret=$?
 	if [ $ret == 0 ]; then
 		echo "ERROR - A error was detected installing IPA server onto $VMNAME, see $installog for details";
+		export exitnow=1;
 		email_result BAD fc7-64;
 		exit;
 	fi
@@ -307,6 +321,7 @@ find ./cfgs/ -type f -maxdepth 1 | while read cfg; do
 	ret=$?
 	if [ $ret != 0 ]; then
 		echo "ERROR - Unable to download the dist repo from $VMNAME";
+		export exitnow=1;
 		email_result BAD fc7-64;
 		exit;
 	fi
@@ -349,4 +364,6 @@ date | tee -a $logdir/log.txt
 ./stop-vm.ksh ./$cfg | tee -a $logdir/log.txt
 echo "" | tee -a $logdir/log.txt
 
-email_result GOOD;
+if [ $exitnow == 0 ]; then
+	email_result GOOD;
+fi

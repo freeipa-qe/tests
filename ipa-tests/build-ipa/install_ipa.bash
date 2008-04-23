@@ -38,6 +38,10 @@ if [ -f /var/run/yum.pid ]; then
 	fi
 fi
 
+if [ -f /etc/yum.repos.d/ipa.repo ]; then
+	rm -f /etc/yum.repos.d/ipa*;
+fi
+
 rpm -e --allmatches fedora-ds-base fedora-ds-base-devel
 # updating
 /etc/init.d/yum-updatesd stop
@@ -53,12 +57,12 @@ if [ $ret != 0 ]; then
                 exit;
         fi
 fi
-yum -y install mercurial rpm-build openldap-devel krb5-devel nss-devel mozldap-devel openssl-devel fedora-ds-base-devel gcc python-devel createrepo autoconf automake libtool libcap-devel TurboGears selinux-policy-devel
+yum -y install git rpm-build openldap-devel krb5-devel nss-devel mozldap-devel openssl-devel fedora-ds-base-devel gcc python-devel createrepo autoconf automake libtool libcap-devel TurboGears selinux-policy-devel
 ret=$?
 if [ $ret != 0 ]; then 
 	ps -fax
 	sleep 60
-	yum -y install mercurial rpm-build openldap-devel krb5-devel nss-devel mozldap-devel openssl-devel fedora-ds-base-devel gcc python-devel createrepo autoconf automake libtool libcap-devel TurboGears selinux-policy-devel
+	yum -y install git rpm-build openldap-devel krb5-devel nss-devel mozldap-devel openssl-devel fedora-ds-base-devel gcc python-devel createrepo autoconf automake libtool libcap-devel TurboGears selinux-policy-devel
 	ret=$?
 	if [ $ret != 0 ]; then 
 		echo "The YUM stuff didn't work, but we have decided that we don't care now as the build stuff is installed in the VM"
@@ -69,9 +73,10 @@ fi
 
 # get the IPA repo
 cd
+rm -Rf ipa
 mkdir ipa
 cd ipa
-hg clone http://hg.fedorahosted.org/hg/freeipa
+git clone git://git.fedorahosted.org/git/freeipa.git
 ret=$?
 if [ $ret != 0 ]; then 
 	echo "ERROR - ipa-server checkout did not work";
@@ -79,7 +84,7 @@ if [ $ret != 0 ]; then
 fi
 
 cd freeipa
-make dist
+make local-dist
 ret=$?
 if [ $ret != 0 ]; then 
 	echo "ERROR - make dist of IPA did not work";
