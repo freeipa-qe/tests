@@ -11,9 +11,51 @@ set -x
 pwd=$(pwd)
 
 . ./env.cfg
+# Fixing the log file to work even when we change out of .
+export logdir="$pwd/$logdir"
 
 # This var is set to be detected by the email script so that it does not send out multiple emails
 export exitnow=0
+
+start_host()
+{
+        if [ $VIRSH = 1 ]; then
+                echo "starting virsh mode"
+                ssh root@$VMHOST "/usr/bin/virsh -c qemu:///system start $VMXFILE"
+        else
+                ssh root@$VMHOST "/usr/bin/vmrun start $VMXFILE"
+        fi
+}
+
+stop_host()
+{
+        if [ $VIRSH = 1 ]; then
+                echo "starting virsh mode"
+                ssh root@$VMHOST "/usr/bin/virsh -c qemu:///system destroy $VMXFILE"
+        else
+                ssh root@$VMHOST "/usr/bin/vmrun stop $VMXFILE"
+        fi
+}
+
+extract_host()
+{
+        # Mounting nfs share
+        if [ $TARONNFS -ne 0 ]; then
+                echo "Mounting $TARBALLMOUNT on host $VMHOST"
+                mntlocation=$(echo $TARBALLMOUNT | awk '{print $2}')
+                ssh root@$VMHOST "mkdir -p $mntlocation;umount -l $mntlocation >> /dev/null;mount $TARBALLMOUNT"
+        fi
+
+        # Extracting tarball
+        echo "Extracting $TARFILE to $TARROOT on host $VMHOST"
+        if [ $VIRSH = 1 ]; then
+                echo "copying $VMXFILE to $TARROOT on $VMHOST"
+                ssh root@$VMHOST "cd $TARROOT;cp -af $TARFILE ."
+        else
+                echo "extracting $VMXFILE to $TARROOT on $VMHOST"
+                ssh root@$VMHOST "cd $TARROOT;tar xvfz $TARFILE"
+        fi
+}
 
 email_result()
 {
@@ -119,7 +161,6 @@ date=$date2
 emailfiletmp=$resultloc
 export date
 export emailfiletmp
-
 # Setup IPA server VM
 . ./server.cfg
 cfg="server.cfg"
@@ -127,17 +168,17 @@ echo "" | tee -a $logdir/log.txt
 echo "Stoping the VM specified in ./$cfg" | tee -a $logdir/log.txt
 echo "" | tee -a $logdir/log.txt
 date | tee -a $logdir/log.txt
-./stop-vm.ksh ./$cfg | tee -a $logdir/log.txt
+stop_host | tee -a $logdir/log.txt
 echo "" | tee -a $logdir/log.txt
 echo "Extracting the VM image from the server specified in ./$cfg" | tee -a $logdir/log.txt
 echo "" | tee -a $logdir/log.txt
 date | tee -a $logdir/log.txt
-./extract-vm.ksh ./$cfg | tee -a $logdir/log.txt
+extract_host | tee -a $logdir/log.txt
 echo "" | tee -a $logdir/log.txt
 echo "Starting the image that was just extracted" | tee -a $logdir/log.txt
 echo "" | tee -a $logdir/log.txt
 date | tee -a $logdir/log.txt
-./start-vm.ksh ./$cfg | tee -a $logdir/log.txt
+start_host | tee -a $logdir/log.txt
 echo "" | tee -a $logdir/log.txt
 echo "Pinging the server specified in $cfg until it is up" | tee -a $logdir/log.txt
 echo "" | tee -a $logdir/log.txt
@@ -152,6 +193,7 @@ while true; do
 		break;
 	fi
 done 
+env
 echo "sleeping 1 min to allow ssh to come up" | tee -a $logdir/log.txt
 sleep 60
 # Pinging again to wait for the VMWARE clock sync bug 
@@ -181,11 +223,15 @@ if [ $ret = 0 ]; then
 fi
 
 oldresult=$resultloc
-resultloc="$resultloc/$OS/$PRO"
-oldurl=$resulturl
-resulturl="$oldurl/$OS/$PRO"
+export resultloc="$resultloc/$OS/$PRO"
+export oldurl=$resulturl
+export resulturl="$oldurl/$OS/$PRO"
 # Making a new dir for logs
 mkdir -p $resultloc/$date | tee -a $logdir/log.txt
+# cleanup of old files if they exist
+if [ -f /tmp/dist.tgz ]; then
+	rm -f /tmp/dist.tgz;
+fi
 
 # Install IPA onto the server
 #  First, fix the install-ipa.bash file
@@ -197,12 +243,13 @@ vmfqdn=`host $VMNAME | awk {'print $1'}`
 sed s=ipamercurial=$ipamercurial=g < ././install_ipa.bash-base | sed s=VMNAME=$vmfqdn=g | sed s=ntpserver=$ntpserver=g > ./install_ipa.bash
 chmod 755 ./install_ipa.bash
 scp ./install_ipa.bash root@$VMNAME:/tmp/.
-#ssh root@$VMNAME " rm -f $installog;set -x;/tmp/install_ipa.bash &> $installog" | tee -a $logdir/log.txt
+ssh root@$VMNAME " rm -f $installog;set -x;/tmp/install_ipa.bash &> $installog" | tee -a $logdir/log.txt
 rm -f $installog
 scp root@$VMNAME:$installog /tmp/. | tee -a $logdir/log.txt
 cp $installog $resultloc/$date/. | tee -a $logdir/log.txt
 grep ERROR $installog
 ret=$?
+rm -f $installog
 if [ $ret == 0 ]; then
 	echo "ERROR - A error was detected installing IPA server onto $VMNAME, see $installog for details";
 	echo "ERROR - A error was detected installing IPA server onto $VMNAME, see $installog for details" >>  $logdir/log.txt;
@@ -224,16 +271,16 @@ fi
 # Untar repo
 cd $resultloc/$date;pwd;tar xvfz /tmp/dist.tgz | tee -a $logdir/log.txt
 
+echo "creating repo file in $resultloc/$date/ipa.repo" | tee -a $logdir/log.txt
 # Create REPO file
 echo "[ipa]" > $resultloc/$date/ipa.repo
 echo "name=IPA" >> $resultloc/$date/ipa.repo
 echo "baseurl=$resulturl/$date/dist" >> $resultloc/$date/ipa.repo
-echo '#mirrorlist=http://mirrors.fedoraproject.org/mirrorlist?repo=fedora-$releasever&arch=$basearch' >> $resulloc/$date/ipa.repo
+echo '#mirrorlist=http://mirrors.fedoraproject.org/mirrorlist?repo=fedora-$releasever&arch=$basearch' >> $resultloc/$date/ipa.repo
 echo "enabled=1" >> $resultloc/$date/ipa.repo
 echo "gpgcheck=0" >> $resultloc/$date/ipa.repo
 cat $resultloc/$date/ipa.repo > $resultloc/ipa.repo
 cat $resultloc/$date/ipa.repo > $oldresult/ipa.repo
-
 resultloc=$oldresult
 resulturl=$oldurl
 cd $pwd
@@ -246,17 +293,17 @@ find ./cfgs/ -type f -maxdepth 1 | while read cfg; do
 	echo "Stoping the VM specified in ./$cfg" | tee -a $logdir/log.txt
 	echo "" | tee -a $logdir/log.txt
 	date | tee -a $logdir/log.txt
-	./stop-vm.ksh ./$cfg | tee -a $logdir/log.txt
+	stop_host | tee -a $logdir/log.txt
 	echo "" | tee -a $logdir/log.txt
 	echo "Extracting the VM image from the server specified in ./$cfg" | tee -a $logdir/log.txt
 	echo "" | tee -a $logdir/log.txt
 	date | tee -a $logdir/log.txt
-	./extract-vm.ksh ./$cfg | tee -a $logdir/log.txt
+	extract_host | tee -a $logdir/log.txt
 	echo "" | tee -a $logdir/log.txt
 	echo "Starting the image that was just extracted" | tee -a $logdir/log.txt
 	echo "" | tee -a $logdir/log.txt
 	date | tee -a $logdir/log.txt
-	./start-vm.ksh ./$cfg | tee -a $logdir/log.txt
+	start_host | tee -a $logdir/log.txt
 	echo "" | tee -a $logdir/log.txt
 	echo "Pinging the server specified in $cfg until it is up" | tee -a $logdir/log.txt
 	echo "" | tee -a $logdir/log.txt
@@ -298,7 +345,7 @@ find ./cfgs/ -type f -maxdepth 1 | while read cfg; do
 	sed s=ipamercurial=$ipamercurial=g < ././install_ipa.bash-base | sed s=VMNAME=$vmfqdn=g | sed s=ntpserver=$ntpserver=g > ./install_ipa.bash
 	chmod 755 ./install_ipa.bash
 	scp ./install_ipa.bash root@$VMNAME:/tmp/.
-	#ssh root@$VMNAME " rm -f $installog;set -x;/tmp/install_ipa.bash &> $installog" | tee -a $logdir/log.txt
+	ssh root@$VMNAME " rm -f $installog;set -x;/tmp/install_ipa.bash &> $installog" | tee -a $logdir/log.txt
 	rm -f $installog
 	scp root@$VMNAME:$installog /tmp/. | tee -a $logdir/log.txt
 	# Making a new dir for logs
@@ -309,11 +356,17 @@ find ./cfgs/ -type f -maxdepth 1 | while read cfg; do
 
 	grep ERROR $installog
 	ret=$?
+	rm -f $installog
 	if [ $ret == 0 ]; then
 		echo "ERROR - A error was detected installing IPA server onto $VMNAME, see $installog for details";
 		export exitnow=1;
 		email_result BAD fc7-64;
 		exit;
+	fi
+
+	# cleanup of old files if they exist
+	if [ -f /tmp/dist.tgz ]; then
+		rm -f /tmp/dist.tgz;
 	fi
 
 	# Download repo
@@ -350,7 +403,7 @@ find ./cfgs/ -type f -maxdepth 1 | while read cfg; do
 	echo "Stoping the VM specified in ./$cfg" | tee -a $logdir/log.txt
 	echo "" | tee -a $logdir/log.txt
 	date | tee -a $logdir/log.txt
-	cd $pwd;./stop-vm.ksh ./$cfg | tee -a $logdir/log.txt
+	stop_host | tee -a $logdir/log.txt
 
 done
 
@@ -361,7 +414,7 @@ echo "" | tee -a $logdir/log.txt
 echo "Stoping the VM specified in ./$cfg" | tee -a $logdir/log.txt
 echo "" | tee -a $logdir/log.txt
 date | tee -a $logdir/log.txt
-./stop-vm.ksh ./$cfg | tee -a $logdir/log.txt
+stop_host | tee -a $logdir/log.txt
 echo "" | tee -a $logdir/log.txt
 
 if [ $exitnow == 0 ]; then
