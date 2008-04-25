@@ -1,6 +1,5 @@
 
 . ./env.cfg
-set -x
 
 cfgfile=$1
 
@@ -40,5 +39,9 @@ vmip=$VMIP"
 
 # Stopping VM
 echo "STOPPING $VMXFILE on $VMHOST"
-ssh root@$VMHOST "if [ \$(/usr/bin/vmrun list | grep $VMXFILE) != \"\" ]; then /usr/bin/vmrun stop $VMXFILE; else echo VM not running; fi"
-
+if [ $VIRSH = 1 ]; then
+        echo "stoping virsh of $VMXFILE"
+        ssh root@$VMHOST "/usr/bin/virsh -c qemu:///system destroy $VMXFILE"
+else
+	ssh root@$VMHOST "if [ \$(/usr/bin/vmrun list | grep $VMXFILE) != \"\" ]; then /usr/bin/vmrun stop $VMXFILE; else echo VM not running; fi"
+fi

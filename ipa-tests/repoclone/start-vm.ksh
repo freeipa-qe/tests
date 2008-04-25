@@ -1,9 +1,9 @@
 
 . ./env.cfg
-set -x
 
 cfgfile=$1
 
+set -x
 printusage()
 {
 	echo "Start VM is used to start a VM on a remote host. That VM needs to be"
@@ -38,5 +38,10 @@ tarballmount=$TARBALLMOUNT
 vmip=$VMIP"
 
 echo "STARTING $VMXFILE on $VMHOST"
-ssh root@$VMHOST "/usr/bin/vmrun start $VMXFILE" 
+if [ $VIRSH = 1 ]; then
+	echo "starting virsh mode"
+	ssh root@$VMHOST "/usr/bin/virsh -c qemu:///system start $VMXFILE" 
+else
+	ssh root@$VMHOST "/usr/bin/vmrun start $VMXFILE" 
+fi
 

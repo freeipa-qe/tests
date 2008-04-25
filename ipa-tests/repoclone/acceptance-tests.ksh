@@ -53,7 +53,7 @@ email_result()
 		echo "The YUM REPO should be at:" >> /tmp/$date-email.txt
 		echo "$resulturl/$OS/$PRO/$date/ipa.repo" >> /tmp/$date-email.txt
 		echo "      getlog - $resulturl/$OS/$PRO/$date/getlog.txt" >> /tmp/$date-email.txt
-		find ./cfgs/ -type f -maxdepth 1 | while read cfg; do
+		find ./cfgs/ -maxdepth 1 -type f | while read cfg; do
 			. $cfg
 			echo "for $OS $PRO the YUM REPO will be at:" >> /tmp/$date-email.txt
 			echo "$resulturl/$OS/$PRO/$date/ipa.repo" >> /tmp/$date-email.txt
@@ -208,12 +208,13 @@ fi
 
 # Untar repo
 cd $resultloc/$date;pwd;tar xvfz /tmp/dist.tgz | tee -a $logdir/log.txt
+rm -f /tmp/dist.tgz
 
 # Create REPO file
 echo "[ipa]" > $resultloc/$date/ipa.repo
 echo "name=IPA" >> $resultloc/$date/ipa.repo
 echo "baseurl=$resulturl/$date/dist" >> $resultloc/$date/ipa.repo
-echo '#mirrorlist=http://mirrors.fedoraproject.org/mirrorlist?repo=fedora-$releasever&arch=$basearch' >> $resulloc/$date/ipa.repo
+echo '#mirrorlist=http://mirrors.fedoraproject.org/mirrorlist?repo=fedora-$releasever&arch=$basearch' >> $resultloc/$date/ipa.repo
 echo "enabled=1" >> $resultloc/$date/ipa.repo
 echo "gpgcheck=0" >> $resultloc/$date/ipa.repo
 #cat $resultloc/$date/ipa.repo > $resultloc/ipa.repo
@@ -227,8 +228,9 @@ cd $pwd
 exitnow=0;
 
 # Setup IPA server VM
-find ./cfgs/ -type f -maxdepth 1 | while read cfg; do 
+find ./cfgs/ -maxdepth 1 -type f | while read cfg; do 
 	. $cfg
+	# Cleaning up
 	echo "" | tee -a $logdir/log.txt
 	echo "Stoping the VM specified in ./$cfg" | tee -a $logdir/log.txt
 	echo "" | tee -a $logdir/log.txt
@@ -291,8 +293,8 @@ find ./cfgs/ -type f -maxdepth 1 | while read cfg; do
 	# Making a new dir for logs
 	originalresultloc=$resultloc
 	resultloc="$resultloc/$OS/$PRO"
-	mkdir -p $resultloc/$date/$OS/$PRO/$date | tee -a $logdir/log.txt
-	cp $installog $resultloc/$OS/$PRO/$date/getlog.txt | tee -a $logdir/log.txt
+	mkdir -p $resultloc/$date | tee -a $logdir/log.txt
+	cp $installog $resultloc/$date/getlog.txt | tee -a $logdir/log.txt
 
 	grep ERROR $installog
 	ret=$?
@@ -316,15 +318,17 @@ find ./cfgs/ -type f -maxdepth 1 | while read cfg; do
 	# Untar repo
 	cd $resultloc/$date
 	tar xvfz /tmp/dist.tgz | tee -a $logdir/log.txt
+	rm -f /tmp/dist.tgz
 
 	oldurl=$resulturl
 	resulturl="$oldurl/$OS/$PRO"
+	resultloc="$originalresultloc"
 
 	# Create REPO file
 	echo "[ipa]" > $resultloc/$date/ipa.repo
 	echo "name=IPA" >> $resultloc/$date/ipa.repo
 	echo "baseurl=$resulturl/$date/dist" >> $resultloc/$date/ipa.repo
-	echo "#mirrorlist=http://mirrors.fedoraproject.org/mirrorlist?repo=fedora-$releasever&arch=$basearch" >> $resulloc/$date/ipa.repo
+	echo "#mirrorlist=http://mirrors.fedoraproject.org/mirrorlist?repo=fedora-$releasever&arch=$basearch" >> $resultloc/$date/ipa.repo
 	echo "enabled=1" >> $resultloc/$date/ipa.repo
 	echo "gpgcheck=0" >> $resultloc/$date/ipa.repo
 #	cat $resultloc/$date/ipa.repo > $resultloc/ipa.repo
