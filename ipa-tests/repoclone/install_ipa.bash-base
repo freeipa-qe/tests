@@ -42,7 +42,7 @@ fi
 rpm -e --allmatches fedora-ds-base fedora-ds-base-devel 
 # updating
 /etc/init.d/yum-updatesd stop
-yum -R 1 -y update
+#yum -R 1 -y update
 ret=$?
 if [ $ret != 0 ]; then
         echo "WARNING - The first try on updating Fedora didn't work, trying again"
