@@ -41,7 +41,7 @@ vmip=$VMIP"
 echo "STOPPING $VMXFILE on $VMHOST"
 if [ $VIRSH = 1 ]; then
         echo "stoping virsh of $VMXFILE"
-        ssh root@$VMHOST "/usr/bin/virsh -c qemu:///system shutdown $VMXFILE"
+        ssh root@$VMHOST "/usr/bin/virsh -c qemu:///system destroy $VMXFILE"
 else
 	ssh root@$VMHOST "if [ \$(/usr/bin/vmrun list | grep $VMXFILE) != \"\" ]; then /usr/bin/vmrun stop $VMXFILE; else echo VM not running; fi"
 fi

@@ -37,7 +37,7 @@ fi
 cd /etc/yum.repos.d;wget http://apoc.dsdev.sjc.redhat.com/tet/results//FC7/i386/ipa.repo
 killall yum
 yum -R 1 -y install yum-fastestmirror
-yum -R 1 -y update policycoreutils selinux-policy
+#yum -R 1 -y update policycoreutils selinux-policy
 ret=$?
 if [ $ret != 0 ]; then 
 	echo "WARNING - update failed, trying again."

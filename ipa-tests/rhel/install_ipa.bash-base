@@ -45,7 +45,7 @@ fi
 rpm -q krb5-workstation
 ret=$?
 if [ $ret == 0 ]; then 
-	rpm -e krb5-workstation
+	rpm -e --allmatches krb5-workstation
 	ret=$?
 	if [ $ret != 0 ]; then 
 		echo "ERROR, rpm -e krb5-workstation failed, please see log."
@@ -155,7 +155,7 @@ if [ ! -f /etc/named.conf ]; then
 fi
 
 # adding forwarders to bind
-sed -i s/dump-file/'forwarders { 172.16.27.23; 172.16.52.28; }; dump-file'/g  /etc/named.conf
+sed -i s/dump-file/'forwarders { 10.14.63.2; }; dump-file'/g  /etc/named.conf
 /bin/replace.pl replace=5 string='};' file=/etc/named.conf | sed s/'type hint'/'#type hint'/g | sed s/'file "named.ca";'/'#file "named.ca";'/g | sed s/'zone "." IN {'/'#zone "." IN {'/g > /etc/named.conf.new
 mv /etc/named.conf /etc/named.conf.old
 mv /etc/named.conf.new /etc/named.conf
