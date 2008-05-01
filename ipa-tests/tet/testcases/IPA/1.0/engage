@@ -1,0 +1,1519 @@
+#!/bin/ksh -p
+#ident "%W% %E%"
+#
+#	File name: engage
+#
+# please use tab stop = 4 when edit this file, ie 
+# :set ts=4
+#
+#	This is the main script of the test automation. It will use the
+#	subsidiary scripts (e.g. engage.vlv) to obtain more information and to
+#	really engage the test suites.
+#
+#	All the variables and functions defined here should be prefixed by
+#	either main_ (functions) or Main (variables).
+#
+#	Created by Jean-Luc SCHWING - SUN Microsystems :
+#		Tue Jun 29 13:53:00 PDT 1999
+#
+#	History
+# -----------------------------------------------------------------------------
+# dd/mm/yy | Author	| Comments
+# -----------------------------------------------------------------------------
+# 29/06/99 | JL SCHWING	| Creation.
+# 21/07/04 | Orla Hegarty | merging bp's 64 bit changes
+# -----------------------------------------------------------------------------
+set -x
+
+IPAVERSION=1.0  # change this reflect the IPA version in email subject line
+
+
+# Make sure there is no problem with ksh users - mandatory for AIX at least
+#
+unset ENV
+# need to run in C locale, 
+# TET depends on the output of date command to be in english (dchan 7/02)
+LC_ALL=C ; export LC_ALL
+
+# input script
+MainRunScript=$0
+
+# Should be declared first
+#
+MainOS=`uname -s`
+# DisplayOS : more information about the current OS
+case $MainOS in
+	Windows_NT)
+		RelOS=`uname -r`
+		if [ "$RelOS" = "4" ]
+		then
+			DisplayOS="Windows_NT4"
+		else
+			DisplayOS="Windows_2000"
+		fi
+	;;
+	SunOS)
+		RelOS=`uname -r`
+		ArchOS=`uname -p`
+		DisplayOS=${MainOS}${RelOS}_${ArchOS}
+		MainOS=${MainOS}-${ArchOS}
+	;;
+	Linux)
+		# Extract Redhat Release Version for display in email subject
+		OS=RHEL # default value
+		if [ -f /etc/redhat-release ]
+		then
+
+			cat /etc/redhat-release | grep -i "release 4" > /dev/null 2>&1
+			if [ $? -eq 0 ];
+			then
+				OS="RHEL4"
+			fi
+
+			cat /etc/redhat-release | grep -i "release 5" > /dev/null 2>&1
+			if [ $? -eq 0 ];
+			then
+				OS="RHEL5"
+			fi
+		fi
+
+		RelOS=$OS
+		ArchOS=`uname -p`
+		DisplayOS="${MainOS}_${RelOS}_${ArchOS}"
+	;;
+	HP-UX)
+		# Add the architecture PA_RISC or IA64 to the email subject
+		ArchOS=`uname -m`
+		DisplayOS=${MainOS}_${ArchOS}
+	;;
+	*)
+		DisplayOS=$MainOS
+	;;
+esac
+
+# Let's try to figure out *where* are the scripts
+case $MainRunScript in
+	/*|[a-zA-Z]:*)	mainRunBaseDir=`dirname $MainRunScript`		;;
+	*)		mainRunBaseDir=`pwd`/`dirname $MainRunScript`	;;
+esac
+
+############### Source Library functions
+. $mainRunBaseDir/engagelib
+
+######################################################################
+# Site dependent information
+# ex : ICNC's sessions will not be on redhat.com
+######################################################################
+case `engage_domainname` in
+	*mtbrook.bozemanpass.com)
+	            WebServer="http://fileserver"
+	            MailHost="mail"
+	            MainMaildomain="bozemanpass.com"
+	            ;;
+	*)			# if you change WebServer besure to change it in engagelib also
+				WebServer="http://idmwiki.sfbay.redhat.com"
+				MailHost="potter.sfbay.redhat.com"
+				MainMaildomain="redhat.com"
+				;;
+esac
+
+# Silk variables
+MainSilkName="c:/Program Files/Segue/SilkTest"
+# BackEnd variables
+MainQuestions=y
+MainConfigFile=./engage.`hostname`.cfg
+CP_P="cp -p"
+case $MainOS in
+	Windows_NT)	MainWhoami="$USERNAME"		;;
+	SunOS*)		MainWhoami=`/usr/ucb/whoami`	;;
+	*)		MainWhoami=`whoami`		;;
+esac
+
+
+# DRIVE is used for NT, blank for any other platform
+# there are no default for DRIVE, this is only use for the automated
+# daily acceptance tests.
+DRIVE=""
+case $MainOS in
+	SunOS-sparc)		
+		MainTccName=bin/c/sparc-sun-solaris2.6/tcc
+		MainPerlName=perl/sparc_sun_solaris2.6/lib/nsPerl5.6.1/bin/nsperl
+		MainTmpDir=/tmp
+		MainSendmail="/usr/lib/sendmail -t"
+		;;
+	SunOS-i386)		
+		MainTccName=bin/c/i386-sun-solaris2.8/tcc
+		MainPerlName=perl/SunOS5.8-i386/lib/nsPerl5.005_03/bin/nsperl
+		MainTmpDir=/tmp
+		MainSendmail="/usr/lib/sendmail -t"
+		;;
+	Windows_NT)	
+		MainTccName=bin/c/winnt/tcc.exe
+		MainPerlName=perl/winnt4.0/lib/nsPerl5.6.1/nsperl
+		MainTmpDir=c:/temp
+		# a hack for NT, have to have -f somebody
+		# most of the time whoami is Administrator, for now force to be robobld
+		MainSendmail="smtpmail -f robobld@${MainMaildomain} -h $MailHost"
+		#MainWhoami="robobld@${MainMaildomain}"
+		MainWhoami=robobld
+		# hack the tetexec.cfg so the NT wont make a copy of 
+		# test suite before executing (faster)
+		echo "TET_EXEC_IN_PLACE=True" > $mainRunBaseDir/../../../tetexec.cfg
+		;;
+	OSF1)
+		MainTccName=bin/c/alpha-dec-osf4.0/tcc
+		MainPerlName=perl/osf1v4.0/lib/nsPerl5.005_03/bin/nsperl
+		MainTmpDir=/tmp
+		#MainSendmail="/usr/lib/sendmail -t"
+		# CR 2001-06-07
+		# Use sendmail from $MailHost
+		MainSendmail="rsh $MailHost /usr/lib/sendmail -t"
+		;;
+	IRIX)
+		MainTccName=bin/c/mips-sgi-irix6.5/tcc
+		MainTmpDir=/tmp
+		MainSendmail="/usr/lib/sendmail -t"
+		CP_P="cp"
+		;;
+	AIX)
+		MainTccName=bin/c/powerpc-ibm-aix4.2.1.0/tcc
+		MainPerlName=/perl/aix4.3/lib/nsPerl5.005_03/bin/nsperl
+		MainTmpDir=/tmp
+		#MainSendmail="/usr/lib/sendmail -t"
+		# CR 2001-06-07
+		# Use sendmail from $MailHost
+		MainSendmail="rsh $MailHost /usr/lib/sendmail -t"
+		;;
+	Linux)
+		MainTccName=bin/c/i686-unknown-linux/tcc
+		MainTmpDir=/tmp
+		MainPerlName=perl/linux2.2/lib/nsPerl5.6.1/bin/nsperl
+		#MainSendmail="/usr/lib/sendmail -t"
+		# CR 2001-06-07
+		# Use sendmail from $MailHost
+		MainSendmail="/usr/lib/sendmail -t"
+		CP_P="cp"
+		;;
+	HP-UX)
+		if [ -n "`file /stand/vmunix | grep 'PA-RISC1\.1'`" ]
+		then
+			MainTccName=bin/c/hppa1.1-hp-hpux10.10/tcc
+		else
+			# Despite its name, this is a PA-RISC 2.0 binary :-(
+			#
+			MainTccName=bin/c/hppa1.1-hp-hpux11.00/tcc
+		fi
+		MainPerlName=perl/hpux11.0/lib/nsPerl5.6.1/bin/nsperl
+		MainTmpDir=/tmp
+		#MainSendmail="/usr/lib/sendmail -t"
+		# CR 2001-06-07
+		# Use sendmail from $MailHost
+		# MainSendmail="remsh $MailHost /usr/lib/sendmail -t"
+		MainSendmail="/usr/lib/sendmail -t"
+		CP_P="cp"
+		;;
+	*)	echo "engage: unknown OS \"`uname -s`\""
+		exit 1
+		;;
+esac
+
+#####################################################
+# Non-System dependent variables
+#####################################################
+# Report Variables 
+logTimeStamp=`date '+%Y%m%d-%H%M%S'`
+
+# engage will abort if install failed due to missing global_src_`uanem -n` file
+AbortInstallFailed=1
+# to store the H:M:S of the elapse time
+ElapseStr=""
+
+###### Export variables ########################################
+export MainRunScript mainRunBaseDir MainOS
+export MainQuestions MainConfigFile MainTccName MainPerlName  MainSendmail MainSilkName
+
+#####################################################
+#
+#	engage's shared library (analyser, etc...)
+#
+#####################################################
+
+# This function initiates the final report
+# Should be called *before* any test occurs.
+#
+main_init_report()
+{
+	rm -f $MainReport
+	touch $MainReport
+	if [ ! -f $MainReport ]
+	then
+		echo "engage: cannot create report file $MainReport"
+		exit 1
+	fi
+
+	# show the user's choices
+	#
+	main_print_choices > $MainReport
+}
+
+main_fixpath()
+# arg : file
+# remove the /tmp_mnt fro OSF and IRIX(dchan)
+# remove drive letter for NT
+{
+# web server can't get file contain /../ in it's path
+# strip the /../ from path,
+n=$1
+d=`dirname $n`
+rd=`(cd $d; pwd)`
+f=`basename $n`
+echo $rd/$f | sed 's:/tmp_mnt::g
+                   s/[A-Za-z]://g'
+}
+
+ENGAGE_MV()
+{
+# mv to a different file system does not work on NT (lgopal 3/00)
+in=$1
+out=$2
+if [ "$MainOS" = "Windows_NT" ]; then
+	cp $in $out
+	#rm -rf $f	
+else
+	mv $in $out
+fi
+}
+
+# Analyse a tet journal file and add report to the report file
+#
+totpass=0
+tottestnum=0
+
+main_analyze()
+{
+	# Generates the report
+	#
+	maTestSuite=$1
+	maJournal=$2
+	maTmpOut=$3
+	maType=$4
+
+	if [ $# -lt 3 ]; then
+		echo "Warning:main_analyze is called with only $# arguments($*)"
+	fi
+	######################################################
+	# figure out the output directory and log directory
+	######################################################
+	# move results directory to a new location
+	# OutputRoot is the directory to store the jounral and output file
+	OutputRoot=${MainReportRoot}/output/${MainOS}
+	if [ ! -d $OutputRoot ]; then mkdir -p $OutputRoot; fi
+	# all the output file will reside in it's only data directory
+	# pick up the testsuite path (ex acceptance/basic ) 
+	testsuite=`echo $maJournal | sed -e 's:/result.*::g' -e 's:^.*'$VER'/::g'`
+	# logdir ex : $OutputRoot/20000127-144024/acceptance/basic/journal
+	logdir=$OutputRoot/$logTimeStamp/$testsuite
+	if [ ! -d $logdir ]; then mkdir -p $logdir; fi
+	# move the result file there
+	newJournalName=$logdir/journal.`basename $maTmpOut`
+	ENGAGE_MV $maJournal $newJournalName
+
+	# clean up output directory
+	# JLS 05-10-00	DON'T remove this directory !!!
+	# JLS 05-10-00	rm -rf `dirname $maJournal`
+	# point to the new journal file
+	maJournal=$newJournalName
+
+	if [ "$maType" != "" ] && [ $maType -eq 1 ]
+	then
+		main_silkreport "$maTestSuite" "$maJournal" $maTmpOut
+		return 0
+	fi
+	# var to determine if replay script needs to be generated
+	maFoundNotPassed=n
+	echo							>> $MainReport
+	echo "############## Result  for  backend test :  $maTestSuite"	>> $MainReport
+	echo
+	#########################################
+	# calculate elapse time
+	#########################################
+	stime=`grep 'TCC Start' $maJournal | awk '{print $2}' | awk -F: '{print $1*3600+$2*60+$3}'`
+	etime=`grep 'TCC End' $maJournal | cut -d\| -f2 | awk -F: '{print $1*3600+$2*60+$3}'`
+	elapsetime=`expr $etime - $stime | awk '{printf "%2.2d:%2.2d:%2.2d\n", $1/3600, $1%3600/60, $1%3600%60 }'`
+	echo "    $maTestSuite elapse time : $elapsetime" >> $MainReport
+
+	#########################################
+	# calculate number of current tests
+	#########################################
+	# use grep instead of egrep (OSF)
+	# OSF egrep will error : *?+ not preceded by valid expression
+	# add awk to strip out white spaces
+	maNbResTot=`grep '^220|' $maJournal | wc -l | awk '{print $1}'`
+	# calculate the total number of tests
+	tottestnum=`expr $tottestnum + $maNbResTot`
+
+	# get for test result from journal file
+	# add awk to print only the first field
+	# some time the line looks like :
+	# 220|0 3 7 10:46:17|NORESULT (auto-generated by TCC)
+	s=`awk -F'|' '$1 == "220" {print $3}' $maJournal|awk '{print $1}'|sort -u`
+	if [ "$s" = "" ]; then # no status, assume FAIL
+		s="FAIL"
+	fi
+	for i in `echo $s`
+	do
+		maNbRes=`awk -F'|' '$1 == "220" {print $3}' $maJournal | grep $i | wc -l | awk '{print $1}'`
+		if [ $maNbRes -eq 0 ]; then
+			pcent=0
+		else
+			pcent=`echo ${maNbRes}00 ${maNbResTot} / p q | dc`
+		fi
+		echo "    $maTestSuite Tests $i      : ${pcent}% ($maNbRes/$maNbResTot)"      >> $MainReport
+		if [ $i != PASS ]
+		then
+			maFoundNotPassed=y # generate replay script
+		else
+			totpass=`expr $totpass + $maNbRes` # calculate total % pass
+		fi
+	done
+	echo								>> $MainReport
+	echo "    Files are located on `hostname` (`date '+%Y%m%d-%H%M%S'`)" >> $MainReport
+	maFixedPath="${WebServer}`main_fixpath $maJournal`"
+	maFixedPath_rloc="<a href=$maFixedPath>$maFixedPath</a>"
+	echo "    Journal    file: $maFixedPath_rloc"			 >> $MainReport
+	for f in $maTmpOut
+	do
+		maFile=`dirname $maJournal`/`basename $f`.$$
+		ENGAGE_MV $f $maFile
+		maFixedPath="${WebServer}`main_fixpath $maFile`"
+		maFixedPath_rloc="<a href=$maFixedPath>$maFixedPath</a>"
+		echo "    Associated file: $maFixedPath_rloc"		 >> $MainReport
+	done
+
+	# Generates the scripts to reproduce the problems 
+	#
+	if [ $maFoundNotPassed = y ]
+	then
+		# Initiates the tet_scen file
+		#
+		maTetScen=`dirname $maJournal`/tet_scen
+		rm -f $maTetScen
+		echo "all"					>> $maTetScen
+		echo "\t\"Starting replay of $maTestSuite\""	>> $maTetScen
+
+		cat $maJournal | awk '
+			BEGIN { Binary=""
+				First=1
+				List="0"
+			}
+			/^10\|/	{ 	if (length(Binary) != 0)
+					{
+						if (length(List) != 0)
+							printf ("\t%s{%s}\n", Binary, List)
+					}
+					if (First == 1)
+					{
+						List="0"
+						First=0
+					}
+					else
+						List=""
+					Binary=$2
+				}
+			/^400\|/ { 	IcNum=$2
+				}
+			/^220\|/ {	if (index ($4, "PASS") == 0)
+					{
+						if (length (List) == 0)
+							List=IcNum;
+						else
+						{
+							# This test is to avoid {0,0}
+							#
+							if (List == IcNum)
+								List=IcNum;
+							else
+								List=List "," IcNum
+						}
+					}
+				}
+			END {
+				if (length(List) != 0)
+				{
+					printf ("\t%s{%s}\n", Binary, List);
+				}
+			}
+		' >> $maTetScen
+
+		echo "\t\"Ending replay of $maTestSuite\""	>> $maTetScen
+		chmod a+r $maTetScen
+
+		# Create the replay script
+		#
+		case $MainOS in
+			Windows_NT)	maStartFieldNum=9	;;
+			*)		maStartFieldNum=10	;;
+		esac
+		maTetCommandLine=`grep "TCC Start, Command line:" $maJournal | awk '{for (i='$maStartFieldNum' ; i<NF ; i++) printf ("%s ", $i);}'`
+		maTetCommandLine=`echo $maTetCommandLine | sed 's,-s [^ ]* ,-s '$maTetScen' ,'`
+		# Remplacer le scen dans la commande !
+		maReplay=`dirname $maJournal`/replay.sh
+		rm -f $maReplay
+		echo "#!/bin/sh"		>> $maReplay
+		echo 				>> $maReplay
+		cat $MainConfigFile		>> $maReplay
+		echo				>> $maReplay
+		cat $MainConfigFile | grep = | awk -F= '{printf ("export %s\n", $1);}'	>> $maReplay
+		echo				>> $maReplay
+		echo "$maTetCommandLine all"	>> $maReplay
+		chmod a+rx $maReplay
+
+		# Add all these information in the report
+		#
+		echo "    To replay on `hostname` use the following script:"	>> $MainReport
+		echo "        $maReplay"					>> $MainReport
+	fi
+
+
+}
+
+#### Add Silk test result file to the Report
+main_silkreport()
+{
+	# Generates the report
+	#
+	maTestSuite=$1
+	maJournalFile=$2
+    maTmpOut=$3
+
+	maResultFile=`grep "silk: result file is" $maTmpOut | awk '{print $5}'`
+	maPassTest=`grep "Tests PASSED :" $maTmpOut | awk '{print $0}'`
+	maFailTest=`grep "Tests FAILED :" $maTmpOut | awk '{print $0}'`
+
+	maFoundNotPassed=n
+
+ # Modified by Lakshmi Gopal 08/16/2000 to print the silk report properly
+
+	echo							>> $MainReport
+	echo "############## Result for SilkTest :  $maTestSuite " >> $MainReport
+
+	echo								>> $MainReport
+    echo " $maTestSuite $maPassTest " >> $MainReport
+    echo " $maTestSuite $maFailTest " >> $MainReport
+    	
+	echo "    Files are located on `hostname`"			>> $MainReport
+
+# Result File
+
+	for f in $maTmpOut
+	do
+		maFile=`dirname $maJournal`/`basename $maResultFile`
+		ENGAGE_MV $maResultFile $maFile
+		maFixedPath="${WebServer}`main_fixpath $maFile`"
+		echo "    Silk Result file: $maFixedPath"		 >> $MainReport
+	done
+
+
+
+	
+# Journal File
+
+	maFixedPath="${WebServer}`main_fixpath $maJournal`"
+ 
+	echo "    Journal    file: $maFixedPath"			 >> $MainReport
+
+ # move the associated file
+	for f in $maTmpOut
+	do
+		maFile=`dirname $maJournal`/`basename $f`.$$
+		ENGAGE_MV $f $maFile
+		maFixedPath="${WebServer}`main_fixpath $maFile`"
+		echo "    Associated file: $maFixedPath"		 >> $MainReport
+	done
+
+}
+
+calnew()
+{
+# new method of calculating total percent pass
+# used to be based on number of testcases, this new function
+# will calculate based on number of testsuite
+report=$1
+# pick out the test pass/total line from the report
+# output format : TestName:Percent:Pass:Total  
+#  ex:
+#	Schema:0%:0:1
+#	Schema:100%:19:19
+
+# egrep to pick out the line that contain the the percentage
+# sed to replace all "FAIL : 100%" and "NORESULT : 100%" with "PASS : 0%"
+# grep to only want to view PASS line
+# sometime there are no test run, replace (0/0) with (0/1)
+# then remove all lines with NORESULT and FAIL
+# last sed to convert to the final format
+egrep ' startup.*Tests.*: |run.*Tests.*: | cleanup.*Tests.*: ' $report |\
+sed 's/(0\/0)/(0\/1)/g
+	 s/FAIL.*: 0% ([0-9]*\//PASS : 0% (0\//g
+	 s/FAIL.*: 100% ([0-9]*\//PASS : 0% (0\//g
+	 s/NORESULT.*: 100% ([0-9]*\//PASS : 0% (0\//g' | grep PASS |\
+sed 's/ startup.*Tests.*PASS.*: /:/g
+		s/ run.*Tests.*PASS.*: /:/g
+		s/ cleanup.*Tests.*PASS.*: /:/g
+		s/^[ ]*//g
+		s/ (/:/g
+		s/)//g
+		s/\//:/g' > $MainTmpDir/a$$
+
+# calculate the total percentage per test suite , Ex:
+# Schema startup, Schema run, and Schema cleanup is consider to be one testsuite
+# output should look like  : Schema:95
+awk -F: 'BEGIN {last=""; tpass=0; ttest=0}
+	$1 != last { if (last != "" ) 
+					{
+					if ( ttest <= 0 ) # no test ran, assume 0% pass
+						printf "%s:0\n", last;
+					else # TestName:TotalPercentPass
+						printf "%s:%d\n", last, tpass/ttest*100;
+					}
+				tpass=$3 ; ttest=$4 ; # first line of test
+				last = $1; next }
+	{ tpass=tpass+$3 ; ttest=ttest+$4 }
+	END { 
+	if (ttest <=0 ) 
+		printf "%s:0\n", last 
+	else
+		printf "%s:%d\n", last, tpass/ttest*100 }' $MainTmpDir/a$$ > $MainTmpDir/b$$
+
+# now calculate the total result based on number of testsuite 
+awk -F: '{n=n+1; t=t+$2}
+	END{ printf "%d\n", t/n }' $MainTmpDir/b$$
+rm $MainTmpDir/a$$ $MainTmpDir/b$$ > /dev/null 2>&1
+}
+
+#is function send the final report by mail
+main_send_report()
+{
+	echo >> $MainReport
+
+	case $MainOS in
+		Windows_NT)
+			# NT require the use of smtpmail with users as argument
+			# strip out "@ something", only want the name
+			#ml=`echo $MainMailTo | sed 's/@[+-~]*//g'`
+			# CR 2001-06-07 : does not seem to work
+			# -> keep the whole address
+			ml=$MainMailTo
+			echo NT mail list $ml 
+			;;
+		*)
+			ml=""
+			;;
+	esac
+	# create report dir if not there
+    ReportRoot=$MainReportRoot/$MainOS
+    if [ ! -d $ReportRoot ]; then mkdir -p $ReportRoot; fi
+
+    # report file
+    reportfile=$ReportRoot/${logTimeStamp}.html
+	# save the original report file
+	plain_reportfile=$ReportRoot/${logTimeStamp}.txt
+	cp $MainReport $plain_reportfile
+
+	# calculate the total 
+	#totpass=`expr $totpass \* 100`
+	#n=0
+	#if [ $tottestnum -gt 0 ]; then
+	#	n=`expr $totpass / $tottestnum`  # calculate % pass
+	#fi
+	# new cal method based on number of testsuite not number of testcases
+	n=`calnew $MainReport`
+
+	# create mail header file
+	if [ "$DSTET_64" = "y" ]; then
+		DSBITS="-64"
+	fi
+
+	case `engage_domainname` in
+	*mtbrook.bozemanpass.com)
+		if [ $AbortInstallFailed -eq 2 ]; then
+			Subject="ABORTED - ${DisplayOS}${DSBITS} DS $DSVERSION ${TEST_CAT} test - $n% pass on `hostname | cut -d'.' -f1`"
+		else
+		    Subject="${DisplayOS}${DSBITS} DS $DSVERSION ${TEST_CAT} test - $n% pass on `hostname  | cut -d'.' -f1`"
+		fi
+		;;
+	*)
+		if [ $AbortInstallFailed -eq 2 ]; then
+			Subject="ABORTED - DS$DSVERSION ${DisplayOS}${DSBITS} ${TEST_CAT} test report - $n% passed on `hostname` using $SRCROOT"
+		else
+			Subject="DS$DSVERSION ${DisplayOS}${DSBITS} ${TEST_CAT} test report - $n% passed on `hostname` using $SRCROOT"
+		fi
+		;;
+	esac
+
+	(
+	echo "MIME-Version: 1.0"
+	echo "Subject: $Subject"
+	if [ "$MainOS" != "SunOS" ]; then
+		# sun don't like the from line
+		echo "From: ${MainWhoami}@${MainMaildomain}"
+	fi
+	echo "To: ${MainMailTo}"
+	echo "Content-Type: multipart/mixed;"
+	echo " boundary=\"------------mailboundary\""
+	echo						# blank line needed for sendmail
+	) > $MainReportHead
+
+	# create mail content
+	if [ -f $TET_ROOT/../CVS/Tag ]; then
+	    TESTTAG=`cat $TET_ROOT/../CVS/Tag | sed 's/^N//g'`
+	else
+	    TESTTAG="none"
+	fi
+	(
+	echo "Subject: $Subject"
+	echo "Test framework tag: $TESTTAG"
+    rloc="<a href=${WebServer}`main_fixpath ${reportfile}`>${WebServer}`main_fixpath ${reportfile}`</a>"
+	echo "Report location : $rloc"
+	echo
+
+	cat $MainReport
+	if [ -s ${TET_TMP_DIR}/isTimeBombset ]; then
+		TIMEBOMB=`cat ${TET_TMP_DIR}/isTimeBombset | awk -F= '{print $2}'`	
+	fi
+	echo "  Is the Time Bomb set (yes/no)  : $TIMEBOMB"
+	echo "	Total Test Elapse time         : $ElapseStr"
+	) > $MainReport.tmp 
+
+	# create the html version of the report
+	(
+	htmlheader
+	# create table of summary
+	mksummary $MainReport
+	# convert to html
+	conv2html $MainReport.tmp 
+	htmltrailer
+	) > $reportfile
+
+	# send out email
+	ENGAGEMAILFILE=$TET_TMP_DIR/engagemail-`date '+%d-%b-%y'`-pid-$$
+	(
+    cat $MainReportHead 
+	cat <<-EOF
+	This is a multi-part message in MIME format.
+	--------------mailboundary
+	Content-Type: text/html; charset=us-ascii
+	Content-Transfer-Encoding: 7bit
+
+	EOF
+	cat $reportfile 
+	echo "--------------mailboundary--"
+	) > $ENGAGEMAILFILE
+	echo "cat $ENGAGEMAILFILE | $MainSendmail $ml"
+	cat "$ENGAGEMAILFILE" | $MainSendmail $ml
+
+	# cleanup
+	rm -f $MainReport.tmp $MainReportHead $MainReport
+}
+
+
+#####################################################
+#
+#	engage's common functions
+#
+#####################################################
+
+# This function will set the default values for the variables needed
+#
+main_default()
+{
+	# Variables for A2k
+	#
+	if [ -z "$PkgName"               ] ; then PkgName=dirsrv ; fi
+
+	if [ -z "$TET_ROOT" ] ;	then TET_ROOT=`(cd $mainRunBaseDir/../../../tet ; pwd)`	; fi
+	if [ -z "$CHARSET" ] ;    then CHARSET=en						 ; fi
+	if [ -z "$IROOT" ] ;      then IROOT=/usr/lib/$PkgName/slapd-`hostname` ; fi
+	if [ -z "$PREFIX" ] ;     then
+      tmp_PREFIX0=`dirname $IROOT`
+      tmp_PREFIX1=`dirname $tmp_PREFIX0`
+      tmp_PREFIX2=`dirname $tmp_PREFIX1`
+      PREFIX=$tmp_PREFIX2
+    fi
+  	if [ -z "$ROOTDN" ] ;     then ROOTDN="cn=directory manager"   ; fi
+	if [ -z "$ROOTDNPW" ] ;   then ROOTDNPW=Secret123              ; fi
+	if [ -z "$TETADMINPW" ] ; then TETADMINPW=Admin123             ; fi
+	if [ -z "$VER" ]
+	then
+		VER=`(cd $mainRunBaseDir ; pwd)`
+		VER=`basename $VER`
+	fi
+	if [ -z "$TESTING_SHARED" ] ;	then TESTING_SHARED=`(cd $TET_ROOT/../Shared ; pwd)`	; fi
+
+	# Default log and other temp directories...
+	# The basic idea is to stored all data in $REALTMP that will be elsewhere than
+	# in the test framework, whenever possible.
+	#
+	HOSTNAME=`hostname`
+	case `engage_domainname` in
+		*France.Sun.COM)
+			case $MainOS in
+				Windows_NT)	REALTMP=y:/$LOGNAME/testsDS51		;;
+				*)		REALTMP=/qa/realtmp/$LOGNAME/testsDS51	;;
+			esac
+			;;
+		*)	REALTMP=`(cd $TET_ROOT/../testcases/DS/${VER} ; pwd)`
+			;;
+	esac
+
+	HOSTNAME=`hostname`
+	case `engage_domainname` in
+	    *mtbrook.bozemanpass.com)
+	        if [ -z "$TET_REPORT_DIR" ] ; then \
+	            if [ "$DisplayOS" = "Windows_2000" ]
+	            then 
+	                TET_REPORT_DIR=//fileserver/shared/projects/aol/docs/other_tests/oneoff/$HOSTNAME
+	            else
+	                TET_REPORT_DIR=/h/shared/projects/aol/docs/other_tests/oneoff/$HOSTNAME
+	            fi
+	        fi
+	    ;;
+	    *)
+	        if [ -z "$TET_REPORT_DIR" ] ; then TET_REPORT_DIR=$REALTMP/results/$HOSTNAME    ; fi
+	    ;;
+	esac
+
+	if [ -z "$TET_TMP_DIR"	  ] ; then TET_TMP_DIR=$REALTMP/tet_tmp_dir/$HOSTNAME	; fi
+	if [ -z "$DS_LOG_DIR"     ] ; then DS_LOG_DIR=$REALTMP/ds_log_dir/$HOSTNAME	; fi
+
+	# Don't forget to create them...
+	#
+	if [ ! -d $TET_REPORT_DIR ] ; then mkdir -p $TET_REPORT_DIR	; fi
+	if [ ! -d $TET_TMP_DIR	  ] ; then mkdir -p $TET_TMP_DIR	; fi
+	if [ ! -d $DS_LOG_DIR	  ] ; then mkdir -p $DS_LOG_DIR		; fi
+
+	#
+	# create the needed directory if not already there
+	# JLS 10082001 : Don't know what $TET_RUN is used for ?!?!?
+	#
+#	if [ -z "$TET_RUN" ]; 		then TET_RUN="$TET_ROOT/../testcases/DS/${VER}_run/`hostname`"; fi
+	if [ "$TET_RUN" != "" ] && [ ! -d "$TET_RUN" ]; then mkdir -p $TET_RUN; fi
+
+    # This variable is used to turn on/off the report of known bugs
+    #
+    if [ -z "$IGNORE_KNOWN_BUGS" ] ; then IGNORE_KNOWN_BUGS=n       ; fi
+
+    # This tells TET to use the associated 64 bit files
+    #
+	if [ -z "$DSTET_64" ] ; then DSTET_64=n ; fi
+
+	# This is a new test debugging variable. Hopefully making debugging easier in future.
+	if [ -z "$DSTET_DEBUG" ]; then DSTET_DEBUG=n ; fi
+
+	# Variables for the script engage
+	#
+	if [ -z "$MainAcceptanceTests"   ] ; then MainAcceptanceTests=y	 ; fi
+    if [ -z "$MainReliabTests"       ] ; then MainReliabTests=n      ; fi
+	if [ -z "$MainStressTests"       ] ; then MainStressTests=n      ; fi
+	if [ -z "$MainGuiTests"          ] ; then MainGuiTests=n         ; fi
+	if [ -z "$MainLongDurationTests" ] ; then MainLongDurationTests=n; fi
+	if [ -z "$MainPerformanceTests"  ] ; then MainPerformanceTests=n ; fi
+
+	if [ -z "$MainRunStartup"        ] ; then MainRunStartup=y       ; fi
+	if [ -z "$MainRunTests"          ] ; then MainRunTests=y         ; fi
+	if [ -z "$MainRunCleanup"        ] ; then MainRunCleanup=y       ; fi
+
+    if [ -z "$MainMailTo"            ] ; then MainMailTo=$LOGNAME@$MainMaildomain	; fi
+
+# export all these variables 
+
+	export TET_ROOT VER CHARSET TESTING_SHARED IROOT PREFIX TET_TMP_DIR  TET_REPORT_DIR DS_LOG_DIR
+	export ROOTDN ROOTDNPW TETADMINPW LDAPhost LDAPport DRIVE
+	export IGNORE_KNOWN_BUGS DSTET_64 DSTET_DEBUG PkgName
+
+	export MainLongDurationTests MainRunStartup MainRunTests MainRunCleanup MainGuiTests MainMailTo MainAcceptanceTests MainReliabTests MainStressTests MainPerformanceTests
+}
+
+# This function will ask the user for more information/choices if needed
+#
+main_backendask()
+{
+
+	# A2K variables
+	#
+	echo
+	echo "Let's check the Automation 2000 framework variables..."
+	echo
+	sav_TET_ROOT=$TET_ROOT
+	echo "    TET_ROOT [$TET_ROOT] ? \c"
+	read TET_ROOT
+	if [ -z "$TET_ROOT" ] ; then TET_ROOT=$sav_TET_ROOT ; fi
+
+	sav_TET_RUN=$TET_RUN
+	echo "    TET_RUN [$TET_RUN] ? \c"
+	read TET_RUN
+	if [ -z "$TET_RUN" ] ; then TET_RUN=$sav_TET_RUN ; fi
+
+	sav_TESTING_SHARED=$TESTING_SHARED
+	echo "    TESTING_SHARED [$TESTING_SHARED] ? \c"
+	read TESTING_SHARED
+	if [ -z "$TESTING_SHARED" ] ; then TESTING_SHARED=$sav_TESTING_SHARED ; fi
+
+	sav_VER=$VER
+	echo "    VER [$VER] ? \c"
+	read VER
+	if [ -z "$VER" ] ; then VER=$sav_VER ; fi
+
+	sav_CHARSET=$CHARSET
+	echo "    CHARSET [$CHARSET] ? \c"
+	read CHARSET
+	if [ -z "$CHARSET" ] ; then CHARSET=$sav_CHARSET ; fi
+
+	sav_TET_REPORT_DIR=$TET_REPORT_DIR
+	echo "    TET_REPORT_DIR [$TET_REPORT_DIR] ? \c"
+	read TET_REPORT_DIR
+	if [ -z "$TET_REPORT_DIR" ] ; then 
+		TET_REPORT_DIR=$sav_TET_REPORT_DIR
+	fi
+#LR 10052000
+	if [ ! -d $TET_REPORT_DIR ] ; then
+		mkdir -p $TET_REPORT_DIR
+	fi
+#LR
+
+	sav_TET_TMP_DIR=$TET_TMP_DIR
+	echo "    TET_TMP_DIR [$TET_TMP_DIR] ? \c"
+	read TET_TMP_DIR
+	if [ -z "$TET_TMP_DIR" ] ; then TET_TMP_DIR=$sav_TET_TMP_DIR ; fi
+#LR 10052000
+	if [ ! -d $TET_TMP_DIR ] ; then
+		mkdir -p $TET_TMP_DIR
+	fi
+#LR
+
+	sav_DS_LOG_DIR=$DS_LOG_DIR
+	echo "    Log/core/backup directory [$DS_LOG_DIR] ? \c"
+	read DS_LOG_DIR
+	if [ -z "$DS_LOG_DIR" ] ; then DS_LOG_DIR=$sav_DS_LOG_DIR ; fi
+	if [ ! -d $DS_LOG_DIR ] ; then
+		mkdir -p $DS_LOG_DIR
+	fi
+
+	sav_PERLPATH=$PERLPATH
+	echo "    PATH to perl to use for tests [$PERLPATH] ? \c"
+	read PERLPATH
+	if [ -z "$PERLPATH" ] ; then PERLPATH=$sav_PERLPATH ; fi
+	if [ ! -f "$PERLPATH/perl" ] ; then
+		echo "$PERLPATH/perl not found!"
+		exit 1
+	fi
+
+	sav_IROOT=$IROOT
+	echo "    IROOT [$IROOT] ? \c"
+	read IROOT
+	if [ -z "$IROOT" ] ; then IROOT=$sav_IROOT ; fi
+
+    if [ -z $PREFIX ]; then
+      tmp_PREFIX0=`dirname $IROOT`
+      tmp_PREFIX1=`dirname $tmp_PREFIX0`
+      tmp_PREFIX2=`dirname $tmp_PREFIX1`
+      PREFIX=$tmp_PREFIX2
+    fi
+	sav_PREFIX=$PREFIX
+	echo "    PREFIX [$PREFIX] ? \c"
+	read PREFIX
+	if [ -z "$PREFIX" ] ; then PREFIX=$sav_PREFIX ; fi
+
+	sav_ROOTDN="$ROOTDN"
+	echo "    ROOTDN [$ROOTDN] ? \c"
+	read ROOTDN
+	if [ -z "$ROOTDN" ] ; then ROOTDN="$sav_ROOTDN" ; fi
+
+	sav_ROOTDNPW="$ROOTDNPW"
+	echo "    ROOTDNPW [$ROOTDNPW] ? \c"
+	read ROOTDNPW
+	if [ -z "$ROOTDNPW" ] ; then ROOTDNPW="$sav_ROOTDNPW" ; fi
+
+	sav_TETADMINPW="$TETADMINPW"
+	echo "    TETADMINPW [$TETADMINPW] ? \c"
+	read TETADMINPW
+	if [ -z "$TETADMINPW" ] ; then TETADMINPW="$sav_TETADMINPW" ; fi
+
+        sav_IGNORE_KNOWN_BUGS="$IGNORE_KNOWN_BUGS"
+        echo
+        echo "    You may configure the tests to ignore (not report) the known bugs:"
+        echo "    IGNORE_KNOWN_BUGS [$IGNORE_KNOWN_BUGS] ? \c"
+        read IGNORE_KNOWN_BUGS
+        if [ -z "$IGNORE_KNOWN_BUGS" ] ; then IGNORE_KNOWN_BUGS="$sav_IGNORE_KNOWN_BUGS" ; fi
+
+		sav_DSTET_64="$DSTET_64"
+		echo
+		echo "	You may configure these tests to use 64 bit associcated files (For 64bit servers): "
+		echo "	DSTET_64 [$DSTET_64] ? \c"
+		read DSTET_64
+		if [ -z "$DSTET_64" ] ; then DSTET_64="$sav_DSTET_64" ; fi
+
+		sav_DSTET_DEBUG="$DSTET_DEBUG"
+		echo
+		echo " You may turn on the debugging flag (DSTET_DEBUG) for more verbose output: "
+		echo " DSTET_DEBUG [$DSTET_DEBUG] ? \c"
+		read DSTET_DEBUG
+		if [ -s "$DSTET_DEBUG" ] ; then DSTET_DEBUG="$sav_DSTET_DEBUG" ; fi
+
+
+}
+
+
+
+main_ask()
+{
+
+	TestChoice=1
+
+	# Script engage's variables
+	#
+	echo
+	echo "Choose  any one of Tests categories  to run :"
+	echo "	1. ACCEPTANCE tests "
+	echo "	2. LONG DURATION  tests "
+	echo "	3. RELIABILITY tests "
+	echo "	4. STRESS tests "
+	echo "	5. GUI Based tests "
+	echo "	6. Performance "
+	echo "	7. Do not want to run any of these tests "
+        echo "  8. example test "
+        echo "choose [$TestChoice] : \c"
+	read rsp
+	if [ -z "$rsp" ] ; then TestChoice=1 ; else TestChoice=$rsp ; fi
+
+	# No category yet.
+	#
+	MainAcceptanceTests=n
+	MainLongDurationTests=n
+	MainReliabTests=n
+	MainStressTests=n
+	MainGuiTests=n
+	MainPerformanceTests=n
+	case $TestChoice in
+		1)	MainAcceptanceTests=y
+			TEST_CAT="Acceptance"
+			;;
+		2)	MainLongDurationTests=y
+			TEST_CAT="Long duration"
+			;;
+		3)	MainReliabTests=y
+			TEST_CAT="Reliability"
+			;;
+		4)	MainStressTests=y				
+			TEST_CAT="Stress"
+			;;
+		5)	MainGuiTests=y			
+			TEST_CAT="Acceptance"
+			;;
+		6)	MainPerformanceTests=y			
+			TEST_CAT="Performance"
+			;;
+		8)	ExampleTest=y
+			TEST_CAT="SAMPLE"
+		*)	echo " You have selected not to run any of the above tests . Exiting program"
+			exit 0
+			;;
+	esac
+
+		sav_MainRunStartup=$MainRunStartup
+		echo "        Execute the  startup (aka initialization) tests [$MainRunStartup] ? \c"
+		read rsp
+		case $rsp in
+			"")	MainRunStartup=$sav_MainRunStartup	;;
+			y|Y)	MainRunStartup=y			;;
+			*)	MainRunStartup=n			;;
+		esac
+
+		sav_MainRunTests=$MainRunTests
+		echo "        Execute the tests [$MainRunTests] ? \c"
+		read rsp
+		case $rsp in
+			"")	MainRunTests=$sav_MainRunTests	;;
+			y|Y)	MainRunTests=y			;;
+			*)	MainRunTests=n			;;
+		esac
+
+		sav_MainRunCleanup=$MainRunCleanup
+		echo "        Execute the cleanup tests [$MainRunCleanup] ? \c"
+		read rsp
+		case $rsp in
+			"")	MainRunCleanup=$sav_MainRunCleanup	;;
+			y|Y)	MainRunCleanup=y			;;
+			*)	MainRunCleanup=n			;;
+		esac
+
+        echo
+        echo "    Mail Reports....."
+
+	sav_MainMailTo=$MainMailTo
+	echo "    Mail reports should be sent to [$MainMailTo] ? \c"
+	read MainMailTo
+	if [ -z "$MainMailTo" ] ; then MainMailTo=$sav_MainMailTo ; fi
+
+
+        main_backendask
+
+	export MainRunTests MainRunCleanup MainRunStartup
+}
+
+# This function will print the user's choices (aka variables)
+#
+main_print()
+{
+	echo "Automation 2000 framework variables:"
+	echo "    TET_ROOT       : $TET_ROOT"
+	echo "    TET_RUN        : $TET_RUN "
+	echo "    TET_REPORT_DIR : $TET_REPORT_DIR"
+	echo "    TET_TMP_DIR    : $TET_TMP_DIR"
+	echo "    DS_LOG_DIR     : $DS_LOG_DIR"
+	echo "    PERLPATH       : $PERLPATH"
+	echo "    TESTING_SHARED : $TESTING_SHARED"
+	echo "    VER            : $VER"
+	echo "    CHARSET        : $CHARSET"
+	echo "    IROOT          : $IROOT"
+	echo "    PREFIX         : $PREFIX"
+	echo "    SRCROOT        : $SRCROOT"
+	if [  "$MainOS" = "Windows_NT" ] && [ "$DRIVE" != "" ]; then
+		echo "    DRIVE          : $DRIVE"
+	fi
+	echo "    ROOTDN         : $ROOTDN"
+	echo "    ROOTDNPW       : $ROOTDNPW"
+	echo "    TETADMINPW     : $TETADMINPW"
+	echo
+	echo
+	echo "Other general choices:"
+	echo "    Execute the Reliability tests  : $MainReliabTests"
+	echo "    Execute the Acceptance tests   : $MainAcceptanceTests"
+	echo "    Execute the Stress tests       : $MainStressTests"
+	echo "    Execute the Gui Tests          : $MainGuiTests"
+	echo "    Execute the Long Duration Tests: $MainLongDurationTests"
+	echo "    Execute the performance tests  : $MainPerformanceTests"
+	echo 
+	echo "    Execute the tests startup      : $MainRunStartup"
+	echo "    Execute the main tests         : $MainRunTests"
+	echo "    Execute the tests cleanup      : $MainRunCleanup"
+	echo "    Mail reports should be sent to : $MainMailTo"
+    echo
+    echo "    64bit Directory Server         : $DSTET_64"
+    echo "    Ignore known bugs              : $IGNORE_KNOWN_BUGS"
+    echo "    Debugging Output (Verbose)     : $DSTET_DEBUG"
+	echo
+}
+
+# This function will echo in shell's format the user's choices
+# It is the calling function that will redirect the output to
+# the saved config file.
+#
+main_save()
+{
+	echo "TET_ROOT=$TET_ROOT"
+	echo "TET_RUN=$TET_RUN"
+	echo "TESTING_SHARED=$TESTING_SHARED"
+	echo "PERLPATH=$PERLPATH"
+	echo "TET_REPORT_DIR=$TET_REPORT_DIR"
+	echo "TET_TMP_DIR=$TET_TMP_DIR"
+	echo "DS_LOG_DIR=$DS_LOG_DIR"
+	echo "VER=$VER"
+	echo "CHARSET=$CHARSET"
+	echo "IROOT=$IROOT"
+	echo "PREFIX=$PREFIX"
+	if [ ! -z "$DOMAINNAME" ]; then
+	    echo "DOMAINNAME=$DOMAINNAME"
+	    export DOMAINNAME
+	fi
+	if [  "$MainOS" = "Windows_NT" ] && [ "$DRIVE" != "" ]; then
+		echo "DRIVE=\"$DRIVE\""
+	fi
+	echo "ROOTDN=\"$ROOTDN\""
+	echo "ROOTDNPW=\"$ROOTDNPW\""
+	echo "TETADMINPW=\"$TETADMINPW\""
+    echo "IGNORE_KNOWN_BUGS=$IGNORE_KNOWN_BUGS"
+	echo "DSTET_64=$DSTET_64"
+	echo "DSTET_DEBUG=$DSTET_DEBUG"
+	# only save it if it's set
+	if [ ! -z "$LDAPhost" ] ; then 
+		echo "LDAPhost=$LDAPhost"
+		export LDAPhost
+	fi
+	if [ ! -z "$LDAPport" ]; then 
+		echo "LDAPport=$LDAPport"
+		export LDAPport
+	fi
+	echo
+	echo "MainReliabTests=$MainReliabTests"
+	echo "MainAcceptanceTests=$MainAcceptanceTests"
+	echo "MainGuiTests=$MainGuiTests"
+	echo "MainStressTests=$MainStressTests"
+	echo "MainLongDurationTests=$MainLongDurationTests"
+	echo "MainPerformanceTests=$MainPerformanceTests"
+	echo 
+	echo "MainRunStartup=$MainRunStartup"
+	echo "MainRunTests=$MainRunTests"
+	echo "MainRunCleanup=$MainRunCleanup"
+	echo "MainMailTo=$MainMailTo"
+	echo
+}
+
+#####################################################
+#
+#	engage's main functions
+#
+#####################################################
+
+# var to hold the offical name of the test catagory
+TEST_CAT=""
+# This function will load the initial values
+#
+main_load_init_values()
+{
+    # If the config file exist, load it.
+    #
+    if [ -f $MainConfigFile ] ; then
+	. $MainConfigFile
+    fi
+
+    # Load each test suite default values
+    #
+    main_default
+	
+    # set perl env vars
+    perl_check $PREFIX
+
+    n=0
+    if [ $MainReliabTests = y ] ; then 
+	. $mainRunBaseDir/reliability/engage.reliability
+	reliability_default 
+	n=`expr $n + 1`
+	TEST_CAT="Reliability"
+    fi
+
+    if [ $MainAcceptanceTests = y ]; then 
+	. $mainRunBaseDir/acceptance/engage.acceptance
+	acceptance_default 
+	n=`expr $n + 1`
+	TEST_CAT="Acceptance"
+    fi
+
+    if [ $MainStressTests = y ] ; then 
+	. $mainRunBaseDir/stress/engage.stress
+	stress_default 
+	n=`expr $n + 1`
+	TEST_CAT="Stress"
+    fi
+
+    if [ $MainGuiTests = y ] ; then 
+	. $mainRunBaseDir/Gui/engage.gui
+	gui_default 
+	n=`expr $n + 1`
+	TEST_CAT="GUI"
+    fi
+
+    if [ $MainLongDurationTests = y ]; then 
+	. $mainRunBaseDir/longduration/engage.longduration
+	longduration_default
+	n=`expr $n + 1`
+	TEST_CAT="Long duration"
+    fi
+
+    if [ $MainPerformanceTests = y ]; then 
+	. $mainRunBaseDir/performance/engage.performance
+	performance_default
+	n=`expr $n + 1`
+	TEST_CAT="Performance"
+    fi
+
+    if [ $n -gt 1 ]; then
+	echo "main_load_init_values:more then one test catagory was selected."
+	echo "Please only select one of the following main catagory : "
+	echo "	ACCEPTANCE, LONG DURATION, RELIABILITY, STRESS, GUI, PERFORMANCE" 
+	echo "exiting..."
+	exit 1
+    fi
+}
+
+
+# This function will print the current choices
+#
+main_print_choices()
+{
+    echo
+    echo "General choices..."
+    echo
+    main_print
+    echo
+    echo "Detailed choices..."
+    echo
+
+    if [ $MainReliabTests       = y ] ; then reliability_print  ; fi
+    if [ $MainAcceptanceTests   = y ] ; then acceptance_print   ; fi
+    if [ $MainStressTests       = y ] ; then stress_print       ; fi
+    if [ $MainGuiTests          = y ] ; then gui_print          ; fi
+    if [ $MainLongDurationTests = y ] ; then longduration_print ; fi
+    if [ $MainPerformanceTests  = y ] ; then performance_print  ; fi
+}
+
+# This function will ask for the user choices
+#
+main_ask_choices()
+{
+    echo
+    main_ask
+    echo
+
+    if [ $MainReliabTests = y ] ; then 
+	. $mainRunBaseDir/reliability/engage.reliability
+	reliability_default 
+	reliability_ask 
+    fi
+
+    if [ $MainAcceptanceTests = y ] ; then 
+	. $mainRunBaseDir/acceptance/engage.acceptance
+	acceptance_default 
+	acceptance_ask 
+    fi
+
+    if [ $MainStressTests = y ] ; then 
+	. $mainRunBaseDir/stress/engage.stress
+	stress_default 
+	stress_ask 
+    fi
+
+    if [ $MainGuiTests = y ] ; then 
+	. $mainRunBaseDir/Gui/engage.gui 
+	gui_default 
+	gui_ask 
+    fi
+
+    if [ $MainLongDurationTests = y ] ; then  
+	. $mainRunBaseDir/longduration/engage.longduration
+	longduration_default
+	longduration_ask
+    fi
+	
+    if [ $MainPerformanceTests = y ] ; then  
+	. $mainRunBaseDir/performance/engage.performance
+	performance_default
+	performance_ask
+    fi
+
+}
+
+# This function will loop on the user's choices
+#
+main_loop_on_choices()
+{
+	rsp=n
+	while [ $rsp != y ]
+	do
+		echo
+		echo "########### Here are the current choices:"
+		main_print_choices
+		echo
+		echo "Do you agree [y] ? \c"
+		read rsp
+		case $rsp in
+			""|y|Y)	rsp=y			;;
+			*)	main_ask_choices
+				rsp=n
+				;;
+		esac
+	done
+	echo
+}
+
+# Save the choices
+#
+main_save_choices()
+{
+    if [ -f $MainConfigFile ] ; then
+	mv $MainConfigFile $MainConfigFile.bak
+    fi
+	
+    # Now, the MainConfigFile does not exist.
+    # Let's fill it
+    #
+    (
+	main_save	
+	if [ $MainReliabTests       = y ] ; then reliability_save  ; fi
+	if [ $MainAcceptanceTests   = y ] ; then acceptance_save   ; fi
+	if [ $MainStressTests       = y ] ; then stress_save       ; fi
+	if [ $MainGuiTests          = y ] ; then gui_save          ; fi
+	if [ $MainLongDurationTests = y ] ; then longduration_save ; fi
+	if [ $MainPerformanceTests  = y ] ; then performance_save  ; fi
+    ) >> $MainConfigFile
+}
+
+
+# This function will check that all the test suites may be executed
+#
+main_check()
+{
+
+    if [ $MainReliabTests = n ] && [ $MainAcceptanceTests = n ] &&  [ $MainStressTests = n ] &&  [ $MainGuiTests = n ] && [ $MainLongDurationTests = n ] && [ $MainPerformanceTests = n ] ; then 
+        echo " You have chosen not to run any tests "
+        exit 0 
+    fi
+
+    echo 
+    echo "########## Checking your choices......"
+
+    if [ $MainReliabTests       = y ] ; then reliability_check  ; fi
+    if [ $MainAcceptanceTests   = y ] ; then acceptance_check   ; fi
+    if [ $MainStressTests       = y ] ; then stress_check       ; fi
+    if [ $MainGuiTests          = y ] ; then gui_check          ; fi
+    if [ $MainLongDurationTests = y ] ; then longduration_check ; fi
+    if [ $MainPerformanceTests  = y ] ; then performance_check  ; fi
+
+    echo
+    echo "   Ok, no problem found."
+}
+
+abortfunc()
+{
+AbortInstallFailed=2 # indicate an email Subject with ABORT message
+main_send_report # send out report before going away
+exit 1
+}
+
+# This function will engage all the test suites
+#
+main_run()
+{
+	# catch signal 16, used by quickinstall to exit program
+	trap abortfunc 16 # 16 is USR1
+    echo
+    echo "########### Running tests in automated mode. You may now"
+    echo "########### return to normal life.   A mail will be sent"
+    echo "########### when completed."
+    echo
+
+    if [ $MainReliabTests = y ] ; then
+	TET_SUITE_ROOT=$mainRunBaseDir/reliability; export TET_SUITE_ROOT
+	reliability_run
+    fi
+
+    if [ $MainAcceptanceTests = y ] ; then
+	TET_SUITE_ROOT=$mainRunBaseDir/acceptance; export TET_SUITE_ROOT
+	acceptance_run
+    fi
+
+    if [ $MainLongDurationTests = y ] ; then
+	TET_SUITE_ROOT=$mainRunBaseDir/longduration; export TET_SUITE_ROOT
+	longduration_run
+    fi
+
+    if [ $MainStressTests = y ] ; then
+	TET_SUITE_ROOT=$mainRunBaseDir/stress; export TET_SUITE_ROOT
+	stress_run
+    fi
+
+    if [ $MainGuiTests = y ] ; then
+	TET_SUITE_ROOT=$mainRunBaseDir/Gui; export TET_SUITE_ROOT
+	gui_run
+    fi
+
+    if [ $MainPerformanceTests = y ] ; then
+	TET_SUITE_ROOT=$mainRunBaseDir/performance; export TET_SUITE_ROOT
+	performance_run
+    fi
+}
+
+
+# Usage function
+#
+main_usage()
+{
+    echo "usage: engage [-c <configfile>]"
+    echo "    Run the Netscape DS automated test suites."
+    echo "    -c : config file (no questions)"
+    echo "    -g : generate config file with all the default value"
+}
+
+# Parse the parameters
+#
+main_get_options()
+{
+	# use getopt instead of getopts, problem with osf and irix (dchan)
+	set -- `getopt gc:h $*`
+	if [ $? -ne 0 ]; then
+		main_usage
+	    exit 1
+	fi
+
+	while [ $1 != -- ]
+	do
+		case $1 in
+			-c)	MainConfigFile=$2
+				MainQuestions=n
+				if [ ! -f $MainConfigFile ]
+				then
+					echo "engage: cannot access config file $MainConfigFile"
+					exit 1
+				fi
+				shift;;
+			-g)  main_load_init_values
+				main_save_choices
+				echo $MainConfigFile config file created.
+				exit 0
+				;;
+			-h|-help)	
+				main_usage
+				exit 0
+				;;
+			\?)	
+				echo "engage: use engage -h to see the arguments."
+				exit 1
+				;;
+		esac
+		shift
+	done
+	shift
+	return 0
+}
+
+# Main function
+#
+main_main()
+{
+	main_get_options $*
+	main_load_init_values
+	if [ $MainQuestions = n ]
+	then
+		main_print_choices
+		echo
+		echo "Using direct values from the config file..."
+	else
+		main_loop_on_choices
+	fi
+
+# Lakshmi Gopal. Storing the test run files in TET_TMP_DIR instead of /tmp dir. 
+	# echo "MainOD ? $MainOS"
+	MainTmpDir=$TET_TMP_DIR/`hostname`$$ 
+	mkdir $MainTmpDir
+	MainReport=$MainTmpDir/engage.body$$
+	MainReportHead=$MainTmpDir/engage.head$$
+	# Lakshmi Gopal . Storing the Report files. 03/13/2000
+	MainReportRoot=$TET_REPORT_DIR
+	export MainTmpDir MainReport MainReportHead MainReportRoot 
+	export MainOS logTimeStamp
+	main_save_choices
+	main_check
+	main_init_report
+	EngageStopwatch start
+	main_run
+	elapse=`EngageStopwatch stop`
+	ElapseStr=`EngageStopwatch $elapse`
+	main_send_report
+}
+
+# Just call the main function ;-)
+#
+main_main $*
+exit 0
+
+#
+# End of file
