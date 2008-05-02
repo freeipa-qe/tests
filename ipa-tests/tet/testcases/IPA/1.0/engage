@@ -23,7 +23,7 @@
 # 29/06/99 | JL SCHWING	| Creation.
 # 21/07/04 | Orla Hegarty | merging bp's 64 bit changes
 # -----------------------------------------------------------------------------
-set -x
+#set -x
 
 IPAVERSION=1.0  # change this reflect the IPA version in email subject line
 
@@ -159,21 +159,6 @@ case $MainOS in
 		# hack the tetexec.cfg so the NT wont make a copy of 
 		# test suite before executing (faster)
 		echo "TET_EXEC_IN_PLACE=True" > $mainRunBaseDir/../../../tetexec.cfg
-		;;
-	OSF1)
-		MainTccName=bin/c/alpha-dec-osf4.0/tcc
-		MainPerlName=perl/osf1v4.0/lib/nsPerl5.005_03/bin/nsperl
-		MainTmpDir=/tmp
-		#MainSendmail="/usr/lib/sendmail -t"
-		# CR 2001-06-07
-		# Use sendmail from $MailHost
-		MainSendmail="rsh $MailHost /usr/lib/sendmail -t"
-		;;
-	IRIX)
-		MainTccName=bin/c/mips-sgi-irix6.5/tcc
-		MainTmpDir=/tmp
-		MainSendmail="/usr/lib/sendmail -t"
-		CP_P="cp"
 		;;
 	AIX)
 		MainTccName=bin/c/powerpc-ibm-aix4.2.1.0/tcc
@@ -729,8 +714,8 @@ main_default()
 	# Variables for A2k
 	#
 	if [ -z "$PkgName"               ] ; then PkgName=dirsrv ; fi
-
-	if [ -z "$TET_ROOT" ] ;	then TET_ROOT=`(cd $mainRunBaseDir/../../../tet ; pwd)`	; fi
+env
+	if [ -z "$TET_ROOT" ] ;	then TET_ROOT=`(cd $mainRunBaseDir/../../../../tet ; pwd)`	; fi
 	if [ -z "$CHARSET" ] ;    then CHARSET=en						 ; fi
 	if [ -z "$IROOT" ] ;      then IROOT=/usr/lib/$PkgName/slapd-`hostname` ; fi
 	if [ -z "$PREFIX" ] ;     then
@@ -747,7 +732,7 @@ main_default()
 		VER=`(cd $mainRunBaseDir ; pwd)`
 		VER=`basename $VER`
 	fi
-	if [ -z "$TESTING_SHARED" ] ;	then TESTING_SHARED=`(cd $TET_ROOT/../Shared ; pwd)`	; fi
+	if [ -z "$TESTING_SHARED" ] ;	then TESTING_SHARED=`(cd $TET_ROOT/Shared ; pwd)`	; fi
 
 	# Default log and other temp directories...
 	# The basic idea is to stored all data in $REALTMP that will be elsewhere than
@@ -761,7 +746,7 @@ main_default()
 				*)		REALTMP=/qa/realtmp/$LOGNAME/testsDS51	;;
 			esac
 			;;
-		*)	REALTMP=`(cd $TET_ROOT/../testcases/DS/${VER} ; pwd)`
+		*)	REALTMP=`(cd $TET_ROOT/testcases/IPA/${VER} ; pwd)`
 			;;
 	esac
 
@@ -980,7 +965,6 @@ main_ask()
 	echo "	5. GUI Based tests "
 	echo "	6. Performance "
 	echo "	7. Do not want to run any of these tests "
-        echo "  8. example test "
         echo "choose [$TestChoice] : \c"
 	read rsp
 	if [ -z "$rsp" ] ; then TestChoice=1 ; else TestChoice=$rsp ; fi
@@ -1014,6 +998,7 @@ main_ask()
 			;;
 		8)	ExampleTest=y
 			TEST_CAT="SAMPLE"
+			;;
 		*)	echo " You have selected not to run any of the above tests . Exiting program"
 			exit 0
 			;;

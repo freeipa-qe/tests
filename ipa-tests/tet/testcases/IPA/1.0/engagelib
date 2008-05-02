@@ -97,19 +97,6 @@ SetPerlEnv()
 		cd $cworkdir
 
 		;;
-	OSF1)
-		if [ ! -d  "$TET_ROOT/../perl/osf1v4.0/lib/nsPerl5.005_03" ] ; then
-		 unzip $TET_ROOT/../perl/osf1v4.0/nsperlosf.zip -d $TET_ROOT/../perl/osf1v4.0
-		else
-			echo "Perl already unzipped"
-		fi
-		$TET_ROOT/../perl/osf1v4.0/lib/nsPerl5.005_03/install
-
-		LD_LIBRARY_PATH=$LOCAL_PREFIX/lib/perl/arch/auto/Mozilla/LDAP/API:$LOCAL_PREFIX/lib/dirsec:$LOCAL_PREFIX/lib:/usr/lib/dirsec:/usr/lib:$LD_LIBRARY_PATH
-		export LD_LIBRARY_PATH
-		PERL5LIB=$LOCAL_PREFIX/lib/perl/
-		export PERL5LIB
-		;;
 
 	AIX)
 
@@ -219,116 +206,6 @@ perl_check()
 {
   SetPerlEnv $1
 }
-
-
-##### Silk Test Routines #########################################
-
-####################################################
-#  SILK : Remote machine testing functions
-####################################################
-
-remote_connect()
-{
-host=$1
-echo "     Checking Remote Host....."
-
-rcm="rsh"
-$rcm $host ls > tmp.out
-
-if [ $? -eq 0 ]
-then
-  if `cat tmp.out | grep "Access Denied"  > tmp.out`
-  then
-    rm -rf tmp.out
-    return 1
-  else
-    return 0
-  fi
-else
-    rm -rf tmp.out
-        return 1
-fi
-return 0
-}
-
-
-remote_drive()
-{
-host=$1
-drive=$2
-drive="$drive:\\"
-
-rcm="rsh"
-echo "     Checking Remote Host mount drive......"
-
-echo "$rcm $host \"`echo $drive`\""
-
- $rcm $host dir \"`echo $drive`\" > tmp1.out
-if `cat tmp1.out | grep "not found" > tmp1.out`
-then
-       rm -rf tmp1.out
-        return 1
-else
-        rm -rf tmp1.out
-        return 0
-fi
-
-return 0
-}
-
-CheckRemoteHost()
-{
-host=$1
-drive=$2
-
-case $MainOS in
-        Windows_NT)
-                ;;
-        *)
-                remote_connect $host
-                if [ $? -eq 1 ]
-                then
-                        echo "      $host is not accessable....."
-                        return 1
-                fi
-
-                REMOTE_CMD="rsh"
-                remote_drive $host $drive
-                if [ $? -eq 1 ]
-                then
-                        echo "      Specified drive $drive is not mounted on $host"
-                        return 1
-                fi
-                ;;
-esac
-return 0
-}
-
-######## Set Silk Environment
-SetSilkEnvironment()
-{
-echo " Setting Target Machines to run Silk ......"
-
-sh $TESTING_SHARED/DS/${VER}/silk/TargetSetup $IROOT $TARGET_SILK_DISPLAY > $TET_TMP_DIR/engagetarget.out
-
-echo " Setting Silk Test environment........."
-
-if [ $? -eq 1 ]
-  then
-    echo "Error in setting  target machine . Exiting program..."
-    exit 1
-  fi
-
-
-sh $TESTING_SHARED/DS/${VER}/silk/silkenvupdate >> $TET_TMP_DIR/engage.out
-if [ $? -eq 1 ]
-  then
-    echo "Error in setting silk environment . Exiting program..."
-    exit 1
-  fi
-return 0
-}
-
 
 
 ####### Report Generation routines ###########################################
