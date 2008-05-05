@@ -1,0 +1,31 @@
+#
+# filename: tet_scen
+#
+
+all
+	"Starting ALL"
+	^sample
+	"Ending ALL"
+
+sample
+	"Starting accept sample tests"
+	/sample.ksh
+	"Ending accept sample tests"
+
+startup
+	"Starting accept sample tests"
+	/sample.ksh{1}
+	"Ending accept sample tests"
+runtest
+	"Starting accept sample tests"
+	/sample.ksh{2}
+	"Ending accept sample tests"
+runguitest
+        "Starting sample Gui test"
+        /samplegui.ksh
+        "Ending sample gui tests"
+cleanup
+	"Starting accept sample tests"
+	/sample.ksh{3}
+	"Ending accept sample tests"
+# EOF

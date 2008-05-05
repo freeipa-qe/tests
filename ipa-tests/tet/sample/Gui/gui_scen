@@ -1,0 +1,29 @@
+[PlanFile]
+       PlanFileName=samplegui.pln
+       OptionSetFileName=samplegui.opt
+       Category=Sample
+[samplestart]
+	#Start ConsoleMenu
+        {
+	  	TestName=GuiStartTest
+        	SuiteFile=samplegui.t
+        }
+   	{
+		TestName=ConsoleMenu
+		SuiteFile=samplegui.t
+	}
+[sample]
+	#Run Search User and Groups
+	 {
+		TestName=SearchUG
+        	SuiteFile=samplegui.t
+         }
+        #End Search User and Groups
+[sampleend]
+       #Cleanup
+        {
+	  	TestName=GuiEndTest
+        	SuiteFile=samplegui.t
+        }
+	#Ending CLeanup 
+# EOF

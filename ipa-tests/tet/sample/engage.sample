@@ -1,0 +1,151 @@
+#!/bin/sh
+#
+# File Name: engage.sample
+#
+sample_default()
+{
+	if [ -z "$SampleRunIt" ]
+	then
+		SampleRunIt=n
+	fi
+
+       if [ -z "$SampleGuiRunIt" ]
+        then
+                SampleGuiRunIt=n
+        fi
+
+
+
+        if [ -z "$LidifFile" ] ;        then LdifFile="Airius.ldif"     ; fi
+        if [ -z "$SuffixName" ] ;       then SuffixName="o=mcom.com"  ; fi
+}
+
+# This function will ask the user for more information/choices if needed.
+#
+sample_ask()
+{
+	sav_SampleRunIt=$SampleRunIt
+	echo "    Execute sample test suite [$SampleRunIt] ? \c"
+	read rsp
+	case $rsp in
+		"")	SampleRunIt=$sav_SampleRunIt	;;
+		y|Y)	SampleRunIt=y ;;
+		*)	SampleRunIt=n		;;
+	esac
+
+        sav_SampleGuiRunIt=$SampleGuiRunIt
+        echo "    Execute Sample Gui test suite [$SampleGuiRunIt] ? \c"
+        read rsp1
+        case $rsp1 in
+                "")     SampleGuiRunIt=$sav_SampleGuiRunIt      ;;
+                y|Y)    SampleGuiRunIt=y                ;;
+                *)      SampleGuiRunIt=n                ;;
+        esac
+
+
+        if [ $SampleGuiRunIt = y ]
+        then
+
+		echo "        Name of the ldif file to import [$LdifFile]: \c"
+        	sav_ldiffile=$LdifFile
+        	read LdifFile
+        	if [ -z "$LdifFile" ] ; then LdifFile=$sav_ldiffile ; fi
+
+        	echo "        Suffix name [$SuffixName]: \c"
+        	sav_suffixname=$SuffixName
+        	read SuffixName
+        	if [ -z "$SuffixName" ] ; then SuffixName=$sav_suffixname ; fi
+     fi
+
+}
+
+# This function will print the user's choices (aka variables)
+#
+sample_print()
+{
+	echo "    Execute sample test suite        : $SampleRunIt"
+        echo "    Execute Sample Gui Test suite    : $SampleGuiRunIt "
+#        echo "    Ldif File to  import             : $LdifFile "
+        echo "    SuffixName                       : $SuffixName "
+
+}
+
+# This function will echo in shell's format the user's choices
+# It is the calling function that will redirect the output to
+# the saved config file.
+#
+sample_save()
+{
+	echo "SampleRunIt=$SampleRunIt"
+
+        echo "SampleGuiRunIt=$SampleGuiRunIt"
+        echo "LdifFile=$LdifFile"
+        echo "SuffixName=$SuffixName"
+
+}
+
+# This function will check that the test suite may be executed
+# It may also perform some kind of pre-configuration of the machine.
+# This function should "exit 1" if there is problem.
+#
+sample_check()
+{
+	kgb=kgb
+}
+
+# This function will startup/initiate the test suite
+#
+sample_startup()
+{
+:
+}
+
+# This function will run the test suite
+#
+sample_run()
+{
+	if [ $SampleRunIt = n ]
+	then
+		return
+	fi
+	echo "engage.sample: Sample run..."
+	$TET_ROOT/$MainTccName \
+		-e -s $TET_ROOT/../testcases/AS/4.5/sample/tet_scen \
+		-x $TET_ROOT/../tetexec.cfg \
+		$TET_ROOT/../testcases/AS/4.5/sample \
+		sample > $MainTmpDir/sample.run.out 2>&1
+	main_analyze "Sample run" `grep "tcc: journal file is" $MainTmpDir/sample.run.out | awk '{print $5}'` $MainTmpDir/sample.run.out
+	MainReportFiles="$MainReportFiles $MainTmpDir/sample.run.out"
+}
+
+
+# This function will run the Gui tests suite
+
+sample_gui_run()
+{
+        if [ $SampleGuiRunIt = n ]
+        then
+                return
+        fi
+        echo "engage.sample: sample_gui_run"
+echo        "$TET_ROOT/$MainTccName -e -s $TET_ROOT/../testcases/AS/4.5/sample/tet_scen -x $TET_ROOT/../tetexec.cfg $TET_ROOT/../testcases/AS/4.5/sample runguitest  > $MainTmpDir/sample.gui.out"
+       $TET_ROOT/$MainTccName -e -s $TET_ROOT/../testcases/AS/4.5/sample/tet_scen -x $TET_ROOT/../tetexec.cfg $TET_ROOT/../testcases/AS/4.5/sample runguitest  > $MainTmpDir/sample.gui.out 2>&1
+
+	echo "engage.sample: sample_gui_run runguitest .... done"
+	echo "engage.sample: analyze started"
+        main_analyze "sample Gui run" `grep "tcc: journal file is" $MainTmpDir/sample.gui.out | awk  '{print $5}'` $MainTmpDir/sample.gui.out 1
+
+
+        MainReportFiles="$MainReportFiles $MainTmpDir/sample.gui.out"
+}
+
+# This function will cleanup after the test suite execution
+#
+sample_cleanup()
+{
+:
+}
+
+
+#
+# End of file
