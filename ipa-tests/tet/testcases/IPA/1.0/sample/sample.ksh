@@ -6,15 +6,15 @@ tet_startup="ServerInfo"
 tet_cleanup=""
 iclist="ic1 ic2 ic3"
 ic1="BobStartState"
-#ic2="tp1 tp2"
-ic2="tp3"
+ic2="tp1 tp2"
+#ic2="tp3"
 ic3="BobEndState"
 
 DATA=$TET_ROOT/../data
 BASESUFFIX="o=airius.com"
-
+set -x
 echo "sample.ksh called here"
-exit
+
 tp1() 
 {
 message "anonymous search uid=mlott"
@@ -29,8 +29,9 @@ if [ $RC != 0 ]; then
     tet_infoline "RC=$RC."
 set -x
     tet_result FAIL
-exit
 else
+echo "passed"
+set -x
     tet_result PASS
 fi
 }

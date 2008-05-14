@@ -130,12 +130,13 @@ sample_run()
 	if [ $SampleRunIt = y ]
 	then
 	echo "Sample run... TET_ROOT is $TET_ROOT MainTccName is $MainTccName"
-	echo "$TET_ROOT/$MainTccName -e -s $TET_ROOT/sample/tet_scen -x $TET_ROOT/testcases/IPA/tetexecpl.cfg $TET_ROOT/sample sample"
-	$TET_ROOT/$MainTccName -e -s $TET_ROOT/sample/tet_scen -x $TET_ROOT/testcases/IPA/tetexecpl.cfg $TET_ROOT/sample sample
+	echo "$TET_ROOT/$MainTccName -e -s $TET_ROOT/testcases/IPA/1.0/sample/tet_scen -x $TET_ROOT/testcases/IPA/tetexecpl.cfg $TET_ROOT/testcases/IPA/1.0/sample sample"
+	pwd
+	$TET_ROOT/$MainTccName -e -s $TET_ROOT/testcases/IPA/1.0/sample/tet_scen -x $TET_ROOT/testcases/IPA/tetexecpl.cfg $TET_ROOT/testcases/IPA/1.0/sample sample
 	$TET_ROOT/$MainTccName \
-		-e -s $TET_ROOT/sample/tet_scen \
+		-e -s $TET_ROOT/testcases/IPA/1.0/sample/tet_scen \
 		-x $TET_ROOT/testcases/IPA/tetexecpl.cfg \
-		$TET_ROOT/sample \
+		$TET_ROOT/testcases/IPA/1.0/sample \
 		sample > $MainTmpDir/sample.run.out 2>&1
 
 	echo "journal file is $MainTmpDir/sample.run.out"
