@@ -4,42 +4,68 @@ use strict;
 use warnings; 
 
 our $sdir = "/home/yi/workspace/ipawebgui/testcases/smog";
-#our $tdir ="/tmp/t/";
-our $tdir=$sdir;
+our $tdir ="/tmp/t/";
+#our $tdir=$sdir;
 
 our @infiles =getdirfiles($sdir);
 if ($#infiles < 0 ){
 	print "\nsource dir has no files [$sdir]";
 	exit;
 }
-foreach my $file (@infiles){ 
-	my $tfile = $tdir.$file;
-	$tfile =~ s/\.pl$/\.t/;
+our $PREFIX=q/
+	my ($data, $sel) = @_;  
+	if (!defined $sel){
+		my $sel = Test::WWW::Selenium->new(host=>$host,port=>$port,browser=>$browser,browser_ur =>$browser_url);
+	}/;
+foreach my $file (@infiles){  
+	my $tc_name = $file;
+	$tc_name =~ s/\.pl$//;
+	my $tfile = $tdir.$tc_name.".t";
 	print "\n[$file] -> [$tfile]";
-	if (!open (DATAFILE , $file)){
-		print  "\nreading [$file]ERROR, skip this file";
+	if (!open (DATAFILE , $sdir."/".$file)){
+		print  "\nopen to read [$file] ERROR, skip this file";
 		next;
 	}
 
 	if (!open (SCRIPT , ">$tfile")){
-		print  "\nreading [$tfile]ERROR, skip this file";
+		print  "\nopen to write [$tfile] ERROR, skip this file";
 		close DATAFILE;
 		next;
 	}
 	my $flag=1;
 	my @lines = <DATAFILE>;
+	my $counter=0;
 	foreach my $line (@lines) {
-		#print "$line";
 		if ($line =~ /\$sel-\>/){
+			if ($line =~ /ok/){
+				$counter++;
+			}
 			if ($flag){
-				print SCRIPT "# source ($file)"; 
-				print SCRIPT "\n# [".gettimestamp()."]\n";
+				print SCRIPT "sub $tc_name {\n\n";
+				print SCRIPT "    # source ($file)\n"; 
+				print SCRIPT "    # [".gettimestamp()."]\n"; 
+				print SCRIPT $PREFIX;
+				print SCRIPT "\n";
 				$flag=0;
 			}
-			print SCRIPT $line;
+			#format:  $sel->open_ok(https://ipaserver.test.com/ipa/user/show?uid=a001);
+			if ($line =~ /open_ok/){ 
+				print SCRIPT "\t#".$line;
+				my $t = q[https://ipaserver.test.com];
+				$line =~ s/$t//; 
+			}			
+			#format: $sel->type_ok("form_title", "automation");
+			if ($line =~ /type_ok\(\"(.*)\"(.*)\"(.*)\"\)/){
+				my $key = $1;
+				my $value = $3;
+				my $replace = "\$testdata->{\'".$key."\'}";
+				$line =~ s/$value/$replace/; 
+			}
+			print SCRIPT "\t".$line;
 		}
 	} 
 	close DATAFILE;
+	print SCRIPT "\n    #use Test::More tests => $counter;\n\n}#$tc_name\n" ;
 	close SCRIPT;
 }
 
