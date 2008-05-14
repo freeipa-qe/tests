@@ -170,7 +170,7 @@ case $MainOS in
 		MainSendmail="rsh $MailHost /usr/lib/sendmail -t"
 		;;
 	Linux)
-		MainTccName=bin/c/i686-unknown-linux/tcc
+		MainTccName=bin/tcc
 		MainTmpDir=/tmp
 		MainPerlName=perl/linux2.2/lib/nsPerl5.6.1/bin/nsperl
 		#MainSendmail="/usr/lib/sendmail -t"

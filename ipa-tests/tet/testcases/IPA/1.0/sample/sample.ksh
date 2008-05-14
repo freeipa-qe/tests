@@ -6,12 +6,15 @@ tet_startup="ServerInfo"
 tet_cleanup=""
 iclist="ic1 ic2 ic3"
 ic1="BobStartState"
-ic2="tp1 tp2"
+#ic2="tp1 tp2"
+ic2="tp3"
 ic3="BobEndState"
 
 DATA=$TET_ROOT/../data
 BASESUFFIX="o=airius.com"
 
+echo "sample.ksh called here"
+exit
 tp1() 
 {
 message "anonymous search uid=mlott"
@@ -24,7 +27,9 @@ RC=$?
 if [ $RC != 0 ]; then
     tet_infoline "exact search failed."
     tet_infoline "RC=$RC."
+set -x
     tet_result FAIL
+exit
 else
     tet_result PASS
 fi
@@ -48,7 +53,18 @@ else
 fi
 }
 
-. $TESTING_SHARED/DS/$VER/ksh/baselib.ksh
-. $TESTING_SHARED/DS/$VER/ksh/applib.ksh
-. $TESTING_SHARED/DS/$VER/ksh/appstates.ksh
-. $TET_ROOT/lib/ksh/tcm.ksh
+tp3()
+{
+	ls /tmp
+	ret=$?
+	if [ $ret eq 0 ]; then
+		echo "it worked!"
+		tet_result PASS
+	else	
+		tet_result FAIL
+	fi
+}
+#. $TESTING_SHARED/DS/$VER/ksh/baselib.ksh
+#. $TESTING_SHARED/DS/$VER/ksh/applib.ksh
+#. $TESTING_SHARED/DS/$VER/ksh/appstates.ksh
+#. $TET_ROOT/lib/ksh/tcm.ksh

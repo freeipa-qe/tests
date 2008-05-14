@@ -39,10 +39,10 @@ sample_ask()
 		*)	SamplePerlRunIt=n		;;
 	esac
 
-        if [ $SamplePerlRunIt = y ]
-        then
-         return                
-        fi
+        #if [ $SamplePerlRunIt = y ]
+        #then
+        # return                
+        #fi
  
 	echo "    Execute sample test suite in korn shell [$SampleRunIt] ? \c"
 	read rsp
@@ -120,7 +120,7 @@ sample_check()
 #
 sample_startup()
 {
-:
+	echo "Sample_Startup running"
 }
 
 # This function will run the test suite
@@ -129,12 +129,16 @@ sample_run()
 {
 	if [ $SampleRunIt = y ]
 	then
-	echo "Sample run..."
+	echo "Sample run... TET_ROOT is $TET_ROOT MainTccName is $MainTccName"
+	echo "$TET_ROOT/$MainTccName -e -s $TET_ROOT/sample/tet_scen -x $TET_ROOT/testcases/IPA/tetexecpl.cfg $TET_ROOT/sample sample"
+	$TET_ROOT/$MainTccName -e -s $TET_ROOT/sample/tet_scen -x $TET_ROOT/testcases/IPA/tetexecpl.cfg $TET_ROOT/sample sample
 	$TET_ROOT/$MainTccName \
-		-e -s $TET_ROOT/../testcases/DS/$VER/sample/tet_scen \
-		-x $TET_ROOT/../tetexec.cfg \
-		$TET_ROOT/../testcases/DS/$VER/sample \
+		-e -s $TET_ROOT/sample/tet_scen \
+		-x $TET_ROOT/testcases/IPA/tetexecpl.cfg \
+		$TET_ROOT/sample \
 		sample > $MainTmpDir/sample.run.out 2>&1
+
+	echo "journal file is $MainTmpDir/sample.run.out"
 	main_analyze "Sample run" `grep "tcc: journal file is" $MainTmpDir/sample.run.out | awk '{print $5}'` $MainTmpDir/sample.run.out
 	MainReportFiles="$MainReportFiles $MainTmpDir/sample.run.out"
        fi

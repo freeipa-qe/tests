@@ -67,10 +67,10 @@ acceptance_run()
 {
 echo "Starting Acceptance Tests........."
 
-TET_SUITE_ROOT=$mainRunBaseDir/acceptance; export TET_SUITE_ROOT
-if [ $MainRunStartup = y ] ; then quickinstall_startup ; fi
-if [ $MainRunTests = y ] ; then quickinstall_run ; fi
-if [ $MainRunCleanup = y ] ; then quickinstall_cleanup ; fi
+#TET_SUITE_ROOT=$mainRunBaseDir/acceptance; export TET_SUITE_ROOT
+#if [ $MainRunStartup = y ] ; then quickinstall_startup ; fi
+#if [ $MainRunTests = y ] ; then quickinstall_run ; fi
+#if [ $MainRunCleanup = y ] ; then quickinstall_cleanup ; fi
 
 TET_SUITE_ROOT=$mainRunBaseDir/sample; export TET_SUITE_ROOT
 if [ $MainRunStartup = y ] ; then sample_startup ; fi
@@ -78,9 +78,9 @@ if [ $MainRunTests = y ]   ; then sample_run     ; fi
 if [ $MainRunCleanup = y ] ; then sample_cleanup ; fi
 
 # uninstall MUST be last
-TET_SUITE_ROOT=$mainRunBaseDir/acceptance; export TET_SUITE_ROOT
-if [ $MainRunStartup = y ] ; then quickuninstall_startup ; fi
-if [ $MainRunTests = y ] ; then quickuninstall_run ; fi
+#TET_SUITE_ROOT=$mainRunBaseDir/acceptance; export TET_SUITE_ROOT
+#if [ $MainRunStartup = y ] ; then quickuninstall_startup ; fi
+#if [ $MainRunTests = y ] ; then quickuninstall_run ; fi
 
 }
 
