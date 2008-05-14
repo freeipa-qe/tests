@@ -3,21 +3,72 @@
 use strict;
 use warnings; 
 
-our $sdir = "/home/yi/workspace/ipawebgui/testcases/smog";
-our $tdir ="/tmp/t/";
+our $sdir = "/home/yi/workspace/ipawebgui/testcases/smog";	# source dir
+our $tdir ="/tmp/t/";										# target dir
+our $ddir = "/home/yi/workspace/ipawebgui/testcases/";		# data dir
+our $dfile = "smogdata.txt";
 #our $tdir=$sdir;
+
+if (!open (DATA, ">$ddir$dfile")){
+	print "Can not open data file to write";
+	exit;
+}
 
 our @infiles =getdirfiles($sdir);
 if ($#infiles < 0 ){
 	print "\nsource dir has no files [$sdir]";
 	exit;
 }
+our $BEGIN=q[
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use Time::HiRes qw(sleep);
+use Test::WWW::Selenium;
+use Test::More tests
+use Test::Exception;
+
+use lib '/home/yi/workspace/ipawebgui/support';
+use IPAutil;
+
+# global veriables
+our $host;
+our $port;
+our $browser;
+our $browser_url;
+our $configfile="test.conf";
+
+# read configruation file
+our $config=IPAutil::readconfig($configfile);
+$host=$config->{'host'};
+$port=$config->{'port'};
+$browser=$config->{'browser'};
+$browser_url=$config->{'browser_url'};
+
+# check testing environment
+if (envcheck()){ 
+	print "\nEnvironment is ready for testing...";
+}else{
+	exit 1;
+}
+my $testdata=prepare_data();
+
+# run test
+run_test($testdata);
+
+cleanup_data($testdata);
+
+print "\ntest finished\n";
+];
+
 our $PREFIX=q/
 	my ($data, $sel) = @_;  
 	if (!defined $sel){
 		my $sel = Test::WWW::Selenium->new(host=>$host,port=>$port,browser=>$browser,browser_ur =>$browser_url);
 	}/;
 foreach my $file (@infiles){  
+	my $body= "";
 	my $tc_name = $file;
 	$tc_name =~ s/\.pl$//;
 	my $tfile = $tdir.$tc_name.".t";
@@ -40,17 +91,18 @@ foreach my $file (@infiles){
 			if ($line =~ /ok/){
 				$counter++;
 			}
-			if ($flag){
-				print SCRIPT "sub $tc_name {\n\n";
-				print SCRIPT "    # source ($file)\n"; 
-				print SCRIPT "    # [".gettimestamp()."]\n"; 
-				print SCRIPT $PREFIX;
-				print SCRIPT "\n";
+			if ($flag){  
+				$body .= "\n#=========== sub =============\n";
+				$body .="\nsub run_test {\n";
+				$body .= "    # test case name ($tc_name)\n"; 
+				$body .= "    # source ($file)\n"; 
+				$body .= "    # [".gettimestamp()."]\n"; 
+				$body .= $PREFIX ."\n";
 				$flag=0;
 			}
 			#format:  $sel->open_ok(https://ipaserver.test.com/ipa/user/show?uid=a001);
-			if ($line =~ /open_ok/){ 
-				print SCRIPT "\t#".$line;
+			if ($line =~ /open_ok/){  
+				$body .= "\t#".$line;
 				my $t = q[https://ipaserver.test.com];
 				$line =~ s/$t//; 
 			}			
@@ -59,15 +111,21 @@ foreach my $file (@infiles){
 				my $key = $1;
 				my $value = $3;
 				my $replace = "\$testdata->{\'".$key."\'}";
+				print DATA "\n$tc_name : $key -> $value";
 				$line =~ s/$value/$replace/; 
-			}
-			print SCRIPT "\t".$line;
+			} 
+			$body .="\t$line";
 		}
 	} 
-	close DATAFILE;
-	print SCRIPT "\n    #use Test::More tests => $counter;\n\n}#$tc_name\n" ;
+	close DATAFILE; 
+	$body .=  "} #$tc_name\n\n" ;
+	my $tc = $BEGIN.$body;
+	$tc =~ s/Test::More tests/use Test::More tests => $counter;/;
+	print SCRIPT $tc;
 	close SCRIPT;
 }
+print "\n$ddir$dfile closed";
+close DATA;
 
 print "\nend of execution\n";
 
