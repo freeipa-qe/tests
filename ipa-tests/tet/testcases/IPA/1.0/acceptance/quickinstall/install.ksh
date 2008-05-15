@@ -560,7 +560,7 @@ tp2()
 }
 ######################################################################
 
-. $TESTING_SHARED/DS/$VER/ksh/baselib.ksh
-. $TESTING_SHARED/DS/$VER/ksh/applib.ksh
-. $TESTING_SHARED/DS/$VER/ksh/appstates.ksh
+#. $TESTING_SHARED/DS/$VER/ksh/baselib.ksh
+. $TESTING_SHARED/instlib.ksh
+. $TESTING_SHARED/shared.ksh
 . $TET_ROOT/lib/ksh/tcm.ksh
