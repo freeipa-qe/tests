@@ -18,7 +18,7 @@ our $browser_url;
 our $configfile="test.conf";
 
 # read configruation file
-our $config=Util::readconfig($configfile);
+our $config=IPAutil::readconfig($configfile);
 $host=$config->{'host'};
 $port=$config->{'port'};
 $browser=$config->{'browser'};

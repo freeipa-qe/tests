@@ -3,11 +3,13 @@
 use strict;
 use warnings; 
 
-our $sdir = "/home/yi/workspace/ipawebgui/testcases/smog";	# source dir
-our $tdir ="/tmp/t/";										# target dir
+our $sdir = "/home/yi/workspace/ipawebgui/testcases/smog/";	# source dir
+our $tdir = "/home/yi/workspace/ipawebgui/testcases/t_smog/";	# target dir
+#our $tdir ="/tmp/t/";						# target dir
 our $ddir = "/home/yi/workspace/ipawebgui/testcases/";		# data dir
 our $dfile = "smogdata.txt";
-#our $tdir=$sdir;
+
+our $testid=1000;
 
 if (!open (DATA, ">$ddir$dfile")){
 	print "Can not open data file to write";
@@ -19,6 +21,7 @@ if ($#infiles < 0 ){
 	print "\nsource dir has no files [$sdir]";
 	exit;
 }
+
 our $BEGIN=q[
 #!/usr/bin/perl
 
@@ -31,6 +34,7 @@ use Test::Exception;
 
 use lib '/home/yi/workspace/ipawebgui/support';
 use IPAutil;
+use IPADataStore;
 
 # global veriables
 our $host;
@@ -38,6 +42,9 @@ our $port;
 our $browser;
 our $browser_url;
 our $configfile="test.conf";
+our $testid;
+our $testdata;
+our @datakeys;
 
 # read configruation file
 our $config=IPAutil::readconfig($configfile);
@@ -46,20 +53,22 @@ $port=$config->{'port'};
 $browser=$config->{'browser'};
 $browser_url=$config->{'browser_url'};
 
-# check testing environment
-if (envcheck()){ 
-	print "\nEnvironment is ready for testing...";
-}else{
-	exit 1;
-}
-my $testdata=prepare_data();
-
-# run test
+## Test starts here 
+IPAutil::env_check($host, $port, $browser, $browser_url);
+prepare_data();
 run_test($testdata);
-
 cleanup_data($testdata);
 
-print "\ntest finished\n";
+];
+
+our $END=q[
+sub prepare_data(){
+	$testdata = IPADataStore::construct_testdata($testid, @datakeys); 
+}
+
+sub cleanup_data(){
+	IPADataStore::cleanup_testdata($testid, $testdata);
+}
 ];
 
 our $PREFIX=q/
@@ -67,8 +76,10 @@ our $PREFIX=q/
 	if (!defined $sel){
 		my $sel = Test::WWW::Selenium->new(host=>$host,port=>$port,browser=>$browser,browser_ur =>$browser_url);
 	}/;
+
 foreach my $file (@infiles){  
 	my $body= "";
+	my $datakeys=q[our @datakeys=(];
 	my $tc_name = $file;
 	$tc_name =~ s/\.pl$//;
 	my $tfile = $tdir.$tc_name.".t";
@@ -111,16 +122,22 @@ foreach my $file (@infiles){
 				my $key = $1;
 				my $value = $3;
 				my $replace = "\$testdata->{\'".$key."\'}";
-				print DATA "\n$tc_name : $key -> $value";
+				$datakeys .="\"".$key."\",";
+				print DATA "\n$tc_name : $key -> $value"; 
 				$line =~ s/$value/$replace/; 
 			} 
 			$body .="\t$line";
 		}
 	} 
 	close DATAFILE; 
+	$testid ++;
 	$body .=  "} #$tc_name\n\n" ;
-	my $tc = $BEGIN.$body;
+	$datakeys =~ s/,$//;
+	$datakeys .= ");";
+	my $tc = $BEGIN.$body.$END;
 	$tc =~ s/Test::More tests/use Test::More tests => $counter;/;
+	$tc =~ s/our \@datakeys;/$datakeys/;
+	$tc =~ s/our \$testid;/our \$testid=$testid;/;
 	print SCRIPT $tc;
 	close SCRIPT;
 }
