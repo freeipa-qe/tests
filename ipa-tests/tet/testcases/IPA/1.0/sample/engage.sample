@@ -139,7 +139,11 @@ sample_run()
 		$TET_ROOT/testcases/IPA/1.0/sample \
 		sample > $MainTmpDir/sample.run.out 2>&1
 
+	echo ""
 	echo "journal file is $MainTmpDir/sample.run.out"
+	echo ""
+	cat $MainTmpDir/sample.run.out
+	echo ""
 	main_analyze "Sample run" `grep "tcc: journal file is" $MainTmpDir/sample.run.out | awk '{print $5}'` $MainTmpDir/sample.run.out
 	MainReportFiles="$MainReportFiles $MainTmpDir/sample.run.out"
        fi

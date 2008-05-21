@@ -3,12 +3,8 @@
 # File Name: engage.acceptan
 #
 ######### Include directories ############################################
-#. $mainRunBaseDir/acceptance/quickinstall/engage.quickinstall
+. $mainRunBaseDir/acceptance/quickinstall/engage.quickinstall
 . $mainRunBaseDir/sample/engage.sample
-
-
-
-
 
 
 #####################################################
@@ -16,6 +12,7 @@
 acceptance_default()
 {
 #	dsmlgw_default
+	quickinstall_default
 	sample_default
 }
 
@@ -23,6 +20,7 @@ acceptance_default()
 #
 acceptance_ask()
 {
+		quickinstall_ask
 		sample_ask
 }
 

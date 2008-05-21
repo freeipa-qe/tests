@@ -713,8 +713,8 @@ main_default()
 {
 	# Variables for A2k
 	#
+
 	if [ -z "$PkgName"               ] ; then PkgName=dirsrv ; fi
-env
 	if [ -z "$TET_ROOT" ] ;	then TET_ROOT=`(cd $mainRunBaseDir/../../../../tet ; pwd)`	; fi
 	if [ -z "$CHARSET" ] ;    then CHARSET=en						 ; fi
 	if [ -z "$IROOT" ] ;      then IROOT=/usr/lib/$PkgName/slapd-`hostname` ; fi
@@ -724,9 +724,15 @@ env
       tmp_PREFIX2=`dirname $tmp_PREFIX1`
       PREFIX=$tmp_PREFIX2
     fi
+	if [ -z "$RELM_NAME" ] ;  then RELM_NAME=SJCTEST.REDHAT.COM ; fi
+	if [ -z "$KERB_MASTER_PASS" ] ; then KERB_MASTER_PASS=Secret123 ; fi 
+	if [ -z "$DM_ADMIN_PASS" ] ; then DM_ADMIN_PASS=Secret123 ; fi
   	if [ -z "$ROOTDN" ] ;     then ROOTDN="cn=directory manager"   ; fi
 	if [ -z "$ROOTDNPW" ] ;   then ROOTDNPW=Secret123              ; fi
 	if [ -z "$TETADMINPW" ] ; then TETADMINPW=Admin123             ; fi
+	if [ -z "$DS_USER" ] ; then DS_USER=admin                      ; fi
+	if [ -z "$NUMSERVERS" ] ; then NUMSERVERS=1                    ; fi
+	if [ -z "$NUMCLIENTS" ] ; then NUMCLIENTS=0                    ; fi
 	if [ -z "$VER" ]
 	then
 		VER=`(cd $mainRunBaseDir ; pwd)`
@@ -811,7 +817,7 @@ env
 
 # export all these variables 
 
-	export TET_ROOT VER CHARSET TESTING_SHARED IROOT PREFIX TET_TMP_DIR  TET_REPORT_DIR DS_LOG_DIR
+	export TET_ROOT VER CHARSET TESTING_SHARED IROOT PREFIX TET_TMP_DIR  TET_REPORT_DIR DS_LOG_DIR RELM_NAME KERB_MASTER_PASS DM_ADMIN_PASS DS_USER NUMSERVERS SERVERS CLIENTS NUMCLIENTS
 	export ROOTDN ROOTDNPW TETADMINPW LDAPhost LDAPport DRIVE
 	export IGNORE_KNOWN_BUGS DSTET_64 DSTET_DEBUG PkgName
 
@@ -947,12 +953,210 @@ main_backendask()
 
 }
 
+ask_m1()
+{
+	echo "hostname of server 1?($HOSTNAME_M1)->"
+	read rsp
+	if [ -z "$rsp" ] ; then echo "hostname unchanged"; else HOSTNAME_M1="$rsp"; fi
+	echo "OS of server 1?"
+	echo "   1. RHEL"
+	echo "   2. FC(Fedora Core)"
+	echo "   Default = $OS_M1"
+	read rsp
+	if [ -z "$rsp" ] ; then os_tmp=d; else os_tmp="$rsp"; fi
+	case $os_tmp in
+		1) OS_M1="RHEL"
+			;;
+		2) OS_M1="FC"
+			;;
+		d) echo "OS_M1 unchanged"
+			;;
+		*) echo "You have chosen a invalid choice($os_tmp), exiting"
+			exit
+			;;
+		esac
+	echo "Repo for server 1? This is a url to the .repo file, or a tarball on hpux ($REPO_M1)->"
+	read rsp
+	if [ -z "$rsp" ] ; then echo "Server repo unchanged"; else REPO_M1="$rsp"; fi
+	export HOSTNAME_M1 OS_M1 REPO_M1 
 
+}
+
+ask_m2()
+{
+	echo "hostname of server 2?($HOSTNAME_M2)->"
+	read rsp
+	if [ -z "$rsp" ] ; then echo "hostname unchanged"; else HOSTNAME_M2="$rsp"; fi
+	echo "OS of server 2?"
+	echo "   1. RHEL"
+	echo "   2. FC(Fedora Core)"
+	echo "   Default = $OS_M2"
+	read rsp
+	if [ -z "$rsp" ] ; then os_tmp=d; else os_tmp="$rsp"; fi
+	case $os_tmp in
+		1) OS_M2="RHEL"
+			;;
+		2) OS_M2="FC"
+			;;
+		d) echo "OS_M2 unchanged"
+			;;
+		*) echo "You have chosen a invalid choice($os_tmp), exiting"
+			exit
+			;;
+		esac
+	echo "Repo for server 2? This is a url to the .repo file, or a tarball on hpux ($REPO_M2)->"
+	read rsp
+	if [ -z "$rsp" ] ; then echo "Server repo unchanged"; else REPO_M2="$rsp"; fi
+	export HOSTNAME_M2 OS_M2 REPO_M2 
+
+}
+
+ask_m3()
+{
+	echo "hostname of server 3?($HOSTNAME_M3)->"
+	read rsp
+	if [ -z "$rsp" ] ; then echo "Server needs a hostname"; else HOSTNAME_M3="$rsp"; fi
+	echo "OS of server 3?"
+	echo "   1. RHEL"
+	echo "   2. FC(Fedora Core)"
+	echo "   Default = $OS_M3"
+	read rsp
+	if [ -z "$rsp" ] ; then os_tmp=d; else os_tmp="$rsp"; fi
+	case $os_tmp in
+		1) OS_M3="RHEL"
+			;;
+		2) OS_M3="FC"
+			;;
+		d) echo "OS_M3 unchanged"
+			;;
+		*) echo "You have chosen a invalid choice($os_tmp), exiting"
+			exit
+			;;
+		esac
+	echo "Repo for server 3? This is a url to the .repo file, or a tarball on hpux ($REPO_M3)->"
+	read rsp
+	if [ -z "$rsp" ] ; then echo "Server repo unchanged"; else REPO_M3="$rsp"; fi
+	export HOSTNAME_M3 OS_M3 REPO_M3 
+
+}
+
+ask_m4()
+{
+	echo "hostname of server 4?($HOSTNAME_M4)->"
+	read rsp
+	if [ -z "$rsp" ] ; then echo "Server needs a hostname"; exit; else HOSTNAME_M4="$rsp"; fi
+	echo "OS of server 4?"
+	echo "   1. RHEL"
+	echo "   2. FC(Fedora Core)"
+	read rsp
+	if [ -z "$rsp" ] ; then os_tmp=d; else os_tmp="$rsp"; fi
+	case $os_tmp in
+		1) OS_M4="RHEL"
+			;;
+		2) OS_M4="FC"
+			;;
+		d) echo "OS_M4 unchanged"
+			;;
+		*) echo "You have chosen a invalid choice($os_tmp), exiting"
+			exit
+			;;
+		esac
+	echo "Repo for server 4? This is a url to the .repo file, or a tarball on hpux ($REPO_M4)->"
+	read rsp
+	if [ -z "$rsp" ] ; then echo "Server repo unchanged"; else REPO_M1="$rsp"; fi
+	export HOSTNAME_M4 OS_M4 REPO_M4 
+
+}
+
+ask_c1()
+{
+	echo "hostname of client 1?($HOSTNAME_C1)->"
+	read rsp
+	if [ -z "$rsp" ] ; then echo "Hostname unchanged"; else HOSTNAME_C1="$rsp"; fi
+	echo "OS of Client 1?"
+	echo "   1. RHEL"
+	echo "   2. HPUX"
+	echo "   3. FC(Fedora Core)"
+	echo "   4. solaris"
+	read rsp
+	if [ -z "$rsp" ] ; then os_tmp=$d; else os_tmp="$rsp"; fi
+	case $os_tmp in
+		1) OS_C1="RHEL"
+			;;
+		2) OS_C1="HPUX"
+			;;
+		3) OS_C1="FC"
+			;;
+		4) OS_C1="solaris"
+			;;
+		d) echo "OS unchanged"
+			;;
+		*) echo "You have chosen a invalid choice($os_tmp), exiting"
+			exit
+			;;
+		esac
+	echo "OS version?"
+	echo "for RHEL - 3,4,5"
+	echo "for FC - 7,8,9"
+	echo "for solaris - 6.7.8.9.10"
+	echo "for HPUX - <insert crazy uname version here>"
+	echo "default <$OS_VER_C1>"
+	echo "->"
+	read rsp
+	if [ -z "$rsp" ] ; then echo "Using $OS_VER_C1"; else OS_VER_C1="$rsp"; fi
+	echo "Repo for client 1? This is a url to the .repo file, or a tarball on hpux ($REPO_M1)->"
+	read rsp
+	if [ -z "$rsp" ] ; then echo "Client repo unchanged"; else  REPO_C1="$rsp"; fi
+	export OS_C1 HOSTNAME_C1 OS_VER_C1 REPO_C1
+
+}
 
 main_ask()
 {
 
 	TestChoice=1
+	echo "How many servers are in this test(not clients)? (4 max for now)"
+	echo "default $NUMSERVERS"
+	echo "->"
+	read rsp
+	if [ -z "$rsp" ] ; then echo "number of servers unchanged"; else NUMSERVERS="$rsp"; fi
+	
+	echo "How many clients are in this test? (4 max for now)"
+	echo "Hit \"Enter\", without any input for none"
+	echo "default $NUMCLIENTS"
+	echo "->"
+	read rsp
+	if [ -z "$rsp" ] ; then echo "Number of Clients unchanged, continuing"; else NUMCLIENTS="$rsp"; fi
+
+	case $NUMSERVERS in 
+		0) echo "0 isn't a valid selection."
+		   exit
+		;;
+		1) SERVERS="M1";ask_m1
+		;;
+		2) SERVERS="M1 M2";ask_m1;ask_m2
+		;;
+		3) SERVERS="M1 M2 M3";ask_m1;ask_m2;ask_m3
+		;;
+		4) SERVERS="M1 M2 M3 M4";ask_m1;ask_m2;ask_m3;ask_m4
+		;;			
+		*) echo "you need to select a number of servers in the valid range"; exit
+		;;
+	esac
+	case $NUMCLIENTS in 
+		0) echo "Alright, no clients in this test"
+		;;
+		1) CLIENTS="C1";ask_c1
+		;;
+		2) CLIENTS="C1 C2";ask_c1;ask_c2
+		;;
+		3) CLIENTS="C1 C2 C3";ask_c1;ask_c2;ask_c3
+		;;
+		4) CLIENTS="C1 C2 C3 C4";ask_c1;ask_c2;ask_c3;ask_c4
+		;;			
+		*) echo "No Clients in this test";
+		;;
+	esac
 
 	# Script engage's variables
 	#
@@ -1042,24 +1246,21 @@ main_ask()
 
         main_backendask
 
-	export MainRunTests MainRunCleanup MainRunStartup
+	export MainRunTests MainRunCleanup MainRunStartup SERVERS CLIENTS NUMSERVERS NUMCLIENTS
 }
 
 # This function will print the user's choices (aka variables)
 #
 main_print()
 {
-	echo "Automation 2000 framework variables:"
 	echo "    TET_ROOT       : $TET_ROOT"
 	echo "    TET_RUN        : $TET_RUN "
 	echo "    TET_REPORT_DIR : $TET_REPORT_DIR"
 	echo "    TET_TMP_DIR    : $TET_TMP_DIR"
 	echo "    DS_LOG_DIR     : $DS_LOG_DIR"
 	echo "    PERLPATH       : $PERLPATH"
-	echo "    TESTING_SHARED : $TESTING_SHARED"
 	echo "    VER            : $VER"
 	echo "    CHARSET        : $CHARSET"
-	echo "    IROOT          : $IROOT"
 	echo "    PREFIX         : $PREFIX"
 	echo "    SRCROOT        : $SRCROOT"
 	if [  "$MainOS" = "Windows_NT" ] && [ "$DRIVE" != "" ]; then
@@ -1068,6 +1269,39 @@ main_print()
 	echo "    ROOTDN         : $ROOTDN"
 	echo "    ROOTDNPW       : $ROOTDNPW"
 	echo "    TETADMINPW     : $TETADMINPW"
+        echo "    RELM_NAME      : $RELM_NAME"
+	echo "    KERB_MASTER_PASS: $KERB_MASTER_PASS"
+	echo "    DM_ADMIN_PASS  : $DM_ADMIN_PASS"
+	echo "    DS_USER        : $DS_USER"
+	echo "    SERVERS        : $SERVERS"
+	echo "    CLIENTS        : $CLIENTS"
+	. $TESTING_SHARED/shared.ksh
+	echo " Host Info"
+	echo $SERVERS | while read s; do
+		if [ "$s" != "" ]; then
+			eval_vars $s
+			echo "   HOSTNAME_$s     : $HOSTNAME"
+			echo "   OS_$s           : $OS"
+			echo "   REPO_$s         : $REPO"
+        		echo "   LDAP_PORT_$s    : $LDAP_PORT"
+        		echo "   LDAPS_PORT_$s   : $LDAPS_PORT"
+			echo "   FILE_SERVER_IS_ALIVE_$s : $FILE_SERVER_IS_ALIVE"
+			echo "   REPLICA_ID_$s   : $REPLICA_ID"
+		fi
+	done
+	echo $CLIENTS | while read s; do
+		if [ "$s" != "" ]; then
+			eval_vars $s
+			echo "   HOSTNAME_$s     : $HOSTNAME"
+			echo "   OS_$s           : $OS"
+			echo "   REPO_$s         : $REPO"
+        		echo "   LDAP_PORT_$s    : $LDAP_PORT"
+        		echo "   LDAPS_PORT_$s   : $LDAPS_PORT"
+			echo "   FILE_SERVER_IS_ALIVE_$s : $FILE_SERVER_IS_ALIVE"
+			echo "   REPLICA_ID_$s   : $REPLICA_ID"
+		fi
+	done
+
 	echo
 	echo
 	echo "Other general choices:"
@@ -1087,6 +1321,7 @@ main_print()
     echo "    Ignore known bugs              : $IGNORE_KNOWN_BUGS"
     echo "    Debugging Output (Verbose)     : $DSTET_DEBUG"
 	echo
+
 }
 
 # This function will echo in shell's format the user's choices
@@ -1128,6 +1363,44 @@ main_save()
 		echo "LDAPport=$LDAPport"
 		export LDAPport
 	fi
+	echo ""
+	echo "RELM_NAME=$RELM_NAME"
+	echo "KERB_MASTER_PASS=$KERB_MASTER_PASS"
+	echo "DM_ADMIN_PASS=$DM_MASTER_PASS"
+	echo "DS_USER=$DS_USER"
+	echo "SERVERS=$SERVERS"
+	echo "CLIENTS=$CLIENTS"
+	echo "NUMSERVERS=$NUMSERVERS"
+	echo "NUMCLIENTS=$NUMCLIENTS"
+	
+	echo $SERVERS | while read s; do
+		if [ "$s" != "" ]; then
+			eval_vars $s
+			echo "#working on $s"
+			echo "HOSTNAME_$s=$HOSTNAME"
+			echo "OS_$s=$OS"
+			echo "REPO_$s=$REPO"
+			echo "LDAP_PORT_$s=$LDAP_PORT"
+        		echo "LDAPS_PORT_$s=$LDAPS_PORT"
+			echo "FILE_SERVER_IS_ALIVE_$s=$FILE_SERVER_IS_ALIVE"
+			echo "REPLICA_ID_$s=$REPLICA_ID"
+		fi
+	done
+	echo $CLIENTS | while read s; do
+		if [ "$s" != "" ]; then
+			eval_vars $s
+			echo "#working on client $s"
+			echo "HOSTNAME_$s=$HOSTNAME"
+			echo "OS_$s=$OS"
+			echo "REPO_$s=$REPO"
+			echo "LDAP_PORT_$s=$LDAP_PORT"
+        		echo "LDAPS_PORT_$s=$LDAPS_PORT"
+			echo "FILE_SERVER_IS_ALIVE_$s=$FILE_SERVER_IS_ALIVE"
+			echo "REPLICA_ID_$s=$REPLICA_ID"
+		fi
+
+	done
+
 	echo
 	echo "MainReliabTests=$MainReliabTests"
 	echo "MainAcceptanceTests=$MainAcceptanceTests"
@@ -1474,6 +1747,21 @@ main_main()
 	else
 		main_loop_on_choices
 	fi
+
+	if [ "$SERVERS" == "" ]&&[ "$CLIENTS" == "" ]&&[ "$RELM_NAME" == "" ]
+	then
+		echo "ERROR no SERVERS, CLIENTS, or RELM_NAME defiened"
+		exit
+	fi
+
+	export HOSTNAME_M1 OS_M1 REPO_M1
+	export HOSTNAME_M2 OS_M2 REPO_M2
+	export HOSTNAME_M3 OS_M3 REPO_M3
+	export HOSTNAME_M4 OS_M4 REPO_M4
+	export HOSTNAME_C1 OS_C1 REPO_C1
+	export HOSTNAME_C2 OS_C2 REPO_C1
+	export HOSTNAME_C3 OS_C3 REPO_C3
+	export HOSTNAME_C4 OS_C4 REPO_C4
 
 # Lakshmi Gopal. Storing the test run files in TET_TMP_DIR instead of /tmp dir. 
 	# echo "MainOD ? $MainOS"

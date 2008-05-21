@@ -38,6 +38,7 @@ quickinstall_default()
 #
 quickinstall_ask()
 {
+
 	sav_quickinstallRunIt=$quickinstallRunIt
 	echo "    Execute quickinstall test suite [$quickinstallRunIt] ? \c"
 	read rsp
@@ -48,7 +49,7 @@ quickinstall_ask()
 			while true
 			do
 				sav_SRCROOT=$SRCROOT
-				echo "    Enter the source location [$SRCROOT] ? \c"
+				echo "    Enter the repo location [$SRCROOT] ?(a dir containing repo files, or a install tarball) \c"
 				read rsp
 				if [ -f "$rsp" ] || [ -d "$rsp" ]; then
 					SRCROOT=$rsp
@@ -108,21 +109,22 @@ quickinstall_run()
 		return
 	fi
 	echo "quickinstall run..."
+	echo "$TET_ROOT/$MainTccName -e -s $TET_ROOT/testcases/IPA/1.0/acceptance/quickinstall/tet_scen -x $TET_ROOT/testcases/IPA/tetexecpl.cfg $TET_ROOT/testcases/IPA/1.0/acceptance/quickinstall install"
+
 	$TET_ROOT/$MainTccName \
-		-e -s $TET_ROOT/../testcases/DS/$VER/acceptance/quickinstall/tet_scen \
-		-x $TET_ROOT/../tetexec.cfg \
-		$TET_ROOT/../testcases/DS/$VER/acceptance/quickinstall \
+		-e -s $TET_ROOT/testcases/IPA/1.0/acceptance/quickinstall/tet_scen \
+		-x $TET_ROOT/testcases/IPA/tetexecpl.cfg \
+		$TET_ROOT/testcases/IPA/1.0/acceptance/quickinstall \
 		install > $MainTmpDir/quickinstall.startup.out 2>&1
+	echo ""
+	echo "quickinstall startup $MainTmpDir/quickinstall.startup.out"
+	echo ""
+	cat $MainTmpDir/quickinstall.startup.out
+	echo ""
 	main_analyze "quickinstall startup" `grep "tcc: journal file is" $MainTmpDir/quickinstall.startup.out | awk '{print $5}'` $MainTmpDir/quickinstall.startup.out
 	MainReportFiles="$MainReportFiles $MainTmpDir/quickinstall.startup.out"
 
 	Gfile="$TET_TMP_DIR/global_src_`uname -n`"
-	if [ ! -f $Gfile ]; then
-		echo "$Gfile does not exist. quickinstall failed, engage abort ..."	
-		echo kill -16 $$
-		kill -16 $$
-	fi
-	. $Gfile
 	rm -f $Gfile
 }
 

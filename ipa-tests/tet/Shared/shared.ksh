@@ -24,8 +24,63 @@ eval_vars()
         FILE_SERVER_IS_ALIVE=`eval echo $x`
         x=\$REPLICA_ID_$1
         REPLICA_ID=`eval echo $x`
-        x=\$$1_OS
+        x=\$OS_$1
         OS=`eval echo $x`
+	x=\$REPO_$1
+	REPO=`eval echo $x`
+}
+
+is_server_alive()
+{
+	SID=$1
+        eval_vars $SID
+
+	ping -c 1 $FULLHOSTNAME
+	ret=$?
+        if [ $ret != 0 ]; then
+                echo "Ping of $FULLHOSTNAME failed. Trying again."
+		ping -c 1 $FULLHOSTNAME
+		ret=$?
+	        if [ $ret != 0 ]; then
+			echo "Ping of $FULLHOSTNAME failed. We are done. Server is not up"
+			tet_result FAIL
+			return 1;
+		fi
+	fi
+
+	tet_result PASS
+	return 0;
+}
+
+
+CheckAlive()
+{
+        echo "Checking to see if servers are alive and listening"
+        echo $SERVERS | while read s; do
+                if [ "$s" != "" ]; then
+                        echo "working on $s now"
+                        is_server_alive $s
+                        ret=$?
+                        if [ $ret -ne 0 ]; then
+                                echo "Server $s not answering pings"
+                                tet_result FAIL
+                        fi
+                fi
+        done
+
+        echo $CLIENTS | while read s; do
+                if [ "$s" != "" ]; then
+                        echo "working on $s now"
+                        is_server_alive $s
+                        ret=$?
+                        if [ $ret -ne 0 ]; then
+                                echo "Server $s not answering pings"
+                                tet_result FAIL
+                        fi
+                fi
+        done
+
+        tet_result PASS
 }
 
 setup_ssh_keys()
@@ -40,14 +95,23 @@ setup_ssh_keys()
 			chmod 600 ~/.ssh
 		fi
 		ssh-keygen -t dsa
+		ret=$?
+		if [ $ret -ne 0 ]; then
+			echo "ERROR! ssh-keygen failed"
+			tet_result FAIL
+			return $ret
+		fi 
 	fi
 	
 	if [ ! -f ~/.ssh/id_dsa.pub ]; then
 		echo "ERROR! ssh-keygen didn't create a key into ~/.ssh/id_dsa.pub"
+		tet_result FAIL
+		return 1
 	fi
 
         if [ "$HOSTNAME" = "" ]; then
 		echo "ERROR! eval_vars returned $HOSTNAME"
+		tet_result FAIL
                 return $rc
         fi
 	echo ""
@@ -70,26 +134,44 @@ setup_ssh_keys()
 	echo ""
 	echo ""
 	echo ""
-	if [ $OS == "rhel" ]; then
-		rm -f ./key-ssh.bash; echo "ssh $FULLHOSTNAME \"mkdir -p /root/.ssh;chmod 700 /root/.ssh\"" >> ./key-ssh.bash; bash ./key-ssh.bash
+	if [ $OS == "RHEL" ]; then
+		rm -f /tmp/key-ssh.bash; echo "ssh $FULLHOSTNAME \"mkdir -p /root/.ssh;chmod 700 /root/.ssh\"" >> /tmp//key-ssh.bash; bash /tmp/key-ssh.bash
 		echo ""
 		echo "Great!, that seems to have worked, enter the same root password again"
 		echo ""
-		scp ~/.ssh/id_dsa.pub $FULLHOSTNAME:/root/.ssh/authorized_keys
+		scp ~/.ssh/id_dsa.pub root@$FULLHOSTNAME:/root/.ssh/authorized_keys
+		ret=$?
+		if [ $ret -ne 0 ]; then
+			echo "ERROR! scp of id_dsa.pub to $HOSTNAME failed"
+			tet_result FAIL
+			return $ret
+		fi 
 	fi
 	if [ $OS == "HPUX" ]; then
-		rm -f ./key-ssh.bash; echo "ssh $FULLHOSTNAME \"mkdir -p /.ssh;chmod 700 /.ssh\"" >> ./key-ssh.bash; bash ./key-ssh.bash
+		rm -f /tmp/key-ssh.bash; echo "ssh $FULLHOSTNAME \"mkdir -p /.ssh;chmod 700 /.ssh\"" >> /tmp/key-ssh.bash; bash /tmp/key-ssh.bash
 		echo ""
 		echo "Great!, that seems to have worked, enter the same root password again"
 		echo ""
-		scp ~/.ssh/id_dsa.pub $FULLHOSTNAME:/.ssh/authorized_keys
+		scp ~/.ssh/id_dsa.pub root@$FULLHOSTNAME:/.ssh/authorized_keys
+		ret=$?
+		if [ $ret -ne 0 ]; then
+			echo "ERROR! scp of id_dsa.pub to $HOSTNAME failed"
+			tet_result FAIL
+			return $ret
+		fi 
 	fi
 	if [ $OS == "solaris" ]; then
-		rm -f ./key-ssh.bash; echo "ssh $FULLHOSTNAME \"mkdir -p /.ssh;chmod 700 /.ssh\"" >> ./key-ssh.bash; bash ./key-ssh.bash
+		rm -f /tmp/key-ssh.bash; echo "ssh $FULLHOSTNAME \"mkdir -p /.ssh;chmod 700 /.ssh\"" >> /tmp/key-ssh.bash; bash /tmp/key-ssh.bash
 		echo ""
 		echo "Great!, that seems to have worked, enter the same root password again"
 		echo ""
-		scp ~/.ssh/id_dsa.pub $FULLHOSTNAME:/.ssh/authorized_keys
+		scp ~/.ssh/id_dsa.pub root@$FULLHOSTNAME:/.ssh/authorized_keys
+		ret=$?
+		if [ $ret -ne 0 ]; then
+			echo "ERROR! scp of id_dsa.pub to $HOSTNAME failed"
+			tet_result FAIL
+			return $ret
+		fi 
 	fi
 
 }
