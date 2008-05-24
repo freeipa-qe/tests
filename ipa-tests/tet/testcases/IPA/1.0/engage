@@ -111,8 +111,8 @@ case `engage_domainname` in
 	            MainMaildomain="bozemanpass.com"
 	            ;;
 	*)			# if you change WebServer besure to change it in engagelib also
-				WebServer="http://idmwiki.sfbay.redhat.com"
-				MailHost="potter.sfbay.redhat.com"
+				WebServer="http://apoc.dsdev.sjc.redhat.com"
+				MailHost="pobox-3.corp.redhat.com"
 				MainMaildomain="redhat.com"
 				;;
 esac

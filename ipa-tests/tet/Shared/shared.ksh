@@ -7,7 +7,6 @@ eval_vars()
 {
         x=\$HOSTNAME_$1
         HOSTNAME=`eval echo $x`
-        export HOSTNAME
         FULLHOSTNAME=`host $HOSTNAME | awk '{print $1}'`
         x=\$LDAP_PORT_$1
         LDAP_PORT=`eval echo $x`
@@ -28,6 +27,75 @@ eval_vars()
         OS=`eval echo $x`
 	x=\$REPO_$1
 	REPO=`eval echo $x`
+	
+        export HOSTNAME FULLHOSTNAME OS REPO LDAP_PORT LDAPS_PORT
+
+}
+
+# This is used to fix the bind configuration on the first server after a ipa-server-install 
+FixBindServer()
+{
+	eval_vars $1
+	rm -f $TET_TMP_DIR/replace.pl
+	echo '#!/usr/bin/perl
+my $file = "";
+my $string = "";
+my $replace = 0;
+foreach $num (0 .. $#ARGV) {
+        ($a1, $a2) = split(/=/, $ARGV[$num]);
+        if ( $a1 =~ "file" ) { $file = $a2;}
+        if ( $a1 =~ "string" ) { $string = $a2;}
+        if ( $a1 =~ "replace" ) { $replace = $a2;} 
+#        print "$ARGV[$num]\\n"; 
+}
+my $match = 0;
+open (LIST, "$file") or die "\\nPROBLEM\\nunable to open file $file\\n";
+while (<LIST>)
+{
+        chomp $_;
+        if ( $_ =~ /$string/ ) 
+        {
+                $match = $match + 1;
+
+        #       print "\\nmatch is $match replace is $replace\\n";
+                if ( "$replace" =~ "$match" )
+                {
+                        print "#$string\\n";
+                } else {
+                        print "$_\\n";
+                }
+        } else {
+                print "$_\\n";
+        }
+}' > $TET_TMP_DIR/replace.pl
+	chmod 755 $TET_TMP_DIR/replace.pl
+	scp $TET_TMP_DIR/replace.pl root@$FULLHOSTNAME:/bin/.
+	ret=$?
+	if [ $ret -ne 0 ]; then
+		echo "ERROR! scp of $TET_TMP_DIR/replace.pl to $FULLHOSTNAME failed"
+		tet_result FAIL
+		return $ret
+	fi 
+	
+	ssh root@$FULLHOSTNAME "/bin/replace.pl replace=5 string='};' file=/etc/named.conf |  
+	sed s='type hint'='#type hint'=g | 
+	sed s='file \"named.ca\";'='#file \"named.ca\";'=g | 
+	sed s='zone \".\" IN {'='#zone \".\" IN {'=g > /etc/named.conf.new"
+	ret=$?
+	if [ $ret -ne 0 ]; then
+		echo "ERROR! bind fix failed"
+		tet_result FAIL
+		return $ret
+	fi 
+
+	ssh root@$FULLHOSTNAME "mv /etc/named.conf /etc/named.conf.old;cp /etc/named.conf.new /etc/named.conf;/etc/init.d/named restart"
+	ret=$?
+	if [ $ret -ne 0 ]; then
+		echo "ERROR! bind fix failed"
+		tet_result FAIL
+		return $ret
+	fi 
+
 }
 
 is_server_alive()
@@ -43,12 +111,10 @@ is_server_alive()
 		ret=$?
 	        if [ $ret != 0 ]; then
 			echo "Ping of $FULLHOSTNAME failed. We are done. Server is not up"
-			tet_result FAIL
 			return 1;
 		fi
 	fi
 
-	tet_result PASS
 	return 0;
 }
 
