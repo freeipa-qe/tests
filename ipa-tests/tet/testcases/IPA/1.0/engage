@@ -733,6 +733,7 @@ main_default()
 	if [ -z "$DS_USER" ] ; then DS_USER=admin                      ; fi
 	if [ -z "$NUMSERVERS" ] ; then NUMSERVERS=1                    ; fi
 	if [ -z "$NUMCLIENTS" ] ; then NUMCLIENTS=0                    ; fi
+	if [ -z "$DNSMASTER" ] ; then DNSMASTER="10.14.63.2"           ; fi
 	if [ -z "$VER" ]
 	then
 		VER=`(cd $mainRunBaseDir ; pwd)`
@@ -817,7 +818,7 @@ main_default()
 
 # export all these variables 
 
-	export TET_ROOT VER CHARSET TESTING_SHARED IROOT PREFIX TET_TMP_DIR  TET_REPORT_DIR DS_LOG_DIR RELM_NAME KERB_MASTER_PASS DM_ADMIN_PASS DS_USER NUMSERVERS SERVERS CLIENTS NUMCLIENTS
+	export TET_ROOT VER CHARSET TESTING_SHARED IROOT PREFIX TET_TMP_DIR  TET_REPORT_DIR DS_LOG_DIR RELM_NAME KERB_MASTER_PASS DM_ADMIN_PASS DS_USER NUMSERVERS SERVERS CLIENTS NUMCLIENTS DNSMASTER
 	export ROOTDN ROOTDNPW TETADMINPW LDAPhost LDAPport DRIVE
 	export IGNORE_KNOWN_BUGS DSTET_64 DSTET_DEBUG PkgName
 
@@ -1158,6 +1159,11 @@ main_ask()
 		;;
 	esac
 
+	echo "What is a CURRENTLY working DNS server, avaliable to all of the servers to forward unknow DNS requests to?"
+	echo "Default $DNSMASTER"
+	echo "->"
+	read rsp
+	if [ -z "$rsp" ] ; then echo "DNS Master unchanged, continuing"; else DNSMASTER="$rsp"; fi
 	# Script engage's variables
 	#
 	echo
@@ -1246,7 +1252,7 @@ main_ask()
 
         main_backendask
 
-	export MainRunTests MainRunCleanup MainRunStartup SERVERS CLIENTS NUMSERVERS NUMCLIENTS
+	export MainRunTests MainRunCleanup MainRunStartup SERVERS CLIENTS NUMSERVERS NUMCLIENTS DNSMASTER
 }
 
 # This function will print the user's choices (aka variables)
@@ -1275,6 +1281,7 @@ main_print()
 	echo "    DS_USER        : $DS_USER"
 	echo "    SERVERS        : $SERVERS"
 	echo "    CLIENTS        : $CLIENTS"
+	echo "    DNSMASTER      : $DNSMASTER"
 	. $TESTING_SHARED/shared.ksh
 	echo " Host Info"
 	echo $SERVERS | while read s; do
@@ -1341,6 +1348,7 @@ main_save()
 	echo "CHARSET=$CHARSET"
 	echo "IROOT=$IROOT"
 	echo "PREFIX=$PREFIX"
+	echo "DNSMASTER=$DNSMASTER"
 	if [ ! -z "$DOMAINNAME" ]; then
 	    echo "DOMAINNAME=$DOMAINNAME"
 	    export DOMAINNAME

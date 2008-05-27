@@ -4,17 +4,19 @@ if [ "$DSTET_DEBUG" = "y" ]; then
 fi
 # The next line is required as it picks up data about the servers to use
 tet_startup="CheckAlive"
-tet_cleanup=""
-iclist="setupssh ic1 ic2 ic3 ic4"
+tet_cleanup="instclean"
+iclist="setupssh ic1 ic2 ic3 ic4 ic5"
 ic1="tp1"
 ic2="tp2"
 ic3="tp3"
 ic4="tp4"
+ic5="tp5 tp6"
 
 
 
 setupssh()
 {
+	echo "START setupssh"
 	echo "running ssh setup"
 	echo $SERVERS | while read s; do
 		if [ "$s" != "" ]; then
@@ -45,7 +47,7 @@ setupssh()
 ######################################################################
 tp1()
 {
-set -x
+	echo "START tp1"
 	echo $SERVERS | while read s; do
 		if [ "$s" != "" ]; then
 			echo "working on $s now"
@@ -74,6 +76,7 @@ set -x
 ######################################################################
 tp2()
 {
+	echo "START tp2"
 	echo $SERVERS | while read s; do
 		if [ "$s" != "" ]; then
 			echo "working on $s now"
@@ -108,6 +111,7 @@ tp2()
 ######################################################################
 tp3()
 {
+	echo "START tp3"
 	echo $SERVERS | while read s; do
 		if [ "$s" != "" ]; then
 			echo "working on $s now"
@@ -139,6 +143,7 @@ tp3()
 ######################################################################
 tp4()
 {
+	echo "START tp4"
 	echo $SERVERS | while read s; do
 		if [ "$s" != "" ]; then
 			echo "working on $s now"
@@ -171,6 +176,96 @@ tp4()
 	tet_result PASS
 
 }
+######################################################################
+
+######################################################################
+# Run some DNS test to make sure everything is working, if so, set 
+# resolv.conf to point to the right place.
+######################################################################
+tp5()
+{
+	echo "START tp5"
+	# Get the IP of the first server to be used in the DNS tests.
+	eval_vars M1
+	dns=$IP
+	echo "$SERVERS $CLIENTS" | while read s; do
+		eval_vars $s
+		# Fix Resolv.conf
+		ssh root@$FULLHOSTNAME "cp -a /etc/resolv.conf /etc/resolv.conf.old; \
+			echo 'nameserver $dns' > /etc/resolv.conf;"
+		# Now test to ensure that DNS works.
+		ssh root@$FULLHOSTNAME "/usr/bin/dig -x 10.14.0.110 @127.0.0.1"
+		ret=$?
+		if [ $ret != 0 ]; then
+			echo "ERROR - reverse lookup aginst localhost failed";
+			tet_result FAIL
+		fi
+
+		ssh root@$FULLHOSTNAME "/usr/bin/dig $FULLHOSTNAME @127.0.0.1"
+		ret=$?
+		if [ $ret != 0 ]; then
+			echo "ERROR - lookup of myself failed";
+			tet_result FAIL
+		fi
+	done
+
+	tet_result PASS
+
+}
+######################################################################
+
+######################################################################
+# Test to ensure that kinit works
+######################################################################
+tp6()
+{
+	echo "START tp6"
+	echo "$SERVERS $CLIENTS" | while read s; do
+		eval_vars $s
+		# Populate kinit expect file
+		rm -f $TET_TMP_DIR/kinit.exp
+		echo 'set timeout -1
+set send_slow {1 .1}
+spawn /usr/kerberos/bin/kinit admin
+match_max 100000
+expect "Password for admin"
+sleep 1
+send -s -- "Secret123\r"
+expect eof ' > $TET_TMP_DIR/kinit.exp
+		ssh root@$FULLHOSTNAME 'rm -f /tmp/kinit.exp'
+		scp $TET_TMP_DIR/kinit.exp root@$FULLHOSTNAME:/tmp/.		
+
+		ssh root@$FULLHOSTNAME 'kdestroy;/usr/bin/expect /tmp/kinit.exp'
+		ret=$?
+		if [ $ret != 0 ]; then
+		        echo "ERROR - kinit failed";
+			tet_result FAIL
+		fi
+
+		ssh root@$FULLHOSTNAME '/usr/sbin/ipa-finduser admin'
+		ret=$?
+		if [ $ret != 0 ]; then
+        		echo "ERROR - ipa-finduser failed";
+			tet_result FAIL
+		fi
+
+	done
+
+	tet_result PASS
+
+}
+
+instclean()
+{
+	ssh root@$FULLHOSTNAME 'kdestroy'
+	ret=$?
+	if [ $ret != 0 ]; then
+       		echo "ERROR - kdestroy failed, continuing anyway";
+	fi
+	tet_result PASS
+
+}
+
 ######################################################################
 
 . $TESTING_SHARED/instlib.ksh

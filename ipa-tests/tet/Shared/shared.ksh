@@ -8,6 +8,7 @@ eval_vars()
         x=\$HOSTNAME_$1
         HOSTNAME=`eval echo $x`
         FULLHOSTNAME=`host $HOSTNAME | awk '{print $1}'`
+	IP=`host $FULLHOSTNAME | awk '{print $4}'`
         x=\$LDAP_PORT_$1
         LDAP_PORT=`eval echo $x`
         x=\$LDAPS_PORT_$1
@@ -82,6 +83,14 @@ while (<LIST>)
 	sed s='file \"named.ca\";'='#file \"named.ca\";'=g | 
 	sed s='zone \".\" IN {'='#zone \".\" IN {'=g > /etc/named.conf.new"
 	ret=$?
+	if [ $ret -ne 0 ]; then
+		echo "ERROR! bind fix failed"
+		tet_result FAIL
+		return $ret
+	fi 
+
+	# Put forwarding DNS server into DNS
+	ssh root@$FULLHOSTNAME "sed -i s/dump-file/'forwarders { $DNSMASTER; }; dump-file'/g  /etc/named.conf.new"
 	if [ $ret -ne 0 ]; then
 		echo "ERROR! bind fix failed"
 		tet_result FAIL
