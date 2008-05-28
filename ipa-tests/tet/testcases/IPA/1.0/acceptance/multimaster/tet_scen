@@ -1,0 +1,12 @@
+ 
+all
+	"Starting ALL"
+	^memberof
+	"Ending ALL"
+
+memberof
+	"Starting accept DS install"
+	/memberof.ksh
+	"Ending accept DS install"
+
+# EOF
