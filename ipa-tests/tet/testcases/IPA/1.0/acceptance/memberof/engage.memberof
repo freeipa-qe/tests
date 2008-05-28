@@ -1,129 +1,105 @@
 #ident "%W% %E%"
 #
-#	File name: run.quickinstall
+#	File name: run.memberof
 #
-#	This file contains the operations specific to the quickinstall tests.
+#	This file contains the operations specific to the memberof tests.
 #	It is targetted to be included by the main script "run" and not be be 
 #	used alone.
 #
 #	Replace the "xyz" by your name (e.g. "schema") and "Xyz" by your
 #	name (e.g. "Schema").
 #
-#	Created by Jean-Luc SCHWING - SUN Microsystems :
-#		Thu Jul  1 14:47:28 PDT 1999
 #
 #	History
 # -----------------------------------------------------------------------------
 # dd/mm/yy | Author	| Comments
 # -----------------------------------------------------------------------------
-# 01/07/99 | JL SCHWING	| Creation.
-# 05/15/08 | MGregg     | modified for IPA tet framework
+# 05/15/08 | MGregg     | Creation
 # -----------------------------------------------------------------------------
 
 # This function will set the default values for the variables needed.
 #
-quickinstall_default()
+memberof_default()
 {
-	if [ -z "$quickinstallRunIt" ]
+	if [ -z "$memberofRunIt" ]
 	then
-		quickinstallRunIt=n
+		memberofRunIt=n
 	fi
-	if [ -z "$quickinstallRunIt" ]
-	then
-		SRCROOT=""
-	fi
-	export SRCROOT
 }
 
 # This function will ask the user for more information/choices if needed.
 #
-quickinstall_ask()
+memberof_ask()
 {
 
-	sav_quickinstallRunIt=$quickinstallRunIt
-	echo "    Execute quickinstall test suite [$quickinstallRunIt] ? \c"
+	sav_memberofRunIt=$memberofRunIt
+	echo "    Execute memberof test suite [$memberofRunIt] ? \c"
 	read rsp
 	case $rsp in
-		"")	quickinstallRunIt=$sav_quickinstallRunIt	;;
+		"")	memberofRunIt=$sav_memberofRunIt	;;
 		y|Y)	
-			quickinstallRunIt=y
-			while true
-			do
-				sav_SRCROOT=$SRCROOT
-				echo "    Enter the repo location [$SRCROOT] ?(a dir containing repo files, or a install tarball) \c"
-				read rsp
-				if [ -f "$rsp" ] || [ -d "$rsp" ]; then
-					SRCROOT=$rsp
-					break
-				else
-					echo "Cannot locate file $SRCROOT"
-				fi
-			done
+			memberofRunIt=y
 			;;
-		*)	quickinstallRunIt=n		;;
+		*)	memberofRunIt=n		;;
 	esac
 
 }
 
 # This function will print the user's choices (aka variables)
 #
-quickinstall_print()
+memberof_print()
 {
-	echo "    Execute quickinstall test suite        : $quickinstallRunIt"
-	if [ $quickinstallRunIt = y ] ; then
-		echo "            quickinstall Source location   : $SRCROOT"
-	fi
+	echo "    Execute memberof test suite        : $memberofRunIt"
 }
 
 # This function will echo in shell's format the user's choices
 # It is the calling function that will redirect the output to
 # the saved config file.
 #
-quickinstall_save()
+memberof_save()
 {
-	echo "quickinstallRunIt=$quickinstallRunIt"
-	echo "SRCROOT=$SRCROOT"
+	echo "memberofRunIt=$memberofRunIt"
 }
 
 # This function will check that the test suite may be executed
 # It may also perform some kind of pre-configuration of the machine.
 # This function should "exit 1" if there is problem.
 #
-quickinstall_check()
+memberof_check()
 {
 	kgb=kgb
 }
 
 # This function will startup/initiate the test suite
 #
-quickinstall_startup()
+memberof_startup()
 {
 :
 }
 
 # This function will run the test suite
 #
-quickinstall_run()
+memberof_run()
 {
-	if [ $quickinstallRunIt = n ]
+	if [ $memberofRunIt = n ]
 	then
 		return
 	fi
-	echo "quickinstall run..."
-	echo "$TET_ROOT/$MainTccName -e -s $TET_ROOT/testcases/IPA/1.0/acceptance/quickinstall/tet_scen -x $TET_ROOT/testcases/IPA/tetexecpl.cfg $TET_ROOT/testcases/IPA/1.0/acceptance/quickinstall install"
+	echo "memberof run..."
+	echo "$TET_ROOT/$MainTccName -e -s $TET_ROOT/testcases/IPA/1.0/acceptance/memberof/tet_scen -x $TET_ROOT/testcases/IPA/tetexecpl.cfg $TET_ROOT/testcases/IPA/1.0/acceptance/memberof install"
 
 	$TET_ROOT/$MainTccName \
-		-e -s $TET_ROOT/testcases/IPA/1.0/acceptance/quickinstall/tet_scen \
+		-e -s $TET_ROOT/testcases/IPA/1.0/acceptance/memberof/tet_scen \
 		-x $TET_ROOT/testcases/IPA/tetexecpl.cfg \
-		$TET_ROOT/testcases/IPA/1.0/acceptance/quickinstall \
-		install > $MainTmpDir/quickinstall.startup.out 2>&1
+		$TET_ROOT/testcases/IPA/1.0/acceptance/memberof \
+		install > $MainTmpDir/memberof.startup.out 2>&1
 	echo ""
-	echo "quickinstall startup $MainTmpDir/quickinstall.startup.out"
+	echo "memberof startup $MainTmpDir/memberof.startup.out"
 	echo ""
-	cat $MainTmpDir/quickinstall.startup.out
+	cat $MainTmpDir/memberof.startup.out
 	echo ""
-	main_analyze "quickinstall startup" `grep "tcc: journal file is" $MainTmpDir/quickinstall.startup.out | awk '{print $5}'` $MainTmpDir/quickinstall.startup.out
-	MainReportFiles="$MainReportFiles $MainTmpDir/quickinstall.startup.out"
+	main_analyze "memberof startup" `grep "tcc: journal file is" $MainTmpDir/memberof.startup.out | awk '{print $5}'` $MainTmpDir/memberof.startup.out
+	MainReportFiles="$MainReportFiles $MainTmpDir/memberof.startup.out"
 
 	Gfile="$TET_TMP_DIR/global_src_`uname -n`"
 	rm -f $Gfile
@@ -131,7 +107,7 @@ quickinstall_run()
 
 # This function will cleanup after the test suite execution
 #
-quickinstall_cleanup()
+memberof_cleanup()
 {
 :
 }

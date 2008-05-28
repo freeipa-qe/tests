@@ -1,12 +1,12 @@
  
 all
 	"Starting ALL"
-	^install
+	^memberof
 	"Ending ALL"
 
-install
+memberof
 	"Starting accept DS install"
-	/install.ksh
+	/memberof.ksh
 	"Ending accept DS install"
 
 # EOF
