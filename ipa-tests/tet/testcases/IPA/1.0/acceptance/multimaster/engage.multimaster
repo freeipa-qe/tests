@@ -1,8 +1,8 @@
 #ident "%W% %E%"
 #
-#	File name: run.memberof
+#	File name: run.multimaster
 #
-#	This file contains the operations specific to the memberof tests.
+#	This file contains the operations specific to the multimaster tests.
 #	It is targetted to be included by the main script "run" and not be be 
 #	used alone.
 #
@@ -19,87 +19,87 @@
 
 # This function will set the default values for the variables needed.
 #
-memberof_default()
+multimaster_default()
 {
-	if [ -z "$memberofRunIt" ]
+	if [ -z "$multimasterRunIt" ]
 	then
-		memberofRunIt=n
+		multimasterRunIt=n
 	fi
 }
 
 # This function will ask the user for more information/choices if needed.
 #
-memberof_ask()
+multimaster_ask()
 {
 
-	sav_memberofRunIt=$memberofRunIt
-	echo "    Execute memberof test suite [$memberofRunIt] ? \c"
+	sav_multimasterRunIt=$multimasterRunIt
+	echo "    Execute multimaster test suite [$multimasterRunIt] ? \c"
 	read rsp
 	case $rsp in
-		"")	memberofRunIt=$sav_memberofRunIt	;;
+		"")	multimasterRunIt=$sav_multimasterRunIt	;;
 		y|Y)	
-			memberofRunIt=y
+			multimasterRunIt=y
 			;;
-		*)	memberofRunIt=n		;;
+		*)	multimasterRunIt=n		;;
 	esac
 
 }
 
 # This function will print the user's choices (aka variables)
 #
-memberof_print()
+multimaster_print()
 {
-	echo "    Execute memberof test suite        : $memberofRunIt"
+	echo "    Execute multimaster test suite        : $multimasterRunIt"
 }
 
 # This function will echo in shell's format the user's choices
 # It is the calling function that will redirect the output to
 # the saved config file.
 #
-memberof_save()
+multimaster_save()
 {
-	echo "memberofRunIt=$memberofRunIt"
+	echo "multimasterRunIt=$multimasterRunIt"
 }
 
 # This function will check that the test suite may be executed
 # It may also perform some kind of pre-configuration of the machine.
 # This function should "exit 1" if there is problem.
 #
-memberof_check()
+multimaster_check()
 {
 	kgb=kgb
 }
 
 # This function will startup/initiate the test suite
 #
-memberof_startup()
+multimaster_startup()
 {
 :
 }
 
 # This function will run the test suite
 #
-memberof_run()
+multimaster_run()
 {
-	if [ $memberofRunIt = n ]
+	if [ $multimasterRunIt = n ]
 	then
 		return
 	fi
-	echo "memberof run..."
-	echo "$TET_ROOT/$MainTccName -e -s $TET_ROOT/testcases/IPA/1.0/acceptance/memberof/tet_scen -x $TET_ROOT/testcases/IPA/tetexecpl.cfg $TET_ROOT/testcases/IPA/1.0/acceptance/memberof install"
+	echo "multimaster run..."
+	echo "$TET_ROOT/$MainTccName -e -s $TET_ROOT/testcases/IPA/1.0/acceptance/multimaster/tet_scen -x $TET_ROOT/testcases/IPA/tetexecpl.cfg $TET_ROOT/testcases/IPA/1.0/acceptance/multimaster install"
 
 	$TET_ROOT/$MainTccName \
-		-e -s $TET_ROOT/testcases/IPA/1.0/acceptance/memberof/tet_scen \
+		-e -s $TET_ROOT/testcases/IPA/1.0/acceptance/multimaster/tet_scen \
 		-x $TET_ROOT/testcases/IPA/tetexecpl.cfg \
-		$TET_ROOT/testcases/IPA/1.0/acceptance/memberof \
-		install > $MainTmpDir/memberof.startup.out 2>&1
+		$TET_ROOT/testcases/IPA/1.0/acceptance/multimaster \
+		install > $MainTmpDir/multimaster.startup.out 2>&1
 	echo ""
-	echo "memberof startup $MainTmpDir/memberof.startup.out"
+	echo "multimaster startup $MainTmpDir/multimaster.startup.out"
 	echo ""
-	cat $MainTmpDir/memberof.startup.out
+	cat $MainTmpDir/multimaster.startup.out
 	echo ""
-	main_analyze "memberof startup" `grep "tcc: journal file is" $MainTmpDir/memberof.startup.out | awk '{print $5}'` $MainTmpDir/memberof.startup.out
-	MainReportFiles="$MainReportFiles $MainTmpDir/memberof.startup.out"
+	main_analyze "multimaster startup" `grep "tcc: journal file is" $MainTmpDir/multimaster.startup.out | awk '{print $5}'` $MainTmpDir/multimaster.startup.out
+	MainReportFiles="$MainReportFiles $MainTmpDir/multimaster.startup.out"
 
 	Gfile="$TET_TMP_DIR/global_src_`uname -n`"
 	rm -f $Gfile
@@ -107,7 +107,7 @@ memberof_run()
 
 # This function will cleanup after the test suite execution
 #
-memberof_cleanup()
+multimaster_cleanup()
 {
 :
 }

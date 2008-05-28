@@ -1,12 +1,12 @@
  
 all
 	"Starting ALL"
-	^memberof
+	^multimaster
 	"Ending ALL"
 
-memberof
+multimaster
 	"Starting accept DS install"
-	/memberof.ksh
+	/multimaster.ksh
 	"Ending accept DS install"
 
 # EOF
