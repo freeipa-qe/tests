@@ -5,7 +5,7 @@
 ######### Include directories ############################################
 . $mainRunBaseDir/acceptance/quickinstall/engage.quickinstall
 . $mainRunBaseDir/acceptance/memberof/engage.memberof
-. $mainRunBaseDir/acceptance/memberof/engage.multimaster
+. $mainRunBaseDir/acceptance/multimaster/engage.multimaster
 . $mainRunBaseDir/acceptance/quickuninstall/engage.quickuninstall
 . $mainRunBaseDir/sample/engage.sample
 
