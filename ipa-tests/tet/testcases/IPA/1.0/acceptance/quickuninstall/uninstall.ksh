@@ -20,7 +20,7 @@ pass()
 setupssh()
 {
 	echo "running ssh setup"
-	echo $SERVERS | while read s; do
+	for s in $SERVERS; do
 		if [ "$s" != "" ]; then
 			echo "working on $s now"
 			setup_ssh_keys $s
@@ -31,7 +31,7 @@ setupssh()
 			fi
 		fi
 	done
-	echo $CLIENTS | while read s; do
+	for s in $CLIENTS; do
 		if [ "$s" != "" ]; then
 			echo "working on $s now"
 			setup_ssh_keys $s
@@ -50,7 +50,7 @@ setupssh()
 tp1()
 {
 	echo "START tp1"
-	echo $SERVERS | while read s; do
+	for s in $SERVERS; do
 		if [ "$s" != "" ]; then
 			echo "working on $s now"
 			UninstallServer $s
@@ -61,7 +61,7 @@ tp1()
 			fi
 		fi
 	done
-	echo $CLIENTS | while read s; do
+	for s in $CLIENTS; do
 		if [ "$s" != "" ]; then
 			echo "working on $s now"
 			UninstallClient $s
@@ -79,7 +79,7 @@ tp1()
 tp2()
 {
 	echo "START tp2"
-	echo $SERVERS | while read s; do
+	for s in $SERVERS; do
 		if [ "$s" != "" ]; then
 			echo "working on $s now"
 			UnInstallServerRPM $s
@@ -90,7 +90,7 @@ tp2()
 			fi
 		fi
 	done
-	echo $CLIENTS | while read s; do
+	for s in $CLIENTS; do
 		if [ "$s" != "" ]; then
 			echo "working on $s now"
 			UnInstallClientRPM $s
@@ -116,7 +116,7 @@ tp3()
 	rm -f $TET_TMP_DIR/filelist.txt
 	echo '/usr/sbin/ipa*
 	/tmp/ipa*' > $TET_TMP_DIR/filelist.txt
-	echo "$SERVERS $CLIENTS" | while read s; do
+	for s in "$SERVERS $CLIENTS"; do
 		if [ "$s" != "" ]; then
 			echo "working on $s now"
 			is_server_alive $s
@@ -162,7 +162,7 @@ tp3()
 tp4()
 {
 	echo "START tp4"
-	echo $SERVERS | while read s; do
+	for s in $SERVERS; do
 		if [ "$s" != "" ]; then
 			echo "working on $s now"
 			SetupServer $s
@@ -179,7 +179,7 @@ tp4()
 			fi
 		fi
 	done
-	echo $CLIENTS | while read s; do
+	for s in $CLIENTS; do
 		if [ "$s" != "" ]; then
 			echo "working on $s now"
 			SetupClient $s

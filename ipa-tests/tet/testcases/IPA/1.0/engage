@@ -311,6 +311,7 @@ main_analyze()
 
 	if [ "$maType" != "" ] && [ $maType -eq 1 ]
 	then
+		echo "main_silkreport $maTestSuite $maJournal $maTmpOut would go here"
 		main_silkreport "$maTestSuite" "$maJournal" $maTmpOut
 		return 0
 	fi
@@ -1284,7 +1285,7 @@ main_print()
 	echo "    DNSMASTER      : $DNSMASTER"
 	. $TESTING_SHARED/shared.ksh
 	echo " Host Info"
-	echo $SERVERS | sed s/\ /"\n"/g | while read s; do
+	for s in $SERVERS; do
 		if [ "$s" != "" ]; then
 			eval_vars $s
 			echo "   HOSTNAME_$s     : $HOSTNAME"
@@ -1296,7 +1297,7 @@ main_print()
 			echo "   REPLICA_ID_$s   : $REPLICA_ID"
 		fi
 	done
-	echo $CLIENTS | sed s/\ /"\n"/g | while read s; do
+	for s in $CLIENTS; do
 		if [ "$s" != "" ]; then
 			eval_vars $s
 			echo "   HOSTNAME_$s     : $HOSTNAME"
@@ -1381,7 +1382,7 @@ main_save()
 	echo "NUMSERVERS=$NUMSERVERS"
 	echo "NUMCLIENTS=$NUMCLIENTS"
 	
-	echo $SERVERS | sed s/\ /"\n"/g | while read s; do
+	for s in $SERVERS; do
 		if [ "$s" != "" ]; then
 			eval_vars $s
 			echo "#working on $s"
@@ -1394,7 +1395,7 @@ main_save()
 			echo "REPLICA_ID_$s=$REPLICA_ID"
 		fi
 	done
-	echo $CLIENTS | sed s/\ /"\n"/g | while read s; do
+	for s in $CLIENTS; do
 		if [ "$s" != "" ]; then
 			eval_vars $s
 			echo "#working on client $s"
@@ -1694,7 +1695,7 @@ main_run()
 main_usage()
 {
     echo "usage: engage [-c <configfile>]"
-    echo "    Run the IPA automated test suites."
+    echo "    Run the Netscape DS automated test suites."
     echo "    -c : config file (no questions)"
     echo "    -g : generate config file with all the default value"
 }
@@ -1782,10 +1783,6 @@ main_main()
 	export MainTmpDir MainReport MainReportHead MainReportRoot 
 	export MainOS logTimeStamp
 	main_save_choices
-	tmpservers=`echo $SERVERS | sed s/\ /"\n"/g`
-	export SERVERS=$tmpservers
-	tmpclients=`echo $CLIENTS | sed s/\ /"\n"/g`
-	export CLIENTS=$tmpclients
 	main_check
 	main_init_report
 	EngageStopwatch start

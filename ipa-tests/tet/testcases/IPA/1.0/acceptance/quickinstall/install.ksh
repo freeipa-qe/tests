@@ -1,4 +1,4 @@
-#!/bin/ksh
+#!/usr/bin/pdksh
 if [ "$DSTET_DEBUG" = "y" ]; then
 	set -x
 fi
@@ -6,7 +6,7 @@ fi
 tet_startup="CheckAlive"
 tet_cleanup="instclean"
 iclist="setupssh ic1 ic2 ic3 ic4 ic5"
-ic1="tp1"
+ic1="setupssh tp1"
 ic2="tp2"
 ic3="tp3"
 ic4="tp4"
@@ -18,7 +18,7 @@ setupssh()
 {
 	echo "START setupssh"
 	echo "running ssh setup"
-	echo $SERVERS | while read s; do
+	for s in $SERVERS; do
 		if [ "$s" != "" ]; then
 			echo "working on $s now"
 			setup_ssh_keys $s
@@ -29,7 +29,7 @@ setupssh()
 			fi
 		fi
 	done
-	echo $CLIENTS | while read s; do
+	for s in $CLIENTS; do
 		if [ "$s" != "" ]; then
 			echo "working on $s now"
 			setup_ssh_keys $s
@@ -48,7 +48,7 @@ setupssh()
 tp1()
 {
 	echo "START tp1"
-	echo $SERVERS | while read s; do
+	for s in $SERVERS; do
 		if [ "$s" != "" ]; then
 			echo "working on $s now"
 			SetupRepo $s
@@ -59,7 +59,7 @@ tp1()
 			fi
 		fi
 	done
-	echo $CLIENTS | while read s; do
+	for s in $CLIENTS; do
 		if [ "$s" != "" ]; then
 			echo "working on $s now"
 			SetupRepo $s
@@ -72,12 +72,13 @@ tp1()
 	done
 
 	tet_result PASS
+	echo "tp1 finish"
 }
 ######################################################################
 tp2()
 {
 	echo "START tp2"
-	echo $SERVERS | while read s; do
+	for s in $SERVERS; do
 		if [ "$s" != "" ]; then
 			echo "working on $s now"
 			InstallServerRPM $s
@@ -88,7 +89,7 @@ tp2()
 			fi
 		fi
 	done
-	echo $CLIENTS | while read s; do
+	for s in $CLIENTS; do
 		if [ "$s" != "" ]; then
 			echo "working on $s now"
 			InstallClientRPM $s
@@ -112,7 +113,7 @@ tp2()
 tp3()
 {
 	echo "START tp3"
-	echo $SERVERS | while read s; do
+	for s in $SERVERS; do
 		if [ "$s" != "" ]; then
 			echo "working on $s now"
 			SetupServerBogus $s
@@ -123,7 +124,7 @@ tp3()
 			fi
 		fi
 	done
-	echo $CLIENTS | while read s; do
+	for s in $CLIENTS; do
 		if [ "$s" != "" ]; then
 			echo "working on $s now"
 			SetupClientBogus $s
@@ -144,7 +145,7 @@ tp3()
 tp4()
 {
 	echo "START tp4"
-	echo $SERVERS | while read s; do
+	for s in $SERVERS; do
 		if [ "$s" != "" ]; then
 			echo "working on $s now"
 			SetupServer $s
@@ -161,7 +162,7 @@ tp4()
 			fi
 		fi
 	done
-	echo $CLIENTS | while read s; do
+	for s in $CLIENTS; do
 		if [ "$s" != "" ]; then
 			echo "working on $s now"
 			SetupClient $s
@@ -188,7 +189,7 @@ tp5()
 	# Get the IP of the first server to be used in the DNS tests.
 	eval_vars M1
 	dns=$IP
-	echo "$SERVERS $CLIENTS" | while read s; do
+	for s in "$SERVERS $CLIENTS"; do
 		eval_vars $s
 		# Fix Resolv.conf
 		ssh root@$FULLHOSTNAME "cp -a /etc/resolv.conf /etc/resolv.conf.old; \
@@ -220,7 +221,7 @@ tp5()
 tp6()
 {
 	echo "START tp6"
-	echo "$SERVERS $CLIENTS" | while read s; do
+	for s in "$SERVERS $CLIENTS"; do
 		eval_vars $s
 		# Populate kinit expect file
 		rm -f $TET_TMP_DIR/kinit.exp
@@ -257,12 +258,35 @@ expect eof ' > $TET_TMP_DIR/kinit.exp
 
 instclean()
 {
-	ssh root@$FULLHOSTNAME 'kdestroy'
-	ret=$?
-	if [ $ret != 0 ]; then
-       		echo "ERROR - kdestroy failed, continuing anyway";
-	fi
+	echo "instclean start"
+	echo "servers is $SERVERS"
+	for s in $SERVERS; do
+		if [ "$s" != "" ]; then
+			echo "working on $s now"
+			eval_vars $s
+			ssh root@$FULLHOSTNAME 'kdestroy'
+			ret=$?
+			if [ $ret != 0 ]; then
+	       			echo "ERROR - kdestroy on server $s failed, continuing anyway";
+			fi
+			echo "done working on $s"
+		fi
+
+	done
+	for s in $CLIENTS; do
+		if [ "$s" != "" ]; then
+			echo "working on $s now"
+			eval_vars $s
+			ssh root@$FULLHOSTNAME 'kdestroy'
+			ret=$?
+			if [ $ret != 0 ]; then
+	       			echo "ERROR - kdestroy on client $s failed, continuing anyway";
+			fi
+		fi
+	done
+
 	tet_result PASS
+	echo "instclean finish"
 
 }
 
