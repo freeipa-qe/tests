@@ -621,16 +621,16 @@ main_send_report()
 	case `engage_domainname` in
 	*mtbrook.bozemanpass.com)
 		if [ $AbortInstallFailed -eq 2 ]; then
-			Subject="ABORTED - ${DisplayOS}${DSBITS} DS $DSVERSION ${TEST_CAT} test - $n% pass on `hostname | cut -d'.' -f1`"
+			Subject="ABORTED - ${DisplayOS}${DSBITS} IPA $IPAVERSION ${TEST_CAT} test - $n% pass on `hostname | cut -d'.' -f1`"
 		else
-		    Subject="${DisplayOS}${DSBITS} DS $DSVERSION ${TEST_CAT} test - $n% pass on `hostname  | cut -d'.' -f1`"
+		    Subject="${DisplayOS}${DSBITS} IPA $IPAVERSION ${TEST_CAT} test - $n% pass on `hostname  | cut -d'.' -f1`"
 		fi
 		;;
 	*)
 		if [ $AbortInstallFailed -eq 2 ]; then
-			Subject="ABORTED - DS$DSVERSION ${DisplayOS}${DSBITS} ${TEST_CAT} test report - $n% passed on `hostname` using $SRCROOT"
+			Subject="ABORTED - IPA $IPAVERSION ${DisplayOS}${DSBITS} ${TEST_CAT} test report - $n% passed on `hostname` using $SRCROOT"
 		else
-			Subject="DS$DSVERSION ${DisplayOS}${DSBITS} ${TEST_CAT} test report - $n% passed on `hostname` using $SRCROOT"
+			Subject="IPA $IPAVERSION ${DisplayOS}${DSBITS} ${TEST_CAT} test report - $n% passed on `hostname` using $SRCROOT"
 		fi
 		;;
 	esac
@@ -1694,7 +1694,7 @@ main_run()
 main_usage()
 {
     echo "usage: engage [-c <configfile>]"
-    echo "    Run the Netscape DS automated test suites."
+    echo "    Run the IPA automated test suites."
     echo "    -c : config file (no questions)"
     echo "    -g : generate config file with all the default value"
 }
