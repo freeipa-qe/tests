@@ -1284,7 +1284,7 @@ main_print()
 	echo "    DNSMASTER      : $DNSMASTER"
 	. $TESTING_SHARED/shared.ksh
 	echo " Host Info"
-	echo $SERVERS | while read s; do
+	echo $SERVERS | sed s/\ /"\n"/g | while read s; do
 		if [ "$s" != "" ]; then
 			eval_vars $s
 			echo "   HOSTNAME_$s     : $HOSTNAME"
@@ -1296,7 +1296,7 @@ main_print()
 			echo "   REPLICA_ID_$s   : $REPLICA_ID"
 		fi
 	done
-	echo $CLIENTS | while read s; do
+	echo $CLIENTS | sed s/\ /"\n"/g | while read s; do
 		if [ "$s" != "" ]; then
 			eval_vars $s
 			echo "   HOSTNAME_$s     : $HOSTNAME"
@@ -1376,31 +1376,31 @@ main_save()
 	echo "KERB_MASTER_PASS=$KERB_MASTER_PASS"
 	echo "DM_ADMIN_PASS=$DM_MASTER_PASS"
 	echo "DS_USER=$DS_USER"
-	echo "SERVERS=$SERVERS"
-	echo "CLIENTS=$CLIENTS"
+	echo "SERVERS=\"$SERVERS\""
+	echo "CLIENTS=\"$CLIENTS\""
 	echo "NUMSERVERS=$NUMSERVERS"
 	echo "NUMCLIENTS=$NUMCLIENTS"
 	
-	echo $SERVERS | while read s; do
+	echo $SERVERS | sed s/\ /"\n"/g | while read s; do
 		if [ "$s" != "" ]; then
 			eval_vars $s
 			echo "#working on $s"
 			echo "HOSTNAME_$s=$HOSTNAME"
 			echo "OS_$s=$OS"
-			echo "REPO_$s=$REPO"
+			echo "REPO_$s=\"$REPO\""
 			echo "LDAP_PORT_$s=$LDAP_PORT"
         		echo "LDAPS_PORT_$s=$LDAPS_PORT"
 			echo "FILE_SERVER_IS_ALIVE_$s=$FILE_SERVER_IS_ALIVE"
 			echo "REPLICA_ID_$s=$REPLICA_ID"
 		fi
 	done
-	echo $CLIENTS | while read s; do
+	echo $CLIENTS | sed s/\ /"\n"/g | while read s; do
 		if [ "$s" != "" ]; then
 			eval_vars $s
 			echo "#working on client $s"
 			echo "HOSTNAME_$s=$HOSTNAME"
 			echo "OS_$s=$OS"
-			echo "REPO_$s=$REPO"
+			echo "REPO_$s=\"$REPO\""
 			echo "LDAP_PORT_$s=$LDAP_PORT"
         		echo "LDAPS_PORT_$s=$LDAPS_PORT"
 			echo "FILE_SERVER_IS_ALIVE_$s=$FILE_SERVER_IS_ALIVE"
@@ -1782,6 +1782,10 @@ main_main()
 	export MainTmpDir MainReport MainReportHead MainReportRoot 
 	export MainOS logTimeStamp
 	main_save_choices
+	tmpservers=`echo $SERVERS | sed s/\ /"\n"/g`
+	export SERVERS=$tmpservers
+	tmpclients=`echo $CLIENTS | sed s/\ /"\n"/g`
+	export CLIENTS=$tmpclients
 	main_check
 	main_init_report
 	EngageStopwatch start

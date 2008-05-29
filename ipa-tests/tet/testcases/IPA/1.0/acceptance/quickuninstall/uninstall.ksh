@@ -108,7 +108,7 @@ tp2()
 ######################################################################
 
 ######################################################################
-#   Test to make sure the list of files in this test do not exost after uninstall
+#   Test to make sure the list of files in this test do not exist after uninstall
 ######################################################################
 tp3()
 {
