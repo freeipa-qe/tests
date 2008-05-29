@@ -20,6 +20,7 @@ setupssh()
 	echo "running ssh setup"
 	for s in $SERVERS; do
 		if [ "$s" != "" ]; then
+			if [ "$DSTET_DEBUG" = "y" ]; then echo "working on $s now"; fi
 			echo "working on $s now"
 			setup_ssh_keys $s
 			ret=$?
@@ -27,10 +28,12 @@ setupssh()
 				echo "Setup of $s ssh failed"
 				tet_result FAIL
 			fi
+		if [ "$DSTET_DEBUG" = "y" ]; then echo "done working on $s"; fi
 		fi
 	done
 	for s in $CLIENTS; do
 		if [ "$s" != "" ]; then
+			if [ "$DSTET_DEBUG" = "y" ]; then echo "working on $s now"; fi
 			echo "working on $s now"
 			setup_ssh_keys $s
 			ret=$?
@@ -38,6 +41,7 @@ setupssh()
 				echo "Setup of $s ssh failed"
 				tet_result FAIL
 			fi
+		if [ "$DSTET_DEBUG" = "y" ]; then echo "done working on $s"; fi
 		fi
 	done
 
@@ -50,24 +54,26 @@ tp1()
 	echo "START tp1"
 	for s in $SERVERS; do
 		if [ "$s" != "" ]; then
-			echo "working on $s now"
+			if [ "$DSTET_DEBUG" = "y" ]; then echo "working on $s now"; fi
 			SetupRepo $s
 			ret=$?
 			if [ $ret -ne 0 ]; then
 				echo "Install of server RPM on $s ssh failed"
 				tet_result FAIL
 			fi
+		if [ "$DSTET_DEBUG" = "y" ]; then echo "done working on $s"; fi
 		fi
 	done
 	for s in $CLIENTS; do
 		if [ "$s" != "" ]; then
-			echo "working on $s now"
+			if [ "$DSTET_DEBUG" = "y" ]; then echo "working on $s now"; fi
 			SetupRepo $s
 			ret=$?
 			if [ $ret -ne 0 ]; then
 				echo "Install of server RPM on $s ssh failed"
 				tet_result FAIL
 			fi
+		if [ "$DSTET_DEBUG" = "y" ]; then echo "done working on $s"; fi
 		fi
 	done
 
@@ -80,24 +86,26 @@ tp2()
 	echo "START tp2"
 	for s in $SERVERS; do
 		if [ "$s" != "" ]; then
-			echo "working on $s now"
+			if [ "$DSTET_DEBUG" = "y" ]; then echo "working on $s now"; fi
 			InstallServerRPM $s
 			ret=$?
 			if [ $ret -ne 0 ]; then
 				echo "Install of server RPM on $s ssh failed"
 				tet_result FAIL
 			fi
+			if [ "$DSTET_DEBUG" = "y" ]; then echo "done working on $s"; fi
 		fi
 	done
 	for s in $CLIENTS; do
 		if [ "$s" != "" ]; then
-			echo "working on $s now"
+			if [ "$DSTET_DEBUG" = "y" ]; then echo "working on $s now"; fi
 			InstallClientRPM $s
 			ret=$?
 			if [ $ret -ne 0 ]; then
 				echo "Install of server RPM on $s ssh failed"
 				tet_result FAIL
 			fi
+			if [ "$DSTET_DEBUG" = "y" ]; then echo "done working on $s"; fi
 		fi
 	done
 
@@ -115,24 +123,26 @@ tp3()
 	echo "START tp3"
 	for s in $SERVERS; do
 		if [ "$s" != "" ]; then
-			echo "working on $s now"
+			if [ "$DSTET_DEBUG" = "y" ]; then echo "working on $s now"; fi
 			SetupServerBogus $s
 			ret=$?
 			if [ $ret -ne 0 ]; then
 				echo "server-install of server on $s ssh failed"
 				tet_result FAIL
 			fi
+			if [ "$DSTET_DEBUG" = "y" ]; then echo "done working on $s"; fi
 		fi
 	done
 	for s in $CLIENTS; do
 		if [ "$s" != "" ]; then
-			echo "working on $s now"
+			if [ "$DSTET_DEBUG" = "y" ]; then echo "working on $s now"; fi
 			SetupClientBogus $s
 			ret=$?
 			if [ $ret -ne 0 ]; then
 				echo "client-install of server on $s ssh failed"
 				tet_result FAIL
 			fi
+			if [ "$DSTET_DEBUG" = "y" ]; then echo "done working on $s"; fi
 		fi
 	done
 
@@ -147,6 +157,7 @@ tp4()
 	echo "START tp4"
 	for s in $SERVERS; do
 		if [ "$s" != "" ]; then
+			if [ "$DSTET_DEBUG" = "y" ]; then echo "working on $s now"; fi
 			echo "working on $s now"
 			SetupServer $s
 			ret=$?
@@ -160,11 +171,13 @@ tp4()
 				echo "fix-bind-server on $s ssh failed"
 				tet_result FAIL
 			fi
+			if [ "$DSTET_DEBUG" = "y" ]; then echo "done working on $s"; fi
 		fi
 	done
 	for s in $CLIENTS; do
 		if [ "$s" != "" ]; then
 			echo "working on $s now"
+			if [ "$DSTET_DEBUG" = "y" ]; then echo "working on $s now"; fi
 			SetupClient $s
 			ret=$?
 			if [ $ret -ne 0 ]; then
@@ -172,6 +185,7 @@ tp4()
 				tet_result FAIL
 			fi
 		fi
+		if [ "$DSTET_DEBUG" = "y" ]; then echo "done working on $s"; fi
 	done
 
 	tet_result PASS
@@ -190,6 +204,7 @@ tp5()
 	eval_vars M1
 	dns=$IP
 	for s in "$SERVERS $CLIENTS"; do
+		if [ "$DSTET_DEBUG" = "y" ]; then echo "working on $s now"; fi
 		eval_vars $s
 		# Fix Resolv.conf
 		ssh root@$FULLHOSTNAME "cp -a /etc/resolv.conf /etc/resolv.conf.old; \
@@ -208,6 +223,7 @@ tp5()
 			echo "ERROR - lookup of myself failed";
 			tet_result FAIL
 		fi
+		if [ "$DSTET_DEBUG" = "y" ]; then echo "done working on $s"; fi
 	done
 
 	tet_result PASS
@@ -222,6 +238,7 @@ tp6()
 {
 	echo "START tp6"
 	for s in "$SERVERS $CLIENTS"; do
+		if [ "$DSTET_DEBUG" = "y" ]; then echo "working on $s now"; fi
 		eval_vars $s
 		# Populate kinit expect file
 		rm -f $TET_TMP_DIR/kinit.exp
@@ -250,6 +267,7 @@ expect eof ' > $TET_TMP_DIR/kinit.exp
 			tet_result FAIL
 		fi
 
+		if [ "$DSTET_DEBUG" = "y" ]; then echo "done working on $s"; fi
 	done
 
 	tet_result PASS
@@ -259,29 +277,29 @@ expect eof ' > $TET_TMP_DIR/kinit.exp
 instclean()
 {
 	echo "instclean start"
-	echo "servers is $SERVERS"
 	for s in $SERVERS; do
 		if [ "$s" != "" ]; then
-			echo "working on $s now"
+			if [ "$DSTET_DEBUG" = "y" ]; then echo "working on $s now"; fi
 			eval_vars $s
 			ssh root@$FULLHOSTNAME 'kdestroy'
 			ret=$?
 			if [ $ret != 0 ]; then
 	       			echo "ERROR - kdestroy on server $s failed, continuing anyway";
 			fi
-			echo "done working on $s"
+			if [ "$DSTET_DEBUG" = "y" ]; then echo "done working on $s"; fi
 		fi
 
 	done
 	for s in $CLIENTS; do
 		if [ "$s" != "" ]; then
-			echo "working on $s now"
+			if [ "$DSTET_DEBUG" = "y" ]; then echo "working on $s now"; fi
 			eval_vars $s
 			ssh root@$FULLHOSTNAME 'kdestroy'
 			ret=$?
 			if [ $ret != 0 ]; then
 	       			echo "ERROR - kdestroy on client $s failed, continuing anyway";
 			fi
+			if [ "$DSTET_DEBUG" = "y" ]; then echo "done working on $s"; fi
 		fi
 	done
 
