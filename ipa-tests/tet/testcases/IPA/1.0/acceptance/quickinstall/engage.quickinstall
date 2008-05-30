@@ -109,6 +109,11 @@ quickinstall_run()
 	then
 		return
 	fi
+	if [ $RunInstall = y ] 
+	then
+		echo "Sorry, you must turn off install before tests if you would like to run the quickInstall test"
+		return
+	fi
 	echo "quickinstall run..."
 	echo "$TET_ROOT/$MainTccName -e -s $TET_ROOT/testcases/IPA/1.0/acceptance/quickinstall/tet_scen -x $TET_ROOT/testcases/IPA/tetexecpl.cfg $TET_ROOT/testcases/IPA/1.0/acceptance/quickinstall install"
 

@@ -30,12 +30,12 @@ eval_vars()
 	REPO=`eval echo $x`
 	
         export HOSTNAME FULLHOSTNAME OS REPO LDAP_PORT LDAPS_PORT
-
 }
 
 # This is used to fix the bind configuration on the first server after a ipa-server-install 
 FixBindServer()
 {
+	if [ $DSTET_DEBUG = y ]; then set -x; fi
 	eval_vars $1
 	rm -f $TET_TMP_DIR/replace.pl
 	echo '#!/usr/bin/perl
@@ -109,6 +109,7 @@ while (<LIST>)
 
 is_server_alive()
 {
+	if [ $DSTET_DEBUG = y ]; then set -x; fi
 	SID=$1
         eval_vars $SID
 
@@ -131,7 +132,7 @@ is_server_alive()
 CheckAlive()
 {
         echo "Checking to see if servers are alive and listening"
-        echo $SERVERS | while read s; do
+        echo "$SERVERS" | while read s; do
                 if [ "$s" != "" ]; then
                         echo "working on $s now"
                         is_server_alive $s
@@ -143,7 +144,7 @@ CheckAlive()
                 fi
         done
 
-        echo $CLIENTS | while read s; do
+        echo "$CLIENTS" | while read s; do
                 if [ "$s" != "" ]; then
                         echo "working on $s now"
                         is_server_alive $s
@@ -160,6 +161,7 @@ CheckAlive()
 
 setup_ssh_keys()
 {
+	if [ $DSTET_DEBUG = y ]; then env; set -x; fi
 	SID=$1
         eval_vars $SID
 	# If there is no local ssh key, create one

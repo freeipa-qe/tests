@@ -23,6 +23,7 @@
 
 SetupServer()
 {
+	if [ $DSTET_DEBUG = y ]; then set -x; fi
 	. $TESTING_SHARED/shared.ksh
 	is_server_alive $1
 	ret=$?
@@ -43,6 +44,7 @@ SetupServer()
 
 UninstallServer()
 {
+	if [ $DSTET_DEBUG = y ]; then set -x; fi
 	. $TESTING_SHARED/shared.ksh
 	is_server_alive $1
 	ret=$?
@@ -63,6 +65,7 @@ UninstallServer()
 
 SetupServerBogus()
 {
+	if [ $DSTET_DEBUG = y ]; then set -x; fi
 	. $TESTING_SHARED/shared.ksh
 	is_server_alive $1
 	ret=$?
@@ -84,6 +87,7 @@ SetupServerBogus()
 
 SetupRepo()
 {
+	if [ $DSTET_DEBUG = y ]; then set -x; fi
 	. $TESTING_SHARED/shared.ksh
 	is_server_alive $1
 	ret=$?
@@ -125,6 +129,7 @@ SetupRepo()
 
 InstallServerRPM()
 {
+	if [ $DSTET_DEBUG = y ]; then set -x; fi
 	. $TESTING_SHARED/shared.ksh
 	is_server_alive $1
 	ret=$?
@@ -138,7 +143,6 @@ InstallServerRPM()
 		echo "Returning"
 		return 0
 	fi
-	set -x
 	ssh root@$FULLHOSTNAME "rpm -e --allmatches fedora-ds-base fedora-ds-base-devel"
 	ssh root@$FULLHOSTNAME "rpm -e --allmatches redhat-ds-base-devel"
 	ssh root@$FULLHOSTNAME "rpm -e --allmatches redhat-ds-base"
@@ -181,6 +185,7 @@ InstallServerRPM()
 
 UnInstallServerRPM()
 {
+	if [ $DSTET_DEBUG = y ]; then set -x; fi
 	. $TESTING_SHARED/shared.ksh
 	is_server_alive $1
 	ret=$?
@@ -194,7 +199,6 @@ UnInstallServerRPM()
 		echo "Returning"
 		return 0
 	fi
-	set -x
 	ssh root@$FULLHOSTNAME "rpm -e --allmatches redhat-ds-base ipa-server ipa-admintools bind caching-nameserver expect krb5-workstation ipa-client ipa-server-selinux"
 	ret=$?
 	if [ $ret -ne 0 ]; then

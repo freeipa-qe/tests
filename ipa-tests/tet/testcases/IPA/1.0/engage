@@ -668,6 +668,10 @@ main_send_report()
 	fi
 	echo "  Is the Time Bomb set (yes/no)  : $TIMEBOMB"
 	echo "	Total Test Elapse time         : $ElapseStr"
+	if [ $RunInstall = y ] ; then
+		echo "Install log as follows:"
+		cat ${TET_TMP_DIR}/install_log.txt
+	fi
 	) > $MainReport.tmp 
 
 	# create the html version of the report
@@ -735,6 +739,8 @@ main_default()
 	if [ -z "$NUMSERVERS" ] ; then NUMSERVERS=1                    ; fi
 	if [ -z "$NUMCLIENTS" ] ; then NUMCLIENTS=0                    ; fi
 	if [ -z "$DNSMASTER" ] ; then DNSMASTER="10.14.63.2"           ; fi
+	if [ -z "$RunInstall" ]; then RunInstall="n"                   ; fi
+	if [ -z "$RunInstallShow" ]; then RunInstallShow="n"                   ; fi
 	if [ -z "$VER" ]
 	then
 		VER=`(cd $mainRunBaseDir ; pwd)`
@@ -823,7 +829,7 @@ main_default()
 	export ROOTDN ROOTDNPW TETADMINPW LDAPhost LDAPport DRIVE
 	export IGNORE_KNOWN_BUGS DSTET_64 DSTET_DEBUG PkgName
 
-	export MainLongDurationTests MainRunStartup MainRunTests MainRunCleanup MainGuiTests MainMailTo MainAcceptanceTests MainReliabTests MainStressTests MainPerformanceTests
+	export MainLongDurationTests MainRunStartup MainRunTests MainRunCleanup MainGuiTests MainMailTo MainAcceptanceTests MainReliabTests MainStressTests MainPerformanceTests RunInstall RunInstallShow
 }
 
 # This function will ask the user for more information/choices if needed
@@ -1243,6 +1249,28 @@ main_ask()
 		esac
 
         echo
+        echo " Run Install on all Servers and Clients before test run?"
+
+		sav_RunInstall=$RunInstall
+		echo "        Install IPA First [$RunInstall] ? \c"
+		read rsp
+		case $rsp in
+			"")	RunInstall=$sav_RunInstall	;;
+			y|Y)	RunInstall=y			;;
+			*)	RunInstall=n			;;
+		esac
+		if [ $RunInstall = y ]; then
+			sav_RunInstallShow=$RunInstallShow
+			echo "            Would you like to watch the install process at the console [$RunInstallShow] ? \c"
+			read rsp
+			case $rsp in
+				"")	RunInstallShow=$sav_RunInstallShow	;;
+				y|Y)	RunInstallShow=y			;;
+				*)	RunInstallShow=n			;;
+			esac
+		fi
+
+        echo
         echo "    Mail Reports....."
 
 	sav_MainMailTo=$MainMailTo
@@ -1253,7 +1281,7 @@ main_ask()
 
         main_backendask
 
-	export MainRunTests MainRunCleanup MainRunStartup SERVERS CLIENTS NUMSERVERS NUMCLIENTS DNSMASTER
+	export MainRunTests MainRunCleanup MainRunStartup SERVERS CLIENTS NUMSERVERS NUMCLIENTS DNSMASTER RunInstall RunInstallShow
 }
 
 # This function will print the user's choices (aka variables)
@@ -1329,6 +1357,8 @@ main_print()
     echo "    Ignore known bugs              : $IGNORE_KNOWN_BUGS"
     echo "    Debugging Output (Verbose)     : $DSTET_DEBUG"
 	echo
+	echo " Install all Servers and Clients at startup : $RunInstall"
+	echo "                         Watch the install? : $RunInstallShow"
 
 }
 
@@ -1350,6 +1380,8 @@ main_save()
 	echo "IROOT=$IROOT"
 	echo "PREFIX=$PREFIX"
 	echo "DNSMASTER=$DNSMASTER"
+	echo "RunInstall=$RunInstall"
+	echo "RunInstallShow=$RunInstallShow"
 	if [ ! -z "$DOMAINNAME" ]; then
 	    echo "DOMAINNAME=$DOMAINNAME"
 	    export DOMAINNAME
@@ -1657,6 +1689,16 @@ main_run()
     echo "########### return to normal life.   A mail will be sent"
     echo "########### when completed."
     echo
+
+    if [ $RunInstall = y ] ; then 
+       echo "Installing IPA on all servers now";
+       rm -f cat ${TET_TMP_DIR}/install_log.txt
+       if [ $DSTET_DEBUG = y ] || [ $RunInstallShow = y ]; then
+           ksh $TET_ROOT/Shared/Full_Install | tee ${TET_TMP_DIR}/install_log.txt
+       else
+           ksh $TET_ROOT/Shared/Full_Install > ${TET_TMP_DIR}/install_log.txt
+       fi
+    fi
 
     if [ $MainReliabTests = y ] ; then
 	TET_SUITE_ROOT=$mainRunBaseDir/reliability; export TET_SUITE_ROOT
