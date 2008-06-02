@@ -120,7 +120,7 @@ SetupRepo()
 		scp $REPO root@$FULLHOSTNAME:/etc/yum.repos.d/.
 		ret=$?
 		if [ $ret -ne 0 ]; then
-			echo "ssh to $FULLHOSTNAME failed"
+			echo "scp to $FULLHOSTNAME failed"
 			return 1
 		fi	
 	fi
@@ -146,6 +146,7 @@ InstallServerRPM()
 	ssh root@$FULLHOSTNAME "rpm -e --allmatches fedora-ds-base fedora-ds-base-devel"
 	ssh root@$FULLHOSTNAME "rpm -e --allmatches redhat-ds-base-devel"
 	ssh root@$FULLHOSTNAME "rpm -e --allmatches redhat-ds-base"
+	ssh root@$FULLHOSTNAME "/usr/bin/yum clean all"
 	ssh root@$FULLHOSTNAME "/etc/init.d/yum-updatesd stop;killall yum;sleep 1; killall -9 yum;yum -y install TurboGears cyrus-sasl-gssapi fedora-ds-base krb5-server krb5-server-ldap lm_sensors mod_python mozldap mozldap-tools perl-Mozilla-LDAP postgresql-libs python-cheetah python-cherrypy python-configobj python-decoratortools python-elixir python-formencode python-genshi python-json python-kerberos python-kid python-krbV python-nose python-paste python-paste-deploy python-paste-script python-protocols python-psycopg2 python-pyasn1 python-ruledispatch python-setuptools python-simplejson python-sqlalchemy python-sqlite2 python-sqlobject python-tgexpandingformwidget python-tgfastdata python-turbocheetah python-turbojson python-turbokid svrcore tcl Updating bind-libs bind-utils cyrus-sasl cyrus-sasl-devel cyrus-sasl-lib cyrus-sasl-md5 cyrus-sasl-plain krb5-devel krb5-libs bind caching-nameserver expect krb5-workstation"
 	ret=$?
 	if [ $ret -ne 0 ]; then
@@ -206,9 +207,15 @@ UnInstallServerRPM()
 		return 1
 	fi	
 
-	ssh root@$FULLHOSTNAME "rpm -e --allmatches fedora-ds-base fedora-ds-base-devel"
-	ssh root@$FULLHOSTNAME "rpm -e --allmatches redhat-ds-base-devel"
-	ssh root@$FULLHOSTNAME "rpm -e --allmatches redhat-ds-base"
+	# Create a working resolv.conf, and remove any lingering redhat-ds packages"
+	ssh root@$FULLHOSTNAME "rm -f /etc/bind.conf.ipasave; \
+		mv /etc/bind.conf /etc/bind.cond.ipasave; \
+		rm -f /etc/resolv.conf.ipasave; \
+		cp /etc/resolv.conf /etc/resolv.conf.ipasave
+		echo \"nameserver $DNSMASTER\" > /etc/resolv.conf; \
+		rpm -e --allmatches fedora-ds-base fedora-ds-base-devel; \
+		rpm -e --allmatches redhat-ds-base-devel; \
+		rpm -e --allmatches redhat-ds-base"
 
 	ssh root@$FULLHOSTNAME 'find / | grep -v proc | grep -v dev > /list-after-ipa-uninstall.txt'
 	ret=$?
@@ -218,3 +225,93 @@ UnInstallServerRPM()
 	fi
 	return 0
 }
+
+Cleanup()
+{
+	echo "START Cleanup"
+	rm -f $TET_TMP_DIR/filelist.txt
+	echo '/usr/sbin/ipa*
+	/tmp/ipa*' > $TET_TMP_DIR/filelist.txt
+	echo "working on $s now"
+	is_server_alive $s
+	if [ $ret -ne 0 ]; then
+		echo "ERROR - Server $1 appears to not respond to pings."
+		return 1;
+		return 1
+	fi
+	eval_vars $s
+	ssh root@$FULLHOSTNAME 'rm -f /tmp/filelist.txt'
+	scp $TET_TMP_DIR/filelist.txt root@$FULLHOSTNAME:/tmp/.
+	ret=$?
+	if [ $ret -ne 0 ]; then
+		echo "scp to $s failed"
+		return 1
+	fi
+	# now check to see if any of the files in filelist.txt exist when they should not.
+	echo "The list of files in the next test should NOT exist, disreguard errors stating that files do not exist"
+	ssh root@$FULLHOSTNAME 'cat /tmp/filelist.txt | \
+		while read f; \
+		do ls $f; if [ $? -eq 0 ]; \
+			then echo "ERROR - $f still exists"; \
+			export setexit=1; fi; \
+		done; \
+		if [ $setexit -eq 1 ]; \
+			then exit 1; fi; 
+		\exit 0'
+		 	ret=$?
+	if [ $ret -ne 0 ]; then
+		echo "some files still exist that should not"
+		return 1
+	fi
+
+	# resolv.conf cleanup
+	ssh root@$FULLHOSTNAME "if [ -f /etc/resolv.conf.old ]; then \
+		rm -f /etc/resolv.conf.ipasave; \
+		mv /etc/resolv.conf /etc/resolv.conf.ipasave; \
+		cp /etc/resolv.conf.old /etc/resolv.conf; \
+		fi"
+
+	return 0
+
+}
+######################################################################
+
+######################################################################
+# Run some DNS test to make sure everything is working, if so, set 
+# resolv.conf to point to the right place.
+######################################################################
+FixResolv()
+{
+	set -x
+	echo "START tp5"
+	# Get the IP of the first server to be used in the DNS tests.
+	eval_vars M1
+	export dnss=$IP
+	if [ "$DSTET_DEBUG" = "y" ]; then echo "working on $s now"; fi
+	eval_vars $s
+	# Fix Resolv.conf
+	ssh root@$FULLHOSTNAME "cp -a /etc/resolv.conf /etc/resolv.conf.old; \
+		echo 'nameserver $dnss' > /etc/resolv.conf;"
+	ssh root@$FULLHOSTNAME "echo 'nameserver $DNSMASTER' >> /etc/resolv.conf"
+	# Now test to ensure that DNS works.
+	ssh root@$FULLHOSTNAME "/usr/bin/dig -x 10.14.0.110 @127.0.0.1"
+	ret=$?
+	if [ $ret != 0 ]; then
+		echo "ERROR - reverse lookup aginst localhost failed";
+		return 1
+	fi
+
+	ssh root@$FULLHOSTNAME "/usr/bin/dig $FULLHOSTNAME @127.0.0.1"
+	ret=$?
+	if [ $ret != 0 ]; then
+		echo "ERROR - lookup of myself failed";
+		return 1
+	fi
+	if [ "$DSTET_DEBUG" = "y" ]; then echo "done working on $s"; fi
+
+	return 0
+
+}
+######################################################################
+
+

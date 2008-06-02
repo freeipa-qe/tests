@@ -140,6 +140,7 @@ CheckAlive()
                         if [ $ret -ne 0 ]; then
                                 echo "Server $s not answering pings"
                                 tet_result FAIL
+				return 1
                         fi
                 fi
         done
@@ -152,11 +153,13 @@ CheckAlive()
                         if [ $ret -ne 0 ]; then
                                 echo "Server $s not answering pings"
                                 tet_result FAIL
+				return 1
                         fi
                 fi
         done
 
         tet_result PASS
+	return 0
 }
 
 setup_ssh_keys()
