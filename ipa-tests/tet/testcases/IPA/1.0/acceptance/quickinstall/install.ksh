@@ -205,22 +205,10 @@ tp5()
 	dns=$IP
 	for s in "$SERVERS $CLIENTS"; do
 		if [ "$DSTET_DEBUG" = "y" ]; then echo "working on $s now"; fi
-		eval_vars $s
-		# Fix Resolv.conf
-		ssh root@$FULLHOSTNAME "cp -a /etc/resolv.conf /etc/resolv.conf.old; \
-			echo 'nameserver $dns' > /etc/resolv.conf;"
-		# Now test to ensure that DNS works.
-		ssh root@$FULLHOSTNAME "/usr/bin/dig -x 10.14.0.110 @127.0.0.1"
+		FixResolv $s
 		ret=$?
 		if [ $ret != 0 ]; then
-			echo "ERROR - reverse lookup aginst localhost failed";
-			tet_result FAIL
-		fi
-
-		ssh root@$FULLHOSTNAME "/usr/bin/dig $FULLHOSTNAME @127.0.0.1"
-		ret=$?
-		if [ $ret != 0 ]; then
-			echo "ERROR - lookup of myself failed";
+			echo "ERROR - fix of resolv.conf failed";
 			tet_result FAIL
 		fi
 		if [ "$DSTET_DEBUG" = "y" ]; then echo "done working on $s"; fi

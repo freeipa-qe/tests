@@ -119,37 +119,12 @@ tp3()
 	for s in "$SERVERS $CLIENTS"; do
 		if [ "$s" != "" ]; then
 			echo "working on $s now"
-			is_server_alive $s
+			Cleanup $s
 			if [ $ret -ne 0 ]; then
-				echo "ERROR - Server $1 appears to not respond to pings."
+				echo "ERROR - Cleanup of Server $s failed"
 				return 1;
 				tet_result FAIL
 			fi
-			eval_vars $s
-			ssh root@$FULLHOSTNAME 'rm -f /tmp/filelist.txt'
-			scp $TET_TMP_DIR/filelist.txt root@$FULLHOSTNAME:/tmp/.
-			ret=$?
-			if [ $ret -ne 0 ]; then
-				echo "scp to $s failed"
-				tet_result FAIL
-			fi
-			# now check to see if any of the files in filelist.txt exist when they should not.
-			echo "The list of files in the next test should NOT exist, disreguard errors stating that files do not exist"
-			ssh root@$FULLHOSTNAME 'cat /tmp/filelist.txt | \
-				while read f; \
-				do ls $f; if [ $? -eq 0 ]; \
-					then echo "ERROR - $f still exists"; \
-					export setexit=1; fi; \
-				done; \
-				if [ $setexit -eq 1 ]; \
-					then exit 1; fi; 
-				\exit 0'
-		 	ret=$?
-			if [ $ret -ne 0 ]; then
-				echo "some files still exist that should not"
-				tet_result FAIL
-			fi
-		
 		fi
 	done
 
