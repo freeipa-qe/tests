@@ -743,6 +743,7 @@ main_default()
       PREFIX=$tmp_PREFIX2
     fi
 	if [ -z "$RELM_NAME" ] ;  then RELM_NAME=SJCTEST.REDHAT.COM ; fi
+	if [ -z "$DNS_DOMAIN" ] ;  then DNS_DOMAIN=sjctest.redhat.com ; fi
 	if [ -z "$KERB_MASTER_PASS" ] ; then KERB_MASTER_PASS=Secret123 ; fi 
 	if [ -z "$DM_ADMIN_PASS" ] ; then DM_ADMIN_PASS=Secret123 ; fi
   	if [ -z "$ROOTDN" ] ;     then ROOTDN="cn=directory manager"   ; fi
@@ -840,7 +841,7 @@ main_default()
 
 # export all these variables 
 
-	export TET_ROOT VER CHARSET TESTING_SHARED IROOT PREFIX TET_TMP_DIR  TET_REPORT_DIR DS_LOG_DIR RELM_NAME KERB_MASTER_PASS DM_ADMIN_PASS DS_USER NUMSERVERS SERVERS CLIENTS NUMCLIENTS DNSMASTER
+	export TET_ROOT VER CHARSET TESTING_SHARED IROOT PREFIX TET_TMP_DIR  TET_REPORT_DIR DS_LOG_DIR RELM_NAME KERB_MASTER_PASS DM_ADMIN_PASS DS_USER NUMSERVERS SERVERS CLIENTS NUMCLIENTS DNSMASTER DNS_DOMAIN
 	export ROOTDN ROOTDNPW TETADMINPW LDAPhost LDAPport DRIVE
 	export IGNORE_KNOWN_BUGS DSTET_64 DSTET_DEBUG PkgName
 
@@ -1186,6 +1187,17 @@ main_ask()
 	echo "->"
 	read rsp
 	if [ -z "$rsp" ] ; then echo "DNS Master unchanged, continuing"; else DNSMASTER="$rsp"; fi
+	echo "What will the IPA RELM name be?(needs to be UPPER case)"
+	echo "Default $RELM_NAME:"
+	echo "->"
+	read rsp
+	if [ -z "$rsp" ] ; then echo "RELM_NAME unchanged, continuing"; else RELM_NAME="$rsp"; fi
+	echo "What will the DNS domain be?(needs to be lower case)"
+	echo "Default $DNS_DOMAIN:"
+	echo "->"
+	read rsp
+	if [ -z "$rsp" ] ; then echo "DNS Domain unchanged, continuing"; else DNS_DOMAIN="$rsp"; fi
+
 	# Script engage's variables
 	#
 	echo
@@ -1339,6 +1351,7 @@ main_print()
 	echo "    ROOTDNPW       : $ROOTDNPW"
 	echo "    TETADMINPW     : $TETADMINPW"
         echo "    RELM_NAME      : $RELM_NAME"
+	echo "    DNS_DOMAIN     : $DNS_DOMAIN"
 	echo "    KERB_MASTER_PASS: $KERB_MASTER_PASS"
 	echo "    DM_ADMIN_PASS  : $DM_ADMIN_PASS"
 	echo "    DS_USER        : $DS_USER"
@@ -1445,6 +1458,7 @@ main_save()
 	fi
 	echo ""
 	echo "RELM_NAME=$RELM_NAME"
+	echo "DNS_DOMAIN=$DNS_DOMAIN"
 	echo "KERB_MASTER_PASS=$KERB_MASTER_PASS"
 	echo "DM_ADMIN_PASS=$DM_MASTER_PASS"
 	echo "DS_USER=$DS_USER"
@@ -1877,9 +1891,10 @@ main_main()
 		main_loop_on_choices
 	fi
 
-	if [ "$SERVERS" == "" ]&&[ "$CLIENTS" == "" ]&&[ "$RELM_NAME" == "" ]
+
+	if [ "$SERVERS" == "" ]||[ "$RELM_NAME" == "" ]||[ "$DNS_DOMAIN" == "" ]
 	then
-		echo "ERROR no SERVERS, CLIENTS, or RELM_NAME defiened"
+		echo "ERROR no SERVERS, DNS_DOMAIN or RELM_NAME do not exist, $SERVERS, $DNS_DOMAIN, $RELM_NAME" 
 		exit
 	fi
 

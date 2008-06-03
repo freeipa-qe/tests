@@ -212,7 +212,6 @@ UnInstallServerRPM()
 		mv /etc/bind.conf /etc/bind.cond.ipasave; \
 		rm -f /etc/resolv.conf.ipasave; \
 		cp /etc/resolv.conf /etc/resolv.conf.ipasave
-		echo \"nameserver $DNSMASTER\" > /etc/resolv.conf; \
 		rpm -e --allmatches fedora-ds-base fedora-ds-base-devel; \
 		rpm -e --allmatches redhat-ds-base-devel; \
 		rpm -e --allmatches redhat-ds-base"
@@ -270,6 +269,11 @@ Cleanup()
 		mv /etc/resolv.conf /etc/resolv.conf.ipasave; \
 		cp /etc/resolv.conf.old /etc/resolv.conf; \
 		fi"
+
+	# save and then remove old bind configuration
+	ssh root@$FULLHOSTNAME "rm -f /var/named.ipasave.tar.gz; \
+		tar cvfz /var/named.ipasave.tar.gz /var/named; \
+		rm -Rf /var/named;"
 
 	return 0
 

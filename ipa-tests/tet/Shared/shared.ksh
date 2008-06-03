@@ -91,6 +91,7 @@ while (<LIST>)
 
 	# Put forwarding DNS server into DNS
 	ssh root@$FULLHOSTNAME "sed -i s/dump-file/'forwarders { $DNSMASTER; }; dump-file'/g  /etc/named.conf.new"
+	ret=$?
 	if [ $ret -ne 0 ]; then
 		echo "ERROR! bind fix failed"
 		tet_result FAIL
@@ -105,6 +106,44 @@ while (<LIST>)
 		return $ret
 	fi 
 
+	# Generate a file containing additions for the zone file referenced by $DNS_DOMAIN
+	rm -f $TET_TMP_DIR/dns-addon-tmp.txt
+	for s in $SERVERS; do
+		if [ "$s" != "" ]; then 
+			eval_vars $s
+			echo "$HOSTNAME IN A $IP" >> $TET_TMP_DIR/dns-addon-tmp.txt
+		fi
+	done
+	for s in $CLIENTS; do
+		if [ "$s" != "" ]; then 
+			eval_vars $s
+			echo "$HOSTNAME IN A $IP" >> $TET_TMP_DIR/dns-addon-tmp.txt
+		fi
+	done
+
+	# Add those changes to the DNS server.
+	eval_vars $1
+	ssh root@$FULLHOSTNAME 'rm -f /tmp/dns-addon-tmp.txt'
+	scp $TET_TMP_DIR/dns-addon-tmp.txt root@$FULLHOSTNAME:/tmp/.
+	ssh root@$FULLHOSTNAME "ls /var/named/$DNS_DOMAIN.zone.db"
+	ret=$?
+	if [ $ret -ne 0 ]; then
+		echo "ERROR /var/named/$DNS_DOMAIN.zone.db on $FULLHOSTNAME does not exist!"
+		tet_result FAIL
+		return $ret
+	fi
+	ssh root@$FULLHOSTNAME "rm -f /var/named/$DNS_DOMAIN.zone.db-ipasave; \
+		cp -a /var/named/$DNS_DOMAIN.zone.db /var/named/$DNS_DOMAIN.zone.db.ipasave;"
+	ssh root@$FULLHOSTNAME "cat /tmp/dns-addon-tmp.txt >> /var/named/$DNS_DOMAIN.zone.db"
+	ssh root@$FULLHOSTNAME "/etc/init.d/named restart"	
+	ret=$?
+	if [ $ret -ne 0 ]; then
+		echo "ERROR - restart of bind on $FULLHOSTNAME failed!"
+		tet_result FAIL
+		return $ret
+	fi
+
+	return 0
 }
 
 is_server_alive()
