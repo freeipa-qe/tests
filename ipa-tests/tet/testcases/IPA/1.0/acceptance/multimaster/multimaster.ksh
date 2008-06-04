@@ -5,9 +5,9 @@ fi
 # The next line is required as it picks up data about the servers to use
 tet_startup="CheckAlive"
 tet_cleanup="instclean"
-iclist="setupssh ic1 ic2"
-ic1="tp1"
-ic2="tp2"
+iclist="ic1 ic2"
+ic1="setupssh"
+ic2="instclean"
 
 setupssh()
 {
