@@ -672,19 +672,18 @@ main_send_report()
 		echo "Install log as follows:"
 		cat ${TET_TMP_DIR}/install_log.txt
 	fi
-	if [ $RunInstall = y ] ; then
+	if [ $RunUnInstall = y ] ; then
 		echo 
 		echo 
 		echo
 		echo
 		echo "-----------------------------------------------------------------------"
 		echo 
-		if [ $RunUnInstall = y ] ; then
-			echo " This is the Uninstall log"
-			cat ${TET_TMP_DIR}/uninstall_log.txt
-		fi
+
+		echo " This is the Uninstall log"
+		cat ${TET_TMP_DIR}/uninstall_log.txt
 	fi
-	
+
 	) > $MainReport.tmp 
 
 	# create the html version of the report
