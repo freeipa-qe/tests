@@ -31,15 +31,79 @@ SetupServer()
 		echo "ERROR - Server $1 appears to not respond to pings."
 		return 1;
 	fi
-	eval_vars $1
-	echo "/usr/sbin/ipa-server-install -U --hostname=$FULLHOSTNAME -r $RELM_NAME -p $DM_ADMIN_PASS -P $KERB_MASTER_PASS -a $DM_ADMIN_PASS --setup-bind -u $DS_USER -d"
-	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-server-install -U --hostname=$FULLHOSTNAME -r $RELM_NAME -p $DM_ADMIN_PASS -P $KERB_MASTER_PASS -a $DM_ADMIN_PASS --setup-bind -u $DS_USER -d"
-	ret=$?
-	if [ $ret -ne 0 ]; then
-		echo "ERROR - ipa-server-install on $FULLHOSTNAME failed."
-		return 1;
-	fi
 
+	eval_vars $1
+	ssh root@$FULLHOSTNAME "rm -f /etc/resolv.conf.original; \
+		cp -a /etc/resolv.conf /etc/resolv.conf.original;"
+
+	if [ "$1" == "M1" ]; then
+		echo "setting up server $1 as a master server"
+		echo "/usr/sbin/ipa-server-install -U --hostname=$FULLHOSTNAME -r $RELM_NAME -p $DM_ADMIN_PASS -P $KERB_MASTER_PASS -a $DM_ADMIN_PASS --setup-bind -u $DS_USER -d"
+		ssh root@$FULLHOSTNAME "/usr/sbin/ipa-server-install -U --hostname=$FULLHOSTNAME -r $RELM_NAME -p $DM_ADMIN_PASS -P $KERB_MASTER_PASS -a $DM_ADMIN_PASS --setup-bind -u $DS_USER -d"
+		ret=$?
+		if [ $ret -ne 0 ]; then
+			echo "ERROR - ipa-server-install on $FULLHOSTNAME failed."
+			return 1;
+		fi
+	else 
+		echo "setting up server $1 as a replica"
+		replica_hostname=$FULLHOSTNAME
+		eval_vars M1
+		echo "Generating replica prepare file for $replica_hostname on $FULLHOSTNAME"
+		ssh root@$FULLHOSTNAME "/usr/sbin/ipa-replica-prepare $replica_hostname"
+		ret=$?
+		if [ $ret -ne 0 ]; then
+			echo "ERROR - /usr/sbin/ipa-replica-prepare $replica_hostname on $FULLHOSTNAME failed."
+			return 1;
+		fi
+		ssh root@$FULLHOSTNAME "ls /var/lib/ipa/replica-info-$replica_hostname"
+		ret=$?
+		if [ $ret -ne 0 ]; then
+			echo "ERROR - ipa-replica-prepare did not create /var/lib/ipa/replica-info-$replica_hostname"
+			return 1;
+		fi
+
+		# copying the relica prepare file from the master server to the replica	
+		rm -f $TET_TMP_DIR/replica-info-$replica_hostname
+		scp root@$FULLHOSTNAME:/var/lib/ipa/replica-info-$replica_hostname $TET_TMP_DIR/.
+		ret=$?
+		ssh root@$replica_hostname "rm -f /tmp/replica-info-$replica_hostname"
+		scp $TET_TMP_DIR/replica-info-$replica_hostname root@$replica_hostname:/tmp/.
+		ret2=$?
+		if [ $ret -ne 0 ]||[ $ret2 -ne 0 ]; then
+			echo "ERROR - scp root@$FULLHOSTNAME:/var/lib/ipa/replica-info-$replica_hostname to root@$replica_hostname:/tmp/. failed"
+			return 1;
+		fi
+		# prepare the replica server
+		# create expect file for use on the replica server
+		echo '#!/usr/bin/expect -f
+set force_conservative 0  ; 
+if {$force_conservative} {
+        set send_slow {1 .1}
+        proc send {ignore arg} {
+                sleep .1
+                exp_send -s -- $arg
+        }
+}
+set timeout -1' > $TET_TMP_DIR/replica-install.exp
+		echo "spawn ipa-replica-install /tmp/replica-info-$replica_hostname" >> $TET_TMP_DIR/replica-install.exp
+		echo 'match_max 100000
+expect -exact "Directory Manager (existing master) password: "' >> $TET_TMP_DIR/replica-install.exp
+		echo "send -- \"$KERB_MASTER_PASS\r\"" >> $TET_TMP_DIR/replica-install.exp
+		echo 'expect eof' >> $TET_TMP_DIR/replica-install.exp
+
+		chmod 755 $TET_TMP_DIR/replica-install.exp
+		scp $TET_TMP_DIR/replica-install.exp root@$replica_hostname:/tmp/.
+		ssh root@$replica_hostname "/usr/bin/expect /tmp/replica-install.exp"
+		ret=$?
+		if [ $ret -ne 0 ]; then
+			echo "ERROR - /usr/bin/expect /tmp/replica-install.exp on $replica_hostname:/tmp/. failed"
+			return 1;
+		fi
+	
+	fi
+	
+	return 0;
 }
 
 UninstallServer()
@@ -147,11 +211,18 @@ InstallServerRPM()
 	ssh root@$FULLHOSTNAME "rpm -e --allmatches redhat-ds-base-devel"
 	ssh root@$FULLHOSTNAME "rpm -e --allmatches redhat-ds-base"
 	ssh root@$FULLHOSTNAME "/usr/bin/yum clean all"
-	ssh root@$FULLHOSTNAME "/etc/init.d/yum-updatesd stop;killall yum;sleep 1; killall -9 yum;yum -y install TurboGears cyrus-sasl-gssapi fedora-ds-base krb5-server krb5-server-ldap lm_sensors mod_python mozldap mozldap-tools perl-Mozilla-LDAP postgresql-libs python-cheetah python-cherrypy python-configobj python-decoratortools python-elixir python-formencode python-genshi python-json python-kerberos python-kid python-krbV python-nose python-paste python-paste-deploy python-paste-script python-protocols python-psycopg2 python-pyasn1 python-ruledispatch python-setuptools python-simplejson python-sqlalchemy python-sqlite2 python-sqlobject python-tgexpandingformwidget python-tgfastdata python-turbocheetah python-turbojson python-turbokid svrcore tcl Updating bind-libs bind-utils cyrus-sasl cyrus-sasl-devel cyrus-sasl-lib cyrus-sasl-md5 cyrus-sasl-plain krb5-devel krb5-libs bind caching-nameserver expect krb5-workstation"
+	pkglistA="TurboGears cyrus-sasl-gssapi fedora-ds-base krb5-server krb5-server-ldap lm_sensors mod_python mozldap mozldap-tools perl-Mozilla-LDAP postgresql-libs python-cheetah python-cherrypy python-configobj python-decoratortools python-elixir python-formencode python-genshi python-json python-kerberos python-kid python-krbV python-nose python-paste python-paste-deploy python-paste-script python-protocols python-psycopg2 python-pyasn1 python-ruledispatch python-setuptools python-simplejson python-sqlalchemy python-sqlite2 python-sqlobject python-tgexpandingformwidget python-tgfastdata python-turbocheetah python-turbojson python-turbokid svrcore tcl Updating bind-libs bind-utils cyrus-sasl cyrus-sasl-devel cyrus-sasl-lib cyrus-sasl-md5 cyrus-sasl-plain krb5-devel krb5-libs bind caching-nameserver expect krb5-workstation"
+	ssh root@$FULLHOSTNAME "/etc/init.d/yum-updatesd stop;killall yum;sleep 1; killall -9 yum;yum -y install $pkglistA"
 	ret=$?
 	if [ $ret -ne 0 ]; then
-		echo "ssh to $FULLHOSTNAME failed"
-		return 1
+		echo "That rpm install didn't work, lets try that again. Sleeping for 60 seconds first" 
+		sleep 60
+		ssh root@$FULLHOSTNAME "/etc/init.d/yum-updatesd stop;killall yum;sleep 1; killall -9 yum;yum -y install $pkglistA"
+		ret=$?
+		if [ $ret -ne 0 ]; then
+			echo "install of $pkglistA on $FULLHOSTNAME failed"
+			return 1
+		fi
 	fi	
 
 	ssh root@$FULLHOSTNAME "yum -y update TurboGears cyrus-sasl-gssapi fedora-ds-base krb5-server krb5-server-ldap lm_sensors mod_python mozldap mozldap-tools perl-Mozilla-LDAP postgresql-libs python-cheetah python-cherrypy python-configobj python-decoratortools python-elixir python-formencode python-genshi python-json python-kerberos python-kid python-krbV python-nose python-paste python-paste-deploy python-paste-script python-protocols python-psycopg2 python-pyasn1 python-ruledispatch python-setuptools python-simplejson python-sqlalchemy python-sqlite2 python-sqlobject python-tgexpandingformwidget python-tgfastdata python-turbocheetah python-turbojson python-turbokid svrcore tcl Updating bind-libs bind-utils cyrus-sasl cyrus-sasl-devel cyrus-sasl-lib cyrus-sasl-md5 cyrus-sasl-plain krb5-devel krb5-libs"
@@ -168,11 +239,18 @@ InstallServerRPM()
 		return 1
 	fi	
 
-	ssh root@$FULLHOSTNAME "yum -y install ipa-server ipa-admintools bind caching-nameserver expect krb5-workstation"
+	pkglistB="ipa-server ipa-admintools bind caching-nameserver expect krb5-workstation"
+	ssh root@$FULLHOSTNAME "yum -y install $pkglistB"
 	ret=$?
 	if [ $ret -ne 0 ]; then
-		echo "ssh to $FULLHOSTNAME failed"
-		return 1
+		echo "That rpm install didn't work, lets try that again. Sleeping for 60 seconds first" 
+		sleep 60
+		ssh root@$FULLHOSTNAME "/etc/init.d/yum-updatesd stop;killall yum;sleep 1; killall -9 yum;yum -y install $pkglistB"
+		ret=$?
+		if [ $ret -ne 0 ]; then
+			echo "install of $pkglistB on $FULLHOSTNAME failed"
+			return 1
+		fi
 	fi	
 
 	ssh root@$FULLHOSTNAME 'find / | grep -v proc | grep -v dev > /list-after-ipa.txt'
@@ -210,8 +288,6 @@ UnInstallServerRPM()
 	# Create a working resolv.conf, and remove any lingering redhat-ds packages"
 	ssh root@$FULLHOSTNAME "rm -f /etc/bind.conf.ipasave; \
 		mv /etc/bind.conf /etc/bind.cond.ipasave; \
-		rm -f /etc/resolv.conf.ipasave; \
-		cp /etc/resolv.conf /etc/resolv.conf.ipasave
 		rpm -e --allmatches fedora-ds-base fedora-ds-base-devel; \
 		rpm -e --allmatches redhat-ds-base-devel; \
 		rpm -e --allmatches redhat-ds-base"
@@ -257,23 +333,33 @@ Cleanup()
 		if [ $setexit -eq 1 ]; \
 			then exit 1; fi; 
 		\exit 0'
-		 	ret=$?
+ 	ret=$?
 	if [ $ret -ne 0 ]; then
 		echo "some files still exist that should not"
 		return 1
 	fi
 
 	# resolv.conf cleanup
-	ssh root@$FULLHOSTNAME "if [ -f /etc/resolv.conf.old ]; then \
+	ssh root@$FULLHOSTNAME "if [ -f /etc/resolv.conf.original ]; then \
 		rm -f /etc/resolv.conf.ipasave; \
 		mv /etc/resolv.conf /etc/resolv.conf.ipasave; \
-		cp /etc/resolv.conf.old /etc/resolv.conf; \
+		cat /etc/resolv.conf.original > /etc/resolv.conf; \
+		cp /etc/resolv.conf.original /etc/resolv.conf; \
 		fi"
 
 	# save and then remove old bind configuration
 	ssh root@$FULLHOSTNAME "rm -f /var/named.ipasave.tar.gz; \
 		tar cvfz /var/named.ipasave.tar.gz /var/named; \
 		rm -Rf /var/named;"
+
+	# yum repo cleanup
+	ssh root@$FULLHOSTNAME "ls /etc/yum.repos.d/ipa*"
+	ret=$?
+	if [ $ret -ne 0 ]; then
+		echo "no /etc/yum.repos.d/ipa* files exist. This may mean that uninstall got broken"
+		return 1
+	fi
+	ssh root@$FULLHOSTNAME "rm -f /etc/yum.repos.d/ipa*"
 
 	return 0
 
@@ -294,18 +380,17 @@ FixResolv()
 	if [ "$DSTET_DEBUG" = "y" ]; then echo "working on $s now"; fi
 	eval_vars $s
 	# Fix Resolv.conf
-	ssh root@$FULLHOSTNAME "cp -a /etc/resolv.conf /etc/resolv.conf.old; \
-		echo 'nameserver $dnss' > /etc/resolv.conf;"
+	ssh root@$FULLHOSTNAME "echo 'nameserver $dnss' > /etc/resolv.conf;"
 	ssh root@$FULLHOSTNAME "echo 'nameserver $DNSMASTER' >> /etc/resolv.conf"
 	# Now test to ensure that DNS works.
-	ssh root@$FULLHOSTNAME "/usr/bin/dig -x 10.14.0.110 @127.0.0.1"
+	ssh root@$FULLHOSTNAME "/usr/bin/dig -x 10.14.0.110"
 	ret=$?
 	if [ $ret != 0 ]; then
 		echo "ERROR - reverse lookup aginst localhost failed";
 		return 1
 	fi
 
-	ssh root@$FULLHOSTNAME "/usr/bin/dig $FULLHOSTNAME @127.0.0.1"
+	ssh root@$FULLHOSTNAME "/usr/bin/dig $FULLHOSTNAME"
 	ret=$?
 	if [ $ret != 0 ]; then
 		echo "ERROR - lookup of myself failed";
