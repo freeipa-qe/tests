@@ -225,19 +225,21 @@ tp5()
 tp6()
 {
 	echo "START tp6"
-	for s in $SERVERS; do
-		if [ "$DSTET_DEBUG" = "y" ]; then echo "working on $s now"; fi
-		eval_vars $s
-		# Populate kinit expect file
-		rm -f $TET_TMP_DIR/kinit.exp
-		echo 'set timeout -1
+	rm -f $TET_TMP_DIR/kinit.exp
+	echo 'set timeout -1
 set send_slow {1 .1}
 spawn /usr/kerberos/bin/kinit admin
 match_max 100000
 expect "Password for admin"
 sleep 1'  > $TET_TMP_DIR/kinit.exp
-echo "send -s -- \"$KERB_MASTER_PASS\r\"" >> $TET_TMP_DIR/kinit.exp
-echo 'expect eof ' >> $TET_TMP_DIR/kinit.exp
+	echo "send -s -- \"$KERB_MASTER_PASS\r\"" >> $TET_TMP_DIR/kinit.exp
+	echo 'expect eof ' >> $TET_TMP_DIR/kinit.exp
+
+	for s in $SERVERS; do
+		if [ "$DSTET_DEBUG" = "y" ]; then echo "working on $s now"; fi
+		eval_vars $s
+		# Populate kinit expect file
+		rm -f $TET_TMP_DIR/kinit.exp
 		ssh root@$FULLHOSTNAME 'rm -f /tmp/kinit.exp'
 		scp $TET_TMP_DIR/kinit.exp root@$FULLHOSTNAME:/tmp/.		
 
@@ -262,15 +264,6 @@ echo 'expect eof ' >> $TET_TMP_DIR/kinit.exp
 		if [ "$DSTET_DEBUG" = "y" ]; then echo "working on $s now"; fi
 		eval_vars $s
 		# Populate kinit expect file
-		rm -f $TET_TMP_DIR/kinit.exp
-		echo 'set timeout -1
-set send_slow {1 .1}
-spawn /usr/kerberos/bin/kinit admin
-match_max 100000
-expect "Password for admin"
-sleep 1
-send -s -- "Secret123\r"
-expect eof ' > $TET_TMP_DIR/kinit.exp
 		ssh root@$FULLHOSTNAME 'rm -f /tmp/kinit.exp'
 		scp $TET_TMP_DIR/kinit.exp root@$FULLHOSTNAME:/tmp/.		
 
