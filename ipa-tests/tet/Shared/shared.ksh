@@ -167,6 +167,44 @@ is_server_alive()
 	return 0;
 }
 
+# KinitAs kinits as a defined user on a defined server, using a given password.
+# input as follows:
+# KinitAs <server identifer> <username> <password>
+KinitAs()
+{
+	if [ "$2" = "" ]; then
+		echo 'ERROR - You must call KinitAs with a username in the $2 position'
+		return 1;
+	fi 
+	if [ "$3" = "" ]; then
+		echo 'ERROR - You must call KinitAs with a password in the $3 position'
+		return 1;
+	fi 
+	SID=$1
+	eval_vars $SID
+        rm -f $TET_TMP_DIR/kinit-tmp.exp
+        echo 'set timeout -1
+set send_slow {1 .1}' > $TET_TMP_DIR/kinit-tmp.exp
+echo "spawn /usr/kerberos/bin/kinit $2" >> $TET_TMP_DIR/kinit-tmp.exp
+echo 'match_max 100000' >> $TET_TMP_DIR/kinit-tmp.exp
+echo "expect \"Password for $2\"" >> $TET_TMP_DIR/kinit-tmp.exp
+echo 'sleep 1' >> $TET_TMP_DIR/kinit-tmp.exp
+	echo "send -s -- \"$3\r\"" >> $TET_TMP_DIR/kinit-tmp.exp
+	echo 'expect eof ' >> $TET_TMP_DIR/kinit-tmp.exp
+
+	ssh root@$FULLHOSTNAME 'rm -f /tmp/kinit.exp'
+	scp $TET_TMP_DIR/kinit.exp root@$FULLHOSTNAME:/tmp/.
+
+	ssh root@$FULLHOSTNAME 'kdestroy;/usr/bin/expect /tmp/kinit.exp'
+	ret=$?
+	if [ $ret != 0 ]; then
+		echo "ERROR - kinit as user $1, password of $2 failed";
+		return 1;
+	fi
+
+	return 0;
+
+}
 
 CheckAlive()
 {
