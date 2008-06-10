@@ -5,12 +5,13 @@ fi
 # The next line is required as it picks up data about the servers to use
 tet_startup="CheckAlive"
 tet_cleanup="instclean"
-iclist="setupssh ic1 ic2 ic3 ic4 ic5"
+iclist="ic1 ic2 ic3 ic4 ic5 ic6"
 ic1="setupssh tp1"
 ic2="tp2"
 ic3="tp3"
 ic4="tp4"
-ic5="tp5 tp6"
+ic5="tp5"
+ic6="tp6"
 
 
 
@@ -165,11 +166,13 @@ tp4()
 				echo "server-install of server on $s ssh failed"
 				tet_result FAIL
 			fi
-			FixBindServer $s
-			ret=$?
-			if [ $ret -ne 0 ]; then
-				echo "fix-bind-server on $s ssh failed"
-				tet_result FAIL
+			if [ "$s" = "M1" ]; then
+				FixBindServer $s
+				ret=$?
+				if [ $ret -ne 0 ]; then
+					echo "fix-bind-server on $s ssh failed"
+					tet_result FAIL
+				fi
 			fi
 			if [ "$DSTET_DEBUG" = "y" ]; then echo "done working on $s"; fi
 		fi
@@ -203,7 +206,18 @@ tp5()
 	# Get the IP of the first server to be used in the DNS tests.
 	eval_vars M1
 	dns=$IP
-	for s in "$SERVERS $CLIENTS"; do
+	for s in $SERVERS; do
+		if [ "$DSTET_DEBUG" = "y" ]; then echo "working on $s now"; fi
+		FixResolv $s
+		ret=$?
+		if [ $ret != 0 ]; then
+			echo "ERROR - fix of resolv.conf failed";
+			tet_result FAIL
+		fi
+		if [ "$DSTET_DEBUG" = "y" ]; then echo "done working on $s"; fi
+	done
+
+	for s in $CLIENTS; do
 		if [ "$DSTET_DEBUG" = "y" ]; then echo "working on $s now"; fi
 		FixResolv $s
 		ret=$?
@@ -226,20 +240,20 @@ tp6()
 {
 	echo "START tp6"
 	rm -f $TET_TMP_DIR/kinit.exp
-	echo 'set timeout -1
+	echo 'set timeout 60
 set send_slow {1 .1}
 spawn /usr/kerberos/bin/kinit admin
 match_max 100000
-expect "Password for admin"
-sleep 1'  > $TET_TMP_DIR/kinit.exp
-	echo "send -s -- \"$KERB_MASTER_PASS\r\"" >> $TET_TMP_DIR/kinit.exp
+sleep 15'  > $TET_TMP_DIR/kinit.exp
+	echo "send -s -- \"$KERB_MASTER_PASS\"" >> $TET_TMP_DIR/kinit.exp
+	echo 'send -s -- "\\r"' >> $TET_TMP_DIR/kinit.exp
+	echo 'send -s -- "\r"' >> $TET_TMP_DIR/kinit.exp
 	echo 'expect eof ' >> $TET_TMP_DIR/kinit.exp
 
 	for s in $SERVERS; do
 		if [ "$DSTET_DEBUG" = "y" ]; then echo "working on $s now"; fi
 		eval_vars $s
 		# Populate kinit expect file
-		rm -f $TET_TMP_DIR/kinit.exp
 		ssh root@$FULLHOSTNAME 'rm -f /tmp/kinit.exp'
 		scp $TET_TMP_DIR/kinit.exp root@$FULLHOSTNAME:/tmp/.		
 
