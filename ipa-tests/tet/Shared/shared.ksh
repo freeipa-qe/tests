@@ -35,6 +35,7 @@ eval_vars()
 # This is used to fix the bind configuration on the first server after a ipa-server-install 
 FixBindServer()
 {
+
 	if [ $DSTET_DEBUG = y ]; then set -x; fi
 	eval_vars $1
 	rm -f $TET_TMP_DIR/replace.pl
@@ -182,15 +183,15 @@ KinitAs()
 	fi 
 	SID=$1
 	eval_vars $SID
-        rm -f $TET_TMP_DIR/kinit-tmp.exp
-        echo 'set timeout -1
-set send_slow {1 .1}' > $TET_TMP_DIR/kinit-tmp.exp
-echo "spawn /usr/kerberos/bin/kinit $2" >> $TET_TMP_DIR/kinit-tmp.exp
-echo 'match_max 100000' >> $TET_TMP_DIR/kinit-tmp.exp
-echo "expect \"Password for $2\"" >> $TET_TMP_DIR/kinit-tmp.exp
-echo 'sleep 1' >> $TET_TMP_DIR/kinit-tmp.exp
-	echo "send -s -- \"$3\r\"" >> $TET_TMP_DIR/kinit-tmp.exp
-	echo 'expect eof ' >> $TET_TMP_DIR/kinit-tmp.exp
+        rm -f $TET_TMP_DIR/kinit.exp
+        echo 'set timeout 60
+set send_slow {1 .1}' > $TET_TMP_DIR/kinit.exp
+echo "spawn /usr/kerberos/bin/kinit $2" >> $TET_TMP_DIR/kinit.exp
+echo 'match_max 100000' >> $TET_TMP_DIR/kinit.exp
+echo 'sleep 15' >> $TET_TMP_DIR/kinit.exp
+	echo "send -s -- \"$3\"" >> $TET_TMP_DIR/kinit.exp
+	echo 'send -s -- "\\r"' >> $TET_TMP_DIR/kinit.exp
+	echo 'expect eof ' >> $TET_TMP_DIR/kinit.exp
 
 	ssh root@$FULLHOSTNAME 'rm -f /tmp/kinit.exp'
 	scp $TET_TMP_DIR/kinit.exp root@$FULLHOSTNAME:/tmp/.
@@ -202,14 +203,19 @@ echo 'sleep 1' >> $TET_TMP_DIR/kinit-tmp.exp
 		return 1;
 	fi
 
+	echo "This is a klist on the machine we just kinited on, it should show that user $2 is kinited"
+	ssh root@$FULLHOSTNAME 'klist'
+
 	return 0;
 
 }
 
 CheckAlive()
 {
+
+	if [ $DSTET_DEBUG = y ]; then set -x; fi
         echo "Checking to see if servers are alive and listening"
-        echo "$SERVERS" | while read s; do
+        for f in $SERVERS; do
                 if [ "$s" != "" ]; then
                         echo "working on $s now"
                         is_server_alive $s
@@ -222,7 +228,7 @@ CheckAlive()
                 fi
         done
 
-        echo "$CLIENTS" | while read s; do
+        for s in $CLIENTS; do
                 if [ "$s" != "" ]; then
                         echo "working on $s now"
                         is_server_alive $s
