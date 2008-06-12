@@ -38,8 +38,8 @@ SetupServer()
 
 	if [ "$1" == "M1" ]; then
 		echo "setting up server $1 as a master server"
-		echo "/usr/sbin/ipa-server-install -U --hostname=$FULLHOSTNAME -r $RELM_NAME -p $DM_ADMIN_PASS -P $KERB_MASTER_PASS -a $DM_ADMIN_PASS --setup-bind -u $DS_USER -d"
-		ssh root@$FULLHOSTNAME "/usr/sbin/ipa-server-install -U --hostname=$FULLHOSTNAME -r $RELM_NAME -p $DM_ADMIN_PASS -P $KERB_MASTER_PASS -a $DM_ADMIN_PASS --setup-bind -u $DS_USER -d"
+		echo "/usr/sbin/ipa-server-install -U --hostname=$FULLHOSTNAME -r $RELM_NAME -p $DM_ADMIN_PASS -P $KERB_MASTER_PASS -a $DM_ADMIN_PASS --setup-bind -d"
+		ssh root@$FULLHOSTNAME "/usr/sbin/ipa-server-install -U --hostname=$FULLHOSTNAME -r $RELM_NAME -p $DM_ADMIN_PASS -P $KERB_MASTER_PASS -a $DM_ADMIN_PASS -u root --setup-bind -d"
 		ret=$?
 		if [ $ret -ne 0 ]; then
 			echo "ERROR - ipa-server-install on $FULLHOSTNAME failed."
@@ -62,6 +62,15 @@ SetupServer()
 			echo "ERROR - ipa-replica-prepare did not create /var/lib/ipa/replica-info-$replica_hostname"
 			return 1;
 		fi
+
+		# Create ldif file for use on replica
+#		echo 'dn: cn=config
+#changetype: modify
+#replace: nsslapd-errorlog-level
+#nsslapd-errorlog-level: 1' > $TET_TMP_DIR/debug.ldif
+#		chmod 755 $TET_TMP_DIR/debug.ldif
+#		ssh root@$replica_hostname "rm -f /tmp/debug.ldif"
+#		scp $TET_TMP_DIR/debug.ldif root@$replica_hostname:/tmp/.
 
 		# copying the relica prepare file from the master server to the replica	
 		rm -f $TET_TMP_DIR/replica-info-$replica_hostname
@@ -86,11 +95,13 @@ if {$force_conservative} {
         }
 }
 set timeout -1' > $TET_TMP_DIR/replica-install.exp
-		echo "spawn ipa-replica-install /tmp/replica-info-$replica_hostname" >> $TET_TMP_DIR/replica-install.exp
+		echo "spawn ipa-replica-install --debug /tmp/replica-info-$replica_hostname" >> $TET_TMP_DIR/replica-install.exp
 		echo 'match_max 100000
 expect -exact "Directory Manager (existing master) password: "' >> $TET_TMP_DIR/replica-install.exp
 		echo "send -- \"$KERB_MASTER_PASS\r\"" >> $TET_TMP_DIR/replica-install.exp
 		echo 'expect eof' >> $TET_TMP_DIR/replica-install.exp
+
+		ssh root@$replica_hostname "ps -ef | grep slapd"
 
 		chmod 755 $TET_TMP_DIR/replica-install.exp
 		scp $TET_TMP_DIR/replica-install.exp root@$replica_hostname:/tmp/.
@@ -100,9 +111,18 @@ expect -exact "Directory Manager (existing master) password: "' >> $TET_TMP_DIR/
 			echo "ERROR - /usr/bin/expect /tmp/replica-install.exp on $replica_hostname:/tmp/. failed"
 			return 1;
 		fi
+		#ssh root@$replica_hostname 'ldapmodify -x -D "cn=directory manager" -w Secret123 -f /tmp/debug.ldif'
+		ssh root@$replica_hostname "ps -ef | grep slapd"
 	
 	fi
-	
+	# The next section is a workaround for bug #450632
+	eval_vars $1
+	ssh root@$FULLHOSTNAME "ps -ef | grep slapd"
+	sleep 4
+	ssh root@$FULLHOSTNAME "/etc/init.d/dirsrv stop"
+	ssh root@$FULLHOSTNAME "/etc/init.d/dirsrv start"
+	ssh root@$FULLHOSTNAME "ps -ef | grep slapd"
+
 	return 0;
 }
 
