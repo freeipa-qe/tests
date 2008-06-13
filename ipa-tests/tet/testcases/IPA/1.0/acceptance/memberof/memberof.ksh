@@ -5,83 +5,286 @@ fi
 # The next line is required as it picks up data about the servers to use
 tet_startup="CheckAlive"
 tet_cleanup="instclean"
-iclist="setupssh ic1 ic2"
+iclist="ic1 ic2 ic3 ic4 ic5 ic6 ic7 ic8"
 ic1="tp1"
 ic2="tp2"
-
-setupssh()
-{
-	echo "START setupssh"
-	echo "running ssh setup"
-	for s in $SERVERS; do
-		if [ "$s" != "" ]; then
-			echo "working on $s now"
-			setup_ssh_keys $s
-			ret=$?
-			if [ $ret -ne 0 ]; then
-				echo "Setup of $s ssh failed"
-				tet_result FAIL
-			fi
-		fi
-	done
-	for s in $SERVERS; do
-		if [ "$s" != "" ]; then
-			echo "working on $s now"
-			setup_ssh_keys $s
-			ret=$?
-			if [ $ret -ne 0 ]; then
-				echo "Setup of $s ssh failed"
-				tet_result FAIL
-			fi
-		fi
-	done
-
-	tet_result PASS
-}
+ic3="tp3"
+ic4="tp4"
+ic5="tp5"
+ic6="tp6"
+ic7="tp7"
+ic8="tp8"
 
 ######################################################################
 tp1()
 {
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+	# Kinit everywhere
 	echo "START tp1"
 	for s in $SERVERS; do
 		if [ "$s" != "" ]; then
-			echo "working on $s now"
-			SetupRepo $s
+			echo "kiniting as $DS_USER, password $DM_ADMIN_PASS on $s"
+			KinitAs $s $DS_USER $DM_ADMIN_PASS
 			ret=$?
 			if [ $ret -ne 0 ]; then
-				echo "Install of server RPM on $s ssh failed"
+				echo "ERROR - kinit on $s failed"
 				tet_result FAIL
 			fi
+		else
+			echo "skipping $s"
 		fi
 	done
-	for s in $SERVERS; do
+	for s in $CLIENTS; do
 		if [ "$s" != "" ]; then
-			echo "working on $s now"
-			SetupRepo $s
+			echo "kiniting as $DS_USER, password $DM_ADMIN_PASS on $s"
+			KinitAs $s $DS_USER $DM_ADMIN_PASS
 			ret=$?
 			if [ $ret -ne 0 ]; then
-				echo "Install of server RPM on $s ssh failed"
+				echo "ERROR - kinit on $s failed"
 				tet_result FAIL
 			fi
 		fi
 	done
 
 	tet_result PASS
+	echo "END tp1"
 }
 ######################################################################
 tp2()
 {
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+	# Create two groups on M1
 	echo "START tp2"
+	eval_vars M1
+	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-addgroup group1 -v -g 444 -d 'group1 for testing'"
+	ret=$?
+	if [ $ret -ne 0 ]; then
+		echo "ERROR, creation of group1 on M1 failed"
+		tet_result FAIL
+	fi
+	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-addgroup group2 -v -g 888 -d 'group2 for testing'"
+	ret=$?
+	if [ $ret -ne 0 ]; then
+		echo "ERROR, creation of group2 on M1 failed"
+		tet_result FAIL
+	fi
+	
+	tet_result PASS
+	echo "END tp2"
+}
+
+tp3()
+{
+	# verify those two groups exist everywhere
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+	echo "START tp3"
+
+	for s in $SERVERS; do
+		if [ "$s" != "" ]; then
+			echo "Verifying that group1 exists on $s"
+			eval_vars $s
+			ssh root@$FULLHOSTNAME '/usr/sbin/ipa-findgroup group1 | /bin/grep GID | /bin/grep 444'
+			ret=$?
+			if [ $ret -ne 0 ]; then
+				echo "ERROR - group1 does not exist on $s"
+				tet_result FAIL
+			fi
+			ssh root@$FULLHOSTNAME '/usr/sbin/ipa-findgroup group2 | /bin/grep GID | /bin/grep 888'
+			ret=$?
+			if [ $ret -ne 0 ]; then
+				echo "ERROR - group2 does not exist on $s"
+				tet_result FAIL
+			fi
+
+		fi
+	done
+	for s in $CLIENTS; do
+		if [ "$s" != "" ]; then
+			echo "Verifying that group1 exists on $s"
+			eval_vars $s
+			ssh root@$FULLHOSTNAME '/usr/sbin/ipa-findgroup group1 | /bin/grep GID | /bin/grep 444'
+			ret=$?
+			if [ $ret -ne 0 ]; then
+				echo "ERROR - group1 does not exist on $s"
+				tet_result FAIL
+			fi
+			ssh root@$FULLHOSTNAME '/usr/sbin/ipa-findgroup group2 | /bin/grep GID | /bin/grep 888'
+			ret=$?
+			if [ $ret -ne 0 ]; then
+				echo "ERROR - group2 does not exist on $s"
+				tet_result FAIL
+			fi
+		fi
+	done
+
+	tet_result PASS
+	echo "END tp3"
+}
+
+tp4()
+{
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+	# join group 2 as a user in group 1 on M1
+	echo "START tp4"
+	eval_vars M1 
+	ssh root@$FULLHOSTNAME 'ipa-modgroup --groupadd group1 group2'
+	ret=$?
+	if [ $ret -ne 0 ]; then
+		echo "ERROR, add of group2 to group1 on M1 failed"
+		tet_result FAIL
+	fi
+
+	tet_result PASS
+	echo "END tp4"
+}
+
+tp5()
+{
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+	# join group 1 as a user in group 2 on M1
+	echo "START tp5"
+
+	eval_vars M1 
+	ssh root@$FULLHOSTNAME 'ipa-modgroup --groupadd group2 group1'
+	ret=$?
+	if [ $ret -ne 0 ]; then
+		echo "ERROR, add of group1 to group2 on M1 failed"
+		tet_result FAIL
+	fi
+
+	tet_result PASS
+	echo "END tp5"
+}
+
+tp6()
+{
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+	# Verify that group 2 is in group 1 on all hosts
+	echo "START tp6"
+
+	for s in $SERVERS; do
+		if [ "$s" != "" ]; then
+			echo "Verifying that group2 is in group1 on $s"
+			eval_vars $s
+			ssh root@$FULLHOSTNAME '/usr/sbin/ipa-findgroup group1 | /bin/grep group2'
+			ret=$?
+			if [ $ret -ne 0 ]; then
+				echo "ERROR - group2 does not exist in group1 on $s"
+				tet_result FAIL
+			fi
+
+			echo "Verifying that group1 is in group2 on $s"
+			ssh root@$FULLHOSTNAME '/usr/sbin/ipa-findgroup group2 | /bin/grep group1'
+			ret=$?
+			if [ $ret -ne 0 ]; then
+				echo "ERROR - group1 does not exist in group2 on $s"
+				tet_result FAIL
+			fi
+
+		fi
+	done
+	for s in $CLIENTS; do
+		if [ "$s" != "" ]; then
+			echo "Verifying that group2 is in group1 on $s"
+			eval_vars $s
+			ssh root@$FULLHOSTNAME '/usr/sbin/ipa-findgroup group1 | /bin/grep group2'
+			ret=$?
+			if [ $ret -ne 0 ]; then
+				echo "ERROR - group2 does not exist in group1 on $s"
+				tet_result FAIL
+			fi
+
+			echo "Verifying that group1 is in group2 on $s"
+			ssh root@$FULLHOSTNAME '/usr/sbin/ipa-findgroup group2 | /bin/grep group1'
+			ret=$?
+			if [ $ret -ne 0 ]; then
+				echo "ERROR - group1 does not exist in group2 on $s"
+				tet_result FAIL
+			fi
+		fi
+	done
+
+	tet_result PASS
+	echo "END tp6"
+}
+
+tp7()
+{
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+	# Verify that ipa-findgroup and grep fails when it's given bad info on all servers
+	echo "START tp7"
+	for s in $SERVERS; do
+		if [ "$s" != "" ]; then
+			echo "Verifying that groupf does not exist in group1 on $s"
+			eval_vars $s
+			ssh root@$FULLHOSTNAME '/usr/sbin/ipa-findgroup group1 | /bin/grep groupf'
+			ret=$?
+			if [ $ret -eq 0 ]; then
+				echo "ERROR - That didn't work! $s"
+				tet_result FAIL
+			fi
+		fi
+	done
+
+
+	tet_result PASS
+	echo "END tp7"
+}
+
+tp8()
+{
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+	echo "START tp8"
+
+	tet_result PASS
+	echo "END tp8"
 }
 
 instclean()
 {
-	ssh root@$FULLHOSTNAME 'kdestroy'
+	echo "START Cleanup"
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+	eval_vars M1
+	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-delgroup group1"
 	ret=$?
-	if [ $ret != 0 ]; then
-       		echo "ERROR - kdestroy failed, continuing anyway";
+	if [ $ret -ne 0 ]; then
+		echo "ERROR - delete of group1 on $s failed"
+		tet_result FAIL
 	fi
+	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-delgroup group2"
+	ret=$?
+	if [ $ret -ne 0 ]; then
+		echo "ERROR - delete of group2 on $s failed"
+		tet_result FAIL
+	fi
+
+	for s in $SERVERS; do
+		if [ "$s" != "" ]; then
+			echo "kdestroying on $s"
+			eval_vars $s
+			ssh root@$FULLHOSTNAME "kdestroy"
+			ret=$?
+			if [ $ret -ne 0 ]; then
+				echo "ERROR - kdestroy $s failed"
+				tet_result FAIL
+			fi
+		fi
+	done
+	for s in $CLIENTS; do
+		if [ "$s" != "" ]; then
+			echo "kdestroying on $s"
+			eval_vars $s
+			ssh root@$FULLHOSTNAME "kdestroy"
+			ret=$?
+			if [ $ret -ne 0 ]; then
+				echo "ERROR - kdestroy $s failed"
+				tet_result FAIL
+			fi
+		fi
+	done
+
 	tet_result PASS
+	echo "END Cleanup"
 
 }
 
