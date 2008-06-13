@@ -233,9 +233,83 @@ tp7()
 
 tp8()
 {
+	# From: https://idmwiki.sjc.redhat.com/export/idmwiki/Testplan/ipa/replica#memberof_feature_test
+	# test 1 0
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 	echo "START tp8"
 
+	eval_vars M1
+	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-addgroup group-1-0 -v -g 555 -d 'group-1-0 for testing'"
+	ret=$?
+	if [ $ret -ne 0 ]; then
+		echo "ERROR, creation of group1 on M1 failed"
+		tet_result FAIL
+	fi
+
+	for s in $SERVERS; do
+		if [ "$s" != "" ]; then
+			echo "Verifying that group-1-0 is on $s"
+			eval_vars $s
+			ssh root@$FULLHOSTNAME '/usr/sbin/ipa-findgroup group-1-0 | /bin/grep dn: | /bin/grep cn=group-1-0'
+			ret=$?
+			if [ $ret -ne 0 ]; then
+				echo "ERROR - group-1-0 does not exist on $s"
+				tet_result FAIL
+			fi
+		fi
+	done
+
+	# renaming group-1-0 to group-test0-test1
+	eval_vars M1
+	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-modgroup --setattr cn=group-test0-test1 group-1-0'"
+	ret=$?
+	if [ $ret -ne 0 ]; then
+		echo "ERROR, rename of group-1-0 on M1 failed"
+		tet_result FAIL
+	fi
+
+	for s in $SERVERS; do
+		if [ "$s" != "" ]; then
+			echo "Verifying that group-test0-test1  is on $s"
+			eval_vars $s
+			ssh root@$FULLHOSTNAME '/usr/sbin/ipa-findgroup group-test0-test1  | /bin/grep dn: | /bin/grep cn=group-test0-test1 '
+			ret=$?
+			if [ $ret -ne 0 ]; then
+				echo "ERROR - group-test0-test1 does not exist on $s"
+				tet_result FAIL
+			fi
+		fi
+	done
+
+	# deleting group-test0-test1
+	eval_vars M1
+	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-delgroup group-test0-test1'"
+	ret=$?
+	if [ $ret -ne 0 ]; then
+		echo "ERROR, rename of group-1-0 on M1 failed"
+		tet_result FAIL
+	fi
+
+	for s in $SERVERS; do
+		if [ "$s" != "" ]; then
+			echo "Verifying that group-test0-test1 does not exist on $s"
+			eval_vars $s
+			ssh root@$FULLHOSTNAME '/usr/sbin/ipa-findgroup group-test0-test1  | /bin/grep dn: | /bin/grep cn=group-test0-test1 '
+			ret=$?
+			if [ $ret -eq 0 ]; then
+				echo "ERROR - group-test0-test1 exists on $s"
+				tet_result FAIL
+			fi
+			ssh root@$FULLHOSTNAME '/usr/sbin/ipa-findgroup group-1-0  | /bin/grep dn: | /bin/grep cn=group-1-0 '
+			ret=$?
+			if [ $ret -eq 0 ]; then
+				echo "ERROR - group-1-0 exists on $s"
+				tet_result FAIL
+			fi
+		fi
+	done
+
+	
 	tet_result PASS
 	echo "END tp8"
 }
