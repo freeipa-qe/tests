@@ -5,7 +5,7 @@ fi
 # The next line is required as it picks up data about the servers to use
 tet_startup="CheckAlive"
 tet_cleanup="instclean"
-iclist="ic1 ic2 ic3 ic4 ic5 ic6 ic7 ic8"
+iclist="ic1 ic2 ic3 ic4 ic5 ic6 ic7 ic8 ic9"
 ic1="tp1"
 ic2="tp2"
 ic3="tp3"
@@ -14,6 +14,7 @@ ic5="tp5"
 ic6="tp6"
 ic7="tp7"
 ic8="tp8"
+ic9="tp9"
 
 ######################################################################
 tp1()
@@ -242,7 +243,7 @@ tp8()
 	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-addgroup group-1-0 -v -g 555 -d 'group-1-0 for testing'"
 	ret=$?
 	if [ $ret -ne 0 ]; then
-		echo "ERROR, creation of group1 on M1 failed"
+		echo "ERROR, creation of group-1-0 on M1 failed"
 		tet_result FAIL
 	fi
 
@@ -261,7 +262,7 @@ tp8()
 
 	# renaming group-1-0 to group-test0-test1
 	eval_vars M1
-	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-modgroup --setattr cn=group-test0-test1 group-1-0'"
+	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-modgroup --setattr cn=group-test0-test1 group-1-0"
 	ret=$?
 	if [ $ret -ne 0 ]; then
 		echo "ERROR, rename of group-1-0 on M1 failed"
@@ -272,7 +273,7 @@ tp8()
 		if [ "$s" != "" ]; then
 			echo "Verifying that group-test0-test1  is on $s"
 			eval_vars $s
-			ssh root@$FULLHOSTNAME '/usr/sbin/ipa-findgroup group-test0-test1  | /bin/grep dn: | /bin/grep cn=group-test0-test1 '
+			ssh root@$FULLHOSTNAME '/usr/sbin/ipa-findgroup group-test0-test1  | /bin/grep dn: | /bin/grep cn=group-test0-test1'
 			ret=$?
 			if [ $ret -ne 0 ]; then
 				echo "ERROR - group-test0-test1 does not exist on $s"
@@ -283,10 +284,10 @@ tp8()
 
 	# deleting group-test0-test1
 	eval_vars M1
-	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-delgroup group-test0-test1'"
+	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-delgroup group-test0-test1"
 	ret=$?
 	if [ $ret -ne 0 ]; then
-		echo "ERROR, rename of group-1-0 on M1 failed"
+		echo "ERROR, delete of group-test0-test1 on M1 failed"
 		tet_result FAIL
 	fi
 
@@ -312,6 +313,96 @@ tp8()
 	
 	tet_result PASS
 	echo "END tp8"
+}
+
+tp9()
+{
+	# From: https://idmwiki.sjc.redhat.com/export/idmwiki/Testplan/ipa/replica#memberof_feature_test
+	# test 2 1
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+	echo "START tp9"
+
+	eval_vars M1
+	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-addgroup group-2-1 -v -g 666 -d 'group-2-1 for testing'"
+	ret=$?
+	if [ $ret -ne 0 ]; then
+		echo "ERROR, creation of group-2-1 on M1 failed"
+		tet_result FAIL
+	fi
+
+	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-adduser -f 'user-2-1' -l 'lastname' user-2-1"
+	ret=$?
+	if [ $ret -ne 0 ]; then
+		echo "ERROR, creation of user-2-1 on M1 failed"
+		tet_result FAIL
+	fi
+
+	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-modgroup --add user-2-1 group-2-1"
+	ret=$?
+	if [ $ret -ne 0 ]; then
+		echo "ERROR, add of user-2-1 to group-2-1 on M1 failed"
+		tet_result FAIL
+	fi
+
+	for s in $SERVERS; do
+		if [ "$s" != "" ]; then
+			echo "Verifying that user-2-1 exists in group-2-1 on $s"
+			eval_vars $s
+			ssh root@$FULLHOSTNAME '/usr/sbin/ipa-findgroup group-2-1 | grep uid=user-2-1'
+			ret=$?
+			if [ $ret -ne 0 ]; then
+				echo "ERROR - user-2-1 does not exist in group-2-1 on $s"
+				tet_result FAIL
+			fi
+		fi
+	done
+
+	eval_vars M1
+	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-modgroup --setattr cn=group-test2-test1 group-2-1"
+	ret=$?
+	if [ $ret -ne 0 ]; then
+		echo "ERROR, rename of group-2-1 on M1 failed"
+		tet_result FAIL
+	fi
+
+	for s in $SERVERS; do
+		if [ "$s" != "" ]; then
+			echo "Verifying that user-2-1 exists in group-test2-test1 on $s"
+			eval_vars $s
+			ssh root@$FULLHOSTNAME '/usr/sbin/ipa-findgroup group-test2-test1 | grep uid=user-2-1'
+			ret=$?
+			if [ $ret -ne 0 ]; then
+				echo "ERROR - user-2-1 does not exist in group-test2-test1 on $s"
+				tet_result FAIL
+			fi
+			# verifying that the old group doesn't exist
+			ssh root@$FULLHOSTNAME '/usr/sbin/ipa-findgroup group-2-1'
+			ret=$?
+			if [ $ret -eq 0 ]; then
+				echo "ERROR - group-2-1 exists on $s"
+				tet_result FAIL
+			fi
+		fi
+	done
+
+	# deleting group-test2-test1
+	eval_vars M1
+	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-delgroup group-test2-test1"
+	ret=$?
+	if [ $ret -ne 0 ]; then
+		echo "ERROR, delete of group-test2-test1 on M1 failed"
+		tet_result FAIL
+	fi
+
+	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-deluser user-2-1"
+	ret=$?
+	if [ $ret -ne 0 ]; then
+		echo "ERROR, delete of user-2-1 on M1 failed"
+		tet_result FAIL
+	fi
+
+	tet_result PASS
+	echo "END tp9"
 }
 
 instclean()
