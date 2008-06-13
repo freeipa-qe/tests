@@ -5,7 +5,7 @@ fi
 # The next line is required as it picks up data about the servers to use
 tet_startup="CheckAlive"
 tet_cleanup="instclean"
-iclist="ic1 ic2 ic3 ic4 ic5 ic6 ic7 ic8 ic9"
+iclist="ic1 ic2 ic3 ic4 ic5 ic6 ic7 ic8 ic9 ic10"
 ic1="tp1"
 ic2="tp2"
 ic3="tp3"
@@ -15,6 +15,7 @@ ic6="tp6"
 ic7="tp7"
 ic8="tp8"
 ic9="tp9"
+ic10="tp10"
 
 ######################################################################
 tp1()
@@ -358,6 +359,13 @@ tp9()
 	done
 
 	eval_vars M1
+	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-moduser --firstname look user-2-1"
+	ret=$?
+	if [ $ret -ne 0 ]; then
+		echo "ERROR, change of firstname for user 2-1 on M1 failed"
+		tet_result FAIL
+	fi
+
 	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-modgroup --setattr cn=group-test2-test1 group-2-1"
 	ret=$?
 	if [ $ret -ne 0 ]; then
@@ -403,6 +411,97 @@ tp9()
 
 	tet_result PASS
 	echo "END tp9"
+}
+
+tp10()
+{
+	# From: https://idmwiki.sjc.redhat.com/export/idmwiki/Testplan/ipa/replica#memberof_feature_test
+	# test 3 1
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+	echo "START tp10"
+
+	eval_vars M1
+	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-addgroup group-3-1 -v -g 777 -d 'group-3-1 for testing'"
+	ret=$?
+	if [ $ret -ne 0 ]; then
+		echo "ERROR, creation of group-3-1 on M1 failed"
+		tet_result FAIL
+	fi
+
+	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-adduser -f 'user-3-1' -l 'lastname' user-3-1"
+	ret=$?
+	if [ $ret -ne 0 ]; then
+		echo "ERROR, creation of user-3-1 on M1 failed"
+		tet_result FAIL
+	fi
+
+	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-modgroup --add user-3-1 group-3-1"
+	ret=$?
+	if [ $ret -ne 0 ]; then
+		echo "ERROR, add of user-3-1 to group-3-1 on M1 failed"
+		tet_result FAIL
+	fi
+
+	for s in $SERVERS; do
+		if [ "$s" != "" ]; then
+			echo "Verifying that user-3-1 exists in group-3-1 on $s"
+			eval_vars $s
+			ssh root@$FULLHOSTNAME '/usr/sbin/ipa-findgroup group-3-1 | grep uid=user-3-1'
+			ret=$?
+			if [ $ret -ne 0 ]; then
+				echo "ERROR - user-3-1 does not exist in group-3-1 on $s"
+				tet_result FAIL
+			fi
+		fi
+	done
+
+	eval_vars M1
+	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-modgroup --setattr cn=group-test3-test1 group-3-1"
+	ret=$?
+	if [ $ret -ne 0 ]; then
+		echo "ERROR, rename of group-3-1 on M1 failed"
+		tet_result FAIL
+	fi
+
+	for s in $SERVERS; do
+		if [ "$s" != "" ]; then
+			echo "Verifying that user-3-1 exists in group-test3-test1 on $s"
+			eval_vars $s
+			ssh root@$FULLHOSTNAME '/usr/sbin/ipa-findgroup group-test3-test1 | grep uid=user-3-1'
+			ret=$?
+			if [ $ret -ne 0 ]; then
+				echo "ERROR - user-3-1 does not exist in group-test3-test1 on $s"
+				tet_result FAIL
+			fi
+			# verifying that the old group doesn't exist
+			ssh root@$FULLHOSTNAME '/usr/sbin/ipa-findgroup group-3-1'
+			ret=$?
+			if [ $ret -eq 0 ]; then
+				echo "ERROR - group-3-1 exists on $s"
+				tet_result FAIL
+			fi
+		fi
+	done
+
+	# deleting group-test3-test1
+	eval_vars M1
+	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-delgroup group-test3-test1"
+	ret=$?
+	if [ $ret -ne 0 ]; then
+		echo "ERROR, delete of group-test3-test1 on M1 failed"
+		tet_result FAIL
+	fi
+
+	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-deluser user-3-1"
+	ret=$?
+	if [ $ret -ne 0 ]; then
+		echo "ERROR, delete of user-3-1 on M1 failed"
+		tet_result FAIL
+	fi
+
+
+	tet_result PASS
+	echo "END tp10"
 }
 
 instclean()
