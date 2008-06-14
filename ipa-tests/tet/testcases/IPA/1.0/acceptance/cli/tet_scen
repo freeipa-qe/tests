@@ -1,0 +1,12 @@
+ 
+all
+	"Starting ALL"
+	^cli
+	"Ending ALL"
+
+cli
+	"Starting cli tests..."
+	/cli.ksh
+	"Ending cli tests..."
+
+# EOF
