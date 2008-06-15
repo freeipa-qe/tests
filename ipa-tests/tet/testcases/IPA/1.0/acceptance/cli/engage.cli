@@ -92,14 +92,14 @@ cli_run()
 		-e -s $TET_ROOT/testcases/IPA/1.0/acceptance/cli/tet_scen \
 		-x $TET_ROOT/testcases/IPA/tetexecpl.cfg \
 		$TET_ROOT/testcases/IPA/1.0/acceptance/cli \
-		cli > $MainTmpDir/cli.startup.out 2>&1
+		cli > $MainTmpDir/cli.run.out 2>&1
 	echo ""
-	echo "cli startup $MainTmpDir/cli.startup.out"
+	echo "cli run $MainTmpDir/cli.run.out"
 	echo ""
-	cat $MainTmpDir/cli.startup.out
+	cat $MainTmpDir/cli.run.out
 	echo ""
-	main_analyze "cli startup" `grep "tcc: journal file is" $MainTmpDir/cli.startup.out | awk '{print $5}'` $MainTmpDir/cli.startup.out
-	MainReportFiles="$MainReportFiles $MainTmpDir/cli.startup.out"
+	main_analyze "cli run" `grep "tcc: journal file is" $MainTmpDir/cli.run.out | awk '{print $5}'` $MainTmpDir/cli.run.out
+	MainReportFiles="$MainReportFiles $MainTmpDir/cli.run.out"
 
 	Gfile="$TET_TMP_DIR/global_src_`uname -n`"
 	rm -f $Gfile

@@ -2,7 +2,7 @@
 
 ######################################################################
 
-#The following ipa commands needs to be tested:
+#The following ipa cli commands needs to be tested:
 
 #ipa-adddelegation       ipa-findgroup           ipa-passwd
 #ipa-addgroup            ipa-findservice         ipa-pwpolicy
@@ -22,7 +22,7 @@ fi
 tet_startup="CheckAlive"
 tet_cleanup=""
 iclist="ic1 "
-ic1="tp1 tp2"
+ic1="tp1 tp2 tp3 tp4 tp5"
 
 ######################################################################
 tp1()
@@ -75,6 +75,55 @@ tp2()
 	echo "END tp2"
 }
 
+######################################################################
+tp3()
+{
+	echo "START tp3"
+	# test for ipa-addservice
+	ipa-addservice "host/idmwiki.sjc.redhat.com"
+	if [ $? -ne 0 ]
+	then
+		echo "ipa-addservice failed"
+		tet_result FAIL
+	fi
+
+	tet_result PASS
+	echo "END tp3"
+
+}
+######################################################################
+tp4()
+{
+	echo "START $tet_thistest"
+	# test for ipa-addservice
+	ipa-addservice "nfs/idmwiki.sjc.redhat.com"
+	if [ $? -ne 0 ]
+	then
+		echo "ipa-addservice failed"
+		tet_result FAIL
+	fi
+
+	tet_result PASS
+	echo "END $tet_thistest"
+
+}
+
+######################################################################
+tp5()
+{
+	echo "START $tet_thistest"
+	# test for ipa-addservice
+	ipa-addservice "ldap/idmwiki.sjc.redhat.com"
+	if [ $? -ne 0 ]
+	then
+		echo "ipa-addservice failed"
+		tet_result FAIL
+	fi
+
+	tet_result PASS
+	echo "END $tet_thistest"
+
+}
 
 ######################################################################
 
