@@ -22,7 +22,7 @@ fi
 tet_startup="CheckAlive"
 tet_cleanup=""
 iclist="ic1 "
-ic1="tp1"
+ic1="tp1 tp2"
 
 ######################################################################
 tp1()
@@ -61,6 +61,16 @@ tp1()
 ######################################################################
 tp2()
 {
+	echo "START tp2"
+	# test for ipactl
+	ipactl restart
+	
+	if [ $? -ne 0 ]
+	then
+		echo "ipactl restart failed"
+		tet_result FAIL
+	fi
+
 	tet_result PASS
 	echo "END tp2"
 }
