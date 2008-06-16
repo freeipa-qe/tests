@@ -384,7 +384,7 @@ tp9()
 				tet_result FAIL
 			fi
 			# verifying that the old group doesn't exist
-			ssh root@$FULLHOSTNAME '/usr/sbin/ipa-findgroup group-2-1'
+			ssh root@$FULLHOSTNAME '/usr/sbin/ipa-findgroup group-2-1 | grep Full\ Name | grep group-2-1'
 			ret=$?
 			if [ $ret -eq 0 ]; then
 				echo "ERROR - group-2-1 exists on $s"
@@ -474,7 +474,7 @@ tp10()
 				tet_result FAIL
 			fi
 			# verifying that the old group doesn't exist
-			ssh root@$FULLHOSTNAME '/usr/sbin/ipa-findgroup group-3-1'
+			ssh root@$FULLHOSTNAME '/usr/sbin/ipa-findgroup group-3-1 | grep Full\ Name | grep group-3-1'
 			ret=$?
 			if [ $ret -eq 0 ]; then
 				echo "ERROR - group-3-1 exists on $s"
