@@ -22,7 +22,7 @@ fi
 tet_startup="CheckAlive"
 tet_cleanup=""
 iclist="ic1 "
-ic1="tp1 tp2 tp3 tp4 tp5 tp6 tp7 tp8"
+ic1="tp1 tp2 tp3 tp4 tp5 tp6 tp7 tp8 tp9 tp10 tp11"
 
 # These services will be used by the tests, and removed when the cli test is complete
 service1='host/emc-cge0.sjc2.redhat.com'
