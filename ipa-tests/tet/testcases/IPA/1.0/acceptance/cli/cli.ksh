@@ -63,14 +63,18 @@ tp2()
 {
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 	echo "START tp2"
-	# test for ipactl
-	ipactl restart
-	
-	if [ $? -ne 0 ]
-	then
-		echo "ipactl restart failed"
-		tet_result FAIL
-	fi
+	for s in $SERVERS; do
+		if [ "$s" != "" ]; then
+			eval_vars $s
+			# test for ipactl
+			ssh root@$FULLHOSTNAME 'ipactl restart'
+			if [ $? -ne 0 ]
+			then
+				echo "ERROR - ipactl restart failed on $FULLHOSTNAME"
+				tet_result FAIL
+			fi
+		fi
+	done
 
 	tet_result PASS
 	echo "END tp2"
@@ -81,13 +85,19 @@ tp3()
 {
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 	echo "START tp3"
-	# test for ipa-addservice
-	ipa-addservice "host/idmwiki.sjc.redhat.com"
-	if [ $? -ne 0 ]
-	then
-		echo "ipa-addservice failed"
-		tet_result FAIL
-	fi
+	for s in $SERVERS; do
+		if [ "$s" != "" ]; then
+			eval_vars $s
+
+			# test for ipa-addservice
+			ssh root@$FULLHOSTNAME 'ipa-addservice "host/emc-cge0.sjc2.redhat.com"'
+			if [ $? -ne 0 ]
+			then
+				echo "ERROR - ipa-addservice failed on $FULHOSTNAME"
+				tet_result FAIL
+			fi
+		fi
+	done
 
 	tet_result PASS
 	echo "END tp3"
@@ -98,13 +108,19 @@ tp4()
 {
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 	echo "START $tet_thistest"
-	# test for ipa-addservice
-	ipa-addservice "nfs/idmwiki.sjc.redhat.com"
-	if [ $? -ne 0 ]
-	then
-		echo "ipa-addservice failed"
-		tet_result FAIL
-	fi
+	for s in $SERVERS; do
+		if [ "$s" != "" ]; then
+			eval_vars $s
+
+			# test for ipa-addservice
+			ssh root@$FULLHOSTNAME 'ipa-addservice "nfs/emc-cge0.sjc2.redhat.com"'
+			if [ $? -ne 0 ]
+			then
+				echo "ERROR - ipa-addservice failed on $FULLHOSTNAME"
+				tet_result FAIL
+			fi
+		fi
+	done
 
 	tet_result PASS
 	echo "END $tet_thistest"
@@ -116,13 +132,19 @@ tp5()
 {
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 	echo "START $tet_thistest"
-	# test for ipa-addservice
-	ipa-addservice "ldap/idmwiki.sjc.redhat.com"
-	if [ $? -ne 0 ]
-	then
-		echo "ipa-addservice failed"
-		tet_result FAIL
-	fi
+	for s in $SERVERS; do
+		if [ "$s" != "" ]; then
+			eval_vars $s
+
+			# test for ipa-addservice
+			ssh root@$FULLHOSTNAME 'ipa-addservice "ldap/emc-cge0.sjc2.redhat.com"'
+			if [ $? -ne 0 ]
+			then
+				echo "ERROR - ipa-addservice failed on $FULLHOSTNAME"
+				tet_result FAIL
+			fi
+		fi
+	done
 
 	tet_result PASS
 	echo "END $tet_thistest"
