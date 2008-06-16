@@ -61,6 +61,7 @@ tp1()
 ######################################################################
 tp2()
 {
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 	echo "START tp2"
 	# test for ipactl
 	ipactl restart
@@ -78,6 +79,7 @@ tp2()
 ######################################################################
 tp3()
 {
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 	echo "START tp3"
 	# test for ipa-addservice
 	ipa-addservice "host/idmwiki.sjc.redhat.com"
@@ -94,6 +96,7 @@ tp3()
 ######################################################################
 tp4()
 {
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 	echo "START $tet_thistest"
 	# test for ipa-addservice
 	ipa-addservice "nfs/idmwiki.sjc.redhat.com"
@@ -111,6 +114,7 @@ tp4()
 ######################################################################
 tp5()
 {
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 	echo "START $tet_thistest"
 	# test for ipa-addservice
 	ipa-addservice "ldap/idmwiki.sjc.redhat.com"
