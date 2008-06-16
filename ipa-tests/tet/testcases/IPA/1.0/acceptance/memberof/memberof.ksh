@@ -324,7 +324,7 @@ tp9()
 	echo "START tp9"
 
 	eval_vars M1
-	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-addgroup group-2-1 -v -g 666 -d 'group-2-1 for testing'"
+	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-addgroup group-2-1 -v -g 666 -d 'group 2 1 for testing'"
 	ret=$?
 	if [ $ret -ne 0 ]; then
 		echo "ERROR, creation of group-2-1 on M1 failed"
@@ -384,7 +384,7 @@ tp9()
 				tet_result FAIL
 			fi
 			# verifying that the old group doesn't exist
-			ssh root@$FULLHOSTNAME '/usr/sbin/ipa-findgroup group-2-1 | grep Full\ Name | grep group-2-1'
+			ssh root@$FULLHOSTNAME '/usr/sbin/ipa-findgroup group-2-1'
 			ret=$?
 			if [ $ret -eq 0 ]; then
 				echo "ERROR - group-2-1 exists on $s"
@@ -421,7 +421,7 @@ tp10()
 	echo "START tp10"
 
 	eval_vars M1
-	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-addgroup group-3-1 -v -g 777 -d 'group-3-1 for testing'"
+	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-addgroup group-3-1 -v -g 777 -d 'group 3 1 for testing'"
 	ret=$?
 	if [ $ret -ne 0 ]; then
 		echo "ERROR, creation of group-3-1 on M1 failed"
@@ -474,7 +474,7 @@ tp10()
 				tet_result FAIL
 			fi
 			# verifying that the old group doesn't exist
-			ssh root@$FULLHOSTNAME '/usr/sbin/ipa-findgroup group-3-1 | grep Full\ Name | grep group-3-1'
+			ssh root@$FULLHOSTNAME '/usr/sbin/ipa-findgroup group-3-1'
 			ret=$?
 			if [ $ret -eq 0 ]; then
 				echo "ERROR - group-3-1 exists on $s"
