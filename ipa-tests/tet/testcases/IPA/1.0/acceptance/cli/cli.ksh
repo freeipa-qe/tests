@@ -22,7 +22,7 @@ fi
 tet_startup="CheckAlive"
 tet_cleanup=""
 iclist="ic1 "
-ic1="tp1 tp2 tp3 tp4 tp5 tp6 tp7 tp8 tp9 tp10 tp11"
+ic1="tp1 tp2 tp3 tp4 tp5 tp6 tp7 tp8 tp9 tp10 tp11 tp12"
 
 # These services will be used by the tests, and removed when the cli test is complete
 service1='host/emc-cge0.sjc2.redhat.com'
@@ -307,9 +307,60 @@ tp11()
 
 }
 #
-#
 ######################################################################
+#
 
+######################################################################
+# ipa-adddelegation
+######################################################################
+tp12()
+{
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+	echo "START $tet_thistest"
+	eval_vars M1
+	code=0
+
+	# Setting up for test
+	ssh root@$FULLHOSTNAME "ipa-adduser -ffirstname-mod1 -llastbname-mod1 usermod1"
+	let code=$code+$?
+
+	ssh root@$FULLHOSTNAME "ipa-adduser -ffirstname-super -llastbname-super super"
+	let code=$code+$?
+
+	ssh root@$FULLHOSTNAME "ipa-addgroup -d super-user  biguser"
+	let code=$code+$?
+
+	ssh root@$FULLHOSTNAME "ipa-addgroup -d group-to-mod-users modusers"
+	let code=$code+$?
+
+	ssh root@$FULLHOSTNAME "ipa-modgroup -a biguser super"
+	let code=$code+$?
+
+	ssh root@$FULLHOSTNAME "ipa-modgroup -a usermod1 modusers"
+	let code=$code+$?
+
+	if [ $code -ne 0 ]
+	then
+		echo "ERROR - setup for $tet_thistest failed"
+		tet_result FAIL
+	fi
+
+	ssh root@$FULLHOSTNAME "ipa-adddelegation --attributes telephonenumber -s super -t modusers namef"
+	ret=$?
+	if [ $ret -ne 0 ]
+	then
+		echo "ERROR - ipa-adddelegation failed on $FULLHOSTNAME"
+		tet_result FAIL
+	fi
+
+	tet_result PASS
+	echo "END $tet_thistest"
+
+}
+
+
+######################################################################
+#
 . $TESTING_SHARED/instlib.ksh
 . $TESTING_SHARED/shared.ksh
 . $TET_ROOT/lib/ksh/tcm.ksh
