@@ -74,10 +74,10 @@ $ipaadmin = $config->{"ipaadmin"};
 $ipaadminpw = $config->{"ipaadminpw"};
 
 # Test starts here 
-$testuid="seluser_".$testid;
-$testgid="selgrp_".$testid;
-$testfulluid="uid=sel_user_".$testid.",".$base;
-$testfullgid="cn=sel_grp_".$testid.",cn=groups,cn=accounts,".$base;
+$testuid="usr_".$testid;
+$testgid="grp_".$testid;
+$testfulluid="uid=usr_".$testid.",".$base;
+$testfullgid="cn=grp_".$testid.",cn=groups,cn=accounts,".$base;
 
 $grpdesc = "automatic generated, gid=$testgid";
 
@@ -95,7 +95,7 @@ sub run_test {
    # be aware: all deta here are default data, if some policy editing test run before this, this test expect to fail
 	$sel = Test::WWW::Selenium->new(host=>$host,port=>$port,browser=>$browser,browser_url=>$browser_url);
 	#$sel->open_ok(https://ipaserver.test.com/ipa); 
-	$sel->open_ok("/ipa"); 
+	$sel->open_ok("/ipa/ui"); 
 	$sel->wait_for_page_to_load_ok("30000");
 	$sel->click_ok("link=Manage Policy");
 	$sel->wait_for_page_to_load_ok("30000");

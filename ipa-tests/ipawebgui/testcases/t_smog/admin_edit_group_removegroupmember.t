@@ -75,11 +75,11 @@ $ipaadmin = $config->{"ipaadmin"};
 $ipaadminpw = $config->{"ipaadminpw"};
 
 # Test starts here 
-$testuid="seluser_".$testid;
-$testgid_a="selgrp_a_".$testid;
-$testgid_b="selgrp_b_".$testid;
-$testfulluid="uid=sel_user_".$testid.",".$base;
-$testfullgid="cn=sel_grp_".$testid.",cn=groups,cn=accounts,".$base;
+$testuid="usr_".$testid;
+$testgid_a="grp_a_".$testid;
+$testgid_b="grp_b_".$testid;
+$testfulluid="uid=usr_".$testid.",".$base;
+$testfullgid="cn=grp_".$testid.",cn=groups,cn=accounts,".$base;
 
 $grpdesc = "automatic generated for test ";
 
@@ -96,7 +96,7 @@ sub run_test {
    # auto generated at 2008/5/26:10:37:52
 	$sel = Test::WWW::Selenium->new(host=>$host,port=>$port,browser=>$browser,browser_url=>$browser_url);
 	#$sel->open_ok(https://ipaserver.test.com/ipa/group/show?cn=autogrp001);
-	$sel->open_ok("/ipa/group/show?cn=$testgid_a");
+	$sel->open_ok("/ipa/ui/group/show?cn=$testgid_a");
 	$sel->wait_for_page_to_load_ok("30000");
 	$sel->click_ok("//input[\@value='Edit Group']");
 	$sel->wait_for_page_to_load_ok("30000");
