@@ -20,7 +20,7 @@ if [ "$DSTET_DEBUG" = "y" ]; then
 fi
 # The next line is required as it picks up data about the servers to use
 tet_startup="CheckAlive"
-tet_cleanup=""
+tet_cleanup="cli_cleanup"
 iclist="ic1 "
 ic1="tp1 tp2 tp3 tp4 tp5 tp6 tp7 tp8 tp9 tp10 tp11 tp12"
 
@@ -358,6 +358,43 @@ tp12()
 
 }
 
+######################################################################
+# Cleanup Section for the cli tests
+######################################################################
+cli_cleanup()
+{
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+	echo "START $tet_thistest"
+	eval_vars M1
+	code=0
+
+
+	# Setting up for test
+	ssh root@$FULLHOSTNAME "ipa-delgroup modusers"
+	let code=$code+$?
+
+	ssh root@$FULLHOSTNAME "ipa-delgroup super"
+	let code=$code+$?
+
+	ssh root@$FULLHOSTNAME "ipa-deluser usermod1"
+	let code=$code+$?
+
+	ssh root@$FULLHOSTNAME "ipa-deluser biguser"
+	let code=$code+$?
+
+	#ssh root@$FULLHOSTNAME "ipa-modgroup -a biguser super"
+	#let code=$code+$?
+
+	#ssh root@$FULLHOSTNAME "ipa-modgroup -a usermod1 modusers"
+	#let code=$code+$?
+
+	if [ $code -ne 0 ]
+	then
+		echo "ERROR - setup for $tet_thistest failed"
+		tet_result FAIL
+	fi
+
+}
 
 ######################################################################
 #
