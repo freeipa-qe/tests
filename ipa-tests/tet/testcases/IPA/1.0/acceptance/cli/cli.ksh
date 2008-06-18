@@ -22,7 +22,7 @@ fi
 tet_startup="CheckAlive"
 tet_cleanup="cli_cleanup"
 iclist="ic1 "
-ic1="tp1 tp2 tp3 tp4 tp5 tp6 tp7 tp8 tp9 tp10 tp11 tp12 tp13 tp14"
+ic1="tp1 tp2 tp3 tp4 tp5 tp6 tp7 tp8 tp9 tp10 tp11 tp12 tp13 tp14 tp15"
 
 # These services will be used by the tests, and removed when the cli test is complete
 service1='host/emc-cge0.sjc2.redhat.com'
@@ -445,11 +445,11 @@ tp14()
 			eval_vars $s
 
 			# test for ipa-addservice
-			ssh root@$FULLHOSTNAME "ipa-finddelegation namef"
+			ssh root@$FULLHOSTNAME "ipa-listdelegation namef"
 			ret=$?
-			if [ $ret -eq 0 ]
+			if [ $ret -ne 0 ]
 			then
-				echo "ERROR - ipa-adddelegation failed on $FULLHOSTNAME"
+				echo "ERROR - ipa-listdelegation failed on $FULLHOSTNAME"
 				tet_result FAIL
 			fi
 		fi
