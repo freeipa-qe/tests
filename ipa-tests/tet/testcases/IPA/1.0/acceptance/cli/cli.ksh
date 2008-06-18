@@ -22,7 +22,7 @@ fi
 tet_startup="CheckAlive"
 tet_cleanup="cli_cleanup"
 iclist="ic1 "
-ic1="tp1 tp2 tp3 tp4 tp5 tp6 tp7 tp8 tp9 tp10 tp11 tp12 tp13 tp14 tp15 tp16 tp17 tp18 tp19"
+ic1="tp1 tp2 tp3 tp4 tp5 tp6 tp7 tp8 tp9 tp10 tp11 tp12 tp13 tp14 tp15 tp16 tp17 tp18 tp19 tp20"
 
 # These services will be used by the tests, and removed when the cli test is complete
 service1='host/emc-cge0.sjc2.redhat.com'
@@ -586,7 +586,7 @@ tp19()
 	for s in $SERVERS; do
 		if [ "$s" != "" ]; then
 			eval_vars $s
-			ssh root@$FULLHOSTNAME "ipa-finduser $superuser | grep First Name | grep $fname"
+			ssh root@$FULLHOSTNAME "ipa-finduser $superuser | grep First\ Name | grep $fname"
 			ret=$?
 			if [ $ret -ne 0 ]
 			then
@@ -599,6 +599,47 @@ tp19()
 	tet_result PASS
 	echo "END $tet_thistest"
 }
+
+######################################################################
+# ipa-getkeytab
+######################################################################
+tp20()
+{
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+	echo "START $tet_thistest"
+	eval_vars M1
+	
+	ssh root@$FULLHOSTNAME "ipa-addservice \"$service1\""
+	if [ $? -ne 0 ]
+	then 
+		echo "ERROR - ipa-addservice failed on $FULLHOSTNAME"
+		tet_result FAIL
+	fi
+
+	server1=$FULLHOSTNAME
+	servicehost=`echo $service1 | sed s=/=\ = | awk '{print $2}'`
+	for s in $SERVERS; do
+		if [ "$s" != "" ]; then
+			eval_vars $s
+			ssh root@$FULLHOSTNAME "rm -f /tmp/keytab;ipa-getkeytab -s $server1 -p $service1 -k /tmp/keytab"
+			ssh root@$FULLHOSTNAME "strings /tmp/keytab | grep $servicehost"
+			ret=$?
+			if [ $ret -ne 0 ]
+			then
+				echo "ERROR - Search for keytab failed on $FULLHOSTNAME"
+				tet_result FAIL
+			fi
+		fi
+	done
+
+	eval_vars M1
+	
+	ssh root@$FULLHOSTNAME "ipa-delservice \"$service1\""
+
+	tet_result PASS
+	echo "END $tet_thistest"
+}
+
 
 
 ######################################################################
