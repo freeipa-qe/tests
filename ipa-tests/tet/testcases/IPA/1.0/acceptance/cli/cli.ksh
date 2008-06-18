@@ -22,7 +22,7 @@ fi
 tet_startup="CheckAlive"
 tet_cleanup="cli_cleanup"
 iclist="ic1 "
-ic1="tp1 tp2 tp3 tp4 tp5 tp6 tp7 tp8 tp9 tp10 tp11 tp12 tp13 tp14 tp15 tp16 tp17 tp18"
+ic1="tp1 tp2 tp3 tp4 tp5 tp6 tp7 tp8 tp9 tp10 tp11 tp12 tp13 tp14 tp15 tp16 tp17 tp18 tp19"
 
 # These services will be used by the tests, and removed when the cli test is complete
 service1='host/emc-cge0.sjc2.redhat.com'
@@ -565,6 +565,41 @@ tp18()
 	echo "END $tet_thistest"
 
 }
+
+######################################################################
+# ipa-moduser
+######################################################################
+tp19()
+{
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+	echo "START $tet_thistest"
+	eval_vars M1
+	
+	fname="kekekejrhr"
+	ssh root@$FULLHOSTNAME "ipa-moduser -f $fname $superuser"
+	if [ $? -ne 0 ]
+	then 
+		echo "ERROR - ipa-moduser failed on $FULLHOSTNAME"
+		tet_result FAIL
+	fi
+
+	for s in $SERVERS; do
+		if [ "$s" != "" ]; then
+			eval_vars $s
+			ssh root@$FULLHOSTNAME "ipa-finduser $superuser | grep First Name | grep $fname"
+			ret=$?
+			if [ $ret -ne 0 ]
+			then
+				echo "ERROR - Search for modified user failed on $FULLHOSTNAME"
+				tet_result FAIL
+			fi
+		fi
+	done
+
+	tet_result PASS
+	echo "END $tet_thistest"
+}
+
 
 ######################################################################
 # Cleanup Section for the cli tests
