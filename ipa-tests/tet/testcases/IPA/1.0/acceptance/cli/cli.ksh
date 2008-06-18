@@ -22,7 +22,7 @@ fi
 tet_startup="CheckAlive"
 tet_cleanup="cli_cleanup"
 iclist="ic1 "
-ic1="tp1 tp2 tp3 tp4 tp5 tp6 tp7 tp8 tp9 tp10 tp11 tp12 tp13 tp14 tp15 tp16"
+ic1="tp1 tp2 tp3 tp4 tp5 tp6 tp7 tp8 tp9 tp10 tp11 tp12 tp13 tp14 tp15 tp16 tp17 tp18"
 
 # These services will be used by the tests, and removed when the cli test is complete
 service1='host/emc-cge0.sjc2.redhat.com'
@@ -463,15 +463,62 @@ tp14()
 
 	tet_result PASS
 	echo "END $tet_thistest"
-
 }
 #
 ######################################################################
 
 ######################################################################
-# ipa-deldelegation
+# ipa-moddelegation
 ######################################################################
 tp15()
+{
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+	echo "START $tet_thistest"
+	eval_vars M1
+	code=0
+
+	ssh root@$FULLHOSTNAME "ipa-moddelegation -a uid=9933 namef"
+	ret=$?
+	if [ $ret -ne 0 ]
+	then
+		echo "ERROR - ipa-moddelegation failed on $FULLHOSTNAME"
+		tet_result FAIL
+	fi
+
+	tet_result PASS
+	echo "END $tet_thistest"
+}
+
+################################################################
+# Check to make sure delegation from tp15 exists everywhere
+################################################################
+tp16()
+{
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+	echo "START $tet_thistest"
+	for s in $SERVERS; do
+		if [ "$s" != "M1" ]&&[ "$s" != "" ]; then
+			eval_vars $s
+
+			ssh root@$FULLHOSTNAME "ipa-listdelegation findf | grep uid | grep 9933"
+			ret=$?
+			if [ $ret -ne 0 ]
+			then
+				echo "ERROR - ipa-listdelegation failed on $FULLHOSTNAME"
+				tet_result FAIL
+			fi
+		fi
+	done
+
+	tet_result PASS
+	echo "END $tet_thistest"
+
+}
+
+######################################################################
+# ipa-deldelegation
+######################################################################
+tp17()
 {
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 	echo "START $tet_thistest"
@@ -493,7 +540,7 @@ tp15()
 ################################################################
 # Check to make sure delegation from tp15 exists everywhere
 ################################################################
-tp16()
+tp18()
 {
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 	echo "START $tet_thistest"
