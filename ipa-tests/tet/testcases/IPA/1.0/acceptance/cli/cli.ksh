@@ -22,7 +22,7 @@ fi
 tet_startup="CheckAlive"
 tet_cleanup="cli_cleanup"
 iclist="ic1 "
-ic1="tp1 tp2 tp3 tp4 tp5 tp6 tp7 tp8 tp9 tp10 tp11 tp12 tp13 tp14 tp15"
+ic1="tp1 tp2 tp3 tp4 tp5 tp6 tp7 tp8 tp9 tp10 tp11 tp12 tp13 tp14 tp15 tp16"
 
 # These services will be used by the tests, and removed when the cli test is complete
 service1='host/emc-cge0.sjc2.redhat.com'
@@ -191,6 +191,7 @@ tp6()
 		if [ "$s" != "M1" ]&&[ "$s" != "" ]; then
 			eval_vars $s
 
+			echo "this step is supposed to fail"
 			# test for ipa-addservice
 			ssh root@$FULLHOSTNAME "ipa-addservice \"$service1\""
 			ret=$?
@@ -218,6 +219,7 @@ tp7()
 		if [ "$s" != "M1" ]&&[ "$s" != "" ]; then
 			eval_vars $s
 
+			echo "this step is supposed to fail"
 			# test for ipa-addservice
 			ssh root@$FULLHOSTNAME "ipa-addservice \"$service2\""
 			ret=$?
@@ -245,6 +247,7 @@ tp8()
 		if [ "$s" != "M1" ]&&[ "$s" != "" ]; then
 			eval_vars $s
 
+			echo "this step is supposed to fail"
 			# test for ipa-addservice
 			ssh root@$FULLHOSTNAME "ipa-addservice \"$service3\""
 			ret=$?
@@ -279,6 +282,7 @@ tp9()
 				echo "ERROR - ipa-delservice failed on $FULLHOSTNAME"
 				tet_result FAIL
 			fi
+			echo "this step is supposed to fail"
 			ssh root@$FULLHOSTNAME "ipa-findservice \"$service1\""
 			if [ $? -eq 0 ]
 			then
@@ -309,6 +313,7 @@ tp10()
 				echo "ERROR - ipa-delservice failed on $FULLHOSTNAME"
 				tet_result FAIL
 			fi
+			echo "this step is supposed to fail"
 			ssh root@$FULLHOSTNAME "ipa-findservice \"$service2\""
 			if [ $? -eq 0 ]
 			then
@@ -339,6 +344,7 @@ tp11()
 				echo "ERROR - ipa-delservice failed on $FULLHOSTNAME"
 				tet_result FAIL
 			fi
+			echo "this step is supposed to fail"
 			ssh root@$FULLHOSTNAME "ipa-findservice \"$service3\""
 			if [ $? -eq 0 ]
 			then
@@ -434,7 +440,7 @@ tp13()
 }
 
 ################################################################
-# Check to make sure delegation from tp13 exists everywhere
+# Check to make sure adddegation from tp13 exists everywhere
 ################################################################
 tp14()
 {
@@ -482,6 +488,34 @@ tp15()
 
 	tet_result PASS
 	echo "END $tet_thistest"
+}
+
+################################################################
+# Check to make sure delegation from tp15 exists everywhere
+################################################################
+tp16()
+{
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+	echo "START $tet_thistest"
+	for s in $SERVERS; do
+		if [ "$s" != "M1" ]&&[ "$s" != "" ]; then
+			eval_vars $s
+
+			echo "this step is supposed to fail"
+			# test for ipa-addservice
+			ssh root@$FULLHOSTNAME "ipa-listdelegation namef"
+			ret=$?
+			if [ $ret -eq 0 ]
+			then
+				echo "ERROR - ipa-listdelegation passed when it should not have $FULLHOSTNAME"
+				tet_result FAIL
+			fi
+		fi
+	done
+
+	tet_result PASS
+	echo "END $tet_thistest"
+
 }
 
 ######################################################################
