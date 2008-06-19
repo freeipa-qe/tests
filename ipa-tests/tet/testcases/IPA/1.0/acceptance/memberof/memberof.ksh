@@ -501,6 +501,82 @@ tp10()
 	echo "END $tet_thistest"
 }
 
+######################################################################
+# From: https://idmwiki.sjc.redhat.com/export/idmwiki/Testplan/ipa/replica#memberof_feature_test
+# test 4 1
+######################################################################
+
+tp11()
+{
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+	# Kinit everywhere
+	echo "START $tet_thistest"
+	for s in $SERVERS; do
+		if [ "$s" != "" ]; then
+			echo "kiniting as $DS_USER, password $DM_ADMIN_PASS on $s"
+			KinitAs $s $DS_USER $DM_ADMIN_PASS
+			ret=$?
+			if [ $ret -ne 0 ]; then
+				echo "ERROR - kinit on $s failed"
+				tet_result FAIL
+			fi
+		else
+			echo "skipping $s"
+		fi
+	done
+	for s in $CLIENTS; do
+		if [ "$s" != "" ]; then
+			echo "kiniting as $DS_USER, password $DM_ADMIN_PASS on $s"
+			KinitAs $s $DS_USER $DM_ADMIN_PASS
+			ret=$?
+			if [ $ret -ne 0 ]; then
+				echo "ERROR - kinit on $s failed"
+				tet_result FAIL
+			fi
+		fi
+	done
+
+	tet_result PASS
+	echo "END $tet_thistest"
+}
+######################################################################
+
+######################################################################
+tpx()
+{
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+	# Kinit everywhere
+	echo "START $tet_thistest"
+	for s in $SERVERS; do
+		if [ "$s" != "" ]; then
+			echo "kiniting as $DS_USER, password $DM_ADMIN_PASS on $s"
+			KinitAs $s $DS_USER $DM_ADMIN_PASS
+			ret=$?
+			if [ $ret -ne 0 ]; then
+				echo "ERROR - kinit on $s failed"
+				tet_result FAIL
+			fi
+		else
+			echo "skipping $s"
+		fi
+	done
+	for s in $CLIENTS; do
+		if [ "$s" != "" ]; then
+			echo "kiniting as $DS_USER, password $DM_ADMIN_PASS on $s"
+			KinitAs $s $DS_USER $DM_ADMIN_PASS
+			ret=$?
+			if [ $ret -ne 0 ]; then
+				echo "ERROR - kinit on $s failed"
+				tet_result FAIL
+			fi
+		fi
+	done
+
+	tet_result PASS
+	echo "END $tet_thistest"
+}
+######################################################################
+
 instclean()
 {
 	echo "START Cleanup"
