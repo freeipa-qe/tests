@@ -22,7 +22,7 @@ tp1()
 {
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 	# Kinit everywhere
-	echo "START tp1"
+	echo "START $tet_thistest"
 	for s in $SERVERS; do
 		if [ "$s" != "" ]; then
 			echo "kiniting as $DS_USER, password $DM_ADMIN_PASS on $s"
@@ -49,14 +49,14 @@ tp1()
 	done
 
 	tet_result PASS
-	echo "END tp1"
+	echo "END $tet_thistest"
 }
 ######################################################################
 tp2()
 {
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 	# Create two groups on M1
-	echo "START tp2"
+	echo "START $tet_thistest"
 	eval_vars M1
 	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-addgroup group1 -v -g 444 -d 'group1 for testing'"
 	ret=$?
@@ -72,14 +72,14 @@ tp2()
 	fi
 	
 	tet_result PASS
-	echo "END tp2"
+	echo "END $tet_thistest"
 }
 
 tp3()
 {
 	# verify those two groups exist everywhere
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	echo "START tp3"
+	echo "START $tet_thistest"
 
 	for s in $SERVERS; do
 		if [ "$s" != "" ]; then
@@ -120,14 +120,14 @@ tp3()
 	done
 
 	tet_result PASS
-	echo "END tp3"
+	echo "END $tet_thistest"
 }
 
 tp4()
 {
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 	# join group 2 as a user in group 1 on M1
-	echo "START tp4"
+	echo "START $tet_thistest"
 	eval_vars M1 
 	ssh root@$FULLHOSTNAME 'ipa-modgroup --groupadd group1 group2'
 	ret=$?
@@ -137,14 +137,14 @@ tp4()
 	fi
 
 	tet_result PASS
-	echo "END tp4"
+	echo "END $tet_thistest"
 }
 
 tp5()
 {
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 	# join group 1 as a user in group 2 on M1
-	echo "START tp5"
+	echo "START $tet_thistest"
 
 	eval_vars M1 
 	ssh root@$FULLHOSTNAME 'ipa-modgroup --groupadd group2 group1'
@@ -155,14 +155,14 @@ tp5()
 	fi
 
 	tet_result PASS
-	echo "END tp5"
+	echo "END $tet_thistest"
 }
 
 tp6()
 {
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 	# Verify that group 2 is in group 1 on all hosts
-	echo "START tp6"
+	echo "START $tet_thistest"
 
 	for s in $SERVERS; do
 		if [ "$s" != "" ]; then
@@ -207,14 +207,14 @@ tp6()
 	done
 
 	tet_result PASS
-	echo "END tp6"
+	echo "END $tet_thistest"
 }
 
 tp7()
 {
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 	# Verify that ipa-findgroup and grep fails when it's given bad info on all servers
-	echo "START tp7"
+	echo "START $tet_thistest"
 	for s in $SERVERS; do
 		if [ "$s" != "" ]; then
 			echo "Verifying that groupf does not exist in group1 on $s"
@@ -230,7 +230,7 @@ tp7()
 
 
 	tet_result PASS
-	echo "END tp7"
+	echo "END $tet_thistest"
 }
 
 tp8()
@@ -238,8 +238,7 @@ tp8()
 	# From: https://idmwiki.sjc.redhat.com/export/idmwiki/Testplan/ipa/replica#memberof_feature_test
 	# test 1 0
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	echo "START tp8"
-
+	echo "START $tet_thistest"
 	eval_vars M1
 	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-addgroup group-1-0 -v -g 555 -d 'group-1-0 for testing'"
 	ret=$?
@@ -313,7 +312,7 @@ tp8()
 
 	
 	tet_result PASS
-	echo "END tp8"
+	echo "END $tet_thistest"
 }
 
 tp9()
@@ -321,8 +320,7 @@ tp9()
 	# From: https://idmwiki.sjc.redhat.com/export/idmwiki/Testplan/ipa/replica#memberof_feature_test
 	# test 2 1
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	echo "START tp9"
-
+	echo "START $tet_thistest"
 	eval_vars M1
 	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-addgroup group-2-1 -v -g 666 -d 'group 2 1 for testing'"
 	ret=$?
@@ -410,7 +408,7 @@ tp9()
 	fi
 
 	tet_result PASS
-	echo "END tp9"
+	echo "END $tet_thistest"
 }
 
 tp10()
@@ -418,8 +416,7 @@ tp10()
 	# From: https://idmwiki.sjc.redhat.com/export/idmwiki/Testplan/ipa/replica#memberof_feature_test
 	# test 3 1
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	echo "START tp10"
-
+	echo "START $tet_thistest"
 	eval_vars M1
 	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-addgroup group-3-1 -v -g 777 -d 'group 3 1 for testing'"
 	ret=$?
@@ -501,7 +498,7 @@ tp10()
 
 
 	tet_result PASS
-	echo "END tp10"
+	echo "END $tet_thistest"
 }
 
 instclean()
