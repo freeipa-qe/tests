@@ -556,7 +556,12 @@ tp18()
 			then
 				echo "ERROR - ipa-listdelegation passed when it should not have $FULLHOSTNAME"
 				# Because of bug 452027 this test will always fail. So, until the bug is fixed, the FAIL part will be commented out.
-#				tet_result FAIL
+				# This is a known bug, so Fail if IGNORE_KNOWN_BUGS isn't set.
+				if [ "$IGNORE_KNOWN_BUGS" != "y" ]; then
+					tet_result FAIL
+				else
+					echo "Ignoring because IGNORE_KNOWN_BUGS is set"
+				fi
 			fi
 		fi
 	done
