@@ -509,12 +509,44 @@ tp10()
 tp11()
 {
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	# Kinit everywhere
+	echo "START $tet_thistest"
+	eval_vars M1
+	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-addgroup group-4-1 -v -g 755 -d 'group 4 1 for testing'; \
+/usr/sbin/ipa-addgroup group-e4-1 -v -g 755 -d 'empty group 4 1 for testing'; \
+/usr/sbin/ipa-adduser -f 'user 4 1' -l 'lastname' user-4-1; \
+/usr/sbin/ipa-modgroup --add group-e4-1 group-4-1; \
+/usr/sbin/ipa-modgroup --add user-4-1 group-4-1;"
+	ret=$?
+
+	if [ $ret -ne 0 ]; then
+		echo "ERROR - $tet_thistest failed in section 1"
+		tet_result FAIL
+	fi
+		
+ssh root@$FULLHOSTNAME "/usr/sbin/ipa-moduser --firstname look1 user-4-1; \
+/usr/sbin/ipa-moduser --firstname look2 user-4-1; \
+/usr/sbin/ipa-moduser --firstname look3 user-4-1; \
+/usr/sbin/ipa-modgroup --setattr cn=group-4b-1 group-e4-1; \
+/usr/sbin/ipa-modgroup --setattr cn=group-4c-1 group-4-1;"
+	ret=$?
+
+	if [ $ret -ne 0 ]; then
+		echo "ERROR - $tet_thistest failed in section 2"
+		tet_result FAIL
+	fi
+
+	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-modgroup --setattr cn=group-test3-test1 group-3-1"
+	ret=$?
+	if [ $ret -ne 0 ]; then
+		echo "ERROR, rename of group-3-1 on M1 failed"
+		tet_result FAIL
+	fi
+
 	echo "START $tet_thistest"
 	for s in $SERVERS; do
 		if [ "$s" != "" ]; then
 			echo "kiniting as $DS_USER, password $DM_ADMIN_PASS on $s"
-			KinitAs $s $DS_USER $DM_ADMIN_PASS
+#			KinitAs $s $DS_USER $DM_ADMIN_PASS
 			ret=$?
 			if [ $ret -ne 0 ]; then
 				echo "ERROR - kinit on $s failed"
@@ -527,7 +559,7 @@ tp11()
 	for s in $CLIENTS; do
 		if [ "$s" != "" ]; then
 			echo "kiniting as $DS_USER, password $DM_ADMIN_PASS on $s"
-			KinitAs $s $DS_USER $DM_ADMIN_PASS
+#			KinitAs $s $DS_USER $DM_ADMIN_PASS
 			ret=$?
 			if [ $ret -ne 0 ]; then
 				echo "ERROR - kinit on $s failed"
@@ -594,6 +626,10 @@ instclean()
 		echo "ERROR - delete of group2 on $s failed"
 		tet_result FAIL
 	fi
+
+	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-delgroup group-e4-1; \
+/usr/sbin/ipa-delgroup group-4-1; \
+/usr/sbin/ipa-deluser user-4-1"
 
 	for s in $SERVERS; do
 		if [ "$s" != "" ]; then
