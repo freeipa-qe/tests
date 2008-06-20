@@ -504,6 +504,17 @@ tp10()
 ######################################################################
 # From: https://idmwiki.sjc.redhat.com/export/idmwiki/Testplan/ipa/replica#memberof_feature_test
 # test 4 1
+# 1. add empty group as member
+# 2. add user as member
+# 3. mix operation 1 & 2 to randomly add user and empty group
+# 4. modify group (rename) member
+# 5. modify user member 
+# 6. delete user member
+# 7. delete empty group member
+# 8. mix operation 6 & 7 to randomly delete user and empty group till only one user type member left
+# 9  mix operation 6 & 7 to randomly delete user and empty group till only one empty group type member left
+# 10. rename the top level group name 
+# 11. delete group member till the top level group became an empty group
 ######################################################################
 
 tp11()
@@ -526,7 +537,7 @@ tp11()
 ssh root@$FULLHOSTNAME "/usr/sbin/ipa-moduser --firstname look1 user-4-1; \
 /usr/sbin/ipa-moduser --firstname look2 user-4-1; \
 /usr/sbin/ipa-moduser --firstname look3 user-4-1; \
-/usr/sbin/ipa-modgroup --setattr cn=group-4b-1 group-e4-1; \
+/usr/sbin/ipa-deluser user-4-1; \
 /usr/sbin/ipa-modgroup --setattr cn=group-4c-1 group-4-1;"
 	ret=$?
 
