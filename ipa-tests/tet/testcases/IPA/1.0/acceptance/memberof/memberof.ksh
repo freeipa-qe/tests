@@ -524,13 +524,11 @@ tp11()
 	echo "START $tet_thistest"
 	eval_vars M1
 	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-addgroup group-4-1 -g 755 -d 'group 4 1 for testing'; \
-/usr/sbin/ipa-addgroup group-e4-1 -g 755 -d 'empty group 4 1 for testing'; \
+/usr/sbin/ipa-addgroup group-e4-1 -g 756 -d 'empty group 4 1 for testing'; \
 /usr/sbin/ipa-adduser -f 'user 4 1' -l 'lastname' user-4-1; \
 /usr/sbin/ipa-modgroup --add group-e4-1 group-4-1; \
 /usr/sbin/ipa-modgroup --add user-4-1 group-4-1;"
-	ret=$?
-
-	if [ $ret -ne 0 ]; then
+	if [ $? -ne 0 ]; then
 		echo "ERROR - $tet_thistest failed in section 1"
 		tet_result FAIL
 	fi
@@ -661,6 +659,10 @@ ipa-deluser user-41d;"
 # From: https://idmwiki.sjc.redhat.com/export/idmwiki/Testplan/ipa/replica#memberof_feature_test
 # test 5 2 
 #1. all test in test set 2
+####1. add user as member
+####2. modify user member
+####3. rename the top level group name 
+####4. delete user member till the group became empty member
 #2. all test in test set 3
 #3. all test in test set 4
 #--- additional test ---
@@ -670,8 +672,49 @@ ipa-deluser user-41d;"
 tp12()
 {
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	# Kinit everywhere
 	echo "START $tet_thistest"
+	sec=1
+	eval_vars M1
+	# Set up level 0 and level 1
+	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-addgroup group-5-2 -g 855 -d 'group 5 2 for testing'; \
+/usr/sbin/ipa-addgroup group-52-1 -g 856 -d 'group for test 5 2 containing only 1 member level 2'; \
+/usr/sbin/ipa-modgroup --groupadd group-52-1 group-5-2;"
+	if [ $? -ne 0 ]; then
+		echo "ERROR - $tet_thistest failed in section $sec"
+		tet_result FAIL
+	fi
+	let sec=$sec+1
+
+	# test set 2
+	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-adduser -f 'user 5 2' -l 'lastname' user-5-2;"
+	if [ $? -ne 0 ]; then
+		echo "ERROR - $tet_thistest failed in section $sec"
+		tet_result FAIL
+	fi
+	let sec=$sec+1
+
+	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-modgroup --add user-5-2 group-52-1;"
+	if [ $? -ne 0 ]; then
+		echo "ERROR - $tet_thistest failed in section $sec"
+		tet_result FAIL
+	fi
+	let sec=$sec+1
+
+	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-moduser --firstname look user-5-2"
+	if [ $? -ne 0 ]; then
+		echo "ERROR - $tet_thistest failed in section $sec"
+		tet_result FAIL
+	fi
+	let sec=$sec+1
+
+	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-modgroup --setattr cn=group-test5-test2 group-52-1"
+	ret=$?
+	if [ $ret -ne 0 ]; then
+		echo "ERROR, rename of group-5-2 on M1 failed in section $sec"
+		tet_result FAIL
+	fi
+	let sec=$sec+1
+
 	for s in $SERVERS; do
 		if [ "$s" != "" ]; then
 			echo "kiniting as $DS_USER, password $DM_ADMIN_PASS on $s"
@@ -696,6 +739,19 @@ tp12()
 			fi
 		fi
 	done
+
+	# Cleanup of test set 2
+	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-delgroup group-5-2; \
+/usr/sbin/ipa-delgroup group-test5-test2; \
+/usr/sbin/ipa-delgroup group-52-1; \
+/usr/sbin/ipa-deluser user-5-2; "
+	ret=$?
+	if [ $ret -ne 0 ]; then
+		echo "ERROR, cleanup of test set 2 failed in section $sec"
+		tet_result FAIL
+	fi
+	let sec=$sec+1
+
 
 	tet_result PASS
 	echo "END $tet_thistest"
