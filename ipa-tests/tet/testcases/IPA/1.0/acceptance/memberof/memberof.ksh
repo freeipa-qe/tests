@@ -5,7 +5,7 @@ fi
 # The next line is required as it picks up data about the servers to use
 tet_startup="CheckAlive"
 tet_cleanup="instclean"
-iclist="ic1 ic2 ic3 ic4 ic5 ic6 ic7 ic8 ic9 ic10 ic11"
+iclist="ic1 ic2 ic3 ic4 ic5 ic6 ic7 ic8 ic9 ic10 ic11 ic12"
 ic1="tp1"
 ic2="tp2"
 ic3="tp3"
@@ -17,6 +17,7 @@ ic8="tp8"
 ic9="tp9"
 ic10="tp10"
 ic11="tp11"
+ic12="tp12"
 
 ######################################################################
 tp1()
@@ -664,6 +665,10 @@ ipa-deluser user-41d;"
 ####3. rename the top level group name 
 ####4. delete user member till the group became empty member
 #2. all test in test set 3
+####1. add empty group as member
+####2. modify group (rename)
+####3. rename the top level group name 
+####4. delete group member till the top level group became an empty group
 #3. all test in test set 4
 #--- additional test ---
 #4. delete all member at level 2
@@ -673,12 +678,15 @@ tp12()
 {
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 	echo "START $tet_thistest"
+	grp1="grp-5-2"
+	grp2="grp-52-1"
+	user1="user-5-2"
 	sec=1
 	eval_vars M1
 	# Set up level 0 and level 1
-	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-addgroup group-5-2 -g 855 -d 'group 5 2 for testing'; \
-/usr/sbin/ipa-addgroup group-52-1 -g 856 -d 'group for test 5 2 containing only 1 member level 2'; \
-/usr/sbin/ipa-modgroup --groupadd group-52-1 group-5-2;"
+	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-addgroup $grp1 -g 855 -d 'group 5 2 for testing'; \
+/usr/sbin/ipa-addgroup $grp2 -g 856 -d 'group for test 5 2 containing only 1 member level 2'; \
+/usr/sbin/ipa-modgroup --groupadd $grp2 $grp1;"
 	if [ $? -ne 0 ]; then
 		echo "ERROR - $tet_thistest failed in section $sec"
 		tet_result FAIL
@@ -686,65 +694,87 @@ tp12()
 	let sec=$sec+1
 
 	# test set 2
-	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-adduser -f 'user 5 2' -l 'lastname' user-5-2;"
+	grp2alt="group-test5-level2"
+	newfirstname="looklookd"
+	# Create user that will be in level 3
+	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-adduser -f 'user 5 2' -l 'lastname' $user1;"
 	if [ $? -ne 0 ]; then
 		echo "ERROR - $tet_thistest failed in section $sec"
 		tet_result FAIL
 	fi
 	let sec=$sec+1
 
-	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-modgroup --add user-5-2 group-52-1;"
+	# Add the level 3 user to the level 2 group
+	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-modgroup --add $user1 $grp2;"
 	if [ $? -ne 0 ]; then
 		echo "ERROR - $tet_thistest failed in section $sec"
 		tet_result FAIL
 	fi
 	let sec=$sec+1
 
-	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-moduser --firstname look user-5-2"
+	# modify the user
+	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-moduser --firstname $newfirstname $user1"
 	if [ $? -ne 0 ]; then
 		echo "ERROR - $tet_thistest failed in section $sec"
 		tet_result FAIL
 	fi
 	let sec=$sec+1
 
-	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-modgroup --setattr cn=group-test5-test2 group-52-1"
+	# modify the group
+	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-modgroup --setattr cn=$grp2alt $grp2"
 	ret=$?
 	if [ $ret -ne 0 ]; then
-		echo "ERROR, rename of group-5-2 on M1 failed in section $sec"
+		echo "ERROR, rename of $grp2 on M1 failed in section $sec"
 		tet_result FAIL
 	fi
 	let sec=$sec+1
 
+	# Check to ensure the group changed to include the user, and that the firstname change took.
 	for s in $SERVERS; do
 		if [ "$s" != "" ]; then
-			echo "kiniting as $DS_USER, password $DM_ADMIN_PASS on $s"
-			KinitAs $s $DS_USER $DM_ADMIN_PASS
+			ssh root@$FULLHOSTNAME "ipa-findgroup -a $grp1 | grep $grp2alt"
 			ret=$?
 			if [ $ret -ne 0 ]; then
-				echo "ERROR - kinit on $s failed"
+				echo "ERROR - $grp2alt does not exist in $grp1"
 				tet_result FAIL
 			fi
-		else
-			echo "skipping $s"
+			ssh root@$FULLHOSTNAME "ipa-findgroup -a $grp1 | grep $newfirstname"
+			ret=$?
+			if [ $ret -ne 0 ]; then
+				echo "ERROR - The altered First Name for user $user1 does not exist in $grp1"
+				echo "ERROR - possibly from bug https://bugzilla.redhat.com/show_bug.cgi?id=451318"
+				tet_result FAIL
+			fi
 		fi
 	done
 	for s in $CLIENTS; do
 		if [ "$s" != "" ]; then
-			echo "kiniting as $DS_USER, password $DM_ADMIN_PASS on $s"
-			KinitAs $s $DS_USER $DM_ADMIN_PASS
+			ssh root@$FULLHOSTNAME "ipa-findgroup -a $grp1 | grep $grp2alt"
 			ret=$?
 			if [ $ret -ne 0 ]; then
-				echo "ERROR - kinit on $s failed"
+				echo "ERROR - $grp2alt does not exist in $grp1"
 				tet_result FAIL
+			fi
+			ssh root@$FULLHOSTNAME "ipa-findgroup -a $grp1 | grep $newfirstname"
+			ret=$?
+
+			if [ $ret -ne 0 ]; then
+				echo "ERROR - The altered First Name for user $user1 does not exist in $grp1"
+				echo "ERROR - possibly from bug https://bugzilla.redhat.com/show_bug.cgi?id=451318"
+				if [ "$IGNORE_KNOWN_BUGS" != "y" ]; then
+					tet_result FAIL
+				else
+					echo "Ignoring because IGNORE_KNOWN_BUGS is set"
+				fi
 			fi
 		fi
 	done
 
 	# Cleanup of test set 2
-	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-delgroup group-5-2; \
-/usr/sbin/ipa-delgroup group-test5-test2; \
-/usr/sbin/ipa-delgroup group-52-1; \
-/usr/sbin/ipa-deluser user-5-2; "
+	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-delgroup $grp1; \
+/usr/sbin/ipa-delgroup $grp2alt; \
+/usr/sbin/ipa-delgroup $grp2; \
+/usr/sbin/ipa-deluser $user1; "
 	ret=$?
 	if [ $ret -ne 0 ]; then
 		echo "ERROR, cleanup of test set 2 failed in section $sec"
@@ -752,6 +782,7 @@ tp12()
 	fi
 	let sec=$sec+1
 
+	# Test Set 4	
 
 	tet_result PASS
 	echo "END $tet_thistest"
