@@ -732,6 +732,7 @@ tp12()
 	# Check to ensure the group changed to include the user, and that the firstname change took.
 	for s in $SERVERS; do
 		if [ "$s" != "" ]; then
+			eval_vars $s
 			ssh root@$FULLHOSTNAME "ipa-findgroup -a $grp1 | grep $grp2alt"
 			ret=$?
 			if [ $ret -ne 0 ]; then
@@ -749,6 +750,7 @@ tp12()
 	done
 	for s in $CLIENTS; do
 		if [ "$s" != "" ]; then
+			eval_vars $s
 			ssh root@$FULLHOSTNAME "ipa-findgroup -a $grp1 | grep $grp2alt"
 			ret=$?
 			if [ $ret -ne 0 ]; then
@@ -770,6 +772,7 @@ tp12()
 		fi
 	done
 
+	eval_vars M1
 	# Cleanup of test set 2
 	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-delgroup $grp1; \
 /usr/sbin/ipa-delgroup $grp2alt; \
@@ -782,7 +785,169 @@ tp12()
 	fi
 	let sec=$sec+1
 
+	tet_result PASS
+	echo "END $tet_thistest"
+}
+
+######################################################################
+# This is actually a continuation of tp12, but it was getting long, so I'm breaking it up.
+######################################################################
+tp13()
+{
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+	echo "START $tet_thistest"
+	sec=1
+	eval_vars M1
+
 	# Test Set 4	
+####1. add empty group as member
+####2. modify group (rename)
+####3. rename the top level group name 
+####4. delete group member till the top level group became an empty group
+	grp1="group-5-2"
+	grp2="group-5-4-1"
+	grp3="group-e5-4-1"
+	grp4="new-groupe541"
+	grp5="new-group541"
+	grpa="group-a-5-2"
+	grpb="group-b-5-2"
+	grpc="group-c-5-2"
+	grpd="group-d-5-2"
+	user1="user-4-1"
+	usera="user-41a"
+	userb="user-41b"
+	userc="user-41c"
+	userd="user-41d"
+	# grp1 is the top level group for test 5
+	# grp2 is the top level group for test 4, but it sits under test 5
+	# grp3 is a empty group to get added to grp2
+	# grp4 is the name the name that grp2 gets renamed to. 
+	# grp5 is the name that grp2 gets renamed to
+	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-addgroup $grp1 -g 767 -d 'group 5 2 for group 4 1 for testing'; \
+/usr/sbin/ipa-addgroup $grp2 -g 765 -d 'group 4 1 for testing'; \
+/usr/sbin/ipa-addgroup $grp3 -g 766 -d 'empty group 4 1 for testing'; \
+/usr/sbin/ipa-adduser -f 'user 4 1' -l 'lastname' $user1; \
+/usr/sbin/ipa-modgroup --add $grp2 $grp1; \
+/usr/sbin/ipa-modgroup --add $grp3 $grp2; \
+/usr/sbin/ipa-modgroup --add $user1 $grp2;"
+	if [ $? -ne 0 ]; then
+		echo "ERROR - $tet_thistest failed in section 1"
+		tet_result FAIL
+	fi
+		
+	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-moduser --firstname look1 $user1; \
+/usr/sbin/ipa-moduser --firstname look2 $user1; \
+/usr/sbin/ipa-moduser --firstname look3 $user1; \
+/usr/sbin/ipa-deluser $user1; \
+/usr/sbin/ipa-modgroup --setattr cn=group-4c-1 $grp2;"
+	if [ $? -ne 0 ]; then
+		echo "ERROR - $tet_thistest failed in section 2"
+		tet_result FAIL
+	fi
+
+	ssh root@$FULLHOSTNAME "ipa-findgroup $grp2"
+	if [ $? -ne 0 ]; then
+		echo "ERROR - $tet_thistest failed in section 3"
+		tet_result FAIL
+	fi
+
+	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-addgroup $grpa -g 771 -d 'group 4 1a for testing'; \
+/usr/sbin/ipa-addgroup $grpb -g 772 -d 'group 4 1b for testing'; \
+/usr/sbin/ipa-addgroup $grpc -g 773 -d 'group 4 1c for testing'; \
+/usr/sbin/ipa-addgroup $grpd -g 774 -d 'group 4 1d for testing'; \
+/usr/sbin/ipa-adduser -f 'user 4 1a' -l 'lastname' $usera; \
+/usr/sbin/ipa-adduser -f 'user 4 1b' -l 'lastname' $userb; \
+/usr/sbin/ipa-adduser -f 'user 4 1c' -l 'lastname' $userc; \
+/usr/sbin/ipa-adduser -f 'user 4 1d' -l 'lastname' $userd; "
+	ret=$?
+
+	if [ $ret -ne 0 ]; then
+		echo "ERROR - $tet_thistest failed in section 4"
+		tet_result FAIL
+	fi
+
+	ssh root@$FULLHOSTNAME "ipa-modgroup --groupadd $grpa $grp2\
+ipa-modgroup --groupadd $grpb $grp2; \
+ipa-modgroup --groupadd $grpc $grp2; \
+ipa-modgroup --groupadd $grpd $grp2; \
+ipa-modgroup --add $usera $grp2; \
+ipa-modgroup --add $userb $grp2; \
+ipa-modgroup --add $userc $grp2; \
+ipa-modgroup --add $userd $grp2;"
+	ret=$?
+
+	if [ $ret -ne 0 ]; then
+		echo "ERROR - $tet_thistest failed in section 5"
+		tet_result FAIL
+	fi
+
+	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-modgroup --setattr cn=$grp2 $grp2;"
+	ret=$?
+	if [ $ret -ne 0 ]; then
+		echo "ERROR, rename of $grp2 on M1 failed"
+		tet_result FAIL
+	fi
+
+# Now, check to make sure that the groups and users exist in grp2
+	checklist="$grpa $grpb $grpc $grpd $usera $userb $userc $userd"
+	for s in $SERVERS; do
+		if [ "$s" != "" ]; then
+			eval_vars $s
+			for c in $checklist; do
+				ssh root@$FULLHOSTNAME "ipa-findgroup $grp2 | grep $c"
+				if [ $? -ne 0 ]; then
+					echo "ERROR - $tet_thistest failed in section 6 at $c"
+					tet_result FAIL
+				fi
+			done
+		fi
+	done
+	for s in $CLIENTS; do
+		if [ "$s" != "" ]; then
+			eval_vars $s
+			for c in $checklist; do
+				ssh root@$FULLHOSTNAME "ipa-findgroup $grp2 | grep $c"
+				if [ $? -ne 0 ]; then
+					echo "ERROR - $tet_thistest failed in section 7 at $c"
+					tet_result FAIL
+				fi
+			done
+		fi
+	done
+
+	checklist="$grpa $grpb $grpc $grpd"
+	for c in $checklist; do
+		ssh root@$FULLHOSTNAME "ipa-delgroup $c; "
+		if [ $? -ne 0 ]; then
+			echo "ERROR - $tet_thistest failed in section 8 on $c"
+			tet_result FAIL
+		fi
+	done 
+
+	checklist="$usera $userb $userc $userd"
+	for c in $checklist; do
+		ssh root@$FULLHOSTNAME "ipa-deluser $c; "
+		if [ $? -ne 0 ]; then
+			echo "ERROR - $tet_thistest failed in section 9 on $c"
+			tet_result FAIL
+		fi
+	done 
+
+	checklist="$grpa $grpb $grpc $grpd $usera $userb $userc $userd"
+	# Now, check to make sure that the groups and users exist in group-4d-1
+	for s in $SERVERS; do
+		if [ "$s" != "" ]; then
+			eval_vars $s
+			for c in $checklist; do
+				ssh root@$FULLHOSTNAME "ipa-findgroup $grp2 | grep $c"
+				if [ $? -eq 0 ]; then
+					echo "ERROR - $tet_thistest failed in section 10 at $c"
+					tet_result FAIL
+				fi
+			done
+		fi
+	done
+
 
 	tet_result PASS
 	echo "END $tet_thistest"
@@ -844,7 +1009,7 @@ instclean()
 		tet_result FAIL
 	fi
 
-	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-delgroup group-e4-1; \
+	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-delgroup $grp3; \
 /usr/sbin/ipa-delgroup group-4-1; \
 /usr/sbin/ipa-delgroup group-4a-1; \
 /usr/sbin/ipa-delgroup group-4b-1; \
