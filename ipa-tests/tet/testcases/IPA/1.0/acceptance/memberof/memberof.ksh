@@ -5,7 +5,7 @@ fi
 # The next line is required as it picks up data about the servers to use
 tet_startup="CheckAlive"
 tet_cleanup="instclean"
-iclist="ic1 ic2 ic3 ic4 ic5 ic6 ic7 ic8 ic9 ic10 ic11 ic12"
+iclist="ic1 ic2 ic3 ic4 ic5 ic6 ic7 ic8 ic9 ic10 ic11 ic12 ic13"
 ic1="tp1"
 ic2="tp2"
 ic3="tp3"
@@ -18,6 +18,7 @@ ic9="tp9"
 ic10="tp10"
 ic11="tp11"
 ic12="tp12"
+ic13="tp13"
 
 ######################################################################
 tp1()
@@ -825,21 +826,29 @@ tp13()
 	# grp5 is the name that grp2 gets renamed to
 	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-addgroup $grp1 -g 767 -d 'group 5 2 for group 4 1 for testing'; \
 /usr/sbin/ipa-addgroup $grp2 -g 765 -d 'group 4 1 for testing'; \
-/usr/sbin/ipa-addgroup $grp3 -g 766 -d 'empty group 4 1 for testing'; \
-/usr/sbin/ipa-adduser -f 'user 4 1' -l 'lastname' $user1; \
-/usr/sbin/ipa-modgroup --add $grp2 $grp1; \
+/usr/sbin/ipa-addgroup $grp3 -g 766 -d 'empty group 4 1 for testing'; "
+	if [ $? -ne 0 ]; then
+		echo "ERROR - $tet_thistest failed in section 1a"
+		tet_result FAIL
+	fi
+
+	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-adduser -f 'user 4 1' -l 'lastname' $user1; "
+	if [ $? -ne 0 ]; then
+		echo "ERROR - $tet_thistest failed in section 1b"
+		tet_result FAIL
+	fi
+
+	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-modgroup --add $grp2 $grp1; \
 /usr/sbin/ipa-modgroup --add $grp3 $grp2; \
 /usr/sbin/ipa-modgroup --add $user1 $grp2;"
 	if [ $? -ne 0 ]; then
-		echo "ERROR - $tet_thistest failed in section 1"
+		echo "ERROR - $tet_thistest failed in section 1c"
 		tet_result FAIL
 	fi
 		
 	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-moduser --firstname look1 $user1; \
 /usr/sbin/ipa-moduser --firstname look2 $user1; \
-/usr/sbin/ipa-moduser --firstname look3 $user1; \
-/usr/sbin/ipa-deluser $user1; \
-/usr/sbin/ipa-modgroup --setattr cn=group-4c-1 $grp2;"
+/usr/sbin/ipa-moduser --firstname look3 $user1; "
 	if [ $? -ne 0 ]; then
 		echo "ERROR - $tet_thistest failed in section 2"
 		tet_result FAIL
@@ -866,7 +875,7 @@ tp13()
 		tet_result FAIL
 	fi
 
-	ssh root@$FULLHOSTNAME "ipa-modgroup --groupadd $grpa $grp2\
+	ssh root@$FULLHOSTNAME "ipa-modgroup --groupadd $grpa $grp2; \
 ipa-modgroup --groupadd $grpb $grp2; \
 ipa-modgroup --groupadd $grpc $grp2; \
 ipa-modgroup --groupadd $grpd $grp2; \
@@ -881,7 +890,7 @@ ipa-modgroup --add $userd $grp2;"
 		tet_result FAIL
 	fi
 
-	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-modgroup --setattr cn=$grp2 $grp2;"
+	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-modgroup --setattr cn=$grp4 $grp2;"
 	ret=$?
 	if [ $ret -ne 0 ]; then
 		echo "ERROR, rename of $grp2 on M1 failed"
@@ -894,11 +903,17 @@ ipa-modgroup --add $userd $grp2;"
 		if [ "$s" != "" ]; then
 			eval_vars $s
 			for c in $checklist; do
-				ssh root@$FULLHOSTNAME "ipa-findgroup $grp2 | grep $c"
+				ssh root@$FULLHOSTNAME "ipa-findgroup $grp1 | grep $c"
 				if [ $? -ne 0 ]; then
-					echo "ERROR - $tet_thistest failed in section 6 at $c"
+					echo "ERROR - $tet_thistest failed in section 6 at $c for $grp1"
 					tet_result FAIL
 				fi
+				ssh root@$FULLHOSTNAME "ipa-findgroup $grp4 | grep $c"
+				if [ $? -ne 0 ]; then
+					echo "ERROR - $tet_thistest failed in section 6 at $c for $grp4"
+					tet_result FAIL
+				fi
+
 			done
 		fi
 	done
@@ -906,7 +921,7 @@ ipa-modgroup --add $userd $grp2;"
 		if [ "$s" != "" ]; then
 			eval_vars $s
 			for c in $checklist; do
-				ssh root@$FULLHOSTNAME "ipa-findgroup $grp2 | grep $c"
+				ssh root@$FULLHOSTNAME "ipa-findgroup $grp1 | grep $c"
 				if [ $? -ne 0 ]; then
 					echo "ERROR - $tet_thistest failed in section 7 at $c"
 					tet_result FAIL
@@ -915,6 +930,7 @@ ipa-modgroup --add $userd $grp2;"
 		fi
 	done
 
+	eval_vars M1
 	checklist="$grpa $grpb $grpc $grpd"
 	for c in $checklist; do
 		ssh root@$FULLHOSTNAME "ipa-delgroup $c; "
@@ -934,20 +950,30 @@ ipa-modgroup --add $userd $grp2;"
 	done 
 
 	checklist="$grpa $grpb $grpc $grpd $usera $userb $userc $userd"
-	# Now, check to make sure that the groups and users exist in group-4d-1
+	# Now, check to make sure that the groups and users do not exist in group-4d-1
 	for s in $SERVERS; do
 		if [ "$s" != "" ]; then
 			eval_vars $s
 			for c in $checklist; do
-				ssh root@$FULLHOSTNAME "ipa-findgroup $grp2 | grep $c"
+				ssh root@$FULLHOSTNAME "ipa-findgroup $grp4 | grep $c"
 				if [ $? -eq 0 ]; then
-					echo "ERROR - $tet_thistest failed in section 10 at $c"
+					echo "ERROR - $tet_thistest passed when it shouldn't have in section 10 at $c"
 					tet_result FAIL
 				fi
 			done
 		fi
 	done
 
+	eval_vars M1
+	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-delgroup $grp2; \
+/usr/sbin/ipa-delgroup $grp2; \
+/usr/sbin/ipa-delgroup $grp3; \
+/usr/sbin/ipa-delgroup $grp4; "
+	ret=$?
+	if [ $ret -ne 0 ]; then
+		echo "ERROR, ipa-delgroup failed on M1, section 12"
+		tet_result FAIL
+	fi
 
 	tet_result PASS
 	echo "END $tet_thistest"
