@@ -670,6 +670,17 @@ ipa-deluser user-41d;"
 ####3. rename the top level group name 
 ####4. delete group member till the top level group became an empty group
 #3. all test in test set 4
+####1. add empty group as member
+####2. add user as member
+####3. mix operation 1 & 2 to randomly add user and empty group
+####4. modify group (rename) member
+####5. modify user member 
+####6. delete user member
+####7. delete empty group member
+####8. mix operation 6 & 7 to randomly delete user and empty group till only one user type member left
+####9  mix operation 6 & 7 to randomly delete user and empty group till only one empty group type member left
+####10. rename the top level group name 
+####11. delete group member till the top level group became an empty group
 #--- additional test ---
 #4. delete all member at level 2
 #5. delete all member at level 1
@@ -1149,6 +1160,53 @@ ipa-delgroup group-4-d-1; "
 
 }
 
+######################################################################
+# Test 6 2 from:
+# https://idmwiki.sjc.redhat.com/export/idmwiki/Testplan/ipa/replica#memberof_feature_test
+#-- For members in level 2 --
+#1. all operation on test set 5
+#-- For members in level 1 --
+#2. add user type member at level 1
+#3. modify user type member at level 1
+#4. delete user type member at level 1
+#-- Change member's 
+#5. user in level 2 move to level 1
+#6. user in level 1 move to level 2
+######################################################################
+tp15()
+{
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+	# Kinit everywhere
+	echo "START $tet_thistest"
+	for s in $SERVERS; do
+		if [ "$s" != "" ]; then
+			echo "kiniting as $DS_USER, password $DM_ADMIN_PASS on $s"
+			KinitAs $s $DS_USER $DM_ADMIN_PASS
+			ret=$?
+			if [ $ret -ne 0 ]; then
+				echo "ERROR - kinit on $s failed"
+				tet_result FAIL
+			fi
+		else
+			echo "skipping $s"
+		fi
+	done
+	for s in $CLIENTS; do
+		if [ "$s" != "" ]; then
+			echo "kiniting as $DS_USER, password $DM_ADMIN_PASS on $s"
+			KinitAs $s $DS_USER $DM_ADMIN_PASS
+			ret=$?
+			if [ $ret -ne 0 ]; then
+				echo "ERROR - kinit on $s failed"
+				tet_result FAIL
+			fi
+		fi
+	done
+
+	tet_result PASS
+	echo "END $tet_thistest"
+}
+######################################################################
 
 
 ######################################################################
