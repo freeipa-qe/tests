@@ -799,22 +799,7 @@ tp13()
 	sec=1
 	eval_vars M1
 
-	tet_result PASS
-	echo "END $tet_thistest"
-
-}
-
-######################################################################
-# This is actually a continuation of tp12, but it was getting long, so I'm breaking it up.
-######################################################################
-tp14()
-{
-	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	echo "START $tet_thistest"
-	sec=1
-	eval_vars M1
-
-	# Test Set 4	
+	# Test Set 3	
 ####1. add empty group as member
 ####2. modify group (rename)
 ####3. rename the top level group name 
@@ -993,6 +978,36 @@ ipa-modgroup --add $userd $grp2;"
 	echo "END $tet_thistest"
 }
 ######################################################################
+
+######################################################################
+# This is actually a continuation of tp12, but it was getting long, so I'm breaking it up.
+######################################################################
+tp14()
+{
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+	echo "START $tet_thistest"
+	sec=1
+	eval_vars M1
+
+	# Test Set 4
+####1. add empty group as member
+####2. add user as member
+####3. mix operation 1 & 2 to randomly add user and empty group
+####4. modify group (rename) member
+####5. modify user member 
+####6. delete user member
+####7. delete empty group member
+####8. mix operation 6 & 7 to randomly delete user and empty group till only one user type member left
+####9  mix operation 6 & 7 to randomly delete user and empty group till only one empty group type member left
+####10. rename the top level group name 
+####11. delete group member till the top level group became an empty group
+
+
+	tet_result PASS
+	echo "END $tet_thistest"
+
+}
+
 
 
 ######################################################################
