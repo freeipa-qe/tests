@@ -527,7 +527,7 @@ tp11()
 	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-addgroup group-4-1 -g 755 -d 'group 4 1 for testing'; \
 /usr/sbin/ipa-addgroup group-e4-1 -g 756 -d 'empty group 4 1 for testing'; \
 /usr/sbin/ipa-adduser -f 'user 4 1' -l 'lastname' user-4-1; \
-/usr/sbin/ipa-modgroup --add group-e4-1 group-4-1; \
+/usr/sbin/ipa-modgroup --groupadd group-e4-1 group-4-1; \
 /usr/sbin/ipa-modgroup --add user-4-1 group-4-1;"
 	if [ $? -ne 0 ]; then
 		echo "ERROR - $tet_thistest failed in section 1"
@@ -1002,6 +1002,147 @@ tp14()
 ####10. rename the top level group name 
 ####11. delete group member till the top level group became an empty group
 
+	# Cleanup, just in case things exist that shouldn't
+ssh root@$FULLHOSTNAME "/usr/sbin/ipa-delgroup group-4-1; \
+/usr/sbin/ipa-delgroup group-4a-1; \
+/usr/sbin/ipa-delgroup group-4b-1; \
+/usr/sbin/ipa-delgroup group-4c-1; \
+/usr/sbin/ipa-delgroup group-4d-1; \
+/usr/sbin/ipa-deluser user-4-1; \
+/usr/sbin/ipa-deluser user-5-1"
+
+	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-addgroup group-5-1 -g 977 -d 'this group will be the top level group'; \
+/usr/sbin/ipa-addgroup group-4-1 -g 755 -d 'group 4 1 for testing'; \
+/usr/sbin/ipa-addgroup group-e4-1 -g 756 -d 'empty group 4 1 for testing'; \
+/usr/sbin/ipa-adduser -f 'user 4 1' -l 'lastname' user-4-1; \
+/usr/sbin/ipa-modgroup --groupadd group-e4-1 group-4-1; \
+/usr/sbin/ipa-modgroup --groupadd group-4-1 group-5-1; \
+/usr/sbin/ipa-modgroup --add user-4-1 group-4-1;"
+	if [ $? -ne 0 ]; then
+		echo "ERROR - $tet_thistest failed in section 1"
+		tet_result FAIL
+	fi
+		
+	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-moduser --firstname look1 user-4-1; \
+/usr/sbin/ipa-moduser --firstname look2 user-4-1; \
+/usr/sbin/ipa-moduser --firstname look3 user-4-1; \
+/usr/sbin/ipa-deluser user-4-1; \
+/usr/sbin/ipa-modgroup --setattr cn=group-4c-1 group-4-1;"
+	if [ $? -ne 0 ]; then
+		echo "ERROR - $tet_thistest failed in section 2"
+		tet_result FAIL
+	fi
+
+	ssh root@$FULLHOSTNAME "ipa-findgroup group-4c-1"
+	if [ $? -ne 0 ]; then
+		echo "ERROR - $tet_thistest failed in section 2"
+		tet_result FAIL
+	fi
+
+	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-addgroup group-4-1a -g 761 -d 'group 4 1a for testing'; \
+/usr/sbin/ipa-addgroup group-4-1b -g 762 -d 'group 4 1b for testing'; \
+/usr/sbin/ipa-addgroup group-4-1c -g 763 -d 'group 4 1c for testing'; \
+/usr/sbin/ipa-addgroup group-4-1d -g 764 -d 'group 4 1d for testing'; \
+/usr/sbin/ipa-adduser -f 'user 4 1a' -l 'lastname' user-41a; \
+/usr/sbin/ipa-adduser -f 'user 4 1b' -l 'lastname' user-41b; \
+/usr/sbin/ipa-adduser -f 'user 4 1c' -l 'lastname' user-41c; \
+/usr/sbin/ipa-adduser -f 'user 4 1d' -l 'lastname' user-41d; "
+	ret=$?
+
+	if [ $ret -ne 0 ]; then
+		echo "ERROR - $tet_thistest failed in section 3"
+		tet_result FAIL
+	fi
+
+	ssh root@$FULLHOSTNAME "ipa-modgroup --groupadd group-4-1a group-4c-1;\
+ipa-modgroup --groupadd group-4-1b group-4c-1; \
+ipa-modgroup --groupadd group-4-1c group-4c-1; \
+ipa-modgroup --groupadd group-4-1d group-4c-1; \
+ipa-modgroup --add user-41a group-4c-1; \
+ipa-modgroup --add user-41b group-4c-1; \
+ipa-modgroup --add user-41c group-4c-1; \
+ipa-modgroup --add user-41d group-4c-1;"
+	ret=$?
+
+	if [ $ret -ne 0 ]; then
+		echo "ERROR - $tet_thistest failed in section 4"
+		tet_result FAIL
+	fi
+
+	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-modgroup --setattr cn=group-4d-1 group-4c-1;"
+	ret=$?
+	if [ $ret -ne 0 ]; then
+		echo "ERROR, rename of group-4c-1 on M1 failed"
+		tet_result FAIL
+	fi
+
+# Now, check to make sure that the groups and users exist in group-4d-1
+	checklist="group-4-1a group-4-1b group-4-1c group-4-1d user-41a user-41b user-41c user-41d"
+	for s in $SERVERS; do
+		if [ "$s" != "" ]; then
+			eval_vars $s
+			for c in $checklist; do
+				ssh root@$FULLHOSTNAME "ipa-findgroup group-5-1 | grep $c"
+				if [ $? -ne 0 ]; then
+					echo "ERROR - $tet_thistest failed in section 5 at $c"
+					tet_result FAIL
+				fi
+			done
+		else
+			echo "skipping $s"
+		fi
+	done
+	for s in $CLIENTS; do
+		if [ "$s" != "" ]; then
+			eval_vars $s
+			for c in $checklist; do
+				ssh root@$FULLHOSTNAME "ipa-findgroup group-5-1 | grep $c"
+				if [ $? -ne 0 ]; then
+					echo "ERROR - $tet_thistest failed in section 6 at $c"
+					tet_result FAIL
+				fi
+			done
+		else
+			echo "skipping $s"
+		fi
+	done
+
+	ssh root@$FULLHOSTNAME "ipa-delgroup group-4-1a; \
+ipa-delgroup group-4-1b; \
+ipa-delgroup group-4-1c; \
+ipa-delgroup group-4-1d;"
+	if [ $? -ne 0 ]; then
+		echo "ERROR - $tet_thistest failed in section 7"
+		tet_result FAIL
+	fi
+
+
+	ssh root@$FULLHOSTNAME "ipa-deluser user-41a; \
+ipa-deluser user-41b; \
+ipa-deluser user-41c; \
+ipa-deluser user-41d;"
+	if [ $? -ne 0 ]; then
+		echo "ERROR - $tet_thistest failed in section 8"
+		tet_result FAIL
+	fi
+
+# Now, check to make sure that the groups and users exist in group-4d-1
+	for s in $SERVERS; do
+		if [ "$s" != "" ]; then
+			eval_vars $s
+			for c in $checklist; do
+				ssh root@$FULLHOSTNAME "ipa-findgroup group-5-1 | grep $c"
+				if [ $? -eq 0 ]; then
+					echo "ERROR - $tet_thistest failed in section 9 at $c"
+					tet_result FAIL
+				fi
+			done
+		fi
+	done
+
+	# A little more cleanup
+	ssh root@$FULLHOSTNAME "ipa-delgroup group-5-1; \
+ipa-delgroup group-4-d-1; "
 
 	tet_result PASS
 	echo "END $tet_thistest"
