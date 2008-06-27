@@ -596,6 +596,7 @@ tp19()
 			if [ $ret -ne 0 ]
 			then
 				echo "ERROR - Search for modified user failed on $FULLHOSTNAME"
+				echo "Possibly due to bug https://bugzilla.redhat.com/show_bug.cgi?id=451318"
 				tet_result FAIL
 			fi
 		fi

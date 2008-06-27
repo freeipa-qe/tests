@@ -5,7 +5,7 @@ fi
 # The next line is required as it picks up data about the servers to use
 tet_startup="CheckAlive"
 tet_cleanup="instclean"
-iclist="ic1 ic2 ic3 ic4 ic5 ic6 ic7 ic8 ic9 ic10 ic11 ic12 ic13"
+iclist="ic1 ic2 ic3 ic4 ic5 ic6 ic7 ic8 ic9 ic10 ic11 ic12"
 ic1="tp1"
 ic2="tp2"
 ic3="tp3"
@@ -17,8 +17,7 @@ ic8="tp8"
 ic9="tp9"
 ic10="tp10"
 ic11="tp11"
-ic12="tp12"
-ic13="tp13"
+ic12="tp12 tp13 tp14"
 
 ######################################################################
 tp1()
@@ -794,6 +793,21 @@ tp12()
 # This is actually a continuation of tp12, but it was getting long, so I'm breaking it up.
 ######################################################################
 tp13()
+{
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+	echo "START $tet_thistest"
+	sec=1
+	eval_vars M1
+
+	tet_result PASS
+	echo "END $tet_thistest"
+
+}
+
+######################################################################
+# This is actually a continuation of tp12, but it was getting long, so I'm breaking it up.
+######################################################################
+tp14()
 {
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 	echo "START $tet_thistest"
