@@ -838,8 +838,8 @@ tp13()
 		tet_result FAIL
 	fi
 
-	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-modgroup --add $grp2 $grp1; \
-/usr/sbin/ipa-modgroup --add $grp3 $grp2; \
+	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-modgroup --groupadd $grp2 $grp1; \
+/usr/sbin/ipa-modgroup --groupadd $grp3 $grp2; \
 /usr/sbin/ipa-modgroup --add $user1 $grp2;"
 	if [ $? -ne 0 ]; then
 		echo "ERROR - $tet_thistest failed in section 1c"
@@ -897,7 +897,7 @@ ipa-modgroup --add $userd $grp2;"
 		tet_result FAIL
 	fi
 
-# Now, check to make sure that the groups and users exist in grp2
+	# Now, check to make sure that the groups and users exist in grp1
 	checklist="$grpa $grpb $grpc $grpd $usera $userb $userc $userd"
 	for s in $SERVERS; do
 		if [ "$s" != "" ]; then
