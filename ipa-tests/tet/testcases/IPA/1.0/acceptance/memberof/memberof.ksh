@@ -1165,6 +1165,7 @@ ipa-delgroup group-4-d-1; "
 # https://idmwiki.sjc.redhat.com/export/idmwiki/Testplan/ipa/replica#memberof_feature_test
 #-- For members in level 2 --
 #1. all operation on test set 5
+###### Bypassing this step as it's assumed that tp12, tp13, and tp14 should cover this part.
 #-- For members in level 1 --
 #2. add user type member at level 1
 #3. modify user type member at level 1
@@ -1178,10 +1179,46 @@ tp15()
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 	# Kinit everywhere
 	echo "START $tet_thistest"
+	grp1="group-6-2-a" #Level 1
+	grp2="group-6-2-b" #Level 2
+	grp3="group-6-2-c" #Level 3
+	user1="user-62b1" # User for level 2
+	user2="user-62b2" # User for level 2
+
+	eval_vars M1
+	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-addgroup $grp1 -g 87 -d 'group 6 2 for testing'; \
+/usr/sbin/ipa-addgroup $grp2 -g 75 -d 'group 6 2 for level 2 testing'; \
+/usr/sbin/ipa-addgroup $grp3 -g 76 -d ' group 6 2 for level 3 testing'; "
+	if [ $? -ne 0 ]; then
+		echo "ERROR - $tet_thistest failed in section 1"
+		tet_result FAIL
+	fi
+
+	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-adduser -f 'user 6 2a' -l 'lastname' $user1; \
+	/usr/sbin/ipa-adduser -f 'user 6 2b' -l 'lastname' $user2; "
+	if [ $? -ne 0 ]; then
+		echo "ERROR - $tet_thistest failed in section 2"
+		tet_result FAIL
+	fi
+
+	ssh root@$FULLHOSTNAME "ipa-modgroup --groupadd $grp2 $grp1; \
+ipa-modgroup --groupadd $grp3 $grp2;"
+	if [ $? -ne 0 ]; then
+		echo "ERROR - $tet_thistest failed in section 3"
+		tet_result FAIL
+	fi
+
+	 ssh root@$FULLHOSTNAME "ipa-modgroup --add $user1 $grp2; \
+ipa-modgroup --add $user2 $grp2"
+	if [ $? -ne 0 ]; then
+		echo "ERROR - $tet_thistest failed in section 4"
+		tet_result FAIL
+	fi
+
 	for s in $SERVERS; do
 		if [ "$s" != "" ]; then
 			echo "kiniting as $DS_USER, password $DM_ADMIN_PASS on $s"
-			KinitAs $s $DS_USER $DM_ADMIN_PASS
+			ls
 			ret=$?
 			if [ $ret -ne 0 ]; then
 				echo "ERROR - kinit on $s failed"
@@ -1194,7 +1231,7 @@ tp15()
 	for s in $CLIENTS; do
 		if [ "$s" != "" ]; then
 			echo "kiniting as $DS_USER, password $DM_ADMIN_PASS on $s"
-			KinitAs $s $DS_USER $DM_ADMIN_PASS
+			ls
 			ret=$?
 			if [ $ret -ne 0 ]; then
 				echo "ERROR - kinit on $s failed"
