@@ -5,7 +5,7 @@ fi
 # The next line is required as it picks up data about the servers to use
 tet_startup="CheckAlive"
 tet_cleanup="instclean"
-iclist="ic1 ic2 ic3 ic4 ic5 ic6 ic7 ic8 ic9 ic10 ic11 ic12"
+iclist="ic1 ic2 ic3 ic4 ic5 ic6 ic7 ic8 ic9 ic10 ic11 ic12 ic13"
 ic1="tp1"
 ic2="tp2"
 ic3="tp3"
@@ -18,6 +18,7 @@ ic9="tp9"
 ic10="tp10"
 ic11="tp11"
 ic12="tp12 tp13 tp14"
+ic13="tp15"
 
 ######################################################################
 tp1()
@@ -1182,10 +1183,13 @@ tp15()
 	grp1="group-6-2-a" #Level 1
 	grp2="group-6-2-b" #Level 2
 	grp3="group-6-2-c" #Level 3
-	user1="user-62b1" # User for level 2
-	user2="user-62b2" # User for level 2
+	user1="user62b1" # User for level 2
+	user2="user62b2" # User for level 2
+	user3="user62b3" # User for level 1
+	user1alt="userb1a1" # username that user 1 will be changed to
 
 	eval_vars M1
+	# set up groups
 	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-addgroup $grp1 -g 87 -d 'group 6 2 for testing'; \
 /usr/sbin/ipa-addgroup $grp2 -g 75 -d 'group 6 2 for level 2 testing'; \
 /usr/sbin/ipa-addgroup $grp3 -g 76 -d ' group 6 2 for level 3 testing'; "
@@ -1194,13 +1198,16 @@ tp15()
 		tet_result FAIL
 	fi
 
+	# set up users
 	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-adduser -f 'user 6 2a' -l 'lastname' $user1; \
-	/usr/sbin/ipa-adduser -f 'user 6 2b' -l 'lastname' $user2; "
+	/usr/sbin/ipa-adduser -f 'user 6 2b' -l 'lastname' $user2; \
+	/usr/sbin/ipa-adduser -f 'user 6 2c' -l 'lastname' $user3; "
 	if [ $? -ne 0 ]; then
 		echo "ERROR - $tet_thistest failed in section 2"
 		tet_result FAIL
 	fi
 
+	# add groups to themselfs 
 	ssh root@$FULLHOSTNAME "ipa-modgroup --groupadd $grp2 $grp1; \
 ipa-modgroup --groupadd $grp3 $grp2;"
 	if [ $? -ne 0 ]; then
@@ -1208,37 +1215,252 @@ ipa-modgroup --groupadd $grp3 $grp2;"
 		tet_result FAIL
 	fi
 
+	# add users to group 2
 	 ssh root@$FULLHOSTNAME "ipa-modgroup --add $user1 $grp2; \
-ipa-modgroup --add $user2 $grp2"
+ipa-modgroup --add $user2 $grp2; \
+ipa-modgroup --add $user3 $grp1;"
 	if [ $? -ne 0 ]; then
 		echo "ERROR - $tet_thistest failed in section 4"
 		tet_result FAIL
 	fi
 
+	# confirm that the users are in the right place, and not in group 3
 	for s in $SERVERS; do
 		if [ "$s" != "" ]; then
-			echo "kiniting as $DS_USER, password $DM_ADMIN_PASS on $s"
-			ls
-			ret=$?
-			if [ $ret -ne 0 ]; then
-				echo "ERROR - kinit on $s failed"
+			eval_vars $s
+			ssh root@$FULLHOSTNAME "ipa-findgroup -v $grp1 | grep $user1"
+			if [ $? -ne 0 ]; then
+				echo "ERROR - ipa-findgroup failed on section 5"
 				tet_result FAIL
 			fi
-		else
-			echo "skipping $s"
+			ssh root@$FULLHOSTNAME "ipa-findgroup -v $grp1 | grep $user2"
+			if [ $? -ne 0 ]; then
+				echo "ERROR - ipa-findgroup failed on section 6"
+				tet_result FAIL
+			fi
+			ssh root@$FULLHOSTNAME "ipa-findgroup -v $grp1 | grep $user3"
+			if [ $? -ne 0 ]; then
+				echo "ERROR - ipa-findgroup failed on section 6a"
+				tet_result FAIL
+			fi
+			ssh root@$FULLHOSTNAME "ipa-findgroup -v $grp3 | grep -e $user2 -e $user3"
+			if [ $? -eq 0 ]; then
+				echo "ERROR - ipa-findgroup failed on section 7"
+				tet_result FAIL
+			fi
 		fi
 	done
 	for s in $CLIENTS; do
 		if [ "$s" != "" ]; then
-			echo "kiniting as $DS_USER, password $DM_ADMIN_PASS on $s"
-			ls
-			ret=$?
-			if [ $ret -ne 0 ]; then
-				echo "ERROR - kinit on $s failed"
+			eval_vars $s
+			ssh root@$FULLHOSTNAME "ipa-findgroup -v $grp1 | grep $user1"
+			if [ $? -ne 0 ]; then
+				echo "ERROR - ipa-findgroup failed on section 8"
+				tet_result FAIL
+			fi
+			ssh root@$FULLHOSTNAME "ipa-findgroup -v $grp1 | grep $user2"
+			if [ $? -ne 0 ]; then
+				echo "ERROR - ipa-findgroup failed on section 9"
+				tet_result FAIL
+			fi
+			ssh root@$FULLHOSTNAME "ipa-findgroup -v $grp1 | grep $user3"
+			if [ $? -ne 0 ]; then
+				echo "ERROR - ipa-findgroup failed on section 9a"
+				tet_result FAIL
+			fi
+			ssh root@$FULLHOSTNAME "ipa-findgroup -v $grp3 | grep -e $user2 -e $user3"
+			if [ $? -eq 0 ]; then
+				echo "ERROR - ipa-findgroup failed on section 10"
 				tet_result FAIL
 			fi
 		fi
 	done
+	eval_vars M1
+	# modify user type member at level 1
+	ssh root@$FULLHOSTNAME "ipa-moduser --setattr \"uid=$user1alt\" $user1"
+	if [ $? -ne 0 ]; then
+		echo "ERROR - $tet_thistest failed in section 11"
+		tet_result FAIL
+	fi
+
+	# delete user type member at level 1
+	ssh root@$FULLHOSTNAME "ipa-deluser $user2"
+	if [ $? -ne 0 ]; then
+		echo "ERROR - $tet_thistest failed in section 12"
+		tet_result FAIL
+	fi
+
+	# confirm that the users are in the right place, and with the right info
+	for s in $SERVERS; do
+		if [ "$s" != "" ]; then
+			eval_vars $s
+			ssh root@$FULLHOSTNAME "ipa-findgroup -v $grp1 | grep $user1alt"
+			if [ $? -ne 0 ]; then
+				echo "ERROR - ipa-findgroup failed on section 13"
+				tet_result FAIL
+			fi
+			ssh root@$FULLHOSTNAME "ipa-findgroup -v $grp2 | grep $user1alt"
+			if [ $? -ne 0 ]; then
+				echo "ERROR - ipa-findgroup failed on section 14"
+				tet_result FAIL
+			fi
+			ssh root@$FULLHOSTNAME "ipa-findgroup -v $grp2 | grep $user2"
+			if [ $? -eq 0 ]; then
+				echo "ERROR - ipa-findgroup failed on section 15"
+				tet_result FAIL
+			fi
+			ssh root@$FULLHOSTNAME "ipa-findgroup -v $grp1 | grep $user2"
+			if [ $? -eq 0 ]; then
+				echo "ERROR - ipa-findgroup failed on section 16"
+				tet_result FAIL
+			fi
+
+		fi
+	done
+	for s in $CLIENTS; do
+		if [ "$s" != "" ]; then
+			eval_vars $s
+			ssh root@$FULLHOSTNAME "ipa-findgroup -v $grp1 | grep $user1alt"
+			if [ $? -ne 0 ]; then
+				echo "ERROR - ipa-findgroup failed on section 17"
+				tet_result FAIL
+			fi
+			ssh root@$FULLHOSTNAME "ipa-findgroup -v $grp2 | grep $user1alt"
+			if [ $? -ne 0 ]; then
+				echo "ERROR - ipa-findgroup failed on section 18"
+				tet_result FAIL
+			fi
+			ssh root@$FULLHOSTNAME "ipa-findgroup -v $grp2 | grep $user2"
+			if [ $? -eq 0 ]; then
+				echo "ERROR - ipa-findgroup failed on section 19"
+				tet_result FAIL
+			fi
+			ssh root@$FULLHOSTNAME "ipa-findgroup -v $grp1 | grep $user2"
+			if [ $? -eq 0 ]; then
+				echo "ERROR - ipa-findgroup failed on section 20"
+				tet_result FAIL
+			fi
+		fi
+	done
+
+	eval_vars M1
+	# user in level 2 move to level 1
+	ssh root@$FULLHOSTNAME "ipa-modgroup --add $user1alt $group1; \
+ipa-modgroup --remove $user1alt $group2;"
+	if [ $? -ne 0 ]; then
+		echo "ERROR - $tet_thistest failed in section 21"
+		tet_result FAIL
+	fi
+
+	# user in level 1 move to level 2
+	ssh root@$FULLHOSTNAME "ipa-modgroup --add $user3 $group2; \
+ipa-modgroup --remove $user3 $group1;"
+	if [ $? -ne 0 ]; then
+		echo "ERROR - $tet_thistest failed in section 22"
+		tet_result FAIL
+	fi
+
+	# confirm that the users are in the right place.
+	for s in $SERVERS; do
+		if [ "$s" != "" ]; then
+			eval_vars $s
+			ssh root@$FULLHOSTNAME "ipa-findgroup -v $grp1 | grep $user1alt"
+			if [ $? -ne 0 ]; then
+				echo "ERROR - ipa-findgroup failed on section 23"
+				tet_result FAIL
+			fi
+			ssh root@$FULLHOSTNAME "ipa-findgroup -v $grp2 | grep $user1alt"
+			if [ $? -eq 0 ]; then
+				echo "ERROR - ipa-findgroup failed on section 24"
+				tet_result FAIL
+			fi
+			ssh root@$FULLHOSTNAME "ipa-findgroup -v $grp2 | grep $user3"
+			if [ $? -ne 0 ]; then
+				echo "ERROR - ipa-findgroup failed on section 25"
+				tet_result FAIL
+			fi
+			ssh root@$FULLHOSTNAME "ipa-findgroup -v $grp1 | grep $user3"
+			if [ $? -ne 0 ]; then
+				echo "ERROR - ipa-findgroup failed on section 26"
+				tet_result FAIL
+			fi
+		fi
+	done
+	for s in $CLIENTS; do
+		if [ "$s" != "" ]; then
+			eval_vars $s
+			ssh root@$FULLHOSTNAME "ipa-findgroup -v $grp1 | grep $user1alt"
+			if [ $? -ne 0 ]; then
+				echo "ERROR - ipa-findgroup failed on section 27"
+				tet_result FAIL
+			fi
+			ssh root@$FULLHOSTNAME "ipa-findgroup -v $grp2 | grep $user1alt"
+			if [ $? -eq 0 ]; then
+				echo "ERROR - ipa-findgroup failed on section 28"
+				tet_result FAIL
+			fi
+			ssh root@$FULLHOSTNAME "ipa-findgroup -v $grp2 | grep $user3"
+			if [ $? -ne 0 ]; then
+				echo "ERROR - ipa-findgroup failed on section 29"
+				tet_result FAIL
+			fi
+			ssh root@$FULLHOSTNAME "ipa-findgroup -v $grp1 | grep $user3"
+			if [ $? -ne 0 ]; then
+				echo "ERROR - ipa-findgroup failed on section 30"
+				tet_result FAIL
+			fi
+		fi
+	done
+
+	# delete user type member at level 1
+	eval_vars M1
+	ssh root@$FULLHOSTNAME "ipa-deluser $user3;"
+	if [ $? -ne 0 ]; then
+		echo "ERROR - $tet_thistest failed in section 31"
+		tet_result FAIL
+	fi
+	# confirm that the user3 does not exist
+	for s in $SERVERS; do
+		if [ "$s" != "" ]; then
+			eval_vars $s
+			ssh root@$FULLHOSTNAME "ipa-findgroup -v $grp1 | grep $user3"
+			if [ $? -eq 0 ]; then
+				echo "ERROR - ipa-findgroup failed on section 32"
+				tet_result FAIL
+			fi
+			ssh root@$FULLHOSTNAME "ipa-findgroup -v $grp2 | grep $user3"
+			if [ $? -eq 0 ]; then
+				echo "ERROR - ipa-findgroup failed on section 33"
+				tet_result FAIL
+			fi
+		fi
+	done
+	for s in $CLIENTS; do
+		if [ "$s" != "" ]; then
+			eval_vars $s
+			ssh root@$FULLHOSTNAME "ipa-findgroup -v $grp1 | grep $user3"
+			if [ $? -eq 0 ]; then
+				echo "ERROR - ipa-findgroup failed on section 34"
+				tet_result FAIL
+			fi
+			ssh root@$FULLHOSTNAME "ipa-findgroup -v $grp2 | grep $user3"
+			if [ $? -eq 0 ]; then
+				echo "ERROR - ipa-findgroup failed on section 35"
+				tet_result FAIL
+			fi
+		fi
+	done
+
+
+	# Cleanup
+	eval_vars M1
+	ssh root@$FULLHOSTNAME "ipa-delgroup $grp1; \
+ipa-delgroup $grp2; \
+ipa-delgroup $grp3; \
+ipa-deluser $user1alt; \
+ipa-deluser $user3; \
+ipa-deluser $user1; \
+ipa-deluser $user2"
 
 	tet_result PASS
 	echo "END $tet_thistest"
