@@ -1345,16 +1345,16 @@ ipa-modgroup --add $user3 $grp1;"
 
 	eval_vars M1
 	# user in level 2 move to level 1
-	ssh root@$FULLHOSTNAME "ipa-modgroup --add $user1alt $group1; \
-ipa-modgroup --remove $user1alt $group2;"
+	ssh root@$FULLHOSTNAME "ipa-modgroup --add $user1alt $grp1; \
+ipa-modgroup --remove $user1alt $grp2;"
 	if [ $? -ne 0 ]; then
 		echo "ERROR - $tet_thistest failed in section 21"
 		tet_result FAIL
 	fi
 
 	# user in level 1 move to level 2
-	ssh root@$FULLHOSTNAME "ipa-modgroup --add $user3 $group2; \
-ipa-modgroup --remove $user3 $group1;"
+	ssh root@$FULLHOSTNAME "ipa-modgroup --add $user3 $grp2; \
+ipa-modgroup --remove $user3 $grp1;"
 	if [ $? -ne 0 ]; then
 		echo "ERROR - $tet_thistest failed in section 22"
 		tet_result FAIL
