@@ -5,14 +5,14 @@ fi
 # The next line is required as it picks up data about the servers to use
 tet_startup="CheckAlive"
 tet_cleanup="instclean"
-iclist="ic1 ic2 ic3 ic4 ic5 ic6"
+iclist="ic1 ic2 ic3 ic4 ic5 ic6 ic7"
 ic1="setupssh tp1"
 ic2="tp2"
 ic3="tp3"
 ic4="tp4"
 ic5="tp5"
 ic6="tp6"
-
+ic7="tp7"
 
 
 setupssh()
@@ -298,6 +298,88 @@ sleep 15'  > $TET_TMP_DIR/kinit.exp
 		if [ "$DSTET_DEBUG" = "y" ]; then echo "done working on $s"; fi
 	done
 
+	tet_result PASS
+
+}
+
+######################################################################
+# Test to ensure that all of the machines seem to sync up when creating users
+######################################################################
+tp7()
+{
+	eval_vars M1
+	user1="testusr1"
+	user2="testusr2"
+	group1="testgroup1"
+	ssh root@$FULLHOSTNAME "ipa-adduser -f 'test user 1' -l 'lastname' $user1;"
+	if [ $? != 0 ]; then
+	        echo "ERROR - ipa-adduser failed on $FULLHOSTNAME";
+		tet_result FAIL
+	fi
+	ssh root@$FULLHOSTNAME "ipa-adduser -f 'test user 2' -l 'lastname' $user2;"
+	if [ $? != 0 ]; then
+	        echo "ERROR - ipa-adduser failed on $FULLHOSTNAME";
+		tet_result FAIL
+	fi
+	ssh root@$FULLHOSTNAME "ipa-addgroup $group1 -g 725 -d 'group for testing';"
+	if [ $? != 0 ]; then
+	        echo "ERROR - ipa-addgroup failed on $FULLHOSTNAME";
+		tet_result FAIL
+	fi
+	ssh root@$FULLHOSTNAME "ipa-modgroup --add $user1 $group1"
+	if [ $? != 0 ]; then
+	        echo "ERROR - ipa-modgroup failed on $FULLHOSTNAME";
+		tet_result FAIL
+	fi
+
+	for s in $SERVERS; do
+		if [ "$DSTET_DEBUG" = "y" ]; then echo "working on $s now"; fi
+		eval_vars $s
+		ssh root@$FULLHOSTNAME "/usr/sbin/ipa-finduser $user1"
+		if [ $? != 0 ]; then
+        		echo "ERROR - ipa-finduser failed on $FULLHOSTNAME";
+			tet_result FAIL
+		fi
+		ssh root@$FULLHOSTNAME "/usr/sbin/ipa-finduser $user2"
+		if [ $? != 0 ]; then
+        		echo "ERROR - ipa-finduser failed on $FULLHOSTNAME";
+			tet_result FAIL
+		fi
+		ssh root@$FULLHOSTNAME "/usr/sbin/ipa-findgroup -v $group1 | grep $user1"
+		if [ $? != 0 ]; then
+        		echo "ERROR - ipa-finduser failed on $FULLHOSTNAME";
+			tet_result FAIL
+		fi
+		if [ "$DSTET_DEBUG" = "y" ]; then echo "done working on $s"; fi
+	done
+
+	for s in $CLIENTS; do
+		if [ "$DSTET_DEBUG" = "y" ]; then echo "working on $s now"; fi
+		eval_vars $s
+		ssh root@$FULLHOSTNAME "/usr/sbin/ipa-finduser $user1"
+		if [ $? != 0 ]; then
+        		echo "ERROR - ipa-finduser failed on $FULLHOSTNAME";
+			tet_result FAIL
+		fi
+		ssh root@$FULLHOSTNAME "/usr/sbin/ipa-finduser $user2"
+		if [ $? != 0 ]; then
+        		echo "ERROR - ipa-finduser failed on $FULLHOSTNAME";
+			tet_result FAIL
+		fi
+		ssh root@$FULLHOSTNAME "/usr/sbin/ipa-findgroup -v $group1 | grep $user1"
+		if [ $? != 0 ]; then
+        		echo "ERROR - ipa-finduser failed on $FULLHOSTNAME";
+			tet_result FAIL
+		fi
+		if [ "$DSTET_DEBUG" = "y" ]; then echo "done working on $s"; fi
+	done
+
+	# Cleanup
+	eval_vars M1
+	ssh root@$FULLHOSTNAME "ipa-delgroup $group1; \
+ipa-deluser $user1; \
+ipa-deluser $user2;"
+	
 	tet_result PASS
 
 }
