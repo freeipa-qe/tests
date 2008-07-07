@@ -5,7 +5,7 @@ fi
 # The next line is required as it picks up data about the servers to use
 tet_startup="CheckAlive"
 tet_cleanup="instclean"
-iclist="ic1 ic2 ic3 ic4 ic5 ic6 ic7 ic8 ic9 ic10 ic11 ic12 ic13"
+iclist="ic1 ic2 ic3 ic4 ic5 ic6 ic7 ic8 ic9 ic10 ic11 ic12 ic13 ic14"
 ic1="tp1"
 ic2="tp2"
 ic3="tp3"
@@ -19,6 +19,7 @@ ic10="tp10"
 ic11="tp11"
 ic12="tp12 tp13 tp14"
 ic13="tp15"
+ic14="tp438891"
 
 ######################################################################
 tp1()
@@ -235,6 +236,7 @@ tp7()
 	tet_result PASS
 	echo "END $tet_thistest"
 }
+
 
 tp8()
 {
@@ -1467,6 +1469,41 @@ ipa-deluser $user2"
 }
 ######################################################################
 
+######################################################################
+# Test for bug https://bugzilla.redhat.com/show_bug.cgi?id=438891
+######################################################################
+tp438891()
+{
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+	# Kinit everywhere
+	echo "START $tet_thistest"
+	for s in $SERVERS; do
+		if [ "$s" != "" ]; then
+			ls
+			ret=$?
+			if [ $ret -ne 0 ]; then
+				echo "ERROR - kinit on $s failed"
+				tet_result FAIL
+			fi
+		else
+			echo "skipping $s"
+		fi
+	done
+	for s in $CLIENTS; do
+		if [ "$s" != "" ]; then
+			ls
+			ret=$?
+			if [ $ret -ne 0 ]; then
+				echo "ERROR - kinit on $s failed"
+				tet_result FAIL
+			fi
+		fi
+	done
+
+	tet_result PASS
+	echo "END $tet_thistest"
+}
+######################################################################
 
 ######################################################################
 tpx()
