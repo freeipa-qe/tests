@@ -1477,28 +1477,41 @@ tp438891()
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 	# Kinit everywhere
 	echo "START $tet_thistest"
-	for s in $SERVERS; do
-		if [ "$s" != "" ]; then
-			ls
-			ret=$?
-			if [ $ret -ne 0 ]; then
-				echo "ERROR - kinit on $s failed"
-				tet_result FAIL
-			fi
-		else
-			echo "skipping $s"
+	# Setup
+	grp1="group438891a" #
+	grp2="group438891b" #
+	grp1alt="group438891alt"
+	user1="u438891" 
+	
+	eval_vars M1
+
+	runnum=0
+	while [[ $runnum -lt $ITTERATIONS ]]; do
+		ssh root@$FULLHOSTNAME "/usr/sbin/ipa-addgroup $grp1 -g 37 -d 'group 438891a for testing'; \
+/usr/sbin/ipa-addgroup $grp2 -g 35 -d 'group 438891b for testing'; \
+/usr/sbin/ipa-adduser -f '438891' -l 'lastname' $user1; \
+ipa-modgroup --groupadd $grp2 $grp1; \
+ipa-modgroup --add $user1 $grp2; \
+ipa-modgroup --setattr cn=$grp1alt $grp1"
+		if [ $? -ne 0 ]; then
+			echo "ERROR - $tet_thistest failed in section 1 itteration $runnum"
+			tet_result FAIL
 		fi
-	done
-	for s in $CLIENTS; do
-		if [ "$s" != "" ]; then
-			ls
-			ret=$?
-			if [ $ret -ne 0 ]; then
-				echo "ERROR - kinit on $s failed"
-				tet_result FAIL
-			fi
+
+		# Now check to make sure that worked
+		ssh root@$FULLHOSTNAME "ipa-finduser -a $user1 | grep $grp1alt"
+		if [ $? -ne 0 ]; then
+			echo "ERROR - $tet_thistest failed in section 2 itteration $runnum"
+			tet_result FAIL
 		fi
-	done
+
+		# Cleanup
+		ssh root@$FULLHOSTNAME "ipa-deluser $user1; \
+ipa-delgroup $grp2; \
+ipa-delgroup $grp1alt;"
+		
+		let runnum=$runnum+1
+	done	
 
 	tet_result PASS
 	echo "END $tet_thistest"
