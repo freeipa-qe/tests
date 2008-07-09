@@ -1499,7 +1499,7 @@ ipa-modgroup --setattr cn=$grp1alt $grp1"
 			tet_result FAIL
 		fi
 
-		# Now check to make sure that worked
+		# Now check to make sure that grp1 got renamed in user1's memberof
 		ssh root@$FULLHOSTNAME "ipa-finduser -a $user1 | grep $grp1alt"
 		if [ $? -ne 0 ]; then
 			echo "ERROR - $tet_thistest failed in section 2 itteration $runnum"
@@ -1547,14 +1547,14 @@ ipa-modgroup --remove $user1 $grp1"
 
 		# Now check to make sure that worked
 		ssh root@$FULLHOSTNAME "ipa-finduser -a $user1 | grep $grp1"
-		if [ $? -eq 1 ]; then
+		if [ $? -eq 0 ]; then
 			echo "ERROR - $tet_thistest failed in section 2 itteration $runnum"
 			tet_result FAIL
 		fi
 
 		# Cleanup
 		ssh root@$FULLHOSTNAME "ipa-deluser $user1; \
-ipa-delgroup $grp2;"
+ipa-delgroup $grp1;"
 		
 		let runnum=$runnum+1
 	done	
@@ -1590,16 +1590,16 @@ ipa-modgroup --groupadd $grp1 $grp2"
 			tet_result FAIL
 		fi
 
-		# Now check to make sure that worked
+		# Now check to make sure that grp1 isn't listed as a member of grp1
 		ssh root@$FULLHOSTNAME "ipa-findgroup $grp1 | grep $grp1:"
-		if [ $? -eq 1 ]; then
+		if [ $? -eq 0 ]; then
 			echo "ERROR - $tet_thistest failed in section 2 itteration $runnum"
 			tet_result FAIL
 		fi
 
-		# Now check to make sure that worked
+		# Now check to make sure that grp2 isn't a member of grp2
 		ssh root@$FULLHOSTNAME "ipa-findgroup $grp2 | grep $grp2:"
-		if [ $? -eq 1 ]; then
+		if [ $? -eq 0 ]; then
 			echo "ERROR - $tet_thistest failed in section 3 itteration $runnum"
 			tet_result FAIL
 		fi
