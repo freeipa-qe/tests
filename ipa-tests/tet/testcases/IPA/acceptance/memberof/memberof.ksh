@@ -19,7 +19,7 @@ ic10="tp10"
 ic11="tp11"
 ic12="tp12 tp13 tp14"
 ic13="tp15"
-ic14="bug438891"
+ic14="bug438891 bug439097 bug439450 bug439628"
 
 ######################################################################
 tp1()
@@ -1487,6 +1487,7 @@ bug438891()
 
 	runnum=0
 	while [[ $runnum -lt $ITTERATIONS ]]; do
+		echo "Test $tet_thistest Itteration $runnum"
 		ssh root@$FULLHOSTNAME "/usr/sbin/ipa-addgroup $grp1 -g 37 -d 'group 438891a for testing'; \
 /usr/sbin/ipa-addgroup $grp2 -g 35 -d 'group 438891b for testing'; \
 /usr/sbin/ipa-adduser -f '438891' -l 'lastname' $user1; \
@@ -1517,6 +1518,155 @@ ipa-delgroup $grp1alt;"
 	echo "END $tet_thistest"
 }
 ######################################################################
+
+######################################################################
+# Test for bug https://bugzilla.redhat.com/show_bug.cgi?id=439097
+######################################################################
+bug439097()
+{
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+	# Kinit everywhere
+	echo "START $tet_thistest"
+	# Setup
+	grp1="group439097" #
+	user1="u439097" 
+	
+	eval_vars M1
+
+	runnum=0
+	while [[ $runnum -lt $ITTERATIONS ]]; do
+		echo "Test $tet_thistest Itteration $runnum"
+		ssh root@$FULLHOSTNAME "/usr/sbin/ipa-addgroup $grp1 -g 37 -d 'group 438891a for testing'; \
+/usr/sbin/ipa-adduser -f '438891' -l 'lastname' $user1; \
+ipa-modgroup --add $user1 $grp1; \
+ipa-modgroup --remove $user1 $grp1"
+		if [ $? -ne 0 ]; then
+			echo "ERROR - $tet_thistest failed in section 1 itteration $runnum"
+			tet_result FAIL
+		fi
+
+		# Now check to make sure that worked
+		ssh root@$FULLHOSTNAME "ipa-finduser -a $user1 | grep $grp1"
+		if [ $? -eq 1 ]; then
+			echo "ERROR - $tet_thistest failed in section 2 itteration $runnum"
+			tet_result FAIL
+		fi
+
+		# Cleanup
+		ssh root@$FULLHOSTNAME "ipa-deluser $user1; \
+ipa-delgroup $grp2;"
+		
+		let runnum=$runnum+1
+	done	
+
+	tet_result PASS
+	echo "END $tet_thistest"
+}
+######################################################################
+
+######################################################################
+# Test for bug https://bugzilla.redhat.com/show_bug.cgi?id=439450
+######################################################################
+bug439450()
+{
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+	# Kinit everywhere
+	echo "START $tet_thistest"
+	# Setup
+	grp1="group439450a" #
+	grp1="group439450b" #
+	
+	eval_vars M1
+
+	runnum=0
+	while [[ $runnum -lt $ITTERATIONS ]]; do
+		echo "Test $tet_thistest Itteration $runnum"
+		ssh root@$FULLHOSTNAME "/usr/sbin/ipa-addgroup $grp1 -g 37 -d 'group a for testing'; \
+/usr/sbin/ipa-addgroup $grp2 -g 39 -d 'group b for testing'; \
+ipa-modgroup --groupadd $grp2 $grp1; \
+ipa-modgroup --groupadd $grp1 $grp2"
+		if [ $? -ne 0 ]; then
+			echo "ERROR - $tet_thistest failed in section 1 itteration $runnum"
+			tet_result FAIL
+		fi
+
+		# Now check to make sure that worked
+		ssh root@$FULLHOSTNAME "ipa-findgroup $grp1 | grep $grp1:"
+		if [ $? -eq 1 ]; then
+			echo "ERROR - $tet_thistest failed in section 2 itteration $runnum"
+			tet_result FAIL
+		fi
+
+		# Now check to make sure that worked
+		ssh root@$FULLHOSTNAME "ipa-findgroup $grp2 | grep $grp2:"
+		if [ $? -eq 1 ]; then
+			echo "ERROR - $tet_thistest failed in section 3 itteration $runnum"
+			tet_result FAIL
+		fi
+
+		# Cleanup
+		ssh root@$FULLHOSTNAME "ipa-delgroup $grp1; \
+ipa-delgroup $grp2;"
+		
+		let runnum=$runnum+1
+	done	
+
+	tet_result PASS
+	echo "END $tet_thistest"
+}
+######################################################################
+
+######################################################################
+# Test for bug https://bugzilla.redhat.com/show_bug.cgi?id=439628
+######################################################################
+bug439628()
+{
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+	# Kinit everywhere
+	echo "START $tet_thistest"
+	# Setup
+	grp1="group439628a" #
+	grp2="group439628b" #
+	user1="u439628" 
+	
+	eval_vars M1
+
+	runnum=0
+	while [[ $runnum -lt $ITTERATIONS ]]; do
+		echo "Test $tet_thistest Itteration $runnum"
+		ssh root@$FULLHOSTNAME "/usr/sbin/ipa-addgroup $grp1 -g 87 -d 'group a for testing'; \
+/usr/sbin/ipa-addgroup $grp2 -g 85 -d 'group b for testing'; \
+/usr/sbin/ipa-adduser -f 'u1' -l 'lastname' $user1; \
+ipa-modgroup --groupadd $grp2 $grp1; \
+ipa-modgroup --add $user1 $grp2; \
+ipa-modgroup --add $user1 $grp1; \
+ipa-modgroup --remove $user1 $grp1;"
+		if [ $? -ne 0 ]; then
+			echo "ERROR - $tet_thistest failed in section 1 itteration $runnum"
+			tet_result FAIL
+		fi
+
+		# Now check to make sure that worked
+		ssh root@$FULLHOSTNAME "ipa-finduser -a $user1 | grep $grp1"
+		if [ $? -ne 0 ]; then
+			echo "ERROR - $tet_thistest failed in section 2 itteration $runnum"
+			echo "ERROR - $grp1 doesn't exist in $user1"
+			tet_result FAIL
+		fi
+
+		# Cleanup
+		ssh root@$FULLHOSTNAME "ipa-deluser $user1; \
+ipa-delgroup $grp1; \
+ipa-delgroup $grp2;"
+		
+		let runnum=$runnum+1
+	done	
+
+	tet_result PASS
+	echo "END $tet_thistest"
+}
+######################################################################
+
 
 ######################################################################
 tpx()
