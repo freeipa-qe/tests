@@ -1574,7 +1574,7 @@ bug439450()
 	echo "START $tet_thistest"
 	# Setup
 	grp1="group439450a" #
-	grp1="group439450b" #
+	grp2="group439450b" #
 	
 	eval_vars M1
 
