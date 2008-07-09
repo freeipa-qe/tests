@@ -86,12 +86,12 @@ multimaster_run()
 		return
 	fi
 	echo "multimaster run..."
-	echo "$TET_ROOT/$MainTccName -e -s $TET_ROOT/testcases/IPA/1.0/acceptance/multimaster/tet_scen -x $TET_ROOT/testcases/IPA/tetexecpl.cfg $TET_ROOT/testcases/IPA/1.0/acceptance/multimaster multimaster"
+	echo "$TET_ROOT/$MainTccName -e -s $TET_ROOT/testcases/IPA/acceptance/multimaster/tet_scen -x $TET_ROOT/testcases/IPA/tetexecpl.cfg $TET_ROOT/testcases/IPA/acceptance/multimaster multimaster"
 
 	$TET_ROOT/$MainTccName \
-		-e -s $TET_ROOT/testcases/IPA/1.0/acceptance/multimaster/tet_scen \
+		-e -s $TET_ROOT/testcases/IPA/acceptance/multimaster/tet_scen \
 		-x $TET_ROOT/testcases/IPA/tetexecpl.cfg \
-		$TET_ROOT/testcases/IPA/1.0/acceptance/multimaster \
+		$TET_ROOT/testcases/IPA/acceptance/multimaster \
 		multimaster > $MainTmpDir/multimaster.startup.out 2>&1
 	echo ""
 	echo "multimaster startup $MainTmpDir/multimaster.startup.out"

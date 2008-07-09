@@ -86,9 +86,9 @@ quickuninstall_run()
 	fi
 	echo "QuickUninstall run..."
 	$TET_ROOT/$MainTccName \
-		-e -s $TET_ROOT/testcases/IPA/1.0/acceptance/quickuninstall/tet_scen \
+		-e -s $TET_ROOT/testcases/IPA/acceptance/quickuninstall/tet_scen \
 		-x $TET_ROOT/testcases/IPA/tetexecpl.cfg \
-		$TET_ROOT/testcases/IPA/1.0/acceptance/quickuninstall \
+		$TET_ROOT/testcases/IPA/acceptance/quickuninstall \
 		uninstall > $MainTmpDir/quickuninstall.cleanup.out 2>&1
 	main_analyze "QuickUninstall cleanup" `grep "tcc: journal file is" $MainTmpDir/quickuninstall.cleanup.out | awk '{print $5}'` $MainTmpDir/quickuninstall.cleanup.out
 	MainReportFiles="$MainReportFiles $MainTmpDir/quickuninstall.cleanup.out"

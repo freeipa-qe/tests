@@ -86,12 +86,12 @@ memberof_run()
 		return
 	fi
 	echo "memberof run..."
-	echo "$TET_ROOT/$MainTccName -e -s $TET_ROOT/testcases/IPA/1.0/acceptance/memberof/tet_scen -x $TET_ROOT/testcases/IPA/tetexecpl.cfg $TET_ROOT/testcases/IPA/1.0/acceptance/memberof memberof"
+	echo "$TET_ROOT/$MainTccName -e -s $TET_ROOT/testcases/IPA/acceptance/memberof/tet_scen -x $TET_ROOT/testcases/IPA/tetexecpl.cfg $TET_ROOT/testcases/IPA/acceptance/memberof memberof"
 
 	$TET_ROOT/$MainTccName \
-		-e -s $TET_ROOT/testcases/IPA/1.0/acceptance/memberof/tet_scen \
+		-e -s $TET_ROOT/testcases/IPA/acceptance/memberof/tet_scen \
 		-x $TET_ROOT/testcases/IPA/tetexecpl.cfg \
-		$TET_ROOT/testcases/IPA/1.0/acceptance/memberof \
+		$TET_ROOT/testcases/IPA/acceptance/memberof \
 		memberof > $MainTmpDir/memberof.startup.out 2>&1
 	echo ""
 	echo "memberof startup $MainTmpDir/memberof.startup.out"
