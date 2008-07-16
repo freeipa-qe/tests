@@ -45,6 +45,11 @@ SetupServer()
 			echo "ERROR - ipa-server-install on $FULLHOSTNAME failed."
 			return 1;
 		fi
+		FixBindServer M1
+		if [ $? -ne 0 ]; then
+			echo "ERROR - FixBindServer on $FULLHOSTNAME failed."
+			return 1;
+		fi
 	else 
 		echo "setting up server $1 as a replica"
 		replica_hostname=$FULLHOSTNAME
@@ -98,7 +103,9 @@ set timeout -1' > $TET_TMP_DIR/replica-install.exp
 		echo "spawn ipa-replica-install --debug /tmp/replica-info-$replica_hostname" >> $TET_TMP_DIR/replica-install.exp
 		echo 'match_max 100000
 expect -exact "Directory Manager (existing master) password: "' >> $TET_TMP_DIR/replica-install.exp
-		echo "send -- \"$KERB_MASTER_PASS\r\"" >> $TET_TMP_DIR/replica-install.exp
+		echo "send -- \"$KERB_MASTER_PASS\"" >> $TET_TMP_DIR/replica-install.exp
+		echo 'send -- "rree"' | sed s/rr/'\\'/g | sed s/ee/r/g
+		echo 'send -- "rree"' | sed s/rr/'\\'/g | sed s/ee/r/g >> $TET_TMP_DIR/replica-install.exp
 		echo 'expect eof' >> $TET_TMP_DIR/replica-install.exp
 
 		ssh root@$replica_hostname "ps -ef | grep slapd"

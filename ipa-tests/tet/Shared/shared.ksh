@@ -168,6 +168,50 @@ is_server_alive()
 	return 0;
 }
 
+# This sets the password of a new user
+# Usage as follows:
+# SetUserPassword <server identifer> <username> <password>
+SetUserPassword()
+{
+	if [ "$2" = "" ]; then
+		echo 'ERROR - You must call SetUserPassword with a username in the $2 position'
+		return 1;
+	fi 
+
+	if [ "$3" = "" ]; then
+		echo 'ERROR - You must call SetUserPassword with a password in the $3 position'
+		return 1;
+	fi 
+	SID=$1
+	eval_vars $SID
+        rm -f $TET_TMP_DIR/SetUserPassword.exp
+        echo 'set timeout 60
+set send_slow {1 .1}' > $TET_TMP_DIR/SetUserPassword.exp
+	echo "spawn ipa-passwd $2" >> $TET_TMP_DIR/SetUserPassword.exp
+	echo 'match_max 100000' >> $TET_TMP_DIR/SetUserPassword.exp
+	echo 'sleep 15' >> $TET_TMP_DIR/SetUserPassword.exp
+	echo "send -s -- \"$3\"" >> $TET_TMP_DIR/SetUserPassword.exp
+	echo 'send -s -- "\\r"' >> $TET_TMP_DIR/SetUserPassword.exp
+	echo 'sleep 15' >> $TET_TMP_DIR/SetUserPassword.exp
+	echo "send -s -- \"$3\"" >> $TET_TMP_DIR/SetUserPassword.exp
+	echo 'send -s -- "\\r"' >> $TET_TMP_DIR/SetUserPassword.exp
+	echo 'expect eof ' >> $TET_TMP_DIR/SetUserPassword.exp
+
+	ssh root@$FULLHOSTNAME 'rm -f /tmp/SetUserPassword.exp'
+	scp $TET_TMP_DIR/SetUserPassword.exp root@$FULLHOSTNAME:/tmp/.
+
+	ssh root@$FULLHOSTNAME '/usr/bin/expect /tmp/SetUserPassword.exp'
+	ret=$?
+	if [ $ret != 0 ]; then
+		echo "ERROR - Setting the password of user $1, password of $2 failed";
+		return 1;
+	fi
+
+	return 0;
+
+}
+
+
 # KinitAs kinits as a defined user on a defined server, using a given password.
 # input as follows:
 # KinitAs <server identifer> <username> <password>
@@ -209,6 +253,56 @@ echo 'sleep 15' >> $TET_TMP_DIR/kinit.exp
 	return 0;
 
 }
+
+# KinitAs kinits as a defined user on a defined server, using a given password.
+# This is to be used to kinit as a freshly created user that will need to 
+# input as follows:
+# KinitAs <server identifer> <username> <password> <newpassword>
+KinitAsFirst()
+{
+	if [ "$2" = "" ]; then
+		echo 'ERROR - You must call KinitAs with a username in the $2 position'
+		return 1;
+	fi 
+	if [ "$3" = "" ]; then
+		echo 'ERROR - You must call KinitAs with a password in the $3 position'
+		return 1;
+	fi 
+	SID=$1
+	eval_vars $SID
+        rm -f $TET_TMP_DIR/kinit.exp
+        echo 'set timeout 60
+set send_slow {1 .1}' > $TET_TMP_DIR/kinit.exp
+	echo "spawn /usr/kerberos/bin/kinit $2" >> $TET_TMP_DIR/kinit.exp
+	echo 'match_max 100000' >> $TET_TMP_DIR/kinit.exp
+	echo 'sleep 15' >> $TET_TMP_DIR/kinit.exp
+	echo "send -s -- \"$3\"" >> $TET_TMP_DIR/kinit.exp
+	echo 'send -s -- "\\r"' >> $TET_TMP_DIR/kinit.exp
+	echo 'sleep 5' >> $TET_TMP_DIR/kinit.exp
+	echo "send -s -- \"$4\"" >> $TET_TMP_DIR/kinit.exp
+	echo 'send -s -- "\\r"' >> $TET_TMP_DIR/kinit.exp
+	echo 'sleep 5' >> $TET_TMP_DIR/kinit.exp
+	echo "send -s -- \"$4\"" >> $TET_TMP_DIR/kinit.exp
+	echo 'send -s -- "\\r"' >> $TET_TMP_DIR/kinit.exp
+	echo 'expect eof ' >> $TET_TMP_DIR/kinit.exp
+
+	ssh root@$FULLHOSTNAME 'rm -f /tmp/kinit.exp'
+	scp $TET_TMP_DIR/kinit.exp root@$FULLHOSTNAME:/tmp/.
+
+	ssh root@$FULLHOSTNAME 'kdestroy;/usr/bin/expect /tmp/kinit.exp'
+	ret=$?
+	if [ $ret != 0 ]; then
+		echo "ERROR - kinit as user $1, password of $2 failed";
+		return 1;
+	fi
+
+	echo "This is a klist on the machine we just kinited on, it should show that user $2 is kinited"
+	ssh root@$FULLHOSTNAME 'klist'
+
+	return 0;
+
+}
+
 
 CheckAlive()
 {
