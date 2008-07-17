@@ -76,6 +76,7 @@ tp1()
 tp2()
 {
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+        echo "START $tet_thistest"
 
 	user1="testusr1"
 	user1pw1="D4mkcidytte3."
@@ -126,22 +127,33 @@ tp2()
 	fi
 
 	# Now attempt to set the password of user1, this should fail.
+	echo "This should fail because the min password age hasn't been reached yet"
 	SetUserPassword M1 $user1 $user1pw3
 	# Download the output from M1 to ensuer that it didn't work
 	rm -f $TET_TMP_DIR/SetUserPassword.tmp
 	scp root@$FULLHOSTNAME:/tmp/SetUserPassword-output.txt $TET_TMP_DIR/.
-	cat $TET_TMP_DIR/SetUserPassword.tmp
 	if [ $? -ne 0 ]; then
 		echo "ERROR - scp root@$FULLHOSTNAME:/tmp/SetUserPassword-output.txt $TET_TMP_DIR/. failed"
 		tet_result FAIL
 	fi
+	grep 'error' $TET_TMP_DIR/SetUserPassword-output.txt
+	if [ $? -ne 0 ]; then
+		echo "ERROR - change password produced a error"
+		echo "contents of $TET_TMP_DIR/SetUserPassword-output.txt are:"
+		cat $TET_TMP_DIR/SetUserPassword-output.txt
+		echo "contents of $TET_TMP_DIR/SetUserPassword-output.txt complete:"
+		tet_result FAIL
+	fi
 	
+	# Now, parse the output of the last SetUserPassword to ensure that it failed properly.
+
 	# incriment date 
 	let newhour=$hour+$minlife+1
 	if [ $newhour -gt 23 ]; then
 		# Hour would be two high, incrimenting day
 		let day=$day+1;
 		export hour='02'
+		export day
 	fi
 
 	# Set the date forward to make the date change valid
@@ -151,20 +163,35 @@ tp2()
 		tet_result FAIL
 	fi
 
-	# Now attempt to set the password of user1, this should fail.
+	# Now attempt to set the password of user1, this should pass.
 	SetUserPassword M1 $user1 $user1pw4
-	# Download the output from M1 to ensuer that it didn't work
+	# Download the output from M1 to ensure that it didn't work
 	rm -f $TET_TMP_DIR/SetUserPassword.tmp
-	scp root@$FULLHOSTNAME:/tmp/SetUserPassword.tmp $TET_TMP_DIR/.
+	scp root@$FULLHOSTNAME:/tmp/SetUserPassword-output.txt $TET_TMP_DIR/.
 	if [ $? -ne 0 ]; then
-		echo "ERROR - scp root@$FULLHOSTNAME:/tmp/SetUserPassword.tmp $TET_TMP_DIR/. failed"
+		echo "ERROR - scp root@$FULLHOSTNAME:/tmp/SetUserPassword-output.txt $TET_TMP_DIR/. failed"
+		tet_result FAIL
+	fi
+	grep 'Password Fails to meet minimum strength criteria' $TET_TMP_DIR/SetUserPassword-output.txt
+	if [ $? -ne 0 ]; then
+		echo "ERROR - change password didn't seem to fail in the way it should have"
+		echo "contents of $TET_TMP_DIR/SetUserPassword-output.txt are:"
+		cat $TET_TMP_DIR/SetUserPassword-output.txt
+		echo "contents of $TET_TMP_DIR/SetUserPassword-output.txt complete:"
 		tet_result FAIL
 	fi
 
-	#
+	# Now, parse the output of the last SetUserPassword to ensure that everything worked.
+	
 	tet_result PASS
 
+	# Reset the kinit on all of the machines
 	tp1
+	# Return pw policy to default
+	eval_vars M1
+	ssh root@$FULLHOSTNAME "ipa-pwpolicy --minlife 1"
+	# cleaning up the user
+	ssh root@$FULLHOSTNAME "ipa-deluser $user1"
 
 	echo "END $tet_thistest"
 }
