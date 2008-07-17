@@ -171,8 +171,10 @@ is_server_alive()
 # This sets the password of a new user
 # Usage as follows:
 # SetUserPassword <server identifer> <username> <password>
+# This program produces it's output on the <server identifer> in the /tmp/SetUserPassword-output.txt file
 SetUserPassword()
 {
+	if [ $DSTET_DEBUG = y ]; then set -x; fi
 	if [ "$2" = "" ]; then
 		echo 'ERROR - You must call SetUserPassword with a username in the $2 position'
 		return 1;
@@ -200,7 +202,7 @@ set send_slow {1 .1}' > $TET_TMP_DIR/SetUserPassword.exp
 	ssh root@$FULLHOSTNAME 'rm -f /tmp/SetUserPassword.exp'
 	scp $TET_TMP_DIR/SetUserPassword.exp root@$FULLHOSTNAME:/tmp/.
 
-	ssh root@$FULLHOSTNAME '/usr/bin/expect /tmp/SetUserPassword.exp'
+	ssh root@$FULLHOSTNAME '/usr/bin/expect /tmp/SetUserPassword.exp > /tmp/SetUserPassword-output.txt'
 	ret=$?
 	if [ $ret != 0 ]; then
 		echo "ERROR - Setting the password of user $1, password of $2 failed";
@@ -217,6 +219,7 @@ set send_slow {1 .1}' > $TET_TMP_DIR/SetUserPassword.exp
 # KinitAs <server identifer> <username> <password>
 KinitAs()
 {
+	if [ $DSTET_DEBUG = y ]; then set -x; fi
 	if [ "$2" = "" ]; then
 		echo 'ERROR - You must call KinitAs with a username in the $2 position'
 		return 1;
@@ -260,6 +263,7 @@ echo 'sleep 15' >> $TET_TMP_DIR/kinit.exp
 # KinitAs <server identifer> <username> <password> <newpassword>
 KinitAsFirst()
 {
+	if [ $DSTET_DEBUG = y ]; then set -x; fi
 	if [ "$2" = "" ]; then
 		echo 'ERROR - You must call KinitAs with a username in the $2 position'
 		return 1;
