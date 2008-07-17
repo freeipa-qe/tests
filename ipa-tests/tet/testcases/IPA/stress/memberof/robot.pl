@@ -252,7 +252,7 @@ sub init_local{
 	my ($indent) = shift;  
 	undef %g  ;
 	undef %u  ; 
-	$usize = $gsize * 10; 
+	$usize = $gsize * 100; 
 	$ulevel = $glevel; 
 	$loopcounter = 0;
 	$addcounter = 0;
@@ -374,17 +374,20 @@ sub system_cleanup {
 		}# all entries
 	} 
 	logger ($indent.$logmsg);
-	
-	logger($indent."[system_cleanup] start deleting..."); 
-	foreach my $id (@leftover){
-		$logmsg ="[system_cleanup] delete [$id]";
-		if(ldap_delete($id)){
-			$logmsg .= "... success";
-		}else{
-			$logmsg .= "... failed";
-		}
-		logger($indent.$logmsg);
-	}#delete all in leftover queue
+	if ($#leftover == -1){
+		logger ($indent."[system_cleanup] system is clean";
+	}else{
+		logger($indent."[system_cleanup] start deleting..."); 
+		foreach my $id (@leftover){
+			$logmsg ="[system_cleanup] delete [$id]";
+			if(ldap_delete($id)){
+				$logmsg .= "... success";
+			}else{
+				$logmsg .= "... failed";
+			}
+			logger($indent.$logmsg);
+		}#delete all in leftover queue
+	}
 	logger($indent."[system_cleanup] finished");
 }# system_cleanup
 
