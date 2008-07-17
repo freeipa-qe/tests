@@ -33,13 +33,16 @@ get_time()
 	export sec=$(date +%S)
 }
 
+tp1()
+{
+	ResetKinit
+}
 
 ######################################################################
-tp1()
+ResetKinit()
 {
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
         # Kinit everywhere
-        echo "START $tet_thistest"
         for s in $SERVERS; do
                 if [ "$s" != "" ]; then
                         echo "kiniting as $DS_USER, password $DM_ADMIN_PASS on $s"
@@ -64,11 +67,16 @@ tp1()
                         fi
                 fi
         done
-
-        tet_result PASS
-        echo "END $tet_thistest"
 }
 
+tp1()
+{
+        echo "START $tet_thistest"
+	ResetKinit
+        tet_result PASS
+        echo "END $tet_thistest"
+
+}
 
 ######################################################################
 # minlife
@@ -186,7 +194,7 @@ tp2()
 	tet_result PASS
 
 	# Reset the kinit on all of the machines
-	tp1
+	ResetKinit
 	# Return pw policy to default
 	eval_vars M1
 	ssh root@$FULLHOSTNAME "ipa-pwpolicy --minlife 1"
