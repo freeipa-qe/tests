@@ -261,6 +261,7 @@ echo 'sleep 15' >> $TET_TMP_DIR/kinit.exp
 # This is to be used to kinit as a freshly created user that will need to 
 # input as follows:
 # KinitAs <server identifer> <username> <password> <newpassword>
+# This sub produces the output into /tmp/KinitAsFirst-out.txt on the destination machine
 KinitAsFirst()
 {
 	if [ $DSTET_DEBUG = y ]; then set -x; fi
@@ -293,13 +294,17 @@ set send_slow {1 .1}' > $TET_TMP_DIR/kinit.exp
 	ssh root@$FULLHOSTNAME 'rm -f /tmp/kinit.exp'
 	scp $TET_TMP_DIR/kinit.exp root@$FULLHOSTNAME:/tmp/.
 
-	ssh root@$FULLHOSTNAME 'kdestroy;/usr/bin/expect /tmp/kinit.exp'
+	ssh root@$FULLHOSTNAME 'kdestroy;/usr/bin/expect /tmp/kinit.exp > /tmp/KinitAsFirst-out.txt'
 	ret=$?
 	if [ $ret != 0 ]; then
 		echo "ERROR - kinit as user $1, password of $2 failed";
 		return 1;
 	fi
-
+	
+	if [ $DSTET_DEBUG = y ]; then
+		echo "printing out kinit output"
+		ssh root@$FULLHOSTNAME 'cat /tmp/KinitAsFirst-out.txt'
+	fi
 	echo "This is a klist on the machine we just kinited on, it should show that user $2 is kinited"
 	ssh root@$FULLHOSTNAME 'klist'
 
