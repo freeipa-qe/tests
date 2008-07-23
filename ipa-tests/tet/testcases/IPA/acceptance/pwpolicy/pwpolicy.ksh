@@ -11,7 +11,7 @@ tet_startup="CheckAlive"
 tet_cleanup="pw_cleanup"
 iclist="ic1 ic2"
 ic1="tp1"
-ic2="tp2"
+ic2="tp2 tp3"
 hour=0
 min=0
 sec=0
@@ -94,6 +94,9 @@ tp2()
 		echo "ERROR - setting the date on $FULLHOSTNAME failed"
 		tet_result FAIL
 	fi
+
+	# Get a new admin ticket to be sure that the ticket won't be expired
+	ResetKinit	
 
 	# add user to test with
 	ssh root@$FULLHOSTNAME "ipa-adduser -f 'test user 1' -l 'lastname' $user1;"
@@ -221,6 +224,9 @@ tp3()
 		tet_result FAIL
 	fi
 
+	# Get a new admin ticket to be sure that the ticket won't be expired
+	ResetKinit	
+
 	# add user to test with
 	ssh root@$FULLHOSTNAME "ipa-adduser -f 'test user 1' -l 'lastname' $user1;"
 	if [ $? != 0 ]; then
@@ -231,7 +237,7 @@ tp3()
 	# set that users password
 	SetUserPassword M1 $user1 $user1pw1	
 	if [ $? != 0 ]; then
-		echo "ERROR - SetUserPasswordfailed on $FULLHOSTNAME";
+		echo "ERROR - SetUserPassword failed on $FULLHOSTNAME";
 		tet_result FAIL
 	fi
 
@@ -242,7 +248,7 @@ tp3()
 		tet_result FAIL
 	fi
 
-	# kinit as the user
+	# kinit as the user to make sure the password is valid
 	ssh root@$FULLHOSTNAME "kdestroy"
 	if [ $? -ne 0 ]; then
 		echo "ERROR - kdestroy on $FULLHOSTNAME failed"
@@ -279,8 +285,8 @@ tp3()
 		export hour=$newhour
 	fi
 
-	# incriment date by day + maxlife +1
-	let newday=$day+$maxlife+1;
+	# incriment date by day + maxlife + 2
+	let newday=$day+$maxlife+2;
 	if [ $newday -gt 28 ]; then
 		# Day might be two high, setting the month higher
 		export day='01'
@@ -305,74 +311,43 @@ tp3()
 		tet_result FAIL
 	fi
 
-	# now try to kinit as the user again hoping to get the "give new pw prompt"
-	KinitAsFirst M1 $user1 $user1pw1 $user1pw2
+	# kinit as the user
+	ssh root@$FULLHOSTNAME "kdestroy"
+	if [ $? -ne 0 ]; then
+		echo "ERROR - kdestroy on $FULLHOSTNAME failed"
+		tet_result FAIL
+	fi
+	KinitAsFirst M1 $user1 $user1pw2 $user1pw3
+	if [ $? -ne 0 ]; then
+		echo "ERROR - kinit as $user1 on $FULLHOSTNAME failed"
+		tet_result FAIL
+	fi
 
-	# Now attempt to set the password of user1, this should fail.
-	echo "This should fail because the min password age hasn't been reached yet"
-	SetUserPassword M1 $user1 $user1pw3
-	# Download the output from M1 to ensuer that it didn't work
-	rm -f $TET_TMP_DIR/SetUserPassword.tmp
-	scp root@$FULLHOSTNAME:/tmp/SetUserPassword-output.txt $TET_TMP_DIR/.
+	# Determine if that worked
+	rm -f $TET_TMP_DIR/KinitAsFirst-out.txt
+	scp root@$FULLHOSTNAME:/tmp/KinitAsFirst-out.txt $TET_TMP_DIR/.
 	if [ $? -ne 0 ]; then
 		echo "ERROR - scp root@$FULLHOSTNAME:/tmp/SetUserPassword-output.txt $TET_TMP_DIR/. failed"
 		tet_result FAIL
 	fi
 	# Now, parse the output of the last SetUserPassword to ensure that it failed properly.
-	grep 'error' $TET_TMP_DIR/SetUserPassword-output.txt
+	grep 'Password expired' $TET_TMP_DIR/KinitAsFirst-out.txt
 	if [ $? -ne 0 ]; then
-		echo "ERROR - change password produced a error"
-		echo "contents of $TET_TMP_DIR/SetUserPassword-output.txt are:"
-		cat $TET_TMP_DIR/SetUserPassword-output.txt
-		echo "contents of $TET_TMP_DIR/SetUserPassword-output.txt complete:"
+		echo "ERROR - password did not seem to expire when it should have"
+		echo "contents of $TET_TMP_DIR/KinitAsFirst-out.txt are:"
+		cat $TET_TMP_DIR/KinitAsFirst-out.txt
+		echo "contents of $TET_TMP_DIR/KinitAsFirst-out.txt complete:"
 		tet_result FAIL
 	fi
-
-	# incriment date 
-	let newhour=$hour+$minlife+1
-	if [ $newhour -gt 23 ]; then
-		# Hour would be two high, incrimenting day
-		let day=$day+1;
-		export hour='02'
-		export day
-	fi
-
-	# Set the date forward to make the date change valid
-	ssh root@$FULLHOSTNAME "date $month$day$hour$min$year"
-	if [ $? -ne 0 ]; then
-		echo "ERROR - setting the date on $FULLHOSTNAME failed"
-		tet_result FAIL
-	fi
-
-	# Now attempt to set the password of user1, this should pass.
-	SetUserPassword M1 $user1 $user1pw4
-	# Download the output from M1 to ensure that it didn't work
-	rm -f $TET_TMP_DIR/SetUserPassword.tmp
-	scp root@$FULLHOSTNAME:/tmp/SetUserPassword-output.txt $TET_TMP_DIR/.
-	if [ $? -ne 0 ]; then
-		echo "ERROR - scp root@$FULLHOSTNAME:/tmp/SetUserPassword-output.txt $TET_TMP_DIR/. failed"
-		tet_result FAIL
-	fi
-	grep 'Password Fails to meet minimum strength criteria' $TET_TMP_DIR/SetUserPassword-output.txt
-	if [ $? -ne 0 ]; then
-		echo "ERROR - change password didn't seem to fail in the way it should have"
-		echo "contents of $TET_TMP_DIR/SetUserPassword-output.txt are:"
-		cat $TET_TMP_DIR/SetUserPassword-output.txt
-		echo "contents of $TET_TMP_DIR/SetUserPassword-output.txt complete:"
-		tet_result FAIL
-	fi
-
-	# Now, parse the output of the last SetUserPassword to ensure that everything worked.
-	
-	tet_result PASS
 
 	# Reset the kinit on all of the machines
 	ResetKinit
 	# Return pw policy to default
 	eval_vars M1
-	ssh root@$FULLHOSTNAME "ipa-pwpolicy --minlife 1"
 	# cleaning up the user
 	ssh root@$FULLHOSTNAME "ipa-deluser $user1"
+
+	tet_result PASS
 
 	echo "END $tet_thistest"
 }
