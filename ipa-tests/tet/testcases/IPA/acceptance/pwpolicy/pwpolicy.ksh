@@ -21,6 +21,7 @@ year=0
 
 # options to use throughout the tests
 minlife=2
+# this value must not be 7 as that number is used in the end of tp3
 maxlife=2
 
 # This function populates the current date into the hour, min, sec, month, day and year vars
@@ -349,6 +350,13 @@ tp3()
 	eval_vars M1
 	# cleaning up the user
 	ssh root@$FULLHOSTNAME "ipa-deluser $user1"
+
+	# resetting password policy 
+	ssh root@$FULLHOSTNAME "ipa-pwpolicy --maxlife 7"
+	if [ $? -ne 0 ]; then
+		echo "ERROR - ipa-pwpolicy on $FULLHOSTNAME failed"
+		tet_result FAIL
+	fi
 
 	tet_result PASS
 
