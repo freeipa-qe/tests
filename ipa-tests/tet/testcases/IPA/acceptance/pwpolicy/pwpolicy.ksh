@@ -145,6 +145,8 @@ tp2()
 	grep 'error' $TET_TMP_DIR/SetUserPassword-output.txt
 	if [ $? -ne 0 ]; then
 		echo "ERROR - change password produced a error"
+		echo "kinit is:"
+		ssh root@$FULLHOSTNAME "klist"
 		echo "contents of $TET_TMP_DIR/SetUserPassword-output.txt are:"
 		cat $TET_TMP_DIR/SetUserPassword-output.txt
 		echo "contents of $TET_TMP_DIR/SetUserPassword-output.txt complete:"
@@ -155,8 +157,9 @@ tp2()
 	let newhour=$hour+$minlife+1
 	if [ $newhour -gt 23 ]; then
 		# Hour would be two high, incrimenting day
-		let day=$day+1;
+		let newday=$day+1;
 		export hour='02'
+		day=`printf "%02d" $newday`
 		export day
 	fi
 
@@ -269,20 +272,20 @@ tp3()
 		if [ $newday -gt 28 ]; then
 			# Day might be two high, setting the month higher
 			export day='01'
-			let $newmonth=$month+1;
+			let newmonth=$month+1;
 			if [ $newmonth -gt 12 ]; then
 				# month will now be greater than december, incrimenting year
 				export month='01'
 				let year=$year+1
 				export year
 			else 
-				export month=$newmonth
+				export month=`printf "%02d" $newmonth`
 			fi
 		else
-			export day=$newday
+			export day=`printf "%02d" $newday`
 		fi
 	else
-		export hour=$newhour
+		export hour=`printf "%02d" $newhour`
 	fi
 
 	# incriment date by day + maxlife + 2
@@ -290,17 +293,17 @@ tp3()
 	if [ $newday -gt 28 ]; then
 		# Day might be two high, setting the month higher
 		export day='01'
-		let $newmonth=$month+1;
+		let newmonth=$month+1;
 		if [ $newmonth -gt 12 ]; then
 			# month will now be greater than december, incrimenting year
 			export month='01'
 			let year=$year+1
 			export year
 		else 
-			export month=$newmonth
+			export month=`printf "%02d" $newmonth`
 		fi
 	else
-		export day=$newday
+		export day=`printf "%02d" $newday`
 	fi
 
 	# Set the date to the new data
