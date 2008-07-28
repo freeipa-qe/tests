@@ -42,21 +42,14 @@ stress_save()
 #
 stress_check()
 {
-
-		quickinstall_check
-		memberof_check
-		multimaster_check
-		cli_check
-		pwpolicy_check
-		quickuninstall_check
-		sample_check
+		kinit_check
 }
 
 # This function will run the test suite
 #
 stress_run()
 {
-echo "Starting Acceptance Tests........."
+echo "Starting Stress Tests........."
 
 TET_SUITE_ROOT=$mainRunBaseDir/kinit; export TET_SUITE_ROOT
 if [ $MainRunStartup = y ] ; then kinit_startup ; fi
