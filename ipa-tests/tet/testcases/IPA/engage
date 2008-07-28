@@ -25,6 +25,8 @@
 # 15/06/08 | Michael Gregg | added updates to allow usage in IPA tet system
 # -----------------------------------------------------------------------------
 #set -x
+# Set this next line to y to see debugging output from engage(not from the tests. This gives a huge ammount of output
+engage_debug=n
 
 IPAVERSION=1.0  # change this reflect the IPA version in email subject line
 
@@ -229,6 +231,7 @@ export MainQuestions MainConfigFile MainTccName MainPerlName  MainSendmail MainS
 #
 main_init_report()
 {
+	if [ "$engage_debug" = "y" ]; then set -x; fi
 	rm -f $MainReport
 	touch $MainReport
 	if [ ! -f $MainReport ]
@@ -247,6 +250,7 @@ main_fixpath()
 # remove the /tmp_mnt fro OSF and IRIX(dchan)
 # remove drive letter for NT
 {
+	if [ "$engage_debug" = "y" ]; then set -x; fi
 # web server can't get file contain /../ in it's path
 # strip the /../ from path,
 n=$1
@@ -259,6 +263,7 @@ echo $rd/$f | sed 's:/tmp_mnt::g
 
 ENGAGE_MV()
 {
+	if [ "$engage_debug" = "y" ]; then set -x; fi
 # mv to a different file system does not work on NT (lgopal 3/00)
 in=$1
 out=$2
@@ -277,6 +282,7 @@ tottestnum=0
 
 main_analyze()
 {
+	if [ "$engage_debug" = "y" ]; then set -x; fi
 	# Generates the report
 	#
 	maTestSuite=$1
@@ -467,6 +473,7 @@ main_analyze()
 #### Add Silk test result file to the Report
 main_silkreport()
 {
+	if [ "$engage_debug" = "y" ]; then set -x; fi
 	# Generates the report
 	#
 	maTestSuite=$1
@@ -580,6 +587,7 @@ rm $MainTmpDir/a$$ $MainTmpDir/b$$ > /dev/null 2>&1
 #is function send the final report by mail
 main_send_report()
 {
+	if [ "$engage_debug" = "y" ]; then set -x; fi
 	echo >> $MainReport
 
 	case $MainOS in
@@ -729,6 +737,7 @@ main_send_report()
 #
 main_default()
 {
+	if [ "$engage_debug" = "y" ]; then set -x; fi
 	# Variables for A2k
 	#
 
@@ -853,6 +862,7 @@ main_default()
 #
 main_backendask()
 {
+	if [ "$engage_debug" = "y" ]; then set -x; fi
 
 	# A2K variables
 	#
@@ -980,6 +990,7 @@ main_backendask()
 
 ask_m1()
 {
+	if [ "$engage_debug" = "y" ]; then set -x; fi
 	echo "hostname of server 1?($HOSTNAME_M1)->"
 	read rsp
 	if [ -z "$rsp" ] ; then echo "hostname unchanged"; else HOSTNAME_M1="$rsp"; fi
@@ -1009,6 +1020,7 @@ ask_m1()
 
 ask_m2()
 {
+	if [ "$engage_debug" = "y" ]; then set -x; fi
 	echo "hostname of server 2?($HOSTNAME_M2)->"
 	read rsp
 	if [ -z "$rsp" ] ; then echo "hostname unchanged"; else HOSTNAME_M2="$rsp"; fi
@@ -1038,6 +1050,7 @@ ask_m2()
 
 ask_m3()
 {
+	if [ "$engage_debug" = "y" ]; then set -x; fi
 	echo "hostname of server 3?($HOSTNAME_M3)->"
 	read rsp
 	if [ -z "$rsp" ] ; then echo "Server needs a hostname"; else HOSTNAME_M3="$rsp"; fi
@@ -1068,6 +1081,7 @@ ask_m3()
 ask_m4()
 {
 	echo "hostname of server 4?($HOSTNAME_M4)->"
+	if [ "$engage_debug" = "y" ]; then set -x; fi
 	read rsp
 	if [ -z "$rsp" ] ; then echo "Server needs a hostname"; exit; else HOSTNAME_M4="$rsp"; fi
 	echo "OS of server 4?"
@@ -1095,6 +1109,7 @@ ask_m4()
 
 ask_c1()
 {
+	if [ "$engage_debug" = "y" ]; then set -x; fi
 	echo "hostname of client 1?($HOSTNAME_C1)->"
 	read rsp
 	if [ -z "$rsp" ] ; then echo "Hostname unchanged"; else HOSTNAME_C1="$rsp"; fi
@@ -1138,6 +1153,7 @@ ask_c1()
 
 main_ask()
 {
+	if [ "$engage_debug" = "y" ]; then set -x; fi
 
 	TestChoice=1
 	echo "How many servers are in this test(not clients)? (4 max for now)"
@@ -1340,6 +1356,7 @@ main_ask()
 #
 main_print()
 {
+	if [ "$engage_debug" = "y" ]; then set -x; fi
 	echo "    TET_ROOT       : $TET_ROOT"
 	echo "    TET_RUN        : $TET_RUN "
 	echo "    TET_REPORT_DIR : $TET_REPORT_DIR"
@@ -1425,6 +1442,7 @@ main_print()
 #
 main_save()
 {
+	if [ "$engage_debug" = "y" ]; then set -x; fi
 	echo "TET_ROOT=$TET_ROOT"
 	echo "TET_RUN=$TET_RUN"
 	echo "TESTING_SHARED=$TESTING_SHARED"
@@ -1530,6 +1548,7 @@ TEST_CAT=""
 #
 main_load_init_values()
 {
+	if [ "$engage_debug" = "y" ]; then set -x; fi
     # If the config file exist, load it.
     #
     if [ -f $MainConfigFile ] ; then
@@ -1600,6 +1619,7 @@ main_load_init_values()
 #
 main_print_choices()
 {
+	if [ "$engage_debug" = "y" ]; then set -x; fi
     echo
     echo "General choices..."
     echo
@@ -1620,6 +1640,7 @@ main_print_choices()
 #
 main_ask_choices()
 {
+	if [ "$engage_debug" = "y" ]; then set -x; fi
     echo
     main_ask
     echo
@@ -1666,6 +1687,7 @@ main_ask_choices()
 #
 main_loop_on_choices()
 {
+	if [ "$engage_debug" = "y" ]; then set -x; fi
 	rsp=n
 	while [ $rsp != y ]
 	do
@@ -1689,6 +1711,7 @@ main_loop_on_choices()
 #
 main_save_choices()
 {
+	if [ "$engage_debug" = "y" ]; then set -x; fi
     if [ -f $MainConfigFile ] ; then
 	mv $MainConfigFile $MainConfigFile.bak
     fi
@@ -1712,6 +1735,7 @@ main_save_choices()
 #
 main_check()
 {
+	if [ "$engage_debug" = "y" ]; then set -x; fi
 
     if [ $MainReliabTests = n ] && [ $MainAcceptanceTests = n ] &&  [ $MainStressTests = n ] &&  [ $MainGuiTests = n ] && [ $MainLongDurationTests = n ] && [ $MainPerformanceTests = n ] ; then 
         echo " You have chosen not to run any tests "
@@ -1743,6 +1767,7 @@ exit 1
 #
 main_run()
 {
+	if [ "$engage_debug" = "y" ]; then set -x; fi
 	# catch signal 16, used by quickinstall to exit program
 	trap abortfunc 16 # 16 is USR1
     echo
@@ -1837,6 +1862,7 @@ main_run()
 #
 main_usage()
 {
+	if [ "$engage_debug" = "y" ]; then set -x; fi
     echo "usage: engage [-c <configfile>]"
     echo "    Run the Netscape DS automated test suites."
     echo "    -c : config file (no questions)"
@@ -1847,6 +1873,7 @@ main_usage()
 #
 main_get_options()
 {
+	if [ "$engage_debug" = "y" ]; then set -x; fi
 	# use getopt instead of getopts, problem with osf and irix (dchan)
 	set -- `getopt gc:h $*`
 	if [ $? -ne 0 ]; then
@@ -1889,6 +1916,7 @@ main_get_options()
 #
 main_main()
 {
+	if [ "$engage_debug" = "y" ]; then set -x; fi
 	main_get_options $*
 	main_load_init_values
 	if [ $MainQuestions = n ]
