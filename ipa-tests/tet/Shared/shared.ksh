@@ -216,7 +216,9 @@ set send_slow {1 .1}' > $TET_TMP_DIR/SetUserPassword.exp
 
 # KinitAs kinits as a defined user on a defined server, using a given password.
 # input as follows:
-# KinitAs <server identifer> <username> <password>
+# KinitAs <server identifer> <username> <password> fast
+# The "fast" is optional. If fast is specified then expect only waits 2 seconds between input.
+# Otherwise it waits a much safer 15 seconds
 KinitAs()
 {
 	if [ $DSTET_DEBUG = y ]; then set -x; fi
@@ -228,6 +230,11 @@ KinitAs()
 		echo 'ERROR - You must call KinitAs with a password in the $3 position'
 		return 1;
 	fi 
+	if [ "$4" = "fast" ] || [ "$5" = "Fast" ]; then
+		fast=1;
+	else
+		fast=0;
+	fi
 	SID=$1
 	eval_vars $SID
         rm -f $TET_TMP_DIR/kinit.exp
@@ -235,7 +242,11 @@ KinitAs()
 set send_slow {1 .1}' > $TET_TMP_DIR/kinit.exp
 echo "spawn /usr/kerberos/bin/kinit $2" >> $TET_TMP_DIR/kinit.exp
 echo 'match_max 100000' >> $TET_TMP_DIR/kinit.exp
-echo 'sleep 15' >> $TET_TMP_DIR/kinit.exp
+	if [ $fast -eq 1 ]; then
+		echo 'sleep 2' >> $TET_TMP_DIR/kinit.exp
+	else	
+		echo 'sleep 15' >> $TET_TMP_DIR/kinit.exp
+	fi
 	echo "send -s -- \"$3\"" >> $TET_TMP_DIR/kinit.exp
 	echo 'send -s -- "\\r"' >> $TET_TMP_DIR/kinit.exp
 	echo 'expect eof ' >> $TET_TMP_DIR/kinit.exp
