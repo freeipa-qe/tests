@@ -4,9 +4,9 @@ all
 	^kinit
 	"Ending ALL"
 
-cli
-	"Starting cli tests..."
+kinit
+	"Starting kinit tests..."
 	/kinit.ksh
-	"Ending cli tests..."
+	"Ending kinit tests..."
 
 # EOF
