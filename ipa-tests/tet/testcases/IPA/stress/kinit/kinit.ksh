@@ -24,8 +24,8 @@ tp1()
 	while [[ $runnum -lt $ITTERATIONS ]]; do
 		for s in $SERVERS; do
 			if [ "$s" != "" ]; then
-				echo "kiniting as $DS_USER, password $DM_ADMIN_PASS on $s"
-				KinitAs $s $DS_USER $DM_ADMIN_PASS
+				echo "kiniting as $DS_USER, password $DM_ADMIN_PASS on $s in a fast mode"
+				KinitAs $s $DS_USER $DM_ADMIN_PASS fast
 				ret=$?
 				if [ $ret -ne 0 ]; then
 					echo "ERROR - kinit on $s failed"
