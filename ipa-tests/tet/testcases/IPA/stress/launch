@@ -1,6 +1,6 @@
 
-# script called by either accept 
-# or launch acceptance tests manually
+# script called by either stress 
+# or launch stress tests manually
 if [ $# -lt 1 ]; then
 	echo "usage:  launch [TestRoot] [complete path of build]"
 	exit 1
@@ -101,10 +101,10 @@ sed 's#\$SRCROOT#'$BUILD'#g
 	 s#\$MAILID#'${MAILID}'#g
 	 s#\$DST64#'${DST64}'#g
 	 s#\$UNIQID#'${UNIQID}'#g' \
-		 ${R}/tetframework/data/DS/$VER/cfg/engage.acceptance.cfg > $tfile
+		 ${R}/tetframework/data/IPA/cfg/engage.stress.cfg > $tfile
 
 
-echo "Running acceptance tests on `hostname` using $BUILD from $R"
+echo "Running stress tests on `hostname` using $BUILD from $R"
 echo "==========================================================="
 echo "Content of the engage input file :"
 cat $tfile
