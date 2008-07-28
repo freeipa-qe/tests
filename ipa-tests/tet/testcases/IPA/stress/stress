@@ -1,6 +1,6 @@
 set -x
 # script called by daily build system
-# usage : accept Build.tar.gz
+# usage : stress Build.tar.gz
 H=$0
 BUILD=$1
 VER=6.0
@@ -11,8 +11,8 @@ case $H in
 	*)      		R=`pwd`/`dirname $H`   ;;
 esac
 # R is the source root, before tetframework/...
-#R=`echo $R | sed 's:/tetframework/testcases/DS/'$VER'/acceptance:/..:g'`
-R=`echo $R | sed 's:/tetframework/testcases/DS/'$VER'/acceptance::g'`
+#R=`echo $R | sed 's:/tetframework/testcases/DS/'$VER'/stress:/..:g'`
+R=`echo $R | sed 's:/tetframework/testcases/DS/'$VER'/stress::g'`
 
 # R=/h/squall/misc/serverqa/release/DS
 TESTCASE_ROOT=$R/tetframework/testcases/DS/$VER
@@ -26,7 +26,7 @@ echo TESTCASE_ROOT is $TESTCASE_ROOT
 
 
 if [ $# -lt 1 ]; then
-	echo "usage:  accept [complete path of build]"
+	echo "usage:  stress [complete path of build]"
 	exit 1
 fi
 DRIVE=""
@@ -100,7 +100,7 @@ case $hname in
 					;;
 			esac
 			;;
-	*)		echo "accept: unknown OS $hname"
+	*)		echo "stress: unknown OS $hname"
 			exit 0
 			;;
 esac
@@ -119,8 +119,8 @@ if [ "$TESTHOST" = "" ]; then
 	echo var. env. TESTHOST unknown, bye.
 	exit 1
 fi
-echo $RSH $TESTHOST sh ${DRIVE}${TESTCASE_ROOT}/acceptance/launch ${DRIVE}$R ${DRIVE}${BUILD}
-$RSH $TESTHOST sh ${DRIVE}${TESTCASE_ROOT}/acceptance/launch ${DRIVE}$R ${DRIVE}${BUILD} &
+echo $RSH $TESTHOST sh ${DRIVE}${TESTCASE_ROOT}/stress/launch ${DRIVE}$R ${DRIVE}${BUILD}
+$RSH $TESTHOST sh ${DRIVE}${TESTCASE_ROOT}/stress/launch ${DRIVE}$R ${DRIVE}${BUILD} &
 
 wait
 
