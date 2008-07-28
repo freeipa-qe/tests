@@ -1751,10 +1751,11 @@ main_run()
     echo "########### when completed."
     echo
 
-    if [ $RunInstall = y ] ; then 
+    # Now install IPA onto the machines if the option is set
+    if [ $RunInstall = y ] || [ $RunInstall = Y ]; then 
        echo "Installing IPA on all servers now";
        rm -f cat ${TET_TMP_DIR}/install_log.txt
-       if [ $DSTET_DEBUG = y ] || [ $RunInstallShow = y ]; then
+       if [ $DSTET_DEBUG = y ] || [ $RunInstallShow = y ] || [ $RunInstallShow = Y ]; then
            ksh $TET_ROOT/Shared/Full_Install | tee ${TET_TMP_DIR}/install_log.txt
            ret=$?
            if [ $ret != 0 ]; then
