@@ -262,7 +262,16 @@ echo 'match_max 100000' >> $TET_TMP_DIR/kinit.exp
 	fi
 
 	echo "This is a klist on the machine we just kinited on, it should show that user $2 is kinited"
-	ssh root@$FULLHOSTNAME 'klist'
+	ssh root@$FULLHOSTNAME 'klist' > $TET_TMP_DIR/KinitAs-output.txt
+	grep $2 $TET_TMP_DIR/KinitAs-output.txt
+	if [ $? -ne 0 ]; then
+		echo "ERROR - error in KinitAs, kinit didn't appear to work, $2 not found in $TET_TMP_DIR/KinitAs-output.txt"
+		echo "contents of $TET_TMP_DIR/KinitAs-output.txt:"
+		cat $TET_TMP_DIR/KinitAs-output.txt
+		return 1;
+	else
+		cat $TET_TMP_DIR/KinitAs-output.txt
+	fi
 
 	return 0;
 
@@ -317,7 +326,16 @@ set send_slow {1 .1}' > $TET_TMP_DIR/kinit.exp
 		ssh root@$FULLHOSTNAME 'cat /tmp/KinitAsFirst-out.txt'
 	fi
 	echo "This is a klist on the machine we just kinited on, it should show that user $2 is kinited"
-	ssh root@$FULLHOSTNAME 'klist'
+	ssh root@$FULLHOSTNAME 'klist' > $TET_TMP_DIR/KinitAsFirst-output.txt
+	grep $2 $TET_TMP_DIR/KinitAsFirst-output.txt
+	if [ $? -ne 0 ]; then
+		echo "ERROR - error in KinitAsFirst, kinit didn't appear to work, $2 not found in $TET_TMP_DIR/KinitAsFirst-output.txt"
+		echo "contents of $TET_TMP_DIR/KinitAsFirst-output.txt:"
+		cat $TET_TMP_DIR/KinitAsFirst-output.txt
+		return 1;
+	else 
+		cat $TET_TMP_DIR/KinitAsFirst-output.txt
+	fi
 
 	return 0;
 
