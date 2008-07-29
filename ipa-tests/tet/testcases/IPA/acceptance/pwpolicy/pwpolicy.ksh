@@ -216,9 +216,9 @@ tp3()
 
 	user1="testusra"
 	user1pw1="D4mkidytte3."
-	user1pw2="9384ccjdmeo8765"
-	user1pw3="lo9s3nchd765"
-	user1pw4="lso983j4nchst63^"
+	user1pw2="9384c.dmeo8765"
+	user1pw3="lo9s3n.hd765"
+	user1pw4="lso983.4nchst63^"
 
 	eval_vars M1
 	# set date on m1 to make sure it's what we think it is
@@ -375,15 +375,14 @@ tp4()
 
 	user1="testusrb"
 	user1pw1="D4mkidytte3."
-	user1pw2="9384ccjdmeo8765"
-	user1pw3="lo9s3nchd765"
-	user1pw4="lso983j4nchst63^"
+	user1pw2="9384.jdm.o8765"
+	user1pw3="lo9s3.chd.65"
+	user1pw4="lso983j4nc.st63^"
 
-	eval_vars M1
-	
 	# Get a new admin ticket to be sure that the ticket won't be expired
 	ResetKinit	
 
+	eval_vars M1	
 	# add user to test with
 	ssh root@$FULLHOSTNAME "ipa-adduser -f 'test user 1' -l 'lastname' $user1;"
 	if [ $? != 0 ]; then
@@ -441,7 +440,7 @@ tp4()
 		echo "ERROR - scp root@$FULLHOSTNAME:/tmp/SetUserPassword-output.txt $TET_TMP_DIR/. failed"
 		tet_result FAIL
 	fi
-	# Now, parse the output of the last SetUserPassword to ensure that it failed properly.
+	# Now, parse the output of the last SetUserPassword to ensure that it kinited fine.
 	grep 'error' $TET_TMP_DIR/KinitAsFirst-out.txt
 	if [ $? -eq 0 ]; then
 		echo "ERROR - KinitAsFirst didn't seem to work."
@@ -452,7 +451,7 @@ tp4()
 	fi
 
 	# set that users password
-	SetUserPassword M1 $user1 $user1pw2
+	SetUserPassword M1 $user1 $user1pw3
 	if [ $? != 0 ]; then
 		echo "ERROR - SetUserPassword failed on $FULLHOSTNAME";
 		tet_result FAIL
@@ -476,7 +475,7 @@ tp4()
 	fi
 
 	# set that users password
-	SetUserPassword M1 $user1 $user1pw3
+	SetUserPassword M1 $user1 $user1pw4
 	if [ $? != 0 ]; then
 		echo "ERROR - SetUserPassword failed on $FULLHOSTNAME";
 		tet_result FAIL
@@ -500,7 +499,7 @@ tp4()
 	fi
 
 	# set that users password to a password 2 passwords ago, this should fail
-	SetUserPassword M1 $user1 $user1pw2
+	SetUserPassword M1 $user1 $user1pw3
 	if [ $? != 0 ]; then
 		echo "ERROR - SetUserPassword failed on $FULLHOSTNAME";
 		tet_result FAIL
