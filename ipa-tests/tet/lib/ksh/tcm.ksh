@@ -154,6 +154,8 @@
 #
 # ***********************************************************************
 
+if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+
 if let TET_XXXXX=1
 then unset TET_XXXXX
 else echo "ERROR: this is not a Korn Shell"
