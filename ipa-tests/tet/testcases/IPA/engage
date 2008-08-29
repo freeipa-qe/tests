@@ -1920,6 +1920,14 @@ main_get_options()
 	return 0
 }
 
+# Runs ntpdate $NTPSERVER on the machine specified in $1
+set_date()
+{
+	ssh $1 "/etc/init.d/ntpd stop;ntpdate $NTPSERVER"&
+	return 0
+}
+
+
 # Main function
 #
 main_main()
@@ -1943,6 +1951,10 @@ main_main()
 		exit
 	fi
 
+	# Syncing clock if we can
+	/etc/init.d/ntpd stop
+	ntpdate $NTPSERVER &
+
 	export HOSTNAME_M1 OS_M1 REPO_M1
 	export HOSTNAME_M2 OS_M2 REPO_M2
 	export HOSTNAME_M3 OS_M3 REPO_M3
@@ -1951,6 +1963,21 @@ main_main()
 	export HOSTNAME_C2 OS_C2 REPO_C1
 	export HOSTNAME_C3 OS_C3 REPO_C3
 	export HOSTNAME_C4 OS_C4 REPO_C4
+	
+	# Setting the time and date on all of the servers and clients if we can
+	for s in $SERVERS; do
+		if [ "$s" != "" ]; then
+			eval_vars $s
+			set_date $FULLHOSTNAME
+		fi
+	done
+	for s in $CLIENTS; do
+		if [ "$s" != "" ]; then
+			eval_vars $s
+			set_date $FULLHOSTNAME
+		fi
+
+	done
 
 # Lakshmi Gopal. Storing the test run files in TET_TMP_DIR instead of /tmp dir. 
 	# echo "MainOD ? $MainOS"
