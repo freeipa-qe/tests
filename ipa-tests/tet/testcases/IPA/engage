@@ -762,6 +762,7 @@ main_default()
 	if [ -z "$NUMSERVERS" ] ; then NUMSERVERS=1                    ; fi
 	if [ -z "$NUMCLIENTS" ] ; then NUMCLIENTS=0                    ; fi
 	if [ -z "$DNSMASTER" ] ; then DNSMASTER="10.14.63.2"           ; fi
+	if [ -z "$NTPSERVER" ] ; then NTPSERVER="bart.sfbay.redhat.com"; fi
 	if [ -z "$RunInstall" ]; then RunInstall="n"                   ; fi
 	if [ -z "$RunInstallShow" ]; then RunInstallShow="n"           ; fi
 	if [ -z "$RunUnInstall" ]; then RunUnInstall="n"               ; fi
@@ -851,7 +852,7 @@ main_default()
 
 # export all these variables 
 
-	export TET_ROOT VER CHARSET TESTING_SHARED IROOT PREFIX TET_TMP_DIR  TET_REPORT_DIR DS_LOG_DIR RELM_NAME KERB_MASTER_PASS DM_ADMIN_PASS DS_USER NUMSERVERS SERVERS CLIENTS NUMCLIENTS DNSMASTER DNS_DOMAIN ITTERATIONS
+	export TET_ROOT VER CHARSET TESTING_SHARED IROOT PREFIX TET_TMP_DIR  TET_REPORT_DIR DS_LOG_DIR RELM_NAME KERB_MASTER_PASS DM_ADMIN_PASS DS_USER NUMSERVERS SERVERS CLIENTS NUMCLIENTS DNSMASTER DNS_DOMAIN ITTERATIONS NTPSERVER
 	export ROOTDN ROOTDNPW TETADMINPW LDAPhost LDAPport DRIVE
 	export IGNORE_KNOWN_BUGS DSTET_64 DSTET_DEBUG PkgName
 
@@ -1204,6 +1205,11 @@ main_ask()
 	echo "->"
 	read rsp
 	if [ -z "$rsp" ] ; then echo "DNS Master unchanged, continuing"; else DNSMASTER="$rsp"; fi
+	echo "What is a CURRENTLY working NTP server, too be used to sync all of the servers to at the begining of this test?"
+	echo "Default $NTPSERVER"
+	echo "->"
+	read rsp
+	if [ -z "$rsp" ] ; then echo "NTP server unchanged, continuing"; else NTPSERVER="$rsp"; fi
 	echo "What will the IPA RELM name be?(needs to be UPPER case)"
 	echo "Default $RELM_NAME:"
 	echo "->"
@@ -1349,7 +1355,7 @@ main_ask()
 
         main_backendask
 
-	export MainRunTests MainRunCleanup MainRunStartup SERVERS CLIENTS NUMSERVERS NUMCLIENTS DNSMASTER RunInstall RunInstallShow RunInstall RunInstallShow
+	export MainRunTests MainRunCleanup MainRunStartup SERVERS CLIENTS NUMSERVERS NUMCLIENTS DNSMASTER RunInstall RunInstallShow RunInstall RunInstallShow NTPSERVER
 }
 
 # This function will print the user's choices (aka variables)
@@ -1375,6 +1381,7 @@ main_print()
 	echo "    TETADMINPW     : $TETADMINPW"
         echo "    RELM_NAME      : $RELM_NAME"
 	echo "    DNS_DOMAIN     : $DNS_DOMAIN"
+	echo "    NTPSERVER      : $NTPSERVER"
 	echo "    KERB_MASTER_PASS: $KERB_MASTER_PASS"
 	echo "    DM_ADMIN_PASS  : $DM_ADMIN_PASS"
 	echo "    DS_USER        : $DS_USER"
@@ -1455,6 +1462,7 @@ main_save()
 	echo "IROOT=$IROOT"
 	echo "PREFIX=$PREFIX"
 	echo "DNSMASTER=$DNSMASTER"
+	echo "NTPSERVER=$NTPSERVER"
 	echo "RunInstall=$RunInstall"
 	echo "RunInstallShow=$RunInstallShow"
 	echo "RunUnInstall=$RunUnInstall"
