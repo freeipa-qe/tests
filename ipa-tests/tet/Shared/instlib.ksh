@@ -342,6 +342,15 @@ Cleanup()
 		return 1
 	fi
 	eval_vars $s
+
+	# resolv.conf cleanup
+	ssh root@$FULLHOSTNAME "if [ -f /etc/resolv.conf.original ]; then \
+		rm -f /etc/resolv.conf.ipasave; \
+		mv /etc/resolv.conf /etc/resolv.conf.ipasave; \
+		cat /etc/resolv.conf.original > /etc/resolv.conf; \
+		cp /etc/resolv.conf.original /etc/resolv.conf; \
+		fi"
+
 	ssh root@$FULLHOSTNAME 'rm -f /tmp/filelist.txt'
 	scp $TET_TMP_DIR/filelist.txt root@$FULLHOSTNAME:/tmp/.
 	ret=$?
@@ -365,14 +374,6 @@ Cleanup()
 		echo "some files still exist that should not"
 		return 1
 	fi
-
-	# resolv.conf cleanup
-	ssh root@$FULLHOSTNAME "if [ -f /etc/resolv.conf.original ]; then \
-		rm -f /etc/resolv.conf.ipasave; \
-		mv /etc/resolv.conf /etc/resolv.conf.ipasave; \
-		cat /etc/resolv.conf.original > /etc/resolv.conf; \
-		cp /etc/resolv.conf.original /etc/resolv.conf; \
-		fi"
 
 	# save and then remove old bind configuration
 	ssh root@$FULLHOSTNAME "rm -f /var/named.ipasave.tar.gz; \

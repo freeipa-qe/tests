@@ -112,9 +112,9 @@ tp4()
 			if [ "$DSTET_DEBUG" = "y" ]; then echo "working on $s now"; fi
 			echo "working on $s now"
 
-			ntpdate homer.sfbay.redhat.com
+			ntpdate $NTPSERVER
 			eval_vars $s
-			ssh root@$FULLHOSTNAME "/etc/init.d/ntpd stop; ntpdate homer.sfbay.redhat.com"
+			ssh root@$FULLHOSTNAME "/etc/init.d/ntpd stop; ntpdate $NTPSERVER"
 			SetupServer $s
 			ret=$?
 			if [ $ret -ne 0 ]; then

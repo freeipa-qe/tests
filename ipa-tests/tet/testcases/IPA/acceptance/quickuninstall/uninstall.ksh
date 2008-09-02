@@ -116,7 +116,7 @@ tp3()
 	rm -f $TET_TMP_DIR/filelist.txt
 	echo '/usr/sbin/ipa*
 	/tmp/ipa*' > $TET_TMP_DIR/filelist.txt
-	for s in "$SERVERS $CLIENTS"; do
+	for s in $SERVERS; do
 		if [ "$s" != "" ]; then
 			echo "working on $s now"
 			Cleanup $s
@@ -127,6 +127,18 @@ tp3()
 			fi
 		fi
 	done
+	for s in $CLIENTS; do
+		if [ "$s" != "" ]; then
+			echo "working on $s now"
+			Cleanup $s
+			if [ $ret -ne 0 ]; then
+				echo "ERROR - Cleanup of Server $s failed"
+				return 1;
+				tet_result FAIL
+			fi
+		fi
+	done
+
 
 	tet_result PASS
 
