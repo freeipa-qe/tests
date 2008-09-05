@@ -11,7 +11,8 @@ tet_startup="CheckAlive"
 tet_cleanup="pw_cleanup"
 iclist="ic1 ic2"
 ic1="tp1"
-ic2="tp2 tp3 tp4 tp5 tp6"
+#ic2="tp2a tp2b"
+ic2="tp2 tp2a tp2b tp3 tp4 tp5 tp6"
 hour=0
 min=0
 sec=0
@@ -76,6 +77,7 @@ tp1()
 
 ######################################################################
 # minlife
+# tp2 runs multiple tests
 ######################################################################
 tp2()
 {
@@ -100,6 +102,7 @@ tp2()
 	# Get a new admin ticket to be sure that the ticket won't be expired
 	ResetKinit	
 
+	eval_vars M1
 	# add user to test with
 	ssh root@$FULLHOSTNAME "ipa-adduser -f 'test user 1' -l 'lastname' $user1;"
 	if [ $? != 0 ]; then
@@ -207,6 +210,181 @@ tp2()
 ######################################################################
 
 ######################################################################
+# minlife
+# From ../../../../ipa-tests/testplans/functional/passwordpolicy/IPA_Password_Policy_test_plan.html test # 1
+# 1 minlife = 0
+#    1.   setup default environment
+#    2. setup default password policy
+#    3. change Min. password lifetime to 0
+#      verify user can change their password immediately 
+# From ../../../../ipa-tests/testplans/functional/passwordpolicy/IPA_Password_Policy_test_plan.html test # 2
+######################################################################
+tp2a()
+{
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+        echo "START $tet_thistest"
+
+	user1="testusra"
+	user1pw1="D4mkcidyte3."
+	user1pw2="93847ccjmeo8765"
+	user1pw3="lo9sh3ncd765"
+
+	eval_vars M1
+	# set date on m1 to make sure it's what we think it is
+	get_time
+	ssh root@$FULLHOSTNAME "date $month$day$hour$min$year"
+	if [ $? -ne 0 ]; then
+		echo "ERROR - setting the date on $FULLHOSTNAME failed"
+		tet_result FAIL
+	fi
+
+	# Get a new admin ticket to be sure that the ticket won't be expired
+	ResetKinit	
+
+	eval_vars M1
+	# add user to test with
+	ssh root@$FULLHOSTNAME "ipa-adduser -f 'test user 1' -l 'lastname' $user1;"
+	if [ $? != 0 ]; then
+		echo "ERROR - ipa-adduser failed on $FULLHOSTNAME";
+		tet_result FAIL
+	fi
+
+	# set that users password
+	SetUserPassword M1 $user1 $user1pw1	
+	if [ $? != 0 ]; then
+		echo "ERROR - SetUserPasswordfailed on $FULLHOSTNAME";
+		tet_result FAIL
+	fi
+
+	# set password policy
+	# first set it to a value so the change to 0 won't fail
+	ssh root@$FULLHOSTNAME "ipa-pwpolicy --minlife 20"
+	ssh root@$FULLHOSTNAME "ipa-pwpolicy --minlife 0"
+	if [ $? -ne 0 ]; then
+		echo "ERROR - ipa-pwpolicy on $FULLHOSTNAME failed"
+		tet_result FAIL
+	fi
+
+	# kinit as the user
+	ssh root@$FULLHOSTNAME "kdestroy"
+	if [ $? -ne 0 ]; then
+		echo "ERROR - kdestroy on $FULLHOSTNAME failed"
+		tet_result FAIL
+	fi
+	KinitAsFirst M1 $user1 $user1pw1 $user1pw2
+	if [ $? -ne 0 ]; then
+		echo "ERROR - kinit as $user1 on $FULLHOSTNAME failed"
+		tet_result FAIL
+	fi
+
+	# Now attempt to set the password of user1, this should fail.
+	echo "This should work because the minpassword age has been set to 0"
+	SetUserPassword M1 $user1 $user1pw3
+	# Download the output from M1 to ensuer that it didn't work
+	rm -f $TET_TMP_DIR/SetUserPassword.tmp
+	scp root@$FULLHOSTNAME:/tmp/SetUserPassword-output.txt $TET_TMP_DIR/.
+	if [ $? -ne 0 ]; then
+		echo "ERROR - scp root@$FULLHOSTNAME:/tmp/SetUserPassword-output.txt $TET_TMP_DIR/. failed"
+		tet_result FAIL
+	fi
+	# Now, parse the output of the last SetUserPassword to ensure that it failed properly.
+	grep 'error' $TET_TMP_DIR/SetUserPassword-output.txt
+	if [ $? -eq 0 ]; then
+		echo "ERROR - change password produced a error"
+		echo "kinit is:"
+		ssh root@$FULLHOSTNAME "klist"
+		echo "contents of $TET_TMP_DIR/SetUserPassword-output.txt are:"
+		cat $TET_TMP_DIR/SetUserPassword-output.txt
+		echo "contents of $TET_TMP_DIR/SetUserPassword-output.txt complete:"
+		tet_result FAIL
+	fi
+
+	# Now, parse the output of the last SetUserPassword to ensure that everything worked.
+	
+	tet_result PASS
+
+	# Reset the kinit on all of the machines
+	ResetKinit
+	# Return pw policy to default
+	eval_vars M1
+	ssh root@$FULLHOSTNAME "ipa-pwpolicy --minlife 0"
+	# cleaning up the user
+	ssh root@$FULLHOSTNAME "ipa-deluser $user1"
+
+	echo "END $tet_thistest"
+}
+######################################################################
+
+######################################################################
+# minlife
+# From ../../../../ipa-tests/testplans/functional/passwordpolicy/IPA_Password_Policy_test_plan.html test # 2
+# 2 minlife = -1
+#   1. setup default environment
+#   2. setup default password policy
+#   3. change Min. password lifetime to -1 via CLI
+#      verify this number can not be accepted through CLI (ipa-pwpolicy) 
+######################################################################
+tp2b()
+{
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+        echo "START $tet_thistest"
+
+	user1="testusrb"
+	user1pw1="D4mkcidyte3."
+	user1pw2="93847ccjmeo8765"
+	user1pw3="lo9sh3ncd765"
+
+	eval_vars M1
+	# set date on m1 to make sure it's what we think it is
+	get_time
+	ssh root@$FULLHOSTNAME "date $month$day$hour$min$year"
+	if [ $? -ne 0 ]; then
+		echo "ERROR - setting the date on $FULLHOSTNAME failed"
+		tet_result FAIL
+	fi
+
+	# Get a new admin ticket to be sure that the ticket won't be expired
+	ResetKinit	
+	eval_vars M1
+
+	# add user to test with
+	ssh root@$FULLHOSTNAME "ipa-adduser -f 'test user 1' -l 'lastname' $user1;"
+	if [ $? != 0 ]; then
+		echo "ERROR - ipa-adduser failed on $FULLHOSTNAME";
+		tet_result FAIL
+	fi
+
+	# set that users password
+	SetUserPassword M1 $user1 $user1pw1	
+	if [ $? != 0 ]; then
+		echo "ERROR - SetUserPasswordfailed on $FULLHOSTNAME";
+		tet_result FAIL
+	fi
+
+	# set password policy
+	ssh root@$FULLHOSTNAME "ipa-pwpolicy --minlife -1"
+	if [ $? -eq 0 ]; then
+		echo "ERROR - ipa-pwpolicy --minlife -1 on $FULLHOSTNAME passed when it should not have, "
+		echo "This could be failing because of bug https://bugzilla.redhat.com/show_bug.cgi?id=461213"
+		tet_result FAIL
+	fi
+
+
+	tet_result PASS
+
+	# Reset the kinit on all of the machines
+	ResetKinit
+	# Return pw policy to default
+	eval_vars M1
+	ssh root@$FULLHOSTNAME "ipa-pwpolicy --minlife 0"
+	# cleaning up the user
+	ssh root@$FULLHOSTNAME "ipa-deluser $user1"
+
+	echo "END $tet_thistest"
+}
+######################################################################
+
+######################################################################
 # maxlife
 ######################################################################
 tp3()
@@ -214,7 +392,7 @@ tp3()
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
         echo "START $tet_thistest"
 
-	user1="testusra"
+	user1="testusrc"
 	user1pw1="D4mkidytte3."
 	user1pw2="9384c.dmeo8765"
 	user1pw3="lo9s3n.hd765"
@@ -231,6 +409,7 @@ tp3()
 
 	# Get a new admin ticket to be sure that the ticket won't be expired
 	ResetKinit	
+	eval_vars M1
 
 	# add user to test with
 	ssh root@$FULLHOSTNAME "ipa-adduser -f 'test user 1' -l 'lastname' $user1;"
@@ -373,7 +552,7 @@ tp4()
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
         echo "START $tet_thistest"
 
-	user1="testusrb"
+	user1="testusrd"
 	user1pw1="D4mkidytte3."
 	user1pw2="9384.jdm.o8765"
 	user1pw3="lo9s3.chd.65"
@@ -550,7 +729,7 @@ tp5()
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
         echo "START $tet_thistest"
 
-	user1="testusrb"
+	user1="testusre"
 	user1pw1="D4mkcidytte3." # pw with 2 classes
 	user1pw2="lo9sh3NCh.765" # pw with 4 classes
 	user1pw3="938478765" # pw with one class
@@ -677,7 +856,7 @@ tp6()
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
         echo "START $tet_thistest"
 
-	user1="testusrc"
+	user1="testusrf"
 	user1pw1="D4mkcidytte3." # pw 
 	user1pw2="lo9sh3NCh.765" # pw with greater than 5 char
 	user1pw3="9nH." # pw with less than 5 char
