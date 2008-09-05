@@ -409,6 +409,62 @@ tp2b()
 ######################################################################
 
 ######################################################################
+# minlife > maxlife
+# From ../../../../ipa-tests/testplans/functional/passwordpolicy/IPA_Password_Policy_test_plan.html test # 12
+#
+#   1.   setup default environment
+#   2. setup default password policy
+#   3. change max passowrd life to 2
+#   4. change Min.password lifetime to 2160
+#   Verify that it fails
+######################################################################
+tp2c()
+{
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+        echo "START $tet_thistest"
+
+
+	# Reset the kinit on all of the machines
+	ResetKinit
+	# Return pw policy to default
+	eval_vars M1
+	
+	# Set max life to 2 
+	# resetting password policy 
+	ssh root@$FULLHOSTNAME "ipa-pwpolicy --maxlife 2"
+	if [ $? -ne 0 ]; then
+		echo "ERROR - ipa-pwpolicy --maxlife 2 on $FULLHOSTNAME passed when it should not have"
+		tet_result FAIL
+	fi
+
+	# set minlife to 2160 this should fail 
+	ssh root@$FULLHOSTNAME "ipa-pwpolicy --minlife 2160"
+	if [ $? -eq 0 ]; then
+		echo "ERROR - ipa-pwpolicy --minlife 2160 on $FULLHOSTNAME failed"
+		echo "Possibly it failed because https://bugzilla.redhat.com/show_bug.cgi?id=461332 is still open?"
+		tet_result FAIL
+	fi
+
+	# resetting password policy 
+	ssh root@$FULLHOSTNAME "ipa-pwpolicy --maxlife 7"
+	if [ $? -ne 0 ]; then
+		echo "ERROR - ipa-pwpolicy on $FULLHOSTNAME failed"
+		tet_result FAIL
+	fi
+	ssh root@$FULLHOSTNAME "ipa-pwpolicy --minlife 2"
+	if [ $? -ne 0 ]; then
+		echo "ERROR - ipa-pwpolicy on $FULLHOSTNAME failed"
+		tet_result FAIL
+	fi
+
+
+	tet_result PASS
+
+	echo "END $tet_thistest"
+}
+######################################################################
+
+######################################################################
 # maxlife
 # From ../../../../ipa-tests/testplans/functional/passwordpolicy/IPA_Password_Policy_test_plan.html test # 9
 #   1.   setup default environment
@@ -623,6 +679,171 @@ tp3a()
 		tet_result FAIL
 	fi
 
+
+	tet_result PASS
+
+	echo "END $tet_thistest"
+}
+######################################################################
+
+######################################################################
+# maxlife
+# From ../../../../ipa-tests/testplans/functional/passwordpolicy/IPA_Password_Policy_test_plan.html test # 11
+#   1.   setup default environment
+#   2. setup default password policy
+#   3. change Min. password lifetime to 0
+# Verify that user can change password
+######################################################################
+tp3b()
+{
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+        echo "START $tet_thistest"
+
+	user1="testusrc"
+	user1pw1="D4mkidyte3."
+	user1pw2="9384c.deo8765"
+	user1pw3="lo9s3n.h765"
+	user1pw4="lso983.4nhst63^"
+
+	eval_vars M1
+	# set date on m1 to make sure it's what we think it is
+	get_time
+	ssh root@$FULLHOSTNAME "date $month$day$hour$min$year"
+	if [ $? -ne 0 ]; then
+		echo "ERROR - setting the date on $FULLHOSTNAME failed"
+		tet_result FAIL
+	fi
+
+	# Get a new admin ticket to be sure that the ticket won't be expired
+	ResetKinit	
+	eval_vars M1
+
+	# add user to test with
+	ssh root@$FULLHOSTNAME "ipa-adduser -f 'test user 1' -l 'lastname' $user1;"
+	if [ $? != 0 ]; then
+		echo "ERROR - ipa-adduser failed on $FULLHOSTNAME";
+		tet_result FAIL
+	fi
+
+	# set that users password
+	SetUserPassword M1 $user1 $user1pw1	
+	if [ $? != 0 ]; then
+		echo "ERROR - SetUserPassword failed on $FULLHOSTNAME";
+		tet_result FAIL
+	fi
+
+	# set password policy
+	ssh root@$FULLHOSTNAME "ipa-pwpolicy --maxlife $maxlife"
+	if [ $? -ne 0 ]; then
+		echo "ERROR - ipa-pwpolicy on $FULLHOSTNAME failed"
+		tet_result FAIL
+	fi
+
+	# kinit as the user to make sure the password is valid
+	ssh root@$FULLHOSTNAME "kdestroy"
+	if [ $? -ne 0 ]; then
+		echo "ERROR - kdestroy on $FULLHOSTNAME failed"
+		tet_result FAIL
+	fi
+	KinitAsFirst M1 $user1 $user1pw1 $user1pw2
+	if [ $? -ne 0 ]; then
+		echo "ERROR - kinit as $user1 on $FULLHOSTNAME failed"
+		tet_result FAIL
+	fi
+
+	# incriment hour by $minlife+1 days for testing positive case later 
+	let newhour=$hour+$minlife+1
+	if [ $newhour -gt 23 ]; then
+		# Hour would be two high, incrimenting day
+		export hour='02'
+		let newday=$day+1;
+		if [ $newday -gt 28 ]; then
+			# Day might be two high, setting the month higher
+			export day='01'
+			let newmonth=$month+1;
+			if [ $newmonth -gt 12 ]; then
+				# month will now be greater than december, incrimenting year
+				export month='01'
+				let year=$year+1
+				export year
+			else 
+				export month=`printf "%02d" $newmonth`
+			fi
+		else
+			export day=`printf "%02d" $newday`
+		fi
+	else
+		export hour=`printf "%02d" $newhour`
+	fi
+
+	# incriment date by day + maxlife + 2
+	let newday=$day+$maxlife+2;
+	if [ $newday -gt 28 ]; then
+		# Day might be two high, setting the month higher
+		export day='01'
+		let newmonth=$month+1;
+		if [ $newmonth -gt 12 ]; then
+			# month will now be greater than december, incrimenting year
+			export month='01'
+			let year=$year+1
+			export year
+		else 
+			export month=`printf "%02d" $newmonth`
+		fi
+	else
+		export day=`printf "%02d" $newday`
+	fi
+
+	# Set the date to the new data
+	echo "Setting date to $month$day$hour$min$year" 
+	ssh root@$FULLHOSTNAME "date $month$day$hour$min$year"
+	if [ $? -ne 0 ]; then
+		echo "ERROR - setting the date on $FULLHOSTNAME failed"
+		tet_result FAIL
+	fi
+
+	# kinit as the user
+	ssh root@$FULLHOSTNAME "kdestroy"
+	if [ $? -ne 0 ]; then
+		echo "ERROR - kdestroy on $FULLHOSTNAME failed"
+		tet_result FAIL
+	fi
+	KinitAsFirst M1 $user1 $user1pw2 $user1pw3
+	if [ $? -ne 0 ]; then
+		echo "ERROR - kinit as $user1 on $FULLHOSTNAME failed"
+		tet_result FAIL
+	fi
+
+	# Determine if that worked
+	rm -f $TET_TMP_DIR/KinitAsFirst-out.txt
+	scp root@$FULLHOSTNAME:/tmp/KinitAsFirst-out.txt $TET_TMP_DIR/.
+	if [ $? -ne 0 ]; then
+		echo "ERROR - scp root@$FULLHOSTNAME:/tmp/SetUserPassword-output.txt $TET_TMP_DIR/. failed"
+		tet_result FAIL
+	fi
+	# Now, parse the output of the last SetUserPassword to ensure that it failed properly.
+	grep 'Password expired' $TET_TMP_DIR/KinitAsFirst-out.txt
+	if [ $? -ne 0 ]; then
+		echo "ERROR - password did not seem to expire when it should have"
+		echo "contents of $TET_TMP_DIR/KinitAsFirst-out.txt are:"
+		cat $TET_TMP_DIR/KinitAsFirst-out.txt
+		echo "contents of $TET_TMP_DIR/KinitAsFirst-out.txt complete:"
+		tet_result FAIL
+	fi
+
+	# Reset the kinit on all of the machines
+	ResetKinit
+	# Return pw policy to default
+	eval_vars M1
+	# cleaning up the user
+	ssh root@$FULLHOSTNAME "ipa-deluser $user1"
+
+	# resetting password policy 
+	ssh root@$FULLHOSTNAME "ipa-pwpolicy --maxlife 7"
+	if [ $? -ne 0 ]; then
+		echo "ERROR - ipa-pwpolicy on $FULLHOSTNAME failed"
+		tet_result FAIL
+	fi
 
 	tet_result PASS
 
