@@ -410,6 +410,12 @@ tp2b()
 
 ######################################################################
 # maxlife
+# From ../../../../ipa-tests/testplans/functional/passwordpolicy/IPA_Password_Policy_test_plan.html test # 9
+#   1.   setup default environment
+#   2. setup default password policy
+#   3. change Max. password lifetime to 1
+#   4. change system time to 1 days later, and do kinit <username>
+# Verify that it worked
 ######################################################################
 tp3()
 {
