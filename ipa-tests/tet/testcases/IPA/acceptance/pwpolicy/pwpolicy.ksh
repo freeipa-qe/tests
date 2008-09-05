@@ -11,8 +11,8 @@ tet_startup="CheckAlive"
 tet_cleanup="pw_cleanup"
 iclist="ic1 ic2"
 ic1="tp1"
-#ic2="tp2a tp2b"
-ic2="tp2 tp2a tp2b tp3 tp4 tp5 tp6"
+ic2="tp2 tp2a tp2b"
+#ic2="tp2 tp2a tp2b tp3 tp4 tp5 tp6"
 hour=0
 min=0
 sec=0
@@ -21,7 +21,7 @@ day=0
 year=0
 
 # options to use throughout the tests
-minlife=2
+minlife=5
 # this value must not be 7 as that number is used in the end of tp3
 maxlife=2
 phistory=2
@@ -78,6 +78,12 @@ tp1()
 ######################################################################
 # minlife
 # tp2 runs multiple tests
+# From ../../../../ipa-tests/testplans/functional/passwordpolicy/IPA_Password_Policy_test_plan.html test # 4
+#   1.   setup default environment
+#   2. setup default password policy
+#   3. change Min.password lifetime to 5
+#       a.   change system time to now + 5 hours - 1 hour, the password is still valid, and user can not change password
+#       b. change system time to now + 5 hours, the password still valid, but user IS be able to change its password
 ######################################################################
 tp2()
 {
@@ -136,6 +142,25 @@ tp2()
 		tet_result FAIL
 	fi
 
+	# incriment date by minlife - 1 
+	let newhour=$hour+$minlife-1
+	if [ $newhour -gt 23 ]; then
+		# Hour would be two high, incrimenting day
+		let newday=$day+1;
+		let thour=$newhour-23
+		hour=`printf "%02d" $thour`
+		export hour
+		day=`printf "%02d" $newday`
+		export day
+	fi
+
+	# Set the date forward to make the date change valid
+	ssh root@$FULLHOSTNAME "date $month$day$hour$min$year"
+	if [ $? -ne 0 ]; then
+		echo "ERROR - setting the date on $FULLHOSTNAME to $month$day$hour$min$year failed"
+		tet_result FAIL
+	fi
+
 	# Now attempt to set the password of user1, this should fail.
 	echo "This should fail because the min password age hasn't been reached yet"
 	SetUserPassword M1 $user1 $user1pw3
@@ -159,7 +184,7 @@ tp2()
 	fi
 
 	# incriment date 
-	let newhour=$hour+$minlife+1
+	let newhour=$hour+$minlife
 	if [ $newhour -gt 23 ]; then
 		# Hour would be two high, incrimenting day
 		let newday=$day+1;
@@ -171,7 +196,7 @@ tp2()
 	# Set the date forward to make the date change valid
 	ssh root@$FULLHOSTNAME "date $month$day$hour$min$year"
 	if [ $? -ne 0 ]; then
-		echo "ERROR - setting the date on $FULLHOSTNAME failed"
+		echo "ERROR - setting the date on $FULLHOSTNAME to $month$day$hour$min$year failed"
 		tet_result FAIL
 	fi
 
@@ -217,7 +242,6 @@ tp2()
 #    2. setup default password policy
 #    3. change Min. password lifetime to 0
 #      verify user can change their password immediately 
-# From ../../../../ipa-tests/testplans/functional/passwordpolicy/IPA_Password_Policy_test_plan.html test # 2
 ######################################################################
 tp2a()
 {
