@@ -11,8 +11,8 @@ tet_startup="CheckAlive"
 tet_cleanup="pw_cleanup"
 iclist="ic1 ic2"
 ic1="tp1"
-ic2="tp2 tp2a tp2b"
-#ic2="tp2 tp2a tp2b tp3 tp4 tp5 tp6"
+#ic2="tp3a"
+ic2="tp2 tp2a tp2b tp3 tp4 tp5 tp6"
 hour=0
 min=0
 sec=0
@@ -23,7 +23,7 @@ year=0
 # options to use throughout the tests
 minlife=5
 # this value must not be 7 as that number is used in the end of tp3
-maxlife=2
+maxlife=1
 phistory=2
 
 # This function populates the current date into the hour, min, sec, month, day and year vars
@@ -561,6 +561,62 @@ tp3()
 		echo "ERROR - ipa-pwpolicy on $FULLHOSTNAME failed"
 		tet_result FAIL
 	fi
+
+	tet_result PASS
+
+	echo "END $tet_thistest"
+}
+######################################################################
+
+######################################################################
+# maxlife < minlife
+# From ../../../../ipa-tests/testplans/functional/passwordpolicy/IPA_Password_Policy_test_plan.html test # 6
+#
+#   1.   setup default environment
+#   2. setup default password policy
+#   3. change Min.password lifetime to 2160
+#   4. change max passowrd life to 5
+#   Verify that it fails
+######################################################################
+tp3a()
+{
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+        echo "START $tet_thistest"
+
+
+	# Reset the kinit on all of the machines
+	ResetKinit
+	# Return pw policy to default
+	eval_vars M1
+	
+	# set minlife to 2160 
+	ssh root@$FULLHOSTNAME "ipa-pwpolicy --minlife 2160"
+	if [ $? -ne 0 ]; then
+		echo "ERROR - ipa-pwpolicy --minlife 2160 on $FULLHOSTNAME failed"
+		tet_result FAIL
+	fi
+
+	# Set max life to 5 (this should fail
+	# resetting password policy 
+	ssh root@$FULLHOSTNAME "ipa-pwpolicy --maxlife 5"
+	if [ $? -eq 0 ]; then
+		echo "ERROR - ipa-pwpolicy --maxlife 5 on $FULLHOSTNAME passed when it should not have"
+		echo "Possibly becuase https://bugzilla.redhat.com/show_bug.cgi?id=461325 is not fixed"
+		tet_result FAIL
+	fi
+	
+	# resetting password policy 
+	ssh root@$FULLHOSTNAME "ipa-pwpolicy --maxlife 7"
+	if [ $? -ne 0 ]; then
+		echo "ERROR - ipa-pwpolicy on $FULLHOSTNAME failed"
+		tet_result FAIL
+	fi
+	ssh root@$FULLHOSTNAME "ipa-pwpolicy --minlife 2"
+	if [ $? -ne 0 ]; then
+		echo "ERROR - ipa-pwpolicy on $FULLHOSTNAME failed"
+		tet_result FAIL
+	fi
+
 
 	tet_result PASS
 
