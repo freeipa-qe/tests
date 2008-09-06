@@ -1158,6 +1158,98 @@ tp5()
 ######################################################################
 
 ######################################################################
+# minclasses
+# From ../../../../ipa-tests/testplans/functional/passwordpolicy/IPA_Password_Policy_test_plan.html test # 14
+#   1.   setup default environment
+#   2. setup default password policy
+#   3. change min. password lifetime to 0
+#   4. change character class to 0
+#   5. change one user's password to 12345678
+# verify that the value is accepted
+######################################################################
+tp5a()
+{
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+        echo "START $tet_thistest"
+
+	user1="testusre"
+	user1pw1="D4mkcidytte3." # pw with 2 classes
+	user1pw2="12345678" # pw with 4 classes
+
+	eval_vars M1
+	# add user to test with
+	ssh root@$FULLHOSTNAME "ipa-adduser -f 'test user 1' -l 'lastname' $user1;"
+	if [ $? != 0 ]; then
+		echo "ERROR - ipa-adduser failed on $FULLHOSTNAME";
+		tet_result FAIL
+	fi
+
+	# set that users password
+	SetUserPassword M1 $user1 $user1pw1	
+	if [ $? != 0 ]; then
+		echo "ERROR - SetUserPassword failed on $FULLHOSTNAME";
+		tet_result FAIL
+	fi
+
+	ssh root@$FULLHOSTNAME "ipa-pwpolicy --minlife 44"
+	ssh root@$FULLHOSTNAME "ipa-pwpolicy --minlife 0"
+	if [ $? -ne 0 ]; then
+		echo "ERROR - ipa-pwpolicy on $FULLHOSTNAME failed"
+		tet_result FAIL
+	fi
+
+	# set password policy
+	ssh root@$FULLHOSTNAME "ipa-pwpolicy --minclasses 0"
+	if [ $? -ne 0 ]; then
+		echo "ERROR - ipa-pwpolicy on $FULLHOSTNAME failed"
+		tet_result FAIL
+	fi
+
+	# Kinit as that user, ensure that it worked
+	KinitAsFirst M1 $user1 $user1pw1 $user1pw2
+	if [ $? -ne 0 ]; then
+		echo "ERROR - kinit as $user1 on $FULLHOSTNAME failed"
+		tet_result FAIL
+	fi
+
+	# Determine if that worked
+	rm -f $TET_TMP_DIR/KinitAsFirst-out.txt
+	scp root@$FULLHOSTNAME:/tmp/KinitAsFirst-out.txt $TET_TMP_DIR/.
+	if [ $? -ne 0 ]; then
+		echo "ERROR - scp root@$FULLHOSTNAME:/tmp/SetUserPassword-output.txt $TET_TMP_DIR/. failed"
+		tet_result FAIL
+	fi
+	# Now, parse the output of the last SetUserPassword to ensure that it kinited fine.
+	grep 'error' $TET_TMP_DIR/KinitAsFirst-out.txt
+	if [ $? -eq 0 ]; then
+		echo "ERROR - KinitAsFirst didn't seem to work."
+		echo "contents of $TET_TMP_DIR/KinitAsFirst-out.txt are:"
+		cat $TET_TMP_DIR/KinitAsFirst-out.txt
+		echo "contents of $TET_TMP_DIR/KinitAsFirst-out.txt complete:"
+		tet_result FAIL
+	fi
+
+	# Reset the kinit on all of the machines
+	ResetKinit
+	# Return pw policy to default
+	eval_vars M1
+	# cleaning up the user
+	ssh root@$FULLHOSTNAME "ipa-deluser $user1"
+
+	# resetting password policy 
+	ssh root@$FULLHOSTNAME "ipa-pwpolicy --minclasses 0"
+	if [ $? -ne 0 ]; then
+		echo "ERROR - ipa-pwpolicy on $FULLHOSTNAME failed"
+		tet_result FAIL
+	fi
+
+	tet_result PASS
+
+	echo "END $tet_thistest"
+}
+######################################################################
+
+######################################################################
 # minlength
 ######################################################################
 tp6()
