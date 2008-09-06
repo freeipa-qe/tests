@@ -1030,6 +1030,171 @@ tp4()
 }
 ######################################################################
 
+
+######################################################################
+# pw history
+# From ../../../../ipa-tests/testplans/functional/passwordpolicy/IPA_Password_Policy_test_plan.html test # 14
+#   1.   setup default environment
+#   2. setup default password policy
+#   3. change min. password lifetime to 0
+#   4. change history size = 0
+#   5. create a user "usr", set its default password to "redhat001"
+#   6. run ipa-passwd to modify "usr" 's password with same value "redhat001"
+#  verify that the user can set password back to redhat001
+######################################################################
+tp4a()
+{
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+        echo "START $tet_thistest"
+
+	user1="testusre"
+	user1pw1="D4mkidytte3."
+	user1pw2="redhat001"
+	user1pw3="redhat001"
+	user1pw4="redhat001"
+
+	# Get a new admin ticket to be sure that the ticket won't be expired
+	ResetKinit	
+
+	eval_vars M1	
+	# add user to test with
+	ssh root@$FULLHOSTNAME "ipa-adduser -f 'test user 1' -l 'lastname' $user1;"
+	if [ $? != 0 ]; then
+		echo "ERROR - ipa-adduser failed on $FULLHOSTNAME";
+		tet_result FAIL
+	fi
+
+	# set that users password
+	SetUserPassword M1 $user1 $user1pw1	
+	if [ $? != 0 ]; then
+		echo "ERROR - SetUserPassword failed on $FULLHOSTNAME";
+		tet_result FAIL
+	fi
+
+	# Ensure that works
+	rm -f $TET_TMP_DIR/SetUserPassword-output.txt
+	scp root@$FULLHOSTNAME:/tmp/SetUserPassword-output.txt $TET_TMP_DIR/.
+	if [ $? -ne 0 ]; then
+		echo "ERROR - scp root@$FULLHOSTNAME:/tmp/SetUserPassword-output.txt $TET_TMP_DIR/. failed"
+		tet_result FAIL
+	fi
+	# Now, parse the output of the last SetUserPassword to ensure that it failed properly.
+	grep 'error' $TET_TMP_DIR/SetUserPassword-output.txt
+	if [ $? -eq 0 ]; then
+		echo "ERROR - set password for user $user1 failed"
+		echo "contents of $TET_TMP_DIR/SetUserPassword-output.txt are:"
+		cat $TET_TMP_DIR/SetUserPassword-output.txt
+		echo "contents of $TET_TMP_DIR/SetUserPassword-output.txt complete:"
+		tet_result FAIL
+	fi
+
+	# set password policy
+	ssh root@$FULLHOSTNAME "ipa-pwpolicy --history 20"
+	ssh root@$FULLHOSTNAME "ipa-pwpolicy --history 0"
+	if [ $? -ne 0 ]; then
+		echo "ERROR - ipa-pwpolicy on $FULLHOSTNAME failed"
+		tet_result FAIL
+	fi
+
+	# kinit as the user to make sure the password is valid
+	ssh root@$FULLHOSTNAME "kdestroy"
+	if [ $? -ne 0 ]; then
+		echo "ERROR - kdestroy on $FULLHOSTNAME failed"
+		tet_result FAIL
+	fi
+	KinitAsFirst M1 $user1 $user1pw1 $user1pw2
+	if [ $? -ne 0 ]; then
+		echo "ERROR - kinit as $user1 on $FULLHOSTNAME failed"
+		tet_result FAIL
+	fi
+
+	# Determine if that worked
+	rm -f $TET_TMP_DIR/KinitAsFirst-out.txt
+	scp root@$FULLHOSTNAME:/tmp/KinitAsFirst-out.txt $TET_TMP_DIR/.
+	if [ $? -ne 0 ]; then
+		echo "ERROR - scp root@$FULLHOSTNAME:/tmp/SetUserPassword-output.txt $TET_TMP_DIR/. failed"
+		tet_result FAIL
+	fi
+	# Now, parse the output of the last SetUserPassword to ensure that it kinited fine.
+	grep 'error' $TET_TMP_DIR/KinitAsFirst-out.txt
+	if [ $? -eq 0 ]; then
+		echo "ERROR - KinitAsFirst didn't seem to work."
+		echo "contents of $TET_TMP_DIR/KinitAsFirst-out.txt are:"
+		cat $TET_TMP_DIR/KinitAsFirst-out.txt
+		echo "contents of $TET_TMP_DIR/KinitAsFirst-out.txt complete:"
+		tet_result FAIL
+	fi
+
+	# set that users password
+	SetUserPassword M1 $user1 $user1pw3
+	if [ $? != 0 ]; then
+		echo "ERROR - SetUserPassword failed on $FULLHOSTNAME";
+		tet_result FAIL
+	fi
+
+	# Ensure that works
+	rm -f $TET_TMP_DIR/SetUserPassword-output.txt
+	scp root@$FULLHOSTNAME:/tmp/SetUserPassword-output.txt $TET_TMP_DIR/.
+	if [ $? -ne 0 ]; then
+		echo "ERROR - scp root@$FULLHOSTNAME:/tmp/SetUserPassword-output.txt $TET_TMP_DIR/. failed"
+		tet_result FAIL
+	fi
+	# Now, parse the output of the last SetUserPassword to ensure that it failed properly.
+	grep 'error' $TET_TMP_DIR/SetUserPassword-output.txt
+	if [ $? -eq 0 ]; then
+		echo "ERROR - set password $user1pw2 for user $user1 failed"
+		echo "contents of $TET_TMP_DIR/SetUserPassword-output.txt are:"
+		cat $TET_TMP_DIR/SetUserPassword-output.txt
+		echo "contents of $TET_TMP_DIR/SetUserPassword-output.txt complete:"
+		tet_result FAIL
+	fi
+
+	# set that users password
+	SetUserPassword M1 $user1 $user1pw4
+	if [ $? != 0 ]; then
+		echo "ERROR - SetUserPassword failed on $FULLHOSTNAME";
+		tet_result FAIL
+	fi
+
+	# Ensure that works
+	rm -f $TET_TMP_DIR/SetUserPassword-output.txt
+	scp root@$FULLHOSTNAME:/tmp/SetUserPassword-output.txt $TET_TMP_DIR/.
+	if [ $? -ne 0 ]; then
+		echo "ERROR - scp root@$FULLHOSTNAME:/tmp/SetUserPassword-output.txt $TET_TMP_DIR/. failed"
+		tet_result FAIL
+	fi
+	# Now, parse the output of the last SetUserPassword to ensure that it failed properly.
+	grep 'error' $TET_TMP_DIR/SetUserPassword-output.txt
+	if [ $? -eq 0 ]; then
+		echo "ERROR - set password $user1pw3 for user $user1 failed"
+		echo "contents of $TET_TMP_DIR/SetUserPassword-output.txt are:"
+		cat $TET_TMP_DIR/SetUserPassword-output.txt
+		echo "contents of $TET_TMP_DIR/SetUserPassword-output.txt complete:"
+		tet_result FAIL
+	fi
+
+	# Reset the kinit on all of the machines
+	ResetKinit
+	# Return pw policy to default
+	eval_vars M1
+	# cleaning up the user
+	ssh root@$FULLHOSTNAME "ipa-deluser $user1"
+
+	# resetting password policy 
+	ssh root@$FULLHOSTNAME "ipa-pwpolicy --history 20"
+	ssh root@$FULLHOSTNAME "ipa-pwpolicy --history 0"
+	if [ $? -ne 0 ]; then
+		echo "ERROR - ipa-pwpolicy on $FULLHOSTNAME failed"
+		tet_result FAIL
+	fi
+
+	tet_result PASS
+
+	echo "END $tet_thistest"
+}
+######################################################################
+
+
 ######################################################################
 # minclasses
 ######################################################################
