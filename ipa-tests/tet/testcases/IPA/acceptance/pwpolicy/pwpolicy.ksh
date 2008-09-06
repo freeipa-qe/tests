@@ -11,8 +11,8 @@ tet_startup="CheckAlive"
 tet_cleanup="pw_cleanup"
 iclist="ic1 ic2"
 ic1="tp1"
-#ic2="tp3a"
-ic2="tp2 tp2a tp2b tp3 tp4 tp5 tp6"
+ic2="tp3a tp3b tp2c"
+#ic2="tp2 tp2a tp2b tp3 tp4 tp5 tp6"
 hour=0
 min=0
 sec=0
@@ -688,7 +688,7 @@ tp3a()
 
 ######################################################################
 # maxlife
-# From ../../../../ipa-tests/testplans/functional/passwordpolicy/IPA_Password_Policy_test_plan.html test # 11
+# From ../../../../ipa-tests/testplans/functional/passwordpolicy/IPA_Password_Policy_test_plan.html test # 10
 #   1.   setup default environment
 #   2. setup default password policy
 #   3. change Min. password lifetime to 0
@@ -733,7 +733,8 @@ tp3b()
 	fi
 
 	# set password policy
-	ssh root@$FULLHOSTNAME "ipa-pwpolicy --maxlife $maxlife"
+	ssh root@$FULLHOSTNAME "ipa-pwpolicy --minlife 4"
+	ssh root@$FULLHOSTNAME "ipa-pwpolicy --minlife 0"
 	if [ $? -ne 0 ]; then
 		echo "ERROR - ipa-pwpolicy on $FULLHOSTNAME failed"
 		tet_result FAIL
@@ -823,8 +824,8 @@ tp3b()
 	fi
 	# Now, parse the output of the last SetUserPassword to ensure that it failed properly.
 	grep 'Password expired' $TET_TMP_DIR/KinitAsFirst-out.txt
-	if [ $? -ne 0 ]; then
-		echo "ERROR - password did not seem to expire when it should have"
+	if [ $? -eq 0 ]; then
+		echo "ERROR - password seemed to expire when it should not have"
 		echo "contents of $TET_TMP_DIR/KinitAsFirst-out.txt are:"
 		cat $TET_TMP_DIR/KinitAsFirst-out.txt
 		echo "contents of $TET_TMP_DIR/KinitAsFirst-out.txt complete:"
@@ -839,6 +840,7 @@ tp3b()
 	ssh root@$FULLHOSTNAME "ipa-deluser $user1"
 
 	# resetting password policy 
+	ssh root@$FULLHOSTNAME "ipa-pwpolicy --maxlife 44"
 	ssh root@$FULLHOSTNAME "ipa-pwpolicy --maxlife 7"
 	if [ $? -ne 0 ]; then
 		echo "ERROR - ipa-pwpolicy on $FULLHOSTNAME failed"
