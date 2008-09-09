@@ -11,8 +11,8 @@ tet_startup="CheckAlive"
 tet_cleanup="pw_cleanup"
 iclist="ic1 ic2"
 ic1="tp1"
-#ic2="tp4"
-ic2="tp2 tp2a tp2b tp2c tp3 tp3a tp3b tp4 tp4a tp5 tp5a tp6"
+ic2="tp6"
+#ic2="tp2 tp2a tp2b tp2c tp3 tp3a tp3b tp4 tp4a tp4b tp5 tp5a tp6"
 hour=0
 min=0
 sec=0
@@ -913,7 +913,7 @@ tp3b()
 
 ######################################################################
 # pw history
-# From ../../../../ipa-tests/testplans/functional/passwordpolicy/IPA_Password_Policy_test_plan.html test # 18
+# From ../../../../ipa-tests/testplans/functional/passwordpolicy/IPA_Password_Policy_test_plan.html test # 19
 #   1.   setup default environment
 #   2. setup default password policy
 #   3. change min. password lifetime to 0
@@ -1398,6 +1398,48 @@ tp4a()
 }
 ######################################################################
 
+######################################################################
+# pw history 
+# From ../../../../ipa-tests/testplans/functional/passwordpolicy/IPA_Password_Policy_test_plan.html test # 20
+#   1.   setup default environment
+#   2. setup default password policy
+#   3. change pw min lifetime to 0
+#   4. change history size to -1 via ldapmodify
+# confirm that pwpolicy gives a non-zero exit code, and a error message 
+######################################################################
+tp4b()
+{
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+        echo "START $tet_thistest"
+
+	# Get a new admin ticket to be sure that the ticket won't be expired
+	ResetKinit	
+
+	eval_vars M1	
+
+	# set password policy
+	ssh root@$FULLHOSTNAME "ipa-pwpolicy --history 20"
+	ssh root@$FULLHOSTNAME "ipa-pwpolicy --history -1" 
+	if [ $? -eq 0 ]; then
+		echo "ERROR - ipa-pwpolicy on $FULLHOSTNAME passed when is should not have"
+		echo "Test - $tet_thistest"
+		tet_result FAIL
+	fi
+
+	# resetting password policy 
+	ssh root@$FULLHOSTNAME "ipa-pwpolicy --history 20"
+	ssh root@$FULLHOSTNAME "ipa-pwpolicy --history 0"
+	if [ $? -ne 0 ]; then
+		echo "ERROR - ipa-pwpolicy on $FULLHOSTNAME failed"
+		echo "Test - $tet_thistest"
+		tet_result FAIL
+	fi
+
+	tet_result PASS
+
+	echo "END $tet_thistest"
+}
+######################################################################
 
 ######################################################################
 # minclasses
@@ -1641,6 +1683,20 @@ tp5a()
 
 ######################################################################
 # minlength
+# From ../../../../ipa-tests/testplans/functional/passwordpolicy/IPA_Password_Policy_test_plan.html test # 24
+#   1.   setup default environment
+#   2. setup default password policy
+#   3. change min. password lifetime to 0
+#   4. change min. character class to 0
+#   5. change min. password length to 9
+#   6. create a user "usr", set its default password to "redhat0000"
+#   7. verify user password is valid
+#    1.   user can change its password to "123456789"
+#    2. user can change its password to "1234567890"
+#    3. user can NOT change its password to "12345678"
+#    4. user can NOT change its password to "1"
+#    5. user can NOT change its password to "" (blank) -- I'm probably not going to test this step
+
 ######################################################################
 tp6()
 {
@@ -1648,10 +1704,11 @@ tp6()
         echo "START $tet_thistest"
 
 	user1="testusrf"
-	user1pw1="D4mkcidytte3." # pw 
-	user1pw2="lo9sh3NCh.765" # pw with greater than 5 char
-	user1pw3="9nH." # pw with less than 5 char
-	user1pw4="lo9sh3765" # pw with greater than 5 char
+	user1pw1="redhat0000" # pw 
+	user1pw2="123456789" 
+	user1pw3="12345767890" 
+	user1pw4="12345678" #
+	user1pw5="1"
 
 	eval_vars M1
 	# add user to test with
@@ -1670,13 +1727,17 @@ tp6()
 		tet_result FAIL
 	fi
 	# set password policy
-	ssh root@$FULLHOSTNAME "ipa-pwpolicy --minlength 5"
+	ssh root@$FULLHOSTNAME "ipa-pwpolicy --minlife 0"
+	ssh root@$FULLHOSTNAME "ipa-pwpolicy --minclasses 0"
+	ssh root@$FULLHOSTNAME "ipa-pwpolicy --minlength 20"
+	ssh root@$FULLHOSTNAME "ipa-pwpolicy --minlength 9"
 	if [ $? -ne 0 ]; then
 		echo "ERROR - ipa-pwpolicy on $FULLHOSTNAME failed"
 		echo "Test - $tet_thistest"
 		tet_result FAIL
 	fi
 
+#    1.   user can change its password to "123456789"
 	# Kinit as that user, ensure that it worked
 	KinitAsFirst M1 $user1 $user1pw1 $user1pw2
 	if [ $? -ne 0 ]; then
@@ -1704,8 +1765,38 @@ tp6()
 		tet_result FAIL
 	fi
 
-	# set that users password to a password with only 4 char, this should fail
+#    2. user can change its password to "1234567890"
+
+	# set that users password to a pw that should work
 	SetUserPassword M1 $user1 $user1pw3
+	if [ $? != 0 ]; then
+		echo "ERROR - SetUserPassword failed on $FULLHOSTNAME";
+		echo "Test - $tet_thistest"
+		tet_result FAIL
+	fi
+
+	# Ensure that works
+	rm -f $TET_TMP_DIR/SetUserPassword-output.txt
+	scp root@$FULLHOSTNAME:/tmp/SetUserPassword-output.txt $TET_TMP_DIR/.
+	if [ $? -ne 0 ]; then
+		echo "ERROR - scp root@$FULLHOSTNAME:/tmp/SetUserPassword-output.txt $TET_TMP_DIR/. failed"
+		echo "Test - $tet_thistest"
+		tet_result FAIL
+	fi
+	# Now, parse the output of the last SetUserPassword to ensure that it failed properly.
+	grep 'error' $TET_TMP_DIR/SetUserPassword-output.txt
+	if [ $? -eq 0 ]; then
+		echo "ERROR - set password $user1pw2 for user $user1 failed"
+		echo "Test - $tet_thistest"
+		echo "contents of $TET_TMP_DIR/SetUserPassword-output.txt are:"
+		cat $TET_TMP_DIR/SetUserPassword-output.txt
+		echo "contents of $TET_TMP_DIR/SetUserPassword-output.txt complete:"
+		tet_result FAIL
+	fi
+
+#    3. user can NOT change its password to "12345678"
+	# set that users password to a password with 8 char, this should fail
+	SetUserPassword M1 $user1 $user1pw4
 	if [ $? != 0 ]; then
 		echo "ERROR - SetUserPassword failed on $FULLHOSTNAME";
 		echo "Test - $tet_thistest"
@@ -1731,8 +1822,9 @@ tp6()
 		tet_result FAIL
 	fi
 
-	# set that users password to a pw that should work
-	SetUserPassword M1 $user1 $user1pw4
+#    4. user can NOT change its password to "1"
+	# set that users password to a password with 1 char, this should fail
+	SetUserPassword M1 $user1 $user1pw5
 	if [ $? != 0 ]; then
 		echo "ERROR - SetUserPassword failed on $FULLHOSTNAME";
 		echo "Test - $tet_thistest"
@@ -1748,9 +1840,9 @@ tp6()
 		tet_result FAIL
 	fi
 	# Now, parse the output of the last SetUserPassword to ensure that it failed properly.
-	grep 'error' $TET_TMP_DIR/SetUserPassword-output.txt
-	if [ $? -eq 0 ]; then
-		echo "ERROR - set password $user1pw2 for user $user1 failed"
+	grep 'Password Fails to meet minimum' $TET_TMP_DIR/SetUserPassword-output.txt
+	if [ $? -ne 0 ]; then
+		echo "ERROR - set password either passed or failed incorrectly when trying to set a invalid password"
 		echo "Test - $tet_thistest"
 		echo "contents of $TET_TMP_DIR/SetUserPassword-output.txt are:"
 		cat $TET_TMP_DIR/SetUserPassword-output.txt
