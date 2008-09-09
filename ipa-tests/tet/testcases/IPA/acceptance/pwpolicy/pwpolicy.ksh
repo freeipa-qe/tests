@@ -1422,6 +1422,7 @@ tp4b()
 	ssh root@$FULLHOSTNAME "ipa-pwpolicy --history -1" 
 	if [ $? -eq 0 ]; then
 		echo "ERROR - ipa-pwpolicy on $FULLHOSTNAME passed when is should not have"
+		echo "possibly because bug https://bugzilla.redhat.com/show_bug.cgi?id=461543 is not fixed"
 		echo "Test - $tet_thistest"
 		tet_result FAIL
 	fi
