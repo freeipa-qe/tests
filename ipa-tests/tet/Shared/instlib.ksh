@@ -21,6 +21,139 @@
 # UninstallClientRPM(servername)
 #	Runs ipa-client-install --uninstall. Then it verifies that assortment of files still looks good.
 
+SetupClient()
+{
+	if [ $DSTET_DEBUG = y ]; then set -x; fi
+	. $TESTING_SHARED/shared.ksh
+	is_server_alive $1
+	ret=$?
+	if [ $ret -ne 0 ]; then
+		echo "ERROR - Server $1 appears to not respond to pings."
+		return 1;
+	fi
+
+	eval_vars $1
+	ssh root@$FULLHOSTNAME "rm -f /etc/resolv.conf.original; \
+		cp -a /etc/resolv.conf /etc/resolv.conf.original;"
+
+	if [ "$1" == "M1" ]; then
+		echo "setting up server $1 as a master server"
+		echo "/usr/sbin/ipa-server-install -U --hostname=$FULLHOSTNAME -r $RELM_NAME -p $DM_ADMIN_PASS -P $KERB_MASTER_PASS -a $DM_ADMIN_PASS --setup-bind -d"
+		ssh root@$FULLHOSTNAME "/usr/sbin/ipa-server-install -U --hostname=$FULLHOSTNAME -r $RELM_NAME -p $DM_ADMIN_PASS -P $KERB_MASTER_PASS -a $DM_ADMIN_PASS -u root --setup-bind -d"
+		ret=$?
+		if [ $ret -ne 0 ]; then
+			echo "ERROR - ipa-server-install on $FULLHOSTNAME failed."
+			return 1;
+		fi
+		FixBindServer M1
+		if [ $? -ne 0 ]; then
+			echo "ERROR - FixBindServer on $FULLHOSTNAME failed."
+			return 1;
+		fi
+	else 
+		echo "setting up server $1 as a replica"
+		replica_hostname=$FULLHOSTNAME
+		eval_vars M1
+		echo "Generating replica prepare file for $replica_hostname on $FULLHOSTNAME"
+		ssh root@$FULLHOSTNAME "/usr/sbin/ipa-replica-prepare $replica_hostname"
+		ret=$?
+		if [ $ret -ne 0 ]; then
+			echo "ERROR - /usr/sbin/ipa-replica-prepare $replica_hostname on $FULLHOSTNAME failed."
+			return 1;
+		fi
+		ssh root@$FULLHOSTNAME "ls /var/lib/ipa/replica-info-$replica_hostname"
+		ret=$?
+		if [ $ret -ne 0 ]; then
+			echo "ERROR - ipa-replica-prepare did not create /var/lib/ipa/replica-info-$replica_hostname"
+			return 1;
+		fi
+
+		# Create ldif file for use on replica
+#		echo 'dn: cn=config
+#changetype: modify
+#replace: nsslapd-errorlog-level
+#nsslapd-errorlog-level: 1' > $TET_TMP_DIR/debug.ldif
+#		chmod 755 $TET_TMP_DIR/debug.ldif
+#		ssh root@$replica_hostname "rm -f /tmp/debug.ldif"
+#		scp $TET_TMP_DIR/debug.ldif root@$replica_hostname:/tmp/.
+
+		# copying the relica prepare file from the master server to the replica	
+		rm -f $TET_TMP_DIR/replica-info-$replica_hostname
+		scp root@$FULLHOSTNAME:/var/lib/ipa/replica-info-$replica_hostname $TET_TMP_DIR/.
+		ret=$?
+		ssh root@$replica_hostname "rm -f /tmp/replica-info-$replica_hostname"
+		scp $TET_TMP_DIR/replica-info-$replica_hostname root@$replica_hostname:/tmp/.
+		ret2=$?
+		if [ $ret -ne 0 ]||[ $ret2 -ne 0 ]; then
+			echo "ERROR - scp root@$FULLHOSTNAME:/var/lib/ipa/replica-info-$replica_hostname to root@$replica_hostname:/tmp/. failed"
+			return 1;
+		fi
+		# prepare the replica server
+		# create expect file for use on the replica server
+		echo '#!/usr/bin/expect -f
+set force_conservative 0  ; 
+if {$force_conservative} {
+        set send_slow {1 .1}
+        proc send {ignore arg} {
+                sleep .1
+                exp_send -s -- $arg
+        }
+}
+set timeout -1' > $TET_TMP_DIR/replica-install.exp
+		echo "spawn ipa-replica-install --debug /tmp/replica-info-$replica_hostname" >> $TET_TMP_DIR/replica-install.exp
+		echo 'match_max 100000
+expect -exact "Directory Manager (existing master) password: "' >> $TET_TMP_DIR/replica-install.exp
+		echo "send -- \"$KERB_MASTER_PASS\"" >> $TET_TMP_DIR/replica-install.exp
+		echo 'send -- "rree"' | sed s/rr/'\\'/g | sed s/ee/r/g
+		echo 'send -- "rree"' | sed s/rr/'\\'/g | sed s/ee/r/g >> $TET_TMP_DIR/replica-install.exp
+		echo 'expect eof' >> $TET_TMP_DIR/replica-install.exp
+
+		ssh root@$replica_hostname "ps -ef | grep slapd"
+
+		chmod 755 $TET_TMP_DIR/replica-install.exp
+		scp $TET_TMP_DIR/replica-install.exp root@$replica_hostname:/tmp/.
+		ssh root@$replica_hostname "/usr/bin/expect /tmp/replica-install.exp"
+		ret=$?
+		if [ $ret -ne 0 ]; then
+			echo "ERROR - /usr/bin/expect /tmp/replica-install.exp on $replica_hostname:/tmp/. failed"
+			return 1;
+		fi
+		#ssh root@$replica_hostname 'ldapmodify -x -D "cn=directory manager" -w Secret123 -f /tmp/debug.ldif'
+		ssh root@$replica_hostname "ps -ef | grep slapd"
+	
+	fi
+	# The next section is a workaround for bug #450632
+	eval_vars $1
+	ssh root@$FULLHOSTNAME "ps -ef | grep slapd"
+	sleep 4
+	ssh root@$FULLHOSTNAME "/etc/init.d/dirsrv stop"
+	ssh root@$FULLHOSTNAME "/etc/init.d/dirsrv start"
+	ssh root@$FULLHOSTNAME "ps -ef | grep slapd"
+
+	return 0;
+}
+
+UninstallServer()
+{
+	if [ $DSTET_DEBUG = y ]; then set -x; fi
+	. $TESTING_SHARED/shared.ksh
+	is_server_alive $1
+	ret=$?
+	if [ $ret -ne 0 ]; then
+		echo "ERROR - Server $1 appears to not respond to pings."
+		return 1;
+	fi
+	eval_vars $1
+	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-server-install -U --uninstall"
+	ret=$?
+	if [ $ret -ne 0 ]; then
+		echo "ERROR - ipa-server-install -uninstall on $FULLHOSTNAME FAILED"
+		return 1;
+	fi
+	return 0;
+
+}
+
 SetupServer()
 {
 	if [ $DSTET_DEBUG = y ]; then set -x; fi
