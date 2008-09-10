@@ -36,7 +36,7 @@ UninstallClient()
 	ret=$?
 	if [ $ret -ne 0 ]; then
 		echo "ERROR - ipa-server-install -uninstall on $FULLHOSTNAME FAILED"
-		return 1;
+#		return 1;
 	fi
 	return 0;
 
@@ -57,7 +57,7 @@ UninstallServer()
 	ret=$?
 	if [ $ret -ne 0 ]; then
 		echo "ERROR - ipa-client-install -uninstall on $FULLHOSTNAME FAILED"
-		return 1;
+#		return 1;
 	fi
 	return 0;
 
@@ -416,11 +416,11 @@ UnInstallClientRPM()
 		echo "Returning"
 		return 0
 	fi
-	ssh root@$FULLHOSTNAME "rpm -e --allmatches redhat-ds-base ipa-server ipa-admintools bind caching-nameserver expect krb5-workstation ipa-client ipa-server-selinux"
+	ssh root@$FULLHOSTNAME "rpm -e --allmatches ipa-client"
 	ret=$?
 	if [ $ret -ne 0 ]; then
 		echo "ssh to $FULLHOSTNAME failed"
-		return 1
+#		return 1
 	fi	
 
 	# Create a working resolv.conf, and remove any lingering redhat-ds packages"
@@ -459,7 +459,7 @@ UnInstallServerRPM()
 	ret=$?
 	if [ $ret -ne 0 ]; then
 		echo "ssh to $FULLHOSTNAME failed"
-		return 1
+#		return 1
 	fi	
 
 	# Create a working resolv.conf, and remove any lingering redhat-ds packages"
