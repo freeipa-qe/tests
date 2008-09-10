@@ -53,10 +53,10 @@ UninstallServer()
 		return 1;
 	fi
 	eval_vars $1
-	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-server-install -U --uninstall"
+	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-client-install -U --uninstall"
 	ret=$?
 	if [ $ret -ne 0 ]; then
-		echo "ERROR - ipa-server-install -uninstall on $FULLHOSTNAME FAILED"
+		echo "ERROR - ipa-client-install -uninstall on $FULLHOSTNAME FAILED"
 		return 1;
 	fi
 	return 0;
