@@ -203,27 +203,6 @@ expect -exact "Directory Manager (existing master) password: "' >> $TET_TMP_DIR/
 	return 0;
 }
 
-UninstallServer()
-{
-	if [ $DSTET_DEBUG = y ]; then set -x; fi
-	. $TESTING_SHARED/shared.ksh
-	is_server_alive $1
-	ret=$?
-	if [ $ret -ne 0 ]; then
-		echo "ERROR - Server $1 appears to not respond to pings."
-		return 1;
-	fi
-	eval_vars $1
-	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-server-install -U --uninstall"
-	ret=$?
-	if [ $ret -ne 0 ]; then
-		echo "ERROR - ipa-server-install -uninstall on $FULLHOSTNAME FAILED"
-		return 1;
-	fi
-	return 0;
-
-}
-
 SetupServerBogus()
 {
 	if [ $DSTET_DEBUG = y ]; then set -x; fi
@@ -419,6 +398,45 @@ InstallServerRPM()
 		return 1
 	fi	
 
+}
+
+UnInstallClientRPM()
+{
+	if [ $DSTET_DEBUG = y ]; then set -x; fi
+	. $TESTING_SHARED/shared.ksh
+	is_server_alive $1
+	ret=$?
+	if [ $ret -ne 0 ]; then
+		echo "ERROR - Server $1 appears to not respond to pings."
+		return 1;
+	fi
+	eval_vars $1	
+	if [ "$OS" != "RHEL" ]&&[ "$OS" != "FC" ]; then
+		echo "OS isn't \"RHEL\" or \"FC\"."
+		echo "Returning"
+		return 0
+	fi
+	ssh root@$FULLHOSTNAME "rpm -e --allmatches redhat-ds-base ipa-server ipa-admintools bind caching-nameserver expect krb5-workstation ipa-client ipa-server-selinux"
+	ret=$?
+	if [ $ret -ne 0 ]; then
+		echo "ssh to $FULLHOSTNAME failed"
+		return 1
+	fi	
+
+	# Create a working resolv.conf, and remove any lingering redhat-ds packages"
+	ssh root@$FULLHOSTNAME "rm -f /etc/bind.conf.ipasave; \
+		mv /etc/bind.conf /etc/bind.cond.ipasave; \
+		rpm -e --allmatches fedora-ds-base fedora-ds-base-devel; \
+		rpm -e --allmatches redhat-ds-base-devel; \
+		rpm -e --allmatches redhat-ds-base"
+
+	ssh root@$FULLHOSTNAME 'find / | grep -v proc | grep -v dev > /list-after-ipa-uninstall.txt'
+	ret=$?
+	if [ $ret -ne 0 ]; then
+		echo "ssh to $FULLHOSTNAME failed"
+		return 1
+	fi
+	return 0
 }
 
 UnInstallServerRPM()
