@@ -234,11 +234,6 @@ InstallClientRPM()
 		echo "Returning"
 		return 0
 	fi
-	ssh root@$FULLHOSTNAME "rpm -e --allmatches fedora-ds-base fedora-ds-base-devel"
-	ssh root@$FULLHOSTNAME "rpm -e --allmatches redhat-ds-base-devel"
-	ssh root@$FULLHOSTNAME "rpm -e --allmatches redhat-ds-base"
-	ssh root@$FULLHOSTNAME "/usr/bin/yum clean all"
-	pkglistA="TurboGears cyrus-sasl-gssapi fedora-ds-base krb5-server krb5-server-ldap lm_sensors mod_python mozldap mozldap-tools perl-Mozilla-LDAP postgresql-libs python-cheetah python-cherrypy python-configobj python-decoratortools python-elixir python-formencode python-genshi python-json python-kerberos python-kid python-krbV python-nose python-paste python-paste-deploy python-paste-script python-protocols python-psycopg2 python-pyasn1 python-ruledispatch python-setuptools python-simplejson python-sqlalchemy python-sqlite2 python-sqlobject python-tgexpandingformwidget python-tgfastdata python-turbocheetah python-turbojson python-turbokid svrcore tcl Updating bind-libs bind-utils cyrus-sasl cyrus-sasl-devel cyrus-sasl-lib cyrus-sasl-md5 cyrus-sasl-plain krb5-devel krb5-libs bind caching-nameserver expect krb5-workstation"
 	ssh root@$FULLHOSTNAME "/etc/init.d/yum-updatesd stop;killall yum;sleep 1; killall -9 yum;yum -y install $pkglistA"
 	ret=$?
 	if [ $ret -ne 0 ]; then
@@ -252,12 +247,7 @@ InstallClientRPM()
 		fi
 	fi	
 
-	ssh root@$FULLHOSTNAME "yum -y update TurboGears cyrus-sasl-gssapi fedora-ds-base krb5-server krb5-server-ldap lm_sensors mod_python mozldap mozldap-tools perl-Mozilla-LDAP postgresql-libs python-cheetah python-cherrypy python-configobj python-decoratortools python-elixir python-formencode python-genshi python-json python-kerberos python-kid python-krbV python-nose python-paste python-paste-deploy python-paste-script python-protocols python-psycopg2 python-pyasn1 python-ruledispatch python-setuptools python-simplejson python-sqlalchemy python-sqlite2 python-sqlobject python-tgexpandingformwidget python-tgfastdata python-turbocheetah python-turbojson python-turbokid svrcore tcl Updating bind-libs bind-utils cyrus-sasl cyrus-sasl-devel cyrus-sasl-lib cyrus-sasl-md5 cyrus-sasl-plain krb5-devel krb5-libs"
-	ret=$?
-	if [ $ret -ne 0 ]; then
-		echo "ssh to $FULLHOSTNAME failed"
-#		return 1
-	fi	
+	ssh root@$FULLHOSTNAME "/usr/bin/yum clean all"
 
 	ssh root@$FULLHOSTNAME 'find / | grep -v proc | grep -v dev > /list-before-ipa.txt'
 	ret=$?
@@ -266,7 +256,7 @@ InstallClientRPM()
 		return 1
 	fi	
 
-	pkglistB="ipa-server ipa-admintools bind caching-nameserver expect krb5-workstation"
+	pkglistB="ipa-client"
 	ssh root@$FULLHOSTNAME "yum -y install $pkglistB"
 	ret=$?
 	if [ $ret -ne 0 ]; then
