@@ -26,6 +26,8 @@ eval_vars()
         REPLICA_ID=`eval echo $x`
         x=\$OS_$1
         OS=`eval echo $x`
+        x=\$OS_VER_$1
+        OS_VER=`eval echo $x`
 	x=\$REPO_$1
 	REPO=`eval echo $x`
 	

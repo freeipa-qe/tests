@@ -1118,7 +1118,7 @@ ask_c1()
 	echo "   3. FC(Fedora Core)"
 	echo "   4. solaris"
 	read rsp
-	if [ -z "$rsp" ] ; then os_tmp=$d; else os_tmp="$rsp"; fi
+	if [ -z "$rsp" ] ; then os_tmp=d; else os_tmp="$rsp"; fi
 	case $os_tmp in
 		1) OS_C1="RHEL"
 			;;
@@ -1412,6 +1412,7 @@ main_print()
 			eval_vars $s
 			echo "   HOSTNAME_$s     : $HOSTNAME"
 			echo "   OS_$s           : $OS"
+			echo "   OS_VER_$s       : $OS_VER"
 			echo "   REPO_$s         : $REPO"
         		echo "   LDAP_PORT_$s    : $LDAP_PORT"
         		echo "   LDAPS_PORT_$s   : $LDAPS_PORT"
@@ -1524,6 +1525,7 @@ main_save()
 			echo "#working on client $s"
 			echo "HOSTNAME_$s=$HOSTNAME"
 			echo "OS_$s=$OS"
+			echo "OS_VER_$s=$OS_VER"
 			echo "REPO_$s=\"$REPO\""
 			echo "LDAP_PORT_$s=$LDAP_PORT"
         		echo "LDAPS_PORT_$s=$LDAPS_PORT"
