@@ -21,6 +21,49 @@
 # UninstallClientRPM(servername)
 #	Runs ipa-client-install --uninstall. Then it verifies that assortment of files still looks good.
 
+UninstallClient()
+{
+	if [ $DSTET_DEBUG = y ]; then set -x; fi
+	. $TESTING_SHARED/shared.ksh
+	is_server_alive $1
+	ret=$?
+	if [ $ret -ne 0 ]; then
+		echo "ERROR - Server $1 appears to not respond to pings."
+		return 1;
+	fi
+	eval_vars $1
+	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-server-install -U --uninstall"
+	ret=$?
+	if [ $ret -ne 0 ]; then
+		echo "ERROR - ipa-server-install -uninstall on $FULLHOSTNAME FAILED"
+		return 1;
+	fi
+	return 0;
+
+}
+
+UninstallServer()
+{
+	if [ $DSTET_DEBUG = y ]; then set -x; fi
+	. $TESTING_SHARED/shared.ksh
+	is_server_alive $1
+	ret=$?
+	if [ $ret -ne 0 ]; then
+		echo "ERROR - Server $1 appears to not respond to pings."
+		return 1;
+	fi
+	eval_vars $1
+	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-server-install -U --uninstall"
+	ret=$?
+	if [ $ret -ne 0 ]; then
+		echo "ERROR - ipa-server-install -uninstall on $FULLHOSTNAME FAILED"
+		return 1;
+	fi
+	return 0;
+
+}
+
+
 SetupClient()
 {
 	if [ $DSTET_DEBUG = y ]; then set -x; fi
@@ -47,26 +90,6 @@ SetupClient()
 	return 0;
 }
 
-UninstallServer()
-{
-	if [ $DSTET_DEBUG = y ]; then set -x; fi
-	. $TESTING_SHARED/shared.ksh
-	is_server_alive $1
-	ret=$?
-	if [ $ret -ne 0 ]; then
-		echo "ERROR - Server $1 appears to not respond to pings."
-		return 1;
-	fi
-	eval_vars $1
-	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-server-install -U --uninstall"
-	ret=$?
-	if [ $ret -ne 0 ]; then
-		echo "ERROR - ipa-server-install -uninstall on $FULLHOSTNAME FAILED"
-		return 1;
-	fi
-	return 0;
-
-}
 
 SetupServer()
 {
