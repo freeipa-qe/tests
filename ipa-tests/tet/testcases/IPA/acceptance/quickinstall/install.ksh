@@ -5,7 +5,7 @@ fi
 # The next line is required as it picks up data about the servers to use
 tet_startup="CheckAlive"
 tet_cleanup="instclean"
-iclist="ic1 ic2 ic3 ic4 ic5 ic6 ic7"
+iclist="ic1 ic2 ic3 ic4 ic5 ic6 ic7 ic8"
 ic1="setupssh tp1"
 ic2="tp2"
 ic3="tp3"
@@ -13,6 +13,7 @@ ic4="tp4"
 ic5="tp5"
 ic6="tp6"
 ic7="tp7"
+ic8="tp8"
 
 
 setupssh()
@@ -177,20 +178,7 @@ tp4()
 			if [ "$DSTET_DEBUG" = "y" ]; then echo "done working on $s"; fi
 		fi
 	done
-	for s in $CLIENTS; do
-		if [ "$s" != "" ]; then
-			echo "working on $s now"
-			if [ "$DSTET_DEBUG" = "y" ]; then echo "working on $s now"; fi
-			SetupClient $s
-			ret=$?
-			if [ $ret -ne 0 ]; then
-				echo "client-install of server on $s ssh failed"
-				tet_result FAIL
-			fi
-		fi
-		if [ "$DSTET_DEBUG" = "y" ]; then echo "done working on $s"; fi
-	done
-
+	
 	tet_result PASS
 
 }
@@ -234,11 +222,36 @@ tp5()
 ######################################################################
 
 ######################################################################
-# Test to ensure that kinit works
+# Set up clients
 ######################################################################
 tp6()
 {
 	echo "START tp6"
+	for s in $CLIENTS; do
+		if [ "$s" != "" ]; then
+			echo "working on $s now"
+			if [ "$DSTET_DEBUG" = "y" ]; then echo "working on $s now"; fi
+			SetupClient $s
+			ret=$?
+			if [ $ret -ne 0 ]; then
+				echo "client-install of server on $s ssh failed"
+				tet_result FAIL
+			fi
+		fi
+		if [ "$DSTET_DEBUG" = "y" ]; then echo "done working on $s"; fi
+	done
+
+	tet_result PASS
+
+}
+######################################################################
+
+######################################################################
+# Test to ensure that kinit works
+######################################################################
+tp7()
+{
+	echo "START tp7"
 	rm -f $TET_TMP_DIR/kinit.exp
 	echo 'set timeout 60
 set send_slow {1 .1}
@@ -305,7 +318,7 @@ sleep 15'  > $TET_TMP_DIR/kinit.exp
 ######################################################################
 # Test to ensure that all of the machines seem to sync up when creating users
 ######################################################################
-tp7()
+tp8()
 {
 	eval_vars M1
 	user1="testusr1"
