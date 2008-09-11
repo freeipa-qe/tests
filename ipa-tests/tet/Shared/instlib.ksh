@@ -227,6 +227,28 @@ SetupServerBogus()
 	return 0;
 }
 
+SetupClientBogus()
+{
+	if [ $DSTET_DEBUG = y ]; then set -x; fi
+	. $TESTING_SHARED/shared.ksh
+	is_server_alive $1
+	ret=$?
+	if [ $ret -ne 0 ]; then
+		echo "ERROR - Server $1 appears to not respond to pings."
+		return 1;
+	fi
+	eval_vars $1
+	echo "ipa-client-install --domain=BOGUSNAME -U"
+	ssh root@$FULLHOSTNAME "ipa-client-install --domain=BOGUSNAME -U"
+	ret=$?
+	if [ $ret -eq 0 ]; then
+		echo "ERROR - ipa-client-install on $FULLHOSTNAME passed when it shouldn't have."
+		return 1;
+	fi
+	return 0;
+}
+
+
 SetupRepo()
 {
 	if [ $DSTET_DEBUG = y ]; then set -x; fi
