@@ -21,27 +21,6 @@
 # UninstallClientRPM(servername)
 #	Runs ipa-client-install --uninstall. Then it verifies that assortment of files still looks good.
 
-UninstallClient()
-{
-	if [ $DSTET_DEBUG = y ]; then set -x; fi
-	. $TESTING_SHARED/shared.ksh
-	is_server_alive $1
-	ret=$?
-	if [ $ret -ne 0 ]; then
-		echo "ERROR - Server $1 appears to not respond to pings."
-		return 1;
-	fi
-	eval_vars $1
-	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-server-install -U --uninstall"
-	ret=$?
-	if [ $ret -ne 0 ]; then
-		echo "ERROR - ipa-server-install -uninstall on $FULLHOSTNAME FAILED"
-#		return 1;
-	fi
-	return 0;
-
-}
-
 UninstallServer()
 {
 	if [ $DSTET_DEBUG = y ]; then set -x; fi
@@ -53,7 +32,28 @@ UninstallServer()
 		return 1;
 	fi
 	eval_vars $1
-	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-client-install -U --uninstall"
+	ssh root@$FULLHOSTNAME "ipa-server-install -U --uninstall"
+	ret=$?
+	if [ $ret -ne 0 ]; then
+		echo "ERROR - ipa-server-install -uninstall on $FULLHOSTNAME FAILED"
+#		return 1;
+	fi
+	return 0;
+
+}
+
+UninstallClient()
+{
+	if [ $DSTET_DEBUG = y ]; then set -x; fi
+	. $TESTING_SHARED/shared.ksh
+	is_server_alive $1
+	ret=$?
+	if [ $ret -ne 0 ]; then
+		echo "ERROR - Server $1 appears to not respond to pings."
+		return 1;
+	fi
+	eval_vars $1
+	ssh root@$FULLHOSTNAME "ipa-client-install -U --uninstall"
 	ret=$?
 	if [ $ret -ne 0 ]; then
 		echo "ERROR - ipa-client-install -uninstall on $FULLHOSTNAME FAILED"
@@ -106,10 +106,13 @@ SetupServer()
 	ssh root@$FULLHOSTNAME "rm -f /etc/resolv.conf.original; \
 		cp -a /etc/resolv.conf /etc/resolv.conf.original;"
 
+	# Just in case a previous uninstall didn't finish:
+	ssh root@$FULLHOSTNAME "ipa-server-install --uninstall -U"
+
 	if [ "$1" == "M1" ]; then
 		echo "setting up server $1 as a master server"
-		echo "/usr/sbin/ipa-server-install -U --hostname=$FULLHOSTNAME -r $RELM_NAME -p $DM_ADMIN_PASS -P $KERB_MASTER_PASS -a $DM_ADMIN_PASS --setup-bind -d"
-		ssh root@$FULLHOSTNAME "/usr/sbin/ipa-server-install -U --hostname=$FULLHOSTNAME -r $RELM_NAME -p $DM_ADMIN_PASS -P $KERB_MASTER_PASS -a $DM_ADMIN_PASS -u root --setup-bind -d"
+		echo "ipa-server-install -U --hostname=$FULLHOSTNAME -r $RELM_NAME -p $DM_ADMIN_PASS -P $KERB_MASTER_PASS -a $DM_ADMIN_PASS -u root --setup-bind -d"
+		ssh root@$FULLHOSTNAME "ipa-server-install -U --hostname=$FULLHOSTNAME -r $RELM_NAME -p $DM_ADMIN_PASS -P $KERB_MASTER_PASS -a $DM_ADMIN_PASS -u root --setup-bind -d"
 		ret=$?
 		if [ $ret -ne 0 ]; then
 			echo "ERROR - ipa-server-install on $FULLHOSTNAME failed."
@@ -214,8 +217,8 @@ SetupServerBogus()
 		return 1;
 	fi
 	eval_vars $1
-	echo "/usr/sbin/ipa-server-install -U --hostname=BOGUSNAME -r BOGUSRELM -p $DM_ADMIN_PASS -P $KERB_MASTER_PASS -a $DM_ADMIN_PASS --setup-bind -u $DS_USER -d"
-	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-server-install -U --hostname=BOGUSNAME -r BOGUSRELM -p $DM_ADMIN_PASS -P $KERB_MASTER_PASS -a $DM_ADMIN_PASS --setup-bind -u $DS_USER -d"
+	echo "ipa-server-install -U --hostname=BOGUSNAME -r BOGUSRELM -p $DM_ADMIN_PASS -P $KERB_MASTER_PASS -a $DM_ADMIN_PASS --setup-bind -u $DS_USER -d"
+	ssh root@$FULLHOSTNAME "ipa-server-install -U --hostname=BOGUSNAME -r BOGUSRELM -p $DM_ADMIN_PASS -P $KERB_MASTER_PASS -a $DM_ADMIN_PASS --setup-bind -u $DS_USER -d"
 	ret=$?
 	if [ $ret -eq 0 ]; then
 		echo "ERROR - ipa-server-install on $FULLHOSTNAME passed when it shouldn't have."
@@ -305,7 +308,7 @@ InstallClientRPM()
 		return 1
 	fi	
 
-	pkglistB="ipa-client"
+	pkglistB="ipa-client ipa-admintools"
 	ssh root@$FULLHOSTNAME "yum -y install $pkglistB"
 	ret=$?
 	if [ $ret -ne 0 ]; then
@@ -416,7 +419,7 @@ UnInstallClientRPM()
 		echo "Returning"
 		return 0
 	fi
-	ssh root@$FULLHOSTNAME "rpm -e --allmatches ipa-client"
+	ssh root@$FULLHOSTNAME "rpm -e --allmatches ipa-client ipa-admintools"
 	ret=$?
 	if [ $ret -ne 0 ]; then
 		echo "ssh to $FULLHOSTNAME failed"
