@@ -227,7 +227,6 @@ SetupServerBogus()
 	return 0;
 }
 
-
 SetupRepo()
 {
 	if [ $DSTET_DEBUG = y ]; then set -x; fi
@@ -250,20 +249,20 @@ SetupRepo()
 		ssh root@$FULLHOSTNAME "cd /etc/yum.repos.d;wget $REPO"
 		ret=$?
 		if [ $ret -ne 0 ]; then
-			echo "ssh to $FULLHOSTNAME failed"
+			echo "ERROR ssh to $FULLHOSTNAME failed"
 			return 1
 		fi	
 	else
 		# the repo file is likley a file.
 		if [ ! -f $REPO ]; then
-			echo "File $REPO not found."
+			echo "ERROR - File $REPO not found."
 			echo "Try using a absolute path in the env file, or, use a file on a http source (http://<path/file.repo)"
 			return 1
 		fi
 		scp $REPO root@$FULLHOSTNAME:/etc/yum.repos.d/.
 		ret=$?
 		if [ $ret -ne 0 ]; then
-			echo "scp to $FULLHOSTNAME failed"
+			echo "ERROR - scp to $FULLHOSTNAME failed"
 			return 1
 		fi	
 	fi
@@ -294,7 +293,7 @@ InstallClientRPM()
 		ssh root@$FULLHOSTNAME "/etc/init.d/yum-updatesd stop;killall yum;sleep 1; killall -9 yum;yum -y install $pkglistA"
 		ret=$?
 		if [ $ret -ne 0 ]; then
-			echo "install of $pkglistA on $FULLHOSTNAME failed"
+			echo "ERROR - install of $pkglistA on $FULLHOSTNAME failed"
 			return 1
 		fi
 	fi	
@@ -304,7 +303,7 @@ InstallClientRPM()
 	ssh root@$FULLHOSTNAME 'find / | grep -v proc | grep -v dev > /list-before-ipa.txt'
 	ret=$?
 	if [ $ret -ne 0 ]; then
-		echo "ssh to $FULLHOSTNAME failed"
+		echo "ERROR - ssh to $FULLHOSTNAME failed"
 		return 1
 	fi	
 
@@ -317,7 +316,7 @@ InstallClientRPM()
 		ssh root@$FULLHOSTNAME "/etc/init.d/yum-updatesd stop;killall yum;sleep 1; killall -9 yum;yum -y install $pkglistB"
 		ret=$?
 		if [ $ret -ne 0 ]; then
-			echo "install of $pkglistB on $FULLHOSTNAME failed"
+			echo "ERROR - install of $pkglistB on $FULLHOSTNAME failed"
 			return 1
 		fi
 	fi	
@@ -325,7 +324,7 @@ InstallClientRPM()
 	ssh root@$FULLHOSTNAME 'find / | grep -v proc | grep -v dev > /list-after-ipa.txt'
 	ret=$?
 	if [ $ret -ne 0 ]; then
-		echo "ssh to $FULLHOSTNAME failed"
+		echo "ERROR - ssh to $FULLHOSTNAME failed"
 		return 1
 	fi	
 
@@ -361,7 +360,7 @@ InstallServerRPM()
 		ssh root@$FULLHOSTNAME "/etc/init.d/yum-updatesd stop;killall yum;sleep 1; killall -9 yum;yum -y install $pkglistA"
 		ret=$?
 		if [ $ret -ne 0 ]; then
-			echo "install of $pkglistA on $FULLHOSTNAME failed"
+			echo "ERROR - install of $pkglistA on $FULLHOSTNAME failed"
 			return 1
 		fi
 	fi	
@@ -369,14 +368,14 @@ InstallServerRPM()
 	ssh root@$FULLHOSTNAME "yum -y update TurboGears cyrus-sasl-gssapi fedora-ds-base krb5-server krb5-server-ldap lm_sensors mod_python mozldap mozldap-tools perl-Mozilla-LDAP postgresql-libs python-cheetah python-cherrypy python-configobj python-decoratortools python-elixir python-formencode python-genshi python-json python-kerberos python-kid python-krbV python-nose python-paste python-paste-deploy python-paste-script python-protocols python-psycopg2 python-pyasn1 python-ruledispatch python-setuptools python-simplejson python-sqlalchemy python-sqlite2 python-sqlobject python-tgexpandingformwidget python-tgfastdata python-turbocheetah python-turbojson python-turbokid svrcore tcl Updating bind-libs bind-utils cyrus-sasl cyrus-sasl-devel cyrus-sasl-lib cyrus-sasl-md5 cyrus-sasl-plain krb5-devel krb5-libs"
 	ret=$?
 	if [ $ret -ne 0 ]; then
-		echo "ssh to $FULLHOSTNAME failed"
+		echo "ERROR - ssh to $FULLHOSTNAME failed"
 #		return 1
 	fi	
 
 	ssh root@$FULLHOSTNAME 'find / | grep -v proc | grep -v dev > /list-before-ipa.txt'
 	ret=$?
 	if [ $ret -ne 0 ]; then
-		echo "ssh to $FULLHOSTNAME failed"
+		echo "ERROR - ssh to $FULLHOSTNAME failed"
 		return 1
 	fi	
 
@@ -389,7 +388,7 @@ InstallServerRPM()
 		ssh root@$FULLHOSTNAME "/etc/init.d/yum-updatesd stop;killall yum;sleep 1; killall -9 yum;yum -y install $pkglistB"
 		ret=$?
 		if [ $ret -ne 0 ]; then
-			echo "install of $pkglistB on $FULLHOSTNAME failed"
+			echo "ERROR - install of $pkglistB on $FULLHOSTNAME failed"
 			return 1
 		fi
 	fi	
@@ -397,7 +396,7 @@ InstallServerRPM()
 	ssh root@$FULLHOSTNAME 'find / | grep -v proc | grep -v dev > /list-after-ipa.txt'
 	ret=$?
 	if [ $ret -ne 0 ]; then
-		echo "ssh to $FULLHOSTNAME failed"
+		echo "ERROR - ssh to $FULLHOSTNAME failed"
 		return 1
 	fi	
 
@@ -422,7 +421,7 @@ UnInstallClientRPM()
 	ssh root@$FULLHOSTNAME "rpm -e --allmatches ipa-client ipa-admintools"
 	ret=$?
 	if [ $ret -ne 0 ]; then
-		echo "ssh to $FULLHOSTNAME failed"
+		echo "ERROR - ssh to $FULLHOSTNAME failed"
 #		return 1
 	fi	
 
@@ -436,7 +435,7 @@ UnInstallClientRPM()
 	ssh root@$FULLHOSTNAME 'find / | grep -v proc | grep -v dev > /list-after-ipa-uninstall.txt'
 	ret=$?
 	if [ $ret -ne 0 ]; then
-		echo "ssh to $FULLHOSTNAME failed"
+		echo "ERROR - ssh to $FULLHOSTNAME failed"
 		return 1
 	fi
 	return 0
@@ -461,7 +460,7 @@ UnInstallServerRPM()
 	ssh root@$FULLHOSTNAME "rpm -e --allmatches redhat-ds-base ipa-server ipa-admintools bind caching-nameserver expect krb5-workstation ipa-client ipa-server-selinux"
 	ret=$?
 	if [ $ret -ne 0 ]; then
-		echo "ssh to $FULLHOSTNAME failed"
+		echo "ERROR - ssh to $FULLHOSTNAME failed"
 #		return 1
 	fi	
 
@@ -475,7 +474,7 @@ UnInstallServerRPM()
 	ssh root@$FULLHOSTNAME 'find / | grep -v proc | grep -v dev > /list-after-ipa-uninstall.txt'
 	ret=$?
 	if [ $ret -ne 0 ]; then
-		echo "ssh to $FULLHOSTNAME failed"
+		echo "ERROR - ssh to $FULLHOSTNAME failed"
 		return 1
 	fi
 	return 0
@@ -492,7 +491,6 @@ Cleanup()
 	if [ $ret -ne 0 ]; then
 		echo "ERROR - Server $1 appears to not respond to pings."
 		return 1;
-		return 1
 	fi
 	eval_vars $s
 
@@ -508,7 +506,7 @@ Cleanup()
 	scp $TET_TMP_DIR/filelist.txt root@$FULLHOSTNAME:/tmp/.
 	ret=$?
 	if [ $ret -ne 0 ]; then
-		echo "scp to $s failed"
+		echo " ERROR - scp to $s failed"
 		return 1
 	fi
 	# now check to see if any of the files in filelist.txt exist when they should not.
@@ -524,7 +522,7 @@ Cleanup()
 		\exit 0'
  	ret=$?
 	if [ $ret -ne 0 ]; then
-		echo "some files still exist that should not"
+		echo "ERROR - some files still exist that should not"
 		return 1
 	fi
 
@@ -537,7 +535,7 @@ Cleanup()
 	ssh root@$FULLHOSTNAME "ls /etc/yum.repos.d/ipa*"
 	ret=$?
 	if [ $ret -ne 0 ]; then
-		echo "no /etc/yum.repos.d/ipa* files exist. This may mean that uninstall got broken"
+		echo "ERROR - no /etc/yum.repos.d/ipa* files exist. This may mean that uninstall got broken"
 		return 1
 	fi
 	ssh root@$FULLHOSTNAME "rm -f /etc/yum.repos.d/ipa*"

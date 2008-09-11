@@ -18,6 +18,7 @@ ic8="tp8"
 
 setupssh()
 {
+if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 	echo "START setupssh"
 	echo "running ssh setup"
 	for s in $SERVERS; do
@@ -53,6 +54,7 @@ setupssh()
 ######################################################################
 tp1()
 {
+if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 	echo "START tp1"
 	for s in $SERVERS; do
 		if [ "$s" != "" ]; then
@@ -85,6 +87,7 @@ tp1()
 ######################################################################
 tp2()
 {
+if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 	echo "START tp2"
 	for s in $SERVERS; do
 		if [ "$s" != "" ]; then
@@ -122,6 +125,7 @@ tp2()
 ######################################################################
 tp3()
 {
+if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 	echo "START tp3"
 	for s in $SERVERS; do
 		if [ "$s" != "" ]; then
@@ -190,6 +194,7 @@ tp4()
 ######################################################################
 tp5()
 {
+if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 	echo "START tp5"
 	# Get the IP of the first server to be used in the DNS tests.
 	eval_vars M1
@@ -226,6 +231,7 @@ tp5()
 ######################################################################
 tp6()
 {
+if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 	echo "START tp6"
 	for s in $CLIENTS; do
 		if [ "$s" != "" ]; then
@@ -251,6 +257,7 @@ tp6()
 ######################################################################
 tp7()
 {
+if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 	echo "START tp7"
 	rm -f $TET_TMP_DIR/kinit.exp
 	echo 'set timeout 60
@@ -320,6 +327,7 @@ sleep 15'  > $TET_TMP_DIR/kinit.exp
 ######################################################################
 tp8()
 {
+if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 	eval_vars M1
 	user1="testusr1"
 	user2="testusr2"
@@ -399,6 +407,7 @@ ipa-deluser $user2;"
 
 instclean()
 {
+if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 	echo "instclean start"
 	for s in $SERVERS; do
 		if [ "$s" != "" ]; then
