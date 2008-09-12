@@ -1150,6 +1150,50 @@ ask_c1()
 
 }
 
+ask_c2()
+{
+	if [ "$engage_debug" = "y" ]; then set -x; fi
+	echo "hostname of client 2?($HOSTNAME_C2)->"
+	read rsp
+	if [ -z "$rsp" ] ; then echo "Hostname unchanged"; else HOSTNAME_C2="$rsp"; fi
+	echo "OS of Client 2?"
+	echo "   1. RHEL"
+	echo "   2. HPUX"
+	echo "   3. FC(Fedora Core)"
+	echo "   4. solaris"
+	read rsp
+	if [ -z "$rsp" ] ; then os_tmp=d; else os_tmp="$rsp"; fi
+	case $os_tmp in
+		1) OS_C2="RHEL"
+			;;
+		2) OS_C2="HPUX"
+			;;
+		3) OS_C2="FC"
+			;;
+		4) OS_C2="solaris"
+			;;
+		d) echo "OS unchanged"
+			;;
+		*) echo "You have chosen a invalid choice($os_tmp), exiting"
+			exit
+			;;
+		esac
+	echo "OS version?"
+	echo "for RHEL - 3,4,5"
+	echo "for FC - 7,8,9"
+	echo "for solaris - 6.7.8.9.10"
+	echo "for HPUX - <insert crazy uname version here>"
+	echo "default <$OS_VER_C2>"
+	echo "->"
+	read rsp
+	if [ -z "$rsp" ] ; then echo "Using $OS_VER_C2"; else OS_VER_C2="$rsp"; fi
+	echo "Repo for client 2? This is a url to the .repo file, or a tarball on hpux ($REPO_M2)->"
+	read rsp
+	if [ -z "$rsp" ] ; then echo "Client repo unchanged"; else  REPO_C2="$rsp"; fi
+	export OS_C2 HOSTNAME_C2 OS_VER_C2 REPO_C2
+
+}
+
 main_ask()
 {
 	if [ "$engage_debug" = "y" ]; then set -x; fi
