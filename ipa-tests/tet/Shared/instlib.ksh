@@ -76,14 +76,17 @@ SetupClient()
 	fi
 
 	eval_vars $1
-	ssh root@$FULLHOSTNAME "rm -f /etc/resolv.conf.original; \
+	thishost=$FULLHOSTNAME
+	eval_vars M1
+	master=$FULLHOSTNAME
+	ssh root@$thishost "rm -f /etc/resolv.conf.original; \
 		cp -a /etc/resolv.conf /etc/resolv.conf.original;"
 
-		echo "ipa-client-install --realm=$RELM_NAME -U"
-		ssh root@$FULLHOSTNAME "ipa-client-install --realm=$RELM_NAME -U"
+		echo "ipa-client-install --server=$master -U"
+		ssh root@$thishost "ipa-client-install --server=$master -U"
 		ret=$?
 		if [ $ret -ne 0 ]; then
-			echo "ERROR - ipa-client-install on $FULLHOSTNAME failed."
+			echo "ERROR - ipa-client-install on $thishost failed."
 			return 1;
 		fi
 
