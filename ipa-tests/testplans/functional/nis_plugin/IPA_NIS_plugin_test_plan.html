@@ -1,0 +1,1012 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html;charset=ISO-8859-1" http-equiv="Content-Type">
+  <title>IPA NIS plugin test plan</title>
+</head>
+<body>
+<p><font color="crimson" size="5">Test plan for IPA NIS plugin
+</font></p>
+<p><br>
+</p>
+<table style="width: 75%;" border="1">
+  <tbody>
+    <tr>
+      <th
+ style="background: crimson none repeat scroll 0%; -moz-background-clip: -moz-initial; -moz-background-origin: -moz-initial; -moz-background-inline-policy: -moz-initial; color: white;">
+Approval By
+      </th>
+      <th
+ style="background: crimson none repeat scroll 0%; -moz-background-clip: -moz-initial; -moz-background-origin: -moz-initial; -moz-background-inline-policy: -moz-initial; color: white;">
+Date
+      </th>
+    </tr>
+    <tr>
+      <td>Based on discussion with Chandra, we check in current version
+1.0 right now.
+      </td>
+      <td>Sept.12, 2008
+      </td>
+    </tr>
+    <tr>
+      <td colspan="2"
+ style="background: crimson none repeat scroll 0%; -moz-background-clip: -moz-initial; -moz-background-origin: -moz-initial; -moz-background-inline-policy: -moz-initial; color: silver;">
+Revision History
+      </td>
+    </tr>
+    <tr>
+      <td> Ver 0.1, Yi Zhang
+      </td>
+      <td> Sept. 9, 2008
+      </td>
+    </tr>
+    <tr>
+      <td> Ver 0.9, Yi Zhang
+      </td>
+      <td> Sept. 10, 2008
+      </td>
+    </tr>
+    <tr>
+      <td> Ver 1.0, Yi Zhang
+      </td>
+      <td> Sept. 11, 2008
+      </td>
+    </tr>
+  </tbody>
+</table>
+<p><br>
+</p>
+<table id="toc" class="toc" summary="Contents">
+  <tbody>
+    <tr>
+      <td>
+      <div id="toctitle">
+      <h2>Contents</h2>
+      <span class="toctoggle">[<a href="javascript:toggleToc()"
+ class="internal" id="togglelink">hide</a>]</span></div>
+      <ul>
+        <li class="toclevel-1"><a
+ href="http://rome.sjc.redhat.com/mediawiki/index.php/IPA_NIS_plugin_test_plan#Feature_Overview"><span
+ class="tocnumber">1</span> <span class="toctext">Feature Overview</span></a>
+          <ul>
+            <li class="toclevel-2"><a
+ href="http://rome.sjc.redhat.com/mediawiki/index.php/IPA_NIS_plugin_test_plan#IPA_NIS_plugin_Overview"><span
+ class="tocnumber">1.1</span> <span class="toctext">IPA NIS plugin
+Overview</span></a></li>
+            <li class="toclevel-2"><a
+ href="http://rome.sjc.redhat.com/mediawiki/index.php/IPA_NIS_plugin_test_plan#Traditional_NIS_server"><span
+ class="tocnumber">1.2</span> <span class="toctext">Traditional NIS
+server</span></a></li>
+          </ul>
+        </li>
+        <li class="toclevel-1"><a
+ href="http://rome.sjc.redhat.com/mediawiki/index.php/IPA_NIS_plugin_test_plan#Testing_Environment"><span
+ class="tocnumber">2</span> <span class="toctext">Testing Environment</span></a></li>
+        <li class="toclevel-1"><a
+ href="http://rome.sjc.redhat.com/mediawiki/index.php/IPA_NIS_plugin_test_plan#Testing_Approach_.26_Methodology"><span
+ class="tocnumber">3</span> <span class="toctext">Testing Approach
+&amp; Methodology</span></a>
+          <ul>
+            <li class="toclevel-2"><a
+ href="http://rome.sjc.redhat.com/mediawiki/index.php/IPA_NIS_plugin_test_plan#Test_assumptions_.26_dependencies"><span
+ class="tocnumber">3.1</span> <span class="toctext">Test assumptions
+&amp; dependencies</span></a></li>
+            <li class="toclevel-2"><a
+ href="http://rome.sjc.redhat.com/mediawiki/index.php/IPA_NIS_plugin_test_plan#Test_approach"><span
+ class="tocnumber">3.2</span> <span class="toctext">Test approach</span></a></li>
+          </ul>
+        </li>
+        <li class="toclevel-1"><a
+ href="http://rome.sjc.redhat.com/mediawiki/index.php/IPA_NIS_plugin_test_plan#Test_cases_.26_Result"><span
+ class="tocnumber">4</span> <span class="toctext">Test cases &amp;
+Result</span></a>
+          <ul>
+            <li class="toclevel-2"><a
+ href="http://rome.sjc.redhat.com/mediawiki/index.php/IPA_NIS_plugin_test_plan#Functional_Testing"><span
+ class="tocnumber">4.1</span> <span class="toctext">Functional Testing</span></a></li>
+            <li class="toclevel-2"><a
+ href="http://rome.sjc.redhat.com/mediawiki/index.php/IPA_NIS_plugin_test_plan#IPA_specific_Testing"><span
+ class="tocnumber">4.2</span> <span class="toctext">IPA specific
+Testing</span></a></li>
+          </ul>
+        </li>
+        <li class="toclevel-1"><a
+ href="http://rome.sjc.redhat.com/mediawiki/index.php/IPA_NIS_plugin_test_plan#Additional_test_covered_in_this_test"><span
+ class="tocnumber">5</span> <span class="toctext">Additional test
+covered in this test</span></a></li>
+        <li class="toclevel-1"><a
+ href="http://rome.sjc.redhat.com/mediawiki/index.php/IPA_NIS_plugin_test_plan#Risk_analysis_.28what_won.27t_be_tested.29"><span
+ class="tocnumber">6</span> <span class="toctext">Risk analysis (what
+won't be tested)</span></a>
+          <ul>
+            <li class="toclevel-2"><a
+ href="http://rome.sjc.redhat.com/mediawiki/index.php/IPA_NIS_plugin_test_plan#This_is_acceptance_test_set_in_this_release_cycle"><span
+ class="tocnumber">6.1</span> <span class="toctext">This is acceptance
+test set in this release cycle</span></a></li>
+            <li class="toclevel-2"><a
+ href="http://rome.sjc.redhat.com/mediawiki/index.php/IPA_NIS_plugin_test_plan#NIS_Master-slave_setup.2Fconfiguration_won.27t_be_tested"><span
+ class="tocnumber">6.2</span> <span class="toctext">NIS Master-slave
+setup/configuration won't be tested</span></a></li>
+            <li class="toclevel-2"><a
+ href="http://rome.sjc.redhat.com/mediawiki/index.php/IPA_NIS_plugin_test_plan#Stress_testing"><span
+ class="tocnumber">6.3</span> <span class="toctext">Stress testing</span></a></li>
+          </ul>
+        </li>
+        <li class="toclevel-1"><a
+ href="http://rome.sjc.redhat.com/mediawiki/index.php/IPA_NIS_plugin_test_plan#Resources"><span
+ class="tocnumber">7</span> <span class="toctext">Resources</span></a></li>
+        <li class="toclevel-1"><a
+ href="http://rome.sjc.redhat.com/mediawiki/index.php/IPA_NIS_plugin_test_plan#Supplements"><span
+ class="tocnumber">8</span> <span class="toctext">Supplements</span></a>
+          <ul>
+            <li class="toclevel-2"><a
+ href="http://rome.sjc.redhat.com/mediawiki/index.php/IPA_NIS_plugin_test_plan#NIS_Configuration_Guide"><span
+ class="tocnumber">8.1</span> <span class="toctext">NIS Configuration
+Guide</span></a></li>
+            <li class="toclevel-2"><a
+ href="http://rome.sjc.redhat.com/mediawiki/index.php/IPA_NIS_plugin_test_plan#RFC"><span
+ class="tocnumber">8.2</span> <span class="toctext">RFC</span></a></li>
+          </ul>
+        </li>
+        <li class="toclevel-1"><a
+ href="http://rome.sjc.redhat.com/mediawiki/index.php/IPA_NIS_plugin_test_plan#Questions_.26_Answers"><span
+ class="tocnumber">9</span> <span class="toctext">Questions &amp;
+Answers</span></a>
+          <ul>
+            <li class="toclevel-2"><a
+ href="http://rome.sjc.redhat.com/mediawiki/index.php/IPA_NIS_plugin_test_plan#HPUX"><span
+ class="tocnumber">9.1</span> <span class="toctext">HPUX</span></a></li>
+          </ul>
+        </li>
+      </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<script type="text/javascript"> if (window.showTocToggle) { var tocShowText = "show"; var tocHideText = "hide"; showTocToggle(); } </script><a
+ name="Feature_Overview"></a>
+<h3><span class="editsection">[<a
+ href="http://rome.sjc.redhat.com/mediawiki/index.php?title=IPA_NIS_plugin_test_plan&amp;action=edit&amp;section=1"
+ title="Edit section: Feature Overview">edit</a>]</span> <span
+ class="mw-headline"> Feature Overview </span></h3>
+<a name="IPA_NIS_plugin_Overview"></a>
+<h4><span class="editsection">[<a
+ href="http://rome.sjc.redhat.com/mediawiki/index.php?title=IPA_NIS_plugin_test_plan&amp;action=edit&amp;section=2"
+ title="Edit section: IPA NIS plugin Overview">edit</a>]</span> <span
+ class="mw-headline"> IPA NIS plugin Overview </span></h4>
+<p>IPA NIS plugin is a Red Hat Directory Server plugin that behaves as
+a fully functional NIS server. It should response to NIS client no
+different from a traditional NIS server, except the functions which are
+only used by the replica part in a replication setup (YPPROC_CLEAR, and
+YPPROC_XFR). The plugin implementation is pretty much a Red Hat
+re-writing of NIS server.
+</p>
+<p>From NIS client's perspective, IPA NIS plugin should meet the
+"common understanding" of what a traditional NIS server should do. In
+another words, customer should configure their NIS client as what they
+do usually, run NIS commands as usual, and they should notice <b>no
+difference</b> at all. A set of test that using NIS commands is a basic
+test set.
+</p>
+<p>From IPA server's perspective, this plugin should server all IPA
+users as well. A set of testing around how this plugin response to IPA
+client request is also a must.
+</p>
+<a name="Traditional_NIS_server"></a>
+<h4><span class="editsection">[<a
+ href="http://rome.sjc.redhat.com/mediawiki/index.php?title=IPA_NIS_plugin_test_plan&amp;action=edit&amp;section=3"
+ title="Edit section: Traditional NIS server">edit</a>]</span> <span
+ class="mw-headline"> Traditional NIS server </span></h4>
+<p>In a nutshell, the Network Information Service (NIS) provides a
+simple and centralized network looking up service to easy network
+accounts and groups management. Its purpose is to provide information,
+that has to be known throughout the network, to all machines on the
+network. Information likely to be distributed by NIS is:
+</p>
+<ul>
+  <li> login names/passwords/home directories (/etc/passwd)
+  </li>
+  <li> group information (/etc/group)
+  </li>
+  <li> host names and IP numbers (/etc/hosts) </li>
+</ul>
+<p>Once NIS server has user and group information, all NIS client
+machine will be able to communicate with NIS server to assign proper
+network-wide resource to its users and groups.
+</p>
+<p>IPA NIS plugin should behave exactly as above.
+</p>
+<a name="Testing_Environment"></a>
+<h3><span class="editsection">[<a
+ href="http://rome.sjc.redhat.com/mediawiki/index.php?title=IPA_NIS_plugin_test_plan&amp;action=edit&amp;section=4"
+ title="Edit section: Testing Environment">edit</a>]</span> <span
+ class="mw-headline"> Testing Environment </span></h3>
+<p><b>[Supported Platforms]</b>
+</p>
+<ol>
+  <li> Supported Server Platform (Same as IPA server supported
+platform)
+    <ul>
+      <li> RHEL 4 i386 &amp; x86_64
+      </li>
+      <li> RHEL 5 i386 &amp; x86_64
+      </li>
+    </ul>
+  </li>
+  <li> Supported Client Platform
+    <ul>
+      <li> RHAS 2.1 (i386) </li>
+      <li> RHEL 3 i386 &amp; x86_64
+      </li>
+      <li> RHEL 4 i386 &amp; x86_64
+      </li>
+      <li> RHEL 5 i386 &amp; x86_64 </li>
+      <li> Solaris 8, 9 &amp; 10 ( SPARC )
+      </li>
+      <li> Solaris 10 x86
+      </li>
+      <li> AIX 5.3 </li>
+      <li> HPUX (11.0, 11i v1, 11i v2) ( PA-RISC ) </li>
+      <li> Mac OSX Tiger (10.4 on Intel)
+      </li>
+      <li> Windows 2000, XP, Vista ( i386 only)
+      </li>
+    </ul>
+  </li>
+</ol>
+<p><b>[Environment Setup]</b>
+</p>
+<ol>
+  <li> Client environment setup
+    <ol>
+      <li> machine that has only <b>NIS</b> client installed and
+configured
+      </li>
+      <li> machine that has only <b>IPA</b> client installed and
+configured
+      </li>
+    </ol>
+  </li>
+  <li> Server environment [Total 4 platform applies to this category:
+RHEL 4 i386, RHEL 4 x86_64, RHEL 5 i386, RHEL 5 x86_64)
+    <ul>
+      <li> <b>Static</b> IPA Server deployment
+        <ul>
+          <li> Single IPA Server deployment
+          </li>
+          <li> IPA master-replica deployment
+          </li>
+        </ul>
+      </li>
+      <li> <b>Dynamic</b> Environment
+        <ul>
+          <li> Server expending environment
+            <ul>
+              <li> Changing from single IPA server to master-replica
+deployment </li>
+              <li> Changing from single IPA server to single master and
+multiple replica deployment (this is a low priority )
+              </li>
+            </ul>
+          </li>
+          <li> Failover environment
+          </li>
+          <li> Changing from master-replica to single IPA master server
+deployment
+          </li>
+          <li> Changing from master-replica to single IPA replica
+server deployment
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ol>
+<p><b>[IPA NIS Plugin configuration]</b>
+The <a
+ href="http://git.fedorahosted.org/git/slapi-nis.git/doc?p=slapi-nis.git;a=blob_plain;f=doc/nis-getting-started.txt"
+ class="external text"
+ title="http://git.fedorahosted.org/git/slapi-nis.git/doc?p=slapi-nis.git;a=blob_plain;f=doc/nis-getting-started.txt"
+ rel="nofollow">official start up guide</a> listes the steps of how to
+setup the plugin. </p>
+<p>It is not necessary to copy all content here. I guess IPA will have
+different way to config it when Rob finished his work. See <a
+ href="https://bugzilla.redhat.com/show_bug.cgi?id=460055"
+ class="external text"
+ title="https://bugzilla.redhat.com/show_bug.cgi?id=460055"
+ rel="nofollow">bug</a> here.
+</p>
+<p><br>
+</p>
+<a name="Testing_Approach_.26_Methodology"></a>
+<h3><span class="editsection">[<a
+ href="http://rome.sjc.redhat.com/mediawiki/index.php?title=IPA_NIS_plugin_test_plan&amp;action=edit&amp;section=5"
+ title="Edit section: Testing Approach &amp; Methodology">edit</a>]</span> <span
+ class="mw-headline"> Testing Approach &amp; Methodology </span></h3>
+<a name="Test_assumptions_.26_dependencies"></a>
+<h4><span class="editsection">[<a
+ href="http://rome.sjc.redhat.com/mediawiki/index.php?title=IPA_NIS_plugin_test_plan&amp;action=edit&amp;section=6"
+ title="Edit section: Test assumptions &amp; dependencies">edit</a>]</span>
+<span class="mw-headline"> Test assumptions &amp; dependencies </span></h4>
+<p>There is no special assumptions
+</p>
+<p>There is no dependencies
+</p>
+<a name="Test_approach"></a>
+<h4><span class="editsection">[<a
+ href="http://rome.sjc.redhat.com/mediawiki/index.php?title=IPA_NIS_plugin_test_plan&amp;action=edit&amp;section=7"
+ title="Edit section: Test approach">edit</a>]</span> <span
+ class="mw-headline"> Test approach </span></h4>
+<p>Two sets of test will be executed:
+</p>
+<p><b>The first set</b> of test is <b>functional testing</b>. The
+purpose of this set is to verity IPA NIS plugin behave. </p>
+<dl>
+  <dd>By using NIS commands to configure NIS client and verity the
+NIS server response, we can prove whether IPA NIS plugin behave same as
+a real NIS server. This set of testing can be break into the next 2
+categories: </dd>
+</dl>
+<ol>
+  <li> NIS client configuration. </li>
+  <li> NIS client command execution testing.
+  </li>
+</ol>
+<p><b>The second set</b> of test is <b>IPA specific functionality
+testing</b>.
+The purpose of this set of test is to verity the plugin implemented as
+design and IPA specific topics. It including the following areas:
+(please check out test cases part for more details)
+</p>
+<ol>
+  <li> IPA specific functional testing </li>
+  <li> Security testing </li>
+  <li> IPV6 testing </li>
+  <li> Stress testing
+  </li>
+  <li> Performance testing
+  </li>
+</ol>
+<a name="Test_cases_.26_Result"></a>
+<h3><span class="editsection">[<a
+ href="http://rome.sjc.redhat.com/mediawiki/index.php?title=IPA_NIS_plugin_test_plan&amp;action=edit&amp;section=8"
+ title="Edit section: Test cases &amp; Result">edit</a>]</span> <span
+ class="mw-headline"> Test cases &amp; Result </span></h3>
+<a name="Functional_Testing"></a>
+<h5><span class="editsection">[<a
+ href="http://rome.sjc.redhat.com/mediawiki/index.php?title=IPA_NIS_plugin_test_plan&amp;action=edit&amp;section=9"
+ title="Edit section: Functional Testing">edit</a>]</span> <span
+ class="mw-headline"> Functional Testing </span></h5>
+<p>[Notes:] </p>
+<ul>
+  <li> Test cases list here are all acceptance level test. All of them
+have to pass. </li>
+  <li> <a
+ href="http://rome.sjc.redhat.com/mediawiki/index.php/IPA_NIS_plugin_test_plan#Testing_Environment"
+ title=""> Environment matrix</a> applies to all of the following test
+  </li>
+</ul>
+<table
+ style="background: lightcyan none repeat scroll 0%; -moz-background-clip: -moz-initial; -moz-background-origin: -moz-initial; -moz-background-inline-policy: -moz-initial;"
+ border="1" cellpadding="5" cellspacing="0">
+  <tbody>
+    <tr>
+      <th
+ style="background: cadetblue none repeat scroll 0%; -moz-background-clip: -moz-initial; -moz-background-origin: -moz-initial; -moz-background-inline-policy: -moz-initial; color: white;">
+#
+      </th>
+      <th
+ style="background: cadetblue none repeat scroll 0%; -moz-background-clip: -moz-initial; -moz-background-origin: -moz-initial; -moz-background-inline-policy: -moz-initial; color: white;">
+Scenario
+      </th>
+      <th
+ style="background: cadetblue none repeat scroll 0%; -moz-background-clip: -moz-initial; -moz-background-origin: -moz-initial; -moz-background-inline-policy: -moz-initial; color: white;">
+Test Procedure
+      </th>
+      <th
+ style="background: cadetblue none repeat scroll 0%; -moz-background-clip: -moz-initial; -moz-background-origin: -moz-initial; -moz-background-inline-policy: -moz-initial; color: white;">
+Expected result
+      </th>
+      <th
+ style="background: cadetblue none repeat scroll 0%; -moz-background-clip: -moz-initial; -moz-background-origin: -moz-initial; -moz-background-inline-policy: -moz-initial; color: white;">
+Test result
+      </th>
+      <th
+ style="background: cadetblue none repeat scroll 0%; -moz-background-clip: -moz-initial; -moz-background-origin: -moz-initial; -moz-background-inline-policy: -moz-initial; color: white;">
+Notes
+      </th>
+    </tr>
+    <tr
+ style="background: papayawhip none repeat scroll 0%; -moz-background-clip: -moz-initial; -moz-background-origin: -moz-initial; -moz-background-inline-policy: -moz-initial; color: cornflowerblue;">
+      <td colspan="6"> <b>Test purpose</b>: The way to configure NIS
+client has no change
+      </td>
+    </tr>
+    <tr>
+      <td valign="top"> 1-1
+      </td>
+      <td valign="top"> NIS client configuration&nbsp;;
+      </td>
+      <td valign="top">
+      <p><small><b>[NIS Server setup]</b><br>
+The "NIS Server" here means IPA NIS plugin. Please follow <a
+ href="http://git.fedorahosted.org/git/slapi-nis.git/doc?p=slapi-nis.git;a=blob_plain;f=doc/nis-getting-started.txt"
+ class="external text"
+ title="http://git.fedorahosted.org/git/slapi-nis.git/doc?p=slapi-nis.git;a=blob_plain;f=doc/nis-getting-started.txt"
+ rel="nofollow">setup guide</a> </small></p>
+      <hr>
+      <p><small><b>[NIS client setup]</b><br>
+This is what RHEL linux should follow. For different platform, please
+follow corresponding <a
+ href="http://rome.sjc.redhat.com/mediawiki/index.php/IPA_NIS_plugin_test_plan#NIS_Configuration_Guide"
+ title=""> NIS configuration Guide</a> </small></p>
+      <ol>
+        <li><small> Append the following line in the <b>/etc/sysconfig/network</b>
+file:
+          </small>
+          <ul>
+            <li><small> <font color="blue"> NISDOMAIN=mynisdomain </font>
+              </small></li>
+          </ul>
+        </li>
+        <li><small> Append the following line in <b>/etc/yp.conf</b>&nbsp;:
+          </small>
+          <ul>
+            <li><small> <font color="blue"> domain mynisdomain server
+192.168.0.1 </font> <small> replace ip to the IPA server IP </small>
+              </small></li>
+          </ul>
+        </li>
+        <li><small> Make sure the following lines contain 'nis' as an
+option in the file <b>/etc/nsswitch.conf</b> <font color="blue">
+          </font></small>
+          <ul>
+            <font color="blue">
+            <li><small> passwd: files nis
+              </small></li>
+            <li><small> shadow: files nis
+              </small></li>
+            <li><small> group: files nis
+              </small></li>
+            <li><small> hosts: files nis dns
+              </small></li>
+            <li><small> networks: files nis
+              </small></li>
+            <li><small> protocols: files nis
+              </small></li>
+            <li><small> publickey: nisplus
+              </small></li>
+            <li><small> automount: files nis
+              </small></li>
+            <li><small> netgroup: files nis
+              </small></li>
+            <li><small> aliases: files nisplus </small></li>
+            </font>
+          </ul>
+        </li>
+        <li><small> restart ypbind and portmap
+          </small>
+          <ul>
+            <li><small> <b>/etc/rc.d/init.d/ypbind restart</b>
+              </small></li>
+            <li><small> <b>/etc/rc.d/init.d/portmap restart</b>
+              </small></li>
+          </ul>
+        </li>
+      </ol>
+      <p>
+      </p>
+      </td>
+      <td valign="top"> Execute the following to verity whether NIS
+client has been correctly configured:
+      <ul>
+        <li> <font color="blue"> yptest </font> <a
+ href="http://linux.die.net/man/8/yptest" class="external text"
+ title="http://linux.die.net/man/8/yptest" rel="nofollow">doc</a>
+        </li>
+      </ul>
+      </td>
+      <td valign="top">
+      <p>Feedback from Nalin
+The yptest command will report an error if the passwd map doesn't
+include an entry for a user named "nobody". In a directory server, this
+is probably going to be rare.
+Typically a client system will only start portmap if it's not running,
+but not restart it. In any case, portmap needs to be running _before_
+the ypbind service is started. </p>
+      </td>
+      <td valign="top"><br>
+      </td>
+    </tr>
+    <tr
+ style="background: papayawhip none repeat scroll 0%; -moz-background-clip: -moz-initial; -moz-background-origin: -moz-initial; -moz-background-inline-policy: -moz-initial; color: cornflowerblue;">
+      <td colspan="6"> <b>Test purpose</b>: NIS command works the
+same.
+Please note, each command will have to feed with different options, and
+that make some extra test cases. I will have details come out later.
+      </td>
+    </tr>
+    <tr>
+      <td valign="top"> 1-2
+      </td>
+      <td valign="top"> ypdomainname
+      </td>
+      <td valign="top">
+      <ol>
+        <li> config client host as test case 1
+        </li>
+        <li> run command <b>ypdomainname</b>
+        </li>
+      </ol>
+      </td>
+      <td valign="top"><br>
+      </td>
+      <td valign="top">
+      <p>Feedback from Nalin:
+Doesn't communicate with the server, shouldn't be affected.
+      </p>
+      </td>
+      <td valign="top"><br>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top"> 1-3
+      </td>
+      <td valign="top"> yptest (extended test)
+      </td>
+      <td valign="top">
+      <ol>
+        <li> config client host as test case 1
+        </li>
+        <li> run command <b>yptest</b>
+        </li>
+      </ol>
+      </td>
+      <td valign="top"><br>
+      </td>
+      <td valign="top">
+      <p>Feedback from Nalin:
+The yptest command will report an error if the passwd map doesn't
+include an entry for a user named "nobody". In a directory server, this
+is probably going to be rare. </p>
+      </td>
+      <td valign="top">
+      <p><br>
+      </p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top"> 1-4
+      </td>
+      <td valign="top"> ypmatch
+      </td>
+      <td valign="top">
+      <ol>
+        <li> config client host as test case 1
+        </li>
+        <li> run command <b>ypmatch</b>
+        </li>
+      </ol>
+      </td>
+      <td valign="top"><br>
+      </td>
+      <td valign="top">
+      <p>Feedback from Nalin: The output should have the same format.
+      </p>
+      </td>
+      <td valign="top"><br>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top"> 1-5
+      </td>
+      <td valign="top"> ypset
+      </td>
+      <td valign="top">
+      <ol>
+        <li> config client host as test case 1
+        </li>
+        <li> run command <b>ypset</b>
+        </li>
+      </ol>
+      </td>
+      <td valign="top"><br>
+      </td>
+      <td valign="top">
+      <p>Feedback from Nalin: Doesn't communicate with the server, so
+it shouldn't be affected by which server is used.
+      </p>
+      </td>
+      <td valign="top"><br>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top"> 1-6
+      </td>
+      <td valign="top"> ypwhich
+      </td>
+      <td valign="top">
+      <ol>
+        <li> config client host as test case 1
+        </li>
+        <li> run command <b>ypwhich</b>
+        </li>
+      </ol>
+      </td>
+      <td valign="top"><br>
+      </td>
+      <td valign="top"><br>
+      </td>
+      <td valign="top"><br>
+      </td>
+    </tr>
+    <tr
+ style="background: papayawhip none repeat scroll 0%; -moz-background-clip: -moz-initial; -moz-background-origin: -moz-initial; -moz-background-inline-policy: -moz-initial; color: cornflowerblue;">
+      <td colspan="6"> <b>Repeat the above 6 test cases in all
+supported IPA client platform</b>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<p><br>
+</p>
+<p><br>
+</p>
+<a name="IPA_specific_Testing"></a>
+<h5><span class="editsection">[<a
+ href="http://rome.sjc.redhat.com/mediawiki/index.php?title=IPA_NIS_plugin_test_plan&amp;action=edit&amp;section=10"
+ title="Edit section: IPA specific Testing">edit</a>]</span> <span
+ class="mw-headline"> IPA specific Testing </span></h5>
+<table
+ style="background: lightcyan none repeat scroll 0%; -moz-background-clip: -moz-initial; -moz-background-origin: -moz-initial; -moz-background-inline-policy: -moz-initial;"
+ border="1" cellpadding="5" cellspacing="0">
+  <tbody>
+    <tr>
+      <th
+ style="background: cadetblue none repeat scroll 0%; -moz-background-clip: -moz-initial; -moz-background-origin: -moz-initial; -moz-background-inline-policy: -moz-initial; color: white;">
+#
+      </th>
+      <th
+ style="background: cadetblue none repeat scroll 0%; -moz-background-clip: -moz-initial; -moz-background-origin: -moz-initial; -moz-background-inline-policy: -moz-initial; color: white;">
+Scenario
+      </th>
+      <th
+ style="background: cadetblue none repeat scroll 0%; -moz-background-clip: -moz-initial; -moz-background-origin: -moz-initial; -moz-background-inline-policy: -moz-initial; color: white;">
+Test Procedure
+      </th>
+      <th
+ style="background: cadetblue none repeat scroll 0%; -moz-background-clip: -moz-initial; -moz-background-origin: -moz-initial; -moz-background-inline-policy: -moz-initial; color: white;">
+Expected result
+      </th>
+      <th
+ style="background: cadetblue none repeat scroll 0%; -moz-background-clip: -moz-initial; -moz-background-origin: -moz-initial; -moz-background-inline-policy: -moz-initial; color: white;">
+Test result
+      </th>
+      <th
+ style="background: cadetblue none repeat scroll 0%; -moz-background-clip: -moz-initial; -moz-background-origin: -moz-initial; -moz-background-inline-policy: -moz-initial; color: white;">
+Notes
+      </th>
+    </tr>
+    <tr
+ style="background: papayawhip none repeat scroll 0%; -moz-background-clip: -moz-initial; -moz-background-origin: -moz-initial; -moz-background-inline-policy: -moz-initial; color: cornflowerblue;">
+      <td colspan="6"> <b>Test purpose</b>: functional testing
+      </td>
+    </tr>
+    <tr>
+      <td valign="top"> 2-1
+      </td>
+      <td valign="top"> map cache synchronization testing.
+      </td>
+      <td valign="top"><br>
+      </td>
+      <td valign="top"><br>
+      </td>
+      <td valign="top">
+      <pre>2-1  Using ldapmodify to change to one of the values for an attribute<br>     in an entry which the plugin provides to clients.  Use ypmatch or<br>     ypcat to verify that the corresponding entry in the NIS map has<br>     been updated (and with yppoll, that the map's "order" has changed).<br><br>     Use ldapadd to add a new entry to the directory server which would<br>     be expected to also show up in a NIS map.  Check that it now does<br>     using ypmatch or ypcat (and with yppoll, that the map's "order" has<br>     changed).<br><br>     Use ldapdelete to delete an entry from the directory server which<br>     has a corresponding entry in a NIS map.  Check that it no longer<br>     appears in the NIS map (and with yppoll, that the map's "order" has<br>     changed).<br></pre>
+      </td>
+      <td valign="top">
+      <p><br>
+      </p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top"> 2-2
+      </td>
+      <td valign="top"> boundary testing: <b>nis-max-dgram-size</b>
+      </td>
+      <td valign="top"><br>
+      </td>
+      <td valign="top"><br>
+      </td>
+      <td valign="top">
+      <pre>2-2  Try adding users to a group until the size of the entry for the<br>     group grows too large to fit into a single datagram reply (there'll<br>     be some overhead due to the protocol's headers).  The ypmatch<br>     command uses datagrams, so it should suddenly stop being able to<br>     "see" the group.  The ypcat command, which opens a connection,<br>     should still show the group as being there.<br></pre>
+      </td>
+      <td valign="top"><br>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top"> 2-3
+      </td>
+      <td valign="top"> boundary testing: <b>nis-max-value-size</b>
+      </td>
+      <td valign="top"><br>
+      </td>
+      <td valign="top"><br>
+      </td>
+      <td valign="top">
+      <pre>2-3  There's a point at which a group will become too large even to be<br>     reported to a connected client.<br></pre>
+      </td>
+      <td valign="top">
+      <p><br>
+      </p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top"> 2-4
+      </td>
+      <td valign="top"> name converting testing (since NIS is name case
+sensitive but LDAP is no)
+      </td>
+      <td valign="top"><br>
+      </td>
+      <td valign="top"><br>
+      </td>
+      <td valign="top"><br>
+      </td>
+      <td valign="top">
+      <p><br>
+      </p>
+      </td>
+    </tr>
+    <tr
+ style="background: papayawhip none repeat scroll 0%; -moz-background-clip: -moz-initial; -moz-background-origin: -moz-initial; -moz-background-inline-policy: -moz-initial; color: cornflowerblue;">
+      <td colspan="6"> <b>Test purpose</b>: Security testing
+      </td>
+    </tr>
+    <tr>
+      <td valign="top"> 2-5
+      </td>
+      <td valign="top"> tcp_wrappers general -- which are
+/etc/hosts.allow and /etc/hosts.deny)
+      </td>
+      <td valign="top"><br>
+      </td>
+      <td valign="top"><br>
+      </td>
+      <td valign="top"><br>
+      </td>
+      <td valign="top"><br>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top"> 2-6
+      </td>
+      <td valign="top"> plugin configuration: nis-tcp-wrappers-name
+attribute testing(enable, disable and mixed use with
+/etc/[hosts.allow|hosts.deny]
+      </td>
+      <td valign="top"><br>
+      </td>
+      <td valign="top"><br>
+      </td>
+      <td valign="top">
+      <pre>2-6  The nis-tcp-wrappers-name attribute doesn't control whether or not<br>     tcp_wrappers is used, just which name the plugin uses for itself<br>     when evaluating the tcp_wrappers configuration.  The default is<br>     "nis-plugin", but it's an option so that values like "ypserv" can<br>     be used if tcp_wrappers is already configured for that on a a given<br>     server.<br>    <br>     The "securenets" config option is an alternate way to do this using<br>     settings stored in the directory server.  Probably want to exercise<br>     that, too.<br></pre>
+      </td>
+      <td valign="top"><br>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top"> 2-7
+      </td>
+      <td valign="top"> ACL (LDAP entry <b>access control list</b>
+testing)
+      </td>
+      <td valign="top"><br>
+      </td>
+      <td valign="top"><br>
+      </td>
+      <td valign="top"> This will be covered in <a
+ href="http://rome.sjc.redhat.com/mediawiki/index.php/IPA_Security_test_plan"
+ class="external text"
+ title="http://rome.sjc.redhat.com/mediawiki/index.php/IPA_Security_test_plan"
+ rel="nofollow">IPA Security Test</a>
+      </td>
+      <td valign="top"><br>
+      </td>
+    </tr>
+    <tr
+ style="background: papayawhip none repeat scroll 0%; -moz-background-clip: -moz-initial; -moz-background-origin: -moz-initial; -moz-background-inline-policy: -moz-initial; color: cornflowerblue;">
+      <td colspan="6"> <b>Test purpose</b>: system testing
+      </td>
+    </tr>
+    <tr>
+      <td valign="top"> 2-8
+      </td>
+      <td valign="top"> IPV6 testing.
+      </td>
+      <td valign="top"> UNIX NIS and RHDS both support IPv6, a minimum
+set of IPv6 supporting should be setup. Here is a little info I found <a
+ href="http://lists.freebsd.org/pipermail/freebsd-questions/2007-August/156844.html"
+ class="external text"
+ title="http://lists.freebsd.org/pipermail/freebsd-questions/2007-August/156844.html"
+ rel="nofollow">online</a>
+      </td>
+      <td valign="top"><br>
+      </td>
+      <td valign="top"><br>
+      </td>
+      <td valign="top"><br>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top"> 2-9
+      </td>
+      <td valign="top"> Stress testing
+      </td>
+      <td valign="top"><br>
+      </td>
+      <td valign="top"><br>
+      </td>
+      <td valign="top"> This test covered in <a
+ href="http://rome.sjc.redhat.com/mediawiki/index.php/IPA_stress_test#NIS_plugin_stress_test"
+ class="external text"
+ title="http://rome.sjc.redhat.com/mediawiki/index.php/IPA_stress_test#NIS_plugin_stress_test"
+ rel="nofollow">IPA Stress Test Plan</a>
+      </td>
+      <td valign="top"><br>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top"> 2-10
+      </td>
+      <td valign="top"> plugin performance testing
+      </td>
+      <td valign="top"><br>
+      </td>
+      <td valign="top"><br>
+      </td>
+      <td valign="top"> This test will dropped from this release cycle
+      </td>
+      <td valign="top"><br>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top"> 2-11
+      </td>
+      <td valign="top"> plugin memory usage testing
+      </td>
+      <td valign="top"><br>
+      </td>
+      <td valign="top"><br>
+      </td>
+      <td valign="top"> This test will dropped from this release cycle
+      </td>
+      <td valign="top"><br>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<a name="Additional_test_covered_in_this_test"></a>
+<h3><span class="editsection">[<a
+ href="http://rome.sjc.redhat.com/mediawiki/index.php?title=IPA_NIS_plugin_test_plan&amp;action=edit&amp;section=11"
+ title="Edit section: Additional test covered in this test">edit</a>]</span>
+<span class="mw-headline"> Additional test covered in this test </span></h3>
+<p>NONE
+</p>
+<a name="Risk_analysis_.28what_won.27t_be_tested.29"></a>
+<h3><span class="editsection">[<a
+ href="http://rome.sjc.redhat.com/mediawiki/index.php?title=IPA_NIS_plugin_test_plan&amp;action=edit&amp;section=12"
+ title="Edit section: Risk analysis (what won't be tested)">edit</a>]</span>
+<span class="mw-headline"> Risk analysis (what won't be tested) </span></h3>
+<a name="This_is_acceptance_test_set_in_this_release_cycle"></a>
+<h4><span class="editsection">[<a
+ href="http://rome.sjc.redhat.com/mediawiki/index.php?title=IPA_NIS_plugin_test_plan&amp;action=edit&amp;section=13"
+ title="Edit section: This is acceptance test set in this release cycle">edit</a>]</span>
+<span class="mw-headline"> This is acceptance test set in this release
+cycle </span></h4>
+<p>All test cases in this test plan are just <b>Acceptance level</b>
+test cases. A fully coverage of NIS functional testing is a required.
+However, due to the time and resource we have right now, we won't be
+able to implement a complete and comprehensive testing set. As of this
+release (IPA 1.1), QE will verity the basic NIS client and server
+functionality. More corner and negative test cases will be added as we
+have more time at IPA 2.0 release cycle.
+</p>
+<a name="NIS_Master-slave_setup.2Fconfiguration_won.27t_be_tested"></a>
+<h4><span class="editsection">[<a
+ href="http://rome.sjc.redhat.com/mediawiki/index.php?title=IPA_NIS_plugin_test_plan&amp;action=edit&amp;section=14"
+ title="Edit section: NIS Master-slave setup/configuration won't be tested">edit</a>]</span>
+<span class="mw-headline"> NIS Master-slave setup/configuration won't
+be tested </span></h4>
+<p>The current UNIX NIS can setup Master-Slave relation. And this
+feature is not implemented in current IPA NIS plugin release. To be
+specific, the following 3 theoretical-possible deployment will NOT be
+tested. </p>
+<ol>
+  <li> UNIX NIS Master &lt;==&gt; IPA NIS Plugin Slave
+  </li>
+  <li> IPA NIS Plugin Master &lt;==&gt; UNIX NIS Slave
+  </li>
+  <li> IPA NIS Plugin Master &lt;==&gt; IPA NIS Plugin Slave
+  </li>
+</ol>
+<a name="Stress_testing"></a>
+<h4><span class="editsection">[<a
+ href="http://rome.sjc.redhat.com/mediawiki/index.php?title=IPA_NIS_plugin_test_plan&amp;action=edit&amp;section=15"
+ title="Edit section: Stress testing">edit</a>]</span> <span
+ class="mw-headline"> Stress testing </span></h4>
+<p>Similar to KDC server, NIS server also response for some
+network-wide resource. A stress test must apply to this NIS plugin.
+This part is covered in <a
+ href="http://rome.sjc.redhat.com/mediawiki/index.php/IPA_stress_test#NIS_plugin_stress_test"
+ class="external text"
+ title="http://rome.sjc.redhat.com/mediawiki/index.php/IPA_stress_test#NIS_plugin_stress_test"
+ rel="nofollow">IPA System Stress test plan</a>
+</p>
+<a name="Resources"></a>
+<h3><span class="editsection">[<a
+ href="http://rome.sjc.redhat.com/mediawiki/index.php?title=IPA_NIS_plugin_test_plan&amp;action=edit&amp;section=16"
+ title="Edit section: Resources">edit</a>]</span> <span
+ class="mw-headline"> Resources </span></h3>
+<ul>
+  <li> <a
+ href="https://idmwiki.sjc.redhat.com/export/idmwiki/NIS_Plug-in_Design"
+ class="external text"
+ title="https://idmwiki.sjc.redhat.com/export/idmwiki/NIS_Plug-in_Design"
+ rel="nofollow">NIS Plugin Design Doc</a>
+  </li>
+  <li> <a href="https://fedorahosted.org/slapi-nis/wiki"
+ class="external text" title="https://fedorahosted.org/slapi-nis/wiki"
+ rel="nofollow">Official Plug-in wiki</a>
+    <ul>
+      <li> <a
+ href="http://git.fedorahosted.org/git/slapi-nis.git/doc?p=slapi-nis.git;a=blob_plain;f=doc/nis-getting-started.txt"
+ class="external text"
+ title="http://git.fedorahosted.org/git/slapi-nis.git/doc?p=slapi-nis.git;a=blob_plain;f=doc/nis-getting-started.txt"
+ rel="nofollow">Getting start Guide</a>
+      </li>
+    </ul>
+  </li>
+  <li> <a href="http://linux-nis.org" class="external text"
+ title="http://linux-nis.org" rel="nofollow">Linux NIS org</a>
+  </li>
+</ul>
+<a name="Supplements"></a>
+<h3><span class="editsection">[<a
+ href="http://rome.sjc.redhat.com/mediawiki/index.php?title=IPA_NIS_plugin_test_plan&amp;action=edit&amp;section=17"
+ title="Edit section: Supplements">edit</a>]</span> <span
+ class="mw-headline"> Supplements </span></h3>
+<a name="NIS_Configuration_Guide"></a>
+<h5><span class="editsection">[<a
+ href="http://rome.sjc.redhat.com/mediawiki/index.php?title=IPA_NIS_plugin_test_plan&amp;action=edit&amp;section=18"
+ title="Edit section: NIS Configuration Guide">edit</a>]</span> <span
+ class="mw-headline"> NIS Configuration Guide </span></h5>
+<p><font color="red"> need find documents online </font>
+</p>
+<ul>
+  <li> RHEL
+  </li>
+  <li> HP-UX
+  </li>
+  <li> Solaris
+  </li>
+  <li> Windows
+  </li>
+</ul>
+<a name="RFC"></a>
+<h5><span class="editsection">[<a
+ href="http://rome.sjc.redhat.com/mediawiki/index.php?title=IPA_NIS_plugin_test_plan&amp;action=edit&amp;section=19"
+ title="Edit section: RFC">edit</a>]</span> <span class="mw-headline">
+RFC </span></h5>
+<ul>
+  <li> <a href="http://www.ietf.org/rfc/rfc1832.txt"
+ class="external text" title="http://www.ietf.org/rfc/rfc1832.txt"
+ rel="nofollow">RFC 1832</a>
+  </li>
+  <li> <a href="http://www.ietf.org/rfc/rfc1833.txt"
+ class="external text" title="http://www.ietf.org/rfc/rfc1833.txt"
+ rel="nofollow">RFC 1833</a>
+  </li>
+</ul>
+</body>
+</html>
