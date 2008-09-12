@@ -63,7 +63,6 @@ UninstallClient()
 
 }
 
-
 SetupClient()
 {
 	if [ $DSTET_DEBUG = y ]; then set -x; fi
@@ -92,7 +91,6 @@ SetupClient()
 
 	return 0;
 }
-
 
 SetupServer()
 {
@@ -310,42 +308,57 @@ InstallClientRPM()
 		echo "Returning"
 		return 0
 	fi
-	ssh root@$FULLHOSTNAME "/etc/init.d/yum-updatesd stop;killall yum;sleep 1; killall -9 yum;yum -y install $pkglistA"
-	ret=$?
-	if [ $ret -ne 0 ]; then
-		echo "That rpm install didn't work, lets try that again. Sleeping for 60 seconds first" 
-		sleep 60
-		ssh root@$FULLHOSTNAME "/etc/init.d/yum-updatesd stop;killall yum;sleep 1; killall -9 yum;yum -y install $pkglistA"
-		ret=$?
-		if [ $ret -ne 0 ]; then
-			echo "ERROR - install of $pkglistA on $FULLHOSTNAME failed"
-			return 1
-		fi
-	fi	
-
-	ssh root@$FULLHOSTNAME "/usr/bin/yum clean all"
 
 	ssh root@$FULLHOSTNAME 'find / | grep -v proc | grep -v dev > /list-before-ipa.txt'
-	ret=$?
+		ret=$?
 	if [ $ret -ne 0 ]; then
 		echo "ERROR - ssh to $FULLHOSTNAME failed"
 		return 1
 	fi	
 
-	pkglistB="ipa-client ipa-admintools"
-	ssh root@$FULLHOSTNAME "yum -y install $pkglistB"
-	ret=$?
-	if [ $ret -ne 0 ]; then
-		echo "That rpm install didn't work, lets try that again. Sleeping for 60 seconds first" 
-		sleep 60
-		ssh root@$FULLHOSTNAME "/etc/init.d/yum-updatesd stop;killall yum;sleep 1; killall -9 yum;yum -y install $pkglistB"
+	if [ "$OS_VER" == "5" ]; then 
+		ssh root@$FULLHOSTNAME "/etc/init.d/yum-updatesd stop;killall yum;sleep 1; killall -9 yum;yum -y install $pkglistA"
 		ret=$?
 		if [ $ret -ne 0 ]; then
-			echo "ERROR - install of $pkglistB on $FULLHOSTNAME failed"
-			return 1
-		fi
-	fi	
+			echo "That rpm install didn't work, lets try that again. Sleeping for 60 seconds first" 
+			sleep 60
+			ssh root@$FULLHOSTNAME "/etc/init.d/yum-updatesd stop;killall yum;sleep 1; killall -9 yum;yum -y install $pkglistA"
+			ret=$?
+			if [ $ret -ne 0 ]; then
+				echo "ERROR - install of $pkglistA on $FULLHOSTNAME failed"
+				return 1
+			fi
+		fi	
 
+		ssh root@$FULLHOSTNAME "/usr/bin/yum clean all"
+
+		pkglistB="ipa-client ipa-admintools"
+		ssh root@$FULLHOSTNAME "yum -y install $pkglistB"
+		ret=$?
+		if [ $ret -ne 0 ]; then
+			echo "That rpm install didn't work, lets try that again. Sleeping for 60 seconds first" 
+			sleep 60
+			ssh root@$FULLHOSTNAME "/etc/init.d/yum-updatesd stop;killall yum;sleep 1; killall -9 yum;yum -y install $pkglistB"
+			ret=$?
+			if [ $ret -ne 0 ]; then
+				echo "ERROR - install of $pkglistB on $FULLHOSTNAME failed"
+				return 1
+			fi
+		fi	
+	elif [ "$OS_VER" == "4" ]; then
+		# The SetupRepo sub should put a rpm in /dev/shm/ipa-<2 digit day>-<2-digit month>
+		# This will install the rpm from that dir.
+		# All needed dependacnies should already exist
+		day=$(date +%d)
+		month=$(date +%m)
+		if [ -d /dev/shm/ipa-$day-$month ]; then
+			echo "Installing files from /dev/shm/ipa-$day-$month"
+			ls -alh /dev/shm/ipa-$day-$month
+			rpm -i /dev/shm/ipa-$day-$month/*.rpm
+		else
+			echo "ERROR - Directory /dev/shm/ipa-$day-$month not found"
+		fi 
+	fi
 	ssh root@$FULLHOSTNAME 'find / | grep -v proc | grep -v dev > /list-after-ipa.txt'
 	ret=$?
 	if [ $ret -ne 0 ]; then
@@ -354,7 +367,6 @@ InstallClientRPM()
 	fi	
 
 }
-
 
 InstallServerRPM()
 {
@@ -606,5 +618,4 @@ FixResolv()
 
 }
 ######################################################################
-
 
