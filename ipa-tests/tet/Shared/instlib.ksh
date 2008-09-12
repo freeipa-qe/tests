@@ -270,26 +270,38 @@ SetupRepo()
 	if [ $? -eq 0 ]; then
 		# the repo file is on http, going to wget it on the server
 		ssh root@$FULLHOSTNAME "cd /etc/yum.repos.d;wget $REPO"
-		ret=$?
-		if [ $ret -ne 0 ]; then
+		if [ $? -ne 0 ]; then
 			echo "ERROR ssh to $FULLHOSTNAME failed"
 			return 1
 		fi	
 	else
-		# the repo file is likley a file.
-		if [ ! -f $REPO ]; then
-			echo "ERROR - File $REPO not found."
-			echo "Try using a absolute path in the env file, or, use a file on a http source (http://<path/file.repo)"
-			return 1
+		echo $REPO | grep repo
+		if [ $? -eq 0 ]; then
+			# the repo file is likley a file.
+			if [ ! -f $REPO ]; then
+				echo "ERROR - File $REPO not found."
+				echo "Try using a absolute path in the env file, or, use a file on a http source (http://<path/file.repo)"
+				return 1
+			fi
+			scp $REPO root@$FULLHOSTNAME:/etc/yum.repos.d/.
+			ret=$?
+			if [ $ret -ne 0 ]; then
+				echo "ERROR - scp to $FULLHOSTNAME failed"
+				return 1
+			fi	
+		else
+			# the file is likley a rpm, putting it in /dev/shm/ipa-$day-$month
+			day=$(date +%d)
+			month=$(date +%m)
+			ssh root@$FULLHOSTNAME "rm -Rf /dev/shm/ipa-$day-$month;mkdir -p /dev/shm/ipa-$day-$month"
+			scp $REPO root@$FULLHOSTNAME:/dev/shm/ipa-$day-$month/.
+			if [ $? -ne 0 ]; then
+				echo "ERROR scp to $FULLHOSTNAME failed"
+				return 1
+			fi	
 		fi
-		scp $REPO root@$FULLHOSTNAME:/etc/yum.repos.d/.
-		ret=$?
-		if [ $ret -ne 0 ]; then
-			echo "ERROR - scp to $FULLHOSTNAME failed"
-			return 1
-		fi	
 	fi
-
+	return 0
 }
 
 InstallClientRPM()
