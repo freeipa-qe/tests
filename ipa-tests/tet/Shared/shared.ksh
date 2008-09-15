@@ -5,6 +5,7 @@
 #               interaction or error.
 eval_vars()
 {
+	#if [ $DSTET_DEBUG = y ]; then set -x; fi
         x=\$HOSTNAME_$1
         HOSTNAME=`eval echo $x`
         FULLHOSTNAME=`host $HOSTNAME | awk '{print $1}'`

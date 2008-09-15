@@ -293,6 +293,7 @@ SetupRepo()
 			# the file is likley a rpm, putting it in /dev/shm/ipa-$day-$month
 			day=$(date +%d)
 			month=$(date +%m)
+			env
 			ssh root@$FULLHOSTNAME "rm -Rf /dev/shm/ipa-$day-$month;mkdir -p /dev/shm/ipa-$day-$month"
 			scp $REPO root@$FULLHOSTNAME:/dev/shm/ipa-$day-$month/.
 			if [ $? -ne 0 ]; then

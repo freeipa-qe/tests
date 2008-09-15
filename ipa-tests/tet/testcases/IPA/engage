@@ -1143,7 +1143,7 @@ ask_c1()
 	echo "->"
 	read rsp
 	if [ -z "$rsp" ] ; then echo "Using $OS_VER_C1"; else OS_VER_C1="$rsp"; fi
-	echo "Repo for client 1? This is a url to the .repo file, or a tarball on hpux ($REPO_M1)->"
+	echo "Repo for client 1? This is a url to the .repo file, or a tarball on hpux ($REPO_C1)->"
 	read rsp
 	if [ -z "$rsp" ] ; then echo "Client repo unchanged"; else  REPO_C1="$rsp"; fi
 	export OS_C1 HOSTNAME_C1 OS_VER_C1 REPO_C1
@@ -1187,7 +1187,7 @@ ask_c2()
 	echo "->"
 	read rsp
 	if [ -z "$rsp" ] ; then echo "Using $OS_VER_C2"; else OS_VER_C2="$rsp"; fi
-	echo "Repo for client 2? This is a url to the .repo file, or a tarball on hpux ($REPO_M2)->"
+	echo "Repo for client 2? This is a url to the .repo file, or a tarball on hpux ($REPO_C2)->"
 	read rsp
 	if [ -z "$rsp" ] ; then echo "Client repo unchanged"; else  REPO_C2="$rsp"; fi
 	export OS_C2 HOSTNAME_C2 OS_VER_C2 REPO_C2
@@ -2010,7 +2010,7 @@ main_main()
 	export HOSTNAME_M3 OS_M3 REPO_M3
 	export HOSTNAME_M4 OS_M4 REPO_M4
 	export HOSTNAME_C1 OS_C1 REPO_C1
-	export HOSTNAME_C2 OS_C2 REPO_C1
+	export HOSTNAME_C2 OS_C2 REPO_C2
 	export HOSTNAME_C3 OS_C3 REPO_C3
 	export HOSTNAME_C4 OS_C4 REPO_C4
 	
