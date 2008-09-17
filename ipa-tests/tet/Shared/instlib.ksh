@@ -74,13 +74,18 @@ SetupClient()
 		return 1;
 	fi
 
-	eval_vars $1
-	thishost=$FULLHOSTNAME
 	eval_vars M1
 	master=$FULLHOSTNAME
+	eval_vars $1
+	thishost=$FULLHOSTNAME
+
 	ssh root@$thishost "rm -f /etc/resolv.conf.original; \
 		cp -a /etc/resolv.conf /etc/resolv.conf.original;"
 
+	if [ "$OS_VER" == "5" ]; then
+		echo "ipa-client-install --realm=$RELM_NAME -U" 
+		ssh root@$thishost "ipa-client-install --realm=$RELM_NAME -U" 
+	elif [ "$OS_VER" == "4" ]; then
 		echo "ipa-client-install --server=$master -U"
 		ssh root@$thishost "ipa-client-install --server=$master -U"
 		ret=$?
@@ -88,6 +93,7 @@ SetupClient()
 			echo "ERROR - ipa-client-install on $thishost failed."
 			return 1;
 		fi
+	fi
 
 	return 0;
 }
@@ -128,17 +134,22 @@ SetupServer()
 		echo "setting up server $1 as a replica"
 		replica_hostname=$FULLHOSTNAME
 		eval_vars M1
+		echo "Clearing out any pre-existing replica files before we start"
+		ssh root@$FULLHOSTNAME "rm -f /var/lib/ipa/replica-info-$replica_hostname*"
 		echo "Generating replica prepare file for $replica_hostname on $FULLHOSTNAME"
 		ssh root@$FULLHOSTNAME "/usr/sbin/ipa-replica-prepare $replica_hostname"
-		ret=$?
-		if [ $ret -ne 0 ]; then
-			echo "ERROR - /usr/sbin/ipa-replica-prepare $replica_hostname on $FULLHOSTNAME failed."
-			return 1;
+		if [ $? -ne 0 ]; then
+			echo "Method one did not work, trying method 2"
+			ssh root@$FULLHOSTNAME "/usr/sbin/ipa-replica-prepare -p $DM_ADMIN_PASS $replica_hostname"
+			if [ $? -ne 0 ]; then
+				echo "ERROR - /usr/sbin/ipa-replica-prepare $replica_hostname on $FULLHOSTNAME failed."
+				return 1;
+			fi
 		fi
-		ssh root@$FULLHOSTNAME "ls /var/lib/ipa/replica-info-$replica_hostname"
-		ret=$?
-		if [ $ret -ne 0 ]; then
-			echo "ERROR - ipa-replica-prepare did not create /var/lib/ipa/replica-info-$replica_hostname"
+		# Checking to ensure that the files got created
+		ssh root@$FULLHOSTNAME "ls /var/lib/ipa/replica-info-$replica_hostname*"
+		if [ $? -ne 0 ]; then
+			echo "ERROR - ipa-replica-prepare did not create /var/lib/ipa/replica-info-$replica_hostname*"
 			return 1;
 		fi
 
@@ -153,10 +164,10 @@ SetupServer()
 
 		# copying the relica prepare file from the master server to the replica	
 		rm -f $TET_TMP_DIR/replica-info-$replica_hostname
-		scp root@$FULLHOSTNAME:/var/lib/ipa/replica-info-$replica_hostname $TET_TMP_DIR/.
+		scp root@$FULLHOSTNAME:/var/lib/ipa/replica-info-$replica_hostname* $TET_TMP_DIR/.
 		ret=$?
 		ssh root@$replica_hostname "rm -f /tmp/replica-info-$replica_hostname"
-		scp $TET_TMP_DIR/replica-info-$replica_hostname root@$replica_hostname:/tmp/.
+		scp $TET_TMP_DIR/replica-info-$replica_hostname* root@$replica_hostname:/tmp/.
 		ret2=$?
 		if [ $ret -ne 0 ]||[ $ret2 -ne 0 ]; then
 			echo "ERROR - scp root@$FULLHOSTNAME:/var/lib/ipa/replica-info-$replica_hostname to root@$replica_hostname:/tmp/. failed"
@@ -187,10 +198,15 @@ expect -exact "Directory Manager (existing master) password: "' >> $TET_TMP_DIR/
 		chmod 755 $TET_TMP_DIR/replica-install.exp
 		scp $TET_TMP_DIR/replica-install.exp root@$replica_hostname:/tmp/.
 		ssh root@$replica_hostname "/usr/bin/expect /tmp/replica-install.exp"
-		ret=$?
-		if [ $ret -ne 0 ]; then
-			echo "ERROR - /usr/bin/expect /tmp/replica-install.exp on $replica_hostname:/tmp/. failed"
-			return 1;
+		if [ $? -ne 0 ]; then
+			echo "Method 1 did not work, trying method 2"
+			# Replacing name in expect script
+			ssh root@$replica_hostname "sed -i s/$replica_hostname/$replica_hostname.gpg/g /tmp/replica-install.exp"
+			ssh root@$replica_hostname "/usr/bin/expect /tmp/replica-install.exp"
+			if [ $? -ne 0 ]; then
+				echo "ERROR - /usr/bin/expect /tmp/replica-install.exp on $replica_hostname:/tmp/. failed"
+				return 1;
+			fi
 		fi
 		#ssh root@$replica_hostname 'ldapmodify -x -D "cn=directory manager" -w Secret123 -f /tmp/debug.ldif'
 		ssh root@$replica_hostname "ps -ef | grep slapd"
@@ -364,13 +380,22 @@ InstallClientRPM()
 		# All needed dependacnies should already exist
 		day=$(date +%d)
 		month=$(date +%m)
-		if [ -d /dev/shm/ipa-$day-$month ]; then
-			echo "Installing files from /dev/shm/ipa-$day-$month"
-			ls -alh /dev/shm/ipa-$day-$month
-			rpm -i /dev/shm/ipa-$day-$month/*.rpm
-		else
-			echo "ERROR - Directory /dev/shm/ipa-$day-$month not found"
-		fi 
+#		ssh root@$FULLHOSTNAME "if [ -d /dev/shm/ipa-$day-$month ]; then \
+#			set -x; \
+#			echo "Installing files from /dev/shm/ipa-$day-$month"; \
+#			ls -alh /dev/shm/ipa-$day-$month; \
+#			return 0; \
+#		else \
+#			echo "ERROR - Directory /dev/shm/ipa-$day-$month not found"; \
+#			return 1; \
+#		fi" 
+#		if [ $? -eq 0 ]; then 
+			ssh root@$FULLHOSTNAME "rpm -i /dev/shm/ipa-$day-$month/*.rpm"
+			if [ $? -ne 0 ]; then
+				echo "ERROR - install of client rpm on $FULLHOSTNAME failed"
+				return 1;
+			fi
+#		fi
 	fi
 	ssh root@$FULLHOSTNAME 'find / | grep -v proc | grep -v dev > /list-after-ipa.txt'
 	ret=$?
@@ -468,7 +493,8 @@ UnInstallClientRPM()
 		echo "Returning"
 		return 0
 	fi
-	ssh root@$FULLHOSTNAME "rpm -e --allmatches ipa-client ipa-admintools"
+	ssh root@$FULLHOSTNAME "rpm -e --allmatches ipa-admintools"
+	ssh root@$FULLHOSTNAME "rpm -e --allmatches ipa-client"
 	ret=$?
 	if [ $ret -ne 0 ]; then
 		echo "ERROR - ssh to $FULLHOSTNAME failed"
@@ -586,7 +612,7 @@ Cleanup()
 	ret=$?
 	if [ $ret -ne 0 ]; then
 		echo "ERROR - no /etc/yum.repos.d/ipa* files exist. This may mean that uninstall got broken"
-		return 1
+	#	return 1
 	fi
 	ssh root@$FULLHOSTNAME "rm -f /etc/yum.repos.d/ipa*"
 

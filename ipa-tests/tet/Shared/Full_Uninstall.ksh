@@ -18,8 +18,8 @@ tp1()
 			UninstallServer $s
 			ret=$?
 			if [ $ret -ne 0 ]; then
-				echo "ipa-server-install --uninstall failed"
-				return 1:
+				echo "ERROR - ipa-server-install --uninstall failed"
+				#return 1:
 			fi
 		fi
 	done
@@ -29,8 +29,8 @@ tp1()
 			UninstallClient $s
 			ret=$?
 			if [ $ret -ne 0 ]; then
-				echo "Install of server RPM on $s ssh failed"
-				return 1
+				echo "ERROR - Install of server RPM on $s ssh failed"
+				#return 1
 			fi
 		fi
 	done
@@ -47,8 +47,8 @@ tp2()
 			UnInstallServerRPM $s
 			ret=$?
 			if [ $ret -ne 0 ]; then
-				echo "remove of server RPM's on $s ssh failed"
-				return 1
+				echo "ERROR - remove of server RPM's on $s ssh failed"
+#				return 1
 			fi
 		fi
 	done
@@ -58,8 +58,8 @@ tp2()
 			UnInstallClientRPM $s
 			ret=$?
 			if [ $ret -ne 0 ]; then
-				echo "remove of Client RPM's on $s ssh failed"
-				return 1
+				echo "ERROR - remove of Client RPM's on $s ssh failed"
+#				return 1
 			fi
 		fi
 	done
@@ -81,8 +81,8 @@ tp3()
 			Cleanup $s
 			ret=$?
 			if [ $ret -ne 0 ]; then
-				echo "Cleanup on $s failed"
-				return 1
+				echo "ERROR - Cleanup on $s failed"
+		#		return 1
 			fi
 		fi
 	done
@@ -94,8 +94,8 @@ tp3()
 			Cleanup $s
 			ret=$?
 			if [ $ret -ne 0 ]; then
-				echo "Cleanup on $s failed"
-				return 1
+				echo "ERROR - Cleanup on $s failed"
+#				return 1
 			fi
 		fi
 	done
