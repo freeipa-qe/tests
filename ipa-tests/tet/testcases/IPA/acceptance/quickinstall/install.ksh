@@ -304,15 +304,17 @@ sleep 15'  > $TET_TMP_DIR/kinit.exp
 		ssh root@$FULLHOSTNAME 'kdestroy;/usr/bin/expect /tmp/kinit.exp'
 		ret=$?
 		if [ $ret != 0 ]; then
-		        echo "ERROR - kinit failed";
+	        	echo "ERROR - kinit failed";
 			tet_result FAIL
 		fi
 
-		ssh root@$FULLHOSTNAME '/usr/sbin/ipa-finduser admin'
-		ret=$?
-		if [ $ret != 0 ]; then
-        		echo "ERROR - ipa-finduser failed";
-			tet_result FAIL
+		if [ "$OS_VER" -eq "5" ] && [ "$OS" -eq "RHEL" ]; then
+			ssh root@$FULLHOSTNAME '/usr/sbin/ipa-finduser admin'
+			ret=$?
+			if [ $ret != 0 ]; then
+        			echo "ERROR - ipa-finduser failed";
+				tet_result FAIL
+			fi
 		fi
 
 		if [ "$DSTET_DEBUG" = "y" ]; then echo "done working on $s"; fi
@@ -377,20 +379,22 @@ if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 	for s in $CLIENTS; do
 		if [ "$DSTET_DEBUG" = "y" ]; then echo "working on $s now"; fi
 		eval_vars $s
-		ssh root@$FULLHOSTNAME "/usr/sbin/ipa-finduser $user1"
-		if [ $? != 0 ]; then
-        		echo "ERROR - ipa-finduser failed on $FULLHOSTNAME";
-			tet_result FAIL
-		fi
-		ssh root@$FULLHOSTNAME "/usr/sbin/ipa-finduser $user2"
-		if [ $? != 0 ]; then
-        		echo "ERROR - ipa-finduser failed on $FULLHOSTNAME";
-			tet_result FAIL
-		fi
-		ssh root@$FULLHOSTNAME "/usr/sbin/ipa-findgroup -v $group1 | grep $user1"
-		if [ $? != 0 ]; then
-        		echo "ERROR - ipa-finduser failed on $FULLHOSTNAME";
-			tet_result FAIL
+		if [ "$OS_VER" -eq "5" ] && [ "$OS" -eq "RHEL" ]; then
+			ssh root@$FULLHOSTNAME "/usr/sbin/ipa-finduser $user1"
+			if [ $? != 0 ]; then
+        			echo "ERROR - ipa-finduser failed on $FULLHOSTNAME";
+				tet_result FAIL
+			fi
+			ssh root@$FULLHOSTNAME "/usr/sbin/ipa-finduser $user2"
+			if [ $? != 0 ]; then
+        			echo "ERROR - ipa-finduser failed on $FULLHOSTNAME";
+				tet_result FAIL
+			fi
+			ssh root@$FULLHOSTNAME "/usr/sbin/ipa-findgroup -v $group1 | grep $user1"
+			if [ $? != 0 ]; then
+        			echo "ERROR - ipa-finduser failed on $FULLHOSTNAME";
+				tet_result FAIL
+			fi
 		fi
 		if [ "$DSTET_DEBUG" = "y" ]; then echo "done working on $s"; fi
 	done
