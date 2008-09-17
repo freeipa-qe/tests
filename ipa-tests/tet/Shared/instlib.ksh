@@ -82,6 +82,9 @@ SetupClient()
 	ssh root@$thishost "rm -f /etc/resolv.conf.original; \
 		cp -a /etc/resolv.conf /etc/resolv.conf.original;"
 
+	# Running uninstall to reduce the number of errors
+	ssh root@$thishost "ipa-client-install --uninstall -U"
+
 	if [ "$OS_VER" == "5" ]; then
 		echo "ipa-client-install --realm=$RELM_NAME -U" 
 		ssh root@$thishost "ipa-client-install --realm=$RELM_NAME -U" 
@@ -609,12 +612,21 @@ Cleanup()
 
 	# yum repo cleanup
 	ssh root@$FULLHOSTNAME "ls /etc/yum.repos.d/ipa*"
-	ret=$?
-	if [ $ret -ne 0 ]; then
+	if [ $? -ne 0 ]; then
 		echo "ERROR - no /etc/yum.repos.d/ipa* files exist. This may mean that uninstall got broken"
 	#	return 1
 	fi
 	ssh root@$FULLHOSTNAME "rm -f /etc/yum.repos.d/ipa*"
+
+	# Test to ensure that ns-slapd isn't still hanging around.
+	ssh root@$FULLHOSTNAME "ps -fax | grep ns-slapd | grep -v grep"
+	if [ $? -ne 0 ]; then
+		echo "ERROR - ns-slapd is still running. It should be gone"
+		return 1
+	else
+		echo "cleaning up dirsec directories"
+		ssh root@$FULLHOSTNAME "rm -Rf /etc/dirsrv/;rm -Rf /var/run/dirsrv/;"
+	fi
 
 	return 0
 
