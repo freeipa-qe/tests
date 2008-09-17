@@ -10,7 +10,7 @@ fi
 tet_startup="CheckAlive"
 tet_cleanup="pw_cleanup"
 iclist="ic1 ic2"
-ic1="tp1"
+ic1="tp1 tp1a"
 ic2="tp2 tp2a tp2b tp2c tp3 tp3a tp3b tp4 tp4a tp4b tp5 tp5a tp6 tp6a"
 hour=0
 min=0
@@ -36,6 +36,22 @@ get_time()
 	export sec=$(date +%S)
 }
 
+#####################################################################
+SyncDate()
+{
+	for s in $SERVERS; do
+		if [ "$s" != "" ]; then
+			eval_vars $s
+			ssh $FULLHOSTNAME "/etc/init.d/ntpd stop;ntpdate $NTPSERVER"&
+		fi
+	done
+	for s in $CLIENTS; do
+		if [ "$s" != "" ]; then
+			eval_vars $s
+			ssh $FULLHOSTNAME "/etc/init.d/ntpd stop;ntpdate $NTPSERVER"&
+		fi
+	done
+}
 ######################################################################
 ResetKinit()
 {
@@ -70,10 +86,20 @@ ResetKinit()
 tp1()
 {
         echo "START $tet_thistest"
+	# Setting the time and date on all of the servers and clients if we can
+	SyncDate
+	eval_vars M1
+        tet_result PASS
+        echo "END $tet_thistest"
+}
+
+
+tp1a()
+{
+        echo "START $tet_thistest"
 	ResetKinit
         tet_result PASS
         echo "END $tet_thistest"
-
 }
 
 ######################################################################
@@ -243,6 +269,9 @@ tp2()
 	# cleaning up the user
 	ssh root@$FULLHOSTNAME "ipa-deluser $user1"
 
+	SyncDate
+	eval_vars M1
+
 	echo "END $tet_thistest"
 }
 ######################################################################
@@ -356,6 +385,9 @@ tp2a()
 	# cleaning up the user
 	ssh root@$FULLHOSTNAME "ipa-deluser $user1"
 
+	SyncDate
+	eval_vars M1
+
 	echo "END $tet_thistest"
 }
 ######################################################################
@@ -429,6 +461,9 @@ tp2b()
 	# cleaning up the user
 	ssh root@$FULLHOSTNAME "ipa-deluser $user1"
 
+	SyncDate
+	eval_vars M1
+
 	echo "END $tet_thistest"
 }
 ######################################################################
@@ -486,6 +521,8 @@ tp2c()
 		tet_result FAIL
 	fi
 
+	SyncDate
+	eval_vars M1
 
 	tet_result PASS
 
@@ -665,6 +702,9 @@ tp3()
 		tet_result FAIL
 	fi
 
+	SyncDate
+	eval_vars M1
+
 	tet_result PASS
 
 	echo "END $tet_thistest"
@@ -724,6 +764,8 @@ tp3a()
 		tet_result FAIL
 	fi
 
+	SyncDate
+	eval_vars M1
 
 	tet_result PASS
 
@@ -903,6 +945,9 @@ tp3b()
 		echo "Test - $tet_thistest"
 		tet_result FAIL
 	fi
+
+	SyncDate
+	eval_vars M1
 
 	tet_result PASS
 
@@ -2018,6 +2063,9 @@ pw_cleanup()
 		echo "Test - $tet_thistest"
 		tet_result FAIL
 	fi
+
+	SyncDate
+	eval_vars M1
 
 	tet_result PASS
 }
