@@ -1,6 +1,6 @@
 [ipa-daily]
 name=ipa-daily
-baseurl=http://porkchop2.devel.redhat.com/nightly/latest-RHEL5.2-IPA-1.0/1.0/i386/os/IPA/ 
+baseurl=http://porkchop.devel.redhat.com/nightly/latest-RHEL5.2-IPA-1.0/1.0/i386/os/IPA/ 
 #baseurl=http://porkchop2.devel.redhat.com/nightly/latest-RHEL5.1-IPA-1.0/1.0/i386/os/IPA/
 enabled=1
 gpgcheck=0
