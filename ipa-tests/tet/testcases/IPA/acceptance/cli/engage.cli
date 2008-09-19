@@ -88,11 +88,14 @@ cli_run()
 	echo "cli run..."
 	echo "$TET_ROOT/$MainTccName -e -s $TET_ROOT/testcases/IPA/acceptance/cli/tet_scen -x $TET_ROOT/testcases/IPA/tetexecpl.cfg $TET_ROOT/testcases/IPA/acceptance/cli cli"
 
+	(
 	$TET_ROOT/$MainTccName \
 		-e -s $TET_ROOT/testcases/IPA/acceptance/cli/tet_scen \
 		-x $TET_ROOT/testcases/IPA/tetexecpl.cfg \
 		$TET_ROOT/testcases/IPA/acceptance/cli \
 		cli > $MainTmpDir/cli.run.out 2>&1
+	)&
+	EngageTimer $! 1200 120 # wait 1200 sec before kill, then 1200 until kill -9
 	echo ""
 	echo "cli run $MainTmpDir/cli.run.out"
 	echo ""
