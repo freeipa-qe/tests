@@ -54,8 +54,10 @@ UninstallClient()
 	fi
 	eval_vars $1
 	ssh root@$FULLHOSTNAME "ipa-client-install -U --uninstall"
-	ret=$?
-	if [ $ret -ne 0 ]; then
+	ret1=$?
+	ssh root@$FULLHOSTNAME "ipa-client-setup -U --uninstall"
+	ret2=$?
+	if [ $ret1 -ne 0 ]&&[ $ret2 -ne 0]; then
 		echo "ERROR - ipa-client-install -uninstall on $FULLHOSTNAME FAILED"
 #		return 1;
 	fi
@@ -89,11 +91,11 @@ SetupClient()
 		echo "ipa-client-install --realm=$RELM_NAME -U" 
 		ssh root@$thishost "ipa-client-install --realm=$RELM_NAME -U" 
 	elif [ "$OS_VER" == "4" ]; then
-		echo "ipa-client-install --server=$master -U"
-		ssh root@$thishost "ipa-client-install --server=$master -U"
+		echo "ipa-client-setup --server=$master -U"
+		ssh root@$thishost "ipa-client-setup --server=$master -U"
 		ret=$?
 		if [ $ret -ne 0 ]; then
-			echo "ERROR - ipa-client-install on $thishost failed."
+			echo "ERROR - ipa-client-setup on $thishost failed."
 			return 1;
 		fi
 	fi
