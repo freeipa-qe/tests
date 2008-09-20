@@ -102,16 +102,19 @@ tp3()
 		if [ "$s" != "" ]; then
 			echo "verifying that the users exist on the client $s"
 			eval_vars $s
-			usernum=$minnum
-			while [[ $usernum -lt $maxnum ]] ; do
-				ssh root@$FULLHOSTNAME "/usr/sbin/ipa-finduser usr$usernum-x | /bin/grep Login: | /bin/grep usr$usernum-x"
-				ret=$?
-				if [ $ret -ne 0 ]; then
-					echo "ERROR - serch for usr$usernum-x on client $FULLHOSTNAME failed"
-					tet_result FAIL
-				fi
-				let usernum+=1
-			done
+			if [ "$OS_VER" -eq "5" ] && [ "$OS" -eq "RHEL" ]; then
+				usernum=$minnum
+				while [[ $usernum -lt $maxnum ]] ; do
+					ssh root@$FULLHOSTNAME "/usr/sbin/ipa-finduser usr$usernum-x | /bin/grep Login: | /bin/grep usr$usernum-x"
+					ret=$?
+					if [ $ret -ne 0 ]; then
+						echo "ERROR - serch for usr$usernum-x on client $FULLHOSTNAME failed"
+						tet_result FAIL
+					fi
+					let usernum+=1
+				done
+			fi
+			echo "Client $s is not rhel5, it's os is $OS, it's version is $OS_VER"
 		fi
 	done
 
@@ -153,24 +156,27 @@ tp4()
 		if [ "$s" != "" ]; then
 			echo "modifying lastname for users on the server $s"
 			eval_vars $s
-			usernum=$minnum
-			while [[ $usernum -lt $maxnum ]] ; do
-				ssh root@$FULLHOSTNAME "/usr/sbin/ipa-moduser -l testtesttestk$s usr$usernum-x"
-				ret=$?
-				if [ $ret -ne 0 ]; then
-					echo "ERROR - search for usr$usernum-x on server $FULLHOSTNAME failed"
-					tet_result FAIL
-				fi
-				eval_vars M1
-				ssh root@$FULLHOSTNAME "/usr/sbin/ipa-finduser -a usr$usernum-x | /bin/grep Last\ Name | /bin/grep testtesttestk$s"
-				ret=$?
-				if [ $ret -ne 0 ]; then
-					echo "ERROR - search for testtesttestk$s in usr$usernum-x on server $FULLHOSTNAME failed"
-					tet_result FAIL
-				fi
-
-				let usernum+=1
-			done
+			if [ "$OS_VER" -eq "5" ] && [ "$OS" -eq "RHEL" ]; then
+				usernum=$minnum
+				while [[ $usernum -lt $maxnum ]] ; do
+					ssh root@$FULLHOSTNAME "/usr/sbin/ipa-moduser -l testtesttestk$s usr$usernum-x"
+					ret=$?
+					if [ $ret -ne 0 ]; then
+						echo "ERROR - search for usr$usernum-x on server $FULLHOSTNAME failed"
+						tet_result FAIL
+					fi
+					eval_vars M1
+					ssh root@$FULLHOSTNAME "/usr/sbin/ipa-finduser -a usr$usernum-x | /bin/grep Last\ Name | /bin/grep testtesttestk$s"
+					ret=$?
+					if [ $ret -ne 0 ]; then
+						echo "ERROR - search for testtesttestk$s in usr$usernum-x on server $FULLHOSTNAME failed"
+						tet_result FAIL
+					fi
+	
+					let usernum+=1
+				done
+			fi
+			echo "Client $s is not rhel5, it's os is $OS, it's version is $OS_VER"
 		fi
 	done
 
@@ -230,16 +236,19 @@ tp6()
 		if [ "$s" != "" ]; then
 			echo "verifying that the users DO NOT exist on the client $s"
 			eval_vars $s
-			usernum=$minnum
-			while [[ $usernum -lt $maxnum ]] ; do
-				ssh root@$FULLHOSTNAME "/usr/sbin/ipa-finduser usr$usernum-x"
-				ret=$?
-				if [ $ret -eq 0 ]; then
-					echo "ERROR - search for usr$usernum-x on client $FULLHOSTNAME succeeded, and it shouldn't have"
-					tet_result FAIL
-				fi
-				let usernum+=1
-			done
+			if [ "$OS_VER" -eq "5" ] && [ "$OS" -eq "RHEL" ]; then
+				usernum=$minnum
+				while [[ $usernum -lt $maxnum ]] ; do
+					ssh root@$FULLHOSTNAME "/usr/sbin/ipa-finduser usr$usernum-x"
+					ret=$?
+					if [ $ret -eq 0 ]; then
+						echo "ERROR - search for usr$usernum-x on client $FULLHOSTNAME succeeded, and it shouldn't have"
+						tet_result FAIL
+					fi
+					let usernum+=1
+				done
+			fi
+			echo "Client $s is not rhel5, it's os is $OS, it's version is $OS_VER"
 		fi
 	done
 
