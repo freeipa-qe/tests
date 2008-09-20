@@ -106,20 +106,23 @@ tp3()
 	done
 	for s in $CLIENTS; do
 		if [ "$s" != "" ]; then
-			echo "Verifying that group1 exists on $s"
 			eval_vars $s
-			ssh root@$FULLHOSTNAME '/usr/sbin/ipa-findgroup group1 | /bin/grep GID | /bin/grep 444'
-			ret=$?
-			if [ $ret -ne 0 ]; then
-				echo "ERROR - group1 does not exist on $s"
-				tet_result FAIL
+			if [ "$OS_VER" -eq "5" ] && [ "$OS" -eq "RHEL" ]; then
+				echo "Verifying that group1 exists on $s"
+				ssh root@$FULLHOSTNAME '/usr/sbin/ipa-findgroup group1 | /bin/grep GID | /bin/grep 444'
+				ret=$?
+				if [ $ret -ne 0 ]; then
+					echo "ERROR - group1 does not exist on $s"
+					tet_result FAIL
+				fi
+				ssh root@$FULLHOSTNAME '/usr/sbin/ipa-findgroup group2 | /bin/grep GID | /bin/grep 888'
+				ret=$?
+				if [ $ret -ne 0 ]; then
+					echo "ERROR - group2 does not exist on $s"
+					tet_result FAIL
+				fi
 			fi
-			ssh root@$FULLHOSTNAME '/usr/sbin/ipa-findgroup group2 | /bin/grep GID | /bin/grep 888'
-			ret=$?
-			if [ $ret -ne 0 ]; then
-				echo "ERROR - group2 does not exist on $s"
-				tet_result FAIL
-			fi
+			echo "Client $s is not rhel5, it's os is $OS, it's version is $OS_VER"
 		fi
 	done
 
@@ -191,22 +194,25 @@ tp6()
 	done
 	for s in $CLIENTS; do
 		if [ "$s" != "" ]; then
-			echo "Verifying that group2 is in group1 on $s"
 			eval_vars $s
-			ssh root@$FULLHOSTNAME '/usr/sbin/ipa-findgroup group1 | /bin/grep group2'
-			ret=$?
-			if [ $ret -ne 0 ]; then
-				echo "ERROR - group2 does not exist in group1 on $s"
-				tet_result FAIL
-			fi
+			if [ "$OS_VER" -eq "5" ] && [ "$OS" -eq "RHEL" ]; then			
+				echo "Verifying that group2 is in group1 on $s"
+				ssh root@$FULLHOSTNAME '/usr/sbin/ipa-findgroup group1 | /bin/grep group2'
+				ret=$?
+				if [ $ret -ne 0 ]; then
+					echo "ERROR - group2 does not exist in group1 on $s"
+					tet_result FAIL
+				fi
 
-			echo "Verifying that group1 is in group2 on $s"
-			ssh root@$FULLHOSTNAME '/usr/sbin/ipa-findgroup group2 | /bin/grep group1'
-			ret=$?
-			if [ $ret -ne 0 ]; then
-				echo "ERROR - group1 does not exist in group2 on $s"
-				tet_result FAIL
+				echo "Verifying that group1 is in group2 on $s"
+				ssh root@$FULLHOSTNAME '/usr/sbin/ipa-findgroup group2 | /bin/grep group1'
+				ret=$?
+				if [ $ret -ne 0 ]; then
+					echo "ERROR - group1 does not exist in group2 on $s"
+					tet_result FAIL
+				fi
 			fi
+			echo "Client $s is not rhel5, it's os is $OS, it's version is $OS_VER"
 		fi
 	done
 
@@ -609,13 +615,16 @@ ipa-modgroup --add user-41d group-4c-1;"
 	for s in $CLIENTS; do
 		if [ "$s" != "" ]; then
 			eval_vars $s
-			for c in $checklist; do
-				ssh root@$FULLHOSTNAME "ipa-findgroup group-4-d-1 | grep $c"
-				if [ $? -ne 0 ]; then
-					echo "ERROR - $tet_thistest failed in section 6 at $c"
-					tet_result FAIL
-				fi
-			done
+			if [ "$OS_VER" -eq "5" ] && [ "$OS" -eq "RHEL" ]; then
+				for c in $checklist; do
+					ssh root@$FULLHOSTNAME "ipa-findgroup group-4-d-1 | grep $c"
+					if [ $? -ne 0 ]; then
+						echo "ERROR - $tet_thistest failed in section 6 at $c"
+						tet_result FAIL
+					fi
+				done
+			fi	
+			echo "Client $s is not rhel5, it's os is $OS, it's version is $OS_VER"
 		else
 			echo "skipping $s"
 		fi
@@ -765,24 +774,28 @@ tp12()
 	for s in $CLIENTS; do
 		if [ "$s" != "" ]; then
 			eval_vars $s
-			ssh root@$FULLHOSTNAME "ipa-findgroup -a $grp1 | grep $grp2alt"
-			ret=$?
-			if [ $ret -ne 0 ]; then
-				echo "ERROR - $grp2alt does not exist in $grp1"
-				tet_result FAIL
-			fi
-			ssh root@$FULLHOSTNAME "ipa-findgroup -a $grp1 | grep $newfirstname"
-			ret=$?
-
-			if [ $ret -ne 0 ]; then
-				echo "ERROR - The altered First Name for user $user1 does not exist in $grp1"
-				echo "ERROR - possibly from bug https://bugzilla.redhat.com/show_bug.cgi?id=451318"
-				if [ "$IGNORE_KNOWN_BUGS" != "y" ]; then
+			if [ "$OS_VER" -eq "5" ] && [ "$OS" -eq "RHEL" ]; then
+				ssh root@$FULLHOSTNAME "ipa-findgroup -a $grp1 | grep $grp2alt"
+				ret=$?
+				if [ $ret -ne 0 ]; then
+					echo "ERROR - $grp2alt does not exist in $grp1"
 					tet_result FAIL
-				else
-					echo "Ignoring because IGNORE_KNOWN_BUGS is set"
+				fi
+				ssh root@$FULLHOSTNAME "ipa-findgroup -a $grp1 | grep $newfirstname"
+				ret=$?
+
+				if [ $ret -ne 0 ]; then
+					echo "ERROR - The altered First Name for user $user1 does not exist in $grp1"
+					echo "ERROR - possibly from bug https://bugzilla.redhat.com/show_bug.cgi?id=451318"
+					if [ "$IGNORE_KNOWN_BUGS" != "y" ]; then
+						tet_result FAIL
+					else
+						echo "Ignoring because IGNORE_KNOWN_BUGS is set"
+					fi
+			
 				fi
 			fi
+			echo "Client $s is not rhel5, it's os is $OS, it's version is $OS_VER"
 		fi
 	done
 
@@ -933,13 +946,16 @@ ipa-modgroup --add $userd $grp2;"
 	for s in $CLIENTS; do
 		if [ "$s" != "" ]; then
 			eval_vars $s
-			for c in $checklist; do
-				ssh root@$FULLHOSTNAME "ipa-findgroup $grp1 | grep $c"
-				if [ $? -ne 0 ]; then
-					echo "ERROR - $tet_thistest failed in section 7 at $c"
-					tet_result FAIL
-				fi
-			done
+			if [ "$OS_VER" -eq "5" ] && [ "$OS" -eq "RHEL" ]; then
+				for c in $checklist; do
+					ssh root@$FULLHOSTNAME "ipa-findgroup $grp1 | grep $c"
+					if [ $? -ne 0 ]; then
+						echo "ERROR - $tet_thistest failed in section 7 at $c"
+						tet_result FAIL
+					fi
+				done
+			fi
+			echo "Client $s is not rhel5, it's os is $OS, it's version is $OS_VER"
 		fi
 	done
 
@@ -1109,13 +1125,16 @@ ipa-modgroup --add user-41d group-4c-1;"
 	for s in $CLIENTS; do
 		if [ "$s" != "" ]; then
 			eval_vars $s
-			for c in $checklist; do
-				ssh root@$FULLHOSTNAME "ipa-findgroup group-5-1 | grep $c"
-				if [ $? -ne 0 ]; then
-					echo "ERROR - $tet_thistest failed in section 6 at $c"
-					tet_result FAIL
-				fi
-			done
+			if [ "$OS_VER" -eq "5" ] && [ "$OS" -eq "RHEL" ]; then
+				for c in $checklist; do
+					ssh root@$FULLHOSTNAME "ipa-findgroup group-5-1 | grep $c"
+					if [ $? -ne 0 ]; then
+						echo "ERROR - $tet_thistest failed in section 6 at $c"
+						tet_result FAIL
+					fi
+				done
+			fi
+			echo "Client $s is not rhel5, it's os is $OS, it's version is $OS_VER"
 		else
 			echo "skipping $s"
 		fi
@@ -1255,26 +1274,29 @@ ipa-modgroup --add $user3 $grp1;"
 	for s in $CLIENTS; do
 		if [ "$s" != "" ]; then
 			eval_vars $s
-			ssh root@$FULLHOSTNAME "ipa-findgroup -v $grp1 | grep $user1"
-			if [ $? -ne 0 ]; then
-				echo "ERROR - ipa-findgroup failed on section 8"
-				tet_result FAIL
+			if [ "$OS_VER" -eq "5" ] && [ "$OS" -eq "RHEL" ]; then
+				ssh root@$FULLHOSTNAME "ipa-findgroup -v $grp1 | grep $user1"
+				if [ $? -ne 0 ]; then
+					echo "ERROR - ipa-findgroup failed on section 8"
+					tet_result FAIL
+				fi
+				ssh root@$FULLHOSTNAME "ipa-findgroup -v $grp1 | grep $user2"
+				if [ $? -ne 0 ]; then
+					echo "ERROR - ipa-findgroup failed on section 9"
+					tet_result FAIL
+				fi
+				ssh root@$FULLHOSTNAME "ipa-findgroup -v $grp1 | grep $user3"
+				if [ $? -ne 0 ]; then
+					echo "ERROR - ipa-findgroup failed on section 9a"
+					tet_result FAIL
+				fi
+				ssh root@$FULLHOSTNAME "ipa-findgroup -v $grp3 | grep -e $user2 -e $user3"
+				if [ $? -eq 0 ]; then
+					echo "ERROR - ipa-findgroup failed on section 10"
+					tet_result FAIL
+				fi
 			fi
-			ssh root@$FULLHOSTNAME "ipa-findgroup -v $grp1 | grep $user2"
-			if [ $? -ne 0 ]; then
-				echo "ERROR - ipa-findgroup failed on section 9"
-				tet_result FAIL
-			fi
-			ssh root@$FULLHOSTNAME "ipa-findgroup -v $grp1 | grep $user3"
-			if [ $? -ne 0 ]; then
-				echo "ERROR - ipa-findgroup failed on section 9a"
-				tet_result FAIL
-			fi
-			ssh root@$FULLHOSTNAME "ipa-findgroup -v $grp3 | grep -e $user2 -e $user3"
-			if [ $? -eq 0 ]; then
-				echo "ERROR - ipa-findgroup failed on section 10"
-				tet_result FAIL
-			fi
+			echo "Client $s is not rhel5, it's os is $OS, it's version is $OS_VER"
 		fi
 	done
 	eval_vars M1
@@ -1322,26 +1344,29 @@ ipa-modgroup --add $user3 $grp1;"
 	for s in $CLIENTS; do
 		if [ "$s" != "" ]; then
 			eval_vars $s
-			ssh root@$FULLHOSTNAME "ipa-findgroup -v $grp1 | grep $user1alt"
-			if [ $? -ne 0 ]; then
-				echo "ERROR - ipa-findgroup failed on section 17"
-				tet_result FAIL
+			if [ "$OS_VER" -eq "5" ] && [ "$OS" -eq "RHEL" ]; then
+				ssh root@$FULLHOSTNAME "ipa-findgroup -v $grp1 | grep $user1alt"
+				if [ $? -ne 0 ]; then
+					echo "ERROR - ipa-findgroup failed on section 17"
+					tet_result FAIL
+				fi
+				ssh root@$FULLHOSTNAME "ipa-findgroup -v $grp2 | grep $user1alt"
+				if [ $? -ne 0 ]; then
+					echo "ERROR - ipa-findgroup failed on section 18"
+					tet_result FAIL
+				fi
+				ssh root@$FULLHOSTNAME "ipa-findgroup -v $grp2 | grep $user2"
+				if [ $? -eq 0 ]; then
+					echo "ERROR - ipa-findgroup failed on section 19"
+					tet_result FAIL
+				fi
+				ssh root@$FULLHOSTNAME "ipa-findgroup -v $grp1 | grep $user2"
+				if [ $? -eq 0 ]; then
+					echo "ERROR - ipa-findgroup failed on section 20"
+					tet_result FAIL
+				fi
 			fi
-			ssh root@$FULLHOSTNAME "ipa-findgroup -v $grp2 | grep $user1alt"
-			if [ $? -ne 0 ]; then
-				echo "ERROR - ipa-findgroup failed on section 18"
-				tet_result FAIL
-			fi
-			ssh root@$FULLHOSTNAME "ipa-findgroup -v $grp2 | grep $user2"
-			if [ $? -eq 0 ]; then
-				echo "ERROR - ipa-findgroup failed on section 19"
-				tet_result FAIL
-			fi
-			ssh root@$FULLHOSTNAME "ipa-findgroup -v $grp1 | grep $user2"
-			if [ $? -eq 0 ]; then
-				echo "ERROR - ipa-findgroup failed on section 20"
-				tet_result FAIL
-			fi
+			echo "Client $s is not rhel5, it's os is $OS, it's version is $OS_VER"
 		fi
 	done
 
@@ -1391,26 +1416,29 @@ ipa-modgroup --remove $user3 $grp1;"
 	for s in $CLIENTS; do
 		if [ "$s" != "" ]; then
 			eval_vars $s
-			ssh root@$FULLHOSTNAME "ipa-findgroup -v $grp1 | grep $user1alt"
-			if [ $? -ne 0 ]; then
-				echo "ERROR - ipa-findgroup failed on section 27"
-				tet_result FAIL
+			if [ "$OS_VER" -eq "5" ] && [ "$OS" -eq "RHEL" ]; then
+				ssh root@$FULLHOSTNAME "ipa-findgroup -v $grp1 | grep $user1alt"
+				if [ $? -ne 0 ]; then
+					echo "ERROR - ipa-findgroup failed on section 27"
+					tet_result FAIL
+				fi
+				ssh root@$FULLHOSTNAME "ipa-findgroup -v $grp2 | grep $user1alt"
+				if [ $? -eq 0 ]; then
+					echo "ERROR - ipa-findgroup failed on section 28"
+					tet_result FAIL
+				fi
+				ssh root@$FULLHOSTNAME "ipa-findgroup -v $grp2 | grep $user3"
+				if [ $? -ne 0 ]; then
+					echo "ERROR - ipa-findgroup failed on section 29"
+					tet_result FAIL
+				fi
+				ssh root@$FULLHOSTNAME "ipa-findgroup -v $grp1 | grep $user3"
+				if [ $? -ne 0 ]; then
+					echo "ERROR - ipa-findgroup failed on section 30"
+					tet_result FAIL
+				fi
 			fi
-			ssh root@$FULLHOSTNAME "ipa-findgroup -v $grp2 | grep $user1alt"
-			if [ $? -eq 0 ]; then
-				echo "ERROR - ipa-findgroup failed on section 28"
-				tet_result FAIL
-			fi
-			ssh root@$FULLHOSTNAME "ipa-findgroup -v $grp2 | grep $user3"
-			if [ $? -ne 0 ]; then
-				echo "ERROR - ipa-findgroup failed on section 29"
-				tet_result FAIL
-			fi
-			ssh root@$FULLHOSTNAME "ipa-findgroup -v $grp1 | grep $user3"
-			if [ $? -ne 0 ]; then
-				echo "ERROR - ipa-findgroup failed on section 30"
-				tet_result FAIL
-			fi
+			echo "Client $s is not rhel5, it's os is $OS, it's version is $OS_VER"
 		fi
 	done
 
@@ -1440,16 +1468,19 @@ ipa-modgroup --remove $user3 $grp1;"
 	for s in $CLIENTS; do
 		if [ "$s" != "" ]; then
 			eval_vars $s
-			ssh root@$FULLHOSTNAME "ipa-findgroup -v $grp1 | grep $user3"
-			if [ $? -eq 0 ]; then
-				echo "ERROR - ipa-findgroup failed on section 34"
-				tet_result FAIL
+			if [ "$OS_VER" -eq "5" ] && [ "$OS" -eq "RHEL" ]; then
+				ssh root@$FULLHOSTNAME "ipa-findgroup -v $grp1 | grep $user3"
+				if [ $? -eq 0 ]; then
+					echo "ERROR - ipa-findgroup failed on section 34"
+					tet_result FAIL
+				fi
+				ssh root@$FULLHOSTNAME "ipa-findgroup -v $grp2 | grep $user3"
+				if [ $? -eq 0 ]; then
+					echo "ERROR - ipa-findgroup failed on section 35"
+					tet_result FAIL
+				fi
 			fi
-			ssh root@$FULLHOSTNAME "ipa-findgroup -v $grp2 | grep $user3"
-			if [ $? -eq 0 ]; then
-				echo "ERROR - ipa-findgroup failed on section 35"
-				tet_result FAIL
-			fi
+			echo "Client $s is not rhel5, it's os is $OS, it's version is $OS_VER"
 		fi
 	done
 
@@ -1689,13 +1720,16 @@ tpx()
 	done
 	for s in $CLIENTS; do
 		if [ "$s" != "" ]; then
-			echo "kiniting as $DS_USER, password $DM_ADMIN_PASS on $s"
-			KinitAs $s $DS_USER $DM_ADMIN_PASS
-			ret=$?
-			if [ $ret -ne 0 ]; then
-				echo "ERROR - kinit on $s failed"
-				tet_result FAIL
+			if [ "$OS_VER" -eq "5" ] && [ "$OS" -eq "RHEL" ]; then
+				echo "kiniting as $DS_USER, password $DM_ADMIN_PASS on $s"
+				KinitAs $s $DS_USER $DM_ADMIN_PASS
+				ret=$?
+				if [ $ret -ne 0 ]; then
+					echo "ERROR - kinit on $s failed"
+					tet_result FAIL
+				fi
 			fi
+			echo "Client $s is not rhel5, it's os is $OS, it's version is $OS_VER"
 		fi
 	done
 
