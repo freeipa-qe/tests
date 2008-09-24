@@ -451,12 +451,15 @@ tp14()
 			eval_vars $s
 
 			# test for ipa-addservice
-			ssh root@$FULLHOSTNAME "ipa-listdelegation namef"
-			ret=$?
-			if [ $ret -ne 0 ]
+			ssh root@$FULLHOSTNAME "ipa-listdelegation -n namef"
+			if [ $? -ne 0 ]
 			then
-				echo "ERROR - ipa-listdelegation failed on $FULLHOSTNAME"
-				tet_result FAIL
+				# that didn't work, try the old method
+				ssh root@$FULLHOSTNAME "ipa-listdelegation -n namef"
+				if [ $? -ne 0 ]; then
+					echo "ERROR - ipa-listdelegation failed on $FULLHOSTNAME"
+					tet_result FAIL
+				fi
 			fi
 		fi
 	done
@@ -500,11 +503,18 @@ tp16()
 		if [ "$s" != "M1" ]&&[ "$s" != "" ]; then
 			eval_vars $s
 
-			ssh root@$FULLHOSTNAME "ipa-listdelegation findf | grep uid | grep 9933"
-			ret=$?
-			if [ $ret -ne 0 ]
+			ssh root@$FULLHOSTNAME "ipa-listdelegation -n findf"
+			if [ $? -eq 0 ]; then
+				# new method
+				search_string="ipa-listdelegation -n findf | grep uid | grep 9933"
+			else
+				# old method
+				search_string="ipa-listdelegation findf | grep uid | grep 9933"
+			fi
+			ssh root@$FULLHOSTNAME "$search_string"
+			if [ $? -ne 0 ]
 			then
-				echo "ERROR - ipa-listdelegation failed on $FULLHOSTNAME"
+				echo "ERROR - $search_string failed on $FULLHOSTNAME"
 				tet_result FAIL
 			fi
 		fi
@@ -550,7 +560,7 @@ tp18()
 
 			echo "this step is supposed to fail"
 			# test for ipa-addservice
-			ssh root@$FULLHOSTNAME "ipa-listdelegation namef"
+			ssh root@$FULLHOSTNAME "ipa-listdelegation -n namef"
 			ret=$?
 			if [ $ret -eq 0 ]
 			then
