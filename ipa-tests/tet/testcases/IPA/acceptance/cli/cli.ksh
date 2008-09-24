@@ -503,13 +503,13 @@ tp16()
 		if [ "$s" != "M1" ]&&[ "$s" != "" ]; then
 			eval_vars $s
 
-			ssh root@$FULLHOSTNAME "ipa-listdelegation -n findf"
+			ssh root@$FULLHOSTNAME "ipa-listdelegation -n namef"
 			if [ $? -eq 0 ]; then
 				# new method
-				search_string="ipa-listdelegation -n findf | grep uid | grep 9933"
+				search_string="ipa-listdelegation -n namef | grep uid | grep 9933"
 			else
 				# old method
-				search_string="ipa-listdelegation findf | grep uid | grep 9933"
+				search_string="ipa-listdelegation namef | grep uid | grep 9933"
 			fi
 			ssh root@$FULLHOSTNAME "$search_string"
 			if [ $? -ne 0 ]
