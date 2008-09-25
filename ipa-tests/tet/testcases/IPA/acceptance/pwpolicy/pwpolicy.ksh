@@ -581,6 +581,7 @@ tp3()
 	fi
 
 	# set password policy
+	ssh root@$FULLHOSTNAME "ipa-pwpolicy --minlife 0"
 	ssh root@$FULLHOSTNAME "ipa-pwpolicy --maxlife $maxlife"
 	if [ $? -ne 0 ]; then
 		echo "ERROR - ipa-pwpolicy on $FULLHOSTNAME failed"
@@ -733,6 +734,7 @@ tp3a()
 	eval_vars M1
 	
 	# set minlife to 2160 
+	ssh root@$FULLHOSTNAME "ipa-pwpolicy --maxlife 400"
 	ssh root@$FULLHOSTNAME "ipa-pwpolicy --minlife 2160"
 	if [ $? -ne 0 ]; then
 		echo "ERROR - ipa-pwpolicy --minlife 2160 on $FULLHOSTNAME failed"
@@ -990,6 +992,7 @@ tp4()
 
 	# Set minlife 2 zero so that the user can rapidly change it's passowrd
 	ssh root@$FULLHOSTNAME "ipa-pwpolicy --minlife 0"
+	ssh root@$FULLHOSTNAME "ipa-pwpolicy --minclasses 0"
 
 	#   5. create a user "usr", set the default password to "redhat000"
 
