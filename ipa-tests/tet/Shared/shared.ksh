@@ -287,6 +287,7 @@ echo 'match_max 100000' >> $TET_TMP_DIR/kinit.exp
         	                set_date $FULLHOSTNAME
 	                fi
 	        done
+		sleep 2
 		eval_vars $SID
 		ssh root@$FULLHOSTNAME 'kdestroy;/usr/bin/expect /tmp/kinit.exp'
 		if [ $? != 0 ]; then
@@ -348,8 +349,7 @@ set send_slow {1 .1}' > $TET_TMP_DIR/kinit.exp
 	scp $TET_TMP_DIR/kinit.exp root@$FULLHOSTNAME:/tmp/.
 
 	ssh root@$FULLHOSTNAME 'kdestroy;/usr/bin/expect /tmp/kinit.exp > /tmp/KinitAsFirst-out.txt'
-	ret=$?
-	if [ $ret != 0 ]; then
+	if [ $? != 0 ]; then
 		echo "ERROR - kinit as user $1, password of $2 failed";
 		return 1;
 	fi
@@ -362,10 +362,41 @@ set send_slow {1 .1}' > $TET_TMP_DIR/kinit.exp
 	ssh root@$FULLHOSTNAME 'klist' > $TET_TMP_DIR/KinitAsFirst-output.txt
 	grep $2 $TET_TMP_DIR/KinitAsFirst-output.txt
 	if [ $? -ne 0 ]; then
-		echo "ERROR - error in KinitAsFirst, kinit didn't appear to work, $2 not found in $TET_TMP_DIR/KinitAsFirst-output.txt"
-		echo "contents of $TET_TMP_DIR/KinitAsFirst-output.txt:"
-		cat $TET_TMP_DIR/KinitAsFirst-output.txt
-		return 1;
+		echo "oops, that didn't work. Re-syncing everything and trying again"
+	        # Setting the time and date on all of the servers and clients if we can
+        	for s in $SERVERS; do
+	                if [ "$s" != "" ]; then
+                        	eval_vars $s
+        	                set_date $FULLHOSTNAME
+                	fi
+	        done
+        	for s in $CLIENTS; do
+	                if [ "$s" != "" ]; then
+                	        eval_vars $s
+        	                set_date $FULLHOSTNAME
+	                fi
+	        done
+		sleep 2
+		eval_vars $SID
+		ssh root@$FULLHOSTNAME 'kdestroy;/usr/bin/expect /tmp/kinit.exp > /tmp/KinitAsFirst-out.txt'
+		if [ $? != 0 ]; then
+			echo "ERROR - kinit as user $1, password of $2 failed";
+			return 1;
+		fi
+	
+		if [ $DSTET_DEBUG = y ]; then
+			echo "printing out kinit output"
+			ssh root@$FULLHOSTNAME 'cat /tmp/KinitAsFirst-out.txt'
+		fi
+		echo "This is a klist on the machine we just kinited on, it should show that user $2 is kinited"
+		ssh root@$FULLHOSTNAME 'klist' > $TET_TMP_DIR/KinitAsFirst-output.txt
+		grep $2 $TET_TMP_DIR/KinitAsFirst-output.txt
+		if [ $? -ne 0 ]; then
+			echo "ERROR - error in KinitAsFirst, kinit didn't appear to work, $2 not found in $TET_TMP_DIR/KinitAsFirst-output.txt"
+			echo "contents of $TET_TMP_DIR/KinitAsFirst-output.txt:"
+			cat $TET_TMP_DIR/KinitAsFirst-output.txt
+			return 1;
+		fi
 	else 
 		cat $TET_TMP_DIR/KinitAsFirst-output.txt
 	fi
