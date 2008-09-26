@@ -8,9 +8,9 @@
 <h1 class="firstHeading">IPA Winsync test plan</h1>
 <h3 id="siteSub">From Wiki</h3>
 <div id="jump-to-nav">Jump to: <a
- href="#column-one">navigation</a>,
+ href="http://rome.sjc.redhat.com/mediawiki/index.php/IPA_Winsync_test_plan#column-one">navigation</a>,
 <a
- href="#searchInput">search</a></div>
+ href="http://rome.sjc.redhat.com/mediawiki/index.php/IPA_Winsync_test_plan#searchInput">search</a></div>
 <!-- start content -->
 <p><small><b> IPA winsync test plan is based on DS Winsync test plan </b></small>
 </p>
@@ -39,7 +39,7 @@ Revision History
       </td>
     </tr>
     <tr>
-      <td> winsync test plan
+      <td> IPA winsync test plan
       </td>
       <td><br>
       </td>
@@ -56,6 +56,12 @@ Revision History
       <td> Sept. 16, 2008
       </td>
     </tr>
+    <tr>
+      <td> ver 1.0 , yi zhang
+      </td>
+      <td> Sept. 26, 2008
+      </td>
+    </tr>
   </tbody>
 </table>
 <p><br>
@@ -70,87 +76,95 @@ Revision History
  class="internal" id="togglelink">hide</a>]</span></div>
       <ul>
         <li class="toclevel-1"><a
- href="#Feature_Overview"><span
+ href="http://rome.sjc.redhat.com/mediawiki/index.php/IPA_Winsync_test_plan#Feature_Overview"><span
  class="tocnumber">1</span> <span class="toctext">Feature Overview</span></a>
           <ul>
             <li class="toclevel-2"><a
- href="#RHDS_feature_overview"><span
+ href="http://rome.sjc.redhat.com/mediawiki/index.php/IPA_Winsync_test_plan#RHDS_feature_overview"><span
  class="tocnumber">1.1</span> <span class="toctext">RHDS feature
 overview</span></a></li>
             <li class="toclevel-2"><a
- href="#IPA_feature_overview"><span
+ href="http://rome.sjc.redhat.com/mediawiki/index.php/IPA_Winsync_test_plan#IPA_feature_overview"><span
  class="tocnumber">1.2</span> <span class="toctext">IPA feature
 overview</span></a></li>
           </ul>
         </li>
         <li class="toclevel-1"><a
- href="#Test_Approach"><span
+ href="http://rome.sjc.redhat.com/mediawiki/index.php/IPA_Winsync_test_plan#Test_Approach"><span
  class="tocnumber">2</span> <span class="toctext">Test Approach</span></a></li>
         <li class="toclevel-1"><a
- href="#Test_Environment_Setup"><span
+ href="http://rome.sjc.redhat.com/mediawiki/index.php/IPA_Winsync_test_plan#Test_Environment_Setup"><span
  class="tocnumber">3</span> <span class="toctext">Test Environment
-Setup</span></a></li>
+Setup</span></a>
+          <ul>
+            <li class="toclevel-2"><a
+ href="http://rome.sjc.redhat.com/mediawiki/index.php/IPA_Winsync_test_plan#DS_winsync_test_environment_setup"><span
+ class="tocnumber">3.1</span> <span class="toctext">DS winsync test
+environment setup</span></a></li>
+            <li class="toclevel-2"><a
+ href="http://rome.sjc.redhat.com/mediawiki/index.php/IPA_Winsync_test_plan#IPA_winsync_test_environment_setup"><span
+ class="tocnumber">3.2</span> <span class="toctext">IPA winsync test
+environment setup</span></a></li>
+          </ul>
+        </li>
         <li class="toclevel-1"><a
- href="#Test_Cases"><span
+ href="http://rome.sjc.redhat.com/mediawiki/index.php/IPA_Winsync_test_plan#Test_Cases"><span
  class="tocnumber">4</span> <span class="toctext">Test Cases</span></a>
           <ul>
             <li class="toclevel-2"><a
- href="#RHDS_acceptance_test_cases"><span
+ href="http://rome.sjc.redhat.com/mediawiki/index.php/IPA_Winsync_test_plan#RHDS_acceptance_test_cases"><span
  class="tocnumber">4.1</span> <span class="toctext">RHDS acceptance
 test cases</span></a></li>
             <li class="toclevel-2"><a
- href="#IPA_test_cases"><span
+ href="http://rome.sjc.redhat.com/mediawiki/index.php/IPA_Winsync_test_plan#IPA_test_cases"><span
  class="tocnumber">4.2</span> <span class="toctext">IPA test cases</span></a>
               <ul>
                 <li class="toclevel-3"><a
- href="#About_SAFE"><span
- class="tocnumber">4.2.1</span> <span class="toctext">About SAFE</span></a></li>
-                <li class="toclevel-3"><a
- href="#IPA_Winsync_plugin_Smoke_test_cases_.28safe-0.29"><span
- class="tocnumber">4.2.2</span> <span class="toctext">IPA Winsync
+ href="http://rome.sjc.redhat.com/mediawiki/index.php/IPA_Winsync_test_plan#IPA_Winsync_plugin_Smoke_test_cases_.28safe-0.29"><span
+ class="tocnumber">4.2.1</span> <span class="toctext">IPA Winsync
 plugin Smoke test cases (safe-0)</span></a></li>
                 <li class="toclevel-3"><a
- href="#IPA_Winsync_plugin_Acceptance_test_cases_.28safe-1.29"><span
- class="tocnumber">4.2.3</span> <span class="toctext">IPA Winsync
+ href="http://rome.sjc.redhat.com/mediawiki/index.php/IPA_Winsync_test_plan#IPA_Winsync_plugin_Acceptance_test_cases_.28safe-1.29"><span
+ class="tocnumber">4.2.2</span> <span class="toctext">IPA Winsync
 plugin Acceptance test cases (safe-1)</span></a></li>
                 <li class="toclevel-3"><a
- href="#IPA_Winsync_plugin_Functional_test_cases_.28safe-2.29"><span
- class="tocnumber">4.2.4</span> <span class="toctext">IPA Winsync
+ href="http://rome.sjc.redhat.com/mediawiki/index.php/IPA_Winsync_test_plan#IPA_Winsync_plugin_Functional_test_cases_.28safe-2.29"><span
+ class="tocnumber">4.2.3</span> <span class="toctext">IPA Winsync
 plugin Functional test cases (safe-2)</span></a></li>
                 <li class="toclevel-3"><a
- href="#IPA_winsync_plugin_Extended_functional_test_cases_.28safe-3.29"><span
- class="tocnumber">4.2.5</span> <span class="toctext">IPA winsync
+ href="http://rome.sjc.redhat.com/mediawiki/index.php/IPA_Winsync_test_plan#IPA_winsync_plugin_Extended_functional_test_cases_.28safe-3.29"><span
+ class="tocnumber">4.2.4</span> <span class="toctext">IPA winsync
 plugin Extended functional test cases (safe-3)</span></a></li>
               </ul>
             </li>
           </ul>
         </li>
         <li class="toclevel-1"><a
- href="#Additional_Test"><span
+ href="http://rome.sjc.redhat.com/mediawiki/index.php/IPA_Winsync_test_plan#Additional_Test"><span
  class="tocnumber">5</span> <span class="toctext">Additional Test</span></a></li>
         <li class="toclevel-1"><a
- href="#What_won.27t_be_Tested"><span
+ href="http://rome.sjc.redhat.com/mediawiki/index.php/IPA_Winsync_test_plan#What_won.27t_be_Tested"><span
  class="tocnumber">6</span> <span class="toctext">What won't be Tested</span></a></li>
         <li class="toclevel-1"><a
- href="#Resources"><span
+ href="http://rome.sjc.redhat.com/mediawiki/index.php/IPA_Winsync_test_plan#Resources"><span
  class="tocnumber">7</span> <span class="toctext">Resources</span></a>
           <ul>
             <li class="toclevel-2"><a
- href="#Active_Directory_.28AD.29_Requirement"><span
+ href="http://rome.sjc.redhat.com/mediawiki/index.php/IPA_Winsync_test_plan#Active_Directory_.28AD.29_Requirement"><span
  class="tocnumber">7.1</span> <span class="toctext">Active Directory
 (AD) Requirement</span></a></li>
             <li class="toclevel-2"><a
- href="#IPA_winsync_requirements"><span
+ href="http://rome.sjc.redhat.com/mediawiki/index.php/IPA_Winsync_test_plan#IPA_winsync_requirements"><span
  class="tocnumber">7.2</span> <span class="toctext">IPA winsync
 requirements</span></a></li>
           </ul>
         </li>
         <li class="toclevel-1"><a
- href="#Supplements"><span
+ href="http://rome.sjc.redhat.com/mediawiki/index.php/IPA_Winsync_test_plan#Supplements"><span
  class="tocnumber">8</span> <span class="toctext">Supplements</span></a>
           <ul>
             <li class="toclevel-2"><a
- href="#IPA-AD_winsync_environment_setup"><span
+ href="http://rome.sjc.redhat.com/mediawiki/index.php/IPA_Winsync_test_plan#IPA-AD_winsync_environment_setup"><span
  class="tocnumber">8.1</span> <span class="toctext">IPA-AD winsync
 environment setup</span></a></li>
           </ul>
@@ -216,22 +230,25 @@ two parts. </p>
  href="http://rome.sjc.redhat.com/mediawiki/index.php?title=IPA_Winsync_test_plan&amp;action=edit&amp;section=3"
  title="Edit section: IPA feature overview">edit</a>]</span> <span
  class="mw-headline"> IPA feature overview </span></h3>
-<p>The following requirements are coming from <a
+<p>IPA winsync is an independent Directory Server plugin that functions
+similar to DS winsync solution but designed specific for IPA server. In
+fact, IPA winsync plugin shares most of code with DS winsync plugin.
+The purpose of this plugin is also to sync users between AD and IPA,
+but it come with the following requirements (source <a
  href="https://idmwiki.sjc.redhat.com/export/idmwiki/DS_WinSync_1_1#Requirements"
  class="external text"
  title="https://idmwiki.sjc.redhat.com/export/idmwiki/DS_WinSync_1_1#Requirements"
- rel="nofollow">idmwiki IPA Winsync design doc</a>
+ rel="nofollow">idmwiki IPA Winsync design doc</a>)
 </p>
-<p><br>
-General Requirements:
+<p>General Syncing Requirements:
 </p>
 <ul>
-  <li> IPA will only sync user data - this can be specified in the sync
-agreement
+  <li> IPA will only sync user data </li>
+  <li> AD user will sync to IPA
   </li>
-  <li> IPA will not send new users from the DS to AD - the users
-must also be added to AD, at which point changes to that user will be
-sync'd between DS and AD
+  <li> IPA will not send new user information from the DS to AD -
+the users must also be added to AD, at which point changes to that user
+will be sync'd between DS and AD
     <ul>
       <li> The sync key is the uid, which must be the same as the
 samAccountName on the AD side
@@ -249,9 +266,10 @@ these in the ou attribute in the user entry
   <li> IPA will need to be able to specify the search base, scope,
 filter, attribute lists, and additional server controls in both
 internal searches and external (AD) searches </li>
+  <li> IPA will be able to force all users to be in sync with the AD
+counterpart (IPA uid == AD samAccountName) </li>
 </ul>
-<p><br>
-The IPA plug-in must be able to do the following:
+<p>The IPA plug-in must be able to do the following:
 </p>
 <ul>
   <li> Intercept and change a user entry before it is sent from dirsrv
@@ -268,17 +286,27 @@ Additional requirements:
   <li> Allow changing the arguments to the AD dirsync search request
   </li>
 </ul>
-<p><br>
+<p>Account Conflict resolving:
 </p>
+<dl>
+  <dd> It is possible that before IPA sync with AD, there is an user
+in IPA server who has uid value same as another user in AD server who
+has samAccountName attribute's value. This is called "pre-exist user
+account conflict". The solution to solve this conflict this is that IPA
+provide one more syncing option "--forceSync". If IPA and AD sync with
+this option, the plugin will tie these two accounts together.
+Otherwise, IPA plugin will treat these two account as two separate
+account. </dd>
+</dl>
 <a name="Test_Approach"></a>
 <h2><span class="editsection">[<a
  href="http://rome.sjc.redhat.com/mediawiki/index.php?title=IPA_Winsync_test_plan&amp;action=edit&amp;section=4"
  title="Edit section: Test Approach">edit</a>]</span> <span
  class="mw-headline"> Test Approach </span></h2>
-<p>There are tw0 sets of test should be run in this test plan. The
-first set is RHDS winsync acceptance test set. It proves the basic sync
-function works as design. The second set of test is IPA winsync plugin
-test set. It is functional functional test to verity the
+<p>There are two sets of test should be run in this test plan. The
+first set is RHDS winsync acceptance test set. It proves the basic
+syncing function works as expected. The second set of test is IPA
+winsync plugin test set. It has functional tests to verity the
 implementation. </p>
 <p><b>RHDS acceptance test set</b> will includes the following
 categories:
@@ -311,6 +339,11 @@ will includes the following additional categories:
  href="http://rome.sjc.redhat.com/mediawiki/index.php?title=IPA_Winsync_test_plan&amp;action=edit&amp;section=5"
  title="Edit section: Test Environment Setup">edit</a>]</span> <span
  class="mw-headline"> Test Environment Setup </span></h2>
+<a name="DS_winsync_test_environment_setup"></a>
+<h3><span class="editsection">[<a
+ href="http://rome.sjc.redhat.com/mediawiki/index.php?title=IPA_Winsync_test_plan&amp;action=edit&amp;section=6"
+ title="Edit section: DS winsync test environment setup">edit</a>]</span>
+<span class="mw-headline"> DS winsync test environment setup </span></h3>
 <p>To setup AD-DS synchronization environment, please follow the <a
  href="http://directory.fedoraproject.org/wiki/Howto:WindowsSync"
  class="external text"
@@ -321,7 +354,7 @@ IPA-AD sync agreement. The general step is below. The <a
  class="external text"
  title="https://idmwiki.sjc.redhat.com/export/idmwiki/DS_WinSync_1_1#Installation_and_Setup"
  rel="nofollow">idmwiki guide is here</a>. The <a
- href="#IPA-AD_winsync_environment_setup"
+ href="http://rome.sjc.redhat.com/mediawiki/index.php/IPA_Winsync_test_plan#IPA-AD_winsync_environment_setup"
  title="">local copy is here</a>
 </p>
 <p><br>
@@ -396,14 +429,37 @@ select the one &lt;ALL&gt; -&gt; [right click] menu -&gt; All tasks
     </ol>
   </li>
 </ol>
+<a name="IPA_winsync_test_environment_setup"></a>
+<h3><span class="editsection">[<a
+ href="http://rome.sjc.redhat.com/mediawiki/index.php?title=IPA_Winsync_test_plan&amp;action=edit&amp;section=7"
+ title="Edit section: IPA winsync test environment setup">edit</a>]</span>
+<span class="mw-headline"> IPA winsync test environment setup </span></h3>
+<ol>
+  <li> following AD-DS sync environment setup steps to exchange certs
+between IPA and Windows AD server
+  </li>
+  <li> run ipa-replica-manager add command to setup the sync agreement.
+    <ul>
+      <li> The official <a
+ href="https://idmwiki.sjc.redhat.com/export/idmwiki/DS_WinSync_1_1#Sync_Agreement_Creation"
+ class="external text"
+ title="https://idmwiki.sjc.redhat.com/export/idmwiki/DS_WinSync_1_1#Sync_Agreement_Creation"
+ rel="nofollow">guide line is here</a>
+      </li>
+      <li> local copy is below
+      </li>
+    </ul>
+  </li>
+</ol>
+<pre>The sync agreement is created by using the ipa-replica-manage add command. <br>There are several new command line flags which must be used.<br><br>    * --winsync - tells ipa-replica-manage that this is a Windows Sync agreement<br>    * --binddn - the full DN of the user to use - the DS will bind to AD as this <br>                 user in order to read and write changes - this user must have read, <br>                 search, and write permissions on the AD subtree, including password<br>                 changes, as well as permission to use the DirSync control (i.e. must <br>                 be able to use Replication)<br>    * --bindpw - the password for the binddn above<br>    * --cacert - the full path and file name of the ASCII/PEM encoded Windows AD CA <br>                 cert - this cert will be installed in the directory server cert db <br>                 under the name "Imported CA" <br></pre>
 <a name="Test_Cases"></a>
 <h2><span class="editsection">[<a
- href="http://rome.sjc.redhat.com/mediawiki/index.php?title=IPA_Winsync_test_plan&amp;action=edit&amp;section=6"
+ href="http://rome.sjc.redhat.com/mediawiki/index.php?title=IPA_Winsync_test_plan&amp;action=edit&amp;section=8"
  title="Edit section: Test Cases">edit</a>]</span> <span
  class="mw-headline"> Test Cases </span></h2>
 <a name="RHDS_acceptance_test_cases"></a>
 <h3><span class="editsection">[<a
- href="http://rome.sjc.redhat.com/mediawiki/index.php?title=IPA_Winsync_test_plan&amp;action=edit&amp;section=7"
+ href="http://rome.sjc.redhat.com/mediawiki/index.php?title=IPA_Winsync_test_plan&amp;action=edit&amp;section=9"
  title="Edit section: RHDS acceptance test cases">edit</a>]</span> <span
  class="mw-headline"> RHDS acceptance test cases </span></h3>
 <table style="width: 100%;" border="1" cellpadding="2" cellspacing="3">
@@ -1151,52 +1207,12 @@ entry should disappear from both side.
 </p>
 <a name="IPA_test_cases"></a>
 <h3><span class="editsection">[<a
- href="http://rome.sjc.redhat.com/mediawiki/index.php?title=IPA_Winsync_test_plan&amp;action=edit&amp;section=8"
+ href="http://rome.sjc.redhat.com/mediawiki/index.php?title=IPA_Winsync_test_plan&amp;action=edit&amp;section=10"
  title="Edit section: IPA test cases">edit</a>]</span> <span
  class="mw-headline"> IPA test cases </span></h3>
-<a name="About_SAFE"></a>
-<h4><span class="editsection">[<a
- href="http://rome.sjc.redhat.com/mediawiki/index.php?title=IPA_Winsync_test_plan&amp;action=edit&amp;section=9"
- title="Edit section: About SAFE">edit</a>]</span> <span
- class="mw-headline"> About <b>SAFE</b> </span></h4>
-<p>I want to divide all of my test cases into the following four
-levels:
-</p>
-<dl>
-  <dd><b>Smoke test level</b> </dd>
-</dl>
-<p>This is a minimum set of positive test cases. The purpose of this
-set of test is to verity the function we are testing on does work when
-right value is given in right environment.This set of test should be
-run each time we finished a new build. It is designed for release
-engineer to make a build. </p>
-<dl>
-  <dd><b>Acceptance test level</b>
-  </dd>
-</dl>
-<p>Test cases in this level will contains all test cases in smoke test
-level plus some negative test cases. This set of test cases is mostly
-run by QA, who tell developers whether this build is acceptable or not.
-</p>
-<dl>
-  <dd><b>Functional test level</b>
-  </dd>
-</dl>
-<p>Test cases in this level is a general test to prove build is
-"working as design". This is a full coverage test set. It contains all
-scenarios. Only when this set of test cases has been executed and all
-passed, QA can then release the build. </p>
-<dl>
-  <dd><b>Extended functional test level</b>
-  </dd>
-</dl>
-<p>This set of test will includes mostly corner test cases and some
-exterme test cases. All bug fix related test cases should be in this
-set as well.
-</p>
 <a name="IPA_Winsync_plugin_Smoke_test_cases_.28safe-0.29"></a>
 <h4><span class="editsection">[<a
- href="http://rome.sjc.redhat.com/mediawiki/index.php?title=IPA_Winsync_test_plan&amp;action=edit&amp;section=10"
+ href="http://rome.sjc.redhat.com/mediawiki/index.php?title=IPA_Winsync_test_plan&amp;action=edit&amp;section=11"
  title="Edit section: IPA Winsync plugin Smoke test cases (safe-0)">edit</a>]</span>
 <span class="mw-headline"> IPA Winsync plugin Smoke test cases (safe-0)</span></h4>
 <table
@@ -1315,7 +1331,7 @@ Notes
 </table>
 <a name="IPA_Winsync_plugin_Acceptance_test_cases_.28safe-1.29"></a>
 <h4><span class="editsection">[<a
- href="http://rome.sjc.redhat.com/mediawiki/index.php?title=IPA_Winsync_test_plan&amp;action=edit&amp;section=11"
+ href="http://rome.sjc.redhat.com/mediawiki/index.php?title=IPA_Winsync_test_plan&amp;action=edit&amp;section=12"
  title="Edit section: IPA Winsync plugin Acceptance test cases (safe-1)">edit</a>]</span>
 <span class="mw-headline"> IPA Winsync plugin Acceptance test cases
 (safe-1)</span></h4>
@@ -1883,7 +1899,7 @@ Notes
 </table>
 <a name="IPA_Winsync_plugin_Functional_test_cases_.28safe-2.29"></a>
 <h4><span class="editsection">[<a
- href="http://rome.sjc.redhat.com/mediawiki/index.php?title=IPA_Winsync_test_plan&amp;action=edit&amp;section=12"
+ href="http://rome.sjc.redhat.com/mediawiki/index.php?title=IPA_Winsync_test_plan&amp;action=edit&amp;section=13"
  title="Edit section: IPA Winsync plugin Functional test cases (safe-2)">edit</a>]</span>
 <span class="mw-headline"> IPA Winsync plugin Functional test cases
 (safe-2)</span></h4>
@@ -1911,20 +1927,81 @@ Notes
     </tr>
     <tr
  style="background: papayawhip none repeat scroll 0%; -moz-background-clip: -moz-initial; -moz-background-origin: -moz-initial; -moz-background-inline-policy: -moz-initial; color: cornflowerblue;">
-      <td colspan="4"> <b>Test purpose</b>: Plugin configuration
+      <td colspan="4"> <b>Test purpose</b>: pre-exist user account
+conflict resolving test
       </td>
     </tr>
     <tr>
-      <td valign="top"> 200
+      <td valign="top"> 200-1
       </td>
-      <td valign="top"> <font color="red"> Place keeper. We might have
-some test cases come out. <font>
-      </font></font></td>
+      <td valign="top"> pre-exist user account conflict resolving test,
+setup sync agreement without "forceSync" option
+      </td>
       <td valign="top">
       <ul>
         <li> test procedure
+          <ol>
+            <li> create one account in AD, set samAccountName to
+"pre-exist-user"
+            </li>
+            <li> create one account in IPA, set uid to "pre-exist-user"
+            </li>
+            <li> setup syncing agreement between IPA and AD, <b>DO NOT</b>
+use <b>--forceSync</b> option
+            </li>
+          </ol>
         </li>
-        <li> expected result </li>
+        <li> expected result
+          <ul>
+            <li> these two accounts should be separate account.
+              <ul>
+                <li> The "ntUser" flag in IPA server for this account
+should not be set. </li>
+                <li> Modify account on one side will not see changes on
+another side
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+      </ul>
+      </td>
+      <td valign="top"><br>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top"> 200-1
+      </td>
+      <td valign="top"> pre-exist user account conflict resolving test,
+setup sync agreement with "forceSync" option
+      </td>
+      <td valign="top">
+      <ul>
+        <li> test procedure
+          <ol>
+            <li> create one account in AD, set samAccountName to
+"pre-exist-user"
+            </li>
+            <li> create one account in IPA, set uid to "pre-exist-user"
+            </li>
+            <li> setup syncing agreement between IPA and AD, <b>DO</b>
+use <b>--forceSync</b> option
+            </li>
+          </ol>
+        </li>
+        <li> expected result
+          <ul>
+            <li> these two accounts should be tied together.
+              <ul>
+                <li> The "ntUser" flag in IPA server for this account
+should be set. </li>
+                <li> Modify account on one side will see changes on
+another side
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </li>
       </ul>
       </td>
       <td valign="top"><br>
@@ -2184,7 +2261,7 @@ activities.
       </td>
     </tr>
     <tr>
-      <td valign="top"> 210
+      <td valign="top"> 210-1
       </td>
       <td valign="top"> User Account status change on IPA side: Active
 user change to In-active user
@@ -2203,12 +2280,40 @@ server)
             </li>
           </ol>
         </li>
-      </ul>
-      <ul>
         <li> expected result
           <ul>
-            <li> <font color="red"> What is going to happen? I have
-seen email talk about this topic, but I don't see a final decision</font>
+            <li> User account on AD side will change from "enable" to
+"disable" </li>
+          </ul>
+        </li>
+      </ul>
+      </td>
+      <td valign="top"><br>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top"> 210-2
+      </td>
+      <td valign="top"> User Account status change on AD side: enabled
+user change to disabled user
+      </td>
+      <td valign="top">
+      <ul>
+        <li> test procedure
+          <ol>
+            <li> setup IPA-AD sync environment
+            </li>
+            <li> create one AD user (this account will sync to IPA
+server)
+            </li>
+            <li> change user account status from <b>enable</b> to <b>disable</b>
+            </li>
+          </ol>
+        </li>
+        <li> expected result
+          <ul>
+            <li> User account on IPA side will change from "active" to
+"in-active"
             </li>
           </ul>
         </li>
@@ -2218,7 +2323,7 @@ seen email talk about this topic, but I don't see a final decision</font>
       </td>
     </tr>
     <tr>
-      <td valign="top"> 211
+      <td valign="top"> 211-1
       </td>
       <td valign="top"> User Account status change on IPA side:
 In-active user change to Active user
@@ -2242,8 +2347,39 @@ server)
         </li>
         <li> expected result
           <ul>
-            <li> <font color="red"> What is going to happen? I have
-seen email talk about this topic, but I don't see a final decision</font>
+            <li> User account on AD side will change from "disable" to
+"enable"
+            </li>
+          </ul>
+        </li>
+      </ul>
+      </td>
+      <td valign="top"><br>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top"> 211-2
+      </td>
+      <td valign="top"> User Account status change on AD side: enabled
+user change to disabled user
+      </td>
+      <td valign="top">
+      <ul>
+        <li> test procedure
+          <ol>
+            <li> setup IPA-AD sync environment
+            </li>
+            <li> create one AD user (this account will sync to IPA
+server)
+            </li>
+            <li> change user account status from <b>disenable</b> to <b>enable</b>
+            </li>
+          </ol>
+        </li>
+        <li> expected result
+          <ul>
+            <li> User account on IPA side will change from "in-active"
+to "active"
             </li>
           </ul>
         </li>
@@ -2333,7 +2469,7 @@ Notes
 </table>
 <a name="IPA_winsync_plugin_Extended_functional_test_cases_.28safe-3.29"></a>
 <h4><span class="editsection">[<a
- href="http://rome.sjc.redhat.com/mediawiki/index.php?title=IPA_Winsync_test_plan&amp;action=edit&amp;section=13"
+ href="http://rome.sjc.redhat.com/mediawiki/index.php?title=IPA_Winsync_test_plan&amp;action=edit&amp;section=14"
  title="Edit section: IPA winsync plugin Extended functional test cases (safe-3)">edit</a>]</span>
 <span class="mw-headline"> IPA winsync plugin Extended functional test
 cases (safe-3) </span></h4>
@@ -2489,7 +2625,7 @@ Notes
 </table>
 <a name="Additional_Test"></a>
 <h2><span class="editsection">[<a
- href="http://rome.sjc.redhat.com/mediawiki/index.php?title=IPA_Winsync_test_plan&amp;action=edit&amp;section=14"
+ href="http://rome.sjc.redhat.com/mediawiki/index.php?title=IPA_Winsync_test_plan&amp;action=edit&amp;section=15"
  title="Edit section: Additional Test">edit</a>]</span> <span
  class="mw-headline"> Additional Test </span></h2>
 <ul>
@@ -2506,7 +2642,7 @@ addition operations.
 </ul>
 <a name="What_won.27t_be_Tested"></a>
 <h2><span class="editsection">[<a
- href="http://rome.sjc.redhat.com/mediawiki/index.php?title=IPA_Winsync_test_plan&amp;action=edit&amp;section=15"
+ href="http://rome.sjc.redhat.com/mediawiki/index.php?title=IPA_Winsync_test_plan&amp;action=edit&amp;section=16"
  title="Edit section: What won't be Tested">edit</a>]</span> <span
  class="mw-headline"> What won't be Tested </span></h2>
 <p>The following tests are usually necessary, but they will not be able
@@ -2520,12 +2656,12 @@ of AD or replicas/hubs of RHDS.
 </ul>
 <a name="Resources"></a>
 <h2><span class="editsection">[<a
- href="http://rome.sjc.redhat.com/mediawiki/index.php?title=IPA_Winsync_test_plan&amp;action=edit&amp;section=16"
+ href="http://rome.sjc.redhat.com/mediawiki/index.php?title=IPA_Winsync_test_plan&amp;action=edit&amp;section=17"
  title="Edit section: Resources">edit</a>]</span> <span
  class="mw-headline"> Resources </span></h2>
 <a name="Active_Directory_.28AD.29_Requirement"></a>
 <h3><span class="editsection">[<a
- href="http://rome.sjc.redhat.com/mediawiki/index.php?title=IPA_Winsync_test_plan&amp;action=edit&amp;section=17"
+ href="http://rome.sjc.redhat.com/mediawiki/index.php?title=IPA_Winsync_test_plan&amp;action=edit&amp;section=18"
  title="Edit section: Active Directory (AD) Requirement">edit</a>]</span>
 <span class="mw-headline"> Active Directory (AD) Requirement </span></h3>
 <p>At least one of the test machines must be a Windows Domain
@@ -2549,7 +2685,7 @@ for windows</a>. Check.ksh is used to confirm changes to the back end.
 </p>
 <a name="IPA_winsync_requirements"></a>
 <h3><span class="editsection">[<a
- href="http://rome.sjc.redhat.com/mediawiki/index.php?title=IPA_Winsync_test_plan&amp;action=edit&amp;section=18"
+ href="http://rome.sjc.redhat.com/mediawiki/index.php?title=IPA_Winsync_test_plan&amp;action=edit&amp;section=19"
  title="Edit section: IPA winsync requirements">edit</a>]</span> <span
  class="mw-headline"> IPA winsync requirements </span></h3>
 <ul>
@@ -2560,15 +2696,14 @@ for windows</a>. Check.ksh is used to confirm changes to the back end.
  rel="nofollow">IPA Winsync PRD</a>
   </li>
 </ul>
-<pre>* IPA will only sync user data - this can be specified in the sync agreement<br>* IPA will not send new users from the DS to AD - the users must also be added to AD, at which point changes <br>to that user will be sync'd between DS and AD<br>* IPA will sync new users added to AD - IPA must be able to change the DN and schema before the entry is stored <br>in DS<br>* IPA will need to be able to specify the search base, scope, filter, attribute lists, and additional server controls in both internal searches and external (AD) searches <br><br>The IPA plug-in must be able to do the following:<br>* Intercept and change a user entry before it is sent from dirsrv to AD, including the DN, both in init mode and <br>update mode<br>* Intercept and change an entry after it is received from AD but before it is processed further by dirsrv, <br>including changing the DN, both in init mode and update mode <br><br>Additional requirements:<br>* Allow changing the arguments to the AD dirsync search request <br></pre>
 <a name="Supplements"></a>
 <h2><span class="editsection">[<a
- href="http://rome.sjc.redhat.com/mediawiki/index.php?title=IPA_Winsync_test_plan&amp;action=edit&amp;section=19"
+ href="http://rome.sjc.redhat.com/mediawiki/index.php?title=IPA_Winsync_test_plan&amp;action=edit&amp;section=20"
  title="Edit section: Supplements">edit</a>]</span> <span
  class="mw-headline"> Supplements </span></h2>
 <a name="IPA-AD_winsync_environment_setup"></a>
 <h3><span class="editsection">[<a
- href="http://rome.sjc.redhat.com/mediawiki/index.php?title=IPA_Winsync_test_plan&amp;action=edit&amp;section=20"
+ href="http://rome.sjc.redhat.com/mediawiki/index.php?title=IPA_Winsync_test_plan&amp;action=edit&amp;section=21"
  title="Edit section: IPA-AD winsync environment setup">edit</a>]</span>
 <span class="mw-headline"> IPA-AD winsync environment setup </span></h3>
 <p><b>[ Pre Requisites ]</b>
