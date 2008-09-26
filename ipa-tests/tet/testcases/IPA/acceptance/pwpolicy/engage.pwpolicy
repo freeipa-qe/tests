@@ -95,7 +95,7 @@ pwpolicy_run()
 		$TET_ROOT/testcases/IPA/acceptance/pwpolicy \
 		pwpolicy > $MainTmpDir/pwpolicy.run.out 2>&1
 	)&
-	EngageTimer $! 2200 120 # wait 2200 sec before kill, then 1200 until kill -9
+	EngageTimer $! 3200 120 # wait 3200 sec before kill, then 1200 until kill -9
 	echo ""
 	echo "pwpolicy run $MainTmpDir/pwpolicy.run.out"
 	echo ""

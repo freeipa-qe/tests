@@ -694,6 +694,10 @@ tp3()
 	eval_vars M1
 	# cleaning up the user
 	ssh root@$FULLHOSTNAME "ipa-deluser $user1"
+	if [ $? -ne 0 ]; then
+		ResetKinit
+		ssh root@$FULLHOSTNAME "ipa-deluser $user1"
+	fi
 
 	# resetting password policy 
 	ssh root@$FULLHOSTNAME "ipa-pwpolicy --maxlife 7"
@@ -788,7 +792,7 @@ tp3b()
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
         echo "START $tet_thistest"
 
-	user1="testusrc"
+	user1="testusrh"
 	user1pw1="D4mkidyte3."
 	user1pw2="9384c.deo8765"
 	user1pw3="lo9s3n.h765"

@@ -35,6 +35,13 @@ eval_vars()
         export HOSTNAME FULLHOSTNAME OS REPO LDAP_PORT LDAPS_PORT
 }
 
+# Runs ntpdate $NTPSERVER on the machine specified in $1
+set_date()
+{
+	ssh $1 "date;/etc/init.d/ntpd stop;ntpdate $NTPSERVER"&
+	return 0
+}
+
 # This is used to fix the bind configuration on the first server after a ipa-server-install 
 FixBindServer()
 {
@@ -258,8 +265,7 @@ echo 'match_max 100000' >> $TET_TMP_DIR/kinit.exp
 	scp $TET_TMP_DIR/kinit.exp root@$FULLHOSTNAME:/tmp/.
 
 	ssh root@$FULLHOSTNAME 'kdestroy;/usr/bin/expect /tmp/kinit.exp'
-	ret=$?
-	if [ $ret != 0 ]; then
+	if [ $? != 0 ]; then
 		echo "ERROR - kinit as user $1, password of $2 failed";
 		return 1;
 	fi
@@ -268,10 +274,34 @@ echo 'match_max 100000' >> $TET_TMP_DIR/kinit.exp
 	ssh root@$FULLHOSTNAME 'klist' > $TET_TMP_DIR/KinitAs-output.txt
 	grep $2 $TET_TMP_DIR/KinitAs-output.txt
 	if [ $? -ne 0 ]; then
-		echo "ERROR - error in KinitAs, kinit didn't appear to work, $2 not found in $TET_TMP_DIR/KinitAs-output.txt"
-		echo "contents of $TET_TMP_DIR/KinitAs-output.txt:"
-		cat $TET_TMP_DIR/KinitAs-output.txt
-		return 1;
+	        # Setting the time and date on all of the servers and clients if we can
+        	for s in $SERVERS; do
+	                if [ "$s" != "" ]; then
+                        	eval_vars $s
+        	                set_date $FULLHOSTNAME
+                	fi
+	        done
+        	for s in $CLIENTS; do
+	                if [ "$s" != "" ]; then
+                	        eval_vars $s
+        	                set_date $FULLHOSTNAME
+	                fi
+	        done
+		eval_vars $SID
+		ssh root@$FULLHOSTNAME 'kdestroy;/usr/bin/expect /tmp/kinit.exp'
+		if [ $? != 0 ]; then
+			echo "ERROR - kinit as user $1, password of $2 failed";
+			return 1
+		fi
+
+		ssh root@$FULLHOSTNAME 'klist' > $TET_TMP_DIR/KinitAs-output.txt
+		grep $2 $TET_TMP_DIR/KinitAs-output.txt
+		if [ $? -ne 0 ]; then
+			echo "ERROR - error in KinitAs, kinit didn't appear to work, $2 not found in $TET_TMP_DIR/KinitAs-output.txt"
+			echo "contents of $TET_TMP_DIR/KinitAs-output.txt:"
+			cat $TET_TMP_DIR/KinitAs-output.txt
+			return 1;
+		fi
 	else
 		cat $TET_TMP_DIR/KinitAs-output.txt
 	fi

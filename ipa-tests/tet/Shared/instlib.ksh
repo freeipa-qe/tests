@@ -142,10 +142,10 @@ SetupServer()
 		echo "Clearing out any pre-existing replica files before we start"
 		ssh root@$FULLHOSTNAME "rm -f /var/lib/ipa/replica-info-$replica_hostname*"
 		echo "Generating replica prepare file for $replica_hostname on $FULLHOSTNAME"
-		ssh root@$FULLHOSTNAME "/usr/sbin/ipa-replica-prepare $replica_hostname"
+		ssh root@$FULLHOSTNAME "/usr/sbin/ipa-replica-prepare -p $DM_ADMIN_PASS $replica_hostname"
 		if [ $? -ne 0 ]; then
 			echo "Method one did not work, trying method 2"
-			ssh root@$FULLHOSTNAME "/usr/sbin/ipa-replica-prepare -p $DM_ADMIN_PASS $replica_hostname"
+			ssh root@$FULLHOSTNAME "/usr/sbin/ipa-replica-prepare $replica_hostname"
 			if [ $? -ne 0 ]; then
 				echo "ERROR - /usr/sbin/ipa-replica-prepare $replica_hostname on $FULLHOSTNAME failed."
 				return 1;
@@ -356,7 +356,7 @@ InstallClientRPM()
 		if [ $ret -ne 0 ]; then
 			echo "That rpm install didn't work, lets try that again. Sleeping for 60 seconds first" 
 			sleep 60
-			ssh root@$FULLHOSTNAME "/etc/init.d/yum-updatesd stop;killall yum;sleep 1; killall -9 yum;yum -y install $pkglistA"
+			ssh root@$FULLHOSTNAME "/etc/init.d/yum-updatesd stop;killall yum;sleep 1; killall -9 yum;/usr/bin/yum clean all;yum -y install $pkglistA"
 			ret=$?
 			if [ $ret -ne 0 ]; then
 				echo "ERROR - install of $pkglistA on $FULLHOSTNAME failed"
@@ -372,7 +372,7 @@ InstallClientRPM()
 		if [ $ret -ne 0 ]; then
 			echo "That rpm install didn't work, lets try that again. Sleeping for 60 seconds first" 
 			sleep 60
-			ssh root@$FULLHOSTNAME "/etc/init.d/yum-updatesd stop;killall yum;sleep 1; killall -9 yum;yum -y install $pkglistB"
+			ssh root@$FULLHOSTNAME "/etc/init.d/yum-updatesd stop;killall yum;sleep 1; killall -9 yum;/usr/bin/yum clean all;yum -y install $pkglistB"
 			ret=$?
 			if [ $ret -ne 0 ]; then
 				echo "ERROR - install of $pkglistB on $FULLHOSTNAME failed"
@@ -437,7 +437,7 @@ InstallServerRPM()
 	if [ $ret -ne 0 ]; then
 		echo "That rpm install didn't work, lets try that again. Sleeping for 60 seconds first" 
 		sleep 60
-		ssh root@$FULLHOSTNAME "/etc/init.d/yum-updatesd stop;killall yum;sleep 1; killall -9 yum;yum -y install $pkglistA"
+		ssh root@$FULLHOSTNAME "/etc/init.d/yum-updatesd stop;killall yum;sleep 1; killall -9 yum;/usr/bin/yum clean all;yum -y install $pkglistA"
 		ret=$?
 		if [ $ret -ne 0 ]; then
 			echo "ERROR - install of $pkglistA on $FULLHOSTNAME failed"
@@ -465,7 +465,7 @@ InstallServerRPM()
 	if [ $ret -ne 0 ]; then
 		echo "That rpm install didn't work, lets try that again. Sleeping for 60 seconds first" 
 		sleep 60
-		ssh root@$FULLHOSTNAME "/etc/init.d/yum-updatesd stop;killall yum;sleep 1; killall -9 yum;yum -y install $pkglistB"
+		ssh root@$FULLHOSTNAME "/etc/init.d/yum-updatesd stop;killall yum;sleep 1; killall -9 yum;/usr/bin/yum clean all;yum -y install $pkglistB"
 		ret=$?
 		if [ $ret -ne 0 ]; then
 			echo "ERROR - install of $pkglistB on $FULLHOSTNAME failed"
