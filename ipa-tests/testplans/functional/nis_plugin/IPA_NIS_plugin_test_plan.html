@@ -5,6 +5,13 @@
   <title>IPA NIS plugin test plan</title>
 </head>
 <body>
+<h1 class="firstHeading">IPA NIS plugin test plan</h1>
+<h3 id="siteSub">From Wiki</h3>
+<div id="jump-to-nav">Jump to: <a
+ href="#column-one">navigation</a>,
+<a
+ href="#searchInput">search</a></div>
+<!-- start content -->
 <p><font color="crimson" size="5">Test plan for IPA NIS plugin
 </font></p>
 <p><br>
@@ -52,6 +59,12 @@ Revision History
       <td> Sept. 11, 2008
       </td>
     </tr>
+    <tr>
+      <td> Ver 1.1, Yi Zhang
+      </td>
+      <td> Sept. 25, 2008
+      </td>
+    </tr>
   </tbody>
 </table>
 <p><br>
@@ -66,95 +79,130 @@ Revision History
  class="internal" id="togglelink">hide</a>]</span></div>
       <ul>
         <li class="toclevel-1"><a
- href="http://rome.sjc.redhat.com/mediawiki/index.php/IPA_NIS_plugin_test_plan#Feature_Overview"><span
+ href="#Feature_Overview"><span
  class="tocnumber">1</span> <span class="toctext">Feature Overview</span></a>
           <ul>
             <li class="toclevel-2"><a
- href="http://rome.sjc.redhat.com/mediawiki/index.php/IPA_NIS_plugin_test_plan#IPA_NIS_plugin_Overview"><span
+ href="#IPA_NIS_plugin_Overview"><span
  class="tocnumber">1.1</span> <span class="toctext">IPA NIS plugin
 Overview</span></a></li>
             <li class="toclevel-2"><a
- href="http://rome.sjc.redhat.com/mediawiki/index.php/IPA_NIS_plugin_test_plan#Traditional_NIS_server"><span
+ href="#Traditional_NIS_server"><span
  class="tocnumber">1.2</span> <span class="toctext">Traditional NIS
 server</span></a></li>
           </ul>
         </li>
         <li class="toclevel-1"><a
- href="http://rome.sjc.redhat.com/mediawiki/index.php/IPA_NIS_plugin_test_plan#Testing_Environment"><span
+ href="#Testing_Environment"><span
  class="tocnumber">2</span> <span class="toctext">Testing Environment</span></a></li>
         <li class="toclevel-1"><a
- href="http://rome.sjc.redhat.com/mediawiki/index.php/IPA_NIS_plugin_test_plan#Testing_Approach_.26_Methodology"><span
+ href="#Testing_Approach_.26_Methodology"><span
  class="tocnumber">3</span> <span class="toctext">Testing Approach
 &amp; Methodology</span></a>
           <ul>
             <li class="toclevel-2"><a
- href="http://rome.sjc.redhat.com/mediawiki/index.php/IPA_NIS_plugin_test_plan#Test_assumptions_.26_dependencies"><span
+ href="#Test_assumptions_.26_dependencies"><span
  class="tocnumber">3.1</span> <span class="toctext">Test assumptions
 &amp; dependencies</span></a></li>
             <li class="toclevel-2"><a
- href="http://rome.sjc.redhat.com/mediawiki/index.php/IPA_NIS_plugin_test_plan#Test_approach"><span
+ href="#Test_approach"><span
  class="tocnumber">3.2</span> <span class="toctext">Test approach</span></a></li>
           </ul>
         </li>
         <li class="toclevel-1"><a
- href="http://rome.sjc.redhat.com/mediawiki/index.php/IPA_NIS_plugin_test_plan#Test_cases_.26_Result"><span
+ href="#Test_cases_.26_Result"><span
  class="tocnumber">4</span> <span class="toctext">Test cases &amp;
 Result</span></a>
           <ul>
             <li class="toclevel-2"><a
- href="http://rome.sjc.redhat.com/mediawiki/index.php/IPA_NIS_plugin_test_plan#Functional_Testing"><span
+ href="#Functional_Testing"><span
  class="tocnumber">4.1</span> <span class="toctext">Functional Testing</span></a></li>
             <li class="toclevel-2"><a
- href="http://rome.sjc.redhat.com/mediawiki/index.php/IPA_NIS_plugin_test_plan#IPA_specific_Testing"><span
+ href="#IPA_specific_Testing"><span
  class="tocnumber">4.2</span> <span class="toctext">IPA specific
 Testing</span></a></li>
           </ul>
         </li>
         <li class="toclevel-1"><a
- href="http://rome.sjc.redhat.com/mediawiki/index.php/IPA_NIS_plugin_test_plan#Additional_test_covered_in_this_test"><span
- class="tocnumber">5</span> <span class="toctext">Additional test
-covered in this test</span></a></li>
+ href="#Additional_test:_schema_compatibility_plugin_test"><span
+ class="tocnumber">5</span> <span class="toctext">Additional test:
+schema compatibility plugin test</span></a>
+          <ul>
+            <li class="toclevel-2"><a
+ href="#What_is_this"><span
+ class="tocnumber">5.1</span> <span class="toctext">What is this</span></a></li>
+            <li class="toclevel-2"><a
+ href="#Environment_Setup"><span
+ class="tocnumber">5.2</span> <span class="toctext">Environment Setup</span></a></li>
+            <li class="toclevel-2"><a
+ href="#Test_cases"><span
+ class="tocnumber">5.3</span> <span class="toctext">Test cases</span></a>
+              <ul>
+                <li class="toclevel-3"><a
+ href="#NIS_System_Resource_Check"><span
+ class="tocnumber">5.3.1</span> <span class="toctext">NIS System
+Resource Check</span></a></li>
+                <li class="toclevel-3"><a
+ href="#Smoke_Test_cases_.28safe-0.29"><span
+ class="tocnumber">5.3.2</span> <span class="toctext">Smoke Test cases
+(safe-0)</span></a></li>
+                <li class="toclevel-3"><a
+ href="#Acceptance_Test_cases_.28safe-1.29"><span
+ class="tocnumber">5.3.3</span> <span class="toctext">Acceptance Test
+cases (safe-1)</span></a></li>
+                <li class="toclevel-3"><a
+ href="#Functional_Test_cases_.28safe-2.29"><span
+ class="tocnumber">5.3.4</span> <span class="toctext">Functional Test
+cases (safe-2)</span></a></li>
+                <li class="toclevel-3"><a
+ href="#Extended_Functional_Test_cases_.28safe-3.29"><span
+ class="tocnumber">5.3.5</span> <span class="toctext">Extended
+Functional Test cases (safe-3)</span></a></li>
+              </ul>
+            </li>
+          </ul>
+        </li>
         <li class="toclevel-1"><a
- href="http://rome.sjc.redhat.com/mediawiki/index.php/IPA_NIS_plugin_test_plan#Risk_analysis_.28what_won.27t_be_tested.29"><span
+ href="#Risk_analysis_.28what_won.27t_be_tested.29"><span
  class="tocnumber">6</span> <span class="toctext">Risk analysis (what
 won't be tested)</span></a>
           <ul>
             <li class="toclevel-2"><a
- href="http://rome.sjc.redhat.com/mediawiki/index.php/IPA_NIS_plugin_test_plan#This_is_acceptance_test_set_in_this_release_cycle"><span
+ href="#This_is_acceptance_test_set_in_this_release_cycle"><span
  class="tocnumber">6.1</span> <span class="toctext">This is acceptance
 test set in this release cycle</span></a></li>
             <li class="toclevel-2"><a
- href="http://rome.sjc.redhat.com/mediawiki/index.php/IPA_NIS_plugin_test_plan#NIS_Master-slave_setup.2Fconfiguration_won.27t_be_tested"><span
+ href="#NIS_Master-slave_setup.2Fconfiguration_won.27t_be_tested"><span
  class="tocnumber">6.2</span> <span class="toctext">NIS Master-slave
 setup/configuration won't be tested</span></a></li>
             <li class="toclevel-2"><a
- href="http://rome.sjc.redhat.com/mediawiki/index.php/IPA_NIS_plugin_test_plan#Stress_testing"><span
+ href="#Stress_testing"><span
  class="tocnumber">6.3</span> <span class="toctext">Stress testing</span></a></li>
           </ul>
         </li>
         <li class="toclevel-1"><a
- href="http://rome.sjc.redhat.com/mediawiki/index.php/IPA_NIS_plugin_test_plan#Resources"><span
+ href="#Resources"><span
  class="tocnumber">7</span> <span class="toctext">Resources</span></a></li>
         <li class="toclevel-1"><a
- href="http://rome.sjc.redhat.com/mediawiki/index.php/IPA_NIS_plugin_test_plan#Supplements"><span
+ href="#Supplements"><span
  class="tocnumber">8</span> <span class="toctext">Supplements</span></a>
           <ul>
             <li class="toclevel-2"><a
- href="http://rome.sjc.redhat.com/mediawiki/index.php/IPA_NIS_plugin_test_plan#NIS_Configuration_Guide"><span
+ href="#NIS_Configuration_Guide"><span
  class="tocnumber">8.1</span> <span class="toctext">NIS Configuration
 Guide</span></a></li>
             <li class="toclevel-2"><a
- href="http://rome.sjc.redhat.com/mediawiki/index.php/IPA_NIS_plugin_test_plan#RFC"><span
+ href="#RFC"><span
  class="tocnumber">8.2</span> <span class="toctext">RFC</span></a></li>
           </ul>
         </li>
         <li class="toclevel-1"><a
- href="http://rome.sjc.redhat.com/mediawiki/index.php/IPA_NIS_plugin_test_plan#Questions_.26_Answers"><span
+ href="#Questions_.26_Answers"><span
  class="tocnumber">9</span> <span class="toctext">Questions &amp;
 Answers</span></a>
           <ul>
             <li class="toclevel-2"><a
- href="http://rome.sjc.redhat.com/mediawiki/index.php/IPA_NIS_plugin_test_plan#HPUX"><span
+ href="#HPUX"><span
  class="tocnumber">9.1</span> <span class="toctext">HPUX</span></a></li>
           </ul>
         </li>
@@ -169,6 +217,22 @@ Answers</span></a>
  href="http://rome.sjc.redhat.com/mediawiki/index.php?title=IPA_NIS_plugin_test_plan&amp;action=edit&amp;section=1"
  title="Edit section: Feature Overview">edit</a>]</span> <span
  class="mw-headline"> Feature Overview </span></h3>
+<p>There are total two NIS relate plug-ins. The first on is NIS server
+plugin. It functions as a replacement of traditional NIS server.
+Another one is "schema compatibility plug-in". The purpose of this plug
+in is to translate some schema conflict between Solaris IPA client and
+IPA server. The test for this plug in is in <b><a
+ href="#Additional_test:_schema_compatibility_plugin_test"
+ title=""> Additional test</a> section</b>. </p>
+<p>As of IPA 1.1 release, there is <b>NO NEED</b> to test the NIS
+server plugin. Only test cases in <a
+ href="#Additional_test:_schema_compatibility_plugin_test"
+ title=""> Additional test</a>
+would be run. (The NIS server plug-in code has been finished. The code
+will ship this time, but QE will not certify this part of code)
+</p>
+<p><br>
+</p>
 <a name="IPA_NIS_plugin_Overview"></a>
 <h4><span class="editsection">[<a
  href="http://rome.sjc.redhat.com/mediawiki/index.php?title=IPA_NIS_plugin_test_plan&amp;action=edit&amp;section=2"
@@ -382,7 +446,7 @@ design and IPA specific topics. It including the following areas:
   <li> Test cases list here are all acceptance level test. All of them
 have to pass. </li>
   <li> <a
- href="http://rome.sjc.redhat.com/mediawiki/index.php/IPA_NIS_plugin_test_plan#Testing_Environment"
+ href="#Testing_Environment"
  title=""> Environment matrix</a> applies to all of the following test
   </li>
 </ul>
@@ -438,7 +502,7 @@ The "NIS Server" here means IPA NIS plugin. Please follow <a
       <p><small><b>[NIS client setup]</b><br>
 This is what RHEL linux should follow. For different platform, please
 follow corresponding <a
- href="http://rome.sjc.redhat.com/mediawiki/index.php/IPA_NIS_plugin_test_plan#NIS_Configuration_Guide"
+ href="#NIS_Configuration_Guide"
  title=""> NIS configuration Guide</a> </small></p>
       <ol>
         <li><small> Append the following line in the <b>/etc/sysconfig/network</b>
@@ -886,21 +950,819 @@ set of IPv6 supporting should be setup. Here is a little info I found <a
     </tr>
   </tbody>
 </table>
-<a name="Additional_test_covered_in_this_test"></a>
+<a name="Additional_test:_schema_compatibility_plugin_test"></a>
 <h3><span class="editsection">[<a
  href="http://rome.sjc.redhat.com/mediawiki/index.php?title=IPA_NIS_plugin_test_plan&amp;action=edit&amp;section=11"
- title="Edit section: Additional test covered in this test">edit</a>]</span>
-<span class="mw-headline"> Additional test covered in this test </span></h3>
+ title="Edit section: Additional test: schema compatibility plugin test">edit</a>]</span>
+<span class="mw-headline"> Additional test: schema compatibility plugin
+test </span></h3>
+<a name="What_is_this"></a>
+<h4><span class="editsection">[<a
+ href="http://rome.sjc.redhat.com/mediawiki/index.php?title=IPA_NIS_plugin_test_plan&amp;action=edit&amp;section=12"
+ title="Edit section: What is this">edit</a>]</span> <span
+ class="mw-headline"> What is this </span></h4>
+<p>This plugin is designed specifically for IPA client on Solaris
+platform to enable NIS function with IPA server. </p>
+<p>A special plug in is required because on Solaris platform, NIS
+client is looking for "member" for user-group relation. And since we
+already use this attribute in IPA schema to map between IPA user and
+groups, we have to make a special mapping for Solaris NIS client.
+</p>
+<a name="Environment_Setup"></a>
+<h4><span class="editsection">[<a
+ href="http://rome.sjc.redhat.com/mediawiki/index.php?title=IPA_NIS_plugin_test_plan&amp;action=edit&amp;section=13"
+ title="Edit section: Environment Setup">edit</a>]</span> <span
+ class="mw-headline"> Environment Setup </span></h4>
+<ul>
+  <li> Server side configuration:
+    <ul>
+      <li> The schema compatibility plugin is part of server and it is
+automatic configured during server installation time. There is no
+special server side configuration need to be done
+      </li>
+    </ul>
+  </li>
+</ul>
+<ul>
+  <li> Client side configuration:
+    <ul>
+      <li> This is a plug in that designed specifically for Solaris
+platform. It works for Solaris 8, 9, 10 (SPARC) and Solaris 10 (x86
+arch). The configuration guide here only apply to these 4 platforms
+      </li>
+      <li> Steps to configure (assuming we already have IPA server
+installed)
+        <ol>
+          <li> edit <b>/etc/nsswitch.ldap</b> and under the hosts and
+ipnodes entries make them look like:
+            <ul>
+              <li> hosts: files dns
+              </li>
+              <li> ipnodes: files dns
+              </li>
+            </ul>
+          </li>
+          <li> run: ldapclient init ipa.example.com (IPA server)
+          </li>
+          <li> ps -ef | grep nscd and kill it
+          </li>
+          <li> getent passwd admin
+          </li>
+        </ol>
+      </li>
+    </ul>
+  </li>
+</ul>
+<a name="Test_cases"></a>
+<h4><span class="editsection">[<a
+ href="http://rome.sjc.redhat.com/mediawiki/index.php?title=IPA_NIS_plugin_test_plan&amp;action=edit&amp;section=14"
+ title="Edit section: Test cases">edit</a>]</span> <span
+ class="mw-headline"> Test cases </span></h4>
+<a name="NIS_System_Resource_Check"></a>
+<h5><span class="editsection">[<a
+ href="http://rome.sjc.redhat.com/mediawiki/index.php?title=IPA_NIS_plugin_test_plan&amp;action=edit&amp;section=15"
+ title="Edit section: NIS System Resource Check">edit</a>]</span> <span
+ class="mw-headline"> NIS System Resource Check </span></h5>
+<ul>
+  <li> SSH password-less login for both local NIS user and IPA user
+    <ul>
+      <li> create an IPA user on IPA server
+      </li>
+      <li> from IPA server host, ssh to IPA client host as this newly
+created user
+        <ul>
+          <li> <font color="green"> Expected: user can ssh into IPA
+client <b>without</b> password prompt. The ssh login should be
+password-less </font>
+          </li>
+        </ul>
+      </li>
+      <li> create an NIS user on IPA client host.
+      </li>
+      <li> create an NIS group on IPA client host.
+      </li>
+      <li> Append this newly created user into the newly created group
+      </li>
+      <li> from IPA client host, ssh to IPA server host as this newly
+created user
+        <ul>
+          <li> <font color="green"> Expected: user can ssh into IPA
+client <b>without</b> password prompt. The ssh login should be
+password-less </font>
+          </li>
+          <li> <font color="green"> Expected: run "id" to verity this
+NIS user is still belongs to the NIS group </font>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+<ul>
+  <li> System login to all IPA client and server for both local NIS
+user and IPA user
+    <ul>
+      <li> create an IPA user on IPA server
+      </li>
+      <li> Perform a system login on IPA client host as this IPA user.
+        <ul>
+          <li> <font color="green"> Expected: user can log into IPA
+client </font>
+          </li>
+        </ul>
+      </li>
+      <li> create an NIS user on IPA client host.
+      </li>
+      <li> create an NIS group on IPA client host.
+      </li>
+      <li> Append this newly created user into the newly created group
+      </li>
+      <li> Perform a system login on IPA server host as this NIS user.
+        <ul>
+          <li> <font color="green"> Expected: user can do system login
+to IPA server</font>
+          </li>
+          <li> <font color="green"> Expected: run "id" to verity this
+NIS user is still belongs to the NIS group</font>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+<ul>
+  <li> NFS mounting for IPA client machine
+    <ul>
+      <li> Setup NFS on IPA server
+      </li>
+      <li> on IPA client host, try to mount this NFS
+        <ul>
+          <li> <font color="green"> Expected: mounting should success</font>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+<p><br>
+</p>
+<a name="Smoke_Test_cases_.28safe-0.29"></a>
+<h5><span class="editsection">[<a
+ href="http://rome.sjc.redhat.com/mediawiki/index.php?title=IPA_NIS_plugin_test_plan&amp;action=edit&amp;section=16"
+ title="Edit section: Smoke Test cases (safe-0)">edit</a>]</span> <span
+ class="mw-headline"> Smoke Test cases (safe-0) </span></h5>
 <p>NONE
 </p>
+<p><br>
+</p>
+<a name="Acceptance_Test_cases_.28safe-1.29"></a>
+<h5><span class="editsection">[<a
+ href="http://rome.sjc.redhat.com/mediawiki/index.php?title=IPA_NIS_plugin_test_plan&amp;action=edit&amp;section=17"
+ title="Edit section: Acceptance Test cases (safe-1)">edit</a>]</span> <span
+ class="mw-headline"> Acceptance Test cases (safe-1) </span></h5>
+<table
+ style="background: lightcyan none repeat scroll 0%; -moz-background-clip: -moz-initial; -moz-background-origin: -moz-initial; -moz-background-inline-policy: -moz-initial;"
+ border="1" cellpadding="5" cellspacing="0">
+  <tbody>
+    <tr>
+      <th
+ style="background: cadetblue none repeat scroll 0%; -moz-background-clip: -moz-initial; -moz-background-origin: -moz-initial; -moz-background-inline-policy: -moz-initial; color: white;"
+ width="*"> #
+      </th>
+      <th
+ style="background: cadetblue none repeat scroll 0%; -moz-background-clip: -moz-initial; -moz-background-origin: -moz-initial; -moz-background-inline-policy: -moz-initial; color: white;"
+ width="30%"> Scenario
+      </th>
+      <th
+ style="background: cadetblue none repeat scroll 0%; -moz-background-clip: -moz-initial; -moz-background-origin: -moz-initial; -moz-background-inline-policy: -moz-initial; color: white;"
+ width="50%"> Test Procedure &amp; Expected results
+      </th>
+      <th
+ style="background: cadetblue none repeat scroll 0%; -moz-background-clip: -moz-initial; -moz-background-origin: -moz-initial; -moz-background-inline-policy: -moz-initial; color: white;"
+ width="10%"> Notes
+      </th>
+    </tr>
+    <tr>
+      <td valign="top"> 100
+      </td>
+      <td valign="top"> Solaris 8 SPARC
+      </td>
+      <td valign="top">
+      <ul>
+        <li> test procedure
+          <ul>
+            <li> Install a fresh IPA server
+            </li>
+            <li> Follow client side configuration guide to configure
+host
+            </li>
+          </ul>
+        </li>
+        <li> expected result
+          <ul>
+            <li> <a
+ href="#NIS_System_Resource_Check"
+ title=""> System Resource Check test set</a> should pass
+            </li>
+          </ul>
+        </li>
+      </ul>
+      </td>
+      <td valign="top"><br>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top"> 101
+      </td>
+      <td valign="top"> Solaris 9 SPARC
+      </td>
+      <td valign="top">
+      <ul>
+        <li> test procedure
+          <ul>
+            <li> Install a fresh IPA server
+            </li>
+            <li> Follow client side configuration guide to configure
+host
+            </li>
+          </ul>
+        </li>
+        <li> expected result
+          <ul>
+            <li> <a
+ href="#NIS_System_Resource_Check"
+ title=""> System Resource Check test set</a> should pass
+            </li>
+          </ul>
+        </li>
+      </ul>
+      </td>
+      <td valign="top"><br>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top"> 102
+      </td>
+      <td valign="top"> Solaris 10 SPARC
+      </td>
+      <td valign="top">
+      <ul>
+        <li> test procedure
+          <ul>
+            <li> Install a fresh IPA server
+            </li>
+            <li> Follow client side configuration guide to configure
+host
+            </li>
+          </ul>
+        </li>
+        <li> expected result
+          <ul>
+            <li> <a
+ href="#NIS_System_Resource_Check"
+ title=""> System Resource Check test set</a> should pass
+            </li>
+          </ul>
+        </li>
+      </ul>
+      </td>
+      <td valign="top"><br>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top"> 103
+      </td>
+      <td valign="top"> Solaris 10 x86
+      </td>
+      <td valign="top">
+      <ul>
+        <li> test procedure
+          <ul>
+            <li> Install a fresh IPA server
+            </li>
+            <li> Follow client side configuration guide to configure
+host
+            </li>
+          </ul>
+        </li>
+        <li> expected result
+          <ul>
+            <li> <a
+ href="#NIS_System_Resource_Check"
+ title=""> System Resource Check test set</a> should pass
+            </li>
+          </ul>
+        </li>
+      </ul>
+      </td>
+      <td valign="top">
+      <p><br>
+      </p>
+      </td>
+    </tr>
+    <tr>
+      <td
+ style="background: lavender none repeat scroll 0%; -moz-background-clip: -moz-initial; -moz-background-origin: -moz-initial; -moz-background-inline-policy: -moz-initial; color: lightgray;">
+#
+      </td>
+      <td
+ style="background: lavender none repeat scroll 0%; -moz-background-clip: -moz-initial; -moz-background-origin: -moz-initial; -moz-background-inline-policy: -moz-initial; color: lightgray;">
+Scenario
+      </td>
+      <td
+ style="background: lavender none repeat scroll 0%; -moz-background-clip: -moz-initial; -moz-background-origin: -moz-initial; -moz-background-inline-policy: -moz-initial; color: lightgray;">
+Test Procedure &amp; Expected results
+      </td>
+      <td
+ style="background: lavender none repeat scroll 0%; -moz-background-clip: -moz-initial; -moz-background-origin: -moz-initial; -moz-background-inline-policy: -moz-initial; color: lightgray;">
+Notes
+      </td>
+    </tr>
+  </tbody>
+</table>
+<p><br>
+</p>
+<a name="Functional_Test_cases_.28safe-2.29"></a>
+<h5><span class="editsection">[<a
+ href="http://rome.sjc.redhat.com/mediawiki/index.php?title=IPA_NIS_plugin_test_plan&amp;action=edit&amp;section=18"
+ title="Edit section: Functional Test cases (safe-2)">edit</a>]</span> <span
+ class="mw-headline"> Functional Test cases (safe-2) </span></h5>
+<ul>
+  <li> Please follow <a
+ href="#Environment_Setup"
+ title=""> Environment set up guide</a> to setup test environment. </li>
+  <li> <b>IPA server</b> is either RHEL5 i386 host or RHEL 5 x86_64
+host that has IPA server bits installed
+  </li>
+  <li> <b>IPA client</b> is one of the following
+    <ul>
+      <li> Host that has fresh <b>Solaris 8 (SPARC)</b> installed
+      </li>
+      <li> Host that has fresh <b>Solaris 9 (SPARC)</b> installed
+      </li>
+      <li> Host that has fresh <b>Solaris 10 (SPARC)</b> installed
+      </li>
+      <li> Host that has fresh <b>Solaris 10 (x86)</b> installed
+      </li>
+    </ul>
+  </li>
+  <li> All of the following test cases has to repeat on above <b>IPA
+client</b> host.
+  </li>
+</ul>
+<table
+ style="background: lightcyan none repeat scroll 0%; -moz-background-clip: -moz-initial; -moz-background-origin: -moz-initial; -moz-background-inline-policy: -moz-initial;"
+ border="1" cellpadding="5" cellspacing="0">
+  <tbody>
+    <tr>
+      <th
+ style="background: cadetblue none repeat scroll 0%; -moz-background-clip: -moz-initial; -moz-background-origin: -moz-initial; -moz-background-inline-policy: -moz-initial; color: white;"
+ width="*"> #
+      </th>
+      <th
+ style="background: cadetblue none repeat scroll 0%; -moz-background-clip: -moz-initial; -moz-background-origin: -moz-initial; -moz-background-inline-policy: -moz-initial; color: white;"
+ width="30%"> Scenario
+      </th>
+      <th
+ style="background: cadetblue none repeat scroll 0%; -moz-background-clip: -moz-initial; -moz-background-origin: -moz-initial; -moz-background-inline-policy: -moz-initial; color: white;"
+ width="50%"> Test Procedure &amp; Expected results
+      </th>
+      <th
+ style="background: cadetblue none repeat scroll 0%; -moz-background-clip: -moz-initial; -moz-background-origin: -moz-initial; -moz-background-inline-policy: -moz-initial; color: white;"
+ width="10%"> Notes
+      </th>
+    </tr>
+    <tr
+ style="background: papayawhip none repeat scroll 0%; -moz-background-clip: -moz-initial; -moz-background-origin: -moz-initial; -moz-background-inline-policy: -moz-initial; color: cornflowerblue;">
+      <td colspan="4"> <b>Test purpose</b>: User accounts
+      </td>
+    </tr>
+    <tr>
+      <td valign="top"> 200
+      </td>
+      <td valign="top"> IPA user account Lock &amp; Unlock operation
+      </td>
+      <td valign="top">
+      <ul>
+        <li> test procedure
+          <ol>
+            <li> create IPA user on IPA server
+            </li>
+            <li> Verity this user <b>can</b>
+              <ul>
+                <li> ssh to IPA client password-less
+                </li>
+                <li> perform system login to IPA client host
+                </li>
+              </ul>
+            </li>
+            <li> Lock this IPA user account </li>
+            <li> Verity this user <b>can NOT</b>
+              <ul>
+                <li> ssh to IPA client password-less </li>
+                <li> perform system login to IPA client host
+                </li>
+              </ul>
+            </li>
+            <li> Unlock this IPA user account </li>
+            <li> Verity this user <b>can</b>
+              <ul>
+                <li> ssh to IPA client password-less
+                </li>
+                <li> perform system login to IPA client host
+                </li>
+              </ul>
+            </li>
+          </ol>
+        </li>
+      </ul>
+      </td>
+      <td valign="top"><br>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top"> 201
+      </td>
+      <td valign="top"> IPA user account Delete operation
+      </td>
+      <td valign="top">
+      <ul>
+        <li> test procedure
+          <ol>
+            <li> create IPA user on IPA server
+            </li>
+            <li> Verity this user <b>can</b>
+              <ul>
+                <li> ssh to IPA client password-less
+                </li>
+                <li> perform system login to IPA client host
+                </li>
+              </ul>
+            </li>
+            <li> Delete this IPA user account </li>
+            <li> Verity this user <b>can NOT</b>
+              <ul>
+                <li> ssh to IPA client password-less </li>
+                <li> perform system login to IPA client host </li>
+              </ul>
+            </li>
+          </ol>
+        </li>
+      </ul>
+      </td>
+      <td valign="top"><br>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top"> 202
+      </td>
+      <td valign="top"> NIS user account Delete operation
+      </td>
+      <td valign="top">
+      <ul>
+        <li> test procedure
+          <ol>
+            <li> create NIS user on IPA client
+            </li>
+            <li> Verity this user <b>can</b>
+              <ul>
+                <li> ssh to IPA server password-less
+                </li>
+                <li> perform system login to IPA server host
+                </li>
+              </ul>
+            </li>
+            <li> Delete this NIS user account </li>
+            <li> Verity this user <b>can NOT</b>
+              <ul>
+                <li> ssh to IPA server password-less </li>
+                <li> perform system login to IPA server host </li>
+              </ul>
+            </li>
+          </ol>
+        </li>
+      </ul>
+      </td>
+      <td valign="top"><br>
+      </td>
+    </tr>
+    <tr>
+      <td
+ style="background: lavender none repeat scroll 0%; -moz-background-clip: -moz-initial; -moz-background-origin: -moz-initial; -moz-background-inline-policy: -moz-initial; color: lightgray;">
+#
+      </td>
+      <td
+ style="background: lavender none repeat scroll 0%; -moz-background-clip: -moz-initial; -moz-background-origin: -moz-initial; -moz-background-inline-policy: -moz-initial; color: lightgray;">
+Scenario
+      </td>
+      <td
+ style="background: lavender none repeat scroll 0%; -moz-background-clip: -moz-initial; -moz-background-origin: -moz-initial; -moz-background-inline-policy: -moz-initial; color: lightgray;">
+Test Procedure &amp; Expected results
+      </td>
+      <td
+ style="background: lavender none repeat scroll 0%; -moz-background-clip: -moz-initial; -moz-background-origin: -moz-initial; -moz-background-inline-policy: -moz-initial; color: lightgray;">
+Notes
+      </td>
+    </tr>
+  </tbody>
+</table>
+<p><br>
+</p>
+<a name="Extended_Functional_Test_cases_.28safe-3.29"></a>
+<h5><span class="editsection">[<a
+ href="http://rome.sjc.redhat.com/mediawiki/index.php?title=IPA_NIS_plugin_test_plan&amp;action=edit&amp;section=19"
+ title="Edit section: Extended Functional Test cases (safe-3)">edit</a>]</span>
+<span class="mw-headline"> Extended Functional Test cases (safe-3) </span></h5>
+<p>This set of test cases is focus on one specific scenario: change
+user account status <b>after</b> user already legally being
+authenticated. In this situation, since account verification only
+happen once for each kerberos session, user's current operation should <b>NOT</b>
+be affected. The account status change will take effect after this
+session expired or being terminated (such as system log out, or exit an
+ssh connection)
+</p>
+<p>Same as functional test cases, the following test cases need run in
+different Solaris OS as well.
+</p>
+<p><br>
+</p>
+<table
+ style="background: lightcyan none repeat scroll 0%; -moz-background-clip: -moz-initial; -moz-background-origin: -moz-initial; -moz-background-inline-policy: -moz-initial;"
+ border="1" cellpadding="5" cellspacing="0">
+  <tbody>
+    <tr>
+      <th
+ style="background: cadetblue none repeat scroll 0%; -moz-background-clip: -moz-initial; -moz-background-origin: -moz-initial; -moz-background-inline-policy: -moz-initial; color: white;"
+ width="*"> #
+      </th>
+      <th
+ style="background: cadetblue none repeat scroll 0%; -moz-background-clip: -moz-initial; -moz-background-origin: -moz-initial; -moz-background-inline-policy: -moz-initial; color: white;"
+ width="30%"> Scenario
+      </th>
+      <th
+ style="background: cadetblue none repeat scroll 0%; -moz-background-clip: -moz-initial; -moz-background-origin: -moz-initial; -moz-background-inline-policy: -moz-initial; color: white;"
+ width="50%"> Test Procedure &amp; Expected results
+      </th>
+      <th
+ style="background: cadetblue none repeat scroll 0%; -moz-background-clip: -moz-initial; -moz-background-origin: -moz-initial; -moz-background-inline-policy: -moz-initial; color: white;"
+ width="10%"> Notes
+      </th>
+    </tr>
+    <tr
+ style="background: papayawhip none repeat scroll 0%; -moz-background-clip: -moz-initial; -moz-background-origin: -moz-initial; -moz-background-inline-policy: -moz-initial; color: cornflowerblue;">
+      <td colspan="4"> <b>Test purpose</b>: User accounts
+      </td>
+    </tr>
+    <tr>
+      <td valign="top"> 300
+      </td>
+      <td valign="top"> <b>ssh passwordless login</b> for IPA user
+account <b>Unlock -&gt; Lock -&gt; Unlock</b> operation <b>while</b>
+user already gained an valid authentication session
+      </td>
+      <td valign="top">
+      <ul>
+        <li> test procedure
+          <ol>
+            <li> create IPA user on IPA server </li>
+            <li> ssh to IPA client as this newly created user
+              <ul>
+                <li> user should login to IPA client without password
+prompt
+                </li>
+              </ul>
+            </li>
+            <li> During this IPA user stays on IPA client host, <b>Lock</b>
+this user
+              <ul>
+                <li> Verity User can still perform normal operation
+(just run some generic UNIX command, such as ls, pwd, id)
+                </li>
+              </ul>
+            </li>
+            <li> Exist from IPA client host
+            </li>
+            <li> try ssh to IPA client host as this user again
+              <ul>
+                <li> Verity the ssh login will be rejected. System
+should prompt
+for password, and even user enter right password, it should be still
+rejected. </li>
+              </ul>
+            </li>
+            <li> <b>unlock</b> this user
+            </li>
+            <li> ssh to IPA client again
+              <ul>
+                <li> user should login to IPA client without password
+prompt
+                </li>
+              </ul>
+            </li>
+          </ol>
+        </li>
+      </ul>
+      </td>
+      <td valign="top"><br>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top"> 301
+      </td>
+      <td valign="top"> <b>system login</b> for IPA user account <b>Unlock
+-&gt; Lock -&gt; Unlock</b> operation <b>while</b> user already gained
+an valid authentication session
+      </td>
+      <td valign="top">
+      <ul>
+        <li> test procedure
+          <ol>
+            <li> create IPA user on IPA server </li>
+            <li> Do system login on IPA client password-less as this
+newly created user
+            </li>
+            <li> During this IPA user stays on IPA client host, <b>Lock</b>
+this user
+              <ul>
+                <li> Verity User can still perform normal operation
+(just run some generic UNIX command, such as ls, pwd, id)
+                </li>
+              </ul>
+            </li>
+            <li> Exist from IPA client host
+            </li>
+            <li> try perform system login on to IPA client host as this
+user again
+              <ul>
+                <li> Verity the system login will be rejected. </li>
+              </ul>
+            </li>
+            <li> <b>unlock</b> this user
+            </li>
+            <li> try perform system login on to IPA client host again
+              <ul>
+                <li> user should be able to login to system
+                </li>
+              </ul>
+            </li>
+          </ol>
+        </li>
+      </ul>
+      </td>
+      <td valign="top"><br>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top"> 302
+      </td>
+      <td valign="top"> <b>ssh password-less login</b>, IPA user
+account <b>Delete</b> operation <b>while</b> user already gained an
+valid authentication session
+      </td>
+      <td valign="top">
+      <ul>
+        <li> test procedure
+          <ol>
+            <li> create IPA user on IPA server </li>
+            <li> ssh to IPA client password-less as this newly created
+user
+            </li>
+            <li> During this IPA user stays on IPA client host, Delete
+this user from IPA server
+              <ul>
+                <li> Verity User can still perform normal operation
+(just run some generic UNIX command, such as ls, pwd, id)
+                </li>
+              </ul>
+            </li>
+            <li> Exist from IPA client host
+            </li>
+            <li> try ssh to IPA client host as this user again
+              <ul>
+                <li> Verity the ssh login will be rejected. System
+should prompt
+for password, and even user enter right password, user should be still
+rejected. </li>
+              </ul>
+            </li>
+          </ol>
+        </li>
+      </ul>
+      </td>
+      <td valign="top"><br>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top"> 303
+      </td>
+      <td valign="top"> <b>system login</b>, IPA user account <b>Delete</b>
+operation <b>while</b> user already gained an valid authentication
+session
+      </td>
+      <td valign="top">
+      <ul>
+        <li> test procedure
+          <ol>
+            <li> create IPA user on IPA server </li>
+            <li> perform system login to IPA client password-less as
+this newly created user
+            </li>
+            <li> During this IPA user stays on IPA client host, Delete
+this user from IPA server
+              <ul>
+                <li> Verity User can still perform normal operation
+(just run some generic UNIX command, such as ls, pwd, id)
+                </li>
+              </ul>
+            </li>
+            <li> Exist from IPA client host
+            </li>
+            <li> try system login to IPA client host as this user again
+              <ul>
+                <li> Verity the ssh login will be rejected. System
+should prompt
+for password, and even user enter right password, user should be still
+rejected. </li>
+              </ul>
+            </li>
+          </ol>
+        </li>
+      </ul>
+      </td>
+      <td valign="top"><br>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top"> 304
+      </td>
+      <td valign="top"> NIS user account Delete operation <b>while</b>
+this user gained valid authentication
+      </td>
+      <td valign="top">
+      <ul>
+        <li> test procedure
+          <ol>
+            <li> create NIS user on IPA client
+            </li>
+            <li> Verity this user <b>can</b>
+              <ul>
+                <li> ssh to IPA server password-less
+                </li>
+                <li> perform system login to IPA server host
+                </li>
+              </ul>
+            </li>
+            <li> Delete this NIS user account while user stays on IPA
+server
+            </li>
+            <li> Verity this user <b>can NOT</b>
+              <ul>
+                <li> ssh to IPA server password-less </li>
+                <li> perform system login to IPA server host </li>
+              </ul>
+            </li>
+          </ol>
+        </li>
+        <li><b>Notes</b>:
+          <ul>
+            <li> We can do <b>ssh login</b> and <b>system login</b>
+test at same time, because we can use different terminal at same time
+            </li>
+          </ul>
+        </li>
+      </ul>
+      </td>
+      <td valign="top"><br>
+      </td>
+    </tr>
+    <tr>
+      <td
+ style="background: lavender none repeat scroll 0%; -moz-background-clip: -moz-initial; -moz-background-origin: -moz-initial; -moz-background-inline-policy: -moz-initial; color: lightgray;">
+#
+      </td>
+      <td
+ style="background: lavender none repeat scroll 0%; -moz-background-clip: -moz-initial; -moz-background-origin: -moz-initial; -moz-background-inline-policy: -moz-initial; color: lightgray;">
+Scenario
+      </td>
+      <td
+ style="background: lavender none repeat scroll 0%; -moz-background-clip: -moz-initial; -moz-background-origin: -moz-initial; -moz-background-inline-policy: -moz-initial; color: lightgray;">
+Test Procedure &amp; Expected results
+      </td>
+      <td
+ style="background: lavender none repeat scroll 0%; -moz-background-clip: -moz-initial; -moz-background-origin: -moz-initial; -moz-background-inline-policy: -moz-initial; color: lightgray;">
+Notes
+      </td>
+    </tr>
+  </tbody>
+</table>
 <a name="Risk_analysis_.28what_won.27t_be_tested.29"></a>
 <h3><span class="editsection">[<a
- href="http://rome.sjc.redhat.com/mediawiki/index.php?title=IPA_NIS_plugin_test_plan&amp;action=edit&amp;section=12"
+ href="http://rome.sjc.redhat.com/mediawiki/index.php?title=IPA_NIS_plugin_test_plan&amp;action=edit&amp;section=20"
  title="Edit section: Risk analysis (what won't be tested)">edit</a>]</span>
 <span class="mw-headline"> Risk analysis (what won't be tested) </span></h3>
 <a name="This_is_acceptance_test_set_in_this_release_cycle"></a>
 <h4><span class="editsection">[<a
- href="http://rome.sjc.redhat.com/mediawiki/index.php?title=IPA_NIS_plugin_test_plan&amp;action=edit&amp;section=13"
+ href="http://rome.sjc.redhat.com/mediawiki/index.php?title=IPA_NIS_plugin_test_plan&amp;action=edit&amp;section=21"
  title="Edit section: This is acceptance test set in this release cycle">edit</a>]</span>
 <span class="mw-headline"> This is acceptance test set in this release
 cycle </span></h4>
@@ -914,11 +1776,11 @@ have more time at IPA 2.0 release cycle.
 </p>
 <a name="NIS_Master-slave_setup.2Fconfiguration_won.27t_be_tested"></a>
 <h4><span class="editsection">[<a
- href="http://rome.sjc.redhat.com/mediawiki/index.php?title=IPA_NIS_plugin_test_plan&amp;action=edit&amp;section=14"
+ href="http://rome.sjc.redhat.com/mediawiki/index.php?title=IPA_NIS_plugin_test_plan&amp;action=edit&amp;section=22"
  title="Edit section: NIS Master-slave setup/configuration won't be tested">edit</a>]</span>
 <span class="mw-headline"> NIS Master-slave setup/configuration won't
 be tested </span></h4>
-<p>The current UNIX NIS can setup Master-Slave relation. And this
+<p>Traditional NIS server can setup Master-Slave relation. And this
 feature is not implemented in current IPA NIS plugin release. To be
 specific, the following 3 theoretical-possible deployment will NOT be
 tested. </p>
@@ -932,7 +1794,7 @@ tested. </p>
 </ol>
 <a name="Stress_testing"></a>
 <h4><span class="editsection">[<a
- href="http://rome.sjc.redhat.com/mediawiki/index.php?title=IPA_NIS_plugin_test_plan&amp;action=edit&amp;section=15"
+ href="http://rome.sjc.redhat.com/mediawiki/index.php?title=IPA_NIS_plugin_test_plan&amp;action=edit&amp;section=23"
  title="Edit section: Stress testing">edit</a>]</span> <span
  class="mw-headline"> Stress testing </span></h4>
 <p>Similar to KDC server, NIS server also response for some
@@ -945,7 +1807,7 @@ This part is covered in <a
 </p>
 <a name="Resources"></a>
 <h3><span class="editsection">[<a
- href="http://rome.sjc.redhat.com/mediawiki/index.php?title=IPA_NIS_plugin_test_plan&amp;action=edit&amp;section=16"
+ href="http://rome.sjc.redhat.com/mediawiki/index.php?title=IPA_NIS_plugin_test_plan&amp;action=edit&amp;section=24"
  title="Edit section: Resources">edit</a>]</span> <span
  class="mw-headline"> Resources </span></h3>
 <ul>
@@ -970,15 +1832,28 @@ This part is covered in <a
   <li> <a href="http://linux-nis.org" class="external text"
  title="http://linux-nis.org" rel="nofollow">Linux NIS org</a>
   </li>
+  <li> Why we need this "schema compatability plugin"
+    <ul>
+      <li> [<a
+ href="http://git.fedorahosted.org/git/slapi-nis.git?p=slapi-nis.git;a=blob;f=doc/sch-ipa.txt;h=44b4f4356a94501d9f3f43f82b0c660e32dba659;hb=HEAD"
+ class="external text"
+ title="http://git.fedorahosted.org/git/slapi-nis.git?p=slapi-nis.git;a=blob;f=doc/sch-ipa.txt;h=44b4f4356a94501d9f3f43f82b0c660e32dba659;hb=HEAD"
+ rel="nofollow">fedora project page</a>] has a good explain about the
+reason. </li>
+      <li> The local copy is here (as of 9-24-2008)
+      </li>
+    </ul>
+  </li>
 </ul>
+<pre>= The Schema Compatibility Plugin in IPA =<br><br>RFC 2307 defines object classes and attributes suitable for representing<br>various POSIX-related information in a directory.  The "posixGroup"<br>object class, for example, models a group of accounts, including the<br>POSIX group's ID (as the value of the "gidNumber" attribute) and the<br>names of each of the members of the group (as values of the "memberUid"<br>attribute).<br><br>This representation is supported by the native LDAP client software<br>supplied with a number of Unix and Unix-like operating systems.<br><br>The draft revision of RFC 2307, known as "rfc2307bis", modifies the<br>contents of a group so that it no longer contains the names of its<br>members in the "memberUid" attribute, but rather uses the "member"<br>attribute to list the distinguished names of the entries which represent<br>the individual members.  A client is typically expected to search the<br>named entries to determine the names of the group's member users.<br><br>It is this representation of groups which FreeIPA and RHEIPA use.<br><br>This representation is not as well-supported by the native LDAP client<br>software supplied with Unix and Unix-like operating systems.<br><br>When configured to consult a server which stores information this way, a<br>client which does not support reading group membership from the "member"<br>attribute will still able to look up a group and read its name and ID,<br>but will be unable to "see" the members of the group.<br><br>For these clients, an IPA server can be configured to use the Schema<br>Compatibility Plugin to resolve the group membership at the server.  The<br>plugin will examine the group entries stored in the server and, as<br>configured, read the distinguished names of the members of those groups.<br><br>It will examine the named entries and read from them the names of the<br>members of the group.  It will then use that data to create an in-memory<br>entry, elsewhere in the directory tree, which contains the group<br>membership information in a form which the client is able to process.<br><br>As configured, an IPA server provides this information, for groups whose<br>entries are beneath "cn=groups, cn=accounts, $SUFFIX", in an area<br>beneath "cn=groups, cn=compat, $SUFFIX".<br>~                                                                <br></pre>
 <a name="Supplements"></a>
 <h3><span class="editsection">[<a
- href="http://rome.sjc.redhat.com/mediawiki/index.php?title=IPA_NIS_plugin_test_plan&amp;action=edit&amp;section=17"
+ href="http://rome.sjc.redhat.com/mediawiki/index.php?title=IPA_NIS_plugin_test_plan&amp;action=edit&amp;section=25"
  title="Edit section: Supplements">edit</a>]</span> <span
  class="mw-headline"> Supplements </span></h3>
 <a name="NIS_Configuration_Guide"></a>
 <h5><span class="editsection">[<a
- href="http://rome.sjc.redhat.com/mediawiki/index.php?title=IPA_NIS_plugin_test_plan&amp;action=edit&amp;section=18"
+ href="http://rome.sjc.redhat.com/mediawiki/index.php?title=IPA_NIS_plugin_test_plan&amp;action=edit&amp;section=26"
  title="Edit section: NIS Configuration Guide">edit</a>]</span> <span
  class="mw-headline"> NIS Configuration Guide </span></h5>
 <p><font color="red"> need find documents online </font>
@@ -995,7 +1870,7 @@ This part is covered in <a
 </ul>
 <a name="RFC"></a>
 <h5><span class="editsection">[<a
- href="http://rome.sjc.redhat.com/mediawiki/index.php?title=IPA_NIS_plugin_test_plan&amp;action=edit&amp;section=19"
+ href="http://rome.sjc.redhat.com/mediawiki/index.php?title=IPA_NIS_plugin_test_plan&amp;action=edit&amp;section=27"
  title="Edit section: RFC">edit</a>]</span> <span class="mw-headline">
 RFC </span></h5>
 <ul>
@@ -1008,5 +1883,47 @@ RFC </span></h5>
  rel="nofollow">RFC 1833</a>
   </li>
 </ul>
+<a name="Questions_.26_Answers"></a>
+<h3><span class="editsection">[<a
+ href="http://rome.sjc.redhat.com/mediawiki/index.php?title=IPA_NIS_plugin_test_plan&amp;action=edit&amp;section=28"
+ title="Edit section: Questions &amp; Answers">edit</a>]</span> <span
+ class="mw-headline"> Questions &amp; Answers </span></h3>
+<a name="HPUX"></a>
+<h4><span class="editsection">[<a
+ href="http://rome.sjc.redhat.com/mediawiki/index.php?title=IPA_NIS_plugin_test_plan&amp;action=edit&amp;section=29"
+ title="Edit section: HPUX">edit</a>]</span> <span class="mw-headline">
+HPUX </span></h4>
+<p>Source <a href="http://docs.hp.com/en/5992-2187/ch01s07.html"
+ class="external text"
+ title="http://docs.hp.com/en/5992-2187/ch01s07.html" rel="nofollow">HP
+NIS guide</a>
+</p>
+<ul>
+  <li> <font color="red"> Question: Do we need support the following?
+why and why not? </font> Click the source URL above to find out the
+following terminology
+    <ul>
+      <li> DNS Forwarding Mode
+      </li>
+      <li> Shadow Password Mode
+      </li>
+      <li> Alternate Directory for the passwd File
+      </li>
+      <li> Long Username and Long Hostname support
+      </li>
+      <li> Support for NIS ypbind v3 Protocol
+      </li>
+      <li> Files for Resolving Map Nicknames
+      </li>
+      <li> Alternate Directory for the passwd File
+      </li>
+      <li> Multi-Homed Node
+      </li>
+    </ul>
+  </li>
+  <li><font color="green"> Answer </font>
+  </li>
+</ul>
+<pre>DNS forwarding mode: no.<br>Shadow Password Mode: yes, but you have to reconfigure the entry formats.<br>Alternate Directory for the passwd file: not applicable.<br>Long Username and Long Hostname support: yes (no assumed limits).<br>Support for NIS ypbind v3 protocol: no.<br>  Do we have any clients that can use the v3 protocol?<br>Files for Resolving Map Nicknames: these files live on the client, so<br>  it's not affected by the server.<br>Multi-Homed Node: no.<br></pre>
 </body>
 </html>
