@@ -8,6 +8,7 @@
 . $mainRunBaseDir/acceptance/multimaster/engage.multimaster
 . $mainRunBaseDir/acceptance/quickuninstall/engage.quickuninstall
 . $mainRunBaseDir/acceptance/cli/engage.cli
+. $mainRunBaseDir/acceptance/client/engage.client
 . $mainRunBaseDir/acceptance/pwpolicy/engage.pwpolicy
 . $mainRunBaseDir/sample/engage.sample
 
@@ -21,6 +22,7 @@ acceptance_default()
 	memberof_default
 	multimaster_default
 	cli_default
+	client_default
 	pwpolicy_default
 	quickuninstall_default
 	sample_default
@@ -34,6 +36,7 @@ acceptance_ask()
 		memberof_ask
 		multimaster_ask
 		cli_ask
+		client_ask
 		pwpolicy_ask
 		quickuninstall_ask
 		sample_ask
@@ -47,6 +50,7 @@ acceptance_print()
 		memberof_print
 		multimaster_print
 		cli_print
+		client_print
 		pwpolicy_print
 		quickuninstall_print
 		sample_print
@@ -64,6 +68,7 @@ acceptance_save()
 	memberof_save
 	multimaster_save
 	cli_save
+	client_save
 	pwpolicy_save
         # quickinstall needs to be last
         quickuninstall_save 
@@ -80,6 +85,7 @@ acceptance_check()
 		memberof_check
 		multimaster_check
 		cli_check
+		client_check
 		pwpolicy_check
 		quickuninstall_check
 		sample_check
@@ -110,6 +116,11 @@ TET_SUITE_ROOT=$mainRunBaseDir/cli; export TET_SUITE_ROOT
 if [ $MainRunStartup = y ] ; then cli_startup ; fi
 if [ $MainRunTests = y ]   ; then cli_run     ; fi
 if [ $MainRunCleanup = y ] ; then cli_cleanup ; fi
+
+TET_SUITE_ROOT=$mainRunBaseDir/client; export TET_SUITE_ROOT
+if [ $MainRunStartup = y ] ; then client_startup ; fi
+if [ $MainRunTests = y ]   ; then client_run     ; fi
+if [ $MainRunCleanup = y ] ; then client_cleanup ; fi
 
 TET_SUITE_ROOT=$mainRunBaseDir/multimaster; export TET_SUITE_ROOT
 if [ $MainRunStartup = y ] ; then multimaster_startup ; fi
