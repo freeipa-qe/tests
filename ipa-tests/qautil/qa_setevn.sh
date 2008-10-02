@@ -3,7 +3,7 @@
 # functions 
 setup_nameserver() {
   # local variables
-  RESOLV_BK=$IPA_TESTS/qautil/qaconfig/$HOSTNAME-resolv.conf
+  RESOLV_BK=$IPA_TESTS/qautil/qaconfig/resolv.$HOSTNAME.conf
   RESOLV_QA=$IPA_TESTS/qautil/qaconfig/resolv.conf
   RESOLV_ORG=/etc/resolv.conf
 
