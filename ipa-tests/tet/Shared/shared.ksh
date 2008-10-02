@@ -405,7 +405,6 @@ set send_slow {1 .1}' > $TET_TMP_DIR/kinit.exp
 
 }
 
-
 CheckAlive()
 {
 

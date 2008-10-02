@@ -375,6 +375,7 @@ InstallClientRPM()
 				if [ $? -ne 0 ]; then
 					echo "ERROR - install of $pkglistB on $FULLHOSTNAME failed"
 					return 1
+				fi
 			fi
 		fi	
 	elif [ "$OS_VER" == "4" ]; then
