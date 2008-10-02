@@ -454,8 +454,8 @@ tp14()
 			ssh root@$FULLHOSTNAME "ipa-listdelegation -n namef"
 			if [ $? -ne 0 ]
 			then
-				# that didn't work, try the old method
-				ssh root@$FULLHOSTNAME "ipa-listdelegation -n namef"
+				echo "that didn't work, try the old method"
+				ssh root@$FULLHOSTNAME "ipa-listdelegation namef"
 				if [ $? -ne 0 ]; then
 					echo "ERROR - ipa-listdelegation failed on $FULLHOSTNAME"
 					tet_result FAIL

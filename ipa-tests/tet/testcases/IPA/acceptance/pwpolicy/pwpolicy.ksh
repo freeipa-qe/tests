@@ -1501,7 +1501,7 @@ tp5()
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
         echo "START $tet_thistest"
 
-	user1="testusre"
+	user1="testusri"
 	user1pw1="D4mkcidytte3." # pw with 2 classes
 	user1pw2="lo9sh3NCh.765" # pw with 4 classes
 	user1pw3="938478765" # pw with one class
@@ -1648,7 +1648,7 @@ tp5a()
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
         echo "START $tet_thistest"
 
-	user1="testusre"
+	user1="testusrt"
 	user1pw1="D4mkcidytte3." # pw with 2 classes
 	user1pw2="12345678" # pw with 4 classes
 
