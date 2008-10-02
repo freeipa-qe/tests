@@ -71,7 +71,7 @@ tp2()
 		tet_result FAIL
 	fi
 
-	KinitAs M1 $user1 pw $user1pw
+	KinitAsFirst M1 $user1 pw $user1pw
 	if [ $? -ne 0 ]; then
 		echo "ERROR - kinit failed on $FULLHOSTNAME"
 		tet_result FAIL
@@ -124,8 +124,9 @@ client_cleanup()
 	eval_vars M1
 	code=0
 
+	KinitAs M1 $DS_USER $DM_ADMIN_PASS
 
-	ssh root@$FULLHOSTNAME "ipa-deluser $superuser"
+	ssh root@$FULLHOSTNAME "ipa-deluser $user1"
 	let code=$code+$?
 
 	#ssh root@$FULLHOSTNAME "ipa-modgroup -a biguser super"
