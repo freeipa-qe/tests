@@ -331,8 +331,7 @@ InstallClientRPM()
 	if [ $DSTET_DEBUG = y ]; then set -x; fi
 	. $TESTING_SHARED/shared.ksh
 	is_server_alive $1
-	ret=$?
-	if [ $ret -ne 0 ]; then
+	if [ $? -ne 0 ]; then
 		echo "ERROR - Server $1 appears to not respond to pings."
 		return 1;
 	fi
@@ -344,21 +343,18 @@ InstallClientRPM()
 	fi
 
 	ssh root@$FULLHOSTNAME 'find / | grep -v proc | grep -v dev > /list-before-ipa.txt'
-		ret=$?
-	if [ $ret -ne 0 ]; then
+	if [ $? -ne 0 ]; then
 		echo "ERROR - ssh to $FULLHOSTNAME failed"
 		return 1
 	fi	
 
 	if [ "$OS_VER" == "5" ]; then 
 		ssh root@$FULLHOSTNAME "/etc/init.d/yum-updatesd stop;killall yum;sleep 1; killall -9 yum;yum -y install $pkglistA"
-		ret=$?
-		if [ $ret -ne 0 ]; then
+		if [ $? -ne 0 ]; then
 			echo "That rpm install didn't work, lets try that again. Sleeping for 60 seconds first" 
 			sleep 60
 			ssh root@$FULLHOSTNAME "/etc/init.d/yum-updatesd stop;killall yum;sleep 1; killall -9 yum;/usr/bin/yum clean all;yum -y install $pkglistA"
-			ret=$?
-			if [ $ret -ne 0 ]; then
+			if [ $? -ne 0 ]; then
 				echo "ERROR - install of $pkglistA on $FULLHOSTNAME failed"
 				return 1
 			fi
@@ -368,15 +364,17 @@ InstallClientRPM()
 
 		pkglistB="ipa-client ipa-admintools"
 		ssh root@$FULLHOSTNAME "yum -y install $pkglistB"
-		ret=$?
-		if [ $ret -ne 0 ]; then
+		if [ $? -ne 0 ]; then
 			echo "That rpm install didn't work, lets try that again. Sleeping for 60 seconds first" 
 			sleep 60
 			ssh root@$FULLHOSTNAME "/etc/init.d/yum-updatesd stop;killall yum;sleep 1; killall -9 yum;/usr/bin/yum clean all;yum -y install $pkglistB"
-			ret=$?
-			if [ $ret -ne 0 ]; then
-				echo "ERROR - install of $pkglistB on $FULLHOSTNAME failed"
-				return 1
+			if [ $? -ne 0 ]; then
+				echo "That rpm install didn't work, lets try that again. Sleeping for 60 seconds first" 
+				sleep 60
+				ssh root@$FULLHOSTNAME "/etc/init.d/yum-updatesd stop;killall yum;sleep 1; killall -9 yum;/usr/bin/yum clean all;yum -y install $pkglistB"
+				if [ $? -ne 0 ]; then
+					echo "ERROR - install of $pkglistB on $FULLHOSTNAME failed"
+					return 1
 			fi
 		fi	
 	elif [ "$OS_VER" == "4" ]; then
@@ -403,8 +401,7 @@ InstallClientRPM()
 #		fi
 	fi
 	ssh root@$FULLHOSTNAME 'find / | grep -v proc | grep -v dev > /list-after-ipa.txt'
-	ret=$?
-	if [ $ret -ne 0 ]; then
+	if [ $? -ne 0 ]; then
 		echo "ERROR - ssh to $FULLHOSTNAME failed"
 		return 1
 	fi	
