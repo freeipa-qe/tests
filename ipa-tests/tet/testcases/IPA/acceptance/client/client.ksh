@@ -12,7 +12,8 @@ tet_cleanup="client_cleanup"
 iclist="ic1 "
 ic1="tp1 tp2"
 
-user1=supusr1
+user1='supusr1'
+user1pw='o3m4n5bchdy!'
 
 ######################################################################
 tp1()
@@ -24,8 +25,7 @@ tp1()
 		if [ "$s" != "" ]; then
 			echo "kiniting as $DS_USER, password $DM_ADMIN_PASS on $s"
 			KinitAs $s $DS_USER $DM_ADMIN_PASS
-			ret=$?
-			if [ $ret -ne 0 ]; then
+			if [ $? -ne 0 ]; then
 				echo "ERROR - kinit on $s failed"
 				tet_result FAIL
 			fi
@@ -37,8 +37,7 @@ tp1()
 		if [ "$s" != "" ]; then
 			echo "kiniting as $DS_USER, password $DM_ADMIN_PASS on $s"
 			KinitAs $s $DS_USER $DM_ADMIN_PASS
-			ret=$?
-			if [ $ret -ne 0 ]; then
+			if [ $? -ne 0 ]; then
 				echo "ERROR - kinit on $s failed"
 				tet_result FAIL
 			fi
@@ -52,6 +51,7 @@ tp1()
 
 ######################################################################
 # Create user to be used in the rest of the test cases 
+# This then sets the password for that user
 ######################################################################
 tp2()
 {
@@ -59,7 +59,23 @@ tp2()
 	echo "START $tet_thistest"
 
 	eval_vars M1
-	ssh root@$FULLHOSTNAME "ipa-adduser -ffirstname-super -llastbname-super $superuser"
+	ssh root@$FULLHOSTNAME "ipa-adduser -ffirstname-super -llastbname-super $user1"
+	if [ $? -ne 0 ]; then
+		echo "ERROR - ipa-adduser failed on $FULLHOSTNAME"
+		tet_result FAIL
+	fi
+
+	SetUserPassword M1 $user1 pw
+	if [ $? -ne 0 ]; then
+		echo "ERROR - SetUserPassword failed on $FULLHOSTNAME"
+		tet_result FAIL
+	fi
+
+	KinitAs M1 $user1 pw $user1pw
+	if [ $? -ne 0 ]; then
+		echo "ERROR - kinit failed on $FULLHOSTNAME"
+		tet_result FAIL
+	fi
 
 	tet_result PASS
 	echo "END $tet_thistest"
@@ -108,16 +124,6 @@ client_cleanup()
 	eval_vars M1
 	code=0
 
-
-	# Setting up for test
-	ssh root@$FULLHOSTNAME "ipa-delgroup modusers"
-	let code=$code+$?
-
-	ssh root@$FULLHOSTNAME "ipa-delgroup superg"
-	let code=$code+$?
-
-	ssh root@$FULLHOSTNAME "ipa-deluser usermod1"
-	let code=$code+$?
 
 	ssh root@$FULLHOSTNAME "ipa-deluser $superuser"
 	let code=$code+$?
