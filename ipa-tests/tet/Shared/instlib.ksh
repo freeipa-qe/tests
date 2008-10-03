@@ -271,22 +271,17 @@ SetupClientBogus()
 }
 
 
-SetupRepo()
+SetupRepoRHEL()
 {
 	if [ $DSTET_DEBUG = y ]; then set -x; fi
 	. $TESTING_SHARED/shared.ksh
 	is_server_alive $1
-	ret=$?
-	if [ $ret -ne 0 ]; then
+	if [ $? -ne 0 ]; then
 		echo "ERROR - Server $1 appears to not respond to pings."
 		return 1;
 	fi
 	eval_vars $1	
-	if [ "$OS" != "RHEL" ]&&[ "$OS" != "FC" ]; then
-		echo "OS isn't \"RHEL\" or \"FC\"."
-		echo "Returning"
-		return 0
-	fi
+
 	echo $REPO |grep ^http 
 	if [ $? -eq 0 ]; then
 		# the repo file is on http, going to wget it on the server
@@ -322,6 +317,28 @@ SetupRepo()
 				return 1
 			fi	
 		fi
+	fi
+	return 0;
+}
+
+SetupRepo()
+{
+	if [ $DSTET_DEBUG = y ]; then set -x; fi
+	. $TESTING_SHARED/shared.ksh
+	is_server_alive $1
+	if [ $? -ne 0 ]; then
+		echo "ERROR - Server $1 appears to not respond to pings."
+		return 1;
+	fi
+	eval_vars $1	
+        case $OS in
+                "RHEL")     SetupRepoRHEL        ;;
+                "FC")       SetupRepoRHEL        ;;
+		"solaris")  PreSetupSolaris      ;;
+                *)      echo "unknown OS"        ;;
+        esac
+	if [ $? -ne 0 ]; then
+		return 1;
 	fi
 	return 0
 }
