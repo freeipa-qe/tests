@@ -10,7 +10,7 @@ fi
 tet_startup="CheckAlive"
 tet_cleanup="client_cleanup"
 iclist="ic1 "
-ic1="tp1 tp2"
+ic1="tp1 tp2 tp3"
 
 user1='supusr1'
 user1pw='o3m4n5bchdy!'
@@ -82,30 +82,76 @@ tp2()
 }
 
 ######################################################################
+# System login with ssh
+######################################################################
 tp3()
 {
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 	echo "START $tet_thistest"
-	for s in $SERVERS; do
-		if [ "$s" == "M1" ]; then
-			eval_vars $s
+	for s in $CLIENTS; do
+		eval_vars $s
 
-			# test for ipa-addservice
-			ssh root@$FULLHOSTNAME "ipa-addservice \"$service1\""
-			ret=$?
-			if [ $ret -ne 0 ]
-			then
-				echo "ERROR - ipa-addservice failed on $FULLHOSTNAME"
-				tet_result FAIL
-			fi
-			ssh root@$FULLHOSTNAME "ipa-findservice \"$service1\""
-			if [ $? -ne 0 ]
-			then
-				echo "ERROR - ipa-findservice failed on $FULLHOSTNAME"
-				tet_result FAIL
-			fi
-
+		# create the file to test through ssh login
+		ssh root@$FULLHOSTNAME "touch /tmp/ipa-client-test.txt"
+		if [ $? -ne 0 ]
+		then
+			echo "ERROR - touch /tmp/ipa-client-test.txt failed on $FULLHOSTNAME"
+			tet_result FAIL
 		fi
+		# run ssh once to sync up ssh keys
+	        rm -f $TET_TMP_DIR/ssh.exp
+	        echo 'set timeout 60
+set send_slow {1 .1}' > $TET_TMP_DIR/ssh.exp
+		echo "spawn /usr/bin/ssh -l $user1 $FULLHOSTNAME 'ls /tmp'" >> $TET_TMP_DIR/ssh.exp
+		echo 'match_max 100000' >> $TET_TMP_DIR/ssh.exp
+	        if [ $fast -eq 1 ]; then
+               		echo 'sleep 2' >> $TET_TMP_DIR/ssh.exp
+	        else
+               		echo 'sleep 15' >> $TET_TMP_DIR/ssh.exp
+	        fi
+	        echo 'send -s -- "yes"' >> $TET_TMP_DIR/ssh.exp
+	        echo 'send -s -- "\\r"' >> $TET_TMP_DIR/ssh.exp
+	        echo 'send -s -- "yes"' >> $TET_TMP_DIR/ssh.exp
+	        echo 'send -s -- "\\r"' >> $TET_TMP_DIR/ssh.exp
+		expect $TET_TMP_DIR/ssh.exp&
+		sleep 60
+		
+		# Wait for that expect script to finish, then run ssh to see if ssh logins work
+
+		# run ssh once to list the contents of /tmp
+	        rm -f $TET_TMP_DIR/ssh.exp
+	        echo 'set timeout 60
+set send_slow {1 .1}' > $TET_TMP_DIR/ssh.exp
+		echo "spawn /usr/bin/ssh -l $user1 $FULLHOSTNAME 'ls /tmp'" >> $TET_TMP_DIR/ssh.exp
+		echo 'match_max 100000' >> $TET_TMP_DIR/ssh.exp
+	        if [ $fast -eq 1 ]; then
+               		echo 'sleep 2' >> $TET_TMP_DIR/ssh.exp
+	        else
+               		echo 'sleep 15' >> $TET_TMP_DIR/ssh.exp
+	        fi
+	        echo "send -s -- \"$user1pw\"" >> $TET_TMP_DIR/ssh.exp
+	        echo 'send -s -- "\\r"' >> $TET_TMP_DIR/ssh.exp
+		expect $TET_TMP_DIR/ssh.exp >$TET_TMP_DIR/ssh-output.txt
+		if [ $? -ne 0 ]; then
+			echo "ERROR - expect $TET_TMP_DIR/ssh.exp failed"
+			tet_result FAIL
+		fi
+	
+		grep "ipa-client-test.txt" $TET_TMP_DIR/ssh-output.txt
+		if [ $? -ne 0 ]; then
+			echo "ERROR - ipa-client-test.txt not found in $TET_TMP_DIR/ssh-output.txt, the ssh login probably didn't work"
+			echo "$TET_TMP_DIR/ssh-output.txt contents are:"
+			cat $TET_TMP_DIR/ssh-output.txt
+			tet_result FAIL
+		fi
+	
+#		ssh root@$FULLHOSTNAME "ipa-findservice \"$service1\""
+#		if [ $? -ne 0 ]
+#		then
+#			echo "ERROR - ipa-findservice failed on $FULLHOSTNAME"
+#			tet_result FAIL
+#		fi
+
 	done
 
 	tet_result PASS
