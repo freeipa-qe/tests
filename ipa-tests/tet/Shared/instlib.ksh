@@ -321,6 +321,30 @@ SetupRepoRHEL()
 	return 0;
 }
 
+PreSetupSolairs()
+{
+	# If the os is solaris, this section does some of the pre-setup for solaris clients
+	echo "backing everything up for restore later"
+	bkup="/ipa-backup"
+	ssh root@$FULLHOSTNAME "mkdir -p $bkup;
+rm -f $bkup/nsswitch.conf; cp /etc/nsswitch.conf $bkup/.;
+rm -f $bkup/resolv.conf; cp /etc/resolv.conf $bkup/.;
+rm -f $bkup/pam.conf; cp /etc/pam.conf $bkup/.;
+rm -f $bkup/ldap.conf;cp /etc/ldap.conf $bkup/.;
+rm -f $bkup/krb5.conf;cp /etc/krb5/krb5.conf $bkup/.;
+rm -f $bkup/krb5.keytab;cp /etc/krb5/krb5.keytab $bkup/."
+	if [ $? -ne 0 ]; then
+		echo "backing up of files on $FULLHOSTNAME to $bkup failed"
+		return 1;
+	fi
+
+	echo "changing nsswitch"
+	shh root@$FULLHOSTNAME "sed -i s/^passwd/'passwd: files ldap[NOTFOUND=return]'/g /etc/nsswitch.conf;
+sed -i s/^group/'group: files ldap[NOTFOUND=return]'/g /etc/nsswitch.conf;";
+	
+	return 0;
+}
+
 SetupRepo()
 {
 	if [ $DSTET_DEBUG = y ]; then set -x; fi
@@ -332,15 +356,19 @@ SetupRepo()
 	fi
 	eval_vars $1	
         case $OS in
-                "RHEL")     SetupRepoRHEL        ;;
-                "FC")       SetupRepoRHEL        ;;
-		"solaris")  PreSetupSolaris      ;;
+                "RHEL")     SetupRepoRHEL $1       ;;
+                "FC")       SetupRepoRHEL $1       ;;
+		"solaris")  PreSetupSolaris $1     ;;
                 *)      echo "unknown OS"        ;;
         esac
 	if [ $? -ne 0 ]; then
 		return 1;
 	fi
 	return 0
+}
+
+InstallClientRPMSolaris()
+{
 }
 
 InstallClientRPM()
@@ -664,8 +692,9 @@ FixResolv()
 	if [ "$DSTET_DEBUG" = "y" ]; then echo "working on $s now"; fi
 	eval_vars $s
 	# Fix Resolv.conf
-	ssh root@$FULLHOSTNAME "echo 'nameserver $dnss' > /etc/resolv.conf;"
-	ssh root@$FULLHOSTNAME "echo 'nameserver $DNSMASTER' >> /etc/resolv.conf"
+	ssh root@$FULLHOSTNAME "echo 'search $DNS_DOMAIN' >> /etc/resolv.conf;
+echo 'nameserver $dnss' >> /etc/resolv.conf;
+echo 'nameserver $DNSMASTER' >> /etc/resolv.conf"
 	# Now test to ensure that DNS works.
 	ssh root@$FULLHOSTNAME "/usr/bin/dig -x 10.14.0.110"
 	ret=$?
