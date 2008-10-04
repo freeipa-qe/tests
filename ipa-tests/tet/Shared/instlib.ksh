@@ -53,6 +53,12 @@ UninstallClient()
 		return 1;
 	fi
 	eval_vars $1
+	if [ "$OS" != "RHEL" ]&&[ "$OS" != "FC" ]; then
+		echo "OS isn't \"RHEL\" or \"FC\"."
+		echo "Returning"
+		return 0
+	fi
+
 	ssh root@$FULLHOSTNAME "ipa-client-install -U --uninstall"
 	ret1=$?
 	ssh root@$FULLHOSTNAME "ipa-client-setup -U --uninstall"
@@ -332,16 +338,14 @@ rm -f $bkup/resolv.conf; cp /etc/resolv.conf $bkup/.;
 rm -f $bkup/pam.conf; cp /etc/pam.conf $bkup/.;
 rm -f $bkup/ldap.conf;cp /etc/ldap.conf $bkup/.;
 rm -f $bkup/krb5.conf;cp /etc/krb5/krb5.conf $bkup/.;
-rm -f $bkup/krb5.keytab;cp /etc/krb5/krb5.keytab $bkup/."
+rm -f $bkup/krb5.keytab;cp /etc/krb5/krb5.keytab $bkup/.;
+rm -f /tmp/solaris-pam-tmp.txt
+rm -f /tmp/solaris-ldap.conf"
 	if [ $? -ne 0 ]; then
 		echo "backing up of files on $FULLHOSTNAME to $bkup failed"
 		return 1;
 	fi
 
-	echo "changing nsswitch"
-	shh root@$FULLHOSTNAME "sed -i s/^passwd/'passwd: files ldap[NOTFOUND=return]'/g /etc/nsswitch.conf;
-sed -i s/^group/'group: files ldap[NOTFOUND=return]'/g /etc/nsswitch.conf;";
-	
 	return 0;
 }
 
@@ -369,9 +373,59 @@ SetupRepo()
 
 InstallClientRPMSolaris()
 {
+	if [ $DSTET_DEBUG = y ]; then set -x; fi
+	. $TESTING_SHARED/shared.ksh
+	is_server_alive $1
+	if [ $? -ne 0 ]; then
+		echo "ERROR - Server $1 appears to not respond to pings."
+		return 1;
+	fi
+	eval_vars $1	
+
+	echo "changing nsswitch"
+	shh root@$FULLHOSTNAME "sed -i s/^passwd/'passwd: files ldap[NOTFOUND=return]'/g /etc/nsswitch.conf;
+sed -i s/^group/'group: files ldap[NOTFOUND=return]'/g /etc/nsswitch.conf;";
+
+	echo "changing pam.conf"
+	echo "login auth requisite pam_authtok_get.so.1
+login auth sufficient pam_krb5.so.1
+login auth required pam_dhkeys.so.1
+login auth required pam_unix_cred.so.1
+login auth required pam_unix_auth.so.1 use_first_pass
+login auth required pam_dial_auth.so.1" > $TET_TMP_DIR/solaris-pam-tmp.txt
+	scp $TET_TMP_DIR/solaris-pam-tmp.txt root@$FULLHOSTNAME:/tmp/. 
+	if [ $? -ne 0 ]; then
+		echo "scp of file to $FULLHOSTNAME failed"
+	fi
+
+	shh root@$FULLHOSTNAME "sed -i s/^login/#login/g /etc/pam.conf;
+cat /tmp/solaris-pam-tmp.txt >> /etc/pam.conf"
+	
+	echo "changing ldap.conf"
+	echo "ldap_version 3
+base dc=example,dc=com
+nss_base_passwd dc=example,dc=com?sub
+nss_base_group dc=example,dc=com?sub
+nss_schema rfc2307bis
+nss_map_objectclass shadowAccount posixAccount
+nss_map_attribute uniqueMember member
+nss_initgroups_ignoreusers root,dirsrv
+nss_reconnect_maxsleeptime 8
+nss_reconnect_sleeptime 1
+bind_timelimit 5
+timelimit 15
+nss_srv_domain example.com
+uri ldap://ipaserver.example.com" > $TET_TMP_DIR/solaris-ldap.conf
+	scp $TET_TMP_DIR/solaris-ldap.conf root@$FULLHOSTNAME:/tmp/. 
+	if [ $? -ne 0 ]; then
+		echo "scp of file to $FULLHOSTNAME failed"
+	fi
+
+
+	return 0;
 }
 
-InstallClientRPM()
+InstallClientRedhat()
 {
 	if [ $DSTET_DEBUG = y ]; then set -x; fi
 	. $TESTING_SHARED/shared.ksh
@@ -381,17 +435,6 @@ InstallClientRPM()
 		return 1;
 	fi
 	eval_vars $1	
-	if [ "$OS" != "RHEL" ]&&[ "$OS" != "FC" ]; then
-		echo "OS isn't \"RHEL\" or \"FC\"."
-		echo "Returning"
-		return 0
-	fi
-
-	ssh root@$FULLHOSTNAME 'find / | grep -v proc | grep -v dev > /list-before-ipa.txt'
-	if [ $? -ne 0 ]; then
-		echo "ERROR - ssh to $FULLHOSTNAME failed"
-		return 1
-	fi	
 
 	if [ "$OS_VER" == "5" ]; then 
 		ssh root@$FULLHOSTNAME "/etc/init.d/yum-updatesd stop;killall yum;sleep 1; killall -9 yum;yum -y install $pkglistA"
@@ -429,28 +472,49 @@ InstallClientRPM()
 		# All needed dependacnies should already exist
 		day=$(date +%d)
 		month=$(date +%m)
-#		ssh root@$FULLHOSTNAME "if [ -d /dev/shm/ipa-$day-$month ]; then \
-#			set -x; \
-#			echo "Installing files from /dev/shm/ipa-$day-$month"; \
-#			ls -alh /dev/shm/ipa-$day-$month; \
-#			return 0; \
-#		else \
-#			echo "ERROR - Directory /dev/shm/ipa-$day-$month not found"; \
-#			return 1; \
-#		fi" 
-#		if [ $? -eq 0 ]; then 
 			ssh root@$FULLHOSTNAME "rpm -i /dev/shm/ipa-$day-$month/*.rpm"
 			if [ $? -ne 0 ]; then
 				echo "ERROR - install of client rpm on $FULLHOSTNAME failed"
 				return 1;
 			fi
-#		fi
 	fi
-	ssh root@$FULLHOSTNAME 'find / | grep -v proc | grep -v dev > /list-after-ipa.txt'
+	return 0;
+}
+
+InstallClientRPM()
+{
+	if [ $DSTET_DEBUG = y ]; then set -x; fi
+	. $TESTING_SHARED/shared.ksh
+	is_server_alive $1
+	if [ $? -ne 0 ]; then
+		echo "ERROR - Server $1 appears to not respond to pings."
+		return 1;
+	fi
+	eval_vars $1	
+	ssh root@$FULLHOSTNAME 'find / | grep -v proc | grep -v dev > /list-before-ipa.txt'
 	if [ $? -ne 0 ]; then
 		echo "ERROR - ssh to $FULLHOSTNAME failed"
 		return 1
 	fi	
+
+        case $OS in
+                "RHEL")     InstallClientRedhat $1       ;;
+                "FC")       InstallClientRedhat $1       ;;
+		"solaris")  InstallClientSolaris $1     ;;
+                *)      echo "unknown OS"        ;;
+        esac
+	if [ $? -ne 0 ]; then
+		return 1;
+	fi
+
+	ssh root@$FULLHOSTNAME 'find / | grep -v proc | grep -v dev > /list-after-ipa.txt'
+	if [ $? -ne 0 ]; then
+		echo "ERROR - ssh to $FULLHOSTNAME failed"
+		echo 'find / | grep -v proc | grep -v dev > /list-after-ipa.txt'
+		return 1
+	fi	
+
+	return 0
 
 }
 
