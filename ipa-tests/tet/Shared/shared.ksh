@@ -201,7 +201,7 @@ SetUserPassword()
 set send_slow {1 .1}' > $TET_TMP_DIR/SetUserPassword.exp
 	echo "spawn ipa-passwd $2" >> $TET_TMP_DIR/SetUserPassword.exp
 	echo 'match_max 100000' >> $TET_TMP_DIR/SetUserPassword.exp
-	echo 'sleep 10' >> $TET_TMP_DIR/SetUserPassword.exp
+	echo 'sleep 7' >> $TET_TMP_DIR/SetUserPassword.exp
 	echo "send -s -- \"$3\"" >> $TET_TMP_DIR/SetUserPassword.exp
 	echo 'send -s -- "\\r"' >> $TET_TMP_DIR/SetUserPassword.exp
 	echo 'sleep 4' >> $TET_TMP_DIR/SetUserPassword.exp
@@ -255,7 +255,7 @@ echo 'match_max 100000' >> $TET_TMP_DIR/kinit.exp
 	if [ $fast -eq 1 ]; then
 		echo 'sleep 2' >> $TET_TMP_DIR/kinit.exp
 	else	
-		echo 'sleep 15' >> $TET_TMP_DIR/kinit.exp
+		echo 'sleep 7' >> $TET_TMP_DIR/kinit.exp
 	fi
 	echo "send -s -- \"$3\"" >> $TET_TMP_DIR/kinit.exp
 	echo 'send -s -- "\\r"' >> $TET_TMP_DIR/kinit.exp
@@ -334,7 +334,7 @@ KinitAsFirst()
 set send_slow {1 .1}' > $TET_TMP_DIR/kinit.exp
 	echo "spawn /usr/kerberos/bin/kinit -V $2" >> $TET_TMP_DIR/kinit.exp
 	echo 'match_max 100000' >> $TET_TMP_DIR/kinit.exp
-	echo 'sleep 15' >> $TET_TMP_DIR/kinit.exp
+	echo 'sleep 7' >> $TET_TMP_DIR/kinit.exp
 	echo "send -s -- \"$3\"" >> $TET_TMP_DIR/kinit.exp
 	echo 'send -s -- "\\r"' >> $TET_TMP_DIR/kinit.exp
 	echo 'sleep 5' >> $TET_TMP_DIR/kinit.exp
