@@ -199,8 +199,7 @@ tp6()
 			eval_vars $s
 			ssh root@$FULLHOSTNAME "/etc/init.d/ntpd stop; ntpdate $NTPSERVER"
 			SetupClient $s
-			ret=$?
-			if [ $ret -ne 0 ]; then
+			if [ $? -ne 0 ]; then
 				echo "client-install of server on $s ssh failed"
 				return 1
 			fi

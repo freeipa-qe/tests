@@ -95,12 +95,15 @@ SetupClient()
 
 	if [ "$OS_VER" == "5" ]; then
 		echo "ipa-client-install --realm=$RELM_NAME -U" 
-		ssh root@$thishost "ipa-client-install --realm=$RELM_NAME -U" 
+		ssh root@$thishost "ipa-client-install --realm=$RELM_NAME --domain=$RELM_NAME -U" 
+		if [ $? -ne 0 ]; then
+			echo "ERROR - ipa-client-setup on $thishost failed."
+			return 1;
+		fi
 	elif [ "$OS_VER" == "4" ]; then
 		echo "ipa-client-setup --server=$master -U"
 		ssh root@$thishost "ipa-client-setup --server=$master -U"
-		ret=$?
-		if [ $ret -ne 0 ]; then
+		if [ $? -ne 0 ]; then
 			echo "ERROR - ipa-client-setup on $thishost failed."
 			return 1;
 		fi
@@ -756,7 +759,7 @@ FixResolv()
 	if [ "$DSTET_DEBUG" = "y" ]; then echo "working on $s now"; fi
 	eval_vars $s
 	# Fix Resolv.conf
-	ssh root@$FULLHOSTNAME "echo 'search $DNS_DOMAIN' >> /etc/resolv.conf;
+	ssh root@$FULLHOSTNAME "echo 'search $DNS_DOMAIN' > /etc/resolv.conf;
 echo 'nameserver $dnss' >> /etc/resolv.conf;
 echo 'nameserver $DNSMASTER' >> /etc/resolv.conf"
 	# Now test to ensure that DNS works.

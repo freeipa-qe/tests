@@ -240,7 +240,7 @@ KinitAs()
 		echo 'ERROR - You must call KinitAs with a password in the $3 position'
 		return 1;
 	fi 
-	if [ "$4" = "fast" ] || [ "$5" = "Fast" ]; then
+	if [ "$4" = "fast" ] || [ "$4" = "Fast" ]; then
 		fast=1;
 	else
 		fast=0;
@@ -493,17 +493,18 @@ setup_ssh_keys()
 	echo ""
 	echo ""
 	if [ $OS == "RHEL" ]; then
-		rm -f /tmp/key-ssh.bash; echo "ssh $FULLHOSTNAME \"mkdir -p /root/.ssh;chmod 700 /root/.ssh\"" >> /tmp//key-ssh.bash; bash /tmp/key-ssh.bash
+		rm -f /tmp/key-ssh.bash; echo "ssh root@$FULLHOSTNAME \"mkdir -p /root/.ssh;chmod 700 /root/.ssh;rm -f /dev/shm/auth-keys.txt;cp -a /root/.ssh/authorized_keys /dev/shm/auth-keys.txt\"" >> /tmp/key-ssh.bash; bash /tmp/key-ssh.bash
 		echo ""
 		echo "Great!, that seems to have worked, enter the same root password again"
 		echo ""
 		scp ~/.ssh/id_dsa.pub root@$FULLHOSTNAME:/root/.ssh/authorized_keys
-		ret=$?
-		if [ $ret -ne 0 ]; then
+		if [ $? -ne 0 ]; then
 			echo "ERROR! scp of id_dsa.pub to $HOSTNAME failed"
 			tet_result FAIL
-			return $ret
+			return 1
 		fi 
+		# now restore the previous authorized keys config
+		ssh root@$FULLHOSTNAME "if [ -f /dev/shm/auth-keys.txt ]; then cat /dev/shm/auth-keys.txt >> /root/.ssh/authorized_keys; fi"
 	fi
 	if [ $OS == "HPUX" ]; then
 		rm -f /tmp/key-ssh.bash; echo "ssh $FULLHOSTNAME \"mkdir -p /.ssh;chmod 700 /.ssh\"" >> /tmp/key-ssh.bash; bash /tmp/key-ssh.bash
