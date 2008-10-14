@@ -440,11 +440,11 @@ InstallClientRedhat()
 	eval_vars $1	
 
 	if [ "$OS_VER" == "5" ]; then 
-		ssh root@$FULLHOSTNAME "/etc/init.d/yum-updatesd stop;killall yum;sleep 1; killall -9 yum;yum -y install $pkglistA"
+		ssh root@$FULLHOSTNAME "/etc/init.d/yum-updatesd stop; killall yum-updatesd-helper; killall yum; sleep 1; killall -9 yum;yum -y install $pkglistA"
 		if [ $? -ne 0 ]; then
 			echo "That rpm install didn't work, lets try that again. Sleeping for 60 seconds first" 
 			sleep 60
-			ssh root@$FULLHOSTNAME "/etc/init.d/yum-updatesd stop;killall yum;sleep 1; killall -9 yum;/usr/bin/yum clean all;yum -y install $pkglistA"
+			ssh root@$FULLHOSTNAME "/etc/init.d/yum-updatesd stop;killall yum; killall yum-updatesd-helper; sleep 1; killall -9 yum;/usr/bin/yum clean all;yum -y install $pkglistA"
 			if [ $? -ne 0 ]; then
 				echo "ERROR - install of $pkglistA on $FULLHOSTNAME failed"
 				return 1
@@ -542,12 +542,12 @@ InstallServerRPM()
 	ssh root@$FULLHOSTNAME "rpm -e --allmatches redhat-ds-base"
 	ssh root@$FULLHOSTNAME "/usr/bin/yum clean all"
 	pkglistA="TurboGears cyrus-sasl-gssapi fedora-ds-base krb5-server krb5-server-ldap lm_sensors mod_python mozldap mozldap-tools perl-Mozilla-LDAP postgresql-libs python-cheetah python-cherrypy python-configobj python-decoratortools python-elixir python-formencode python-genshi python-json python-kerberos python-kid python-krbV python-nose python-paste python-paste-deploy python-paste-script python-protocols python-psycopg2 python-pyasn1 python-ruledispatch python-setuptools python-simplejson python-sqlalchemy python-sqlite2 python-sqlobject python-tgexpandingformwidget python-tgfastdata python-turbocheetah python-turbojson python-turbokid svrcore tcl Updating bind-libs bind-utils cyrus-sasl cyrus-sasl-devel cyrus-sasl-lib cyrus-sasl-md5 cyrus-sasl-plain krb5-devel krb5-libs bind caching-nameserver expect krb5-workstation"
-	ssh root@$FULLHOSTNAME "/etc/init.d/yum-updatesd stop;killall yum;sleep 1; killall -9 yum;yum -y install $pkglistA"
+	ssh root@$FULLHOSTNAME "/etc/init.d/yum-updatesd stop; killall yum; killall yum-updatesd-helper; sleep 1; killall -9 yum;yum -y install $pkglistA"
 	ret=$?
 	if [ $ret -ne 0 ]; then
 		echo "That rpm install didn't work, lets try that again. Sleeping for 60 seconds first" 
 		sleep 60
-		ssh root@$FULLHOSTNAME "/etc/init.d/yum-updatesd stop;killall yum;sleep 1; killall -9 yum;/usr/bin/yum clean all;yum -y install $pkglistA"
+		ssh root@$FULLHOSTNAME "/etc/init.d/yum-updatesd stop; killall yum; killall yum-updatesd-helper; sleep 1; killall -9 yum;/usr/bin/yum clean all;yum -y install $pkglistA"
 		ret=$?
 		if [ $ret -ne 0 ]; then
 			echo "ERROR - install of $pkglistA on $FULLHOSTNAME failed"
