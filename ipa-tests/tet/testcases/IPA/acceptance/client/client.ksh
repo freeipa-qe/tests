@@ -104,11 +104,7 @@ tp3()
 set send_slow {1 .1}' > $TET_TMP_DIR/ssh.exp
 		echo "spawn /usr/bin/ssh -l $user1 $FULLHOSTNAME 'ls /tmp'" >> $TET_TMP_DIR/ssh.exp
 		echo 'match_max 100000' >> $TET_TMP_DIR/ssh.exp
-	        if [ $fast -eq 1 ]; then
-               		echo 'sleep 2' >> $TET_TMP_DIR/ssh.exp
-	        else
-               		echo 'sleep 15' >> $TET_TMP_DIR/ssh.exp
-	        fi
+		echo 'sleep 7' >> $TET_TMP_DIR/ssh.exp
 	        echo 'send -s -- "yes"' >> $TET_TMP_DIR/ssh.exp
 	        echo 'send -s -- "\\r"' >> $TET_TMP_DIR/ssh.exp
 	        echo 'send -s -- "yes"' >> $TET_TMP_DIR/ssh.exp
@@ -124,11 +120,7 @@ set send_slow {1 .1}' > $TET_TMP_DIR/ssh.exp
 set send_slow {1 .1}' > $TET_TMP_DIR/ssh.exp
 		echo "spawn /usr/bin/ssh -l $user1 $FULLHOSTNAME 'ls /tmp'" >> $TET_TMP_DIR/ssh.exp
 		echo 'match_max 100000' >> $TET_TMP_DIR/ssh.exp
-	        if [ $fast -eq 1 ]; then
-               		echo 'sleep 2' >> $TET_TMP_DIR/ssh.exp
-	        else
-               		echo 'sleep 15' >> $TET_TMP_DIR/ssh.exp
-	        fi
+		echo 'sleep 7' >> $TET_TMP_DIR/ssh.exp
 	        echo "send -s -- \"$user1pw\"" >> $TET_TMP_DIR/ssh.exp
 	        echo 'send -s -- "\\r"' >> $TET_TMP_DIR/ssh.exp
 		expect $TET_TMP_DIR/ssh.exp >$TET_TMP_DIR/ssh-output.txt

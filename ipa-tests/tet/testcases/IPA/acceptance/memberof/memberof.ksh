@@ -617,7 +617,7 @@ ipa-modgroup --add user-41d group-4c-1;"
 			eval_vars $s
 			if [ "$OS_VER" -eq "5" ] && [ "$OS" -eq "RHEL" ]; then
 				for c in $checklist; do
-					ssh root@$FULLHOSTNAME "ipa-findgroup group-4-d-1 | grep $c"
+					ssh root@$FULLHOSTNAME "ipa-findgroup group-4d-1 | grep $c"
 					if [ $? -ne 0 ]; then
 						echo "ERROR - $tet_thistest failed in section 6 at $c"
 						tet_result FAIL
@@ -649,12 +649,12 @@ ipa-deluser user-41d;"
 		tet_result FAIL
 	fi
 
-# Now, check to make sure that the groups and users exist in group-4d-1
+# Now, check to make sure that the groups and users do not exist in group-4d-1
 	for s in $SERVERS; do
 		if [ "$s" != "" ]; then
 			eval_vars $s
 			for c in $checklist; do
-				ssh root@$FULLHOSTNAME "ipa-findgroup group-4-d-1 | grep $c"
+				ssh root@$FULLHOSTNAME "ipa-findgroup group-4d-1 | grep $c"
 				if [ $? -eq 0 ]; then
 					echo "ERROR - $tet_thistest failed in section 9 at $c"
 					tet_result FAIL
@@ -662,6 +662,14 @@ ipa-deluser user-41d;"
 			done
 		fi
 	done
+
+# Cleanup
+	eval_vars M1
+	ssh root@$FULLHOSTNAME "ipa-delgroup group-4d-1"	
+	if [ $? -ne 0 ]; then
+		echo "ipa-delgroup group-4d-1 failed"
+		tet_result FAIL
+	fi
 
 	tet_result PASS
 	echo "END $tet_thistest"
