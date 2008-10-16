@@ -1530,7 +1530,11 @@ main_save()
 	echo "TETADMINPW=\"$TETADMINPW\""
     echo "IGNORE_KNOWN_BUGS=$IGNORE_KNOWN_BUGS"
 	echo "DSTET_64=$DSTET_64"
-	echo "DSTET_DEBUG=$DSTET_DEBUG"
+	if [ "$DSTET_DEBUG" = "" ]; then
+		echo "DSTET_DEBUG=y"
+	else
+		echo "DSTET_DEBUG=$DSTET_DEBUG"
+	fi
 	# only save it if it's set
 	if [ ! -z "$LDAPhost" ] ; then 
 		echo "LDAPhost=$LDAPhost"

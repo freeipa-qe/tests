@@ -180,7 +180,7 @@ klist -ket /tmp/krb5.keytab.$FULLHOSTNAME"
 	return 0;
 }
 
-SetupClient()
+SetupClientRedhat()
 {
 	if [ $DSTET_DEBUG = y ]; then set -x; fi
 	. $TESTING_SHARED/shared.ksh
@@ -219,6 +219,28 @@ SetupClient()
 	fi
 
 	return 0;
+}
+
+SetupClient()
+{
+	if [ $DSTET_DEBUG = y ]; then set -x; fi
+	. $TESTING_SHARED/shared.ksh
+	is_server_alive $1
+	if [ $? -ne 0 ]; then
+		echo "ERROR - Server $1 appears to not respond to pings."
+		return 1;
+	fi
+	eval_vars $1	
+        case $OS in
+                "RHEL")     SetupClientRedhat $1       ;;
+                "FC")       SetupClientRedhat $1       ;;
+		"solaris")  InstallClientSolaris $1     ;;
+                *)      echo "unknown OS"        ;;
+        esac
+	if [ $? -ne 0 ]; then
+		return 1;
+	fi
+	return 0
 }
 
 SetupServer()
@@ -485,7 +507,7 @@ SetupRepo()
 
 InstallClientRPMSolaris()
 {
-	return 1;
+	return 0;
 }
 
 InstallClientRedhat()
@@ -822,19 +844,24 @@ FixResolv()
 	ssh root@$FULLHOSTNAME "echo 'search $DNS_DOMAIN' > /etc/resolv.conf;
 echo 'nameserver $dnss' >> /etc/resolv.conf;
 echo 'nameserver $DNSMASTER' >> /etc/resolv.conf"
+	
 	# Now test to ensure that DNS works.
 	ssh root@$FULLHOSTNAME "/usr/bin/dig -x 10.14.0.110"
-	ret=$?
-	if [ $ret != 0 ]; then
+	if [ $? != 0 ]; then
 		echo "ERROR - reverse lookup aginst localhost failed";
-		return 1
+		echo "This might be fine on non RHEL clients"
+		if [ "$OS" -eq "RHEL" ]; then
+			return 1;
+		fi
 	fi
 
 	ssh root@$FULLHOSTNAME "/usr/bin/dig $FULLHOSTNAME"
-	ret=$?
-	if [ $ret != 0 ]; then
+	if [ $? != 0 ]; then
 		echo "ERROR - lookup of myself failed";
-		return 1
+		echo "This might be fine on non RHEL clients"
+		if [ "$OS" -eq "RHEL" ]; then
+			return 1;
+		fi
 	fi
 	if [ "$DSTET_DEBUG" = "y" ]; then echo "done working on $s"; fi
 
