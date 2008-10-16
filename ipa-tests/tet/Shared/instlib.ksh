@@ -71,6 +71,115 @@ UninstallClient()
 
 }
 
+InstallClientSolaris()
+{
+	if [ $DSTET_DEBUG = y ]; then set -x; fi
+	. $TESTING_SHARED/shared.ksh
+	is_server_alive $1
+	if [ $? -ne 0 ]; then
+		echo "ERROR - Server $1 appears to not respond to pings."
+		return 1;
+	fi
+	echo "gathering hostname for M1"
+	eval_vars M1
+	m1hostname=$FULLHOSTNAME
+	eval_vars $1	
+
+	echo "changing nsswitch"
+	ssh root@$FULLHOSTNAME "sed s=^passwd=\'passwd: files ldap[NOTFOUND=return]\'=g < /etc/nsswitch.conf > /tmp/nsswitchtmp;
+sed s/^group/'group: files ldap[NOTFOUND=return]'/g < /tmp/nsswitchtmp > /etc/nsswitch.conf;";
+
+	echo "changing pam.conf"
+	echo "login auth requisite pam_authtok_get.so.1
+login auth sufficient pam_krb5.so.1
+login auth required pam_dhkeys.so.1
+login auth required pam_unix_cred.so.1
+login auth required pam_unix_auth.so.1 use_first_pass
+login auth required pam_dial_auth.so.1" > $TET_TMP_DIR/solaris-pam-tmp.txt
+	scp $TET_TMP_DIR/solaris-pam-tmp.txt root@$FULLHOSTNAME:/tmp/. 
+	if [ $? -ne 0 ]; then
+		echo "ERROR - scp of file to $FULLHOSTNAME failed"
+		return 1;
+	fi
+
+	ssh root@$FULLHOSTNAME "sed s/^login/#login/g < /etc/pam.conf > /tmp/pam-tmp.conf;
+cat /tmp/solaris-pam-tmp.txt >> /tmp/pam-tmp.conf;
+cat /tmp/pam-tmp.conf > /etc/pam.conf"
+	
+	echo "copying ldap.conf from M1 to $1"
+	rm -f $TET_TMP_DIR/solaris-ldap.conf
+	scp root@$m1hostname:/etc/ldap.conf $TET_TMP_DIR/solaris-ldap.conf
+	scp $TET_TMP_DIR/solaris-ldap.conf root@$FULLHOSTNAME:/etc/ldap.conf 
+	if [ $? -ne 0 ]; then
+		echo "ERROR - scp of file to $FULLHOSTNAME failed"
+		return 1;
+	fi
+
+	echo "copying krb5.conf from M1 to $1"
+	rm -f $TET_TMP_DIR/solaris-krb5.conf
+	scp root@$m1hostname:/etc/krb5.conf $TET_TMP_DIR/solaris-krb5.conf
+	scp $TET_TMP_DIR/solaris-krb5.conf root@$FULLHOSTNAME:/etc/krb5/krb5.conf 
+	if [ $? -ne 0 ]; then
+		echo "ERROR - scp of file to $FULLHOSTNAME failed"
+		return 1;
+	fi
+
+	echo "adding services host/$FULLHOSTNAME to M1"
+	tcmds="rm -f /tmp/krb5.keytab.$FULLHOSTNAME
+ipa-addservice nfs/$FULLHOSTNAME
+ipa-getkeytab -s $m1hostname -p nfs/$FULLHOSTNAME -k /tmp/krb5.keytab.$FULLHOSTNAME -e des-cbc-crc 
+ipa-addservice host/$FULLHOSTNAME 
+ipa-getkeytab -s $m1hostname -p host/$FULLHOSTNAME -k /tmp/krb5.keytab.$FULLHOSTNAME -e des-cbc-crc
+klist -ket /tmp/krb5.keytab.$FULLHOSTNAME"
+	cmds=`eval echo $tcmds`
+
+	# for all in file do ssh blah	
+	for c in $cmds; do
+		ssh root@$m1hostname "$c"
+		if [ $? -ne 0 ]; then
+			echo "ERROR - $c on $m1hostname failed!"
+			#return 1;
+		fi
+	done
+
+	echo "Improve keytab on $FULLHOSTNAME"
+	rm -f $TET_TMP_DIR/krb5.keytab.$FULLHOSTNAME
+	scp root@$m1hostname:/tmp/krb5.keytab.$FULLHOSTNAME $TET_TMP_DIR:/krb5.keytab.$FULLHOSTNAME
+	if [ $? -ne 0 ]; then
+		echo "ERROR - scp of file to $m1hostname failed"
+		return 1;
+	fi
+	ssh root@$FULLHOSTNAME "rm -f /tmp/krb5.keytab.$FULLHOSTNAME;rm -f /etc/krb5/krb5.keytab"
+	if [ $? -ne 0 ]; then
+		echo "ERROR - ssh of file to $FULLHOSTNAME failed"
+		return 1;
+	fi
+	scp $TET_TMP_DIR:/krb5.keytab.$FULLHOSTNAME root@$FULLHOSTNAME:/etc/krb5/krb5.keytab
+	if [ $? -ne 0 ]; then
+		echo "ERROR - scp of file to $FULLHOSTNAME failed"
+		return 1;
+	fi
+#		echo 'set force_conservative 0  ; 
+#if {$force_conservative} {
+#        set send_slow {1 .1}
+#        proc send {ignore arg} {
+#                sleep .1
+#                exp_send -s -- $arg
+#        }
+#}
+#set timeout -1' > $TET_TMP_DIR/replica-install.exp
+#		echo "spawn ipa-replica-install --debug /tmp/replica-info-$replica_hostname" >> $TET_TMP_DIR/replica-install.exp
+#		echo 'match_max 100000
+#expect -exact "Directory Manager (existing master) password: "' >> $TET_TMP_DIR/replica-install.exp
+#		echo "send -- \"$KERB_MASTER_PASS\"" >> $TET_TMP_DIR/replica-install.exp
+#		echo 'send -- "rree"' | sed s/rr/'\\'/g | sed s/ee/r/g
+
+#	echo "read_kt /tmp/krb5.keytab
+#write_kt /etc/krb5/krb5.keytab
+#q"
+	return 0;
+}
+
 SetupClient()
 {
 	if [ $DSTET_DEBUG = y ]; then set -x; fi
@@ -377,117 +486,6 @@ SetupRepo()
 InstallClientRPMSolaris()
 {
 	return 1;
-}
-
-InstallClientSolaris()
-{
-	if [ $DSTET_DEBUG = y ]; then set -x; fi
-	. $TESTING_SHARED/shared.ksh
-	is_server_alive $1
-	if [ $? -ne 0 ]; then
-		echo "ERROR - Server $1 appears to not respond to pings."
-		return 1;
-	fi
-	echo "gathering hostname for M1"
-	eval_vars M1
-	m1hostname=$FULLHOSTNAME
-	eval_vars $1	
-
-	echo "changing nsswitch"
-	ssh root@$FULLHOSTNAME "sed s=^passwd=\'passwd: files ldap[NOTFOUND=return]\'=g < /etc/nsswitch.conf > /tmp/nsswitchtmp;
-sed s/^group/'group: files ldap[NOTFOUND=return]'/g < /tmp/nsswitchtmp > /etc/nsswitch.conf;";
-
-	echo "changing pam.conf"
-	echo "login auth requisite pam_authtok_get.so.1
-login auth sufficient pam_krb5.so.1
-login auth required pam_dhkeys.so.1
-login auth required pam_unix_cred.so.1
-login auth required pam_unix_auth.so.1 use_first_pass
-login auth required pam_dial_auth.so.1" > $TET_TMP_DIR/solaris-pam-tmp.txt
-	scp $TET_TMP_DIR/solaris-pam-tmp.txt root@$FULLHOSTNAME:/tmp/. 
-	if [ $? -ne 0 ]; then
-		echo "ERROR - scp of file to $FULLHOSTNAME failed"
-		return 1;
-	fi
-
-	ssh root@$FULLHOSTNAME "sed s/^login/#login/g < /etc/pam.conf > /tmp/pam-tmp.conf;
-cat /tmp/solaris-pam-tmp.txt >> /tmp/pam-tmp.conf;
-cat /tmp/pam-tmp.conf > /etc/pam.conf"
-	
-	echo "copying ldap.conf from M1 to $1"
-	rm -f $TET_TMP_DIR/solaris-ldap.conf
-	scp root@$m1hostname:/etc/ldap.conf $TET_TMP_DIR/solaris-ldap.conf
-	scp $TET_TMP_DIR/solaris-ldap.conf root@$FULLHOSTNAME:/etc/ldap.conf 
-	if [ $? -ne 0 ]; then
-		echo "ERROR - scp of file to $FULLHOSTNAME failed"
-		return 1;
-	fi
-
-	echo "copying krb5.conf from M1 to $1"
-	rm -f $TET_TMP_DIR/solaris-krb5.conf
-	scp root@$m1hostname:/etc/krb5.conf $TET_TMP_DIR/solaris-krb5.conf
-	scp $TET_TMP_DIR/solaris-krb5.conf root@$FULLHOSTNAME:/etc/krb5/krb5.conf 
-	if [ $? -ne 0 ]; then
-		echo "ERROR - scp of file to $FULLHOSTNAME failed"
-		return 1;
-	fi
-
-	echo "adding services host/$FULLHOSTNAME to M1"
-	tcmds="rm -f /tmp/krb5.keytab.$FULLHOSTNAME
-ipa-addservice nfs/$FULLHOSTNAME
-ipa-getkeytab -s $m1hostname -p nfs/$FULLHOSTNAME -k /tmp/krb5.keytab.$FULLHOSTNAME -e des-cbc-crc 
-ipa-addservice host/$FULLHOSTNAME 
-ipa-getkeytab -s $m1hostname -p host/$FULLHOSTNAME -k /tmp/krb5.keytab.$FULLHOSTNAME -e des-cbc-crc
-klist -ket /tmp/krb5.keytab.$FULLHOSTNAME"
-	cmds=`eval echo $tcmds`
-
-	# for all in file do ssh blah	
-	for c in $cmds; do
-		ssh root@$m1hostname "$c"
-		if [ $? -ne 0 ]; then
-			echo "ERROR - $c on $m1hostname failed!"
-			#return 1;
-		fi
-	done
-
-	echo "Improve keytab on $FULLHOSTNAME"
-	rm -f $TET_TMP_DIR/krb5.keytab.$FULLHOSTNAME
-	scp root@$m1hostname:/tmp/krb5.keytab.$FULLHOSTNAME $TET_TMP_DIR:/krb5.keytab.$FULLHOSTNAME
-	if [ $? -ne 0 ]; then
-		echo "ERROR - scp of file to $m1hostname failed"
-		return 1;
-	fi
-	ssh root@$FULLHOSTNAME "rm -f /tmp/krb5.keytab.$FULLHOSTNAME;rm -f /etc/krb5/krb5.keytab"
-	if [ $? -ne 0 ]; then
-		echo "ERROR - ssh of file to $FULLHOSTNAME failed"
-		return 1;
-	fi
-	scp $TET_TMP_DIR:/krb5.keytab.$FULLHOSTNAME root@$FULLHOSTNAME:/etc/krb5/krb5.keytab
-	if [ $? -ne 0 ]; then
-		echo "ERROR - scp of file to $FULLHOSTNAME failed"
-		return 1;
-	fi
-#		echo 'set force_conservative 0  ; 
-#if {$force_conservative} {
-#        set send_slow {1 .1}
-#        proc send {ignore arg} {
-#                sleep .1
-#                exp_send -s -- $arg
-#        }
-#}
-#set timeout -1' > $TET_TMP_DIR/replica-install.exp
-#		echo "spawn ipa-replica-install --debug /tmp/replica-info-$replica_hostname" >> $TET_TMP_DIR/replica-install.exp
-#		echo 'match_max 100000
-#expect -exact "Directory Manager (existing master) password: "' >> $TET_TMP_DIR/replica-install.exp
-#		echo "send -- \"$KERB_MASTER_PASS\"" >> $TET_TMP_DIR/replica-install.exp
-#		echo 'send -- "rree"' | sed s/rr/'\\'/g | sed s/ee/r/g
-
-#	echo "read_kt /tmp/krb5.keytab
-#write_kt /etc/krb5/krb5.keytab
-#q"
-
-
-	return 0;
 }
 
 InstallClientRedhat()
