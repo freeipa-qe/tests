@@ -47,8 +47,7 @@ UninstallClient()
 	if [ $DSTET_DEBUG = y ]; then set -x; fi
 	. $TESTING_SHARED/shared.ksh
 	is_server_alive $1
-	ret=$?
-	if [ $ret -ne 0 ]; then
+	if [ $? -ne 0 ]; then
 		echo "ERROR - Server $1 appears to not respond to pings."
 		return 1;
 	fi
@@ -83,11 +82,30 @@ InstallClientSolaris()
 	echo "gathering hostname for M1"
 	eval_vars M1
 	m1hostname=$FULLHOSTNAME
+	echo "kiniting as $DS_USER, password $DM_ADMIN_PASS on $s"
+	KinitAs M1 $DS_USER $DM_ADMIN_PASS
+	if [ $ret -ne 0 ]; then
+		echo "ERROR - kinit on M1 failed"
+		return 1;
+	fi
+
+	# Reloading vars for the machine we are working on
 	eval_vars $1	
 
 	echo "changing nsswitch"
-	ssh root@$FULLHOSTNAME "sed s=^passwd=\'passwd: files ldap[NOTFOUND=return]\'=g < /etc/nsswitch.conf > /tmp/nsswitchtmp;
-sed s/^group/'group: files ldap[NOTFOUND=return]'/g < /tmp/nsswitchtmp > /etc/nsswitch.conf;";
+	echo "sed s/'^passwd:'/'passwd: files ldap[NOTFOUND=return]'/g < /etc/nsswitch.conf > /tmp/nsswitchtmp;
+sed s/'^group'/'group: files ldap[NOTFOUND=return]'/g < /tmp/nsswitchtmp > /etc/nsswitch.conf;" > $TET_TMP_DIR/nsswitch.sh
+	chmod 755 $TET_TMP_DIR/nsswitch.sh
+	scp $TET_TMP_DIR/nsswitch.sh root@$FULLHOSTNAME:/.
+	if [ $? -ne 0 ]; then
+		echo "ERROR - scp of file to $FULLHOSTNAME failed"
+		return 1;
+	fi
+	ssh root@$FULLHOSTNAME "/nsswitch.sh"
+	if [ $? -ne 0 ]; then
+		echo "ERROR - ssh of file to $FULLHOSTNAME failed"
+		return 1;
+	fi
 
 	echo "changing pam.conf"
 	echo "login auth requisite pam_authtok_get.so.1
@@ -102,9 +120,20 @@ login auth required pam_dial_auth.so.1" > $TET_TMP_DIR/solaris-pam-tmp.txt
 		return 1;
 	fi
 
-	ssh root@$FULLHOSTNAME "sed s/^login/#login/g < /etc/pam.conf > /tmp/pam-tmp.conf;
+	 echo "sed s/'^login'/'#login'/g < /etc/pam.conf > /tmp/pam-tmp.conf;
 cat /tmp/solaris-pam-tmp.txt >> /tmp/pam-tmp.conf;
-cat /tmp/pam-tmp.conf > /etc/pam.conf"
+cat /tmp/pam-tmp.conf > /etc/pam.conf" > $TET_TMP_DIR/pam.sh
+	chmod 755 $TET_TMP_DIR/pam.sh
+	scp $TET_TMP_DIR/pam.sh root@$FULLHOSTNAME:/.
+	if [ $? -ne 0 ]; then
+		echo "ERROR - scp of file to $FULLHOSTNAME failed"
+		return 1;
+	fi
+	ssh root@$FULLHOSTNAME "/pam.sh"
+	if [ $? -ne 0 ]; then
+		echo "ERROR - ssh of file to $FULLHOSTNAME failed"
+		return 1;
+	fi
 	
 	echo "copying ldap.conf from M1 to $1"
 	rm -f $TET_TMP_DIR/solaris-ldap.conf
@@ -125,26 +154,29 @@ cat /tmp/pam-tmp.conf > /etc/pam.conf"
 	fi
 
 	echo "adding services host/$FULLHOSTNAME to M1"
-	tcmds="rm -f /tmp/krb5.keytab.$FULLHOSTNAME
+	echo "rm -f /tmp/krb5.keytab.$FULLHOSTNAME
 ipa-addservice nfs/$FULLHOSTNAME
 ipa-getkeytab -s $m1hostname -p nfs/$FULLHOSTNAME -k /tmp/krb5.keytab.$FULLHOSTNAME -e des-cbc-crc 
 ipa-addservice host/$FULLHOSTNAME 
 ipa-getkeytab -s $m1hostname -p host/$FULLHOSTNAME -k /tmp/krb5.keytab.$FULLHOSTNAME -e des-cbc-crc
-klist -ket /tmp/krb5.keytab.$FULLHOSTNAME"
-	cmds=`eval echo $tcmds`
+klist -ket /tmp/krb5.keytab.$FULLHOSTNAME" > $TET_TMP_DIR/$1-cmds.txt
 
+	chmod 755 $TET_TMP_DIR/$1-cmds.txt
+	ssh root@$m1hostname "rm -f /tmp/$1-cmds.txt"
+	scp $TET_TMP_DIR/$1-cmds.txt root@$m1hostname:/tmp/.
+	ssh root@$m1hostname "/tmp/$1-cmds.txt"
 	# for all in file do ssh blah	
-	for c in $cmds; do
-		ssh root@$m1hostname "$c"
-		if [ $? -ne 0 ]; then
-			echo "ERROR - $c on $m1hostname failed!"
-			#return 1;
-		fi
-	done
+#	cat $TET_TMP_DIR/$1-cmds.txt | while read c; do
+#		ssh root@$m1hostname "$c"
+#		if [ $? -ne 0 ]; then
+#			echo "ERROR - $c on $m1hostname failed!"
+#			return 1;
+#		fi
+#	done
 
 	echo "Improve keytab on $FULLHOSTNAME"
 	rm -f $TET_TMP_DIR/krb5.keytab.$FULLHOSTNAME
-	scp root@$m1hostname:/tmp/krb5.keytab.$FULLHOSTNAME $TET_TMP_DIR:/krb5.keytab.$FULLHOSTNAME
+	scp root@$m1hostname:/tmp/krb5.keytab.$FULLHOSTNAME $TET_TMP_DIR/krb5.keytab.$FULLHOSTNAME
 	if [ $? -ne 0 ]; then
 		echo "ERROR - scp of file to $m1hostname failed"
 		return 1;
@@ -154,7 +186,7 @@ klist -ket /tmp/krb5.keytab.$FULLHOSTNAME"
 		echo "ERROR - ssh of file to $FULLHOSTNAME failed"
 		return 1;
 	fi
-	scp $TET_TMP_DIR:/krb5.keytab.$FULLHOSTNAME root@$FULLHOSTNAME:/etc/krb5/krb5.keytab
+	scp $TET_TMP_DIR/krb5.keytab.$FULLHOSTNAME root@$FULLHOSTNAME:/etc/krb5/krb5.keytab
 	if [ $? -ne 0 ]; then
 		echo "ERROR - scp of file to $FULLHOSTNAME failed"
 		return 1;
@@ -311,11 +343,11 @@ SetupServer()
 		rm -f $TET_TMP_DIR/replica-info-$replica_hostname
 		scp root@$FULLHOSTNAME:/var/lib/ipa/replica-info-$replica_hostname* $TET_TMP_DIR/.
 		ret=$?
-		ssh root@$replica_hostname "rm -f /tmp/replica-info-$replica_hostname"
-		scp $TET_TMP_DIR/replica-info-$replica_hostname* root@$replica_hostname:/tmp/.
+		ssh root@$replica_hostname "rm -f /dev/shm/replica-info-$replica_hostname"
+		scp $TET_TMP_DIR/replica-info-$replica_hostname* root@$replica_hostname:/dev/shm/.
 		ret2=$?
 		if [ $ret -ne 0 ]||[ $ret2 -ne 0 ]; then
-			echo "ERROR - scp root@$FULLHOSTNAME:/var/lib/ipa/replica-info-$replica_hostname to root@$replica_hostname:/tmp/. failed"
+			echo "ERROR - scp root@$FULLHOSTNAME:/var/lib/ipa/replica-info-$replica_hostname to root@$replica_hostname:/dev/shm/. failed"
 			return 1;
 		fi
 		# prepare the replica server
@@ -330,7 +362,7 @@ if {$force_conservative} {
         }
 }
 set timeout -1' > $TET_TMP_DIR/replica-install.exp
-		echo "spawn ipa-replica-install --debug /tmp/replica-info-$replica_hostname" >> $TET_TMP_DIR/replica-install.exp
+		echo "spawn ipa-replica-install --debug /dev/shm/replica-info-$replica_hostname" >> $TET_TMP_DIR/replica-install.exp
 		echo 'match_max 100000
 expect -exact "Directory Manager (existing master) password: "' >> $TET_TMP_DIR/replica-install.exp
 		echo "send -- \"$KERB_MASTER_PASS\"" >> $TET_TMP_DIR/replica-install.exp
@@ -341,21 +373,55 @@ expect -exact "Directory Manager (existing master) password: "' >> $TET_TMP_DIR/
 		ssh root@$replica_hostname "ps -ef | grep slapd"
 
 		chmod 755 $TET_TMP_DIR/replica-install.exp
-		scp $TET_TMP_DIR/replica-install.exp root@$replica_hostname:/tmp/.
-		ssh root@$replica_hostname "/usr/bin/expect /tmp/replica-install.exp"
+		scp $TET_TMP_DIR/replica-install.exp root@$replica_hostname:/dev/shm/.
+		ssh root@$replica_hostname "/usr/bin/expect /dev/shm/replica-install.exp"
 		if [ $? -ne 0 ]; then
 			echo "Method 1 did not work, trying method 2"
 			# Replacing name in expect script
-			ssh root@$replica_hostname "sed -i s/$replica_hostname/$replica_hostname.gpg/g /tmp/replica-install.exp"
-			ssh root@$replica_hostname "/usr/bin/expect /tmp/replica-install.exp"
+			ssh root@$replica_hostname "sed -i s/$replica_hostname/$replica_hostname.gpg/g /dev/shm/replica-install.exp"
+			ssh root@$replica_hostname "/usr/bin/expect /dev/shm/replica-install.exp"
 			if [ $? -ne 0 ]; then
-				echo "ERROR - /usr/bin/expect /tmp/replica-install.exp on $replica_hostname:/tmp/. failed"
-				return 1;
+				# replica install failed. Trying it all over again
+				echo "trying it all again"
+				# Just in case a previous uninstall didn't finish:
+				ssh root@$replica_hostname "ipa-server-install --uninstall -U"
+				ssh root@$FULLHOSTNAME "rm -f /var/lib/ipa/replica-info-$replica_hostname*"
+				echo "Generating replica prepare file for $replica_hostname on $FULLHOSTNAME"
+				ssh root@$FULLHOSTNAME "/usr/sbin/ipa-replica-prepare -p $DM_ADMIN_PASS $replica_hostname"
+				if [ $? -ne 0 ]; then
+					echo "Method one did not work, trying method 2"
+					ssh root@$FULLHOSTNAME "/usr/sbin/ipa-replica-prepare $replica_hostname"
+					if [ $? -ne 0 ]; then
+						echo "ERROR - /usr/sbin/ipa-replica-prepare $replica_hostname on $FULLHOSTNAME failed."
+						return 1;
+					fi
+				fi
+				# copying the relica prepare file from the master server to the replica	
+				rm -f $TET_TMP_DIR/replica-info-$replica_hostname
+				scp root@$FULLHOSTNAME:/var/lib/ipa/replica-info-$replica_hostname* $TET_TMP_DIR/.
+				ret=$?
+				ssh root@$replica_hostname "rm -f /dev/shm/replica-info-$replica_hostname"
+				scp $TET_TMP_DIR/replica-info-$replica_hostname* root@$replica_hostname:/dev/shm/.
+				ret2=$?
+				if [ $ret -ne 0 ]||[ $ret2 -ne 0 ]; then
+					echo "ERROR - scp root@$FULLHOSTNAME:/var/lib/ipa/replica-info-$replica_hostname to root@$replica_hostname:/dev/shm/. failed"
+					return 1;
+				fi
+				ssh root@$replica_hostname "sed -i s/$replica_hostname.gpg/$replica_hostname/g /dev/shm/replica-install.exp"
+				ssh root@$replica_hostname "/usr/bin/expect /dev/shm/replica-install.exp"
+				if [ $? -ne 0 ]; then
+					echo "Method 1 did not work, trying method 2"
+					# Replacing name in expect script
+					ssh root@$replica_hostname "sed -i s/$replica_hostname/$replica_hostname.gpg/g /dev/shm/replica-install.exp"
+					ssh root@$replica_hostname "/usr/bin/expect /dev/shm/replica-install.exp"
+					if [ $? -ne 0 ]; then	
+						echo "ERROR - /usr/bin/expect /dev/shm/replica-install.exp on $replica_hostname:/dev/shm/. failed"
+						return 1;
+					fi
+				fi
 			fi
+			ssh root@$replica_hostname "ps -ef | grep slapd"
 		fi
-		#ssh root@$replica_hostname 'ldapmodify -x -D "cn=directory manager" -w Secret123 -f /tmp/debug.ldif'
-		ssh root@$replica_hostname "ps -ef | grep slapd"
-	
 	fi
 	# The next section is a workaround for bug #450632
 	eval_vars $1
@@ -850,7 +916,7 @@ echo 'nameserver $DNSMASTER' >> /etc/resolv.conf"
 	if [ $? != 0 ]; then
 		echo "ERROR - reverse lookup aginst localhost failed";
 		echo "This might be fine on non RHEL clients"
-		if [ "$OS" -eq "RHEL" ]; then
+		if [ "$OS" = "RHEL" ]; then
 			return 1;
 		fi
 	fi
@@ -859,7 +925,7 @@ echo 'nameserver $DNSMASTER' >> /etc/resolv.conf"
 	if [ $? != 0 ]; then
 		echo "ERROR - lookup of myself failed";
 		echo "This might be fine on non RHEL clients"
-		if [ "$OS" -eq "RHEL" ]; then
+		if [ "$OS" = "RHEL" ]; then
 			return 1;
 		fi
 	fi
