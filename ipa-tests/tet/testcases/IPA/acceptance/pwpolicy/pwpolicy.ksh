@@ -98,6 +98,7 @@ tp1a()
 {
         echo "START $tet_thistest"
 	ResetKinit
+	/etc/init.d/ipa_kpasswd restart
         tet_result PASS
         echo "END $tet_thistest"
 }
