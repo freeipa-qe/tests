@@ -250,8 +250,14 @@ KinitAs()
         rm -f $TET_TMP_DIR/kinit.exp
         echo 'set timeout 60
 set send_slow {1 .1}' > $TET_TMP_DIR/kinit.exp
-echo "spawn /usr/kerberos/bin/kinit -V $2" >> $TET_TMP_DIR/kinit.exp
-echo 'match_max 100000' >> $TET_TMP_DIR/kinit.exp
+	echo "OS is $OS"
+	case $OS in
+		"RHEL")     echo "spawn /usr/kerberos/bin/kinit -V $2" >> $TET_TMP_DIR/kinit.exp       ;;
+		"FC")       echo "spawn /usr/kerberos/bin/kinit -V $2" >> $TET_TMP_DIR/kinit.exp       ;;
+		"solaris")  echo "spawn /usr/bin/kinit -V $2" >> $TET_TMP_DIR/kinit.exp     ;;
+		*)      echo "spawn /usr/bin/kinit -V $2" >> $TET_TMP_DIR/kinit.exp        ;;
+	esac
+	echo 'match_max 100000' >> $TET_TMP_DIR/kinit.exp
 	if [ $fast -eq 1 ]; then
 		echo 'sleep 2' >> $TET_TMP_DIR/kinit.exp
 	else	
@@ -332,7 +338,13 @@ KinitAsFirst()
         rm -f $TET_TMP_DIR/kinit.exp
         echo 'set timeout 60
 set send_slow {1 .1}' > $TET_TMP_DIR/kinit.exp
-	echo "spawn /usr/kerberos/bin/kinit -V $2" >> $TET_TMP_DIR/kinit.exp
+	echo "OS is $OS"
+	case $OS in
+		"RHEL")     echo "spawn /usr/kerberos/bin/kinit -V $2" >> $TET_TMP_DIR/kinit.exp       ;;
+		"FC")       echo "spawn /usr/kerberos/bin/kinit -V $2" >> $TET_TMP_DIR/kinit.exp       ;;
+		"solaris")  echo "spawn /usr/bin/kinit -V $2" >> $TET_TMP_DIR/kinit.exp     ;;
+		*)      echo "spawn /usr/bin/kinit -V $2" >> $TET_TMP_DIR/kinit.exp        ;;
+	esac
 	echo 'match_max 100000' >> $TET_TMP_DIR/kinit.exp
 	echo 'sleep 7' >> $TET_TMP_DIR/kinit.exp
 	echo "send -s -- \"$3\"" >> $TET_TMP_DIR/kinit.exp
