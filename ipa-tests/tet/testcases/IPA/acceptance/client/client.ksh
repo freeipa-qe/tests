@@ -99,31 +99,34 @@ tp3()
 			tet_result FAIL
 		fi
 
-#		if [ "$OS" = "RHEL" ]; then
-		# run ssh once to list the contents of /tmp
-	        rm -f $TET_TMP_DIR/ssh.exp
-	        echo 'set timeout 60
+		if [ "$OS" = "RHEL" ]; then
+			# run ssh once to list the contents of /tmp
+		        rm -f $TET_TMP_DIR/ssh.exp
+	        	echo 'set timeout 60
 set send_slow {1 .1}' > $TET_TMP_DIR/ssh.exp
-		echo "spawn /usr/bin/ssh -l $user1 $FULLHOSTNAME 'ls /tmp'" >> $TET_TMP_DIR/ssh.exp
-		echo 'match_max 100000' >> $TET_TMP_DIR/ssh.exp
-		echo 'sleep 4' >> $TET_TMP_DIR/ssh.exp
-	        echo "send -s -- \"yes\"" >> $TET_TMP_DIR/ssh.exp
-	        echo 'send -s -- "\\r"' >> $TET_TMP_DIR/ssh.exp
-		echo 'sleep 7' >> $TET_TMP_DIR/ssh.exp
-	        echo "send -s -- \"$user1pw\"" >> $TET_TMP_DIR/ssh.exp
-	        echo 'send -s -- "\\r"' >> $TET_TMP_DIR/ssh.exp
-		expect $TET_TMP_DIR/ssh.exp >$TET_TMP_DIR/ssh-output.txt
-		if [ $? -ne 0 ]; then
-			echo "ERROR - expect $TET_TMP_DIR/ssh.exp failed"
-			tet_result FAIL
-		fi
+			echo "spawn /usr/bin/ssh -l $user1 $FULLHOSTNAME 'ls /tmp'" >> $TET_TMP_DIR/ssh.exp
+			echo 'match_max 100000' >> $TET_TMP_DIR/ssh.exp
+			echo 'sleep 4' >> $TET_TMP_DIR/ssh.exp
+		        echo "send -s -- \"yes\"" >> $TET_TMP_DIR/ssh.exp
+		        echo 'send -s -- "\\r"' >> $TET_TMP_DIR/ssh.exp
+			echo 'sleep 7' >> $TET_TMP_DIR/ssh.exp
+		        echo "send -s -- \"$user1pw\"" >> $TET_TMP_DIR/ssh.exp
+		        echo 'send -s -- "\\r"' >> $TET_TMP_DIR/ssh.exp
+			expect $TET_TMP_DIR/ssh.exp >$TET_TMP_DIR/ssh-output.txt
+			if [ $? -ne 0 ]; then
+				echo "ERROR - expect $TET_TMP_DIR/ssh.exp failed"
+				tet_result FAIL
+			fi
 	
-		grep "ipa-client-test.txt" $TET_TMP_DIR/ssh-output.txt
-		if [ $? -ne 0 ]; then
-			echo "ERROR - ipa-client-test.txt not found in $TET_TMP_DIR/ssh-output.txt, the ssh login probably didn't work"
-			echo "$TET_TMP_DIR/ssh-output.txt contents are:"
-			cat $TET_TMP_DIR/ssh-output.txt
-			tet_result FAIL
+			grep "ipa-client-test.txt" $TET_TMP_DIR/ssh-output.txt
+			if [ $? -ne 0 ]; then
+				echo "ERROR - ipa-client-test.txt not found in $TET_TMP_DIR/ssh-output.txt, the ssh login probably didn't work"
+				echo "$TET_TMP_DIR/ssh-output.txt contents are:"
+				cat $TET_TMP_DIR/ssh-output.txt
+				tet_result FAIL
+			fi
+		else
+			 echo "skipping, OS is not RHEL"
 		fi
 	
 #		ssh root@$FULLHOSTNAME "ipa-findservice \"$service1\""
