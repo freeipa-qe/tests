@@ -706,6 +706,7 @@ tp3()
 	fi
 
 	# resetting password policy 
+	ssh root@$FULLHOSTNAME "ipa-pwpolicy --minlife 0"
 	ssh root@$FULLHOSTNAME "ipa-pwpolicy --maxlife 7"
 	if [ $? -ne 0 ]; then
 		echo "ERROR - ipa-pwpolicy on $FULLHOSTNAME failed"
