@@ -717,7 +717,7 @@ tp12()
 	user1="user-5-2"
 	sec=1
 	eval_vars M1
-	# Set up level 0 and level 1
+	echo "Set up level 0 and level 1"
 	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-addgroup $grp1 -g 855 -d 'group 5 2 for testing'; \
 /usr/sbin/ipa-addgroup $grp2 -g 856 -d 'group for test 5 2 containing only 1 member level 2'; \
 /usr/sbin/ipa-modgroup --groupadd $grp2 $grp1;"
@@ -730,7 +730,7 @@ tp12()
 	# test set 2
 	grp2alt="group-test5-level2"
 	newfirstname="looklookd"
-	# Create user that will be in level 3
+	echo "Create user that will be in level 3"
 	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-adduser -f 'user 5 2' -l 'lastname' $user1;"
 	if [ $? -ne 0 ]; then
 		echo "ERROR - $tet_thistest failed in section $sec"
@@ -738,7 +738,7 @@ tp12()
 	fi
 	let sec=$sec+1
 
-	# Add the level 3 user to the level 2 group
+	echo "Add the level 3 user to the level 2 group"
 	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-modgroup --add $user1 $grp2;"
 	if [ $? -ne 0 ]; then
 		echo "ERROR - $tet_thistest failed in section $sec"
@@ -746,7 +746,7 @@ tp12()
 	fi
 	let sec=$sec+1
 
-	# modify the user
+	echo "modify the user"
 	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-moduser --firstname $newfirstname $user1"
 	if [ $? -ne 0 ]; then
 		echo "ERROR - $tet_thistest failed in section $sec"
@@ -754,7 +754,7 @@ tp12()
 	fi
 	let sec=$sec+1
 
-	# modify the group
+	echo "modify the group"
 	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-modgroup --setattr cn=$grp2alt $grp2"
 	ret=$?
 	if [ $ret -ne 0 ]; then
@@ -763,7 +763,7 @@ tp12()
 	fi
 	let sec=$sec+1
 
-	# Check to ensure the group changed to include the user, and that the firstname change took.
+	echo "Check to ensure the group changed to include the user, and that the firstname change took."
 	for s in $SERVERS; do
 		if [ "$s" != "" ]; then
 			eval_vars $s
@@ -812,7 +812,7 @@ tp12()
 	done
 
 	eval_vars M1
-	# Cleanup of test set 2
+	echo "Cleanup of test set 2"
 	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-delgroup $grp1; \
 /usr/sbin/ipa-delgroup $grp2alt; \
 /usr/sbin/ipa-delgroup $grp2; \
