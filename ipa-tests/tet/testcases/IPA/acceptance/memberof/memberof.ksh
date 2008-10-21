@@ -121,8 +121,9 @@ tp3()
 					echo "ERROR - group2 does not exist on $s"
 					tet_result FAIL
 				fi
+			else
+				echo "Client $s is not rhel5, it's os is $OS, it's version is $OS_VER"
 			fi
-			echo "Client $s is not rhel5, it's os is $OS, it's version is $OS_VER"
 		fi
 	done
 
@@ -211,8 +212,9 @@ tp6()
 					echo "ERROR - group1 does not exist in group2 on $s"
 					tet_result FAIL
 				fi
+			else
+				echo "Client $s is not rhel5, it's os is $OS, it's version is $OS_VER"
 			fi
-			echo "Client $s is not rhel5, it's os is $OS, it's version is $OS_VER"
 		fi
 	done
 
@@ -623,8 +625,9 @@ ipa-modgroup --add user-41d group-4c-1;"
 						tet_result FAIL
 					fi
 				done
-			fi	
-			echo "Client $s is not rhel5, it's os is $OS, it's version is $OS_VER"
+			else	
+				echo "Client $s is not rhel5, it's os is $OS, it's version is $OS_VER"
+			fi
 		else
 			echo "skipping $s"
 		fi
@@ -802,8 +805,9 @@ tp12()
 					fi
 			
 				fi
+			else
+				echo "Client $s is not rhel5, it's os is $OS, it's version is $OS_VER"
 			fi
-			echo "Client $s is not rhel5, it's os is $OS, it's version is $OS_VER"
 		fi
 	done
 
@@ -962,8 +966,9 @@ ipa-modgroup --add $userd $grp2;"
 						tet_result FAIL
 					fi
 				done
+			else
+				echo "Client $s is not rhel5, it's os is $OS, it's version is $OS_VER"
 			fi
-			echo "Client $s is not rhel5, it's os is $OS, it's version is $OS_VER"
 		fi
 	done
 
@@ -1141,8 +1146,9 @@ ipa-modgroup --add user-41d group-4c-1;"
 						tet_result FAIL
 					fi
 				done
+			else
+				echo "Client $s is not rhel5, it's os is $OS, it's version is $OS_VER"
 			fi
-			echo "Client $s is not rhel5, it's os is $OS, it's version is $OS_VER"
 		else
 			echo "skipping $s"
 		fi
@@ -1303,8 +1309,9 @@ ipa-modgroup --add $user3 $grp1;"
 					echo "ERROR - ipa-findgroup failed on section 10"
 					tet_result FAIL
 				fi
+			else
+				echo "Client $s is not rhel5, it's os is $OS, it's version is $OS_VER"
 			fi
-			echo "Client $s is not rhel5, it's os is $OS, it's version is $OS_VER"
 		fi
 	done
 	eval_vars M1
@@ -1373,8 +1380,9 @@ ipa-modgroup --add $user3 $grp1;"
 					echo "ERROR - ipa-findgroup failed on section 20"
 					tet_result FAIL
 				fi
+			else
+				echo "Client $s is not rhel5, it's os is $OS, it's version is $OS_VER"
 			fi
-			echo "Client $s is not rhel5, it's os is $OS, it's version is $OS_VER"
 		fi
 	done
 
@@ -1445,8 +1453,9 @@ ipa-modgroup --remove $user3 $grp1;"
 					echo "ERROR - ipa-findgroup failed on section 30"
 					tet_result FAIL
 				fi
+			else
+				echo "Client $s is not rhel5, it's os is $OS, it's version is $OS_VER"
 			fi
-			echo "Client $s is not rhel5, it's os is $OS, it's version is $OS_VER"
 		fi
 	done
 
@@ -1487,8 +1496,9 @@ ipa-modgroup --remove $user3 $grp1;"
 					echo "ERROR - ipa-findgroup failed on section 35"
 					tet_result FAIL
 				fi
+			else
+				echo "Client $s is not rhel5, it's os is $OS, it's version is $OS_VER"
 			fi
-			echo "Client $s is not rhel5, it's os is $OS, it's version is $OS_VER"
 		fi
 	done
 
@@ -1736,8 +1746,9 @@ tpx()
 					echo "ERROR - kinit on $s failed"
 					tet_result FAIL
 				fi
+			else
+				echo "Client $s is not rhel5, it's os is $OS, it's version is $OS_VER"
 			fi
-			echo "Client $s is not rhel5, it's os is $OS, it's version is $OS_VER"
 		fi
 	done
 
