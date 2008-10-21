@@ -99,12 +99,16 @@ tp3()
 			tet_result FAIL
 		fi
 
+#		if [ "$OS" = "RHEL" ]; then
 		# run ssh once to list the contents of /tmp
 	        rm -f $TET_TMP_DIR/ssh.exp
 	        echo 'set timeout 60
 set send_slow {1 .1}' > $TET_TMP_DIR/ssh.exp
 		echo "spawn /usr/bin/ssh -l $user1 $FULLHOSTNAME 'ls /tmp'" >> $TET_TMP_DIR/ssh.exp
 		echo 'match_max 100000' >> $TET_TMP_DIR/ssh.exp
+		echo 'sleep 4' >> $TET_TMP_DIR/ssh.exp
+	        echo "send -s -- \"yes\"" >> $TET_TMP_DIR/ssh.exp
+	        echo 'send -s -- "\\r"' >> $TET_TMP_DIR/ssh.exp
 		echo 'sleep 7' >> $TET_TMP_DIR/ssh.exp
 	        echo "send -s -- \"$user1pw\"" >> $TET_TMP_DIR/ssh.exp
 	        echo 'send -s -- "\\r"' >> $TET_TMP_DIR/ssh.exp
