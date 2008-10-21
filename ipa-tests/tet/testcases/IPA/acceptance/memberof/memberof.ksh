@@ -773,7 +773,7 @@ tp12()
 				echo "ERROR - $grp2alt does not exist in $grp1"
 				tet_result FAIL
 			fi
-			ssh root@$FULLHOSTNAME "ipa-user -a $user1 | grep $newfirstname"
+			ssh root@$FULLHOSTNAME "ipa-finduser -a $user1 | grep $newfirstname"
 			ret=$?
 			if [ $ret -ne 0 ]; then
 				echo "ERROR - The altered First Name for user $user1 does not exist in $grp1"
