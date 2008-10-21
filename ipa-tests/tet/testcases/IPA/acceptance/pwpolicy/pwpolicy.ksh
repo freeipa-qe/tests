@@ -98,7 +98,12 @@ tp1a()
 {
         echo "START $tet_thistest"
 	ResetKinit
-	/etc/init.d/ipa_kpasswd restart
+	for s in $SERVERS; do
+		if [ "$s" != "" ]; then
+			eval_vars $s
+			ssh $FULLHOSTNAME "/etc/init.d/ipa_kpasswd restart"
+		fi
+	done
         tet_result PASS
         echo "END $tet_thistest"
 }
