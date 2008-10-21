@@ -300,6 +300,8 @@ SetupServer()
 		ret=$?
 		if [ $ret -ne 0 ]; then
 			echo "ERROR - ipa-server-install on $FULLHOSTNAME failed."
+			echo "contents of ipaserver-install.log and krb5kdc.log:: "
+			ssh root@$FULLHOSTNAME "cat /var/log/ipaserver-install.log;cat /var/log/krb5kdc.log";
 			return 1;
 		fi
 		FixBindServer M1
