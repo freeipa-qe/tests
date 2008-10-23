@@ -42,6 +42,26 @@ UninstallServer()
 
 }
 
+UninstallClientRedhat()
+{
+	eval_vars $1
+	if [ "$os" != "rhel" ]&&[ "$os" != "fc" ]; then
+		echo "os isn't \"rhel\" or \"fc\"."
+		echo "returning"
+		return 1
+	fi
+
+	ssh root@$fullhostname "ipa-client-install -u --uninstall"
+	ret1=$?
+	ssh root@$fullhostname "ipa-client-setup -u --uninstall"
+	ret2=$?
+	if [ $ret1 -ne 0 ]&&[ $ret2 -ne 0]; then
+		echo "error - ipa-client-install -uninstall on $fullhostname failed"
+#		return 1;
+	fi
+	return 0;
+}
+
 UninstallClient()
 {
 	if [ $DSTET_DEBUG = y ]; then set -x; fi
@@ -52,20 +72,13 @@ UninstallClient()
 		return 1;
 	fi
 	eval_vars $1
-	if [ "$OS" != "RHEL" ]&&[ "$OS" != "FC" ]; then
-		echo "OS isn't \"RHEL\" or \"FC\"."
-		echo "Returning"
-		return 0
-	fi
+        case $OS in
+                "RHEL")     UninstallClientRedhat $1       ;;
+                "FC")       UninstallClientRedhat $1       ;;
+		"solaris")  UninstallClientSolaris $1     ;;
+                *)      echo "unknown OS"        ;;
+        esac
 
-	ssh root@$FULLHOSTNAME "ipa-client-install -U --uninstall"
-	ret1=$?
-	ssh root@$FULLHOSTNAME "ipa-client-setup -U --uninstall"
-	ret2=$?
-	if [ $ret1 -ne 0 ]&&[ $ret2 -ne 0]; then
-		echo "ERROR - ipa-client-install -uninstall on $FULLHOSTNAME FAILED"
-#		return 1;
-	fi
 	return 0;
 
 }
