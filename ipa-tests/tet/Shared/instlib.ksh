@@ -62,6 +62,18 @@ UninstallClientRedhat()
 	return 0;
 }
 
+UninstallClientSolaris()
+{
+	eval_vars $1
+	if [ "$os" != "solaris" ] 
+		echo "os isn't \"solaris\""
+		echo "returning"
+		return 1
+	fi
+
+	return 0;
+}
+
 UninstallClient()
 {
 	if [ $DSTET_DEBUG = y ]; then set -x; fi
