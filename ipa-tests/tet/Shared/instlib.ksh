@@ -532,7 +532,22 @@ SetupRepoRHEL()
 PreSetupSolaris()
 {
 	# If the os is solaris, this section does some of the pre-setup for solaris clients
+	echo "If this is the first run of install, back up everything to /ipa-original"
 	echo "backing everything up for restore later"
+	bkup="/ipa-original"
+	ssh root@$FULLHOSTNAME "if [ ! -d $bkup ]; then mkdir -p $bkup;
+rm -f $bkup/nsswitch.conf; cp /etc/nsswitch.conf $bkup/.;
+rm -f $bkup/resolv.conf; cp /etc/resolv.conf $bkup/.;
+rm -f $bkup/pam.conf; cp /etc/pam.conf $bkup/.;
+rm -f $bkup/ldap.conf;cp /etc/ldap.conf $bkup/.;
+rm -f $bkup/krb5.conf;cp /etc/krb5/krb5.conf $bkup/.;
+rm -f $bkup/krb5.keytab;cp /etc/krb5/krb5.keytab $bkup/.; fi;"
+	if [ $? -ne 0 ]; then
+		echo "backing up of files on $FULLHOSTNAME to $bkup failed"
+		return 1;
+	fi
+
+	echo "backing everything up for restore later, these files may be corrupted from a previous install"
 	bkup="/ipa-backup"
 	ssh root@$FULLHOSTNAME "mkdir -p $bkup;
 rm -f $bkup/nsswitch.conf; cp /etc/nsswitch.conf $bkup/.;
