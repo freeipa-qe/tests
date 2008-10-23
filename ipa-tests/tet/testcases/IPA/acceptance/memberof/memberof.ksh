@@ -782,6 +782,8 @@ tp12()
 			fi
 		fi
 	done
+	# wait some time for the change to propigate.
+	sleep 60
 	for s in $CLIENTS; do
 		if [ "$s" != "" ]; then
 			eval_vars $s
