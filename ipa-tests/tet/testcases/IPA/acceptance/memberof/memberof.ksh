@@ -792,7 +792,7 @@ tp12()
 					echo "ERROR - $grp2alt does not exist in $grp1"
 					tet_result FAIL
 				fi
-				ssh root@$FULLHOSTNAME "ipa-findgroup -a $grp1 | grep $newfirstname"
+				ssh root@$FULLHOSTNAME "ipa-finduser -a $grp1 | grep $newfirstname"
 				ret=$?
 
 				if [ $ret -ne 0 ]; then
