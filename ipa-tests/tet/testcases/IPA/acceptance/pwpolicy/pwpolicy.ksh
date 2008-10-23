@@ -42,13 +42,15 @@ SyncDate()
 	for s in $SERVERS; do
 		if [ "$s" != "" ]; then
 			eval_vars $s
-			ssh $FULLHOSTNAME "/etc/init.d/ntpd stop;ntpdate $NTPSERVER"&
+			# Switch the comment out lines to enable/disable Bug 464828
+			ssh $FULLHOSTNAME "/etc/init.d/ntpd stop;ntpdate $NTPSERVER;/etc/init.d/ipa_kpasswd restart"
+			#ssh $FULLHOSTNAME "/etc/init.d/ntpd stop;ntpdate $NTPSERVER;/etc/init.d/ipa_kpasswd restart"
 		fi
 	done
 	for s in $CLIENTS; do
 		if [ "$s" != "" ]; then
 			eval_vars $s
-			ssh $FULLHOSTNAME "/etc/init.d/ntpd stop;ntpdate $NTPSERVER"&
+			ssh $FULLHOSTNAME "/etc/init.d/ntpd stop;ntpdate $NTPSERVER"
 		fi
 	done
 }
@@ -98,12 +100,6 @@ tp1a()
 {
         echo "START $tet_thistest"
 	ResetKinit
-	for s in $SERVERS; do
-		if [ "$s" != "" ]; then
-			eval_vars $s
-			ssh $FULLHOSTNAME "/etc/init.d/ipa_kpasswd restart"
-		fi
-	done
         tet_result PASS
         echo "END $tet_thistest"
 }
@@ -514,6 +510,7 @@ tp2c()
 	fi
 
 	# resetting password policy 
+	ssh root@$FULLHOSTNAME "ipa-pwpolicy --minlife 0"
 	ssh root@$FULLHOSTNAME "ipa-pwpolicy --maxlife 7"
 	if [ $? -ne 0 ]; then
 		echo "ERROR - ipa-pwpolicy on $FULLHOSTNAME failed"
@@ -764,6 +761,7 @@ tp3a()
 	fi
 	
 	# resetting password policy 
+	ssh root@$FULLHOSTNAME "ipa-pwpolicy --minlife 0"
 	ssh root@$FULLHOSTNAME "ipa-pwpolicy --maxlife 7"
 	if [ $? -ne 0 ]; then
 		echo "ERROR - ipa-pwpolicy on $FULLHOSTNAME failed"
@@ -817,6 +815,7 @@ tp3b()
 
 	# Get a new admin ticket to be sure that the ticket won't be expired
 	ResetKinit	
+
 	eval_vars M1
 
 	# add user to test with
@@ -952,6 +951,7 @@ tp3b()
 
 	# resetting password policy 
 	ssh root@$FULLHOSTNAME "ipa-pwpolicy --maxlife 44"
+	ssh root@$FULLHOSTNAME "ipa-pwpolicy --minlife 0"
 	ssh root@$FULLHOSTNAME "ipa-pwpolicy --maxlife 7"
 	if [ $? -ne 0 ]; then
 		echo "ERROR - ipa-pwpolicy on $FULLHOSTNAME failed"
@@ -1357,6 +1357,7 @@ tp4a()
 	KinitAsFirst M1 $user1 $user1pw1 $user1pw2
 	if [ $? -ne 0 ]; then
 		echo "ERROR - kinit as $user1 on $FULLHOSTNAME failed"
+		ssh root@$FULLHOSTNAME "ipa-pwpolicy --show"
 		echo "Test - $tet_thistest"
 		tet_result FAIL
 	fi
@@ -1366,6 +1367,7 @@ tp4a()
 	scp root@$FULLHOSTNAME:/tmp/KinitAsFirst-out.txt $TET_TMP_DIR/.
 	if [ $? -ne 0 ]; then
 		echo "ERROR - scp root@$FULLHOSTNAME:/tmp/SetUserPassword-output.txt $TET_TMP_DIR/. failed"
+		ssh root@$FULLHOSTNAME "ipa-pwpolicy --show"
 		echo "Test - $tet_thistest"
 		tet_result FAIL
 	fi
@@ -1377,6 +1379,7 @@ tp4a()
 		echo "contents of $TET_TMP_DIR/KinitAsFirst-out.txt are:"
 		cat $TET_TMP_DIR/KinitAsFirst-out.txt
 		echo "contents of $TET_TMP_DIR/KinitAsFirst-out.txt complete:"
+		ssh root@$FULLHOSTNAME "ipa-pwpolicy --show"
 		tet_result FAIL
 	fi
 
@@ -1404,6 +1407,7 @@ tp4a()
 		echo "contents of $TET_TMP_DIR/SetUserPassword-output.txt are:"
 		cat $TET_TMP_DIR/SetUserPassword-output.txt
 		echo "contents of $TET_TMP_DIR/SetUserPassword-output.txt complete:"
+		ssh root@$FULLHOSTNAME "ipa-pwpolicy --show"
 		tet_result FAIL
 	fi
 
@@ -1412,6 +1416,7 @@ tp4a()
 	if [ $? != 0 ]; then
 		echo "ERROR - SetUserPassword failed on $FULLHOSTNAME";
 		echo "Test - $tet_thistest"
+		ssh root@$FULLHOSTNAME "ipa-pwpolicy --show"
 		tet_result FAIL
 	fi
 
@@ -1431,6 +1436,7 @@ tp4a()
 		echo "contents of $TET_TMP_DIR/SetUserPassword-output.txt are:"
 		cat $TET_TMP_DIR/SetUserPassword-output.txt
 		echo "contents of $TET_TMP_DIR/SetUserPassword-output.txt complete:"
+		ssh root@$FULLHOSTNAME "ipa-pwpolicy --show"
 		tet_result FAIL
 	fi
 
