@@ -65,12 +65,21 @@ UninstallClientRedhat()
 UninstallClientSolaris()
 {
 	eval_vars $1
-	if [ "$os" != "solaris" ] 
-		echo "os isn't \"solaris\""
-		echo "returning"
-		return 1
+	if [ "$os" != "solaris" ]; then
+		echo "os isn't \"solaris\"";
+		echo "returning";
+		return 1;
 	fi
-
+	
+	bkup="/ipa-original"
+	ssh root@$FULLHOSTNAME "cat $bkup/nsswitch.conf >/etc/nsswitch.conf;
+cat $bkup/resolv.conf > cp /etc/resolv.conf;
+cat $bkup/pam.conf >/etc/pam.conf;
+rm -f /etc/ldap.conf;
+cat $bkup/krb5.conf > /etc/krb5/krb5.conf;
+rm -f /etc/krb5/krb5.keytab";
+	
+	ssh root@$FULLHOSTNAME 'find / | grep -v proc | grep -v dev > /list-after-ipa-uninstall.txt'&
 	return 0;
 }
 
