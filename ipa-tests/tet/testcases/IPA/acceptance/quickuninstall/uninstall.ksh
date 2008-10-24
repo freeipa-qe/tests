@@ -49,7 +49,7 @@ setupssh()
 ######################################################################
 tp1()
 {
-	echo "START tp1"
+	echo "START $tet_thistest"
 	for s in $SERVERS; do
 		if [ "$s" != "" ]; then
 			echo "working on $s now"
@@ -74,11 +74,12 @@ tp1()
 	done
 
 	tet_result PASS
+	echo "END $tet_thistest"
 }
 ######################################################################
 tp2()
 {
-	echo "START tp2"
+	echo "START $tet_thistest"
 	for s in $SERVERS; do
 		if [ "$s" != "" ]; then
 			echo "working on $s now"
@@ -103,6 +104,7 @@ tp2()
 	done
 
 	tet_result PASS
+	echo "END $tet_thistest"
 
 }
 ######################################################################
@@ -112,7 +114,7 @@ tp2()
 ######################################################################
 tp3()
 {
-	echo "START tp3"
+	echo "START $tet_thistest"
 	rm -f $TET_TMP_DIR/filelist.txt
 	echo '/usr/sbin/ipa*
 	/tmp/ipa*' > $TET_TMP_DIR/filelist.txt
@@ -120,9 +122,8 @@ tp3()
 		if [ "$s" != "" ]; then
 			echo "working on $s now"
 			Cleanup $s
-			if [ $ret -ne 0 ]; then
+			if [ $? -ne 0 ]; then
 				echo "ERROR - Cleanup of Server $s failed"
-				return 1;
 				tet_result FAIL
 			fi
 		fi
@@ -131,16 +132,15 @@ tp3()
 		if [ "$s" != "" ]; then
 			echo "working on $s now"
 			Cleanup $s
-			if [ $ret -ne 0 ]; then
+			if [ $? -ne 0 ]; then
 				echo "ERROR - Cleanup of Server $s failed"
-				return 1;
 				tet_result FAIL
 			fi
 		fi
 	done
 
-
 	tet_result PASS
+	echo "END $tet_thistest"
 
 }
 ######################################################################
@@ -153,14 +153,12 @@ tp4()
 		if [ "$s" != "" ]; then
 			echo "working on $s now"
 			SetupServer $s
-			ret=$?
-			if [ $ret -ne 0 ]; then
+			if [ $? -ne 0 ]; then
 				echo "server-install of server on $s ssh failed"
 				tet_result FAIL
 			fi
 			FixBindServer $s
-			ret=$?
-			if [ $ret -ne 0 ]; then
+			if [ $? -ne 0 ]; then
 				echo "fix-bind-server on $s ssh failed"
 				tet_result FAIL
 			fi
@@ -170,8 +168,7 @@ tp4()
 		if [ "$s" != "" ]; then
 			echo "working on $s now"
 			SetupClient $s
-			ret=$?
-			if [ $ret -ne 0 ]; then
+			if [ $? -ne 0 ]; then
 				echo "client-install of server on $s ssh failed"
 				tet_result FAIL
 			fi
