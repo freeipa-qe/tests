@@ -55,7 +55,7 @@ if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 tp1()
 {
 if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	echo "START tp1"
+	echo "START $tet_thistest"
 	for s in $SERVERS; do
 		if [ "$s" != "" ]; then
 			if [ "$DSTET_DEBUG" = "y" ]; then echo "working on $s now"; fi
@@ -82,13 +82,13 @@ if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 	done
 
 	tet_result PASS
-	echo "tp1 finish"
+	echo "STOP $tet_thistest"
 }
 ######################################################################
 tp2()
 {
 if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	echo "START tp2"
+	echo "START $tet_thistest"
 	for s in $SERVERS; do
 		if [ "$s" != "" ]; then
 			if [ "$DSTET_DEBUG" = "y" ]; then echo "working on $s now"; fi
@@ -115,6 +115,7 @@ if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 	done
 
 	tet_result PASS
+	echo "STOP $tet_thistest"
 
 }
 ######################################################################
@@ -126,7 +127,7 @@ if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 tp3()
 {
 if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	echo "START tp3"
+	echo "START $tet_thistest"
 	for s in $SERVERS; do
 		if [ "$s" != "" ]; then
 			if [ "$DSTET_DEBUG" = "y" ]; then echo "working on $s now"; fi
@@ -153,6 +154,7 @@ if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 	done
 
 	tet_result PASS
+	echo "STOP $tet_thistest"
 
 }
 ######################################################################
@@ -160,7 +162,7 @@ if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 ######################################################################
 tp4()
 {
-	echo "START tp4"
+	echo "START $tet_thistest"
 	for s in $SERVERS; do
 		if [ "$s" != "" ]; then
 			if [ "$DSTET_DEBUG" = "y" ]; then echo "working on $s now"; fi
@@ -183,7 +185,8 @@ tp4()
 		fi
 	done
 	
-	tet_result PASS
+	tet_result PASS	
+	echo "STOP $tet_thistest"
 
 }
 ######################################################################
@@ -195,7 +198,7 @@ tp4()
 tp5()
 {
 if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	echo "START tp5"
+	echo "START $tet_thistest"
 	# Get the IP of the first server to be used in the DNS tests.
 	eval_vars M1
 	dns=$IP
@@ -222,6 +225,7 @@ if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 	done
 
 	tet_result PASS
+	echo "STOP $tet_thistest"
 
 }
 ######################################################################
@@ -232,7 +236,7 @@ if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 tp6()
 {
 if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	echo "START tp6"
+	echo "START $tet_thistest"
 	for s in $CLIENTS; do
 		if [ "$s" != "" ]; then
 			echo "working on $s now"
@@ -248,6 +252,7 @@ if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 	done
 
 	tet_result PASS
+	echo "STOP $tet_thistest"
 
 }
 ######################################################################
@@ -258,7 +263,7 @@ if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 tp7()
 {
 if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	echo "START tp7"
+	echo "START $tet_thistest"
 
 	for s in $SERVERS; do
 		if [ "$DSTET_DEBUG" = "y" ]; then echo "working on $s now"; fi
@@ -302,6 +307,7 @@ if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 	done
 
 	tet_result PASS
+	echo "STOP $tet_thistest"
 
 }
 
@@ -387,6 +393,7 @@ ipa-deluser $user1; \
 ipa-deluser $user2;"
 	
 	tet_result PASS
+	echo "STOP $tet_thistest"
 
 }
 
