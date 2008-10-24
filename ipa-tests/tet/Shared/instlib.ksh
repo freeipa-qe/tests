@@ -45,8 +45,8 @@ UninstallServer()
 UninstallClientRedhat()
 {
 	eval_vars $1
-	if [ "$OS" != "rhel" ]&&[ "$OS" != "fc" ]; then
-		echo "OS isn't \"rhel\" or \"fc\", it's $OS"
+	if [ "$OS" != "RHEL" ]&&[ "$OS" != "FC" ]; then
+		echo "OS isn't \"RHEL\" or \"FC\", it's $OS"
 		echo "returning"
 		return 1
 	fi
@@ -79,7 +79,7 @@ rm -f /etc/ldap.conf;
 cat $bkup/krb5.conf > /etc/krb5/krb5.conf;
 rm -f /etc/krb5/krb5.keytab";
 	
-	ssh root@$FULLHOSTNAME 'find / | grep -v proc | grep -v dev > /list-after-ipa-uninstall.txt'&
+#	ssh root@$FULLHOSTNAME 'find / | grep -v proc | grep -v dev > /list-after-ipa-uninstall.txt'&
 	return 0;
 }
 
@@ -127,8 +127,8 @@ InstallClientSolaris()
 	eval_vars $1	
 
 	echo "changing nsswitch"
-	echo "sed s/sed s/^passwd*:*files/'passwd: files ldap[NOTFOUND=return]'/g < /etc/nsswitch.conf > /tmp/nsswitchtmp;
-sed s/^group*:*files/'group: files ldap[NOTFOUND=return]'/g < /tmp/nsswitchtmp > /etc/nsswitch.conf;" > $TET_TMP_DIR/nsswitch.sh
+	echo "sed s/passwd.*files/'passwd: files ldap[NOTFOUND=return]'/g < /etc/nsswitch.conf > /tmp/nsswitchtmp;
+sed s/group.*files/'group: files ldap[NOTFOUND=return]'/g < /tmp/nsswitchtmp > /etc/nsswitch.conf;" > $TET_TMP_DIR/nsswitch.sh
 	chmod 755 $TET_TMP_DIR/nsswitch.sh
 	scp $TET_TMP_DIR/nsswitch.sh root@$FULLHOSTNAME:/.
 	if [ $? -ne 0 ]; then
@@ -635,7 +635,7 @@ InstallClientRedhat()
 	eval_vars $1	
 
 	if [ "$OS_VER" == "5" ]; then 
-		ssh root@$FULLHOSTNAME "/etc/init.d/yum-updatesd stop;killall yum; killall yum-updatesd-helper; sleep 1; killall -9 yum;/usr/bin/yum clean all;rpm -e --allmatches krb5-devel"
+		ssh root@$FULLHOSTNAME "/etc/init.d/yum-updatesd stop;killall yum; killall yum-updatesd-helper; sleep 1; killall -9 yum;/usr/bin/yum clean all;rm /var/cache/yum/* -Rf;rpm -e --allmatches krb5-devel"
 
 		ssh root@$FULLHOSTNAME "/usr/bin/yum clean all"
 
@@ -680,11 +680,11 @@ InstallClientRPM()
 		return 1;
 	fi
 	eval_vars $1	
-	ssh root@$FULLHOSTNAME 'find / | grep -v proc | grep -v dev > /list-before-ipa.txt'
-	if [ $? -ne 0 ]; then
-		echo "ERROR - ssh to $FULLHOSTNAME failed"
-		return 1
-	fi	
+#	ssh root@$FULLHOSTNAME 'find / | grep -v proc | grep -v dev > /list-before-ipa.txt'
+#	if [ $? -ne 0 ]; then
+#		echo "ERROR - ssh to $FULLHOSTNAME failed"
+#		return 1
+#	fi	
 
         case $OS in
                 "RHEL")     InstallClientRedhat $1       ;;
@@ -696,12 +696,12 @@ InstallClientRPM()
 		return 1;
 	fi
 
-	ssh root@$FULLHOSTNAME 'find / | grep -v proc | grep -v dev > /list-after-ipa.txt'
-	if [ $? -ne 0 ]; then
-		echo "ERROR - ssh to $FULLHOSTNAME failed"
-		echo 'find / | grep -v proc | grep -v dev > /list-after-ipa.txt'
-		return 1
-	fi	
+#	ssh root@$FULLHOSTNAME 'find / | grep -v proc | grep -v dev > /list-after-ipa.txt'
+#	if [ $? -ne 0 ]; then
+#		echo "ERROR - ssh to $FULLHOSTNAME failed"
+#		echo 'find / | grep -v proc | grep -v dev > /list-after-ipa.txt'
+#		return 1
+#	fi	
 
 	return 0
 
@@ -755,11 +755,11 @@ InstallServerRPM()
 #		return 1
 #	fi	
 
-	ssh root@$FULLHOSTNAME 'find / | grep -v proc | grep -v dev > /list-before-ipa.txt'
-	if [ $? -ne 0 ]; then
-		echo "ERROR - ssh to $FULLHOSTNAME failed"
-		return 1
-	fi	
+#	ssh root@$FULLHOSTNAME 'find / | grep -v proc | grep -v dev > /list-before-ipa.txt'
+#	if [ $? -ne 0 ]; then
+#		echo "ERROR - ssh to $FULLHOSTNAME failed"
+#		return 1
+#	fi	
 
 	pkglistB="ipa-server ipa-admintools bind caching-nameserver expect krb5-workstation"
 	ssh root@$FULLHOSTNAME "yum -y install $pkglistB"
@@ -767,7 +767,7 @@ InstallServerRPM()
 	if [ $ret -ne 0 ]; then
 		echo "That rpm install didn't work, lets try that again. Sleeping for 60 seconds first" 
 		sleep 60
-		ssh root@$FULLHOSTNAME "/etc/init.d/yum-updatesd stop;killall yum;sleep 1; killall -9 yum;rpm -e --allmatches krb5-devel;/usr/bin/yum clean all;yum -y install $pkglistB"
+		ssh root@$FULLHOSTNAME "/etc/init.d/yum-updatesd stop;killall yum;sleep 1; killall -9 yum;rpm -e --allmatches krb5-devel;/usr/bin/yum clean all;rm /var/cache/yum/* -Rf;yum -y install $pkglistB"
 		ret=$?
 		if [ $ret -ne 0 ]; then
 			echo "ERROR - install of $pkglistB on $FULLHOSTNAME failed"
@@ -775,12 +775,12 @@ InstallServerRPM()
 		fi
 	fi	
 
-	ssh root@$FULLHOSTNAME 'find / | grep -v proc | grep -v dev > /list-after-ipa.txt'
-	ret=$?
-	if [ $ret -ne 0 ]; then
-		echo "ERROR - ssh to $FULLHOSTNAME failed"
-		return 1
-	fi	
+#	ssh root@$FULLHOSTNAME 'find / | grep -v proc | grep -v dev > /list-after-ipa.txt'
+#	ret=$?
+#	if [ $ret -ne 0 ]; then
+#		echo "ERROR - ssh to $FULLHOSTNAME failed"
+#		return 1
+#	fi	
 
 }
 
@@ -815,12 +815,12 @@ UnInstallClientRPM()
 		rpm -e --allmatches redhat-ds-base-devel; \
 		rpm -e --allmatches redhat-ds-base"
 
-	ssh root@$FULLHOSTNAME 'find / | grep -v proc | grep -v dev > /list-after-ipa-uninstall.txt'
-	ret=$?
-	if [ $ret -ne 0 ]; then
-		echo "ERROR - ssh to $FULLHOSTNAME failed"
-		return 1
-	fi
+#	ssh root@$FULLHOSTNAME 'find / | grep -v proc | grep -v dev > /list-after-ipa-uninstall.txt'
+#	ret=$?
+#	if [ $ret -ne 0 ]; then
+#		echo "ERROR - ssh to $FULLHOSTNAME failed"
+#		return 1
+#	fi
 	return 0
 }
 
@@ -854,12 +854,12 @@ UnInstallServerRPM()
 		rpm -e --allmatches redhat-ds-base-devel; \
 		rpm -e --allmatches redhat-ds-base"
 
-	ssh root@$FULLHOSTNAME 'find / | grep -v proc | grep -v dev > /list-after-ipa-uninstall.txt'
-	ret=$?
-	if [ $ret -ne 0 ]; then
-		echo "ERROR - ssh to $FULLHOSTNAME failed"
-		return 1
-	fi
+#	ssh root@$FULLHOSTNAME 'find / | grep -v proc | grep -v dev > /list-after-ipa-uninstall.txt'
+#	ret=$?
+#	if [ $ret -ne 0 ]; then
+#		echo "ERROR - ssh to $FULLHOSTNAME failed"
+#		return 1
+#	fi
 	return 0
 }
 
@@ -868,7 +868,7 @@ Cleanup()
 	echo "START Cleanup"
 	rm -f $TET_TMP_DIR/filelist.txt
 	echo '/usr/sbin/ipa*
-	/tmp/ipa*' > $TET_TMP_DIR/filelist.txt
+/tmp/ipa*' > $TET_TMP_DIR/filelist.txt
 	echo "working on $s now"
 	is_server_alive $s
 	if [ $ret -ne 0 ]; then
@@ -887,49 +887,65 @@ Cleanup()
 
 	ssh root@$FULLHOSTNAME 'rm -f /tmp/filelist.txt'
 	scp $TET_TMP_DIR/filelist.txt root@$FULLHOSTNAME:/tmp/.
-	ret=$?
-	if [ $ret -ne 0 ]; then
+	if [ $? -ne 0 ]; then
 		echo " ERROR - scp to $s failed"
 		return 1
 	fi
 	# now check to see if any of the files in filelist.txt exist when they should not.
-	echo "The list of files in the next test should NOT exist, disreguard errors stating that files do not exist"
-	ssh root@$FULLHOSTNAME 'cat /tmp/filelist.txt | \
-		while read f; \
-		do ls $f; if [ $? -eq 0 ]; \
-			then echo "ERROR - $f still exists"; \
-			export setexit=1; fi; \
-		done; \
-		if [ $setexit -eq 1 ]; \
-			then exit 1; fi; 
-		\exit 0'
- 	ret=$?
-	if [ $ret -ne 0 ]; then
-		echo "ERROR - some files still exist that should not"
-		return 1
+	if [ "$OS" != "RHEL" ]&&[ "$OS" != "FC" ]; then
+		echo "Not a RHEL or FC system, continuing"
+	else
+		echo "The list of files in the next test should NOT exist, disreguard errors stating that files do not exist"
+		ssh root@$FULLHOSTNAME 'cat /tmp/filelist.txt | \
+			while read f; \
+			do ls $f; if [ $? -eq 0 ]; \
+				then echo "ERROR - $f still exists"; \
+				export setexit=1; fi; \
+			done; \
+			if [ $setexit -eq 1 ]; \
+				then exit 1; fi; 
+			\exit 0'
+		if [ $? -ne 0 ]; then
+			echo "ERROR - some files still exist that should not"
+			return 1
+		fi
 	fi
 
 	# save and then remove old bind configuration
-	ssh root@$FULLHOSTNAME "rm -f /var/named.ipasave.tar.gz; \
-		tar cvfz /var/named.ipasave.tar.gz /var/named; \
-		rm -Rf /var/named;"
-
+	echo $s | grep M
+	if [ $? -eq 0 ]; then
+		ssh root@$FULLHOSTNAME "rm -f /var/named.ipasave.tar.gz; \
+			tar cvfz /var/named.ipasave.tar.gz /var/named; \
+			rm -Rf /var/named;"
+	else
+		echo "system doesn't appear to be a master, continuing."
+	fi
+	
 	# yum repo cleanup
 	ssh root@$FULLHOSTNAME "ls /etc/yum.repos.d/ipa*"
 	if [ $? -ne 0 ]; then
 		echo "ERROR - no /etc/yum.repos.d/ipa* files exist. This may mean that uninstall got broken"
+		echo "This is just fine if this system isn't a RHEL or FC machine"
 	#	return 1
 	fi
 	ssh root@$FULLHOSTNAME "rm -f /etc/yum.repos.d/ipa*"
 
 	# Test to ensure that ns-slapd isn't still hanging around.
-	ssh root@$FULLHOSTNAME "ps -fax | grep ns-slapd | grep -v grep"
-	if [ $? -ne 0 ]; then
-		echo "ERROR - ns-slapd is still running. It should be gone"
-		return 1
+	if [ "$OS" != "RHEL" ]&&[ "$OS" != "FC" ]; then
+		echo "Not a RHEL or FC system, continuing"
 	else
-		echo "cleaning up dirsec directories"
-		ssh root@$FULLHOSTNAME "rm -Rf /etc/dirsrv/;rm -Rf /var/run/dirsrv/;"
+		ssh root@$FULLHOSTNAME "ps -ef | grep -v grep | grep ns-slapd"
+		if [ $? -eq 0 ]; then
+			echo "ERROR - ns-slapd is still running. It should be gone"
+			echo "psef.txt contains:"
+			cat $TET_TMP_DIR/psef.txt
+			echo "ps -ef from $FULLHOSTNAME is:"
+			ssh root@$FULLHOSTNAME "ps -ef"
+			return 1
+		else
+			echo "cleaning up dirsec directories"
+			ssh root@$FULLHOSTNAME "rm -Rf /etc/dirsrv/;rm -Rf /var/run/dirsrv/;"
+		fi
 	fi
 
 	return 0
