@@ -45,8 +45,8 @@ UninstallServer()
 UninstallClientRedhat()
 {
 	eval_vars $1
-	if [ "$os" != "rhel" ]&&[ "$os" != "fc" ]; then
-		echo "os isn't \"rhel\" or \"fc\"."
+	if [ "$OS" != "rhel" ]&&[ "$OS" != "fc" ]; then
+		echo "OS isn't \"rhel\" or \"fc\", it's $OS"
 		echo "returning"
 		return 1
 	fi
@@ -65,8 +65,8 @@ UninstallClientRedhat()
 UninstallClientSolaris()
 {
 	eval_vars $1
-	if [ "$os" != "solaris" ]; then
-		echo "os isn't \"solaris\"";
+	if [ "$OS" != "solaris" ]; then
+		echo "OS isn't \"solaris\", it's $OS";
 		echo "returning";
 		return 1;
 	fi
@@ -94,9 +94,9 @@ UninstallClient()
 	fi
 	eval_vars $1
         case $OS in
-                "RHEL")     UninstallClientRedhat $1       ;;
-                "FC")       UninstallClientRedhat $1       ;;
-		"solaris")  UninstallClientSolaris $1     ;;
+                "RHEL")     UninstallClientRedhat $1; return $?       ;;
+                "FC")       UninstallClientRedhat $1; return $?      ;;
+		"solaris")  UninstallClientSolaris $1; return $?     ;;
                 *)      echo "unknown OS"        ;;
         esac
 
@@ -127,8 +127,8 @@ InstallClientSolaris()
 	eval_vars $1	
 
 	echo "changing nsswitch"
-	echo "sed s/'^passwd:'/'passwd: files ldap[NOTFOUND=return]'/g < /etc/nsswitch.conf > /tmp/nsswitchtmp;
-sed s/'^group'/'group: files ldap[NOTFOUND=return]'/g < /tmp/nsswitchtmp > /etc/nsswitch.conf;" > $TET_TMP_DIR/nsswitch.sh
+	echo "sed s/sed s/^passwd*:*files/'passwd: files ldap[NOTFOUND=return]'/g < /etc/nsswitch.conf > /tmp/nsswitchtmp;
+sed s/^group*:*files/'group: files ldap[NOTFOUND=return]'/g < /tmp/nsswitchtmp > /etc/nsswitch.conf;" > $TET_TMP_DIR/nsswitch.sh
 	chmod 755 $TET_TMP_DIR/nsswitch.sh
 	scp $TET_TMP_DIR/nsswitch.sh root@$FULLHOSTNAME:/.
 	if [ $? -ne 0 ]; then
@@ -573,9 +573,7 @@ PreSetupSolaris()
 rm -f $bkup/nsswitch.conf; cp /etc/nsswitch.conf $bkup/.;
 rm -f $bkup/resolv.conf; cp /etc/resolv.conf $bkup/.;
 rm -f $bkup/pam.conf; cp /etc/pam.conf $bkup/.;
-rm -f $bkup/ldap.conf;cp /etc/ldap.conf $bkup/.;
-rm -f $bkup/krb5.conf;cp /etc/krb5/krb5.conf $bkup/.;
-rm -f $bkup/krb5.keytab;cp /etc/krb5/krb5.keytab $bkup/.; fi;"
+rm -f $bkup/krb5.conf;cp /etc/krb5/krb5.conf $bkup/.; fi;"
 	if [ $? -ne 0 ]; then
 		echo "backing up of files on $FULLHOSTNAME to $bkup failed"
 		return 1;
@@ -587,9 +585,7 @@ rm -f $bkup/krb5.keytab;cp /etc/krb5/krb5.keytab $bkup/.; fi;"
 rm -f $bkup/nsswitch.conf; cp /etc/nsswitch.conf $bkup/.;
 rm -f $bkup/resolv.conf; cp /etc/resolv.conf $bkup/.;
 rm -f $bkup/pam.conf; cp /etc/pam.conf $bkup/.;
-rm -f $bkup/ldap.conf;cp /etc/ldap.conf $bkup/.;
 rm -f $bkup/krb5.conf;cp /etc/krb5/krb5.conf $bkup/.;
-rm -f $bkup/krb5.keytab;cp /etc/krb5/krb5.keytab $bkup/.;
 rm -f /tmp/solaris-pam-tmp.txt
 rm -f /tmp/solaris-ldap.conf"
 	if [ $? -ne 0 ]; then
@@ -639,16 +635,7 @@ InstallClientRedhat()
 	eval_vars $1	
 
 	if [ "$OS_VER" == "5" ]; then 
-		ssh root@$FULLHOSTNAME "/etc/init.d/yum-updatesd stop; killall yum-updatesd-helper; killall yum; sleep 1; killall -9 yum;yum -y install $pkglistA"
-		if [ $? -ne 0 ]; then
-			echo "That rpm install didn't work, lets try that again. Sleeping for 60 seconds first" 
-			sleep 60
-			ssh root@$FULLHOSTNAME "/etc/init.d/yum-updatesd stop;killall yum; killall yum-updatesd-helper; sleep 1; killall -9 yum;/usr/bin/yum clean all;yum -y install $pkglistA"
-			if [ $? -ne 0 ]; then
-				echo "ERROR - install of $pkglistA on $FULLHOSTNAME failed"
-				return 1
-			fi
-		fi	
+		ssh root@$FULLHOSTNAME "/etc/init.d/yum-updatesd stop;killall yum; killall yum-updatesd-helper; sleep 1; killall -9 yum;/usr/bin/yum clean all;rpm -e --allmatches krb5-devel"
 
 		ssh root@$FULLHOSTNAME "/usr/bin/yum clean all"
 
@@ -740,30 +727,36 @@ InstallServerRPM()
 	ssh root@$FULLHOSTNAME "rpm -e --allmatches redhat-ds-base-devel"
 	ssh root@$FULLHOSTNAME "rpm -e --allmatches redhat-ds-base"
 	ssh root@$FULLHOSTNAME "/usr/bin/yum clean all"
-	pkglistA="TurboGears cyrus-sasl-gssapi fedora-ds-base krb5-server krb5-server-ldap lm_sensors mod_python mozldap mozldap-tools perl-Mozilla-LDAP postgresql-libs python-cheetah python-cherrypy python-configobj python-decoratortools python-elixir python-formencode python-genshi python-json python-kerberos python-kid python-krbV python-nose python-paste python-paste-deploy python-paste-script python-protocols python-psycopg2 python-pyasn1 python-ruledispatch python-setuptools python-simplejson python-sqlalchemy python-sqlite2 python-sqlobject python-tgexpandingformwidget python-tgfastdata python-turbocheetah python-turbojson python-turbokid svrcore tcl Updating bind-libs bind-utils cyrus-sasl cyrus-sasl-devel cyrus-sasl-lib cyrus-sasl-md5 cyrus-sasl-plain krb5-devel krb5-libs bind caching-nameserver expect krb5-workstation"
-	ssh root@$FULLHOSTNAME "/etc/init.d/yum-updatesd stop; killall yum; killall yum-updatesd-helper; sleep 1; killall -9 yum;yum -y install $pkglistA"
-	ret=$?
-	if [ $ret -ne 0 ]; then
-		echo "That rpm install didn't work, lets try that again. Sleeping for 60 seconds first" 
-		sleep 60
-		ssh root@$FULLHOSTNAME "/etc/init.d/yum-updatesd stop; killall yum; killall yum-updatesd-helper; sleep 1; killall -9 yum;/usr/bin/yum clean all;yum -y install $pkglistA"
-		ret=$?
-		if [ $ret -ne 0 ]; then
-			echo "ERROR - install of $pkglistA on $FULLHOSTNAME failed"
-			return 1
-		fi
-	fi	
+#	pkglistA="TurboGears cyrus-sasl-gssapi fedora-ds-base krb5-server krb5-server-ldap lm_sensors mod_python mozldap mozldap-tools perl-Mozilla-LDAP postgresql-libs python-cheetah python-cherrypy python-configobj python-decoratortools python-elixir python-formencode python-genshi python-json python-kerberos python-kid python-krbV python-nose python-paste python-paste-deploy python-paste-script python-protocols python-psycopg2 python-pyasn1 python-ruledispatch python-setuptools python-simplejson python-sqlalchemy python-sqlite2 python-sqlobject python-tgexpandingformwidget python-tgfastdata python-turbocheetah python-turbojson python-turbokid svrcore tcl Updating bind-libs bind-utils cyrus-sasl cyrus-sasl-devel cyrus-sasl-lib cyrus-sasl-md5 cyrus-sasl-plain krb5-devel krb5-libs bind caching-nameserver expect krb5-workstation"
+#	ssh root@$FULLHOSTNAME "/etc/init.d/yum-updatesd stop; killall yum; killall yum-updatesd-helper; sleep 1; killall -9 yum;rpm -e --allmatches krb5-devel;yum -y install $pkglistA"
+#	ret=$?
+#	if [ $ret -ne 0 ]; then
+#		echo "That rpm install didn't work, lets try that again. Sleeping for 60 seconds first" 
+#		sleep 60
+#		ssh root@$FULLHOSTNAME "/etc/init.d/yum-updatesd stop; killall yum; killall yum-updatesd-helper; sleep 1; killall -9 yum;/usr/bin/yum clean all;yum -y install $pkglistA"
+#		ret=$?
+#		if [ $ret -ne 0 ]; then
+#			echo "ERROR - install of $pkglistA on $FULLHOSTNAME failed"
+#			return 1
+#		fi
+#	fi	
 
-	ssh root@$FULLHOSTNAME "yum -y update TurboGears cyrus-sasl-gssapi fedora-ds-base krb5-server krb5-server-ldap lm_sensors mod_python mozldap mozldap-tools perl-Mozilla-LDAP postgresql-libs python-cheetah python-cherrypy python-configobj python-decoratortools python-elixir python-formencode python-genshi python-json python-kerberos python-kid python-krbV python-nose python-paste python-paste-deploy python-paste-script python-protocols python-psycopg2 python-pyasn1 python-ruledispatch python-setuptools python-simplejson python-sqlalchemy python-sqlite2 python-sqlobject python-tgexpandingformwidget python-tgfastdata python-turbocheetah python-turbojson python-turbokid svrcore tcl Updating bind-libs bind-utils cyrus-sasl cyrus-sasl-devel cyrus-sasl-lib cyrus-sasl-md5 cyrus-sasl-plain krb5-devel krb5-libs"
-	ret=$?
-	if [ $ret -ne 0 ]; then
-		echo "ERROR - ssh to $FULLHOSTNAME failed"
+#	ssh root@$FULLHOSTNAME "yum -y update TurboGears cyrus-sasl-gssapi fedora-ds-base krb5-server krb5-server-ldap lm_sensors mod_python mozldap mozldap-tools perl-Mozilla-LDAP postgresql-libs python-cheetah python-cherrypy python-configobj python-decoratortools python-elixir python-formencode python-genshi python-json python-kerberos python-kid python-krbV python-nose python-paste python-paste-deploy python-paste-script python-protocols python-psycopg2 python-pyasn1 python-ruledispatch python-setuptools python-simplejson python-sqlalchemy python-sqlite2 python-sqlobject python-tgexpandingformwidget python-tgfastdata python-turbocheetah python-turbojson python-turbokid svrcore tcl Updating bind-libs bind-utils cyrus-sasl cyrus-sasl-devel cyrus-sasl-lib cyrus-sasl-md5 cyrus-sasl-plain krb5-devel krb5-libs"
+#	ret=$?
+#	if [ $ret -ne 0 ]; then
+#		echo "ERROR - ssh to $FULLHOSTNAME failed"
+##		return 1
+#	fi	
+
+	# Checking to ensure that expect is installed
+#	ssh root@$FULLHOSTNAME 'ls /usr/bin/expect'
+#	if [ $? -ne 0 ]; then
+#		echo "ERROR - expect not found on $FULLHOSTNAME This could mean that the RPM install failed."
 #		return 1
-	fi	
+#	fi	
 
 	ssh root@$FULLHOSTNAME 'find / | grep -v proc | grep -v dev > /list-before-ipa.txt'
-	ret=$?
-	if [ $ret -ne 0 ]; then
+	if [ $? -ne 0 ]; then
 		echo "ERROR - ssh to $FULLHOSTNAME failed"
 		return 1
 	fi	
@@ -774,7 +767,7 @@ InstallServerRPM()
 	if [ $ret -ne 0 ]; then
 		echo "That rpm install didn't work, lets try that again. Sleeping for 60 seconds first" 
 		sleep 60
-		ssh root@$FULLHOSTNAME "/etc/init.d/yum-updatesd stop;killall yum;sleep 1; killall -9 yum;/usr/bin/yum clean all;yum -y install $pkglistB"
+		ssh root@$FULLHOSTNAME "/etc/init.d/yum-updatesd stop;killall yum;sleep 1; killall -9 yum;rpm -e --allmatches krb5-devel;/usr/bin/yum clean all;yum -y install $pkglistB"
 		ret=$?
 		if [ $ret -ne 0 ]; then
 			echo "ERROR - install of $pkglistB on $FULLHOSTNAME failed"
@@ -847,7 +840,7 @@ UnInstallServerRPM()
 		echo "Returning"
 		return 0
 	fi
-	ssh root@$FULLHOSTNAME "rpm -e --allmatches redhat-ds-base ipa-server ipa-admintools bind caching-nameserver expect krb5-workstation ipa-client ipa-server-selinux"
+	ssh root@$FULLHOSTNAME "rpm -e --allmatches redhat-ds-base ipa-server ipa-admintools bind caching-nameserver krb5-workstation ipa-client ipa-server-selinux"
 	ret=$?
 	if [ $ret -ne 0 ]; then
 		echo "ERROR - ssh to $FULLHOSTNAME failed"

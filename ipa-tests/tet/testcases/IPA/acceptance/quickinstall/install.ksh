@@ -259,27 +259,12 @@ tp7()
 {
 if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 	echo "START tp7"
-	rm -f $TET_TMP_DIR/kinit.exp
-	echo 'set timeout 60
-set send_slow {1 .1}
-spawn /usr/kerberos/bin/kinit admin
-match_max 100000
-sleep 15'  > $TET_TMP_DIR/kinit.exp
-	echo "send -s -- \"$KERB_MASTER_PASS\"" >> $TET_TMP_DIR/kinit.exp
-	echo 'send -s -- "\\r"' >> $TET_TMP_DIR/kinit.exp
-	echo 'send -s -- "\r"' >> $TET_TMP_DIR/kinit.exp
-	echo 'expect eof ' >> $TET_TMP_DIR/kinit.exp
 
 	for s in $SERVERS; do
 		if [ "$DSTET_DEBUG" = "y" ]; then echo "working on $s now"; fi
 		eval_vars $s
-		# Populate kinit expect file
-		ssh root@$FULLHOSTNAME 'rm -f /tmp/kinit.exp'
-		scp $TET_TMP_DIR/kinit.exp root@$FULLHOSTNAME:/tmp/.		
-
-		ssh root@$FULLHOSTNAME 'kdestroy;/usr/bin/expect /tmp/kinit.exp'
-		ret=$?
-		if [ $ret != 0 ]; then
+		KinitAs $s $DS_USER $DM_ADMIN_PASS	
+		if [ $? != 0 ]; then
 		        echo "ERROR - kinit failed";
 			tet_result FAIL
 		fi
@@ -297,13 +282,9 @@ sleep 15'  > $TET_TMP_DIR/kinit.exp
 	for s in $CLIENTS; do
 		if [ "$DSTET_DEBUG" = "y" ]; then echo "working on $s now"; fi
 		eval_vars $s
-		# Populate kinit expect file
-		ssh root@$FULLHOSTNAME 'rm -f /tmp/kinit.exp'
-		scp $TET_TMP_DIR/kinit.exp root@$FULLHOSTNAME:/tmp/.		
 
-		ssh root@$FULLHOSTNAME 'kdestroy;/usr/bin/expect /tmp/kinit.exp'
-		ret=$?
-		if [ $ret != 0 ]; then
+		KinitAs $s $DS_USER $DM_ADMIN_PASS
+		if [ $? != 0 ]; then
 	        	echo "ERROR - kinit failed";
 			tet_result FAIL
 		fi
