@@ -5,46 +5,17 @@ fi
 # The next line is required as it picks up data about the servers to use
 tet_startup="CheckAlive"
 tet_cleanup="pass"
-iclist="setupssh ic1 ic2 ic3"
+iclist="ic1 ic2 ic3"
 ic1="tp1"
 ic2="tp2"
 ic3="tp3"
 ic4="tp4"
-
 
 pass()
 {
 	tet_result PASS
 }
 
-setupssh()
-{
-	echo "running ssh setup"
-	for s in $SERVERS; do
-		if [ "$s" != "" ]; then
-			echo "working on $s now"
-			setup_ssh_keys $s
-			ret=$?
-			if [ $ret -ne 0 ]; then
-				echo "Setup of $s ssh failed"
-				tet_result FAIL
-			fi
-		fi
-	done
-	for s in $CLIENTS; do
-		if [ "$s" != "" ]; then
-			echo "working on $s now"
-			setup_ssh_keys $s
-			ret=$?
-			if [ $ret -ne 0 ]; then
-				echo "Setup of $s ssh failed"
-				tet_result FAIL
-			fi
-		fi
-	done
-
-	tet_result PASS
-}
 
 ######################################################################
 tp1()
@@ -141,41 +112,6 @@ tp3()
 
 	tet_result PASS
 	echo "END $tet_thistest"
-
-}
-######################################################################
-
-######################################################################
-tp4()
-{
-	echo "START tp4"
-	for s in $SERVERS; do
-		if [ "$s" != "" ]; then
-			echo "working on $s now"
-			SetupServer $s
-			if [ $? -ne 0 ]; then
-				echo "server-install of server on $s ssh failed"
-				tet_result FAIL
-			fi
-			FixBindServer $s
-			if [ $? -ne 0 ]; then
-				echo "fix-bind-server on $s ssh failed"
-				tet_result FAIL
-			fi
-		fi
-	done
-	for s in $CLIENTS; do
-		if [ "$s" != "" ]; then
-			echo "working on $s now"
-			SetupClient $s
-			if [ $? -ne 0 ]; then
-				echo "client-install of server on $s ssh failed"
-				tet_result FAIL
-			fi
-		fi
-	done
-
-	tet_result PASS
 
 }
 ######################################################################
