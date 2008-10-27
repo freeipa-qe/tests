@@ -723,7 +723,7 @@ InstallServerRPM()
 	fi
 	eval_vars $1	
 	if [ "$OS" != "RHEL" ]&&[ "$OS" != "FC" ]; then
-		echo "OS isn't \"RHEL\" or \"FC\"."
+		echo "OS isn't \"RHEL\" or \"FC\", it's $OS"
 		echo "Returning"
 		return 0
 	fi
@@ -800,7 +800,7 @@ UnInstallClientRPM()
 	fi
 	eval_vars $1	
 	if [ "$OS" != "RHEL" ]&&[ "$OS" != "FC" ]; then
-		echo "OS isn't \"RHEL\" or \"FC\"."
+		echo "OS isn't \"RHEL\" or \"FC\", it's $OS"
 		echo "Returning"
 		return 0
 	fi
@@ -840,7 +840,7 @@ UnInstallServerRPM()
 	fi
 	eval_vars $1	
 	if [ "$OS" != "RHEL" ]&&[ "$OS" != "FC" ]; then
-		echo "OS isn't \"RHEL\" or \"FC\"."
+		echo "OS isn't \"RHEL\" or \"FC\", it's $OS"
 		echo "Returning"
 		return 0
 	fi
