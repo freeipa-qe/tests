@@ -1117,6 +1117,7 @@ ask_c1()
 	echo "   2. HPUX"
 	echo "   3. FC(Fedora Core)"
 	echo "   4. solaris"
+	echo "Default <$OS_C1>:"
 	read rsp
 	if [ -z "$rsp" ] ; then os_tmp=d; else os_tmp="$rsp"; fi
 	case $os_tmp in
@@ -1161,6 +1162,7 @@ ask_c2()
 	echo "   2. HPUX"
 	echo "   3. FC(Fedora Core)"
 	echo "   4. solaris"
+	echo "Default <$OS_C2>:"
 	read rsp
 	if [ -z "$rsp" ] ; then os_tmp=d; else os_tmp="$rsp"; fi
 	case $os_tmp in
@@ -1193,6 +1195,52 @@ ask_c2()
 	export OS_C2 HOSTNAME_C2 OS_VER_C2 REPO_C2
 
 }
+
+ask_c3()
+{
+	if [ "$engage_debug" = "y" ]; then set -x; fi
+	echo "hostname of client 3?($HOSTNAME_C3)->"
+	read rsp
+	if [ -z "$rsp" ] ; then echo "Hostname unchanged"; else HOSTNAME_C3="$rsp"; fi
+	echo "OS of Client 2?"
+	echo "   1. RHEL"
+	echo "   2. HPUX"
+	echo "   3. FC(Fedora Core)"
+	echo "   4. solaris"
+	echo "Default <$OS_C3>:"
+	read rsp
+	if [ -z "$rsp" ] ; then os_tmp=d; else os_tmp="$rsp"; fi
+	case $os_tmp in
+		1) OS_C3="RHEL"
+			;;
+		2) OS_C3="HPUX"
+			;;
+		3) OS_C3="FC"
+			;;
+		4) OS_C3="solaris"
+			;;
+		d) echo "OS unchanged"
+			;;
+		*) echo "You have chosen a invalid choice($os_tmp), exiting"
+			exit
+			;;
+		esac
+	echo "OS version?"
+	echo "for RHEL - 3,4,5"
+	echo "for FC - 7,8,9"
+	echo "for solaris - 6.7.8.9.10"
+	echo "for HPUX - <insert crazy uname version here>"
+	echo "default <$OS_VER_C3>"
+	echo "->"
+	read rsp
+	if [ -z "$rsp" ] ; then echo "Using $OS_VER_C3"; else OS_VER_C3="$rsp"; fi
+	echo "Repo for client 3? This is a url to the .repo file, or a tarball on hpux ($REPO_C3)->"
+	read rsp
+	if [ -z "$rsp" ] ; then echo "Client repo unchanged"; else  REPO_C3="$rsp"; fi
+	export OS_C3 HOSTNAME_C3 OS_VER_C3 REPO_C3
+
+}
+
 
 main_ask()
 {
