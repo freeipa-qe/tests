@@ -165,13 +165,14 @@ tp5()
 				echo "ERROR - ipa-addservice failed on $FULLHOSTNAME"
 				tet_result FAIL
 			fi
-			ssh root@$FULLHOSTNAME "ipa-findservice \"$service3\""
-			if [ $? -ne 0 ]
-			then
-				echo "ERROR - ipa-findservice failed on $FULLHOSTNAME"
-				tet_result FAIL
-			fi
-
+			# Sleeping for 10 seconds to allow addservice to sync
+			sleep 10;
+		fi
+		ssh root@$FULLHOSTNAME "ipa-findservice \"$service3\""
+		if [ $? -ne 0 ]
+		then
+			echo "ERROR - ipa-findservice failed on $FULLHOSTNAME"
+			tet_result FAIL
 		fi
 	done
 
