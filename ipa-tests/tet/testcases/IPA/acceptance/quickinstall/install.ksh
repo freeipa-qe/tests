@@ -18,7 +18,7 @@ ic8="tp8"
 
 setupssh()
 {
-if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 	echo "START setupssh"
 	echo "running ssh setup"
 	for s in $SERVERS; do
@@ -54,7 +54,7 @@ if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 ######################################################################
 tp1()
 {
-if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 	echo "START $tet_thistest"
 	for s in $SERVERS; do
 		if [ "$s" != "" ]; then
@@ -87,7 +87,7 @@ if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 ######################################################################
 tp2()
 {
-if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 	echo "START $tet_thistest"
 	for s in $SERVERS; do
 		if [ "$s" != "" ]; then
@@ -126,7 +126,7 @@ if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 ######################################################################
 tp3()
 {
-if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 	echo "START $tet_thistest"
 	for s in $SERVERS; do
 		if [ "$s" != "" ]; then
@@ -162,6 +162,7 @@ if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 ######################################################################
 tp4()
 {
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 	echo "START $tet_thistest"
 	for s in $SERVERS; do
 		if [ "$s" != "" ]; then
@@ -197,7 +198,7 @@ tp4()
 ######################################################################
 tp5()
 {
-if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 	echo "START $tet_thistest"
 	# Get the IP of the first server to be used in the DNS tests.
 	eval_vars M1
@@ -235,7 +236,7 @@ if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 ######################################################################
 tp6()
 {
-if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 	echo "START $tet_thistest"
 	for s in $CLIENTS; do
 		if [ "$s" != "" ]; then
@@ -262,7 +263,7 @@ if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 ######################################################################
 tp7()
 {
-if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 	echo "START $tet_thistest"
 
 	for s in $SERVERS; do
@@ -316,7 +317,7 @@ if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 ######################################################################
 tp8()
 {
-if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 	eval_vars M1
 	user1="testusr1"
 	user2="testusr2"
@@ -399,7 +400,7 @@ ipa-deluser $user2;"
 
 instclean()
 {
-if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 	echo "instclean start"
 	for s in $SERVERS; do
 		if [ "$s" != "" ]; then

@@ -82,22 +82,24 @@ tp2()
 }
 
 ######################################################################
-# System login with ssh
+# Login to M1 using kerberos token key passing
 ######################################################################
 tp3()
 {
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 	echo "START $tet_thistest"
+	# Populate file in M1 to check with
+	eval_vars M1
+	# create the file to test through ssh login
+	ssh root@$FULLHOSTNAME "touch /tmp/ipa-client-test.txt"
+	if [ $? -ne 0 ]
+	then
+		echo "ERROR - touch /tmp/ipa-client-test.txt failed on $FULLHOSTNAME"
+		tet_result FAIL
+	fi
+
 	for s in $CLIENTS; do
 		eval_vars $s
-
-		# create the file to test through ssh login
-		ssh root@$FULLHOSTNAME "touch /tmp/ipa-client-test.txt"
-		if [ $? -ne 0 ]
-		then
-			echo "ERROR - touch /tmp/ipa-client-test.txt failed on $FULLHOSTNAME"
-			tet_result FAIL
-		fi
 
 		if [ "$OS" = "RHEL" ]; then
 			# run ssh once to list the contents of /tmp
