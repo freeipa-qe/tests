@@ -43,8 +43,8 @@ SyncDate()
 		if [ "$s" != "" ]; then
 			eval_vars $s
 			# Switch the comment out lines to enable/disable Bug 464828
-			ssh $FULLHOSTNAME "/etc/init.d/ntpd stop;ntpdate $NTPSERVER;/etc/init.d/ipa_kpasswd restart"
 			#ssh $FULLHOSTNAME "/etc/init.d/ntpd stop;ntpdate $NTPSERVER;/etc/init.d/ipa_kpasswd restart"
+			ssh $FULLHOSTNAME "/etc/init.d/ntpd stop;ntpdate $NTPSERVER"
 		fi
 	done
 	for s in $CLIENTS; do
