@@ -12,6 +12,7 @@ set -x
 tp1()
 {
 	echo "START tp1"
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 	for s in $SERVERS; do
 		if [ "$s" != "" ]; then
 			echo "working on $s now"
@@ -41,6 +42,7 @@ tp1()
 tp2()
 {
 	echo "START tp2"
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 	for s in $SERVERS; do
 		if [ "$s" != "" ]; then
 			echo "working on $s now"
@@ -74,6 +76,7 @@ tp2()
 ######################################################################
 tp3()
 {
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 	for s in $SERVERS; do
 		if [ "$s" != "" ]; then
 			echo "working on $s now"

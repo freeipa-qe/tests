@@ -45,6 +45,7 @@ UninstallServer()
 UninstallClientRedhat()
 {
 	eval_vars $1
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 	if [ "$OS" != "RHEL" ]&&[ "$OS" != "FC" ]; then
 		echo "OS isn't \"RHEL\" or \"FC\", it's $OS"
 		echo "returning"
@@ -65,6 +66,7 @@ UninstallClientRedhat()
 UninstallClientSolaris()
 {
 	eval_vars $1
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 	if [ "$OS" != "solaris" ]; then
 		echo "OS isn't \"solaris\", it's $OS";
 		echo "returning";
@@ -568,6 +570,7 @@ PreSetupSolaris()
 	# If the os is solaris, this section does some of the pre-setup for solaris clients
 	echo "If this is the first run of install, back up everything to /ipa-original"
 	echo "backing everything up for restore later"
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 	bkup="/ipa-original"
 	ssh root@$FULLHOSTNAME "if [ ! -d $bkup ]; then mkdir -p $bkup;
 rm -f $bkup/nsswitch.conf; cp /etc/nsswitch.conf $bkup/.;
@@ -620,6 +623,7 @@ SetupRepo()
 
 InstallClientRPMSolaris()
 {
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 	return 0;
 }
 
@@ -866,6 +870,7 @@ UnInstallServerRPM()
 Cleanup()
 {
 	echo "START Cleanup"
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 	rm -f $TET_TMP_DIR/filelist.txt
 	echo '/usr/sbin/ipa*
 /tmp/ipa*' > $TET_TMP_DIR/filelist.txt
