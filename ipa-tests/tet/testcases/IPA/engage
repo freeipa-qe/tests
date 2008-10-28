@@ -1320,7 +1320,7 @@ main_ask()
 		;;
 	esac
 	case $NUMCLIENTS in 
-		0) echo "Alright, no clients in this test"
+		0) CLIENTS="";echo "Alright, no clients in this test"
 		;;
 		1) CLIENTS="C1";ask_c1
 		;;
