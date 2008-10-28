@@ -90,6 +90,7 @@ tp3()
 	echo "START $tet_thistest"
 	# Populate file in M1 to check with
 	eval_vars M1
+	srvhostname=$FULLHOSTNAME
 	# create the file to test through ssh login
 	ssh root@$FULLHOSTNAME "touch /tmp/ipa-client-test.txt"
 	if [ $? -ne 0 ]
@@ -101,43 +102,47 @@ tp3()
 	for s in $CLIENTS; do
 		eval_vars $s
 
-		if [ "$OS" = "RHEL" ]; then
-			# run ssh once to list the contents of /tmp
-		        rm -f $TET_TMP_DIR/ssh.exp
-	        	echo 'set timeout 60
+		KinitAs $s $user1 $user1pw
+
+		# now we need to run ssh on the client to ok the ssh key from the server
+	        rm -f $TET_TMP_DIR/ssh.exp
+        	echo 'set timeout 60
 set send_slow {1 .1}' > $TET_TMP_DIR/ssh.exp
-			echo "spawn /usr/bin/ssh -l $user1 $FULLHOSTNAME 'ls /tmp'" >> $TET_TMP_DIR/ssh.exp
-			echo 'match_max 100000' >> $TET_TMP_DIR/ssh.exp
-			echo 'sleep 4' >> $TET_TMP_DIR/ssh.exp
-		        echo "send -s -- \"yes\"" >> $TET_TMP_DIR/ssh.exp
-		        echo 'send -s -- "\\r"' >> $TET_TMP_DIR/ssh.exp
-			echo 'sleep 7' >> $TET_TMP_DIR/ssh.exp
-		        echo "send -s -- \"$user1pw\"" >> $TET_TMP_DIR/ssh.exp
-		        echo 'send -s -- "\\r"' >> $TET_TMP_DIR/ssh.exp
-			expect $TET_TMP_DIR/ssh.exp >$TET_TMP_DIR/ssh-output.txt
-			if [ $? -ne 0 ]; then
-				echo "ERROR - expect $TET_TMP_DIR/ssh.exp failed"
-				tet_result FAIL
-			fi
+		echo "spawn /usr/bin/ssh -l $user1 $srvhostname 'ls /tmp'" >> $TET_TMP_DIR/ssh.exp
+		echo 'match_max 100000' >> $TET_TMP_DIR/ssh.exp
+		echo 'sleep 4' >> $TET_TMP_DIR/ssh.exp
+	        echo "send -s -- \"yes\"" >> $TET_TMP_DIR/ssh.exp
+	        echo 'send -s -- "\\r"' >> $TET_TMP_DIR/ssh.exp
+		ssh root@$FULLHOSTNAME 'rm -f /tmp/ssh.exp'
+		scp $TET_TMP_DIR/ssh.exp root@$FULLHOSTNAME:/tmp/.
+		ssh root@$FULLHOSTNAME 'expect /tmp/ssh.exp'&
+		sleep 10
 	
+		# Now, ssh from the client to the master, kerberos auth should work here. 
+		ssh root@$FULLHOSTNAME "ssh -l $user1 $srvhostname 'ls /tmp'" > $TET_TMP_DIR/ssh-output.txt &
+		sleep 15
+		grep "ipa-client-test.txt" $TET_TMP_DIR/ssh-output.txt
+		if [ $? -ne 0 ]; then
+			echo "Well that didn't work, lets try again"
+			ssh root@$FULLHOSTNAME "klist"
+			ssh root@$FULLHOSTNAME "ssh -l $user1 $srvhostname 'ls /tmp'" > $TET_TMP_DIR/ssh-output.txt &
+			sleep 15
 			grep "ipa-client-test.txt" $TET_TMP_DIR/ssh-output.txt
 			if [ $? -ne 0 ]; then
-				echo "ERROR - ipa-client-test.txt not found in $TET_TMP_DIR/ssh-output.txt, the ssh login probably didn't work"
-				echo "$TET_TMP_DIR/ssh-output.txt contents are:"
-				cat $TET_TMP_DIR/ssh-output.txt
-				tet_result FAIL
+				echo "Well that didn't work, lets try it a THIRD TIME. We will get a new kinit first."
+				KinitAs $s $user1 $user1pw
+				ssh root@$FULLHOSTNAME "klist"
+				ssh root@$FULLHOSTNAME "ssh -l $user1 $srvhostname 'ls /tmp'" > $TET_TMP_DIR/ssh-output.txt &
+				sleep 15
+				grep "ipa-client-test.txt" $TET_TMP_DIR/ssh-output.txt
+				if [ $? -ne 0 ]; then
+					echo "ERROR - ipa-client-test.txt not found in $TET_TMP_DIR/ssh-output.txt, the ssh login probably didn't work"
+					echo "$TET_TMP_DIR/ssh-output.txt contents are:"
+					cat $TET_TMP_DIR/ssh-output.txt
+					tet_result FAIL
+				fi
 			fi
-		else
-			 echo "skipping, OS is not RHEL"
 		fi
-	
-#		ssh root@$FULLHOSTNAME "ipa-findservice \"$service1\""
-#		if [ $? -ne 0 ]
-#		then
-#			echo "ERROR - ipa-findservice failed on $FULLHOSTNAME"
-#			tet_result FAIL
-#		fi
-
 	done
 
 	tet_result PASS
