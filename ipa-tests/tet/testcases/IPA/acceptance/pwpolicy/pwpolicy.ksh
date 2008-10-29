@@ -233,8 +233,8 @@ tp2()
 	grep 'error' $TET_TMP_DIR/SetUserPassword-output.txt
 	ret1=$?
 	grep 'Could not initialize' $TET_TMP_DIR/SetUserPassword-output.txt
-	if [ $? -eq 0 ]||[ $ret1 -eq 0 ]; then
-		echo "ERROR - change password produced a error"
+	if [ $? -eq 0 ]||[ $ret1 -ne 0 ]; then
+		echo "ERROR - change password produced a error it should not have."
 		echo "Test - $tet_thistest"
 		echo "kinit is:"
 		ssh root@$FULLHOSTNAME "klist"
@@ -356,8 +356,7 @@ tp2a()
 
 	# set password policy
 	# first set it to a value so the change to 0 won't fail
-	ssh root@$FULLHOSTNAME "ipa-pwpolicy --minlife 20"
-	ssh root@$FULLHOSTNAME "ipa-pwpolicy --minlife 0"
+	ssh root@$FULLHOSTNAME "ipa-pwpolicy --minlife 20;ipa-pwpolicy --minlife 0"
 	if [ $? -ne 0 ]; then
 		echo "ERROR - ipa-pwpolicy on $FULLHOSTNAME failed"
 		echo "Test - $tet_thistest"
@@ -525,8 +524,7 @@ tp2c()
 	fi
 
 	# resetting password policy 
-	ssh root@$FULLHOSTNAME "ipa-pwpolicy --minlife 0"
-	ssh root@$FULLHOSTNAME "ipa-pwpolicy --maxlife 7"
+	ssh root@$FULLHOSTNAME "ipa-pwpolicy --minlife 0;ipa-pwpolicy --maxlife 7"
 	if [ $? -ne 0 ]; then
 		echo "ERROR - ipa-pwpolicy on $FULLHOSTNAME failed"
 		echo "Test - $tet_thistest"
@@ -599,8 +597,7 @@ tp3()
 	fi
 
 	# set password policy
-	ssh root@$FULLHOSTNAME "ipa-pwpolicy --minlife 0"
-	ssh root@$FULLHOSTNAME "ipa-pwpolicy --maxlife $maxlife"
+	ssh root@$FULLHOSTNAME "ipa-pwpolicy --minlife 0;ipa-pwpolicy --maxlife $maxlife"
 	if [ $? -ne 0 ]; then
 		echo "ERROR - ipa-pwpolicy on $FULLHOSTNAME failed"
 		echo "Test - $tet_thistest"
@@ -720,8 +717,7 @@ tp3()
 	fi
 
 	# resetting password policy 
-	ssh root@$FULLHOSTNAME "ipa-pwpolicy --minlife 0"
-	ssh root@$FULLHOSTNAME "ipa-pwpolicy --maxlife 7"
+	ssh root@$FULLHOSTNAME "ipa-pwpolicy --minlife 0;ipa-pwpolicy --maxlife 7"
 	if [ $? -ne 0 ]; then
 		echo "ERROR - ipa-pwpolicy on $FULLHOSTNAME failed"
 		echo "Test - $tet_thistest"
@@ -759,8 +755,7 @@ tp3a()
 	eval_vars M1
 	
 	# set minlife to 2160 
-	ssh root@$FULLHOSTNAME "ipa-pwpolicy --maxlife 400"
-	ssh root@$FULLHOSTNAME "ipa-pwpolicy --minlife 2160"
+	ssh root@$FULLHOSTNAME "ipa-pwpolicy --maxlife 400;ipa-pwpolicy --minlife 2160"
 	if [ $? -ne 0 ]; then
 		echo "ERROR - ipa-pwpolicy --minlife 2160 on $FULLHOSTNAME failed"
 		echo "Test - $tet_thistest"
@@ -778,8 +773,7 @@ tp3a()
 	fi
 	
 	# resetting password policy 
-	ssh root@$FULLHOSTNAME "ipa-pwpolicy --minlife 0"
-	ssh root@$FULLHOSTNAME "ipa-pwpolicy --maxlife 7"
+	ssh root@$FULLHOSTNAME "ipa-pwpolicy --minlife 0;ipa-pwpolicy --maxlife 7"
 	if [ $? -ne 0 ]; then
 		echo "ERROR - ipa-pwpolicy on $FULLHOSTNAME failed"
 		echo "Test - $tet_thistest"
@@ -1395,6 +1389,7 @@ tp4a()
 	if [ $? -eq 0 ]; then
 		echo "ERROR - KinitAsFirst didn't seem to work."
 		echo "Test - $tet_thistest"
+		echo "Perhaps Bug https://bugzilla.redhat.com/show_bug.cgi?id=467973 hasn't been fixed"
 		echo "contents of $TET_TMP_DIR/KinitAsFirst-out.txt are:"
 		cat $TET_TMP_DIR/KinitAsFirst-out.txt
 		echo "contents of $TET_TMP_DIR/KinitAsFirst-out.txt complete:"
@@ -1467,8 +1462,7 @@ tp4a()
 	ssh root@$FULLHOSTNAME "ipa-deluser $user1"
 
 	# resetting password policy 
-	ssh root@$FULLHOSTNAME "ipa-pwpolicy --history 20"
-	ssh root@$FULLHOSTNAME "ipa-pwpolicy --history 0"
+	ssh root@$FULLHOSTNAME "ipa-pwpolicy --history 20;ipa-pwpolicy --history 0"
 	if [ $? -ne 0 ]; then
 		echo "ERROR - ipa-pwpolicy on $FULLHOSTNAME failed"
 		echo "Test - $tet_thistest"
@@ -1501,8 +1495,7 @@ tp4b()
 	eval_vars M1	
 
 	# set password policy
-	ssh root@$FULLHOSTNAME "ipa-pwpolicy --history 20"
-	ssh root@$FULLHOSTNAME "ipa-pwpolicy --history -1" 
+	ssh root@$FULLHOSTNAME "ipa-pwpolicy --history 20;ipa-pwpolicy --history -1" 
 	if [ $? -eq 0 ]; then
 		echo "ERROR - ipa-pwpolicy on $FULLHOSTNAME passed when is should not have"
 		echo "possibly because bug https://bugzilla.redhat.com/show_bug.cgi?id=461543 is not fixed"
@@ -1511,8 +1504,7 @@ tp4b()
 	fi
 
 	# resetting password policy 
-	ssh root@$FULLHOSTNAME "ipa-pwpolicy --history 20"
-	ssh root@$FULLHOSTNAME "ipa-pwpolicy --history 0"
+	ssh root@$FULLHOSTNAME "ipa-pwpolicy --history 20;ipa-pwpolicy --history 0"
 	if [ $? -ne 0 ]; then
 		echo "ERROR - ipa-pwpolicy on $FULLHOSTNAME failed"
 		echo "Test - $tet_thistest"
@@ -1701,8 +1693,7 @@ tp5a()
 		tet_result FAIL
 	fi
 
-	ssh root@$FULLHOSTNAME "ipa-pwpolicy --minlife 44"
-	ssh root@$FULLHOSTNAME "ipa-pwpolicy --minlife 0"
+	ssh root@$FULLHOSTNAME "ipa-pwpolicy --minlife 44;ipa-pwpolicy --minlife 0"
 	if [ $? -ne 0 ]; then
 		echo "ERROR - ipa-pwpolicy on $FULLHOSTNAME failed"
 		echo "Test - $tet_thistest"
@@ -1710,7 +1701,7 @@ tp5a()
 	fi
 
 	# set password policy
-	ssh root@$FULLHOSTNAME "ipa-pwpolicy --minclasses 0"
+	ssh root@$FULLHOSTNAME "ipa-pwpolicy --minclasses 2;ipa-pwpolicy --minclasses 0"
 	if [ $? -ne 0 ]; then
 		echo "ERROR - ipa-pwpolicy on $FULLHOSTNAME failed"
 		echo "Test - $tet_thistest"
@@ -1811,10 +1802,7 @@ tp6()
 		tet_result FAIL
 	fi
 	# set password policy
-	ssh root@$FULLHOSTNAME "ipa-pwpolicy --minlife 0"
-	ssh root@$FULLHOSTNAME "ipa-pwpolicy --minclasses 0"
-	ssh root@$FULLHOSTNAME "ipa-pwpolicy --minlength 20"
-	ssh root@$FULLHOSTNAME "ipa-pwpolicy --minlength 9"
+	ssh root@$FULLHOSTNAME "ipa-pwpolicy --minlife 0;ipa-pwpolicy --minclasses 0;ipa-pwpolicy --minlength 20;ipa-pwpolicy --minlength 9"
 	if [ $? -ne 0 ]; then
 		echo "ERROR - ipa-pwpolicy on $FULLHOSTNAME failed"
 		echo "Test - $tet_thistest"
@@ -1995,10 +1983,7 @@ tp6a()
 		tet_result FAIL
 	fi
 	# set password policy
-	ssh root@$FULLHOSTNAME "ipa-pwpolicy --minlife 0"
-	ssh root@$FULLHOSTNAME "ipa-pwpolicy --minclasses 0"
-	ssh root@$FULLHOSTNAME "ipa-pwpolicy --minlength 20"
-	ssh root@$FULLHOSTNAME "ipa-pwpolicy --minlength 1"
+	ssh root@$FULLHOSTNAME "ipa-pwpolicy --minlife 0;ipa-pwpolicy --minclasses 0;ipa-pwpolicy --minlength 20;ipa-pwpolicy --minlength 1"
 	if [ $? -ne 0 ]; then
 		echo "ERROR - ipa-pwpolicy on $FULLHOSTNAME failed"
 		echo "Test - $tet_thistest"
