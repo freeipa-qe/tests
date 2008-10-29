@@ -124,22 +124,30 @@ set send_slow {1 .1}' > $TET_TMP_DIR/ssh.exp
 		grep "ipa-client-test.txt" $TET_TMP_DIR/ssh-output.txt
 		if [ $? -ne 0 ]; then
 			echo "Well that didn't work, lets try again"
-			ssh root@$FULLHOSTNAME "klist"
-			ssh root@$FULLHOSTNAME "ssh -l $user1 $srvhostname 'ls /tmp'" > $TET_TMP_DIR/ssh-output.txt &
+			cat $TET_TMP_DIR/ssh-output.txt
+			ssh root@$FULLHOSTNAME "klist;ssh -l $user1 $srvhostname 'ls /tmp'" > $TET_TMP_DIR/ssh-output.txt &
 			sleep 15
 			grep "ipa-client-test.txt" $TET_TMP_DIR/ssh-output.txt
 			if [ $? -ne 0 ]; then
 				echo "Well that didn't work, lets try it a THIRD TIME. We will get a new kinit first."
 				KinitAs $s $user1 $user1pw
-				ssh root@$FULLHOSTNAME "klist"
-				ssh root@$FULLHOSTNAME "ssh -l $user1 $srvhostname 'ls /tmp'" > $TET_TMP_DIR/ssh-output.txt &
+				cat $TET_TMP_DIR/ssh-output.txt
+				ssh root@$FULLHOSTNAME "klist;ssh -l $user1 $srvhostname 'ls /tmp'" > $TET_TMP_DIR/ssh-output.txt &
 				sleep 15
 				grep "ipa-client-test.txt" $TET_TMP_DIR/ssh-output.txt
 				if [ $? -ne 0 ]; then
-					echo "ERROR - ipa-client-test.txt not found in $TET_TMP_DIR/ssh-output.txt, the ssh login probably didn't work"
-					echo "$TET_TMP_DIR/ssh-output.txt contents are:"
+					echo "Well that didn't work, lets try it a FOURTH TIME. We will get a new kinit first."
+					KinitAs $s $user1 $user1pw
 					cat $TET_TMP_DIR/ssh-output.txt
-					tet_result FAIL
+					ssh root@$FULLHOSTNAME "klist;ssh -l $user1 $srvhostname 'ls /tmp'" > $TET_TMP_DIR/ssh-output.txt 
+#					sleep 60
+					grep "ipa-client-test.txt" $TET_TMP_DIR/ssh-output.txt
+					if [ $? -ne 0 ]; then
+						echo "ERROR - ipa-client-test.txt not found in $TET_TMP_DIR/ssh-output.txt, the ssh login probably didn't work"
+						echo "$TET_TMP_DIR/ssh-output.txt contents are:"
+						cat $TET_TMP_DIR/ssh-output.txt
+						tet_result FAIL
+					fi
 				fi
 			fi
 		fi
@@ -172,8 +180,7 @@ client_cleanup()
 	#ssh root@$FULLHOSTNAME "ipa-modgroup -a usermod1 modusers"
 	#let code=$code+$?
 
-	if [ $code -ne 0 ]
-	then
+	if [ $code -ne 0 ]; then
 		echo "ERROR - setup for $tet_thistest failed"
 		tet_result FAIL
 	fi
