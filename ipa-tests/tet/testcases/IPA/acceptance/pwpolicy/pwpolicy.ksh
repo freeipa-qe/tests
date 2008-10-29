@@ -42,8 +42,6 @@ SyncDate()
 	for s in $SERVERS; do
 		if [ "$s" != "" ]; then
 			eval_vars $s
-			# Switch the comment out lines to enable/disable Bug 464828
-			#ssh $FULLHOSTNAME "/etc/init.d/ntpd stop;ntpdate $NTPSERVER;/etc/init.d/ipa_kpasswd restart"
 			ssh $FULLHOSTNAME "/etc/init.d/ntpd stop;ntpdate $NTPSERVER"
 		fi
 	done
@@ -55,12 +53,33 @@ SyncDate()
 	done
 }
 ######################################################################
+
+#####################################################################
+SyncKpasswd()
+{
+	for s in $SERVERS; do
+		if [ "$s" != "" ]; then
+			eval_vars $s
+			ssh $FULLHOSTNAME "/etc/init.d/ntpd stop;ntpdate $NTPSERVER;/etc/init.d/ipa_kpasswd restart"
+		fi
+	done
+	for s in $CLIENTS; do
+		if [ "$s" != "" ]; then
+			eval_vars $s
+			ssh $FULLHOSTNAME "/etc/init.d/ntpd stop;ntpdate $NTPSERVER"
+		fi
+	done
+}
+######################################################################
+
 ResetKinit()
 {
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
         # Kinit everywhere
         for s in $SERVERS; do
                 if [ "$s" != "" ]; then
+			eval_vars $s
+			ssh $FULLHOSTNAME "/etc/init.d/ntpd stop;ntpdate $NTPSERVER;/etc/init.d/ipa_kpasswd restart"
                         echo "kiniting as $DS_USER, password $DM_ADMIN_PASS on $s"
                         KinitAs $s $DS_USER $DM_ADMIN_PASS
                         ret=$?
@@ -140,7 +159,7 @@ tp2()
 
 	eval_vars M1
 	# add user to test with
-	ssh root@$FULLHOSTNAME "ipa-adduser -f 'test user 1' -l 'lastname' $user1;"
+	ssh root@$FULLHOSTNAME "ipa-deluser $user1;ipa-adduser -f 'test user 1' -l 'lastname' $user1;"
 	if [ $? != 0 ]; then
 		echo "ERROR - ipa-adduser failed on $FULLHOSTNAME";
 		echo "Test - $tet_thistest"
@@ -197,6 +216,8 @@ tp2()
 		tet_result FAIL
 	fi
 
+	ssh root@$FULLHOSTNAME "/etc/init.d/ipa_kpasswd restart"
+
 	# Now attempt to set the password of user1, this should fail.
 	echo "This should fail because the min password age hasn't been reached yet"
 	SetUserPassword M1 $user1 $user1pw3
@@ -210,11 +231,15 @@ tp2()
 	fi
 	# Now, parse the output of the last SetUserPassword to ensure that it failed properly.
 	grep 'error' $TET_TMP_DIR/SetUserPassword-output.txt
-	if [ $? -ne 0 ]; then
+	ret1=$?
+	grep 'Could not initialize' $TET_TMP_DIR/SetUserPassword-output.txt
+	if [ $? -eq 0 ]||[ $ret1 -eq 0 ]; then
 		echo "ERROR - change password produced a error"
 		echo "Test - $tet_thistest"
 		echo "kinit is:"
 		ssh root@$FULLHOSTNAME "klist"
+		echo "pwpolicy on $FULLHOSTNAME is:"
+		ssh root@$FULLHOSTNAME "ipa-pwpolicy --show"
 		echo "contents of $TET_TMP_DIR/SetUserPassword-output.txt are:"
 		cat $TET_TMP_DIR/SetUserPassword-output.txt
 		echo "contents of $TET_TMP_DIR/SetUserPassword-output.txt complete:"
@@ -238,6 +263,8 @@ tp2()
 		echo "Test - $tet_thistest"
 		tet_result FAIL
 	fi
+
+	ssh root@$FULLHOSTNAME "/etc/init.d/ipa_kpasswd restart"
 
 	# Now attempt to set the password of user1, this should pass.
 	SetUserPassword M1 $user1 $user1pw4
@@ -271,7 +298,7 @@ tp2()
 	# cleaning up the user
 	ssh root@$FULLHOSTNAME "ipa-deluser $user1"
 
-	SyncDate
+	SyncKpasswd
 	eval_vars M1
 
 	echo "END $tet_thistest"
@@ -312,7 +339,7 @@ tp2a()
 
 	eval_vars M1
 	# add user to test with
-	ssh root@$FULLHOSTNAME "ipa-adduser -f 'test user 1' -l 'lastname' $user1;"
+	ssh root@$FULLHOSTNAME "ipa-deluser $user1;ipa-adduser -f 'test user 1' -l 'lastname' $user1;"
 	if [ $? != 0 ]; then
 		echo "ERROR - ipa-adduser failed on $FULLHOSTNAME";
 		echo "Test - $tet_thistest"
@@ -387,7 +414,7 @@ tp2a()
 	# cleaning up the user
 	ssh root@$FULLHOSTNAME "ipa-deluser $user1"
 
-	SyncDate
+	SyncKpasswd
 	eval_vars M1
 
 	echo "END $tet_thistest"
@@ -414,21 +441,9 @@ tp2b()
 	user1pw3="lo9sh3ncd765"
 
 	eval_vars M1
-	# set date on m1 to make sure it's what we think it is
-	get_time
-	ssh root@$FULLHOSTNAME "date $month$day$hour$min$year"
-	if [ $? -ne 0 ]; then
-		echo "ERROR - setting the date on $FULLHOSTNAME failed"
-		echo "Test - $tet_thistest"
-		tet_result FAIL
-	fi
-
-	# Get a new admin ticket to be sure that the ticket won't be expired
-	ResetKinit	
-	eval_vars M1
 
 	# add user to test with
-	ssh root@$FULLHOSTNAME "ipa-adduser -f 'test user 1' -l 'lastname' $user1;"
+	ssh root@$FULLHOSTNAME "ipa-deluser $user1;ipa-adduser -f 'test user 1' -l 'lastname' $user1;"
 	if [ $? != 0 ]; then
 		echo "ERROR - ipa-adduser failed on $FULLHOSTNAME";
 		echo "Test - $tet_thistest"
@@ -463,7 +478,7 @@ tp2b()
 	# cleaning up the user
 	ssh root@$FULLHOSTNAME "ipa-deluser $user1"
 
-	SyncDate
+	SyncKpasswd
 	eval_vars M1
 
 	echo "END $tet_thistest"
@@ -555,6 +570,7 @@ tp3()
 
 	eval_vars M1
 	# set date on m1 to make sure it's what we think it is
+	ResetKinit	
 	get_time
 	ssh root@$FULLHOSTNAME "date $month$day$hour$min$year"
 	if [ $? -ne 0 ]; then
@@ -564,11 +580,10 @@ tp3()
 	fi
 
 	# Get a new admin ticket to be sure that the ticket won't be expired
-	ResetKinit	
 	eval_vars M1
 
 	# add user to test with
-	ssh root@$FULLHOSTNAME "ipa-adduser -f 'test user 1' -l 'lastname' $user1;"
+	ssh root@$FULLHOSTNAME "ipa-deluser $user1;ipa-adduser -f 'test user 1' -l 'lastname' $user1;"
 	if [ $? != 0 ]; then
 		echo "ERROR - ipa-adduser failed on $FULLHOSTNAME";
 		echo "Test - $tet_thistest"
@@ -658,6 +673,8 @@ tp3()
 		tet_result FAIL
 	fi
 
+	ssh root@$FULLHOSTNAME "/etc/init.d/ipa_kpasswd restart"
+
 	# kinit as the user
 	ssh root@$FULLHOSTNAME "kdestroy"
 	if [ $? -ne 0 ]; then
@@ -711,7 +728,7 @@ tp3()
 		tet_result FAIL
 	fi
 
-	SyncDate
+	SyncKpasswd
 	eval_vars M1
 
 	tet_result PASS
@@ -819,7 +836,7 @@ tp3b()
 	eval_vars M1
 
 	# add user to test with
-	ssh root@$FULLHOSTNAME "ipa-adduser -f 'test user 1' -l 'lastname' $user1;"
+	ssh root@$FULLHOSTNAME "ipa-deluser $user1;ipa-adduser -f 'test user 1' -l 'lastname' $user1;"
 	if [ $? != 0 ]; then
 		echo "ERROR - ipa-adduser failed on $FULLHOSTNAME";
 		echo "Test - $tet_thistest"
@@ -909,6 +926,8 @@ tp3b()
 		tet_result FAIL
 	fi
 
+	ssh root@$FULLHOSTNAME "/etc/init.d/ipa_kpasswd restart"
+
 	# kinit as the user
 	ssh root@$FULLHOSTNAME "kdestroy"
 	if [ $? -ne 0 ]; then
@@ -959,7 +978,7 @@ tp3b()
 		tet_result FAIL
 	fi
 
-	SyncDate
+	SyncKpasswd
 	eval_vars M1
 
 	tet_result PASS
@@ -1008,7 +1027,7 @@ tp4()
 	#   5. create a user "usr", set the default password to "redhat000"
 
 	# add user to test with
-	ssh root@$FULLHOSTNAME "ipa-adduser -f 'test user 1' -l 'lastname' $user1;"
+	ssh root@$FULLHOSTNAME "ipa-deluser $user1;ipa-adduser -f 'test user 1' -l 'lastname' $user1;"
 	if [ $? != 0 ]; then
 		echo "ERROR - ipa-adduser failed on $FULLHOSTNAME";
 		echo "Test - $tet_thistest"
@@ -1304,7 +1323,7 @@ tp4a()
 
 	eval_vars M1	
 	# add user to test with
-	ssh root@$FULLHOSTNAME "ipa-adduser -f 'test user 1' -l 'lastname' $user1;"
+	ssh root@$FULLHOSTNAME "ipa-deluser $user1;ipa-adduser -f 'test user 1' -l 'lastname' $user1;"
 	if [ $? != 0 ]; then
 		echo "ERROR - ipa-adduser failed on $FULLHOSTNAME";
 		echo "Test - $tet_thistest"
@@ -1522,7 +1541,7 @@ tp5()
 
 	eval_vars M1
 	# add user to test with
-	ssh root@$FULLHOSTNAME "ipa-adduser -f 'test user 1' -l 'lastname' $user1;"
+	ssh root@$FULLHOSTNAME "ipa-deluser $user1;ipa-adduser -f 'test user 1' -l 'lastname' $user1;"
 	if [ $? != 0 ]; then
 		echo "ERROR - ipa-adduser failed on $FULLHOSTNAME";
 		echo "Test - $tet_thistest"
@@ -1667,7 +1686,7 @@ tp5a()
 
 	eval_vars M1
 	# add user to test with
-	ssh root@$FULLHOSTNAME "ipa-adduser -f 'test user 1' -l 'lastname' $user1;"
+	ssh root@$FULLHOSTNAME "ipa-deluser $user1;ipa-adduser -f 'test user 1' -l 'lastname' $user1;"
 	if [ $? != 0 ]; then
 		echo "ERROR - ipa-adduser failed on $FULLHOSTNAME";
 		echo "Test - $tet_thistest"
@@ -1777,7 +1796,7 @@ tp6()
 
 	eval_vars M1
 	# add user to test with
-	ssh root@$FULLHOSTNAME "ipa-adduser -f 'test user 1' -l 'lastname' $user1;"
+	ssh root@$FULLHOSTNAME "ipa-deluser $user1;ipa-adduser -f 'test user 1' -l 'lastname' $user1;"
 	if [ $? != 0 ]; then
 		echo "ERROR - ipa-adduser failed on $FULLHOSTNAME";
 		echo "Test - $tet_thistest"
@@ -1961,7 +1980,7 @@ tp6a()
 
 	eval_vars M1
 	# add user to test with
-	ssh root@$FULLHOSTNAME "ipa-adduser -f 'test user 1' -l 'lastname' $user1;"
+	ssh root@$FULLHOSTNAME "ipa-deluser $user1;ipa-adduser -f 'test user 1' -l 'lastname' $user1;"
 	if [ $? != 0 ]; then
 		echo "ERROR - ipa-adduser failed on $FULLHOSTNAME";
 		echo "Test - $tet_thistest"
