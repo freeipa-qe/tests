@@ -372,6 +372,7 @@ set send_slow {1 .1}' > $TET_TMP_DIR/kinit.exp
 	fi
 	echo "This is a klist on the machine we just kinited on, it should show that user $2 is kinited"
 	ssh root@$FULLHOSTNAME 'klist' > $TET_TMP_DIR/KinitAsFirst-output.txt
+	cat $TET_TMP_DIR/KinitAsFirst-output.txt
 	grep $2 $TET_TMP_DIR/KinitAsFirst-output.txt
 	if [ $? -ne 0 ]; then
 		echo "oops, that didn't work. Re-syncing everything and trying again"
@@ -402,6 +403,7 @@ set send_slow {1 .1}' > $TET_TMP_DIR/kinit.exp
 		fi
 		echo "This is a klist on the machine we just kinited on, it should show that user $2 is kinited"
 		ssh root@$FULLHOSTNAME 'klist' > $TET_TMP_DIR/KinitAsFirst-output.txt
+		cat $TET_TMP_DIR/KinitAsFirst-output.txt
 		grep $2 $TET_TMP_DIR/KinitAsFirst-output.txt
 		if [ $? -ne 0 ]; then
 			echo "ERROR - error in KinitAsFirst, kinit didn't appear to work, $2 not found in $TET_TMP_DIR/KinitAsFirst-output.txt"

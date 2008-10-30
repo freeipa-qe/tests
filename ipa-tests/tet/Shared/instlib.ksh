@@ -106,6 +106,58 @@ UninstallClient()
 
 }
 
+ImproveKeytab()
+{
+	eval_vars M1
+	m1hostname=$FULLHOSTNAME
+	eval_vars $1
+	echo "adding services host/$FULLHOSTNAME to M1"
+	echo "rm -f /tmp/krb5.keytab.$FULLHOSTNAME
+ipa-addservice nfs/$FULLHOSTNAME
+ipa-getkeytab -s $m1hostname -p nfs/$FULLHOSTNAME -k /tmp/krb5.keytab.$FULLHOSTNAME -e des-cbc-crc 
+ipa-addservice host/$FULLHOSTNAME 
+ipa-getkeytab -s $m1hostname -p host/$FULLHOSTNAME -k /tmp/krb5.keytab.$FULLHOSTNAME -e des-cbc-crc
+klist -ket /tmp/krb5.keytab.$FULLHOSTNAME" > $TET_TMP_DIR/$1-cmds.txt
+
+	chmod 755 $TET_TMP_DIR/$1-cmds.txt
+	ssh root@$m1hostname "rm -f /tmp/$1-cmds.txt"
+	scp $TET_TMP_DIR/$1-cmds.txt root@$m1hostname:/tmp/.
+	ssh root@$m1hostname "/tmp/$1-cmds.txt"
+	# for all in file do ssh blah	
+#	cat $TET_TMP_DIR/$1-cmds.txt | while read c; do
+#		ssh root@$m1hostname "$c"
+#		if [ $? -ne 0 ]; then
+#			echo "ERROR - $c on $m1hostname failed!"
+#			return 1;
+#		fi
+#	done
+
+	echo "Improve keytab on $FULLHOSTNAME"
+	case $OS in
+		"RHEL")     kdest="/etc/krb5.keytab"       ;;
+                "FC")       kdest="/etc/krb5.keytab"       ;;
+		"solaris")  kdest="/etc/krb5/krb5.keytab"     ;;
+                *)      echo "unknown OS"        ;;
+        esac
+
+	rm -f $TET_TMP_DIR/krb5.keytab.$FULLHOSTNAME
+	scp root@$m1hostname:/tmp/krb5.keytab.$FULLHOSTNAME $TET_TMP_DIR/krb5.keytab.$FULLHOSTNAME
+	if [ $? -ne 0 ]; then
+		echo "ERROR - scp of file to $m1hostname failed"
+		return 1;
+	fi
+	ssh root@$FULLHOSTNAME "rm -f /tmp/krb5.keytab.$FULLHOSTNAME;rm -f $kdest"
+	if [ $? -ne 0 ]; then
+		echo "ERROR - ssh of file to $FULLHOSTNAME failed"
+		return 1;
+	fi
+	scp $TET_TMP_DIR/krb5.keytab.$FULLHOSTNAME root@$FULLHOSTNAME:$kdest
+	if [ $? -ne 0 ]; then
+		echo "ERROR - scp of file to $FULLHOSTNAME failed"
+		return 1;
+	fi
+}
+
 InstallClientSolaris()
 {
 	if [ $DSTET_DEBUG = y ]; then set -x; fi
@@ -188,45 +240,8 @@ cat /tmp/pam-tmp.conf > /etc/pam.conf" > $TET_TMP_DIR/pam.sh
 		echo "ERROR - scp of file to $FULLHOSTNAME failed"
 		return 1;
 	fi
-
-	echo "adding services host/$FULLHOSTNAME to M1"
-	echo "rm -f /tmp/krb5.keytab.$FULLHOSTNAME
-ipa-addservice nfs/$FULLHOSTNAME
-ipa-getkeytab -s $m1hostname -p nfs/$FULLHOSTNAME -k /tmp/krb5.keytab.$FULLHOSTNAME -e des-cbc-crc 
-ipa-addservice host/$FULLHOSTNAME 
-ipa-getkeytab -s $m1hostname -p host/$FULLHOSTNAME -k /tmp/krb5.keytab.$FULLHOSTNAME -e des-cbc-crc
-klist -ket /tmp/krb5.keytab.$FULLHOSTNAME" > $TET_TMP_DIR/$1-cmds.txt
-
-	chmod 755 $TET_TMP_DIR/$1-cmds.txt
-	ssh root@$m1hostname "rm -f /tmp/$1-cmds.txt"
-	scp $TET_TMP_DIR/$1-cmds.txt root@$m1hostname:/tmp/.
-	ssh root@$m1hostname "/tmp/$1-cmds.txt"
-	# for all in file do ssh blah	
-#	cat $TET_TMP_DIR/$1-cmds.txt | while read c; do
-#		ssh root@$m1hostname "$c"
-#		if [ $? -ne 0 ]; then
-#			echo "ERROR - $c on $m1hostname failed!"
-#			return 1;
-#		fi
-#	done
-
-	echo "Improve keytab on $FULLHOSTNAME"
-	rm -f $TET_TMP_DIR/krb5.keytab.$FULLHOSTNAME
-	scp root@$m1hostname:/tmp/krb5.keytab.$FULLHOSTNAME $TET_TMP_DIR/krb5.keytab.$FULLHOSTNAME
-	if [ $? -ne 0 ]; then
-		echo "ERROR - scp of file to $m1hostname failed"
-		return 1;
-	fi
-	ssh root@$FULLHOSTNAME "rm -f /tmp/krb5.keytab.$FULLHOSTNAME;rm -f /etc/krb5/krb5.keytab"
-	if [ $? -ne 0 ]; then
-		echo "ERROR - ssh of file to $FULLHOSTNAME failed"
-		return 1;
-	fi
-	scp $TET_TMP_DIR/krb5.keytab.$FULLHOSTNAME root@$FULLHOSTNAME:/etc/krb5/krb5.keytab
-	if [ $? -ne 0 ]; then
-		echo "ERROR - scp of file to $FULLHOSTNAME failed"
-		return 1;
-	fi
+	
+	ImproveKeytab $1
 #		echo 'set force_conservative 0  ; 
 #if {$force_conservative} {
 #        set send_slow {1 .1}
@@ -285,6 +300,9 @@ SetupClientRedhat()
 			return 1;
 		fi
 	fi
+
+	ImproveKeytab
+	ssh root@$FULLHOSTNAME "/etc/init.d/rpcgssd restart;/etc/init.d/nfs restart"
 
 	return 0;
 }
