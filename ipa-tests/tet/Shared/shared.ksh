@@ -38,6 +38,7 @@ eval_vars()
 # Runs ntpdate $NTPSERVER on the machine specified in $1
 set_date()
 {
+	if [ $DSTET_DEBUG = y ]; then set -x; fi
 	ssh $1 "date;/etc/init.d/ntpd stop;ntpdate $NTPSERVER"&
 	return 0
 }
@@ -548,4 +549,38 @@ setup_ssh_keys()
 	fi
 
 }
+
+
+ResetKinit()
+{
+        if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+        # Kinit everywhere
+        for s in $SERVERS; do
+                if [ "$s" != "" ]; then
+			eval_vars $s
+			ssh $FULLHOSTNAME "/etc/init.d/ntpd stop;ntpdate $NTPSERVER;/etc/init.d/ipa_kpasswd restart"
+                        echo "kiniting as $DS_USER, password $DM_ADMIN_PASS on $s"
+                        KinitAs $s $DS_USER $DM_ADMIN_PASS
+                        ret=$?
+                        if [ $ret -ne 0 ]; then
+                                echo "ERROR - kinit on $s failed"
+				echo "Test - $tet_thistest - ResetKinit"
+                                tet_result FAIL
+                        fi
+                fi
+        done
+        for s in $CLIENTS; do
+                if [ "$s" != "" ]; then
+                        echo "kiniting as $DS_USER, password $DM_ADMIN_PASS on $s"
+                        KinitAs $s $DS_USER $DM_ADMIN_PASS
+                        ret=$?
+                        if [ $ret -ne 0 ]; then
+                                echo "ERROR - kinit on $s failed"
+				echo "Test - $tet_thistest - ResetKinit"
+                                tet_result FAIL
+                        fi
+                fi
+        done
+}
+
 
