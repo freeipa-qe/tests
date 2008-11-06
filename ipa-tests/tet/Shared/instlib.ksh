@@ -208,10 +208,21 @@ sed s/group.*files/'group: files ldap[NOTFOUND=return]'/g < /tmp/nsswitchtmp > /
 	fi
 
 	echo "changing pam.conf"
-	if [ "$OS_VER" == "8" ]; then
+	if [ "$OS_VER" == "7" ]; then
 		echo 'login auth sufficient /usr/lib/security/pam_krb5.so
 login auth required /usr/lib/security/pam_unix.so use_first_pass
 login auth required /usr/lib/security/$ISA/pam_dial_auth.so.1' > $TET_TMP_DIR/solaris-pam-tmp.txt
+	elif [ "$OS_VER" == "8" ]; then
+		echo 'login auth sufficient /usr/lib/security/pam_krb5.so
+login auth required /usr/lib/security/pam_unix.so use_first_pass
+login auth required /usr/lib/security/$ISA/pam_dial_auth.so.1' > $TET_TMP_DIR/solaris-pam-tmp.txt
+	elif [ "$OS_VER" == "9" ]; then
+		echo 'login auth requisite pam_authtok_get.so.1
+login auth sufficient pam_krb5.so.1 use_first_pass
+login auth sufficient pam_unix.so.1 use_first_pass
+login auth required pam_dhkeys.so.1
+login auth required pam_unix_auth.so.1
+login auth required pam_dial_auth.so.1' > $TET_TMP_DIR/solaris-pam-tmp.txt
 	elif [ "$OS_VER" == "10" ]; then
 		echo "login auth requisite pam_authtok_get.so.1
 login auth sufficient pam_krb5.so.1
