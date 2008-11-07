@@ -1473,13 +1473,13 @@ main_ask()
 	if [ "$engage_debug" = "y" ]; then set -x; fi
 
 	TestChoice=1
-	echo "How many servers are in this test(not clients)? (4 max for now)"
+	echo "How many servers are in this test(not clients)? (4 max)"
 	echo "default $NUMSERVERS"
 	echo "->"
 	read rsp
 	if [ -z "$rsp" ] ; then echo "number of servers unchanged"; else NUMSERVERS="$rsp"; fi
 	
-	echo "How many clients are in this test? (4 max for now)"
+	echo "How many clients are in this test? (8 max)"
 	echo "Hit \"Enter\", without any input for none"
 	echo "default $NUMCLIENTS"
 	echo "->"
@@ -1511,6 +1511,14 @@ main_ask()
 		3) CLIENTS="C1 C2 C3";ask_c1;ask_c2;ask_c3
 		;;
 		4) CLIENTS="C1 C2 C3 C4";ask_c1;ask_c2;ask_c3;ask_c4
+		;;			
+		5) CLIENTS="C1 C2 C3 C4 C5";ask_c1;ask_c2;ask_c3;ask_c4;ask_c5
+		;;			
+		6) CLIENTS="C1 C2 C3 C4 C5 C6";ask_c1;ask_c2;ask_c3;ask_c4;ask_c5;ask_c6
+		;;			
+		7) CLIENTS="C1 C2 C3 C4 C5 C6 C7";ask_c1;ask_c2;ask_c3;ask_c4;ask_c5;ask_c6;ask_c7
+		;;			
+		8) CLIENTS="C1 C2 C3 C4 C5 C6 C7 C8";ask_c1;ask_c2;ask_c3;ask_c4;ask_c5;ask_c6;ask_c7;ask_c8
 		;;			
 		*) echo "No Clients in this test";
 		;;
@@ -2292,6 +2300,10 @@ main_main()
 	export HOSTNAME_C2 OS_C2 REPO_C2 OS_VER_C2
 	export HOSTNAME_C3 OS_C3 REPO_C3 OS_VER_C3
 	export HOSTNAME_C4 OS_C4 REPO_C4 OS_VER_C4
+	export HOSTNAME_C5 OS_C5 REPO_C5 OS_VER_C5
+	export HOSTNAME_C6 OS_C6 REPO_C6 OS_VER_C6
+	export HOSTNAME_C7 OS_C7 REPO_C7 OS_VER_C7
+	export HOSTNAME_C8 OS_C8 REPO_C8 OS_VER_C8
 	
 	# Setting the time and date on all of the servers and clients if we can
 	for s in $SERVERS; do
