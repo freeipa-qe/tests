@@ -6,16 +6,17 @@ stopipa()
   IPACTL=/usr/sbin/ipactl
   if [ -e $IPACTL ] &&  [ -x $IPACTL ];then
 	$IPACTL stop
-	ps -eo pid,cmd | grep ipa_web    | grep -v "grep" | cut -d" " -f1 > pid.txt	
-	ps -eo pid,cmd | grep kdc        | grep -v "grep" | cut -d" " -f1 >> pid.txt
-	ps -eo pid,cmd | grep ipa_kpasswd| grep -v "grep" | cut -d" " -f1 >> pid.txt
-	ps -eo pid,cmd | grep ns-slapd   | grep -v "grep" | cut -d" " -f1 >> pid.txt
-	if [ `wc pid.txt -l | cut -d" " -f1` -gt 0 ];then
-		for pid in `cat pid.txt`
+	pidfile=/tmp/$RANDOM.pids
+	ps -eo pid,cmd | grep ipa_web    | grep -v "grep" | cut -d" " -f1 > $pidfile	
+	ps -eo pid,cmd | grep kdc        | grep -v "grep" | cut -d" " -f1 >> $pidfile
+	ps -eo pid,cmd | grep ipa_kpasswd| grep -v "grep" | cut -d" " -f1 >> $pidfile
+	ps -eo pid,cmd | grep ns-slapd   | grep -v "grep" | cut -d" " -f1 >> $pidfile
+	if [ `wc $pidfile -l | cut -d" " -f1` -gt 0 ];then
+		for pid in `cat `$pidfile
 		do
 		  kill -9 $pid
 		done
-		rm pid.txt
+		rm $pidfile
 	fi
 	sleep 3
 	echo "ipa stopped"
@@ -36,12 +37,12 @@ if [ -z $snapshot_name ];then
 else
 	snapshot_dir=$snapshot_base/$snapshot_name
 fi
-echo "using $snapshot_dir as snapshot directory storage"
+echo "using [$snapshot_dir] as snapshot directory storage"
 
 current_dir=`pwd`
 
 mkdir -p $snapshot_dir 
-if [ -d $snapshot_dir ] && [ -d /etc/dirsrv ] && [ -d /var/lib/dirsrv ] && [ -d /var/log/dirsrv ]
+if [ -d $snapshot_dir ] && [ -d /etc/dirsrv ] && [ -d /var/lib/dirsrv ] && [ -d /var/log/dirsrv ] && [ -d /etc/ipa ]
 then
 	echo "using [$snapshot_dir]"
 	echo "step 1: stop ipa"
@@ -65,12 +66,27 @@ then
 	mv db.tar $snapshot_dir/.
 	echo "/var/lib/dirsrv $snapshot_dir/db.tar" >> $snapshot_dir/restore.conf
 
-	cd $snapshot_dir
-	pwd
-	ls -lh
-	echo "content of restore.conf file:"
-	cat restore.conf
+	echo "step 5: archive krb5 conf and keytab file under /etc"
+	cd /etc
+	tar cf krb5.tar krb5*
+	mv krb5.tar $snapshot_dir/.
+	echo "/etc/ $snapshot_dir/krb5.tar" >> $snapshot_dir/restore.conf
+
+	echo "step 6: archive ipa configure dir under /etc/ipa"
+	cd /etc/ipa
+	tar cf ipa.tar *
+	mv ipa.tar $snapshot_dir/.
+	echo "/etc/ipa $snapshot_dir/ipa.tar" >> $snapshot_dir/restore.conf
+
+	echo "step 7: start ipa servers"
 	$IPACTL start
-	echo "done"
+	
+	echo "========== report =========="
+	cd $snapshot_dir
+	echo "restore directory: [`pwd`]"
+	ls -lh
+	echo "content of `pwd`/restore.conf :"
+	cat restore.conf
+	echo "=========== done ==========="
 	cd $current_dir
 fi
