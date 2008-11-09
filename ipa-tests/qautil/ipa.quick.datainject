@@ -1,0 +1,20 @@
+#!/bin/sh
+echo "quick data inject starts..."
+echo redhat123 | kinit admin
+
+last="099"
+ipa-addgroup -d "root group" grp$last
+for (( i = 100; i< 120; i++ ))
+do
+        ipa-adduser -c GECOS -d /home/q$i -f quser -l $i -p redhat123 -s /bin/bash q$i
+        ipa-addgroup -d "group $i" grp$i
+        ipa-modgroup -a q$i grp$i
+        ipa-modgroup -g grp$i grp$last
+        echo "last=$last i=$i"
+        last=$i
+done
+echo "finished. show one user to prove the insertion"
+echo "=========== user [q119] =================="
+ipa-finduser -a q$last
+echo "=========================================="
+echo ""
