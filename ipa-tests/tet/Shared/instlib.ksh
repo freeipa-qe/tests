@@ -52,12 +52,12 @@ UninstallClientRedhat()
 		return 1
 	fi
 
-	ssh root@$fullhostname "ipa-client-install -u --uninstall"
+	ssh root@$FULLHOSTNAME "ipa-client-install -u --uninstall"
 	ret1=$?
-	ssh root@$fullhostname "ipa-client-setup -u --uninstall"
+	ssh root@$FULLHOSTNAME "ipa-client-setup -u --uninstall"
 	ret2=$?
 	if [ $ret1 -ne 0 ]&&[ $ret2 -ne 0]; then
-		echo "error - ipa-client-install -uninstall on $fullhostname failed"
+		echo "error - ipa-client-install -uninstall on $FULLHOSTNAME failed"
 #		return 1;
 	fi
 	return 0;
@@ -74,12 +74,17 @@ UninstallClientSolaris()
 	fi
 	
 	bkup="/ipa-original"
-	ssh root@$FULLHOSTNAME "cat $bkup/nsswitch.conf >/etc/nsswitch.conf;
+	ssh root@$FULLHOSTNAME "ls $bkup"
+	if [ $? -ne 0 ]; then
+		echo "ipa doesn't appear to be installed on $FULLHOSTNAME, continuing"
+	else
+		ssh root@$FULLHOSTNAME "cat $bkup/nsswitch.conf >/etc/nsswitch.conf;
 cat $bkup/resolv.conf > /etc/resolv.conf;
 cat $bkup/pam.conf >/etc/pam.conf;
 rm -f /etc/ldap.conf;
 cat $bkup/krb5.conf > /etc/krb5/krb5.conf;
 rm -f /etc/krb5/krb5.keytab";
+	fi
 	
 #	ssh root@$FULLHOSTNAME 'find / | grep -v proc | grep -v dev > /list-after-ipa-uninstall.txt'&
 	return 0;
@@ -148,7 +153,7 @@ klist -ket /tmp/krb5.keytab.$FULLHOSTNAME" > $TET_TMP_DIR/$1-cmds.txt
 	case $OS in
 		"RHEL")     kdest="/etc/krb5.keytab"       ;;
                 "FC")       kdest="/etc/krb5.keytab"       ;;
-		"solaris")  kdest="/etc/krb5/krb5.keytab"     ;;
+		"solaris")  kdest="/tmp/krb5.keytab.temp";fdest="/etc/krb5/krb5.keytab";     ;;
                 *)      echo "unknown OS"        ;;
         esac
 
@@ -168,6 +173,53 @@ klist -ket /tmp/krb5.keytab.$FULLHOSTNAME" > $TET_TMP_DIR/$1-cmds.txt
 		echo "ERROR - scp of file to $FULLHOSTNAME failed"
 		return 1;
 	fi
+	if [ $OS = "solaris" ]; then
+		if [ "$OS_VER" == "10" ]; then
+			# Create ktutil expect file
+			rm -f $TET_TMP_DIR/$FULLHOSTNAME-kutil.exp
+			echo '#!/usr/bin/expect -f
+set force_conservative 0  ; 
+if {$force_conservative} {
+        set send_slow {1 .1}
+        proc send {ignore arg} {
+                sleep .1
+                exp_send -s -- $arg
+        }
+}
+set timeout -1' > $TET_TMP_DIR/$FULLHOSTNAME-kutil.exp
+			echo "spawn ktutil" >> $TET_TMP_DIR/$FULLHOSTNAME-kutil.exp
+			echo 'match_max 100000
+expect "ktutil:  "' >> $TET_TMP_DIR/replica-install.exp
+			echo "send -- \"read_kt $kdest\"" >> $TET_TMP_DIR/$FULLHOSTNAME-kutil.exp
+			echo "expect \"read_kt $kdest\"" >> $TET_TMP_DIR/$FULLHOSTNAME-kutil.exp
+			echo 'send -- "rree"' | sed s/rr/'\\'/g | sed s/ee/r/g >> $TET_TMP_DIR/$FULLHOSTNAME-kutil.exp
+			echo "sleep 1" >> $TET_TMP_DIR/$FULLHOSTNAME-kutil.exp
+			echo "send -- \"write_kt $fdest\"" >> $TET_TMP_DIR/$FULLHOSTNAME-kutil.exp
+			echo "expect \"write_kt $fdest\"" >> $TET_TMP_DIR/$FULLHOSTNAME-kutil.exp
+			echo 'send -- "rree"' | sed s/rr/'\\'/g | sed s/ee/r/g >> $TET_TMP_DIR/$FULLHOSTNAME-kutil.exp
+			echo "sleep 1" >> $TET_TMP_DIR/$FULLHOSTNAME-kutil.exp
+			echo "send -- \"q\"" >> $TET_TMP_DIR/$FULLHOSTNAME-kutil.exp
+			echo 'send -- "rree"' | sed s/rr/'\\'/g | sed s/ee/r/g >> $TET_TMP_DIR/$FULLHOSTNAME-kutil.exp
+			
+			scp $TET_TMP_DIR/$FULLHOSTNAME-kutil.exp root@$FULLHOSTNAME:/tmp/.
+			if [ $? -ne 0 ]; then
+				echo "ERROR - scp of file to $FULLHOSTNAME failed"
+				return 1;
+			fi
+			ssh root@$FULLHOSTNAME "rm -f $fdest;expect /tmp/$FULLHOSTNAME-kutil.exp"
+			if [ $? -ne 0 ]; then
+				echo "ERROR - expect on $FULLHOSTNAME failed"
+				return 1;
+			fi
+		fi
+	else
+		ssh root@$FULLHOSTNAME "rm -f $fdest;cp -a $kdest $fdest"
+		if [ $? -ne 0 ]; then
+			echo "ERROR - expect on $FULLHOSTNAME failed"
+			return 1;
+		fi
+	fi
+	return 0
 }
 
 InstallClientSolaris()

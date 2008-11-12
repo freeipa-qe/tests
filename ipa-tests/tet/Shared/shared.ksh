@@ -39,7 +39,7 @@ eval_vars()
 set_date()
 {
 	if [ $DSTET_DEBUG = y ]; then set -x; fi
-	ssh $1 "date;/etc/init.d/ntpd stop;ntpdate $NTPSERVER"&
+	ssh $1 "date;/etc/init.d/ntpd stop;ntpdate -b $NTPSERVER"&
 	return 0
 }
 
