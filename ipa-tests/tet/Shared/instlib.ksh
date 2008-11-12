@@ -211,12 +211,12 @@ expect "ktutil:  "' >> $TET_TMP_DIR/replica-install.exp
 				echo "ERROR - expect on $FULLHOSTNAME failed"
 				return 1;
 			fi
-		fi
-	else
-		ssh root@$FULLHOSTNAME "rm -f $fdest;cp -a $kdest $fdest"
-		if [ $? -ne 0 ]; then
-			echo "ERROR - expect on $FULLHOSTNAME failed"
-			return 1;
+		else
+			ssh root@$FULLHOSTNAME "rm -f $fdest;cp -a $kdest $fdest"
+			if [ $? -ne 0 ]; then
+				echo "ERROR - expect on $FULLHOSTNAME failed"
+				return 1;
+			fi
 		fi
 	fi
 	return 0
