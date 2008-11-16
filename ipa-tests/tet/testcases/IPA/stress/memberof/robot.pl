@@ -14,7 +14,7 @@ our $logdir;
 
 if ($x==1){
 	$configfile = $ARGV[0]; 
-	$logdir = "/tmp/robot/"; 
+	$logdir = "/tmp/"; 
 	print "\nUsage: robot.pl <config file> <log dir>\n";
 	print "\nUsing config file [$configfile]";
 	print "\nUsing default log directory [$logdir]"; 
@@ -375,7 +375,7 @@ sub system_cleanup {
 	} 
 	logger ($indent.$logmsg);
 	if ($#leftover == -1){
-		logger ($indent."[system_cleanup] system is clean";
+		logger ($indent."[system_cleanup] system is clean");
 	}else{
 		logger($indent."[system_cleanup] start deleting..."); 
 		foreach my $id (@leftover){
