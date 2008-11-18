@@ -7,7 +7,7 @@ tet_startup="CheckAlive"
 tet_cleanup="instclean"
 minnum=0
 maxnum=3
-iclist="ic1 ic2 ic3 ic4 ic5 ic6"
+iclist="ic1 ic2 ic3 ic4 ic5 ic6 tp7"
 ic1="tp1"
 ic2="tp2"
 ic3="tp3"
@@ -262,9 +262,60 @@ tp7()
 
 	if [ $NUMSERVERS -ne 1 ]; then
 		echo "We have more than one master, great! Let's test to ensure that ipa-replica-manage shows what is should"
-		
-	fi
+		# Create "ipa-replica-manage list" expect file
+		rm -f $TET_TMP_DIR/manage-list.exp
+		echo '#!/usr/bin/expect -f
+set force_conservative 0  ; 
+if {$force_conservative} {
+        set send_slow {1 .1}
+        proc send {ignore arg} {
+                sleep .1
+                exp_send -s -- $arg
+        }
+}
+set timeout -1' > $TET_TMP_DIR/manage-list.exp
+			echo "spawn ipa-replica-manage list" >> $TET_TMP_DIR/manage-list.exp
+			echo 'match_max 100000
+expect "Directory Manager password: "' >>$TET_TMP_DIR/manage-list.exp
+			echo "send -- \"$KERB_MASTER_PASS\"" >> $TET_TMP_DIR/manage-list.exp
+			echo 'send -- "rree"' | sed s/rr/'\\'/g | sed s/ee/r/g >> $TET_TMP_DIR/manage-list.exp
+			echo 'expect eof' >> $TET_TMP_DIR/manage-list.exp
 
+		# Run the expect file on all of the masters and create a list of all of the fullhostnames in $TET_TMP_DIR/server-list.txt
+		rm -f $TET_TMP_DIR/server-list.txt
+		for s in $SERVERS; do
+			if [ "$s" != "" ]; then
+				eval_vars $s
+				echo $FULLHOSTNAME >> $TET_TMP_DIR/server-list.txt
+				ssh root@$FULLHOSTNAME 'rm -f /tmp/manage-list.exp'
+				scp $TET_TMP_DIR/manage-list.exp $FULLHOSTNAME:/tmp/.
+				ssh root@$FULLHOSTNAME "expect /tmp/manage-list.exp" > $TET_TMP_DIR/$s-list-out.txt 
+				if [ $? -ne 0 ]; then
+					echo "ERROR - expect /tmp/manage-list.exp failed on $FULLHOSTNAME"
+					tet_result FAIL
+				fi
+			fi
+		done
+		# Now check the output of all of the list output files to ensure that hey were correct
+		for s in $SERVERS; do
+			if [ "$s" != "" ]; then
+				eval_vars $s
+				# grep the hostname of the current machine out of the server list, as it will not show up on the ipa-replica-manage list
+				grep -v $FULLHOSTNAME $TET_TMP_DIR/server-list.txt > $TET_TMP_DIR/$s-server-list.txt
+				cat $TET_TMP_DIR/$s-server-list.txt | while read newlist; do 
+					grep $newlist $TET_TMP_DIR/$s-list-out.txt;
+					if [ $? -ne 0 ]; then
+						echo "ERROR - $newlist not found in server $s's ipa-replica-manage list"
+						echo "$s replica-manage list is"
+						cat $TET_TMP_DIR/$s-list-out.txt
+						tet_result FAIL
+					else
+						echo "That worked! $newlist was found in the replica list for $FULLHOSTNAME"
+					fi
+				done
+			fi
+		done
+	fi
 	tet_result PASS
 	echo "STOP $tet_thistest"
 
