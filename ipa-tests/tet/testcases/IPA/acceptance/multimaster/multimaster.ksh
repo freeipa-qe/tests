@@ -19,9 +19,8 @@ ic7="tp7"
 ######################################################################
 tp1()
 {
-	if [ "$DSTET_DEBUG" = "y" ]; then
-		set -x
-	fi
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+	echo "START $tet_thistest"
 
 	echo "START tp1"
 	echo "kiniting as admin on all hosts"
@@ -49,15 +48,14 @@ tp1()
 	done
 
 	tet_result PASS
+	echo "STOP $tet_thistest"
 }
 ######################################################################
 
 tp2()
 {
-	echo "START tp2"
-	if [ "$DSTET_DEBUG" = "y" ]; then
-		set -x
-	fi
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+	echo "START $tet_thistest"
 
 	echo "creating 10 users on M1"
 	eval_vars M1
@@ -74,15 +72,14 @@ tp2()
 	done
 
 	tet_result PASS
+	echo "STOP $tet_thistest"
 
 }
 
 tp3()
 {
-	echo "START tp3"
-	if [ "$DSTET_DEBUG" = "y" ]; then
-		set -x
-	fi
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+	echo "START $tet_thistest"
 
 	for s in $SERVERS; do
 		if [ "$s" != "" ]; then
@@ -121,14 +118,13 @@ tp3()
 	done
 
 	tet_result PASS
+	echo "STOP $tet_thistest"
 }
 
 tp4()
 {
-	echo "START tp4"
-	if [ "$DSTET_DEBUG" = "y" ]; then
-		set -x
-	fi
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+	echo "START $tet_thistest"
 
 	for s in $SERVERS; do
 		if [ "$s" != "" ]; then
@@ -183,15 +179,14 @@ tp4()
 	done
 
 	tet_result PASS
+	echo "STOP $tet_thistest"
 }
 
 
 tp5()
 {
-	echo "START tp5"
-	if [ "$DSTET_DEBUG" = "y" ]; then
-		set -x
-	fi
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+	echo "START $tet_thistest"
 
 	echo "deleting 10 users on M1"
 	eval_vars M1
@@ -208,15 +203,14 @@ tp5()
 	done
 
 	tet_result PASS
+	echo "STOP $tet_thistest"
 
 }
 
 tp6()
 {
-	echo "START tp6"
-	if [ "$DSTET_DEBUG" = "y" ]; then
-		set -x
-	fi
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+	echo "START $tet_thistest"
 
 	for s in $SERVERS; do
 		if [ "$s" != "" ]; then
@@ -255,6 +249,7 @@ tp6()
 	done
 
 	tet_result PASS
+	echo "STOP $tet_thistest"
 }
 
 ######################################################################
