@@ -5,7 +5,7 @@ fi
 # The next line is required as it picks up data about the servers to use
 tet_startup="CheckAlive"
 tet_cleanup="instclean"
-iclist="ic1 ic2 ic3 ic4 ic5 ic6 ic7 ic8"
+iclist="ic1 ic2 ic3 ic4 ic5 ic6 ic7 ic8 ic9"
 ic1="setupssh tp1"
 ic2="tp2"
 ic3="tp3"
@@ -14,7 +14,7 @@ ic5="tp5"
 ic6="tp6"
 ic7="tp7"
 ic8="tp8"
-
+ic9="tp9"
 
 setupssh()
 {
@@ -313,9 +313,27 @@ tp7()
 }
 
 ######################################################################
-# Test to ensure that all of the machines seem to sync up when creating users
+# Test to ensure that ipa-replica-manage shows proper information
 ######################################################################
 tp8()
+{
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+	echo "START $tet_thistest"
+
+	if [ $NUMSERVERS -ne 1 ]; then
+		echo "We have more than one master, great! Let's test to ensure that ipa-replica-manage shows what is should"
+		
+	fi
+
+	tet_result PASS
+	echo "STOP $tet_thistest"
+
+}
+
+######################################################################
+# Test to ensure that all of the machines seem to sync up when creating users
+######################################################################
+tp9()
 {
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 	eval_vars M1

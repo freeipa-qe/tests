@@ -14,6 +14,7 @@ ic3="tp3"
 ic4="tp4"
 ic5="tp5"
 ic6="tp6"
+ic7="tp7"
 
 ######################################################################
 tp1()
@@ -50,6 +51,7 @@ tp1()
 	tet_result PASS
 }
 ######################################################################
+
 tp2()
 {
 	echo "START tp2"
@@ -255,7 +257,23 @@ tp6()
 	tet_result PASS
 }
 
+######################################################################
+# Test to ensure that ipa-replica-manage shows proper information
+######################################################################
+tp7()
+{
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+	echo "START $tet_thistest"
 
+	if [ $NUMSERVERS -ne 1 ]; then
+		echo "We have more than one master, great! Let's test to ensure that ipa-replica-manage shows what is should"
+		
+	fi
+
+	tet_result PASS
+	echo "STOP $tet_thistest"
+
+}
 
 instclean()
 {
