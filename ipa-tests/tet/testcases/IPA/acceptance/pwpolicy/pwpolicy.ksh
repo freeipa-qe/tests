@@ -11,7 +11,8 @@ tet_startup="CheckAlive"
 tet_cleanup="pw_cleanup"
 iclist="ic1 ic2"
 ic1="tp1 tp1a"
-ic2="tp2 tp2a tp2b tp2c tp3 tp3a tp3b tp4 tp4a tp4b tp5 tp5a tp6 tp6a"
+# tp4a invalidated per https://bugzilla.redhat.com/show_bug.cgi?id=467973
+ic2="tp2 tp2a tp2b tp2c tp3 tp3a tp3b tp4 tp4b tp5 tp5a tp6 tp6a"
 hour=0
 min=0
 sec=0
@@ -1292,6 +1293,7 @@ tp4()
 
 ######################################################################
 # pw history
+# Test case invalidated per https://bugzilla.redhat.com/show_bug.cgi?id=467973
 # From ../../../../ipa-tests/testplans/functional/passwordpolicy/IPA_Password_Policy_test_plan.html test # 18
 #   1.   setup default environment
 #   2. setup default password policy
@@ -1740,10 +1742,8 @@ tp5a()
 	# Return pw policy to default
 	eval_vars M1
 	# cleaning up the user
-	ssh root@$FULLHOSTNAME "ipa-deluser $user1"
-
 	# resetting password policy 
-	ssh root@$FULLHOSTNAME "ipa-pwpolicy --minclasses 0"
+	ssh root@$FULLHOSTNAME "ipa-deluser $user1;ipa-pwpolicy --minclasses 3;ipa-pwpolicy --minclasses 0"
 	if [ $? -ne 0 ]; then
 		echo "ERROR - ipa-pwpolicy on $FULLHOSTNAME failed"
 		echo "Test - $tet_thistest"
