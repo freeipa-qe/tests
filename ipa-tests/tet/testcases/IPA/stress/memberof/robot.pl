@@ -951,6 +951,7 @@ sub ldap_make_usrattrs{
                           'homeDirectory' => '/home/user_'.$uid_index,
                           'uidNumber' => $uid_index,
                           'gidNumber' => $gid_index,
+						  'userPassword' => 'password',
                           'objectclass' => [ 'person','inetOrgPerson','inetUser','posixAccount','krbPrincipalAux','radiusprofile']];   
 	return $ipausrattrs;
 }# construct user entry attrs
