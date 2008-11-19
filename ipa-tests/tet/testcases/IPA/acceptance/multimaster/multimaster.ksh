@@ -7,7 +7,8 @@ tet_startup="CheckAlive"
 tet_cleanup="instclean"
 minnum=0
 maxnum=3
-iclist="ic1 ic2 ic3 ic4 ic5 ic6 tp7"
+iclist="ic7"
+#iclist="ic1 ic2 ic3 ic4 ic5 ic6 ic7"
 ic1="tp1"
 ic2="tp2"
 ic3="tp3"
@@ -297,22 +298,36 @@ expect "Directory Manager password: "' >>$TET_TMP_DIR/manage-list.exp
 			fi
 		done
 		# Now check the output of all of the list output files to ensure that hey were correct
+		# Start with M1
+		eval_vars M1
+		s="M1"
+		# grep the hostname of the current machine out of the server list, as it will not show up on the ipa-replica-manage list
+		grep -v $FULLHOSTNAME $TET_TMP_DIR/server-list.txt > $TET_TMP_DIR/$s-server-list.txt
+		cat $TET_TMP_DIR/$s-server-list.txt | while read newlist; do 
+			grep $newlist $TET_TMP_DIR/$s-list-out.txt;
+			if [ $? -ne 0 ]; then
+				echo "ERROR - $newlist not found in server $s's ipa-replica-manage list"
+				echo "$s replica-manage list is"
+				cat $TET_TMP_DIR/$s-list-out.txt
+				tet_result FAIL
+			else
+				echo "That worked! $newlist was found in the replica list for $FULLHOSTNAME"
+			fi
+		done
+		m1hostname=$FULLHOSTNAME
+		# Now do the other servers
 		for s in $SERVERS; do
 			if [ "$s" != "" ]; then
 				eval_vars $s
-				# grep the hostname of the current machine out of the server list, as it will not show up on the ipa-replica-manage list
-				grep -v $FULLHOSTNAME $TET_TMP_DIR/server-list.txt > $TET_TMP_DIR/$s-server-list.txt
-				cat $TET_TMP_DIR/$s-server-list.txt | while read newlist; do 
-					grep $newlist $TET_TMP_DIR/$s-list-out.txt;
-					if [ $? -ne 0 ]; then
-						echo "ERROR - $newlist not found in server $s's ipa-replica-manage list"
-						echo "$s replica-manage list is"
-						cat $TET_TMP_DIR/$s-list-out.txt
-						tet_result FAIL
-					else
-						echo "That worked! $newlist was found in the replica list for $FULLHOSTNAME"
-					fi
-				done
+				grep $m1hostname $TET_TMP_DIR/$s-list-out.txt;
+				if [ $? -ne 0 ]; then
+					echo "ERROR - $m1hostname not found in server $s's ipa-replica-manage list"
+					echo "$s replica-manage list is"
+					cat $TET_TMP_DIR/$s-list-out.txt
+					tet_result FAIL
+				else
+					echo "That worked! $m1hostname was found in the replica list for $FULLHOSTNAME"
+				fi
 			fi
 		done
 	fi
