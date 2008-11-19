@@ -633,6 +633,7 @@ ipa-modgroup --add user-41d group-4c-1;"
 		fi
 	done
 
+	eval_vars M1
 	ssh root@$FULLHOSTNAME "ipa-delgroup group-4-1a; \
 ipa-delgroup group-4-1b; \
 ipa-delgroup group-4-1c; \
@@ -984,7 +985,7 @@ ipa-modgroup --add $userd $grp2;"
 		fi
 	done 
 
-	checklist="$usera $userb $userc $userd"
+	checklist="$usera $userb $userc $userd $user1"
 	for c in $checklist; do
 		ssh root@$FULLHOSTNAME "ipa-deluser $c; "
 		if [ $? -ne 0 ]; then
@@ -1009,12 +1010,11 @@ ipa-modgroup --add $userd $grp2;"
 	done
 
 	eval_vars M1
-	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-delgroup $grp2; \
-/usr/sbin/ipa-delgroup $grp2; \
-/usr/sbin/ipa-delgroup $grp3; \
-/usr/sbin/ipa-delgroup $grp4; "
-	ret=$?
-	if [ $ret -ne 0 ]; then
+	ssh root@$FULLHOSTNAME "ipa-delgroup $grp2; \
+ipa-delgroup $grp2; \
+ipa-delgroup $grp3; \
+ipa-delgroup $grp4;"
+	if [ $? -ne 0 ]; then
 		echo "ERROR, ipa-delgroup failed on M1, section 12"
 		tet_result FAIL
 	fi
