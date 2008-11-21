@@ -1,0 +1,43 @@
+5c5
+< modifyTimestamp: 20081023113156Z
+---
+> modifyTimestamp: 20081028220437Z
+6a7,8
+> nisDomain: rhqa.net
+> associatedDomain: rhqa.net
+60a63,64
+> objectClass: nisDomainObject
+> objectClass: domainRelatedObject
+4804a4809,4840
+> # entry-id: 133
+> dn: ou=profile,dc=rhqa,dc=net
+> objectClass: top
+> objectClass: organizationalUnit
+> ou: profiles
+> ou: profile
+> creatorsName: cn=directory manager
+> modifiersName: cn=directory manager
+> createTimestamp: 20081028220437Z
+> modifyTimestamp: 20081028220437Z
+> nsUniqueId: 5b568301-1dd211b2-94a9e05c-fddb0000
+> 
+> # entry-id: 134
+> dn: cn=default,ou=profile,dc=rhqa,dc=net
+> defaultServerList: replica32.rhqa.net
+> defaultSearchBase: dc=rhqa,dc=net
+> objectClass: top
+> objectClass: DUAConfigProfile
+> serviceSearchDescriptor: passwd:cn=users,cn=accounts,dc=rhqa,dc=net
+> serviceSearchDescriptor: group:cn=groups,cn=compat,dc=rhqa,dc=net
+> searchTimeLimit: 15
+> followReferrals: TRUE
+> objectclassMap: shadow:shadowAccount=posixAccount
+> bindTimeLimit: 5
+> authenticationMethod: none
+> cn: default
+> creatorsName: cn=directory manager
+> modifiersName: cn=directory manager
+> createTimestamp: 20081028220437Z
+> modifyTimestamp: 20081028220437Z
+> nsUniqueId: 5b568303-1dd211b2-94a9e05c-fddb0000
+> 
