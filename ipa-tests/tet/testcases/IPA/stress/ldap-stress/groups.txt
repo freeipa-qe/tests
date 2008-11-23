@@ -1,0 +1,9 @@
+# groups.txt - groups template file
+
+#
+objectClass: top
+objectClass: groupofnames
+objectClass: posixGroup
+gidNumber: [A]
+description: group id [A]
+member: uid=[A],cn=users,cn=accounts,dc=dsqa,dc=sjc2,dc=redhat,dc=com
