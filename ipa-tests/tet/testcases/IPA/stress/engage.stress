@@ -37,7 +37,7 @@ stress_print()
 stress_save()
 {
 	kinit_save
-	ipaadduser_print
+	ipaadduser_save
 }
 
 # This function will check that the test suite may be executed
