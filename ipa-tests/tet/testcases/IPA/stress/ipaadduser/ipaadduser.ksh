@@ -110,29 +110,55 @@ tp2()
 #     check to confirm that the users exist on the masters 
 ######################################################################
 tp3()
+######################################################################
 {
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+	# Kinit everywhere
 	echo "START $tet_thistest"
-	failcount=0
-	runnum=0
-	while [[ $runnum -lt $ITTERATIONS ]]; do
-		for s in $SERVERS; do
-			if [ "$s" != "" ]; then
-				echo "working on $s"
-			fi
-		done
-		let runnum=$runnum+1
+	#runnum=0
+	#while [[ $runnum -lt $ITTERATIONS ]]; do
+	usrnum=0
+	maxnum=$mastermax
+	for s in $SERVERS; do
+		if [ "$s" != "" ]; then
+			echo "working on $s"
+			eval_vars $s
+			echo '#!/bin/bash' > $TET_TMP_DIR/stress-findusr.bash
+			while [[ $usrnum -lt $maxnum ]]; do
+				hexnum=$(printf '%02X' $usrnum)
+				echo "ipa-finduser u$hexnum > /dev/shm/find-out.txt" >> $TET_TMP_DIR/stress-findusr.bash 
+				echo "if [ \$? -ne 0 ];then echo 'ERROR - return code was not 0'; fi" >> $TET_TMP_DIR/stress-findusr.bash
+				echo "grep 'First Name: firstname-super' /dev/shm/find-out.txt; if [ \$? -ne 0 ];then echo 'ERROR - firstname-super not in /dev/shm/find-out.txt'; cat /dev/shm/find-out.txt;fi" >> $TET_TMP_DIR/stress-findusr.bash
+				let usrnum=$usrnum+1
+			done
+			# Incriment maxnum for the next server
+			let maxnum=$maxnum+$mastermax
+		fi
 	done
-
-	if [ $failcount -eq 0 ]; then
-		tet_result PASS
-	else
-		echo "ERROR - failcount wasn't 0, it's $failcount"
+	ssh root@$FULLHOSTNAME "rm -f /tmp/stress-findusr.bash";
+	chmod 755 $TET_TMP_DIR/stress-findusr.bash
+	scp $TET_TMP_DIR/stress-findusr.bash root@$FULLHOSTNAME:/tmp/.
+	ssh root@$FULLHOSTNAME "/tmp/stress-findusr.bash > /tmp/stress-findusr.bash-output"
+	rm -f $TET_TMP_DIR/stress-findusr.bash-output
+	scp root@$FULLHOSTNAME:/tmp/stress-findusr.bash-output $TET_TMP_DIR/.
+	grep ERROR $TET_TMP_DIR/stress-findusr.bash-output
+	if [ $? -eq 0 ]; then
+		echo "ERROR - ERROR detected in finduser output see $TET_TMP_DIR/stress-findusr.bash-output for details"
+		if [ "$DSTET_DEBUG" = "y" ]; then
+			echo "debugging output:"
+			cat $TET_TMP_DIR/stress-findusr.bash-output
+		fi
 		tet_result FAIL
 	fi
+
+#		let runnum=$runnum+1
+
+#	done
+
+	tet_result PASS
 	echo "END $tet_thistest"
+
 }
-######################################################################
 
 ######################################################################
 # delete users
