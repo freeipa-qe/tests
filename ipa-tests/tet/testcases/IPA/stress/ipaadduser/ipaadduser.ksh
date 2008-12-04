@@ -74,6 +74,12 @@ tp2()
 			echo '#!/bin/bash' > $TET_TMP_DIR/$s-addusr.bash
 			while [[ $usrnum -lt $maxnum ]]; do
 				hexnum=$(printf '%02X' $usrnum)
+				echo "ipa-adduser -ffirstname-super -llastbname-super u$hexnum&" >> $TET_TMP_DIR/$s-addusr.bash 
+				let usrnum=$usrnum+1
+				hexnum=$(printf '%02X' $usrnum)
+				echo "ipa-adduser -ffirstname-super -llastbname-super u$hexnum&" >> $TET_TMP_DIR/$s-addusr.bash 
+				let usrnum=$usrnum+1
+				hexnum=$(printf '%02X' $usrnum)
 				echo "ipa-adduser -ffirstname-super -llastbname-super u$hexnum" >> $TET_TMP_DIR/$s-addusr.bash 
 				echo "if [ \$? -ne 0 ];then echo 'ERROR - return code was not 0'; fi" >> $TET_TMP_DIR/$s-addusr.bash
 				let usrnum=$usrnum+1
