@@ -13,7 +13,7 @@ mastermax=100
 tet_startup="TestSetup"
 tet_cleanup="ipaadduser_cleanup"
 iclist="ic1 "
-ic1="tp1 tp2 tp3"
+ic1="tp1 tp2 tp3 tp4"
 
 TestSetup()
 {
@@ -150,25 +150,25 @@ tp4()
 		if [ "$s" != "" ]; then
 			echo "working on $s"
 			eval_vars $s
-			echo '#!/bin/bash' > $TET_TMP_DIR/$s-addusr.bash
+			echo '#!/bin/bash' > $TET_TMP_DIR/$s-delusr.bash
 			while [[ $usrnum -lt $maxnum ]]; do
 				hexnum=$(printf '%02X' $usrnum)
-				echo "ipa-adduser -ffirstname-super -llastbname-super u$hexnum" >> $TET_TMP_DIR/$s-addusr.bash 
-				echo "if [ \$? -ne 0 ];then echo 'ERROR - return code was not 0'; fi" >> $TET_TMP_DIR/$s-addusr.bash
+				echo "ipa-deluser u$hexnum" >> $TET_TMP_DIR/$s-delusr.bash 
+				echo "if [ \$? -ne 0 ];then echo 'ERROR - return code was not 0'; fi" >> $TET_TMP_DIR/$s-delusr.bash
 				let usrnum=$usrnum+1
 			done
-			ssh root@$FULLHOSTNAME "rm -f /tmp/$s-addusr.bash";
-			chmod 755 $TET_TMP_DIR/$s-addusr.bash
-			scp $TET_TMP_DIR/$s-addusr.bash root@$FULLHOSTNAME:/tmp/.
-			ssh root@$FULLHOSTNAME "/tmp/$s-addusr.bash > /tmp/$s-addusr.bash-output"
-			rm -f $TET_TMP_DIR/$s-addusr.bash-output
-			scp root@$FULLHOSTNAME:/tmp/$s-addusr.bash-output $TET_TMP_DIR/.
-			grep ERROR $TET_TMP_DIR/$s-addusr.bash-output
+			ssh root@$FULLHOSTNAME "rm -f /tmp/$s-delusr.bash";
+			chmod 755 $TET_TMP_DIR/$s-delusr.bash
+			scp $TET_TMP_DIR/$s-delusr.bash root@$FULLHOSTNAME:/tmp/.
+			ssh root@$FULLHOSTNAME "/tmp/$s-delusr.bash > /tmp/$s-delusr.bash-output"
+			rm -f $TET_TMP_DIR/$s-delusr.bash-output
+			scp root@$FULLHOSTNAME:/tmp/$s-delusr.bash-output $TET_TMP_DIR/.
+			grep ERROR $TET_TMP_DIR/$s-delusr.bash-output
 			if [ $? -eq 0 ]; then
-				echo "ERROR - ERROR detected in adduser output see $TET_TMP_DIR/$s-addusr.bash-output for details"
+				echo "ERROR - ERROR detected in deluser output see $TET_TMP_DIR/$s-delusr.bash-output for details"
 				if [ "$DSTET_DEBUG" = "y" ]; then
 					echo "debugging output:"
-					cat $TET_TMP_DIR/$s-addusr.bash-output
+					cat $TET_TMP_DIR/$s-delusr.bash-output
 				fi
 
 				tet_result FAIL
