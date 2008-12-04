@@ -4,13 +4,14 @@
 #
 ######### Include directories ############################################
 . $mainRunBaseDir/stress/kinit/engage.kinit
-
+. $mainRunBaseDir/stress/ipa-adduser/engage.ipa-adduser
 
 #####################################################
 
 stress_default()
 {
 	kinit_default
+	ipa-adduser_default
 }
 
 # This function will ask the user for more information/choices if needed.
@@ -18,6 +19,7 @@ stress_default()
 stress_ask()
 {
 		kinit_ask
+		ipa-adduser_ask
 }
 
 # This function will print the user's choices (aka variables)
@@ -25,6 +27,7 @@ stress_ask()
 stress_print()
 {
 		kinit_print
+		ipa-adduser_print
 }
 
 # This function will echo in shell's format the user's choices
@@ -34,6 +37,7 @@ stress_print()
 stress_save()
 {
 	kinit_save
+	ipa-adduser_print
 }
 
 # This function will check that the test suite may be executed
@@ -43,6 +47,7 @@ stress_save()
 stress_check()
 {
 		kinit_check
+		ipa-adduser_check
 }
 
 # This function will run the test suite
@@ -56,6 +61,10 @@ if [ $MainRunStartup = y ] ; then kinit_startup ; fi
 if [ $MainRunTests = y ] ; then kinit_run ; fi
 if [ $MainRunCleanup = y ] ; then kinit_cleanup ; fi
 
+TET_SUITE_ROOT=$mainRunBaseDir/ipa-adduser; export TET_SUITE_ROOT
+if [ $MainRunStartup = y ] ; then ipa-adduser_startup ; fi
+if [ $MainRunTests = y ] ; then ipa-adduser_run ; fi
+if [ $MainRunCleanup = y ] ; then ipa-adduser_cleanup ; fi
 
 # uninstall MUST be last
 #TET_SUITE_ROOT=$mainRunBaseDir/stress; export TET_SUITE_ROOT
