@@ -87,6 +87,10 @@ tp2()
 			grep ERROR $TET_TMP_DIR/$s-addusr.bash-output
 			if [ $? -eq 0 ]; then
 				echo "ERROR - ERROR detected in adduser output see $TET_TMP_DIR/$s-addusr.bash-output for details"
+				if [ "$DSTET_DEBUG" = "y" ]; then
+					echo "debugging output:"
+					cat $TET_TMP_DIR/$s-addusr.bash-output
+				fi
 				tet_result FAIL
 			fi
 			# Incriment maxnum for the next server
@@ -162,6 +166,11 @@ tp4()
 			grep ERROR $TET_TMP_DIR/$s-addusr.bash-output
 			if [ $? -eq 0 ]; then
 				echo "ERROR - ERROR detected in adduser output see $TET_TMP_DIR/$s-addusr.bash-output for details"
+				if [ "$DSTET_DEBUG" = "y" ]; then
+					echo "debugging output:"
+					cat $TET_TMP_DIR/$s-addusr.bash-output
+				fi
+
 				tet_result FAIL
 			fi
 			# Incriment maxnum for the next server
