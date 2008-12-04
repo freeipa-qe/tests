@@ -1,12 +1,12 @@
  
 all
 	"Starting ALL"
-	^kinit
+	^ipaadduser
 	"Ending ALL"
 
-kinit
-	"Starting kinit tests..."
-	/kinit.ksh
-	"Ending kinit tests..."
+ipaadduser
+	"Starting ipaadduser tests..."
+	/ipaadduser.ksh
+	"Ending ipaadduser tests..."
 
 # EOF

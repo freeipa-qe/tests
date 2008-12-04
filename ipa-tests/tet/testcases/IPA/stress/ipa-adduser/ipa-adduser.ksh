@@ -1,7 +1,7 @@
 #!/bin/ksh
 
 ######################################################################
-# Run kinit followed by kdestroy over and over again to see ho often it works.
+# Run ipa-adduser followed by kdestroy over and over again to see how often it works.
 ######################################################################
 
 if [ "$DSTET_DEBUG" = "y" ]; then
@@ -9,7 +9,7 @@ if [ "$DSTET_DEBUG" = "y" ]; then
 fi
 # The next line is required as it picks up data about the servers to use
 tet_startup="TestSetup"
-tet_cleanup="kinit_cleanup"
+tet_cleanup="ipaadduser_cleanup"
 iclist="ic1 "
 ic1="tp1 tp2"
 
@@ -20,7 +20,7 @@ TestSetup()
 }
 
 ######################################################################
-#	kinit as admin, and check to see if it worked $ITTERATIONS times
+#	ipa-adduser as admin, and check to see if it worked $ITTERATIONS times
 ######################################################################
 tp1()
 {
@@ -31,25 +31,11 @@ tp1()
 	while [[ $runnum -lt $ITTERATIONS ]]; do
 		for s in $SERVERS; do
 			if [ "$s" != "" ]; then
-				echo "kiniting as $DS_USER, password $DM_ADMIN_PASS on $s in a fast mode"
-				KinitAs $s $DS_USER $DM_ADMIN_PASS fast
-				ret=$?
-				if [ $ret -ne 0 ]; then
-					echo "ERROR - kinit on $s failed"
-					tet_result FAIL
-				fi
-				ssh root@$FULLHOSTNAME "ipa-finduser $DS_USER" > $TET_TMP_DIR/stress-kinit-tmp.txt
-				grep Login:\ $DS_USER $TET_TMP_DIR/stress-kinit-tmp.txt
-				if [ $? -ne 0 ]; then
-					echo "ERROR: Login:\ $DS_USER not found in $TET_TMP_DIR/stress-kinit-tmp.txt"
-					echo "contents of $TET_TMP_DIR/stress-kinit-tmp.txt"
-					cat $TET_TMP_DIR/stress-kinit-tmp.txt
-					echo "$TET_TMP_DIR/stress-kinit-tmp.txt complete"
-					tet_result FAIL
-				fi
+				echo "working on $s"
 			fi
 		done
 		let runnum=$runnum+1
+
 	done
 
 	tet_result PASS
@@ -58,67 +44,19 @@ tp1()
 ######################################################################
 
 ######################################################################
-#	kinit as a new user and check to see if it worked $ITTERATIONS times 
+#     check to confirm that the users exist on the masters 
 ######################################################################
 tp2()
 {
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 	# Kinit everywhere
 	echo "START $tet_thistest"
-	user1=tstusrk1
-	user1pw1="9384nhjc6."
-	user1pw2="kdsid74nc44"
 	failcount=0
 	runnum=0
 	while [[ $runnum -lt $ITTERATIONS ]]; do
 		for s in $SERVERS; do
 			if [ "$s" != "" ]; then
-				echo "kiniting as $DS_USER, password $DM_ADMIN_PASS on $s in a fast mode"
-				KinitAs $s $DS_USER $DM_ADMIN_PASS fast
-				ret=$?
-				if [ $ret -ne 0 ]; then
-					echo "ERROR - kinit on $s failed"
-					let failcount=$failcount+1
-				fi
-				# add user to test with
-				ssh root@$FULLHOSTNAME "ipa-adduser -f 'test user 1' -l 'lastname' $user1;"
-				if [ $? != 0 ]; then
-					echo "ERROR - ipa-adduser failed on $FULLHOSTNAME";
-					let failcount=$failcount+1
-				fi
-
-				# set that users password
-				SetUserPassword M1 $user1 $user1pw1	
-				if [ $? != 0 ]; then
-					echo "ERROR - SetUserPassword failed on $FULLHOSTNAME";
-					let failcount=$failcount+1
-				fi
-
-				KinitAsFirst M1 $user1 $user1pw1 $user1pw2 fast
-				if [ $? -ne 0 ]; then
-					echo "ERROR - kinit as $user1 on $FULLHOSTNAME failed"
-					let failcount=$failcount+1
-				fi
-				ssh root@$FULLHOSTNAME "ipa-finduser $user1" > $TET_TMP_DIR/stress-kinit-tmp.txt
-				grep Login:\ $user1 $TET_TMP_DIR/stress-kinit-tmp.txt
-				if [ $? -ne 0 ]; then
-					echo "ERROR: Login:\ $user1 not found in $TET_TMP_DIR/stress-kinit-tmp.txt"
-					echo "contents of $TET_TMP_DIR/stress-kinit-tmp.txt"
-					cat $TET_TMP_DIR/stress-kinit-tmp.txt
-					echo "$TET_TMP_DIR/stress-kinit-tmp.txt complete"
-					let failcount=$failcount+1
-				fi
-				
-				# re-kinit as admin to delete the test account with.
-				KinitAs $s $DS_USER $DM_ADMIN_PASS fast
-				ret=$?
-				if [ $ret -ne 0 ]; then
-					echo "ERROR - kinit on $s failed"
-					let failcount=$failcount+1
-				fi
-
-				# cleaning up the user
-				ssh root@$FULLHOSTNAME "ipa-deluser $user1"
+				echo "working on $s"
 			fi
 		done
 		let runnum=$runnum+1
@@ -134,12 +72,10 @@ tp2()
 }
 ######################################################################
 
-
-
 ######################################################################
-# Cleanup Section for the kinit tests
+# Cleanup Section for the ipa-adduser tests
 ######################################################################
-kinit_cleanup()
+ipaadduser_cleanup()
 {
 	tet_thistest="cleanup"
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
