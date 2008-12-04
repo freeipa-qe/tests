@@ -8,7 +8,7 @@ if [ "$DSTET_DEBUG" = "y" ]; then
 	set -x
 fi
 # This is the number of users to create on every master
-mastermax=100
+mastermax=10000
 # The next line is required as it picks up data about the servers to use
 tet_startup="TestSetup"
 tet_cleanup="ipaadduser_cleanup"
