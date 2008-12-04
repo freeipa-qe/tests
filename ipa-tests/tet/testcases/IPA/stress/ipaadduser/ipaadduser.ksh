@@ -11,18 +11,54 @@ fi
 tet_startup="TestSetup"
 tet_cleanup="ipaadduser_cleanup"
 iclist="ic1 "
-ic1="tp1 tp2"
+ic1="tp1 tp2 tp3"
 
 TestSetup()
 {
 	eval_vars M1
-	ssh root@$FULLHOSTNAME "ipa-pwpolicy --minlife 0"
+	#ssh root@$FULLHOSTNAME "ipa-pwpolicy --minlife 0"
+	tet_result PASS
+}
+
+######################################################################
+tp1()
+{
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+	# Kinit everywhere
+	echo "START $tet_thistest"
+	for s in $SERVERS; do
+		if [ "$s" != "" ]; then
+			echo "kiniting as $DS_USER, password $DM_ADMIN_PASS on $s"
+			KinitAs $s $DS_USER $DM_ADMIN_PASS
+			ret=$?
+			if [ $ret -ne 0 ]; then
+				echo "ERROR - kinit on $s failed"
+				tet_result FAIL
+			fi
+		else
+			echo "skipping $s"
+		fi
+	done
+	for s in $CLIENTS; do
+		if [ "$s" != "" ]; then
+			echo "kiniting as $DS_USER, password $DM_ADMIN_PASS on $s"
+			KinitAs $s $DS_USER $DM_ADMIN_PASS
+			ret=$?
+			if [ $ret -ne 0 ]; then
+				echo "ERROR - kinit on $s failed"
+				tet_result FAIL
+			fi
+		fi
+	done
+
+	tet_result PASS
+	echo "END $tet_thistest"
 }
 
 ######################################################################
 #	ipa-adduser as admin, and check to see if it worked $ITTERATIONS times
 ######################################################################
-tp1()
+tp2()
 {
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 	# Kinit everywhere
@@ -49,7 +85,6 @@ tp1()
 tp2()
 {
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	# Kinit everywhere
 	echo "START $tet_thistest"
 	failcount=0
 	runnum=0

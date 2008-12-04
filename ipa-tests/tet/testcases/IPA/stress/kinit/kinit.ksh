@@ -1,7 +1,7 @@
 #!/bin/ksh
 
 ######################################################################
-# Run kinit followed by kdestroy over and over again to see ho often it works.
+# Run ipa-adduser followed by ipa-finduser over and over again to see ho often it works.
 ######################################################################
 
 if [ "$DSTET_DEBUG" = "y" ]; then
@@ -11,21 +11,55 @@ fi
 tet_startup="TestSetup"
 tet_cleanup="kinit_cleanup"
 iclist="ic1 "
-ic1="tp1 tp2"
+ic1="tp1 tp2 tp3"
 
 TestSetup()
 {
 	eval_vars M1
-	ssh root@$FULLHOSTNAME "ipa-pwpolicy --minlife 0"
+	#ssh root@$FULLHOSTNAME "ipa-pwpolicy --minlife 0"
+	tet_result PASS
 }
 
-######################################################################
-#	kinit as admin, and check to see if it worked $ITTERATIONS times
 ######################################################################
 tp1()
 {
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 	# Kinit everywhere
+	echo "START $tet_thistest"
+	for s in $SERVERS; do
+		if [ "$s" != "" ]; then
+			echo "kiniting as $DS_USER, password $DM_ADMIN_PASS on $s"
+			KinitAs $s $DS_USER $DM_ADMIN_PASS
+			ret=$?
+			if [ $ret -ne 0 ]; then
+				echo "ERROR - kinit on $s failed"
+				tet_result FAIL
+			fi
+		else
+			echo "skipping $s"
+		fi
+	done
+	for s in $CLIENTS; do
+		if [ "$s" != "" ]; then
+			echo "kiniting as $DS_USER, password $DM_ADMIN_PASS on $s"
+			KinitAs $s $DS_USER $DM_ADMIN_PASS
+			ret=$?
+			if [ $ret -ne 0 ]; then
+				echo "ERROR - kinit on $s failed"
+				tet_result FAIL
+			fi
+		fi
+	done
+
+	tet_result PASS
+	echo "END $tet_thistest"
+}
+######################################################################
+#	Create a lot of users. 10,000 sounds good. Do it with ipa-adduser
+######################################################################
+tp2()
+{
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 	echo "START $tet_thistest"
 	runnum=0
 	while [[ $runnum -lt $ITTERATIONS ]]; do
@@ -60,7 +94,7 @@ tp1()
 ######################################################################
 #	kinit as a new user and check to see if it worked $ITTERATIONS times 
 ######################################################################
-tp2()
+tp3()
 {
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 	# Kinit everywhere
