@@ -1156,6 +1156,7 @@ ipa-modgroup --add user-41d group-4c-1;"
 		fi
 	done
 
+	eval_vars M1
 	ssh root@$FULLHOSTNAME "ipa-delgroup group-4-1a; \
 ipa-delgroup group-4-1b; \
 ipa-delgroup group-4-1c; \
