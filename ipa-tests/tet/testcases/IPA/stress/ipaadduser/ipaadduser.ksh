@@ -7,6 +7,8 @@
 if [ "$DSTET_DEBUG" = "y" ]; then
 	set -x
 fi
+# This is the number of users to create on every master
+mastermax=100
 # The next line is required as it picks up data about the servers to use
 tet_startup="TestSetup"
 tet_cleanup="ipaadduser_cleanup"
@@ -30,8 +32,7 @@ tp1()
 		if [ "$s" != "" ]; then
 			echo "kiniting as $DS_USER, password $DM_ADMIN_PASS on $s"
 			KinitAs $s $DS_USER $DM_ADMIN_PASS
-			ret=$?
-			if [ $ret -ne 0 ]; then
+			if [ $? -ne 0 ]; then
 				echo "ERROR - kinit on $s failed"
 				tet_result FAIL
 			fi
@@ -43,8 +44,7 @@ tp1()
 		if [ "$s" != "" ]; then
 			echo "kiniting as $DS_USER, password $DM_ADMIN_PASS on $s"
 			KinitAs $s $DS_USER $DM_ADMIN_PASS
-			ret=$?
-			if [ $ret -ne 0 ]; then
+			if [ $? -ne 0 ]; then
 				echo "ERROR - kinit on $s failed"
 				tet_result FAIL
 			fi
@@ -63,16 +63,39 @@ tp2()
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 	# Kinit everywhere
 	echo "START $tet_thistest"
-	runnum=0
-	while [[ $runnum -lt $ITTERATIONS ]]; do
-		for s in $SERVERS; do
-			if [ "$s" != "" ]; then
-				echo "working on $s"
+	#runnum=0
+	#while [[ $runnum -lt $ITTERATIONS ]]; do
+	usrnum=0
+	maxnum=$mastermax
+	for s in $SERVERS; do
+		if [ "$s" != "" ]; then
+			echo "working on $s"
+			eval_vars $s
+			echo '#!/bin/bash' > $TET_TMP_DIR/$s-addusr.bash
+			while [[ $usrnum -lt $maxnum ]]; do
+				hexnum=$(printf '%02X' $usrnum)
+				echo "ipa-adduser -ffirstname-super -llastbname-super u$hexnum" >> $TET_TMP_DIR/$s-addusr.bash 
+				echo "if [ \$? -ne 0 ];then echo 'ERROR - return code was not 0'; fi" >> $TET_TMP_DIR/$s-addusr.bash
+				let usrnum=$usrnum+1
+			done
+			ssh root@$FULLHOSTNAME "rm -f /tmp/$s-addusr.bash";
+			chmod 755 $TET_TMP_DIR/$s-addusr.bash
+			scp $TET_TMP_DIR/$s-addusr.bash root@$FULLHOSTNAME:/tmp/.
+			ssh root@$FULLHOSTNAME "/tmp/$s-addusr.bash > /tmp/$s-addusr.bash-output"
+			rm -f $TET_TMP_DIR/$s-addusr.bash-output
+			scp root@$FULLHOSTNAME:/tmp/$s-addusr.bash-output $TET_TMP_DIR/.
+			grep ERROR $TET_TMP_DIR/$s-addusr.bash-output
+			if [ $? -eq 0 ]; then
+				echo "ERROR - ERROR detected in adduser output see $TET_TMP_DIR/$s-addusr.bash-output for details"
+				tet_result FAIL
 			fi
-		done
-		let runnum=$runnum+1
-
+			# Incriment maxnum for the next server
+			let maxnum=$maxnum+$mastermax
+		fi
 	done
+#		let runnum=$runnum+1
+
+#	done
 
 	tet_result PASS
 	echo "END $tet_thistest"
@@ -82,7 +105,7 @@ tp2()
 ######################################################################
 #     check to confirm that the users exist on the masters 
 ######################################################################
-tp2()
+tp3()
 {
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 	echo "START $tet_thistest"
@@ -103,6 +126,53 @@ tp2()
 		echo "ERROR - failcount wasn't 0, it's $failcount"
 		tet_result FAIL
 	fi
+	echo "END $tet_thistest"
+}
+######################################################################
+
+######################################################################
+# delete users
+######################################################################
+tp4()
+{
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+	# Kinit everywhere
+	echo "START $tet_thistest"
+	#runnum=0
+	#while [[ $runnum -lt $ITTERATIONS ]]; do
+	usrnum=0
+	maxnum=$mastermax
+	for s in $SERVERS; do
+		if [ "$s" != "" ]; then
+			echo "working on $s"
+			eval_vars $s
+			echo '#!/bin/bash' > $TET_TMP_DIR/$s-addusr.bash
+			while [[ $usrnum -lt $maxnum ]]; do
+				hexnum=$(printf '%02X' $usrnum)
+				echo "ipa-adduser -ffirstname-super -llastbname-super u$hexnum" >> $TET_TMP_DIR/$s-addusr.bash 
+				echo "if [ \$? -ne 0 ];then echo 'ERROR - return code was not 0'; fi" >> $TET_TMP_DIR/$s-addusr.bash
+				let usrnum=$usrnum+1
+			done
+			ssh root@$FULLHOSTNAME "rm -f /tmp/$s-addusr.bash";
+			chmod 755 $TET_TMP_DIR/$s-addusr.bash
+			scp $TET_TMP_DIR/$s-addusr.bash root@$FULLHOSTNAME:/tmp/.
+			ssh root@$FULLHOSTNAME "/tmp/$s-addusr.bash > /tmp/$s-addusr.bash-output"
+			rm -f $TET_TMP_DIR/$s-addusr.bash-output
+			scp root@$FULLHOSTNAME:/tmp/$s-addusr.bash-output $TET_TMP_DIR/.
+			grep ERROR $TET_TMP_DIR/$s-addusr.bash-output
+			if [ $? -eq 0 ]; then
+				echo "ERROR - ERROR detected in adduser output see $TET_TMP_DIR/$s-addusr.bash-output for details"
+				tet_result FAIL
+			fi
+			# Incriment maxnum for the next server
+			let maxnum=$maxnum+$mastermax
+		fi
+	done
+#		let runnum=$runnum+1
+
+#	done
+
+	tet_result PASS
 	echo "END $tet_thistest"
 }
 ######################################################################
