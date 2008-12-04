@@ -316,7 +316,7 @@ expect "Directory Manager password: "' >>$TET_TMP_DIR/manage-list.exp
 		m1hostname=$FULLHOSTNAME
 		# Now do the other servers
 		for s in $SERVERS; do
-			if [ "$s" != "" ]; then
+			if [ "$s" != "" ]&&[ "$s" != "M1" ]; then
 				eval_vars $s
 				grep $m1hostname $TET_TMP_DIR/$s-list-out.txt;
 				if [ $? -ne 0 ]; then
