@@ -1,4 +1,0 @@
-the cert file
-    ad-cert-from-mirror.pfx
-'s password is "redhat"
-
