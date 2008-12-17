@@ -47,18 +47,18 @@ quickinstall_ask()
 		"")	quickinstallRunIt=$sav_quickinstallRunIt	;;
 		y|Y)	
 			quickinstallRunIt=y
-			while true
-			do
-				sav_SRCROOT=$SRCROOT
-				echo "    Enter the repo location [$SRCROOT] ?(a dir containing repo files, or a install tarball) \c"
-				read rsp
-				if [ -f "$rsp" ] || [ -d "$rsp" ]; then
-					SRCROOT=$rsp
-					break
-				else
-					echo "Cannot locate file $SRCROOT"
-				fi
-			done
+	#		while true
+#			do
+#				sav_SRCROOT=$SRCROOT
+#				echo "    Enter the repo location [$SRCROOT] ?(a dir containing repo files, or a install tarball) \c"
+#				read rsp
+#				if [ -f "$rsp" ] || [ -d "$rsp" ]; then
+#					SRCROOT=$rsp
+#					break
+#				else
+#					echo "Cannot locate file $SRCROOT"
+#				fi
+#			done
 			;;
 		*)	quickinstallRunIt=n		;;
 	esac
