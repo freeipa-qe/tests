@@ -9,6 +9,11 @@ eval_vars()
         x=\$HOSTNAME_$1
         HOSTNAME=`eval echo $x`
         FULLHOSTNAME=`host $HOSTNAME | awk '{print $1}'`
+	if [ "$FULLHOSTNAME" == "Host" ]; then
+		echo "ERROR! FullHostname resolved to $FULLHOSTNAME. Please make sure that you have all of your domains in the search section of your resolv.conf"
+		tet_result FAIL
+		return 1;
+	fi
 	IP=`host $FULLHOSTNAME | awk '{print $4}'`
         x=\$LDAP_PORT_$1
         LDAP_PORT=`eval echo $x`
@@ -62,7 +67,7 @@ foreach $num (0 .. $#ARGV) {
 #        print "$ARGV[$num]\\n"; 
 }
 my $match = 0;
-open (LIST, "$file") or die "\\nPROBLEM\\nunable to open file $file\\n";
+open (LIST, "$file") or die "PROBLEM - nunable to open file $file";
 while (<LIST>)
 {
         chomp $_;
