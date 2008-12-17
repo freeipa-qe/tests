@@ -125,11 +125,11 @@ tp3()
 	#while [[ $runnum -lt $ITTERATIONS ]]; do
 	usrnum=0
 	maxnum=$mastermax
+	echo '#!/bin/bash' > $TET_TMP_DIR/stress-findusr.bash
 	for s in $SERVERS; do
 		if [ "$s" != "" ]; then
 			echo "working on $s"
 			eval_vars $s
-			echo '#!/bin/bash' > $TET_TMP_DIR/stress-findusr.bash
 			while [[ $usrnum -lt $maxnum ]]; do
 				hexnum=$(printf '%02X' $usrnum)
 				echo "ipa-finduser u$hexnum > /dev/shm/find-out.txt" >> $TET_TMP_DIR/stress-findusr.bash 
@@ -141,21 +141,27 @@ tp3()
 			let maxnum=$maxnum+$mastermax
 		fi
 	done
-	ssh root@$FULLHOSTNAME "rm -f /tmp/stress-findusr.bash";
-	chmod 755 $TET_TMP_DIR/stress-findusr.bash
-	scp $TET_TMP_DIR/stress-findusr.bash root@$FULLHOSTNAME:/tmp/.
-	ssh root@$FULLHOSTNAME "/tmp/stress-findusr.bash > /tmp/stress-findusr.bash-output"
-	rm -f $TET_TMP_DIR/stress-findusr.bash-output
-	scp root@$FULLHOSTNAME:/tmp/stress-findusr.bash-output $TET_TMP_DIR/.
-	grep ERROR $TET_TMP_DIR/stress-findusr.bash-output
-	if [ $? -eq 0 ]; then
-		echo "ERROR - ERROR detected in finduser output see $TET_TMP_DIR/stress-findusr.bash-output for details"
-		if [ "$DSTET_DEBUG" = "y" ]; then
-			echo "debugging output:"
-			cat $TET_TMP_DIR/stress-findusr.bash-output
+	for s in $SERVERS; do
+		if [ "$s" != "" ]; then
+			echo "working on $s"
+			eval_vars $s
+			ssh root@$FULLHOSTNAME "rm -f /tmp/stress-findusr.bash";
+			chmod 755 $TET_TMP_DIR/stress-findusr.bash
+			scp $TET_TMP_DIR/stress-findusr.bash root@$FULLHOSTNAME:/tmp/.
+			ssh root@$FULLHOSTNAME "/tmp/stress-findusr.bash > /tmp/stress-findusr.bash-output"
+			rm -f $TET_TMP_DIR/stress-findusr.bash-output
+			scp root@$FULLHOSTNAME:/tmp/stress-findusr.bash-output $TET_TMP_DIR/.
+			grep ERROR $TET_TMP_DIR/stress-findusr.bash-output
+			if [ $? -eq 0 ]; then
+				echo "ERROR - ERROR detected in finduser output see $TET_TMP_DIR/stress-findusr.bash-output for details"
+				if [ "$DSTET_DEBUG" = "y" ]; then
+					echo "debugging output:"
+					cat $TET_TMP_DIR/stress-findusr.bash-output
+				fi
+				tet_result FAIL
+			fi
 		fi
-		tet_result FAIL
-	fi
+	done
 
 #		let runnum=$runnum+1
 
