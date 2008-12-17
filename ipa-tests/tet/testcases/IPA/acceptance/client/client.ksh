@@ -119,10 +119,13 @@ set send_slow {1 .1}' > $TET_TMP_DIR/ssh.exp
 		sleep 10
 	
 		# Now, ssh from the client to the master, kerberos auth should work here. 
-		ssh root@$FULLHOSTNAME "ssh -l $user1 $srvhostname 'ls /tmp'" > $TET_TMP_DIR/ssh-output.txt &
+#		ssh root@$FULLHOSTNAME "ssh -l $user1 $srvhostname 'ls /tmp'" > $TET_TMP_DIR/ssh-output.txt &
+		rm -f $TET_TMP_DIR/ipa-client-test.txt
+		scp root@$FULLHOSTNAME:/tmp/ipa-client-test.txt $TET_TMP_DIR/.
 		sleep 15
-		grep "ipa-client-test.txt" $TET_TMP_DIR/ssh-output.txt
-		if [ $? -ne 0 ]; then
+#		grep "ipa-client-test.txt" $TET_TMP_DIR/ssh-output.txt
+#		if [ $? -ne 0 ]; then
+		if [ ! -f "$TET_TMP_DIR/ipa-client-test.txt" ]; then
 			echo "Well that didn't work, lets try again"
 			cat $TET_TMP_DIR/ssh-output.txt
 			ssh root@$FULLHOSTNAME "klist;ssh -l $user1 $srvhostname 'ls /tmp'" > $TET_TMP_DIR/ssh-output.txt &
@@ -136,7 +139,7 @@ set send_slow {1 .1}' > $TET_TMP_DIR/ssh.exp
 				sleep 15
 				grep "ipa-client-test.txt" $TET_TMP_DIR/ssh-output.txt
 				if [ $? -ne 0 ]; then
-					echo "Well that didn't work, lets try it a FOURTH TIME. We will get a new kinit first."
+					echo "Well that didn't work, lets try it a FOURTH TIME. We will get a new kinit first. "
 					KinitAs $s $user1 $user1pw
 					cat $TET_TMP_DIR/ssh-output.txt
 					ssh root@$FULLHOSTNAME "klist;ssh -l $user1 $srvhostname 'ls /tmp'" > $TET_TMP_DIR/ssh-output.txt 
