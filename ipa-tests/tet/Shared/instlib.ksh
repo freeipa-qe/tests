@@ -432,12 +432,18 @@ SetupServer()
 		echo "setting up server $1 as a master server"
 		echo "ipa-server-install -N -U --hostname=$FULLHOSTNAME -r $RELM_NAME -p $DM_ADMIN_PASS -P $KERB_MASTER_PASS -a $DM_ADMIN_PASS -u root --setup-bind -d"
 		ssh root@$FULLHOSTNAME "ipa-server-install -N -U --hostname=$FULLHOSTNAME -r $RELM_NAME -p $DM_ADMIN_PASS -P $KERB_MASTER_PASS -a $DM_ADMIN_PASS -u root --setup-bind -d"
-		ret=$?
-		if [ $ret -ne 0 ]; then
+		if [ $? -ne 0 ]; then
 			echo "ERROR - ipa-server-install on $FULLHOSTNAME failed."
 			echo "contents of ipaserver-install.log and krb5kdc.log:: "
-			ssh root@$FULLHOSTNAME "cat /var/log/ipaserver-install.log;cat /var/log/krb5kdc.log";
-			return 1;
+			ssh root@$FULLHOSTNAME "cat /var/log/ipaserver-install.log;cat /var/log/krb5kdc.log;cat /etc/hosts;cat /etc/resolv.conf";
+			echo "Trying again"			
+			ssh root@$FULLHOSTNAME "ipa-server-install -N -U --hostname=$FULLHOSTNAME -r $RELM_NAME -p $DM_ADMIN_PASS -P $KERB_MASTER_PASS -a $DM_ADMIN_PASS -u root --setup-bind -d"
+			if [ $? -ne 0 ]; then
+				echo "ERROR - ipa-server-install on $FULLHOSTNAME failed."
+				echo "contents of ipaserver-install.log and krb5kdc.log:: "
+				ssh root@$FULLHOSTNAME "cat /var/log/ipaserver-install.log;cat /var/log/krb5kdc.log;cat /etc/hosts;cat /etc/resolv.conf";
+				return 1;
+			fi
 		fi
 		FixBindServer M1
 		if [ $? -ne 0 ]; then
