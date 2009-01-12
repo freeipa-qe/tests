@@ -31,8 +31,7 @@ tp1()
 		if [ "$s" != "" ]; then
 			echo "kiniting as $DS_USER, password $DM_ADMIN_PASS on $s"
 			KinitAs $s $DS_USER $DM_ADMIN_PASS
-			ret=$?
-			if [ $ret -ne 0 ]; then
+			if [ $? -ne 0 ]; then
 				echo "ERROR - kinit on $s failed"
 				tet_result FAIL
 			fi
@@ -44,7 +43,6 @@ tp1()
 		if [ "$s" != "" ]; then
 			echo "kiniting as $DS_USER, password $DM_ADMIN_PASS on $s"
 			KinitAs $s $DS_USER $DM_ADMIN_PASS
-			ret=$?
 			if [ $ret -ne 0 ]; then
 				echo "ERROR - kinit on $s failed"
 				tet_result FAIL
@@ -795,7 +793,7 @@ tp12()
 					echo "ERROR - $grp2alt does not exist in $grp1"
 					tet_result FAIL
 				fi
-				ssh root@$FULLHOSTNAME "ipa-finduser -a $grp1 | grep $newfirstname"
+				ssh root@$FULLHOSTNAME "ipa-findgroup -a $grp1 | grep $newfirstname"
 				ret=$?
 
 				if [ $ret -ne 0 ]; then
