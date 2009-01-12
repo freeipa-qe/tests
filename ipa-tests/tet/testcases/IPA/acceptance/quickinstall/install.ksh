@@ -16,6 +16,55 @@ ic7="tp7"
 ic8="tp8"
 ic9="tp9"
 
+resetdate()
+{
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+	echo "START resetdate"
+	for s in $CLIENTS; do
+		if [ "$s" != "" ]; then
+			if [ "$DSTET_DEBUG" = "y" ]; then echo "working on $s now"; fi
+			echo "working on $s now"
+			set_date $s
+			ret=$?
+			if [ $ret -ne 0 ]; then
+				echo "set date on $s failed"
+				tet_result FAIL
+			fi
+		if [ "$DSTET_DEBUG" = "y" ]; then echo "done working on $s"; fi
+		fi
+	done
+
+	for s in $SERVERS; do
+		if [ "$s" != "" ]; then
+			if [ "$DSTET_DEBUG" = "y" ]; then echo "working on $s now"; fi
+			echo "working on $s now"
+			set_date $s
+			ret=$?
+			if [ $ret -ne 0 ]; then
+				echo "Setdate on $s failed"
+				tet_result FAIL
+			fi
+		if [ "$DSTET_DEBUG" = "y" ]; then echo "done working on $s"; fi
+		fi
+	done
+
+	for s in $SERVERS; do
+		if [ "$s" != "" ]; then
+			if [ "$DSTET_DEBUG" = "y" ]; then echo "working on $s now"; fi
+			echo "working on $s now"
+			setup_ssh_keys $s
+			ret=$?
+			if [ $ret -ne 0 ]; then
+				echo "Setup of $s ssh failed"
+				tet_result FAIL
+			fi
+		if [ "$DSTET_DEBUG" = "y" ]; then echo "done working on $s"; fi
+		fi
+	done
+
+	tet_result PASS
+}
+
 setupssh()
 {
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
