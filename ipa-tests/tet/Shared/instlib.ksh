@@ -454,6 +454,8 @@ SetupServer()
 		echo "setting up server $1 as a replica"
 		replica_hostname=$FULLHOSTNAME
 		eval_vars M1
+		echo "backing up, and fixing resolv.conf configuration on replica"
+		ssh root@$replica_hostname "rm -f /etc/resolv.conf.tmp;cp -a /etc/resolv.conf /etc/resolv.conf.tmp;echo 'nameserver $IP' > /etc/resolv.conf"
 		echo "Clearing out any pre-existing replica files before we start"
 		ssh root@$FULLHOSTNAME "rm -f /var/lib/ipa/replica-info-$replica_hostname*"
 		echo "Generating replica prepare file for $replica_hostname on $FULLHOSTNAME"
@@ -495,36 +497,17 @@ SetupServer()
 		fi
 		# prepare the replica server
 		# create expect file for use on the replica server
-		echo '#!/usr/bin/expect -f
-set force_conservative 0  ; 
-if {$force_conservative} {
-        set send_slow {1 .1}
-        proc send {ignore arg} {
-                sleep .1
-                exp_send -s -- $arg
-        }
-}
-set timeout -1' > $TET_TMP_DIR/replica-install.exp
-		echo "spawn ipa-replica-install --debug /dev/shm/replica-info-$replica_hostname" >> $TET_TMP_DIR/replica-install.exp
-		echo 'match_max 100000
-expect -exact "Directory Manager (existing master) password: "' >> $TET_TMP_DIR/replica-install.exp
-		echo "send -- \"$KERB_MASTER_PASS\"" >> $TET_TMP_DIR/replica-install.exp
-		echo 'send -- "rree"' | sed s/rr/'\\'/g | sed s/ee/r/g
-		echo 'send -- "rree"' | sed s/rr/'\\'/g | sed s/ee/r/g >> $TET_TMP_DIR/replica-install.exp
-		echo 'expect eof' >> $TET_TMP_DIR/replica-install.exp
-
 		ssh root@$replica_hostname "ps -ef | grep slapd"
-
-		chmod 755 $TET_TMP_DIR/replica-install.exp
 		scp $TET_TMP_DIR/replica-install.exp root@$replica_hostname:/dev/shm/.
-		ssh root@$replica_hostname "/usr/bin/expect /dev/shm/replica-install.exp"
+		ssh root@$replica_hostname "ipa-replica-install --debug /dev/shm/replica-info-$replica_hostname -p $DM_ADMIN_PASS"
 		if [ $? -ne 0 ]; then
 			echo "Method 1 did not work, trying method 2"
-			# Replacing name in expect script
-			ssh root@$replica_hostname "sed -i s/$replica_hostname/$replica_hostname.gpg/g /dev/shm/replica-install.exp"
-			ssh root@$replica_hostname "/usr/bin/expect /dev/shm/replica-install.exp"
+			ssh root@$replica_hostname "ipa-replica-install --debug /dev/shm/replica-info-$replica_hostname.gpg -p $DM_ADMIN_PASS"
 			if [ $? -ne 0 ]; then
 				# replica install failed. Trying it all over again
+				echo "That failed, debugging info:"
+				ssh root@$replica_hostname "cat /etc/hosts;cat /etc/resolv.conf;dig $replica_hostname; dig $replica_hostname @$FULLHOSTNAME"
+				ssh root@$FULLHOSTNAME "ps -fax; dig $replica_hostname"
 				echo "trying it all again"
 				# Just in case a previous uninstall didn't finish:
 				ssh root@$replica_hostname "ipa-server-install --uninstall -U"
@@ -564,6 +547,8 @@ expect -exact "Directory Manager (existing master) password: "' >> $TET_TMP_DIR/
 				fi
 			fi
 			ssh root@$replica_hostname "ps -ef | grep slapd"
+			echo "Restoring resolv.conf on replica"
+			ssh root@$replica_hostname "if [ -f /etc/resolv.conf.tmp ]; then rm -f /etc/resolv.conf;cp -a /etc/resolv.conf.tmp /etc/resolv.conf; fi"
 		fi
 	fi
 	# The next section is a workaround for bug #450632
