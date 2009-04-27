@@ -1,0 +1,37 @@
+#! /bin/sh
+. ./vmconf
+. ./functions
+
+vmup mv32a ds81installed
+
+# Syntax : vmup <vmlabel> <env target>
+#################################################################
+#          Available VM resources                               #
+#  +=========================================================+  #
+#  | vmlabel	  OS         |  possible environment target  |  #
+#  +---------------------------------------------------------+  #
+#  |  mv32a   RHEL 5 i386    | qa, ds81rpm, ds81installed    |  #
+#  |  mv32b          " "     | qa                            |  #
+#  |  mv32c          " "     | qa                            |  #
+#  |  mv32d   RHEL 4 i386    | qa, ds81rpm, ds81installed    |  #
+#  |  mv32e          " "     | qa                            |  #
+#  |  mv32f   Window XP      | qa, ds81console               |  #
+#  |  mv32g   Window 2003    | qa                            |  #
+#  |  mv32h                  |                               |  #
+#  |  mv32i                  |                               |  #
+#  |  mv32j                  |                               |  #
+#  |  -----------------------------------------------------  |  #
+#  |  mv64a   RHEL 5 x86_64  | qa, ds81rpm, ds81installed    |  #
+#  |  mv64b          " "     | qa, ds81rpm, ds81installed    |  #
+#  |  mv64c          " "     | qa                            |  #
+#  |  mv64d   RHEL 4 x86_64  | qa, ds81rpm,                  |  #
+#  |  mv64e          " "     | qa                            |  #
+#  |  mv64f                  |                               |  #
+#  |  mv64g                  |                               |  #
+#  |  mv64h   RHEL 5 x86_64  |                               |  #
+#  |  mv64i                  |                               |  #
+#  |  mv64j   Fedora 10 [test kickoff machine]               |  #
+#  +=========================================================+  #
+#################################################################
+
+
