@@ -77,6 +77,89 @@ reventVM()
   echo ""
 }
 
+vmsave_as()
+{
+  vmhoster=$1
+  vmguest_hostname=$2
+  vmguest_imagename=$3
+  vmguest_currentimage=$4
+  vmguest_image_alias=$5
+  vmguest_image_savename=$6
+  techo "[$vmguest_imagename] save as VM STARTS..."
+  techo "       +------------------------------------------------------+"
+  techo "       | vm hoster   : $vmhoster"
+  techo "       | vm guest    : $vmguest_hostname"
+  techo "       | vm image    : $vmguest_imagename"
+  techo "       +------------------------------------------------------+"
+  techo "       | save current image as : [$vmguest_savename]"
+  techo "       |         and link it as: [$vmguest_image_alias] "
+  techo "       +------------------------------------------------------+"
+  techo "       [1/4] : stutdown current image: $vmguest_hostname"
+  shutdownVM $vmhoster $vmguest_hostname $vmguest_imagename
+  techo "       [2/4] : save it as ($vmguest_savename)"
+  ssh root@$vmhoster "cp -f $vmguest_currentimage $vmguest_image_savename"
+  techo "       [3/4] : link it with environmetn name: ($vmguest_image_alias)"
+  ssh root@$vmhoster "ln -s $vmguest_image_savename $vmguest_image_alias"
+  techo "       [4/4] : start the image"
+  startVM $vmhoster $vmguest_hostname $vmguest_imagename
+  techo "[$vmguest_imagename] save as VM Finished"
+  echo ""
+
+}
+
+vmpoweroff()
+{
+  vmhoster=$1
+  vmguest_hostname=$2
+  vmguest_imagename=$3
+  techo "power off vm [$vmguest_imagename] ..."
+  techo "       +------------------------------------------------------+"
+  techo "       | vm hoster   : $vmhoster"
+  techo "       | vm guest    : $vmguest_hostname"
+  techo "       | vm image    : $vmguest_imagename"
+  techo "       +------------------------------------------------------+"
+  shutdownVM $vmhoster $vmguest_hostname $vmguest_imagename
+}
+
+vmpoweron()
+{
+  vmhoster=$1
+  vmguest_hostname=$2
+  vmguest_imagename=$3
+  techo "power on vm [$vmguest_imagename] ..."
+  techo "       +------------------------------------------------------+"
+  techo "       | vm hoster   : $vmhoster"
+  techo "       | vm guest    : $vmguest_hostname"
+  techo "       | vm image    : $vmguest_imagename"
+  techo "       +------------------------------------------------------+"
+  startVM $vmhoster $vmguest_hostname $vmguest_imagename
+}
+
+vmupdate()
+{
+  vmhoster=$1
+  vmguest_hostname=$2
+  vmguest_imagename=$3
+  vmguest_currentimage=$4
+  vmguest_image_tobeupdate=$5
+  techo "update vm [$vmguest_imagename] with current image file ..."
+  techo "       +------------------------------------------------------+"
+  techo "       | vm hoster   : $vmhoster"
+  techo "       | vm guest    : $vmguest_hostname"
+  techo "       | vm image    : $vmguest_imagename"
+  techo "       | image to be update : $vmguest_image_tobeupdate"
+  techo "       +------------------------------------------------------+"
+  techo"	[1/3] stop current image [$vmguest_imagename]"
+  shutdownVM $vmhoster $vmguest_hostname $vmguest_imagename
+  techo "       [2/3] : update image with ($vmguest_image_tobeupdate)"
+  ssh root@$vmhoster "cp -f $vmguest_currentimage $vmguest_image_tobeupdate"
+  techo "       [3/3] : start the current image again "
+  startVM $vmhoster $vmguest_hostname $vmguest_imagename
+  techo "update VM [$vmguest_image_tobeupdate] Finished"
+  echo ""
+}
+
+
 vmup(){
 	vmlabel=$1
 	target=$2
