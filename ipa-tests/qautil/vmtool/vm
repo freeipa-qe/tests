@@ -4,6 +4,34 @@
 
 vmup mv32a ds81installed
 
+# Available functions
+# [vmup]
+#	usage  : vmup <vmlabel> <available environment>
+#	example: vmup mv64a ds81rpm
+#	  -- bring up one vm host (identified by vmlabel) to certain environment
+#
+# [vmupdate]
+#	usage  : vmupdate <vmlabel> <targetted environment>
+#	example: vmupdate mv32a ds81imstalled
+# 	  -- save current image, identified by vmlabel, as targetted environment
+#
+# [vmpoweron]
+#	usage  : vmpoweron <vmlabel>
+#	example: vmpoweron mv32d
+#	  -- just turn on one vm, identified by vmlabel
+#
+# [vmpoweroff]
+#	usage  : vmpoweroff <vmlabel>
+#	example: vmpoweroff mv32d
+#	  -- just turn off one vm, identified by vmlabel
+#
+# [vmsave_as]
+#	usage  : vmsave_as <vmlabel> <vm alias> <vm file name>
+#	example: vmsave-as mv32a ipa20rpm rhel5-i386-mv32a-vm.img.ds.rpm.2009-04-14
+#	  -- save current image, identified by vmlabel, 
+#			with real file name, rhel5-i386-mv32a-vm.img.ds.rpm.2009-04-14, 
+#			and create a link "ipa20rpm" to it
+
 # Syntax : vmup <vmlabel> <env target>
 #################################################################
 #          Available VM resources                               #
