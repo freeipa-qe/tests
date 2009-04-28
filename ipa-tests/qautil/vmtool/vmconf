@@ -18,47 +18,19 @@ if [ -z $vmlabel ];then
 	echo "[ERROR] vmlabel is not given, exit"
 	exit
 fi
-hoster=$VMHOSTER32
 hostname="${vmlabel}-vm.$DOMAIN"
 case $vmlabel in
 	mv32[abc])
+		hoster=$VMHOSTER32
 		imagename="rhel5-i386-${vmlabel}-vm"
 		imagefile=$IMAGE_BASE/rhel5-i386-${vmlabel}-vm.img
 		imagebase=$IMAGE_BK_BASE/rhel5-i386/${vmlabel}-vm
 		;;
-#	mv32b)
-#		hoster=$VMHOSTER32
-#		hostname="${vmlabel}-vm.$DOMAIN"
-#		imagename="rhel5-i386-mv32b-vm"
-#		imagefile=$IMAGE_BASE/rhel5-i386-mv32b-vm.img
-#		imagebase=$IMAGE_BK_BASE/rhel5-i386/mv32b-vm
-#		;;
-#	mv32c)
-#		hoster=$VMHOSTER32
-#		hostname="${vmlabel}-vm.$DOMAIN"
-#		imagename="rhel5-i386-mv32c-vm"
-#		imagefile=$IMAGE_BASE/rhel5-i386-mv32c-vm.img
-#		imagebase=$IMAGE_BK_BASE/rhel5-i386/mv32c-vm
-#		;;
-	mv32d)
-		imagename="rhel4-i386-mv32d-vm"
-		imagefile=$IMAGE_BASE/rhel4-i386-mv32d-vm.img
-		imagebase=$IMAGE_BK_BASE/rhel4-i386/mv32d-vm
-		;;
-	mv32e)
-		imagename="rhel4-i386-mv32e-vm"
-		imagefile=$IMAGE_BASE/rhel4-i386-mv32e-vm.img
-		imagebase=$IMAGE_BK_BASE/rhel4-i386/mv32e-vm
-		;;
-	mv32f)
-		imagename="rhel4-i386-mv32e-vm"
-		imagefile=$IMAGE_BASE/window-xp-mv32f-vm.img
-		imagebase=$IMAGE_BK_BASE/window/xp
-		;;
-	mv32g)
-		imagename="rhel4-i386-mv32e-vm"
-		imagefile=$IMAGE_BASE/window-2003-mv32g-vm.img
-		imagebase=$IMAGE_BK_BASE/window/2003
+	mv32[defg])
+		hoster=$VMHOSTER32
+		imagename="rhel4-i386-{$vmlabel}-vm"
+		imagefile=$IMAGE_BASE/rhel4-i386-${vmlabel}-vm.img
+		imagebase=$IMAGE_BK_BASE/rhel4-i386/${vmlabel}-vm
 		;;
 	mv32h)
 		echo "	[$vmlabel] is not ready"
@@ -69,40 +41,17 @@ case $vmlabel in
 	mv32j)
 		echo "	[$vmlabel] is not ready"
 		;;
-	mv64a)
+	mv64[abc])
 		hoster=$VMHOSTER64
-		hostname="${vmlabel}-vm.$DOMAIN"
-		imagename="rhel5-x86_64-mv64a-vm"
-		imagefile=$IMAGE_BASE/rhel5-x86_64-mv64a-vm.img
-		imagebase=$IMAGE_BK_BASE/rhel5-x86_64/mv64a-vm
+		imagename="rhel5-x86_64-${vmlabel}-vm"
+		imagefile=$IMAGE_BASE/rhel5-x86_64-${vmlabel}-vm.img
+		imagebase=$IMAGE_BK_BASE/rhel5-x86_64/${vmlabel}-vm
 		;;
-	mv64b)
+	mv64[de])
 		hoster=$VMHOSTER64
-		hostname="${vmlabel}-vm.$DOMAIN"
-		imagename="rhel5-x86_64-mv64b-vm"
-		imagefile=$IMAGE_BASE/rhel5-x86_64-mv64b-vm.img
-		imagebase=$IMAGE_BK_BASE/rhel5-x86_64/mv64b-vm
-		;;
-	mv64c)
-		hoster=$VMHOSTER64
-		hostname="${vmlabel}-vm.$DOMAIN"
-		imagename="rhel5-x86_64-mv64c-vm"
-		imagefile=$IMAGE_BASE/rhel5-x86_64-mv64c-vm.img
-		imagebase=$IMAGE_BK_BASE/rhel5-x86_64/mv64c-vm
-		;;
-	mv64d)
-		hoster=$VMHOSTER64
-		hostname="${vmlabel}-vm.$DOMAIN"
 		imagename="rhel4-x86_64-mv64d-vm"
-		imagefile=$IMAGE_BASE/rhel4-x86_64-mv64d-vm.img
-		imagebase=$IMAGE_BK_BASE/rhel4-x86_64/mv64d-vm
-		;;
-	mv64e)
-		hoster=$VMHOSTER64
-		hostname="${vmlabel}-vm.$DOMAIN"
-		imagename="rhel4-x86_64-mv64e-vm"
-		imagefile=$IMAGE_BASE/rhel4-x86_64-mv64e-vm.img
-		imagebase=$IMAGE_BK_BASE/rhel4-x86_64/mv64e-vm
+		imagefile=$IMAGE_BASE/rhel4-x86_64-${vmlabel}-vm.img
+		imagebase=$IMAGE_BK_BASE/rhel4-x86_64/${vmlabel}-vm
 		;;
 	mv64f)
 		echo "	[$vmlabel] is not ready"

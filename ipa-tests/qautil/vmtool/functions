@@ -244,33 +244,3 @@ vmup(){
 	reventVM $hoster $hostname $imagename $imagefile $imagebase/$target
 }
 
-##########################################
-###   mv32a-vm possible environments   ###
-##########################################
-setmv32a(){
-	vmlabel=$1
-	if [ -z $vmlabel ]; then
-		vmlabel=qa
-	fi
-	vmhoster=$mv32a_hoster
-	vmguest_hostname=$mv32a_hostname
-	vmguest_imagename=$mv32a_imagename
-	vmguest_imagefile=$mv32a_imagefile
-	vmguest_reventimage=$mv32a_imagebase/${vmlabel}
-	reventVM $vmhoster $vmguest_hostname $vmguest_imagename $vmguest_imagefile $vmguest_reventimage
-}
-
-
-setmv32d(){
-	vmlabel=$1
-	if [ -z $vmlabel ]; then
-		vmlabel=qa
-	fi
-	vmhoster=$mv32d_hoster
-	vmguest_hostname=$mv32d_hostname
-	vmguest_imagename=$mv32d_imagename
-	vmguest_imagefile=$mv32d_imagefile
-	vmguest_reventimage=$mv32d_imagebase/${vmlabel}
-	reventVM $vmhoster $vmguest_hostname $vmguest_imagename $vmguest_imagefile $vmguest_reventimage
-}
-
