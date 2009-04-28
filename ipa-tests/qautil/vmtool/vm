@@ -2,7 +2,9 @@
 . ./vmconf
 . ./functions
 
-vmup mv32a ds81installed
+#vmup mv32a ds81installed
+#vmpoweron mv32a
+vmsave_as mv32a test just.test
 
 # Available functions
 # [vmup]
@@ -27,9 +29,10 @@ vmup mv32a ds81installed
 #
 # [vmsave_as]
 #	usage  : vmsave_as <vmlabel> <vm alias> <vm file name>
-#	example: vmsave-as mv32a ipa20rpm rhel5-i386-mv32a-vm.img.ds.rpm.2009-04-14
+#	example: vmsave-as mv32a ipa20rpm ds.rpm
 #	  -- save current image, identified by vmlabel, 
 #			with real file name, rhel5-i386-mv32a-vm.img.ds.rpm.2009-04-14, 
+#			notice : suffix "rhel5-i386-mv32a-vm.img" and date is automatic added
 #			and create a link "ipa20rpm" to it
 
 # Syntax : vmup <vmlabel> <env target>

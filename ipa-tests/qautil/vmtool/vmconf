@@ -18,53 +18,44 @@ if [ -z $vmlabel ];then
 	echo "[ERROR] vmlabel is not given, exit"
 	exit
 fi
-
+hoster=$VMHOSTER32
+hostname="${vmlabel}-vm.$DOMAIN"
 case $vmlabel in
-	mv32a)
-		hoster=$VMHOSTER32
-		hostname="${vmlabel}-vm.$DOMAIN"
-		imagename="rhel5-i386-mv32a-vm"
-		imagefile=$IMAGE_BASE/rhel5-i386-mv32a-vm.img
-		imagebase=$IMAGE_BK_BASE/rhel5-i386/mv32a-vm
+	mv32[abc])
+		imagename="rhel5-i386-${vmlabel}-vm"
+		imagefile=$IMAGE_BASE/rhel5-i386-${vmlabel}-vm.img
+		imagebase=$IMAGE_BK_BASE/rhel5-i386/${vmlabel}-vm
 		;;
-	mv32b)
-		hoster=$VMHOSTER32
-		hostname="${vmlabel}-vm.$DOMAIN"
-		imagename="rhel5-i386-mv32b-vm"
-		imagefile=$IMAGE_BASE/rhel5-i386-mv32b-vm.img
-		imagebase=$IMAGE_BK_BASE/rhel5-i386/mv32b-vm
-		;;
-	mv32c)
-		hoster=$VMHOSTER32
-		hostname="${vmlabel}-vm.$DOMAIN"
-		imagename="rhel5-i386-mv32c-vm"
-		imagefile=$IMAGE_BASE/rhel5-i386-mv32c-vm.img
-		imagebase=$IMAGE_BK_BASE/rhel5-i386/mv32c-vm
-		;;
+#	mv32b)
+#		hoster=$VMHOSTER32
+#		hostname="${vmlabel}-vm.$DOMAIN"
+#		imagename="rhel5-i386-mv32b-vm"
+#		imagefile=$IMAGE_BASE/rhel5-i386-mv32b-vm.img
+#		imagebase=$IMAGE_BK_BASE/rhel5-i386/mv32b-vm
+#		;;
+#	mv32c)
+#		hoster=$VMHOSTER32
+#		hostname="${vmlabel}-vm.$DOMAIN"
+#		imagename="rhel5-i386-mv32c-vm"
+#		imagefile=$IMAGE_BASE/rhel5-i386-mv32c-vm.img
+#		imagebase=$IMAGE_BK_BASE/rhel5-i386/mv32c-vm
+#		;;
 	mv32d)
-		hoster=$VMHOSTER32
-		hostname="${vmlabel}-vm.$DOMAIN"
 		imagename="rhel4-i386-mv32d-vm"
 		imagefile=$IMAGE_BASE/rhel4-i386-mv32d-vm.img
 		imagebase=$IMAGE_BK_BASE/rhel4-i386/mv32d-vm
 		;;
 	mv32e)
-		hoster=$VMHOSTER32
-		hostname="${vmlabel}-vm.$DOMAIN"
 		imagename="rhel4-i386-mv32e-vm"
 		imagefile=$IMAGE_BASE/rhel4-i386-mv32e-vm.img
 		imagebase=$IMAGE_BK_BASE/rhel4-i386/mv32e-vm
 		;;
 	mv32f)
-		hoster=$VMHOSTER32
-		hostname="${vmlabel}-vm.$DOMAIN"
 		imagename="rhel4-i386-mv32e-vm"
 		imagefile=$IMAGE_BASE/window-xp-mv32f-vm.img
 		imagebase=$IMAGE_BK_BASE/window/xp
 		;;
 	mv32g)
-		hoster=$VMHOSTER32
-		hostname="${vmlabel}-vm.$DOMAIN"
 		imagename="rhel4-i386-mv32e-vm"
 		imagefile=$IMAGE_BASE/window-2003-mv32g-vm.img
 		imagebase=$IMAGE_BK_BASE/window/2003
