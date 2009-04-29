@@ -1,0 +1,14 @@
+[ipa-daily]
+name=ipa-daily
+baseurl=http://porkchop.devel.redhat.com/nightly/latest-RHEL5.2-IPA-2.0/2.0/i386/os/IPA/
+#baseurl=http://porkchop.devel.redhat.com/nightly/latest-RHEL5.2-IPA-1.1/tree-i386/IPA/
+#baseurl=http://porkchop2.devel.redhat.com/nightly/latest-RHEL5.1-IPA-1.0/1.0/i386/os/IPA/
+enabled=1
+gpgcheck=0
+
+#[rhds80-ga]
+#name=rhds80-ga
+#baseurl=http://tsunami.dsdev.sjc.redhat.com/share/builds/yum/identity/ga/products/DS80/RHEL5/i386/RPMS/
+#enabled=1
+#gpgcheck=0
+
