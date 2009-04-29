@@ -223,14 +223,15 @@ tp4()
 				echo "server-install of server on $s ssh failed"
 				tet_result FAIL
 			fi
-			if [ "$s" = "M1" ]; then
-				FixBindServer $s
-				ret=$?
-				if [ $ret -ne 0 ]; then
-					echo "fix-bind-server on $s ssh failed"
-					tet_result FAIL
-				fi
-			fi
+	# This should be run as part of SetupServer
+#			if [ "$s" = "M1" ]; then
+#				FixBindServer $s
+#				ret=$?
+#				if [ $ret -ne 0 ]; then
+#					echo "fix-bind-server on $s ssh failed"
+#					tet_result FAIL
+#				fi
+#			fi
 			if [ "$DSTET_DEBUG" = "y" ]; then echo "done working on $s"; fi
 		fi
 	done
