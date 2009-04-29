@@ -2,18 +2,107 @@
 
 ######################################################################
 
-#The following ipa cli commands needs to be tested:
+# The following ipa cli commands needs to be tested:
+#  aci-add                   Add a new aci.
+#  aci-del                   Delete an existing aci.
+#  aci-find                  Search for a aci.
+#  aci-mod                   Edit an existing aci.
+#  aci-show                  Examine an existing aci.
+#  aci-showall               Examine all existing acis.
+#  application-create        Add a new application
+#  application-delete        Delete an application
+#  application-edit          Edit an existing application
+#  application-find          Search for applications
+#  application-show          Examine an existing application
+#  automount-addindirectmap  Add a new automap indirect mount point.
+#  automount-addkey          Add a new automount key.
+#  automount-addmap          Add a new automount map.
+#  automount-delkey          Delete an automount key.
+#  automount-delmap          Delete an automount map.
+#  automount-findkey         Search automount keys.
+#  automount-findmap         Search automount maps.
+#  automount-getkeys         Retrieve all keys for an automount map.
+#  automount-getmaps         Retrieve all automount maps
+#  automount-modkey          Edit an existing automount key.
+#  automount-modmap          Edit an existing automount map.
+#  automount-showkey         Examine an existing automount key.
+#  automount-showmap         Examine an existing automount map.
+#  automount-tofiles         Generate the automount maps as they would be in the filesystem
+#  console                   Start the IPA interactive Python console.
+#  defaultoptions-mod        Options command.
+#  defaultoptions-show       Retrieve current default options
+#  delegation-add            Add a new delegation.
+#  delegation-del            Delete an existing delegation.
+#  delegation-find           Search for a delegation.
+#  delegation-mod            Edit an existing delegation.
+#  delegation-show           Examine an existing delegation.
+#  env                       Show environment variables
+#  group-add                 Add a new group.
+#  group-add-member          Add a member to a group.
+#  group-del                 Delete an existing group.
+#  group-find                Search the groups.
+#  group-mod                 Edit an existing group.
+#  group-remove-member       Remove a member from a group.
+#  group-show                Examine an existing group.
+#  help                      Display help for a command or topic.
+#  host-add                  Add a new host.
+#  host-del                  Delete an existing host.
+#  host-find                 Search the hosts.
+#  host-mod                  Edit an existing host.
+#  host-show                 Examine an existing host.
+#  hostgroup-add             Add a new hostgroup.
+#  hostgroup-add-member      Add a member to a hostgroup.
+#  hostgroup-del             Delete an existing hostgroup.
+#  hostgroup-find            Search the groups.
+#  hostgroup-mod             Edit an existing hostgroup.
+#  hostgroup-remove-member   Remove a member from a hostgroup.
+#  hostgroup-show            Examine an existing hostgroup.
+#  join                      Join an IPA domain
+#  netgroup-add              Add a new netgroup.
+#  netgroup-add-member       Add a member to a netgroup.
+#  netgroup-del              Delete an existing netgroup.
+#  netgroup-find             Search the groups.
+#  netgroup-mod              Edit an existing netgroup.
+#  netgroup-remove-member    Remove a member from a netgroup.
+#  netgroup-show             Examine an existing netgroup.
+#  passwd                    Edit existing password policy.
+#  plugins                   Show all loaded plugins
+#  pwpolicy-mod              Edit existing password policy.
+#  pwpolicy-show             Retrieve current password policy
+#  rolegroup-add             Add a new rolegroup.
+#  rolegroup-add-member      Add a member to a rolegroup.
+#  rolegroup-del             Delete an existing rolegroup.
+#  rolegroup-find            Search the groups.
+#  rolegroup-mod             Edit an existing rolegroup.
+#  rolegroup-remove-member   Remove a member from a rolegroup.
+#  rolegroup-show            Examine an existing rolegroup.
+#  service-add               Add a new service.
+#  service-del               Delete an existing service.
+#  service-find              Search the existing services.
+#  service-show              Examine an existing service.
+#  taskgroup-add             Add a new taskgroup.
+#  taskgroup-add-member      Add a member to a taskgroup.
+#  taskgroup-del             Delete an existing taskgroup.
+#  taskgroup-find            Search the groups.
+#  taskgroup-mod             Edit an existing taskgroup.
+#  taskgroup-remove-member   Remove a member from a taskgroup.
+#  taskgroup-show            Examine an existing taskgroup.
+#  taskgroup-showall         List all taskgroups.
+#  user2-create              Create new user.
+#  user2-delete              Delete user.
+#  user2-find                Search for users.
+#  user2-lock                Lock user account.
+#  user2-mod                 Modify user.
+#  user2-show                Display user.
+#  user2-unlock              Unlock user account.
+#  user-add                  Add a new user.
+#  user-del                  Delete an existing user.
+#  user-find                 Search for users.
+#  user-lock                 Lock a user account.
+#  user-mod                  Edit an existing user.
+#  user-show                 Examine an existing user.
+#  user-unlock               Unlock a user account.
 
-#ipa-adddelegation       ipa-findgroup           ipa-passwd
-#ipa-addgroup            ipa-findservice         ipa-pwpolicy
-#ipa-addservice          ipa-finduser            ipa-replica-install
-#ipa-adduser             ipa-getkeytab           ipa-replica-manage
-#ipa-client-install      ipa_kpasswd             ipa-replica-prepare
-#ipactl                  ipa-listdelegation      ipa-server-certinstall
-#ipa-deldelegation       ipa-lockuser            ipa-server-install
-#ipa-delgroup            ipa-moddelegation       ipa-upgradeconfig
-#ipa-delservice          ipa-modgroup            ipa_webgui
-#ipa-deluser             ipa-moduser             
 ######################################################################
 if [ "$DSTET_DEBUG" = "y" ]; then
 	set -x
