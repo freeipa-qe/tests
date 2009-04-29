@@ -111,12 +111,13 @@ fi
 tet_startup="CheckAlive"
 tet_cleanup="cli_cleanup"
 iclist="ic1 "
-ic1="tp1 tp2 tp3 tp4 tp5 tp6 tp7 tp8 tp9 tp10 tp11 tp12 tp13 tp14 tp15 tp16 tp17 tp18 tp19 tp20"
+ic1="tp1 tp2 tp3 tp4 tp5 tp6 negaddservice tp7 tp8 tp9 tp10 tp11 tp12 tp13 tp14 tp15 tp16 tp17 tp18 tp19 tp20"
 
 # These services will be used by the tests, and removed when the cli test is complete
-service1='host/emc-cge0.sjc2.redhat.com'
-service2='nfs/emc-cge0.sjc2.redhat.com'
-service3='ldap/emc-cge0.sjc2.redhat.com'
+host1='alpha.dsdev.sjc.redhat.com'
+service1="host/$host1"
+service2="nfs/$host1"
+service3="ldap/$host1"
 
 # Users to be used in varios tests
 superuser="sup34"
@@ -177,8 +178,40 @@ tp2()
 	echo "END $tet_thistest"
 }
 
-######################################################################
+# ipa host-add
 tp3()
+{
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+	echo "START $tet_thistest"
+	for s in $SERVERS; do
+		if [ "$s" == "M1" ]; then
+			eval_vars $s
+
+			# test for ipa host-add
+			ssh root@$FULLHOSTNAME "ipa host-add \"$host1\""
+			ret=$?
+			if [ $ret -ne 0 ]
+			then
+				echo "ERROR - ipa host-add failed on $FULLHOSTNAME"
+				tet_result FAIL
+			fi
+			# Verifying
+			ssh root@$FULLHOSTNAME "ipa host-find \"$host1\" | grep $host1"
+			if [ $? -ne 0 ]
+			then
+				echo "ERROR - ipa host-find \"$host1\" failed on $FULLHOSTNAME"
+				tet_result FAIL
+			fi
+		fi
+	done
+
+	tet_result PASS
+	echo "END $tet_thistest"
+
+}
+
+######################################################################
+tp4()
 {
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 	echo "START $tet_thistest"
@@ -209,7 +242,7 @@ tp3()
 
 }
 ######################################################################
-tp4()
+tp5()
 {
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 	echo "START $tet_thistest"
@@ -239,7 +272,7 @@ tp4()
 }
 
 ######################################################################
-tp5()
+tp6()
 {
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 	echo "START $tet_thistest"
@@ -273,7 +306,7 @@ tp5()
 ################################################################
 # Negitive test case of tp3
 ################################################################
-tp6()
+negaddservice()
 {
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 	echo "START $tet_thistest"
