@@ -111,9 +111,9 @@ fi
 tet_startup="CheckAlive"
 tet_cleanup="cli_cleanup"
 iclist="ic1 "
-ic1="tp1 tp2 tp3 hostlist servicelist tp5 tp6 tp7 tp8 tp9 tp10 tp11 tp12 tp13 tp14 tp15 tp16 tp17 tp18 tp19 tp20"
+ic1="tp1 tp2 tp3 hostlist servicelist tp12 tp13 tp14 tp15 tp16 tp17 tp18 tp19 tp20"
 hostlist="ipahostfind ipahostshow ipahostmoda ipahostmodb ipahostmodc ipahostmodd ipahostmode ipahostdel"
-servicelist="ipaserviceprepare ipaserviceadd negaddservice ipaservicedel ipaservicecleanup"
+servicelist="ipaserviceprepare ipaserviceadd ipaserviceaddb ipaserviceaddc negaddservice negaddserviceb negaddservicec ipaservicedel ipaservicedelb ipaservicedelc ipanegservicedel ipaservicecleanup"
 # These services will be used by the tests, and removed when the cli test is complete
 host1='alpha.dsdev.sjc.redhat.com'
 service1="ssh/$host1"
@@ -545,6 +545,124 @@ negaddservice()
 }
 
 ######################################################################
+ipaserviceaddb()
+{
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+	echo "START $tet_thistest"
+	for s in $SERVERS; do
+		if [ "$s" == "M1" ]; then
+			eval_vars $s
+
+			# test for ipa-addservice
+			ssh root@$FULLHOSTNAME "ipa-addservice \"$service2\""
+			if [ $? -ne 0 ]
+			then
+				echo "ERROR - ipa-addservice failed on $FULLHOSTNAME"
+				tet_result FAIL
+			fi
+			ssh root@$FULLHOSTNAME "ipa-findservice \"$service2\""
+			if [ $? -ne 0 ]
+			then
+				echo "ERROR - ipa-findservice failed on $FULLHOSTNAME"
+				tet_result FAIL
+			fi
+		fi
+	done
+
+	tet_result PASS
+	echo "END $tet_thistest"
+
+}
+
+######################################################################
+ipaserviceaddc()
+{
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+	echo "START $tet_thistest"
+	for s in $SERVERS; do
+		if [ "$s" == "M1" ]; then
+			eval_vars $s
+
+			# test for ipa-addservice
+			ssh root@$FULLHOSTNAME "ipa-addservice \"$service3\""
+			if [ $? -ne 0 ]
+			then
+				echo "ERROR - ipa-addservice failed on $FULLHOSTNAME"
+				tet_result FAIL
+			fi
+			# Sleeping for 10 seconds to allow addservice to sync
+			sleep 10;
+		fi
+		ssh root@$FULLHOSTNAME "ipa-findservice \"$service3\""
+		if [ $? -ne 0 ]
+		then
+			echo "ERROR - ipa-findservice failed on $FULLHOSTNAME"
+			tet_result FAIL
+		fi
+	done
+
+	tet_result PASS
+	echo "END $tet_thistest"
+
+}
+
+################################################################
+# Negitive test case of ipaserviceaddb
+################################################################
+negaddserviceb()
+{
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+	echo "START $tet_thistest"
+	for s in $SERVERS; do
+		if [ "$s" != "M1" ]&&[ "$s" != "" ]; then
+			eval_vars $s
+
+			echo "this step is supposed to fail"
+			# test for ipa-addservice
+			ssh root@$FULLHOSTNAME "ipa-addservice \"$service2\""
+			ret=$?
+			if [ $ret -eq 0 ]
+			then
+				echo "ERROR - ipa-addservice passed when it should not have on $FULLHOSTNAME"
+				tet_result FAIL
+			fi
+		fi
+	done
+
+	tet_result PASS
+	echo "END $tet_thistest"
+
+}
+
+################################################################
+# Negitive test case of tp5
+################################################################
+negaddservicec()
+{
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+	echo "START $tet_thistest"
+	for s in $SERVERS; do
+		if [ "$s" != "M1" ]&&[ "$s" != "" ]; then
+			eval_vars $s
+
+			echo "this step is supposed to fail"
+			# test for ipa-addservice
+			ssh root@$FULLHOSTNAME "ipa-addservice \"$service3\""
+			ret=$?
+			if [ $ret -eq 0 ]
+			then
+				echo "ERROR - ipa-addservice passed when it should not have on $FULLHOSTNAME"
+				tet_result FAIL
+			fi
+		fi
+	done
+
+	tet_result PASS
+	echo "END $tet_thistest"
+
+}
+#
+###############################################################################
 ipaservicedel()
 {
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
@@ -554,18 +672,17 @@ ipaservicedel()
 			eval_vars $s
 
 			# test for ipa-addservice
-			ssh root@$FULLHOSTNAME "ipa service-add \"$service2\";ipa service-add \"$service3\""
 			ssh root@$FULLHOSTNAME "ipa service-del \"$service1\""
 			ret=$?
 			if [ $ret -ne 0 ]
 			then
-				echo "ERROR - ipa service-add failed on $FULLHOSTNAME"
+				echo "ERROR - ipa service-del failed on $FULLHOSTNAME"
 				tet_result FAIL
 			fi
 			ssh root@$FULLHOSTNAME "ipa service-find \"$service1\""
 			if [ $? -eq 0 ]
 			then
-				echo "ERROR - ipa-findservice passed when it should not have on $FULLHOSTNAME"
+				echo "ERROR - ipa service-find passed when it should not have on $FULLHOSTNAME"
 				tet_result FAIL
 			fi
 
@@ -576,6 +693,103 @@ ipaservicedel()
 	echo "END $tet_thistest"
 
 }
+
+###############################################################################
+ipaservicedelb()
+{
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+	echo "START $tet_thistest"
+	for s in $SERVERS; do
+		if [ "$s" == "M1" ]; then
+			eval_vars $s
+
+			# test for ipa-addservice
+			ssh root@$FULLHOSTNAME "ipa service-del \"$service2\""
+			ret=$?
+			if [ $ret -ne 0 ]
+			then
+				echo "ERROR - ipa service-del failed on $FULLHOSTNAME"
+				tet_result FAIL
+			fi
+			ssh root@$FULLHOSTNAME "ipa service-find \"$service2\""
+			if [ $? -eq 0 ]
+			then
+				echo "ERROR - ipa service-find passed when it should not have on $FULLHOSTNAME"
+				tet_result FAIL
+			fi
+
+		fi
+	done
+
+	tet_result PASS
+	echo "END $tet_thistest"
+
+}
+
+###############################################################################
+ipaservicedelc()
+{
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+	echo "START $tet_thistest"
+	for s in $SERVERS; do
+		if [ "$s" == "M1" ]; then
+			eval_vars $s
+
+			# test for ipa-addservice
+			ssh root@$FULLHOSTNAME "ipa service-del \"$service3\""
+			ret=$?
+			if [ $ret -ne 0 ]
+			then
+				echo "ERROR - ipa service-del failed on $FULLHOSTNAME"
+				tet_result FAIL
+			fi
+			ssh root@$FULLHOSTNAME "ipa service-find \"$service3\""
+			if [ $? -eq 0 ]
+			then
+				echo "ERROR - ipa service-find passed when it should not have on $FULLHOSTNAME"
+				tet_result FAIL
+			fi
+
+		fi
+	done
+
+	tet_result PASS
+	echo "END $tet_thistest"
+
+}
+
+###############################################################################
+ipanegservicedel()
+{
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+	echo "START $tet_thistest"
+	for s in $SERVERS; do
+		if [ "$s" == "M1" ]; then
+			eval_vars $s
+
+			# test for ipa-addservice
+			ssh root@$FULLHOSTNAME "ipa service-del \"$service3\""
+			ret=$?
+			if [ $ret -eq 0 ]
+			then
+				echo "ERROR - ipa service-del passed when it should not have on $FULLHOSTNAME"
+				tet_result FAIL
+			fi
+			ssh root@$FULLHOSTNAME "ipa service-find \"$service3\""
+			if [ $? -eq 0 ]
+			then
+				echo "ERROR - ipa service-find passed when it should not have on $FULLHOSTNAME"
+				tet_result FAIL
+			fi
+
+		fi
+	done
+
+	tet_result PASS
+	echo "END $tet_thistest"
+
+}
+
 
 # Cleanup host used in the service cli tests
 ipaservicecleanup()
@@ -608,221 +822,6 @@ ipaservicecleanup()
 	echo "END $tet_thistest"
 
 }
-
-######################################################################
-tp5()
-{
-	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	echo "START $tet_thistest"
-	for s in $SERVERS; do
-		if [ "$s" == "M1" ]; then
-			eval_vars $s
-
-			# test for ipa-addservice
-			ssh root@$FULLHOSTNAME "ipa-addservice \"$service2\""
-			if [ $? -ne 0 ]
-			then
-				echo "ERROR - ipa-addservice failed on $FULLHOSTNAME"
-				tet_result FAIL
-			fi
-			ssh root@$FULLHOSTNAME "ipa-findservice \"$service2\""
-			if [ $? -ne 0 ]
-			then
-				echo "ERROR - ipa-findservice failed on $FULLHOSTNAME"
-				tet_result FAIL
-			fi
-		fi
-	done
-
-	tet_result PASS
-	echo "END $tet_thistest"
-
-}
-
-######################################################################
-tp6()
-{
-	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	echo "START $tet_thistest"
-	for s in $SERVERS; do
-		if [ "$s" == "M1" ]; then
-			eval_vars $s
-
-			# test for ipa-addservice
-			ssh root@$FULLHOSTNAME "ipa-addservice \"$service3\""
-			if [ $? -ne 0 ]
-			then
-				echo "ERROR - ipa-addservice failed on $FULLHOSTNAME"
-				tet_result FAIL
-			fi
-			# Sleeping for 10 seconds to allow addservice to sync
-			sleep 10;
-		fi
-		ssh root@$FULLHOSTNAME "ipa-findservice \"$service3\""
-		if [ $? -ne 0 ]
-		then
-			echo "ERROR - ipa-findservice failed on $FULLHOSTNAME"
-			tet_result FAIL
-		fi
-	done
-
-	tet_result PASS
-	echo "END $tet_thistest"
-
-}
-
-################################################################
-# Negitive test case of tp4
-################################################################
-tp7()
-{
-	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	echo "START $tet_thistest"
-	for s in $SERVERS; do
-		if [ "$s" != "M1" ]&&[ "$s" != "" ]; then
-			eval_vars $s
-
-			echo "this step is supposed to fail"
-			# test for ipa-addservice
-			ssh root@$FULLHOSTNAME "ipa-addservice \"$service2\""
-			ret=$?
-			if [ $ret -eq 0 ]
-			then
-				echo "ERROR - ipa-addservice passed when it should not have on $FULLHOSTNAME"
-				tet_result FAIL
-			fi
-		fi
-	done
-
-	tet_result PASS
-	echo "END $tet_thistest"
-
-}
-
-################################################################
-# Negitive test case of tp5
-################################################################
-tp8()
-{
-	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	echo "START $tet_thistest"
-	for s in $SERVERS; do
-		if [ "$s" != "M1" ]&&[ "$s" != "" ]; then
-			eval_vars $s
-
-			echo "this step is supposed to fail"
-			# test for ipa-addservice
-			ssh root@$FULLHOSTNAME "ipa-addservice \"$service3\""
-			ret=$?
-			if [ $ret -eq 0 ]
-			then
-				echo "ERROR - ipa-addservice passed when it should not have on $FULLHOSTNAME"
-				tet_result FAIL
-			fi
-		fi
-	done
-
-	tet_result PASS
-	echo "END $tet_thistest"
-
-}
-#
-######################################################################
-#
-
-tp9()
-{
-	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	echo "START $tet_thistest"
-	for s in $SERVERS; do
-		if [ "$s" == "M1" ]; then
-			eval_vars $s
-
-			# test for ipa-addservice
-			ssh root@$FULLHOSTNAME "ipa-delservice \"$service1\""
-			if [ $? -ne 0 ]
-			then
-				echo "ERROR - ipa-delservice failed on $FULLHOSTNAME"
-				tet_result FAIL
-			fi
-			echo "this step is supposed to fail"
-			ssh root@$FULLHOSTNAME "ipa-findservice \"$service1\""
-			if [ $? -eq 0 ]
-			then
-				echo "ERROR - ipa-findservice passed when it shouldn't have on $FULLHOSTNAME"
-				tet_result FAIL
-			fi
-
-		fi
-	done
-
-	tet_result PASS
-	echo "END $tet_thistest"
-
-}
-
-tp10()
-{
-	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	echo "START $tet_thistest"
-	for s in $SERVERS; do
-		if [ "$s" == "M1" ]; then
-			eval_vars $s
-
-			# test for ipa-addservice
-			ssh root@$FULLHOSTNAME "ipa-delservice \"$service2\""
-			if [ $? -ne 0 ]
-			then
-				echo "ERROR - ipa-delservice failed on $FULLHOSTNAME"
-				tet_result FAIL
-			fi
-			echo "this step is supposed to fail"
-			ssh root@$FULLHOSTNAME "ipa-findservice \"$service2\""
-			if [ $? -eq 0 ]
-			then
-				echo "ERROR - ipa-findservice passed when it shouldn't have on $FULLHOSTNAME"
-				tet_result FAIL
-			fi
-
-		fi
-	done
-
-	tet_result PASS
-	echo "END $tet_thistest"
-
-}
-
-tp11()
-{
-	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	echo "START $tet_thistest"
-	for s in $SERVERS; do
-		if [ "$s" == "M1" ]; then
-			eval_vars $s
-
-			# test for ipa-addservice
-			ssh root@$FULLHOSTNAME "ipa-delservice \"$service3\""
-			if [ $? -ne 0 ]
-			then
-				echo "ERROR - ipa-delservice failed on $FULLHOSTNAME"
-				tet_result FAIL
-			fi
-			echo "this step is supposed to fail"
-			ssh root@$FULLHOSTNAME "ipa-findservice \"$service3\""
-			if [ $? -eq 0 ]
-			then
-				echo "ERROR - ipa-findservice passed when it shouldn't have on $FULLHOSTNAME"
-				tet_result FAIL
-			fi
-
-		fi
-	done
-
-	tet_result PASS
-	echo "END $tet_thistest"
-
-}
-
 
 ######################################################################
 # ipa-adduser
