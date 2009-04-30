@@ -112,7 +112,7 @@ tet_startup="CheckAlive"
 tet_cleanup="cli_cleanup"
 iclist="ic1 "
 ic1="tp1 tp2 tp3 hostlist tp4 tp5 tp6 negaddservice tp7 tp8 tp9 tp10 tp11 tp12 tp13 tp14 tp15 tp16 tp17 tp18 tp19 tp20"
-hostlist="ipahostfind"
+hostlist="ipahostfind ipahostshow ipahostmoda ipahostmodb ipahostmodc ipahostmodd ipahostmode"
 # These services will be used by the tests, and removed when the cli test is complete
 host1='alpha.dsdev.sjc.redhat.com'
 service1="host/$host1"
@@ -241,6 +241,191 @@ ipahostfind()
 
 }
 
+# ipa host-show
+ipahostshow()
+{
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+	echo "START $tet_thistest"
+	for s in $SERVERS; do
+		if [ "$s" == "M1" ]; then
+			eval_vars $s
+
+			# check return code
+			ssh root@$FULLHOSTNAME "ipa host-show \"$host1\""
+			if [ $? -ne 0 ]
+			then
+				echo "ERROR - ipa host-show \"$host1\" failed on $FULLHOSTNAME"
+				tet_result FAIL
+			fi
+			# check output
+			ssh root@$FULLHOSTNAME "ipa host-show \"$host1\" | grep $host1"
+			if [ $? -ne 0 ]
+			then
+				echo "ERROR - ipa host-show \"$host1\" failed on $FULLHOSTNAME"
+				tet_result FAIL
+			fi
+		fi
+	done
+
+	tet_result PASS
+	echo "END $tet_thistest"
+
+}
+
+# ipa host-mod
+ipahostmoda()
+{
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+	echo "START $tet_thistest"
+	for s in $SERVERS; do
+		if [ "$s" == "M1" ]; then
+			eval_vars $s
+
+			# check return code
+			ssh root@$FULLHOSTNAME "ipa host-mod --location=testloc \"$host1\""
+			if [ $? -ne 0 ]
+			then
+				echo "ERROR - ipa host-mod \"$host1\" failed on $FULLHOSTNAME"
+				tet_result FAIL
+			fi
+			# check output
+			ssh root@$FULLHOSTNAME "ipa host-show \"$host1\" | grep testloc"
+			if [ $? -ne 0 ]
+			then
+				echo "ERROR - ipa host-show \"$host1\" failed on $FULLHOSTNAME"
+				tet_result FAIL
+			fi
+		fi
+	done
+
+	tet_result PASS
+	echo "END $tet_thistest"
+
+}
+
+# ipa host-mod
+ipahostmodb()
+{
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+	echo "START $tet_thistest"
+	for s in $SERVERS; do
+		if [ "$s" == "M1" ]; then
+			eval_vars $s
+
+			# check return code
+			ssh root@$FULLHOSTNAME "ipa host-mod --platform=MAC \"$host1\""
+			if [ $? -ne 0 ]
+			then
+				echo "ERROR - ipa host-mod \"$host1\" failed on $FULLHOSTNAME"
+				tet_result FAIL
+			fi
+			# check output
+			ssh root@$FULLHOSTNAME "ipa host-show \"$host1\" | grep MAC"
+			if [ $? -ne 0 ]
+			then
+				echo "ERROR - ipa host-show \"$host1\" failed on $FULLHOSTNAME"
+				tet_result FAIL
+			fi
+		fi
+	done
+
+	tet_result PASS
+	echo "END $tet_thistest"
+
+}
+
+# ipa host-mod
+ipahostmodc()
+{
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+	echo "START $tet_thistest"
+	for s in $SERVERS; do
+		if [ "$s" == "M1" ]; then
+			eval_vars $s
+
+			# check return code
+			ssh root@$FULLHOSTNAME "ipa host-mod --os=osx \"$host1\""
+			if [ $? -ne 0 ]
+			then
+				echo "ERROR - ipa host-mod \"$host1\" failed on $FULLHOSTNAME"
+				tet_result FAIL
+			fi
+			# check output
+			ssh root@$FULLHOSTNAME "ipa host-show \"$host1\" | grep osx"
+			if [ $? -ne 0 ]
+			then
+				echo "ERROR - ipa host-show \"$host1\" failed on $FULLHOSTNAME"
+				tet_result FAIL
+			fi
+		fi
+	done
+
+	tet_result PASS
+	echo "END $tet_thistest"
+
+}
+
+# ipa host-mod
+ipahostmodd()
+{
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+	echo "START $tet_thistest"
+	for s in $SERVERS; do
+		if [ "$s" == "M1" ]; then
+			eval_vars $s
+
+			# check return code
+			ssh root@$FULLHOSTNAME "ipa host-mod --description='interesting description' \"$host1\""
+			if [ $? -ne 0 ]
+			then
+				echo "ERROR - ipa host-mod \"$host1\" failed on $FULLHOSTNAME"
+				tet_result FAIL
+			fi
+			# check output
+			ssh root@$FULLHOSTNAME "ipa host-show \"$host1\" | grep 'interesting description'"
+			if [ $? -ne 0 ]
+			then
+				echo "ERROR - ipa host-show \"$host1\" failed on $FULLHOSTNAME"
+				tet_result FAIL
+			fi
+		fi
+	done
+
+	tet_result PASS
+	echo "END $tet_thistest"
+
+}
+
+# ipa host-mod
+ipahostmode()
+{
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+	echo "START $tet_thistest"
+	for s in $SERVERS; do
+		if [ "$s" == "M1" ]; then
+			eval_vars $s
+
+			# check return code
+			ssh root@$FULLHOSTNAME "ipa host-mod --locality='mountain view, ca' \"$host1\""
+			if [ $? -ne 0 ]
+			then
+				echo "ERROR - ipa host-mod \"$host1\" failed on $FULLHOSTNAME"
+				tet_result FAIL
+			fi
+			# check output
+			ssh root@$FULLHOSTNAME "ipa host-show \"$host1\" | grep 'mountain view, ca'"
+			if [ $? -ne 0 ]
+			then
+				echo "ERROR - ipa host-show \"$host1\" failed on $FULLHOSTNAME"
+				tet_result FAIL
+			fi
+		fi
+	done
+
+	tet_result PASS
+	echo "END $tet_thistest"
+
+}
 
 ######################################################################
 tp4()
