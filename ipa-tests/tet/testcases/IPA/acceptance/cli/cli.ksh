@@ -111,9 +111,10 @@ fi
 tet_startup="CheckAlive"
 tet_cleanup="cli_cleanup"
 iclist="ic1 "
-ic1="tp1 tp2 tp3 hostlist servicelist tp12 tp13 tp14 tp15 tp16 tp17 tp18 tp19 tp20"
+ic1="tp1 tp2 tp3 hostlist servicelist adduser delegationlist tp14 tp15 tp16 tp17 tp18 tp19 tp20"
 hostlist="ipahostfind ipahostshow ipahostmoda ipahostmodb ipahostmodc ipahostmodd ipahostmode ipahostdel"
 servicelist="ipaserviceprepare ipaserviceadd ipaserviceaddb ipaserviceaddc negaddservice negaddserviceb negaddservicec ipaservicedel ipaservicedelb ipaservicedelc ipanegservicedel ipaservicecleanup"
+delegationlist="adddelegationsetup"
 # These services will be used by the tests, and removed when the cli test is complete
 host1='alpha.dsdev.sjc.redhat.com'
 service1="ssh/$host1"
@@ -826,23 +827,23 @@ ipaservicecleanup()
 ######################################################################
 # ipa-adduser
 ######################################################################
-tp12()
+adduser()
 {
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 	echo "START $tet_thistest"
 	eval_vars M1
 
-	ssh root@$FULLHOSTNAME "ipa-adduser -ffirstname-super -llastbname-super $superuser"
+	ssh root@$FULLHOSTNAME "ipa user-add --first=firstname-super --last=lastbname-super $superuser"
 	if [ $? -ne 0 ]
 	then 
-		echo "ERROR - ipa-adduser failed on $FULLHOSTNAME"
+		echo "ERROR - ipa user-add failed on $FULLHOSTNAME"
 		tet_result FAIL
 	fi
 
 	for s in $SERVERS; do
 		if [ "$s" != "" ]; then
 			eval_vars $s
-			ssh root@$FULLHOSTNAME "ipa-finduser $superuser | grep Login | grep $superuser"
+			ssh root@$FULLHOSTNAME "ipa user-find $superuser | grep uid | grep $superuser"
 			ret=$?
 			if [ $ret -ne 0 ]
 			then
@@ -857,9 +858,9 @@ tp12()
 }
 
 ######################################################################
-# ipa-adddelegation
+# adddelegation setup
 ######################################################################
-tp13()
+adddelegationsetup()
 {
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 	echo "START $tet_thistest"
@@ -867,10 +868,10 @@ tp13()
 	code=0
 
 	# Setting up for test
-	ssh root@$FULLHOSTNAME "ipa-adduser -ffirstname-mod1 -llastbname-mod1 usermod1"
+	ssh root@$FULLHOSTNAME "ipa user-add --first=firstname-mod1 --last=lastbname-mod1 usermod1"
 	let code=$code+$?
 
-	ssh root@$FULLHOSTNAME "ipa-addgroup -d super-user superg"
+	ssh root@$FULLHOSTNAME "ipa group-add -d super-user superg"
 	let code=$code+$?
 
 	ssh root@$FULLHOSTNAME "ipa-addgroup -d group-to-mod-users modusers"
