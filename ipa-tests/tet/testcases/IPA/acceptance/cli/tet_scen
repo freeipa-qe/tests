@@ -6,7 +6,6 @@ all
 
 cli
 	"Starting cli tests..."
-	/cli.ksh
 	/usercli.ksh
 	/acicli.ksh
    	/groupcli.ksh
