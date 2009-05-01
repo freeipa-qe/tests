@@ -12,6 +12,7 @@ cli
    	/hostcli.ksh
    	/netgroupcli.ksh
    	/delegationcli.ksh
+	/servicecli.ksh
 #   	/automountcli.ksh
 #   	/applicationcli.ksh
 	"Ending cli tests..."
