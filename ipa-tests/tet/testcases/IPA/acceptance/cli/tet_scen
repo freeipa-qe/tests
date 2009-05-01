@@ -8,6 +8,13 @@ cli
 	"Starting cli tests..."
 	/cli.ksh
 	/usercli.ksh
+	/acicli.ksh
+   	/groupcli.ksh
+   	/hostcli.ksh
+   	/netgroupcli.ksh
+   	/delegationcli.ksh
+#   	/automountcli.ksh
+#   	/applicationcli.ksh
 	"Ending cli tests..."
 
 # EOF

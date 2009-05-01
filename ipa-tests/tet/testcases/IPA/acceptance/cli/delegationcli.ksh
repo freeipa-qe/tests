@@ -19,7 +19,7 @@ fi
 tet_startup="CheckAlive"
 tet_cleanup="user_cleanup"
 iclist="ic1"
-ic1="kinit tp2 adduser"
+ic1="kinit"
 # These services will be used by the tests, and removed when the cli test is complete
 host1='alpha.dsdev.sjc.redhat.com'
 service1="ssh/$host1"
@@ -55,60 +55,6 @@ kinit()
 			ret=$?
 			if [ $ret -ne 0 ]; then
 				echo "ERROR - kinit on $s failed"
-				tet_result FAIL
-			fi
-		fi
-	done
-
-	tet_result PASS
-	echo "END $tet_thistest"
-}
-######################################################################
-tp2()
-{
-	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	echo "START $tet_thistest"
-	for s in $SERVERS; do
-		if [ "$s" != "" ]; then
-			eval_vars $s
-			# test for ipactl
-			ssh root@$FULLHOSTNAME 'ipactl restart'
-			if [ $? -ne 0 ]
-			then
-				echo "ERROR - ipactl restart failed on $FULLHOSTNAME"
-				tet_result FAIL
-			fi
-		fi
-	done
-
-	tet_result PASS
-	echo "END $tet_thistest"
-}
-
-######################################################################
-# ipa-adduser
-######################################################################
-adduser()
-{
-	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	echo "START $tet_thistest"
-	eval_vars M1
-
-	ssh root@$FULLHOSTNAME "ipa user-add --first=firstname-super --last=lastbname-super $superuser"
-	if [ $? -ne 0 ]
-	then 
-		echo "ERROR - ipa user-add failed on $FULLHOSTNAME"
-		tet_result FAIL
-	fi
-
-	for s in $SERVERS; do
-		if [ "$s" != "" ]; then
-			eval_vars $s
-			ssh root@$FULLHOSTNAME "ipa user-find $superuser | grep uid | grep $superuser"
-			ret=$?
-			if [ $ret -ne 0 ]
-			then
-				echo "ERROR - Search for created user failed on $FULLHOSTNAME"
 				tet_result FAIL
 			fi
 		fi
