@@ -130,24 +130,8 @@ user_cleanup()
 	code=0
 
 
-	# Setting up for test
-	ssh root@$FULLHOSTNAME "ipa-delgroup modusers"
+	ssh root@$FULLHOSTNAME "ipa user-del $superuser"
 	let code=$code+$?
-
-	ssh root@$FULLHOSTNAME "ipa-delgroup superg"
-	let code=$code+$?
-
-	ssh root@$FULLHOSTNAME "ipa-deluser usermod1"
-	let code=$code+$?
-
-	ssh root@$FULLHOSTNAME "ipa-deluser $superuser"
-	let code=$code+$?
-
-	#ssh root@$FULLHOSTNAME "ipa-modgroup -a biguser super"
-	#let code=$code+$?
-
-	#ssh root@$FULLHOSTNAME "ipa-modgroup -a usermod1 modusers"
-	#let code=$code+$?
 
 	if [ $code -ne 0 ]
 	then

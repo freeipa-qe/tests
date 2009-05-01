@@ -1136,23 +1136,17 @@ cli_cleanup()
 
 
 	# Setting up for test
-	ssh root@$FULLHOSTNAME "ipa-delgroup modusers"
+	ssh root@$FULLHOSTNAME "ipa group-del modusers"
 	let code=$code+$?
 
-	ssh root@$FULLHOSTNAME "ipa-delgroup superg"
+	ssh root@$FULLHOSTNAME "ipa group-del superg"
 	let code=$code+$?
 
-	ssh root@$FULLHOSTNAME "ipa-deluser usermod1"
+	ssh root@$FULLHOSTNAME "ipa user-del usermod1"
 	let code=$code+$?
 
-	ssh root@$FULLHOSTNAME "ipa-deluser $superuser"
+	ssh root@$FULLHOSTNAME "ipa user-del $superuser"
 	let code=$code+$?
-
-	#ssh root@$FULLHOSTNAME "ipa-modgroup -a biguser super"
-	#let code=$code+$?
-
-	#ssh root@$FULLHOSTNAME "ipa-modgroup -a usermod1 modusers"
-	#let code=$code+$?
 
 	if [ $code -ne 0 ]
 	then
