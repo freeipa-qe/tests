@@ -110,7 +110,8 @@ fi
 # The next line is required as it picks up data about the servers to use
 tet_startup="CheckAlive"
 tet_cleanup="cli_cleanup"
-iclist="ic1 "
+iclist="icli"
+icli="tp1"
 ic1="tp1 tp2 tp3 hostlist servicelist adduser delegationlist acilist tp14 tp15 tp16 tp17 tp18 tp19 tp20"
 hostlist="ipahostfind ipahostshow ipahostmoda ipahostmodb ipahostmodc ipahostmodd ipahostmode ipahostdel"
 servicelist="ipaserviceprepare ipaserviceadd ipaserviceaddb ipaserviceaddc negaddservice negaddserviceb negaddservicec ipaservicedel ipaservicedelb ipaservicedelc ipanegservicedel ipaservicecleanup"
@@ -506,7 +507,7 @@ ipaserviceadd()
 			ssh root@$FULLHOSTNAME "ipa service-find \"$service1\""
 			if [ $? -ne 0 ]
 			then
-				echo "ERROR - ipa-findservice failed on $FULLHOSTNAME"
+				echo "ERROR - ipa service-find failed on $FULLHOSTNAME"
 				tet_result FAIL
 			fi
 

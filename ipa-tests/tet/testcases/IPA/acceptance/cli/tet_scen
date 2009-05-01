@@ -7,6 +7,7 @@ all
 cli
 	"Starting cli tests..."
 	/cli.ksh
+	/usercli.ksh
 	"Ending cli tests..."
 
 # EOF
