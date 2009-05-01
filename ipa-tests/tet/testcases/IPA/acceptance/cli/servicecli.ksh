@@ -18,7 +18,7 @@ tet_startup="CheckAlive"
 tet_cleanup="cli_cleanup"
 iclist="ic1 ic2"
 ic1="kinit"
-ic2="ipaserviceprepare ipaserviceadd ipaserviceaddb ipaserviceaddc negaddservice negaddserviceb negaddservicec ipaservicedel ipaservicedelb ipaservicedelc ipanegservicedel ipaservicecleanup"
+ic2="ipaserviceprepare ipaserviceadd ipaserviceaddb ipaserviceaddc negaddservice negaddserviceb negaddservicec ipaservicefinda ipaservicefindb ipaservicefindc ipanegservicefind ipaservicedel ipaservicedelb ipaservicedelc ipanegservicedel ipaservicecleanup"
 # These services will be used by the tests, and removed when the cli test is complete
 host1='alpha.dsdev.sjc.redhat.com'
 service1="ssh/$host1"
@@ -265,6 +265,98 @@ negaddservicec()
 	echo "END $tet_thistest"
 
 }
+######################################################################
+ipaservicefinda()
+{
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+	echo "START $tet_thistest"
+	for s in $SERVERS; do
+		if [ "$s" == "M1" ]; then
+			eval_vars $s
+
+			ssh root@$FULLHOSTNAME "ipa service-find \"$service1\"| grep \"$service1\""
+			if [ $? -ne 0 ]
+			then
+				echo "ERROR - ipa service-find failed on $FULLHOSTNAME"
+				tet_result FAIL
+			fi
+
+		fi
+	done
+
+	tet_result PASS
+	echo "END $tet_thistest"
+
+}
+######################################################################
+ipaservicefindb()
+{
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+	echo "START $tet_thistest"
+	for s in $SERVERS; do
+		if [ "$s" == "M1" ]; then
+			eval_vars $s
+
+			ssh root@$FULLHOSTNAME "ipa service-find \"$service2\"| grep \"$service2\""
+			if [ $? -ne 0 ]
+			then
+				echo "ERROR - ipa service-find failed on $FULLHOSTNAME"
+				tet_result FAIL
+			fi
+
+		fi
+	done
+
+	tet_result PASS
+	echo "END $tet_thistest"
+
+}
+######################################################################
+ipaservicefindc()
+{
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+	echo "START $tet_thistest"
+	for s in $SERVERS; do
+		if [ "$s" == "M1" ]; then
+			eval_vars $s
+
+			ssh root@$FULLHOSTNAME "ipa service-find \"$service3\"| grep \"$service3\""
+			if [ $? -ne 0 ]
+			then
+				echo "ERROR - ipa service-find failed on $FULLHOSTNAME"
+				tet_result FAIL
+			fi
+
+		fi
+	done
+
+	tet_result PASS
+	echo "END $tet_thistest"
+
+}
+######################################################################
+ipanegservicefind()
+{
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+	echo "START $tet_thistest"
+	for s in $SERVERS; do
+		if [ "$s" == "M1" ]; then
+			eval_vars $s
+
+			ssh root@$FULLHOSTNAME "ipa service-find \"badjunk/bad.host.redhat.com\""
+			if [ $? -ne 0 ]
+			then
+				echo "ERROR - ipa service-find failed on $FULLHOSTNAME"
+				tet_result FAIL
+			fi
+
+		fi
+	done
+
+	tet_result PASS
+	echo "END $tet_thistest"
+
+}
 #
 ###############################################################################
 ipaservicedel()
@@ -454,10 +546,18 @@ cli_cleanup()
 	ssh root@$FULLHOSTNAME "ipa user-del $superuser"
 	let code=$code+$?
 
+	ssh root@$FULLHOSTNAME "ipa service-del $service1@$RELM_NAME"
+	let code=$code+$?
+
+	ssh root@$FULLHOSTNAME "ipa service-del $service2@$RELM_NAME"
+	let code=$code+$?
+
+	ssh root@$FULLHOSTNAME "ipa service-del $service3@$RELM_NAME"
+	let code=$code+$?
+
 	if [ $code -ne 0 ]
 	then
-		echo "ERROR - setup for $tet_thistest failed"
-		tet_result FAIL
+		echo "WARNING - $tet_thistest failed... not that it matters"
 	fi
 
 	tet_result PASS
