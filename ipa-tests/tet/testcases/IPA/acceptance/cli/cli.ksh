@@ -115,6 +115,7 @@ ic1="tp1 tp2 tp3 hostlist servicelist adduser delegationlist tp14 tp15 tp16 tp17
 hostlist="ipahostfind ipahostshow ipahostmoda ipahostmodb ipahostmodc ipahostmodd ipahostmode ipahostdel"
 servicelist="ipaserviceprepare ipaserviceadd ipaserviceaddb ipaserviceaddc negaddservice negaddserviceb negaddservicec ipaservicedel ipaservicedelb ipaservicedelc ipanegservicedel ipaservicecleanup"
 delegationlist="adddelegationsetup"
+acilist=""
 # These services will be used by the tests, and removed when the cli test is complete
 host1='alpha.dsdev.sjc.redhat.com'
 service1="ssh/$host1"
@@ -871,16 +872,16 @@ adddelegationsetup()
 	ssh root@$FULLHOSTNAME "ipa user-add --first=firstname-mod1 --last=lastbname-mod1 usermod1"
 	let code=$code+$?
 
-	ssh root@$FULLHOSTNAME "ipa group-add -d super-user superg"
+	ssh root@$FULLHOSTNAME "ipa group-add --description=super-user superg"
 	let code=$code+$?
 
-	ssh root@$FULLHOSTNAME "ipa-addgroup -d group-to-mod-users modusers"
+	ssh root@$FULLHOSTNAME "ipa group-add --description=group-to-mod-users modusers"
 	let code=$code+$?
 
-	ssh root@$FULLHOSTNAME "ipa-modgroup -a $superuser superg"
+	ssh root@$FULLHOSTNAME "ipa group-add-member --users=$superuser superg"
 	let code=$code+$?
 
-	ssh root@$FULLHOSTNAME "ipa-modgroup -a usermod1 modusers"
+	ssh root@$FULLHOSTNAME "ipa group-add-member --users=usermod1 modusers"
 	let code=$code+$?
 
 	if [ $code -ne 0 ]
@@ -889,7 +890,7 @@ adddelegationsetup()
 		tet_result FAIL
 	fi
 
-	ssh root@$FULLHOSTNAME "ipa-adddelegation --attributes telephonenumber -s superg -t modusers namef"
+	ssh root@$FULLHOSTNAME "ipa delegation-add --attributes telephonenumber --source=superg --target=modusers namef"
 	ret=$?
 	if [ $ret -ne 0 ]
 	then
