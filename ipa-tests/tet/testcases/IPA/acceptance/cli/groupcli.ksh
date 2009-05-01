@@ -12,6 +12,7 @@
 #  user-unlock               Unlock a user account.
 
 ######################################################################
+echo "groupcli"
 if [ "$DSTET_DEBUG" = "y" ]; then
 	set -x
 fi

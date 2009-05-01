@@ -9,13 +9,16 @@
 #  service-show              Examine an existing service.
 
 ######################################################################
+echo "start service cli"
 if [ "$DSTET_DEBUG" = "y" ]; then
 	set -x
 fi
 # The next line is required as it picks up data about the servers to use
 tet_startup="CheckAlive"
 tet_cleanup="cli_cleanup"
-iclist="kinit ipaserviceprepare ipaserviceadd ipaserviceaddb ipaserviceaddc negaddservice negaddserviceb negaddservicec ipaservicedel ipaservicedelb ipaservicedelc ipanegservicedel ipaservicecleanup"
+iclist="ic1 ic2"
+ic1="kinit"
+ic2="ipaserviceprepare ipaserviceadd ipaserviceaddb ipaserviceaddc negaddservice negaddserviceb negaddservicec ipaservicedel ipaservicedelb ipaservicedelc ipanegservicedel ipaservicecleanup"
 # These services will be used by the tests, and removed when the cli test is complete
 host1='alpha.dsdev.sjc.redhat.com'
 service1="ssh/$host1"
@@ -94,7 +97,7 @@ ipaserviceadd()
 		if [ "$s" == "M1" ]; then
 			eval_vars $s
 
-			# test for ipa-addservice
+			# test for ipa service-add
 			ssh root@$FULLHOSTNAME "ipa service-add \"$service1\""
 			ret=$?
 			if [ $ret -ne 0 ]
@@ -129,7 +132,7 @@ negaddservice()
 			eval_vars $s
 
 			echo "this step is supposed to fail"
-			# test for ipa-addservice
+			# test for ipa service-add
 			ssh root@$FULLHOSTNAME "ipa service-add \"$service1\""
 			ret=$?
 			if [ $ret -eq 0 ]
@@ -154,17 +157,17 @@ ipaserviceaddb()
 		if [ "$s" == "M1" ]; then
 			eval_vars $s
 
-			# test for ipa-addservice
-			ssh root@$FULLHOSTNAME "ipa-addservice \"$service2\""
+			# test for ipa service-add
+			ssh root@$FULLHOSTNAME "ipa service-add \"$service2\""
 			if [ $? -ne 0 ]
 			then
-				echo "ERROR - ipa-addservice failed on $FULLHOSTNAME"
+				echo "ERROR - ipa service-add failed on $FULLHOSTNAME"
 				tet_result FAIL
 			fi
-			ssh root@$FULLHOSTNAME "ipa-findservice \"$service2\""
+			ssh root@$FULLHOSTNAME "ipa service-find \"$service2\""
 			if [ $? -ne 0 ]
 			then
-				echo "ERROR - ipa-findservice failed on $FULLHOSTNAME"
+				echo "ERROR - ipa service-find failed on $FULLHOSTNAME"
 				tet_result FAIL
 			fi
 		fi
@@ -184,20 +187,20 @@ ipaserviceaddc()
 		if [ "$s" == "M1" ]; then
 			eval_vars $s
 
-			# test for ipa-addservice
-			ssh root@$FULLHOSTNAME "ipa-addservice \"$service3\""
+			# test for ipa service-add
+			ssh root@$FULLHOSTNAME "ipa service-add \"$service3\""
 			if [ $? -ne 0 ]
 			then
-				echo "ERROR - ipa-addservice failed on $FULLHOSTNAME"
+				echo "ERROR - ipa service-add failed on $FULLHOSTNAME"
 				tet_result FAIL
 			fi
 			# Sleeping for 10 seconds to allow addservice to sync
 			sleep 10;
 		fi
-		ssh root@$FULLHOSTNAME "ipa-findservice \"$service3\""
+		ssh root@$FULLHOSTNAME "ipa service-find \"$service3\""
 		if [ $? -ne 0 ]
 		then
-			echo "ERROR - ipa-findservice failed on $FULLHOSTNAME"
+			echo "ERROR - ipa service-find failed on $FULLHOSTNAME"
 			tet_result FAIL
 		fi
 	done
@@ -219,12 +222,12 @@ negaddserviceb()
 			eval_vars $s
 
 			echo "this step is supposed to fail"
-			# test for ipa-addservice
-			ssh root@$FULLHOSTNAME "ipa-addservice \"$service2\""
+			# test for ipa service-add
+			ssh root@$FULLHOSTNAME "ipa service-add \"$service2\""
 			ret=$?
 			if [ $ret -eq 0 ]
 			then
-				echo "ERROR - ipa-addservice passed when it should not have on $FULLHOSTNAME"
+				echo "ERROR - ipa service-add passed when it should not have on $FULLHOSTNAME"
 				tet_result FAIL
 			fi
 		fi
@@ -247,12 +250,12 @@ negaddservicec()
 			eval_vars $s
 
 			echo "this step is supposed to fail"
-			# test for ipa-addservice
-			ssh root@$FULLHOSTNAME "ipa-addservice \"$service3\""
+			# test for ipa service-add
+			ssh root@$FULLHOSTNAME "ipa service-add \"$service3\""
 			ret=$?
 			if [ $ret -eq 0 ]
 			then
-				echo "ERROR - ipa-addservice passed when it should not have on $FULLHOSTNAME"
+				echo "ERROR - ipa service-add passed when it should not have on $FULLHOSTNAME"
 				tet_result FAIL
 			fi
 		fi
@@ -272,12 +275,13 @@ ipaservicedel()
 		if [ "$s" == "M1" ]; then
 			eval_vars $s
 
-			# test for ipa-addservice
+			# test for ipa service-add
 			ssh root@$FULLHOSTNAME "ipa service-del \"$service1\""
 			ret=$?
 			if [ $ret -ne 0 ]
 			then
 				echo "ERROR - ipa service-del failed on $FULLHOSTNAME"
+				echo "NOTE - This could be related to https://bugzilla.redhat.com/show_bug.cgi?id=498538"
 				tet_result FAIL
 			fi
 			ssh root@$FULLHOSTNAME "ipa service-find \"$service1\""
@@ -304,7 +308,7 @@ ipaservicedelb()
 		if [ "$s" == "M1" ]; then
 			eval_vars $s
 
-			# test for ipa-addservice
+			# test for ipa service-add
 			ssh root@$FULLHOSTNAME "ipa service-del \"$service2\""
 			ret=$?
 			if [ $ret -ne 0 ]
@@ -336,7 +340,7 @@ ipaservicedelc()
 		if [ "$s" == "M1" ]; then
 			eval_vars $s
 
-			# test for ipa-addservice
+			# test for ipa service-del
 			ssh root@$FULLHOSTNAME "ipa service-del \"$service3\""
 			ret=$?
 			if [ $ret -ne 0 ]
@@ -368,7 +372,7 @@ ipanegservicedel()
 		if [ "$s" == "M1" ]; then
 			eval_vars $s
 
-			# test for ipa-addservice
+			# test for ipa service-del
 			ssh root@$FULLHOSTNAME "ipa service-del \"$service3\""
 			ret=$?
 			if [ $ret -eq 0 ]
