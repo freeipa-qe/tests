@@ -3,13 +3,12 @@
 ######################################################################
 
 # The following ipa cli commands needs to be tested:
-#  user-add                  Add a new user.
-#  user-del                  Delete an existing user.
-#  user-find                 Search for users.
-#  user-lock                 Lock a user account.
-#  user-mod                  Edit an existing user.
-#  user-show                 Examine an existing user.
-#  user-unlock               Unlock a user account.
+#  aci-add                   Add a new aci.
+#  aci-del                   Delete an existing aci.
+#  aci-find                  Search for a aci.
+#  aci-mod                   Edit an existing aci.
+#  aci-show                  Examine an existing aci.
+#  aci-showall               Examine all existing acis.
 
 ######################################################################
 echo "start acicli"
@@ -23,12 +22,9 @@ iclist="ic1"
 ic1="kinit"
 # These services will be used by the tests, and removed when the cli test is complete
 host1='alpha.dsdev.sjc.redhat.com'
-service1="ssh/$host1"
-service2="nfs/$host1"
-service3="ldap/$host1"
 
 # Users to be used in varios tests
-superuser="sup34"
+superuser="sup35a"
 
 ######################################################################
 kinit()
