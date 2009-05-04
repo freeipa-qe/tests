@@ -197,8 +197,8 @@ vmupdate()
 		exit
 	fi
   techo "+warning+ the targeted vm enviroment [$vmtarget] has to exist"
-  techo "          otherwise, a new file will be created. If this is you"
-  techo "	   intention, please use vmsave_as <alias name> <img file>"
+  techo "          otherwise, a new file will be created. "
+  techo "          Please use vmsave_as <alias name> <img file>"
   techo "update vm [$imagename] with current image file ..."
   techo "       +------------------------------------------------------+"
   techo "       | vm hoster   : $hoster"
@@ -206,7 +206,7 @@ vmupdate()
   techo "       | vm image    : $imagename"
   techo "       | image to be update : $vmtarget"
   techo "       +------------------------------------------------------+"
-  techo"	[1/3] stop current image [$imagename]"
+  techo "       [1/3] stop current image [$imagename]"
   shutdownVM $hoster $hostname $imagename
   techo "       [2/3] : update image ($vmtarget)"
   ssh root@$hoster "cp -f $imagefile $imagebase/$vmtarget"
