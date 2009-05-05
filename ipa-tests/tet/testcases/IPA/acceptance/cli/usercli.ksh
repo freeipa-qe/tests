@@ -19,7 +19,7 @@ fi
 tet_startup="CheckAlive"
 tet_cleanup="user_cleanup"
 iclist="ic1"
-ic1="kinit tp2 adduser"
+ic1="kinit adduser addusera adduserb adduserc adduserd addusere adduserf negadduser"
 # These services will be used by the tests, and removed when the cli test is complete
 host1='alpha.dsdev.sjc.redhat.com'
 service1="ssh/$host1"
@@ -28,6 +28,11 @@ service3="ldap/$host1"
 
 # Users to be used in varios tests
 superuser="sup34"
+superuserprinc="principal$superuser"
+superuserhome="/home2/$superuser"
+superusergecos="whatsgecos?"
+superuserfirst="Superuser"
+superuserlast="crazylastnametoolong"
 
 ######################################################################
 kinit()
@@ -63,27 +68,6 @@ kinit()
 	tet_result PASS
 	echo "END $tet_thistest"
 }
-######################################################################
-tp2()
-{
-	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	echo "START $tet_thistest"
-	for s in $SERVERS; do
-		if [ "$s" != "" ]; then
-			eval_vars $s
-			# test for ipactl
-			ssh root@$FULLHOSTNAME 'ipactl restart'
-			if [ $? -ne 0 ]
-			then
-				echo "ERROR - ipactl restart failed on $FULLHOSTNAME"
-				tet_result FAIL
-			fi
-		fi
-	done
-
-	tet_result PASS
-	echo "END $tet_thistest"
-}
 
 ######################################################################
 # ipa-adduser
@@ -94,7 +78,7 @@ adduser()
 	echo "START $tet_thistest"
 	eval_vars M1
 
-	ssh root@$FULLHOSTNAME "ipa user-add --first=firstname-super --last=lastbname-super $superuser"
+	ssh root@$FULLHOSTNAME "ipa user-add --first=$superuserfirst --last=$superuserlast --gecos=$superusergecos --home=$superuserhome --principal=$superuserprinc --email=$superuseremail $superuser"
 	if [ $? -ne 0 ]
 	then 
 		echo "ERROR - ipa user-add failed on $FULLHOSTNAME"
@@ -117,6 +101,177 @@ adduser()
 	tet_result PASS
 	echo "END $tet_thistest"
 }
+
+######################################################################
+# ipa-adduser content test 1. First name
+######################################################################
+addusera()
+{
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+	echo "START $tet_thistest"
+
+	for s in $SERVERS; do
+		if [ "$s" != "" ]; then
+			eval_vars $s
+			ssh root@$FULLHOSTNAME "ipa user-find $superuser | grep $superuserfirst"
+			ret=$?
+			if [ $ret -ne 0 ]
+			then
+				echo "ERROR - Search for created user failed on $FULLHOSTNAME"
+				tet_result FAIL
+			fi
+		fi
+	done
+
+	tet_result PASS
+	echo "END $tet_thistest"
+}
+
+######################################################################
+# ipa-adduser content test 2. Last name
+######################################################################
+adduserb()
+{
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+	echo "START $tet_thistest"
+
+	for s in $SERVERS; do
+		if [ "$s" != "" ]; then
+			eval_vars $s
+			ssh root@$FULLHOSTNAME "ipa user-find $superuser | grep $superuserlast"
+			ret=$?
+			if [ $ret -ne 0 ]
+			then
+				echo "ERROR - Search for created user failed on $FULLHOSTNAME"
+				tet_result FAIL
+			fi
+		fi
+	done
+
+	tet_result PASS
+	echo "END $tet_thistest"
+}
+
+######################################################################
+# ipa-adduser content test 3. gecos name
+######################################################################
+adduserc()
+{
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+	echo "START $tet_thistest"
+
+	for s in $SERVERS; do
+		if [ "$s" != "" ]; then
+			eval_vars $s
+			ssh root@$FULLHOSTNAME "ipa user-find $superuser | grep $superusergecos"
+			ret=$?
+			if [ $ret -ne 0 ]
+			then
+				echo "ERROR - Search for created user failed on $FULLHOSTNAME"
+				tet_result FAIL
+			fi
+		fi
+	done
+
+	tet_result PASS
+	echo "END $tet_thistest"
+}
+
+######################################################################
+# ipa-adduser content test 4. Home directory 
+######################################################################
+adduserd()
+{
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+	echo "START $tet_thistest"
+
+	for s in $SERVERS; do
+		if [ "$s" != "" ]; then
+			eval_vars $s
+			ssh root@$FULLHOSTNAME "ipa user-find $superuser | grep $superuserhome"
+			ret=$?
+			if [ $ret -ne 0 ]
+			then
+				echo "ERROR - Search for created user failed on $FULLHOSTNAME"
+				tet_result FAIL
+			fi
+		fi
+	done
+
+	tet_result PASS
+	echo "END $tet_thistest"
+}
+
+######################################################################
+# ipa-adduser content test 5. Principal
+######################################################################
+addusere()
+{
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+	echo "START $tet_thistest"
+
+	for s in $SERVERS; do
+		if [ "$s" != "" ]; then
+			eval_vars $s
+			ssh root@$FULLHOSTNAME "ipa user-find $superuser | grep $superuserprinc"
+			ret=$?
+			if [ $ret -ne 0 ]
+			then
+				echo "ERROR - Search for created user failed on $FULLHOSTNAME"
+				tet_result FAIL
+			fi
+		fi
+	done
+
+	tet_result PASS
+	echo "END $tet_thistest"
+}
+
+######################################################################
+# ipa-adduser content test 6. email
+######################################################################
+adduserf()
+{
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+	echo "START $tet_thistest"
+
+	for s in $SERVERS; do
+		if [ "$s" != "" ]; then
+			eval_vars $s
+			ssh root@$FULLHOSTNAME "ipa user-find $superuser | grep $superuseremail"
+			ret=$?
+			if [ $ret -ne 0 ]
+			then
+				echo "ERROR - Search for created user failed on $FULLHOSTNAME"
+				tet_result FAIL
+			fi
+		fi
+	done
+
+	tet_result PASS
+	echo "END $tet_thistest"
+}
+
+######################################################################
+# Negitive test case of ipa-adduser
+######################################################################
+negadduser()
+{
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+	echo "START $tet_thistest"
+	eval_vars M1
+
+	ssh root@$FULLHOSTNAME "ipa user-add --first=$superuserfirst --last=$superuserlast --gecos=$superusergecos --home=$superuserhome --principal=$superuserprinc --email=$superuseremail $superuser"
+	if [ $? -eq 0 ]
+	then 
+		echo "ERROR - ipa user-add passed when it should not have $FULLHOSTNAME"
+		tet_result FAIL
+	fi
+
+	tet_result PASS
+	echo "END $tet_thistest"
+}
+
 
 ######################################################################
 # Cleanup Section for the cli tests
