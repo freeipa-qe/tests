@@ -588,4 +588,21 @@ ResetKinit()
         done
 }
 
+# This function is dedicated to dupplicate message between stdout and 
+# tet's journal.
+#
+message()
+{
+	echo "$*"
+	type tet_infoline > /dev/null 2>&1 && tet_infoline "$*"
+}
+
+# This function is dedicated to log a test case result in stdout and
+# in tet's journal, associated with a keyword and the test case name.
+#
+result()
+{
+	message "TestCaseResult $tet_thistest $*"
+	tet_result "$*"
+}
 
