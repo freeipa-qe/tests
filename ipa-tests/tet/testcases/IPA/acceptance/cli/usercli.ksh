@@ -28,6 +28,7 @@ service3="ldap/$host1"
 
 # Users to be used in varios tests
 superuser="sup34"
+superuseremail="$superuser@really.cool.domain.co.uk.us.fi.com"
 superuserprinc="principal$superuser"
 superuserhome="/home2/$superuser"
 superusergecos="whatsgecos?"
@@ -163,7 +164,7 @@ adduserc()
 	for s in $SERVERS; do
 		if [ "$s" != "" ]; then
 			eval_vars $s
-			ssh root@$FULLHOSTNAME "ipa user-find $superuser | grep $superusergecos"
+			ssh root@$FULLHOSTNAME "ipa user-find --all $superuser | grep $superusergecos"
 			ret=$?
 			if [ $ret -ne 0 ]
 			then
@@ -213,7 +214,7 @@ addusere()
 	for s in $SERVERS; do
 		if [ "$s" != "" ]; then
 			eval_vars $s
-			ssh root@$FULLHOSTNAME "ipa user-find $superuser | grep $superuserprinc"
+			ssh root@$FULLHOSTNAME "ipa user-find -all $superuser | grep $superuserprinc"
 			ret=$?
 			if [ $ret -ne 0 ]
 			then
@@ -238,7 +239,7 @@ adduserf()
 	for s in $SERVERS; do
 		if [ "$s" != "" ]; then
 			eval_vars $s
-			ssh root@$FULLHOSTNAME "ipa user-find $superuser | grep $superuseremail"
+			ssh root@$FULLHOSTNAME "ipa user-find --all $superuser | grep $superuseremail"
 			ret=$?
 			if [ $ret -ne 0 ]
 			then
