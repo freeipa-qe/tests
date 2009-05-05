@@ -214,7 +214,7 @@ addusere()
 	for s in $SERVERS; do
 		if [ "$s" != "" ]; then
 			eval_vars $s
-			ssh root@$FULLHOSTNAME "ipa user-find -all $superuser | grep $superuserprinc"
+			ssh root@$FULLHOSTNAME "ipa user-find --all $superuser | grep $superuserprinc"
 			ret=$?
 			if [ $ret -ne 0 ]
 			then
