@@ -205,7 +205,7 @@ SetUserPassword()
         rm -f $TET_TMP_DIR/SetUserPassword.exp
         echo 'set timeout 60
 set send_slow {1 .1}' > $TET_TMP_DIR/SetUserPassword.exp
-	echo "spawn ipa-passwd $2" >> $TET_TMP_DIR/SetUserPassword.exp
+	echo "spawn ipa passwd $2" >> $TET_TMP_DIR/SetUserPassword.exp
 	echo 'match_max 100000' >> $TET_TMP_DIR/SetUserPassword.exp
 	echo 'sleep 7' >> $TET_TMP_DIR/SetUserPassword.exp
 	echo "send -s -- \"$3\"" >> $TET_TMP_DIR/SetUserPassword.exp

@@ -59,9 +59,11 @@ tp2()
 	echo "START $tet_thistest"
 
 	eval_vars M1
-	ssh root@$FULLHOSTNAME "ipa-adduser -ffirstname-super -llastbname-super $user1"
+	superuserfirst=firstnamef
+	superuserlast=lastnameg
+	ssh root@$FULLHOSTNAME "ipa user-add --first=$superuserfirst --last=$superuserlast $user1"
 	if [ $? -ne 0 ]; then
-		echo "ERROR - ipa-adduser failed on $FULLHOSTNAME"
+		echo "ERROR - ipa user-add failed on $FULLHOSTNAME"
 		tet_result FAIL
 	fi
 
