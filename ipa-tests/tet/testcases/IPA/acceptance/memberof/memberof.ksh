@@ -60,12 +60,12 @@ tp2()
 	# Create two groups on M1
 	echo "START $tet_thistest"
 	eval_vars M1
-	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-addgroup group1 -v -g 444 -d 'group1 for testing'"
+	ssh root@$FULLHOSTNAME "/usr/sbin/ipa group-add --gid=444 --description='group1 for testing' group1"
 	if [ $? -ne 0 ]; then
 		echo "ERROR, creation of group1 on M1 failed"
 		tet_result FAIL
 	fi
-	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-addgroup group2 -v -g 888 -d 'group2 for testing'"
+	ssh root@$FULLHOSTNAME "/usr/sbin/ipa group-add --gid=888 --description='group2 for testing' group2"
 	if [ $? -ne 0 ]; then
 		echo "ERROR, creation of group2 on M1 failed"
 		tet_result FAIL
@@ -85,17 +85,16 @@ tp3()
 		if [ "$s" != "" ]; then
 			echo "Verifying that group1 exists on $s"
 			eval_vars $s
-			ssh root@$FULLHOSTNAME '/usr/sbin/ipa-findgroup group1 | /bin/grep GID | /bin/grep 444'
+			ssh root@$FULLHOSTNAME '/usr/sbin/ipa group-find group1 | /bin/grep gidnumber | /bin/grep 444'
 			if [ $? -ne 0 ]; then
 				echo "ERROR - group1 does not exist on $s"
 				tet_result FAIL
 			fi
-			ssh root@$FULLHOSTNAME '/usr/sbin/ipa-findgroup group2 | /bin/grep GID | /bin/grep 888'
+			ssh root@$FULLHOSTNAME '/usr/sbin/ipa group-find group2 | /bin/grep gidnumber | /bin/grep 888'
 			if [ $? -ne 0 ]; then
 				echo "ERROR - group2 does not exist on $s"
 				tet_result FAIL
 			fi
-
 		fi
 	done
 	for s in $CLIENTS; do
@@ -103,12 +102,12 @@ tp3()
 			eval_vars $s
 			if [ "$OS_VER" -eq "5" ] && [ "$OS" -eq "RHEL" ]; then
 				echo "Verifying that group1 exists on $s"
-				ssh root@$FULLHOSTNAME '/usr/sbin/ipa-findgroup group1 | /bin/grep GID | /bin/grep 444'
+				ssh root@$FULLHOSTNAME '/usr/sbin/ipa group-find group1 | /bin/grep gidnumber | /bin/grep 444'
 				if [ $? -ne 0 ]; then
 					echo "ERROR - group1 does not exist on $s"
 					tet_result FAIL
 				fi
-				ssh root@$FULLHOSTNAME '/usr/sbin/ipa-findgroup group2 | /bin/grep GID | /bin/grep 888'
+				ssh root@$FULLHOSTNAME '/usr/sbin/ipa group-find group2 | /bin/grep gidnumber | /bin/grep 888'
 				if [ $? -ne 0 ]; then
 					echo "ERROR - group2 does not exist on $s"
 					tet_result FAIL
@@ -129,7 +128,7 @@ tp4()
 	# join group 2 as a user in group 1 on M1
 	echo "START $tet_thistest"
 	eval_vars M1 
-	ssh root@$FULLHOSTNAME 'ipa-modgroup --groupadd group1 group2'
+	ssh root@$FULLHOSTNAME 'ipa group-add-member --groups=group1 group2'
 	if [ $? -ne 0 ]; then
 		echo "ERROR, add of group2 to group1 on M1 failed"
 		tet_result FAIL
@@ -146,7 +145,7 @@ tp5()
 	echo "START $tet_thistest"
 
 	eval_vars M1 
-	ssh root@$FULLHOSTNAME 'ipa-modgroup --groupadd group2 group1'
+	ssh root@$FULLHOSTNAME 'ipa group-add-member --groups=group2 group1'
 	if [ $? -ne 0 ]; then
 		echo "ERROR, add of group1 to group2 on M1 failed"
 		tet_result FAIL
