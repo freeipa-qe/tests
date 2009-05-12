@@ -382,7 +382,7 @@ SetupClientRedhat()
 		fi
 	fi
 
-	ImproveKeytab $1
+	#ImproveKeytab $1
 	ssh root@$FULLHOSTNAME "/etc/init.d/rpcgssd restart;/etc/init.d/nfs restart"
 
 	return 0;
@@ -430,8 +430,14 @@ SetupServer()
 
 	if [ "$1" == "M1" ]; then
 		echo "setting up server $1 as a master server"
-		echo "ipa-server-install -N -U --hostname=$FULLHOSTNAME -r $RELM_NAME -p $DM_ADMIN_PASS -P $KERB_MASTER_PASS -a $DM_ADMIN_PASS -u root --setup-bind -d"
-		ssh root@$FULLHOSTNAME "ipa-server-install -N -U --hostname=$FULLHOSTNAME -r $RELM_NAME -p $DM_ADMIN_PASS -P $KERB_MASTER_PASS -a $DM_ADMIN_PASS -u root --setup-bind -d"
+		if [ $DSTET_DEBUG = y ]; then
+			echo "ipa-server-install -N -U --hostname=$FULLHOSTNAME -r $RELM_NAME -p $DM_ADMIN_PASS -P $KERB_MASTER_PASS -a $DM_ADMIN_PASS -u root --setup-bind"
+			ssh root@$FULLHOSTNAME "ipa-server-install -N -U --hostname=$FULLHOSTNAME -r $RELM_NAME -p $DM_ADMIN_PASS -P $KERB_MASTER_PASS -a $DM_ADMIN_PASS -u root --setup-bind -d"
+		else
+			echo "ipa-server-install -N -U --hostname=$FULLHOSTNAME -r $RELM_NAME -p $DM_ADMIN_PASS -P $KERB_MASTER_PASS -a $DM_ADMIN_PASS -u root --setup-bind"
+			ssh root@$FULLHOSTNAME "ipa-server-install -N -U --hostname=$FULLHOSTNAME -r $RELM_NAME -p $DM_ADMIN_PASS -P $KERB_MASTER_PASS -a $DM_ADMIN_PASS -u root --setup-bind"
+
+		fi
 		if [ $? -ne 0 ]; then
 			echo "ERROR - ipa-server-install on $FULLHOSTNAME failed."
 			echo "contents of ipaserver-install.log and krb5kdc.log:: "
