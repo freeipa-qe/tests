@@ -21,6 +21,9 @@ ic12="tp12 tp13 tp14"
 ic13="tp15"
 ic14="bug438891 bug439097 bug439450 bug439628"
 
+group1=grp1af
+group2=grpt2m
+
 ######################################################################
 tp1()
 {
@@ -60,14 +63,14 @@ tp2()
 	# Create two groups on M1
 	echo "START $tet_thistest"
 	eval_vars M1
-	ssh root@$FULLHOSTNAME "/usr/sbin/ipa group-add --gid=444 --description='group1 for testing' group1"
+	ssh root@$FULLHOSTNAME "/usr/sbin/ipa group-add --gid=444 --description='$group1 for testing' $group1"
 	if [ $? -ne 0 ]; then
-		echo "ERROR, creation of group1 on M1 failed"
+		echo "ERROR, creation of $group1 on M1 failed"
 		tet_result FAIL
 	fi
-	ssh root@$FULLHOSTNAME "/usr/sbin/ipa group-add --gid=888 --description='group2 for testing' group2"
+	ssh root@$FULLHOSTNAME "/usr/sbin/ipa group-add --gid=888 --description='$group2 for testing' $group2"
 	if [ $? -ne 0 ]; then
-		echo "ERROR, creation of group2 on M1 failed"
+		echo "ERROR, creation of $group2 on M1 failed"
 		tet_result FAIL
 	fi
 	
@@ -83,16 +86,16 @@ tp3()
 
 	for s in $SERVERS; do
 		if [ "$s" != "" ]; then
-			echo "Verifying that group1 exists on $s"
+			echo "Verifying that $group1 exists on $s"
 			eval_vars $s
-			ssh root@$FULLHOSTNAME '/usr/sbin/ipa group-find group1 | /bin/grep gidnumber | /bin/grep 444'
+			ssh root@$FULLHOSTNAME "/usr/sbin/ipa group-find $group1 | /bin/grep gidnumber | /bin/grep 444"
 			if [ $? -ne 0 ]; then
-				echo "ERROR - group1 does not exist on $s"
+				echo "ERROR - $group1 does not exist on $s"
 				tet_result FAIL
 			fi
-			ssh root@$FULLHOSTNAME '/usr/sbin/ipa group-find group2 | /bin/grep gidnumber | /bin/grep 888'
+			ssh root@$FULLHOSTNAME "/usr/sbin/ipa group-find $group2 | /bin/grep gidnumber | /bin/grep 888"
 			if [ $? -ne 0 ]; then
-				echo "ERROR - group2 does not exist on $s"
+				echo "ERROR - $group2 does not exist on $s"
 				tet_result FAIL
 			fi
 		fi
@@ -101,15 +104,15 @@ tp3()
 		if [ "$s" != "" ]; then
 			eval_vars $s
 			if [ "$OS_VER" -eq "5" ] && [ "$OS" -eq "RHEL" ]; then
-				echo "Verifying that group1 exists on $s"
-				ssh root@$FULLHOSTNAME '/usr/sbin/ipa group-find group1 | /bin/grep gidnumber | /bin/grep 444'
+				echo "Verifying that $group1 exists on $s"
+				ssh root@$FULLHOSTNAME "/usr/sbin/ipa group-find $group1 | /bin/grep gidnumber | /bin/grep 444"
 				if [ $? -ne 0 ]; then
-					echo "ERROR - group1 does not exist on $s"
+					echo "ERROR - $group1 does not exist on $s"
 					tet_result FAIL
 				fi
-				ssh root@$FULLHOSTNAME '/usr/sbin/ipa group-find group2 | /bin/grep gidnumber | /bin/grep 888'
+				ssh root@$FULLHOSTNAME "/usr/sbin/ipa group-find $group2 | /bin/grep gidnumber | /bin/grep 888"
 				if [ $? -ne 0 ]; then
-					echo "ERROR - group2 does not exist on $s"
+					echo "ERROR - $group2 does not exist on $s"
 					tet_result FAIL
 				fi
 			else
@@ -128,9 +131,9 @@ tp4()
 	# join group 2 as a user in group 1 on M1
 	echo "START $tet_thistest"
 	eval_vars M1 
-	ssh root@$FULLHOSTNAME 'ipa group-add-member --groups=group1 group2'
+	ssh root@$FULLHOSTNAME "ipa group-add-member --groups=$group1 $group2"
 	if [ $? -ne 0 ]; then
-		echo "ERROR, add of group2 to group1 on M1 failed"
+		echo "ERROR, add of $group2 to $group1 on M1 failed"
 		tet_result FAIL
 	fi
 
@@ -145,9 +148,9 @@ tp5()
 	echo "START $tet_thistest"
 
 	eval_vars M1 
-	ssh root@$FULLHOSTNAME 'ipa group-add-member --groups=group2 group1'
+	ssh root@$FULLHOSTNAME "ipa group-add-member --groups=$group2 $group1"
 	if [ $? -ne 0 ]; then
-		echo "ERROR, add of group1 to group2 on M1 failed"
+		echo "ERROR, add of $group1 to $group2 on M1 failed"
 		tet_result FAIL
 	fi
 
@@ -163,18 +166,18 @@ tp6()
 
 	for s in $SERVERS; do
 		if [ "$s" != "" ]; then
-			echo "Verifying that group2 is in group1 on $s"
+			echo "Verifying that $group2 is in $group1 on $s"
 			eval_vars $s
-			ssh root@$FULLHOSTNAME '/usr/sbin/ipa-findgroup group1 | /bin/grep group2'
+			ssh root@$FULLHOSTNAME "/usr/sbin/ipa-findgroup $group1 | /bin/grep $group2"
 			if [ $? -ne 0 ]; then
-				echo "ERROR - group2 does not exist in group1 on $s"
+				echo "ERROR - $group2 does not exist in $group1 on $s"
 				tet_result FAIL
 			fi
 
-			echo "Verifying that group1 is in group2 on $s"
-			ssh root@$FULLHOSTNAME '/usr/sbin/ipa-findgroup group2 | /bin/grep group1'
+			echo "Verifying that $group1 is in $group2 on $s"
+			ssh root@$FULLHOSTNAME "/usr/sbin/ipa-findgroup $group2 | /bin/grep $group1"
 			if [ $? -ne 0 ]; then
-				echo "ERROR - group1 does not exist in group2 on $s"
+				echo "ERROR - $group1 does not exist in $group2 on $s"
 				tet_result FAIL
 			fi
 
@@ -184,17 +187,17 @@ tp6()
 		if [ "$s" != "" ]; then
 			eval_vars $s
 			if [ "$OS_VER" -eq "5" ] && [ "$OS" -eq "RHEL" ]; then			
-				echo "Verifying that group2 is in group1 on $s"
-				ssh root@$FULLHOSTNAME '/usr/sbin/ipa-findgroup group1 | /bin/grep group2'
+				echo "Verifying that $group2 is in $group1 on $s"
+				ssh root@$FULLHOSTNAME "/usr/sbin/ipa-findgroup $group1 | /bin/grep $group2"
 				if [ $? -ne 0 ]; then
-					echo "ERROR - group2 does not exist in group1 on $s"
+					echo "ERROR - $group2 does not exist in $group1 on $s"
 					tet_result FAIL
 				fi
 
-				echo "Verifying that group1 is in group2 on $s"
-				ssh root@$FULLHOSTNAME '/usr/sbin/ipa-findgroup group2 | /bin/grep group1'
+				echo "Verifying that $group1 is in $group2 on $s"
+				ssh root@$FULLHOSTNAME "/usr/sbin/ipa-findgroup $group2 | /bin/grep $group1"
 				if [ $? -ne 0 ]; then
-					echo "ERROR - group1 does not exist in group2 on $s"
+					echo "ERROR - $group1 does not exist in $group2 on $s"
 					tet_result FAIL
 				fi
 			else
@@ -214,9 +217,9 @@ tp7()
 	echo "START $tet_thistest"
 	for s in $SERVERS; do
 		if [ "$s" != "" ]; then
-			echo "Verifying that groupf does not exist in group1 on $s"
+			echo "Verifying that groupf does not exist in $group1 on $s"
 			eval_vars $s
-			ssh root@$FULLHOSTNAME '/usr/sbin/ipa-findgroup group1 | /bin/grep groupf'
+			ssh root@$FULLHOSTNAME "/usr/sbin/ipa-findgroup $group1 | /bin/grep groupf"
 			if [ $? -eq 0 ]; then
 				echo "ERROR - That didn't work! $s"
 				tet_result FAIL
@@ -247,7 +250,7 @@ tp8()
 		if [ "$s" != "" ]; then
 			echo "Verifying that group-1-0 is on $s"
 			eval_vars $s
-			ssh root@$FULLHOSTNAME '/usr/sbin/ipa-findgroup group-1-0 | /bin/grep dn: | /bin/grep cn=group-1-0'
+			ssh root@$FULLHOSTNAME "/usr/sbin/ipa-findgroup group-1-0 | /bin/grep dn: | /bin/grep cn=group-1-0"
 			if [ $? -ne 0 ]; then
 				echo "ERROR - group-1-0 does not exist on $s"
 				tet_result FAIL
@@ -267,7 +270,7 @@ tp8()
 		if [ "$s" != "" ]; then
 			echo "Verifying that group-test0-test1  is on $s"
 			eval_vars $s
-			ssh root@$FULLHOSTNAME '/usr/sbin/ipa-findgroup group-test0-test1  | /bin/grep dn: | /bin/grep cn=group-test0-test1'
+			ssh root@$FULLHOSTNAME "/usr/sbin/ipa-findgroup group-test0-test1  | /bin/grep dn: | /bin/grep cn=group-test0-test1"
 			if [ $? -ne 0 ]; then
 				echo "ERROR - group-test0-test1 does not exist on $s"
 				tet_result FAIL
@@ -287,12 +290,12 @@ tp8()
 		if [ "$s" != "" ]; then
 			echo "Verifying that group-test0-test1 does not exist on $s"
 			eval_vars $s
-			ssh root@$FULLHOSTNAME '/usr/sbin/ipa-findgroup group-test0-test1  | /bin/grep dn: | /bin/grep cn=group-test0-test1 '
+			ssh root@$FULLHOSTNAME "/usr/sbin/ipa-findgroup group-test0-test1  | /bin/grep dn: | /bin/grep cn=group-test0-test1 "
 			if [ $? -eq 0 ]; then
 				echo "ERROR - group-test0-test1 exists on $s"
 				tet_result FAIL
 			fi
-			ssh root@$FULLHOSTNAME '/usr/sbin/ipa-findgroup group-1-0  | /bin/grep dn: | /bin/grep cn=group-1-0 '
+			ssh root@$FULLHOSTNAME "/usr/sbin/ipa-findgroup group-1-0  | /bin/grep dn: | /bin/grep cn=group-1-0 "
 			if [ $? -eq 0 ]; then
 				echo "ERROR - group-1-0 exists on $s"
 				tet_result FAIL
@@ -334,7 +337,7 @@ tp9()
 		if [ "$s" != "" ]; then
 			echo "Verifying that user-2-1 exists in group-2-1 on $s"
 			eval_vars $s
-			ssh root@$FULLHOSTNAME '/usr/sbin/ipa-findgroup group-2-1 | grep uid=user-2-1'
+			ssh root@$FULLHOSTNAME "/usr/sbin/ipa-findgroup group-2-1 | grep uid=user-2-1"
 			if [ $? -ne 0 ]; then
 				echo "ERROR - user-2-1 does not exist in group-2-1 on $s"
 				tet_result FAIL
@@ -359,13 +362,13 @@ tp9()
 		if [ "$s" != "" ]; then
 			echo "Verifying that user-2-1 exists in group-test2-test1 on $s"
 			eval_vars $s
-			ssh root@$FULLHOSTNAME '/usr/sbin/ipa-findgroup group-test2-test1 | grep uid=user-2-1'
+			ssh root@$FULLHOSTNAME "/usr/sbin/ipa-findgroup group-test2-test1 | grep uid=user-2-1"
 			if [ $? -ne 0 ]; then
 				echo "ERROR - user-2-1 does not exist in group-test2-test1 on $s"
 				tet_result FAIL
 			fi
 			# verifying that the old group doesn't exist
-			ssh root@$FULLHOSTNAME '/usr/sbin/ipa-findgroup group-2-1'
+			ssh root@$FULLHOSTNAME "/usr/sbin/ipa-findgroup group-2-1"
 			if [ $? -eq 0 ]; then
 				echo "ERROR - group-2-1 exists on $s"
 				tet_result FAIL
@@ -420,7 +423,7 @@ tp10()
 		if [ "$s" != "" ]; then
 			echo "Verifying that user-3-1 exists in group-3-1 on $s"
 			eval_vars $s
-			ssh root@$FULLHOSTNAME '/usr/sbin/ipa-findgroup group-3-1 | grep uid=user-3-1'
+			ssh root@$FULLHOSTNAME "/usr/sbin/ipa-findgroup group-3-1 | grep uid=user-3-1"
 			if [ $? -ne 0 ]; then
 				echo "ERROR - user-3-1 does not exist in group-3-1 on $s"
 				tet_result FAIL
@@ -439,13 +442,13 @@ tp10()
 		if [ "$s" != "" ]; then
 			echo "Verifying that user-3-1 exists in group-test3-test1 on $s"
 			eval_vars $s
-			ssh root@$FULLHOSTNAME '/usr/sbin/ipa-findgroup group-test3-test1 | grep uid=user-3-1'
+			ssh root@$FULLHOSTNAME "/usr/sbin/ipa-findgroup group-test3-test1 | grep uid=user-3-1"
 			if [ $? -ne 0 ]; then
 				echo "ERROR - user-3-1 does not exist in group-test3-test1 on $s"
 				tet_result FAIL
 			fi
 			# verifying that the old group doesn't exist
-			ssh root@$FULLHOSTNAME '/usr/sbin/ipa-findgroup group-3-1'
+			ssh root@$FULLHOSTNAME "/usr/sbin/ipa-findgroup group-3-1"
 			if [ $? -eq 0 ]; then
 				echo "ERROR - group-3-1 exists on $s"
 				tet_result FAIL
@@ -1700,14 +1703,14 @@ instclean()
 	echo "START Cleanup"
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 	eval_vars M1
-	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-delgroup group1"
+	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-delgroup $group1"
 	if [ $? -ne 0 ]; then
-		echo "ERROR - delete of group1 on $s failed"
+		echo "ERROR - delete of $group1 on $s failed"
 		tet_result FAIL
 	fi
-	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-delgroup group2"
+	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-delgroup $group2"
 	if [ $? -ne 0 ]; then
-		echo "ERROR - delete of group2 on $s failed"
+		echo "ERROR - delete of $group2 on $s failed"
 		tet_result FAIL
 	fi
 
