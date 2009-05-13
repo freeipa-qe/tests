@@ -667,9 +667,9 @@ tp12()
 	sec=1
 	eval_vars M1
 	echo "Set up level 0 and level 1"
-	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-addgroup $grp1 -g 855 -d 'group 5 2 for testing'; \
-/usr/sbin/ipa-addgroup $grp2 -g 856 -d 'group for test 5 2 containing only 1 member level 2'; \
-/usr/sbin/ipa-modgroup --groupadd $grp2 $grp1;"
+	ssh root@$FULLHOSTNAME "/usr/sbin/ipa group-add --description 'group 5 2 for testing' --gid=855 $grp1; \
+/usr/sbin/ipa group-add --description 'group for test 5 2 containing only 1 member level 2' --gid=656 $grp2; \
+/usr/sbin/ipa group-add-member --groups=$grp2 $grp1;"
 	if [ $? -ne 0 ]; then
 		echo "ERROR - $tet_thistest failed in section $sec"
 		tet_result FAIL
@@ -680,7 +680,7 @@ tp12()
 	grp2alt="group-test5-level2"
 	newfirstname="looklookd"
 	echo "Create user that will be in level 3"
-	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-adduser -f 'user 5 2' -l 'lastname' $user1;"
+	ssh root@$FULLHOSTNAME "/usr/sbin/ipa user-add --first='user 5 2' --last='lastname' $user1;"
 	if [ $? -ne 0 ]; then
 		echo "ERROR - $tet_thistest failed in section $sec"
 		tet_result FAIL
@@ -688,7 +688,7 @@ tp12()
 	let sec=$sec+1
 
 	echo "Add the level 3 user to the level 2 group"
-	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-modgroup --add $user1 $grp2;"
+	ssh root@$FULLHOSTNAME "/usr/sbin/ipa group-add-member --users=$user1 $grp2;"
 	if [ $? -ne 0 ]; then
 		echo "ERROR - $tet_thistest failed in section $sec"
 		tet_result FAIL
@@ -696,7 +696,7 @@ tp12()
 	let sec=$sec+1
 
 	echo "modify the user"
-	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-moduser --firstname $newfirstname $user1"
+	ssh root@$FULLHOSTNAME "/usr/sbin/ipa user-mod --first=$newfirstname $user1"
 	if [ $? -ne 0 ]; then
 		echo "ERROR - $tet_thistest failed in section $sec"
 		tet_result FAIL
@@ -704,7 +704,7 @@ tp12()
 	let sec=$sec+1
 
 	echo "modify the group"
-	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-modgroup --setattr cn=$grp2alt $grp2"
+	ssh root@$FULLHOSTNAME "/usr/sbin/ipa group-mod --setattr='cn=$grp2alt' $grp2"
 	if [ $? -ne 0 ]; then
 		echo "ERROR, rename of $grp2 on M1 failed in section $sec"
 		tet_result FAIL
@@ -715,12 +715,12 @@ tp12()
 	for s in $SERVERS; do
 		if [ "$s" != "" ]; then
 			eval_vars $s
-			ssh root@$FULLHOSTNAME "ipa-findgroup -a $grp1 | grep $grp2alt"
+			ssh root@$FULLHOSTNAME "ipa group-find $grp1 | grep $grp2alt"
 			if [ $? -ne 0 ]; then
 				echo "ERROR - $grp2alt does not exist in $grp1"
 				tet_result FAIL
 			fi
-			ssh root@$FULLHOSTNAME "ipa-finduser -a $user1 | grep $newfirstname"
+			ssh root@$FULLHOSTNAME "ipa user-find --all $user1 | grep $newfirstname"
 			if [ $? -ne 0 ]; then
 				echo "ERROR - The altered First Name for user $user1 does not exist in $grp1"
 				echo "ERROR - possibly from bug https://bugzilla.redhat.com/show_bug.cgi?id=451318"
@@ -734,12 +734,12 @@ tp12()
 		if [ "$s" != "" ]; then
 			eval_vars $s
 			if [ "$OS_VER" -eq "5" ] && [ "$OS" -eq "RHEL" ]; then
-				ssh root@$FULLHOSTNAME "ipa-findgroup -a $grp1 | grep $grp2alt"
+				ssh root@$FULLHOSTNAME "ipa group-find $grp1 | grep $grp2alt"
 				if [ $? -ne 0 ]; then
 					echo "ERROR - $grp2alt does not exist in $grp1"
 					tet_result FAIL
 				fi
-				ssh root@$FULLHOSTNAME "ipa-findgroup -a $grp1 | grep $newfirstname"
+				ssh root@$FULLHOSTNAME "ipa group-find $grp1 | grep $newfirstname"
 
 				if [ $? -ne 0 ]; then
 					echo "ERROR - The altered First Name for user $user1 does not exist in $grp1"
@@ -759,10 +759,10 @@ tp12()
 
 	eval_vars M1
 	echo "Cleanup of test set 2"
-	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-delgroup $grp1; \
-/usr/sbin/ipa-delgroup $grp2alt; \
-/usr/sbin/ipa-delgroup $grp2; \
-/usr/sbin/ipa-deluser $user1; "
+	ssh root@$FULLHOSTNAME "/usr/sbin/ipa group-del $grp1; \
+/usr/sbin/ipa group-del $grp2alt; \
+/usr/sbin/ipa group-del $grp2; \
+/usr/sbin/ipa user-del $user1; "
 	if [ $? -ne 0 ]; then
 		echo "ERROR, cleanup of test set 2 failed in section $sec"
 		tet_result FAIL
