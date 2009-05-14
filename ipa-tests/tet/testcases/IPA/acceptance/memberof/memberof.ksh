@@ -63,12 +63,12 @@ tp2()
 	# Create two groups on M1
 	echo "START $tet_thistest"
 	eval_vars M1
-	ssh root@$FULLHOSTNAME "/usr/sbin/ipa group-add --gid=444 --description='$group1 for testing' $group1"
+	ssh root@$FULLHOSTNAME "ipa group-add --gid=444 --description='$group1 for testing' $group1"
 	if [ $? -ne 0 ]; then
 		echo "ERROR, creation of $group1 on M1 failed"
 		tet_result FAIL
 	fi
-	ssh root@$FULLHOSTNAME "/usr/sbin/ipa group-add --gid=888 --description='$group2 for testing' $group2"
+	ssh root@$FULLHOSTNAME "ipa group-add --gid=888 --description='$group2 for testing' $group2"
 	if [ $? -ne 0 ]; then
 		echo "ERROR, creation of $group2 on M1 failed"
 		tet_result FAIL
@@ -88,12 +88,12 @@ tp3()
 		if [ "$s" != "" ]; then
 			echo "Verifying that $group1 exists on $s"
 			eval_vars $s
-			ssh root@$FULLHOSTNAME "/usr/sbin/ipa group-find $group1 | /bin/grep gidnumber | /bin/grep 444"
+			ssh root@$FULLHOSTNAME "ipa group-find $group1 | /bin/grep gidnumber | /bin/grep 444"
 			if [ $? -ne 0 ]; then
 				echo "ERROR - $group1 does not exist on $s"
 				tet_result FAIL
 			fi
-			ssh root@$FULLHOSTNAME "/usr/sbin/ipa group-find $group2 | /bin/grep gidnumber | /bin/grep 888"
+			ssh root@$FULLHOSTNAME "ipa group-find $group2 | /bin/grep gidnumber | /bin/grep 888"
 			if [ $? -ne 0 ]; then
 				echo "ERROR - $group2 does not exist on $s"
 				tet_result FAIL
@@ -105,12 +105,12 @@ tp3()
 			eval_vars $s
 			if [ "$OS_VER" -eq "5" ] && [ "$OS" -eq "RHEL" ]; then
 				echo "Verifying that $group1 exists on $s"
-				ssh root@$FULLHOSTNAME "/usr/sbin/ipa group-find $group1 | /bin/grep gidnumber | /bin/grep 444"
+				ssh root@$FULLHOSTNAME "ipa group-find $group1 | /bin/grep gidnumber | /bin/grep 444"
 				if [ $? -ne 0 ]; then
 					echo "ERROR - $group1 does not exist on $s"
 					tet_result FAIL
 				fi
-				ssh root@$FULLHOSTNAME "/usr/sbin/ipa group-find $group2 | /bin/grep gidnumber | /bin/grep 888"
+				ssh root@$FULLHOSTNAME "ipa group-find $group2 | /bin/grep gidnumber | /bin/grep 888"
 				if [ $? -ne 0 ]; then
 					echo "ERROR - $group2 does not exist on $s"
 					tet_result FAIL
@@ -168,14 +168,14 @@ tp6()
 		if [ "$s" != "" ]; then
 			echo "Verifying that $group2 is in $group1 on $s"
 			eval_vars $s
-			ssh root@$FULLHOSTNAME "/usr/sbin/ipa group-find $group1 | /bin/grep $group2"
+			ssh root@$FULLHOSTNAME "ipa group-find $group1 | /bin/grep $group2"
 			if [ $? -ne 0 ]; then
 				echo "ERROR - $group2 does not exist in $group1 on $s"
 				tet_result FAIL
 			fi
 
 			echo "Verifying that $group1 is in $group2 on $s"
-			ssh root@$FULLHOSTNAME "/usr/sbin/ipa group-find $group2 | /bin/grep $group1"
+			ssh root@$FULLHOSTNAME "ipa group-find $group2 | /bin/grep $group1"
 			if [ $? -ne 0 ]; then
 				echo "ERROR - $group1 does not exist in $group2 on $s"
 				tet_result FAIL
@@ -188,14 +188,14 @@ tp6()
 			eval_vars $s
 			if [ "$OS_VER" -eq "5" ] && [ "$OS" -eq "RHEL" ]; then			
 				echo "Verifying that $group2 is in $group1 on $s"
-				ssh root@$FULLHOSTNAME "/usr/sbin/ipa group-find $group1 | /bin/grep $group2"
+				ssh root@$FULLHOSTNAME "ipa group-find $group1 | /bin/grep $group2"
 				if [ $? -ne 0 ]; then
 					echo "ERROR - $group2 does not exist in $group1 on $s"
 					tet_result FAIL
 				fi
 
 				echo "Verifying that $group1 is in $group2 on $s"
-				ssh root@$FULLHOSTNAME "/usr/sbin/ipa group-find $group2 | /bin/grep $group1"
+				ssh root@$FULLHOSTNAME "ipa group-find $group2 | /bin/grep $group1"
 				if [ $? -ne 0 ]; then
 					echo "ERROR - $group1 does not exist in $group2 on $s"
 					tet_result FAIL
@@ -219,7 +219,7 @@ tp7()
 		if [ "$s" != "" ]; then
 			echo "Verifying that groupf does not exist in $group1 on $s"
 			eval_vars $s
-			ssh root@$FULLHOSTNAME "/usr/sbin/ipa group-find $group1 | /bin/grep groupf"
+			ssh root@$FULLHOSTNAME "ipa group-find $group1 | /bin/grep groupf"
 			if [ $? -eq 0 ]; then
 				echo "ERROR - That didn't work! $s"
 				tet_result FAIL
@@ -240,7 +240,7 @@ tp8()
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 	echo "START $tet_thistest"
 	eval_vars M1
-	ssh root@$FULLHOSTNAME "/usr/sbin/ipa group-add --description 'group-1-0 for testing' --gid=555 group-1-0"
+	ssh root@$FULLHOSTNAME "ipa group-add --description 'group-1-0 for testing' --gid=555 group-1-0"
 	if [ $? -ne 0 ]; then
 		echo "ERROR, creation of group-1-0 on M1 failed"
 		tet_result FAIL
@@ -250,7 +250,7 @@ tp8()
 		if [ "$s" != "" ]; then
 			echo "Verifying that group-1-0 is on $s"
 			eval_vars $s
-			ssh root@$FULLHOSTNAME "/usr/sbin/ipa group-find group-1-0 | /bin/grep dn: | /bin/grep cn=group-1-0"
+			ssh root@$FULLHOSTNAME "ipa group-find group-1-0 | /bin/grep dn: | /bin/grep cn=group-1-0"
 			if [ $? -ne 0 ]; then
 				echo "ERROR - group-1-0 does not exist on $s"
 				tet_result FAIL
@@ -260,7 +260,7 @@ tp8()
 
 	# renaming group-1-0 to group-test0-test1
 	eval_vars M1
-	ssh root@$FULLHOSTNAME "/usr/sbin/ipa group-mod --setattr cn=group-test0-test1 group-1-0"
+	ssh root@$FULLHOSTNAME "ipa group-mod --setattr cn=group-test0-test1 group-1-0"
 	if [ $? -ne 0 ]; then
 		echo "ERROR, rename of group-1-0 on M1 failed"
 		tet_result FAIL
@@ -270,7 +270,7 @@ tp8()
 		if [ "$s" != "" ]; then
 			echo "Verifying that group-test0-test1  is on $s"
 			eval_vars $s
-			ssh root@$FULLHOSTNAME "/usr/sbin/ipa group-find group-test0-test1  | /bin/grep dn: | /bin/grep cn=group-test0-test1"
+			ssh root@$FULLHOSTNAME "ipa group-find group-test0-test1  | /bin/grep dn: | /bin/grep cn=group-test0-test1"
 			if [ $? -ne 0 ]; then
 				echo "ERROR - group-test0-test1 does not exist on $s"
 				tet_result FAIL
@@ -280,7 +280,7 @@ tp8()
 
 	# deleting group-test0-test1
 	eval_vars M1
-	ssh root@$FULLHOSTNAME "/usr/sbin/ipa group-del group-test0-test1"
+	ssh root@$FULLHOSTNAME "ipa group-del group-test0-test1"
 	if [ $? -ne 0 ]; then
 		echo "ERROR, delete of group-test0-test1 on M1 failed"
 		tet_result FAIL
@@ -290,12 +290,12 @@ tp8()
 		if [ "$s" != "" ]; then
 			echo "Verifying that group-test0-test1 does not exist on $s"
 			eval_vars $s
-			ssh root@$FULLHOSTNAME "/usr/sbin/ipa group-find group-test0-test1  | /bin/grep dn: | /bin/grep cn=group-test0-test1 "
+			ssh root@$FULLHOSTNAME "ipa group-find group-test0-test1  | /bin/grep dn: | /bin/grep cn=group-test0-test1 "
 			if [ $? -eq 0 ]; then
 				echo "ERROR - group-test0-test1 exists on $s"
 				tet_result FAIL
 			fi
-			ssh root@$FULLHOSTNAME "/usr/sbin/ipa group-find group-1-0  | /bin/grep dn: | /bin/grep cn=group-1-0 "
+			ssh root@$FULLHOSTNAME "ipa group-find group-1-0  | /bin/grep dn: | /bin/grep cn=group-1-0 "
 			if [ $? -eq 0 ]; then
 				echo "ERROR - group-1-0 exists on $s"
 				tet_result FAIL
@@ -315,19 +315,19 @@ tp9()
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 	echo "START $tet_thistest"
 	eval_vars M1
-	ssh root@$FULLHOSTNAME "/usr/sbin/ipa group-add --description 'group 2 1 for testing' --gid=666 group-2-1"
+	ssh root@$FULLHOSTNAME "ipa group-add --description 'group 2 1 for testing' --gid=666 group-2-1"
 	if [ $? -ne 0 ]; then
 		echo "ERROR, creation of group-2-1 on M1 failed"
 		tet_result FAIL
 	fi
 
-	ssh root@$FULLHOSTNAME "/usr/sbin/ipa user-add --first='user-2-1' --last='lastname' user-2-1"
+	ssh root@$FULLHOSTNAME "ipa user-add --first='user-2-1' --last='lastname' user-2-1"
 	if [ $? -ne 0 ]; then
 		echo "ERROR, creation of user-2-1 on M1 failed"
 		tet_result FAIL
 	fi
 
-	ssh root@$FULLHOSTNAME "/usr/sbin/ipa group-add-member --users=user-2-1 group-2-1"
+	ssh root@$FULLHOSTNAME "ipa group-add-member --users=user-2-1 group-2-1"
 	if [ $? -ne 0 ]; then
 		echo "ERROR, add of user-2-1 to group-2-1 on M1 failed"
 		tet_result FAIL
@@ -337,7 +337,7 @@ tp9()
 		if [ "$s" != "" ]; then
 			echo "Verifying that user-2-1 exists in group-2-1 on $s"
 			eval_vars $s
-			ssh root@$FULLHOSTNAME "/usr/sbin/ipa group-find group-2-1 | grep uid=user-2-1"
+			ssh root@$FULLHOSTNAME "ipa group-find group-2-1 | grep uid=user-2-1"
 			if [ $? -ne 0 ]; then
 				echo "ERROR - user-2-1 does not exist in group-2-1 on $s"
 				tet_result FAIL
@@ -346,13 +346,13 @@ tp9()
 	done
 
 	eval_vars M1
-	ssh root@$FULLHOSTNAME "/usr/sbin/ipa user-mod --first=look user-2-1"
+	ssh root@$FULLHOSTNAME "ipa user-mod --first=look user-2-1"
 	if [ $? -ne 0 ]; then
 		echo "ERROR, change of firstname for user 2-1 on M1 failed"
 		tet_result FAIL
 	fi
 
-	ssh root@$FULLHOSTNAME "/usr/sbin/ipa group-mod --setattr='cn=group-test2-test1' group-2-1"
+	ssh root@$FULLHOSTNAME "ipa group-mod --setattr='cn=group-test2-test1' group-2-1"
 	if [ $? -ne 0 ]; then
 		echo "ERROR, rename of group-2-1 on M1 failed"
 		tet_result FAIL
@@ -362,13 +362,13 @@ tp9()
 		if [ "$s" != "" ]; then
 			echo "Verifying that user-2-1 exists in group-test2-test1 on $s"
 			eval_vars $s
-			ssh root@$FULLHOSTNAME "/usr/sbin/ipa group-find group-test2-test1 | grep uid=user-2-1"
+			ssh root@$FULLHOSTNAME "ipa group-find group-test2-test1 | grep uid=user-2-1"
 			if [ $? -ne 0 ]; then
 				echo "ERROR - user-2-1 does not exist in group-test2-test1 on $s"
 				tet_result FAIL
 			fi
 			# verifying that the old group doesn't exist
-			ssh root@$FULLHOSTNAME "/usr/sbin/ipa group-find group-2-1"
+			ssh root@$FULLHOSTNAME "ipa group-find group-2-1"
 			if [ $? -eq 0 ]; then
 				echo "ERROR - group-2-1 exists on $s"
 				tet_result FAIL
@@ -378,13 +378,13 @@ tp9()
 
 	# deleting group-test2-test1
 	eval_vars M1
-	ssh root@$FULLHOSTNAME "/usr/sbin/ipa group-del group-test2-test1"
+	ssh root@$FULLHOSTNAME "ipa group-del group-test2-test1"
 	if [ $? -ne 0 ]; then
 		echo "ERROR, delete of group-test2-test1 on M1 failed"
 		tet_result FAIL
 	fi
 
-	ssh root@$FULLHOSTNAME "/usr/sbin/ipa user-del user-2-1"
+	ssh root@$FULLHOSTNAME "ipa user-del user-2-1"
 	if [ $? -ne 0 ]; then
 		echo "ERROR, delete of user-2-1 on M1 failed"
 		tet_result FAIL
@@ -401,19 +401,19 @@ tp10()
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 	echo "START $tet_thistest"
 	eval_vars M1
-	ssh root@$FULLHOSTNAME "/usr/sbin/ipa group-add --description 'group 3 1 for testing' --gid=777 group-3-1"
+	ssh root@$FULLHOSTNAME "ipa group-add --description 'group 3 1 for testing' --gid=777 group-3-1"
 	if [ $? -ne 0 ]; then
 		echo "ERROR, creation of group-3-1 on M1 failed"
 		tet_result FAIL
 	fi
 
-	ssh root@$FULLHOSTNAME "/usr/sbin/ipa user-add --first='user-3-1' --last='lastname' user-3-1"
+	ssh root@$FULLHOSTNAME "ipa user-add --first='user-3-1' --last='lastname' user-3-1"
 	if [ $? -ne 0 ]; then
 		echo "ERROR, creation of user-3-1 on M1 failed"
 		tet_result FAIL
 	fi
 
-	ssh root@$FULLHOSTNAME "/usr/sbin/ipa group-add-member --users=user-3-1 group-3-1"
+	ssh root@$FULLHOSTNAME "ipa group-add-member --users=user-3-1 group-3-1"
 	if [ $? -ne 0 ]; then
 		echo "ERROR, add of user-3-1 to group-3-1 on M1 failed"
 		tet_result FAIL
@@ -423,7 +423,7 @@ tp10()
 		if [ "$s" != "" ]; then
 			echo "Verifying that user-3-1 exists in group-3-1 on $s"
 			eval_vars $s
-			ssh root@$FULLHOSTNAME "/usr/sbin/ipa-findgroup group-3-1 | grep uid=user-3-1"
+			ssh root@$FULLHOSTNAME "ipa-findgroup group-3-1 | grep uid=user-3-1"
 			if [ $? -ne 0 ]; then
 				echo "ERROR - user-3-1 does not exist in group-3-1 on $s"
 				tet_result FAIL
@@ -432,7 +432,7 @@ tp10()
 	done
 
 	eval_vars M1
-	ssh root@$FULLHOSTNAME "/usr/sbin/ipa group-mod --setattr='cn=group-test3-test1' group-3-1"
+	ssh root@$FULLHOSTNAME "ipa group-mod --setattr='cn=group-test3-test1' group-3-1"
 	if [ $? -ne 0 ]; then
 		echo "ERROR, rename of group-3-1 on M1 failed"
 		tet_result FAIL
@@ -442,13 +442,13 @@ tp10()
 		if [ "$s" != "" ]; then
 			echo "Verifying that user-3-1 exists in group-test3-test1 on $s"
 			eval_vars $s
-			ssh root@$FULLHOSTNAME "/usr/sbin/ipa group-find group-test3-test1 | grep uid=user-3-1"
+			ssh root@$FULLHOSTNAME "ipa group-find group-test3-test1 | grep uid=user-3-1"
 			if [ $? -ne 0 ]; then
 				echo "ERROR - user-3-1 does not exist in group-test3-test1 on $s"
 				tet_result FAIL
 			fi
 			# verifying that the old group doesn't exist
-			ssh root@$FULLHOSTNAME "/usr/sbin/ipa group-find group-3-1"
+			ssh root@$FULLHOSTNAME "ipa group-find group-3-1"
 			if [ $? -eq 0 ]; then
 				echo "ERROR - group-3-1 exists on $s"
 				tet_result FAIL
@@ -458,13 +458,13 @@ tp10()
 
 	# deleting group-test3-test1
 	eval_vars M1
-	ssh root@$FULLHOSTNAME "/usr/sbin/ipa group-del group-test3-test1"
+	ssh root@$FULLHOSTNAME "ipa group-del group-test3-test1"
 	if [ $? -ne 0 ]; then
 		echo "ERROR, delete of group-test3-test1 on M1 failed"
 		tet_result FAIL
 	fi
 
-	ssh root@$FULLHOSTNAME "/usr/sbin/ipa user-del user-3-1"
+	ssh root@$FULLHOSTNAME "ipa user-del user-3-1"
 	if [ $? -ne 0 ]; then
 		echo "ERROR, delete of user-3-1 on M1 failed"
 		tet_result FAIL
@@ -496,20 +496,20 @@ tp11()
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 	echo "START $tet_thistest"
 	eval_vars M1
-	ssh root@$FULLHOSTNAME "/usr/sbin/ipa group-add --description 'group 4 1 for testing' --gid=775 group-4-1; \
-/usr/sbin/ipa group-add --description 'empty group 4 1 for testing' --gid=756 group-e4-1; \
-/usr/sbin/ipa user-add --first='user 4 1' --last='lastname' user-4-1; \
-/usr/sbin/ipa group-add-member --groups=group-e4-1 --users=user-4-1 group-4-1;"
+	ssh root@$FULLHOSTNAME "ipa group-add --description 'group 4 1 for testing' --gid=775 group-4-1; \
+ipa group-add --description 'empty group 4 1 for testing' --gid=756 group-e4-1; \
+ipa user-add --first='user 4 1' --last='lastname' user-4-1; \
+ipa group-add-member --groups=group-e4-1 --users=user-4-1 group-4-1;"
 	if [ $? -ne 0 ]; then
 		echo "ERROR - $tet_thistest failed in section 1"
 		tet_result FAIL
 	fi
 		
-	ssh root@$FULLHOSTNAME "/usr/sbin/ipa user-mod --first=look1 user-4-1; \
-/usr/sbin/ipa user-mod --first=look2 user-4-1; \
-/usr/sbin/ipa user-mod --first=look3 user-4-1; \
-/usr/sbin/ipa user-del user-4-1; \
-/usr/sbin/ipa group-mod --setattr'cn=group-4c-1' group-4-1;"
+	ssh root@$FULLHOSTNAME "ipa user-mod --first=look1 user-4-1; \
+ipa user-mod --first=look2 user-4-1; \
+ipa user-mod --first=look3 user-4-1; \
+ipa user-del user-4-1; \
+ipa group-mod --setattr'cn=group-4c-1' group-4-1;"
 	if [ $? -ne 0 ]; then
 		echo "ERROR - $tet_thistest failed in section 2"
 		tet_result FAIL
@@ -521,14 +521,14 @@ tp11()
 		tet_result FAIL
 	fi
 
-	ssh root@$FULLHOSTNAME "/usr/sbin/ipa group-add --description='group 4 1a for testing' --gid=761 group-4-1a; \
-/usr/sbin/ipa group-add --description='group 4 1b for testing' --gid=762 group-4-1b; \
-/usr/sbin/ipa group-add --description='group 4 1c for testing' --gid=763 group-4-1c; \
-/usr/sbin/ipa group-add --description='group 4 1d for testing' --gid=764 group-4-1d; \
-/usr/sbin/ipa user-add --first='user 4 1a' --last='lastname' user-41a; \
-/usr/sbin/ipa user-add --first='user 4 1b' --last='lastname' user-41b; \
-/usr/sbin/ipa user-add --first='user 4 1c' --last='lastname' user-41c; \
-/usr/sbin/ipa user-add --first='user 4 1d' --last='lastname' user-41d;"
+	ssh root@$FULLHOSTNAME "ipa group-add --description='group 4 1a for testing' --gid=761 group-4-1a; \
+ipa group-add --description='group 4 1b for testing' --gid=762 group-4-1b; \
+ipa group-add --description='group 4 1c for testing' --gid=763 group-4-1c; \
+ipa group-add --description='group 4 1d for testing' --gid=764 group-4-1d; \
+ipa user-add --first='user 4 1a' --last='lastname' user-41a; \
+ipa user-add --first='user 4 1b' --last='lastname' user-41b; \
+ipa user-add --first='user 4 1c' --last='lastname' user-41c; \
+ipa user-add --first='user 4 1d' --last='lastname' user-41d;"
 	if [ $? -ne 0 ]; then
 		echo "ERROR - $tet_thistest failed in section 3"
 		tet_result FAIL
@@ -540,7 +540,7 @@ tp11()
 		tet_result FAIL
 	fi
 
-	ssh root@$FULLHOSTNAME "/usr/sbin/ipa group-mod --setattr='cn=group-4d-1' group-4c-1;"
+	ssh root@$FULLHOSTNAME "ipa group-mod --setattr='cn=group-4d-1' group-4c-1;"
 	if [ $? -ne 0 ]; then
 		echo "ERROR, rename of group-4c-1 on M1 failed"
 		tet_result FAIL
@@ -667,9 +667,9 @@ tp12()
 	sec=1
 	eval_vars M1
 	echo "Set up level 0 and level 1"
-	ssh root@$FULLHOSTNAME "/usr/sbin/ipa group-add --description 'group 5 2 for testing' --gid=855 $grp1; \
-/usr/sbin/ipa group-add --description 'group for test 5 2 containing only 1 member level 2' --gid=656 $grp2; \
-/usr/sbin/ipa group-add-member --groups=$grp2 $grp1;"
+	ssh root@$FULLHOSTNAME "ipa group-add --description 'group 5 2 for testing' --gid=855 $grp1; \
+ipa group-add --description 'group for test 5 2 containing only 1 member level 2' --gid=656 $grp2; \
+ipa group-add-member --groups=$grp2 $grp1;"
 	if [ $? -ne 0 ]; then
 		echo "ERROR - $tet_thistest failed in section $sec"
 		tet_result FAIL
@@ -680,7 +680,7 @@ tp12()
 	grp2alt="group-test5-level2"
 	newfirstname="looklookd"
 	echo "Create user that will be in level 3"
-	ssh root@$FULLHOSTNAME "/usr/sbin/ipa user-add --first='user 5 2' --last='lastname' $user1;"
+	ssh root@$FULLHOSTNAME "ipa user-add --first='user 5 2' --last='lastname' $user1;"
 	if [ $? -ne 0 ]; then
 		echo "ERROR - $tet_thistest failed in section $sec"
 		tet_result FAIL
@@ -688,7 +688,7 @@ tp12()
 	let sec=$sec+1
 
 	echo "Add the level 3 user to the level 2 group"
-	ssh root@$FULLHOSTNAME "/usr/sbin/ipa group-add-member --users=$user1 $grp2;"
+	ssh root@$FULLHOSTNAME "ipa group-add-member --users=$user1 $grp2;"
 	if [ $? -ne 0 ]; then
 		echo "ERROR - $tet_thistest failed in section $sec"
 		tet_result FAIL
@@ -696,7 +696,7 @@ tp12()
 	let sec=$sec+1
 
 	echo "modify the user"
-	ssh root@$FULLHOSTNAME "/usr/sbin/ipa user-mod --first=$newfirstname $user1"
+	ssh root@$FULLHOSTNAME "ipa user-mod --first=$newfirstname $user1"
 	if [ $? -ne 0 ]; then
 		echo "ERROR - $tet_thistest failed in section $sec"
 		tet_result FAIL
@@ -704,7 +704,7 @@ tp12()
 	let sec=$sec+1
 
 	echo "modify the group"
-	ssh root@$FULLHOSTNAME "/usr/sbin/ipa group-mod --setattr='cn=$grp2alt' $grp2"
+	ssh root@$FULLHOSTNAME "ipa group-mod --setattr='cn=$grp2alt' $grp2"
 	if [ $? -ne 0 ]; then
 		echo "ERROR, rename of $grp2 on M1 failed in section $sec"
 		tet_result FAIL
@@ -759,10 +759,10 @@ tp12()
 
 	eval_vars M1
 	echo "Cleanup of test set 2"
-	ssh root@$FULLHOSTNAME "/usr/sbin/ipa group-del $grp1; \
-/usr/sbin/ipa group-del $grp2alt; \
-/usr/sbin/ipa group-del $grp2; \
-/usr/sbin/ipa user-del $user1; "
+	ssh root@$FULLHOSTNAME "ipa group-del $grp1; \
+ipa group-del $grp2alt; \
+ipa group-del $grp2; \
+ipa user-del $user1; "
 	if [ $? -ne 0 ]; then
 		echo "ERROR, cleanup of test set 2 failed in section $sec"
 		tet_result FAIL
@@ -807,31 +807,31 @@ tp13()
 	# grp3 is a empty group to get added to grp2
 	# grp4 is the name the name that grp2 gets renamed to. 
 	# grp5 is the name that grp2 gets renamed to
-	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-addgroup $grp1 -g 767 -d 'group 5 2 for group 4 1 for testing'; \
-/usr/sbin/ipa-addgroup $grp2 -g 765 -d 'group 4 1 for testing'; \
-/usr/sbin/ipa-addgroup $grp3 -g 766 -d 'empty group 4 1 for testing'; "
+	ssh root@$FULLHOSTNAME "ipa-addgroup $grp1 -g 767 -d 'group 5 2 for group 4 1 for testing'; \
+ipa-addgroup $grp2 -g 765 -d 'group 4 1 for testing'; \
+ipa-addgroup $grp3 -g 766 -d 'empty group 4 1 for testing'; "
 	if [ $? -ne 0 ]; then
 		echo "ERROR - $tet_thistest failed in section 1a"
 		tet_result FAIL
 	fi
 
-	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-adduser -f 'user 4 1' -l 'lastname' $user1; "
+	ssh root@$FULLHOSTNAME "ipa-adduser -f 'user 4 1' -l 'lastname' $user1; "
 	if [ $? -ne 0 ]; then
 		echo "ERROR - $tet_thistest failed in section 1b"
 		tet_result FAIL
 	fi
 
-	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-modgroup --groupadd $grp2 $grp1; \
-/usr/sbin/ipa-modgroup --groupadd $grp3 $grp2; \
-/usr/sbin/ipa-modgroup --add $user1 $grp2;"
+	ssh root@$FULLHOSTNAME "ipa-modgroup --groupadd $grp2 $grp1; \
+ipa-modgroup --groupadd $grp3 $grp2; \
+ipa-modgroup --add $user1 $grp2;"
 	if [ $? -ne 0 ]; then
 		echo "ERROR - $tet_thistest failed in section 1c"
 		tet_result FAIL
 	fi
 		
-	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-moduser --firstname look1 $user1; \
-/usr/sbin/ipa-moduser --firstname look2 $user1; \
-/usr/sbin/ipa-moduser --firstname look3 $user1; "
+	ssh root@$FULLHOSTNAME "ipa-moduser --firstname look1 $user1; \
+ipa-moduser --firstname look2 $user1; \
+ipa-moduser --firstname look3 $user1; "
 	if [ $? -ne 0 ]; then
 		echo "ERROR - $tet_thistest failed in section 2"
 		tet_result FAIL
@@ -843,14 +843,14 @@ tp13()
 		tet_result FAIL
 	fi
 
-	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-addgroup $grpa -g 771 -d 'group 4 1a for testing'; \
-/usr/sbin/ipa-addgroup $grpb -g 772 -d 'group 4 1b for testing'; \
-/usr/sbin/ipa-addgroup $grpc -g 773 -d 'group 4 1c for testing'; \
-/usr/sbin/ipa-addgroup $grpd -g 774 -d 'group 4 1d for testing'; \
-/usr/sbin/ipa-adduser -f 'user 4 1a' -l 'lastname' $usera; \
-/usr/sbin/ipa-adduser -f 'user 4 1b' -l 'lastname' $userb; \
-/usr/sbin/ipa-adduser -f 'user 4 1c' -l 'lastname' $userc; \
-/usr/sbin/ipa-adduser -f 'user 4 1d' -l 'lastname' $userd; "
+	ssh root@$FULLHOSTNAME "ipa-addgroup $grpa -g 771 -d 'group 4 1a for testing'; \
+ipa-addgroup $grpb -g 772 -d 'group 4 1b for testing'; \
+ipa-addgroup $grpc -g 773 -d 'group 4 1c for testing'; \
+ipa-addgroup $grpd -g 774 -d 'group 4 1d for testing'; \
+ipa-adduser -f 'user 4 1a' -l 'lastname' $usera; \
+ipa-adduser -f 'user 4 1b' -l 'lastname' $userb; \
+ipa-adduser -f 'user 4 1c' -l 'lastname' $userc; \
+ipa-adduser -f 'user 4 1d' -l 'lastname' $userd; "
 	if [ $? -ne 0 ]; then
 		echo "ERROR - $tet_thistest failed in section 4"
 		tet_result FAIL
@@ -869,7 +869,7 @@ ipa-modgroup --add $userd $grp2;"
 		tet_result FAIL
 	fi
 
-	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-modgroup --setattr cn=$grp4 $grp2;"
+	ssh root@$FULLHOSTNAME "ipa-modgroup --setattr cn=$grp4 $grp2;"
 	if [ $? -ne 0 ]; then
 		echo "ERROR, rename of $grp2 on M1 failed"
 		tet_result FAIL
@@ -985,31 +985,31 @@ tp14()
 ####11. delete group member till the top level group became an empty group
 
 	# Cleanup, just in case things exist that shouldn't
-ssh root@$FULLHOSTNAME "/usr/sbin/ipa-delgroup group-4-1; \
-/usr/sbin/ipa-delgroup group-4a-1; \
-/usr/sbin/ipa-delgroup group-4b-1; \
-/usr/sbin/ipa-delgroup group-4c-1; \
-/usr/sbin/ipa-delgroup group-4d-1; \
-/usr/sbin/ipa-deluser user-4-1; \
-/usr/sbin/ipa-deluser user-5-1"
+ssh root@$FULLHOSTNAME "ipa-delgroup group-4-1; \
+ipa-delgroup group-4a-1; \
+ipa-delgroup group-4b-1; \
+ipa-delgroup group-4c-1; \
+ipa-delgroup group-4d-1; \
+ipa-deluser user-4-1; \
+ipa-deluser user-5-1"
 
-	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-addgroup group-5-1 -g 977 -d 'this group will be the top level group'; \
-/usr/sbin/ipa-addgroup group-4-1 -g 755 -d 'group 4 1 for testing'; \
-/usr/sbin/ipa-addgroup group-e4-1 -g 756 -d 'empty group 4 1 for testing'; \
-/usr/sbin/ipa-adduser -f 'user 4 1' -l 'lastname' user-4-1; \
-/usr/sbin/ipa-modgroup --groupadd group-e4-1 group-4-1; \
-/usr/sbin/ipa-modgroup --groupadd group-4-1 group-5-1; \
-/usr/sbin/ipa-modgroup --add user-4-1 group-4-1;"
+	ssh root@$FULLHOSTNAME "ipa-addgroup group-5-1 -g 977 -d 'this group will be the top level group'; \
+ipa-addgroup group-4-1 -g 755 -d 'group 4 1 for testing'; \
+ipa-addgroup group-e4-1 -g 756 -d 'empty group 4 1 for testing'; \
+ipa-adduser -f 'user 4 1' -l 'lastname' user-4-1; \
+ipa-modgroup --groupadd group-e4-1 group-4-1; \
+ipa-modgroup --groupadd group-4-1 group-5-1; \
+ipa-modgroup --add user-4-1 group-4-1;"
 	if [ $? -ne 0 ]; then
 		echo "ERROR - $tet_thistest failed in section 1"
 		tet_result FAIL
 	fi
 		
-	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-moduser --firstname look1 user-4-1; \
-/usr/sbin/ipa-moduser --firstname look2 user-4-1; \
-/usr/sbin/ipa-moduser --firstname look3 user-4-1; \
-/usr/sbin/ipa-deluser user-4-1; \
-/usr/sbin/ipa-modgroup --setattr cn=group-4c-1 group-4-1;"
+	ssh root@$FULLHOSTNAME "ipa-moduser --firstname look1 user-4-1; \
+ipa-moduser --firstname look2 user-4-1; \
+ipa-moduser --firstname look3 user-4-1; \
+ipa-deluser user-4-1; \
+ipa-modgroup --setattr cn=group-4c-1 group-4-1;"
 	if [ $? -ne 0 ]; then
 		echo "ERROR - $tet_thistest failed in section 2"
 		tet_result FAIL
@@ -1021,14 +1021,14 @@ ssh root@$FULLHOSTNAME "/usr/sbin/ipa-delgroup group-4-1; \
 		tet_result FAIL
 	fi
 
-	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-addgroup group-4-1a -g 761 -d 'group 4 1a for testing'; \
-/usr/sbin/ipa-addgroup group-4-1b -g 762 -d 'group 4 1b for testing'; \
-/usr/sbin/ipa-addgroup group-4-1c -g 763 -d 'group 4 1c for testing'; \
-/usr/sbin/ipa-addgroup group-4-1d -g 764 -d 'group 4 1d for testing'; \
-/usr/sbin/ipa-adduser -f 'user 4 1a' -l 'lastname' user-41a; \
-/usr/sbin/ipa-adduser -f 'user 4 1b' -l 'lastname' user-41b; \
-/usr/sbin/ipa-adduser -f 'user 4 1c' -l 'lastname' user-41c; \
-/usr/sbin/ipa-adduser -f 'user 4 1d' -l 'lastname' user-41d; "
+	ssh root@$FULLHOSTNAME "ipa-addgroup group-4-1a -g 761 -d 'group 4 1a for testing'; \
+ipa-addgroup group-4-1b -g 762 -d 'group 4 1b for testing'; \
+ipa-addgroup group-4-1c -g 763 -d 'group 4 1c for testing'; \
+ipa-addgroup group-4-1d -g 764 -d 'group 4 1d for testing'; \
+ipa-adduser -f 'user 4 1a' -l 'lastname' user-41a; \
+ipa-adduser -f 'user 4 1b' -l 'lastname' user-41b; \
+ipa-adduser -f 'user 4 1c' -l 'lastname' user-41c; \
+ipa-adduser -f 'user 4 1d' -l 'lastname' user-41d; "
 	if [ $? -ne 0 ]; then
 		echo "ERROR - $tet_thistest failed in section 3"
 		tet_result FAIL
@@ -1047,7 +1047,7 @@ ipa-modgroup --add user-41d group-4c-1;"
 		tet_result FAIL
 	fi
 
-	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-modgroup --setattr cn=group-4d-1 group-4c-1;"
+	ssh root@$FULLHOSTNAME "ipa-modgroup --setattr cn=group-4d-1 group-4c-1;"
 	if [ $? -ne 0 ]; then
 		echo "ERROR, rename of group-4c-1 on M1 failed"
 		tet_result FAIL
@@ -1160,18 +1160,18 @@ tp15()
 
 	eval_vars M1
 	# set up groups
-	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-addgroup $grp1 -g 87 -d 'group 6 2 for testing'; \
-/usr/sbin/ipa-addgroup $grp2 -g 75 -d 'group 6 2 for level 2 testing'; \
-/usr/sbin/ipa-addgroup $grp3 -g 76 -d ' group 6 2 for level 3 testing'; "
+	ssh root@$FULLHOSTNAME "ipa-addgroup $grp1 -g 87 -d 'group 6 2 for testing'; \
+ipa-addgroup $grp2 -g 75 -d 'group 6 2 for level 2 testing'; \
+ipa-addgroup $grp3 -g 76 -d ' group 6 2 for level 3 testing'; "
 	if [ $? -ne 0 ]; then
 		echo "ERROR - $tet_thistest failed in section 1"
 		tet_result FAIL
 	fi
 
 	# set up users
-	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-adduser -f 'user 6 2a' -l 'lastname' $user1; \
-	/usr/sbin/ipa-adduser -f 'user 6 2b' -l 'lastname' $user2; \
-	/usr/sbin/ipa-adduser -f 'user 6 2c' -l 'lastname' $user3; "
+	ssh root@$FULLHOSTNAME "ipa-adduser -f 'user 6 2a' -l 'lastname' $user1; \
+	ipa-adduser -f 'user 6 2b' -l 'lastname' $user2; \
+	ipa-adduser -f 'user 6 2c' -l 'lastname' $user3; "
 	if [ $? -ne 0 ]; then
 		echo "ERROR - $tet_thistest failed in section 2"
 		tet_result FAIL
@@ -1472,9 +1472,9 @@ bug438891()
 	runnum=0
 	while [[ $runnum -lt $ITTERATIONS ]]; do
 		echo "Test $tet_thistest Itteration $runnum"
-		ssh root@$FULLHOSTNAME "/usr/sbin/ipa-addgroup $grp1 -g 37 -d 'group 438891a for testing'; \
-/usr/sbin/ipa-addgroup $grp2 -g 35 -d 'group 438891b for testing'; \
-/usr/sbin/ipa-adduser -f '438891' -l 'lastname' $user1; \
+		ssh root@$FULLHOSTNAME "ipa-addgroup $grp1 -g 37 -d 'group 438891a for testing'; \
+ipa-addgroup $grp2 -g 35 -d 'group 438891b for testing'; \
+ipa-adduser -f '438891' -l 'lastname' $user1; \
 ipa-modgroup --groupadd $grp2 $grp1; \
 ipa-modgroup --add $user1 $grp2; \
 ipa-modgroup --setattr cn=$grp1alt $grp1"
@@ -1520,8 +1520,8 @@ bug439097()
 	runnum=0
 	while [[ $runnum -lt $ITTERATIONS ]]; do
 		echo "Test $tet_thistest Itteration $runnum"
-		ssh root@$FULLHOSTNAME "/usr/sbin/ipa-addgroup $grp1 -g 37 -d 'group 438891a for testing'; \
-/usr/sbin/ipa-adduser -f '438891' -l 'lastname' $user1; \
+		ssh root@$FULLHOSTNAME "ipa-addgroup $grp1 -g 37 -d 'group 438891a for testing'; \
+ipa-adduser -f '438891' -l 'lastname' $user1; \
 ipa-modgroup --add $user1 $grp1; \
 ipa-modgroup --remove $user1 $grp1"
 		if [ $? -ne 0 ]; then
@@ -1565,8 +1565,8 @@ bug439450()
 	runnum=0
 	while [[ $runnum -lt $ITTERATIONS ]]; do
 		echo "Test $tet_thistest Itteration $runnum"
-		ssh root@$FULLHOSTNAME "/usr/sbin/ipa-addgroup $grp1 -g 37 -d 'group a for testing'; \
-/usr/sbin/ipa-addgroup $grp2 -g 39 -d 'group b for testing'; \
+		ssh root@$FULLHOSTNAME "ipa-addgroup $grp1 -g 37 -d 'group a for testing'; \
+ipa-addgroup $grp2 -g 39 -d 'group b for testing'; \
 ipa-modgroup --groupadd $grp2 $grp1; \
 ipa-modgroup --groupadd $grp1 $grp2"
 		if [ $? -ne 0 ]; then
@@ -1618,9 +1618,9 @@ bug439628()
 	runnum=0
 	while [[ $runnum -lt $ITTERATIONS ]]; do
 		echo "Test $tet_thistest Itteration $runnum"
-		ssh root@$FULLHOSTNAME "/usr/sbin/ipa-addgroup $grp1 -g 87 -d 'group a for testing'; \
-/usr/sbin/ipa-addgroup $grp2 -g 85 -d 'group b for testing'; \
-/usr/sbin/ipa-adduser -f 'u1' -l 'lastname' $user1; \
+		ssh root@$FULLHOSTNAME "ipa-addgroup $grp1 -g 87 -d 'group a for testing'; \
+ipa-addgroup $grp2 -g 85 -d 'group b for testing'; \
+ipa-adduser -f 'u1' -l 'lastname' $user1; \
 ipa-modgroup --groupadd $grp2 $grp1; \
 ipa-modgroup --add $user1 $grp2; \
 ipa-modgroup --add $user1 $grp1; \
@@ -1695,24 +1695,24 @@ instclean()
 	echo "START Cleanup"
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 	eval_vars M1
-	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-delgroup $group1"
+	ssh root@$FULLHOSTNAME "ipa-delgroup $group1"
 	if [ $? -ne 0 ]; then
 		echo "ERROR - delete of $group1 on $s failed"
 		tet_result FAIL
 	fi
-	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-delgroup $group2"
+	ssh root@$FULLHOSTNAME "ipa-delgroup $group2"
 	if [ $? -ne 0 ]; then
 		echo "ERROR - delete of $group2 on $s failed"
 		tet_result FAIL
 	fi
 
-	ssh root@$FULLHOSTNAME "/usr/sbin/ipa-delgroup $grp3; \
-/usr/sbin/ipa-delgroup group-4-1; \
-/usr/sbin/ipa-delgroup group-4a-1; \
-/usr/sbin/ipa-delgroup group-4b-1; \
-/usr/sbin/ipa-delgroup group-4c-1; \
-/usr/sbin/ipa-delgroup group-4d-1; \
-/usr/sbin/ipa-deluser user-4-1"
+	ssh root@$FULLHOSTNAME "ipa-delgroup $grp3; \
+ipa-delgroup group-4-1; \
+ipa-delgroup group-4a-1; \
+ipa-delgroup group-4b-1; \
+ipa-delgroup group-4c-1; \
+ipa-delgroup group-4d-1; \
+ipa-deluser user-4-1"
 
 	for s in $SERVERS; do
 		if [ "$s" != "" ]; then
