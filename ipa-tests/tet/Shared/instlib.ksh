@@ -739,7 +739,7 @@ InstallClientRedhat()
 
 		ssh root@$FULLHOSTNAME "/usr/bin/yum clean all"
 
-		pkglistB="ipa-client ipa-admintools"
+		pkglistB="ipa-client ipa-admintools ipa-server expect"
 		ssh root@$FULLHOSTNAME "yum -y install $pkglistB"
 		if [ $? -ne 0 ]; then
 			echo "That rpm install didn't work, lets try that again. Sleeping for 60 seconds first" 
@@ -917,7 +917,7 @@ UnInstallClientRPM()
 		echo "Returning"
 		return 0
 	fi
-	ssh root@$FULLHOSTNAME "rpm -e --allmatches ipa-admintools;rpm -e --allmatches ipa-client"
+	ssh root@$FULLHOSTNAME "rpm -e --allmatches ipa-admintools;rpm -e --allmatches ipa-client; rpm -e --allmatches ipa-server; rpm -e --allmatches redhat-ds-base ipa-server krb5-workstation ipa-server-selinux"
 	ret=$?
 	if [ $ret -ne 0 ]; then
 		echo "ERROR - ssh to $FULLHOSTNAME failed"
