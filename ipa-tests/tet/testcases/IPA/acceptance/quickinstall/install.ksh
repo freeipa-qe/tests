@@ -325,7 +325,7 @@ tp7()
 			tet_result FAIL
 		fi
 
-		ssh root@$FULLHOSTNAME '/usr/bin/ipa user-find admin'
+		ssh root@$FULLHOSTNAME 'ipa user-find admin'
 		ret=$?
 		if [ $ret != 0 ]; then
         		echo "ERROR - ipa user-find admin failed";
@@ -346,7 +346,7 @@ tp7()
 		fi
 
 		if [ "$OS_VER" -eq "5" ] && [ "$OS" -eq "RHEL" ]; then
-			ssh root@$FULLHOSTNAME '/usr/bin/ipa user-find admin'
+			ssh root@$FULLHOSTNAME 'ipa user-find admin'
 			ret=$?
 			if [ $ret != 0 ]; then
         			echo "ERROR - ipa user-find admin failed";
@@ -414,18 +414,18 @@ tp9()
 	for s in $SERVERS; do
 		if [ "$DSTET_DEBUG" = "y" ]; then echo "working on $s now"; fi
 		eval_vars $s
-		ssh root@$FULLHOSTNAME "/usr/sbin/ipa user-finduser $user1"
+		ssh root@$FULLHOSTNAME "ipa user-finduser $user1"
 		if [ $? != 0 ]; then
         		echo "ERROR - ipa user-find failed on $FULLHOSTNAME";
 			tet_result FAIL
 		fi
-		ssh root@$FULLHOSTNAME "/usr/sbin/ipa user-finduser $user2"
+		ssh root@$FULLHOSTNAME "ipa user-finduser $user2"
 		if [ $? != 0 ]; then
         		echo "ERROR - ipa user-find failed on $FULLHOSTNAME";
 			tet_result FAIL
 		fi
 
-		ssh root@$FULLHOSTNAME "/usr/sbin/ipa group-find -v $group1 | grep $user1"
+		ssh root@$FULLHOSTNAME "ipa group-find -v $group1 | grep $user1"
 		if [ $? != 0 ]; then
         		echo "ERROR - ipa $user1 not found in $group1 failed on $FULLHOSTNAME";
 			tet_result FAIL
@@ -437,18 +437,18 @@ tp9()
 		if [ "$DSTET_DEBUG" = "y" ]; then echo "working on $s now"; fi
 		eval_vars $s
 		if [ "$OS_VER" -eq "5" ] && [ "$OS" -eq "RHEL" ]; then
-			ssh root@$FULLHOSTNAME "/usr/sbin/ipa user-finduser $user1"
+			ssh root@$FULLHOSTNAME "ipa user-finduser $user1"
 			if [ $? != 0 ]; then
         			echo "ERROR - ipa user-find failed on $FULLHOSTNAME";
 				tet_result FAIL
 			fi
-			ssh root@$FULLHOSTNAME "/usr/sbin/ipa user-finduser $user2"
+			ssh root@$FULLHOSTNAME "ipa user-finduser $user2"
 			if [ $? != 0 ]; then
         			echo "ERROR - ipa user-find failed on $FULLHOSTNAME";
 				tet_result FAIL
 			fi
 	
-			ssh root@$FULLHOSTNAME "/usr/sbin/ipa group-find -v $group1 | grep $user1"
+			ssh root@$FULLHOSTNAME "ipa group-find -v $group1 | grep $user1"
 			if [ $? != 0 ]; then
         			echo "ERROR - ipa $user1 not found in $group1 failed on $FULLHOSTNAME";
 			tet_result FAIL
