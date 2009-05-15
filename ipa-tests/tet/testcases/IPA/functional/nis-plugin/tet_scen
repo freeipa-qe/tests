@@ -1,0 +1,12 @@
+ 
+all
+	"Starting ALL"
+	^nis
+	"Ending ALL"
+
+nis
+	"Starting nis plugin tests..."
+	/nis.ksh
+	"Ending nis plugin tests..."
+
+# EOF
