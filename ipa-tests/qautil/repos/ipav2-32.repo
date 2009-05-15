@@ -1,0 +1,5 @@
+[ipa-v2-daily-i386]
+name=ipa-v2-daily-i386
+baseurl=http://porkchop.devel.redhat.com/nightly/RHEL5.3-IPA-2.0-20090429.1.nightly/2.0/i386/os/IPA/
+enabled=1
+gpgcheck=0 
