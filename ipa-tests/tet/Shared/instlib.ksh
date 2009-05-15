@@ -515,42 +515,6 @@ SetupServer()
 				ssh root@$replica_hostname "cat /etc/hosts;cat /etc/resolv.conf;dig $replica_hostname; dig $replica_hostname @$FULLHOSTNAME"
 				ssh root@$FULLHOSTNAME "ps -fax; dig $replica_hostname"
 				echo "trying it all again"
-				# Just in case a previous uninstall didn't finish:
-				ssh root@$replica_hostname "ipa-server-install --uninstall -U"
-				ssh root@$FULLHOSTNAME "rm -f /var/lib/ipa/replica-info-$replica_hostname*"
-				echo "Generating replica prepare file for $replica_hostname on $FULLHOSTNAME"
-				ssh root@$FULLHOSTNAME "/usr/sbin/ipa-replica-prepare -p $DM_ADMIN_PASS $replica_hostname"
-				if [ $? -ne 0 ]; then
-					echo "Method one did not work, trying method 2"
-					ssh root@$FULLHOSTNAME "/usr/sbin/ipa-replica-prepare $replica_hostname"
-					if [ $? -ne 0 ]; then
-						echo "ERROR - /usr/sbin/ipa-replica-prepare $replica_hostname on $FULLHOSTNAME failed."
-						return 1;
-					fi
-				fi
-				# copying the relica prepare file from the master server to the replica	
-				rm -f $TET_TMP_DIR/replica-info-$replica_hostname
-				scp root@$FULLHOSTNAME:/var/lib/ipa/replica-info-$replica_hostname* $TET_TMP_DIR/.
-				ret=$?
-				ssh root@$replica_hostname "rm -f /dev/shm/replica-info-$replica_hostname"
-				scp $TET_TMP_DIR/replica-info-$replica_hostname* root@$replica_hostname:/dev/shm/.
-				ret2=$?
-				if [ $ret -ne 0 ]||[ $ret2 -ne 0 ]; then
-					echo "ERROR - scp root@$FULLHOSTNAME:/var/lib/ipa/replica-info-$replica_hostname to root@$replica_hostname:/dev/shm/. failed"
-					return 1;
-				fi
-				ssh root@$replica_hostname "sed -i s/$replica_hostname.gpg/$replica_hostname/g /dev/shm/replica-install.exp"
-				ssh root@$replica_hostname "/usr/bin/expect /dev/shm/replica-install.exp"
-				if [ $? -ne 0 ]; then
-					echo "Method 1 did not work, trying method 2"
-					# Replacing name in expect script
-					ssh root@$replica_hostname "sed -i s/$replica_hostname/$replica_hostname.gpg/g /dev/shm/replica-install.exp"
-					ssh root@$replica_hostname "/usr/bin/expect /dev/shm/replica-install.exp"
-					if [ $? -ne 0 ]; then	
-						echo "ERROR - /usr/bin/expect /dev/shm/replica-install.exp on $replica_hostname:/dev/shm/. failed"
-						return 1;
-					fi
-				fi
 			fi
 			ssh root@$replica_hostname "ps -ef | grep slapd"
 			echo "Restoring resolv.conf on replica"
@@ -917,7 +881,7 @@ UnInstallClientRPM()
 		echo "Returning"
 		return 0
 	fi
-	ssh root@$FULLHOSTNAME "rpm -e --allmatches ipa-admintools;rpm -e --allmatches ipa-client; rpm -e --allmatches ipa-server; rpm -e --allmatches redhat-ds-base ipa-server krb5-workstation ipa-server-selinux"
+	ssh root@$FULLHOSTNAME "rpm -e --allmatches ipa-admintools;rpm -e --allmatches ipa-client; rpm -e --allmatches ipa-server; rpm -e --allmatches redhat-ds-base ipa-server krb5-workstation ipa-server-selinux;rpm -e --allmatches redhat-ds-base ipa-server krb5-workstation ipa-server-selinux ipa-client;rpm -e ipa-client ipa-admintools ipa-server ipa-server-selinux"
 	ret=$?
 	if [ $ret -ne 0 ]; then
 		echo "ERROR - ssh to $FULLHOSTNAME failed"
