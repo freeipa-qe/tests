@@ -260,7 +260,7 @@ tp8()
 
 	# renaming group-1-0 to group-test0-test1
 	eval_vars M1
-	ssh root@$FULLHOSTNAME "ipa group-mod --setattr cn=group-test0-test1 group-1-0"
+	ssh root@$FULLHOSTNAME "ipa group-mod --gid=group-test0-test1 group-1-0"
 	if [ $? -ne 0 ]; then
 		echo "ERROR, rename of group-1-0 on M1 failed"
 		tet_result FAIL
@@ -352,7 +352,7 @@ tp9()
 		tet_result FAIL
 	fi
 
-	ssh root@$FULLHOSTNAME "ipa group-mod --setattr='cn=group-test2-test1' group-2-1"
+	ssh root@$FULLHOSTNAME "ipa group-mod --gid=group-test2-test1 group-2-1"
 	if [ $? -ne 0 ]; then
 		echo "ERROR, rename of group-2-1 on M1 failed"
 		tet_result FAIL
@@ -432,7 +432,7 @@ tp10()
 	done
 
 	eval_vars M1
-	ssh root@$FULLHOSTNAME "ipa group-mod --setattr='cn=group-test3-test1' group-3-1"
+	ssh root@$FULLHOSTNAME "ipa group-mod --gid=group-test3-test1 group-3-1"
 	if [ $? -ne 0 ]; then
 		echo "ERROR, rename of group-3-1 on M1 failed"
 		tet_result FAIL
@@ -509,7 +509,7 @@ ipa group-add-member --groups=group-e4-1 --users=user-4-1 group-4-1;"
 ipa user-mod --first=look2 user-4-1; \
 ipa user-mod --first=look3 user-4-1; \
 ipa user-del user-4-1; \
-ipa group-mod --setattr'cn=group-4c-1' group-4-1;"
+ipa group-mod --gid=group-4c-1 group-4-1;"
 	if [ $? -ne 0 ]; then
 		echo "ERROR - $tet_thistest failed in section 2"
 		tet_result FAIL
@@ -540,7 +540,7 @@ ipa user-add --first='user 4 1d' --last='lastname' user-41d;"
 		tet_result FAIL
 	fi
 
-	ssh root@$FULLHOSTNAME "ipa group-mod --setattr='cn=group-4d-1' group-4c-1;"
+	ssh root@$FULLHOSTNAME "ipa group-mod --gid=group-4d-1 group-4c-1;"
 	if [ $? -ne 0 ]; then
 		echo "ERROR, rename of group-4c-1 on M1 failed"
 		tet_result FAIL
@@ -704,7 +704,7 @@ ipa group-add-member --groups=$grp2 $grp1;"
 	let sec=$sec+1
 
 	echo "modify the group"
-	ssh root@$FULLHOSTNAME "ipa group-mod --setattr='cn=$grp2alt' $grp2"
+	ssh root@$FULLHOSTNAME "ipa group-mod --gid=$grp2alt $grp2"
 	if [ $? -ne 0 ]; then
 		echo "ERROR, rename of $grp2 on M1 failed in section $sec"
 		tet_result FAIL
