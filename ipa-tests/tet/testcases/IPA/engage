@@ -37,6 +37,7 @@ unset ENV
 # TET depends on the output of date command to be in english (dchan 7/02)
 LC_ALL=C ; export LC_ALL
 
+export PATH=$PATH:/usr/kerberos/sbin:/usr/kerberos/bin:/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/usr/sbin:/root/bin
 # input script
 MainRunScript=$0
 
@@ -846,6 +847,7 @@ main_default()
 	if [ -z "$MainGuiTests"          ] ; then MainGuiTests=n         ; fi
 	if [ -z "$MainLongDurationTests" ] ; then MainLongDurationTests=n; fi
 	if [ -z "$MainPerformanceTests"  ] ; then MainPerformanceTests=n ; fi
+	if [ -z "$MainFunctionalTestNIS"  ] ; then MainFunctionalTestNIS=n ; fi
 
 	if [ -z "$MainRunStartup"        ] ; then MainRunStartup=y       ; fi
 	if [ -z "$MainRunTests"          ] ; then MainRunTests=y         ; fi
@@ -859,7 +861,7 @@ main_default()
 	export ROOTDN ROOTDNPW TETADMINPW LDAPhost LDAPport DRIVE IPAVERSION
 	export IGNORE_KNOWN_BUGS DSTET_64 DSTET_DEBUG PkgName
 
-	export MainLongDurationTests MainRunStartup MainRunTests MainRunCleanup MainGuiTests MainMailTo MainAcceptanceTests MainReliabTests MainStressTests MainPerformanceTests RunInstall RunInstallShow RunInstall RunInstallShow
+	export MainLongDurationTests MainRunStartup MainRunTests MainRunCleanup MainGuiTests MainMailTo MainAcceptanceTests MainReliabTests MainStressTests MainPerformanceTests MainFunctionalTestNIS RunInstall RunInstallShow RunInstall RunInstallShow
 }
 
 # This function will ask the user for more information/choices if needed
@@ -1570,7 +1572,8 @@ main_ask()
 	echo "	4. STRESS tests "
 	echo "	5. GUI Based tests "
 	echo "	6. Performance "
-	echo "	7. Do not want to run any of these tests "
+	echo "	7. FunctionalTest: NIS plugin"
+	echo "	8. Do not want to run any of these tests "
         echo "choose [$TestChoice] : \c"
 	read rsp
 	if [ -z "$rsp" ] ; then TestChoice=1 ; else TestChoice=$rsp ; fi
@@ -1583,6 +1586,7 @@ main_ask()
 	MainStressTests=n
 	MainGuiTests=n
 	MainPerformanceTests=n
+	MainFunctionalTestNIS=n
 	case $TestChoice in
 		1)	MainAcceptanceTests=y
 			TEST_CAT="Acceptance"
@@ -1601,6 +1605,9 @@ main_ask()
 			;;
 		6)	MainPerformanceTests=y			
 			TEST_CAT="Performance"
+			;;
+		7)	MainFunctionalTestNIS=y			
+			TEST_CAT="FunctionalTestNIS"
 			;;
 		8)	ExampleTest=y
 			TEST_CAT="SAMPLE"
@@ -1761,6 +1768,7 @@ main_print()
 	echo "    Execute the Gui Tests          : $MainGuiTests"
 	echo "    Execute the Long Duration Tests: $MainLongDurationTests"
 	echo "    Execute the performance tests  : $MainPerformanceTests"
+	echo "    Execute the NIS plugin tests   : $MainFunctionalTestNIS"
 	echo 
 	echo "    Execute the tests startup      : $MainRunStartup"
 	echo "    Execute the main tests         : $MainRunTests"
@@ -1878,6 +1886,7 @@ main_save()
 	echo "MainStressTests=$MainStressTests"
 	echo "MainLongDurationTests=$MainLongDurationTests"
 	echo "MainPerformanceTests=$MainPerformanceTests"
+	echo "MainFunctionalTestNIS=$MainFunctionalTestNIS"
 	echo 
 	echo "MainRunStartup=$MainRunStartup"
 	echo "MainRunTests=$MainRunTests"
@@ -1955,6 +1964,13 @@ main_load_init_values()
 	TEST_CAT="Performance"
     fi
 
+    if [ $MainFunctionalTestNIS = y ]; then 
+	. $mainRunBaseDir/functional/nis-plugin/engage.nis
+	nis_default
+	n=`expr $n + 1`
+	TEST_CAT="Functional NIS"
+    fi
+
     if [ $n -gt 1 ]; then
 	echo "main_load_init_values:more then one test catagory was selected."
 	echo "Please only select one of the following main catagory : "
@@ -1984,6 +2000,7 @@ main_print_choices()
     if [ $MainGuiTests          = y ] ; then gui_print          ; fi
     if [ $MainLongDurationTests = y ] ; then longduration_print ; fi
     if [ $MainPerformanceTests  = y ] ; then performance_print  ; fi
+    if [ $MainFunctionalTestNIS = y ] ; then nis_print          ; fi
 }
 
 # This function will ask for the user choices
@@ -2029,6 +2046,12 @@ main_ask_choices()
 	. $mainRunBaseDir/performance/engage.performance
 	performance_default
 	performance_ask
+    fi
+	
+    if [ $MainFunctionalTestNIS = y ] ; then  
+	. $mainRunBaseDir/functional/nis-plugin/engage.nis
+	nis_default
+	nis_ask
     fi
 
 }
@@ -2077,6 +2100,7 @@ main_save_choices()
 	if [ $MainGuiTests          = y ] ; then gui_save          ; fi
 	if [ $MainLongDurationTests = y ] ; then longduration_save ; fi
 	if [ $MainPerformanceTests  = y ] ; then performance_save  ; fi
+	if [ $MainFunctionalTestNIS = y ] ; then nis_save          ; fi
     ) >> $MainConfigFile
 }
 
@@ -2101,6 +2125,7 @@ main_check()
     if [ $MainGuiTests          = y ] ; then gui_check          ; fi
     if [ $MainLongDurationTests = y ] ; then longduration_check ; fi
     if [ $MainPerformanceTests  = y ] ; then performance_check  ; fi
+    if [ $MainFunctionalTestNIS = y ] ; then nis_check          ; fi
 
     echo
     echo "   Ok, no problem found."
@@ -2179,6 +2204,11 @@ main_run()
     if [ $MainPerformanceTests = y ] ; then
 	TET_SUITE_ROOT=$mainRunBaseDir/performance; export TET_SUITE_ROOT
 	performance_run
+    fi
+
+    if [ $MainFunctionalTestNIS = y ] ; then
+	TET_SUITE_ROOT=$mainRunBaseDir/functioinal/nis-plugin ; export TET_SUITE_ROOT
+	nis_run
     fi
 
     if [ $RunUnInstall = y ] ; then 
@@ -2267,7 +2297,8 @@ main_get_options()
 # Runs ntpdate $NTPSERVER on the machine specified in $1
 set_date()
 {
-	ssh $1 "/etc/init.d/ntpd stop;ntpdate $NTPSERVER"&
+	echo "setup date sync for host [$1] with ntp server [$NTPSERVER]"
+	ssh root@$1 "/etc/init.d/ntpd stop;ntpdate $NTPSERVER"&
 	return 0
 }
 
@@ -2302,8 +2333,8 @@ main_main()
 	fi
 
 	# Syncing clock if we can
-	/etc/init.d/ntpd stop
-	ntpdate $NTPSERVER &
+	sudo /etc/init.d/ntpd stop
+	sudo ntpdate $NTPSERVER &
 
 	export HOSTNAME_M1 OS_M1 REPO_M1 
 	export HOSTNAME_M2 OS_M2 REPO_M2 
