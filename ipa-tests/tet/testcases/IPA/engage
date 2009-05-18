@@ -2214,9 +2214,12 @@ main_usage()
 {
 	if [ "$engage_debug" = "y" ]; then set -x; fi
     echo "usage: engage [-c <configfile>]"
-    echo "    Run the Netscape DS automated test suites."
+    echo "    Run the IPA DS automated test suites."
     echo "    -c : config file (no questions)"
     echo "    -f : force engage to run as non-root user (not-advised)"
+    echo ""
+    echo "To generate a new config, simply run ./engage as root, and answer \"n\" to the first question \"Do you agree [y] ?\""
+    echo ""
 }
 
 # Parse the parameters
