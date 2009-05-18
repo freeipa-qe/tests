@@ -24,10 +24,12 @@
 # 21/07/04 | Orla Hegarty | merging bp's 64 bit changes
 # 15/06/08 | Michael Gregg | added updates to allow usage in IPA tet system
 # -----------------------------------------------------------------------------
-#set -x
 # Set this next line to y to see debugging output from engage(not from the tests. This gives a huge ammount of output
-engage_debug=n
+export engage_debug=n
 
+if [ "$engage_debug" = "y" ]; then
+	set -x;
+fi
 # Make sure there is no problem with ksh users - mandatory for AIX at least
 #
 unset ENV
@@ -37,6 +39,9 @@ LC_ALL=C ; export LC_ALL
 
 # input script
 MainRunScript=$0
+
+# Force var to be used later
+forcerun=0
 
 # Should be declared first
 #
@@ -2212,6 +2217,7 @@ main_usage()
     echo "    Run the Netscape DS automated test suites."
     echo "    -c : config file (no questions)"
     echo "    -g : generate config file with all the default value"
+    echo "    -f : force engage to run as non-root user (not-advised)"
 }
 
 # Parse the parameters
@@ -2220,7 +2226,7 @@ main_get_options()
 {
 	if [ "$engage_debug" = "y" ]; then set -x; fi
 	# use getopt instead of getopts, problem with osf and irix (dchan)
-	set -- `getopt gc:h $*`
+	set -- `getopt gc:fh $*`
 	if [ $? -ne 0 ]; then
 		main_usage
 	    exit 1
@@ -2240,6 +2246,10 @@ main_get_options()
 			-g)  main_load_init_values
 				main_save_choices
 				echo $MainConfigFile config file created.
+				exit 0
+				;;
+			-f|--force)	
+				export forcerun=1;
 				exit 0
 				;;
 			-h|-help)	
@@ -2271,6 +2281,12 @@ main_main()
 {
 	if [ "$engage_debug" = "y" ]; then set -x; fi
 	main_get_options $*
+	if [ `whoami` != "root" ]&&[ $forcerun -ne 1 ]; then
+		echo "";
+		echo "please run engage as the root user";
+		echo "";
+		exit
+	fi
 	main_load_init_values
 	if [ $MainQuestions = n ]
 	then
