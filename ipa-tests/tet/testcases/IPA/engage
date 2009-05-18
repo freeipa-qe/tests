@@ -2216,7 +2216,6 @@ main_usage()
     echo "usage: engage [-c <configfile>]"
     echo "    Run the Netscape DS automated test suites."
     echo "    -c : config file (no questions)"
-    echo "    -g : generate config file with all the default value"
     echo "    -f : force engage to run as non-root user (not-advised)"
 }
 
@@ -2226,7 +2225,7 @@ main_get_options()
 {
 	if [ "$engage_debug" = "y" ]; then set -x; fi
 	# use getopt instead of getopts, problem with osf and irix (dchan)
-	set -- `getopt gc:fh $*`
+	set -- `getopt c:fh $*`
 	if [ $? -ne 0 ]; then
 		main_usage
 	    exit 1
@@ -2243,11 +2242,6 @@ main_get_options()
 					exit 1
 				fi
 				shift;;
-			-g)  main_load_init_values
-				main_save_choices
-				echo $MainConfigFile config file created.
-				exit 0
-				;;
 			-f|--force)	
 				export forcerun=1;
 				exit 0
