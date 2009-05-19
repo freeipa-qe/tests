@@ -10,6 +10,7 @@ cli
 	/acicli.ksh
    	/groupcli.ksh
    	/hostcli.ksh
+	/hostgrpcli.ksh
    	/netgroupcli.ksh
    	/delegationcli.ksh
 	/servicecli.ksh
