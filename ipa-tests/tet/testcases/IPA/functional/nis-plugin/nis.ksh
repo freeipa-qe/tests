@@ -18,24 +18,35 @@ ic1="s1"
 ic2="s2"
 ic99="nis_cleanup"
 
+# testing environment variable
+
+#target host: $HOSTNAME_M1
+host=$HOSTNAME_M1
+
+################# Test environment: set up and clean up  ################
 # startup section
 nis_startup()
 {
-	echo "nis start up: setup testing environment"
+	logmessage "nis start up: setup testing environment: no specific setup, using default"
+	tet_result PASS	
 }
 
 # cleanup section
 nis_cleanup()
 {
-	echo "nis cleanup: remove all nis related setting and restore the ipa to the state before the nis test run"
+	logmessage "nis cleanup: remove all nis related setting and restore the ipa to the state before the nis test run"
 }
 
 ################# test cases start here ################
 s1()
 {
-	echo "this is test case 1"
+	tc="nis-1"
+	logmessage "$tc: starts"
+	logmessage "$tc: finished"
 }
 s2()
 {
-	echo "this is test case 2"
+	tc="nis-2"
+	logmessage "$tc: starts"
+	logmessage "$tc: finished"
 }
