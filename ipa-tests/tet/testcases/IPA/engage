@@ -2111,7 +2111,7 @@ main_check()
 {
 	if [ "$engage_debug" = "y" ]; then set -x; fi
 
-    if [ $MainReliabTests = n ] && [ $MainAcceptanceTests = n ] &&  [ $MainStressTests = n ] &&  [ $MainGuiTests = n ] && [ $MainLongDurationTests = n ] && [ $MainPerformanceTests = n ] ; then 
+    if [ $MainReliabTests = n ] && [ $MainAcceptanceTests = n ] &&  [ $MainStressTests = n ] &&  [ $MainGuiTests = n ] && [ $MainLongDurationTests = n ] && [ $MainFunctionalTestNIS = n ] && [ $MainPerformanceTests = n ] ; then 
         echo " You have chosen not to run any tests "
         exit 0 
     fi
