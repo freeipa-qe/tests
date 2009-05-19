@@ -597,6 +597,14 @@ message()
 	type tet_infoline > /dev/null 2>&1 && tet_infoline "$*"
 }
 
+# Add time stamp before we log the message
+logmessage()
+{
+        MSG=$1
+        TIMESTAMP=`date "+[%D %H:%M:%S]"`
+        message "$TIMESTAMP $MSG"
+}
+
 # This function is dedicated to log a test case result in stdout and
 # in tet's journal, associated with a keyword and the test case name.
 #
