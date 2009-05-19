@@ -35,6 +35,7 @@ nis_startup()
 nis_cleanup()
 {
 	logmessage "nis cleanup: remove all nis related setting and restore the ipa to the state before the nis test run"
+	tet_result PASS	
 }
 
 ################# test cases start here ################
@@ -43,10 +44,19 @@ s1()
 	tc="nis-1"
 	logmessage "$tc: starts"
 	logmessage "$tc: finished"
+	tet_result FAIL
 }
 s2()
 {
 	tc="nis-2"
 	logmessage "$tc: starts"
 	logmessage "$tc: finished"
+	tet_result FAIL
 }
+
+######################################################################
+#
+. $TESTING_SHARED/instlib.ksh
+. $TESTING_SHARED/shared.ksh
+. $TET_ROOT/lib/ksh/tcm.ksh
+
