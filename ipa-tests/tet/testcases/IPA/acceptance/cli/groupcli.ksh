@@ -314,6 +314,9 @@ user_cleanup()
 	ssh root@$FULLHOSTNAME "ipa user-del $usr2"
 	let code=$code+$?
 
+	ssh root@$FULLHOSTNAME "ipa group-del $grp2"
+	let code=$code+$?
+
 	if [ $code -ne 0 ]
 	then
 		echo "WARNING - $tet_thistest failed... not that it matters"
