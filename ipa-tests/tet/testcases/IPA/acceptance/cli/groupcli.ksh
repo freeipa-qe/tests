@@ -20,7 +20,7 @@ fi
 tet_startup="kinit"
 tet_cleanup="user_cleanup"
 iclist="ic1"
-ic1="add_group_users group_add group_find group_add_posix group_mod_neg_posix group_mod_posix group_mod_description group_add_member_user group_add_member_user_neg group_add_member_group group_add_member_group_neg group_del"
+ic1="add_group_users group_add group_find group_find_neg group_show group_show_neg group_add_posix group_mod_neg_posix group_mod_posix group_mod_description group_add_member_user group_add_member_user_neg group_add_member_group group_add_member_group_neg group_del"
 # These services will be used by the tests, and removed when the cli test is complete
 host1='alpha.dsdev.sjc.redhat.com'
 
@@ -35,6 +35,7 @@ usr2="usermk5"
 ######################################################################
 kinit()
 {
+	tet_thistest="kinit"
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 	# Kinit everywhere
 	echo "START $tet_thistest"
@@ -70,7 +71,6 @@ kinit()
 # This is the startup for the group tests. Mainly, it just creates the users to be used in the add and remove member tests 
 add_group_users()
 {
-	tet_thistest="cleanup"
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 	echo "START $tet_thistest"
 	eval_vars M1
@@ -94,7 +94,6 @@ add_group_users()
 
 group_add()
 {
-	tet_thistest="cleanup"
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 	echo "START $tet_thistest"
 	eval_vars M1
@@ -117,7 +116,6 @@ group_add()
 
 group_find()
 {
-	tet_thistest="cleanup"
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 	echo "START $tet_thistest"
 	eval_vars M1
@@ -135,9 +133,66 @@ group_find()
 	tet_result PASS
 }
 
+group_find_neg()
+{
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+	echo "START $tet_thistest"
+	eval_vars M1
+	code=0
+
+	ssh root@$FULLHOSTNAME "ipa group-find nonexistgroup"
+	let code=$code+$?
+
+	if [ $code -eq 0 ]
+	then
+		echo "ERROR - $tet_thistest failed. ipa group-find passed when it should not have"
+		echo "ERROR - This failure might be related to https://bugzilla.redhat.com/show_bug.cgi?id=501840"
+		tet_result FAIL
+	fi
+
+	tet_result PASS
+}
+
+group_show()
+{
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+	echo "START $tet_thistest"
+	eval_vars M1
+	code=0
+
+	ssh root@$FULLHOSTNAME "ipa group-show $grp1 | grep group-to-test-find-user"
+	let code=$code+$?
+
+	if [ $code -ne 0 ]
+	then
+		echo "ERROR - $tet_thistest failed."
+		tet_result FAIL
+	fi
+
+	tet_result PASS
+}
+
+group_show_neg()
+{
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+	echo "START $tet_thistest"
+	eval_vars M1
+	code=0
+
+	ssh root@$FULLHOSTNAME "ipa group-show nonexistgroup"
+	let code=$code+$?
+
+	if [ $code -eq 0 ]
+	then
+		echo "ERROR - $tet_thistest failed. ipa group-find passed when it should not have"
+		tet_result FAIL
+	fi
+
+	tet_result PASS
+}
+
 group_add_posix()
 {
-	tet_thistest="cleanup"
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 	echo "START $tet_thistest"
 	eval_vars M1
@@ -160,7 +215,6 @@ group_add_posix()
 
 group_mod_posix()
 {
-	tet_thistest="cleanup"
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 	echo "START $tet_thistest"
 	eval_vars M1
@@ -183,7 +237,6 @@ group_mod_posix()
 
 group_mod_neg_posix()
 {
-	tet_thistest="cleanup"
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 	echo "START $tet_thistest"
 	eval_vars M1
@@ -202,7 +255,6 @@ group_mod_neg_posix()
 
 group_mod_description()
 {
-	tet_thistest="cleanup"
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 	echo "START $tet_thistest"
 	eval_vars M1
@@ -225,7 +277,6 @@ group_mod_description()
 
 group_add_member_user()
 {
-	tet_thistest="cleanup"
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 	echo "START $tet_thistest"
 	eval_vars M1
@@ -248,7 +299,6 @@ group_add_member_user()
 
 group_add_member_user_neg()
 {
-	tet_thistest="cleanup"
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 	echo "START $tet_thistest"
 	eval_vars M1
@@ -268,7 +318,6 @@ group_add_member_user_neg()
 
 group_add_member_group()
 {
-	tet_thistest="cleanup"
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 	echo "START $tet_thistest"
 	eval_vars M1
@@ -291,7 +340,6 @@ group_add_member_group()
 
 group_add_member_group_neg()
 {
-	tet_thistest="cleanup"
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 	echo "START $tet_thistest"
 	eval_vars M1
@@ -311,7 +359,6 @@ group_add_member_group_neg()
 
 group_del()
 {
-	tet_thistest="cleanup"
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 	echo "START $tet_thistest"
 	eval_vars M1
