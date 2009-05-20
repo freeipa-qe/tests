@@ -20,7 +20,7 @@ fi
 tet_startup="kinit"
 tet_cleanup="user_cleanup"
 iclist="ic1"
-ic1="add_group_users group_add group_find group_add_posix group_mod_neg_posix group_mod_posix group_mod_description group_add_member_user group_add_member_group group_del"
+ic1="add_group_users group_add group_find group_add_posix group_mod_neg_posix group_mod_posix group_mod_description group_add_member_user group_add_member_user_neg group_add_member_group group_add_member_group_neg group_del"
 # These services will be used by the tests, and removed when the cli test is complete
 host1='alpha.dsdev.sjc.redhat.com'
 
@@ -231,7 +231,7 @@ group_add_member_user()
 	eval_vars M1
 	code=0
 
-	ssh root@$FULLHOSTNAME "ipa group-add-member --users=$usr1 $grp1"
+	ssh root@$FULLHOSTNAME "ipa group-add-member --users=$usr1,$usr2 $grp1"
 	let code=$code+$?
 
 	ssh root@$FULLHOSTNAME "ipa group-find $grp1 | grep $usr1"
@@ -240,6 +240,26 @@ group_add_member_user()
 	if [ $code -ne 0 ]
 	then
 		echo "ERROR - $tet_thistest failed."
+		tet_result FAIL
+	fi
+
+	tet_result PASS
+}
+
+group_add_member_user_neg()
+{
+	tet_thistest="cleanup"
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+	echo "START $tet_thistest"
+	eval_vars M1
+	code=0
+
+	# This should fail because these users should already be in this group
+	ssh root@$FULLHOSTNAME "ipa group-add-member --users=$usr1,$usr2 $grp1"
+	if [ $? -eq 0 ]
+	then
+		echo "ERROR - $tet_thistest failed."
+		echo "ERROR - This is likley related to bug https://bugzilla.redhat.com/show_bug.cgi?id=499464"
 		tet_result FAIL
 	fi
 
@@ -263,6 +283,26 @@ group_add_member_group()
 	if [ $code -ne 0 ]
 	then
 		echo "ERROR - $tet_thistest failed."
+		tet_result FAIL
+	fi
+
+	tet_result PASS
+}
+
+group_add_member_group_neg()
+{
+	tet_thistest="cleanup"
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+	echo "START $tet_thistest"
+	eval_vars M1
+	code=0
+
+	# This should fail because this group should already be in this group
+	ssh root@$FULLHOSTNAME "ipa group-add-member --groups=$grp2 $grp1"
+	if [ $? -eq 0 ]
+	then
+		echo "ERROR - $tet_thistest failed."
+		echo "ERROR - This is likley related to bug https://bugzilla.redhat.com/show_bug.cgi?id=499464"
 		tet_result FAIL
 	fi
 
