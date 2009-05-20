@@ -17,10 +17,10 @@ if [ "$DSTET_DEBUG" = "y" ]; then
 	set -x
 fi
 # The next line is required as it picks up data about the servers to use
-tet_startup="CheckAlive"
+tet_startup="kinit"
 tet_cleanup="user_cleanup"
 iclist="ic1"
-ic1="kinit"
+ic1="add_group_users group_add group_find group_add_posix group_mod_neg_posix group_mod_posix group_mod_description group_add_member_user group_add_member_group group_del"
 # These services will be used by the tests, and removed when the cli test is complete
 host1='alpha.dsdev.sjc.redhat.com'
 
@@ -28,6 +28,9 @@ host1='alpha.dsdev.sjc.redhat.com'
 superuser="sup64"
 grp1="grpkl1"
 grp2="ghml4pam"
+
+usr1="usermk4"
+usr2="usermk5"
 
 ######################################################################
 kinit()
@@ -63,6 +66,31 @@ kinit()
 	tet_result PASS
 	echo "END $tet_thistest"
 }
+
+# This is the startup for the group tests. Mainly, it just creates the users to be used in the add and remove member tests 
+add_group_users()
+{
+	tet_thistest="cleanup"
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+	echo "START $tet_thistest"
+	eval_vars M1
+	code=0
+
+	ssh root@$FULLHOSTNAME "ipa user-add --first=\"firstuname\" --last=\"lastuname\" $usr1"
+	let code=$code+$?
+
+	ssh root@$FULLHOSTNAME "ipa user-add --first=\"firstuname2\" --last=\"lastuname2\" $usr2"
+	let code=$code+$?
+
+	if [ $code -ne 0 ]
+	then
+		echo "ERROR - $tet_thistest failed."
+		tet_result FAIL
+	fi
+
+	tet_result PASS
+}
+
 
 group_add()
 {
@@ -195,6 +223,52 @@ group_mod_description()
 	tet_result PASS
 }
 
+group_add_member_user()
+{
+	tet_thistest="cleanup"
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+	echo "START $tet_thistest"
+	eval_vars M1
+	code=0
+
+	ssh root@$FULLHOSTNAME "ipa group-add-member --users=$usr1 $grp1"
+	let code=$code+$?
+
+	ssh root@$FULLHOSTNAME "ipa group-find $grp1 | grep $usr1"
+	let code=$code+$?
+
+	if [ $code -ne 0 ]
+	then
+		echo "ERROR - $tet_thistest failed."
+		tet_result FAIL
+	fi
+
+	tet_result PASS
+}
+
+group_add_member_group()
+{
+	tet_thistest="cleanup"
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+	echo "START $tet_thistest"
+	eval_vars M1
+	code=0
+
+	ssh root@$FULLHOSTNAME "ipa group-add-member --groups=$grp2 $grp1"
+	let code=$code+$?
+
+	ssh root@$FULLHOSTNAME "ipa group-find $grp1 | grep $grp2"
+	let code=$code+$?
+
+	if [ $code -ne 0 ]
+	then
+		echo "ERROR - $tet_thistest failed."
+		tet_result FAIL
+	fi
+
+	tet_result PASS
+}
+
 group_del()
 {
 	tet_thistest="cleanup"
@@ -234,7 +308,10 @@ user_cleanup()
 	code=0
 
 
-	ssh root@$FULLHOSTNAME "ipa user-del $superuser"
+	ssh root@$FULLHOSTNAME "ipa user-del $usr1"
+	let code=$code+$?
+
+	ssh root@$FULLHOSTNAME "ipa user-del $usr2"
 	let code=$code+$?
 
 	if [ $code -ne 0 ]
