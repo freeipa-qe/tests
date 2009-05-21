@@ -20,7 +20,7 @@ fi
 tet_startup="kinit"
 tet_cleanup="user_cleanup"
 iclist="ic1"
-ic1="add_group_users group_add group_find group_find_neg group_show group_show_neg group_add_posix group_mod_neg_posix group_mod_posix group_mod_description group_add_member_user group_add_member_user_neg group_add_member_group group_add_member_group_neg group_del"
+ic1="add_group_users group_add group_find group_find_neg group_show group_show_neg group_add_posix group_mod_neg_posix group_mod_posix group_mod_description group_add_member_user group_add_member_user_neg group_add_member_group group_add_member_group_neg group_remove_member_group group_remove_member_group_neg group_remove_member_user group_remove_member_user_neg group_del"
 # These services will be used by the tests, and removed when the cli test is complete
 host1='alpha.dsdev.sjc.redhat.com'
 
@@ -141,9 +141,7 @@ group_find_neg()
 	code=0
 
 	ssh root@$FULLHOSTNAME "ipa group-find nonexistgroup"
-	let code=$code+$?
-
-	if [ $code -eq 0 ]
+	if [ $? -eq 0 ]
 	then
 		echo "ERROR - $tet_thistest failed. ipa group-find passed when it should not have"
 		echo "ERROR - This failure might be related to https://bugzilla.redhat.com/show_bug.cgi?id=501840"
@@ -180,9 +178,7 @@ group_show_neg()
 	code=0
 
 	ssh root@$FULLHOSTNAME "ipa group-show nonexistgroup"
-	let code=$code+$?
-
-	if [ $code -eq 0 ]
+	if [ $? -eq 0 ]
 	then
 		echo "ERROR - $tet_thistest failed. ipa group-find passed when it should not have"
 		tet_result FAIL
@@ -351,6 +347,104 @@ group_add_member_group_neg()
 	then
 		echo "ERROR - $tet_thistest failed."
 		echo "ERROR - This is likley related to bug https://bugzilla.redhat.com/show_bug.cgi?id=499464"
+		tet_result FAIL
+	fi
+
+	tet_result PASS
+}
+
+group_remove_member_group()
+{
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+	echo "START $tet_thistest"
+	eval_vars M1
+	code=0
+
+	ssh root@$FULLHOSTNAME "ipa group-remove-member --groups=$grp2 $grp1"
+	if [ $? -ne 0 ]
+	then
+		echo "ERROR - $tet_thistest failed."
+		tet_result FAIL
+	fi
+
+	ssh root@$FULLHOSTNAME "ipa group-find $grp1 | grep $grp2"
+	if [ $? -eq 0 ]
+	then
+		echo "ERROR - $tet_thistest failed. $grp2 still appears to be in $grp1 when it should not be"
+		tet_result FAIL
+	fi
+
+	tet_result PASS
+}
+
+group_remove_member_group_neg()
+{
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+	echo "START $tet_thistest"
+	eval_vars M1
+	code=0
+
+	ssh root@$FULLHOSTNAME "ipa group-remove-member --groups=$grp2 $grp1"
+	if [ $? -eq 0 ]
+	then
+		echo "ERROR - $tet_thistest failed. group-remove-member returned a 0 when it should not have"
+		echo "ERROR - This failure may be related to https://bugzilla.redhat.com/show_bug.cgi?id=501841"
+		tet_result FAIL
+	fi
+
+	ssh root@$FULLHOSTNAME "ipa group-find $grp1 | grep $grp2"
+	if [ $? -eq 0 ]
+	then
+		echo "ERROR - $tet_thistest failed. $grp2 still appears to be in $grp1 when it should not be"
+		tet_result FAIL
+	fi
+
+	tet_result PASS
+}
+
+group_remove_member_user()
+{
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+	echo "START $tet_thistest"
+	eval_vars M1
+	code=0
+
+	ssh root@$FULLHOSTNAME "ipa group-remove-member --users=$usr2 $grp1"
+	if [ $? -ne 0 ]
+	then
+		echo "ERROR - $tet_thistest failed."
+		tet_result FAIL
+	fi
+
+	ssh root@$FULLHOSTNAME "ipa group-find $grp1 | grep $usr2"
+	if [ $? -eq 0 ]
+	then
+		echo "ERROR - $tet_thistest failed. $grp2 still appears to be in $grp1 when it should not be"
+		tet_result FAIL
+	fi
+
+	tet_result PASS
+}
+
+group_remove_member_user_neg()
+{
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+	echo "START $tet_thistest"
+	eval_vars M1
+	code=0
+
+	ssh root@$FULLHOSTNAME "ipa group-remove-member --users=$usr2 $grp1"
+	if [ $? -eq 0 ]
+	then
+		echo "ERROR - $tet_thistest failed. group-remove-member returned a 0 when it should not have"
+		echo "ERROR - This failure may be related to https://bugzilla.redhat.com/show_bug.cgi?id=501841"
+		tet_result FAIL
+	fi
+
+	ssh root@$FULLHOSTNAME "ipa group-find $grp1 | grep $usr2"
+	if [ $? -eq 0 ]
+	then
+		echo "ERROR - $tet_thistest failed. $grp2 still appears to be in $grp1 when it should not be"
 		tet_result FAIL
 	fi
 
