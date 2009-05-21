@@ -18,8 +18,8 @@ fi
 # The next line is required as it picks up data about the servers to use
 tet_startup="CheckAlive"
 tet_cleanup="user_cleanup"
-iclist="ic1"
-ic1="kinit adduser addusera adduserb adduserc adduserd addusere adduserf negadduser"
+iclist="adduserlist"
+adduserlist="kinit adduser addusera adduserb adduserc adduserd addusere adduserf negadduser"
 # These services will be used by the tests, and removed when the cli test is complete
 host1='alpha.dsdev.sjc.redhat.com'
 service1="ssh/$host1"
