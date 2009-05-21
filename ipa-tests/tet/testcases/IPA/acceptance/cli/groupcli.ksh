@@ -194,7 +194,7 @@ group_add_posix()
 	eval_vars M1
 	code=0
 
-	ssh root@$FULLHOSTNAME "ipa group-add --description=group-to-test-posix $grp2"
+	ssh root@$FULLHOSTNAME "ipa group-add --posix --description=group-to-test-posix $grp2"
 	let code=$code+$?
 
 	ssh root@$FULLHOSTNAME "ipa group-find $grp2 | grep posixgroup"
