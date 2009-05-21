@@ -757,12 +757,12 @@ main_default()
 	if [ -z "$DM_ADMIN_PASS" ] ; then DM_ADMIN_PASS=Secret123 ; fi
   	if [ -z "$ROOTDN" ] ;     then ROOTDN="cn=directory manager"   ; fi
 	if [ -z "$ROOTDNPW" ] ;   then ROOTDNPW=Secret123              ; fi
-	if [ -z "$TETADMINPW" ] ; then TETADMINPW=Admin123             ; fi
+	if [ -z "$TETADMINPW" ] ; then TETADMINPW=Secret123             ; fi
 	if [ -z "$DS_USER" ] ; then DS_USER=admin                      ; fi
 	if [ -z "$NUMSERVERS" ] ; then NUMSERVERS=1                    ; fi
 	if [ -z "$NUMCLIENTS" ] ; then NUMCLIENTS=0                    ; fi
 	if [ -z "$DNSMASTER" ] ; then DNSMASTER="10.14.63.2"           ; fi
-	if [ -z "$NTPSERVER" ] ; then NTPSERVER="bart.sfbay.redhat.com"; fi
+	if [ -z "$NTPSERVER" ] ; then NTPSERVER="clock.redhat.com"; fi
 	if [ -z "$RunInstall" ]; then RunInstall="n"                   ; fi
 	if [ -z "$RunInstallShow" ]; then RunInstallShow="n"           ; fi
 	if [ -z "$RunUnInstall" ]; then RunUnInstall="n"               ; fi
