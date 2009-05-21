@@ -742,9 +742,9 @@ main_default()
 	#
 
 	if [ -z "$PkgName"               ] ; then PkgName=dirsrv ; fi
-	if [ -z "$TET_ROOT" ] ;	then TET_ROOT=`(cd $mainRunBaseDir/../../../tet ; pwd)`	; fi
+#	if [ -z "$TET_ROOT" ] ;	then TET_ROOT=`(cd $mainRunBaseDir/../../../tet ; pwd)`	; fi
 	if [ -z "$CHARSET" ] ;    then CHARSET=en						 ; fi
-	if [ -z "$IROOT" ] ;      then IROOT=/usr/lib/$PkgName/slapd-`hostname` ; fi
+#	if [ -z "$IROOT" ] ;      then IROOT=/usr/lib/$PkgName/slapd-`hostname` ; fi
 	if [ -z "$PREFIX" ] ;     then
       tmp_PREFIX0=`dirname $IROOT`
       tmp_PREFIX1=`dirname $tmp_PREFIX0`
@@ -810,13 +810,13 @@ main_default()
 	esac
 
 	if [ -z "$TET_TMP_DIR"	  ] ; then TET_TMP_DIR=$REALTMP/tet_tmp_dir/$HOSTNAME	; fi
-	if [ -z "$DS_LOG_DIR"     ] ; then DS_LOG_DIR=$REALTMP/ds_log_dir/$HOSTNAME	; fi
+#	if [ -z "$DS_LOG_DIR"     ] ; then DS_LOG_DIR=$REALTMP/ds_log_dir/$HOSTNAME	; fi
 
 	# Don't forget to create them...
 	#
 	if [ ! -d $TET_REPORT_DIR ] ; then mkdir -p $TET_REPORT_DIR	; fi
 	if [ ! -d $TET_TMP_DIR	  ] ; then mkdir -p $TET_TMP_DIR	; fi
-	if [ ! -d $DS_LOG_DIR	  ] ; then mkdir -p $DS_LOG_DIR		; fi
+#	if [ ! -d $DS_LOG_DIR	  ] ; then mkdir -p $DS_LOG_DIR		; fi
 
 	#
 	# create the needed directory if not already there
@@ -854,7 +854,7 @@ main_default()
 
 # export all these variables 
 
-	export TET_ROOT VER CHARSET TESTING_SHARED IROOT PREFIX TET_TMP_DIR  TET_REPORT_DIR DS_LOG_DIR RELM_NAME KERB_MASTER_PASS DM_ADMIN_PASS DS_USER NUMSERVERS SERVERS CLIENTS NUMCLIENTS DNSMASTER DNS_DOMAIN ITTERATIONS NTPSERVER
+	export TET_ROOT VER CHARSET TESTING_SHARED PREFIX TET_TMP_DIR TET_REPORT_DIR RELM_NAME KERB_MASTER_PASS DM_ADMIN_PASS DS_USER NUMSERVERS SERVERS CLIENTS NUMCLIENTS DNSMASTER DNS_DOMAIN ITTERATIONS NTPSERVER
 	export ROOTDN ROOTDNPW TETADMINPW LDAPhost LDAPport DRIVE IPAVERSION
 	export IGNORE_KNOWN_BUGS DSTET_64 DSTET_DEBUG PkgName
 
@@ -887,10 +887,10 @@ main_backendask()
 	read TESTING_SHARED
 	if [ -z "$TESTING_SHARED" ] ; then TESTING_SHARED=$sav_TESTING_SHARED ; fi
 
-	sav_VER=$VER
-	echo "    VER [$VER] ? \c"
-	read VER
-	if [ -z "$VER" ] ; then VER=$sav_VER ; fi
+	#sav_VER=$VER
+	#echo "    VER [$VER] ? \c"
+	#read VER
+	#if [ -z "$VER" ] ; then VER=$sav_VER ; fi
 
 	sav_CHARSET=$CHARSET
 	echo "    CHARSET [$CHARSET] ? \c"
@@ -919,27 +919,27 @@ main_backendask()
 	fi
 #LR
 
-	sav_DS_LOG_DIR=$DS_LOG_DIR
-	echo "    Log/core/backup directory [$DS_LOG_DIR] ? \c"
-	read DS_LOG_DIR
-	if [ -z "$DS_LOG_DIR" ] ; then DS_LOG_DIR=$sav_DS_LOG_DIR ; fi
-	if [ ! -d $DS_LOG_DIR ] ; then
-		mkdir -p $DS_LOG_DIR
-	fi
+	#sav_DS_LOG_DIR=$DS_LOG_DIR
+	#echo "    Log/core/backup directory [$DS_LOG_DIR] ? \c"
+	#read DS_LOG_DIR
+	#if [ -z "$DS_LOG_DIR" ] ; then DS_LOG_DIR=$sav_DS_LOG_DIR ; fi
+	#if [ ! -d $DS_LOG_DIR ] ; then
+	#	mkdir -p $DS_LOG_DIR
+	#fi
 
-	sav_PERLPATH=$PERLPATH
-	echo "    PATH to perl to use for tests [$PERLPATH] ? \c"
-	read PERLPATH
-	if [ -z "$PERLPATH" ] ; then PERLPATH=$sav_PERLPATH ; fi
-	if [ ! -f "$PERLPATH/perl" ] ; then
-		echo "$PERLPATH/perl not found!"
-		exit 1
-	fi
+	#sav_PERLPATH=$PERLPATH
+	#echo "    PATH to perl to use for tests [$PERLPATH] ? \c"
+	#read PERLPATH
+	#if [ -z "$PERLPATH" ] ; then PERLPATH=$sav_PERLPATH ; fi
+	#if [ ! -f "$PERLPATH/perl" ] ; then
+	#	echo "$PERLPATH/perl not found!"
+	#	exit 1
+	#fi
 
-	sav_IROOT=$IROOT
-	echo "    IROOT [$IROOT] ? \c"
-	read IROOT
-	if [ -z "$IROOT" ] ; then IROOT=$sav_IROOT ; fi
+	#sav_IROOT=$IROOT
+	#echo "    IROOT [$IROOT] ? \c"
+	#read IROOT
+	#if [ -z "$IROOT" ] ; then IROOT=$sav_IROOT ; fi
 
     if [ -z $PREFIX ]; then
       tmp_PREFIX0=`dirname $IROOT`
@@ -974,12 +974,12 @@ main_backendask()
         read IGNORE_KNOWN_BUGS
         if [ -z "$IGNORE_KNOWN_BUGS" ] ; then IGNORE_KNOWN_BUGS="$sav_IGNORE_KNOWN_BUGS" ; fi
 
-		sav_DSTET_64="$DSTET_64"
-		echo
-		echo "	You may configure these tests to use 64 bit associcated files (For 64bit servers): "
-		echo "	DSTET_64 [$DSTET_64] ? \c"
-		read DSTET_64
-		if [ -z "$DSTET_64" ] ; then DSTET_64="$sav_DSTET_64" ; fi
+	#	sav_DSTET_64="$DSTET_64"
+	#	echo
+	#	echo "	You may configure these tests to use 64 bit associcated files (For 64bit servers): "
+	#	echo "	DSTET_64 [$DSTET_64] ? \c"
+	#	read DSTET_64
+	#	if [ -z "$DSTET_64" ] ; then DSTET_64="$sav_DSTET_64" ; fi
 
 		sav_DSTET_DEBUG="$DSTET_DEBUG"
 		echo
@@ -1705,8 +1705,8 @@ main_print()
 	echo "    TET_RUN        : $TET_RUN "
 	echo "    TET_REPORT_DIR : $TET_REPORT_DIR"
 	echo "    TET_TMP_DIR    : $TET_TMP_DIR"
-	echo "    DS_LOG_DIR     : $DS_LOG_DIR"
-	echo "    PERLPATH       : $PERLPATH"
+#	echo "    DS_LOG_DIR     : $DS_LOG_DIR"
+#	echo "    PERLPATH       : $PERLPATH"
 	echo "    VER            : $VER"
 	echo "    IPAVERSION     : $IPAVERSION"
 	echo "    CHARSET        : $CHARSET"
@@ -1794,13 +1794,13 @@ main_save()
 	echo "TET_ROOT=$TET_ROOT"
 	echo "TET_RUN=$TET_RUN"
 	echo "TESTING_SHARED=$TESTING_SHARED"
-	echo "PERLPATH=$PERLPATH"
+#	echo "PERLPATH=$PERLPATH"
 	echo "TET_REPORT_DIR=$TET_REPORT_DIR"
 	echo "TET_TMP_DIR=$TET_TMP_DIR"
-	echo "DS_LOG_DIR=$DS_LOG_DIR"
+#	echo "DS_LOG_DIR=$DS_LOG_DIR"
 	echo "VER=$VER"
 	echo "CHARSET=$CHARSET"
-	echo "IROOT=$IROOT"
+#	echo "IROOT=$IROOT"
 	echo "PREFIX=$PREFIX"
 	echo "DNSMASTER=$DNSMASTER"
 	echo "NTPSERVER=$NTPSERVER"
