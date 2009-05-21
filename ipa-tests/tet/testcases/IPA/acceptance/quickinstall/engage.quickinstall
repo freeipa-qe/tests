@@ -70,9 +70,9 @@ quickinstall_ask()
 quickinstall_print()
 {
 	echo "    Execute quickinstall test suite        : $quickinstallRunIt"
-	if [ $quickinstallRunIt = y ] ; then
-		echo "            quickinstall Source location   : $SRCROOT"
-	fi
+#	if [ $quickinstallRunIt = y ] ; then
+#		echo "            quickinstall Source location   : $SRCROOT"
+#	fi
 }
 
 # This function will echo in shell's format the user's choices
