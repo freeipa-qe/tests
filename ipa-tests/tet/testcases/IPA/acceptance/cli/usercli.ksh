@@ -18,8 +18,9 @@ fi
 # The next line is required as it picks up data about the servers to use
 tet_startup="CheckAlive"
 tet_cleanup="user_cleanup"
-iclist="adduserlist"
+iclist="adduserlist locklist"
 adduserlist="kinit adduser addusera adduserb adduserc adduserd addusere adduserf negadduser"
+locklist"addlockuser kinit lock kinitlock kinit unlock kinitunlock kinit"
 # These services will be used by the tests, and removed when the cli test is complete
 host1='alpha.dsdev.sjc.redhat.com'
 service1="ssh/$host1"
@@ -34,6 +35,9 @@ superuserhome="/home2/$superuser"
 superusergecos="whatsgecos?"
 superuserfirst="Superuser"
 superuserlast="crazylastnametoolong"
+
+lusr="locku44"
+lusrpw="o3948cyhdg65"
 
 ######################################################################
 kinit()
@@ -273,6 +277,133 @@ negadduser()
 	echo "END $tet_thistest"
 }
 
+######################################################################
+# add a user to be used with lock tests
+######################################################################
+addlockuser()
+{
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+	echo "START $tet_thistest"
+	eval_vars M1
+
+	ssh root@$FULLHOSTNAME "ipa user-add --first=$superuserfirst --last=$superuserlast $lusr"
+	if [ $? -ne 0 ]
+	then 
+		echo "ERROR - ipa user-add failed on $FULLHOSTNAME"
+		tet_result FAIL
+	fi
+
+	for s in $SERVERS; do
+		if [ "$s" != "" ]; then
+			eval_vars $s
+			ssh root@$FULLHOSTNAME "ipa user-find $lusr | grep uid | grep $lusr"
+			ret=$?
+			if [ $ret -ne 0 ]
+			then
+				echo "ERROR - Search for created user failed on $FULLHOSTNAME"
+				tet_result FAIL
+			fi
+		fi
+	done
+
+	# Set up the password of the new user so that they can kinit later
+	SetUserPassword M1 $lusr pw
+	if [ $? -ne 0 ]; then
+		echo "ERROR - SetUserPassword failed on $FULLHOSTNAME"
+		tet_result FAIL
+	fi
+
+	KinitAsFirst M1 $lusr pw $lusrpw
+	if [ $? -ne 0 ]; then
+		echo "ERROR - kinit failed on $FULLHOSTNAME"
+		tet_result FAIL
+	fi
+
+	tet_result PASS
+	echo "END $tet_thistest"
+}
+
+######################################################################
+# lock the user that we just created in addlockuser 
+# kinit should get called before this test
+######################################################################
+lock()
+{
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+	echo "START $tet_thistest"
+	eval_vars M1
+
+	ssh root@$FULLHOSTNAME "ipa user-lock $lusr"
+	if [ $? -ne 0 ]
+	then 
+		echo "ERROR - ipa user-lock failed on $FULLHOSTNAME"
+		tet_result FAIL
+	fi
+
+	tet_result PASS
+	echo "END $tet_thistest"
+}
+
+######################################################################
+# kinit as lusr to ensure that it doesn't work
+######################################################################
+kinitlock()
+{
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+	echo "START $tet_thistest"
+	eval_vars M1
+
+ 	KinitAs $s $lusr $lusrpw
+	if [ $? -eq 0 ]
+	then 
+		echo "ERROR - kinit as $lusr worked on $FULLHOSTNAME when it should not have"
+		tet_result FAIL
+	fi
+
+	tet_result PASS
+	echo "END $tet_thistest"
+}
+
+######################################################################
+# uplock the user that we just created in addlockuser 
+# kinit should be run before this test
+######################################################################
+unlock()
+{
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+	echo "START $tet_thistest"
+	eval_vars M1
+
+	ssh root@$FULLHOSTNAME "ipa user-lock $lusr"
+	if [ $? -ne 0 ]
+	then 
+		echo "ERROR - ipa user-lock failed on $FULLHOSTNAME"
+		tet_result FAIL
+	fi
+
+	tet_result PASS
+	echo "END $tet_thistest"
+}
+
+######################################################################
+# kinit as lusr to ensure that it doesn't work
+######################################################################
+kinitunlock()
+{
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+	echo "START $tet_thistest"
+	eval_vars M1
+
+ 	KinitAs $s $lusr $lusrpw
+	if [ $? -ne 0 ]
+	then 
+		echo "ERROR - kinit as $lusr failed on $FULLHOSTNAME"
+		tet_result FAIL
+	fi
+
+	tet_result PASS
+	echo "END $tet_thistest"
+}
 
 ######################################################################
 # Cleanup Section for the cli tests
