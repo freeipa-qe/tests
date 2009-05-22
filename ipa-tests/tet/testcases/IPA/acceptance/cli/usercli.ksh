@@ -12,16 +12,15 @@
 #  user-unlock               Unlock a user account.
 
 ######################################################################
-if [ "$DSTET_DEBUG" = "y" ]; then
-	set -x
-fi
+if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 # The next line is required as it picks up data about the servers to use
 tet_startup="CheckAlive"
 tet_cleanup="user_cleanup"
-iclist="adduserlist locklist modlist userdel"
-adduserlist="kinit adduser addusera adduserb adduserc adduserd addusere adduserf negadduser"
-locklist="addlockuser kinit lock kinitlock kinit unlock kinitunlock kinit"
-modlist="addmoduser addmodgroup modfirst modlast modemail modprinc modhome modgecos modgroup modgroup2 moduid modstreet modshell"
+iclist="ic1 ic2 ic3 ic4"
+ic1="kinit"
+ic2="addusersetup addusera adduserb adduserc adduserd addusere adduserf negadduser"
+ic3="addlockuser kinit lock kinitlock kinit unlock kinitunlock kinit"
+ic4="addmoduser addmodgroup modfirst modlast modemail modprinc modhome modgecos modgroup modgroup2 moduid modstreet modshell"
 
 # Users to be used in varios tests
 superuser="sup34"
@@ -85,7 +84,7 @@ kinit()
 ######################################################################
 # ipa-adduser
 ######################################################################
-adduser()
+addusersetup()
 {
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 	echo "START $tet_thistest"
