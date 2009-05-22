@@ -59,8 +59,7 @@ kinit()
 		if [ "$s" != "" ]; then
 			echo "kiniting as $DS_USER, password $DM_ADMIN_PASS on $s"
 			KinitAs $s $DS_USER $DM_ADMIN_PASS
-			ret=$?
-			if [ $ret -ne 0 ]; then
+			if [ $? -ne 0 ]; then
 				echo "ERROR - kinit on $s failed"
 				tet_result FAIL
 			fi
@@ -72,8 +71,7 @@ kinit()
 		if [ "$s" != "" ]; then
 			echo "kiniting as $DS_USER, password $DM_ADMIN_PASS on $s"
 			KinitAs $s $DS_USER $DM_ADMIN_PASS
-			ret=$?
-			if [ $ret -ne 0 ]; then
+			if [ $? -ne 0 ]; then
 				echo "ERROR - kinit on $s failed"
 				tet_result FAIL
 			fi
@@ -104,8 +102,7 @@ adduser()
 		if [ "$s" != "" ]; then
 			eval_vars $s
 			ssh root@$FULLHOSTNAME "ipa user-find $superuser | grep uid | grep $superuser"
-			ret=$?
-			if [ $ret -ne 0 ]
+			if [ $? -ne 0 ]
 			then
 				echo "ERROR - Search for created user failed on $FULLHOSTNAME"
 				tet_result FAIL
@@ -129,8 +126,7 @@ addusera()
 		if [ "$s" != "" ]; then
 			eval_vars $s
 			ssh root@$FULLHOSTNAME "ipa user-find $superuser | grep $superuserfirst"
-			ret=$?
-			if [ $ret -ne 0 ]
+			if [ $? -ne 0 ]
 			then
 				echo "ERROR - Search for created user failed on $FULLHOSTNAME"
 				tet_result FAIL
@@ -154,9 +150,7 @@ adduserb()
 		if [ "$s" != "" ]; then
 			eval_vars $s
 			ssh root@$FULLHOSTNAME "ipa user-find $superuser | grep $superuserlast"
-			ret=$?
-			if [ $ret -ne 0 ]
-			then
+			if [ $? -ne 0 ]; then
 				echo "ERROR - Search for created user failed on $FULLHOSTNAME"
 				tet_result FAIL
 			fi
@@ -179,8 +173,7 @@ adduserc()
 		if [ "$s" != "" ]; then
 			eval_vars $s
 			ssh root@$FULLHOSTNAME "ipa user-find --all $superuser | grep $superusergecos"
-			ret=$?
-			if [ $ret -ne 0 ]
+			if [ $? -ne 0 ]
 			then
 				echo "ERROR - Search for created user failed on $FULLHOSTNAME"
 				tet_result FAIL
@@ -204,8 +197,7 @@ adduserd()
 		if [ "$s" != "" ]; then
 			eval_vars $s
 			ssh root@$FULLHOSTNAME "ipa user-find $superuser | grep $superuserhome"
-			ret=$?
-			if [ $ret -ne 0 ]
+			if [ $? -ne 0 ]
 			then
 				echo "ERROR - Search for created user failed on $FULLHOSTNAME"
 				tet_result FAIL
@@ -229,8 +221,7 @@ addusere()
 		if [ "$s" != "" ]; then
 			eval_vars $s
 			ssh root@$FULLHOSTNAME "ipa user-find --all $superuser | grep $superuserprinc"
-			ret=$?
-			if [ $ret -ne 0 ]
+			if [ $? -ne 0 ]
 			then
 				echo "ERROR - Search for created user failed on $FULLHOSTNAME"
 				tet_result FAIL
@@ -254,8 +245,7 @@ adduserf()
 		if [ "$s" != "" ]; then
 			eval_vars $s
 			ssh root@$FULLHOSTNAME "ipa user-find --all $superuser | grep $superuseremail"
-			ret=$?
-			if [ $ret -ne 0 ]
+			if [ $? -ne 0 ]
 			then
 				echo "ERROR - Search for created user failed on $FULLHOSTNAME"
 				tet_result FAIL
@@ -307,8 +297,7 @@ addlockuser()
 		if [ "$s" != "" ]; then
 			eval_vars $s
 			ssh root@$FULLHOSTNAME "ipa user-find $lusr | grep uid | grep $lusr"
-			ret=$?
-			if [ $ret -ne 0 ]
+			if [ $? -ne 0 ]
 			then
 				echo "ERROR - Search for created user failed on $FULLHOSTNAME"
 				tet_result FAIL
@@ -432,8 +421,7 @@ addmoduser()
 	fi
 
 	ssh root@$FULLHOSTNAME "ipa user-find $musr | grep uid | grep $musr"
-	ret=$?
-	if [ $ret -ne 0 ]
+	if [ $? -ne 0 ]
 	then
 		echo "ERROR - Search for created user failed on $FULLHOSTNAME"
 		tet_result FAIL
@@ -460,8 +448,7 @@ addmodgroup()
 	fi
 
 	ssh root@$FULLHOSTNAME "ipa group-find $mgroup"
-	ret=$?
-	if [ $ret -ne 0 ]
+	if [ $? -ne 0 ]
 	then
 		echo "ERROR - Search for group $mgroup failed on $FULLHOSTNAME"
 		tet_result FAIL
@@ -488,8 +475,7 @@ modfirst()
 	fi
 
 	ssh root@$FULLHOSTNAME "ipa user-show --all $musr | grep $mfirst"
-	ret=$?
-	if [ $ret -ne 0 ]
+	if [ $? -ne 0 ]
 	then
 		echo "ERROR - Search for created user failed on $FULLHOSTNAME"
 		tet_result FAIL
@@ -516,8 +502,7 @@ modlast()
 	fi
 
 	ssh root@$FULLHOSTNAME "ipa user-show --all $musr | grep $mlast"
-	ret=$?
-	if [ $ret -ne 0 ]
+	if [ $? -ne 0 ]
 	then
 		echo "ERROR - Search for created user failed on $FULLHOSTNAME"
 		tet_result FAIL
@@ -544,8 +529,7 @@ modemail()
 	fi
 
 	ssh root@$FULLHOSTNAME "ipa user-show --all $musr | grep \'$memail\'"
-	ret=$?
-	if [ $ret -ne 0 ]
+	if [ $? -ne 0 ]
 	then
 		echo "ERROR - Search for created user failed on $FULLHOSTNAME"
 		tet_result FAIL
@@ -572,8 +556,7 @@ modprinc()
 	fi
 
 	ssh root@$FULLHOSTNAME "ipa user-show --all $musr | grep $mlast"
-	ret=$?
-	if [ $ret -ne 0 ]
+	if [ $? -ne 0 ]
 	then
 		echo "ERROR - Search for created user failed on $FULLHOSTNAME"
 		tet_result FAIL
@@ -600,8 +583,7 @@ modhome()
 	fi
 
 	ssh root@$FULLHOSTNAME "ipa user-show --all $musr | grep \'$mhome\'"
-	ret=$?
-	if [ $ret -ne 0 ]
+	if [ $? -ne 0 ]
 	then
 		echo "ERROR - Search for created user failed on $FULLHOSTNAME"
 		tet_result FAIL
@@ -628,8 +610,7 @@ modgecos()
 	fi
 
 	ssh root@$FULLHOSTNAME "ipa user-show --all $musr | grep \'$mgecos\'"
-	ret=$?
-	if [ $ret -ne 0 ]
+	if [ $? -ne 0 ]
 	then
 		echo "ERROR - Search for created user failed on $FULLHOSTNAME"
 		tet_result FAIL
@@ -656,8 +637,7 @@ modgroup()
 	fi
 
 	ssh root@$FULLHOSTNAME "ipa group-show --all $mgroup1 | grep \'$musr\'"
-	ret=$?
-	if [ $ret -ne 0 ]
+	if [ $? -ne 0 ]
 	then
 		echo "ERROR - Search for $musr in $mgroup1 failed failed on $FULLHOSTNAME"
 		tet_result FAIL
@@ -684,16 +664,14 @@ modgroup2()
 	fi
 
 	ssh root@$FULLHOSTNAME "ipa group-show --all $mgroup1 | grep \'$musr\'"
-	ret=$?
-	if [ $ret -ne 0 ]
+	if [ $? -ne 0 ]
 	then
 		echo "ERROR - Search for $musr in $mgroup1 failed failed on $FULLHOSTNAME"
 		tet_result FAIL
 	fi
 
 	ssh root@$FULLHOSTNAME "ipa group-show --all $mgroup2 | grep \'$musr\'"
-	ret=$?
-	if [ $ret -ne 0 ]
+	if [ $? -ne 0 ]
 	then
 		echo "ERROR - Search for $musr in $mgroup2 failed failed on $FULLHOSTNAME"
 		tet_result FAIL
@@ -720,8 +698,7 @@ moduid()
 	fi
 
 	ssh root@$FULLHOSTNAME "ipa user-show --all $musr | grep \'$muid\'"
-	ret=$?
-	if [ $ret -ne 0 ]
+	if [ $? -ne 0 ]
 	then
 		echo "ERROR - Search for created user failed on $FULLHOSTNAME"
 		tet_result FAIL
@@ -748,8 +725,7 @@ modstreet()
 	fi
 
 	ssh root@$FULLHOSTNAME "ipa user-show --all $musr | grep \'$mstreet\'"
-	ret=$?
-	if [ $ret -ne 0 ]
+	if [ $? -ne 0 ]
 	then
 		echo "ERROR - Search for created user failed on $FULLHOSTNAME"
 		tet_result FAIL
@@ -776,8 +752,7 @@ modshell()
 	fi
 
 	ssh root@$FULLHOSTNAME "ipa user-show --all $musr | grep \'$mshell\'"
-	ret=$?
-	if [ $ret -ne 0 ]
+	if [ $? -ne 0 ]
 	then
 		echo "ERROR - Search for created user failed on $FULLHOSTNAME"
 		tet_result FAIL
