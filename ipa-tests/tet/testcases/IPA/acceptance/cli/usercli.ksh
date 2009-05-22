@@ -18,9 +18,10 @@ fi
 # The next line is required as it picks up data about the servers to use
 tet_startup="CheckAlive"
 tet_cleanup="user_cleanup"
-iclist="adduserlist locklist"
+iclist="adduserlist locklist modlist"
 adduserlist="kinit adduser addusera adduserb adduserc adduserd addusere adduserf negadduser"
-locklist"addlockuser kinit lock kinitlock kinit unlock kinitunlock kinit"
+locklist="addlockuser kinit lock kinitlock kinit unlock kinitunlock kinit"
+modlist="addmoduser"
 # These services will be used by the tests, and removed when the cli test is complete
 host1='alpha.dsdev.sjc.redhat.com'
 service1="ssh/$host1"
@@ -38,6 +39,15 @@ superuserlast="crazylastnametoolong"
 
 lusr="locku44"
 lusrpw="o3948cyhdg65"
+
+# Users to be used in user-mod tests
+musr="msup88"
+musremail="$musr@really.cool.domain.co.uk.us.fi.com"
+musrprinc="principal$musr"
+mhome="/home2/$musr"
+mgecos="whatsgecos?"
+mfirst="Superuser"
+mlast="crazylastnametoolong"
 
 ######################################################################
 kinit()
@@ -406,6 +416,34 @@ kinitunlock()
 }
 
 ######################################################################
+# add a user to be used with mod tests
+######################################################################
+addmoduser()
+{
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+	echo "START $tet_thistest"
+	eval_vars M1
+
+	ssh root@$FULLHOSTNAME "ipa user-add --first=superuserfirst --last=superuserlast $musr"
+	if [ $? -ne 0 ]
+	then 
+		echo "ERROR - ipa user-add failed on $FULLHOSTNAME"
+		tet_result FAIL
+	fi
+
+	ssh root@$FULLHOSTNAME "ipa user-find $musr | grep uid | grep $musr"
+	ret=$?
+	if [ $ret -ne 0 ]
+	then
+		echo "ERROR - Search for created user failed on $FULLHOSTNAME"
+		tet_result FAIL
+	fi
+
+	tet_result PASS
+	echo "END $tet_thistest"
+}
+
+######################################################################
 # Cleanup Section for the cli tests
 ######################################################################
 user_cleanup()
@@ -420,10 +458,15 @@ user_cleanup()
 	ssh root@$FULLHOSTNAME "ipa user-del $superuser"
 	let code=$code+$?
 
+	ssh root@$FULLHOSTNAME "ipa user-del $lusr"
+	let code=$code+$?
+
+	ssh root@$FULLHOSTNAME "ipa user-del $musr"
+	let code=$code+$?
+
 	if [ $code -ne 0 ]
 	then
-		echo "ERROR - setup for $tet_thistest failed"
-		tet_result FAIL
+		echo "ERROR - setup for $tet_thistest failed - not that it matters"
 	fi
 
 	tet_result PASS
