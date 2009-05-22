@@ -5,7 +5,7 @@
 #               interaction or error.
 eval_vars()
 {
-	#if [ $DSTET_DEBUG = y ]; then set -x; fi
+	#if [ $DSTET_DEBUG = y ]; then set -x; env; fi
         x=\$HOSTNAME_$1
         HOSTNAME=`eval echo $x`
         FULLHOSTNAME=`host $HOSTNAME | awk '{print $1}'`
@@ -430,7 +430,7 @@ CheckAlive()
 
 	if [ $DSTET_DEBUG = y ]; then set -x; fi
         echo "Checking to see if servers are alive and listening"
-        for f in $SERVERS; do
+        for s in $SERVERS; do
                 if [ "$s" != "" ]; then
                         echo "working on $s now"
                         is_server_alive $s
