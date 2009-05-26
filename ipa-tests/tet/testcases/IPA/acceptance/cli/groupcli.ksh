@@ -19,8 +19,11 @@ fi
 # The next line is required as it picks up data about the servers to use
 tet_startup="kinit"
 tet_cleanup="user_cleanup"
-iclist="ic1"
-ic1="add_group_users group_add group_find group_find_neg group_show group_show_neg group_add_posix group_mod_neg_posix group_mod_posix group_mod_description group_add_member_user group_add_member_user_neg group_add_member_group group_add_member_group_neg group_remove_member_group group_remove_member_group_neg group_remove_member_user group_remove_member_user_neg group_del"
+iclist="ic1 ic2 ic3 ic4"
+ic1="add_group_users group_add group_find group_find_neg group_show group_show_neg"
+ic2="group_add_posix group_mod_posix group_mod_neg_posix group_mod_description"
+ic3="group_add_member_user group_add_member_user_neg group_add_member_group group_add_member_group_neg group_remove_member_group group_remove_member_group_neg group_remove_member_user group_remove_member_user_neg"
+ic4="group_del"
 # These services will be used by the tests, and removed when the cli test is complete
 host1='alpha.dsdev.sjc.redhat.com'
 
@@ -197,7 +200,7 @@ group_add_posix()
 	ssh root@$FULLHOSTNAME "ipa group-add --posix --description=group-to-test-posix $grp2"
 	let code=$code+$?
 
-	ssh root@$FULLHOSTNAME "ipa group-find $grp2 | grep posixgroup"
+	ssh root@$FULLHOSTNAME "ipa group-find $grp2 | grep posixGroup"
 	let code=$code+$?
 
 	if [ $code -ne 0 ]
@@ -219,7 +222,7 @@ group_mod_posix()
 	ssh root@$FULLHOSTNAME "ipa group-mod --posix $grp1"
 	let code=$code+$?
 
-	ssh root@$FULLHOSTNAME "ipa group-find $grp1 | grep posixgroup"
+	ssh root@$FULLHOSTNAME "ipa group-find $grp1 | grep posixGroup"
 	let code=$code+$?
 
 	if [ $code -ne 0 ]

@@ -44,7 +44,7 @@ mfirst="Superuser"
 mlast="crazylastnametoolong"
 mshell="/bin/sh"
 mstreet="334 wolfsten way"
-muid="gidmodb"
+muid="412842"
 mgroup1="mgroup1"
 mgroup2="mgroup2"
 
@@ -372,7 +372,7 @@ unlock()
 	echo "START $tet_thistest"
 	eval_vars M1
 
-	ssh root@$FULLHOSTNAME "ipa user-lock $lusr"
+	ssh root@$FULLHOSTNAME "ipa user-unlock $lusr"
 	if [ $? -ne 0 ]
 	then 
 		echo "ERROR - ipa user-lock failed on $FULLHOSTNAME"
@@ -439,17 +439,17 @@ addmodgroup()
 	echo "START $tet_thistest"
 	eval_vars M1
 
-	ssh root@$FULLHOSTNAME "ipa group-add --description=\"group that the user in the user-mod will include\" $mgroup"
+	ssh root@$FULLHOSTNAME "ipa group-add --description=\"group that the user in the user-mod will include\" $mgroup1"
 	if [ $? -ne 0 ]
 	then 
 		echo "ERROR - ipa user-add failed on $FULLHOSTNAME"
 		tet_result FAIL
 	fi
 
-	ssh root@$FULLHOSTNAME "ipa group-find $mgroup"
+	ssh root@$FULLHOSTNAME "ipa group-find $mgroup1"
 	if [ $? -ne 0 ]
 	then
-		echo "ERROR - Search for group $mgroup failed on $FULLHOSTNAME"
+		echo "ERROR - Search for group $mgroup1 failed on $FULLHOSTNAME"
 		tet_result FAIL
 	fi
 
@@ -527,7 +527,7 @@ modemail()
 		tet_result FAIL
 	fi
 
-	ssh root@$FULLHOSTNAME "ipa user-show --all $musr | grep \'$memail\'"
+	ssh root@$FULLHOSTNAME "ipa user-show --all $musr | grep '$memail'"
 	if [ $? -ne 0 ]
 	then
 		echo "ERROR - Search for created user failed on $FULLHOSTNAME"
@@ -581,7 +581,7 @@ modhome()
 		tet_result FAIL
 	fi
 
-	ssh root@$FULLHOSTNAME "ipa user-show --all $musr | grep \'$mhome\'"
+	ssh root@$FULLHOSTNAME "ipa user-show --all $musr | grep '$mhome'"
 	if [ $? -ne 0 ]
 	then
 		echo "ERROR - Search for created user failed on $FULLHOSTNAME"
@@ -601,14 +601,14 @@ modgecos()
 	echo "START $tet_thistest"
 	eval_vars M1
 
-	ssh root@$FULLHOSTNAME "ipa user-mod --gecos=\'$mgecos\' $musr"
+	ssh root@$FULLHOSTNAME "ipa user-mod --gecos=$mgecos $musr"
 	if [ $? -ne 0 ]
 	then 
 		echo "ERROR - ipa user-mod failed on $FULLHOSTNAME"
 		tet_result FAIL
 	fi
 
-	ssh root@$FULLHOSTNAME "ipa user-show --all $musr | grep \'$mgecos\'"
+	ssh root@$FULLHOSTNAME "ipa user-show --all $musr | grep '$mgecos'"
 	if [ $? -ne 0 ]
 	then
 		echo "ERROR - Search for created user failed on $FULLHOSTNAME"
@@ -628,14 +628,15 @@ modgroup()
 	echo "START $tet_thistest"
 	eval_vars M1
 
-	ssh root@$FULLHOSTNAME "ipa user-mod --groups=\'$mgroup1\' $musr"
+	ssh root@$FULLHOSTNAME "ipa user-mod --groups=$mgroup1 $musr"
 	if [ $? -ne 0 ]
 	then 
 		echo "ERROR - ipa user-mod failed on $FULLHOSTNAME"
+		echo "ERROR possibly related to https://bugzilla.redhat.com/show_bug.cgi?id=502114"
 		tet_result FAIL
 	fi
 
-	ssh root@$FULLHOSTNAME "ipa group-show --all $mgroup1 | grep \'$musr\'"
+	ssh root@$FULLHOSTNAME "ipa group-show --all $mgroup1 | grep '$musr'"
 	if [ $? -ne 0 ]
 	then
 		echo "ERROR - Search for $musr in $mgroup1 failed failed on $FULLHOSTNAME"
@@ -655,21 +656,22 @@ modgroup2()
 	echo "START $tet_thistest"
 	eval_vars M1
 
-	ssh root@$FULLHOSTNAME "ipa user-mod --groups=\'$mgroup1,$mgroup2\' $musr"
+	ssh root@$FULLHOSTNAME "ipa user-mod --groups=$mgroup1,$mgroup2 $musr"
 	if [ $? -ne 0 ]
 	then 
 		echo "ERROR - ipa user-mod failed on $FULLHOSTNAME"
+		echo "ERROR possibly related to ttps://bugzilla.redhat.com/show_bug.cgi?id=502114"
 		tet_result FAIL
 	fi
 
-	ssh root@$FULLHOSTNAME "ipa group-show --all $mgroup1 | grep \'$musr\'"
+	ssh root@$FULLHOSTNAME "ipa group-show --all $mgroup1 | grep '$musr'"
 	if [ $? -ne 0 ]
 	then
 		echo "ERROR - Search for $musr in $mgroup1 failed failed on $FULLHOSTNAME"
 		tet_result FAIL
 	fi
 
-	ssh root@$FULLHOSTNAME "ipa group-show --all $mgroup2 | grep \'$musr\'"
+	ssh root@$FULLHOSTNAME "ipa group-show --all $mgroup2 | grep '$musr'"
 	if [ $? -ne 0 ]
 	then
 		echo "ERROR - Search for $musr in $mgroup2 failed failed on $FULLHOSTNAME"
@@ -689,14 +691,15 @@ moduid()
 	echo "START $tet_thistest"
 	eval_vars M1
 
-	ssh root@$FULLHOSTNAME "ipa user-mod --uid=\'$muid\' $musr"
+	ssh root@$FULLHOSTNAME "ipa user-mod --uid=$muid $musr"
 	if [ $? -ne 0 ]
 	then 
 		echo "ERROR - ipa user-mod failed on $FULLHOSTNAME"
+		echo "ERROR may be related to https://bugzilla.redhat.com/show_bug.cgi?id=502684"
 		tet_result FAIL
 	fi
 
-	ssh root@$FULLHOSTNAME "ipa user-show --all $musr | grep \'$muid\'"
+	ssh root@$FULLHOSTNAME "ipa user-show --all $musr | grep '$muid'"
 	if [ $? -ne 0 ]
 	then
 		echo "ERROR - Search for created user failed on $FULLHOSTNAME"
@@ -716,14 +719,14 @@ modstreet()
 	echo "START $tet_thistest"
 	eval_vars M1
 
-	ssh root@$FULLHOSTNAME "ipa user-mod --street=\'$muid\' $musr"
+	ssh root@$FULLHOSTNAME "ipa user-mod --street=\'$mstreet\' $musr"
 	if [ $? -ne 0 ]
 	then 
 		echo "ERROR - ipa user-mod failed on $FULLHOSTNAME"
 		tet_result FAIL
 	fi
 
-	ssh root@$FULLHOSTNAME "ipa user-show --all $musr | grep \'$mstreet\'"
+	ssh root@$FULLHOSTNAME "ipa user-show --all $musr | grep '$mstreet'"
 	if [ $? -ne 0 ]
 	then
 		echo "ERROR - Search for created user failed on $FULLHOSTNAME"
@@ -750,7 +753,7 @@ modshell()
 		tet_result FAIL
 	fi
 
-	ssh root@$FULLHOSTNAME "ipa user-show --all $musr | grep \'$mshell\'"
+	ssh root@$FULLHOSTNAME "ipa user-show --all $musr | grep '$mshell'"
 	if [ $? -ne 0 ]
 	then
 		echo "ERROR - Search for created user failed on $FULLHOSTNAME"
