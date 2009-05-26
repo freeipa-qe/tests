@@ -3,7 +3,7 @@ set -x
 # usage : stress Build.tar.gz
 H=$0
 BUILD=$1
-VER=6.0
+VER=2.0
 
 # figure out where we are
 case $H in
@@ -12,10 +12,10 @@ case $H in
 esac
 # R is the source root, before tetframework/...
 #R=`echo $R | sed 's:/tetframework/testcases/DS/'$VER'/stress:/..:g'`
-R=`echo $R | sed 's:/tetframework/testcases/DS/'$VER'/stress::g'`
+R=`echo $R | sed 's:/tet/testcases/IPA/stress::g'`
 
 # R=/h/squall/misc/serverqa/release/DS
-TESTCASE_ROOT=$R/tetframework/testcases/DS/$VER
+TESTCASE_ROOT=$R/tet/testcases/IPA
 
 
 # Lakshmi Gopal 04/05/00 removing the temproray mnt 
@@ -92,11 +92,11 @@ case $hname in
 					fi
 					if [ "$OS" = "RHEL5" ]
 					then
-						TESTHOST="marcus.dsqa.sjc2.redhat.com"
+						TESTHOST="jennyv2.bos.redhat.com"
 					fi
 					;;
 				*)
-					TESTHOST=""
+					TESTHOST="jennyv2.bos.redhat.com"
 					;;
 			esac
 			;;

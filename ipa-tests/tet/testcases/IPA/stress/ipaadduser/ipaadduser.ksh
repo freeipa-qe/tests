@@ -8,12 +8,15 @@ if [ "$DSTET_DEBUG" = "y" ]; then
 	set -x
 fi
 # This is the number of users to create on every master
-mastermax=10000
+mastermax=1000
 # The next line is required as it picks up data about the servers to use
 tet_startup="TestSetup"
 tet_cleanup="ipaadduser_cleanup"
-iclist="ic1 "
-ic1="tp1 tp2 tp3 tp4"
+iclist="ic1 ic4"
+ic1="tp1"
+ic2="tp2"
+ic3="tp3"
+ic4="tp4"
 
 TestSetup()
 {
@@ -74,13 +77,13 @@ tp2()
 			echo '#!/bin/bash' > $TET_TMP_DIR/$s-addusr.bash
 			while [[ $usrnum -lt $maxnum ]]; do
 				hexnum=$(printf '%02X' $usrnum)
-				echo "ipa-adduser -ffirstname-super -llastbname-super u$hexnum&" >> $TET_TMP_DIR/$s-addusr.bash 
+				echo "ipa -n user-add --first=f$hexnum --last=l$hexnum" >> $TET_TMP_DIR/$s-addusr.bash 
 				let usrnum=$usrnum+1
 				hexnum=$(printf '%02X' $usrnum)
-				echo "ipa-adduser -ffirstname-super -llastbname-super u$hexnum&" >> $TET_TMP_DIR/$s-addusr.bash 
+				echo "ipa -n user-add --first=f$hexnum --last=l$hexnum" >> $TET_TMP_DIR/$s-addusr.bash 
 				let usrnum=$usrnum+1
 				hexnum=$(printf '%02X' $usrnum)
-				echo "ipa-adduser -ffirstname-super -llastbname-super u$hexnum" >> $TET_TMP_DIR/$s-addusr.bash 
+				echo "ipa -n user-add --first=f$hexnum --last=l$hexnum" >> $TET_TMP_DIR/$s-addusr.bash 
 				echo "if [ \$? -ne 0 ];then echo 'ERROR - return code was not 0'; fi" >> $TET_TMP_DIR/$s-addusr.bash
 				let usrnum=$usrnum+1
 			done
@@ -132,9 +135,9 @@ tp3()
 			eval_vars $s
 			while [[ $usrnum -lt $maxnum ]]; do
 				hexnum=$(printf '%02X' $usrnum)
-				echo "ipa-finduser u$hexnum > /dev/shm/find-out.txt" >> $TET_TMP_DIR/stress-findusr.bash 
+				echo "ipa user-find fl$hexnum > /dev/shm/find-out.txt" >> $TET_TMP_DIR/stress-findusr.bash 
 				echo "if [ \$? -ne 0 ];then echo 'ERROR - return code was not 0'; fi" >> $TET_TMP_DIR/stress-findusr.bash
-				echo "grep 'First Name: firstname-super' /dev/shm/find-out.txt; if [ \$? -ne 0 ];then echo 'ERROR - firstname-super not in /dev/shm/find-out.txt'; cat /dev/shm/find-out.txt;fi" >> $TET_TMP_DIR/stress-findusr.bash
+				echo "grep 'givenname: f$hexnum' /dev/shm/find-out.txt; if [ \$? -ne 0 ];then echo 'ERROR - f$hexnum not in /dev/shm/find-out.txt'; cat /dev/shm/find-out.txt;fi" >> $TET_TMP_DIR/stress-findusr.bash
 				let usrnum=$usrnum+1
 			done
 			# Incriment maxnum for the next server
@@ -191,7 +194,7 @@ tp4()
 			echo '#!/bin/bash' > $TET_TMP_DIR/$s-delusr.bash
 			while [[ $usrnum -lt $maxnum ]]; do
 				hexnum=$(printf '%02X' $usrnum)
-				echo "ipa-deluser u$hexnum" >> $TET_TMP_DIR/$s-delusr.bash 
+				echo "ipa user-del fl$hexnum" >> $TET_TMP_DIR/$s-delusr.bash 
 				echo "if [ \$? -ne 0 ];then echo 'ERROR - return code was not 0'; fi" >> $TET_TMP_DIR/$s-delusr.bash
 				let usrnum=$usrnum+1
 			done

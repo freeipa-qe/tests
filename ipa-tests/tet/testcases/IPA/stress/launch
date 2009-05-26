@@ -42,10 +42,10 @@ fi
 #
 R=$1
 BUILD=$2
-VER=6.0
-DSVERSION=8.0
+VER=2.0
+DSVERSION=8.1
 ARCVER=`echo ${DSVERSION} | sed s'/\.//g'` # archive version used for path information
-TESTCASE_ROOT=${R}/tetframework/testcases/IPA/$VER
+TESTCASE_ROOT=${R}/tet/testcases/IPA
 REL=${R}
 MAILID="ldap-devel-list@redhat.com"
 UNIQID=`uname -n`.$$.`date '+%Y%m%d%H%M%S'`
@@ -101,7 +101,7 @@ sed 's#\$SRCROOT#'$BUILD'#g
 	 s#\$MAILID#'${MAILID}'#g
 	 s#\$DST64#'${DST64}'#g
 	 s#\$UNIQID#'${UNIQID}'#g' \
-		 ${R}/tetframework/data/IPA/cfg/engage.stress.cfg > $tfile
+		 ${R}/tet/data/IPA/cfg/engage.stress.cfg > $tfile
 
 
 echo "Running stress tests on `hostname` using $BUILD from $R"
