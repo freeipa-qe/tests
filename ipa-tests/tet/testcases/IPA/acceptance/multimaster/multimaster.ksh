@@ -84,7 +84,7 @@ tp3()
 			eval_vars $s
 			usernum=$minnum
 			while [[ $usernum -lt $maxnum ]] ; do
-				ssh root@$FULLHOSTNAME "/usr/sbin/ipa user-find usr$usernum-x | /bin/grep dn: | /bin/grep uid=usr$usernum-x"
+				ssh root@$FULLHOSTNAME "ipa user-find usr$usernum-x | /bin/grep dn: | /bin/grep uid=usr$usernum-x"
 				if [ $? -ne 0 ]; then
 					echo "ERROR - serch for usr$usernum-x on server $FULLHOSTNAME failed"
 					tet_result FAIL
@@ -100,7 +100,7 @@ tp3()
 			if [ "$OS_VER" -eq "5" ] && [ "$OS" -eq "RHEL" ]; then
 				usernum=$minnum
 				while [[ $usernum -lt $maxnum ]] ; do
-					ssh root@$FULLHOSTNAME "/usr/sbin/ipa user-find usr$usernum-x | /bin/grep dn: | /bin/grep uid=usr$usernum-x"
+					ssh root@$FULLHOSTNAME "ipa user-find usr$usernum-x | /bin/grep dn: | /bin/grep uid=usr$usernum-x"
 					if [ $? -ne 0 ]; then
 						echo "ERROR - serch for usr$usernum-x on client $FULLHOSTNAME failed"
 						tet_result FAIL
@@ -127,13 +127,13 @@ tp4()
 			eval_vars $s
 			usernum=$minnum
 			while [[ $usernum -lt $maxnum ]] ; do
-				ssh root@$FULLHOSTNAME "/usr/sbin/ipa user-mod --last=testtesttestk$s usr$usernum-x"
+				ssh root@$FULLHOSTNAME "ipa user-mod --last=testtesttestk$s usr$usernum-x"
 				if [ $? -ne 0 ]; then
 					echo "ERROR - search for usr$usernum-x on server $FULLHOSTNAME failed"
 					tet_result FAIL
 				fi
 				eval_vars M1
-				ssh root@$FULLHOSTNAME "/usr/sbin/ipa user-find --all usr$usernum-x | /bin/grep Last\ Name | /bin/grep testtesttestk$s"
+				ssh root@$FULLHOSTNAME "ipa user-find --all usr$usernum-x | /bin/grep Last\ Name | /bin/grep testtesttestk$s"
 				if [ $? -ne 0 ]; then
 					echo "ERROR - search for testtesttestk$s in usr$usernum-x on server $FULLHOSTNAME failed"
 					tet_result FAIL
@@ -150,13 +150,13 @@ tp4()
 			if [ "$OS_VER" -eq "5" ] && [ "$OS" -eq "RHEL" ]; then
 				usernum=$minnum
 				while [[ $usernum -lt $maxnum ]] ; do
-					ssh root@$FULLHOSTNAME "/usr/sbin/ipa user-mod --last=testtesttestk$s usr$usernum-x"
+					ssh root@$FULLHOSTNAME "ipa user-mod --last=testtesttestk$s usr$usernum-x"
 					if [ $? -ne 0 ]; then
 						echo "ERROR - search for usr$usernum-x on server $FULLHOSTNAME failed"
 						tet_result FAIL
 					fi
 					eval_vars M1
-					ssh root@$FULLHOSTNAME "/usr/sbin/ipa user-find --all usr$usernum-x | /bin/grep Last\ Name | /bin/grep testtesttestk$s"
+					ssh root@$FULLHOSTNAME "ipa user-find --all usr$usernum-x | /bin/grep Last\ Name | /bin/grep testtesttestk$s"
 					if [ $? -ne 0 ]; then
 						echo "ERROR - search for testtesttestk$s in usr$usernum-x on server $FULLHOSTNAME failed"
 						tet_result FAIL
@@ -184,7 +184,7 @@ tp5()
 	usernum=$minnum
 	while [[ $usernum -lt $maxnum ]] ; do
 		echo "deleting user usr$usernum-x on $FULLHOSTNAME"
-		ssh root@$FULLHOSTNAME "/usr/sbin/ipa user-del usr$usernum-x"
+		ssh root@$FULLHOSTNAME "ipa user-del usr$usernum-x"
 		if [ $? -ne 0 ]; then
 			echo "ERROR - deletion of usr$usernum-x on M1 failed ssh failed"
 			tet_result FAIL
@@ -208,7 +208,7 @@ tp6()
 			eval_vars $s
 			usernum=$minnum
 			while [[ $usernum -lt $maxnum ]] ; do
-				ssh root@$FULLHOSTNAME "/usr/sbin/ipa user-find usr$usernum-x"
+				ssh root@$FULLHOSTNAME "ipa user-find usr$usernum-x"
 				if [ $? -eq 0 ]; then
 					echo "ERROR - search for usr$usernum-x on server $FULLHOSTNAME succeeded, and it shouldn't have"
 					tet_result FAIL
@@ -224,7 +224,7 @@ tp6()
 			if [ "$OS_VER" -eq "5" ] && [ "$OS" -eq "RHEL" ]; then
 				usernum=$minnum
 				while [[ $usernum -lt $maxnum ]] ; do
-					ssh root@$FULLHOSTNAME "/usr/sbin/ipa user-find usr$usernum-x"
+					ssh root@$FULLHOSTNAME "ipa user-find usr$usernum-x"
 					if [ $? -eq 0 ]; then
 						echo "ERROR - search for usr$usernum-x on client $FULLHOSTNAME succeeded, and it shouldn't have"
 						tet_result FAIL
