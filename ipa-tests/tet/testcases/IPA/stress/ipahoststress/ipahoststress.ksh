@@ -9,7 +9,7 @@ if [ "$DSTET_DEBUG" = "y" ]; then
 	set -x
 fi
 # This is the number of hosts to create on every master
-mastermax=1000
+mastermax=2000
 
 # Tests
 iclist="ic0 ic1 ic2 ic3 ic4 ic5"
