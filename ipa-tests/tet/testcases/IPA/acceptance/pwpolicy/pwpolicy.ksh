@@ -161,8 +161,7 @@ tp2()
 
 	eval_vars M1
 	# add user to test with
-#	ssh root@$FULLHOSTNAME "ipa user-del $user1;ipa add-user --first='test user 1' --last='lastname' $user1;"
-	ssh root@$FULLHOSTNAME "ipa-deluser $user1;ipa-adduser -f 'test user 1' -l 'lastname' $user1;"
+	ssh root@$FULLHOSTNAME "ipa user-del $user1;ipa user-add --first='test user 1' --last='lastname' $user1;"
 	if [ $? != 0 ]; then
 		echo "ERROR - ipa user-add failed on $FULLHOSTNAME";
 		echo "Test - $tet_thistest"
@@ -178,9 +177,9 @@ tp2()
 	fi
 
 	# set password policy
-	ssh root@$FULLHOSTNAME "ipa-pwpolicy --minlife $minlife"
+	ssh root@$FULLHOSTNAME "ipa pwpolicy-mod --minlife=$minlife"
 	if [ $? -ne 0 ]; then
-		echo "ERROR - ipa-pwpolicy on $FULLHOSTNAME failed"
+		echo "ERROR - ipa pwpolicy-mod on $FULLHOSTNAME failed"
 		echo "Test - $tet_thistest"
 		tet_result FAIL
 	fi
@@ -199,7 +198,7 @@ tp2()
 		tet_result FAIL
 	fi
 
-	# incriment date by minlife - 1 
+	# incriment date by minlife=- 1 
 	let newhour=$hour+$minlife-1
 	if [ $newhour -gt 23 ]; then
 		# Hour would be two high, incrimenting day
@@ -242,7 +241,7 @@ tp2()
 		echo "kinit is:"
 		ssh root@$FULLHOSTNAME "klist"
 		echo "pwpolicy on $FULLHOSTNAME is:"
-		ssh root@$FULLHOSTNAME "ipa-pwpolicy --show"
+		ssh root@$FULLHOSTNAME "ipa pwpolicy-show"
 		echo "contents of $TET_TMP_DIR/SetUserPassword-output.txt are:"
 		cat $TET_TMP_DIR/SetUserPassword-output.txt
 		echo "contents of $TET_TMP_DIR/SetUserPassword-output.txt complete:"
@@ -298,9 +297,9 @@ tp2()
 	if [ $? -ne 0 ]; then echo "ERROR - ResetKinit failed in $tet_thistest"; tet_result FAIL; fi
 	# Return pw policy to default
 	eval_vars M1
-	ssh root@$FULLHOSTNAME "ipa-pwpolicy --minlife 0"
+	ssh root@$FULLHOSTNAME "ipa pwpolicy-mod --minlife=0"
 	# cleaning up the user
-	ssh root@$FULLHOSTNAME "ipa-deluser $user1"
+	ssh root@$FULLHOSTNAME "ipa user-del $user1"
 
 	SyncKpasswd
 	eval_vars M1
@@ -312,7 +311,7 @@ tp2()
 ######################################################################
 # minlife
 # From ../../../../ipa-tests/testplans/functional/passwordpolicy/IPA_Password_Policy_test_plan.html test # 1
-# 1 minlife = 0
+# 1 minlife== 0
 #    1.   setup default environment
 #    2. setup default password policy
 #    3. change Min. password lifetime to 0
@@ -344,9 +343,9 @@ tp2a()
 
 	eval_vars M1
 	# add user to test with
-	ssh root@$FULLHOSTNAME "ipa-deluser $user1;ipa-adduser -f 'test user 1' -l 'lastname' $user1;"
+	ssh root@$FULLHOSTNAME "ipa user-del $user1;ipa user-add --first='test user 1' --last='lastname' $user1;"
 	if [ $? != 0 ]; then
-		echo "ERROR - ipa-adduser failed on $FULLHOSTNAME";
+		echo "ERROR - ipa user-add failed on $FULLHOSTNAME";
 		echo "Test - $tet_thistest"
 		tet_result FAIL
 	fi
@@ -360,10 +359,10 @@ tp2a()
 	fi
 
 	# set password policy
-	# first set it to a value so the change to 0 won't fail
-	ssh root@$FULLHOSTNAME "ipa-pwpolicy --minlife 20;ipa-pwpolicy --minlife 0"
+	# first set it to a value so the change to 0 won't fail"
+	ssh root@$FULLHOSTNAME "ipa pwpolicy-mod --minlife=20;ipa pwpolicy-mod --minlife=0"
 	if [ $? -ne 0 ]; then
-		echo "ERROR - ipa-pwpolicy on $FULLHOSTNAME failed"
+		echo "ERROR - ipa pwpolicy-mod on $FULLHOSTNAME failed"
 		echo "Test - $tet_thistest"
 		tet_result FAIL
 	fi
@@ -415,9 +414,9 @@ tp2a()
 	if [ $? -ne 0 ]; then echo "ERROR - ResetKinit failed in $tet_thistest"; tet_result FAIL; fi
 	# Return pw policy to default
 	eval_vars M1
-	ssh root@$FULLHOSTNAME "ipa-pwpolicy --minlife 0"
+	ssh root@$FULLHOSTNAME "ipa pwpolicy-mod --minlife=0"
 	# cleaning up the user
-	ssh root@$FULLHOSTNAME "ipa-deluser $user1"
+	ssh root@$FULLHOSTNAME "ipa user-del $user1"
 
 	SyncKpasswd
 	eval_vars M1
@@ -429,11 +428,11 @@ tp2a()
 ######################################################################
 # minlife
 # From ../../../../ipa-tests/testplans/functional/passwordpolicy/IPA_Password_Policy_test_plan.html test # 2
-# 2 minlife = -1
+# 2 minlife== -1
 #   1. setup default environment
 #   2. setup default password policy
 #   3. change Min. password lifetime to -1 via CLI
-#      verify this number can not be accepted through CLI (ipa-pwpolicy) 
+#      verify this number can not be accepted through CLI (ipa pwpolicy-mod) 
 ######################################################################
 tp2b()
 {
@@ -448,9 +447,9 @@ tp2b()
 	eval_vars M1
 
 	# add user to test with
-	ssh root@$FULLHOSTNAME "ipa-deluser $user1;ipa-adduser -f 'test user 1' -l 'lastname' $user1;"
+	ssh root@$FULLHOSTNAME "ipa user-del $user1;ipa user-add --first='test user 1' --last='lastname' $user1;"
 	if [ $? != 0 ]; then
-		echo "ERROR - ipa-adduser failed on $FULLHOSTNAME";
+		echo "ERROR - ipa user-add failed on $FULLHOSTNAME";
 		echo "Test - $tet_thistest"
 		tet_result FAIL
 	fi
@@ -464,9 +463,9 @@ tp2b()
 	fi
 
 	# set password policy
-	ssh root@$FULLHOSTNAME "ipa-pwpolicy --minlife -1"
+	ssh root@$FULLHOSTNAME "ipa pwpolicy-mod --minlife=-1"
 	if [ $? -eq 0 ]; then
-		echo "ERROR - ipa-pwpolicy --minlife -1 on $FULLHOSTNAME passed when it should not have, "
+		echo "ERROR - ipa pwpolicy-mod --minlife=-1 on $FULLHOSTNAME passed when it should not have, "
 		echo "Test - $tet_thistest"
 		echo "This could be failing because of bug https://bugzilla.redhat.com/show_bug.cgi?id=461213"
 		tet_result FAIL
@@ -480,9 +479,9 @@ tp2b()
 	if [ $? -ne 0 ]; then echo "ERROR - ResetKinit failed in $tet_thistest"; tet_result FAIL; fi
 	# Return pw policy to default
 	eval_vars M1
-	ssh root@$FULLHOSTNAME "ipa-pwpolicy --minlife 0"
+	ssh root@$FULLHOSTNAME "ipa pwpolicy-mod --minlife=0"
 	# cleaning up the user
-	ssh root@$FULLHOSTNAME "ipa-deluser $user1"
+	ssh root@$FULLHOSTNAME "ipa user-del=$user1"
 
 	SyncKpasswd
 	eval_vars M1
@@ -492,12 +491,12 @@ tp2b()
 ######################################################################
 
 ######################################################################
-# minlife > maxlife
+# minlife=> maxlife
 # From ../../../../ipa-tests/testplans/functional/passwordpolicy/IPA_Password_Policy_test_plan.html test # 12
 #
 #   1.   setup default environment
 #   2. setup default password policy
-#   3. change max passowrd life to 2
+#   3. change max passowrd life=to 2
 #   4. change Min.password lifetime to 2160
 #   Verify that it fails
 ######################################################################
@@ -513,34 +512,34 @@ tp2c()
 	# Return pw policy to default
 	eval_vars M1
 	
-	# Set max life to 2 
+	# Set max life=to 2 
 	# resetting password policy 
-	ssh root@$FULLHOSTNAME "ipa-pwpolicy --maxlife 2"
+	ssh root@$FULLHOSTNAME "ipa pwpolicy-mod --maxlife=2"
 	if [ $? -ne 0 ]; then
-		echo "ERROR - ipa-pwpolicy --maxlife 2 on $FULLHOSTNAME passed when it should not have"
+		echo "ERROR - ipa pwpolicy-mod --maxlife=2 on $FULLHOSTNAME passed when it should not have"
 		echo "Test - $tet_thistest"
 		tet_result FAIL
 	fi
 
-	# set minlife to 2160 this should fail 
-	ssh root@$FULLHOSTNAME "ipa-pwpolicy --minlife 2160"
+	# set minlife=to 2160 this should fail 
+	ssh root@$FULLHOSTNAME "ipa pwpolicy-mod --minlife=2160"
 	if [ $? -eq 0 ]; then
-		echo "ERROR - ipa-pwpolicy --minlife 2160 on $FULLHOSTNAME failed"
+		echo "ERROR - ipa pwpolicy-mod --minlife=2160 on $FULLHOSTNAME failed"
 		echo "Test - $tet_thistest"
 		echo "Possibly it failed because https://bugzilla.redhat.com/show_bug.cgi?id=461332 is still open?"
 		tet_result FAIL
 	fi
 
 	# resetting password policy 
-	ssh root@$FULLHOSTNAME "ipa-pwpolicy --minlife 0;ipa-pwpolicy --maxlife 7"
+	ssh root@$FULLHOSTNAME "ipa pwpolicy-mod --minlife=0;ipa pwpolicy-mod --maxlife=7"
 	if [ $? -ne 0 ]; then
-		echo "ERROR - ipa-pwpolicy on $FULLHOSTNAME failed"
+		echo "ERROR - ipa pwpolicy-mod on $FULLHOSTNAME failed"
 		echo "Test - $tet_thistest"
 		tet_result FAIL
 	fi
-	ssh root@$FULLHOSTNAME "ipa-pwpolicy --minlife 2"
+	ssh root@$FULLHOSTNAME "ipa pwpolicy-mod --minlife=2"
 	if [ $? -ne 0 ]; then
-		echo "ERROR - ipa-pwpolicy on $FULLHOSTNAME failed"
+		echo "ERROR - ipa pwpolicy-mod on $FULLHOSTNAME failed"
 		echo "Test - $tet_thistest"
 		tet_result FAIL
 	fi
@@ -590,9 +589,9 @@ tp3()
 	eval_vars M1
 
 	# add user to test with
-	ssh root@$FULLHOSTNAME "ipa-deluser $user1;ipa-adduser -f 'test user 1' -l 'lastname' $user1;"
+	ssh root@$FULLHOSTNAME "ipa user-del $user1;ipa user-add --first='test user 1' --last='lastname' $user1;"
 	if [ $? != 0 ]; then
-		echo "ERROR - ipa-adduser failed on $FULLHOSTNAME";
+		echo "ERROR - ipa user-add failed on $FULLHOSTNAME";
 		echo "Test - $tet_thistest"
 		tet_result FAIL
 	fi
@@ -606,9 +605,9 @@ tp3()
 	fi
 
 	# set password policy
-	ssh root@$FULLHOSTNAME "ipa-pwpolicy --minlife 0;ipa-pwpolicy --maxlife $maxlife"
+	ssh root@$FULLHOSTNAME "ipa pwpolicy-mod --minlife=0;ipa pwpolicy-mod --maxlife=$maxlife"
 	if [ $? -ne 0 ]; then
-		echo "ERROR - ipa-pwpolicy on $FULLHOSTNAME failed"
+		echo "ERROR - ipa pwpolicy-mod on $FULLHOSTNAME failed"
 		echo "Test - $tet_thistest"
 		tet_result FAIL
 	fi
@@ -652,7 +651,7 @@ tp3()
 		export hour=`printf "%02d" $newhour`
 	fi
 
-	# incriment date by day + maxlife + 2
+	# incriment date by day + maxlife=+ 2
 	let newday=$day+$maxlife+2;
 	if [ $newday -gt 28 ]; then
 		# Day might be two high, setting the month higher
@@ -720,17 +719,17 @@ tp3()
 	# Return pw policy to default
 	eval_vars M1
 	# cleaning up the user
-	ssh root@$FULLHOSTNAME "ipa-deluser $user1"
+	ssh root@$FULLHOSTNAME "ipa user-del $user1"
 	if [ $? -ne 0 ]; then
 		ResetKinit
 		if [ $? -ne 0 ]; then echo "ERROR - ResetKinit failed in $tet_thistest"; tet_result FAIL; fi
-		ssh root@$FULLHOSTNAME "ipa-deluser $user1"
+		ssh root@$FULLHOSTNAME "ipa user-del $user1"
 	fi
 
 	# resetting password policy 
-	ssh root@$FULLHOSTNAME "ipa-pwpolicy --minlife 0;ipa-pwpolicy --maxlife 7"
+	ssh root@$FULLHOSTNAME "ipa pwpolicy-mod --minlife=0;ipa pwpolicy-mod --maxlife=7"
 	if [ $? -ne 0 ]; then
-		echo "ERROR - ipa-pwpolicy on $FULLHOSTNAME failed"
+		echo "ERROR - ipa pwpolicy-mod on $FULLHOSTNAME failed"
 		echo "Test - $tet_thistest"
 		tet_result FAIL
 	fi
@@ -745,13 +744,13 @@ tp3()
 ######################################################################
 
 ######################################################################
-# maxlife < minlife
+# maxlife=< minlife
 # From ../../../../ipa-tests/testplans/functional/passwordpolicy/IPA_Password_Policy_test_plan.html test # 6
 #
 #   1.   setup default environment
 #   2. setup default password policy
 #   3. change Min.password lifetime to 2160
-#   4. change max passowrd life to 5
+#   4. change max passowrd life=to 5
 #   Verify that it fails
 ######################################################################
 tp3a()
@@ -766,34 +765,34 @@ tp3a()
 	# Return pw policy to default
 	eval_vars M1
 	
-	# set minlife to 2160 
-	ssh root@$FULLHOSTNAME "ipa-pwpolicy --maxlife 400;ipa-pwpolicy --minlife 2160"
+	# set minlife=to 2160 
+	ssh root@$FULLHOSTNAME "ipa pwpolicy-mod --maxlife=400;ipa pwpolicy-mod --minlife=2160"
 	if [ $? -ne 0 ]; then
-		echo "ERROR - ipa-pwpolicy --minlife 2160 on $FULLHOSTNAME failed"
+		echo "ERROR - ipa pwpolicy-mod --minlife=2160 on $FULLHOSTNAME failed"
 		echo "Test - $tet_thistest"
 		tet_result FAIL
 	fi
 
-	# Set max life to 5 (this should fail
+	# Set max life=to 5 (this should fail
 	# resetting password policy 
-	ssh root@$FULLHOSTNAME "ipa-pwpolicy --maxlife 5"
+	ssh root@$FULLHOSTNAME "ipa pwpolicy-mod --maxlife=5"
 	if [ $? -eq 0 ]; then
-		echo "ERROR - ipa-pwpolicy --maxlife 5 on $FULLHOSTNAME passed when it should not have"
+		echo "ERROR - ipa pwpolicy-mod --maxlife=5 on $FULLHOSTNAME passed when it should not have"
 		echo "Test - $tet_thistest"
 		echo "Possibly becuase https://bugzilla.redhat.com/show_bug.cgi?id=461325 is not fixed"
 		tet_result FAIL
 	fi
 	
 	# resetting password policy 
-	ssh root@$FULLHOSTNAME "ipa-pwpolicy --minlife 0;ipa-pwpolicy --maxlife 7"
+	ssh root@$FULLHOSTNAME "ipa pwpolicy-mod --minlife=0;ipa pwpolicy-mod --maxlife=7"
 	if [ $? -ne 0 ]; then
-		echo "ERROR - ipa-pwpolicy on $FULLHOSTNAME failed"
+		echo "ERROR - ipa pwpolicy-mod on $FULLHOSTNAME failed"
 		echo "Test - $tet_thistest"
 		tet_result FAIL
 	fi
-	ssh root@$FULLHOSTNAME "ipa-pwpolicy --minlife 2"
+	ssh root@$FULLHOSTNAME "ipa pwpolicy-mod --minlife=2"
 	if [ $? -ne 0 ]; then
-		echo "ERROR - ipa-pwpolicy on $FULLHOSTNAME failed"
+		echo "ERROR - ipa pwpolicy-mod on $FULLHOSTNAME failed"
 		echo "Test - $tet_thistest"
 		tet_result FAIL
 	fi
@@ -843,9 +842,9 @@ tp3b()
 	eval_vars M1
 
 	# add user to test with
-	ssh root@$FULLHOSTNAME "ipa-deluser $user1;ipa-adduser -f 'test user 1' -l 'lastname' $user1;"
+	ssh root@$FULLHOSTNAME "ipa user-del $user1;ipa user-add --first='test user 1' --last='lastname' $user1;"
 	if [ $? != 0 ]; then
-		echo "ERROR - ipa-adduser failed on $FULLHOSTNAME";
+		echo "ERROR - ipa user-add failed on $FULLHOSTNAME";
 		echo "Test - $tet_thistest"
 		tet_result FAIL
 	fi
@@ -859,10 +858,10 @@ tp3b()
 	fi
 
 	# set password policy
-	ssh root@$FULLHOSTNAME "ipa-pwpolicy --minlife 4"
-	ssh root@$FULLHOSTNAME "ipa-pwpolicy --minlife 0"
+	ssh root@$FULLHOSTNAME "ipa pwpolicy-mod --minlife=4"
+	ssh root@$FULLHOSTNAME "ipa pwpolicy-mod --minlife=0"
 	if [ $? -ne 0 ]; then
-		echo "ERROR - ipa-pwpolicy on $FULLHOSTNAME failed"
+		echo "ERROR - ipa pwpolicy-mod on $FULLHOSTNAME failed"
 		echo "Test - $tet_thistest"
 		tet_result FAIL
 	fi
@@ -906,7 +905,7 @@ tp3b()
 		export hour=`printf "%02d" $newhour`
 	fi
 
-	# incriment date by day + maxlife + 2
+	# incriment date by day + maxlife=+ 2
 	let newday=$day+$maxlife+2;
 	if [ $newday -gt 28 ]; then
 		# Day might be two high, setting the month higher
@@ -974,14 +973,14 @@ tp3b()
 	# Return pw policy to default
 	eval_vars M1
 	# cleaning up the user
-	ssh root@$FULLHOSTNAME "ipa-deluser $user1"
+	ssh root@$FULLHOSTNAME "ipa user-del $user1"
 
 	# resetting password policy 
-	ssh root@$FULLHOSTNAME "ipa-pwpolicy --maxlife 44"
-	ssh root@$FULLHOSTNAME "ipa-pwpolicy --minlife 0"
-	ssh root@$FULLHOSTNAME "ipa-pwpolicy --maxlife 7"
+	ssh root@$FULLHOSTNAME "ipa pwpolicy-mod --maxlife=44"
+	ssh root@$FULLHOSTNAME "ipa pwpolicy-mod --minlife=0"
+	ssh root@$FULLHOSTNAME "ipa pwpolicy-mod --maxlife=7"
 	if [ $? -ne 0 ]; then
-		echo "ERROR - ipa-pwpolicy on $FULLHOSTNAME failed"
+		echo "ERROR - ipa pwpolicy-mod on $FULLHOSTNAME failed"
 		echo "Test - $tet_thistest"
 		tet_result FAIL
 	fi
@@ -1029,16 +1028,16 @@ tp4()
 
 	eval_vars M1	
 
-	# Set minlife 2 zero so that the user can rapidly change it's passowrd
-	ssh root@$FULLHOSTNAME "ipa-pwpolicy --minlife 0"
-	ssh root@$FULLHOSTNAME "ipa-pwpolicy --minclasses 0"
+	# Set minlife=2 zero so that the user can rapidly change it's passowrd
+	ssh root@$FULLHOSTNAME "ipa pwpolicy-mod --minlife=0"
+	ssh root@$FULLHOSTNAME "ipa pwpolicy-mod --minclasses=0"
 
 	#   5. create a user "usr", set the default password to "redhat000"
 
 	# add user to test with
-	ssh root@$FULLHOSTNAME "ipa-deluser $user1;ipa-adduser -f 'test user 1' -l 'lastname' $user1;"
+	ssh root@$FULLHOSTNAME "ipa user-del $user1;ipa user-add --first='test user 1' --last='lastname' $user1;"
 	if [ $? != 0 ]; then
-		echo "ERROR - ipa-adduser failed on $FULLHOSTNAME";
+		echo "ERROR - ipa user-add failed on $FULLHOSTNAME";
 		echo "Test - $tet_thistest"
 		tet_result FAIL
 	fi
@@ -1071,9 +1070,9 @@ tp4()
 	fi
 
 	# set password policy
-	ssh root@$FULLHOSTNAME "ipa-pwpolicy --history $phistory"
+	ssh root@$FULLHOSTNAME "ipa pwpolicy-mod --history $phistory"
 	if [ $? -ne 0 ]; then
-		echo "ERROR - ipa-pwpolicy on $FULLHOSTNAME failed"
+		echo "ERROR - ipa pwpolicy-mod on $FULLHOSTNAME failed"
 		echo "Test - $tet_thistest"
 		tet_result FAIL
 	fi
@@ -1290,12 +1289,12 @@ tp4()
 	# Return pw policy to default
 	eval_vars M1
 	# cleaning up the user
-	ssh root@$FULLHOSTNAME "ipa-deluser $user1"
+	ssh root@$FULLHOSTNAME "ipa user-del $user1"
 
 	# resetting password policy 
-	ssh root@$FULLHOSTNAME "ipa-pwpolicy --history 0"
+	ssh root@$FULLHOSTNAME "ipa pwpolicy-mod --history 0"
 	if [ $? -ne 0 ]; then
-		echo "ERROR - ipa-pwpolicy on $FULLHOSTNAME failed"
+		echo "ERROR - ipa pwpolicy-mod on $FULLHOSTNAME failed"
 		echo "Test - $tet_thistest"
 		tet_result FAIL
 	fi
@@ -1335,9 +1334,9 @@ tp4a()
 
 	eval_vars M1	
 	# add user to test with
-	ssh root@$FULLHOSTNAME "ipa-deluser $user1;ipa-adduser -f 'test user 1' -l 'lastname' $user1;"
+	ssh root@$FULLHOSTNAME "ipa user-del $user1;ipa user-add --first='test user 1' --last='lastname' $user1;"
 	if [ $? != 0 ]; then
-		echo "ERROR - ipa-adduser failed on $FULLHOSTNAME";
+		echo "ERROR - ipa user-add failed on $FULLHOSTNAME";
 		echo "Test - $tet_thistest"
 		tet_result FAIL
 	fi
@@ -1370,10 +1369,10 @@ tp4a()
 	fi
 
 	# set password policy
-	ssh root@$FULLHOSTNAME "ipa-pwpolicy --history 20"
-	ssh root@$FULLHOSTNAME "ipa-pwpolicy --history 0"
+	ssh root@$FULLHOSTNAME "ipa pwpolicy-mod --history 20"
+	ssh root@$FULLHOSTNAME "ipa pwpolicy-mod --history 0"
 	if [ $? -ne 0 ]; then
-		echo "ERROR - ipa-pwpolicy on $FULLHOSTNAME failed"
+		echo "ERROR - ipa pwpolicy-mod on $FULLHOSTNAME failed"
 		echo "Test - $tet_thistest"
 		tet_result FAIL
 	fi
@@ -1388,7 +1387,7 @@ tp4a()
 	KinitAsFirst M1 $user1 $user1pw1 $user1pw2
 	if [ $? -ne 0 ]; then
 		echo "ERROR - kinit as $user1 on $FULLHOSTNAME failed"
-		ssh root@$FULLHOSTNAME "ipa-pwpolicy --show"
+		ssh root@$FULLHOSTNAME "ipa pwpolicy-mod --show"
 		echo "Test - $tet_thistest"
 		tet_result FAIL
 	fi
@@ -1398,7 +1397,7 @@ tp4a()
 	scp root@$FULLHOSTNAME:/tmp/KinitAsFirst-out.txt $TET_TMP_DIR/.
 	if [ $? -ne 0 ]; then
 		echo "ERROR - scp root@$FULLHOSTNAME:/tmp/SetUserPassword-output.txt $TET_TMP_DIR/. failed"
-		ssh root@$FULLHOSTNAME "ipa-pwpolicy --show"
+		ssh root@$FULLHOSTNAME "ipa pwpolicy-mod --show"
 		echo "Test - $tet_thistest"
 		tet_result FAIL
 	fi
@@ -1411,7 +1410,7 @@ tp4a()
 		echo "contents of $TET_TMP_DIR/KinitAsFirst-out.txt are:"
 		cat $TET_TMP_DIR/KinitAsFirst-out.txt
 		echo "contents of $TET_TMP_DIR/KinitAsFirst-out.txt complete:"
-		ssh root@$FULLHOSTNAME "ipa-pwpolicy --show"
+		ssh root@$FULLHOSTNAME "ipa pwpolicy-mod --show"
 		tet_result FAIL
 	fi
 
@@ -1439,7 +1438,7 @@ tp4a()
 		echo "contents of $TET_TMP_DIR/SetUserPassword-output.txt are:"
 		cat $TET_TMP_DIR/SetUserPassword-output.txt
 		echo "contents of $TET_TMP_DIR/SetUserPassword-output.txt complete:"
-		ssh root@$FULLHOSTNAME "ipa-pwpolicy --show"
+		ssh root@$FULLHOSTNAME "ipa pwpolicy-mod --show"
 		tet_result FAIL
 	fi
 
@@ -1448,7 +1447,7 @@ tp4a()
 	if [ $? != 0 ]; then
 		echo "ERROR - SetUserPassword failed on $FULLHOSTNAME";
 		echo "Test - $tet_thistest"
-		ssh root@$FULLHOSTNAME "ipa-pwpolicy --show"
+		ssh root@$FULLHOSTNAME "ipa pwpolicy-mod --show"
 		tet_result FAIL
 	fi
 
@@ -1468,7 +1467,7 @@ tp4a()
 		echo "contents of $TET_TMP_DIR/SetUserPassword-output.txt are:"
 		cat $TET_TMP_DIR/SetUserPassword-output.txt
 		echo "contents of $TET_TMP_DIR/SetUserPassword-output.txt complete:"
-		ssh root@$FULLHOSTNAME "ipa-pwpolicy --show"
+		ssh root@$FULLHOSTNAME "ipa pwpolicy-mod --show"
 		tet_result FAIL
 	fi
 
@@ -1478,12 +1477,12 @@ tp4a()
 	# Return pw policy to default
 	eval_vars M1
 	# cleaning up the user
-	ssh root@$FULLHOSTNAME "ipa-deluser $user1"
+	ssh root@$FULLHOSTNAME "ipa user-del $user1"
 
 	# resetting password policy 
-	ssh root@$FULLHOSTNAME "ipa-pwpolicy --history 20;ipa-pwpolicy --history 0"
+	ssh root@$FULLHOSTNAME "ipa pwpolicy-mod --history 20;ipa pwpolicy-mod --history 0"
 	if [ $? -ne 0 ]; then
-		echo "ERROR - ipa-pwpolicy on $FULLHOSTNAME failed"
+		echo "ERROR - ipa pwpolicy-mod on $FULLHOSTNAME failed"
 		echo "Test - $tet_thistest"
 		tet_result FAIL
 	fi
@@ -1515,18 +1514,18 @@ tp4b()
 	eval_vars M1	
 
 	# set password policy
-	ssh root@$FULLHOSTNAME "ipa-pwpolicy --history 20;ipa-pwpolicy --history -1" 
+	ssh root@$FULLHOSTNAME "ipa pwpolicy-mod --history 20;ipa pwpolicy-mod --history -1" 
 	if [ $? -eq 0 ]; then
-		echo "ERROR - ipa-pwpolicy on $FULLHOSTNAME passed when is should not have"
+		echo "ERROR - ipa pwpolicy-mod on $FULLHOSTNAME passed when is should not have"
 		echo "possibly because bug https://bugzilla.redhat.com/show_bug.cgi?id=461543 is not fixed"
 		echo "Test - $tet_thistest"
 		tet_result FAIL
 	fi
 
 	# resetting password policy 
-	ssh root@$FULLHOSTNAME "ipa-pwpolicy --history 20;ipa-pwpolicy --history 0"
+	ssh root@$FULLHOSTNAME "ipa pwpolicy-mod --history 20;ipa pwpolicy-mod --history 0"
 	if [ $? -ne 0 ]; then
-		echo "ERROR - ipa-pwpolicy on $FULLHOSTNAME failed"
+		echo "ERROR - ipa pwpolicy-mod on $FULLHOSTNAME failed"
 		echo "Test - $tet_thistest"
 		tet_result FAIL
 	fi
@@ -1553,9 +1552,9 @@ tp5()
 
 	eval_vars M1
 	# add user to test with
-	ssh root@$FULLHOSTNAME "ipa-deluser $user1;ipa-adduser -f 'test user 1' -l 'lastname' $user1;"
+	ssh root@$FULLHOSTNAME "ipa user-del $user1;ipa user-add --first='test user 1' --last='lastname' $user1;"
 	if [ $? != 0 ]; then
-		echo "ERROR - ipa-adduser failed on $FULLHOSTNAME";
+		echo "ERROR - ipa user-add failed on $FULLHOSTNAME";
 		echo "Test - $tet_thistest"
 		tet_result FAIL
 	fi
@@ -1568,9 +1567,9 @@ tp5()
 		tet_result FAIL
 	fi
 	# set password policy
-	ssh root@$FULLHOSTNAME "ipa-pwpolicy --minclasses 2"
+	ssh root@$FULLHOSTNAME "ipa pwpolicy-mod --minclasses=2"
 	if [ $? -ne 0 ]; then
-		echo "ERROR - ipa-pwpolicy on $FULLHOSTNAME failed"
+		echo "ERROR - ipa pwpolicy-mod on $FULLHOSTNAME failed"
 		echo "Test - $tet_thistest"
 		tet_result FAIL
 	fi
@@ -1662,12 +1661,12 @@ tp5()
 	# Return pw policy to default
 	eval_vars M1
 	# cleaning up the user
-	ssh root@$FULLHOSTNAME "ipa-deluser $user1"
+	ssh root@$FULLHOSTNAME "ipa user-del $user1"
 
 	# resetting password policy 
-	ssh root@$FULLHOSTNAME "ipa-pwpolicy --minclasses 0"
+	ssh root@$FULLHOSTNAME "ipa pwpolicy-mod --minclasses=0"
 	if [ $? -ne 0 ]; then
-		echo "ERROR - ipa-pwpolicy on $FULLHOSTNAME failed"
+		echo "ERROR - ipa pwpolicy-mod on $FULLHOSTNAME failed"
 		echo "Test - $tet_thistest"
 		tet_result FAIL
 	fi
@@ -1699,9 +1698,9 @@ tp5a()
 
 	eval_vars M1
 	# add user to test with
-	ssh root@$FULLHOSTNAME "ipa-deluser $user1;ipa-adduser -f 'test user 1' -l 'lastname' $user1;"
+	ssh root@$FULLHOSTNAME "ipa user-del $user1;ipa user-add --first='test user 1' --last='lastname' $user1;"
 	if [ $? != 0 ]; then
-		echo "ERROR - ipa-adduser failed on $FULLHOSTNAME";
+		echo "ERROR - ipa user-add failed on $FULLHOSTNAME";
 		echo "Test - $tet_thistest"
 		tet_result FAIL
 	fi
@@ -1714,17 +1713,17 @@ tp5a()
 		tet_result FAIL
 	fi
 
-	ssh root@$FULLHOSTNAME "ipa-pwpolicy --minlife 44;ipa-pwpolicy --minlife 0"
+	ssh root@$FULLHOSTNAME "ipa pwpolicy-mod --minlife=44;ipa pwpolicy-mod --minlife=0"
 	if [ $? -ne 0 ]; then
-		echo "ERROR - ipa-pwpolicy on $FULLHOSTNAME failed"
+		echo "ERROR - ipa pwpolicy-mod on $FULLHOSTNAME failed"
 		echo "Test - $tet_thistest"
 		tet_result FAIL
 	fi
 
 	# set password policy
-	ssh root@$FULLHOSTNAME "ipa-pwpolicy --minclasses 2;ipa-pwpolicy --minclasses 0"
+	ssh root@$FULLHOSTNAME "ipa pwpolicy-mod --minclasses=2;ipa pwpolicy-mod --minclasses=0"
 	if [ $? -ne 0 ]; then
-		echo "ERROR - ipa-pwpolicy on $FULLHOSTNAME failed"
+		echo "ERROR - ipa pwpolicy-mod on $FULLHOSTNAME failed"
 		echo "Test - $tet_thistest"
 		tet_result FAIL
 	fi
@@ -1763,9 +1762,9 @@ tp5a()
 	eval_vars M1
 	# cleaning up the user
 	# resetting password policy 
-	ssh root@$FULLHOSTNAME "ipa-deluser $user1;ipa-pwpolicy --minclasses 3;ipa-pwpolicy --minclasses 0"
+	ssh root@$FULLHOSTNAME "ipa user-del $user1;ipa pwpolicy-mod --minclasses=3;ipa pwpolicy-mod --minclasses=0"
 	if [ $? -ne 0 ]; then
-		echo "ERROR - ipa-pwpolicy on $FULLHOSTNAME failed"
+		echo "ERROR - ipa pwpolicy-mod on $FULLHOSTNAME failed"
 		echo "Test - $tet_thistest"
 		tet_result FAIL
 	fi
@@ -1783,7 +1782,7 @@ tp5a()
 #   2. setup default password policy
 #   3. change min. password lifetime to 0
 #   4. change min. character class to 0
-#   5. change min. password length to 9
+#   5. change min. password length=to 9
 #   6. create a user "usr", set its default password to "redhat0000"
 #   7. verify user password is valid
 #    1.   user can change its password to "123456789"
@@ -1807,9 +1806,9 @@ tp6()
 
 	eval_vars M1
 	# add user to test with
-	ssh root@$FULLHOSTNAME "ipa-deluser $user1;ipa-adduser -f 'test user 1' -l 'lastname' $user1;"
+	ssh root@$FULLHOSTNAME "ipa user-del $user1;ipa user-add --first='test user 1' --last='lastname' $user1;"
 	if [ $? != 0 ]; then
-		echo "ERROR - ipa-adduser failed on $FULLHOSTNAME";
+		echo "ERROR - ipa user-add failed on $FULLHOSTNAME";
 		echo "Test - $tet_thistest"
 		tet_result FAIL
 	fi
@@ -1822,9 +1821,9 @@ tp6()
 		tet_result FAIL
 	fi
 	# set password policy
-	ssh root@$FULLHOSTNAME "ipa-pwpolicy --minlife 0;ipa-pwpolicy --minclasses 0;ipa-pwpolicy --minlength 20;ipa-pwpolicy --minlength 9"
+	ssh root@$FULLHOSTNAME "ipa pwpolicy-mod --minlife=0;ipa pwpolicy-mod --minclasses=0;ipa pwpolicy-mod --minlength=20;ipa pwpolicy-mod --minlength=9"
 	if [ $? -ne 0 ]; then
-		echo "ERROR - ipa-pwpolicy on $FULLHOSTNAME failed"
+		echo "ERROR - ipa pwpolicy-mod on $FULLHOSTNAME failed"
 		echo "Test - $tet_thistest"
 		tet_result FAIL
 	fi
@@ -1948,12 +1947,12 @@ tp6()
 	# Return pw policy to default
 	eval_vars M1
 	# cleaning up the user
-	ssh root@$FULLHOSTNAME "ipa-deluser $user1"
+	ssh root@$FULLHOSTNAME "ipa user-del $user1"
 
 	# resetting password policy 
-	ssh root@$FULLHOSTNAME "ipa-pwpolicy --minlength 0"
+	ssh root@$FULLHOSTNAME "ipa pwpolicy-mod --minlength=0"
 	if [ $? -ne 0 ]; then
-		echo "ERROR - ipa-pwpolicy on $FULLHOSTNAME failed"
+		echo "ERROR - ipa pwpolicy-mod on $FULLHOSTNAME failed"
 		echo "Test - $tet_thistest"
 		tet_result FAIL
 	fi
@@ -1971,7 +1970,7 @@ tp6()
 #   2. setup default password policy
 #   3. change min. password lifetime to 0
 #   4. change min. character class to 0
-#   5. change min. password length to '1
+#   5. change min. password length=to '1
 #   6. create a user "usr", set its default password to "1"
 #   7. verify user password is valid
 #    1. user can change its password to "2"
@@ -1989,9 +1988,9 @@ tp6a()
 
 	eval_vars M1
 	# add user to test with
-	ssh root@$FULLHOSTNAME "ipa-deluser $user1;ipa-adduser -f 'test user 1' -l 'lastname' $user1;"
+	ssh root@$FULLHOSTNAME "ipa user-del $user1;ipa user-add --first='test user 1' --last='lastname' $user1;"
 	if [ $? != 0 ]; then
-		echo "ERROR - ipa-adduser failed on $FULLHOSTNAME";
+		echo "ERROR - ipa user-add failed on $FULLHOSTNAME";
 		echo "Test - $tet_thistest"
 		tet_result FAIL
 	fi
@@ -2004,9 +2003,9 @@ tp6a()
 		tet_result FAIL
 	fi
 	# set password policy
-	ssh root@$FULLHOSTNAME "ipa-pwpolicy --minlife 0;ipa-pwpolicy --minclasses 0;ipa-pwpolicy --minlength 20;ipa-pwpolicy --minlength 1"
+	ssh root@$FULLHOSTNAME "ipa pwpolicy-mod --minlife=0;ipa pwpolicy-mod --minclasses=0;ipa pwpolicy-mod --minlength=20;ipa pwpolicy-mod --minlength=1"
 	if [ $? -ne 0 ]; then
-		echo "ERROR - ipa-pwpolicy on $FULLHOSTNAME failed"
+		echo "ERROR - ipa pwpolicy-mod on $FULLHOSTNAME failed"
 		echo "Test - $tet_thistest"
 		tet_result FAIL
 	fi
@@ -2075,12 +2074,12 @@ tp6a()
 	# Return pw policy to default
 	eval_vars M1
 	# cleaning up the user
-	ssh root@$FULLHOSTNAME "ipa-deluser $user1"
+	ssh root@$FULLHOSTNAME "ipa user-del $user1"
 
 	# resetting password policy 
-	ssh root@$FULLHOSTNAME "ipa-pwpolicy --minlength 0"
+	ssh root@$FULLHOSTNAME "ipa pwpolicy-mod --minlength=0"
 	if [ $? -ne 0 ]; then
-		echo "ERROR - ipa-pwpolicy on $FULLHOSTNAME failed"
+		echo "ERROR - ipa pwpolicy-mod on $FULLHOSTNAME failed"
 		echo "Test - $tet_thistest"
 		tet_result FAIL
 	fi
