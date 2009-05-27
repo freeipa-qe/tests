@@ -83,11 +83,10 @@ ResetKinit()
 			ssh $FULLHOSTNAME "/etc/init.d/ntpd stop;ntpdate $NTPSERVER;/etc/init.d/ipa_kpasswd restart"
                         echo "kiniting as $DS_USER, password $DM_ADMIN_PASS on $s"
                         KinitAs $s $DS_USER $DM_ADMIN_PASS
-                        ret=$?
-                        if [ $ret -ne 0 ]; then
+                        if [ $? -ne 0 ]; then
                                 echo "ERROR - kinit on $s failed"
 				echo "Test - $tet_thistest - ResetKinit"
-                                tet_result FAIL
+				return 1
                         fi
                 fi
         done
@@ -95,14 +94,14 @@ ResetKinit()
                 if [ "$s" != "" ]; then
                         echo "kiniting as $DS_USER, password $DM_ADMIN_PASS on $s"
                         KinitAs $s $DS_USER $DM_ADMIN_PASS
-                        ret=$?
-                        if [ $ret -ne 0 ]; then
+                        if [ $? -ne 0 ]; then
                                 echo "ERROR - kinit on $s failed"
 				echo "Test - $tet_thistest - ResetKinit"
-                                tet_result FAIL
+				return 1
                         fi
                 fi
         done
+	return 0
 }
 
 tp1()
@@ -120,6 +119,7 @@ tp1a()
 {
         echo "START $tet_thistest"
 	ResetKinit
+	if [ $? -ne 0 ]; then echo "ERROR - ResetKinit failed in $tet_thistest"; tet_result FAIL; fi
         tet_result PASS
         echo "END $tet_thistest"
 }
@@ -157,12 +157,14 @@ tp2()
 
 	# Get a new admin ticket to be sure that the ticket won't be expired
 	ResetKinit	
+	if [ $? -ne 0 ]; then echo "ERROR - ResetKinit failed in $tet_thistest"; tet_result FAIL; fi
 
 	eval_vars M1
 	# add user to test with
+#	ssh root@$FULLHOSTNAME "ipa user-del $user1;ipa add-user --first='test user 1' --last='lastname' $user1;"
 	ssh root@$FULLHOSTNAME "ipa-deluser $user1;ipa-adduser -f 'test user 1' -l 'lastname' $user1;"
 	if [ $? != 0 ]; then
-		echo "ERROR - ipa-adduser failed on $FULLHOSTNAME";
+		echo "ERROR - ipa user-add failed on $FULLHOSTNAME";
 		echo "Test - $tet_thistest"
 		tet_result FAIL
 	fi
@@ -293,6 +295,7 @@ tp2()
 
 	# Reset the kinit on all of the machines
 	ResetKinit
+	if [ $? -ne 0 ]; then echo "ERROR - ResetKinit failed in $tet_thistest"; tet_result FAIL; fi
 	# Return pw policy to default
 	eval_vars M1
 	ssh root@$FULLHOSTNAME "ipa-pwpolicy --minlife 0"
@@ -337,6 +340,7 @@ tp2a()
 
 	# Get a new admin ticket to be sure that the ticket won't be expired
 	ResetKinit	
+	if [ $? -ne 0 ]; then echo "ERROR - ResetKinit failed in $tet_thistest"; tet_result FAIL; fi
 
 	eval_vars M1
 	# add user to test with
@@ -408,6 +412,7 @@ tp2a()
 
 	# Reset the kinit on all of the machines
 	ResetKinit
+	if [ $? -ne 0 ]; then echo "ERROR - ResetKinit failed in $tet_thistest"; tet_result FAIL; fi
 	# Return pw policy to default
 	eval_vars M1
 	ssh root@$FULLHOSTNAME "ipa-pwpolicy --minlife 0"
@@ -472,6 +477,7 @@ tp2b()
 
 	# Reset the kinit on all of the machines
 	ResetKinit
+	if [ $? -ne 0 ]; then echo "ERROR - ResetKinit failed in $tet_thistest"; tet_result FAIL; fi
 	# Return pw policy to default
 	eval_vars M1
 	ssh root@$FULLHOSTNAME "ipa-pwpolicy --minlife 0"
@@ -503,6 +509,7 @@ tp2c()
 
 	# Reset the kinit on all of the machines
 	ResetKinit
+	if [ $? -ne 0 ]; then echo "ERROR - ResetKinit failed in $tet_thistest"; tet_result FAIL; fi
 	# Return pw policy to default
 	eval_vars M1
 	
@@ -570,6 +577,7 @@ tp3()
 	eval_vars M1
 	# set date on m1 to make sure it's what we think it is
 	ResetKinit	
+	if [ $? -ne 0 ]; then echo "ERROR - ResetKinit failed in $tet_thistest"; tet_result FAIL; fi
 	get_time
 	ssh root@$FULLHOSTNAME "date $month$day$hour$min$year"
 	if [ $? -ne 0 ]; then
@@ -708,12 +716,14 @@ tp3()
 
 	# Reset the kinit on all of the machines
 	ResetKinit
+	if [ $? -ne 0 ]; then echo "ERROR - ResetKinit failed in $tet_thistest"; tet_result FAIL; fi
 	# Return pw policy to default
 	eval_vars M1
 	# cleaning up the user
 	ssh root@$FULLHOSTNAME "ipa-deluser $user1"
 	if [ $? -ne 0 ]; then
 		ResetKinit
+		if [ $? -ne 0 ]; then echo "ERROR - ResetKinit failed in $tet_thistest"; tet_result FAIL; fi
 		ssh root@$FULLHOSTNAME "ipa-deluser $user1"
 	fi
 
@@ -752,6 +762,7 @@ tp3a()
 
 	# Reset the kinit on all of the machines
 	ResetKinit
+	if [ $? -ne 0 ]; then echo "ERROR - ResetKinit failed in $tet_thistest"; tet_result FAIL; fi
 	# Return pw policy to default
 	eval_vars M1
 	
@@ -827,6 +838,7 @@ tp3b()
 
 	# Get a new admin ticket to be sure that the ticket won't be expired
 	ResetKinit	
+	if [ $? -ne 0 ]; then echo "ERROR - ResetKinit failed in $tet_thistest"; tet_result FAIL; fi
 
 	eval_vars M1
 
@@ -958,6 +970,7 @@ tp3b()
 
 	# Reset the kinit on all of the machines
 	ResetKinit
+	if [ $? -ne 0 ]; then echo "ERROR - ResetKinit failed in $tet_thistest"; tet_result FAIL; fi
 	# Return pw policy to default
 	eval_vars M1
 	# cleaning up the user
@@ -1012,6 +1025,7 @@ tp4()
 
 	# Get a new admin ticket to be sure that the ticket won't be expired
 	ResetKinit	
+	if [ $? -ne 0 ]; then echo "ERROR - ResetKinit failed in $tet_thistest"; tet_result FAIL; fi
 
 	eval_vars M1	
 
@@ -1272,6 +1286,7 @@ tp4()
 
 	# Reset the kinit on all of the machines
 	ResetKinit
+	if [ $? -ne 0 ]; then echo "ERROR - ResetKinit failed in $tet_thistest"; tet_result FAIL; fi
 	# Return pw policy to default
 	eval_vars M1
 	# cleaning up the user
@@ -1316,6 +1331,7 @@ tp4a()
 
 	# Get a new admin ticket to be sure that the ticket won't be expired
 	ResetKinit	
+	if [ $? -ne 0 ]; then echo "ERROR - ResetKinit failed in $tet_thistest"; tet_result FAIL; fi
 
 	eval_vars M1	
 	# add user to test with
@@ -1458,6 +1474,7 @@ tp4a()
 
 	# Reset the kinit on all of the machines
 	ResetKinit
+	if [ $? -ne 0 ]; then echo "ERROR - ResetKinit failed in $tet_thistest"; tet_result FAIL; fi
 	# Return pw policy to default
 	eval_vars M1
 	# cleaning up the user
@@ -1493,6 +1510,7 @@ tp4b()
 
 	# Get a new admin ticket to be sure that the ticket won't be expired
 	ResetKinit	
+	if [ $? -ne 0 ]; then echo "ERROR - ResetKinit failed in $tet_thistest"; tet_result FAIL; fi
 
 	eval_vars M1	
 
@@ -1640,6 +1658,7 @@ tp5()
 
 	# Reset the kinit on all of the machines
 	ResetKinit
+	if [ $? -ne 0 ]; then echo "ERROR - ResetKinit failed in $tet_thistest"; tet_result FAIL; fi
 	# Return pw policy to default
 	eval_vars M1
 	# cleaning up the user
@@ -1739,6 +1758,7 @@ tp5a()
 
 	# Reset the kinit on all of the machines
 	ResetKinit
+	if [ $? -ne 0 ]; then echo "ERROR - ResetKinit failed in $tet_thistest"; tet_result FAIL; fi
 	# Return pw policy to default
 	eval_vars M1
 	# cleaning up the user
@@ -1924,6 +1944,7 @@ tp6()
 
 	# Reset the kinit on all of the machines
 	ResetKinit
+	if [ $? -ne 0 ]; then echo "ERROR - ResetKinit failed in $tet_thistest"; tet_result FAIL; fi
 	# Return pw policy to default
 	eval_vars M1
 	# cleaning up the user
@@ -2050,6 +2071,7 @@ tp6a()
 
 	# Reset the kinit on all of the machines
 	ResetKinit
+	if [ $? -ne 0 ]; then echo "ERROR - ResetKinit failed in $tet_thistest"; tet_result FAIL; fi
 	# Return pw policy to default
 	eval_vars M1
 	# cleaning up the user
