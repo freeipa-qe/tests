@@ -8,6 +8,7 @@
 . $mainRunBaseDir/stress/kinit/engage.kinit
 . $mainRunBaseDir/stress/ipaadduser/engage.ipaadduser
 . $mainRunBaseDir/stress/ipahoststress/engage.ipahoststress
+. $mainRunBaseDir/stress/ipahostgrpstress/engage.ipahostgrpstress
 
 #####################################################
 
@@ -17,6 +18,7 @@ stress_default()
 	kinit_default
 	ipaadduser_default
 	ipahoststress_default
+	ipahostgrpstress_default
 	quickuninstall_default
 }
 
@@ -28,6 +30,7 @@ stress_ask()
 		kinit_ask
 		ipaadduser_ask
 		ipahoststress_ask
+		ipahostgrpstress_ask
 		quickuninstall_ask
 }
 
@@ -39,6 +42,7 @@ stress_print()
 		kinit_print
 		ipaadduser_print
 		ipahoststress_print
+		ipahostgrpstress_print
 		quickuninstall_print
 }
 
@@ -52,6 +56,7 @@ stress_save()
 	kinit_save
 	ipaadduser_save
 	ipahoststress_save
+	ipahostgrpstress_save
 	quickuninstall_save
 }
 
@@ -65,6 +70,7 @@ stress_check()
 		kinit_check
 		ipaadduser_check
 		ipahoststress_check
+		ipahostgrpstress_check
 		quickuninstall_check
 }
 
@@ -93,6 +99,11 @@ TET_SUITE_ROOT=$mainRunBaseDir/ipahoststress; export TET_SUITE_ROOT
 if [ $MainRunStartup = y ] ; then ipahoststress_startup ; fi
 if [ $MainRunTests = y ] ; then ipahoststress_run ; fi
 if [ $MainRunCleanup = y ] ; then ipahoststress_cleanup ; fi
+
+TET_SUITE_ROOT=$mainRunBaseDir/ipahostgrpstress; export TET_SUITE_ROOT
+if [ $MainRunStartup = y ] ; then ipahostgrpstress_startup ; fi
+if [ $MainRunTests = y ] ; then ipahostgrpstress_run ; fi
+if [ $MainRunCleanup = y ] ; then ipahostgrpstress_cleanup ; fi
 
 TET_SUITE_ROOT=$mainRunBaseDir/acceptance; export TET_SUITE_ROOT
 if [ $MainRunStartup = y ] ; then quickuninstall_startup ; fi
