@@ -213,7 +213,7 @@ tp6()
 tp7()
 {
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	# Verify that ipa-findgroup and grep fails when it's given bad info on all servers
+	# Verify that ipa group-show --all and grep fails when it's given bad info on all servers
 	echo "START $tet_thistest"
 	for s in $SERVERS; do
 		if [ "$s" != "" ]; then
@@ -423,7 +423,7 @@ tp10()
 		if [ "$s" != "" ]; then
 			echo "Verifying that user-3-1 exists in group-3-1 on $s"
 			eval_vars $s
-			ssh root@$FULLHOSTNAME "ipa-findgroup group-3-1 | grep uid=user-3-1"
+			ssh root@$FULLHOSTNAME "ipa group-show --all group-3-1 | grep uid=user-3-1"
 			if [ $? -ne 0 ]; then
 				echo "ERROR - user-3-1 does not exist in group-3-1 on $s"
 				tet_result FAIL
@@ -619,7 +619,7 @@ ipa user-del user-41d;"
 	eval_vars M1
 	ssh root@$FULLHOSTNAME "ipa group-del group-4d-1"	
 	if [ $? -ne 0 ]; then
-		echo "ipa-delgroup group-4d-1 failed"
+		echo "ipa group-del group-4d-1 failed"
 		tet_result FAIL
 	fi
 
@@ -943,7 +943,7 @@ ipa group-del $grp2; \
 ipa group-del $grp3; \
 ipa group-del $grp4; "
 	if [ $? -ne 0 ]; then
-		echo "ERROR, ipa-delgroup failed on M1, section 12"
+		echo "ERROR, ipa group-del failed on M1, section 12"
 		tet_result FAIL
 	fi
 
@@ -976,21 +976,21 @@ tp14()
 ####11. delete group member till the top level group became an empty group
 
 	# Cleanup, just in case things exist that shouldn't
-ssh root@$FULLHOSTNAME "ipa-delgroup group-4-1; \
-ipa-delgroup group-4a-1; \
-ipa-delgroup group-4b-1; \
-ipa-delgroup group-4c-1; \
-ipa-delgroup group-4d-1; \
-ipa-deluser user-4-1; \
-ipa-deluser user-5-1"
+ssh root@$FULLHOSTNAME "ipa group-del group-4-1; \
+ipa group-del group-4a-1; \
+ipa group-del group-4b-1; \
+ipa group-del group-4c-1; \
+ipa group-del group-4d-1; \
+ipa user-del user-4-1; \
+ipa user-del user-5-1"
 
-	ssh root@$FULLHOSTNAME "ipa-addgroup group-5-1 -g 977 -d 'this group will be the top level group'; \
-ipa-addgroup group-4-1 -g 755 -d 'group 4 1 for testing'; \
-ipa-addgroup group-e4-1 -g 756 -d 'empty group 4 1 for testing'; \
-ipa-adduser -f 'user 4 1' -l 'lastname' user-4-1; \
-ipa-modgroup --groupadd group-e4-1 group-4-1; \
-ipa-modgroup --groupadd group-4-1 group-5-1; \
-ipa-modgroup --add user-4-1 group-4-1;"
+	ssh root@$FULLHOSTNAME "ipa group-add --gid=977 --description='this group will be the top level group' group-5-1; \
+ipa group-add --gid=755 --description='group 4 1 for testing' group-4-1; \
+ipa group-add --gid=756 --description='empty group 4 1 for testing' group-e4-1; \
+ipa user-add --first='user 4 1' --last='lastname' user-4-1; \
+ipa group-add-member --groups=group-e4-1 group-4-1;\
+ipa group-add-member --groups=group-4-1 group-5-1;\
+ipa group-add-member --users=user-4-1 group-4-1;"
 	if [ $? -ne 0 ]; then
 		echo "ERROR - $tet_thistest failed in section 1"
 		tet_result FAIL
@@ -999,46 +999,39 @@ ipa-modgroup --add user-4-1 group-4-1;"
 	ssh root@$FULLHOSTNAME "ipa-moduser --firstname look1 user-4-1; \
 ipa-moduser --firstname look2 user-4-1; \
 ipa-moduser --firstname look3 user-4-1; \
-ipa-deluser user-4-1; \
-ipa-modgroup --setattr cn=group-4c-1 group-4-1;"
+ipa user-del user-4-1; \
+ipa group-mod --setattr cn=group-4c-1 group-4-1;"
 	if [ $? -ne 0 ]; then
 		echo "ERROR - $tet_thistest failed in section 2"
 		tet_result FAIL
 	fi
 
-	ssh root@$FULLHOSTNAME "ipa-findgroup group-4c-1"
+	ssh root@$FULLHOSTNAME "ipa group-show --all group-4c-1"
 	if [ $? -ne 0 ]; then
 		echo "ERROR - $tet_thistest failed in section 2"
 		tet_result FAIL
 	fi
 
-	ssh root@$FULLHOSTNAME "ipa-addgroup group-4-1a -g 761 -d 'group 4 1a for testing'; \
-ipa-addgroup group-4-1b -g 762 -d 'group 4 1b for testing'; \
-ipa-addgroup group-4-1c -g 763 -d 'group 4 1c for testing'; \
-ipa-addgroup group-4-1d -g 764 -d 'group 4 1d for testing'; \
-ipa-adduser -f 'user 4 1a' -l 'lastname' user-41a; \
-ipa-adduser -f 'user 4 1b' -l 'lastname' user-41b; \
-ipa-adduser -f 'user 4 1c' -l 'lastname' user-41c; \
-ipa-adduser -f 'user 4 1d' -l 'lastname' user-41d; "
+	ssh root@$FULLHOSTNAME "ipa group-add --gid=761 --description='group 4 1a for testing' group-4-1a; \
+ipa group-add --gid=762 --description='group 4 1b for testing' group-4-1b; \
+ipa group-add --gid=763 --description='group 4 1c for testing' group-4-1c; \
+ipa group-add --gid=764 --description='group 4 1d for testing' group-4-1d; \
+ipa user-add --first='user 4 1a' --last='lastname' user-41a; \
+ipa user-add --first='user 4 1b' --last='lastname' user-41b; \
+ipa user-add --first='user 4 1c' --last='lastname' user-41c; \
+ipa user-add --first='user 4 1d' --last='lastname' user-41d; "
 	if [ $? -ne 0 ]; then
 		echo "ERROR - $tet_thistest failed in section 3"
 		tet_result FAIL
 	fi
 
-	ssh root@$FULLHOSTNAME "ipa-modgroup --groupadd group-4-1a group-4c-1;\
-ipa-modgroup --groupadd group-4-1b group-4c-1; \
-ipa-modgroup --groupadd group-4-1c group-4c-1; \
-ipa-modgroup --groupadd group-4-1d group-4c-1; \
-ipa-modgroup --add user-41a group-4c-1; \
-ipa-modgroup --add user-41b group-4c-1; \
-ipa-modgroup --add user-41c group-4c-1; \
-ipa-modgroup --add user-41d group-4c-1;"
+	ssh root@$FULLHOSTNAME "ipa group-add-member --users=user-41a,user-41b,user-41c,user-41d --groups=group-4-1a,group-4-1b,group-4-1c,group-4-1d group-4c-1;"
 	if [ $? -ne 0 ]; then
 		echo "ERROR - $tet_thistest failed in section 4"
 		tet_result FAIL
 	fi
 
-	ssh root@$FULLHOSTNAME "ipa-modgroup --setattr cn=group-4d-1 group-4c-1;"
+	ssh root@$FULLHOSTNAME "ipa group-mod --setattr cn=group-4d-1 group-4c-1;"
 	if [ $? -ne 0 ]; then
 		echo "ERROR, rename of group-4c-1 on M1 failed"
 		tet_result FAIL
@@ -1050,7 +1043,7 @@ ipa-modgroup --add user-41d group-4c-1;"
 		if [ "$s" != "" ]; then
 			eval_vars $s
 			for c in $checklist; do
-				ssh root@$FULLHOSTNAME "ipa-findgroup group-5-1 | grep $c"
+				ssh root@$FULLHOSTNAME "ipa group-show --all group-5-1 | grep $c"
 				if [ $? -ne 0 ]; then
 					echo "ERROR - $tet_thistest failed in section 5 at $c"
 					tet_result FAIL
@@ -1065,7 +1058,7 @@ ipa-modgroup --add user-41d group-4c-1;"
 			eval_vars $s
 			if [ "$OS_VER" -eq "5" ] && [ "$OS" -eq "RHEL" ]; then
 				for c in $checklist; do
-					ssh root@$FULLHOSTNAME "ipa-findgroup group-5-1 | grep $c"
+					ssh root@$FULLHOSTNAME "ipa group-show --all group-5-1 | grep $c"
 					if [ $? -ne 0 ]; then
 						echo "ERROR - $tet_thistest failed in section 6 at $c"
 						tet_result FAIL
@@ -1080,20 +1073,20 @@ ipa-modgroup --add user-41d group-4c-1;"
 	done
 
 	eval_vars M1
-	ssh root@$FULLHOSTNAME "ipa-delgroup group-4-1a; \
-ipa-delgroup group-4-1b; \
-ipa-delgroup group-4-1c; \
-ipa-delgroup group-4-1d;"
+	ssh root@$FULLHOSTNAME "ipa group-del group-4-1a; \
+ipa group-del group-4-1b; \
+ipa group-del group-4-1c; \
+ipa group-del group-4-1d;"
 	if [ $? -ne 0 ]; then
 		echo "ERROR - $tet_thistest failed in section 7"
 		tet_result FAIL
 	fi
 
 
-	ssh root@$FULLHOSTNAME "ipa-deluser user-41a; \
-ipa-deluser user-41b; \
-ipa-deluser user-41c; \
-ipa-deluser user-41d;"
+	ssh root@$FULLHOSTNAME "ipa user-del user-41a; \
+ipa user-del user-41b; \
+ipa user-del user-41c; \
+ipa user-del user-41d;"
 	if [ $? -ne 0 ]; then
 		echo "ERROR - $tet_thistest failed in section 8"
 		tet_result FAIL
@@ -1104,7 +1097,7 @@ ipa-deluser user-41d;"
 		if [ "$s" != "" ]; then
 			eval_vars $s
 			for c in $checklist; do
-				ssh root@$FULLHOSTNAME "ipa-findgroup group-5-1 | grep $c"
+				ssh root@$FULLHOSTNAME "ipa group-show --all group-5-1 | grep $c"
 				if [ $? -eq 0 ]; then
 					echo "ERROR - $tet_thistest failed in section 9 at $c"
 					tet_result FAIL
@@ -1114,8 +1107,8 @@ ipa-deluser user-41d;"
 	done
 
 	# A little more cleanup
-	ssh root@$FULLHOSTNAME "ipa-delgroup group-5-1; \
-ipa-delgroup group-4-d-1; "
+	ssh root@$FULLHOSTNAME "ipa group-del group-5-1; \
+ipa group-del group-4-d-1; "
 
 	tet_result PASS
 	echo "END $tet_thistest"
@@ -1151,35 +1144,33 @@ tp15()
 
 	eval_vars M1
 	# set up groups
-	ssh root@$FULLHOSTNAME "ipa-addgroup $grp1 -g 87 -d 'group 6 2 for testing'; \
-ipa-addgroup $grp2 -g 75 -d 'group 6 2 for level 2 testing'; \
-ipa-addgroup $grp3 -g 76 -d ' group 6 2 for level 3 testing'; "
+	ssh root@$FULLHOSTNAME "ipa group-add --gid=87 --description='group 6 2 for testing' $grp1; \
+ipa group-add --gid=75 --description='group 6 2 for level 2 testing' $grp2; \
+ipa group-add --gid=76 --description=' group 6 2 for level 3 testing' $grp3; "
 	if [ $? -ne 0 ]; then
 		echo "ERROR - $tet_thistest failed in section 1"
 		tet_result FAIL
 	fi
 
 	# set up users
-	ssh root@$FULLHOSTNAME "ipa-adduser -f 'user 6 2a' -l 'lastname' $user1; \
-	ipa-adduser -f 'user 6 2b' -l 'lastname' $user2; \
-	ipa-adduser -f 'user 6 2c' -l 'lastname' $user3; "
+	ssh root@$FULLHOSTNAME "ipa user-add --first='user 6 2a' --last='lastname' $user1; \
+	ipa user-add --first='user 6 2b' --last='lastname' $user2; \
+	ipa user-add --first='user 6 2c' --last='lastname' $user3; "
 	if [ $? -ne 0 ]; then
 		echo "ERROR - $tet_thistest failed in section 2"
 		tet_result FAIL
 	fi
 
 	# add groups to themselfs 
-	ssh root@$FULLHOSTNAME "ipa-modgroup --groupadd $grp2 $grp1; \
-ipa-modgroup --groupadd $grp3 $grp2;"
+	ssh root@$FULLHOSTNAME "ipa group-add-member --groups=$grp2,$grp3 $grp1;"
 	if [ $? -ne 0 ]; then
 		echo "ERROR - $tet_thistest failed in section 3"
 		tet_result FAIL
 	fi
 
 	# add users to group 2
-	 ssh root@$FULLHOSTNAME "ipa-modgroup --add $user1 $grp2; \
-ipa-modgroup --add $user2 $grp2; \
-ipa-modgroup --add $user3 $grp1;"
+	ssh root@$FULLHOSTNAME "ipa group-add-member --users=$user1,$user2 $grp2; \
+ipa group-add-member --users=$user3 $grp1;"
 	if [ $? -ne 0 ]; then
 		echo "ERROR - $tet_thistest failed in section 4"
 		tet_result FAIL
@@ -1189,24 +1180,24 @@ ipa-modgroup --add $user3 $grp1;"
 	for s in $SERVERS; do
 		if [ "$s" != "" ]; then
 			eval_vars $s
-			ssh root@$FULLHOSTNAME "ipa-findgroup -v $grp1 | grep $user1"
+			ssh root@$FULLHOSTNAME "ipa group-show --all $grp1 | grep $user1"
 			if [ $? -ne 0 ]; then
-				echo "ERROR - ipa-findgroup failed on section 5"
+				echo "ERROR - ipa group-show --all failed on section 5"
 				tet_result FAIL
 			fi
-			ssh root@$FULLHOSTNAME "ipa-findgroup -v $grp1 | grep $user2"
+			ssh root@$FULLHOSTNAME "ipa group-show --all $grp1 | grep $user2"
 			if [ $? -ne 0 ]; then
-				echo "ERROR - ipa-findgroup failed on section 6"
+				echo "ERROR - ipa group-show --all failed on section 6"
 				tet_result FAIL
 			fi
-			ssh root@$FULLHOSTNAME "ipa-findgroup -v $grp1 | grep $user3"
+			ssh root@$FULLHOSTNAME "ipa group-show --all $grp1 | grep $user3"
 			if [ $? -ne 0 ]; then
-				echo "ERROR - ipa-findgroup failed on section 6a"
+				echo "ERROR - ipa group-show --all failed on section 6a"
 				tet_result FAIL
 			fi
-			ssh root@$FULLHOSTNAME "ipa-findgroup -v $grp3 | grep -e $user2 -e $user3"
+			ssh root@$FULLHOSTNAME "ipa group-show --all $grp3 | grep -e $user2 -e $user3"
 			if [ $? -eq 0 ]; then
-				echo "ERROR - ipa-findgroup failed on section 7"
+				echo "ERROR - ipa group-show --all failed on section 7"
 				tet_result FAIL
 			fi
 		fi
@@ -1215,24 +1206,24 @@ ipa-modgroup --add $user3 $grp1;"
 		if [ "$s" != "" ]; then
 			eval_vars $s
 			if [ "$OS_VER" -eq "5" ] && [ "$OS" -eq "RHEL" ]; then
-				ssh root@$FULLHOSTNAME "ipa-findgroup -v $grp1 | grep $user1"
+				ssh root@$FULLHOSTNAME "ipa group-show --all $grp1 | grep $user1"
 				if [ $? -ne 0 ]; then
-					echo "ERROR - ipa-findgroup failed on section 8"
+					echo "ERROR - ipa group-show --all failed on section 8"
 					tet_result FAIL
 				fi
-				ssh root@$FULLHOSTNAME "ipa-findgroup -v $grp1 | grep $user2"
+				ssh root@$FULLHOSTNAME "ipa group-show --all $grp1 | grep $user2"
 				if [ $? -ne 0 ]; then
-					echo "ERROR - ipa-findgroup failed on section 9"
+					echo "ERROR - ipa group-show --all failed on section 9"
 					tet_result FAIL
 				fi
-				ssh root@$FULLHOSTNAME "ipa-findgroup -v $grp1 | grep $user3"
+				ssh root@$FULLHOSTNAME "ipa group-show --all $grp1 | grep $user3"
 				if [ $? -ne 0 ]; then
-					echo "ERROR - ipa-findgroup failed on section 9a"
+					echo "ERROR - ipa group-show --all failed on section 9a"
 					tet_result FAIL
 				fi
-				ssh root@$FULLHOSTNAME "ipa-findgroup -v $grp3 | grep -e $user2 -e $user3"
+				ssh root@$FULLHOSTNAME "ipa group-show --all $grp3 | grep -e $user2 -e $user3"
 				if [ $? -eq 0 ]; then
-					echo "ERROR - ipa-findgroup failed on section 10"
+					echo "ERROR - ipa group-show --all failed on section 10"
 					tet_result FAIL
 				fi
 			else
@@ -1249,7 +1240,7 @@ ipa-modgroup --add $user3 $grp1;"
 	fi
 
 	# delete user type member at level 1
-	ssh root@$FULLHOSTNAME "ipa-deluser $user2"
+	ssh root@$FULLHOSTNAME "ipa user-del $user2"
 	if [ $? -ne 0 ]; then
 		echo "ERROR - $tet_thistest failed in section 12"
 		tet_result FAIL
@@ -1259,24 +1250,24 @@ ipa-modgroup --add $user3 $grp1;"
 	for s in $SERVERS; do
 		if [ "$s" != "" ]; then
 			eval_vars $s
-			ssh root@$FULLHOSTNAME "ipa-findgroup -v $grp1 | grep $user1alt"
+			ssh root@$FULLHOSTNAME "ipa group-show --all $grp1 | grep $user1alt"
 			if [ $? -ne 0 ]; then
-				echo "ERROR - ipa-findgroup failed on section 13"
+				echo "ERROR - ipa group-show --all failed on section 13"
 				tet_result FAIL
 			fi
-			ssh root@$FULLHOSTNAME "ipa-findgroup -v $grp2 | grep $user1alt"
+			ssh root@$FULLHOSTNAME "ipa group-show --all $grp2 | grep $user1alt"
 			if [ $? -ne 0 ]; then
-				echo "ERROR - ipa-findgroup failed on section 14"
+				echo "ERROR - ipa group-show --all failed on section 14"
 				tet_result FAIL
 			fi
-			ssh root@$FULLHOSTNAME "ipa-findgroup -v $grp2 | grep $user2"
+			ssh root@$FULLHOSTNAME "ipa group-show --all $grp2 | grep $user2"
 			if [ $? -eq 0 ]; then
-				echo "ERROR - ipa-findgroup failed on section 15"
+				echo "ERROR - ipa group-show --all failed on section 15"
 				tet_result FAIL
 			fi
-			ssh root@$FULLHOSTNAME "ipa-findgroup -v $grp1 | grep $user2"
+			ssh root@$FULLHOSTNAME "ipa group-show --all $grp1 | grep $user2"
 			if [ $? -eq 0 ]; then
-				echo "ERROR - ipa-findgroup failed on section 16"
+				echo "ERROR - ipa group-show --all failed on section 16"
 				tet_result FAIL
 			fi
 
@@ -1286,24 +1277,24 @@ ipa-modgroup --add $user3 $grp1;"
 		if [ "$s" != "" ]; then
 			eval_vars $s
 			if [ "$OS_VER" -eq "5" ] && [ "$OS" -eq "RHEL" ]; then
-				ssh root@$FULLHOSTNAME "ipa-findgroup -v $grp1 | grep $user1alt"
+				ssh root@$FULLHOSTNAME "ipa group-show --all $grp1 | grep $user1alt"
 				if [ $? -ne 0 ]; then
-					echo "ERROR - ipa-findgroup failed on section 17"
+					echo "ERROR - ipa group-show --all failed on section 17"
 					tet_result FAIL
 				fi
-				ssh root@$FULLHOSTNAME "ipa-findgroup -v $grp2 | grep $user1alt"
+				ssh root@$FULLHOSTNAME "ipa group-show --all $grp2 | grep $user1alt"
 				if [ $? -ne 0 ]; then
-					echo "ERROR - ipa-findgroup failed on section 18"
+					echo "ERROR - ipa group-show --all failed on section 18"
 					tet_result FAIL
 				fi
-				ssh root@$FULLHOSTNAME "ipa-findgroup -v $grp2 | grep $user2"
+				ssh root@$FULLHOSTNAME "ipa group-show --all $grp2 | grep $user2"
 				if [ $? -eq 0 ]; then
-					echo "ERROR - ipa-findgroup failed on section 19"
+					echo "ERROR - ipa group-show --all failed on section 19"
 					tet_result FAIL
 				fi
-				ssh root@$FULLHOSTNAME "ipa-findgroup -v $grp1 | grep $user2"
+				ssh root@$FULLHOSTNAME "ipa group-show --all $grp1 | grep $user2"
 				if [ $? -eq 0 ]; then
-					echo "ERROR - ipa-findgroup failed on section 20"
+					echo "ERROR - ipa group-show --all failed on section 20"
 					tet_result FAIL
 				fi
 			else
@@ -1314,16 +1305,16 @@ ipa-modgroup --add $user3 $grp1;"
 
 	eval_vars M1
 	# user in level 2 move to level 1
-	ssh root@$FULLHOSTNAME "ipa-modgroup --add $user1alt $grp1; \
-ipa-modgroup --remove $user1alt $grp2;"
+	ssh root@$FULLHOSTNAME "ipa group-add-member --users=$user1alt $grp1; \
+ipa group-remove-member --users=$user1alt $grp2;"
 	if [ $? -ne 0 ]; then
 		echo "ERROR - $tet_thistest failed in section 21"
 		tet_result FAIL
 	fi
 
 	# user in level 1 move to level 2
-	ssh root@$FULLHOSTNAME "ipa-modgroup --add $user3 $grp2; \
-ipa-modgroup --remove $user3 $grp1;"
+ssh root@$FULLHOSTNAME "ipa group-add-member --users=$user3 $grp2; \
+ipa group-remove-member --users=$user3 $grp1;"
 	if [ $? -ne 0 ]; then
 		echo "ERROR - $tet_thistest failed in section 22"
 		tet_result FAIL
@@ -1333,24 +1324,24 @@ ipa-modgroup --remove $user3 $grp1;"
 	for s in $SERVERS; do
 		if [ "$s" != "" ]; then
 			eval_vars $s
-			ssh root@$FULLHOSTNAME "ipa-findgroup -v $grp1 | grep $user1alt"
+			ssh root@$FULLHOSTNAME "ipa group-show --all $grp1 | grep $user1alt"
 			if [ $? -ne 0 ]; then
-				echo "ERROR - ipa-findgroup failed on section 23"
+				echo "ERROR - ipa group-show --all failed on section 23"
 				tet_result FAIL
 			fi
-			ssh root@$FULLHOSTNAME "ipa-findgroup -v $grp2 | grep $user1alt"
+			ssh root@$FULLHOSTNAME "ipa group-show --all $grp2 | grep $user1alt"
 			if [ $? -eq 0 ]; then
-				echo "ERROR - ipa-findgroup failed on section 24"
+				echo "ERROR - ipa group-show --all failed on section 24"
 				tet_result FAIL
 			fi
-			ssh root@$FULLHOSTNAME "ipa-findgroup -v $grp2 | grep $user3"
+			ssh root@$FULLHOSTNAME "ipa group-show --all $grp2 | grep $user3"
 			if [ $? -ne 0 ]; then
-				echo "ERROR - ipa-findgroup failed on section 25"
+				echo "ERROR - ipa group-show --all failed on section 25"
 				tet_result FAIL
 			fi
-			ssh root@$FULLHOSTNAME "ipa-findgroup -v $grp1 | grep $user3"
+			ssh root@$FULLHOSTNAME "ipa group-show --all $grp1 | grep $user3"
 			if [ $? -ne 0 ]; then
-				echo "ERROR - ipa-findgroup failed on section 26"
+				echo "ERROR - ipa group-show --all failed on section 26"
 				tet_result FAIL
 			fi
 		fi
@@ -1359,24 +1350,24 @@ ipa-modgroup --remove $user3 $grp1;"
 		if [ "$s" != "" ]; then
 			eval_vars $s
 			if [ "$OS_VER" -eq "5" ] && [ "$OS" -eq "RHEL" ]; then
-				ssh root@$FULLHOSTNAME "ipa-findgroup -v $grp1 | grep $user1alt"
+				ssh root@$FULLHOSTNAME "ipa group-show --all $grp1 | grep $user1alt"
 				if [ $? -ne 0 ]; then
-					echo "ERROR - ipa-findgroup failed on section 27"
+					echo "ERROR - ipa group-show --all failed on section 27"
 					tet_result FAIL
 				fi
-				ssh root@$FULLHOSTNAME "ipa-findgroup -v $grp2 | grep $user1alt"
+				ssh root@$FULLHOSTNAME "ipa group-show --all $grp2 | grep $user1alt"
 				if [ $? -eq 0 ]; then
-					echo "ERROR - ipa-findgroup failed on section 28"
+					echo "ERROR - ipa group-show --all failed on section 28"
 					tet_result FAIL
 				fi
-				ssh root@$FULLHOSTNAME "ipa-findgroup -v $grp2 | grep $user3"
+				ssh root@$FULLHOSTNAME "ipa group-show --all $grp2 | grep $user3"
 				if [ $? -ne 0 ]; then
-					echo "ERROR - ipa-findgroup failed on section 29"
+					echo "ERROR - ipa group-show --all failed on section 29"
 					tet_result FAIL
 				fi
-				ssh root@$FULLHOSTNAME "ipa-findgroup -v $grp1 | grep $user3"
+				ssh root@$FULLHOSTNAME "ipa group-show --all $grp1 | grep $user3"
 				if [ $? -ne 0 ]; then
-					echo "ERROR - ipa-findgroup failed on section 30"
+					echo "ERROR - ipa group-show --all failed on section 30"
 					tet_result FAIL
 				fi
 			else
@@ -1387,7 +1378,7 @@ ipa-modgroup --remove $user3 $grp1;"
 
 	# delete user type member at level 1
 	eval_vars M1
-	ssh root@$FULLHOSTNAME "ipa-deluser $user3;"
+	ssh root@$FULLHOSTNAME "ipa user-del $user3;"
 	if [ $? -ne 0 ]; then
 		echo "ERROR - $tet_thistest failed in section 31"
 		tet_result FAIL
@@ -1396,14 +1387,14 @@ ipa-modgroup --remove $user3 $grp1;"
 	for s in $SERVERS; do
 		if [ "$s" != "" ]; then
 			eval_vars $s
-			ssh root@$FULLHOSTNAME "ipa-findgroup -v $grp1 | grep $user3"
+			ssh root@$FULLHOSTNAME "ipa group-show --all $grp1 | grep $user3"
 			if [ $? -eq 0 ]; then
-				echo "ERROR - ipa-findgroup failed on section 32"
+				echo "ERROR - ipa group-show --all failed on section 32"
 				tet_result FAIL
 			fi
-			ssh root@$FULLHOSTNAME "ipa-findgroup -v $grp2 | grep $user3"
+			ssh root@$FULLHOSTNAME "ipa group-show --all $grp2 | grep $user3"
 			if [ $? -eq 0 ]; then
-				echo "ERROR - ipa-findgroup failed on section 33"
+				echo "ERROR - ipa group-show --all failed on section 33"
 				tet_result FAIL
 			fi
 		fi
@@ -1412,14 +1403,14 @@ ipa-modgroup --remove $user3 $grp1;"
 		if [ "$s" != "" ]; then
 			eval_vars $s
 			if [ "$OS_VER" -eq "5" ] && [ "$OS" -eq "RHEL" ]; then
-				ssh root@$FULLHOSTNAME "ipa-findgroup -v $grp1 | grep $user3"
+				ssh root@$FULLHOSTNAME "ipa group-show --all $grp1 | grep $user3"
 				if [ $? -eq 0 ]; then
-					echo "ERROR - ipa-findgroup failed on section 34"
+					echo "ERROR - ipa group-show --all failed on section 34"
 					tet_result FAIL
 				fi
-				ssh root@$FULLHOSTNAME "ipa-findgroup -v $grp2 | grep $user3"
+				ssh root@$FULLHOSTNAME "ipa group-show --all $grp2 | grep $user3"
 				if [ $? -eq 0 ]; then
-					echo "ERROR - ipa-findgroup failed on section 35"
+					echo "ERROR - ipa group-show --all failed on section 35"
 					tet_result FAIL
 				fi
 			else
@@ -1431,13 +1422,13 @@ ipa-modgroup --remove $user3 $grp1;"
 
 	# Cleanup
 	eval_vars M1
-	ssh root@$FULLHOSTNAME "ipa-delgroup $grp1; \
-ipa-delgroup $grp2; \
-ipa-delgroup $grp3; \
-ipa-deluser $user1alt; \
-ipa-deluser $user3; \
-ipa-deluser $user1; \
-ipa-deluser $user2"
+	ssh root@$FULLHOSTNAME "ipa group-del $grp1; \
+ipa group-del $grp2; \
+ipa group-del $grp3; \
+ipa user-del $user1alt; \
+ipa user-del $user3; \
+ipa user-del $user1; \
+ipa user-del $user2"
 
 	tet_result PASS
 	echo "END $tet_thistest"
@@ -1463,12 +1454,11 @@ bug438891()
 	runnum=0
 	while [[ $runnum -lt $ITTERATIONS ]]; do
 		echo "Test $tet_thistest Itteration $runnum"
-		ssh root@$FULLHOSTNAME "ipa-addgroup $grp1 -g 37 -d 'group 438891a for testing'; \
-ipa-addgroup $grp2 -g 35 -d 'group 438891b for testing'; \
-ipa-adduser -f '438891' -l 'lastname' $user1; \
-ipa-modgroup --groupadd $grp2 $grp1; \
-ipa-modgroup --add $user1 $grp2; \
-ipa-modgroup --setattr cn=$grp1alt $grp1"
+		ssh root@$FULLHOSTNAME "ipa group-add --gid=37 --description='group 438891a for testing' $grp1; \
+ipa group-add --gid=35 --description='group 438891b for testing' $grp2; \
+ipa user-add --first='438891' --last='lastname' $user1; \
+ipa group-add-member --groups=$grp2 --users=$user1 $grp1; \
+ipa group-mod --setattr cn=$grp1alt $grp1"
 		if [ $? -ne 0 ]; then
 			echo "ERROR - $tet_thistest failed in section 1 itteration $runnum"
 			tet_result FAIL
@@ -1482,9 +1472,9 @@ ipa-modgroup --setattr cn=$grp1alt $grp1"
 		fi
 
 		# Cleanup
-		ssh root@$FULLHOSTNAME "ipa-deluser $user1; \
-ipa-delgroup $grp2; \
-ipa-delgroup $grp1alt;"
+		ssh root@$FULLHOSTNAME "ipa user-del $user1; \
+ipa group-del $grp2; \
+ipa group-del $grp1alt;"
 		
 		let runnum=$runnum+1
 	done	
@@ -1511,10 +1501,10 @@ bug439097()
 	runnum=0
 	while [[ $runnum -lt $ITTERATIONS ]]; do
 		echo "Test $tet_thistest Itteration $runnum"
-		ssh root@$FULLHOSTNAME "ipa-addgroup $grp1 -g 37 -d 'group 438891a for testing'; \
-ipa-adduser -f '438891' -l 'lastname' $user1; \
-ipa-modgroup --add $user1 $grp1; \
-ipa-modgroup --remove $user1 $grp1"
+		ssh root@$FULLHOSTNAME "ipa group-add --gid=37 --description='group 438891a for testing' $grp1; \
+ipa user-add --first='438891' --last='lastname' $user1; \
+ipa group-add-member --users=$user1 $grp1; \
+ipa group-remove-member --users=$user1 $grp1;"
 		if [ $? -ne 0 ]; then
 			echo "ERROR - $tet_thistest failed in section 1 itteration $runnum"
 			tet_result FAIL
@@ -1528,8 +1518,8 @@ ipa-modgroup --remove $user1 $grp1"
 		fi
 
 		# Cleanup
-		ssh root@$FULLHOSTNAME "ipa-deluser $user1; \
-ipa-delgroup $grp1;"
+		ssh root@$FULLHOSTNAME "ipa user-del $user1; \
+ipa group-del $grp1;"
 		
 		let runnum=$runnum+1
 	done	
@@ -1556,32 +1546,32 @@ bug439450()
 	runnum=0
 	while [[ $runnum -lt $ITTERATIONS ]]; do
 		echo "Test $tet_thistest Itteration $runnum"
-		ssh root@$FULLHOSTNAME "ipa-addgroup $grp1 -g 37 -d 'group a for testing'; \
-ipa-addgroup $grp2 -g 39 -d 'group b for testing'; \
-ipa-modgroup --groupadd $grp2 $grp1; \
-ipa-modgroup --groupadd $grp1 $grp2"
+		ssh root@$FULLHOSTNAME "ipa group-add --gid=37 --description='group a for testing' $grp1; \
+ipa group-add $grp2 --gid=39 --description='group b for testing' $grp2; \
+ipa group-add-members --groups=$grp2 $grp1; \
+ipa group-add-members --groups=$grp1 $grp2;" 
 		if [ $? -ne 0 ]; then
 			echo "ERROR - $tet_thistest failed in section 1 itteration $runnum"
 			tet_result FAIL
 		fi
 
 		# Now check to make sure that grp1 isn't listed as a member of grp1
-		ssh root@$FULLHOSTNAME "ipa-findgroup $grp1 | grep $grp1:"
+		ssh root@$FULLHOSTNAME "ipa group-show --all $grp1 | grep $grp1:"
 		if [ $? -eq 0 ]; then
 			echo "ERROR - $tet_thistest failed in section 2 itteration $runnum"
 			tet_result FAIL
 		fi
 
 		# Now check to make sure that grp2 isn't a member of grp2
-		ssh root@$FULLHOSTNAME "ipa-findgroup $grp2 | grep $grp2:"
+		ssh root@$FULLHOSTNAME "ipa group-show --all $grp2 | grep $grp2:"
 		if [ $? -eq 0 ]; then
 			echo "ERROR - $tet_thistest failed in section 3 itteration $runnum"
 			tet_result FAIL
 		fi
 
 		# Cleanup
-		ssh root@$FULLHOSTNAME "ipa-delgroup $grp1; \
-ipa-delgroup $grp2;"
+		ssh root@$FULLHOSTNAME "ipa group-del $grp1; \
+ipa group-del $grp2;"
 		
 		let runnum=$runnum+1
 	done	
@@ -1609,13 +1599,13 @@ bug439628()
 	runnum=0
 	while [[ $runnum -lt $ITTERATIONS ]]; do
 		echo "Test $tet_thistest Itteration $runnum"
-		ssh root@$FULLHOSTNAME "ipa-addgroup $grp1 -g 87 -d 'group a for testing'; \
-ipa-addgroup $grp2 -g 85 -d 'group b for testing'; \
-ipa-adduser -f 'u1' -l 'lastname' $user1; \
-ipa-modgroup --groupadd $grp2 $grp1; \
-ipa-modgroup --add $user1 $grp2; \
-ipa-modgroup --add $user1 $grp1; \
-ipa-modgroup --remove $user1 $grp1;"
+		ssh root@$FULLHOSTNAME "ipa group-add $grp1 --gid=87 --description='group a for testing' $grp1; \
+ipa group-add --gid=85 --description='group b for testing' $grp2; \
+ipa user-add --first='u1' --last='lastname' $user1; \
+ipa group-add-members --groups=$grp2 $grp1; \
+ipa group-add-members --users=$user1 $grp2; \
+ipa group-add-members --users=$user1 $grp1; \
+ipa group-remove-members --users=$user1 $grp1;"
 		if [ $? -ne 0 ]; then
 			echo "ERROR - $tet_thistest failed in section 1 itteration $runnum"
 			tet_result FAIL
@@ -1630,9 +1620,9 @@ ipa-modgroup --remove $user1 $grp1;"
 		fi
 
 		# Cleanup
-		ssh root@$FULLHOSTNAME "ipa-deluser $user1; \
-ipa-delgroup $grp1; \
-ipa-delgroup $grp2;"
+		ssh root@$FULLHOSTNAME "ipa user-del $user1; \
+ipa group-del $grp1; \
+ipa group-del $grp2;"
 		
 		let runnum=$runnum+1
 	done	
@@ -1686,24 +1676,24 @@ instclean()
 	echo "START Cleanup"
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 	eval_vars M1
-	ssh root@$FULLHOSTNAME "ipa-delgroup $group1"
+	ssh root@$FULLHOSTNAME "ipa group-del $group1"
 	if [ $? -ne 0 ]; then
 		echo "ERROR - delete of $group1 on $s failed"
 		tet_result FAIL
 	fi
-	ssh root@$FULLHOSTNAME "ipa-delgroup $group2"
+	ssh root@$FULLHOSTNAME "ipa group-del $group2"
 	if [ $? -ne 0 ]; then
 		echo "ERROR - delete of $group2 on $s failed"
 		tet_result FAIL
 	fi
 
-	ssh root@$FULLHOSTNAME "ipa-delgroup $grp3; \
-ipa-delgroup group-4-1; \
-ipa-delgroup group-4a-1; \
-ipa-delgroup group-4b-1; \
-ipa-delgroup group-4c-1; \
-ipa-delgroup group-4d-1; \
-ipa-deluser user-4-1"
+	ssh root@$FULLHOSTNAME "ipa group-del $grp3; \
+ipa group-del group-4-1; \
+ipa group-del group-4a-1; \
+ipa group-del group-4b-1; \
+ipa group-del group-4c-1; \
+ipa group-del group-4d-1; \
+ipa user-del user-4-1"
 
 	for s in $SERVERS; do
 		if [ "$s" != "" ]; then
