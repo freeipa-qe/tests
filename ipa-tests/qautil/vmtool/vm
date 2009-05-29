@@ -2,15 +2,29 @@
 . ./vmconf
 . ./functions
 
+#vmup mv32a qa
+#vmup mv64c qa
 #vmup mv32a ds81installed
+#vmup mv32b qa
+
+#vmsave_as mv32j ipacode ipa.v2.coding
+
+#vmsave_as mv32a ipav2rpm ipav2.rpm.installed
+vmsave_as mv32a ipav2installed ipav2.installed
+
+#vmupdate mv32a qa
+#vmupdate mv32a ipav2installed
+#vmupdate mv32b  qa
+
+
 #vmpoweron mv32a
-vmsave_as mv32a test just.test
+
 
 # Available functions
 # [vmup]
 #	usage  : vmup <vmlabel> <available environment>
 #	example: vmup mv64a ds81rpm
-#	  -- bring up one vm host (identified by vmlabel) to certain environment
+#	  -- shutdown current image, bring up one vm host (identified by vmlabel) to certain environment
 #
 # [vmupdate]
 #	usage  : vmupdate <vmlabel> <targetted environment>
@@ -42,6 +56,7 @@ vmsave_as mv32a test just.test
 #  | vmlabel	  OS         |  possible environment target  |  #
 #  +---------------------------------------------------------+  #
 #  |  mv32a   RHEL 5 i386    | qa, ds81rpm, ds81installed    |  #
+#  |                         | qa, ipav2rpm, ipav2installed  |  #
 #  |  mv32b          " "     | qa                            |  #
 #  |  mv32c          " "     | qa                            |  #
 #  |  mv32d   RHEL 4 i386    | qa, ds81rpm, ds81installed    |  #
@@ -50,10 +65,11 @@ vmsave_as mv32a test just.test
 #  |  mv32g   Window 2003    | qa                            |  #
 #  |  mv32h                  |                               |  #
 #  |  mv32i                  |                               |  #
-#  |  mv32j                  |                               |  #
+#  |  mv32j                  | startpoint ipacode            |  #
 #  |  -----------------------------------------------------  |  #
 #  |  mv64a   RHEL 5 x86_64  | qa, ds81rpm, ds81installed    |  #
 #  |  mv64b          " "     | qa, ds81rpm, ds81installed    |  #
+#  |                 " "     |     ipav2rpm,                 |  #
 #  |  mv64c          " "     | qa                            |  #
 #  |  mv64d   RHEL 4 x86_64  | qa, ds81rpm,                  |  #
 #  |  mv64e          " "     | qa                            |  #
