@@ -21,8 +21,12 @@ then
 	echo "using SERVER=[$SERVER]"
 fi
 
+echo "copy schema file to [$SERVER]"
+scp ./75autofs.ldif root@$SERVER:/etc/dirsrv/slapd-*/schema/
+echo "restart DS"
+ssh root@$SERVER "service dirsrv restart"
 
-echo "create to level container"
+echo "create top level container"
 $LDAPMODIFY -v -h $SERVER  -D "$CN" -w "$PW" -a -c <<_EOF
 dn: cn=automount,$DN
 objectClass: nsContainer
