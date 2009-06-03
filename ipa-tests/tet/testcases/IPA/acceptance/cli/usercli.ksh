@@ -16,11 +16,12 @@ if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 # The next line is required as it picks up data about the servers to use
 tet_startup="CheckAlive"
 tet_cleanup="user_cleanup"
-iclist="ic1 ic2 ic3 ic4"
+iclist="ic1 ic2 ic3 ic4 ic5"
 ic1="kinit"
 ic2="addusersetup addusera adduserb adduserc adduserd addusere adduserf negadduser"
 ic3="addlockuser kinit lock kinitlock kinit unlock kinitunlock kinit"
-ic4="addmoduser addmodgroup modfirst modlast modemail modprinc modhome modgecos modgroup modgroup2 moduid modstreet modshell"
+ic4="addmoduser modfirst modlast modemail modprinc modhome modgecos modgroup modgroup2 moduid modstreet modshell"
+ic5="deluser user_cleanup"
 
 # Users to be used in varios tests
 superuser="sup34"
@@ -36,12 +37,12 @@ lusrpw="o3948cyhdg65"
 
 # Users to be used in user-mod tests
 musr="msup88"
-musremail="$musr@really.cool.domain.co.uk.us.fi.com"
-musrprinc="principal$musr"
+memail="$musr@really.cool.domain.co.uk.us.fi.com"
+mprinc="principal$musr"
 mhome="/home2/$musr"
 mgecos="whatsgecos?"
-mfirst="Superuser"
-mlast="crazylastnametoolong"
+mfirst="NewFirst"
+mlast="NewLast"
 mshell="/bin/sh"
 mstreet="334 wolfsten way"
 muid="412842"
@@ -51,34 +52,35 @@ mgroup2="mgroup2"
 ######################################################################
 kinit()
 {
+	myresult=PASS
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 	# Kinit everywhere
-	echo "START $tet_thistest"
+	message "START $tet_thistest: Kinit Everywhere"
 	for s in $SERVERS; do
 		if [ "$s" != "" ]; then
-			echo "kiniting as $DS_USER, password $DM_ADMIN_PASS on $s"
+			message "kiniting as $DS_USER, password $DM_ADMIN_PASS on $s"
 			KinitAs $s $DS_USER $DM_ADMIN_PASS
 			if [ $? -ne 0 ]; then
-				echo "ERROR - kinit on $s failed"
-				tet_result FAIL
+				message "ERROR - kinit on $s failed"
+				myresult=FAIL
 			fi
 		else
-			echo "skipping $s"
+			message "skipping $s"
 		fi
 	done
 	for s in $CLIENTS; do
 		if [ "$s" != "" ]; then
-			echo "kiniting as $DS_USER, password $DM_ADMIN_PASS on $s"
+			message "kiniting as $DS_USER, password $DM_ADMIN_PASS on $s"
 			KinitAs $s $DS_USER $DM_ADMIN_PASS
 			if [ $? -ne 0 ]; then
-				echo "ERROR - kinit on $s failed"
-				tet_result FAIL
+				message "ERROR - kinit on $s failed"
+				myresult=FAIL
 			fi
 		fi
 	done
 
-	tet_result PASS
-	echo "END $tet_thistest"
+	result $myresult
+	message "END $tet_thistest"
 }
 
 ######################################################################
@@ -86,15 +88,16 @@ kinit()
 ######################################################################
 addusersetup()
 {
+	myresult=PASS
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	echo "START $tet_thistest"
+	message "START $tet_thistest: Add User"
 	eval_vars M1
 
 	ssh root@$FULLHOSTNAME "ipa user-add --first=$superuserfirst --last=$superuserlast --gecos=$superusergecos --home=$superuserhome --principal=$superuserprinc --email=$superuseremail $superuser"
 	if [ $? -ne 0 ]
 	then 
-		echo "ERROR - ipa user-add failed on $FULLHOSTNAME"
-		tet_result FAIL
+		message "ERROR - ipa user-add failed on $FULLHOSTNAME"
+		myresult=FAIL
 	fi
 
 	for s in $SERVERS; do
@@ -103,14 +106,14 @@ addusersetup()
 			ssh root@$FULLHOSTNAME "ipa user-find $superuser | grep uid | grep $superuser"
 			if [ $? -ne 0 ]
 			then
-				echo "ERROR - Search for created user failed on $FULLHOSTNAME"
-				tet_result FAIL
+				message "ERROR - Search for created user failed on $FULLHOSTNAME"
+				myresult=FAIL
 			fi
 		fi
 	done
 
-	tet_result PASS
-	echo "END $tet_thistest"
+	result $myresult
+	message "END $tet_thistest"
 }
 
 ######################################################################
@@ -118,8 +121,9 @@ addusersetup()
 ######################################################################
 addusera()
 {
+	myresult=PASS
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	echo "START $tet_thistest"
+	message "START $tet_thistest: Verify User's First Name"
 
 	for s in $SERVERS; do
 		if [ "$s" != "" ]; then
@@ -127,14 +131,14 @@ addusera()
 			ssh root@$FULLHOSTNAME "ipa user-find $superuser | grep $superuserfirst"
 			if [ $? -ne 0 ]
 			then
-				echo "ERROR - Search for created user failed on $FULLHOSTNAME"
-				tet_result FAIL
+				message "ERROR - Search for created user failed on $FULLHOSTNAME"
+				myresult=FAIL
 			fi
 		fi
 	done
 
-	tet_result PASS
-	echo "END $tet_thistest"
+	result $myresult
+	message "END $tet_thistest"
 }
 
 ######################################################################
@@ -142,22 +146,23 @@ addusera()
 ######################################################################
 adduserb()
 {
+	myresult=PASS
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	echo "START $tet_thistest"
+	message "START $tet_thistest: Verify User's Last Name"
 
 	for s in $SERVERS; do
 		if [ "$s" != "" ]; then
 			eval_vars $s
 			ssh root@$FULLHOSTNAME "ipa user-find $superuser | grep $superuserlast"
 			if [ $? -ne 0 ]; then
-				echo "ERROR - Search for created user failed on $FULLHOSTNAME"
-				tet_result FAIL
+				message "ERROR - Search for created user failed on $FULLHOSTNAME"
+				myresult=FAIL
 			fi
 		fi
 	done
 
-	tet_result PASS
-	echo "END $tet_thistest"
+	result $myresult
+	message "END $tet_thistest"
 }
 
 ######################################################################
@@ -165,8 +170,9 @@ adduserb()
 ######################################################################
 adduserc()
 {
+	myresult=PASS
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	echo "START $tet_thistest"
+	message "START $tet_thistest: Verify User's GECOS"
 
 	for s in $SERVERS; do
 		if [ "$s" != "" ]; then
@@ -174,14 +180,14 @@ adduserc()
 			ssh root@$FULLHOSTNAME "ipa user-find --all $superuser | grep $superusergecos"
 			if [ $? -ne 0 ]
 			then
-				echo "ERROR - Search for created user failed on $FULLHOSTNAME"
-				tet_result FAIL
+				message "ERROR - Search for created user failed on $FULLHOSTNAME"
+				myresult=FAIL
 			fi
 		fi
 	done
 
-	tet_result PASS
-	echo "END $tet_thistest"
+	result $myresult
+	message "END $tet_thistest"
 }
 
 ######################################################################
@@ -189,8 +195,9 @@ adduserc()
 ######################################################################
 adduserd()
 {
+	myresult=PASS
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	echo "START $tet_thistest"
+	message "START $tet_thistest: Verify User's Home Directory"
 
 	for s in $SERVERS; do
 		if [ "$s" != "" ]; then
@@ -198,14 +205,14 @@ adduserd()
 			ssh root@$FULLHOSTNAME "ipa user-find $superuser | grep $superuserhome"
 			if [ $? -ne 0 ]
 			then
-				echo "ERROR - Search for created user failed on $FULLHOSTNAME"
-				tet_result FAIL
+				message "ERROR - Search for created user failed on $FULLHOSTNAME"
+				myresult=FAIL
 			fi
 		fi
 	done
 
-	tet_result PASS
-	echo "END $tet_thistest"
+	result $myresult
+	message "END $tet_thistest"
 }
 
 ######################################################################
@@ -213,8 +220,9 @@ adduserd()
 ######################################################################
 addusere()
 {
+	myresult=PASS
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	echo "START $tet_thistest"
+	message "START $tet_thistest: Verify User's Principal Name"
 
 	for s in $SERVERS; do
 		if [ "$s" != "" ]; then
@@ -222,14 +230,14 @@ addusere()
 			ssh root@$FULLHOSTNAME "ipa user-find --all $superuser | grep $superuserprinc"
 			if [ $? -ne 0 ]
 			then
-				echo "ERROR - Search for created user failed on $FULLHOSTNAME"
-				tet_result FAIL
+				message "ERROR - Search for created user failed on $FULLHOSTNAME"
+				myresult=FAIL
 			fi
 		fi
 	done
 
-	tet_result PASS
-	echo "END $tet_thistest"
+	result $myresult
+	message "END $tet_thistest"
 }
 
 ######################################################################
@@ -237,8 +245,9 @@ addusere()
 ######################################################################
 adduserf()
 {
+	myresult=PASS
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	echo "START $tet_thistest"
+	message "START $tet_thistest: Verify User's Email"
 
 	for s in $SERVERS; do
 		if [ "$s" != "" ]; then
@@ -246,14 +255,14 @@ adduserf()
 			ssh root@$FULLHOSTNAME "ipa user-find --all $superuser | grep $superuseremail"
 			if [ $? -ne 0 ]
 			then
-				echo "ERROR - Search for created user failed on $FULLHOSTNAME"
-				tet_result FAIL
+				message "ERROR - Search for created user failed on $FULLHOSTNAME"
+				myresult=FAIL
 			fi
 		fi
 	done
 
-	tet_result PASS
-	echo "END $tet_thistest"
+	result $myresult
+	message "END $tet_thistest"
 }
 
 ######################################################################
@@ -261,19 +270,20 @@ adduserf()
 ######################################################################
 negadduser()
 {
+	myresult=PASS
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	echo "START $tet_thistest"
+	message "START $tet_thistest: Add Duplication User - Negative"
 	eval_vars M1
 
 	ssh root@$FULLHOSTNAME "ipa user-add --first=$superuserfirst --last=$superuserlast --gecos=$superusergecos --home=$superuserhome --principal=$superuserprinc --email=$superuseremail $superuser"
 	if [ $? -eq 0 ]
 	then 
-		echo "ERROR - ipa user-add passed when it should not have $FULLHOSTNAME"
-		tet_result FAIL
+		message "ERROR - ipa user-add passed when it should not have $FULLHOSTNAME"
+		myresult=FAIL
 	fi
 
-	tet_result PASS
-	echo "END $tet_thistest"
+	result $myresult
+	message "END $tet_thistest"
 }
 
 ######################################################################
@@ -281,15 +291,16 @@ negadduser()
 ######################################################################
 addlockuser()
 {
+	myresult=PASS
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	echo "START $tet_thistest"
+	message "START $tet_thistest: Add user - Set Password - Kinit"
 	eval_vars M1
 
 	ssh root@$FULLHOSTNAME "ipa user-add --first=$superuserfirst --last=$superuserlast $lusr"
 	if [ $? -ne 0 ]
 	then 
-		echo "ERROR - ipa user-add failed on $FULLHOSTNAME"
-		tet_result FAIL
+		message "ERROR - ipa user-add failed on $FULLHOSTNAME"
+		myresult=FAIL
 	fi
 
 	for s in $SERVERS; do
@@ -298,8 +309,8 @@ addlockuser()
 			ssh root@$FULLHOSTNAME "ipa user-find $lusr | grep uid | grep $lusr"
 			if [ $? -ne 0 ]
 			then
-				echo "ERROR - Search for created user failed on $FULLHOSTNAME"
-				tet_result FAIL
+				message "ERROR - Search for created user failed on $FULLHOSTNAME"
+				myresult=FAIL
 			fi
 		fi
 	done
@@ -307,18 +318,18 @@ addlockuser()
 	# Set up the password of the new user so that they can kinit later
 	SetUserPassword M1 $lusr pw
 	if [ $? -ne 0 ]; then
-		echo "ERROR - SetUserPassword failed on $FULLHOSTNAME"
-		tet_result FAIL
+		message "ERROR - SetUserPassword failed on $FULLHOSTNAME"
+		myresult=FAIL
 	fi
 
 	KinitAsFirst M1 $lusr pw $lusrpw
 	if [ $? -ne 0 ]; then
-		echo "ERROR - kinit failed on $FULLHOSTNAME"
-		tet_result FAIL
+		message "ERROR - kinit failed on $FULLHOSTNAME"
+		myresult=FAIL
 	fi
 
-	tet_result PASS
-	echo "END $tet_thistest"
+	result $myresult
+	message "END $tet_thistest"
 }
 
 ######################################################################
@@ -327,19 +338,20 @@ addlockuser()
 ######################################################################
 lock()
 {
+	myresult=PASS
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	echo "START $tet_thistest"
+	message "START $tet_thistest: Lock User"
 	eval_vars M1
 
 	ssh root@$FULLHOSTNAME "ipa user-lock $lusr"
 	if [ $? -ne 0 ]
 	then 
-		echo "ERROR - ipa user-lock failed on $FULLHOSTNAME"
-		tet_result FAIL
+		message "ERROR - ipa user-lock failed on $FULLHOSTNAME"
+		myresult=FAIL
 	fi
 
-	tet_result PASS
-	echo "END $tet_thistest"
+	result $myresult
+	message "END $tet_thistest"
 }
 
 ######################################################################
@@ -347,19 +359,20 @@ lock()
 ######################################################################
 kinitlock()
 {
+	myresult=PASS
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	echo "START $tet_thistest"
+	message "START $tet_thistest: Kinit Locked User"
 	eval_vars M1
 
  	KinitAs $s $lusr $lusrpw
 	if [ $? -eq 0 ]
 	then 
-		echo "ERROR - kinit as $lusr worked on $FULLHOSTNAME when it should not have"
-		tet_result FAIL
+		message "ERROR - kinit as $lusr worked on $FULLHOSTNAME when it should not have"
+		myresult=FAIL
 	fi
 
-	tet_result PASS
-	echo "END $tet_thistest"
+	result $myresult
+	message "END $tet_thistest"
 }
 
 ######################################################################
@@ -368,19 +381,20 @@ kinitlock()
 ######################################################################
 unlock()
 {
+	myresult=PASS
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	echo "START $tet_thistest"
+	message "START $tet_thistest: Unlock User"
 	eval_vars M1
 
 	ssh root@$FULLHOSTNAME "ipa user-unlock $lusr"
 	if [ $? -ne 0 ]
 	then 
-		echo "ERROR - ipa user-lock failed on $FULLHOSTNAME"
-		tet_result FAIL
+		message "ERROR - ipa user-lock failed on $FULLHOSTNAME"
+		myresult=FAIL
 	fi
 
-	tet_result PASS
-	echo "END $tet_thistest"
+	result $myresult
+	message "END $tet_thistest"
 }
 
 ######################################################################
@@ -388,19 +402,20 @@ unlock()
 ######################################################################
 kinitunlock()
 {
+	myresult=PASS
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	echo "START $tet_thistest"
+	message "START $tet_thistest: Kinit As Unlocked User"
 	eval_vars M1
 
  	KinitAs $s $lusr $lusrpw
 	if [ $? -ne 0 ]
 	then 
-		echo "ERROR - kinit as $lusr failed on $FULLHOSTNAME"
-		tet_result FAIL
+		message "ERROR - kinit as $lusr failed on $FULLHOSTNAME"
+		myresult=FAIL
 	fi
 
-	tet_result PASS
-	echo "END $tet_thistest"
+	result $myresult
+	message "END $tet_thistest"
 }
 
 ######################################################################
@@ -408,53 +423,27 @@ kinitunlock()
 ######################################################################
 addmoduser()
 {
+	myresult=PASS
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	echo "START $tet_thistest"
+	message "START $tet_thistest: Add User - Define Only Required Attributes"
 	eval_vars M1
 
 	ssh root@$FULLHOSTNAME "ipa user-add --first=superuserfirst --last=superuserlast $musr"
 	if [ $? -ne 0 ]
 	then 
-		echo "ERROR - ipa user-add failed on $FULLHOSTNAME"
-		tet_result FAIL
+		message "ERROR - ipa user-add failed on $FULLHOSTNAME"
+		myresult=FAIL
 	fi
 
 	ssh root@$FULLHOSTNAME "ipa user-find $musr | grep uid | grep $musr"
 	if [ $? -ne 0 ]
 	then
-		echo "ERROR - Search for created user failed on $FULLHOSTNAME"
-		tet_result FAIL
+		message "ERROR - Search for created user failed on $FULLHOSTNAME"
+		myresult=FAIL
 	fi
 
-	tet_result PASS
-	echo "END $tet_thistest"
-}
-
-######################################################################
-# add a group to be used with mod tests
-######################################################################
-addmodgroup()
-{
-	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	echo "START $tet_thistest"
-	eval_vars M1
-
-	ssh root@$FULLHOSTNAME "ipa group-add --description=\"group that the user in the user-mod will include\" $mgroup1"
-	if [ $? -ne 0 ]
-	then 
-		echo "ERROR - ipa user-add failed on $FULLHOSTNAME"
-		tet_result FAIL
-	fi
-
-	ssh root@$FULLHOSTNAME "ipa group-find $mgroup1"
-	if [ $? -ne 0 ]
-	then
-		echo "ERROR - Search for group $mgroup1 failed on $FULLHOSTNAME"
-		tet_result FAIL
-	fi
-
-	tet_result PASS
-	echo "END $tet_thistest"
+	result $myresult
+	message "END $tet_thistest"
 }
 
 ######################################################################
@@ -462,26 +451,27 @@ addmodgroup()
 ######################################################################
 modfirst()
 {
+	myresult=PASS
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	echo "START $tet_thistest"
+	message "START $tet_thistest: Modify First Name"
 	eval_vars M1
 
 	ssh root@$FULLHOSTNAME "ipa user-mod --first=$mfirst $musr"
 	if [ $? -ne 0 ]
 	then 
-		echo "ERROR - ipa user-mod failed on $FULLHOSTNAME"
-		tet_result FAIL
+		message "ERROR - ipa user-mod failed on $FULLHOSTNAME"
+		myresult=FAIL
 	fi
 
 	ssh root@$FULLHOSTNAME "ipa user-show --all $musr | grep $mfirst"
 	if [ $? -ne 0 ]
 	then
-		echo "ERROR - Search for created user failed on $FULLHOSTNAME"
-		tet_result FAIL
+		message "ERROR - Search for created user failed on $FULLHOSTNAME"
+		myresult=FAIL
 	fi
 
-	tet_result PASS
-	echo "END $tet_thistest"
+	result $myresult
+	message "END $tet_thistest"
 }
 
 ######################################################################
@@ -489,26 +479,27 @@ modfirst()
 ######################################################################
 modlast()
 {
+	myresult=PASS
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	echo "START $tet_thistest"
+	message "START $tet_thistest: Modify Last Name"
 	eval_vars M1
 
 	ssh root@$FULLHOSTNAME "ipa user-mod --last=$mlast $musr"
 	if [ $? -ne 0 ]
 	then 
-		echo "ERROR - ipa user-mod failed on $FULLHOSTNAME"
-		tet_result FAIL
+		message "ERROR - ipa user-mod failed on $FULLHOSTNAME"
+		myresult=FAIL
 	fi
 
 	ssh root@$FULLHOSTNAME "ipa user-show --all $musr | grep $mlast"
 	if [ $? -ne 0 ]
 	then
-		echo "ERROR - Search for created user failed on $FULLHOSTNAME"
-		tet_result FAIL
+		message "ERROR - Search for created user failed on $FULLHOSTNAME"
+		myresult=FAIL
 	fi
 
-	tet_result PASS
-	echo "END $tet_thistest"
+	result $myresult
+	message "END $tet_thistest"
 }
 
 ######################################################################
@@ -516,26 +507,27 @@ modlast()
 ######################################################################
 modemail()
 {
+	myresult=PASS
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	echo "START $tet_thistest"
+	message "START $tet_thistest: Modify Email"
 	eval_vars M1
 
 	ssh root@$FULLHOSTNAME "ipa user-mod --email=\'$memail\' $musr"
 	if [ $? -ne 0 ]
 	then 
-		echo "ERROR - ipa user-mod failed on $FULLHOSTNAME"
-		tet_result FAIL
+		message "ERROR - ipa user-mod failed on $FULLHOSTNAME"
+		myresult=FAIL
 	fi
 
 	ssh root@$FULLHOSTNAME "ipa user-show --all $musr | grep '$memail'"
 	if [ $? -ne 0 ]
 	then
-		echo "ERROR - Search for created user failed on $FULLHOSTNAME"
-		tet_result FAIL
+		message "ERROR - Search for created user failed on $FULLHOSTNAME"
+		myresult=FAIL
 	fi
 
-	tet_result PASS
-	echo "END $tet_thistest"
+	result $myresult
+	message "END $tet_thistest"
 }
 
 ######################################################################
@@ -543,26 +535,27 @@ modemail()
 ######################################################################
 modprinc()
 {
+	myresult=PASS
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	echo "START $tet_thistest"
+	message "START $tet_thistest: Modify Principal Name"
 	eval_vars M1
 
-	ssh root@$FULLHOSTNAME "ipa user-mod --principal=\'$mprinc\' $musr"
+	ssh root@$FULLHOSTNAME "ipa user-mod --principal=$mprinc $musr"
 	if [ $? -ne 0 ]
 	then 
-		echo "ERROR - ipa user-mod failed on $FULLHOSTNAME"
-		tet_result FAIL
+		message "ERROR - ipa user-mod failed on $FULLHOSTNAME"
+		myresult=FAIL
 	fi
 
-	ssh root@$FULLHOSTNAME "ipa user-show --all $musr | grep $mlast"
+	ssh root@$FULLHOSTNAME "ipa user-show --all $musr | grep $mprinc"
 	if [ $? -ne 0 ]
 	then
-		echo "ERROR - Search for created user failed on $FULLHOSTNAME"
-		tet_result FAIL
+		message "ERROR - Search for created user failed on $FULLHOSTNAME"
+		myresult=FAIL
 	fi
 
-	tet_result PASS
-	echo "END $tet_thistest"
+	result $myresult
+	message "END $tet_thistest"
 }
 
 ######################################################################
@@ -570,26 +563,27 @@ modprinc()
 ######################################################################
 modhome()
 {
+	myresult=PASS
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	echo "START $tet_thistest"
+	message "START $tet_thistest: Modify Home Directory"
 	eval_vars M1
 
 	ssh root@$FULLHOSTNAME "ipa user-mod --home=\'$mhome\' $musr"
 	if [ $? -ne 0 ]
 	then 
-		echo "ERROR - ipa user-mod failed on $FULLHOSTNAME"
-		tet_result FAIL
+		message "ERROR - ipa user-mod failed on $FULLHOSTNAME"
+		myresult=FAIL
 	fi
 
 	ssh root@$FULLHOSTNAME "ipa user-show --all $musr | grep '$mhome'"
 	if [ $? -ne 0 ]
 	then
-		echo "ERROR - Search for created user failed on $FULLHOSTNAME"
-		tet_result FAIL
+		message "ERROR - Search for created user failed on $FULLHOSTNAME"
+		myresult=FAIL
 	fi
 
-	tet_result PASS
-	echo "END $tet_thistest"
+	result PASS
+	message "END $tet_thistest"
 }
 
 ######################################################################
@@ -597,26 +591,27 @@ modhome()
 ######################################################################
 modgecos()
 {
+	myresult=PASS
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	echo "START $tet_thistest"
+	message "START $tet_thistest: Modify GECOS"
 	eval_vars M1
 
 	ssh root@$FULLHOSTNAME "ipa user-mod --gecos=$mgecos $musr"
 	if [ $? -ne 0 ]
 	then 
-		echo "ERROR - ipa user-mod failed on $FULLHOSTNAME"
-		tet_result FAIL
+		message "ERROR - ipa user-mod failed on $FULLHOSTNAME"
+		myresult=FAIL
 	fi
 
 	ssh root@$FULLHOSTNAME "ipa user-show --all $musr | grep '$mgecos'"
 	if [ $? -ne 0 ]
 	then
-		echo "ERROR - Search for created user failed on $FULLHOSTNAME"
-		tet_result FAIL
+		message "ERROR - Search for created user failed on $FULLHOSTNAME"
+		myresult=FAIL
 	fi
 
-	tet_result PASS
-	echo "END $tet_thistest"
+	result PASS
+	message "END $tet_thistest"
 }
 
 ######################################################################
@@ -624,27 +619,42 @@ modgecos()
 ######################################################################
 modgroup()
 {
+	myresult=PASS
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	echo "START $tet_thistest"
+	message "START $tet_thistest: Modify Group Membership"
 	eval_vars M1
+
+        ssh root@$FULLHOSTNAME "ipa group-add --description=\"group that the user in the user-mod will include\" $mgroup1"
+        if [ $? -ne 0 ]
+        then
+                message "ERROR - ipa group-add failed on $FULLHOSTNAME"
+                myresult=FAIL
+        fi
+
+        ssh root@$FULLHOSTNAME "ipa group-find $mgroup1"
+        if [ $? -ne 0 ]
+        then
+                message "ERROR - Search for group $mgroup1 failed on $FULLHOSTNAME"
+                myresult=FAIL
+        fi
 
 	ssh root@$FULLHOSTNAME "ipa user-mod --groups=$mgroup1 $musr"
 	if [ $? -ne 0 ]
 	then 
-		echo "ERROR - ipa user-mod failed on $FULLHOSTNAME"
-		echo "ERROR possibly related to https://bugzilla.redhat.com/show_bug.cgi?id=502114"
-		tet_result FAIL
+		message "ERROR - ipa user-mod failed on $FULLHOSTNAME"
+		message "ERROR possibly related to https://bugzilla.redhat.com/show_bug.cgi?id=502114"
+		myresult=FAIL
 	fi
 
 	ssh root@$FULLHOSTNAME "ipa group-show --all $mgroup1 | grep '$musr'"
 	if [ $? -ne 0 ]
 	then
-		echo "ERROR - Search for $musr in $mgroup1 failed failed on $FULLHOSTNAME"
-		tet_result FAIL
+		message "ERROR - Search for $musr in $mgroup1 failed failed on $FULLHOSTNAME"
+		myresult=FAIL
 	fi
 
-	tet_result PASS
-	echo "END $tet_thistest"
+	result $myresult
+	message "END $tet_thistest"
 }
 
 ######################################################################
@@ -652,34 +662,49 @@ modgroup()
 ######################################################################
 modgroup2()
 {
+	myresult=PASS
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	echo "START $tet_thistest"
+	message "START $tet_thistest: Modify Second Group Membership"
 	eval_vars M1
 
-	ssh root@$FULLHOSTNAME "ipa user-mod --groups=$mgroup1,$mgroup2 $musr"
+        ssh root@$FULLHOSTNAME "ipa group-add --description=\"group2 that the user in the user-mod will include\" $mgroup2"
+        if [ $? -ne 0 ]
+        then
+                message "ERROR - ipa group-add failed on $FULLHOSTNAME"
+                myresult=FAIL
+        fi
+
+        ssh root@$FULLHOSTNAME "ipa group-find $mgroup2"
+        if [ $? -ne 0 ]
+        then
+                message "ERROR - Search for group $mgroup2 failed on $FULLHOSTNAME"
+                myresult=FAIL
+        fi
+
+	ssh root@$FULLHOSTNAME "ipa user-mod --groups=$mgroup2 $musr"
 	if [ $? -ne 0 ]
 	then 
-		echo "ERROR - ipa user-mod failed on $FULLHOSTNAME"
-		echo "ERROR possibly related to ttps://bugzilla.redhat.com/show_bug.cgi?id=502114"
-		tet_result FAIL
+		message "ERROR - ipa user-mod failed on $FULLHOSTNAME"
+		message "ERROR possibly related to ttps://bugzilla.redhat.com/show_bug.cgi?id=502114"
+		myresult=FAIL
 	fi
 
 	ssh root@$FULLHOSTNAME "ipa group-show --all $mgroup1 | grep '$musr'"
 	if [ $? -ne 0 ]
 	then
-		echo "ERROR - Search for $musr in $mgroup1 failed failed on $FULLHOSTNAME"
-		tet_result FAIL
+		message "ERROR - Search for $musr in $mgroup1 failed failed on $FULLHOSTNAME"
+		myresult=FAIL
 	fi
 
 	ssh root@$FULLHOSTNAME "ipa group-show --all $mgroup2 | grep '$musr'"
 	if [ $? -ne 0 ]
 	then
-		echo "ERROR - Search for $musr in $mgroup2 failed failed on $FULLHOSTNAME"
-		tet_result FAIL
+		message "ERROR - Search for $musr in $mgroup2 failed failed on $FULLHOSTNAME"
+		myresult=FAIL
 	fi
 
-	tet_result PASS
-	echo "END $tet_thistest"
+	result $myresult
+	message "END $tet_thistest"
 }
 
 ######################################################################
@@ -687,27 +712,28 @@ modgroup2()
 ######################################################################
 moduid()
 {
+	myresult=PASS
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	echo "START $tet_thistest"
+	message "START $tet_thistest: Modify UID"
 	eval_vars M1
 
 	ssh root@$FULLHOSTNAME "ipa user-mod --uid=$muid $musr"
 	if [ $? -ne 0 ]
 	then 
-		echo "ERROR - ipa user-mod failed on $FULLHOSTNAME"
-		echo "ERROR may be related to https://bugzilla.redhat.com/show_bug.cgi?id=502684"
-		tet_result FAIL
+		message "ERROR - ipa user-mod failed on $FULLHOSTNAME"
+		message "ERROR may be related to https://bugzilla.redhat.com/show_bug.cgi?id=502684"
+		myresult=FAIL
 	fi
 
 	ssh root@$FULLHOSTNAME "ipa user-show --all $musr | grep '$muid'"
 	if [ $? -ne 0 ]
 	then
-		echo "ERROR - Search for created user failed on $FULLHOSTNAME"
-		tet_result FAIL
+		message "ERROR - Search for created user failed on $FULLHOSTNAME"
+		myresult=FAIL
 	fi
 
-	tet_result PASS
-	echo "END $tet_thistest"
+	result $myresult
+	message "END $tet_thistest"
 }
 
 ######################################################################
@@ -715,26 +741,27 @@ moduid()
 ######################################################################
 modstreet()
 {
+	myresult=PASS
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	echo "START $tet_thistest"
+	message "START $tet_thistest: Modify Street"
 	eval_vars M1
 
-	ssh root@$FULLHOSTNAME "ipa user-mod --street=\'$mstreet\' $musr"
+	ssh root@$FULLHOSTNAME "ipa user-mod --street=\"$mstreet\" $musr"
 	if [ $? -ne 0 ]
 	then 
-		echo "ERROR - ipa user-mod failed on $FULLHOSTNAME"
-		tet_result FAIL
+		message "ERROR - ipa user-mod failed on $FULLHOSTNAME"
+		myresult=FAIL
 	fi
 
-	ssh root@$FULLHOSTNAME "ipa user-show --all $musr | grep '$mstreet'"
+	ssh root@$FULLHOSTNAME "ipa user-show --all $musr | grep \"$mstreet\""
 	if [ $? -ne 0 ]
 	then
-		echo "ERROR - Search for created user failed on $FULLHOSTNAME"
-		tet_result FAIL
+		message "ERROR - Search for created user failed on $FULLHOSTNAME"
+		myresult=FAIL
 	fi
 
-	tet_result PASS
-	echo "END $tet_thistest"
+	result $myresult
+	message "END $tet_thistest"
 }
 
 ######################################################################
@@ -742,26 +769,27 @@ modstreet()
 ######################################################################
 modshell()
 {
+	myresult=PASS
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	echo "START $tet_thistest"
+	message "START $tet_thistest: Modify Default Shell"
 	eval_vars M1
 
 	ssh root@$FULLHOSTNAME "ipa user-mod --shell=\'$mshell\' $musr"
 	if [ $? -ne 0 ]
 	then 
-		echo "ERROR - ipa user-mod failed on $FULLHOSTNAME"
-		tet_result FAIL
+		message "ERROR - ipa user-mod failed on $FULLHOSTNAME"
+		myresult=FAIL
 	fi
 
 	ssh root@$FULLHOSTNAME "ipa user-show --all $musr | grep '$mshell'"
 	if [ $? -ne 0 ]
 	then
-		echo "ERROR - Search for created user failed on $FULLHOSTNAME"
-		tet_result FAIL
+		message "ERROR - Search for created user failed on $FULLHOSTNAME"
+		myresult=FAIL
 	fi
 
-	tet_result PASS
-	echo "END $tet_thistest"
+	result $myresult
+	message "END $tet_thistest"
 }
 
 ######################################################################
@@ -771,41 +799,59 @@ modshell()
 ######################################################################
 deluser()
 {
+	myresult=PASS
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	echo "START $tet_thistest"
+	message "START $tet_thistest: Delete User"
 	eval_vars M1
 
-	ssh root@$FULLHOSTNAME "ipa user-add --first=$superuserfirst --last=$superuserlast --gecos=$superusergecos --home=$superuserhome --principal=$superuserprinc --email=$superuseremail deluser1"
-	if [ $? -ne 0 ]
-	then 
-		echo "ERROR - ipa user-add failed on $FULLHOSTNAME"
-		tet_result FAIL
-	fi
-
-	ssh root@$FULLHOSTNAME "ipa user-find $deluser1 | grep uid | grep $userdel1"
+	ssh root@$FULLHOSTNAME "ipa user-del $superuser"
 	if [ $? -ne 0 ]
 	then
-		echo "ERROR - Search for created user failed on $FULLHOSTNAME"
-		tet_result FAIL
+		message "ERROR - Deleting user $superuser failed on $FULLHOSTNAME"
+		myresult=FAIL
 	fi
 
-
-	ssh root@$FULLHOSTNAME "ipa user-del deluser1"
-	if [ $? -ne 0 ]
-	then
-		echo "ERROR - Search for created user failed on $FULLHOSTNAME"
-		tet_result FAIL
-	fi
-
-	ssh root@$FULLHOSTNAME "ipa user-find deluser1 | grep uid | grep userdel1"
+	ssh root@$FULLHOSTNAME "ipa user-find $superuser"
 	if [ $? -eq 0 ]
 	then
-		echo "ERROR - Search for deluser1 on $FULLHOSTNAME when is should not have"
-		tet_result FAIL
+		message "ERROR - Search for deleted user was successful on $FULLHOSTNAME when is should not have"
+		message "ERROR possibly related to https://bugzilla.redhat.com/show_bug.cgi?id=504021"
+		myresult=FAIL
 	fi
 
-	tet_result PASS
-	echo "END $tet_thistest"
+        ssh root@$FULLHOSTNAME "ipa user-del $musr"
+        if [ $? -ne 0 ]
+        then
+                message "ERROR - Deleting user $musr failed on $FULLHOSTNAME"
+                myresult=FAIL
+        fi
+
+        ssh root@$FULLHOSTNAME "ipa user-find $msur"
+        if [ $? -eq 0 ]
+        then
+                message "ERROR - Search for deleted user was successful on $FULLHOSTNAME when is should not have"
+		message "ERROR possibly related to https://bugzilla.redhat.com/show_bug.cgi?id=504021"
+		message 
+                myresult=FAIL
+        fi
+
+        ssh root@$FULLHOSTNAME "ipa user-del $lusr"
+        if [ $? -ne 0 ]
+        then
+                message "ERROR - Deleting user $lusr failed on $FULLHOSTNAME"
+                myresult=FAIL
+        fi
+
+        ssh root@$FULLHOSTNAME "ipa user-find $lsur"
+        if [ $? -eq 0 ]
+        then
+                message "ERROR - Search for deleted user was successful on $FULLHOSTNAME when is should not have"
+		message "ERROR possibly related to https://bugzilla.redhat.com/show_bug.cgi?id=504021"
+                myresult=FAIL
+        fi
+
+	result $myresult
+	message "END $tet_thistest"
 }
 
 
@@ -814,34 +860,29 @@ deluser()
 ######################################################################
 user_cleanup()
 {
+	myresult=PASS
 	tet_thistest="cleanup"
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	echo "START $tet_thistest"
+	message "START $tet_thistest: Cleanup"
 	eval_vars M1
 	code=0
 
-
-	ssh root@$FULLHOSTNAME "ipa user-del $superuser"
-	let code=$code+$?
-
-	ssh root@$FULLHOSTNAME "ipa user-del $lusr"
-	let code=$code+$?
-
-	ssh root@$FULLHOSTNAME "ipa user-del $musr"
-	let code=$code+$?
-
 	ssh root@$FULLHOSTNAME "ipa group-del $mgroup1"
-	let code=$code+$?
+	if [ $? -ne 0 ]
+        then
+                message "ERROR - setup for $tet_thistest failed - not that it matters"
+                myresult=FAIL
+        fi
 
 	ssh root@$FULLHOSTNAME "ipa group-del $mgroup2"
-	let code=$code+$?
-
-	if [ $code -ne 0 ]
+	if [ $? -ne 0 ]
 	then
-		echo "ERROR - setup for $tet_thistest failed - not that it matters"
+		message "ERROR - setup for $tet_thistest failed - not that it matters"
+		myresult=FAIL
 	fi
 
-	tet_result PASS
+	result $myresult
+	message "END $tet_thistest"
 }
 
 ######################################################################
