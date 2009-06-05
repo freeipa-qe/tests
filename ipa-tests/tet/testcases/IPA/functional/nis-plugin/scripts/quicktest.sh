@@ -7,4 +7,5 @@ nisserver=$server
 echo "enable nis on remote ipa server : [$server]"
 ./env.nis.enable.sh $server
 echo "config nis client : [$client]"
-./config.nis.client.sh $client $nisdomain $nisserver
+. ./config.nis.client.sh 
+config_nisclient $client $nisdomain $nisserver

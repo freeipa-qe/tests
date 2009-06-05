@@ -31,6 +31,37 @@ config_nsswitch()
 }
 ##################################
 
+restore_nisclient()
+{
+client=$1
+nisdomain=$2
+nisserver=$3
+
+# default client 
+if [ -z $client ]
+then
+        client="mv32b-vm.idm.lab.bos.redhat.com"
+fi
+# default nisdomain
+if [ -z $nisdomain ]
+then
+        nisdomain="idm.lab.bos.redhat.com"
+fi
+# default nisserver
+if [ -z $nisserver ]
+then
+        nisserver="mv32a-vm.idm.lab.bos.redhat.com"
+fi
+
+### restore starts here
+echo "nis configuration restore starts"
+	ssh root@$client "mv -f /etc/nsswitch.conf.bk /etc/nsswitch.conf; mv -f /etc/yp.conf.bk /etc/yp.conf; mv -f /etc/sysconfig/network.bk /etc/sysconfig/network; service ypbind stop"
+echo "nis configuration restore finished"
+}
+
+
+config_nisclient()
+{
 client=$1
 nisdomain=$2
 nisserver=$3
@@ -64,11 +95,11 @@ echo "config nis client [$client] starts"
 #	echo "	this will be replaced"
 #fi
 
-
 config_network $client "$nisdomain"
 config_yp_conf $client $nisdomain $nisserver
 config_nsswitch $client
 
-echo "configuration finished"
-echo "run yptest on [$client]"
-ssh root@$client "service portmap restart; service ypbind restart; yptest 2>&1"
+echo "nis configuration finished"
+#echo "run yptest on [$client]"
+#ssh root@$client "service portmap restart; service ypbind restart; yptest 2>&1"
+}
