@@ -12,13 +12,13 @@
 #  group-show                Examine an existing group.
 
 ######################################################################
-echo "groupcli"
+message "groupcli"
 if [ "$DSTET_DEBUG" = "y" ]; then
 	set -x
 fi
 # The next line is required as it picks up data about the servers to use
 tet_startup="kinit"
-tet_cleanup="user_cleanup"
+tet_cleanup="group_cleanup"
 iclist="ic1 ic2 ic3 ic4"
 ic1="add_group_users group_add group_find group_find_neg group_show group_show_neg"
 ic2="group_add_posix group_mod_posix group_mod_neg_posix group_mod_description"
@@ -38,44 +38,46 @@ usr2="usermk5"
 ######################################################################
 kinit()
 {
+	myresult=PASS
 	tet_thistest="kinit"
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 	# Kinit everywhere
-	echo "START $tet_thistest"
+	message "START $tet_thistest: kinit everywhere"
 	for s in $SERVERS; do
 		if [ "$s" != "" ]; then
-			echo "kiniting as $DS_USER, password $DM_ADMIN_PASS on $s"
+			message "kiniting as $DS_USER, password $DM_ADMIN_PASS on $s"
 			KinitAs $s $DS_USER $DM_ADMIN_PASS
 			ret=$?
 			if [ $ret -ne 0 ]; then
-				echo "ERROR - kinit on $s failed"
-				tet_result FAIL
+				message "ERROR - kinit on $s failed"
+				myresult=FAIL
 			fi
 		else
-			echo "skipping $s"
+			message "skipping $s"
 		fi
 	done
 	for s in $CLIENTS; do
 		if [ "$s" != "" ]; then
-			echo "kiniting as $DS_USER, password $DM_ADMIN_PASS on $s"
+			message "kiniting as $DS_USER, password $DM_ADMIN_PASS on $s"
 			KinitAs $s $DS_USER $DM_ADMIN_PASS
 			ret=$?
 			if [ $ret -ne 0 ]; then
-				echo "ERROR - kinit on $s failed"
-				tet_result FAIL
+				message "ERROR - kinit on $s failed"
+				myresult=FAIL
 			fi
 		fi
 	done
 
-	tet_result PASS
-	echo "END $tet_thistest"
+	result $myresult
+	message "END $tet_thistest"
 }
 
 # This is the startup for the group tests. Mainly, it just creates the users to be used in the add and remove member tests 
 add_group_users()
 {
+	myresult=PASS
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	echo "START $tet_thistest"
+	message "START $tet_thistest: Add Users for Testing Memberships"
 	eval_vars M1
 	code=0
 
@@ -87,157 +89,172 @@ add_group_users()
 
 	if [ $code -ne 0 ]
 	then
-		echo "ERROR - $tet_thistest failed."
-		tet_result FAIL
+		message "ERROR - $tet_thistest failed."
+		myresult=FAIL
 	fi
 
-	tet_result PASS
+	result $myresult
+	message "END $tet_thistest"
 }
 
 
 group_add()
 {
+	myresult=PASS
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	echo "START $tet_thistest"
+	message "START $tet_thistest: Add Group"
 	eval_vars M1
 	code=0
 
-	ssh root@$FULLHOSTNAME "ipa group-add --description=group-to-test-find-user $grp1"
+	ssh root@$FULLHOSTNAME "ipa group-add --description=group-to-test-groups $grp1"
 	let code=$code+$?
 
-	ssh root@$FULLHOSTNAME "ipa group-find $grp1 | grep group-to-test-find-user"
+	ssh root@$FULLHOSTNAME "ipa group-find $grp1 | grep group-to-test-groups"
 	let code=$code+$?
 
 	if [ $code -ne 0 ]
 	then
-		echo "ERROR - $tet_thistest failed."
-		tet_result FAIL
+		message "ERROR - $tet_thistest failed."
+		myresult=FAIL
 	fi
 
-	tet_result PASS
+	result $myresult
+	message "END $tet_thistest"
 }
 
 group_find()
 {
+	myresult=PASS
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	echo "START $tet_thistest"
+	message "START $tet_thistest: Find Group"
 	eval_vars M1
 	code=0
 
-	ssh root@$FULLHOSTNAME "ipa group-find $grp1 | grep group-to-test-find-user"
+	ssh root@$FULLHOSTNAME "ipa group-find $grp1 | grep group-to-test-groups"
 	let code=$code+$?
 
 	if [ $code -ne 0 ]
 	then
-		echo "ERROR - $tet_thistest failed."
-		tet_result FAIL
+		message "ERROR - $tet_thistest failed."
+		myresult=FAIL
 	fi
 
-	tet_result PASS
+	result $myresult
+	message "END $tet_thistest"
 }
 
 group_find_neg()
 {
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	echo "START $tet_thistest"
+	message "START $tet_thistest: Find Group That Doesn't Exist -Negative"
 	eval_vars M1
 	code=0
 
 	ssh root@$FULLHOSTNAME "ipa group-find nonexistgroup"
 	if [ $? -eq 0 ]
 	then
-		echo "ERROR - $tet_thistest failed. ipa group-find passed when it should not have"
-		echo "ERROR - This failure might be related to https://bugzilla.redhat.com/show_bug.cgi?id=501840"
-		tet_result FAIL
+		message "ERROR - $tet_thistest failed. ipa group-find passed when it should not have"
+		message "ERROR - This failure might be related to https://bugzilla.redhat.com/show_bug.cgi?id=501840"
+		myresult=FAIL
 	fi
 
-	tet_result PASS
+	result $myresult
+	message "END $tet_thistest"
 }
 
 group_show()
 {
+	myresult=PASS
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	echo "START $tet_thistest"
+	message "START $tet_thistest: Show Group"
 	eval_vars M1
 	code=0
 
-	ssh root@$FULLHOSTNAME "ipa group-show $grp1 | grep group-to-test-find-user"
+	ssh root@$FULLHOSTNAME "ipa group-show $grp1 | grep group-to-test-groups"
 	let code=$code+$?
 
 	if [ $code -ne 0 ]
 	then
-		echo "ERROR - $tet_thistest failed."
-		tet_result FAIL
+		message "ERROR - $tet_thistest failed."
+		myresult=FAIL
 	fi
 
-	tet_result PASS
+	result $myresult
+	message "END $tet_thistest"
 }
 
 group_show_neg()
 {
+	myresult=PASS
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	echo "START $tet_thistest"
+	message "START $tet_thistest: Show Group That Doesn't Exist - Negative"
 	eval_vars M1
 	code=0
 
 	ssh root@$FULLHOSTNAME "ipa group-show nonexistgroup"
 	if [ $? -eq 0 ]
 	then
-		echo "ERROR - $tet_thistest failed. ipa group-find passed when it should not have"
-		tet_result FAIL
+		message "ERROR - $tet_thistest failed. ipa group-find passed when it should not have"
+		myresult=FAIL
 	fi
 
-	tet_result PASS
+	result $myresult
+	message "END $tet_thistest"
 }
 
 group_add_posix()
 {
+	myresult=PASS
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	echo "START $tet_thistest"
+	message "START $tet_thistest: Add Posix Group"
 	eval_vars M1
 	code=0
 
 	ssh root@$FULLHOSTNAME "ipa group-add --posix --description=group-to-test-posix $grp2"
 	let code=$code+$?
 
-	ssh root@$FULLHOSTNAME "ipa group-find $grp2 | grep posixGroup"
+	ssh root@$FULLHOSTNAME "ipa group-show --all $grp2 | grep posixGroup"
 	let code=$code+$?
 
 	if [ $code -ne 0 ]
 	then
-		echo "ERROR - $tet_thistest failed."
-		tet_result FAIL
+		message "ERROR - $tet_thistest failed."
+		myresult=FAIL
 	fi
 
-	tet_result PASS
+	result $myresult
+	message "END $tet_thistest"
 }
 
 group_mod_posix()
 {
+	myresult=PASS
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	echo "START $tet_thistest"
+	message "START $tet_thistest: Modify Group - Add Posix"
 	eval_vars M1
 	code=0
 
 	ssh root@$FULLHOSTNAME "ipa group-mod --posix $grp1"
 	let code=$code+$?
 
-	ssh root@$FULLHOSTNAME "ipa group-find $grp1 | grep posixGroup"
+	ssh root@$FULLHOSTNAME "ipa group-show --all $grp1 | grep posixgroup"
 	let code=$code+$?
 
 	if [ $code -ne 0 ]
 	then
-		echo "ERROR - $tet_thistest failed."
-		tet_result FAIL
+		message "ERROR - $tet_thistest failed."
+		myresult=FAIL
 	fi
 
-	tet_result PASS
+	result $myresult
+	message "END $tet_thistest"
 }
 
 group_mod_neg_posix()
 {
+	myresult=PASS
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	echo "START $tet_thistest"
+	message "START $tet_thistest: Modify Posix Group - Add Posix - Negative"
 	eval_vars M1
 	code=0
 
@@ -245,17 +262,19 @@ group_mod_neg_posix()
 	ssh root@$FULLHOSTNAME "ipa group-mod --posix $grp1"
 	if [ $? -eq 0 ]
 	then
-		echo "ERROR - $tet_thistest failed. ipa group-mod --posix $grp1 worked when it should not have."
-		tet_result FAIL
+		message "ERROR - $tet_thistest failed. ipa group-mod --posix $grp1 worked when it should not have."
+		myresult=FAIL
 	fi
 
-	tet_result PASS
+	result $myresult
+	message "END $tet_thistest"
 }
 
 group_mod_description()
 {
+	myresult=PASS
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	echo "START $tet_thistest"
+	message "START $tet_thistest: Modify Group Description"
 	eval_vars M1
 	code=0
 
@@ -267,39 +286,46 @@ group_mod_description()
 
 	if [ $code -ne 0 ]
 	then
-		echo "ERROR - $tet_thistest failed."
-		tet_result FAIL
+		message "ERROR - $tet_thistest failed."
+		myresult=FAIL
 	fi
 
-	tet_result PASS
+	result $myresult
+	message "END $tet_thistest"
 }
 
 group_add_member_user()
 {
+	myresult=PASS
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	echo "START $tet_thistest"
+	message "START $tet_thistest: Add User Members"
 	eval_vars M1
 	code=0
 
 	ssh root@$FULLHOSTNAME "ipa group-add-member --users=$usr1,$usr2 $grp1"
 	let code=$code+$?
 
-	ssh root@$FULLHOSTNAME "ipa group-find $grp1 | grep $usr1"
+	ssh root@$FULLHOSTNAME "ipa group-show $grp1 | grep $usr1"
 	let code=$code+$?
+
+        ssh root@$FULLHOSTNAME "ipa group-show $grp1 | grep $usr2"
+        let code=$code+$?
 
 	if [ $code -ne 0 ]
 	then
-		echo "ERROR - $tet_thistest failed."
-		tet_result FAIL
+		message "ERROR - $tet_thistest failed."
+		myresult=FAIL
 	fi
 
-	tet_result PASS
+	result $myresult
+	message "END $tet_thistest"
 }
 
 group_add_member_user_neg()
 {
+	myresult=PASS
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	echo "START $tet_thistest"
+	message "START $tet_thistest: Add User Member That Already is a Member - Negative"
 	eval_vars M1
 	code=0
 
@@ -307,18 +333,20 @@ group_add_member_user_neg()
 	ssh root@$FULLHOSTNAME "ipa group-add-member --users=$usr1,$usr2 $grp1"
 	if [ $? -eq 0 ]
 	then
-		echo "ERROR - $tet_thistest failed."
-		echo "ERROR - This is likley related to bug https://bugzilla.redhat.com/show_bug.cgi?id=499464"
-		tet_result FAIL
+		message "ERROR - $tet_thistest failed."
+		message "ERROR - This is likley related to bug https://bugzilla.redhat.com/show_bug.cgi?id=499464"
+		myresult=FAIL
 	fi
 
-	tet_result PASS
+	result $myresult
+	message "END $tet_thistest"
 }
 
 group_add_member_group()
 {
+	myresult=PASS
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	echo "START $tet_thistest"
+	message "START $tet_thistest: Add Group Members"
 	eval_vars M1
 	code=0
 
@@ -330,17 +358,19 @@ group_add_member_group()
 
 	if [ $code -ne 0 ]
 	then
-		echo "ERROR - $tet_thistest failed."
-		tet_result FAIL
+		message "ERROR - $tet_thistest failed."
+		myresult=FAIL
 	fi
 
-	tet_result PASS
+	result $myresult
+	message "END $tet_thistest"
 }
 
 group_add_member_group_neg()
 {
+	myresult=PASS
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	echo "START $tet_thistest"
+	message "START $tet_thistest: Add Group Member That Already is a Member - Negative"
 	eval_vars M1
 	code=0
 
@@ -348,134 +378,152 @@ group_add_member_group_neg()
 	ssh root@$FULLHOSTNAME "ipa group-add-member --groups=$grp2 $grp1"
 	if [ $? -eq 0 ]
 	then
-		echo "ERROR - $tet_thistest failed."
-		echo "ERROR - This is likley related to bug https://bugzilla.redhat.com/show_bug.cgi?id=499464"
-		tet_result FAIL
+		message "ERROR - $tet_thistest failed."
+		message "ERROR - This is likley related to bug https://bugzilla.redhat.com/show_bug.cgi?id=499464"
+		myresult=FAIL
 	fi
 
-	tet_result PASS
+	result $myresult
+	message "END $tet_thistest"
 }
 
 group_remove_member_group()
 {
+	myresult=PASS
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	echo "START $tet_thistest"
+	message "START $tet_thistest: Remove Group Member"
 	eval_vars M1
 	code=0
 
 	ssh root@$FULLHOSTNAME "ipa group-remove-member --groups=$grp2 $grp1"
 	if [ $? -ne 0 ]
 	then
-		echo "ERROR - $tet_thistest failed."
-		tet_result FAIL
+		message "ERROR - $tet_thistest failed."
+		myresult=FAIL
 	fi
 
 	ssh root@$FULLHOSTNAME "ipa group-find $grp1 | grep $grp2"
 	if [ $? -eq 0 ]
 	then
-		echo "ERROR - $tet_thistest failed. $grp2 still appears to be in $grp1 when it should not be"
-		tet_result FAIL
+		message "ERROR - $tet_thistest failed. $grp2 still appears to be in $grp1 when it should not be"
+		myresult=FAIL
 	fi
 
-	tet_result PASS
+	result $myresult
+	message "END $tet_thistest"
 }
 
 group_remove_member_group_neg()
 {
+	myresult=PASS
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	echo "START $tet_thistest"
+	message "START $tet_thistest: Remove Group Member That isn't a Member - Negative"
 	eval_vars M1
 	code=0
 
 	ssh root@$FULLHOSTNAME "ipa group-remove-member --groups=$grp2 $grp1"
 	if [ $? -eq 0 ]
 	then
-		echo "ERROR - $tet_thistest failed. group-remove-member returned a 0 when it should not have"
-		echo "ERROR - This failure may be related to https://bugzilla.redhat.com/show_bug.cgi?id=501841"
-		tet_result FAIL
+		message "ERROR - $tet_thistest failed. group-remove-member returned a 0 when it should not have"
+		message "ERROR - This failure may be related to https://bugzilla.redhat.com/show_bug.cgi?id=501841"
+		myresult=FAIL
 	fi
 
 	ssh root@$FULLHOSTNAME "ipa group-find $grp1 | grep $grp2"
 	if [ $? -eq 0 ]
 	then
-		echo "ERROR - $tet_thistest failed. $grp2 still appears to be in $grp1 when it should not be"
-		tet_result FAIL
+		message "ERROR - $tet_thistest failed. $grp2 still appears to be in $grp1 when it should not be"
+		myresult=FAIL
 	fi
 
-	tet_result PASS
+	result $myresult
+	message "END $tet_thistest"
 }
 
 group_remove_member_user()
 {
+	myresult=PASS
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	echo "START $tet_thistest"
+	message "START $tet_thistest: Remove User Member"
 	eval_vars M1
 	code=0
 
 	ssh root@$FULLHOSTNAME "ipa group-remove-member --users=$usr2 $grp1"
 	if [ $? -ne 0 ]
 	then
-		echo "ERROR - $tet_thistest failed."
-		tet_result FAIL
+		message "ERROR - $tet_thistest failed."
+		myresult=FAIL
 	fi
 
 	ssh root@$FULLHOSTNAME "ipa group-find $grp1 | grep $usr2"
 	if [ $? -eq 0 ]
 	then
-		echo "ERROR - $tet_thistest failed. $grp2 still appears to be in $grp1 when it should not be"
-		tet_result FAIL
+		message "ERROR - $tet_thistest failed. $grp2 still appears to be in $grp1 when it should not be"
+		myresult=FAIL
 	fi
 
-	tet_result PASS
+        ssh root@$FULLHOSTNAME "ipa group-find $grp1 | grep $usr1"
+        if [ $? -ne 0 ]
+        then
+                message "ERROR - $tet_thistest failed. $grp1 is not in $grp1 when it should be"
+                myresult=FAIL
+        fi
+
+	result $myresult
+	message "END $tet_thistest"
 }
 
 group_remove_member_user_neg()
 {
+	myresult=PASS
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	echo "START $tet_thistest"
+	message "START $tet_thistest: Remove User Member That isn't a Member - Negative"
 	eval_vars M1
 	code=0
 
 	ssh root@$FULLHOSTNAME "ipa group-remove-member --users=$usr2 $grp1"
 	if [ $? -eq 0 ]
 	then
-		echo "ERROR - $tet_thistest failed. group-remove-member returned a 0 when it should not have"
-		echo "ERROR - This failure may be related to https://bugzilla.redhat.com/show_bug.cgi?id=501841"
-		tet_result FAIL
+		message "ERROR - $tet_thistest failed. group-remove-member returned a 0 when it should not have"
+		message "ERROR - This failure may be related to https://bugzilla.redhat.com/show_bug.cgi?id=501841"
+		myresult=FAIL
 	fi
 
 	ssh root@$FULLHOSTNAME "ipa group-find $grp1 | grep $usr2"
 	if [ $? -eq 0 ]
 	then
-		echo "ERROR - $tet_thistest failed. $grp2 still appears to be in $grp1 when it should not be"
-		tet_result FAIL
+		message "ERROR - $tet_thistest failed. $grp2 still appears to be in $grp1 when it should not be"
+		myresult=FAIL
 	fi
 
-	tet_result PASS
+	result $myresult
+	message "END $tet_thistest"
 }
 
 group_del()
 {
+	myresult=PASS
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	echo "START $tet_thistest"
+	message "START $tet_thistest: Delete Group"
 	eval_vars M1
 	code=0
 
 	ssh root@$FULLHOSTNAME "ipa group-del $grp1"
 	if [ $? -ne 0 ]
 	then
-		echo "ERROR - $tet_thistest failed."
-		tet_result FAIL
+		message "ERROR - $tet_thistest failed."
+		myresult=FAIL
 	fi
 
 	ssh root@$FULLHOSTNAME "ipa group-find $grp1 | grep desc2"
 	if [ $? -eq 0 ]
 	then
-		echo "ERROR - $tet_thistest failed. ipa group-find passed when it should not have."
-		tet_result FAIL
+		message "ERROR - $tet_thistest failed. ipa group-find passed when it should not have."
+		myresult=FAIL
 	fi
 
-	tet_result PASS
+	result $myresult
+	message "END $tet_thistest"
 }
 
 
@@ -483,11 +531,12 @@ group_del()
 ######################################################################
 # Cleanup Section for the cli tests
 ######################################################################
-user_cleanup()
+group_cleanup()
 {
+	myresult=PASS
 	tet_thistest="cleanup"
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	echo "START $tet_thistest"
+	message "START $tet_thistest: Cleanup"
 	eval_vars M1
 	code=0
 
@@ -503,10 +552,12 @@ user_cleanup()
 
 	if [ $code -ne 0 ]
 	then
-		echo "WARNING - $tet_thistest failed... not that it matters"
+		message "WARNING - $tet_thistest failed... not that it matters"
+		myresult=FAIL
 	fi
 
-	tet_result PASS
+	result $myresult
+	message "END $tet_thistest"
 }
 
 ######################################################################
