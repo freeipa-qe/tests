@@ -32,7 +32,7 @@ shutdownVM()
   if echo $status | grep "running" 1>/dev/null 2>&1
   then
 	techo "		image is running, sending 'poweroff' signal to $vmguest_hostname"
-  	techo "		sleep for 60 seconds, wait for $vmguest_hostanme fully shutdown"
+  	techo "		sleep for 60 seconds, wait for $vmguest_hostanme shutdown"
 	ssh root@$vmguest_hostname poweroff
 	sleep 60
   else
@@ -51,8 +51,8 @@ startVM()
         techo "		$vmguest_hostname is already started"
   else
         ssh root@$vmhoster "virsh start $vmguest_imagename > /dev/null 2>&1 "
-        techo "		virsh start called, sleep 30 seconds, wait for system full up "
-	sleep 30
+        techo "		virsh start called, sleep 45 seconds, wait for system boot up "
+	sleep 45
   fi
 }
 

@@ -76,7 +76,7 @@ ipaserversetup()
 {
 # ipa-server-install -N -U --hostname=mv32a-vm.idm.lab.bos.redhat.com -r IDM.LAB.BOS.REDHAT.COM -p redhat123 -P redhat123 -a redhat123 -u root
 	remote_server=$1
-	echo "yum install ipa starts..."
+	echo "install ipa starts..."
 	if [ -z $remote_server ]
 	then
 		echo "	no remote server defined, do nothing"
@@ -85,6 +85,7 @@ ipaserversetup()
 	ssh root@${remote_server} "ipa-server-install -N -U --hostname=mv32a-vm.idm.lab.bos.redhat.com -r IDM.LAB.BOS.REDHAT.COM -p redhat123 -P redhat123 -a redhat123 -u root"
 
 }
+
 remote_server="mv32a-vm.idm.lab.bos.redhat.com"
 repo_server="mv64j-vm.idm.lab.bos.redhat.com"
 repo_uri="/repo/"
