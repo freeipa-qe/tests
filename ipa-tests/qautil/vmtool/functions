@@ -51,8 +51,8 @@ startVM()
         techo "		$vmguest_hostname is already started"
   else
         ssh root@$vmhoster "virsh start $vmguest_imagename > /dev/null 2>&1 "
-        techo "		virsh start called, sleep 75 seconds, wait for system boot up "
-	sleep 75
+        techo "		virsh start called, sleep 90 seconds, wait for system boot up "
+	sleep 90
   fi
 }
 
