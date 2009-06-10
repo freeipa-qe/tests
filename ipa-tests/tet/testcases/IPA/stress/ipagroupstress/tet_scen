@@ -1,0 +1,12 @@
+ 
+all
+	"Starting ALL"
+	^ipagroupstress
+	"Ending ALL"
+
+ipagroupstress
+	"Starting ipagroupstress tests..."
+	/ipagroupstress.ksh
+	"Ending ipagroupstress tests..."
+
+# EOF
