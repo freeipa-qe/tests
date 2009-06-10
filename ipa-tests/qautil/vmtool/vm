@@ -1,6 +1,10 @@
 #! /bin/sh
 . ./vmconf
 . ./functions
+. ./remotecontrol
+
+vmup mv32b qa
+vmup mv32a ipav2installed
 
 #vmup mv32a qa
 #vmup mv64c qa
@@ -10,7 +14,7 @@
 #vmsave_as mv32j ipacode ipa.v2.coding
 
 #vmsave_as mv32a ipav2rpm ipav2.rpm.installed
-vmsave_as mv32a ipav2installed ipav2.installed
+#vmsave_as mv32a ipav2installed ipav2.installed
 
 #vmupdate mv32a qa
 #vmupdate mv32a ipav2installed
