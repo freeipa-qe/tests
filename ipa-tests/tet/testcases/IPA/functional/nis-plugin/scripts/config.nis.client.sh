@@ -1,9 +1,7 @@
-#!/bin/sh
-
 ########## functions #############
 config_network()
 {
-	echo "	config /etc/sysconfig/network"
+	echo "	config [$client] /etc/sysconfig/network"
 	client=$1
 	nisdomain=$2
 	ssh root@$client "mv -f /etc/sysconfig/network /etc/sysconfig/network.bk"
@@ -13,7 +11,7 @@ config_network()
 
 config_yp_conf()
 {
-	echo "	config /etc/yp.conf"
+	echo "	config [$client] /etc/yp.conf"
 	client=$1
 	nisdomain=$2
 	nisserver=$3
@@ -24,7 +22,7 @@ config_yp_conf()
 
 config_nsswitch()
 {
-	echo "	config /etc/nsswitch.conf"
+	echo "	config [$client] /etc/nsswitch.conf"
 	client=$1
 	ssh root@$client "mv -f /etc/nsswitch.conf /etc/nsswitch.conf.bk"
 	ssh root@$client "sed 	-e 's/^passwd:.*files$/passwd:	files nis/' -e 's/^shadow:.*files$/shadow:	files nis/' -e 's/^group:.*files$/group:	files nis/'   -e 's/^hosts:.*files$/hosts:	files nis dns/' -e 's/^networks:.*files$/networks:	files nis/' -e 's/^protocols:.*files$/protocols:	files nis/' < /etc/nsswitch.conf.bk > /etc/nsswitch.conf "
@@ -60,7 +58,7 @@ echo "nis configuration restore finished"
 }
 
 
-config_nisclient()
+config_nis_client()
 {
 client=$1
 nisdomain=$2
