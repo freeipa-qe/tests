@@ -100,4 +100,4 @@ RestoreNISClient()
 #	echo -e -n "\033[0m "
 #	echo "	this will be replaced"
 #fi
-
+#test line from Sankar Ramalingam. test check-in
