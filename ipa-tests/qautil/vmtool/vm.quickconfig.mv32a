@@ -6,14 +6,17 @@
 # there are many hardcord date here, use it when you fully understand it
 
 # 1. clear saved image file and links
-#echo "remove the original ipav2 images"
-#ssh root@giant "rm -r ipav2installed rhel5-i386-mv32a-vm.img.ipav2.installed.* ipav2rpm rhel5-i386-mv32a-vm.img.ipav2.rpm.installed.* "
+echo "remove the original ipav2 images"
+ssh root@giant "rm -r ipav2installed rhel5-i386-mv32a-vm.img.ipav2.installed.* ipav2rpm rhel5-i386-mv32a-vm.img.ipav2.rpm.installed.* "
 
 # 2. bring up qa image, and exchange public key for future passwrodless login
-#vmup mv32a qa
-
+vmup mv32b qa
+ssh-copy-id -i /root/.ssh/id_rsa.pub mv32b-vm
+vmup mv32a qa
 ssh-copy-id -i /root/.ssh/id_rsa.pub mv32a-vm
+
 vmupdate mv32a qa
+vmupdate mv32b qa
 
 # 3. download the repo, and also install ipa server bits
 remote_server="mv32a-vm.idm.lab.bos.redhat.com"
