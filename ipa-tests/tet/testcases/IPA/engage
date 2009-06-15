@@ -27,6 +27,31 @@
 # Set this next line to y to see debugging output from engage(not from the tests. This gives a huge ammount of output
 export engage_debug=n
 
+# checking to make sure that the ksh on this system is from pdksh. 
+rpm -qf /bin/ksh | grep pdksh
+if [ $? != 0 ]; then
+	echo ""
+	echo "ERROR!"
+	echo "the ksh at /bin/ksh is not the ksh from pdksh"
+	echo "tet does not run properly with the ksh from redhat or fedora."
+	echo "Please install pdksh."
+	echo "Try getting it from here: http://apoc.dsdev.sjc.redhat.com/tet/ipa2/ipa-tests/tet/pdksh"
+	exit 1
+fi
+
+grep "Red Hat Enterprise Linux Server release 5" /etc/redhat-release
+if [ $? != 0 ]; then
+	echo ""
+	echo "WARNING!"
+	echo "tet has been know to be unreliable when not used on Red Hat Enterprise Linux Server release 5.x"
+	echo "fixing engage to make it work well on Fedora is a planned feature for the future"
+	echo "This engage will allow you to continue on this machine, but, for now, you are advised"
+	echo " to run this engage from RHEL 5.x"
+	echo " Hit enter to continue"
+	echo ""
+	read rsp
+fi
+
 if [ "$engage_debug" = "y" ]; then
 	set -x;
 fi

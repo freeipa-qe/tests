@@ -10,3 +10,9 @@ gpgcheck=0
 #enabled=1
 #gpgcheck=0
 
+[bind]
+name=newbind
+baseurl=http://apoc.dsdev.sjc.redhat.com/tet/bind/x86_64/
+enabled=1
+gpgcheck=0
+
