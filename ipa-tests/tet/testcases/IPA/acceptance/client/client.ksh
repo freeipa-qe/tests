@@ -176,7 +176,7 @@ client_cleanup()
 
 	KinitAs M1 $DS_USER $DM_ADMIN_PASS
 
-	ssh root@$FULLHOSTNAME "ipa-deluser $user1"
+	ssh root@$FULLHOSTNAME "ipa user-del $user1"
 	let code=$code+$?
 
 	#ssh root@$FULLHOSTNAME "ipa-modgroup -a biguser super"
