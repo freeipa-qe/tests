@@ -296,7 +296,7 @@ if [ "$MainOS" = "Windows_NT" ]; then
 	cp $in $out
 	#rm -rf $f	
 else
-	mv $in $out
+	cp -r $in $out
 fi
 }
 
