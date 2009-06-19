@@ -187,43 +187,40 @@ hostgrpcli_001()
 	myresult=PASS
         message "START $tet_thistest: Add Host Groups"
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	for s in $SERVERS; do
-		if [ "$s" == "M1" ]; then
-			eval_vars $s
-			i=0
-			while [ $i -lt ${#grouplist[@]} ] ; do
-			  upper=`echo  ${grouplist[$i]} |  tr "[a-z]" "[A-Z]"` 
-			  description="Testing Host Group"
-			  # test for ipa hostgroup-add
-			  echo "adding group  \"${grouplist[$i]}\""
-			  ssh root@$FULLHOSTNAME "ipa hostgroup-add --description=\"$description\" \"${grouplist[$i]}\""
-			  if [ $? -ne 0 ]
-			  then
-				message "ERROR - ipa hostgroup-add failed on $FULLHOSTNAME"
-				myresult=FAIL
-			  fi
-			  # Verifying lower case
-			  ssh root@$FULLHOSTNAME "ipa hostgroup-find \"${grouplist[$i]}\" | grep \"${grouplist[$i]}\""
-			  if [ $? -ne 0 ]
-			  then
-				message "ERROR - ipa hostgroup-find \"${grouplist[$i]}\" failed on $FULLHOSTNAME"
-				myresult=FAIL
-			  else
-				message "ipa hostgroup-find successful for \"${grouplist[$i]}\" on $FULLHOSTNAME"
-			  fi
-			  # Verifying upper case
-                          ssh root@$FULLHOSTNAME "ipa hostgroup-find \"$upper\" | grep \"${grouplist[$i]}\""
-                          if [ $? -ne 0 ]
-                          then
-                                message "ERROR - ipa hostgroup-find \"$upper\" failed on $FULLHOSTNAME"
-                                myresult=FAIL
-                          else
-                                message "ipa hostgroup-find successful for \"$upper\" on $FULLHOSTNAME"
-
-                          fi
-			  ((i=$i+1))
-		  	done
+	eval_vars M1
+	i=0
+	while [ $i -lt ${#grouplist[@]} ] ; do
+		upper=`echo  ${grouplist[$i]} |  tr "[a-z]" "[A-Z]"` 
+		description="Testing Host Group"
+		# test for ipa hostgroup-add
+		echo "adding group  \"${grouplist[$i]}\""
+		ssh root@$FULLHOSTNAME "ipa hostgroup-add --description=\"$description\" \"${grouplist[$i]}\""
+		if [ $? -ne 0 ] ; then
+			message "ERROR - ipa hostgroup-add failed on $FULLHOSTNAME"
+			myresult=FAIL
 		fi
+	done
+
+	for s in $SERVERS; do
+		eval_vars $s
+		message "Working on $s"	
+		# Verifying lower case
+		ssh root@$FULLHOSTNAME "ipa hostgroup-find \"${grouplist[$i]}\" | grep \"${grouplist[$i]}\""
+		if [ $? -ne 0 ] ; then
+			message "ERROR - ipa hostgroup-find \"${grouplist[$i]}\" failed on $FULLHOSTNAME"
+			myresult=FAIL
+		else
+			message "ipa hostgroup-find successful for \"${grouplist[$i]}\" on $FULLHOSTNAME"
+		fi
+		# Verifying upper case
+                ssh root@$FULLHOSTNAME "ipa hostgroup-find \"$upper\" | grep \"${grouplist[$i]}\""
+                if [ $? -ne 0 ] ; then
+                	message "ERROR - ipa hostgroup-find \"$upper\" failed on $FULLHOSTNAME"
+                	myresult=FAIL
+                else
+                        message "ipa hostgroup-find successful for \"$upper\" on $FULLHOSTNAME"
+		fi
+		((i=$i+1))
 	done
 
 	result $myresult
@@ -235,33 +232,33 @@ hostgrpcli_002()
 	myresult=PASS
         message "START $tet_thistest: Modify Host Description"
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-        for s in $SERVERS; do
-                if [ "$s" == "M1" ]; then
-                        eval_vars $s
-			i=0
-                        while [ $i -lt ${#grouplist[@]} ] ; do
-				description="This is a new description for ${grouplist[$i]}"
-                        	ssh root@$FULLHOSTNAME "ipa hostgroup-mod --description=\"$description\" \"${grouplist[$i]}\""
-                        	if [ $? -ne 0 ] ; then
-                                  message "ERROR - ipa hostgroup-mod failed on $FULLHOSTNAME"
-                                  myresult=FAIL
-                        	fi
-
-                        	# Verify description
-                        	value=`ssh root@$FULLHOSTNAME "ipa hostgroup-show \"${grouplist[$i]}\" | grep description:"`
-                        	value=`echo $value | awk -F: '{print $2}'`
-                        	#trim white space
-                        	value=`echo $value`
-                        	if [ $value -ne $description ] ; then
-                                 message "ERROR - \"${grouplist[$i]}\" description not correct on $FULLHOSTNAME expected: $description  got: $value"
-                                 myresult=FAIL
-                        	else
-                                  message "Host \"${grouplist[$i]}\" description is as expected: $value"
-                        	fi
-				((i=$i+1))
-			done
+        eval_vars M1
+	i=0
+        while [ $i -lt ${#grouplist[@]} ] ; do
+		description="This is a new description for ${grouplist[$i]}"
+                ssh root@$FULLHOSTNAME "ipa hostgroup-mod --description=\"$description\" \"${grouplist[$i]}\""
+                if [ $? -ne 0 ] ; then
+                	message "ERROR - ipa hostgroup-mod failed on $FULLHOSTNAME"
+                        myresult=FAIL
                 fi
-        done
+	done
+	
+	for s in $SERVERS; do
+		eval_vars $s
+		message "Working on $s"
+                # Verify description
+                value=`ssh root@$FULLHOSTNAME "ipa hostgroup-show \"${grouplist[$i]}\" | grep description:"`
+                value=`echo $value | awk -F: '{print $2}'`
+                #trim white space
+                value=`echo $value`
+                if [ $value -ne $description ] ; then
+                	message "ERROR - \"${grouplist[$i]}\" description not correct on $FULLHOSTNAME expected: $description  got: $value"
+                        myresult=FAIL
+                else
+                        message "Host \"${grouplist[$i]}\" description is as expected: $value"
+                fi
+		((i=$i+1))
+	done
 
         result $myresult
         message "END $tet_thistest"
@@ -273,45 +270,43 @@ hostgrpcli_003()
 	tmpfile=$TET_TMP_DIR/members.txt
 	message "START $tet_thistest: Add Hosts to Host Groups"
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+	eval_vars M1
+	#### Add all hosts to all groups ####
+	i=0
+	while [ $i -lt ${#grouplist[@]} ] ; do
+		h=0
+		while [ $h -lt ${#hostlist[@]} ] ; do
+			# add host to host group
+			ssh root@$FULLHOSTNAME "ipa hostgroup-add-member --hosts=${hostlist[$h]} \"${grouplist[$i]}\""
+			if [ $? -ne 0 ] ; then
+				message "ERROR - ipa hostgroup-add-member host \"${hostlist[$h]}\" to \"${grouplist[$i]}\" failed on $FULLHOSTNAME"
+				myresult=FAIL
+			fi
+			((h=$h+1))
+		done
+		((i=$i+1))
+	done
+
 	for s in $SERVERS; do
-		if [ "$s" == "M1" ]; then
-			eval_vars $s
-
-			#### Add all hosts to all groups ####
-			i=0
-			while [ $i -lt ${#grouplist[@]} ] ; do
-				h=0
-				while [ $h -lt ${#hostlist[@]} ] ; do
-				  # add host to host group
-				  ssh root@$FULLHOSTNAME "ipa hostgroup-add-member --hosts=${hostlist[$h]} \"${grouplist[$i]}\""
-				  if [ $? -ne 0 ] ; then
-				     message "ERROR - ipa hostgroup-add-member host \"${hostlist[$h]}\" to \"${grouplist[$i]}\" failed on $FULLHOSTNAME"
-				     myresult=FAIL
-				  fi
-				  ((h=$h+1))
-				done
-			   ((i=$i+1))
+		eval_vars $s
+		message "Working on $s"
+		##### Verify host memberships #####
+		i=0
+		while [ $i -lt ${#grouplist[@]} ] ; do
+        		ssh root@$FULLHOSTNAME "ipa hostgroup-show \"${grouplist[$i]}\"" > $tmpfile
+			h=0
+			while [ $h -lt ${#hostlist[@]} ] ; do
+			   cat $tmpfile | grep "${hostlist[$h]}"
+			   if [ $? -ne 0 ] ; then
+			     message "ERROR - \"${hostlist[$h]}\" is not a member of \"${grouplist[$i]}\" and should be - failed on $FULLHOSTNAME"
+			     myresult=FAIL
+			   else
+			     message "\"${hostlist[$h]}\" is a member of \"${grouplist[$i]}\" - verified on $FULLHOSTNAME"
+			   fi
+			   ((h=$h+1))
 			done
-
-			##### Verify host memberships #####
-			i=0
-			while [ $i -lt ${#grouplist[@]} ] ; do
-                           # verify membership
-                           ssh root@$FULLHOSTNAME "ipa hostgroup-show \"${grouplist[$i]}\"" > $tmpfile
-			   h=0
-			   while [ $h -lt ${#hostlist[@]} ] ; do
-				cat $tmpfile | grep "${hostlist[$h]}"
-				if [ $? -ne 0 ] ; then
-				  message "ERROR - \"${hostlist[$h]}\" is not a member of \"${grouplist[$i]}\" and should be - failed on $FULLHOSTNAME"
-				  myresult=FAIL
-			 	else
-				   message "\"${hostlist[$h]}\" is a member of \"${grouplist[$i]}\" - verified on $FULLHOSTNAME"
-				fi
-				((h=$h+1))
-			   done
-			   ((i=$i+1))
-			done
-		fi
+		done
+		((i=$i+1))
 	done
 	
 	rm -rf $tmpfile
@@ -325,45 +320,43 @@ hostgrpcli_004()
         tmpfile=$TET_TMP_DIR/members.txt
         message "START $tet_thistest: Add User Groups to Host Groups"
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-        for s in $SERVERS; do
-                if [ "$s" == "M1" ]; then
-                        eval_vars $s
+        eval_vars M1
+        #### Add all user groups to all host groups ####
+        i=0
+        while [ $i -lt ${#grouplist[@]} ] ; do
+        	h=0
+        	while [ $h -lt ${#ugrplist[@]} ] ; do
+                	ssh root@$FULLHOSTNAME "ipa hostgroup-add-member --groups=${ugrplist[$h]} \"${grouplist[$i]}\""
+                	if [ $? -ne 0 ] ; then
+                        	message "ERROR - ipa hostgroup-add-member user group \"${ugrplist[$h]}\" to \"${grouplist[$i]}\" failed on $FULLHOSTNAME"
+                                myresult=FAIL
+                	fi
+                        ((h=$h+1))
+                done
+                ((i=$i+1))
+	done
 
-                        #### Add all user groups to all host groups ####
-                        i=0
-                        while [ $i -lt ${#grouplist[@]} ] ; do
-                                h=0
-                                while [ $h -lt ${#ugrplist[@]} ] ; do
-                                  ssh root@$FULLHOSTNAME "ipa hostgroup-add-member --groups=${ugrplist[$h]} \"${grouplist[$i]}\""
-                                  if [ $? -ne 0 ] ; then
-                                     message "ERROR - ipa hostgroup-add-member user group \"${ugrplist[$h]}\" to \"${grouplist[$i]}\" failed on $FULLHOSTNAME"
-                                     myresult=FAIL
-                                  fi
-                                  ((h=$h+1))
-                                done
-                           ((i=$i+1))
-                        done
-
-                        ##### Verify user group memberships #####
-                        i=0
-                        while [ $i -lt ${#ugrplist[@]} ] ; do
-                           # verify membership
-                           ssh root@$FULLHOSTNAME "ipa hostgroup-show \"${grouplist[$i]}\"" > $tmpfile
-                           h=0
-                           while [ $h -lt ${#ugrplist[@]} ] ; do
-                                cat $tmpfile | grep "${ugrplist[$h]}"
-                                if [ $? -ne 0 ] ; then
-                                  message "ERROR - \"${ugrplist[$h]}\" is not a member of \"${grouplist[$i]}\" and should be - failed on $FULLHOSTNAME"
+        ##### Verify user group memberships #####
+	for s in $SERVERS; do
+		eval_vars $s
+		message  "Working on $s"
+		i=0
+        	while [ $i -lt ${#ugrplist[@]} ] ; do
+        		ssh root@$FULLHOSTNAME "ipa hostgroup-show \"${grouplist[$i]}\"" > $tmpfile
+                	h=0
+                	while [ $h -lt ${#ugrplist[@]} ] ; do
+                		cat $tmpfile | grep "${ugrplist[$h]}"
+                        	if [ $? -ne 0 ] ; then
+                        	  message "ERROR - \"${ugrplist[$h]}\" is not a member of \"${grouplist[$i]}\" and should be - failed on $FULLHOSTNAME"
                                   myresult=FAIL
-                                else
-                                   message "\"${ugrplist[$h]}\" is a member of \"${grouplist[$i]}\" - verified on $FULLHOSTNAME"
-                                fi
-                                ((h=$h+1))
-                           done
-                           ((i=$i+1))
-                        done
-                fi
-        done
+                        	else
+                                  message "\"${ugrplist[$h]}\" is a member of \"${grouplist[$i]}\" - verified on $FULLHOSTNAME"
+                        	fi
+                        	((h=$h+1))
+                	done
+                	((i=$i+1))
+         	done
+	done
 
         rm -rf $tmpfile
         result $myresult
@@ -376,44 +369,41 @@ hostgrpcli_005()
         tmpfile=$TET_TMP_DIR/members.txt
         message "START $tet_thistest: Remove Hosts from Host Groups"
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-        for s in $SERVERS; do
-                if [ "$s" == "M1" ]; then
-                        eval_vars $s
+        eval_vars M1
+	#### Remove all hosts from all groups ####
+        i=0
+        while [ $i -lt ${#grouplist[@]} ] ; do
+        	h=0
+                while [ $h -lt ${#hostlist[@]} ] ; do
+                	ssh root@$FULLHOSTNAME "ipa hostgroup-remove-member --hosts=${hostlist[$h]} \"${grouplist[$i]}\""
+                        if [ $? -ne 0 ] ; then
+                        	message "ERROR - ipa hostgroup-remove-member host \"${hostlist[$h]}\" to \"${grouplist[$i]}\" failed on $FULLHOSTNAME"
+                                myresult=FAIL
+                        fi
+                        ((h=$h+1))
+                done
+                ((i=$i+1))
+        done
 
-                        #### Remove all hosts from all groups ####
-                        i=0
-                        while [ $i -lt ${#grouplist[@]} ] ; do
-                                h=0
-                                while [ $h -lt ${#hostlist[@]} ] ; do
-                                  ssh root@$FULLHOSTNAME "ipa hostgroup-remove-member --hosts=${hostlist[$h]} \"${grouplist[$i]}\""
-                                  if [ $? -ne 0 ] ; then
-                                     message "ERROR - ipa hostgroup-remove-member host \"${hostlist[$h]}\" to \"${grouplist[$i]}\" failed on $FULLHOSTNAME"
-                                     myresult=FAIL
-                                  fi
-                                  ((h=$h+1))
-                                done
-                           ((i=$i+1))
+	##### Verify host memberships #####
+	for s in $SERVERS; do
+		eval_vars
+                i=0
+                while [ $i -lt ${#grouplist[@]} ] ; do
+                	ssh root@$FULLHOSTNAME "ipa hostgroup-show \"${grouplist[$i]}\"" > $tmpfile
+                        h=0
+                        while [ $h -lt ${#hostlist[@]} ] ; do
+                            cat $tmpfile | grep "${hostlist[$h]}"
+                            if [ $? -eq 0 ] ; then
+                                message "ERROR - \"${hostlist[$h]}\" is still a member of \"${grouplist[$i]}\" and should not be - failed on $FULLHOSTNAME"
+                                myresult=FAIL
+                            else
+                                message "\"${hostlist[$h]}\" is no longer a member of \"${grouplist[$i]}\" - verified on $FULLHOSTNAME"
+                            fi
+                            ((h=$h+1))
                         done
-
-                        ##### Verify host memberships #####
-                        i=0
-                        while [ $i -lt ${#grouplist[@]} ] ; do
-                           # verify membership
-                           ssh root@$FULLHOSTNAME "ipa hostgroup-show \"${grouplist[$i]}\"" > $tmpfile
-                           h=0
-                           while [ $h -lt ${#hostlist[@]} ] ; do
-                                cat $tmpfile | grep "${hostlist[$h]}"
-                                if [ $? -eq 0 ] ; then
-                                  message "ERROR - \"${hostlist[$h]}\" is still a member of \"${grouplist[$i]}\" and should not be - failed on $FULLHOSTNAME"
-                                  myresult=FAIL
-                                else
-                                   message "\"${hostlist[$h]}\" is no longer a member of \"${grouplist[$i]}\" - verified on $FULLHOSTNAME"
-                                fi
-                                ((h=$h+1))
-                           done
-                           ((i=$i+1))
-                        done
-                fi
+                        ((i=$i+1))
+                done
         done
 
         rm -rf $tmpfile
@@ -427,44 +417,43 @@ hostgrpcli_006()
         tmpfile=$TET_TMP_DIR/members.txt
         message "START $tet_thistest: Remove User Groups from Host Groups"
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-        for s in $SERVERS; do
-                if [ "$s" == "M1" ]; then
-                        eval_vars $s
+        eval_vars M1
+	#### Remove all user groups to all host groups ####
+        i=0
+        while [ $i -lt ${#grouplist[@]} ] ; do
+        	h=0
+                while [ $h -lt ${#ugrplist[@]} ] ; do
+                	ssh root@$FULLHOSTNAME "ipa hostgroup-remove-member --groups=\"${ugrplist[$h]}\" \"${grouplist[$i]}\""
+                        if [ $? -ne 0 ] ; then
+                          message "ERROR - ipa hostgroup-remove-member user group \"${ugrplist[$h]}\" from \"${grouplist[$i]}\" failed on $FULLHOSTNAME"
+                          myresult=FAIL
+                        fi
+                        ((h=$h+1))
+                done
+                ((i=$i+1))
+        done
 
-                        #### Remove all user groups to all host groups ####
-                        i=0
-                        while [ $i -lt ${#grouplist[@]} ] ; do
-                                h=0
-                                while [ $h -lt ${#ugrplist[@]} ] ; do
-                                  ssh root@$FULLHOSTNAME "ipa hostgroup-remove-member --groups=\"${ugrplist[$h]}\" \"${grouplist[$i]}\""
-                                  if [ $? -ne 0 ] ; then
-                                     message "ERROR - ipa hostgroup-remove-member user group \"${ugrplist[$h]}\" from \"${grouplist[$i]}\" failed on $FULLHOSTNAME"
-                                     myresult=FAIL
-                                  fi
-                                  ((h=$h+1))
-                                done
-                           ((i=$i+1))
+        ##### Verify user group memberships #####
+	for s in $SERVERS; do
+		eval_vars $s
+		message "Working on $s"
+                i=0
+                while [ $i -lt ${#ugrplist[@]} ] ; do
+                	ssh root@$FULLHOSTNAME "ipa hostgroup-show \"${grouplist[$i]}\"" > $tmpfile
+                        h=0
+                        while [ $h -lt ${#ugrplist[@]} ] ; do
+                           cat $tmpfile | grep "${ugrplist[$h]}"
+                           if [ $? -eq 0 ] ; then
+                              message "ERROR - \"${ugrplist[$h]}\" is still a member of \"${grouplist[$i]}\" and should not be - failed on $FULLHOSTNAME"
+                              myresult=FAIL
+                           else
+                              message "\"${ugrplist[$h]}\" is no longer a member of \"${grouplist[$i]}\" - verified on $FULLHOSTNAME"
+                           fi
+                           ((h=$h+1))
                         done
+                        ((i=$i+1))
+		done
 
-                        ##### Verify user group memberships #####
-                        i=0
-                        while [ $i -lt ${#ugrplist[@]} ] ; do
-                           # verify membership
-                           ssh root@$FULLHOSTNAME "ipa hostgroup-show \"${grouplist[$i]}\"" > $tmpfile
-                           h=0
-                           while [ $h -lt ${#ugrplist[@]} ] ; do
-                                cat $tmpfile | grep "${ugrplist[$h]}"
-                                if [ $? -eq 0 ] ; then
-                                  message "ERROR - \"${ugrplist[$h]}\" is still a member of \"${grouplist[$i]}\" and should not be - failed on $FULLHOSTNAME"
-                                  myresult=FAIL
-                                else
-                                   message "\"${ugrplist[$h]}\" is no longer a member of \"${grouplist[$i]}\" - verified on $FULLHOSTNAME"
-                                fi
-                                ((h=$h+1))
-                           done
-                           ((i=$i+1))
-                        done
-                fi
         done
 
         rm -rf $tmpfile
@@ -478,54 +467,57 @@ hostgrpcli_007()
         tmpfile=$TET_TMP_DIR/members.txt
         message "START $tet_thistest: Nested Host Groups"
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-        for s in $SERVERS; do
-                if [ "$s" == "M1" ]; then
-                        eval_vars $s
-
-			#### Add Nested Host groups ####
-                        ssh root@$FULLHOSTNAME "ipa hostgroup-add-member --hostgroups=\"$group5\" \"$group4\""
-                        if [ $? -ne 0 ] ; then
-                        	message "ERROR - ipa hostgroup-add-member \"$group5\" to \"$group4\" failed on $FULLHOSTNAME"
-                        	myresult=FAIL
-                        fi
+        eval_vars M1
+	#### Add Nested Host groups ####
+        ssh root@$FULLHOSTNAME "ipa hostgroup-add-member --hostgroups=\"$group5\" \"$group4\""
+        if [ $? -ne 0 ] ; then
+        	message "ERROR - ipa hostgroup-add-member \"$group5\" to \"$group4\" failed on $FULLHOSTNAME"
+               	myresult=FAIL
+        fi
 			
-                        ssh root@$FULLHOSTNAME "ipa hostgroup-add-member --hostgroups="\"$group1\",\"$group2\",\"$group3\"" \"$group5\""
-                        if [ $? -ne 0 ] ; then
-                                message "ERROR - ipa hostgroup-add-member failed on $FULLHOSTNAME. rc: $?"
-                                myresult=FAIL
-                        fi
+        ssh root@$FULLHOSTNAME "ipa hostgroup-add-member --hostgroups="\"$group1\",\"$group2\",\"$group3\"" \"$group5\""
+        if [ $? -ne 0 ] ; then
+                message "ERROR - ipa hostgroup-add-member failed on $FULLHOSTNAME. rc: $?"
+                myresult=FAIL
+        fi
 	
-			##### Verify Group Memberships ####
-			ssh root@$FULLHOSTNAME "ipa hostgroup-show \"$group4\"" > $tmpfile
-			cat $tmpfile | grep "$group5"
-			if [ $? -ne 0 ] ; then
-				message "ERROR - \"$group5\" should be a member of \"$group4\" but is not - failed on $FULLHOSTNAME"
-			else
-				message "\"$group5\" is a member of \"$group4\""
-			fi
-
-                        ssh root@$FULLHOSTNAME "ipa hostgroup-show \"$group5\"" > $tmpfile
-                        cat $tmpfile | grep "$group1"
-                        if [ $? -ne 0 ] ; then
-                                message "ERROR - \"$group1\" should be a member of \"$group4\" but is not - failed on $FULLHOSTNAME"
-                        else
-                                message "\"$group1\" is a member of \"$group4\""
-                        fi
-
-                        cat $tmpfile | grep "$group2"
-                        if [ $? -ne 0 ] ; then
-                                message "ERROR - \"$group2\" should be a member of \"$group4\" but is not - failed on $FULLHOSTNAME"
-                        else
-                                message "\"$group2\" is a member of \"$group4\""
-                        fi
-
-                        cat $tmpfile | grep "$group3"
-                        if [ $? -ne 0 ] ; then
-                                message "ERROR - \"$group3\" should be a member of \"$group4\" but is not - failed on $FULLHOSTNAME"
-                        else
-                                message "\"$group3\" is a member of \"$group4\""
-                        fi
+	##### Verify Group Memberships ####
+	for s in $SERVERS; do
+		eval_vars $s
+		message "Working on $s"
+		ssh root@$FULLHOSTNAME "ipa hostgroup-show \"$group4\"" > $tmpfile
+		cat $tmpfile | grep "$group5"
+		if [ $? -ne 0 ] ; then
+			message "ERROR - \"$group5\" should be a member of \"$group4\" but is not - failed on $FULLHOSTNAME"
+			myresult=FAIL
+		else
+			message "\"$group5\" is a member of \"$group4\""
 		fi
+
+                ssh root@$FULLHOSTNAME "ipa hostgroup-show \"$group5\"" > $tmpfile
+                cat $tmpfile | grep "$group1"
+                if [ $? -ne 0 ] ; then
+                	message "ERROR - \"$group1\" should be a member of \"$group4\" but is not - failed on $FULLHOSTNAME"
+			myresult=FAIL
+                else
+                        message "\"$group1\" is a member of \"$group4\""
+                fi
+
+                cat $tmpfile | grep "$group2"
+                if [ $? -ne 0 ] ; then
+                	message "ERROR - \"$group2\" should be a member of \"$group4\" but is not - failed on $FULLHOSTNAME"
+			myresult=FAIL
+                else
+                        message "\"$group2\" is a member of \"$group4\""
+                fi
+
+                cat $tmpfile | grep "$group3"
+                if [ $? -ne 0 ] ; then
+                	message "ERROR - \"$group3\" should be a member of \"$group4\" but is not - failed on $FULLHOSTNAME"
+			myresult=FAIL
+                else
+                        message "\"$group3\" is a member of \"$group4\""
+                fi
 	done
 
         rm -rf $tmpfile
@@ -540,38 +532,41 @@ hostgrpcli_008()
 	tmpfile=$TET_TMP_DIR/members.txt
         message "START $tet_thistest: Remove Nested Group Memberships"
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-        for s in $SERVERS; do
-             eval_vars $s
-
-            #### Remove all user groups to all host groups ####
-            ssh root@$FULLHOSTNAME "ipa hostgroup-remove-member --hostgroups=\"$group5\" \"$group4\""
-            if [ $? -ne 0 ] ; then
-            	message "ERROR - ipa hostgroup-remove-member \"$group5\" to \"$group4\" failed on $FULLHOSTNAME"
+        eval_vars M1
+	#### Remove all user groups to all host groups ####
+        ssh root@$FULLHOSTNAME "ipa hostgroup-remove-member --hostgroups=\"$group5\" \"$group4\""
+        if [ $? -ne 0 ] ; then
+        	message "ERROR - ipa hostgroup-remove-member \"$group5\" to \"$group4\" failed on $FULLHOSTNAME"
             	myresult=FAIL
-            fi
+        fi
 
-            ssh root@$FULLHOSTNAME "ipa hostgroup-remove-member --hostgroups="\"$group1\",\"$group2\",\"$group3\"" \"$group5\""
-            if [ $? -ne 0 ] ; then
-            	message "ERROR - ipa hostgroup-remove-member failed on $FULLHOSTNAME. rc: $?"
+        ssh root@$FULLHOSTNAME "ipa hostgroup-remove-member --hostgroups="\"$group1\",\"$group2\",\"$group3\"" \"$group5\""
+        if [ $? -ne 0 ] ; then
+        	message "ERROR - ipa hostgroup-remove-member failed on $FULLHOSTNAME. rc: $?"
             	myresult=FAIL
-            fi
+        fi
 
-	    ##### Verify hostgroups are removed ####
-            ssh root@$FULLHOSTNAME "ipa hostgroup-show \"$group4\"" > $tmpfile
-            cat $tmpfile | grep "$group5"
-            if [ $? -eq 0 ] ; then
-            	message "ERROR - \"$group5\" still have members and should not - failed on $FULLHOSTNAME"
-            else
-            	message "\"$group5\" no longer has any members."
-            fi
+	##### Verify hostgroups are removed ####
+	for s in $SERVERS ; do
+		eval_vars $s
+		message "Working on $s"
+            	ssh root@$FULLHOSTNAME "ipa hostgroup-show \"$group4\"" > $tmpfile
+            	cat $tmpfile | grep "$group5"
+            	if [ $? -eq 0 ] ; then
+            		message "ERROR - \"$group5\" still have members and should not - failed on $FULLHOSTNAME"
+			myresult=FAIL
+            	else
+            		message "\"$group5\" no longer has any members."
+                fi
 
-           ssh root@$FULLHOSTNAME "ipa hostgroup-show \"$group5\"" > $tmpfile
-           cat $tmpfile | grep "member:"
-           if [ $? -eq 0 ] ; then
-           	message "ERROR - \"$group4\" still has members and should not - failed on $FULLHOSTNAME"
-           else
-          	 message "\"$group4\" no longer has any members."
-           fi
+                ssh root@$FULLHOSTNAME "ipa hostgroup-show \"$group5\"" > $tmpfile
+                cat $tmpfile | grep "member:"
+                if [ $? -eq 0 ] ; then
+           		message "ERROR - \"$group4\" still has members and should not - failed on $FULLHOSTNAME"
+			myresult=FAIL
+                else
+          		message "\"$group4\" no longer has any members."
+                fi
 
         done
 
@@ -587,19 +582,17 @@ hostgrpcli_009()
         message "START $tet_thistest: Negative - add duplicate host group"
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
         for s in $SERVERS; do
-             if [ "$s" == "M1" ]; then
-                eval_vars $s
-
-                # check return code
+        	eval_vars $s
+		message "Working on $s"
+		# check return code
                 ssh root@$FULLHOSTNAME "ipa hostgroup-add --description="testing" \"$group5\""
                 ret=`echo $?`
                 if [ $ret -ne $errorcode ] ; then
-                        message "ERROR - unexpected return code from ipa hostgroup-add.  expected: $errorcode got: $?"
+                	message "ERROR - unexpected return code from ipa hostgroup-add.  expected: $errorcode got: $?"
                         myresult=FAIL
                 else
                         message "ipa hostgroup-add returned expected code trying to add duplicate host."
                 fi
-             fi
         done
         result $myresult
         message "END $tet_thistest"
@@ -613,9 +606,8 @@ hostgrpcli_010()
         message "START $tet_thistest: Negative - Host Group Doesn't Exist"
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
         for s in $SERVERS; do
-             if [ "$s" == "M1" ]; then
                 eval_vars $s
-
+		message "Working on $s"
                 # check return code
                 ssh root@$FULLHOSTNAME "ipa hostgroup-del \"$mygroup\""
                 if [ $? -ne $errorcode ] ; then
@@ -666,7 +658,6 @@ hostgrpcli_010()
                 else 
                         message "ipa hostgroup-remove-member returned expected code trying to removing a member from a host group that doesn't exist."
                 fi
-             fi
         done
         result $myresult
         message "END $tet_thistest"
@@ -679,27 +670,29 @@ hostgrpcli_011()
 	tmpfile=$TET_TMP_DIR/members.txt
         message "START $tet_thistest: Negative - Host Group as Member to itself"
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	s="M1"
-	eval_vars $s 
+	for s in $SERVERS ; do
+		eval_vars $s
+		message "Working on $s" 
 
-	ssh root@$FULLHOSTNAME "ipa hostgroup-add-member --hostgroups=$group1 \"$group1\""
-	# check error code
-        if [ $? -ne $errorcode ] ; then
-             message "ERROR - unexpected return code from ipa hostgroup-add-member.  expected: $errorcode got: $?"
-             myresult=FAIL
-        else
-             message "ipa hostgroup-add-member returned expected code trying to adding self as member to a host group"
-        fi
+		ssh root@$FULLHOSTNAME "ipa hostgroup-add-member --hostgroups=$group1 \"$group1\""
+		# check error code
+        	if [ $? -ne $errorcode ] ; then
+             		message "ERROR - unexpected return code from ipa hostgroup-add-member.  expected: $errorcode got: $?"
+             		myresult=FAIL
+        	else
+             		message "ipa hostgroup-add-member returned expected code trying to adding self as member to a host group"
+        	fi
 
-	# verify host group is not a member of itself
-	ssh root@$FULLHOSTNAME "ipa hostgroup-show \"$group1\"" > $tmpfile
-        cat $tmpfile | grep "${ugrplist[$h]}"
-        if [ $? -ne 0 ] ; then
-             message "ERROR - \"${ugrplist[$h]}\" is not a member of \"${grouplist[$i]}\" and should be - failed on $FULLHOSTNAME"
-             myresult=FAIL
-        else
-             message "\"${ugrplist[$h]}\" is a member of \"${grouplist[$i]}\" - verified on $FULLHOSTNAME"         
-       fi
+		# verify host group still has no members
+		ssh root@$FULLHOSTNAME "ipa hostgroup-show \"$group1\"" > $tmpfile
+        	cat $tmpfile | grep "member:"
+        	if [ $? -eq 0 ] ; then
+             		message "ERROR - \"$group1\" has at least one member and should not - failed on $FULLHOSTNAME"
+             		myresult=FAIL
+        	else
+             		message "\"$group1\" does not have any members - verified on $FULLHOSTNAME"         
+       		fi
+	done
 	
 	rm -rf $tmpfile
         result $myresult
@@ -712,46 +705,44 @@ hostgrpcli_012()
         tmpfile=$TET_TMP_DIR/members.txt
         message "START $tet_thistest: Delete Host group that has members"
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-        s="M1"
-        eval_vars $s
-
+        eval_vars M1
         i=0
         while [ $i -lt 2 ] ; do
 
-          # add members to two host groups
-           ssh root@$FULLHOSTNAME "ipa hostgroup-add-member --hosts=\"${hostlist[0]}\" --groups=\"${ugrplist[0]}\" --hostgroups=\"${grouplist[2]}\" \"${grouplist[$i]}\""
-            if [ $? -ne 0 ] ; then
-                message "ERROR - ipa hostgroup-add-member to \"${grouplist[$i]}\" failed on $FULLHOSTNAME"
-                myresult=FAIL
-            fi
+        	# add members to two host groups
+           	ssh root@$FULLHOSTNAME "ipa hostgroup-add-member --hosts=\"${hostlist[0]}\" --groups=\"${ugrplist[0]}\" --hostgroups=\"${grouplist[2]}\" \"${grouplist[$i]}\""
+            	if [ $? -ne 0 ] ; then
+                	message "ERROR - ipa hostgroup-add-member to \"${grouplist[$i]}\" failed on $FULLHOSTNAME"
+                	myresult=FAIL
+            	fi
 
-        # verify membership
-          ssh root@$FULLHOSTNAME "ipa hostgroup-show \"${grouplist[$i]}\"" > $tmpfile
-          cat $tmpfile | grep ${hostlist[0]}
-          if [ $? -ne 0 ] ; then
-                message "ERROR - \"${hostlist[0]}\" should be a member of \"${grouplist[$i]}\" but is not - failed on $FULLHOSTNAME"
-                myresult=FAIL
-          else
-                message "\"${hostlist[0]}\" is a member of \"${grouplist[$i]}\""
-          fi
+        	# verify membership
+        	ssh root@$FULLHOSTNAME "ipa hostgroup-show \"${grouplist[$i]}\"" > $tmpfile
+        	cat $tmpfile | grep ${hostlist[0]}
+        	if [ $? -ne 0 ] ; then
+              		message "ERROR - \"${hostlist[0]}\" should be a member of \"${grouplist[$i]}\" but is not - failed on $FULLHOSTNAME"
+              		myresult=FAIL
+        	else
+              		message "\"${hostlist[0]}\" is a member of \"${grouplist[$i]}\""
+        	fi
 
-          cat $tmpfile | grep ${ugrplist[0]}
-          if [ $? -ne 0 ] ; then
-                message "ERROR - \"${ugrplist[0]}\" should be a member of \"${grouplist[$i]}\" but is not - failed on $FULLHOSTNAME"
-                myresult=FAIL
-          else
-                message "\"${ugrplist[0]}\" is a member of \"${grouplist[$i]}\""
-          fi
+        	cat $tmpfile | grep ${ugrplist[0]}
+        	if [ $? -ne 0 ] ; then
+              		message "ERROR - \"${ugrplist[0]}\" should be a member of \"${grouplist[$i]}\" but is not - failed on $FULLHOSTNAME"
+           	   	myresult=FAIL
+        	else
+              		message "\"${ugrplist[0]}\" is a member of \"${grouplist[$i]}\""
+        	fi
 
-          cat $tmpfile | grep ${grouplist[2]}
-          if [ $? -ne 0 ] ; then
-                message "ERROR - \"${grouplist[2]}\" should be a member of \"${grouplist[$i]}\" but is not - failed on $FULLHOSTNAME"
-                myresult=FAIL
-          else
-                message "\"${grouplist[2]}\" is a member of \"${grouplist[$i]}\""
-          fi
+        	cat $tmpfile | grep ${grouplist[2]}
+        	if [ $? -ne 0 ] ; then
+              		message "ERROR - \"${grouplist[2]}\" should be a member of \"${grouplist[$i]}\" but is not - failed on $FULLHOSTNAME"
+              		myresult=FAIL
+        	else
+              		message "\"${grouplist[2]}\" is a member of \"${grouplist[$i]}\""
+        	fi
 
-          ((i=$i+1))
+          	((i=$i+1))
 
 	done
 
@@ -762,40 +753,45 @@ hostgrpcli_012()
                myresult=FAIL
         fi
 
-	# verify the host group was delete
-        ssh root@$FULLHOSTNAME "ipa hostgroup-show \"${grouplist[0]}\""
-        if [ $? -ne 161 ] ; then
-               message "ERROR - ipa hostgroup-show \"${grouplist[0]}\" return code not as expected on $FULLHOSTNAME got:$? expected: 161"
-               myresult=FAIL
-        else
-               message "\"${grouplist[0]}\" deleted successfully."
-        fi
 
-	# verify memberships for the other host group
-          ssh root@$FULLHOSTNAME "ipa hostgroup-show \"${grouplist[1]}\"" > $tmpfile
-          cat $tmpfile | grep ${hostlist[0]}
-          if [ $? -ne 0 ] ; then
-                message "ERROR - \"${hostlist[0]}\" should be a member of \"${grouplist[1]}\" but is not - failed on $FULLHOSTNAME"
-                myresult=FAIL
-          else
-                message "\"${hostlist[0]}\" is a member of \"${grouplist[1]}\""
-          fi
+	######### verify the host group was deleted and other group memberships in tact ############
+	for s in $SERVERS ; do
+		eval_vars $s
+		message "Working on $s"
+        	ssh root@$FULLHOSTNAME "ipa hostgroup-show \"${grouplist[0]}\""
+        	if [ $? -ne 161 ] ; then
+               		message "ERROR - ipa hostgroup-show \"${grouplist[0]}\" return code not as expected on $FULLHOSTNAME got:$? expected: 161"
+               		myresult=FAIL
+        	else
+               		message "\"${grouplist[0]}\" deleted successfully."
+        	fi
 
-          cat $tmpfile | grep ${ugrplist[0]}
-          if [ $? -ne 0 ] ; then
-                message "ERROR - \"${ugrplist[0]}\" should be a member of \"${grouplist[1]}\" but is not - failed on $FULLHOSTNAME"
-                myresult=FAIL
-          else
-                message "\"${ugrplist[0]}\" is a member of \"${grouplist[1]}\""
-          fi
+		# verify memberships for the other host group
+          	ssh root@$FULLHOSTNAME "ipa hostgroup-show \"${grouplist[1]}\"" > $tmpfile
+          	cat $tmpfile | grep ${hostlist[0]}
+          	if [ $? -ne 0 ] ; then
+                	message "ERROR - \"${hostlist[0]}\" should be a member of \"${grouplist[1]}\" but is not - failed on $FULLHOSTNAME"
+                	myresult=FAIL
+          	else
+                	message "\"${hostlist[0]}\" is a member of \"${grouplist[1]}\""
+          	fi
 
-          cat $tmpfile | grep ${grouplist[2]}
-          if [ $? -ne 0 ] ; then
-                message "ERROR - \"${grouplist[2]}\" should be a member of \"${grouplist[1]}\" but is not - failed on $FULLHOSTNAME"
-                myresult=FAIL
-          else
-                message "\"${grouplist[2]}\" is a member of \"${grouplist[1]}\""
-          fi
+          	cat $tmpfile | grep ${ugrplist[0]}
+          	if [ $? -ne 0 ] ; then
+                	message "ERROR - \"${ugrplist[0]}\" should be a member of \"${grouplist[1]}\" but is not - failed on $FULLHOSTNAME"
+                	myresult=FAIL
+          	else
+                	message "\"${ugrplist[0]}\" is a member of \"${grouplist[1]}\""
+          	fi
+
+          	cat $tmpfile | grep ${grouplist[2]}
+          	if [ $? -ne 0 ] ; then
+                	message "ERROR - \"${grouplist[2]}\" should be a member of \"${grouplist[1]}\" but is not - failed on $FULLHOSTNAME"
+                	myresult=FAIL
+          	else
+                	message "\"${grouplist[2]}\" is a member of \"${grouplist[1]}\""
+          	fi
+	done
 
         rm -rf $tmpfile
         result $myresult
@@ -808,8 +804,7 @@ hostgrpcli_013()
         tmpfile=$TET_TMP_DIR/members.txt
         message "START $tet_thistest: Delete Host that is a member of host groups"
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-        s="M1"
-        eval_vars $s
+        eval_vars M1
 
         # add host to another host group
         ssh root@$FULLHOSTNAME "ipa hostgroup-add-member --hosts=${hostlist[0]} \"${grouplist[2]}\""
@@ -820,18 +815,15 @@ hostgrpcli_013()
 
         i=1
         while [ $i -lt 3 ] ; do
-
-        # verify membership
-          ssh root@$FULLHOSTNAME "ipa hostgroup-show \"${grouplist[$i]}\"" > $tmpfile
-          cat $tmpfile | grep ${hostlist[0]}
-          if [ $? -ne 0 ] ; then
-                message "ERROR - \"${hostlist[0]}\" should be a member of \"${grouplist[$i]}\" but is not - failed on $FULLHOSTNAME"
-                myresult=FAIL
-          else
-                message "\"${hostlist[0]}\" is a member of \"${grouplist[$i]}\""
-          fi
-          ((i=$i+1))
-
+        	ssh root@$FULLHOSTNAME "ipa hostgroup-show \"${grouplist[$i]}\"" > $tmpfile
+          	cat $tmpfile | grep ${hostlist[0]}
+          	if [ $? -ne 0 ] ; then
+                	message "ERROR - \"${hostlist[0]}\" should be a member of \"${grouplist[$i]}\" but is not - failed on $FULLHOSTNAME"
+                	myresult=FAIL
+          	else
+                	message "\"${hostlist[0]}\" is a member of \"${grouplist[$i]}\""
+          	fi
+          	((i=$i+1))
         done
 
         # now delete the host
@@ -843,25 +835,28 @@ hostgrpcli_013()
 	       message "\"${hostlist[0]}\" deleted successfully."
         fi
 
-        # verify the host groups do not have host as member - host was removed as member
-
-        i=1
-        while [ $i -lt 3 ] ; do
-
-          ssh root@$FULLHOSTNAME "ipa hostgroup-show \"${grouplist[$i]}\"" > $tmpfile
-          cat $tmpfile | grep \"${hostlist[0]}\"
-          if [ $? -eq 0 ] ; then
-              message "ERROR - \"${grouplist[$i]}\" still has \"${hostlist[0]}\" as member - failed on $FULLHOSTNAME"
-          else
-              message "\"${hostlist[0]}\" no longer member of\"${grouplist[$i]}\"."
-          fi
-	  ((i=$i+1))
+        ########## verify the host groups do not have host as member - host was removed as member ########
+	for s in $SERVERS ; do
+		eval_vars $s
+		message "Working on $s"
+        	i=1
+        	while [ $i -lt 3 ] ; do
+			ssh root@$FULLHOSTNAME "ipa hostgroup-show \"${grouplist[$i]}\"" > $tmpfile
+          		cat $tmpfile | grep \"${hostlist[0]}\"
+          		if [ $? -eq 0 ] ; then
+              			message "ERROR - \"${grouplist[$i]}\" still has \"${hostlist[0]}\" as member - failed on $FULLHOSTNAME"
+				myresult=FAIL
+          		else
+              			message "\"${hostlist[0]}\" no longer member of\"${grouplist[$i]}\"."
+          		fi
+	  		((i=$i+1))
+		done
 
        done
 
-        rm -rf $tmpfile
-        result $myresult
-        message "END $tet_thistest"
+       rm -rf $tmpfile
+       result $myresult
+       message "END $tet_thistest"
 }
 
 hostgrpcli_014()
@@ -870,10 +865,8 @@ hostgrpcli_014()
         tmpfile=$TET_TMP_DIR/members.txt
         message "START $tet_thistest: Delete user group that is a member of host groups"
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-        s="M1"
-        eval_vars $s
-
-        # add user group to another host group
+        eval_vars M1
+        ########### add user group to another host group ##########
         ssh root@$FULLHOSTNAME "ipa hostgroup-add-member --groups=${ugrplist[0]} \"${grouplist[2]}\""
         if [ $? -ne 0 ] ; then
                 message "ERROR - ipa hostgroup-add-member host \"${ugrplist[0]}\" to \"${grouplist[2]}\" failed on $FULLHOSTNAME"
@@ -882,21 +875,18 @@ hostgrpcli_014()
 
         i=1
         while [ $i -lt 3 ] ; do
-
-        # verify membership
-          ssh root@$FULLHOSTNAME "ipa hostgroup-show \"${grouplist[$i]}\"" > $tmpfile
-          cat $tmpfile | grep ${ugrplist[0]}
-          if [ $? -ne 0 ] ; then
-                message "ERROR - \"${ugrplist[0]}\" should be a member of \"${grouplist[$i]}\" but is not - failed on $FULLHOSTNAME"
-                myresult=FAIL
-          else
-                message "\"${ugrplist[0]}\" is a member of \"${grouplist[$i]}\""
-          fi
-          ((i=$i+1))
-
+        	ssh root@$FULLHOSTNAME "ipa hostgroup-show \"${grouplist[$i]}\"" > $tmpfile
+          	cat $tmpfile | grep ${ugrplist[0]}
+          	if [ $? -ne 0 ] ; then
+                	message "ERROR - \"${ugrplist[0]}\" should be a member of \"${grouplist[$i]}\" but is not - failed on $FULLHOSTNAME"
+                	myresult=FAIL
+          	else
+                	message "\"${ugrplist[0]}\" is a member of \"${grouplist[$i]}\""
+         	fi
+          	((i=$i+1))
         done
 
-        # now delete the user group
+        ############ now delete the user group ############
         ssh root@$FULLHOSTNAME "ipa group-del ${ugrplist[0]}"
         if [ $? -ne 0 ] ; then
                message "ERROR - ipa group-del \"${ugrplist[0]}\" failed on $FULLHOSTNAME rc:$?"
@@ -905,20 +895,23 @@ hostgrpcli_014()
 	       message "\"${ugrplist[0]}\" deleted successfully."
         fi
 
-        # verify the host groups do not have user group as member - host was removed as member
-        i=1
-        while [ $i -lt 3 ] ; do
-
-          ssh root@$FULLHOSTNAME "ipa hostgroup-show \"${grouplist[$i]}\"" > $tmpfile
-          cat $tmpfile | grep \"${ugrplist[0]}\"
-          if [ $? -eq 0 ] ; then
-              message "ERROR - \"${grouplist[$i]}\" still has \"${ugrplist[0]}\" as member - failed on $FULLHOSTNAME"
-          else
-              message "\"${ugrplist[0]}\" no longer member of\"${grouplist[$i]}\"."
-          fi
-	  ((i=$i+1))
-
-       done
+        ############ verify the host groups do not have user group as member - host was removed as member ############
+	for s in $SERVERS ; do
+		eval_vars $s
+		message "Working on $s"
+        	i=1
+        	while [ $i -lt 3 ] ; do
+			ssh root@$FULLHOSTNAME "ipa hostgroup-show \"${grouplist[$i]}\"" > $tmpfile
+          		cat $tmpfile | grep \"${ugrplist[0]}\"
+          		if [ $? -eq 0 ] ; then
+              			message "ERROR - \"${grouplist[$i]}\" still has \"${ugrplist[0]}\" as member - failed on $FULLHOSTNAME"
+				myresult=FAIL
+          		else
+              			message "\"${ugrplist[0]}\" no longer member of\"${grouplist[$i]}\"."
+          		fi
+	  		((i=$i+1))
+		done
+	done
 
         rm -rf $tmpfile
         result $myresult
@@ -931,36 +924,35 @@ hostgrpcli_015()
         tmpfile=$TET_TMP_DIR/members.txt
         message "START $tet_thistest: Delete host group that is a member of host groups"
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-        s="M1"
-        eval_vars $s
+        eval_vars M1
 
-        # add host group to another host group
+        ############# add host group to another host group ############
         ssh root@$FULLHOSTNAME "ipa hostgroup-add-member --hostgroups=\"${grouplist[2]}\" \"${grouplist[3]}\""
         if [ $? -ne 0 ] ; then
                 message "ERROR - ipa hostgroup-add-member \"${grouplist[2]}\" to \"${grouplist[3]}\" failed on $FULLHOSTNAME: rc: $?"
                 myresult=FAIL
         fi
 
-        # verify membership
-          ssh root@$FULLHOSTNAME "ipa hostgroup-show \"${grouplist[1]}\"" > $tmpfile
-          cat $tmpfile | grep ${grouplist[2]}
-          if [ $? -ne 0 ] ; then
-                message "ERROR - \"${grouplist[2]}\" should be a member of \"${grouplist[1]}\" but is not - failed on $FULLHOSTNAME"
-                myresult=FAIL
-          else
-                message "\"${grouplist[2]}\" is a member of \"${grouplist[1]}\""
-          fi
+        ############# verify membership ##############
+        ssh root@$FULLHOSTNAME "ipa hostgroup-show \"${grouplist[1]}\"" > $tmpfile
+        cat $tmpfile | grep ${grouplist[2]}
+        if [ $? -ne 0 ] ; then
+              message "ERROR - \"${grouplist[2]}\" should be a member of \"${grouplist[1]}\" but is not - failed on $FULLHOSTNAME"
+              myresult=FAIL
+        else
+              message "\"${grouplist[2]}\" is a member of \"${grouplist[1]}\""
+        fi
 
-          ssh root@$FULLHOSTNAME "ipa hostgroup-show \"${grouplist[3]}\"" > $tmpfile
-          cat $tmpfile | grep ${grouplist[2]}
-          if [ $? -ne 0 ] ; then
-                message "ERROR - \"${grouplist[2]}\" should be a member of \"${grouplist[3]}\" but is not - failed on $FULLHOSTNAME"
-                myresult=FAIL 
-          else
-                message "\"${grouplist[2]}\" is a member of \"${grouplist[3]}\""
-          fi
+        ssh root@$FULLHOSTNAME "ipa hostgroup-show \"${grouplist[3]}\"" > $tmpfile
+        cat $tmpfile | grep ${grouplist[2]}
+        if [ $? -ne 0 ] ; then
+              message "ERROR - \"${grouplist[2]}\" should be a member of \"${grouplist[3]}\" but is not - failed on $FULLHOSTNAME"
+              myresult=FAIL 
+        else
+              message "\"${grouplist[2]}\" is a member of \"${grouplist[3]}\""
+        fi
 
-        # now delete the host group
+        ############ now delete the host group #################
         ssh root@$FULLHOSTNAME "ipa hostgroup-del ${grouplist[2]}"
         if [ $? -ne 0 ] ; then
                message "ERROR - ipa hostgroup-del \"${grouplist[2]}\" failed on $FULLHOSTNAME rc:$?"
@@ -969,22 +961,28 @@ hostgrpcli_015()
 		message " \"${grouplist[2]}\" deleted successfully."
         fi
 
-        # verify the host groups do not have host group as member - host was removed as member
-        ssh root@$FULLHOSTNAME "ipa hostgroup-show \"${grouplist[1]}\"" > $tmpfile
-        cat $tmpfile | grep ${grouplist[2]}
-        if [ $? -eq 0 ] ; then
-            message "ERROR - \"${grouplist[1]}\" still has \"${grouplist[2]}\" as member - failed on $FULLHOSTNAME"
-        else
-            message "\"${grouplist[2]}\" no longer member of\"${grouplist[1]}\"."
-        fi
+        ########### verify the host groups do not have host group as member - host was removed as member #########
+	for s in $SERVERS ; do
+		eval_vars $s
+		message "Working on $s"
+        	ssh root@$FULLHOSTNAME "ipa hostgroup-show \"${grouplist[1]}\"" > $tmpfile
+        	cat $tmpfile | grep ${grouplist[2]}
+        	if [ $? -eq 0 ] ; then
+            		message "ERROR - \"${grouplist[1]}\" still has \"${grouplist[2]}\" as member - failed on $FULLHOSTNAME"
+			myresult=FAIL
+        	else
+            		message "\"${grouplist[2]}\" no longer member of\"${grouplist[1]}\"."
+        	fi
 
-        ssh root@$FULLHOSTNAME "ipa hostgroup-show \"${grouplist[3]}\"" > $tmpfile
-        cat $tmpfile | grep ${grouplist[2]}
-        if [ $? -eq 0 ] ; then
-            message "ERROR - \"${grouplist[3]}\" still has \"${grouplist[2]}\" as member - failed on $FULLHOSTNAME"
-        else
-            message "\"${grouplist[2]}\" no longer member of\"${grouplist[3]}\"."
-        fi
+        	ssh root@$FULLHOSTNAME "ipa hostgroup-show \"${grouplist[3]}\"" > $tmpfile
+        	cat $tmpfile | grep ${grouplist[2]}
+        	if [ $? -eq 0 ] ; then
+            		message "ERROR - \"${grouplist[3]}\" still has \"${grouplist[2]}\" as member - failed on $FULLHOSTNAME"
+			myresult=FAIL
+        	else
+            		message "\"${grouplist[2]}\" no longer member of\"${grouplist[3]}\"."
+        	fi
+	done
 
         rm -rf $tmpfile
         result $myresult
@@ -996,55 +994,44 @@ cleanup()
         myresult=PASS
         message "START $tet_thistest: Cleanup"
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-        for s in $SERVERS; do
-                if [ "$s" == "M1" ]; then
-                	eval_vars $s
-                   	i=0
-		   	while [ $i -lt ${#grouplist[@]} ] ; do
-                        	ssh root@$FULLHOSTNAME "ipa hostgroup-del \"${grouplist[$i]}\""
-
-                        	# check return code
-                        	ssh root@$FULLHOSTNAME "ipa hostgroup-show \"${grouplist[$i]}\""
-                        	if [ $? -ne 161 ] ; then
-                                  message "ERROR - ipa hostgroup-show \"${grouplist[$i]}\" return code not as expected on $FULLHOSTNAME got:$? expected: 161"
-                                  myresult=FAIL
-                        	else
-                                  message "\"${grouplist[$i]}\" does not exist."
-                        	fi
-				((i=$i+1))
-                  	done
-
-		  	i=0
-		  	while [ $i -lt ${#hostlist[@]} ] ; do
-                        	ssh root@$FULLHOSTNAME "ipa host-del \"${hostlist[$i]}\""
-
-                        	# check return code
-                        	ssh root@$FULLHOSTNAME "ipa host-show \"${hostlist[$i]}\""
-                        	if [ $? -ne 161 ] ; then
-                                  message "ERROR - ipa host-show \"${hostlist[$i]}\" return code not as expected on $FULLHOSTNAME got:$? expected: 161"
-                                  myresult=FAIL
-                        	else
-                                  message "\"${hostlist[$i]}\" does not exist."
-                        	fi
-				((i=$i+1))
-		  	done
-
-                        i=0
-                        while [ $i -lt ${#ugrplist[@]} ] ; do
-                                ssh root@$FULLHOSTNAME "ipa group-del \"${ugrplist[$i]}\""
-
-                                # check return code
-                                ssh root@$FULLHOSTNAME "ipa group-show \"${ugrplist[$i]}\""
-                                if [ $? -ne 161 ] ; then
-                                  message "ERROR - ipa group-show \"${ugrplist[$i]}\" return code not as expected on $FULLHOSTNAME got:$? expected: 161"
-                                  myresult=FAIL
-                                else
-                                  message "\"${ugrplist[$i]}\" does not exist."
-                                fi
-                                ((i=$i+1))
-                        done
-
+        eval_vars M1
+        i=0
+	while [ $i -lt ${#grouplist[@]} ] ; do
+		ssh root@$FULLHOSTNAME "ipa hostgroup-del \"${grouplist[$i]}\""
+                ssh root@$FULLHOSTNAME "ipa hostgroup-show \"${grouplist[$i]}\""
+                if [ $? -ne 161 ] ; then
+                	message "ERROR - ipa hostgroup-show \"${grouplist[$i]}\" return code not as expected on $FULLHOSTNAME got:$? expected: 161"
+                        myresult=FAIL
+                else
+                	message "\"${grouplist[$i]}\" does not exist."
                 fi
+		((i=$i+1))
+	done
+
+	i=0
+	while [ $i -lt ${#hostlist[@]} ] ; do
+        	ssh root@$FULLHOSTNAME "ipa host-del \"${hostlist[$i]}\""
+                ssh root@$FULLHOSTNAME "ipa host-show \"${hostlist[$i]}\""
+                if [ $? -ne 161 ] ; then
+                	message "ERROR - ipa host-show \"${hostlist[$i]}\" return code not as expected on $FULLHOSTNAME got:$? expected: 161"
+                        myresult=FAIL
+                else
+                	message "\"${hostlist[$i]}\" does not exist."
+                fi
+		((i=$i+1))
+	done
+
+        i=0
+        while [ $i -lt ${#ugrplist[@]} ] ; do
+        	ssh root@$FULLHOSTNAME "ipa group-del \"${ugrplist[$i]}\""
+                ssh root@$FULLHOSTNAME "ipa group-show \"${ugrplist[$i]}\""
+        	if [ $? -ne 161 ] ; then
+                	message "ERROR - ipa group-show \"${ugrplist[$i]}\" return code not as expected on $FULLHOSTNAME got:$? expected: 161"
+                        myresult=FAIL
+                else
+                        message "\"${ugrplist[$i]}\" does not exist."
+                fi
+                ((i=$i+1))
         done
 
         result $myresult
@@ -1057,25 +1044,24 @@ bug499731()
         message "START $tet_thistest: Adding host to host group causes memberOf errors in DS Log"
 
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-        s="M1"
-	eval_vars $s
-		  i=0
-		  while [ $i -lt ${#hostlist[@]} ] ; do
-			# search the log for the message
-			inst=`echo $REALM | sed 's/\./-/g'`
-			errmsg="Entry \\\"cn=${hostlist[$i]},cn=computers,cn=accounts,$BASEDN\\\" -- attribute \\\"memberOf\\\" not allowed"
-			message "Looking for \"$errmsg\" in Directory Server Log"
-			dirlog="/var/log/dirsrv/slapd-$inst/errors"
-			ret=`ssh root@$FULLHOSTNAME "grep -Fc \"${errmsg}\" -- \"${dirlog}\""` 
-			if [ $ret -ne 0 ] ; then
-				message "ERROR - bug 499731 still exists or has returned!"
-				message "Found $ret occurences of the error in the DS Log for \"${hostlist[$i]}\""
-				myresult=FAIL
-			else
-				message "Found $ret occurences of the error in the DS Log for \"${hostlist[$i]}\""
-			fi
-			((i=$i+1))
-		   done
+	eval_vars M1
+	i=0
+	while [ $i -lt ${#hostlist[@]} ] ; do
+		# search the log for the message
+		inst=`echo $REALM | sed 's/\./-/g'`
+		errmsg="Entry \\\"cn=${hostlist[$i]},cn=computers,cn=accounts,$BASEDN\\\" -- attribute \\\"memberOf\\\" not allowed"
+		message "Looking for \"$errmsg\" in Directory Server Log"
+		dirlog="/var/log/dirsrv/slapd-$inst/errors"
+		ret=`ssh root@$FULLHOSTNAME "grep -Fc \"${errmsg}\" -- \"${dirlog}\""` 
+		if [ $ret -ne 0 ] ; then
+			message "ERROR - bug 499731 still exists or has returned!"
+			message "Found $ret occurences of the error in the DS Log for \"${hostlist[$i]}\""
+			myresult=FAIL
+		else
+			message "Found $ret occurences of the error in the DS Log for \"${hostlist[$i]}\""
+		fi
+		((i=$i+1))
+	done
 
         result $myresult
         message "END $tet_thistest"
