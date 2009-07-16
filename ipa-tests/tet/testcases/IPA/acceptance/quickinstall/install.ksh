@@ -400,7 +400,7 @@ tp9()
 	        echo "ERROR - ipa user-add failed on $FULLHOSTNAME";
 		tet_result FAIL
 	fi
-	ssh root@$FULLHOSTNAME "ipa group-add $group1 --gid=725 --description='group for testing';"
+	ssh root@$FULLHOSTNAME "ipa group-add $group1 --gid=725 --desc='group for testing';"
 	if [ $? != 0 ]; then
 	        echo "ERROR - ipa group-add failed on $FULLHOSTNAME";
 		tet_result FAIL
