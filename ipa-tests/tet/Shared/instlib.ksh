@@ -823,7 +823,7 @@ InstallServerRPM()
 #		return 1
 #	fi	
 
-	pkglistB="ipa-server ipa-admintools bind caching-nameserver expect krb5-workstation"
+	pkglistB="ipa-server ipa-admintools bind caching-nameserver expect krb5-workstation bind-dyndb-ldap"
 	ssh root@$FULLHOSTNAME "yum -y install $pkglistB"
 	if [ $? -ne 0 ]; then
 		echo "That rpm install didn't work, lets try that again. Sleeping for 60 seconds first" 
@@ -920,6 +920,10 @@ UnInstallServerRPM()
 		echo "Returning"
 		return 0
 	fi
+
+	# Restoring resolv.conf on server before continuing
+	ssh root@$FULLHOSTNAME "if [ -f /etc/resolv.conf.ipasave ]; then cat /etc/resolv.conf.ipasave > /etc/resolv.conf; fi"
+
 	ssh root@$FULLHOSTNAME "rpm -e --allmatches redhat-ds-base ipa-server ipa-admintools bind caching-nameserver krb5-workstation ipa-client ipa-server-selinux"
 	if [ $? -ne 0 ]; then
 		echo "ERROR - ssh to $FULLHOSTNAME failed"
@@ -931,6 +935,8 @@ UnInstallServerRPM()
 		mv /etc/bind.conf /etc/bind.cond.ipasave; \
 		rpm -e --allmatches fedora-ds-base fedora-ds-base-devel; \
 		rpm -e --allmatches redhat-ds-base-devel; \
+		rpm -e --allmatches rpm -e ipa-server ipa-server-selinux; \
+		rpm -e --allmatches bind bind-dyndb-ldap caching-nameserver; \
 		rpm -e --allmatches redhat-ds-base"
 
 #	ssh root@$FULLHOSTNAME 'find / | grep -v proc | grep -v dev > /list-after-ipa-uninstall.txt'

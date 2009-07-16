@@ -54,53 +54,10 @@ FixBindServer()
 
 	if [ $DSTET_DEBUG = y ]; then set -x; fi
 	eval_vars $1
-	rm -f $TET_TMP_DIR/replace.pl
-	echo '#!/usr/bin/perl
-my $file = "";
-my $string = "";
-my $replace = 0;
-foreach $num (0 .. $#ARGV) {
-        ($a1, $a2) = split(/=/, $ARGV[$num]);
-        if ( $a1 =~ "file" ) { $file = $a2;}
-        if ( $a1 =~ "string" ) { $string = $a2;}
-        if ( $a1 =~ "replace" ) { $replace = $a2;} 
-#        print "$ARGV[$num]\\n"; 
-}
-my $match = 0;
-open (LIST, "$file") or die "PROBLEM - nunable to open file $file";
-while (<LIST>)
-{
-        chomp $_;
-        if ( $_ =~ /$string/ ) 
-        {
-                $match = $match + 1;
 
-        #       print "\\nmatch is $match replace is $replace\\n";
-                if ( "$replace" =~ "$match" )
-                {
-                        print "#$string\\n";
-                } else {
-                        print "$_\\n";
-                }
-        } else {
-                print "$_\\n";
-        }
-}' > $TET_TMP_DIR/replace.pl
-	chmod 755 $TET_TMP_DIR/replace.pl
-	scp $TET_TMP_DIR/replace.pl root@$FULLHOSTNAME:/bin/.
-	ret=$?
-	if [ $ret -ne 0 ]; then
-		echo "ERROR! scp of $TET_TMP_DIR/replace.pl to $FULLHOSTNAME failed"
-		tet_result FAIL
-		return $ret
-	fi 
-	
-	ssh root@$FULLHOSTNAME "/bin/replace.pl replace=5 string='};' file=/etc/named.conf |  
-	sed s='type hint'='#type hint'=g | 
-	sed s='file \"named.ca\";'='#file \"named.ca\";'=g | 
-	sed s='zone \".\" IN {'='#zone \".\" IN {'=g > /etc/named.conf.new"
-	ret=$?
-	if [ $ret -ne 0 ]; then
+	# Backing up DNS server config on Server
+	ssh root@$FULLHOSTNAME "cat /etc/named.conf > /etc/named.conf.original; cat /etc/named.conf > /etc/named.conf.new;"
+	if [ $? -ne 0 ]; then
 		echo "ERROR! bind fix failed"
 		tet_result FAIL
 		return $ret
@@ -108,57 +65,19 @@ while (<LIST>)
 
 	# Put forwarding DNS server into DNS
 	ssh root@$FULLHOSTNAME "sed -i s/dump-file/'forwarders { $DNSMASTER; }; dump-file'/g  /etc/named.conf.new"
-	ret=$?
-	if [ $ret -ne 0 ]; then
+	if [ $? -ne 0 ]; then
 		echo "ERROR! bind fix failed"
 		tet_result FAIL
 		return $ret
 	fi 
 
+	# Copying new DNS config to it's place on the server, and restarting DNS
 	ssh root@$FULLHOSTNAME "mv /etc/named.conf /etc/named.conf.old;cp /etc/named.conf.new /etc/named.conf;/etc/init.d/named restart"
-	ret=$?
-	if [ $ret -ne 0 ]; then
+	if [ $? -ne 0 ]; then
 		echo "ERROR! bind fix failed"
 		tet_result FAIL
 		return $ret
 	fi 
-
-	# Generate a file containing additions for the zone file referenced by $DNS_DOMAIN
-	rm -f $TET_TMP_DIR/dns-addon-tmp.txt
-	for s in $SERVERS; do
-		if [ "$s" != "" ]; then 
-			eval_vars $s
-			echo "$HOSTNAME IN A $IP" >> $TET_TMP_DIR/dns-addon-tmp.txt
-		fi
-	done
-	for s in $CLIENTS; do
-		if [ "$s" != "" ]; then 
-			eval_vars $s
-			echo "$HOSTNAME IN A $IP" >> $TET_TMP_DIR/dns-addon-tmp.txt
-		fi
-	done
-
-	# Add those changes to the DNS server.
-	eval_vars $1
-	ssh root@$FULLHOSTNAME 'rm -f /tmp/dns-addon-tmp.txt'
-	scp $TET_TMP_DIR/dns-addon-tmp.txt root@$FULLHOSTNAME:/tmp/.
-	ssh root@$FULLHOSTNAME "ls /var/named/$DNS_DOMAIN.zone.db"
-	ret=$?
-	if [ $ret -ne 0 ]; then
-		echo "ERROR /var/named/$DNS_DOMAIN.zone.db on $FULLHOSTNAME does not exist!"
-		tet_result FAIL
-		return $ret
-	fi
-	ssh root@$FULLHOSTNAME "rm -f /var/named/$DNS_DOMAIN.zone.db-ipasave; \
-		cp -a /var/named/$DNS_DOMAIN.zone.db /var/named/$DNS_DOMAIN.zone.db.ipasave;"
-	ssh root@$FULLHOSTNAME "cat /tmp/dns-addon-tmp.txt >> /var/named/$DNS_DOMAIN.zone.db"
-	ssh root@$FULLHOSTNAME "/etc/init.d/named restart"	
-	ret=$?
-	if [ $ret -ne 0 ]; then
-		echo "ERROR - restart of bind on $FULLHOSTNAME failed!"
-		tet_result FAIL
-		return $ret
-	fi
 
 	return 0
 }
