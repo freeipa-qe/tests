@@ -924,7 +924,7 @@ UnInstallServerRPM()
 	# Restoring resolv.conf on server before continuing
 	ssh root@$FULLHOSTNAME "if [ -f /etc/resolv.conf.ipasave ]; then cat /etc/resolv.conf.ipasave > /etc/resolv.conf; fi"
 
-	ssh root@$FULLHOSTNAME "rpm -e --allmatches redhat-ds-base ipa-server ipa-admintools bind caching-nameserver krb5-workstation ipa-client ipa-server-selinux"
+	ssh root@$FULLHOSTNAME "rpm -e --allmatches redhat-ds-base ipa-server ipa-admintools bind caching-nameserver krb5-workstation ipa-client ipa-server-selinux ipa-admintools bind-dyndb-ldap ipa-client"
 	if [ $? -ne 0 ]; then
 		echo "ERROR - ssh to $FULLHOSTNAME failed"
 #		return 1
@@ -935,7 +935,7 @@ UnInstallServerRPM()
 		mv /etc/bind.conf /etc/bind.cond.ipasave; \
 		rpm -e --allmatches fedora-ds-base fedora-ds-base-devel; \
 		rpm -e --allmatches redhat-ds-base-devel; \
-		rpm -e --allmatches rpm -e ipa-server ipa-server-selinux; \
+		rpm -e --allmatches ipa-server ipa-server-selinux; \
 		rpm -e --allmatches bind bind-dyndb-ldap caching-nameserver; \
 		rpm -e --allmatches redhat-ds-base"
 

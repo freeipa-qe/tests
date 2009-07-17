@@ -79,7 +79,48 @@ FixBindServer()
 		return $ret
 	fi 
 
-	return 0
+	# Now we need to populate the ldap dns with all of the new server and client ip's 
+	# Add reverse entry of M1 to the DNS server
+	# Kiniting as admin  on the servser first
+	KinitAs $1 $DS_USER $KERB_MASTER_PASS 
+	if [ $? -ne 0 ]; then
+		echo "ERROR - kinit as $DS_USER on $1 fialed"
+		tet_result FAIL
+		return 1
+	fi
+	thisserver=$FULLHOSTNAME
+	eval_vars M1
+	ssh root@$thisserver "ipa dns-add-rr $DNS_DOMAIN $IP PTR \"$HOSTNAME\""	
+	# Add forward and reverse entries for all servers and clients
+	for s in $SERVERS; do
+		if [ "$s" != "" ]; then
+			# Make sure that we are not trying to add the server that we are working on twice
+			if [ "$s" != "$1" ]; then 
+				eval_vars $s	
+				ssh root@$thisserver "ipa dns-add-rr $DNS_DOMAIN $IP PTR \"$HOSTNAME\";ipa dns-add-rr $DNS_DOMAIN $HOSTNAME A \"$IP\""
+				ret=$?
+				if [ $ret -ne 0 ]; then
+					echo "ERROR - addition of dns entry into $thisserver fialed for $FULLHOSTNAME"
+					tet_result FAIL
+					return $ret
+				fi
+			fi
+		fi
+	done
+	for s in $CLIENTS; do
+		if [ "$s" != "" ]; then
+			eval_vars $s
+			ssh root@$thisserver "ipa dns-add-rr $DNS_DOMAIN $IP PTR \"$HOSTNAME\";ipa dns-add-rr $DNS_DOMAIN $HOSTNAME A \"$IP\""
+			ret=$?
+			if [ $ret -ne 0 ]; then
+				echo "ERROR - addition of dns entry into $thisserver fialed for $FULLHOSTNAME"
+				tet_result FAIL
+				return $ret
+			fi
+		fi
+	done
+
+	return 0;
 }
 
 is_server_alive()
