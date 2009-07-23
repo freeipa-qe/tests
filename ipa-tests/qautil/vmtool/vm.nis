@@ -1,8 +1,0 @@
-#! /bin/sh
-. ./vmconf
-. ./functions
-. ./remotecontrol
-
-vmup mv32b qa
-vmup mv32a ipav2installed
-
