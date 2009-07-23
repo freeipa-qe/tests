@@ -1,1 +1,0 @@
-[11-21-2008] I almost lost all of my scripts. And for now, even I understand these scripts are not mature, I still need check them into svn to avoid data lose. I will continue make them better for furute work. 
