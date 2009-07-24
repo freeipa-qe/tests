@@ -1,22 +1,12 @@
  
 all
 	"Starting ALL"
-	^startup
 	^sssd
-	^cleanup
 	"Ending ALL"
 
-startup
-	"Starting SSSD startup...."
-	/startup.ksh
-	"Ending SSSD startup...."
 sssd
 	"Starting SSSD tests..."
    	/sssd_local.ksh
 	"Ending SSSD tests..."
 
-cleanup
-	"Starting SSSD cleanup...."
-	/cleanup.ksh
-	"Ending SSSD cleanup...."
 # EOF
