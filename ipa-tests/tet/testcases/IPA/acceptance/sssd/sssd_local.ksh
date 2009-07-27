@@ -12,6 +12,7 @@ fi
 #  Test Case List
 #####################################################################
 iclist="ic0 ic1 ic2 ic3 ic99"
+#iclist="ic99"
 ic0="startup"
 ic1="sssd_001 sssd_002 sssd_003 sssd_004 sssd_005 sssd_006 sssd_007 sssd_008 sssd_009 sssd_010 sssd_011 sssd_012 sssd_013 sssd_014 sssd_015 sssd_016 sssd_017 sssd_018 sssd_019 sssd_020 sssd_021 sssd_022 sssd_023 sssd_024 sssd_025 sssd_026 sssd_027 sssd_028"
 ic2="sssd_029 sssd_030 sssd_031 sssd_032 sssd_033 sssd_034 sssd_035"
@@ -295,7 +296,7 @@ sssd_008()
 	EXPMSG="The user user1000 already exists"
         for c in $SSSD_CLIENTS ; do
                 message "Working on $c"
-                MSG=`ssh root@$c "sss_useradd -u 1000 -h /home/user1000 -s /bin/bash user1000 2>&1"`
+                MSG=`ssh root@$c "sss_useradd -u 1010 -h /home/user1000 -s /bin/bash user1000 2>&1"`
                 if [ $? -ne 1 ] ; then
                         message "ERROR: Adding Duplicate LOCAL user1000.  Unexpected return code. Expected: 1  Got: $?"
                         myresult=FAIL
@@ -427,7 +428,7 @@ sssd_012()
 sssd_013()
 {
         myresult=PASS
-        message "START $tet_thistest: Delete Local User within uidNumber Range"
+        message "START $tet_thistest: Delete Local User"
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 
         for c in $SSSD_CLIENTS ; do
@@ -659,7 +660,7 @@ sssd_019()
         EXPMSG="The group group1010 already exists"
         for c in $SSSD_CLIENTS ; do
                 message "Working on $c"
-                MSG=`ssh root@$c "sss_groupadd -g 1010 group1010 2>&1"`
+                MSG=`ssh root@$c "sss_groupadd -g 1001 group1010 2>&1"`
                 if [ $? -ne 1 ] ; then
                         message "ERROR: Adding Duplicate LOCAL group1010.  Unexpected return code. Expected: 1  Got: $?"
                         myresult=FAIL
