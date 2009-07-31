@@ -11,19 +11,18 @@ fi
 ######################################################################
 #  Test Case List
 #####################################################################
-iclist="ic0 ic1 ic2 ic3 ic99"
-#iclist="ic99"
+iclist="ic0 ic1 ic2 ic3 ic4 ic99"
 ic0="startup"
 ic1="sssd_001 sssd_002 sssd_003 sssd_004 sssd_005 sssd_006 sssd_007 sssd_008 sssd_009 sssd_010 sssd_011 sssd_012 sssd_013 sssd_014 sssd_015 sssd_016 sssd_017 sssd_018 sssd_019 sssd_020 sssd_021 sssd_022 sssd_023 sssd_024 sssd_025 sssd_026 sssd_027 sssd_028"
 ic2="sssd_029 sssd_030 sssd_031 sssd_032 sssd_033 sssd_034 sssd_035"
 ic3="sssd_036 sssd_037 sssd_038 sssd_039"
+ic4="sssd_040 sssd_041 sssd_042 sssd_043 sssd_044 sssd_046"
 ic99="cleanup"
 #################################################################
 #  GLOBALS
 #################################################################
-#C1="jennyv2.bos.redhat.com"
-C1="jennyv2.bos.redhat.com dhcp\-100\-2\-185.bos.redhat.com"
-#C1="dhcp-100-2-185.bos.redhat.com"
+#C1="jennyv2.bos.redhat.com dhcp\-100\-2\-185.bos.redhat.com"
+C1="dhcp\-100\-2\-185.bos.redhat.com"
 SSSD_CLIENTS="$C1"
 export SSSD_CLIENTS
 DIRSERV="jennyv4.bos.redhat.com"
@@ -45,6 +44,15 @@ startup()
   message "START $tet_this_test: Setup for SSSD Local Domain Testing"
   for c in $SSSD_CLIENTS; do
         message "Working on $c"
+
+	ssh root@$c "yum -y install sssd"
+	if [ $? -ne 0 ] ; then
+		message "ERROR:  Failed to install SSSD. Return code: $?"
+		myresult=FAIL
+        else
+                message "SSSD installed successfully."
+	fi
+
 	sssdClientSetup $c
 	if [ $? -ne 0 ] ; then
 		message "ERROR: SSSD Client Setup Failed for $c."
@@ -62,7 +70,7 @@ sssd_001()
    #	enumerate: 3
    #	minId: 1000
    #	maxId: 1010
-   #	legacy: FALSE
+   #	legacy: TRUE
    #	magicPrivateGroups: TRUE
    #	provider: local
    ####################################################################
@@ -195,7 +203,7 @@ sssd_004()
 			HOMEDIR=`ssh root@$c getent -s sss passwd | grep user1000 | cut -d : -f 6 | cut -d / -f 2`
                         if [ $HOMEDIR -ne export ] ; then
                                 message "ERROR: user1000: getent failed to return expected home directory for LOCAL user.  Return Code: $?"
-                                message "Expected: export  Got: $SHELL"
+                                message "Expected: export  Got: $HOMEDIR"
                                 myresult=FAIL
                         else
                                 message "LOCAL domain user1000 home directory modified successfully."
@@ -293,7 +301,7 @@ sssd_008()
         myresult=PASS
         message "START $tet_thistest: Add Duplicate Local User"
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	EXPMSG="The user user1000 already exists"
+	EXPMSG="A user with the same name or UID already exists"
         for c in $SSSD_CLIENTS ; do
                 message "Working on $c"
                 MSG=`ssh root@$c "sss_useradd -u 1010 -h /home/user1000 -s /bin/bash user1000 2>&1"`
@@ -319,13 +327,14 @@ sssd_009()
         myresult=PASS
         message "START $tet_thistest: Add Duplicate Local uidNumber"
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-        EXPMSG="The uid number 1000 is already in use"
+        EXPMSG="A user with the same name or UID already exists"
         for c in $SSSD_CLIENTS ; do
                 message "Working on $c"
                 MSG=`ssh root@$c "sss_useradd -u 1000 -h /home/user1002 -s /bin/bash user1002 2>&1"`
                 if [ $? -ne 1 ] ; then
                         message "ERROR: Adding Duplicate LOCAL uidNumber 1000.  Unexpected return code. Expected: 1  Got: $?"
                         myresult=FAIL
+			ssh root@$c "sss_userdel user1002"
                 fi
 
                 if [[ $EXPMSG != $MSG ]] ; then
@@ -376,7 +385,7 @@ sssd_011()
 
         for c in $SSSD_CLIENTS ; do
                 message "Working on $c"
-		EXPMSG="The user myuser does not exist"
+		EXPMSG="No such user"
                 MSG=`ssh root@$c "sss_userdel user1001 2>&1"`
                 if [ $? -ne 1 ] ; then
                         message "ERROR: Deleting LOCAL user that doesn't exist.  Unexpected return code. Expected: 1  Got: $?"
@@ -404,7 +413,7 @@ sssd_012()
 
         for c in $SSSD_CLIENTS ; do
                 message "Working on $c"
-		EXPMSG="The group mygroup does not exist"
+		EXPMSG="Could not modify user - check if group names are correct"
                 MSG=`ssh root@$c "sss_usermod -a mygroup user1000 2>&1"`
                 if [ $? -ne 1 ] ; then
                         message "ERROR: Adding LOCAL user to group that doesn't exist.  Unexpected return code. Expected: 1  Got: $?"
@@ -657,7 +666,7 @@ sssd_019()
         myresult=PASS
         message "START $tet_thistest: Add Duplicate Local Group"
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-        EXPMSG="The group group1010 already exists"
+        EXPMSG="A group with the same name or UID already exists"
         for c in $SSSD_CLIENTS ; do
                 message "Working on $c"
                 MSG=`ssh root@$c "sss_groupadd -g 1001 group1010 2>&1"`
@@ -683,7 +692,7 @@ sssd_020()
         myresult=PASS
         message "START $tet_thistest: Add Duplicate Local gidNumber"
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-        EXPMSG="The gid number 1010 is already in use"
+        EXPMSG="A group with the same name or UID already exists"
         for c in $SSSD_CLIENTS ; do
                 message "Working on $c"
                 MSG=`ssh root@$c "sss_groupadd -g 1010 group1010 2>&1"`
@@ -712,7 +721,7 @@ sssd_021()
 
         for c in $SSSD_CLIENTS ; do
                 message "Working on $c"
-                EXPMSG="The group mygroup does not exist"
+                EXPMSG="Could not modify group - check if member group names are correct"
                 MSG=`ssh root@$c "sss_groupmod -a mygroup group1009 2>&1"`
                 if [ $? -ne 1 ] ; then
                         message "ERROR: Adding non-existing group to LOCAL group.  Unexpected return code. Expected: 1  Got: $?"
@@ -739,7 +748,7 @@ sssd_022()
 
         for c in $SSSD_CLIENTS ; do
                 message "Working on $c"
-                EXPMSG="The user myuser does not exist"
+                EXPMSG="Could not modify user - check if group names are correct"
                 MSG=`ssh root@$c "sss_usermod -a group1009 myuser 2>&1"`
                 if [ $? -ne 1 ] ; then
                         message "ERROR: Adding non-existing user to LOCAL group.  Unexpected return code. Expected: 1  Got: $?"
@@ -936,7 +945,7 @@ sssd_027()
 
         for c in $SSSD_CLIENTS ; do
                 message "Working on $c"
-                EXPMSG="The group mygroup does not exist"
+                EXPMSG="Could not modify group - check if member group names are correct"
                 MSG=`ssh root@$c "sss_groupmod -a group1009 mygroup 2>&1"`
                 if [ $? -ne 1 ] ; then
                         message "ERROR: Modifying LOCAL group that doesn't exist.  Unexpected return code. Expected: 1  Got: $?"
@@ -963,7 +972,7 @@ sssd_028()
 
         for c in $SSSD_CLIENTS ; do
                 message "Working on $c"
-                EXPMSG="The group mygroup does not exist"
+                EXPMSG="No such group"
                 MSG=`ssh root@$c "sss_groupdel mygroup 2>&1"`
                 if [ $? -ne 1 ] ; then
                         message "ERROR: Deleting LOCAL group that doesn't exist.  Unexpected return code. Expected: 1  Got: $?"
@@ -1228,7 +1237,7 @@ sssd_036()
    ####################################################################
 
         myresult=PASS
-        message "START $tet_thistest: Setup Local SSSD Configuration 2"
+        message "START $tet_thistest: Setup Local SSSD Configuration 3"
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
         for c in $SSSD_CLIENTS ; do
                 message "Working on $c"
@@ -1416,6 +1425,295 @@ sssd_039()
   message "END $tet_thistest"
 }
 
+sssd_040()
+{
+   ####################################################################
+   #   Configuration 5
+   #    enumerate: 1
+   #    minId: 2000
+   # 	maxId: 2010
+   #    legacy: TRUE
+   #    magicPrivateGroups: TRUE
+   #    provider: local
+   #	[user_defaults]
+   #	defaultShell = /bin/ksh
+   #    baseDirectory = /export 
+   ####################################################################
+
+        myresult=PASS
+        message "START $tet_thistest: Setup Local SSSD Configuration 5"
+        if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+        for c in $SSSD_CLIENTS ; do
+                message "Working on $c"
+                message "Backing up original sssd.conf and copying over test sssd.conf"
+                sssdCfg $c sssd_local5.conf
+                if [ $? -ne 0 ] ; then
+                        message "ERROR Configuring SSSD on $c."
+                        myresult=FAIL
+                else
+                        restartSSSD $c
+                        if [ $? -ne 0 ] ; then
+                                message "ERROR: Restart SSSD failed on $c"
+                                myresult=FAIL
+                        else
+                                message "SSSD Server restarted on client $c"
+                        fi
+                fi
+
+                verifyCfg $c LOCAL enumerate 1
+                if [ $? -ne 0 ] ; then
+                        myresult=FAIL
+                fi
+
+                verifyCfg $c LOCAL minId 2000
+                if [ $? -ne 0 ] ; then
+                        myresult=FAIL
+                fi
+
+                verifyCfg $c LOCAL maxId 2010
+                if [ $? -ne 0 ] ; then
+                        myresult=FAIL
+                fi
+
+                verifyCfg $c LOCAL legacy TRUE
+                if [ $? -ne 0 ] ; then
+                        myresult=FAIL
+                fi
+
+                verifyCfg $c LOCAL magicPrivateGroups TRUE
+                if [ $? -ne 0 ] ; then
+                        myresult=FAIL
+                fi
+
+                verifyCfg $c LOCAL provider local
+                if [ $? -ne 0 ] ; then
+                        myresult=FAIL
+                fi
+        done
+
+        result $myresult
+        message "END $tet_thistest"
+}
+
+sssd_041()
+{
+        myresult=PASS
+        message "START $tet_thistest: Add Local User - User Default Shell Not Specified"
+        if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+
+        for c in $SSSD_CLIENTS ; do
+                message "Working on $c"
+                ssh root@$c "sss_useradd -u 2000 -h /home/user2000 user2000"
+                if [ $? -ne 0 ] ; then
+                        message "ERROR: Adding LOCAL domain user2000.  Return Code: $?"
+                        myresult=FAIL
+                else
+                        SHELL=`ssh root@$c getent -s sss passwd | grep user2000 | cut -d : -f 7 | cut -d / -f 3`
+			message "Shell returned is $SHELL"
+                        if [ $SHELL != ksh ] ; then
+                                message "ERROR: user2000: getent failed to return expected shell for LOCAL user.  Return Code: $?"
+                                message "Expected: ksh  Got: $SHELL"
+                                myresult=FAIL
+                        else
+                                message "LOCAL domain user2000 default shell is correct."
+                        fi
+
+                fi
+
+	        # delete the user added
+        	ssh root@$c "sss_userdel user2000"
+        done
+
+        result $myresult
+        message "END $tet_thistest"
+}
+
+sssd_042()
+{
+        myresult=PASS
+        message "START $tet_thistest: Add Local User - User Home Directory Not Specified"
+        if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+
+        for c in $SSSD_CLIENTS ; do
+                message "Working on $c"
+                ssh root@$c "sss_useradd -u 2000 user2000"
+                if [ $? -ne 0 ] ; then
+                        message "ERROR: Adding LOCAL domain user2000.  Return Code: $?"
+                        myresult=FAIL
+                else
+                        HOMEDIR=`ssh root@$c getent -s sss passwd | grep user2000 | cut -d : -f 6 | cut -d / -f 2`
+			message "Base Home Directory returned is $HOMEDIR"
+                        if [ $HOMEDIR != export ] ; then
+                                message "ERROR: user2000: getent failed to return expected home directory for LOCAL user.  Return Code: $?"
+                                message "Expected: export  Got: $HOMEDIR"
+                                myresult=FAIL
+                        else
+                                message "LOCAL domain user2000 home directory is correct."
+                        fi
+
+                fi
+
+        	#delete the user added
+        	ssh root@$c "sss_userdel user2000"
+
+        done
+
+        result $myresult
+        message "END $tet_thistest"
+}
+
+sssd_043()
+{
+        myresult=PASS
+        message "START $tet_thistest: Add Local Users - No uidNumber Specified - use up allowed uidNumbers"
+        if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+
+        for c in $SSSD_CLIENTS ; do
+                message "Working on $c"
+		i=2000
+		while [ $i -le 2010 ] ; do
+			ssh root@$c "sss_useradd user$i"
+			rc=$?
+			if [ $rc -ne 0 ] ; then
+				message "ERROR: Failed to add LOCAL user$i.  Return Code: $rc"
+				myresult=FAIL
+			else
+                        	UIDNUM=`ssh root@$c getent -s sss passwd | grep user$i | cut -d : -f 3`
+                        	if [ $UIDNUM -ne $i ] ; then
+                                	message "ERROR: user$i: getent failed to return expected uidNumber for LOCAL user.  Expected: $i  Got: $UIDNUM"
+                                	myresult=FAIL
+                        	else
+                                	message "LOCAL domain user$i uidNumber is correct."
+                        	fi
+
+			fi
+			let i=$i+1
+		done
+
+		# try to add one more user that should fail because no more allowed uidNumbers
+               	EXPMSG="Failed to allocate new id, out of range"
+                MSG=`ssh root@$c "sss_useradd user2011 2>&1"`
+                if [ $? -eq 0 ] ; then
+                        message "ERROR: Adding LOCAL user was expected to fail no more allowed uidNumbers, but was successful."
+                        myresult=FAIL
+                fi
+
+		echo $MSG | grep "$EXPMSG"
+		if [ $? -ne 0 ] ; then
+                #if [[ $EXPMSG != $MSG ]] ; then
+                        message "ERROR: Unexpected Error message.  Got: $MSG  Expected: $EXPMSG"
+                        myresult=FAIL
+                else
+                        message "Adding LOCAL user failed as expected."
+                fi
+        done
+
+        result $myresult
+        message "END $tet_thistest"
+}
+
+sssd_044()
+{
+        myresult=PASS
+        message "START $tet_thistest: Add Local Groups - No gidNumber Specified - magicPrivateGroups - Shared ID Space"
+        if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+
+        for c in $SSSD_CLIENTS ; do
+                message "Working on $c"
+                i=2000
+                while [ $i -le 2010 ] ; do
+			EXPMSG="Failed to allocate new id, out of range"
+                        MSG=`ssh root@$c "sss_groupadd group$i 2>&1"`
+	                if [ $? -eq 0 ] ; then
+        	                message "ERROR: Adding LOCAL group was expected to fail no more allowed gidNumbers, but was successful."
+                	        myresult=FAIL
+				ssh root@$c "sss_groupdel group$i"
+               	 	fi
+
+                	echo $MSG | grep "$EXPMSG"
+                	if [ $? -ne 0 ] ; then
+                        	message "ERROR: Unexpected Error message.  Got: $MSG  Expected: $EXPMSG"
+                        	myresult=FAIL
+                	else
+                        	message "Adding LOCAL group failed as expected."
+                	fi
+
+                        let i=$i+1
+                done
+        done
+
+        result $myresult
+        message "END $tet_thistest"
+}
+
+sssd_045()
+{
+        myresult=PASS
+        message "START $tet_thistest: Add Local Groups - gidNumber Specified - magicPrivateGroups - Shared Name Space"
+        if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+
+        for c in $SSSD_CLIENTS ; do
+                message "Working on $c"
+		u=2000
+                while [ $i -le 2020 ] ; do
+			EXPMSG="The group user$u already exists"
+                        MSG=`ssh root@$c "sss_groupadd user$u 2>&1"`
+                        if [ $? -eq 0 ] ; then
+                                message "ERROR: Adding LOCAL group was expected to fail no more allowed gidNumbers, but was successful."
+                                myresult=FAIL
+                                ssh root@$c "sss_groupdel user$u"
+                        fi
+
+                        echo $MSG | grep "$EXPMSG"
+                        if [ $? -ne 0 ] ; then
+                                message "ERROR: Unexpected Error message.  Got: $MSG  Expected: $EXPMSG"
+                                myresult=FAIL
+                        else
+                                message "Adding LOCAL group failed as expected."
+                        fi      
+
+			let u=$u+1
+                done
+        done
+
+        result $myresult
+        message "END $tet_thistest"
+}
+
+sssd_046()
+{
+        myresult=PASS
+        message "START $tet_thistest: Delete Users - magic Private Group Deleted"
+        if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+
+        for c in $SSSD_CLIENTS ; do
+                message "Working on $c"
+        
+        	i=2000
+        	while [ $i -le 2010 ] ; do
+                	ssh root@$c "sss_userdel user$i"
+                	if [ $? -ne 0 ] ; then
+                        	message "ERROR: Failed to delete LOCAL user$i.  Return Code: $?"
+                        	myresult=FAIL
+                	fi
+
+			ssh root$c "getent -s sss group | grep user$i"
+			if [ $? -eq 0 ] ; then
+				message "ERROR: User was deleted but the user's magic private group still exists."
+				myresult=FAIL
+				ssh root@$c "sss_groupdel user$i"
+			else
+				message "User's magic private group was removed as expected."
+			fi
+                	let i=$i+1
+		done
+        done
+
+        result $myresult
+        message "END $tet_thistest"
+}
+
+
 cleanup()
 {
   myresult=PASS
@@ -1427,6 +1725,14 @@ cleanup()
 		message "ERROR:  SSSD Client Cleanup did not complete successfully."
 		myresult=FAIL
    	fi
+
+	ssh root@$c "yum -y erase sssd ; rm -rf /var/lib/sss/ ; yum clean all"
+	if [ $? -ne 0 ] ; then
+		message "ERROR: Failed to uninstall and cleanup SSSD. Return code: $?"
+		myresult=FAIL
+	else
+		message "SSSD Uninstall and Cleanup Success."
+	fi
   done
 
   result $myresult
