@@ -6,9 +6,10 @@ all
 
 sssd
 	"Starting SSSD tests..."
+	/sssd_services.ksh
 	/sssd_local.ksh
 	/sssd_ldap.ksh
-	/sssd_services.ksh
+	/sssd_multi.ksh
 	"Ending SSSD tests..."
 
 # EOF

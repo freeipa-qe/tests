@@ -22,8 +22,8 @@ ic99="cleanup"
 #  GLOBALS
 #################################################################
 #C1="jennyv2.bos.redhat.com"
-C1="jennyv2.bos.redhat.com dhcp\-100\-2\-185.bos.redhat.com"
-#C1="dhcp-100-2-185.bos.redhat.com"
+#C1="jennyv2.bos.redhat.com dhcp\-100\-2\-185.bos.redhat.com"
+C1="dhcp-100-2-185.bos.redhat.com"
 SSSD_CLIENTS="$C1"
 export SSSD_CLIENTS
 PIDFILE=/var/run/sssd.pid

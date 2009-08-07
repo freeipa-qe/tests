@@ -358,7 +358,7 @@ sssd_010()
 
         for c in $SSSD_CLIENTS ; do
                 message "Working on $c"
-		EXPMSG="The user myuser does not exist"
+		EXPMSG="Could not modify user - check if user name is correct"
                 MSG=`ssh root@$c "sss_usermod -c \"User Thousand\" myuser 2>&1"`
                 if [ $? -ne 1 ] ; then
                         message "ERROR: Modifying LOCAL user that doesn't exist.  Unexpected return code. Expected: 1  Got: $?"
@@ -996,7 +996,7 @@ sssd_029()
    ####################################################################
    #   Configuration 2
    #    enumerate: 1
-   #    legacy: FALSE
+   #    legacy: TRUE
    #	useFullyQualifiedNames TRUE
    #    provider: local
    ####################################################################
@@ -1036,16 +1036,11 @@ sssd_029()
                         myresult=FAIL
                 fi
   
-                verifyCfg $c LOCAL legacy FALSE
+                verifyCfg $c LOCAL legacy TRUE
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
 
-                verifyCfg $c LOCAL magicPrivateGroups TRUE
-                if [ $? -ne 0 ] ; then
-                        myresult=FAIL
-                fi
-   
                 verifyCfg $c LOCAL provider local
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
@@ -1150,9 +1145,9 @@ sssd_033()
   
   for c in $SSSD_CLIENTS; do
         message "Working on $c"
-        ssh root@$c "sss_usermod  -a user1000@LOCAL group1000@LOCAL"
+        ssh root@$c "sss_usermod -a user1000@LOCAL group1000@LOCAL"
         if [ $? -ne 0 ] ; then
-                message "ERROR: Adding user1000@LOCAL to group@LOCAL failed."
+                message "ERROR: Adding user1000@LOCAL to group1000@LOCAL failed."
                 myresult=FAIL
         else
                 ssh root@$c getent -s sss group | grep user1000@LOCAL
