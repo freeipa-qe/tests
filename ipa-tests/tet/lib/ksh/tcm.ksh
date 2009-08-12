@@ -452,6 +452,8 @@ tet_docleanup(){
 # TCM main flow
 #
 
+if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+
 # capture command line args before they disappear
 TET_TCM_ARGC=$#
 TET_TCM_ARGS="$*"
