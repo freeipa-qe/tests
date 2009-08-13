@@ -4,15 +4,15 @@
 CONFIG_DIR=$TET_ROOT/testcases/IPA/acceptance/sssd/config
 SSSD_CONFIG_DIR=/etc/sssd
 SSSD_CONFIG_FILE=$SSSD_CONFIG_DIR/sssd.conf
-SSSD_CONFIG_DB=/var/lib/sss/db/config.ldb
 PAMCFG=/etc/pam.d/system-auth
 LDAPCFG=/etc/ldap.conf
 NSSCFG=/etc/nsswitch.conf
-SYS_CFG_FILES="$PAMCFG $NSSCFG $SSSD_CONFIG_FILE"
+SYS_CFG_FILES="$PAMCFG $LDAPCFG $NSSCFG $SSSD_CONFIG_FILE"
 ######################################################################################
 
 sssdClientSetup()
 {
+  rc=0
   client=$1
   ###################################################################################
   # stop nscd service - SSSD has own caching service
@@ -21,81 +21,87 @@ sssdClientSetup()
   ssh root@$client "service nscd stop"
 
   ####################################################################################
-  #  Back up default ldap.conf, nsswitch.conf, system-auth and sssd.conf
+  #  Back up default nsswitch.conf, system-auth and sssd.conf
   #  copy over the modify configuration files for SSSD
   ###################################################################################
   PAMFILE=/etc/pam.d/system-auth
-  message "Checking to see if system-auth file is already backed up"
+  message "Backing up system-auth file"
   ssh root@$client "ls $PAMFILE.orig"
   if [ $? -eq 0 ] ; then
        	message "$PAMFILE file already backed up"
   else
-	message "Backing up configuration file"
   	ssh root@$client "cp $PAMFILE $PAMFILE.orig"
 	if [ $? -ne 0 ] ; then
 		message "ERROR: Failed to backup $PAMFILE on client $client"
+		rc=1
 	else
   		scp $CONFIG_DIR/sssd_system-auth root@$client:$PAMFILE
   		if [ $? -ne 0 ] ; then
   			message "ERROR: Failed to scp SSSD system-auth config file to target client: $client"
+			rc=1
   		fi
 	fi
   fi
 
   NSSFILE=/etc/nsswitch.conf
-  message "Checking to see if nsswitch.conf file is already backed up"
+  message "Backing up nsswitch.conf file"
   ssh root@$client "ls $NSSFILE.orig"
   if [ $? -eq 0 ] ; then
         message "$NSSFILE file already backed up"
   else 
-	message "Backing up configuration file"
         ssh root@$client "cp $NSSFILE $NSSFILE.orig"
         if [ $? -ne 0 ] ; then
                 message "ERROR: Failed to backup $NSSFILE on client $client"
+		rc=1
         else
                 scp $CONFIG_DIR/sssd_nsswitch.conf root@$client:$NSSFILE
                 if [ $? -ne 0 ] ; then
                         message "ERROR: Failed to scp SSSD nss config file to target client: $client"
+			rc=1
                 fi
         fi
   fi 
+
+  return $rc
 }
 
 sssdLDAPSetup()
 {
     rc=0
     client=$1
-    ds=$2
+    dirsrv=$2
+    basedn=$3
+    port=$4
 
   ###################################################################################
   #  LDAP.CONF - modify a generic ldap.conf for the target directory server
   ##################################################################################
 
-  cat $CONFIG_DIR/ldap.conf > sssd_ldap.conf
-  echo "uri ldap://$ds" >> sssd_ldap.conf
-  echo "ssl no" >> sssd_ldap.conf
-  echo "tls_cacertdir /etc/openldap/cacerts" >> sssd_ldap.conf
-  echo "pam_password md5" >> sssd_ldap.conf
+  cp  $CONFIG_DIR/ldap.conf $TET_TMP_DIR/ldap.conf
+  echo "uri ldap://$dirsrv:$port" >> $TET_TMP_DIR/ldap.conf
+  echo "ssl no" >> $TET_TMP_DIR/ldap.conf
+  echo "base $basedn" >> $TET_TMP_DIR/ldap.conf
 
   LDAPFILE=/etc/ldap.conf
-  message "Checking to see if ldap.conf file is already backed up"
+  message "Backing up ldap.conf file"
   ssh root@$client "ls $LDAPFILE.orig"
   if [ $? -eq 0 ] ; then
         message "$LDAPFILE file already backed up"
   else
-        message "Backing up configuration file"
         ssh root@$client "cp $LDAPFILE $LDAPFILE.orig"
         if [ $? -ne 0 ] ; then
                 message "ERROR: Failed to backup $LDAPFILE on client $client"
-		rc=1
+                rc=1
         else
-                scp $CONFIG_DIR/sssd_ldap.conf root@$client:$LDAPFILE
+                scp $TET_TMP_DIR/ldap.conf root@$client:$LDAPFILE
                 if [ $? -ne 0 ] ; then
                         message "ERROR: Failed to scp SSSD ldap config file to target client: $client"
-			rc=1
+                        rc=1
                 fi
         fi
   fi
+
+  rm -rf $TET_TMP_DIR/ldap.conf
 
   return $rc
 }
@@ -105,15 +111,10 @@ sssdClientCleanup()
    rc=0
    client=$1
    for item in $SYS_CFG_FILES ; do
-#	if [ -e $item.orig ] ; then
-   		ssh root@$client "mv -f $item.orig $item"
-		if [ $? -ne 0 ] ; then
-			message "ERROR: Failed to restore configuration file $item"
-			rc=1
-  		else
-			message "Original $item file restored."
-		fi
-#	fi
+     ssh root@$client "mv -f $item.orig $item"
+     if [ $? -eq 0 ] ; then
+     	message "Original $item file restored."
+     fi
    done
 
    message "Stopping SSSD Service.........."
@@ -133,7 +134,6 @@ sssdClientCleanup()
    else
         message "NSCD Service started successfully."
    fi
-
 
    return $rc
 }
@@ -233,6 +233,8 @@ restartSSSD()
                 message "SSSD service restarted"
         fi
    fi
+
+   sleep 10
 
    return $rc
 }
