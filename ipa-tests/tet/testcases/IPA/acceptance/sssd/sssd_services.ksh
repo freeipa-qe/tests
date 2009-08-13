@@ -33,7 +33,7 @@ PIDFILE=/var/run/sssd.pid
 startup()
 {
   myresult=PASS
-  message "START $tet_this_test: Setup NSS and PAM AUTH Configurations"
+  message "START $tet_thistest: Setup NSS and PAM AUTH Configurations"
   for c in $SSSD_CLIENTS; do
         message "Working on $c"
         sssdClientSetup $c 
@@ -53,13 +53,13 @@ startup()
   done
 
   tet_result $myresult
-  message "END $tet_this_test"
+  message "END $tet_thistest"
 }
 
 bug512733()
 {
   myresult=PASS
-  message "START $tet_this_test: Start Services with No Domains Configured - bug 512733"
+  message "START $tet_thistest: Start Services with No Domains Configured - bug 512733"
   for c in $SSSD_CLIENTS; do
         message "Working on $c"
 	ssh root@$c "service sssd start"
@@ -77,14 +77,14 @@ bug512733()
 	fi
   done
   tet_result $myresult
-  message "END $tet_this_test"
+  message "END $tet_thistest"
 }
 
 
 sssd_service_001()
 {
   myresult=PASS
-  message "START $tet_this_test: Start Services and Verify Status"
+  message "START $tet_thistest: Start Services and Verify Status"
   for c in $SSSD_CLIENTS; do
         message "Working on $c"
 
@@ -126,13 +126,13 @@ sssd_service_001()
   done
 
   tet_result $myresult
-  message "END $tet_this_test"
+  message "END $tet_thistest"
 }
 
 sssd_service_002()
 {
   myresult=PASS
-  message "START $tet_this_test: Stop Services and Check Status"
+  message "START $tet_thistest: Stop Services and Check Status"
   for c in $SSSD_CLIENTS; do
         message "Working on $c"
 	ssh root@$c "service sssd stop"
@@ -152,13 +152,13 @@ sssd_service_002()
 	fi
   done
   tet_result $myresult
-  message "END $tet_this_test"
+  message "END $tet_thistest"
 }
 
 cleanup()
 {
   myresult=PASS
-  message "START $tet_this_test: Cleanup Clients"
+  message "START $tet_thistest: Cleanup Clients"
   for c in $SSSD_CLIENTS; do
         message "Working on $c"
         sssdClientCleanup $c 
@@ -178,7 +178,7 @@ cleanup()
   done
 
   result $myresult
-  message "END $tet_this_test"
+  message "END $tet_thistest"
 }
 
 ##################################################################

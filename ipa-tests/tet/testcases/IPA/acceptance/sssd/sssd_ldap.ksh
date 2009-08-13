@@ -12,7 +12,6 @@ fi
 #  Test Case List
 #####################################################################
 iclist="ic0 ic1 ic2 ic3 ic4 ic99"
-iclist="ic99"
 ic0="startup"
 ic1="sssd_ldap_001 sssd_ldap_002 sssd_ldap_003 sssd_ldap_004 sssd_ldap_005 sssd_ldap_006 sssd_ldap_007"
 ic2="sssd_ldap_008 sssd_ldap_009 sssd_ldap_010 sssd_ldap_011 sssd_ldap_012"
@@ -29,6 +28,7 @@ SSSD_CLIENTS="$C1"
 export SSSD_CLIENTS
 RH_DIRSERV="jennyv4.bos.redhat.com"
 RH_BASEDN="dc=example,dc=com"
+PORT=389
 ADS_DIRSERV="jennyv3.bos.redhat.com"
 ADS_BASEDN="dc=bos,dc=redhat,dc=com"
 ROOTDN="cn=Directory Manager"
@@ -94,7 +94,6 @@ sssd_ldap_001()
    #    enumerate: 3
    #    minId: 1000
    #    maxId: 1010
-   #	legacy: FALSE
    #    provider: proxy
    #    cache-credentials: FALSE
    ####################################################################
@@ -104,7 +103,7 @@ sssd_ldap_001()
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
         for c in $SSSD_CLIENTS ; do
                 message "Working on $c"
-        	sssdLDAPSetup $c $RH_DIRSERV $RH_BASEDN
+        	sssdLDAPSetup $c $RH_DIRSERV $RH_BASEDN $PORT
         	if [ $? -ne 0 ] ; then
                 	message "ERROR: SSSD LDAP Setup Failed for $c."
                 	myresult=FAIL
@@ -140,11 +139,6 @@ sssd_ldap_001()
                         myresult=FAIL
                 fi
 
-                verifyCfg $c LDAP legacy FALSE
-                if [ $? -ne 0 ] ; then
-                        myresult=FAIL
-                fi
-
                 verifyCfg $c LDAP provider proxy
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
@@ -173,7 +167,7 @@ sssd_ldap_002()
 		for item in $USERS ; do
 		   echo $RET | grep $item
 		   if [ $? -ne 0 ] ; then
-		sssd_ldap_014	message "ERROR: Expected $item user to be returned."
+			message "ERROR: Expected $item user to be returned."
 			myresult=FAIL
 		   else
 			message "$item user returned as expected."
@@ -308,7 +302,6 @@ sssd_ldap_008()
    #   Configuration 2
    #    enumerate: 3
    #    minId: 1000
-   #	legacy: TRUE
    #	useFullyQualifiedNames: TRUE
    #    provider: proxy
    #    cache-credentials: TRUE
@@ -340,11 +333,6 @@ sssd_ldap_008()
                 fi
 
                 verifyCfg $c LDAP minId 1000
-                if [ $? -ne 0 ] ; then
-                        myresult=FAIL
-                fi
-
-                verifyCfg $c LDAP legacy TRUE
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
@@ -467,7 +455,6 @@ sssd_ldap_013()
    #    enumerate: 3
    #    minId: 1000
    #    maxId: 1010
-   #	legacy: FALSE
    #    provider: ldap 
    #    cache-credentials: FALSE
    ####################################################################
@@ -480,7 +467,7 @@ sssd_ldap_013()
                 message "Working on $c"
 
                 message "Working on $c"
-                sssdLDAPSetup $c $RHDS_DIRSERV $RHDS_BASEDN
+                sssdLDAPSetup $c $RHDS_DIRSERV $RHDS_BASEDN $PORT
                 if [ $? -ne 0 ] ; then
                         message "ERROR: SSSD LDAP Setup Failed for $c."
                         myresult=FAIL
@@ -512,11 +499,6 @@ sssd_ldap_013()
                 fi
 
                 verifyCfg $c LDAP maxId 1010
-                if [ $? -ne 0 ] ; then
-                        myresult=FAIL
-                fi
-
-                verifyCfg $c LDAP legacy FALSE
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
@@ -684,7 +666,6 @@ sssd_ldap_020()
    #   Configuration 4
    #    enumerate: 3
    #    minId: 1000
-   #    legacy: TRUE
    #    useFullyQualifiedNames: TRUE
    #    provider: ldap
    #    cache-credentials: TRUE
@@ -716,11 +697,6 @@ sssd_ldap_020()
                 fi
 
                 verifyCfg $c LDAP minId 1000
-                if [ $? -ne 0 ] ; then
-                        myresult=FAIL
-                fi
-
-                verifyCfg $c LDAP legacy TRUE
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi

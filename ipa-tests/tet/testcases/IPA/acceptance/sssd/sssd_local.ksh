@@ -16,7 +16,7 @@ ic0="startup"
 ic1="sssd_001 sssd_002 sssd_003 sssd_004 sssd_005 sssd_006 sssd_007 sssd_008 sssd_009 sssd_010 sssd_011 sssd_012 sssd_013 sssd_014 sssd_015 sssd_016 sssd_017 sssd_018 sssd_019 sssd_020 sssd_021 sssd_022 sssd_023 sssd_024 sssd_025 sssd_026 sssd_027 sssd_028"
 ic2="sssd_029 sssd_030 sssd_031 sssd_032 sssd_033 sssd_034 sssd_035"
 ic3="sssd_036 sssd_037 sssd_038 sssd_039"
-ic4="sssd_040 sssd_041 sssd_042 sssd_043 sssd_044 sssd_046"
+ic4="sssd_040 sssd_041 sssd_042 sssd_043 sssd_044 sssd_045 sssd_046"
 ic99="cleanup"
 #################################################################
 #  GLOBALS
@@ -41,7 +41,7 @@ SYS_CFG_FILES="$PAMCFG $LDAPCFG $NSSCFG $SSSD_CONFIG_FILE"
 startup()
 {
   myresult=PASS
-  message "START $tet_this_test: Setup for SSSD Local Domain Testing"
+  message "START $tet_thistest: Setup for SSSD Local Domain Testing"
   for c in $SSSD_CLIENTS; do
         message "Working on $c"
 
@@ -60,7 +60,7 @@ startup()
 	fi
   done
   tet_result $myresult
-  message "END $tet_this_test"
+  message "END $tet_thistest"
 }
 
 sssd_001()
@@ -70,7 +70,6 @@ sssd_001()
    #	enumerate: 3
    #	minId: 1000
    #	maxId: 1010
-   #	legacy: TRUE
    #	magicPrivateGroups: TRUE
    #	provider: local
    ####################################################################
@@ -106,11 +105,6 @@ sssd_001()
                 fi
 
                 verifyCfg $c LOCAL maxId 1010
-                if [ $? -ne 0 ] ; then
-                        myresult=FAIL
-                fi
-
-                verifyCfg $c LOCAL legacy FALSE
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
@@ -470,38 +464,23 @@ sssd_014()
 	#  bug description: sss_useradd: Segmentation Fault Trying to add user with uidNumber below minId              #
 	################################################################################################################ 
         myresult=PASS
-        message "START $tet_thistest: Add user with uidNumber below Allowed minId- User added to Legacy Local"
+        message "START $tet_thistest: Add user with uidNumber below Allowed minId"
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-
+	EXPMSG="The selected UID is outside all domain ranges"
         for c in $SSSD_CLIENTS ; do
 		message "Working on $c"
-                ssh root@$c "sss_useradd -u 999 -h /home/user999 -s /bin/bash user999"
-		rc=$?	
-                if [ $rc -ne 0 ] ; then
-                        message "ERROR: Adding user999 to Legacy Local.  Return Code: $rc"
+                MSG=`ssh root@$c "sss_useradd -u 999 -h /home/user999 -s /bin/bash user999 2>&1"`
+                if [ $? -eq 0 ] ; then
+                        message "ERROR: Adding user999 with uid below minId was successful."
+                        myresult=FAIL
+                fi
+ 
+                if [[ $EXPMSG != $MSG ]] ; then
+                        message "ERROR: Unexpected Error message.  Got: $MSG  Expected: $EXPMSG"
                         myresult=FAIL
                 else
-			# verify user was not Added to LOCAL domain database
-                        ssh root@$c ldbsearch -H /var/lib/sss/db/sssd.ldb -b "cn=Users,cn=LOCAL,cn=sysdb" | grep user999
-                        if [ $? -eq 0 ] ; then
-                                message "ERROR: User with uidNumber below minId was added to the LOCAL domain database."
-                                myresult=FAIL
-                        else
-				# verify user was added to /etc/passwd
-				ssh root@$c "cat /etc/passwd | grep user999"
-				if [ $? -eq 0 ] ; then
-                                	message "user999 added to /etc/passwd with uidNumber below minId successfully."
-					ssh root@c$ "userdel -r user999"
-					if [ $? -ne 0 ] ; then
-						message "Failed to cleanup and delete legacy local user user999. Return Code: $?"
-					fi
-				else
-					message "ERROR: user999 was not found in the /etc/passwd file as expected.  Return Code: $?"
-					myresult=FAIL
-				fi
-                        fi	
+                        message "Adding user with uid below minId error message was as expected."
                 fi
-
 	done
 
         result $myresult
@@ -518,35 +497,22 @@ sssd_015()
         myresult=PASS
         message "START $tet_thistest: Add user with uidNumber above Allowed maxId - User added to Legacy Local"
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-
+	EXPMSG="The selected UID is outside all domain ranges"
         for c in $SSSD_CLIENTS ; do
 		message "Working on $c"
-                ssh root@$c "sss_useradd -u 1011 -h /home/user1011 -s /bin/bash user1011"
-		rc=$?
-                if [ $rc -ne 0 ] ; then
-                        message "ERROR: Adding user1011 to Legacy Local.  Return Code: $rc"
+                MSG=`ssh root@$c "sss_useradd -u 1011 -h /home/user1011 -s /bin/bash user1011 2>&1"`
+                if [ $? -eq 0 ] ; then
+                        message "ERROR: Adding user1011 with uid above maxId was successful."
+                        myresult=FAIL
+                fi
+
+                if [[ $EXPMSG != $MSG ]] ; then
+                        message "ERROR: Unexpected Error message.  Got: $MSG  Expected: $EXPMSG"
                         myresult=FAIL
                 else
-                        # verify user was not Added to LOCAL domain database
-                        ssh root@$c ldbsearch -H /var/lib/sss/db/sssd.ldb -b "cn=Users,cn=LOCAL,cn=sysdb" | grep user1011
-                        if [ $? -eq 0 ] ; then
-                                message "ERROR: User with uidNumber above maxId was added to the LOCAL domain database."
-                                myresult=FAIL
-                        else
-                                # verify user was added to /etc/passwd
-                                ssh root@$c "cat /etc/passwd | grep user1011"
-                                if [ $? -eq 0 ] ; then
-                                        message "user999 added to /etc/passwd with uidNumber above maxId successfully."
-                                        ssh root@c$ "userdel -r user1011"
-                                        if [ $? -ne 0 ] ; then
-                                                message "Failed to cleanup and delete legacy local user user1011. Return Code: $?"
-                                        fi
-                                else
-                                        message "ERROR: user1011 was not found in the /etc/passwd file as expected.  Return Code: $?"
-                                        myresult=FAIL
-                                fi
-                        fi
+                        message "Adding user with uid above maxId error message was as expected."
                 fi
+
         done
 
         result $myresult
@@ -583,36 +549,22 @@ sssd_016()
 sssd_017()
 {
         myresult=PASS
-        message "START $tet_thistest: Add group with gidNumber below Allowed minId- Group added to Legacy Local"
+        message "START $tet_thistest: Add group with gidNumber below Allowed minId"
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-
+	EXPMSG="The selected GID is outside all domain ranges"
         for c in $SSSD_CLIENTS ; do
                 message "Working on $c"
-                ssh root@$c "sss_groupadd -g 999 group999"
-                rc=$?
-                if [ $rc -ne 0 ] ; then
-                        message "ERROR: Adding group999 to Legacy Local.  Return Code: $rc"
+                MSG=`ssh root@$c "sss_groupadd -g 999 group999 2>&1"`
+                if [ $? -eq 0 ] ; then
+                        message "ERROR: Adding group999 with gid below minId was successful."
+                        myresult=FAIL
+                fi
+
+                if [[ $EXPMSG != $MSG ]] ; then
+                        message "ERROR: Unexpected Error message.  Got: $MSG  Expected: $EXPMSG"
                         myresult=FAIL
                 else
-                        # verify group was not Added to LOCAL domain database
-                        ssh root@$c ldbsearch -H /var/lib/sss/db/sssd.ldb -b "cn=groups,cn=LOCAL,cn=sysdb" | grep group999
-                        if [ $? -eq 0 ] ; then
-                                message "ERROR: Group with gidNumber below minId was added to the LOCAL domain database."
-                                myresult=FAIL
-                        else
-                                # verify group was added to /etc/group
-                                ssh root@$c "cat /etc/group | grep group999"
-                                if [ $? -eq 0 ] ; then
-                                        message "group999 added to /etc/group with gidNumber below minId successfully."
-                                        ssh root@$c "groupdel group999"
-                                        if [ $? -ne 0 ] ; then
-                                                message "Failed to cleanup and delete legacy local group group999. Return Code: $?"
-                                        fi
-                                else
-                                        message "ERROR: group999 was not found in the /etc/group file as expected.  Return Code: $?"
-                                        myresult=FAIL
-                                fi
-                        fi
+                        message "Adding group with gid below minId error message was as expected."
                 fi
         done
 
@@ -623,37 +575,24 @@ sssd_017()
 sssd_018()
 {
         myresult=PASS
-        message "START $tet_thistest: Add group with gidNumber above Allowed maxId- Group added to Legacy Local"
+        message "START $tet_thistest: Add group with gidNumber above Allowed maxId"
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-
+	EXPMSG="The selected GID is outside all domain ranges"
         for c in $SSSD_CLIENTS ; do
                 message "Working on $c"
-                ssh root@$c "sss_groupadd -g 1011 group1011"
-                rc=$?
-                if [ $rc -ne 0 ] ; then
-                        message "ERROR: Adding group1011 to Legacy Local.  Return Code: $rc"
+                MSG=`ssh root@$c "sss_groupadd -g 1011 group1011 2>&1"`
+                if [ $? -eq 0 ] ; then
+                        message "ERROR: Adding group1011 with gid above maxId was successful."
                         myresult=FAIL
-                else 
-                        # verify group was not Added to LOCAL domain database
-                        ssh root@$c ldbsearch -H /var/lib/sss/db/sssd.ldb -b "cn=groups,cn=LOCAL,cn=sysdb" | grep group1011
-                        if [ $? -eq 0 ] ; then
-                                message "ERROR: Group with gidNumber below minId was added to the LOCAL domain database."
-                                myresult=FAIL
-                        else
-                                # verify group was added to /etc/group
-                                ssh root@$c "cat /etc/group | grep group1011"
-                                if [ $? -eq 0 ] ; then
-                                        message "group1011 added to /etc/group with gidNumber below minId successfully."
-                                        ssh root@$c "groupdel group1011"
-                                        if [ $? -ne 0 ] ; then
-                                                message "Failed to cleanup and delete legacy local group group1011. Return Code: $?"
-                                        fi
-                                else
-                                        message "ERROR: group1011 was not found in the /etc/group file as expected.  Return Code: $?"
-                                        myresult=FAIL
-                                fi
-                        fi
                 fi
+
+                if [[ $EXPMSG != $MSG ]] ; then
+                        message "ERROR: Unexpected Error message.  Got: $MSG  Expected: $EXPMSG"
+                        myresult=FAIL
+                else
+                        message "Adding group with gid above maxId error message was as expected."
+                fi
+
         done
 
         result $myresult
@@ -782,6 +721,7 @@ sssd_023()
                         myresult=FAIL
                 else
                         ssh root@$c sss_groupmod -a group1009 group1010
+			sleep 5
                         if [ $? -ne 0 ] ; then
                                 message "ERROR: Failed to add nested group.  Return Code: $?"
                                 myresult=FAIL
@@ -996,7 +936,6 @@ sssd_029()
    ####################################################################
    #   Configuration 2
    #    enumerate: 1
-   #    legacy: TRUE
    #	useFullyQualifiedNames TRUE
    #    provider: local
    ####################################################################
@@ -1036,11 +975,6 @@ sssd_029()
                         myresult=FAIL
                 fi
   
-                verifyCfg $c LOCAL legacy TRUE
-                if [ $? -ne 0 ] ; then
-                        myresult=FAIL
-                fi
-
                 verifyCfg $c LOCAL provider local
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
@@ -1059,8 +993,14 @@ sssd_029()
 sssd_030()
 {
   myresult=PASS
-  message "START $tet_this_test: User Fully Qualified Name"
-
+  message "START $tet_thistest: User Fully Qualified Name"
+  #################################################################################
+  # If the user is added successfully, but fails to be found with getent, you may
+  # be seeing a regression of bug https://fedorahosted.org/sssd/ticket/95
+  # with magicPrivateGroups set to FALSE user is added with gidNumber of 0 and 
+  # then getent fails to return 0 - debug output will show an error - but no error
+  # returned on the search
+  #################################################################################
   for c in $SSSD_CLIENTS; do
         message "Working on $c"
         ssh root@$c "sss_useradd -u 1000 -h /home/user1000 -s /bin/bash user1000"
@@ -1086,7 +1026,7 @@ sssd_030()
 sssd_031()
 {
   myresult=PASS
-  message "START $tet_this_test: Add Group Fully Qualified Name"
+  message "START $tet_thistest: Add Group Fully Qualified Name"
 
   for c in $SSSD_CLIENTS; do
         message "Working on $c"
@@ -1114,7 +1054,7 @@ sssd_031()
 sssd_032()
 {
   myresult=PASS
-  message "START $tet_this_test: Modify User Using Fully Qualified Name"
+  message "START $tet_thistest: Modify User Using Fully Qualified Name"
   
   for c in $SSSD_CLIENTS; do
         message "Working on $c"
@@ -1141,7 +1081,7 @@ sssd_032()
 sssd_033()
 {
   myresult=PASS
-  message "START $tet_this_test: Add user to group Using Fully Qualified Names"
+  message "START $tet_thistest: Add user to group Using Fully Qualified Names"
   
   for c in $SSSD_CLIENTS; do
         message "Working on $c"
@@ -1168,7 +1108,7 @@ sssd_033()
 sssd_034()
 {
   myresult=PASS
-  message "START $tet_this_test: Delete User Using Fully Qualified Name"
+  message "START $tet_thistest: Delete User Using Fully Qualified Name"
   
   for c in $SSSD_CLIENTS; do
         message "Working on $c"
@@ -1195,7 +1135,7 @@ sssd_034()
 sssd_035()
 {
   myresult=PASS
-  message "START $tet_this_test: Delete Group Using Fully Qualified Name"
+  message "START $tet_thistest: Delete Group Using Fully Qualified Name"
   
   for c in $SSSD_CLIENTS; do
         message "Working on $c"
@@ -1226,7 +1166,6 @@ sssd_036()
    #    enumerate: 1
    #    minId: 1000
    #    maxId: 1010
-   #    legacy: FALSE
    #    magicPrivateGroups: TRUE
    #    provider: local
    ####################################################################
@@ -1266,11 +1205,6 @@ sssd_036()
                         myresult=FAIL
                 fi
 
-                verifyCfg $c LOCAL legacy FALSE
-                if [ $? -ne 0 ] ; then
-                        myresult=FAIL
-                fi
-
                 verifyCfg $c LOCAL magicPrivateGroups TRUE
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
@@ -1290,7 +1224,7 @@ sssd_036()
 sssd_037()
 {
   myresult=PASS
-  message "START $tet_this_test: Enumerate users only"
+  message "START $tet_thistest: Enumerate users only"
 
   for c in $SSSD_CLIENTS; do
         message "Working on $c"
@@ -1326,7 +1260,6 @@ sssd_038()
    #    enumerate: 2
    #    minId: 1000
    #    maxId: 1010
-   #    legacy: FALSE
    #    magicPrivateGroups: TRUE
    #    provider: local
    ####################################################################
@@ -1366,11 +1299,6 @@ sssd_038()
                         myresult=FAIL
                 fi
 
-                verifyCfg $c LOCAL legacy FALSE
-                if [ $? -ne 0 ] ; then
-                        myresult=FAIL
-                fi
-
                 verifyCfg $c LOCAL magicPrivateGroups TRUE
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
@@ -1390,7 +1318,7 @@ sssd_038()
 sssd_039()
 {
   myresult=PASS
-  message "START $tet_this_test: Enumerate groups only"
+  message "START $tet_thistest: Enumerate groups only"
 
   for c in $SSSD_CLIENTS; do
         message "Working on $c"
@@ -1408,7 +1336,7 @@ sssd_039()
                 message "ERROR: Enumerate 2 should not return the user added but it did."
                 myresult=FAIL
         else
-                message "User was not returned as expected with configuration enumerate set to 2."
+                message "Group was not returned as expected with configuration enumerate set to 2."
         fi
 
         ssh root@$c "sss_userdel user1000"
@@ -1466,11 +1394,6 @@ sssd_040()
                 fi
 
                 verifyCfg $c LOCAL maxId 2010
-                if [ $? -ne 0 ] ; then
-                        myresult=FAIL
-                fi
-
-                verifyCfg $c LOCAL legacy TRUE
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
@@ -1650,8 +1573,8 @@ sssd_045()
         for c in $SSSD_CLIENTS ; do
                 message "Working on $c"
 		u=2000
-                while [ $i -le 2020 ] ; do
-			EXPMSG="The group user$u already exists"
+		EXPMSG="A group with the same name or UID already exists"
+                while [ $u -le 2010 ] ; do
                         MSG=`ssh root@$c "sss_groupadd user$u 2>&1"`
                         if [ $? -eq 0 ] ; then
                                 message "ERROR: Adding LOCAL group was expected to fail no more allowed gidNumbers, but was successful."
@@ -1692,7 +1615,7 @@ sssd_046()
                         	myresult=FAIL
                 	fi
 
-			ssh root$c "getent -s sss group | grep user$i"
+			ssh root@$c "getent -s sss group | grep user$i"
 			if [ $? -eq 0 ] ; then
 				message "ERROR: User was deleted but the user's magic private group still exists."
 				myresult=FAIL
@@ -1712,7 +1635,7 @@ sssd_046()
 cleanup()
 {
   myresult=PASS
-  message "START $tet_this_test: Cleanup Clients"
+  message "START $tet_thistest: Cleanup Clients"
   for c in $SSSD_CLIENTS; do
 	message "Working on $c"
 	sssdClientCleanup $c
@@ -1731,7 +1654,7 @@ cleanup()
   done
 
   result $myresult
-  message "END $tet_this_test"
+  message "END $tet_thistest"
 }
 
 ##################################################################
