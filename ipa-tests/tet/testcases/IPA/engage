@@ -788,6 +788,7 @@ main_default()
 	if [ -z "$NUMCLIENTS" ] ; then NUMCLIENTS=0                    ; fi
 	if [ -z "$DNSMASTER" ] ; then DNSMASTER="10.14.63.2"           ; fi
 	if [ -z "$NTPSERVER" ] ; then NTPSERVER="clock.redhat.com"; fi
+	if [ -z "$SetupSSHKeys" ]; then SetupSSHKeys="n"                   ; fi
 	if [ -z "$RunInstall" ]; then RunInstall="n"                   ; fi
 	if [ -z "$RunInstallShow" ]; then RunInstallShow="n"           ; fi
 	if [ -z "$RunUnInstall" ]; then RunUnInstall="n"               ; fi
@@ -883,7 +884,7 @@ main_default()
 	export ROOTDN ROOTDNPW TETADMINPW LDAPhost LDAPport DRIVE IPAVERSION
 	export IGNORE_KNOWN_BUGS DSTET_64 DSTET_DEBUG PkgName
 
-	export MainLongDurationTests MainRunStartup MainRunTests MainRunCleanup MainGuiTests MainMailTo MainAcceptanceTests MainReliabTests MainStressTests MainPerformanceTests MainFunctionalTestNIS RunInstall RunInstallShow RunInstall RunInstallShow
+	export MainLongDurationTests MainRunStartup MainRunTests MainRunCleanup MainGuiTests MainMailTo MainAcceptanceTests MainReliabTests MainStressTests MainPerformanceTests MainFunctionalTestNIS RunInstall RunInstallShow RunInstall RunInstallShow SetupSSHKeys
 }
 
 # This function will ask the user for more information/choices if needed
@@ -1042,6 +1043,15 @@ ask_m1()
 	echo "Repo for server 1? This is a url to the .repo file, or a tarball on hpux ($REPO_M1)->"
 	read rsp
 	if [ -z "$rsp" ] ; then echo "Server repo unchanged"; else REPO_M1="$rsp"; fi
+	if [ "$SetupSSHKeys" = "y" ]; then 
+		echo "Root password of $HOSTNAME_M1?"
+		echo " Default - $PASSWORD_M1"
+		echo "->"
+		read rsp
+		if [ -z "$rsp" ] ; then echo "Root password unchanged"; else PASSWORD_M1="$rsp"; fi
+		export PASSWORD_M1
+	fi
+
 	export HOSTNAME_M1 OS_M1 REPO_M1 
 
 }
@@ -1501,6 +1511,15 @@ main_ask()
 {
 	if [ "$engage_debug" = "y" ]; then set -x; fi
 
+	echo ""
+	echo "Run setup of SSH keys on all of the Servers and Clients?"
+	echo "NOTE - Choosing Y will require the root passwords of all of the machines."
+	echo "default $SetupSSHKeys"
+	echo "->"
+	read rsp
+	if [ -z "$rsp" ] ; then echo "Setup of SSH Keys still $SetupSSHKeys"; else SetupSSHKeys="$rsp"; fi
+	export SetupSSHKeys
+
 	TestChoice=1
 	echo "How many servers are in this test(not clients)? (4 max)"
 	echo "default $NUMSERVERS"
@@ -1718,7 +1737,7 @@ main_ask()
 
         main_backendask
 
-	export MainRunTests MainRunCleanup MainRunStartup SERVERS CLIENTS NUMSERVERS NUMCLIENTS DNSMASTER RunInstall RunInstallShow RunInstall RunInstallShow NTPSERVER IPAVERSION
+	export MainRunTests MainRunCleanup MainRunStartup SERVERS CLIENTS NUMSERVERS NUMCLIENTS DNSMASTER RunInstall RunInstallShow RunInstall RunInstallShow NTPSERVER IPAVERSION SetupSSHKeys
 }
 
 # This function will print the user's choices (aka variables)
@@ -1753,31 +1772,28 @@ main_print()
 	echo "    CLIENTS        : $CLIENTS"
 	echo "    DNSMASTER      : $DNSMASTER"
 	echo "    ITTERATIONS    : $ITTERATIONS"
+	echo " Set up SSH keys?  : $SetupSSHKeys"
 	. $TESTING_SHARED/shared.ksh
 	echo " Host Info"
 	for s in $SERVERS; do
 		if [ "$s" != "" ]; then
 			eval_vars $s
+			echo "         Host $s"
 			echo "   HOSTNAME_$s     : $HOSTNAME"
 			echo "   OS_$s           : $OS"
 			echo "   REPO_$s         : $REPO"
-        		echo "   LDAP_PORT_$s    : $LDAP_PORT"
-        		echo "   LDAPS_PORT_$s   : $LDAPS_PORT"
-			echo "   FILE_SERVER_IS_ALIVE_$s : $FILE_SERVER_IS_ALIVE"
-			echo "   REPLICA_ID_$s   : $REPLICA_ID"
+			if [ "$SetupSSHKeys" = "y" ]; then echo "   PASSWORD_$s     : $PASSWORD"; fi
 		fi
 	done
 	for s in $CLIENTS; do
 		if [ "$s" != "" ]; then
 			eval_vars $s
+			echo "         Host $s"
 			echo "   HOSTNAME_$s     : $HOSTNAME"
 			echo "   OS_$s           : $OS"
 			echo "   OS_VER_$s       : $OS_VER"
 			echo "   REPO_$s         : $REPO"
-        		echo "   LDAP_PORT_$s    : $LDAP_PORT"
-        		echo "   LDAPS_PORT_$s   : $LDAPS_PORT"
-			echo "   FILE_SERVER_IS_ALIVE_$s : $FILE_SERVER_IS_ALIVE"
-			echo "   REPLICA_ID_$s   : $REPLICA_ID"
+			if [ "$SetupSSHKeys" = "y" ]; then echo "   PASSWORD_$s     : $PASSWORD"; fi
 		fi
 	done
 
@@ -1800,7 +1816,8 @@ main_print()
     echo "    64bit Directory Server         : $DSTET_64"
     echo "    Ignore known bugs              : $IGNORE_KNOWN_BUGS"
     echo "    Debugging Output (Verbose)     : $DSTET_DEBUG"
-	echo
+	echo ""
+	echo " Setup SSH keys on all Servers and Clinets? : $SetupSSHKeys"
 	echo " Install all Servers and Clients at startup : $RunInstall"
 	echo "                         Watch the install? : $RunInstallShow"
 	echo " UnInstall all Servers and Clients after run: $RunUnInstall"
@@ -1830,6 +1847,7 @@ main_save()
 	echo "DNSMASTER=$DNSMASTER"
 	echo "NTPSERVER=$NTPSERVER"
 	echo "IPAVERSION=$IPAVERSION"
+	echo "SetupSSHKeys=$SetupSSHKeys"
 	echo "RunInstall=$RunInstall"
 	echo "RunInstallShow=$RunInstallShow"
 	echo "RunUnInstall=$RunUnInstall"
@@ -1883,6 +1901,7 @@ main_save()
         		echo "LDAPS_PORT_$s=$LDAPS_PORT"
 			echo "FILE_SERVER_IS_ALIVE_$s=$FILE_SERVER_IS_ALIVE"
 			echo "REPLICA_ID_$s=$REPLICA_ID"
+			if [ "$SetupSSHKeys" = "y" ]; then echo "PASSWORD_$s=$PASSWORD"; fi
 		fi
 	done
 	for s in $CLIENTS; do
@@ -1897,6 +1916,7 @@ main_save()
         		echo "LDAPS_PORT_$s=$LDAPS_PORT"
 			echo "FILE_SERVER_IS_ALIVE_$s=$FILE_SERVER_IS_ALIVE"
 			echo "REPLICA_ID_$s=$REPLICA_ID"
+			if [ "$SetupSSHKeys" = "y" ]; then echo "PASSWORD_$s=$PASSWORD"; fi
 		fi
 
 	done
@@ -2347,18 +2367,18 @@ main_main()
 	sudo /etc/init.d/ntpd stop
 	sudo ntpdate $NTPSERVER &
 
-	export HOSTNAME_M1 OS_M1 REPO_M1 
-	export HOSTNAME_M2 OS_M2 REPO_M2 
-	export HOSTNAME_M3 OS_M3 REPO_M3 
-	export HOSTNAME_M4 OS_M4 REPO_M4 
-	export HOSTNAME_C1 OS_C1 REPO_C1 OS_VER_C1
-	export HOSTNAME_C2 OS_C2 REPO_C2 OS_VER_C2
-	export HOSTNAME_C3 OS_C3 REPO_C3 OS_VER_C3
-	export HOSTNAME_C4 OS_C4 REPO_C4 OS_VER_C4
-	export HOSTNAME_C5 OS_C5 REPO_C5 OS_VER_C5
-	export HOSTNAME_C6 OS_C6 REPO_C6 OS_VER_C6
-	export HOSTNAME_C7 OS_C7 REPO_C7 OS_VER_C7
-	export HOSTNAME_C8 OS_C8 REPO_C8 OS_VER_C8
+	export HOSTNAME_M1 OS_M1 REPO_M1 PASSWORD_M1 
+	export HOSTNAME_M2 OS_M2 REPO_M2 PASSWORD_M2
+	export HOSTNAME_M3 OS_M3 REPO_M3 PASSWORD_M3
+	export HOSTNAME_M4 OS_M4 REPO_M4 PASSWORD_M4
+	export HOSTNAME_C1 OS_C1 REPO_C1 OS_VER_C1 PASSWORD_C1
+	export HOSTNAME_C2 OS_C2 REPO_C2 OS_VER_C2 PASSWORD_C2
+	export HOSTNAME_C3 OS_C3 REPO_C3 OS_VER_C3 PASSWORD_C3
+	export HOSTNAME_C4 OS_C4 REPO_C4 OS_VER_C4 PASSWORD_C4
+	export HOSTNAME_C5 OS_C5 REPO_C5 OS_VER_C5 PASSWORD_C5
+	export HOSTNAME_C6 OS_C6 REPO_C6 OS_VER_C6 PASSWORD_C6
+	export HOSTNAME_C7 OS_C7 REPO_C7 OS_VER_C7 PASSWORD_C7
+	export HOSTNAME_C8 OS_C8 REPO_C8 OS_VER_C8 PASSWORD_C8
 	
 	# Setting the time and date on all of the servers and clients if we can
 	for s in $SERVERS; do

@@ -36,6 +36,12 @@ eval_vars()
         OS_VER=`eval echo $x`
 	x=\$REPO_$1
 	REPO=`eval echo $x`
+
+	if [ "$SetupSSHKeys" = "y" ]; then 
+		x=\$PASSWORD_$1
+		PASSWORD=`eval echo $x`
+		export PASSWORD
+	fi
 	
         export HOSTNAME FULLHOSTNAME OS REPO LDAP_PORT LDAPS_PORT
 }
