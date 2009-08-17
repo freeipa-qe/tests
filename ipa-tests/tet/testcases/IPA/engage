@@ -2380,6 +2380,37 @@ main_main()
 	export HOSTNAME_C7 OS_C7 REPO_C7 OS_VER_C7 PASSWORD_C7
 	export HOSTNAME_C8 OS_C8 REPO_C8 OS_VER_C8 PASSWORD_C8
 	
+	
+	# If SetupSSHKeys is specified then check to ensure that expect is installed, and set up ssh keys
+	if [ "$SetupSSHKeys" = "y" ]; then 
+		# Check to ensure that expect is installed
+		# If it is, then set up ssh keys
+		/bin/rpm -q expect
+		if [ $? -eq 0 ]; then
+			# Check to make sure that a local public key file exists, if not, create one.
+			if [ ! -f ~/.ssh/id_dsa.pub ]; then
+				setup_local_ssh_keys;
+				if [ $? -ne 0 ]; then
+					echo "ERROR - setup of local ssh keypair seems to have failed."
+					exit 1
+				fi
+			fi
+			for s in $SERVERS; do
+				if [ "$s" != "" ]; then
+					setup_ssh_keys_remote $s
+				fi
+			done
+			for s in $CLIENTS; do
+				if [ "$s" != "" ]; then
+					setup_ssh_keys_remote $s
+				fi
+			done
+		else
+			echo "ERROR! WARNING! Expect is not installed. Please install expect to enable"
+			echo " the setting up of all of the ssh keys"
+		fi
+	fi
+
 	# Setting the time and date on all of the servers and clients if we can
 	for s in $SERVERS; do
 		if [ "$s" != "" ]; then
@@ -2392,7 +2423,6 @@ main_main()
 			eval_vars $s
 			set_date $FULLHOSTNAME
 		fi
-
 	done
 
 # Lakshmi Gopal. Storing the test run files in TET_TMP_DIR instead of /tmp dir. 
