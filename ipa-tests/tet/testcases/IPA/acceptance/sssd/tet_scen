@@ -7,6 +7,7 @@ all
 sssd
 	"Starting SSSD tests..."
 	/sssd_services.ksh
+	/sssd_files.ksh
 	/sssd_local.ksh
 	/sssd_ldap.ksh
 	/sssd_multi.ksh
