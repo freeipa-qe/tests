@@ -563,6 +563,112 @@ message()
 	type tet_infoline > /dev/null 2>&1 && tet_infoline "$*"
 }
 
+# This function sets up the local ssh keys. It creates a ssh keyset that has no passwords for use in later tests.
+setup_local_ssh_keys()
+{
+        if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+	message "Creating expect file for setting up local ssh keys"
+	message "removing any currently existing dsa keys in the home directory"
+	rm -f ~/.ssh/id_dsa*
+	message "creating expect file"
+	echo '#!/usr/bin/expect -f
+set timeout 10
+spawn $env(SHELL)
+#match_max 100000
+send "ssh-keygen -t dsa\r"
+expect "Generating public/private dsa key pair." {
+ sleep 2
+ send "\r"
+}
+expect "Enter passphrase (empty for no passphrase):" {
+ sleep 1
+ send "\r"
+}
+expect "Enter same passphrase again:" {
+ sleep 1
+ send "\r"
+}' > $TET_TMP_DIR/setup-ssh-local.exp
+	message "Running expect script"
+	/usr/bin/expect $TET_TMP_DIR/setup-ssh-local.exp
+
+	# Check to ensure that worked properly
+	if [ -f ~/.ssh/id_dsa.pub ]; then
+		message "Creation of local ssh keys seems to have worked."
+		return 0;
+	else 
+		message "ERROR, creation of local ssh keys seems to have failed."
+		ls ~/.ssh
+		return 1;
+	fi
+}
+
+# The purpose of this function is to create a expect script that will set up a public
+# key ssh key setup with this host and the remote machine specified in $1
+setup_ssh_keys_remote()
+{
+	eval_vars $1
+        if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+	message "setting ssh keys with $FULLHOSTNAME"
+	message "Removing any entries for the new host from knownhosts"
+	cat ~/.ssh/known_hosts | grep -v $HOSTNAME > $TET_TMP_DIR/know-hosts
+	cat $TET_TMP_DIR/know-hosts > ~/.ssh/known_hosts
+	message "creating expect file"
+	echo '#!/usr/bin/expect -f
+set timeout 10
+set send_slow {1 .1}
+spawn $env(SHELL)
+match_max 100000' > $TET_TMP_DIR/setup-ssh-remote.exp
+	echo "send -s -- \"ssh root@$FULLHOSTNAME 'ls /'\"" >> $TET_TMP_DIR/setup-ssh-remote.exp
+	echo "expect \"*'ls /'\"" >> $TET_TMP_DIR/setup-ssh-remote.exp
+echo 'sleep .1
+send -s -- "\r"
+expect "*Are you sure you want to continue connecting (yes/no)? "
+sleep .1
+send -s -- "yes\r"
+sleep .5' >> $TET_TMP_DIR/setup-ssh-remote.exp
+echo "send -s -- \"$PASSWORD\r\"" >> $TET_TMP_DIR/setup-ssh-remote.exp
+echo 'sleep .1
+send -s -- "\r"' >> $TET_TMP_DIR/setup-ssh-remote.exp
+	message "Running expect script"
+	/usr/bin/expect $TET_TMP_DIR/setup-ssh-remote.exp
+
+	message "Creating /root/.ssh dir on $FULLHOSTNAME"
+	message "creating expect file"
+	echo '#!/usr/bin/expect -f
+set timeout 10
+set send_slow {1 .1}
+spawn $env(SHELL)
+match_max 100000' > $TET_TMP_DIR/setup-ssh-remote2.exp
+	echo "send -s -- \"ssh root@$FULLHOSTNAME 'mkdir /root/.ssh;chmod 600 /root/.ssh;rm -f /root/.ssh/authorized_keys'\"" >> $TET_TMP_DIR/setup-ssh-remote2.exp
+	echo "expect \"*'mkdir /root/.ssh;chmod 600 /root/.ssh;rm -f /root/.ssh/authorized_keys'\"" >> $TET_TMP_DIR/setup-ssh-remote2.exp
+echo 'sleep .1
+send -s -- "\r"
+expect "*password: "
+sleep .1' >> $TET_TMP_DIR/setup-ssh-remote2.exp
+	echo "send -s -- \"$PASSWORD\r\"" >> $TET_TMP_DIR/setup-ssh-remote2.exp
+	echo 'expect eof' >> $TET_TMP_DIR/setup-ssh-remote2.exp
+	message "Running expect script"
+	/usr/bin/expect $TET_TMP_DIR/setup-ssh-remote2.exp
+
+	message "Great, now copy the ssh keys over to the remote host"
+	message "creating expect file"
+	echo '#!/usr/bin/expect -f
+set timeout 10
+set send_slow {1 .1}
+spawn $env(SHELL)
+match_max 100000' > $TET_TMP_DIR/setup-ssh-remote3.exp
+	echo "send -s -- \"scp ~/.ssh/id_dsa.pub root@$FULLHOSTNAME:/root/.ssh/authorized_keys\r\"" >> $TET_TMP_DIR/setup-ssh-remote3.exp
+
+	echo 'expect "*password: "
+sleep .1' >> $TET_TMP_DIR/setup-ssh-remote3.exp
+	echo "send -s -- \"$PASSWORD\r\"" >> $TET_TMP_DIR/setup-ssh-remote3.exp
+	echo 'expect eof' >> $TET_TMP_DIR/setup-ssh-remote3.exp
+	message "Running expect script"
+	/usr/bin/expect $TET_TMP_DIR/setup-ssh-remote3.exp
+
+	return 0;
+}
+
 # Add time stamp before we log the message
 logmessage()
 {
