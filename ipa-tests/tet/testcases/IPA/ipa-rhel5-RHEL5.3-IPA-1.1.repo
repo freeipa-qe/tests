@@ -1,6 +1,12 @@
-[ipa-daily]
-name=ipa-daily
+[ipa-daily-64]
+name=ipa-daily-64
 baseurl=http://porkchop.devel.redhat.com/nightly/latest-RHEL5.3-IPA-2.0/2.0/x86_64/os/IPA/
+enabled=1
+gpgcheck=0
+
+[ipa-daily-32]
+name=ipa-daily
+baseurl=http://porkchop.devel.redhat.com/nightly/latest-RHEL5.3-IPA-2.0/2.0/i386/os/IPA/
 enabled=1
 gpgcheck=0
 
@@ -10,16 +16,33 @@ gpgcheck=0
 #enabled=1
 #gpgcheck=0
 
-[bind]
+#[rhds90-32]
+#name=rhds90
+#baseurl=https://porkchop.devel.redhat.com/nightly/latest-RHEL5.3-DSRV-9.01/9.0/i386/os/RedHat/RPMS/
+#enabled=1
+#gpgcheck=0
+
+[bind-64]
 name=newbind
 baseurl=http://apoc.dsdev.sjc.redhat.com/tet/bind/x86_64/
 enabled=1
 gpgcheck=0
 
-[sssd]
+[bind-32]
+name=newbind
+baseurl=http://apoc.dsdev.sjc.redhat.com/tet/bind/i386/
+enabled=1
+gpgcheck=0
+
+[sssd-64]
 name=sssd
 baseurl=http://fedorapeople.org/~sgallagh/repos/RHEL5/x86_64/
 enabled=1
 gpgcheck=0
 
+[sssd-32]
+name=sssd
+baseurl=http://fedorapeople.org/~sgallagh/repos/RHEL5/i386/
+enabled=1
+gpgcheck=0
 
