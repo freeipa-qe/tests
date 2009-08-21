@@ -11,11 +11,12 @@ fi
 ######################################################################
 #  Test Case List
 #####################################################################
-iclist="ic0 ic1 ic2 ic3 ic99"
+iclist="ic0 ic1 ic2 ic3 ic4 ic99"
 ic0="startup"
 ic1="bug512733"
 ic2="sssd_service_001"
 ic3="sssd_service_002"
+ic4="sssd_service_003"
 ic99="cleanup"
 
 #################################################################
@@ -132,14 +133,54 @@ sssd_service_001()
 sssd_service_002()
 {
   myresult=PASS
+  message "START $tet_thistest: Verify if a back end service dies - it is automatically restarted"
+  for c in $SSSD_CLIENTS; do
+        message "Working on $c"
+	SERVICES="sssd_dp sssd_nss sssd_pam"
+	for s in $SERVICES ; do	
+		OPID=`ssh root@$c "ps -e | grep $s | cut -d \" \" -f 1 2>&1"`
+		if [ $? -ne 0 ] ; then
+			message "ERROR: Failed to get PID for $s"
+			myresult=FAIL
+		else
+			message "Original PID for $s was $OPID"
+			ssh root@$c "kill $OPID"
+			if [ $? -ne 0 ] ; then
+				message "ERROR: Failed to kill $s. return code: $?"
+				myresult=FAIL
+			else
+				sleep 2
+				NPID=`ssh root@$c "ps -e | grep $s | cut -d \" \" -f 1 2>&1"`
+				if [ $? -ne 0 ] ; then
+					message "ERROR: Failed to get new PID for $s - may not have restarted. return code: $?"
+					myresult=FAIL
+				else
+					if [ $OPID -eq $NPID ] ; then
+						message "New PID is the same as the original.  Service never died."
+						myresult=FAIL
+					else
+						message "$s was automatically restarted. New PID is $NPID"
+					fi
+				fi
+			fi
+		fi
+	done
+  done
+  tet_result $myresult
+  message "END $tet_thistest"
+}
+
+sssd_service_003()
+{
+  myresult=PASS
   message "START $tet_thistest: Stop Services and Check Status"
   for c in $SSSD_CLIENTS; do
         message "Working on $c"
-	ssh root@$c "service sssd stop"
-	if [ $? -ne 0 ] ; then
-		message "ERROR: SSSD Service failed to stop. Return Code: $?"
-		myresult=FAIL
-	fi
+        ssh root@$c "service sssd stop"
+        if [ $? -ne 0 ] ; then
+                message "ERROR: SSSD Service failed to stop. Return Code: $?"
+                myresult=FAIL
+        fi
 
         MSG="sssd is stopped"
         # check the status of the service should not be running
@@ -148,12 +189,14 @@ sssd_service_002()
                 message "ERROR: Unexpected status returned.  Expected: $MSG Got: $STATUS"
                 myresult=FAIL
         else
-		message "SSSD service is stopped as expected."
-	fi
+                message "SSSD service is stopped as expected."
+        fi
   done
   tet_result $myresult
   message "END $tet_thistest"
 }
+
+
 
 cleanup()
 {

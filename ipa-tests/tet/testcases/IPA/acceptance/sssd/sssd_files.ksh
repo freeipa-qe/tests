@@ -13,7 +13,7 @@ fi
 #####################################################################
 iclist="ic0 ic1 ic99"
 ic0="startup"
-ic1="sssd_files_001 sssd_files_002 sssd_files_003 sssd_files_004 sssd_files_005 sssd_files_006 sssd_files_007 sssd_files_009 sssd_files_009 sssd_files_010 sssd_files_011 sssd_files_012 sssd_files_013 sssd_files_014 sssd_files_015 sssd_files_016 sssd_files_017"
+ic1="sssd_files_001 sssd_files_002 sssd_files_003 sssd_files_006 sssd_files_007 sssd_files_008 sssd_files_009"
 ic99="cleanup"
 #################################################################
 #  GLOBALS
@@ -70,7 +70,7 @@ sssd_files_001()
    ####################################################################
 
         myresult=PASS
-        message "START $tet_thistest: Configuration 1 - FILES - No min or max ID"
+        message "START $tet_thistest: Configuration 1 - FILES - Min and max ID"
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
         for c in $SSSD_CLIENTS ; do
                 message "Working on $c"

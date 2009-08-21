@@ -12,7 +12,6 @@ fi
 #  Test Case List
 #####################################################################
 iclist="ic0 ic1 ic2 ic3 ic4 ic5 ic6 ic7 ic99"
-#iclist="ic99"
 ic0="startup"
 ic1="sssd_multi_001 sssd_multi_002 sssd_multi_003 sssd_multi_004 sssd_multi_005 sssd_multi_006 sssd_multi_007"
 ic2="sssd_multi_008 sssd_multi_009 sssd_multi_010 sssd_multi_011 sssd_multi_012 sssd_multi_013 sssd_multi_014"
@@ -65,8 +64,8 @@ PGROUP1=Group1
 PGROUP2=Group2
 PGROUP3=Group3
 PGROUP4=Group4
-PGROUP5=Group1
-PGROUP6=Group2000
+PGROUP5=Group1000
+PGROUP6=group2000
 PGROUP7=Duplicate
 ######################################################################
 # Tests
@@ -889,25 +888,23 @@ sssd_multi_018()
 
               done
 
-		# Let's make sure we got both Duplicate groups - since they have different gids - they are unique
+		# Let's make sure we do not get both Duplicate groups without useFullyQualifiedNames
         	RET=`ssh root@$c getent -s sss group | grep $PGROUP7 2>&1`
 		echo $RET | grep 1010
                 if [ $? -ne 0 ] ; then
                         message "ERROR: Expected group with gid 1010 to be returned."
                         myresult=FAIL
                 else
-                        message "Duplicate group name with unique gid 1010 returned as expected."
+                        message "First Duplicate group name returned as expected."
                 fi
 
                 echo $RET | grep 2010
-                if [ $? -ne 0 ] ; then
-                        message "ERROR: Expected group with gid 2010 to be returned."
+                if [ $? -eq 0 ] ; then
+                        message "ERROR: Expected second duplicate group not to be returned."
                         myresult=FAIL
                 else
-                        message "Duplicate group name with unique gid 2010 returned as expected."
+                        message "Second Duplicate group name not returned as expected."
                 fi
-
-
         done
 
         result $myresult
@@ -952,6 +949,11 @@ sssd_multi_019()
                         myresult=FAIL
                 fi
 
+                verifyCfg $c "EXAMPLE\.COM" legacy TRUE
+                if [ $? -ne 0 ] ; then
+                        myresult=FAIL
+                fi
+
 		verifyCfg $c "EXAMPLE\.COM" useFullyQualifiedNames TRUE
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
@@ -963,6 +965,11 @@ sssd_multi_019()
                 fi
 
                 verifyCfg $c "BOS\.REDHAT\.COM" enumerate 3
+                if [ $? -ne 0 ] ; then
+                        myresult=FAIL
+                fi
+
+                verifyCfg $c "BOS\.REDHAT\.COM" legacy TRUE
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
@@ -1119,7 +1126,12 @@ sssd_multi_023()
                         myresult=FAIL
                 fi
 
-                verifyCfg $c "EXAMPLE\.COM" provider proxy
+                verifyCfg $c "EXAMPLE\.COM" provider ldap
+                if [ $? -ne 0 ] ; then
+                        myresult=FAIL
+                fi
+
+                verifyCfg $c "EXAMPLE\.COM" legacy TRUE
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
@@ -1145,6 +1157,11 @@ sssd_multi_023()
                 fi
 
                 verifyCfg $c "BOS\.REDHAT\.COM" provider proxy
+                if [ $? -ne 0 ] ; then
+                        myresult=FAIL
+                fi
+
+                verifyCfg $c "BOS\.REDHAT\.COM" legacy TRUE
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
@@ -1216,22 +1233,22 @@ sssd_multi_025()
 
               done
 
-		# Let's make sure we got both Duplicate groups - since they have different gids - they are unique
+		# Let's make sure we do not get both Duplicate groups without useFullyQualifiedNames
         	RET=`ssh root@$c getent -s sss group | grep $PGROUP7 2>&1`
 		echo $RET | grep 1010
                 if [ $? -ne 0 ] ; then
                         message "ERROR: Expected group with gid 1010 to be returned."
                         myresult=FAIL
                 else
-                        message "Duplicate group name with unique gid 1010 returned as expected."
+                        message "First Duplicate group name returned as expected."
                 fi
 
                 echo $RET | grep 2010
-                if [ $? -ne 0 ] ; then
-                        message "ERROR: Expected group with gid 2010 to be returned."
+                if [ $? -eq 0 ] ; then
+                        message "ERROR: Expected group with gid 2010 not to be returned."
                         myresult=FAIL
                 else
-                        message "Duplicate group name with unique gid 2010 returned as expected."
+                        message "Second Duplicate group name not returned as expected."
                 fi
 
 
@@ -1278,7 +1295,7 @@ sssd_multi_026()
                         myresult=FAIL
                 fi
 
-                verifyCfg $c "EXAMPLE\.COM" provider proxy
+                verifyCfg $c "EXAMPLE\.COM" provider ldap
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi

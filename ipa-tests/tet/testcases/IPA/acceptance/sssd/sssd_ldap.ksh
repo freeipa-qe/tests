@@ -12,6 +12,7 @@ fi
 #  Test Case List
 #####################################################################
 iclist="ic0 ic1 ic2 ic3 ic4 ic99"
+#iclist="ic99"
 ic0="startup"
 ic1="sssd_ldap_001 sssd_ldap_002 sssd_ldap_003 sssd_ldap_004 sssd_ldap_005 sssd_ldap_006 sssd_ldap_007"
 ic2="sssd_ldap_008 sssd_ldap_009 sssd_ldap_010 sssd_ldap_011 sssd_ldap_012"
@@ -503,7 +504,7 @@ sssd_ldap_013()
                         myresult=FAIL
                 fi
 
-                verifyCfg $c LDAP provider proxy
+                verifyCfg $c LDAP provider ldap
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi

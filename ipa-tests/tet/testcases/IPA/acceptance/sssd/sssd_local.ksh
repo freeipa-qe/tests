@@ -11,12 +11,13 @@ fi
 ######################################################################
 #  Test Case List
 #####################################################################
-iclist="ic0 ic1 ic2 ic3 ic4 ic99"
+iclist="ic0 ic1 ic2 ic3 ic4 ic5 ic99"
 ic0="startup"
 ic1="sssd_001 sssd_002 sssd_003 sssd_004 sssd_005 sssd_006 sssd_007 sssd_008 sssd_009 sssd_010 sssd_011 sssd_012 sssd_013 sssd_014 sssd_015 sssd_016 sssd_017 sssd_018 sssd_019 sssd_020 sssd_021 sssd_022 sssd_023 sssd_024 sssd_025 sssd_026 sssd_027 sssd_028"
 ic2="sssd_029 sssd_030 sssd_031 sssd_032 sssd_033 sssd_034 sssd_035"
 ic3="sssd_036 sssd_037 sssd_038 sssd_039"
 ic4="sssd_040 sssd_041 sssd_042 sssd_043 sssd_044 sssd_045 sssd_046"
+ic5="sssd_047 sssd_049"
 ic99="cleanup"
 #################################################################
 #  GLOBALS
@@ -980,6 +981,11 @@ sssd_029()
                         myresult=FAIL
                 fi
 
+                verifyCfg $c LOCAL magicPrivateGroups TRUE
+                if [ $? -ne 0 ] ; then
+                        myresult=FAIL
+                fi
+
                 verifyCfg $c LOCAL useFullyQualifiedNames TRUE
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
@@ -994,13 +1000,6 @@ sssd_030()
 {
   myresult=PASS
   message "START $tet_thistest: User Fully Qualified Name"
-  #################################################################################
-  # If the user is added successfully, but fails to be found with getent, you may
-  # be seeing a regression of bug https://fedorahosted.org/sssd/ticket/95
-  # with magicPrivateGroups set to FALSE user is added with gidNumber of 0 and 
-  # then getent fails to return 0 - debug output will show an error - but no error
-  # returned on the search
-  #################################################################################
   for c in $SSSD_CLIENTS; do
         message "Working on $c"
         ssh root@$c "sss_useradd -u 1000 -h /home/user1000 -s /bin/bash user1000"
@@ -1085,10 +1084,14 @@ sssd_033()
   
   for c in $SSSD_CLIENTS; do
         message "Working on $c"
-        ssh root@$c "sss_usermod -a user1000@LOCAL group1000@LOCAL"
+	ERRMSG="Could not modify user - check if group names are correct"
+        MSG=`ssh root@$c "sss_usermod -a -g group1000@LOCAL user1000@LOCAL 2>&1"`
         if [ $? -ne 0 ] ; then
                 message "ERROR: Adding user1000@LOCAL to group1000@LOCAL failed."
                 myresult=FAIL
+                if [[ $ERRMSG == $MSG ]] ; then
+                        message "ERROR: Got: $MSG - might be regression of trac issue 121"
+                fi
         else
                 ssh root@$c getent -s sss group | grep user1000@LOCAL
                 if [ $? -ne 0 ] ; then
@@ -1352,7 +1355,7 @@ sssd_040()
 {
    ####################################################################
    #   Configuration 5
-   #    enumerate: 1
+   #    enumerate: 3
    #    minId: 2000
    # 	maxId: 2010
    #    legacy: TRUE
@@ -1383,7 +1386,7 @@ sssd_040()
                         fi
                 fi
 
-                verifyCfg $c LOCAL enumerate 1
+                verifyCfg $c LOCAL enumerate 3
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
@@ -1625,6 +1628,135 @@ sssd_046()
 			fi
                 	let i=$i+1
 		done
+        done
+
+        result $myresult
+        message "END $tet_thistest"
+}
+
+sssd_047()
+{
+   ####################################################################
+   #   Configuration 6
+   #    enumerate: 1
+   #    magicPrivateGroups FALSE (should ignore and set to TRUE)
+   #	useFullyQualifiedNames TRUE
+   #    provider: local
+   ####################################################################
+
+        myresult=PASS
+        message "START $tet_thistest: Setup Local SSSD Configuration 6"
+        if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+        for c in $SSSD_CLIENTS ; do
+                message "Working on $c"
+                message "Backing up original sssd.conf and copying over test sssd.conf"
+                sssdCfg $c sssd_local6.conf
+                if [ $? -ne 0 ] ; then
+                        message "ERROR Configuring SSSD on $c."
+                        myresult=FAIL
+                else
+                        restartSSSD $c
+                        if [ $? -ne 0 ] ; then
+                                message "ERROR: Restart SSSD failed on $c"
+                                myresult=FAIL
+                        else
+                                message "SSSD Server restarted on client $c"
+                        fi
+                fi
+
+                verifyCfg $c LOCAL enumerate 3
+                if [ $? -ne 0 ] ; then
+                        myresult=FAIL
+                fi
+
+                verifyCfg $c LOCAL minId 1000
+                if [ $? -ne 0 ] ; then
+                        myresult=FAIL
+                fi
+
+                verifyCfg $c LOCAL maxId 1003
+                if [ $? -ne 0 ] ; then
+                        myresult=FAIL
+                fi
+  
+                verifyCfg $c LOCAL provider local
+                if [ $? -ne 0 ] ; then
+                        myresult=FAIL
+                fi
+
+                verifyCfg $c LOCAL magicPrivateGroups TRUE
+                if [ $? -ne 0 ] ; then
+                        myresult=FAIL
+                fi
+
+                verifyCfg $c LOCAL useFullyQualifiedNames TRUE
+                if [ $? -ne 0 ] ; then
+                        myresult=FAIL
+                fi
+        done
+
+        result $myresult
+        message "END $tet_thistest"
+}
+
+sssd_048()
+{
+	###########################################################################################
+        #  This test is no longer valid because the fix to ticket 95 was to always set to TRUE
+	###########################################################################################
+        myresult=PASS
+        message "START $tet_thistest: Trac Ticket 95 - magicPrivateGroups set to FALSE, Local user added with gidNumber of 0"
+	#################################################################################
+	# If the user is added successfully, but fails to be found with getent, you may
+	# be seeing a regression of bug https://fedorahosted.org/sssd/ticket/95
+	# with magicPrivateGroups set to FALSE user is added with gidNumber of 0 and
+	# then getent fails to return 0 - debug output will show an error - but no error
+	# returned on the search
+	#################################################################################
+  	for c in $SSSD_CLIENTS; do
+        	message "Working on $c"
+        	ssh root@$c "sss_useradd -u 1000 -h /home/user1000 -s /bin/bash user1000"
+        	if [ $? -ne 0 ] ; then
+                	message "ERROR: Adding LOCAL domain user1000.  Return Code: $?"
+                	myresult=FAIL
+        	else
+                        verifyAttr $c "name=user1000,cn=users,cn=LOCAL,cn=sysdb" gidNumber 0
+                        if [ $? -eq 0 ] ; then
+				message "ERROR: User added with gidNumber 0, trac ticket issue 95 still exists."
+                                myresult=FAIL
+                        else
+                                message "LOCAL domain user1000 has non 0 gidNumber."
+                        fi
+        	fi
+
+		# clean up
+		ssh root@$c "sss_userdel user1000"
+        done
+
+        result $myresult
+        message "END $tet_thistest"
+}
+
+sssd_049()
+{
+        myresult=PASS
+        message "START $tet_thistest: Trac Ticket 57 - sssd assigning uid number already in use"
+        for c in $SSSD_CLIENTS; do
+                message "Working on $c"
+		# add a user manually defining uid 1001
+		ssh root@$c "sss_useradd -u 1001 -h /home/user1001 -s /bin/bash user1001"
+		# add two users without defining uid, first user should get uid 1000, second user should get 1002
+		# should skip uid number already in use
+		ssh root@$c "sss_useradd -h /home/user1000 -s /bin/bash user1000 ; sss_useradd -h /home/user1002 -s /bin/bash user1002"
+
+		# now verify user1002's uidNumber
+		verifyAttr $c "name=user1002,cn=users,cn=LOCAL,cn=sysdb" uidNumber 1002
+		if [ $? -ne 0 ] ; then
+			message "ERROR: uidNumber not as expected - could be regression of trac issue 57"
+			myresult=FAIL
+		else
+			message "Trac Issue 57 appears to be fixed - uidNumber assigned correctly"
+		fi
         done
 
         result $myresult
