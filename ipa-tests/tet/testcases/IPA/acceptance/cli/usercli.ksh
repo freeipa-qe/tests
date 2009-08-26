@@ -728,7 +728,8 @@ moduid()
 	ssh root@$FULLHOSTNAME "ipa user-show --all $musr | grep '$muid'"
 	if [ $? -ne 0 ]
 	then
-		message "ERROR - Search for created user failed on $FULLHOSTNAME"
+		message "ERROR - Search for created user failed on $FULLHOSTNAME."
+		message "ERROR may be related to https://bugzilla.redhat.com/show_bug.cgi?id=519481"
 		myresult=FAIL
 	fi
 
