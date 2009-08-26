@@ -168,7 +168,7 @@ startup()
 	description="Test User Group"
         while [ $i -lt ${#ugrplist[@]} ] ; do
                 echo "adding user group \"${ugrplist[$i]}\""
-                ssh root@$FULLHOSTNAME "ipa group-add --description=\"$description\" \"${ugrplist[$i]}\""
+                ssh root@$FULLHOSTNAME "ipa group-add --desc=\"$description\" \"${ugrplist[$i]}\""
                 if [ $? -ne 0 ] ; then
                         message "ERROR - ipa group-add failed on $FULLHOSTNAME"
                         myresult=FAIL
@@ -194,33 +194,38 @@ hostgrpcli_001()
 		description="Testing Host Group"
 		# test for ipa hostgroup-add
 		echo "adding group  \"${grouplist[$i]}\""
-		ssh root@$FULLHOSTNAME "ipa hostgroup-add --description=\"$description\" \"${grouplist[$i]}\""
+		ssh root@$FULLHOSTNAME "ipa hostgroup-add --desc=\"$description\" \"${grouplist[$i]}\""
 		if [ $? -ne 0 ] ; then
 			message "ERROR - ipa hostgroup-add failed on $FULLHOSTNAME"
 			myresult=FAIL
 		fi
+		((i=$i+1))
 	done
 
 	for s in $SERVERS; do
-		eval_vars $s
-		message "Working on $s"	
-		# Verifying lower case
-		ssh root@$FULLHOSTNAME "ipa hostgroup-find \"${grouplist[$i]}\" | grep \"${grouplist[$i]}\""
-		if [ $? -ne 0 ] ; then
-			message "ERROR - ipa hostgroup-find \"${grouplist[$i]}\" failed on $FULLHOSTNAME"
-			myresult=FAIL
-		else
-			message "ipa hostgroup-find successful for \"${grouplist[$i]}\" on $FULLHOSTNAME"
-		fi
-		# Verifying upper case
-                ssh root@$FULLHOSTNAME "ipa hostgroup-find \"$upper\" | grep \"${grouplist[$i]}\""
-                if [ $? -ne 0 ] ; then
-                	message "ERROR - ipa hostgroup-find \"$upper\" failed on $FULLHOSTNAME"
-                	myresult=FAIL
-                else
-                        message "ipa hostgroup-find successful for \"$upper\" on $FULLHOSTNAME"
-		fi
-		((i=$i+1))
+		i=0
+		while [ $i -lt ${#grouplist[@]} ] ; do
+			eval_vars $s
+			message "Working on $s"	
+			# Verifying lower case
+			ssh root@$FULLHOSTNAME "ipa hostgroup-find \"${grouplist[$i]}\" | grep \"${grouplist[$i]}\""
+			if [ $? -ne 0 ] ; then
+				message "ERROR - ipa hostgroup-find \"${grouplist[$i]}\" failed on $FULLHOSTNAME"
+				myresult=FAIL
+			else
+				message "ipa hostgroup-find successful for \"${grouplist[$i]}\" on $FULLHOSTNAME"
+			fi
+			# Verifying upper case
+			upper=`echo ${grouplist[$i]} | tr "[a-z]" "[A-Z]"`
+                	ssh root@$FULLHOSTNAME "ipa hostgroup-find \"$upper\" | grep \"${grouplist[$i]}\""
+                	if [ $? -ne 0 ] ; then
+                		message "ERROR - ipa hostgroup-find \"$upper\" failed on $FULLHOSTNAME"
+                		myresult=FAIL
+                	else
+                        	message "ipa hostgroup-find successful for \"$upper\" on $FULLHOSTNAME"
+			fi
+			((i=$i+1))
+		done
 	done
 
 	result $myresult
@@ -236,28 +241,32 @@ hostgrpcli_002()
 	i=0
         while [ $i -lt ${#grouplist[@]} ] ; do
 		description="This is a new description for ${grouplist[$i]}"
-                ssh root@$FULLHOSTNAME "ipa hostgroup-mod --description=\"$description\" \"${grouplist[$i]}\""
+                ssh root@$FULLHOSTNAME "ipa hostgroup-mod --desc=\"$description\" \"${grouplist[$i]}\""
                 if [ $? -ne 0 ] ; then
                 	message "ERROR - ipa hostgroup-mod failed on $FULLHOSTNAME"
                         myresult=FAIL
                 fi
+		((i=$i+1))
 	done
 	
 	for s in $SERVERS; do
 		eval_vars $s
 		message "Working on $s"
-                # Verify description
-                value=`ssh root@$FULLHOSTNAME "ipa hostgroup-show \"${grouplist[$i]}\" | grep description:"`
-                value=`echo $value | awk -F: '{print $2}'`
-                #trim white space
-                value=`echo $value`
-                if [ $value -ne $description ] ; then
-                	message "ERROR - \"${grouplist[$i]}\" description not correct on $FULLHOSTNAME expected: $description  got: $value"
-                        myresult=FAIL
-                else
-                        message "Host \"${grouplist[$i]}\" description is as expected: $value"
-                fi
-		((i=$i+1))
+		i=0
+		while [ $i -lt ${#grouplist[@]} ] ; do
+                	# Verify description
+                	value=`ssh root@$FULLHOSTNAME "ipa hostgroup-show \"${grouplist[$i]}\" | grep description:"`
+                	value=`echo $value | awk -F: '{print $2}'`
+                	#trim white space
+                	value=`echo $value`
+                	if [ $value -ne $description ] ; then
+                		message "ERROR - \"${grouplist[$i]}\" description not correct on $FULLHOSTNAME expected: $description  got: $value"
+                        	myresult=FAIL
+                	else
+                        	message "Host \"${grouplist[$i]}\" description is as expected: $value"
+                	fi
+			((i=$i+1))
+		done
 	done
 
         result $myresult
@@ -289,9 +298,9 @@ hostgrpcli_003()
 
 	for s in $SERVERS; do
 		eval_vars $s
+		i=0
 		message "Working on $s"
 		##### Verify host memberships #####
-		i=0
 		while [ $i -lt ${#grouplist[@]} ] ; do
         		ssh root@$FULLHOSTNAME "ipa hostgroup-show \"${grouplist[$i]}\"" > $tmpfile
 			h=0
@@ -305,8 +314,8 @@ hostgrpcli_003()
 			   fi
 			   ((h=$h+1))
 			done
+			((i=$i+1))
 		done
-		((i=$i+1))
 	done
 	
 	rm -rf $tmpfile
@@ -578,14 +587,14 @@ hostgrpcli_008()
 hostgrpcli_009()
 {
         myresult=PASS
-        errorcode=162
+        errorcode=1
         message "START $tet_thistest: Negative - add duplicate host group"
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
         for s in $SERVERS; do
         	eval_vars $s
 		message "Working on $s"
 		# check return code
-                ssh root@$FULLHOSTNAME "ipa hostgroup-add --description="testing" \"$group5\""
+                ssh root@$FULLHOSTNAME "ipa hostgroup-add --desc="testing" \"$group5\""
                 ret=`echo $?`
                 if [ $ret -ne $errorcode ] ; then
                 	message "ERROR - unexpected return code from ipa hostgroup-add.  expected: $errorcode got: $?"
@@ -601,7 +610,7 @@ hostgrpcli_009()
 hostgrpcli_010()
 {
         myresult=PASS
-        errorcode=161
+        errorcode=2
 	mygroup="Bad Group"
         message "START $tet_thistest: Negative - Host Group Doesn't Exist"
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
@@ -634,7 +643,7 @@ hostgrpcli_010()
                         message "ipa hostgroup-show returned expected code trying to show a host group that doesn't exist."
                 fi
 
-                ssh root@$FULLHOSTNAME "ipa hostgroup-mod --description="testing" \"$mygroup\""
+                ssh root@$FULLHOSTNAME "ipa hostgroup-mod --desc="testing" \"$mygroup\""
                 if [ $? -ne $errorcode ] ; then
                         message "ERROR - unexpected return code from ipa hostgroup-mod.  expected: $errorcode got: $?"
                         myresult=FAIL
@@ -666,7 +675,7 @@ hostgrpcli_010()
 hostgrpcli_011()
 {
         myresult=PASS
-        errorcode=100
+        errorcode=1
 	tmpfile=$TET_TMP_DIR/members.txt
         message "START $tet_thistest: Negative - Host Group as Member to itself"
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
@@ -759,8 +768,8 @@ hostgrpcli_012()
 		eval_vars $s
 		message "Working on $s"
         	ssh root@$FULLHOSTNAME "ipa hostgroup-show \"${grouplist[0]}\""
-        	if [ $? -ne 161 ] ; then
-               		message "ERROR - ipa hostgroup-show \"${grouplist[0]}\" return code not as expected on $FULLHOSTNAME got:$? expected: 161"
+        	if [ $? -ne 2 ] ; then
+               		message "ERROR - ipa hostgroup-show \"${grouplist[0]}\" return code not as expected on $FULLHOSTNAME got:$? expected: 2"
                		myresult=FAIL
         	else
                		message "\"${grouplist[0]}\" deleted successfully."
@@ -999,8 +1008,8 @@ cleanup()
 	while [ $i -lt ${#grouplist[@]} ] ; do
 		ssh root@$FULLHOSTNAME "ipa hostgroup-del \"${grouplist[$i]}\""
                 ssh root@$FULLHOSTNAME "ipa hostgroup-show \"${grouplist[$i]}\""
-                if [ $? -ne 161 ] ; then
-                	message "ERROR - ipa hostgroup-show \"${grouplist[$i]}\" return code not as expected on $FULLHOSTNAME got:$? expected: 161"
+                if [ $? -ne 2 ] ; then
+                	message "ERROR - ipa hostgroup-show \"${grouplist[$i]}\" return code not as expected on $FULLHOSTNAME got:$? expected: 2"
                         myresult=FAIL
                 else
                 	message "\"${grouplist[$i]}\" does not exist."
@@ -1012,8 +1021,8 @@ cleanup()
 	while [ $i -lt ${#hostlist[@]} ] ; do
         	ssh root@$FULLHOSTNAME "ipa host-del \"${hostlist[$i]}\""
                 ssh root@$FULLHOSTNAME "ipa host-show \"${hostlist[$i]}\""
-                if [ $? -ne 161 ] ; then
-                	message "ERROR - ipa host-show \"${hostlist[$i]}\" return code not as expected on $FULLHOSTNAME got:$? expected: 161"
+                if [ $? -ne 2 ] ; then
+                	message "ERROR - ipa host-show \"${hostlist[$i]}\" return code not as expected on $FULLHOSTNAME got:$? expected: 2"
                         myresult=FAIL
                 else
                 	message "\"${hostlist[$i]}\" does not exist."
@@ -1025,8 +1034,8 @@ cleanup()
         while [ $i -lt ${#ugrplist[@]} ] ; do
         	ssh root@$FULLHOSTNAME "ipa group-del \"${ugrplist[$i]}\""
                 ssh root@$FULLHOSTNAME "ipa group-show \"${ugrplist[$i]}\""
-        	if [ $? -ne 161 ] ; then
-                	message "ERROR - ipa group-show \"${ugrplist[$i]}\" return code not as expected on $FULLHOSTNAME got:$? expected: 161"
+        	if [ $? -ne 2 ] ; then
+                	message "ERROR - ipa group-show \"${ugrplist[$i]}\" return code not as expected on $FULLHOSTNAME got:$? expected: 2"
                         myresult=FAIL
                 else
                         message "\"${ugrplist[$i]}\" does not exist."

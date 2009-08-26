@@ -597,7 +597,7 @@ bug499018()
 hostcli_010()
 {
 	myresult=PASS
-	errorcode=162
+	errorcode=1
 	message "START $tet_thistest: Negative - add duplicate host"
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
         for s in $SERVERS; do
@@ -607,7 +607,7 @@ hostcli_010()
 		ssh root@$FULLHOSTNAME "ipa host-add \"$host5\""
 		ret=`echo $?`
 		if [ $ret -ne $errorcode ] ; then
-			message "ERROR - unexpected return code from ipa host-add.  expected: $errorcode got: $?"
+			message "ERROR - unexpected return code from ipa host-add.  expected: $errorcode got: $ret"
 			myresult=FAIL
 		else
 			message "ipa host-add returned expected code trying to add duplicate host."
@@ -620,7 +620,7 @@ hostcli_010()
 hostcli_011()
 {
         myresult=PASS
-	errorcode=161
+	errorcode=2
 	myhost=notthere.$DOMAIN
         message "START $tet_thistest: Negative - Host Doesn't Exist"
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
@@ -744,7 +744,7 @@ hostcli_013()
 		eval_vars $s
 		message "Working on $s"
 		ssh root@$FULLHOSTNAME "ipa host-show \"$item\""
-		if [ $? -ne 161 ] ; then
+		if [ $? -ne 2 ] ; then
 			message "ERROR - ipa host-show \"$item\" return code not as expected on $FULLHOSTNAME got:$? expected: 161"
 			myresult=FAIL
 		else
