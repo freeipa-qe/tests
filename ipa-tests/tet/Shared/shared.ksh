@@ -8,13 +8,13 @@ eval_vars()
 	#if [ $DSTET_DEBUG = y ]; then set -x; env; fi
         x=\$HOSTNAME_$1
         HOSTNAME=`eval echo $x`
-        FULLHOSTNAME=`host $HOSTNAME | awk '{print $1}'`
+        FULLHOSTNAME=`host $HOSTNAME | grep -v IPv6 | awk '{print $1}'`
 	if [ "$FULLHOSTNAME" == "Host" ]; then
 		echo "ERROR! FullHostname resolved to $FULLHOSTNAME. Please make sure that you have all of your domains in the search section of your resolv.conf"
 		tet_result FAIL
 		return 1;
 	fi
-	IP=`host $FULLHOSTNAME | awk '{print $4}'`
+	IP=`host $FULLHOSTNAME | grep -v IPv6 | awk '{print $4}'`
         x=\$LDAP_PORT_$1
         LDAP_PORT=`eval echo $x`
         x=\$LDAPS_PORT_$1
@@ -579,25 +579,30 @@ send "ssh-keygen -t dsa\r"
 expect "Generating public/private dsa key pair." {
  sleep 2
  send "\r"
-}
-expect "Enter passphrase (empty for no passphrase):" {
+ sleep 1
+ send "\r"
  sleep 1
  send "\r"
 }
-expect "Enter same passphrase again:" {
- sleep 1
- send "\r"
-}' > $TET_TMP_DIR/setup-ssh-local.exp
+expect "*again:" {
+sleep 1
+send "\r"
+}
+expect eof' > $TET_TMP_DIR/setup-ssh-local.exp
+	message "In the event of a non-existant home directory, create one:"
+	if [ ! -d /root/.ssh ]; then mkdir -p /root/.ssh; chmod 777 /root/.ssh; fi
 	message "Running expect script"
 	/usr/bin/expect $TET_TMP_DIR/setup-ssh-local.exp
+	chmod 600 /root/.ssh
 
 	# Check to ensure that worked properly
-	if [ -f ~/.ssh/id_dsa.pub ]; then
+	if [ -f /root/.ssh/id_dsa.pub ]; then
 		message "Creation of local ssh keys seems to have worked."
 		return 0;
 	else 
 		message "ERROR, creation of local ssh keys seems to have failed."
-		ls ~/.ssh
+		ls -al /root/.ssh
+		ls -al /root
 		return 1;
 	fi
 }
@@ -657,7 +662,7 @@ set timeout 10
 set send_slow {1 .1}
 spawn $env(SHELL)
 match_max 100000' > $TET_TMP_DIR/setup-ssh-remote3.exp
-	echo "send -s -- \"scp ~/.ssh/id_dsa.pub root@$FULLHOSTNAME:/root/.ssh/authorized_keys\r\"" >> $TET_TMP_DIR/setup-ssh-remote3.exp
+	echo "send -s -- \"scp /root/.ssh/id_dsa.pub root@$FULLHOSTNAME:/root/.ssh/authorized_keys\r\"" >> $TET_TMP_DIR/setup-ssh-remote3.exp
 
 	echo 'expect "*password: "
 sleep .1' >> $TET_TMP_DIR/setup-ssh-remote3.exp
