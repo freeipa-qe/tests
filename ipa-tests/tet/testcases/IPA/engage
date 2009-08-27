@@ -134,12 +134,10 @@ esac
 ######################################################################
 case `engage_domainname` in
 	*mtbrook.bozemanpass.com)
-	            WebServer="http://fileserver"
 	            MailHost="mail"
 	            MainMaildomain="bozemanpass.com"
 	            ;;
 	*)			# if you change WebServer besure to change it in engagelib also
-				WebServer="http://apoc.dsdev.sjc.redhat.com"
 				MailHost="pobox-3.corp.redhat.com"
 				MainMaildomain="redhat.com"
 				;;
@@ -781,6 +779,7 @@ main_default()
 	if [ -z "$KERB_MASTER_PASS" ] ; then KERB_MASTER_PASS=Secret123 ; fi 
 	if [ -z "$DM_ADMIN_PASS" ] ; then DM_ADMIN_PASS=Secret123 ; fi
   	if [ -z "$ROOTDN" ] ;     then ROOTDN="cn=directory manager"   ; fi
+	if [ -z "$WebServer" ] ;  then WebServer="http://apoc.dsdev.sjc.redhat.com" ; fi
 	if [ -z "$ROOTDNPW" ] ;   then ROOTDNPW=Secret123              ; fi
 	if [ -z "$TETADMINPW" ] ; then TETADMINPW=Secret123             ; fi
 	if [ -z "$DS_USER" ] ; then DS_USER=admin                      ; fi
@@ -884,7 +883,7 @@ main_default()
 	export ROOTDN ROOTDNPW TETADMINPW LDAPhost LDAPport DRIVE IPAVERSION
 	export IGNORE_KNOWN_BUGS DSTET_64 DSTET_DEBUG PkgName
 
-	export MainLongDurationTests MainRunStartup MainRunTests MainRunCleanup MainGuiTests MainMailTo MainAcceptanceTests MainReliabTests MainStressTests MainPerformanceTests MainFunctionalTestNIS RunInstall RunInstallShow RunInstall RunInstallShow SetupSSHKeys
+	export MainLongDurationTests MainRunStartup MainRunTests MainRunCleanup MainGuiTests MainMailTo MainAcceptanceTests MainReliabTests MainStressTests MainPerformanceTests MainFunctionalTestNIS RunInstall RunInstallShow RunInstall RunInstallShow SetupSSHKeys WebServer
 }
 
 # This function will ask the user for more information/choices if needed
@@ -1582,6 +1581,11 @@ main_ask()
 	echo "->"
 	read rsp
 	if [ -z "$rsp" ] ; then echo "NTP server unchanged, continuing"; else NTPSERVER="$rsp"; fi
+	echo "What is the Report server that the results will be viewable on? If unsuer, accept the default."
+	echo "Default $WebServer"
+	echo "->"
+	read rsp
+	if [ -z "$rsp" ] ; then echo "Report server unchanged, continuing"; else WebServer="$rsp"; fi
 	echo "What will the IPA RELM name be?(needs to be UPPER case)"
 	echo "Default $RELM_NAME:"
 	echo "->"
@@ -1737,7 +1741,7 @@ main_ask()
 
         main_backendask
 
-	export MainRunTests MainRunCleanup MainRunStartup SERVERS CLIENTS NUMSERVERS NUMCLIENTS DNSMASTER RunInstall RunInstallShow RunInstall RunInstallShow NTPSERVER IPAVERSION SetupSSHKeys
+	export MainRunTests MainRunCleanup MainRunStartup SERVERS CLIENTS NUMSERVERS NUMCLIENTS DNSMASTER RunInstall RunInstallShow RunInstall RunInstallShow NTPSERVER IPAVERSION SetupSSHKeys WebServer
 }
 
 # This function will print the user's choices (aka variables)
@@ -1765,6 +1769,7 @@ main_print()
         echo "    RELM_NAME      : $RELM_NAME"
 	echo "    DNS_DOMAIN     : $DNS_DOMAIN"
 	echo "    NTPSERVER      : $NTPSERVER"
+	echo "    Report Server  : $WebServer"
 	echo "    KERB_MASTER_PASS: $KERB_MASTER_PASS"
 	echo "    DM_ADMIN_PASS  : $DM_ADMIN_PASS"
 	echo "    DS_USER        : $DS_USER"
@@ -1846,6 +1851,7 @@ main_save()
 	echo "PREFIX=$PREFIX"
 	echo "DNSMASTER=$DNSMASTER"
 	echo "NTPSERVER=$NTPSERVER"
+	echo "WebServer=$WebServer"
 	echo "IPAVERSION=$IPAVERSION"
 	echo "SetupSSHKeys=$SetupSSHKeys"
 	echo "RunInstall=$RunInstall"

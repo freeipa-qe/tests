@@ -4,13 +4,6 @@ baseurl=http://porkchop.devel.redhat.com/nightly/latest-RHEL5.3-IPA-2.0/2.0/i386
 enabled=1
 gpgcheck=0
 
-#[rhds90-32]
-#name=rhds90
-#baseurl=https://porkchop.devel.redhat.com/nightly/latest-RHEL5.3-DSRV-9.01/9.0/i386/os/RedHat/RPMS/
-#baseurl=http://tsunami.dsdev.sjc.redhat.com/share/builds/yum/identity/ga/products/DS80/RHEL5/i386/RPMS/
-#enabled=1
-#gpgcheck=0
-
 [bind-32]
 name=newbind
 baseurl=http://apoc.dsdev.sjc.redhat.com/tet/bind/i386/
