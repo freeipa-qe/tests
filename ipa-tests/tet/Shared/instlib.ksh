@@ -431,11 +431,11 @@ SetupServer()
 	if [ "$1" == "M1" ]; then
 		echo "setting up server $1 as a master server"
 		if [ $DSTET_DEBUG = y ]; then
-			echo "ipa-server-install -N -U --hostname=$FULLHOSTNAME -r $RELM_NAME -p $DM_ADMIN_PASS -P $KERB_MASTER_PASS -a $DM_ADMIN_PASS -u root --setup-bind"
-			ssh root@$FULLHOSTNAME "ipa-server-install -N -U --hostname=$FULLHOSTNAME -r $RELM_NAME -p $DM_ADMIN_PASS -P $KERB_MASTER_PASS -a $DM_ADMIN_PASS -u root --setup-bind -d"
+			echo "ipa-server-install -N -U --hostname=$FULLHOSTNAME -r $RELM_NAME -p $DM_ADMIN_PASS -P $KERB_MASTER_PASS -a $DM_ADMIN_PASS -u root --setup-dns"
+			ssh root@$FULLHOSTNAME "ipa-server-install -N -U --hostname=$FULLHOSTNAME -r $RELM_NAME -p $DM_ADMIN_PASS -P $KERB_MASTER_PASS -a $DM_ADMIN_PASS -u root --setup-dns -d"
 		else
-			echo "ipa-server-install -N -U --hostname=$FULLHOSTNAME -r $RELM_NAME -p $DM_ADMIN_PASS -P $KERB_MASTER_PASS -a $DM_ADMIN_PASS -u root --setup-bind"
-			ssh root@$FULLHOSTNAME "ipa-server-install -N -U --hostname=$FULLHOSTNAME -r $RELM_NAME -p $DM_ADMIN_PASS -P $KERB_MASTER_PASS -a $DM_ADMIN_PASS -u root --setup-bind"
+			echo "ipa-server-install -N -U --hostname=$FULLHOSTNAME -r $RELM_NAME -p $DM_ADMIN_PASS -P $KERB_MASTER_PASS -a $DM_ADMIN_PASS -u root --setup-dns"
+			ssh root@$FULLHOSTNAME "ipa-server-install -N -U --hostname=$FULLHOSTNAME -r $RELM_NAME -p $DM_ADMIN_PASS -P $KERB_MASTER_PASS -a $DM_ADMIN_PASS -u root --setup-dns"
 
 		fi
 		if [ $? -ne 0 ]; then
@@ -443,7 +443,7 @@ SetupServer()
 			echo "contents of ipaserver-install.log and krb5kdc.log:: "
 			ssh root@$FULLHOSTNAME "cat /var/log/ipaserver-install.log;cat /var/log/krb5kdc.log;cat /etc/hosts;cat /etc/resolv.conf";
 			echo "Trying again"			
-			ssh root@$FULLHOSTNAME "ipa-server-install -N -U --hostname=$FULLHOSTNAME -r $RELM_NAME -p $DM_ADMIN_PASS -P $KERB_MASTER_PASS -a $DM_ADMIN_PASS -u root --setup-bind -d"
+			ssh root@$FULLHOSTNAME "ipa-server-install -N -U --hostname=$FULLHOSTNAME -r $RELM_NAME -p $DM_ADMIN_PASS -P $KERB_MASTER_PASS -a $DM_ADMIN_PASS -u root --setup-dns -d"
 			if [ $? -ne 0 ]; then
 				echo "ERROR - ipa-server-install on $FULLHOSTNAME failed."
 				echo "contents of ipaserver-install.log and krb5kdc.log:: "
@@ -543,8 +543,8 @@ SetupServerBogus()
 		return 1;
 	fi
 	eval_vars $1
-	echo "ipa-server-install -U --hostname=BOGUSNAME -r BOGUSRELM -p $DM_ADMIN_PASS -P $KERB_MASTER_PASS -a $DM_ADMIN_PASS --setup-bind -u $DS_USER -d"
-	ssh root@$FULLHOSTNAME "ipa-server-install -U --hostname=BOGUSNAME -r BOGUSRELM -p $DM_ADMIN_PASS -P $KERB_MASTER_PASS -a $DM_ADMIN_PASS --setup-bind -u $DS_USER -d"
+	echo "ipa-server-install -U --hostname=BOGUSNAME -r BOGUSRELM -p $DM_ADMIN_PASS -P $KERB_MASTER_PASS -a $DM_ADMIN_PASS --setup-dns -u $DS_USER -d"
+	ssh root@$FULLHOSTNAME "ipa-server-install -U --hostname=BOGUSNAME -r BOGUSRELM -p $DM_ADMIN_PASS -P $KERB_MASTER_PASS -a $DM_ADMIN_PASS --setup-dns -u $DS_USER -d"
 	ret=$?
 	if [ $ret -eq 0 ]; then
 		echo "ERROR - ipa-server-install on $FULLHOSTNAME passed when it shouldn't have."
