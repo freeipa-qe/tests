@@ -13,13 +13,13 @@ fi
 #####################################################################
 iclist="ic0 ic1 ic2 ic3 ic4 ic5 ic6 ic7 ic99"
 ic0="startup"
-ic1="sssd_multi_001 sssd_multi_002 sssd_multi_003 sssd_multi_004 sssd_multi_005 sssd_multi_006 sssd_multi_007"
-ic2="sssd_multi_008 sssd_multi_009 sssd_multi_010 sssd_multi_011 sssd_multi_012 sssd_multi_013 sssd_multi_014"
-ic3="sssd_multi_015"
-ic4="sssd_multi_016 sssd_multi_017 sssd_multi_018" 
-ic5="sssd_multi_019 sssd_multi_020 sssd_multi_021 sssd_multi_022"
-ic6="sssd_multi_023 sssd_multi_024 sssd_multi_025"
-ic7="sssd_multi_026 sssd_multi_027 sssd_multi_028 sssd_multi_029"
+ic1="sssd_multi_001 sssd_multi_002 sssd_multi_003 sssd_multi_004 sssd_multi_005 sssd_multi_006 sssd_multi_007 sssd_multi_008"
+ic2="sssd_multi_009 sssd_multi_010 sssd_multi_011 sssd_multi_012 sssd_multi_013 sssd_multi_014 sssd_multi_015 sssd_multi_016"
+ic3="sssd_multi_017"
+ic4="sssd_multi_018 sssd_multi_019 sssd_multi_020" 
+ic5="sssd_multi_021 sssd_multi_022 sssd_multi_023 sssd_multi_024"
+ic6="sssd_multi_025 sssd_multi_026 sssd_multi_027"
+ic7="sssd_multi_028 sssd_multi_029 sssd_multi_030 sssd_multi_031 sssd_multi_032"
 ic99="cleanup"
 #################################################################
 #  GLOBALS
@@ -127,7 +127,7 @@ sssd_multi_001()
                         fi
                 fi
 
-                verifyCfg $c LOCAL enumerate 3
+                verifyCfg $c LOCAL enumerate TRUE
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
@@ -152,7 +152,7 @@ sssd_multi_001()
                         myresult=FAIL
                 fi
 
-                verifyCfg $c LDAP enumerate 3
+                verifyCfg $c LDAP enumerate TRUE
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
@@ -308,6 +308,7 @@ sssd_multi_004()
 
                 if [[ $EXPMSG != $MSG ]] ; then
                         message "ERROR: Unexpected Error message.  Got: $MSG  Expected: $EXPMSG"
+			message "Trac issue 100"
                         myresult=FAIL
                 else
                         message "Modifying LDAP user error message was as expected."
@@ -401,9 +402,43 @@ sssd_multi_007()
 
 }
 
+sssd_multi_008()
+{
+        myresult=PASS
+        message "START $tet_thistest: Attempt to LOCAL User to LDAP Domain Group - LDAP PROXY and LOCAL"
+        if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+
+        EXPMSG="Unsupported domain type"
+        for c in $SSSD_CLIENTS ; do
+                message "Working on $c"
+		# add a user to the local sssd database
+		ssh root@$c "sss_useradd myuser"
+                MSG=`ssh root@$c "sss_usermod -g 1010 myuser 2>&1"`
+                if [ $? -eq 0 ] ; then
+                        message "ERROR: Adding LOCAL user to LDAP Domain group was successful."
+                        myresult=FAIL
+                fi
+
+                if [[ $EXPMSG != $MSG ]] ; then
+                        message "ERROR: Unexpected Error message.  Got: $MSG  Expected: $EXPMSG"
+                        myresult=FAIL
+                else
+                        message "Attempting to Add LOCAL user to LDAP DOMAIN group error message was as expected."
+                fi
+		
+		# clean up the user
+		ssh root@$c "sss_userdel myuser"
+        done
+
+        result $myresult
+        message "END $tet_thistest"
+
+}
+
+
 #############################################################################################################################
 
-sssd_multi_008()
+sssd_multi_009()
 {
    ####################################################################
    #   Configuration 2
@@ -428,7 +463,7 @@ sssd_multi_008()
                         fi
                 fi
 		
-                verifyCfg $c LOCAL enumerate 3
+                verifyCfg $c LOCAL enumerate TRUE
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
@@ -458,7 +493,7 @@ sssd_multi_008()
                         myresult=FAIL
                 fi
 
-                verifyCfg $c LDAP enumerate 3
+                verifyCfg $c LDAP enumerate TRUE
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
@@ -494,7 +529,7 @@ sssd_multi_008()
         message "END $tet_thistest"
 }
 
-sssd_multi_009()
+sssd_multi_010()
 {
         myresult=PASS
         message "START $tet_thistest: Only users in domain configured ranges are returned - LDAP and LOCAL - FQN"
@@ -545,7 +580,7 @@ sssd_multi_009()
         message "END $tet_thistest"
 }
 
-sssd_multi_010()
+sssd_multi_011()
 {
         myresult=PASS
         message "START $tet_thistest: Only groups in domain configured ranges are returned - LDAP and LOCAL - FQN"
@@ -597,7 +632,7 @@ sssd_multi_010()
         message "END $tet_thistest"
 }
 
-sssd_multi_011()
+sssd_multi_012()
 {
         myresult=PASS
         message "START $tet_thistest: Attempt to modify LDAP Domain Users - LDAP and LOCAL - FQN"
@@ -624,7 +659,7 @@ sssd_multi_011()
         message "END $tet_thistest"
 }
 
-sssd_multi_012()
+sssd_multi_013()
 {
         myresult=PASS
         message "START $tet_thistest: Attempt to delete LDAP Domain User - LDAP and LOCAL - FQN"
@@ -652,7 +687,7 @@ sssd_multi_012()
 
 }
 
-sssd_multi_013()
+sssd_multi_014()
 {
         myresult=PASS
         message "START $tet_thistest: Attempt to modify LDAP Domain Groups - LDAP and LOCAL - FQN"
@@ -679,7 +714,7 @@ sssd_multi_013()
         message "END $tet_thistest"
 }
 
-sssd_multi_014()
+sssd_multi_015()
 {
         myresult=PASS
         message "START $tet_thistest: Attempt to delete LDAP Domain Group - LDAP and LOCAL - FQN"
@@ -707,9 +742,42 @@ sssd_multi_014()
 
 }
 
+sssd_multi_016()
+{
+        myresult=PASS
+        message "START $tet_thistest: Attempt to LOCAL User to LDAP Domain Group - LDAP and LOCAL"
+        if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+
+        EXPMSG="Unsupported domain type"
+        for c in $SSSD_CLIENTS ; do
+                message "Working on $c"
+                # add a user to the local sssd database
+                ssh root@$c "sss_useradd myuser"
+                MSG=`ssh root@$c "sss_usermod -g 1001 myuser 2>&1"`
+                if [ $? -eq 0 ] ; then
+                        message "ERROR: Adding LOCAL user to LDAP Domain group was successful."
+                        myresult=FAIL
+                fi
+
+                if [[ $EXPMSG != $MSG ]] ; then
+                        message "ERROR: Unexpected Error message.  Got: $MSG  Expected: $EXPMSG"
+                        myresult=FAIL
+                else
+                        message "Attempting to Add LOCAL user to LDAP DOMAIN group error message was as expected."
+                fi
+ 
+                # clean up the user
+                ssh root@$c "sss_userdel myuser" 
+        done 
+
+        result $myresult
+        message "END $tet_thistest"
+}
+
+
 ########################################################################################################################
 
-sssd_multi_015()
+sssd_multi_017()
 {
    ####################################################################
    #   Configuration 3
@@ -749,7 +817,7 @@ sssd_multi_015()
 
 ############################################################################################################################
 
-sssd_multi_016()
+sssd_multi_018()
 {
    ####################################################################
    #   Configuration 4
@@ -776,7 +844,7 @@ sssd_multi_016()
                         fi
                 fi
 
-                verifyCfg $c "EXAMPLE\.COM" enumerate 3
+                verifyCfg $c "EXAMPLE\.COM" enumerate TRUE
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
@@ -801,7 +869,7 @@ sssd_multi_016()
                         myresult=FAIL
                 fi
 
-                verifyCfg $c "BOS\.REDHAT\.COM" enumerate 3
+                verifyCfg $c "BOS\.REDHAT\.COM" enumerate TRUE
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
@@ -832,7 +900,7 @@ sssd_multi_016()
         message "END $tet_thistest"
 }
 
-sssd_multi_017()
+sssd_multi_019()
 {
         myresult=PASS
         message "START $tet_thistest:  Enumerated Users - LDAP and LDAP - RHDS - Ranges - No FQN"
@@ -863,7 +931,7 @@ sssd_multi_017()
         message "END $tet_thistest"
 }
 
-sssd_multi_018()
+sssd_multi_020()
 {
         myresult=PASS
         message "START $tet_thistest:  Enumerated Groups - LDAP and LDAP - RHDS - Ranges - No FQN"
@@ -888,7 +956,7 @@ sssd_multi_018()
 
               done
 
-		# Let's make sure we do not get both Duplicate groups without useFullyQualifiedNames
+		# Let's make sure we do get both Duplicate groups without useFullyQualifiedNames
         	RET=`ssh root@$c getent -s sss group | grep $PGROUP7 2>&1`
 		echo $RET | grep 1010
                 if [ $? -ne 0 ] ; then
@@ -899,13 +967,13 @@ sssd_multi_018()
                 fi
 
                 echo $RET | grep 2010
-                if [ $? -eq 0 ] ; then
-                        message "ERROR: Expected second duplicate group not to be returned."
+		if [ $? -ne 0 ] ; then
+                        message "ERROR: Expected group with gid 2010 to be returned."
                         myresult=FAIL
                 else
-                        message "Second Duplicate group name not returned as expected."
+                        message "Second Duplicate group name returned as expected."
                 fi
-        done
+	done
 
         result $myresult
         message "END $tet_thistest"
@@ -913,7 +981,7 @@ sssd_multi_018()
 
 ##########################################################################################################################
 
-sssd_multi_019()
+sssd_multi_021()
 {
    ####################################################################
    #   Configuration 5
@@ -939,7 +1007,7 @@ sssd_multi_019()
                         fi
                 fi
 
-                verifyCfg $c "EXAMPLE\.COM" enumerate 3
+                verifyCfg $c "EXAMPLE\.COM" enumerate TRUE
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
@@ -964,7 +1032,7 @@ sssd_multi_019()
                         myresult=FAIL
                 fi
 
-                verifyCfg $c "BOS\.REDHAT\.COM" enumerate 3
+                verifyCfg $c "BOS\.REDHAT\.COM" enumerate TRUE
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
@@ -995,7 +1063,7 @@ sssd_multi_019()
         message "END $tet_thistest"
 }
 
-sssd_multi_020()
+sssd_multi_022()
 {
         myresult=PASS
         message "START $tet_thistest:  Enumerated Users - LDAP and LDAP - RHDS - No Ranges - FQN"
@@ -1025,7 +1093,7 @@ sssd_multi_020()
         message "END $tet_thistest"
 }
 
-sssd_multi_021()
+sssd_multi_023()
 {
         myresult=PASS
         message "START $tet_thistest:  Enumerated Groups - LDAP and LDAP - RHDS - No Ranges - FQN"
@@ -1054,7 +1122,7 @@ sssd_multi_021()
         message "END $tet_thistest"
 }
 
-sssd_multi_022()
+sssd_multi_024()
 {
         myresult=PASS
         message "START $tet_thistest:  Invalid memberuid is not returned - LDAP and LDAP - RHDS - No Ranges - FQN"
@@ -1079,7 +1147,7 @@ sssd_multi_022()
 
 #######################################################################################################################################
 
-sssd_multi_023()
+sssd_multi_025()
 {
    ####################################################################
    #   Configuration 6
@@ -1111,7 +1179,7 @@ sssd_multi_023()
                         fi
                 fi
 
-                verifyCfg $c "EXAMPLE\.COM" enumerate 3
+                verifyCfg $c "EXAMPLE\.COM" enumerate TRUE
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
@@ -1141,7 +1209,7 @@ sssd_multi_023()
                         myresult=FAIL
                 fi
 
-                verifyCfg $c "BOS\.REDHAT\.COM" enumerate 3
+                verifyCfg $c "BOS\.REDHAT\.COM" enumerate TRUE
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
@@ -1177,7 +1245,7 @@ sssd_multi_023()
         message "END $tet_thistest"
 }
 
-sssd_multi_024()
+sssd_multi_026()
 {
         myresult=PASS
         message "START $tet_thistest:  Enumerated Users - LDAP and PROXY LDAP - RHDS - Ranges - No FQN - Proxy"
@@ -1208,7 +1276,7 @@ sssd_multi_024()
         message "END $tet_thistest"
 }
 
-sssd_multi_025()
+sssd_multi_027()
 {
         myresult=PASS
         message "START $tet_thistest:  Enumerated Groups - LDAP and PROXY LDAP - RHDS - Ranges - No FQN - proxy"
@@ -1258,7 +1326,7 @@ sssd_multi_025()
         message "END $tet_thistest"
 }
 
-sssd_multi_026()
+sssd_multi_028()
 {
    ####################################################################
    #   Configuration 7
@@ -1290,7 +1358,7 @@ sssd_multi_026()
                         fi
                 fi
 
-                verifyCfg $c "EXAMPLE\.COM" enumerate 3
+                verifyCfg $c "EXAMPLE\.COM" enumerate TRUE
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
@@ -1310,7 +1378,7 @@ sssd_multi_026()
                         myresult=FAIL
                 fi
 
-                verifyCfg $c "BOS\.REDHAT\.COM" enumerate 3
+                verifyCfg $c "BOS\.REDHAT\.COM" enumerate TRUE
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
@@ -1336,7 +1404,7 @@ sssd_multi_026()
         message "END $tet_thistest"
 }
 
-sssd_multi_027()
+sssd_multi_029()
 {
         myresult=PASS
         message "START $tet_thistest:  Enumerated Users - LDAP and PROXY LDAP - RHDS - No Ranges - FQN - proxy"
@@ -1366,7 +1434,7 @@ sssd_multi_027()
         message "END $tet_thistest"
 }
 
-sssd_multi_028()
+sssd_multi_030()
 {
         myresult=PASS
         message "START $tet_thistest:  Enumerated Groups - LDAP and PROXY LDAP - RHDS - No Ranges - FQN - proxy"
@@ -1395,7 +1463,7 @@ sssd_multi_028()
         message "END $tet_thistest"
 }
 
-sssd_multi_029()
+sssd_multi_031()
 {
         myresult=PASS
         message "START $tet_thistest:  Invalid memberuid is not returned - LDAP and PROXY LDAP - RHDS - No Ranges - FQN - proxy"
@@ -1418,6 +1486,32 @@ sssd_multi_029()
         message "END $tet_thistest"
 }
 
+sssd_multi_032()
+{
+        myresult=PASS
+        message "START $tet_thistest:  Add User to Group in Different Domain - LDAP and PROXY LDAP - RHDS - No Ranges - FQN - proxy"
+        if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+	EXPMSG="Cannot get domain info"
+        for c in $SSSD_CLIENTS ; do
+                message "Working on $c"
+                MSG=`ssh root@$c sss_usermod -g 2010 puser1 2>&1`
+                        if [ $? -eq 0 ] ; then
+                                message "ERROR: Adding LDAP user to Group in Different LDAP Domain was successful."
+                                myresult=FAIL
+                        fi
+
+                        if [[ $EXPMSG != $MSG ]] ; then
+                                message "ERROR: Unexpected Error message.  Got: $MSG  Expected: $EXPMSG"
+                                myresult=FAIL
+                        else
+                                message "Attempting to add user to LDAP group in another domain error message was as expected."
+                        fi
+
+        done
+
+        result $myresult
+        message "END $tet_thistest"
+}
 
 cleanup()
 {

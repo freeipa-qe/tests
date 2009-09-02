@@ -80,6 +80,7 @@ sssd_config_001()
 		if [ $? -eq 0 ] ; then
 			message "$MSG"
 			message "ERROR: Invalid configuration MaxId less than MinId - service started"
+			message "Trac issue 126"
 			myresult=FAIL
 		else
 	                if [[ $EXPMSG != $MSG ]] ; then
@@ -115,6 +116,7 @@ sssd_config_002()
                 if [ $? -eq 0 ] ; then
 			message "$MSG"
                         message "ERROR: Invalid configuration MaxId is the same as MinId - service started"
+			message "Trac issue 126"
                         myresult=FAIL
                 else
                         if [[ $EXPMSG != $MSG ]] ; then
@@ -149,6 +151,7 @@ sssd_config_003()
                 if [ $? -eq 0 ] ; then
 			message "$MSG"
                         message "ERROR: Invalid configuration Negative minId - service started"
+			message "Trac issue 127"
                         myresult=FAIL
                 else
                         if [[ $EXPMSG != $MSG ]] ; then
@@ -183,6 +186,7 @@ sssd_config_004()
                 if [ $? -eq 0 ] ; then
 			message "$MSG"
                         message "ERROR: Invalid configuration Negative maxId - service started"
+			message "Trac issue 127"
                         myresult=FAIL
                 else
                         if [[ $EXPMSG != $MSG ]] ; then
@@ -224,7 +228,7 @@ sssd_config_005()
 			message "ERROR: Trac issue 128 still exists. Segmentation Fault"
 			myresult=FAIL
 		else
-                	verifyCfg $c LOCAL enumerate 3
+                	verifyCfg $c LOCAL enumerate TRUE
                 	if [ $? -ne 0 ] ; then
                         	myresult=FAIL
 			fi
@@ -280,6 +284,7 @@ sssd_config_006()
                 if [ $? -eq 0 ] ; then
                         message "$MSG"
                         message "ERROR: Invalid configuration no Provider defined - service started"
+			message "Trac issue 130"
                         myresult=FAIL
                 else
                         if [[ $EXPMSG != $MSG ]] ; then
@@ -299,7 +304,7 @@ sssd_config_006()
 sssd_config_007()
 {
   myresult=PASS
-  message "START $tet_thistest: Enumeration defined with Non Integer"
+  message "START $tet_thistest: Enumeration defined with Integer"
   EXPMSG=""
   for c in $SSSD_CLIENTS; do
         message "Working on $c"
@@ -313,7 +318,8 @@ sssd_config_007()
                 MSG=`ssh root@$c "service sssd start 2>&1"`
                 if [ $? -eq 0 ] ; then
                         message "$MSG"
-                        message "ERROR: Invalid configuration enumeration defined with non integer - service started"
+                        message "ERROR: Invalid configuration enumeration defined with integer - service started"
+			message "Trac issue 131"
                         myresult=FAIL
                 else
                         if [[ $EXPMSG != $MSG ]] ; then
@@ -333,7 +339,7 @@ sssd_config_007()
 sssd_config_008()
 {
   myresult=PASS
-  message "START $tet_thistest: Enumeration defined with Negative Integer"
+  message "START $tet_thistest: Enumeration defined with non boolean"
   EXPMSG=""
   for c in $SSSD_CLIENTS; do
         message "Working on $c"
@@ -347,7 +353,8 @@ sssd_config_008()
                 MSG=`ssh root@$c "service sssd start 2>&1"`
                 if [ $? -eq 0 ] ; then
                         message "$MSG"
-                        message "ERROR: Invalid configuration enumeration defined with negative integer - service started"
+                        message "ERROR: Invalid configuration enumeration defined with non boolean - service started"
+			message "Trac issue 131"
                         myresult=FAIL
                 else
                         if [[ $EXPMSG != $MSG ]] ; then
@@ -382,6 +389,7 @@ sssd_config_009()
                 if [ $? -eq 0 ] ; then
                         message "$MSG"
                         message "ERROR: Invalid configuration boolean defined with a string - service started"
+			message "Trac issue 132"
                         myresult=FAIL
                 else
                         if [[ $EXPMSG != $MSG ]] ; then
@@ -416,6 +424,7 @@ sssd_config_010()
                 if [ $? -eq 0 ] ; then
                         message "$MSG"
                         message "ERROR: Invalid configuration boolean defined with an integer - service started"
+			message "Trac issue 132"
                         myresult=FAIL
                 else
                         if [[ $EXPMSG != $MSG ]] ; then

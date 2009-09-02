@@ -12,7 +12,6 @@ fi
 #  Test Case List
 #####################################################################
 iclist="ic0 ic1 ic2 ic3 ic4 ic99"
-#iclist="ic99"
 ic0="startup"
 ic1="sssd_ldap_001 sssd_ldap_002 sssd_ldap_003 sssd_ldap_004 sssd_ldap_005 sssd_ldap_006 sssd_ldap_007"
 ic2="sssd_ldap_008 sssd_ldap_009 sssd_ldap_010 sssd_ldap_011 sssd_ldap_012"
@@ -92,7 +91,7 @@ sssd_ldap_001()
 {
    ####################################################################
    #   Configuration 1
-   #    enumerate: 3
+   #    enumerate: TRUE
    #    minId: 1000
    #    maxId: 1010
    #    provider: proxy
@@ -125,7 +124,7 @@ sssd_ldap_001()
                         fi
                 fi
 
-                verifyCfg $c LDAP enumerate 3
+                verifyCfg $c LDAP enumerate TRUE
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
@@ -301,7 +300,7 @@ sssd_ldap_008()
 {
    ####################################################################
    #   Configuration 2
-   #    enumerate: 3
+   #    enumerate: TRUE
    #    minId: 1000
    #	useFullyQualifiedNames: TRUE
    #    provider: proxy
@@ -328,7 +327,7 @@ sssd_ldap_008()
                         fi
                 fi
 
-                verifyCfg $c LDAP enumerate 3
+                verifyCfg $c LDAP enumerate TRUE
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
@@ -453,7 +452,7 @@ sssd_ldap_013()
 {
    ####################################################################
    #   Configuration 3
-   #    enumerate: 3
+   #    enumerate: TRUE
    #    minId: 1000
    #    maxId: 1010
    #    provider: ldap 
@@ -489,7 +488,7 @@ sssd_ldap_013()
                         fi
                 fi
 
-                verifyCfg $c LDAP enumerate 3
+                verifyCfg $c LDAP enumerate TRUE
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
@@ -665,7 +664,7 @@ sssd_ldap_020()
 {
    ####################################################################
    #   Configuration 4
-   #    enumerate: 3
+   #    enumerate: TRUE
    #    minId: 1000
    #    useFullyQualifiedNames: TRUE
    #    provider: ldap
@@ -692,7 +691,7 @@ sssd_ldap_020()
                         fi
                 fi
 
-                verifyCfg $c LDAP enumerate 3
+                verifyCfg $c LDAP enumerate TRUE
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi

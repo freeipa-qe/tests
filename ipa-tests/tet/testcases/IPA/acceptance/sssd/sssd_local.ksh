@@ -15,7 +15,7 @@ iclist="ic0 ic1 ic2 ic3 ic4 ic5 ic99"
 ic0="startup"
 ic1="sssd_001 sssd_002 sssd_003 sssd_004 sssd_005 sssd_006 sssd_007 sssd_008 sssd_009 sssd_010 sssd_011 sssd_012 sssd_013 sssd_014 sssd_015 sssd_016 sssd_017 sssd_018 sssd_019 sssd_020 sssd_021 sssd_022 sssd_023 sssd_024 sssd_025 sssd_026 sssd_027 sssd_028"
 ic2="sssd_029 sssd_030 sssd_031 sssd_032 sssd_033 sssd_034 sssd_035"
-ic3="sssd_036 sssd_037 sssd_038 sssd_039"
+ic3="sssd_036 sssd_037"
 ic4="sssd_040 sssd_041 sssd_042 sssd_043 sssd_044 sssd_045 sssd_046"
 ic5="sssd_047 sssd_049"
 ic99="cleanup"
@@ -68,7 +68,7 @@ sssd_001()
 {
    ####################################################################
    #   Configuration 1
-   #	enumerate: 3
+   #	enumerate: TRUE
    #	minId: 1000
    #	maxId: 1010
    #	magicPrivateGroups: TRUE
@@ -95,7 +95,7 @@ sssd_001()
 			fi
 		fi
 		
-		verifyCfg $c LOCAL enumerate 3
+		verifyCfg $c LOCAL enumerate TRUE
 		if [ $? -ne 0 ] ; then
 			myresult=FAIL
 		fi
@@ -362,6 +362,7 @@ sssd_010()
 
                 if [[ $EXPMSG != $MSG ]] ; then
                         message "ERROR: Unexpected Error message.  Got: $MSG  Expected: $EXPMSG"
+			message "Trac issue 126"
                         myresult=FAIL
                 else
                         message "Modifying user that doesn't exist error message was as expected."
@@ -848,9 +849,9 @@ sssd_026()
                                 message "LOCAL domain group1009 deleted successfully."
                         fi
 
-                        verifyAttr $c "name=user1009,cn=users,cn=LOCAL,cn=sysdb" member "name=group1009,cn=groups,cn=LOCAL,cn=sysdb"
+                        verifyAttr $c "name=user1009,cn=users,cn=LOCAL,cn=sysdb" memberOf "name=group1009,cn=groups,cn=LOCAL,cn=sysdb"
                         if [ $? -eq 0 ] ; then
-                                message "ERROR: Parent group deleted, but child group still has member attribute defined."
+                                message "ERROR: Parent group deleted, but child group still has memberOf attribute defined."
                                 myresult=FAIL
                         else
                                 message "Child group member attribute was removed."
@@ -922,6 +923,7 @@ sssd_028()
 
                 if [[ $EXPMSG != $MSG ]] ; then
                         message "ERROR: Unexpected Error message.  Got: $MSG  Expected: $EXPMSG"
+			message "Trac issue 136"
                         myresult=FAIL
                 else
                         message "Deleting group that doesn't exist error message was as expected."
@@ -936,7 +938,7 @@ sssd_029()
 {
    ####################################################################
    #   Configuration 2
-   #    enumerate: 1
+   #    enumerate: TRUE
    #	useFullyQualifiedNames TRUE
    #    provider: local
    ####################################################################
@@ -961,7 +963,7 @@ sssd_029()
                         fi
                 fi
 
-                verifyCfg $c LOCAL enumerate 3
+                verifyCfg $c LOCAL enumerate TRUE
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
@@ -1166,7 +1168,7 @@ sssd_036()
 {
    ####################################################################
    #   Configuration 3
-   #    enumerate: 1
+   #    enumerate: FALSE
    #    minId: 1000
    #    maxId: 1010
    #    magicPrivateGroups: TRUE
@@ -1193,7 +1195,7 @@ sssd_036()
                         fi
                 fi
 
-                verifyCfg $c LOCAL enumerate 1
+                verifyCfg $c LOCAL enumerate FALSE
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
@@ -1236,18 +1238,18 @@ sssd_037()
 
 	ssh root@$c getent -s sss passwd | grep user1000
         if [ $? -ne 0 ] ; then
-                message "ERROR: Enumerate 1 should return the user added but did not."
+                message "ERROR: Enumerate FALSE should return the user added but did not."
                 myresult=FAIL
         else
-                message "User returned successfully with configuration enumerate set to 1."
+                message "User returned successfully with configuration enumerate set to FALSE."
         fi
 
         ssh root@$c getent -s sss group | grep group1000
         if [ $? -eq 0 ] ; then
-                message "ERROR: Enumerate 1 should not return the group added but it did."
+                message "ERROR: Enumerate FALSE should not return the group added but it did."
                 myresult=FAIL
         else
-                message "Group was not returned as expected with configuration enumerate set to 1."
+                message "Group was not returned as expected with configuration enumerate set to FALSE."
         fi
 
   done
@@ -1256,6 +1258,10 @@ sssd_037()
   message "END $tet_thistest"
 }
 
+#######################################################################################################
+# Enumeration has been changed to boolean TRUE = enumeration users and groups, FALSE = enumerate
+# users only.  This means tests 38 and 39 are now invalid
+#######################################################################################################
 sssd_038()
 {
    ####################################################################
@@ -1355,7 +1361,7 @@ sssd_040()
 {
    ####################################################################
    #   Configuration 5
-   #    enumerate: 3
+   #    enumerate: TRUE
    #    minId: 2000
    # 	maxId: 2010
    #    legacy: TRUE
@@ -1386,7 +1392,7 @@ sssd_040()
                         fi
                 fi
 
-                verifyCfg $c LOCAL enumerate 3
+                verifyCfg $c LOCAL enumerate TRUE
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
@@ -1638,8 +1644,7 @@ sssd_047()
 {
    ####################################################################
    #   Configuration 6
-   #    enumerate: 1
-   #    magicPrivateGroups FALSE (should ignore and set to TRUE)
+   #    enumerate: TRUE
    #	useFullyQualifiedNames TRUE
    #    provider: local
    ####################################################################
@@ -1664,7 +1669,7 @@ sssd_047()
                         fi
                 fi
 
-                verifyCfg $c LOCAL enumerate 3
+                verifyCfg $c LOCAL enumerate TRUE
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
@@ -1680,11 +1685,6 @@ sssd_047()
                 fi
   
                 verifyCfg $c LOCAL provider local
-                if [ $? -ne 0 ] ; then
-                        myresult=FAIL
-                fi
-
-                verifyCfg $c LOCAL magicPrivateGroups TRUE
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
@@ -1744,15 +1744,16 @@ sssd_049()
         for c in $SSSD_CLIENTS; do
                 message "Working on $c"
 		# add a user manually defining uid 1001
-		ssh root@$c "sss_useradd -u 1001 -h /home/user1001 -s /bin/bash user1001"
-		# add two users without defining uid, first user should get uid 1000, second user should get 1002
+		ssh root@$c "sss_useradd -u 1000 -h /home/user1001 -s /bin/bash user1000"
+		# add another users and verify the uid number 1000 was not used, but the next available
 		# should skip uid number already in use
-		ssh root@$c "sss_useradd -h /home/user1000 -s /bin/bash user1000 ; sss_useradd -h /home/user1002 -s /bin/bash user1002"
+		ssh root@$c "sss_useradd -h /home/user1001 -s /bin/bash user1001"
 
-		# now verify user1002's uidNumber
-		verifyAttr $c "name=user1002,cn=users,cn=LOCAL,cn=sysdb" uidNumber 1002
-		if [ $? -ne 0 ] ; then
-			message "ERROR: uidNumber not as expected - could be regression of trac issue 57"
+		# now verify user1001's uidNumber
+		USER=`ssh root@$c getent -s sss passwd user1001`
+		UID=`echo $USER | cut -d ":" -f 2`
+		if [ $UID -ne 1001 ] ; then
+			message "ERROR: uidNumber not as expected - could be regression of trac issue 57 Expected: 1001 Got: $UID"
 			myresult=FAIL
 		else
 			message "Trac Issue 57 appears to be fixed - uidNumber assigned correctly"
