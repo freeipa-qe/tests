@@ -799,6 +799,7 @@ sssd_multi_017()
                         MSG=` ssh root@$c "service sssd start 2>&1"`
                         if [ $? -ne 0 ] ; then
                                 message "ERROR: SSSD Should have failed to start with 2 LOCAL domains configured on $c"
+				message "Trac issue 97"
                                 myresult=FAIL
                         fi
 

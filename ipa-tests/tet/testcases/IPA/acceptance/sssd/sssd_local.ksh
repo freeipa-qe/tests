@@ -1237,11 +1237,11 @@ sssd_037()
 	ssh root@$c "sss_groupadd -g 1000 group1000"
 
 	ssh root@$c getent -s sss passwd | grep user1000
-        if [ $? -ne 0 ] ; then
-                message "ERROR: Enumerate FALSE should return the user added but did not."
+        if [ $? -eq 0 ] ; then
+                message "ERROR: Enumerate FALSE should not return the user added but it did."
                 myresult=FAIL
         else
-                message "User returned successfully with configuration enumerate set to FALSE."
+                message "User was not returned as expected with configuration enumerate set to FALSE."
         fi
 
         ssh root@$c getent -s sss group | grep group1000

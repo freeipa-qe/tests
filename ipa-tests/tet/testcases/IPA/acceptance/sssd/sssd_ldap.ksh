@@ -14,9 +14,9 @@ fi
 iclist="ic0 ic1 ic2 ic3 ic4 ic99"
 ic0="startup"
 ic1="sssd_ldap_001 sssd_ldap_002 sssd_ldap_003 sssd_ldap_004 sssd_ldap_005 sssd_ldap_006 sssd_ldap_007"
-ic2="sssd_ldap_008 sssd_ldap_009 sssd_ldap_010 sssd_ldap_011 sssd_ldap_012"
-ic3="sssd_ldap_013 sssd_ldap_014 sssd_ldap_015 sssd_ldap_016 sssd_ldap_017 sssd_ldap_018 sssd_ldap_019"
-ic4="sssd_ldap_020 sssd_ldap_021 sssd_ldap_022 sssd_ldap_023 sssd_ldap_024"
+ic2="sssd_ldap_008 sssd_ldap_009 sssd_ldap_010 sssd_ldap_011 sssd_ldap_012 sssd_ldap_013 sssd_ldap_014"
+ic3="sssd_ldap_015 sssd_ldap_016 sssd_ldap_017 sssd_ldap_018 sssd_ldap_019 sssd_ldap_020 sssd_ldap_021"
+ic4="sssd_ldap_022 sssd_ldap_023 sssd_ldap_024 sssd_ldap_025 sssd_ldap_026 sssd_ldap_027 sssd_ldap_028"
 ic99="cleanup"
 
 #################################################################
@@ -35,6 +35,7 @@ ROOTDN="cn=Directory Manager"
 ROOTDNPWD="Secret123"
 export RH_DIRSERV ADS_DIRSRV ROOTDN ROOTDNPWD
 CONFIG_DIR=$TET_ROOT/testcases/IPA/acceptance/sssd/config
+LDIFS=$TET_ROOT/testcases/IPA/acceptance/sssd/ldifs
 SSSD_CONFIG_DIR=/etc/sssd
 SSSD_CONFIG_FILE=$SSSD_CONFIG_DIR/sssd.conf
 SSSD_CONFIG_DB=/var/lib/sss/db/config.ldb
@@ -118,7 +119,7 @@ sssd_ldap_001()
                         restartSSSD $c
                         if [ $? -ne 0 ] ; then
                                 message "ERROR: Restart SSSD failed on $c"
-                             sssd_ldap_014   myresult=FAIL
+                                myresult=FAIL
                         else
                                 message "SSSD Server restarted on client $c"
                         fi
@@ -450,6 +451,83 @@ sssd_ldap_012()
 
 sssd_ldap_013()
 {
+        myresult=PASS
+        message "START $tet_thistest: New User added - cache test - RHDS - provider proxy"
+
+        if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+        for c in $SSSD_CLIENTS ; do 
+                message "Working on $c"
+		# add a new ldap user within valid ID range
+		echo "/usr/bin/ldapmodify -x -h $RH_DIRSERV -p $PORT -D "$ROOTDN" -w $ROOTDNPW -a -f $LDIFS/newuser.ldif"
+		/usr/bin/ldapmodify -x -h $RH_DIRSERV -p $PORT -D "$ROOTDN" -w $ROOTDNPW -a -f $LDIFS/newuser.ldif
+
+		# search for the new user
+		ssh root@$c "getent -s sss passwd nuser@LDAP"
+		if [ $? -ne 0 ] ; then
+			message "New user not found yet. Waiting for cache to expire."
+			sleep 10
+			ssh root@$c "getent -s sss passwd nuser@LDAP"
+			if [ $? -ne 0 ] ; then
+				message "New user still not found even after cache timeout expired"
+				message "Trac issue 162"
+				myresult=FAIL
+			else
+				message "New user found after cache expired."
+			fi
+		else
+			message "New user was immediately found - looks like first attempt did not use cache."
+			myresult=FAIL
+		fi
+
+		# delete the ldap user
+		/usr/bin/ldapmodify -x -h $RH_DIRSERV -p $PORT -D "$ROOTDN" -w $ROOTDNPW -f $LDIFS/deluser.ldif
+        done
+
+        result $myresult
+        message "END $tet_thistest"
+
+}
+
+sssd_ldap_014()
+{
+        myresult=PASS
+        message "START $tet_thistest: New Group added - cache test - RHDS - provider ldap"
+
+        if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+        for c in $SSSD_CLIENTS ; do 
+                message "Working on $c"
+                # add a new ldap group within valid ID range
+		/usr/bin/ldapmodify -x -h $RH_DIRSERV -p $PORT -D "$ROOTDN" -w $ROOTDNPW -a -f $LDIFS/newgroup.ldif
+
+                # search for the new group
+                ssh root@$c "getent -s sss group group1005@LDAP"
+                if [ $? -ne 0 ] ; then
+                        message "New group not found yet. Waiting for cache to expire."
+                        sleep 10
+                        ssh root@$c "getent -s sss group nuser@LDAP"
+                        if [ $? -ne 0 ] ; then
+                                message "New group still not found even after cache timeout expired"
+				message "Trac issue 162"
+                                myresult=FAIL
+                        else
+                                message "New group found after cache expired."
+                        fi
+                else
+                        message "New group was immediately found - looks like first attempt did not use cache."
+                        myresult=FAIL
+                fi
+
+                # delete the ldap user
+		/usr/bin/ldapmodify -x -h $RH_DIRSERV -p $PORT -D "$ROOTDN" -w $ROOTDNPW -f $LDIFS/delgroup.ldif
+        done
+
+        result $myresult
+        message "END $tet_thistest"
+
+}
+
+sssd_ldap_015()
+{
    ####################################################################
    #   Configuration 3
    #    enumerate: TRUE
@@ -519,7 +597,7 @@ sssd_ldap_013()
         message "END $tet_thistest"
 }
 
-sssd_ldap_014()
+sssd_ldap_016()
 {
         myresult=PASS
         message "START $tet_thistest: Get Valid LDAP Users - RHDS - provider ldap"
@@ -543,7 +621,7 @@ sssd_ldap_014()
         message "END $tet_thistest"
 }
 
-sssd_ldap_015()
+sssd_ldap_017()
 {
         myresult=PASS
         message "START $tet_thistest: Get Valid LDAP Groups - RHDS - provider ldap"
@@ -567,7 +645,7 @@ sssd_ldap_015()
         message "END $tet_thistest"
 }
 
-sssd_ldap_016()
+sssd_ldap_018()
 {
         myresult=PASS
         message "START $tet_thistest: Users uidNumbers below minId and above maxId - RHDS - provider ldap"
@@ -592,7 +670,7 @@ sssd_ldap_016()
         message "END $tet_thistest"
 }
 
-sssd_ldap_017()
+sssd_ldap_019()
 {
         myresult=PASS
         message "START $tet_thistest: Groups gidNumbers below minId and above maxId - RHDS - provider ldap"
@@ -616,7 +694,7 @@ sssd_ldap_017()
         message "END $tet_thistest"
 }
 
-sssd_ldap_018()
+sssd_ldap_020()
 {
         myresult=PASS
         message "START $tet_thistest: Non Posix User - RHDS - provider ldap"
@@ -638,7 +716,7 @@ sssd_ldap_018()
         message "END $tet_thistest"
 }
 
-sssd_ldap_019()
+sssd_ldap_021()
 {
         myresult=PASS
         message "START $tet_thistest: Non Posix Group - RHDS - provider ldap"
@@ -660,7 +738,7 @@ sssd_ldap_019()
         message "END $tet_thistest"
 }
 
-sssd_ldap_020()
+sssd_ldap_022()
 {
    ####################################################################
    #   Configuration 4
@@ -722,7 +800,7 @@ sssd_ldap_020()
         message "END $tet_thistest"
 }
 
-sssd_ldap_021()
+sssd_ldap_023()
 {
         myresult=PASS
         message "START $tet_thistest: Get Valid LDAP Users - No maxId - FQN - RHDS - provider ldap"
@@ -746,7 +824,7 @@ sssd_ldap_021()
         message "END $tet_thistest"
 }
 
-sssd_ldap_022()
+sssd_ldap_024()
 {
         myresult=PASS
         message "START $tet_thistest: Get Valid LDAP Groups - No maxId - FQN - RHDS - provider ldap"
@@ -770,7 +848,7 @@ sssd_ldap_022()
         message "END $tet_thistest"
 }
 
-sssd_ldap_023()
+sssd_ldap_025()
 {
         myresult=PASS
         message "START $tet_thistest: User uidNumber not within allowed range - FQN - RHDS - provider ldap"
@@ -791,7 +869,7 @@ sssd_ldap_023()
         message "END $tet_thistest"
 }
 
-sssd_ldap_024()
+sssd_ldap_026()
 {
         myresult=PASS
         message "START $tet_thistest: Group gidNumber not within allowed range - FQN - RHDS - provider ldap"
@@ -812,6 +890,77 @@ sssd_ldap_024()
         message "END $tet_thistest"
 }
 
+sssd_ldap_027()
+{
+        myresult=PASS
+        message "START $tet_thistest: New User added - cache test - RHDS - provider ldap"
+
+        if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+        for c in $SSSD_CLIENTS ; do
+                message "Working on $c"
+               # add a new ldap user within valid ID range
+		/usr/bin/ldapmodify -x -h $RH_DIRSERV -p $PORT -D "$ROOTDN" -w $ROOTDNPW -a -f $LDIFS/newuser.ldif
+
+                # search for the new user
+                ssh root@$c "getent -s sss passwd nuser@LDAP"
+                if [ $? -ne 0 ] ; then
+                        message "New user not found yet. Waiting for cache to expire."
+                        sleep 10
+                        ssh root@$c "getent -s sss passwd nuser@LDAP"
+                        if [ $? -ne 0 ] ; then
+                                message "New user still not found even after cache timeout expired"
+                                myresult=FAIL
+                        else
+                                message "New user found after cache expired."
+                        fi
+		else
+                        message "New user added was found."
+                fi
+
+                # delete the ldap user
+		/usr/bin/ldapmodify -x -h $RH_DIRSERV -p $PORT -D "$ROOTDN" -w $ROOTDNPW -f $LDIFS/deluser.ldif
+        done
+
+        result $myresult
+        message "END $tet_thistest"
+
+}
+
+sssd_ldap_028()
+{
+        myresult=PASS
+        message "START $tet_thistest: New Group added - cache test - RHDS - provider ldap"
+
+        if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+        for c in $SSSD_CLIENTS ; do
+                message "Working on $c"
+                # add a new ldap group within valid ID range
+		/usr/bin/ldapmodify -x -h $RH_DIRSERV -p $PORT -D "$ROOTDN" -w $ROOTDNPW -a -f $LDIFS/newgroup.ldif
+
+                # search for the new group
+                ssh root@$c "getent -s sss group group1005@LDAP"
+                if [ $? -ne 0 ] ; then
+                        message "New group not found yet. Waiting for cache to expire."
+                        sleep 10
+                        ssh root@$c "getent -s sss group nuser@LDAP"
+                        if [ $? -ne 0 ] ; then
+                                message "New group still not found even after cache timeout expired"
+                                myresult=FAIL
+                        else
+                                message "New group found after cache expired."
+                        fi
+                else
+                        message "New group added was found."
+                fi
+
+                # delete the ldap user
+		/usr/bin/ldapmodify -x -h $RH_DIRSERV -p $PORT -D "$ROOTDN" -w $ROOTDNPW -f $LDIFS/delgroup.ldif
+        done
+
+        result $myresult
+        message "END $tet_thistest"
+
+}
 
 cleanup()
 {
