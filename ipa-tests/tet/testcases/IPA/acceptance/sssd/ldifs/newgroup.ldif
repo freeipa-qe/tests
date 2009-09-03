@@ -1,0 +1,7 @@
+dn: cn=group1005,ou=Groups,dc=example,dc=com
+gidNumber: 1005
+objectClass: top
+objectClass: groupofuniquenames
+objectClass: posixgroup
+cn: group1005
+

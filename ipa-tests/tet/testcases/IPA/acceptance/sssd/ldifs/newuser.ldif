@@ -1,0 +1,9 @@
+dn: cn=New User,ou=People,dc=example,dc=com
+cn: New User
+uid: nuser
+uidNumber: 1015
+gidNumber: 1015
+homeDirectory: /export/nuser
+objectClass: top
+objectClass: posixAccount
+

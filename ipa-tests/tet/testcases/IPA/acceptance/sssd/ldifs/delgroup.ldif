@@ -1,0 +1,2 @@
+dn: cn=group1005,ou=Groups,dc=example,dc=com
+changetype: delete
