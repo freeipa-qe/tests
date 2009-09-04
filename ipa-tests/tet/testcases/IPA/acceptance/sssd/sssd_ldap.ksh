@@ -475,8 +475,7 @@ sssd_ldap_013()
 				message "New user found after cache expired."
 			fi
 		else
-			message "New user was immediately found - looks like first attempt did not use cache."
-			myresult=FAIL
+			message "New user added was found on first search attempt."
 		fi
 
 		# delete the ldap user
@@ -491,7 +490,7 @@ sssd_ldap_013()
 sssd_ldap_014()
 {
         myresult=PASS
-        message "START $tet_thistest: New Group added - cache test - RHDS - provider ldap"
+        message "START $tet_thistest: New Group added - cache test - RHDS - provider proxy"
 
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
         for c in $SSSD_CLIENTS ; do 
@@ -513,8 +512,7 @@ sssd_ldap_014()
                                 message "New group found after cache expired."
                         fi
                 else
-                        message "New group was immediately found - looks like first attempt did not use cache."
-                        myresult=FAIL
+                        message "New group added was found on first search attempt."
                 fi
 
                 # delete the ldap user
@@ -914,7 +912,7 @@ sssd_ldap_027()
                                 message "New user found after cache expired."
                         fi
 		else
-                        message "New user added was found."
+                        message "New user added was found on first search attempt."
                 fi
 
                 # delete the ldap user
@@ -950,7 +948,7 @@ sssd_ldap_028()
                                 message "New group found after cache expired."
                         fi
                 else
-                        message "New group added was found."
+                        message "New group added was found on first search attempt."
                 fi
 
                 # delete the ldap user

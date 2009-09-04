@@ -380,7 +380,7 @@ sssd_files_010()
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
         for c in $SSSD_CLIENTS ; do
                 message "Working on $c"
-                ssh root@$c "groupadd -g 2500 group2500"
+                ssh root@$c "groupadd -g 400 group400"
                 if [ $? -ne 0 ] ; then
                         message "ERROR: Add legacy group failed. return code: $?"
                         myresult=FAIL
@@ -388,7 +388,7 @@ sssd_files_010()
 
 		sleep 30
 
-                ssh root@$c "getent -s sss group | grep group2500"
+                ssh root@$c "getent -s sss group | grep group400"
                 if [ $? -eq 0 ] ; then
                         message "ERROR: Local provider files new group outside of range was returned."
                         myresult=FAIL
@@ -447,16 +447,17 @@ sssd_files_012()
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
         for c in $SSSD_CLIENTS ; do
                 message "Working on $c"
-                ssh root@$c "groupdel group1600 ; groupdel group2500"
+                ssh root@$c "groupdel group1600 ; groupdel group400"
 		rc=$?
                 if [ $rc -ne 0 ] ; then
-                        message "ERROR: Failed to delete group1600. return code: $rc"
+                        message "ERROR: Failed to delete groups with shadow utils. return code: $rc"
                         myresult=FAIL
                 else
 			sleep 2
                         ssh root@$c "getent -s sss group | grep group1600"
                         if [ $? -eq 0 ] ; then
                                 message "ERROR: group1600 deleted successfully, but getent still found the group."
+				message "Trac issue 160"
                                 myresult=FAIL
                         fi
                 fi

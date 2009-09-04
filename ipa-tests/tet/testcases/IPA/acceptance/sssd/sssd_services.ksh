@@ -149,7 +149,7 @@ sssd_service_002()
 				message "ERROR: Failed to kill $s. return code: $?"
 				myresult=FAIL
 			else
-				sleep 2
+				sleep 5
 				NPID=`ssh root@$c "ps -e | grep $s | cut -d \" \" -f 1 2>&1"`
 				if [ $? -ne 0 ] ; then
 					message "ERROR: Failed to get new PID for $s - may not have restarted. return code: $?"
