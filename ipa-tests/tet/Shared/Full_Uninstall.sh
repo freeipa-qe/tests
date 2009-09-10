@@ -1,4 +1,4 @@
-#!/bin/ksh
+#!/bin/sh
 # This file is called by engage after everythig gets run to uninstall the rpms and packages 
 # from all of the servers and clients.
 # Any additions here should also be made to the quickuninstall acceptance test
@@ -132,8 +132,8 @@ main()
 	return 0
 }
 
-. $TESTING_SHARED/instlib.ksh
-. $TESTING_SHARED/shared.ksh
+. $TESTING_SHARED/instlib.sh
+. $TESTING_SHARED/shared.sh
 
 main
 ret=$?

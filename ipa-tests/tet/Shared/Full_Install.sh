@@ -1,4 +1,4 @@
-#!/bin/ksh
+#!/bin/sh
 # This file is called by engage to install the rpms and packages 
 # to all of the servers and clients.
 # Any additions here should also be made to the quickinstall acceptance test
@@ -308,8 +308,8 @@ RunFullInstall()
 	return 0
 }
 
-. $TESTING_SHARED/instlib.ksh
-. $TESTING_SHARED/shared.ksh
+. $TESTING_SHARED/instlib.sh
+. $TESTING_SHARED/shared.sh
 
 if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 RunFullInstall

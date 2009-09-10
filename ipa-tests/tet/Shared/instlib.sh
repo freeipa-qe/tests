@@ -24,7 +24,7 @@
 UninstallServer()
 {
 	if [ $DSTET_DEBUG = y ]; then set -x; fi
-	. $TESTING_SHARED/shared.ksh
+	. $TESTING_SHARED/shared.sh
 	is_server_alive $1
 	ret=$?
 	if [ $ret -ne 0 ]; then
@@ -93,7 +93,7 @@ rm -f /etc/krb5/krb5.keytab";
 UninstallClient()
 {
 	if [ $DSTET_DEBUG = y ]; then set -x; fi
-	. $TESTING_SHARED/shared.ksh
+	. $TESTING_SHARED/shared.sh
 	is_server_alive $1
 	if [ $? -ne 0 ]; then
 		echo "ERROR - Server $1 appears to not respond to pings."
@@ -225,7 +225,7 @@ expect "ktutil:  "' >> $TET_TMP_DIR/replica-install.exp
 InstallClientSolaris()
 {
 	if [ $DSTET_DEBUG = y ]; then set -x; fi
-	. $TESTING_SHARED/shared.ksh
+	. $TESTING_SHARED/shared.sh
 	is_server_alive $1
 	if [ $? -ne 0 ]; then
 		echo "ERROR - Server $1 appears to not respond to pings."
@@ -347,7 +347,7 @@ cat /tmp/pam-tmp.conf > /etc/pam.conf" > $TET_TMP_DIR/pam.sh
 SetupClientRedhat()
 {
 	if [ $DSTET_DEBUG = y ]; then set -x; fi
-	. $TESTING_SHARED/shared.ksh
+	. $TESTING_SHARED/shared.sh
 	is_server_alive $1
 	ret=$?
 	if [ $ret -ne 0 ]; then
@@ -391,7 +391,7 @@ SetupClientRedhat()
 SetupClient()
 {
 	if [ $DSTET_DEBUG = y ]; then set -x; fi
-	. $TESTING_SHARED/shared.ksh
+	. $TESTING_SHARED/shared.sh
 	is_server_alive $1
 	if [ $? -ne 0 ]; then
 		echo "ERROR - Server $1 appears to not respond to pings."
@@ -413,7 +413,7 @@ SetupClient()
 SetupServer()
 {
 	if [ $DSTET_DEBUG = y ]; then set -x; fi
-	. $TESTING_SHARED/shared.ksh
+	. $TESTING_SHARED/shared.sh
 	is_server_alive $1
 	ret=$?
 	if [ $ret -ne 0 ]; then
@@ -538,7 +538,7 @@ SetupServer()
 SetupServerBogus()
 {
 	if [ $DSTET_DEBUG = y ]; then set -x; fi
-	. $TESTING_SHARED/shared.ksh
+	. $TESTING_SHARED/shared.sh
 	is_server_alive $1
 	ret=$?
 	if [ $ret -ne 0 ]; then
@@ -564,7 +564,7 @@ SetupServerBogus()
 SetupClientBogus()
 {
 	if [ $DSTET_DEBUG = y ]; then set -x; fi
-	. $TESTING_SHARED/shared.ksh
+	. $TESTING_SHARED/shared.sh
 	is_server_alive $1
 	ret=$?
 	if [ $ret -ne 0 ]; then
@@ -586,7 +586,7 @@ SetupClientBogus()
 SetupRepoRHEL()
 {
 	if [ $DSTET_DEBUG = y ]; then set -x; fi
-	. $TESTING_SHARED/shared.ksh
+	. $TESTING_SHARED/shared.sh
 	is_server_alive $1
 	if [ $? -ne 0 ]; then
 		echo "ERROR - Server $1 appears to not respond to pings."
@@ -670,7 +670,7 @@ rm -f /tmp/solaris-ldap.conf"
 SetupRepo()
 {
 	if [ $DSTET_DEBUG = y ]; then set -x; fi
-	. $TESTING_SHARED/shared.ksh
+	. $TESTING_SHARED/shared.sh
 	is_server_alive $1
 	if [ $? -ne 0 ]; then
 		echo "ERROR - Server $1 appears to not respond to pings."
@@ -698,7 +698,7 @@ InstallClientRPMSolaris()
 InstallClientRedhat()
 {
 	if [ $DSTET_DEBUG = y ]; then set -x; fi
-	. $TESTING_SHARED/shared.ksh
+	. $TESTING_SHARED/shared.sh
 	is_server_alive $1
 	if [ $? -ne 0 ]; then
 		echo "ERROR - Server $1 appears to not respond to pings."
@@ -745,7 +745,7 @@ InstallClientRedhat()
 InstallClientRPM()
 {
 	if [ $DSTET_DEBUG = y ]; then set -x; fi
-	. $TESTING_SHARED/shared.ksh
+	. $TESTING_SHARED/shared.sh
 	is_server_alive $1
 	if [ $? -ne 0 ]; then
 		echo "ERROR - Server $1 appears to not respond to pings."
@@ -782,7 +782,7 @@ InstallClientRPM()
 InstallServerRPM()
 {
 	if [ $DSTET_DEBUG = y ]; then set -x; fi
-	. $TESTING_SHARED/shared.ksh
+	. $TESTING_SHARED/shared.sh
 	is_server_alive $1
 	ret=$?
 	if [ $ret -ne 0 ]; then
@@ -876,7 +876,7 @@ InstallServerRPM()
 UnInstallClientRPM()
 {
 	if [ $DSTET_DEBUG = y ]; then set -x; fi
-	. $TESTING_SHARED/shared.ksh
+	. $TESTING_SHARED/shared.sh
 	is_server_alive $1
 	ret=$?
 	if [ $ret -ne 0 ]; then
@@ -915,7 +915,7 @@ UnInstallClientRPM()
 UnInstallServerRPM()
 {
 	if [ $DSTET_DEBUG = y ]; then set -x; fi
-	. $TESTING_SHARED/shared.ksh
+	. $TESTING_SHARED/shared.sh
 	is_server_alive $1
 	ret=$?
 	if [ $ret -ne 0 ]; then
