@@ -1,0 +1,23 @@
+name=SSSD - $basearch
+failovermethod=priority
+baseurl=http://sssd-builder.idm.lab.bos.redhat.com/repos/rhel5/$basearch/RPMS
+enabled=1
+metadata_expire=6h
+gpgcheck=0
+
+[sssd-debuginfo]
+name=SSSD - $basearch - Debug
+baseurl=http://sssd-builder.idm.lab.bos.redhat.com/repos/rhel5/$basearch/DEBUGINFO
+failovermethod=priority
+enabled=0
+metadata_expire=6h
+gpgcheck=0
+
+[sssd-source]
+name=SSSD - $basearch - Source
+baseurl=http://sssd-builder.idm.lab.bos.redhat.com/repos/rhel5/SRPMS
+failovermethod=priority
+enabled=0
+metadata_expire=6h
+gpgcheck=0
+
