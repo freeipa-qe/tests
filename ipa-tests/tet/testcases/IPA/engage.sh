@@ -1,4 +1,4 @@
-#!/bin/ksh -p
+#!/bin/sh
 #ident "%W% %E%"
 #
 #	File name: engage
@@ -27,18 +27,6 @@
 # Set this next line to y to see debugging output from engage(not from the tests. This gives a huge ammount of output
 export engage_debug=n
 
-# checking to make sure that the ksh on this system is from pdksh. 
-rpm -qf /bin/ksh | grep pdksh
-if [ $? != 0 ]; then
-	echo ""
-	echo "ERROR!"
-	echo "the ksh at /bin/ksh is not the ksh from pdksh"
-	echo "tet does not run properly with the ksh from redhat or fedora."
-	echo "Please install pdksh."
-	echo "Try getting it from here: http://apoc.dsdev.sjc.redhat.com/tet/ipa2/ipa-tests/tet/pdksh"
-	exit 1
-fi
-
 grep "Red Hat Enterprise Linux Server release 5" /etc/redhat-release
 if [ $? != 0 ]; then
 	echo ""
@@ -55,7 +43,7 @@ fi
 if [ "$engage_debug" = "y" ]; then
 	set -x;
 fi
-# Make sure there is no problem with ksh users - mandatory for AIX at least
+# Make sure there is no problem with sh users - mandatory for AIX at least
 #
 unset ENV
 # need to run in C locale, 
@@ -1877,7 +1865,7 @@ main_print()
 	echo "    DNSMASTER      : $DNSMASTER"
 	echo "    ITTERATIONS    : $ITTERATIONS"
 	echo " Set up SSH keys?  : $SetupSSHKeys"
-	. $TESTING_SHARED/shared.ksh
+	. $TESTING_SHARED/shared.sh
 	echo " Host Info"
 	for s in $SERVERS; do
 		if [ "$s" != "" ]; then
@@ -2287,7 +2275,7 @@ main_run()
        echo "Installing IPA on all servers now";
        rm -f cat ${TET_TMP_DIR}/install_log.txt
        if [ $DSTET_DEBUG = y ] || [ $RunInstallShow = y ] || [ $RunInstallShow = Y ]; then
-           ksh $TET_ROOT/Shared/Full_Install | tee ${TET_TMP_DIR}/install_log.txt
+           sh $TET_ROOT/Shared/Full_Install | tee ${TET_TMP_DIR}/install_log.txt
            ret=$?
            if [ $ret != 0 ]; then
               echo ""
@@ -2296,7 +2284,7 @@ main_run()
               sleep 10
            fi
        else
-           ksh $TET_ROOT/Shared/Full_Install > ${TET_TMP_DIR}/install_log.txt
+           sh $TET_ROOT/Shared/Full_Install > ${TET_TMP_DIR}/install_log.txt
            ret=$?
            if [ $ret != 0 ]; then
               echo ""
@@ -2346,7 +2334,7 @@ main_run()
        echo "UnInstalling IPA on all servers now";
        rm -f cat ${TET_TMP_DIR}/uninstall_log.txt
        if [ $DSTET_DEBUG = y ] || [ $RunUnInstallShow = y ]; then
-           ksh $TET_ROOT/Shared/Full_Uninstall.ksh | tee ${TET_TMP_DIR}/uninstall_log.txt
+           sh $TET_ROOT/Shared/Full_Uninstall.sh | tee ${TET_TMP_DIR}/uninstall_log.txt
            ret=$?
            if [ $ret != 0 ]; then
               echo ""
@@ -2355,7 +2343,7 @@ main_run()
               sleep 10
            fi
        else
-           ksh $TET_ROOT/Shared/Full_UnInstall > ${TET_TMP_DIR}/uninstall_log.txt
+           sh $TET_ROOT/Shared/Full_UnInstall > ${TET_TMP_DIR}/uninstall_log.txt
            ret=$?
            if [ $ret != 0 ]; then
               echo ""
