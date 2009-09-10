@@ -9,7 +9,7 @@
 #  service-show              Examine an existing service.
 
 ######################################################################
-echo "start service cli"
+message "start service cli"
 if [ "$DSTET_DEBUG" = "y" ]; then
 	set -x
 fi
@@ -33,34 +33,34 @@ kinit()
 {
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 	# Kinit everywhere
-	echo "START $tet_thistest"
+	message "START $tet_thistest"
 	for s in $SERVERS; do
 		if [ "$s" != "" ]; then
-			echo "kiniting as $DS_USER, password $DM_ADMIN_PASS on $s"
+			message "kiniting as $DS_USER, password $DM_ADMIN_PASS on $s"
 			KinitAs $s $DS_USER $DM_ADMIN_PASS
 			ret=$?
 			if [ $ret -ne 0 ]; then
-				echo "ERROR - kinit on $s failed"
+				message "ERROR - kinit on $s failed"
 				tet_result FAIL
 			fi
 		else
-			echo "skipping $s"
+			message "skipping $s"
 		fi
 	done
 	for s in $CLIENTS; do
 		if [ "$s" != "" ]; then
-			echo "kiniting as $DS_USER, password $DM_ADMIN_PASS on $s"
+			message "kiniting as $DS_USER, password $DM_ADMIN_PASS on $s"
 			KinitAs $s $DS_USER $DM_ADMIN_PASS
 			ret=$?
 			if [ $ret -ne 0 ]; then
-				echo "ERROR - kinit on $s failed"
+				message "ERROR - kinit on $s failed"
 				tet_result FAIL
 			fi
 		fi
 	done
 
 	tet_result PASS
-	echo "END $tet_thistest"
+	message "END $tet_thistest"
 }
 
 ######################################################################
@@ -68,7 +68,7 @@ kinit()
 ipaserviceprepare()
 {
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	echo "START $tet_thistest"
+	message "START $tet_thistest"
 	for s in $SERVERS; do
 		if [ "$s" == "M1" ]; then
 			eval_vars $s
@@ -77,14 +77,14 @@ ipaserviceprepare()
 			ret=$?
 			if [ $ret -ne 0 ]
 			then
-				echo "ERROR - ipa host-add failed on $FULLHOSTNAME"
+				message "ERROR - ipa host-add failed on $FULLHOSTNAME"
 				tet_result FAIL
 			fi
 		fi
 	done
 
 	tet_result PASS
-	echo "END $tet_thistest"
+	message "END $tet_thistest"
 
 }
 
@@ -92,7 +92,7 @@ ipaserviceprepare()
 ipaserviceadd()
 {
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	echo "START $tet_thistest"
+	message "START $tet_thistest"
 	for s in $SERVERS; do
 		if [ "$s" == "M1" ]; then
 			eval_vars $s
@@ -102,13 +102,13 @@ ipaserviceadd()
 			ret=$?
 			if [ $ret -ne 0 ]
 			then
-				echo "ERROR - ipa service-add failed on $FULLHOSTNAME"
+				message "ERROR - ipa service-add failed on $FULLHOSTNAME"
 				tet_result FAIL
 			fi
 			ssh root@$FULLHOSTNAME "ipa service-find \"$service1\""
 			if [ $? -ne 0 ]
 			then
-				echo "ERROR - ipa service-find failed on $FULLHOSTNAME"
+				message "ERROR - ipa service-find failed on $FULLHOSTNAME"
 				tet_result FAIL
 			fi
 
@@ -116,7 +116,7 @@ ipaserviceadd()
 	done
 
 	tet_result PASS
-	echo "END $tet_thistest"
+	message "END $tet_thistest"
 
 }
 
@@ -126,25 +126,25 @@ ipaserviceadd()
 negaddservice()
 {
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	echo "START $tet_thistest"
+	message "START $tet_thistest"
 	for s in $SERVERS; do
 		if [ "$s" != "M1" ]&&[ "$s" != "" ]; then
 			eval_vars $s
 
-			echo "this step is supposed to fail"
+			message "this step is supposed to fail"
 			# test for ipa service-add
 			ssh root@$FULLHOSTNAME "ipa service-add \"$service1\""
 			ret=$?
 			if [ $ret -eq 0 ]
 			then
-				echo "ERROR - ipa service-add passed when it should not have on $FULLHOSTNAME"
+				message "ERROR - ipa service-add passed when it should not have on $FULLHOSTNAME"
 				tet_result FAIL
 			fi
 		fi
 	done
 
 	tet_result PASS
-	echo "END $tet_thistest"
+	message "END $tet_thistest"
 
 }
 
@@ -152,7 +152,7 @@ negaddservice()
 ipaserviceaddb()
 {
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	echo "START $tet_thistest"
+	message "START $tet_thistest"
 	for s in $SERVERS; do
 		if [ "$s" == "M1" ]; then
 			eval_vars $s
@@ -161,20 +161,20 @@ ipaserviceaddb()
 			ssh root@$FULLHOSTNAME "ipa service-add \"$service2\""
 			if [ $? -ne 0 ]
 			then
-				echo "ERROR - ipa service-add failed on $FULLHOSTNAME"
+				message "ERROR - ipa service-add failed on $FULLHOSTNAME"
 				tet_result FAIL
 			fi
 			ssh root@$FULLHOSTNAME "ipa service-find \"$service2\""
 			if [ $? -ne 0 ]
 			then
-				echo "ERROR - ipa service-find failed on $FULLHOSTNAME"
+				message "ERROR - ipa service-find failed on $FULLHOSTNAME"
 				tet_result FAIL
 			fi
 		fi
 	done
 
 	tet_result PASS
-	echo "END $tet_thistest"
+	message "END $tet_thistest"
 
 }
 
@@ -182,7 +182,7 @@ ipaserviceaddb()
 ipaserviceaddc()
 {
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	echo "START $tet_thistest"
+	message "START $tet_thistest"
 	for s in $SERVERS; do
 		if [ "$s" == "M1" ]; then
 			eval_vars $s
@@ -191,7 +191,7 @@ ipaserviceaddc()
 			ssh root@$FULLHOSTNAME "ipa service-add \"$service3\""
 			if [ $? -ne 0 ]
 			then
-				echo "ERROR - ipa service-add failed on $FULLHOSTNAME"
+				message "ERROR - ipa service-add failed on $FULLHOSTNAME"
 				tet_result FAIL
 			fi
 			# Sleeping for 10 seconds to allow addservice to sync
@@ -200,13 +200,13 @@ ipaserviceaddc()
 		ssh root@$FULLHOSTNAME "ipa service-find \"$service3\""
 		if [ $? -ne 0 ]
 		then
-			echo "ERROR - ipa service-find failed on $FULLHOSTNAME"
+			message "ERROR - ipa service-find failed on $FULLHOSTNAME"
 			tet_result FAIL
 		fi
 	done
 
 	tet_result PASS
-	echo "END $tet_thistest"
+	message "END $tet_thistest"
 
 }
 
@@ -216,25 +216,25 @@ ipaserviceaddc()
 negaddserviceb()
 {
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	echo "START $tet_thistest"
+	message "START $tet_thistest"
 	for s in $SERVERS; do
 		if [ "$s" != "M1" ]&&[ "$s" != "" ]; then
 			eval_vars $s
 
-			echo "this step is supposed to fail"
+			message "this step is supposed to fail"
 			# test for ipa service-add
 			ssh root@$FULLHOSTNAME "ipa service-add \"$service2\""
 			ret=$?
 			if [ $ret -eq 0 ]
 			then
-				echo "ERROR - ipa service-add passed when it should not have on $FULLHOSTNAME"
+				message "ERROR - ipa service-add passed when it should not have on $FULLHOSTNAME"
 				tet_result FAIL
 			fi
 		fi
 	done
 
 	tet_result PASS
-	echo "END $tet_thistest"
+	message "END $tet_thistest"
 
 }
 
@@ -244,32 +244,32 @@ negaddserviceb()
 negaddservicec()
 {
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	echo "START $tet_thistest"
+	message "START $tet_thistest"
 	for s in $SERVERS; do
 		if [ "$s" != "M1" ]&&[ "$s" != "" ]; then
 			eval_vars $s
 
-			echo "this step is supposed to fail"
+			message "this step is supposed to fail"
 			# test for ipa service-add
 			ssh root@$FULLHOSTNAME "ipa service-add \"$service3\""
 			ret=$?
 			if [ $ret -eq 0 ]
 			then
-				echo "ERROR - ipa service-add passed when it should not have on $FULLHOSTNAME"
+				message "ERROR - ipa service-add passed when it should not have on $FULLHOSTNAME"
 				tet_result FAIL
 			fi
 		fi
 	done
 
 	tet_result PASS
-	echo "END $tet_thistest"
+	message "END $tet_thistest"
 
 }
 ######################################################################
 ipaservicefinda()
 {
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	echo "START $tet_thistest"
+	message "START $tet_thistest"
 	for s in $SERVERS; do
 		if [ "$s" == "M1" ]; then
 			eval_vars $s
@@ -277,7 +277,7 @@ ipaservicefinda()
 			ssh root@$FULLHOSTNAME "ipa service-find \"$service1\"| grep \"$service1\""
 			if [ $? -ne 0 ]
 			then
-				echo "ERROR - ipa service-find failed on $FULLHOSTNAME"
+				message "ERROR - ipa service-find failed on $FULLHOSTNAME"
 				tet_result FAIL
 			fi
 
@@ -285,14 +285,14 @@ ipaservicefinda()
 	done
 
 	tet_result PASS
-	echo "END $tet_thistest"
+	message "END $tet_thistest"
 
 }
 ######################################################################
 ipaservicefindb()
 {
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	echo "START $tet_thistest"
+	message "START $tet_thistest"
 	for s in $SERVERS; do
 		if [ "$s" == "M1" ]; then
 			eval_vars $s
@@ -300,7 +300,7 @@ ipaservicefindb()
 			ssh root@$FULLHOSTNAME "ipa service-find \"$service2\"| grep \"$service2\""
 			if [ $? -ne 0 ]
 			then
-				echo "ERROR - ipa service-find failed on $FULLHOSTNAME"
+				message "ERROR - ipa service-find failed on $FULLHOSTNAME"
 				tet_result FAIL
 			fi
 
@@ -308,14 +308,14 @@ ipaservicefindb()
 	done
 
 	tet_result PASS
-	echo "END $tet_thistest"
+	message "END $tet_thistest"
 
 }
 ######################################################################
 ipaservicefindc()
 {
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	echo "START $tet_thistest"
+	message "START $tet_thistest"
 	for s in $SERVERS; do
 		if [ "$s" == "M1" ]; then
 			eval_vars $s
@@ -323,7 +323,7 @@ ipaservicefindc()
 			ssh root@$FULLHOSTNAME "ipa service-find \"$service3\"| grep \"$service3\""
 			if [ $? -ne 0 ]
 			then
-				echo "ERROR - ipa service-find failed on $FULLHOSTNAME"
+				message "ERROR - ipa service-find failed on $FULLHOSTNAME"
 				tet_result FAIL
 			fi
 
@@ -331,14 +331,14 @@ ipaservicefindc()
 	done
 
 	tet_result PASS
-	echo "END $tet_thistest"
+	message "END $tet_thistest"
 
 }
 ######################################################################
 ipanegservicefind()
 {
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	echo "START $tet_thistest"
+	message "START $tet_thistest"
 	for s in $SERVERS; do
 		if [ "$s" == "M1" ]; then
 			eval_vars $s
@@ -346,7 +346,7 @@ ipanegservicefind()
 			ssh root@$FULLHOSTNAME "ipa service-find \"badjunk/bad.host.redhat.com\""
 			if [ $? -ne 0 ]
 			then
-				echo "ERROR - ipa service-find failed on $FULLHOSTNAME"
+				message "ERROR - ipa service-find failed on $FULLHOSTNAME"
 				tet_result FAIL
 			fi
 
@@ -354,7 +354,7 @@ ipanegservicefind()
 	done
 
 	tet_result PASS
-	echo "END $tet_thistest"
+	message "END $tet_thistest"
 
 }
 #
@@ -362,7 +362,7 @@ ipanegservicefind()
 ipaservicedel()
 {
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	echo "START $tet_thistest"
+	message "START $tet_thistest"
 	for s in $SERVERS; do
 		if [ "$s" == "M1" ]; then
 			eval_vars $s
@@ -372,14 +372,14 @@ ipaservicedel()
 			ret=$?
 			if [ $ret -ne 0 ]
 			then
-				echo "ERROR - ipa service-del failed on $FULLHOSTNAME"
-				echo "NOTE - This could be related to https://bugzilla.redhat.com/show_bug.cgi?id=498538"
+				message "ERROR - ipa service-del failed on $FULLHOSTNAME"
+				message "NOTE - This could be related to https://bugzilla.redhat.com/show_bug.cgi?id=498538"
 				tet_result FAIL
 			fi
 			ssh root@$FULLHOSTNAME "ipa service-find \"$service1\""
 			if [ $? -eq 0 ]
 			then
-				echo "ERROR - ipa service-find passed when it should not have on $FULLHOSTNAME"
+				message "ERROR - ipa service-find passed when it should not have on $FULLHOSTNAME"
 				tet_result FAIL
 			fi
 
@@ -387,7 +387,7 @@ ipaservicedel()
 	done
 
 	tet_result PASS
-	echo "END $tet_thistest"
+	message "END $tet_thistest"
 
 }
 
@@ -395,7 +395,7 @@ ipaservicedel()
 ipaservicedelb()
 {
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	echo "START $tet_thistest"
+	message "START $tet_thistest"
 	for s in $SERVERS; do
 		if [ "$s" == "M1" ]; then
 			eval_vars $s
@@ -405,13 +405,13 @@ ipaservicedelb()
 			ret=$?
 			if [ $ret -ne 0 ]
 			then
-				echo "ERROR - ipa service-del failed on $FULLHOSTNAME"
+				message "ERROR - ipa service-del failed on $FULLHOSTNAME"
 				tet_result FAIL
 			fi
 			ssh root@$FULLHOSTNAME "ipa service-find \"$service2\""
 			if [ $? -eq 0 ]
 			then
-				echo "ERROR - ipa service-find passed when it should not have on $FULLHOSTNAME"
+				message "ERROR - ipa service-find passed when it should not have on $FULLHOSTNAME"
 				tet_result FAIL
 			fi
 
@@ -419,7 +419,7 @@ ipaservicedelb()
 	done
 
 	tet_result PASS
-	echo "END $tet_thistest"
+	message "END $tet_thistest"
 
 }
 
@@ -427,7 +427,7 @@ ipaservicedelb()
 ipaservicedelc()
 {
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	echo "START $tet_thistest"
+	message "START $tet_thistest"
 	for s in $SERVERS; do
 		if [ "$s" == "M1" ]; then
 			eval_vars $s
@@ -437,13 +437,13 @@ ipaservicedelc()
 			ret=$?
 			if [ $ret -ne 0 ]
 			then
-				echo "ERROR - ipa service-del failed on $FULLHOSTNAME"
+				message "ERROR - ipa service-del failed on $FULLHOSTNAME"
 				tet_result FAIL
 			fi
 			ssh root@$FULLHOSTNAME "ipa service-find \"$service3\""
 			if [ $? -eq 0 ]
 			then
-				echo "ERROR - ipa service-find passed when it should not have on $FULLHOSTNAME"
+				message "ERROR - ipa service-find passed when it should not have on $FULLHOSTNAME"
 				tet_result FAIL
 			fi
 
@@ -451,7 +451,7 @@ ipaservicedelc()
 	done
 
 	tet_result PASS
-	echo "END $tet_thistest"
+	message "END $tet_thistest"
 
 }
 
@@ -459,7 +459,7 @@ ipaservicedelc()
 ipanegservicedel()
 {
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	echo "START $tet_thistest"
+	message "START $tet_thistest"
 	for s in $SERVERS; do
 		if [ "$s" == "M1" ]; then
 			eval_vars $s
@@ -469,13 +469,13 @@ ipanegservicedel()
 			ret=$?
 			if [ $ret -eq 0 ]
 			then
-				echo "ERROR - ipa service-del passed when it should not have on $FULLHOSTNAME"
+				message "ERROR - ipa service-del passed when it should not have on $FULLHOSTNAME"
 				tet_result FAIL
 			fi
 			ssh root@$FULLHOSTNAME "ipa service-find \"$service3\""
 			if [ $? -eq 0 ]
 			then
-				echo "ERROR - ipa service-find passed when it should not have on $FULLHOSTNAME"
+				message "ERROR - ipa service-find passed when it should not have on $FULLHOSTNAME"
 				tet_result FAIL
 			fi
 
@@ -483,7 +483,7 @@ ipanegservicedel()
 	done
 
 	tet_result PASS
-	echo "END $tet_thistest"
+	message "END $tet_thistest"
 
 }
 
@@ -492,7 +492,7 @@ ipanegservicedel()
 ipaservicecleanup()
 {
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	echo "START $tet_thistest"
+	message "START $tet_thistest"
 	for s in $SERVERS; do
 		if [ "$s" == "M1" ]; then
 			eval_vars $s
@@ -502,21 +502,21 @@ ipaservicecleanup()
 			ssh root@$FULLHOSTNAME "ipa host-del \"$host1\""
 			if [ $? -ne 0 ]
 			then
-				echo "ERROR - ipa host-del \"$host1\" failed on $FULLHOSTNAME"
+				message "ERROR - ipa host-del \"$host1\" failed on $FULLHOSTNAME"
 				tet_result FAIL
 			fi
 			# check output
 			ssh root@$FULLHOSTNAME "ipa host-show \"$host1\" | grep 'mountain view, ca'"
 			if [ $? -eq 0 ]
 			then
-				echo "ERROR - ipa host-show \"$host1\" passed when it should not have on $FULLHOSTNAME"
+				message "ERROR - ipa host-show \"$host1\" passed when it should not have on $FULLHOSTNAME"
 				tet_result FAIL
 			fi
 		fi
 	done
 
 	tet_result PASS
-	echo "END $tet_thistest"
+	message "END $tet_thistest"
 
 }
 
@@ -528,7 +528,7 @@ cli_cleanup()
 {
 	tet_thistest="cleanup"
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	echo "START $tet_thistest"
+	message "START $tet_thistest"
 	eval_vars M1
 	code=0
 
@@ -557,7 +557,7 @@ cli_cleanup()
 
 	if [ $code -ne 0 ]
 	then
-		echo "WARNING - $tet_thistest failed... not that it matters"
+		message "WARNING - $tet_thistest failed... not that it matters"
 	fi
 
 	tet_result PASS
