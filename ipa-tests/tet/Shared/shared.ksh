@@ -37,13 +37,9 @@ eval_vars()
 	x=\$REPO_$1
 	REPO=`eval echo $x`
 
-	if [ "$SetupSSHKeys" = "y" ]; then 
-		x=\$PASSWORD_$1
-		PASSWORD=`eval echo $x`
-		export PASSWORD
-	fi
-	
-        export HOSTNAME FULLHOSTNAME OS REPO LDAP_PORT LDAPS_PORT
+	x=\$PASSWORD_$1
+	PASSWORD=`eval echo $x`
+        export HOSTNAME FULLHOSTNAME OS REPO LDAP_PORT LDAPS_PORT PASSWORD
 }
 
 # Runs ntpdate $NTPSERVER on the machine specified in $1
@@ -62,28 +58,38 @@ FixBindServer()
 	eval_vars $1
 
 	# Backing up DNS server config on Server
-	ssh root@$FULLHOSTNAME "cat /etc/named.conf > /etc/named.conf.original; cat /etc/named.conf > /etc/named.conf.new;"
-	if [ $? -ne 0 ]; then
-		echo "ERROR! bind fix failed"
-		tet_result FAIL
-		return $ret
-	fi 
+#	ssh root@$FULLHOSTNAME "cat /etc/named.conf > /etc/named.conf.original; cat /etc/named.conf > /etc/named.conf.new;"
+#	if [ $? -ne 0 ]; then
+#		echo "ERROR! bind fix failed"
+#		tet_result FAIL
+#		return $ret
+#	fi 
 
 	# Put forwarding DNS server into DNS
-	ssh root@$FULLHOSTNAME "sed -i s/dump-file/'forwarders { $DNSMASTER; }; dump-file'/g  /etc/named.conf.new"
-	if [ $? -ne 0 ]; then
-		echo "ERROR! bind fix failed"
-		tet_result FAIL
-		return $ret
-	fi 
+#	ssh root@$FULLHOSTNAME "sed -i s/dump-file/'forwarders { $DNSMASTER; }; dump-file'/g  /etc/named.conf.new"
+#	if [ $? -ne 0 ]; then
+#		echo "ERROR! bind fix failed"
+#		tet_result FAIL
+#		return $ret
+#	fi 
 
 	# Copying new DNS config to it's place on the server, and restarting DNS
-	ssh root@$FULLHOSTNAME "mv /etc/named.conf /etc/named.conf.old;cp /etc/named.conf.new /etc/named.conf;/etc/init.d/named restart"
+#	ssh root@$FULLHOSTNAME "mv /etc/named.conf /etc/named.conf.old;cp /etc/named.conf.new /etc/named.conf;/etc/init.d/named restart"
+#	if [ $? -ne 0 ]; then
+#		echo "ERROR! bind fix failed"
+#		tet_result FAIL
+#		return $ret
+#	fi 
+
+	# Restart bind on M1 in to ensure that everythign is working.
+	eval_vars M1
+	ssh root@$FULLHOSTNAME "/etc/init.d/named restart"
 	if [ $? -ne 0 ]; then
-		echo "ERROR! bind fix failed"
+		echo "ERROR! Restart of bind on $FULLHOSTNAME failed"
 		tet_result FAIL
 		return $ret
 	fi 
+	eval_vars $1
 
 	# Now we need to populate the ldap dns with all of the new server and client ip's 
 	# Add reverse entry of M1 to the DNS server

@@ -432,10 +432,10 @@ SetupServer()
 		echo "setting up server $1 as a master server"
 		if [ $DSTET_DEBUG = y ]; then
 			echo "ipa-server-install -N -U --hostname=$FULLHOSTNAME -r $RELM_NAME -p $DM_ADMIN_PASS -P $KERB_MASTER_PASS -a $DM_ADMIN_PASS -u root --setup-dns"
-			ssh root@$FULLHOSTNAME "ipa-server-install -N -U --hostname=$FULLHOSTNAME -r $RELM_NAME -p $DM_ADMIN_PASS -P $KERB_MASTER_PASS -a $DM_ADMIN_PASS -u root --setup-dns -d"
+			ssh root@$FULLHOSTNAME "ipa-server-install -N -U --hostname=$FULLHOSTNAME -r $RELM_NAME -p $DM_ADMIN_PASS -P $KERB_MASTER_PASS -a $DM_ADMIN_PASS -u root --setup-dns --forwarder=$DNSMASTER -d "
 		else
 			echo "ipa-server-install -N -U --hostname=$FULLHOSTNAME -r $RELM_NAME -p $DM_ADMIN_PASS -P $KERB_MASTER_PASS -a $DM_ADMIN_PASS -u root --setup-dns"
-			ssh root@$FULLHOSTNAME "ipa-server-install -N -U --hostname=$FULLHOSTNAME -r $RELM_NAME -p $DM_ADMIN_PASS -P $KERB_MASTER_PASS -a $DM_ADMIN_PASS -u root --setup-dns"
+			ssh root@$FULLHOSTNAME "ipa-server-install -N -U --hostname=$FULLHOSTNAME -r $RELM_NAME -p $DM_ADMIN_PASS -P $KERB_MASTER_PASS -a $DM_ADMIN_PASS -u root --setup-dns --forwarder=$DNSMASTER"
 
 		fi
 		if [ $? -ne 0 ]; then
@@ -451,11 +451,14 @@ SetupServer()
 				return 1;
 			fi
 		fi
+		message "Restart bind"
+		ssh root@$FULLHOSTNAME "/etc/init.d/named restart"
 		FixBindServer M1
 		if [ $? -ne 0 ]; then
 			echo "ERROR - FixBindServer on $FULLHOSTNAME failed."
 			return 1;
 		fi
+		message "Restart bind"
 	else 
 		echo "setting up server $1 as a replica"
 		replica_hostname=$FULLHOSTNAME
@@ -545,8 +548,13 @@ SetupServerBogus()
 	eval_vars $1
 	echo "ipa-server-install -U --hostname=BOGUSNAME -r BOGUSRELM -p $DM_ADMIN_PASS -P $KERB_MASTER_PASS -a $DM_ADMIN_PASS --setup-dns -u $DS_USER -d"
 	ssh root@$FULLHOSTNAME "ipa-server-install -U --hostname=BOGUSNAME -r BOGUSRELM -p $DM_ADMIN_PASS -P $KERB_MASTER_PASS -a $DM_ADMIN_PASS --setup-dns -u $DS_USER -d"
-	ret=$?
-	if [ $ret -eq 0 ]; then
+	if [ $? -eq 0 ]; then
+		echo "ERROR - ipa-server-install on $FULLHOSTNAME passed when it shouldn't have."
+		return 1;
+	fi
+	echo "This bit should fail because there is no forwarder setup in the dns config"
+	ssh root@$FULLHOSTNAME "ipa-server-install -N -U --hostname=$FULLHOSTNAME -r $RELM_NAME -p $DM_ADMIN_PASS -P $KERB_MASTER_PASS -a $DM_ADMIN_PASS -u root --setup-dns"
+	if [ $? -eq 0 ]; then
 		echo "ERROR - ipa-server-install on $FULLHOSTNAME passed when it shouldn't have."
 		return 1;
 	fi

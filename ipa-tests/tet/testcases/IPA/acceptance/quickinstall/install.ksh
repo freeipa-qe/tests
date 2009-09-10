@@ -111,7 +111,7 @@ tp1()
 			SetupRepo $s
 			ret=$?
 			if [ $ret -ne 0 ]; then
-				echo "Install of server RPM on $s ssh failed"
+				echo "Install of IPA repo on $s ssh failed"
 				tet_result FAIL
 			fi
 		if [ "$DSTET_DEBUG" = "y" ]; then echo "done working on $s"; fi
@@ -123,7 +123,7 @@ tp1()
 			SetupRepo $s
 			ret=$?
 			if [ $ret -ne 0 ]; then
-				echo "Install of server RPM on $s ssh failed"
+				echo "Install of IPA repo on $s ssh failed"
 				tet_result FAIL
 			fi
 		if [ "$DSTET_DEBUG" = "y" ]; then echo "done working on $s"; fi

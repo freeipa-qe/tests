@@ -1886,7 +1886,7 @@ main_print()
 			echo "   HOSTNAME_$s     : $HOSTNAME"
 			echo "   OS_$s           : $OS"
 			echo "   REPO_$s         : $REPO"
-			if [ "$SetupSSHKeys" = "y" ]; then echo "   PASSWORD_$s     : $PASSWORD"; fi
+			echo "   PASSWORD_$s     : $PASSWORD"
 		fi
 	done
 	for s in $CLIENTS; do
@@ -1897,7 +1897,7 @@ main_print()
 			echo "   OS_$s           : $OS"
 			echo "   OS_VER_$s       : $OS_VER"
 			echo "   REPO_$s         : $REPO"
-			if [ "$SetupSSHKeys" = "y" ]; then echo "   PASSWORD_$s     : $PASSWORD"; fi
+			echo "   PASSWORD_$s     : $PASSWORD"
 		fi
 	done
 
