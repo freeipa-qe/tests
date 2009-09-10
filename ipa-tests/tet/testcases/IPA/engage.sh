@@ -2048,7 +2048,7 @@ main_load_init_values()
     fi
 
     if [ $MainAcceptanceTests = y ]; then 
-	. $mainRunBaseDir/acceptance/engage.acceptance
+	. $mainRunBaseDir/acceptance/engage.acceptance.sh
 	acceptance_default 
 	n=`expr $n + 1`
 	TEST_CAT="Acceptance"
