@@ -6,7 +6,7 @@ all
 
 memberof
 	"Starting accept DS install"
-	/memberof.ksh
+	/memberof.sh
 	"Ending accept DS install"
 
 # EOF

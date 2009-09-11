@@ -6,7 +6,7 @@ all
 
 install
 	"Starting accept DS install"
-	/install.ksh
+	/install.sh
 	"Ending accept DS install"
 
 # EOF

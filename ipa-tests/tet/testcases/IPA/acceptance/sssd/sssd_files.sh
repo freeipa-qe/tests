@@ -1,7 +1,7 @@
-#!/bin/ksh
+#!/bin/sh
 
 ######################################################################
-#  File: sssd_files.ksh - acceptance tests for SSSD and Local files
+#  File: sssd_files.sh - acceptance tests for SSSD and Local files
 ######################################################################
 
 if [ "$DSTET_DEBUG" = "y" ]; then
@@ -498,9 +498,9 @@ cleanup()
 }
 
 ##################################################################
-. $TESTING_SHARED/shared.ksh
-. $TESTING_SHARED/sssdlib.ksh
-. $TET_ROOT/lib/ksh/tcm.ksh
+. $TESTING_SHARED/shared.sh
+. $TESTING_SHARED/sssdlib.sh
+. $TET_ROOT/lib/sh/tcm.sh
 
 #EOF
 

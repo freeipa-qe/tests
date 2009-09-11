@@ -1,7 +1,7 @@
-#!/bin/ksh
+#!/bin/sh
 
 ######################################################################
-#  File: sssd.ksh - acceptance tests for SSSD
+#  File: sssd.sh - acceptance tests for SSSD
 ######################################################################
 
 if [ "$DSTET_DEBUG" = "y" ]; then
@@ -161,15 +161,15 @@ sssd_003()
 
         for c in $SSSD_CLIENTS ; do
 		message "Working on $c"
-                ssh root@$c "sss_usermod -s /bin/ksh user1000"
+                ssh root@$c "sss_usermod -s /bin/sh user1000"
                 if [ $? -ne 0 ] ; then
                         message "ERROR: Modifying LOCAL domain user1000.  Return Code: $?"
                         myresult=FAIL
                 else
                         SHELL=`ssh root@$c getent -s sss passwd | grep user1000 | cut -d : -f 7 | cut -d / -f 2`
-                        if [ $SHELL -ne ksh ] ; then
+                        if [ $SHELL -ne sh ] ; then
                                 message "ERROR: user1000: getent failed to return expected shell for LOCAL user.  Return Code: $?"
-				message "Expected: ksh  Got: $SHELL"
+				message "Expected: sh  Got: $SHELL"
                                 myresult=FAIL
                         else
                                 message "LOCAL domain user1000 default shell modified successfully."
@@ -1368,7 +1368,7 @@ sssd_040()
    #    magicPrivateGroups: TRUE
    #    provider: local
    #	[user_defaults]
-   #	defaultShell = /bin/ksh
+   #	defaultShell = /bin/sh
    #    baseDirectory = /export 
    ####################################################################
 
@@ -1437,9 +1437,9 @@ sssd_041()
                 else
                         SHELL=`ssh root@$c getent -s sss passwd | grep user2000 | cut -d : -f 7 | cut -d / -f 3`
 			message "Shell returned is $SHELL"
-                        if [ $SHELL != ksh ] ; then
+                        if [ $SHELL != sh ] ; then
                                 message "ERROR: user2000: getent failed to return expected shell for LOCAL user.  Return Code: $?"
-                                message "Expected: ksh  Got: $SHELL"
+                                message "Expected: sh  Got: $SHELL"
                                 myresult=FAIL
                         else
                                 message "LOCAL domain user2000 default shell is correct."
@@ -1791,8 +1791,8 @@ cleanup()
 }
 
 ##################################################################
-. $TESTING_SHARED/shared.ksh
-. $TESTING_SHARED/sssdlib.ksh
-. $TET_ROOT/lib/ksh/tcm.ksh
+. $TESTING_SHARED/shared.sh
+. $TESTING_SHARED/sssdlib.sh
+. $TET_ROOT/lib/sh/tcm.sh
 
 #EOF

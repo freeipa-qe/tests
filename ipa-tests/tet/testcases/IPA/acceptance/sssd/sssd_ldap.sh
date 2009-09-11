@@ -1,7 +1,7 @@
-#!/bin/ksh
+#!/bin/sh
 
 ######################################################################
-#  File: sssd_ldap.ksh - LDAP BE acceptance tests for SSSD
+#  File: sssd_ldap.sh - LDAP BE acceptance tests for SSSD
 ######################################################################
 
 if [ "$DSTET_DEBUG" = "y" ]; then
@@ -987,9 +987,9 @@ cleanup()
 }
 
 ##################################################################
-. $TESTING_SHARED/shared.ksh
-. $TESTING_SHARED/sssdlib.ksh
-. $TET_ROOT/lib/ksh/tcm.ksh
+. $TESTING_SHARED/shared.sh
+. $TESTING_SHARED/sssdlib.sh
+. $TET_ROOT/lib/sh/tcm.sh
 
 #EOF
 

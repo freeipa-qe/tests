@@ -6,7 +6,7 @@ all
 
 pwpolicy
 	"Starting pwpolicy tests..."
-	/pwpolicy.ksh
+	/pwpolicy.sh
 	"Ending pwpolicy tests..."
 
 # EOF

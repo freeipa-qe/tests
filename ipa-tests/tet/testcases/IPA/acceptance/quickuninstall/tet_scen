@@ -6,7 +6,7 @@ all
 
 uninstall
 	"Starting accept DS uninstall"
-	/uninstall.ksh
+	/uninstall.sh
 	"Ending accept DS uninstall"
 
 # EOF

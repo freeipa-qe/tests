@@ -1,4 +1,4 @@
-#!/bin/ksh
+#!/bin/sh
 if [ "$DSTET_DEBUG" = "y" ]; then
 	set -x
 fi
@@ -348,6 +348,6 @@ instclean()
 
 ######################################################################
 
-. $TESTING_SHARED/instlib.ksh
-. $TESTING_SHARED/shared.ksh
-. $TET_ROOT/lib/ksh/tcm.ksh
+. $TESTING_SHARED/instlib.sh
+. $TESTING_SHARED/shared.sh
+. $TET_ROOT/lib/sh/tcm.sh

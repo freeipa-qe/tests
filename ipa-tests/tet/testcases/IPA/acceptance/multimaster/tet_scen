@@ -6,7 +6,7 @@ all
 
 multimaster
 	"Starting accept DS install"
-	/multimaster.ksh
+	/multimaster.sh
 	"Ending accept DS install"
 
 # EOF

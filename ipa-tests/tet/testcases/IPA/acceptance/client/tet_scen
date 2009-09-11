@@ -6,7 +6,7 @@ all
 
 client
 	"Starting client tests..."
-	/client.ksh
+	/client.sh
 	"Ending client tests..."
 
 # EOF

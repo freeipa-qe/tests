@@ -109,5 +109,5 @@ echo "==========================================================="
 echo "Content of the engage input file :"
 cat $tfile
 echo "==========================================================="
-echo ksh $TESTCASE_ROOT/engage -c $tfile
-ksh $TESTCASE_ROOT/engage -c $tfile
+echo sh $TESTCASE_ROOT/engage -c $tfile
+sh $TESTCASE_ROOT/engage -c $tfile
