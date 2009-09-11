@@ -1,8 +1,8 @@
 #ident "%W% %E%"
 #
-#	File name: run.cli
+#	File name: run.pwpolicy
 #
-#	This file contains the operations specific to the cli tests.
+#	This file contains the operations specific to the pwpolicy tests.
 #	It is targetted to be included by the main script "run" and not be be 
 #	used alone.
 #
@@ -14,95 +14,95 @@
 # -----------------------------------------------------------------------------
 # dd/mm/yy | Author	| Comments
 # -----------------------------------------------------------------------------
-# 05/15/08 | MGregg     | Creation
+# 07/11/08 | MGregg     | Creation from pwpolicy tests
 # -----------------------------------------------------------------------------
 
 # This function will set the default values for the variables needed.
 #
-cli_default()
+pwpolicy_default()
 {
-	if [ -z "$cliRunIt" ]
+	if [ -z "$pwpolicyRunIt" ]
 	then
-		cliRunIt=n
+		pwpolicyRunIt=n
 	fi
 }
 
 # This function will ask the user for more information/choices if needed.
 #
-cli_ask()
+pwpolicy_ask()
 {
 
-	sav_cliRunIt=$cliRunIt
-	echo "    Execute cli test suite [$cliRunIt] ? \c"
+	sav_pwpolicyRunIt=$pwpolicyRunIt
+	echo "    Execute pwpolicy test suite [$pwpolicyRunIt] ? \c"
 	read rsp
 	case $rsp in
-		"")	cliRunIt=$sav_cliRunIt	;;
+		"")	pwpolicyRunIt=$sav_pwpolicyRunIt	;;
 		y|Y)	
-			cliRunIt=y
+			pwpolicyRunIt=y
 			;;
-		*)	cliRunIt=n		;;
+		*)	pwpolicyRunIt=n		;;
 	esac
 
 }
 
 # This function will print the user's choices (aka variables)
 #
-cli_print()
+pwpolicy_print()
 {
-	echo "    Execute cli test suite        : $cliRunIt"
+	echo "    Execute pwpolicy test suite        : $pwpolicyRunIt"
 }
 
 # This function will echo in shell's format the user's choices
 # It is the calling function that will redirect the output to
 # the saved config file.
 #
-cli_save()
+pwpolicy_save()
 {
-	echo "cliRunIt=$cliRunIt"
+	echo "pwpolicyRunIt=$pwpolicyRunIt"
 }
 
 # This function will check that the test suite may be executed
 # It may also perform some kind of pre-configuration of the machine.
 # This function should "exit 1" if there is problem.
 #
-cli_check()
+pwpolicy_check()
 {
 	kgb=kgb
 }
 
 # This function will startup/initiate the test suite
 #
-cli_startup()
+pwpolicy_startup()
 {
 :
 }
 
 # This function will run the test suite
 #
-cli_run()
+pwpolicy_run()
 {
-	if [ $cliRunIt = n ]
+	if [ $pwpolicyRunIt = n ]
 	then
 		return
 	fi
-	echo "cli run..."
-	echo "$TET_ROOT/$MainTccName -e -s $TET_ROOT/testcases/IPA/acceptance/cli/tet_scen.sh -x $TET_ROOT/testcases/IPA/tetexecpl.cfg $TET_ROOT/testcases/IPA/acceptance/cli cli"
+	echo "pwpolicy run..."
+	echo "$TET_ROOT/$MainTccName -e -s $TET_ROOT/testcases/IPA/acceptance/pwpolicy/tet_scen -x $TET_ROOT/testcases/IPA/tetexecpl.cfg $TET_ROOT/testcases/IPA/acceptance/pwpolicy pwpolicy"
 
 	(
 	$TET_ROOT/$MainTccName \
-		-e -s $TET_ROOT/testcases/IPA/acceptance/cli/tet_scen.sh \
+		-e -s $TET_ROOT/testcases/IPA/acceptance/pwpolicy/tet_scen \
 		-x $TET_ROOT/testcases/IPA/tetexecpl.cfg \
-		$TET_ROOT/testcases/IPA/acceptance/cli \
-		cli > $MainTmpDir/cli.run.out 2>&1
+		$TET_ROOT/testcases/IPA/acceptance/pwpolicy \
+		pwpolicy > $MainTmpDir/pwpolicy.run.out 2>&1
 	)&
-	EngageTimer $! 1200 120 # wait 1200 sec before kill, then 1200 until kill -9
+	EngageTimer $! 3200 120 # wait 3200 sec before kill, then 1200 until kill -9
 	echo ""
-	echo "cli run $MainTmpDir/cli.run.out"
+	echo "pwpolicy run $MainTmpDir/pwpolicy.run.out"
 	echo ""
-	cat $MainTmpDir/cli.run.out
+	cat $MainTmpDir/pwpolicy.run.out
 	echo ""
-	main_analyze "cli run" `grep "tcc: journal file is" $MainTmpDir/cli.run.out | awk '{print $5}'` $MainTmpDir/cli.run.out
-	MainReportFiles="$MainReportFiles $MainTmpDir/cli.run.out"
+	main_analyze "pwpolicy run" `grep "tcc: journal file is" $MainTmpDir/pwpolicy.run.out | awk '{print $5}'` $MainTmpDir/pwpolicy.run.out
+	MainReportFiles="$MainReportFiles $MainTmpDir/pwpolicy.run.out"
 
 	Gfile="$TET_TMP_DIR/global_src_`uname -n`"
 	rm -f $Gfile
@@ -110,7 +110,7 @@ cli_run()
 
 # This function will cleanup after the test suite execution
 #
-cli_cleanup()
+pwpolicy_cleanup()
 {
 :
 }

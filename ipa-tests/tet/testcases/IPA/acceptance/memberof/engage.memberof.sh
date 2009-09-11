@@ -1,8 +1,8 @@
 #ident "%W% %E%"
 #
-#	File name: run.cli
+#	File name: run.memberof
 #
-#	This file contains the operations specific to the cli tests.
+#	This file contains the operations specific to the memberof tests.
 #	It is targetted to be included by the main script "run" and not be be 
 #	used alone.
 #
@@ -19,90 +19,90 @@
 
 # This function will set the default values for the variables needed.
 #
-cli_default()
+memberof_default()
 {
-	if [ -z "$cliRunIt" ]
+	if [ -z "$memberofRunIt" ]
 	then
-		cliRunIt=n
+		memberofRunIt=n
 	fi
 }
 
 # This function will ask the user for more information/choices if needed.
 #
-cli_ask()
+memberof_ask()
 {
 
-	sav_cliRunIt=$cliRunIt
-	echo "    Execute cli test suite [$cliRunIt] ? \c"
+	sav_memberofRunIt=$memberofRunIt
+	echo "    Execute memberof test suite [$memberofRunIt] ? \c"
 	read rsp
 	case $rsp in
-		"")	cliRunIt=$sav_cliRunIt	;;
+		"")	memberofRunIt=$sav_memberofRunIt	;;
 		y|Y)	
-			cliRunIt=y
+			memberofRunIt=y
 			;;
-		*)	cliRunIt=n		;;
+		*)	memberofRunIt=n		;;
 	esac
 
 }
 
 # This function will print the user's choices (aka variables)
 #
-cli_print()
+memberof_print()
 {
-	echo "    Execute cli test suite        : $cliRunIt"
+	echo "    Execute memberof test suite        : $memberofRunIt"
 }
 
 # This function will echo in shell's format the user's choices
 # It is the calling function that will redirect the output to
 # the saved config file.
 #
-cli_save()
+memberof_save()
 {
-	echo "cliRunIt=$cliRunIt"
+	echo "memberofRunIt=$memberofRunIt"
 }
 
 # This function will check that the test suite may be executed
 # It may also perform some kind of pre-configuration of the machine.
 # This function should "exit 1" if there is problem.
 #
-cli_check()
+memberof_check()
 {
 	kgb=kgb
 }
 
 # This function will startup/initiate the test suite
 #
-cli_startup()
+memberof_startup()
 {
 :
 }
 
 # This function will run the test suite
 #
-cli_run()
+memberof_run()
 {
-	if [ $cliRunIt = n ]
+	if [ $memberofRunIt = n ]
 	then
 		return
 	fi
-	echo "cli run..."
-	echo "$TET_ROOT/$MainTccName -e -s $TET_ROOT/testcases/IPA/acceptance/cli/tet_scen.sh -x $TET_ROOT/testcases/IPA/tetexecpl.cfg $TET_ROOT/testcases/IPA/acceptance/cli cli"
+	echo "memberof run..."
+	echo "$TET_ROOT/$MainTccName -e -s $TET_ROOT/testcases/IPA/acceptance/memberof/tet_scen -x $TET_ROOT/testcases/IPA/tetexecpl.cfg $TET_ROOT/testcases/IPA/acceptance/memberof memberof"
 
 	(
 	$TET_ROOT/$MainTccName \
-		-e -s $TET_ROOT/testcases/IPA/acceptance/cli/tet_scen.sh \
+		-e -s $TET_ROOT/testcases/IPA/acceptance/memberof/tet_scen \
 		-x $TET_ROOT/testcases/IPA/tetexecpl.cfg \
-		$TET_ROOT/testcases/IPA/acceptance/cli \
-		cli > $MainTmpDir/cli.run.out 2>&1
+		$TET_ROOT/testcases/IPA/acceptance/memberof \
+		memberof > $MainTmpDir/memberof.startup.out 2>&1
 	)&
-	EngageTimer $! 1200 120 # wait 1200 sec before kill, then 1200 until kill -9
+	EngageTimer $! 2100 120 # wait 2100 sec before kill, then 120 until kill -9
 	echo ""
-	echo "cli run $MainTmpDir/cli.run.out"
+	echo "memberof startup $MainTmpDir/memberof.startup.out"
 	echo ""
-	cat $MainTmpDir/cli.run.out
+	cat $MainTmpDir/memberof.startup.out
 	echo ""
-	main_analyze "cli run" `grep "tcc: journal file is" $MainTmpDir/cli.run.out | awk '{print $5}'` $MainTmpDir/cli.run.out
-	MainReportFiles="$MainReportFiles $MainTmpDir/cli.run.out"
+	main_analyze "memberof startup" `grep "tcc: journal file is" $MainTmpDir/memberof.startup.out | awk '{print $5}'` $MainTmpDir/memberof.startup.out
+	MainReportFiles="$MainReportFiles $MainTmpDir/memberof.startup.out"
 
 	Gfile="$TET_TMP_DIR/global_src_`uname -n`"
 	rm -f $Gfile
@@ -110,7 +110,7 @@ cli_run()
 
 # This function will cleanup after the test suite execution
 #
-cli_cleanup()
+memberof_cleanup()
 {
 :
 }

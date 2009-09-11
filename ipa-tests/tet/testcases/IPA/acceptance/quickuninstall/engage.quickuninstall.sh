@@ -1,116 +1,102 @@
 #ident "%W% %E%"
 #
-#	File name: run.cli
+#	File name: run.quickuninstall
 #
-#	This file contains the operations specific to the cli tests.
+#	This file contains the operations specific to the quickuninstall tests.
 #	It is targetted to be included by the main script "run" and not be be 
 #	used alone.
 #
 #	Replace the "xyz" by your name (e.g. "schema") and "Xyz" by your
 #	name (e.g. "Schema").
 #
+#	Created by Jean-Luc SCHWING - SUN Microsystems :
+#		Thu Jul  1 14:47:28 PDT 1999
 #
 #	History
 # -----------------------------------------------------------------------------
 # dd/mm/yy | Author	| Comments
 # -----------------------------------------------------------------------------
-# 05/15/08 | MGregg     | Creation
+# 01/07/99 | JL SCHWING	| Creation.
 # -----------------------------------------------------------------------------
 
 # This function will set the default values for the variables needed.
 #
-cli_default()
+quickuninstall_default()
 {
-	if [ -z "$cliRunIt" ]
+	if [ -z "$QuickUninstallRunIt" ]
 	then
-		cliRunIt=n
+		QuickUninstallRunIt=n
 	fi
 }
 
 # This function will ask the user for more information/choices if needed.
 #
-cli_ask()
+quickuninstall_ask()
 {
-
-	sav_cliRunIt=$cliRunIt
-	echo "    Execute cli test suite [$cliRunIt] ? \c"
+	sav_QuickUninstallRunIt=$QuickUninstallRunIt
+	echo "    Execute quickuninstall test suite [$QuickUninstallRunIt] ? \c"
 	read rsp
 	case $rsp in
-		"")	cliRunIt=$sav_cliRunIt	;;
-		y|Y)	
-			cliRunIt=y
-			;;
-		*)	cliRunIt=n		;;
+		"")	QuickUninstallRunIt=$sav_QuickUninstallRunIt	;;
+		y|Y)	QuickUninstallRunIt=y ;;
+		*)	QuickUninstallRunIt=n		;;
 	esac
 
 }
 
 # This function will print the user's choices (aka variables)
 #
-cli_print()
+quickuninstall_print()
 {
-	echo "    Execute cli test suite        : $cliRunIt"
+	echo "    Execute quickuninstall test suite        : $QuickUninstallRunIt"
 }
 
 # This function will echo in shell's format the user's choices
 # It is the calling function that will redirect the output to
 # the saved config file.
 #
-cli_save()
+quickuninstall_save()
 {
-	echo "cliRunIt=$cliRunIt"
+	echo "QuickUninstallRunIt=$QuickUninstallRunIt"
 }
 
 # This function will check that the test suite may be executed
 # It may also perform some kind of pre-configuration of the machine.
 # This function should "exit 1" if there is problem.
 #
-cli_check()
+quickuninstall_check()
 {
 	kgb=kgb
 }
 
 # This function will startup/initiate the test suite
 #
-cli_startup()
+quickuninstall_startup()
 {
 :
 }
 
 # This function will run the test suite
 #
-cli_run()
+quickuninstall_run()
 {
-	if [ $cliRunIt = n ]
+	if [ $QuickUninstallRunIt = n ]
 	then
 		return
 	fi
-	echo "cli run..."
-	echo "$TET_ROOT/$MainTccName -e -s $TET_ROOT/testcases/IPA/acceptance/cli/tet_scen.sh -x $TET_ROOT/testcases/IPA/tetexecpl.cfg $TET_ROOT/testcases/IPA/acceptance/cli cli"
-
-	(
+	echo "QuickUninstall run..."
 	$TET_ROOT/$MainTccName \
-		-e -s $TET_ROOT/testcases/IPA/acceptance/cli/tet_scen.sh \
+		-e -s $TET_ROOT/testcases/IPA/acceptance/quickuninstall/tet_scen.sh \
 		-x $TET_ROOT/testcases/IPA/tetexecpl.cfg \
-		$TET_ROOT/testcases/IPA/acceptance/cli \
-		cli > $MainTmpDir/cli.run.out 2>&1
-	)&
-	EngageTimer $! 1200 120 # wait 1200 sec before kill, then 1200 until kill -9
-	echo ""
-	echo "cli run $MainTmpDir/cli.run.out"
-	echo ""
-	cat $MainTmpDir/cli.run.out
-	echo ""
-	main_analyze "cli run" `grep "tcc: journal file is" $MainTmpDir/cli.run.out | awk '{print $5}'` $MainTmpDir/cli.run.out
-	MainReportFiles="$MainReportFiles $MainTmpDir/cli.run.out"
-
-	Gfile="$TET_TMP_DIR/global_src_`uname -n`"
-	rm -f $Gfile
+		$TET_ROOT/testcases/IPA/acceptance/quickuninstall \
+		uninstall > $MainTmpDir/quickuninstall.cleanup.out 2>&1
+	main_analyze "QuickUninstall cleanup" `grep "tcc: journal file is" $MainTmpDir/quickuninstall.cleanup.out | awk '{print $5}'` $MainTmpDir/quickuninstall.cleanup.out
+	MainReportFiles="$MainReportFiles $MainTmpDir/quickuninstall.cleanup.out"
 }
 
 # This function will cleanup after the test suite execution
 #
-cli_cleanup()
+quickuninstall_cleanup()
 {
 :
 }

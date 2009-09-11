@@ -400,7 +400,7 @@ main_analyze()
 	then
 		# Initiates the tet_scen file
 		#
-		maTetScen=`dirname $maJournal`/tet_scen
+		maTetScen=`dirname $maJournal`/tet_scen.sh
 		rm -f $maTetScen
 		echo "all"					>> $maTetScen
 		echo "\t\"Starting replay of $maTestSuite\""	>> $maTetScen

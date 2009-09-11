@@ -1,8 +1,8 @@
 #ident "%W% %E%"
 #
-#	File name: run.cli
+#	File name: run.sssd
 #
-#	This file contains the operations specific to the cli tests.
+#	This file contains the operations specific to the sssd tests.
 #	It is targetted to be included by the main script "run" and not be be 
 #	used alone.
 #
@@ -14,95 +14,95 @@
 # -----------------------------------------------------------------------------
 # dd/mm/yy | Author	| Comments
 # -----------------------------------------------------------------------------
-# 05/15/08 | MGregg     | Creation
+# 07/15/09 | JGalipea     | Creation
 # -----------------------------------------------------------------------------
 
 # This function will set the default values for the variables needed.
 #
-cli_default()
+sssd_default()
 {
-	if [ -z "$cliRunIt" ]
+	if [ -z "$sssdRunIt" ]
 	then
-		cliRunIt=n
+		sssdRunIt=n
 	fi
 }
 
 # This function will ask the user for more information/choices if needed.
 #
-cli_ask()
+sssd_ask()
 {
 
-	sav_cliRunIt=$cliRunIt
-	echo "    Execute cli test suite [$cliRunIt] ? \c"
+	sav_sssdRunIt=$sssdRunIt
+	echo "    Execute sssd test suite [$sssdRunIt] ? \c"
 	read rsp
 	case $rsp in
-		"")	cliRunIt=$sav_cliRunIt	;;
+		"")	sssdRunIt=$sav_sssdRunIt	;;
 		y|Y)	
-			cliRunIt=y
+			sssdRunIt=y
 			;;
-		*)	cliRunIt=n		;;
+		*)	sssdRunIt=n		;;
 	esac
 
 }
 
 # This function will print the user's choices (aka variables)
 #
-cli_print()
+sssd_print()
 {
-	echo "    Execute cli test suite        : $cliRunIt"
+	echo "    Execute sssd test suite        : $sssdRunIt"
 }
 
 # This function will echo in shell's format the user's choices
 # It is the calling function that will redirect the output to
 # the saved config file.
 #
-cli_save()
+sssd_save()
 {
-	echo "cliRunIt=$cliRunIt"
+	echo "sssdRunIt=$sssdRunIt"
 }
 
 # This function will check that the test suite may be executed
 # It may also perform some kind of pre-configuration of the machine.
 # This function should "exit 1" if there is problem.
 #
-cli_check()
+sssd_check()
 {
 	kgb=kgb
 }
 
 # This function will startup/initiate the test suite
 #
-cli_startup()
+sssd_startup()
 {
 :
 }
 
 # This function will run the test suite
 #
-cli_run()
+sssd_run()
 {
-	if [ $cliRunIt = n ]
+	if [ $sssdRunIt = n ]
 	then
 		return
 	fi
-	echo "cli run..."
-	echo "$TET_ROOT/$MainTccName -e -s $TET_ROOT/testcases/IPA/acceptance/cli/tet_scen.sh -x $TET_ROOT/testcases/IPA/tetexecpl.cfg $TET_ROOT/testcases/IPA/acceptance/cli cli"
+	echo "sssd run..."
+	echo "$TET_ROOT/$MainTccName -e -s $TET_ROOT/testcases/IPA/acceptance/sssd/tet_scen -x $TET_ROOT/testcases/IPA/tetexecpl.cfg $TET_ROOT/testcases/IPA/acceptance/sssd sssd"
 
 	(
 	$TET_ROOT/$MainTccName \
-		-e -s $TET_ROOT/testcases/IPA/acceptance/cli/tet_scen.sh \
+		-e -s $TET_ROOT/testcases/IPA/acceptance/sssd/tet_scen \
 		-x $TET_ROOT/testcases/IPA/tetexecpl.cfg \
-		$TET_ROOT/testcases/IPA/acceptance/cli \
-		cli > $MainTmpDir/cli.run.out 2>&1
+		$TET_ROOT/testcases/IPA/acceptance/sssd \
+		sssd > $MainTmpDir/sssd.run.out 2>&1
 	)&
 	EngageTimer $! 1200 120 # wait 1200 sec before kill, then 1200 until kill -9
 	echo ""
-	echo "cli run $MainTmpDir/cli.run.out"
+	echo "sssd run $MainTmpDir/sssd.run.out"
 	echo ""
-	cat $MainTmpDir/cli.run.out
+	cat $MainTmpDir/sssd.run.out
 	echo ""
-	main_analyze "cli run" `grep "tcc: journal file is" $MainTmpDir/cli.run.out | awk '{print $5}'` $MainTmpDir/cli.run.out
-	MainReportFiles="$MainReportFiles $MainTmpDir/cli.run.out"
+	main_analyze "sssd run" `grep "tcc: journal file is" $MainTmpDir/sssd.run.out | awk '{print $5}'` $MainTmpDir/sssd.run.out
+	MainReportFiles="$MainReportFiles $MainTmpDir/sssd.run.out"
 
 	Gfile="$TET_TMP_DIR/global_src_`uname -n`"
 	rm -f $Gfile
@@ -110,7 +110,7 @@ cli_run()
 
 # This function will cleanup after the test suite execution
 #
-cli_cleanup()
+sssd_cleanup()
 {
 :
 }

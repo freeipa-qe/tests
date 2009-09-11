@@ -1,8 +1,8 @@
 #ident "%W% %E%"
 #
-#	File name: run.cli
+#	File name: run.client
 #
-#	This file contains the operations specific to the cli tests.
+#	This file contains the operations specific to the client tests.
 #	It is targetted to be included by the main script "run" and not be be 
 #	used alone.
 #
@@ -14,95 +14,95 @@
 # -----------------------------------------------------------------------------
 # dd/mm/yy | Author	| Comments
 # -----------------------------------------------------------------------------
-# 05/15/08 | MGregg     | Creation
+# 10/2/08 | MGregg     | Creation
 # -----------------------------------------------------------------------------
 
 # This function will set the default values for the variables needed.
 #
-cli_default()
+client_default()
 {
-	if [ -z "$cliRunIt" ]
+	if [ -z "$clientRunIt" ]
 	then
-		cliRunIt=n
+		clientRunIt=n
 	fi
 }
 
 # This function will ask the user for more information/choices if needed.
 #
-cli_ask()
+client_ask()
 {
 
-	sav_cliRunIt=$cliRunIt
-	echo "    Execute cli test suite [$cliRunIt] ? \c"
+	sav_clientRunIt=$clientRunIt
+	echo "    Execute client test suite [$clientRunIt] ? \c"
 	read rsp
 	case $rsp in
-		"")	cliRunIt=$sav_cliRunIt	;;
+		"")	clientRunIt=$sav_clientRunIt	;;
 		y|Y)	
-			cliRunIt=y
+			clientRunIt=y
 			;;
-		*)	cliRunIt=n		;;
+		*)	clientRunIt=n		;;
 	esac
 
 }
 
 # This function will print the user's choices (aka variables)
 #
-cli_print()
+client_print()
 {
-	echo "    Execute cli test suite        : $cliRunIt"
+	echo "    Execute client test suite        : $clientRunIt"
 }
 
 # This function will echo in shell's format the user's choices
 # It is the calling function that will redirect the output to
 # the saved config file.
 #
-cli_save()
+client_save()
 {
-	echo "cliRunIt=$cliRunIt"
+	echo "clientRunIt=$clientRunIt"
 }
 
 # This function will check that the test suite may be executed
 # It may also perform some kind of pre-configuration of the machine.
 # This function should "exit 1" if there is problem.
 #
-cli_check()
+client_check()
 {
 	kgb=kgb
 }
 
 # This function will startup/initiate the test suite
 #
-cli_startup()
+client_startup()
 {
 :
 }
 
 # This function will run the test suite
 #
-cli_run()
+client_run()
 {
-	if [ $cliRunIt = n ]
+	if [ $clientRunIt = n ]
 	then
 		return
 	fi
-	echo "cli run..."
-	echo "$TET_ROOT/$MainTccName -e -s $TET_ROOT/testcases/IPA/acceptance/cli/tet_scen.sh -x $TET_ROOT/testcases/IPA/tetexecpl.cfg $TET_ROOT/testcases/IPA/acceptance/cli cli"
+	echo "client run..."
+	echo "$TET_ROOT/$MainTccName -e -s $TET_ROOT/testcases/IPA/acceptance/client/tet_scen -x $TET_ROOT/testcases/IPA/tetexecpl.cfg $TET_ROOT/testcases/IPA/acceptance/client client"
 
 	(
 	$TET_ROOT/$MainTccName \
-		-e -s $TET_ROOT/testcases/IPA/acceptance/cli/tet_scen.sh \
+		-e -s $TET_ROOT/testcases/IPA/acceptance/client/tet_scen \
 		-x $TET_ROOT/testcases/IPA/tetexecpl.cfg \
-		$TET_ROOT/testcases/IPA/acceptance/cli \
-		cli > $MainTmpDir/cli.run.out 2>&1
+		$TET_ROOT/testcases/IPA/acceptance/client \
+		client > $MainTmpDir/client.run.out 2>&1
 	)&
 	EngageTimer $! 1200 120 # wait 1200 sec before kill, then 1200 until kill -9
 	echo ""
-	echo "cli run $MainTmpDir/cli.run.out"
+	echo "client run $MainTmpDir/client.run.out"
 	echo ""
-	cat $MainTmpDir/cli.run.out
+	cat $MainTmpDir/client.run.out
 	echo ""
-	main_analyze "cli run" `grep "tcc: journal file is" $MainTmpDir/cli.run.out | awk '{print $5}'` $MainTmpDir/cli.run.out
-	MainReportFiles="$MainReportFiles $MainTmpDir/cli.run.out"
+	main_analyze "client run" `grep "tcc: journal file is" $MainTmpDir/client.run.out | awk '{print $5}'` $MainTmpDir/client.run.out
+	MainReportFiles="$MainReportFiles $MainTmpDir/client.run.out"
 
 	Gfile="$TET_TMP_DIR/global_src_`uname -n`"
 	rm -f $Gfile
@@ -110,7 +110,7 @@ cli_run()
 
 # This function will cleanup after the test suite execution
 #
-cli_cleanup()
+client_cleanup()
 {
 :
 }

@@ -1,8 +1,8 @@
 #ident "%W% %E%"
 #
-#	File name: run.cli
+#	File name: run.multimaster
 #
-#	This file contains the operations specific to the cli tests.
+#	This file contains the operations specific to the multimaster tests.
 #	It is targetted to be included by the main script "run" and not be be 
 #	used alone.
 #
@@ -19,90 +19,87 @@
 
 # This function will set the default values for the variables needed.
 #
-cli_default()
+multimaster_default()
 {
-	if [ -z "$cliRunIt" ]
+	if [ -z "$multimasterRunIt" ]
 	then
-		cliRunIt=n
+		multimasterRunIt=n
 	fi
 }
 
 # This function will ask the user for more information/choices if needed.
 #
-cli_ask()
+multimaster_ask()
 {
 
-	sav_cliRunIt=$cliRunIt
-	echo "    Execute cli test suite [$cliRunIt] ? \c"
+	sav_multimasterRunIt=$multimasterRunIt
+	echo "    Execute multimaster test suite [$multimasterRunIt] ? \c"
 	read rsp
 	case $rsp in
-		"")	cliRunIt=$sav_cliRunIt	;;
+		"")	multimasterRunIt=$sav_multimasterRunIt	;;
 		y|Y)	
-			cliRunIt=y
+			multimasterRunIt=y
 			;;
-		*)	cliRunIt=n		;;
+		*)	multimasterRunIt=n		;;
 	esac
 
 }
 
 # This function will print the user's choices (aka variables)
 #
-cli_print()
+multimaster_print()
 {
-	echo "    Execute cli test suite        : $cliRunIt"
+	echo "    Execute multimaster test suite        : $multimasterRunIt"
 }
 
 # This function will echo in shell's format the user's choices
 # It is the calling function that will redirect the output to
 # the saved config file.
 #
-cli_save()
+multimaster_save()
 {
-	echo "cliRunIt=$cliRunIt"
+	echo "multimasterRunIt=$multimasterRunIt"
 }
 
 # This function will check that the test suite may be executed
 # It may also perform some kind of pre-configuration of the machine.
 # This function should "exit 1" if there is problem.
 #
-cli_check()
+multimaster_check()
 {
 	kgb=kgb
 }
 
 # This function will startup/initiate the test suite
 #
-cli_startup()
+multimaster_startup()
 {
 :
 }
 
 # This function will run the test suite
 #
-cli_run()
+multimaster_run()
 {
-	if [ $cliRunIt = n ]
+	if [ $multimasterRunIt = n ]
 	then
 		return
 	fi
-	echo "cli run..."
-	echo "$TET_ROOT/$MainTccName -e -s $TET_ROOT/testcases/IPA/acceptance/cli/tet_scen.sh -x $TET_ROOT/testcases/IPA/tetexecpl.cfg $TET_ROOT/testcases/IPA/acceptance/cli cli"
+	echo "multimaster run..."
+	echo "$TET_ROOT/$MainTccName -e -s $TET_ROOT/testcases/IPA/acceptance/multimaster/tet_scen -x $TET_ROOT/testcases/IPA/tetexecpl.cfg $TET_ROOT/testcases/IPA/acceptance/multimaster multimaster"
 
-	(
 	$TET_ROOT/$MainTccName \
-		-e -s $TET_ROOT/testcases/IPA/acceptance/cli/tet_scen.sh \
+		-e -s $TET_ROOT/testcases/IPA/acceptance/multimaster/tet_scen \
 		-x $TET_ROOT/testcases/IPA/tetexecpl.cfg \
-		$TET_ROOT/testcases/IPA/acceptance/cli \
-		cli > $MainTmpDir/cli.run.out 2>&1
-	)&
-	EngageTimer $! 1200 120 # wait 1200 sec before kill, then 1200 until kill -9
+		$TET_ROOT/testcases/IPA/acceptance/multimaster \
+		multimaster > $MainTmpDir/multimaster.startup.out 2>&1
 	echo ""
-	echo "cli run $MainTmpDir/cli.run.out"
+	echo "multimaster startup $MainTmpDir/multimaster.startup.out"
 	echo ""
-	cat $MainTmpDir/cli.run.out
+	cat $MainTmpDir/multimaster.startup.out
 	echo ""
-	main_analyze "cli run" `grep "tcc: journal file is" $MainTmpDir/cli.run.out | awk '{print $5}'` $MainTmpDir/cli.run.out
-	MainReportFiles="$MainReportFiles $MainTmpDir/cli.run.out"
+	main_analyze "multimaster startup" `grep "tcc: journal file is" $MainTmpDir/multimaster.startup.out | awk '{print $5}'` $MainTmpDir/multimaster.startup.out
+	MainReportFiles="$MainReportFiles $MainTmpDir/multimaster.startup.out"
 
 	Gfile="$TET_TMP_DIR/global_src_`uname -n`"
 	rm -f $Gfile
@@ -110,7 +107,7 @@ cli_run()
 
 # This function will cleanup after the test suite execution
 #
-cli_cleanup()
+multimaster_cleanup()
 {
 :
 }
