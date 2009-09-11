@@ -6,17 +6,15 @@ all
 
 cli
 	"Starting cli tests..."
-	/usercli.ksh
-	/acicli.ksh
-   	/groupcli.ksh
-   	/hostcli.ksh
-	/hostgrpcli.ksh
-   	/netgroupcli.ksh
-  	/delegationcli.ksh
-	/servicecli.ksh
+	/usercli.sh
+	/acicli.sh
+  	/groupcli.sh
+   	/hostcli.sh
+	/hostgrpcli.sh
+	/netgroupcli.sh
+  	/delegationcli.sh
+	/servicecli.sh
 
-#   	/automountcli.ksh
-#   	/applicationcli.ksh
 	"Ending cli tests..."
 
 # EOF
