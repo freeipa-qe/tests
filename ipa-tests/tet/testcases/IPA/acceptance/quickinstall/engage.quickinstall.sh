@@ -115,11 +115,11 @@ quickinstall_run()
 		return
 	fi
 	echo "quickinstall run..."
-	echo "$TET_ROOT/$MainTccName -e -s $TET_ROOT/testcases/IPA/acceptance/quickinstall/tet_scen -x $TET_ROOT/testcases/IPA/tetexecpl.cfg $TET_ROOT/testcases/IPA/acceptance/quickinstall install"
+	echo "$TET_ROOT/$MainTccName -e -s $TET_ROOT/testcases/IPA/acceptance/quickinstall/tet_scen.sh -x $TET_ROOT/testcases/IPA/tetexecpl.cfg $TET_ROOT/testcases/IPA/acceptance/quickinstall install"
 
 	(
 	$TET_ROOT/$MainTccName \
-		-e -s $TET_ROOT/testcases/IPA/acceptance/quickinstall/tet_scen \
+		-e -s $TET_ROOT/testcases/IPA/acceptance/quickinstall/tet_scen.sh \
 		-x $TET_ROOT/testcases/IPA/tetexecpl.cfg \
 		$TET_ROOT/testcases/IPA/acceptance/quickinstall \
 		install > $MainTmpDir/quickinstall.startup.out 2>&1

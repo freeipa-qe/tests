@@ -1,4 +1,4 @@
-#!/bin/ksh
+#!/bin/sh
 
 ######################################################################
 # The following ipa cli commands needs to be tested:
@@ -1079,7 +1079,7 @@ bug499731()
 
 ######################################################################
 #
-. $TESTING_SHARED/instlib.ksh
-. $TESTING_SHARED/shared.ksh
-. $TET_ROOT/lib/ksh/tcm.ksh
+. $TESTING_SHARED/instlib.sh
+. $TESTING_SHARED/shared.sh
+. $TET_ROOT/lib/sh/tcm.sh
 
