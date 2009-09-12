@@ -20,32 +20,32 @@ tp1()
 {
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 	# Kinit everywhere
-	echo "START $tet_thistest"
+	message "START $tet_thistest"
 	for s in $SERVERS; do
 		if [ "$s" != "" ]; then
-			echo "kiniting as $DS_USER, password $DM_ADMIN_PASS on $s"
+			message "kiniting as $DS_USER, password $DM_ADMIN_PASS on $s"
 			KinitAs $s $DS_USER $DM_ADMIN_PASS
 			if [ $? -ne 0 ]; then
-				echo "ERROR - kinit on $s failed"
+				message "ERROR - kinit on $s failed"
 				tet_result FAIL
 			fi
 		else
-			echo "skipping $s"
+			message "skipping $s"
 		fi
 	done
 	for s in $CLIENTS; do
 		if [ "$s" != "" ]; then
-			echo "kiniting as $DS_USER, password $DM_ADMIN_PASS on $s"
+			message "kiniting as $DS_USER, password $DM_ADMIN_PASS on $s"
 			KinitAs $s $DS_USER $DM_ADMIN_PASS
 			if [ $? -ne 0 ]; then
-				echo "ERROR - kinit on $s failed"
+				message "ERROR - kinit on $s failed"
 				tet_result FAIL
 			fi
 		fi
 	done
 
 	tet_result PASS
-	echo "END $tet_thistest"
+	message "END $tet_thistest"
 }
 ######################################################################
 
@@ -56,31 +56,31 @@ tp1()
 tp2()
 {
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	echo "START $tet_thistest"
+	message "START $tet_thistest"
 
 	eval_vars M1
 	superuserfirst=firstnamef
 	superuserlast=lastnameg
 	ssh root@$FULLHOSTNAME "ipa user-add --first=$superuserfirst --last=$superuserlast $user1"
 	if [ $? -ne 0 ]; then
-		echo "ERROR - ipa user-add failed on $FULLHOSTNAME"
+		message "ERROR - ipa user-add failed on $FULLHOSTNAME"
 		tet_result FAIL
 	fi
 
 	SetUserPassword M1 $user1 pw
 	if [ $? -ne 0 ]; then
-		echo "ERROR - SetUserPassword failed on $FULLHOSTNAME"
+		message "ERROR - SetUserPassword failed on $FULLHOSTNAME"
 		tet_result FAIL
 	fi
 
 	KinitAsFirst M1 $user1 pw $user1pw
 	if [ $? -ne 0 ]; then
-		echo "ERROR - kinit failed on $FULLHOSTNAME"
+		message "ERROR - kinit failed on $FULLHOSTNAME"
 		tet_result FAIL
 	fi
 
 	tet_result PASS
-	echo "END $tet_thistest"
+	message "END $tet_thistest"
 }
 
 ######################################################################
@@ -89,7 +89,7 @@ tp2()
 tp3()
 {
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	echo "START $tet_thistest"
+	message "START $tet_thistest"
 	# Populate file in M1 to check with
 	eval_vars M1
 	srvhostname=$FULLHOSTNAME
@@ -97,7 +97,7 @@ tp3()
 	ssh root@$FULLHOSTNAME "touch /tmp/ipa-client-test.txt"
 	if [ $? -ne 0 ]
 	then
-		echo "ERROR - touch /tmp/ipa-client-test.txt failed on $FULLHOSTNAME"
+		message "ERROR - touch /tmp/ipa-client-test.txt failed on $FULLHOSTNAME"
 		tet_result FAIL
 	fi
 
@@ -108,13 +108,13 @@ tp3()
 
 		# now we need to run ssh on the client to ok the ssh key from the server
 	        rm -f $TET_TMP_DIR/ssh.exp
-        	echo 'set timeout 60
+        	echo 'set timeout 30
 set send_slow {1 .1}' > $TET_TMP_DIR/ssh.exp
 		echo "spawn /usr/bin/ssh -l $user1 $srvhostname 'ls /tmp'" >> $TET_TMP_DIR/ssh.exp
 		echo 'match_max 100000' >> $TET_TMP_DIR/ssh.exp
 		echo 'sleep 4' >> $TET_TMP_DIR/ssh.exp
 	        echo "send -s -- \"yes\"" >> $TET_TMP_DIR/ssh.exp
-	        echo 'send -s -- "\\r"' >> $TET_TMP_DIR/ssh.exp
+	        echo 'send -s -- "\r"' >> $TET_TMP_DIR/ssh.exp
 		ssh root@$FULLHOSTNAME 'rm -f /tmp/ssh.exp'
 		scp $TET_TMP_DIR/ssh.exp root@$FULLHOSTNAME:/tmp/.
 		ssh root@$FULLHOSTNAME 'expect /tmp/ssh.exp'&
@@ -128,28 +128,28 @@ set send_slow {1 .1}' > $TET_TMP_DIR/ssh.exp
 #		grep "ipa-client-test.txt" $TET_TMP_DIR/ssh-output.txt
 #		if [ $? -ne 0 ]; then
 		if [ ! -f "$TET_TMP_DIR/ipa-client-test.txt" ]; then
-			echo "Well that didn't work, lets try again"
+			message "Well that didn't work, lets try again"
 			cat $TET_TMP_DIR/ssh-output.txt
 			ssh root@$FULLHOSTNAME "klist;ssh -l $user1 $srvhostname 'ls /tmp'" > $TET_TMP_DIR/ssh-output.txt &
 			sleep 15
 			grep "ipa-client-test.txt" $TET_TMP_DIR/ssh-output.txt
 			if [ $? -ne 0 ]; then
-				echo "Well that didn't work, lets try it a THIRD TIME. We will get a new kinit first."
+				message "Well that didn't work, lets try it a THIRD TIME. We will get a new kinit first."
 				KinitAs $s $user1 $user1pw
 				cat $TET_TMP_DIR/ssh-output.txt
 				ssh root@$FULLHOSTNAME "klist;ssh -l $user1 $srvhostname 'ls /tmp'" > $TET_TMP_DIR/ssh-output.txt &
 				sleep 15
 				grep "ipa-client-test.txt" $TET_TMP_DIR/ssh-output.txt
 				if [ $? -ne 0 ]; then
-					echo "Well that didn't work, lets try it a FOURTH TIME. We will get a new kinit first. "
+					message "Well that didn't work, lets try it a FOURTH TIME. We will get a new kinit first. "
 					KinitAs $s $user1 $user1pw
 					cat $TET_TMP_DIR/ssh-output.txt
 					ssh root@$FULLHOSTNAME "klist;ssh -l $user1 $srvhostname 'ls /tmp'" > $TET_TMP_DIR/ssh-output.txt 
 #					sleep 60
 					grep "ipa-client-test.txt" $TET_TMP_DIR/ssh-output.txt
 					if [ $? -ne 0 ]; then
-						echo "ERROR - ipa-client-test.txt not found in $TET_TMP_DIR/ssh-output.txt, the ssh login probably didn't work"
-						echo "$TET_TMP_DIR/ssh-output.txt contents are:"
+						message "ERROR - ipa-client-test.txt not found in $TET_TMP_DIR/ssh-output.txt, the ssh login probably didn't work"
+						message "$TET_TMP_DIR/ssh-output.txt contents are:"
 						cat $TET_TMP_DIR/ssh-output.txt
 						tet_result FAIL
 					fi
@@ -159,7 +159,7 @@ set send_slow {1 .1}' > $TET_TMP_DIR/ssh.exp
 	done
 
 	tet_result PASS
-	echo "END $tet_thistest"
+	message "END $tet_thistest"
 
 }
 
@@ -170,7 +170,7 @@ client_cleanup()
 {
 	tet_thistest="cleanup"
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	echo "START $tet_thistest"
+	message "START $tet_thistest"
 	eval_vars M1
 	code=0
 
@@ -186,7 +186,7 @@ client_cleanup()
 	#let code=$code+$?
 
 	if [ $code -ne 0 ]; then
-		echo "ERROR - setup for $tet_thistest failed"
+		message "ERROR - setup for $tet_thistest failed"
 		tet_result FAIL
 	fi
 

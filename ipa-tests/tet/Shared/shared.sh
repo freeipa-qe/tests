@@ -5,7 +5,7 @@
 #               interaction or error.
 eval_vars()
 {
-	#if [ $DSTET_DEBUG = y ]; then set -x; env; fi
+	#if [ "$DSTET_DEBUG" = "y" ]; then set -x; env; fi
         x=\$HOSTNAME_$1
         HOSTNAME=`eval echo $x`
         FULLHOSTNAME=`host $HOSTNAME | grep -v IPv6 | awk '{print $1}'`
@@ -45,7 +45,7 @@ eval_vars()
 # Runs ntpdate $NTPSERVER on the machine specified in $1
 set_date()
 {
-	if [ $DSTET_DEBUG = y ]; then set -x; fi
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 	ssh $1 "date;/etc/init.d/ntpd stop;ntpdate -b $NTPSERVER"&
 	return 0
 }
@@ -54,7 +54,7 @@ set_date()
 FixBindServer()
 {
 
-	if [ $DSTET_DEBUG = y ]; then set -x; fi
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 	eval_vars $1
 
 	# Backing up DNS server config on Server
@@ -137,7 +137,7 @@ FixBindServer()
 
 is_server_alive()
 {
-	if [ $DSTET_DEBUG = y ]; then set -x; fi
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 	SID=$1
         eval_vars $SID
 
@@ -162,7 +162,7 @@ is_server_alive()
 # This program produces it's output on the <server identifer> in the /tmp/SetUserPassword-output.txt file
 SetUserPassword()
 {
-	if [ $DSTET_DEBUG = y ]; then set -x; fi
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 	if [ "$2" = "" ]; then
 		echo 'ERROR - You must call SetUserPassword with a username in the $2 position'
 		return 1;
@@ -181,10 +181,10 @@ set send_slow {1 .1}' > $TET_TMP_DIR/SetUserPassword.exp
 	echo 'match_max 100000' >> $TET_TMP_DIR/SetUserPassword.exp
 	echo 'sleep 7' >> $TET_TMP_DIR/SetUserPassword.exp
 	echo "send -s -- \"$3\"" >> $TET_TMP_DIR/SetUserPassword.exp
-	echo 'send -s -- "\\r"' >> $TET_TMP_DIR/SetUserPassword.exp
+	echo 'send -s -- "\r"' >> $TET_TMP_DIR/SetUserPassword.exp
 	echo 'sleep 4' >> $TET_TMP_DIR/SetUserPassword.exp
 	echo "send -s -- \"$3\"" >> $TET_TMP_DIR/SetUserPassword.exp
-	echo 'send -s -- "\\r"' >> $TET_TMP_DIR/SetUserPassword.exp
+	echo 'send -s -- "\r"' >> $TET_TMP_DIR/SetUserPassword.exp
 	echo 'expect eof ' >> $TET_TMP_DIR/SetUserPassword.exp
 
 	ssh root@$FULLHOSTNAME 'rm -f /tmp/SetUserPassword.exp'
@@ -209,7 +209,7 @@ set send_slow {1 .1}' > $TET_TMP_DIR/SetUserPassword.exp
 # Otherwise it waits a much safer 15 seconds
 KinitAs()
 {
-	if [ $DSTET_DEBUG = y ]; then set -x; fi
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 	if [ "$2" = "" ]; then
 		echo 'ERROR - You must call KinitAs with a username in the $2 position'
 		return 1;
@@ -226,7 +226,8 @@ KinitAs()
 	SID=$1
 	eval_vars $SID
         rm -f $TET_TMP_DIR/kinit.exp
-        echo 'set timeout 60
+        echo 'set timeout 30
+set force_conservative 0
 set send_slow {1 .1}' > $TET_TMP_DIR/kinit.exp
 	echo "OS is $OS"
 	case $OS in
@@ -236,13 +237,15 @@ set send_slow {1 .1}' > $TET_TMP_DIR/kinit.exp
 		*)      echo "spawn /usr/bin/kinit $2" >> $TET_TMP_DIR/kinit.exp        ;;
 	esac
 	echo 'match_max 100000' >> $TET_TMP_DIR/kinit.exp
-	if [ $fast -eq 1 ]; then
-		echo 'sleep 2' >> $TET_TMP_DIR/kinit.exp
-	else	
-		echo 'sleep 7' >> $TET_TMP_DIR/kinit.exp
-	fi
+#	if [ $fast -eq 1 ]; then
+#		echo 'sleep 2' >> $TET_TMP_DIR/kinit.exp
+#	else	
+#		echo 'sleep 7' >> $TET_TMP_DIR/kinit.exp
+#	fi
+	echo 'expect "*: "' >> $TET_TMP_DIR/kinit.exp
+	echo 'sleep .5' >> $TET_TMP_DIR/kinit.exp
 	echo "send -s -- \"$3\"" >> $TET_TMP_DIR/kinit.exp
-	echo 'send -s -- "\\r"' >> $TET_TMP_DIR/kinit.exp
+	echo 'send -s -- "\r"' >> $TET_TMP_DIR/kinit.exp
 	echo 'expect eof ' >> $TET_TMP_DIR/kinit.exp
 
 	ssh root@$FULLHOSTNAME 'rm -f /tmp/kinit.exp'
@@ -302,7 +305,7 @@ set send_slow {1 .1}' > $TET_TMP_DIR/kinit.exp
 # This sub produces the output into /tmp/KinitAsFirst-out.txt on the destination machine
 KinitAsFirst()
 {
-	if [ $DSTET_DEBUG = y ]; then set -x; fi
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 	if [ "$2" = "" ]; then
 		echo 'ERROR - You must call KinitAs with a username in the $2 position'
 		return 1;
@@ -314,7 +317,7 @@ KinitAsFirst()
 	SID=$1
 	eval_vars $SID
         rm -f $TET_TMP_DIR/kinit.exp
-        echo 'set timeout 60
+        echo 'set timeout 30
 set send_slow {1 .1}' > $TET_TMP_DIR/kinit.exp
 	echo "OS is $OS"
 	case $OS in
@@ -324,15 +327,18 @@ set send_slow {1 .1}' > $TET_TMP_DIR/kinit.exp
 		*)      echo "spawn /usr/bin/kinit $2" >> $TET_TMP_DIR/kinit.exp        ;;
 	esac
 	echo 'match_max 100000' >> $TET_TMP_DIR/kinit.exp
-	echo 'sleep 7' >> $TET_TMP_DIR/kinit.exp
+	echo 'expect "*: "' >> $TET_TMP_DIR/kinit.exp
+	echo 'sleep .5' >> $TET_TMP_DIR/kinit.exp
 	echo "send -s -- \"$3\"" >> $TET_TMP_DIR/kinit.exp
-	echo 'send -s -- "\\r"' >> $TET_TMP_DIR/kinit.exp
-	echo 'sleep 5' >> $TET_TMP_DIR/kinit.exp
+	echo 'send -s -- "\r"' >> $TET_TMP_DIR/kinit.exp
+	echo 'expect "*: "' >> $TET_TMP_DIR/kinit.exp
+	echo 'sleep .5' >> $TET_TMP_DIR/kinit.exp
 	echo "send -s -- \"$4\"" >> $TET_TMP_DIR/kinit.exp
-	echo 'send -s -- "\\r"' >> $TET_TMP_DIR/kinit.exp
-	echo 'sleep 5' >> $TET_TMP_DIR/kinit.exp
+	echo 'send -s -- "\r"' >> $TET_TMP_DIR/kinit.exp
+	echo 'expect "*: "' >> $TET_TMP_DIR/kinit.exp
+	echo 'sleep .5' >> $TET_TMP_DIR/kinit.exp
 	echo "send -s -- \"$4\"" >> $TET_TMP_DIR/kinit.exp
-	echo 'send -s -- "\\r"' >> $TET_TMP_DIR/kinit.exp
+	echo 'send -s -- "\r"' >> $TET_TMP_DIR/kinit.exp
 	echo 'expect eof ' >> $TET_TMP_DIR/kinit.exp
 
 	ssh root@$FULLHOSTNAME 'rm -f /tmp/kinit.exp'
@@ -344,7 +350,7 @@ set send_slow {1 .1}' > $TET_TMP_DIR/kinit.exp
 		return 1;
 	fi
 	
-	if [ $DSTET_DEBUG = y ]; then
+	if [ "$DSTET_DEBUG" = "y" ]; then
 		echo "printing out kinit output"
 		ssh root@$FULLHOSTNAME 'cat /tmp/KinitAsFirst-out.txt'
 	fi
@@ -375,7 +381,7 @@ set send_slow {1 .1}' > $TET_TMP_DIR/kinit.exp
 			return 1;
 		fi
 	
-		if [ $DSTET_DEBUG = y ]; then
+		if [ "$DSTET_DEBUG" = "y" ]; then
 			echo "printing out kinit output"
 			ssh root@$FULLHOSTNAME 'cat /tmp/KinitAsFirst-out.txt'
 		fi
@@ -400,7 +406,7 @@ set send_slow {1 .1}' > $TET_TMP_DIR/kinit.exp
 CheckAlive()
 {
 
-	if [ $DSTET_DEBUG = y ]; then set -x; fi
+	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
         echo "Checking to see if servers are alive and listening"
         for s in $SERVERS; do
                 if [ "$s" != "" ]; then
@@ -434,7 +440,7 @@ CheckAlive()
 
 setup_ssh_keys()
 {
-	if [ $DSTET_DEBUG = y ]; then env; set -x; fi
+	if [ "$DSTET_DEBUG" = "y" ]; then env; set -x; fi
 	SID=$1
         eval_vars $SID
 	# If there is no local ssh key, create one

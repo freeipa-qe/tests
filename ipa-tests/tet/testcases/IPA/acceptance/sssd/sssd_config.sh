@@ -8,6 +8,10 @@ if [ "$DSTET_DEBUG" = "y" ]; then
         set -x
 fi
 
+env
+ls $TESTING_SHARED/sssdlib.sh
+ls $TESTING_SHARED/
+
 ######################################################################
 #  Test Case List
 #####################################################################
