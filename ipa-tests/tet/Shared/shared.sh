@@ -204,9 +204,7 @@ set send_slow {1 .1}' > $TET_TMP_DIR/SetUserPassword.exp
 
 # KinitAs kinits as a defined user on a defined server, using a given password.
 # input as follows:
-# KinitAs <server identifer> <username> <password> fast
-# The "fast" is optional. If fast is specified then expect only waits 2 seconds between input.
-# Otherwise it waits a much safer 15 seconds
+# KinitAs <server identifer> <username> <password> 
 KinitAs()
 {
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
@@ -218,12 +216,9 @@ KinitAs()
 		echo 'ERROR - You must call KinitAs with a password in the $3 position'
 		return 1;
 	fi 
-	if [ "$4" = "fast" ] || [ "$4" = "Fast" ]; then
-		fast=1;
-	else
-		fast=0;
-	fi
 	SID=$1
+	username=$2
+	password=$3
 	eval_vars $SID
         rm -f $TET_TMP_DIR/kinit.exp
         echo 'set timeout 30
@@ -231,20 +226,15 @@ set force_conservative 0
 set send_slow {1 .1}' > $TET_TMP_DIR/kinit.exp
 	echo "OS is $OS"
 	case $OS in
-		"RHEL")     echo "spawn /usr/kerberos/bin/kinit -V $2" >> $TET_TMP_DIR/kinit.exp       ;;
-		"FC")       echo "spawn /usr/kerberos/bin/kinit -V $2" >> $TET_TMP_DIR/kinit.exp       ;;
-		"solaris")  echo "spawn /usr/bin/kinit $2" >> $TET_TMP_DIR/kinit.exp     ;;
-		*)      echo "spawn /usr/bin/kinit $2" >> $TET_TMP_DIR/kinit.exp        ;;
+		"RHEL")     echo "spawn /usr/kerberos/bin/kinit -V $username" >> $TET_TMP_DIR/kinit.exp       ;;
+		"FC")       echo "spawn /usr/kerberos/bin/kinit -V $username" >> $TET_TMP_DIR/kinit.exp       ;;
+		"solaris")  echo "spawn /usr/bin/kinit $username" >> $TET_TMP_DIR/kinit.exp     ;;
+		*)      echo "spawn /usr/bin/kinit $username" >> $TET_TMP_DIR/kinit.exp        ;;
 	esac
 	echo 'match_max 100000' >> $TET_TMP_DIR/kinit.exp
-#	if [ $fast -eq 1 ]; then
-#		echo 'sleep 2' >> $TET_TMP_DIR/kinit.exp
-#	else	
-#		echo 'sleep 7' >> $TET_TMP_DIR/kinit.exp
-#	fi
 	echo 'expect "*: "' >> $TET_TMP_DIR/kinit.exp
 	echo 'sleep .5' >> $TET_TMP_DIR/kinit.exp
-	echo "send -s -- \"$3\"" >> $TET_TMP_DIR/kinit.exp
+	echo "send -s -- \"$password\"" >> $TET_TMP_DIR/kinit.exp
 	echo 'send -s -- "\r"' >> $TET_TMP_DIR/kinit.exp
 	echo 'expect eof ' >> $TET_TMP_DIR/kinit.exp
 
@@ -253,13 +243,13 @@ set send_slow {1 .1}' > $TET_TMP_DIR/kinit.exp
 
 	ssh root@$FULLHOSTNAME 'kdestroy;/usr/bin/expect /tmp/kinit.exp'
 	if [ $? != 0 ]; then
-		echo "ERROR - kinit as user $1, password of $2 failed";
+		echo "ERROR - kinit as user $username, password of $password failed";
 		return 1;
 	fi
 
-	echo "This is a klist on the machine we just kinited on, it should show that user $2 is kinited"
+	echo "This is a klist on the machine we just kinited on, it should show that user $username is kinited"
 	ssh root@$FULLHOSTNAME 'klist' > $TET_TMP_DIR/KinitAs-output.txt
-	grep $2 $TET_TMP_DIR/KinitAs-output.txt
+	grep $username $TET_TMP_DIR/KinitAs-output.txt
 	if [ $? -ne 0 ]; then
 	        # Setting the time and date on all of the servers and clients if we can
         	for s in $SERVERS; do
@@ -278,14 +268,14 @@ set send_slow {1 .1}' > $TET_TMP_DIR/kinit.exp
 		eval_vars $SID
 		ssh root@$FULLHOSTNAME 'kdestroy;/usr/bin/expect /tmp/kinit.exp'
 		if [ $? != 0 ]; then
-			echo "ERROR - kinit as user $1, password of $2 failed";
+			echo "ERROR - kinit as user $username, password of $password failed";
 			return 1
 		fi
 
 		ssh root@$FULLHOSTNAME 'klist' > $TET_TMP_DIR/KinitAs-output.txt
-		grep $2 $TET_TMP_DIR/KinitAs-output.txt
+		grep $username $TET_TMP_DIR/KinitAs-output.txt
 		if [ $? -ne 0 ]; then
-			echo "ERROR - error in KinitAs, kinit didn't appear to work, $2 not found in $TET_TMP_DIR/KinitAs-output.txt"
+			echo "ERROR - error in KinitAs, kinit didn't appear to work, $username not found in $TET_TMP_DIR/KinitAs-output.txt"
 			echo "contents of $TET_TMP_DIR/KinitAs-output.txt:"
 			cat $TET_TMP_DIR/KinitAs-output.txt
 			return 1;
@@ -315,29 +305,32 @@ KinitAsFirst()
 		return 1;
 	fi 
 	SID=$1
+	username=$2
+	password=$3
+	newpassword=$4
 	eval_vars $SID
         rm -f $TET_TMP_DIR/kinit.exp
         echo 'set timeout 30
 set send_slow {1 .1}' > $TET_TMP_DIR/kinit.exp
 	echo "OS is $OS"
 	case $OS in
-		"RHEL")     echo "spawn /usr/kerberos/bin/kinit -V $2" >> $TET_TMP_DIR/kinit.exp       ;;
-		"FC")       echo "spawn /usr/kerberos/bin/kinit -V $2" >> $TET_TMP_DIR/kinit.exp       ;;
-		"solaris")  echo "spawn /usr/bin/kinit $2" >> $TET_TMP_DIR/kinit.exp     ;;
-		*)      echo "spawn /usr/bin/kinit $2" >> $TET_TMP_DIR/kinit.exp        ;;
+		"RHEL")     echo "spawn /usr/kerberos/bin/kinit -V $username" >> $TET_TMP_DIR/kinit.exp       ;;
+		"FC")       echo "spawn /usr/kerberos/bin/kinit -V $username" >> $TET_TMP_DIR/kinit.exp       ;;
+		"solaris")  echo "spawn /usr/bin/kinit $username" >> $TET_TMP_DIR/kinit.exp     ;;
+		*)      echo "spawn /usr/bin/kinit $username" >> $TET_TMP_DIR/kinit.exp        ;;
 	esac
 	echo 'match_max 100000' >> $TET_TMP_DIR/kinit.exp
 	echo 'expect "*: "' >> $TET_TMP_DIR/kinit.exp
 	echo 'sleep .5' >> $TET_TMP_DIR/kinit.exp
-	echo "send -s -- \"$3\"" >> $TET_TMP_DIR/kinit.exp
+	echo "send -s -- \"$password\"" >> $TET_TMP_DIR/kinit.exp
 	echo 'send -s -- "\r"' >> $TET_TMP_DIR/kinit.exp
 	echo 'expect "*: "' >> $TET_TMP_DIR/kinit.exp
 	echo 'sleep .5' >> $TET_TMP_DIR/kinit.exp
-	echo "send -s -- \"$4\"" >> $TET_TMP_DIR/kinit.exp
+	echo "send -s -- \"$newpassword\"" >> $TET_TMP_DIR/kinit.exp
 	echo 'send -s -- "\r"' >> $TET_TMP_DIR/kinit.exp
 	echo 'expect "*: "' >> $TET_TMP_DIR/kinit.exp
 	echo 'sleep .5' >> $TET_TMP_DIR/kinit.exp
-	echo "send -s -- \"$4\"" >> $TET_TMP_DIR/kinit.exp
+	echo "send -s -- \"$newpassword\"" >> $TET_TMP_DIR/kinit.exp
 	echo 'send -s -- "\r"' >> $TET_TMP_DIR/kinit.exp
 	echo 'expect eof ' >> $TET_TMP_DIR/kinit.exp
 
@@ -346,7 +339,7 @@ set send_slow {1 .1}' > $TET_TMP_DIR/kinit.exp
 
 	ssh root@$FULLHOSTNAME 'kdestroy;/usr/bin/expect /tmp/kinit.exp > /tmp/KinitAsFirst-out.txt'
 	if [ $? != 0 ]; then
-		echo "ERROR - kinit as user $1, password of $2 failed";
+		echo "ERROR - kinit as user $username, password of $password, newpassword of $newpassword failed";
 		return 1;
 	fi
 	
@@ -354,7 +347,7 @@ set send_slow {1 .1}' > $TET_TMP_DIR/kinit.exp
 		echo "printing out kinit output"
 		ssh root@$FULLHOSTNAME 'cat /tmp/KinitAsFirst-out.txt'
 	fi
-	echo "This is a klist on the machine we just kinited on, it should show that user $2 is kinited"
+	echo "This is a klist on the machine we just kinited on, it should show that user $username is kinited"
 	ssh root@$FULLHOSTNAME 'klist' > $TET_TMP_DIR/KinitAsFirst-output.txt
 	cat $TET_TMP_DIR/KinitAsFirst-output.txt
 	grep $2 $TET_TMP_DIR/KinitAsFirst-output.txt
@@ -377,7 +370,7 @@ set send_slow {1 .1}' > $TET_TMP_DIR/kinit.exp
 		eval_vars $SID
 		ssh root@$FULLHOSTNAME 'kdestroy;/usr/bin/expect /tmp/kinit.exp > /tmp/KinitAsFirst-out.txt'
 		if [ $? != 0 ]; then
-			echo "ERROR - kinit as user $1, password of $2 failed";
+			echo "ERROR - kinit as user $username, password of $password, newpassword of $newpassword failed";
 			return 1;
 		fi
 	
@@ -385,12 +378,12 @@ set send_slow {1 .1}' > $TET_TMP_DIR/kinit.exp
 			echo "printing out kinit output"
 			ssh root@$FULLHOSTNAME 'cat /tmp/KinitAsFirst-out.txt'
 		fi
-		echo "This is a klist on the machine we just kinited on, it should show that user $2 is kinited"
+		echo "This is a klist on the machine we just kinited on, it should show that user $username is kinited"
 		ssh root@$FULLHOSTNAME 'klist' > $TET_TMP_DIR/KinitAsFirst-output.txt
 		cat $TET_TMP_DIR/KinitAsFirst-output.txt
-		grep $2 $TET_TMP_DIR/KinitAsFirst-output.txt
+		grep $username $TET_TMP_DIR/KinitAsFirst-output.txt
 		if [ $? -ne 0 ]; then
-			echo "ERROR - error in KinitAsFirst, kinit didn't appear to work, $2 not found in $TET_TMP_DIR/KinitAsFirst-output.txt"
+			echo "ERROR - error in KinitAsFirst, kinit didn't appear to work, $username not found in $TET_TMP_DIR/KinitAsFirst-output.txt"
 			echo "contents of $TET_TMP_DIR/KinitAsFirst-output.txt:"
 			cat $TET_TMP_DIR/KinitAsFirst-output.txt
 			return 1;
