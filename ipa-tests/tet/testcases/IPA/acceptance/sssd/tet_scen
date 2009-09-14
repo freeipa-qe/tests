@@ -6,14 +6,14 @@ all
 
 sssd
 	"Starting SSSD tests..."
-	/sssd_startup.sh
+	/startup.sh
 	/sssd_services.sh
 	/sssd_config.sh
 	/sssd_files.sh
 	/sssd_local.sh
 	/sssd_ldap.sh
 	/sssd_multi.sh
-	/sssd_cleanup.sh
+	/cleanup.sh
 	"Ending SSSD tests..."
 
 # EOF
