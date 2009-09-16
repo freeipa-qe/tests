@@ -1,12 +1,12 @@
 [ipa-daily-64]
 name=ipa-daily-64
-baseurl=http://porkchop.devel.redhat.com/nightly/latest-RHEL5.3-IPA-2.0/2.0/x86_64/os/IPA/
+baseurl=http://porkchop.devel.redhat.com/nightly/latest-RHEL5.4-IPA-2.0/2.0/x86_64/os/IPA/
 enabled=1
 gpgcheck=0
 
 [ipa-daily-32]
 name=ipa-daily
-baseurl=http://porkchop.devel.redhat.com/nightly/latest-RHEL5.3-IPA-2.0/2.0/i386/os/IPA/
+baseurl=http://porkchop.devel.redhat.com/nightly/latest-RHEL5.4-IPA-2.0/2.0/i386/os/IPA/
 enabled=1
 gpgcheck=0
 
