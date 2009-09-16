@@ -15,7 +15,7 @@ ls $TESTING_SHARED/
 ######################################################################
 #  Test Case List
 #####################################################################
-iclist="ic0 ic1 ic2 ic3 ic4 ic5 ic6 ic7 ic8 ic9 ic10 ic99"
+iclist="ic1 ic2 ic3 ic4 ic5 ic6 ic7 ic8 ic9 ic10"
 ic1="sssd_config_001"
 ic2="sssd_config_002"
 ic3="sssd_config_003"
@@ -75,7 +75,7 @@ sssd_config_002()
                 message "ERROR Configuring SSSD on $FULLHOSTNAME."
                 myresult=FAIL
         else
-                ssh root@$FULLHOSTNAME service sssd stop
+                ssh root@$FULLHOSTNAME "service sssd stop"
                 ssh root@$FULLHOSTNAME "service sssd start"
                 if [ $? -eq 0 ] ; then
                         message "ERROR: Invalid configuration MaxId is the same as MinId - service started"
@@ -106,7 +106,7 @@ sssd_config_003()
                 message "ERROR Configuring SSSD on $FULLHOSTNAME."
                 myresult=FAIL
         else
-                ssh root@$FULLHOSTNAME service sssd stop
+                ssh root@$FULLHOSTNAME "service sssd stop"
                 ssh root@$FULLHOSTNAME "service sssd start"
                 if [ $? -eq 0 ] ; then
                         message "ERROR: Invalid configuration Negative minId - service started"
@@ -137,7 +137,7 @@ sssd_config_004()
                 message "ERROR Configuring SSSD on $FULLHOSTNAME."
                 myresult=FAIL
         else
-                ssh root@$FULLHOSTNAME service sssd stop
+                ssh root@$FULLHOSTNAME "service sssd stop"
                 ssh root@$FULLHOSTNAME "service sssd start"
                 if [ $? -eq 0 ] ; then
                         message "ERROR: Invalid configuration Negative maxId - service started"
@@ -232,7 +232,7 @@ sssd_config_006()
                 message "ERROR Configuring SSSD on $FULLHOSTNAME."
                 myresult=FAIL
         else
-                ssh root@$FULLHOSTNAME service sssd stop
+                ssh root@$FULLHOSTNAME "service sssd stop"
                 ssh root@$FULLHOSTNAME "service sssd start"
                 if [ $? -eq 0 ] ; then
                         message "ERROR: Invalid configuration no Provider defined - service started"
@@ -263,7 +263,7 @@ sssd_config_007()
                 message "ERROR Configuring SSSD on $FULLHOSTNAME."
                 myresult=FAIL
         else
-                ssh root@$FULLHOSTNAME service sssd stop
+                ssh root@$FULLHOSTNAME "service sssd stop"
                 ssh root@$FULLHOSTNAME "service sssd start"
                 if [ $? -eq 0 ] ; then
                         message "ERROR: Invalid configuration enumeration defined with integer - service started"
@@ -294,7 +294,7 @@ sssd_config_008()
                 message "ERROR Configuring SSSD on $FULLHOSTNAME."
                 myresult=FAIL
         else
-                ssh root@$FULLHOSTNAME service sssd stop
+                ssh root@$FULLHOSTNAME "service sssd stop"
                 ssh root@$FULLHOSTNAME "service sssd start"
                 if [ $? -eq 0 ] ; then
                         message "ERROR: Invalid configuration enumeration defined with non boolean - service started"
@@ -325,7 +325,7 @@ sssd_config_009()
                 message "ERROR Configuring SSSD on $FULLHOSTNAME."
                 myresult=FAIL
         else
-                ssh root@$FULLHOSTNAME service sssd stop
+                ssh root@$FULLHOSTNAME "service sssd stop"
                 ssh root@$FULLHOSTNAME "service sssd start"
                 if [ $? -eq 0 ] ; then
                         message "ERROR: Invalid configuration boolean defined with a string - service started"
@@ -356,7 +356,7 @@ sssd_config_010()
                 message "ERROR Configuring SSSD on $FULLHOSTNAME."
                 myresult=FAIL
         else
-                ssh root@$FULLHOSTNAME service sssd stop
+                ssh root@$FULLHOSTNAME "service sssd stop"
                 ssh root@$FULLHOSTNAME "service sssd start"
                 if [ $? -eq 0 ] ; then
                         message "ERROR: Invalid configuration boolean defined with an integer - service started"

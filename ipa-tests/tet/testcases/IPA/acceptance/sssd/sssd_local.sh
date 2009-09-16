@@ -12,7 +12,6 @@ fi
 #  Test Case List
 #####################################################################
 iclist="ic1 ic2 ic3 ic4 ic5"
-
 ic1="sssd_001 sssd_002 sssd_003 sssd_004 sssd_005 sssd_006 sssd_007 sssd_008 sssd_009 sssd_010 sssd_011 sssd_012 sssd_013 sssd_014 sssd_015 sssd_016 sssd_017 sssd_018 sssd_019 sssd_020 sssd_021 sssd_022 sssd_023 sssd_024 sssd_025 sssd_026 sssd_027 sssd_028"
 ic2="sssd_029 sssd_030 sssd_031 sssd_032 sssd_033 sssd_034 sssd_035"
 ic3="sssd_036 sssd_037"
@@ -119,7 +118,7 @@ sssd_003()
         myresult=PASS
         message "START $tet_thistest: Modify Shell Local User"
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-
+	EXP="/bin/ksh"
         for c in $CLIENTS ; do
 		eval_vars $c
 		message "Working on $FULLHOSTNAME"
@@ -128,10 +127,11 @@ sssd_003()
                         message "ERROR: Modifying LOCAL domain user1000.  Return Code: $?"
                         myresult=FAIL
                 else
-                        SHELL=`ssh root@$FULLHOSTNAME getent -s sss passwd | grep user1000 | cut -d : -f 7 | cut -d / -f 2`
-                        if [ $SHELL -ne ksh ] ; then
+                        #SHELL=`ssh root@$FULLHOSTNAME "getent -s sss passwd | grep user1000 | cut -d : -f 7 | cut -d / -f 2"`
+			SHELL=`ssh root@$FULLHOSTNAME "getent -s sss passwd | grep user1000 | cut -d : -f 7"`
+                        if [ "$SHELL" != "$EXP" ] ; then
                                 message "ERROR: user1000: getent failed to return expected shell for LOCAL user.  Return Code: $?"
-				message "Expected: ksh  Got: $SHELL"
+				message "Expected: $EXP  Got: $SHELL"
                                 myresult=FAIL
                         else
                                 message "LOCAL domain user1000 default shell modified successfully."
@@ -159,7 +159,7 @@ sssd_004()
                         myresult=FAIL
                 else
 			HOMEDIR=`ssh root@$FULLHOSTNAME getent -s sss passwd | grep user1000 | cut -d : -f 6 | cut -d / -f 2`
-                        if [ $HOMEDIR -ne export ] ; then
+                        if [ $HOMEDIR != "export" ] ; then
                                 message "ERROR: user1000: getent failed to return expected home directory for LOCAL user.  Return Code: $?"
                                 message "Expected: export  Got: $HOMEDIR"
                                 myresult=FAIL
@@ -752,12 +752,12 @@ sssd_024()
                                 message "LOCAL domain group1010 deleted successfully."
                         fi
 
-			verifyAttr $FULLHOSTNAME "name=group1009,cn=groups,cn=LOCAL,cn=sysdb" member "name=group1010,cn=groups,cn=LOCAL,cn=sysdb"
+			verifyAttr $FULLHOSTNAME "name=group1009,cn=groups,cn=LOCAL,cn=sysdb" memberof "name=group1010,cn=groups,cn=LOCAL,cn=sysdb"
 			if [ $? -eq 0 ] ; then
 				message "ERROR: Parent group deleted, but child group still has member attribute defined."
 				myresult=FAIL
 			else
-				message "Child group member attribute was removed."
+				message "Child group memberof attribute was removed."
 			fi
                 fi
         done
@@ -828,9 +828,9 @@ sssd_026()
                                 message "LOCAL domain group1009 deleted successfully."
                         fi
 
-                        verifyAttr $FULLHOSTNAME "name=user1009,cn=users,cn=LOCAL,cn=sysdb" memberOf "name=group1009,cn=groups,cn=LOCAL,cn=sysdb"
+                        verifyAttr $FULLHOSTNAME "name=user1009,cn=users,cn=LOCAL,cn=sysdb" memberof "name=group1009,cn=groups,cn=LOCAL,cn=sysdb"
                         if [ $? -eq 0 ] ; then
-                                message "ERROR: Parent group deleted, but child group still has memberOf attribute defined."
+                                message "ERROR: Parent group deleted, but user group member still has memberof attribute defined."
                                 myresult=FAIL
                         else
                                 message "Child group member attribute was removed."
@@ -1359,7 +1359,7 @@ sssd_040()
    #    magicPrivateGroups: TRUE
    #    provider: local
    #	[user_defaults]
-   #	defaultShell = /bin/ksh
+   #	defaultShell = /bin/sh
    #    baseDirectory = /export 
    ####################################################################
 
@@ -1419,6 +1419,7 @@ sssd_041()
         myresult=PASS
         message "START $tet_thistest: Add Local User - User Default Shell Not Specified"
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+	EXP="/bin/sh"
         for c in $CLIENTS ; do
 		eval_vars $c
                 message "Working on $FULLHOSTNAME"
@@ -1427,11 +1428,11 @@ sssd_041()
                         message "ERROR: Adding LOCAL domain user2000.  Return Code: $?"
                         myresult=FAIL
                 else
-                        SHELL=`ssh root@$FULLHOSTNAME getent -s sss passwd | grep user2000 | cut -d : -f 7 | cut -d / -f 3`
+                        SHELL=`ssh root@$FULLHOSTNAME getent -s sss passwd | grep user2000 | cut -d : -f 7`
 			message "Shell returned is $SHELL"
-                        if [ $SHELL != ksh ] ; then
+                        if [ "$SHELL" != "$EXP" ] ; then
                                 message "ERROR: user2000: getent failed to return expected shell for LOCAL user.  Return Code: $?"
-                                message "Expected: ksh  Got: $SHELL"
+                                message "Expected: $EXP  Got: $SHELL"
                                 myresult=FAIL
                         else
                                 message "LOCAL domain user2000 default shell is correct."
@@ -1747,14 +1748,18 @@ sssd_049()
 		ssh root@$FULLHOSTNAME "sss_useradd -h /home/user1001 -s /bin/bash user1001"
 
 		# now verify user1001's uidNumber
-		USER=`ssh root@$FULLHOSTNAME getent -s sss passwd user1001`
-		UID=`echo $USER | cut -d ":" -f 2`
-		if [ $UID -ne 1001 ] ; then
+		USER=`ssh root@$FULLHOSTNAME getent -s sss passwd user1001@LOCAL`
+		MYUID=`echo $USER | cut -d ":" -f 2`
+		if [ $NYUID -ne 1001 ] ; then
 			message "ERROR: uidNumber not as expected - could be regression of trac issue 57 Expected: 1001 Got: $UID"
 			myresult=FAIL
 		else
 			message "Trac Issue 57 appears to be fixed - uidNumber assigned correctly"
 		fi
+
+		# clean up
+		ssh root@FULLHOSTNAME "sss_userdel user1000 ; sss_userdel user1001"
+
         done
 
         result $myresult

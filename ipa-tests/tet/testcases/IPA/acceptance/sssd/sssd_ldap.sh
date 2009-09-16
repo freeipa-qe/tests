@@ -12,7 +12,6 @@ fi
 #  Test Case List
 #####################################################################
 iclist="ic1 ic2 ic3 ic4"
-
 ic1="sssd_ldap_001 sssd_ldap_002 sssd_ldap_003 sssd_ldap_004 sssd_ldap_005 sssd_ldap_006 sssd_ldap_007"
 ic2="sssd_ldap_008 sssd_ldap_009 sssd_ldap_010 sssd_ldap_011 sssd_ldap_012 sssd_ldap_013 sssd_ldap_014"
 ic3="sssd_ldap_015 sssd_ldap_016 sssd_ldap_017 sssd_ldap_018 sssd_ldap_019 sssd_ldap_020 sssd_ldap_021"
@@ -53,31 +52,6 @@ GROUP5=test
 ######################################################################
 # Tests
 ######################################################################
-startup()
-{
-  myresult=PASS
-  message "START $tet_this_test: Setup for NSS and PAM AUTH"
-  for c in $CLIENTS; do
-	eval_vars $c
-        message "Working on $FULLHOSTNAME"
-        sssdClientSetup $FULLHOSTNAME 
-        if [ $? -ne 0 ] ; then
-                message "ERROR: SSSD Client Setup Failed for $FULLHOSTNAME."
-                myresult=FAIL
-        fi
-
-        ssh root@$FULLHOSTNAME "yum -y install sssd"
-        if [ $? -ne 0 ] ; then
-                message "ERROR:  Failed to install SSSD. Return code: $?"
-                myresult=FAIL
-        else
-                message "SSSD installed successfully."
-        fi
-
-  done
-  tet_result $myresult
-  message "END $tet_this_test"
-}
 
 sssd_ldap_001()
 {
@@ -178,12 +152,11 @@ sssd_ldap_003()
         myresult=PASS
         message "START $tet_thistest: Get Valid LDAP Groups - RHDS - provider proxy"
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	GROUPS="$PGROUP1 $PGROUP2"
         for c in $CLIENTS ; do
 		eval_vars $c
                 message "Working on $FULLHOSTNAME"
                 RET=`ssh root@$FULLHOSTNAME getent -s sss group 2>&1`
-                for item in $GROUPS ; do
+                for item in $PGROUP1 $PGROUP2 ; do
                    echo $RET | grep $item
                    if [ $? -ne 0 ] ; then
                         message "ERROR: Expected $item group to be returned."    
@@ -203,12 +176,11 @@ sssd_ldap_004()
         myresult=PASS
         message "START $tet_thistest: Users uidNumbers below minId and above maxId - RHDS - provider proxy"
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	USERS="$PUSER3 $PUSER4"
         for c in $CLIENTS ; do
 		eval_vars $c
                 message "Working on $FULLHOSTNAME"
                 RET=`ssh root@$FULLHOSTNAME getent -s sss passwd 2>&1`
-                for item in $USERS ; do
+                for item in $PUSER3 $PUSER4 ; do
                    echo $RET | grep $item
                    if [ $? -eq 0 ] ; then
                         message "ERROR: Expected $item user not to be returned: uidNumber out of allowed range."
@@ -229,12 +201,11 @@ sssd_ldap_005()
         myresult=PASS
         message "START $tet_thistest: Groups gidNumbers below minId and above maxId - RHDS - provider proxy"
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	GROUPS="$PGROUP3 $PGROUP4"
         for c in $CLIENTS ; do
 		eval_vars $c
                 message "Working on $FULLHOSTNAME"
                 RET=`ssh root@$FULLHOSTNAME getent -s sss group 2>&1`
-                for item in $GROUPS ; do
+                for item in $PGROUP3 $PGROUP4 ; do
                    echo $RET | grep $item
                    if [ $? -eq 0 ] ; then
                         message "ERROR: Expected $item group not to be returned: gidNumber out of allowed range."
@@ -363,12 +334,11 @@ sssd_ldap_009()
         myresult=PASS
         message "START $tet_thistest: Get Valid LDAP Users - No maxId - FQN - RHDS - provider proxy"
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-        USERS="$PUSER1 $PUSER2 $PUSER4"
         for c in $CLIENTS ; do
 		eval_vars $c
                 message "Working on $FULLHOSTNAME"
-                RET=`ssh root@$FULLHOSTNAME getent -s sss passwd 2>&1`
-                for item in $USERS ; do
+                RET=`ssh root@$FULLHOSTNAME "getent -s sss passwd 2>&1"`
+                for item in $PUSER1 $PUSER2 $PUSER4 ; do
                    echo $RET | grep $item@LDAP
                    if [ $? -ne 0 ] ; then
                         message "ERROR: Expected $item@LDAP user to be returned."
@@ -388,12 +358,12 @@ sssd_ldap_010()
         myresult=PASS
         message "START $tet_thistest: Get Valid LDAP Groups - No maxId - FQN - RHDS - provider proxy"
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-        GROUPS="$PGROUP1 $PGROUP2 $PGROUP4"
         for c in $CLIENTS ; do
 		eval_vars $c
                 message "Working on $FULLHOSTNAME"
-                RET=`ssh root@$FULLHOSTNAME getent -s sss group 2>&1`
-                for item in $GROUPS ; do
+                RET=`ssh root@$FULLHOSTNAME "getent -s sss group 2>&1"`
+                for item in $PGROUP1 $PGROUP2 $PGROUP4 ; do
+		   echo $RET
                    echo $RET | grep $item@LDAP
                    if [ $? -ne 0 ] ; then
                         message "ERROR: Expected $item@LDAP group to be returned."
@@ -416,7 +386,7 @@ sssd_ldap_011()
         for c in $CLIENTS ; do
 		eval_vars $c
                 message "Working on $FULLHOSTNAME"
-                RET=`ssh root@$FULLHOSTNAME getent -s sss passwd 2>&1`
+                RET=`ssh root@$FULLHOSTNAME "getent -s sss passwd 2>&1"`
                 echo $RET | grep $PUSER3@LDAP
                 if [ $? -eq 0 ] ; then
                 	message "ERROR: Expected $PUSER3@LDAP user not to be returned: uidNumber out of allowed range."
@@ -438,7 +408,7 @@ sssd_ldap_012()
         for c in $CLIENTS ; do
 		eval_vars $c
                 message "Working on $FULLHOSTNAME"
-                RET=`ssh root@$FULLHOSTNAME getent -s sss group 2>&1`
+                RET=`ssh root@$FULLHOSTNAME "getent -s sss group 2>&1"`
 		echo $RET | grep $PGROUP3@LDAP
                 if [ $? -eq 0 ] ; then
                         message "ERROR: Expected $PGROUP3@LDAP group not to be returned: gidNumber out of allowed range."
@@ -606,12 +576,11 @@ sssd_ldap_016()
         myresult=PASS
         message "START $tet_thistest: Get Valid LDAP Users - RHDS - provider ldap"
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-        USERS="$PUSER1 $PUSER2"
         for c in $CLIENTS ; do 
 		eval_vars $c
                 message "Working on $FULLHOSTNAME" 
                 RET=`ssh root@$FULLHOSTNAME getent -s sss passwd 2>&1`
-                for item in $USERS ; do
+                for item in $PUSER1 $PUSER2 ; do
                    echo $RET | grep $item
                    if [ $? -ne 0 ] ; then
                         message "ERROR: Expected $item user to be returned."
@@ -631,12 +600,11 @@ sssd_ldap_017()
         myresult=PASS
         message "START $tet_thistest: Get Valid LDAP Groups - RHDS - provider ldap"
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-        GROUPS="$PGROUP1 $PGROUP2"
         for c in $CLIENTS ; do
 		eval_vars $c
                 message "Working on $FULLHOSTNAME"
                 RET=`ssh root@$FULLHOSTNAME getent -s sss group 2>&1`
-                for item in $GROUPS ; do
+                for item in $PGROUP1 $PGROUP2 ; do
                    echo $RET | grep $item
                    if [ $? -ne 0 ] ; then
                         message "ERROR: Expected $item group to be returned."
@@ -656,12 +624,11 @@ sssd_ldap_018()
         myresult=PASS
         message "START $tet_thistest: Users uidNumbers below minId and above maxId - RHDS - provider ldap"
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-        USERS="$PUSER3 $PUSER4"
         for c in $CLIENTS ; do
 		eval_vars $c
                 message "Working on $FULLHOSTNAME"
                 RET=`ssh root@$FULLHOSTNAME getent -s sss passwd 2>&1`
-                for item in $USERS ; do
+                for item in $PUSER3 $PUSER4 ; do
                    echo $RET | grep $item
                    if [ $? -eq 0 ] ; then
                         message "ERROR: Expected $item user not to be returned: uidNumber out of allowed range."
@@ -682,12 +649,11 @@ sssd_ldap_019()
         myresult=PASS
         message "START $tet_thistest: Groups gidNumbers below minId and above maxId - RHDS - provider ldap"
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-        GROUPS="$PGROUP3 $PGROUP4"
         for c in $CLIENTS ; do
 		eval_vars $c
                 message "Working on $FULLHOSTNAME"
                 RET=`ssh root@$FULLHOSTNAME getent -s sss group 2>&1`
-                for item in $GROUPS ; do
+                for item in $PGROUP3 $PGROUP4 ; do
                    echo $RET | grep $item
                    if [ $? -eq 0 ] ; then
                         message "ERROR: Expected $item group not to be returned: gidNumber out of allowed range."
@@ -816,12 +782,11 @@ sssd_ldap_023()
         myresult=PASS
         message "START $tet_thistest: Get Valid LDAP Users - No maxId - FQN - RHDS - provider ldap"
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-        USERS="$PUSER1 $PUSER2 $PUSER4"
         for c in $CLIENTS ; do
 		eval_vars $c
                 message "Working on $FULLHOSTNAME"
                 RET=`ssh root@$FULLHOSTNAME getent -s sss passwd 2>&1`
-                for item in $USERS ; do
+                for item in $PUSER1 $PUSER2 $PUSER4 ; do
                    echo $RET | grep $item@LDAP
                    if [ $? -ne 0 ] ; then
                         message "ERROR: Expected $item@LDAP user to be returned."
@@ -841,12 +806,11 @@ sssd_ldap_024()
         myresult=PASS
         message "START $tet_thistest: Get Valid LDAP Groups - No maxId - FQN - RHDS - provider ldap"
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-        GROUPS="$PGROUP1 $PGROUP2 $PGROUP4"
         for c in $CLIENTS ; do
 		eval_vars $c
                 message "Working on $FULLHOSTNAME"
                 RET=`ssh root@$FULLHOSTNAME getent -s sss group 2>&1`
-                for item in $GROUPS ; do
+                for item in $PGROUP1 $PGROUP2 $PGROUP4 ; do
                    echo $RET | grep $item@LDAP
                    if [ $? -ne 0 ] ; then
                         message "ERROR: Expected $item@LDAP group to be returned."
@@ -977,33 +941,6 @@ sssd_ldap_028()
         result $myresult
         message "END $tet_thistest"
 
-}
-
-cleanup()
-{
-  myresult=PASS
-  message "START $tet_this_test: Cleanup Clients"
-  for c in $CLIENTS; do
-	eval_vars $c
-        message "Working on $FULLHOSTNAME"
-        sssdClientCleanup $FULLHOSTNAME 
-        if [ $? -ne 0 ] ; then
-                message "ERROR:  SSSD Client Cleanup did not complete successfully on client $FULLHOSTNAME."
-                myresult=FAIL
-        fi
-
-        ssh root@$FULLHOSTNAME "yum -y erase sssd ; rm -rf /var/lib/sss/ ; rm -rf /etc/sssd/ ; yum clean all"
-        if [ $? -ne 0 ] ; then
-                message "ERROR: Failed to uninstall and cleanup SSSD. Return code: $?"
-                myresult=FAIL
-        else
-                message "SSSD Uninstall and Cleanup Success."
-        fi
-
-  done
-
-  result $myresult
-  message "END $tet_this_test"
 }
 
 ##################################################################

@@ -11,11 +11,34 @@ fi
 ######################################################################
 #  Test Case List
 #####################################################################
-iclist="ic1"
+iclist="ic0 ic1"
+ic0="startup"
 ic1="sssd_files_001 sssd_files_002 sssd_files_003 sssd_files_004 sssd_files_005 sssd_files_006 sssd_files_007 sssd_files_008 sssd_files_009 sssd_files_010 sssd_files_011 sssd_files_012"
 ######################################################################
 # Tests
 ######################################################################
+
+startup()
+{
+        myresult=PASS
+        message "START $tet_thistest: Configuration 1 - FILES - Max ID"
+        if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+        for c in $CLIENTS ; do
+                eval_vars $c
+                message "Working on $FULLHOSTNAME"
+		# add local users for testing
+		ssh root@$FULLHOSTNAME "useradd -u 999 user999 ; useradd -u 1000 user1000 ; useradd -u 1999 user1999 ; useradd -u 2000 user2000"
+		if [ $? -ne 0 ] ; then
+			message "ERROR: Failed to add legacy passwd file users with shadow utils. return code: $?"
+			myresult=FAIL
+		else
+			message "Legacy passwd file users added successfully using shadow utils."
+		fi
+        done
+
+        result $myresult
+        message "END $tet_thistest"
+}
 
 sssd_files_001()
 {

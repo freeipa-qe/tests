@@ -171,36 +171,33 @@ sssd_multi_002()
                         myresult=FAIL
                 fi
 
-	   # verify user enumeration
-	   # Users that should be returned
-	      USERS="$PUSER1 $PUSER2 user2000 user2001"
-              RET=`ssh root@$FULLHOSTNAME getent -s sss passwd 2>&1`
-              for item in $USERS ; do
-              	echo $RET | grep $item
-                if [ $? -ne 0 ] ; then
-                	message "ERROR: Expected $item user to be returned."
-                        myresult=FAIL
-                else
-                        message "$item user returned as expected."
-                fi
+	   	# verify user enumeration
+	   	# Users that should be returned
+		RET=`ssh root@$FULLHOSTNAME getent -s sss passwd 2>&1`	
+              	for item in $PUSER1 $PUSER2 user2000 user2001 ; do
+              		echo $RET | grep $item
+                	if [ $? -ne 0 ] ; then
+                		message "ERROR: Expected $item user to be returned."
+                        	myresult=FAIL
+                	else
+                        	message "$item user returned as expected."
+                	fi
+              	done
 
-              done
+	    	# users that shouldn't be returned
+              	RET=`ssh root@$FULLHOSTNAME getent -s sss passwd 2>&1`
+              	for item in $PUSER3 $PUSER4 ; do
+                	echo $RET | grep $item
+                	if [ $? -eq 0 ] ; then
+                        	message "ERROR: Expected $item user not to be returned. Out of configured range"
+                        	myresult=FAIL
+                	else
+                        	message "$item user was NOT returned as expected."
+                	fi
+              	done
 
-	     ssh root@$FULLHOSTNAME "sss_userdel user2000 ; sss_userdel user2001"
-
-	    # users that shouldn't be returned
-              USERS="$PUSER3 $PUSER4"
-              RET=`ssh root@$FULLHOSTNAME getent -s sss passwd 2>&1`
-              for item in $USERS ; do
-                echo $RET | grep $item
-                if [ $? -eq 0 ] ; then
-                        message "ERROR: Expected $item user not to be returned. Out of configured range"
-                        myresult=FAIL
-                else
-                        message "$item user was NOT returned as expected."
-                fi
-		
-              done
+		# clean up
+		ssh root@$FULLHOSTNAME "sss_userdel user2000 ; sss_userdel user2001"
         done
 
         result $myresult
@@ -223,36 +220,33 @@ sssd_multi_003()
                         myresult=FAIL
                 fi
 
-           # verify group enumeration
-           # Users that should be returned
-              GROUPS="$PGROUP1 $PGROUP2 group2000 group2001"
-              RET=`ssh root@$FULLHOSTNAME getent -s sss group 2>&1`
-              for item in $GROUPS ; do
-                echo $RET | grep $item
-                if [ $? -ne 0 ] ; then
-                        message "ERROR: Expected $item group to be returned."
-                        myresult=FAIL
-                else
-                        message "$item group returned as expected."
-                fi
-	
-              done
+           	# verify group enumeration
+           	# Users that should be returned
+              	RET=`ssh root@$FULLHOSTNAME getent -s sss group 2>&1`
+              	for item in $PGROUP1 $PGROUP2 group2000 group2001 ; do
+                	echo $RET | grep $item
+                	if [ $? -ne 0 ] ; then
+                        	message "ERROR: Expected $item group to be returned."
+                        	myresult=FAIL
+                	else
+                        	message "$item group returned as expected."
+                	fi
+              	done
 
-	      ssh root@$FULLHOSTNAME "sss_groupdel group2000 ; sss_groupdel group2001"
+            	# groups that shouldn't be returned
+              	RET=`ssh root@$FULLHOSTNAME getent -s sss group 2>&1`
+              	for item in $PGROUP3 $PROUP4 ; do
+                	echo $RET | grep $item
+                	if [ $? -eq 0 ] ; then
+                        	message "ERROR: Expected $item group not to be returned. Out of configured range"
+                        	myresult=FAIL
+                	else
+                        	message "$item group was NOT returned as expected."
+                	fi
+              	done
 
-            # groups that shouldn't be returned
-              GROUPS="$PGROUP3 $PROUP4"
-              RET=`ssh root@$FULLHOSTNAME getent -s sss group 2>&1`
-              for item in $GROUPS ; do
-                echo $RET | grep $item
-                if [ $? -eq 0 ] ; then
-                        message "ERROR: Expected $item group not to be returned. Out of configured range"
-                        myresult=FAIL
-                else
-                        message "$item group was NOT returned as expected."
-                fi
-              done
-              
+		# clean up
+		ssh root@$FULLHOSTNAME "sss_groupdel group2000 ; sss_groupdel group2001"
         done
 
         result $myresult
@@ -520,36 +514,33 @@ sssd_multi_010()
                         myresult=FAIL
                 fi
 
-           # verify user enumeration
-           # Users that should be returned
-              USERS="$PUSER1@LDAP $PUSER2@LDAP user2000@LOCAL user2001@LOCAL"
-              RET=`ssh root@$FULLHOSTNAME getent -s sss passwd 2>&1`
-              for item in $USERS ; do
-                echo $RET | grep $item
-                if [ $? -ne 0 ] ; then
-                        message "ERROR: Expected $item user to be returned."
-                        myresult=FAIL
-                else
-                        message "$item user returned as expected."
-                fi
+           	# verify user enumeration
+           	# Users that should be returned
+              	RET=`ssh root@$FULLHOSTNAME getent -s sss passwd 2>&1`
+              	for item in $PUSER1@LDAP $PUSER2@LDAP user2000@LOCAL user2001@LOCAL ; do
+                	echo $RET | grep $item
+                	if [ $? -ne 0 ] ; then
+                        	message "ERROR: Expected $item user to be returned."
+                        	myresult=FAIL
+                	else
+                        	message "$item user returned as expected."
+                	fi
+              	done
 
-              done
+            	# users that shouldn't be returned
+              	RET=`ssh root@$FULLHOSTNAME getent -s sss passwd 2>&1`
+              	for item in $PUSER3 $PUSER4 ; do
+                	echo $RET | grep $item
+                	if [ $? -eq 0 ] ; then
+                        	message "ERROR: Expected $item user not to be returned. Out of configured range"
+                        	myresult=FAIL
+                	else
+                        	message "$item user was NOT returned as expected."
+                	fi
+              	done
 
-             ssh root@$FULLHOSTNAME "sss_userdel user2000 ; sss_userdel user2001"
-
-            # users that shouldn't be returned
-              USERS="$PUSER3 $PUSER4"
-              RET=`ssh root@$FULLHOSTNAME getent -s sss passwd 2>&1`
-              for item in $USERS ; do
-                echo $RET | grep $item
-                if [ $? -eq 0 ] ; then
-                        message "ERROR: Expected $item user not to be returned. Out of configured range"
-                        myresult=FAIL
-                else
-                        message "$item user was NOT returned as expected."
-                fi
-
-              done
+		# clean up
+		ssh root@$FULLHOSTNAME "sss_userdel user2000 ; sss_userdel user2001"
         done
 
         result $myresult
@@ -573,35 +564,33 @@ sssd_multi_011()
                         myresult=FAIL
                 fi
 
-           # verify group enumeration
-           # Users that should be returned
-              GROUPS="$PGROUP1@LDAP $PGROUP2@LDAP group2000@LOCAL group2001@LOCAL"
-              RET=`ssh root@$FULLHOSTNAME getent -s sss group 2>&1`
-              for item in $GROUPS ; do
-                echo $RET | grep $item
-                if [ $? -ne 0 ] ; then
-                        message "ERROR: Expected $item group to be returned."
-                        myresult=FAIL
-                else
-                        message "$item group returned as expected."
-                fi
-
+           	# verify group enumeration
+           	# Users that should be returned
+              	RET=`ssh root@$FULLHOSTNAME getent -s sss group 2>&1`
+              	for item in $PGROUP1@LDAP $PGROUP2@LDAP group2000@LOCAL group2001@LOCAL ; do
+                	echo $RET | grep $item
+                	if [ $? -ne 0 ] ; then
+                        	message "ERROR: Expected $item group to be returned."
+                        	myresult=FAIL
+                	else
+                        	message "$item group returned as expected."
+                	fi
               done
 
-              ssh root@$FULLHOSTNAME "sss_groupdel group2000 ; sss_groupdel group2001"
+            	# groups that shouldn't be returned
+              	RET=`ssh root@$FULLHOSTNAME getent -s sss group 2>&1`
+              	for item in $PGROUP3 $PROUP4 ; do
+                	echo $RET | grep $item
+                	if [ $? -eq 0 ] ; then
+                        	message "ERROR: Expected $item group not to be returned. Out of configured range"
+                        	myresult=FAIL
+                	else
+                        	message "$item group was NOT returned as expected."
+               		fi
+              	done
 
-            # groups that shouldn't be returned
-              GROUPS="$PGROUP3 $PROUP4"
-              RET=`ssh root@$FULLHOSTNAME getent -s sss group 2>&1`
-              for item in $GROUPS ; do
-                echo $RET | grep $item
-                if [ $? -eq 0 ] ; then
-                        message "ERROR: Expected $item group not to be returned. Out of configured range"
-                        myresult=FAIL
-                else
-                        message "$item group was NOT returned as expected."
-                fi
-              done
+		#clean up
+		ssh root@$FULLHOSTNAME "sss_groupdel group2000 ; sss_groupdel group2001"
               
         done
 
@@ -779,19 +768,13 @@ sssd_multi_017()
                         message "ERROR Configuring SSSD on $FULLHOSTNAME."
                         myresult=FAIL
                 else
-                        ssh root@$FULLHOSTNAME "rm -rf /var/lib/sss/*.ldb ; service sssd stop"
-                        MSG=` ssh root@$FULLHOSTNAME "service sssd start 2>&1"`
-                        if [ $? -ne 0 ] ; then
+                        ssh root@$FULLHOSTNAME "service sssd stop ; rm -rf /var/lib/sss/*.ldb"
+                        ssh root@$FULLHOSTNAME "service sssd start"
+                        if [ $? -eq 0 ] ; then
                                 message "ERROR: SSSD Should have failed to start with 2 LOCAL domains configured on $FULLHOSTNAME"
-				message "Trac issue 97"
                                 myresult=FAIL
-                        fi
-
-                	if [[ $EXPMSG != $MSG ]] ; then
-                        	message "ERROR: Unexpected Error message.  Got: $MSG  Expected: $EXPMSG"
-                        	myresult=FAIL
                 	else
-                        	message "Deleting LDAP group error message was as expected."
+                        	message "SSSD failed to start as expected with more than one local domain configured."
                 	fi
 		fi
         done
@@ -820,7 +803,6 @@ sssd_multi_018()
                         message "ERROR Configuring SSSD on $FULLHOSTNAME."
                         myresult=FAIL
                 else
-                        ssh root@$FULLHOSTNAME "rm -rf /var/lib/sss/*.ldb"
                         restartSSSD $FULLHOSTNAME
                         if [ $? -ne 0 ] ; then
                                 message "ERROR: Restart SSSD failed on $FULLHOSTNAME"
@@ -892,26 +874,22 @@ sssd_multi_019()
         message "START $tet_thistest:  Enumerated Users - LDAP and LDAP - RHDS - Ranges - No FQN"
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 
-        EXPMSG="Unsupported domain type"
         for c in $CLIENTS ; do
 		eval_vars $c
                 message "Working on $FULLHOSTNAME"
 
-           # verify user enumeration
-           # Users that should be returned
-              USERS="$PUSER1 $PUSER2 $PUSER5 $PUSER6"
-              RET=`ssh root@$FULLHOSTNAME getent -s sss passwd 2>&1`
-              for item in $USERS ; do
-                echo $RET | grep $item
-                if [ $? -ne 0 ] ; then
-                        message "ERROR: Expected $item user to be returned."
-                        myresult=FAIL
-                else
-                        message "$item user returned as expected."
-                fi
-
-              done
-
+           	# verify user enumeration
+           	# Users that should be returned
+              	RET=`ssh root@$FULLHOSTNAME getent -s sss passwd 2>&1`
+              	for item in $PUSER1 $PUSER2 $PUSER5 $PUSER6 ; do
+                	echo $RET | grep $item
+                	if [ $? -ne 0 ] ; then
+                        	message "ERROR: Expected $item user to be returned."
+                        	myresult=FAIL
+                	else
+                        	message "$item user returned as expected."
+                	fi
+              	done
         done
 
         result $myresult
@@ -924,25 +902,21 @@ sssd_multi_020()
         message "START $tet_thistest:  Enumerated Groups - LDAP and LDAP - RHDS - Ranges - No FQN"
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 
-        EXPMSG="Unsupported domain type"
         for c in $CLIENTS ; do
 		eval_vars $c
                 message "Working on $FULLHOSTNAME"
 
-           # verify group enumeration
-           # Groups that should be returned
-              GROUPSS="$PGROUP1 $PGROUP2 $PGROUP5 $PGROUP6"
-              RET=`ssh root@$FULLHOSTNAME getent -s sss group 2>&1`
-              for item in $GROUPS ; do
-                echo $RET | grep $item
-                if [ $? -ne 0 ] ; then
-                        message "ERROR: Expected $item group to be returned."
-                        myresult=FAIL
-                else
-                        message "$item group returned as expected."
-                fi
-
-              done
+           	# verify group enumeration
+              	RET=`ssh root@$FULLHOSTNAME getent -s sss group 2>&1`
+              	for item in $PGROUP1 $PGROUP2 $PGROUP6 ; do
+                	echo $RET | grep $item
+                	if [ $? -ne 0 ] ; then
+                        	message "ERROR: Expected $item group to be returned."
+                        	myresult=FAIL
+                	else
+                        	message "$item group returned as expected."
+                	fi
+              	done
 
 		# Let's make sure we do get both Duplicate groups without useFullyQualifiedNames
         	RET=`ssh root@$FULLHOSTNAME getent -s sss group | grep $PGROUP7 2>&1`
@@ -986,7 +960,6 @@ sssd_multi_021()
                         message "ERROR Configuring SSSD on $FULLHOSTNAME."
                         myresult=FAIL
                 else
-                        ssh root@$FULLHOSTNAME "rm -rf /var/lib/sss/*.ldb"
                         restartSSSD $FULLHOSTNAME
                         if [ $? -ne 0 ] ; then
                                 message "ERROR: Restart SSSD failed on $FULLHOSTNAME"
@@ -1006,11 +979,6 @@ sssd_multi_021()
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME "EXAMPLE\.COM" legacy TRUE
-                if [ $? -ne 0 ] ; then
-                        myresult=FAIL
-                fi
-
 		verifyCfg $FULLHOSTNAME "EXAMPLE\.COM" useFullyQualifiedNames TRUE
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
@@ -1022,11 +990,6 @@ sssd_multi_021()
                 fi
 
                 verifyCfg $FULLHOSTNAME "BOS\.REDHAT\.COM" enumerate TRUE
-                if [ $? -ne 0 ] ; then
-                        myresult=FAIL
-                fi
-
-                verifyCfg $FULLHOSTNAME "BOS\.REDHAT\.COM" legacy TRUE
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
@@ -1062,21 +1025,18 @@ sssd_multi_022()
 		eval_vars $c
                 message "Working on $FULLHOSTNAME"
 
-           # verify user enumeration
-           # Users that should be returned
-              USERS="$PUSER1@$DOMAIN1 $PUSER2@$DOMAIN1 $PUSER5@$DOMAIN2 $PUSER6@$DOMAIN2"
-              RET=`ssh root@$FULLHOSTNAME getent -s sss passwd 2>&1`
-              for item in $USERS ; do
-                echo $RET | grep $item
-                if [ $? -ne 0 ] ; then
-                        message "ERROR: Expected $item user to be returned."
-                        myresult=FAIL
-                else
-                        message "$item user returned as expected."
-                fi
-
-              done
-
+           	# verify user enumeration
+           	# Users that should be returned
+              	RET=`ssh root@$FULLHOSTNAME getent -s sss passwd 2>&1`
+              	for item in $PUSER1@$DOMAIN1 $PUSER2@$DOMAIN1 $PUSER5@$DOMAIN2 $PUSER6@$DOMAIN2 ; do
+                	echo $RET | grep $item
+                	if [ $? -ne 0 ] ; then
+                        	message "ERROR: Expected $item user to be returned."
+                        	myresult=FAIL
+                	else
+                        	message "$item user returned as expected."
+                	fi
+              	done
         done
 
         result $myresult
@@ -1093,20 +1053,18 @@ sssd_multi_023()
 		eval_vars $c
                 message "Working on $FULLHOSTNAME"
 
-           # verify group enumeration
-           # Groups that should be returned
-              GROUPS="$PGROUP1@$DOMAIN1 $PGROUP2@$DOMAIN1 $PGROUP5@$DOMAIN2 $PGROUP6@$DOMAIN2 $PGROUP7@$DOMAIN1 $PGROUP7@$DOMAIN2"
-              RET=`ssh root@$FULLHOSTNAME getent -s sss group 2>&1`
-              for item in $GROUPS ; do
-                echo $RET | grep $item
-                if [ $? -ne 0 ] ; then
-                        message "ERROR: Expected $item group to be returned."
-                        myresult=FAIL
-                else
-                        message "$item group returned as expected."
-                fi
-
-              done
+           	# verify group enumeration
+           	# Groups that should be returned
+              	RET=`ssh root@$FULLHOSTNAME getent -s sss group 2>&1`
+              	for item in $PGROUP1@$DOMAIN1 $PGROUP2@$DOMAIN1 $PGROUP5@$DOMAIN2 $PGROUP6@$DOMAIN2 $PGROUP7@$DOMAIN1 $PGROUP7@$DOMAIN2 ; do
+                	echo $RET | grep $item
+                	if [ $? -ne 0 ] ; then
+                        	message "ERROR: Expected $item group to be returned."
+                        	myresult=FAIL
+                	else
+                        	message "$item group returned as expected."
+                	fi
+              	done
         done
 
         result $myresult
@@ -1162,7 +1120,6 @@ sssd_multi_025()
                         message "ERROR Configuring SSSD on $FULLHOSTNAME."
                         myresult=FAIL
                 else
-                        ssh root@$FULLHOSTNAME "rm -rf /var/lib/sss/*.ldb"
                         restartSSSD $FULLHOSTNAME
                         if [ $? -ne 0 ] ; then
                                 message "ERROR: Restart SSSD failed on $FULLHOSTNAME"
@@ -1192,11 +1149,6 @@ sssd_multi_025()
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME "EXAMPLE\.COM" legacy TRUE
-                if [ $? -ne 0 ] ; then
-                        myresult=FAIL
-                fi
-
                 verifyCfg $FULLHOSTNAME "EXAMPLE\.COM" "cache\-credentials" FALSE
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
@@ -1218,11 +1170,6 @@ sssd_multi_025()
                 fi
 
                 verifyCfg $FULLHOSTNAME "BOS\.REDHAT\.COM" provider proxy
-                if [ $? -ne 0 ] ; then
-                        myresult=FAIL
-                fi
-
-                verifyCfg $FULLHOSTNAME "BOS\.REDHAT\.COM" legacy TRUE
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
@@ -1249,21 +1196,18 @@ sssd_multi_026()
 		eval_vars $c
                 message "Working on $FULLHOSTNAME"
 
-           # verify user enumeration
-           # Users that should be returned
-              USERS="$PUSER1 $PUSER2 $PUSER5 $PUSER6"
-              RET=`ssh root@$FULLHOSTNAME getent -s sss passwd 2>&1`
-              for item in $USERS ; do
-                echo $RET | grep $item
-                if [ $? -ne 0 ] ; then
-                        message "ERROR: Expected $item user to be returned."
-                        myresult=FAIL
-                else
-                        message "$item user returned as expected."
-                fi
-
+           	# verify user enumeration
+           	# Users that should be returned
+              	RET=`ssh root@$FULLHOSTNAME getent -s sss passwd 2>&1`
+              	for item in $PUSER1 $PUSER2 $PUSER5 $PUSER6 ; do
+                	echo $RET | grep $item
+                	if [ $? -ne 0 ] ; then
+                        	message "ERROR: Expected $item user to be returned."
+                        	myresult=FAIL
+                	else
+                        	message "$item user returned as expected."
+                	fi
               done
-
         done
 
         result $myresult
@@ -1276,30 +1220,25 @@ sssd_multi_027()
         message "START $tet_thistest:  Enumerated Groups - LDAP and PROXY LDAP - RHDS - Ranges - No FQN - proxy"
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 
-        EXPMSG="Unsupported domain type"
         for c in $CLIENTS ; do
 		eval_vars $c
                 message "Working on $FULLHOSTNAME"
 
-           # verify group enumeration
-           # Groups that should be returned
-              GROUPSS="$PGROUP1 $PGROUP2 $PGROUP5 $PGROUP6"
-              RET=`ssh root@$FULLHOSTNAME getent -s sss group 2>&1`
-              for item in $GROUPS ; do
-                echo $RET | grep $item
-                if [ $? -ne 0 ] ; then
-                        message "ERROR: Expected $item group to be returned."
-                        myresult=FAIL
-                else
-                        message "$item group returned as expected."
-                fi
+           	# verify group enumeration
+              	RET=`ssh root@$FULLHOSTNAME getent -s sss group 2>&1`
+              	for item in $PGROUP1 $PGROUP2 $PGROUP6 ; do
+                	echo $RET | grep $item
+                	if [ $? -ne 0 ] ; then
+                        	message "ERROR: Expected $item group to be returned."
+                        	myresult=FAIL
+                	else
+                        	message "$item group returned as expected."
+                	fi
+              	done
 
-              done
-
-		# Let's make sure we do not get both Duplicate groups without useFullyQualifiedNames
-        	RET=`ssh root@$FULLHOSTNAME getent -s sss group | grep $PGROUP7 2>&1`
+		# Let's make sure we get both Duplicate groups without useFullyQualifiedNames and enumerating
 		echo $RET | grep 1010
-                if [ $? -ne 0 ] ; then
+                	if [ $? -ne 0 ] ; then
                         message "ERROR: Expected group with gid 1010 to be returned."
                         myresult=FAIL
                 else
@@ -1307,14 +1246,12 @@ sssd_multi_027()
                 fi
 
                 echo $RET | grep 2010
-                if [ $? -eq 0 ] ; then
+                if [ $? -ne 0 ] ; then
                         message "ERROR: Expected group with gid 2010 not to be returned."
                         myresult=FAIL
                 else
                         message "Second Duplicate group name not returned as expected."
                 fi
-
-
         done
 
         result $myresult
@@ -1344,7 +1281,6 @@ sssd_multi_028()
                         message "ERROR Configuring SSSD on $FULLHOSTNAME."
                         myresult=FAIL
                 else
-                        ssh root@$FULLHOSTNAME "rm -rf /var/lib/sss/*.ldb"
                         restartSSSD $FULLHOSTNAME
                         if [ $? -ne 0 ] ; then
                                 message "ERROR: Restart SSSD failed on $FULLHOSTNAME"
@@ -1410,21 +1346,18 @@ sssd_multi_029()
 		eval_vars $c
                 message "Working on $FULLHOSTNAME"
 
-           # verify user enumeration
-           # Users that should be returned
-              USERS="$PUSER1@$DOMAIN1 $PUSER2@$DOMAIN1 $PUSER5@$DOMAIN2 $PUSER6@$DOMAIN2"
-              RET=`ssh root@$FULLHOSTNAME getent -s sss passwd 2>&1`
-              for item in $USERS ; do
-                echo $RET | grep $item
-                if [ $? -ne 0 ] ; then
-                        message "ERROR: Expected $item user to be returned."
-                        myresult=FAIL
-                else
-                        message "$item user returned as expected."
-                fi
-
-              done
-
+           	# verify user enumeration
+           	# Users that should be returned
+              	RET=`ssh root@$FULLHOSTNAME getent -s sss passwd 2>&1`
+              	for item in $PUSER1@$DOMAIN1 $PUSER2@$DOMAIN1 $PUSER5@$DOMAIN2 $PUSER6@$DOMAIN2 ; do
+                	echo $RET | grep $item
+                	if [ $? -ne 0 ] ; then
+                        	message "ERROR: Expected $item user to be returned."
+                        	myresult=FAIL
+                	else
+                        	message "$item user returned as expected."
+                	fi
+              	done
         done
 
         result $myresult
@@ -1443,9 +1376,8 @@ sssd_multi_030()
 
            # verify group enumeration
            # Groups that should be returned
-              GROUPS="$PGROUP1@$DOMAIN1 $PGROUP2@$DOMAIN1 $PGROUP5@$DOMAIN2 $PGROUP6@$DOMAIN2 $PGROUP7@$DOMAIN1 $PGROUP7@$DOMAIN2"
               RET=`ssh root@$FULLHOSTNAME getent -s sss group 2>&1`
-              for item in $GROUPS ; do
+              for item in $PGROUP1@$DOMAIN1 $PGROUP2@$DOMAIN1 $PGROUP5@$DOMAIN2 $PGROUP6@$DOMAIN2 $PGROUP7@$DOMAIN1 $PGROUP7@$DOMAIN2 ; do
                 echo $RET | grep $item
                 if [ $? -ne 0 ] ; then
                         message "ERROR: Expected $item group to be returned."
