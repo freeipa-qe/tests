@@ -174,18 +174,32 @@ verifyCfg()
    domain=$2
    config=$3
    value=$4
-   CONFIG=`ssh root@$client ldbsearch -H /var/lib/sss/db/config.ldb -b "cn=$domain,cn=domains,cn=config" | grep $config: | cut -d : -f 2`
-   #trim whitespace
-   CONFIG=`echo $CONFIG`
-   if [ $CONFIG -ne $value ] ; then
-   	message "$domain domain configuration for $config not as expected. Expected: $value  Got: $CONFIG"
-        rc=1
+   VALUE=`ssh root@$client ldbsearch -H /var/lib/sss/db/config.ldb -b "cn=$domain,cn=domains,cn=config" | grep $config: | cut -d : -f 2`
+   if [ -z $VALUE ] ; then
+	message "ERROR: Search for $config returned NULL value"
+	rc = 1
    else
-   	message "$domain domain configuration for $config is as expected: $CONFIG"
+   	#trim whitespace
+  	VALUE=`echo $VALUE`
+   	eval 'true $(($VALUE))'
+   	if [ $? -eq 0 ] ; then
+   		if [ $VALUE -ne $value ] ; then
+   			message "ERROR: $domain domain configuration for $config not as expected. Expected: $value  Got: $VALUE"
+        		rc=1
+   		else
+   			message "$domain domain configuration for $config is as expected: $VALUE"
+   		fi
+   	else
+        	if [ "$VALUE" != "$value" ] ; then
+                	message "ERROR: $domain domain configuration for $config not as expected. Expected: $value  Got: $VALUE"
+                	rc=1
+        	else
+                	message "$domain domain configuration for $config is as expected: $VALUE"
+        	fi
+   	fi
    fi
-  
-   return $rc
 
+   return $rc
 }
 
 verifyAttr()
@@ -196,17 +210,31 @@ verifyAttr()
    attr=$3
    value=$4
    VALUE=`ssh root@$client ldbsearch -H /var/lib/sss/db/sssd.ldb -b "$dn" | grep $attr: | cut -d : -f 2`
-   #trim whitespace
-   VALUE=`echo $VALUE`
-   if [[ $VALUE != $value ]] ; then
-        message "The value of $attr attribute for $dn is not as expected. Expected: $value  Got: $VALUE"
-        rc=1
+   if [ -z $VALUE ] ; then
+	message "ERROR: Search for $attr returned NULL value."
+	rc=1
    else
-        message "$attr attribute value for $dn is as expected: $VALUE"
+   	#trim whitespace
+   	VALUE=`echo $VALUE`
+   	eval 'true $(($VALUE))'
+   	if [ $? -eq 0 ] ; then
+   		if [ $VALUE -ne $value ] ; then
+        		message "The value of $attr attribute for $dn is not as expected. Expected: $value  Got: $VALUE"
+        		rc=1
+   		else
+        		message "$attr attribute value for $dn is as expected: $VALUE"
+   		fi
+   	else
+        	if [ "$VALUE" != "$value" ] ; then
+                	message "The value of $attr attribute for $dn is not as expected. Expected: $value  Got: $VALUE"
+                	rc=1
+        	else
+                	message "$attr attribute value for $dn is as expected: $VALUE"
+        	fi
+  	fi
    fi
 
    return $rc
-
 }
 
 restartSSSD()
@@ -234,7 +262,7 @@ restartSSSD()
         fi
    fi
 
-   sleep 10
+   sleep 2
 
    return $rc
 }
