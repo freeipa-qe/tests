@@ -13,7 +13,7 @@ fi
 #####################################################################
 iclist="ic0 ic1"
 ic0="startup"
-ic1="sssd_files_001 sssd_files_002 sssd_files_003 sssd_files_004 sssd_files_005 sssd_files_006 sssd_files_007 sssd_files_008 sssd_files_009 sssd_files_010 sssd_files_011 sssd_files_012"
+ic1="sssd_files_001 sssd_files_002 sssd_files_003 sssd_files_004 sssd_files_005 sssd_files_006 sssd_files_007 sssd_files_008 sssd_files_009 sssd_files_010 sssd_files_011 sssd_files_012 sssd_files_013"
 ######################################################################
 # Tests
 ######################################################################
@@ -80,7 +80,7 @@ sssd_files_001()
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME FILES provider files
+                verifyCfg $FULLHOSTNAME FILES provider proxy
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
@@ -261,7 +261,7 @@ sssd_files_006()
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME FILES provider files
+                verifyCfg $FULLHOSTNAME FILES provider proxy
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
@@ -387,6 +387,30 @@ sssd_files_010()
 sssd_files_011()
 {
         myresult=PASS
+        message "START $tet_thistest: Trac Ticket 189 - Seg Fault with id command"
+        if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+        for c in $CLIENTS ; do
+                eval_vars $c
+                message "Working on $FULLHOSTNAME"
+		# excute id against all users in the /etc/passwd file
+		for user in $(awk -F: '{print $1}' /etc/passwd); do 
+			id $user 
+			if [ $? -ne 0 ] ; then
+				message "ERROR: id $user failed. return code: $?"
+				myresult=FAIL
+			else
+				message "id $user successful."
+			fi
+		done
+        done
+
+        result $myresult
+        message "END $tet_thistest"
+}
+
+sssd_files_012()
+{
+        myresult=PASS
         message "START $tet_thistest: Delete Local Users"
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
         for c in $CLIENTS ; do
@@ -424,7 +448,7 @@ sssd_files_011()
         message "END $tet_thistest"
 }
 
-sssd_files_012()
+sssd_files_013()
 {
         myresult=PASS
         message "START $tet_thistest: Delete Local Group"

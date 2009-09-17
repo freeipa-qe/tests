@@ -616,6 +616,7 @@ sssd_multi_012()
 
                 if [[ $EXPMSG != $MSG ]] ; then
                         message "ERROR: Unexpected Error message.  Got: $MSG  Expected: $EXPMSG"
+			message "Trac issue 188"
                         myresult=FAIL
                 else
                         message "Modifying LDAP user error message was as expected."
@@ -644,6 +645,7 @@ sssd_multi_013()
 
                 if [[ $EXPMSG != $MSG ]] ; then
                         message "ERROR: Unexpected Error message.  Got: $MSG  Expected: $EXPMSG"
+			message "Trac issue 188"
                         myresult=FAIL
                 else
                         message "Deleting LDAP user error message was as expected."
@@ -701,6 +703,7 @@ sssd_multi_015()
 
                 if [[ $EXPMSG != $MSG ]] ; then
                         message "ERROR: Unexpected Error message.  Got: $MSG  Expected: $EXPMSG"
+			message "Trac issue 188"
                         myresult=FAIL
                 else
                         message "Deleting LDAP group error message was as expected."
@@ -715,7 +718,7 @@ sssd_multi_015()
 sssd_multi_016()
 {
         myresult=PASS
-        message "START $tet_thistest: Attempt to LOCAL User to LDAP Domain Group - LDAP and LOCAL"
+        message "START $tet_thistest: Attempt to add LOCAL User to LDAP Domain Group - LDAP and LOCAL"
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 
         EXPMSG="Unsupported domain type"
@@ -1203,6 +1206,7 @@ sssd_multi_026()
                 	echo $RET | grep $item
                 	if [ $? -ne 0 ] ; then
                         	message "ERROR: Expected $item user to be returned."
+				message "Trac issue 187"
                         	myresult=FAIL
                 	else
                         	message "$item user returned as expected."
@@ -1230,6 +1234,7 @@ sssd_multi_027()
                 	echo $RET | grep $item
                 	if [ $? -ne 0 ] ; then
                         	message "ERROR: Expected $item group to be returned."
+				message "Trac issue 187"
                         	myresult=FAIL
                 	else
                         	message "$item group returned as expected."
@@ -1248,6 +1253,7 @@ sssd_multi_027()
                 echo $RET | grep 2010
                 if [ $? -ne 0 ] ; then
                         message "ERROR: Expected group with gid 2010 not to be returned."
+			message "Trac issue 187"
                         myresult=FAIL
                 else
                         message "Second Duplicate group name not returned as expected."
@@ -1284,7 +1290,7 @@ sssd_multi_028()
                         restartSSSD $FULLHOSTNAME
                         if [ $? -ne 0 ] ; then
                                 message "ERROR: Restart SSSD failed on $FULLHOSTNAME"
-                             sssd_ldap_014   myresult=FAIL
+                                myresult=FAIL
                         else
                                 message "SSSD Server restarted on client $FULLHOSTNAME"
                         fi
@@ -1353,6 +1359,7 @@ sssd_multi_029()
                 	echo $RET | grep $item
                 	if [ $? -ne 0 ] ; then
                         	message "ERROR: Expected $item user to be returned."
+				message "Trac issue 186"
                         	myresult=FAIL
                 	else
                         	message "$item user returned as expected."
@@ -1381,6 +1388,7 @@ sssd_multi_030()
                 echo $RET | grep $item
                 if [ $? -ne 0 ] ; then
                         message "ERROR: Expected $item group to be returned."
+			message "Trac issue 186"
                         myresult=FAIL
                 else
                         message "$item group returned as expected."
