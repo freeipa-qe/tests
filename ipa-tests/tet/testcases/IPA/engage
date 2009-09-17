@@ -380,6 +380,13 @@ main_analyze()
 			totpass=`expr $totpass + $maNbRes` # calculate total % pass
 		fi
 	done
+	# The TESTVERSION env variable seems to only exist on rhts enviroments.
+	# If TESTVERSION exists, then we will try to fix the report path to match where it's going.
+	if [ ! -z $TESTVERSION ]; then 
+		new_fixpath=`echo $main_fixpath | sed s='/export/svrbld/tet_root/'='/dirsec/archives-mp1/archives/rhts/ipa/'=g`
+		main_fixpath=$new_fixpath
+		export main_fixpath
+	fi
 	echo								>> $MainReport
 	echo "    Files are located on `hostname` (`date '+%Y%m%d-%H%M%S'`)" >> $MainReport
 	maFixedPath="${WebServer}`main_fixpath $maJournal`"

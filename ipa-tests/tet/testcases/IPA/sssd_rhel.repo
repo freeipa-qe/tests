@@ -1,3 +1,4 @@
+[sssd]
 name=SSSD - $basearch
 failovermethod=priority
 baseurl=http://sssd-builder.idm.lab.bos.redhat.com/repos/rhel5/$basearch/RPMS

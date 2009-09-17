@@ -431,7 +431,7 @@ SetupServer()
 	if [ "$1" == "M1" ]; then
 		echo "setting up server $1 as a master server"
 		if [ $DSTET_DEBUG = y ]; then
-			echo "ipa-server-install -N -U --hostname=$FULLHOSTNAME -r $RELM_NAME -p $DM_ADMIN_PASS -P $KERB_MASTER_PASS -a $DM_ADMIN_PASS -u root --setup-dns"
+			message "ipa-server-install -N -U --hostname=$FULLHOSTNAME -r $RELM_NAME -p $DM_ADMIN_PASS -P $KERB_MASTER_PASS -a $DM_ADMIN_PASS -u root --setup-dns"
 			ssh root@$FULLHOSTNAME "ipa-server-install -N -U --hostname=$FULLHOSTNAME -r $RELM_NAME -p $DM_ADMIN_PASS -P $KERB_MASTER_PASS -a $DM_ADMIN_PASS -u root --setup-dns --forwarder=$DNSMASTER -d "
 		else
 			echo "ipa-server-install -N -U --hostname=$FULLHOSTNAME -r $RELM_NAME -p $DM_ADMIN_PASS -P $KERB_MASTER_PASS -a $DM_ADMIN_PASS -u root --setup-dns"
@@ -439,9 +439,11 @@ SetupServer()
 
 		fi
 		if [ $? -ne 0 ]; then
-			echo "ERROR - ipa-server-install on $FULLHOSTNAME failed."
+			message "ERROR - ipa-server-install on $FULLHOSTNAME failed."
 			echo "contents of ipaserver-install.log and krb5kdc.log:: "
 			ssh root@$FULLHOSTNAME "cat /var/log/ipaserver-install.log;cat /var/log/krb5kdc.log;cat /etc/hosts;cat /etc/resolv.conf";
+			# Install debugging
+			if [ $DSTET_DEBUG = y ]; then message "additional debugging info stored in install log"; echo /var/log/ipaserver-install.log; cat /var/log/ipaserver-install.log; echo /var/log/httpd/nss_error_log; cat /var/log/httpd/nss_error_log; echo /var/log/httpd/error_log; cat /var/log/httpd/nss_error_log; fi
 			echo "Trying again"			
 			ssh root@$FULLHOSTNAME "ipa-server-install -N -U --hostname=$FULLHOSTNAME -r $RELM_NAME -p $DM_ADMIN_PASS -P $KERB_MASTER_PASS -a $DM_ADMIN_PASS -u root --setup-dns -d"
 			if [ $? -ne 0 ]; then
@@ -795,7 +797,7 @@ InstallServerRPM()
 		echo "Returning"
 		return 0
 	fi
-	ssh root@$FULLHOSTNAME "rpm -e --allmatches fedora-ds-base fedora-ds-base-devel;rpm -e --allmatches redhat-ds-base-devel;rpm -e --allmatches redhat-ds-base"
+	ssh root@$FULLHOSTNAME "for i in `echo redhat-ds-base ipa-server ipa-admintools bind caching-nameserver krb5-workstation ipa-client ipa-server-selinux ipa-admintools bind-dyndb-ldap ipa-client redhat-ds-base-devel fedora-ds-base fedora-ds-base-devel ipa-python`; do sudo rpm -ev --nodeps $i; done"
 	ssh root@$FULLHOSTNAME "/usr/bin/yum clean all"
 #	pkglistA="TurboGears cyrus-sasl-gssapi fedora-ds-base krb5-server krb5-server-ldap lm_sensors mod_python mozldap mozldap-tools perl-Mozilla-LDAP postgresql-libs python-cheetah python-cherrypy python-configobj python-decoratortools python-elixir python-formencode python-genshi python-json python-kerberos python-kid python-krbV python-nose python-paste python-paste-deploy python-paste-script python-protocols python-psycopg2 python-pyasn1 python-ruledispatch python-setuptools python-simplejson python-sqlalchemy python-sqlite2 python-sqlobject python-tgexpandingformwidget python-tgfastdata python-turbocheetah python-turbojson python-turbokid svrcore tcl Updating bind-libs bind-utils cyrus-sasl cyrus-sasl-devel cyrus-sasl-lib cyrus-sasl-md5 cyrus-sasl-plain krb5-devel krb5-libs bind caching-nameserver expect krb5-workstation"
 #	ssh root@$FULLHOSTNAME "/etc/init.d/yum-updatesd stop; killall yum; killall yum-updatesd-helper; sleep 1; killall -9 yum;rpm -e --allmatches krb5-devel;yum -y install $pkglistA"
@@ -835,6 +837,8 @@ InstallServerRPM()
 	ssh root@$FULLHOSTNAME "yum -y install $pkglistB"
 	if [ $? -ne 0 ]; then
 		echo "That rpm install didn't work, lets try that again. Sleeping for 60 seconds first" 
+		# Install debugging
+		if [ $DSTET_DEBUG = y ]; then echo /var/log/ipaserver-install.log; cat /var/log/ipaserver-install.log; echo /var/log/httpd/nss_error_log; cat /var/log/httpd/nss_error_log; echo /var/log/httpd/error_log; cat /var/log/httpd/nss_error_log; fi
 		sleep 60
 		ssh root@$FULLHOSTNAME "/etc/init.d/yum-updatesd stop;killall yum;sleep 1; killall -9 yum;rpm -e --allmatches krb5-devel krb5-workstation ipa-client;/usr/bin/yum clean all;rm /var/cache/yum/* -Rf;yum -y install $pkglistB"
 		if [ $? -ne 0 ]; then
@@ -932,27 +936,12 @@ UnInstallServerRPM()
 	# Restoring resolv.conf on server before continuing
 	ssh root@$FULLHOSTNAME "if [ -f /etc/resolv.conf.ipasave ]; then cat /etc/resolv.conf.ipasave > /etc/resolv.conf; fi"
 
-	ssh root@$FULLHOSTNAME "rpm -e --allmatches redhat-ds-base ipa-server ipa-admintools bind caching-nameserver krb5-workstation ipa-client ipa-server-selinux ipa-admintools bind-dyndb-ldap ipa-client"
+	ssh root@$FULLHOSTNAME "for i in `echo redhat-ds-base ipa-server ipa-admintools bind caching-nameserver krb5-workstation ipa-client ipa-server-selinux ipa-admintools bind-dyndb-ldap ipa-client redhat-ds-base-devel fedora-ds-base fedora-ds-base-devel ipa-python`; do sudo rpm -ev --nodeps $i; done"
 	if [ $? -ne 0 ]; then
 		echo "ERROR - ssh to $FULLHOSTNAME failed"
-#		return 1
+		return 1
 	fi	
 
-	# Create a working resolv.conf, and remove any lingering redhat-ds packages"
-	ssh root@$FULLHOSTNAME "rm -f /etc/bind.conf.ipasave; \
-		mv /etc/bind.conf /etc/bind.cond.ipasave; \
-		rpm -e --allmatches fedora-ds-base fedora-ds-base-devel; \
-		rpm -e --allmatches redhat-ds-base-devel; \
-		rpm -e --allmatches ipa-server ipa-server-selinux; \
-		rpm -e --allmatches bind bind-dyndb-ldap caching-nameserver; \
-		rpm -e --allmatches redhat-ds-base"
-
-#	ssh root@$FULLHOSTNAME 'find / | grep -v proc | grep -v dev > /list-after-ipa-uninstall.txt'
-#	ret=$?
-#	if [ $ret -ne 0 ]; then
-#		echo "ERROR - ssh to $FULLHOSTNAME failed"
-#		return 1
-#	fi
 	return 0
 }
 
