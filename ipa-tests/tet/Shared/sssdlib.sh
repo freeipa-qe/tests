@@ -181,8 +181,7 @@ verifyCfg()
    else
    	#trim whitespace
   	VALUE=`echo $VALUE`
-   	eval 'true $(($VALUE))'
-   	if [ $? -eq 0 ] ; then
+	if [ $VALUE -eq $VALUE 2> /dev/null ]; then
    		if [ $VALUE -ne $value ] ; then
    			message "ERROR: $domain domain configuration for $config not as expected. Expected: $value  Got: $VALUE"
         		rc=1
@@ -216,8 +215,7 @@ verifyAttr()
    else
    	#trim whitespace
    	VALUE=`echo $VALUE`
-   	eval 'true $(($VALUE))'
-   	if [ $? -eq 0 ] ; then
+	if [ $VALUE -eq $VALUE 2> /dev/null ]; then
    		if [ $VALUE -ne $value ] ; then
         		message "The value of $attr attribute for $dn is not as expected. Expected: $value  Got: $VALUE"
         		rc=1
