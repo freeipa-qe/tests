@@ -13,6 +13,7 @@ sssd
 	/sssd_local.sh
 	/sssd_ldap.sh
 	/sssd_multi.sh
+	/sssd_selinux.sh
 	/cleanup.sh
 	"Ending SSSD tests..."
 

@@ -13,7 +13,7 @@ fi
 #####################################################################
 iclist="ic0 ic1"
 ic0="startup"
-ic1="sssd_files_001 sssd_files_002 sssd_files_003 sssd_files_004 sssd_files_005 sssd_files_006 sssd_files_007 sssd_files_008 sssd_files_009 sssd_files_010 sssd_files_011 sssd_files_012 sssd_files_013"
+ic1="sssd_files_001 sssd_files_002 sssd_files_003 sssd_files_004 sssd_files_005 sssd_files_006 sssd_files_007 sssd_files_008 sssd_files_009 sssd_files_010 sssd_files_011 sssd_files_012 sssd_files_013 sssd_files_014"
 ######################################################################
 # Tests
 ######################################################################
@@ -387,30 +387,6 @@ sssd_files_010()
 sssd_files_011()
 {
         myresult=PASS
-        message "START $tet_thistest: Trac Ticket 189 - Seg Fault with id command"
-        if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-        for c in $CLIENTS ; do
-                eval_vars $c
-                message "Working on $FULLHOSTNAME"
-		# excute id against all users in the /etc/passwd file
-		for user in $(awk -F: '{print $1}' /etc/passwd); do 
-			id $user 
-			if [ $? -ne 0 ] ; then
-				message "ERROR: id $user failed. return code: $?"
-				myresult=FAIL
-			else
-				message "id $user successful."
-			fi
-		done
-        done
-
-        result $myresult
-        message "END $tet_thistest"
-}
-
-sssd_files_012()
-{
-        myresult=PASS
         message "START $tet_thistest: Delete Local Users"
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
         for c in $CLIENTS ; do
@@ -448,7 +424,7 @@ sssd_files_012()
         message "END $tet_thistest"
 }
 
-sssd_files_013()
+sssd_files_012()
 {
         myresult=PASS
         message "START $tet_thistest: Delete Local Group"
@@ -475,6 +451,103 @@ sssd_files_013()
 			message "getent did not find the group."
                 fi
         done
+
+        result $myresult
+        message "END $tet_thistest"
+}
+
+sssd_files_013()
+{
+   ####################################################################
+   #   Configuration 3
+   #    enumerate: TRUE
+   #    minId = 500
+   #    provider: files
+   ####################################################################
+
+        myresult=PASS
+        message "START $tet_thistest: Configuration 3 - FILES - Min ID - Cache Options"
+        if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+        for c in $CLIENTS ; do
+                eval_vars $c
+                message "Working on $FULLHOSTNAME"
+                message "Backing up original sssd.conf and copying over test sssd.conf"
+                sssdCfg $FULLHOSTNAME sssd_files3.conf
+                if [ $? -ne 0 ] ; then
+                        message "ERROR Configuring SSSD on $FULLHOSTNAME."
+                        myresult=FAIL
+                else
+                        restartSSSD $FULLHOSTNAME
+                        if [ $? -ne 0 ] ; then
+                                message "ERROR: Restart SSSD failed on $FULLHOSTNAME"
+                                myresult=FAIL
+                        else
+                                message "SSSD Server restarted on client $FULLHOSTNAME"
+                        fi
+                fi
+
+                verifyCfg $FULLHOSTNAME LEGACYLOCAL enumerate TRUE
+                if [ $? -ne 0 ] ; then
+                        myresult=FAIL
+                fi
+
+                verifyCfg $FULLHOSTNAME LEGACYLOCAL minId 500
+                if [ $? -ne 0 ] ; then
+                        myresult=FAIL
+                fi
+
+                verifyCfg $FULLHOSTNAME LEGACYLOCAL provider proxy
+                if [ $? -ne 0 ] ; then
+                        myresult=FAIL
+                fi
+
+        done
+
+        result $myresult
+        message "END $tet_thistest"
+}
+
+sssd_files_014()
+{
+        myresult=PASS
+        message "START $tet_thistest: Trac Ticket 189 - Seg Fault with id command"
+        if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+        for c in $CLIENTS ; do
+                eval_vars $c
+                message "Working on $FULLHOSTNAME"
+		# clean out /var/log/messages
+		ssh root@$FULLHOSTNAME "cat /dev/null > /var/log/messages"
+                # excute id against all users in the /etc/passwd file
+                ssh root@$FULLHOSTNAME "id bin > /dev/nul &"
+		i=0
+		while [ $i -le 10 ] ; do
+			ssh root@$FULLHOSTNAME "ps | grep id"
+			if [ $? -eq 0 ] ; then
+				sleep 1
+				i=`expr $i + 1`
+				if [ $i -eq 10 ] ; then
+					message "id command is taking way to long"
+				fi
+			fi
+		done
+
+		# now check the log for seg fault
+		F7="segfault"
+		ssh root@$FULLHOSTNAME "cat /var/log/messages | grep sssd_be"
+		if [ $? -eq 0 ] ; then
+			RET7=`ssh root@$FULLHOSTNAME "cat /var/log/messages | grep sssd | cut -d \" \" -f 7"`
+			if [ "$RET7" = "$F7" ] ; then
+				message "ERROR: Trac Issue 189 Segfault still exists."
+				message "$RET7"
+				myresult=FAIL
+			else
+				message "sssd_be logged a message but it was not a segfault"
+				message "$RET7"
+			fi
+		else
+			message "Trac Issue 189 fixed - no Segfault by sssd_be"
+		fi
+        done	
 
         result $myresult
         message "END $tet_thistest"

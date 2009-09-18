@@ -46,6 +46,16 @@ startup()
 		message "ERROR: SSSD Client Setup Failed for $FULLHOSTNAME."
 		myresult=FAIL
 	fi
+
+	# Add custom ldap port to SELinux policy for sssd_t
+	ssh root@$FULLHOSTNAME "semanage port -a -t ldap_port_t -p tcp 11329"
+	if [ $? -ne 0 ] ; then
+		message "ERROR: Adding SSSD SELinux Policy modification for custom LDAP port failed. return code: 0"
+		myresult=FAIL
+	fi
+
+	# clear out the audit log
+	ssh root@$FULLHOSTNAME "cat /dev/null > /var/log/audit/audit.log"
   done
   tet_result $myresult
   message "END $tet_thistest"

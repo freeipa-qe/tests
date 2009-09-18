@@ -40,6 +40,13 @@ cleanup()
                 message "SSSD Uninstall and Cleanup Success."
         fi
 
+	# remove custom SELinux policy modification
+        ssh root@$FULLHOSTNAME "semanage port -d -t ldap_port_t -p tcp 11329"
+        if [ $? -ne 0 ] ; then
+                message "ERROR: Removing SSSD SELinux Policy modification for custom LDAP port failed. return code: 0"
+                myresult=FAIL
+        fi
+
   done
 
   result $myresult
