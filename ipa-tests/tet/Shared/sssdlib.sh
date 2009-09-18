@@ -77,31 +77,29 @@ sssdLDAPSetup()
   #  LDAP.CONF - modify a generic ldap.conf for the target directory server
   ##################################################################################
 
+  rm -rf $TET_TMP_DIR/ldap.conf
   cp  $CONFIG_DIR/ldap.conf $TET_TMP_DIR/ldap.conf
   echo "uri ldap://$dirsrv:$port" >> $TET_TMP_DIR/ldap.conf
   echo "ssl no" >> $TET_TMP_DIR/ldap.conf
   echo "base $basedn" >> $TET_TMP_DIR/ldap.conf
 
-  LDAPFILE=/etc/ldap.conf
   message "Backing up ldap.conf file"
-  ssh root@$client "ls $LDAPFILE.orig"
+  ssh root@$client "ls $LDAPCFG.orig"
   if [ $? -eq 0 ] ; then
-        message "$LDAPFILE file already backed up"
+        message "$LDAPCFG file already backed up"
   else
-        ssh root@$client "cp $LDAPFILE $LDAPFILE.orig"
+        ssh root@$client "cp $LDAPCFG $LDAPCFG.orig"
         if [ $? -ne 0 ] ; then
-                message "ERROR: Failed to backup $LDAPFILE on client $client"
+                message "ERROR: Failed to backup $LDAPCFG on client $client"
                 rc=1
-        else
-                scp $TET_TMP_DIR/ldap.conf root@$client:$LDAPFILE
-                if [ $? -ne 0 ] ; then
-                        message "ERROR: Failed to scp SSSD ldap config file to target client: $client"
-                        rc=1
-                fi
-        fi
+  	fi
   fi
-
-  rm -rf $TET_TMP_DIR/ldap.conf
+     
+  scp $TET_TMP_DIR/ldap.conf root@$client:$LDAPCFG
+  if [ $? -ne 0 ] ; then
+  	message "ERROR: Failed to scp SSSD ldap config file to target client: $client"
+        rc=1
+  fi
 
   return $rc
 }
@@ -114,6 +112,9 @@ sssdClientCleanup()
      ssh root@$client "mv -f $item.orig $item"
      if [ $? -eq 0 ] ; then
      	message "Original $item file restored."
+     else
+	message "Failed to restore orginal file $item"
+	rc=1
      fi
    done
 
