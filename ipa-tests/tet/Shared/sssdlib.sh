@@ -178,7 +178,7 @@ verifyCfg()
    VALUE=`ssh root@$client ldbsearch -H /var/lib/sss/db/config.ldb -b "cn=$domain,cn=domains,cn=config" | grep $config: | cut -d : -f 2`
    if [ -z $VALUE ] ; then
 	message "ERROR: Search for $config returned NULL value"
-	rc = 1
+	rc=1
    else
    	#trim whitespace
   	VALUE=`echo $VALUE`
