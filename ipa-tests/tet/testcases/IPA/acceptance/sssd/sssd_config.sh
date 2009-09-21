@@ -15,7 +15,7 @@ ls $TESTING_SHARED/
 ######################################################################
 #  Test Case List
 #####################################################################
-iclist="ic1 ic2 ic3 ic4 ic5 ic6 ic7 ic8 ic9 ic10"
+iclist="ic1 ic2 ic3 ic4 ic5 ic6 ic7 ic8 ic9"
 ic1="sssd_config_001"
 ic2="sssd_config_002"
 ic3="sssd_config_003"
@@ -25,7 +25,6 @@ ic6="sssd_config_006"
 ic7="sssd_config_007"
 ic8="sssd_config_008"
 ic9="sssd_config_009"
-ic10="sssd_config_010"
 ######################################################################
 # Tests
 ######################################################################
@@ -55,6 +54,26 @@ sssd_config_001()
                         message "Starting services with invalid configuration failed as expected."
 		fi
 	fi
+
+        MSG="PID file exists"
+        # check the status of the service should not be running
+	STATUS=`ssh root@$FULLHOSTNAME "if [ -f /var/run/sssd.pid ] ; then echo "PID file exists" ; fi"`
+        if [[ $STATUS == $MSG ]] ; then
+                message "PID file /var/run/sssd.pid exists."
+                myresult=FAIL
+        else
+                message "PID file was not created."
+        fi
+
+	MSG="sssd is stopped"
+        STATUS=`ssh root@$FULLHOSTNAME "service sssd status"`
+        if [[ $STATUS != $MSG ]] ; then
+                message "ERROR: Status returned \"$MSG\"."
+                myresult=FAIL
+        else
+                message "Status as expected: \"$MSG\"."
+        fi
+
   done
 
   tet_result $myresult
@@ -62,37 +81,6 @@ sssd_config_001()
 }
 
 sssd_config_002()
-{
-  myresult=PASS
-  message "START $tet_thistest: MaxId is the same as MinId"
-  EXPMSG=""
-  for c in $CLIENTS; do
-	eval_vars $c
-        message "Working on $FULLHOSTNAME"
-	EXPMSG="Invalid domain range"
-        sssdCfg $FULLHOSTNAME sssd_config2.conf
-        if [ $? -ne 0 ] ; then
-                message "ERROR Configuring SSSD on $FULLHOSTNAME."
-                myresult=FAIL
-        else
-                ssh root@$FULLHOSTNAME "service sssd stop"
-                ssh root@$FULLHOSTNAME "service sssd start"
-                if [ $? -eq 0 ] ; then
-                        message "ERROR: Invalid configuration MaxId is the same as MinId - service started"
-			message "Trac issue 126"
-                        myresult=FAIL
-			ssh root@$FULLHOSTNAME "service sssd stop"
-                else
-                        message "Starting services with invalid configuration failed as expected."
-                fi
-        fi
-  done
-
-  tet_result $myresult
-  message "END $tet_thistest"
-}
-
-sssd_config_003()
 {
   myresult=PASS
   message "START $tet_thistest: Negative minId"
@@ -117,13 +105,32 @@ sssd_config_003()
                         message "Starting services with invalid configuration failed as expected."
                 fi
         fi
+
+        MSG="PID file exists"
+        # check the status of the service should not be running
+        STATUS=`ssh root@$FULLHOSTNAME "if [ -f /var/run/sssd.pid ] ; then echo "PID file exists" ; fi"`
+        if [[ $STATUS == $MSG ]] ; then
+                message "PID file /var/run/sssd.pid exists."
+                myresult=FAIL
+        else
+                message "PID file was not created."
+        fi
+
+        MSG="sssd is stopped"
+        STATUS=`ssh root@$FULLHOSTNAME "service sssd status"`
+        if [[ $STATUS != $MSG ]] ; then
+                message "ERROR: Status returned \"$MSG\"."
+                myresult=FAIL
+        else
+                message "Status as expected: \"$MSG\"."
+        fi
   done
 
   tet_result $myresult
   message "END $tet_thistest"
 }
 
-sssd_config_004()
+sssd_config_003()
 {
   myresult=PASS
   message "START $tet_thistest: Negative MaxId"
@@ -148,13 +155,32 @@ sssd_config_004()
                         message "Starting services with invalid configuration failed as expected."
                 fi
         fi
+
+        MSG="PID file exists"
+        # check the status of the service should not be running
+        STATUS=`ssh root@$FULLHOSTNAME "if [ -f /var/run/sssd.pid ] ; then echo "PID file exists" ; fi"`
+        if [[ $STATUS == $MSG ]] ; then
+                message "PID file /var/run/sssd.pid exists."
+                myresult=FAIL
+        else
+                message "PID file was not created."
+        fi
+
+        MSG="sssd is stopped"
+        STATUS=`ssh root@$FULLHOSTNAME "service sssd status"`
+        if [[ $STATUS != $MSG ]] ; then
+                message "ERROR: Status returned \"$MSG\"."
+                myresult=FAIL
+        else
+                message "Status as expected: \"$MSG\"."
+        fi
   done
 
   tet_result $myresult
   message "END $tet_thistest"
 }
 
-sssd_config_005()
+sssd_config_004()
 {
   myresult=PASS
   message "START $tet_thistest: Duplicate Defined Parameters - Last One Read Wins"
@@ -212,13 +238,15 @@ sssd_config_005()
 
         	fi
 	fi
+
+	ssh root@$FULLHOSTNAME "service sssd stop"
   done
 
   tet_result $myresult
   message "END $tet_thistest"
 }
 
-sssd_config_006()
+sssd_config_005()
 {
   myresult=PASS
   message "START $tet_thistest: Required Key provider Not Defined"
@@ -243,13 +271,32 @@ sssd_config_006()
                         message "Starting services with invalid configuration failed as expected."
                 fi
         fi
+
+        MSG="PID file exists"
+        # check the status of the service should not be running
+        STATUS=`ssh root@$FULLHOSTNAME "if [ -f /var/run/sssd.pid ] ; then echo "PID file exists" ; fi"`
+        if [[ $STATUS == $MSG ]] ; then
+                message "PID file /var/run/sssd.pid exists."
+                myresult=FAIL
+        else
+                message "PID file was not created."
+        fi
+
+        MSG="sssd is stopped"
+        STATUS=`ssh root@$FULLHOSTNAME "service sssd status"`
+        if [[ $STATUS != $MSG ]] ; then
+                message "ERROR: Status returned \"$MSG\"."
+                myresult=FAIL
+        else
+                message "Status as expected: \"$MSG\"."
+        fi
   done
 
   tet_result $myresult
   message "END $tet_thistest"
 }
 
-sssd_config_007()
+sssd_config_006()
 {
   myresult=PASS
   message "START $tet_thistest: Enumeration defined with Integer"
@@ -274,13 +321,32 @@ sssd_config_007()
                         message "Starting services with invalid configuration failed as expected."
                 fi
         fi
+
+        MSG="PID file exists"
+        # check the status of the service should not be running
+        STATUS=`ssh root@$FULLHOSTNAME "if [ -f /var/run/sssd.pid ] ; then echo "PID file exists" ; fi"`
+        if [[ $STATUS == $MSG ]] ; then
+                message "PID file /var/run/sssd.pid exists."
+                myresult=FAIL
+        else
+                message "PID file was not created."
+        fi
+
+        MSG="sssd is stopped"
+        STATUS=`ssh root@$FULLHOSTNAME "service sssd status"`
+        if [[ $STATUS != $MSG ]] ; then
+                message "ERROR: Status returned \"$MSG\"."
+                myresult=FAIL
+        else
+                message "Status as expected: \"$MSG\"."
+        fi
   done
 
   tet_result $myresult
   message "END $tet_thistest"
 }
 
-sssd_config_008()
+sssd_config_007()
 {
   myresult=PASS
   message "START $tet_thistest: Enumeration defined with non boolean"
@@ -305,13 +371,32 @@ sssd_config_008()
                         message "Starting services with invalid configuration failed as expected."
                 fi
         fi
+
+        MSG="PID file exists"
+        # check the status of the service should not be running
+        STATUS=`ssh root@$FULLHOSTNAME "if [ -f /var/run/sssd.pid ] ; then echo "PID file exists" ; fi"`
+        if [[ $STATUS == $MSG ]] ; then
+                message "PID file /var/run/sssd.pid exists."
+                myresult=FAIL
+        else
+                message "PID file was not created."
+        fi
+
+        MSG="sssd is stopped"
+        STATUS=`ssh root@$FULLHOSTNAME "service sssd status"`
+        if [[ $STATUS != $MSG ]] ; then
+                message "ERROR: Status returned \"$MSG\"."
+                myresult=FAIL
+        else
+                message "Status as expected: \"$MSG\"."
+        fi
   done
 
   tet_result $myresult
   message "END $tet_thistest"
 }
 
-sssd_config_009()
+sssd_config_008()
 {
   myresult=PASS
   message "START $tet_thistest: useFullyQualifiedNames defined with a string"
@@ -336,13 +421,32 @@ sssd_config_009()
                         message "Starting services with invalid configuration failed as expected."
                 fi
         fi
+
+        MSG="PID file exists"
+        # check the status of the service should not be running
+        STATUS=`ssh root@$FULLHOSTNAME "if [ -f /var/run/sssd.pid ] ; then echo "PID file exists" ; fi"`
+        if [[ $STATUS == $MSG ]] ; then
+                message "PID file /var/run/sssd.pid exists."
+                myresult=FAIL
+        else
+                message "PID file was not created."
+        fi
+
+        MSG="sssd is stopped"
+        STATUS=`ssh root@$FULLHOSTNAME "service sssd status"`
+        if [[ $STATUS != $MSG ]] ; then
+                message "ERROR: Status returned \"$MSG\"."
+                myresult=FAIL
+        else
+                message "Status as expected: \"$MSG\"."
+        fi
   done
 
   tet_result $myresult
   message "END $tet_thistest"
 }
 
-sssd_config_010()
+sssd_config_009()
 {
   myresult=PASS
   message "START $tet_thistest: useFullyQualifiedNames defined with an integer"
@@ -365,6 +469,25 @@ sssd_config_010()
                 else
                         message "Starting services with invalid configuration failed as expected."
                 fi
+        fi
+
+        MSG="PID file exists"
+        # check the status of the service should not be running
+        STATUS=`ssh root@$FULLHOSTNAME "if [ -f /var/run/sssd.pid ] ; then echo "PID file exists" ; fi"`
+        if [[ $STATUS == $MSG ]] ; then
+                message "PID file /var/run/sssd.pid exists."
+                myresult=FAIL
+        else
+                message "PID file was not created."
+        fi
+
+        MSG="sssd is stopped"
+        STATUS=`ssh root@$FULLHOSTNAME "service sssd status"`
+        if [[ $STATUS != $MSG ]] ; then
+                message "ERROR: Status returned \"$MSG\"."
+                myresult=FAIL
+        else
+                message "Status as expected: \"$MSG\"."
         fi
   done
 

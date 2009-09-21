@@ -35,15 +35,30 @@ bug512733()
 	if [ $? -eq 0 ] ; then
 		message "ERROR: Starting service should return non zero return code."
 		myresult=FAIL
+	else
+		message "This part fixed. Non-zero return code: $?"
+	fi
+
+	MSG="PID file exists"
+	MSG=`ssh root@$FULLHOSTNAME "if [ -e /var/run/sssd.pid ] ; then echo "PID file exists" ;fi"`
+	if [[ $STATUS == $MSG ]] ; then
+		message "PID file /var/run/sssd.pid exists."
+		myresult=FAIL
+	else
+		message "This part fixed. PID file was not created."
 	fi
 
 	MSG="sssd dead but pid file exists"
-	# check the status of the service should not be running
 	STATUS=`ssh root@$FULLHOSTNAME "service sssd status"`
 	if [[ $STATUS == $MSG ]] ; then
 		message "ERROR: Bug 512733 Still Exists"
 		myresult=FAIL
+	else
+		message "This part fixed. Status did not return \"$MSG\"."
 	fi
+
+	ssh root@$FULLHOSTNAME "service sssd stop"
+	ssh root@$FULLHOSTNAME "rm -rf /var/run/sssd.pid"
   done
   tet_result $myresult
   message "END $tet_thistest"

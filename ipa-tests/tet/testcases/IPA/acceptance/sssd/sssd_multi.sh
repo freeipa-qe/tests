@@ -457,7 +457,7 @@ sssd_multi_009()
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME LOCAL fullyQualifiedNames TRUE
+                verifyCfg $FULLHOSTNAME LOCAL useFullyQualifiedNames TRUE
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
@@ -487,7 +487,7 @@ sssd_multi_009()
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME LDAP fullyQualifiedNames TRUE
+                verifyCfg $FULLHOSTNAME LDAP useFullyQualifiedNames TRUE
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
