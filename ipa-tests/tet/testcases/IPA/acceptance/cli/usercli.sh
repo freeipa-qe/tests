@@ -638,7 +638,7 @@ modgroup()
                 myresult=FAIL
         fi
 
-	ssh root@$FULLHOSTNAME "ipa user-mod --groups=$mgroup1 $musr"
+	ssh root@$FULLHOSTNAME "ipa group-add-member --users $musr $mgroup1"
 	if [ $? -ne 0 ]
 	then 
 		message "ERROR - ipa user-mod failed on $FULLHOSTNAME"
@@ -681,7 +681,7 @@ modgroup2()
                 myresult=FAIL
         fi
 
-	ssh root@$FULLHOSTNAME "ipa user-mod --groups=$mgroup2 $musr"
+	ssh root@$FULLHOSTNAME "ipa group-add-member --users $musr $mgroup2"
 	if [ $? -ne 0 ]
 	then 
 		message "ERROR - ipa user-mod failed on $FULLHOSTNAME"
@@ -827,7 +827,7 @@ deluser()
                 myresult=FAIL
         fi
 
-        ssh root@$FULLHOSTNAME "ipa user-find $msur"
+        ssh root@$FULLHOSTNAME "ipa user-find $musr"
         if [ $? -eq 0 ]
         then
                 message "ERROR - Search for deleted user was successful on $FULLHOSTNAME when is should not have"
@@ -843,7 +843,7 @@ deluser()
                 myresult=FAIL
         fi
 
-        ssh root@$FULLHOSTNAME "ipa user-find $lsur"
+        ssh root@$FULLHOSTNAME "ipa user-find $lusr"
         if [ $? -eq 0 ]
         then
                 message "ERROR - Search for deleted user was successful on $FULLHOSTNAME when is should not have"

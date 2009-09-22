@@ -435,7 +435,7 @@ hostcli_009()
 	  eval_vars $s
 	  message "Working on $s"
 	  #verify objectclasses are returned
-	  set -A classes nshost ipahost pkiuser krbprincipalaux krbprincipal top
+	  set -a classes nshost ipahost pkiuser krbprincipalaux krbprincipal top
           
 	  ssh root@$FULLHOSTNAME "ipa host-show --all \"$host1\"" > $tmpfile
 	  i=0 

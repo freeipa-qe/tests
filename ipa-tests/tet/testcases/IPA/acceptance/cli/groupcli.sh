@@ -213,7 +213,7 @@ group_add_posix()
 	ssh root@$FULLHOSTNAME "ipa group-add --posix --desc=group-to-test-posix $grp2"
 	let code=$code+$?
 
-	ssh root@$FULLHOSTNAME "ipa group-show --all $grp2 | grep posixGroup"
+	ssh root@$FULLHOSTNAME "ipa group-show --all $grp2 | grep posixgroup"
 	let code=$code+$?
 
 	if [ $code -ne 0 ]
