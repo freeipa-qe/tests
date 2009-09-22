@@ -753,7 +753,7 @@ main_default()
 	#
 
 	if [ -z "$PkgName"               ] ; then PkgName=dirsrv ; fi
-#	if [ -z "$TET_ROOT" ] ;	then TET_ROOT=`(cd $mainRunBaseDir/../../../tet ; pwd)`	; fi
+	if [ -z "$TET_ROOT" ] ;	then TET_ROOT=`(cd $mainRunBaseDir/../../../tet ; pwd)`	; fi
 	if [ -z "$CHARSET" ] ;    then CHARSET=en						 ; fi
 #	if [ -z "$IROOT" ] ;      then IROOT=/usr/lib/$PkgName/slapd-`hostname` ; fi
 	if [ -z "$PREFIX" ] ;     then
