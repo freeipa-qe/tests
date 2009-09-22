@@ -624,7 +624,7 @@ modgroup()
 	message "START $tet_thistest: Modify Group Membership"
 	eval_vars M1
 
-        ssh root@$FULLHOSTNAME "ipa group-add --description=\"group that the user in the user-mod will include\" $mgroup1"
+        ssh root@$FULLHOSTNAME "ipa group-add --desc=\"group that the user in the user-mod will include\" $mgroup1"
         if [ $? -ne 0 ]
         then
                 message "ERROR - ipa group-add failed on $FULLHOSTNAME"
@@ -667,7 +667,7 @@ modgroup2()
 	message "START $tet_thistest: Modify Second Group Membership"
 	eval_vars M1
 
-        ssh root@$FULLHOSTNAME "ipa group-add --description=\"group2 that the user in the user-mod will include\" $mgroup2"
+        ssh root@$FULLHOSTNAME "ipa group-add --desc=\"group2 that the user in the user-mod will include\" $mgroup2"
         if [ $? -ne 0 ]
         then
                 message "ERROR - ipa group-add failed on $FULLHOSTNAME"

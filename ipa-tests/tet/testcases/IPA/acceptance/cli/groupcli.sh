@@ -106,7 +106,7 @@ group_add()
 	eval_vars M1
 	code=0
 
-	ssh root@$FULLHOSTNAME "ipa group-add --description=group-to-test-groups $grp1"
+	ssh root@$FULLHOSTNAME "ipa group-add --desc=group-to-test-groups $grp1"
 	let code=$code+$?
 
 	ssh root@$FULLHOSTNAME "ipa group-find $grp1 | grep group-to-test-groups"
@@ -210,7 +210,7 @@ group_add_posix()
 	eval_vars M1
 	code=0
 
-	ssh root@$FULLHOSTNAME "ipa group-add --posix --description=group-to-test-posix $grp2"
+	ssh root@$FULLHOSTNAME "ipa group-add --posix --desc=group-to-test-posix $grp2"
 	let code=$code+$?
 
 	ssh root@$FULLHOSTNAME "ipa group-show --all $grp2 | grep posixGroup"
@@ -278,7 +278,7 @@ group_mod_description()
 	eval_vars M1
 	code=0
 
-	ssh root@$FULLHOSTNAME "ipa group-mod --description=desc2 $grp1"
+	ssh root@$FULLHOSTNAME "ipa group-mod --desc=desc2 $grp1"
 	let code=$code+$?
 
 	ssh root@$FULLHOSTNAME "ipa group-find $grp1 | grep desc2"
