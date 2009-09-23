@@ -3,17 +3,57 @@
 . ./functions
 . ./remotecontrol
 
-vmup mv32b qa
-vmup mv32a ipav2installed
+#vmsave_as mv64b sasl ds81.sasl 
+#vmsave_as mv64c sasl ds81.sasl 
+#vmsave_as mv32c sasl ds81.sasl 
 
-#vmup mv32a qa
+onebyone(){
+	env=$1
+	if [ -z $env ];then
+		echo "env lable?"
+		exit
+	fi
+	vmup mv64b $env
+	vmup mv64c $env
+	vmup mv32c $env
+}
+
+allatonce(){
+	env=$1
+	if [ -z $env ];then
+		echo "env lable?"
+		exit
+	fi
+  {
+	vmup mv64b $env
+  }&
+  {
+	vmup mv64c $env
+  }&
+  {
+	vmup mv32c $env
+  }&
+}
+
+#allatonce ds81
+#vmupdate mv64c qa
+
+#vmsave_as mv64a ds90
+#vmsave_as mv32a ds90
+vmup mv64a qa
+#vmupdate mv32b qa
+#vmupdate mv32c qa
+#vmupdate mv64a qa
+#vmupdate mv64b qa
+#vmupdate mv64c qa
+
 #vmup mv64c qa
 #vmup mv32a ds81installed
 #vmup mv32b qa
 
 #vmsave_as mv32j ipacode ipa.v2.coding
 
-#vmsave_as mv32a ipav2rpm ipav2.rpm.installed
+#vmsave_as mv64a ds90 ds90.daily
 #vmsave_as mv32a ipav2installed ipav2.installed
 
 #vmupdate mv32a qa
