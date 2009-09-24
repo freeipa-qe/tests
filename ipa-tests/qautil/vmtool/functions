@@ -85,7 +85,6 @@ vmsave_as()
 {
   vmlabel=$1
   vmalias=$2
-  vmfilename=$3
   time=`date +"%F"`
   setupvm $vmlabel
 	if [ -z $hoster ];then
@@ -104,7 +103,7 @@ vmsave_as()
 		techo "	[imagebase is not set]"
 		exit
 	fi
-  saveas=$imagename.img.$vmfilename.$time
+  saveas=$imagename.img.$vmalias.$time
   techo "[$imagename] save as VM STARTS..."
   techo "       +------------------------------------------------------+"
   techo "       | vm hoster   : $hoster"
