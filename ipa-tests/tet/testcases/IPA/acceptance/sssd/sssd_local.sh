@@ -16,8 +16,12 @@ ic1="sssd_001 sssd_002 sssd_003 sssd_004 sssd_005 sssd_006 sssd_007 sssd_008 sss
 ic2="sssd_029 sssd_030 sssd_031 sssd_032 sssd_033 sssd_034 sssd_035"
 ic3="sssd_036 sssd_037"
 ic4="sssd_040 sssd_041 sssd_042 sssd_043 sssd_044 sssd_045 sssd_046"
-ic5="sssd_047 sssd_049"
-
+ic5="sssd_047 sssd_049 sssd_050 sssd_051 sssd_052"
+#####################################################################
+# Globals
+####################################################################
+HOMEDIR="$TET_ROOT/testcases/IPA/acceptance/sssd"
+export HOMEDIR
 ######################################################################
 # Tests
 ######################################################################
@@ -331,7 +335,7 @@ sssd_010()
 
                 if [[ $EXPMSG != $MSG ]] ; then
                         message "ERROR: Unexpected Error message.  Got: $MSG  Expected: $EXPMSG"
-			message "Trac issue 126"
+			message "Trac issue 100"
                         myresult=FAIL
                 else
                         message "Modifying user that doesn't exist error message was as expected."
@@ -584,7 +588,7 @@ sssd_019()
         myresult=PASS
         message "START $tet_thistest: Add Duplicate Local Group"
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-        EXPMSG="A group with the same name or UID already exists"
+        EXPMSG="A group with the same name or GID already exists"
         for c in $CLIENTS ; do
 		eval_vars $c
                 message "Working on $FULLHOSTNAME"
@@ -611,7 +615,7 @@ sssd_020()
         myresult=PASS
         message "START $tet_thistest: Add Duplicate Local gidNumber"
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-        EXPMSG="A group with the same name or UID already exists"
+        EXPMSG="A group with the same name or GID already exists"
         for c in $CLIENTS ; do
 		eval_vars $c
                 message "Working on $FULLHOSTNAME"
@@ -697,6 +701,7 @@ sssd_023()
                 message "Working on $FULLHOSTNAME"
                 #Adding another group to add to first group
                 ssh root@$FULLHOSTNAME "sss_groupadd -g 1009 group1009"
+		sleep 1
                 if [ $? -ne 0 ] ; then
                         message "ERROR: Adding LOCAL domain group1010.  Return Code: $?"
                         myresult=FAIL
@@ -709,8 +714,11 @@ sssd_023()
                         else
                                 verifyAttr $FULLHOSTNAME "name=group1009,cn=groups,cn=LOCAL,cn=sysdb" memberof "name=group1010,cn=groups,cn=LOCAL,cn=sysdb"
                                 if [ $? -ne 0 ] ; then
-					echo $?
                                         myresult=FAIL
+					verifyAttr $FULLHOSTNAME "name=group1009,cn=groups,cn=LOCAL,cn=sysdb" member "name=group1010,cn=groups,cn=LOCAL,cn=sysdb"
+					if [ $? -eq 0 ] ; then
+						message "Regression of track issue 101 - Child group has member attribute but should have memberof attribute."
+					fi
                                 else
                                         message "LOCAL domain group1009 member attribute is correct."
                                 fi
@@ -718,12 +726,15 @@ sssd_023()
                                 verifyAttr $FULLHOSTNAME "name=group1010,cn=groups,cn=LOCAL,cn=sysdb" member "name=group1009,cn=groups,cn=LOCAL,cn=sysdb"
                                 if [ $? -ne 0 ] ; then
                                         myresult=FAIL
+					verifyAttr $FULLHOSTNAME "name=group1010,cn=groups,cn=LOCAL,cn=sysdb" memberof "name=group1009,cn=groups,cn=LOCAL,cn=sysdb"
+					if [ $? -eq 0 ] ; then 
+						message "Regression of track issue 101 - Parent group has memberof attribute but should have member attribute."
+					fi
                                 else
                                         message "LOCAL domain group1010 memberof attribute is correct."
                                 fi
                         fi
                 fi
-
         done
 
         result $myresult
@@ -1072,7 +1083,7 @@ sssd_033()
 	eval_vars $c
         message "Working on $FULLHOSTNAME"
 	ERRMSG="Could not modify user - check if group names are correct"
-        MSG=`ssh root@$FULLHOSTNAME "sss_usermod -a -g group1000@LOCAL user1000@LOCAL 2>&1"`
+        MSG=`ssh root@$FULLHOSTNAME "sss_usermod -a group1000@LOCAL user1000@LOCAL 2>&1"`
         if [ $? -ne 0 ] ; then
                 message "ERROR: Adding user1000@LOCAL to group1000@LOCAL failed."
                 myresult=FAIL
@@ -1575,7 +1586,7 @@ sssd_045()
 		eval_vars $c
                 message "Working on $FULLHOSTNAME"
 		u=2000
-		EXPMSG="A group with the same name or UID already exists"
+		EXPMSG="A group with the same name or GID already exists"
                 while [ $u -le 2010 ] ; do
                         MSG=`ssh root@$FULLHOSTNAME "sss_groupadd user$u 2>&1"`
                         if [ $? -eq 0 ] ; then
@@ -1750,21 +1761,113 @@ sssd_049()
 		# now verify user1001's uidNumber
 		USER=`ssh root@$FULLHOSTNAME getent -s sss passwd user1001@LOCAL`
 		MYUID=`echo $USER | cut -d ":" -f 2`
-		if [ $NYUID -ne 1001 ] ; then
-			message "ERROR: uidNumber not as expected - could be regression of trac issue 57 Expected: 1001 Got: $UID"
+		if [ $MYUID -ne 1001 ] ; then
+			message "ERROR: uidNumber not as expected - could be regression of trac issue 57 Expected: 1001 Got: $MYUID"
 			myresult=FAIL
 		else
 			message "Trac Issue 57 appears to be fixed - uidNumber assigned correctly"
 		fi
 
 		# clean up
-		ssh root@FULLHOSTNAME "sss_userdel user1000 ; sss_userdel user1001"
-
         done
 
         result $myresult
         message "END $tet_thistest"
 }
+
+sssd_050()
+{
+
+        myresult=PASS
+        message "START $tet_thistest: Authentication local user with no password assigned"
+        if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi 
+        for c in $CLIENTS; do 
+                eval_vars $c
+                message "Working on $FULLHOSTNAME"
+		rm -rf $TET_TMP_DIR/expect-ssh-nopasswd-out.txt
+		# test authentication via ssh
+		expect $HOMEDIR/expect/ssh_deny.exp user1000@LOCAL $FULLHOSTNAME ihavenopassword > $TET_TMP_DIR/expect-ssh-nopasswd-out.txt
+		cat $TET_TMP_DIR/expect-ssh-nopasswd-out.txt | grep "Permission denied"
+		if [ $? -ne 0 ] ; then
+			message "ERROR: User without password did not get permission denied.  See $TET_TMP_DIR/expect-ssh-nopasswd-out.txt for details!"
+			myresult=FAIL
+		else
+			message "User without password assigned failed authentication - Permission denied."
+		fi
+        done
+
+        result $myresult
+        message "END $tet_thistest"
+}
+
+sssd_051()
+{
+
+        myresult=PASS
+        message "START $tet_thistest: Authentication local user with password assigned"
+        if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+
+	rm -rf $TET_TMP_DIR/SetUserPassword.exp
+	echo "spawn passwd user1000@LOCAL" >> $TET_TMP_DIR/SetUserPassword.exp
+	echo "expect \"New password: \"" >> $TET_TMP_DIR/SetUserPassword.exp
+	echo "send onLine4now" >> $TET_TMP_DIR/SetUserPassword.exp
+	echo "send \"\\r\"" >> $TET_TMP_DIR/SetUserPassword.exp
+	echo "expect \"Retype new password: \"" >> $TET_TMP_DIR/SetUserPassword.exp
+	echo "send onLine4now"  >> $TET_TMP_DIR/SetUserPassword.exp
+	echo "send \"\\r\"" >> $TET_TMP_DIR/SetUserPassword.exp
+	echo "expect eof" >> $TET_TMP_DIR/SetUserPassword.exp
+
+        for c in $CLIENTS; do
+                eval_vars $c
+                message "Working on $FULLHOSTNAME"
+		rm -rf $TET_TMP_DIR/expect-ssh-success-out.txt
+        	ssh root@$FULLHOSTNAME 'rm -f /tmp/SetUserPassword.exp'
+        	scp $TET_TMP_DIR/SetUserPassword.exp root@$FULLHOSTNAME:/tmp/.
+
+        	ssh root@$FULLHOSTNAME '/usr/bin/expect /tmp/SetUserPassword.exp > /tmp/SetUserPassword-output.txt'
+		
+                expect $HOMEDIR/expect/ssh.exp user1000@LOCAL $FULLHOSTNAME onLine4now > $TET_TMP_DIR/expect-ssh-success-out.txt
+		cat $TET_TMP_DIR/expect-ssh-success-out.txt | grep "Permission denied"
+                if [ $? -eq 0 ] ; then
+			echo $?
+                        message "ERROR: User with password assigned failed authentication!"
+                        myresult=FAIL
+                else
+                        message "User with password assigned successfully authentication."
+                fi
+        done
+
+        result $myresult
+        message "END $tet_thistest"
+}
+
+sssd_052()
+{
+
+        myresult=PASS
+        message "START $tet_thistest: Authentication local user with incorrect password assigned"
+        if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+        for c in $CLIENTS; do
+                eval_vars $c
+                message "Working on $FULLHOSTNAME"
+		rm -rf $TET_TMP_DIR/expect-ssh-badpasswd-out.txt
+                expect $HOMEDIR/expect/ssh_deny.exp user1000@LOCAL $FULLHOSTNAME abcd123xyz789 > $TET_TMP_DIR/expect-ssh-badpasswd-out.txt
+		cat $TET_TMP_DIR/expect-ssh-badpasswd-out.txt | grep "Permission denied"
+                if [ $? -ne 0 ] ; then
+			echo $?
+                        message "ERROR: User authentication with incorrect password did not get permission denied.  Please see $TET_TMP_DIR/expect-ssh-badpasswd-out.txt for details!"
+                        myresult=FAIL
+                else
+                        message "User authentication with incorrect password assigned failed authentication."
+                fi
+
+		ssh root@$FULLHOSTNAME "sss_userdel user1000@LOCAL ; sss_userdel user1001@LOCAL"
+        done
+
+        result $myresult
+        message "END $tet_thistest"
+}
+
 
 ##################################################################
 . $TESTING_SHARED/shared.sh
