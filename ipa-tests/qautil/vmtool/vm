@@ -36,11 +36,11 @@ allatonce(){
 }
 
 #allatonce ds81
-#vmupdate mv64c qa
+#vmup mv64a qa
 
-#vmsave_as mv64a ds90
+vmsave_as mv64a ipa2
 #vmsave_as mv32a ds90
-vmup mv64a qa
+#vmup mv64a qa
 #vmupdate mv32b qa
 #vmupdate mv32c qa
 #vmupdate mv64a qa
@@ -51,10 +51,7 @@ vmup mv64a qa
 #vmup mv32a ds81installed
 #vmup mv32b qa
 
-#vmsave_as mv32j ipacode ipa.v2.coding
 
-#vmsave_as mv64a ds90 ds90.daily
-#vmsave_as mv32a ipav2installed ipav2.installed
 
 #vmupdate mv32a qa
 #vmupdate mv32a ipav2installed
@@ -86,11 +83,11 @@ vmup mv64a qa
 #	  -- just turn off one vm, identified by vmlabel
 #
 # [vmsave_as]
-#	usage  : vmsave_as <vmlabel> <vm alias> <vm file name>
+#	usage  : vmsave_as <vmlabel> <vm alias> 
 #	example: vmsave-as mv32a ipa20rpm ds.rpm
 #	  -- save current image, identified by vmlabel, 
 #			with real file name, rhel5-i386-mv32a-vm.img.ds.rpm.2009-04-14, 
-#			notice : suffix "rhel5-i386-mv32a-vm.img" and date is automatic added
+#			notice : prefix "rhel5-i386-mv32a-vm.img" and suffix date are automatic added
 #			and create a link "ipa20rpm" to it
 
 # Syntax : vmup <vmlabel> <env target>
