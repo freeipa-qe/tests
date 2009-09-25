@@ -21,7 +21,11 @@ ic5="sssd_047 sssd_049 sssd_050 sssd_051 sssd_052"
 # Globals
 ####################################################################
 HOMEDIR="$TET_ROOT/testcases/IPA/acceptance/sssd"
-export HOMEDIR
+USEFQN="use_fully_qualified_names"
+MPG="magic_private_groups"
+PROVIDER="id_provider"
+MAXID="max_id"
+MINID="min_id"
 ######################################################################
 # Tests
 ######################################################################
@@ -31,10 +35,10 @@ sssd_001()
    ####################################################################
    #   Configuration 1
    #	enumerate: TRUE
-   #	minId: 1000
-   #	maxId: 1010
-   #	magicPrivateGroups: TRUE
-   #	provider: local
+   #	$MINID: 1000
+   #	$MAXID: 1010
+   #	$MPG: TRUE
+   #	$PROVIDER: local
    ####################################################################
 
 	myresult=PASS
@@ -63,22 +67,22 @@ sssd_001()
 			myresult=FAIL
 		fi
 
-                verifyCfg $FULLHOSTNAME LOCAL minId 1000
+                verifyCfg $FULLHOSTNAME LOCAL $MINID 1000
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME LOCAL maxId 1010
+                verifyCfg $FULLHOSTNAME LOCAL $MAXID 1010
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME LOCAL magicPrivateGroups TRUE
+                verifyCfg $FULLHOSTNAME LOCAL $MPG TRUE
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME LOCAL provider local
+                verifyCfg $FULLHOSTNAME LOCAL $PROVIDER local
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
@@ -439,10 +443,10 @@ sssd_014()
 	################################################################################################################
 	#  NOTE: if this test fails with Segmentation Fault return code 139 on the local machine and return code 255   #
 	#  when executed via ssh like these tests - maybe regression of bug in sssd trac #86                           #
-	#  bug description: sss_useradd: Segmentation Fault Trying to add user with uidNumber below minId              #
+	#  bug description: sss_useradd: Segmentation Fault Trying to add user with uidNumber below $MINID              #
 	################################################################################################################ 
         myresult=PASS
-        message "START $tet_thistest: Add user with uidNumber below Allowed minId"
+        message "START $tet_thistest: Add user with uidNumber below Allowed $MINID"
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 	EXPMSG="The selected UID is outside the allowed range"
         for c in $CLIENTS ; do
@@ -450,7 +454,7 @@ sssd_014()
 		message "Working on $FULLHOSTNAME"
                 MSG=`ssh root@$FULLHOSTNAME "sss_useradd -u 999 -h /home/user999 -s /bin/bash user999 2>&1"`
                 if [ $? -eq 0 ] ; then
-                        message "ERROR: Adding user999 with uid below minId was successful."
+                        message "ERROR: Adding user999 with uid below $MINID was successful."
                         myresult=FAIL
                 fi
  
@@ -458,7 +462,7 @@ sssd_014()
                         message "ERROR: Unexpected Error message.  Got: $MSG  Expected: $EXPMSG"
                         myresult=FAIL
                 else
-                        message "Adding user with uid below minId error message was as expected."
+                        message "Adding user with uid below $MINID error message was as expected."
                 fi
 	done
 
@@ -471,10 +475,10 @@ sssd_015()
 {
         ################################################################################################################
         #  NOTE: if this test fails with Segmentation Fault return code 139 - maybe regression of bug in sssd trac #86 #
-        #  bug description: sss_useradd: Segmentation Fault Trying to add user with uidNumber below minId              #
+        #  bug description: sss_useradd: Segmentation Fault Trying to add user with uidNumber below $MINID              #
         ################################################################################################################
         myresult=PASS
-        message "START $tet_thistest: Add user with uidNumber above Allowed maxId - User added to Legacy Local"
+        message "START $tet_thistest: Add user with uidNumber above Allowed $MAXID - User added to Legacy Local"
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 	EXPMSG="The selected UID is outside the allowed range"
         for c in $CLIENTS ; do
@@ -482,7 +486,7 @@ sssd_015()
 		message "Working on $FULLHOSTNAME"
                 MSG=`ssh root@$FULLHOSTNAME "sss_useradd -u 1011 -h /home/user1011 -s /bin/bash user1011 2>&1"`
                 if [ $? -eq 0 ] ; then
-                        message "ERROR: Adding user1011 with uid above maxId was successful."
+                        message "ERROR: Adding user1011 with uid above $MAXID was successful."
                         myresult=FAIL
                 fi
 
@@ -490,7 +494,7 @@ sssd_015()
                         message "ERROR: Unexpected Error message.  Got: $MSG  Expected: $EXPMSG"
                         myresult=FAIL
                 else
-                        message "Adding user with uid above maxId error message was as expected."
+                        message "Adding user with uid above $MAXID error message was as expected."
                 fi
 
         done
@@ -530,7 +534,7 @@ sssd_016()
 sssd_017()
 {
         myresult=PASS
-        message "START $tet_thistest: Add group with gidNumber below Allowed minId"
+        message "START $tet_thistest: Add group with gidNumber below Allowed $MINID"
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 	EXPMSG="The selected GID is outside the allowed range"
         for c in $CLIENTS ; do
@@ -538,7 +542,7 @@ sssd_017()
                 message "Working on $FULLHOSTNAME"
                 MSG=`ssh root@$FULLHOSTNAME "sss_groupadd -g 999 group999 2>&1"`
                 if [ $? -eq 0 ] ; then
-                        message "ERROR: Adding group999 with gid below minId was successful."
+                        message "ERROR: Adding group999 with gid below $MINID was successful."
                         myresult=FAIL
                 fi
 
@@ -546,7 +550,7 @@ sssd_017()
                         message "ERROR: Unexpected Error message.  Got: $MSG  Expected: $EXPMSG"
                         myresult=FAIL
                 else
-                        message "Adding group with gid below minId error message was as expected."
+                        message "Adding group with gid below $MINID error message was as expected."
                 fi
         done
 
@@ -557,7 +561,7 @@ sssd_017()
 sssd_018()
 {
         myresult=PASS
-        message "START $tet_thistest: Add group with gidNumber above Allowed maxId"
+        message "START $tet_thistest: Add group with gidNumber above Allowed $MAXID"
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 	EXPMSG="The selected GID is outside the allowed range"
         for c in $CLIENTS ; do
@@ -565,7 +569,7 @@ sssd_018()
                 message "Working on $FULLHOSTNAME"
                 MSG=`ssh root@$FULLHOSTNAME "sss_groupadd -g 1011 group1011 2>&1"`
                 if [ $? -eq 0 ] ; then
-                        message "ERROR: Adding group1011 with gid above maxId was successful."
+                        message "ERROR: Adding group1011 with gid above $MAXID was successful."
                         myresult=FAIL
                 fi
 
@@ -573,7 +577,7 @@ sssd_018()
                         message "ERROR: Unexpected Error message.  Got: $MSG  Expected: $EXPMSG"
                         myresult=FAIL
                 else
-                        message "Adding group with gid above maxId error message was as expected."
+                        message "Adding group with gid above $MAXID error message was as expected."
                 fi
 
         done
@@ -712,34 +716,26 @@ sssd_023()
                                 message "ERROR: Failed to add nested group.  Return Code: $?"
                                 myresult=FAIL
                         else
-                                verifyAttr $FULLHOSTNAME "name=group1009,cn=groups,cn=LOCAL,cn=sysdb" memberof "name=group1010,cn=groups,cn=LOCAL,cn=sysdb"
-                                if [ $? -ne 0 ] ; then
-                                        myresult=FAIL
-					verifyAttr $FULLHOSTNAME "name=group1009,cn=groups,cn=LOCAL,cn=sysdb" member "name=group1010,cn=groups,cn=LOCAL,cn=sysdb"
-					if [ $? -eq 0 ] ; then
-						message "Regression of track issue 101 - Child group has member attribute but should have memberof attribute."
-					fi
-                                else
-                                        message "LOCAL domain group1009 member attribute is correct."
-                                fi
 
-                                verifyAttr $FULLHOSTNAME "name=group1010,cn=groups,cn=LOCAL,cn=sysdb" member "name=group1009,cn=groups,cn=LOCAL,cn=sysdb"
-                                if [ $? -ne 0 ] ; then
-                                        myresult=FAIL
-					verifyAttr $FULLHOSTNAME "name=group1010,cn=groups,cn=LOCAL,cn=sysdb" memberof "name=group1009,cn=groups,cn=LOCAL,cn=sysdb"
-					if [ $? -eq 0 ] ; then 
-						message "Regression of track issue 101 - Parent group has memberof attribute but should have member attribute."
-					fi
-                                else
-                                        message "LOCAL domain group1010 memberof attribute is correct."
-                                fi
-                        fi
+                        	verifyAttr $FULLHOSTNAME "name=group1009,cn=groups,cn=LOCAL,cn=sysdb" member "name=group1010,cn=groups,cn=LOCAL,cn=sysdb"
+                        	if [ $? -ne 0 ] ; then
+                        		myresult=FAIL
+                        	else
+                                	message "LOCAL domain group1009 member attribute is correct."
+                        	fi
+
+				verifyAttr $FULLHOSTNAME "name=group1010,cn=groups,cn=LOCAL,cn=sysdb" memberof "name=group1009,cn=groups,cn=LOCAL,cn=sysdb"
+				if [ $? -ne 0 ] ; then 
+					myresult=FAIL
+                        	else
+                                	message "LOCAL domain group1010 memberof attribute is correct."
+                        	fi
+			fi
                 fi
         done
 
         result $myresult
         message "END $tet_thistest"
-
 }
 
 sssd_024()
@@ -929,8 +925,8 @@ sssd_029()
    ####################################################################
    #   Configuration 2
    #    enumerate: TRUE
-   #	useFullyQualifiedNames TRUE
-   #    provider: local
+   #	$USEFQN TRUE
+   #    $PROVIDER: local
    ####################################################################
 
         myresult=PASS
@@ -959,27 +955,27 @@ sssd_029()
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME LOCAL minId 1000
+                verifyCfg $FULLHOSTNAME LOCAL $MINID 1000
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME LOCAL maxId 1010
+                verifyCfg $FULLHOSTNAME LOCAL $MAXID 1010
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
   
-                verifyCfg $FULLHOSTNAME LOCAL provider local
+                verifyCfg $FULLHOSTNAME LOCAL $PROVIDER local
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME LOCAL magicPrivateGroups TRUE
+                verifyCfg $FULLHOSTNAME LOCAL $MPG TRUE
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME LOCAL useFullyQualifiedNames TRUE
+                verifyCfg $FULLHOSTNAME LOCAL $USEFQN TRUE
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
@@ -1167,10 +1163,10 @@ sssd_036()
    ####################################################################
    #   Configuration 3
    #    enumerate: FALSE
-   #    minId: 1000
-   #    maxId: 1010
-   #    magicPrivateGroups: TRUE
-   #    provider: local
+   #    $MINID: 1000
+   #    $MAXID: 1010
+   #    $MPG: TRUE
+   #    $PROVIDER: local
    ####################################################################
 
         myresult=PASS
@@ -1199,22 +1195,22 @@ sssd_036()
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME LOCAL minId 1000
+                verifyCfg $FULLHOSTNAME LOCAL $MINID 1000
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME LOCAL maxId 1010
+                verifyCfg $FULLHOSTNAME LOCAL $MAXID 1010
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME LOCAL magicPrivateGroups TRUE
+                verifyCfg $FULLHOSTNAME LOCAL $MPG TRUE
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME LOCAL provider local
+                verifyCfg $FULLHOSTNAME LOCAL $PROVIDER local
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
@@ -1267,10 +1263,10 @@ sssd_038()
    ####################################################################
    #   Configuration 4
    #    enumerate: 2
-   #    minId: 1000
-   #    maxId: 1010
-   #    magicPrivateGroups: TRUE
-   #    provider: local
+   #    $MINID: 1000
+   #    $MAXID: 1010
+   #    $MPG: TRUE
+   #    $PROVIDER: local
    ####################################################################
 
         myresult=PASS
@@ -1299,22 +1295,22 @@ sssd_038()
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME LOCAL minId 1000
+                verifyCfg $FULLHOSTNAME LOCAL $MINID 1000
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME LOCAL maxId 1010
+                verifyCfg $FULLHOSTNAME LOCAL $MAXID 1010
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME LOCAL magicPrivateGroups TRUE
+                verifyCfg $FULLHOSTNAME LOCAL $MPG TRUE
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME LOCAL provider local
+                verifyCfg $FULLHOSTNAME LOCAL $PROVIDER local
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
@@ -1364,11 +1360,11 @@ sssd_040()
    ####################################################################
    #   Configuration 5
    #    enumerate: TRUE
-   #    minId: 2000
-   # 	maxId: 2010
+   #    $MINID: 2000
+   # 	$MAXID: 2010
    #    legacy: TRUE
-   #    magicPrivateGroups: TRUE
-   #    provider: local
+   #    $MPG: TRUE
+   #    $PROVIDER: local
    #	[user_defaults]
    #	defaultShell = /bin/sh
    #    baseDirectory = /export 
@@ -1400,22 +1396,22 @@ sssd_040()
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME LOCAL minId 2000
+                verifyCfg $FULLHOSTNAME LOCAL $MINID 2000
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME LOCAL maxId 2010
+                verifyCfg $FULLHOSTNAME LOCAL $MAXID 2010
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME LOCAL magicPrivateGroups TRUE
+                verifyCfg $FULLHOSTNAME LOCAL $MPG TRUE
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME LOCAL provider local
+                verifyCfg $FULLHOSTNAME LOCAL $PROVIDER local
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
@@ -1546,7 +1542,7 @@ sssd_043()
 sssd_044()
 {
         myresult=PASS
-        message "START $tet_thistest: Add Local Groups - No gidNumber Specified - magicPrivateGroups - Shared ID Space"
+        message "START $tet_thistest: Add Local Groups - No gidNumber Specified - $MPG - Shared ID Space"
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
         for c in $CLIENTS ; do
 		eval_vars $c
@@ -1580,7 +1576,7 @@ sssd_044()
 sssd_045()
 {
         myresult=PASS
-        message "START $tet_thistest: Add Local Groups - gidNumber Specified - magicPrivateGroups - Shared Name Space"
+        message "START $tet_thistest: Add Local Groups - gidNumber Specified - $MPG - Shared Name Space"
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
         for c in $CLIENTS ; do
 		eval_vars $c
@@ -1649,8 +1645,8 @@ sssd_047()
    ####################################################################
    #   Configuration 6
    #    enumerate: TRUE
-   #	useFullyQualifiedNames TRUE
-   #    provider: local
+   #	$USEFQN TRUE
+   #    $PROVIDER: local
    ####################################################################
 
         myresult=PASS
@@ -1679,22 +1675,22 @@ sssd_047()
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME LOCAL minId 1000
+                verifyCfg $FULLHOSTNAME LOCAL $MINID 1000
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME LOCAL maxId 1003
+                verifyCfg $FULLHOSTNAME LOCAL $MAXID 1003
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
   
-                verifyCfg $FULLHOSTNAME LOCAL provider local
+                verifyCfg $FULLHOSTNAME LOCAL $PROVIDER local
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME LOCAL useFullyQualifiedNames TRUE
+                verifyCfg $FULLHOSTNAME LOCAL $USEFQN TRUE
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
@@ -1710,12 +1706,12 @@ sssd_048()
         #  This test is no longer valid because the fix to ticket 95 was to always set to TRUE
 	###########################################################################################
         myresult=PASS
-        message "START $tet_thistest: Trac Ticket 95 - magicPrivateGroups set to FALSE, Local user added with gidNumber of 0"
+        message "START $tet_thistest: Trac Ticket 95 - $MPG set to FALSE, Local user added with gidNumber of 0"
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 	#################################################################################
 	# If the user is added successfully, but fails to be found with getent, you may
 	# be seeing a regression of bug https://fedorahosted.org/sssd/ticket/95
-	# with magicPrivateGroups set to FALSE user is added with gidNumber of 0 and
+	# with $MPG set to FALSE user is added with gidNumber of 0 and
 	# then getent fails to return 0 - debug output will show an error - but no error
 	# returned on the search
 	#################################################################################

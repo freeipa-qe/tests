@@ -32,7 +32,7 @@ startup()
         fi
 
 	# INSTALL SSSD
-	ssh root@$FULLHOSTNAME "yum clean all ; yum -y install sssd"
+	ssh root@$FULLHOSTNAME "yum clean all ; yum -y install sssd sssd-client"
 	if [ $? -ne 0 ] ; then
 		message "ERROR:  Failed to install SSSD. Return code: $?"
 		myresult=FAIL

@@ -9,7 +9,6 @@ sssd
 	/startup.sh
 	/sssd_services.sh
 	/sssd_config.sh
-	/sssd_files.sh
 	/sssd_local.sh
 	/sssd_ldap.sh
 	/sssd_multi.sh

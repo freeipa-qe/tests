@@ -1,4 +1,10 @@
 #!/bin/sh
+######################################################################
+######################################################################
+# PROVIDER FILES IS NO LONGER SUPPORTED. THESE TESTS WILL NO LONGER 
+# BE EXECUTED.  THIS SCRIPT IS REMOVED FROM TET_SCEN FILE.
+######################################################################
+#####################################################################
 
 ######################################################################
 #  File: sssd_files.sh - acceptance tests for SSSD and Local files
@@ -117,7 +123,6 @@ sssd_files_002()
                                 myresult=FAIL
                         fi
 		done
-
 	done
 	
 	if [ $myresult == PASS ] ; then
@@ -174,7 +179,7 @@ sssd_files_004()
 		EXPMSG="Operation not allowed"
                 MSG=`ssh root@$FULLHOSTNAME "sss_useradd -h /home/user1 -s /bin/bash user1 2>&1"`
                 if [ $? -eq 0 ] ; then
-                        message "ERROR: Add user with SSS Tools with provider = files was successful, but expected to fail."
+                        message "ERROR: Add user with SSS Tools with provider files was successful, but expected to fail."
                         myresult=FAIL
 			ssh root@$FULLHOSTNAME "sss_userdel user1"
 		fi
@@ -203,7 +208,7 @@ sssd_files_005()
                 EXPMSG="Operation not allowed"
                 MSG=`ssh root@$FULLHOSTNAME "sss_groupadd group1 2>&1"`
                 if [ $? -eq 0 ] ; then
-                        message "ERROR: Add group with SSS Tools with provider = files was successful, but expected to fail."
+                        message "ERROR: Add group with SSS Tools with provider files was successful, but expected to fail."
                         myresult=FAIL
                         ssh root@$FULLHOSTNAME "sss_groupdel group1"
                 fi

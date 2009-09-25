@@ -30,11 +30,12 @@ PORT2=11329
 ROOTDN="cn=Directory Manager"
 ROOTDNPWD="Secret123"
 export RH_DIRSERV ROOTDN ROOTDNPWD
-#CONFIG_DIR=$TET_ROOT/testcases/IPA/acceptance/sssd/config
-#SSSD_CONFIG_DIR=/etc/sssd
-#SSSD_CONFIG_FILE=$SSSD_CONFIG_DIR/sssd.conf
-#SSSD_CONFIG_DB=/var/lib/sss/db/config.ldb
-#SSSD_LOCAL_DB=/var/lib/sss/db/sssd.ldb
+USEFQN="use_fully_qualified_names"
+MPG="magic_private_groups"
+PROVIDER="id_provider"
+MAXID="max_id"
+MINID="min_id"
+CACHECREDS="cache_credentials"
 ###################
 # LDAP domains
 ###################
@@ -103,22 +104,22 @@ sssd_multi_001()
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME LOCAL minId 2000
+                verifyCfg $FULLHOSTNAME LOCAL $MINID 2000
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME LOCAL maxId 2010
+                verifyCfg $FULLHOSTNAME LOCAL $MAXID 2010
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME LOCAL magicPrivateGroups TRUE
+                verifyCfg $FULLHOSTNAME LOCAL $MPG TRUE
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME LOCAL provider local
+                verifyCfg $FULLHOSTNAME LOCAL $PROVIDER local
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
@@ -128,22 +129,22 @@ sssd_multi_001()
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME LDAP minId 1000
+                verifyCfg $FULLHOSTNAME LDAP $MINID 1000
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME LDAP maxId 1010
+                verifyCfg $FULLHOSTNAME LDAP $MAXID 1010
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME LDAP provider proxy
+                verifyCfg $FULLHOSTNAME LDAP $PROVIDER proxy
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME LDAP "cache\-credentials" FALSE
+                verifyCfg $FULLHOSTNAME LDAP $CACHECREDS FALSE
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
@@ -345,7 +346,7 @@ sssd_multi_007()
         message "START $tet_thistest: Attempt to delete LDAP Domain Group - LDAP PROXY and LOCAL"
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 
-	EXPMSG="The selected GID is outside the allowed range"
+	EXPMSG="No such group"
         for c in $CLIENTS ; do
 		eval_vars $c
                 message "Working on $FULLHOSTNAME"
@@ -437,27 +438,27 @@ sssd_multi_009()
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME LOCAL minId 2000
+                verifyCfg $FULLHOSTNAME LOCAL $MINID 2000
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME LOCAL maxId 2010
+                verifyCfg $FULLHOSTNAME LOCAL $MAXID 2010
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME LOCAL magicPrivateGroups TRUE
+                verifyCfg $FULLHOSTNAME LOCAL $MPG TRUE
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME LOCAL provider local
+                verifyCfg $FULLHOSTNAME LOCAL $PROVIDER local
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME LOCAL useFullyQualifiedNames TRUE
+                verifyCfg $FULLHOSTNAME LOCAL $USEFQN TRUE
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
@@ -467,27 +468,27 @@ sssd_multi_009()
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME LDAP minId 1000
+                verifyCfg $FULLHOSTNAME LDAP $MINID 1000
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME LDAP maxId 1010
+                verifyCfg $FULLHOSTNAME LDAP $MAXID 1010
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME LDAP provider ldap
+                verifyCfg $FULLHOSTNAME LDAP $PROVIDER ldap
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME LDAP "cache\-credentials" FALSE
+                verifyCfg $FULLHOSTNAME LDAP $CACHECREDS FALSE
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME LDAP useFullyQualifiedNames TRUE
+                verifyCfg $FULLHOSTNAME LDAP $USEFQN TRUE
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
@@ -675,6 +676,7 @@ sssd_multi_014()
 
                 if [[ $EXPMSG != $MSG ]] ; then
                         message "ERROR: Unexpected Error message.  Got: $MSG  Expected: $EXPMSG"
+			message "Trac issue 188"
                         myresult=FAIL
                 else
                         message "Modifying LDAP group error message was as expected."
@@ -820,22 +822,22 @@ sssd_multi_018()
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME "EXAMPLE\.COM" minId 1000
+                verifyCfg $FULLHOSTNAME "EXAMPLE\.COM" $MINID 1000
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME "EXAMPLE\.COM" maxId 1010
+                verifyCfg $FULLHOSTNAME "EXAMPLE\.COM" $MAXID 1010
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME "EXAMPLE\.COM" provider ldap
+                verifyCfg $FULLHOSTNAME "EXAMPLE\.COM" $PROVIDER ldap
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME "EXAMPLE\.COM" "cache\-credentials" FALSE
+                verifyCfg $FULLHOSTNAME "EXAMPLE\.COM" $CACHECREDS FALSE
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
@@ -845,22 +847,22 @@ sssd_multi_018()
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME "BOS\.REDHAT\.COM" minId 2000
+                verifyCfg $FULLHOSTNAME "BOS\.REDHAT\.COM" $MINID 2000
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME "BOS\.REDHAT\.COM" maxId 2010
+                verifyCfg $FULLHOSTNAME "BOS\.REDHAT\.COM" $MAXID 2010
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME "BOS\.REDHAT\.COM" provider ldap
+                verifyCfg $FULLHOSTNAME "BOS\.REDHAT\.COM" $PROVIDER ldap
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME "BOS\.REDHAT\.COM" "cache\-credentials" FALSE
+                verifyCfg $FULLHOSTNAME "BOS\.REDHAT\.COM" $CACHECREDS FALSE
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
@@ -921,7 +923,7 @@ sssd_multi_020()
                 	fi
               	done
 
-		# Let's make sure we do get both Duplicate groups without useFullyQualifiedNames
+		# Let's make sure we do get both Duplicate groups without $USEFQN
         	RET=`ssh root@$FULLHOSTNAME getent -s sss group | grep $PGROUP7 2>&1`
 		echo $RET | grep 1010
                 if [ $? -ne 0 ] ; then
@@ -977,17 +979,17 @@ sssd_multi_021()
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME "EXAMPLE\.COM" provider ldap
+                verifyCfg $FULLHOSTNAME "EXAMPLE\.COM" $PROVIDER ldap
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
 
-		verifyCfg $FULLHOSTNAME "EXAMPLE\.COM" useFullyQualifiedNames TRUE
+		verifyCfg $FULLHOSTNAME "EXAMPLE\.COM" $USEFQN TRUE
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME "EXAMPLE\.COM" cache\-credentials FALSE
+                verifyCfg $FULLHOSTNAME "EXAMPLE\.COM" $CACHECREDS FALSE
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
@@ -997,17 +999,17 @@ sssd_multi_021()
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME "BOS\.REDHAT\.COM" useFullyQualifiedNames TRUE
+                verifyCfg $FULLHOSTNAME "BOS\.REDHAT\.COM" $USEFQN TRUE
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME "BOS\.REDHAT\.COM" provider ldap
+                verifyCfg $FULLHOSTNAME "BOS\.REDHAT\.COM" $PROVIDER ldap
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME "BOS\.REDHAT\.COM" cache\-credentials FALSE
+                verifyCfg $FULLHOSTNAME "BOS\.REDHAT\.COM" $CACHECREDS FALSE
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
@@ -1137,22 +1139,22 @@ sssd_multi_025()
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME "EXAMPLE\.COM" minId 1000
+                verifyCfg $FULLHOSTNAME "EXAMPLE\.COM" $MINID 1000
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME "EXAMPLE\.COM" maxId 1010
+                verifyCfg $FULLHOSTNAME "EXAMPLE\.COM" $MAXID 1010
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME "EXAMPLE\.COM" provider ldap
+                verifyCfg $FULLHOSTNAME "EXAMPLE\.COM" $PROVIDER ldap
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME "EXAMPLE\.COM" "cache\-credentials" FALSE
+                verifyCfg $FULLHOSTNAME "EXAMPLE\.COM" $CACHECREDS FALSE
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
@@ -1162,22 +1164,22 @@ sssd_multi_025()
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME "BOS\.REDHAT\.COM" minId 2000
+                verifyCfg $FULLHOSTNAME "BOS\.REDHAT\.COM" $MINID 2000
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME "BOS\.REDHAT\.COM" maxId 2010
+                verifyCfg $FULLHOSTNAME "BOS\.REDHAT\.COM" $MAXID 2010
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME "BOS\.REDHAT\.COM" provider proxy
+                verifyCfg $FULLHOSTNAME "BOS\.REDHAT\.COM" $PROVIDER proxy
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME "BOS\.REDHAT\.COM" "cache\-credentials" FALSE
+                verifyCfg $FULLHOSTNAME "BOS\.REDHAT\.COM" $CACHECREDS FALSE
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
@@ -1241,7 +1243,7 @@ sssd_multi_027()
                 	fi
               	done
 
-		# Let's make sure we get both Duplicate groups without useFullyQualifiedNames and enumerating
+		# Let's make sure we get both Duplicate groups without $USEFQN and enumerating
 		echo $RET | grep 1010
                 	if [ $? -ne 0 ] ; then
                         message "ERROR: Expected group with gid 1010 to be returned."
@@ -1301,17 +1303,17 @@ sssd_multi_028()
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME "EXAMPLE\.COM" provider ldap
+                verifyCfg $FULLHOSTNAME "EXAMPLE\.COM" $PROVIDER ldap
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
 
-		verifyCfg $FULLHOSTNAME "EXAMPLE\.COM" useFullyQualifiedNames TRUE
+		verifyCfg $FULLHOSTNAME "EXAMPLE\.COM" $USEFQN TRUE
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME "EXAMPLE\.COM" cache\-credentials FALSE
+                verifyCfg $FULLHOSTNAME "EXAMPLE\.COM" $CACHECREDS FALSE
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
@@ -1321,17 +1323,17 @@ sssd_multi_028()
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME "BOS\.REDHAT\.COM" useFullyQualifiedNames TRUE
+                verifyCfg $FULLHOSTNAME "BOS\.REDHAT\.COM" $USEFQN TRUE
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME "BOS\.REDHAT\.COM" provider proxy
+                verifyCfg $FULLHOSTNAME "BOS\.REDHAT\.COM" $PROVIDER proxy
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME "BOS\.REDHAT\.COM" cache\-credentials FALSE
+                verifyCfg $FULLHOSTNAME "BOS\.REDHAT\.COM" $CACHECREDS FALSE
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi

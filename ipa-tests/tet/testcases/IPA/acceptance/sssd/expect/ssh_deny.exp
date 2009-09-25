@@ -1,0 +1,10 @@
+set USER [lindex $argv 0]
+set FULLHOSTNAME [lindex $argv 1]
+set PWD [lindex $argv 2]
+spawn ssh $USER@$FULLHOSTNAME
+expect "*password: "
+send "$PWD"
+send "\r"
+expect "*password: "
+expect eof
+

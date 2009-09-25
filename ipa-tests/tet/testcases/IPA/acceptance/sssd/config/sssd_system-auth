@@ -13,8 +13,8 @@ account     sufficient    pam_succeed_if.so uid < 500 quiet
 account     required      pam_permit.so
 
 password    requisite     pam_cracklib.so try_first_pass retry=3
-password    sufficient    pam_unix.so sha512 shadow nullok use_authtok
-password    sufficient    pam_sss.so use_first_pass
+password    sufficient    pam_unix.so sha512 shadow nullok try_first_pass use_authtok
+password    sufficient    pam_sss.so use_authtok
 password    required      pam_deny.so
 
 session     optional      pam_keyinit.so revoke

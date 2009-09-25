@@ -15,7 +15,7 @@ ls $TESTING_SHARED/
 ######################################################################
 #  Test Case List
 #####################################################################
-iclist="ic1 ic2 ic3 ic4 ic5 ic6 ic7 ic8 ic9"
+iclist="ic1 ic2 ic3 ic4 ic5 ic6 ic7 ic8 ic9 ic10"
 ic1="sssd_config_001"
 ic2="sssd_config_002"
 ic3="sssd_config_003"
@@ -25,6 +25,32 @@ ic6="sssd_config_006"
 ic7="sssd_config_007"
 ic8="sssd_config_008"
 ic9="sssd_config_009"
+ic10="sssd_config_010"
+USEFQN="use_fully_qualified_names"
+MPG="magic_private_groups"
+PROVIDER="id_provider"
+MAXID="max_id"
+MINID="min_id"
+#####################################################################
+# Sub Routines
+#####################################################################
+scrubLog()
+{
+ message "Searching for message \"$1\""
+ 
+ rc=0
+
+ ssh root@$FULLHOSTNAME cat /var/log/messages | grep "$1"
+ if [ $? -ne 0 ] ; then
+ 	message "ERROR: $1 not found in /var/log/messages"
+	sftp root@$FULLHOSTNAME:/var/log/messages $TET_TMP_DIR/messages_sssd
+ 	rc=1
+ else
+ 	message "$1 found in /var/log/messages"
+ fi
+
+ return $rc
+}
 ######################################################################
 # Tests
 ######################################################################
@@ -37,14 +63,13 @@ sssd_config_001()
   for c in $CLIENTS; do
 	eval_vars $c
         message "Working on $FULLHOSTNAME"
-	EXPMSG="Invalid domain range"
         sssdCfg $FULLHOSTNAME sssd_config1.conf
         if [ $? -ne 0 ] ; then
         	message "ERROR Configuring SSSD on $FULLHOSTNAME."
                 myresult=FAIL
         else
 		ssh root@$FULLHOSTNAME "service sssd stop"
-		ssh root@$FULLHOSTNAME "service sssd start"
+		ssh root@$FULLHOSTNAME "cat /dev/null > /var/log/messages ; service sssd start"
 		if [ $? -eq 0 ] ; then
 			message "ERROR: Invalid configuration MaxId less than MinId - service started"
 			message "Trac issue 126"
@@ -74,6 +99,11 @@ sssd_config_001()
                 message "Status as expected: \"$MSG\"."
         fi
 
+        # check /var/log/messages for error message
+#	scrubLog "Invalid domain range"
+#       if [ $? -ne 0 ] ; then
+#                myresult=FAIL
+#        fi
   done
 
   tet_result $myresult
@@ -83,19 +113,73 @@ sssd_config_001()
 sssd_config_002()
 {
   myresult=PASS
+  message "START $tet_thistest: Provider FILES with magicPrivateGroups TRUE"
+  EXPMSG=""
+  for c in $CLIENTS; do
+        eval_vars $c
+        message "Working on $FULLHOSTNAME"
+        sssdCfg $FULLHOSTNAME sssd_config2.conf
+        if [ $? -ne 0 ] ; then
+                message "ERROR Configuring SSSD on $FULLHOSTNAME."
+                myresult=FAIL
+        else
+                ssh root@$FULLHOSTNAME "service sssd stop"
+                ssh root@$FULLHOSTNAME "cat /dev/null > /var/log/messages ; service sssd start"
+                if [ $? -eq 0 ] ; then
+                        message "ERROR: Invalid configuration Provider FILES with magicPrivateGroups TRUE - service started"
+                        message "Trac issue 144"
+                        myresult=FAIL
+                        ssh root@$FULLHOSTNAME "service sssd stop"
+                else
+                        message "Starting services with invalid configuration failed as expected."
+                fi
+        fi
+
+        MSG="PID file exists"
+        # check the status of the service should not be running
+        STATUS=`ssh root@$FULLHOSTNAME "if [ -f /var/run/sssd.pid ] ; then echo "PID file exists" ; fi"`
+        if [[ $STATUS == $MSG ]] ; then
+                message "PID file /var/run/sssd.pid exists."
+                myresult=FAIL
+        else
+                message "PID file was not created."
+        fi
+
+        MSG="sssd is stopped"
+        STATUS=`ssh root@$FULLHOSTNAME "service sssd status"`
+        if [[ $STATUS != $MSG ]] ; then
+                message "ERROR: Status returned \"$MSG\"."
+                myresult=FAIL
+        else
+                message "Status as expected: \"$MSG\"."
+        fi
+
+        # check /var/log/messages for error message
+#        scrubLog "Invalid domain configuration"
+#        if [ $? -ne 0 ] ; then
+#                myresult=FAIL
+#        fi
+  done
+  tet_result $myresult
+  message "END $tet_thistest"
+}
+
+
+sssd_config_003()
+{
+  myresult=PASS
   message "START $tet_thistest: Negative minId"
   EXPMSG=""
   for c in $CLIENTS; do
 	eval_vars $c
         message "Working on $FULLHOSTNAME"
-	EXPMSG="Invalid value for minId"
         sssdCfg $FULLHOSTNAME sssd_config3.conf
         if [ $? -ne 0 ] ; then
                 message "ERROR Configuring SSSD on $FULLHOSTNAME."
                 myresult=FAIL
         else
                 ssh root@$FULLHOSTNAME "service sssd stop"
-                ssh root@$FULLHOSTNAME "service sssd start"
+                ssh root@$FULLHOSTNAME "cat /dev/null > /var/log/messages ; service sssd start"
                 if [ $? -eq 0 ] ; then
                         message "ERROR: Invalid configuration Negative minId - service started"
 			message "Trac issue 127"
@@ -124,13 +208,19 @@ sssd_config_002()
         else
                 message "Status as expected: \"$MSG\"."
         fi
+
+        # check /var/log/messages for error message
+#        scrubLog "Invalid value for minId"
+#        if [ $? -ne 0 ] ; then
+#                myresult=FAIL
+#        fi
   done
 
   tet_result $myresult
   message "END $tet_thistest"
 }
 
-sssd_config_003()
+sssd_config_004()
 {
   myresult=PASS
   message "START $tet_thistest: Negative MaxId"
@@ -138,14 +228,13 @@ sssd_config_003()
   for c in $CLIENTS; do
 	eval_vars $c
         message "Working on $FULLHOSTNAME"
-	EXPMSG="Invalid value for maxId"
         sssdCfg $FULLHOSTNAME sssd_config4.conf
         if [ $? -ne 0 ] ; then
                 message "ERROR Configuring SSSD on $FULLHOSTNAME."
                 myresult=FAIL
         else
                 ssh root@$FULLHOSTNAME "service sssd stop"
-                ssh root@$FULLHOSTNAME "service sssd start"
+                ssh root@$FULLHOSTNAME "cat /dev/null > /var/log/messages ; service sssd start"
                 if [ $? -eq 0 ] ; then
                         message "ERROR: Invalid configuration Negative maxId - service started"
 			message "Trac issue 127"
@@ -174,13 +263,19 @@ sssd_config_003()
         else
                 message "Status as expected: \"$MSG\"."
         fi
+
+        # check /var/log/messages for error message
+#        scrubLog "Invalid value for maxId"
+#        if [ $? -ne 0 ] ; then
+#                myresult=FAIL
+#        fi
   done
 
   tet_result $myresult
   message "END $tet_thistest"
 }
 
-sssd_config_004()
+sssd_config_005()
 {
   myresult=PASS
   message "START $tet_thistest: Duplicate Defined Parameters - Last One Read Wins"
@@ -211,27 +306,27 @@ sssd_config_004()
                         	myresult=FAIL
 			fi
 
-                	verifyCfg $FULLHOSTNAME LOCAL minId 2000
+                	verifyCfg $FULLHOSTNAME LOCAL $MINID 2000
                 	if [ $? -ne 0 ] ; then
                         	myresult=FAIL
                 	fi
 
-                	verifyCfg $FULLHOSTNAME LOCAL maxId 2010
+                	verifyCfg $FULLHOSTNAME LOCAL $MAXID 2010
                 	if [ $? -ne 0 ] ; then
                         	myresult=FAIL
                 	fi
 
-                	verifyCfg $FULLHOSTNAME LOCAL magicPrivateGroups TRUE
+                	verifyCfg $FULLHOSTNAME LOCAL $MPG TRUE
                 	if [ $? -ne 0 ] ; then
                         	myresult=FAIL
                 	fi
 
-                	verifyCfg $FULLHOSTNAME LOCAL provider local
+                	verifyCfg $FULLHOSTNAME LOCAL $PROVIDER local
                 	if [ $? -ne 0 ] ; then
                         	myresult=FAIL
                 	fi
 
-                	verifyCfg $FULLHOSTNAME LOCAL useFullyQualifiedNames TRUE
+                	verifyCfg $FULLHOSTNAME LOCAL $USEFQN TRUE
                 	if [ $? -ne 0 ] ; then
                         	myresult=FAIL
                 	fi
@@ -246,11 +341,10 @@ sssd_config_004()
   message "END $tet_thistest"
 }
 
-sssd_config_005()
+sssd_config_006()
 {
   myresult=PASS
   message "START $tet_thistest: Required Key provider Not Defined"
-  EXPMSG=""
   for c in $CLIENTS; do
 	eval_vars $c
         message "Working on $FULLHOSTNAME"
@@ -261,7 +355,7 @@ sssd_config_005()
                 myresult=FAIL
         else
                 ssh root@$FULLHOSTNAME "service sssd stop"
-                ssh root@$FULLHOSTNAME "service sssd start"
+                ssh root@$FULLHOSTNAME "cat /dev/null > /var/log/messages ; service sssd start"
                 if [ $? -eq 0 ] ; then
                         message "ERROR: Invalid configuration no Provider defined - service started"
 			message "Trac issue 130"
@@ -290,17 +384,22 @@ sssd_config_005()
         else
                 message "Status as expected: \"$MSG\"."
         fi
+
+        # check /var/log/messages for error message
+#        scrubLog "does not specify a provider"
+#        if [ $? -ne 0 ] ; then
+#                myresult=FAIL
+#        fi
   done
 
   tet_result $myresult
   message "END $tet_thistest"
 }
 
-sssd_config_006()
+sssd_config_007()
 {
   myresult=PASS
   message "START $tet_thistest: Enumeration defined with Integer"
-  EXPMSG=""
   for c in $CLIENTS; do
 	eval_vars $c
         message "Working on $FULLHOSTNAME"
@@ -311,7 +410,7 @@ sssd_config_006()
                 myresult=FAIL
         else
                 ssh root@$FULLHOSTNAME "service sssd stop"
-                ssh root@$FULLHOSTNAME "service sssd start"
+                ssh root@$FULLHOSTNAME "cat /dev/null > /var/log/messages ; service sssd start"
                 if [ $? -eq 0 ] ; then
                         message "ERROR: Invalid configuration enumeration defined with integer - service started"
 			message "Trac issue 131"
@@ -340,17 +439,22 @@ sssd_config_006()
         else
                 message "Status as expected: \"$MSG\"."
         fi
+
+        # check /var/log/messages for error message
+#        scrubLog "Invalid value for enumerate"
+#        if [ $? -ne 0 ] ; then
+#                myresult=FAIL
+#        fi
   done
 
   tet_result $myresult
   message "END $tet_thistest"
 }
 
-sssd_config_007()
+sssd_config_008()
 {
   myresult=PASS
   message "START $tet_thistest: Enumeration defined with non boolean"
-  EXPMSG=""
   for c in $CLIENTS; do
 	eval_vars $c
         message "Working on $FULLHOSTNAME"
@@ -361,7 +465,7 @@ sssd_config_007()
                 myresult=FAIL
         else
                 ssh root@$FULLHOSTNAME "service sssd stop"
-                ssh root@$FULLHOSTNAME "service sssd start"
+                ssh root@$FULLHOSTNAME "cat /dev/null > /var/log/messages ; service sssd start"
                 if [ $? -eq 0 ] ; then
                         message "ERROR: Invalid configuration enumeration defined with non boolean - service started"
 			message "Trac issue 131"
@@ -390,13 +494,18 @@ sssd_config_007()
         else
                 message "Status as expected: \"$MSG\"."
         fi
+
+#        scrubLog "Invalid value for enumerate"
+#        if [ $? -ne 0 ] ; then
+#                myresult=FAIL
+#        fi
   done
 
   tet_result $myresult
   message "END $tet_thistest"
 }
 
-sssd_config_008()
+sssd_config_009()
 {
   myresult=PASS
   message "START $tet_thistest: useFullyQualifiedNames defined with a string"
@@ -404,14 +513,13 @@ sssd_config_008()
   for c in $CLIENTS; do
 	eval_vars $c
         message "Working on $FULLHOSTNAME"
-	EXPMSG=""
         sssdCfg $FULLHOSTNAME sssd_config9.conf
         if [ $? -ne 0 ] ; then
                 message "ERROR Configuring SSSD on $FULLHOSTNAME."
                 myresult=FAIL
         else
                 ssh root@$FULLHOSTNAME "service sssd stop"
-                ssh root@$FULLHOSTNAME "service sssd start"
+                ssh root@$FULLHOSTNAME "cat /dev/null > /var/log/messages ; service sssd start"
                 if [ $? -eq 0 ] ; then
                         message "ERROR: Invalid configuration boolean defined with a string - service started"
 			message "Trac issue 132"
@@ -440,13 +548,18 @@ sssd_config_008()
         else
                 message "Status as expected: \"$MSG\"."
         fi
+	
+#        scrubLog "Invalid value for useFullyQualifiedNames"
+#        if [ $? -ne 0 ] ; then
+#                myresult=FAIL
+#        fi
   done
 
   tet_result $myresult
   message "END $tet_thistest"
 }
 
-sssd_config_009()
+sssd_config_010()
 {
   myresult=PASS
   message "START $tet_thistest: useFullyQualifiedNames defined with an integer"
@@ -454,14 +567,13 @@ sssd_config_009()
   for c in $CLIENTS; do
 	eval_vars $c
         message "Working on $FULLHOSTNAME"
-	EXPMSG=""
         sssdCfg $FULLHOSTNAME sssd_config10.conf
         if [ $? -ne 0 ] ; then
                 message "ERROR Configuring SSSD on $FULLHOSTNAME."
                 myresult=FAIL
         else
                 ssh root@$FULLHOSTNAME "service sssd stop"
-                ssh root@$FULLHOSTNAME "service sssd start"
+                ssh root@$FULLHOSTNAME "cat /dev/null > /var/log/messages ; service sssd start"
                 if [ $? -eq 0 ] ; then
                         message "ERROR: Invalid configuration boolean defined with an integer - service started"
 			message "Trac issue 132"
@@ -489,6 +601,11 @@ sssd_config_009()
         else
                 message "Status as expected: \"$MSG\"."
         fi
+
+#        scrubLog "Invalid value for useFullyQualifiedNames"
+#        if [ $? -ne 0 ] ; then
+#                myresult=FAIL
+#        fi
   done
 
   tet_result $myresult

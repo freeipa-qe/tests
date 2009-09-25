@@ -31,7 +31,7 @@ bug512733()
   for c in $CLIENTS; do
 	 eval_vars $c
         message "Working on $FULLHOSTNAME"
-	ssh root@$FULLHOSTNAME "service sssd start"
+	ssh root@$FULLHOSTNAME "cat /dev/null > /var/log/messages ; service sssd start"
 	if [ $? -eq 0 ] ; then
 		message "ERROR: Starting service should return non zero return code."
 		myresult=FAIL
@@ -39,14 +39,15 @@ bug512733()
 		message "This part fixed. Non-zero return code: $?"
 	fi
 
-	MSG="PID file exists"
-	MSG=`ssh root@$FULLHOSTNAME "if [ -e /var/run/sssd.pid ] ; then echo "PID file exists" ;fi"`
-	if [[ $STATUS == $MSG ]] ; then
-		message "PID file /var/run/sssd.pid exists."
-		myresult=FAIL
-	else
-		message "This part fixed. PID file was not created."
-	fi
+        MSG="PID file exists"
+        # check the status of the service should not be running
+        STATUS=`ssh root@$FULLHOSTNAME "if [ -f /var/run/sssd.pid ] ; then echo "PID file exists" ; fi"`
+        if [[ $STATUS == $MSG ]] ; then
+                message "PID file /var/run/sssd.pid exists."
+                myresult=FAIL
+        else
+                message "PID file was not created."
+        fi
 
 	MSG="sssd dead but pid file exists"
 	STATUS=`ssh root@$FULLHOSTNAME "service sssd status"`
@@ -56,6 +57,18 @@ bug512733()
 	else
 		message "This part fixed. Status did not return \"$MSG\"."
 	fi
+
+	# check /var/log/messages for error message
+#	ERR="No domains configured"
+#	message "Searching /var/log/messages for \"$ERR\""
+#	ssh root@$FULLHOSTNAME cat /var/log/messages | grep "$ERR"
+#	if [ $? -ne 0 ] ; then
+#		message "ERROR: \"$ERR\" not found in /var/log/messages"
+#		sftp root@$FULLHOSTNAME:/var/log/messages $TET_TMP_DIR/messages_bug512733
+#		myresult=FAIL
+#	else
+#		message "\"$ERR\" found in /var/log/messages"
+#	fi
 
 	ssh root@$FULLHOSTNAME "service sssd stop"
 	ssh root@$FULLHOSTNAME "rm -rf /var/run/sssd.pid"

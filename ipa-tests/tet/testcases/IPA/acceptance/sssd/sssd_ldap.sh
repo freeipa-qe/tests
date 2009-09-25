@@ -12,11 +12,11 @@ fi
 #  Test Case List
 #####################################################################
 iclist="ic1 ic2 ic3 ic4"
-ic1="sssd_ldap_001 sssd_ldap_002 sssd_ldap_003 sssd_ldap_004 sssd_ldap_005 sssd_ldap_006 sssd_ldap_007"
-ic2="sssd_ldap_008 sssd_ldap_009 sssd_ldap_010 sssd_ldap_011 sssd_ldap_012 sssd_ldap_013 sssd_ldap_014"
-ic3="sssd_ldap_015 sssd_ldap_016 sssd_ldap_017 sssd_ldap_018 sssd_ldap_019 sssd_ldap_020 sssd_ldap_021"
-ic4="sssd_ldap_022 sssd_ldap_023 sssd_ldap_024 sssd_ldap_025 sssd_ldap_026 sssd_ldap_027 sssd_ldap_028"
-
+ic1="sssd_ldap_001 sssd_ldap_002 sssd_ldap_003 sssd_ldap_004 sssd_ldap_005 sssd_ldap_006 sssd_ldap_007 sssd_ldap_008 sssd_ldap_009 sssd_ldap_010 sssd_ldap_011"
+ic2="sssd_ldap_012 sssd_ldap_013 sssd_ldap_014 sssd_ldap_015 sssd_ldap_016 sssd_ldap_017 sssd_ldap_018 sssd_ldap_019 sssd_ldap_020"
+ic3="sssd_ldap_021 sssd_ldap_022 sssd_ldap_023 sssd_ldap_024 sssd_ldap_025 sssd_ldap_026 sssd_ldap_027 sssd_ldap_028 sssd_ldap_029 sssd_ldap_030 sssd_ldap_031"
+ic4="sssd_ldap_032 sssd_ldap_033 sssd_ldap_034 sssd_ldap_035 sssd_ldap_036 sssd_ldap_037 sssd_ldap_038 sssd_ldap_039 sssd_ldap_040"
+ic5="sssd_ldap_041 sssd_ldap_042 sssd_ldap_043 sssd_ldap_044"
 #################################################################
 #  GLOBALS
 #################################################################
@@ -29,6 +29,13 @@ ROOTDN="cn=Directory Manager"
 ROOTDNPWD="Secret123"
 export RH_DIRSERV ADS_DIRSRV ROOTDN ROOTDNPWD
 LDIFS=$TET_ROOT/testcases/IPA/acceptance/sssd/ldifs
+HOMEDIR="$TET_ROOT/testcases/IPA/acceptance/sssd"
+export HOMEDIR LDIFS
+USEFQN="use_fully_qualified_names"
+PROVIDER="id_provider"
+MAXID="max_id"
+MINID="min_id"
+CACHECREDS="cache_credentials"
 ###################
 # KNOW LDAP USERS #
 ###################
@@ -58,14 +65,14 @@ sssd_ldap_001()
    ####################################################################
    #   Configuration 1
    #    enumerate: TRUE
-   #    minId: 1000
-   #    maxId: 1010
-   #    provider: proxy
+   #    $MINID: 1000
+   #    $MAXID: 1010
+   #    $PROVIDER: proxy
    #    cache-credentials: FALSE
    ####################################################################
 
         myresult=PASS
-        message "START $tet_thistest: Setup LDAP SSSD Configuration 1 - RHDS - provider proxy"
+        message "START $tet_thistest: Setup LDAP SSSD Configuration 1 - RHDS - $PROVIDER proxy"
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
         for c in $CLIENTS ; do
 		eval_vars $c
@@ -96,22 +103,22 @@ sssd_ldap_001()
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME LDAP minId 1000
+                verifyCfg $FULLHOSTNAME LDAP $MINID 1000
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME LDAP maxId 1010
+                verifyCfg $FULLHOSTNAME LDAP $MAXID 1010
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME LDAP provider proxy
+                verifyCfg $FULLHOSTNAME LDAP $PROVIDER proxy
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME LDAP cache\-credentials FALSE
+                verifyCfg $FULLHOSTNAME LDAP $CACHECREDS FALSE
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
@@ -125,14 +132,13 @@ sssd_ldap_001()
 sssd_ldap_002()
 {
         myresult=PASS
-        message "START $tet_thistest: Get Valid LDAP Users - RHDS - provider proxy"
+        message "START $tet_thistest: Get Valid LDAP Users - RHDS - $PROVIDER proxy"
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-        USERS="$PUSER1 $PUSER2"
         for c in $CLIENTS ; do
 		eval_vars $c
                 message "Working on $FULLHOSTNAME"
 		RET=`ssh root@$FULLHOSTNAME getent -s sss passwd 2>&1`
-		for item in $USERS ; do
+		for item in $PUSER1 $PUSER2 ; do
 		   echo $RET | grep $item
 		   if [ $? -ne 0 ] ; then
 			message "ERROR: Expected $item user to be returned."
@@ -150,7 +156,7 @@ sssd_ldap_002()
 sssd_ldap_003()
 {
         myresult=PASS
-        message "START $tet_thistest: Get Valid LDAP Groups - RHDS - provider proxy"
+        message "START $tet_thistest: Get Valid LDAP Groups - RHDS - $PROVIDER proxy"
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
         for c in $CLIENTS ; do
 		eval_vars $c
@@ -174,7 +180,7 @@ sssd_ldap_003()
 sssd_ldap_004()
 {
         myresult=PASS
-        message "START $tet_thistest: Users uidNumbers below minId and above maxId - RHDS - provider proxy"
+        message "START $tet_thistest: Users uidNumbers below $MINID and above $MAXID - RHDS - $PROVIDER proxy"
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
         for c in $CLIENTS ; do
 		eval_vars $c
@@ -199,7 +205,7 @@ sssd_ldap_004()
 sssd_ldap_005()
 {
         myresult=PASS
-        message "START $tet_thistest: Groups gidNumbers below minId and above maxId - RHDS - provider proxy"
+        message "START $tet_thistest: Groups gidNumbers below $MINID and above $MAXID - RHDS - $PROVIDER proxy"
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
         for c in $CLIENTS ; do
 		eval_vars $c
@@ -223,7 +229,7 @@ sssd_ldap_005()
 sssd_ldap_006()
 {
         myresult=PASS
-        message "START $tet_thistest: Non Posix User - RHDS - provider proxy"
+        message "START $tet_thistest: Non Posix User - RHDS - $PROVIDER proxy"
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 
         for c in $CLIENTS ; do
@@ -246,7 +252,7 @@ sssd_ldap_006()
 sssd_ldap_007()
 {
         myresult=PASS
-        message "START $tet_thistest: Non Posix Group - RHDS - provider proxy"
+        message "START $tet_thistest: Non Posix Group - RHDS - $PROVIDER proxy"
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 
         for c in $CLIENTS ; do
@@ -268,17 +274,135 @@ sssd_ldap_007()
 
 sssd_ldap_008()
 {
+
+        myresult=PASS
+        message "START $tet_thistest: Authentication ldap user with password assigned - proxy - no FQN"
+        if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+
+        for c in $CLIENTS; do
+                eval_vars $c
+                message "Working on $FULLHOSTNAME"
+		rm -rf $TET_TMP_DIR/expect-ssh-success-proxyldap-out.txt
+		
+                expect $HOMEDIR/expect/ssh.exp puser1 $FULLHOSTNAME Secret123 > $TET_TMP_DIR/expect-ssh-success-proxyldap-out.txt
+		cat $TET_TMP_DIR/expect-ssh-success-proxyldap-out.txt | grep "Permission denied"
+                if [ $? -eq 0 ] ; then
+			echo $?
+                        message "ERROR: User with password assigned failed authentication!"
+                        myresult=FAIL
+                else
+                        message "User with password assigned successfully authentication."
+                fi
+        done
+
+        result $myresult
+        message "END $tet_thistest"
+}
+
+sssd_ldap_009()
+{
+
+        myresult=PASS
+        message "START $tet_thistest: Change User's password - proxy - no FQN"
+        if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+
+	# change LDAP user's password
+        echo "/usr/bin/ldapmodify -x -h $RH_DIRSERV -p $PORT -D "$ROOTDN" -w $ROOTDNPW -f $LDIFS/newpwd.ldif"
+        /usr/bin/ldapmodify -x -h $RH_DIRSERV -p $PORT -D "$ROOTDN" -w $ROOTDNPW -f $LDIFS/newpwd.ldif
+
+        for c in $CLIENTS; do
+                eval_vars $c
+                message "Working on $FULLHOSTNAME"
+		rm -rf $TET_TMP_DIR/expect-ssh-success-newpwd-proxyldap-out.txt
+
+                expect $HOMEDIR/expect/ssh.exp puser1 $FULLHOSTNAME onLine4now > $TET_TMP_DIR/expect-ssh-success-newpwd-proxyldap-out.txt
+                cat $TET_TMP_DIR/expect-ssh-success-newpwd-proxyldap-out.txt | grep "Permission denied"
+                if [ $? -eq 0 ] ; then
+                        echo $?
+                        message "ERROR: User with password assigned failed authentication!"
+                        myresult=FAIL
+                else
+                        message "User with password assigned successfully authentication."
+                fi
+
+        done
+
+	# change LDAP user's password back to original
+        echo "/usr/bin/ldapmodify -x -h $RH_DIRSERV -p $PORT -D "$ROOTDN" -w $ROOTDNPW -f $LDIFS/restorepwd.ldif"
+        /usr/bin/ldapmodify -x -h $RH_DIRSERV -p $PORT -D "$ROOTDN" -w $ROOTDNPW -f $LDIFS/restorepwd.ldif
+
+        result $myresult
+        message "END $tet_thistest"
+}
+
+sssd_ldap_010()
+{
+
+        myresult=PASS
+        message "START $tet_thistest: Authentication ldap user without password assigned - proxy - no FQN"
+        if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi 
+
+        for c in $CLIENTS; do
+                eval_vars $c
+                message "Working on $FULLHOSTNAME"
+                rm -rf $TET_TMP_DIR/expect-ssh-nopasswd-proxyldap-out.txt
+
+                expect $HOMEDIR/expect/ssh.exp puser2 $FULLHOSTNAME Secret123 > $TET_TMP_DIR/expect-ssh-nopasswd-proxyldap-out.txt
+                cat $TET_TMP_DIR/expect-ssh-nopasswd-proxyldap-out.txt | grep "Permission denied"
+                if [ $? -ne 0 ] ; then
+                        echo $? 
+                        message "ERROR: User without password assigned did not get Permission denied.  See $TET_TMP_DIR/expect-ssh-nopasswd-proxyldap-out.txt!"
+                        myresult=FAIL
+                else
+                        message "User without password assigned failed authentication - Permission denied."
+                fi
+        done
+
+        result $myresult
+        message "END $tet_thistest"
+}
+
+sssd_ldap_011()
+{
+
+        myresult=PASS
+        message "START $tet_thistest: Authentication ldap user with incorrect password - proxy - no FQN"
+        if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+
+        for c in $CLIENTS; do
+                eval_vars $c
+                message "Working on $FULLHOSTNAME"
+                rm -rf $TET_TMP_DIR/expect-ssh-badpasswd-proxyldap-out.txt
+
+                expect $HOMEDIR/expect/ssh.exp puser1 $FULLHOSTNAME thisisabadpwd > $TET_TMP_DIR/expect-ssh-badpasswd-proxyldap-out.txt
+                cat $TET_TMP_DIR/expect-ssh-badpasswd-proxyldap-out.txt | grep "Permission denied"
+                if [ $? -ne 0 ] ; then
+                        echo $?
+                        message "ERROR: User with incorrect password did not get Permission denied.  See $TET_TMP_DIR/expect-ssh-nopasswd-proxyldap-out.txt!"
+                        myresult=FAIL
+                else
+                        message "User with incorrect password assigned failed authentication - Permission denied."
+                fi
+        done
+
+        result $myresult
+        message "END $tet_thistest"
+}
+
+
+sssd_ldap_012()
+{
    ####################################################################
    #   Configuration 2
    #    enumerate: TRUE
-   #    minId: 1000
-   #	useFullyQualifiedNames: TRUE
-   #    provider: proxy
+   #    $MINID: 1000
+   #	$USEFQN: TRUE
+   #    $PROVIDER: proxy
    #    cache-credentials: TRUE
    ####################################################################
 
         myresult=PASS
-        message "START $tet_thistest: Setup LDAP SSSD Configuration 2 - RHDS - provider proxy"
+        message "START $tet_thistest: Setup LDAP SSSD Configuration 2 - RHDS - $PROVIDER proxy"
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
         for c in $CLIENTS ; do
 		eval_vars $c
@@ -303,22 +427,22 @@ sssd_ldap_008()
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME LDAP minId 1000
+                verifyCfg $FULLHOSTNAME LDAP $MINID 1000
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME LDAP provider proxy
+                verifyCfg $FULLHOSTNAME LDAP $PROVIDER proxy
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME LDAP cache\-credentials TRUE
+                verifyCfg $FULLHOSTNAME LDAP $CACHECREDS TRUE
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME LDAP useFullyQualifiedNames TRUE
+                verifyCfg $FULLHOSTNAME LDAP $USEFQN TRUE
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
@@ -329,10 +453,10 @@ sssd_ldap_008()
         message "END $tet_thistest"
 }
 
-sssd_ldap_009()
+sssd_ldap_013()
 {
         myresult=PASS
-        message "START $tet_thistest: Get Valid LDAP Users - No maxId - FQN - RHDS - provider proxy"
+        message "START $tet_thistest: Get Valid LDAP Users - No $MAXID - FQN - RHDS - $PROVIDER proxy"
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
         for c in $CLIENTS ; do
 		eval_vars $c
@@ -353,10 +477,10 @@ sssd_ldap_009()
         message "END $tet_thistest"
 }
 
-sssd_ldap_010()
+sssd_ldap_014()
 {
         myresult=PASS
-        message "START $tet_thistest: Get Valid LDAP Groups - No maxId - FQN - RHDS - provider proxy"
+        message "START $tet_thistest: Get Valid LDAP Groups - No $MAXID - FQN - RHDS - $PROVIDER proxy"
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
         for c in $CLIENTS ; do
 		eval_vars $c
@@ -378,10 +502,10 @@ sssd_ldap_010()
         message "END $tet_thistest"
 }
 
-sssd_ldap_011()
+sssd_ldap_015()
 {
         myresult=PASS
-        message "START $tet_thistest: User uidNumber not within allowed range - FQN - RHDS - provider proxy"
+        message "START $tet_thistest: User uidNumber not within allowed range - FQN - RHDS - $PROVIDER proxy"
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
         for c in $CLIENTS ; do
 		eval_vars $c
@@ -400,10 +524,10 @@ sssd_ldap_011()
         message "END $tet_thistest"
 }
 
-sssd_ldap_012()
+sssd_ldap_016()
 {
         myresult=PASS
-        message "START $tet_thistest: Group gidNumber not within allowed range - FQN - RHDS - provider proxy"
+        message "START $tet_thistest: Group gidNumber not within allowed range - FQN - RHDS - $PROVIDER proxy"
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi 
         for c in $CLIENTS ; do
 		eval_vars $c
@@ -422,10 +546,10 @@ sssd_ldap_012()
         message "END $tet_thistest"
 }
 
-sssd_ldap_013()
+sssd_ldap_017()
 {
         myresult=PASS
-        message "START $tet_thistest: New User added - cache test - RHDS - provider proxy"
+        message "START $tet_thistest: New User added - cache test - RHDS - $PROVIDER proxy"
 
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
         for c in $CLIENTS ; do 
@@ -461,10 +585,10 @@ sssd_ldap_013()
 
 }
 
-sssd_ldap_014()
+sssd_ldap_018()
 {
         myresult=PASS
-        message "START $tet_thistest: New Group added - cache test - RHDS - provider proxy"
+        message "START $tet_thistest: New Group added - cache test - RHDS - $PROVIDER proxy"
 
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
         for c in $CLIENTS ; do 
@@ -499,19 +623,80 @@ sssd_ldap_014()
 
 }
 
-sssd_ldap_015()
+sssd_ldap_019()
+{
+
+        myresult=PASS
+        message "START $tet_thistest: Authentication ldap user with password assigned - Proxy - FQN"
+        if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+
+        for c in $CLIENTS; do
+                eval_vars $c
+                message "Working on $FULLHOSTNAME"
+                rm -rf $TET_TMP_DIR/expect-ssh-success-fqn-proxyldap-out.txt
+ 
+                expect $HOMEDIR/expect/ssh.exp puser1@LDAP $FULLHOSTNAME Secret123 > $TET_TMP_DIR/expect-ssh-success-fqn-proxyldap-out.txt
+                cat $TET_TMP_DIR/expect-ssh-success-fqn-proxyldap-out.txt | grep "Permission denied"
+                if [ $? -eq 0 ] ; then
+                        echo $?
+                        message "ERROR: User with password assigned failed authentication!"
+                        myresult=FAIL 
+                else
+                        message "User with password assigned successfully authentication."
+                fi
+        done
+
+        result $myresult
+        message "END $tet_thistest"
+}
+
+sssd_ldap_020()
+{
+
+        myresult=PASS
+        message "START $tet_thistest: Caching on - Change User's password - proxy - FQN"
+        if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+
+        # change LDAP user's password
+        echo "/usr/bin/ldapmodify -x -h $RH_DIRSERV -p $PORT -D "$ROOTDN" -w $ROOTDNPW -f $LDIFS/newpwd.ldif"
+        /usr/bin/ldapmodify -x -h $RH_DIRSERV -p $PORT -D "$ROOTDN" -w $ROOTDNPW -f $LDIFS/newpwd.ldif
+
+        for c in $CLIENTS; do
+                eval_vars $c
+                message "Working on $FULLHOSTNAME"
+                rm -rf $TET_TMP_DIR/expect-ssh-success-fqn-proxyldap-out.txt
+		message "Authenticate with new password expecting success"
+                expect $HOMEDIR/expect/ssh.exp puser1@LDAP $FULLHOSTNAME onLine4now > $TET_TMP_DIR/expect-ssh-success-fqn-proxyldap-out.txt
+                cat $TET_TMP_DIR/expect-ssh-success-fqn-proxyldap-out.txt | grep "Permission denied"
+                if [ $? -eq 0 ] ; then
+                        message "ERROR: User authentication with new password against failed! See $TET_TMP_DIR/expect-ssh-success-fqn-proxyldap-out.txt for details."
+                        myresult=FAIL
+                else
+                        message "User authentication with new password successful."
+                fi
+        done
+
+        # change LDAP user's password back to original
+        echo "/usr/bin/ldapmodify -x -h $RH_DIRSERV -p $PORT -D "$ROOTDN" -w $ROOTDNPW -f $LDIFS/restorepwd.ldif"
+        /usr/bin/ldapmodify -x -h $RH_DIRSERV -p $PORT -D "$ROOTDN" -w $ROOTDNPW -f $LDIFS/restorepwd.ldif
+
+        result $myresult
+        message "END $tet_thistest"
+}
+
+sssd_ldap_021()
 {
    ####################################################################
    #   Configuration 3
    #    enumerate: TRUE
-   #    minId: 1000
-   #    maxId: 1010
-   #    provider: ldap 
+   #    $MINID: 1000
+   #    $MAXID: 1010
+   #    $PROVIDER: ldap 
    #    cache-credentials: FALSE
    ####################################################################
 
         myresult=PASS
-        message "START $tet_thistest: Setup LDAP SSSD Configuration 3 - RHDS - provider ldap"
+        message "START $tet_thistest: Setup LDAP SSSD Configuration 3 - RHDS - $PROVIDER ldap"
 
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
         for c in $CLIENTS ; do
@@ -545,22 +730,22 @@ sssd_ldap_015()
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME LDAP minId 1000
+                verifyCfg $FULLHOSTNAME LDAP $MINID 1000
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME LDAP maxId 1010
+                verifyCfg $FULLHOSTNAME LDAP $MAXID 1010
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME LDAP provider ldap
+                verifyCfg $FULLHOSTNAME LDAP $PROVIDER ldap
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME LDAP cache\-credentials FALSE
+                verifyCfg $FULLHOSTNAME LDAP $CACHECREDS FALSE
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
@@ -571,10 +756,10 @@ sssd_ldap_015()
         message "END $tet_thistest"
 }
 
-sssd_ldap_016()
+sssd_ldap_022()
 {
         myresult=PASS
-        message "START $tet_thistest: Get Valid LDAP Users - RHDS - provider ldap"
+        message "START $tet_thistest: Get Valid LDAP Users - RHDS - $PROVIDER ldap"
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
         for c in $CLIENTS ; do 
 		eval_vars $c
@@ -595,10 +780,10 @@ sssd_ldap_016()
         message "END $tet_thistest"
 }
 
-sssd_ldap_017()
+sssd_ldap_023()
 {
         myresult=PASS
-        message "START $tet_thistest: Get Valid LDAP Groups - RHDS - provider ldap"
+        message "START $tet_thistest: Get Valid LDAP Groups - RHDS - $PROVIDER ldap"
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
         for c in $CLIENTS ; do
 		eval_vars $c
@@ -619,10 +804,10 @@ sssd_ldap_017()
         message "END $tet_thistest"
 }
 
-sssd_ldap_018()
+sssd_ldap_024()
 {
         myresult=PASS
-        message "START $tet_thistest: Users uidNumbers below minId and above maxId - RHDS - provider ldap"
+        message "START $tet_thistest: Users uidNumbers below $MINID and above $MAXID - RHDS - $PROVIDER ldap"
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
         for c in $CLIENTS ; do
 		eval_vars $c
@@ -644,10 +829,10 @@ sssd_ldap_018()
         message "END $tet_thistest"
 }
 
-sssd_ldap_019()
+sssd_ldap_025()
 {
         myresult=PASS
-        message "START $tet_thistest: Groups gidNumbers below minId and above maxId - RHDS - provider ldap"
+        message "START $tet_thistest: Groups gidNumbers below $MINID and above $MAXID - RHDS - $PROVIDER ldap"
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
         for c in $CLIENTS ; do
 		eval_vars $c
@@ -668,10 +853,10 @@ sssd_ldap_019()
         message "END $tet_thistest"
 }
 
-sssd_ldap_020()
+sssd_ldap_026()
 {
         myresult=PASS
-        message "START $tet_thistest: Non Posix User - RHDS - provider ldap"
+        message "START $tet_thistest: Non Posix User - RHDS - $PROVIDER ldap"
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 
         for c in $CLIENTS ; do
@@ -691,10 +876,10 @@ sssd_ldap_020()
         message "END $tet_thistest"
 }
 
-sssd_ldap_021()
+sssd_ldap_027()
 {
         myresult=PASS
-        message "START $tet_thistest: Non Posix Group - RHDS - provider ldap"
+        message "START $tet_thistest: Non Posix Group - RHDS - $PROVIDER ldap"
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 
         for c in $CLIENTS ; do
@@ -714,19 +899,136 @@ sssd_ldap_021()
         message "END $tet_thistest"
 }
 
-sssd_ldap_022()
+sssd_ldap_028()
+{
+
+        myresult=PASS
+        message "START $tet_thistest: Authentication ldap user with password assigned - native - no FQN"
+        if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+
+        for c in $CLIENTS; do
+                eval_vars $c
+                message "Working on $FULLHOSTNAME"
+                rm -rf $TET_TMP_DIR/expect-ssh-success-nativeldap-out.txt
+
+                expect $HOMEDIR/expect/ssh.exp puser1 $FULLHOSTNAME Secret123 > $TET_TMP_DIR/expect-ssh-success-nativeldap-out.txt
+                cat $TET_TMP_DIR/expect-ssh-success-nativeldap-out.txt | grep "Permission denied"
+                if [ $? -eq 0 ] ; then
+                        echo $?
+                        message "ERROR: User with password assigned failed authentication!"
+                        myresult=FAIL
+                else
+                        message "User with password assigned successfully authentication."
+                fi
+        done
+
+        result $myresult
+        message "END $tet_thistest"
+}
+
+sssd_ldap_029()
+{
+
+        myresult=PASS
+        message "START $tet_thistest: Change User's password - native - no FQN"
+        if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+
+        # change LDAP user's password
+        echo "/usr/bin/ldapmodify -x -h $RH_DIRSERV -p $PORT -D "$ROOTDN" -w $ROOTDNPW -f $LDIFS/newpwd.ldif"
+        /usr/bin/ldapmodify -x -h $RH_DIRSERV -p $PORT -D "$ROOTDN" -w $ROOTDNPW -f $LDIFS/newpwd.ldif
+
+        for c in $CLIENTS; do
+                eval_vars $c
+                message "Working on $FULLHOSTNAME"
+                rm -rf $TET_TMP_DIR/expect-ssh-success-newpwd-nativeldap-out.txt
+
+                expect $HOMEDIR/expect/ssh.exp puser1 $FULLHOSTNAME onLine4now > $TET_TMP_DIR/expect-ssh-success-newpwd-nativeldap-out.txt
+                cat $TET_TMP_DIR/expect-ssh-success-newpwd-nativeldap-out.txt | grep "Permission denied"
+                if [ $? -eq 0 ] ; then
+                        echo $?
+                        message "ERROR: User with password assigned failed authentication!"
+                        myresult=FAIL
+                else
+                        message "User with password assigned successfully authentication."
+                fi
+
+        done
+
+        # change LDAP user's password back to original
+        echo "/usr/bin/ldapmodify -x -h $RH_DIRSERV -p $PORT -D "$ROOTDN" -w $ROOTDNPW -f $LDIFS/restorepwd.ldif"
+        /usr/bin/ldapmodify -x -h $RH_DIRSERV -p $PORT -D "$ROOTDN" -w $ROOTDNPW -f $LDIFS/restorepwd.ldif
+
+        result $myresult
+        message "END $tet_thistest"
+}
+
+sssd_ldap_030()
+{
+
+        myresult=PASS
+        message "START $tet_thistest: Authentication ldap user without password assigned - native - no FQN"
+        if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+
+        for c in $CLIENTS; do
+                eval_vars $c
+                message "Working on $FULLHOSTNAME"
+                rm -rf $TET_TMP_DIR/expect-ssh-nopasswd-nativeldap-out.txt
+
+                expect $HOMEDIR/expect/ssh.exp puser2 $FULLHOSTNAME Secret123 > $TET_TMP_DIR/expect-ssh-nopasswd-nativeldap-out.txt
+                cat $TET_TMP_DIR/expect-ssh-nopasswd-nativeldap-out.txt | grep "Permission denied"
+                if [ $? -ne 0 ] ; then
+                        echo $?
+                        message "ERROR: User without password assigned did not get Permission denied.  See $TET_TMP_DIR/expect-ssh-nopasswd-nativeldap-out.txt!"
+                        myresult=FAIL
+                else
+                        message "User without password assigned failed authentication - Permission denied."
+                fi
+        done
+
+        result $myresult
+        message "END $tet_thistest"
+}
+
+sssd_ldap_031()
+{
+
+        myresult=PASS
+        message "START $tet_thistest: Authentication ldap user with incorrect password - native - no FQN"
+        if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+
+        for c in $CLIENTS; do
+                eval_vars $c
+                message "Working on $FULLHOSTNAME"
+                rm -rf $TET_TMP_DIR/expect-ssh-badpasswd-nativeldap-out.txt
+
+                expect $HOMEDIR/expect/ssh.exp puser1 $FULLHOSTNAME thisisabadpwd > $TET_TMP_DIR/expect-ssh-badpasswd-nativeldap-out.txt
+                cat $TET_TMP_DIR/expect-ssh-badpasswd-nativeldap-out.txt | grep "Permission denied"
+                if [ $? -ne 0 ] ; then
+                        echo $?
+                        message "ERROR: User with incorrect password did not get Permission denied.  See $TET_TMP_DIR/expect-ssh-nopasswd-nativeldap-out.txt!"
+                        myresult=FAIL
+                else
+                        message "User with incorrect password assigned failed authentication - Permission denied."
+                fi
+        done
+
+        result $myresult
+        message "END $tet_thistest"
+}
+
+sssd_ldap_032()
 {
    ####################################################################
    #   Configuration 4
    #    enumerate: TRUE
-   #    minId: 1000
-   #    useFullyQualifiedNames: TRUE
-   #    provider: ldap
+   #    $MINID: 1000
+   #    $USEFQN: TRUE
+   #    $PROVIDER: ldap
    #    cache-credentials: TRUE
    ####################################################################
 
         myresult=PASS
-        message "START $tet_thistest: Setup LDAP SSSD Configuration 4 - RHDS - provider ldap"
+        message "START $tet_thistest: Setup LDAP SSSD Configuration 4 - RHDS - $PROVIDER ldap"
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
         for c in $CLIENTS ; do
 		eval_vars $c
@@ -751,22 +1053,22 @@ sssd_ldap_022()
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME LDAP minId 1000
+                verifyCfg $FULLHOSTNAME LDAP $MINID 1000
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME LDAP provider ldap
+                verifyCfg $FULLHOSTNAME LDAP $PROVIDER ldap
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME LDAP cache\-credentials TRUE
+                verifyCfg $FULLHOSTNAME LDAP $CACHECREDS TRUE
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME LDAP useFullyQualifiedNames TRUE
+                verifyCfg $FULLHOSTNAME LDAP $USEFQN TRUE
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
@@ -777,10 +1079,10 @@ sssd_ldap_022()
         message "END $tet_thistest"
 }
 
-sssd_ldap_023()
+sssd_ldap_033()
 {
         myresult=PASS
-        message "START $tet_thistest: Get Valid LDAP Users - No maxId - FQN - RHDS - provider ldap"
+        message "START $tet_thistest: Get Valid LDAP Users - No $MAXID - FQN - RHDS - $PROVIDER ldap"
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
         for c in $CLIENTS ; do
 		eval_vars $c
@@ -801,10 +1103,10 @@ sssd_ldap_023()
         message "END $tet_thistest"
 }
 
-sssd_ldap_024()
+sssd_ldap_034()
 {
         myresult=PASS
-        message "START $tet_thistest: Get Valid LDAP Groups - No maxId - FQN - RHDS - provider ldap"
+        message "START $tet_thistest: Get Valid LDAP Groups - No $MAXID - FQN - RHDS - $PROVIDER ldap"
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
         for c in $CLIENTS ; do
 		eval_vars $c
@@ -825,10 +1127,10 @@ sssd_ldap_024()
         message "END $tet_thistest"
 }
 
-sssd_ldap_025()
+sssd_ldap_035()
 {
         myresult=PASS
-        message "START $tet_thistest: User uidNumber not within allowed range - FQN - RHDS - provider ldap"
+        message "START $tet_thistest: User uidNumber not within allowed range - FQN - RHDS - $PROVIDER ldap"
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
         for c in $CLIENTS ; do
 		eval_vars $c
@@ -847,10 +1149,10 @@ sssd_ldap_025()
         message "END $tet_thistest"
 }
 
-sssd_ldap_026()
+sssd_ldap_036()
 {
         myresult=PASS
-        message "START $tet_thistest: Group gidNumber not within allowed range - FQN - RHDS - provider ldap"
+        message "START $tet_thistest: Group gidNumber not within allowed range - FQN - RHDS - $PROVIDER ldap"
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi 
         for c in $CLIENTS ; do
 		eval_vars $c
@@ -869,10 +1171,10 @@ sssd_ldap_026()
         message "END $tet_thistest"
 }
 
-sssd_ldap_027()
+sssd_ldap_037()
 {
         myresult=PASS
-        message "START $tet_thistest: New User added - cache test - RHDS - provider ldap"
+        message "START $tet_thistest: New User added - cache test - RHDS - $PROVIDER ldap"
 
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
         for c in $CLIENTS ; do
@@ -906,10 +1208,10 @@ sssd_ldap_027()
 
 }
 
-sssd_ldap_028()
+sssd_ldap_038()
 {
         myresult=PASS
-        message "START $tet_thistest: New Group added - cache test - RHDS - provider ldap"
+        message "START $tet_thistest: New Group added - cache test - RHDS - $PROVIDER ldap"
 
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
         for c in $CLIENTS ; do
@@ -940,7 +1242,176 @@ sssd_ldap_028()
 
         result $myresult
         message "END $tet_thistest"
+}
 
+sssd_ldap_039()
+{
+
+        myresult=PASS
+        message "START $tet_thistest: Authentication ldap user with password assigned - native - FQN"
+        if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+
+        for c in $CLIENTS; do
+                eval_vars $c
+                message "Working on $FULLHOSTNAME"
+                rm -rf $TET_TMP_DIR/expect-ssh-success-fqn-nativeldap-out.txt
+
+                expect $HOMEDIR/expect/ssh.exp puser1@LDAP $FULLHOSTNAME Secret123 > $TET_TMP_DIR/expect-ssh-success-fqn-nativeldap-out.txt
+                cat $TET_TMP_DIR/expect-ssh-success-fqn-nativeldap-out.txt | grep "Permission denied"
+                if [ $? -eq 0 ] ; then
+                        echo $?
+                        message "ERROR: User with password assigned failed authentication!"
+                        myresult=FAIL
+                else
+                        message "User with password assigned successfully authentication."
+                fi
+        done
+
+        result $myresult
+        message "END $tet_thistest"
+}
+
+sssd_ldap_040()
+{
+
+        myresult=PASS
+        message "START $tet_thistest: Change User's password - native - FQN"
+        if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+
+        # change LDAP user's password
+        echo "/usr/bin/ldapmodify -x -h $RH_DIRSERV -p $PORT -D "$ROOTDN" -w $ROOTDNPW -f $LDIFS/newpwd.ldif"
+        /usr/bin/ldapmodify -x -h $RH_DIRSERV -p $PORT -D "$ROOTDN" -w $ROOTDNPW -f $LDIFS/newpwd.ldif
+
+        for c in $CLIENTS; do
+                eval_vars $c
+                message "Working on $FULLHOSTNAME"
+                rm -rf $TET_TMP_DIR/expect-ssh-success-fqn-nativeldap-out.txt
+                message "Authenticate with new password expecting success"
+                expect $HOMEDIR/expect/ssh.exp puser1@LDAP $FULLHOSTNAME onLine4now > $TET_TMP_DIR/expect-ssh-success-fqn-nativeldap-out.txt
+                cat $TET_TMP_DIR/expect-ssh-success-fqn-nativeldap-out.txt | grep "Permission denied"
+                if [ $? -eq 0 ] ; then
+                        message "ERROR: User authentication with new password against failed! See $TET_TMP_DIR/expect-ssh-success-fqn-nativeldap-out.txt for details."
+                        myresult=FAIL
+                else
+                        message "User authentication with new password successful."
+                fi
+        done
+
+        # change LDAP user's password back to original
+        echo "/usr/bin/ldapmodify -x -h $RH_DIRSERV -p $PORT -D "$ROOTDN" -w $ROOTDNPW -f $LDIFS/restorepwd.ldif"
+        /usr/bin/ldapmodify -x -h $RH_DIRSERV -p $PORT -D "$ROOTDN" -w $ROOTDNPW -f $LDIFS/restorepwd.ldif
+
+        result $myresult
+        message "END $tet_thistest"
+}
+
+sssd_ldap_041()
+{
+   ####################################################################
+   #   Configuration 5
+   #    ldaps 
+   #    tls_reqcert = hard 
+   ####################################################################
+
+        myresult=PASS
+        message "START $tet_thistest: Setup LDAP SSSD Configuration 5 - native - FQN - LDAPS - TLS"
+        if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+        for c in $CLIENTS ; do
+                eval_vars $c
+                message "Working on $FULLHOSTNAME"
+                message "Backing up original sssd.conf and copying over test sssd.conf"
+                sssdCfg $FULLHOSTNAME sssd_ldap5.conf
+                if [ $? -ne 0 ] ; then
+                        message "ERROR Configuring SSSD on $FULLHOSTNAME."
+                        myresult=FAIL
+                else
+                        restartSSSD $FULLHOSTNAME
+                        if [ $? -ne 0 ] ; then
+                                message "ERROR: Restart SSSD failed on $FULLHOSTNAME"
+                                myresult=FAIL
+                        else
+                                message "SSSD Server restarted on client $FULLHOSTNAME"
+                        fi
+                fi
+        done
+
+        result $myresult
+        message "END $tet_thistest"
+}
+
+sssd_ldap_042()
+{
+        myresult=PASS
+        message "START $tet_thistest: Get Valid LDAP Users - native - FQN - LDAPS - TLS"
+        if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+        for c in $CLIENTS ; do
+                eval_vars $c
+                message "Working on $FULLHOSTNAME"
+                RET=`ssh root@$FULLHOSTNAME getent -s sss passwd 2>&1`
+                for item in $PUSER1 $PUSER2 $PUSER4 ; do
+                   echo $RET | grep $item@LDAP
+                   if [ $? -ne 0 ] ; then
+                        message "ERROR: Expected $item@LDAP user to be returned."
+                        myresult=FAIL
+                   else
+                        message "$item@LDAP user returned as expected."
+                  fi
+                done
+        done
+
+        result $myresult
+        message "END $tet_thistest"
+}
+
+sssd_ldap_043()
+{
+        myresult=PASS
+        message "START $tet_thistest: Get Valid LDAP Groups - native - FQN - LDAPS - TLS"
+        if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+        for c in $CLIENTS ; do
+                eval_vars $c
+                message "Working on $FULLHOSTNAME"
+                RET=`ssh root@$FULLHOSTNAME getent -s sss group 2>&1`
+                for item in $PGROUP1 $PGROUP2 $PGROUP4 ; do
+                   echo $RET | grep $item@LDAP
+                   if [ $? -ne 0 ] ; then
+                        message "ERROR: Expected $item@LDAP group to be returned."
+                        myresult=FAIL
+                   else
+                        message "$item@LDAP group returned as expected."
+                  fi
+                done
+        done
+
+        result $myresult
+        message "END $tet_thistest"
+}
+
+sssd_ldap_044()
+{
+
+        myresult=PASS
+        message "START $tet_thistest: Authentication ldap user with password assigned - native - FQN - LDAPS - TLS"
+        if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+
+        for c in $CLIENTS; do
+                eval_vars $c
+                message "Working on $FULLHOSTNAME"
+                rm -rf $TET_TMP_DIR/expect-ssh-success-fqn-nativeldaps-out.txt
+
+                expect $HOMEDIR/expect/ssh.exp puser1@LDAP $FULLHOSTNAME Secret123 > $TET_TMP_DIR/expect-ssh-success-fqn-nativeldaps-out.txt
+                cat $TET_TMP_DIR/expect-ssh-success-fqn-nativeldapx-out.txt | grep "Permission denied"
+                if [ $? -eq 0 ] ; then
+                        echo $?
+                        message "ERROR: User with password assigned failed authentication! See $TET_TMP_DIR/expect-ssh-success-fqn-nativeldaps-out.txt for details."
+                        myresult=FAIL
+                else
+                        message "User with password assigned successfully authentication."
+                fi
+        done
+
+        result $myresult
+        message "END $tet_thistest"
 }
 
 ##################################################################
