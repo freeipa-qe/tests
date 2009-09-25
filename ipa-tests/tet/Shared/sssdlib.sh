@@ -5,6 +5,8 @@ CONFIG_DIR=$TET_ROOT/testcases/IPA/acceptance/sssd/config
 SSSD_CONFIG_DIR=/etc/sssd
 SSSD_CONFIG_FILE=$SSSD_CONFIG_DIR/sssd.conf
 PAMCFG=/etc/pam.d/system-auth
+LDAPAUTHPROXY=/etc/pam.d/sssdproxyldap
+CACERTDIR=/etc/openldap/cacerts
 LDAPCFG=/etc/ldap.conf
 NSSCFG=/etc/nsswitch.conf
 SYS_CFG_FILES="$PAMCFG $LDAPCFG $NSSCFG $SSSD_CONFIG_FILE"
@@ -62,6 +64,20 @@ sssdClientSetup()
         fi
   fi 
 
+  scp $CONFIG_DIR/cacert.asc root@$client:$CACERTDIR/cacert.asc
+  if [ $? -ne 0 ] ; then
+        message "ERROR: Failed to scp cacert.asc file to target client: $client"
+        rc=1
+  fi
+
+  scp $CONFIG_DIR/sssdproxyldap root@$client:$LDAPAUTHPROXY
+  if [ $? -ne 0 ] ; then
+        message "ERROR: Failed to scp sssdproxyauth config file to target client: $client"
+        rc=1
+  fi
+
+  
+
   return $rc
 }
 
@@ -109,14 +125,20 @@ sssdClientCleanup()
    rc=0
    client=$1
    for item in $SYS_CFG_FILES ; do
-     ssh root@$client "mv -f $item.orig $item"
+     ssh root@$client "ls $item.orig"
      if [ $? -eq 0 ] ; then
-     	message "Original $item file restored."
-     else
-	message "Failed to restore orginal file $item"
-	rc=1
-     fi
+     	ssh root@$client "mv -f $item.orig $item"
+     	if [ $? -eq 0 ] ; then
+     		message "Original $item file restored."
+     	else
+		message "Failed to restore orginal file $item"
+		rc=1
+     	fi
+    fi
    done
+
+   ssh root@$client "rm -rf $LDAPAUTHPROXY"
+   ssh root@$client "rm -rf $CACERTDIR/cacert.asc"
 
    message "Stopping SSSD Service.........."
    ssh root@$client "service sssd stop"
@@ -175,9 +197,10 @@ verifyCfg()
    domain=$2
    config=$3
    value=$4
-   VALUE=`ssh root@$client ldbsearch -H /var/lib/sss/db/config.ldb -b "cn=$domain,cn=domains,cn=config" | grep $config: | cut -d : -f 2`
+   message "Searching domain $domain configuration for $config"
+   VALUE=`ssh root@$client ldbsearch -H /var/lib/sss/db/config.ldb -b "cn=$domain,cn=domain,cn=config" | grep "$config:" | cut -d : -f 2`
    if [ -z $VALUE ] ; then
-	message "ERROR: Search for $config returned NULL value"
+	message "WARNING: Search for $config returned NULL value"
 	rc=1
    else
    	#trim whitespace
@@ -211,7 +234,7 @@ verifyAttr()
    value=$4
    VALUE=`ssh root@$client ldbsearch -H /var/lib/sss/db/sssd.ldb -b "$dn" | grep $attr: | cut -d : -f 2`
    if [ -z $VALUE ] ; then
-	message "ERROR: Search for $attr returned NULL value."
+	message "WARNING: Search for $attr returned NULL value."
 	rc=1
    else
    	#trim whitespace
