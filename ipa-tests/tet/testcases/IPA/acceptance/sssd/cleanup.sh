@@ -32,7 +32,7 @@ cleanup()
         fi
 
 	# uninstall and clean up SSSD
-        ssh root@$FULLHOSTNAME "yum -y erase sssd sssd-client ; rm -rf /var/lib/sss/ ; rm -rf /etc/sssd/ ; rm -rf /var/log/sssd ; rm -rf /etc/yum.repos.d/sssd_* ; yum clean all"
+        ssh root@$FULLHOSTNAME "yum -y erase sssd sssd-client ldb-tools libtevent libldb libtdb libtalloc expect ; rm -rf /var/lib/sss/ ; rm -rf /etc/sssd/ ; rm -rf /var/log/sssd ; rm -rf /etc/yum.repos.d/sssd_* ; yum clean all"
         if [ $? -ne 0 ] ; then
                 message "ERROR: Failed to uninstall and cleanup SSSD. Return code: $?"
                 myresult=FAIL
