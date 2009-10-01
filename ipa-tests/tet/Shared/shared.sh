@@ -109,7 +109,13 @@ FixBindServer()
 			# Make sure that we are not trying to add the server that we are working on twice
 			if [ "$s" != "$1" ]; then 
 				eval_vars $s	
-				ssh root@$thisserver "ipa dns-add-rr $DNS_DOMAIN $IP PTR \"$HOSTNAME\";ipa dns-add-rr $DNS_DOMAIN $HOSTNAME A \"$IP\""
+				# Derive the reverse zone
+				oct1=$(echo $IP | sed s/'\.'/\ /g |awk '{ print $1 }')
+				oct2=$(echo $IP | sed s/'\.'/\ /g |awk '{ print $2 }')
+				oct3=$(echo $IP | sed s/'\.'/\ /g |awk '{ print $3 }')
+				oct4=$(echo $IP | sed s/'\.'/\ /g |awk '{ print $4 }')
+				arpadomain="$oct3.$oct2.$oct1.in-addr.arpa"
+				ssh root@$thisserver "ipa dns-add-rr $arpadomain $oct4 PTR \"$FULLHOSTNAME.\";ipa dns-add-rr $DNS_DOMAIN $HOSTNAME A \"$IP\""
 				ret=$?
 				if [ $ret -ne 0 ]; then
 					echo "ERROR - addition of dns entry into $thisserver fialed for $FULLHOSTNAME"
@@ -122,7 +128,13 @@ FixBindServer()
 	for s in $CLIENTS; do
 		if [ "$s" != "" ]; then
 			eval_vars $s
-			ssh root@$thisserver "ipa dns-add-rr $DNS_DOMAIN $IP PTR \"$HOSTNAME\";ipa dns-add-rr $DNS_DOMAIN $HOSTNAME A \"$IP\""
+			# Derive the reverse zone
+			oct1=$(echo $IP | sed s/'\.'/\ /g |awk '{ print $1 }')
+			oct2=$(echo $IP | sed s/'\.'/\ /g |awk '{ print $2 }')
+			oct3=$(echo $IP | sed s/'\.'/\ /g |awk '{ print $3 }')
+			oct4=$(echo $IP | sed s/'\.'/\ /g |awk '{ print $4 }')
+			arpadomain="$oct3.$oct2.$oct1.in-addr.arpa"
+			ssh root@$thisserver "ipa dns-add-rr $arpadomain $oct4 PTR \"$FULLHOSTNAME.\";ipa dns-add-rr $DNS_DOMAIN $HOSTNAME A \"$IP\""
 			ret=$?
 			if [ $ret -ne 0 ]; then
 				echo "ERROR - addition of dns entry into $thisserver fialed for $FULLHOSTNAME"
@@ -446,9 +458,9 @@ setup_ssh_keys()
 		ssh-keygen -t dsa
 		ret=$?
 		if [ $ret -ne 0 ]; then
-			echo "ERROR! ssh-keygen failed"
-			tet_result FAIL
-			return $ret
+			echo "WARNING! ssh-keygen failed"
+#			tet_result FAIL
+#			return $ret
 		fi 
 	fi
 	

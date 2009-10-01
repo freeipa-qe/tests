@@ -44,6 +44,7 @@ tp1()
 	for s in $SERVERS; do
 		if [ "$s" != "" ]; then
 			if [ "$DSTET_DEBUG" = "y" ]; then echo "working on $s now"; fi
+			BackupResolv $s
 			SetupRepo $s
 			ret=$?
 			if [ $ret -ne 0 ]; then
@@ -56,6 +57,7 @@ tp1()
 	for s in $CLIENTS; do
 		if [ "$s" != "" ]; then
 			if [ "$DSTET_DEBUG" = "y" ]; then echo "working on $s now"; fi
+			BackupResolv $s
 			SetupRepo $s
 			ret=$?
 			if [ $ret -ne 0 ]; then

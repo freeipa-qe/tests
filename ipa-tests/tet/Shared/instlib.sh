@@ -344,6 +344,20 @@ cat /tmp/pam-tmp.conf > /etc/pam.conf" > $TET_TMP_DIR/pam.sh
 	return 0;
 }
 
+BackupResolv()
+{
+	if [ $DSTET_DEBUG = y ]; then set -x; fi
+	. $TESTING_SHARED/shared.sh
+	
+	eval_vars $1
+	ssh root@$FULLHOSTNAME "cat /etc/resolv.conf > /etc/resolv.conf.ipasave"
+	if [ $? -eq 0 ]; then
+		message "ERROR - Backup of resolv.conf on $FULLHOSTNAE FAILED."
+		return 1;
+	fi
+	return 0;
+}
+
 SetupClientRedhat()
 {
 	if [ $DSTET_DEBUG = y ]; then set -x; fi

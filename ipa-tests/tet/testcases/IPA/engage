@@ -865,6 +865,16 @@ main_default()
 
     if [ -z "$MainMailTo"            ] ; then MainMailTo=$LOGNAME@$MainMaildomain	; fi
 
+	# Set up default repos to make things a bit faster
+	if [ -z "$REPO_M1" ]; then REPO_M1='http://apoc.dsdev.sjc.redhat.com/tet/ipa2/ipa-tests/tet/testcases/IPA/ipa-rhel5-RHEL5.3-IPA-1.1.repo'  ; fi
+	if [ -z "$REPO_M2" ]; then REPO_M2='http://apoc.dsdev.sjc.redhat.com/tet/ipa2/ipa-tests/tet/testcases/IPA/ipa-rhel5-RHEL5.3-IPA-1.1.repo'  ; fi
+	if [ -z "$REPO_M3" ]; then REPO_M3='http://apoc.dsdev.sjc.redhat.com/tet/ipa2/ipa-tests/tet/testcases/IPA/ipa-rhel5-RHEL5.3-IPA-1.1.repo'  ; fi
+	if [ -z "$REPO_M4" ]; then REPO_M4='http://apoc.dsdev.sjc.redhat.com/tet/ipa2/ipa-tests/tet/testcases/IPA/ipa-rhel5-RHEL5.3-IPA-1.1.repo'  ; fi
+	if [ -z "$REPO_C1" ]; then REPO_C1='http://apoc.dsdev.sjc.redhat.com/tet/ipa2/ipa-tests/tet/testcases/IPA/ipa-rhel5-RHEL5.3-IPA-1.1.repo'  ; fi
+	if [ -z "$REPO_C2" ]; then REPO_C2='http://apoc.dsdev.sjc.redhat.com/tet/ipa2/ipa-tests/tet/testcases/IPA/ipa-rhel5-RHEL5.3-IPA-1.1.repo'  ; fi
+	if [ -z "$REPO_C3" ]; then REPO_C3='http://apoc.dsdev.sjc.redhat.com/tet/ipa2/ipa-tests/tet/testcases/IPA/ipa-rhel5-RHEL5.3-IPA-1.1.repo'  ; fi
+	if [ -z "$REPO_C4" ]; then REPO_C4='http://apoc.dsdev.sjc.redhat.com/tet/ipa2/ipa-tests/tet/testcases/IPA/ipa-rhel5-RHEL5.3-IPA-1.1.repo'  ; fi
+	export REPO_M1 REPO_M2 REPO_M3 REPO_M4 REPO_C1 REPO_C2 REPO_C3 REPO_C4 
 # export all these variables 
 
 	export TET_ROOT VER CHARSET TESTING_SHARED PREFIX TET_TMP_DIR TET_REPORT_DIR RELM_NAME KERB_MASTER_PASS DM_ADMIN_PASS DS_USER NUMSERVERS SERVERS CLIENTS NUMCLIENTS DNSMASTER DNS_DOMAIN ITTERATIONS NTPSERVER
@@ -1030,16 +1040,13 @@ ask_m1()
 	echo "Repo for server 1? This is a url to the .repo file, or a tarball on hpux ($REPO_M1)->"
 	read rsp
 	if [ -z "$rsp" ] ; then echo "Server repo unchanged"; else REPO_M1="$rsp"; fi
-	if [ "$SetupSSHKeys" = "y" ]; then 
-		echo "Root password of $HOSTNAME_M1?"
-		echo " Default - $PASSWORD_M1"
-		echo "->"
-		read rsp
-		if [ -z "$rsp" ] ; then echo "Root password unchanged"; else PASSWORD_M1="$rsp"; fi
-		export PASSWORD_M1
-	fi
+	echo "Root password of $HOSTNAME_M1?"
+	echo " Default - $PASSWORD_M1"
+	echo "->"
+	read rsp
+	if [ -z "$rsp" ] ; then echo "Root password unchanged"; else PASSWORD_M1="$rsp"; fi
 
-	export HOSTNAME_M1 OS_M1 REPO_M1 
+	export HOSTNAME_M1 OS_M1 REPO_M1 PASSWORD_M1 
 
 }
 
@@ -1069,14 +1076,12 @@ ask_m2()
 	echo "Repo for server 2? This is a url to the .repo file, or a tarball on hpux ($REPO_M2)->"
 	read rsp
 	if [ -z "$rsp" ] ; then echo "Server repo unchanged"; else REPO_M2="$rsp"; fi
-	if [ "$SetupSSHKeys" = "y" ]; then 
-		echo "Root password of $HOSTNAME_M2?"
-		echo " Default - $PASSWORD_M2"
-		echo "->"
-		read rsp
-		if [ -z "$rsp" ] ; then echo "Root password unchanged"; else PASSWORD_M2="$rsp"; fi
-		export PASSWORD_M2
-	fi
+	echo "Root password of $HOSTNAME_M2?"
+	echo " Default - $PASSWORD_M2"
+	echo "->"
+	read rsp
+	if [ -z "$rsp" ] ; then echo "Root password unchanged"; else PASSWORD_M2="$rsp"; fi
+	export PASSWORD_M2
 
 	export HOSTNAME_M2 OS_M2 REPO_M2 
 
@@ -1108,14 +1113,12 @@ ask_m3()
 	echo "Repo for server 3? This is a url to the .repo file, or a tarball on hpux ($REPO_M3)->"
 	read rsp
 	if [ -z "$rsp" ] ; then echo "Server repo unchanged"; else REPO_M3="$rsp"; fi
-	if [ "$SetupSSHKeys" = "y" ]; then 
-		echo "Root password of $HOSTNAME_M3?"
-		echo " Default - $PASSWORD_M3"
-		echo "->"
-		read rsp
-		if [ -z "$rsp" ] ; then echo "Root password unchanged"; else PASSWORD_M3="$rsp"; fi
-		export PASSWORD_M3
-	fi
+	echo "Root password of $HOSTNAME_M3?"
+	echo " Default - $PASSWORD_M3"
+	echo "->"
+	read rsp
+	if [ -z "$rsp" ] ; then echo "Root password unchanged"; else PASSWORD_M3="$rsp"; fi
+	export PASSWORD_M3
 
 	export HOSTNAME_M3 OS_M3 REPO_M3 
 
@@ -1146,14 +1149,12 @@ ask_m4()
 	echo "Repo for server 4? This is a url to the .repo file, or a tarball on hpux ($REPO_M4)->"
 	read rsp
 	if [ -z "$rsp" ] ; then echo "Server repo unchanged"; else REPO_M1="$rsp"; fi
-	if [ "$SetupSSHKeys" = "y" ]; then 
-		echo "Root password of $HOSTNAME_M4?"
-		echo " Default - $PASSWORD_M4"
-		echo "->"
-		read rsp
-		if [ -z "$rsp" ] ; then echo "Root password unchanged"; else PASSWORD_M4="$rsp"; fi
-		export PASSWORD_M4
-	fi
+	echo "Root password of $HOSTNAME_M4?"
+	echo " Default - $PASSWORD_M4"
+	echo "->"
+	read rsp
+	if [ -z "$rsp" ] ; then echo "Root password unchanged"; else PASSWORD_M4="$rsp"; fi
+	export PASSWORD_M4
 
 	export HOSTNAME_M4 OS_M4 REPO_M4 
 
@@ -1200,14 +1201,12 @@ ask_c1()
 	echo "Repo for client 1? This is a url to the .repo file, or a tarball on hpux ($REPO_C1)->"
 	read rsp
 	if [ -z "$rsp" ] ; then echo "Client repo unchanged"; else  REPO_C1="$rsp"; fi
-	if [ "$SetupSSHKeys" = "y" ]; then 
-		echo "Root password of $HOSTNAME_C1?"
-		echo " Default - $PASSWORD_C1"
-		echo "->"
-		read rsp
-		if [ -z "$rsp" ] ; then echo "Root password unchanged"; else PASSWORD_C1="$rsp"; fi
-		export PASSWORD_C1
-	fi
+	echo "Root password of $HOSTNAME_C1?"
+	echo " Default - $PASSWORD_C1"
+	echo "->"
+	read rsp
+	if [ -z "$rsp" ] ; then echo "Root password unchanged"; else PASSWORD_C1="$rsp"; fi
+	export PASSWORD_C1
 
 	export OS_C1 HOSTNAME_C1 OS_VER_C1 REPO_C1
 
@@ -1254,14 +1253,12 @@ ask_c2()
 	echo "Repo for client 2? This is a url to the .repo file, or a tarball on hpux ($REPO_C2)->"
 	read rsp
 	if [ -z "$rsp" ] ; then echo "Client repo unchanged"; else  REPO_C2="$rsp"; fi
-	if [ "$SetupSSHKeys" = "y" ]; then 
-		echo "Root password of $HOSTNAME_C2?"
-		echo " Default - $PASSWORD_C2"
-		echo "->"
-		read rsp
-		if [ -z "$rsp" ] ; then echo "Root password unchanged"; else PASSWORD_C2="$rsp"; fi
-		export PASSWORD_C2
-	fi
+	echo "Root password of $HOSTNAME_C2?"
+	echo " Default - $PASSWORD_C2"
+	echo "->"
+	read rsp
+	if [ -z "$rsp" ] ; then echo "Root password unchanged"; else PASSWORD_C2="$rsp"; fi
+	export PASSWORD_C2
 
 	export OS_C2 HOSTNAME_C2 OS_VER_C2 REPO_C2
 
@@ -1308,14 +1305,12 @@ ask_c3()
 	echo "Repo for client 3? This is a url to the .repo file, or a tarball on hpux ($REPO_C3)->"
 	read rsp
 	if [ -z "$rsp" ] ; then echo "Client repo unchanged"; else  REPO_C3="$rsp"; fi
-	if [ "$SetupSSHKeys" = "y" ]; then 
-		echo "Root password of $HOSTNAME_C3?"
-		echo " Default - $PASSWORD_C3"
-		echo "->"
-		read rsp
-		if [ -z "$rsp" ] ; then echo "Root password unchanged"; else PASSWORD_C3="$rsp"; fi
-		export PASSWORD_C3
-	fi
+	echo "Root password of $HOSTNAME_C3?"
+	echo " Default - $PASSWORD_C3"
+	echo "->"
+	read rsp
+	if [ -z "$rsp" ] ; then echo "Root password unchanged"; else PASSWORD_C3="$rsp"; fi
+	export PASSWORD_C3
 
 	export OS_C3 HOSTNAME_C3 OS_VER_C3 REPO_C3
 
@@ -1362,14 +1357,12 @@ ask_c4()
 	echo "Repo for client 4? This is a url to the .repo file, or a tarball on hpux ($REPO_C4)->"
 	read rsp
 	if [ -z "$rsp" ] ; then echo "Client repo unchanged"; else  REPO_C4="$rsp"; fi
-	if [ "$SetupSSHKeys" = "y" ]; then 
-		echo "Root password of $HOSTNAME_C4?"
-		echo " Default - $PASSWORD_C4"
-		echo "->"
-		read rsp
-		if [ -z "$rsp" ] ; then echo "Root password unchanged"; else PASSWORD_C4="$rsp"; fi
-		export PASSWORD_C4
-	fi
+	echo "Root password of $HOSTNAME_C4?"
+	echo " Default - $PASSWORD_C4"
+	echo "->"
+	read rsp
+	if [ -z "$rsp" ] ; then echo "Root password unchanged"; else PASSWORD_C4="$rsp"; fi
+	export PASSWORD_C4
 
 	export OS_C4 HOSTNAME_C4 OS_VER_C4 REPO_C4
 
@@ -1416,14 +1409,12 @@ ask_c5()
 	echo "Repo for client 5? This is a url to the .repo file, or a tarball on hpux ($REPO_C5)->"
 	read rsp
 	if [ -z "$rsp" ] ; then echo "Client repo unchanged"; else  REPO_C5="$rsp"; fi
-	if [ "$SetupSSHKeys" = "y" ]; then 
-		echo "Root password of $HOSTNAME_C5?"
-		echo " Default - $PASSWORD_C5"
-		echo "->"
-		read rsp
-		if [ -z "$rsp" ] ; then echo "Root password unchanged"; else PASSWORD_C5="$rsp"; fi
-		export PASSWORD_C5
-	fi
+	echo "Root password of $HOSTNAME_C5?"
+	echo " Default - $PASSWORD_C5"
+	echo "->"
+	read rsp
+	if [ -z "$rsp" ] ; then echo "Root password unchanged"; else PASSWORD_C5="$rsp"; fi
+	export PASSWORD_C5
 
 	export OS_C5 HOSTNAME_C5 OS_VER_C5 REPO_C5
 
@@ -1471,14 +1462,12 @@ ask_c6()
 	echo "Repo for client 6? This is a url to the .repo file, or a tarball on hpux ($REPO_C6)->"
 	read rsp
 	if [ -z "$rsp" ] ; then echo "Client repo unchanged"; else  REPO_C6="$rsp"; fi
-	if [ "$SetupSSHKeys" = "y" ]; then 
-		echo "Root password of $HOSTNAME_C6?"
-		echo " Default - $PASSWORD_C6"
-		echo "->"
-		read rsp
-		if [ -z "$rsp" ] ; then echo "Root password unchanged"; else PASSWORD_C6="$rsp"; fi
-		export PASSWORD_C6
-	fi
+	echo "Root password of $HOSTNAME_C6?"
+	echo " Default - $PASSWORD_C6"
+	echo "->"
+	read rsp
+	if [ -z "$rsp" ] ; then echo "Root password unchanged"; else PASSWORD_C6="$rsp"; fi
+	export PASSWORD_C6
 
 	export OS_C6 HOSTNAME_C6 OS_VER_C6 REPO_C6
 
@@ -1526,14 +1515,12 @@ ask_c7()
 	echo "Repo for client 7? This is a url to the .repo file, or a tarball on hpux ($REPO_C7)->"
 	read rsp
 	if [ -z "$rsp" ] ; then echo "Client repo unchanged"; else  REPO_C7="$rsp"; fi
-	if [ "$SetupSSHKeys" = "y" ]; then 
-		echo "Root password of $HOSTNAME_C7?"
-		echo " Default - $PASSWORD_C7"
-		echo "->"
-		read rsp
-		if [ -z "$rsp" ] ; then echo "Root password unchanged"; else PASSWORD_C7="$rsp"; fi
-		export PASSWORD_C7
-	fi
+	echo "Root password of $HOSTNAME_C7?"
+	echo " Default - $PASSWORD_C7"
+	echo "->"
+	read rsp
+	if [ -z "$rsp" ] ; then echo "Root password unchanged"; else PASSWORD_C7="$rsp"; fi
+	export PASSWORD_C7
 
 	export OS_C7 HOSTNAME_C7 OS_VER_C7 REPO_C7
 
@@ -1580,14 +1567,12 @@ ask_c8()
 	echo "Repo for client 8? This is a url to the .repo file, or a tarball on hpux ($REPO_C8)->"
 	read rsp
 	if [ -z "$rsp" ] ; then echo "Client repo unchanged"; else  REPO_C8="$rsp"; fi
-	if [ "$SetupSSHKeys" = "y" ]; then 
-		echo "Root password of $HOSTNAME_C8?"
-		echo " Default - $PASSWORD_C8"
-		echo "->"
-		read rsp
-		if [ -z "$rsp" ] ; then echo "Root password unchanged"; else PASSWORD_C8="$rsp"; fi
-		export PASSWORD_C8
-	fi
+	echo "Root password of $HOSTNAME_C8?"
+	echo " Default - $PASSWORD_C8"
+	echo "->"
+	read rsp
+	if [ -z "$rsp" ] ; then echo "Root password unchanged"; else PASSWORD_C8="$rsp"; fi
+	export PASSWORD_C8
 
 	export OS_C8 HOSTNAME_C8 OS_VER_C8 REPO_C8
 
