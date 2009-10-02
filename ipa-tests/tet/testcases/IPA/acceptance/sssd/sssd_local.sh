@@ -16,7 +16,7 @@ ic1="sssd_001 sssd_002 sssd_003 sssd_004 sssd_005 sssd_006 sssd_007 sssd_008 sss
 ic2="sssd_029 sssd_030 sssd_031 sssd_032 sssd_033 sssd_034 sssd_035"
 ic3="sssd_036 sssd_037"
 ic4="sssd_040 sssd_041 sssd_042 sssd_043 sssd_044 sssd_045 sssd_046"
-ic5="sssd_047 sssd_049 sssd_050 sssd_051 sssd_052"
+ic5="sssd_047 sssd_049 sssd_050 sssd_051 sssd_052 sssd_053 sssd_054"
 #####################################################################
 # Globals
 ####################################################################
@@ -26,6 +26,7 @@ MPG="magic_private_groups"
 PROVIDER="id_provider"
 MAXID="max_id"
 MINID="min_id"
+SSSDCFG="/etc/sssd/sssd.conf"
 ######################################################################
 # Tests
 ######################################################################
@@ -1756,7 +1757,12 @@ sssd_049()
 
 		# now verify user1001's uidNumber
 		USER=`ssh root@$FULLHOSTNAME getent -s sss passwd user1001@LOCAL`
-		MYUID=`echo $USER | cut -d ":" -f 2`
+		if [ $OS == "RHEL" ] ; then
+			MYUID=`echo $USER | cut -d ":" -f 3`
+		else
+			MYUID=`echo $USER | cut -d ":" -f 2`
+		fi
+
 		if [ $MYUID -ne 1001 ] ; then
 			message "ERROR: uidNumber not as expected - could be regression of trac issue 57 Expected: 1001 Got: $MYUID"
 			myresult=FAIL
@@ -1862,6 +1868,118 @@ sssd_052()
 
         result $myresult
         message "END $tet_thistest"
+}
+
+sssd_053()
+{
+        myresult=PASS
+        message "START $tet_thistest: Modify Allowed Range with Existing Local Users - Users and MPGs now out of range"
+        if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+        for c in $CLIENTS ; do
+                eval_vars $c
+                message "Working on $FULLHOSTNAME"
+
+                ssh root@$FULLHOSTNAME "sss_useradd user1 ; sss_useradd user2"
+                if [ $? -ne 0 ] ; then
+                	message "ERROR: Failed to add LOCAL users.  Return Code: $?"
+                	myresult=FAIL
+                else
+			for i in 1 2 ; do
+                		ssh root@$FULLHOSTNAME "getent -s sss passwd | grep user$i"
+                        	if [ $? -ne 0 ] ; then
+                                	message "ERROR: User$i was not returned by getent."
+                                	myresult=FAIL
+				else
+					message "New user User$i returned by getent"
+				fi	
+                                ssh root@$FULLHOSTNAME "getent -s sss group | grep user$i"
+                                if [ $? -ne 0 ] ; then
+                                        message "ERROR: User$i's MPG was not returned by getent."
+                                        myresult=FAIL
+				else
+					message "User$i's MPG returned by getent"
+                                fi
+                        done
+
+			# change the minId and maxId configuration so users are out of range
+			ssh root@$FULLHOSTNAME "sed -i -e \"s%max_id = 1003%max_id = 2003%g\" $SSSDCFG ; sed -i -e \"s%min_id = 1000%min_id = 2000%g\" $SSSDCFG"
+                        restartSSSD $FULLHOSTNAME
+                        if [ $? -ne 0 ] ; then
+                                message "ERROR: Restart SSSD failed on $FULLHOSTNAME"
+                                myresult=FAIL
+                        else
+                                message "SSSD Server restarted on client $FULLHOSTNAME"
+                        fi
+
+	                verifyCfg $FULLHOSTNAME LOCAL $MAXID 2003
+        	        if [ $? -ne 0 ] ; then
+                	        myresult=FAIL
+                	fi
+
+                	verifyCfg $FULLHOSTNAME LOCAL $MINID 2000
+                	if [ $? -ne 0 ] ; then
+                        	myresult=FAIL
+                	fi
+
+			# Search for users and MPGs - shouldn't find them
+                        for i in 1 2 ; do
+                                ssh root@$FULLHOSTNAME "getent -s sss passwd | grep user$i"
+                                if [ $? -eq 0 ] ; then
+                                        message "ERROR: User$i was returned by getent and the userid is out of range."
+                                        myresult=FAIL
+				else
+					message "Getent did not return user whose userid is now out of range"
+                                fi
+
+                                ssh root@$FULLHOSTNAME "getent -s sss group | grep user$i"
+                                if [ $? -eq 0 ] ; then
+                                        message "ERROR: User$i's MPG was returned by getent and the groupid is out of range."
+                                        myresult=FAIL
+				else
+					message "Getent did not return user's MPG whose groupid is now out of range"
+                                fi
+                        done
+		fi
+
+		# cleanup 
+		ssh root@$FULLHOSTNAME "sss_userdel user1 ; sss_useradd user2"
+        done
+
+        result $myresult
+        message "END $tet_thistest"
+}
+
+sssd_054()
+{
+        myresult=PASS
+        message "START $tet_thistest: Add local user - MPG already exists"
+        if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+        for c in $CLIENTS ; do
+                eval_vars $c
+                message "Working on $FULLHOSTNAME"
+		# add group manually
+		ssh root@$FULLHOSTNAME "sss_groupadd -g 2000 user2000"
+                if [ $? -ne 0 ] ; then
+                        message "ERROR: Failed to add LOCAL group"
+                        myresult=FAIL
+		else
+                	ssh root@$FULLHOSTNAME "sss_useradd -u 2000 user2000"
+                	if [ $? -ne 0 ] ; then
+                        	message "ERROR: Failed to add LOCAL users."
+                        	myresult=FAIL
+				# Get the error message - trac issue 214
+		                MSG=`ssh root@$FULLHOSTNAME "sss_useradd -u 2000 user2000 2>&1"`
+				message "Trac issue 214"
+				message "ERROR MSG: $BUGMSG"
+                	fi
+		fi
+	
+		# cleanup
+		ssh root@$FULLHOSTNAME "sss_userdel user2000 ; sss_groupdel user2000"
+        done
+
+        result $myresult
+        message "END $tet_thistest" 
 }
 
 
