@@ -100,18 +100,18 @@ sssdLDAPSetup()
   echo "base $basedn" >> $TET_TMP_DIR/ldap.conf
 
   message "Backing up ldap.conf file"
-  ssh root@$client "ls $LDAPCFG.orig"
+  ssh root@$client "ls /etc/ldap.conf.orig"
   if [ $? -eq 0 ] ; then
-        message "$LDAPCFG file already backed up"
+        message "/etc/ldap.conf file already backed up"
   else
-        ssh root@$client "cp $LDAPCFG $LDAPCFG.orig"
+        ssh root@$client "cp /etc/ldap.conf /etc/ldap.conf.orig"
         if [ $? -ne 0 ] ; then
-                message "ERROR: Failed to backup $LDAPCFG on client $client"
+                message "ERROR: Failed to backup /etc/ldap.conf on client $client"
                 rc=1
   	fi
   fi
      
-  scp $TET_TMP_DIR/ldap.conf root@$client:$LDAPCFG
+  scp $TET_TMP_DIR/ldap.conf root@$client:/etc/ldap.conf
   if [ $? -ne 0 ] ; then
   	message "ERROR: Failed to scp SSSD ldap config file to target client: $client"
         rc=1
@@ -197,7 +197,7 @@ verifyCfg()
    domain=$2
    config=$3
    value=$4
-   message "Searching domain $domain configuration for $config"
+   #message "Searching domain $domain configuration for $config"
    VALUE=`ssh root@$client ldbsearch -H /var/lib/sss/db/config.ldb -b "cn=$domain,cn=domain,cn=config" | grep "$config:" | cut -d : -f 2`
    if [ -z $VALUE ] ; then
 	message "WARNING: Search for $config returned NULL value"
