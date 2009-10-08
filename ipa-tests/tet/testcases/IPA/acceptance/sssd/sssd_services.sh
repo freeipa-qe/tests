@@ -11,11 +11,12 @@ fi
 ######################################################################
 #  Test Case List
 #####################################################################
-iclist="ic1 ic2 ic3 ic4"
+iclist="ic1 ic2 ic3 ic4 ic5"
 ic1="bug512733"
 ic2="sssd_service_001"
 ic3="sssd_service_002"
 ic4="sssd_service_003"
+ic5="sssd_service_004"
 #################################################################
 #  GLOBALS
 #################################################################
@@ -191,6 +192,62 @@ sssd_service_003()
                 message "SSSD service is stopped as expected."
         fi
   done
+  tet_result $myresult
+  message "END $tet_thistest"
+}
+
+sssd_service_004()
+{
+  myresult=PASS
+  message "START $tet_thistest: Verify if a monitor service dies - child processes are stopped"
+  for c in $CLIENTS; do
+        eval_vars $c
+	ssh root@$FULLHOSTNAME "service sssd start"
+	sleep 2
+        SERVICES="sssd_dp sssd_nss sssd_pam"
+        PID=`ssh root@$FULLHOSTNAME "cat /var/run/sssd.pid 2>&1"`
+        if [ $? -ne 0 ] ; then
+        	message "ERROR: Failed to get process id for monitor from pid file"
+                myresult=FAIL
+        else
+        	message "Killing sssd service"
+                ssh root@$FULLHOSTNAME "kill $PID"
+                if [ $? -ne 0 ] ; then
+                	message "ERROR: Failed to kill sssd monitor. return code: $?"
+                        myresult=FAIL
+                else
+                	sleep 2
+			for s in $SERVICES ; do
+                                ssh root@$FULLHOSTNAME "ps -e | grep $s"
+                                if [ $? -eq 0 ] ; then
+                                        message "ERROR: Monitor killed but child process $s is still running."
+                                        myresult=FAIL
+                                else
+                                	message "$s not longer running as expected."
+                                fi
+			done
+			# check sssd service status
+        		MSG="sssd dead but subsys locked"
+        		STATUS=`ssh root@$FULLHOSTNAME "service sssd status"`
+        		if [[ $STATUS != $MSG ]] ; then
+                		message "ERROR: Unexpected status returned.  Expected: $MSG Got: $STATUS"
+                		myresult=FAIL
+        		else
+                		message "SSSD service is stopped as expected."
+        		fi
+                fi
+	fi
+
+        restartSSSD $FULLHOSTNAME
+        if [ $? -ne 0 ] ; then
+        	message "ERROR: Restart SSSD failed on $FULLHOSTNAME"
+                myresult=FAIL
+        else
+                message "SSSD Server restarted on client $FULLHOSTNAME"
+        fi
+	
+  done
+
   tet_result $myresult
   message "END $tet_thistest"
 }

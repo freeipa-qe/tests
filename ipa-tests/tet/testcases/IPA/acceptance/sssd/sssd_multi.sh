@@ -751,7 +751,9 @@ sssd_multi_016()
         message "END $tet_thistest"
 }
 
+# auth local sssd user and kerberos auth
 
+# auth ldap user and ldap auth
 ########################################################################################################################
 
 sssd_multi_017()
@@ -817,52 +819,52 @@ sssd_multi_018()
                         fi
                 fi
 
-                verifyCfg $FULLHOSTNAME "EXAMPLE\.COM" enumerate TRUE
+                verifyCfg $FULLHOSTNAME "EXAMPLE.COM" enumerate TRUE
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME "EXAMPLE\.COM" $MINID 1000
+                verifyCfg $FULLHOSTNAME "EXAMPLE.COM" $MINID 1000
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME "EXAMPLE\.COM" $MAXID 1010
+                verifyCfg $FULLHOSTNAME "EXAMPLE.COM" $MAXID 1010
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME "EXAMPLE\.COM" $PROVIDER ldap
+                verifyCfg $FULLHOSTNAME "EXAMPLE.COM" $PROVIDER ldap
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME "EXAMPLE\.COM" $CACHECREDS FALSE
+                verifyCfg $FULLHOSTNAME "EXAMPLE.COM" $CACHECREDS FALSE
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME "BOS\.REDHAT\.COM" enumerate TRUE
+                verifyCfg $FULLHOSTNAME "BOS.REDHAT.COM" enumerate TRUE
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME "BOS\.REDHAT\.COM" $MINID 2000
+                verifyCfg $FULLHOSTNAME "BOS.REDHAT.COM" $MINID 2000
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME "BOS\.REDHAT\.COM" $MAXID 2010
+                verifyCfg $FULLHOSTNAME "BOS.REDHAT.COM" $MAXID 2010
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME "BOS\.REDHAT\.COM" $PROVIDER ldap
+                verifyCfg $FULLHOSTNAME "BOS.REDHAT.COM" $PROVIDER ldap
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME "BOS\.REDHAT\.COM" $CACHECREDS FALSE
+                verifyCfg $FULLHOSTNAME "BOS.REDHAT.COM" $CACHECREDS FALSE
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
@@ -974,42 +976,42 @@ sssd_multi_021()
                         fi
                 fi
 
-                verifyCfg $FULLHOSTNAME "EXAMPLE\.COM" enumerate TRUE
+                verifyCfg $FULLHOSTNAME "EXAMPLE.COM" enumerate TRUE
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME "EXAMPLE\.COM" $PROVIDER ldap
+                verifyCfg $FULLHOSTNAME "EXAMPLE.COM" $PROVIDER ldap
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
 
-		verifyCfg $FULLHOSTNAME "EXAMPLE\.COM" $USEFQN TRUE
+		verifyCfg $FULLHOSTNAME "EXAMPLE.COM" $USEFQN TRUE
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME "EXAMPLE\.COM" $CACHECREDS FALSE
+                verifyCfg $FULLHOSTNAME "EXAMPLE.COM" $CACHECREDS FALSE
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME "BOS\.REDHAT\.COM" enumerate TRUE
+                verifyCfg $FULLHOSTNAME "BOS.REDHAT.COM" enumerate TRUE
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME "BOS\.REDHAT\.COM" $USEFQN TRUE
+                verifyCfg $FULLHOSTNAME "BOS.REDHAT.COM" $USEFQN TRUE
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME "BOS\.REDHAT\.COM" $PROVIDER ldap
+                verifyCfg $FULLHOSTNAME "BOS.REDHAT.COM" $PROVIDER ldap
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME "BOS\.REDHAT\.COM" $CACHECREDS FALSE
+                verifyCfg $FULLHOSTNAME "BOS.REDHAT.COM" $CACHECREDS FALSE
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
@@ -1134,52 +1136,52 @@ sssd_multi_025()
                         fi
                 fi
 
-                verifyCfg $FULLHOSTNAME "EXAMPLE\.COM" enumerate TRUE
+                verifyCfg $FULLHOSTNAME "EXAMPLE.COM" enumerate TRUE
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME "EXAMPLE\.COM" $MINID 1000
+                verifyCfg $FULLHOSTNAME "EXAMPLE.COM" $MINID 1000
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME "EXAMPLE\.COM" $MAXID 1010
+                verifyCfg $FULLHOSTNAME "EXAMPLE.COM" $MAXID 1010
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME "EXAMPLE\.COM" $PROVIDER ldap
+                verifyCfg $FULLHOSTNAME "EXAMPLE.COM" $PROVIDER ldap
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME "EXAMPLE\.COM" $CACHECREDS FALSE
+                verifyCfg $FULLHOSTNAME "EXAMPLE.COM" $CACHECREDS FALSE
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME "BOS\.REDHAT\.COM" enumerate TRUE
+                verifyCfg $FULLHOSTNAME "BOS.REDHAT.COM" enumerate TRUE
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME "BOS\.REDHAT\.COM" $MINID 2000
+                verifyCfg $FULLHOSTNAME "BOS.REDHAT.COM" $MINID 2000
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME "BOS\.REDHAT\.COM" $MAXID 2010
+                verifyCfg $FULLHOSTNAME "BOS.REDHAT.COM" $MAXID 2010
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME "BOS\.REDHAT\.COM" $PROVIDER proxy
+                verifyCfg $FULLHOSTNAME "BOS.REDHAT.COM" $PROVIDER proxy
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME "BOS\.REDHAT\.COM" $CACHECREDS FALSE
+                verifyCfg $FULLHOSTNAME "BOS.REDHAT.COM" $CACHECREDS FALSE
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
@@ -1298,42 +1300,42 @@ sssd_multi_028()
                         fi
                 fi
 
-                verifyCfg $FULLHOSTNAME "EXAMPLE\.COM" enumerate TRUE
+                verifyCfg $FULLHOSTNAME "EXAMPLE.COM" enumerate TRUE
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME "EXAMPLE\.COM" $PROVIDER ldap
+                verifyCfg $FULLHOSTNAME "EXAMPLE.COM" $PROVIDER ldap
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
 
-		verifyCfg $FULLHOSTNAME "EXAMPLE\.COM" $USEFQN TRUE
+		verifyCfg $FULLHOSTNAME "EXAMPLE.COM" $USEFQN TRUE
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME "EXAMPLE\.COM" $CACHECREDS FALSE
+                verifyCfg $FULLHOSTNAME "EXAMPLE.COM" $CACHECREDS FALSE
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME "BOS\.REDHAT\.COM" enumerate TRUE
+                verifyCfg $FULLHOSTNAME "BOS.REDHAT.COM" enumerate TRUE
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME "BOS\.REDHAT\.COM" $USEFQN TRUE
+                verifyCfg $FULLHOSTNAME "BOS.REDHAT.COM" $USEFQN TRUE
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME "BOS\.REDHAT\.COM" $PROVIDER proxy
+                verifyCfg $FULLHOSTNAME "BOS.REDHAT.COM" $PROVIDER proxy
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi
 
-                verifyCfg $FULLHOSTNAME "BOS\.REDHAT\.COM" $CACHECREDS FALSE
+                verifyCfg $FULLHOSTNAME "BOS.REDHAT.COM" $CACHECREDS FALSE
                 if [ $? -ne 0 ] ; then
                         myresult=FAIL
                 fi

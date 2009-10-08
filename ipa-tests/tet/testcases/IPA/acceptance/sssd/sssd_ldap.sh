@@ -11,12 +11,14 @@ fi
 ######################################################################
 #  Test Case List
 #####################################################################
-iclist="ic1 ic2 ic3 ic4"
+iclist="ic1 ic2 ic3 ic4 ic5 ic6 ic7"
 ic1="sssd_ldap_001 sssd_ldap_002 sssd_ldap_003 sssd_ldap_004 sssd_ldap_005 sssd_ldap_006 sssd_ldap_007 sssd_ldap_008 sssd_ldap_009 sssd_ldap_010 sssd_ldap_011"
 ic2="sssd_ldap_012 sssd_ldap_013 sssd_ldap_014 sssd_ldap_015 sssd_ldap_016 sssd_ldap_017 sssd_ldap_018 sssd_ldap_019 sssd_ldap_020"
 ic3="sssd_ldap_021 sssd_ldap_022 sssd_ldap_023 sssd_ldap_024 sssd_ldap_025 sssd_ldap_026 sssd_ldap_027 sssd_ldap_028 sssd_ldap_029 sssd_ldap_030 sssd_ldap_031"
 ic4="sssd_ldap_032 sssd_ldap_033 sssd_ldap_034 sssd_ldap_035 sssd_ldap_036 sssd_ldap_037 sssd_ldap_038 sssd_ldap_039 sssd_ldap_040"
 ic5="sssd_ldap_041 sssd_ldap_042 sssd_ldap_043 sssd_ldap_044"
+ic6="sssd_ldap_045 sssd_ldap_046 sssd_ldap_047 sssd_ldap_048"
+ic7="sssd_ldap_049 sssd_ldap_050 sssd_ldap_051 sssd_ldap_052"
 #################################################################
 #  GLOBALS
 #################################################################
@@ -36,6 +38,9 @@ PROVIDER="id_provider"
 MAXID="max_id"
 MINID="min_id"
 CACHECREDS="cache_credentials"
+AUTHDN="ldap_default_bind_dn"
+AUTHTKNTYPE="ldap_default_authtok_type"
+AUTHTKN="ldap_default_authtok"
 ###################
 # KNOW LDAP USERS #
 ###################
@@ -96,6 +101,8 @@ sssd_ldap_001()
                         else
                                 message "SSSD Server restarted on client $FULLHOSTNAME"
                         fi
+			# wait for back ends to be fully up
+			sleep 5
                 fi
 
                 verifyCfg $FULLHOSTNAME LDAP enumerate TRUE
@@ -303,7 +310,7 @@ sssd_ldap_009()
 {
 
         myresult=PASS
-        message "START $tet_thistest: Change User's password - proxy - no FQN"
+        message "START $tet_thistest: Change User's password and Authenticate - proxy - no FQN"
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 
 	# change LDAP user's password
@@ -402,7 +409,7 @@ sssd_ldap_012()
    ####################################################################
 
         myresult=PASS
-        message "START $tet_thistest: Setup LDAP SSSD Configuration 2 - RHDS - $PROVIDER proxy"
+        message "START $tet_thistest: Setup LDAP SSSD Configuration 2 - RHDS - provider proxy"
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
         for c in $CLIENTS ; do
 		eval_vars $c
@@ -420,6 +427,8 @@ sssd_ldap_012()
                         else
                                 message "SSSD Server restarted on client $FULLHOSTNAME"
                         fi
+                        # wait for back ends to be fully up
+                        sleep 5
                 fi
 
                 verifyCfg $FULLHOSTNAME LDAP enumerate TRUE
@@ -456,7 +465,7 @@ sssd_ldap_012()
 sssd_ldap_013()
 {
         myresult=PASS
-        message "START $tet_thistest: Get Valid LDAP Users - No $MAXID - FQN - RHDS - $PROVIDER proxy"
+        message "START $tet_thistest: Get Valid LDAP Users - No $MAXID - FQN - RHDS - provider proxy"
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
         for c in $CLIENTS ; do
 		eval_vars $c
@@ -480,7 +489,7 @@ sssd_ldap_013()
 sssd_ldap_014()
 {
         myresult=PASS
-        message "START $tet_thistest: Get Valid LDAP Groups - No $MAXID - FQN - RHDS - $PROVIDER proxy"
+        message "START $tet_thistest: Get Valid LDAP Groups - No $MAXID - FQN - RHDS - provider proxy"
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
         for c in $CLIENTS ; do
 		eval_vars $c
@@ -505,7 +514,7 @@ sssd_ldap_014()
 sssd_ldap_015()
 {
         myresult=PASS
-        message "START $tet_thistest: User uidNumber not within allowed range - FQN - RHDS - $PROVIDER proxy"
+        message "START $tet_thistest: User uidNumber not within allowed range - FQN - RHDS - provider proxy"
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
         for c in $CLIENTS ; do
 		eval_vars $c
@@ -527,7 +536,7 @@ sssd_ldap_015()
 sssd_ldap_016()
 {
         myresult=PASS
-        message "START $tet_thistest: Group gidNumber not within allowed range - FQN - RHDS - $PROVIDER proxy"
+        message "START $tet_thistest: Group gidNumber not within allowed range - FQN - RHDS - provider proxy"
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi 
         for c in $CLIENTS ; do
 		eval_vars $c
@@ -549,7 +558,7 @@ sssd_ldap_016()
 sssd_ldap_017()
 {
         myresult=PASS
-        message "START $tet_thistest: New User added - cache test - RHDS - $PROVIDER proxy"
+        message "START $tet_thistest: New User added - cache test - RHDS - provider proxy"
 
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
         for c in $CLIENTS ; do 
@@ -588,7 +597,7 @@ sssd_ldap_017()
 sssd_ldap_018()
 {
         myresult=PASS
-        message "START $tet_thistest: New Group added - cache test - RHDS - $PROVIDER proxy"
+        message "START $tet_thistest: New Group added - cache test - RHDS - provider proxy"
 
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
         for c in $CLIENTS ; do 
@@ -696,7 +705,7 @@ sssd_ldap_021()
    ####################################################################
 
         myresult=PASS
-        message "START $tet_thistest: Setup LDAP SSSD Configuration 3 - RHDS - $PROVIDER ldap"
+        message "START $tet_thistest: Setup LDAP SSSD Configuration 3 - RHDS - provider ldap"
 
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
         for c in $CLIENTS ; do
@@ -723,6 +732,8 @@ sssd_ldap_021()
                         else
                                 message "SSSD Server restarted on client $FULLHOSTNAME"
                         fi
+                        # wait for back ends to be fully up
+                        sleep 5
                 fi
 
                 verifyCfg $FULLHOSTNAME LDAP enumerate TRUE
@@ -759,7 +770,7 @@ sssd_ldap_021()
 sssd_ldap_022()
 {
         myresult=PASS
-        message "START $tet_thistest: Get Valid LDAP Users - RHDS - $PROVIDER ldap"
+        message "START $tet_thistest: Get Valid LDAP Users - RHDS - provider ldap"
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
         for c in $CLIENTS ; do 
 		eval_vars $c
@@ -783,7 +794,7 @@ sssd_ldap_022()
 sssd_ldap_023()
 {
         myresult=PASS
-        message "START $tet_thistest: Get Valid LDAP Groups - RHDS - $PROVIDER ldap"
+        message "START $tet_thistest: Get Valid LDAP Groups - RHDS - provider ldap"
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
         for c in $CLIENTS ; do
 		eval_vars $c
@@ -1046,6 +1057,8 @@ sssd_ldap_032()
                         else
                                 message "SSSD Server restarted on client $FULLHOSTNAME"
                         fi
+                        # wait for back ends to be fully up
+                        sleep 5
                 fi
 
                 verifyCfg $FULLHOSTNAME LDAP enumerate TRUE
@@ -1310,7 +1323,7 @@ sssd_ldap_041()
    ####################################################################
    #   Configuration 5
    #    ldaps 
-   #    tls_reqcert = hard 
+   #    tls_reqcert = never 
    ####################################################################
 
         myresult=PASS
@@ -1342,7 +1355,7 @@ sssd_ldap_041()
 sssd_ldap_042()
 {
         myresult=PASS
-        message "START $tet_thistest: Get Valid LDAP Users - native - FQN - LDAPS - TLS"
+        message "START $tet_thistest: Get Valid LDAP Users - native - FQN - LDAPS - TLS - never"
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
         for c in $CLIENTS ; do
                 eval_vars $c
@@ -1366,7 +1379,7 @@ sssd_ldap_042()
 sssd_ldap_043()
 {
         myresult=PASS
-        message "START $tet_thistest: Get Valid LDAP Groups - native - FQN - LDAPS - TLS"
+        message "START $tet_thistest: Get Valid LDAP Groups - native - FQN - LDAPS - TLS - never"
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
         for c in $CLIENTS ; do
                 eval_vars $c
@@ -1391,7 +1404,7 @@ sssd_ldap_044()
 {
 
         myresult=PASS
-        message "START $tet_thistest: Authentication ldap user with password assigned - native - FQN - LDAPS - TLS"
+        message "START $tet_thistest: Authentication ldap user with password assigned - native - FQN - LDAPS - TLS - never"
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 
         for c in $CLIENTS; do
@@ -1407,6 +1420,268 @@ sssd_ldap_044()
                         myresult=FAIL
                 else
                         message "User with password assigned successfully authentication."
+                fi
+        done
+
+        result $myresult
+        message "END $tet_thistest"
+}
+
+sssd_ldap_045()
+{
+   ####################################################################
+   #   Configuration 6
+   #    ldaps 
+   #    tls_reqcert = hard 
+   ####################################################################
+
+        myresult=PASS
+        message "START $tet_thistest: Setup LDAP SSSD Configuration 6 - native - FQN - LDAPS - TLS - hard"
+        if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+        for c in $CLIENTS ; do
+                eval_vars $c
+                message "Working on $FULLHOSTNAME"
+                message "Backing up original sssd.conf and copying over test sssd.conf"
+                sssdCfg $FULLHOSTNAME sssd_ldap6.conf
+                if [ $? -ne 0 ] ; then
+                        message "ERROR Configuring SSSD on $FULLHOSTNAME."
+                        myresult=FAIL
+                else
+                        restartSSSD $FULLHOSTNAME
+                        if [ $? -ne 0 ] ; then
+                                message "ERROR: Restart SSSD failed on $FULLHOSTNAME"
+                                myresult=FAIL
+                        else
+                                message "SSSD Server restarted on client $FULLHOSTNAME"
+                        fi
+                        # wait for back ends to be fully up
+                        sleep 5
+                fi
+        done
+
+        result $myresult
+        message "END $tet_thistest"
+}
+
+sssd_ldap_046()
+{
+        myresult=PASS
+        message "START $tet_thistest: Get Valid LDAP Users - native - FQN - LDAPS - TLS - hard"
+        if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+        for c in $CLIENTS ; do
+                eval_vars $c
+                message "Working on $FULLHOSTNAME"
+                RET=`ssh root@$FULLHOSTNAME getent -s sss passwd 2>&1`
+                for item in $PUSER1 $PUSER2 $PUSER4 ; do
+                   echo $RET | grep $item@LDAP
+                   if [ $? -ne 0 ] ; then
+                        message "ERROR: Expected $item@LDAP user to be returned."
+                        myresult=FAIL
+                   else
+                        message "$item@LDAP user returned as expected."
+                  fi
+                done
+        done
+
+        result $myresult
+        message "END $tet_thistest"
+}
+
+sssd_ldap_047()
+{
+        myresult=PASS
+        message "START $tet_thistest: Get Valid LDAP Groups - native - FQN - LDAPS - TLS - hard"
+        if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+        for c in $CLIENTS ; do
+                eval_vars $c
+                message "Working on $FULLHOSTNAME"
+                RET=`ssh root@$FULLHOSTNAME getent -s sss group 2>&1`
+                for item in $PGROUP1 $PGROUP2 $PGROUP4 ; do
+                   echo $RET | grep $item@LDAP
+                   if [ $? -ne 0 ] ; then
+                        message "ERROR: Expected $item@LDAP group to be returned."
+                        myresult=FAIL
+                   else
+                        message "$item@LDAP group returned as expected."
+                  fi
+                done
+        done
+
+        result $myresult
+        message "END $tet_thistest"
+}
+
+sssd_ldap_048()
+{
+
+        myresult=PASS
+        message "START $tet_thistest: Authentication ldap user with password assigned - native - FQN - LDAPS - TLS - hard"
+        if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+
+        for c in $CLIENTS; do
+                eval_vars $c
+                message "Working on $FULLHOSTNAME"
+                rm -rf $TET_TMP_DIR/expect-ssh-success-fqn-nativeldaps-out.txt
+
+                expect $HOMEDIR/expect/ssh.exp puser1@LDAP $FULLHOSTNAME Secret123 > $TET_TMP_DIR/expect-ssh-success-fqn-nativeldaps-out.txt
+                cat $TET_TMP_DIR/expect-ssh-success-fqn-nativeldapx-out.txt | grep "Permission denied"
+                if [ $? -eq 0 ] ; then
+                        echo $?
+                        message "ERROR: User with password assigned failed authentication! See $TET_TMP_DIR/expect-ssh-success-fqn-nativeldaps-out.txt for details."
+                        myresult=FAIL
+                else
+                        message "User with password assigned successfully authentication."
+                fi
+        done
+
+        result $myresult
+        message "END $tet_thistest"
+}
+
+sssd_ldap_049()
+{
+   ####################################################################
+   #   Configuration 7
+   #    bind DN configured
+   ####################################################################
+
+        myresult=PASS
+        message "START $tet_thistest: Setup LDAP SSSD Configuration 7 - Bind DN configured - provider - ldap"
+        if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+        for c in $CLIENTS ; do
+                eval_vars $c
+                message "Working on $FULLHOSTNAME"
+
+                message "Backing up original sssd.conf and copying over test sssd.conf"
+                sssdCfg $FULLHOSTNAME sssd_ldap7.conf
+                if [ $? -ne 0 ] ; then
+                        message "ERROR Configuring SSSD on $FULLHOSTNAME."
+                        myresult=FAIL
+                else
+                        restartSSSD $FULLHOSTNAME
+                        if [ $? -ne 0 ] ; then
+                                message "ERROR: Restart SSSD failed on $FULLHOSTNAME"
+                                myresult=FAIL
+                        else
+                                message "SSSD Server restarted on client $FULLHOSTNAME"
+                        fi
+                        # wait for back ends to be fully up
+                        sleep 5
+                fi
+
+                verifyCfg $FULLHOSTNAME LDAP $AUTHDN "uid=puser1,ou=People,dc=example,dc=com"
+                if [ $? -ne 0 ] ; then
+                        myresult=FAIL
+                fi
+
+                verifyCfg $FULLHOSTNAME LDAP $AUTHTKNTYPE "password"
+                if [ $? -ne 0 ] ; then
+                        myresult=FAIL
+                fi
+
+                verifyCfg $FULLHOSTNAME LDAP $AUTHTKN "Secret123"
+                if [ $? -ne 0 ] ; then
+                        myresult=FAIL
+                fi
+        done
+
+        result $myresult
+        message "END $tet_thistest"
+}
+
+sssd_ldap_050()
+{
+        myresult=PASS
+        message "START $tet_thistest: Get Valid LDAP Users - Bind DN configured - provider - ldap"
+        if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+        for c in $CLIENTS ; do
+                eval_vars $c
+                message "Working on $FULLHOSTNAME"
+                RET=`ssh root@$FULLHOSTNAME getent -s sss passwd 2>&1`
+                for item in $PUSER1 $PUSER2 ; do
+                   echo $RET | grep $item
+                   if [ $? -ne 0 ] ; then
+                        message "ERROR: Expected $item user to be returned."
+                        myresult=FAIL
+                   else
+                        message "$item user returned as expected."
+                  fi
+                done
+        done
+
+        result $myresult
+        message "END $tet_thistest"
+}
+
+sssd_ldap_051()
+{
+        myresult=PASS
+        message "START $tet_thistest: Get Valid LDAP Groups - Bind DN configured - provider - ldap"
+        if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+        for c in $CLIENTS ; do
+                eval_vars $c
+                message "Working on $FULLHOSTNAME"
+                RET=`ssh root@$FULLHOSTNAME getent -s sss group 2>&1`
+                for item in $PGROUP1 $PGROUP2 ; do
+                   echo $RET | grep $item
+                   if [ $? -ne 0 ] ; then
+                        message "ERROR: Expected $item group to be returned."
+                        myresult=FAIL
+                   else
+                        message "$item group returned as expected."
+                  fi
+                done
+        done
+
+        result $myresult
+        message "END $tet_thistest"
+}
+
+sssd_ldap_052()
+{
+        myresult=PASS
+        message "START $tet_thistest: LDAP BE Unreachable - Trace Ticket 218"
+        if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+        for c in $CLIENTS ; do
+                eval_vars $c
+                message "Working on $FULLHOSTNAME"
+		# first stop sssd and deleted the databases because the users are cached
+		ssh root@$FULLHOSTNAME "service sssd stop"
+		ssh root@$FULLHOSTNAME "rm -rf /var/lib/sss/db/*.ldb"
+
+		# now stop the directory server to make is unreachable
+		COMMAND="service dirsrv stop"
+		expect $HOMEDIR/expect/execute.exp root $FULLHOSTNAME redhat "$COMMAND" > $TET_TMP_DIR/stop_dirsrv.exp.out
+
+		# empty /var/log messages - start sssd and search a user and a group - check /var/log/messages for a seg fault
+		ssh root@$FULLHOSTNAME "cat /dev/null > /var/log/messages ; service sssd start"
+		ssh root@$FULLHOSTNAME "getent -s sss passwd $PUSER1 ; getent -s sss group $PGROUP1"
+		ssh root@$FULLHOSTNAME "cat /var/log/messages | grep segfault"
+		if [ $? -eq 0 ] ; then
+			message "ERROR: Searching for user/group of unreachable backend caused segmentation fault"
+			myresult=FAIL
+		else
+			message "No segfault found in /var/log/messages"
+		fi
+
+		# now lets start the directory server back up - wait ample time for cache to expire - and search again
+		COMMAND="service dirsrv start"
+		expect $HOMEDIR/expect/execute.exp root $FULLHOSTNAME redhat "$COMMAND" > $TET_TMP_DIR/start_dirsrv.exp.out
+		sleep 5
+		ssh root@$FULLHOSTNAME "getent -s sss passwd $PUSER1"
+		if [ $? -ne 0 ] ; then
+			message "ERROR: Directory Server user still not found after restart and sleep of 5 seconds. - Cache settings are at 1 second"	
+			myresult=FAIL
+		else
+			message "Directory Server user found after restart."
+		fi
+
+                ssh root@$FULLHOSTNAME "getent -s sss group $PGROUP1"
+                if [ $? -ne 0 ] ; then          
+                        message "ERROR: Directory Server group still not found after restart and sleep of 5 seconds. - Cache settings are at 1 second"   
+                        myresult=FAIL
+                else
+                        message "Directory Server group found after restart."            
                 fi
         done
 

@@ -11,12 +11,13 @@ fi
 ######################################################################
 #  Test Case List
 #####################################################################
-iclist="ic1 ic2 ic3 ic4 ic5"
+#iclist="ic1 ic2 ic3 ic4 ic5"
+iclist="ic5"
 ic1="sssd_001 sssd_002 sssd_003 sssd_004 sssd_005 sssd_006 sssd_007 sssd_008 sssd_009 sssd_010 sssd_011 sssd_012 sssd_013 sssd_014 sssd_015 sssd_016 sssd_017 sssd_018 sssd_019 sssd_020 sssd_021 sssd_022 sssd_023 sssd_024 sssd_025 sssd_026 sssd_027 sssd_028"
 ic2="sssd_029 sssd_030 sssd_031 sssd_032 sssd_033 sssd_034 sssd_035"
 ic3="sssd_036 sssd_037"
 ic4="sssd_040 sssd_041 sssd_042 sssd_043 sssd_044 sssd_045 sssd_046"
-ic5="sssd_047 sssd_049 sssd_050 sssd_051 sssd_052 sssd_053 sssd_054"
+ic5="sssd_047 sssd_049 sssd_050 sssd_051 sssd_052 sssd_053 sssd_054 sssd_055 sssd_056 sssd_057 sssd_058 sssd_059 sssd_060 sssd_061"
 #####################################################################
 # Globals
 ####################################################################
@@ -104,11 +105,12 @@ sssd_002()
 		eval_vars $c
 		message "Working on $FULLHOSTNAME"
 		ssh root@$FULLHOSTNAME "sss_useradd -u 1000 -h /home/user1000 -s /bin/bash user1000"
+		
 		if [ $? -ne 0 ] ; then
 			message "ERROR: Adding LOCAL domain user1000.  Return Code: $?"
 			myresult=FAIL
 		else
-			ssh root@$FULLHOSTNAME "getent -s sss passwd | grep user1000"
+			ssh root@$FULLHOSTNAME "getent -s sss passwd user1000"
 			if [ $? -ne 0 ] ; then
 				message "ERROR: user1000:  getent failed to return LOCAL user.  Return Code: $?"
 				myresult=FAIL
@@ -331,7 +333,7 @@ sssd_010()
         for c in $CLIENTS ; do
 		eval_vars $c
                 message "Working on $FULLHOSTNAME"
-		EXPMSG="Could not modify user - check if user name is correct"
+		EXPMSG="Could not modify user - check if group names are correct"
                 MSG=`ssh root@$FULLHOSTNAME "sss_usermod -c \"User Thousand\" myuser 2>&1"`
                 if [ $? -ne 1 ] ; then
                         message "ERROR: Modifying LOCAL user that doesn't exist.  Unexpected return code. Expected: 1  Got: $?"
@@ -706,13 +708,11 @@ sssd_023()
                 message "Working on $FULLHOSTNAME"
                 #Adding another group to add to first group
                 ssh root@$FULLHOSTNAME "sss_groupadd -g 1009 group1009"
-		sleep 1
                 if [ $? -ne 0 ] ; then
                         message "ERROR: Adding LOCAL domain group1010.  Return Code: $?"
                         myresult=FAIL
                 else
                         ssh root@$FULLHOSTNAME sss_groupmod -a group1009 group1010
-			sleep 5
                         if [ $? -ne 0 ] ; then
                                 message "ERROR: Failed to add nested group.  Return Code: $?"
                                 myresult=FAIL
@@ -995,13 +995,15 @@ sssd_030()
 	eval_vars $c
         message "Working on $FULLHOSTNAME"
         ssh root@$FULLHOSTNAME "sss_useradd -u 1000 -h /home/user1000 -s /bin/bash user1000"
-        if [ $? -ne 0 ] ; then
+	RC=$?
+        if [ $RC -ne 0 ] ; then
         	message "ERROR: Adding LOCAL domain user1000.  Return Code: $?"
                 myresult=FAIL
         else
-		ssh root@$FULLHOSTNAME getent -s sss passwd | grep user1000@LOCAL
-		if [ $? -ne 0 ] ; then
-			message "ERROR: User not returned with fully qualified name."
+		ssh root@$FULLHOSTNAME "getent -s sss passwd | grep user1000@LOCAL"
+		RC=$?
+		if [ $RC -ne 0 ] ; then
+			message "ERROR: User not returned with fully qualified name. return code: $RC"
 			myresult=FAIL
 		else
 			message "User returned with fully qualified name as expected."
@@ -1027,9 +1029,9 @@ sssd_031()
                 message "ERROR: Adding LOCAL domain group1000.  Return Code: $?"
                 myresult=FAIL
         else
-                ssh root@$FULLHOSTNAME getent -s sss group | grep group1000@LOCAL
+                ssh root@$FULLHOSTNAME "getent -s sss group | grep group1000@LOCAL"
                 if [ $? -ne 0 ] ; then
-                        message "ERROR: Group not returned with fully qualified name."
+                        message "ERROR: Group not returned with fully qualified name. return code: $?"
                         myresult=FAIL
                 else
                         message "Group returned with fully qualified name as expected."
@@ -1786,6 +1788,7 @@ sssd_050()
         for c in $CLIENTS; do 
                 eval_vars $c
                 message "Working on $FULLHOSTNAME"
+		ssh root@$FULLHOSTNAME "cat /dev/null > /var/log/secure"
 		rm -rf $TET_TMP_DIR/expect-ssh-nopasswd-out.txt
 		# test authentication via ssh
 		expect $HOMEDIR/expect/ssh_deny.exp user1000@LOCAL $FULLHOSTNAME ihavenopassword > $TET_TMP_DIR/expect-ssh-nopasswd-out.txt
@@ -1795,6 +1798,14 @@ sssd_050()
 			myresult=FAIL
 		else
 			message "User without password assigned failed authentication - Permission denied."
+			# now check for failure message in /var/log/secure
+			ssh root@$FULLHOSTNAME "cat /var/log/secure | grep \"authentication failure\""
+			if [ $? -ne 0 ] ; then
+				message "Authentication failure message not found in /var/log/secure"
+				myresult=FAIL
+			else
+				message "Authentication failure message found in /var/log/secure"
+			fi
 		fi
         done
 
@@ -1852,6 +1863,7 @@ sssd_052()
         for c in $CLIENTS; do
                 eval_vars $c
                 message "Working on $FULLHOSTNAME"
+		ssh root@$FULLHOSTNAME "cat /dev/null > /var/log/secure"
 		rm -rf $TET_TMP_DIR/expect-ssh-badpasswd-out.txt
                 expect $HOMEDIR/expect/ssh_deny.exp user1000@LOCAL $FULLHOSTNAME abcd123xyz789 > $TET_TMP_DIR/expect-ssh-badpasswd-out.txt
 		cat $TET_TMP_DIR/expect-ssh-badpasswd-out.txt | grep "Permission denied"
@@ -1861,6 +1873,14 @@ sssd_052()
                         myresult=FAIL
                 else
                         message "User authentication with incorrect password assigned failed authentication."
+                        # now check for failure message in /var/log/secure
+                        ssh root@$FULLHOSTNAME "cat /var/log/secure | grep \"authentication failure\""
+                        if [ $? -ne 0 ] ; then
+                                message "Authentication failure message not found in /var/log/secure"
+                                myresult=FAIL
+                        else
+                                message "Authentication failure message found in /var/log/secure"
+                        fi
                 fi
 
 		ssh root@$FULLHOSTNAME "sss_userdel user1000@LOCAL ; sss_userdel user1001@LOCAL"
@@ -1970,7 +1990,7 @@ sssd_054()
 				# Get the error message - trac issue 214
 		                MSG=`ssh root@$FULLHOSTNAME "sss_useradd -u 2000 user2000 2>&1"`
 				message "Trac issue 214"
-				message "ERROR MSG: $BUGMSG"
+				message "ERROR MSG: $MSG"
                 	fi
 		fi
 	
@@ -1982,6 +2002,282 @@ sssd_054()
         message "END $tet_thistest" 
 }
 
+sssd_055()
+{
+        myresult=PASS
+        message "START $tet_thistest: sss utils as non root user - sss_useradd"
+        if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+        for c in $CLIENTS ; do
+                eval_vars $c
+                message "Working on $FULLHOSTNAME"
+		
+		# add a local user and set their password
+		ssh root@$FULLHOSTNAME "/usr/sbin/useradd myuser"
+		expect $HOMEDIR/expect/setpwd.exp myuser $FULLHOSTNAME online4now
+		
+		COMMAND="sss_useradd test"
+		ERRMSG="sss_useradd must be run as root"
+		expect $HOMEDIR/expect/execute.exp myuser $FULLHOSTNAME online4now "$COMMAND" > $TET_TMP_DIR/sss_useradd.exp.out
+		cat $TET_TMP_DIR/sss_useradd.exp.out | grep "$ERRMSG"
+		if [ $? -ne 0 ] ; then
+			message "ERROR: expected error was not found. Expected: $ERRMSG"
+			myresult=FAIL
+		fi
+
+		# make sure the user really wasn't added 
+                ssh root@$FULLHOSTNAME "getent -s sss password | grep test"
+                if [ $? -eq 0 ] ; then
+                	message "ERROR: User was added to the local sssd database by non root user."
+                        myresult=FAIL
+                        ssh root@$FULLHOSTNAME "sss_userdel test"
+                else
+                        message "User does not exist in the sssd local database."
+                fi
+        done
+
+        result $myresult
+        message "END $tet_thistest"
+}
+
+sssd_056()
+{
+        myresult=PASS
+        message "START $tet_thistest: sss utils as non root user - sss_usermod"
+        if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+        for c in $CLIENTS ; do
+                eval_vars $c
+                message "Working on $FULLHOSTNAME"
+		# add an sssd user
+		ssh root@$FULLHOSTNAME "sss_useradd test"
+
+                COMMAND="/usr/sbin/sss_usermod test -s /bin/ksh"
+                ERRMSG="sss_usermod must be run as root"
+                expect $HOMEDIR/expect/execute.exp myuser $FULLHOSTNAME online4now "$COMMAND" > $TET_TMP_DIR/sss_usermod.exp.out
+                cat $TET_TMP_DIR/sss_usermod.exp.out | grep "$ERRMSG"
+                if [ $? -ne 0 ] ; then
+                        message "ERROR: expected error was not found. Expected: $ERRMSG"
+                        myresult=FAIL
+                fi
+
+		# check to make user user's shell is not /bin/ksh
+		MOD="/bin/ksh"
+		SHELL=`ssh root@$FULLHOSTNAME getent -s sss passwd | grep test | cut -d : -f 7`
+		if [ "$MOD" == "$SHELL" ] ; then
+			message "ERROR: User's shell was modified and is now $SHELL"
+			myresult=FAIL
+		else
+			message "User's shell was not modified."
+		fi
+        done
+
+        result $myresult
+        message "END $tet_thistest"
+}
+
+sssd_057()
+{
+        myresult=PASS
+        message "START $tet_thistest: sss utils as non root user - sss_userdel"
+        if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+        for c in $CLIENTS ; do
+                eval_vars $c
+                message "Working on $FULLHOSTNAME"
+
+                COMMAND="/usr/sbin/sss_userdel test"
+                ERRMSG="sss_userdel must be run as root"
+                expect $HOMEDIR/expect/execute.exp myuser $FULLHOSTNAME online4now "$COMMAND" > $TET_TMP_DIR/sss_userdel.exp.out
+                cat $TET_TMP_DIR/sss_userdel.exp.out | grep "$ERRMSG"
+                if [ $? -ne 0 ] ; then
+                        message "ERROR: expected error was not found. Expected: $ERRMSG"
+                        myresult=FAIL
+                fi
+
+                # check to make the user still exists
+                ssh root@$FULLHOSTNAME "getent -s sss passwd | grep test"
+                if [ $? -ne 0 ] ; then
+                        message "ERROR: User was not returned by getent."
+                        myresult=FAIL
+                else
+                        message "User still exists."
+                fi
+
+		#clean up - delete test user
+		ssh root@$FULLHOSTNAME "sss_userdel test"
+        done
+
+        result $myresult
+        message "END $tet_thistest"
+}
+
+sssd_058()
+{
+        myresult=PASS
+        message "START $tet_thistest: sss utils as non root user - sss_groupadd"
+        if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+        for c in $CLIENTS ; do
+                eval_vars $c
+                message "Working on $FULLHOSTNAME"
+
+                COMMAND="/usr/sbin/sss_groupadd test"
+                ERRMSG="sss_groupadd must be run as root"
+                expect $HOMEDIR/expect/execute.exp myuser $FULLHOSTNAME online4now "$COMMAND" > $TET_TMP_DIR/sss_groupadd.exp.out
+                cat $TET_TMP_DIR/sss_groupadd.exp.out | grep "$ERRMSG"
+                if [ $? -ne 0 ] ; then
+                        message "ERROR: expected error was not found. Expected: $ERRMSG"
+                        myresult=FAIL
+                fi
+
+                # make sure the group really wasn't added 
+                ssh root@$FULLHOSTNAME "getent -s sss group | grep test"
+                if [ $? -eq 0 ] ; then
+                        message "ERROR: Group was added to the local sssd database by non root user."
+                        myresult=FAIL
+                        ssh root@$FULLHOSTNAME "sss_groupdel test"
+                else
+                        message "Group does not exist in the sssd local database."
+                fi
+        done
+
+        result $myresult
+        message "END $tet_thistest"
+}
+
+sssd_059()
+{
+        myresult=PASS
+        message "START $tet_thistest: sss utils as non root user - sss_groupmod"
+        if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+        for c in $CLIENTS ; do
+                eval_vars $c
+                message "Working on $FULLHOSTNAME"
+                # add an sssd group
+                ssh root@$FULLHOSTNAME "sss_groupadd test"
+
+                COMMAND="/usr/sbin/sss_groupmod -a test2 test"
+                ERRMSG="sss_groupmod must be run as root"
+                expect $HOMEDIR/expect/execute.exp myuser $FULLHOSTNAME online4now "$COMMAND" > $TET_TMP_DIR/sss_groupmod.exp.out
+                cat $TET_TMP_DIR/sss_groupmod.exp.out | grep "$ERRMSG"
+                if [ $? -ne 0 ] ; then
+                        message "ERROR: expected error was not found. Expected: $ERRMSG"
+                        myresult=FAIL
+		else
+			message "Group was not modified and error message as expected."
+                fi
+        done
+
+        result $myresult
+        message "END $tet_thistest"
+}
+
+sssd_060()
+{
+        myresult=PASS
+        message "START $tet_thistest: sss utils as non root user - sss_groupdel"
+        if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+        for c in $CLIENTS ; do
+                eval_vars $c
+                message "Working on $FULLHOSTNAME"
+
+                COMMAND="/usr/sbin/sss_groupdel test"
+                ERRMSG="sss_groupdel must be run as root"
+                expect $HOMEDIR/expect/execute.exp myuser $FULLHOSTNAME online4now "$COMMAND" > $TET_TMP_DIR/sss_groupdel.exp.out
+                cat $TET_TMP_DIR/sss_groupdel.exp.out | grep "$ERRMSG"
+                if [ $? -ne 0 ] ; then
+                        message "ERROR: expected error was not found. Expected: $ERRMSG"
+                        myresult=FAIL
+                fi
+
+                # check to make the group still exists
+                ssh root@$FULLHOSTNAME "getent -s sss group | grep test"
+                if [ $? -ne 0 ] ; then
+                        message "ERROR: Group was not returned by getent."
+                        myresult=FAIL
+                else
+                        message "Group still exists."
+                fi
+
+                #clean up - delete test group
+                ssh root@$FULLHOSTNAME "sss_groupdel test"
+
+		#delete the non-root user
+		ssh root@$FULLHOSTNAME "userdel -r myuser"
+        done
+
+        result $myresult
+        message "END $tet_thistest"
+}
+
+sssd_061()
+{
+        myresult=PASS
+        message "START $tet_thistest: Filtered user as member of Group - Trac Issue 108"
+        if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
+        for c in $CLIENTS ; do
+                eval_vars $c
+                message "Working on $FULLHOSTNAME"
+		# change the max_id value - there are none left
+		ssh root@$FULLHOSTNAME "sed -i -e \"s%max_id = 2003%max_id = 2010%g\" $SSSDCFG"
+		restartSSSD $FULLHOSTNAME
+		sleep 5
+
+		# first we need to add two users - one that is filtered and one that isn't - in sssd_local6.conf, user jenny is filtered
+		ssh root@$FULLHOSTNAME "sss_useradd jenny ; sss_useradd jimi"
+		# verify jenny is in the database, but not returned by getent
+		ssh root@$FULLHOSTNAME "ldbsearch -H /var/lib/sss/db/sssd.ldb -b \"cn=users,cn=LOCAL,cn=sysdb\" | grep jenny"
+		if [ $? -ne 0 ] ; then
+			message "ERROR: User add was not found in the sssd database"
+			myresult=FAIL
+		else
+			ssh root@$FULLHOSTNAME "getent -s sss passwd jenny@LOCAL"
+			if [ $? -eq 0 ] ; then
+				message "ERROR: Filtered user was returned by getent"
+				myresult=FAIL
+			else
+				message "Filtered user found in database but was not returned by getent as expected."
+			fi
+		fi
+		# now add a group and make jenny and jimi members
+		ssh root@$FULLHOSTNAME "sss_groupadd test@LOCAL ; sss_usermod -a test@LOCAL jenny@LOCAL ; sss_usermod -a test@LOCAL jimi@LOCAL"
+		
+		# verify the memberships from the database
+                verifyAttr $FULLHOSTNAME "name=jenny,cn=users,cn=LOCAL,cn=sysdb" memberof "name=test,cn=groups,cn=LOCAL,cn=sysdb"
+                if [ $? -ne 0 ] ; then
+                	myresult=FAIL
+                else
+                	message "LOCAL domain jenny memberof attribute is correct."
+                fi
+
+                verifyAttr $FULLHOSTNAME "name=jimi,cn=users,cn=LOCAL,cn=sysdb" memberof "name=test,cn=groups,cn=LOCAL,cn=sysdb"
+                if [ $? -ne 0 ] ; then
+                        myresult=FAIL
+                else
+                        message "LOCAL domain jimi memberof attribute is correct."
+                fi
+
+		# now verify getent on the group , does not return the filter user, but does return the non filtered user
+		GROUP=`ssh root@$FULLHOSTNAME "getent -s sss group test@LOCAL"`
+		echo $GROUP | grep "jimi@LOCAL"
+		if [ $? -ne 0 ] ; then
+			message "ERROR: User jimi is not filtered and was not returned as member of group test"
+			myresult=FAIL
+		else
+			message "Unfiltered user was returned as member of the group."
+		fi
+		echo $GROUP | grep "jenny@LOCAL"
+                if [ $? -eq 0 ] ; then
+                        message "ERROR: User jenny is filtered and was returned as member of group test"
+                        myresult=FAIL
+                else
+                        message "Filtered user was not returned as member of the group."
+                fi
+	
+		# cleanup!
+		ssh root@$FULLHOSTNAME "sss_userdel jenny ; sss_userdel jimi ; sss_groupdel test"
+        done
+
+        result $myresult
+        message "END $tet_thistest"
+}
 
 ##################################################################
 . $TESTING_SHARED/shared.sh

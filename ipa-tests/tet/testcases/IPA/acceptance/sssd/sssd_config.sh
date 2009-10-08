@@ -15,7 +15,7 @@ ls $TESTING_SHARED/
 ######################################################################
 #  Test Case List
 #####################################################################
-iclist="ic1 ic2 ic3 ic4 ic5 ic6 ic7 ic8 ic9 ic10"
+iclist="ic1 ic2 ic3 ic4 ic5 ic6 ic7 ic8 ic9 ic10 ic11"
 ic1="sssd_config_001"
 ic2="sssd_config_002"
 ic3="sssd_config_003"
@@ -26,6 +26,7 @@ ic7="sssd_config_007"
 ic8="sssd_config_008"
 ic9="sssd_config_009"
 ic10="sssd_config_010"
+ic11="sssd_config_011"
 USEFQN="use_fully_qualified_names"
 MPG="magic_private_groups"
 PROVIDER="id_provider"
@@ -93,7 +94,7 @@ sssd_config_001()
 	MSG="sssd is stopped"
         STATUS=`ssh root@$FULLHOSTNAME "service sssd status"`
         if [[ $STATUS != $MSG ]] ; then
-                message "ERROR: Status returned \"$MSG\"."
+                message "ERROR: Status returned \"$STATUS\"."
                 myresult=FAIL
         else
                 message "Status as expected: \"$MSG\"."
@@ -148,7 +149,7 @@ sssd_config_002()
         MSG="sssd is stopped"
         STATUS=`ssh root@$FULLHOSTNAME "service sssd status"`
         if [[ $STATUS != $MSG ]] ; then
-                message "ERROR: Status returned \"$MSG\"."
+                message "ERROR: Status returned \"$STATUS\"."
                 myresult=FAIL
         else
                 message "Status as expected: \"$MSG\"."
@@ -203,7 +204,7 @@ sssd_config_003()
         MSG="sssd is stopped"
         STATUS=`ssh root@$FULLHOSTNAME "service sssd status"`
         if [[ $STATUS != $MSG ]] ; then
-                message "ERROR: Status returned \"$MSG\"."
+                message "ERROR: Status returned \"$STATUS\"."
                 myresult=FAIL
         else
                 message "Status as expected: \"$MSG\"."
@@ -258,7 +259,7 @@ sssd_config_004()
         MSG="sssd is stopped"
         STATUS=`ssh root@$FULLHOSTNAME "service sssd status"`
         if [[ $STATUS != $MSG ]] ; then
-                message "ERROR: Status returned \"$MSG\"."
+                message "ERROR: Status returned \"$STATUS\"."
                 myresult=FAIL
         else
                 message "Status as expected: \"$MSG\"."
@@ -379,7 +380,7 @@ sssd_config_006()
         MSG="sssd is stopped"
         STATUS=`ssh root@$FULLHOSTNAME "service sssd status"`
         if [[ $STATUS != $MSG ]] ; then
-                message "ERROR: Status returned \"$MSG\"."
+                message "ERROR: Status returned \"$STATUS\"."
                 myresult=FAIL
         else
                 message "Status as expected: \"$MSG\"."
@@ -434,7 +435,7 @@ sssd_config_007()
         MSG="sssd is stopped"
         STATUS=`ssh root@$FULLHOSTNAME "service sssd status"`
         if [[ $STATUS != $MSG ]] ; then
-                message "ERROR: Status returned \"$MSG\"."
+                message "ERROR: Status returned \"$STATUS\"."
                 myresult=FAIL
         else
                 message "Status as expected: \"$MSG\"."
@@ -489,7 +490,7 @@ sssd_config_008()
         MSG="sssd is stopped"
         STATUS=`ssh root@$FULLHOSTNAME "service sssd status"`
         if [[ $STATUS != $MSG ]] ; then
-                message "ERROR: Status returned \"$MSG\"."
+                message "ERROR: Status returned \"$STATUS\"."
                 myresult=FAIL
         else
                 message "Status as expected: \"$MSG\"."
@@ -546,7 +547,7 @@ sssd_config_009()
                 message "ERROR: Status returned \"$MSG\"."
                 myresult=FAIL
         else
-                message "Status as expected: \"$MSG\"."
+                message "Status as expected: \"$STATUS\"."
         fi
 	
 #        scrubLog "Invalid value for useFullyQualifiedNames"
@@ -596,7 +597,7 @@ sssd_config_010()
         MSG="sssd is stopped"
         STATUS=`ssh root@$FULLHOSTNAME "service sssd status"`
         if [[ $STATUS != $MSG ]] ; then
-                message "ERROR: Status returned \"$MSG\"."
+                message "ERROR: Status returned \"$STATUS\"."
                 myresult=FAIL
         else
                 message "Status as expected: \"$MSG\"."
@@ -611,6 +612,60 @@ sssd_config_010()
   tet_result $myresult
   message "END $tet_thistest"
 }
+
+sssd_config_011()
+{
+  myresult=PASS
+  message "START $tet_thistest: Invalid auth-module for provider_id LOCAL"
+  EXPMSG=""
+  for c in $CLIENTS; do
+        eval_vars $c
+        message "Working on $FULLHOSTNAME"
+        sssdCfg $FULLHOSTNAME sssd_config11.conf
+        if [ $? -ne 0 ] ; then
+                message "ERROR Configuring SSSD on $FULLHOSTNAME."
+                myresult=FAIL
+        else
+                ssh root@$FULLHOSTNAME "service sssd stop"
+                ssh root@$FULLHOSTNAME "cat /dev/null > /var/log/messages ; service sssd start"
+                if [ $? -eq 0 ] ; then
+                        message "ERROR: Invalid auth-module for provider_id LOCAL - service started"
+                        message "Trac issue 216"
+                        myresult=FAIL
+                else
+                        message "Starting services with invalid configuration failed as expected."
+                fi
+        fi
+
+        MSG="PID file exists"
+        # check the status of the service should not be running
+        STATUS=`ssh root@$FULLHOSTNAME "if [ -f /var/run/sssd.pid ] ; then echo "PID file exists" ; fi"`
+        if [[ $STATUS == $MSG ]] ; then
+                message "PID file /var/run/sssd.pid exists."
+                myresult=FAIL
+        else
+                message "PID file was not created."
+        fi
+
+        MSG="sssd is stopped"
+        STATUS=`ssh root@$FULLHOSTNAME "service sssd status"`
+        if [[ $STATUS != $MSG ]] ; then
+                message "ERROR: Status returned \"$STATUS\"."
+                myresult=FAIL
+        else
+                message "Status as expected: \"$MSG\"."
+        fi
+
+#        scrubLog "Invalid authentication configuration for provider local"
+#        if [ $? -ne 0 ] ; then
+#                myresult=FAIL
+#        fi
+  done
+
+  tet_result $myresult
+  message "END $tet_thistest"
+}
+
 
 ##################################################################
 . $TESTING_SHARED/shared.sh
