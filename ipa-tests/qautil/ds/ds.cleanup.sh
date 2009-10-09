@@ -13,14 +13,14 @@ ps -ef | grep slapd | grep -v grep | awk '{print $2}' | xargs kill -9
 ps -ef | grep httpd | grep -v grep | awk '{print $2}' | xargs kill -9
 
 echo "=== remove all slapd directories === "
-sudo rm -Rvf /etc/dirsrv/ \
-        /var/lib/dirsrv/ \
-        /usr/lib/dirsrv/ \
-        /var/run/dirsrv/ \
-        /var/log/dirsrv/ \
-        /var/lock/dirsrv/\
-        /var/lib64/dirsrv/ \
-        /usr/lib64/dirsrv/ 
+sudo rm -Rvf /etc/dirsrv \
+        /var/lib/dirsrv \
+        /usr/lib/dirsrv \
+        /var/run/dirsrv \
+        /var/log/dirsrv \
+        /var/lock/dirsrv\
+        /var/lib64/dirsrv \
+        /usr/lib64/dirsrv
 
 echo "=== cleal yum cache ==="
 sudo yum clean all
