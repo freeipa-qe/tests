@@ -7,6 +7,10 @@ do
         echo "try to remove [$d]"
         sudo /usr/sbin/remove-ds.pl -d -i $d
 done
+# kill ds processes - just in case
+echo "kill slapd & httpd"
+ps -ef | grep slapd | grep -v grep | awk '{print $2}' | xargs kill -9
+ps -ef | grep httpd | grep -v grep | awk '{print $2}' | xargs kill -9
 
 echo "=== remove all slapd directories === "
 sudo rm -Rvf /etc/dirsrv/ \
