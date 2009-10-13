@@ -86,8 +86,12 @@ ConfigNISClient()
 	#config nsswitch
 	logmessage "$h: config [$client] /etc/nsswitch.conf"
 	ssh root@$client "mv -f /etc/nsswitch.conf /etc/nsswitch.conf.bk"
-	ssh root@$client "sed 	-e 's/^passwd:.*files$/passwd:	files nis/' -e 's/^shadow:.*files$/shadow:	files nis/' -e 's/^group:.*files$/group:	files nis/'    -e 's/^networks:.*files$/networks:	files nis/' < /etc/nsswitch.conf.bk > /etc/nsswitch.conf "
-	logmessage "$h: starts"
+	ssh root@$client "sed 	-e 's/^passwd:.*files$/passwd:	files nis/'\
+				-e 's/^shadow:.*files$/shadow:	files nis/'\
+				-e 's/^group:.*files$/group:	files nis/'\
+				-e 's/^networks:.*files$/networks:	files nis/' \
+				< /etc/nsswitch.conf.bk > /etc/nsswitch.conf "
+	logmessage "$h: finished"
 }
 
 RestoreNISClient()
