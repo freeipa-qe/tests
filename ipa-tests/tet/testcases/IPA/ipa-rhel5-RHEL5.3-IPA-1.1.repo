@@ -22,16 +22,16 @@ baseurl=http://apoc.dsdev.sjc.redhat.com/tet/bind/i386/
 enabled=1
 gpgcheck=0
 
-[sssd-64]
-name=sssd
-baseurl=http://fedorapeople.org/~sgallagh/repos/RHEL5/x86_64/
-enabled=0
+[gui-64]
+name=gui
+baseurl=http://apoc.dsdev.sjc.redhat.com/tet/gui/x86_64/
+enabled=1
 gpgcheck=0
 
-[sssd-32]
-name=sssd
-baseurl=http://fedorapeople.org/~sgallagh/repos/RHEL5/i386/
-enabled=0
+[gui-32]
+name=gui
+baseurl=http://apoc.dsdev.sjc.redhat.com/tet/gui/i386/
+enabled=1
 gpgcheck=0
 
 [53-repo-64]
