@@ -20,7 +20,29 @@ ic5="sssd_service_004"
 #################################################################
 #  GLOBALS
 #################################################################
-PIDFILE=/var/run/sssd.pid
+PIDFILE="/var/run/sssd.pid"
+SSSDLOG="/var/log/sssd/sssd.log"
+######################################################################
+# Sub Routines
+######################################################################
+scrublog()
+{
+	ERR=$1
+	RC=0
+
+        message "Searching $SSSDLOG for \"$ERR\""
+        ssh root@$FULLHOSTNAME cat $SSSDLOG | grep "$ERR"
+        if [ $? -ne 0 ] ; then
+                message "ERROR: \"$ERR\" not found in $SSSDLOG"
+		ssh root@$FULLHOSTNAME "cat $SSSDLOG >> /tmp/sssd.log"
+                RC=1
+        else
+                message "\"$ERR\" found in $SSSDLOG"
+        fi
+
+	return $RC
+
+}
 ######################################################################
 # Tests
 ######################################################################
@@ -40,40 +62,36 @@ bug512733()
 		message "This part fixed. Non-zero return code: $?"
 	fi
 
-        MSG="PID file exists"
-        # check the status of the service should not be running
-        STATUS=`ssh root@$FULLHOSTNAME "if [ -f /var/run/sssd.pid ] ; then echo "PID file exists" ; fi"`
-        if [[ $STATUS == $MSG ]] ; then
+        # check the status of the service should not be running and no PID file should have been created
+        ssh root@$FULLHOSTNAME "ls /var/run/sssd.pid"
+        if [ $? -eq 0 ] ; then
                 message "PID file /var/run/sssd.pid exists."
                 myresult=FAIL
         else
                 message "PID file was not created."
         fi
 
-	MSG="sssd dead but pid file exists"
+	MSG="sssd is stopped"
 	STATUS=`ssh root@$FULLHOSTNAME "service sssd status"`
 	if [[ $STATUS == $MSG ]] ; then
-		message "ERROR: Bug 512733 Still Exists"
-		myresult=FAIL
+		message "Status is as expected.  GOT: $STATUS"
 	else
-		message "This part fixed. Status did not return \"$MSG\"."
+		message "Status not as expected. GOT: $STATUS EXP: $MSG"
+		myresult=FAIL
 	fi
 
 	# check /var/log/messages for error message
-#	ERR="No domains configured"
-#	message "Searching /var/log/messages for \"$ERR\""
-#	ssh root@$FULLHOSTNAME cat /var/log/messages | grep "$ERR"
-#	if [ $? -ne 0 ] ; then
-#		message "ERROR: \"$ERR\" not found in /var/log/messages"
-#		sftp root@$FULLHOSTNAME:/var/log/messages $TET_TMP_DIR/messages_bug512733
-#		myresult=FAIL
-#	else
-#		message "\"$ERR\" found in /var/log/messages"
-#	fi
+	ERR="No domains configured"
+	scrublog "$ERR"
+	rc=$?
+	if [ $rc -ne 0 ] ; then
+		myresult=FAIL
+	fi
 
 	ssh root@$FULLHOSTNAME "service sssd stop"
 	ssh root@$FULLHOSTNAME "rm -rf /var/run/sssd.pid"
   done
+
   tet_result $myresult
   message "END $tet_thistest"
 }
@@ -135,13 +153,23 @@ sssd_service_002()
   for c in $CLIENTS; do
 	eval_vars $c
         message "Working on $FULLHOSTNAME"
-	SERVICES="sssd_dp sssd_nss sssd_pam"
-	for s in $SERVICES ; do	
+	SERVICES="sssd_nss sssd_pam"
+	for s in $SERVICES ; do
+
                 OPID=`ssh root@$FULLHOSTNAME "ps -e | grep $s | cut -d \" \" -f 1 2>&1"`
 		if [ $? -ne 0 ] ; then
-                        message "ERROR: Failed to find running process id for $s"
-                        myresult=FAIL
-		else
+                       message "ERROR: Failed to find running process id for $s"
+                       myresult=FAIL
+		elif [ -z $OPID ] ; then
+			OPID=`ssh root@$FULLHOSTNAME "ps -e | grep $s | cut -d \" \" -f 1 2>&1"`
+			if [ -z $OPID ] ; then
+				message "ERROR: Failed to process id for $s"
+				myresult=FAIL
+			fi
+		fi
+
+		if [ $myresult != "FAIL" ] ; then
+
 			message "Original PID for $s was $OPID"
 			ssh root@$FULLHOSTNAME "kill $OPID"
 			if [ $? -ne 0 ] ; then
@@ -165,6 +193,7 @@ sssd_service_002()
 		fi
 	done
   done
+
   tet_result $myresult
   message "END $tet_thistest"
 }
@@ -204,7 +233,7 @@ sssd_service_004()
         eval_vars $c
 	ssh root@$FULLHOSTNAME "service sssd start"
 	sleep 2
-        SERVICES="sssd_dp sssd_nss sssd_pam"
+        SERVICES="sssd_nss sssd_pam"
         PID=`ssh root@$FULLHOSTNAME "cat /var/run/sssd.pid 2>&1"`
         if [ $? -ne 0 ] ; then
         	message "ERROR: Failed to get process id for monitor from pid file"

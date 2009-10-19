@@ -11,7 +11,8 @@ fi
 ######################################################################
 #  Test Case List
 #####################################################################
-iclist="ic1 ic2 ic3 ic4 ic5 ic6 ic7"
+#iclist="ic1 ic2 ic3 ic4 ic5 ic6 ic7"
+iclist="ic7"
 ic1="sssd_multi_001 sssd_multi_002 sssd_multi_003 sssd_multi_004 sssd_multi_005 sssd_multi_006 sssd_multi_007 sssd_multi_008"
 ic2="sssd_multi_009 sssd_multi_010 sssd_multi_011 sssd_multi_012 sssd_multi_013 sssd_multi_014 sssd_multi_015 sssd_multi_016"
 ic3="sssd_multi_017"
@@ -260,7 +261,7 @@ sssd_multi_004()
         message "START $tet_thistest: Attempt to modify LDAP Domain Users - LDAP PROXY and LOCAL"
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 
-        EXPMSG="Could not modify user - check if user names are correct"
+        EXPMSG="Cannot find user in local domain, modifying users is allowed only in local domain"
         for c in $CLIENTS ; do
 		eval_vars $c
                 message "Working on $FULLHOSTNAME"
@@ -289,7 +290,7 @@ sssd_multi_005()
         message "START $tet_thistest: Attempt to delete LDAP Domain User - LDAP PROXY and LOCAL"
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 
-	EXPMSG="The selected UID is outside the allowed range"
+	EXPMSG="No such user in local domain. Removing users only allowed in local domain."
         for c in $CLIENTS ; do
 		eval_vars $c
                 message "Working on $FULLHOSTNAME"
@@ -318,7 +319,7 @@ sssd_multi_006()
         message "START $tet_thistest: Attempt to modify LDAP Domain Groups - LDAP PROXY and LOCAL"
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 
-	EXPMSG="Could not modify group - check if member group names are correct"
+	EXPMSG="Cannot find group in local domain, modifying groups is allowed only in local domain"
         for c in $CLIENTS ; do
 		eval_vars $c
                 message "Working on $FULLHOSTNAME"
@@ -346,7 +347,7 @@ sssd_multi_007()
         message "START $tet_thistest: Attempt to delete LDAP Domain Group - LDAP PROXY and LOCAL"
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 
-	EXPMSG="No such group"
+	EXPMSG="No such group in local domain. Removing groups only allowed in local domain."
         for c in $CLIENTS ; do
 		eval_vars $c
                 message "Working on $FULLHOSTNAME"
@@ -375,13 +376,13 @@ sssd_multi_008()
         message "START $tet_thistest: Attempt to LOCAL User to LDAP Domain Group - LDAP PROXY and LOCAL"
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 
-        EXPMSG="Unsupported domain type"
+        EXPMSG="Cannot find group Group1 in local domain, only groups in local domain are allowed"
         for c in $CLIENTS ; do
 		eval_vars $c
                 message "Working on $FULLHOSTNAME"
 		# add a user to the local sssd database
 		ssh root@$FULLHOSTNAME "sss_useradd myuser"
-                MSG=`ssh root@$FULLHOSTNAME "sss_usermod -g 1010 myuser 2>&1"`
+                MSG=`ssh root@$FULLHOSTNAME "sss_usermod -a Group1 myuser 2>&1"`
                 if [ $? -eq 0 ] ; then
                         message "ERROR: Adding LOCAL user to LDAP Domain group was successful."
                         myresult=FAIL
@@ -605,7 +606,7 @@ sssd_multi_012()
         message "START $tet_thistest: Attempt to modify LDAP Domain Users - LDAP and LOCAL - FQN"
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 
-        EXPMSG="The selected UID is outside the allowed range"
+        EXPMSG="Invalid domain specified in FQDN"
         for c in $CLIENTS ; do
 		eval_vars $c
                 message "Working on $FULLHOSTNAME"
@@ -634,7 +635,7 @@ sssd_multi_013()
         message "START $tet_thistest: Attempt to delete LDAP Domain User - LDAP and LOCAL - FQN"
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 
-        EXPMSG="The selected UID is outside the allowed range"
+        EXPMSG="Invalid domain specified in FQDN"
         for c in $CLIENTS ; do
 		eval_vars $c
                 message "Working on $FULLHOSTNAME"
@@ -664,7 +665,7 @@ sssd_multi_014()
         message "START $tet_thistest: Attempt to modify LDAP Domain Groups - LDAP and LOCAL - FQN"
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 
-        EXPMSG="The selected GID is outside the allowed range"
+        EXPMSG="Invalid domain specified in FQDN"
         for c in $CLIENTS ; do
 		eval_vars $c
                 message "Working on $FULLHOSTNAME"
@@ -693,7 +694,7 @@ sssd_multi_015()
         message "START $tet_thistest: Attempt to delete LDAP Domain Group - LDAP and LOCAL - FQN"
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 
-        EXPMSG="Unsupported domain type"
+        EXPMSG="Invalid domain specified in FQDN"
         for c in $CLIENTS ; do
 		eval_vars $c
                 message "Working on $FULLHOSTNAME"
@@ -723,13 +724,13 @@ sssd_multi_016()
         message "START $tet_thistest: Attempt to add LOCAL User to LDAP Domain Group - LDAP and LOCAL"
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
 
-        EXPMSG="Unsupported domain type"
+        EXPMSG="Cannot find group Group1 in local domain, only groups in local domain are allowed"
         for c in $CLIENTS ; do
 		eval_vars $c
                 message "Working on $FULLHOSTNAME"
                 # add a user to the local sssd database
                 ssh root@$FULLHOSTNAME "sss_useradd myuser"
-                MSG=`ssh root@$FULLHOSTNAME "sss_usermod -g 1001 myuser 2>&1"`
+                MSG=`ssh root@$FULLHOSTNAME "sss_usermod -a Group1 myuser 2>&1"`
                 if [ $? -eq 0 ] ; then
                         message "ERROR: Adding LOCAL user to LDAP Domain group was successful."
                         myresult=FAIL
@@ -1438,7 +1439,7 @@ sssd_multi_032()
         for c in $CLIENTS ; do
 		eval_vars $c
                 message "Working on $FULLHOSTNAME"
-                MSG=`ssh root@$FULLHOSTNAME sss_usermod -g 2010 puser1 2>&1`
+                MSG=`ssh root@$FULLHOSTNAME sss_usermod -a Group1@BOS.REDHAT.COM puser1@EXAMPLE.COM 2>&1`
                         if [ $? -eq 0 ] ; then
                                 message "ERROR: Adding LDAP user to Group in Different LDAP Domain was successful."
 				message "Trac issue 164"

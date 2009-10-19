@@ -11,8 +11,7 @@ fi
 ######################################################################
 #  Test Case List
 #####################################################################
-#iclist="ic1 ic2 ic3 ic4 ic5"
-iclist="ic5"
+iclist="ic1 ic2 ic3 ic4 ic5"
 ic1="sssd_001 sssd_002 sssd_003 sssd_004 sssd_005 sssd_006 sssd_007 sssd_008 sssd_009 sssd_010 sssd_011 sssd_012 sssd_013 sssd_014 sssd_015 sssd_016 sssd_017 sssd_018 sssd_019 sssd_020 sssd_021 sssd_022 sssd_023 sssd_024 sssd_025 sssd_026 sssd_027 sssd_028"
 ic2="sssd_029 sssd_030 sssd_031 sssd_032 sssd_033 sssd_034 sssd_035"
 ic3="sssd_036 sssd_037"
@@ -273,7 +272,7 @@ sssd_008()
         myresult=PASS
         message "START $tet_thistest: Add Duplicate Local User"
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	EXPMSG="A user with the same name or UID already exists"
+	EXPMSG="A user or group with the same name or ID already exists"
         for c in $CLIENTS ; do
 		eval_vars $c
                 message "Working on $FULLHOSTNAME"
@@ -300,7 +299,7 @@ sssd_009()
         myresult=PASS
         message "START $tet_thistest: Add Duplicate Local uidNumber"
         if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-        EXPMSG="A user with the same name or UID already exists"
+        EXPMSG="A user or group with the same name or ID already exists"
         for c in $CLIENTS ; do
 		eval_vars $c
                 message "Working on $FULLHOSTNAME"
@@ -333,7 +332,7 @@ sssd_010()
         for c in $CLIENTS ; do
 		eval_vars $c
                 message "Working on $FULLHOSTNAME"
-		EXPMSG="Could not modify user - check if group names are correct"
+		EXPMSG="Cannot find user in local domain, modifying users is allowed only in local domain"
                 MSG=`ssh root@$FULLHOSTNAME "sss_usermod -c \"User Thousand\" myuser 2>&1"`
                 if [ $? -ne 1 ] ; then
                         message "ERROR: Modifying LOCAL user that doesn't exist.  Unexpected return code. Expected: 1  Got: $?"
@@ -362,7 +361,7 @@ sssd_011()
         for c in $CLIENTS ; do
 		eval_vars $c
                 message "Working on $FULLHOSTNAME"
-		EXPMSG="No such user"
+		EXPMSG="No such user in local domain. Removing users only allowed in local domain."
                 MSG=`ssh root@$FULLHOSTNAME "sss_userdel user1001 2>&1"`
                 if [ $? -ne 1 ] ; then
                         message "ERROR: Deleting LOCAL user that doesn't exist.  Unexpected return code. Expected: 1  Got: $?"
@@ -391,7 +390,7 @@ sssd_012()
         for c in $CLIENTS ; do
 		eval_vars $c
                 message "Working on $FULLHOSTNAME"
-		EXPMSG="Could not modify user - check if group names are correct"
+		EXPMSG="Cannot find group mygroup in local domain, only groups in local domain are allowed"
                 MSG=`ssh root@$FULLHOSTNAME "sss_usermod -a mygroup user1000 2>&1"`
                 if [ $? -ne 1 ] ; then
                         message "ERROR: Adding LOCAL user to group that doesn't exist.  Unexpected return code. Expected: 1  Got: $?"
@@ -652,7 +651,7 @@ sssd_021()
         for c in $CLIENTS ; do
 		eval_vars $c
                 message "Working on $FULLHOSTNAME"
-                EXPMSG="Could not modify group - check if member group names are correct"
+                EXPMSG="Cannot find group in local domain, modifying groups is allowed only in local domain"
                 MSG=`ssh root@$FULLHOSTNAME "sss_groupmod -a mygroup group1009 2>&1"`
                 if [ $? -ne 1 ] ; then
                         message "ERROR: Adding non-existing group to LOCAL group.  Unexpected return code. Expected: 1  Got: $?"
@@ -679,7 +678,7 @@ sssd_022()
         for c in $CLIENTS ; do
 		eval_vars $c
                 message "Working on $FULLHOSTNAME"
-                EXPMSG="Could not modify user - check if group names are correct"
+                EXPMSG="Cannot find user in local domain, modifying users is allowed only in local domain"
                 MSG=`ssh root@$FULLHOSTNAME "sss_usermod -a group1009 myuser 2>&1"`
                 if [ $? -ne 1 ] ; then
                         message "ERROR: Adding non-existing user to LOCAL group.  Unexpected return code. Expected: 1  Got: $?"
@@ -874,7 +873,7 @@ sssd_027()
         for c in $CLIENTS ; do
 		eval_vars $c
                 message "Working on $FULLHOSTNAME"
-                EXPMSG="Could not modify group - check if member group names are correct"
+                EXPMSG="Cannot find group in local domain, modifying groups is allowed only in local domain"
                 MSG=`ssh root@$FULLHOSTNAME "sss_groupmod -a group1009 mygroup 2>&1"`
                 if [ $? -ne 1 ] ; then
                         message "ERROR: Modifying LOCAL group that doesn't exist.  Unexpected return code. Expected: 1  Got: $?"
@@ -901,7 +900,7 @@ sssd_028()
         for c in $CLIENTS ; do
 		eval_vars $c
                 message "Working on $FULLHOSTNAME"
-                EXPMSG="No such group"
+                EXPMSG="No such group in local domain. Removing groups only allowed in local domain."
                 MSG=`ssh root@$FULLHOSTNAME "sss_groupdel mygroup 2>&1"`
                 if [ $? -ne 1 ] ; then
                         message "ERROR: Deleting LOCAL group that doesn't exist.  Unexpected return code. Expected: 1  Got: $?"
@@ -1794,10 +1793,10 @@ sssd_050()
 		expect $HOMEDIR/expect/ssh_deny.exp user1000@LOCAL $FULLHOSTNAME ihavenopassword > $TET_TMP_DIR/expect-ssh-nopasswd-out.txt
 		cat $TET_TMP_DIR/expect-ssh-nopasswd-out.txt | grep "Permission denied"
 		if [ $? -ne 0 ] ; then
-			message "ERROR: User without password did not get permission denied.  See $TET_TMP_DIR/expect-ssh-nopasswd-out.txt for details!"
+			message "ERROR: User without password successfully authenticated to client.  See $TET_TMP_DIR/expect-ssh-nopasswd-out.txt for details!"
 			myresult=FAIL
 		else
-			message "User without password assigned failed authentication - Permission denied."
+			message "User without password assigned failed authentication."
 			# now check for failure message in /var/log/secure
 			ssh root@$FULLHOSTNAME "cat /var/log/secure | grep \"authentication failure\""
 			if [ $? -ne 0 ] ; then
@@ -1840,8 +1839,8 @@ sssd_051()
         	ssh root@$FULLHOSTNAME '/usr/bin/expect /tmp/SetUserPassword.exp > /tmp/SetUserPassword-output.txt'
 		
                 expect $HOMEDIR/expect/ssh.exp user1000@LOCAL $FULLHOSTNAME onLine4now > $TET_TMP_DIR/expect-ssh-success-out.txt
-		cat $TET_TMP_DIR/expect-ssh-success-out.txt | grep "Permission denied"
-                if [ $? -eq 0 ] ; then
+		cat $TET_TMP_DIR/expect-ssh-success-out.txt | grep "$"
+                if [ $? -ne 0 ] ; then
 			echo $?
                         message "ERROR: User with password assigned failed authentication!"
                         myresult=FAIL
@@ -1869,7 +1868,7 @@ sssd_052()
 		cat $TET_TMP_DIR/expect-ssh-badpasswd-out.txt | grep "Permission denied"
                 if [ $? -ne 0 ] ; then
 			echo $?
-                        message "ERROR: User authentication with incorrect password did not get permission denied.  Please see $TET_TMP_DIR/expect-ssh-badpasswd-out.txt for details!"
+                        message "ERROR: User authentication with incorrect password was successful.  Please see $TET_TMP_DIR/expect-ssh-badpasswd-out.txt for details!"
                         myresult=FAIL
                 else
                         message "User authentication with incorrect password assigned failed authentication."
@@ -1983,15 +1982,14 @@ sssd_054()
                         message "ERROR: Failed to add LOCAL group"
                         myresult=FAIL
 		else
-                	ssh root@$FULLHOSTNAME "sss_useradd -u 2000 user2000"
-                	if [ $? -ne 0 ] ; then
-                        	message "ERROR: Failed to add LOCAL users."
+			EXPMSG="A user or group with the same name or ID already exists"
+                	ERR=`ssh root@$FULLHOSTNAME "sss_useradd -u 2000 user2000 2>&1"`
+			if [ "$EXPMSG" != "$ERR" ] ; then
+                        	message "ERROR: Unexpected error message. Expected: $EXPMSG Got: $ERR"
                         	myresult=FAIL
-				# Get the error message - trac issue 214
-		                MSG=`ssh root@$FULLHOSTNAME "sss_useradd -u 2000 user2000 2>&1"`
-				message "Trac issue 214"
-				message "ERROR MSG: $MSG"
-                	fi
+			else
+				message "Error message as expected: $ERR"
+			fi
 		fi
 	
 		# cleanup
@@ -2015,7 +2013,7 @@ sssd_055()
 		ssh root@$FULLHOSTNAME "/usr/sbin/useradd myuser"
 		expect $HOMEDIR/expect/setpwd.exp myuser $FULLHOSTNAME online4now
 		
-		COMMAND="sss_useradd test"
+		COMMAND="/usr/sbin/sss_useradd test"
 		ERRMSG="sss_useradd must be run as root"
 		expect $HOMEDIR/expect/execute.exp myuser $FULLHOSTNAME online4now "$COMMAND" > $TET_TMP_DIR/sss_useradd.exp.out
 		cat $TET_TMP_DIR/sss_useradd.exp.out | grep "$ERRMSG"
