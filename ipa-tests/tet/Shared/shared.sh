@@ -589,7 +589,7 @@ setup_local_ssh_keys()
 	rm -f ~/.ssh/id_dsa*
 	message "creating expect file"
 	echo '#!/usr/bin/expect -f
-set timeout 10
+set timeout 30
 spawn $env(SHELL)
 #match_max 100000
 send "ssh-keygen -t dsa\r"
@@ -636,7 +636,7 @@ setup_ssh_keys_remote()
 	cat $TET_TMP_DIR/know-hosts > ~/.ssh/known_hosts
 	message "creating expect file"
 	echo '#!/usr/bin/expect -f
-set timeout 10
+set timeout 30
 set send_slow {1 .1}
 spawn $env(SHELL)
 match_max 100000' > $TET_TMP_DIR/setup-ssh-remote.exp
@@ -657,7 +657,7 @@ send -s -- "\r"' >> $TET_TMP_DIR/setup-ssh-remote.exp
 	message "Creating /root/.ssh dir on $FULLHOSTNAME"
 	message "creating expect file"
 	echo '#!/usr/bin/expect -f
-set timeout 10
+set timeout 30
 set send_slow {1 .1}
 spawn $env(SHELL)
 match_max 100000' > $TET_TMP_DIR/setup-ssh-remote2.exp
@@ -675,7 +675,7 @@ sleep .1' >> $TET_TMP_DIR/setup-ssh-remote2.exp
 	message "Great, now copy the ssh keys over to the remote host"
 	message "creating expect file"
 	echo '#!/usr/bin/expect -f
-set timeout 10
+set timeout 30
 set send_slow {1 .1}
 spawn $env(SHELL)
 match_max 100000' > $TET_TMP_DIR/setup-ssh-remote3.exp
