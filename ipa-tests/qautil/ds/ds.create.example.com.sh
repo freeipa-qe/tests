@@ -104,7 +104,7 @@ dn: $BASEDN
 objectClass: top
 objectClass: domain
 dc: $DB
-# above "dc: $DB <-- it is just because DB value is "example", part of BASEDN, 
+# about above "dc: $DB" <-- it is just because DB value is "example", part of BASEDN, 
 
 dn: ou=people,$BASEDN
 objectClass: top
@@ -125,3 +125,6 @@ sn: 001
 cn: test 001
 mail: t001@example.com
 EOF
+
+echo "verify the success"
+$LDAPSEARCH -x -h $HOST -p $PORT -D "$CN" -w "$PW" -s sub -b "$BASEDN" "" "*"
