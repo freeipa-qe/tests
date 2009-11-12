@@ -811,41 +811,10 @@ InstallServerRPM()
 		echo "Returning"
 		return 0
 	fi
-	#ssh root@$FULLHOSTNAME 'for i in `echo redhat-ds-base ipa-server ipa-admintools bind caching-nameserver krb5-workstation ipa-client ipa-server-selinux ipa-admintools bind-dyndb-ldap ipa-client redhat-ds-base-devel fedora-ds-base fedora-ds-base-devel ipa-python`; do rpm -ev --nodeps $i; done'
 	ssh root@$FULLHOSTNAME "/usr/bin/yum clean all"
-#	pkglistA="TurboGears cyrus-sasl-gssapi fedora-ds-base krb5-server krb5-server-ldap lm_sensors mod_python mozldap mozldap-tools perl-Mozilla-LDAP postgresql-libs python-cheetah python-cherrypy python-configobj python-decoratortools python-elixir python-formencode python-genshi python-json python-kerberos python-kid python-krbV python-nose python-paste python-paste-deploy python-paste-script python-protocols python-psycopg2 python-pyasn1 python-ruledispatch python-setuptools python-simplejson python-sqlalchemy python-sqlite2 python-sqlobject python-tgexpandingformwidget python-tgfastdata python-turbocheetah python-turbojson python-turbokid svrcore tcl Updating bind-libs bind-utils cyrus-sasl cyrus-sasl-devel cyrus-sasl-lib cyrus-sasl-md5 cyrus-sasl-plain krb5-devel krb5-libs bind caching-nameserver expect krb5-workstation"
-#	ssh root@$FULLHOSTNAME "/etc/init.d/yum-updatesd stop; killall yum; killall yum-updatesd-helper; sleep 1; killall -9 yum;rpm -e --allmatches krb5-devel;yum -y install $pkglistA"
-#	ret=$?
-#	if [ $ret -ne 0 ]; then
-#		echo "That rpm install didn't work, lets try that again. Sleeping for 60 seconds first" 
-#		sleep 60
-#		ssh root@$FULLHOSTNAME "/etc/init.d/yum-updatesd stop; killall yum; killall yum-updatesd-helper; sleep 1; killall -9 yum;/usr/bin/yum clean all;yum -y install $pkglistA"
-#		ret=$?
-#		if [ $ret -ne 0 ]; then
-#			echo "ERROR - install of $pkglistA on $FULLHOSTNAME failed"
-#			return 1
-#		fi
-#	fi	
 
-#	ssh root@$FULLHOSTNAME "yum -y update TurboGears cyrus-sasl-gssapi fedora-ds-base krb5-server krb5-server-ldap lm_sensors mod_python mozldap mozldap-tools perl-Mozilla-LDAP postgresql-libs python-cheetah python-cherrypy python-configobj python-decoratortools python-elixir python-formencode python-genshi python-json python-kerberos python-kid python-krbV python-nose python-paste python-paste-deploy python-paste-script python-protocols python-psycopg2 python-pyasn1 python-ruledispatch python-setuptools python-simplejson python-sqlalchemy python-sqlite2 python-sqlobject python-tgexpandingformwidget python-tgfastdata python-turbocheetah python-turbojson python-turbokid svrcore tcl Updating bind-libs bind-utils cyrus-sasl cyrus-sasl-devel cyrus-sasl-lib cyrus-sasl-md5 cyrus-sasl-plain krb5-devel krb5-libs"
-#	ret=$?
-#	if [ $ret -ne 0 ]; then
-#		echo "ERROR - ssh to $FULLHOSTNAME failed"
-##		return 1
-#	fi	
-
-	# Checking to ensure that expect is installed
-#	ssh root@$FULLHOSTNAME 'ls /usr/bin/expect'
-#	if [ $? -ne 0 ]; then
-#		echo "ERROR - expect not found on $FULLHOSTNAME This could mean that the RPM install failed."
-#		return 1
-#	fi	
-
-#	ssh root@$FULLHOSTNAME 'find / | grep -v proc | grep -v dev > /list-before-ipa.txt'
-#	if [ $? -ne 0 ]; then
-#		echo "ERROR - ssh to $FULLHOSTNAME failed"
-#		return 1
-#	fi	
+	# Cleaning up yum log so that it can be used to record installed packages
+	ssh root@$FULLHOSTNAME "rm -f /var/log/yum.log"
 
 	pkglistB="ipa-server ipa-admintools bind caching-nameserver expect krb5-workstation bind-dyndb-ldap"
 	ssh root@$FULLHOSTNAME "yum -y install $pkglistB"
@@ -865,6 +834,14 @@ InstallServerRPM()
 			fi
 		fi
 	fi	
+
+	# Generating log file of packages installed for use with uninstall later
+	# First, create the file /etc/ipa-installed-list containg only "start"
+	# Then list all of the installed packages from /var/log/yum.log
+	# Place all of these packages on one line in /etc/ipa-installed-list 
+	# finally remove the remaining "start " from /etc/ipa-installed-list
+	ilist="/etc/ipa-installed-list"
+	ssh root@$FULLHOSTNAME "echo start > $ilist; cat /var/log/yum.log | grep Installed | awk '{print \$5}' | while read f; do sed -i s/^start/start\ \$f/g $ilist; done; sed -i s/^start\ //g $ilist"
 
 	# Back up bind config on M1
 	echo $1 | grep M1
@@ -950,7 +927,7 @@ UnInstallServerRPM()
 	# Restoring resolv.conf on server before continuing
 	ssh root@$FULLHOSTNAME "if [ -f /etc/resolv.conf.ipasave ]; then cat /etc/resolv.conf.ipasave > /etc/resolv.conf; fi"
 
-	ssh root@$FULLHOSTNAME 'for i in `echo redhat-ds-base ipa-server ipa-admintools bind caching-nameserver krb5-workstation ipa-client ipa-server-selinux ipa-admintools bind-dyndb-ldap ipa-client redhat-ds-base-devel fedora-ds-base fedora-ds-base-devel ipa-python`; do rpm -ev --nodeps $i; done'
+	ssh root@$FULLHOSTNAME 'yum -y erase  dirsec-nspr dirsec-nss-tools dirsec-nss svrcore perl-Mozilla-LDAP dirsec-jss ldapjdk redhat-ds mozldap mozldap-tols icu libicu redhat-ds-base ipa-server ipa-admintools bind caching-nameserver krb5-workstation ipa-client ipa-server-selinux ipa-admintools bind-dyndb-ldap ipa-client redhat-ds-base-devel fedora-ds-base fedora-ds-base-devel ipa-python'
 	if [ $? -ne 0 ]; then
 		echo "ERROR - ssh to $FULLHOSTNAME failed"
 		return 1
@@ -1044,6 +1021,10 @@ Cleanup()
 			ssh root@$FULLHOSTNAME "rm -Rf /etc/dirsrv/;rm -Rf /var/run/dirsrv/;"
 		fi
 	fi
+
+	# Cleanup any existing ds/ipa directories
+
+	ssh root@$FULLHOSTNAME "rm -Rf /etc/dirsrv/ /var/lib/dirsrv/ /usr/lib/dirsrv/ /var/run/dirsrv/ /var/log/dirsrv/ /usr/share/dirsrv/ /var/lock/dirsrv/;rm -Rf /etc/dirsrv/ /var/lib64/dirsrv/ /usr/lib64/dirsrv/ /var/run/dirsrv/ /var/log/dirsrv/"
 
 	return 0
 
