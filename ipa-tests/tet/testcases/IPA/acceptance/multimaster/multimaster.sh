@@ -133,7 +133,7 @@ tp4()
 					tet_result FAIL
 				fi
 				eval_vars M1
-				ssh root@$FULLHOSTNAME "ipa user-find --all usr$usernum-x | /bin/grep Last\ Name | /bin/grep testtesttestk$s"
+				ssh root@$FULLHOSTNAME "ipa user-find --all usr$usernum-x | /bin/grep sn | /bin/grep testtesttestk$s"
 				if [ $? -ne 0 ]; then
 					echo "ERROR - search for testtesttestk$s in usr$usernum-x on server $FULLHOSTNAME failed"
 					tet_result FAIL
@@ -156,7 +156,7 @@ tp4()
 						tet_result FAIL
 					fi
 					eval_vars M1
-					ssh root@$FULLHOSTNAME "ipa user-find --all usr$usernum-x | /bin/grep Last\ Name | /bin/grep testtesttestk$s"
+					ssh root@$FULLHOSTNAME "ipa user-find --all usr$usernum-x | /bin/grep sn | /bin/grep testtesttestk$s"
 					if [ $? -ne 0 ]; then
 						echo "ERROR - search for testtesttestk$s in usr$usernum-x on server $FULLHOSTNAME failed"
 						tet_result FAIL
