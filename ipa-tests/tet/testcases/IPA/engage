@@ -688,21 +688,6 @@ main_send_report()
 	fi
 	echo "  Is the Time Bomb set (yes/no)  : $TIMEBOMB"
 	echo "	Total Test Elapse time         : $ElapseStr"
-	if [ $RunInstall = y ] ; then
-		echo "Install log as follows:"
-		cat ${TET_TMP_DIR}/install_log.txt
-	fi
-	if [ $RunUnInstall = y ] ; then
-		echo 
-		echo 
-		echo
-		echo
-		echo "-----------------------------------------------------------------------"
-		echo 
-
-		echo " This is the Uninstall log"
-		cat ${TET_TMP_DIR}/uninstall_log.txt
-	fi
 
 	) > $MainReport.tmp 
 
@@ -776,10 +761,6 @@ main_default()
 	if [ -z "$DNSMASTER" ] ; then DNSMASTER="10.14.63.2"           ; fi
 	if [ -z "$NTPSERVER" ] ; then NTPSERVER="clock.redhat.com"; fi
 	if [ -z "$SetupSSHKeys" ]; then SetupSSHKeys="n"                   ; fi
-	if [ -z "$RunInstall" ]; then RunInstall="n"                   ; fi
-	if [ -z "$RunInstallShow" ]; then RunInstallShow="n"           ; fi
-	if [ -z "$RunUnInstall" ]; then RunUnInstall="n"               ; fi
-	if [ -z "$RunUnInstallShow" ]; then RunUnInstallShow="n"       ; fi
 	if [ -z "$ITTERATIONS" ]; then ITTERATIONS=10                  ; fi
 	if [ -z "$IPAVERSION" ]; then IPAVERSION='1.0'                 ; fi
 	if [ -z "$VER" ]
@@ -881,7 +862,7 @@ main_default()
 	export ROOTDN ROOTDNPW TETADMINPW DRIVE IPAVERSION
 	export IGNORE_KNOWN_BUGS DSTET_64 DSTET_DEBUG PkgName
 
-	export MainLongDurationTests MainRunStartup MainRunTests MainRunCleanup MainGuiTests MainMailTo MainAcceptanceTests MainReliabTests MainStressTests MainPerformanceTests MainFunctionalTestNIS RunInstall RunInstallShow RunInstall RunInstallShow SetupSSHKeys WebServer
+	export MainLongDurationTests MainRunStartup MainRunTests MainRunCleanup MainGuiTests MainMailTo MainAcceptanceTests MainReliabTests MainStressTests MainPerformanceTests MainFunctionalTestNIS SetupSSHKeys WebServer
 }
 
 # This function will ask the user for more information/choices if needed
@@ -1762,47 +1743,6 @@ main_ask()
 		esac
 
         echo
-        echo " Run Install on all Servers and Clients before test run?"
-
-		sav_RunInstall=$RunInstall
-		echo "        Install IPA First [$RunInstall] ? \c"
-		read rsp
-		case $rsp in
-			"")	RunInstall=$sav_RunInstall	;;
-			y|Y)	RunInstall=y			;;
-			*)	RunInstall=n			;;
-		esac
-		if [ $RunInstall = y ]; then
-			sav_RunInstallShow=$RunInstallShow
-			echo "            Would you like to watch the install process at the console [$RunInstallShow] ? \c"
-			read rsp
-			case $rsp in
-				"")	RunInstallShow=$sav_RunInstallShow	;;
-				y|Y)	RunInstallShow=y			;;
-				*)	RunInstallShow=n			;;
-			esac
-		fi
-
-		sav_RunUnInstall=$RunUnInstall
-		echo "        UnInstall IPA after everything is complete [$RunUnInstall] ? \c"
-		read rsp
-		case $rsp in
-			"")	RunUnInstall=$sav_RunUnInstall	;;
-			y|Y)	RunUnInstall=y			;;
-			*)	RunUnInstall=n			;;
-		esac
-		if [ $RunUnInstall = y ]; then
-			sav_RunUnInstallShow=$RunUnInstallShow
-			echo "            Would you like to watch the uninstall process at the console [$RunUnInstallShow] ? \c"
-			read rsp
-			case $rsp in
-				"")	RunUnInstallShow=$sav_RunUnInstallShow	;;
-				y|Y)	RunUnInstallShow=y			;;
-				*)	RunUnInstallShow=n			;;
-			esac
-		fi
-
-        echo
         echo "    Mail Reports....."
 
 	sav_MainMailTo=$MainMailTo
@@ -1813,7 +1753,7 @@ main_ask()
 
         main_backendask
 
-	export MainRunTests MainRunCleanup MainRunStartup SERVERS CLIENTS NUMSERVERS NUMCLIENTS DNSMASTER RunInstall RunInstallShow RunInstall RunInstallShow NTPSERVER IPAVERSION SetupSSHKeys WebServer
+	export MainRunTests MainRunCleanup MainRunStartup SERVERS CLIENTS NUMSERVERS NUMCLIENTS DNSMASTER NTPSERVER IPAVERSION SetupSSHKeys WebServer
 }
 
 # This function will print the user's choices (aka variables)
@@ -1895,10 +1835,6 @@ main_print()
     echo "    Debugging Output (Verbose)     : $DSTET_DEBUG"
 	echo ""
 	echo " Setup SSH keys on all Servers and Clinets? : $SetupSSHKeys"
-	echo " Install all Servers and Clients at startup : $RunInstall"
-	echo "                         Watch the install? : $RunInstallShow"
-	echo " UnInstall all Servers and Clients after run: $RunUnInstall"
-	echo "                       Watch the uninstall? : $RunUnInstallShow"
 
 
 }
@@ -1926,10 +1862,6 @@ main_save()
 	echo "WebServer=\"$WebServer\""
 	echo "IPAVERSION=$IPAVERSION"
 	echo "SetupSSHKeys=$SetupSSHKeys"
-	echo "RunInstall=$RunInstall"
-	echo "RunInstallShow=$RunInstallShow"
-	echo "RunUnInstall=$RunUnInstall"
-	echo "RunUnInstallShow=$RunUnInstallShow"
 	echo "ITTERATIONS=$ITTERATIONS"
 	if [ ! -z "$DOMAINNAME" ]; then
 	    echo "DOMAINNAME=$DOMAINNAME"
@@ -2255,31 +2187,6 @@ main_run()
     echo "########### when completed."
     echo
 
-    # Now install IPA onto the machines if the option is set
-    if [ $RunInstall = y ] || [ $RunInstall = Y ]; then 
-       echo "Installing IPA on all servers now";
-       rm -f cat ${TET_TMP_DIR}/install_log.txt
-       if [ $DSTET_DEBUG = y ] || [ $RunInstallShow = y ] || [ $RunInstallShow = Y ]; then
-           sh $TET_ROOT/Shared/Full_Install | tee ${TET_TMP_DIR}/install_log.txt
-           ret=$?
-           if [ $ret != 0 ]; then
-              echo ""
-              echo "ERROR - install failed."
-              echo ""
-              sleep 10
-           fi
-       else
-           sh $TET_ROOT/Shared/Full_Install > ${TET_TMP_DIR}/install_log.txt
-           ret=$?
-           if [ $ret != 0 ]; then
-              echo ""
-              echo "ERROR - install failed."
-              echo ""
-              sleep 10
-           fi
-       fi
-    fi
-
     if [ $MainReliabTests = y ] ; then
 	TET_SUITE_ROOT=$mainRunBaseDir/reliability; export TET_SUITE_ROOT
 	reliability_run
@@ -2313,30 +2220,6 @@ main_run()
     if [ $MainFunctionalTestNIS = y ] ; then
 	TET_SUITE_ROOT=$mainRunBaseDir/functioinal/nis-plugin ; export TET_SUITE_ROOT
 	nis_run
-    fi
-
-    if [ $RunUnInstall = y ] ; then 
-       echo "UnInstalling IPA on all servers now";
-       rm -f cat ${TET_TMP_DIR}/uninstall_log.txt
-       if [ $DSTET_DEBUG = y ] || [ $RunUnInstallShow = y ]; then
-           sh $TET_ROOT/Shared/Full_Uninstall.sh | tee ${TET_TMP_DIR}/uninstall_log.txt
-           ret=$?
-           if [ $ret != 0 ]; then
-              echo ""
-              echo "ERROR - uninstall failed."
-              echo ""
-              sleep 10
-           fi
-       else
-           sh $TET_ROOT/Shared/Full_UnInstall > ${TET_TMP_DIR}/uninstall_log.txt
-           ret=$?
-           if [ $ret != 0 ]; then
-              echo ""
-              echo "ERROR - uninstall failed."
-              echo ""
-              sleep 10
-           fi
-       fi
     fi
 
 }
