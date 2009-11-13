@@ -103,7 +103,7 @@ addusersetup()
 	for s in $SERVERS; do
 		if [ "$s" != "" ]; then
 			eval_vars $s
-			ssh root@$FULLHOSTNAME "ipa user-find $superuser | grep uid | grep $superuser"
+			ssh root@$FULLHOSTNAME "ipa user-find $superuser | grep id | grep $superuser"
 			if [ $? -ne 0 ]
 			then
 				message "ERROR - Search for created user failed on $FULLHOSTNAME"
@@ -306,7 +306,7 @@ addlockuser()
 	for s in $SERVERS; do
 		if [ "$s" != "" ]; then
 			eval_vars $s
-			ssh root@$FULLHOSTNAME "ipa user-find $lusr | grep uid | grep $lusr"
+			ssh root@$FULLHOSTNAME "ipa user-find $lusr | grep id | grep $lusr"
 			if [ $? -ne 0 ]
 			then
 				message "ERROR - Search for created user failed on $FULLHOSTNAME"
@@ -435,7 +435,7 @@ addmoduser()
 		myresult=FAIL
 	fi
 
-	ssh root@$FULLHOSTNAME "ipa user-find $musr | grep uid | grep $musr"
+	ssh root@$FULLHOSTNAME "ipa user-find $musr | grep id | grep $musr"
 	if [ $? -ne 0 ]
 	then
 		message "ERROR - Search for created user failed on $FULLHOSTNAME"
