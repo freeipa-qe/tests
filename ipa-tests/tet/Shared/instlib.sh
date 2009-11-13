@@ -927,7 +927,18 @@ UnInstallServerRPM()
 	# Restoring resolv.conf on server before continuing
 	ssh root@$FULLHOSTNAME "if [ -f /etc/resolv.conf.ipasave ]; then cat /etc/resolv.conf.ipasave > /etc/resolv.conf; fi"
 
-	ssh root@$FULLHOSTNAME 'yum -y erase  dirsec-nspr dirsec-nss-tools dirsec-nss svrcore perl-Mozilla-LDAP dirsec-jss ldapjdk redhat-ds mozldap mozldap-tols icu libicu redhat-ds-base ipa-server ipa-admintools bind caching-nameserver krb5-workstation ipa-client ipa-server-selinux ipa-admintools bind-dyndb-ldap ipa-client redhat-ds-base-devel fedora-ds-base fedora-ds-base-devel ipa-python'
+	# Removing packages that were installed during the install process
+	ilist="/etc/ipa-installed-list"
+	ssh root@$FULLHOSTNAME "unlist=\$(cat $ilist);yum -y erase \$unlist"
+	if [ $? -ne 0 ]; then
+		echo "ERROR - uninstall of installed packages list failed. Falling back to shotgun approach"
+		ssh root@$FULLHOSTNAME 'yum -y erase  dirsec-nspr dirsec-nss-tools dirsec-nss svrcore perl-Mozilla-LDAP dirsec-jss ldapjdk redhat-ds mozldap mozldap-tols icu libicu redhat-ds-base ipa-server ipa-admintools bind caching-nameserver krb5-workstation ipa-client ipa-server-selinux ipa-admintools bind-dyndb-ldap ipa-client redhat-ds-base-devel fedora-ds-base fedora-ds-base-devel ipa-python'
+		if [ $? -ne 0 ]; then
+			echo "ERROR - erasing of packages failed in several ways."
+			tet_result FAIL
+			return 1
+		fi
+	fi
 	if [ $? -ne 0 ]; then
 		echo "ERROR - ssh to $FULLHOSTNAME failed"
 		return 1
@@ -1023,8 +1034,8 @@ Cleanup()
 	fi
 
 	# Cleanup any existing ds/ipa directories
-
-	ssh root@$FULLHOSTNAME "rm -Rf /etc/dirsrv/ /var/lib/dirsrv/ /usr/lib/dirsrv/ /var/run/dirsrv/ /var/log/dirsrv/ /usr/share/dirsrv/ /var/lock/dirsrv/;rm -Rf /etc/dirsrv/ /var/lib64/dirsrv/ /usr/lib64/dirsrv/ /var/run/dirsrv/ /var/log/dirsrv/"
+	ilist="/etc/ipa-installed-list"
+	ssh root@$FULLHOSTNAME "tar cvfz /var/log/ipa-backup.tar.gz /var/log/ipa; rm -Rf /etc/ipa /root/ipa /etc/dirsrv/ /var/lib/dirsrv/ /var/log/ipa /usr/lib/dirsrv/ /usr/share/ipa /var/cache/ipa /var/lib/ipa /var/run/dirsrv/ /var/log/dirsrv/ /usr/share/dirsrv/ /var/lock/dirsrv/ /etc/dirsrv/ /var/lib64/dirsrv/ /usr/lib64/dirsrv/ /var/run/dirsrv/ /var/log/dirsrv/; rm -f $ilist"
 
 	return 0
 
