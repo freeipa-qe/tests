@@ -122,16 +122,22 @@ quickinstall_run()
 		-e -s $TET_ROOT/testcases/IPA/acceptance/quickinstall/tet_scen \
 		-x $TET_ROOT/testcases/IPA/tetexecpl.cfg \
 		$TET_ROOT/testcases/IPA/acceptance/quickinstall \
-		install > $MainTmpDir/quickinstall.startup.out 2>&1
+		install > $MainTmpDir/quickinstall.run.out 2>&1
 	)&
 	EngageTimer $! 2200 120 # wait 2200 sec before kill, then 1200 until kill -9
 	echo ""
-	echo "quickinstall startup $MainTmpDir/quickinstall.startup.out"
+	echo "quickinstall run $MainTmpDir/quickinstall.run.out"
 	echo ""
-	cat $MainTmpDir/quickinstall.startup.out
+	cat $MainTmpDir/quickinstall.run.out
 	echo ""
-	main_analyze "quickinstall startup" `grep "tcc: journal file is" $MainTmpDir/quickinstall.startup.out | awk '{print $5}'` $MainTmpDir/quickinstall.startup.out
-	MainReportFiles="$MainReportFiles $MainTmpDir/quickinstall.startup.out"
+	main_analyze "quickinstall run" `grep "tcc: journal file is" $MainTmpDir/quickinstall.run.out | awk '{print $5}'` $MainTmpDir/quickinstall.run.out
+	grep "tet_result FAIL" $MainTmpDir/quickinstall.run.out
+	if [ $? -eq 0 ]; then
+		echo "Install failure detected. Placing abort file on M1"
+		eval_vars M1
+		ssh root@$FULLHOSTNAME "touch /ipa-install-failure"
+	fi
+	MainReportFiles="$MainReportFiles $MainTmpDir/quickinstall.run.out"
 
 	Gfile="$TET_TMP_DIR/global_src_`uname -n`"
 	rm -f $Gfile

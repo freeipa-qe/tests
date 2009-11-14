@@ -89,9 +89,9 @@ quickuninstall_run()
 		-e -s $TET_ROOT/testcases/IPA/acceptance/quickuninstall/tet_scen \
 		-x $TET_ROOT/testcases/IPA/tetexecpl.cfg \
 		$TET_ROOT/testcases/IPA/acceptance/quickuninstall \
-		uninstall > $MainTmpDir/quickuninstall.cleanup.out 2>&1
-	main_analyze "QuickUninstall cleanup" `grep "tcc: journal file is" $MainTmpDir/quickuninstall.cleanup.out | awk '{print $5}'` $MainTmpDir/quickuninstall.cleanup.out
-	MainReportFiles="$MainReportFiles $MainTmpDir/quickuninstall.cleanup.out"
+		uninstall > $MainTmpDir/quickuninstall.run.out 2>&1
+	main_analyze "QuickUninstall run" `grep "tcc: journal file is" $MainTmpDir/quickuninstall.run.out | awk '{print $5}'` $MainTmpDir/quickuninstall.run.out
+	MainReportFiles="$MainReportFiles $MainTmpDir/quickuninstall.run.out"
 }
 
 # This function will cleanup after the test suite execution
