@@ -232,7 +232,7 @@ tp2()
 		tet_result FAIL
 	fi
 	# Now, parse the output of the last SetUserPassword to ensure that it failed properly.
-	grep 'error' $TET_TMP_DIR/SetUserPassword-output.txt
+	grep -i 'error' $TET_TMP_DIR/SetUserPassword-output.txt
 	ret1=$?
 	grep 'Could not initialize' $TET_TMP_DIR/SetUserPassword-output.txt
 	if [ $? -eq 0 ]||[ $ret1 -ne 0 ]; then
@@ -278,7 +278,7 @@ tp2()
 		echo "Test - $tet_thistest"
 		tet_result FAIL
 	fi
-	grep 'Password Fails to meet minimum strength criteria' $TET_TMP_DIR/SetUserPassword-output.txt
+	grep -i 'Password Fails to meet minimum strength criteria' $TET_TMP_DIR/SetUserPassword-output.txt
 	if [ $? -ne 0 ]; then
 		echo "ERROR - change password didn't seem to fail in the way it should have"
 		echo "Test - $tet_thistest"
@@ -481,7 +481,7 @@ tp2b()
 	eval_vars M1
 	ssh root@$FULLHOSTNAME "ipa pwpolicy-mod --minlife=0"
 	# cleaning up the user
-	ssh root@$FULLHOSTNAME "ipa user-del=$user1"
+	ssh root@$FULLHOSTNAME "ipa user-del $user1"
 
 	SyncKpasswd
 	eval_vars M1
@@ -525,6 +525,7 @@ tp2c()
 	ssh root@$FULLHOSTNAME "ipa pwpolicy-mod --minlife=2160"
 	if [ $? -eq 0 ]; then
 		echo "ERROR - ipa pwpolicy-mod --minlife=2160 on $FULLHOSTNAME failed"
+		echo "ERROR - We tried to set min lifetime to a value higher that max lifetime. That should not work"
 		echo "Test - $tet_thistest"
 		echo "Possibly it failed because https://bugzilla.redhat.com/show_bug.cgi?id=461332 is still open?"
 		tet_result FAIL
