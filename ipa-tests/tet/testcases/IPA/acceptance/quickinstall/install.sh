@@ -19,46 +19,46 @@ ic9="tp9"
 resetdate()
 {
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	echo "START resetdate"
+	message "START resetdate"
 	for s in $CLIENTS; do
 		if [ "$s" != "" ]; then
-			if [ "$DSTET_DEBUG" = "y" ]; then echo "working on $s now"; fi
-			echo "working on $s now"
+			if [ "$DSTET_DEBUG" = "y" ]; then message "working on $s now"; fi
+			message "working on $s now"
 			set_date $s
 			ret=$?
 			if [ $ret -ne 0 ]; then
-				echo "set date on $s failed"
+				message "set date on $s failed"
 				tet_result FAIL
 			fi
-		if [ "$DSTET_DEBUG" = "y" ]; then echo "done working on $s"; fi
+		if [ "$DSTET_DEBUG" = "y" ]; then message "done working on $s"; fi
 		fi
 	done
 
 	for s in $SERVERS; do
 		if [ "$s" != "" ]; then
-			if [ "$DSTET_DEBUG" = "y" ]; then echo "working on $s now"; fi
-			echo "working on $s now"
+			if [ "$DSTET_DEBUG" = "y" ]; then message "working on $s now"; fi
+			message "working on $s now"
 			set_date $s
 			ret=$?
 			if [ $ret -ne 0 ]; then
-				echo "Setdate on $s failed"
+				message "Setdate on $s failed"
 				tet_result FAIL
 			fi
-		if [ "$DSTET_DEBUG" = "y" ]; then echo "done working on $s"; fi
+		if [ "$DSTET_DEBUG" = "y" ]; then message "done working on $s"; fi
 		fi
 	done
 
 	for s in $SERVERS; do
 		if [ "$s" != "" ]; then
-			if [ "$DSTET_DEBUG" = "y" ]; then echo "working on $s now"; fi
-			echo "working on $s now"
+			if [ "$DSTET_DEBUG" = "y" ]; then message "working on $s now"; fi
+			message "working on $s now"
 			setup_ssh_keys $s
 			ret=$?
 			if [ $ret -ne 0 ]; then
-				echo "Setup of $s ssh failed"
+				message "Setup of $s ssh failed"
 				tet_result FAIL
 			fi
-		if [ "$DSTET_DEBUG" = "y" ]; then echo "done working on $s"; fi
+		if [ "$DSTET_DEBUG" = "y" ]; then message "done working on $s"; fi
 		fi
 	done
 
@@ -68,32 +68,32 @@ resetdate()
 setupssh()
 {
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	echo "START setupssh"
-	echo "running ssh setup"
+	message "START setupssh"
+	message "running ssh setup"
 	for s in $SERVERS; do
 		if [ "$s" != "" ]; then
-			if [ "$DSTET_DEBUG" = "y" ]; then echo "working on $s now"; fi
-			echo "working on $s now"
+			if [ "$DSTET_DEBUG" = "y" ]; then message "working on $s now"; fi
+			message "working on $s now"
 			setup_ssh_keys $s
 			ret=$?
 			if [ $ret -ne 0 ]; then
-				echo "Setup of $s ssh failed"
+				message "Setup of $s ssh failed"
 				tet_result FAIL
 			fi
-		if [ "$DSTET_DEBUG" = "y" ]; then echo "done working on $s"; fi
+		if [ "$DSTET_DEBUG" = "y" ]; then message "done working on $s"; fi
 		fi
 	done
 	for s in $CLIENTS; do
 		if [ "$s" != "" ]; then
-			if [ "$DSTET_DEBUG" = "y" ]; then echo "working on $s now"; fi
-			echo "working on $s now"
+			if [ "$DSTET_DEBUG" = "y" ]; then message "working on $s now"; fi
+			message "working on $s now"
 			setup_ssh_keys $s
 			ret=$?
 			if [ $ret -ne 0 ]; then
-				echo "Setup of $s ssh failed"
+				message "Setup of $s ssh failed"
 				tet_result FAIL
 			fi
-		if [ "$DSTET_DEBUG" = "y" ]; then echo "done working on $s"; fi
+		if [ "$DSTET_DEBUG" = "y" ]; then message "done working on $s"; fi
 		fi
 	done
 
@@ -104,67 +104,67 @@ setupssh()
 tp1()
 {
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	echo "START $tet_thistest"
+	message "START $tet_thistest"
 	for s in $SERVERS; do
 		if [ "$s" != "" ]; then
-			if [ "$DSTET_DEBUG" = "y" ]; then echo "working on $s now"; fi
+			if [ "$DSTET_DEBUG" = "y" ]; then message "working on $s now"; fi
 			SetupRepo $s
 			ret=$?
 			if [ $ret -ne 0 ]; then
-				echo "Install of IPA repo on $s ssh failed"
+				message "Install of IPA repo on $s ssh failed"
 				tet_result FAIL
 			fi
-		if [ "$DSTET_DEBUG" = "y" ]; then echo "done working on $s"; fi
+		if [ "$DSTET_DEBUG" = "y" ]; then message "done working on $s"; fi
 		fi
 	done
 	for s in $CLIENTS; do
 		if [ "$s" != "" ]; then
-			if [ "$DSTET_DEBUG" = "y" ]; then echo "working on $s now"; fi
+			if [ "$DSTET_DEBUG" = "y" ]; then message "working on $s now"; fi
 			SetupRepo $s
 			ret=$?
 			if [ $ret -ne 0 ]; then
-				echo "Install of IPA repo on $s ssh failed"
+				message "Install of IPA repo on $s ssh failed"
 				tet_result FAIL
 			fi
-		if [ "$DSTET_DEBUG" = "y" ]; then echo "done working on $s"; fi
+		if [ "$DSTET_DEBUG" = "y" ]; then message "done working on $s"; fi
 		fi
 	done
 
 	tet_result PASS
-	echo "STOP $tet_thistest"
+	message "STOP $tet_thistest"
 }
 ######################################################################
 tp2()
 {
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	echo "START $tet_thistest"
+	message "START $tet_thistest"
 	for s in $SERVERS; do
 		if [ "$s" != "" ]; then
-			if [ "$DSTET_DEBUG" = "y" ]; then echo "working on $s now"; fi
+			if [ "$DSTET_DEBUG" = "y" ]; then message "working on $s now"; fi
 			InstallServerRPM $s
 			ret=$?
 			if [ $ret -ne 0 ]; then
-				echo "Install of server RPM on $s ssh failed"
+				message "Install of server RPM on $s ssh failed"
 				tet_result FAIL
 			fi
-			if [ "$DSTET_DEBUG" = "y" ]; then echo "done working on $s"; fi
+			if [ "$DSTET_DEBUG" = "y" ]; then message "done working on $s"; fi
 		fi
 	done
 	for s in $CLIENTS; do
 		if [ "$s" != "" ]; then
-			if [ "$DSTET_DEBUG" = "y" ]; then echo "working on $s now"; fi
+			if [ "$DSTET_DEBUG" = "y" ]; then message "working on $s now"; fi
 			InstallClientRPM $s
 			ret=$?
 			if [ $ret -ne 0 ]; then
-				echo "Install of server RPM on $s ssh failed"
+				message "Install of server RPM on $s ssh failed"
 				tet_result FAIL
 			fi
-			if [ "$DSTET_DEBUG" = "y" ]; then echo "done working on $s"; fi
+			if [ "$DSTET_DEBUG" = "y" ]; then message "done working on $s"; fi
 		fi
 	done
 
 	tet_result PASS
-	echo "STOP $tet_thistest"
+	message "STOP $tet_thistest"
 
 }
 ######################################################################
@@ -176,34 +176,34 @@ tp2()
 tp3()
 {
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	echo "START $tet_thistest"
+	message "START $tet_thistest"
 	for s in $SERVERS; do
 		if [ "$s" != "" ]; then
-			if [ "$DSTET_DEBUG" = "y" ]; then echo "working on $s now"; fi
+			if [ "$DSTET_DEBUG" = "y" ]; then message "working on $s now"; fi
 			SetupServerBogus $s
 			ret=$?
 			if [ $ret -ne 0 ]; then
-				echo "server-install of server on $s ssh failed"
+				message "server-install of server on $s ssh failed"
 				tet_result FAIL
 			fi
-			if [ "$DSTET_DEBUG" = "y" ]; then echo "done working on $s"; fi
+			if [ "$DSTET_DEBUG" = "y" ]; then message "done working on $s"; fi
 		fi
 	done
 	for s in $CLIENTS; do
 		if [ "$s" != "" ]; then
-			if [ "$DSTET_DEBUG" = "y" ]; then echo "working on $s now"; fi
+			if [ "$DSTET_DEBUG" = "y" ]; then message "working on $s now"; fi
 			SetupClientBogus $s
 			ret=$?
 			if [ $ret -ne 0 ]; then
-				echo "client-install of server on $s ssh failed"
+				message "client-install of server on $s ssh failed"
 				tet_result FAIL
 			fi
-			if [ "$DSTET_DEBUG" = "y" ]; then echo "done working on $s"; fi
+			if [ "$DSTET_DEBUG" = "y" ]; then message "done working on $s"; fi
 		fi
 	done
 
 	tet_result PASS
-	echo "STOP $tet_thistest"
+	message "STOP $tet_thistest"
 
 }
 ######################################################################
@@ -212,15 +212,15 @@ tp3()
 tp4()
 {
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	echo "START $tet_thistest"
+	message "START $tet_thistest"
 	for s in $SERVERS; do
 		if [ "$s" != "" ]; then
-			if [ "$DSTET_DEBUG" = "y" ]; then echo "working on $s now"; fi
-			echo "working on $s now"
+			if [ "$DSTET_DEBUG" = "y" ]; then message "working on $s now"; fi
+			message "working on $s now"
 			SetupServer $s
 			ret=$?
 			if [ $ret -ne 0 ]; then
-				echo "server-install of server on $s ssh failed"
+				message "server-install of server on $s ssh failed"
 				tet_result FAIL
 			fi
 	# This should be run as part of SetupServer
@@ -228,16 +228,16 @@ tp4()
 #				FixBindServer $s
 #				ret=$?
 #				if [ $ret -ne 0 ]; then
-#					echo "fix-bind-server on $s ssh failed"
+#					message "fix-bind-server on $s ssh failed"
 #					tet_result FAIL
 #				fi
 #			fi
-			if [ "$DSTET_DEBUG" = "y" ]; then echo "done working on $s"; fi
+			if [ "$DSTET_DEBUG" = "y" ]; then message "done working on $s"; fi
 		fi
 	done
 	
 	tet_result PASS	
-	echo "STOP $tet_thistest"
+	message "STOP $tet_thistest"
 
 }
 ######################################################################
@@ -249,34 +249,34 @@ tp4()
 tp5()
 {
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	echo "START $tet_thistest"
+	message "START $tet_thistest"
 	# Get the IP of the first server to be used in the DNS tests.
 	eval_vars M1
 	dns=$IP
 	for s in $SERVERS; do
-		if [ "$DSTET_DEBUG" = "y" ]; then echo "working on $s now"; fi
+		if [ "$DSTET_DEBUG" = "y" ]; then message "working on $s now"; fi
 		FixResolv $s
 		ret=$?
 		if [ $ret != 0 ]; then
-			echo "ERROR - fix of resolv.conf failed";
+			message "ERROR - fix of resolv.conf failed";
 			tet_result FAIL
 		fi
-		if [ "$DSTET_DEBUG" = "y" ]; then echo "done working on $s"; fi
+		if [ "$DSTET_DEBUG" = "y" ]; then message "done working on $s"; fi
 	done
 
 	for s in $CLIENTS; do
-		if [ "$DSTET_DEBUG" = "y" ]; then echo "working on $s now"; fi
+		if [ "$DSTET_DEBUG" = "y" ]; then message "working on $s now"; fi
 		FixResolv $s
 		ret=$?
 		if [ $ret != 0 ]; then
-			echo "ERROR - fix of resolv.conf failed";
+			message "ERROR - fix of resolv.conf failed";
 			tet_result FAIL
 		fi
-		if [ "$DSTET_DEBUG" = "y" ]; then echo "done working on $s"; fi
+		if [ "$DSTET_DEBUG" = "y" ]; then message "done working on $s"; fi
 	done
 
 	tet_result PASS
-	echo "STOP $tet_thistest"
+	message "STOP $tet_thistest"
 
 }
 ######################################################################
@@ -287,23 +287,23 @@ tp5()
 tp6()
 {
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	echo "START $tet_thistest"
+	message "START $tet_thistest"
 	for s in $CLIENTS; do
 		if [ "$s" != "" ]; then
-			echo "working on $s now"
-			if [ "$DSTET_DEBUG" = "y" ]; then echo "working on $s now"; fi
+			message "working on $s now"
+			if [ "$DSTET_DEBUG" = "y" ]; then message "working on $s now"; fi
 			SetupClient $s
 			ret=$?
 			if [ $ret -ne 0 ]; then
-				echo "client-install of server on $s ssh failed"
+				message "client-install of server on $s ssh failed"
 				tet_result FAIL
 			fi
 		fi
-		if [ "$DSTET_DEBUG" = "y" ]; then echo "done working on $s"; fi
+		if [ "$DSTET_DEBUG" = "y" ]; then message "done working on $s"; fi
 	done
 
 	tet_result PASS
-	echo "STOP $tet_thistest"
+	message "STOP $tet_thistest"
 
 }
 ######################################################################
@@ -314,34 +314,34 @@ tp6()
 tp7()
 {
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	echo "START $tet_thistest"
+	message "START $tet_thistest"
 
 	for s in $SERVERS; do
-		if [ "$DSTET_DEBUG" = "y" ]; then echo "working on $s now"; fi
+		if [ "$DSTET_DEBUG" = "y" ]; then message "working on $s now"; fi
 		eval_vars $s
 		KinitAs $s $DS_USER $DM_ADMIN_PASS	
 		if [ $? != 0 ]; then
-		        echo "ERROR - kinit failed";
+		        message "ERROR - kinit failed";
 			tet_result FAIL
 		fi
 
 		ssh root@$FULLHOSTNAME 'ipa user-find admin'
 		ret=$?
 		if [ $ret != 0 ]; then
-        		echo "ERROR - ipa user-find admin failed on $s";
+        		message "ERROR - ipa user-find admin failed on $s";
 			tet_result FAIL
 		fi
 
-		if [ "$DSTET_DEBUG" = "y" ]; then echo "done working on $s"; fi
+		if [ "$DSTET_DEBUG" = "y" ]; then message "done working on $s"; fi
 	done
 
 	for s in $CLIENTS; do
-		if [ "$DSTET_DEBUG" = "y" ]; then echo "working on $s now"; fi
+		if [ "$DSTET_DEBUG" = "y" ]; then message "working on $s now"; fi
 		eval_vars $s
 
 		KinitAs $s $DS_USER $DM_ADMIN_PASS
 		if [ $? != 0 ]; then
-	        	echo "ERROR - kinit failed";
+	        	message "ERROR - kinit failed";
 			tet_result FAIL
 		fi
 
@@ -349,16 +349,16 @@ tp7()
 			ssh root@$FULLHOSTNAME 'ipa user-find admin'
 			ret=$?
 			if [ $ret != 0 ]; then
-        			echo "ERROR - ipa user-find admin failed on $s";
+        			message "ERROR - ipa user-find admin failed on $s";
 				tet_result FAIL
 			fi
 		fi
 
-		if [ "$DSTET_DEBUG" = "y" ]; then echo "done working on $s"; fi
+		if [ "$DSTET_DEBUG" = "y" ]; then message "done working on $s"; fi
 	done
 
 	tet_result PASS
-	echo "STOP $tet_thistest"
+	message "STOP $tet_thistest"
 
 }
 
@@ -368,15 +368,15 @@ tp7()
 tp8()
 {
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	echo "START $tet_thistest"
+	message "START $tet_thistest"
 
 	if [ $NUMSERVERS -ne 1 ]; then
-		echo "We have more than one master, great! Let's test to ensure that ipa-replica-manage shows what is should"
+		message "We have more than one master, great! Let's test to ensure that ipa-replica-manage shows what is should"
 		
 	fi
 
 	tet_result PASS
-	echo "STOP $tet_thistest"
+	message "STOP $tet_thistest"
 
 }
 
@@ -392,69 +392,69 @@ tp9()
 	group1="testgroup1"
 	ssh root@$FULLHOSTNAME "ipa user-add --first='test user 1' --last='lastname' $user1;"
 	if [ $? != 0 ]; then
-	        echo "ERROR - ipa user-add failed on $FULLHOSTNAME";
+	        message "ERROR - ipa user-add failed on $FULLHOSTNAME";
 		tet_result FAIL
 	fi
 	ssh root@$FULLHOSTNAME "ipa user-add --first='test user 1' --last='lastname' $user2;"
 	if [ $? != 0 ]; then
-	        echo "ERROR - ipa user-add failed on $FULLHOSTNAME";
+	        message "ERROR - ipa user-add failed on $FULLHOSTNAME";
 		tet_result FAIL
 	fi
 	ssh root@$FULLHOSTNAME "ipa group-add $group1 --gid=725 --desc='group for testing';"
 	if [ $? != 0 ]; then
-	        echo "ERROR - ipa group-add failed on $FULLHOSTNAME";
+	        message "ERROR - ipa group-add failed on $FULLHOSTNAME";
 		tet_result FAIL
 	fi
 	ssh root@$FULLHOSTNAME "ipa group-add-member --users=$user1 $group1"
 	if [ $? != 0 ]; then
-	        echo "ERROR - ipa group-mod failed on $FULLHOSTNAME";
+	        message "ERROR - ipa group-mod failed on $FULLHOSTNAME";
 		tet_result FAIL
 	fi
 
 	for s in $SERVERS; do
-		if [ "$DSTET_DEBUG" = "y" ]; then echo "working on $s now"; fi
+		if [ "$DSTET_DEBUG" = "y" ]; then message "working on $s now"; fi
 		eval_vars $s
 		ssh root@$FULLHOSTNAME "ipa user-find $user1"
 		if [ $? != 0 ]; then
-        		echo "ERROR - ipa user-find failed on $FULLHOSTNAME";
+        		message "ERROR - ipa user-find failed on $FULLHOSTNAME";
 			tet_result FAIL
 		fi
 		ssh root@$FULLHOSTNAME "ipa user-find $user2"
 		if [ $? != 0 ]; then
-        		echo "ERROR - ipa user-find failed on $FULLHOSTNAME";
+        		message "ERROR - ipa user-find failed on $FULLHOSTNAME";
 			tet_result FAIL
 		fi
 
 		ssh root@$FULLHOSTNAME "ipa group-find $group1 | grep $user1"
 		if [ $? != 0 ]; then
-        		echo "ERROR - ipa $user1 not found in $group1 failed on $FULLHOSTNAME";
+        		message "ERROR - ipa $user1 not found in $group1 failed on $FULLHOSTNAME";
 			tet_result FAIL
 		fi
-		if [ "$DSTET_DEBUG" = "y" ]; then echo "done working on $s"; fi
+		if [ "$DSTET_DEBUG" = "y" ]; then message "done working on $s"; fi
 	done
 
 	for s in $CLIENTS; do
-		if [ "$DSTET_DEBUG" = "y" ]; then echo "working on $s now"; fi
+		if [ "$DSTET_DEBUG" = "y" ]; then message "working on $s now"; fi
 		eval_vars $s
 		if [ "$OS_VER" -eq "5" ] && [ "$OS" -eq "RHEL" ]; then
 			ssh root@$FULLHOSTNAME "ipa user-find $user1"
 			if [ $? != 0 ]; then
-        			echo "ERROR - ipa user-find failed on $FULLHOSTNAME";
+        			message "ERROR - ipa user-find failed on $FULLHOSTNAME";
 				tet_result FAIL
 			fi
 			ssh root@$FULLHOSTNAME "ipa user-find $user2"
 			if [ $? != 0 ]; then
-        			echo "ERROR - ipa user-find failed on $FULLHOSTNAME";
+        			message "ERROR - ipa user-find failed on $FULLHOSTNAME";
 				tet_result FAIL
 			fi
 	
 			ssh root@$FULLHOSTNAME "ipa group-find $group1 | grep $user1"
 			if [ $? != 0 ]; then
-        			echo "ERROR - ipa $user1 not found in $group1 failed on $FULLHOSTNAME";
+        			message "ERROR - ipa $user1 not found in $group1 failed on $FULLHOSTNAME";
 			tet_result FAIL
 			fi
 		fi
-		if [ "$DSTET_DEBUG" = "y" ]; then echo "done working on $s"; fi
+		if [ "$DSTET_DEBUG" = "y" ]; then message "done working on $s"; fi
 	done
 
 	# Cleanup
@@ -464,42 +464,42 @@ ipa user-del $user1; \
 ipa user-del $user2;"
 	
 	tet_result PASS
-	echo "STOP $tet_thistest"
+	message "STOP $tet_thistest"
 
 }
 
 instclean()
 {
 	if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-	echo "instclean start"
+	message "instclean start"
 	for s in $SERVERS; do
 		if [ "$s" != "" ]; then
-			if [ "$DSTET_DEBUG" = "y" ]; then echo "working on $s now"; fi
+			if [ "$DSTET_DEBUG" = "y" ]; then message "working on $s now"; fi
 			eval_vars $s
 			ssh root@$FULLHOSTNAME 'kdestroy'
 			ret=$?
 			if [ $ret != 0 ]; then
-	       			echo "ERROR - kdestroy on server $s failed, continuing anyway";
+	       			message "ERROR - kdestroy on server $s failed, continuing anyway";
 			fi
-			if [ "$DSTET_DEBUG" = "y" ]; then echo "done working on $s"; fi
+			if [ "$DSTET_DEBUG" = "y" ]; then message "done working on $s"; fi
 		fi
 
 	done
 	for s in $CLIENTS; do
 		if [ "$s" != "" ]; then
-			if [ "$DSTET_DEBUG" = "y" ]; then echo "working on $s now"; fi
+			if [ "$DSTET_DEBUG" = "y" ]; then message "working on $s now"; fi
 			eval_vars $s
 			ssh root@$FULLHOSTNAME 'kdestroy'
 			ret=$?
 			if [ $ret != 0 ]; then
-	       			echo "ERROR - kdestroy on client $s failed, continuing anyway";
+	       			message "ERROR - kdestroy on client $s failed, continuing anyway";
 			fi
-			if [ "$DSTET_DEBUG" = "y" ]; then echo "done working on $s"; fi
+			if [ "$DSTET_DEBUG" = "y" ]; then message "done working on $s"; fi
 		fi
 	done
 
 	tet_result PASS
-	echo "instclean finish"
+	message "instclean finish"
 
 }
 

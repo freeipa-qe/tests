@@ -85,6 +85,8 @@ quickuninstall_run()
 		return
 	fi
 	echo "QuickUninstall run..."
+eval_vars M1
+echo "using HOSTNAME $HOSTNAME FULLHOSTNAME $FULLHOSTNAME"
 	$TET_ROOT/$MainTccName \
 		-e -s $TET_ROOT/testcases/IPA/acceptance/quickuninstall/tet_scen \
 		-x $TET_ROOT/testcases/IPA/tetexecpl.cfg \
