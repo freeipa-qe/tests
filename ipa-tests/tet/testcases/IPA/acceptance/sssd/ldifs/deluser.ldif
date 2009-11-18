@@ -1,2 +1,0 @@
-dn: cn=New User,ou=People,dc=example,dc=com
-changetype: delete
