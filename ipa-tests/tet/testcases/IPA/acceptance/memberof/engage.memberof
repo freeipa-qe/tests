@@ -86,23 +86,29 @@ memberof_run()
 		return
 	fi
 	echo "memberof run..."
-	echo "$TET_ROOT/$MainTccName -e -s $TET_ROOT/testcases/IPA/acceptance/memberof/tet_scen -x $TET_ROOT/testcases/IPA/tetexecpl.cfg $TET_ROOT/testcases/IPA/acceptance/memberof memberof"
-
+	echo "Checking to ensure that ipa installed properly"
+	eval_vars M1
+	ssh root@$FULLHOSTNAME 'ls /ipa-install-failure'
+	if [ $? -eq 0 ]; then 
+		echo "ERROR! /ipa-install-failure was found on $FULLHOSTNAME. This indicates a install failure. Aborting." >> $MainTmpDir/memberof.run.out
+		echo "FAIL" >> $MainTmpDir/memberof.run.out
+	else
 	(
-	$TET_ROOT/$MainTccName \
-		-e -s $TET_ROOT/testcases/IPA/acceptance/memberof/tet_scen \
-		-x $TET_ROOT/testcases/IPA/tetexecpl.cfg \
-		$TET_ROOT/testcases/IPA/acceptance/memberof \
-		memberof > $MainTmpDir/memberof.startup.out 2>&1
-	)&
-	EngageTimer $! 2100 120 # wait 2100 sec before kill, then 120 until kill -9
+		$TET_ROOT/$MainTccName \
+			-e -s $TET_ROOT/testcases/IPA/acceptance/memberof/tet_scen \
+			-x $TET_ROOT/testcases/IPA/tetexecpl.cfg \
+			$TET_ROOT/testcases/IPA/acceptance/memberof \
+			memberof > $MainTmpDir/memberof.run.out 2>&1
+		)&
+		EngageTimer $! 2100 120 # wait 2100 sec before kill, then 120 until kill -9
+	fi
 	echo ""
-	echo "memberof startup $MainTmpDir/memberof.startup.out"
+	echo "memberof run $MainTmpDir/memberof.run.out"
 	echo ""
-	cat $MainTmpDir/memberof.startup.out
+	cat $MainTmpDir/memberof.run.out
 	echo ""
-	main_analyze "memberof startup" `grep "tcc: journal file is" $MainTmpDir/memberof.startup.out | awk '{print $5}'` $MainTmpDir/memberof.startup.out
-	MainReportFiles="$MainReportFiles $MainTmpDir/memberof.startup.out"
+	main_analyze "memberof run" `grep "tcc: journal file is" $MainTmpDir/memberof.run.out | awk '{print $5}'` $MainTmpDir/memberof.run.out
+	MainReportFiles="$MainReportFiles $MainTmpDir/memberof.run.out"
 
 	Gfile="$TET_TMP_DIR/global_src_`uname -n`"
 	rm -f $Gfile

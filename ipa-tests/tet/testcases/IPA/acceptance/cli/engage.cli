@@ -86,16 +86,22 @@ cli_run()
 		return
 	fi
 	echo "cli run..."
-	echo "$TET_ROOT/$MainTccName -e -s $TET_ROOT/testcases/IPA/acceptance/cli/tet_scen -x $TET_ROOT/testcases/IPA/tetexecpl.cfg $TET_ROOT/testcases/IPA/acceptance/cli cli"
-
+	echo "Checking to ensure that ipa installed properly"
+	eval_vars M1
+	ssh root@$FULLHOSTNAME 'ls /ipa-install-failure'
+	if [ $? -eq 0 ]; then 
+		echo "ERROR! /ipa-install-failure was found on $FULLHOSTNAME. This indicates a install failure. Aborting." >> $MainTmpDir/cli.run.out
+		echo "FAIL" >> $MainTmpDir/cli.run.out
+	else
 	(
-	$TET_ROOT/$MainTccName \
-		-e -s $TET_ROOT/testcases/IPA/acceptance/cli/tet_scen \
-		-x $TET_ROOT/testcases/IPA/tetexecpl.cfg \
-		$TET_ROOT/testcases/IPA/acceptance/cli \
-		cli > $MainTmpDir/cli.run.out 2>&1
-	)&
-	EngageTimer $! 1200 120 # wait 1200 sec before kill, then 1200 until kill -9
+		$TET_ROOT/$MainTccName \
+			-e -s $TET_ROOT/testcases/IPA/acceptance/cli/tet_scen \
+			-x $TET_ROOT/testcases/IPA/tetexecpl.cfg \
+			$TET_ROOT/testcases/IPA/acceptance/cli \
+			cli > $MainTmpDir/cli.run.out 2>&1
+		)&
+		EngageTimer $! 1200 120 # wait 1200 sec before kill, then 1200 until kill -9
+	fi
 	echo ""
 	echo "cli run $MainTmpDir/cli.run.out"
 	echo ""
