@@ -1035,7 +1035,7 @@ Cleanup()
 
 	# Cleanup any existing ds/ipa directories
 	ilist="/etc/ipa-installed-list"
-	ssh root@$FULLHOSTNAME "tar cvfz /var/log/ipa-backup.tar.gz /var/log/ipa; rm -Rf /etc/ipa /root/ipa /etc/dirsrv/ /var/lib/dirsrv/ /var/log/ipa /usr/lib/dirsrv/ /usr/share/ipa /var/cache/ipa /var/lib/ipa /var/run/dirsrv/ /var/log/dirsrv/ /usr/share/dirsrv/ /var/lock/dirsrv/ /etc/dirsrv/ /var/lib64/dirsrv/ /usr/lib64/dirsrv/ /var/run/dirsrv/ /var/log/dirsrv/; rm -f $ilist; rm -f /ipa-install-failure"
+	ssh root@$FULLHOSTNAME "tar cvfz /var/log/ipa-backup.tar.gz /var/log/ipa; rm -Rf /etc/ipa /root/ipa /etc/dirsrv/ /var/lib/dirsrv/ /var/log/ipa /usr/lib/dirsrv/ /usr/share/ipa /var/cache/ipa /var/lib/ipa /var/run/dirsrv/ /var/log/dirsrv/ /usr/share/dirsrv/ /var/lock/dirsrv/ /etc/dirsrv/ /var/lib64/dirsrv/ /usr/lib64/dirsrv/ /var/run/dirsrv/ /var/log/dirsrv/ $ilist /ipa-install-failure";
 
 	return 0
 
