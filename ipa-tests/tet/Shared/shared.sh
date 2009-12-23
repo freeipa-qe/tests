@@ -661,8 +661,8 @@ set timeout 30
 set send_slow {1 .1}
 spawn $env(SHELL)
 match_max 100000' > $TET_TMP_DIR/setup-ssh-remote2.exp
-	echo "send -s -- \"ssh root@$FULLHOSTNAME 'mkdir /root/.ssh;chmod 600 /root/.ssh;rm -f /root/.ssh/authorized_keys'\"" >> $TET_TMP_DIR/setup-ssh-remote2.exp
-	echo "expect \"*'mkdir /root/.ssh;chmod 600 /root/.ssh;rm -f /root/.ssh/authorized_keys'\"" >> $TET_TMP_DIR/setup-ssh-remote2.exp
+	echo "send -s -- \"ssh root@$FULLHOSTNAME 'mkdir /root/.ssh;chmod 600 /root/.ssh;rm -f /root/.ssh/authorized_keys;restorecon -R -v /root/.ssh'\"" >> $TET_TMP_DIR/setup-ssh-remote2.exp
+	echo "expect \"*'mkdir /root/.ssh;chmod 600 /root/.ssh;rm -f /root/.ssh/authorized_keys;restorecon -R -v /root/.ssh'\"" >> $TET_TMP_DIR/setup-ssh-remote2.exp
 echo 'sleep .1
 send -s -- "\r"
 expect "*password: "

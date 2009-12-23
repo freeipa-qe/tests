@@ -884,7 +884,7 @@ UnInstallClientRPM()
 		echo "Returning"
 		return 0
 	fi
-	ssh root@$FULLHOSTNAME "rpm -e --allmatches ipa-admintools;rpm -e --allmatches ipa-client; rpm -e --allmatches ipa-server; rpm -e --allmatches redhat-ds-base ipa-server krb5-workstation ipa-server-selinux;rpm -e --allmatches redhat-ds-base ipa-server krb5-workstation ipa-server-selinux ipa-client;rpm -e ipa-client ipa-admintools ipa-server ipa-server-selinux"
+	ssh root@$FULLHOSTNAME 'yum -y erase  dirsec-nspr dirsec-nss-tools dirsec-nss svrcore perl-Mozilla-LDAP dirsec-jss ldapjdk redhat-ds mozldap mozldap-tols icu libicu redhat-ds-base ipa-server ipa-admintools bind caching-nameserver krb5-workstation ipa-client ipa-server-selinux ipa-admintools bind-dyndb-ldap ipa-client redhat-ds-base-devel fedora-ds-base fedora-ds-base-devel ipa-python'
 	ret=$?
 	if [ $ret -ne 0 ]; then
 		echo "ERROR - ssh to $FULLHOSTNAME failed"
