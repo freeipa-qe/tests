@@ -49,16 +49,25 @@ print OUT $root;
 # define entry for members in group A
 for my $i (1..$total){
 	my $id=sprintf("%0${len}d", $i);
+	my $nextid;
+	if ($id == $total){
+		$nextid=1;
+	}
+	else{
+		$nextid=$id+1;
+	}
+	my $nextid=sprintf("%0${len}d", $nextid);
 	#my $id="$i";
-	print OUT "\n\ndn: uid=user.".$id.",ou=people,dc=example,dc=com";
-	print OUT "\ncn: user.".$id;
+	print OUT "\n\ndn: uid=ref.".$id.",ou=people,dc=example,dc=com";
+	print OUT "\ncn: ref.".$id;
 	print OUT "\nsn: ".$id;
-	print OUT "\nuid: user.".$id;
-	print OUT "\nmail: user".$id."\@example.com";
+	print OUT "\nuid: ref.".$id;
+	print OUT "\nmail: ref".$id."\@example.com";
 	print OUT "\nobjectclass: top";
 	print OUT "\nobjectclass: person";
 	print OUT "\nobjectclass: inetorgperson";
 	print OUT "\nuserpassword: redhat"; 
+	print OUT "\nsecretary: uid=ref.".$nextid.",ou=people,dc=example,dc=com"; 
 }
 
 close OUT;
