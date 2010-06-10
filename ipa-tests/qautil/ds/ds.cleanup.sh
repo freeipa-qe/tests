@@ -19,6 +19,7 @@ sudo rm -Rvf /etc/dirsrv \
         /var/run/dirsrv \
         /var/log/dirsrv \
         /var/lock/dirsrv\
+		/etc/sysconfig/dirsrv* \
         /var/lib64/dirsrv \
         /usr/lib64/dirsrv
 
