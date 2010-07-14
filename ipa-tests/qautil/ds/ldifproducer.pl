@@ -56,22 +56,23 @@ for my $i (1..$total){
 	else{
 		$nextid=$id+1;
 	}
-	my $nextid=sprintf("%0${len}d", $nextid);
+	$nextid=sprintf("%0${len}d", $nextid);
 	#my $id="$i";
-	print OUT "\n\ndn: uid=ref.".$id.",ou=people,dc=example,dc=com";
-	print OUT "\ncn: ref.".$id;
+	print OUT "\n\ndn: uid=test.".$id.",ou=people,dc=example,dc=com";
+	print OUT "\ncn: test.".$id;
 	print OUT "\nsn: ".$id;
-	print OUT "\nuid: ref.".$id;
-	print OUT "\nmail: ref".$id."\@example.com";
+	print OUT "\nuid: test.".$id;
+	print OUT "\nmail: test".$id."\@example.com";
+	print OUT "\npostalAddress: test.".$id;
 	print OUT "\nobjectclass: top";
 	print OUT "\nobjectclass: person";
 	print OUT "\nobjectclass: inetorgperson";
 	print OUT "\nuserpassword: redhat"; 
-	print OUT "\nsecretary: uid=ref.".$nextid.",ou=people,dc=example,dc=com"; 
+	#print OUT "\nsecretary: uid=ref.".$nextid.",ou=people,dc=example,dc=com"; 
 }
 
 close OUT;
 # the output "1" will be callected by caller
-print "Done\n";
+print "done\n";
 print 1;
 
