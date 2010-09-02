@@ -1,0 +1,9 @@
+set force_conservative 1  ;# set to 1 to force conservative mode even if
+set timeout 30
+spawn passwd root
+match_max 100000
+expect "password: "
+send -- "redhat\r"
+expect "password: "
+send -- "redhat\r"
+expect eof
