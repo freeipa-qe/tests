@@ -3,7 +3,7 @@
 		ipa-server i386
 	</whiteboard>
 	<recipeSet>
-		<recipe whiteboard="">
+		<recipe whiteboard="ipa-server i386 on ipaqavma">
 			<distroRequires>
 				<and>
 					<distro_family op="=" value="Fedora13"/>
@@ -14,7 +14,7 @@
 			</distroRequires>
 			<hostRequires>
 				<and>
-					<hostname op="=" value="ipaqavm.idm.lab.bos.redhat.com"/>
+					<hostname op="=" value="ipaqavma.idm.lab.bos.redhat.com"/>
 				</and>
 			</hostRequires>
 			<repos/>
