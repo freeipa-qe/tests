@@ -1,0 +1,3 @@
+PURPOSE of /CoreOS/tests/Regression/ipa-host-cli
+Description: IPA host CLI acceptance tests
+Author: Jenny Galipeau <jgalipea@redhat.com>
