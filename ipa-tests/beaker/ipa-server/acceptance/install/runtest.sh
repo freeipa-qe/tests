@@ -79,11 +79,9 @@ rlJournalStart
 		sed -i s/$hostname_s//g /dev/shm/hosts
 		echo "$ipaddr $hostname" >> /dev/shm/hosts
 		cat /dev/shm/hosts > /etc/hosts
-#		rlRun "/usr/sbin/authconfig --update --enablesssd --enablesssdauth"
 		rlRun "ls /root"
-#		rlRun sleep 300
 		# install IPA
-		ipa-server-install --setup-dns --forwarder=10.14.63.12 --hostname=$(hostname) -r testrelm -n testdomain -p Secret123 -P Secret123 -a Secret123 -u admin -U
+		ipa-server-install --setup-dns --forwarder=10.14.63.12 --hostname=$hostname -r testrelm -n testdomain -p Secret123 -P Secret123 -a Secret123 -u admin -U
 		rlRun "cat /etc/krb5.conf"
 		# Create expect file to kinit with
 		echo '#!/usr/bin/expect -f
@@ -106,7 +104,6 @@ expect eof' > /dev/shm/kinit-admin.exp
 		expect /dev/shm/kinit-admin.exp
 		rlRun "cat /dev/shm/kinit-admin.exp"
 		rlRun "klist"
-		sleep 600
 		rlRun "kdestroy"
 	rlPhaseEnd
 
