@@ -36,6 +36,7 @@ SERVICE="ipa_kpasswd"
 
 rlJournalStart
 	rlPhaseStartSetup
+		env
 		rlRun "rm -f /etc/yum.repos.d/ipa*"
 		rlRun "cd /etc/yum.repos.d;wget http://jdennis.fedorapeople.org/ipa-devel/ipa-devel-fedora.repo"
 		#rlRun "cd /etc/yum.repos.d;wget http://apoc.dsdev.sjc.redhat.com/tet/ipa-fedora.repo"
@@ -81,7 +82,9 @@ rlJournalStart
 		cat /dev/shm/hosts > /etc/hosts
 		rlRun "ls /root"
 		# install IPA
-		ipa-server-install --setup-dns --forwarder=10.14.63.12 --hostname=$hostname -r testrelm -n testdomain -p Secret123 -P Secret123 -a Secret123 -u admin -U
+		echo "ipa-server-install --setup-dns --forwarder=10.14.63.12 --hostname=$hostname -r testrelm -n testdomain -p Secret123 -P Secret123 -a Secret123 -u admin -U" > /dev/shm/installipa.bash
+		setenforce 0
+		/bin/bash /dev/shm/installipa.bash
 		rlRun "cat /etc/krb5.conf"
 		# Create expect file to kinit with
 		echo '#!/usr/bin/expect -f
@@ -117,6 +120,7 @@ expect eof' > /dev/shm/kinit-admin.exp
 		rlRun "ls /tmp"
 		rlRun "ls /root"
 		rlRun "ls /etc/yum.repos.d"
+		rhts-submit-log -l /var/log/ipaserver-install.log
 	rlPhaseEnd
 
 rlJournalPrintText

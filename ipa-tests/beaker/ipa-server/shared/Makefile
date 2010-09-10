@@ -43,6 +43,10 @@ run: $(FILES) build
 	cp ./set-root-pw.exp /dev/shm/.
 	rm -f /dev/shm/id_rsa*
 	cp ./id_rda* /dev/shm/.
+	mkdir /root/.ssh
+	cp ./id_rda* /root/.ssh/.
+	chmod 600 /root/.ssh
+	chmod 600 /root/.ssh/id*
 
 build: $(BUILT_FILES)
 	chmod 755 ipa-server-shared.sh
