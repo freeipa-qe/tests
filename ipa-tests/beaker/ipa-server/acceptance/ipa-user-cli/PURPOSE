@@ -1,0 +1,3 @@
+PURPOSE of /CoreOS/tests/Regression/ipa-user-cli
+Description: IPA user cli acceptance tests
+Author: Yi Zhang <yzhang@redhat.com>
