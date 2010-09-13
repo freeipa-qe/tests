@@ -2,91 +2,57 @@
 # this is a testcase file for user-cli test #
 #############################################
 
+t_addusertest_envsetup()
+{
+    rlPhaseStartTest "setup environment for addusertest"
+        rlLog "kinit as admin"
+        Kinit $admin $adminpassword
+        if [ $? -ne 0 ];then
+            rlFail "kinit as $admin failed"
+        else
+            rlFail "kinit as $admin success"
+        fi
+    rlPhaseEnd
+} #t_addusertest_envsetup
+
+t_addusertest_envcleanup()
+{
+    rlPhaseStartTest "clean up enviroment for addusertest"
+        rlRun "ipa user-del $superuser" 0 "delete $superuser account"
+        rlRun "ipa user-del $lusr " 0 "delete $lusr account"
+        rlLog "run kdestroy to clean up all ticket"
+        Kdestroy
+        if [ $? -ne 0 ];then
+            rlFail "kinit as admin failed"
+        else
+            rlPass "kinit as admin success"
+        fi
+    rlPhaseEnd
+} #t_addusertest_envcleanup
+
 t_addusersetup()
 {
     rlPhaseStartTest "add user setup"
-
         rlRun "ipa user-add --first=$superuserfirst \
                             --last=$superuserlast \
                             --gecos=$superusergecos \
                             --home=$superuserhome \
                             --principal=$superuserprinc \
-                            --email=$superuseremail $superuser"
-        if [ $? -ne 0 ];then 
-            rlLog "ERROR - ipa user-add failed "
-            rlFail
-        else
-            rlLog "ipa user-add returned success"
-            rlPass
-        fi
-
+                            --email=$superuseremail $superuser" \
+                            0 \
+                            "add user into ipa server"
     rlPhaseEnd
 } #t_addusersetup
 
 t_adduserverify()
 {
     rlPhaseStartTest "verify the newly added user account"
-        rlLog "verify the first name"
-        rlRun "ipa user-find $superuser | grep $superuserfirst"
-         if [ $? -ne 0 ];then 
-            rlLog "user firstname does not match"
-            rlFail
-            return
-        else
-            rlLog "user firstname matches"
-        fi
-
-        rlLog "verify the last name"
-        rlRun "ipa user-find $superuser | grep $superuserlast"
-         if [ $? -ne 0 ];then 
-            rlLog "user lastname does not match"
-            rlFail
-            return
-        else
-            rlLog "user lastname matches"
-        fi
- 
-        rlLog "verify the gecos"
-        rlRun "ipa user-find $superuser | grep $superusergecos"
-         if [ $? -ne 0 ];then 
-            rlLog "user gecos does not match"
-            rlFail
-            return
-        else
-            rlLog "user gecos matches"
-        fi
- 
-        rlLog "verify the home"
-        rlRun "ipa user-find $superuser | grep $superuserhome"
-         if [ $? -ne 0 ];then 
-            rlLog "user home does not match"
-            rlFail
-            return
-        else
-            rlLog "user home matches"
-        fi
-
-        rlLog "verify the principal name"
-        rlRun "ipa user-find $superuser | grep $superuserprinc"
-         if [ $? -ne 0 ];then 
-            rlLog "user principal does not match"
-            rlFail
-            return
-        else
-            rlLog "user principal matches"
-        fi
-
-        rlLog "verify the email"
-        rlRun "ipa user-find $superuser | grep $superuseremail"
-         if [ $? -ne 0 ];then 
-            rlLog "user email does not match"
-            rlFail
-            return
-        else
-            rlLog "user email matches"
-        fi
-
-
+        rlRun "ipa user-find $superuser | grep $superuserfirst" 0 "check user firstname"
+        rlRun "ipa user-find $superuser | grep $superuserlast" 0 "check last name"
+        rlRun "ipa user-find --all $superuser | grep $superusergecos" 0 "check gecos"
+        rlRun "ipa user-find $superuser | grep $superuserhome" 0 "check home directory"
+        rlRun "ipa user-find --all $superuser | grep \"$superuserprinc\" " 0 "check principal"
+        rlRun "ipa user-find --all $superuser | grep \"$superuseremail\" " 0 "check user email"
     rlPhaseEnd
 } #t_adduserverify
 
@@ -99,32 +65,22 @@ t_negative_adduser()
                             --gecos=$superusergecos \
                             --home=$superuserhome \
                             --principal=$superuserprinc \
-                            --email=$superuseremail $superuser"
-        if [ $? -eq 0 ];then 
-            rlLog "ERROR - ipa user-add passed when it should not"
-            rlFail
-            return
-        else 
-            rlLog "Good, duplicated user can not be added"
-            rlPass
-        fi
+                            --email=$superuseremail $superuser" \
+                            1 \
+                            "add duplicated user expected to fail"
     rlPhaseEnd
 } #t_negative_adduser
 
-t_addlockuser
+t_addlockuser()
 {
     rlPhaseStartTest
         rlLog "START  Add user - Set Password - Kinit"
-        rlRun "ipa user-add --first=$superuserfirst --last=$superuserlast $lusr"
-        if [ $? -ne 0 ];then 
-            rlLog "ERROR - ipa user-add failed "
-            rlFail
-            return #FIXME : not sure if this is a necessary step
-        fi
-        rlRun "ipa user-find $lusr | grep id | grep $lusr"
+        rlRun "ipa user-add --first=$superuserfirst --last=$superuserlast $lusr" 0 "add user $lusr for lock-unlock test"
+
+        ipa user-find $lusr | grep $lusr
         if [ $? -ne 0 ];then
-            rlLog "ERROR - Search for created user failed "
-            rlFail
+            rlFail "ERROR - Search for created user failed "
+            rlPhaseEnd
             return
         fi
         # Set up the password of the new user so that they can kinit later
@@ -189,238 +145,112 @@ t_unlockuser()
     rlPhaseEnd
 } #t_unlock
 
-t_addmoduser()
+t_moduser_envsetup()
 {
-    rlPhaseStartEnd    
+    rlPhaseStartTest   
         rlLog "START  Add User - Define Only Required Attributes"
-        rlRun "ipa user-add --first=superuserfirst --last=superuserlast $musr"
-        if [ $? -ne 0 ];then 
-            rlLog "ERROR - ipa user-add failed "
-            rlFail
-        else
-            rlRun "ipa user-find $musr | grep id | grep $musr"
-            if [ $? -ne 0 ];then
-                rlLog "ERROR - Search for created user failed "
-                rlFail
-            else
-                rlLog "Success, uer found"
-                rlPass
-            fi
-        fi
+        Kdestroy
+        Kinit $admin $adminpassword
+        rlRun "ipa user-add --first=superuserfirst --last=superuserlast $musr" 0 "add test user account"
+        rlRun "ipa user-find $musr | grep $musr" 0 "confirm the existance of test account"
     rlPhaseEnd
-} #t_addmoduser
+} #t_moduser_envsetup
+
+t_moduser_envcleanup()
+{
+    rlPhaseStartTest
+        rlLog "clean up env for moduser test"
+        rlRun "ipa user-del $musr" 0 "remove test user account [$musr]"
+        Kdestroy
+    rlPhaseEnd
+} #t_moduser_envcleanup
 
 t_modfirstname()
 {
-    rlPhaseStartStart 
+    rlPhaseStartTest
         rlLog "START  Modify First Name"
-        rlRun "ipa user-mod --first=$mfirst $musr"
-        if [ $? -ne 0 ];then 
-            rlLog "ERROR - ipa user-mod failed "
-            rlFail
-        else
-            rlRun "ipa user-show --all $musr | grep $mfirst"
-            if [ $? -ne 0 ];then
-                rlLog "ERROR - Search for created user failed "
-                rlFail
-            else
-                rlLog "Success"
-                rlPass
-            fi
-        fi
+        rlRun "ipa user-mod --first=$mfirst $musr" 0 "modify first name"
+        rlRun "ipa user-show --all $musr | grep $mfirst" 0 "check the mfirst to verify"
     rlPhaseEnd
 } #t_modfirstname
 
 t_modlastname()
 {
-    rlPhaseStartStart 
+    rlPhaseStartTest
         rlLog "START  Modify Last Name"
-        rlRun "ipa user-mod --last=$mlast $musr"
-        if [ $? -ne 0 ];then 
-            rlLog "ERROR - ipa user-mod failed "
-            rlFail
-        else
-            rlRun "ipa user-show --all $musr | grep $mlast"
-            if [ $? -ne 0 ];then
-                rlLog "ERROR - Search for created user failed "
-                rlFail
-            else
-                rlLog "Success"
-                rlPass
-            fi
-        fi
+        rlRun "ipa user-mod --last=$mlast $musr" 0 "modify the last name"
+        rlRun "ipa user-show --all $musr | grep $mlast" 0 "check last name"
     rlPhaseEnd
 } #t_modlastname
 
 t_modemail()
 {
-     rlPhaseStartStart 
+     rlPhaseStartTest
         rlLog "START  Modify email"
-        rlRun "ipa user-mod --email=\'$memail\' $musr"
-        if [ $? -ne 0 ];then 
-            rlLog "ERROR - ipa user-mod failed "
-            rlFail
-        else
-            rlRun "ipa user-show --all $musr | grep $memail"
-            if [ $? -ne 0 ];then
-                rlLog "ERROR - Search for created user failed "
-                rlFail
-            else
-                rlLog "Success"
-                rlPass
-            fi
-        fi
+        rlRun "ipa user-mod --email=\'$memail\' $musr" 0 "modify email"
+        rlRun "ipa user-show --all $musr | grep $memail" 0 "check email"
     rlPhaseEnd
 } #t_modemail
 
 t_modprinc()
 {
-    rlPhaseStartStart 
+    rlPhaseStartTest
         rlLog "START  Modify principal"
-        rlRun "ipa user-mod --principal=$mprinc $musr"
-        if [ $? -ne 0 ];then 
-            rlLog "ERROR - ipa user-mod failed "
-            rlFail
-        else
-            rlRun "ipa user-show --all $musr | grep $mprinc"
-            if [ $? -ne 0 ];then
-                rlLog "ERROR - Search for created user failed "
-                rlFail
-            else
-                rlLog "Success"
-                rlPass
-            fi
-        fi
+        rlRun "ipa user-mod --principal=$mprinc $musr" 0 "modify principal"
+        rlRun "ipa user-show --all $musr | grep $mprinc" 0 "check principal"
     rlPhaseEnd   
 } #t_modprinc
 
 t_modhome()
 {
-    rlPhaseStartStart 
+    rlPhaseStartTest
         rlLog "START  Modify home directory"
-        rlRun "ipa user-mod --home=\'$mhome\' $musr"
-        if [ $? -ne 0 ];then 
-            rlLog "ERROR - ipa user-mod failed "
-            rlFail
-        else
-            rlRun "ipa user-show --all $musr | grep $mhome"
-            if [ $? -ne 0 ];then
-                rlLog "ERROR - Search for created user failed "
-                rlFail
-            else
-                rlLog "Success"
-                rlPass
-            fi
-        fi
+        rlRun "ipa user-mod --home=\'$mhome\' $musr" 0 "modify home directory"
+        rlRun "ipa user-show --all $musr | grep $mhome" 0 "check home directory"
     rlPhaseEnd   
 } #t_modhome
 
 t_modgecos()
 {
-    rlPhaseStartStart 
+    rlPhaseStartTest
         rlLog "START  Modify gecos"
-        rlRun "ipa user-mod --gecos=$mgecos $musr"
-        if [ $? -ne 0 ];then 
-            rlLog "ERROR - ipa user-mod failed "
-            rlFail
-        else
-            rlRun "ipa user-show --all $musr | grep $mgecos"
-            if [ $? -ne 0 ];then
-                rlLog "ERROR - Search for created user failed "
-                rlFail
-            else
-                rlLog "Success"
-                rlPass
-            fi
-        fi
+        rlRun "ipa user-mod --gecos=$mgecos $musr" 0 "modify gecos"
+        rlRun "ipa user-show --all $musr | grep $mgecos" 0 "check gecos"
     rlPhaseEnd   
 } #t_modgecos
 
 t_moduid()
 {
-   rlPhaseStartStart 
+   rlPhaseStartTest
         rlLog "START  Modify uid"
-        rlRun "ipa user-mod --uid=$muid $musr"
-        if [ $? -ne 0 ];then 
-            rlLog "ERROR - ipa user-mod failed "
-            rlFail
-        else
-            rlRun "ipa user-show --all $musr | grep $muid"
-            if [ $? -ne 0 ];then
-                rlLog "ERROR - Search for created user failed "
-                rlFail
-            else
-                rlLog "Success"
-                rlPass
-            fi
-        fi
+        rlRun "ipa user-mod --uid=$muid $musr" 0 "modify uid"
+        rlRun "ipa user-show --all $musr | grep $muid" 0 "check uid"
     rlPhaseEnd   
 } #t_moduid
 
 t_modstreet()
 {
-    rlPhaseStartStart 
+    rlPhaseStartTest
         rlLog "START  Modify street"
-        rlRun "ipa user-mod --street=\"$mstreet\" $musr"
-        if [ $? -ne 0 ];then 
-            rlLog "ERROR - ipa user-mod failed "
-            rlFail
-        else
-            rlRun "ipa user-show --all $musr | grep \"$mstreet\""
-            if [ $? -ne 0 ];then
-                rlLog "ERROR - Search for created user failed "
-                rlFail
-            else
-                rlLog "Success"
-                rlPass
-            fi
-        fi
+        rlRun "ipa user-mod --street=\"$mstreet\" $musr" 0 "modify street info"
+        rlRun "ipa user-show --all $musr | grep \"$mstreet\"" 0 "check street info"
     rlPhaseEnd   
 } #t_modstreet
 
 t_modshell()
 {
-    rlPhaseStartStart 
+    rlPhaseStartTest
         rlLog "START  Modify street"
-        rlRun "ipa user-mod --shell=\'$mshell\' $musr"
-        if [ $? -ne 0 ];then 
-            rlLog "ERROR - ipa user-mod failed "
-            rlFail
-        else
-            rlRun "ipa user-show --all $musr | grep '$mshell'"
-            if [ $? -ne 0 ];then
-                rlLog "ERROR - Search for created user failed "
-                rlFail
-            else
-                rlLog "Success"
-                rlPass
-            fi
-        fi
+        rlRun "ipa user-mod --shell=\'$mshell\' $musr" 0 "modify shell"
+        rlRun "ipa user-show --all $musr | grep '$mshell'" 0 "check shell"
     rlPhaseEnd   
 } #t_modshell
 
 t_deluser()
 {
     rlPhaseStartTest    
-        rlLog "START  Delete User"
-        for user in "$superuser $musr $lusr"
-        do
-            rlRun "ipa user-del $user"
-            if [ $? -ne 0 ];then
-                rlLog "ERROR - Deleting user $user failed "
-                rlFail
-            else
-                rlRun "ipa user-find $user"
-                if [ $? -eq 0 ];then
-                    rlLog "ERROR - Search for deleted user was successful  when is should not have"
-                    rlLog "ERROR possibly related to https://bugzilla.redhat.com/show_bug.cgi?id=504021"
-                    rlFail
-                else
-                    rlLog "Success: user $superuser deleted"
-                    rlPass
-                fi
-            fi
-        done
+        rlLog "user deletion test already included into adduser test and moduser test, simple log pass here"
+        rlPass
     rlPhaseEnd
 } #t_deluser
 
