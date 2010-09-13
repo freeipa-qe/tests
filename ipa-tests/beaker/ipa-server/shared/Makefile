@@ -29,7 +29,7 @@ export TESTVERSION=1.0
 
 BUILT_FILES=
 
-FILES=$(METADATA) ipa-server-shared.sh Makefile PURPOSE set-root-pw.exp id_rsa.pub id_rsa 
+FILES=$(METADATA) ipa-server-shared.sh ipa-host-cli-lib.sh Makefile PURPOSE set-root-pw.exp id_rsa.pub id_rsa 
 
 .PHONY: all install download clean
 
@@ -39,6 +39,8 @@ run: $(FILES) build
 	#wget http://apoc.dsdev.sjc.redhat.com/tet/rhts-get.txt
 	rm -f /dev/shm/ipa-server-shared.sh
 	cp ./ipa-server-shared.sh /dev/shm/.
+	rm -f /dev/shm/ipa-host-cli-lib.sh
+	cp ./ipa-host-cli-lib.sh /dev/shm/.
 	rm -f /dev/shm/set-root-pw.exp
 	cp ./set-root-pw.exp /dev/shm/.
 	rm -f /dev/shm/id_rsa*
