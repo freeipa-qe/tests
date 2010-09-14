@@ -64,7 +64,7 @@ rlJournalStart
         rlAssertRpm $PACKAGE
         rlRun "TmpDir=\`mktemp -d\`" 0 "Creating tmp directory"
         rlRun "pushd $TmpDir"
-	#rlRun "mykinit $ADMINID $ADMINPWD" 0 "Kinit as admin user"
+	rlRun "kinitAs $ADMINID $ADMINPWD" 0 "Kinit as admin user"
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-host-cli-001: Add lower case host"
@@ -129,13 +129,48 @@ rlJournalStart
         done
     rlPhaseEnd
 
+    rlPhaseStartTest "ipa-host-cli-09: Show Host Objectclasses"
+	tmpfile=/tmp/showall.out
+	ipa host-show --all $host1 > /tmp/showall.out
+	classes=(ipaobject ipaservice nshost ipahost pkiuser krbprincipalaux krbprincipal top);
+	len=${#classes[*]};
+	i=0
+	while [ $i -le $len ] ; do
+		cat $tmpfile | grep "${classes[$i]}"
+		rc=$?
+		rlAssert0 "Verifying objectclass \"${classes[$i]}\" with host-show --all" $rc
+		((i=$i+1))
+	done
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-host-cli-10: Disable Host - Remove Keytab"
+	# first get a keytab and verify it exists
+	for item in $host1 $host4 $host5 ; do
+		rlRun "ipa-getkeytab -s `hostname` -p host/$item -k /tmp/host.$item.keytab"
+		rlRun "verifyHostAttr $item Keytab True" 0 "Check if keytab exists"
+		rlRun "disableHost $item" 0 "Disable host which should remove keytab"
+		rlRun "verifyHostAttr $item Keytab False" 0 "Check if keytab was removed."
+	done
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-host-cli-11: Regression test for bug 499016"
+	for item in $host1 $host3 $host5 ; do
+        	attr="desc"
+        	value="this is a very interesting description"
+		os="Fedora 11"
+        	rlRun "modifyHost $item $attr \"$value\"" 0 "Modifying host $item $attr."
+        	rlRun "verifyHostAttr $item $attr \"$value\"" 0 "Verifying host $attr was modified."
+		rlRun "verifyHostAttr $item os \"$os\"" 0 "Verifying host OS was not modified."
+	done
+    rlPhaseEnd
+
     rlPhaseStartCleanup "ipa-host-cli-cleanup: Destroying admin credentials."
         rlRun "popd"
         rlRun "rm -r $TmpDir" 0 "Removing tmp directory"
 	rlRun "ipa host-del \"$host1\"" 0 "Deleting host added."
 	rlRun "ipa host-del \"$host3\"" 0 "Deleting host added."
 	rlRun "ipa host-del \"$host5\"" 0 "Deleting host added."
-	#rlRun "kdestroy" 0 "Destroying admin credentials."
+	rlRun "kdestroy" 0 "Destroying admin credentials."
     rlPhaseEnd
 rlJournalPrintText
 rlJournalEnd
