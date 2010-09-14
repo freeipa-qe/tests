@@ -8,6 +8,7 @@
 #	findHost
 #	modHost
 #	verifyHostAttr
+#	verifyHostClasses
 #	deleteHost
 ######################################################################
 # Assumes:
@@ -47,7 +48,6 @@ findHost()
    myhost=$1
    ipa host-find $myhost
    rc=$?
-   echo "DEBUG: return code is $rc"
    if [ $rc -eq 0 ] ; then
 	rlLog "$myhost was found."
    	# check hostname
@@ -131,7 +131,7 @@ verifyHostAttr()
 	echo $result | grep "$attriute $value"
 	rc=$?
    	if [ $rc -ne 0 ] ; then
-        	rlLog "ERROR: $myhost verification failed: Value of $attribute not correct."
+        	rlLog "$myhost verification failed: Value of $attribute is $value."
    	else
 		rlLog "Value of $attribute for $myhost is as expected."
    	fi
@@ -141,6 +141,60 @@ verifyHostAttr()
 
    return $rc
 }
+
+verifyHostClasses()
+{
+   myhost=$1
+   rc=0
+
+   ipa host-show --all $myhost
+   rc=$?
+   if [ $rc -eq 0 ] ; then
+	i=0
+	set -a expected ipaobject nshost ipahost pkiuser ipaservice krbprincipalaux krbprincipal top
+	classes=`ipa host-show --all $myhost | grep objectclass`
+	while [ $i -le 8 ] ; do
+		echo $classes | grep "${classes[$i]}"
+		if [ $? -ne 0 ] ; then
+			rlLog "ERROR - objectclass \"${classes[$i]}\" was not returned with host-show --all"
+			rc=1
+		else
+			rlLog "objectclass \"${classes[$i]}\" was returned as expected with host-show --all"
+		fi
+		((i=$i+1))
+	done
+   else
+	rlLog "ERROR: Show host failed. Return Code: $rc"
+   fi
+
+   return $rc
+}
+
+#######################################################################
+# disableHost Usage:
+#       disableHost hostname
+# example:
+#       disableHost jenny.bos.redhat.com
+#       disableHost jenny
+# returns
+#       return code from ipa host-disable command
+######################################################################
+
+disableHost()
+{
+   myhost=$1
+   rc=0
+
+   ipa host-disable $myhost
+   rc=$?
+   if [ $rc -ne 0 ] ; then
+        rlLog "ERROR: Disabling host $myhost failed."
+   else
+        rlLog "Host $myhost disabled successfully."
+   fi
+   return $rc
+}
+
 
 #######################################################################
 # deleteHost Usage:
