@@ -4,9 +4,46 @@
 #  IPA SERVER SHARED LIBRARY
 #######################################################################
 # Includes:
+#	kinitAs
 #       os_nslookup
 #       os_getdomainname
 ######################################################################
+#######################################################################
+# kinitAs Usage:
+#       kinitAs <username> <password>
+#####################################################################
+kinitAs()
+{
+   username=$1
+   password=$2
+   rc=0
+   expfile=/tmp/kinit.exp
+   outfile=/tmp/kinitAs.out
+
+   rm -rf $expfile
+   echo 'set timeout 30
+set force_conservative 0
+set send_slow {1 .1}' > $expfile
+   echo "spawn /usr/kerberos/bin/kinit -V $username" >> $expfile
+   echo 'match_max 100000' >> $expfile
+   echo 'expect "*: "' >> $expfile
+   echo 'sleep .5' >> $expfile
+   echo "send -s -- \"$password\"" >> $expfile
+   echo 'send -s -- "\r"' >> $expfile
+   echo 'expect eof ' >> $expfile
+
+   kdestroy;/usr/bin/expect $expfile
+   
+   # verify credentials
+   klist > $outfile
+   grep $username $outfile
+   if [ $? -ne 0 ] ; then
+	rlLog "ERROR: kinit as $username with password $password failed."
+	rc=1
+   else
+	rlLog "kinit as $username with password $password was successful."
+   fi
+}  
 
 #######################################################################
 # os_nslookup Usage:
