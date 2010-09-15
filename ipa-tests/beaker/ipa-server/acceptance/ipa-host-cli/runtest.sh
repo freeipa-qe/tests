@@ -164,12 +164,108 @@ rlJournalStart
 	done
     rlPhaseEnd
 
+    rlPhaseStartTest "ipa-host-cli-12: Negative - add duplicate host"
+	command="ipa host-add $host1"
+	expmsg="ipa: ERROR: This entry already exists"
+	rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-host-cli-13: Negative - Delete host that doesn't exist"
+        command="ipa host-del ghost.$DOMAIN"
+        expmsg="ipa: ERROR: ghost.$DOMAIN: host not found"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-host-cli-14: Negative - setattr and addattr on fqdn"
+        command="ipa host-mod --setattr fqdn=newfqdn $host1"
+        expmsg="ipa: ERROR: no modifications to be performed"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
+	command="ipa host-mod --addattr fqdn=newfqdn $host1"
+	rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-host-cli-15: Negative - setattr and addattr on ipaUniqueID"
+        command="ipa host-mod --setattr ipaUniqueID=127863947-84375973-gq9587 $host1"
+        expmsg="ipa: ERROR: no modifications to be performed"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
+        command="ipa host-mod --addattr ipaUniqueID=127863947-84375973-gq9587 $host1"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-host-cli-16: Negative - setattr and addattr on krbPrincipalName"
+        command="ipa host-mod --setattr krbPrincipalName=host/$host2@BOS.REDHAT.COM $host1"
+        expmsg="ipa: ERROR: no modifications to be performed"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
+        command="ipa host-mod --addattr krbPrincipalName=host/$host2@BOS.REDHAT.COM $host1"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-host-cli-17: Negative - setattr and addattr on serverHostName"
+        command="ipa host-mod --setattr serverHostName=$host2 $host1"
+        expmsg="ipa: ERROR: no modifications to be performed"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
+        command="ipa host-mod --addattr serverHostName=$host2 $host1"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-host-cli-18:  setattr and addattr on nsHostLocation"
+        command="ipa host-mod --setattr nsHostLocation=mars $host1"
+        expmsg="ipa: ERROR: no modifications to be performed"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
+        command="ipa host-mod --addattr nsHostLocation=jupiter $host1"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-host-cli-19:  setattr and addattr on l - locality"
+        command="ipa host-mod --setattr l=sunnyside $host1"
+        expmsg="ipa: ERROR: no modifications to be performed"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
+        command="ipa host-mod --addattr l=moonside $host1"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-host-cli-20:  setattr and addattr on nsOsVersion"
+        command="ipa host-mod --setattr nsOsVersion=RHEL6 $host1"
+        expmsg="ipa: ERROR: no modifications to be performed"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
+        command="ipa host-mod --addattr nsOsVersion=RHEL5 $host1"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-host-cli-21:  Negative - setattr and addattr on enrolledBy"
+        command="ipa host-mod --setattr enrolledBy=\"uid=user,cn=users,cn=accounts,dc=bos,dc=redhat,dc=com\" $host1"
+        expmsg="ipa: ERROR: no modifications to be performed"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
+        command="ipa host-mod --addattr enrolledBy=\"uid=user,cn=users,cn=accounts,dc=bos,dc=redhat,dc=com\" $host1"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-host-cli-22:  Negative - setattr and addattr on enrolledBy - invalid syntax"
+        command="ipa host-mod --setattr enrolledBy=me $host1"
+        expmsg="ipa: ERROR: Invalid syntax:enrolledBy: value #0 invalid per syntax"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
+        command="ipa host-mod --addattr enrolledBy=you $host1"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-host-cli-23:  Negative - setattr and addattr on description"
+        command="ipa host-mod --setattr description=new $host1"
+        expmsg="ipa: ERROR: no modifications to be performed"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
+        command="ipa host-mod --addattr description=newer $host1"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-host-cli-24: Delete Hosts"
+        for item in $host1 $host3 $host5 ; do
+                rlRun "deleteHost $item" 0 "Delete host $item."
+                rlRun "findHost $item" 1 "Verifying host $item was deleted."
+        done
+     rlPhaseEnd
+
     rlPhaseStartCleanup "ipa-host-cli-cleanup: Destroying admin credentials."
         rlRun "popd"
         rlRun "rm -r $TmpDir" 0 "Removing tmp directory"
-	rlRun "ipa host-del \"$host1\"" 0 "Deleting host added."
-	rlRun "ipa host-del \"$host3\"" 0 "Deleting host added."
-	rlRun "ipa host-del \"$host5\"" 0 "Deleting host added."
 	rlRun "kdestroy" 0 "Destroying admin credentials."
     rlPhaseEnd
 rlJournalPrintText
