@@ -143,9 +143,9 @@ verifyErrorMsg()
    expmsg=$2
    rc=0
 
-   actual=`$command 2>&1`
-	rlLog "DEBUG: Actual: $actual"
-	rlLog "DEBUG: Expected: $expmsg"
+   rlLog "Executing: $command"
+   $command 2> /tmp/errormsg.out
+   actual=`cat /tmp/errormsg.out`
    if [[ "$actual" == "$expmsg" ]] ; then
 	rlLog "Error message as expected: $actual"
    else
