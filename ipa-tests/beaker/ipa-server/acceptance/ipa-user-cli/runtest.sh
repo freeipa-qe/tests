@@ -47,11 +47,11 @@
 #. /dev/shm/ipa-user-cli-lib.sh
 #. /dev/shm/ipa-server-shared.sh
 
+. /iparhts/shared/ipa-server-shared.sh
 . /usr/share/beakerlib/beakerlib.sh
 
 # Include local help file
 . ./lib.user-cli.sh
-
 # Include test case file
 . ./t.user-cli.sh
 
@@ -103,11 +103,11 @@ rlJournalStart
         rlRun "pushd $TmpDir"
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-user-cli: ipa user-cli test starts"
-        addusertest
-        modusertest
-        delusertest        
-   rlPhaseEnd
+    # test starts
+    addusertest
+    #modusertest
+    #delusertest        
+    # test ends
 
     rlPhaseStartCleanup "ipa-user-cli-cleanup"
         rlRun "popd"
