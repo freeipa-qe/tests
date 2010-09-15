@@ -44,6 +44,7 @@ set send_slow {1 .1}' > $expfile
    else
 	rlLog "kinit as $username with password $password was successful."
    fi
+   return $rc
 }  
 
 #######################################################################
