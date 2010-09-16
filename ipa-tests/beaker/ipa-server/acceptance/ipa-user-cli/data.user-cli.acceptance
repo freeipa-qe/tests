@@ -35,4 +35,7 @@ muid="412842"
 mgroup1="mgroup1"
 mgroup2="mgroup2"
 
-
+# user to be used in user-show test
+suser="showtest01"
+sfirst="showuserfirst"
+slast="showuserlast"

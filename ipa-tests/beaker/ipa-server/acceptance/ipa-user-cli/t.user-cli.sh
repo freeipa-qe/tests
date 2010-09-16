@@ -6,7 +6,7 @@ t_addusertest_envsetup()
 {
     rlPhaseStartTest "setup environment for addusertest"
         rlLog "kinit as admin"
-        Kinit $admin $adminpassword
+        kinitAs $admin $adminpassword
         if [ $? -ne 0 ];then
             rlFail "kinit as $admin failed"
         else
@@ -18,12 +18,11 @@ t_addusertest_envsetup()
 t_addusertest_envcleanup()
 {
     rlPhaseStartTest "clean up enviroment for addusertest"
-        #KinitAs $admin $adminpassword
-        rlRun "echo $adminpassword | kinit $admin" 0 "re-kinit as $admin"
+        kinitAs $admin $adminpassword
         rlRun "ipa user-del $superuser" 0 "delete $superuser account"
         rlRun "ipa user-del $lusr " 0 "delete $lusr account"
         rlLog "run kdestroy to clean up all ticket"
-        Kdestroy
+        rlRun "/usr/kerberos/bin/kdestroy" 0 "remove all kinit tickets"
         if [ $? -ne 0 ];then
             rlFail "kinit as admin failed"
         else
@@ -75,26 +74,22 @@ t_negative_adduser()
 
 t_addlockuser()
 {
-    rlPhaseStartTest "Add user - Set Password - Kinit"
-        rlRun "ipa user-add --first=$superuserfirst --last=$superuserlast $lusr" 0 "add user $lusr for lock-unlock test" 0 "add user for accout lock-unlock test"
-        rlRun "ipa user-find $lusr | grep $lusr" 0 "search for the newly created account"
-        # Set up the password of the new user so that they can kinit later
-        #SetUserPassword $lusr pw
-        #if [ $? -ne 0 ]; then
-        #    rlFail "ERROR - SetUserPassword failed "
-        #    rlPhaseEnd
-        #    return
-        #fi
+    rlPhaseStartTest "Add user for account lock-unlock test"
+        rlRun   "ipa user-add --first=$superuserfirst --last=$superuserlast $lusr" \
+                0 \
+                "add user $lusr for lock-unlock test" 0 "add user for accout lock-unlock test"
+        rlRun   "ipa user-find $lusr | grep $lusr" 0 "search for the newly created account"
 
+        # set initial password, and we change it right away
         initialpw="thisjunk10"
         rlRun "echo $initialpw | ipa user-mod --password $lusr" 0 "set initial pasword"
         FirstKinitAs $lusr $initialpw $lusrpw
         if [ $? -ne 0 ]; then
             rlFail "ERROR - kinit failed "
-            rlPhaseEnd
-            return
+        else
+            rlPass "Success - kinit at first time with password [$lusrpw] success"
+            rlLog "user account for lock-unlokc test created"
         fi
-        rlPass "user account for lock-unlokc test created"
     rlPhaseEnd
 } #t_addlockuser
 
@@ -102,8 +97,7 @@ t_lockuser()
 {
     rlPhaseStartTest "Lock User"
         # re-kinit as admin, since only admin can lock-unlock user account
-        #kinitAs $admin $adminpassword
-        rlRun "echo $adminpassword | kinit $admin" 0 "re-kinit as $admin"
+        kinitAs $admin $adminpassword
         rlRun "ipa user-lock $lusr" 0 "perform user account locking"
         if [ $? -ne 0 ];then 
             rlFail "ERROR - ipa user-lock failed "
@@ -122,13 +116,12 @@ t_lockuser()
 t_unlockuser()
 {
     rlPhaseStartTest "Unlock User"
-        #kinitAs $admin $adminpassword
-        rlRun "echo $adminpassword | kinit $admin" 0 "re-kinit as $admin"
+        kinitAs $admin $adminpassword
         rlRun "ipa user-unlock $lusr"
         if [ $? -ne 0 ];then 
             rlFail "ERROR - ipa user-lock failed "
         else
-            kinitAs $s $lusr $lusrpw
+            kinitAs $lusr $lusrpw
             if [ $? -ne 0 ];then 
                 rlFail "ERROR - kinit as $lusr failed after unlock. expect success "
             else
@@ -136,13 +129,13 @@ t_unlockuser()
             fi
         fi
     rlPhaseEnd
-} #t_unlock
+} #t_unlockuser
 
 t_moduser_envsetup()
 {
     rlPhaseStartTest "Add User - Define Only Required Attributes"
-        Kdestroy
-        Kinit $admin $adminpassword
+        rlRun "/usr/kerberos/bin/kdestroy" 0 "remove all kinit tickets"
+        kinitAs $admin $adminpassword
         rlRun "ipa user-add --first=superuserfirst --last=superuserlast $musr" 0 "add test user account"
         rlRun "ipa user-find $musr | grep $musr" 0 "confirm the existance of test account"
     rlPhaseEnd
@@ -152,7 +145,7 @@ t_moduser_envcleanup()
 {
     rlPhaseStartTest "clean up env for moduser test"
         rlRun "ipa user-del $musr" 0 "remove test user account [$musr]"
-        Kdestroy
+        rlRun "/usr/kerberos/bin/kdestroy" 0 "remove all kinit tickets"
     rlPhaseEnd
 } #t_moduser_envcleanup
 
@@ -324,4 +317,59 @@ t_modgroup2()
     result $myresult
     rlLog "END $tet_thistest"
 } #t_modgroup2
+
+t_showusertest_envsetup()
+{
+    rlPhaseStartTest "show user test env setup"
+        kinitAs $admin $adminpassword
+        if [ $? -ne 0 ];then
+            rlFail "kinit as $admin failed, test can not continue"
+        else
+            rlLog "kinit as $admin success, now create a testing account"
+        fi
+        rlRun "ipa user-add --first=$sfirst --last=$slast $suser" 0 "add test user account"
+        rlRun "ipa user-find $suser | grep $suser" 0 "confirm the existance of test account"
+    rlPhaseEnd
+} # t_showusertest_envsetup
+
+t_showusertest_envcleanup()
+{
+    rlPhaseStartTest "show user test env cleanup"
+        rlRun "/usr/kerberos/bin/kdestroy" 0 "remove all kinit tickets"
+        kinitAs $admin $adminpassword 
+        rlRun "ipa user-del $suser"
+    rlPhaseEnd
+} #t_showusetest_envcleanup
+
+t_showall()
+{
+    rlPhaseStartTest "test --all option of command: ipa user-show"
+        tmp=/tmp/ipa.showall.$RANDOM.out
+        datafile="/iparhts/acceptance/ipa-user-cli/data.showall.fields.txt"
+        rlRun "ipa user-show --all $suser > $tmp" 0 "output --all to [$tmp]"
+        for field in `cat $datafile`
+        do
+            rlAssertGrep "$field" $tmp 
+        done
+        rlAssertGrep "Last name: $slast" $tmp
+        rlAssertGrep "First name: $sfirst" $tmp
+        rm -f $tmp
+    rlPhaseEnd
+} #t_showall
+
+t_showraw()
+{
+    rlPhaseStartTest "test --raw option of command: ipa user-show"
+        tmp=/tmp/ipa.showraw.$RANDOM.out
+        datafile="/iparhts/acceptance/ipa-user-cli/data.showraw.fields.txt"
+        rlRun "ipa user-show --raw $suser > $tmp" 0 "output --all to [$tmp]"
+        for field in `cat $datafile`
+        do
+            rlAssertGrep "$field" $tmp
+        done
+        rlAssertGrep "sn: $slast" $tmp
+        rlAssertGrep "givenname: $sfirst" $tmp
+        rm -f $tmp
+    rlPhaseEnd
+} #t_showraw
 

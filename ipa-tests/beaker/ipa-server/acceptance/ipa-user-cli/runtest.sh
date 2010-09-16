@@ -87,6 +87,14 @@ modusertest()
     t_moduser_envcleanup
 } #modusertest
 
+showusertest()
+{
+    t_showusertest_envsetup
+    t_showall
+    t_showraw
+    t_showusertest_envcleanup
+} #showusertest
+
 delusertest()
 {
     t_deluser
@@ -105,8 +113,9 @@ rlJournalStart
 
     # test starts
     addusertest
-    #modusertest
-    #delusertest        
+    modusertest
+    showusertest
+    delusertest        
     # test ends
 
     rlPhaseStartCleanup "ipa-user-cli-cleanup"
