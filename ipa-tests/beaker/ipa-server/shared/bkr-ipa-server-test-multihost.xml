@@ -3,7 +3,7 @@
 		ipa-server x86_64 multihost qe-blade-12
 	</whiteboard>
 	<recipeSet>
-		<recipe kernel_options="" kernel_options_post="" ks_meta="" role="None" whiteboard="">
+		<recipe kernel_options="" kernel_options_post="" ks_meta="" role="MASTER" whiteboard="">
 			<watchdog/>
 			<packages/>
 			<ks_appends/>
@@ -26,7 +26,7 @@
 			<task name="/distribution/install" role="STANDALONE">
 				<params/>
 			</task>
-			<task name="/CoreOS/ipa-server/acceptance/install" role="STANDALONE">
+			<task name="/CoreOS/ipa-server/acceptance/install" role="MASTER">
 				<params/>
 			</task>
 			<task name="/CoreOS/ipa-server/acceptance/uninstall" role="STANDALONE">
@@ -34,7 +34,7 @@
 			</task>
 
 		</recipe>
-		<recipe kernel_options="" kernel_options_post="" ks_meta="" role="None" whiteboard="">
+		<recipe kernel_options="" kernel_options_post="" ks_meta="" role="SLAVE" whiteboard="">
 			<watchdog/>
 			<packages/>
 			<ks_appends/>
@@ -58,7 +58,7 @@
 			<task name="/distribution/install" role="STANDALONE">
 				<params/>
 			</task>
-			<task name="/CoreOS/ipa-server/acceptance/install" role="STANDALONE">
+			<task name="/CoreOS/ipa-server/acceptance/install" role="SLAVE">
 				<params/>
 			</task>
 			<task name="/CoreOS/ipa-server/acceptance/uninstall" role="STANDALONE">
