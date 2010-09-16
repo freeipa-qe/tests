@@ -24,7 +24,7 @@
 					<param name="PKGARGNAME" value="expect ipa-server"/>
 				</params>
 			</task>
-			<task name="/CoreOS/ipa-server/acceptance/install" role="STANDALONE">
+			<task name="/CoreOS/ipa-server/acceptance/install" role="MASTER">
 				<params/>
 			</task>
 

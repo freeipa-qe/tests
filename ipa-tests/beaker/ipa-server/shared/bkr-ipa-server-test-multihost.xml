@@ -23,6 +23,9 @@
 				</and>
 			</hostRequires>
 			<partitions/>
+			<task name="/CoreOS/ipa-server/shared" role="STANDALONE">
+				<params/>
+			</task>
 			<task name="/distribution/install" role="STANDALONE">
 				<params/>
 			</task>
@@ -56,6 +59,9 @@
 			</hostRequires>
 			<partitions/>
 			<task name="/distribution/install" role="STANDALONE">
+				<params/>
+			</task>
+			<task name="/CoreOS/ipa-server/shared" role="STANDALONE">
 				<params/>
 			</task>
 			<task name="/CoreOS/ipa-server/acceptance/install" role="SLAVE">

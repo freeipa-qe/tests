@@ -190,6 +190,6 @@ exect eof' >> $TET_TMP_DIR/setup-ssh-remote.exp
 	else
 		rlLog "AddToKnownHosts called improperly, please see shared lib for usage"
 		return 1
-	if
+	fi
 	return 0
 }

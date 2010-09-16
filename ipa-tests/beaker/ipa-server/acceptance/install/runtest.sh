@@ -29,6 +29,7 @@
 # Include rhts environment
 . /usr/bin/rhts-environment.sh
 . /usr/lib/beakerlib/beakerlib.sh
+. /dev/shm/ipa-server-shared.sh
 
 PACKAGE="ipa-server"
 HOSTSFILE="/etc/hosts"
@@ -37,6 +38,10 @@ SERVICE="ipa_kpasswd"
 rlJournalStart
 	rlPhaseStartSetup
 		env
+		rlRun "ls /dev/shm/ipa-server-shared.sh"
+		if [ ! -f /dev/shm/ipa-server-shared.sh ]; then
+			echo "ERROR - /dev/shm/ipa-server-shared.sh does not exist, did the shared libs get installed?"
+		fi
 		rlRun "rm -f /etc/yum.repos.d/ipa*"
 		rlRun "cd /etc/yum.repos.d;wget http://jdennis.fedorapeople.org/ipa-devel/ipa-devel-fedora.repo"
 		#rlRun "cd /etc/yum.repos.d;wget http://apoc.dsdev.sjc.redhat.com/tet/ipa-fedora.repo"
@@ -116,13 +121,33 @@ expect eof' > /dev/shm/kinit-admin.exp
 		fi
 
 		# setup ssh key files
-		for s in $CLIENTS; do
+		for s in $CLIENT; do
 			if [ "$s" != "" ]; then
+				AddToKnownHosts $s
+			fi
+		done
+		for s in $MASTER; do
+			if [ "$s" != "" ]; then
+				AddToKnownHosts $s
+			fi
+		done
+		for s in $SLAVE; do
+			if [ "$s" != "" ]; then
+				AddToKnownHosts $s
+			fi
+		done
 
 		# Set up ipa server clone files 
 		if [ "$MASTER" = "$HOSTNAME" ]; then 
-for s in $CLIENTS; do
-if [ "$s" != "" ]; then
+			# This is the master server, create the replictation certs
+			for s in $SLAVE; do
+				if [ "$s" != "" ]; then
+					ipa-replica-prepare $s
+					# Copy the replica info to the slave
+					rlRun "scp /var/lib/ipa/replica-info-$s.gpg root@$s:/dev/shm/."
+				fi
+			done
+		fi
 
 		rlRun "cat /dev/shm/kinit-admin.exp"
 		rlRun "kdestroy"

@@ -45,7 +45,7 @@ run: $(FILES) build
 	cp ./set-root-pw.exp /dev/shm/.
 	rm -f /dev/shm/id_rsa*
 	cp ./id_rsa* /dev/shm/.
-	mkdir /root/.ssh
+	mkdir -p /root/.ssh
 	cp ./id_rsa* /root/.ssh/.
 	rm -f /dev/shm/id_dsa*
 	cp ./id_dsa* /dev/shm/.
