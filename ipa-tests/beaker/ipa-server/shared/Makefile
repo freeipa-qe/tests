@@ -29,7 +29,7 @@ export TESTVERSION=1.0
 
 BUILT_FILES=
 
-FILES=$(METADATA) ipa-server-shared.sh ipa-host-cli-lib.sh Makefile PURPOSE set-root-pw.exp id_rsa.pub id_rsa 
+FILES=$(METADATA) ipa-server-shared.sh ipa-host-cli-lib.sh Makefile PURPOSE set-root-pw.exp id_rsa.pub id_rsa id_dsa.pub id_dsa 
 
 .PHONY: all install download clean
 
@@ -47,6 +47,9 @@ run: $(FILES) build
 	cp ./id_rsa* /dev/shm/.
 	mkdir /root/.ssh
 	cp ./id_rsa* /root/.ssh/.
+	rm -f /dev/shm/id_dsa*
+	cp ./id_dsa* /dev/shm/.
+	cp ./id_dsa* /root/.ssh/.
 	chmod 600 /root/.ssh
 	chmod 600 /root/.ssh/id*
 

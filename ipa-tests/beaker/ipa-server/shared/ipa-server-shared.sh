@@ -156,3 +156,40 @@ verifyErrorMsg()
 
    return $rc
 }
+
+#########################################################################
+# AddToKnownHosts
+#   Add the machine with the hostname in $1 to the sshknown hosts file.
+#   This sub will also remove any entries for the defined hostname from 
+#    known hosts before completing. This sub assumes that the shared libs are 
+#    installed, this should set up id_rsa and id_dsa in the root's .ssh dir
+#   Usage: AddToKnownHosts <fullhostname>
+#   Returns 1 if $1 is empty
+#   Returns 0 if everything seems to have worked.
+#######################################################################
+AddToKnownHosts()
+{
+	TET_TMP_DIR=/dev/shm
+	if [ "$1" != "" ]; then 
+		rlLog "creating expect file to add $1 to known hosts file"
+		echo '#!/usr/bin/expect -f
+set timeout 30
+set send_slow {1 .1}
+spawn $env(SHELL)
+match_max 100000' > $TET_TMP_DIR/setup-ssh-remote.exp
+		echo "send -s -- \"ssh root@$1 'ls /'\"" >> $TET_TMP_DIR/setup-ssh-remote.exp
+		echo "expect \"*'ls /'\"" >> $TET_TMP_DIR/setup-ssh-remote.exp
+		echo 'sleep .1
+send -s -- "\r"
+expect "*Are you sure you want to continue connecting (yes/no)? "
+sleep .1
+send -s -- "yes\r"
+exect eof' >> $TET_TMP_DIR/setup-ssh-remote.exp
+		rlLog "Running expect script to add $1 to known hosts file"
+		$TET_TMP_DIR/setup-ssh-remote.exp
+	else
+		rlLog "AddToKnownHosts called improperly, please see shared lib for usage"
+		return 1
+	if
+	return 0
+}
