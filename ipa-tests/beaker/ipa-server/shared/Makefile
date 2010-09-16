@@ -44,9 +44,9 @@ run: $(FILES) build
 	rm -f /dev/shm/set-root-pw.exp
 	cp ./set-root-pw.exp /dev/shm/.
 	rm -f /dev/shm/id_rsa*
-	cp ./id_rda* /dev/shm/.
+	cp ./id_rsa* /dev/shm/.
 	mkdir /root/.ssh
-	cp ./id_rda* /root/.ssh/.
+	cp ./id_rsa* /root/.ssh/.
 	chmod 600 /root/.ssh
 	chmod 600 /root/.ssh/id*
 
