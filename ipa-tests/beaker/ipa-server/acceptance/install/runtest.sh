@@ -42,7 +42,7 @@ rlJournalStart
 		#rlRun "cd /etc/yum.repos.d;wget http://apoc.dsdev.sjc.redhat.com/tet/ipa-fedora.repo"
 		rlRun "rm -f /dev/shm/set*.exp"
 		rlRun "cd /dev/shm;wget http://apoc.dsdev.sjc.redhat.com/tet/sssd/tests/ipa-server/acceptance/install/set-root-pw.exp"
-		rlRun "expect /dev/shm/set-root-pw.exp"
+#		rlRun "expect /dev/shm/set-root-pw.exp"
 #		rlRun "yum clean"
 		# Run yum install 3 times because the repos are flaky
 		packages="ipa-server ipa-admintools bind caching-nameserver expect krb5-workstation bind-dyndb-ldap"
@@ -80,11 +80,16 @@ rlJournalStart
 		sed -i s/$hostname_s//g /dev/shm/hosts
 		echo "$ipaddr $hostname" >> /dev/shm/hosts
 		cat /dev/shm/hosts > /etc/hosts
+		echo "hosts file contains"
+		cat /etc/hosts
 		rlRun "ls /root"
-		# install IPA
-		echo "ipa-server-install --setup-dns --forwarder=10.14.63.12 --hostname=$hostname -r testrelm -n testdomain -p Secret123 -P Secret123 -a Secret123 -u admin -U" > /dev/shm/installipa.bash
-		setenforce 0
-		/bin/bash /dev/shm/installipa.bash
+		# install IPA only if the is the master server
+		if [ "$MASTER" = "$HOSTNAME" ]; then 
+			# This is the master server, set up ipa-server
+			echo "ipa-server-install --setup-dns --forwarder=10.14.63.12 --hostname=$hostname -r testrelm -n testdomain -p Secret123 -P Secret123 -a Secret123 -u admin -U" > /dev/shm/installipa.bash
+			setenforce 0
+			/bin/bash /dev/shm/installipa.bash
+		fi
 		rlRun "cat /etc/krb5.conf"
 		# Create expect file to kinit with
 		echo '#!/usr/bin/expect -f
@@ -104,10 +109,24 @@ match_max 100000
 expect ": "
 send -- "Secret123\r"
 expect eof' > /dev/shm/kinit-admin.exp
-		expect /dev/shm/kinit-admin.exp
+		if [ "$MASTER" = "$HOSTNAME" ]; then 
+			# This is the master server, make sure kinit works.
+			expect /dev/shm/kinit-admin.exp
+			rlRun "klist"
+		fi
+
+		# setup ssh key files
+		for s in $CLIENTS; do
+			if [ "$s" != "" ]; then
+
+		# Set up ipa server clone files 
+		if [ "$MASTER" = "$HOSTNAME" ]; then 
+for s in $CLIENTS; do
+if [ "$s" != "" ]; then
+
 		rlRun "cat /dev/shm/kinit-admin.exp"
-		rlRun "klist"
 		rlRun "kdestroy"
+
 	rlPhaseEnd
 
 	rlPhaseStartTest "IPA start test section"
