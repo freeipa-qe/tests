@@ -68,19 +68,19 @@ rlJournalStart
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-host-cli-001: Add lower case host"
-        rlRun "addHost $host1" 0 "Adding new host with ipa host-add."
+        rlRun "addHost $host1 force" 0 "Adding new host with ipa host-add."
         rlRun "findHost $host1" 0 "Verifying host was added with ipa host-find lower case."
         rlRun "findHost $host2" 0 "Verifying host was added with ipa host-find upper case."
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-host-cli-02: Add upper case host"
-        rlRun "addHost $host3" 0 "Adding new host with ipa host-add."
+        rlRun "addHost $host3 force" 0 "Adding new host with ipa host-add."
         rlRun "findHost $host3" 0 "Verifying host was added with ipa host-find lower case."
         rlRun "findHost $host4" 0 "Verifying host was added with ipa host-find upper case."
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-host-cli-03: Add host with dashes in hostname"
-        rlRun "addHost $host5" 0 "Adding new host with ipa host-add."
+        rlRun "addHost $host5 force" 0 "Adding new host with ipa host-add."
         rlRun "findHost $host5" 0 "Verifying host was added with ipa host-find lower case."
     rlPhaseEnd
 
@@ -178,7 +178,7 @@ rlJournalStart
 
     rlPhaseStartTest "ipa-host-cli-14: Negative - setattr and addattr on fqdn"
         command="ipa host-mod --setattr fqdn=newfqdn $host1"
-        expmsg="ipa: ERROR: no modifications to be performed"
+        expmsg="ipa: ERROR: Operation not allowed on RDN:"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
 	command="ipa host-mod --addattr fqdn=newfqdn $host1"
 	rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
@@ -194,7 +194,7 @@ rlJournalStart
 
     rlPhaseStartTest "ipa-host-cli-16: Negative - setattr and addattr on krbPrincipalName"
         command="ipa host-mod --setattr krbPrincipalName=host/$host2@BOS.REDHAT.COM $host1"
-        expmsg="ipa: ERROR: no modifications to be performed"
+        expmsg="ipa: ERROR: Insufficient access: Principal name already set, it is unchangeable."
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
         command="ipa host-mod --addattr krbPrincipalName=host/$host2@BOS.REDHAT.COM $host1"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
@@ -208,27 +208,33 @@ rlJournalStart
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-host-cli-18:  setattr and addattr on nsHostLocation"
-        command="ipa host-mod --setattr nsHostLocation=mars $host1"
-        expmsg="ipa: ERROR: no modifications to be performed"
-        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
+    rlPhaseStartTest "ipa-host-cli-18: setattr and addattr on nsHostLocation"
+	attr="nsHostLocation"
+	rlRun "setAttribute host $attr mars $host1" 0 "Setting attribute $attr to value of mars."
+	rlRun "verifyHostAttr $host1 location \"$value\"" 0 "Verifying host $attr was modified."
+	# shouldn't be multivalue - additional add should fail
         command="ipa host-mod --addattr nsHostLocation=jupiter $host1"
+	expmsg="ipa: ERROR: no modifications to be performed"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-host-cli-19:  setattr and addattr on l - locality"
-        command="ipa host-mod --setattr l=sunnyside $host1"
-        expmsg="ipa: ERROR: no modifications to be performed"
-        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
+    rlPhaseStartTest "ipa-host-cli-19: setattr and addattr on l - locality"
+	attr="l"
+	rlRun "setAttribute host $attr sunnyside $host1" 0 "Setting attribute $attr to value of mars."
+	rlRun "verifyHostAttr $host1 locality sunnyside" 0 "Verifying host $attr was modified."
+	# shouldn't be multivalue - additional add should fail
         command="ipa host-mod --addattr l=moonside $host1"
+	expmsg="ipa: ERROR: no modifications to be performed"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-host-cli-20:  setattr and addattr on nsOsVersion"
-        command="ipa host-mod --setattr nsOsVersion=RHEL6 $host1"
-        expmsg="ipa: ERROR: no modifications to be performed"
-        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
+    rlPhaseStartTest "ipa-host-cli-20: setattr and addattr on nsOsVersion"
+        attr="nsOsVersion"
+        rlRun "setAttribute host $attr RHEL6 $host1" 0 "Setting attribute $attr to value of RHEL6."
+        rlRun "verifyHostAttr $host1 os RHEL6" 0 "Verifying host $attr was modified."
+	# shouldn't be multivalue - additional add should fail
         command="ipa host-mod --addattr nsOsVersion=RHEL5 $host1"
+	expmsg="ipa: ERROR: no modifications to be performed"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
     rlPhaseEnd
 
@@ -248,11 +254,13 @@ rlJournalStart
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-host-cli-23:  Negative - setattr and addattr on description"
-        command="ipa host-mod --setattr description=new $host1"
-        expmsg="ipa: ERROR: no modifications to be performed"
-        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
+    rlPhaseStartTest "ipa-host-cli-23: setattr and addattr on description"
+        attr="description"
+        rlRun "setAttribute host $attr new $host1" 0 "Setting attribute $attr to value of new."
+        rlRun "verifyHostAttr $host1 desc RHEL6" 0 "Verifying host $attr was modified."
+        # shouldn't be multivalue - additional add should fail
         command="ipa host-mod --addattr description=newer $host1"
+	expmsg="ipa: ERROR: no modifications to be performed"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
     rlPhaseEnd
 
@@ -263,10 +271,41 @@ rlJournalStart
         done
      rlPhaseEnd
 
+     rlPhaseStartTest "ipa-host-cli-25: Modify Host that doesn't Exist"
+        command="ipa host-mod --location=mars $host1"
+        expmsg="ipa: ERROR: $host1: host not found"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
+     rlPhaseEnd
+
+     rlPhaseStartTest "ipa-host-cli-26: Find Host that doesn't Exist"
+        command="ipa host-show $host1"
+        expmsg="ipa: ERROR: $host1: host not found"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
+     rlPhaseEnd
+
+     rlPhaseStartTest "ipa-host-cli-27: Show Host that doesn't Exist"
+        command="ipa host-show $host1"
+        expmsg="ipa: ERROR: $host1: host not found"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
+     rlPhaseEnd
+
+     rlPhaseStartTest "ipa-host-cli-28: Disable Host that doesn't Exist"
+        command="ipa host-disable $host1"
+        expmsg="ipa: ERROR: $host1: host not found"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
+     rlPhaseEnd
+
+     rlPhaseStartTest "ipa-host-cli-29: Add Host without force or add DNS record options"
+        command="ipa host-add $host1"
+        expmsg="ipa: ERROR: Host does not have corresponding DNS A record"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
+     rlPhaseEnd
+
     rlPhaseStartCleanup "ipa-host-cli-cleanup: Destroying admin credentials."
         rlRun "popd"
         rlRun "rm -r $TmpDir" 0 "Removing tmp directory"
 	rlRun "kdestroy" 0 "Destroying admin credentials."
     rlPhaseEnd
+
 rlJournalPrintText
 rlJournalEnd
