@@ -73,7 +73,14 @@ rlJournalStart
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verifying error message"
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-cli-03: Delete user and check for Private Group Removal"
+    rlPhaseStartTest "ipa-group-cli-03: Verify private group not returned with group-find command"
+        result=`ipa group-find jennyg`
+	echo $result | grep "0 groups matched"
+	rc=$?
+	rlAssert0 "0 Groups should be matched" $rc
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-group-cli-04: Delete user and check for Private Group Removal"
 	rlRun "ipa user-del jennyg" 0 "Deleting Test User"
 	rlRun "verifyGroupClasses jennyg yes" 2 "Verify user's private group was removed."
     rlPhaseEnd
