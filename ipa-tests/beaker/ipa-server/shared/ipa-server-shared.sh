@@ -184,7 +184,7 @@ send -s -- "\r"
 expect "*Are you sure you want to continue connecting (yes/no)? "
 sleep .1
 send -s -- "yes\r"
-exect eof' >> $TET_TMP_DIR/setup-ssh-remote.exp
+expect eof' >> $TET_TMP_DIR/setup-ssh-remote.exp
 		rlLog "Running expect script to add $1 to known hosts file"
 		$TET_TMP_DIR/setup-ssh-remote.exp
 	else
