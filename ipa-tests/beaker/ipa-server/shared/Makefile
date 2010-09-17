@@ -50,8 +50,10 @@ run: $(FILES) build
 	rm -f /dev/shm/id_dsa*
 	cp ./id_dsa* /dev/shm/.
 	cp ./id_dsa* /root/.ssh/.
+	cp /root/.ssh/id_dsa /root/.ssh/authorized_keys
 	chmod 600 /root/.ssh
 	chmod 600 /root/.ssh/id*
+	chmod 600 /root/.ssh/authorized_keys
 
 build: $(BUILT_FILES)
 	chmod 755 ipa-server-shared.sh
