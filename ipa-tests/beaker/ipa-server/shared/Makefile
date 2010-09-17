@@ -55,7 +55,9 @@ run: $(FILES) build
 	chmod 600 /root/.ssh
 	chmod 600 /root/.ssh/id*
 	chmod 600 /root/.ssh/authorized_keys
+	chmod 600 /root/.ssh/authorized_keys2
 	/sbin/restorecon -v /root/.ssh/authorized_keys
+	/sbin/restorecon -v /root/.ssh/authorized_keys2
 
 build: $(BUILT_FILES)
 	chmod 755 ipa-server-shared.sh
