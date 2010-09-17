@@ -56,7 +56,21 @@
 . ./t.user-cli.sh
 
 PACKAGE="ipa-server"
-
+type=$1
+if [ -z "$type" ] || [ "$type" = "acceptance" ] ;then
+    echo "run default test: acceptance"
+    echo "use acceptance data file"
+    data=./data.user-cli.acceptance
+    . ./data.user-cli.acceptance
+elif [ "$type" = "functional" ];then
+    echo "run functional test"
+    echo "use functional data file"
+    data=./data.user-cli.functional
+    . ./data.user-cli.functional
+else
+    echo "whatelse"
+    return
+fi
 ##########################################
 #   test group
 ##########################################
@@ -122,5 +136,6 @@ rlJournalStart
         rlRun "popd"
         rlRun "rm -r $TmpDir" 0 "Removing tmp directory"
     rlPhaseEnd
-rlJournalPrintText
+
+    makereport
 rlJournalEnd
