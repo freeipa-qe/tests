@@ -24,14 +24,16 @@
 addHost()
 {
    newhost=$1
+   rc=0
 
-   ipa host-add $newhost
-   rc=$?
-   if [ $rc -ne 0 ] ; then
-        rlLog "Adding new host $newhost failed"
-   else
-        rlLog "Adding new host $newhost successful."
-   fi
+	ipa host-add $newhost --force
+	rc=$?
+   	if [ $rc -ne 0 ] ; then
+        	rlLog "Adding new host $newhost failed with force option"
+   	else
+        	rlLog "Adding new host $newhost successful with force option."
+   	fi
+
    return $rc
 
 }
