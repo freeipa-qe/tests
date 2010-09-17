@@ -4,7 +4,7 @@
 
 t_addusertest_envsetup()
 {
-    rlPhaseStartTest "setup environment for addusertest"
+    rlPhaseStartTest "setup environment for addusertest" # sort=100
         rlLog "kinit as admin"
         kinitAs $admin $adminpassword
         if [ $? -ne 0 ];then
@@ -17,7 +17,7 @@ t_addusertest_envsetup()
 
 t_addusertest_envcleanup()
 {
-    rlPhaseStartTest "clean up enviroment for addusertest"
+    rlPhaseStartTest "clean up enviroment for addusertest" # sort=199
         kinitAs $admin $adminpassword
         rlRun "ipa user-del $superuser" 0 "delete $superuser account"
         rlRun "ipa user-del $lusr " 0 "delete $lusr account"
@@ -33,7 +33,7 @@ t_addusertest_envcleanup()
 
 t_addusersetup()
 {
-    rlPhaseStartTest "add user setup"
+    rlPhaseStartTest "add user setup" # sort=101
         rlRun "ipa user-add --first=$superuserfirst \
                             --last=$superuserlast \
                             --gecos=$superusergecos \
@@ -47,7 +47,7 @@ t_addusersetup()
 
 t_adduserverify()
 {
-    rlPhaseStartTest "verify the newly added user account"
+    rlPhaseStartTest "verify the newly added user account" # sort=102
         rlRun "ipa user-find $superuser | grep $superuserfirst" 0 "check user firstname"
         rlRun "ipa user-find $superuser | grep $superuserlast" 0 "check last name"
         rlRun "ipa user-find --all $superuser | grep $superusergecos" 0 "check gecos"
@@ -59,7 +59,7 @@ t_adduserverify()
 
 t_negative_adduser()
 {
-    rlPhaseStartTest "Negative test case: Add duplicated user should fail"    
+    rlPhaseStartTest "Negative test case: Add duplicated user should fail"  # sort=103 
         rlLog "START  Add Duplication User - Negative"
         rlRun "ipa user-add --first=$superuserfirst \
                             --last=$superuserlast \
@@ -74,7 +74,7 @@ t_negative_adduser()
 
 t_addlockuser()
 {
-    rlPhaseStartTest "Add user for account lock-unlock test"
+    rlPhaseStartTest "Add user for account lock-unlock test" # sort=104
         rlRun   "ipa user-add --first=$superuserfirst --last=$superuserlast $lusr" \
                 0 \
                 "add user $lusr for lock-unlock test" 0 "add user for accout lock-unlock test"
@@ -95,7 +95,7 @@ t_addlockuser()
 
 t_lockuser()
 {
-    rlPhaseStartTest "Lock User"
+    rlPhaseStartTest "Lock User" # sort=105
         # re-kinit as admin, since only admin can lock-unlock user account
         kinitAs $admin $adminpassword
         rlRun "ipa user-lock $lusr" 0 "perform user account locking"
@@ -115,7 +115,7 @@ t_lockuser()
 
 t_unlockuser()
 {
-    rlPhaseStartTest "Unlock User"
+    rlPhaseStartTest "Unlock User" # sort=106
         kinitAs $admin $adminpassword
         rlRun "ipa user-unlock $lusr"
         if [ $? -ne 0 ];then 
@@ -133,7 +133,7 @@ t_unlockuser()
 
 t_moduser_envsetup()
 {
-    rlPhaseStartTest "Add User - Define Only Required Attributes"
+    rlPhaseStartTest "Add User - Define Only Required Attributes" # sort=200
         rlRun "/usr/kerberos/bin/kdestroy" 0 "remove all kinit tickets"
         kinitAs $admin $adminpassword
         rlRun "ipa user-add --first=superuserfirst --last=superuserlast $musr" 0 "add test user account"
@@ -143,7 +143,7 @@ t_moduser_envsetup()
 
 t_moduser_envcleanup()
 {
-    rlPhaseStartTest "clean up env for moduser test"
+    rlPhaseStartTest "clean up env for moduser test" # sort=299
         rlRun "ipa user-del $musr" 0 "remove test user account [$musr]"
         rlRun "/usr/kerberos/bin/kdestroy" 0 "remove all kinit tickets"
     rlPhaseEnd
@@ -151,7 +151,7 @@ t_moduser_envcleanup()
 
 t_modfirstname()
 {
-    rlPhaseStartTest "Modify First Name"
+    rlPhaseStartTest "Modify First Name" # sort=201
         rlRun "ipa user-mod --first=$mfirst $musr" 0 "modify first name"
         rlRun "ipa user-show --all $musr | grep $mfirst" 0 "check the mfirst to verify"
     rlPhaseEnd
@@ -159,7 +159,7 @@ t_modfirstname()
 
 t_modlastname()
 {
-    rlPhaseStartTest "Modify Last Name"
+    rlPhaseStartTest "Modify Last Name" # sort=202
         rlRun "ipa user-mod --last=$mlast $musr" 0 "modify the last name"
         rlRun "ipa user-show --all $musr | grep $mlast" 0 "check last name"
     rlPhaseEnd
@@ -167,7 +167,7 @@ t_modlastname()
 
 t_modemail()
 {
-     rlPhaseStartTest "Modify email"
+     rlPhaseStartTest "Modify email" # sort=203
         rlRun "ipa user-mod --email=\'$memail\' $musr" 0 "modify email"
         rlRun "ipa user-show --all $musr | grep $memail" 0 "check email"
     rlPhaseEnd
@@ -175,7 +175,7 @@ t_modemail()
 
 t_modprinc()
 {
-    rlPhaseStartTest "Modify principal"
+    rlPhaseStartTest "Modify principal" # sort=204
         rlRun "ipa user-mod --principal=$mprinc $musr" 0 "modify principal"
         rlRun "ipa user-show --all $musr | grep $mprinc" 0 "check principal"
     rlPhaseEnd   
@@ -183,7 +183,7 @@ t_modprinc()
 
 t_modhome()
 {
-    rlPhaseStartTest "Modify home directory"
+    rlPhaseStartTest "Modify home directory" # sort=205
         rlRun "ipa user-mod --home=\'$mhome\' $musr" 0 "modify home directory"
         rlRun "ipa user-show --all $musr | grep $mhome" 0 "check home directory"
     rlPhaseEnd   
@@ -191,7 +191,7 @@ t_modhome()
 
 t_modgecos()
 {
-    rlPhaseStartTest "Modify gecos"
+    rlPhaseStartTest "Modify gecos" # sort=206
         rlRun "ipa user-mod --gecos=$mgecos $musr" 0 "modify gecos"
         rlRun "ipa user-show --all $musr | grep $mgecos" 0 "check gecos"
     rlPhaseEnd   
@@ -199,7 +199,7 @@ t_modgecos()
 
 t_moduid()
 {
-   rlPhaseStartTest "Modify uid"
+   rlPhaseStartTest "Modify uid" # sort=207
         rlRun "ipa user-mod --uid=$muid $musr" 0 "modify uid"
         rlRun "ipa user-show --all $musr | grep $muid" 0 "check uid"
     rlPhaseEnd   
@@ -207,7 +207,7 @@ t_moduid()
 
 t_modstreet()
 {
-    rlPhaseStartTest "Modify street"
+    rlPhaseStartTest "Modify street" # sort=208
         rlRun "ipa user-mod --street=\"$mstreet\" $musr" 0 "modify street info"
         rlRun "ipa user-show --all $musr | grep \"$mstreet\"" 0 "check street info"
     rlPhaseEnd   
@@ -215,7 +215,7 @@ t_modstreet()
 
 t_modshell()
 {
-    rlPhaseStartTest "Modify street"
+    rlPhaseStartTest "Modify street" # sort=209
         rlRun "ipa user-mod --shell=\'$mshell\' $musr" 0 "modify shell"
         rlRun "ipa user-show --all $musr | grep '$mshell'" 0 "check shell"
     rlPhaseEnd   
@@ -223,7 +223,7 @@ t_modshell()
 
 t_deluser()
 {
-    rlPhaseStartTest "delete user" 
+    rlPhaseStartTest "delete user"  # sort=400
         rlPass "user deletion test already included into adduser test and moduser test, simple log pass here"
     rlPhaseEnd
 } #t_deluser
@@ -320,7 +320,7 @@ t_modgroup2()
 
 t_showusertest_envsetup()
 {
-    rlPhaseStartTest "show user test env setup"
+    rlPhaseStartTest "show user test env setup" # sort=300
         kinitAs $admin $adminpassword
         if [ $? -ne 0 ];then
             rlFail "kinit as $admin failed, test can not continue"
@@ -334,7 +334,7 @@ t_showusertest_envsetup()
 
 t_showusertest_envcleanup()
 {
-    rlPhaseStartTest "show user test env cleanup"
+    rlPhaseStartTest "show user test env cleanup" # sort=399
         rlRun "/usr/kerberos/bin/kdestroy" 0 "remove all kinit tickets"
         kinitAs $admin $adminpassword 
         rlRun "ipa user-del $suser"
@@ -343,7 +343,7 @@ t_showusertest_envcleanup()
 
 t_showall()
 {
-    rlPhaseStartTest "test --all option of command: ipa user-show"
+    rlPhaseStartTest "test --all option of command: ipa user-show" # sort=301
         tmp=/tmp/ipa.showall.$RANDOM.out
         datafile="/iparhts/acceptance/ipa-user-cli/data.showall.fields.txt"
         rlRun "ipa user-show --all $suser > $tmp" 0 "output --all to [$tmp]"
@@ -359,7 +359,7 @@ t_showall()
 
 t_showraw()
 {
-    rlPhaseStartTest "test --raw option of command: ipa user-show"
+    rlPhaseStartTest "test --raw option of command: ipa user-show" # sort=302
         tmp=/tmp/ipa.showraw.$RANDOM.out
         datafile="/iparhts/acceptance/ipa-user-cli/data.showraw.fields.txt"
         rlRun "ipa user-show --raw $suser > $tmp" 0 "output --all to [$tmp]"
