@@ -8,6 +8,10 @@
 #	FirstKinitAs
 #       os_nslookup
 #       os_getdomainname
+#	verifyErrorMsg
+#	AddToKnowHosts
+#	setAttribute
+#	addAttribute
 ######################################################################
 #######################################################################
 # kinitAs Usage:
@@ -145,16 +149,25 @@ verifyErrorMsg()
    rc=0
 
    rlLog "Executing: $command"
-   $command 2> /tmp/errormsg.out
-   actual=`cat /tmp/errormsg.out`
-   if [[ "$actual" == "$expmsg" ]] ; then
-	rlLog "Error message as expected: $actual"
+   $command
+   rc=$?
+   if [ $rc -eq 0 ] ; then
+        rlLog "ERROR: Expected \"$command\" to fail."
+        rc=1
    else
-	rlLog "ERROR: Message not as expected. GOT: $actual  EXP: $expmsg"
-	rc=1
-   fi
+	rc=0
+	rlLog "\"$command\" failed as expected."
+        $command 2> /tmp/errormsg.out
+        actual=`cat /tmp/errormsg.out`
+        if [[ "$actual" == "$expmsg" ]] ; then
+                rlLog "Error message as expected: $actual"
+        else
+                rlLog "ERROR: Message not as expected. GOT: $actual  EXP: $expmsg"
+                rc=1
+        fi
+  fi
 
-   return $rc
+  return $rc
 }
 
 #########################################################################
@@ -193,3 +206,63 @@ expect eof' >> $TET_TMP_DIR/setup-ssh-remote.exp
 	fi
 	return 0
 }
+
+#######################################################################
+# setAttribute Usage:
+#       setAttribute <topic> <attribute> <value> <object>
+# Example:
+#	setAttribute host location "Lab 3" jennyv2.bos.redhat.com
+#####################################################################
+
+setAttribute()
+{
+  topic=$1
+  attr=$2
+  value=$3
+  object=$4
+  rc=0
+
+  rlLog "Executing: ipa $topic-mod --setattr $attr=\"$value\" $object"
+  ipa $topic-mod --setattr $attr="$value" $object
+  rc=$?
+  if [ $rc -ne 0 ] ; then
+	rlLog "ERROR: Failed to set value for attribute $attr."
+	rc=1
+  else
+	rlLog "Successfully set attribute $attr to \"$value\""
+  fi
+
+  return $rc
+
+}
+
+#######################################################################
+# addAttribute Usage:
+#       addAttribute <topic> <attribute> <value> <object>
+# Example:
+#       addAttribute host location "Lab 3" jennyv2.bos.redhat.com
+#####################################################################
+
+addAttribute()
+{
+  topic=$1
+  attr=$2
+  value=$3
+  object=$4
+  rc=0
+
+  rlLog "Executing: ipa $topic-mod --addattr $attr=\"$value\" $object"
+  ipa $topic-mod --addattr $attr="$value" $object
+  rc=$?
+  if [ $rc -ne 0 ] ; then
+        rlLog "ERROR: Failed to add additional attribute value for attribute $attr."
+        rc=1
+  else
+        rlLog "Successfully added additional attribute $attr with value \"$value\""
+  fi
+
+  return $rc
+
+}
+
+
