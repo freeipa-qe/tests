@@ -204,6 +204,7 @@ expect eof' >> $TET_TMP_DIR/setup-ssh-remote.exp
 		rlLog "AddToKnownHosts called improperly, please see shared lib for usage"
 		return 1
 	fi
+	chmod 777 $TET_TMP_DIR/setup-ssh-remote.exp
 	expect $TET_TMP_DIR/setup-ssh-remote.exp
 	return 0
 }

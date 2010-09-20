@@ -142,7 +142,7 @@ expect eof' > /dev/shm/kinit-admin.exp
 			# This is the master server, create the replictation certs
 			for s in $SLAVE; do
 				if [ "$s" != "" ]; then
-					ipa-replica-prepare $s
+					ipa-replica-prepare -p Secret123 $s
 					# Copy the replica info to the slave
 					rlRun "scp /var/lib/ipa/replica-info-$s.gpg root@$s:/dev/shm/."
 				fi
@@ -164,7 +164,9 @@ expect eof' > /dev/shm/kinit-admin.exp
 		rlRun "ls /tmp"
 		rlRun "ls /root"
 		rlRun "ls /etc/yum.repos.d"
-		rhts-submit-log -l /var/log/ipaserver-install.log
+		if [ -f /var/log/ipaserver-install.log ]; then
+			rhts-submit-log -l /var/log/ipaserver-install.log
+		fi
 	rlPhaseEnd
 
 rlJournalPrintText
