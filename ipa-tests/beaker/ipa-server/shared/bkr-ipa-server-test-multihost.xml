@@ -32,6 +32,9 @@
 			<task name="/CoreOS/ipa-server/acceptance/install" role="MASTER">
 				<params/>
 			</task>
+			<task name="/CoreOS/ipa-server/acceptance/install-slave" role="MASTER">
+				<params/>
+			</task>
 			<task name="/CoreOS/ipa-server/acceptance/uninstall" role="STANDALONE">
 				<params/>
 			</task>
@@ -65,6 +68,9 @@
 				<params/>
 			</task>
 			<task name="/CoreOS/ipa-server/acceptance/install" role="SLAVE">
+				<params/>
+			</task>
+			<task name="/CoreOS/ipa-server/acceptance/install-slave" role="SLAVE">
 				<params/>
 			</task>
 			<task name="/CoreOS/ipa-server/acceptance/uninstall" role="STANDALONE">
