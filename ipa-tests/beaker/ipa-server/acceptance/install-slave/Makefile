@@ -41,7 +41,6 @@ run: $(FILES) build
 
 build: $(BUILT_FILES)
 	chmod a+x runtest.sh
-	chmod 755 set-root-pw.exp
 
 clean:
 	rm -f *~ $(BUILT_FILES)

@@ -44,13 +44,16 @@ rlJournalStart
 	rlPhaseEnd
 
 	rlPhaseStartTest "IPA start test section"
-		echo  $SLAVE | grep $HOSTNAME
-		if [ $? -eq 0]; then
+		echo "$SLAVE" | grep "$HOSTNAME"
+		if [ $? -eq 0 ]; then
 			# This machine is a slave
+			echo "I am a slave/replica"
 			rlRun "ls /dev/shm/replica-info-$s.gpg"
 			echo "ipa-replica-install -p Secret123 /dev/shm/replica-info-$s.gpg" > /dev/shm/replica-install.bash
 			chmod 755 /dev/shm/replica-install.bash
 			bash /dev/shm/replica-install.bash
+		else
+			echo "not a slave, SLAVE is $SLAVE"
 		fi
 
 		# Create expect file to kinit with

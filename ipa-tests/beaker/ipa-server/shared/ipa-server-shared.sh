@@ -185,6 +185,7 @@ AddToKnownHosts()
 	TET_TMP_DIR=/dev/shm
 	if [ "$1" != "" ]; then 
 		rlLog "creating expect file to add $1 to known hosts file"
+		export SHELL="/bin/bash"
 		echo '#!/usr/bin/expect -f
 set timeout 30
 set send_slow {1 .1}
