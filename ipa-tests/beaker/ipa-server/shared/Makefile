@@ -29,7 +29,7 @@ export TESTVERSION=1.0
 
 BUILT_FILES=
 
-FILES=$(METADATA) ipa-server-shared.sh ipa-host-cli-lib.sh Makefile PURPOSE set-root-pw.exp id_rsa.pub id_rsa id_dsa.pub id_dsa 
+FILES=$(METADATA) ipa-server-shared.sh runtest.sh ipa-host-cli-lib.sh Makefile PURPOSE set-root-pw.exp id_rsa.pub id_rsa id_dsa.pub id_dsa 
 
 .PHONY: all install download clean
 
@@ -58,10 +58,12 @@ run: $(FILES) build
 	chmod 600 /root/.ssh/authorized_keys2
 	/sbin/restorecon -v /root/.ssh/authorized_keys
 	/sbin/restorecon -v /root/.ssh/authorized_keys2
+	./runtest.sh
 
 build: $(BUILT_FILES)
 	chmod 755 ipa-server-shared.sh
 	chmod 755 set-root-pw.exp
+	chmod a+x runtest.sh
 
 clean:
 	rm -f *~ $(BUILT_FILES)
