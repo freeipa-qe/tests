@@ -50,6 +50,14 @@
 ADMINID="admin"
 ADMINPWD="Admin123"
 
+BASEDN=`getBaseDN`
+USERRDN="cn=users,cn=accounts,"
+USERDN="$USERRDN$BASEDN"
+USERRDN="cn=users,cn=accounts,"
+GROUPDN="$GROUPRDN$BASEDN"
+echo "USERDN is $USERDN"
+echo "GROUPDN is $GROUPDN"
+
 ########################################################################
 
 PACKAGE="ipa-admintools"
@@ -461,48 +469,224 @@ rlJournalStart
     rlPhasEnd
 
     rlPhaseStartTest "ipa-group-cli-40: Removed Single User Member"
-	rlRun "removeGroupMembers users juser1 fish" 0 "Removing user juser1 from group fish."
+	# DIRECT MEMBERSHIP - fish
+	rlRun "removeGroupMembers users mdolphin fish" 0 "Removing user mdolphin from group fish."
         ipa group-find fish > /tmp/findgroup.out
         users=`cat /tmp/findgroup.out | grep "Member users:"`
-        echo $users | grep juser1
+        echo $users | grep mdolpin
 	rc=$?
-	rlAssertNotEquals "Checking that user is no longer a member" $rc 0
+	rlAssertNotEquals "Checking that user is no longer a member of direct group fish" $rc 0
+
+	# INDIRECT MEMBERSHIPS - animalkingdom and disneyworld
+        ipa group-find animalkingdon > /tmp/findgroup.out
+        users=`cat /tmp/findgroup.out | grep "Member users:"`
+        echo $users | grep mdolpin
+        rc=$?
+        rlAssertNotEquals "Checking that user is no longer a member of indirect group animalkingdom" $rc 0
+
+        ipa group-find disneyworld > /tmp/findgroup.out
+        users=`cat /tmp/findgroup.out | grep "Member users:"`
+        echo $users | grep mdolpin
+        rc=$?
+        rlAssertNotEquals "Checking that user is no longer a member of indirect group disneyworld" $rc 0
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-group-cli-41: Removed Single Group Member"
+	# DIRECT MEMBERSHIP - animalkingdom
         rlRun "removeGroupMembers groups fish animalkingdom" 0 "Removing group fish from group animalkingdom."
         ipa group-find animalkingdom > /tmp/findgroup.out
         groups=`cat /tmp/findgroup.out | grep "Member groups:"`
         echo $groups | grep fish
         rc=$?
-        rlAssertNotEquals "Checking that group is no longer a member" $rc 0
+        rlAssertNotEquals "Checking that group is no longer a member of direct group animalkingdom" $rc 0
+
+	# INDIRECT MEMBERSHIP - disneyworld
+        ipa group-find disneyworld > /tmp/findgroup.out
+        groups=`cat /tmp/findgroup.out | grep "Member groups:"`
+        echo $groups | grep fish
+        rc=$?
+        rlAssertNotEquals "Checking that group is no longer a member of indirect group disneyworld" $rc 0
+
+	# INDIRECT USER MEMBERSHIP - juser1
+        ipa group-find animalkingdom > /tmp/findgroup.out
+        users=`cat /tmp/findgroup.out | grep "Member users:"`
+        echo $users | grep juser1
+        rc=$?
+        rlAssertNotEquals "Checking that user is no longer a member of indirect group animalkingdom" $rc 0
+
+        ipa group-find disneyworld > /tmp/findgroup.out
+        users=`cat /tmp/findgroup.out | grep "Member users:"`
+        echo $users | grep juser1
+        rc=$?
+        rlAssertNotEquals "Checking that user is no longer a member of indirect group disneyworld" $rc 0
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-group-cli-42: Removed Multiple Group Members"
+	# DIRECT GROUP MEMBERSHIP - epcot
         rlRun "removeGroupMembers groups \"germany,japan\" epcot" 0 "Removing groups germany and japan from group epcot."
         ipa group-find epcot > /tmp/findgroup.out
 	groups=`cat /tmp/findgroup.out | grep "Member groups:"`
-	for items in germany japan ; do
+	for item in germany japan ; do
         	echo $groups | grep $item
         	rc=$?
-        	rlAssertNotEquals "Checking that group $item is no longer a member" $rc 0
+        	rlAssertNotEquals "Checking that group $item is no longer a member of direct group epcot" $rc 0
 	done
-    rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-cli-43: Removed Multiple User Members"
-        rlRun "removeGroupMembers users \"guser1,guser2\" germany" 0 "Removing users guser1 and guser2 from group germany."
-        ipa group-find germany > /tmp/findgroup.out
+        # INDIRECT USER MEMBERSHIPS - epcot
         users=`cat /tmp/findgroup.out | grep "Member users:"`
-        for items in guser1 guser2 ; do
-                echo $users | grep $item
+        for item in juser1 juser2 guser1 guser2; do
+                echo $groups | grep $item
                 rc=$?
-                rlAssertNotEquals "Checking that user $item is no longer a member" $rc 0
+                rlAssertNotEquals "Checking that user $item is no longer a member of indirect group disneyworld" $rc 0
+        done
+
+        # INDIRECT GROUP MEMBERSHIPS - disneyworld
+        ipa group-find disneyworld > /tmp/findgroup.out
+        groups=`cat /tmp/findgroup.out | grep "Member groups:"`
+        for item in germany japan ; do
+                echo $groups | grep $item
+                rc=$?
+                rlAssertNotEquals "Checking that group $item is no longer a member of indirect group disneyworld" $rc 0
+        done
+
+	# INDIRECT USER MEMBERSHIPS - disneyworld
+        users=`cat /tmp/findgroup.out | grep "Member users:"`
+        for item in juser1 juser2 guser1 guser2; do
+                echo $groups | grep $item
+                rc=$?
+                rlAssertNotEquals "Checking that user $item is no longer a member of indirect group disneyworld" $rc 0
         done
     rlPhaseEnd
 
-    rlPhaseStartCleanup "ipa-group-cli-cleanup: Destroying admin credentials."
+    rlPhaseStartTest "ipa-group-cli-43: Removed Multiple User Members"
+        rlRun "removeGroupMembers users \"trainer1,trainer2\" animalkingdom" 0 "Removing users trainer1 and trainer2 from group animalkingdom."
+	# DIRECT GROUP MEMBERSHIPS - animalkingdom
+        ipa group-find animalkingdom > /tmp/findgroup.out
+        users=`cat /tmp/findgroup.out | grep "Member users:"`
+        for item in trainer1 trainer2 ; do
+                echo $users | grep $item
+                rc=$?
+                rlAssertNotEquals "Checking that user $item is no longer a member of direct group animalkingdom" $rc 0
+        done
+
+        # INDIRECT GROUP MEMBERSHIPS - disneyworld
+        ipa group-find disneyworld > /tmp/findgroup.out
+        users=`cat /tmp/findgroup.out | grep "Member users:"`
+        for item in trainer1 trainer2 ; do
+                echo $users | grep $item
+                rc=$?
+                rlAssertNotEquals "Checking that user $item is no longer a member of indirect group disneyworld" $rc 0
+        done
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-group-cli-44: Delete User that is a member of two Groups"
+	rlRun "ipa user-del juser1" 0 "Deleting user that is member of two groups"
+	# DIRECT MEMBERSHIPS
+        ipa group-find fish > /tmp/findgroup.out
+        users=`cat /tmp/findgroup.out | grep "Member users:"`
+        echo $users | grep juser1
+        rc=$?
+        rlAssertNotEquals "Checking that user $item is no longer a member of direct group fish" $rc 0
+
+        ipa group-find japan > /tmp/findgroup.out
+        users=`cat /tmp/findgroup.out | grep "Member users:"`
+        echo $users | grep juser1
+        rc=$?
+        rlAssertNotEquals "Checking that user $item is no longer a member of direct group japan" $rc 0
+
+	# INDIRECT MEMBERSHIPS
+        ipa group-find animalkingdom > /tmp/findgroup.out
+        users=`cat /tmp/findgroup.out | grep "Member users:"`
+        echo $users | grep juser1
+        rc=$?
+        rlAssertNotEquals "Checking that user $item is no longer a member of indirect group animalkingdom" $rc 0
+
+        ipa group-find disneyworld > /tmp/findgroup.out
+        users=`cat /tmp/findgroup.out | grep "Member users:"`
+        echo $users | grep juser1
+        rc=$?
+        rlAssertNotEquals "Checking that user $item is no longer a member of indirect group disneyworld" $rc 0
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-group-cli-45: Delete lower level nested group"
+	rlRun "deleteGroup dinasaurs" 0 "Deleting lower level nested group"
+	# DIRECT MEMBERSHIP
+        ipa group-find animalkingdom > /tmp/findgroup.out
+        groups=`cat /tmp/findgroup.out | grep "Member groups:"`
+        echo $groups | grep dinasaurs
+        rc=$?
+        rlAssertNotEquals "Checking that group dinasaur is no longer a member of direct group animalkingdom" $rc 0
+
+	# INDIRECT MEMBERSHIP
+        ipa group-find disneyworld > /tmp/findgroup.out
+        groups=`cat /tmp/findgroup.out | grep "Member groups:"`
+        echo $groups | grep dinasaurs
+        rc=$?
+        rlAssertNotEquals "Checking that group dinasaur is no longer a member of indirect group disneyworld" $rc 0
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-group-cli-46: Delete Groups"
+	# lets clean up
+	for item in disneyworld animalkingdom epcot japan germany ; do
+		rlRun "deleteGroup $item" 0 "Deleting group $item"
+	done
+
+	for item in wdisney trainer1 trainer2 euser1 euser2 juser2 guser1 guser2 ; do
+		rlRun "ipa user-del $item" 0 "Deleting user $item"
+	done
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-group-cli-47: Negative - setattr and addattr on dn"
+        command="ipa group-mod --setattr dn=mynewDN fish"
+        expmsg="ipa: ERROR: attribute distinguishedName not allowed"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
+        command="ipa group-mod --addattr dn=anothernewDN fish"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-group-cli-48: Negative - setattr and addattr on ipauniqueid"
+        command="ipa group-mod --setattr ipauniqueid=mynew-unique-id fish"
+        expmsg="ipa: ERROR: attribute ipaunique not allowed"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
+        command="ipa group-mod --addattr ipauniqueid=another-new-unique-id fish"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-group-cli-49: Negative - setattr and addattr on cn"
+        command="ipa group-mod --setattr cn=\"cn=new,cn=groups,dc=domain,dc=com\" fish"
+        expmsg="ipa: ERROR: Operation not allowed on RDN:"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
+        command="ipa group-mod --addattr cn=\"cn=new,cn=groups,dc=domain,dc=com\" fish"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-group-cli-50: setattr and addattr on description"
+        attr="description"
+        rlRun "setAttribute group $attr new fish" 0 "Setting attribute $attr to value of new."
+        rlRun "verifyGroupAttr fish desc new" 0 "Verifying group $attr was modified."
+        # shouldn't be multivalue - additional add should fail
+        command="ipa group-mod --addattr description=newer fish"
+        expmsg="ipa: ERROR: no modifications to be performed"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-group-cli-51: setattr and addattr on member"
+        attr="member"
+	member1="uid=trex,$USERDN"
+	member2="uid=mdolphin,$USERDN"
+	command="ipa group-mod --setattr member=\"$member1\" fish"
+	expmsg"ipa: ERROR: Operation not allowed on member"
+	rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
+	command="ipa group-mod --addattr member=\"$member2\" fish"
+	rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
+    rlPhaseEnd
+
+    rlPhaseStartCleanup "ipa-group-cli-cleanup: Delete remaining users and group and Destroying admin credentials"
         rlRun "popd"
         rlRun "rm -r $TmpDir" 0 "Removing tmp directory"
+	rlRun "ipa user-del trex" 0 "Deleting user trex."
+	rlRun "ipa-user-del mdolphin" 0 "Deleting user mdolphin."
+	rlRun "deleteGroup fish" 0 "Deleting group fish."
 	rlRun "kdestroy" 0 "Destroying admin credentials."
     rlPhaseEnd
 
