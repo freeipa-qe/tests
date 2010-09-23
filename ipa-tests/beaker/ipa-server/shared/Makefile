@@ -29,7 +29,7 @@ export TESTVERSION=1.0
 
 BUILT_FILES=
 
-FILES=$(METADATA) ipa-server-shared.sh runtest.sh ipa-host-cli-lib.sh Makefile PURPOSE set-root-pw.exp id_rsa.pub id_rsa id_dsa.pub id_dsa 
+FILES=$(METADATA) ipa-server-shared.sh runtest.sh ipa-host-cli-lib.sh ipa-group-cli-lib.sh Makefile PURPOSE set-root-pw.exp id_rsa.pub id_rsa id_dsa.pub id_dsa 
 
 .PHONY: all install download clean
 
@@ -41,6 +41,8 @@ run: $(FILES) build
 	cp ./ipa-server-shared.sh /dev/shm/.
 	rm -f /dev/shm/ipa-host-cli-lib.sh
 	cp ./ipa-host-cli-lib.sh /dev/shm/.
+	rm -f /dev/shm/ipa-group-cli-lib.sh
+	cp ./ipa-group-cli-lib.sh /dev/shm/.
 	rm -f /dev/shm/set-root-pw.exp
 	cp ./set-root-pw.exp /dev/shm/.
 	rm -f /dev/shm/id_rsa*

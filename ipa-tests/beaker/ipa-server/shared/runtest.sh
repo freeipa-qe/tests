@@ -37,16 +37,14 @@
 . /usr/lib/beakerlib/beakerlib.sh
 
 rlJournalStart
-    rlPhaseStartSetup "Copy Shared Libraries to /dev/shm"
-	rlRun "cp ipa-server-share.sh /dev/shm/" 0 "Copying ipa-server-shared.sh"
-	rlRun "cp ipa-host-cli-lib.sh /dev/shm/" 0 "Copying ipa-server-cli-lib.sh"
-	rlRun "cp ipa-host-cli-lib.sh /dev/shm/" 0 "Copying ipa-group-cli-lib.sh"
+    rlPhaseStartSetup "list files in /dev/shm"
+	rlRun "ls /dev/shm"
     rlPhaseEnd
 
     rlPhaseStartTest "Verify shared libraries are available"
-	rlRun "ls /dev/shm/ipa-server-share.sh" 0 "Verifying ipa-server-shared.sh"
-	rlRun "ls /dev/shm/ipa-host-cli-lib.sh" 0 "Verifying ipa-host-cli-lib.sh"
-	rlRun "ls /dev/shm/ipa-host-cli-lib.sh" 0 "Verifying ipa-group-cli-lib.sh"
+	rlRun "ls /dev/shm/ipa-server-share.sh" 
+	rlRun "ls /dev/shm/ipa-host-cli-lib.sh" 
+	rlRun "ls /dev/shm/ipa-group-cli-lib.sh" 
     rlPhaseEnd
 
 rlJournalPrintText
