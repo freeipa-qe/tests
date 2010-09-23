@@ -48,8 +48,8 @@ rlJournalStart
 		if [ $? -eq 0 ]; then
 			# This machine is a slave
 			echo "I am a slave/replica"
-			rlRun "ls /dev/shm/replica-info-$s.gpg"
-			echo "ipa-replica-install -p Secret123 /dev/shm/replica-info-$s.gpg" > /dev/shm/replica-install.bash
+			rlRun "ls /dev/shm/replica-info-$HOSTNAME.gpg"
+			echo "ipa-replica-install -p Secret123 /dev/shm/replica-info-$HOSTNAME.gpg" > /dev/shm/replica-install.bash
 			chmod 755 /dev/shm/replica-install.bash
 			bash /dev/shm/replica-install.bash
 		else
