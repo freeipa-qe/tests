@@ -42,9 +42,7 @@ rlJournalStart
     rlPhaseEnd
 
     rlPhaseStartTest "Verify shared libraries are available"
-	rlRun "ls /dev/shm/ipa-server-share.sh" 
-	rlRun "ls /dev/shm/ipa-host-cli-lib.sh" 
-	rlRun "ls /dev/shm/ipa-group-cli-lib.sh" 
+	rlRun "ls /dev/shm/ipa-server-shared.sh" 
     rlPhaseEnd
 
 rlJournalPrintText

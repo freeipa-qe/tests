@@ -41,6 +41,22 @@ rlJournalStart
 		if [ ! -f /dev/shm/ipa-server-shared.sh ]; then
 			echo "ERROR - /dev/shm/ipa-server-shared.sh does not exist, did the shared libs get installed?"
 		fi
+		echo "$SLAVE" | grep "$HOSTNAME"
+		if [ $? -eq 0 ]; then
+			echo "this is a slave, wait for the replica file"
+			if [ ! -f /dev/shm/replica-info-$HOSTNAME.gpg ]; then
+				echo "waiting for replica file"
+				sleep 300
+				if [ ! -f /dev/shm/replica-info-$HOSTNAME.gpg ]; then
+					echo "waiting for replica file"
+					sleep 300
+					if [ ! -f /dev/shm/replica-info-$HOSTNAME.gpg ]; then
+						echo "ERROR - replica file not found, did the master install work properly?"
+						rlRun "ls /dev/shm/replica-info-$HOSTNAME.gpg"
+					fi
+				fi
+			fi
+		fi
 	rlPhaseEnd
 
 	rlPhaseStartTest "IPA start test section"
