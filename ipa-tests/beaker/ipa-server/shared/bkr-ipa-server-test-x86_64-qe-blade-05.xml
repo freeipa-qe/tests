@@ -1,9 +1,9 @@
 <job>
 	<whiteboard>
-		ipa-server  full run on qe-blade-12 x86_64
+		ipa-server  full run on qe-blade-05 x86_64
 	</whiteboard>
 	<recipeSet>
-		<recipe whiteboard="ipa server on x86_64 on qe-blade-12">
+		<recipe whiteboard="ipa server on x86_64 on qe-blade-05">
 			<distroRequires>
 				<and>
 					<distro_family op="=" value="Fedora13"/>
@@ -14,7 +14,7 @@
 			</distroRequires>
 			<hostRequires>
 				<and>
-					<hostname op="=" value="qe-blade-12.idm.lab.bos.redhat.com"/>
+					<hostname op="=" value="qe-blade-05.idm.lab.bos.redhat.com"/>
 				</and>
 			</hostRequires>
 			<repos/>
