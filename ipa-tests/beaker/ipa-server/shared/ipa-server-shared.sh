@@ -8,6 +8,7 @@
 #	FirstKinitAs
 #       os_nslookup
 #       os_getdomainname
+#	getBaseDN
 #	verifyErrorMsg
 #	AddToKnowHosts
 #	setAttribute
@@ -135,6 +136,19 @@ os_getdomainname()
      mydn=`hostname -f |  cut -d"." -f2-`
    fi
    echo "$mydn"
+}
+
+#######################################################################
+# getBaseDN Usage:
+#       basedn=`getBaseDN`
+#####################################################################
+getBaseDN()
+{
+  domain=`os_getdomainname`
+  echo dc=$domain > /tmp/domain.out
+  basedn=`cat /tmp/domain.out | sed -e 's/\./,dc=/g'`
+
+  echo "$basedn"
 }
 
 #########################################################################
