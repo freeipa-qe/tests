@@ -48,7 +48,7 @@
 # Test Suite Globals
 ########################################################################
 ADMINID="admin"
-ADMINPWD="Admin123"
+ADMINPWD="Sceret123"
 
 BASEDN=`getBaseDN`
 USERRDN="cn=users,cn=accounts,"
