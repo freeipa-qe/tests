@@ -11,6 +11,7 @@
 #       verifyGroupAttr
 #       verifyGroupClasses
 #	addGroupMembers
+#	removeGroupMembers
 #	verifyGroupMembers
 #	verifyUserMembers
 #	detachGroup
