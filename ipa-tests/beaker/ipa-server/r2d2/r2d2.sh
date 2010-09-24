@@ -1,0 +1,145 @@
+#!/bin/sh
+# File: r2d2.sh
+# Date: Setp 19, 2010
+# Author: yi zhang (yzhang@redhat.com)
+
+# r2d2.sh will read file from ./template directory and make test suite files based on the given conf file, a given sample is r2d2.conf
+
+# check the configuration file
+CONF=$1
+if [ -z "$CONF" ];then
+	echo "usage: r2d2.sh <test_suite_conf file>"
+	echo -n "test suite configuration file: "
+	read CONF
+fi
+
+if [ -r "$CONF" ];then
+    echo "configuration file: [$CONF]"
+    . $CONF
+else
+    echo "no configurationn file provides, exit"
+    exit 0
+fi
+
+# check the starting point: where we have acceptance test stored
+while [ ! -d $RHTS/r2d2 ] && [ -d $RHTS/acceptance ]
+do
+    if [ ! -z "$RHTS" ];then
+        echo "verify RHTS value... [$RHTS/acceptance] not found"
+    fi
+    echo -n "RHTS root:"
+    read RHTS
+done
+echo "using RHTS=[$RHTS]"
+echo "r2d2 root=[$RHTS/r2d2]"
+r2d2=$RHTS/r2d2
+template=$r2d2/template
+
+# verify source template directory
+
+# prepare output directory
+now=`date "+%Y%m%d_%H%M" `
+out="$r2d2/out/${testsuitename}.${now}"
+echo "output dir: [$out]"
+
+if [ ! -d $r2d2/$out ];then
+    mkdir -p $out
+else
+    echo -n "clean [$out] (y/n) y ?"
+    read answer
+    if [ -z "$answer" ] || [ "$answer" = "y" ];then
+        rm -rf $out
+    else
+        echo "do nothing. No output directory defined. You can wait for one minutes to rerun this program"
+        exit 0
+    fi
+fi
+echo "output directory : [$out]"
+
+# display the template file (template source of this script)
+makefile_template=$template/Makefile.template
+purpose_template=$template/PURPOSE.template
+testinfo_template=$template/testinfo.template
+runtest_template=$template/runtest.template
+t_template=$template/t.template
+lib_template=$template/lib.template
+
+# output file (destination)
+makefile_out=$out/Makefile
+purpose_out=$out/PURPOSE
+testinfo_out=$out/testinfo.desc
+runtest_out=$out/runtest.sh
+t_out=$out/t.${testsuitename}.sh
+lib_out=$out/lib.${testsuitename}.sh
+
+if [ -r $lib_template ] \
+    && [ -r $makefile_template ]\
+    && [ -r $purpose_template ] \
+    && [ -r $runtest_template ] \
+    && [ -r $testinfo_template ]\
+    && [ -r $t_template ] \
+    && [ -r $lib_template ]
+then
+    echo "template used in this test:"
+    echo "template for Makefile:        [$makefile_template]"
+    echo "template for PURPOSE :        [$purpose_template]"
+    echo "template for testinfo.desc:   [$testinfo_template]"
+    echo "template for runtest.sh:      [$runtest_template]"
+    echo "template for test case:       [$t_template]"
+    echo "template for local lib file:  [$lib_template]"
+
+    echo "output file goes to:"
+    echo "Makefile:        [$makefile_out]"
+    echo "PURPOSE :        [$purpose_out]"
+    echo "testinfo.desc:   [$testinfo_out]"
+    echo "runtest.sh:      [$runtest_out]"
+    echo "test case:       [$t_out]"
+    echo "local lib file:  [$lib_out]"
+fi
+
+########################################
+#    produce: Makefile                 #
+########################################
+sed -e 's/r2d2_author/$author/g' \
+    -e 's/r2d2_authoremail/$authoremail/g' \
+    -e 's/r2d2_description/$description/g' \
+    -e 's/r2d2_version/$version/g' \
+    -e 's/r2d2_testsuitename/$testsuitename/g'\
+    $makefile_template > $makefile_out
+
+########################################
+#    produce: PURPOSE                  #
+########################################
+sed -e 's/r2d2_author/$author/g' \
+    -e 's/r2d2_authoremail/$authoremail/g' \
+    -e 's/r2d2_description/$description/g' \
+    -e 's/r2d2_testsuitename/$testsuitename/g'\
+    $purpose_template > $purpose_out
+
+########################################
+#    produce: testinfo.desc            #
+########################################
+sed -e 's/r2d2author/$author/g' \
+    -e 's/r2d2_authoremail/$authoremail/g' \
+    -e 's/r2d2_description/$description/g' \
+    -e 's/r2d2_testsuitename/$testsuitename/g'\
+    $testinfo_template > $testinfo_out
+
+########################################
+#    produce: runtest.sh               #
+########################################
+sed -e 's/r2d2author/$author/g' \
+    $runtest_template > $runtest_out
+
+########################################
+#    produce: t.<test suite>.sh        #
+########################################
+sed -e 's/r2d2author/$author/g' \
+    $t_template > $t_out
+
+########################################
+#    produce: lib.<test suite>.sh      #
+########################################
+sed -e 's/r2d2author/$author/g' \
+    $lib_template > $lib_out
+

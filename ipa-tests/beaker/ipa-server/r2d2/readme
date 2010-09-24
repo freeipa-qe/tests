@@ -1,0 +1,8 @@
+Notes from yzhang:
+    The purpose of r2d2 sub-project, is to build up a fully automate tool to help ipa team to do the following:
+    1. write the sketch of test suite
+    2. provide tool to sync test cases to TCMS
+    3. provide tool to generate automatic report
+    4. sync with test plan
+
+
