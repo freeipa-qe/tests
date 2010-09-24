@@ -29,7 +29,7 @@ export TESTVERSION=1.0
 
 BUILT_FILES=
 
-FILES=$(METADATA) ipa-server-shared.sh runtest.sh ipa-host-cli-lib.sh ipa-group-cli-lib.sh Makefile PURPOSE set-root-pw.exp id_rsa.pub id_rsa id_dsa.pub id_dsa 
+FILES=$(METADATA) ipa-server-shared.sh runtest.sh ipa-host-cli-lib.sh ipa-group-cli-lib.sh Makefile PURPOSE set-root-pw.exp id_rsa.pub id_rsa id_dsa.pub id_dsa env.sh 
 
 .PHONY: all install download clean
 
@@ -37,6 +37,8 @@ run: $(FILES) build
 	#yum -y install expect
 	#expect ./set-root-pw.exp
 	#wget http://apoc.dsdev.sjc.redhat.com/tet/rhts-get.txt
+	rm -f /dev/shm/env.sh
+	cp ./env.sh /dev/shm/.
 	rm -f /dev/shm/ipa-server-shared.sh
 	cp ./ipa-server-shared.sh /dev/shm/.
 	rm -f /dev/shm/ipa-host-cli-lib.sh

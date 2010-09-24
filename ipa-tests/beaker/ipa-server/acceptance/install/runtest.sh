@@ -30,6 +30,7 @@
 . /usr/bin/rhts-environment.sh
 . /usr/lib/beakerlib/beakerlib.sh
 . /dev/shm/ipa-server-shared.sh
+. /dev/shm/env.sh
 
 PACKAGE="ipa-server"
 HOSTSFILE="/etc/hosts"
@@ -50,7 +51,7 @@ rlJournalStart
 #		rlRun "expect /dev/shm/set-root-pw.exp"
 #		rlRun "yum clean"
 		# Run yum install 3 times because the repos are flaky
-		packages="ipa-server ipa-client ipa-admintools bind caching-nameserver expect krb5-workstation bind-dyndb-ldap"
+		packages="ipa-server ipa-client ipa-admintools bind caching-nameserver expect krb5-workstation bind-dyndb-ldap ntpdate"
 		yum -y install $packages
 		if [ $? -ne 0 ]; then
 			sleep 200
@@ -66,6 +67,8 @@ rlJournalStart
 				fi
 			fi
 		fi
+		/etc/init.d/ntpd stop
+		ntpdate $NTPSERVER
 		rlRun "rpm -qa ipa-server" 
 		rlAssertRpm $PACKAGE
 		# Back up the local hosts file 
@@ -91,7 +94,7 @@ rlJournalStart
 		# install IPA only if the is the master server
 		if [ "$MASTER" = "$HOSTNAME" ]; then 
 			# This is the master server, set up ipa-server
-			echo "ipa-server-install --setup-dns --forwarder=10.14.63.12 --hostname=$hostname -r testrelm -n testdomain -p Secret123 -P Secret123 -a Secret123 -u admin -U" > /dev/shm/installipa.bash
+			echo "ipa-server-install --setup-dns --forwarder=$DNSFORWARD --hostname=$hostname -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -u admin -U" > /dev/shm/installipa.bash
 			setenforce 0
 			/bin/bash /dev/shm/installipa.bash
 		else
@@ -144,7 +147,7 @@ expect eof' > /dev/shm/kinit-admin.exp
 			# This is the master server, create the replictation certs
 			for s in $SLAVE; do
 				if [ "$s" != "" ]; then
-					ipa-replica-prepare -p Secret123 $s
+					ipa-replica-prepare -p $ADMINPW $s
 					# Copy the replica info to the slave
 					rlRun "scp /var/lib/ipa/replica-info-$s.gpg root@$s:/dev/shm/."
 				fi

@@ -30,6 +30,7 @@
 . /usr/bin/rhts-environment.sh
 . /usr/lib/beakerlib/beakerlib.sh
 . /dev/shm/ipa-server-shared.sh
+. /dev/shm/env.sh
 
 PACKAGE="ipa-client"
 SERVICE="ipa_kpasswd"
@@ -72,7 +73,7 @@ rlJournalStart
 		if [ $? -eq 0 ]; then
 			# This machine is a client
 			echo "I am a client"
-			echo "ipa-client-install --domain=testdomain --realm=testrelm --ntp-server=clock.redhat.com -w Secret123 -U --server=$MASTER" > /dev/shm/client-install.bash
+			echo "ipa-client-install --domain=$DOMAIN --realm=$RELM --ntp-server=$NTPSERVER -w $ADMINPW -U --server=$MASTER" > /dev/shm/client-install.bash
 			chmod 755 /dev/shm/client-install.bash
 			bash /dev/shm/client-install.bash
 		else

@@ -40,11 +40,13 @@
 . /usr/lib/beakerlib/beakerlib.sh
 . /dev/shm/ipa-host-cli-lib.sh
 . /dev/shm/ipa-server-shared.sh
+. /dev/shm/env.sh
 
 ########################################################################
 # Test Suite Globals
 ########################################################################
-ADMINID="admin"
+#ADMINID is now part of env.sh
+#ADMINID="admin"
 ADMINPWD="Admin123"
 
 REALM=`os_getdomainname | tr "[a-z]" "[A-Z]"`

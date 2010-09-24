@@ -43,12 +43,14 @@
 . /usr/lib/beakerlib/beakerlib.sh
 . /dev/shm/ipa-group-cli-lib.sh
 . /dev/shm/ipa-server-shared.sh
+. /dev/shm/env.sh
 
 ########################################################################
 # Test Suite Globals
 ########################################################################
-ADMINID="admin"
-ADMINPWD="Sceret123"
+# ADMINID is now part of env.sh
+#ADMINID="admin"
+ADMINPWD=$ADMINPW
 
 BASEDN=`getBaseDN`
 USERRDN="cn=users,cn=accounts,"

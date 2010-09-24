@@ -30,6 +30,7 @@
 . /usr/bin/rhts-environment.sh
 . /usr/lib/beakerlib/beakerlib.sh
 . /dev/shm/ipa-server-shared.sh
+. /dev/shm/env.sh
 
 PACKAGE="ipa-server"
 SERVICE="ipa_kpasswd"
@@ -37,6 +38,8 @@ SERVICE="ipa_kpasswd"
 rlJournalStart
 	rlPhaseStartSetup
 		env
+		/etc/init.d/ntpd stop
+		ntpdate $NTPSERVER
 		rlRun "ls /dev/shm/ipa-server-shared.sh"
 		if [ ! -f /dev/shm/ipa-server-shared.sh ]; then
 			echo "ERROR - /dev/shm/ipa-server-shared.sh does not exist, did the shared libs get installed?"
@@ -65,7 +68,7 @@ rlJournalStart
 			# This machine is a slave
 			echo "I am a slave/replica"
 			rlRun "ls /dev/shm/replica-info-$HOSTNAME.gpg"
-			echo "ipa-replica-install -p Secret123 /dev/shm/replica-info-$HOSTNAME.gpg" > /dev/shm/replica-install.bash
+			echo "ipa-replica-install -p $ADMINPW /dev/shm/replica-info-$HOSTNAME.gpg" > /dev/shm/replica-install.bash
 			chmod 755 /dev/shm/replica-install.bash
 			bash /dev/shm/replica-install.bash
 		else
