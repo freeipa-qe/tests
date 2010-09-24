@@ -1,9 +1,9 @@
 <job>
 	<whiteboard>
-		ipa-server  full run on qe-blade-05 x86_64
+		ipa-server  full run on x86_64 host
 	</whiteboard>
 	<recipeSet>
-		<recipe whiteboard="ipa server on x86_64 on qe-blade-05">
+		<recipe whiteboard="ipa server on x86_64 host">
 			<distroRequires>
 				<and>
 					<distro_family op="=" value="Fedora13"/>
