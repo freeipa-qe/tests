@@ -50,7 +50,7 @@ rlJournalStart
 #		rlRun "expect /dev/shm/set-root-pw.exp"
 #		rlRun "yum clean"
 		# Run yum install 3 times because the repos are flaky
-		packages="ipa-server ipa-admintools bind caching-nameserver expect krb5-workstation bind-dyndb-ldap"
+		packages="ipa-server ipa-client ipa-admintools bind caching-nameserver expect krb5-workstation bind-dyndb-ldap"
 		yum -y install $packages
 		if [ $? -ne 0 ]; then
 			sleep 200
@@ -94,6 +94,8 @@ rlJournalStart
 			echo "ipa-server-install --setup-dns --forwarder=10.14.63.12 --hostname=$hostname -r testrelm -n testdomain -p Secret123 -P Secret123 -a Secret123 -u admin -U" > /dev/shm/installipa.bash
 			setenforce 0
 			/bin/bash /dev/shm/installipa.bash
+		else
+			sleep 500
 		fi
 		rlRun "cat /etc/krb5.conf"
 		# Create expect file to kinit with

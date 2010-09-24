@@ -1,6 +1,6 @@
 <job>
 	<whiteboard>
-		ipa-server x86_64 multihost on pool machines
+		ipa-server x86_64 multihost qe-blade-04 05 and 12
 	</whiteboard>
 	<recipeSet>
 		<recipe kernel_options="" kernel_options_post="" ks_meta="" role="MASTER" whiteboard="">
@@ -18,7 +18,9 @@
 				<distro_virt op="=" value=""/>
 			</distroRequires>
 			<hostRequires>
-				<and/>
+				<and>
+					<hostname op="=" value="qe-blade-04.idm.lab.bos.redhat.com"/>
+				</and>
 			</hostRequires>
 			<partitions/>
 			<task name="/distribution/install" role="STANDALONE">
@@ -36,7 +38,6 @@
 			<task name="/CoreOS/ipa-server/acceptance/install-client" role="MASTER">
 				<params/>
 			</task>
-
 			<task name="/CoreOS/ipa-server/acceptance/uninstall" role="STANDALONE">
 				<params/>
 			</task>
@@ -58,7 +59,9 @@
 			</distroRequires>
 
 			<hostRequires>
-				<and/>
+				<and>
+					<hostname op="=" value="qe-blade-05.idm.lab.bos.redhat.com"/>
+				</and>
 			</hostRequires>
 			<partitions/>
 			<task name="/distribution/install" role="STANDALONE">
@@ -97,7 +100,9 @@
 			</distroRequires>
 
 			<hostRequires>
-				<and/>
+				<and>
+					<hostname op="=" value="qe-blade-12.idm.lab.bos.redhat.com"/>
+				</and>
 			</hostRequires>
 			<partitions/>
 			<task name="/distribution/install" role="STANDALONE">
