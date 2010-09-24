@@ -638,7 +638,7 @@ rlJournalStart
 
     rlPhaseStartTest "ipa-group-cli-47: Negative - setattr and addattr on dn"
         command="ipa group-mod --setattr dn=mynewDN fish"
-        expmsg="ipa: ERROR: attribute distinguishedName not allowed"
+        expmsg="ipa: ERROR: attribute \"distinguishedName\" not allowed"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
         command="ipa group-mod --addattr dn=anothernewDN fish"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
