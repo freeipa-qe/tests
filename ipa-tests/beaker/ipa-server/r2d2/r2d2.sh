@@ -61,8 +61,6 @@ makefile_template=$template/Makefile.template
 purpose_template=$template/PURPOSE.template
 testinfo_template=$template/testinfo.template
 runtest_template=$template/runtest.template
-t_template=$template/t.template
-lib_template=$template/lib.template
 
 # output file (destination)
 makefile_out=$out/Makefile
@@ -70,23 +68,20 @@ purpose_out=$out/PURPOSE
 testinfo_out=$out/testinfo.desc
 runtest_out=$out/runtest.sh
 t_out=$out/t.${testsuitename}.sh
-lib_out=$out/lib.${testsuitename}.sh
 
 if [ -r $lib_template ] \
     && [ -r $makefile_template ]\
     && [ -r $purpose_template ] \
     && [ -r $runtest_template ] \
     && [ -r $testinfo_template ]\
-    && [ -r $t_template ] \
-    && [ -r $lib_template ]
+    && [ -r $menifest ]
 then
     echo "template used in this test:"
     echo "template for Makefile:        [$makefile_template]"
     echo "template for PURPOSE :        [$purpose_template]"
     echo "template for testinfo.desc:   [$testinfo_template]"
     echo "template for runtest.sh:      [$runtest_template]"
-    echo "template for test case:       [$t_template]"
-    echo "template for local lib file:  [$lib_template]"
+    echo "manifest for test case:       [$manifest]"
 
     echo "output file goes to:"
     echo "Makefile:        [$makefile_out]"
@@ -94,52 +89,55 @@ then
     echo "testinfo.desc:   [$testinfo_out]"
     echo "runtest.sh:      [$runtest_out]"
     echo "test case:       [$t_out]"
-    echo "local lib file:  [$lib_out]"
 fi
+
+echo "------------------------------------------------"
 
 ########################################
 #    produce: Makefile                 #
 ########################################
-sed -e 's/r2d2_author/$author/g' \
-    -e 's/r2d2_authoremail/$authoremail/g' \
-    -e 's/r2d2_description/$description/g' \
-    -e 's/r2d2_version/$version/g' \
-    -e 's/r2d2_testsuitename/$testsuitename/g'\
+sed -e "s/r2d2_author/$author/g" \
+    -e "s/r2d2_authoremail/$authoremail/g" \
+    -e "s/r2d2_description/$description/g" \
+    -e "s/r2d2_version/$version/g" \
+    -e "s/r2d2_testsuitename/$testsuitename/g"\
     $makefile_template > $makefile_out
+echo "makefile is done:      [$makefile_out]"
 
 ########################################
 #    produce: PURPOSE                  #
 ########################################
-sed -e 's/r2d2_author/$author/g' \
-    -e 's/r2d2_authoremail/$authoremail/g' \
-    -e 's/r2d2_description/$description/g' \
-    -e 's/r2d2_testsuitename/$testsuitename/g'\
+sed -e "s/r2d2_author/$author/g" \
+    -e "s/r2d2_authoremail/$authoremail/g" \
+    -e "s/r2d2_description/$description/g" \
+    -e "s/r2d2_testsuitename/$testsuitename/g"\
     $purpose_template > $purpose_out
+echo "purpose file is done:  [$purpose_out]"
 
 ########################################
 #    produce: testinfo.desc            #
 ########################################
-sed -e 's/r2d2author/$author/g' \
-    -e 's/r2d2_authoremail/$authoremail/g' \
-    -e 's/r2d2_description/$description/g' \
-    -e 's/r2d2_testsuitename/$testsuitename/g'\
+sed -e "s/r2d2author/$author/g" \
+    -e "s/r2d2_authoremail/$authoremail/g" \
+    -e "s/r2d2_description/$description/g" \
+    -e "s/r2d2_testsuitename/$testsuitename/g"\
     $testinfo_template > $testinfo_out
+echo "testinfo.desc is done: [$testinfo_out]"
 
 ########################################
 #    produce: runtest.sh               #
 ########################################
-sed -e 's/r2d2author/$author/g' \
+sed -e "s/r2d2author/$author/g" \
+    -e "s/r2d2_testsuitename/$testsuitename/g"\
     $runtest_template > $runtest_out
+echo "runtest.sh is done:    [$runtest_out]"
 
 ########################################
-#    produce: t.<test suite>.sh        #
+#    produce: t.$testsuitename.sh      #
 ########################################
-sed -e 's/r2d2author/$author/g' \
-    $t_template > $t_out
+r2d2pl=$RHTS/r2d2/r2d2.pl
+$r2d2pl "$manifest" "$t_out" > /dev/null
+echo "testcase file is done: [$t_out]"
 
-########################################
-#    produce: lib.<test suite>.sh      #
-########################################
-sed -e 's/r2d2author/$author/g' \
-    $lib_template > $lib_out
+echo "------------- end of r2d2 -----------"
 

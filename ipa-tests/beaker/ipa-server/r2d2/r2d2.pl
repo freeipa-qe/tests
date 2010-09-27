@@ -11,14 +11,28 @@
 use strict;
 use warnings;
 
+our $manifest;
+our $tfile;
+our $output="";
 our $totalArgs=$#ARGV;
+
 if ( $totalArgs < 0 ){
-    print "usage: r2d2.pl <manifest file>";
+    print "usage: r2d2.pl <manifest file> ";
+    exit;
+}elsif ($totalArgs == 0) {
+    $manifest=$ARGV[0];
+    my @temp = split(/\./,$manifest);
+    $tfile = "t.".$temp[0].".sh";
+}elsif ($totalArgs == 1){
+    $manifest=$ARGV[0];
+    $tfile=$ARGV[1];
+}else{
+    print "usage: r2d2.pl <manifest file> <testcase file - this is optional>";
     exit;
 }
+print "\nmanifest file: [$manifest]";
+print "\ntestcase file: [$tfile]";
 
-our $output="";
-our $manifest=$ARGV[0];
 # FIXME: get testsuite name out of manifest file
 #       the manifest file format is expected as:
 #       <test suite name>.manifest
@@ -28,12 +42,19 @@ if ( ! open(MANIFEST, "$manifest")){
     exit;
 }
 
+if ( ! open (OUTPUT, ">$tfile")){
+    print "can not open test case file to write: [$tfile]";
+    exit;
+}
+close (OUTPUT); #just test to verify we are be able to write, the actual writing will be later
+
 # ############ main parsing and work starts here ########33
 
 # ######################## #
 #      global variables    #
 # ######################## #
 our %testsuite;
+our @logics;
 our @parsingErrors;
 our $setindex=0;
 our $caseindex=0;
@@ -141,7 +162,7 @@ if ($errorFlags > 0){
     exit 1;
 } # exit if error found
 
-print "\n--------- parsing output ---------";
+#print "\n--------- parsing output ---------";
 printTestSuite() ;
 
 ###################### start produce automation file ################
@@ -164,9 +185,21 @@ appendTestCase_to_TestSet();
 appendline ("# test cases");
 appendTestCaseElement_to_TestCase();
 
-print "\n function file: ";
+#print "\n test case file:";
+foreach my $f (@logics){
+    writelogic ($f);
+}
+
+#print "\n function file: ";
 $output =~ s/__/\$/g;
-print "$output";
+#print "$output";
+if ( ! open (OUTPUT, ">$tfile")){
+    print "can not open test case file to write: [$tfile]";
+    exit;
+}
+print  OUTPUT $output;
+close (OUTPUT);
+
 ###################### end of produce automation file ###############
 print "\n--- end of program ---\n";
 
@@ -376,13 +409,13 @@ sub loopit
     }
     
     if($dynamic eq ""){
-        print "\nno loop necessary";
+        #print "\nno loop necessary";
         return $fcall;
     } #program hits here only when no loop data defined
     elsif($dynamic =~ /^(\w+)\s(.*)$/){
         my $first = $1;
         my $rest = $2;
-        print "\n[level: $level] first=>[$first]  rest=>[$rest]";
+        #print "\n[level: $level] first=>[$first]  rest=>[$rest]";
         $localreturn = "$currentIndent"."for __".$first."_value in __".$first;
         $localreturn = $localreturn."\n$currentIndent"."do";
         my $functionline = loopit($level+1, $indent, $fcall." __".$first."_value", $rest); 
@@ -392,14 +425,46 @@ sub loopit
         #print $localreturn;
         #print "\n-------------------";
     }else{
-        print "\n[level: $level] first=>[$dynamic]  rest=>[]";
+        #print "\n[level: $level] first=>[$dynamic]  rest=>[]";
         $localreturn = "$currentIndent"."for __".$dynamic."_value in __".$dynamic;
         $localreturn = $localreturn."\n$currentIndent"."do";
-        $localreturn = $localreturn."\n$currentIndent".$indent.$fcall." __".$dynamic."_value";
+        $fcall = $fcall." __".$dynamic;
+        push @logics, $fcall;
+        $localreturn = $localreturn."\n$currentIndent".$indent.$fcall."_value";
         $localreturn = $localreturn."\n$currentIndent"."done";
-        print "\n----localreturn----";
-        print $localreturn;
-        print "\n-------------------";
+        #print "\n----localreturn----";
+        #print $localreturn;
+        #print "\n-------------------";
     }
     return $localreturn;
 }# loopit
+
+sub writelogic
+{
+    my ($logic) = shift;
+    print "\nLogic=[$logic]";
+    if ($logic =~ m/(\w+)\s(.*)$/){
+        my $function = $1;
+        my $parameters = $2;
+        print "\n   function name: [$function]";
+        print "\n   parameters   : [$parameters]";
+        appendline ("$function()");
+        appendline ("{");
+        appendline ("   # accept parameters:");
+        appendline ("   # $parameters");
+        my @params = split(/ /,$parameters);
+        foreach (0..$#params){
+            my $index = $_;
+            my $param = $params[$index];
+            appendline ("   ".$param."=__".($index+1));   
+        } #foreach
+        appendline ("");
+        appendline ("   # test logic starts");
+        appendline ("");
+        appendline ("   # test logic ends");
+        appendline ("} #$function ");
+        appendline ("");
+    }else{
+        print "\n   Format error";
+    }
+} #writelogic
