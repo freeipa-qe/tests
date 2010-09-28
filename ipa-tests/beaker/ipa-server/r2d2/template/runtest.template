@@ -3,16 +3,10 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
 #   runtest.sh of /CoreOS/ipa-tests/acceptance/ipa-user-cli
-#   Description: IPA user cli acceptance tests
+#   Description: IPA r2d2_testsuitename r2d2_testlevel tests
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# The following ipa cli commands needs to be tested:
-#   user-add     Add a new user.
-#   user-del     Delete a user.
-#   user-find    Search for users.
-#   user-lock    Lock a user account.
-#   user-mod     Modify a user.
-#   user-show    Display information about a user.
-#   user-unlock  Unlock a user account.
+# The following ipa will be tested:
+#
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
 #   Author: r2d2_author <r2d2_authoremail>
@@ -40,12 +34,9 @@
 # Include data-driven test data file:
 
 # Include rhts environment
-#. /usr/bin/rhts-environment.sh
+. /usr/bin/rhts-environment.sh
 . /usr/share/beakerlib/beakerlib.sh
-#. /dev/shm/ipa-user-cli-lib.sh
-#. /dev/shm/ipa-server-shared.sh
-
-. /iparhts/shared/ipa-server-shared.sh
+. /dev/shm/ipa-server-shared.sh
 
 # Include test case file
 . ./t.r2d2_testsuitename.sh
@@ -72,3 +63,5 @@ rlJournalStart
 
     makereport
 rlJournalEnd
+
+
