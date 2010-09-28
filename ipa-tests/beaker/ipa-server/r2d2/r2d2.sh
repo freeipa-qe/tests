@@ -100,6 +100,7 @@ echo "------------------------------------------------"
 sed -e "s/r2d2_author/$author/g" \
     -e "s/r2d2_authoremail/$authoremail/g" \
     -e "s/r2d2_description/$description/g" \
+    -e "s/r2d2_testlevel/$testlevel/g" \
     -e "s/r2d2_version/$version/g" \
     -e "s/r2d2_testsuitename/$testsuitename/g"\
     $makefile_template > $makefile_out
