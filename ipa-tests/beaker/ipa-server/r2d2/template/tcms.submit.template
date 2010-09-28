@@ -1,4 +1,0 @@
-#/bin/sh
-cmd=tcms-submit --phases --description --runtest ./t.user-cli.sh --plans 962
-echo $cmd
-$cmd
