@@ -24,9 +24,9 @@ fi
 # check the starting point: where we have acceptance test stored
 while [ ! -d $RHTS/r2d2 ]
 do
-    echo -n "RHTS root:"
+    echo -n "RHTS root: "
     read RHTS
-    if [ ! -z $RHTS ];then
+    if [ ! -d $RHTS/r2d2 ];then
         echo "verify RHTS value... [$RHTS/r2d2] not found"
     fi
 done

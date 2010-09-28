@@ -1,4 +1,4 @@
-# teststuie   : ipapassword    
+# teststuie   : ipasample
     ## testset: _lifetime
         ### testcase: minlife_nolimit 
             #### comment : this is to test for minimum of password history

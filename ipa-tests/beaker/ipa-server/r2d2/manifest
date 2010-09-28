@@ -1,6 +1,0 @@
-# File: manifest
-# Purpose: it defines the sketch of test suite, another tool, r2d2.sh will generate a full test suite based on this manifest
-
-# Author: yi zhang (yzhang@redhat.com)
-# Date  : Sept 19, 2010
-
