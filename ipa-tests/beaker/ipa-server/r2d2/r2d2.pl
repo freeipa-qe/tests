@@ -17,10 +17,14 @@ our $output="";
 our $totalArgs=$#ARGV;
 
 if ( $totalArgs < 0 ){
-    print "usage: r2d2.pl <manifest file> ";
+    print "usage 1: r2d2.pl <manifest file> ";
+    print "usage 2: r2d2.pl <manifest file> <test suite file> #test suite file is optional, if not given, it will use the string before the . from manifest file";
     exit;
 }elsif ($totalArgs == 0) {
     $manifest=$ARGV[0];
+    # get testsuite name out of manifest file
+    #       the manifest file format is expected as:
+    #       <test suite name>.manifest
     my @temp = split(/\./,$manifest);
     $tfile = "t.".$temp[0].".sh";
 }elsif ($totalArgs == 1){
@@ -32,10 +36,6 @@ if ( $totalArgs < 0 ){
 }
 print "\nmanifest file: [$manifest]";
 print "\ntestcase file: [$tfile]";
-
-# FIXME: get testsuite name out of manifest file
-#       the manifest file format is expected as:
-#       <test suite name>.manifest
 
 if ( ! open(MANIFEST, "$manifest")){
     print "can not open manifest file [$manifest]";
