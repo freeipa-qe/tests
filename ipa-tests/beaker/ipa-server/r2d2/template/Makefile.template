@@ -50,7 +50,7 @@ $(METADATA): Makefile
 	@echo "Name:            $(TEST)" >> $(METADATA)
 	@echo "TestVersion:     $(TESTVERSION)" >> $(METADATA)
 	@echo "Path:            $(TEST_DIR)" >> $(METADATA)
-	@echo "Description:     IPA user cli acceptance tests" >> $(METADATA)
+	@echo "Description:     IPA r2d2_testsuitename r2d2_testlevel tests" >> $(METADATA)
 	@echo "Type:            Regression" >> $(METADATA)
 	@echo "TestTime:        15m" >> $(METADATA)
 	@echo "RunFor:          ipa-server" >> $(METADATA)
