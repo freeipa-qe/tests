@@ -46,7 +46,7 @@
 #########################################
 
 rlJournalStart
-    rlPhaseStartSetup "ipa-user-cli-startup: Check for ipa-server package"
+    rlPhaseStartSetup "r2d2_testsuitename startup: Check for ipa-server package"
         rlAssertRpm $PACKAGE
         rlRun "TmpDir=\`mktemp -d\`" 0 "Creating tmp directory"
         rlRun "pushd $TmpDir"
@@ -56,7 +56,7 @@ rlJournalStart
     r2d2_testsuitename
     # r2d2_test_ends
 
-    rlPhaseStartCleanup "ipa-user-cli-cleanup"
+    rlPhaseStartCleanup "r2d2_testsuitename cleanup"
         rlRun "popd"
         rlRun "rm -r $TmpDir" 0 "Removing tmp directory"
     rlPhaseEnd
