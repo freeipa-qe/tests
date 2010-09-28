@@ -22,14 +22,15 @@ else
 fi
 
 # check the starting point: where we have acceptance test stored
-while [ ! -d $RHTS/r2d2 ] && [ -d $RHTS/acceptance ]
+while [ ! -d $RHTS/r2d2 ]
 do
-    if [ ! -z "$RHTS" ];then
-        echo "verify RHTS value... [$RHTS/acceptance] not found"
-    fi
     echo -n "RHTS root:"
     read RHTS
+    if [ ! -z $RHTS ];then
+        echo "verify RHTS value... [$RHTS/r2d2] not found"
+    fi
 done
+
 echo "using RHTS=[$RHTS]"
 echo "r2d2 root=[$RHTS/r2d2]"
 r2d2=$RHTS/r2d2
