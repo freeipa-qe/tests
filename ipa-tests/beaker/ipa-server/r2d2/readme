@@ -6,3 +6,5 @@ Notes from yzhang:
     4. sync with test plan
 
 
+To run sample:
+    ./r2d2.sh ./sample_r2d2.conf
