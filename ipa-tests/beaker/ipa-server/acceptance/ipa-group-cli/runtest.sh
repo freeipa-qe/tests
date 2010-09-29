@@ -52,13 +52,14 @@
 #ADMINID="admin"
 ADMINPWD=$ADMINPW
 
-BASEDN=`getBaseDN`
+BASEDN="dc=$RELM"
 USERRDN="cn=users,cn=accounts,"
 USERDN="$USERRDN$BASEDN"
 USERRDN="cn=users,cn=accounts,"
 GROUPDN="$GROUPRDN$BASEDN"
 echo "USERDN is $USERDN"
 echo "GROUPDN is $GROUPDN"
+echo "Server is $MASTER"
 
 ########################################################################
 
@@ -94,12 +95,8 @@ rlJournalStart
 	rlRun "verifyGroupAttr jennyg Description \"Description: User private group for jennyg\"" 0 "Verify UPG description."
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-cli-05: Verify user's UID and Users' private group GID match"
-	ipa user-show --all jennyg > /tmp/showuser.out
-	USERIDNUM=`cat /tmp/showuser.out | grep UID | cut -d ":" -f 2`
-	USERIDNUM=`echo $USERIDNUM`
-	rlLog " User's uidNumber is $USERIDNUM"
-	rlRun "verifyGroupAttr jennyg uidNumber $USERIDNUM" 0 "Verify User's Private Group GID matches user's UID"
+    rlPhaseStartTest "ipa-group-cli-05: Verify User Private Group"
+	rlRun "verifyUPG jennyg" 0 "UPG verification"
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-group-cli-06: Delete user and check for Private Group Removal"
@@ -110,7 +107,7 @@ rlJournalStart
     rlPhaseStartTest "ipa-group-cli-07: Detach UPG"
         rlRun "ipa user-add --first Jenny --last Galipeau jennyg" 0 "Adding Test User"
         rlRun "detachUPG jennyg" 0 "Detach user's private group."
-	rlRun "verifyGroupClasses jennyg ipa" 0 "Verify group is regular group now."
+	rlRun "verifyGroupClasses jennyg posix" 0 "Verify group is regular group now."
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-group-cli-08: Verify group find returns detached group" 
@@ -122,45 +119,47 @@ rlJournalStart
 	rlRun "ipa user-del jennyg" 0 "Cleanup - Delete the test user."
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-cli-10: Add Posix Group"
-	rlRun "addPosixGroup \"My Posix Group\" myposixgroup" 0 "Adding posix group"
+    rlPhaseStartTest "ipa-group-cli-10 Add IPA Group"
+	rlRun "addGroup \"My Posix Group\" myposixgroup" 0 "Adding IPA posix group"
 	rlRun "verifyGroupClasses myposixgroup posix" 0 "Verify group has posixgroup objectclass."
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-cli-11: Modify Posix Group"
-	rlRun "modifyGroup myposixgroup desc \"My New Posix Group Description\"" 0 "Modifying posix group description"
+    rlPhaseStartTest "ipa-group-cli-11: Modify IPA Posix Group"
+	rlRun "modifyGroup myposixgroup desc \"My New Posix Group Description\"" 0 "Modifying IPA posix group description"
 	rlRun "verifyGroupAttr myposixgroup Description \"My New Posix Group Description\"" 0 "Verifying description was modified."
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-cli-12: Delete posix Group"
+    rlPhaseStartTest "ipa-group-cli-12: Delete IPA posix Group"
         rlRun "deleteGroup myposixgroup" 0 "Deleting posix group"
-        rlRun "findGroup myposixgroup" 1 "Verify posix group was removed."
+        rlRun "findGroup myposixgroup" 1 "Verify IPA posix group was removed."
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-group-cli-13: Add Regular IPA Group"
-	rlRun "addGroup \"My IPA Group\" regular" 0 "Adding regular IPA Group"
+	rlRun "addNonPosixGroup \"My IPA Group\" regular" 0 "Adding regular IPA Group"
 	rlRun "verifyGroupClasses regular ipa" 0 "Verify group has ipa group objectclass."
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-cli-14: Modify IPA Group"
+    rlPhaseStartTest "ipa-group-cli-14: Modify IPA Regular Group"
         rlRun "modifyGroup regular desc \"My New IPA Group Description\"" 0 "Modifying ipa group description"
         rlRun "verifyGroupAttr regular Description \"My New IPA Group Description\"" 0 "Verifying description was modified."
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-cli-15: Modify IPA Group - add Posix"
-        rlRun "ipa group-mod --posix regular" 0 "Making IPA group a posix group"
-        rlRun "verifyGroupClasses regular posix" 0 "Verify group has ipa posix group objectclasses."
+    rlPhaseStartTest "ipa-group-cli-15: Delete IPA regular Group"
+        rlRun "deleteGroup regular" 0 "Deleting non posix group"
+        rlRun "findGroup regular" 1 "Verify non posix group was removed."
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-cli-16: Negative - add Posix to group that is already posix"
-        command="ipa group-mod --posix regular"
-        expmsg="ipa: ERROR: This is already a posix group"
+    rlPhaseStartTest "ipa-group-cli-16: Modify IPA Group - NON Posix"
+	rlRun "addGroup test testgroup" 0 "Adding a test group"
+        rlRun "ipa group-mod --nonposix testgroup" 0 "Making IPA group a non posix group"
+        rlRun "verifyGroupClasses regular ipa" 0 "Verify group has ipa non posix group objectclasses."
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-group-cli-17: Negative - modify non Posix to group that is already non posix"
+        command="ipa group-mod --nonposix testgroup"
+        expmsg="ipa: ERROR: This is already not a posix group"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
-    rlPhaseEnd
-
-    rlPhaseStartTest "ipa-group-cli-17: Delete IPA Group"
-	rlRun "deleteGroup regular" 0 "Deleting IPA group"
-	rlRun "findGroup regular" 1 "Verify posix group was removed."
+	rlRun "deleteGroup testgroup" 0 "Cleaning up the test group"
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-group-cli-18: Negative - Delete group that doesn't exist"
@@ -194,7 +193,19 @@ rlJournalStart
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-cli-23: Negative - Add Duplicate Group"
+    rlPhaseStartTest "ipa-group-cli-23: Negative - setattr group that doesn't exist"
+        command="ipa group-mod --setattr dn=mynewDN doesntexist"
+        expmsg="ipa: ERROR: doesntexist: group not found"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-group-cli-24: Negative - addattr group that doesn't exist"
+        command="ipa group-mod --addattr dn=mynewDN doesntexist"
+        expmsg="ipa: ERROR: doesntexist: group not found"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-group-cli-25: Negative - Add Duplicate Group"
 	rlRun "addGroup test test" 0 "Setup - Adding a group"
         command="ipa group-add --desc=test test"
         expmsg="ipa: ERROR: This entry already exists"
@@ -202,7 +213,7 @@ rlJournalStart
 	rlRun "deleteGroup test" 0 "Cleanup - Deleting the group"
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-cli-24: Add Nested Groups Memberships"
+    rlPhaseStartTest "ipa-group-cli-26: Add Nested Groups Memberships"
 	# add the groups
         rlRun "addGroup \"Florida Resort\" disneyworld" 0 "Adding Parent group"
 	rlRun "addGroup \"All around the world\" epcot" 0 "Adding Second level group"
@@ -218,7 +229,7 @@ rlJournalStart
 	rlRun "addGroupMembers groups \"dinasaurs,fish\" animalkingdom" 0 "Nesting second third level"
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-cli-25: Add Nested User Memberships"
+    rlPhaseStartTest "ipa-group-cli-27: Add Nested User Memberships"
 	# add the users
 	rlRun "ipa user-add --first=Walt --last=Disney wdisney" 0 "Adding user wdisney"
 	rlRun "ipa user-add --first=Epcot --last=User1 euser1" 0 "Adding user euser1"
@@ -242,7 +253,11 @@ rlJournalStart
 	rlRun "addGroupMembers users \"trex,guser1\" dinasaurs" 0 "Adding users trex and guser1 to group dinasaurs."
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-cli-26: Verify Group Memberships - Group: disneyworld"
+    rlPhaseStartTest "ipa-group-cli-28: Verify Group Memberships - Group: disneyworld"
+
+        rlRun "verifyGroupMember epcot group disneyworld" 0 "member and memberOf attribute verification"
+        rlRun "verifyGroupMember animalkingdom group disneyworld" 0 "member and memberOf attribute verification"
+	rlRun "verifyGroupMember wdisney user disneyworld" 0 "member and memberOf attribute verification"
 
 	rlLog "=====================  group-show ==================="
 	ipa group-show disneyworld > /tmp/showgroup.out
@@ -275,9 +290,15 @@ rlJournalStart
                 rc=$?
                 rlAssert0 "Checking if user $item is a member of group disneyworld - group-show" $rc
         done
+
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-cli-27: Verify Group Memberships - Group: epcot"
+    rlPhaseStartTest "ipa-group-cli-29: Verify Group Memberships - Group: epcot"
+
+        rlRun "verifyGroupMember germany group epcot" 0 "member and memberOf attribute verification"
+        rlRun "verifyGroupMember japan group epcot" 0 "member and memberOf attribute verification"
+        rlRun "verifyGroupMember euser1 user epcot" 0 "member and memberOf attribute verification"
+        rlRun "verifyGroupMember euser2 user epcot" 0 "member and memberOf attribute verification"
 
 	rlLog "=====================  group-show ==================="
         ipa group-show epcot > /tmp/showgroup.out
@@ -304,7 +325,7 @@ rlJournalStart
                 rlAssert0 "Checking if group $item is a member of group epcot - group-find" $rc
         done
 
-	userss=`cat /tmp/findgroup.out | grep "Member users:"`
+	users=`cat /tmp/findgroup.out | grep "Member users:"`
         for item in euser1 euser2 guser1 guser2 juser1 juser2 ; do
                 echo $users | grep $item
                 rc=$?
@@ -312,7 +333,12 @@ rlJournalStart
         done
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-cli-28: Verify Group Memberships - Group: animalkingdom"
+    rlPhaseStartTest "ipa-group-cli-30: Verify Group Memberships - Group: animalkingdom"
+
+        rlRun "verifyGroupMember fish group animalkingdom" 0 "member and memberOf attribute verification"
+        rlRun "verifyGroupMember dinasaurs group animalkingdom" 0 "member and memberOf attribute verification"
+        rlRun "verifyGroupMember trainer1 user animalkingdom" 0 "member and memberOf attribute verification"
+        rlRun "verifyGroupMember trainer2 user animalkingdom" 0 "member and memberOf attribute verification"
 
 	rlLog "=====================  group-show ==================="
         ipa group-show animalkingdom > /tmp/showgroup.out
@@ -347,7 +373,11 @@ rlJournalStart
         done
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-cli-29: Verify Group Memberships - Group: dinasaurs"
+    rlPhaseStartTest "ipa-group-cli-31: Verify Group Memberships - Group: dinasaurs"
+
+        rlRun "verifyGroupMember trex user dinasaurs" 0 "member and memberOf attribute verification"
+        rlRun "verifyGroupMember guser1 user dinasaurs" 0 "member and memberOf attribute verification"
+
         rlLog "=====================  group-show ==================="
         ipa group-show dinasaurs > /tmp/showgroup.out
         users=`cat /tmp/showgroup.out | grep "Member users:"`
@@ -367,7 +397,11 @@ rlJournalStart
         done
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-cli-30: Verify Group Memberships - Group: fish"
+    rlPhaseStartTest "ipa-group-cli-32: Verify Group Memberships - Group: fish"
+
+        rlRun "verifyGroupMember mdolphin user fish" 0 "member and memberOf attribute verification"
+        rlRun "verifyGroupMember juser1 user fish" 0 "member and memberOf attribute verification"
+
         rlLog "=====================  group-show ==================="
         ipa group-show fish > /tmp/showgroup.out
         users=`cat /tmp/showgroup.out | grep "Member users:"`
@@ -387,7 +421,11 @@ rlJournalStart
         done
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-cli-31: Verify Group Memberships - Group: germany"
+    rlPhaseStartTest "ipa-group-cli-33: Verify Group Memberships - Group: germany"
+
+        rlRun "verifyGroupMember guser1 user germany" 0 "member and memberOf attribute verification"
+        rlRun "verifyGroupMember guser2 user germany" 0 "member and memberOf attribute verification"
+
         rlLog "=====================  group-show ==================="
         ipa group-show germany > /tmp/showgroup.out
         users=`cat /tmp/showgroup.out | grep "Member users:"`
@@ -408,7 +446,11 @@ rlJournalStart
         done
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-cli-32: Verify Group Memberships - Group: japan"
+    rlPhaseStartTest "ipa-group-cli-34: Verify Group Memberships - Group: japan"
+
+        rlRun "verifyGroupMember juser1 user japan" 0 "member and memberOf attribute verification"
+        rlRun "verifyGroupMember juser2 user japan" 0 "member and memberOf attribute verification"
+
         rlLog "=====================  group-show ==================="
         ipa group-show japan > /tmp/showgroup.out
         users=`cat /tmp/showgroup.out | grep "Member users:"`
@@ -428,49 +470,49 @@ rlJournalStart
         done
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-cli-33: Negative - Add Group Member that is already a member"
+    rlPhaseStartTest "ipa-group-cli-35: Negative - Add Group Member that is already a member"
         result=`ipa group-add-member --groups=germany epcot`
         echo $result | grep "Number of members added 0"
         rc=$?
         rlAssert0 "0 Members should be added" $rc
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-cli-35: Negative - Add User Member that is already a member"
+    rlPhaseStartTest "ipa-group-cli-36: Negative - Add User Member that is already a member"
         result=`ipa group-add-member --users=euser1 epcot`
         echo $result | grep "Number of members added 0"
         rc=$?
         rlAssert0 "0 Members should be added" $rc
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-cli-36: Negative - Add Group Member that doesn't exist"
+    rlPhaseStartTest "ipa-group-cli-37: Negative - Add Group Member that doesn't exist"
         result=`ipa group-add-member --groups=doesntexist epcot`
         echo $result | grep "Number of members added 0"
         rc=$?
         rlAssert0 "0 Members should be added" $rc
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-cli-37: Negative - Add User Member that doesn't exist"
+    rlPhaseStartTest "ipa-group-cli-38: Negative - Add User Member that doesn't exist"
         result=`ipa group-add-member --users=doesntexist epcot`
         echo $result | grep "Number of members added 0"
         rc=$?
         rlAssert0 "0 Members should be added" $rc
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-cli-38: Negative - Remove Group Member that doesn't exist"
+    rlPhaseStartTest "ipa-group-cli-39: Negative - Remove Group Member that doesn't exist"
         result=`ipa group-remove-member --users=doesntexist epcot`
         echo $result | grep "Number of members removed 0"
         rc=$?
         rlAssert0 "0 Members should be removed" $rc
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-cli-39: Negative - Remove User Member that doesn't exist"
+    rlPhaseStartTest "ipa-group-cli-40: Negative - Remove User Member that doesn't exist"
         result=`ipa group-remove-member --users=doesntexist epcot`
         echo $result | grep "Number of members removed 0"
         rc=$?
         rlAssert0 "0 Members should be removed" $rc
-    rlPhasEnd
+    rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-cli-40: Removed Single User Member"
+    rlPhaseStartTest "ipa-group-cli-41: Removed Single User Member"
 	# DIRECT MEMBERSHIP - fish
 	rlRun "removeGroupMembers users mdolphin fish" 0 "Removing user mdolphin from group fish."
         ipa group-find fish > /tmp/findgroup.out
@@ -491,9 +533,11 @@ rlJournalStart
         echo $users | grep mdolpin
         rc=$?
         rlAssertNotEquals "Checking that user is no longer a member of indirect group disneyworld" $rc 0
+
+	rlRun "verifyGroupMember mdolphin user fish" 3 "member and memberOf attributes removed verification"
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-cli-41: Removed Single Group Member"
+    rlPhaseStartTest "ipa-group-cli-42: Removed Single Group Member"
 	# DIRECT MEMBERSHIP - animalkingdom
         rlRun "removeGroupMembers groups fish animalkingdom" 0 "Removing group fish from group animalkingdom."
         ipa group-find animalkingdom > /tmp/findgroup.out
@@ -521,9 +565,11 @@ rlJournalStart
         echo $users | grep juser1
         rc=$?
         rlAssertNotEquals "Checking that user is no longer a member of indirect group disneyworld" $rc 0
+
+	rlRun "verifyGroupMember fish group animalkingdom" 3 "member and memberOf attributes removed verification"
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-cli-42: Removed Multiple Group Members"
+    rlPhaseStartTest "ipa-group-cli-43: Removed Multiple Group Members"
 	# DIRECT GROUP MEMBERSHIP - epcot
         rlRun "removeGroupMembers groups \"germany,japan\" epcot" 0 "Removing groups germany and japan from group epcot."
         ipa group-find epcot > /tmp/findgroup.out
@@ -558,9 +604,12 @@ rlJournalStart
                 rc=$?
                 rlAssertNotEquals "Checking that user $item is no longer a member of indirect group disneyworld" $rc 0
         done
+
+	rlRun "verifyGroupMember germany group epcot" 3 "member and memberOf attributes removed verification"
+	rlRun "verifyGroupMember japan group epcot" 3 "member and memberOf attributes removed verification"
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-cli-43: Removed Multiple User Members"
+    rlPhaseStartTest "ipa-group-cli-44: Removed Multiple User Members"
         rlRun "removeGroupMembers users \"trainer1,trainer2\" animalkingdom" 0 "Removing users trainer1 and trainer2 from group animalkingdom."
 	# DIRECT GROUP MEMBERSHIPS - animalkingdom
         ipa group-find animalkingdom > /tmp/findgroup.out
@@ -579,9 +628,12 @@ rlJournalStart
                 rc=$?
                 rlAssertNotEquals "Checking that user $item is no longer a member of indirect group disneyworld" $rc 0
         done
+
+	rlRun "verifyGroupMember trainer1 user animalkingdom" 3 "member and memberOf attributes removed verification"
+	rlRun "verifyGroupMember trainer2 user animalkingdom" 3 "member and memberOf attributes removed verification"
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-cli-44: Delete User that is a member of two Groups"
+    rlPhaseStartTest "ipa-group-cli-45: Delete User that is a member of two Groups"
 	rlRun "ipa user-del juser1" 0 "Deleting user that is member of two groups"
 	# DIRECT MEMBERSHIPS
         ipa group-find fish > /tmp/findgroup.out
@@ -608,9 +660,12 @@ rlJournalStart
         echo $users | grep juser1
         rc=$?
         rlAssertNotEquals "Checking that user $item is no longer a member of indirect group disneyworld" $rc 0
+
+	rlRun "verifyGroupMember juser1 group japan" 3 "member and memberOf attributes removed verification"
+	rlRun "verifyGroupMember juser1 group fish" 3 "member and memberOf attributes removed verification"
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-cli-45: Delete lower level nested group"
+    rlPhaseStartTest "ipa-group-cli-46: Delete group with two members"
 	rlRun "deleteGroup dinasaurs" 0 "Deleting lower level nested group"
 	# DIRECT MEMBERSHIP
         ipa group-find animalkingdom > /tmp/findgroup.out
@@ -625,9 +680,12 @@ rlJournalStart
         echo $groups | grep dinasaurs
         rc=$?
         rlAssertNotEquals "Checking that group dinasaur is no longer a member of indirect group disneyworld" $rc 0
+
+	rlRun "verifyGroupMember trex user dinasaurs" 3 "member and memberOf attributes removed verification"
+	rlRun "verifyGroupMember guser1 group dinasaurs" 3 "member and memberOf attributes removed verification"
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-cli-46: Delete Groups"
+    rlPhaseStartTest "ipa-group-cli-47: Delete Groups"
 	# lets clean up
 	for item in disneyworld animalkingdom epcot japan germany ; do
 		rlRun "deleteGroup $item" 0 "Deleting group $item"
@@ -638,7 +696,7 @@ rlJournalStart
 	done
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-cli-47: Negative - setattr and addattr on dn"
+    rlPhaseStartTest "ipa-group-cli-48: Negative - setattr and addattr on dn"
         command="ipa group-mod --setattr dn=mynewDN fish"
         expmsg="ipa: ERROR: attribute \"distinguishedName\" not allowed"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
@@ -646,15 +704,15 @@ rlJournalStart
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-cli-48: Negative - setattr and addattr on ipauniqueid"
+    rlPhaseStartTest "ipa-group-cli-49: Negative - setattr and addattr on ipauniqueid"
         command="ipa group-mod --setattr ipauniqueid=mynew-unique-id fish"
-        expmsg="ipa: ERROR: attribute ipaunique not allowed"
+        expmsg="ipa: ERROR: Insufficient access: Insufficient 'write' privilege to the 'ipaUniqueID' attribute of entry 'cn=fish,cn=groups,cn=accounts,dc=testrelm'."
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
         command="ipa group-mod --addattr ipauniqueid=another-new-unique-id fish"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-cli-49: Negative - setattr and addattr on cn"
+    rlPhaseStartTest "ipa-group-cli-50: Negative - setattr and addattr on cn"
         command="ipa group-mod --setattr cn=\"cn=new,cn=groups,dc=domain,dc=com\" fish"
         expmsg="ipa: ERROR: Operation not allowed on RDN:"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
@@ -662,7 +720,7 @@ rlJournalStart
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-cli-50: setattr and addattr on description"
+    rlPhaseStartTest "ipa-group-cli-51: setattr and addattr on description"
         attr="description"
         rlRun "setAttribute group $attr new fish" 0 "Setting attribute $attr to value of new."
         rlRun "verifyGroupAttr fish desc new" 0 "Verifying group $attr was modified."
@@ -672,22 +730,30 @@ rlJournalStart
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-cli-51: setattr and addattr on member"
+    rlPhaseStartTest "ipa-group-cli-52: setattr and addattr on member"
         attr="member"
 	member1="uid=trex,$USERDN"
 	member2="uid=mdolphin,$USERDN"
 	command="ipa group-mod --setattr member=\"$member1\" fish"
-	expmsg"ipa: ERROR: Operation not allowed on member"
+	expmsg="ipa: ERROR: Operation not allowed on member"
 	rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
 	command="ipa group-mod --addattr member=\"$member2\" fish"
 	rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-group-cli-53: Negative - setattr and addattr on invalid attribute"
+        command="ipa group-mod --setattr bad=test fish"
+        expmsg="ipa: ERROR: attribute \"bad\" not allowed"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
+        command="ipa group-mod --setattr bad=test fish"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
     rlPhaseEnd
 
     rlPhaseStartCleanup "ipa-group-cli-cleanup: Delete remaining users and group and Destroying admin credentials"
         rlRun "popd"
         rlRun "rm -r $TmpDir" 0 "Removing tmp directory"
 	rlRun "ipa user-del trex" 0 "Deleting user trex."
-	rlRun "ipa-user-del mdolphin" 0 "Deleting user mdolphin."
+	rlRun "ipa user-del mdolphin" 0 "Deleting user mdolphin."
 	rlRun "deleteGroup fish" 0 "Deleting group fish."
 	rlRun "kdestroy" 0 "Destroying admin credentials."
     rlPhaseEnd
