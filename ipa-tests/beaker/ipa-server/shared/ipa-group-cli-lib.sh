@@ -1,19 +1,19 @@
 #!/bin/sh
+. /dev/shm/env.sh
 
 ########################################################################
 #  GROUP CLI SHARED LIBRARY
 #######################################################################
 # Includes:
 #       addGroup
-#	addPosixGroup
+#	addNonPosixGroup
 #       findGroup
 #       modifyGroup
 #       verifyGroupAttr
 #       verifyGroupClasses
 #	addGroupMembers
 #	removeGroupMembers
-#	verifyGroupMembers
-#	verifyUserMembers
+#	verifyGroupMember
 #	detachGroup
 #       deleteGroup
 ######################################################################
@@ -47,18 +47,18 @@ addGroup()
 }
 
 #######################################################################
-# addPosixGroup Usage:
-#       addPosixGroup <description> <groupname>
+# addNonPosixGroup Usage:
+#       addNonPosixGroup <description> <groupname>
 # Example:
-#       addPosix Group "Idenity Management Quality Engineering" "IDM QE"
+#       addNonPosix Group "Idenity Management Quality Engineering" "IDM QE"
 ######################################################################
-addPosixGroup()
+addNonPosixGroup()
 {
    description=$1
    groupname=$2
    rc=0
 
-        ipa group-add --posix --desc="$description" $groupname
+        ipa group-add --nonposix --desc="$description" $groupname
         rc=$?
         if [ $rc -ne 0 ] ; then
                 rlLog "Adding new posix group \"$groupname\" failed."
@@ -257,7 +257,7 @@ addGroupMembers()
 
 #######################################################################
 # removeGroupMembers Usage:
-#       removeGroupMembers <groups or users> <comma_separated_list_of_groups> groupname
+#       removeGroupMembers <groups or users> <comma_separated_list_of_groups_or_users> groupname
 # example:
 #       removeGroupMembers groups "animalkingdom,epcot" disneyworld
 ######################################################################
@@ -282,7 +282,6 @@ removeGroupMembers()
 
   return $rc
 }
-
 
 #######################################################################
 # detachUPG Usage:
@@ -327,3 +326,121 @@ deleteGroup()
    fi
    return $rc
 }
+
+#######################################################################
+# verifyGroupMember Usage:
+#       verifyGroupMember membername membertype groupname 
+# example:
+#       verifyGroupMember mdolphin user fish 
+######################################################################
+
+verifyGroupMember()
+{
+  member=$1
+  membertype=$2
+  mygroup=$3
+  rc=0
+
+  # construct memberDN
+  if [[ $membertype == "user" ]] ; then
+        member="uid=$member"
+        memberDN="$member,cn=users,cn=accounts,dc=$RELM"
+        rlLog "Verifying User Member: $memberDN"
+  elif [[ $membertype == "group" ]] ; then
+        member="cn=$member"
+        memberDN="$member,cn=groups,cn=accounts,dc=$RELM"
+        rlLog "Verifying Group Member: $memberDN"
+  else
+        rlLog "ERROR: unknown membertype: $membertype"
+        rc=1
+  fi
+
+  # construct groupDN
+  mygroup="cn=$mygroup"
+  groupDN="$mygroup,cn=groups,cn=accounts,dc=$RELM"
+
+  rlLog "Member DN: $memberDN"
+  rlLog "Group DN: $groupDN"
+  if [ $rc -eq 0 ] ; then
+  	# verify member attribute for group
+  	ldapsearch -x -h $MASTER -p 389 -D "cn=Directory Manager" -w $ROOTDNPWD -b "$groupDN" | grep "member:" > /tmp/member.out
+  	cat /tmp/member.out | grep "$memberDN"
+  	if [ $? -ne 0 ] ; then
+        	rlLog "ERROR: member: $memberDN not found for group $mygroup"
+        	rc=2 
+  	fi
+
+  	# verify memberof attribute for the member
+
+  	ldapsearch -x -h $MASTER -p 389 -D "cn=Directory Manager" -w $ROOTDNPWD -b "$memberDN" | grep "memberOf:" > /tmp/memberof.out
+  	cat /tmp/memberof.out | grep "$groupDN"
+  	if [ $? -ne 0 ] ; then
+        	rlLog "ERROR: memberOf: $groupDN not found for member $member"
+        	let rc=$rc+1
+  	fi
+
+  	if [ $rc -eq 0 ] ; then
+        	rlLog "member and memberOf attributes for group membership are as expected."
+  	fi
+  fi
+
+  return $rc
+}
+
+#######################################################################
+# verifyUPG Usage:
+#       verifyManagedEntry username
+# example:
+#       verifyUPG username
+######################################################################
+
+verifyUPG()
+{
+  member=$1
+  rc=0
+
+  # construct memberDN
+  memberdn="uid=$member"
+  memberDN="$memberdn,cn=users,cn=accounts,dc=$RELM"
+  rlLog "Verifying User Member: $memberDN"
+
+  # construct groupDN
+  groupdn="cn=$member"
+  groupDN="$groupdn,cn=groups,cn=accounts,dc=$RELM"
+
+  rlLog "User DN: $memberDN"
+  rlLog "Group DN: $groupDN"
+
+  # verify mepManagedEntry attribute for user
+  ldapsearch -x -h $MASTER -p 389 -D "cn=Directory Manager" -w $ROOTDNPWD -b "$memberDN" | grep "mepManagedEntry:" > /tmp/mepManagedEntry.out
+  cat /tmp/mepManagedEntry.out | grep "$groupDN"
+  if [ $? -ne 0 ] ; then
+        rlLog "ERROR: mepManagedEntry: $groupDN not found for group $member"
+        rc=1
+  fi
+
+  # verify mepManagerBy attribute for the group
+
+  ldapsearch -x -h $MASTER -p 389 -D "cn=Directory Manager" -w $ROOTDNPWD -b "$groupDN" | grep "mepManagedBy:" > /tmp/mepManagedBy.out
+  cat /tmp/mepManagedBy.out | grep "$memberDN"
+  if [ $? -ne 0 ] ; then
+        rlLog "ERROR: mepManagedBy: $memberDN not found for member $member"
+        rc=1
+  fi
+
+  # verify user's id number and upg's id number match
+  ipa user-show --all $member > /tmp/showuser.out
+  USERIDNUM=`cat /tmp/showuser.out | grep UID | cut -d ":" -f 2`
+  USERIDNUM=`echo $USERIDNUM`
+  rlLog " User's uidNumber is $USERIDNUM"
+  verifyGroupAttr $member uidNumber $USERIDNUM
+  if [ $? -ne 0 ] ; then
+	rc=1
+  else
+	rlLog "User and Group member unique IDs match."
+  fi
+
+  return $rc
+}
+
+
