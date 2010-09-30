@@ -194,7 +194,7 @@ foreach my $f (@logics){
 
 #print "\n function file: ";
 $output =~ s/__/\$/g;
-print "$output";
+#print "$output";
 if ( ! open (OUTPUT, ">$tfile")){
     print "can not open test case file to write: [$tfile]";
     exit;
@@ -415,7 +415,7 @@ sub loopit
         push @logics, $fcall;
         return $currentIndent.$fcall;
     } #program hits here only when no loop data defined
-    elsif($dynamic =~ /^(\w+)\s(.*)$/){
+    elsif($dynamic =~ /^(\w+)\s(.+)$/){
         my $first = $1;
         my $rest = $2;
         #print "\n[level: $level] first=>[$first]  rest=>[$rest]";
@@ -431,9 +431,9 @@ sub loopit
         #print "\n[level: $level] first=>[$dynamic]  rest=>[]";
         $localreturn = "$currentIndent"."for __".$dynamic."_value in __".$dynamic;
         $localreturn = $localreturn."\n$currentIndent"."do";
-        $fcall = $fcall." __".$dynamic;
+        $fcall = $fcall." __".$dynamic."_value";
         push @logics, $fcall;
-        $localreturn = $localreturn."\n$currentIndent".$indent.$fcall."_value";
+        $localreturn = $localreturn."\n$currentIndent".$indent.$fcall;
         $localreturn = $localreturn."\n$currentIndent"."done";
         #print "\n----localreturn----";
         #print $localreturn;
@@ -463,7 +463,8 @@ sub writelogic
         foreach (0..$#params){
             my $index = $_;
             my $param = $params[$index];
-            appendline ("   ".$param."=__".($index+1));   
+            $param =~ s/__//g;
+            appendline ("   "."local ".$param."=__".($index+1));   
         } #foreach
         appendline ("");
         appendline ("   # test logic starts");

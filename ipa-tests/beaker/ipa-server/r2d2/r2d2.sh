@@ -131,7 +131,7 @@ echo "testinfo.desc is done: [$testinfo_out]"
 ########################################
 sed -e "s/r2d2_author/$author/g" \
     -e "s/r2d2_authoremail/$authoremail/g" \
-    -e "s/r2d2_testlevel/$testlevel/g" \
+    -e "s/r2d2_testlevel/$testlevel/g"\
     -e "s/r2d2_testsuitename/$testsuitename/g"\
     $runtest_template > $runtest_out
 echo " " >> $runtest_out
@@ -143,6 +143,7 @@ echo "runtest.sh is done:    [$runtest_out]"
 #    produce: t.$testsuitename.sh      #
 ########################################
 r2d2pl=$RHTS/r2d2/r2d2.pl
+echo $r2d2pl "$manifest" "$t_out" > /dev/null
 $r2d2pl "$manifest" "$t_out" > /dev/null
 echo "testcase file is done: [$t_out]"
 
