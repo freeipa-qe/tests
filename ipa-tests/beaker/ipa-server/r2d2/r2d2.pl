@@ -115,11 +115,12 @@ while (<MANIFEST>){
         $testcase {"logic"} = $testcase_name."_logic";
         $current_testset->{"$next_testcase_index"} = \%testcase;
         $current_testset->{"total"} = $caseindex;
+        #print "\nappend $testcase_name to ".$current_testset->{"name"}. " testcase index=".$caseindex;
     }# parsing test case
 
     elsif ($line =~ m/^#{2}/){  #### parsing the test set line
         my $thisline = $line;
-        $thisline =~ s/##//; #remove the '#' charactars
+        $thisline =~ s/##//g; #remove the '#' charactars
         # start a new set
         $setindex ++;
         $caseindex = 0; # reset the testcase counter since we have a new set
@@ -137,7 +138,7 @@ while (<MANIFEST>){
 
     elsif ($line =~ m/^#{1}/){  ### parsing the test suite line
         my $thisline = $line;
-        $thisline =~ s/#//; #remove the '#' charactars
+        $thisline =~ s/#//g; #remove the '#' charactars
         my $testsuitename = parseName ($thisline, $lineIndex);
         if ( (! exists $testsuite{"name"}) && ($testsuitename ne "") ){
            #create a brand new hash table for test suite
@@ -187,12 +188,13 @@ appendTestCaseElement_to_TestCase();
 
 #print "\n test case file:";
 foreach my $f (@logics){
+    print "\n write logic [$f]";
     writelogic ($f);
 }
 
 #print "\n function file: ";
 $output =~ s/__/\$/g;
-#print "$output";
+print "$output";
 if ( ! open (OUTPUT, ">$tfile")){
     print "can not open test case file to write: [$tfile]";
     exit;
@@ -273,7 +275,7 @@ sub printTestSet
     my $total = $set->{"total"};
     my $name = $set->{"name"};
     if ($total < 1){
-        print "\nThis set has no test case defined";
+        print "\nThis set [$name] has no test case defined";
         return;
     }else{
         print "\n  testset: [$name] has [$total] testcases";
@@ -410,6 +412,7 @@ sub loopit
     
     if($dynamic eq ""){
         #print "\nno loop necessary";
+        push @logics, $fcall;
         return $currentIndent.$fcall;
     } #program hits here only when no loop data defined
     elsif($dynamic =~ /^(\w+)\s(.*)$/){
@@ -443,6 +446,10 @@ sub writelogic
 {
     my ($logic) = shift;
     print "\nLogic=[$logic]";
+    if ($logic =~m /^\s*$/){
+        print "\nLogic is empty, skip it";
+        return;
+    }
     if ($logic =~ m/(\w+)\s(.*)$/){
         my $function = $1;
         my $parameters = $2;
@@ -465,6 +472,18 @@ sub writelogic
         appendline ("} #$function ");
         appendline ("");
     }else{
-        print "\n   Format error";
+        my $function = $logic;
+        print "\n   function name: [$function]";
+        print "\n   parameters   : [EMPTY]";
+        appendline ("$function()");
+        appendline ("{");
+        appendline ("   # accept parameters: NONE");
+        appendline ("");
+        appendline ("   # test logic starts");
+        appendline ("");
+        appendline ("   # test logic ends");
+        appendline ("} #$function ");
+        appendline ("");
+
     }
 } #writelogic
