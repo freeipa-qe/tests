@@ -30,7 +30,7 @@ do
         echo "verify RHTS value... [$RHTS/r2d2] not found"
     fi
 done
-
+export RHTS
 echo "using RHTS=[$RHTS]"
 echo "r2d2 root=[$RHTS/r2d2]"
 r2d2=$RHTS/r2d2

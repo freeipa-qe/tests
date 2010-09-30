@@ -410,7 +410,7 @@ sub loopit
     
     if($dynamic eq ""){
         #print "\nno loop necessary";
-        return $fcall;
+        return $currentIndent.$fcall;
     } #program hits here only when no loop data defined
     elsif($dynamic =~ /^(\w+)\s(.*)$/){
         my $first = $1;
