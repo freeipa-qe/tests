@@ -182,7 +182,7 @@ verifyGroupClasses()
    rc=$?
    if [ $rc -eq 0 ] ; then
 	classes=`cat $tmpfile | grep objectclass`
-	rlLog "DEBUG: $classes"
+	#rlLog "DEBUG: $classes"
 	if [ $grptype == "ipa" ] ; then
 		rlLog "Group type is ipa"
 		for item in top groupofnames nestedgroup ipausergroup ipaobject ; do
@@ -363,19 +363,19 @@ verifyGroupMember()
   rlLog "Group DN: $groupDN"
   if [ $rc -eq 0 ] ; then
   	# verify member attribute for group
-  	ldapsearch -x -h $MASTER -p 389 -D "cn=Directory Manager" -w $ROOTDNPWD -b "$groupDN" | grep "member:" > /tmp/member.out
+  	/usr/bin/ldapsearch -x -h $MASTER -p 389 -D "cn=Directory Manager" -w $ROOTDNPWD -b "$groupDN" | grep "member:" > /tmp/member.out
   	cat /tmp/member.out | grep "$memberDN"
   	if [ $? -ne 0 ] ; then
-        	rlLog "ERROR: member: $memberDN not found for group $mygroup"
+        	rlLog "WARNING: member: $memberDN not found for group $mygroup"
         	rc=2 
   	fi
 
   	# verify memberof attribute for the member
 
-  	ldapsearch -x -h $MASTER -p 389 -D "cn=Directory Manager" -w $ROOTDNPWD -b "$memberDN" | grep "memberOf:" > /tmp/memberof.out
+  	/usr/bin/ldapsearch -x -h $MASTER -p 389 -D "cn=Directory Manager" -w $ROOTDNPWD -b "$memberDN" | grep "memberOf:" > /tmp/memberof.out
   	cat /tmp/memberof.out | grep "$groupDN"
   	if [ $? -ne 0 ] ; then
-        	rlLog "ERROR: memberOf: $groupDN not found for member $member"
+        	rlLog "WARNING: memberOf: $groupDN not found for member $member"
         	let rc=$rc+1
   	fi
 
@@ -415,7 +415,7 @@ verifyUPG()
   ldapsearch -x -h $MASTER -p 389 -D "cn=Directory Manager" -w $ROOTDNPWD -b "$memberDN" | grep "mepManagedEntry:" > /tmp/mepManagedEntry.out
   cat /tmp/mepManagedEntry.out | grep "$groupDN"
   if [ $? -ne 0 ] ; then
-        rlLog "ERROR: mepManagedEntry: $groupDN not found for group $member"
+        rlLog "WARNING: mepManagedEntry: $groupDN not found for group $member"
         rc=1
   fi
 
@@ -424,7 +424,7 @@ verifyUPG()
   ldapsearch -x -h $MASTER -p 389 -D "cn=Directory Manager" -w $ROOTDNPWD -b "$groupDN" | grep "mepManagedBy:" > /tmp/mepManagedBy.out
   cat /tmp/mepManagedBy.out | grep "$memberDN"
   if [ $? -ne 0 ] ; then
-        rlLog "ERROR: mepManagedBy: $memberDN not found for member $member"
+        rlLog "WARNING: mepManagedBy: $memberDN not found for member $member"
         rc=1
   fi
 
