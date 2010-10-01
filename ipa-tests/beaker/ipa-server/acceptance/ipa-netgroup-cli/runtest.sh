@@ -9,7 +9,7 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-#   Author: Michael Gregg <Michael Greggemail>
+#   Author: Michael Gregg <mgregg@redhat.com>
 #   Date  : Sept 10, 2010
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
@@ -37,6 +37,7 @@
 . /usr/bin/rhts-environment.sh
 . /usr/share/beakerlib/beakerlib.sh
 . /dev/shm/ipa-server-shared.sh
+. /dev/shm/ipa-netgroup-cli-lib.sh
 
 # Include test case file
 . ./t.ipa-netgroup.sh

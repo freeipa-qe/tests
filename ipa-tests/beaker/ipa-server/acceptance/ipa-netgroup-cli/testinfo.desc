@@ -1,7 +1,7 @@
-Owner:           Michael Gregg <Michael Greggemail>
-Name:            /CoreOS/ipa-server/acceptance/ipa-netgroup
+Owner:           Michael Gregg <mgregg@redhat.com>
+Name:            /CoreOS/ipa-server/acceptance/ipa-netgroup-cli
 TestVersion:     1.0
-Path:            /mnt/tests/CoreOS/ipa-server/acceptance/ipa-netgroup
+Path:            /mnt/tests/CoreOS/ipa-server/acceptance/ipa-netgroup-cli
 Description:     IPA netgroup test
 Type:            Regression
 TestTime:        15m

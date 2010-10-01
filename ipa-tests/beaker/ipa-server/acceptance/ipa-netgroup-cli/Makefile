@@ -1,8 +1,8 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-#   Makefile of /CoreOS/tests/Regression/ipa-netgroup
+#   Makefile of /CoreOS/tests/Regression/ipa-netgroup-cli
 #   Description: IPA netgroup test
-#   Author: Michael Gregg <Michael Greggemail>
+#   Author: Michael Gregg <mgregg@redhat.com>
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
@@ -24,7 +24,7 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-export TEST=/CoreOS/ipa-server/acceptance/ipa-netgroup
+export TEST=/CoreOS/ipa-server/acceptance/ipa-netgroup-cli
 export TESTVERSION=1.0
 
 BUILT_FILES=
@@ -46,7 +46,7 @@ clean:
 include /usr/share/rhts/lib/rhts-make.include
 
 $(METADATA): Makefile
-	@echo "Owner:           Michael Gregg <Michael Greggemail>" > $(METADATA)
+	@echo "Owner:           Michael Gregg <mgregg@redhat.com>" > $(METADATA)
 	@echo "Name:            $(TEST)" >> $(METADATA)
 	@echo "TestVersion:     $(TESTVERSION)" >> $(METADATA)
 	@echo "Path:            $(TEST_DIR)" >> $(METADATA)
