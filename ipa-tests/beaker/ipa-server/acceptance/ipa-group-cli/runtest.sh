@@ -262,14 +262,14 @@ rlJournalStart
 	rlLog "=====================  group-show ==================="
 	ipa group-show disneyworld > /tmp/showgroup.out
 	groups=`cat /tmp/showgroup.out | grep "Member groups:"`
-	for item in epcot animalkingdom japan germany fish dinasaurs ; do
+	for item in epcot animalkingdom ; do
 		echo $groups | grep $item
 		rc=$?
 		rlAssert0 "Checking if group $item is a member of group disneyworld - group-show" $rc
 	done 
 
         users=`cat /tmp/showgroup.out | grep "Member users:"`
-        for item in wdisney euser1 euser2 trainer1 trainer2 guser1 guser2 juser1 juser2 mdolphin trex ; do
+        for item in wdisney ; do
                 echo $users | grep $item
                 rc=$?
                 rlAssert0 "Checking if user $item is a member of group disneyworld - group-show" $rc
@@ -278,14 +278,14 @@ rlJournalStart
 	rlLog "=====================  group-find ==================="
         ipa group-find disneyworld > /tmp/findgroup.out
         groups=`cat /tmp/findgroup.out | grep "Member groups:"`
-        for item in epcot animalkingdom japan germany fish dinasaurs ; do
+        for item in epcot animalkingdom ; do
                 echo $groups | grep $item
                 rc=$?
                 rlAssert0 "Checking if group $item is a member of group disneyworld - group-find" $rc
         done
 
 	users=`cat /tmp/findgroup.out | grep "Member users:"`
-        for item in wdisney euser1 euser2 trainer1 trainer2 guser1 guser2 juser1 juser2 mdolphin trex ; do
+        for item in wdisney ; do
                 echo $users | grep $item
                 rc=$?
                 rlAssert0 "Checking if user $item is a member of group disneyworld - group-show" $rc
@@ -310,7 +310,7 @@ rlJournalStart
         done
 
         users=`cat /tmp/showgroup.out | grep "Member users:"`
-        for item in euser1 euser2 guser1 guser2 juser1 juser2 ; do
+        for item in euser1 euser2 ; do
                 echo $users | grep $item
                 rc=$?
                 rlAssert0 "Checking if user $item is a member of group epcot - group-show" $rc
@@ -326,7 +326,7 @@ rlJournalStart
         done
 
 	users=`cat /tmp/findgroup.out | grep "Member users:"`
-        for item in euser1 euser2 guser1 guser2 juser1 juser2 ; do
+        for item in euser1 euser2 ; do
                 echo $users | grep $item
                 rc=$?
                 rlAssert0 "Checking if user $item is a member of group epcot - group-find" $rc
@@ -350,7 +350,7 @@ rlJournalStart
         done
 
 	users=`cat /tmp/showgroup.out | grep "Member users:"`
-        for item in trainer1 trainer2 trex guser1 mdolphin juser1; do
+        for item in trainer1 trainer2 ; do
                 echo $users | grep $item
                 rc=$?
                 rlAssert0 "Checking if user $item is a member of group animalkingdom - group-show" $rc
@@ -366,7 +366,7 @@ rlJournalStart
         done
 
         users=`cat /tmp/findgroup.out | grep "Member users:"`
-        for item in trainer1 trainer2 trex guser1 mdolphin juser1; do
+        for item in trainer1 trainer2 ; do
                 echo $users | grep $item
                 rc=$?
                 rlAssert0 "Checking if user $item is a member of group animalkingdom - group-find" $rc
@@ -747,6 +747,56 @@ rlJournalStart
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
         command="ipa group-mod --setattr bad=test fish"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-group-cli-54: Allowed special characters"
+	rlRun "addGroup \"Special Group\" \"my_gr-ou.p$\"" 0 "Adding group with special characters"
+	rlRun "modifyGroup  \"my_gr-ou.p$\" desc  \"my_gr-ou.p$\"" 0 "Modifying group with special characters"
+	rlRun "addGroupMembers users mdolphin \"my_gr-ou.p$\"" 0 "Adding member to group with special characters"
+	rlRun "removeGroupMembers users mdolphin \"my_gr-ou.p$\"" 0 "Removing member from group with special characters"
+	rlRun "deleteGroup \"my_gr-ou.p$\"" 0 "Deleting group with special characters"
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-group-cli-55: Not Allowed special characters @"
+        command="ipa group-add --desc=\"test@\" \"test@\""
+        expmsg="ipa: ERROR: invalid 'cn': may only include letters, numbers, _, -, . and $"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-group-cli-56: Not Allowed special characters %"
+        command="ipa group-add --desc=\"test%\" \"test%\""
+        expmsg="ipa: ERROR: invalid 'cn': may only include letters, numbers, _, -, . and $"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-group-cli-57: Not Allowed special characters ^"
+        command="ipa group-add --desc=\"test^\" \"test^\""
+        expmsg="ipa: ERROR: invalid 'cn': may only include letters, numbers, _, -, . and $"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-group-cli-58: Not Allowed special characters *"
+        command="ipa group-add --desc=\"test*\" \"test*\""
+        expmsg="ipa: ERROR: invalid 'cn': may only include letters, numbers, _, -, . and $"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-group-cli-59: Not Allowed special characters +"
+        command="ipa group-add --desc=\"test+\" \"test+\""
+        expmsg="ipa: ERROR: invalid 'cn': may only include letters, numbers, _, -, . and $"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-group-cli-60: Not Allowed special characters ~"
+        command="ipa group-add --desc=\"test~\" \"test~\""
+        expmsg="ipa: ERROR: invalid 'cn': may only include letters, numbers, _, -, . and $"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-group-cli-61: Not Allowed special characters ="
+        command="ipa group-add --desc=\"test=\" \"test=\""
+        expmsg="ipa: ERROR: invalid 'cn': may only include letters, numbers, _, -, . and $"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
     rlPhaseEnd
 
     rlPhaseStartCleanup "ipa-group-cli-cleanup: Delete remaining users and group and Destroying admin credentials"
