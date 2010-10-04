@@ -181,7 +181,7 @@ printTestSuite() ;
 
 # maintest function includes all test set information
 appendline ("######################");
-appendline ("# main test function #");
+appendline ("# main test          #");
 appendline ("######################");
 our $maintest = $testsuite{"name"};
 appendline("$maintest()");
@@ -193,11 +193,15 @@ appendline("} # $maintest");
 appendline ("");
 
 # create each testset that contains its test case
-appendline ("# testset");
+appendline ("######################");
+appendline ("# testset            #");
+appendline ("######################");
 appendTestCase_to_TestSet();
 
+appendline ("######################");
+appendline ("# test cases         #");
+appendline ("######################");
 
-appendline ("# test cases");
 appendTestCaseElement_to_TestCase();
 
 #print "\n test case file:";
@@ -388,16 +392,15 @@ sub appendTestCaseElement_to_TestCase
                 my $logic   = $testcase->{"logic"};
                 my $loop    = $testcase->{"data-loop"};
                 my $noloop  = $testcase->{"data-no-loop"};
-                appendline ("# loop   : $loop");
-                appendline ("# no loop: $noloop");
-                appendline ("");
-                appendline ($indent."rlPhaseStartTest \"$comment\"");
+                appendline ("# looped data   : $loop");
+                appendline ("# non-loop data : $noloop");
+                appendline ($indent."rlPhaseStartTest \"$testcase_name\"");
+                appendline ($indent.$indent."rlLog \"$comment\"");
                 my $level=2; #level 2 means put double size of indent before each line of loop
                 my $fcall = getFunctionLine($logic, $noloop);
                 my $fbody = loopit ($level,$indent,$fcall,$loop);
                 appendline ($fbody);
                 appendline ($indent."rlPhaseEnd");
-                appendline ("");
                 appendline ("} #$testcase_name");
                 appendline ("");
             }#foreach to append test case name under test set
@@ -513,7 +516,6 @@ sub writelogic
         appendline ("$function()");
         appendline ("{");
         appendline ("$indent# accept parameters: NONE");
-        appendline ("");
         appendline ("$indent# test logic starts");
         appendline ("");
         appendline ("$indent# test logic ends");
