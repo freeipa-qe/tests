@@ -162,6 +162,7 @@ verifyErrorMsg()
    expmsg=$2
    rc=0
 
+   rm -rf /tmp/errormsg.out /tmp/errormsg_clean.out
    rlLog "Executing: $command"
    $command
    rc=$?
@@ -172,7 +173,8 @@ verifyErrorMsg()
 	rc=0
 	rlLog "\"$command\" failed as expected."
         $command 2> /tmp/errormsg.out
-        actual=`cat /tmp/errormsg.out`
+	sed 's/"//g' /tmp/errormsg.out > /tmp/errormsg_clean.out
+        actual=`cat /tmp/errormsg_clean.out`
         if [[ "$actual" == "$expmsg" ]] ; then
                 rlLog "Error message as expected: $actual"
         else
