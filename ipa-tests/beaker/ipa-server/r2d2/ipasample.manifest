@@ -17,10 +17,6 @@
             #### data-loop: minage
             #### data-no-loop : pwusername pwinitial_password
     ## testset: pwhistory
-        ### testcase: _evnsetup
-            #### comment: set up the environment for password history test
-            #### data-loop: historysize 
-            #### data-no-loop:  admin adminpassword
         ### testcase: _defaultvalue
             #### comment: verifyt the default value
             #### data-loop: size day 
@@ -32,8 +28,4 @@
         ### testcase: password_history_negative
             #### comment: do negative test on history of password
             #### data-loop:  size day expired newpw
-            #### data-no-loop: admin adminpassword
-        ### testcase: _envcleanup 
-            #### comment: clean up environment setting, back to default
-            #### data-loop: size day expired newpw junkpw
             #### data-no-loop: admin adminpassword
