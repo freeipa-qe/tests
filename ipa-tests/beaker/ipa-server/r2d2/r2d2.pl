@@ -15,10 +15,12 @@ our $manifest;
 our $tfile;
 our $output="";
 our $totalArgs=$#ARGV;
-
+our $indent="    ";
 if ( $totalArgs < 0 ){
     print "usage 1: r2d2.pl <manifest file> ";
-    print "usage 2: r2d2.pl <manifest file> <test suite file> #test suite file is optional, if not given, it will use the string before the . from manifest file";
+    print "usage 2: r2d2.pl <manifest file> <test suite file> ";
+    print "\n   #test suite file is optional, if not given, it will use the string before the . from manifest file";
+    print "\n";
     exit;
 }elsif ($totalArgs == 0) {
     $manifest=$ARGV[0];
@@ -130,10 +132,14 @@ while (<MANIFEST>){
         if ($testset_name =~ m/^_/){
             $testset_name= $testsuite{"name"}."$testset_name";
         }
+        $testset{"envsetup"} = $testset_name."_envsetup";
+        $testset{"envcleanup"} = $testset_name."_envcleanup";
         $testset{"name"} = $testset_name;
         $testset{"total"} = 0;
         $testsuite{"$next_testset_index"} = \%testset;
         $testsuite{"total"} = $setindex;
+        push @logics,$testset_name."_envsetup";
+        push @logics,$testset_name."_envcleanup";
     }# parsing test set 
 
     elsif ($line =~ m/^#{1}/){  ### parsing the test suite line
@@ -144,6 +150,10 @@ while (<MANIFEST>){
            #create a brand new hash table for test suite
            $testsuite{"name"}=$testsuitename;
            $testsuite{"total"} = 0;
+           $testsuite{"envsetup"} = $testsuitename."_envsetup";
+           $testsuite{"envcleanup"} = $testsuitename."_envcleanup";
+           push @logics,$testsuitename."_envsetup";
+           push @logics,$testsuitename."_envcleanup";
         }else{
            recordError($lineIndex, 
                         "Format error", 
@@ -170,11 +180,15 @@ printTestSuite() ;
 
 
 # maintest function includes all test set information
-appendline ("# main test function ");
+appendline ("######################");
+appendline ("# main test function #");
+appendline ("######################");
 our $maintest = $testsuite{"name"};
 appendline("$maintest()");
 appendline("{");
+appendline($indent.$testsuite{"envsetup"});
 appendTestSet_to_TestSuite();
+appendline($indent.$testsuite{"envcleanup"});
 appendline("} # $maintest");
 appendline ("");
 
@@ -318,11 +332,10 @@ sub appendTestSet_to_TestSuite
     if ($totalsets < 1){
         appendline ("# Empty test sets");
     }else{
-        appendline ("# Test Sets: $totalsets");
         foreach (1..$totalsets){
                 my $setindex="$_";
                 my $testset_name = $testsuite{$setindex}->{"name"};
-                appendline ("   $testset_name");
+                appendline ($indent."$testset_name");
         }
     }# non-empty set
 } #appendTestSet_to_TestSuite
@@ -339,13 +352,15 @@ sub appendTestCase_to_TestSet
             my $testset_name = $testset->{"name"};
             appendline ("$testset_name()");
             appendline ("{");
+            appendline ($indent.$testset->{"envsetup"});
             my $totalcase = $testset->{"total"};
             foreach (1..$totalcase){
                 my $testcaseIndex = "$_";
                 my $testcase = $testset->{$testcaseIndex};
                 my $testcase_name = $testcase->{"name"};
-                appendline ("   $testcase_name");
+                appendline ($indent."$testcase_name");
             }#foreach to append test case name under test set
+            appendline ($indent.$testset->{"envcleanup"});
             appendline ("} #$testset_name");
             appendline ("");
         }#foreach to loop through test set in test suite
@@ -376,13 +391,12 @@ sub appendTestCaseElement_to_TestCase
                 appendline ("# loop   : $loop");
                 appendline ("# no loop: $noloop");
                 appendline ("");
-                appendline ("   rlPhaseStartTest \"$comment\"");
-                my $indent="    ";
+                appendline ($indent."rlPhaseStartTest \"$comment\"");
                 my $level=2; #level 2 means put double size of indent before each line of loop
                 my $fcall = getFunctionLine($logic, $noloop);
                 my $fbody = loopit ($level,$indent,$fcall,$loop);
                 appendline ($fbody);
-                appendline ("   rlPhaseEnd");
+                appendline ($indent."rlPhaseEnd");
                 appendline ("");
                 appendline ("} #$testcase_name");
                 appendline ("");
@@ -457,34 +471,53 @@ sub writelogic
         print "\n   parameters   : [$parameters]";
         appendline ("$function()");
         appendline ("{");
-        appendline ("   # accept parameters:");
-        appendline ("   # $parameters");
+        appendline ("$indent# accept parameters: $parameters");
         my @params = split(/ /,$parameters);
         foreach (0..$#params){
             my $index = $_;
             my $param = $params[$index];
             $param =~ s/__//g;
-            appendline ("   "."local ".$param."=__".($index+1));   
+            appendline ("$indent"."local ".$param."=__".($index+1));   
         } #foreach
+        appendline ("$indent# test logic starts");
         appendline ("");
-        appendline ("   # test logic starts");
-        appendline ("");
-        appendline ("   # test logic ends");
+        appendline ("$indent# test logic ends");
         appendline ("} #$function ");
         appendline ("");
-    }else{
+    }elsif ($logic =~ m/envsetup/){
+        appendline ("$logic()");
+        appendline ("{");
+        appendline ($indent."rlPhaseStartSetup \"".$logic."\"");
+        appendline ($indent.$indent."#environment setup starts here");
+        appendline ("");
+        appendline ($indent.$indent."#environment setup ends   here");
+        appendline ($indent."rlPhaseEnd");
+        appendline ("} #$logic");
+        appendline ("");
+    }# append standard env setup rlPhasestatements
+    elsif ($logic =~ m/envcleanup/){
+        appendline ("$logic()");
+        appendline ("{");
+        appendline ($indent."rlPhaseStartCleanup \"".$logic."\"");
+        appendline ($indent.$indent."#environment cleanup starts here");
+        appendline ("");
+        appendline ($indent.$indent."#environment cleanup ends   here");
+        appendline ($indent."rlPhaseEnd");
+        appendline ("} #$logic");
+        appendline ("");
+    }# append standard env cleanup rlPhaseStatement
+    else{
         my $function = $logic;
-        print "\n   function name: [$function]";
-        print "\n   parameters   : [EMPTY]";
+        print "\n$indent"."function name: [$function]";
+        print "\n$indent"."parameters   : [EMPTY]";
         appendline ("$function()");
         appendline ("{");
-        appendline ("   # accept parameters: NONE");
+        appendline ("$indent# accept parameters: NONE");
         appendline ("");
-        appendline ("   # test logic starts");
+        appendline ("$indent# test logic starts");
         appendline ("");
-        appendline ("   # test logic ends");
-        appendline ("} #$function ");
+        appendline ("$indent# test logic ends");
+        appendline ("} # $function ");
         appendline ("");
-
     }
 } #writelogic
