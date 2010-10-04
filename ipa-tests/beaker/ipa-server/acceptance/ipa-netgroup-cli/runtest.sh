@@ -38,6 +38,7 @@
 . /usr/share/beakerlib/beakerlib.sh
 . /dev/shm/ipa-server-shared.sh
 . /dev/shm/ipa-netgroup-cli-lib.sh
+. /dev/shm/env.sh
 
 # Include test case file
 . ./t.ipa-netgroup.sh
@@ -51,10 +52,19 @@ rlJournalStart
         rlAssertRpm $PACKAGE
         rlRun "TmpDir=\`mktemp -d\`" 0 "Creating tmp directory"
         rlRun "pushd $TmpDir"
+	kdestroy
+	rlRun "kinitAs $ADMINID $ADMINPW" 0 "kiniting as admin"
     rlPhaseEnd
 
+group1=testg1
+
     # r2d2_test_starts
-    ipa-netgroup
+    rlPhaseStartTest "run the netgroup cli tests"
+        rlAssertRpm $PACKAGE
+        rlRun "addNetgroup $group1 test-group-1" 0 "adding first netgroup"
+    rlPhaseEnd
+
+    
     # r2d2_test_ends
 
     rlPhaseStartCleanup "ipa-netgroup cleanup"
