@@ -119,7 +119,7 @@ rlJournalStart
 	rlRun "ipa user-del jennyg" 0 "Cleanup - Delete the test user."
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-cli-10 Add IPA Group"
+    rlPhaseStartTest "ipa-group-cli-10 Add IPA Posix Group"
 	rlRun "addGroup \"My Posix Group\" myposixgroup" 0 "Adding IPA posix group"
 	rlRun "verifyGroupClasses myposixgroup posix" 0 "Verify group has posixgroup objectclass."
     rlPhaseEnd
@@ -134,30 +134,31 @@ rlJournalStart
         rlRun "findGroup myposixgroup" 1 "Verify IPA posix group was removed."
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-cli-13: Add Regular IPA Group"
+    rlPhaseStartTest "ipa-group-cli-13: Add IPA NON Posix Group"
 	rlRun "addNonPosixGroup \"My IPA Group\" regular" 0 "Adding regular IPA Group"
 	rlRun "verifyGroupClasses regular ipa" 0 "Verify group has ipa group objectclass."
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-cli-14: Modify IPA Regular Group"
+    rlPhaseStartTest "ipa-group-cli-14: Modify IPA NON Posix Group"
         rlRun "modifyGroup regular desc \"My New IPA Group Description\"" 0 "Modifying ipa group description"
         rlRun "verifyGroupAttr regular Description \"My New IPA Group Description\"" 0 "Verifying description was modified."
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-cli-15: Delete IPA regular Group"
+    rlPhaseStartTest "ipa-group-cli-15: Delete IPA NON Posix Group"
         rlRun "deleteGroup regular" 0 "Deleting non posix group"
         rlRun "findGroup regular" 1 "Verify non posix group was removed."
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-cli-16: Modify IPA Group - NON Posix"
-	rlRun "addGroup test testgroup" 0 "Adding a test group"
-        rlRun "ipa group-mod --nonposix testgroup" 0 "Making IPA group a non posix group"
-        rlRun "verifyGroupClasses regular ipa" 0 "Verify group has ipa non posix group objectclasses."
+    rlPhaseStartTest "ipa-group-cli-16: Add Group - NON Posix - Modify to be Posix"
+	rlRun "addNonPosixGroup test testgroup" 0 "Adding a non posix test group"
+	rlRun "verifyGroupClasses testgroup ipa" 0 "Verify group has ipa non posix group objectclasses."
+        rlRun "ipa group-mod --posix testgroup" 0 "Making NON posix group a posix group"
+        rlRun "verifyGroupClasses testgroup posix" 0 "Verify group has ipa non posix group objectclasses."
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-cli-17: Negative - modify non Posix to group that is already non posix"
-        command="ipa group-mod --nonposix testgroup"
-        expmsg="ipa: ERROR: This is already not a posix group"
+    rlPhaseStartTest "ipa-group-cli-17: Negative - modify Posix to group that is already posix"
+        command="ipa group-mod --posix testgroup"
+        expmsg="ipa: ERROR: This is already a posix group"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
 	rlRun "deleteGroup testgroup" 0 "Cleaning up the test group"
     rlPhaseEnd
@@ -513,7 +514,6 @@ rlJournalStart
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-group-cli-41: Removed Single User Member"
-	# DIRECT MEMBERSHIP - fish
 	rlRun "removeGroupMembers users mdolphin fish" 0 "Removing user mdolphin from group fish."
         ipa group-find fish > /tmp/findgroup.out
         users=`cat /tmp/findgroup.out | grep "Member users:"`
@@ -521,56 +521,20 @@ rlJournalStart
 	rc=$?
 	rlAssertNotEquals "Checking that user is no longer a member of direct group fish" $rc 0
 
-	# INDIRECT MEMBERSHIPS - animalkingdom and disneyworld
-        ipa group-find animalkingdon > /tmp/findgroup.out
-        users=`cat /tmp/findgroup.out | grep "Member users:"`
-        echo $users | grep mdolpin
-        rc=$?
-        rlAssertNotEquals "Checking that user is no longer a member of indirect group animalkingdom" $rc 0
-
-        ipa group-find disneyworld > /tmp/findgroup.out
-        users=`cat /tmp/findgroup.out | grep "Member users:"`
-        echo $users | grep mdolpin
-        rc=$?
-        rlAssertNotEquals "Checking that user is no longer a member of indirect group disneyworld" $rc 0
-
 	rlRun "verifyGroupMember mdolphin user fish" 3 "member and memberOf attributes removed verification"
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-group-cli-42: Removed Single Group Member"
-	# DIRECT MEMBERSHIP - animalkingdom
-        rlRun "removeGroupMembers groups fish animalkingdom" 0 "Removing group fish from group animalkingdom."
         ipa group-find animalkingdom > /tmp/findgroup.out
         groups=`cat /tmp/findgroup.out | grep "Member groups:"`
         echo $groups | grep fish
         rc=$?
         rlAssertNotEquals "Checking that group is no longer a member of direct group animalkingdom" $rc 0
 
-	# INDIRECT MEMBERSHIP - disneyworld
-        ipa group-find disneyworld > /tmp/findgroup.out
-        groups=`cat /tmp/findgroup.out | grep "Member groups:"`
-        echo $groups | grep fish
-        rc=$?
-        rlAssertNotEquals "Checking that group is no longer a member of indirect group disneyworld" $rc 0
-
-	# INDIRECT USER MEMBERSHIP - juser1
-        ipa group-find animalkingdom > /tmp/findgroup.out
-        users=`cat /tmp/findgroup.out | grep "Member users:"`
-        echo $users | grep juser1
-        rc=$?
-        rlAssertNotEquals "Checking that user is no longer a member of indirect group animalkingdom" $rc 0
-
-        ipa group-find disneyworld > /tmp/findgroup.out
-        users=`cat /tmp/findgroup.out | grep "Member users:"`
-        echo $users | grep juser1
-        rc=$?
-        rlAssertNotEquals "Checking that user is no longer a member of indirect group disneyworld" $rc 0
-
 	rlRun "verifyGroupMember fish group animalkingdom" 3 "member and memberOf attributes removed verification"
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-group-cli-43: Removed Multiple Group Members"
-	# DIRECT GROUP MEMBERSHIP - epcot
         rlRun "removeGroupMembers groups \"germany,japan\" epcot" 0 "Removing groups germany and japan from group epcot."
         ipa group-find epcot > /tmp/findgroup.out
 	groups=`cat /tmp/findgroup.out | grep "Member groups:"`
@@ -580,38 +544,12 @@ rlJournalStart
         	rlAssertNotEquals "Checking that group $item is no longer a member of direct group epcot" $rc 0
 	done
 
-        # INDIRECT USER MEMBERSHIPS - epcot
-        users=`cat /tmp/findgroup.out | grep "Member users:"`
-        for item in juser1 juser2 guser1 guser2; do
-                echo $groups | grep $item
-                rc=$?
-                rlAssertNotEquals "Checking that user $item is no longer a member of indirect group disneyworld" $rc 0
-        done
-
-        # INDIRECT GROUP MEMBERSHIPS - disneyworld
-        ipa group-find disneyworld > /tmp/findgroup.out
-        groups=`cat /tmp/findgroup.out | grep "Member groups:"`
-        for item in germany japan ; do
-                echo $groups | grep $item
-                rc=$?
-                rlAssertNotEquals "Checking that group $item is no longer a member of indirect group disneyworld" $rc 0
-        done
-
-	# INDIRECT USER MEMBERSHIPS - disneyworld
-        users=`cat /tmp/findgroup.out | grep "Member users:"`
-        for item in juser1 juser2 guser1 guser2; do
-                echo $groups | grep $item
-                rc=$?
-                rlAssertNotEquals "Checking that user $item is no longer a member of indirect group disneyworld" $rc 0
-        done
-
 	rlRun "verifyGroupMember germany group epcot" 3 "member and memberOf attributes removed verification"
 	rlRun "verifyGroupMember japan group epcot" 3 "member and memberOf attributes removed verification"
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-group-cli-44: Removed Multiple User Members"
         rlRun "removeGroupMembers users \"trainer1,trainer2\" animalkingdom" 0 "Removing users trainer1 and trainer2 from group animalkingdom."
-	# DIRECT GROUP MEMBERSHIPS - animalkingdom
         ipa group-find animalkingdom > /tmp/findgroup.out
         users=`cat /tmp/findgroup.out | grep "Member users:"`
         for item in trainer1 trainer2 ; do
@@ -620,22 +558,12 @@ rlJournalStart
                 rlAssertNotEquals "Checking that user $item is no longer a member of direct group animalkingdom" $rc 0
         done
 
-        # INDIRECT GROUP MEMBERSHIPS - disneyworld
-        ipa group-find disneyworld > /tmp/findgroup.out
-        users=`cat /tmp/findgroup.out | grep "Member users:"`
-        for item in trainer1 trainer2 ; do
-                echo $users | grep $item
-                rc=$?
-                rlAssertNotEquals "Checking that user $item is no longer a member of indirect group disneyworld" $rc 0
-        done
-
 	rlRun "verifyGroupMember trainer1 user animalkingdom" 3 "member and memberOf attributes removed verification"
 	rlRun "verifyGroupMember trainer2 user animalkingdom" 3 "member and memberOf attributes removed verification"
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-group-cli-45: Delete User that is a member of two Groups"
 	rlRun "ipa user-del juser1" 0 "Deleting user that is member of two groups"
-	# DIRECT MEMBERSHIPS
         ipa group-find fish > /tmp/findgroup.out
         users=`cat /tmp/findgroup.out | grep "Member users:"`
         echo $users | grep juser1
@@ -648,38 +576,17 @@ rlJournalStart
         rc=$?
         rlAssertNotEquals "Checking that user $item is no longer a member of direct group japan" $rc 0
 
-	# INDIRECT MEMBERSHIPS
-        ipa group-find animalkingdom > /tmp/findgroup.out
-        users=`cat /tmp/findgroup.out | grep "Member users:"`
-        echo $users | grep juser1
-        rc=$?
-        rlAssertNotEquals "Checking that user $item is no longer a member of indirect group animalkingdom" $rc 0
-
-        ipa group-find disneyworld > /tmp/findgroup.out
-        users=`cat /tmp/findgroup.out | grep "Member users:"`
-        echo $users | grep juser1
-        rc=$?
-        rlAssertNotEquals "Checking that user $item is no longer a member of indirect group disneyworld" $rc 0
-
 	rlRun "verifyGroupMember juser1 group japan" 3 "member and memberOf attributes removed verification"
 	rlRun "verifyGroupMember juser1 group fish" 3 "member and memberOf attributes removed verification"
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-group-cli-46: Delete group with two members"
 	rlRun "deleteGroup dinasaurs" 0 "Deleting lower level nested group"
-	# DIRECT MEMBERSHIP
         ipa group-find animalkingdom > /tmp/findgroup.out
         groups=`cat /tmp/findgroup.out | grep "Member groups:"`
         echo $groups | grep dinasaurs
         rc=$?
         rlAssertNotEquals "Checking that group dinasaur is no longer a member of direct group animalkingdom" $rc 0
-
-	# INDIRECT MEMBERSHIP
-        ipa group-find disneyworld > /tmp/findgroup.out
-        groups=`cat /tmp/findgroup.out | grep "Member groups:"`
-        echo $groups | grep dinasaurs
-        rc=$?
-        rlAssertNotEquals "Checking that group dinasaur is no longer a member of indirect group disneyworld" $rc 0
 
 	rlRun "verifyGroupMember trex user dinasaurs" 3 "member and memberOf attributes removed verification"
 	rlRun "verifyGroupMember guser1 group dinasaurs" 3 "member and memberOf attributes removed verification"
