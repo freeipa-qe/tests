@@ -43,6 +43,14 @@
 # Include test case file
 . ./t.ipa-netgroup.sh
 
+PACKAGE=ipa-server
+
+group1=testg1
+user1=usrjjk1r
+user2=userl33t
+user3=usern00b
+user4=lopcr4k
+
 ##########################################
 #   test main 
 #########################################
@@ -54,20 +62,50 @@ rlJournalStart
         rlRun "pushd $TmpDir"
 	kdestroy
 	rlRun "kinitAs $ADMINID $ADMINPW" 0 "kiniting as admin"
+	# Adding users for use later
+	ipa user-add --first=aa --last=bb $user1
+	ipa user-add --first=aa --last=bb $user2
+	ipa user-add --first=aa --last=bb $user3
+	ipa user-add --first=aa --last=bb $user4
     rlPhaseEnd
-
-group1=testg1
 
     # r2d2_test_starts
     rlPhaseStartTest "run the netgroup cli tests"
         rlAssertRpm $PACKAGE
+	# Add netgroup group1
         rlRun "addNetgroup $group1 test-group-1" 0 "adding first netgroup"
+	# Verify if it exists
+	rlRun "ipa netgroup-find $group1 | grep $group1" 0 "checking to ensure netgroup was created"
+	# Adding users to group1
+	rlRun "ipa netgroup-add-member --users=$user1,$user2 $group1" 0 "Adding user1 and user2 to group1"
+	rlRun "ipa netgroup-add-member --users=$user3 $group1" 0 "Adding user3 to group1"
+	# Checking to ensure that it happened.
+	#rlRun "ipa 
+	# <How do I do this?>
+
+	# Removing users from group1
+	rlRun "ipa netgroup-remove-member --users=$user1,$user2 $group1" 0 "Adding user1 and user2 to group1"
+	rlRun "ipa netgroup-remove-member --users=$user3 $group1" 0 "Adding user3 to group1"
+	# Checking to ensure that it happened.
+	#rlRun "ipa 
+	# <How do I do this?>
+
     rlPhaseEnd
 
     
     # r2d2_test_ends
 
     rlPhaseStartCleanup "ipa-netgroup cleanup"
+	# Delete netgroup group1
+	rlRun "delNetgroup $group1" 0 "deleting first netgroup"
+	# Verify if it exists
+	rlRun "ipa netgroup-find $group1 | grep $group1" 1 "checking to ensure netgroup was deleted"
+
+	# Cleaning up users
+	ipa user-del $user1
+	ipa user-del $user2
+	ipa user-del $user3
+	ipa user-del $user4
         rlRun "popd"
         rlRun "rm -r $TmpDir" 0 "Removing tmp directory"
     rlPhaseEnd
