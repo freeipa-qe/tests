@@ -138,8 +138,8 @@ while (<MANIFEST>){
         $testset{"total"} = 0;
         $testsuite{"$next_testset_index"} = \%testset;
         $testsuite{"total"} = $setindex;
-        push @logics,$testset_name."_envsetup";
-        push @logics,$testset_name."_envcleanup";
+        #push @logics,$testset_name."_envsetup";
+        #push @logics,$testset_name."_envcleanup";
     }# parsing test set 
 
     elsif ($line =~ m/^#{1}/){  ### parsing the test suite line
@@ -152,8 +152,8 @@ while (<MANIFEST>){
            $testsuite{"total"} = 0;
            $testsuite{"envsetup"} = $testsuitename."_envsetup";
            $testsuite{"envcleanup"} = $testsuitename."_envcleanup";
-           push @logics,$testsuitename."_envsetup";
-           push @logics,$testsuitename."_envcleanup";
+          # push @logics,$testsuitename."_envsetup";
+          # push @logics,$testsuitename."_envcleanup";
         }else{
            recordError($lineIndex, 
                         "Format error", 
@@ -181,7 +181,7 @@ printTestSuite() ;
 
 # maintest function includes all test set information
 appendline ("######################");
-appendline ("# main test          #");
+appendline ("# test suite         #");
 appendline ("######################");
 our $maintest = $testsuite{"name"};
 appendline("$maintest()");
@@ -194,7 +194,7 @@ appendline ("");
 
 # create each testset that contains its test case
 appendline ("######################");
-appendline ("# testset            #");
+appendline ("# test set           #");
 appendline ("######################");
 appendTestCase_to_TestSet();
 
@@ -205,8 +205,10 @@ appendline ("######################");
 appendTestCaseElement_to_TestCase();
 
 #print "\n test case file:";
+our $i=0;
 foreach my $f (@logics){
-    print "\n write logic [$f]";
+    print "\nLogic[$i] [$f]";
+    $i ++;
     writelogic ($f);
 }
 
@@ -377,11 +379,16 @@ sub appendTestCaseElement_to_TestCase
     if ($totalsets < 1){
         appendline ("# Empty test sets, skip");
     }else{
+        writelogic ($testsuite{"envsetup"});
+        writelogic ($testsuite{"envcleanup"});
         foreach (1..$totalsets){
             my $setindex="$_";
             my $testset = $testsuite{$setindex};
             my $testset_name = $testset->{"name"};
             my $totalcase = $testset->{"total"};
+            # insert envsetup here
+            writelogic ($testset->{"envsetup"});
+            writelogic ($testset->{"envcleanup"});
             foreach (1..$totalcase){
                 my $testcaseIndex = "$_";
                 my $testcase = $testset->{$testcaseIndex};
@@ -395,6 +402,9 @@ sub appendTestCaseElement_to_TestCase
                 appendline ("# looped data   : $loop");
                 appendline ("# non-loop data : $noloop");
                 appendline ($indent."rlPhaseStartTest \"$testcase_name\"");
+                if ( ! defined $comment){
+                    $comment = "";
+                }
                 appendline ($indent.$indent."rlLog \"$comment\"");
                 my $level=2; #level 2 means put double size of indent before each line of loop
                 my $fcall = getFunctionLine($logic, $noloop);
@@ -404,6 +414,8 @@ sub appendTestCaseElement_to_TestCase
                 appendline ("} #$testcase_name");
                 appendline ("");
             }#foreach to append test case name under test set
+            # insert envcleanup here
+            #writelogic ($testset->{"envcleanup"});
         }#foreach to loop through test set in test suite
     }# non-empty set
 } # appendTestCaseElement_to_TestCase
@@ -462,7 +474,7 @@ sub loopit
 sub writelogic
 {
     my ($logic) = shift;
-    print "\nLogic=[$logic]";
+    #print "\nLogic=[$logic]";
     if ($logic =~m /^\s*$/){
         print "\nLogic is empty, skip it";
         return;
