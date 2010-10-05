@@ -40,6 +40,9 @@
 			<task name="/CoreOS/ipa-server/acceptance/ipa-user-cli" role="STANDALONE">
 				<params/>
 			</task>
+			<task name="/CoreOS/ipa-server/acceptance/ipa-netgroup-cli" role="STANDALONE">
+				<params/>
+			</task>
 			<task name="/CoreOS/ipa-server/acceptance/uninstall" role="STANDALONE">
 				<params/>
 			</task>
