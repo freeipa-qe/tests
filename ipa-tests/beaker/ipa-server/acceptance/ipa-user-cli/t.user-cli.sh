@@ -98,9 +98,9 @@ t_lockuser()
     rlPhaseStartTest "Lock User" # sort=105
         # re-kinit as admin, since only admin can lock-unlock user account
         kinitAs $admin $adminpassword
-        rlRun "ipa user-lock $lusr" 0 "perform user account locking"
+        rlRun "ipa user-disable $lusr" 0 "perform user account locking"
         if [ $? -ne 0 ];then 
-            rlFail "ERROR - ipa user-lock failed "
+            rlFail "ERROR - ipa user-disable failed "
         else
             rlLog "Lock user success"
             kinitAs $lusr $lusrpw
@@ -117,9 +117,9 @@ t_unlockuser()
 {
     rlPhaseStartTest "Unlock User" # sort=106
         kinitAs $admin $adminpassword
-        rlRun "ipa user-unlock $lusr"
+        rlRun "ipa user-enable $lusr"
         if [ $? -ne 0 ];then 
-            rlFail "ERROR - ipa user-lock failed "
+            rlFail "ERROR - ipa user-disable failed "
         else
             kinitAs $lusr $lusrpw
             if [ $? -ne 0 ];then 
