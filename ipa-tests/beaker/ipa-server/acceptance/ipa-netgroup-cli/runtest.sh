@@ -45,11 +45,15 @@
 
 PACKAGE=ipa-server
 
-group1=testg1
+ngroup1=testg1
 user1=usrjjk1r
 user2=userl33t
 user3=usern00b
 user4=lopcr4k
+group1=grpddee
+group2=grplloo
+group3=grpmmpp
+group4=grpeeww
 
 ##########################################
 #   test main 
@@ -67,6 +71,10 @@ rlJournalStart
 	ipa user-add --first=aa --last=bb $user2
 	ipa user-add --first=aa --last=bb $user3
 	ipa user-add --first=aa --last=bb $user4
+	ipa group-add --desc=testtest $group1
+	ipa group-add --desc=testtest $group2
+	ipa group-add --desc=testtest $group3
+	ipa group-add --desc=testtest $group4
     rlPhaseEnd
 
     # r2d2_test_starts
@@ -75,17 +83,30 @@ rlJournalStart
 	# Add netgroup group1
         rlRun "addNetgroup $group1 test-group-1" 0 "adding first netgroup"
 	# Verify if it exists
-	rlRun "ipa netgroup-find $group1 | grep $group1" 0 "checking to ensure netgroup was created"
+	rlRun "ipa netgroup-find $ngroup1 | grep $ngroup1" 0 "checking to ensure netgroup was created"
 	# Adding users to group1
-	rlRun "ipa netgroup-add-member --users=$user1,$user2 $group1" 0 "Adding user1 and user2 to group1"
-	rlRun "ipa netgroup-add-member --users=$user3 $group1" 0 "Adding user3 to group1"
+	rlRun "ipa netgroup-add-member --users=$user1,$user2 $ngroup1" 0 "Adding user1 and user2 to group1"
+	rlRun "ipa netgroup-add-member --users=$user3 $ngroup1" 0 "Adding user3 to group1"
+	# Checking to ensure that it happened.
+	#rlRun "ipa 
+	# <How do I do this?>
+
+	# Adding users to group1
+	rlRun "ipa netgroup-add-member --groups=$group1,$group2 $ngroup1" 0 "Adding user1 and user2 to group1"
+	rlRun "ipa netgroup-add-member --groups=$group3 $ngroup1" 0 "Adding user3 to group1"
+	# Checking to ensure that it happened.
+	#rlRun "ipa 
+	# <How do I do this?>
+	
+	# Checking to ensure that addign a host to a netgroup works
+	rlRun "ipa netgroup-remove-member --hosts=$HOSTNAME $ngroup1" 0 "Adding user3 to group1"
 	# Checking to ensure that it happened.
 	#rlRun "ipa 
 	# <How do I do this?>
 
 	# Removing users from group1
-	rlRun "ipa netgroup-remove-member --users=$user1,$user2 $group1" 0 "Adding user1 and user2 to group1"
-	rlRun "ipa netgroup-remove-member --users=$user3 $group1" 0 "Adding user3 to group1"
+	rlRun "ipa netgroup-remove-member --users=$user1,$user2 $ngroup1" 0 "Adding user1 and user2 to group1"
+	rlRun "ipa netgroup-remove-member --users=$user3 $ngroup1" 0 "Adding user3 to group1"
 	# Checking to ensure that it happened.
 	#rlRun "ipa 
 	# <How do I do this?>
