@@ -46,6 +46,7 @@
 PACKAGE=ipa-server
 
 ngroup1=testg1
+ngroup2=testgaga2
 user1=usrjjk1r
 user2=userl33t
 user3=usern00b
@@ -54,6 +55,9 @@ group1=grpddee
 group2=grplloo
 group3=grpmmpp
 group4=grpeeww
+hgroup1=hg144335566
+hgroup2=hg2
+hgroup3=hg3afdsk
 
 ##########################################
 #   test main 
@@ -75,41 +79,77 @@ rlJournalStart
 	ipa group-add --desc=testtest $group2
 	ipa group-add --desc=testtest $group3
 	ipa group-add --desc=testtest $group4
+	ipa hostgroup-add $hgroup1
+	ipa hostgroup-add $hgroup2
+	ipa hostgroup-add $hgroup3
     rlPhaseEnd
 
     # r2d2_test_starts
     rlPhaseStartTest "run the netgroup cli tests"
         rlAssertRpm $PACKAGE
-	# Add netgroup group1
-        rlRun "addNetgroup $group1 test-group-1" 0 "adding first netgroup"
+	echo "Add netgroup ngroup1"
+        rlRun "addNetgroup $ngroup1 test-group-1" 0 "adding first netgroup"
+	echo "Add netgroup ngroup2"
+        rlRun "addNetgroup $ngroup2 test-group-1" 0 "adding second netgroup"
 	# Verify if it exists
 	rlRun "ipa netgroup-find $ngroup1 | grep $ngroup1" 0 "checking to ensure netgroup was created"
 	# Adding users to group1
 	rlRun "ipa netgroup-add-member --users=$user1,$user2 $ngroup1" 0 "Adding user1 and user2 to group1"
 	rlRun "ipa netgroup-add-member --users=$user3 $ngroup1" 0 "Adding user3 to group1"
 	# Checking to ensure that it happened.
-	#rlRun "ipa 
-	# <How do I do this?>
+	rlRun "ipa netgroup-show --all $ngroup1|grep $user1" 0 "Verifying that user1 is in ngroup1"
+	rlRun "ipa netgroup-show --all $ngroup1|grep $user2" 0 "Verifying that user2 is in ngroup1"
+	rlRun "ipa netgroup-show --all $ngroup1|grep $user3" 0 "Verifying that user3 is in ngroup1"
 
 	# Adding users to group1
 	rlRun "ipa netgroup-add-member --groups=$group1,$group2 $ngroup1" 0 "Adding user1 and user2 to group1"
 	rlRun "ipa netgroup-add-member --groups=$group3 $ngroup1" 0 "Adding user3 to group1"
 	# Checking to ensure that it happened.
-	#rlRun "ipa 
-	# <How do I do this?>
+	rlRun "ipa netgroup-show --all $ngroup1|grep $group1" 0 "Verifying that group1 is in ngroup1"
+	rlRun "ipa netgroup-show --all $ngroup1|grep $group2" 0 "Verifying that group2 is in ngroup1"
+	rlRun "ipa netgroup-show --all $ngroup1|grep $group3" 0 "Verifying that group3 is in ngroup1"
 	
 	# Checking to ensure that addign a host to a netgroup works
-	rlRun "ipa netgroup-remove-member --hosts=$HOSTNAME $ngroup1" 0 "Adding user3 to group1"
+	rlRun "ipa netgroup-add-member --hosts=$HOSTNAME $ngroup1" 0 "Adding local hostname to ngroup1"
 	# Checking to ensure that it happened.
-	#rlRun "ipa 
-	# <How do I do this?>
+	rlRun "ipa netgroup-show --all $ngroup1 | grep Host | grep $HOSTNAME" 0 "Verifying that HOSNAME is in ngroup1"
 
-	# Removing users from group1
-	rlRun "ipa netgroup-remove-member --users=$user1,$user2 $ngroup1" 0 "Adding user1 and user2 to group1"
-	rlRun "ipa netgroup-remove-member --users=$user3 $ngroup1" 0 "Adding user3 to group1"
+	# Adding a hostgroup to a netgroup
+	rlRun "ipa netgroup-add-member --hostgroups=$hgroup1,$hgroup2 $ngroup1" 0 "adding hostgroup 1 and 2 to ngroup1"
+	rlRun "ipa netgroup-add-member --hostgroups=$hgroup3 $ngroup1" 0 "adding hostgroup 3 to ngroup1"
 	# Checking to ensure that it happened.
-	#rlRun "ipa 
-	# <How do I do this?>
+	rlRun "ipa netgroup-show --all $ngroup1 | grep $hgroup1" 0 "Verifying that hgroup1 is in ngroup1"
+	rlRun "ipa netgroup-show --all $ngroup1 | grep $hgroup2" 0 "Verifying that hgroup1 is in ngroup2"
+	rlRun "ipa netgroup-show --all $ngroup1 | grep $hgroup3" 0 "Verifying that hgroup1 is in ngroup3"
+
+	# Removing users from ngroup1
+	rlRun "ipa netgroup-remove-member --users=$user1,$user2 $ngroup1" 0 "Removing user1 and user2 from ngroup1"
+	rlRun "ipa netgroup-remove-member --users=$user3 $ngroup1" 0 "Removing user3 from ngroup1"
+	# Checking to ensure that it happened.
+	rlRun "ipa netgroup-show --all $ngroup1|grep $user1" 1 "Verifying that user1 is not in ngroup1"
+	rlRun "ipa netgroup-show --all $ngroup1|grep $user2" 1 "Verifying that user2 is not in ngroup1"
+	rlRun "ipa netgroup-show --all $ngroup1|grep $user3" 1 "Verifying that user3 is not in ngroup1"
+
+	# Removing groups from ngroup1
+	rlRun "ipa netgroup-remove-member --groups=$group1,$group2 $ngroup1" 0 "Removing group1 and group2 from ngroup1"
+	rlRun "ipa netgroup-remove-member --groups=$group3 $ngroup1" 0 "Removing group3 from ngroup1"
+	# Checking to ensure that it happened.
+	rlRun "ipa netgroup-show --all $ngroup1|grep $group1" 1 "Verifying that group1 is not in ngroup1"
+	rlRun "ipa netgroup-show --all $ngroup1|grep $group2" 1 "Verifying that group2 is not in ngroup1"
+	rlRun "ipa netgroup-show --all $ngroup1|grep $group3" 1 "Verifying that group3 is not in ngroup1"
+
+	# Removing hostgroups from ngroup1
+	rlRun "ipa netgroup-remove-member --groups=$hgroup1,$hgroup2 $ngroup1" 0 "Removing hgroup1 and hgroup2 from ngroup1"
+	rlRun "ipa netgroup-remove-member --groups=$hgroup3 $ngroup1" 0 "Removing hgroup3 from ngroup1"
+	# Checking to ensure that it happened.
+	rlRun "ipa netgroup-show --all $ngroup1|grep $hgroup1" 1 "Verifying that hgroup1 is not in ngroup1"
+	rlRun "ipa netgroup-show --all $ngroup1|grep $hgroup2" 1 "Verifying that hgroup2 is not in ngroup1"
+	rlRun "ipa netgroup-show --all $ngroup1|grep $hgroup3" 1 "Verifying that hgroup3 is not in ngroup1"
+
+	# Removing a host from ngroup1
+	rlRun "ipa netgroup-remove-member --hosts=$HOSTNAME $ngroup1" 0 "Removing local hostname from ngroup1"
+	# Checking to ensure that it happened.
+	rlRun "ipa netgroup-show --all $ngroup1 | grep Host | grep $HOSTNAME" 1 "Verifying that HOSNAME is not in ngroup1"
 
     rlPhaseEnd
 
