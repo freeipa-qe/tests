@@ -79,9 +79,9 @@ rlJournalStart
 	ipa group-add --desc=testtest $group2
 	ipa group-add --desc=testtest $group3
 	ipa group-add --desc=testtest $group4
-	ipa hostgroup-add $hgroup1
-	ipa hostgroup-add $hgroup2
-	ipa hostgroup-add $hgroup3
+	ipa hostgroup-add --desc=$hgroup1 $hgroup1
+	ipa hostgroup-add --desc=$hgroup2 $hgroup2
+	ipa hostgroup-add --desc=$hgroup3 $hgroup3
     rlPhaseEnd
 
     # r2d2_test_starts
@@ -151,6 +151,25 @@ rlJournalStart
 	# Checking to ensure that it happened.
 	rlRun "ipa netgroup-show --all $ngroup1 | grep Host | grep $HOSTNAME" 1 "Verifying that HOSNAME is not in ngroup1"
 
+	# checking description hostgroup-mod
+	rlRun "ipa netgroup-mod --desc=testdesc11 $ngroup1" 0 "change the description on ngroup1"
+	# Verify
+	rlRun "ipa netgroup-show --all $ngroup1 | grep testdesc11" 0 "Verifying that the description changed on ngroup1"
+
+	# checking setaddr hostgroup-mod
+	rlRun "ipa netgroup-mod --addattr=testattr=yes $ngroup1" 0 "add custom attribute on ngroup1"
+	# Verify
+	rlRun "ipa netgroup-show --all $ngroup1 | grep testattr" 0 "Verifying that the attr added to ngroup1"
+
+	# checking setaddr hostgroup-mod
+	rlRun "ipa netgroup-mod --addattr=setattr=no $ngroup1" 0 "setting custom attribute on ngroup1"
+	# Verify
+	rlRun "ipa netgroup-show --all $ngroup1 | grep testattr | grep no" 0 "Verifying that the attr changed on ngroup1"
+
+	# verifying hostgroup-del
+	rlRun "ipa netgroup-del $ngroup3" 0 "Deleting ngroup3"
+	# Verify
+	rlRun "ipa netgroup-show $ngroup3 | grep $ngroup3" 1 "Verifying that ngroup3 doesn't exist"
     rlPhaseEnd
 
     
@@ -158,15 +177,21 @@ rlJournalStart
 
     rlPhaseStartCleanup "ipa-netgroup cleanup"
 	# Delete netgroup group1
-	rlRun "delNetgroup $group1" 0 "deleting first netgroup"
+	rlRun "delNetgroup $ngroup1" 0 "deleting first netgroup"
 	# Verify if it exists
-	rlRun "ipa netgroup-find $group1 | grep $group1" 1 "checking to ensure netgroup was deleted"
+	rlRun "ipa netgroup-find $ngroup1 | grep $ngroup1" 1 "checking to ensure netgroup was deleted"
 
 	# Cleaning up users
 	ipa user-del $user1
 	ipa user-del $user2
 	ipa user-del $user3
 	ipa user-del $user4
+	ipa group-del $group1
+	ipa group-del $group2
+	ipa group-del $group3
+	ipa group-del $group4
+	ipa hostgroup-del $hgroup1
+	ipa hostgorup-del $hgroup2 
         rlRun "popd"
         rlRun "rm -r $TmpDir" 0 "Removing tmp directory"
     rlPhaseEnd
