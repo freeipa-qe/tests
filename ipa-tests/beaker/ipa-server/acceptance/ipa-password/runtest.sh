@@ -2,21 +2,15 @@
 # vim: dict=/usr/share/beakerlib/dictionary.vim cpt=.,w,b,u,t,i,k
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-#   runtest.sh of /CoreOS/ipa-tests/acceptance/ipa-user-cli
-#   Description: IPA user cli acceptance tests
+#   runtest.sh of /CoreOS/ipa-tests/acceptance/ipapassword
+#   Description: IPA ipapassword acceptance tests
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# The following ipa cli commands needs to be tested:
-#   user-add     Add a new user.
-#   user-del     Delete a user.
-#   user-find    Search for users.
-#   user-lock    Lock a user account.
-#   user-mod     Modify a user.
-#   user-show    Display information about a user.
-#   user-unlock  Unlock a user account.
+# The following ipa will be tested:
+#
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-#   Author: Yi Zhang <yzhang@redhat.com>
-#   Date  : Sept 21, 2010
+#   Author: Yi Zhang <Yi Zhangemail>
+#   Date  : Sept 10, 2010
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
 #   Copyright (c) 2010 Red Hat, Inc. All rights reserved.
@@ -38,100 +32,263 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 # Include data-driven test data file:
-. ./data.password.acceptance
-. ./data.password.functional
 
 # Include rhts environment
-#. /usr/bin/rhts-environment.sh
+. /usr/bin/rhts-environment.sh
 . /usr/share/beakerlib/beakerlib.sh
-#. /dev/shm/ipa-user-cli-lib.sh
-#. /dev/shm/ipa-server-shared.sh
+. /dev/shm/ipa-server-shared.sh
 
-. /iparhts/shared/ipa-server-shared.sh
-
-# Include local help file
-. ./lib.password.sh
 # Include test case file
-. ./t.password.sh
+. ./lib.ipapassword.sh
+. ./t.ipapassword.sh
 
-PACKAGE="ipa-server"
-type=$1
-if [ -z "$type" ] || [ "$type" = "acceptance" ] ;then
-    echo "run default test: acceptance"
-    echo "use acceptance data file"
-    data=./data.user-cli.acceptance
-    . ./data.user-cli.acceptance
-elif [ "$type" = "functional" ];then
-    echo "run functional test"
-    echo "use functional data file"
-    data=./data.user-cli.functional
-    . ./data.user-cli.functional
-else
-    echo "whatelse"
-    return
+# Include test data file
+. ./data.ipapassword.acceptance
+
+# Test environment setup
+if [ ! -d $tmpdir ];then
+    mkdir -p $tmpdir
 fi
 
+PACKAGE="ipa-server"
+
 ##########################################
-#   test group
-##########################################
-password_life()
-{
-    t_password_envsetup
-    t_minlife_somelimit
-    t_minlife_nolimit
-    t_minlife_negative
-    t_maxlife_verify
-    t_maxlife_lessthan_minlife
-    t_password_envcleanup
-} #password_life
-
-password_history()
-{
-    t_password_envsetup
-    t_password_history
-    t_password_history_lowbound
-    t_password_history_negative
-    t_password_envcleanup
-} #password_history
-
-classes()
-{
-    t_password_envsetup
-    t_classes_min
-    t_classes_lowerbound
-    t_password_envcleanup
-} #password_classes
-
-length()
-{
-    t_password_envsetup
-    t_length_min
-    t_length_min_lowerbound
-    t_password_envcleanup
-} #password_length
-
-#########################################
 #   test main 
 #########################################
 
 rlJournalStart
-    rlPhaseStartSetup "ipa-password-startup: Check for ipa-server package"
+    rlPhaseStartSetup "ipapassword startup: Check for ipa-server package"
         rlAssertRpm $PACKAGE
         rlRun "TmpDir=\`mktemp -d\`" 0 "Creating tmp directory"
         rlRun "pushd $TmpDir"
     rlPhaseEnd
 
-    # test starts
-    password_life
-    password_history
-    password_classes
-    password_length
-    # test ends
+    # r2d2_test_starts
+    ipapassword
+    # r2d2_test_ends
 
-    rlPhaseStartCleanup "ipa-password-cleanup"
+    rlPhaseStartCleanup "ipapassword cleanup"
         rlRun "popd"
         rlRun "rm -r $TmpDir" 0 "Removing tmp directory"
     rlPhaseEnd
 
     makereport
 rlJournalEnd
+
+
+ 
+# manifest:
+
+#testsuite: ipapassword
+    ## testset: _globalpolicy
+        ### testcase: _maxlifetime_default
+            #### comment : 
+            #### data-loop:
+            #### data-no-loop:
+        ### testcase: _maxlifetime_lowerbound
+            #### comment :
+            #### data-loop:
+            #### data-no-loop:
+        ### testcase: _maxlifetime_upperbound
+            #### comment :
+            #### data-loop:
+            #### data-no-loop:
+        ### testcase: _maxlifetime_negative
+            #### comment :
+            #### data-loop:
+            #### data-no-loop:
+        ### testcase: _minlifetime_default
+            #### comment :
+            #### data-loop:
+            #### data-no-loop:
+        ### testcase: _minlifetime_lowerbound
+            #### comment :
+            #### data-loop:
+            #### data-no-loop:
+        ### testcase: _minlifetime_upperbound
+            #### comment :
+            #### data-loop:
+            #### data-no-loop:
+        ### testcase: _minlifetime_negative
+            #### comment :
+            #### data-loop:
+            #### data-no-loop:
+        ### testcase: _minandmax_negative
+            #### comment : when max life is less than min life, setting should fail
+            #### data-loop:
+            #### data-no-loop:
+        ### testcase: _history_default
+            #### comment: 
+            #### data-loop: 
+            #### data-no-loop: 
+        ### testcase: _history_lowerbound
+            #### comment: 
+            #### data-loop: 
+            #### data-no-loop: 
+        ### testcase: _history_upperbound
+            #### comment: 
+            #### data-loop: 
+            #### data-no-loop: 
+        ### testcase: _history_negative
+            #### comment: 
+            #### data-loop: 
+            #### data-no-loop: 
+        ### testcase: _classes_default
+            #### comment: check minimum classes
+            #### data-loop:
+            #### data-no-loop:
+        ### testcase: _classes_lowerbound
+            #### comment: check minimum classes lowbound
+            #### data-loop:
+            #### data-no-loop:
+        ### testcase: _classes_upperbound
+            #### comment: check minimum classes upperbound
+            #### data-loop:
+            #### data-no-loop:
+        ### testcase: _classes_negative
+            #### comment: 
+            #### data-loop: 
+            #### data-no-loop: 
+        ### testcase: _length_default
+            #### comment: check minimum length
+            #### data-loop:
+            #### data-no-loop:
+        ### testcase: _length_lowerbound
+            #### comment: check minimum length
+            #### data-loop:
+            #### data-no-loop:
+        ### testcase: _length_upperbound
+            #### comment: check minimum length
+            #### data-loop:
+            #### data-no-loop:
+        ### testcase: _length_negative
+            #### comment: check minimum length
+            #### data-loop:
+            #### data-no-loop:
+    ## testset: _grouppolicy
+        ### testcase: _maxlifetime_default
+            #### comment :
+            #### data-loop:
+            #### data-no-loop:
+        ### testcase: _maxlifetime_lowerbound
+            #### comment :
+            #### data-loop:
+            #### data-no-loop:
+        ### testcase: _maxlifetime_upperbound
+            #### comment :
+            #### data-loop:
+            #### data-no-loop:
+        ### testcase: _maxlifetime_negative
+            #### comment :
+            #### data-loop:
+            #### data-no-loop:
+        ### testcase: _minlifetime_default
+            #### comment :
+            #### data-loop:
+            #### data-no-loop:
+        ### testcase: _minlifetime_lowerbound
+            #### comment :
+            #### data-loop:
+            #### data-no-loop:
+        ### testcase: _minlifetime_upperbound
+            #### comment :
+            #### data-loop:
+            #### data-no-loop:
+        ### testcase: _minlifetime_negative
+            #### comment :
+            #### data-loop:
+            #### data-no-loop:
+        ### testcase: _minandmax_negative
+            #### comment : when max life is less than min life, setting should fail
+            #### data-loop:
+            #### data-no-loop:
+        ### testcase: _history_default
+            #### comment: 
+            #### data-loop: 
+            #### data-no-loop: 
+        ### testcase: _history_lowerbound
+            #### comment: 
+            #### data-loop: 
+            #### data-no-loop: 
+        ### testcase: _history_upperbound
+            #### comment: 
+            #### data-loop: 
+            #### data-no-loop: 
+        ### testcase: _history_negative
+            #### comment: 
+            #### data-loop: 
+            #### data-no-loop: 
+        ### testcase: _classes_default
+            #### comment: check minimum classes
+            #### data-loop:
+            #### data-no-loop:
+        ### testcase: _classes_lowerbound
+            #### comment: check minimum classes lowbound
+            #### data-loop:
+            #### data-no-loop:
+        ### testcase: _classes_upperbound
+            #### comment: check minimum classes upperbound
+            #### data-loop:
+            #### data-no-loop:
+        ### testcase: _classes_negative
+            #### comment: 
+            #### data-loop: 
+            #### data-no-loop: 
+        ### testcase: _length_default
+            #### comment: check minimum length
+            #### data-loop:
+            #### data-no-loop:
+        ### testcase: _length_lowerbound
+            #### comment: check minimum length
+            #### data-loop:
+            #### data-no-loop:
+        ### testcase: _length_upperbound
+            #### comment: check minimum length
+            #### data-loop:
+            #### data-no-loop:
+        ### testcase: _length_negative
+            #### comment: check minimum length
+            #### data-loop:
+            #### data-no-loop:
+    ## testset: _globalandgroup
+        ### testcase: _maxlife_conflict
+            #### commnet: when group setting for maxlife > global maxlife setting
+            #### data-loop:
+            #### data-no-loop:
+        ### testcase: _minlife_conflict
+            #### comment: when group setting for minlife < global minlife setting
+            #### data-loop:
+            #### data-no-loop:
+        ### testcase: _history_conflict
+            #### commnet: when group setting for history size > global history size setting
+            #### data-loop:
+            #### data-no-loop:
+        ### testcase: _classes_conflict
+            #### comment: when group classes > global classes
+            #### data-loop:
+            #### data-no-loop:
+        ### testcase: _length_conflict
+            #### comment: when group length > global length
+            #### data-loop:
+            #### data-no-loop:
+    ## testset: _nestedgroup
+        ### testcase: _maxlife_conflict
+            #### commnet: when group setting for maxlife > global maxlife setting
+            #### data-loop:
+            #### data-no-loop:
+        ### testcase: _minlife_conflict
+            #### comment: when group setting for minlife < global minlife setting
+            #### data-loop:
+            #### data-no-loop:
+        ### testcase: _history_conflict
+            #### commnet: when group setting for history size > global history size setting
+            #### data-loop:
+            #### data-no-loop:
+        ### testcase: _classes_conflict
+            #### comment: when group classes > global classes
+            #### data-loop:
+            #### data-no-loop:
+        ### testcase: _length_conflict
+            #### comment: when group length > global length
+            #### data-loop:
+            #### data-no-loop:
