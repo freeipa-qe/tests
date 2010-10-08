@@ -706,6 +706,13 @@ rlJournalStart
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
     rlPhaseEnd
 
+    rlPhaseStartTest "ipa-group-cli-62: Negative - Add self as group member"
+        ipa group-add-member --groups=fish fish > /tmp/error.out
+        cat /tmp/error.out | grep "Number of members added 0"
+        rc=$?
+        rlAssert0 "Number of members added 0" $rc
+    rlPhaseEnd
+
     rlPhaseStartCleanup "ipa-group-cli-cleanup: Delete remaining users and group and Destroying admin credentials"
         rlRun "popd"
         rlRun "rm -r $TmpDir" 0 "Removing tmp directory"
