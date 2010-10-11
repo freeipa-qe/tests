@@ -73,7 +73,7 @@ reset_global_pwpolicy()
 add_test_user_account()
 {
     userlogin_exist $testacLogin
-    if [ $? = 1 ]
+    if [ $? = 0 ]
     then
         delete_test_user_account $testacLogin
     fi
@@ -90,7 +90,7 @@ add_test_user_account()
 delete_test_user_account()
 {
     userlogin_exist $testacLogin
-    if [ $? = 1 ]
+    if [ $? = 0 ]
     then
         rlLog "test account exist, now delete it"
         rlRun "$kdestroy"
@@ -108,15 +108,21 @@ userlogin_exist()
 # return 1 if user account does NOT exist
     local userlogin=$1
     local out=$tmpdir/userexist.txt
-    if [ ! -z "$login" ]
+    if [ ! -z "$userlogin" ]
     then
         KinitAsAdmin $adminpassword
         rlRun "ipa user-find $userlogin > $out" 0 "find this user account"
         rlLog "parsing the user-find output to veirfy the account"
-        grep "User login: $userlogin$" $out
-        ret=$?
-        rm $out
-        return $ret
+        if grep -i "User login: $userlogin$" $out
+        then
+            rlLog "find [$userlogin] in ipa server"
+            rm $out
+            return 0
+        else
+            rlLog "didn't find [$userlogin]"
+            rm $out
+            return 1
+        fi
     else
         return 1 # when login value not given, return not found
     fi

@@ -20,8 +20,8 @@ ipapassword_globalpolicy()
     ipapassword_globalpolicy_envsetup
     ipapassword_globalpolicy_maxlifetime_default
     ipapassword_globalpolicy_maxlifetime_lowerbound
-#    ipapassword_globalpolicy_maxlifetime_upperbound
-#    ipapassword_globalpolicy_maxlifetime_negative
+    ipapassword_globalpolicy_maxlifetime_upperbound
+    ipapassword_globalpolicy_maxlifetime_negative
 #    ipapassword_globalpolicy_minlifetime_default
 #    ipapassword_globalpolicy_minlifetime_lowerbound
 #    ipapassword_globalpolicy_minlifetime_upperbound
@@ -190,20 +190,6 @@ ipapassword_globalpolicy_maxlifetime_lowerbound_logic()
         rlRun "ipa pwpolicy-mod --minlife=48" #set minlife to 2 days (48 hours)
         rlRun "ipa pwpolicy-mod --maxlife=1" 1 "expect to fail since maxlife has to >= minlife"
         rlRun "ipa pwpolicy-mod --maxlife=2" 0 "expect to success since maxlife could = minlife"
-        # to make my life easier, the following test can be ignored
-        #twodays=`echo "2 * 24 * 60 * 60" | bc`
-        #set_systime "+ $twodays + 60" # set system clock 1 minute after max life
-        #rlRun "$kdestroy"
-        #echo $testacNEWPW | kinit $testacLogin > $out
-        #cat $out
-        #if grep "Password expired" $out
-        #then
-        #    rlPass "system prompt for password change"
-        #else
-        #    rlFail "system did not prompt for password change"
-        #fi
-        #rm $out
-
     # test logic ends
 } # ipapassword_globalpolicy_maxlifetime_lowerbound_logic 
 
@@ -221,7 +207,14 @@ ipapassword_globalpolicy_maxlifetime_upperbound_logic()
 {
     # accept parameters: NONE
     # test logic starts
-        rlFail "EMPTY LOGIC"
+        rlLog "the upper bound of maxlife is the max int it can takes"
+        KinitAsAdmin $adminpassword
+        for v in 100 1000 9999 99999
+        do
+            rlRun "ipa pwpolicy-mod --maxlife=$v" \
+                   0 "set value to [$v], expect to pass"
+        done
+
     # test logic ends
 } # ipapassword_globalpolicy_maxlifetime_upperbound_logic 
 
@@ -230,8 +223,13 @@ ipapassword_globalpolicy_maxlifetime_negative()
 # looped data   : 
 # non-loop data : 
     rlPhaseStartTest "ipapassword_globalpolicy_maxlifetime_negative"
-        rlLog ""
-        ipapassword_globalpolicy_maxlifetime_negative_logic
+        rlLog "maxlife can not be non-interget value"
+        KinitAsAdmin $adminpassword
+        rlRun "ipa pwpolicy-mod --minlife=0" 0 "set minlife to 0"
+        for maxlife_value in -2 -1 a abc
+        do
+            ipapassword_globalpolicy_maxlifetime_negative_logic $maxlife_value
+        done
     rlPhaseEnd
 } #ipapassword_globalpolicy_maxlifetime_negative
 
@@ -239,7 +237,7 @@ ipapassword_globalpolicy_maxlifetime_negative_logic()
 {
     # accept parameters: NONE
     # test logic starts
-        rlFail "EMPTY LOGIC"
+        rlRun "ipa pwpolicy-mod --maxlife=$1" 1 "expect to fail for maxlife=[$1]"
     # test logic ends
 } # ipapassword_globalpolicy_maxlifetime_negative_logic 
 
