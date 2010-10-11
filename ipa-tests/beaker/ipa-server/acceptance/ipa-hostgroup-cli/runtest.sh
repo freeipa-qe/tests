@@ -54,9 +54,9 @@ HOSTGRPDN="cn=hostgroups,cn=accounts,"
 HOSTGRPRDN="$HOSTGRPDN$BASEDN"
 HOSTDN="cn=computers,cn=accounts,"
 HOSTRDN="$HOSTDN$BASEDN"
-echo "HOSTDN is $HOSTRDN"
-echo "HOSTGRPDN is $HOSTGRPRDN"
-echo "Server is $MASTER"
+rlLog "HOSTDN is $HOSTRDN"
+rlLog "HOSTGRPDN is $HOSTGRPRDN"
+rlLog "Server is $MASTER"
 
 host1="nightcrawler."$DOMAIN
 host2="ivanova."$DOMAIN
@@ -272,22 +272,40 @@ rlJournalStart
         attr="member"
         member1="cn=newcn,$HOSTRDN"
         member2="cn=newcn2,$HOSTRDN"
-        command="ipa group-mod --setattr member=\"$member1\" $group1"
-        expmsg="ipa: ERROR: Operation not allowed on member"
+        command="ipa group-mod --setattr $attr=\"$member1\" \"$group1\""
+        expmsg="ipa: ERROR: Operation not allowed on $attr"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
-        command="ipa group-mod --addattr member=\"$member2\" $group1"
+        command="ipa group-mod --addattr $attr=\"$member2\" \"$group1\""
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-hostgroup-cli-28: Negative - setattr and addattr on ipauniqueid"
+    rlPhaseStartTest "ipa-hostgroup-cli-28: setattr and addattr on memberOf"
+        attr="memberOf"
+        member1="cn=bogus,$HOSTGRPRDN"
+        member2="cn=bogus2,$HOSTGRPRDN"
+        command="ipa group-mod --setattr $attr=\"$member1\" \"$group1\""
+        expmsg="ipa: ERROR: Operation not allowed on $attr"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
+        command="ipa group-mod --addattr $attr=\"$member2\" \"$group1\""
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-hostgroup-cli-29: Negative - setattr and addattr on ipauniqueid"
         command="ipa hostgroup-mod --setattr ipauniqueid=mynew-unique-id $group1"
-        expmsg="ipa: ERROR: Insufficient access: Insufficient 'write' privilege to the 'ipaUniqueID' attribute of entry 'cn=hostgrp1,cn=hostgroups,cn=accounts,dc=testrelm'."
+        expmsg="ipa: ERROR: Insufficient access: Insufficient 'write' privilege to the 'ipaUniqueID' attribute of entry 'cn=$group1,cn=hostgroups,cn=accounts,dc=testrelm'."
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
         command="ipa hostgroup-mod --addattr ipauniqueid=another-new-unique-id $group1"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-hostgroup-cli-29: Delete Host Groups"
+    rlPhaseStartTest "ipa-hostgroup-cli-30: Negative - Add self as group member"
+        ipa hostgroup-add-member --hostgroups="$group1" "$group1" > /tmp/error.out
+        cat /tmp/error.out | grep "Number of members added 0"
+        rc=$?
+        rlAssert0 "Number of members added 0" $rc
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-hostgroup-cli-31: Delete Host Groups"
 	rlRun "deleteHostGroup \"$group1\"" 0 "Deleting host group \"$group1\""
 	rlRun "deleteHostGroup \"$group2\"" 0 "Deleting host group \"$group2\""
 	rlRun "deleteHostGroup \"$group4\"" 0 "Deleting host group \"$group4\""
