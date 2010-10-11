@@ -40,7 +40,7 @@ restart_ipa_passwd()
 
 read_default_policy_setting()
 {
-    KinitAsAdmin $adminpassword
+    KinitAsAdmin
     local out=$tmpdir/defaultvalues.$RANDOM.txt
     rlRun "ipa pwpolicy-show > $out" 0 "read global password policy"
     default_maxlife=`grep "Max lifetime" $out | cut -d":" -f2` # unit is in day
@@ -60,7 +60,7 @@ reset_global_pwpolicy()
     rlLog "reset password policy"
     rlLog "maxlife [$default_maxlife] days , minlife [$default_minlife] hours"
     rlLog "history [$default_history], classes [$default_classes], length [$default_length]"
-    KinitAsAdmin $adminpassword
+    KinitAsAdmin 
     rlLog "set global password policy back to default"
     ipa pwpolicy-mod --maxlife=$default_maxlife \
                      --minlife=$default_minlife \
@@ -70,13 +70,15 @@ reset_global_pwpolicy()
     rlLog "reset finished"
 } #reset_pwpolicy_to_default
 
-add_test_user_account()
+add_test_ac()
 {
     userlogin_exist $testacLogin
     if [ $? = 0 ]
     then
         delete_test_user_account $testacLogin
     fi
+    rlRun "$kdestroy"
+    KinitAsAdmin
     rlRun "echo $initialpw |\
            ipa user-add $testacLogin\
                         --first $testacFirst\
@@ -85,22 +87,24 @@ add_test_user_account()
           0 "add test user account"
     # set test account password 
     FirstKinitAs $testacLogin $initialpw $testacPW
-} # add_test_user_account
+    rlRun "$kdestroy"
+} # add_test_ac_
 
-delete_test_user_account()
+delete_test_ac()
 {
     userlogin_exist $testacLogin
     if [ $? = 0 ]
     then
         rlLog "test account exist, now delete it"
         rlRun "$kdestroy"
-        KinitAsAdmin $adminpassword
+        KinitAsAdmin
         rlRun "ipa user-del $testacLogin" 0 "delete test account [$testacLogin]"
+        rlRun "$kdestroy"
     else
         rlLog "test account does not exist"
         rlPass "no need to delete"
     fi
-} # delete_test_user_account
+} # delete_test_ac
 
 userlogin_exist()
 {
@@ -110,7 +114,7 @@ userlogin_exist()
     local out=$tmpdir/userexist.txt
     if [ ! -z "$userlogin" ]
     then
-        KinitAsAdmin $adminpassword
+        KinitAsAdmin
         rlRun "ipa user-find $userlogin > $out" 0 "find this user account"
         rlLog "parsing the user-find output to veirfy the account"
         if grep -i "User login: $userlogin$" $out
@@ -162,7 +166,7 @@ kinit_aftermaxlife()
 
 KinitAsAdmin()
 {
-    pw=$1
+    local pw=$adminpassword
     out=$tmpdir/kinitasadmin.$RANDOM.txt
     echo $pw | kinit admin > $out
     if [ $? = 0 ];then
@@ -196,7 +200,7 @@ KinitAsAdmin()
             echo 'send -s -- "\r"' >> $exp
             echo 'expect eof ' >> $exp
             /usr/bin/expect $exp 
-            cat $exp
+            #cat $exp
             rm $exp
             # after reset password, test the new password
             $kdestroy
@@ -217,6 +221,38 @@ KinitAsAdmin()
     fi
 } #KinitAsAdmin
 
+change_password()
+{ # change password between min and max life os password 
+    local userlogin=$1
+    local oldpw=$2
+    local newpw=$3
+    rlLog "change passwor for [$userlogin] old[$oldpw], new [$newpw]"
+    rlRun "echo $oldpw | kinit $userlogin" 0 "first of all: old pw should work"
+    local out=$tmpdir/changepassword.$RANDOM.out
+    local exp=$tmpdir/changepassword.$RANDOM.exp
+    echo "set timeout 30" > $exp
+    echo "set force_conservative 0" >> $exp
+    echo "set send_slow {1 .1}" >> $exp
+    echo "spawn ipa passwd $userlogin" >> $exp
+    echo 'match_max 100000' >> $exp
+    echo 'expect "*: "' >> $exp
+    echo "send -s -- \"$newpw\"" >> $exp
+    echo 'send -s -- "\r"' >> $exp
+    echo 'expect "*: "' >> $exp
+    echo "send -s -- \"$newpw\"" >> $exp
+    echo 'send -s -- "\r"' >> $exp
+    echo 'expect eof ' >> $exp
+    /usr/bin/expect $exp  > $out
+    if grep "Constraint violation:Password Fails to meet minimum strength criteria" $out
+    then
+        ret=1
+    else
+        ret=0
+    fi
+    rm $out
+    rm $exp
+    return $ret
+} #change_password
 #############################################################
 # This function populates the current date into the hour, min, sec, month, day and year vars
 get_time()
