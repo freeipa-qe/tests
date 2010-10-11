@@ -157,14 +157,14 @@ rlJournalStart
 	rlRun "ipa netgroup-show --all $ngroup1 | grep testdesc11" 0 "Verifying that the description changed on ngroup1"
 
 	# checking setaddr hostgroup-mod
-	rlRun "ipa netgroup-mod --addattr=testattr=yes $ngroup1" 0 "add custom attribute on ngroup1"
+	rlRun "ipa netgroup-mod --addattr=externalHost=ipaqatesthost $ngroup1" 0 "add custom attribute on ngroup1"
 	# Verify
-	rlRun "ipa netgroup-show --all $ngroup1 | grep testattr" 0 "Verifying that the attr added to ngroup1"
+	rlRun "ipa netgroup-show --all $ngroup1 | grep ipaqatesthost" 0 "Verifying that the attr added to ngroup1"
 
-	# checking setaddr hostgroup-mod
-	rlRun "ipa netgroup-mod --addattr=setattr=no $ngroup1" 0 "setting custom attribute on ngroup1"
+	# checking setaddr hostgroup-mod --setattr
+	rlRun "ipa netgroup-mod --setattr=externalHost=althost $ngroup1" 0 "setting custom attribute on ngroup1"
 	# Verify
-	rlRun "ipa netgroup-show --all $ngroup1 | grep testattr | grep no" 0 "Verifying that the attr changed on ngroup1"
+	rlRun "ipa netgroup-show --all $ngroup1 | grep alt | grep no" 0 "Verifying that the attr changed on ngroup1"
 
 	# verifying hostgroup-del
 	rlRun "ipa netgroup-del $ngroup3" 0 "Deleting ngroup3"
