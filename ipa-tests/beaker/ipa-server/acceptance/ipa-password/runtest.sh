@@ -67,12 +67,11 @@ rlJournalStart
     ipapassword
     # r2d2_test_ends
 
+    makereport
     rlPhaseStartCleanup "ipapassword cleanup"
         rlRun "popd"
         rlRun "rm -r $TmpDir" 0 "Removing tmp directory"
     rlPhaseEnd
-
-    makereport
 rlJournalEnd
 
 
@@ -111,10 +110,6 @@ rlJournalEnd
             #### data-no-loop:
         ### testcase: _minlifetime_negative
             #### comment :
-            #### data-loop:
-            #### data-no-loop:
-        ### testcase: _minandmax_negative
-            #### comment : when max life is less than min life, setting should fail
             #### data-loop:
             #### data-no-loop:
         ### testcase: _history_default
@@ -196,10 +191,6 @@ rlJournalEnd
             #### data-no-loop:
         ### testcase: _minlifetime_negative
             #### comment :
-            #### data-loop:
-            #### data-no-loop:
-        ### testcase: _minandmax_negative
-            #### comment : when max life is less than min life, setting should fail
             #### data-loop:
             #### data-no-loop:
         ### testcase: _history_default

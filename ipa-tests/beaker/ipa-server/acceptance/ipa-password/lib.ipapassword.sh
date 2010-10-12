@@ -41,7 +41,7 @@ restart_ipa_passwd()
 read_default_policy_setting()
 {
     KinitAsAdmin
-    local out=$tmpdir/defaultvalues.$RANDOM.txt
+    local out=$TmpDir/defaultvalues.$RANDOM.txt
     rlRun "ipa pwpolicy-show > $out" 0 "read global password policy"
     default_maxlife=`grep "Max lifetime" $out | cut -d":" -f2` # unit is in day
     default_minlife=`grep "Min lifetime" $out | cut -d":" -f2` # unit is in hour
@@ -111,7 +111,7 @@ userlogin_exist()
 # return 0 if user exist
 # return 1 if user account does NOT exist
     local userlogin=$1
-    local out=$tmpdir/userexist.txt
+    local out=$TmpDir/userexist.txt
     if [ ! -z "$userlogin" ]
     then
         KinitAsAdmin
@@ -137,7 +137,7 @@ kinit_aftermaxlife()
     local username=$1
     local pw=$2
     local newpw=$3
-    local exp=$tmpdir/kinitaftermaxlife.$RANDOM.exp
+    local exp=$TmpDir/kinitaftermaxlife.$RANDOM.exp
     echo "set timeout 30" > $exp
     echo "set force_conservative 0" >> $exp
     echo "set send_slow {1 .1}" >> $exp
@@ -167,7 +167,7 @@ kinit_aftermaxlife()
 KinitAsAdmin()
 {
     local pw=$adminpassword
-    out=$tmpdir/kinitasadmin.$RANDOM.txt
+    out=$TmpDir/kinitasadmin.$RANDOM.txt
     echo $pw | kinit admin > $out
     if [ $? = 0 ];then
         rlPass "kinit as admin with $pw success"
@@ -175,7 +175,7 @@ KinitAsAdmin()
         if grep "Password expired" $out
         then
             rlLog "admin password exipred, do reset process"
-            exp=$tmpdir/resetadminpassword.$RANDOM.exp
+            exp=$TmpDir/resetadminpassword.$RANDOM.exp
             temppw="New_$pw"
             kinit_aftermaxlife "admin" $adminpassword $temppw
             # set password policy to allow admin change password right away
@@ -224,12 +224,13 @@ KinitAsAdmin()
 change_password()
 { # change password between min and max life os password 
     local userlogin=$1
-    local oldpw=$2
+    local currentpw=$2
     local newpw=$3
-    rlLog "change passwor for [$userlogin] old[$oldpw], new [$newpw]"
-    rlRun "echo $oldpw | kinit $userlogin" 0 "first of all: old pw should work"
-    local out=$tmpdir/changepassword.$RANDOM.out
-    local exp=$tmpdir/changepassword.$RANDOM.exp
+    rlLog "change password for [$userlogin] from [$currentpw] to [$newpw]"
+    rlRun "echo $currentpw | kinit $userlogin" \
+          0 "check current pw"
+    local out=$TmpDir/changepassword.$RANDOM.out
+    local exp=$TmpDir/changepassword.$RANDOM.exp
     echo "set timeout 30" > $exp
     echo "set force_conservative 0" >> $exp
     echo "set send_slow {1 .1}" >> $exp
@@ -253,80 +254,6 @@ change_password()
     rm $exp
     return $ret
 } #change_password
-#############################################################
-# This function populates the current date into the hour, min, sec, month, day and year vars
-get_time()
-{
-	export month=$(date +%m)
-	export day=$(date +%d)
-	export year=$(date +%Y)
-	export hour=$(date +%H)
-	export min=$(date +%M)
-	export sec=$(date +%S)
-}
-
-SyncDate()
-{
-	for s in $SERVERS; do
-		if [ "$s" != "" ]; then
-			eval_vars $s
-			ssh $FULLHOSTNAME "/etc/init.d/ntpd stop;ntpdate $NTPSERVER"
-		fi
-	done
-	for s in $CLIENTS; do
-		if [ "$s" != "" ]; then
-			eval_vars $s
-			ssh $FULLHOSTNAME "/etc/init.d/ntpd stop;ntpdate $NTPSERVER"
-		fi
-	done
-}
-
-SyncKpasswd()
-{
-	for s in $SERVERS; do
-		if [ "$s" != "" ]; then
-			eval_vars $s
-			ssh $FULLHOSTNAME "/etc/init.d/ntpd stop;ntpdate $NTPSERVER;/etc/init.d/ipa_kpasswd restart"
-		fi
-	done
-	for s in $CLIENTS; do
-		if [ "$s" != "" ]; then
-			eval_vars $s
-			ssh $FULLHOSTNAME "/etc/init.d/ntpd stop;ntpdate $NTPSERVER"
-		fi
-	done
-}
-
-ResetKinit()
-{
-        if [ "$DSTET_DEBUG" = "y" ]; then set -x; fi
-        # Kinit everywhere
-        for s in $SERVERS; do
-                if [ "$s" != "" ]; then
-			eval_vars $s
-			ssh $FULLHOSTNAME "/etc/init.d/ntpd stop;ntpdate $NTPSERVER;/etc/init.d/ipa_kpasswd restart"
-                        message "kiniting as $DS_USER, password $DM_ADMIN_PASS on $s"
-                        KinitAs $s $DS_USER $DM_ADMIN_PASS
-                        if [ $? -ne 0 ]; then
-                                message "ERROR - kinit on $s failed"
-				message "Test - $tet_thistest - ResetKinit"
-				return 1
-                        fi
-                fi
-        done
-        for s in $CLIENTS; do
-                if [ "$s" != "" ]; then
-                        message "kiniting as $DS_USER, password $DM_ADMIN_PASS on $s"
-                        KinitAs $s $DS_USER $DM_ADMIN_PASS
-                        if [ $? -ne 0 ]; then
-                                message "ERROR - kinit on $s failed"
-				message "Test - $tet_thistest - ResetKinit"
-				return 1
-                        fi
-                fi
-        done
-	return 0
-}
 
 makereport()
 {
@@ -335,10 +262,13 @@ makereport()
     pass=`rlJournalPrintText | grep "RESULT" | grep "\[   PASS   \]" | wc -l`
     fail=`rlJournalPrintText | grep "RESULT" | grep "\[   FAIL   \]" | wc -l`
     abort=`rlJournalPrintText | grep "RESULT" | grep "\[  ABORT   \]" | wc -l`
-    report=$tmpdir/rhts.report.$RANDOM.txt
+    report=$TmpDir/rhts.report.$RANDOM.txt
     echo "================ final pass/fail report =================" > $report
     echo "   Test Date: `date` " >> $report
-    echo "   Total: [$total] passed: [$pass] failed: [$fail] abort: [$abort]" >> $report
+    echo "   Total : [$total] "  >> $report
+    echo "   Passed: [$pass] "   >> $report
+    echo "   Failed: [$fail] "   >> $report
+    echo "   Abort : [$abort]"   >> $report
     echo "---------------------------------------------------------" >> $report
     rlJournalPrintText | grep "RESULT" | grep "\[   PASS   \]"| sed -e 's/:/ /g' -e 's/RESULT//g' >> $report
     echo "" >> $report
