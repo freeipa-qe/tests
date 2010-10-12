@@ -1,0 +1,14 @@
+Owner:           Yi Zhang <Yi Zhangemail>
+Name:            /CoreOS/ipa-server/acceptance/ipadefault
+TestVersion:     1.0
+Path:            /mnt/tests/CoreOS/ipa-server/acceptance/ipadefault
+Description:     IPA default setting test
+Type:            Regression
+TestTime:        15m
+RunFor:          ipa-server
+Requires:        ipa-admintools
+Requires:        expect
+Priority:        Normal
+License:         GPLv2
+Confidential:    no
+Destructive:     no

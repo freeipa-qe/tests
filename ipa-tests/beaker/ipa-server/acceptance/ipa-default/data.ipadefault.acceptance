@@ -1,0 +1,12 @@
+admin="admin"
+adminpassword="redhat123"
+
+realm="SJC.REDHAT.COM"
+# default settings for password policy
+default_pw_maxlife=90
+default_pw_minlife=1
+default_pw_history=0
+default_pw_classes=0
+default_pw_length=8
+
+
