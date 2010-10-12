@@ -41,6 +41,8 @@
 # Include test case file
 . ./t.r2d2_testsuitename.sh
 
+PACKAGE="ipa-server"
+
 ##########################################
 #   test main 
 #########################################
