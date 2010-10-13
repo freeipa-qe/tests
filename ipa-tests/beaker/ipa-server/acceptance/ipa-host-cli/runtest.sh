@@ -45,9 +45,6 @@
 ########################################################################
 # Test Suite Globals
 ########################################################################
-#ADMINID is now part of env.sh
-#ADMINID="admin"
-ADMINPWD="Admin123"
 
 REALM=`os_getdomainname | tr "[a-z]" "[A-Z]"`
 DOMAIN=`os_getdomainname`
@@ -66,7 +63,7 @@ rlJournalStart
         rlAssertRpm $PACKAGE
         rlRun "TmpDir=\`mktemp -d\`" 0 "Creating tmp directory"
         rlRun "pushd $TmpDir"
-	rlRun "kinitAs $ADMINID $ADMINPWD" 0 "Kinit as admin user"
+	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-host-cli-001: Add lower case host"
