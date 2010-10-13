@@ -18,14 +18,14 @@ ipapassword()
 ipapassword_globalpolicy()
 {
     ipapassword_globalpolicy_envsetup
-#    ipapassword_globalpolicy_maxlifetime_default
-#    ipapassword_globalpolicy_maxlifetime_lowerbound
-#    ipapassword_globalpolicy_maxlifetime_upperbound
-#    ipapassword_globalpolicy_maxlifetime_negative
-#    ipapassword_globalpolicy_minlifetime_default
-#    ipapassword_globalpolicy_minlifetime_lowerbound
-#    ipapassword_globalpolicy_minlifetime_upperbound
-#    ipapassword_globalpolicy_minlifetime_negative
+    ipapassword_globalpolicy_maxlifetime_default
+    ipapassword_globalpolicy_maxlifetime_lowerbound
+    ipapassword_globalpolicy_maxlifetime_upperbound
+    ipapassword_globalpolicy_maxlifetime_negative
+    ipapassword_globalpolicy_minlifetime_default
+    ipapassword_globalpolicy_minlifetime_lowerbound
+    ipapassword_globalpolicy_minlifetime_upperbound
+    ipapassword_globalpolicy_minlifetime_negative
     ipapassword_globalpolicy_history_default
     ipapassword_globalpolicy_history_lowerbound
     ipapassword_globalpolicy_history_upperbound
