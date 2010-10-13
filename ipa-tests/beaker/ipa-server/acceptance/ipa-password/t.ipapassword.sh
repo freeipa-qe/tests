@@ -18,18 +18,18 @@ ipapassword()
 ipapassword_globalpolicy()
 {
     ipapassword_globalpolicy_envsetup
-    ipapassword_globalpolicy_maxlifetime_default
-    ipapassword_globalpolicy_maxlifetime_lowerbound
-    ipapassword_globalpolicy_maxlifetime_upperbound
-    ipapassword_globalpolicy_maxlifetime_negative
-    ipapassword_globalpolicy_minlifetime_default
-    ipapassword_globalpolicy_minlifetime_lowerbound
-    ipapassword_globalpolicy_minlifetime_upperbound
-    ipapassword_globalpolicy_minlifetime_negative
+#    ipapassword_globalpolicy_maxlifetime_default
+#    ipapassword_globalpolicy_maxlifetime_lowerbound
+#    ipapassword_globalpolicy_maxlifetime_upperbound
+#    ipapassword_globalpolicy_maxlifetime_negative
+#    ipapassword_globalpolicy_minlifetime_default
+#    ipapassword_globalpolicy_minlifetime_lowerbound
+#    ipapassword_globalpolicy_minlifetime_upperbound
+#    ipapassword_globalpolicy_minlifetime_negative
     ipapassword_globalpolicy_history_default
-#    ipapassword_globalpolicy_history_lowerbound
-#    ipapassword_globalpolicy_history_upperbound
-#    ipapassword_globalpolicy_history_negative
+    ipapassword_globalpolicy_history_lowerbound
+    ipapassword_globalpolicy_history_upperbound
+    ipapassword_globalpolicy_history_negative
 #    ipapassword_globalpolicy_classes_default
 #    ipapassword_globalpolicy_classes_lowerbound
 #    ipapassword_globalpolicy_classes_upperbound
@@ -428,16 +428,13 @@ ipapassword_globalpolicy_history_default()
         rlLog "default behave of history setting test"
         KinitAsAdmin
         rlLog "set all other password constrains to 0"
-        ipa pwpolicy-mod --maxlife=$default_maxlife --minlife=0 --history=0 --minlength=0 --minclasses=1 
+        ipa pwpolicy-mod --maxlife=$default_maxlife --minlife=0 --minlength=0 --minclasses=1 
         ipa pwpolicy-show > $out
         minlife=`grep "Min lifetime" $out | cut -d":" -f2|xargs echo`
-        history=`grep "History size:" $out | cut -d":" -f2|xargs echo`
         length=`grep "length:" $out | cut -d":" -f2|xargs echo`
         classes=`grep "classes:" $out | cut -d":" -f2|xargs echo`
-        rlLog "set preconditoin: minlife=[$minlife] "
-        rlLog "    history=[$history] minlength=[$length] classes=[$classes]"
-        if [ $minlife = 0 ] && [ $history = 0 ] \
-            && [ $length = 0 ] && [ $classes = 1 ]
+        rlLog "preconditoin: minlife=[$minlife] minlength=[$length] classes=[$classes]"
+        if [ $minlife = 0 ] && [ $length = 0 ] && [ $classes = 1 ]
         then
             add_test_ac
             ipapassword_globalpolicy_history_default_logic
@@ -453,31 +450,9 @@ ipapassword_globalpolicy_history_default_logic()
 {
     # accept parameters: NONE
     # test logic starts
-        # when history=0, user can reuse their password as many as they want
-        # please note that change password to current working password
-        # does not allowed by the nature of kerberos. so history=0 means
-        # you can actually switch between 2 passwords
-        counter=0
-        oldpw=$testacPW
-        newpw="dummy123"
-        while [ $counter -lt 4 ] #password is $oldpw when out of this loop
-        do
-            change_password $testacLogin $oldpw $newpw
-            if [ $? = 0 ];then
-                rlPass "[$counter] change success, current password [$newpw]"
-                #swap the password
-                tmp=$oldpw
-                oldpw=$newpw
-                newpw=$tmp 
-            else
-                rlFail "[$counter] password change failed"
-            fi
-            counter=$((counter+1))
-        done
-        
         # set history to N, then N history password can not be used
         number=$RANDOM
-        let "number %= 10"
+        let "number %= 20"
         N=`echo "$number + 2" | bc` # set N >= 2
         pws="$testacPW"
         counter=1 #reset counter
@@ -531,8 +506,27 @@ ipapassword_globalpolicy_history_lowerbound()
 # looped data   : 
 # non-loop data : 
     rlPhaseStartTest "ipapassword_globalpolicy_history_lowerbound"
-        rlLog ""
-        ipapassword_globalpolicy_history_lowerbound_logic
+        lowbound=0
+        rlLog "lowerbound of password history is $lowbound"
+        KinitAsAdmin
+        rlLog "set all other password constrains to 0"
+        ipa pwpolicy-mod --maxlife=$default_maxlife --minlife=0 --minlength=0 --minclasses=1 --history=$lowbound
+        ipa pwpolicy-show > $out
+        minlife=`grep "Min lifetime" $out | cut -d":" -f2|xargs echo`
+        length=`grep "length:" $out | cut -d":" -f2|xargs echo`
+        classes=`grep "classes:" $out | cut -d":" -f2|xargs echo`
+        history=`grep "History size:" $out | cut -d":" -f2|xargs echo`
+        rlLog "preconditoin: minlife=[$minlife] minlength=[$length] classes=[$classes] history=[$history]"
+        if [ $minlife = 0 ] && [ $length = 0 ] && [ $classes = 1 ] \
+            && [ $history = 0 ]
+        then
+            add_test_ac
+            ipapassword_globalpolicy_history_lowerbound_logic
+            delete_test_ac
+        else
+            rlFail "can not set precondition for history test"
+        fi
+
     rlPhaseEnd
 } #ipapassword_globalpolicy_history_lowerbound
 
@@ -540,7 +534,33 @@ ipapassword_globalpolicy_history_lowerbound_logic()
 {
     # accept parameters: NONE
     # test logic starts
-        rlFail "EMPTY LOGIC"
+        # when history=0, user can reuse their password as many as they want
+        # please note that change password to current working password
+        # does not allowed by the nature of kerberos. so history=0 means
+        # you can actually switch between 2 passwords
+        rlRun "$kdestroy"
+        kinitAs $testacLogin $testacPW
+        number=$RANDOM
+        let "number %= 10"
+        N=`echo "$number + 2" | bc` # set N >= 2
+        counter=0
+        currentpw=$testacPW
+        newpw="dummy123"
+        rlLog "keep change password [$N] times with two password:[$currentpw] & [$newpw]"
+        while [ $counter -lt $N ] #password is $oldpw when out of this loop
+        do
+            change_password $testacLogin $currentpw $newpw
+            if [ $? = 0 ];then
+                rlPass "[$counter] change success, current password [$newpw]"
+                #swap the password
+                tmp=$currentpw
+                currentpw=$newpw
+                newpw=$tmp 
+            else
+                rlFail "[$counter] password change failed"
+            fi
+            counter=$((counter+1))
+        done
     # test logic ends
 } # ipapassword_globalpolicy_history_lowerbound_logic 
 
@@ -549,8 +569,20 @@ ipapassword_globalpolicy_history_upperbound()
 # looped data   : 
 # non-loop data : 
     rlPhaseStartTest "ipapassword_globalpolicy_history_upperbound"
-        rlLog ""
-        ipapassword_globalpolicy_history_upperbound_logic
+        rlLog "there is no real upperbound, just try some randam integers"
+        lastvalue=$RANDOM
+        max=20 #test 20 times
+        i=0
+        KinitAsAdmin 
+        while [ $i -lt $max ]
+        do 
+            size=$RANDOM
+            if [ $size -ne $lastvalue ]; then
+                ipapassword_globalpolicy_history_upperbound_logic $size
+            fi
+            lastvalue=$size
+            i=$((i+1))
+        done
     rlPhaseEnd
 } #ipapassword_globalpolicy_history_upperbound
 
@@ -558,7 +590,8 @@ ipapassword_globalpolicy_history_upperbound_logic()
 {
     # accept parameters: NONE
     # test logic starts
-        rlFail "EMPTY LOGIC"
+        local v=$1
+        rlRun "ipa pwpolicy-mod --history=$v" 0 "set password history to integer [$v] shoul success"
     # test logic ends
 } # ipapassword_globalpolicy_history_upperbound_logic 
 
@@ -567,8 +600,13 @@ ipapassword_globalpolicy_history_negative()
 # looped data   : 
 # non-loop data : 
     rlPhaseStartTest "ipapassword_globalpolicy_history_negative"
-        rlLog ""
-        ipapassword_globalpolicy_history_negative_logic
+        rlLog "negaive integer and letters are not acceptable for history size"
+        testdata="-2 -1 a abc"
+        KinitAsAdmin 
+        for value in $testdata
+        do
+            ipapassword_globalpolicy_history_negative_logic $value
+        done
     rlPhaseEnd
 } #ipapassword_globalpolicy_history_negative
 
@@ -576,7 +614,8 @@ ipapassword_globalpolicy_history_negative_logic()
 {
     # accept parameters: NONE
     # test logic starts
-        rlFail "EMPTY LOGIC"
+        local v=$1
+        rlRun "ipa pwpolicy-mod --history=$v" 1 "set password history to negative integer or letters [$v] should fail"
     # test logic ends
 } # ipapassword_globalpolicy_history_negative_logic 
 
