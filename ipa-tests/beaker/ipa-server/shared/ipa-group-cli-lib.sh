@@ -470,7 +470,8 @@ findGroupsTime()
 
    limit=$1
    rc=0
-   ipa group-find --timelimit="$limit" > /tmp/groups.out
+   rlLog: "Executing: ipa group-find --timelimit=$limit"
+   ipa group-find --timelimit=$limit > /tmp/groups.out
    rc=$?
    result=`cat /tmp/groups.out | grep "Number of entries returned"`
    number=`echo $result | cut -d " " -f 5`
@@ -488,7 +489,8 @@ findGroupsNumber()
 
    limit=$1
    rc=0
-   ipa group-find --sizelimit="$limit" > /tmp/groups.out
+   rlLog "Executing: ipa group-find --sizelimit=$limit"
+   ipa group-find --sizelimit=$limit > /tmp/groups.out
    rc=$?
    result=`cat /tmp/groups.out | grep "Number of entries returned"`
    number=`echo $result | cut -d " " -f 5`
