@@ -1,0 +1,338 @@
+dn: cn=testgroup,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=test,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=disneyworld,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=epcot,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=animalkingdom,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=japan,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=germany,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=dinasaurs,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=fish,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=regular,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=myposixgroup,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=my_gr-ou.p$,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=group1,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=group2,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=group3,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=group4,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=group5,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=group6,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=group7,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=group8,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=group9,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=group10,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=group11,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=group12,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=group13,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=group14,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=group15,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=group16,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=group17,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=group18,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=group19,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=group20,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=group21,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=group22,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=group23,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=group24,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=group25,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=group26,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=group27,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=group28,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=group29,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=group30,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=group31,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=group32,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=group33,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=group34,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=group35,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=group36,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=group37,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=group38,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=group39,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=group40,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=group41,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=group42,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=group43,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=group44,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=group45,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=group46,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=group47,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=group48,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=group49,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=group50,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=group51,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=group52,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=group53,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=group54,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=group55,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=group56,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=group57,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=group58,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=group59,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=group60,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=group61,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=group62,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=group63,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=group64,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=group65,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=group66,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=group67,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=group68,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=group69,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=group70,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=group71,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=group72,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=group73,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=group74,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=group75,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=group76,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=group77,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=group78,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=group79,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=group80,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=group81,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=group82,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=group83,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=group84,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=group85,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=group86,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=group87,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=group88,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=group89,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=group90,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=group91,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=group92,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=group93,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=group94,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=group95,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=group96,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=group97,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=group98,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=group99,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=group100,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
+
+dn: cn=jennyg,cn=groups,cn=accounts,dc=testrelm
+changetype: delete
