@@ -229,6 +229,8 @@ KinitAsAdmin()
 
 change_password()
 { # change password between min and max life os password 
+  # return 0  when password change success
+  # return 1  when password change failed
     local userlogin=$1
     local currentpw=$2
     local newpw=$3
@@ -237,7 +239,7 @@ change_password()
     local ret
     rlLog "change password for [$userlogin] from [$currentpw] to [$newpw]"
     rlRun "echo \"$currentpw\" | kinit $userlogin" \
-          0 "check current pw [$currentpw]"
+          0 "current pw [$currentpw] has to work before we continue"
     echo "set timeout 5" > $exp
     echo "set force_conservative 0" >> $exp
     echo "set send_slow {1 .1}" >> $exp
@@ -267,12 +269,15 @@ generate_password()
     local classes=$1
     local length=$2
     local pwoutfile=$3
-    local pw=""
+    local randompw=""
     local allclasses="lowerl upperl digit special"
     local selectedclasses=""
     local i=0
 
     # example assume classes=3, lenght=5
+    if [ $classes = 0 ];then
+        classes=1 # there is no such password that has no class at all
+    fi
     while [ $i -lt $classes ]
     do
         number=$RANDOM
@@ -300,24 +305,28 @@ generate_password()
         i=$((i+1))
     done
     # up to here, we might have: selectedclasses= lowerl upperl special lowerl upperl
-    pw=""
+    #rlLog "selectedclasses=[$selectedclasses]"
     for class in $selectedclasses
     do
-        thisletter=`get_random $class`
-        pw="${pw}${thisletter}"
+        get_random $class $pwoutfile
     done
-    rlLog "generated password : [$pw] classes=[$classes] length=[$length]"
-    echo "$pw" > $pwoutfile
+    # if you want to debug, uncomment the next 2 lines
+    #randompw=`cat $pwoutfile`
+    #rlLog "generated password : [$randompw] classes=[$classes] length=[$length]"
 } #generate_password
 get_random()
 {
     local class=$1
+    local outf=$2
     local lowerl="a b c d e f g h i j k l m n o p q r s t u v w x y z"
     local upperl="A B C D E F G H I J K L M N O P Q R S T U V W X Y Z"
     local digit="0 1 2 3 4 5 6 7 8 9"
-    local special=". , ? < > /  ~ ! @ # % ^ & * - + = _ ;"
+    local special="= + . , ? ! < > / ~ @ # % ^ ;"
     #local special=". , ? < > / ( ) ~ ! @ # $ % ^ & * - + = _ { } [ ] ;"
-    # FIXME: the special char: $ ( ) { } [ ] won't accept by "expect" language
+    # FIXME: the special char: $ ( ) { } [ ] _ + - & * has special meaning in shell
+    # this is due to 2 cause: 1. shell treats $? $! $@ differently
+    #                         2. password will be fed into expect program, 
+    #                            and ()[]{} are not welcomed
     local str=""
     local len=0
     local l
@@ -335,14 +344,14 @@ get_random()
     fi
     if [ $class = "special" ];then
         str="$special"
-        len=19 #full length should be 27
+        len=15 #full length should be 27
     fi
     index=$RANDOM
     let "index %= $len"
     index=$((index+1))
     l=`echo $str | cut -d" " -f$index`
-    #rlLog "class: [$class] len=[$len] ramdon: [$l]"
-    echo $l
+    #rlLog "this letter: [${l}], index=[$index]"
+    echo -n "${l}" >> $outf 
 } #get_random
 
 makereport()

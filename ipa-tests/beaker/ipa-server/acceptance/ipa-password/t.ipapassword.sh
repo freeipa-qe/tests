@@ -18,20 +18,20 @@ ipapassword()
 ipapassword_globalpolicy()
 {
     ipapassword_globalpolicy_envsetup
-    ipapassword_globalpolicy_maxlifetime_default
-    ipapassword_globalpolicy_maxlifetime_lowerbound
-    ipapassword_globalpolicy_maxlifetime_upperbound
-    ipapassword_globalpolicy_maxlifetime_negative
-    ipapassword_globalpolicy_minlifetime_default
-    ipapassword_globalpolicy_minlifetime_lowerbound
-    ipapassword_globalpolicy_minlifetime_upperbound
-    ipapassword_globalpolicy_minlifetime_negative
-    ipapassword_globalpolicy_history_default
-    ipapassword_globalpolicy_history_lowerbound
-    ipapassword_globalpolicy_history_upperbound
-    ipapassword_globalpolicy_history_negative
+#    ipapassword_globalpolicy_maxlifetime_default
+#    ipapassword_globalpolicy_maxlifetime_lowerbound
+#    ipapassword_globalpolicy_maxlifetime_upperbound
+#    ipapassword_globalpolicy_maxlifetime_negative
+#    ipapassword_globalpolicy_minlifetime_default
+#    ipapassword_globalpolicy_minlifetime_lowerbound
+#    ipapassword_globalpolicy_minlifetime_upperbound
+#    ipapassword_globalpolicy_minlifetime_negative
+#    ipapassword_globalpolicy_history_default
+#    ipapassword_globalpolicy_history_lowerbound
+#    ipapassword_globalpolicy_history_upperbound
+#    ipapassword_globalpolicy_history_negative
     ipapassword_globalpolicy_classes_default
-#    ipapassword_globalpolicy_classes_lowerbound
+    ipapassword_globalpolicy_classes_lowerbound
 #    ipapassword_globalpolicy_classes_upperbound
 #    ipapassword_globalpolicy_classes_negative
 #    ipapassword_globalpolicy_length_default
@@ -625,7 +625,7 @@ ipapassword_globalpolicy_classes_default()
 # non-loop data : 
     rlPhaseStartTest "ipapassword_globalpolicy_classes_default"
         local out=$TmpDir/pwclassesdefault.$RANDOM.out
-        rlLog "check minimum classes default behave: when classes between [2,4]"
+        rlLog "check minimum classes default behave: when classes between [2-4]"
         KinitAsAdmin
         rlLog "set all other password constrains to 0"
         ipa pwpolicy-mod --maxlife=$default_maxlife --minlife=0 --minlength=0 --history=0 
@@ -717,8 +717,22 @@ ipapassword_globalpolicy_classes_lowerbound()
 # looped data   : 
 # non-loop data : 
     rlPhaseStartTest "ipapassword_globalpolicy_classes_lowerbound"
-        rlLog "check minimum classes lowbound: 0 and 1"
-        ipapassword_globalpolicy_classes_lowerbound_logic
+        local out=$TmpDir/classeslowerbound.$RANDOM.out
+        rlLog "check minimum classes lowbound: 0"
+        KinitAsAdmin
+        ipa pwpolicy-mod --maxlife=$default_maxlife --minlife=0 --minlength=0 --history=0 
+        ipa pwpolicy-show > $out
+        minlife=`grep "Min lifetime" $out | cut -d":" -f2|xargs echo`
+        length=`grep "length:" $out | cut -d":" -f2|xargs echo`
+        history=`grep "History size:" $out | cut -d":" -f2|xargs echo`
+        unset out
+        rlLog "preconditoin: minlife=[$minlife] minlength=[$length] history=[$history]"
+        if [ $minlife = 0 ] && [ $length = 0 ] && [ $history = 0 ]
+        then
+            ipapassword_globalpolicy_classes_lowerbound_logic
+        else
+            rlFail "can not set precondition for history test"
+        fi
     rlPhaseEnd
 } #ipapassword_globalpolicy_classes_lowerbound
 
@@ -726,7 +740,48 @@ ipapassword_globalpolicy_classes_lowerbound_logic()
 {
     # accept parameters: NONE
     # test logic starts
-        rlFail "EMPTY LOGIC"
+        # classLevel: 0 & 1 has same effect to password, they share same test logic
+        local classLevel
+        local temp
+        local out=$TmpDir/classeslowerbound.$RANDOM.out
+        local pwout
+        local pw
+        for classLevel in 0 1
+        do
+            rlLog "test classLevel=[$classLevel]"
+            KinitAsAdmin
+            ipa pwpolicy-mod --minclasses=$classLevel
+            ipa pwpolicy-show > $out
+            rlRun "$kdestroy" 0 "clear all kerberos tickets"
+            temp=`grep "classes:" $out | cut -d":" -f2| xargs echo`
+            if [ $temp = $classLevel ];then
+                add_test_ac
+                rlLog "set classes to [$temp] success, test continue"
+                # run same test 8 times, to ensure all password classes covered
+                i=0
+                currentPW=$testacPW
+                while [ $i -lt 8 ]
+                do
+                    pwout="$TmpDir/pwout.$RANDOM.out"
+                    generate_password $classLevel 8 "$pwout"
+                    pw=`cat $pwout`
+                    rm $pwout
+                    rlLog "[test $i]: now change to new password [$pw]"
+                    change_password $testacLogin $currentPW $pw
+                    if [ $? = 0 ];then
+                        rlPass "password change success is expected"
+                        currentPW=$pw
+                    else
+                        rlFail "password change failed, this is not expected"
+                    fi
+                    i=$((i+1))
+                done
+                delete_test_ac
+            else
+                rlLog "set classes to [$temp] failed, can not continue test"
+            fi
+        done
+        rm $out
     # test logic ends
 } # ipapassword_globalpolicy_classes_lowerbound_logic 
 
