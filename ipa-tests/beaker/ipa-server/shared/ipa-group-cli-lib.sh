@@ -16,6 +16,7 @@
 #	verifyGroupMember
 #	detachGroup
 #       deleteGroup
+#	getNumberOfGroups
 ######################################################################
 # Assumes:
 #       For successful command exectution, administrative credentials
@@ -443,4 +444,55 @@ verifyUPG()
   return $rc
 }
 
+#######################################################################
+# getNumberOfGroups Usage:
+#       getNumberOfGroups
+######################################################################
+getNumberOfGroups()
+{
 
+   rc=0
+   ipa group-find > /tmp/groups.out
+   rc=$?
+   result=`cat /tmp/groups.out | grep "Number of entries returned"`
+   number=`echo $result | cut -d " " -f 5`
+
+   echo $number
+   return $rc
+}
+
+#######################################################################
+# findGroupsTime Usage:
+#       findGroupsTime timelimit
+######################################################################
+findGroupsTime()
+{
+
+   limit=$1
+   rc=0
+   ipa group-find --timelimit="$limit" > /tmp/groups.out
+   rc=$?
+   result=`cat /tmp/groups.out | grep "Number of entries returned"`
+   number=`echo $result | cut -d " " -f 5`
+
+   echo $number
+   return $rc
+}
+
+#######################################################################
+# findGroupsNumber Usage:
+#       findGroupsNumber sizelimit
+######################################################################
+findGroupsNumber()
+{
+
+   limit=$1
+   rc=0
+   ipa group-find --sizelimit="$limit" > /tmp/groups.out
+   rc=$?
+   result=`cat /tmp/groups.out | grep "Number of entries returned"`
+   number=`echo $result | cut -d " " -f 5`
+
+   echo $number
+   return $rc
+}

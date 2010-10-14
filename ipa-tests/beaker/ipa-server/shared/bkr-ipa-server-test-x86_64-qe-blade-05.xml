@@ -36,10 +36,10 @@
 			<task name="/CoreOS/ipa-server/acceptance/ipa-group-cli" role="STANDALONE">
 				<params/>
 			</task>
-			<task name="/CoreOS/ipa-server/acceptance/ipa-host-cli" role="STANDALONE">
+			<task name="/CoreOS/ipa-server/acceptance/ipa-hostgroup-cli" role="STANDALONE">
 				<params/>
 			</task>
-			<task name="/CoreOS/ipa-server/acceptance/ipa-user-cli" role="STANDALONE">
+			<task name="/CoreOS/ipa-server/acceptance/ipa-host-cli" role="STANDALONE">
 				<params/>
 			</task>
 			<task name="/CoreOS/ipa-server/acceptance/uninstall" role="STANDALONE">
