@@ -246,7 +246,7 @@ rlJournalStart
         command="ipa hostgroup-mod --setattr dn=mynewDN $group1"
         expmsg="ipa: ERROR: attribute \"distinguishedName\" not allowed"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
-        command="ipa group-mod --addattr dn=anothernewDN $group1"
+        command="ipa hostgroup-mod --addattr dn=anothernewDN $group1"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
     rlPhaseEnd
 
@@ -272,10 +272,10 @@ rlJournalStart
         attr="member"
         member1="cn=newcn,$HOSTRDN"
         member2="cn=newcn2,$HOSTRDN"
-        command="ipa group-mod --setattr $attr=\"$member1\" \"$group1\""
+        command="ipa hostgroup-mod --setattr $attr=\"$member1\" \"$group1\""
         expmsg="ipa: ERROR: Operation not allowed on $attr"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
-        command="ipa group-mod --addattr $attr=\"$member2\" \"$group1\""
+        command="ipa hostgroup-mod --addattr $attr=\"$member2\" \"$group1\""
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
     rlPhaseEnd
 
@@ -283,7 +283,7 @@ rlJournalStart
         attr="memberOf"
         member1="cn=bogus,$HOSTGRPRDN"
         member2="cn=bogus2,$HOSTGRPRDN"
-        command="ipa group-mod --setattr $attr=\"$member1\" \"$group1\""
+        command="ipa hostgroup-mod --setattr $attr=\"$member1\" \"$group1\""
         expmsg="ipa: ERROR: Operation not allowed on $attr"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
         command="ipa group-mod --addattr $attr=\"$member2\" \"$group1\""
