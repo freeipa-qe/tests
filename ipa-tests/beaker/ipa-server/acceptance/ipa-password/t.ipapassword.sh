@@ -30,7 +30,7 @@ ipapassword_globalpolicy()
     ipapassword_globalpolicy_history_lowerbound
     ipapassword_globalpolicy_history_upperbound
     ipapassword_globalpolicy_history_negative
-#    ipapassword_globalpolicy_classes_default
+    ipapassword_globalpolicy_classes_default
 #    ipapassword_globalpolicy_classes_lowerbound
 #    ipapassword_globalpolicy_classes_upperbound
 #    ipapassword_globalpolicy_classes_negative
@@ -624,8 +624,22 @@ ipapassword_globalpolicy_classes_default()
 # looped data   : 
 # non-loop data : 
     rlPhaseStartTest "ipapassword_globalpolicy_classes_default"
-        rlLog "check minimum classes"
-        ipapassword_globalpolicy_classes_default_logic
+        local out=$TmpDir/pwclassesdefault.$RANDOM.out
+        rlLog "check minimum classes default behave: when classes between [2,4]"
+        KinitAsAdmin
+        rlLog "set all other password constrains to 0"
+        ipa pwpolicy-mod --maxlife=$default_maxlife --minlife=0 --minlength=0 --history=0 
+        ipa pwpolicy-show > $out
+        minlife=`grep "Min lifetime" $out | cut -d":" -f2|xargs echo`
+        length=`grep "length:" $out | cut -d":" -f2|xargs echo`
+        history=`grep "History size:" $out | cut -d":" -f2|xargs echo`
+        rlLog "preconditoin: minlife=[$minlife] minlength=[$length] history=[$history]"
+        if [ $minlife = 0 ] && [ $length = 0 ] && [ $history = 0 ]
+        then
+            ipapassword_globalpolicy_classes_default_logic
+        else
+            rlFail "can not set precondition for history test"
+        fi
     rlPhaseEnd
 } #ipapassword_globalpolicy_classes_default
 
@@ -633,7 +647,68 @@ ipapassword_globalpolicy_classes_default_logic()
 {
     # accept parameters: NONE
     # test logic starts
-        rlFail "EMPTY LOGIC"
+        local out=$TmpDir/classesdefault.$RANDOM.out
+        local n
+        rlRun "$kdestroy" 0 "clear all kerberos"
+        for n in 2 3 4
+        do
+            KinitAsAdmin
+            ipa pwpolicy-mod --minclasses=$n
+            ipa pwpolicy-show > $out
+            classes=`grep "classes:" $out | cut -d":" -f2| xargs echo`
+            rlRun "$kdestroy" 0 "clear all kerberos tickets"
+            if [ $classes -eq $n ];then
+                add_test_ac
+                rlLog "Set minclasses to [$n] success, now continue test"
+                rlRun "echo $testacPW | kinit $testacLogin" 0 "get kerberos ticket for current user, prepare for password change"
+
+                # scenario 1: when new password classes less than $n, password change should fail
+                minclasses=1 # when classes = 0 it has same effect as 1, 
+                             #      we will test this in lowerbound test
+                maxclasses=5 # when classes > 5, it has same effect as 4, 
+                             #      we will test this in upperbound test
+                classLevel=$minclasses
+                while [ $classLevel -lt $n ]
+                do
+                    pwout=$TmpDir/pwout.$RANDOM.out
+                    rlLog "password out file: [$pwout]"
+                    generate_password $classLevel 8 $pwout
+                    pw=`cat $pwout`
+                    rm $pwout
+                    rlLog "generate password [$pw] with [$classLevel] classes"
+                    change_password $testacLogin $testacPW $pw
+                    if [ $? = 0 ];then
+                        rlFail "password change success is not expected"
+                    else
+                        rlPass "password change failed, this is expected"
+                    fi
+                    classLevel=$((classLevel+1))
+                done
+                # scenario 2: when new password classes equal or greater than $n, password change should sucess
+                currentPW=$testacPW
+                while [ $classLevel -lt $maxclasses ]
+                do  
+                    #classesLevel will grow from n to 4
+                    pwout=$TmpDir/pwout.$RANDOM.out
+                    generate_password $classLevel 8 $pwout
+                    pw=`cat $pwout`
+                    rm $pwout
+                    rlLog "generate password [$pw] with [$classLevel] classes"
+                    change_password $testacLogin "$currentPW" "$pw"
+                    if [ $? = 0 ];then
+                        rlPass "password change success is expected"
+                        currentPW="$pw"
+                    else
+                        rlFail "password change failed, this is NOT expected"
+                    fi
+                    classLevel=$((classLevel+1))
+                done
+                delete_test_ac
+            else
+                rlFail "set minclasses to [$n] failed"
+            fi
+        done
+        rm $out
     # test logic ends
 } # ipapassword_globalpolicy_classes_default_logic 
 
@@ -642,7 +717,7 @@ ipapassword_globalpolicy_classes_lowerbound()
 # looped data   : 
 # non-loop data : 
     rlPhaseStartTest "ipapassword_globalpolicy_classes_lowerbound"
-        rlLog "check minimum classes lowbound"
+        rlLog "check minimum classes lowbound: 0 and 1"
         ipapassword_globalpolicy_classes_lowerbound_logic
     rlPhaseEnd
 } #ipapassword_globalpolicy_classes_lowerbound
@@ -660,7 +735,7 @@ ipapassword_globalpolicy_classes_upperbound()
 # looped data   : 
 # non-loop data : 
     rlPhaseStartTest "ipapassword_globalpolicy_classes_upperbound"
-        rlLog "check minimum classes upperbound"
+        rlLog "check minimum classes upperbound: >4"
         ipapassword_globalpolicy_classes_upperbound_logic
     rlPhaseEnd
 } #ipapassword_globalpolicy_classes_upperbound

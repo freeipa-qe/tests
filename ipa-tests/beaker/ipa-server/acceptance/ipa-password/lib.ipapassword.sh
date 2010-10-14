@@ -16,7 +16,10 @@ set_systime()
 # expected input: + 86400 <== set system time to one day later
 #                 - 86400 <== set system time to one day before
     local offset=$1
-    before=`date`
+    local before=`date`
+    local now
+    local desiredtime
+    local after
     rlLog "before set systime [$before]"
     rlLog "offset [$offset] seconds"
     now=`date "+%s"`
@@ -75,7 +78,7 @@ add_test_ac()
     userlogin_exist $testacLogin
     if [ $? = 0 ]
     then
-        delete_test_user_account $testacLogin
+        delete_test_ac $testacLogin
     fi
     rlRun "$kdestroy"
     KinitAsAdmin
@@ -111,7 +114,7 @@ userlogin_exist()
 # return 0 if user exist
 # return 1 if user account does NOT exist
     local userlogin=$1
-    local out=$TmpDir/userexist.txt
+    local out=$TmpDir/userexist.$RANDOM.out
     if [ ! -z "$userlogin" ]
     then
         KinitAsAdmin
@@ -167,7 +170,9 @@ kinit_aftermaxlife()
 KinitAsAdmin()
 {
     local pw=$adminpassword
-    out=$TmpDir/kinitasadmin.$RANDOM.txt
+    local out=$TmpDir/kinitasadmin.$RANDOM.txt
+    local exp
+    local temppw
     echo $pw | kinit admin > $out
     if [ $? = 0 ];then
         rlPass "kinit as admin with $pw success"
@@ -219,6 +224,7 @@ KinitAsAdmin()
     else
         rlFail "unknow error, return code [$?] not recoginzed"
     fi
+    rm $out
 } #KinitAsAdmin
 
 change_password()
@@ -226,12 +232,13 @@ change_password()
     local userlogin=$1
     local currentpw=$2
     local newpw=$3
-    rlLog "change password for [$userlogin] from [$currentpw] to [$newpw]"
-    rlRun "echo $currentpw | kinit $userlogin" \
-          0 "check current pw"
     local out=$TmpDir/changepassword.$RANDOM.out
     local exp=$TmpDir/changepassword.$RANDOM.exp
-    echo "set timeout 30" > $exp
+    local ret
+    rlLog "change password for [$userlogin] from [$currentpw] to [$newpw]"
+    rlRun "echo \"$currentpw\" | kinit $userlogin" \
+          0 "check current pw [$currentpw]"
+    echo "set timeout 5" > $exp
     echo "set force_conservative 0" >> $exp
     echo "set send_slow {1 .1}" >> $exp
     echo "spawn ipa passwd $userlogin" >> $exp
@@ -254,6 +261,89 @@ change_password()
     rm $exp
     return $ret
 } #change_password
+
+generate_password()
+{
+    local classes=$1
+    local length=$2
+    local pwoutfile=$3
+    local pw=""
+    local allclasses="lowerl upperl digit special"
+    local selectedclasses=""
+    local i=0
+
+    # example assume classes=3, lenght=5
+    while [ $i -lt $classes ]
+    do
+        number=$RANDOM
+        let "number %= 4"
+        number=$((number+1)) #get random number in [1,2,3,4]
+        field=`echo $allclasses | cut -d" " -f$number`
+        #rlLog "num[$number],field=[$field]"
+        if  echo $selectedclasses| grep $field 2>&1 >/dev/null
+        then
+            continue
+        else
+            selectedclasses="$selectedclasses $field"
+            i=$((i+1))
+        fi
+    done
+    # up to here, we might have: selectedclasses= lowerl upperl special
+    #i=$classes
+    field="" #this is just a symble reuse, it has no relation with previous value
+    while [ $i -lt $length ]
+    do
+        let "index = $i % $classes"
+        index=$((index+1))
+        field=`echo $selectedclasses | cut -d" " -f$index`
+        selectedclasses="$selectedclasses $field"
+        i=$((i+1))
+    done
+    # up to here, we might have: selectedclasses= lowerl upperl special lowerl upperl
+    pw=""
+    for class in $selectedclasses
+    do
+        thisletter=`get_random $class`
+        pw="${pw}${thisletter}"
+    done
+    rlLog "generated password : [$pw] classes=[$classes] length=[$length]"
+    echo "$pw" > $pwoutfile
+} #generate_password
+get_random()
+{
+    local class=$1
+    local lowerl="a b c d e f g h i j k l m n o p q r s t u v w x y z"
+    local upperl="A B C D E F G H I J K L M N O P Q R S T U V W X Y Z"
+    local digit="0 1 2 3 4 5 6 7 8 9"
+    local special=". , ? < > /  ~ ! @ # % ^ & * - + = _ ;"
+    #local special=". , ? < > / ( ) ~ ! @ # $ % ^ & * - + = _ { } [ ] ;"
+    # FIXME: the special char: $ ( ) { } [ ] won't accept by "expect" language
+    local str=""
+    local len=0
+    local l
+    if [ $class = "lowerl" ];then
+        str="$lowerl"
+        len=26
+    fi
+    if [ $class = "upperl" ];then
+        str="$upperl"
+        len=26
+    fi
+    if [ $class = "digit" ];then
+        str="$digit"
+        len=10
+    fi
+    if [ $class = "special" ];then
+        str="$special"
+        len=19 #full length should be 27
+    fi
+    index=$RANDOM
+    let "index %= $len"
+    index=$((index+1))
+    l=`echo $str | cut -d" " -f$index`
+    #rlLog "class: [$class] len=[$len] ramdon: [$l]"
+    echo $l
+} #get_random
 
 makereport()
 {
