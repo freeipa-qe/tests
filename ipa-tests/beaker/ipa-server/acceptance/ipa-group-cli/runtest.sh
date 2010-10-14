@@ -56,7 +56,7 @@ BASEDN="dc=$RELM"
 USERRDN="cn=users,cn=accounts,"
 USERDN="$USERRDN$BASEDN"
 USERRDN="cn=users,cn=accounts,"
-GROUPDN="$GROUPRDN$BASEDN"
+GROUPRDN="$GROUPRDN$BASEDN"
 echo "USERDN is $USERDN"
 echo "GROUPDN is $GROUPDN"
 echo "Server is $MASTER"
@@ -611,15 +611,7 @@ rlJournalStart
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-cli-49: Negative - setattr and addattr on ipauniqueid"
-        command="ipa group-mod --setattr ipauniqueid=mynew-unique-id fish"
-        expmsg="ipa: ERROR: Insufficient access: Insufficient 'write' privilege to the 'ipaUniqueID' attribute of entry 'cn=fish,cn=groups,cn=accounts,dc=testrelm'."
-        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
-        command="ipa group-mod --addattr ipauniqueid=another-new-unique-id fish"
-        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
-    rlPhaseEnd
-
-    rlPhaseStartTest "ipa-group-cli-50: Negative - setattr and addattr on cn"
+    rlPhaseStartTest "ipa-group-cli-49: Negative - setattr and addattr on cn"
         command="ipa group-mod --setattr cn=\"cn=new,cn=groups,dc=domain,dc=com\" fish"
         expmsg="ipa: ERROR: Operation not allowed on RDN:"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
@@ -627,7 +619,7 @@ rlJournalStart
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-cli-51: setattr and addattr on description"
+    rlPhaseStartTest "ipa-group-cli-50: setattr and addattr on description"
         attr="description"
         rlRun "setAttribute group $attr new fish" 0 "Setting attribute $attr to value of new."
         rlRun "verifyGroupAttr fish desc new" 0 "Verifying group $attr was modified."
@@ -637,7 +629,7 @@ rlJournalStart
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-cli-52: setattr and addattr on member"
+    rlPhaseStartTest "ipa-group-cli-51: setattr and addattr on member"
         attr="member"
 	member1="uid=trex,$USERDN"
 	member2="uid=mdolphin,$USERDN"
@@ -648,7 +640,27 @@ rlJournalStart
 	rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-cli-53: Negative - setattr and addattr on invalid attribute"
+    rlPhaseStartTest "ipa-group-cli-52: setattr and addattr on memberOf"
+        attr="memberOf"
+        member1="cn=bogus,$GROUPRDN"
+        member2="cn=bogus2,$GROUPRDN"
+        command="ipa group-mod --setattr $attr=\"$member1\" fish"
+        expmsg="ipa: ERROR: Operation not allowed on $attr"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
+        command="ipa group-mod --addattr $attr=\"$member2\" fish"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-group-cli-53: Negative - setattr and addattr on ipauniqueid"
+        command="ipa group-mod --setattr ipauniqueid=mynew-unique-id fish"
+        expmsg="ipa: ERROR: Insufficient access: Insufficient 'write' privilege to the 'ipaUniqueID' attribute of entry 'cn=fish,cn=groups,cn=accounts,dc=testrelm'."
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
+        command="ipa group-mod --addattr ipauniqueid=another-new-unique-id fish"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
+    rlPhaseEnd
+
+
+    rlPhaseStartTest "ipa-group-cli-54: Negative - setattr and addattr on invalid attribute"
         command="ipa group-mod --setattr bad=test fish"
         expmsg="ipa: ERROR: attribute \"bad\" not allowed"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
@@ -656,7 +668,7 @@ rlJournalStart
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-cli-54: Allowed special characters"
+    rlPhaseStartTest "ipa-group-cli-55: Allowed special characters"
 	rlRun "addGroup \"Special Group\" \"my_gr-ou.p$\"" 0 "Adding group with special characters"
 	rlRun "modifyGroup  \"my_gr-ou.p$\" desc  \"my_gr-ou.p$\"" 0 "Modifying group with special characters"
 	rlRun "addGroupMembers users mdolphin \"my_gr-ou.p$\"" 0 "Adding member to group with special characters"
@@ -664,53 +676,92 @@ rlJournalStart
 	rlRun "deleteGroup \"my_gr-ou.p$\"" 0 "Deleting group with special characters"
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-cli-55: Not Allowed special characters @"
+    rlPhaseStartTest "ipa-group-cli-56: Not Allowed special characters @"
         command="ipa group-add --desc=\"test@\" \"test@\""
         expmsg="ipa: ERROR: invalid 'cn': may only include letters, numbers, _, -, . and $"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-cli-56: Not Allowed special characters %"
+    rlPhaseStartTest "ipa-group-cli-57: Not Allowed special characters %"
         command="ipa group-add --desc=\"test%\" \"test%\""
         expmsg="ipa: ERROR: invalid 'cn': may only include letters, numbers, _, -, . and $"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-cli-57: Not Allowed special characters ^"
+    rlPhaseStartTest "ipa-group-cli-58: Not Allowed special characters ^"
         command="ipa group-add --desc=\"test^\" \"test^\""
         expmsg="ipa: ERROR: invalid 'cn': may only include letters, numbers, _, -, . and $"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-cli-58: Not Allowed special characters *"
+    rlPhaseStartTest "ipa-group-cli-59: Not Allowed special characters *"
         command="ipa group-add --desc=\"test*\" \"test*\""
         expmsg="ipa: ERROR: invalid 'cn': may only include letters, numbers, _, -, . and $"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-cli-59: Not Allowed special characters +"
+    rlPhaseStartTest "ipa-group-cli-60: Not Allowed special characters +"
         command="ipa group-add --desc=\"test+\" \"test+\""
         expmsg="ipa: ERROR: invalid 'cn': may only include letters, numbers, _, -, . and $"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-cli-60: Not Allowed special characters ~"
+    rlPhaseStartTest "ipa-group-cli-61: Not Allowed special characters ~"
         command="ipa group-add --desc=\"test~\" \"test~\""
         expmsg="ipa: ERROR: invalid 'cn': may only include letters, numbers, _, -, . and $"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-cli-61: Not Allowed special characters ="
+    rlPhaseStartTest "ipa-group-cli-62: Not Allowed special characters ="
         command="ipa group-add --desc=\"test=\" \"test=\""
         expmsg="ipa: ERROR: invalid 'cn': may only include letters, numbers, _, -, . and $"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-cli-62: Negative - Add self as group member"
+    rlPhaseStartTest "ipa-group-cli-63: Negative - Add self as group member"
         ipa group-add-member --groups=fish fish > /tmp/error.out
         cat /tmp/error.out | grep "Number of members added 0"
         rc=$?
         rlAssert0 "Number of members added 0" $rc
+	rlRun "deleteGroup fish" 0 "Cleanup: Deleting group fish."
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-group-cli-64: Add 100 groups and test find returns all"
+	i=1
+	while [ $i -le 100 ] ; do
+		rlRun "addGroup Group$i Group$i" 0 "Adding Group Group$i"
+		let i=$i+1
+	done
+	number=`getNumberOfGroups`
+	rlAssertEquals "Verifying number of groups returned" $number 103		
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-group-cli-65: find 0 groups"
+	number=`findGroupsNumber 0`
+	rlAssertEquals "Verifying sizelimit 0" $number 0
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-group-cli-66: find 10 groups"
+        number=`findGroupsNumber 10`
+        rlAssertEquals "Verifying sizelimit 10" $number 10
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-group-cli-67: find 59 groups"
+        number=`findGroupsNumber 59`
+        rlAssertEquals "Verifying sizelimit 59" $number 59
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-group-cli-68: find more groups than exist"
+        number=`findGroupsNumber 200`
+        rlAssertEquals "Verifying sizelimit 200" $number 103
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-group-cli-69: find groups - size limit not an integer"
+        expmsg="ipa: ERROR: invalid 'sizelimit': must be an integer"
+        command="ipa group-find --sizelimit=abvd"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message - alpha characters."
+        command="ipa group-find --sizelimit=#*"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message - special characters."
     rlPhaseEnd
 
     rlPhaseStartCleanup "ipa-group-cli-cleanup: Delete remaining users and group and Destroying admin credentials"
@@ -718,7 +769,6 @@ rlJournalStart
         rlRun "rm -r $TmpDir" 0 "Removing tmp directory"
 	rlRun "ipa user-del trex" 0 "Deleting user trex."
 	rlRun "ipa user-del mdolphin" 0 "Deleting user mdolphin."
-	rlRun "deleteGroup fish" 0 "Deleting group fish."
 	rlRun "kdestroy" 0 "Destroying admin credentials."
     rlPhaseEnd
 
