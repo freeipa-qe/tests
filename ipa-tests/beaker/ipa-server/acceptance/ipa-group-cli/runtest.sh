@@ -525,6 +525,7 @@ rlJournalStart
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-group-cli-42: Removed Single Group Member"
+	rlRun "removeGroupMembers groups fish animalkingdom" 0 "Removing user mdolphin from group fish."
         ipa group-find animalkingdom > /tmp/findgroup.out
         groups=`cat /tmp/findgroup.out | grep "Member groups:"`
         echo $groups | grep fish
@@ -738,7 +739,7 @@ rlJournalStart
 
     rlPhaseStartTest "ipa-group-cli-65: find 0 groups"
 	number=`findGroupsNumber 0`
-	rlAssertEquals "Verifying sizelimit 0" $number 0
+	rlAssertEquals "Verifying sizelimit 0" $number 103
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-group-cli-66: find 10 groups"
@@ -764,11 +765,25 @@ rlJournalStart
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message - special characters."
     rlPhaseEnd
 
+    rlPhaseStartTest "ipa-group-cli-70: find groups - time limit 0"
+        number=`findGroupsTime 0`
+        rlAssertEquals "Verify no entries returned with time limit 0" 0 $number
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-group-cli-71: find groups - time limit not an integer"
+        expmsg="ipa: ERROR: invalid 'timelimit': must be an integer"
+        command="ipa group-find --timelimit=abvd"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message - alpha characters."
+        command="ipa group-find --timelimit=#*"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message - special characters."
+    rlPhaseEnd
+
     rlPhaseStartCleanup "ipa-group-cli-cleanup: Delete remaining users and group and Destroying admin credentials"
         rlRun "popd"
         rlRun "rm -r $TmpDir" 0 "Removing tmp directory"
 	rlRun "ipa user-del trex" 0 "Deleting user trex."
 	rlRun "ipa user-del mdolphin" 0 "Deleting user mdolphin."
+	rlRun "/usr/bin/ldapmodify -x -h $MASTER -p 389 -D \"$ROOTDN\" -w \"$ROOTDNPWD\" -c -f ./deletegrps.ldif" 0 "Deleting all groups."
 	rlRun "kdestroy" 0 "Destroying admin credentials."
     rlPhaseEnd
 
