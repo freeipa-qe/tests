@@ -71,6 +71,7 @@ reset_global_pwpolicy()
                      --minclasses=$default_classes \
                      --minlength=$default_length 
     rlLog "reset finished"
+    rlRun "$kdestroy"
 } #reset_pwpolicy_to_default
 
 add_test_ac()
@@ -238,8 +239,15 @@ change_password()
     local exp=$TmpDir/changepassword.$RANDOM.exp
     local ret
     rlLog "change password for [$userlogin] from [$currentpw] to [$newpw]"
-    rlRun "echo \"$currentpw\" | kinit $userlogin" \
-          0 "current pw [$currentpw] has to work before we continue"
+    #rlRun "echo \"$currentpw\" | kinit $userlogin" \
+    #      0 "current pw [$currentpw] has to work before we continue"
+    if klist | grep -i "Default principal: $userlogin"
+    then
+        rlLog "found kerberos for user [$userlogin], test continue"
+    else
+        rlFail "no kerberos found for [$userlogin], test can not continue"
+        return 1
+    fi
     echo "set timeout 5" > $exp
     echo "set force_conservative 0" >> $exp
     echo "set send_slow {1 .1}" >> $exp
@@ -253,7 +261,10 @@ change_password()
     echo 'send -s -- "\r"' >> $exp
     echo 'expect eof ' >> $exp
     /usr/bin/expect $exp  > $out
-    if grep "Constraint violation:Password Fails to meet minimum strength criteria" $out
+    #echo "===============output of change_password==============="
+    #cat $out
+    #echo "======================================================="
+    if grep "Constraint violation:Password Fails to meet minimum strength criteria" $out || grep "ipa: ERROR" $out
     then
         ret=1
     else
@@ -306,9 +317,14 @@ generate_password()
     done
     # up to here, we might have: selectedclasses= lowerl upperl special lowerl upperl
     #rlLog "selectedclasses=[$selectedclasses]"
+    # it is possible length<class, in this case we have to fulfill length requirement
+    i=0
     for class in $selectedclasses
     do
-        get_random $class $pwoutfile
+        if [ $i -lt $length ] ;then
+            get_random $class $pwoutfile
+            i=$((i+1))
+        fi
     done
     # if you want to debug, uncomment the next 2 lines
     #randompw=`cat $pwoutfile`
@@ -321,12 +337,13 @@ get_random()
     local lowerl="a b c d e f g h i j k l m n o p q r s t u v w x y z"
     local upperl="A B C D E F G H I J K L M N O P Q R S T U V W X Y Z"
     local digit="0 1 2 3 4 5 6 7 8 9"
-    local special="= + . , ? ! < > / ~ @ # % ^ ;"
+    local special="= + . , ? ! / ~ @ # % ^"
     #local special=". , ? < > / ( ) ~ ! @ # $ % ^ & * - + = _ { } [ ] ;"
-    # FIXME: the special char: $ ( ) { } [ ] _ + - & * has special meaning in shell
-    # this is due to 2 cause: 1. shell treats $? $! $@ differently
+    # FIXME: the special char: $ ( ) { } [ ] _ + - & * ; has special meaning in shell
+    # this is due to 3 cause: 1. shell treats $? $! $@ differently
     #                         2. password will be fed into expect program, 
     #                            and ()[]{} are not welcomed
+    #                         3. beaker doesn't like '<' and '>'
     local str=""
     local len=0
     local l
@@ -344,7 +361,7 @@ get_random()
     fi
     if [ $class = "special" ];then
         str="$special"
-        len=15 #full length should be 27
+        len=12 #full length should be 27
     fi
     index=$RANDOM
     let "index %= $len"
