@@ -76,41 +76,39 @@ reset_global_pwpolicy()
 
 add_test_ac()
 {
-    userlogin_exist $testacLogin
+    user_exist $testac
     if [ $? = 0 ]
     then
-        delete_test_ac $testacLogin
+        del_test_ac 
     fi
     rlRun "$kdestroy"
     KinitAsAdmin
     rlRun "echo $initialpw |\
-           ipa user-add $testacLogin\
+           ipa user-add $testac\
                         --first $testacFirst\
                         --last  $testacLast\
                         --password " \
           0 "add test user account"
     # set test account password 
-    FirstKinitAs $testacLogin $initialpw $testacPW
+    FirstKinitAs $testac $initialpw $testacPW
     rlRun "$kdestroy"
 } # add_test_ac_
 
-delete_test_ac()
+del_test_ac()
 {
-    userlogin_exist $testacLogin
+    user_exist $testac
     if [ $? = 0 ]
     then
-        rlLog "test account exist, now delete it"
-        rlRun "$kdestroy"
+        rlLog "test account found, now delete it"
         KinitAsAdmin
-        rlRun "ipa user-del $testacLogin" 0 "delete test account [$testacLogin]"
+        rlRun "ipa user-del $testac" 0 "delete test account [$testac]"
         rlRun "$kdestroy"
     else
-        rlLog "test account does not exist"
-        rlPass "no need to delete"
+        rlLog "test account does not exist, do nothing"
     fi
-} # delete_test_ac
+} # del_test_ac
 
-userlogin_exist()
+user_exist()
 {
 # return 0 if user exist
 # return 1 if user account does NOT exist
@@ -120,7 +118,7 @@ userlogin_exist()
     then
         KinitAsAdmin
         rlRun "ipa user-find $userlogin > $out" 0 "find this user account"
-        rlLog "parsing the user-find output to veirfy the account"
+        rlRun "$kdestroy"
         if grep -i "User login: $userlogin$" $out
         then
             rlLog "find [$userlogin] in ipa server"
@@ -135,6 +133,58 @@ userlogin_exist()
         return 1 # when login value not given, return not found
     fi
 } #user_exist
+
+add_test_grp()
+{
+    grp_exist $testgrp
+    if [ $? = 0 ]
+    then
+        del_test_grp 
+    fi
+    KinitAsAdmin
+    rlRun "ipa group-add $testgrp\
+        --desc \"test group for group pwpolicy\" " \
+          0 "add test group [$testgrp]"
+    rlRun "$kdestroy"
+} #add_test_grp
+
+del_test_grp()
+{
+    grp_exist $testgrp
+    if [ $? = 0 ]
+    then
+        rlLog "test group [$testgrp] exist, now delete it"
+        KinitAsAdmin
+        rlRun "ipa group-del $testgrp" 0 "delete test group [$testgrp]"
+        rlRun "$kdestroy"
+    else
+        rlLog "test group [$testgrp] does not exist, do nothing"
+    fi
+} #del_test_grp
+
+grp_exist()
+{
+    local grp=$1
+    local out=$TmpDir/grpexist.$RANDOM.out
+    if [ ! -z "$grp" ]
+    then
+        KinitAsAdmin
+        rlRun "ipa group-find $grp > $out" 0 "find this user account"
+        rlRun "$kdestroy"
+        if grep -i "Group name: $grp$" $out
+        then
+            rlLog "group [$grp] found"
+            rm $out
+            return 0
+        else
+            rlLog "group [$grp] not found"
+            rm $out
+            return 1
+        fi
+    else
+        return 1 # when grp name is not given, return not found
+    fi
+} #grp_exist
 
 kinit_aftermaxlife()
 {

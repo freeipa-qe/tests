@@ -6,7 +6,7 @@ ipapassword()
 {
     ipapassword_envsetup
     ipapassword_globalpolicy
-#    ipapassword_grouppolicy
+    ipapassword_grouppolicy
 #    ipapassword_globalandgroup
 #    ipapassword_nestedgroup
     ipapassword_envcleanup
@@ -44,26 +44,26 @@ ipapassword_globalpolicy()
 ipapassword_grouppolicy()
 {
     ipapassword_grouppolicy_envsetup
-    ipapassword_grouppolicy_maxlifetime_default
-    ipapassword_grouppolicy_maxlifetime_lowerbound
-    ipapassword_grouppolicy_maxlifetime_upperbound
-    ipapassword_grouppolicy_maxlifetime_negative
-    ipapassword_grouppolicy_minlifetime_default
-    ipapassword_grouppolicy_minlifetime_lowerbound
-    ipapassword_grouppolicy_minlifetime_upperbound
-    ipapassword_grouppolicy_minlifetime_negative
-    ipapassword_grouppolicy_history_default
-    ipapassword_grouppolicy_history_lowerbound
-    ipapassword_grouppolicy_history_upperbound
-    ipapassword_grouppolicy_history_negative
-    ipapassword_grouppolicy_classes_default
-    ipapassword_grouppolicy_classes_lowerbound
-    ipapassword_grouppolicy_classes_upperbound
-    ipapassword_grouppolicy_classes_negative
-    ipapassword_grouppolicy_length_default
-    ipapassword_grouppolicy_length_lowerbound
-    ipapassword_grouppolicy_length_upperbound
-    ipapassword_grouppolicy_length_negative
+#    ipapassword_grouppolicy_maxlifetime_default
+#    ipapassword_grouppolicy_maxlifetime_lowerbound
+#    ipapassword_grouppolicy_maxlifetime_upperbound
+#    ipapassword_grouppolicy_maxlifetime_negative
+#    ipapassword_grouppolicy_minlifetime_default
+#    ipapassword_grouppolicy_minlifetime_lowerbound
+#    ipapassword_grouppolicy_minlifetime_upperbound
+#    ipapassword_grouppolicy_minlifetime_negative
+#    ipapassword_grouppolicy_history_default
+#    ipapassword_grouppolicy_history_lowerbound
+#    ipapassword_grouppolicy_history_upperbound
+#    ipapassword_grouppolicy_history_negative
+#    ipapassword_grouppolicy_classes_default
+#    ipapassword_grouppolicy_classes_lowerbound
+#    ipapassword_grouppolicy_classes_upperbound
+#    ipapassword_grouppolicy_classes_negative
+#    ipapassword_grouppolicy_length_default
+#    ipapassword_grouppolicy_length_lowerbound
+#    ipapassword_grouppolicy_length_upperbound
+#    ipapassword_grouppolicy_length_negative
     ipapassword_grouppolicy_envcleanup
 } #ipapassword_grouppolicy
 
@@ -139,11 +139,11 @@ ipapassword_globalpolicy_maxlifetime_default()
 # non-loop data : 
     rlPhaseStartTest "ipapassword_globalpolicy_maxlifetime_default"
         add_test_ac
-        rlLog "default maxlife : [$default_maxlife]"        
-        rlLog "default minlife : [$default_minlife]"        
+        rlLog "default maxlife : [$default_maxlife]" 
+        rlLog "default minlife : [$default_minlife]"
         rlLog "maxlife: when reached, ipa shold prompt for password change"
         ipapassword_globalpolicy_maxlifetime_default_logic
-        delete_test_ac
+        del_test_ac
     rlPhaseEnd
 } #ipapassword_globalpolicy_maxlifetime_default
 
@@ -158,12 +158,12 @@ ipapassword_globalpolicy_maxlifetime_default_logic()
         rlLog "mid point: [$midpoint]"
         set_systime "+ $midpoint"
         rlRun "$kdestroy"
-        rlRun "echo $testacPW | kinit $testacLogin" 0 "kinit as same password between minlife and max life should success"
+        rlRun "echo $testacPW | kinit $testac" 0 "kinit as same password between minlife and max life should success"
 
         # when system time > maxlife, ipa server should prompt for password change
         set_systime "+ $midpoint + 60"  # set system time after the max life
         rlRun "$kdestroy"
-        kinit_aftermaxlife $testacLogin $testacPW $testacNEWPW
+        kinit_aftermaxlife $testac $testacPW $testacNEWPW
 
     # test logic ends
 } # ipapassword_globalpolicy_maxlifetime_default_logic 
@@ -176,7 +176,7 @@ ipapassword_globalpolicy_maxlifetime_lowerbound()
         add_test_ac
         rlLog "lowerbound of maxlife is the minlife"
         ipapassword_globalpolicy_maxlifetime_lowerbound_logic
-        delete_test_ac
+        del_test_ac
     rlPhaseEnd
 } #ipapassword_globalpolicy_maxlifetime_lowerbound
 
@@ -201,7 +201,7 @@ ipapassword_globalpolicy_maxlifetime_upperbound()
     rlPhaseStartTest "ipapassword_globalpolicy_maxlifetime_upperbound"
         add_test_ac
         ipapassword_globalpolicy_maxlifetime_upperbound_logic
-        delete_test_ac
+        del_test_ac
     rlPhaseEnd
 } #ipapassword_globalpolicy_maxlifetime_upperbound
 
@@ -277,8 +277,8 @@ ipapassword_globalpolicy_minlifetime_default_logic()
             rlLog "set system time 2 minute before minlife"
             set_systime "+ 2*60*60 - 2*60"
             # before minlife, change password should fail
-            rlRun "echo $testacPW | kinit $testacLogin" 0 "make sure currentPW work [$testacPW]"
-            change_password $testacLogin $testacPW "dummy123"
+            rlRun "echo $testacPW | kinit $testac" 0 "make sure currentPW work [$testacPW]"
+            change_password $testac $testacPW "dummy123"
             if [ $? = 0 ];then
                 rlFail "password change success, this is not expected"
             else 
@@ -287,14 +287,14 @@ ipapassword_globalpolicy_minlifetime_default_logic()
 
             # after minlife, change passwod should success
             set_systime "+ 2*60"  # setsystime 2 minutes after
-            rlRun "echo $testacPW | kinit $testacLogin" 0 "make sure currentPW work [$testacPW]"
-            change_password $testacLogin $testacPW "dummy123"
+            rlRun "echo $testacPW | kinit $testac" 0 "make sure currentPW work [$testacPW]"
+            change_password $testac $testacPW "dummy123"
             if [ $? = 0 ];then
                 rlPass "password change success, this is expected"
             else
                 rlFail "password change failed is not expected"
             fi
-            delete_test_ac
+            del_test_ac
         else
             rlFail "can not set pre-condition"
         fi
@@ -339,8 +339,8 @@ ipapassword_globalpolicy_minlifetime_lowerbound_logic()
             for offset in 0 1 2 4 8 16 32
             do
                 set_systime "+ $offset"
-                rlRun "echo $oldpw | kinit $testacLogin" 0 "make sure currentPW work [$oldpw]"
-                change_password $testacLogin $oldpw $newpw
+                rlRun "echo $oldpw | kinit $testac" 0 "make sure currentPW work [$oldpw]"
+                change_password $testac $oldpw $newpw
                 if [ $? = 0 ];then
                     rlPass "password change success, this is expected"
                     #swap the password
@@ -351,7 +351,7 @@ ipapassword_globalpolicy_minlifetime_lowerbound_logic()
                     rlFail "password change failed is not expected"
                 fi
             done
-            delete_test_ac
+            del_test_ac
         else
             rlFail "can not set pre-condition for minlife lowbound test"
         fi
@@ -442,7 +442,7 @@ ipapassword_globalpolicy_history_default()
         then
             add_test_ac
             ipapassword_globalpolicy_history_default_logic
-            delete_test_ac
+            del_test_ac
         else
             rlFail "can not set precondition for history test"
         fi
@@ -471,7 +471,7 @@ ipapassword_globalpolicy_history_default_logic()
         rlLog "password pool: [$pws]"
         # now we start to change password, the all expected to fail
         rlRun "$kdestroy"
-        kinitAs $testacLogin $testacPW
+        kinitAs $testac $testacPW
         counter=1 #reset counter
         while [ $counter -lt $N ]
         do
@@ -479,8 +479,8 @@ ipapassword_globalpolicy_history_default_logic()
             currentPW=`echo $pws | cut -d" " -f$counter`
             nextPW=`echo $pws |cut -d" " -f$next`
             rlLog "counter=[$counter] currentpw[$currentPW], nextpw[$nextPW]"
-            rlRun "echo $currentPW | kinit $testacLogin" 0 "make sure currentPW work [$currentPW]"
-            change_password $testacLogin $currentPW $nextPW
+            rlRun "echo $currentPW | kinit $testac" 0 "make sure currentPW work [$currentPW]"
+            change_password $testac $currentPW $nextPW
             if [ $? = 0 ];then
                 rlPass "password change success, current working password [$nextPW]"
             else
@@ -496,8 +496,8 @@ ipapassword_globalpolicy_history_default_logic()
         for p in $pws
         do
             rlLog "testpw=[$p]"
-            rlRun "echo $currentPW | kinit $testacLogin" 0 "make sure currentPW work [$currentPW]"
-            change_password $testacLogin $currentPW $p
+            rlRun "echo $currentPW | kinit $testac" 0 "make sure currentPW work [$currentPW]"
+            change_password $testac $currentPW $p
             if [ $? = 0 ];then
                 rlFail "password [$p] reuse success is not expected"
             else
@@ -528,7 +528,7 @@ ipapassword_globalpolicy_history_lowerbound()
         then
             add_test_ac
             ipapassword_globalpolicy_history_lowerbound_logic
-            delete_test_ac
+            del_test_ac
         else
             rlFail "can not set precondition for history test"
         fi
@@ -545,7 +545,7 @@ ipapassword_globalpolicy_history_lowerbound_logic()
         # does not allowed by the nature of kerberos. so history=0 means
         # you can actually switch between 2 passwords
         rlRun "$kdestroy"
-        kinitAs $testacLogin $testacPW
+        kinitAs $testac $testacPW
         number=$RANDOM
         let "number %= 10"
         N=`echo "$number + 2" | bc` # set N >= 2
@@ -555,8 +555,8 @@ ipapassword_globalpolicy_history_lowerbound_logic()
         rlLog "keep change password [$N] times with two password:[$currentPW] & [$newPW]"
         while [ $counter -lt $N ] #password is $oldpw when out of this loop
         do
-            rlRun "echo $currentPW | kinit $testacLogin" 0 "make sure currentPW work [$currentPW]"
-            change_password $testacLogin $currentPW $newPW
+            rlRun "echo $currentPW | kinit $testac" 0 "make sure currentPW work [$currentPW]"
+            change_password $testac $currentPW $newPW
             if [ $? = 0 ];then
                 rlPass "[$counter] change success, current password [$newPW]"
                 #swap the password
@@ -667,7 +667,7 @@ ipapassword_globalpolicy_classes_default_logic()
             if [ $classes -eq $n ];then
                 add_test_ac
                 rlLog "Set minclasses to [$n] success, now continue test"
-                rlRun "echo $testacPW | kinit $testacLogin" 0 "get kerberos ticket for current user, prepare for password change"
+                rlRun "echo $testacPW | kinit $testac" 0 "get kerberos ticket for current user, prepare for password change"
 
                 # scenario 1: when new password classes less than $n, password change should fail
                 minclasses=1 # when classes = 0 it has same effect as 1, 
@@ -683,8 +683,8 @@ ipapassword_globalpolicy_classes_default_logic()
                     pw=`cat $pwout`
                     rm $pwout
                     rlLog "generate password [$pw] with [$classLevel] classes"
-                    rlRun "echo $testacPW | kinit $testacLogin" 0 "make sure currentPW work"
-                    change_password $testacLogin $testacPW $pw
+                    rlRun "echo $testacPW | kinit $testac" 0 "make sure currentPW work"
+                    change_password $testac $testacPW $pw
                     if [ $? = 0 ];then
                         rlFail "password change success is not expected"
                     else
@@ -702,8 +702,8 @@ ipapassword_globalpolicy_classes_default_logic()
                     pw=`cat $pwout`
                     rm $pwout
                     rlLog "generate password [$pw] with [$classLevel] classes"
-                    rlRun "echo \"$currentPW\"| kinit $testacLogin" 0 "make sure currentPW work"
-                    change_password $testacLogin "$currentPW" "$pw"
+                    rlRun "echo \"$currentPW\"| kinit $testac" 0 "make sure currentPW work"
+                    change_password $testac "$currentPW" "$pw"
                     if [ $? = 0 ];then
                         rlPass "password change success is expected"
                         currentPW="$pw"
@@ -712,7 +712,7 @@ ipapassword_globalpolicy_classes_default_logic()
                     fi
                     classLevel=$((classLevel+1))
                 done
-                delete_test_ac
+                del_test_ac
             else
                 rlFail "set minclasses to [$n] failed"
             fi
@@ -777,8 +777,8 @@ ipapassword_globalpolicy_classes_lowerbound_logic()
                     pw=`cat $pwout`
                     rm $pwout
                     rlLog "[test $i]: now change to new password [$pw]"
-                    rlRun "echo \"$currentPW\"| kinit $testacLogin" 0 "make sure currentPW work"
-                    change_password $testacLogin $currentPW $pw
+                    rlRun "echo \"$currentPW\"| kinit $testac" 0 "make sure currentPW work"
+                    change_password $testac $currentPW $pw
                     if [ $? = 0 ];then
                         rlPass "password change success is expected"
                         currentPW=$pw
@@ -787,7 +787,7 @@ ipapassword_globalpolicy_classes_lowerbound_logic()
                     fi
                     i=$((i+1))
                 done
-                delete_test_ac
+                del_test_ac
             else
                 rlLog "set classes to [$temp] failed, can not continue test"
             fi
@@ -838,7 +838,7 @@ ipapassword_globalpolicy_classes_upperbound_logic()
             if [ $classes -eq $n ];then
                 add_test_ac
                 rlLog "Set minclasses to [$n] success, now continue test"
-                rlRun "echo $testacPW | kinit $testacLogin" 0 "get kerberos ticket for current user, prepare for password change"
+                rlRun "echo $testacPW | kinit $testac" 0 "get kerberos ticket for current user, prepare for password change"
 
                 # scenario 1: when new password classes less than $n, password change should fail
                 minclasses=1 # when classes = 0 it has same effect as 1, 
@@ -854,8 +854,8 @@ ipapassword_globalpolicy_classes_upperbound_logic()
                     pw=`cat $pwout`
                     rm $pwout
                     rlLog "generate password [$pw] with [$classLevel] classes"
-                    rlRun "echo \"$testacPW\"| kinit $testacLogin" 0 "make sure currentPW work"
-                    change_password $testacLogin $testacPW $pw
+                    rlRun "echo \"$testacPW\"| kinit $testac" 0 "make sure currentPW work"
+                    change_password $testac $testacPW $pw
                     if [ $? = 0 ];then
                         rlFail "password change success is not expected"
                     else
@@ -873,8 +873,8 @@ ipapassword_globalpolicy_classes_upperbound_logic()
                     pw=`cat $pwout`
                     rm $pwout
                     rlLog "generate password [$pw] with [$classLevel] classes"
-                    rlRun "echo \"$currentPW\"| kinit $testacLogin" 0 "make sure currentPW work"
-                    change_password $testacLogin "$currentPW" "$pw"
+                    rlRun "echo \"$currentPW\"| kinit $testac" 0 "make sure currentPW work"
+                    change_password $testac "$currentPW" "$pw"
                     if [ $? = 0 ];then
                         rlPass "password change success is expected"
                         currentPW="$pw"
@@ -883,7 +883,7 @@ ipapassword_globalpolicy_classes_upperbound_logic()
                     fi
                     classLevel=$((classLevel+1))
                 done
-                delete_test_ac
+                del_test_ac
             else
                 rlFail "set minclasses to [$n] failed"
             fi
@@ -941,7 +941,7 @@ ipapassword_globalpolicy_length_default()
         then
             add_test_ac
             ipapassword_globalpolicy_length_default_logic
-            delete_test_ac
+            del_test_ac
         else
             rlFail "can not set precondition for password length test"
         fi
@@ -969,8 +969,8 @@ ipapassword_globalpolicy_length_default_logic()
             pw=`cat $pwout`
             rm $pwout
             rlLog "minlength=[$default_length], current len [$length],password=[$pw]"
-            rlRun "echo $testacPW | kinit $testacLogin" 0 "validating current password"
-            change_password $testacLogin $testacPW $pw    
+            rlRun "echo $testacPW | kinit $testac" 0 "validating current password"
+            change_password $testac $testacPW $pw    
             if [ $? = 0 ];then
                 rlFail "password change success is not expected"
             else
@@ -992,8 +992,8 @@ ipapassword_globalpolicy_length_default_logic()
             pw=`cat $pwout`
             rm $pwout
             rlLog "minlength=[$default_length], current len [$length],password=[$pw]"
-            rlRun "echo $currentPW | kinit $testacLogin" 0 "validating current password"
-            change_password $testacLogin $currentPW $pw    
+            rlRun "echo $currentPW | kinit $testac" 0 "validating current password"
+            change_password $testac $currentPW $pw    
             if [ $? = 0 ];then
                 rlPass "password change success is expected"
                 currentPW=$pw
@@ -1029,7 +1029,7 @@ ipapassword_globalpolicy_length_lowerbound()
         then
             add_test_ac
             ipapassword_globalpolicy_length_lowerbound_logic
-            delete_test_ac
+            del_test_ac
         else
             rlFail "can not set precondition for password length test"
         fi
@@ -1041,10 +1041,10 @@ ipapassword_globalpolicy_length_lowerbound_logic()
     # accept parameters: NONE
     # test logic starts
         rlLog "there is only one password has length 0: empty string"
-        kinitAs $testacLogin $testacPW
+        kinitAs $testac $testacPW
         nullpassword=""
-        rlRun "echo $testacPW | kinit $testacLogin" 0 "validating current password"
-        change_password $testacLogin $testacPW "$nullpassword"
+        rlRun "echo $testacPW | kinit $testac" 0 "validating current password"
+        change_password $testac $testacPW "$nullpassword"
         if [ $? = 0 ];then
             rlFail "password change success is not expected"
         else
@@ -1075,7 +1075,7 @@ ipapassword_globalpolicy_length_upperbound()
         then
             add_test_ac
             ipapassword_globalpolicy_length_upperbound_logic
-            delete_test_ac
+            del_test_ac
         else
             rlFail "can not set precondition for password length upper bound test"
         fi
@@ -1112,8 +1112,8 @@ ipapassword_globalpolicy_length_upperbound_logic()
                 pw=`cat $pwout`
                 rm $pwout
                 rlLog "minlength=[$edge], current len [$below],password=[$pw]"
-                rlRun "echo $currentPW | kinit $testacLogin" 0 "validating current password"
-                change_password $testacLogin $currentPW $pw    
+                rlRun "echo $currentPW | kinit $testac" 0 "validating current password"
+                change_password $testac $currentPW $pw    
                 if [ $? = 0 ];then
                     rlFail "password change success is NOT expected"
                     currentPW=$pw
@@ -1133,8 +1133,8 @@ ipapassword_globalpolicy_length_upperbound_logic()
                 pw=`cat $pwout`
                 rm $pwout
                 rlLog "minlength=[$edge], current len [$edge],password=[$pw]"
-                rlRun "echo $currentPW | kinit $testacLogin" 0 "validating current password"
-                change_password $testacLogin $currentPW $pw    
+                rlRun "echo $currentPW | kinit $testac" 0 "validating current password"
+                change_password $testac $currentPW $pw    
                 if [ $? = 0 ];then
                     rlPass "password change success is expected"
                     currentPW=$pw
@@ -1154,8 +1154,8 @@ ipapassword_globalpolicy_length_upperbound_logic()
                 pw=`cat $pwout`
                 rm $pwout
                 rlLog "minlength=[$edge], current len [$upper],password=[$pw]"
-                rlRun "echo $currentPW | kinit $testacLogin" 0 "validating current password"
-                change_password $testacLogin $currentPW $pw    
+                rlRun "echo $currentPW | kinit $testac" 0 "validating current password"
+                change_password $testac $currentPW $pw    
                 if [ $? = 0 ];then
                     rlPass "password change success is expected"
                     currentPW=$pw
@@ -1197,7 +1197,9 @@ ipapassword_grouppolicy_envsetup()
 {
     rlPhaseStartSetup "ipapassword_grouppolicy_envsetup"
         #environment setup starts here
-
+        add_test_grp
+        add_test_ac 
+        #add_member $testac $testgrp
         #environment setup ends   here
     rlPhaseEnd
 } #ipapassword_grouppolicy_envsetup
@@ -1206,7 +1208,7 @@ ipapassword_grouppolicy_envcleanup()
 {
     rlPhaseStartCleanup "ipapassword_grouppolicy_envcleanup"
         #environment cleanup starts here
-
+        delete_test_grp
         #environment cleanup ends   here
     rlPhaseEnd
 } #ipapassword_grouppolicy_envcleanup
