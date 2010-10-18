@@ -730,7 +730,7 @@ rlJournalStart
     rlPhaseStartTest "ipa-group-cli-64: Add 100 groups and test find returns all"
 	i=1
 	while [ $i -le 100 ] ; do
-		rlRun "addGroup Group$i Group$i" 0 "Adding Group Group$i"
+		addGroup Group$i Group$i
 		let i=$i+1
 	done
 	number=`getNumberOfGroups`
@@ -738,23 +738,47 @@ rlJournalStart
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-group-cli-65: find 0 groups"
-	number=`findGroupsNumber 0`
-	rlAssertEquals "Verifying sizelimit 0" $number 103
+	ipa group-find --sizelimit=0 > /tmp/groupfind.out
+	result=`cat /tmp/groupfind.out | grep "Number of entries returned"`
+	number=`echo $result | cut -d " " -f 5`
+	if [ $number -eq 103 ] ; then
+		rlPass "All group returned as expected with size limit of 0"
+	else
+		rlFail "Number of groups returned is not as expected.  GOT: $number EXP: 103"
+	fi
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-group-cli-66: find 10 groups"
-        number=`findGroupsNumber 10`
-        rlAssertEquals "Verifying sizelimit 10" $number 10
+        ipa group-find --sizelimit=10 > /tmp/groupfind.out
+        result=`cat /tmp/groupfind.out | grep "Number of entries returned"`
+        number=`echo $result | cut -d " " -f 5`
+        if [ $number -eq 10 ] ; then
+                rlPass "All group returned as expected with size limit of 10"
+        else
+                rlFail "Number of groups returned is not as expected.  GOT: $number EXP: 10"
+        fi
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-group-cli-67: find 59 groups"
-        number=`findGroupsNumber 59`
-        rlAssertEquals "Verifying sizelimit 59" $number 59
+        ipa group-find --sizelimit=59 > /tmp/groupfind.out
+        result=`cat /tmp/groupfind.out | grep "Number of entries returned"`
+        number=`echo $result | cut -d " " -f 5`
+        if [ $number -eq 59 ] ; then
+                rlPass "All group returned as expected with size limit of 59"
+        else
+                rlFail "Number of groups returned is not as expected.  GOT: $number EXP: 59"
+        fi
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-group-cli-68: find more groups than exist"
-        number=`findGroupsNumber 200`
-        rlAssertEquals "Verifying sizelimit 200" $number 103
+	ipa group-find --sizelimit=200 > /tmp/groupfind.out
+        result=`cat /tmp/groupfind.out | grep "Number of entries returned"`
+        number=`echo $result | cut -d " " -f 5`
+        if [ $number -eq 103 ] ; then
+                rlPass "All group returned as expected with size limit of 200"
+        else
+                rlFail "Number of groups returned is not as expected.  GOT: $number EXP: 103"
+        fi
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-group-cli-69: find groups - size limit not an integer"
@@ -766,8 +790,14 @@ rlJournalStart
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-group-cli-70: find groups - time limit 0"
-        number=`findGroupsTime 0`
-        rlAssertEquals "Verify no entries returned with time limit 0" 0 $number
+        ipa group-find --timelimit=0 > /tmp/groupfind.out
+        result=`cat /tmp/groupfind.out | grep "Number of entries returned"`
+        number=`echo $result | cut -d " " -f 5`
+        if [ $number -eq 0 ] ; then
+                rlPass "No groups returned as expected with time limit of 0"
+        else
+                rlFail "Number of groups returned is not as expected.  GOT: $number EXP: 0"
+        fi
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-group-cli-71: find groups - time limit not an integer"
@@ -783,7 +813,11 @@ rlJournalStart
         rlRun "rm -r $TmpDir" 0 "Removing tmp directory"
 	rlRun "ipa user-del trex" 0 "Deleting user trex."
 	rlRun "ipa user-del mdolphin" 0 "Deleting user mdolphin."
-	rlRun "/usr/bin/ldapmodify -x -h $MASTER -p 389 -D \"$ROOTDN\" -w \"$ROOTDNPWD\" -c -f ./deletegrps.ldif" 0 "Deleting all groups."
+        i=1
+        while [ $i -le 100 ] ; do
+                deleteGroup Group$i
+                let i=$i+1
+        done
 	rlRun "kdestroy" 0 "Destroying admin credentials."
     rlPhaseEnd
 
