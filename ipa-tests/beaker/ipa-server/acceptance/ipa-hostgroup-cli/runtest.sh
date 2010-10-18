@@ -312,6 +312,76 @@ rlJournalStart
 	rlRun "deleteHostGroup \"$group5\"" 0 "Deleting host group \"$group5\""
     rlPhaseEnd
 
+ rlPhaseStartTest "ipa-hostgroup-cli-32: Add 100 host groups and test find returns all"
+        i=1
+        while [ $i -le 100 ] ; do
+                addHostGroup Group$i Group$i
+                let i=$i+1
+        done
+        number=`getNumberOfGroups`
+        rlAssertEquals "Verifying number of groups returned" $number 100
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-hostgroup-cli-33: find 0 host groups"
+        ipa hostgroup-find --sizelimit=0 > /tmp/hostgroupfind.out
+        result=`cat /tmp/hostgroupfind.out | grep "Number of entries returned"`
+        number=`echo $result | cut -d " " -f 5`
+        if [ $number -eq 100 ] ; then
+                rlPass "All host group returned as expected with size limit of 0"
+        else
+                rlFail "Number of host groups returned is not as expected.  GOT: $number EXP: 100"
+        fi
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-hostgroup-cli-34: find 10 host groups"
+        ipa hostgroup-find --sizelimit=10 > /tmp/hostgroupfind.out
+        result=`cat /tmp/hostgroupfind.out | grep "Number of entries returned"`
+        number=`echo $result | cut -d " " -f 5`
+        if [ $number -eq 10 ] ; then
+                rlPass "10 host groups returned as expected with size limit of 10"
+        else
+                rlFail "Number of host groups returned is not as expected.  GOT: $number EXP: 10"
+        fi
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-hostgroup-cli-35: find 59 host groups"
+        ipa hostgroup-find --sizelimit=59 > /tmp/hostgroupfind.out
+        result=`cat /tmp/hostgroupfind.out | grep "Number of entries returned"`
+        number=`echo $result | cut -d " " -f 5`
+        if [ $number -eq 59 ] ; then
+                rlPass "59 host groups returned as expected with size limit of 59"
+        else
+                rlFail "Number of host groups returned is not as expected.  GOT: $number EXP: 59"
+        fi
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-hostgroup-cli-36: find host groups - size limit not an integer"
+        expmsg="ipa: ERROR: invalid 'sizelimit': must be an integer"
+        command="ipa hostgroup-find --sizelimit=abvd"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message - alpha characters."
+        command="ipa hostgroup-find --sizelimit=#*"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message - special characters."
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-hostgroup-cli-37: find host groups - time limit 0"
+        ipa hostgroup-find --timelimit=0 > /tmp/hostgroupfind.out
+        result=`cat /tmp/hostgroupfind.out | grep "Number of entries returned"`
+        number=`echo $result | cut -d " " -f 5`
+        if [ $number -eq 0 ] ; then
+                rlPass "No host groups returned as expected with time limit of 0"
+        else
+                rlFail "Number of host groups returned is not as expected.  GOT: $number EXP: 0"
+        fi
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-hostgroup-cli-38: find host groups - time limit not an integer"
+        expmsg="ipa: ERROR: invalid 'timelimit': must be an integer"
+        command="ipa hostgroup-find --timelimit=abvd"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message - alpha characters."
+        command="ipa hostgroup-find --timelimit=#*"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message - special characters."
+    rlPhaseEnd
+
     rlPhaseStartCleanup "ipa-hostgroup-cli-cleanup: Delete remaining hosts and Destroying admin credentials"
         rlRun "popd"
         rlRun "rm -r $TmpDir" 0 "Removing tmp directory"
@@ -319,6 +389,13 @@ rlJournalStart
         for item in $host1 $host3 $host4 $host5 ; do
                 rlRun "deleteHost $item" 0 "Deleting host $item"
         done
+
+        i=1
+        while [ $i -le 100 ] ; do
+                deleteHostGroup Group$i
+                let i=$i+1
+        done
+
 	rlRun "kdestroy" 0 "Destroying admin credentials."
     rlPhaseEnd
 
