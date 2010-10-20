@@ -211,7 +211,7 @@ deleteHost()
 # getNumberOfHosts Usage:
 #       getNumberOfHosts
 ######################################################################
-getNumberOfGroups()
+getNumberOfHosts()
 {
 
    rc=0
