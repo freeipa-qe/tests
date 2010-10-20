@@ -14,6 +14,7 @@
 #	removeHostGroupMembers
 #	verifyHostGroupMember
 #       deleteHostGroup
+#	getNumberOfHostGroups
 ######################################################################
 # Assumes:
 #       For successful command exectution, administrative credentials
@@ -34,7 +35,7 @@ addHostGroup()
         ipa hostgroup-add --desc="$description" "$groupname"
         rc=$?
         if [ $rc -ne 0 ] ; then
-                rlLog "WARINGING: Adding new Host Group \"$groupname\" failed."
+                rlLog "WARNING: Adding new Host Group \"$groupname\" failed."
         else
                 rlLog "Adding new Host Group \"$groupname\" successful."
         fi
@@ -51,12 +52,13 @@ findHostGroup()
 {
    mygroup=$1
    description=$2
+   tmpfile=/tmp/findhostgroup.out
 
-   ipa hostgroup-find "$mygroup" > /tmp/findhostgroup.out
+   ipa hostgroup-find "$mygroup" > $tmpfile
    rc=$?
    if [ $rc -eq 0 ] ; then
         # check group
-        cat /tmp/findhostgroup.out | grep "Host-group: $mygroup"
+        cat $tmpfile | grep "Host-group: $mygroup"
         if [ $? -ne 0 ] ; then
                 rlLog "ERROR: Host Group name not as expected."
                 rc=1
@@ -64,7 +66,7 @@ findHostGroup()
                 rlLog "Host Group name is as expected."
         fi
 
-        cat /tmp/findhostgroup.out | grep "Description: $mygroup"
+        cat $tmpfile | grep "Description: $mygroup"
         if [ $? -ne 0 ] ; then
                 rlLog "ERROR: Host Group description not as expected."
                 rc=1
@@ -73,7 +75,7 @@ findHostGroup()
         fi
 
    else
-                rlLog "ERROR: Failed to find host. Return code: $rc"
+                rlLog "WARNING: Failed to find host."
    fi
 
    return $rc
@@ -82,7 +84,7 @@ findHostGroup()
 
 #######################################################################
 # modifyHostGroup Usage:
-#       modifyHostGroup groupname attribute value
+#       modifyHostGroup <groupname> <attribute> <value>
 ######################################################################
 
 modifyHostGroup()
@@ -93,7 +95,7 @@ modifyHostGroup()
    value=$3
    rc=0
 
-   rlLog "Executing: ipa hostgroup-mod --$attribute=\"$value\" \"$mygroup\""
+   #rlLog "Executing: ipa hostgroup-mod --$attribute=\"$value\" \"$mygroup\""
    ipa hostgroup-mod --$attribute="$value" "$mygroup"
    rc=$?
    if [ $rc -ne 0 ] ; then
@@ -102,12 +104,13 @@ modifyHostGroup()
    else
         rlLog "Modifying host group $mygroup successful."
    fi
+
    return $rc
 }
 
 #######################################################################
 # verifyHostGroupAttr Usage:
-#       verifyHostGroupAttr groupname attribute value
+#       verifyHostGroupAttr <groupname> <attribute> <value>
 ######################################################################
 
 verifyHostGroupAttr()
@@ -119,7 +122,6 @@ verifyHostGroupAttr()
 
    attribute="$attribute:"
    tmpfile="/tmp/hostgroupshow.out"
-   delim=":"
    ipa hostgroup-show "$mygroup" > $tmpfile
    rc=$?
    if [ $rc -eq 0 ] ; then
@@ -131,7 +133,7 @@ verifyHostGroupAttr()
                 rlLog "Value of $attribute for $mygroup is as expected: $value."
         fi
    else
-        rlLog "ERROR: ipa hostgroup-show command failed. Return code: $rc"
+        rlLog "WARNING: ipa hostgroup-show command failed."
    fi
 
    return $rc
@@ -139,7 +141,7 @@ verifyHostGroupAttr()
 
 #######################################################################
 # showHostGroup Usage:
-#       showHostGroup groupname
+#       showHostGroup <groupname>
 ######################################################################
 
 showHostGroup()
@@ -151,8 +153,9 @@ showHostGroup()
    ipa hostgroup-show --all "$mygroup" > $tmpfile
    rc=$?
    if [ $rc -eq 0 ] ; then
+	classes=`cat $tmpfile | grep objectclass`
 	for item in ipaobject ipahostgroup nestedGroup groupOfNames top ; do
-                cat $tmpfile | grep "$item"
+                echo $classes | grep "$item"
                 if [ $? -ne 0 ] ; then
                         rlLog "ERROR - objectclass $item was not returned with hostgroup-show --all"
                         rc=1
@@ -169,7 +172,7 @@ showHostGroup()
 
 #######################################################################
 # addHostGroupMembers Usage:
-#       addHostGroupMembers <groups or hosts> <comma_separated_list_of_groups> groupname
+#       addHostGroupMembers <groups or hosts> <comma_separated_list_of_groups> <groupname>
 ######################################################################
 
 addHostGroupMembers()
@@ -185,7 +188,7 @@ addHostGroupMembers()
   ipa hostgroup-add-member $flag="$memberlist" "$mygroup"
   rc=$?
   if [ $rc -ne 0 ] ; then
-        rlLog "ERROR: Adding $membertype to host group $mygroup failed."
+        rlLog "WARNING: Adding $membertype to host group $mygroup failed."
   else
         rlLog "Adding $membertype \"$memberlist\" to host group $mygroup successful."
   fi
@@ -195,7 +198,7 @@ addHostGroupMembers()
 
 #######################################################################
 # removeHostGroupMembers Usage:
-#       removeHostGroupMembers <groups or users> <comma_separated_list_of_groups_or_users> groupname
+#       removeHostGroupMembers <groups or users> <comma_separated_list_of_groups_or_users> <groupname>
 ######################################################################
 
 removeHostGroupMembers()
@@ -207,11 +210,11 @@ removeHostGroupMembers()
 
   flag="--$membertype"
 
-  rlLog "Executing: ipa hostgroup-remove-member $flag=\"$memberlist\" \"$mygroup\""
+  #rlLog "Executing: ipa hostgroup-remove-member $flag=\"$memberlist\" \"$mygroup\""
   ipa hostgroup-remove-member $flag="$memberlist" "$mygroup"
   rc=$?
   if [ $rc -ne 0 ] ; then
-        rlLog "ERROR: Removing $membertype from group \"$mygroup\" failed."
+        rlLog "WARNING: Removing $membertype from group \"$mygroup\" failed."
   else
         rlLog "Removing $membertype \"$memberlist\" from group \"$mygroup\" successful."
   fi
@@ -221,7 +224,7 @@ removeHostGroupMembers()
 
 #######################################################################
 # deleteHostGroup Usage:
-#       deleteHostGroup groupname
+#       deleteHostGroup <groupname>
 ######################################################################
 
 deleteHostGroup()
@@ -241,7 +244,7 @@ deleteHostGroup()
 
 #######################################################################
 # verifyHostGroupMember Usage:
-#       verifyHostGroupMember membername membertype groupname 
+#       verifyHostGroupMember <membername> <membertype> <groupname> 
 ######################################################################
 
 verifyHostGroupMember()
@@ -332,5 +335,24 @@ verifyHostGroupMember()
   fi
 
   return $rc
+}
+
+#######################################################################
+# getNumberOfHostGroups Usage:
+#       getNumberOfHostGroups
+######################################################################
+getNumberOfHostGroups()
+{
+
+   rc=0
+   tmpfile=/tmp/hostgroups.out
+
+   ipa hostgroup-find > $tmpfile
+   rc=$?
+   result=`cat $tmpfile | grep "Number of entries returned"`
+   number=`echo $result | cut -d " " -f 5`
+
+   echo $number
+   return $rc
 }
 

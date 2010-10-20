@@ -26,8 +26,6 @@
 #######################################################################
 # addGroup Usage:
 #       addGroup <description> <groupname>
-# Example:
-#	addGroup "Idenity Management Quality Engineering" "IDM QE"
 ######################################################################
 
 addGroup()
@@ -39,7 +37,7 @@ addGroup()
         ipa group-add --desc="$description" $groupname
         rc=$?
         if [ $rc -ne 0 ] ; then
-                rlLog "Adding new group \"$groupname\" failed."
+                rlLog "WARNING: Adding new group \"$groupname\" failed."
         else
                 rlLog "Adding new group \"$groupname\" successful."
         fi
@@ -50,8 +48,6 @@ addGroup()
 #######################################################################
 # addNonPosixGroup Usage:
 #       addNonPosixGroup <description> <groupname>
-# Example:
-#       addNonPosix Group "Idenity Management Quality Engineering" "IDM QE"
 ######################################################################
 addNonPosixGroup()
 {
@@ -62,7 +58,7 @@ addNonPosixGroup()
         ipa group-add --nonposix --desc="$description" $groupname
         rc=$?
         if [ $rc -ne 0 ] ; then
-                rlLog "Adding new posix group \"$groupname\" failed."
+                rlLog "WARNING: Adding new posix group \"$groupname\" failed."
         else
                 rlLog "Adding new posix group \"$groupname\" successful."
         fi
@@ -74,8 +70,6 @@ addNonPosixGroup()
 #######################################################################
 # findGroup Usage:
 #       findGroup <groupname>
-# example:
-#       findGroup "IDM QE"
 ######################################################################
 
 findGroup()
@@ -97,7 +91,7 @@ findGroup()
         fi
 
    else
-                rlLog "ERROR: Failed to add host. Return code: $rc"
+                rlLog "WARNING: Failed to find host."
    fi
 
    return $rc
@@ -106,9 +100,7 @@ findGroup()
 
 #######################################################################
 # modifyGroup Usage:
-#       modifyGroup groupname attribute value
-# example:
-#       modifyGroup test desc "new description"
+#       modifyGroup <groupname> <attribute> <value>
 ######################################################################
 
 modifyGroup()
@@ -123,7 +115,7 @@ modifyGroup()
    ipa group-mod --$attribute="$value" $mygroup
    rc=$?
    if [ $rc -ne 0 ] ; then
-        rlLog "ERROR: Modifying group $mygroup failed."
+        rlLog "WARNING: Modifying group $mygroup failed."
    else
         rlLog "Modifying group $mygroup successful."
    fi
@@ -132,9 +124,7 @@ modifyGroup()
 
 #######################################################################
 # verifyGroupAttr Usage:
-#       verifyGroupAttr groupname attribute value
-# example:
-#       verifyGroupAttr test desc "my description"
+#       verifyGroupAttr <groupname> <attribute> <value>
 ######################################################################
 
 verifyGroupAttr()
@@ -154,7 +144,7 @@ verifyGroupAttr()
         echo $result | grep "$attriute $value"
         rc=$?
         if [ $rc -ne 0 ] ; then
-                rlLog "$mygroup verification failed: Value of $attribute is $value."
+                rlLog "ERROR: $mygroup verification failed: Value of $attribute is $value."
         else
                 rlLog "Value of $attribute for $mygroup is as expected: $value."
         fi
@@ -167,9 +157,7 @@ verifyGroupAttr()
 
 #######################################################################
 # verifyGroupClasses Usage:
-#       verifyGroupClasses groupname <ipa or upg or posix>
-# example:
-#       verifyGroupClasses test ipa
+#       verifyGroupClasses <groupname> <ipa or upg or posix>
 ######################################################################
 
 verifyGroupClasses()
@@ -230,9 +218,7 @@ verifyGroupClasses()
 
 #######################################################################
 # addGroupMembers Usage:
-#       addGroupMembers <groups or users> <comma_separated_list_of_groups> groupname
-# example:
-#       addGroupMembers groups "animalkingdom,epcot" disneyworld
+#       addGroupMembers <groups or users> <comma_separated_list_of_groups> <groupname>
 ######################################################################
 
 addGroupMembers()
@@ -248,7 +234,7 @@ addGroupMembers()
   ipa group-add-member $flag="$memberlist" $mygroup
   rc=$?
   if [ $rc -ne 0 ] ; then
-        rlLog "ERROR: Adding $membertype to group $mygroup failed."
+        rlLog "WARNING: Adding $membertype to group $mygroup failed."
   else
         rlLog "Adding $membertype \"$memberlist\" to group $mygroup successful."
   fi
@@ -258,9 +244,7 @@ addGroupMembers()
 
 #######################################################################
 # removeGroupMembers Usage:
-#       removeGroupMembers <groups or users> <comma_separated_list_of_groups_or_users> groupname
-# example:
-#       removeGroupMembers groups "animalkingdom,epcot" disneyworld
+#       removeGroupMembers <groups or users> <comma_separated_list_of_groups_or_users> <groupname>
 ######################################################################
 
 removeGroupMembers()
@@ -276,7 +260,7 @@ removeGroupMembers()
   ipa group-remove-member $flag="$memberlist" $mygroup
   rc=$?
   if [ $rc -ne 0 ] ; then
-        rlLog "ERROR: Removing $membertype from group $mygroup failed."
+        rlLog "WARNING: Removing $membertype from group $mygroup failed."
   else
         rlLog "Removing $membertype \"$memberlist\" from group $mygroup successful."
   fi
@@ -287,8 +271,6 @@ removeGroupMembers()
 #######################################################################
 # detachUPG Usage:
 #       detachUPG userprivategroupname
-# example:
-#       deleteUPG test
 ######################################################################
 
 detachUPG()
@@ -299,18 +281,17 @@ detachUPG()
    ipa group-detach $upgroup
    rc=$?
    if [ $rc -ne 0 ] ; then
-        rlLog "ERROR: Detaching user private group $upgroup failed."
+        rlLog "WARNING: Detaching user private group $upgroup failed."
    else
         rlLog "User Private Group $upgroup detached successfully."
    fi
+
    return $rc
 }
 
 #######################################################################
 # deleteGroup Usage:
 #       deleteGroup groupname
-# example:
-#       deleteGroup test
 ######################################################################
 
 deleteGroup()
@@ -321,7 +302,7 @@ deleteGroup()
    ipa group-del $mygroup
    rc=$?
    if [ $rc -ne 0 ] ; then
-        rlLog "ERROR: Deleting group $mygroup failed."
+        rlLog "WARNING: Deleting group $mygroup failed."
    else
         rlLog "Group $mygroup deleted successfully."
    fi
@@ -330,9 +311,7 @@ deleteGroup()
 
 #######################################################################
 # verifyGroupMember Usage:
-#       verifyGroupMember membername membertype groupname 
-# example:
-#       verifyGroupMember mdolphin user fish 
+#       verifyGroupMember <membername> <membertype> <groupname> 
 ######################################################################
 
 verifyGroupMember()
@@ -354,6 +333,7 @@ verifyGroupMember()
   else
         rlLog "ERROR: unknown membertype: $membertype"
         rc=1
+	return $rc
   fi
 
   # construct groupDN
@@ -390,9 +370,7 @@ verifyGroupMember()
 
 #######################################################################
 # verifyUPG Usage:
-#       verifyManagedEntry username
-# example:
-#       verifyUPG username
+#       verifyManagedEntry <username>
 ######################################################################
 
 verifyUPG()

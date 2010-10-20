@@ -9,7 +9,9 @@
 #	modHost
 #	verifyHostAttr
 #	verifyHostClasses
+#	disableHost
 #	deleteHost
+#	getNumberOfHosts
 ######################################################################
 # Assumes:
 #	For successful command exectution, administrative credentials
@@ -18,7 +20,7 @@
 
 #######################################################################
 # addHost Usage:
-#	addHost hostname.domain.com
+#	addHost <hostname>
 ######################################################################
 
 addHost()
@@ -29,7 +31,7 @@ addHost()
 	ipa host-add $newhost --force
 	rc=$?
    	if [ $rc -ne 0 ] ; then
-        	rlLog "Adding new host $newhost failed with force option"
+        	rlLog "WARNING: Adding new host $newhost failed with force option"
    	else
         	rlLog "Adding new host $newhost successful with force option."
    	fi
@@ -40,9 +42,7 @@ addHost()
 
 #######################################################################
 # findHost Usage:
-#       findHost hostname.domain.com
-# example:
-#	findHost jenny.bos.redhat.com
+#       findHost <hostname>
 ######################################################################
 
 findHost()
@@ -51,7 +51,6 @@ findHost()
    ipa host-find $myhost
    rc=$?
    if [ $rc -eq 0 ] ; then
-	rlLog "$myhost was found."
    	# check hostname
 	result=`ipa host-find $myhost`
    	check=`echo $myhost | tr "[A-Z]" "[a-z]"`
@@ -72,7 +71,7 @@ findHost()
 		rlLog "Principal name is as expected."
 	fi
    else
-		rlLog "ERROR: Failed to add host. Return code: $rc"
+		rlLog "WARNING: Failed to find host."
    fi
 
    return $rc
@@ -81,11 +80,7 @@ findHost()
 
 #######################################################################
 # modifyHost Usage:
-#       modifyHost hostname.domain.com attribute value
-# example:
-#	modifyHost jenny.bos.redhat.com location "Lab 3"
-# returns:
-#	return code from ipa host-mod command
+#       modifyHost <hostname> <attribute> <value>
 ######################################################################
 
 modifyHost()
@@ -99,21 +94,17 @@ modifyHost()
    ipa host-mod --$attribute="${value}" $myhost
    rc=$?
    if [ $rc -ne 0 ] ; then
-        rlLog "ERROR: Modifying host $myhost failed."
+        rlLog "WARNING: Modifying host $myhost failed."
    else
         rlLog "Modifying host $myhost successful."
    fi
+
    return $rc
 }
 
 #######################################################################
 # verifyHostAttr Usage:
-#       verifyHostAttr hostname.domain.com attribute value
-# example:
-#       verifyHostAttr jenny.bos.redhat.com location "Lab 3"
-# returns:
-#	0 - success
-#	1 - failure
+#       verifyHostAttr <hostname> <attribute> <value>
 ######################################################################
 
 verifyHostAttr()
@@ -125,45 +116,47 @@ verifyHostAttr()
 
    attribute="$attribute:"
    tmpfile="/tmp/hostshow_$myhost.out"
-   delim=":"
-   ipa host-show $myhost
+
+   ipa host-show $myhost > $tmpfile
    rc=$?
    if [ $rc -eq 0 ] ; then
-   	result=`ipa host-show $myhost`
-	echo $result | grep "$attriute $value"
-	rc=$?
-   	if [ $rc -ne 0 ] ; then
-        	rlLog "$myhost verification failed: Value of $attribute is $value."
+	cat $tmpfile | grep "$attriute $value"
+   	if [ $? -ne 0 ] ; then
+        	rlLog "ERROR: $myhost verification failed: Value of $attribute is $value."
    	else
 		rlLog "Value of $attribute for $myhost is as expected."
    	fi
    else
-	rlLog "ERROR: ipa host-show command failed. Return code: $rc"
+	rlLog "WARNING: ipa host-show command failed."
    fi
 
    return $rc
 }
 
+#######################################################################
+# verifyHostClasses Usage:
+#       verifyHostClasses <hostname>
+######################################################################
 verifyHostClasses()
 {
    myhost=$1
+   tmpfile=/tmp/show_$myhost.out
    rc=0
 
-   ipa host-show --all $myhost
+   ipa host-show --all $myhost > $tmpfile
    rc=$?
    if [ $rc -eq 0 ] ; then
 	i=0
 	set -a expected ipaobject nshost ipahost pkiuser ipaservice krbprincipalaux krbprincipal top
-	classes=`ipa host-show --all $myhost | grep objectclass`
-	while [ $i -le 8 ] ; do
-		echo $classes | grep "${classes[$i]}"
+	classes=`cat $tmpfile | grep objectclass`
+	for item in ipaobject nshost ipahost pkiuser ipaservice krbprincipalaux krbprincipal top ; do
+		echo $classes | grep $item
 		if [ $? -ne 0 ] ; then
-			rlLog "ERROR - objectclass \"${classes[$i]}\" was not returned with host-show --all"
+			rlLog "ERROR - objectclass \"$item\" was not returned with host-show --all"
 			rc=1
 		else
-			rlLog "objectclass \"${classes[$i]}\" was returned as expected with host-show --all"
+			rlLog "objectclass \"$item\" was returned as expected with host-show --all"
 		fi
-		((i=$i+1))
 	done
    else
 	rlLog "ERROR: Show host failed. Return Code: $rc"
@@ -174,12 +167,7 @@ verifyHostClasses()
 
 #######################################################################
 # disableHost Usage:
-#       disableHost hostname
-# example:
-#       disableHost jenny.bos.redhat.com
-#       disableHost jenny
-# returns
-#       return code from ipa host-disable command
+#       disableHost <hostname>
 ######################################################################
 
 disableHost()
@@ -190,22 +178,17 @@ disableHost()
    ipa host-disable $myhost
    rc=$?
    if [ $rc -ne 0 ] ; then
-        rlLog "ERROR: Disabling host $myhost failed."
+        rlLog "WARNING: Disabling host $myhost failed."
    else
         rlLog "Host $myhost disabled successfully."
    fi
+
    return $rc
 }
 
-
 #######################################################################
 # deleteHost Usage:
-#       deleteHost hostname
-# example:
-#       deleteHost jenny.bos.redhat.com
-#	deleteHost jenny
-# returns
-#	return code from ipa host-del command
+#       deleteHost <hostname>
 ######################################################################
 
 deleteHost()
@@ -216,9 +199,28 @@ deleteHost()
    ipa host-del $myhost
    rc=$?
    if [ $rc -ne 0 ] ; then
-        rlLog "ERROR: Deleting host $myhost failed."
+        rlLog "WARNING: Deleting host $myhost failed."
    else
         rlLog "Host $myhost deleted successfully."
    fi
+
    return $rc
 }
+
+#######################################################################
+# getNumberOfHosts Usage:
+#       getNumberOfHosts
+######################################################################
+getNumberOfGroups()
+{
+
+   rc=0
+   ipa host-find > /tmp/hosts.out
+   rc=$?
+   result=`cat /tmp/hosts.out | grep "Number of entries returned"`
+   number=`echo $result | cut -d " " -f 5`
+
+   echo $number
+   return $rc
+}
+
