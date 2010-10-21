@@ -1,8 +1,8 @@
-Owner:           Yi Zhang <Yi Zhangemail>
-Name:            /CoreOS/ipa-server/acceptance/ipapassword
+Owner:           Yi Zhang <yzhang@redhat.com>
+Name:            /CoreOS/ipa-server/acceptance/ipa-password
 TestVersion:     1.0
-Path:            /mnt/tests/CoreOS/ipa-server/acceptance/ipapassword
-Description:     IPA passwd and password-policy test
+Path:            /mnt/tests/CoreOS/ipa-server/acceptance/ipa-password
+Description:     IPA ipapassword acceptance tests
 Type:            Regression
 TestTime:        15m
 RunFor:          ipa-server
