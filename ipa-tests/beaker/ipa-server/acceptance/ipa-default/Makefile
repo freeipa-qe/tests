@@ -24,7 +24,7 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-export TEST=/CoreOS/ipa-server/acceptance/ipadefault
+export TEST=/CoreOS/ipa-server/acceptance/ipa-default
 export TESTVERSION=1.0
 
 BUILT_FILES=
