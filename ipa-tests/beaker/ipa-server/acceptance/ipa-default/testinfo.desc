@@ -1,8 +1,8 @@
-Owner:           Yi Zhang <Yi Zhangemail>
-Name:            /CoreOS/ipa-server/acceptance/ipadefault
+Owner:           Yi Zhang <yzhang@redhat.com>
+Name:            /CoreOS/ipa-server/acceptance/ipa-default
 TestVersion:     1.0
-Path:            /mnt/tests/CoreOS/ipa-server/acceptance/ipadefault
-Description:     IPA default setting test
+Path:            /mnt/tests/CoreOS/ipa-server/acceptance/ipa-default
+Description:     IPA ipadefault acceptance tests
 Type:            Regression
 TestTime:        15m
 RunFor:          ipa-server
