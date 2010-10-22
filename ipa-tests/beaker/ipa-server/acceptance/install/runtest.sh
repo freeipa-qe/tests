@@ -67,6 +67,8 @@ rlJournalStart
 				fi
 			fi
 		fi
+		# Because I want to. 
+		yum -y install vim-enhanced&
 		/etc/init.d/ntpd stop
 		ntpdate $NTPSERVER
 		rlRun "rpm -qa ipa-server" 
@@ -81,20 +83,25 @@ rlJournalStart
 		ipaddr=$(ifconfig $currenteth | grep inet\ addr | sed s/:/\ /g | awk '{print $3}')
 		echo "Ip address is $ipaddr"
 		# Now, fix the hosts file to work with IPA.
-		cat /etc/hosts | grep -v ^$ipaddr > /dev/shm/hosts	
 		hostname=$(hostname)
 		hostname_s=$(hostname -s)
+		cat /etc/hosts | grep -v ^$ipaddr > /dev/shm/hosts	
+		# Remove any existing hostname entries from the hosts file
 		sed -i s/$hostname//g /dev/shm/hosts
 		sed -i s/$hostname_s//g /dev/shm/hosts
-		echo "$ipaddr $hostname" >> /dev/shm/hosts
+		echo "$ipaddr $hostname_s.$DOMAIN $hostname $hostname_s" >> /dev/shm/hosts
 		cat /dev/shm/hosts > /etc/hosts
 		echo "hosts file contains"
 		cat /etc/hosts
-		rlRun "ls /root"
+		# Fix hostname
+		rlRun "hostname $hostname.$DOMAIN"
+		hostname $hostname.$DOMAIN
+		# Fix ntpd.conf, this will likley be temporary
+		echo 'OPTIONS="-u ntp:ntp -p /var/run/ntpd.pid -g"' > /etc/sysconfig/ntpd
 		# install IPA only if the is the master server
 		if [ "$MASTER" = "$HOSTNAME" ]; then 
 			# This is the master server, set up ipa-server
-			echo "ipa-server-install --setup-dns --forwarder=$DNSFORWARD --hostname=$hostname -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -u admin -U" > /dev/shm/installipa.bash
+			echo "ipa-server-install --setup-dns --forwarder=$DNSFORWARD --hostname=$hostname_s.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -u admin -U" > /dev/shm/installipa.bash
 			setenforce 0
 			/bin/bash /dev/shm/installipa.bash
 		else
