@@ -164,7 +164,7 @@ rlJournalStart
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-host-cli-12: Negative - add duplicate host"
-	command="ipa host-add $host1"
+	command="ipa host-add $host1 --force"
 	expmsg="ipa: ERROR: This entry already exists"
 	rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
     rlPhaseEnd
@@ -185,7 +185,7 @@ rlJournalStart
 
     rlPhaseStartTest "ipa-host-cli-15: Negative - setattr and addattr on ipaUniqueID"
         command="ipa host-mod --setattr ipaUniqueID=127863947-84375973-gq9587 $host1"
-        expmsg="ipa: ERROR: no modifications to be performed"
+        expmsg="ipa: ERROR: Insufficient access: Insufficient 'write' privilege to the 'ipaUniqueID' attribute of entry 'fqdn=$host1,cn=computers,cn=accounts,dc=$RELM'."
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
         command="ipa host-mod --addattr ipaUniqueID=127863947-84375973-gq9587 $host1"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
@@ -270,40 +270,163 @@ rlJournalStart
         done
      rlPhaseEnd
 
-     rlPhaseStartTest "ipa-host-cli-25: Modify Host that doesn't Exist"
+    rlPhaseStartTest "ipa-host-cli-25:  Negative - add host not fully qualified DN"
+        command="ipa host-add myhost --force"
+        expmsg="ipa: ERROR: invalid 'fqdn': Fully-qualified hostname required"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
+    rlPhaseEnd
+
+     rlPhaseStartTest "ipa-host-cli-26: Modify Host that doesn't Exist"
         command="ipa host-mod --location=mars $host1"
         expmsg="ipa: ERROR: $host1: host not found"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
      rlPhaseEnd
 
-     rlPhaseStartTest "ipa-host-cli-26: Find Host that doesn't Exist"
+     rlPhaseStartTest "ipa-host-cli-27: Find Host that doesn't Exist"
         command="ipa host-show $host1"
         expmsg="ipa: ERROR: $host1: host not found"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
      rlPhaseEnd
 
-     rlPhaseStartTest "ipa-host-cli-27: Show Host that doesn't Exist"
+     rlPhaseStartTest "ipa-host-cli-28: Show Host that doesn't Exist"
         command="ipa host-show $host1"
         expmsg="ipa: ERROR: $host1: host not found"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
      rlPhaseEnd
 
-     rlPhaseStartTest "ipa-host-cli-28: Disable Host that doesn't Exist"
+     rlPhaseStartTest "ipa-host-cli-29: Disable Host that doesn't Exist"
         command="ipa host-disable $host1"
         expmsg="ipa: ERROR: $host1: host not found"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
      rlPhaseEnd
 
-     rlPhaseStartTest "ipa-host-cli-29: Add Host without force or add DNS record options"
+     rlPhaseStartTest "ipa-host-cli-30: Add Host without force or add DNS record options"
         command="ipa host-add $host1"
         expmsg="ipa: ERROR: Host does not have corresponding DNS A record"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
      rlPhaseEnd
 
+    rlPhaseStartTest "ipa-host-cli-31: Negative - setattr and addattr on dn"
+	addHost $host1
+        command="ipa host-mod --setattr dn=mynewDN $host1"
+        expmsg="ipa: ERROR: attribute \"distinguishedName\" not allowed"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
+        command="ipa group-mod --addattr dn=anothernewDN $host1"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-host-cli-32: Negative - setattr and addattr on cn"
+        command="ipa host-mod --setattr cn=\"cn=new,cn=computers,dc=domain,dc=com\" $host1"
+        expmsg="ipa: ERROR: Operation not allowed on RDN:"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
+        command="ipa host-mod --addattr cn=\"cn=new,cn=computers,dc=domain,dc=com\" $host1"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-host-cli-33: Negative - setattr and addattr on keytab"
+        command="ipa host-mod --setattr keytab=true $host1"
+        expmsg="ipa: ERROR: attribute keytab not allowed"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
+        command="ipa host-mod --addattr keytab=false $host1"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
+	deleteHost $host1
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-host-cli-34: Add 100 hosts and test find returns all"
+        i=1
+        while [ $i -le 100 ] ; do
+                addHost host$i.$RELM
+                let i=$i+1
+        done
+        number=`getNumberOfHosts`
+	if [ $number -ne 101 ] ; then
+		rlFail "Number of hosts returned is not as expected.  GOT: $number EXP: 101"
+	else
+		rlPass "Number of hosts returned is as expected"
+	fi
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-host-cli-35: find 0 hosts"
+        ipa host-find --sizelimit=0 > /tmp/hostfind.out
+        result=`cat /tmp/hostfind.out | grep "Number of entries returned"`
+        number=`echo $result | cut -d " " -f 5`
+        if [ $number -eq 101 ] ; then
+                rlPass "All hosts returned as expected with size limit of 0"
+        else
+                rlFail "Number of hosts returned is not as expected.  GOT: $number EXP: 101"
+        fi
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-group-cli-36: find 10 hosts"
+        ipa host-find --sizelimit=10 > /tmp/hostfind.out
+        result=`cat /tmp/hostfind.out | grep "Number of entries returned"`
+        number=`echo $result | cut -d " " -f 5`
+        if [ $number -eq 10 ] ; then
+                rlPass "Number of hosts returned as expected with size limit of 10"
+        else
+                rlFail "Number of hosts returned is not as expected.  GOT: $number EXP: 10"
+        fi
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-host-cli-37: find 37 groups"
+        ipa host-find --sizelimit=37 > /tmp/hostfind.out
+        result=`cat /tmp/hostfind.out | grep "Number of entries returned"`
+        number=`echo $result | cut -d " " -f 5`
+        if [ $number -eq 37 ] ; then
+                rlPass "Number of hosts returned as expected with size limit of 37"
+        else
+                rlFail "Number of hosts returned is not as expected.  GOT: $number EXP: 37"
+        fi
+    rlPhaseEnd
+
+rlPhaseStartTest "ipa-host-cli-38: find more hosts than exist"
+        ipa host-find --sizelimit=300 > /tmp/hostfind.out
+        result=`cat /tmp/hostfind.out | grep "Number of entries returned"`
+        number=`echo $result | cut -d " " -f 5`
+        if [ $number -eq 101 ] ; then
+                rlPass "All hosts returned as expected with size limit of 300"
+        else
+                rlFail "Number of hosts returned is not as expected.  GOT: $number EXP: 101"
+        fi
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-host-cli-39: find hosts - size limit not an integer"
+        expmsg="ipa: ERROR: invalid 'sizelimit': must be an integer"
+        command="ipa host-find --sizelimit=abvd"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message - alpha characters."
+        command="ipa host-find --sizelimit=#*"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message - special characters."
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-host-cli-40: find hosts - time limit 0"
+        ipa host-find --timelimit=0 > /tmp/hostfind.out
+        result=`cat /tmp/hostfind.out | grep "Number of entries returned"`
+        number=`echo $result | cut -d " " -f 5`
+        if [ $number -eq 0 ] ; then
+                rlPass "No hosts returned as expected with time limit of 0"
+        else
+                rlFail "Number of hosts returned is not as expected.  GOT: $number EXP: 0"
+        fi
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-host-cli-41: find hosts - time limit not an integer"
+        expmsg="ipa: ERROR: invalid 'timelimit': must be an integer"
+        command="ipa host-find --timelimit=abvd"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message - alpha characters."
+        command="ipa host-find --timelimit=#*"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message - special characters."
+    rlPhaseEnd
     rlPhaseStartCleanup "ipa-host-cli-cleanup: Destroying admin credentials."
         rlRun "popd"
         rlRun "rm -r $TmpDir" 0 "Removing tmp directory"
+        i=1
+        while [ $i -le 100 ] ; do
+                deleteHost host$i.$RELM
+                let i=$i+1
+        done
+
 	rlRun "kdestroy" 0 "Destroying admin credentials."
+	rhts-submit-log -l /var/log/httpd/error_log
     rlPhaseEnd
 
 rlJournalPrintText
