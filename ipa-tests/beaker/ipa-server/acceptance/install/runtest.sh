@@ -94,8 +94,14 @@ rlJournalStart
 		echo "hosts file contains"
 		cat /etc/hosts
 		# Fix hostname
-		rlRun "hostname $hostname.$DOMAIN"
-		hostname $hostname.$DOMAIN
+		rlRun "hostname $hostname_s.$DOMAIN"
+		hostname $hostname_s.$DOMAIN
+		cat /etc/sysconfig/network | grep -v $hostname_s > /dev/shm/network
+		echo "HOSTNAME=$hostname_s.$DOMAIN" >> /dev/shm/network
+		mv /etc/sysconfig/network /etc/sysconfig/network-ipabackup
+		cat /dev/shm/network > /etc/sysconfig/network
+		echo "/etc/sysconfig/network contains"
+		cat /etc/sysconfig/network
 		# Fix ntpd.conf, this will likley be temporary
 		echo 'OPTIONS="-u ntp:ntp -p /var/run/ntpd.pid -g"' > /etc/sysconfig/ntpd
 		# install IPA only if the is the master server
