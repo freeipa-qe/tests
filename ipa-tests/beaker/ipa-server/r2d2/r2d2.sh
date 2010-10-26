@@ -21,6 +21,12 @@ else
     exit 0
 fi
 
+# checking to ensure that manifest file exists
+if [ ! -f $manifest ]
+then
+    echo "WARNING - manifest file $manifest not found"
+fi
+
 # check the starting point: where we have acceptance test stored
 while [ ! -d $RHTS/r2d2 ]
 do
@@ -52,7 +58,7 @@ else
         rm -rf $out
     else
         echo "do nothing. No output directory defined. You can wait for one minutes to rerun this program"
-        exit 0
+        exit 1
     fi
 fi
 echo "output directory : [$out]"
