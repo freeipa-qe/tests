@@ -75,20 +75,20 @@ reset_group_pwpolicy()
 {
     local out=$TmpDir/setgrouppwpolicy.$RANDOM.out
     rlLog "set group password policy"
-    rlLog "maxlife [$group_maxlife] days, minlife [$group_minlife] hours history [$group_history]" 
-    rlLog "classes [$group_classes], length [$group_length] priority [$group_priority]"
+    rlLog "maxlife [$grouppw_maxlife] days, minlife [$grouppw_minlife] hours history [$grouppw_history]" 
+    rlLog "classes [$grouppw_classes], length [$grouppw_length] priority [$grouppw_priority]"
     grppw_exist $testgrp
     if [ $? = 0 ];then
         del_grppw $testgrp
     fi
     KinitAsAdmin 
     ipa pwpolicy-add $testgrp \
-                     --maxlife=$group_maxlife\
-                     --minlife=$group_minlife \
-                     --history=$group_history \
-                     --minclasses=$group_classes \
-                     --minlength=$group_length \
-                     --priority=$group_priority
+                     --maxlife=$grouppw_maxlife\
+                     --minlife=$grouppw_minlife \
+                     --history=$grouppw_history \
+                     --minclasses=$grouppw_classes \
+                     --minlength=$grouppw_length \
+                     --priority=$grouppw_priority
     ipa pwpolicy-show $testgrp > $out
     maxlife=`grep "Max lifetime" $out | cut -d ":" -f2| xargs echo`
     minlife=`grep "Min lifetime" $out | cut -d ":" -f2| xargs echo`
@@ -96,9 +96,9 @@ reset_group_pwpolicy()
     classes=`grep "classes" $out | cut -d ":" -f2| xargs echo`
     length=`grep "Min length" $out | cut -d ":" -f2| xargs echo`
     priority=`grep "Priority" $out | cut -d ":" -f2| xargs echo`
-    if [ $maxlife = $group_maxlife ] && [ $minlife = $group_minlife ] \
-      && [ $history = $group_history ] && [ $classes = $group_classes ] \
-      && [ $length = $group_length ] && [ $priority = $group_priority ]
+    if [ $maxlife = $grouppw_maxlife ] && [ $minlife = $grouppw_minlife ] \
+      && [ $history = $grouppw_history ] && [ $classes = $grouppw_classes ] \
+      && [ $length = $grouppw_length ] && [ $priority = $grouppw_priority ]
     then
         rlPass "group pwpolicy has been set"
     else
@@ -410,12 +410,12 @@ change_password()
     echo 'send -s -- "\r"' >> $exp
     echo 'expect eof ' >> $exp
     /usr/bin/expect $exp  > $out
-    echo "===============output of change_password==============="
-    cat $out
-    echo "======================================================="
     if grep "Constraint violation:Password Fails to meet minimum strength criteria" $out  2>&1 >/dev/null|| grep "ipa: ERROR" $out 2>&1 >/dev/null
     then
         ret=1
+        echo "===============output of change_password==============="
+        cat $out
+        echo "======================================================="
     else
         ret=0
     fi
@@ -590,7 +590,7 @@ minlife_default()
     ipa pwpolicy-show
     echo "------------------------------------------"
     rlLog "set all other password constrains to 0"
-    ipa pwpolicy-mod $grp --maxlife=$group_maxlife --history=0 --minlength=0 --minclasses=1 
+    ipa pwpolicy-mod $grp --maxlife=$grouppw_maxlife --history=0 --minlength=0 --minclasses=1 
     ipa pwpolicy-show  $grp > $out
     history=`grep "History size:" $out | cut -d":" -f2|xargs echo`
     length=`grep "length:" $out | cut -d":" -f2|xargs echo`
@@ -688,4 +688,7 @@ minlife_lowerbound()
     # test logic ends
 } # minlife_lowerbound
 
-
+history_default()
+{
+    echo "notset"
+} #history_default
