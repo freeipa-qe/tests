@@ -43,26 +43,28 @@ rlJournalStart
 		# Backing up resolv.conf
 		rlRun "rm -f /dev/shm/resolv.conf.ipabackup"
 		
-		rlRun "ls /dev/shm/ipa-server-shared.sh"
+		rlRun "ls /dev/shm/ipa-server-shared.sh" 0 "Checking for existance of shared libs"
 		if [ ! -f /dev/shm/ipa-server-shared.sh ]; then
 			echo "ERROR - /dev/shm/ipa-server-shared.sh does not exist, did the shared libs get installed?"
 		fi
+		hostname_s=$(hostname -s)
 		echo "$SLAVE" | grep "$HOSTNAME"
 		if [ $? -eq 0 ]; then
 			echo "this is a slave, wait for the replica file"
-			if [ ! -f /dev/shm/replica-info-$HOSTNAME.gpg ]; then
+			if [ ! -f /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg ]; then
 				echo "waiting for replica file"
 				sleep 300
-				if [ ! -f /dev/shm/replica-info-$HOSTNAME.gpg ]; then
+				if [ ! -f /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg ]; then
 					echo "waiting for replica file"
 					sleep 300
-					if [ ! -f /dev/shm/replica-info-$HOSTNAME.gpg ]; then
+					if [ ! -f /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg ]; then
 						echo "ERROR - replica file not found, did the master install work properly?"
-						rlRun "ls /dev/shm/replica-info-$HOSTNAME.gpg"
+						rlRun "ls /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg" 0 "Checking for existance of replica gpg file"
 					fi
 				fi
 			fi
 		fi
+		rlRun "ls /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg" 0 "Checking for existance of replica gpg file"
 	rlPhaseEnd
 
 	rlPhaseStartTest "IPA start test section"
@@ -70,8 +72,8 @@ rlJournalStart
 		if [ $? -eq 0 ]; then
 			# This machine is a slave
 			echo "I am a slave/replica"
-			rlRun "ls /dev/shm/replica-info-$HOSTNAME.gpg"
-			echo "ipa-replica-install -p $ADMINPW /dev/shm/replica-info-$HOSTNAME.gpg" > /dev/shm/replica-install.bash
+			rlRun "ls /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg" 0 "Checking for existance of replica gpg file"
+			echo "ipa-replica-install -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg" > /dev/shm/replica-install.bash
 			chmod 755 /dev/shm/replica-install.bash
 			bash /dev/shm/replica-install.bash
 		else

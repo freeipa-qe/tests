@@ -160,9 +160,14 @@ expect eof' > /dev/shm/kinit-admin.exp
 			# This is the master server, create the replictation certs
 			for s in $SLAVE; do
 				if [ "$s" != "" ]; then
-					ipa-replica-prepare -p $ADMINPW $s
+					# Determine the IP of the slave to be used when creating the replica file.
+					ipofs=$(dig +noquestion $s  | grep ipaqa64vmb.idm.lab.bos.redhat.com | grep IN | awk '{print $5}')
+					# put the short form of the hostname for server $s into s_short
+					s_short=$(echo $s | cut -d. -f1)
+					echo "IP of server $s is resolving as $ipofs, using short hostname of $s_short" 
+					ipa-replica-prepare -p $ADMINPW --ip-address=$ipofs $s_short.$DOMAIN
 					# Copy the replica info to the slave
-					rlRun "scp /var/lib/ipa/replica-info-$s.gpg root@$s:/dev/shm/."
+					rlRun "scp /var/lib/ipa/replica-info-$s_short.$DOMAIN.gpg root@$s:/dev/shm/."
 				fi
 			done
 		fi
