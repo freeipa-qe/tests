@@ -108,7 +108,65 @@ reset_group_pwpolicy()
         echo "------------------------------"
     fi
     rlRun "$kdestroy"
-} # set_group_pwpolicy
+} # reset_group_pwpolicy
+
+reset_nestedgroup_pwpolicy()
+{
+    local out=$TmpDir/setgrouppwpolicy.$RANDOM.out
+    rlLog "set group password policy"
+    rlLog "maxlife [$nestedpw_maxlife] days, minlife [$nestedpw_minlife] hours history [$nestedpw_history]" 
+    rlLog "classes [$nestedpw_classes], length [$nestedpw_length] priority [$nestedpw_priority]"
+    grppw_exist $nestedgrp
+    if [ $? = 0 ];then
+        del_grppw $nestedgrp 
+    fi
+    KinitAsAdmin 
+    ipa pwpolicy-add $nestedgrp\
+                     --maxlife=$nestedpw_maxlife\
+                     --minlife=$nestedpw_minlife \
+                     --history=$nestedpw_history \
+                     --minclasses=$nestedpw_classes \
+                     --minlength=$nestedpw_length \
+                     --priority=$nestedpw_priority
+    ipa pwpolicy-show $nestedgrp > $out
+    maxlife=`grep "Max lifetime" $out | cut -d ":" -f2| xargs echo`
+    minlife=`grep "Min lifetime" $out | cut -d ":" -f2| xargs echo`
+    history=`grep "History size" $out | cut -d ":" -f2| xargs echo`
+    classes=`grep "classes" $out | cut -d ":" -f2| xargs echo`
+    length=`grep "Min length" $out | cut -d ":" -f2| xargs echo`
+    priority=`grep "Priority" $out | cut -d ":" -f2| xargs echo`
+    if [ $maxlife = $nestedpw_maxlife ] && [ $minlife = $nestedpw_minlife ] \
+      && [ $history = $nestedpw_history ] && [ $classes = $nestedpw_classes ] \
+      && [ $length = $nestedpw_length ] && [ $priority = $nestedpw_priority ]
+    then
+        rlPass "group pwpolicy has been set"
+    else
+        rlFail "group pwpolicy set failed"
+        echo "------------------------------"
+        cat $out
+        echo "------------------------------"
+    fi
+    rlRun "$kdestroy"
+    rm $out
+} # reset_group_pwpolicy
+
+
+util_pwpolicy_createnew()
+{ #FIXME: not sure whether i need this one, just add it here for now
+    local out=$TmpDir/util.pwpolicy.createnew.$RANDOM.out
+    local argstring=""
+    #build arguments
+    local policyname=$1
+    shift
+    for arg in "$@";do
+        thisarg="--${arg}"
+        argstring="$argstring $thisarg"
+    done
+    KinitAsAdmin
+    rlRun "ipa pwpolicy-add $policyname $argstring" \
+          0 "create password policy: [$policyname]"
+    rm $out
+} #util_pwpolicy_createnew
 
 del_grppw()
 {
@@ -122,6 +180,7 @@ del_grppw()
         rlLog "not found group password policy: [$grppw], do nothing"
     fi
     rlRun "$kdestroy"
+    rm $out
 } #del_grppw
 
 grppw_exist()
@@ -141,6 +200,7 @@ grppw_exist()
         rlRun "$kdestroy"
         return 1
     fi
+    rm $out
 } #grppw_exist
 
 add_test_ac()
@@ -201,6 +261,7 @@ user_exist()
     else
         return 1 # when login value not given, return not found
     fi
+    rm $out
 } #user_exist
 
 add_test_grp()
@@ -210,11 +271,7 @@ add_test_grp()
     then
         del_test_grp 
     fi
-    KinitAsAdmin
-    rlRun "ipa group-add $testgrp\
-        --desc \"test group for group pwpolicy\" " \
-          0 "add test group [$testgrp]"
-    rlRun "$kdestroy"
+    add_grp "$testgrp" "test group for group pwpolicy"
 } #add_test_grp
 
 del_test_grp()
@@ -223,13 +280,44 @@ del_test_grp()
     if [ $? = 0 ]
     then
         rlLog "test group [$testgrp] exist, now delete it"
-        KinitAsAdmin
-        rlRun "ipa group-del $testgrp" 0 "delete test group [$testgrp]"
-        rlRun "$kdestroy"
+        del_grp "$testgrp"
     else
         rlLog "test group [$testgrp] does not exist, do nothing"
     fi
 } #del_test_grp
+
+add_test_nestgrp()
+{
+    grp_exist $nestedgrp
+    if [ $? = 0 ]
+    then
+        del_grp $nestedgrp
+    fi
+    add_grp "$nestedgrp" "nested test group for group pwpplicy"
+} #add_test_nestedgrp
+
+add_grp(){
+    local grpname=$1
+    local desc=$2
+    if [ ! -z "$grpname" ];then
+        KinitAsAdmin
+        rlRun "ipa group-add $grpname --desc \"$desc\"" 0 "create group [$grpname]"
+        rlRun "$kdestroy"
+    else
+        rlFail "no group name is given, fail to create group"
+    fi
+} # add_grp
+
+del_grp(){
+    local grpname=$1
+    if [ ! -z "$grpname" ];then
+        KinitAsAdmin
+        rlRun "ipa group-del $grpname" 0 "delete group: [$grpname]"
+        rlRun "$kdestroy"
+    else
+        rlFail "no group name is given, fail to delete group"
+    fi
+} #del_grp
 
 grp_exist()
 {
@@ -269,6 +357,50 @@ append_test_member()
     rlRun "$kdestroy"
     rm $out
 } # add_test_member
+
+append_test_grp()
+{
+    local out=$TmpDir/appendgrouptogroup.$RANDOM.out
+    KinitAsAdmin
+    ipa group-show $testgrp > $out
+    if grep "Member groups" $out | grep -i $nestedgrp 2>&1 > /dev/null
+    then
+        rlPass "group [$nestedgrp] already member of [$testgrp]"
+    else
+        rlRun "ipa group-add-member --groups=$nestedgrp $testgrp"\
+              0 "add group [$nestedgrp] as member of [$testgrp]"
+        rlRun "$kdestroy"
+    fi
+    rm $out
+} # append_test_grp
+
+append_test_nested_ac()
+{
+    local out=$TmpDir/appendnestedac.$RANDOM.out
+    KinitAsAdmin
+
+    # test account should not be member of top group
+    ipa group-show $testgrp > $out
+    if grep "Member users" $out | grep -i $testac 2>&1 > /dev/null
+    then
+        # remove the membership if it is
+        rlRun "ipa group-remove-member $testgrp --users=$testac" \
+              0 "remove [$testac] from [$testgrp]"
+    fi
+    
+    # test account should be member of nested group
+    ipa group-show $nestedgrp > $out
+    if grep "Member users" $out | grep -i $testac 2>&1 > /dev/null
+    then
+        rlPass "[$testac] already member of [$nestedgrp]"
+    else
+        # if not, add it 
+        rlRun "ipa group-add-member $nestedgrp --users=$testac"\
+              0 "add [$testac] as member of [$nestedgrp]"
+    fi
+    rlRun "$kdestroy"
+    rm $out
+} #append_test_nested_ac
 
 remove_test_member()
 {
@@ -688,7 +820,107 @@ minlife_lowerbound()
     # test logic ends
 } # minlife_lowerbound
 
-history_default()
+prepare_nestedgrp_testenv()
 {
-    echo "notset"
-} #history_default
+    add_test_grp
+    add_test_nestgrp
+    add_test_ac
+    append_test_grp
+    append_test_nested_ac
+    reset_group_pwpolicy
+    reset_nestedgroup_pwpolicy
+} # prepare_nestedgrptestenv
+
+cleanup_nestedgrp_testenv()
+{
+    del_test_ac
+    util_pwpolicy_removeall
+    del_grp $nestedgrp
+    del_grp $testgrp
+} #cleanup_nestedgrp_testenv
+
+util_pwpolicy_removeall()
+{
+    local out=$TmpDir/uitl.pwpolicy.removeall.out
+    local i=0
+    local list
+    KinitAsAdmin
+    ipa pwpolicy-find | grep -i "group" | grep -v -i "GLOBAL" > $out
+    for line in `cat $out`; do
+        pwpolicy=`echo $line | cut -d":" -f2 | xargs echo`
+        if [ ! -z "$pwpolicy" ];then
+            rlLogDebug "remove password policy: [$pwpolicy]"
+            list="$list $pwpolicy"
+            rlRun "ipa pwpolicy-del $pwpolicy 2>&1 >/dev/null" 
+            i=$((i+1))
+        fi
+    done
+    total=`wc -l $out | cut -d" " -f1`
+    if [ $total = $i ];then
+        rlPass "all password policy [$i:$list] have been deleted"
+    else
+        rlFail "expect [$total] password policy, deleted [$i]"
+    fi
+    rlRun "$kdestroy"
+    rm $out
+    unset i
+    unset list
+    unset out
+} # util_pwpolicy_removeall
+
+getrandomint()
+{
+#usage: getrandomint <INT> to get random int between [0,INT]
+#       getrandomint <INT INT> to get random int between [INT,INT]
+
+    local i=0
+    local seed=0
+    local seed2=0
+    local first=0
+    local second=0
+    local ceiling=0
+    local floor=0
+    local final=0
+    for arg in $@;do
+        i=$((i+1))
+    done
+    if [ $i -eq 0 ];then
+        echo $RANDOM
+        return
+    elif [ $i -eq 1 ];then
+        ceiling=$1
+        floor=0
+    else
+        first=$1
+        second=$2
+        if [ $first -gt $second ];then
+            ceiling=$first
+            floor=$second
+        else
+            ceiling=$second
+            floor=$first
+        fi
+    fi
+
+    #echo "between: [$floor, $ceiling]"
+    if [ $floor -eq $ceiling ];then
+        final=$floor
+        echo "$final"
+        return
+    fi
+    diff=`echo "$ceiling - $floor + 1" | bc`
+    seed=$RANDOM
+    let "seed %= $ceiling"
+    if [ $seed -lt $floor ];then
+        seed2=$RANDOM
+        let "seed2 = $seed2 % $diff "
+        final=`echo "$floor + $seed2" | bc`
+    else
+        final=$seed
+    fi
+    echo $final
+    return
+    #echo "seed=$seed diff=$diff seed2=$seed2 final = [$final]"
+} #getrandomint
+
+

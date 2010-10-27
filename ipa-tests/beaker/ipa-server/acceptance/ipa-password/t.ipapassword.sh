@@ -5,10 +5,9 @@
 ipapassword()
 {
     ipapassword_envsetup
-    ipapassword_globalpolicy
-    ipapassword_grouppolicy
-#    ipapassword_globalandgroup
-#    ipapassword_nestedgroup
+#    ipapassword_globalpolicy
+#    ipapassword_grouppolicy
+    ipapassword_nestedgroup
     ipapassword_envcleanup
 } # ipapassword
 
@@ -66,17 +65,6 @@ ipapassword_grouppolicy()
     ipapassword_grouppolicy_length_negative
     ipapassword_grouppolicy_envcleanup
 } #ipapassword_grouppolicy
-
-ipapassword_globalandgroup()
-{
-    ipapassword_globalandgroup_envsetup
-    ipapassword_globalandgrouppw_maxlife_conflict
-    ipapassword_globalandgrouppw_minlife_conflict
-    ipapassword_globalandgrouppw_history_conflict
-    ipapassword_globalandgrouppw_classes_conflict
-    ipapassword_globalandgrouppw_length_conflict
-    ipapassword_globalandgroup_envcleanup
-} #ipapassword_globalandgroup
 
 ipapassword_nestedgroup()
 {
@@ -2213,119 +2201,11 @@ ipapassword_grouppolicy_length_negative_logic()
     # test logic ends
 } # ipapassword_grouppolicy_length_negative_logic 
 
-ipapassword_globalandgroup_envsetup()
-{
-    rlPhaseStartSetup "ipapassword_globalandgroup_envsetup"
-        #environment setup starts here
-
-        #environment setup ends   here
-    rlPhaseEnd
-} #ipapassword_globalandgroup_envsetup
-
-ipapassword_globalandgroup_envcleanup()
-{
-    rlPhaseStartCleanup "ipapassword_globalandgroup_envcleanup"
-        #environment cleanup starts here
-
-        #environment cleanup ends   here
-    rlPhaseEnd
-} #ipapassword_globalandgroup_envcleanup
-
-ipapassword_globalandgrouppw_maxlife_conflict()
-{
-# looped data   : 
-# non-loop data : 
-    rlPhaseStartTest "ipapassword_globalandgrouppw_maxlife_conflict"
-        rlLog ""
-        ipapassword_globalandgrouppw_maxlife_conflict_logic
-    rlPhaseEnd
-} #ipapassword_globalandgrouppw_maxlife_conflict
-
-ipapassword_globalandgrouppw_maxlife_conflict_logic()
-{
-    # accept parameters: NONE
-    # test logic starts
-        rlFail "EMPTY LOGIC"
-    # test logic ends
-} # ipapassword_globalandgrouppw_maxlife_conflict_logic 
-
-ipapassword_globalandgrouppw_minlife_conflict()
-{
-# looped data   : 
-# non-loop data : 
-    rlPhaseStartTest "ipapassword_globalandgrouppw_minlife_conflict"
-        rlLog "when group setting for minlife < global minlife setting"
-        ipapassword_globalandgrouppw_minlife_conflict_logic
-    rlPhaseEnd
-} #ipapassword_globalandgrouppw_minlife_conflict
-
-ipapassword_globalandgrouppw_minlife_conflict_logic()
-{
-    # accept parameters: NONE
-    # test logic starts
-        rlFail "EMPTY LOGIC"
-    # test logic ends
-} # ipapassword_globalandgrouppw_minlife_conflict_logic 
-
-ipapassword_globalandgrouppw_history_conflict()
-{
-# looped data   : 
-# non-loop data : 
-    rlPhaseStartTest "ipapassword_globalandgrouppw_history_conflict"
-        rlLog ""
-        ipapassword_globalandgrouppw_history_conflict_logic
-    rlPhaseEnd
-} #ipapassword_globalandgrouppw_history_conflict
-
-ipapassword_globalandgrouppw_history_conflict_logic()
-{
-    # accept parameters: NONE
-    # test logic starts
-        rlFail "EMPTY LOGIC"
-    # test logic ends
-} # ipapassword_globalandgrouppw_history_conflict_logic 
-
-ipapassword_globalandgrouppw_classes_conflict()
-{
-# looped data   : 
-# non-loop data : 
-    rlPhaseStartTest "ipapassword_globalandgrouppw_classes_conflict"
-        rlLog "when group classes > global classes"
-        ipapassword_globalandgrouppw_classes_conflict_logic
-    rlPhaseEnd
-} #ipapassword_globalandgrouppw_classes_conflict
-
-ipapassword_globalandgrouppw_classes_conflict_logic()
-{
-    # accept parameters: NONE
-    # test logic starts
-        rlFail "EMPTY LOGIC"
-    # test logic ends
-} # ipapassword_globalandgrouppw_classes_conflict_logic 
-
-ipapassword_globalandgrouppw_length_conflict()
-{
-# looped data   : 
-# non-loop data : 
-    rlPhaseStartTest "ipapassword_globalandgrouppw_length_conflict"
-        rlLog "when group length > global length"
-        ipapassword_globalandgrouppw_length_conflict_logic
-    rlPhaseEnd
-} #ipapassword_globalandgrouppw_length_conflict
-
-ipapassword_globalandgrouppw_length_conflict_logic()
-{
-    # accept parameters: NONE
-    # test logic starts
-        rlFail "EMPTY LOGIC"
-    # test logic ends
-} # ipapassword_globalandgrouppw_length_conflict_logic 
-
 ipapassword_nestedgroup_envsetup()
 {
     rlPhaseStartSetup "ipapassword_nestedgroup_envsetup"
         #environment setup starts here
-
+        prepare_nestedgrp_testenv
         #environment setup ends   here
     rlPhaseEnd
 } #ipapassword_nestedgroup_envsetup
@@ -2334,7 +2214,7 @@ ipapassword_nestedgroup_envcleanup()
 {
     rlPhaseStartCleanup "ipapassword_nestedgroup_envcleanup"
         #environment cleanup starts here
-
+        cleanup_nestedgrp_testenv
         #environment cleanup ends   here
     rlPhaseEnd
 } #ipapassword_nestedgroup_envcleanup
@@ -2344,16 +2224,68 @@ ipapassword_nestedgrouppw_maxlife_conflict()
 # looped data   : 
 # non-loop data : 
     rlPhaseStartTest "ipapassword_nestedgrouppw_maxlife_conflict"
-        rlLog ""
-        ipapassword_nestedgrouppw_maxlife_conflict_logic
+        # set other password policy constrain to 0
+        KinitAsAdmin
+        rlRun "ipa pwpolicy-mod $testgrp  \
+                   --minlife=0 --history=0 --minclasses=0 --minlength=0"\
+               0 "setup pwpolicy [$testgrp]"
+        rlRun "ipa pwpolicy-mod $nestedgrp \
+                   --minlife=0 --history=0 --minclasses=0 --minlength=0"\
+               0 "setup pwpolicy [$nestedgrp]"
+        # member testac belongs to nestedgrp, who is member of testgrp
+        # testgrp group-pwpolicy has priority 6
+        # nestedgrp group-pwpolicy has prioirty 7
+        # therefore user "testac" should follow testgrp (the one has lower number)
+#FIXME
+        maxlife=`getrandomint 2 10` # in days
+        below=$((maxlife - 1 ))
+        above=$((maxlife + 1 ))
+        rlRun "ipa pwpolicy-mod $testgrp --maxlife=$maxlife" \
+              0 "set maxlife for [$testgrp] to [$maxlife]"
+        rlRun "ipa pwpolicy-mod $nestedgrp --maxlife=$below" \
+              0 "set maxlife for [$nestedgrp] to [$below]"
+        rlRun "$kdestroy"
+
+        rlRun "echo $testacPW | kinit $testac 2>&1 >/dev/null" 0 "check current password"
+        rlRun "$kdestroy"
+        # set system one minute before $below, same password should work withoud password change prompt
+        set_systime "+ $below * 24 * 60 * 60 - 1 * 60"
+        rlRun "echo $testacPW | kinit $testac 2>&1 >/dev/null" 0 "no password change prompt"
+        set_systime "+ 1 * 24 * 60 * 60 "
+        rlRun "echo $testacPW | kinit $testac 2>&1 >/dev/null" 0 "no password change prompt"
+        set_systime "+ 2*60"
+        rlRun "echo $testacPW | kinit $testac 2>&1 >/dev/null" 1 "password change prompt"
+
+        # reset the test ac
+        add_test_ac
+        append_test_nested_ac
+        KinitAsAdmin
+        rlRun "ipa pwpolicy-mod $nestedgrp --maxlife=$above" \
+              0 "set maxlife for [$nestedgrp] to [$above]"
+        rlRun "$kdestroy"
+
+        rlRun "echo $testacPW | kinit $testac 2>&1 >/dev/null" 0 "check current password"
+        rlRun "$kdestroy"
+        # set system one minute before $below, same password should work withoud password change prompt
+        set_systime "+ $maxlife * 24 * 60 * 60 - 1 * 60"
+        rlRun "echo $testacPW | kinit $testac 2>&1 >/dev/null" 0 "no password change prompt"
+        set_systime "+ 1 * 24 * 60 * 60 "
+        rlRun "echo $testacPW | kinit $testac 2>&1 >/dev/null" 1 "no password change prompt"
+        set_systime "+ 2*60"
+        rlRun "echo $testacPW | kinit $testac 2>&1 >/dev/null" 1 "password change prompt"
+
     rlPhaseEnd
 } #ipapassword_nestedgrouppw_maxlife_conflict
 
 ipapassword_nestedgrouppw_maxlife_conflict_logic()
 {
-    # accept parameters: NONE
+    # accept parameters: 
+    #   $1= maxlife of testgrp`
+    #   $2= maxlife of nestedgrp
+    #   $3= expected result
     # test logic starts
-        rlFail "EMPTY LOGIC"
+       # black
+       echo "empty function" 
     # test logic ends
 } # ipapassword_nestedgrouppw_maxlife_conflict_logic 
 
@@ -2363,7 +2295,40 @@ ipapassword_nestedgrouppw_minlife_conflict()
 # non-loop data : 
     rlPhaseStartTest "ipapassword_nestedgrouppw_minlife_conflict"
         rlLog "when group setting for minlife < global minlife setting"
-        ipapassword_nestedgrouppw_minlife_conflict_logic
+        KinitAsAdmin
+        rlRun "ipa pwpolicy-mod $testgrp \
+                --maxlife=100 --history=0 --minclasses=0 --minlength=0"\
+              0 "set other password constrains to 0 for [$testgrp]"
+        rlRun "ipa pwpolicy-mod $nestedgrp\
+                --maxlife=100 --history=0 --minclasses=0 --minlength=0"\
+              0 "set other password constrains to 0 for [$nestedgrp]"
+        minlife=`getrandomint 2 100` # in hours
+        below=$((minlife - 1))
+        above=$((minlife + 1))
+        rlRun "ipa pwpolicy-mod --minlife=$minlife $testgrp"  0 "set minlife to [$minlife] for [$tesgrp]"
+        rlRun "ipa pwpolicy-mod --minlife=$below $nestedgrp"  0 "set minlife to [$below] for [$nestedgrp]"
+        rlRun "$kdestroy"
+
+        add_test_ac
+        append_test_nested_ac
+        currentPW=$testacPW
+        set_systime "+ $minlife * 60 * 60 - 2 * 60" # set system two minutes before minlife
+        rlRun "echo $currentPW | kinit $testac 2>&1 > /dev/null" 0  "check password before test"
+        change_password $testac $currentPW "dummy123"
+        if [ $? -eq 0 ];then
+            rlFail "change password success is not expected"
+            currentPW="dummy123"
+        else
+            rlPass "change password failed is expected"
+        fi 
+        set_systime "+ 3 * 60 " # set system one minutes after minlife
+        rlRun "echo $currentPW | kinit $testac 2>&1 > /dev/null" 0  "check password before test"
+        change_password $testac $currentPW "again_dummy123"
+        if [ $? -eq 0 ];then
+            rlPass "change password success is expected"
+        else
+            rlFail "change password failed is NOT expected"
+        fi
     rlPhaseEnd
 } #ipapassword_nestedgrouppw_minlife_conflict
 
@@ -2371,7 +2336,7 @@ ipapassword_nestedgrouppw_minlife_conflict_logic()
 {
     # accept parameters: NONE
     # test logic starts
-        rlFail "EMPTY LOGIC"
+        echo "empty function"
     # test logic ends
 } # ipapassword_nestedgrouppw_minlife_conflict_logic 
 
