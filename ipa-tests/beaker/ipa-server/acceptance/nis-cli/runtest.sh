@@ -38,14 +38,20 @@
 . /usr/share/beakerlib/beakerlib.sh
 . /dev/shm/ipa-server-shared.sh
 
-# Include test case file
-. ./t.nis-cli.sh
-
 PACKAGE="ipa-server"
+
+# Init master var
+master = 0;
 
 ##########################################
 #   test main 
 #########################################
+
+# Determine if this is a master
+
+if [ "$MASTER" = "$HOSTNAME" ]; then 
+	master = 1;
+fi
 
 rlJournalStart
     rlPhaseStartSetup "nis-cli startup: Check for ipa-server package"
@@ -54,8 +60,56 @@ rlJournalStart
         rlRun "pushd $TmpDir"
     rlPhaseEnd
 
+	rlPhaseStartTest "Installing rpcbind yptools"
+		yum -y install wget rpcbind
+	rlPhaseEnd
+
+if [ $master -eq 1 ]; then
+	echo $ADMINPW > /dev/shm/password
+	ipa-compat-manage -y /dev/shm/password enable
+	ipa-nis-manage -y /dev/shm/password enable
+	/etc/init.d/rpcbind restart
+	/etc/init.d/dirsrv restart
+	# populating file that lets other machines know that nis is configured.
+	touch /var/www/html/nisconfigured.html
+	chmod 755 /var/www/html/nisconfigured.html
+	/etc/init.d/httpd restart
+fi
+
+# If this is a client, wait until the master server is setup before continuing.
+serverdone = 0;
+while [ $serverdone -eq 0 ]; do
+	cd /dev/shm;wget http://$MASTER/nisconfigured.html
+	if [ $? -ne 0 ]; then
+		echo "NIS not configured on master yet, waiting 60 sec"
+		sleep 60
+	else
+		echo "NIS configured on master!"
+		serverdone = 1;
+	fi
+done
+
     # r2d2_test_starts
-    nis-cli
+	rlPhaseStartTest "Get admin ticket"
+	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+	rlPhaseEnd
+
+	rlPhaseStartTest "check to see if ypcat can enumerate passwd"
+	rlRun "ypcat -h $MASTER -d $DOMAIN passwd" 0 "Check to see that passwd can be enumerated"
+	rlPhaseEnd
+
+	rlPhaseStartTest "check to see if ypcat can enumerate group"
+	rlRun "ypcat -h $MASTER -d $DOMAIN group" 0 "Check to see that group can be enumerated"
+	rlPhaseEnd
+
+	rlPhaseStartTest "check to see if ypcat can enumerate netgroup"
+	rlRun "ypcat -h $MASTER -d $DOMAIN netgroup" 0 "Check to see that netgroup can be enumerated"
+	rlPhaseEnd
+
+	rlPhaseStartTest "check to see if ypcat cannot enumerate badgroup"
+	rlRun "ypcat -h $MASTER -d $DOMAIN badgroup" 1 "Check to see that badgroup can not be enumerated"
+	rlPhaseEnd
+
     # r2d2_test_ends
 
     rlPhaseStartCleanup "nis-cli cleanup"
