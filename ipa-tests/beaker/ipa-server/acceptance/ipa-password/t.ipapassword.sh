@@ -667,11 +667,12 @@ ipapassword_globalpolicy_classes_default_logic()
                 classLevel=$minclasses
                 while [ $classLevel -lt $n ]
                 do
-                    pwout=$TmpDir/pwout.$RANDOM.out
-                    rlLog "password out file: [$pwout]"
-                    generate_password $classLevel $globalpw_length $pwout
-                    pw=`cat $pwout`
-                    rm $pwout
+                    #pwout=$TmpDir/pwout.$RANDOM.out
+                    #rlLog "password out file: [$pwout]"
+                    #generate_password $classLevel $globalpw_length $pwout
+                    #pw=`cat $pwout`
+                    #rm $pwout
+                    pw=`generate_password $classLevel $globalpw_length`
                     rlLog "generate password [$pw] with [$classLevel] classes"
                     rlRun "echo $testacPW | kinit $testac 2>&1 >/dev/null" 0 "make sure currentPW work"
                     change_password $testac $testacPW $pw
@@ -687,10 +688,11 @@ ipapassword_globalpolicy_classes_default_logic()
                 while [ $classLevel -lt $maxclasses ]
                 do  
                     #classesLevel will grow from n to 4
-                    pwout=$TmpDir/pwout.$RANDOM.out
-                    generate_password $classLevel $globalpw_length $pwout
-                    pw=`cat $pwout`
-                    rm $pwout
+                    #pwout=$TmpDir/pwout.$RANDOM.out
+                    #generate_password $classLevel $globalpw_length $pwout
+                    #pw=`cat $pwout`
+                    #rm $pwout
+                    pw=`generate_password $classLevel $globalpw_length`
                     rlLog "generate password [$pw] with [$classLevel] classes"
                     rlRun "echo \"$currentPW\"| kinit $testac 2>&1 >/dev/null" 0 "make sure currentPW work"
                     change_password $testac "$currentPW" "$pw"
@@ -762,10 +764,11 @@ ipapassword_globalpolicy_classes_lowerbound_logic()
                 num_of_test=8
                 while [ $i -lt $num_of_test ]
                 do
-                    pwout="$TmpDir/pwout.$RANDOM.out"
-                    generate_password $classLevel $globalpw_length "$pwout"
-                    pw=`cat $pwout`
-                    rm $pwout
+                    #pwout="$TmpDir/pwout.$RANDOM.out"
+                    #generate_password $classLevel $globalpw_length "$pwout"
+                    #pw=`cat $pwout`
+                    #rm $pwout
+                    pw=`generate_password $classLevel $globalpw_length`
                     rlLog "[test $i]: now change to new password [$pw]"
                     rlRun "echo \"$currentPW\"| kinit $testac 2>&1 >/dev/null" 0 "make sure currentPW work"
                     change_password $testac $currentPW $pw
@@ -838,11 +841,12 @@ ipapassword_globalpolicy_classes_upperbound_logic()
                 classLevel=$minclasses
                 while [ $classLevel -lt $n ]
                 do
-                    pwout=$TmpDir/pwout.$RANDOM.out
-                    rlLog "password out file: [$pwout]"
-                    generate_password $classLevel $globalpw_length $pwout
-                    pw=`cat $pwout`
-                    rm $pwout
+                    #pwout=$TmpDir/pwout.$RANDOM.out
+                    #rlLog "password out file: [$pwout]"
+                    #generate_password $classLevel $globalpw_length $pwout
+                    #pw=`cat $pwout`
+                    #rm $pwout
+                    pw=`generate_password $classLevel $globalpw_length`
                     rlLog "generate password [$pw] with [$classLevel] classes"
                     rlRun "echo \"$testacPW\"| kinit $testac 2>&1 >/dev/null" 0 "make sure currentPW work"
                     change_password $testac $testacPW $pw
@@ -858,10 +862,11 @@ ipapassword_globalpolicy_classes_upperbound_logic()
                 while [ $classLevel -lt $maxclasses ]
                 do  
                     #classesLevel will grow from n to 4
-                    pwout=$TmpDir/pwout.$RANDOM.out
-                    generate_password $classLevel $globalpw_length $pwout
-                    pw=`cat $pwout`
-                    rm $pwout
+                    #pwout=$TmpDir/pwout.$RANDOM.out
+                    #generate_password $classLevel $globalpw_length $pwout
+                    #pw=`cat $pwout`
+                    #rm $pwout
+                    pw=`generate_password $classLevel $globalpw_length`
                     rlLog "generate password [$pw] with [$classLevel] classes"
                     rlRun "echo \"$currentPW\"| kinit $testac 2>&1 >/dev/null" 0 "make sure currentPW work"
                     change_password $testac "$currentPW" "$pw"
@@ -953,11 +958,12 @@ ipapassword_globalpolicy_length_default_logic()
             number=$RANDOM
             let "number %= 4"
             classLevel=$((number+1)) #classLevel rotate between 1-4
-            pwout=$TmpDir/pwout.$RANDOM.out
+            #pwout=$TmpDir/pwout.$RANDOM.out
             rlLog "minlength=[$globalpw_length], current len [$length],class=[$classLevel] number=[$number]"
-            generate_password $classLevel $length $pwout
-            pw=`cat $pwout`
-            rm $pwout
+            #generate_password $classLevel $length $pwout
+            #pw=`cat $pwout`
+            #rm $pwout
+            pw=`generate_password $classLevel $length`
             rlLog "minlength=[$globalpw_length], current len [$length],password=[$pw]"
             rlRun "echo $testacPW | kinit $testac 2>&1 >/dev/null" 0 "validating current password"
             change_password $testac $testacPW $pw    
@@ -976,11 +982,12 @@ ipapassword_globalpolicy_length_default_logic()
             number=$RANDOM
             let "number %= 4"
             classLevel=$((number+1)) #classLevel rotate between 1-4
-            pwout=$TmpDir/pwout.$RANDOM.out
+            #pwout=$TmpDir/pwout.$RANDOM.out
             rlLog "minlength=[$globalpw_length], current len [$length],class=[$classLevel] number=[$number]"
-            generate_password $classLevel $length $pwout
-            pw=`cat $pwout`
-            rm $pwout
+            #generate_password $classLevel $length $pwout
+            #pw=`cat $pwout`
+            #rm $pwout
+            pw=`generate_password $classLevel $length`
             rlLog "minlength=[$globalpw_length], current len [$length],password=[$pw]"
             rlRun "echo $currentPW | kinit $testac 2>&1 >/dev/null" 0 "validating current password"
             change_password $testac $currentPW $pw    
@@ -1097,10 +1104,11 @@ ipapassword_globalpolicy_length_upperbound_logic()
                 number=$RANDOM
                 let "number %= 4"
                 classLevel=$((number+1)) #classLevel rotate between 1-4
-                pwout=$TmpDir/pwout.$RANDOM.out
-                generate_password $classLevel $below $pwout
-                pw=`cat $pwout`
-                rm $pwout
+                #pwout=$TmpDir/pwout.$RANDOM.out
+                #generate_password $classLevel $below $pwout
+                #pw=`cat $pwout`
+                #rm $pwout
+                pw=`generate_password $classLevel $below`
                 rlLog "minlength=[$edge], current len [$below],password=[$pw]"
                 rlRun "echo $currentPW | kinit $testac 2>&1 >/dev/null" 0 "validating current password"
                 change_password $testac $currentPW $pw    
@@ -1117,11 +1125,12 @@ ipapassword_globalpolicy_length_upperbound_logic()
                 number=$RANDOM
                 let "number %= 4"
                 classLevel=$((number+1)) #classLevel rotate between 1-4
-                pwout=$TmpDir/pwout.$RANDOM.out
+                #pwout=$TmpDir/pwout.$RANDOM.out
                 rlLog "minlength=[$edge], current len [$edge],class=[$classLevel] number=[$number]"
-                generate_password $classLevel $edge $pwout
-                pw=`cat $pwout`
-                rm $pwout
+                #generate_password $classLevel $edge $pwout
+                #pw=`cat $pwout`
+                #rm $pwout
+                pw=`generate_password $classLevel $edge`
                 rlLog "minlength=[$edge], current len [$edge],password=[$pw]"
                 rlRun "echo $currentPW | kinit $testac 2>&1 >/dev/null" 0 "validating current password"
                 change_password $testac $currentPW $pw    
@@ -1139,10 +1148,11 @@ ipapassword_globalpolicy_length_upperbound_logic()
                 number=$RANDOM
                 let "number %= 4"
                 classLevel=$((number+1)) #classLevel rotate between 1-4
-                pwout=$TmpDir/pwout.$RANDOM.out
-                generate_password $classLevel $upper $pwout
-                pw=`cat $pwout`
-                rm $pwout
+                #pwout=$TmpDir/pwout.$RANDOM.out
+                #generate_password $classLevel $upper $pwout
+                #pw=`cat $pwout`
+                #rm $pwout
+                pw=`generate_password $classLevel $upper`
                 rlLog "minlength=[$edge], current len [$upper],password=[$pw]"
                 rlRun "echo $currentPW | kinit $testac 2>&1 >/dev/null" 0 "validating current password"
                 change_password $testac $currentPW $pw    
@@ -1674,11 +1684,12 @@ ipapassword_grouppolicy_classes_default_logic()
                 classLevel=$minclasses
                 while [ $classLevel -lt $n ]
                 do
-                    pwout=$TmpDir/pwout.$RANDOM.out
-                    rlLog "password out file: [$pwout]"
-                    generate_password $classLevel $grouppw_length $pwout
-                    pw=`cat $pwout`
-                    rm $pwout
+                    #pwout=$TmpDir/pwout.$RANDOM.out
+                    #rlLog "password out file: [$pwout]"
+                    #generate_password $classLevel $grouppw_length $pwout
+                    #pw=`cat $pwout`
+                    #rm $pwout
+                    pw=`generate_password $classLevel $grouppw_length`
                     rlLog "generate password [$pw] with [$classLevel] classes"
                     rlRun "echo $testacPW | kinit $testac 2>&1 >/dev/null" 0 "make sure currentPW work"
                     change_password $testac $testacPW $pw
@@ -1694,10 +1705,11 @@ ipapassword_grouppolicy_classes_default_logic()
                 while [ $classLevel -lt $maxclasses ]
                 do  
                     #classesLevel will grow from n to 4
-                    pwout=$TmpDir/pwout.$RANDOM.out
-                    generate_password $classLevel $globalpw_length $pwout
-                    pw=`cat $pwout`
-                    rm $pwout
+                    #pwout=$TmpDir/pwout.$RANDOM.out
+                    #generate_password $classLevel $globalpw_length $pwout
+                    #pw=`cat $pwout`
+                    #rm $pwout
+                    pw=`generate_password $classLevel $globalpw_length`
                     rlLog "generate password [$pw] with [$classLevel] classes"
                     rlRun "echo \"$currentPW\"| kinit $testac 2>&1 >/dev/null" 0 "make sure currentPW work"
                     change_password $testac "$currentPW" "$pw"
@@ -1770,10 +1782,11 @@ ipapassword_grouppolicy_classes_lowerbound_logic()
                 num_of_test=8
                 while [ $i -lt $num_of_test ]
                 do
-                    pwout="$TmpDir/pwout.$RANDOM.out"
-                    generate_password $classLevel $globalpw_length "$pwout"
-                    pw=`cat $pwout`
-                    rm $pwout
+                    #pwout="$TmpDir/pwout.$RANDOM.out"
+                    #generate_password $classLevel $globalpw_length "$pwout"
+                    #pw=`cat $pwout`
+                    #rm $pwout
+                    pw=`generate_password $classLevel $globalpw_length`
                     rlLog "[test $i]: now change to new password [$pw]"
                     rlRun "echo \"$currentPW\"| kinit $testac 2>&1 >/dev/null" 0 "make sure currentPW work"
                     change_password $testac $currentPW $pw
@@ -1848,11 +1861,12 @@ ipapassword_grouppolicy_classes_upperbound_logic()
                 classLevel=$minclasses
                 while [ $classLevel -lt $n ]
                 do
-                    pwout=$TmpDir/pwout.$RANDOM.out
-                    rlLog "password out file: [$pwout]"
-                    generate_password $classLevel $grouppw_length $pwout
-                    pw=`cat $pwout`
-                    rm $pwout
+                    #pwout=$TmpDir/pwout.$RANDOM.out
+                    #rlLog "password out file: [$pwout]"
+                    #generate_password $classLevel $grouppw_length $pwout
+                    #pw=`cat $pwout`
+                    #rm $pwout
+                    pw=`generate_password $classLevel $grouppw_length`
                     rlLog "generate password [$pw] with [$classLevel] classes"
                     rlRun "echo \"$testacPW\"| kinit $testac 2>&1 >/dev/null" 0 "make sure currentPW work"
                     change_password $testac $testacPW $pw
@@ -1868,10 +1882,11 @@ ipapassword_grouppolicy_classes_upperbound_logic()
                 while [ $classLevel -lt $maxclasses ]
                 do  
                     #classesLevel will grow from n to 4
-                    pwout=$TmpDir/pwout.$RANDOM.out
-                    generate_password $classLevel $grouppw_length $pwout
-                    pw=`cat $pwout`
-                    rm $pwout
+                    #pwout=$TmpDir/pwout.$RANDOM.out
+                    #generate_password $classLevel $grouppw_length $pwout
+                    #pw=`cat $pwout`
+                    #rm $pwout
+                    pw=`generate_password $classLevel $grouppw_length`
                     rlLog "generate password [$pw] with [$classLevel] classes"
                     rlRun "echo \"$currentPW\"| kinit $testac 2>&1 >/dev/null" 0 "make sure currentPW work"
                     change_password $testac "$currentPW" "$pw"
@@ -1964,11 +1979,12 @@ ipapassword_grouppolicy_length_default_logic()
             number=$RANDOM
             let "number %= 4"
             classLevel=$((number+1)) #classLevel rotate between 1-4
-            pwout=$TmpDir/pwout.$RANDOM.out
+            #pwout=$TmpDir/pwout.$RANDOM.out
             rlLog "minlength=[$grouppw_length], current len [$length],class=[$classLevel] number=[$number]"
-            generate_password $classLevel $length $pwout
-            pw=`cat $pwout`
-            rm $pwout
+            #generate_password $classLevel $length $pwout
+            #pw=`cat $pwout`
+            #rm $pwout
+            pw=`generate_password $classLevel $length`
             rlLog "minlength=[$grouppw_length], current len [$length],password=[$pw]"
             rlRun "echo $testacPW | kinit $testac 2>&1 >/dev/null" 0 "validating current password"
             change_password $testac $testacPW $pw    
@@ -1987,11 +2003,12 @@ ipapassword_grouppolicy_length_default_logic()
             number=$RANDOM
             let "number %= 4"
             classLevel=$((number+1)) #classLevel rotate between 1-4
-            pwout=$TmpDir/pwout.$RANDOM.out
+            #pwout=$TmpDir/pwout.$RANDOM.out
             rlLog "minlength=[$grouppw_length], current len [$length],class=[$classLevel] number=[$number]"
-            generate_password $classLevel $length $pwout
-            pw=`cat $pwout`
-            rm $pwout
+            #generate_password $classLevel $length $pwout
+            #pw=`cat $pwout`
+            #rm $pwout
+            pw=`generate_password $classLevel`
             rlLog "minlength=[$grouppw_length], current len [$length],password=[$pw]"
             rlRun "echo $currentPW | kinit $testac 2>&1 >/dev/null" 0 "validating current password"
             change_password $testac $currentPW $pw    
@@ -2113,10 +2130,11 @@ ipapassword_grouppolicy_length_upperbound_logic()
                 number=$RANDOM
                 let "number %= 4"
                 classLevel=$((number+1)) #classLevel rotate between 1-4
-                pwout=$TmpDir/pwout.$RANDOM.out
-                generate_password $classLevel $below $pwout
-                pw=`cat $pwout`
-                rm $pwout
+                #pwout=$TmpDir/pwout.$RANDOM.out
+                #generate_password $classLevel $below $pwout
+                #pw=`cat $pwout`
+                #rm $pwout
+                pw=`generate_password $classLevel $below`
                 rlLog "minlength=[$edge], current len [$below],password=[$pw]"
                 rlRun "echo $currentPW | kinit $testac 2>&1 >/dev/null" 0 "validating current password"
                 change_password $testac $currentPW $pw    
@@ -2133,11 +2151,12 @@ ipapassword_grouppolicy_length_upperbound_logic()
                 number=$RANDOM
                 let "number %= 4"
                 classLevel=$((number+1)) #classLevel rotate between 1-4
-                pwout=$TmpDir/pwout.$RANDOM.out
+                #pwout=$TmpDir/pwout.$RANDOM.out
                 rlLog "minlength=[$edge], current len [$edge],class=[$classLevel] number=[$number]"
-                generate_password $classLevel $edge $pwout
-                pw=`cat $pwout`
-                rm $pwout
+                #generate_password $classLevel $edge $pwout
+                #pw=`cat $pwout`
+                #rm $pwout
+                pw=`generate_password $classLevel $edge`
                 rlLog "minlength=[$edge], current len [$edge],password=[$pw]"
                 rlRun "echo $currentPW | kinit $testac 2>&1 >/dev/null" 0 "validating current password"
                 change_password $testac $currentPW $pw    
@@ -2155,10 +2174,11 @@ ipapassword_grouppolicy_length_upperbound_logic()
                 number=$RANDOM
                 let "number %= 4"
                 classLevel=$((number+1)) #classLevel rotate between 1-4
-                pwout=$TmpDir/pwout.$RANDOM.out
-                generate_password $classLevel $upper $pwout
-                pw=`cat $pwout`
-                rm $pwout
+                #pwout=$TmpDir/pwout.$RANDOM.out
+                #generate_password $classLevel $upper $pwout
+                #pw=`cat $pwout`
+                #rm $pwout
+                pw=`generate_password $classLevel $upper`
                 rlLog "minlength=[$edge], current len [$upper],password=[$pw]"
                 rlRun "echo $currentPW | kinit $testac 2>&1 >/dev/null" 0 "validating current password"
                 change_password $testac $currentPW $pw    
@@ -2345,16 +2365,88 @@ ipapassword_nestedgrouppw_history_conflict()
 # looped data   : 
 # non-loop data : 
     rlPhaseStartTest "ipapassword_nestedgrouppw_history_conflict"
-        rlLog ""
-        ipapassword_nestedgrouppw_history_conflict_logic
-    rlPhaseEnd
+        rlLog "when group setting for minlife < global minlife setting"
+        KinitAsAdmin
+        rlRun "ipa pwpolicy-mod $testgrp \
+                --maxlife=100 --minlife=0 --minclasses=0 --minlength=0"\
+              0 "set other password constrains to 0 for [$testgrp]"
+        rlRun "ipa pwpolicy-mod $nestedgrp\
+                --maxlife=100 --minlife=0 --minclasses=0 --minlength=0"\
+              0 "set other password constrains to 0 for [$nestedgrp]"
+        history=`getrandomint 2 20` 
+        below=$((history - 1))
+        above=$((history + 1))
+        rlRun "ipa pwpolicy-mod --history=$history $testgrp"  0 "set history to [$history] for [$tesgrp]"
+        rlRun "ipa pwpolicy-mod --history=$below $nestedgrp"  0 "set history to [$below] for [$nestedgrp]"
+        rlRun "$kdestroy"
+
+        add_test_ac
+        append_test_nested_ac
+        ipapassword_nestedgrouppw_history_conflict_logic $history
+
+        # change the history size of nestedgrp pwpolicy to above, and the actual effected historysize should
+        # be the same as above
+        KinitAsAdmin
+        rlRun "ipa pwpolicy-mod --history=$above $nestedgrp"  0 "set history to [$above] for [$nestedgrp]"
+        rlRun "$kdestroy"
+        add_test_ac
+        append_test_nested_ac
+        ipapassword_nestedgrouppw_history_conflict_logic $history
+
+     rlPhaseEnd
 } #ipapassword_nestedgrouppw_history_conflict
 
 ipapassword_nestedgrouppw_history_conflict_logic()
 {
     # accept parameters: NONE
     # test logic starts
-        rlFail "EMPTY LOGIC"
+        local history=$1
+        local currentPW=$testacPW
+        local counter=1
+        local passwordPool=" $currentPW"
+        local failedPool=""
+        local newPW=""
+
+        while [ $counter -lt $history ];do
+            newPW=`generate_password 4 10` #FIXME
+            rlRun "echo $currentPW | kinit $testac 2>&1 >/dev/null"
+            change_password $testac $currentPW "$newPW"
+            if [ $? -eq 0 ];then
+                passwordPool="$passwordPool $newPW"
+                currentPW=$newPW
+            else
+                rlFail "change password failed is NOT expected"
+            fi
+            counter=$((counter+1))
+        done
+        # all password in password pool should not be reused
+        for pw in $passwordPool
+        do
+            if [ $currentPW != $pw ];then
+                rlRun "echo $currentPW | kinit $testac 2>&1 >/dev/null"
+                change_password $testac $currentPW "$pw"
+                if [ $? -eq 0 ];then
+                    rlFail "password reuse [$pw] is NOT expected"
+                    currentPW=$pw
+                else
+                    failedPool="$failedPool $pw"
+                    rlPass "password reuse failed is expected"
+                fi           
+            fi
+        done 
+        # once we out of above loop, we should be able to change password
+        newPW=`generate_password 4 10` #FIXME
+        rlRun "echo $currentPW | kinit $testac 2>&1 >/dev/null"
+        change_password $testac $currentPW "$newPW"
+        if [ $? -eq 0 ];then
+            rlPass "password change after [$history] times is expected"
+        else
+            rlFail "password change failed is NOT expected"
+        fi
+        rlLog "history size=[$history]"
+        rlLog "passwordPool=[$passwordPool]"
+        rlLog "failedPool  =[$failedPool]"
+
     # test logic ends
 } # ipapassword_nestedgrouppw_history_conflict_logic 
 
@@ -2364,7 +2456,33 @@ ipapassword_nestedgrouppw_classes_conflict()
 # non-loop data : 
     rlPhaseStartTest "ipapassword_nestedgrouppw_classes_conflict"
         rlLog "when group classes > global classes"
-        ipapassword_nestedgrouppw_classes_conflict_logic
+        KinitAsAdmin
+        rlRun "ipa pwpolicy-mod $testgrp \
+                --maxlife=100 --minlife=0 --history=0 --minlength=0"\
+              0 "set other password constrains to 0 for [$testgrp]"
+        rlRun "ipa pwpolicy-mod $nestedgrp\
+                --maxlife=100 --minlife=0 --history=0 --minlength=0"\
+              0 "set other password constrains to 0 for [$nestedgrp]"
+        classes=`getrandomint 2 3` 
+        below=$((classes - 1))
+        above=$((classes + 1))
+        rlRun "ipa pwpolicy-mod --minclasses=$classes $testgrp"  0 "set minclasses to [$classes] for [$tesgrp]"
+        rlRun "ipa pwpolicy-mod --minclasses=$below $nestedgrp"  0 "set minclasses to [$below] for [$nestedgrp]"
+        rlRun "$kdestroy"
+
+        add_test_ac
+        append_test_nested_ac
+        ipapassword_nestedgrouppw_classes_conflict_logic $classes
+
+        # change the minclasses setting of nestedgrp pwpolicy to above, and the actual effected minclasses should
+        # be the same as above
+        KinitAsAdmin
+        rlRun "ipa pwpolicy-mod --minclasses=$above $nestedgrp"  0 "set classes to [$above] for [$nestedgrp]"
+        rlRun "$kdestroy"
+        add_test_ac
+        append_test_nested_ac
+        ipapassword_nestedgrouppw_classes_conflict_logic $classes
+
     rlPhaseEnd
 } #ipapassword_nestedgrouppw_classes_conflict
 
@@ -2372,7 +2490,52 @@ ipapassword_nestedgrouppw_classes_conflict_logic()
 {
     # accept parameters: NONE
     # test logic starts
-        rlFail "EMPTY LOGIC"
+        local classes=$1
+        local i=1
+        local j=0
+        local badPasswordPool=""
+        local goodPasswordPool=""
+        local currentPW=""
+
+        while [ $i -lt $classes ];do
+            while [ $j -lt 8 ];do  #try 8 password to cover more class type
+                badPW=`generate_password $i 10`
+                badPasswordPool="$badPasswordPool $badPW"
+                j=$((j+1))
+            done
+            i=$((i+1))
+        done
+        # after this loop, i==$classes
+        j=0
+        while [ $j -lt 8 ];do  #try 8 password to cover more class type
+            goodPW=`generate_password $i 10`
+            goodPasswordPool="$goodPasswordPool $goodPW"
+            j=$((j+1))
+        done
+        currentPW="$testacPW"
+        for pw in $badPasswordPool;do
+            rlRun "echo $currentPW | kinit $testac 2>&1 >/dev/null"
+            change_password $testac $currentPW $pw
+            if [ $? -eq 0 ];then
+                rlFail "when class=[$classes]: password change to [$pw] is NOT expected"
+                currentPW=$pw
+            else
+                rlPass "when class=[$classes]: password change to [$pw] failed is expected"
+            fi
+        done
+        for pw in $goodPasswordPool;do
+            rlRun "echo $currentPW | kinit $testac 2>&1 >/dev/null"
+            change_password $testac $currentPW $pw
+            if [ $? -eq 0 ];then
+                rlPass "when class=[$classes]: password change to [$pw] is expected"
+                currentPW=$pw
+            else
+                rlFail "when class=[$classes]: password change to [$pw] failed is NOT expected"
+            fi
+        done
+        rlLog "classes=[$classes]"
+        rlLog "bad passwords=[$badPasswordPool]"
+        rlLog "good passwords=[$goodPasswordPool]"
     # test logic ends
 } # ipapassword_nestedgrouppw_classes_conflict_logic 
 
@@ -2382,7 +2545,33 @@ ipapassword_nestedgrouppw_length_conflict()
 # non-loop data : 
     rlPhaseStartTest "ipapassword_nestedgrouppw_length_conflict"
         rlLog "when group length > global length"
-        ipapassword_nestedgrouppw_length_conflict_logic
+        KinitAsAdmin
+        rlRun "ipa pwpolicy-mod $testgrp \
+                --maxlife=100 --minlife=0 --minclasses=0 --history=0"\
+              0 "set other password constrains to 0 for [$testgrp]"
+        rlRun "ipa pwpolicy-mod $nestedgrp\
+                --maxlife=100 --minlife=0 --minclasses=0 --history=0"\
+              0 "set other password constrains to 0 for [$nestedgrp]"
+        length=`getrandomint 2 20` 
+        below=$((length - 1))
+        above=$((length + 1))
+        rlRun "ipa pwpolicy-mod --minlength=$length $testgrp"  0 "set minlength to [$length] for [$tesgrp]"
+        rlRun "ipa pwpolicy-mod --minlength=$below $nestedgrp"  0 "set minlength to [$below] for [$nestedgrp]"
+        rlRun "$kdestroy"
+
+        add_test_ac
+        append_test_nested_ac
+        ipapassword_nestedgrouppw_length_conflict_logic $length
+
+        # change the history size of nestedgrp pwpolicy to above, and the actual effected historysize should
+        # be the same as above
+        KinitAsAdmin
+        rlRun "ipa pwpolicy-mod --minlength=$above $nestedgrp"  0 "set minlength to [$above] for [$nestedgrp]"
+        rlRun "$kdestroy"
+        add_test_ac
+        append_test_nested_ac
+        ipapassword_nestedgrouppw_length_conflict_logic $length
+
     rlPhaseEnd
 } #ipapassword_nestedgrouppw_length_conflict
 
@@ -2390,6 +2579,54 @@ ipapassword_nestedgrouppw_length_conflict_logic()
 {
     # accept parameters: NONE
     # test logic starts
-        rlFail "EMPTY LOGIC"
+        local length=$1
+        local i=1
+        local j=0
+        local classes=0
+        local badPasswordPool=""
+        local goodPasswordPool=""
+        local currentPW=""
+
+        while [ $i -lt $length ];do
+            while [ $j -lt 4 ];do  #try 4 password to cover more class type
+                classes=`getrandomint 1 4`
+                badPW=`generate_password $classes $i`
+                badPasswordPool="$badPasswordPool $badPW"
+                j=$((j+1))
+            done
+            i=$((i+1))
+        done
+        # after this loop, i==$length
+        j=0
+        while [ $j -lt 4 ];do  #try 4 password to cover more class type
+            classes=`getrandomint 1 4`
+            goodPW=`generate_password $classes $i`
+            goodPasswordPool="$goodPasswordPool $goodPW"
+            j=$((j+1))
+        done
+        currentPW="$testacPW"
+        for pw in $badPasswordPool;do
+            rlRun "echo $currentPW | kinit $testac 2>&1 >/dev/null"
+            change_password $testac $currentPW $pw
+            if [ $? -eq 0 ];then
+                rlFail "when length=[$length]: password change to [$pw] is NOT expected"
+                currentPW=$pw
+            else
+                rlPass "when length=[$length]: password change to [$pw] failed is expected"
+            fi
+        done
+        for pw in $goodPasswordPool;do
+            rlRun "echo $currentPW | kinit $testac 2>&1 >/dev/null"
+            change_password $testac $currentPW $pw
+            if [ $? -eq 0 ];then
+                rlPass "when length=[$length]: password change to [$pw] is expected"
+                currentPW=$pw
+            else
+                rlFail "when length=[$length]: password change to [$pw] failed is NOT expected"
+            fi
+        done
+        rlLog "length=[$length]"
+        rlLog "bad passwords=[$badPasswordPool]"
+        rlLog "good passwords=[$goodPasswordPool]"
     # test logic ends
 } # ipapassword_nestedgrouppw_length_conflict_logic 

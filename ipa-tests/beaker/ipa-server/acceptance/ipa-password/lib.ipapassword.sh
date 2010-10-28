@@ -570,7 +570,7 @@ generate_password()
 {
     local classes=$1
     local length=$2
-    local pwoutfile=$3
+    local pwoutfile=$TmpDir/generatepassword.$RANDOM.out
     local randompw=""
     local allclasses="lowerl upperl digit special"
     local selectedclasses=""
@@ -618,7 +618,9 @@ generate_password()
         fi
     done
     # if you want to debug, uncomment the next 2 lines
-    #randompw=`cat $pwoutfile`
+    finalpw=`cat $pwoutfile`
+    rm $pwoutfile
+    echo $finalpw
     #rlLog "generated password : [$randompw] classes=[$classes] length=[$length]"
 } #generate_password
 get_random()
