@@ -5,8 +5,8 @@
 ipapassword()
 {
     ipapassword_envsetup
-#    ipapassword_globalpolicy
-#    ipapassword_grouppolicy
+    ipapassword_globalpolicy
+    ipapassword_grouppolicy
     ipapassword_nestedgroup
     ipapassword_envcleanup
 } # ipapassword
@@ -1118,7 +1118,7 @@ ipapassword_globalpolicy_length_upperbound_logic()
                 else
                     rlPass "password change failed, this is expected"
                 fi               
-
+                rlRun "$kdestroy"
                 ##############################################################
                 # if password length = edge, password changing should success
                 ##############################################################
@@ -1140,7 +1140,7 @@ ipapassword_globalpolicy_length_upperbound_logic()
                 else
                     rlFail "password change failed, this is NOT expected"
                 fi               
-
+                rlRun "$kdestroy"
                 ##############################################################
                 # if password length > edge, password changing should success
                 ##############################################################
@@ -1162,6 +1162,7 @@ ipapassword_globalpolicy_length_upperbound_logic()
                 else
                     rlFail "password change failed, this is NOT expected"
                 fi               
+                rlRun "$kdestroy"
             else
                 rlFail "can not set minlength to [$edge]"
             fi
@@ -1970,10 +1971,11 @@ ipapassword_grouppolicy_length_default_logic()
         local length=1 # length=0 will be tested in lowerbound test case
         local maxlength=15 # we only test upto 15, a resonable assumption
         local pw
-
+        local currentPW=""
         # scenario 1: password change should fail when length < $globalpw_length
         add_test_ac
         append_test_member
+        currentPW=$testacPW
         while [ $length -lt $grouppw_length ]
         do
             number=$RANDOM
@@ -1986,18 +1988,19 @@ ipapassword_grouppolicy_length_default_logic()
             #rm $pwout
             pw=`generate_password $classLevel $length`
             rlLog "minlength=[$grouppw_length], current len [$length],password=[$pw]"
-            rlRun "echo $testacPW | kinit $testac 2>&1 >/dev/null" 0 "validating current password"
+            rlRun "echo $currentPW| kinit $testac 2>&1 >/dev/null" 0 "validating current password"
             change_password $testac $testacPW $pw    
             if [ $? = 0 ];then
                 rlFail "password change success is not expected"
+                currentPW=$pw
             else
                 rlPass "password change failed, this is expected"
             fi
             length=$((length+1))
+            rlRun "$kdestroy"
         done
 
         # scenario 2: password change should success when length < $globalpw_length
-        currentPW=$testacPW
         while [ $length -lt $maxlength ]
         do
             number=$RANDOM
@@ -2008,7 +2011,7 @@ ipapassword_grouppolicy_length_default_logic()
             #generate_password $classLevel $length $pwout
             #pw=`cat $pwout`
             #rm $pwout
-            pw=`generate_password $classLevel`
+            pw=`generate_password $classLevel $length`
             rlLog "minlength=[$grouppw_length], current len [$length],password=[$pw]"
             rlRun "echo $currentPW | kinit $testac 2>&1 >/dev/null" 0 "validating current password"
             change_password $testac $currentPW $pw    
@@ -2019,6 +2022,7 @@ ipapassword_grouppolicy_length_default_logic()
                 rlFail "password change failed, this is NOT expected"
             fi
             length=$((length+1))
+            rlRun "$kdestroy"
         done
     # test logic ends
 } # ipapassword_grouppolicy_length_default_logic 
