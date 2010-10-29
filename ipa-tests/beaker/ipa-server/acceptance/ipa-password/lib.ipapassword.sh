@@ -38,6 +38,34 @@ restart_ipa_passwd()
     rlRun "service ipa_kpasswd restart" 0 "restart ipa_kpasswd"
 } # restart_ipa_passwd
 
+read_pwpolicy()
+{
+#read password policy setting
+    local attr=$1
+    local pwpolicy=$2
+    local out=$TmpDir/read.passwordpolicy.$RANDOM.out
+    local result=""
+    KinitAsAdmin
+    ipa pwpolicy-show $pwpolicy > $out
+    if [ $attr = "history" ];then
+        keyword="History size:"
+    elif [ $attr = "length" ];then
+        keyword="Min length"
+    elif [ $attr = "maxlife" ];then
+        keyword="Max lifetime"
+    elif [ $attr = "minlife" ];then
+        keyword="Min lifetime"
+    elif [ $attr = "classes" ];then
+        keyword="Character classes"
+    else
+        keyword="$attr"
+    fi
+    result=`grep -i "$keyword" | cut -d":" -f2 | xargs echo`
+    rm $out
+    `$kdestroy`
+    echo $result
+} # read_pwpolicy
+
 read_default_policy_setting()
 {
     KinitAsAdmin
@@ -700,11 +728,12 @@ maxlife_default()
     local midpoint=`echo "($minlife + $maxlife)/2" |bc` 
     rlLog "mid point: [$midpoint]"
     set_systime "+ $midpoint"
+    rlRun "$kdestroy"
     rlRun "echo $testacPW | kinit $testac" 0 "kinit as same password between minlife and max life should success"
+    rlRun "$kdestroy"
 
     # when system time > maxlife, ipa server should prompt for password change
     set_systime "+ $midpoint + 60"  # set system time after the max life
-    rlRun "$kdestroy"
     kinit_aftermaxlife $testac $testacPW $testacNEWPW
 } #maxlife_default
 

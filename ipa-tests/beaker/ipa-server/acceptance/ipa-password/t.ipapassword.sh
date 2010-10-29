@@ -667,11 +667,6 @@ ipapassword_globalpolicy_classes_default_logic()
                 classLevel=$minclasses
                 while [ $classLevel -lt $n ]
                 do
-                    #pwout=$TmpDir/pwout.$RANDOM.out
-                    #rlLog "password out file: [$pwout]"
-                    #generate_password $classLevel $globalpw_length $pwout
-                    #pw=`cat $pwout`
-                    #rm $pwout
                     pw=`generate_password $classLevel $globalpw_length`
                     rlLog "generate password [$pw] with [$classLevel] classes"
                     rlRun "echo $testacPW | kinit $testac 2>&1 >/dev/null" 0 "make sure currentPW work"
@@ -688,10 +683,6 @@ ipapassword_globalpolicy_classes_default_logic()
                 while [ $classLevel -lt $maxclasses ]
                 do  
                     #classesLevel will grow from n to 4
-                    #pwout=$TmpDir/pwout.$RANDOM.out
-                    #generate_password $classLevel $globalpw_length $pwout
-                    #pw=`cat $pwout`
-                    #rm $pwout
                     pw=`generate_password $classLevel $globalpw_length`
                     rlLog "generate password [$pw] with [$classLevel] classes"
                     rlRun "echo \"$currentPW\"| kinit $testac 2>&1 >/dev/null" 0 "make sure currentPW work"
@@ -745,7 +736,6 @@ ipapassword_globalpolicy_classes_lowerbound_logic()
         local classLevel
         local temp
         local out=$TmpDir/classeslowerbound.$RANDOM.out
-        local pwout
         local pw
         for classLevel in 0 1
         do
@@ -764,10 +754,6 @@ ipapassword_globalpolicy_classes_lowerbound_logic()
                 num_of_test=8
                 while [ $i -lt $num_of_test ]
                 do
-                    #pwout="$TmpDir/pwout.$RANDOM.out"
-                    #generate_password $classLevel $globalpw_length "$pwout"
-                    #pw=`cat $pwout`
-                    #rm $pwout
                     pw=`generate_password $classLevel $globalpw_length`
                     rlLog "[test $i]: now change to new password [$pw]"
                     rlRun "echo \"$currentPW\"| kinit $testac 2>&1 >/dev/null" 0 "make sure currentPW work"
@@ -841,11 +827,6 @@ ipapassword_globalpolicy_classes_upperbound_logic()
                 classLevel=$minclasses
                 while [ $classLevel -lt $n ]
                 do
-                    #pwout=$TmpDir/pwout.$RANDOM.out
-                    #rlLog "password out file: [$pwout]"
-                    #generate_password $classLevel $globalpw_length $pwout
-                    #pw=`cat $pwout`
-                    #rm $pwout
                     pw=`generate_password $classLevel $globalpw_length`
                     rlLog "generate password [$pw] with [$classLevel] classes"
                     rlRun "echo \"$testacPW\"| kinit $testac 2>&1 >/dev/null" 0 "make sure currentPW work"
@@ -862,10 +843,6 @@ ipapassword_globalpolicy_classes_upperbound_logic()
                 while [ $classLevel -lt $maxclasses ]
                 do  
                     #classesLevel will grow from n to 4
-                    #pwout=$TmpDir/pwout.$RANDOM.out
-                    #generate_password $classLevel $globalpw_length $pwout
-                    #pw=`cat $pwout`
-                    #rm $pwout
                     pw=`generate_password $classLevel $globalpw_length`
                     rlLog "generate password [$pw] with [$classLevel] classes"
                     rlRun "echo \"$currentPW\"| kinit $testac 2>&1 >/dev/null" 0 "make sure currentPW work"
@@ -958,11 +935,7 @@ ipapassword_globalpolicy_length_default_logic()
             number=$RANDOM
             let "number %= 4"
             classLevel=$((number+1)) #classLevel rotate between 1-4
-            #pwout=$TmpDir/pwout.$RANDOM.out
             rlLog "minlength=[$globalpw_length], current len [$length],class=[$classLevel] number=[$number]"
-            #generate_password $classLevel $length $pwout
-            #pw=`cat $pwout`
-            #rm $pwout
             pw=`generate_password $classLevel $length`
             rlLog "minlength=[$globalpw_length], current len [$length],password=[$pw]"
             rlRun "echo $testacPW | kinit $testac 2>&1 >/dev/null" 0 "validating current password"
@@ -982,11 +955,7 @@ ipapassword_globalpolicy_length_default_logic()
             number=$RANDOM
             let "number %= 4"
             classLevel=$((number+1)) #classLevel rotate between 1-4
-            #pwout=$TmpDir/pwout.$RANDOM.out
             rlLog "minlength=[$globalpw_length], current len [$length],class=[$classLevel] number=[$number]"
-            #generate_password $classLevel $length $pwout
-            #pw=`cat $pwout`
-            #rm $pwout
             pw=`generate_password $classLevel $length`
             rlLog "minlength=[$globalpw_length], current len [$length],password=[$pw]"
             rlRun "echo $currentPW | kinit $testac 2>&1 >/dev/null" 0 "validating current password"
@@ -1104,10 +1073,6 @@ ipapassword_globalpolicy_length_upperbound_logic()
                 number=$RANDOM
                 let "number %= 4"
                 classLevel=$((number+1)) #classLevel rotate between 1-4
-                #pwout=$TmpDir/pwout.$RANDOM.out
-                #generate_password $classLevel $below $pwout
-                #pw=`cat $pwout`
-                #rm $pwout
                 pw=`generate_password $classLevel $below`
                 rlLog "minlength=[$edge], current len [$below],password=[$pw]"
                 rlRun "echo $currentPW | kinit $testac 2>&1 >/dev/null" 0 "validating current password"
@@ -1125,11 +1090,7 @@ ipapassword_globalpolicy_length_upperbound_logic()
                 number=$RANDOM
                 let "number %= 4"
                 classLevel=$((number+1)) #classLevel rotate between 1-4
-                #pwout=$TmpDir/pwout.$RANDOM.out
                 rlLog "minlength=[$edge], current len [$edge],class=[$classLevel] number=[$number]"
-                #generate_password $classLevel $edge $pwout
-                #pw=`cat $pwout`
-                #rm $pwout
                 pw=`generate_password $classLevel $edge`
                 rlLog "minlength=[$edge], current len [$edge],password=[$pw]"
                 rlRun "echo $currentPW | kinit $testac 2>&1 >/dev/null" 0 "validating current password"
@@ -1148,10 +1109,6 @@ ipapassword_globalpolicy_length_upperbound_logic()
                 number=$RANDOM
                 let "number %= 4"
                 classLevel=$((number+1)) #classLevel rotate between 1-4
-                #pwout=$TmpDir/pwout.$RANDOM.out
-                #generate_password $classLevel $upper $pwout
-                #pw=`cat $pwout`
-                #rm $pwout
                 pw=`generate_password $classLevel $upper`
                 rlLog "minlength=[$edge], current len [$upper],password=[$pw]"
                 rlRun "echo $currentPW | kinit $testac 2>&1 >/dev/null" 0 "validating current password"
@@ -1685,11 +1642,6 @@ ipapassword_grouppolicy_classes_default_logic()
                 classLevel=$minclasses
                 while [ $classLevel -lt $n ]
                 do
-                    #pwout=$TmpDir/pwout.$RANDOM.out
-                    #rlLog "password out file: [$pwout]"
-                    #generate_password $classLevel $grouppw_length $pwout
-                    #pw=`cat $pwout`
-                    #rm $pwout
                     pw=`generate_password $classLevel $grouppw_length`
                     rlLog "generate password [$pw] with [$classLevel] classes"
                     rlRun "echo $testacPW | kinit $testac 2>&1 >/dev/null" 0 "make sure currentPW work"
@@ -1706,10 +1658,6 @@ ipapassword_grouppolicy_classes_default_logic()
                 while [ $classLevel -lt $maxclasses ]
                 do  
                     #classesLevel will grow from n to 4
-                    #pwout=$TmpDir/pwout.$RANDOM.out
-                    #generate_password $classLevel $globalpw_length $pwout
-                    #pw=`cat $pwout`
-                    #rm $pwout
                     pw=`generate_password $classLevel $globalpw_length`
                     rlLog "generate password [$pw] with [$classLevel] classes"
                     rlRun "echo \"$currentPW\"| kinit $testac 2>&1 >/dev/null" 0 "make sure currentPW work"
@@ -1745,7 +1693,6 @@ ipapassword_grouppolicy_classes_lowerbound()
         minlife=`grep "Min lifetime" $out | cut -d":" -f2|xargs echo`
         length=`grep "length:" $out | cut -d":" -f2|xargs echo`
         history=`grep "History size:" $out | cut -d":" -f2|xargs echo`
-        unset out
         rlLog "preconditoin: minlife=[$minlife] minlength=[$length] history=[$history]"
         if [ $minlife = 0 ] && [ $length = 0 ] && [ $history = 0 ]
         then
@@ -1753,6 +1700,7 @@ ipapassword_grouppolicy_classes_lowerbound()
         else
             rlFail "can not set precondition for minclasses test"
         fi
+        rm $out
     rlPhaseEnd
 } #ipapassword_grouppolicy_classes_lowerbound
 
@@ -1763,7 +1711,6 @@ ipapassword_grouppolicy_classes_lowerbound_logic()
         local classLevel
         local temp
         local out=$TmpDir/classeslowerbound.$RANDOM.out
-        local pwout
         local pw
         for classLevel in 0 1
         do
@@ -1783,10 +1730,6 @@ ipapassword_grouppolicy_classes_lowerbound_logic()
                 num_of_test=8
                 while [ $i -lt $num_of_test ]
                 do
-                    #pwout="$TmpDir/pwout.$RANDOM.out"
-                    #generate_password $classLevel $globalpw_length "$pwout"
-                    #pw=`cat $pwout`
-                    #rm $pwout
                     pw=`generate_password $classLevel $globalpw_length`
                     rlLog "[test $i]: now change to new password [$pw]"
                     rlRun "echo \"$currentPW\"| kinit $testac 2>&1 >/dev/null" 0 "make sure currentPW work"
@@ -1862,11 +1805,6 @@ ipapassword_grouppolicy_classes_upperbound_logic()
                 classLevel=$minclasses
                 while [ $classLevel -lt $n ]
                 do
-                    #pwout=$TmpDir/pwout.$RANDOM.out
-                    #rlLog "password out file: [$pwout]"
-                    #generate_password $classLevel $grouppw_length $pwout
-                    #pw=`cat $pwout`
-                    #rm $pwout
                     pw=`generate_password $classLevel $grouppw_length`
                     rlLog "generate password [$pw] with [$classLevel] classes"
                     rlRun "echo \"$testacPW\"| kinit $testac 2>&1 >/dev/null" 0 "make sure currentPW work"
@@ -1883,10 +1821,6 @@ ipapassword_grouppolicy_classes_upperbound_logic()
                 while [ $classLevel -lt $maxclasses ]
                 do  
                     #classesLevel will grow from n to 4
-                    #pwout=$TmpDir/pwout.$RANDOM.out
-                    #generate_password $classLevel $grouppw_length $pwout
-                    #pw=`cat $pwout`
-                    #rm $pwout
                     pw=`generate_password $classLevel $grouppw_length`
                     rlLog "generate password [$pw] with [$classLevel] classes"
                     rlRun "echo \"$currentPW\"| kinit $testac 2>&1 >/dev/null" 0 "make sure currentPW work"
@@ -1981,11 +1915,7 @@ ipapassword_grouppolicy_length_default_logic()
             number=$RANDOM
             let "number %= 4"
             classLevel=$((number+1)) #classLevel rotate between 1-4
-            #pwout=$TmpDir/pwout.$RANDOM.out
             rlLog "minlength=[$grouppw_length], current len [$length],class=[$classLevel] number=[$number]"
-            #generate_password $classLevel $length $pwout
-            #pw=`cat $pwout`
-            #rm $pwout
             pw=`generate_password $classLevel $length`
             rlLog "minlength=[$grouppw_length], current len [$length],password=[$pw]"
             rlRun "echo $currentPW| kinit $testac 2>&1 >/dev/null" 0 "validating current password"
@@ -2006,11 +1936,7 @@ ipapassword_grouppolicy_length_default_logic()
             number=$RANDOM
             let "number %= 4"
             classLevel=$((number+1)) #classLevel rotate between 1-4
-            #pwout=$TmpDir/pwout.$RANDOM.out
             rlLog "minlength=[$grouppw_length], current len [$length],class=[$classLevel] number=[$number]"
-            #generate_password $classLevel $length $pwout
-            #pw=`cat $pwout`
-            #rm $pwout
             pw=`generate_password $classLevel $length`
             rlLog "minlength=[$grouppw_length], current len [$length],password=[$pw]"
             rlRun "echo $currentPW | kinit $testac 2>&1 >/dev/null" 0 "validating current password"
@@ -2134,10 +2060,6 @@ ipapassword_grouppolicy_length_upperbound_logic()
                 number=$RANDOM
                 let "number %= 4"
                 classLevel=$((number+1)) #classLevel rotate between 1-4
-                #pwout=$TmpDir/pwout.$RANDOM.out
-                #generate_password $classLevel $below $pwout
-                #pw=`cat $pwout`
-                #rm $pwout
                 pw=`generate_password $classLevel $below`
                 rlLog "minlength=[$edge], current len [$below],password=[$pw]"
                 rlRun "echo $currentPW | kinit $testac 2>&1 >/dev/null" 0 "validating current password"
@@ -2155,11 +2077,7 @@ ipapassword_grouppolicy_length_upperbound_logic()
                 number=$RANDOM
                 let "number %= 4"
                 classLevel=$((number+1)) #classLevel rotate between 1-4
-                #pwout=$TmpDir/pwout.$RANDOM.out
                 rlLog "minlength=[$edge], current len [$edge],class=[$classLevel] number=[$number]"
-                #generate_password $classLevel $edge $pwout
-                #pw=`cat $pwout`
-                #rm $pwout
                 pw=`generate_password $classLevel $edge`
                 rlLog "minlength=[$edge], current len [$edge],password=[$pw]"
                 rlRun "echo $currentPW | kinit $testac 2>&1 >/dev/null" 0 "validating current password"
@@ -2178,10 +2096,6 @@ ipapassword_grouppolicy_length_upperbound_logic()
                 number=$RANDOM
                 let "number %= 4"
                 classLevel=$((number+1)) #classLevel rotate between 1-4
-                #pwout=$TmpDir/pwout.$RANDOM.out
-                #generate_password $classLevel $upper $pwout
-                #pw=`cat $pwout`
-                #rm $pwout
                 pw=`generate_password $classLevel $upper`
                 rlLog "minlength=[$edge], current len [$upper],password=[$pw]"
                 rlRun "echo $currentPW | kinit $testac 2>&1 >/dev/null" 0 "validating current password"
