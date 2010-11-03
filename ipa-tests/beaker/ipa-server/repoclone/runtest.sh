@@ -86,26 +86,15 @@ fi
 
 # updating
 /etc/init.d/yum-updatesd stop
-#yum -R 1 -y update
-ret=$?
-if [ $ret != 0 ]; then
-        echo "WARNING - The first try on updating Fedora didn't work, trying again"
-        sleep 60
-        yum -R 1 -y update
-        ret=$?
-        if [ $ret != 0 ]; then 
-                echo "ERROR - yum install of freeipa failed";
-                exit;
-        fi
-fi
+
 yum clean all
-yum -y erase fedora-ds-base fedora-ds-base-devel 
-yum -y install yum-utils createrepo portmap nfs-utils
+yum --disablerepo=beaker-distro1 --disablerepo=beaker-harness --disablerepo=beaker-tasks -y erase fedora-ds-base fedora-ds-base-devel 
+yum --disablerepo=beaker-distro1 --disablerepo=beaker-harness --disablerepo=beaker-tasks -y install yum-utils createrepo portmap nfs-utils
 ret=$?
 if [ $ret != 0 ]; then 
 	ps -fax
 	sleep 60
-	yum -y install yum-utils createrepo
+	yum --disablerepo=beaker-distro1 --disablerepo=beaker-harness --disablerepo=beaker-tasks -y install yum-utils createrepo
 	ret=$?
 	if [ $ret != 0 ]; then 
 		echo "The YUM stuff didn't work, but we have decided that we don't care now as the build stuff is installed in the VM"
