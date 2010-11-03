@@ -4,12 +4,12 @@ set -x
 
 # Fix date
 /etc/init.d/ntpd stop
-/usr/sbin/ntpdate homer.sfbay.redhat.com
+/usr/sbin/ntpdate clock.redhat.com
 ret=$?
 if [ $ret != 0 ]; then 
 	# ntp update didn't work the first time, lets try it again.
 	sleep 60
-	/usr/sbin/ntpdate homer.sfbay.redhat.com
+	/usr/sbin/ntpdate clock.redhat.com
 	ret=$?
 	if [ $ret != 0 ]; then 
 		sleep 10
@@ -69,18 +69,18 @@ if [ $ret != 0 ]; then
 fi
 
 # Fixing yumdownloader
-sed -i s/'po1.epoch, po1.ver, po1.rel'/'po1.epoch, po1.version, po1.release'/g /usr/lib/python2.4/site-packages/yum/packages.py
-ret=$?
-if [ $ret != 0 ]; then 
-	echo "ERROR - fixing of packages.py failed";
-	exit;
-fi
-sed -i s/'po2.epoch, po2.ver, po2.rel'/'po2.epoch, po2.version, po2.release'/g /usr/lib/python2.4/site-packages/yum/packages.py
-ret=$?
-if [ $ret != 0 ]; then 
-	echo "ERROR - fixing of packages.py failed";
-	exit;
-fi
+#sed -i s/'po1.epoch, po1.ver, po1.rel'/'po1.epoch, po1.version, po1.release'/g /usr/lib/python2.4/site-packages/yum/packages.py
+#ret=$?
+#if [ $ret != 0 ]; then 
+#	echo "ERROR - fixing of packages.py failed";
+#	exit;
+#fi
+#sed -i s/'po2.epoch, po2.ver, po2.rel'/'po2.epoch, po2.version, po2.release'/g /usr/lib/python2.4/site-packages/yum/packages.py
+#ret=$?
+#if [ $ret != 0 ]; then 
+#	echo "ERROR - fixing of packages.py failed";
+#	exit;
+#fi
 
 # Getting the daily files
 mkdir -p /root/dist
