@@ -87,9 +87,14 @@ fi
 # updating
 /etc/init.d/yum-updatesd stop
 
+# Cleaning up beaker repo files 
+rm -rf /dev/shm/beakerrepo
+mkdir -p /dev/shm/beakerrepo
+mv /etc/yum.repos.d/beaker* /dev/shm/beakerrepo/.
+
 yum clean all
-yum --disablerepo=beaker-distro1 --disablerepo=beaker-harness --disablerepo=beaker-tasks -y erase fedora-ds-base fedora-ds-base-devel 
-yum --disablerepo=beaker-distro1 --disablerepo=beaker-harness --disablerepo=beaker-tasks -y install yum-utils createrepo portmap nfs-utils
+yum -y erase fedora-ds-base fedora-ds-base-devel 
+yum -y install yum-utils createrepo portmap nfs-utils
 ret=$?
 if [ $ret != 0 ]; then 
 	ps -fax
@@ -187,6 +192,8 @@ mkdir /mnt/nfslocation/archives/ipa/$datecode
 cd /root/dist;rsync -av * /mnt/nfslocation/archives/ipa/$datecode/.
 
 rlRun "umount /mnt/nfslocation" 0 "Unmounting nfs share"
+cp -a /dev/shm/beakerrepo/*.repo /etc/yum.repos.d/.
+
 	rlPhaseEnd
 
 
