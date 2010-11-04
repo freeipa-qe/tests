@@ -1,6 +1,6 @@
 <job>
 	<whiteboard>
-		ipa repoclone Fedora13 x86_64
+		ipa repoclone Fedora12 x86_64
 	</whiteboard>
 	<recipeSet>
 		<recipe whiteboard="">
