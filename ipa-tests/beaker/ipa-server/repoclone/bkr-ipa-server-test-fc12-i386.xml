@@ -1,0 +1,31 @@
+<job>
+	<whiteboard>
+		ipa repoclone Fedora12 i386
+	</whiteboard>
+	<recipeSet>
+		<recipe whiteboard="">
+			<distroRequires>
+				<and>
+                                        <distro_family op="=" value="Fedora12"/>
+                                        <distro_method op="=" value="http"/>
+                                        <distro_tag op="=" value="RELEASED"/>
+                                        <distro_arch op="=" value="i386"/>
+				</and>
+			</distroRequires>
+                        <hostRequires>
+                                <and>
+                                <hostname op="=" value="qe-blade-12.idm.lab.bos.redhat.com"/>
+                                </and>
+			</hostRequires>
+			<repos/>
+			<task name="/distribution/install" role="STANDALONE">
+				<params/>
+			</task>
+			<task name="/CoreOS/ipa-server/repoclone" role="MASTER">
+				<params/>
+			</task>
+
+		</recipe>
+	</recipeSet>
+</job>
+
