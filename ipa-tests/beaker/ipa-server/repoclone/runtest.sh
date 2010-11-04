@@ -190,6 +190,7 @@ mount $nfslocation /mnt/nfslocation
 rlRun "ls /mnt/nfslocation/archives/ipa" 0" Checking to ensure that the destination directory exists"
 mkdir /mnt/nfslocation/archives/ipa/$datecode
 cd /root/dist;rsync -av * /mnt/nfslocation/archives/ipa/$datecode/.
+chmod -Rf 755 /mnt/nfslocation/archives/ipa/$datecode/*
 
 rlRun "umount /mnt/nfslocation" 0 "Unmounting nfs share"
 cp -a /dev/shm/beakerrepo/*.repo /etc/yum.repos.d/.
