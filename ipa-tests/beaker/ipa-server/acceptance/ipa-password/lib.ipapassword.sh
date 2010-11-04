@@ -45,10 +45,8 @@ read_pwpolicy()
     local pwpolicy=$2
     local out=$TmpDir/read.passwordpolicy.$RANDOM.out
     local result=""
-    KinitAsAdmin
-    ipa pwpolicy-show $pwpolicy > $out
     if [ $attr = "history" ];then
-        keyword="History size:"
+        keyword="History size"
     elif [ $attr = "length" ];then
         keyword="Min length"
     elif [ $attr = "maxlife" ];then
@@ -60,9 +58,11 @@ read_pwpolicy()
     else
         keyword="$attr"
     fi
-    result=`grep -i "$keyword" | cut -d":" -f2 | xargs echo`
+    KinitAsAdmin 2>&1 >/dev/null
+    ipa pwpolicy-show $pwpolicy > $out
+    result=`grep -i "$keyword" $out | cut -d":" -f2 | xargs echo`
     rm $out
-    `$kdestroy`
+    rlRun $kdestroy 2>&1 >/dev/null
     echo $result
 } # read_pwpolicy
 
@@ -898,6 +898,24 @@ util_pwpolicy_removeall()
     unset list
     unset out
 } # util_pwpolicy_removeall
+
+getrandomstring()
+{
+    local len=$1
+    local i=0
+    local string=""
+    if [ -z $len ];then
+        len=`getrandomint 1 15`
+    fi
+    local chars="a b c d e f g h i j k l m n o p q r s t u v w x y z A B C D E F G H I J K L M N O P Q R S T U V W X Y Z"
+   while [ $i -lt $len ]; do
+       index=`getrandomint 1 52`
+       char=`echo $chars | cut -d" " -f$index`
+       string="${string}${char}" 
+       i=$((i+1))
+   done
+   echo $string
+} #getrandomstring
 
 getrandomint()
 {

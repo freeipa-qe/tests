@@ -5,9 +5,10 @@
 ipapassword()
 {
     ipapassword_envsetup
-    ipapassword_globalpolicy
-    ipapassword_grouppolicy
-    ipapassword_nestedgroup
+#    ipapassword_globalpolicy
+#    ipapassword_grouppolicy
+#    ipapassword_nestedgroup
+    ipapassword_attr
     ipapassword_envcleanup
 } # ipapassword
 
@@ -76,6 +77,14 @@ ipapassword_nestedgroup()
     ipapassword_nestedgrouppw_length_conflict
     ipapassword_nestedgroup_envcleanup
 } #ipapassword_nestedgroup
+
+ipapassword_attr()
+{
+    ipapassword_attr_envsetup
+    ipapassword_attr_set
+    ipapassword_attr_add
+    ipapassword_attr_envcleanup
+} #ipapassword_attr
 
 ######################
 # test cases         #
@@ -246,7 +255,7 @@ ipapassword_globalpolicy_minlifetime_default_logic()
     # test logic starts
         local out=$TmpDir/globalminlifedefault.$RANDOM.txt
         KinitAsAdmin
-        rlLog "set all other password constrains to 0"
+        rlLog "disable other password policy constrains"
         ipa pwpolicy-mod --maxlife=$globalpw_maxlife --history=0 --minlength=0 --minclasses=1 
         ipa pwpolicy-show > $out
         history=`grep "History size:" $out | cut -d":" -f2|xargs echo`
@@ -305,7 +314,7 @@ ipapassword_globalpolicy_minlifetime_lowerbound_logic()
         local out=$TmpDir/minlifelowbound.$RANDOM.out
         rlLog "The lower bound of minlife time is [$lowbound]"
         KinitAsAdmin
-        rlLog "set all other password constrains to 0"
+        rlLog "disable other password policy constrains"
         ipa pwpolicy-mod --maxlife=$globalpw_maxlife --history=0 --minlength=0 --minclasses=1 
         ipa pwpolicy-show > $out
         history=`grep "History size:" $out | cut -d":" -f2|xargs echo`
@@ -419,7 +428,7 @@ ipapassword_globalpolicy_history_default()
         local out=$TmpdIR/globalpolicyhistorydefault.$RANDOM.out
         rlLog "default behave of history setting test"
         KinitAsAdmin
-        rlLog "set all other password constrains to 0"
+        rlLog "disable other password policy constrains"
         ipa pwpolicy-mod --maxlife=$globalpw_maxlife --minlife=0 --minlength=0 --minclasses=1 
         ipa pwpolicy-show > $out
         minlife=`grep "Min lifetime" $out | cut -d":" -f2|xargs echo`
@@ -504,7 +513,7 @@ ipapassword_globalpolicy_history_lowerbound()
         lowbound=0
         rlLog "lowerbound of password history is $lowbound"
         KinitAsAdmin
-        rlLog "set all other password constrains to 0"
+        rlLog "disable other password policy constrains"
         ipa pwpolicy-mod --maxlife=$globalpw_maxlife --minlife=0 --minlength=0 --minclasses=1 --history=$lowbound
         ipa pwpolicy-show > $out
         minlife=`grep "Min lifetime" $out | cut -d":" -f2|xargs echo`
@@ -623,7 +632,7 @@ ipapassword_globalpolicy_classes_default()
         local out=$TmpDir/globalpwclassesdefault.$RANDOM.out
         rlLog "check minimum classes default behave: when classes between [2-4]"
         KinitAsAdmin
-        rlLog "set all other password constrains to 0"
+        rlLog "disable other password policy constrains"
         ipa pwpolicy-mod --maxlife=$globalpw_maxlife --minlife=0 --minlength=0 --history=0 
         ipa pwpolicy-show > $out
         minlife=`grep "Min lifetime" $out | cut -d":" -f2|xargs echo`
@@ -783,7 +792,7 @@ ipapassword_globalpolicy_classes_upperbound()
         local out=$TmpDir/pwclassesupperbound.$RANDOM.out
         rlLog "check minimum classes upperbound: >4, it should behave same as 4"
         KinitAsAdmin
-        rlLog "set all other password constrains to 0"
+        rlLog "disable other password policy constrains"
         ipa pwpolicy-mod --maxlife=$globalpw_maxlife --minlife=0 --minlength=0 --history=0 
         ipa pwpolicy-show > $out
         minlife=`grep "Min lifetime" $out | cut -d":" -f2|xargs echo`
@@ -899,7 +908,7 @@ ipapassword_globalpolicy_length_default()
         local out=$TmpDir/pwlengthdefault.$RANDOM.out
         rlLog "check minimum length default behave"
         reset_global_pwpolicy
-        rlLog "set all other password constrains to 0"
+        rlLog "disable other password policy constrains"
         KinitAsAdmin
         ipa pwpolicy-mod --maxlife=$globalpw_maxlife --minlife=0 --minclasses=0 --history=0 
         ipa pwpolicy-show > $out
@@ -980,7 +989,7 @@ ipapassword_globalpolicy_length_lowerbound()
         rlLog "minimum length = 0"
         rlLog "check minimum length lowerbound"
         reset_global_pwpolicy
-        rlLog "set all other password constrains to 0"
+        rlLog "disable other password policy constrains"
         KinitAsAdmin
         ipa pwpolicy-mod --maxlife=$globalpw_maxlife --minlife=0 --minclasses=0 --history=0 --minlength=0
         ipa pwpolicy-show > $out
@@ -1027,7 +1036,7 @@ ipapassword_globalpolicy_length_upperbound()
         local out=$TmpDir/pwlengthupperbounddefault.$RANDOM.out
         rlLog "check upper bound of length setting"
         reset_global_pwpolicy
-        rlLog "set all other password constrains to 0"
+        rlLog "disable other password policy constrains"
         KinitAsAdmin
         ipa pwpolicy-mod --maxlife=$globalpw_maxlife --minlife=0 --minclasses=0 --history=0 
         ipa pwpolicy-show > $out
@@ -1390,7 +1399,7 @@ ipapassword_grouppolicy_history_default()
         append_test_member
         reset_group_pwpolicy
         KinitAsAdmin
-        rlLog "set all other password constrains to 0"
+        rlLog "disable other password policy constrains"
         ipa pwpolicy-mod $testgrp --maxlife=$grouppw_maxlife --minlife=0 --minlength=0 --minclasses=1 
         ipa pwpolicy-show $testgrp > $out
         minlife=`grep "Min lifetime" $out | cut -d":" -f2|xargs echo`
@@ -1469,20 +1478,22 @@ ipapassword_grouppolicy_history_lowerbound()
 # non-loop data : 
     rlPhaseStartTest "ipapassword_grouppolicy_history_lowerbound"
         local out=$TmpDir/grouppolicyhistorylowbound.$RANDOM.out
+        local lowbound=0
         add_test_ac
         add_test_grp
         append_test_member
         reset_group_pwpolicy
-        lowbound=0
         rlLog "lowerbound of password history is $lowbound"
         KinitAsAdmin
-        rlLog "set all other password constrains to 0"
+        rlLog "disable other password policy constrains"
         ipa pwpolicy-mod $testgrp --maxlife=$grouppw_maxlife --minlife=0 --minlength=0 --minclasses=1 --history=$lowbound
         ipa pwpolicy-show $testgrp > $out
         minlife=`grep "Min lifetime" $out | cut -d":" -f2|xargs echo`
         length=`grep "length:" $out | cut -d":" -f2|xargs echo`
         classes=`grep "classes:" $out | cut -d":" -f2|xargs echo`
         history=`grep "History size:" $out | cut -d":" -f2|xargs echo`
+        #history=`read_pwpolicy "history" $testgrp`
+        echo "====================================history=[$history]"
         rlLog "preconditoin: minlife=[$minlife] minlength=[$length] classes=[$classes] history=[$history]"
         if [ $minlife = 0 ] && [ $length = 0 ] && [ $classes = 1 ] \
             && [ $history = 0 ]
@@ -1536,9 +1547,9 @@ ipapassword_grouppolicy_history_upperbound()
 # non-loop data : 
     rlPhaseStartTest "ipapassword_grouppolicy_history_upperbound"
         rlLog "there is no real upperbound, just try some randam integers"
-        lastvalue=$RANDOM
-        max=20 #test 20 times
-        i=0
+        local lastvalue=$RANDOM
+        local max=20 #test 20 times
+        local i=0
         KinitAsAdmin 
         while [ $i -lt $max ]
         do 
@@ -1567,7 +1578,7 @@ ipapassword_grouppolicy_history_negative()
 # non-loop data : 
     rlPhaseStartTest "ipapassword_grouppolicy_history_negative"
         rlLog "negaive integer and letters are not acceptable for history size"
-        testdata="-2 -1 a abc"
+        local testdata="-2 -1 a abc"
         KinitAsAdmin 
         for value in $testdata
         do
@@ -1597,7 +1608,7 @@ ipapassword_grouppolicy_classes_default()
         append_test_member
         reset_group_pwpolicy
         KinitAsAdmin
-        rlLog "set all other password constrains to 0"
+        rlLog "disable other password policy constrains"
         ipa pwpolicy-mod $testgrp --maxlife=$grouppw_maxlife --minlife=0 --minlength=0 --history=0 
         ipa pwpolicy-show $testgrp > $out
         minlife=`grep "Min lifetime" $out | cut -d":" -f2|xargs echo`
@@ -1610,6 +1621,7 @@ ipapassword_grouppolicy_classes_default()
         else
             rlFail "can not set precondition for minclasses test"
         fi
+        rm $out
     rlPhaseEnd
 } #ipapassword_grouppolicy_classes_default
 
@@ -1758,7 +1770,7 @@ ipapassword_grouppolicy_classes_upperbound()
         rlLog "check minimum classes upperbound"
         local out=$TmpDir/pwclassesupperbound.$RANDOM.out
         KinitAsAdmin
-        rlLog "set all other password constrains to 0"
+        rlLog "disable other password policy constrains"
         add_test_grp
         reset_group_pwpolicy
         ipa pwpolicy-mod $testgrp --maxlife=$globalpw_maxlife --minlife=0 --minlength=0 --history=0 
@@ -1878,7 +1890,7 @@ ipapassword_grouppolicy_length_default()
         rlLog "check minimum length default behave"
         add_test_grp
         reset_group_pwpolicy
-        rlLog "set all other password constrains to 0"
+        rlLog "disable other password policy constrains"
         KinitAsAdmin
         ipa pwpolicy-mod $testgrp --maxlife=$globalpw_maxlife --minlife=0 --minclasses=0 --history=0 
         ipa pwpolicy-show $testgrp > $out
@@ -1917,8 +1929,8 @@ ipapassword_grouppolicy_length_default_logic()
             classLevel=$((number+1)) #classLevel rotate between 1-4
             rlLog "minlength=[$grouppw_length], current len [$length],class=[$classLevel] number=[$number]"
             pw=`generate_password $classLevel $length`
-            rlLog "minlength=[$grouppw_length], current len [$length],password=[$pw]"
-            rlRun "echo $currentPW| kinit $testac 2>&1 >/dev/null" 0 "validating current password"
+            rlLog "minlength=[$grouppw_length], current len [$length],next password=[$pw]"
+            rlRun "echo $currentPW| kinit $testac 2>&1 >/dev/null" 0 "validating current password [$currentPW]"
             change_password $testac $testacPW $pw    
             if [ $? = 0 ];then
                 rlFail "password change success is not expected"
@@ -1938,8 +1950,8 @@ ipapassword_grouppolicy_length_default_logic()
             classLevel=$((number+1)) #classLevel rotate between 1-4
             rlLog "minlength=[$grouppw_length], current len [$length],class=[$classLevel] number=[$number]"
             pw=`generate_password $classLevel $length`
-            rlLog "minlength=[$grouppw_length], current len [$length],password=[$pw]"
-            rlRun "echo $currentPW | kinit $testac 2>&1 >/dev/null" 0 "validating current password"
+            rlLog "minlength=[$grouppw_length], current len [$length],next password=[$pw]"
+            rlRun "echo \"$currentPW\" | kinit $testac 2>&1 >/dev/null" 0 "validating current password [$currentPW]"
             change_password $testac $currentPW $pw    
             if [ $? = 0 ];then
                 rlPass "password change success is expected"
@@ -1965,7 +1977,7 @@ ipapassword_grouppolicy_length_lowerbound()
         add_test_grp
         append_test_member
         reset_group_pwpolicy
-        rlLog "set all other password constrains to 0"
+        rlLog "disable other password policy constrains"
         KinitAsAdmin
         ipa pwpolicy-mod $testgrp --maxlife=$grouppw_maxlife --minlife=0 --minclasses=0 --history=0 --minlength=0
         ipa pwpolicy-show $testgrp > $out
@@ -2011,7 +2023,7 @@ ipapassword_grouppolicy_length_upperbound()
         rlLog "check upper bound of length setting"
         add_test_grp
         reset_group_pwpolicy
-        rlLog "set all other password constrains to 0"
+        rlLog "disable other password policy constrains"
         KinitAsAdmin
         ipa pwpolicy-mod $testgrp --maxlife=$grouppw_maxlife --minlife=0 --minclasses=0 --history=0 
         ipa pwpolicy-show $testgrp > $out
@@ -2048,9 +2060,9 @@ ipapassword_grouppolicy_length_upperbound_logic()
             echo "============= [$testgrp] pwpolicy =========="
             cat $out
             echo "============================================"
-            rlLog "len=[$len] edge=[$edge]"
             rlRun "$kdestroy"
             len=`grep "length" $out | cut -d":" -f2| xargs echo`
+            rlLog "len=[$len] edge=[$edge]"
             if [ $len = $edge ];then
                 rlLog "minlength=[$len], now continue test"
                 ##############################################################
@@ -2548,3 +2560,360 @@ ipapassword_nestedgrouppw_length_conflict_logic()
         rlLog "good passwords=[$goodPasswordPool]"
     # test logic ends
 } # ipapassword_nestedgrouppw_length_conflict_logic 
+
+ipapassword_attr_envsetup()
+{
+    rlPhaseStartSetup "ipapassword_attr_envsetup"
+        #environment setup starts here
+        # objectclasses: ( 2.16.840.1.113719.1.301.6.14.1 
+        #   NAME 'krbPwdPolicy' SUP top 
+        #   STRUCTURAL MUST cn 
+        #   MAY ( krbMaxPwdLife $ krbMinPwdLife $ krbPwdMinDiffChars 
+        #               $ krbPwdMinLength $ krbPwdHistoryLength ) )
+        add_test_grp
+        reset_group_pwpolicy
+        #environment setup ends   here
+    rlPhaseEnd
+} #ipapassword_attr_envsetup
+
+
+ipapassword_attr_envcleanup()
+{
+    rlPhaseStartCleanup "ipapassword_attr_envcleanup"
+        #environment cleanup starts here
+        del_test_grp
+        #environment cleanup ends   here
+    rlPhaseEnd
+} #ipapassword_attr_envcleanup
+
+ipapassword_attr_set()
+{
+    ipapassword_attr_set_krbMaxPwdLife
+    ipapassword_attr_set_krbMaxPwdLife_negative
+    ipapassword_attr_set_krbMinPwdLife
+    ipapassword_attr_set_krbMinPwdLife_negative
+    ipapassword_attr_set_krbPwdMinDiffChars
+    ipapassword_attr_set_krbPwdMinDiffChars_negative
+    ipapassword_attr_set_krbPwdMinLength
+    ipapassword_attr_set_krbPwdMinLength_negative
+    ipapassword_attr_set_krbPwdHistoryLength
+    ipapassword_attr_set_krbPwdHistoryLength_negative
+} #ipapassword_attr_set
+
+ipapassword_attr_set_krbMaxPwdLife()
+{
+# looped data   : 
+# non-loop data : 
+    rlPhaseStartTest "ipapassword_attr_set_krbMaxPwdLife"
+        local attr=krbMaxPwdLife
+        local value=`getrandomint`
+        KinitAsAdmin
+        ipapassword_attr_set_logic $attr $value 0 ""
+        rlRun "$kdestroy"
+    rlPhaseEnd
+} #ipapassword_attr_set_krbMaxPwdLife
+
+ipapassword_attr_set_krbMaxPwdLife_negative()
+{
+    rlPhaseStartTest "ipapassword_attr_set_krbMaxPwdLife_negative"
+        local attr=krbMaxPwdLife
+        local value=`getrandomstring`
+        KinitAsAdmin
+        ipapassword_attr_set_logic $attr $value 1 ""
+        rlRun "$kdestroy"
+    rlPhaseEnd
+} #ipapassword_attr_set_krbMaxPwdLife_negative
+
+ipapassword_attr_set_krbMinPwdLife()
+{
+    rlPhaseStartTest "ipapassword_attr_set_krbMinPwdLife"
+        local attr=krbMinPwdLife
+        local value=`getrandomint`
+        KinitAsAdmin
+        maxlife=`ipa pwpolicy-show $testgrp --all | grep -i "max lifetime" | cut -d":" -f2 | xargs echo`
+        max=`echo "$maxlife * 24" | bc`
+        minvalue=`getrandomint $max `
+        ipapassword_attr_set_logic $attr "$minvalue" 0 ""
+        rlRun "$kdestroy"
+    rlPhaseEnd
+} #ipapassword_attr_set_krbMinPwdLife
+
+ipapassword_attr_set_krbMinPwdLife_negative()
+{
+    rlPhaseStartTest "ipapassword_attr_set_krbMinPwdLife_negative"
+        local attr=krbMinPwdLife
+        local value=`getrandomstring`
+        KinitAsAdmin
+        ipapassword_attr_set_logic $attr $value 1 "ipa: ERROR: invalid 'krbminpwdlife': must be an integer"
+        rlRun "$kdestroy"
+    rlPhaseEnd
+
+} #ipapassword_attr_set_krbMinPwdLife_negative
+
+ipapassword_attr_set_krbPwdMinDiffChars()
+{
+    rlPhaseStartTest "ipapassword_attr_set_krbPwdMinDiffChars"
+        local attr=krbPwdMinDiffChars
+        local value=`getrandomint 1 5`
+        KinitAsAdmin
+        ipapassword_attr_set_logic $attr $value 0 ""
+        rlRun "$kdestroy"
+    rlPhaseEnd
+
+} #ipapassword_attr_set_krbPwdMinDiffChars
+
+ipapassword_attr_set_krbPwdMinDiffChars_negative()
+{
+    rlPhaseStartTest "ipapassword_attr_set_krbPwdMinDiffChars_negative"
+        local attr=krbPwdMinDiffChars
+        local value=`getrandomint 6 50000`
+        KinitAsAdmin
+        ipapassword_attr_set_logic $attr $value 1 "ipa: ERROR: invalid 'krbpwdmindiffchars': can be at most 5"
+        rlRun "$kdestroy"
+    rlPhaseEnd
+
+} #ipapassword_attr_set_krbPwdMinDiffChars_negative
+
+ipapassword_attr_set_krbPwdMinLength()
+{
+    rlPhaseStartTest "ipapassword_attr_set_krbPwdMinLength"
+        local attr=krbPwdMinLength
+        local value=`getrandomint`
+        KinitAsAdmin
+        ipapassword_attr_set_logic $attr $value 0 ""
+        rlRun "$kdestroy"
+    rlPhaseEnd
+
+} #ipapassword_attr_set_krbPwdMinLength
+
+ipapassword_attr_set_krbPwdMinLength_negative()
+{
+    rlPhaseStartTest "ipapassword_attr_set_krbPwdMinLength_negative"
+        local attr=krbPwdMinLength
+        local value=`getrandomstring`
+        KinitAsAdmin
+        ipapassword_attr_set_logic $attr "-$value" 1 "ipa: ERROR: invalid 'krbpwdminlength': must be an integer"
+        rlRun "$kdestroy"
+    rlPhaseEnd
+
+} #ipapassword_attr_set_krbPwdMinLength_negative
+
+ipapassword_attr_set_krbPwdHistoryLength()
+{
+    rlPhaseStartTest "ipapassword_attr_set_krbPwdHistoryLength"
+        local attr=krbPwdHistoryLength
+        local value=`getrandomint`
+        KinitAsAdmin
+        ipapassword_attr_set_logic $attr $value 0 ""
+        rlRun "$kdestroy"
+    rlPhaseEnd
+
+} #ipapassword_attr_set_krbPwdHistoryLength
+
+ipapassword_attr_set_krbPwdHistoryLength_negative()
+{
+    rlPhaseStartTest "ipapassword_attr_set_krbPwdHistoryLength_negative"
+        local attr=krbPwdHistoryLength
+        local value=`getrandomint`
+        KinitAsAdmin
+        ipapassword_attr_set_logic $attr "-$value" 1 "ipa: ERROR: invalid 'krbpwdhistorylength': must be at least 0"
+        rlRun "$kdestroy"
+    rlPhaseEnd
+
+} #ipapassword_attr_set_krbPwdHistoryLength_negative
+
+ipapassword_attr_set_logic()
+{
+    # accept parameters: attribute name , attribute value, expected result, error message
+        local attr=$1
+        local value=$2
+        local expected=$3
+        local errmsg=$4
+        local out=$TmpDir/attrsetlogic.$RANDOM.out
+        rlLog "set [$attr] to [$value], expect [$expected], errmsg=[$errmsg]"
+        rlRun "ipa pwpolicy-mod $testgrp --setattr $attr=$value 2>$out" $expected 
+        if [ ! -z "$errmsg" ];then
+            if grep -i "$errmsg" $out 2>&1 >/dev/null
+            then
+                rlPass "error msg matches with output"
+            else
+                rlFail "error msg not found in output file"
+                echo "============== output ====================="
+                cat $out
+                echo "==========================================="
+            fi
+        fi
+} #ipapassword_attr_set_logic
+
+ipapassword_attr_add()
+{
+    ipapassword_attr_add_krbMaxPwdLife
+    ipapassword_attr_add_krbMaxPwdLife_negative
+    ipapassword_attr_add_krbMinPwdLife
+    ipapassword_attr_add_krbMinPwdLife_negative
+    ipapassword_attr_add_krbPwdMinDiffChars
+    ipapassword_attr_add_krbPwdMinDiffChars_negative
+    ipapassword_attr_add_krbPwdMinLength
+    ipapassword_attr_add_krbPwdMinLength_negative
+    ipapassword_attr_add_krbPwdHistoryLength
+    ipapassword_attr_add_krbPwdHistoryLength_negative
+} #ipapassword_attr_add
+
+ipapassword_attr_add_krbMaxPwdLife()
+{
+# looped data   : 
+# non-loop data : 
+    rlPhaseStartTest "ipapassword_attr_add"
+        for attr in $pwpolicyattrs; do
+            KinitAsAdmin
+            ipapassword_attr_add_logic $attr
+            rlRun "$kdestroy"
+        done
+    rlPhaseEnd
+} #ipapassword_attr_add_krbMaxPwdLife
+
+ipapassword_attr_add_krbMaxPwdLife()
+{
+# looped data   : 
+# non-loop data : 
+    rlPhaseStartTest "ipapassword_attr_add_krbMaxPwdLife"
+        local attr=krbMaxPwdLife
+        local value=`getrandomint`
+        KinitAsAdmin
+        ipapassword_attr_add_logic $attr $value 0 ""
+        rlRun "$kdestroy"
+    rlPhaseEnd
+} #ipapassword_attr_add_krbMaxPwdLife
+
+ipapassword_attr_add_krbMaxPwdLife_negative()
+{
+    rlPhaseStartTest "ipapassword_attr_add_krbMaxPwdLife_negative"
+        local attr=krbMaxPwdLife
+        local value=`getrandomstring`
+        KinitAsAdmin
+        ipapassword_attr_add_logic $attr $value 1 ""
+        rlRun "$kdestroy"
+    rlPhaseEnd
+} #ipapassword_attr_add_krbMaxPwdLife_negative
+
+ipapassword_attr_add_krbMinPwdLife()
+{
+    rlPhaseStartTest "ipapassword_attr_add_krbMinPwdLife"
+        local attr=krbMinPwdLife
+        local value=`getrandomint`
+        KinitAsAdmin
+        maxlife=`ipa pwpolicy-show $testgrp --all | grep -i "max lifetime" | cut -d":" -f2 | xargs echo`
+        max=`echo "$maxlife * 24" | bc`
+        minvalue=`getrandomint $max `
+        ipapassword_attr_add_logic $attr "$minvalue" 0 ""
+        rlRun "$kdestroy"
+    rlPhaseEnd
+} #ipapassword_attr_add_krbMinPwdLife
+
+ipapassword_attr_add_krbMinPwdLife_negative()
+{
+    rlPhaseStartTest "ipapassword_attr_add_krbMinPwdLife_negative"
+        local attr=krbMinPwdLife
+        local value=`getrandomstring`
+        KinitAsAdmin
+        ipapassword_attr_set_logic $attr $value 1 "ipa: ERROR: invalid 'krbminpwdlife': must be an integer"
+        rlRun "$kdestroy"
+    rlPhaseEnd
+} #ipapassword_attr_add_krbMinPwdLife_negative
+
+ipapassword_attr_add_krbPwdMinDiffChars()
+{
+    rlPhaseStartTest "ipapassword_attr_add_krbPwdMinDiffChars"
+        local attr=krbPwdMinDiffChars
+        local value=`getrandomint 1 5`
+        KinitAsAdmin
+        ipapassword_attr_add_logic $attr $value 0 ""
+        rlRun "$kdestroy"
+    rlPhaseEnd
+
+} #ipapassword_attr_add_krbPwdMinDiffChars
+
+ipapassword_attr_add_krbPwdMinDiffChars_negative()
+{
+    rlPhaseStartTest "ipapassword_attr_add_krbPwdMinDiffChars_negative"
+        local attr=krbPwdMinDiffChars
+        local value=`getrandomint 6 50000`
+        KinitAsAdmin
+        ipapassword_attr_add_logic $attr $value 1 "ipa: ERROR: invalid 'krbpwdmindiffchars': can be at most 5"
+        rlRun "$kdestroy"
+    rlPhaseEnd
+
+} #ipapassword_attr_add_krbPwdMinDiffChars_negative
+
+ipapassword_attr_add_krbPwdMinLength()
+{
+    rlPhaseStartTest "ipapassword_attr_add_krbPwdMinLength"
+        local attr=krbPwdMinLength
+        local value=`getrandomint`
+        KinitAsAdmin
+        ipapassword_attr_add_logic $attr $value 0 ""
+        rlRun "$kdestroy"
+    rlPhaseEnd
+
+} #ipapassword_attr_add_krbPwdMinLength
+
+ipapassword_attr_add_krbPwdMinLength_negative()
+{
+    rlPhaseStartTest "ipapassword_attr_add_krbPwdMinLength_negative"
+        local attr=krbPwdMinLength
+        local value=`getrandomstring`
+        KinitAsAdmin
+        ipapassword_attr_add_logic $attr "-$value" 1 "ipa: ERROR: invalid 'krbpwdminlength': must be an integer"
+        rlRun "$kdestroy"
+    rlPhaseEnd
+
+} #ipapassword_attr_add_krbPwdMinLength_negative
+
+ipapassword_attr_add_krbPwdHistoryLength()
+{
+    rlPhaseStartTest "ipapassword_attr_add_krbPwdHistoryLength"
+        local attr=krbPwdHistoryLength
+        local value=`getrandomint`
+        KinitAsAdmin
+        ipapassword_attr_add_logic $attr $value 0 ""
+        rlRun "$kdestroy"
+    rlPhaseEnd
+
+} #ipapassword_attr_add_krbPwdHistoryLength
+
+ipapassword_attr_add_krbPwdHistoryLength_negative()
+{
+    rlPhaseStartTest "ipapassword_attr_add_krbPwdHistoryLength_negative"
+        local attr=krbPwdHistoryLength
+        local value=`getrandomint`
+        KinitAsAdmin
+        ipapassword_attr_add_logic $attr "-$value" 1 "ipa: ERROR: invalid 'krbpwdhistorylength': must be at least 0"
+        rlRun "$kdestroy"
+    rlPhaseEnd
+
+} #ipapassword_attr_add_krbPwdHistoryLength_negative
+
+ipapassword_attr_add_logic()
+{
+    # accept parameters: attribute name , attribute value, expected result, error message
+        local attr=$1
+        local value=$2
+        local expected=$3
+        local errmsg=$4
+        local out=$TmpDir/attrsetlogic.$RANDOM.out
+        rlLog "set [$attr] to [$value], expect [$expected], errmsg=[$errmsg]"
+        rlRun "ipa pwpolicy-mod $testgrp --addattr $attr=$value 2>$out" $expected 
+        if [ ! -z "$errmsg" ];then
+            if grep -i "$errmsg" $out 2>&1 >/dev/null
+            then
+                rlPass "error msg matches with output"
+            else
+                rlFail "error msg not found in output file"
+                echo "============== output ====================="
+                cat $out
+                echo "==========================================="
+            fi
+        fi
+        rm $out
+} #ipapassword_attr_add_logic
+
