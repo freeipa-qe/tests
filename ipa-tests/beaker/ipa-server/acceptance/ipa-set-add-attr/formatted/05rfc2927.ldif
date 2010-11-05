@@ -1,0 +1,1 @@
+attributeTypes: ( 1.3.6.1.4.1.1466.101.120.17 NAME 'ldapSchemas'  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 USAGE directoryOperation   X-ORIGIN 'RFC 2927' )

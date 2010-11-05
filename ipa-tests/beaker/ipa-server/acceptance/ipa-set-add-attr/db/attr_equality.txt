@@ -1,0 +1,8 @@
+EQUALITY octetStringMatch
+EQUALITY integerMatch
+EQUALITY caseIgnoreMatch
+EQUALITY generalizedTimeMatch
+EQUALITY caseExactMatch
+EQUALITY caseExactIA5Match
+EQUALITY distinguishedNameMatch
+EQUALITY booleanMatch
