@@ -46,7 +46,7 @@ clean:
 include /usr/share/rhts/lib/rhts-make.include
 
 $(METADATA): Makefile
-	@echo "Owner:           Michael Gregg <Michael Greggemail>" > $(METADATA)
+	@echo "Owner:           Michael Gregg <mgregg@redhat.com>" > $(METADATA) 
 	@echo "Name:            $(TEST)" >> $(METADATA)
 	@echo "TestVersion:     $(TESTVERSION)" >> $(METADATA)
 	@echo "Path:            $(TEST_DIR)" >> $(METADATA)
