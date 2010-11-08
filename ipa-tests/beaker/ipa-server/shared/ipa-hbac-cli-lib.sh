@@ -27,7 +27,8 @@ addHBACRule()
    rulename=$6
    rc=0
 
-	ipa hbac-add $type $usercat $hostcat $srchostcat $servicecat $rulename
+	rlLog "Executing: ipa hbac-add --type=$type --usercat=$usercat --hostcat=$hostcat --srchostcat=$srchostcat --servicecat=$servicecat $rulename"
+	ipa hbac-add --type=$type --usercat=$usercat --hostcat=$hostcat --srchostcat=$srchostcat --servicecat=$servicecat $rulename
 	rc=$?
    	if [ $rc -ne 0 ] ; then
         	rlLog "WARNING: Adding new hbac rule $rulename failed."
