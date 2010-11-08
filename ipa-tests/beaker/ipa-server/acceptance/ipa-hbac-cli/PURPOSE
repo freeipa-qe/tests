@@ -1,0 +1,3 @@
+PURPOSE of /CoreOS/tests/Regression/ipa-hbac-cli
+Description: Host Based Access Control (HBAC) CLI acceptance tests
+Author: Jenny Galipeau <jgalipea@redhat.com>
