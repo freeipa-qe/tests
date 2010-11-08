@@ -614,9 +614,13 @@ rlJournalStart
 
     rlPhaseStartTest "ipa-group-cli-49: Negative - setattr and addattr on cn"
         command="ipa group-mod --setattr cn=\"cn=new,cn=groups,dc=domain,dc=com\" fish"
-        expmsg="ipa: ERROR: Operation not allowed on RDN:"
+        expmsg="ipa: ERROR: Invalid DN syntax: invalid RDN"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
-        command="ipa group-mod --addattr cn=\"cn=new,cn=groups,dc=domain,dc=com\" fish"
+        command="ipa group-mod --setattr cn=\"cn=new,cn=groups,dc=$RELM\" fish"
+        expmsg="ipa: ERROR: modifying primary key is not allowed"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
+	expmsg="ipa: ERROR: cn: Only one value allowed."
+        command="ipa group-mod --addattr cn=\"cn=new,cn=groups,dc=$RELM\" fish"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
     rlPhaseEnd
 
@@ -626,19 +630,17 @@ rlJournalStart
         rlRun "verifyGroupAttr fish desc new" 0 "Verifying group $attr was modified."
         # shouldn't be multivalue - additional add should fail
         command="ipa group-mod --addattr description=newer fish"
-        expmsg="ipa: ERROR: no modifications to be performed"
+        expmsg="ipa: ERROR: description: Only one value allowed."
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-group-cli-51: setattr and addattr on member"
-        attr="member"
 	member1="uid=trex,$USERDN"
 	member2="uid=mdolphin,$USERDN"
-	command="ipa group-mod --setattr member=\"$member1\" fish"
-	expmsg="ipa: ERROR: Operation not allowed on member"
-	rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
-	command="ipa group-mod --addattr member=\"$member2\" fish"
-	rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
+	ipa group-mod --setattr member=\"$member1\" fish
+	ipa group-mod --addattr member=\"$member2\" fish
+	rlRun "verifyGroupMember trex user fish" 0 "member and memberOf attribute verification"
+	rlRun "verifyGroupMember mdolphin user fish" 0 "member and memberOf attribute verification"
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-group-cli-52: setattr and addattr on memberOf"
@@ -646,7 +648,7 @@ rlJournalStart
         member1="cn=bogus,$GROUPRDN"
         member2="cn=bogus2,$GROUPRDN"
         command="ipa group-mod --setattr $attr=\"$member1\" fish"
-        expmsg="ipa: ERROR: Operation not allowed on $attr"
+        expmsg="ipa: ERROR: Insufficient access: Insufficient 'write' privilege to the 'memberOf' attribute of entry 'cn=fish,cn=groups,cn=accounts,dc=testrelm'."
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
         command="ipa group-mod --addattr $attr=\"$member2\" fish"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
@@ -654,7 +656,7 @@ rlJournalStart
 
     rlPhaseStartTest "ipa-group-cli-53: Negative - setattr and addattr on ipauniqueid"
         command="ipa group-mod --setattr ipauniqueid=mynew-unique-id fish"
-        expmsg="ipa: ERROR: Insufficient access: Insufficient 'write' privilege to the 'ipaUniqueID' attribute of entry 'cn=fish,cn=groups,cn=accounts,dc=testrelm'."
+        expmsg="ipa: ERROR: Insufficient access: Only the Directory Manager can set arbitrary values for ipaUniqueID"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
         command="ipa group-mod --addattr ipauniqueid=another-new-unique-id fish"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
@@ -733,8 +735,15 @@ rlJournalStart
 		addGroup Group$i Group$i
 		let i=$i+1
 	done
-	number=`getNumberOfGroups`
-	rlAssertEquals "Verifying number of groups returned" $number 103		
+
+	ipa group-find > /tmp/groupfind.out
+        result=`cat /tmp/groupfind.out | grep "Number of entries returned"`
+        number=`echo $result | cut -d " " -f 5`
+        if [ $number -eq 103 ] ; then
+                rlPass "All group returned as expected with size limit of 0"
+        else
+                rlFail "Number of groups returned is not as expected.  GOT: $number EXP: 103"
+        fi
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-group-cli-65: find 0 groups"
