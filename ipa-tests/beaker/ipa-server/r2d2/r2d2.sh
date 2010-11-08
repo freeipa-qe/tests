@@ -103,8 +103,8 @@ echo "------------------------------------------------"
 ########################################
 #    produce: Makefile                 #
 ########################################
-sed -e "s/r2d2_author/$author/g" \
-    -e "s/r2d2_authoremail/$authoremail/g" \
+sed -e "s/r2d2_authoremail/$authoremail/g" \
+    -e "s/r2d2_author/$author/g" \
     -e "s/r2d2_description/$description/g" \
     -e "s/r2d2_testlevel/$testlevel/g" \
     -e "s/r2d2_version/$version/g" \
@@ -115,8 +115,8 @@ echo "makefile is done:      [$makefile_out]"
 ########################################
 #    produce: PURPOSE                  #
 ########################################
-sed -e "s/r2d2_author/$author/g" \
-    -e "s/r2d2_authoremail/$authoremail/g" \
+sed -e "s/r2d2_authoremail/$authoremail/g" \
+    -e "s/r2d2_author/$author/g" \
     -e "s/r2d2_description/$description/g" \
     -e "s/r2d2_testsuitename/$testsuitename/g"\
     $purpose_template > $purpose_out
@@ -125,8 +125,8 @@ echo "purpose file is done:  [$purpose_out]"
 ########################################
 #    produce: testinfo.desc            #
 ########################################
-sed -e "s/r2d2_author/$author/g" \
-    -e "s/r2d2_authoremail/$authoremail/g" \
+sed -e "s/r2d2_authoremail/$authoremail/g" \
+    -e "s/r2d2_author/$author/g" \
     -e "s/r2d2_description/$description/g" \
     -e "s/r2d2_testsuitename/$testsuitename/g"\
     $testinfo_template > $testinfo_out
@@ -135,8 +135,8 @@ echo "testinfo.desc is done: [$testinfo_out]"
 ########################################
 #    produce: runtest.sh               #
 ########################################
-sed -e "s/r2d2_author/$author/g" \
-    -e "s/r2d2_authoremail/$authoremail/g" \
+sed -e "s/r2d2_authoremail/$authoremail/g" \
+    -e "s/r2d2_author/$author/g" \
     -e "s/r2d2_testlevel/$testlevel/g"\
     -e "s/r2d2_testsuitename/$testsuitename/g"\
     $runtest_template > $runtest_out
