@@ -54,6 +54,10 @@ host2="NIGHTCRAWLER."$DOMAIN
 host3="SHADOWFALL."$DOMAIN
 host4="shadowfall."$DOMAIN
 host5="qe-blade-01."$DOMAIN
+
+rlLog "$RELM"
+rlLog "$ROOTDN"
+rlLog "$ROOTDNPWD"
 ########################################################################
 
 PACKAGE="ipa-admintools"
@@ -319,7 +323,11 @@ rlJournalStart
         command="ipa host-mod --setattr cn=\"cn=new,cn=computers,dc=domain,dc=com\" $host1"
         expmsg="ipa: ERROR: Operation not allowed on RDN:"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
-        command="ipa host-mod --addattr cn=\"cn=new,cn=computers,dc=domain,dc=com\" $host1"
+        command="ipa host-mod --setattr cn=\"cn=new,cn=computers,dc=$RELM\" $host1"
+        expmsg="ipa: ERROR: modifying primary key is not allowed"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
+	expmsg="ipa: ERROR: cn: Only one value allowed."
+        command="ipa host-mod --addattr cn=\"cn=new,cn=computers,dc=$RELM\" $host1"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
     rlPhaseEnd
 
