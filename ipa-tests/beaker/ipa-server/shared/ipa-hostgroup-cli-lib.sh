@@ -314,7 +314,7 @@ verifyHostGroupMember()
   rlLog "Member DN: $memberDN"
   rlLog "Host Group DN: $groupDN"
   # verify member attribute for group
-  /usr/bin/ldapsearch -x -h $MASTER -p 389 -D "cn=Directory Manager" -w $ROOTDNPWD -b "$groupDN" | grep "member:" > /tmp/member.out
+  /usr/bin/ldapsearch -x -h $MASTER -p 389 -D "$ROOTDN" -w $ROOTDNPWD -b "$groupDN" | grep "member:" > /tmp/member.out
    cat /tmp/member.out | grep "$memberDN"
   if [ $? -ne 0 ] ; then
   	rlLog "WARNING: member: $memberDN not found for group $mygroup"	
@@ -325,7 +325,7 @@ verifyHostGroupMember()
 
   # verify memberof attribute for the member
 
-  /usr/bin/ldapsearch -x -h $MASTER -p 389 -D "cn=Directory Manager" -w $ROOTDNPWD -b "$memberDN" | grep "memberOf:" > /tmp/memberof.out
+  /usr/bin/ldapsearch -x -h $MASTER -p 389 -D "$ROOTDN" -w $ROOTDNPWD -b "$memberDN" | grep "memberOf:" > /tmp/memberof.out
   cat /tmp/memberof.out | grep "$groupDN"
   if [ $? -ne 0 ] ; then
   	rlLog "WARNING: memberOf: $groupDN not found for member $member"
