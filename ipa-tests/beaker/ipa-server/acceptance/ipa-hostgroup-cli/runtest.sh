@@ -54,6 +54,7 @@ HOSTGRPDN="cn=hostgroups,cn=accounts,"
 HOSTGRPRDN="$HOSTGRPDN$BASEDN"
 HOSTDN="cn=computers,cn=accounts,"
 HOSTRDN="$HOSTDN$BASEDN"
+
 rlLog "HOSTDN is $HOSTRDN"
 rlLog "HOSTGRPDN is $HOSTGRPRDN"
 rlLog "Server is $MASTER"
@@ -251,10 +252,11 @@ rlJournalStart
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-hostgroup-cli-25: Negative - setattr and addattr on cn"
-        command="ipa hostgroup-mod --setattr cn=\"cn=new,cn=groups,dc=domain,dc=com\" $group1"
-        expmsg="ipa: ERROR: Operation not allowed on RDN:"
+        command="ipa hostgroup-mod --setattr cn=\"cn=new,cn=groups,dc=$RELM\" $group1"
+        expmsg="ipa: ERROR: modifying primary key is not allowed"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
-        command="ipa hostgroup-mod --addattr cn=\"cn=new,cn=groups,dc=domain,dc=com\" $group1"
+        command="ipa hostgroup-mod --addattr cn=\"cn=new,cn=groups,dc=$RELM\" $group1"
+	expmsg="ipa: ERROR: cn: Only one value allowed."
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
     rlPhaseEnd
 
@@ -264,7 +266,7 @@ rlJournalStart
         rlRun "verifyHostGroupAttr $group1 desc new" 0 "Verifying host group $attr was modified."
         # shouldn't be multivalue - additional add should fail
         command="ipa hostgroup-mod --addattr description=newer $group1"
-        expmsg="ipa: ERROR: no modifications to be performed"
+        expmsg="ipa: ERROR: description: Only one value allowed."
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
     rlPhaseEnd
 
@@ -272,11 +274,10 @@ rlJournalStart
         attr="member"
         member1="cn=newcn,$HOSTRDN"
         member2="cn=newcn2,$HOSTRDN"
-        command="ipa hostgroup-mod --setattr $attr=\"$member1\" \"$group1\""
-        expmsg="ipa: ERROR: Operation not allowed on $attr"
-        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
-        command="ipa hostgroup-mod --addattr $attr=\"$member2\" \"$group1\""
-        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
+        ipa hostgroup-mod --setattr $attr="$member1" "$group1"
+	rlRun "verifyHostGroupMember \"$member1\" host  \"$group3\"" 0 "Verify member was added"
+        ipa hostgroup-mod --addattr $attr="$member2" "$group1"
+	rlRun "verifyHostGroupMember \"$member2\" host  \"$group3\"" 0 "Verify member was added"
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-hostgroup-cli-28: setattr and addattr on memberOf"
@@ -284,15 +285,15 @@ rlJournalStart
         member1="cn=bogus,$HOSTGRPRDN"
         member2="cn=bogus2,$HOSTGRPRDN"
         command="ipa hostgroup-mod --setattr $attr=\"$member1\" \"$group1\""
-        expmsg="ipa: ERROR: Operation not allowed on $attr"
+        expmsg="ipa: ERROR: Insufficient access: Insufficient 'write' privilege to the 'memberOf' attribute of entry 'cn=hostgrp1,cn=hostgroups,cn=accounts,dc=testrelm'."
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
-        command="ipa group-mod --addattr $attr=\"$member2\" \"$group1\""
+        command="ipa hostgroup-mod --addattr $attr=\"$member2\" \"$group1\""
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-hostgroup-cli-29: Negative - setattr and addattr on ipauniqueid"
         command="ipa hostgroup-mod --setattr ipauniqueid=mynew-unique-id $group1"
-        expmsg="ipa: ERROR: Insufficient access: Insufficient 'write' privilege to the 'ipaUniqueID' attribute of entry 'cn=$group1,cn=hostgroups,cn=accounts,dc=testrelm'."
+        expmsg="ipa: ERROR: Insufficient access: Only the Directory Manager can set arbitrary values for ipaUniqueID"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
         command="ipa hostgroup-mod --addattr ipauniqueid=another-new-unique-id $group1"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
@@ -318,8 +319,14 @@ rlJournalStart
                 addHostGroup Group$i Group$i
                 let i=$i+1
         done
-        number=`getNumberOfGroups`
-        rlAssertEquals "Verifying number of groups returned" $number 100
+        ipa hostgroup-find --sizelimit=0 > /tmp/hostgroupfind.out
+        result=`cat /tmp/hostgroupfind.out | grep "Number of entries returned"`
+        number=`echo $result | cut -d " " -f 5`
+        if [ $number -eq 100 ] ; then
+                rlPass "All host group returned as expected"
+        else
+                rlFail "Number of host groups returned is not as expected.  GOT: $number EXP: 100"
+        fi
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-hostgroup-cli-33: find 0 host groups"
