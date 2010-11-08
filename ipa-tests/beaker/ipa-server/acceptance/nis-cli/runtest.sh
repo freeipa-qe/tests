@@ -41,7 +41,7 @@
 PACKAGE="ipa-server"
 
 # Init master var
-master = 0;
+export master=0;
 
 ##########################################
 #   test main 
@@ -50,7 +50,7 @@ master = 0;
 # Determine if this is a master
 
 if [ "$MASTER" = "$HOSTNAME" ]; then 
-	master = 1;
+	export master=1;
 fi
 
 rlJournalStart
@@ -77,7 +77,7 @@ if [ $master -eq 1 ]; then
 fi
 
 # If this is a client, wait until the master server is setup before continuing.
-serverdone = 0;
+export serverdone=0;
 while [ $serverdone -eq 0 ]; do
 	cd /dev/shm;wget http://$MASTER/nisconfigured.html
 	if [ $? -ne 0 ]; then
@@ -85,10 +85,11 @@ while [ $serverdone -eq 0 ]; do
 		sleep 60
 	else
 		echo "NIS configured on master!"
-		serverdone = 1;
+		export serverdone=1;
 	fi
 done
 
+env
     # r2d2_test_starts
 	rlPhaseStartTest "Get admin ticket"
 	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
