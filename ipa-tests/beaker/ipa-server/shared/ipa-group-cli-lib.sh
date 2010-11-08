@@ -1,5 +1,7 @@
 #!/bin/sh
 . /dev/shm/env.sh
+ROOTDN="cn=Directory Manager"
+ROOTDNPWD="Secret123"
 
 ########################################################################
 #  GROUP CLI SHARED LIBRARY
@@ -91,7 +93,7 @@ findGroup()
         fi
 
    else
-                rlLog "WARNING: Failed to find host."
+                rlLog "WARNING: Failed to find group."
    fi
 
    return $rc
@@ -344,7 +346,7 @@ verifyGroupMember()
   rlLog "Group DN: $groupDN"
   if [ $rc -eq 0 ] ; then
   	# verify member attribute for group
-  	/usr/bin/ldapsearch -x -h $MASTER -p 389 -D "cn=Directory Manager" -w $ROOTDNPWD -b "$groupDN" | grep "member:" > /tmp/member.out
+  	/usr/bin/ldapsearch -x -h $MASTER -p 389 -D "$ROOTDN" -w $ROOTDNPWD -b "$groupDN" | grep "member:" > /tmp/member.out
   	cat /tmp/member.out | grep "$memberDN"
   	if [ $? -ne 0 ] ; then
         	rlLog "WARNING: member: $memberDN not found for group $mygroup"
