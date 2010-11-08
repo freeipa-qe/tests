@@ -1,7 +1,5 @@
 #!/bin/sh
 . /dev/shm/env.sh
-ROOTDN="cn=Directory Manager"
-ROOTDNPWD="Secret123"
 
 ########################################################################
 #  GROUP CLI SHARED LIBRARY
