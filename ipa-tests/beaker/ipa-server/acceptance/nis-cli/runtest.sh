@@ -9,7 +9,7 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-#   Author: Michael Gregg <Michael Greggemail>
+#   Author: Michael Gregg <mgregg@redhat.com>
 #   Date  : Sept 10, 2010
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #

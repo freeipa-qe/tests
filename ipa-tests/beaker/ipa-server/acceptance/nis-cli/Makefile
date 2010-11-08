@@ -2,7 +2,7 @@
 #
 #   Makefile of /CoreOS/tests/Regression/nis-cli
 #   Description: Tests setup and exercise of nis integrated ipa tasks
-#   Author: Michael Gregg <Michael Greggemail>
+#   Author: Michael Gregg <mgregg@redhat.com>
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
@@ -46,7 +46,7 @@ clean:
 include /usr/share/rhts/lib/rhts-make.include
 
 $(METADATA): Makefile
-	@echo "Owner:           Michael Gregg <mgregg@redhat.com>" > $(METADATA) 
+	@echo "Owner:           Michael Gregg <mgregg@redhat.com>" > $(METADATA)
 	@echo "Name:            $(TEST)" >> $(METADATA)
 	@echo "TestVersion:     $(TESTVERSION)" >> $(METADATA)
 	@echo "Path:            $(TEST_DIR)" >> $(METADATA)

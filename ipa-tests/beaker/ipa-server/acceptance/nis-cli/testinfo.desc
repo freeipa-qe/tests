@@ -1,4 +1,4 @@
-Owner:           Michael Gregg <Michael Greggemail>
+Owner:           Michael Gregg <mgregg@redhat.com>
 Name:            /CoreOS/ipa-server/acceptance/nis-cli
 TestVersion:     1.0
 Path:            /mnt/tests/CoreOS/ipa-server/acceptance/nis-cli
