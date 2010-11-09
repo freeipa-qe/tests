@@ -29,7 +29,7 @@ export TESTVERSION=1.0
 
 BUILT_FILES=
 
-FILES=$(METADATA) runtest.sh Makefile PURPOSE t.ipaconfig.sh
+FILES=$(METADATA) runtest.sh Makefile PURPOSE t.ipaconfig.sh data.ipaconfig.acceptance lib.ipaconfig.sh
 
 .PHONY: all install download clean
 
