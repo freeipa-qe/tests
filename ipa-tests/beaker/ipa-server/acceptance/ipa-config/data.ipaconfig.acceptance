@@ -1,0 +1,53 @@
+############################################
+# this is a acceptance test leve data file #
+############################################
+# test suite: ipapassword
+# data : acceptance test data
+# Users to be used in varios tests
+# called by: ipa-password/runtest.sh
+
+admin="admin"
+adminpassword="redhat123"
+realm="SJC.REDHAT.COM"
+initialpw="Initial@123"
+tmpdir="/dev/shm/ipapassword/tmp"
+kdestroy="/usr/kerberos/bin/kdestroy -q 2>&1 >/dev/null"
+
+ntpserver="wiki.idm.lab.bos.redhat.com"
+
+# test account info
+testac="passwordTestAC"
+testacLast="passwordTest"
+testacFirst="passwordFirst"
+testacPW="passWORD@123"
+testacNEWPW="newpassWORD@123"
+
+testgrp="passwordTestGrp"
+grouppw_maxlife=60
+grouppw_minlife=2
+grouppw_history=1
+grouppw_classes=1
+grouppw_length=10
+grouppw_priority=6
+
+nestedgrp="nestedpwTestGrp"
+nestedpw_maxlife=50
+nestedpw_minlife=3
+nestedpw_history=2
+nestedpw_classes=1
+nestedpw_length=8
+nestedpw_priority=7
+
+#global pwpolicy data
+globalpw_maxlife=90
+globalpw_minlife=1
+globalpw_history=0
+globalpw_classes=0
+globalpw_length=8
+
+# objectclasses: ( 2.16.840.1.113719.1.301.6.14.1 
+#   NAME 'krbPwdPolicy' SUP top 
+#   STRUCTURAL MUST cn 
+#   MAY ( krbMaxPwdLife $ krbMinPwdLife $ krbPwdMinDiffChars 
+#               $ krbPwdMinLength $ krbPwdHistoryLength ) )
+pwpolicyattrs="krbMaxPwdLife krbMinPwdLife krbPwdMinDiffChars krbPwdMinLength krbPwdHistoryLength"
