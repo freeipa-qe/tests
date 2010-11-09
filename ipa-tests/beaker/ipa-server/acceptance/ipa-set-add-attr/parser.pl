@@ -250,7 +250,7 @@ sub saveto {
     my @keys = keys %hash;
     print "\ntotal [".$#keys."] values";
     foreach my $key (sort keys %hash){
-        print FILE "\n[$key]";
+        print FILE "\n=[$key]=";
         my $tmphash=$hash{$key};
         my %content = %$tmphash;
         foreach my $k (sort keys %content){
