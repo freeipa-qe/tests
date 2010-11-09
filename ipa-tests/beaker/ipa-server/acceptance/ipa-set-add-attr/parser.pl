@@ -5,25 +5,42 @@ use warnings;
 
 # file : parser.pl
 #     parsing all schema file and save into db
-# date : Jan. 6, 2010
+# date : Nov. 5, 2010
 # by   : yzhang@redhat.com
 
-our $base=".";
-our $standardDir="$base/standard";
-our $db="$base/db";
-our $formatted="$base/formatted";
+our $schemaDir="/etc/dirsrv/schema";
+our $outdir="./";
+
+if ($#ARGV == -1){
+    print "\nUsing default ...";
+    print "\nSchema dir : $schemaDir";
+    print "\noutput dir : $outdir";
+}elsif ($#ARGV == 0){
+    $schemaDir=$ARGV[0];
+}elsif ($#ARGV == 1){
+    $schemaDir=$ARGV[0];
+    $outdir=$ARGV[1];
+}else {
+    print "\nargs=$#ARGV";
+    print "\nUsage: schemaparser.pl <schema dir> <output file>";
+    print "\nDefault schema dir : $schemaDir";
+    print "\nDefault output dir : $outdir";
+    exit 0;
+}
+
+
+our $formatted="";
+createtmp();
 
 our (%attributeTypes , %objectClasses) ;
-our (%attr_name, %attr_numericoid, %attr_desc, %attr_sup, %attr_equality, %attr_ordering, %attr_substr, %attr_syntax, %attr_usage, %attr_extensions);
-our (%obj_name, %obj_numericoid, %obj_desc, %obj_sup, %obj_may, %obj_must, %obj_extensions);
 
-print "\nparser starts...";
+print "\nSchema parser starts...";
 
 # format the file for future parsing
-if (opendir (DIR, $standardDir)){
+if (opendir (DIR, $schemaDir)){
     while (my $schemafile = readdir(DIR)){
         if ($schemafile =~/\.ldif$/){
-            formatfile("$standardDir/$schemafile", "$formatted/$schemafile");
+            formatfile("$schemaDir/$schemafile", "$formatted/$schemafile");
         }
     }
 }#format file
@@ -42,12 +59,15 @@ if (opendir (DIR,$formatted) ){
     printhash (\%attributeTypes);
     print "\n\n------- objectClass---------------------------";
     printhash (\%objectClasses);
-    # save to db -- currently use file as data holder
-    savetodb ("$db/attributeTypes.txt", \%attributeTypes);
-    savetodb ("$db/objectClasses.txt", \%objectClasses);
+
+    # save to outfile
+    saveto("$outdir/attributeTypes.txt", \%attributeTypes);
+    saveto("$outdir/objectClasses.txt", \%objectClasses);
 } else {
-    print "[$standardDir] ERROR";
+    print "[$schemaDir] ERROR";
 }
+
+deletetmp();
 print "\nend of programm\n";
 #end of main
 
@@ -219,27 +239,46 @@ sub printhash {
     }
 }
 
-sub savetodb {
-    my ($dbfile,$data)=@_;
+sub saveto {
+    my ($dbfile,$h)=@_;
     if (! open (FILE, ">$dbfile")){
         print "\n error, can not write to file, return";
         return;
     }
-    if (ref($data) eq "ARRAY"){
-    # save array type to file, each line for each element
-        foreach my $value (@$data){
-            print FILE $value;
-            print FILE "\n";
+
+    my %hash = %$h;
+    my @keys = keys %hash;
+    print "\ntotal [".$#keys."] values";
+    foreach my $key (sort keys %hash){
+        print FILE "\n[$key]";
+        my $tmphash=$hash{$key};
+        my %content = %$tmphash;
+        foreach my $k (sort keys %content){
+            print FILE "\n [$k] ==> [$content{$k}]";
         }
+        print FILE "\n";
     }
-    if (ref($data) eq "HASH"){
-    # save hash type to file, each line using format: key=value
-        my %hash = %$data;
-        foreach my $key (sort keys %hash){
-            print FILE $key."=".$hash{$key};
-            print FILE "\n";
-        }
-    }
+
     print "\nSave to [$dbfile] done";
     close FILE;
 }#end of savetodb
+
+sub createtmp{
+    my $num=int(rand() * 10000 );
+    my $dirname="/tmp/formatted".$num;
+    if (! -d $dirname ){
+        mkdir ($dirname, 0777) || die $!;
+        $formatted=$dirname;
+        print "\ncreate temp dir [$formatted]";
+    }else{
+        print "\nCan not make temp dir";
+        exit 0;
+    }
+} #createtmp
+
+sub deletetmp{
+    if ( -d $formatted){
+        system ("rm -rf $formatted");
+        print "\nremove temp dir [$formatted]";
+    }
+}# deletetmp
