@@ -6,6 +6,7 @@ ipadefault()
 {
     ipadefault_envsetup
     ipadefault_pwpolicy
+    ipadefault_config
     ipadefault_envcleanup
 } # ipadefault
 
@@ -20,17 +21,23 @@ ipadefault_pwpolicy()
 } #ipadefault_pwpolicy
 
 ######################
+# test set           #
+######################
+ipadefault_config()
+{
+    ipadefault_config_envsetup
+    ipadefault_config_all
+    ipadefault_config_envcleanup
+} #ipadefault_config
+
+
+######################
 # test cases         #
 ######################
 ipadefault_envsetup()
 {
     rlPhaseStartSetup "ipadefault_envsetup"
         #environment setup starts here
-#        if [ ! -d $tmpdir ];then
-#            rlPass "mkdir -p $tmpdir" 0 "create tmp dir"
-#        else
-#            rlPass "tmpdir=[$tmpdir] no other special environment setup required, use all default setting"
-#        fi
         rlPass "tmpdir=[$TmpDir] no other special environment setup required, use all default setting"
         #environment setup ends   here
     rlPhaseEnd
@@ -118,3 +125,72 @@ ipadefault_pwpolicy_all_logic()
         rm $out
     # test logic ends
 } # ipadefault_pwpolicy_all_logic 
+
+ipadefault_config_envsetup()
+{
+    rlPhaseStartSetup "ipadefault_config_envsetup"
+        #environment setup starts here
+        rlPass "no special environment setup required, use all default setting"
+        #environment setup ends   here
+    rlPhaseEnd
+} #ipadefault_config_envsetup
+
+ipadefault_config_envcleanup()
+{
+    rlPhaseStartCleanup "ipadefault_config_envcleanup"
+        #environment cleanup starts here
+        rlPass "no special environment cleanup required, use all default setting"
+        #environment cleanup ends   here
+    rlPhaseEnd
+} #ipadefault_config_envcleanup
+
+ipadefault_config_all()
+{
+# looped data   : 
+# non-loop data : 
+    rlPhaseStartTest "ipadefault_config_all"
+        rlLog "check the default settings for general ipa server configuration"
+        ipadefault_config_all_logic
+    rlPhaseEnd
+} #ipadefault_config_all
+
+ipadefault_config_all_logic()
+{
+    # accept parameters: NONE
+    # test logic starts
+        local out=$TmpDir/defaultvalues.$RANDOM.txt
+        kinitAs $admin $adminpassword
+        rlRun "ipa config-show > $out" 0 "store config-show in [$out]"
+        usernamelength=`grep "Max username length" $out | cut -d":" -f2| xargs echo`
+        ipacompare "default user name length" "$default_config_usernamelength" "$usernamelength"
+
+        homebase=`grep "Home directory base" $out | cut -d":" -f2| xargs echo`
+        ipacompare "default home base" "$default_config_homebase" "$homebase"
+       
+        defaultshell=`grep "Default shell" $out | cut -d":" -f2| xargs echo`
+        ipacompare "default shell" "$default_config_shell" "$defaultshell"
+
+        usersgroup=`grep "Default users group" $out | cut -d":" -f2| xargs echo`
+        ipacompare "Default users group" "$default_config_usergroup" "$usersgroup"
+
+        searchtimelimit=`grep "Search time limit" $out | cut -d":" -f2| xargs echo`
+        ipacompare "search time limit" "$default_config_timelimit" "$searchtimelimit"
+
+        searchsizelimit=`grep "Search size limit" $out | cut -d":" -f2| xargs echo`
+        ipacompare "search size limit" "$default_config_sizelimit" "$searchsizelimit"
+
+        usersearchfields=`grep "User search fields" $out | cut -d":" -f2| xargs echo`
+        ipacompare "user search fields" "$default_config_usersearchfields" "$usersearchfields"
+
+        groupsearchfields=`grep "Group search fields" $out | cut -d":" -f2| xargs echo`
+        ipacompare "group search fields" "$default_config_groupsearchfields" "$groupsearchfields"
+
+        migrationmode=`grep "Migration mode"  $out | cut -d":" -f2| xargs echo`
+        ipacompare "migration mode" "$default_config_migrationmode" "$migrationmode"
+
+        certsubjectbase=`grep "Certificate Subject base" $out | cut -d":" -f2| xargs echo`
+        ipacompare "cert subject base" "$default_config_certsubjectbase" "$certsubjectbase"
+
+        rm $out
+    # test logic ends
+} # ipadefault_config_all_logic 

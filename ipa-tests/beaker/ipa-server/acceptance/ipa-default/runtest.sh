@@ -41,6 +41,7 @@
 # Include test case file
 . ./t.ipadefault.sh
 . ./data.ipadefault.acceptance
+. ./lib.ipadefault.sh
 
 PACKAGE="ipa-server"
 

@@ -9,4 +9,13 @@ default_pw_history=0
 default_pw_classes=0
 default_pw_length=8
 
-
+default_config_usernamelength="8"
+default_config_homebase="/home"
+default_config_shell="/bin/sh"
+default_config_usergroup="ipausers"
+default_config_timelimit="2"
+default_config_sizelimit="0"
+default_config_usersearchfields="uid,givenname,sn,telephonenumber,ou,title"
+default_config_groupsearchfields="cn,description"
+default_config_migrationmode="FALSE"
+default_config_certsubjectbase="O=IPA"
