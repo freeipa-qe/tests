@@ -1,2 +1,0 @@
-ORDERING integerOrderingMatch
-ORDERING generalizedTimeOrderingMatch

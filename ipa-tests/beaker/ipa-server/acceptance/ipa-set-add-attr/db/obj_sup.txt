@@ -1,7 +1,0 @@
-SUP top
-SUP nsRoleDefinition
-SUP cosSuperDefinition
-SUP nsSimpleRoleDefinition
-SUP javaObject
-SUP ldapSubEntry
-SUP nsComplexRoleDefinition
