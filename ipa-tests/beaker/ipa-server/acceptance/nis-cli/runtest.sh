@@ -37,12 +37,25 @@
 . /usr/bin/rhts-environment.sh
 . /usr/share/beakerlib/beakerlib.sh
 . /dev/shm/ipa-server-shared.sh
+. /dev/shm/ipa-netgroup-cli-lib.sh
 . /dev/shm/env.sh
 
 PACKAGE="ipa-server"
 
 # Init master var
 export master=0;
+
+hostname_s=$(hostname -s)
+
+user1=usk1r
+user2=use33t
+user3=usern00b
+user4=lopr4k
+group1=grpddee
+group2=grplloo
+group3=grpmmpp
+group4=grpeeww
+ngroup1=ngrp7664
 
 ##########################################
 #   test main 
@@ -66,6 +79,7 @@ rlJournalStart
 	rlPhaseEnd
 
 if [ $master -eq 1 ]; then
+	setenforce 0
 	echo $ADMINPW > /dev/shm/password
 	ipa-compat-manage -y /dev/shm/password enable
 	ipa-nis-manage -y /dev/shm/password enable
@@ -90,33 +104,80 @@ while [ $serverdone -eq 0 ]; do
 	fi
 done
 
-env
     # r2d2_test_starts
 	rlPhaseStartTest "Get admin ticket"
 	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 	rlPhaseEnd
 
+ 	ipa user-add --first=aa --last=bb $user1
+	ipa user-add --first=aa --last=bb $user2
+	ipa user-add --first=aa --last=bb $user3
+	ipa user-add --first=aa --last=bb $user4
+	ipa group-add --desc=testtest $group1
+	ipa group-add --desc=testtest $group2
+	ipa group-add --desc=testtest $group3
+	ipa group-add --desc=testtest $group4
+
+        addNetgroup $ngroup1 test-group-1
+
 	rlPhaseStartTest "check to see if ypcat can enumerate passwd"
-	rlRun "ypcat -h $MASTER -d $DOMAIN passwd" 0 "Check to see that passwd can be enumerated"
+		rlRun "ypcat -h $MASTER -d $DOMAIN passwd" 0 "Check to see that passwd can be enumerated"
 	rlPhaseEnd
 
 	rlPhaseStartTest "check to see if ypcat can enumerate group"
-	rlRun "ypcat -h $MASTER -d $DOMAIN group" 0 "Check to see that group can be enumerated"
+		rlRun "ypcat -h $MASTER -d $DOMAIN group" 0 "Check to see that group can be enumerated"
 	rlPhaseEnd
 
 	rlPhaseStartTest "check to see if ypcat can enumerate netgroup"
-	rlRun "ypcat -h $MASTER -d $DOMAIN netgroup" 0 "Check to see that netgroup can be enumerated"
+		rlRun "ypcat -h $MASTER -d $DOMAIN netgroup" 0 "Check to see that netgroup can be enumerated"
 	rlPhaseEnd
 
 	rlPhaseStartTest "check to see if ypcat cannot enumerate badgroup"
-	rlRun "ypcat -h $MASTER -d $DOMAIN badgroup" 1 "Check to see that badgroup can not be enumerated"
+		rlRun "ypcat -h $MASTER -d $DOMAIN badgroup" 1 "Check to see that badgroup can not be enumerated"
 	rlPhaseEnd
+
+	# enumerate maps into some files for analysis. 
+	ypcat -h $MASTER -d $DOMAIN passwd > /dev/shm/passwd-map
+	ypcat -h $MASTER -d $DOMAIN group > /dev/shm/group-map
+	ypcat -h $MASTER -d $DOMAIN netgroup > /dev/shm/netgroup-map	
+	rlPhaseStartTest "check to ensure all users are in nis"
+		rlRun "grep $user1 /dev/shm/passwd-map" 0 "Verifying that user1 is in the nis passwd map"
+		rlRun "grep $user2 /dev/shm/passwd-map" 0 "Verifying that user2 is in the nis passwd map"
+		rlRun "grep $user3 /dev/shm/passwd-map" 0 "Verifying that user3 is in the nis passwd map"
+		rlRun "grep $user4 /dev/shm/passwd-map" 0 "Verifying that user4 is in the nis passwd map"
+	rlPhaseEnd
+
+	rlPhaseStartTest "check to ensure that groups are in nis passwd map"
+		rlRun "grep $group1 /dev/shm/group-map" 0 "Verifying that group1 is in the nis password map"
+		rlRun "grep $group2 /dev/shm/group-map" 0 "Verifying that group2 is in the nis password map"
+		rlRun "grep $group3 /dev/shm/group-map" 0 "Verifying that group3 is in the nis password map"
+		rlRun "grep $group4 /dev/shm/group-map" 0 "Verifying that group4 is in the nis password map"
+	rlPhaseEnd
+
+	rlPhaseStartTest "check to ensure that net groups are in nis passwd map"
+		rlRun "grep $ngroup1 /dev/shm/netgroup-map" 0 "Verifying that netgroup1 is in the nis password map"
+	rlPhaseEnd
+
+	rlPhaseStartTest "check to ensure invalid users are not in nis"
+		rlRun "grep baduser1 /dev/shm/passwd-map" 1 "Verifying that user1 is in the nis passwd map"
+	rlPhaseEnd
+
 
     # r2d2_test_ends
 
     rlPhaseStartCleanup "nis-cli cleanup"
         rlRun "popd"
         rlRun "rm -r $TmpDir" 0 "Removing tmp directory"
+	rlRun "setenforce 1" 0 "reenable enforcing selinux"
+	ipa user-del $user1
+	ipa user-del $user2
+	ipa user-del $user3
+	ipa user-del $user4
+	ipa group-del $group1
+	ipa group-del $group2
+	ipa group-del $group3
+	ipa group-del $group4
+	ipa netgroup-del $ngroup1
     rlPhaseEnd
 
     makereport
