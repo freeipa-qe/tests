@@ -39,6 +39,8 @@
 . /dev/shm/ipa-server-shared.sh
 
 # Include test case file
+. ./data.ipaconfig.acceptance
+. ./lib.ipaconfig.sh
 . ./t.ipaconfig.sh
 
 PACKAGE="ipa-server"
