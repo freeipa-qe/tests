@@ -16,6 +16,7 @@ kdestroy="/usr/kerberos/bin/kdestroy 2>&1 >/dev/null"
 ntpserver="wiki.idm.lab.bos.redhat.com"
 initialpw="initial123@IPA"
 
+config_username_maxlength="255"
 # test account info
 testac="configTestUser"
 testacLast="configTestLast"

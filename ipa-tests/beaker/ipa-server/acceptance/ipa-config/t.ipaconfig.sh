@@ -193,43 +193,22 @@ ipaconfig_mod_maxusername_default()
 # non-loop data : 
     rlPhaseStartTest "ipaconfig_mod_maxusername_default"
         rlLog "this is to test for default behave"
-        KinitAsAdmin
-        definedlength=`getrandomint 1 255`
-        rlRun "ipa config-mod --maxusername=$definedlength" 0 "set maxusername to [$definedlength]"
-        clear_kticket
-
-        curlen=1 
-        #when current username<defined, test should pass
-        expected=0
-        while [ "$curlen" -le "$definedlength" ];do
-            username=`dataGenerator "username" $curlen`
-            lastname=`dataGenerator "lastname" $curlen`
-            firstname=`dataGenerator "firstname" $curlen`
-            password=`dataGenerator "password" 8`
-            rlLog "test: len=[$curlen], username=[$username], expect success"
-            create_ipauser $expected $username $firstname $lastname $password
-            delete_ipauser "$username"
-            curlen=$((curlen+1))
+        # only do spot check for username length setting
+        # assuming spot is randomly selected at 21
+        # we will then check: 1, 20,21,22,255
+        # so "spot" range would be : 3-255
+        local max=$((config_username_maxlength - 2))
+        #local spot=`getrandomint 3 $max`
+        local spot=`getrandomint 3 31`
+        #for len in 1 $spot $config_username_maxlength
+        for len in 1 $spot 
+        do
+            #set the maxusername via ipa config-mod
+            KinitAsAdmin
+            rlRun "ipa config-mod --maxusername=$len" 0 "set maxusername to [$len]"
+            clear_kticket
+            ipaconfig_mod_maxusername_default_logic $len
         done
-
-        #when current username>defined, test should fail 
-        offset=`getrandomint 20 100`
-        upperedge=$((definedlength + offset))
-        loweredge=$((definedlength + 1))
-        expected=1
-        i=0
-        totaltest=5 #lets just test 5 times
-        while [ "$i" -lt "$totaltest" ];do
-            newlen=`getrandomint $loweredge $upperedge`
-            username=`dataGenerator "username" $newlen`
-            lastname=`dataGenerator "lastname" $newlen`
-            firstname=`dataGenerator "firstname" $newlen`
-            password=`dataGenerator "password" 8`
-            rlLog "test: len=[$newlen], username=[$username], expect fail"
-            create_ipauser $expected $username $firstname $lastname $password
-            i=$((i+1))
-        done
-        clear_kticket
     rlPhaseEnd
 } #ipaconfig_mod_maxusername_default
 
@@ -237,16 +216,39 @@ ipaconfig_mod_maxusername_default_logic()
 {
     # accept parameters: length 
     # test logic starts
-        local expected=$1
-        local length=$2
-        local username=$3
-        local lastname=$4
-        local firstname=$5
-        local password=$6
-        local out=$TmpDir/config.maxusername.default.$RANDOM.out
+        local length=$1
+        # when user name < defined max length, we should be able to create user 
+        # we still do spot check here:
+        # example: if passin length = 10, we then define
+        # pass case: 1, 6 , 10 --> whee "6" is randomm spot we picked
+        # fail case: 11, 255 (current max)
 
-        create_ipauser $expected $username $firstname $lastname $password
-        rm $out
+        local spot=`getrandomint 2 $length` 
+        local username_length="1 $spot $length"
+        #when current username < definedLength, test should pass
+        expected=0
+        for curlen in $username_length ; do
+            username=`dataGenerator "username" $curlen`
+            lastname=`dataGenerator "lastname" $curlen`
+            firstname=`dataGenerator "firstname" $curlen`
+            password=`dataGenerator "password" 8`
+            rlLog "test: len=[$curlen], username=[$username], expect success"
+            create_ipauser $expected $username $firstname $lastname $password
+            delete_ipauser "$username"
+        done
+
+        local longer=$((length + 1))
+        local username_length="$longer $config_username_maxlength"
+        #when current username>defined, test should fail 
+        expected=1
+        for curlen in $username_length ; do
+            username=`dataGenerator "username" $curlen`
+            lastname=`dataGenerator "lastname" $curlen`
+            firstname=`dataGenerator "firstname" $curlen`
+            password=`dataGenerator "password" 8`
+            rlLog "test: len=[$curlen], username=[$username], expect fail"
+            create_ipauser $expected $username $firstname $lastname $password
+        done
     # test logic ends
 } # ipaconfig_mod_maxusername_default_logic 
 
@@ -256,7 +258,10 @@ ipaconfig_mod_maxusername_negative()
 # non-loop data : 
     rlPhaseStartTest "ipaconfig_mod_maxusername_negative"
         rlLog "negative test case for maxusername"
-        ipaconfig_mod_maxusername_negative_logic
+        for len in 0 -1 a abc
+        do
+            ipaconfig_mod_maxusername_negative_logic $len
+        done
     rlPhaseEnd
 } #ipaconfig_mod_maxusername_negative
 
@@ -264,7 +269,10 @@ ipaconfig_mod_maxusername_negative_logic()
 {
     # accept parameters: NONE
     # test logic starts
-        rlFail "EMPTY LOGIC"
+        local  len=$1
+        KinitAsAdmin
+        rlRun "ipa config-mod --maxusername=$len" 1 "expect to fail: maxusername=[$len]"
+        clear_kticket
     # test logic ends
 } # ipaconfig_mod_maxusername_negative_logic 
 
