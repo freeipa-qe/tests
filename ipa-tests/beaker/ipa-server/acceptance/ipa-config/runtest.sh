@@ -41,6 +41,7 @@
 # Include test case file
 . ./data.ipaconfig.acceptance
 . ./lib.ipaconfig.sh
+. ./lib.dataGenerator.sh
 . ./t.ipaconfig.sh
 
 PACKAGE="ipa-server"
@@ -60,12 +61,13 @@ rlJournalStart
     ipaconfig
     # r2d2_test_ends
 
+    makereport
+
     rlPhaseStartCleanup "ipaconfig cleanup"
         rlRun "popd"
         rlRun "rm -r $TmpDir" 0 "Removing tmp directory"
     rlPhaseEnd
 
-    makereport
 rlJournalEnd
 
 

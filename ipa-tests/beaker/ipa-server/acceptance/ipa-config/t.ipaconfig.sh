@@ -5,10 +5,10 @@
 ipaconfig()
 {
     ipaconfig_envsetup
-    ipaconfig_show
+#    ipaconfig_show
     ipaconfig_mod
-    ipaconfig_searchlimit
-    ipaconfig_server
+#    ipaconfig_searchlimit
+#    ipaconfig_server
     ipaconfig_envcleanup
 } # ipaconfig
 
@@ -116,36 +116,36 @@ ipaconfig_show_default_logic()
         local out=$TmpDir/ipaconfig.show.all.$RANDOM.out
         kinitAs $admin $adminpassword
         rlRun "ipa config-show --all > $out" 0 "save show --all in [$out]"
-        string_exist "Max username length:" $out
-        string_exist "Home directory base:" $out
-        string_exist "Default shell:" $out
-        string_exist "Default users group:" $out
-        string_exist "Default e-mail domain:" $out
-        string_exist "Search time limit:" $out
-        string_exist "Search size limit:" $out
-        string_exist "User search fields:" $out
-        string_exist "Group search fields:" $out
-        string_exist "Migration mode:" $out
-        string_exist "Certificate Subject base:" $out
-        string_exist "aci:" $out
-        string_exist "ipapwdexpadvnotify:" $out
+        string_exist_infile "Max username length:" $out
+        string_exist_infile "Home directory base:" $out
+        string_exist_infile "Default shell:" $out
+        string_exist_infile "Default users group:" $out
+        string_exist_infile "Default e-mail domain:" $out
+        string_exist_infile "Search time limit:" $out
+        string_exist_infile "Search size limit:" $out
+        string_exist_infile "User search fields:" $out
+        string_exist_infile "Group search fields:" $out
+        string_exist_infile "Migration mode:" $out
+        string_exist_infile "Certificate Subject base:" $out
+        string_exist_infile "aci:" $out
+        string_exist_infile "ipapwdexpadvnotify:" $out
         rm $out; 
 
         rlLog "test for --raw option"
         local out=$TmpDir/ipaconfig.show.raw.$RANDOM.out
         rlRun "ipa config-show --raw > $out" 0 "save show --raw in [$out]" 
-        string_exist "ipamaxusernamelength:" $out
-        string_exist "ipahomesrootdir:" $out
-        string_exist "ipadefaultloginshell:" $out
-        string_exist "ipadefaultprimarygroup:" $out
-        string_exist "ipasearchtimelimit:" $out
-        string_exist "ipasearchrecordslimit:" $out
-        string_exist "ipausersearchfields:" $out
-        string_exist "ipagroupsearchfields:" $out
-        string_exist "ipamigrationenabled:" $out
-        string_exist "ipacertificatesubjectbase:" $out
+        string_exist_infile "ipamaxusernamelength:" $out
+        string_exist_infile "ipahomesrootdir:" $out
+        string_exist_infile "ipadefaultloginshell:" $out
+        string_exist_infile "ipadefaultprimarygroup:" $out
+        string_exist_infile "ipasearchtimelimit:" $out
+        string_exist_infile "ipasearchrecordslimit:" $out
+        string_exist_infile "ipausersearchfields:" $out
+        string_exist_infile "ipagroupsearchfields:" $out
+        string_exist_infile "ipamigrationenabled:" $out
+        string_exist_infile "ipacertificatesubjectbase:" $out
 
-        rlRun "$kdestroy"
+        clear_kticket
         rm $out; 
     # test logic ends
 } # ipaconfig_show_default_logic 
@@ -164,7 +164,8 @@ ipaconfig_show_negative_logic()
 {
     # accept parameters: NONE
     # test logic starts
-        rlFail "EMPTY LOGIC"
+        clear_kticket
+        rlRun "ipa config-show" 1 "only ipa user can do config-show"
     # test logic ends
 } # ipaconfig_show_negative_logic 
 
@@ -172,7 +173,7 @@ ipaconfig_mod_envsetup()
 {
     rlPhaseStartSetup "ipaconfig_mod_envsetup"
         #environment setup starts here
-
+        rlPass "no special env setup for config-mod"
         #environment setup ends   here
     rlPhaseEnd
 } #ipaconfig_mod_envsetup
@@ -181,7 +182,7 @@ ipaconfig_mod_envcleanup()
 {
     rlPhaseStartCleanup "ipaconfig_mod_envcleanup"
         #environment cleanup starts here
-
+        rlPass "no special env cleanup for config-mod"
         #environment cleanup ends   here
     rlPhaseEnd
 } #ipaconfig_mod_envcleanup
@@ -192,15 +193,60 @@ ipaconfig_mod_maxusername_default()
 # non-loop data : 
     rlPhaseStartTest "ipaconfig_mod_maxusername_default"
         rlLog "this is to test for default behave"
-        ipaconfig_mod_maxusername_default_logic
+        KinitAsAdmin
+        definedlength=`getrandomint 1 255`
+        rlRun "ipa config-mod --maxusername=$definedlength" 0 "set maxusername to [$definedlength]"
+        clear_kticket
+
+        curlen=1 
+        #when current username<defined, test should pass
+        expected=0
+        while [ "$curlen" -le "$definedlength" ];do
+            username=`dataGenerator "username" $curlen`
+            lastname=`dataGenerator "lastname" $curlen`
+            firstname=`dataGenerator "firstname" $curlen`
+            password=`dataGenerator "password" 8`
+            rlLog "test: len=[$curlen], username=[$username], expect success"
+            create_ipauser $expected $username $firstname $lastname $password
+            delete_ipauser "$username"
+            curlen=$((curlen+1))
+        done
+
+        #when current username>defined, test should fail 
+        offset=`getrandomint 20 100`
+        upperedge=$((definedlength + offset))
+        loweredge=$((definedlength + 1))
+        expected=1
+        i=0
+        totaltest=5 #lets just test 5 times
+        while [ "$i" -lt "$totaltest" ];do
+            newlen=`getrandomint $loweredge $upperedge`
+            username=`dataGenerator "username" $newlen`
+            lastname=`dataGenerator "lastname" $newlen`
+            firstname=`dataGenerator "firstname" $newlen`
+            password=`dataGenerator "password" 8`
+            rlLog "test: len=[$newlen], username=[$username], expect fail"
+            create_ipauser $expected $username $firstname $lastname $password
+            i=$((i+1))
+        done
+        clear_kticket
     rlPhaseEnd
 } #ipaconfig_mod_maxusername_default
 
 ipaconfig_mod_maxusername_default_logic()
 {
-    # accept parameters: NONE
+    # accept parameters: length 
     # test logic starts
-        rlFail "EMPTY LOGIC"
+        local expected=$1
+        local length=$2
+        local username=$3
+        local lastname=$4
+        local firstname=$5
+        local password=$6
+        local out=$TmpDir/config.maxusername.default.$RANDOM.out
+
+        create_ipauser $expected $username $firstname $lastname $password
+        rm $out
     # test logic ends
 } # ipaconfig_mod_maxusername_default_logic 
 

@@ -11,16 +11,16 @@ adminpassword="redhat123"
 realm="SJC.REDHAT.COM"
 initialpw="Initial@123"
 tmpdir="/dev/shm/ipapassword/tmp"
-kdestroy="/usr/kerberos/bin/kdestroy -q 2>&1 >/dev/null"
+kdestroy="/usr/kerberos/bin/kdestroy 2>&1 >/dev/null"
 
 ntpserver="wiki.idm.lab.bos.redhat.com"
+initialpw="initial123@IPA"
 
 # test account info
-testac="passwordTestAC"
-testacLast="passwordTest"
-testacFirst="passwordFirst"
-testacPW="passWORD@123"
-testacNEWPW="newpassWORD@123"
+testac="configTestUser"
+testacLast="configTestLast"
+testacFirst="configTestFirst"
+testacPW="configTest123@IPA"
 
 testgrp="passwordTestGrp"
 grouppw_maxlife=60
@@ -45,9 +45,3 @@ globalpw_history=0
 globalpw_classes=0
 globalpw_length=8
 
-# objectclasses: ( 2.16.840.1.113719.1.301.6.14.1 
-#   NAME 'krbPwdPolicy' SUP top 
-#   STRUCTURAL MUST cn 
-#   MAY ( krbMaxPwdLife $ krbMinPwdLife $ krbPwdMinDiffChars 
-#               $ krbPwdMinLength $ krbPwdHistoryLength ) )
-pwpolicyattrs="krbMaxPwdLife krbMinPwdLife krbPwdMinDiffChars krbPwdMinLength krbPwdHistoryLength"
