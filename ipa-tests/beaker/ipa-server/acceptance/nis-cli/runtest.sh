@@ -162,6 +162,31 @@ done
 		rlRun "grep baduser1 /dev/shm/passwd-map" 1 "Verifying that user1 is in the nis passwd map"
 	rlPhaseEnd
 
+	rlPhaseStartTest "checking that using netgroups with nis really works."
+		ipa user-add --first=Kermit --last=Frog kfrog
+		ipa user-add --first=Count --last=VonCount count123
+		ipa user-add --first=Oscar --last=Grouch scram
+		ipa user-add --first=Elmo --last=Gonzales elmo
+		ipa user-add --first=Zoe --last=MacPhearson zoe
+		ipa user-add --first=Prairie --last=Dawn pdawn
+		ipa group-add --desc="Monsters on Sesame Street" monsters
+		ipa group-add --desc="Muppets moonlighting for CTW" muppets
+		ipa group-add-member --users=kfrog,scram,pdawn muppets
+		ipa group-add-member --users=count123,elmo,zoe monsters
+		ipa netgroup-add --desc="staging servers" net-stage
+		ipa netgroup-add --desc="live servers" net-live
+		ipa hostgroup-add --desc "Live servers" host-live
+		ipa hostgroup-add --desc "Staging servers" stage-live
+		ipa hostgroup-add-member --hosts=$MASTER host-live
+		ipa hostgroup-add-member --hosts=$MASTER stage-live
+		ipa netgroup-add-member --groups=muppets --hostgroups=host-live net-live
+		ipa netgroup-add-member --groups=muppets --hostgroups=host-stage net-stage
+		ypcat -h $MASTER -d $DOMAIN netgroup > /dev/shm/netgroup-map
+		rlRun "grep $MASTER /dev/shm/netgroup-map" 0 "Checking to ensure that nis is able to find a created netgroup"
+	rlPhaseEnd
+
+	# sleeping to allow all hosts to sync up. 
+	sleep 200
 
     # r2d2_test_ends
 
@@ -178,6 +203,18 @@ done
 	ipa group-del $group3
 	ipa group-del $group4
 	ipa netgroup-del $ngroup1
+	ipa netgroup-del net-live
+	ipa netgroup-del net-stage
+	ipa hostgroup-del host-live
+	ipa hostgroup-del stage-live
+	ipa group-del muppets
+	ipa group-del monsters
+	ipa user-del pdawn
+	ipa user-del zoe
+	ipa user-del elmo
+	ipa user-del scram
+	ipa user-del count123
+	ipa user-del kfrog
     rlPhaseEnd
 
     makereport
