@@ -120,19 +120,19 @@ done
 
         addNetgroup $ngroup1 test-group-1
 
-	rlPhaseStartTest "check to see if ypcat can enumerate passwd"
+	rlPhaseStartTest "ipa-nis-cli-01: check to see if ypcat can enumerate passwd"
 		rlRun "ypcat -h $MASTER -d $DOMAIN passwd" 0 "Check to see that passwd can be enumerated"
 	rlPhaseEnd
 
-	rlPhaseStartTest "check to see if ypcat can enumerate group"
+	rlPhaseStartTest "ipa-nis-cli-02: check to see if ypcat can enumerate group"
 		rlRun "ypcat -h $MASTER -d $DOMAIN group" 0 "Check to see that group can be enumerated"
 	rlPhaseEnd
 
-	rlPhaseStartTest "check to see if ypcat can enumerate netgroup"
+	rlPhaseStartTest "ipa-nis-cli-03: check to see if ypcat can enumerate netgroup"
 		rlRun "ypcat -h $MASTER -d $DOMAIN netgroup" 0 "Check to see that netgroup can be enumerated"
 	rlPhaseEnd
 
-	rlPhaseStartTest "check to see if ypcat cannot enumerate badgroup"
+	rlPhaseStartTest "ipa-nis-cli-04: check to see if ypcat cannot enumerate badgroup"
 		rlRun "ypcat -h $MASTER -d $DOMAIN badgroup" 1 "Check to see that badgroup can not be enumerated"
 	rlPhaseEnd
 
@@ -140,14 +140,14 @@ done
 	ypcat -h $MASTER -d $DOMAIN passwd > /dev/shm/passwd-map
 	ypcat -h $MASTER -d $DOMAIN group > /dev/shm/group-map
 	ypcat -h $MASTER -d $DOMAIN netgroup > /dev/shm/netgroup-map	
-	rlPhaseStartTest "check to ensure all users are in nis"
+	rlPhaseStartTest "ipa-nis-cli-05: check to ensure all users are in nis"
 		rlRun "grep $user1 /dev/shm/passwd-map" 0 "Verifying that user1 is in the nis passwd map"
 		rlRun "grep $user2 /dev/shm/passwd-map" 0 "Verifying that user2 is in the nis passwd map"
 		rlRun "grep $user3 /dev/shm/passwd-map" 0 "Verifying that user3 is in the nis passwd map"
 		rlRun "grep $user4 /dev/shm/passwd-map" 0 "Verifying that user4 is in the nis passwd map"
 	rlPhaseEnd
 
-	rlPhaseStartTest "check to ensure that groups are in nis passwd map"
+	rlPhaseStartTest "ipa-nis-cli-06: check to ensure that groups are in nis passwd map"
 		rlRun "grep $group1 /dev/shm/group-map" 0 "Verifying that group1 is in the nis password map"
 		rlRun "grep $group2 /dev/shm/group-map" 0 "Verifying that group2 is in the nis password map"
 		rlRun "grep $group3 /dev/shm/group-map" 0 "Verifying that group3 is in the nis password map"
@@ -158,11 +158,11 @@ done
 #		rlRun "grep $ngroup1 /dev/shm/netgroup-map" 0 "Verifying that netgroup1 is in the nis password map"
 #	rlPhaseEnd
 
-	rlPhaseStartTest "check to ensure invalid users are not in nis"
+	rlPhaseStartTest "ipa-nis-cli-07: check to ensure invalid users are not in nis"
 		rlRun "grep baduser1 /dev/shm/passwd-map" 1 "Verifying that user1 is in the nis passwd map"
 	rlPhaseEnd
 
-	rlPhaseStartTest "checking that using netgroups with nis really works."
+	rlPhaseStartTest "ipa-nis-cli-08: checking that using netgroups with nis works."
 		ipa user-add --first=Kermit --last=Frog kfrog
 		ipa user-add --first=Count --last=VonCount count123
 		ipa user-add --first=Oscar --last=Grouch scram
