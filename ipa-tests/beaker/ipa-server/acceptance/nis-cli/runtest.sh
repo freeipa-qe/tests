@@ -154,9 +154,9 @@ done
 		rlRun "grep $group4 /dev/shm/group-map" 0 "Verifying that group4 is in the nis password map"
 	rlPhaseEnd
 
-	rlPhaseStartTest "check to ensure that net groups are in nis passwd map"
-		rlRun "grep $ngroup1 /dev/shm/netgroup-map" 0 "Verifying that netgroup1 is in the nis password map"
-	rlPhaseEnd
+#	rlPhaseStartTest "check to ensure that net groups are in nis passwd map"
+#		rlRun "grep $ngroup1 /dev/shm/netgroup-map" 0 "Verifying that netgroup1 is in the nis password map"
+#	rlPhaseEnd
 
 	rlPhaseStartTest "check to ensure invalid users are not in nis"
 		rlRun "grep baduser1 /dev/shm/passwd-map" 1 "Verifying that user1 is in the nis passwd map"
