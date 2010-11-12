@@ -185,6 +185,7 @@ rlJournalStart
 		rlRun "ipa netgroup-show $ngroup3 | grep $ngroup3" 1 "Verifying that ngroup3 doesn't exist"
 	rlPhaseEnd
 
+# The final part of this test will be included in the nis-cli test
     
     # r2d2_test_ends
 
