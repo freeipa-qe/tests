@@ -13,6 +13,16 @@
 #	removeFromHBAC
 #	verifyHBACAssoc
 #	deleteHBACRule
+#	addHBACService
+#	modifyHBACService
+#	findHBACService
+#	verifyHBACService
+#	deleteHBACService
+#	addHBACServiceGroup
+#	modifyHBACServiceGroup
+#	findHBACServiceGroup
+#	verifyHBACServiceGroup
+#	deleteHBACServiceGroup
 ######################################################################
 # Assumes:
 #	For successful command exectution, administrative credentials
@@ -289,4 +299,255 @@ deleteHBACRule()
 
    return $rc
 }
+
+#######################################################################
+# addHBACService Usage:
+#       addHBACService <servicename> <description>
+######################################################################
+
+addHBACService()
+{
+   servicename=$1
+   description=$2
+   rc=0
+
+   ipa hbacsvc-add --desc="$description" $servicename
+   rc=$?
+   if [ $rc -ne 0 ] ; then
+        rlLog "WARNING: Adding hbac service $servicename failed."
+   else
+        rlLog "HBAC service $servicename added successfully."
+   fi
+
+   return $rc
+}
+
+#######################################################################
+# modifyHBACService Usage:
+#       modifyHBACService <servicename> <attribute> <value>
+######################################################################
+
+modifyHBACService()
+{
+
+   servicenanme=$1
+   attribute=$2
+   value=$3
+   rc=0
+
+   rlLog "Executing: ipa hbacsvc-mod --$attribute=\"$value\" $servicename"
+   ipa hbacsvc-mod --$attribute="$value" $servicename
+   rc=$?
+   if [ $rc -ne 0 ] ; then
+        rlLog "WARNING: Modifying HBAC service $servicename failed."
+   else
+        rlLog "Modifying HBAC service $servicename successful."
+   fi
+   return $rc
+}
+
+
+############################################################################
+# findHBACService Usage:
+#	findHBACService <servicename>
+############################################################################
+
+findHBACService()
+{
+   servicename=$1
+   rc=0
+
+   tmpfile=/tmp/hbacsvcfind.out
+
+   ipa hbacsvc-find $servicename >$tmpfile
+   rc=$?
+
+   if [ $rc -eq 0 ] ; then
+	rlLog "HBAC service $servicename found."
+   else
+	rlLog "WARNING: HBAC service $service NOT found."
+	rc=1
+   fi
+
+   return $rc
+}
+
+#############################################################################
+# verifyHBACService Usage
+#   verifyHBACService <servicename> <attr> <value>
+##############################################################################
+
+verifyHBACService()
+{
+  servicename=$1
+  attr=$2
+  value=$3
+  rc=0
+
+  tmpfile=/tmp/hbacsvcshow.out
+
+  ipa hbacsvc-show --all $servicename > $tmpfile
+  rc=$?
+  if [ $rc -eq 0 ] ; then
+     attrs=`cat $tmpfile | grep "$attr" | cut -d ":" -f 2`
+     echo $attrs | grep "$value"
+     if [ $? -eq 0 ] ; then
+        rlLog "$attr \"$value\" is associated with service $servicename"
+     else
+        rlLog "WARNING: $attr \"$value\" is NOT associated with service $servicename"
+        rc=1
+     fi
+ else
+     rlLog "ERROR: ipa hbacsvc-show command failed"
+ fi
+
+ return $rc
+}
+
+#######################################################################
+# deleteHBACService Usage:
+#       deleteHBACService <servicename>
+######################################################################
+
+deleteHBACService()
+{
+   servicename=$1
+   rc=0
+
+   ipa hbacsvc-del $servicename
+   rc=$?
+   if [ $rc -ne 0 ] ; then
+        rlLog "WARNING: Deleting hbac service $servicename failed."
+   else
+        rlLog "HBAC service $servicename deleted successfully."
+   fi
+
+   return $rc
+}
+
+#######################################################################
+# addHBACServiceGroup Usage:
+#       addHBACServiceGroup <groupname> <description>
+######################################################################
+
+addHBACServiceGroup()
+{
+   groupname=$1
+   description=$2
+   rc=0
+
+   rlLog "DEBUG: ipa hbacsvcgroup-add --desc=\"$description\" \"$groupname\""
+   ipa hbacsvcgroup-add --desc="$description" "$groupname"
+   rc=$?
+   if [ $rc -ne 0 ] ; then
+        rlLog "WARNING: Adding hbac service group $groupname failed."
+   else
+        rlLog "HBAC service group $groupname added successfully."
+   fi
+
+   return $rc
+}
+
+#######################################################################
+# modifyHBACServiceGroup Usage:
+#       modifyHBACServiceGroup <groupname> <attribute> <value>
+######################################################################
+
+modifyHBACServiceGroup()
+{
+
+   groupnanme=$1
+   attribute=$2
+   value=$3
+   rc=0
+
+   rlLog "Executing: ipa hbacsvcgroup-mod --$attribute=\"$value\" $groupname"
+   ipa hbacsvcgroup-mod --$attribute="$value" $groupname
+   rc=$?
+   if [ $rc -ne 0 ] ; then
+        rlLog "WARNING: Modifying HBAC service group $groupname failed."
+   else
+        rlLog "Modifying HBAC service group $groupname successful."
+   fi
+   return $rc
+}
+
+############################################################################
+# findHBACServiceGroup Usage:
+#	findHBACServiceGroup <groupname>
+############################################################################
+
+findHBACServiceGroup()
+{
+   groupname=$1
+   rc=0
+
+   tmpfile=/tmp/hbacsvcgrpfind.out
+
+   ipa hbacsvcgroup-find "$groupname" > $tmpfile
+   rc=$?
+
+   if [ $rc -eq 0 ] ; then
+        rlLog "HBAC service group \"$groupname\" found."
+   else
+        rlLog "WARNING: HBAC service group \"$groupname\" NOT found."
+        rc=1
+   fi
+
+   return $rc
+}
+
+#############################################################################
+# verifyHBACServiceGroup Usage
+#   verifyHBACServiceGroup <servicename> <attr> <value>
+##############################################################################
+
+verifyHBACServiceGroup()
+{
+  groupname=$1
+  attr=$2
+  value=$3
+  rc=0
+
+  tmpfile=/tmp/hbacsvcgrpshow.out
+  rlLog "DEBUG: ipa hbacsvcgroup-show --all \"$groupname\" > $tmpfile"
+  ipa hbacsvcgroup-show --all "$groupname" > $tmpfile
+  rc=$?
+  if [ $rc -eq 0 ] ; then
+     attrs=`cat $tmpfile | grep "$attr" | cut -d ":" -f 2`
+     echo $attrs | grep "$value"
+     if [ $? -eq 0 ] ; then
+        rlLog "$attr \"$value\" is associated with service group $groupname"
+     else
+        rlLog "WARNING: $attr \"$value\" is NOT associated with service group $groupname"
+        rc=1
+     fi
+ else
+     rlLog "ERROR: ipa hbacsvcgroup-show command failed"
+ fi
+
+ return $rc
+}
+
+#######################################################################
+# deleteHBACServiceGroup Usage:
+#       deleteHBACServiceGroup <groupname>
+######################################################################
+
+deleteHBACServiceGroup()
+{
+   groupname=$1
+   rc=0
+
+   ipa hbacsvcgroup-del "$groupname"
+   rc=$?
+   if [ $rc -ne 0 ] ; then
+        rlLog "WARNING: Deleting hbac service group $groupname failed."
+   else
+        rlLog "HBAC service group $groupname deleted successfully."
+   fi
+
+   return $rc
+}
+
 
