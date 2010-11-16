@@ -206,6 +206,23 @@ rlJournalStart
         rlRun "verifyHBACServiceGroup $servicegroup1 Description \"Newer Description\"" 0 "Verify New Service group Description"
     rlPhaseEnd
 
+    rlPhaseStartTest "ipa-hbacsvc-cli-019: Verify Default SUDO Service Members"
+	rlRun "verifyHBACGroupMember sudo SUDO" 0 "Verifying service group member."
+	rlRun "verifyHBACGroupMember sudo-i SUDO" 0 "Verifying service group member."
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-hbacsvc-cli-020: Verify Add Existing Services to New Service Group"
+	rlRun "addServiceGroupMembers \"sshd,ftp\" $servicegroup1" 0 "Adding service members to service group."
+        rlRun "verifyHBACGroupMember sshd $servicegroup1" 0 "Verifying service group member was added."
+        rlRun "verifyHBACGroupMember ftp $servicegroup1" 0 "Verifying service group member was added."
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-hbacsvc-cli-021: Verify Remove Existing Services to New Service Group"
+        rlRun "removeServiceGroupMembers \"sshd,ftp\" $servicegroup1" 0 "Removing service members to service group."
+        rlRun "verifyHBACGroupMember sshd $servicegroup1" 4 "Verifying service group member was removed."
+        rlRun "verifyHBACGroupMember ftp $servicegroup1" 4 "Verifying service group member was removed."
+    rlPhaseEnd
+
     rlPhaseStartCleanup "ipa-hbac-cli-cleanup: Destroying admin credentials."
         rlRun "popd"
         rlRun "rm -r $TmpDir" 0 "Removing tmp directory"
