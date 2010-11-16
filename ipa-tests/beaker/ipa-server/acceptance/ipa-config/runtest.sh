@@ -6,7 +6,29 @@
 #   Description: IPA ipaconfig acceptance tests
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # The following ipa will be tested:
+#  -h, --help            show this help message and exit
+#  --maxusername=INT     Max username length
+#  --homedirectory=STR   Default location of home directories
+#  --defaultshell=STR    Default shell for new users
+#  --defaultgroup=STR    Default group for new users
+#  --emaildomain=STR     Default e-mail domain new users
+#  --searchtimelimit=INT
 #
+#  Max. amount of time (sec.) for a search (-1 is
+#  unlimited)
+#  --searchrecordslimit=INT
+#  Max. number of records to search (-1 is unlimited)
+#  --usersearch=STR      A comma-separated list of fields to search when
+#  searching for users
+#  --groupsearch=STR     A comma-separated list of fields to search when searching for groups
+#  --enable-migration=BOOL   Enable migration mode
+#
+#  --subject=STR         Base for certificate subjects (OU=Test,O=Example)
+#  --addattr=STR         Add an attribute/value pair. Format is attr=value
+#  --setattr=STR         Set an attribute to an name/value pair. Format is attr=value
+#  --all                 retrieve all attributes
+#  --raw                 print entries as stored on the server
+#  
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
 #   Author: Yi Zhang <yzhang@redhat.com>

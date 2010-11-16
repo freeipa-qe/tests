@@ -26,10 +26,10 @@ ipaconfig_show()
 ipaconfig_mod()
 {
     ipaconfig_mod_envsetup
-    ipaconfig_mod_maxusername_default
-    ipaconfig_mod_maxusername_negative
-    ipaconfig_mod_homedirectory_default
-    ipaconfig_mod_homedirectory_negative
+#    ipaconfig_mod_maxusername_default
+#    ipaconfig_mod_maxusername_negative
+#    ipaconfig_mod_homedirectory_default
+#    ipaconfig_mod_homedirectory_negative
     ipaconfig_mod_defaultshell_default
     ipaconfig_mod_defaultshell_negative
     ipaconfig_mod_defaultgroup_default
@@ -75,7 +75,7 @@ ipaconfig_envcleanup()
 {
     rlPhaseStartCleanup "ipaconfig_envcleanup"
         #environment cleanup starts here
-        rlPass "no special env cleanup required"
+        restore_ipaconfig
         #environment cleanup ends   here
     rlPhaseEnd
 } #ipaconfig_envcleanup
@@ -229,11 +229,8 @@ ipaconfig_mod_maxusername_default_logic()
         expected=0
         for curlen in $username_length ; do
             username=`dataGenerator "username" $curlen`
-            lastname=`dataGenerator "lastname" $curlen`
-            firstname=`dataGenerator "firstname" $curlen`
-            password=`dataGenerator "password" 8`
             rlLog "test: len=[$curlen], username=[$username], expect success"
-            create_ipauser $expected $username $firstname $lastname $password
+            create_ipauser $expected $username 
             delete_ipauser "$username"
         done
 
@@ -243,11 +240,8 @@ ipaconfig_mod_maxusername_default_logic()
         expected=1
         for curlen in $username_length ; do
             username=`dataGenerator "username" $curlen`
-            lastname=`dataGenerator "lastname" $curlen`
-            firstname=`dataGenerator "firstname" $curlen`
-            password=`dataGenerator "password" 8`
             rlLog "test: len=[$curlen], username=[$username], expect fail"
-            create_ipauser $expected $username $firstname $lastname $password
+            create_ipauser $expected $username
         done
     # test logic ends
 } # ipaconfig_mod_maxusername_default_logic 
@@ -282,7 +276,10 @@ ipaconfig_mod_homedirectory_default()
 # non-loop data : 
     rlPhaseStartTest "ipaconfig_mod_homedirectory_default"
         rlLog "this is to test for default behave"
-        ipaconfig_mod_homedirectory_default_logic
+        KinitAsAdmin
+        local testdir=`GenerateHomeDirectoryName`
+        rlRun "ipa config-mod --homedirectory=$testdir" 0 "set homedirectory=[$testdir]"
+        ipaconfig_mod_homedirectory_default_logic "$testdir"
     rlPhaseEnd
 } #ipaconfig_mod_homedirectory_default
 
@@ -290,7 +287,21 @@ ipaconfig_mod_homedirectory_default_logic()
 {
     # accept parameters: NONE
     # test logic starts
-        rlFail "EMPTY LOGIC"
+        local basedir=$1
+        local out=$TmpDir/config.homedirectory.$RANDOM.out
+        username=`dataGenerator "username" 8` # FIXME: not sure length 8 is right to use -- since we changed maxusernamelength to something we don't know when we hit this test case
+        create_ipauser 0 $username
+        KinitAsAdmin
+        ipa user-find $username > $out
+        actualdir=`grep "Home directory" $out | cut -d":" -f2 | xargs echo`
+        if echo $actualdir | grep "^$basedir" 2>&1 >/dev/null
+        then
+            rlPass "found [$basedir] in actual:[$actualdir]"
+        else
+            rlFail "actual [$actualdir], expect [$basedir]"
+        fi
+        clear_kticket
+        rm $out
     # test logic ends
 } # ipaconfig_mod_homedirectory_default_logic 
 
@@ -299,8 +310,11 @@ ipaconfig_mod_homedirectory_negative()
 # looped data   : 
 # non-loop data : 
     rlPhaseStartTest "ipaconfig_mod_homedirectory_negative"
-        rlLog "negative test case for homedirectory"
-        ipaconfig_mod_homedirectory_negative_logic
+        KinitAsAdmin
+        local dirs="ť úů ý0ž aábč" # 8bit string now allowed in homedir
+        for testdir in $dirs; do
+            rlRun "ipa config-mod --homedirectory=$testdir" 1 "set homedirectory=[$testdir]" 0 "8bit char should no accepted "
+        done
     rlPhaseEnd
 } #ipaconfig_mod_homedirectory_negative
 
@@ -308,7 +322,7 @@ ipaconfig_mod_homedirectory_negative_logic()
 {
     # accept parameters: NONE
     # test logic starts
-        rlFail "EMPTY LOGIC"
+        rlLog "this is blank function"
     # test logic ends
 } # ipaconfig_mod_homedirectory_negative_logic 
 
@@ -318,7 +332,10 @@ ipaconfig_mod_defaultshell_default()
 # non-loop data : 
     rlPhaseStartTest "ipaconfig_mod_defaultshell_default"
         rlLog "this is to test for default behave"
-        ipaconfig_mod_defaultshell_default_logic
+        KinitAsAdmin
+        local testshell=`GenerateShellName`
+        rlRun "ipa config-mod --defaultshell=$testshell" 0 "set defaultshell=[$testshell]"
+        ipaconfig_mod_defaultshell_default_logic "$testshell"
     rlPhaseEnd
 } #ipaconfig_mod_defaultshell_default
 
@@ -326,7 +343,22 @@ ipaconfig_mod_defaultshell_default_logic()
 {
     # accept parameters: NONE
     # test logic starts
-        rlFail "EMPTY LOGIC"
+        local baseshell=$1
+        local out=$TmpDir/config.defaultshell.$RANDOM.out
+        username=`dataGenerator "username" 8` # FIXME: not sure length 8 is right to use -- since we changed maxusernamelength to something we don't know when we hit this test case
+        create_ipauser 0 $username
+        KinitAsAdmin
+        ipa user-find $username > $out
+        actualshell=`grep "Login shell" $out | cut -d":" -f2 | xargs echo`
+        if echo $actualshell | grep "^$baseshell" 2>&1 >/dev/null
+        then
+            rlPass "found [$baseshell] in actual:[$actualshell]"
+        else
+            rlFail "actual [$actualshell], expect [$baseshell]"
+        fi
+        clear_kticket
+        rm $out
+
     # test logic ends
 } # ipaconfig_mod_defaultshell_default_logic 
 
@@ -336,7 +368,12 @@ ipaconfig_mod_defaultshell_negative()
 # non-loop data : 
     rlPhaseStartTest "ipaconfig_mod_defaultshell_negative"
         rlLog "negative test case for defaultshell"
-        ipaconfig_mod_defaultshell_negative_logic
+        KinitAsAdmin
+        local shells="ťt̬ ðʒʊʊɔɒɪɪ ɝɛɜɚəə ú ů ý0ž aábč" # 8bit string now allowed in homedir
+        for testshell in $shells; do
+            rlRun "ipa config-mod --defaultshell=$testshell" 1 "set defaultshell=[$testshell]" 1 "8bit char should no accepted "
+        done
+
     rlPhaseEnd
 } #ipaconfig_mod_defaultshell_negative
 
@@ -344,7 +381,7 @@ ipaconfig_mod_defaultshell_negative_logic()
 {
     # accept parameters: NONE
     # test logic starts
-        rlFail "EMPTY LOGIC"
+        rlLog "EMPTY LOGIC"
     # test logic ends
 } # ipaconfig_mod_defaultshell_negative_logic 
 
