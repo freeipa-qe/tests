@@ -30,10 +30,10 @@ ipaconfig_mod()
 #    ipaconfig_mod_maxusername_negative
 #    ipaconfig_mod_homedirectory_default
 #    ipaconfig_mod_homedirectory_negative
-    ipaconfig_mod_defaultshell_default
-    ipaconfig_mod_defaultshell_negative
-    ipaconfig_mod_defaultgroup_default
-    ipaconfig_mod_defaultgroup_negative
+#    ipaconfig_mod_defaultshell_default
+#    ipaconfig_mod_defaultshell_negative
+#    ipaconfig_mod_defaultgroup_default
+#    ipaconfig_mod_defaultgroup_negative
     ipaconfig_mod_emaildomain_default
     ipaconfig_mod_emaildomain_negative
     ipaconfig_mod_envcleanup
@@ -294,7 +294,7 @@ ipaconfig_mod_homedirectory_default_logic()
         KinitAsAdmin
         ipa user-find $username > $out
         actualdir=`grep "Home directory" $out | cut -d":" -f2 | xargs echo`
-        if echo $actualdir | grep "^$basedir" 2>&1 >/dev/null
+        if echo $actualdir | grep -i "^$basedir" 2>&1 >/dev/null
         then
             rlPass "found [$basedir] in actual:[$actualdir]"
         else
@@ -350,7 +350,7 @@ ipaconfig_mod_defaultshell_default_logic()
         KinitAsAdmin
         ipa user-find $username > $out
         actualshell=`grep "Login shell" $out | cut -d":" -f2 | xargs echo`
-        if echo $actualshell | grep "^$baseshell" 2>&1 >/dev/null
+        if echo $actualshell | grep -i "^$baseshell" 2>&1 >/dev/null
         then
             rlPass "found [$baseshell] in actual:[$actualshell]"
         else
@@ -373,7 +373,6 @@ ipaconfig_mod_defaultshell_negative()
         for testshell in $shells; do
             rlRun "ipa config-mod --defaultshell=$testshell" 1 "set defaultshell=[$testshell]" 1 "8bit char should no accepted "
         done
-
     rlPhaseEnd
 } #ipaconfig_mod_defaultshell_negative
 
@@ -391,7 +390,10 @@ ipaconfig_mod_defaultgroup_default()
 # non-loop data : 
     rlPhaseStartTest "ipaconfig_mod_defaultgroup_default"
         rlLog "this is to test for default behave"
-        ipaconfig_mod_defaultgroup_default_logic
+        KinitAsAdmin
+        local testgroup=`GenerateGroupName`
+        rlRun "ipa config-mod --defaultgroup=\"$testgroup\" " 0 "set defaultgroup=[$testgroup]"
+        ipaconfig_mod_defaultgroup_default_logic "$testgroup"
     rlPhaseEnd
 } #ipaconfig_mod_defaultgroup_default
 
@@ -399,7 +401,21 @@ ipaconfig_mod_defaultgroup_default_logic()
 {
     # accept parameters: NONE
     # test logic starts
-        rlFail "EMPTY LOGIC"
+        local basegroup=$1
+        local out=$TmpDir/config.defaultgroup.$RANDOM.out
+        username=`dataGenerator "username" 8` # FIXME: not sure length 8 is right to use -- since we changed maxusernamelength to something we don't know when we hit this test case
+        create_ipauser 0 $username
+        KinitAsAdmin
+        ipa user-find $username > $out
+        actualgroup=`grep "Groups" $out | cut -d":" -f2 | xargs echo`
+        if echo $actualgroup | grep -i "^$basegroup" 2>&1 >/dev/null
+        then
+            rlPass "found [$basegroup] in actual:[$actualgroup]"
+        else
+            rlFail "actual [$actualgroup], expect [$basegroup]"
+        fi
+        clear_kticket
+        rm $out
     # test logic ends
 } # ipaconfig_mod_defaultgroup_default_logic 
 
@@ -417,7 +433,7 @@ ipaconfig_mod_defaultgroup_negative_logic()
 {
     # accept parameters: NONE
     # test logic starts
-        rlFail "EMPTY LOGIC"
+        rlFail "FIXME : I haven't find any negative case yet"
     # test logic ends
 } # ipaconfig_mod_defaultgroup_negative_logic 
 
@@ -427,7 +443,10 @@ ipaconfig_mod_emaildomain_default()
 # non-loop data : 
     rlPhaseStartTest "ipaconfig_mod_emaildomain_default"
         rlLog "this is to test for default behave"
-        ipaconfig_mod_emaildomain_default_logic
+        KinitAsAdmin
+        local testdomain=`GenerateDomainName`
+        rlRun "ipa config-mod --emaildomain=$testdomain" 0 "set emaildomain=[$testdomain]"
+        ipaconfig_mod_emaildomain_default_logic "$testdomain"
     rlPhaseEnd
 } #ipaconfig_mod_emaildomain_default
 
@@ -435,7 +454,27 @@ ipaconfig_mod_emaildomain_default_logic()
 {
     # accept parameters: NONE
     # test logic starts
-        rlFail "EMPTY LOGIC"
+        local basedomain=$1
+        local out=$TmpDir/config.defaultdomain.$RANDOM.out
+        username=`dataGenerator "username" 8` # FIXME: not sure length 8 is right to use -- since we changed maxusernamelength to something we don't know when we hit this test case
+        #create_ipauser 0 $username "" "" "" "--email=${username}@${basedomain}"  #this is right version
+        create_ipauser 0 $username "" "" "" "--email=${username}"
+        KinitAsAdmin
+        ipa user-find $username --raw --all > $out
+        actualdomain=`grep "mail" $out | cut -d":" -f2 | xargs echo`
+        if echo $actualdomain | grep -i "$basedomain" 2>&1 >/dev/null
+        then
+            rlPass "found [$basedomain] in actual:[$actualdomain]"
+        else
+            echo "============ out ============"
+            cat $out
+            echo "============================="
+            rlFail "actual [$actualdomain], expect [$basedomain]"
+        fi
+        clear_kticket
+        rm $out
+
+
     # test logic ends
 } # ipaconfig_mod_emaildomain_default_logic 
 
