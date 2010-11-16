@@ -22,6 +22,7 @@
 #	modifyHBACServiceGroup
 #	findHBACServiceGroup
 #	verifyHBACServiceGroup
+#	verifyHBACGroupMember
 #	deleteHBACServiceGroup
 ######################################################################
 # Assumes:
@@ -527,6 +528,119 @@ verifyHBACServiceGroup()
  fi
 
  return $rc
+}
+
+#######################################################################
+# addServiceGroupMembers Usage:
+#       addServiceGroupMembers <comma_separated_list_of_services> <groupname>
+######################################################################
+
+addServiceGroupMembers()
+{
+  memberlist=$1
+  mygroup=$2
+  rc=0
+
+
+  rlLog "Executing: ipa hbacsvcgroup-add-member --hbacsvcs=\"$memberlist\" \"$mygroup\""
+  ipa hbacsvcgroup-add-member --hbacsvcs="$memberlist" $mygroup
+  rc=$?
+  if [ $rc -ne 0 ] ; then
+        rlLog "WARNING: Adding \"$memberlist\" to HBAC service group $mygroup failed."
+  else
+        rlLog "Adding \"$memberlist\" to HBAC service group $mygroup successful."
+  fi
+
+  return $rc
+}
+
+#######################################################################
+# removeServiceGroupMembers Usage:
+#       removeServiceGroupMembers <comma_separated_list_of_services> <groupname>
+######################################################################
+
+removeServiceGroupMembers()
+{
+  memberlist=$1
+  mygroup=$2
+  rc=0
+
+  rlLog "Executing: ipa hbacsvcgroup-remove-member --hbacsvcs=\"$memberlist\" \"$mygroup\""
+  ipa hbacsvcgroup-remove-member --hbacsvcs="$memberlist" "$mygroup"
+  rc=$?
+  if [ $rc -ne 0 ] ; then
+        rlLog "WARNING: Removing \"$memberlist\" from Service group \"$mygroup\" failed."
+  else
+        rlLog "Removing \"$memberlist\" from Service group \"$mygroup\" successful."
+  fi
+
+  return $rc
+}
+
+#######################################################################
+# verifyHBACGroupMember Usage:
+#       verifyGroupMember <membername> <groupname> 
+######################################################################
+
+verifyHBACGroupMember()
+{
+  member=$1
+  mygroup=$2
+  rc=0
+
+  # construct memberDN
+  memberCN="cn=$member"
+  memberDN="$memberCN,cn=hbacservices,cn=accounts,dc=$RELM"
+  rlLog "Verifying Service: $memberDN"
+
+  # construct groupDN
+  mygroupCN="cn=$mygroup"
+  groupDN="$mygroupCN,cn=hbacservicegroups,cn=accounts,dc=$RELM"
+  rlLog "Verifying Service Group: $groupDN"
+
+  # verify member attribute for group
+  /usr/bin/ldapsearch -x -h $MASTER -p 389 -D "$ROOTDN" -w $ROOTDNPWD -b "$groupDN" | grep "member:" > /tmp/member.out
+  cat /tmp/member.out | grep "$memberDN"
+  if [ $? -ne 0 ] ; then
+  	rlLog "WARNING: member: $memberDN not found for group $mygroup"
+        rc=$(( $rc + 1 ))
+	rlLog "RC is $rc"
+  else
+	rlLog "member: $memberDN found for group $mygroup" 
+  fi
+
+  # verify memberof attribute for the member
+  /usr/bin/ldapsearch -x -h $MASTER -p 389 -D "cn=Directory Manager" -w $ROOTDNPWD -b "$memberDN" | grep "memberOf:" > /tmp/memberof.out
+  cat /tmp/memberof.out | grep "$groupDN"
+  if [ $? -ne 0 ] ; then
+  	rlLog "WARNING: memberOf: $groupDN not found for member $member"
+        rc=$(( $rc + 1 ))
+	rlLog "RC is $rc"
+  else
+	rlLog "memberOf: $groupDN found for member $member"
+  fi
+
+  # verify show all for member
+  verifyHBACService $member memberof $groupDN
+  if [ $? -eq 0 ] ; then
+	rlLog "show --all for service: $member is memberof $mygroup."
+  else
+	rlLog "WARNING: show --all for service: $member is NOT a member of $mygroup."
+	rc=$(( $rc + 1 ))
+	rlLog "RC is $rc"
+  fi
+
+  # verify show all for group
+  verifyHBACServiceGroup $mygroup member_hbacsvc $member
+  if [ $? -eq 0 ] ; then
+        rlLog "show --all for service group: $mygroup has member $member."
+  else
+        rlLog "WARNING: show --all for service group: $mygroup does NOT have member of $member."
+        rc=$(( $rc + 1 ))
+	rlLog "RC is $rc"
+  fi
+
+  return $rc
 }
 
 #######################################################################
