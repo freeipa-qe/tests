@@ -1,4 +1,9 @@
 <job>
+	<notify>
+		<cc>
+		ipa-and-samba-team-automation@redhat.com
+		</cc> 
+	</notify>
 	<whiteboard>
 		ipa repoclone Fedora12 x86_64
 	</whiteboard>
