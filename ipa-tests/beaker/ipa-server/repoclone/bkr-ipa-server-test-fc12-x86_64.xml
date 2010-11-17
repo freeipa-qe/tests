@@ -1,7 +1,16 @@
 <job>
 	<notify>
 		<cc>
-		ipa-and-samba-team-automation@redhat.com
+		mgregg@redhat.com
+		</cc> 
+		<cc>
+		ckannan@redhat.com
+		</cc> 
+		<cc>
+		yzhang@redhat.com
+		</cc> 
+		<cc>
+		jgalipea@redhat.com
 		</cc> 
 	</notify>
 	<whiteboard>
