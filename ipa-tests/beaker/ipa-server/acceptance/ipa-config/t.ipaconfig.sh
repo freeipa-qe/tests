@@ -5,9 +5,9 @@
 ipaconfig()
 {
     ipaconfig_envsetup
-#    ipaconfig_show
-#    ipaconfig_mod
-#    ipaconfig_searchlimit
+    ipaconfig_show
+    ipaconfig_mod
+    ipaconfig_searchlimit
     ipaconfig_server
     ipaconfig_envcleanup
 } # ipaconfig
@@ -26,14 +26,14 @@ ipaconfig_show()
 ipaconfig_mod()
 {
     ipaconfig_mod_envsetup
-#    ipaconfig_mod_maxusername_default
-#    ipaconfig_mod_maxusername_negative
-#    ipaconfig_mod_homedirectory_default
-#    ipaconfig_mod_homedirectory_negative
-#    ipaconfig_mod_defaultshell_default
-#    ipaconfig_mod_defaultshell_negative
-#    ipaconfig_mod_defaultgroup_default
-#    ipaconfig_mod_defaultgroup_negative
+    ipaconfig_mod_maxusername_default
+    ipaconfig_mod_maxusername_negative
+    ipaconfig_mod_homedirectory_default
+    ipaconfig_mod_homedirectory_negative
+    ipaconfig_mod_defaultshell_default
+    ipaconfig_mod_defaultshell_negative
+    ipaconfig_mod_defaultgroup_default
+    ipaconfig_mod_defaultgroup_negative
     ipaconfig_mod_emaildomain_default
     ipaconfig_mod_emaildomain_negative
     ipaconfig_mod_envcleanup
@@ -498,7 +498,7 @@ ipaconfig_searchlimit_envsetup()
 {
     rlPhaseStartSetup "ipaconfig_searchlimit_envsetup"
         #environment setup starts here
-
+        rlPass "no special env setup required"
         #environment setup ends   here
     rlPhaseEnd
 } #ipaconfig_searchlimit_envsetup
@@ -507,7 +507,7 @@ ipaconfig_searchlimit_envcleanup()
 {
     rlPhaseStartCleanup "ipaconfig_searchlimit_envcleanup"
         #environment cleanup starts here
-
+        rlPass "no special env cleanup required"
         #environment cleanup ends   here
     rlPhaseEnd
 } #ipaconfig_searchlimit_envcleanup
@@ -518,7 +518,20 @@ ipaconfig_searchlimit_timelimie_default()
 # non-loop data : 
     rlPhaseStartTest "ipaconfig_searchlimit_timelimie_default"
         rlLog "this is to test for default behave"
-        ipaconfig_searchlimit_timelimie_default_logic
+        out=$TmpDir/ipaconfig.searchtimelimit.$RANDOM.out
+        KinitAsAdmin
+        for value in 0 10 100 1000 10000
+        do
+            ipa config-mod --searchtimelimit=$value 2>&1 >/dev/null
+            ipa config-show > $out
+            if grep -i "Search time limit: $value" $out 2>&1 >/dev/null 
+            then
+                rlPass "set migration mode to $value success"
+            else
+                rlFail "set to migration mode to $value failed"
+            fi
+        done
+        rm $out
     rlPhaseEnd
 } #ipaconfig_searchlimit_timelimie_default
 
@@ -536,7 +549,21 @@ ipaconfig_searchlimit_timelimie_negative()
 # non-loop data : 
     rlPhaseStartTest "ipaconfig_searchlimit_timelimie_negative"
         rlLog "negative test case"
-        ipaconfig_searchlimit_timelimie_negative_logic
+        out=$TmpDir/ipaconfig.searchtimelimit.$RANDOM.out
+        KinitAsAdmin
+        for value in -1 -10 a abc
+        do
+            ipa config-mod --searchtimelimit=$value 2>&1 >/dev/null
+            ipa config-show > $out
+            if grep -i "Search time limit: $value" $out 2>&1 >/dev/null 
+            then
+                rlFail "set migration mode to $value success is not expected"
+            else
+                rlPass "set to migration mode to $value failed is expected"
+            fi
+        done
+        rm $out
+
     rlPhaseEnd
 } #ipaconfig_searchlimit_timelimie_negative
 
@@ -554,7 +581,20 @@ ipaconfig_searchlimit_recordsimie_default()
 # non-loop data : 
     rlPhaseStartTest "ipaconfig_searchlimit_recordsimie_default"
         rlLog "this is to test for default behave"
-        ipaconfig_searchlimit_recordsimie_default_logic
+        out=$TmpDir/ipaconfig.searchrecordlimit.$RANDOM.out
+        KinitAsAdmin
+        for value in 0 10 100 10000
+        do
+            ipa config-mod --searchrecordslimit=$value 2>&1 >/dev/null
+            ipa config-show > $out
+            if grep -i "Search size limit: $value" $out 2>&1 >/dev/null 
+            then
+                rlPass "set search record limit to $value success "
+            else
+                rlFail "set search record limit to $value failed"
+            fi
+        done
+        rm $out
     rlPhaseEnd
 } #ipaconfig_searchlimit_recordsimie_default
 
@@ -572,7 +612,20 @@ ipaconfig_searchlimit_recordslimie_negative()
 # non-loop data : 
     rlPhaseStartTest "ipaconfig_searchlimit_recordslimie_negative"
         rlLog "negative test case"
-        ipaconfig_searchlimit_recordslimie_negative_logic
+        out=$TmpDir/ipaconfig.searchrecordlimit.$RANDOM.out
+        KinitAsAdmin
+        for value in -1 -10 a abc 
+        do
+            ipa config-mod --searchrecordslimit=$value 2>&1 >/dev/null
+            ipa config-show > $out
+            if grep -i "Search size limit: $value" $out 2>&1 >/dev/null 
+            then
+                rlFail "set search record limit to $value success is not expected "
+            else
+                rlPass "set search record limit to $value failed is expected"
+            fi
+        done
+        rm $out
     rlPhaseEnd
 } #ipaconfig_searchlimit_recordslimie_negative
 
@@ -701,7 +754,6 @@ ipaconfig_server_subject_negative()
             rlPass "set subject to $value failed as expected"
         fi
         rm $out
-
     rlPhaseEnd
 } #ipaconfig_server_subject_negative
 
