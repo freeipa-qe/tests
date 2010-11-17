@@ -6,9 +6,9 @@ ipaconfig()
 {
     ipaconfig_envsetup
 #    ipaconfig_show
-    ipaconfig_mod
+#    ipaconfig_mod
 #    ipaconfig_searchlimit
-#    ipaconfig_server
+    ipaconfig_server
     ipaconfig_envcleanup
 } # ipaconfig
 
@@ -473,8 +473,6 @@ ipaconfig_mod_emaildomain_default_logic()
         fi
         clear_kticket
         rm $out
-
-
     # test logic ends
 } # ipaconfig_mod_emaildomain_default_logic 
 
@@ -610,7 +608,20 @@ ipaconfig_server_enablemigration()
 # non-loop data : 
     rlPhaseStartTest "ipaconfig_server_enablemigration"
         rlLog "this is to test for default behave"
-        ipaconfig_server_enablemigration_logic
+        out=$TmpDir/ipaconfig.enablemigration.$RANDOM.out
+        KinitAsAdmin
+        for value in FALSE True False True false true
+        do
+            ipa config-mod --enable-migration=$value 2>&1 >/dev/null
+            ipa config-show > $out
+            if grep -i "Migration mode: $value" $out 2>&1 >/dev/null 
+            then
+                rlPass "set migration mode to $value success"
+            else
+                rlFail "set to migration mode to $value failed"
+            fi
+        done
+        rm $out
     rlPhaseEnd
 } #ipaconfig_server_enablemigration
 
@@ -628,7 +639,10 @@ ipaconfig_server_enablemigration_negative()
 # non-loop data : 
     rlPhaseStartTest "ipaconfig_server_enablemigration_negative"
         rlLog "negative test case"
-        ipaconfig_server_enablemigration_negative_logic
+        for value in T F a 0 -1 
+        do
+            rlRun "ipa config-mod --enable-migration=$value" 1 "set migration mode to [$value] should fail"
+        done
     rlPhaseEnd
 } #ipaconfig_server_enablemigration_negative
 
@@ -646,7 +660,18 @@ ipaconfig_server_subject()
 # non-loop data : 
     rlPhaseStartTest "ipaconfig_server_subject"
         rlLog "this is to test for default behave"
-        ipaconfig_server_subject_logic
+        out=$TmpDir/ipaconfig.subject.$RANDOM.out
+        KinitAsAdmin
+        value="o=ipatest"
+        ipa config-mod --subject=$value 2>&1 >/dev/null
+        ipa config-show > $out
+        if grep -i "Certificate Subject base: $value" $out 2>&1 >/dev/null 
+        then
+            rlPass "set subject to $value success"
+        else
+            rlFail "set subject to $value failed"
+        fi
+        rm $out
     rlPhaseEnd
 } #ipaconfig_server_subject
 
@@ -664,7 +689,19 @@ ipaconfig_server_subject_negative()
 # non-loop data : 
     rlPhaseStartTest "ipaconfig_server_subject_negative"
         rlLog "negative test case"
-        ipaconfig_server_subject_negative_logic
+        out=$TmpDir/ipaconfig.subject.negative.$RANDOM.out
+        KinitAsAdmin
+        value="ťúůýžáčďéěíňóřš"
+        ipa config-mod --subject=$value 2>&1 >/dev/null
+        ipa config-show > $out
+        if grep -i "Certificate Subject base: $value" $out 2>&1 >/dev/null 
+        then
+            rlFail "set subject to $value should fail but not"
+        else
+            rlPass "set subject to $value failed as expected"
+        fi
+        rm $out
+
     rlPhaseEnd
 } #ipaconfig_server_subject_negative
 
