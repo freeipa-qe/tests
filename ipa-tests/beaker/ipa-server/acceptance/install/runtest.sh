@@ -161,7 +161,7 @@ expect eof' > /dev/shm/kinit-admin.exp
 			for s in $SLAVE; do
 				if [ "$s" != "" ]; then
 					# Determine the IP of the slave to be used when creating the replica file.
-					ipofs=$(dig +noquestion $s  | grep ipaqa64vmb.idm.lab.bos.redhat.com | grep IN | awk '{print $5}')
+					ipofs=$(dig +noquestion $s  | grep $s | grep IN | awk '{print $5}')
 					# put the short form of the hostname for server $s into s_short
 					s_short=$(echo $s | cut -d. -f1)
 					echo "IP of server $s is resolving as $ipofs, using short hostname of $s_short" 
@@ -172,6 +172,12 @@ expect eof' > /dev/shm/kinit-admin.exp
 			done
 		fi
 
+		# Adding MASTER and SLAVE bits to env.sh
+		echo "export MASTER=$MASTER" >> /dev/shm/env.sh
+		echo "export SLAVE=$SLAVE" >> /dev/shm/env.sh
+		echo "export CLIENT=$CLIENT" >> /dev/shm/env.sh
+		echo "Contents of env.sh are"
+		cat /dev/shm/env.sh
 		rlRun "cat /dev/shm/kinit-admin.exp"
 		rlRun "kdestroy"
 
