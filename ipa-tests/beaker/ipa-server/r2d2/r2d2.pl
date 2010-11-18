@@ -56,7 +56,7 @@ close (OUTPUT); #just test to verify we are be able to write, the actual writing
 #      global variables    #
 # ######################## #
 our %testsuite;
-our @logics;
+our %logics;
 our @parsingErrors;
 our $setindex=0;
 our $caseindex=0;
@@ -138,8 +138,6 @@ while (<MANIFEST>){
         $testset{"total"} = 0;
         $testsuite{"$next_testset_index"} = \%testset;
         $testsuite{"total"} = $setindex;
-        #push @logics,$testset_name."_envsetup";
-        #push @logics,$testset_name."_envcleanup";
     }# parsing test set 
 
     elsif ($line =~ m/^#{1}/){  ### parsing the test suite line
@@ -152,8 +150,6 @@ while (<MANIFEST>){
            $testsuite{"total"} = 0;
            $testsuite{"envsetup"} = $testsuitename."_envsetup";
            $testsuite{"envcleanup"} = $testsuitename."_envcleanup";
-          # push @logics,$testsuitename."_envsetup";
-          # push @logics,$testsuitename."_envcleanup";
         }else{
            recordError($lineIndex, 
                         "Format error", 
@@ -203,14 +199,6 @@ appendline ("# test cases         #");
 appendline ("######################");
 
 appendTestCaseElement_to_TestCase();
-
-#print "\n test case file:";
-our $i=0;
-foreach my $f (@logics){
-    print "\nLogic[$i] [$f]";
-    $i ++;
-    writelogic ($f);
-}
 
 #print "\n function file: ";
 $output =~ s/__/\$/g;
@@ -397,22 +385,27 @@ sub appendTestCaseElement_to_TestCase
                 appendline ("{");
                 my $comment = $testcase->{"comment"};
                 my $logic   = $testcase->{"logic"};
-                my $loop    = $testcase->{"data-loop"};
-                my $noloop  = $testcase->{"data-no-loop"};
-                appendline ("# looped data   : $loop");
-                appendline ("# non-loop data : $noloop");
+                my $loopdata    = $testcase->{"data-loop"};
+                my $nonloopdata = $testcase->{"data-no-loop"};
+                appendline ("# looped data   : $loopdata");
+                appendline ("# non-loop data : $nonloopdata");
                 appendline ($indent."rlPhaseStartTest \"$testcase_name\"");
                 if ( ! defined $comment){
                     $comment = "";
                 }
                 appendline ($indent.$indent."rlLog \"$comment\"");
                 my $level=2; #level 2 means put double size of indent before each line of loop
-                my $fcall = getFunctionLine($logic, $noloop);
-                my $fbody = loopit ($level,$indent,$fcall,$loop);
+                my $fcall = getFunctionLine($logic, $nonloopdata);
+                my $fbody = loopit ($level,$indent,$fcall,$loopdata,$testcase_name);
                 appendline ($fbody);
                 appendline ($indent."rlPhaseEnd");
                 appendline ("} #$testcase_name");
                 appendline ("");
+                # end of test case itself, now check whether the <testcase>_logic exist, if it does, then append it here
+                if ( exists $logics{$testcase_name}){
+                    my $logicfunction = $logics{$testcase_name};
+                    writelogic ($logicfunction);
+                } # append testcase logic
             }#foreach to append test case name under test set
             # insert envcleanup here
             #writelogic ($testset->{"envcleanup"});
@@ -432,7 +425,7 @@ sub getFunctionLine
 
 sub loopit
 {
-    my ($level, $indent, $fcall, $dynamic) = @_;
+    my ($level, $indent, $fcall, $dynamic,$hashkey) = @_;
     my $localreturn="";
     my $currentIndent="";
     for (my $i=0; $i<$level; $i++){
@@ -441,7 +434,7 @@ sub loopit
     
     if($dynamic eq ""){
         #print "\nno loop necessary";
-        push @logics, $fcall;
+        $logics{$hashkey}=$fcall;
         return $currentIndent.$fcall;
     } #program hits here only when no loop data defined
     elsif($dynamic =~ /^(\w+)\s(.+)$/){
@@ -461,7 +454,7 @@ sub loopit
         $localreturn = "$currentIndent"."for __".$dynamic."_value in __".$dynamic;
         $localreturn = $localreturn."\n$currentIndent"."do";
         $fcall = $fcall." __".$dynamic."_value";
-        push @logics, $fcall;
+        $logics{$hashkey}=$fcall;
         $localreturn = $localreturn."\n$currentIndent".$indent.$fcall;
         $localreturn = $localreturn."\n$currentIndent"."done";
         #print "\n----localreturn----";
@@ -529,7 +522,7 @@ sub writelogic
         appendline ("{");
         appendline ("$indent# accept parameters: NONE");
         appendline ("$indent# test logic starts");
-        appendline ("");
+        appendline ("$indent"."$indent"."rlFail \"EMPTY LOGIC\"");
         appendline ("$indent# test logic ends");
         appendline ("} # $function ");
         appendline ("");
