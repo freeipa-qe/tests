@@ -127,7 +127,7 @@ rlJournalStart
 	# nest user groups
 	rlRun "addGroupMembers groups \"$usergroup1,$usergroup2\" $usergroup3" 0 "SETUP: Nesting Groups - $usergroup1 and $usergroup2 members of $usergroup3" 
 	# add service group
-	rlRun "ipa hbacsvcgroup-add --desc=$servicegroup $servicegroup" 0 "SETUP: Adding service group $servicegroup"
+	rlRun "addHBACServiceGroup $servicegroup $servicegroup" 0 "SETUP: Adding service group $servicegroup"
   	
     rlPhaseEnd
 
@@ -403,27 +403,98 @@ rlJournalStart
         rlRun "verifyHBACAssoc Engineering \"Rule type\" deny" 0 "Verifying Type"
     rlPhaseEnd
 
+    rlPhaseStartTest "ipa-hbac-cli-043: Delete User Associated with a Rule"
+	rlRun "modifyHBACRule Engineering usercat \"\" " 0 "Modifying Engineering Rule's User Category"
+	rlRun "addToHBAC Engineering user users $user1" 0 "Adding user $user1 to Engineering rule."
+        rlRun "verifyHBACAssoc Engineering \"Users\" $user1" 0 "Verifying user $user1 is associated with the Engineering rule."
+	rlRun "ipa user-del $user1" 0 "Deleting User associated with rule."
+	rlRun "verifyHBACAssoc Engineering \"Users\" $user1" 1 "Verifying user $user1 is no longer associated with the Engineering rule."
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-hbac-cli-044: Delete Group Associated with a Rule"
+	rlRun "addToHBAC Engineering user groups $usergroup1" 0 "Adding user group $usergroup1 to Engineering rule."
+        rlRun "verifyHBACAssoc Engineering \"Groups\" $usergroup1" 0 "Verifying user group $usergroup1 is associated with the Engineering rule."
+	rlRun "deleteGroup $usergroup1" 0 "Deleting User Group associated with rule."
+	rlRun "verifyHBACAssoc Engineering \"Groups\" $usergroup1" 1 "Verifying user group $usergroup1 is no longer associated with the Engineering rule."
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-hbac-cli-045: Delete Host Associated with a Rule"
+	rlRun "modifyHBACRule Engineering hostcat \"\" " 0 "Modifying Engineering Rule's Host Category"
+        rlRun "addToHBAC Engineering host hosts $host3" 0 "Adding host $host3 to Engineering rule."
+        rlRun "verifyHBACAssoc Engineering Hosts $host3" 0 "Verifying host $host3 is associated with the Engineering rule."
+        rlRun "deleteHost $host3" 0 "Deleting Host associated with rule."
+        rlRun "verifyHBACAssoc Engineering Hosts $host3" 1 "Verifying host $host3 is no longer associated with the Engineering rule."
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-hbac-cli-046: Delete Host Group Associated with a Rule"
+	rlRun "modifyHBACRule Engineering srchostcat \"\" " 0 "Modifying Engineering Rule's Source Host Category"
+	rlRun "addToHBAC Engineering host hostgroups $hostgroup1" 0 "Adding host group $hostgroup1 to Engineering rule."
+        rlRun "verifyHBACAssoc Engineering \"Host Groups\" $hostgroup1" 0 "Verifying host group $hostgroup1 is associated with the Engineering rule."
+	rlRun "deleteHostGroup $hostgroup1" 0 "Deleting Host Group associated with rule."
+	rlRun "verifyHBACAssoc Engineering \"Host Groups\" $hostgroup1" 1 "Verifying host group $hostgroup1 is no longer associated with the Engineering rule."
+	rlRun "deleteHBACRule Engineering" 0 "CLEANUP: Deleting Rule"
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-hbac-cli-047: Find Rules by name"
+	rlRun "addHBACRule allow \" \" \" \" \" \" \" \" test1" 0 "Adding HBAC rule."
+	rlRun "addHBACRule deny all all all all test2" 0 "Adding HBAC rule."
+	rlRun "addHBACRule allow all all all all test3" 0 "Adding HBAC rule."
+	rlRun "addHBACRule deny \" \" \" \" \" \" \" \" test4" 0 "Adding HBAC rule."
+
+	for item in test1 test2 test3 test4 ; do
+		rlRun "findHBACRuleByOption name $item $item" 0 "Finding rule $item by name"	
+	done
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-hbac-cli-047: Find Rules by type"
+	rlRun "findHBACRuleByOption type allow \"allow_all test1 test3\"" 0 "Finding rule $item by type"
+	rlRun "findHBACRuleByOption type deny \"test2 test4\"" 0 "Finding rule $item by type"
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-hbac-cli-048: Find Rules by user category"
+	rlRun "findHBACRuleByOption usercat all \"allow_all test2 test3\"" 0 "Finding rule $item by user category all"
+	rlRun "findHBACRuleByOption usercat \" \" \"test1 test4\"" 0 "Finding rule $item by user category none"
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-hbac-cli-049: Find Rules by host category"
+        rlRun "findHBACRuleByOption hostcat all \"allow_all test2 test3\"" 0 "Finding rule $item by host category all"
+        rlRun "findHBACRuleByOption hostcat \" \" \"test1 test4\"" 0 "Finding rule $item by host category none"
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-hbac-cli-050: Find Rules by  source host category"
+        rlRun "findHBACRuleByOption srchostcat all \"allow_all test2 test3\"" 0 "Finding rule $item by source host category all"
+        rlRun "findHBACRuleByOption srchostcat \" \" \"test1 test4\"" 0 "Finding rule $item by source host category none"
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-hbac-cli-051: Find Rules by service category"
+        rlRun "findHBACRuleByOption servicecat all \"allow_all test2 test3\"" 0 "Finding rule $item by service category all"
+        rlRun "findHBACRuleByOption servicecat \" \" \"test1 test4\"" 0 "Finding rule $item by service category none"
+	# cleanup
+	for item in test1 test2 test3 test4 ; do
+		rlRun "deleteHBACRule $item" 0 "CLEANUP: Deleting Rule $item"
+	done
+    rlPhaseEnd
+
     rlPhaseStartCleanup "ipa-hbac-cli-cleanup: Destroying admin credentials."
         rlRun "popd"
         rlRun "rm -r $TmpDir" 0 "Removing tmp directory"
-	rlRun "deleteHBACRule Engineering" 0 "CLEANUP: Deleting Rule"
 	# delete users
-	for item in $user1 $user2 $user3 $user4 ; do
+	for item in $user2 $user3 $user4 ; do
 		rlRun "ipa user-del $item" 0 "CLEANUP: Deleting user $item"
 	done
 
 	# delete hosts
-	for item in $host1 $host2 $host3 $host4 ; do
+	for item in $host1 $host2 $host4 ; do
 		rlRun "deleteHost $item" 0 "CLEANUP: Deleting host $item"
 	done
 
 	# delete user groups
-	for item in $usergroup1 $usergroup2 $usergroup3 ; do
+	for item in $usergroup2 $usergroup3 ; do
 		rlRun "deleteGroup $item" 0 "CLEANUP: Deleting user group $item"
 	done 
 	
 	# delete host groups
-	for item in $hostgroup1 $hostgroup2 $hostgroup3 ; do
+	for item in $hostgroup2 $hostgroup3 ; do
 		rlRun "deleteHostGroup $item" 0 "CLEANUP: Deleting host group $item"
 	done
 
