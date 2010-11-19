@@ -6,6 +6,7 @@
 # Includes:
 #	addHBACRule
 #	findHBACRule
+#	findHBACRuleByOption
 #	disableHBACRule
 #	enableHBACRule
 #	verifyHBACStatus
@@ -103,6 +104,43 @@ findHBACRule()
 
    return $rc
 
+}
+
+#######################################################################
+# findHBACRuleByOption Usage:
+#       findHBACRule <option> <value> <space_delimited_list_of_expected_rules>
+######################################################################
+
+findHBACRuleByOption()
+{
+   option=$1
+   value=$2
+   rules=$3
+   rc=0
+
+   flag="--$option"
+   tmpfile=/tmp/findrulebyoption.txt
+
+   rlLog "Executing: ipa hbac-find $flap=$value"
+   ipa hbac-find $flag=$value > $tmpfile
+   rc=$?
+   if [ $rc -eq 0 ] ; then
+	rlLog "Searching for rules: $rules"
+	for item in $rules ; do
+		results=`cat $tmpfile | grep "Rule name"`
+		echo $results | grep $item
+		if [ $? -eq 0 ] ; then
+			rlLog "Rule $item found as expected."
+		else
+			rlLog "ERROR: Rule $item was not found."
+			rc=1
+		fi
+	done
+   else
+   	rlLog "WARNING: hbac-find command faied."
+   fi
+
+   return $rc
 }
 
 #######################################################################
