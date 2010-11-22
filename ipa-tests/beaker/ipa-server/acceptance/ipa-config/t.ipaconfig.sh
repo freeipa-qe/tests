@@ -732,6 +732,52 @@ ipaconfig_searchfields_userfields_default()
     rlPhaseEnd
 } #ipaconfig_searchfields_userfields_default
 
+########FIXME : I AM HERE ###########
+ipaconfig_searchfields_groupfields_default()
+{
+# looped data   : 
+# non-loop data : 
+    rlPhaseStartTest "ipaconfig_searchfields_groupfields_default"
+        rlLog "this is to test for default behave"
+        local out=$TmpDir/searchfields.groupfields.$RANDOM.out
+        # setup special account for this test
+        specialvalue=999999999999
+        username=`dataGenerator "username" 8`
+
+        create_ipauser 0 $username
+        KinitAsAdmin
+        ipa user-mod $username --setattr=homephone="123-456-${specialvalue}"
+        totalEntries=`ipa user-find $specialvalue | grep "Number of entries returned" | cut -d" " -f5| xargs echo`
+        if [ "$totalEntries" = "0" ];then
+            rlLog "environment checked, good to go"
+        else
+            rlFail "environment setup failed, we are not suppose to find any entries for now"
+        fi
+
+        # start configuration change
+        value="uid,givenname,sn,ou,title,homephone"
+        ipa config-mod --usersearch=$value 2>&1 >/dev/null
+        ipa config-show > $out
+        if grep -i "User search fields: $value" $out 2>&1 >/dev/null 
+        then
+            rlPass "set user search fields to [$value] success "
+        else
+            rlFail "set user search fields to [$value] failed"
+        fi
+
+        # we should be able to find this user after user search fields search
+        totalEntries=`ipa user-find $specialvalue | grep "Number of entries returned" | cut -d" " -f5| xargs echo`
+        rlLog "found [$totalEntries]"
+        if [ "$totalEntries" = "1" ];then
+            rlPass "user-find return 1"
+        else
+            rlFail "returned [$returnedNumEntry] entries when 1 is expected"
+        fi
+        clear_kticket
+        rm $out
+    rlPhaseEnd
+} #ipaconfig_searchfields_groupfields_default
+
 ipaconfig_server_envsetup()
 {
     rlPhaseStartSetup "ipaconfig_server_envsetup"
