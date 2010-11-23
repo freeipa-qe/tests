@@ -65,22 +65,12 @@ REALM=`os_getdomainname | tr "[a-z]" "[A-Z]"`
 DOMAIN=`os_getdomainname`
 
 host1="dev_host."$DOMAIN
-host2="qe_host."$DOMAIN
-host3="common_host."$DOMAIN
-host4="sales_host."$DOMAIN
 
 user1="dev"
-user2="qe"
-user3="manager"
-user4="sales"
 
 usergroup1="dev_ugrp"
-usergroup2="qe_ugrp"
-usergroup3="eng_usrs"
 
 hostgroup1="dev_hosts"
-hostgroup2="qe_hosts"
-hostgroup3="eng_hosts"
 
 servicegroup="remote_access"
 
@@ -95,37 +85,14 @@ rlJournalStart
         rlRun "pushd $TmpDir"
 	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 
-	# add hosts for testing
-	for item in $host1 $host2 $host3 $host4 ; do
-		rlRun "addHost $item" 0 "SETUP: Adding host $item for testing."
-	done
-	# add hostgroups testing
-	for item in $hostgroup1 $hostgroup2 $hostgroup3 ; do
-		rlRun "addHostGroup $item $item" 0 "SETUP: Adding host group $item for testing."
-	done
-
-	# set up host memberships
-	rlRun "addHostGroupMembers hosts $host1 $hostgroup1" 0 "SETUP: Adding host $host1 to host group $hostgroup1."
-	rlRun "addHostGroupMembers hosts $host2 $hostgroup2" 0 "SETUP: Adding host $host2 to host group $hostgroup2."
-	rlRun "addHostGroupMembers hosts $host3 $hostgroup3" 0 "SETUP: Adding host $host3 to host group $hostgroup3."
-	# nest host groups
-	rlRun "addHostGroupMembers hostgroups \"$hostgroup1,$hostgroup2\" $hostgroup3" 0 "SETUP: Nesting Groups - $hostgroup1 and $hostgroup2 members of $hostgroup3"
-
-	# add users for testing
-	for item in $user1 $user2 $user3 $user4 ; do
-		rlRun "ipa user-add --first=$item --last=$item $item" 0 "SETUP: Adding user $item."
-	done
-
-	# add groups for testing
-	for item in $usergroup1 $usergroup2 $usergroup3 ; do
-		rlRun "addGroup $item $item" 0 "SETUP: Adding user $item."
-	done
-
-	# set up user memberships
-	rlRun "addGroupMembers users $user1 $usergroup1" 0 "SETUP: Adding user $user1 to group $usergroup1"
-	rlRun "addGroupMembers users $user2 $usergroup2" 0 "SETUP: Adding user $user2 to group $usergroup2"
-	# nest user groups
-	rlRun "addGroupMembers groups \"$usergroup1,$usergroup2\" $usergroup3" 0 "SETUP: Nesting Groups - $usergroup1 and $usergroup2 members of $usergroup3" 
+	# add host for testing
+	rlRun "addHost $host1" 0 "SETUP: Adding host $host1 for testing."
+	# add host group for testing
+	rlRun "addHostGroup $hostgroup1 $hostgroup1" 0 "SETUP: Adding host group $hostgroup1 for testing."
+	# add user for testing
+	rlRun "ipa user-add --first=$user1 --last=$user1 $user1" 0 "SETUP: Adding user $user1."
+	# add group for testing
+	rlRun "addGroup $usergroup1 $usergroup1" 0 "SETUP: Adding user $usergroup1."
 	# add service group
 	rlRun "addHBACServiceGroup $servicegroup $servicegroup" 0 "SETUP: Adding service group $servicegroup"
   	
@@ -314,13 +281,13 @@ rlJournalStart
 
     rlPhaseStartTest "ipa-hbac-cli-025: Add host to Rule"
 	rlRun "addHBACRule allow \" \" \" \" \" \" \" \" Engineering" 0 "Adding HBAC rule."
-	rlRun "addToHBAC Engineering host hosts $host3" 0 "Adding host $host3 to Engineering rule."
-	rlRun "verifyHBACAssoc Engineering Hosts $host3" 0 "Verifying host $host3 is associated with the Engineering rule."
+	rlRun "addToHBAC Engineering host hosts $host1" 0 "Adding host $host1 to Engineering rule."
+	rlRun "verifyHBACAssoc Engineering Hosts $host1" 0 "Verifying host $host1 is associated with the Engineering rule."
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-hbac-cli-026: Remove host from Rule"
-        rlRun "removeFromHBAC Engineering host hosts $host3" 0 "Removing host $host3 to Engineering rule."
-        rlRun "verifyHBACAssoc Engineering Hosts $host3" 1 "Verifying host $host3 is no longer associated with the Engineering rule."
+        rlRun "removeFromHBAC Engineering host hosts $host1" 0 "Removing host $host1 to Engineering rule."
+        rlRun "verifyHBACAssoc Engineering Hosts $host1" 1 "Verifying host $host1 is no longer associated with the Engineering rule."
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-hbac-cli-027: Add host group to Rule"
@@ -355,22 +322,22 @@ rlJournalStart
 
     rlPhaseStartTest "ipa-hbac-cli-033: Add service to Rule"
         rlRun "addToHBAC Engineering service hbacsvcs sshd" 0 "Adding service sshd to Engineering rule."
-        rlRun "verifyHBACAssoc Engineering \"Services\" sshd" 0 "Verifying service sshd is associated with the Engineering rule."
+        rlRun "verifyHBACAssoc Engineering \"memberservice_hbacsvc\" sshd" 0 "Verifying service sshd is associated with the Engineering rule."
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-hbac-cli-034: Remove service from Rule"
         rlRun "removeFromHBAC Engineering service hbacsvcs sshd" 0 "Removing service sshd to Engineering rule."
-        rlRun "verifyHBACAssoc Engineering \"Services\" sshd" 1 "Verifying service sshd is no longer associated with the Engineering rule."
+        rlRun "verifyHBACAssoc Engineering \"memberservice_hbacsvc\" sshd" 1 "Verifying service sshd is no longer associated with the Engineering rule."
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-hbac-cli-035: Add service group to Rule"
         rlRun "addToHBAC Engineering service hbacsvcgroups $servicegroup" 0 "Adding service group $servicegroup to Engineering rule."
-        rlRun "verifyHBACAssoc Engineering \"Service Groups\" $servicegroup" 0 "Verifying service group $servicegroup is associated with the Engineering rule."
+        rlRun "verifyHBACAssoc Engineering \"memberservice_hbacsvcgroup\" $servicegroup" 0 "Verifying service group $servicegroup is associated with the Engineering rule."
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-hbac-cli-036: Remove service group from Rule"
         rlRun "removeFromHBAC Engineering service hbacsvcgroups $servicegroup" 0 "Removing service group $servicegroup to Engineering rule."
-        rlRun "verifyHBACAssoc Engineering \"Service Groups\" $servicegroup" 1 "Verifying service group $servicegroup is no longer associated with the Engineering rule."
+        rlRun "verifyHBACAssoc Engineering \"memberservice_hbacsvcgroup\" $servicegroup" 1 "Verifying service group $servicegroup is no longer associated with the Engineering rule."
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-hbac-cli-037: Modify Description"
@@ -420,10 +387,10 @@ rlJournalStart
 
     rlPhaseStartTest "ipa-hbac-cli-045: Delete Host Associated with a Rule"
 	rlRun "modifyHBACRule Engineering hostcat \"\" " 0 "Modifying Engineering Rule's Host Category"
-        rlRun "addToHBAC Engineering host hosts $host3" 0 "Adding host $host3 to Engineering rule."
-        rlRun "verifyHBACAssoc Engineering Hosts $host3" 0 "Verifying host $host3 is associated with the Engineering rule."
-        rlRun "deleteHost $host3" 0 "Deleting Host associated with rule."
-        rlRun "verifyHBACAssoc Engineering Hosts $host3" 1 "Verifying host $host3 is no longer associated with the Engineering rule."
+        rlRun "addToHBAC Engineering host hosts $host1" 0 "Adding host $host1 to Engineering rule."
+        rlRun "verifyHBACAssoc Engineering Hosts $host1" 0 "Verifying host $host1 is associated with the Engineering rule."
+        rlRun "deleteHost $host1" 0 "Deleting Host associated with rule."
+        rlRun "verifyHBACAssoc Engineering Hosts $host1" 1 "Verifying host $host1 is no longer associated with the Engineering rule."
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-hbac-cli-046: Delete Host Group Associated with a Rule"
@@ -447,28 +414,31 @@ rlJournalStart
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-hbac-cli-047: Find Rules by type"
-	rlRun "findHBACRuleByOption type allow \"allow_all test1 test3\"" 0 "Finding rule $item by type"
-	rlRun "findHBACRuleByOption type deny \"test2 test4\"" 0 "Finding rule $item by type"
+	rlRun "findHBACRuleByOption type allow \"allow_all test1 test3\"" 0 "Finding rule by type"
+	rlRun "findHBACRuleByOption type allow \"test2 test4\"" 1 "Finding rule by type"
+	rlRun "findHBACRuleByOption type deny \"test2 test4\"" 0 "Finding rule by type"
+	rlRun "findHBACRuleByOption type deny \"allow_all test1 test3\"" 1 "Finding rule by type"
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-hbac-cli-048: Find Rules by user category"
-	rlRun "findHBACRuleByOption usercat all \"allow_all test2 test3\"" 0 "Finding rule $item by user category all"
-	rlRun "findHBACRuleByOption usercat \" \" \"test1 test4\"" 0 "Finding rule $item by user category none"
+	rlRun "findHBACRuleByOption usercat all \"allow_all test2 test3\"" 0 "Finding rules by user category all"
+	rlRun "findHBACRuleByOption usercat all \"test1\"" 1 "Finding rules by user category all"
+	rlRun "findHBACRuleByOption usercat all \"test4\"" 1 "Finding rules by user category all"
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-hbac-cli-049: Find Rules by host category"
-        rlRun "findHBACRuleByOption hostcat all \"allow_all test2 test3\"" 0 "Finding rule $item by host category all"
-        rlRun "findHBACRuleByOption hostcat \" \" \"test1 test4\"" 0 "Finding rule $item by host category none"
+        rlRun "findHBACRuleByOption hostcat all \"allow_all test2 test3\"" 0 "Finding rules by host category all"
+        rlRun "findHBACRuleByOption hostcat all \"test1 test4\"" 1 "Finding rules by host category none"
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-hbac-cli-050: Find Rules by  source host category"
-        rlRun "findHBACRuleByOption srchostcat all \"allow_all test2 test3\"" 0 "Finding rule $item by source host category all"
-        rlRun "findHBACRuleByOption srchostcat \" \" \"test1 test4\"" 0 "Finding rule $item by source host category none"
+    rlPhaseStartTest "ipa-hbac-cli-050: Find Rules by source host category"
+        rlRun "findHBACRuleByOption srchostcat all \"allow_all test2 test3\"" 0 "Finding rules by source host category all"
+        rlRun "findHBACRuleByOption srchostcat all \"test1 test4\"" 1 "Finding rules by source host category none"
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-hbac-cli-051: Find Rules by service category"
-        rlRun "findHBACRuleByOption servicecat all \"allow_all test2 test3\"" 0 "Finding rule $item by service category all"
-        rlRun "findHBACRuleByOption servicecat \" \" \"test1 test4\"" 0 "Finding rule $item by service category none"
+        rlRun "findHBACRuleByOption servicecat all \"allow_all test2 test3\"" 0 "Finding rules by service category all"
+        rlRun "findHBACRuleByOption servicecat all \"test1 test4\"" 1 "Finding rules by service category none"
 	# cleanup
 	for item in test1 test2 test3 test4 ; do
 		rlRun "deleteHBACRule $item" 0 "CLEANUP: Deleting Rule $item"
@@ -478,25 +448,6 @@ rlJournalStart
     rlPhaseStartCleanup "ipa-hbac-cli-cleanup: Destroying admin credentials."
         rlRun "popd"
         rlRun "rm -r $TmpDir" 0 "Removing tmp directory"
-	# delete users
-	for item in $user2 $user3 $user4 ; do
-		rlRun "ipa user-del $item" 0 "CLEANUP: Deleting user $item"
-	done
-
-	# delete hosts
-	for item in $host1 $host2 $host4 ; do
-		rlRun "deleteHost $item" 0 "CLEANUP: Deleting host $item"
-	done
-
-	# delete user groups
-	for item in $usergroup2 $usergroup3 ; do
-		rlRun "deleteGroup $item" 0 "CLEANUP: Deleting user group $item"
-	done 
-	
-	# delete host groups
-	for item in $hostgroup2 $hostgroup3 ; do
-		rlRun "deleteHostGroup $item" 0 "CLEANUP: Deleting host group $item"
-	done
 
 	# delete service group
 	rlRun "ipa hbacsvcgroup-del $servicegroup" 0 "CLEANUP: Deleting service group $servicegroup"
