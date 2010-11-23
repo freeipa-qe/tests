@@ -121,7 +121,7 @@ findHBACRuleByOption()
    flag="--$option"
    tmpfile=/tmp/findrulebyoption.txt
 
-   rlLog "Executing: ipa hbac-find $flap=$value"
+   rlLog "Executing: ipa hbac-find $flag=$value"
    ipa hbac-find $flag=$value > $tmpfile
    rc=$?
    if [ $rc -eq 0 ] ; then
@@ -411,6 +411,44 @@ findHBACService()
    return $rc
 }
 
+#######################################################################
+# findHBACServiceByOption Usage:
+#       findHBACServiceByOption <option> <value> <space_delimited_list_of_expected_services>
+######################################################################
+
+findHBACServiceByOption()
+{
+   option=$1
+   value=$2
+   services=$3
+   rc=0
+
+   flag="--$option"
+   tmpfile=/tmp/findservicebyoption.txt
+
+   rlLog "Executing: ipa hbacsvc-find $flag=$value"
+   ipa hbacsvc-find $flag=$value > $tmpfile
+   rc=$?
+   if [ $rc -eq 0 ] ; then
+        rlLog "Searching for services: $rules"
+        for item in $services ; do
+                results=`cat $tmpfile | grep "Service name"`
+                echo $services | grep $item
+                if [ $? -eq 0 ] ; then
+                        rlLog "Service $item found as expected."
+                else
+                        rlLog "ERROR: Service $item was not found."
+                        rc=1
+                fi
+        done
+   else
+        rlLog "WARNING: hbacsvc-find command faied."
+   fi
+
+   return $rc
+}
+
+
 #############################################################################
 # verifyHBACService Usage
 #   verifyHBACService <servicename> <attr> <value>
@@ -475,7 +513,6 @@ addHBACServiceGroup()
    description=$2
    rc=0
 
-   rlLog "DEBUG: ipa hbacsvcgroup-add --desc=\"$description\" \"$groupname\""
    ipa hbacsvcgroup-add --desc="$description" "$groupname"
    rc=$?
    if [ $rc -ne 0 ] ; then
@@ -549,7 +586,6 @@ verifyHBACServiceGroup()
   rc=0
 
   tmpfile=/tmp/hbacsvcgrpshow.out
-  rlLog "DEBUG: ipa hbacsvcgroup-show --all \"$groupname\" > $tmpfile"
   ipa hbacsvcgroup-show --all "$groupname" > $tmpfile
   rc=$?
   if [ $rc -eq 0 ] ; then
@@ -624,7 +660,7 @@ verifyHBACGroupMember()
 {
   member=$1
   mygroup=$2
-  rc=0
+  i=0
 
   # construct memberDN
   memberCN="cn=$member"
@@ -641,8 +677,7 @@ verifyHBACGroupMember()
   cat /tmp/member.out | grep "$memberDN"
   if [ $? -ne 0 ] ; then
   	rlLog "WARNING: member: $memberDN not found for group $mygroup"
-        rc=$(( $rc + 1 ))
-	rlLog "RC is $rc"
+        let i=$i+1
   else
 	rlLog "member: $memberDN found for group $mygroup" 
   fi
@@ -652,33 +687,32 @@ verifyHBACGroupMember()
   cat /tmp/memberof.out | grep "$groupDN"
   if [ $? -ne 0 ] ; then
   	rlLog "WARNING: memberOf: $groupDN not found for member $member"
-        rc=$(( $rc + 1 ))
-	rlLog "RC is $rc"
+        let i=$i+1
   else
 	rlLog "memberOf: $groupDN found for member $member"
   fi
 
   # verify show all for member
   verifyHBACService $member memberof $groupDN
-  if [ $? -eq 0 ] ; then
+  rc=$?
+  if [ $rc -eq 0 ] ; then
 	rlLog "show --all for service: $member is memberof $mygroup."
   else
 	rlLog "WARNING: show --all for service: $member is NOT a member of $mygroup."
-	rc=$(( $rc + 1 ))
-	rlLog "RC is $rc"
+	let i=$i+1
   fi
 
   # verify show all for group
   verifyHBACServiceGroup $mygroup member_hbacsvc $member
-  if [ $? -eq 0 ] ; then
+  rc=$?
+  if [ $rc -eq 0 ] ; then
         rlLog "show --all for service group: $mygroup has member $member."
   else
         rlLog "WARNING: show --all for service group: $mygroup does NOT have member of $member."
-        rc=$(( $rc + 1 ))
-	rlLog "RC is $rc"
+        let i=$i+1
   fi
 
-  return $rc
+  return $i
 }
 
 #######################################################################
