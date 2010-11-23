@@ -120,6 +120,7 @@ findHBACRuleByOption()
 
    flag="--$option"
    tmpfile=/tmp/findrulebyoption.txt
+   rm -rf $tmpfile
 
    rlLog "Executing: ipa hbac-find $flag=$value"
    ipa hbac-find $flag=$value > $tmpfile
