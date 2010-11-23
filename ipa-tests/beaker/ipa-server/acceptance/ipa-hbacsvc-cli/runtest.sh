@@ -51,9 +51,10 @@ DOMAIN=`os_getdomainname`
 
 service1="http"
 service2="https"
+service3="rlogin"
 
-servicegroup1="http_group"
-servicegroup2="remote_access"
+servicegroup1="remote"
+servicegroup2="web"
 
 ########################################################################
 
@@ -212,15 +213,35 @@ rlJournalStart
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-hbacsvc-cli-020: Verify Add Existing Services to New Service Group"
-	rlRun "addServiceGroupMembers \"sshd,ftp\" $servicegroup1" 0 "Adding service members to service group."
-        rlRun "verifyHBACGroupMember sshd $servicegroup1" 0 "Verifying service group member was added."
-        rlRun "verifyHBACGroupMember ftp $servicegroup1" 0 "Verifying service group member was added."
+	rlRun "addHBACServiceGroup $servicegroup2 $servicegroup2" 0 "Adding HBAC service Group $servicegroup2."
+	rlRun "addServiceGroupMembers \"sshd,ftp\" $servicegroup2" 0 "Adding service members to service group."
+        rlRun "verifyHBACGroupMember sshd $servicegroup2" 0 "Verifying service group member was added."
+        rlRun "verifyHBACGroupMember ftp $servicegroup2" 0 "Verifying service group member was added."
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-hbacsvc-cli-021: Verify Remove Existing Services to New Service Group"
-        rlRun "removeServiceGroupMembers \"sshd,ftp\" $servicegroup1" 0 "Removing service members to service group."
-        rlRun "verifyHBACGroupMember sshd $servicegroup1" 4 "Verifying service group member was removed."
-        rlRun "verifyHBACGroupMember ftp $servicegroup1" 4 "Verifying service group member was removed."
+        rlRun "removeServiceGroupMembers \"sshd,ftp\" $servicegroup2" 0 "Removing service members to service group."
+        rlRun "verifyHBACGroupMember sshd $servicegroup2" 4 "Verifying service group member was removed."
+        rlRun "verifyHBACGroupMember ftp $servicegroup2" 4 "Verifying service group member was removed."
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-hbacsvc-cli-022: Delete service that is a Member of two service groups"
+ 	for item in $service2 $service3 ; do
+    		rlRun "addHBACService $item \"$item service\"" 0 "Adding new service $item."
+	done
+    	rlRun "addServiceGroupMembers \"sshd,ftp,rlogin\" $servicegroup1" 0 "Adding service members to service group."
+    	rlRun "addServiceGroupMembers \"http,https,rlogin\" $servicegroup2" 0 "Adding service members to service group."
+    	rlRun "verifyHBACGroupMember rlogin $servicegroup1" 0 "Verifying service group member was added."
+	rlRun "verifyHBACGroupMember rlogin $servicegroup2" 0 "Verifying service group member was added."
+	rlRun "deleteHBACService $service3" 0 "Deleting service that is member of 2 service groups."
+        rlRun "verifyHBACGroupMember rlogin $servicegroup1" 4 "Verifying service group member was removed."
+        rlRun "verifyHBACGroupMember rlogin $servicegroup2" 4 "Verifying service group member was removed."
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-hbacscc-cli-023: Delete service group with service members."
+	rlRun "deleteHBACServiceGroup $servicegroup2" 0 "Deleting service group $servicegroup2"
+	rlRun "verifyHBACService http memberof \"cn=$servicegroup2,cn=hbacservicegroups,cn=accounts,dc=$RELM\"" 1 "Verifying service exists but membership was removed."
+        rlRun "verifyHBACService https memberof \"cn=$servicegroup2,cn=hbacservicegroups,cn=accounts,dc=$RELM\"" 1 "Verifying service exists but membership was removed."
     rlPhaseEnd
 
     rlPhaseStartCleanup "ipa-hbac-cli-cleanup: Destroying admin credentials."
@@ -229,6 +250,7 @@ rlJournalStart
 
 	# delete service groups
 	rlRun "deleteHBACService $service1" 0 "CLEANUP: Deleting service $service1"
+	rlRun "deleteHBACService $service2" 0 "CLEANUP: Deleting service $service2"
 	rlRun "deleteHBACServiceGroup \"$servicegroup1\"" 0 "CLEANUP: Deleting service group $servicegroup1"
 	rlRun "kdestroy" 0 "Destroying admin credentials."
 	rhts-submit-log -l /var/log/httpd/error_log
