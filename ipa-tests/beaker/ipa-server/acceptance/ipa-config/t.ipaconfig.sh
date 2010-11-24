@@ -5,11 +5,11 @@
 ipaconfig()
 {
     ipaconfig_envsetup
-#    ipaconfig_show
-#    ipaconfig_mod
-#    ipaconfig_searchlimit
+    ipaconfig_show
+    ipaconfig_mod
+    ipaconfig_searchlimit
     ipaconfig_searchfields
-#    ipaconfig_server
+    ipaconfig_server
     ipaconfig_envcleanup
 } # ipaconfig
 
@@ -54,9 +54,9 @@ ipaconfig_searchfields()
 {
     ipaconfig_searchfields_envsetup
     ipaconfig_searchfields_userfields_default
-#    ipaconfig_searchfields_userfields_negative
-#    ipaconfig_searchfields_groupfields_default
-#    ipaconfig_searchfields_groupfields_negative
+    ipaconfig_searchfields_userfields_negative
+    ipaconfig_searchfields_groupfields_default
+    ipaconfig_searchfields_groupfields_negative
     ipaconfig_searchfields_envcleanup
 } #ipaconfig_searchfields
 
