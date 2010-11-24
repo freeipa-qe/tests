@@ -739,10 +739,10 @@ rlJournalStart
 	ipa group-find > /tmp/groupfind.out
         result=`cat /tmp/groupfind.out | grep "Number of entries returned"`
         number=`echo $result | cut -d " " -f 5`
-        if [ $number -eq 103 ] ; then
+        if [ $number -eq 100 ] ; then
                 rlPass "All group returned as expected with size limit of 0"
         else
-                rlFail "Number of groups returned is not as expected.  GOT: $number EXP: 103"
+                rlFail "Number of groups returned is not as expected.  GOT: $number EXP: 100"
         fi
     rlPhaseEnd
 
