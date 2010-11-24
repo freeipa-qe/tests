@@ -319,7 +319,7 @@ rlJournalStart
                 addHostGroup Group$i Group$i
                 let i=$i+1
         done
-        ipa hostgroup-find --sizelimit=0 > /tmp/hostgroupfind.out
+        ipa hostgroup-find > /tmp/hostgroupfind.out
         result=`cat /tmp/hostgroupfind.out | grep "Number of entries returned"`
         number=`echo $result | cut -d " " -f 5`
         if [ $number -eq 100 ] ; then
@@ -333,10 +333,10 @@ rlJournalStart
         ipa hostgroup-find --sizelimit=0 > /tmp/hostgroupfind.out
         result=`cat /tmp/hostgroupfind.out | grep "Number of entries returned"`
         number=`echo $result | cut -d " " -f 5`
-        if [ $number -eq 100 ] ; then
+        if [ $number -eq 102 ] ; then
                 rlPass "All host group returned as expected with size limit of 0"
         else
-                rlFail "Number of host groups returned is not as expected.  GOT: $number EXP: 100"
+                rlFail "Number of host groups returned is not as expected.  GOT: $number EXP: 102"
         fi
     rlPhaseEnd
 
