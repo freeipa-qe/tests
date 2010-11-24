@@ -105,7 +105,7 @@ t_lockuser()
             rlLog "Lock user success"
             kinitAs $lusr $lusrpw
             if [ $? -ne 0 ];then 
-                rlPass"kinit as $lusr failed as expected"
+                rlPass "kinit as $lusr failed as expected"
             else
                 rlFail "kinit as $lusr success when fail expected "
             fi
