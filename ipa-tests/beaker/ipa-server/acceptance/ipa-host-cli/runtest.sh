@@ -181,15 +181,16 @@ rlJournalStart
 
     rlPhaseStartTest "ipa-host-cli-14: Negative - setattr and addattr on fqdn"
         command="ipa host-mod --setattr fqdn=newfqdn $host1"
-        expmsg="ipa: ERROR: Operation not allowed on RDN:"
+        expmsg="ipa: ERROR: modifying primary key is not allowed"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
+	expmsg="ipa: ERROR: fqdn: Only one value allowed."
 	command="ipa host-mod --addattr fqdn=newfqdn $host1"
 	rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-host-cli-15: Negative - setattr and addattr on ipaUniqueID"
         command="ipa host-mod --setattr ipaUniqueID=127863947-84375973-gq9587 $host1"
-        expmsg="ipa: ERROR: Insufficient access: Insufficient 'write' privilege to the 'ipaUniqueID' attribute of entry 'fqdn=$host1,cn=computers,cn=accounts,dc=$RELM'."
+        expmsg="ipa: ERROR: Insufficient access: Only the Directory Manager can set arbitrary values for ipaUniqueID"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
         command="ipa host-mod --addattr ipaUniqueID=127863947-84375973-gq9587 $host1"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
@@ -205,7 +206,7 @@ rlJournalStart
 
     rlPhaseStartTest "ipa-host-cli-17: Negative - setattr and addattr on serverHostName"
         command="ipa host-mod --setattr serverHostName=$host2 $host1"
-        expmsg="ipa: ERROR: no modifications to be performed"
+        expmsg="ipa: ERROR: Insufficient access: Insufficient 'write' privilege to the 'serverHostName' attribute of entry 'fqdn=$host1,cn=computers,cn=accounts,dc=$RELM'."
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
         command="ipa host-mod --addattr serverHostName=$host2 $host1"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
@@ -217,7 +218,7 @@ rlJournalStart
 	rlRun "verifyHostAttr $host1 location \"$value\"" 0 "Verifying host $attr was modified."
 	# shouldn't be multivalue - additional add should fail
         command="ipa host-mod --addattr nsHostLocation=jupiter $host1"
-	expmsg="ipa: ERROR: no modifications to be performed"
+	expmsg="ipa: ERROR: nshostlocation: Only one value allowed."
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
     rlPhaseEnd
 
@@ -227,7 +228,7 @@ rlJournalStart
 	rlRun "verifyHostAttr $host1 locality sunnyside" 0 "Verifying host $attr was modified."
 	# shouldn't be multivalue - additional add should fail
         command="ipa host-mod --addattr l=moonside $host1"
-	expmsg="ipa: ERROR: no modifications to be performed"
+	expmsg="ipa: ERROR: l: Only one value allowed."
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
     rlPhaseEnd
 
@@ -237,13 +238,13 @@ rlJournalStart
         rlRun "verifyHostAttr $host1 os RHEL6" 0 "Verifying host $attr was modified."
 	# shouldn't be multivalue - additional add should fail
         command="ipa host-mod --addattr nsOsVersion=RHEL5 $host1"
-	expmsg="ipa: ERROR: no modifications to be performed"
+	expmsg="ipa: ERROR: nsosversion: Only one value allowed."
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-host-cli-21:  Negative - setattr and addattr on enrolledBy"
         command="ipa host-mod --setattr enrolledBy=\"uid=user,cn=users,cn=accounts,dc=bos,dc=redhat,dc=com\" $host1"
-        expmsg="ipa: ERROR: no modifications to be performed"
+        expmsg="ipa: ERROR: Insufficient access: Insufficient 'write' privilege to the 'enrolledBy' attribute of entry 'fqdn=$host1,cn=computers,cn=accounts,dc=$RELM'."
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
         command="ipa host-mod --addattr enrolledBy=\"uid=user,cn=users,cn=accounts,dc=bos,dc=redhat,dc=com\" $host1"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
@@ -251,7 +252,7 @@ rlJournalStart
 
     rlPhaseStartTest "ipa-host-cli-22:  Negative - setattr and addattr on enrolledBy - invalid syntax"
         command="ipa host-mod --setattr enrolledBy=me $host1"
-        expmsg="ipa: ERROR: Invalid syntax:enrolledBy: value #0 invalid per syntax"
+        expmsg="ipa: ERROR: Insufficient access: Insufficient 'write' privilege to the 'enrolledBy' attribute of entry 'fqdn=$host1,cn=computers,cn=accounts,dc=$RELM'."
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
         command="ipa host-mod --addattr enrolledBy=you $host1"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
@@ -263,7 +264,7 @@ rlJournalStart
         rlRun "verifyHostAttr $host1 desc RHEL6" 0 "Verifying host $attr was modified."
         # shouldn't be multivalue - additional add should fail
         command="ipa host-mod --addattr description=newer $host1"
-	expmsg="ipa: ERROR: no modifications to be performed"
+	expmsg="ipa: ERROR: description: Only one value allowed."
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
     rlPhaseEnd
 
@@ -315,7 +316,7 @@ rlJournalStart
         command="ipa host-mod --setattr dn=mynewDN $host1"
         expmsg="ipa: ERROR: attribute \"distinguishedName\" not allowed"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
-        command="ipa group-mod --addattr dn=anothernewDN $host1"
+        command="ipa host-mod --addattr dn=anothernewDN $host1"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
     rlPhaseEnd
 
@@ -347,8 +348,8 @@ rlJournalStart
                 let i=$i+1
         done
         number=`getNumberOfHosts`
-	if [ $number -ne 101 ] ; then
-		rlFail "Number of hosts returned is not as expected.  GOT: $number EXP: 101"
+	if [ $number -ne 100 ] ; then
+		rlFail "Number of hosts returned is not as expected.  GOT: $number EXP: 100"
 	else
 		rlPass "Number of hosts returned is as expected"
 	fi
