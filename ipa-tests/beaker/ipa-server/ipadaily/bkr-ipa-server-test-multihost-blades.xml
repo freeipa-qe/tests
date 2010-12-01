@@ -1,6 +1,12 @@
 <job>
+	<notify>
+		<cc>mgregg@redhat.com</cc>
+		<cc>jgalipea@redhat.com</cc>
+		<cc>yzhang@redhat.com</cc>
+	</notify>
+
 	<whiteboard>
-		ipa-server x86_64 multihost qe-blade-04 05 and 12
+		ipa-server x86_64 daily multihost qe-blade-04 05 and 12
 	</whiteboard>
 	<recipeSet>
 		<recipe kernel_options="" kernel_options_post="" ks_meta="" role="MASTER" whiteboard="">
