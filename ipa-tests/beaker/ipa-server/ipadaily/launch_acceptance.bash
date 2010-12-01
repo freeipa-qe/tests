@@ -32,7 +32,9 @@ done
 
 # submit beaker jobs
 cd $DAILY
-bkr job-submit acceptance.xml
+ls *.xml | while read x; do
+	bkr job-submit $x
+done
 
 cd $REPOCLONE
 ls *.xml | while read x; do
