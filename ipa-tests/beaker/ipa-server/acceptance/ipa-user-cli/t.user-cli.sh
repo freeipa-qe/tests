@@ -424,3 +424,64 @@ t_showraw()
     rlPhaseEnd
 } #t_showraw
 
+t_setattr()
+{
+# test for --setattr
+    rlPhaseStartTest "test --setattr option of command: ipa user-mod" # sort=302
+        kinitAs $admin $adminpassword
+        set_and_check_attr $superuser  \
+                            "homedirectory" "/new/home/dir" \
+        set_and_check_attr $superuser  \
+                            "gecos" "new_gecos" \
+        set_and_check_attr $superuser  \
+                            "loginshell" "/new/login/shell" \
+        set_and_check_attr $superuser  \
+                            "krbprincipalname" "newprincipalname@newrealm" \
+        set_and_check_attr $superuser  \
+                            "uidnumber" "2010120299" \
+        set_and_check_attr $superuser  \
+                            "street" "1200 new street" \
+        set_and_check_attr $superuser  \
+                            "mail" "newemail@newdomain.com" \
+        set_and_check_attr $superuser  \
+                            "telephonenumber" "000-000-0001" \
+        set_and_check_attr $superuser  \
+                            "mobile" "000-000-0002" \
+        set_and_check_attr $superuser  \
+                            "pager" "000-000-0003" \
+        set_and_check_attr $superuser  \
+                            "facsimiletelephonenumber" "000-000-0004" \
+    rlPhaseEnd
+} #t_setattr
+
+t_addattr()
+{
+# test for --addattr
+    rlPhaseStartTest "test --addattr option of command: ipa user-mod" # sort=302
+        kinitAs $admin $adminpassword
+        add_and_check_attr $superuser  \
+                            "homedirectory" "/new/home/dir" \
+        add_and_check_attr $superuser  \
+                            "gecos" "new_gecos" \
+        add_and_check_attr $superuser  \
+                            "loginshell" "/new/login/shell" \
+        add_and_check_attr $superuser  \
+                            "krbprincipalname" "newprincipalname@newrealm" \
+        add_and_check_attr $superuser  \
+                            "uidnumber" "2010120299" \
+        add_and_check_attr $superuser  \
+                            "street" "1200 new street" \
+        add_and_check_attr $superuser  \
+                            "mail" "newemail@newdomain.com" \
+        add_and_check_attr $superuser  \
+                            "telephonenumber" "000-000-0001" \
+        add_and_check_attr $superuser  \
+                            "mobile" "000-000-0002" \
+        add_and_check_attr $superuser  \
+                            "pager" "000-000-0003" \
+        add_and_check_attr $superuser  \
+                            "facsimiletelephonenumber" "000-000-0004" \
+
+    rlPhaseEnd
+} #t_addattr
+

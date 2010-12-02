@@ -115,6 +115,11 @@ delusertest()
     t_deluser
 } #delusertest
 
+attrtest()
+{
+    t_setattr
+    t_addattr
+}
 #########################################
 #   test main 
 #########################################
@@ -131,6 +136,7 @@ rlJournalStart
     modusertest
     showusertest
     delusertest        
+    attrtest
     # test ends
 
     rlPhaseStartCleanup "ipa-user-cli-cleanup"

@@ -38,3 +38,43 @@ userfind_field_check()
           0 \
           "test option:[$option], verify field [$field] value [$value]"
 } #field_check
+
+set_and_check_attr
+{
+    local out=$TmpDir/setandcheckattr.$RANDOM.out
+    local login="$1"
+    local attr="$2"
+    local value="$3"
+    local checkcondition="$2: $3"
+    rlRun "ipa user-mod \"$login\" --setattr=$attr=\"$value\"" 0 "set [$attr]=[$value] for [$login]"
+    # I might not need the next pass/fail determine statement
+    # comment them out for now
+    #ipa user-find $login --all > $out
+    #if grep "$checkcondition" $out 2>&1 >/dev/null
+    #then
+    #    rlPass "set success, test pass"
+    #else
+    #    rlFail "set failed, test failed"
+    #fi 
+    #rm $out
+} #set_and_check_attr
+
+add_and_check_attr
+{
+    local out=$TmpDir/setandcheckattr.$RANDOM.out
+    local login="$1"
+    local attr="$2"
+    local value="$3"
+    local checkcondition="$2: $3"
+    rlRun "ipa user-mod \"$login\" --addattr=$attr=\"$value\"" 0 "set [$attr]=[$value] for [$login]"
+    # I might not need the next pass/fail determine statement
+    # comment them out for now
+    #ipa user-find $login --all > $out
+    #if grep "$checkcondition" $out 2>&1 >/dev/null
+    #then
+    #    rlPass "add success, test pass"
+    #else
+    #    rlFail "add failed, test failed"
+    #fi 
+    #rm $out
+} #set_and_check_attr
