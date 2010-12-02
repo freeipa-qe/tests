@@ -29,7 +29,7 @@ makereport()
     cat $report
 }
 
-field_check()
+userfind_field_check()
 {
     local option="$1"
     local field="$2"

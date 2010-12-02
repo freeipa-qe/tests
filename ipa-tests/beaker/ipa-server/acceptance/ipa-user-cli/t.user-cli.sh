@@ -75,24 +75,24 @@ t_userfind()
     rlPhaseStartTest "user-find: use newly added user account to verify the find command" 
         # call same function to verify 
         #              user-find option               output field         expected value
-        field_check "--login=\"$superuser\" "         "User login"         "$superuser"
-        field_check "--first=\"$superuserfirst\" "    "First name"         "$superuserfirst"
-        field_check "--last=\"$superuserlast\" "      "Last login"         "$superuserlast"
-        field_check "--homedir=\"$superuserhome\" "   "Home directory"     "$superuserhome"
-        field_check "--gecos=\"$superusergecos\" "    "GECOS field"        "$superusergecos"
-        field_check "--shell=\"$shell\" "             "Login shell"        "$shell" # default
-        field_check "--principal=\"$superuserprinc\"" "Kerberos principal" "$superuserprinc"
-        field_check "--email=\"$superuserlast\" "     "Email address"      "$superuseremail"
-        field_check "--uid=\"$uid\" "                 "UID"                "$uid"
-        field_check "--street=\"$street\" "           "Street address"     "$street"
-        field_check "--phone=\"$phone\" "            "Telephone Number"    "$phone"
-        field_check "--mobil=\"$mobil\" "             "Mobile Telephone"   "$mobil"
-        field_check "--pager=\"$pager\" "             "Pager Number"       "$pager"
-        field_check "--fax=\"$fax\" "                 "Fax Number"         "$fax"
+        userfind_field_check "--login=\"$superuser\" "         "User login"         "$superuser"
+        userfind_field_check "--first=\"$superuserfirst\" "    "First name"         "$superuserfirst"
+        userfind_field_check "--last=\"$superuserlast\" "      "Last login"         "$superuserlast"
+        userfind_field_check "--homedir=\"$superuserhome\" "   "Home directory"     "$superuserhome"
+        userfind_field_check "--gecos=\"$superusergecos\" "    "GECOS field"        "$superusergecos"
+        userfind_field_check "--shell=\"$shell\" "             "Login shell"        "$shell" # default
+        userfind_field_check "--principal=\"$superuserprinc\"" "Kerberos principal" "$superuserprinc"
+        userfind_field_check "--email=\"$superuserlast\" "     "Email address"      "$superuseremail"
+        userfind_field_check "--uid=\"$uid\" "                 "UID"                "$uid"
+        userfind_field_check "--street=\"$street\" "           "Street address"     "$street"
+        userfind_field_check "--phone=\"$phone\" "             "Telephone Number"   "$phone"
+        userfind_field_check "--mobil=\"$mobil\" "             "Mobile Telephone"   "$mobil"
+        userfind_field_check "--pager=\"$pager\" "             "Pager Number"       "$pager"
+        userfind_field_check "--fax=\"$fax\" "                 "Fax Number"         "$fax"
+        userfind_field_check "--whoami "                       "User login"         "admin" #--whoami does not take any value, it reads the kerberos ticket information
     rlPhaseEnd
     
 } #t_userfind
-
 
 t_negative_adduser()
 {
@@ -261,7 +261,21 @@ t_modshell()
 t_deluser()
 {
     rlPhaseStartTest "delete user"  # sort=400
-        rlPass "user deletion test already included into adduser test and moduser test, simple log pass here"
+        rlLog "simple user deletion test already included into adduser test and moduser test, i will test --continue option here "
+        kinitAs $admin $adminpassword
+        rlRun "ipa user-add testuser0001 --first=test --last=user0001" 0 "add test account testuser0001"
+        rlRun "ipa user-add testuser0002 --first=test --last=user0002" 0 "add test account testuser0001"
+        rlRun "ipa user-add testuser0003 --first=test --last=user0003" 0 "add test account testuser0001"
+        rlRun "ipa user-del --continue testuserNotExist001 testuser0001 testuserNotExist002 testuser0002 testuserNotExist003 testuser0003" 0 "delete users"
+        for ac in testuser0001 testuser0002 testuser0003
+        do
+            if ipa user-find testuser | grep $ac
+            then
+                rlFail "expect the account [$ac] to be deleted but it is exist"
+            else
+                rlPass "account [$ac] deleted as expected"
+            fi
+        done
     rlPhaseEnd
 } #t_deluser
 
