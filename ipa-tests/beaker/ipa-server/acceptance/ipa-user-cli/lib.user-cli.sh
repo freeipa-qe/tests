@@ -29,4 +29,12 @@ makereport()
     cat $report
 }
 
-
+field_check()
+{
+    local option="$1"
+    local field="$2"
+    local value="$3"
+    rlRun "ipa user-find --all $option | grep \"$field\" | grep \"$value\" " \
+          0 \
+          "test option:[$option], verify field [$field] value [$value]"
+} #field_check

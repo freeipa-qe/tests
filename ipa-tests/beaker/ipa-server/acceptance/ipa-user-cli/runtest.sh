@@ -79,6 +79,7 @@ addusertest()
     t_addusertest_envsetup
     t_addusersetup
     t_adduserverify
+    t_userfind
     t_negative_adduser
     t_addlockuser
     t_lockuser

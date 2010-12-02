@@ -17,9 +17,16 @@ superuserhome="/home2/$superuser"
 superusergecos="whatsgecos?"
 superuserfirst="Superuser"
 superuserlast="crazylastnametoolong"
-
+uid="20101202"
+shell="/bin/bash"
 lusr="locku44"
 lusrpw="o3948cyhdg65"
+
+phone="123-456-7890"
+mobil="234-567-8901"
+pager="345-678-9012"
+fax="456-789-0123"
+street="444 castro street suite 500, Mountain View, California"
 
 # Users to be used in user-mod tests
 musr="msup88"

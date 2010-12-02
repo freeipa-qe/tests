@@ -36,14 +36,21 @@ t_addusersetup()
     rlPhaseStartTest "add user setup" # sort=101
         rlRun "ipa user-add --first=$superuserfirst \
                             --last=$superuserlast \
+                            --uid=$uid \
                             --gecos=$superusergecos \
                             --home=$superuserhome \
                             --principal=$superuserprinc \
+                            --phone=$phone \
+                            --mobil=$mobil \
+                            --pager=$pager \
+                            --fafx=$fax \
+                            --street=\"$street\" \
                             --email=$superuseremail $superuser" \
                             0 \
                             "add user into ipa server"
     rlPhaseEnd
 } #t_addusersetup
+
 
 t_adduserverify()
 {
@@ -54,8 +61,38 @@ t_adduserverify()
         rlRun "ipa user-find $superuser | grep $superuserhome" 0 "check home directory"
         rlRun "ipa user-find --all $superuser | grep \"$superuserprinc\" " 0 "check principal"
         rlRun "ipa user-find --all $superuser | grep \"$superuseremail\" " 0 "check user email"
+        rlRun "ipa user-find --all $superuser | grep \"Telephone Number\" | grep \"$phone\" " 0 "check phone number"
+        rlRun "ipa user-find --all $superuser | grep \"Mobile Telephone Number\" | grep \"$mobil\" " 0 "check mobil number"
+        rlRun "ipa user-find --all $superuser | grep \"Pager Number\" | grep \"$phone\" " 0 "check pager number"
+        rlRun "ipa user-find --all $superuser | grep \"Fax Number\" | grep \"$fax\" " 0 "check fax number"
+
     rlPhaseEnd
 } #t_adduserverify
+
+t_userfind()
+{
+# test user-find : this should run right after t_adduserverify, which is right after t_addusersetup
+    rlPhaseStartTest "user-find: use newly added user account to verify the find command" 
+        # call same function to verify 
+        #              user-find option               output field         expected value
+        field_check "--login=\"$superuser\" "         "User login"         "$superuser"
+        field_check "--first=\"$superuserfirst\" "    "First name"         "$superuserfirst"
+        field_check "--last=\"$superuserlast\" "      "Last login"         "$superuserlast"
+        field_check "--homedir=\"$superuserhome\" "   "Home directory"     "$superuserhome"
+        field_check "--gecos=\"$superusergecos\" "    "GECOS field"        "$superusergecos"
+        field_check "--shell=\"$shell\" "             "Login shell"        "$shell" # default
+        field_check "--principal=\"$superuserprinc\"" "Kerberos principal" "$superuserprinc"
+        field_check "--email=\"$superuserlast\" "     "Email address"      "$superuseremail"
+        field_check "--uid=\"$uid\" "                 "UID"                "$uid"
+        field_check "--street=\"$street\" "           "Street address"     "$street"
+        field_check "--phone=\"$phone\" "            "Telephone Number"    "$phone"
+        field_check "--mobil=\"$mobil\" "             "Mobile Telephone"   "$mobil"
+        field_check "--pager=\"$pager\" "             "Pager Number"       "$pager"
+        field_check "--fax=\"$fax\" "                 "Fax Number"         "$fax"
+    rlPhaseEnd
+    
+} #t_userfind
+
 
 t_negative_adduser()
 {
