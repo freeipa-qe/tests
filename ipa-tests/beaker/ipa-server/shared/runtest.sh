@@ -41,6 +41,15 @@ rlJournalStart
 	rlRun "ls /dev/shm"
     rlPhaseEnd
 
+    rlPhaseStartSetup "Make available user data files"
+	 # user data
+        rm -f /dev/shm/data.*
+        userdatafiles="data.showall.fields.txt data.showraw.fields.txt data.user-cli.acceptance data.user-cli.functional"
+        for item in $userdatafiles ; do
+                cp ./data/user/$item /dev/shm/.
+        done
+    rlPhaseEnd
+
     rlPhaseStartTest "Verify shared libraries are available"
 	rlRun "ls /dev/shm/ipa-server-shared.sh" 
     rlPhaseEnd

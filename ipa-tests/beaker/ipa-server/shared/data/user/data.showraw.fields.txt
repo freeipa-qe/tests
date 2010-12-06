@@ -1,0 +1,5 @@
+uid:
+givenname:
+sn:
+homedirectory:
+loginshell:

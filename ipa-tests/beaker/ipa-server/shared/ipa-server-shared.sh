@@ -285,4 +285,30 @@ addAttribute()
 
 }
 
+makereport()
+{
+    report=$1
+    # capture the result and make a simple report
+    total=`rlJournalPrintText | grep "RESULT" | wc -l`
+    pass=`rlJournalPrintText | grep "RESULT" | grep "\[   PASS   \]" | wc -l`
+    fail=`rlJournalPrintText | grep "RESULT" | grep "\[   FAIL   \]" | wc -l`
+    abort=`rlJournalPrintText | grep "RESULT" | grep "\[  ABORT   \]" | wc -l`
+    echo "================ final pass/fail report =================" > $report
+    echo "   Test Date: `date` " >> $report
+    echo "   Total : [$total] "  >> $report
+    echo "   Passed: [$pass] "   >> $report
+    echo "   Failed: [$fail] "   >> $report
+    echo "   Abort : [$abort]"   >> $report
+    echo "---------------------------------------------------------" >> $report
+    rlJournalPrintText | grep "RESULT" | grep "\[   PASS   \]"| sed -e 's/:/ /g' -e 's/RESULT//g' >> $report
+    echo "" >> $report
+    rlJournalPrintText | grep "RESULT" | grep "\[   FAIL   \]"| sed -e 's/:/ /g' -e 's/RESULT//g' >> $report
+    echo "" >> $report
+    rlJournalPrintText | grep "RESULT" | grep "\[  ABORT   \]"| sed -e 's/:/ /g' -e 's/RESULT//g' >> $report
+    echo "=========================================================" >> $report
+    echo "report saved as: $report"
+    cat $report
+}
+
+
 

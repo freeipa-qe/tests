@@ -134,14 +134,11 @@ verifyGroupAttr()
    value=$3
    rc=0
 
-   attribute="$attribute:"
    tmpfile="/tmp/groupshow_$mygroup.out"
-   delim=":"
-   ipa group-show $mygroup
+   ipa group-show --all $mygroup > $tmpfile
    rc=$?
    if [ $rc -eq 0 ] ; then
-        result=`ipa group-show $mygroup`
-        echo $result | grep "$attriute $value"
+        cat $tmpfile | grep "$attriute: $value"
         rc=$?
         if [ $rc -ne 0 ] ; then
                 rlLog "ERROR: $mygroup verification failed: Value of $attribute is $value."
