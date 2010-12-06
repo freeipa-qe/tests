@@ -1,0 +1,3 @@
+PURPOSE of /CoreOS/tests/Regression/ipa-user-cli/adduser
+Description: IPA user cli acceptance tests - Add User
+Author: Yi Zhang <yzhang@redhat.com>
