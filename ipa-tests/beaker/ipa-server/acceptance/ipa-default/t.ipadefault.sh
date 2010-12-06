@@ -7,6 +7,7 @@ ipadefault()
     ipadefault_envsetup
     ipadefault_pwpolicy
     ipadefault_config
+    ipadefault_krbtpolicy
     ipadefault_envcleanup
 } # ipadefault
 
@@ -30,6 +31,15 @@ ipadefault_config()
     ipadefault_config_envcleanup
 } #ipadefault_config
 
+######################
+# test set           #
+######################
+ipadefault_krbtpolicy()
+{
+    ipadefault_krbt_envsetup
+    ipadefault_krbt_all
+    ipadefault_krbt_envcleanup
+} #ipadefault_krbt
 
 ######################
 # test cases         #
@@ -194,3 +204,50 @@ ipadefault_config_all_logic()
         rm $out
     # test logic ends
 } # ipadefault_config_all_logic 
+
+#######################################################################
+
+ipadefault_krbt_envsetup()
+{
+    rlPhaseStartSetup "ipadefault_krbt_envsetup"
+        #environment setup starts here
+        rlPass "no special environment setup required, use all default setting"
+        #environment setup ends   here
+    rlPhaseEnd
+} #ipadefault_krbt_envsetup
+
+ipadefault_krbt_envcleanup()
+{
+    rlPhaseStartCleanup "ipadefault_krbt_envcleanup"
+        #environment cleanup starts here
+        rlPass "no special environment cleanup required, use all default setting"
+        #environment cleanup ends   here
+    rlPhaseEnd
+} #ipadefault_krbt_envcleanup
+
+ipadefault_krbt_all()
+{
+# looped data   : 
+# non-loop data : 
+    rlPhaseStartTest "ipadefault_krbt_all"
+        rlLog "check the default settings for general ipa server krbt policy setting"
+        ipadefault_krbt_all_logic
+    rlPhaseEnd
+} #ipadefault_krbt_all
+
+ipadefault_krbt_all_logic()
+{
+    # accept parameters: NONE
+    # test logic starts
+        local out=$TmpDir/defaultvalues.$RANDOM.txt
+        kinitAs $admin $adminpassword
+        rlRun "ipa krbtpolicy-show > $out" 0 "store krbtpolicy-show in [$out]"
+
+        maxlife=`grep "Max life" $out | cut -d":" -f2| xargs echo`
+        maxrenew=`grep "Max renew" $out | cut -d":" -f2 | xargs echo`
+
+        ipacompare "max kerberos ticket life" "$default_krbtpolicy_maxlife" "$maxlife"
+        ipacompare "max kerberos renew ticket life" "$default_krbtpolicy_maxrenew" "$maxrenew"
+        rm $out
+    # test logic ends
+} # ipadefault_krbt_all_logic 

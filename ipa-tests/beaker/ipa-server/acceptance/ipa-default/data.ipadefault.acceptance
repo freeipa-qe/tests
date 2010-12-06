@@ -19,3 +19,6 @@ default_config_usersearchfields="uid,givenname,sn,telephonenumber,ou,title"
 default_config_groupsearchfields="cn,description"
 default_config_migrationmode="FALSE"
 default_config_certsubjectbase="O=IPA"
+
+default_krbtpolicy_maxlife="86400"
+default_krbtpolicy_maxrenew="86400"
