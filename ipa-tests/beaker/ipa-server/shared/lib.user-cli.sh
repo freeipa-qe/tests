@@ -4,7 +4,35 @@
 
 # functions used in user-cli test
 
+#  addUserWithPassword
+#  modifyUser
+#  verifyUserAttr
+
+######################################################################
+# addUserWithPassword
+#	addUserWithPassword <firstname> <lastname> <userid> <initial_password>
 #######################################################################
+
+addUserWithPassword()
+{
+   firstname=$1
+   lastname=$2
+   userid=$3
+   initpwd=$4
+   rc=0
+
+   echo $initpwd | ipa user-add --first=$firstname --last=$lastname --password $userid
+   rc=$?
+   if [ $? -eq 0 ] ; then
+	rlLog "Adding user with password successful."
+   else
+	rlLog "ERROR: Adding user with password failed."
+   fi
+
+   return $rc
+}
+
+######################################################################
 # modifyUser Usage:
 #       modifyUser <username> <attribute> <value>
 ######################################################################
