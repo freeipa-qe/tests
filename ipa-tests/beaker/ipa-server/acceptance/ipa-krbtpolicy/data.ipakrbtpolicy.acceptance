@@ -1,0 +1,12 @@
+# data file for ipa krbtpolicy testing
+
+username="ipakrbt"
+first="krbt"
+last="ipa"
+
+default_maxlife=86400
+default_renew=604800
+
+admin="admin"
+adminpassword="redhat123"
+

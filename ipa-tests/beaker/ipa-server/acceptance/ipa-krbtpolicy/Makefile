@@ -29,7 +29,7 @@ export TESTVERSION=1.0
 
 BUILT_FILES=
 
-FILES=$(METADATA) runtest.sh Makefile PURPOSE t.ipakrbtpolicy.sh
+FILES=$(METADATA) runtest.sh Makefile PURPOSE t.ipakrbtpolicy.sh lib.ipakrbtpolicy.sh data.ipakrbtpolicy.acceptance
 
 .PHONY: all install download clean
 

@@ -39,6 +39,8 @@
 . /dev/shm/ipa-server-shared.sh
 
 # Include test case file
+. ./data.ipakrbtpolicy.acceptance
+. ./lib.ipakrbtpolicy.sh
 . ./t.ipakrbtpolicy.sh
 
 PACKAGE="ipa-server"
@@ -59,11 +61,11 @@ rlJournalStart
     # r2d2_test_ends
 
     rlPhaseStartCleanup "ipakrbtpolicy cleanup"
+        makereport
         rlRun "popd"
         rlRun "rm -r $TmpDir" 0 "Removing tmp directory"
     rlPhaseEnd
 
-    makereport
 rlJournalEnd
 
 
