@@ -3,6 +3,7 @@
 		<cc>mgregg@redhat.com</cc>
 		<cc>jgalipea@redhat.com</cc>
 		<cc>yzhang@redhat.com</cc>
+		<cc>ipa-and-samba-team-list@redhat.com</cc>
 	</notify>
 	<whiteboard>
 		ipa-server full run on qe-blade-12 x86_64
@@ -34,6 +35,12 @@
                         </task>
 
 			<task name="/CoreOS/ipa-server/acceptance/install" role="MASTER">
+				<params/>
+			</task>
+			<task name="/CoreOS/ipa-server/acceptance/ipa-user-cli/adduser" role="MASTER">
+				<params/>
+			</task>
+			<task name="/CoreOS/ipa-server/acceptance/ipa-user-cli/moduser" role="MASTER">
 				<params/>
 			</task>
 			<task name="/CoreOS/ipa-server/acceptance/ipa-group-cli" role="MASTER">
