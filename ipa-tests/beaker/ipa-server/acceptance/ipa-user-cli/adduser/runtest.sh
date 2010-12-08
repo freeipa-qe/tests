@@ -192,7 +192,7 @@ rlJournalStart
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-user-cli-add-014: uid 0"
-        command="ipa user-add --first=uid0 --last=uid0 --uid=0 uid0"
+        command="ipa user-add --first=uid0 --last=uid0 --uidNumber=0 uid0"
         expmsg="ipa: ERROR: uid 0 not allowed"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
 	ipa user-del uid0
@@ -323,15 +323,10 @@ rlJournalStart
     rlPhaseStartTest "ipa-user-clil-add-025: Delete Users"
 	i=1
         while [ $i -le 100 ] ; do
-                rlRun "ipa user-del user$i" 0 "Deleting user user$i"
-                let i=$i+1
-        done
-
-        i=1
-        while [ $i -le 100 ] ; do
-                command="ipa user-show user$i"
-		expmsg="ipa: ERROR: user$i: user not found"
-		rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message - user$i shouldn't exist"
+                ipa user-del user$i
+		command="ipa user-show user$i"
+                expmsg="ipa: ERROR: user$i: user not found"
+                rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message - user$i shouldn't exist"
                 let i=$i+1
         done
     rlPhaseEnd
@@ -372,6 +367,25 @@ rlJournalStart
 
 	# issue with --continue when one of the users do not exist it isn't working so deleting them for now
 	ipa user-del user1 user3 user4
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-user-cli-add-030: Add user - group with same name already exists"
+	rlRun "addGroup johnny johnny" 0 "Adding a test group"
+	command="ipa user-add --first=johnny --last=johnny johnny"
+	expmsg="ipa: ERROR: failed to add user, group with name 'johnny' already exists"
+	rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message"
+	# clean up
+	ipa group-del johnny
+	# just in case
+	ipa user-del johnny
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-user-cli-add-031: Add user with --password"
+	rlRun "addUserWithPassword Jenny Galipeau jennyg newpassword" 0 "Adding user with initial password assigned."
+	rlRun "FirstKinitAs jennyg newpassword fo0m4nchU" 0 "Testing kerberos authentication"
+	kinitAs $ADMINID $ADMINPW
+	# delete the user
+	ipa user-del jennyg
     rlPhaseEnd
 
     rlPhaseStartCleanup "ipa-user-cli-add-cleanup"
