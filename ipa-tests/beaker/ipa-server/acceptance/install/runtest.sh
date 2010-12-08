@@ -54,14 +54,14 @@ rlJournalStart
 		packages="ipa-server ipa-client ipa-admintools bind caching-nameserver expect krb5-workstation bind-dyndb-ldap ntpdate krb5-pkinit-openssl"
 		yum -y install $packages
 		if [ $? -ne 0 ]; then
-			sleep 200
+			sleep 100
 			yum -y install $packages
 			if [ $? -ne 0 ]; then
-				sleep 200
+				sleep 100
 				yum clean all
 				yum -y install $packages
 				if [ $? -ne 0 ]; then
-					sleep 200
+					sleep 100
 					yum clean all
 					yum -y install $packages
 				fi

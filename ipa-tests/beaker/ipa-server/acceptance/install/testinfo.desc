@@ -4,7 +4,7 @@ TestVersion:     1.0
 Path:            /mnt/tests/CoreOS/ipa-server/acceptance/install
 Description:     install of setup-ds.pl with ipa-server
 Type:            Acceptance
-TestTime:        20m
+TestTime:        30m
 RunFor:          ipa-server
 Requires:        ipa-server
 Priority:        Normal

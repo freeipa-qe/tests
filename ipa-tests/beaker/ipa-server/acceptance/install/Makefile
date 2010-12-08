@@ -56,7 +56,7 @@ $(METADATA): Makefile
 	@echo "Path:            $(TEST_DIR)" >> $(METADATA)
 	@echo "Description:     install of setup-ds.pl with ipa-server" >> $(METADATA)
 	@echo "Type:            Acceptance" >> $(METADATA)
-	@echo "TestTime:        20m" >> $(METADATA)
+	@echo "TestTime:        30m" >> $(METADATA)
 	@echo "RunFor:          ipa-server" >> $(METADATA)
 	@echo "Requires:        ipa-server" >> $(METADATA)
 	@echo "Priority:        Normal" >> $(METADATA)
