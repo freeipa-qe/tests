@@ -368,20 +368,6 @@ ipakrbt_mod_addattr_logic()
                 rlPass "add $attr=$value failed for single-value attribute is expected"
             fi
         done
-        create_user
-        KinitAsAdmin
-        for attr in $attrs
-        do
-            value=$RANDOM
-            rlRun "ipa krbtpolicy-mod --addattr=$attr=$value" 0 "addattr: $attr=$value"
-            if ipa krbtpolicy-show --raw --all | grep "$attr" | grep "$value"
-            then
-                rlPass "add $attr=$value success"
-            else
-                rlFail "add $attr=$value failed"
-            fi
-        done
-        delete_user
         clear_kticket
     # test logic ends
 } # ipakrbt_mod_addattr_logic 

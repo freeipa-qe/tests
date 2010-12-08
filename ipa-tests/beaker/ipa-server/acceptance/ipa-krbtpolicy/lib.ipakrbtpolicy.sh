@@ -17,7 +17,7 @@ create_user()
         l="$last"
     fi
     KinitAsAdmin
-    if ipa user-find $login | grep -i "login: $login " $out
+    if ipa user-find $login | grep -i "login: $login$" $out
     then
         rlRun "ipa user-del $login " 0 "remove existing user [$login]"
     fi
