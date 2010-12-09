@@ -13,6 +13,8 @@
 #	AddToKnowHosts
 #	setAttribute
 #	addAttribute
+#   create_ipauser
+#   delete_ipauser
 ######################################################################
 #######################################################################
 # kinitAs Usage:
@@ -20,11 +22,11 @@
 #####################################################################
 kinitAs()
 {
-   username=$1
-   password=$2
-   rc=0
-   expfile=/tmp/kinit.exp
-   outfile=/tmp/kinitAs.out
+   local username=$1
+   local password=$2
+   local rc=0
+   local expfile=/tmp/kinit.exp
+   local outfile=/tmp/kinitAs.out
 
    rm -rf $expfile
    echo 'set timeout 30
@@ -58,46 +60,45 @@ set send_slow {1 .1}' > $expfile
 #####################################################################
 FirstKinitAs()
 {
-   username=$1
-   password=$2
-   newpassword=$3
-   rc=0
-   expfile=/tmp/kinit.exp
-   outfile=/tmp/kinitAs.out
+    local username=$1
+    local password=$2
+    local newpassword=$3
+    local rc=0
+    local expfile=/tmp/kinit.exp
+    local outfile=/tmp/kinitAs.out
 
-   rm -rf $expfile
-   echo 'set timeout 30
+    rm -rf $expfile
+    echo 'set timeout 30
 set send_slow {1 .1}' > $expfile
-   echo "spawn /usr/kerberos/bin/kinit -V $username" >> $expfile
-   echo 'match_max 100000' >> $expfile
-   echo 'expect "*: "' >> $expfile
-   echo 'sleep .5' >> $expfile
-   echo "send -s -- \"$password\"" >> $expfile
-   echo 'send -s -- "\r"' >> $expfile
-   echo 'expect "*: "' >> $expfile
-   echo 'sleep .5' >> $expfile
-   echo "send -s -- \"$newpassword\"" >> $expfile
-   echo 'send -s -- "\r"' >> $expfile
-   echo 'expect "*: "' >> $expfile
-   echo 'sleep .5' >> $expfile
-   echo "send -s -- \"$newpassword\"" >> $expfile
-   echo 'send -s -- "\r"' >> $expfile
-   echo 'expect eof ' >> $expfile
+    echo "spawn /usr/kerberos/bin/kinit -V $username" >> $expfile
+    echo 'match_max 100000' >> $expfile
+    echo 'expect "*: "' >> $expfile
+    echo 'sleep .5' >> $expfile
+    echo "send -s -- \"$password\"" >> $expfile
+    echo 'send -s -- "\r"' >> $expfile
+    echo 'expect "*: "' >> $expfile
+    echo 'sleep .5' >> $expfile
+    echo "send -s -- \"$newpassword\"" >> $expfile
+    echo 'send -s -- "\r"' >> $expfile
+    echo 'expect "*: "' >> $expfile
+    echo 'sleep .5' >> $expfile
+    echo "send -s -- \"$newpassword\"" >> $expfile
+    echo 'send -s -- "\r"' >> $expfile
+    echo 'expect eof ' >> $expfile
 
-   kdestroy;/usr/bin/expect $expfile
+    kdestroy;/usr/bin/expect $expfile
 
-   # verify credentials
-   klist > $outfile
-   grep $username $outfile
-   if [ $? -ne 0 ] ; then
-        rlLog "ERROR: kinit as $username with password $password failed."
+    # verify credentials
+    klist > $outfile
+    grep $username $outfile
+    if [ $? -ne 0 ] ; then
+        rlLog "ERROR: kinit as $username with new password $newpassword failed."
         rc=1
-   else
-        rlLog "kinit as $username with password $password was successful."
-   fi
-
-   return $rc
-}
+    else
+        rlLog "kinit as $username with new password $newpassword was successful."
+    fi
+    return $rc
+} #FirstKinitAs
 
 #######################################################################
 # os_nslookup Usage:
@@ -105,7 +106,7 @@ set send_slow {1 .1}' > $expfile
 #####################################################################
 os_nslookup()
 {
-h=$1
+local h=$1
 case $ARCH in
         "Linux "*)
                 rval=`nslookup -sil $h`
@@ -131,7 +132,7 @@ esac
 
 os_getdomainname()
 {
-   mydn=`hostname | nslookup 2> /dev/null | grep 'Name:' | cut -d"." -f2-`
+   local mydn=`hostname | nslookup 2> /dev/null | grep 'Name:' | cut -d"." -f2-`
    if [ "$mydn" = "" ]; then
      mydn=`hostname -f |  cut -d"." -f2-`
    fi
@@ -144,9 +145,9 @@ os_getdomainname()
 #####################################################################
 getBaseDN()
 {
-  domain=`os_getdomainname`
+  local domain=`os_getdomainname`
   echo dc=$domain > /tmp/domain.out
-  basedn=`cat /tmp/domain.out | sed -e 's/\./,dc=/g'`
+  local basedn=`cat /tmp/domain.out | sed -e 's/\./,dc=/g'`
 
   echo "$basedn"
 }
@@ -158,9 +159,9 @@ getBaseDN()
 
 verifyErrorMsg()
 {
-   command=$1
-   expmsg=$2
-   rc=0
+   local command=$1
+   local expmsg=$2
+   local rc=0
 
    rm -rf /tmp/errormsg.out /tmp/errormsg_clean.out
    rlLog "Executing: $command"
@@ -236,25 +237,24 @@ expect eof' >> $TET_TMP_DIR/setup-ssh-remote.exp
 
 setAttribute()
 {
-  topic=$1
-  attr=$2
-  value=$3
-  object=$4
-  rc=0
+    local topic=$1
+    local attr=$2
+    local value=$3
+    local object=$4
+    local rc=0
 
-  rlLog "Executing: ipa $topic-mod --setattr $attr=\"$value\" $object"
-  ipa $topic-mod --setattr $attr="$value" $object
-  rc=$?
-  if [ $rc -ne 0 ] ; then
-	rlLog "ERROR: Failed to set value for attribute $attr."
-	rc=1
-  else
-	rlLog "Successfully set attribute $attr to \"$value\""
-  fi
+    rlLog "Executing: ipa $topic-mod --setattr $attr=\"$value\" $object"
+    ipa $topic-mod --setattr $attr="$value" $object
+    rc=$?
+    if [ $rc -ne 0 ] ; then
+        rlLog "ERROR: Failed to set value for attribute $attr."
+        rc=1
+    else
+        rlLog "Successfully set attribute $attr to \"$value\""
+    fi
 
-  return $rc
-
-}
+    return $rc
+} #setAttribute
 
 #######################################################################
 # addAttribute Usage:
@@ -265,34 +265,32 @@ setAttribute()
 
 addAttribute()
 {
-  topic=$1
-  attr=$2
-  value=$3
-  object=$4
-  rc=0
+    local topic=$1
+    local attr=$2
+    local value=$3
+    local object=$4
+    local rc=0
 
-  rlLog "Executing: ipa $topic-mod --addattr $attr=\"$value\" $object"
-  ipa $topic-mod --addattr $attr="$value" $object
-  rc=$?
-  if [ $rc -ne 0 ] ; then
+    rlLog "Executing: ipa $topic-mod --addattr $attr=\"$value\" $object"
+    ipa $topic-mod --addattr $attr="$value" $object
+    rc=$?
+    if [ $rc -ne 0 ] ; then
         rlLog "ERROR: Failed to add additional attribute value for attribute $attr."
         rc=1
-  else
+    else
         rlLog "Successfully added additional attribute $attr with value \"$value\""
-  fi
-
-  return $rc
-
-}
+    fi
+    return $rc
+} #addAttribute
 
 makereport()
 {
-    report=$1
+    local report=$1
     # capture the result and make a simple report
-    total=`rlJournalPrintText | grep "RESULT" | wc -l`
-    pass=`rlJournalPrintText | grep "RESULT" | grep "\[   PASS   \]" | wc -l`
-    fail=`rlJournalPrintText | grep "RESULT" | grep "\[   FAIL   \]" | wc -l`
-    abort=`rlJournalPrintText | grep "RESULT" | grep "\[  ABORT   \]" | wc -l`
+    local total=`rlJournalPrintText | grep "RESULT" | wc -l`
+    local pass=`rlJournalPrintText | grep "RESULT" | grep "\[   PASS   \]" | wc -l`
+    local fail=`rlJournalPrintText | grep "RESULT" | grep "\[   FAIL   \]" | wc -l`
+    local abort=`rlJournalPrintText | grep "RESULT" | grep "\[  ABORT   \]" | wc -l`
     echo "================ final pass/fail report =================" > $report
     echo "   Test Date: `date` " >> $report
     echo "   Total : [$total] "  >> $report
@@ -310,5 +308,87 @@ makereport()
     cat $report
 }
 
+KinitAsAdmin()
+{
+    echo $adminpassword | /usr/kerberos/bin/kinit $admin 2>&1 >/dev/null
+} #KinitAsAdmin
 
+create_ipauser()
+{
+    local login=$1
+    local firstname=$2
+    local lastname=$3
+    local password=$4
+    local dummypw="dummy123@ipa.com"
+
+    if [ "$login" = "" ];then
+        login="ipatest${RANDOM}"
+    fi
+    if [ "$firstname" = "" ];then
+        firstname="fName${RANDOM}"
+    fi
+    if [ "$lastname" = "" ];then
+        lastname="lName${RANDOM}"
+    fi
+    if [ "$password" = "" ];then
+        password="testpw123@ipa.com"
+    fi
+
+    rlLog "create ipa user: [$login], firstname: [$firstname], lastname: [$lastname]  password: [$password]"
+    ipauser_exist $login
+    if [ $? = 0 ]
+    then
+        delete_ipauser $login
+    fi
+    rlLog "create ipa user: [$login], password: [$password]"
+    KinitAsAdmin
+    
+    rlRun "echo $dummypw |\
+           ipa user-add $login \
+                        --first $firstname\
+                        --last  $lastname\
+                        --password " \
+          0 "add test user account"
+          #0 "add test user account" 2>&1 >/dev/null
+    # set test account password 
+    #FirstKinitAs $login $dummypw $password 2>&1 >/dev/null
+    FirstKinitAs $login $dummypw $password 
+    /usr/kerberos/bin/kdestroy 2>&1 >/dev/null #clear admin's kerberos ticket
+    echo $login
+} #create_ipauser
+
+delete_ipauser()
+{
+    local login=$1
+    ipauser_exist $login
+    if [ $? = 0 ]
+    then
+        KinitAsAdmin
+        rlRun "ipa user-del $login" 0 "delete account [$login]"
+        /usr/kerberos/bin/kdestroy 2>&1 >/dev/null #clear admin's kerberos ticket
+    else
+        rlLog "account [$login] does not exist, do nothing"
+    fi
+} #delete_ipauser
+
+ipauser_exist()
+{
+# return 0 if user exist
+# return 1 if user account does NOT exist
+    local login=$1
+    if [ ! -z "$login" ]
+    then
+        KinitAsAdmin
+        if ipa user-find $login| grep -i "User login: $login$" 2>&1 >/dev/null
+        then
+            #rlLog "find [$login] in ipa server"
+            return 0
+        else
+            #rlLog "didn't find [$login]"
+            return 1
+        fi
+    else
+        return 1 # when login value not given, return not found
+    fi
+} #ipauser_exist
 
