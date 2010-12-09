@@ -83,7 +83,7 @@ rlJournalStart
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-ctl-09: ensure that ipactl start runs with a zero return code"
-		rlRun "ls /usr/sbin/ipactl start" 0 "Checking to ensure that ipactl start returns a zero return code"
+		rlRun "/usr/sbin/ipactl start" 0 "Checking to ensure that ipactl start returns a zero return code"
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-ctl-10: ensure that ipactl start started httpd"
@@ -107,7 +107,7 @@ rlJournalStart
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-ctl-14: ensure that ipactl restart runs with a zero return code"
-		rlRun "ls /usr/sbin/ipactl restart" 0 "Checking to ensure that ipactl start returns a zero return code"
+		rlRun "/usr/sbin/ipactl restart" 0 "Checking to ensure that ipactl start returns a zero return code"
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-ctl-15: ensure that ipactl restart started httpd"
