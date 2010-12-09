@@ -48,7 +48,6 @@ rlJournalStart
         for item in $userdatafiles ; do
                 cp ./data/user/$item /dev/shm/.
         done
-	evn
     rlPhaseEnd
 
     rlPhaseStartTest "Verify shared libraries are available"
