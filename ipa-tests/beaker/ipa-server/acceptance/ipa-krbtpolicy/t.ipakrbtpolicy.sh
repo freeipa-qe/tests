@@ -5,15 +5,24 @@
 ipakrbtpolicy()
 {
     ipakrbt_envsetup
-    ipakrbt_show
-    ipakrbt_reset
-    ipakrbt_mod
+    ipakrbt_functional
+#    ipakrbt_show
+#    ipakrbt_reset
+#    ipakrbt_mod
     ipakrbt_envcleanup
 } # ipakrbt
 
 ######################
 # test set           #
 ######################
+ipakrbt_functional()
+{
+    ipakrbt_functional_envsetup
+    ipakrbt_functional_maxlife
+    ipakrbt_functional_maxrenew
+    ipakrbt_functional_envcleanup
+}
+
 ipakrbt_show()
 {
     ipakrbt_show_envsetup
@@ -65,6 +74,71 @@ ipakrbt_envcleanup()
         #environment cleanup ends   here
     rlPhaseEnd
 } #ipakrbt_envcleanup
+
+ipakrbt_functional_envsetup()
+{
+    rlPhaseStartSetup "ipakrbt_functional_envsetup"
+        #environment setup starts here
+        create_ipauser $username $first $last $password
+        #environment setup ends   here
+    rlPhaseEnd
+}
+
+ipakrbt_functional_envcleanup()
+{
+    rlPhaseStartCleanup "ipakrbt_functional_envcleanup"
+        #environment cleanup starts here
+        delete_user $username
+        #environment cleanup ends   here
+    rlPhaseEnd
+}
+
+ipakrbt_functional_maxlife()
+{
+    rlPhaseStartTest "ipakrbt_functional_maxlife"
+        local delay=60 # set maxlife of kerberos ticket life to 1 minute for test account
+        KinitAsAdmin
+        rlRun "ipa krbtpolicy-mod $username --maxlife=$delay" 0 "set maxlife to $delay second"
+        clear_kticket
+
+        rlRun "echo $password | kinit $username" 0 "kinit as [$username] and expect ticket expire in 60 seconds"
+        rlRun "ipa user-find $username 2>&1 >/dev/null" 0 "after grant kerberos ticket, user-find should success"
+        sleep $delay
+        rlRun "ipa user-find $username 2>&1 | grep -i 'Ticket expired' " 0 "expect 'user-find' to fail for 'Ticket expired' after [$delay] seconds"
+        clear_kticket
+    rlPhaseEnd
+} #ipakrbt_functional_maxlife
+
+ipakrbt_functional_maxrenew()
+{
+    rlPhaseStartTest "ipakrbt_functional_maxrenew"
+        local maxlife=60
+        local renew=`echo "$maxlife *2" | bc` # set renew life as double of maxlife
+        KinitAsAdmin
+        rlRun "ipa krbtpolicy-mod $username --maxlife=$maxlife --maxrenew=$renew" 0 "set maxlife:[$maxlife], renew=[$renew]"
+        clear_kticket
+
+        #step 1: normal kinit should success and allow ipa user to do user-find
+        rlRun "echo $password | kinit $username" 0 "kinit as [$username] and expect ticket expire in 60 seconds"
+        rlRun "ipa user-find $username 2>&1 >/dev/null" 0 "after grant kerberos ticket, user-find should success"
+
+        #step 2: after kerberos ticket life time (defined by maxlife), ticket should expire, and user-find should fail
+        sleep $maxlife
+        rlRun "ipa user-find $username 2>&1 | grep -i 'Ticket expired' " 0 "expect 'user-find' to fail for 'Ticket expired' after [$maxlife] seconds"
+
+        #step 3: run kinit -R should give [maxlife] seonds of new life to user's kerberos ticket
+        rlRun "kinit -R" 0 "when user kerberos ticket expired but still within renew time, kinit -R should give user new life"
+        rlRun "ipa user-find $username 2>&1 >/dev/null" 0 "after kinit -R , user-find should success"
+
+        #step 4: after renew time limit reaches its limit, kinit -R no longer work
+        sleep $maxlife  # sleep again
+        rlRun "ipa user-find $username 2>&1 | grep -i 'Ticket expired' " 0 "expect 'user-find' to fail for 'Ticket expired' after [$delay] seconds"
+        rlRun "kinit -R" 1 "when user kerberos ticket expired and also out renew time, kinit -R should fail"
+        rlRun "ipa user-find $username 2>&1 | grep -i 'Ticket expired' " 0 "expect 'user-find' to fail for 'Ticket expired' after [$maxlife] seconds"
+        clear_kticket
+
+    rlPhaseEnd
+} #ipakrbt_functional_maxrenew
 
 ipakrbt_show_envsetup()
 {

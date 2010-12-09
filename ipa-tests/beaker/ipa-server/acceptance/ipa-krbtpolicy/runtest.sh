@@ -6,7 +6,9 @@
 #   Description: IPA ipakrbtpolicy acceptance tests
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # The following ipa will be tested:
-#
+# ipa krbtpolicy-show
+# ipa krbtpolicy-mod --maxlife --maxrenew
+# ipa krbtpolicy-reset 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
 #   Author: Yi Zhang <yzhang@redhat.com>
@@ -59,9 +61,9 @@ rlJournalStart
     # r2d2_test_starts
     ipakrbtpolicy
     # r2d2_test_ends
+    makereport
 
     rlPhaseStartCleanup "ipakrbtpolicy cleanup"
-        makereport
         rlRun "popd"
         rlRun "rm -r $TmpDir" 0 "Removing tmp directory"
     rlPhaseEnd
