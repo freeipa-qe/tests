@@ -98,10 +98,6 @@ rlJournalStart
 		rlRun "ps xa | grep -v grep |grep ntpd" 0 "Checking to ensure that ipactl start started ntpd"
 	rlPhaseEnd
 
-	rlPhaseStartTest "ipa-ctl-13: ensure that ipactl start started the PKI instance of dirsrv"
-		rlRun "ps xa | grep -v grep |grep dirsrv| grep PKI" 0 "Checking to ensure that ipactl start started PKI"
-	rlPhaseEnd
-
 	rlPhaseStartTest "ipa-ctl-13: ensure that ipactl start started the $RELM instance of dirsrv"
 		rlRun "ps xa | grep -v grep |grep dirsrv| grep -i $RELM" 0 "Checking to ensure that ipactl start started $RELM"
 	rlPhaseEnd
@@ -122,11 +118,7 @@ rlJournalStart
 		rlRun "ps xa | grep -v grep |grep ntpd" 0 "Checking to ensure that ipactl start restarted ntpd"
 	rlPhaseEnd
 
-	rlPhaseStartTest "ipa-ctl-18: ensure that ipactl restart started the PKI instance of dirsrv"
-		rlRun "ps xa | grep -v grep |grep dirsrv| grep PKI" 0 "Checking to ensure that ipactl restart started PKI"
-	rlPhaseEnd
-
-	rlPhaseStartTest "ipa-ctl-19: ensure that ipactl restart started the $RELM instance of dirsrv"
+	rlPhaseStartTest "ipa-ctl-18: ensure that ipactl restart started the $RELM instance of dirsrv"
 		rlRun "ps xa | grep -v grep |grep dirsrv| grep -i $RELM" 0 "Checking to ensure that ipactl restart started $RELM"
 	rlPhaseEnd
 
