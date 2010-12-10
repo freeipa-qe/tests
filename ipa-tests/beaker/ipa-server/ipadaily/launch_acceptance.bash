@@ -22,7 +22,7 @@ rm -rf *.rpm
 make rpm
 bkr task-add *.rpm
 
-testsuites="ipa-user-cli ipa-group-cli ipa-host-cli ipa-hostgroup-cli ipa-netgroup-cli ipa-set-add-attr nis-cli install ipa-default ipa-password ipa-hbac-cli ipa-hbacsvc-cli ipa-config ipa-dns install-slave install-client uninstall"
+testsuites="ipa-user-cli/adduser ipa-user-cli/moduser ipa-group-cli ipa-host-cli ipa-hostgroup-cli ipa-netgroup-cli ipa-set-add-attr nis-cli install ipa-default ipa-password ipa-hbac-cli ipa-hbacsvc-cli ipa-config ipa-dns install-slave install-client uninstall"
 for item in $testsuites ; do
 	cd $TESTROOT/$item/
 	rm -rf *.rpm
