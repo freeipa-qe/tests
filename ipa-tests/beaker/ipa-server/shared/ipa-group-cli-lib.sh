@@ -138,7 +138,7 @@ verifyGroupAttr()
    ipa group-show --all $mygroup > $tmpfile
    rc=$?
    if [ $rc -eq 0 ] ; then
-        cat $tmpfile | grep "$attriute: $value"
+        cat $tmpfile | grep "$attribute: $value"
         rc=$?
         if [ $rc -ne 0 ] ; then
                 rlLog "ERROR: $mygroup verification failed: Value of $attribute is $value."
@@ -182,7 +182,7 @@ verifyGroupClasses()
         	done
 	elif [ $grptype == "upg" ] ; then
 		rlLog "Group type is user private"
-                for item in posixGroup mepManagedEntry top ; do
+                for item in posixgroup mepManagedEntry top ; do
                         echo $classes | grep "$item"
                         if [ $? -ne 0 ] ; then
                                 rlLog "ERROR - objectclass $item was not returned with group-show --all"
@@ -409,7 +409,7 @@ verifyUPG()
   USERIDNUM=`cat /tmp/showuser.out | grep UID | cut -d ":" -f 2`
   USERIDNUM=`echo $USERIDNUM`
   rlLog " User's uidNumber is $USERIDNUM"
-  verifyGroupAttr $member uidNumber $USERIDNUM
+  verifyGroupAttr $member GID $USERIDNUM
   if [ $? -ne 0 ] ; then
 	rc=1
   else
