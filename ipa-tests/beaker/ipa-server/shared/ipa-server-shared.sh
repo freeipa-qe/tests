@@ -319,6 +319,13 @@ KinitAsAdmin()
     echo $adminpassword | /usr/kerberos/bin/kinit $admin 2>&1 >/dev/null
 } #KinitAsAdmin
 
+KinitAsUser()
+{
+    local userlogin=$1
+    local password=$2
+    echo $password | /usr/kerberos/bin/kinit $userlogin 2>&1 >/dev/null
+} #KinitAsUser
+
 create_ipauser()
 {
     local login=$1
