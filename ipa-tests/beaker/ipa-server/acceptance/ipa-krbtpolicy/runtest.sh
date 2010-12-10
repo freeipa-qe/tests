@@ -61,7 +61,11 @@ rlJournalStart
     # r2d2_test_starts
     ipakrbtpolicy
     # r2d2_test_ends
-    makereport
+
+    rlJournalPrintText
+    report=$TmpDir/rhts.report.$RANDOM.txt
+    makereport $report
+    rhts-submit-log -l $report
 
     rlPhaseStartCleanup "ipakrbtpolicy cleanup"
         rlRun "popd"
