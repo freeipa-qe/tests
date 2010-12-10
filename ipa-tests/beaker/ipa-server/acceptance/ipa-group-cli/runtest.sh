@@ -61,6 +61,11 @@ echo "USERDN is $USERDN"
 echo "GROUPDN is $GROUPDN"
 echo "Server is $MASTER"
 
+if [ -z $MASTER ] ; then
+	export MASTER=`hostname`
+fi
+rlLog "MASTER: $MASTER"
+
 ########################################################################
 
 PACKAGE="ipa-admintools"
@@ -84,15 +89,20 @@ rlJournalStart
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verifying error message"
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-cli-03: Verify private group not returned with group-find command"
+    rlPhaseStartTest "ipa-group-cli-03: Verify private with group-find command"
         result=`ipa group-find jennyg`
 	echo $result | grep "0 groups matched"
 	rc=$?
 	rlAssert0 "0 Groups should be matched" $rc
+
+	result=`ipa group-find --private jennyg`
+	echo $result | grep "1 group matched"
+	rc=$?
+	rlAssert0 "1 Group should be matched" $rc
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-group-cli-04: Verify private group is returned with group-show command"
-	rlRun "verifyGroupAttr jennyg Description \"Description: User private group for jennyg\"" 0 "Verify UPG description."
+	rlRun "verifyGroupAttr jennyg Description \"User private group for jennyg\"" 0 "Verify UPG description."
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-group-cli-05: Verify User Private Group"
@@ -266,15 +276,29 @@ rlJournalStart
 	for item in epcot animalkingdom ; do
 		echo $groups | grep $item
 		rc=$?
-		rlAssert0 "Checking if group $item is a member of group disneyworld - group-show" $rc
+		rlAssert0 "Checking if group $item is a direct member of group disneyworld - group-show" $rc
 	done 
+
+        groups=`cat /tmp/showgroup.out | grep "Indirect Member groups:"`
+	for item in fish dinasaurs germany japan ; do
+                echo $groups | grep $item
+                rc=$?
+                rlAssert0 "Checking if group $item is an indirect member of group disneyworld - group-show" $rc
+        done
 
         users=`cat /tmp/showgroup.out | grep "Member users:"`
         for item in wdisney ; do
                 echo $users | grep $item
                 rc=$?
-                rlAssert0 "Checking if user $item is a member of group disneyworld - group-show" $rc
+                rlAssert0 "Checking if user $item is a directory member of group disneyworld - group-show" $rc
         done	
+
+        users=`cat /tmp/showgroup.out | grep "Indirect Member users:"`
+        for item in euser1 euser2 guser1 guser2 juser1 juser2 trainer1 trainer2 ; do
+                echo $users | grep $item
+                rc=$?
+                rlAssert0 "Checking if user $item is an indirect member of group disneyworld - group-show" $rc
+        done
 
 	rlLog "=====================  group-find ==================="
         ipa group-find disneyworld > /tmp/findgroup.out
@@ -282,16 +306,29 @@ rlJournalStart
         for item in epcot animalkingdom ; do
                 echo $groups | grep $item
                 rc=$?
-                rlAssert0 "Checking if group $item is a member of group disneyworld - group-find" $rc
+                rlAssert0 "Checking if group $item is a direct member of group disneyworld - group-find" $rc
+        done
+
+        groups=`cat /tmp/findgroup.out | grep "Indirect Member groups:"`
+        for item in fish dinasaurs germany japan ; do
+                echo $groups | grep $item
+                rc=$?
+                rlAssert0 "Checking if group $item is an indirect member of group disneyworld - group-show" $rc
         done
 
 	users=`cat /tmp/findgroup.out | grep "Member users:"`
         for item in wdisney ; do
                 echo $users | grep $item
                 rc=$?
-                rlAssert0 "Checking if user $item is a member of group disneyworld - group-show" $rc
+                rlAssert0 "Checking if user $item is a direct member of group disneyworld - group-show" $rc
         done
 
+        users=`cat /tmp/findgroup.out | grep "Indirect Member users:"`
+        for item in euser1 euser2 guser1 guser2 juser1 juser2 trainer1 trainer2 ; do
+                echo $users | grep $item
+                rc=$?
+                rlAssert0 "Checking if user $item is an indirect member of group disneyworld - group-show" $rc
+        done
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-group-cli-29: Verify Group Memberships - Group: epcot"
@@ -613,21 +650,21 @@ rlJournalStart
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-group-cli-49: Negative - setattr and addattr on cn"
-        command="ipa group-mod --setattr cn=\"cn=new,cn=groups,dc=domain,dc=com\" fish"
-        expmsg="ipa: ERROR: Invalid DN syntax: invalid RDN"
-        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
-        command="ipa group-mod --setattr cn=\"cn=new,cn=groups,dc=$RELM\" fish"
-        expmsg="ipa: ERROR: modifying primary key is not allowed"
-        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
+	# add a test group
+	addGroup mynewgroup mynewgroup
+	rlRun "setAttribute group cn blah mynewgroup" 0 "Setting new cn attribute"
+	rlRun "verifyGroupAttr cn blah blah" 0 "Verifying new cn attribute"
 	expmsg="ipa: ERROR: cn: Only one value allowed."
-        command="ipa group-mod --addattr cn=\"cn=new,cn=groups,dc=$RELM\" fish"
+        command="ipa group-mod --addattr cn=another blah"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
+	# delete the test group
+	deleteGroup blah
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-group-cli-50: setattr and addattr on description"
-        attr="description"
+        attr="desc"
         rlRun "setAttribute group $attr new fish" 0 "Setting attribute $attr to value of new."
-        rlRun "verifyGroupAttr fish desc new" 0 "Verifying group $attr was modified."
+        rlRun "verifyGroupAttr fish Description new" 0 "Verifying group $attr was modified."
         # shouldn't be multivalue - additional add should fail
         command="ipa group-mod --addattr description=newer fish"
         expmsg="ipa: ERROR: description: Only one value allowed."
@@ -637,8 +674,10 @@ rlJournalStart
     rlPhaseStartTest "ipa-group-cli-51: setattr and addattr on member"
 	member1="uid=trex,$USERDN"
 	member2="uid=mdolphin,$USERDN"
-	ipa group-mod --setattr member=\"$member1\" fish
-	ipa group-mod --addattr member=\"$member2\" fish
+	#ipa group-mod --setattr member=\"$member1\" fish
+	#ipa group-mod --addattr member=\"$member2\" fish
+	rlRun "setAttribute group member \"$member1\" fish" 0 "setting member attribute member to $member"
+	rlRun "addAttribute group member \"$member2\" fish" 0 "Adding attribute member $member"
 	rlRun "verifyGroupMember trex user fish" 0 "member and memberOf attribute verification"
 	rlRun "verifyGroupMember mdolphin user fish" 0 "member and memberOf attribute verification"
     rlPhaseEnd
@@ -750,10 +789,10 @@ rlJournalStart
 	ipa group-find --sizelimit=0 > /tmp/groupfind.out
 	result=`cat /tmp/groupfind.out | grep "Number of entries returned"`
 	number=`echo $result | cut -d " " -f 5`
-	if [ $number -eq 103 ] ; then
+	if [ $number -eq 100 ] ; then
 		rlPass "All group returned as expected with size limit of 0"
 	else
-		rlFail "Number of groups returned is not as expected.  GOT: $number EXP: 103"
+		rlFail "Number of groups returned is not as expected.  GOT: $number EXP: 100"
 	fi
     rlPhaseEnd
 
@@ -818,8 +857,6 @@ rlJournalStart
     rlPhaseEnd
 
     rlPhaseStartCleanup "ipa-group-cli-cleanup: Delete remaining users and group and Destroying admin credentials"
-        rlRun "popd"
-        rlRun "rm -r $TmpDir" 0 "Removing tmp directory"
 	rlRun "ipa user-del trex" 0 "Deleting user trex."
 	rlRun "ipa user-del mdolphin" 0 "Deleting user mdolphin."
         i=1
@@ -831,4 +868,7 @@ rlJournalStart
     rlPhaseEnd
 
 rlJournalPrintText
+report=$TmpDir/rhts.report.$RANDOM.txt
+makereport $report
+rhts-submit-log -l $report
 rlJournalEnd
