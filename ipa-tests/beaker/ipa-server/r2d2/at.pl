@@ -229,3 +229,111 @@ sub printArray {
         print "$indent"."[$d] ";
     }
 }#printArray
+
+sub optengine {
+    my ($cmd, $options_ref, $rules_ref) = @_ ;
+    my %rules= %$rules_ref;
+    my @allopts = computeAllOpts($options_ref); 
+    print "\n-------ALl possible combinations--------";
+    printArray (sortArray(@allopts));
+    print "\n----------------------------------";
+    my @optsafter = applyRules(\@allopts, \%rules);
+    print "\n===== After rules applied =======";
+    printArray (sortArray(@optsafter));
+    print "\n===================================";
+    return sortArray(@optsafter);
+}# optengine
+
+sub computeAllOpts {
+    my $options_ref = shift;
+    my @options = @$options_ref;
+    my @queue=();
+    @queue = comb(\@options, \@queue);
+    return @queue;
+}#computeAllOpts
+
+sub comb {
+    my ($opts_ref, $queue_ref) = @_;
+    my @opts = @$opts_ref;
+    my @queue = @$queue_ref;
+    #print "\nopts [$#opts], queue [$#queue]";
+    if ($#opts == 0){
+        #print "\n$#opts";
+        push @queue, $opts[0];
+        #printArray (@queue);
+        return @queue;
+    }else{
+        my $first = shift @opts;
+        #print "\n1->[$first]";
+        #printArray (@opts);
+        @queue = comb (\@opts, \@queue);
+        my @newcomb=();
+        foreach my $q (@queue){
+            my $combination = "$first $q";
+            push @newcomb, $combination;
+        }
+        push @queue, @newcomb;
+        push @queue, $first;
+        return @queue;
+    }
+}
+
+sub applyRules {
+    my ($allopts_ref , $rules_ref) = @_;
+    my @allopts = @$allopts_ref;
+    my %rules = %$rules_ref;
+    while (my ($opt, $rule)=each %rules){
+        my @newopts=();
+        print "\ncheck [$opt]'s rule: [$rule]";
+        foreach my $line (@allopts){
+            print "for opt comb [$line]";
+            if ($line =~ /$opt/){
+                if (obeyRule($opt, $line, $rule)){
+                    push @newopts, $line;
+                    print "\t--> Pass\n";
+                }else{
+                    print "\t--> Delete: [$line]\n";
+                }
+            }#apply rules
+            else{
+                print "\t-->N/A, pass\n";
+                push @newopts, $line;
+            }
+        }#foreach loop
+        @allopts=@newopts;
+        print "\nafter check, we have:";
+        printArray (@allopts);
+    }#while loop
+    return @allopts;
+}# applyRules;
+
+sub obeyRule {
+    my ($option, $optioncomb, $rule) = @_;
+    my $ret=0; 
+    if ($rule eq "any"){
+        $ret=1; #rule passed
+    }#rule: any
+    elsif ($rule eq "only"){
+        if ($option eq "$optioncomb"){
+            $ret=1;
+        }else{
+            $ret=0;
+        }
+    }#rule: only
+    elsif ($rule =~ /must (.*)/){
+        my $check = $1;
+        if ($optioncomb =~ /$check/){
+            $ret=1;
+        }else {
+            $ret=0;
+        }
+    }#must
+    else{
+        $ret=1; #otherwise, just make it pass
+    }
+    if (! $ret){
+        print "\n[$optioncomb] violates [$option]'s rule: [$rule]";
+    }
+    return $ret;
+}#obeyRule
+ 
