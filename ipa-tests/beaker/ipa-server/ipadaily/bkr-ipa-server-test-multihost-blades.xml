@@ -6,7 +6,7 @@
 	</notify>
 
 	<whiteboard>
-		ipa-server x86_64 daily multihost qe-blade-04 05 and 12
+		ipa-server x86_64 daily multihost 
 	</whiteboard>
 	<recipeSet>
 		<recipe kernel_options="" kernel_options_post="" ks_meta="" role="MASTER" whiteboard="">
@@ -23,11 +23,7 @@
 				</and>
 				<distro_virt op="=" value=""/>
 			</distroRequires>
-			<hostRequires>
-				<and>
-					<hostname op="=" value="qe-blade-04.idm.lab.bos.redhat.com"/>
-				</and>
-			</hostRequires>
+			<hostRequires/>
 			<partitions/>
 			<task name="/distribution/install" role="STANDALONE">
 				<params/>
@@ -68,11 +64,7 @@
 				<distro_virt op="=" value=""/>
 			</distroRequires>
 
-			<hostRequires>
-				<and>
-					<hostname op="=" value="qe-blade-05.idm.lab.bos.redhat.com"/>
-				</and>
-			</hostRequires>
+			<hostRequires/>
 			<partitions/>
 			<task name="/distribution/install" role="STANDALONE">
 				<params/>
@@ -113,11 +105,7 @@
 				<distro_virt op="=" value=""/>
 			</distroRequires>
 
-			<hostRequires>
-				<and>
-					<hostname op="=" value="qe-blade-12.idm.lab.bos.redhat.com"/>
-				</and>
-			</hostRequires>
+			<hostRequires/>
 			<partitions/>
 			<task name="/distribution/install" role="STANDALONE">
 				<params/>
