@@ -304,6 +304,7 @@ rlJournalStart
         cat /tmp/error.out | grep "Number of members added 0"
         rc=$?
         rlAssert0 "Number of members added 0" $rc
+	rlRun "ipa hostgroup-add-member --hostgroups=\"$group1\" \"$group1\"" 1 "Check return code is non zero."
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-hostgroup-cli-31: Delete Host Groups"
