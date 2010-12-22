@@ -34,7 +34,7 @@
 
 # Include rhts environment
 . /usr/bin/rhts-environment.sh
-. /usr/lib/beakerlib/beakerlib.sh
+. /usr/share/beakerlib/beakerlib.sh
 
 rlJournalStart
     rlPhaseStartSetup "list files in /dev/shm"
