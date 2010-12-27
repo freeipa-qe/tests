@@ -34,6 +34,7 @@ our %GeneralOptionData=(
         "--timelimit"=>"seconds",
         "default"=>"none"
         );
+
 # command line argument parse
 our $totalArgs=$#ARGV;
 if ($totalArgs == 0) {
@@ -103,7 +104,7 @@ sub usage{
     print "\nexample: at.pl config";
     print "\n       means find out all possible CLI test for ipa config feature";
     print "\n";
-}
+}#usage
 
 sub parseIPAcmd{
     my ($helpmsg) = shift;
@@ -277,7 +278,11 @@ sub prepare {
                 $option_datatype = getGeneralData($option, \%GeneralOptionData);
             }
             print DATA "\n# $option_doc";
-            print DATA "\n$option: $option_datatype \n";
+            #print DATA "\n$option: $option_datatype";
+            print DATA "\n$option (positive):";
+            print DATA "\n$option (boundary):";
+            print DATA "\n$option (negative):";
+            print DATA "\n";
         }# print original docuemnt and followed by option's data type into DATA file
         print DATA   "\n\n";
 
