@@ -275,6 +275,8 @@ verifyHostGroupMember()
 
 	ipa hostgroup-show --all "$group" > /tmp/showhostgroup.out
         members=`cat /tmp/showhostgroup.out | grep "Member hosts:" | cut -d ":" -f2`
+	rlLog "$members"
+	rlLog "Looking for $member"
         echo $members | grep "$member"
         if [ $? -eq 0 ] ; then
                 rlLog "$membertype \"$member\" returned with hostgroup-show"
@@ -287,18 +289,18 @@ verifyHostGroupMember()
         mymember="cn=$member"
         memberDN="$mymember,cn=hostgroups,cn=accounts,dc=$RELM"
 
-	ipa hostgroup-find "$group" > /tmp/findhostgroup.out
-        members=`cat /tmp/findhostgroup.out | grep "Member host-groups:" | cut -d ":" -f2`
-        echo $members | grep "$member"
+	ipa hostgroup-find "$member" > /tmp/findhostgroup.out
+        members=`cat /tmp/findhostgroup.out | grep "Member of host-groups:" | cut -d ":" -f2`
+        echo $members | grep "$group"
         if [ $? -eq 0 ] ; then
-                rlLog "$membertype "$member" returned with hostgroup-find"
+                rlLog "$membertype "$group" returned with hostgroup-find on $member"
         else
-                rlLog "WARNING: $membertype \"$member\" not returned with hostgroup-find"
+                rlLog "WARNING: $membertype \"$group\" not returned with hostgroup-find on $member"
                 let rc=$rc+1
         fi
 
         ipa hostgroup-show --all "$group" > /tmp/showhostgroup.out
-        members=`cat /tmp/showhostgroup.out | grep "Member host-groups:" | cut -d ":" -f2`
+        members=`cat /tmp/showhostgroup.out | grep "member_hostgroup:" | cut -d ":" -f2`
         echo $members | grep "$member"
         if [ $? -eq 0 ] ; then
                 rlLog "$membertype \"$member\" returned with hostgroup-show"
