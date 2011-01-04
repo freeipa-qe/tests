@@ -111,7 +111,7 @@ rlJournalStart
 			# This is the master server, set up ipa-server
 			# temporary workaround for installing tomcat5 on Fedora 14
 			rlRun "ln -s /usr/share/java/xalan-j2-serializer.jar /usr/share/tomcat5/common/lib/xalan-j2-serializer.jar" 0 "Tomcat5 workaround"
-			echo "ipa-server-install --setup-dns --forwarder=$DNSFORWARD --hostname=$hostname_s.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -u admin -U --no-pkinit" > /dev/shm/installipa.bash
+			echo "ipa-server-install --setup-dns --forwarder=$DNSFORWARD --hostname=$hostname_s.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -u admin -U --no-pkinit --selfsign" > /dev/shm/installipa.bash
 			setenforce 0
 			/bin/bash /dev/shm/installipa.bash
 		else
