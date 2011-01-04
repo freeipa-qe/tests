@@ -312,7 +312,7 @@ rlJournalStart
 	rlRun "verifyUserAttr $superuser \"Telephone Number\" \"111-111-1111, 222-222-2222, 333-333-3333, 444-444-4444\"" 0 "Verifying phone numbers"
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-user-cli-mod-039: etattr and add addattr on mobile"
+    rlPhaseStartTest "ipa-user-cli-mod-039: setattr and add addattr on mobile"
         rlRun "setAttribute user mobile 111-111-1111 $superuser" 0 "Setting setting mobile number"
         rlRun "verifyUserAttr $superuser \"Mobile Telephone Number\" 111-111-1111" 0 "Verify user's mobile phone number"
         for item in 222-222-2222 333-333-3333 444-444-4444 ; do
@@ -340,7 +340,7 @@ rlJournalStart
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-user-cli-mod-042: uid 0"
-        command="ipa user-mod --setattr uid=0 $superuser"
+        command="ipa user-mod --setattr uidNumber=0 $superuser"
         expmsg="ipa: ERROR: uid 0 not allowed"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
         command="ipa user-mod --uid=0 $superuser"
