@@ -653,7 +653,7 @@ rlJournalStart
 	# add a test group
 	addGroup mynewgroup mynewgroup
 	rlRun "setAttribute group cn blah mynewgroup" 0 "Setting new cn attribute"
-	rlRun "verifyGroupAttr cn blah blah" 0 "Verifying new cn attribute"
+	rlRun "verifyGroupAttr blah \"Group name\" blah" 0 "Verifying new cn attribute"
 	expmsg="ipa: ERROR: cn: Only one value allowed."
         command="ipa group-mod --addattr cn=another blah"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
@@ -662,8 +662,7 @@ rlJournalStart
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-group-cli-50: setattr and addattr on description"
-        attr="desc"
-        rlRun "setAttribute group $attr new fish" 0 "Setting attribute $attr to value of new."
+        rlRun "setAttribute group description new fish" 0 "Setting attribute $attr to value of new."
         rlRun "verifyGroupAttr fish Description new" 0 "Verifying group $attr was modified."
         # shouldn't be multivalue - additional add should fail
         command="ipa group-mod --addattr description=newer fish"
@@ -789,10 +788,10 @@ rlJournalStart
 	ipa group-find --sizelimit=0 > /tmp/groupfind.out
 	result=`cat /tmp/groupfind.out | grep "Number of entries returned"`
 	number=`echo $result | cut -d " " -f 5`
-	if [ $number -eq 100 ] ; then
+	if [ $number -eq 103 ] ; then
 		rlPass "All group returned as expected with size limit of 0"
 	else
-		rlFail "Number of groups returned is not as expected.  GOT: $number EXP: 100"
+		rlFail "Number of groups returned is not as expected.  GOT: $number EXP: 103"
 	fi
     rlPhaseEnd
 
