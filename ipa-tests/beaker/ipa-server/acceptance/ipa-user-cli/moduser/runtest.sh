@@ -33,8 +33,7 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 # Include data-driven test data file:
-. /dev/shm/data.user-cli.acceptance
-. /dev/shm/data.user-cli.functional
+. ./data.user-cli.acceptance
 
 # Include rhts and ipa environment
 . /usr/bin/rhts-environment.sh

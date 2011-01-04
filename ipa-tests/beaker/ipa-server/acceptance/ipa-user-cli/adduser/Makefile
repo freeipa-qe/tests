@@ -29,7 +29,7 @@ export TESTVERSION=1.0
 
 BUILT_FILES=
 
-FILES=$(METADATA) runtest.sh Makefile PURPOSE
+FILES=$(METADATA) runtest.sh Makefile PURPOSE data.user-cli.acceptance
 
 .PHONY: all install download clean
 

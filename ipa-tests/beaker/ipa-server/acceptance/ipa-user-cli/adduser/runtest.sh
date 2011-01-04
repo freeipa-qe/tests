@@ -38,8 +38,7 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 # Include data-driven test data file:
-. /dev/shm/data.user-cli.acceptance
-. /dev/shm/data.user-cli.functional
+. ./data.user-cli.acceptance
 
 # Include rhts and ipa environment
 . /usr/bin/rhts-environment.sh
@@ -47,6 +46,7 @@
 . /dev/shm/env.sh
 . /dev/shm/ipa-server-shared.sh
 . /dev/shm/lib.user-cli.sh
+. /dev/shm/ipa-group-cli-lib.sh
 
 PACKAGE="ipa-admintools"
 
