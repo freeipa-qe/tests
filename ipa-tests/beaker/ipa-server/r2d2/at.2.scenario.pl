@@ -16,25 +16,26 @@ print "scenario engine starts...";
 our $ipacmd;
 our $syntaxfile;
 our $datafile;
-
+our $testsignture;
 # command line argument parse
 our $totalArgs=$#ARGV;
 if ($totalArgs == 2) {
     $ipacmd     = $ARGV[0];
     $syntaxfile = $ARGV[1];
     $datafile   = $ARGV[2];
+    $testsignture = "$ipacmd.testsignture";
 }else{
     usage();
     exit;
 }
 
+our %ipatestcase;
 our %syntax = parseConfFile($syntaxfile);
 #printConf (\%syntax);
-our %data= parseConfFile($datafile);
-#printConf (\%data);
-our @allsmogtest=();
+
 # calculate all possible combination for each ipa sub command
 foreach my $ipasubcmd (keys %syntax){
+    my @allsmogtest=();
     print "\nwork on [$ipasubcmd]...";
     my $syntax_ref = $syntax{$ipasubcmd};
     my %syntax_details = %$syntax_ref;
@@ -57,17 +58,67 @@ foreach my $ipasubcmd (keys %syntax){
     }
     printArray(@sortedSmog);
     push @allsmogtest,@sortedSmog;
-    print " done";
+    $ipatestcase{$ipasubcmd} = \@allsmogtest;
+    print "\n============ all smog test cases option ================";
+    printArray(@allsmogtest);
+    print "\n========================================================";
 }#foreach
 
-print "\n============ all smog test cases option ================";
-printArray(@allsmogtest);
-print "\n========================================================";
+
+print "\n====== Now let's plugin some data ========";
+our %data = parseConfFile($datafile);
+printConf (\%data);
+
+foreach my $ipasubcmd (keys %ipatestcase ){
+    my $smogtest_ref = $ipatestcase{$ipasubcmd};
+    my @smogtest = @$smogtest_ref;
+    my $data_ref = $data{$ipasubcmd};
+    my @allfinal=();
+    print "\nipa cmd: $ipasubcmd";
+    foreach my $smogoption(@smogtest){
+        my @finaltest=();
+        my @optionlist = split (/ /,$smogoption);
+        #print "\nsmog test: [$smogoption]";
+        foreach my $thisoption (@optionlist){
+            #print "[Option: $thisoption] has final test case as below:";
+            my @optiondata = parseData($thisoption, $data_ref);
+            if ($#finaltest == -1){ # if no previous option data exist, simple copy optiondata array
+                @finaltest = @optiondata;
+            }else{
+                my @tempfinal=();
+                foreach my $od (@optiondata){
+                    foreach my $previous_od (@finaltest){
+                        my $test = "$previous_od $od";
+                        #print "\nDEBUG: push value = [$test]";
+                        push @tempfinal, $test;
+                    }#previous_od loop
+                }#current od loop
+                @finaltest = @tempfinal; # grow the finaltest
+            }# if-else
+            #printArray (@finaltest);
+            #print "\n-------------------------\n";
+        }#parse each option line to option list 
+        #printArray (@finaltest);
+        # remove some test 
+        my @readytopush=();
+        foreach my $testscenario (@finaltest){
+            next if ($testscenario =~ /negative(.*)boundary/);
+            next if ($testscenario =~ /boundary(.*)negative/);
+            push @readytopush, $testscenario;
+        }
+        push @allfinal, @readytopush;
+    }#finall, we get the test case scenario for each ipa sub command
+    print "\n--------------- final test scenario for [$ipasubcmd]---------------------";
+    printArray(@allfinal);
+    my $outputfile = "$testsignture.$ipasubcmd.scenario";
+    writeToSignture($ipasubcmd, \@allfinal, $outputfile);
+}#this is loop for ipa sub command
+
 print "\nOption engine ends\n";
 
-#
-################# sub routine ##################
-#
+################################################
+#                 sub routine                  #
+################################################
 
 sub scenarioExtractor{
     # extract scenario based on given keyword
@@ -126,7 +177,7 @@ sub extractSmog {
                     next;    
                 }# if no relation
                 else{
-                    print "\nerror , exit";
+                    print "\nerror , exit\n";
                     exit;
                 }#we should never hit this block
                 @rest = keys %smog;
@@ -175,7 +226,7 @@ sub extractSmog {
                     next;    
                 }# if $key same as $thiskey
                 else{
-                    print "\nerror , exit";
+                    print "\nerror , exit\n";
                     exit;
                 }#we should never hit this block
                 @rest = keys %smog;
@@ -341,7 +392,7 @@ sub parseSyntaxFile{
     if (open SYNTAX,"<$configfile"){
         print "\nLoading syntax file: [$configfile]";
     }else{
-        print "\nCan not read syntax file: [$configfile], exit";
+        print "\nCan not read syntax file: [$configfile], exit\n";
         exit;
     }
 
@@ -362,7 +413,7 @@ sub parseSyntaxFile{
             }else{
                 if (exists $syntax{$currentcmd}){
                     # report error and exit program
-                    print "\nFormat error, duplicate cmd syntax detected, [$currentcmd], exit";
+                    print "\nFormat error, duplicate cmd syntax detected, [$currentcmd], exit\n";
                     exit;
                 }else{
                     #load into syntax hashtable;
@@ -384,7 +435,7 @@ sub parseSyntaxFile{
                 $currentsyntax{$option} = $detail;
             }else{
                 print "\nFormat error: expect format <option>: <details> -- use ':' as delimiter";
-                print "\nActually get: $line";
+                print "\nActually get: $line\n";
                 exit;
             }
         }
@@ -394,7 +445,7 @@ sub parseSyntaxFile{
     # some left over to save
     if (exists $syntax{$currentcmd}){
         # report error and exit program
-        print "\nFormat error, duplicate cmd syntax detected, [$currentcmd], exit";
+        print "\nFormat error, duplicate cmd syntax detected, [$currentcmd], exit\n";
         exit;
     }else{
         #load into syntax hashtable;
@@ -411,7 +462,7 @@ sub parseConfFile{
     if (open CONF,"<$configfile"){
         print "\nLoading config file: [$configfile]";
     }else{
-        print "\nCan not read syntax file: [$configfile], exit";
+        print "\nCan not read syntax file: [$configfile], exit\n";
         exit;
     }
 
@@ -422,8 +473,10 @@ sub parseConfFile{
         chop $line;
         next if ($line =~/^#/);
         next if ($line =~/^\s*$/);
+        $line =~ s/^\s+//; #remove leading spaces
+        $line =~ s/\s+$//; #remove trailing spaces
         #print "\nreadline: [$line]";
-        if ($line =~/\[(.*)\]/){
+        if ($line =~/^\[(.*)\]/){
             my $cmd = $1;
             #print "\nRead cmd: [$cmd]";
             if ($currentcmd eq ""){
@@ -432,11 +485,11 @@ sub parseConfFile{
             }else{
                 if (exists $conf{$currentcmd}){
                     # report error and exit program
-                    print "\nFormat error, duplicate command detected, [$currentcmd], exit";
+                    print "\nFormat error, duplicate command detected, [$currentcmd], exit\n";
                     exit;
                 }else{
                     #load into rules hashtable;
-                    #print "\nSave cmd: [$currentcmd], new commer: [$cmd]";
+                    print "\nSave cmd: [$currentcmd], new commer: [$cmd]";
                     $conf{$currentcmd} = \%currentrule;
                     $currentcmd = $cmd;
                 }
@@ -454,7 +507,7 @@ sub parseConfFile{
                 $currentrule{$option} = $detail;
             }else{
                 print "\nFormat error: expect format <option>: <details> -- use ':' as delimiter";
-                print "\nActually get: $line";
+                print "\nActually get: $line\n";
                 exit;
             }
         }
@@ -468,7 +521,7 @@ sub parseConfFile{
         exit;
     }else{
         #load into conf hashtable;
-        #print "\nSave cmd: [$currentcmd]";
+        print "\nSave cmd: [$currentcmd]";
         $conf{$currentcmd} = \%currentrule;
     }
     return %conf;
@@ -563,4 +616,46 @@ sub contains {
     return $code;
 }#contains
 
+sub parseData{
+    my ($option,  $data_ref) = @_;
+    my %dataHash = %$data_ref;
+    my @dataoption = ();
+    foreach my $datascenario (keys %dataHash){
+        #print "\ndata scenario: [$datascenario]";
+        if ($datascenario =~ /^$option\s+\((.*)\)/){
+            my $scenariotype= $1;
+            #print " push[$datascenario,$scenariotype]";
+            my $datavalue = $dataHash{$datascenario};
+            next if ($datavalue =~ /none/);
+            my $pushvalue = "$option;$scenariotype;$datavalue";
+            #print " push [$pushvalue]";
+            push @dataoption , $pushvalue;
+        }# datascenario parsing
+    }# walk through dataHash
+    #printArray(@dataoption);
+    if ($#dataoption == -1){
+        push @dataoption, $option;  # if no data option defined, it measn this option does not take argument 
+                                    # such as --all, --raw , --rights
+    }
+    return @dataoption;
+}#parseData
 
+sub writeToSignture {
+    my ($cmd, $scenario, $outfile) = @_;
+    if (open (OUT, ">$outfile")) {
+        print "\nready to output to file [$outfile]";
+    }else{
+        print "\ncan not open file [$outfile] to write\n";
+        exit;
+    }
+    print OUT "# test scenario for ipa command: [$cmd]";
+    my @test = @$scenario;
+    my @sorted = sortArray(@test);
+    my $total = $#sorted + 1;
+    print OUT " total $total test cases";
+    foreach (@sorted){
+        print OUT "\n$_";
+    }
+    close OUT;
+    print "\nsuccess! Output testscenario for [$cmd] to file [$outfile]";
+}#writeToSignture
