@@ -37,7 +37,7 @@
 
 # Include rhts environment
 . /usr/bin/rhts-environment.sh
-. /usr/lib/beakerlib/beakerlib.sh
+. /usr/share/beakerlib/beakerlib.sh
 . /dev/shm/ipa-host-cli-lib.sh
 . /dev/shm/ipa-server-shared.sh
 . /dev/shm/env.sh
