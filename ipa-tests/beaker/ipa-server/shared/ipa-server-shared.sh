@@ -283,6 +283,11 @@ addAttribute()
     return $rc
 } #addAttribute
 
+#############################################################################
+# makereport Usage: (generates summary report)
+#	makereport <full_path_and_name_for_report_location>
+#############################################################################
+
 makereport()
 {
     local report=$1
@@ -312,7 +317,27 @@ makereport()
     echo "=========================================================" >> $report
     echo "report saved as: $report"
     cat $report
-}
+} #makereport
+
+############################################################################
+# getReverseZone Usage: (returns reverse zone)
+#	rzone=`getReverseZone`
+###########################################################################
+
+getReverseZone()
+{
+  rzonedn=`ipa dns-find | grep dn: | grep arpa`
+  if [ $? -eq 0 ] ; then
+	rzone=`echo $rzonedn | cut -d "=" -f 2 | cut -d "," -f 1`
+  else
+	rlLog "WARNING: No Reverse DNS zone found"
+	rc=1
+  fi
+
+  echo $rzone
+  return $rc
+} #getReverseZone
+
 
 KinitAsAdmin()
 {
