@@ -39,7 +39,7 @@
 
 # Include rhts environment
 . /usr/bin/rhts-environment.sh
-. /usr/lib/beakerlib/beakerlib.sh
+. /usr/share/beakerlib/beakerlib.sh
 . /dev/shm/ipa-host-cli-lib.sh
 . /dev/shm/ipa-hostgroup-cli-lib.sh
 . /dev/shm/ipa-server-shared.sh
@@ -68,8 +68,8 @@ host5="qe-blade-01."$DOMAIN
 group1="hostgrp1"
 group2="host group 2"
 group3="host-group_3"
-group4="parent host group"
-group5="child host group"
+group4="parent"
+group5="child"
 
 ########################################################################
 
@@ -159,18 +159,18 @@ rlJournalStart
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-hostgroup-cli-10: Nested Host Groups"
-	rlRun "addHostGroupMembers hostgroups \"$group4\" \"$group5\"" 0 "Adding host group \"$group4\" to host group \"$group5\""
-	rlRun "verifyHostGroupMember \"$group4\" hostgroup  \"$group5\"" 0 "Verify member"
+	rlRun "addHostGroupMembers hostgroups \"$group5\" \"$group4\"" 0 "Adding host group \"$group5\" to host group \"$group4\""
+	rlRun "verifyHostGroupMember \"$group5\" hostgroup \"$group4\"" 0 "Verify member"
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-hostgroup-cli-11: Remove host member"
         rlRun "removeHostGroupMembers hosts \"$host1\" \"$group1\"" 0 "Removing host \"$host1\" from host group \"$group1\""
-        rlRun "verifyHostGroupMember \"$host1\" host  \"$group1\"" 4 "Verify member was removed"
+        rlRun "verifyHostGroupMember \"$host1\" host \"$group1\"" 4 "Verify member was removed"
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-hostgroup-cli-12: Remove host group member"
-        rlRun "removeHostGroupMembers hostgroups \"$group4\" \"$group5\"" 0 "Removing host group \"$group4\" from host group \"$group5\""
-        rlRun "verifyHostGroupMember \"$group4\" hostgroup  \"$group5\"" 4 "Verify member was removed"
+        rlRun "removeHostGroupMembers hostgroups \"$group5\" \"$group4\"" 0 "Removing host group \"$group4\" from host group \"$group5\""
+        rlRun "verifyHostGroupMember \"$group4\" hostgroup \"$group5\"" 4 "Verify member was removed"
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-hostgroup-cli-13: Delete Host that is member of multiple host groups"
@@ -238,7 +238,7 @@ rlJournalStart
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-hostgroup-cli-23: Add duplicate host group"
-        expmsg="ipa: ERROR: This entry already exists"
+        expmsg="ipa: ERROR: hostgroup with name $group1 already exists"
         command="ipa hostgroup-add --desc=test \"$group1\""
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
     rlPhaseEnd
@@ -272,12 +272,13 @@ rlJournalStart
 
     rlPhaseStartTest "ipa-hostgroup-cli-27: setattr and addattr on member"
         attr="member"
-        member1="cn=newcn,$HOSTRDN"
-        member2="cn=newcn2,$HOSTRDN"
-        ipa hostgroup-mod --setattr $attr="$member1" "$group1"
-	rlRun "verifyHostGroupMember \"$member1\" host  \"$group3\"" 0 "Verify member was added"
-        ipa hostgroup-mod --addattr $attr="$member2" "$group1"
-	rlRun "verifyHostGroupMember \"$member2\" host  \"$group3\"" 0 "Verify member was added"
+        member1="fqdn=new.testrelm,$HOSTRDN"
+        member2="fqdn=new2.testrelm,$HOSTRDN"
+        rlRun "setAttribute hostgroup member \"$member1\" $group1" 0 "Setting member attribute"
+	rlRun "verifyHostGroupMember \"$member1\" host \"$group1\"" 0 "Verify member was added"
+	rlRun "addAttribute hostgroup member \"$member2\" $group1" 0 "Adding additional member attribute"
+        #ipa hostgroup-mod --addattr $attr="$member2" "$group1"
+	rlRun "verifyHostGroupMember \"$member2\" host \"$group1\"" 0 "Verify member was added"
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-hostgroup-cli-28: setattr and addattr on memberOf"
@@ -334,10 +335,10 @@ rlJournalStart
         ipa hostgroup-find --sizelimit=0 > /tmp/hostgroupfind.out
         result=`cat /tmp/hostgroupfind.out | grep "Number of entries returned"`
         number=`echo $result | cut -d " " -f 5`
-        if [ $number -eq 102 ] ; then
+        if [ $number -eq 100 ] ; then
                 rlPass "All host group returned as expected with size limit of 0"
         else
-                rlFail "Number of host groups returned is not as expected.  GOT: $number EXP: 102"
+                rlFail "Number of host groups returned is not as expected.  GOT: $number EXP: 100"
         fi
     rlPhaseEnd
 
@@ -391,8 +392,6 @@ rlJournalStart
     rlPhaseEnd
 
     rlPhaseStartCleanup "ipa-hostgroup-cli-cleanup: Delete remaining hosts and Destroying admin credentials"
-        rlRun "popd"
-        rlRun "rm -r $TmpDir" 0 "Removing tmp directory"
         # delete remaining hosts added to test host members
         for item in $host1 $host3 $host4 $host5 ; do
                 rlRun "deleteHost $item" 0 "Deleting host $item"
@@ -408,4 +407,7 @@ rlJournalStart
     rlPhaseEnd
 
 rlJournalPrintText
+report=$TmpDir/rhts.report.$RANDOM.txt
+makereport $report
+rhts-submit-log -l $report
 rlJournalEnd
