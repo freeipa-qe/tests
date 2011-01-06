@@ -46,18 +46,12 @@
 # Test Suite Globals
 ########################################################################
 
-REALM=`os_getdomainname | tr "[a-z]" "[A-Z]"`
-DOMAIN=`os_getdomainname`
+host1="nightcrawler."$RELM
+host2="NIGHTCRAWLER."$RELM
+host3="SHADOWFALL."$RELM
+host4="shadowfall."$RELM
+host5="qe-blade-01."$RELM
 
-host1="nightcrawler."$DOMAIN
-host2="NIGHTCRAWLER."$DOMAIN
-host3="SHADOWFALL."$DOMAIN
-host4="shadowfall."$DOMAIN
-host5="qe-blade-01."$DOMAIN
-
-rlLog "$RELM"
-rlLog "$ROOTDN"
-rlLog "$ROOTDNPWD"
 ########################################################################
 
 PACKAGE="ipa-admintools"
@@ -169,13 +163,13 @@ rlJournalStart
 
     rlPhaseStartTest "ipa-host-cli-12: Negative - add duplicate host"
 	command="ipa host-add $host1 --force"
-	expmsg="ipa: ERROR: This entry already exists"
+	expmsg="ipa: ERROR: host with name nightcrawler.testrelm already exists"
 	rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-host-cli-13: Negative - Delete host that doesn't exist"
-        command="ipa host-del ghost.$DOMAIN"
-        expmsg="ipa: ERROR: ghost.$DOMAIN: host not found"
+        command="ipa host-del ghost.$RELM"
+        expmsg="ipa: ERROR: ghost.$RELM: host not found"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
     rlPhaseEnd
 
@@ -312,33 +306,37 @@ rlJournalStart
      rlPhaseEnd
 
     rlPhaseStartTest "ipa-host-cli-31: Negative - setattr and addattr on dn"
-	addHost $host1
-        command="ipa host-mod --setattr dn=mynewDN $host1"
+	myhost="mytest.$RELM"
+	addHost $myhost
+        command="ipa host-mod --setattr dn=mynewDN $myhost"
         expmsg="ipa: ERROR: attribute \"distinguishedName\" not allowed"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
-        command="ipa host-mod --addattr dn=anothernewDN $host1"
+        command="ipa host-mod --addattr dn=anothernewDN $myhost"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
+	deleteHost $myhost
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-host-cli-32: Negative - setattr and addattr on cn"
-        command="ipa host-mod --setattr cn=\"cn=new,cn=computers,dc=domain,dc=com\" $host1"
-        expmsg="ipa: ERROR: Operation not allowed on RDN:"
-        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
-        command="ipa host-mod --setattr cn=\"cn=new,cn=computers,dc=$RELM\" $host1"
-        expmsg="ipa: ERROR: modifying primary key is not allowed"
-        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
+        myhost="mytest.$RELM"
+        addHost $myhost
+        expmsg="ipa: ERROR: attribute cn not allowed"
+        command="ipa host-mod --setattr cn=mytest2.$RELM $myhost"
+	rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
 	expmsg="ipa: ERROR: cn: Only one value allowed."
-        command="ipa host-mod --addattr cn=\"cn=new,cn=computers,dc=$RELM\" $host1"
+        command="ipa host-mod --addattr cn=mytest3.$RELM $myhost"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
+	deleteHost $myhost
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-host-cli-33: Negative - setattr and addattr on keytab"
-        command="ipa host-mod --setattr keytab=true $host1"
+	myhost="mytest.$RELM"
+        addHost $myhost
+        command="ipa host-mod --setattr \"keytab=true\" $myhost"
         expmsg="ipa: ERROR: attribute keytab not allowed"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
-        command="ipa host-mod --addattr keytab=false $host1"
+        command="ipa host-mod --addattr keytab=false $myhost"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
-	deleteHost $host1
+	deleteHost $myhost
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-host-cli-34: Add 100 hosts and test find returns all"
@@ -366,7 +364,7 @@ rlJournalStart
         fi
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-cli-36: find 10 hosts"
+    rlPhaseStartTest "ipa-host-cli-36: find 10 hosts"
         ipa host-find --sizelimit=10 > /tmp/hostfind.out
         result=`cat /tmp/hostfind.out | grep "Number of entries returned"`
         number=`echo $result | cut -d " " -f 5`
@@ -425,9 +423,97 @@ rlPhaseStartTest "ipa-host-cli-38: find more hosts than exist"
         command="ipa host-find --timelimit=#*"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message - special characters."
     rlPhaseEnd
+
+    rlPhaseStartTest "ipa-host-cli-42: add Managed By Host"
+	myhost1=mytesthost1.$RELM
+	myhost2=mytesthost2.$RELM
+	addHost $myhost1
+	addHost $myhost2
+	rlRun "addHostManagedBy $myhost2 $myhost1" 0 "Adding Managed By Host"
+	rlRun "verifyHostAttr $myhost1 \"Managed by\" \"$myhost1, $myhost2\""
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-host-cli-43: removed Managed By Host"
+        rlRun "removeHostManagedBy $myhost2 $myhost1" 0 "Removing Managed By Host"
+        rlRun "verifyHostAttr $myhost1 \"Managed by\" $myhost1"
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-host-cli-44: add Multiple Managed By Host"
+        myhost1=mytesthost1.$RELM
+        myhost2=mytesthost2.$RELM
+	myhost3=mytesthost3.$RELM
+	addHost $myhost3
+        rlRun "addHostManagedBy \"$myhost2, $myhost3\" $myhost1" 0 "Adding Managed By Hosts"
+        rlRun "verifyHostAttr $myhost1 \"Managed by\" \"$myhost1, $myhost2\""
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-host-cli-45: removed Multiple Managed By Hosts"
+        myhost1=mytesthost1.$RELM
+        myhost2=mytesthost2.$RELM
+	myhost3=mytesthost3.$RELM
+        rlRun "removeHostManagedBy \"$myhost2, $myhost3\" $myhost1" 0 "Removing Managed By Hosts"
+        rlRun "verifyHostAttr $myhost1 \"Managed by\" $myhost1"
+        deleteHost $myhost1
+        deleteHost $myhost2
+	deleteHost $myhost3
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-host-cli-46: Add host with DNS Record"
+	short=myhost
+	myhost=$short.$RELM
+	rzone=`getReverseZone`
+	if [ $rzone ] ; then
+		oct=`echo $rzone | cut -d "i" -f 1`
+		oct1=`echo $oct | cut -d "." -f 3`
+		oct2=`echo $oct | cut -d "." -f 2`
+		oct3=`echo $oct | cut -d "." -f 1`
+		ipaddr=$oct1.$oct2.$oct3.99
+		export ipaddr
+		rlRun "ipa host-add --ipaddr=$ipaddr $myhost" 0 "Adding host with IP Address $ipaddr"
+		rlRun "findHost $myhost" 0 "Verifying host was added with IP Address."
+		rlRun "ipa dns-find-rr $RELM $short" 0 "Checking for forward DNS entry"
+		rlRun "ipa dns-find-rr $rzone 99" 0 "Checking for reverse DNS entry"
+	else
+		rlFail "Reverse DNS zone not found."
+	fi	
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-host-cli-47: Delete host without deleting DNS Record"
+	short=myhost
+        myhost=$short.$RELM
+	rlRun "deleteHost $myhost" 0 "Deleting host without deleting DNS entries"
+	rlRun "ipa dns-find-rr $RELM $short" 0 "Checking for forward DNS entry"
+	rlRun "ipa dns-find-rr $rzone 99" 0 "Checking for reverse DNS entry"
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-host-cli-48: Add host without force option - DNS Record Exists"
+	short=myhost
+        myhost=$short.$RELM
+	rlRun "ipa host-add $myhost" 0 "Add host DNS entries exist"
+	rlRun "findHost $myhost" 0 "Verifying host was added when DNS records exist."
+	rlRun "ipa dns-find-rr $RELM $short" 0 "Checking for forward DNS entry"
+        rlRun "ipa dns-find-rr $rzone 99" 0 "Checking for reverse DNS entry"
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-host-cli-49: Delete Host and Update DNS"
+	short=myhost
+        myhost=$short.$RELM
+	ipa host-add --force $myhost
+	rlRun "ipa host-del --updatedns $myhost" 0 "Delete host and update DNS"
+	rlRun "findHost $myhost" 1 "Verifying host was deleted."
+	rlRun "ipa dns-show-rr $RELM $ipaddr" 2 "Checking for forward DNS entry"
+        rlRun "ipa dns-show-rr $rzone 99" 2 "Checking for reverse DNS entry"
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-host-cli-50: Delete Host and Update DNS when DNS entriess do not exist"
+	short=myhost
+        myhost=$short.$RELM
+        ipa host-add --force $myhost
+        rlRun "ipa host-del --updatedns $myhost" 0 "Delete host and update DNS"
+	rlRun "findHost $myhost" 1 "Verifying host was deleted."
+    rlPhaseEnd
+
     rlPhaseStartCleanup "ipa-host-cli-cleanup: Destroying admin credentials."
-        rlRun "popd"
-        rlRun "rm -r $TmpDir" 0 "Removing tmp directory"
         i=1
         while [ $i -le 100 ] ; do
                 deleteHost host$i.$RELM
@@ -439,4 +525,7 @@ rlPhaseStartTest "ipa-host-cli-38: find more hosts than exist"
     rlPhaseEnd
 
 rlJournalPrintText
+report=$TmpDir/rhts.report.$RANDOM.txt
+makereport $report
+rhts-submit-log -l $report
 rlJournalEnd
