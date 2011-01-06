@@ -38,11 +38,11 @@
 
 rlJournalStart
     rlPhaseStartSetup "list files in /dev/shm"
-	rlRun "ls /dev/shm"
+	rlRun "ls /dev/shm" 0 "Listing files in /dev/shm"
     rlPhaseEnd
 
     rlPhaseStartTest "Verify shared libraries are available"
-	rlRun "ls /dev/shm/ipa-server-shared.sh" 
+	rlRun "ls /dev/shm/ipa-server-shared.sh" 0 "Checking for shared library"
     rlPhaseEnd
 
 rlJournalPrintText

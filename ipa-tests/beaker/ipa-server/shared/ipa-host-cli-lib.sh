@@ -9,6 +9,8 @@
 #	modHost
 #	verifyHostAttr
 #	verifyHostClasses
+#	addHostManagedBy
+#	removeHostManagedBy
 #	disableHost
 #	deleteHost
 #	getNumberOfHosts
@@ -100,6 +102,50 @@ modifyHost()
    fi
 
    return $rc
+}
+
+#######################################################################
+# addHostManagedBy Usage"
+#	addHostManagedBy <managedByHostname_list> <hostname>
+#######################################################################
+
+addHostManagedBy()
+{
+  managedbylist="$1"
+  myhost=$2
+  rc=0
+
+  ipa host-add-managedby --hosts="$managedbylist" $myhost
+  rc=$?
+  if [ $rc -ne 0 ] ; then
+	rlLog "WARNING: Adding Managed By Hosts failed for $myhost."
+  else
+	rlLog "Adding Managed By Hosts Successful."
+  fi
+
+  return $rc
+}
+
+#######################################################################
+# removeHostManagedBy Usage"
+#       removeHostManagedBy <managedByHostname> <hostname>
+#######################################################################
+
+removeHostManagedBy()
+{
+  managedbylist=$1
+  myhost=$2
+  rc=0
+
+  ipa host-remove-managedby --hosts="$managedbylist" $myhost
+  rc=$?
+  if [ $rc -ne 0 ] ; then
+        rlLog "WARNING: Removing Managed By Hosts failed for $myhost."
+  else  
+        rlLog "Removing Managed By Hosts Successful."
+  fi
+
+  return $rc
 }
 
 #######################################################################
