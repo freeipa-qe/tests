@@ -16,6 +16,7 @@
 #   create_ipauser
 #   delete_ipauser
 ######################################################################
+KINITEXC=/usr/bin/kinit
 #######################################################################
 # kinitAs Usage:
 #       kinitAs <username> <password>
@@ -32,7 +33,7 @@ kinitAs()
    echo 'set timeout 30
 set force_conservative 0
 set send_slow {1 .1}' > $expfile
-   echo "spawn /usr/kerberos/bin/kinit -V $username" >> $expfile
+   echo "spawn $KINITEXEC -V $username" >> $expfile
    echo 'match_max 100000' >> $expfile
    echo 'expect "*: "' >> $expfile
    echo 'sleep .5' >> $expfile
@@ -70,7 +71,7 @@ FirstKinitAs()
     rm -rf $expfile
     echo 'set timeout 30
 set send_slow {1 .1}' > $expfile
-    echo "spawn /usr/kerberos/bin/kinit -V $username" >> $expfile
+    echo "spawn $KINITEXEC -V $username" >> $expfile
     echo 'match_max 100000' >> $expfile
     echo 'expect "*: "' >> $expfile
     echo 'sleep .5' >> $expfile
@@ -341,14 +342,14 @@ getReverseZone()
 
 KinitAsAdmin()
 {
-    echo $adminpassword | /usr/kerberos/bin/kinit $admin 2>&1 >/dev/null
+    echo $adminpassword | $KINITEXEC $admin 2>&1 >/dev/null
 } #KinitAsAdmin
 
 KinitAsUser()
 {
     local userlogin=$1
     local password=$2
-    echo $password | /usr/kerberos/bin/kinit $userlogin 2>&1 >/dev/null
+    echo $password | $KINITEXEC $userlogin 2>&1 >/dev/null
 } #KinitAsUser
 
 create_ipauser()
@@ -391,7 +392,7 @@ create_ipauser()
     # set test account password 
     #FirstKinitAs $login $dummypw $password 2>&1 >/dev/null
     FirstKinitAs $login $dummypw $password 
-    /usr/kerberos/bin/kdestroy 2>&1 >/dev/null #clear admin's kerberos ticket
+    /usr/bin/kdestroy 2>&1 >/dev/null #clear admin's kerberos ticket
     echo $login
 } #create_ipauser
 
@@ -403,7 +404,7 @@ delete_ipauser()
     then
         KinitAsAdmin
         rlRun "ipa user-del $login" 0 "delete account [$login]"
-        /usr/kerberos/bin/kdestroy 2>&1 >/dev/null #clear admin's kerberos ticket
+        /usr/bin/kdestroy 2>&1 >/dev/null #clear admin's kerberos ticket
     else
         rlLog "account [$login] does not exist, do nothing"
     fi
