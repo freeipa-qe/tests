@@ -43,20 +43,12 @@
 # Test Suite Globals
 ########################################################################
 
-REALM=`os_getdomainname | tr "[a-z]" "[A-Z]"`
-DOMAIN=`os_getdomainname`
+RELM=`echo $RELM | tr "[a-z]" "[A-Z]"`
 
 ########################################################################
-ADMINID="admin"
-ADMINPW="redhat123"
-admin="admin"
-adminpassword="redhat123"
-
 user1="user1"
 user2="user2"
 userpw="Secret123"
-
-MASTER=`hostname`
 
 PACKAGE1="ipa-admintools"
 PACKAGE2="ipa-client"
@@ -64,15 +56,17 @@ PACKAGE2="ipa-client"
 TMP_KEYTAB="/opt/krb5.keytab"
 
 setup() {
+rlPhaseStartTest
         rlAssertRpm $PACKAGE1
         rlAssertRpm $PACKAGE2
 	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user" 
 	rlRun "create_ipauser $user1 $user1 $user1 $userpw"
 	sleep 5
-	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user" 
+	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 	rlRun "create_ipauser $user2 $user2 $user2 $userpw"
         rlRun "TmpDir=\`mktemp -d\`" 0 "Creating tmp directory"
         rlRun "pushd $TmpDir"
+rlPhaseEnd
 }
 
 getkeytab_001() {
@@ -91,7 +85,7 @@ rlPhaseStartTest "getkeytab_001: Testing the quiet mode command option."
 	rlRun "ipa-getkeytab --server $MASTER --principal $user1 --keytab $TMP_KEYTAB > $TmpDir/getkeytab.out 2>&1" 6
 	rlAssertGrep "$MSG" "$TmpDir/getkeytab.out"
 
-	# getkeytab with quiet mode option enabled.
+ 	# getkeytab with quiet mode option enabled.
 	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user" 
 	rlRun "ipa-getkeytab -q --server $MASTER --principal $user1 --keytab $TMP_KEYTAB > $TmpDir/getkeytab.out 2>&1"
 	if [ -s $TmpDir/getkeytab.out ]; then 
@@ -154,8 +148,8 @@ for i in "--principal" "-p"; do
         MSG="Keytab successfully retrieved and stored in: $TMP_KEYTAB"
         rlAssertGrep "$MSG" "$TmpDir/getkeytab.out"
 
-	# getkeytab when $PRINC@REALM
-	rlRun "ipa-getkeytab -s $MASTER $i $user1@$REALM --keytab $TMP_KEYTAB > $TmpDir/getkeytab.out 2>&1"
+	# getkeytab when $PRINC@RELM
+	rlRun "ipa-getkeytab -s $MASTER $i $user1@$RELM --keytab $TMP_KEYTAB > $TmpDir/getkeytab.out 2>&1"
 	MSG="Keytab successfully retrieved and stored in: $TMP_KEYTAB"
         rlAssertGrep "$MSG" "$TmpDir/getkeytab.out"
 done
@@ -182,7 +176,7 @@ for i in "--keytab" "-k" ; do
 
 	rlRun "ipa-getkeytab -s $MASTER --principal $user1 $i $TMP_KEYTAB"
         rlAssertExists "$TMP_KEYTAB"
-	rlRun "klist -ekt $TMP_KEYTAB | grep \"$REALM\" | wc -l > $TmpDir/getkeytab.out 2>&1"
+	rlRun "klist -ekt $TMP_KEYTAB | grep \"$RELM\" | wc -l > $TmpDir/getkeytab.out 2>&1"
 	MSG="8"
 	rlAssertGrep "$MSG" "$TmpDir/getkeytab.out"
 
@@ -417,11 +411,11 @@ rlPhaseStartTest "rmkeytab_002: Testing the \"-r\" command option."
 
 	rlRun "kinitAs $ADMINID $ADMINPW" 0
 	rlRun "ipa-getkeytab --server $MASTER --principal $user1 --keytab $TMP_KEYTAB" 0 "Getting keytab..."
-        rlRun "ipa-rmkeytab -r $REALM -k $TMP_KEYTAB > $TmpDir/rmkeytab.out 2>&1"
-        MSG="Removing principal $user1@$REALM"
+        rlRun "ipa-rmkeytab -r $RELM -k $TMP_KEYTAB > $TmpDir/rmkeytab.out 2>&1"
+        MSG="Removing principal $user1@$RELM"
         rlAssertGrep "$MSG" "$TmpDir/rmkeytab.out"
         rlRun "klist -ekt $TMP_KEYTAB > $TmpDir/keytab.out"
-        rlAssertNotGrep "$user1@$REALM" "$TmpDir/keytab.out"
+        rlAssertNotGrep "$user1@$RELM" "$TmpDir/keytab.out"
 
 rlPhaseEnd
 }
@@ -440,6 +434,7 @@ rlPhaseEnd
 }
 
 cleanup() {
+rlPhaseStartTest
 	rlRun "kinitAs $ADMINID $ADMINPW" 0
 	rlRun "ipa user-del $user1"
 	sleep 5
@@ -448,4 +443,5 @@ cleanup() {
 
         rlRun "popd"
         rlRun "rm -r $TmpDir" 0 "Removing tmp directory"
+rlPhaseEnd
 }

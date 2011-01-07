@@ -42,11 +42,6 @@
 # Include test case file
 . ./t.ipa-get-rm-keytab.sh
 
-# Test environment setup
-if [ ! -d $tmpdir ];then
-    mkdir -p $tmpdir
-fi
-
 PACKAGE="ipa-server"
 
 ##########################################
@@ -86,4 +81,7 @@ rlJournalStart
     rlPhaseEnd
 
 rlJournalEnd
+report=/tmp/rhts.report.$RANDOM.txt
+makereport $report
+rhts-submit-log -l $report
 rlJournalPrintText
