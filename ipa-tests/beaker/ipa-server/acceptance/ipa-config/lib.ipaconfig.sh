@@ -122,7 +122,7 @@ makereport()
 
 clear_kticket()
 {
-    /usr/kerberos/bin/kdestroy 2>&1 >/dev/null
+    kdestroy 2>&1 >/dev/null
 } #clear_kticket
 
 restore_ipaconfig()
