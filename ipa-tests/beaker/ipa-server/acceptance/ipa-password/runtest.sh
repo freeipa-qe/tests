@@ -37,6 +37,7 @@
 . /usr/bin/rhts-environment.sh
 . /usr/share/beakerlib/beakerlib.sh
 . /dev/shm/ipa-server-shared.sh
+. /dev/shm/env.sh
 
 # Include test case file
 . ./lib.ipapassword.sh

@@ -479,7 +479,8 @@ kinit_aftermaxlife()
 
 KinitAsAdmin()
 {
-    local pw=$adminpassword
+    #local pw=$adminpassword
+    local pw=$ADMINPW #use the password in env.sh file
     local out=$TmpDir/kinitasadmin.$RANDOM.txt
     local exp
     local temppw
