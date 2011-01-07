@@ -22,7 +22,7 @@ t_addusertest_envcleanup()
         rlRun "ipa user-del $superuser" 0 "delete $superuser account"
         rlRun "ipa user-del $lusr " 0 "delete $lusr account"
         rlLog "run kdestroy to clean up all ticket"
-        rlRun "/usr/kerberos/bin/kdestroy" 0 "remove all kinit tickets"
+        rlRun "kdestroy" 0 "remove all kinit tickets"
         if [ $? -ne 0 ];then
             rlFail "kinit as admin failed"
         else
@@ -171,7 +171,7 @@ t_unlockuser()
 t_moduser_envsetup()
 {
     rlPhaseStartTest "Add User - Define Only Required Attributes" # sort=200
-        rlRun "/usr/kerberos/bin/kdestroy" 0 "remove all kinit tickets"
+        rlRun "kdestroy" 0 "remove all kinit tickets"
         kinitAs $admin $adminpassword
         rlRun "ipa user-add --first=superuserfirst --last=superuserlast $musr" 0 "add test user account"
         rlRun "ipa user-find $musr | grep $musr" 0 "confirm the existance of test account"
@@ -182,7 +182,7 @@ t_moduser_envcleanup()
 {
     rlPhaseStartTest "clean up env for moduser test" # sort=299
         rlRun "ipa user-del $musr" 0 "remove test user account [$musr]"
-        rlRun "/usr/kerberos/bin/kdestroy" 0 "remove all kinit tickets"
+        rlRun "kdestroy" 0 "remove all kinit tickets"
     rlPhaseEnd
 } #t_moduser_envcleanup
 
@@ -386,7 +386,7 @@ t_showusertest_envsetup()
 t_showusertest_envcleanup()
 {
     rlPhaseStartTest "show user test env cleanup" # sort=399
-        rlRun "/usr/kerberos/bin/kdestroy" 0 "remove all kinit tickets"
+        rlRun "kdestroy" 0 "remove all kinit tickets"
         kinitAs $admin $adminpassword 
         rlRun "ipa user-del $suser"
     rlPhaseEnd
