@@ -11,7 +11,7 @@ adminpassword="redhat123"
 realm="SJC.REDHAT.COM"
 initialpw="Initial@123"
 tmpdir="/dev/shm/ipapassword/tmp"
-kdestroy="/usr/kerberos/bin/kdestroy 2>&1 >/dev/null"
+kdestroy="kdestroy 2>&1 >/dev/null"
 
 ntpserver="wiki.idm.lab.bos.redhat.com"
 initialpw="initial123@IPA"
