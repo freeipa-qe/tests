@@ -40,13 +40,13 @@ delete_user()
 KinitAsAdmin()
 {
     # simple kinit function
-    echo $adminpassword | /usr/kerberos/bin/kinit $admin 2>&1 >/dev/null
+    echo $adminpassword | kinit $admin 2>&1 >/dev/null
     #rlRun "echo $adminpassword | kinit $admin"
 } #KinitAsAdmin
 
 clear_kticket()
 {
-    /usr/kerberos/bin/kdestroy 2>&1 >/dev/null
+    kdestroy 2>&1 >/dev/null
 } #clear_kticket
 
 read_maxlife()
