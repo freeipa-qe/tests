@@ -454,7 +454,7 @@ kinit_aftermaxlife()
     echo "set timeout 30" > $exp
     echo "set force_conservative 0" >> $exp
     echo "set send_slow {1 .1}" >> $exp
-    echo "spawn /usr/kerberos/bin/kinit -V $username" >> $exp
+    echo "spawn kinit -V $username" >> $exp
     echo 'match_max 100000' >> $exp
     echo 'expect "*: "' >> $exp
     echo 'sleep .5' >> $exp
