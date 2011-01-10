@@ -16,7 +16,7 @@
 #   create_ipauser
 #   delete_ipauser
 ######################################################################
-KINITEXC=/usr/bin/kinit
+KINITEXEC=/usr/bin/kinit
 #######################################################################
 # kinitAs Usage:
 #       kinitAs <username> <password>
