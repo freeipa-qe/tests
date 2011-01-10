@@ -320,7 +320,7 @@ rlJournalStart
         fi
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-user-clil-add-025: Delete Users"
+    rlPhaseStartTest "ipa-user-cli-add-025: Delete Users"
 	i=1
         while [ $i -le 100 ] ; do
                 ipa user-del user$i
