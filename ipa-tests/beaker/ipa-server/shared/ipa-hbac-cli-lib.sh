@@ -46,8 +46,8 @@ addHBACRule()
    rulename=$6
    rc=0
 
-	rlLog "Executing: ipa hbac-add --type=$type --usercat=$usercat --hostcat=$hostcat --srchostcat=$srchostcat --servicecat=$servicecat $rulename"
-	ipa hbac-add --type=$type --usercat=$usercat --hostcat=$hostcat --srchostcat=$srchostcat --servicecat=$servicecat $rulename
+	rlLog "Executing: ipa hbacrule-add --type=$type --usercat=$usercat --hostcat=$hostcat --srchostcat=$srchostcat --servicecat=$servicecat $rulename"
+	ipa hbacrule-add --type=$type --usercat=$usercat --hostcat=$hostcat --srchostcat=$srchostcat --servicecat=$servicecat $rulename
 	rc=$?
    	if [ $rc -ne 0 ] ; then
         	rlLog "WARNING: Adding new hbac rule $rulename failed."
@@ -67,10 +67,10 @@ addHBACRule()
 findHBACRule()
 {
    rulename=$1
-   ipa hbac-find $rulename
+   ipa hbacrule-find $rulename
    rc=$?
    if [ $rc -eq 0 ] ; then
-	result=`ipa hbac-find $rulename`
+	result=`ipa hbacrule-find $rulename`
 
 	# check rule name
  	echo $result | grep "Rule name: $rulename"
@@ -122,8 +122,8 @@ findHBACRuleByOption()
    tmpfile=/tmp/findrulebyoption.txt
    rm -rf $tmpfile
 
-   rlLog "Executing: ipa hbac-find $flag=$value"
-   ipa hbac-find $flag=$value > $tmpfile
+   rlLog "Executing: ipa hbacrule-find $flag=$value"
+   ipa hbacrule-find $flag=$value > $tmpfile
    rc=$?
    if [ $rc -eq 0 ] ; then
 	rlLog "Searching for rules: $rules"
@@ -133,12 +133,12 @@ findHBACRuleByOption()
 		if [ $? -eq 0 ] ; then
 			rlLog "Rule $item found as expected."
 		else
-			rlLog "ERROR: Rule $item was not found."
+			rlLog "WARNING: Rule $item was not found."
 			rc=1
 		fi
 	done
    else
-   	rlLog "WARNING: hbac-find command faied."
+   	rlLog "WARNING: hbacrule-find command faied."
    fi
 
    return $rc
@@ -156,7 +156,7 @@ verifyHBACStatus()
    rc=0
    tmpfile=/tmp/hbacfind.out
 
-   ipa hbac-find $rulename > $tmpfile
+   ipa hbacrule-find $rulename > $tmpfile
    rc=$?
    if [ $rc -eq 0 ] ; then
 	result=`cat $tmpfile | grep "Enabled" | cut -d ":" -f 2`
@@ -167,7 +167,7 @@ verifyHBACStatus()
 		rlLog "$rulename is $status as expected."
    	fi
    else
-	rlLog "WARNING: ipa hbac-find command failed."
+	rlLog "WARNING: ipa hbacrule-find command failed."
    fi
 
    return $rc
@@ -184,7 +184,7 @@ disableHBACRule()
    rulename=$1
    rc=0
 
-   ipa hbac-disable $rulename
+   ipa hbacrule-disable $rulename
    rc=$?
    if [ $rc -ne 0 ] ; then
         rlLog "WARNING: Disabling hbac rule $rulename failed."
@@ -205,7 +205,7 @@ enableHBACRule()
    rulename=$1
    rc=0
 
-   ipa hbac-enable $rulename
+   ipa hbacrule-enable $rulename
    rc=$?
    if [ $rc -ne 0 ] ; then
         rlLog "WARNING: Enabling hbac rule $rulename failed."
@@ -228,11 +228,11 @@ addToHBAC()
    objects=$4
    rc=0
 
-   rlLog "EXECUTING: ipa hbac-add-$option --$type=\"$objects\" $rulename"
-   ipa hbac-add-$option --$type="$objects" $rulename
+   rlLog "EXECUTING: ipa hbacrule-add-$option --$type=\"$objects\" $rulename"
+   ipa hbacrule-add-$option --$type="$objects" $rulename
    rc=$?
    if [ $rc -ne 0 ] ; then 
-	rlLog "WARNING: ipa hbac-add-$option failed to objects \"$objects\" of type $type to Rule $rulename"
+	rlLog "WARNING: ipa hbacrule-add-$option failed to objects \"$objects\" of type $type to Rule $rulename"
    else
 	rlLog "\"$objects\" of type $type successfully added to Rule $rulename"
    fi
@@ -252,11 +252,11 @@ removeFromHBAC()
    objects=$4
    rc=0
 
-   rlLog "EXECUTING: ipa hbac-remove-$option --$type=\"$objects\" $rulename"
-   ipa hbac-remove-$option --$type="$objects" $rulename
+   rlLog "EXECUTING: ipa hbacrule-remove-$option --$type=\"$objects\" $rulename"
+   ipa hbacrule-remove-$option --$type="$objects" $rulename
    rc=$?
    if [ $rc -ne 0 ] ; then
-        rlLog "WARNING: ipa hbac-remove-$option failed to objects \"$objects\" of type $type to Rule $rulename"
+        rlLog "WARNING: ipa hbacrule-remove-$option failed to objects \"$objects\" of type $type to Rule $rulename"
    else
         rlLog "\"$objects\" of type $type successfully removed from Rule $rulename"
    fi
@@ -275,7 +275,7 @@ modifyHBACRule()
   value=$3
   rc=0
 
-  ipa hbac-mod --$option="$value" $rulename
+  ipa hbacrule-mod --$option="$value" $rulename
   rc=$?
   if [ $rc -eq 0 ] ; then
 	rlLog "Modify rule $rulename $option successful. Value: $value"
@@ -301,7 +301,7 @@ verifyHBACAssoc()
 
   tmpfile=/tmp/hbacshow.out
 
-  ipa hbac-show --all $rulename > $tmpfile
+  ipa hbacrule-show --all $rulename > $tmpfile
   rc=$?
   if [ $rc -eq 0 ] ; then
      objects=`cat $tmpfile | grep "$objtype" | cut -d ":" -f 2`
@@ -313,7 +313,7 @@ verifyHBACAssoc()
         rc=1
      fi
  else
-     rlLog "ERROR: ipa hbac-show command failed"
+     rlLog "ERROR: ipa hbacrule-show command failed"
  fi
 
  return $rc
@@ -329,7 +329,7 @@ deleteHBACRule()
    rulename=$1
    rc=0
 
-   ipa hbac-del $rulename
+   ipa hbacrule-del $rulename
    rc=$?
    if [ $rc -ne 0 ] ; then
         rlLog "WARNING: Deleting hbac rule $rulename failed."
