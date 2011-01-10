@@ -29,7 +29,7 @@ export TESTVERSION=1.0
 
 BUILT_FILES=
 
-FILES=$(METADATA) runtest.sh Makefile PURPOSE
+FILES=$(METADATA) runtest.sh rhel-gold.repo Makefile PURPOSE
 
 .PHONY: all install download clean
 
@@ -37,6 +37,8 @@ run: $(FILES) build
 	#yum -y install expect
 	#expect ./set-root-pw.exp
 	#wget http://apoc.dsdev.sjc.redhat.com/tet/rhts-get.txt
+	chmod 755 ./rhel-gold.repo
+	cp ./rhel-gold.repo /dev/shm/.
 	./runtest.sh
 
 build: $(BUILT_FILES)

@@ -31,7 +31,20 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 nfslocation="n0abos-0.bos.redhat.com:/vol/archives_mp1"
-iparepo="http://jdennis.fedorapeople.org/ipa-devel/ipa-devel-fedora.repo"
+
+# Determining OS, variant, and processor type
+if [ -x $VARIANT ]; then
+	cat /etc/redhat-release | grep Fedora
+	if [ $? -eq 0 ]; then
+		VARIANT="Fedora"
+		export iparepo="http://jdennis.fedorapeople.org/ipa-devel/ipa-devel-fedora.repo"
+	fi
+	cat /etc/redhat-release | grep Red
+	if [ $? -eq 0 ]; then
+		VARIANT="RHEL"
+		export iparepo="http://jdennis.fedorapeople.org/ipa-devel/ipa-devel-rhel.repo"
+	fi
+fi
 
 # Include rhts environment
 . /usr/bin/rhts-environment.sh
@@ -122,17 +135,6 @@ fi
 #	exit;
 #fi
 
-# Determining OS, variant, and processor type
-if [ -x $VARIANT ]; then
-	cat /etc/redhat-release | grep Fedora
-	if [ $? -eq 0 ]; then
-		VARIANT="Fedora"
-	fi
-	cat /etc/redhat-release | grep Red
-	if [ $? -eq 0 ]; then
-		VARIANT="RHEL"
-	fi
-fi
 if [ -x $ARCH ]; then
 	file /bin/ls | grep 32-bit
 	if [ $? -eq 0 ]; then
@@ -147,6 +149,8 @@ if [ "$VARIANT" = "Fedora" ]; then
 fi
 if [ "$VARIANT" = "rhel" ]; then
 	VER=$(cat /etc/redhat-release | cut -d\  -f7)
+	rm -f /etc/yum.repos.d/rhel-gold.repo
+	cp /dev/shm/rhel-gold.repo /etc/yum.repos.d/.
 fi
 
 tempdir="/root/dist/$VARIANT/$VER/$ARCH"
