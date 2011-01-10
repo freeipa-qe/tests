@@ -13,6 +13,9 @@
 			<watchdog/>
 			<packages/>
 			<ks_appends/>
+			<repos>
+				<repo name="ipa" url="http://jdennis.fedorapeople.org/ipa-devel/fedora/14/x86_64/os/"/>
+				<repo name="beaker-harness" url="http://beaker-stage.app.eng.bos.redhat.com/harness/Fedora14/\$basearch"/>
 			<repos/>
 			<distroRequires>
 				<and>
@@ -53,6 +56,9 @@
 			<watchdog/>
 			<packages/>
 			<ks_appends/>
+			<repos>
+				<repo name="ipa" url="http://jdennis.fedorapeople.org/ipa-devel/fedora/14/x86_64/os/"/>
+			        <repo name="beaker-harness" url="http://beaker-stage.app.eng.bos.redhat.com/harness/Fedora14/\$basearch"/>
 			<repos/>
 			<distroRequires>
 				<and>
@@ -94,6 +100,9 @@
 			<watchdog/>
 			<packages/>
 			<ks_appends/>
+			<repos>
+				<repo name="ipa" url="http://jdennis.fedorapeople.org/ipa-devel/fedora/14/x86_64/os/"/>
+				<repo name="beaker-harness" url="http://beaker-stage.app.eng.bos.redhat.com/harness/Fedora14/\$basearch"/>
 			<repos/>
 			<distroRequires>
 				<and>
