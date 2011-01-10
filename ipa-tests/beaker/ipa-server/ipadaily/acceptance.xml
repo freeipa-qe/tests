@@ -67,6 +67,10 @@
 			<task name="/CoreOS/ipa-server/acceptance/nis-cli" role="MASTER">
 				<params/>
 			</task>
+			<task>
+			<task name="/CoreOS/ipa-server/acceptance/ipa-get-rm-keytab" role="MASTER">
+				<params/>
+			</task>
 			<task name="/CoreOS/ipa-server/acceptance/uninstall" role="STANDALONE">
 				<params/>
 			</task>
