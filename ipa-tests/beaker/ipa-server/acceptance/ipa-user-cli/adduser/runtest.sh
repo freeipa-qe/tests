@@ -111,7 +111,7 @@ rlJournalStart
         if [ $? -ne 0 ];then
             rlFail "ERROR - ipa user-disable failed "
         else
-            rlRun "verifyUserAttr $lusr \"Account disabled\" true" 0 "Verify user's account disabled status"
+            rlRun "verifyUserAttr $lusr \"Account activation status\" True" 0 "Verify user's account disabled status"
             kinitAs $lusr $lusrpw
             if [ $? -ne 0 ];then
                 rlPass "kinit as $lusr failed as expected"
@@ -133,7 +133,7 @@ rlJournalStart
         if [ $? -ne 0 ];then
             rlFail "ERROR - ipa user-enable failed "
         else
-	    rlRun "verifyUserAttr $lusr \"Account disabled\" false" 0 "Verify user's account disabled status"
+	    rlRun "verifyUserAttr $lusr \"Account activation status\" False" 0 "Verify user's account disabled status"
             kinitAs $lusr $lusrpw
             if [ $? -ne 0 ];then
                 rlFail "ERROR - kinit as $lusr failed after unlock. expect success "
@@ -151,7 +151,7 @@ rlJournalStart
 	rlRun "cat $tmpfile | grep \"Last name: $superuserlast\"" 0 "Verify Last name"
 	rlRun "cat $tmpfile | grep \"Home directory: /home/$lusr\"" 0 "Verify home directory"
 	rlRun "cat $tmpfile | grep \"Login shell: /bin/sh\"" 0 "Verify Login shell"
-	rlRun "cat $tmpfile | grep \"Account disabled: false\"" 0 "Verify account status"
+	rlRun "cat $tmpfile | grep \"Account activation status: False\"" 0 "Verify account status"
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-user-cli-add-008: Unlock an unlocked user"
@@ -163,36 +163,36 @@ rlJournalStart
 
     rlPhaseStartTest "ipa-user-cli-add-009: Over Max username length"
         command="ipa user-add --first=test --last=test abcdefghijklmnopqrstuvwxyx12345678"
-        expmsg="ipa: ERROR: invalid 'uid': can be at most 32 characters"
+        expmsg="ipa: ERROR: invalid 'login': can be at most 32 characters"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-user-cli-add-010: Invalid username character - #"
         command="ipa user-add --first=test --last=test abcd#"
-        expmsg="ipa: ERROR: invalid 'uid': may only include letters, numbers, _, -, . and $"
+        expmsg="ipa: ERROR: invalid 'login': may only include letters, numbers, _, -, . and $"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-user-cli-add-011: Invalid username character - @"
         command="ipa user-add --first=test --last=test abcd@"
-        expmsg="ipa: ERROR: invalid 'uid': may only include letters, numbers, _, -, . and $"
+        expmsg="ipa: ERROR: invalid 'login': may only include letters, numbers, _, -, . and $"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-user-cli-add-012: Invalid username character - *"
         command="ipa user-add --first=test --last=test abcd*"
-        expmsg="ipa: ERROR: invalid 'uid': may only include letters, numbers, _, -, . and $"
+        expmsg="ipa: ERROR: invalid 'login': may only include letters, numbers, _, -, . and $"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-user-cli-add-013: Invalid username character - ?"
         command="ipa user-add --first=test --last=test abcd?"
-        expmsg="ipa: ERROR: invalid 'uid': may only include letters, numbers, _, -, . and $"
+        expmsg="ipa: ERROR: invalid 'login': may only include letters, numbers, _, -, . and $"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-user-cli-add-014: uid 0"
-        command="ipa user-add --first=uid0 --last=uid0 --uidNumber=0 uid0"
+        command="ipa user-add --first=uid0 --last=uid0 --uid=0 uid0"
         expmsg="ipa: ERROR: uid 0 not allowed"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
 	ipa user-del uid0
@@ -372,7 +372,7 @@ rlJournalStart
     rlPhaseStartTest "ipa-user-cli-add-030: Add user - group with same name already exists"
 	rlRun "addGroup johnny johnny" 0 "Adding a test group"
 	command="ipa user-add --first=johnny --last=johnny johnny"
-	expmsg="ipa: ERROR: failed to add user, group with name 'johnny' already exists"
+	expmsg="ipa: ERROR: Unable to create private group. A group 'johnny' already exists."
 	rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message"
 	# clean up
 	ipa group-del johnny
