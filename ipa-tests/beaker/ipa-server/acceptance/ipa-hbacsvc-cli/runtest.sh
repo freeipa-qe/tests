@@ -61,7 +61,7 @@ servicegroup2="web"
 PACKAGE="ipa-admintools"
 
 rlJournalStart
-    rlPhaseStartSetup "ipa-hbac-cli-startup: Check for admintools package and Kinit"
+    rlPhaseStartSetup "ipa-hbacsvc-cli-startup: Check for admintools package and Kinit"
         rlAssertRpm $PACKAGE
         rlRun "TmpDir=\`mktemp -d\`" 0 "Creating tmp directory"
         rlRun "pushd $TmpDir"
@@ -70,7 +70,7 @@ rlJournalStart
 
     rlPhaseStartTest "ipa-hbacsvc-cli-001: Negative - Add HBAC Service that already exists"
         command="ipa hbacsvc-add sshd"
-        expmsg="ipa: ERROR: HBAC service with name sshd already exists"
+        expmsg="ipa: ERROR: hbacsvc with name sshd already exists"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for empty Rule Type"
     rlPhaseEnd
 
@@ -139,7 +139,7 @@ rlJournalStart
 
     rlPhaseStartTest "ipa-hbacsvc-cli-010: Negative - Add HBAC Service Group that already exists"
         command="ipa hbacsvcgroup-add --desc=test SUDO"
-        expmsg="ipa: ERROR: HBAC service group with name SUDO already exists"
+        expmsg="ipa: ERROR: hbacsvcgroup with name sudo already exists"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for empty Rule Type"
     rlPhaseEnd
 
@@ -244,10 +244,7 @@ rlJournalStart
         rlRun "verifyHBACService https memberof \"cn=$servicegroup2,cn=hbacservicegroups,cn=accounts,dc=$RELM\"" 1 "Verifying service exists but membership was removed."
     rlPhaseEnd
 
-    rlPhaseStartCleanup "ipa-hbac-cli-cleanup: Destroying admin credentials."
-        rlRun "popd"
-        rlRun "rm -r $TmpDir" 0 "Removing tmp directory"
-
+    rlPhaseStartCleanup "ipa-hbacsvc-cli-cleanup: Destroying admin credentials."
 	# delete service groups
 	rlRun "deleteHBACService $service1" 0 "CLEANUP: Deleting service $service1"
 	rlRun "deleteHBACService $service2" 0 "CLEANUP: Deleting service $service2"
@@ -257,4 +254,7 @@ rlJournalStart
     rlPhaseEnd
 
 rlJournalPrintText
+report=$TmpDir/rhts.report.$RANDOM.txt
+makereport $report
+rhts-submit-log -l $report
 rlJournalEnd
