@@ -46,6 +46,15 @@ if ( -r $signturefile){
         $testcase{"index"} = "$index";
         $testcase{"name"}  = $testname;
         $testcase{"signture"} = $value;
+        my $tc_type="positive";
+        if ($value=~ /negative/){
+            $tc_type = "negative";
+        }elsif ($value=~ /boundary/){
+            $tc_type = "boundary";
+        }else{
+            $tc_type = "positive";
+        }
+        $testcase{"testtype"} = $tc_type;
         $tc{"$index"} = \%testcase;
         #print "\n[$index]=>[$testname]";
         $total=$_+1;
@@ -86,7 +95,8 @@ foreach my $index (sort keys %tc){
     my %testcase = %$tc_ref;
     my $name = $testcase{"name"};
     my $signture = $testcase{"signture"};
-    print DEST "$indent"."$name  #test_scenario: [$signture]";
+    my $tc_type= $testcase{"testtype"};
+    print DEST "$indent"."$name  #test_scenario ($tc_type test): [$signture]";
 }# parse the tc hash data and generate test case content
 print DEST "$indent"."$ipasubcmd"."_envcleanup";
 print DEST "\n} #$ipasubcmd\n";
@@ -181,9 +191,10 @@ sub createTestCase{
     my $name = $testcase{"name"};
     my $signture = $testcase{"signture"};
     my $index = $testcase{"index"};
+    my $tc_type = $testcase{"testtype"};
     my $tc="";
     $tc .= "\n$name()";
-    $tc .= "\n{ #signture: $signture";
+    $tc .= "\n{ #test_scenario ($tc_type): $signture";
     $tc .= "$indent"."rlPhaseStartTest \"$name\"";
     $tc .= "$indent2"."KinitAsAdmin";
     my @ipatestcommand = buildTestStatement($subcmd, $signture);
