@@ -16,14 +16,14 @@ our @subcmds;
 our $tempint=int(rand()*1000);
 our %understanding;
 our %GeneralOptionRules=(
-        "--all"=>"any",
-        "--raw"=>"any",
-        "--timelimit"=>"any",
-        "--sizelimit"=>"any",
+        "--all"=>"all",
+        "--raw"=>"all",
+        "--timelimit"=>"all",
+        "--sizelimit"=>"all",
         "--rights"=>"must --all",
-        "--setattr"=>"only",
-        "--addattr"=>"only",
-        "default"=>"any"
+        "--setattr"=>"none",
+        "--addattr"=>"none",
+        "default"=>"all"
         );
 our %GeneralOptionData=(
         "--all"=>"none",
@@ -279,9 +279,9 @@ sub prepare {
             }
             print DATA "\n# $option_doc";
             #print DATA "\n$option: $option_datatype";
-            print DATA "\n$option (positive):";
-            print DATA "\n$option (boundary):";
-            print DATA "\n$option (negative):";
+            print DATA "\n$option (positive):".$option_datatype;
+            print DATA "\n$option (boundary):".$option_datatype;
+            print DATA "\n$option (negative):".$option_datatype;
             print DATA "\n";
         }# print original docuemnt and followed by option's data type into DATA file
         print DATA   "\n\n";
@@ -430,9 +430,12 @@ sub getGeneralRule{
 
 sub getGeneralData{
     my ($option , $data) = @_;
+    my $datavalue;
     if (! exists $data->{$option}){
+        print "\ndefault apply to [$option]";
         return $data->{"default"};
     }else{
+        print "\ndata rule found for [$option]";
         return $data->{$option};
     }
 } #getGeneralData

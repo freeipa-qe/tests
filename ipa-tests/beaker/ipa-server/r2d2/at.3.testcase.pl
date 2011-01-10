@@ -19,10 +19,14 @@ our %tc; # hash table to hold each test case signture and their index;
 our $total;
 our $indent="\n    ";
 our $indent2="\n        ";
+our $indent4="\n                ";
 # command line argument parse
 our $totalArgs=$#ARGV;
 if ($totalArgs == 1) {
     $ipasubcmd    = $ARGV[0];
+    if ($ipasubcmd =~ /-/){
+        $ipasubcmd =~ s/-/_/;
+    }
     $signturefile = $ARGV[1];
     $testcasefile = "$signturefile.testcase";
 }else{
@@ -76,20 +80,37 @@ print DEST "\n\n#Total $total test cases";
 print DEST "\n";
 print DEST "\n$ipasubcmd()";
 print DEST "\n{";
+print DEST "$indent"."$ipasubcmd"."_envsetup";
 foreach my $index (sort keys %tc){
     my $tc_ref = $tc{$index};
     my %testcase = %$tc_ref;
     my $name = $testcase{"name"};
     my $signture = $testcase{"signture"};
-    print DEST "$indent"."$name  #signture: [$signture]";
+    print DEST "$indent"."$name  #test_scenario: [$signture]";
 }# parse the tc hash data and generate test case content
+print DEST "$indent"."$ipasubcmd"."_envcleanup";
 print DEST "\n} #$ipasubcmd\n";
+
+# create env setup and cleanup test case
+print DEST "\n$ipasubcmd"."_envsetup()";
+print DEST "\n{";
+print DEST "$indent"."rlPhaseStartSetup \"$ipasubcmd"."_envsetup\"";
+print DEST "$indent2"."#environment setup starts here";
+print DEST "$indent2"."#environment setup ends   here";
+print DEST "$indent"."rlPhaseEnd";
+print DEST "\n} #envsetup\n";
+
+print DEST "\n$ipasubcmd"."_envcleanup()";
+print DEST "\n{";
+print DEST "$indent"."rlPhaseStartCleanup \"$ipasubcmd"."_envcleanup\"";
+print DEST "$indent2"."#environment cleanup starts here";
+print DEST "$indent2"."#environment cleanup ends   here";
+print DEST "$indent"."rlPhaseEnd";
+print DEST "\n} #envcleanup\n";
+# end of create env setup & cleanup block
 
 foreach my $index (sort keys %tc){
     my $tc_ref = $tc{$index};
-    #my %testcase = %$tc_ref;
-    #my $name = $testcase{"name"};
-    #my $signture = $testcase{"signture"};
     my $testcase = createTestCase($ipasubcmd,$tc_ref);
     #print DEST "\n#[$index] [$name],[$signture]";
     print DEST $testcase;
@@ -208,7 +229,7 @@ sub buildTestStatement{
             }
             my $optionData = $optionParts[2];
 
-            my $localVariableStatement = "local $optionVariableName=getTestValue(\"$option\")";
+            my $localVariableStatement = "local $optionVariableName=getTestValue(\"$subcmd;$option\")";
             push @localVariableDeclarition, $localVariableStatement;
             $testCmdStatement .= " --$optionName \$$optionVariableName";
             $testCommentStatement .=" [$optionName]=[\$$optionVariableName]";

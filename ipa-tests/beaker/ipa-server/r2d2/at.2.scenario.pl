@@ -16,14 +16,12 @@ print "scenario engine starts...";
 our $ipacmd;
 our $syntaxfile;
 our $datafile;
-our $testsignture;
 # command line argument parse
 our $totalArgs=$#ARGV;
 if ($totalArgs == 2) {
     $ipacmd     = $ARGV[0];
     $syntaxfile = $ARGV[1];
     $datafile   = $ARGV[2];
-    $testsignture = "$ipacmd.testsignture";
 }else{
     usage();
     exit;
@@ -41,27 +39,33 @@ foreach my $ipasubcmd (keys %syntax){
     my %syntax_details = %$syntax_ref;
     my @options = keys %syntax_details;
     my @all=optengine($ipasubcmd, \@options, \%syntax_details);
-    print "\nget all options";
+    print "\n[$ipasubcmd] total options: [$#all]";
     my @tempAll;
     foreach my $option (@all){
         my $sortedOption= arrayTostring(sortArray(stringToarray($option)));
         push @tempAll , $sortedOption;
     }
     my @sortedAll = sortArray (@tempAll);
-    #printArray(@sortedAll);
-    my @smog = scenarioExtractor ("smog", @sortedAll);
-    print "\n===== smog test cases ======";
-    my @sortedSmog;
-    foreach my $option (@smog){
-        my $sortedOption = arrayTostring(sortArray(stringToarray($option)));
-        push @sortedSmog, $sortedOption;
-    }
-    printArray(@sortedSmog);
-    push @allsmogtest,@sortedSmog;
-    $ipatestcase{$ipasubcmd} = \@allsmogtest;
-    print "\n============ all smog test cases option ================";
-    printArray(@allsmogtest);
-    print "\n========================================================";
+    printArray(@sortedAll);
+    $ipatestcase{$ipasubcmd} = \@sortedAll;
+
+    # I have a big bug right here:
+    #   Although the logic below are correct, the computation time is tooooo long to use them.
+    #   This is reason why I change to use 'computeMinOpts' function to reduce the calculation time
+
+    #my @smog = scenarioExtractor ("smog", @sortedAll);
+    #print "\n===== smog test cases ======";
+    #my @sortedSmog;
+    #foreach my $option (@smog){
+    #    my $sortedOption = arrayTostring(sortArray(stringToarray($option)));
+    #    push @sortedSmog, $sortedOption;
+    #}
+    #printArray(@sortedSmog);
+    #push @allsmogtest,@sortedSmog;
+    #$ipatestcase{$ipasubcmd} = \@allsmogtest;
+    #print "\n============ all smog test cases option ================";
+    #printArray(@allsmogtest);
+    #print "\n========================================================";
 }#foreach
 
 
@@ -70,15 +74,14 @@ our %data = parseConfFile($datafile);
 printConf (\%data);
 
 foreach my $ipasubcmd (keys %ipatestcase ){
-    my $smogtest_ref = $ipatestcase{$ipasubcmd};
-    my @smogtest = @$smogtest_ref;
+    my $testcase_ref = $ipatestcase{$ipasubcmd};
+    my @testcase = @$testcase_ref;
     my $data_ref = $data{$ipasubcmd};
     my @allfinal=();
     print "\nipa cmd: $ipasubcmd";
-    foreach my $smogoption(@smogtest){
+    foreach my $testoptions (@testcase){
         my @finaltest=();
-        my @optionlist = split (/ /,$smogoption);
-        #print "\nsmog test: [$smogoption]";
+        my @optionlist = split (/ /,$testoptions);
         foreach my $thisoption (@optionlist){
             #print "[Option: $thisoption] has final test case as below:";
             my @optiondata = parseData($thisoption, $data_ref);
@@ -102,15 +105,20 @@ foreach my $ipasubcmd (keys %ipatestcase ){
         # remove some test 
         my @readytopush=();
         foreach my $testscenario (@finaltest){
-            next if ($testscenario =~ /negative(.*)boundary/);
+            
+            next if ($testscenario =~ /negative(.*)negative/); # negative test case does NOT combine with another negative test scenario
+            next if ($testscenario =~ /negative(.*)boundary/); # negative test case does not combine with boundary check
             next if ($testscenario =~ /boundary(.*)negative/);
+            next if ($testscenario =~ /boundary(.*)boundary/); # boundary check does not combine with other positive or boundary check, it goes alone
+            next if ($testscenario =~ /boundary(.*)positive/);
+            next if ($testscenario =~ /positive(.*)boundary/);
             push @readytopush, $testscenario;
         }
         push @allfinal, @readytopush;
     }#finall, we get the test case scenario for each ipa sub command
     print "\n--------------- final test scenario for [$ipasubcmd]---------------------";
     printArray(@allfinal);
-    my $outputfile = "$testsignture.$ipasubcmd.scenario";
+    my $outputfile = "$ipacmd.$ipasubcmd.scenario";
     writeToSignture($ipasubcmd, \@allfinal, $outputfile);
 }#this is loop for ipa sub command
 
@@ -246,6 +254,10 @@ sub extractSmog {
 
 sub optengine {
     my ($cmd, $options_ref, $rules_ref) = @_ ;
+    my @minopts= computeMinimumOpts($rules_ref,$options_ref); 
+    return @minopts;
+
+    # the rest of code take too much time, it is not practical
     my %rules= %$rules_ref;
     my @allopts = computeAllOpts($options_ref); 
     #print "\n-------ALl possible combinations--------";
@@ -258,6 +270,42 @@ sub optengine {
     #return sortArray(@optsafter);
     return @optsafter;
 }# optengine
+
+sub computeMinimumOpts {
+    my ($syntax_ref, $option_ref) = @_;
+    my %syntax = %$syntax_ref;
+    my @option = @$option_ref;
+    #print "\n=========options==============";
+    #printArray(sortArray(@option));
+    #print "\n-------------hash-------------";
+    #printHashRef($syntax_ref);
+    #print "\n=======================";
+    my @queue=();
+    my $longform="";
+    foreach (@option){
+        #the value in @option looks like: --desc (negative)
+        my @array = split(/ /,$_);
+        my $opt = $array[0];
+        #print "\ndebug: opt[$opt]";
+        my $rule = $syntax{$opt};
+        #print "\nRule: [$rule]";
+        if ($rule =~ /all/){
+            push @queue, $opt;
+            $longform .=" $opt";
+        }elsif($rule =~ /none/){
+            push @queue, $opt;
+        }elsif ($rule =~ /must (.*)/) {
+            push @queue, "$opt $1";
+            $longform .=" $opt $1";
+        }else{
+            print "\nError, i only understand 'all', 'none' and 'must' for now";
+            exit;
+        }
+    }
+    push @queue, $longform;
+    #print "\nReturn minimum set of test option combination";
+    return @queue;
+} #computMinimumOpts
 
 sub computeAllOpts {
     my $options_ref = shift;
@@ -295,7 +343,7 @@ sub comb {
         push @queue, $first;
         return @queue;
     }
-}
+} #comb
 
 sub applyRules {
     my ($allopts_ref , $rules_ref) = @_;
@@ -330,18 +378,20 @@ sub applyRules {
 }# applyRules;
 
 sub obeyRule {
+# return 1 : rule check passed
+# return 0 : rule check failed
     my ($option, $optioncomb, $rule) = @_;
     my $ret=0; 
-    if ($rule eq "any"){
-        $ret=1; #rule passed
-    }#rule: any
-    elsif ($rule eq "only"){
+    if ($rule eq "all"){
+        $ret=1; #rule passed regardless
+    }#rule: all
+    elsif ($rule eq "none"){
         if ($option eq "$optioncomb"){
             $ret=1;
         }else{
             $ret=0;
         }
-    }#rule: only
+    }#rule: none
     elsif ($rule =~ /must (.*)/){
         my $check = $1;
         if ($optioncomb =~ /$check/){
@@ -349,10 +399,19 @@ sub obeyRule {
         }else {
             $ret=0;
         }
-    }#must
+    }#rule: must
+    elsif ($rule =~ /disallow (.*)/) {
+        my $check = $1;
+        if ($optioncomb =~ /$check/){
+            $ret = 0;
+        }else{
+            $ret = 1;
+        }
+    }#rule: disallow
     else{
         $ret=1; #otherwise, just make it pass
     }
+
     if (! $ret){
         print "\n[$optioncomb] violates [$option]'s rule: [$rule]";
     }
@@ -364,6 +423,15 @@ sub printArray {
     print "\n";
     foreach (0..$#a ) {
         print "\n[$_]". $a[$_];
+    }
+}
+
+sub printHashRef{
+    my ($h) = shift;
+    my %hash = %$h;
+    print "\n";
+    while (my ($key, $value) = each (%hash)){
+        print "\n[$key->"."$value]";
     }
 }
          
