@@ -78,12 +78,14 @@ rlPhaseStartTest "getkeytab_001: Testing the quiet mode command option."
 	rlRun "ipa-getkeytab --server $MASTER --principal $user2 --keytab $TMP_KEYTAB > $TmpDir/getkeytab.out 2>&1" 9
 	MSG="Operation failed! Insufficient access rights"
 	rlAssertGrep  "$MSG" "$TmpDir/getkeytab.out"
+	rlRun "cat $TmpDir/getkeytab.out"
 
 	# getkeytab when no credentials are found"
 	rlRun "kdestroy" 0 "Destroying admin credentials"
 	MSG="Kerberos User Principal not found. Do you have a valid Credential Cache?"
 	rlRun "ipa-getkeytab --server $MASTER --principal $user1 --keytab $TMP_KEYTAB > $TmpDir/getkeytab.out 2>&1" 6
 	rlAssertGrep "$MSG" "$TmpDir/getkeytab.out"
+	rlRun "cat $TmpDir/getkeytab.out"
 
  	# getkeytab with quiet mode option enabled.
 	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user" 
@@ -98,6 +100,7 @@ rlPhaseStartTest "getkeytab_001: Testing the quiet mode command option."
 	MSG="Keytab successfully retrieved and stored in: $TMP_KEYTAB"
 	rlRun "ipa-getkeytab --server $MASTER --principal $user1 --keytab $TMP_KEYTAB > $TmpDir/getkeytab.out 2>&1"
 	rlAssertGrep "$MSG" "$TmpDir/getkeytab.out"
+	rlRun "cat $TmpDir/getkeytab.out"
 
 rlPhaseEnd
 }
@@ -137,21 +140,25 @@ for i in "--principal" "-p"; do
 	rlRun "ipa-getkeytab -s $MASTER $i user --keytab $TMP_KEYTAB > $TmpDir/getkeytab.out 2>&1" 9
 	MSG="Operation failed\! PrincipalName not found"
 	rlAssertGrep "$MSG" "$TmpDir/getkeytab.out"
+	rlRun "cat $TmpDir/getkeytab.out"
 
 	# getkeytab when $PRINC has invalid realm
 	rlRun "ipa-getkeytab -s $MASTER $i $user1@INVALID.IPASERVER.REALM.COM --keytab $TMP_KEYTAB > $TmpDir/getkeytab.out 2>&1" 9
 	MSG="Operation failed\! PrincipalName not found"
 	rlAssertGrep "$MSG" "$TmpDir/getkeytab.out"
+	rlRun "cat $TmpDir/getkeytab.out"
 
 	# getkeytab when $PRINC has no realm
 	rlRun "ipa-getkeytab -s $MASTER $i $user1 --keytab $TMP_KEYTAB > $TmpDir/getkeytab.out 2>&1"
         MSG="Keytab successfully retrieved and stored in: $TMP_KEYTAB"
         rlAssertGrep "$MSG" "$TmpDir/getkeytab.out"
+	rlRun "cat $TmpDir/getkeytab.out"
 
 	# getkeytab when $PRINC@RELM
 	rlRun "ipa-getkeytab -s $MASTER $i $user1@$RELM --keytab $TMP_KEYTAB > $TmpDir/getkeytab.out 2>&1"
 	MSG="Keytab successfully retrieved and stored in: $TMP_KEYTAB"
         rlAssertGrep "$MSG" "$TmpDir/getkeytab.out"
+	rlRun "cat $TmpDir/getkeytab.out"
 done
 
 rlPhaseEnd
@@ -172,6 +179,7 @@ for i in "--keytab" "-k" ; do
 	rlRun "ipa-getkeytab -s $MASTER --principal $user1 $i $TMP_KEYTAB > $TmpDir/getkeytab.out 2>&1"
         MSG="Keytab successfully retrieved and stored in: $TMP_KEYTAB"
         rlAssertGrep "$MSG" "$TmpDir/getkeytab.out"
+	rlRun "cat $TmpDir/getkeytab.out"
 	rlAssertExists "$TMP_KEYTAB"
 
 	rlRun "ipa-getkeytab -s $MASTER --principal $user1 $i $TMP_KEYTAB"
@@ -179,6 +187,7 @@ for i in "--keytab" "-k" ; do
 	rlRun "klist -ekt $TMP_KEYTAB | grep \"$RELM\" | wc -l > $TmpDir/getkeytab.out 2>&1"
 	MSG="8"
 	rlAssertGrep "$MSG" "$TmpDir/getkeytab.out"
+	rlRun "cat $TmpDir/getkeytab.out"
 
         if [ -f "/opt/krb5.keytab.txt" ]; then
                 rlRun "rm -f /opt/krb5.keytab.txt"
@@ -188,6 +197,7 @@ for i in "--keytab" "-k" ; do
         rlRun "ipa-getkeytab -s $MASTER --principal $user1 $i /opt/krb5.keytab.txt > $TmpDir/getkeytab.out 2>&1" 11
         MSG="Failed to add key to the keytab"
         rlAssertGrep "$MSG" "$TmpDir/getkeytab.out"
+	rlRun "cat $TmpDir/getkeytab.out"
 
 done
 rlPhaseEnd
@@ -199,10 +209,11 @@ rlPhaseStartTest "getkeytab_005: Testing the \"-e\" (encryption types) command o
 
 	# Verifying the existing encryption types created in the default keytab durin ipa-client enrollment.
 	rlRun "klist -ekt /etc/krb5.keytab > $TmpDir/keytab.out"
-	rlAssertGrep "(AES-256 CTS mode with 96-bit SHA-1 HMAC)" "$TmpDir/keytab.out"
-	rlAssertGrep "(AES-128 CTS mode with 96-bit SHA-1 HMAC)" "$TmpDir/keytab.out"
-        rlAssertGrep "(Triple DES cbc mode with HMAC/sha1)" "$TmpDir/keytab.out"
-        rlAssertGrep "(ArcFour with HMAC/md5)" "$TmpDir/keytab.out"
+	rlAssertGrep "(aes256-cts-hmac-sha1-96)" "$TmpDir/keytab.out"
+	rlAssertGrep "(aes128-cts-hmac-sha1-96)" "$TmpDir/keytab.out"
+        rlAssertGrep "(des3-cbc-sha1)" "$TmpDir/keytab.out"
+        rlAssertGrep "(arcfour-hmac)" "$TmpDir/keytab.out"
+	rlRun "cat $TmpDir/keytab.out"
 
 
 	# Testing for -e=aes256-cts
@@ -211,10 +222,11 @@ rlPhaseStartTest "getkeytab_005: Testing the \"-e\" (encryption types) command o
         fi
 	rlRun "ipa-getkeytab -s $MASTER -p $user1 -k $TMP_KEYTAB -e aes256-cts"
 	rlRun "klist -ekt $TMP_KEYTAB > $TmpDir/keytab.out"
-	rlAssertGrep "(AES-256 CTS mode with 96-bit SHA-1 HMAC)" "$TmpDir/keytab.out"
-	rlAssertNotGrep "(AES-128 CTS mode with 96-bit SHA-1 HMAC)" "$TmpDir/keytab.out"
-	rlAssertNotGrep "(Triple DES cbc mode with HMAC/sha1)" "$TmpDir/keytab.out"
-	rlAssertNotGrep "(ArcFour with HMAC/md5)" "$TmpDir/keytab.out"
+	rlAssertGrep "(aes256-cts-hmac-sha1-96)" "$TmpDir/keytab.out"
+	rlAssertNotGrep "(aes128-cts-hmac-sha1-96)" "$TmpDir/keytab.out"
+	rlAssertNotGrep "(des3-cbc-sha1)" "$TmpDir/keytab.out"
+	rlAssertNotGrep "(arcfour-hmac)" "$TmpDir/keytab.out"
+	rlRun "cat $TmpDir/keytab.out"
 	rlRun "kinit -k -t $TMP_KEYTAB $user1"
 	rlRun "kdestroy"
 	rlRun "kinitAs $ADMINID $ADMINPW"
@@ -226,10 +238,11 @@ rlPhaseStartTest "getkeytab_005: Testing the \"-e\" (encryption types) command o
         fi
 	rlRun "ipa-getkeytab -s $MASTER -p $user1 -k $TMP_KEYTAB -e aes128-cts"
         rlRun "klist -ekt $TMP_KEYTAB > $TmpDir/keytab.out"
-        rlAssertNotGrep "(AES-256 CTS mode with 96-bit SHA-1 HMAC)" "$TmpDir/keytab.out"
-        rlAssertGrep "(AES-128 CTS mode with 96-bit SHA-1 HMAC)" "$TmpDir/keytab.out"
-        rlAssertNotGrep "(Triple DES cbc mode with HMAC/sha1)" "$TmpDir/keytab.out"
-        rlAssertNotGrep "(ArcFour with HMAC/md5)" "$TmpDir/keytab.out"
+        rlAssertNotGrep "(aes256-cts-hmac-sha1-96)" "$TmpDir/keytab.out"
+        rlAssertGrep "(aes128-cts-hmac-sha1-96)" "$TmpDir/keytab.out"
+        rlAssertNotGrep "(des3-cbc-sha1)" "$TmpDir/keytab.out"
+        rlAssertNotGrep "(arcfour-hmac)" "$TmpDir/keytab.out"
+	rlRun "cat $TmpDir/keytab.out"
 	rlRun "kinit -k -t $TMP_KEYTAB $user1"
 	rlRun "kdestroy"
 	rlRun "kinitAs $ADMINID $ADMINPW"
@@ -241,10 +254,11 @@ rlPhaseStartTest "getkeytab_005: Testing the \"-e\" (encryption types) command o
         fi
         rlRun "ipa-getkeytab -s $MASTER -p $user1 -k $TMP_KEYTAB -e arcfour-hmac"
         rlRun "klist -ekt $TMP_KEYTAB > $TmpDir/keytab.out"
-        rlAssertNotGrep "(AES-256 CTS mode with 96-bit SHA-1 HMAC)" "$TmpDir/keytab.out"
-        rlAssertNotGrep "(AES-128 CTS mode with 96-bit SHA-1 HMAC)" "$TmpDir/keytab.out"
-        rlAssertNotGrep "(Triple DES cbc mode with HMAC/sha1)" "$TmpDir/keytab.out"
-        rlAssertGrep "(ArcFour with HMAC/md5)" "$TmpDir/keytab.out"
+        rlAssertNotGrep "(aes256-cts-hmac-sha1-96)" "$TmpDir/keytab.out"
+        rlAssertNotGrep "(aes128-cts-hmac-sha1-96)" "$TmpDir/keytab.out"
+        rlAssertNotGrep "(des3-cbc-sha1)" "$TmpDir/keytab.out"
+        rlAssertGrep "(arcfour-hmac)" "$TmpDir/keytab.out"
+	rlRun "cat $TmpDir/keytab.out"
 	rlRun "kinit -k -t $TMP_KEYTAB $user1"
 	rlRun "kdestroy"
 	rlRun "kinitAs $ADMINID $ADMINPW"
@@ -256,10 +270,11 @@ rlPhaseStartTest "getkeytab_005: Testing the \"-e\" (encryption types) command o
         fi
         rlRun "ipa-getkeytab -s $MASTER -p $user1 -k $TMP_KEYTAB -e des3-hmac-sha1"
         rlRun "klist -ekt $TMP_KEYTAB > $TmpDir/keytab.out"
-        rlAssertNotGrep "(AES-256 CTS mode with 96-bit SHA-1 HMAC)" "$TmpDir/keytab.out"
-        rlAssertNotGrep "(AES-128 CTS mode with 96-bit SHA-1 HMAC)" "$TmpDir/keytab.out"
-        rlAssertGrep "(Triple DES cbc mode with HMAC/sha1)" "$TmpDir/keytab.out"
-        rlAssertNotGrep "(ArcFour with HMAC/md5)" "$TmpDir/keytab.out"
+        rlAssertNotGrep "(aes256-cts-hmac-sha1-96)" "$TmpDir/keytab.out"
+        rlAssertNotGrep "(aes128-cts-hmac-sha1-96)" "$TmpDir/keytab.out"
+        rlAssertGrep "(des3-cbc-sha1)" "$TmpDir/keytab.out"
+        rlAssertNotGrep "(arcfour-hmac)" "$TmpDir/keytab.out"
+	rlRun "cat $TmpDir/keytab.out"
 	rlRun "kinit -k -t $TMP_KEYTAB $user1"
 	rlRun "kdestroy"
 	rlRun "kinitAs $ADMINID $ADMINPW"
@@ -268,22 +283,24 @@ rlPhaseStartTest "getkeytab_005: Testing the \"-e\" (encryption types) command o
         if [ -f "$TMP_KEYTAB" ]; then
                 rlRun "rm -f $TMP_KEYTAB"
         fi
-        rlRun "ipa-getkeytab -s $MASTER -p $user1 -k $TMP_KEYTAB -e invalid > $TmpDir/getkeytab.out 2>&1" 8
+        rlRun "ipa-getkeytab -s $MASTER -p $user1 -k $TMP_KEYTAB -e invalid > $TmpDir/keytab.out 2>&1" 8
 	MSG="Warning unrecognized encryption type"
-	rlAssertGrep "$MSG" "$TmpDir/getkeytab.out"
+	rlAssertGrep "$MSG" "$TmpDir/keytab.out"
+	rlRun "cat $TmpDir/keytab.out"
         rlAssertNotExists "$TMP_KEYTAB"
 
 	# Testing for -e=des-cbc-md5 (unsupported)
         if [ -f "$TMP_KEYTAB" ]; then
                 rlRun "rm -f $TMP_KEYTAB"
         fi
-        rlRun "ipa-getkeytab -s $MASTER -p $user1 -k $TMP_KEYTAB -e des-cbc-md5 > $TmpDir/getkeytab.out 2>&1"
+        rlRun "ipa-getkeytab -s $MASTER -p $user1 -k $TMP_KEYTAB -e des-cbc-md5 > $TmpDir/keytab.out 2>&1"
         rlRun "klist -ekt $TMP_KEYTAB > $TmpDir/keytab.out"
-        rlAssertNotGrep "(AES-256 CTS mode with 96-bit SHA-1 HMAC)" "$TmpDir/keytab.out"
-        rlAssertNotGrep "(AES-128 CTS mode with 96-bit SHA-1 HMAC)" "$TmpDir/keytab.out"
-        rlAssertNotGrep "(Triple DES cbc mode with HMAC/sha1)" "$TmpDir/keytab.out"
-        rlAssertNotGrep "(ArcFour with HMAC/md5)" "$TmpDir/keytab.out"
-	rlAssertGrep "(DES cbc mode with RSA-MD5)" "$TmpDir/keytab.out"
+        rlAssertNotGrep "(aes256-cts-hmac-sha1-96)" "$TmpDir/keytab.out"
+        rlAssertNotGrep "(aes128-cts-hmac-sha1-96)" "$TmpDir/keytab.out"
+        rlAssertNotGrep "(des3-cbc-sha1)" "$TmpDir/keytab.out"
+        rlAssertNotGrep "(arcfour-hmac)" "$TmpDir/keytab.out"
+	rlAssertGrep "(des-cbc-md5)" "$TmpDir/keytab.out"
+        rlRun "cat $TmpDir/keytab.out"
 	rlRun "kinit -k -t $TMP_KEYTAB $user1" 1 "Key table entry not found while getting initial credentials"
 	rlRun "kdestroy"
 	rlRun "kinitAs $ADMINID $ADMINPW"
@@ -365,22 +382,27 @@ rlPhaseStartTest "getkeytab_007: Testing \"--binddn\" and \"--bindpw\" command o
         MSG="Kerberos User Principal not found. Do you have a valid Credential Cache?"
         rlRun "ipa-getkeytab --server $MASTER --principal $user1 --keytab $TMP_KEYTAB > $TmpDir/getkeytab.out 2>&1" 6
         rlAssertGrep "$MSG" "$TmpDir/getkeytab.out"
+	rlRun "cat $TmpDir/getkeytab.out"
 
-	rlRun "ipa-getkeytab --server $MASTER --principal $user1 --keytab $TMP_KEYTAB -D \"cn=Directory Manager\" -w \"$userpw\" > $TmpDir/getkeytab.out 2>&1"
+	rlRun "ipa-getkeytab --server localhost --principal $user1 --keytab $TMP_KEYTAB -D \"cn=Directory Manager\" -w \"$userpw\" > $TmpDir/getkeytab.out 2>&1"
         MSG="Keytab successfully retrieved and stored in: $TMP_KEYTAB"
         rlAssertGrep "$MSG" "$TmpDir/getkeytab.out"
+	rlRun "cat $TmpDir/getkeytab.out"
 
-	rlRun "ipa-getkeytab --server $MASTER --principal $user1 --keytab $TMP_KEYTAB -D \" \" -w \"$userpw\" > $TmpDir/getkeytab.out 2>&1" 9
+	rlRun "ipa-getkeytab --server localhost --principal $user1 --keytab $TMP_KEYTAB -D \" \" -w \"$userpw\" > $TmpDir/getkeytab.out 2>&1" 9
         MSG="Anonymous Binds are not allowed"
         rlAssertGrep "$MSG" "$TmpDir/getkeytab.out"
+	rlRun "cat $TmpDir/getkeytab.out"
 
-        rlRun "ipa-getkeytab --server $MASTER --principal $user1 --keytab $TMP_KEYTAB -D \"cn=DirectoryM\" -w \" \" > $TmpDir/getkeytab.out 2>&1" 9
+        rlRun "ipa-getkeytab --server localhost --principal $user1 --keytab $TMP_KEYTAB -D \"cn=Directory Manager\" -w \" \" > $TmpDir/getkeytab.out 2>&1" 9
         MSG="Simple bind failed"
         rlAssertGrep "$MSG" "$TmpDir/getkeytab.out"
+	rlRun "cat $TmpDir/getkeytab.out"
 
-        rlRun "ipa-getkeytab --server $MASTER --principal $user1 --keytab $TMP_KEYTAB -D \"cn=Directory Manager\" > $TmpDir/getkeytab.out 2>&1" 10
+        rlRun "ipa-getkeytab --server localhost --principal $user1 --keytab $TMP_KEYTAB -D \"cn=Directory Manager\" > $TmpDir/getkeytab.out 2>&1" 10
 	MSG="Bind password required when using a bind DN."
 	rlAssertGrep "$MSG" "$TmpDir/getkeytab.out"
+	rlRun "cat $TmpDir/getkeytab.out"
 
 rlPhaseEnd
 }
@@ -394,11 +416,13 @@ rlPhaseStartTest "rmkeytab_001: Testing the \"-p\" command option."
 	rlRun "ipa-rmkeytab -p invalidprinc -k $TMP_KEYTAB > $TmpDir/rmkeytab.out 2>&1" 5
 	MSG="principal not found"
 	rlAssertGrep "$MSG" "$TmpDir/rmkeytab.out"
+	rlRun "cat $TmpDir/rmkeytab.out"
 
 	rlRun "ipa-getkeytab --server $MASTER --principal $user1 --keytab $TMP_KEYTAB" 0 "Getting keytab..."
 	rlRun "ipa-rmkeytab -p $user1 -k $TMP_KEYTAB > $TmpDir/rmkeytab.out 2>&1"
 	MSG="Removing principal $user1"
 	rlAssertGrep "$MSG" "$TmpDir/rmkeytab.out"
+	rlRun "cat $TmpDir/rmkeytab.out"
 	rlRun "klist -ekt $TMP_KEYTAB > $TmpDir/keytab.out"
 	rlAssertNotGrep "$user1" "$TmpDir/keytab.out"
 
@@ -412,6 +436,7 @@ rlPhaseStartTest "rmkeytab_002: Testing the \"-r\" command option."
 	rlRun "kinitAs $ADMINID $ADMINPW" 0
 	rlRun "ipa-getkeytab --server $MASTER --principal $user1 --keytab $TMP_KEYTAB" 0 "Getting keytab..."
         rlRun "ipa-rmkeytab -r $RELM -k $TMP_KEYTAB > $TmpDir/rmkeytab.out 2>&1"
+	rlRun "cat $TmpDir/rmkeytab.out"
         MSG="Removing principal $user1@$RELM"
         rlAssertGrep "$MSG" "$TmpDir/rmkeytab.out"
         rlRun "klist -ekt $TMP_KEYTAB > $TmpDir/keytab.out"
@@ -427,6 +452,7 @@ rlPhaseStartTest "rmkeytab_003: Testing the \"-k\" command option."
 	rlRun "kinitAs $ADMINID $ADMINPW" 0
         rlRun "ipa-getkeytab --server $MASTER --principal $user1 --keytab $TMP_KEYTAB" 0 "Getting keytab..."
         rlRun "ipa-rmkeytab -p $user1 -k /opt/invalid.keytab > $TmpDir/rmkeytab.out 2>&1" 3
+	rlRun "cat $TmpDir/rmkeytab.out"
         MSG="Failed to open keytab"
         rlAssertGrep "$MSG" "$TmpDir/rmkeytab.out"
 
