@@ -219,7 +219,7 @@ rlJournalStart
     rlPhaseStartTest "ipa-group-cli-25: Negative - Add Duplicate Group"
 	rlRun "addGroup test test" 0 "Setup - Adding a group"
         command="ipa group-add --desc=test test"
-        expmsg="ipa: ERROR: This entry already exists"
+        expmsg="ipa: ERROR: group with name test already exists"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
 	rlRun "deleteGroup test" 0 "Cleanup - Deleting the group"
     rlPhaseEnd
@@ -719,43 +719,43 @@ rlJournalStart
 
     rlPhaseStartTest "ipa-group-cli-56: Not Allowed special characters @"
         command="ipa group-add --desc=\"test@\" \"test@\""
-        expmsg="ipa: ERROR: invalid 'cn': may only include letters, numbers, _, -, . and $"
+        expmsg="ipa: ERROR: invalid 'group_name': may only include letters, numbers, _, -, . and $"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-group-cli-57: Not Allowed special characters %"
         command="ipa group-add --desc=\"test%\" \"test%\""
-        expmsg="ipa: ERROR: invalid 'cn': may only include letters, numbers, _, -, . and $"
+        expmsg="ipa: ERROR: invalid 'group_name': may only include letters, numbers, _, -, . and $"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-group-cli-58: Not Allowed special characters ^"
         command="ipa group-add --desc=\"test^\" \"test^\""
-        expmsg="ipa: ERROR: invalid 'cn': may only include letters, numbers, _, -, . and $"
+        expmsg="ipa: ERROR: invalid 'group_name': may only include letters, numbers, _, -, . and $"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-group-cli-59: Not Allowed special characters *"
         command="ipa group-add --desc=\"test*\" \"test*\""
-        expmsg="ipa: ERROR: invalid 'cn': may only include letters, numbers, _, -, . and $"
+        expmsg="ipa: ERROR: invalid 'group_name': may only include letters, numbers, _, -, . and $"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-group-cli-60: Not Allowed special characters +"
         command="ipa group-add --desc=\"test+\" \"test+\""
-        expmsg="ipa: ERROR: invalid 'cn': may only include letters, numbers, _, -, . and $"
+        expmsg="ipa: ERROR: invalid 'group_name': may only include letters, numbers, _, -, . and $"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-group-cli-61: Not Allowed special characters ~"
         command="ipa group-add --desc=\"test~\" \"test~\""
-        expmsg="ipa: ERROR: invalid 'cn': may only include letters, numbers, _, -, . and $"
+        expmsg="ipa: ERROR: invalid 'group_name': may only include letters, numbers, _, -, . and $"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-group-cli-62: Not Allowed special characters ="
         command="ipa group-add --desc=\"test=\" \"test=\""
-        expmsg="ipa: ERROR: invalid 'cn': may only include letters, numbers, _, -, . and $"
+        expmsg="ipa: ERROR: invalid 'group_name': may only include letters, numbers, _, -, . and $"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
     rlPhaseEnd
 
