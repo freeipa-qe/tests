@@ -125,7 +125,7 @@ ipaconfig_show_default_logic()
     # test logic starts
         rlLog "test for --all option"
         local out=$TmpDir/ipaconfig.show.all.$RANDOM.out
-        kinitAs $admin $adminpassword
+        kinitAs $ADMINID $ADMINPW 
         rlRun "ipa config-show --all > $out" 0 "save show --all in [$out]"
         string_exist_infile "Max username length:" $out
         string_exist_infile "Home directory base:" $out

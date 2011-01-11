@@ -91,8 +91,7 @@ user_exist()
 KinitAsAdmin()
 {
     # simple kinit function
-    echo $adminpassword | kinit $admin 2>&1 >/dev/null
-    #rlRun "echo $adminpassword | kinit $admin"
+    echo $ADMINPW | kinit $ADMINID 2>&1 >/dev/null
 } #KinitAsAdmin
 
 makereport()
