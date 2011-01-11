@@ -29,6 +29,7 @@
 			<repos>
 				<repo name="ipa" url="http://jdennis.fedorapeople.org/ipa-devel/fedora/14/x86_64/os/"/>
 				<repo name="beaker-harness" url="http://beaker-stage.app.eng.bos.redhat.com/harness/Fedora14/\$basearch"/>
+				<repo name="beaker-redhat" url="http://apoc.dsdev.sjc.redhat.com/tet/beakerlib-fc14/"/>
 			</repos>
 			<hostRequires>
                                 <and>
