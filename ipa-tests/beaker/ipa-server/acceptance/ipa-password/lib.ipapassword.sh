@@ -484,7 +484,7 @@ KinitAsAdmin()
     local out=$TmpDir/kinitasadmin.$RANDOM.txt
     local exp
     local temppw
-    echo $pw | kinit admin > $out
+    echo $pw | kinit $ADMINID > $out
     if [ $? = 0 ];then
         rlPass "kinit as admin with $pw success"
     elif [ $? = 1 ];then
@@ -493,7 +493,7 @@ KinitAsAdmin()
             rlLog "admin password exipred, do reset process"
             exp=$TmpDir/resetadminpassword.$RANDOM.exp
             temppw="New_$pw"
-            kinit_aftermaxlife "admin" $adminpassword $temppw
+            kinit_aftermaxlife "$ADMINID" "$ADMINPW" $temppw
             # set password policy to allow admin change password right away
             min=`ipa pwpolicy-show | grep "Min lifetime" | cut -d":" -f2`
             min=`echo $min`
@@ -520,7 +520,7 @@ KinitAsAdmin()
             rm $exp
             # after reset password, test the new password
             $kdestroy
-            echo $pw | kinit admin
+            echo $pw | kinit $ADMINID
             if [ $? = 1 ];then
                 rlFail "reset password back to original [$pw] failed"
             fi
