@@ -26,13 +26,18 @@
 					<distro_arch op="=" value="i386"/>
 				</and>
 			</distroRequires>
+			<repos>
+				<repo name="ipa" url="http://jdennis.fedorapeople.org/ipa-devel/fedora/14/i386/os/"/>
+				<repo name="beaker-harness" url="http://beaker-stage.app.eng.bos.redhat.com/harness/Fedora14/i686"/>
+				<repo name="beaker-redhat" url="http://apoc.dsdev.sjc.redhat.com/tet/beakerlib-fc14/"/>
+			</repos>
+
 			<hostRequires>
                                 <and>
                                 <hostname op="=" value="qe-blade-12.idm.lab.bos.redhat.com"/>
  
 				</and>
 			</hostRequires>
-			<repos/>
 			<task name="/distribution/install" role="STANDALONE">
 				<params/>
 			</task>
