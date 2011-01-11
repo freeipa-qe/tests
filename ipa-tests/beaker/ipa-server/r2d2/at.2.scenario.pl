@@ -29,7 +29,7 @@ if ($totalArgs == 2) {
 
 our %ipatestcase;
 our %syntax = parseConfFile($syntaxfile);
-#printConf (\%syntax);
+printConf (\%syntax);
 
 # calculate all possible combination for each ipa sub command
 foreach my $ipasubcmd (keys %syntax){
@@ -468,7 +468,7 @@ sub parseSyntaxFile{
     my %currentsyntax;
     while (<SYNTAX>){
         my $line = $_;
-        chop $line;
+        chomp $line;
         next if ($line =~/^#/);
         next if ($line =~/^\s*$/);
         #print "\nreadline: [$line]";
@@ -535,35 +535,22 @@ sub parseConfFile{
     }
 
     my $currentcmd="";
-    my %currentrule;
     while (<CONF>){
         my $line = $_;
-        chop $line;
+        chomp $line;
         next if ($line =~/^#/);
         next if ($line =~/^\s*$/);
         $line =~ s/^\s+//; #remove leading spaces
         $line =~ s/\s+$//; #remove trailing spaces
         #print "\nreadline: [$line]";
-        if ($line =~/^\[(.*)\]/){
-            my $cmd = $1;
-            #print "\nRead cmd: [$cmd]";
-            if ($currentcmd eq ""){
-                # this is the first syntax group detected
-                $currentcmd = $cmd;
-            }else{
-                if (exists $conf{$currentcmd}){
-                    # report error and exit program
-                    print "\nFormat error, duplicate command detected, [$currentcmd], exit\n";
-                    exit;
-                }else{
-                    #load into rules hashtable;
-                    print "\nSave cmd: [$currentcmd], new commer: [$cmd]";
-                    $conf{$currentcmd} = \%currentrule;
-                    $currentcmd = $cmd;
-                }
-            }#
-        }else{
+        if ($line =~/^\[(.*)\]$/){
+            $currentcmd = $1;
+            my %currentrule = ();
+            $conf{$currentcmd} = \%currentrule;
+        }#parse the perticular line: [ipa sub command], create a new blank hashtable for it
+        else{
             #print "\nline: $line";
+            my $currentrule_ref = $conf{$currentcmd};
             my @option_rules = split(/:/, $line);
             if ($#option_rules == 1){
                 my $option = $option_rules[0];
@@ -572,26 +559,16 @@ sub parseConfFile{
                 $option =~ s/\s+$//; # remove trailing spaces
                 $detail =~ s/^\s+//; # remove leading spaces
                 $detail =~ s/\s+$//; # remove trailing spaces
-                $currentrule{$option} = $detail;
+                $currentrule_ref->{$option} = $detail;
+                $conf{$currentcmd} = $currentrule_ref;
             }else{
                 print "\nFormat error: expect format <option>: <details> -- use ':' as delimiter";
                 print "\nActually get: $line\n";
                 exit;
             }
-        }
-    }
+        }#parse lines under [ipa sub cmd]
+    }#while loop
     close (CONF);
-
-    # some left over to save
-    if (exists $conf{$currentcmd}){
-        # report error and exit program
-        print "\nFormat error, duplicate comand detected, [$currentcmd], exit";
-        exit;
-    }else{
-        #load into conf hashtable;
-        print "\nSave cmd: [$currentcmd]";
-        $conf{$currentcmd} = \%currentrule;
-    }
     return %conf;
 }#end of parseConfFile
 

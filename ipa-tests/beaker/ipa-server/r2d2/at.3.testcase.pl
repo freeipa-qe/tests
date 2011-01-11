@@ -159,7 +159,7 @@ sub fileToArray {
         my $line = $_;
         next if ($line =~/^#/);
         next if ($line =~/^\s*$/);
-        chop $line;
+        chomp $line;
         push @array, $line;
     }
     close IN;
