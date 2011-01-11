@@ -193,7 +193,7 @@ rlJournalStart
 
     rlPhaseStartTest "ipa-user-cli-add-014: uid 0"
         command="ipa user-add --first=uid0 --last=uid0 --uid=0 uid0"
-        expmsg="ipa: ERROR: uid 0 not allowed"
+        expmsg="ipa: ERROR: invalid 'uid': must be at least 1"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
 	ipa user-del uid0
     rlPhaseEnd
