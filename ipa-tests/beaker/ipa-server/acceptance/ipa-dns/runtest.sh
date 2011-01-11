@@ -88,12 +88,24 @@ fi
 		ipa-replica-prepare -p $ADMINPW --ip-address=$ipoc1.$ipoc2.$ipoc3.$newip newfakehost$newip.$DOMAIN
 	rlPhaseEnd
 
-	rlPhaseStartTest "ipa-dns-02: ensure that the forward ip of the new fakehost was created in dns correctly"
+	rlPhaseStartTest "ipa-dns-02: ensure that the forward ip of the new fakehost was created in dns correctly with ping"
 		rlRun "ping -c 1 newfakehost$newip.$DOMAIN" 0 "Checking to ensure that the forward for the new fake host was created in dns"
 	rlPhaseEnd
 
-	rlPhaseStartTest "ipa-dns-03: ensure that the forward ip of the new fakehost was created in ldap correctly"
-		rlRun "ping -c 1 newfakehost$newip.$DOMAIN" 0 "Checking to ensure that the forward for the new fake host was created in dns"
+	rlPhaseStartTest "ipa-dns-03: ensure that the forward ip of the new fakehost was created in dns correctly with dig"
+		rlRun "dig newfakehost$newip.$DOMAIN | grep $ipoc1.$ipoc2.$ipoc3.$newip" 0 "Checking to ensure that dig returns the correct ip address"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-04: ensure that the reverse entry of the new fakehost was created in dns correctly with dig"
+		rlRun "dig -x $ipoc1.$ipoc2.$ipoc3.$newip | grep newfakehost$newip.$DOMAIN" 0 "Checking to ensure that reverse of newfakehost$newip.$DOMAIN is set up correctly"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-05: ensure that the forward ip of the new fakehost is resolvable by dns-show-rr"
+		rlRun "ipa dns-show-rr $DOMAIN newfakehost$newip" 0 "Checking to ensure that ipa dns-show seems to think that the entry exists"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-06: ensure that the forward ip of the new fakehost is resolvable by dns-show"
+		rlRun "ipa dns-show-rr $DOMAIN newfakehost$newip" 0 "Checking to ensure that ipa dns-show seems to think that the entry exists"
 	rlPhaseEnd
 
 
