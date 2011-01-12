@@ -122,8 +122,6 @@ foreach my $ipasubcmd (keys %ipatestcase ){
     }#finall, we get the test case scenario for each ipa sub command
     print "\n--------------- final test scenario for [$ipasubcmd]---------------------";
     printArray(@allfinal);
-    my $outputfile = "$ipacmd.$ipasubcmd.scenario";
-    writeToSignture($ipasubcmd, \@allfinal, $outputfile);
     appendToScenarioFile($ipasubcmd, \@allfinal, $scenariofile);
 }#this is loop for ipa sub command
 
@@ -690,27 +688,6 @@ sub parseData{
     return @dataoption;
 }#parseData
 
-sub writeToSignture {
-    my ($cmd, $scenario, $outfile) = @_;
-    if (open (OUT, ">$outfile")) {
-        print "\nready to output to file [$outfile]";
-    }else{
-        print "\ncan not open file [$outfile] to write\n";
-        exit;
-    }
-    print OUT "# test scenario for ipa command: [$cmd]";
-    my @test = @$scenario;
-    my @sorted = sortArray(@test);
-    my $total = $#sorted + 1;
-    print OUT " total $total test cases";
-    foreach (@sorted){
-        print OUT "\n$_";
-    }
-    close OUT;
-    print "\nsuccess! Output testscenario for [$cmd] to file [$outfile]";
-}#writeToSignture
-
-
 sub appendToScenarioFile{
     my ($cmd, $scenario, $outfile) = @_;
     if (open (OUT, ">>$outfile")) {
@@ -738,8 +715,9 @@ sub clearFileContent {
         if (open (IN, ">$file")){
             print IN ""; #clear scenario file
             close IN;
-    }else{
-        print "\nFile [$file] does not exist\n";
-        exit;
+        }else{
+            print "\nFile exist but not able to open for writing";
+            exit;
+        }
     }
 }#clearFileContent
