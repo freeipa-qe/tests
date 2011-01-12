@@ -16,12 +16,14 @@ print "scenario engine starts...";
 our $ipacmd;
 our $syntaxfile;
 our $datafile;
+our $scenariofile;
 # command line argument parse
 our $totalArgs=$#ARGV;
 if ($totalArgs == 2) {
     $ipacmd     = $ARGV[0];
     $syntaxfile = $ARGV[1];
     $datafile   = $ARGV[2];
+    $scenariofile = "$ipacmd".".scenario";
 }else{
     usage();
     exit;
@@ -30,6 +32,8 @@ if ($totalArgs == 2) {
 our %ipatestcase;
 our %syntax = parseConfFile($syntaxfile);
 printConf (\%syntax);
+
+clearFileContent($scenariofile);
 
 # calculate all possible combination for each ipa sub command
 foreach my $ipasubcmd (keys %syntax){
@@ -120,6 +124,7 @@ foreach my $ipasubcmd (keys %ipatestcase ){
     printArray(@allfinal);
     my $outputfile = "$ipacmd.$ipasubcmd.scenario";
     writeToSignture($ipasubcmd, \@allfinal, $outputfile);
+    appendToScenarioFile($ipasubcmd, \@allfinal, $scenariofile);
 }#this is loop for ipa sub command
 
 print "\nOption engine ends\n";
@@ -583,7 +588,7 @@ sub printConf{
             print "\n  [$key] ==> [$value]";
         }#while loop
     }#foreach
-}#printCOnf
+}#printConf
 
 sub arrayTostring {
     my @array = @_;
@@ -704,3 +709,37 @@ sub writeToSignture {
     close OUT;
     print "\nsuccess! Output testscenario for [$cmd] to file [$outfile]";
 }#writeToSignture
+
+
+sub appendToScenarioFile{
+    my ($cmd, $scenario, $outfile) = @_;
+    if (open (OUT, ">>$outfile")) {
+        print "\nready to append to file [$outfile]";
+    }else{
+        print "\ncan not open file [$outfile] to write\n";
+        exit;
+    }
+    print OUT "\n[$cmd]";
+    my @test = @$scenario;
+    my @sorted = sortArray(@test);
+    my $total = $#sorted + 1;
+    print OUT "\n# total $total test cases";
+    foreach (@sorted){
+        print OUT "\n$_";
+    }
+    print OUT "\n# end of scenario for command: [$cmd]\n";
+    close OUT;
+    #print "\nsuccess! Output testscenario for [$cmd] to file [$outfile]";
+}#appendToScenarioFile
+
+sub clearFileContent {
+    my $file = shift;
+    if (( -e $file) && (-w $file)){
+        if (open (IN, ">$file")){
+            print IN ""; #clear scenario file
+            close IN;
+    }else{
+        print "\nFile [$file] does not exist\n";
+        exit;
+    }
+}#clearFileContent

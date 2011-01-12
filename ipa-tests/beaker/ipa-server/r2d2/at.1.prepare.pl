@@ -30,8 +30,8 @@ our %GeneralOptionData=(
         "--raw"=>"none",
         "--rights"=>"none",
         "--continue"=>"none",
-        "--sizelimit"=>"integer",
-        "--timelimit"=>"seconds",
+#        "--sizelimit"=>"integer",
+#        "--timelimit"=>"seconds",
         "default"=>"none"
         );
 
@@ -226,11 +226,6 @@ sub printIPAcmd {
             my $opt_tmp = $optproperty{$key};
             my %optvalues = %$opt_tmp;
             printHash ("\n\t\t", %optvalues);
-            #my $tmp_value = $optproperty{"$key"};
-            #my %hashvalue = %$tmp_value;
-            #foreach my $valuekey (keys %hashvalue){
-            #    print "\n\t[$valuekey] [".$hashvalue{"$valuekey"};
-            #}#foreach
         }#read option property
     }#foreach key
 }# printIPAcmd
@@ -279,9 +274,19 @@ sub prepare {
             }
             print DATA "\n# $option_doc";
             #print DATA "\n$option: $option_datatype";
-            print DATA "\n$option (positive):".$option_datatype;
-            print DATA "\n$option (boundary):".$option_datatype;
-            print DATA "\n$option (negative):".$option_datatype;
+            # deal with some special case: --raw --rights --all 
+            if ( ($option =~ /--raw/) || ($option =~ /--rights/) 
+                || ($option =~ /--all/) || ($option =~ /--continue/)
+               ){
+                print DATA "\n$option : none";
+            }elsif ( $option_datatype =~ /INT/){
+                print DATA "\n$option (positive):".$option_datatype;
+                print DATA "\n$option (boundary):".$option_datatype;
+                print DATA "\n$option (negative):".$option_datatype;
+            }else{
+                print DATA "\n$option (positive):".$option_datatype;
+                print DATA "\n$option (negative):".$option_datatype;
+            }
             print DATA "\n";
         }# print original docuemnt and followed by option's data type into DATA file
         print DATA   "\n\n";
