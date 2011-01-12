@@ -56,7 +56,7 @@ PACKAGE2="ipa-client"
 TMP_KEYTAB="/opt/krb5.keytab"
 
 setup() {
-rlPhaseStartTest
+rlPhaseStartTest "Setup for getkeytab and rmkeytab tests"
         rlAssertRpm $PACKAGE1
         rlAssertRpm $PACKAGE2
 	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user" 
@@ -191,6 +191,8 @@ for i in "--keytab" "-k" ; do
 
         if [ -f "/opt/krb5.keytab.txt" ]; then
                 rlRun "rm -f /opt/krb5.keytab.txt"
+		rlRun "touch /opt/krb5.keytab.txt"
+	else
 		rlRun "touch /opt/krb5.keytab.txt"
         fi
 
@@ -460,7 +462,7 @@ rlPhaseEnd
 }
 
 cleanup() {
-rlPhaseStartTest
+rlPhaseStartTest "Clean up for getkeytab and rmkeytab tests"
 	rlRun "kinitAs $ADMINID $ADMINPW" 0
 	rlRun "ipa user-del $user1"
 	sleep 5
