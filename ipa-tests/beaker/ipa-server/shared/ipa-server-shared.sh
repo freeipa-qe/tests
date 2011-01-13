@@ -218,6 +218,7 @@ sleep .1
 send -s "yes\r"
 #expect "*"
 expect eof' >> $TET_TMP_DIR/setup-ssh-remote.exp
+		chmod 755 $TET_TMP_DIR/setup-ssh-remote.exp
 		rlLog "Running expect script to add $1 to known hosts file"
 		$TET_TMP_DIR/setup-ssh-remote.exp
 	else
