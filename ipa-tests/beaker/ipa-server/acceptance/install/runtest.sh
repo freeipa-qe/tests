@@ -44,9 +44,12 @@ rlJournalStart
 			echo "ERROR - /dev/shm/ipa-server-shared.sh does not exist, did the shared libs get installed?"
 		fi
 		rlRun "rm -f /etc/yum.repos.d/ipa*"
-		wget &> /dev/shm
-		if [ $? -ne 1 ]; then
+		if [ ! -f /usr/bin/wget ]; then
 			# wget doesn't appear to be installed. Installing now.
+			echo ""
+			echo "wget doesn't appear to be on this system. Installing it now."
+			echo ""
+			sleep 2
 			yum -y install wget 
 		fi
 		rlRun "cd /etc/yum.repos.d;wget http://jdennis.fedorapeople.org/ipa-devel/ipa-devel-fedora.repo"
