@@ -44,6 +44,10 @@ rlJournalStart
 			echo "ERROR - /dev/shm/ipa-server-shared.sh does not exist, did the shared libs get installed?"
 		fi
 		rlRun "rm -f /etc/yum.repos.d/ipa*"
+		if [ wget -ne 1 ]; then
+			# wget doesn't appear to be installed. Installing now.
+			yum -y install wget 
+		fi
 		rlRun "cd /etc/yum.repos.d;wget http://jdennis.fedorapeople.org/ipa-devel/ipa-devel-fedora.repo"
 		#rlRun "cd /etc/yum.repos.d;wget http://apoc.dsdev.sjc.redhat.com/tet/ipa-fedora.repo"
 		rlRun "rm -f /dev/shm/set*.exp"
@@ -51,7 +55,7 @@ rlJournalStart
 #		rlRun "expect /dev/shm/set-root-pw.exp"
 #		rlRun "yum clean"
 		# Run yum install 3 times because the repos are flaky
-		packages="ipa-server ipa-client ipa-admintools bind caching-nameserver expect krb5-workstation bind-dyndb-ldap ntpdate krb5-pkinit-openssl wget lynx"
+		packages="ipa-server ipa-client ipa-admintools bind caching-nameserver expect krb5-workstation bind-dyndb-ldap ntpdate krb5-pkinit-openssl" 
 		yum -y install $packages
 		if [ $? -ne 0 ]; then
 			sleep 100
