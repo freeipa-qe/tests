@@ -44,7 +44,8 @@ rlJournalStart
 			echo "ERROR - /dev/shm/ipa-server-shared.sh does not exist, did the shared libs get installed?"
 		fi
 		rlRun "rm -f /etc/yum.repos.d/ipa*"
-		if [ wget -ne 1 ]; then
+		wget &> /dev/shm
+		if [ $? -ne 1 ]; then
 			# wget doesn't appear to be installed. Installing now.
 			yum -y install wget 
 		fi
