@@ -100,12 +100,18 @@ fi
 		rlRun "dig -x $ipoc1.$ipoc2.$ipoc3.$newip | grep newfakehost$newip.$DOMAIN" 0 "Checking to ensure that reverse of newfakehost$newip.$DOMAIN is set up correctly"
 	rlPhaseEnd
 
-	rlPhaseStartTest "ipa-dns-05: ensure that the forward ip of the new fakehost is resolvable by dns-show-rr"
-		rlRun "ipa dns-show-rr $DOMAIN newfakehost$newip" 0 "Checking to ensure that ipa dns-show seems to think that the entry exists"
+	rlPhaseStartTest "ipa-dns-05: ensure that the forward ip of the new fakehost is resolvable by dnsrecord-show"
+		rlRun "ipa dnsrecord-show $DOMAIN newfakehost$newip" 0 "Checking to ensure that ipa dns-show seems to think that the entry exists"
 	rlPhaseEnd
 
-	rlPhaseStartTest "ipa-dns-06: ensure that the forward ip of the new fakehost is resolvable by dns-show"
-		rlRun "ipa dns-show-rr $DOMAIN newfakehost$newip" 0 "Checking to ensure that ipa dns-show seems to think that the entry exists"
+# incomplete
+	rlPhaseStartTest "ipa-dns-06: ensure that the reverse ip of the new fakehost is resolvable by dns-show"
+		rlRun "ipa dns-sh $DOMAIN newfakehost$newip" 0 "Checking to ensure that ipa dnsrecord-show gives the reverse for fakehost"
+	rlPhaseEnd
+
+	
+	rlPhaseStartTest "ipa-dns-07: create a new zone"
+		rlRun "ipa dnsrecord-show $DOMAIN newfakehost$newip" 0 "Checking to ensure that ipa dns-show seems to think that the entry exists"
 	rlPhaseEnd
 
 
