@@ -29,7 +29,9 @@ set_systime()
 restore_systime()
 {
 #restore system time by sync with ntp server
-    rlRun "ntpdate $ntpserver" 0 "restore system by sync with ntp server"
+    rlRun "service ntpd stop" 0 "Stopping local ntpd service to sync with external source"
+    rlRun "ntpdate $NTPSERVER" 0 "restore system by sync with ntp server"
+    rlRun "service ntpd start" 0 "Starting local ntpd service again"
 } # restore_systime
 
 restart_ipa_passwd()
@@ -240,15 +242,18 @@ add_test_ac()
     fi
     rlRun "$kdestroy"
     KinitAsAdmin
-    rlRun "echo $initialpw |\
+    echo $initialpw |\
            ipa user-add $testac\
                         --first $testacFirst\
                         --last  $testacLast\
-                        --password " \
-          0 "add test user account"
+                        --password 
+    rc=$?    
     # set test account password 
     FirstKinitAs $testac $initialpw $testacPW
     rlRun "$kdestroy"
+
+    return $rc
+
 } # add_test_ac
 
 del_test_ac()
@@ -258,11 +263,15 @@ del_test_ac()
     then
         rlLog "test account found, now delete it"
         KinitAsAdmin
-        rlRun "ipa user-del $testac" 0 "delete test account [$testac]"
+        ipa user-del $testac
+	rc=$?
         rlRun "$kdestroy"
     else
         rlLog "test account does not exist, do nothing"
     fi
+
+    return $rc
+
 } # del_test_ac
 
 user_exist()
@@ -274,7 +283,7 @@ user_exist()
     if [ ! -z "$userlogin" ]
     then
         KinitAsAdmin
-        rlRun "ipa user-find $userlogin > $out" 0 "user [$userlogin] found"
+        ipa user-find $userlogin > $out
         rlRun "$kdestroy"
         if grep -i "User login: $userlogin$" $out 2>&1 >/dev/null
         then
@@ -354,7 +363,7 @@ grp_exist()
     if [ ! -z "$grp" ]
     then
         KinitAsAdmin
-        rlRun "ipa group-find $grp > $out" 0 "group [$grp] found"
+        ipa group-find $grp > $out
         rlRun "$kdestroy"
         if grep -i "Group name: $grp$" $out 2>&1 >/dev/null
         then
@@ -759,7 +768,7 @@ minlife_default()
     history=`grep "History size:" $out | cut -d":" -f2|xargs echo`
     length=`grep "length:" $out | cut -d":" -f2|xargs echo`
     classes=`grep "classes:" $out | cut -d":" -f2|xargs echo`
-    rlLog "set preconditoin: history=[$history] minlength=[$length] classes=[$classes]"
+    rlLog "set precondition: history=[$history] minlength=[$length] classes=[$classes]"
     if [ $history = 0 ] && [ $length = 0 ] && [ $classes = 1 ]
     then
         life=2 #set minlife to 2 hours
@@ -811,7 +820,7 @@ minlife_lowerbound()
         history=`grep "History size:" $out | cut -d":" -f2|xargs echo`
         length=`grep "length:" $out | cut -d":" -f2|xargs echo`
         classes=`grep "classes:" $out | cut -d":" -f2|xargs echo`
-        rlLog "set preconditoin: history=[$history] minlength=[$length] classes=[$classes]"
+        rlLog "set precondition: history=[$history] minlength=[$length] classes=[$classes]"
         if [ $history = 0 ] && [ $length = 0 ] && [ $classes = 1 ]
         then
             rlRun "ipa pwpolicy-mod $grp --minlife=$lowbound" 0 "set to lowbound should success"

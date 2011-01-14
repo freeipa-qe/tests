@@ -261,7 +261,7 @@ ipapassword_globalpolicy_minlifetime_default_logic()
         history=`grep "History size:" $out | cut -d":" -f2|xargs echo`
         length=`grep "length:" $out | cut -d":" -f2|xargs echo`
         classes=`grep "classes:" $out | cut -d":" -f2|xargs echo`
-        rlLog "set preconditoin: history=[$history] minlength=[$length] classes=[$classes]"
+        rlLog "set precondition: history=[$history] minlength=[$length] classes=[$classes]"
         if [ $history = 0 ] && [ $length = 0 ] && [ $classes = 1 ]
         then
             life=2 #set minlife to 2 hours
@@ -320,7 +320,7 @@ ipapassword_globalpolicy_minlifetime_lowerbound_logic()
         history=`grep "History size:" $out | cut -d":" -f2|xargs echo`
         length=`grep "length:" $out | cut -d":" -f2|xargs echo`
         classes=`grep "classes:" $out | cut -d":" -f2|xargs echo`
-        rlLog "set preconditoin: history=[$history] minlength=[$length] classes=[$classes]"
+        rlLog "set precondition: history=[$history] minlength=[$length] classes=[$classes]"
         if [ $history = 0 ] && [ $length = 0 ] && [ $classes = 1 ]
         then
             rlRun "ipa pwpolicy-mod --minlife=$lowbound" 0 "set to lowbound should success"
@@ -434,7 +434,7 @@ ipapassword_globalpolicy_history_default()
         minlife=`grep "Min lifetime" $out | cut -d":" -f2|xargs echo`
         length=`grep "length:" $out | cut -d":" -f2|xargs echo`
         classes=`grep "classes:" $out | cut -d":" -f2|xargs echo`
-        rlLog "preconditoin: minlife=[$minlife] minlength=[$length] classes=[$classes]"
+        rlLog "precondition: minlife=[$minlife] minlength=[$length] classes=[$classes]"
         if [ $minlife = 0 ] && [ $length = 0 ] && [ $classes = 1 ]
         then
             add_test_ac
@@ -520,7 +520,7 @@ ipapassword_globalpolicy_history_lowerbound()
         length=`grep "length:" $out | cut -d":" -f2|xargs echo`
         classes=`grep "classes:" $out | cut -d":" -f2|xargs echo`
         history=`grep "History size:" $out | cut -d":" -f2|xargs echo`
-        rlLog "preconditoin: minlife=[$minlife] minlength=[$length] classes=[$classes] history=[$history]"
+        rlLog "precondition: minlife=[$minlife] minlength=[$length] classes=[$classes] history=[$history]"
         if [ $minlife = 0 ] && [ $length = 0 ] && [ $classes = 1 ] \
             && [ $history = 0 ]
         then
@@ -596,7 +596,7 @@ ipapassword_globalpolicy_history_upperbound_logic()
     # accept parameters: NONE
     # test logic starts
         local v=$1
-        rlRun "ipa pwpolicy-mod --history=$v" 0 "set password history to integer [$v] shoul success"
+        rlRun "ipa pwpolicy-mod --history=$v" 0 "set password history to integer [$v] should success"
     # test logic ends
 } # ipapassword_globalpolicy_history_upperbound_logic 
 
@@ -638,7 +638,7 @@ ipapassword_globalpolicy_classes_default()
         minlife=`grep "Min lifetime" $out | cut -d":" -f2|xargs echo`
         length=`grep "length:" $out | cut -d":" -f2|xargs echo`
         history=`grep "History size:" $out | cut -d":" -f2|xargs echo`
-        rlLog "preconditoin: minlife=[$minlife] minlength=[$length] history=[$history]"
+        rlLog "precondition: minlife=[$minlife] minlength=[$length] history=[$history]"
         if [ $minlife = 0 ] && [ $length = 0 ] && [ $history = 0 ]
         then
             ipapassword_globalpolicy_classes_default_logic
@@ -727,7 +727,7 @@ ipapassword_globalpolicy_classes_lowerbound()
         length=`grep "length:" $out | cut -d":" -f2|xargs echo`
         history=`grep "History size:" $out | cut -d":" -f2|xargs echo`
         unset out
-        rlLog "preconditoin: minlife=[$minlife] minlength=[$length] history=[$history]"
+        rlLog "precondition: minlife=[$minlife] minlength=[$length] history=[$history]"
         if [ $minlife = 0 ] && [ $length = 0 ] && [ $history = 0 ]
         then
             ipapassword_globalpolicy_classes_lowerbound_logic
@@ -798,7 +798,7 @@ ipapassword_globalpolicy_classes_upperbound()
         minlife=`grep "Min lifetime" $out | cut -d":" -f2|xargs echo`
         length=`grep "length:" $out | cut -d":" -f2|xargs echo`
         history=`grep "History size:" $out | cut -d":" -f2|xargs echo`
-        rlLog "preconditoin: minlife=[$minlife] minlength=[$length] history=[$history]"
+        rlLog "precondition: minlife=[$minlife] minlength=[$length] history=[$history]"
         if [ $minlife = 0 ] && [ $length = 0 ] && [ $history = 0 ]
         then
             ipapassword_globalpolicy_classes_upperbound_logic
@@ -917,7 +917,7 @@ ipapassword_globalpolicy_length_default()
         history=`grep "History size:" $out | cut -d":" -f2|xargs echo`
         rm $out
         rlRun "$kdestroy"
-        rlLog "preconditoin: minlife=[$minlife] minclasses=[$classes] history=[$history]"
+        rlLog "precondition: minlife=[$minlife] minclasses=[$classes] history=[$history]"
         if [ $minlife = 0 ] && [ $classes = 0 ] && [ $history = 0 ]
         then
             add_test_ac
@@ -999,7 +999,7 @@ ipapassword_globalpolicy_length_lowerbound()
         length=`grep "length" $out | cut -d":" -f2|xargs echo`
         rm $out
         rlRun "$kdestroy"
-        rlLog "preconditoin: minlife=[$minlife] minclasses=[$classes] history=[$history] minlength=[$length]"
+        rlLog "precondition: minlife=[$minlife] minclasses=[$classes] history=[$history] minlength=[$length]"
         if [ $minlife = 0 ] && [ $classes = 0 ] && [ $history = 0 ] && [ $length = 0 ]
         then
             add_test_ac
@@ -1045,7 +1045,7 @@ ipapassword_globalpolicy_length_upperbound()
         history=`grep "History size:" $out | cut -d":" -f2|xargs echo`
         rm $out
         rlRun "$kdestroy"
-        rlLog "preconditoin: minlife=[$minlife] minclasses=[$classes] history=[$history]"
+        rlLog "precondition: minlife=[$minlife] minclasses=[$classes] history=[$history]"
         if [ $minlife = 0 ] && [ $classes = 0 ] && [ $history = 0 ]
         then
             add_test_ac
@@ -1405,7 +1405,7 @@ ipapassword_grouppolicy_history_default()
         minlife=`grep "Min lifetime" $out | cut -d":" -f2|xargs echo`
         length=`grep "length:" $out | cut -d":" -f2|xargs echo`
         classes=`grep "classes:" $out | cut -d":" -f2|xargs echo`
-        rlLog "preconditoin: minlife=[$minlife] minlength=[$length] classes=[$classes]"
+        rlLog "precondition: minlife=[$minlife] minlength=[$length] classes=[$classes]"
         if [ $minlife = 0 ] && [ $length = 0 ] && [ $classes = 1 ]
         then
             ipapassword_grouppolicy_history_default_logic
@@ -1494,7 +1494,7 @@ ipapassword_grouppolicy_history_lowerbound()
         history=`grep "History size:" $out | cut -d":" -f2|xargs echo`
         #history=`read_pwpolicy "history" $testgrp`
         echo "====================================history=[$history]"
-        rlLog "preconditoin: minlife=[$minlife] minlength=[$length] classes=[$classes] history=[$history]"
+        rlLog "precondition: minlife=[$minlife] minlength=[$length] classes=[$classes] history=[$history]"
         if [ $minlife = 0 ] && [ $length = 0 ] && [ $classes = 1 ] \
             && [ $history = 0 ]
         then
@@ -1568,7 +1568,7 @@ ipapassword_grouppolicy_history_upperbound_logic()
     # accept parameters: NONE
     # test logic starts
         local v=$1
-        rlRun "ipa pwpolicy-mod $testgrp --history=$v" 0 "set password history to integer [$v] shoul success"
+        rlRun "ipa pwpolicy-mod $testgrp --history=$v" 0 "set password history to integer [$v] should success"
     # test logic ends
 } # ipapassword_grouppolicy_history_upperbound_logic 
 
@@ -1614,7 +1614,7 @@ ipapassword_grouppolicy_classes_default()
         minlife=`grep "Min lifetime" $out | cut -d":" -f2|xargs echo`
         length=`grep "length:" $out | cut -d":" -f2|xargs echo`
         history=`grep "History size:" $out | cut -d":" -f2|xargs echo`
-        rlLog "preconditoin: minlife=[$minlife] minlength=[$length] history=[$history]"
+        rlLog "precondition: minlife=[$minlife] minlength=[$length] history=[$history]"
         if [ $minlife = 0 ] && [ $length = 0 ] && [ $history = 0 ]
         then
             ipapassword_grouppolicy_classes_default_logic
@@ -1705,7 +1705,7 @@ ipapassword_grouppolicy_classes_lowerbound()
         minlife=`grep "Min lifetime" $out | cut -d":" -f2|xargs echo`
         length=`grep "length:" $out | cut -d":" -f2|xargs echo`
         history=`grep "History size:" $out | cut -d":" -f2|xargs echo`
-        rlLog "preconditoin: minlife=[$minlife] minlength=[$length] history=[$history]"
+        rlLog "precondition: minlife=[$minlife] minlength=[$length] history=[$history]"
         if [ $minlife = 0 ] && [ $length = 0 ] && [ $history = 0 ]
         then
             ipapassword_grouppolicy_classes_lowerbound_logic
@@ -1778,7 +1778,7 @@ ipapassword_grouppolicy_classes_upperbound()
         minlife=`grep "Min lifetime" $out | cut -d":" -f2|xargs echo`
         length=`grep "length:" $out | cut -d":" -f2|xargs echo`
         history=`grep "History size:" $out | cut -d":" -f2|xargs echo`
-        rlLog "preconditoin: minlife=[$minlife] minlength=[$length] history=[$history]"
+        rlLog "precondition: minlife=[$minlife] minlength=[$length] history=[$history]"
         if [ $minlife = 0 ] && [ $length = 0 ] && [ $history = 0 ]
         then
             ipapassword_grouppolicy_classes_upperbound_logic
@@ -1899,7 +1899,7 @@ ipapassword_grouppolicy_length_default()
         history=`grep "History size:" $out | cut -d":" -f2|xargs echo`
         rm $out
         rlRun "$kdestroy"
-        rlLog "preconditoin: minlife=[$minlife] minclasses=[$classes] history=[$history]"
+        rlLog "precondition: minlife=[$minlife] minclasses=[$classes] history=[$history]"
         if [ $minlife = 0 ] && [ $classes = 0 ] && [ $history = 0 ]
         then
             ipapassword_grouppolicy_length_default_logic
@@ -1987,7 +1987,7 @@ ipapassword_grouppolicy_length_lowerbound()
         length=`grep "length" $out | cut -d":" -f2|xargs echo`
         rm $out
         rlRun "$kdestroy"
-        rlLog "preconditoin: minlife=[$minlife] minclasses=[$classes] history=[$history] minlength=[$length]"
+        rlLog "precondition: minlife=[$minlife] minclasses=[$classes] history=[$history] minlength=[$length]"
         if [ $minlife = 0 ] && [ $classes = 0 ] && [ $history = 0 ] && [ $length = 0 ]
         then
             ipapassword_grouppolicy_length_lowerbound_logic
@@ -2032,7 +2032,7 @@ ipapassword_grouppolicy_length_upperbound()
         history=`grep "History size:" $out | cut -d":" -f2|xargs echo`
         rm $out
         rlRun "$kdestroy"
-        rlLog "preconditoin: minlife=[$minlife] minclasses=[$classes] history=[$history]"
+        rlLog "precondition: minlife=[$minlife] minclasses=[$classes] history=[$history]"
         if [ $minlife = 0 ] && [ $classes = 0 ] && [ $history = 0 ]
         then
             ipapassword_grouppolicy_length_upperbound_logic
