@@ -70,8 +70,8 @@ rlJournalStart
 		rlRun "ps xa | grep -v grep |grep ipa_kpasswd" 1 "Checking to ensure that ipactl stop stopped ipa_kpasswd"
 	rlPhaseEnd
 
-	rlPhaseStartTest "ipa-ctl-06: ensure that ipactl stop stopped ntpd"
-		rlRun "ps xa | grep -v grep |grep ntpd" 1 "Checking to ensure that ipactl stop stopped ntpd"
+	rlPhaseStartTest "ipa-ctl-06: ensure that ipactl stop stopped named"
+		rlRun "ps xa | grep -v grep |grep named" 1 "Checking to ensure that ipactl stop stopped named"
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-ctl-07: ensure that ipactl stop stopped the PKI instance of dirsrv"
@@ -94,8 +94,8 @@ rlJournalStart
 		rlRun "ps xa | grep -v grep |grep ipa_kpasswd" 0 "Checking to ensure that ipactl start started ipa_kpasswd"
 	rlPhaseEnd
 
-	rlPhaseStartTest "ipa-ctl-12: ensure that ipactl start started ntpd"
-		rlRun "ps xa | grep -v grep |grep ntpd" 0 "Checking to ensure that ipactl start started ntpd"
+	rlPhaseStartTest "ipa-ctl-12: ensure that ipactl start started named"
+		rlRun "ps xa | grep -v grep |grep named" 0 "Checking to ensure that ipactl start started named"
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-ctl-13: ensure that ipactl start started the $RELM instance of dirsrv"
@@ -114,8 +114,8 @@ rlJournalStart
 		rlRun "ps xa | grep -v grep |grep ipa_kpasswd" 0 "Checking to ensure that ipactl restart started ipa_kpasswd"
 	rlPhaseEnd
 
-	rlPhaseStartTest "ipa-ctl-17: ensure that ipactl restart started ntpd"
-		rlRun "ps xa | grep -v grep |grep ntpd" 0 "Checking to ensure that ipactl start restarted ntpd"
+	rlPhaseStartTest "ipa-ctl-17: ensure that ipactl restart started named"
+		rlRun "ps xa | grep -v grep |grep named" 0 "Checking to ensure that ipactl start restarted named"
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-ctl-18: ensure that ipactl restart started the $RELM instance of dirsrv"
@@ -128,40 +128,9 @@ rlJournalStart
         rlRun "rm -r $TmpDir" 0 "Removing tmp directory"
     rlPhaseEnd
 
-    makereport
+  rlJournalPrintText
+  report=/tmp/rhts.report.$RANDOM.txt
+  makereport $report
+rhts-submit-log -l $report
+
 rlJournalEnd
-
-
- 
-# manifest:
-# teststuie   : ipasample
-    ## testset: _lifetime
-        ### testcase: minlife_nolimit 
-            #### comment : this is to test for minimum of password history
-            #### data-loop : minage
-            #### data-no-loop : pwusername pwinintial_password
-        ### testcase: _minlife_somelimit
-            #### comment: set password life time to 0
-            #### data-loop: 
-            #### data-no-loop : pwusername pwinitial_password
-        ### testcase: _minlife_negative
-            #### comment: negative test case for minimum password life
-            #### data-loop: minage
-            #### data-no-loop : pwusername pwinitial_password
-        ### testcase: _minlife_verify
-            #### comment: verify the changes
-            #### data-loop: minage
-            #### data-no-loop : pwusername pwinitial_password
-    ## testset: pwhistory
-        ### testcase: _defaultvalue
-            #### comment: verifyt the default value
-            #### data-loop: size day 
-            #### data-no-loop:  admin adminpassword
-        ### testcase: _lowbound
-            #### comment: check the lower bound of value range
-            #### data-loop:  size day expired
-            #### data-no-loop: 
-        ### testcase: password_history_negative
-            #### comment: do negative test on history of password
-            #### data-loop:  size day expired newpw
-            #### data-no-loop: admin adminpassword
