@@ -93,6 +93,11 @@ rlJournalStart
 	rlPhaseStartTest "ipa-initscripts-008: $IPASERVICE stop"
 		rlRun "service $IPASERVICE stop" 0 " Stopping service"
 		rlRun "service $IPASERVICE status" 1 " Status of stopped service"
+                        # work around for bug 669358
+                        PID=`ps -e | grep slapd | cut -d " " -f 1`
+                        kill -9 $PID
+                        sleep 1
+                        ipactl stop
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-initscripts-009: $IPASERVICE stop service already stopped"
@@ -119,48 +124,40 @@ rlJournalStart
 		rlRun "service $IPASERVICE condrestart" 0 " Service has to implement condrestart function"
 	rlPhaseEnd
 
-	rlPhaseStartTest "ipa-initscripts-012: $IPASERVICE operation reload"
-		rlRun "service $IPASERVICE reload" 0 " Service has to implement reload function"
-	rlPhaseEnd
-
-	rlPhaseStartTest "ipa-initscripts-013: $IPASERVICE operation force-reload"
-		rlRun "service $IPASERVICE force-reload" 0 " Service has to implement force-reload function "
-	rlPhaseEnd
-
-	rlPhaseStartTest "ipa-initscripts-014: $IPASERVICE non existent function"
+	rlPhaseStartTest "ipa-initscripts-012: $IPASERVICE non existent function"
 		rlRun "service $IPASERVICE noexistop" 2 " Testing proper return code when nonexisting function"
 	rlPhaseEnd
 
-        rlPhaseStartTest "ipa-initscripts-015: $KPWDSERVICE start"
+        rlPhaseStartTest "ipa-initscripts-013: $KPWDSERVICE start"
                 rlServiceStop $KPWDSERVICE
                 rlRun "service $KPWDSERVICE start" 0 " Service must start without problem"
         rlPhaseEnd
 
-        rlPhaseStartTest "ipa-initscripts-016: $KPWDSERVICE status while started"
+        rlPhaseStartTest "ipa-initscripts-014: $KPWDSERVICE status while started"
                 rlRun "service $KPWDSERVICE status" 0 "Status with service started "
         rlPhaseEnd
 
-        rlPhaseStartTest "ipa-initscripts-017: $KPWDSERVICE start already started services"
+        rlPhaseStartTest "ipa-initscripts-015: $KPWDSERVICE start already started services"
                 rlRun "service $KPWDSERVICE start" 0 " Already started service "
                 rlRun "service $KPWDSERVICE status" 0 " Again status command "
         rlPhaseEnd
 
-        rlPhaseStartTest "ipa-initscripts-018: $KPWDSERVICE restart"
+        rlPhaseStartTest "ipa-initscripts-016: $KPWDSERVICE restart"
                 rlRun "service $KPWDSERVICE restart" 0 " Restarting of service"
                 rlRun "service $KPWDSERVICE status" 0 " Status command"
         rlPhaseEnd
 
-        rlPhaseStartTest "ipa-initscripts-019: $KPWDSERVICE stop"
+        rlPhaseStartTest "ipa-initscripts-017: $KPWDSERVICE stop"
                 rlRun "service $KPWDSERVICE stop" 0 " Stopping service"
                 rlRun "service $KPWDSERVICE status" 3 " Status of stopped service"
         rlPhaseEnd
 
-        rlPhaseStartTest "ipa-initscripts-020: $KPWDSERVICE stop service already stopped"
+        rlPhaseStartTest "ipa-initscripts-018: $KPWDSERVICE stop service already stopped"
                 rlRun "service $KPWDSERVICE stop" 0 " Stopping service again "
                 rlRun "service $KPWDSERVICE status" 3 " Status of stopped service "
         rlPhaseEnd
 
-        rlPhaseStartTest "ipa-initscripts-021: $KPWDSERVICE service as non root user"
+        rlPhaseStartTest "ipa-initscripts-019: $KPWDSERVICE service as non root user"
                 rlRun "su testuserqa -c 'service $KPWDSERVICE start'" 1 "Insufficient rights, starting service as nonprivileged user"
                 rlRun "su testuserqa -c 'service $KPWDSERVICE restart'" 1 "Insufficient rights, restarting service as nonprivileged user"
                 rlRun "service $KPWDSERVICE start " 0 " Starting service for next test"
@@ -168,52 +165,44 @@ rlJournalStart
                 rlRun "service $KPWDSERVICE stop " 0 " Stopping service for next test"
         rlPhaseEnd
 
-        rlPhaseStartTest "ipa-initscripts-022: $KPWDSERVICE operations - condrestart"
+        rlPhaseStartTest "ipa-initscripts-020: $KPWDSERVICE operations - condrestart"
                 rlRun "service $KPWDSERVICE condrestart" 0 " Service has to implement condrestart function"
         rlPhaseEnd
 
-        rlPhaseStartTest "ipa-initscripts-023: $KPWDSERVICE operation reload"
-                rlRun "service $KPWDSERVICE reload" 0 " Service has to implement reload function"
-        rlPhaseEnd
-
-        rlPhaseStartTest "ipa-initscripts-024: $KPWDSERVICE operation force-reload"
-                rlRun "service $KPWDSERVICE force-reload" 0 " Service has to implement force-reload function "
-        rlPhaseEnd
-
-        rlPhaseStartTest "ipa-initscripts-025: $KPWDSERVICE non existent function"
+        rlPhaseStartTest "ipa-initscripts-021: $KPWDSERVICE non existent function"
                 rlRun "service $KPWDSERVICE noexistop" 2 " Testing proper return code when nonexisting function"
         rlPhaseEnd
 
-        rlPhaseStartTest "ipa-initscripts-026: $DSSERVICE start"
+        rlPhaseStartTest "ipa-initscripts-022: $DSSERVICE start"
                 rlServiceStop $DSSERVICE
                 rlRun "service $DSSERVICE start" 0 " Service must start without problem"
         rlPhaseEnd
 
-        rlPhaseStartTest "ipa-initscripts-027: $DSSERVICE status while started"
+        rlPhaseStartTest "ipa-initscripts-023: $DSSERVICE status while started"
                 rlRun "service $DSSERVICE status" 0 "Status with service started "
         rlPhaseEnd
 
-        rlPhaseStartTest "ipa-initscripts-028: $DSSERVICE start already started services"
+        rlPhaseStartTest "ipa-initscripts-024: $DSSERVICE start already started services"
                 rlRun "service $DSSERVICE start" 0 " Already started service "
                 rlRun "service $DSSERVICE status" 0 " Again status command "
         rlPhaseEnd
 
-        rlPhaseStartTest "ipa-initscripts-029: $DSSERVICE restart"
+        rlPhaseStartTest "ipa-initscripts-025: $DSSERVICE restart"
                 rlRun "service $DSSERVICE restart" 0 " Restarting of service"
                 rlRun "service $DSSERVICE status" 0 " Status command"
         rlPhaseEnd
 
-        rlPhaseStartTest "ipa-initscripts-030: $DSSERVICE stop"
+        rlPhaseStartTest "ipa-initscripts-026: $DSSERVICE stop"
                 rlRun "service $DSSERVICE stop" 0 " Stopping service"
                 rlRun "service $DsSERVICE status" 3 " Status of stopped service"
         rlPhaseEnd
 
-        rlPhaseStartTest "ipa-initscripts-031: $DSSERVICE stop service already stopped"
+        rlPhaseStartTest "ipa-initscripts-027: $DSSERVICE stop service already stopped"
                 rlRun "service $DSSERVICE stop" 0 " Stopping service again "
                 rlRun "service $DSSERVICE status" 3 " Status of stopped service "
 	rlPhaseEnd
 
-        rlPhaseStartTest "ipa-initscripts-032: $DSSERVICE service as non root user"
+        rlPhaseStartTest "ipa-initscripts-028: $DSSERVICE service as non root user"
                 rlRun "su testuserqa -c 'service $DSSERVICE start'" 1 "Insufficient rights, starting service as nonprivileged user"
                 rlRun "su testuserqa -c 'service $DSSERVICE restart'" 1 "Insufficient rights, restarting service as nonprivileged user"
                 rlRun "service $DSSERVICE start " 0 " Starting service for next test"
@@ -228,19 +217,11 @@ rlJournalStart
                         ipactlstart
         rlPhaseEnd
 
-        rlPhaseStartTest "ipa-initscripts-033: $DSSERVICE operations - condrestart"
+        rlPhaseStartTest "ipa-initscripts-029: $DSSERVICE operations - condrestart"
                 rlRun "service $DSSERVICE condrestart" 0 " Service has to implement condrestart function"
         rlPhaseEnd
 
-        rlPhaseStartTest "ipa-initscripts-034: $DSSERVICE operation reload"
-                rlRun "service $DSSERVICE reload" 0 " Service has to implement reload function"
-        rlPhaseEnd
-
-        rlPhaseStartTest "ipa-initscripts-035: $DSSERVICE operation force-reload"
-                rlRun "service $DSSERVICE force-reload" 0 " Service has to implement force-reload function "
-        rlPhaseEnd
-
-        rlPhaseStartTest "ipa-initscripts-036: $DSSERVICE non existent function"
+        rlPhaseStartTest "ipa-initscripts-030: $DSSERVICE non existent function"
                 rlRun "service $DSSERVICE noexistop" 2 " Testing proper return code when nonexisting function"
         rlPhaseEnd
 
