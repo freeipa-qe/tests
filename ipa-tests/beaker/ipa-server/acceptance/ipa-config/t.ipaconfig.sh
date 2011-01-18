@@ -531,7 +531,7 @@ ipaconfig_searchlimit_timelimit_default()
         rlLog "this is to test for default behave"
         out=$TmpDir/ipaconfig.searchtimelimit.$RANDOM.out
         KinitAsAdmin
-        for value in -1 0 10 100 10000
+        for value in -1 10 55 100 10000
         do
             ipa config-mod --searchtimelimit=$value 2>&1 >/dev/null
             ipa config-show > $out
@@ -562,7 +562,7 @@ ipaconfig_searchlimit_timelimit_negative()
         rlLog "negative test case"
         out=$TmpDir/ipaconfig.searchtimelimit.$RANDOM.out
         KinitAsAdmin
-        for value in -10 a abc
+        for value in -10 0 a abc
         do
             ipa config-mod --searchtimelimit=$value 2>&1 >/dev/null
             ipa config-show > $out
