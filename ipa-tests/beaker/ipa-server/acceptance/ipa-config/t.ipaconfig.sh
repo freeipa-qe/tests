@@ -138,8 +138,8 @@ ipaconfig_show_default_logic()
         string_exist_infile "Group search fields:" $out
         string_exist_infile "Migration mode:" $out
         string_exist_infile "Certificate Subject base:" $out
-        string_exist_infile "aci:" $out
-        string_exist_infile "ipapwdexpadvnotify:" $out
+        string_exist_infile "Password plugin features:" $out
+        string_exist_infile "Password Expiration Notification:" $out
         rm $out; 
 
         rlLog "test for --raw option"
@@ -630,7 +630,7 @@ ipaconfig_searchlimit_recordslimit_default()
     rlPhaseEnd
 } #ipaconfig_searchlimit_recordsimie_default
 
-ipaconfig_searchlimit_recordsimie_default_logic()
+ipaconfig_searchlimit_recordslimit_default_logic()
 {
     # accept parameters: NONE
     # test logic starts
@@ -804,7 +804,7 @@ ipaconfig_server_enablemigration()
         rlLog "this is to test for default behave"
         out=$TmpDir/ipaconfig.enablemigration.$RANDOM.out
         KinitAsAdmin
-        for value in FALSE True False True false true
+        for value in TRUE FALSE True False true false
         do
             ipa config-mod --enable-migration=$value 2>&1 >/dev/null
             ipa config-show > $out
