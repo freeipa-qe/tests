@@ -110,45 +110,81 @@ fi
 	rlPhaseEnd
 
 	
+	zone=newzone
+	email="ipaqa@redhat.com"
+	serial=2010010701
+	refresh=300
+	retry=100
+	expire=1200
+	minimum=30
+	maximum=300
+	TTL=50
+	badnum=12345678901234
 	rlPhaseStartTest "ipa-dns-07: create a new zone"
-		rlRun "ipa dnsrecord-show $DOMAIN newfakehost$newip" 0 "Checking to ensure that ipa dns-show seems to think that the entry exists"
+		rlRun "ipa dnszone-add --name-server=$ipaddr --admin-email=$email --serial=$serial --refresh=$refresh --retry=$retry --expire=$expire --minimum=$minimum --ttl=$ttl $zone" 0 "Checking to ensure that ipa thinks that it can create a zone"
 	rlPhaseEnd
 
+# Neg zone add test cases
+	rlPhaseStartTest "ipa-dns-08: try to create a new zone using a bad serial number"
+		rlRun "ipa dnszone-add --name-server=$ipaddr --admin-email=$email --serial=$badnum --refresh=$refresh --retry=$retry --expire=$expire --minimum=$minimum --ttl=$ttl zone" 1 "trying to create a zone using a bad serial number"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-09: try to create a new zone using a bad refresh"
+		rlRun "ipa dnszone-add --name-server=$ipaddr--admin-email=$email --serial=$serial --refresh=$badnum --retry=$retry --expire=$expire --minimum=$minimum --ttl=$ttl zone" 1 "trying to create a zone using a bad refresh"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-10: try to create a new zone using a bad retry"
+		rlRun "ipa dnszone-add --name-server=$ipaddr --admin-email=$email --serial=$serial --refresh=$refresh --retry=$badnum --expire=$expire --minimum=$minimum --ttl=$ttl zone" 1 "trying to create a zone using a bad retry"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-11: try to create a new zone using a bad expire"
+		rlRun "ipa dnszone-add --name-server=$ipaddr --admin-email=$email --serial=$serial --refresh=$refresh --retry=$retry --expire=$badnum --minimum=$minimum --ttl=$ttl zone" 1 "trying to create a zone using a bad expire"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-12: try to create a new zone using a bad minimum"
+		rlRun "ipa dnszone-add --name-server=$ipaddr --admin-email=$email --serial=$serial --refresh=$refresh --retry=$retry --expire=$expire --minimum=$badnum --ttl=$ttl zone" 1 "trying to create a zone using a bad minimum"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-13: try to create a new zone using a bad ttl"
+		rlRun "ipa dnszone-add --name-server=$ipaddr --admin-email=$email --serial=$serial --refresh=$refresh --retry=$retry --expire=$expire --minimum=$minimum --ttl=$badnum zone" 1 "trying to create a zone using a bad ttl"
+	rlPhaseEnd
+
+# End neg add test cases
+
+	rlPhaseStartTest "ipa-dns-14: checking to ensure that the new zone got created with the correct name-server"
+		rlRun "ipa dnszone-find $zone | grep $ipaddr" 0 "checking to ensure that the new zone got created with the correct name-server"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-15: checking to ensure that the new zone got created with the correct email"
+		rlRun "ipa dnszone-find $zone | grep $email" 0 "checking to ensure that the new zone got created with the correct email"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-16: checking to ensure that the new zone got created with the correct serial number"
+		rlRun "ipa dnszone-find $zone | grep $serial" 0 "checking to ensure that the new zone got created with the correct serial number"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-17: checking to ensure that the new zone got created with the correct refresh"
+		rlRun "ipa dnszone-find $zone | grep $refresh" 0 "checking to ensure that the new zone got created with the correct "
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-18: checking to ensure that the new zone got created with the correct retry"
+		rlRun "ipa dnszone-find $zone | grep $retry" 0 "checking to ensure that the new zone got created with the correct retry"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-19: checking to ensure that the new zone got created with the correct expire"
+		rlRun "ipa dnszone-find $zone | grep $expire" 0 "checking to ensure that the new zone got created with the correct expire"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-20: checking to ensure that the new zone got created with the correct minimum"
+		rlRun "ipa dnszone-find $zone | grep $minimum" 0 "checking to ensure that the new zone got created with the correct minimum"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-21: checking to ensure that the new zone got created with the correct ttl"
+		rlRun "ipa dnszone-find $zone | grep $ttl" 0 "checking to ensure that the new zone got created with the correct ttl"
+	rlPhaseEnd
 
     makereport
 rlJournalEnd
 
 
  
-# manifest:
-# teststuie   : ipasample
-    ## testset: _lifetime
-        ### testcase: minlife_nolimit 
-            #### comment : this is to test for minimum of password history
-            #### data-loop : minage
-            #### data-no-loop : pwusername pwinintial_password
-        ### testcase: _minlife_somelimit
-            #### comment: set password life time to 0
-            #### data-loop: 
-            #### data-no-loop : pwusername pwinitial_password
-        ### testcase: _minlife_negative
-            #### comment: negative test case for minimum password life
-            #### data-loop: minage
-            #### data-no-loop : pwusername pwinitial_password
-        ### testcase: _minlife_verify
-            #### comment: verify the changes
-            #### data-loop: minage
-            #### data-no-loop : pwusername pwinitial_password
-    ## testset: pwhistory
-        ### testcase: _defaultvalue
-            #### comment: verifyt the default value
-            #### data-loop: size day 
-            #### data-no-loop:  admin adminpassword
-        ### testcase: _lowbound
-            #### comment: check the lower bound of value range
-            #### data-loop:  size day expired
-            #### data-no-loop: 
-        ### testcase: password_history_negative
-            #### comment: do negative test on history of password
-            #### data-loop:  size day expired newpw
-            #### data-no-loop: admin adminpassword
