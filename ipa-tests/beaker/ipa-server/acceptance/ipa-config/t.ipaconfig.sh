@@ -66,8 +66,8 @@ ipaconfig_server()
     ipaconfig_server_enablemigration
     ipaconfig_server_enablemigration_negative
     ipaconfig_server_subject
-    ipaconfig_server_subject_negative
-    ipaconfig_server_envcleanup
+    #ipaconfig_server_subject_negative - tests no longer valid option to configure has been removed
+    #ipaconfig_server_envcleanup
 } #ipaconfig_server
 
 ######################
@@ -114,7 +114,7 @@ ipaconfig_show_default()
 # looped data   : 
 # non-loop data : 
     rlPhaseStartTest "ipaconfig_show_default"
-        rlLog "this is to test for defult behave"
+        rlLog "this is to test for defult behavior"
         ipaconfig_show_default_logic
     rlPhaseEnd
 } #ipaconfig_show_default
@@ -166,7 +166,7 @@ ipaconfig_show_negative()
 # looped data   : 
 # non-loop data : 
     rlPhaseStartTest "ipaconfig_show_negative"
-        rlLog "this is to test for defult behave"
+        rlLog "this is to test for defult behavior"
         ipaconfig_show_negative_logic
     rlPhaseEnd
 } #ipaconfig_show_negative
@@ -203,7 +203,7 @@ ipaconfig_mod_maxusername_default()
 # looped data   : 
 # non-loop data : 
     rlPhaseStartTest "ipaconfig_mod_maxusername_default"
-        rlLog "this is to test for default behave"
+        rlLog "this is to test for default behavior"
         # only do spot check for username length setting
         # assuming spot is randomly selected at 21
         # we will then check: 1, 20,21,22,255
@@ -286,7 +286,7 @@ ipaconfig_mod_homedirectory_default()
 # looped data   : 
 # non-loop data : 
     rlPhaseStartTest "ipaconfig_mod_homedirectory_default"
-        rlLog "this is to test for default behave"
+        rlLog "this is to test for default behavior"
         KinitAsAdmin
         local testdir=`GenerateHomeDirectoryName`
         rlRun "ipa config-mod --homedirectory=$testdir" 0 "set homedirectory=[$testdir]"
@@ -342,7 +342,7 @@ ipaconfig_mod_defaultshell_default()
 # looped data   : 
 # non-loop data : 
     rlPhaseStartTest "ipaconfig_mod_defaultshell_default"
-        rlLog "this is to test for default behave"
+        rlLog "this is to test for default behavior"
         KinitAsAdmin
         local testshell=`GenerateShellName`
         rlRun "ipa config-mod --defaultshell=$testshell" 0 "set defaultshell=[$testshell]"
@@ -400,7 +400,7 @@ ipaconfig_mod_defaultgroup_default()
 # looped data   : 
 # non-loop data : 
     rlPhaseStartTest "ipaconfig_mod_defaultgroup_default"
-        rlLog "this is to test for default behave"
+        rlLog "this is to test for default behavior"
         KinitAsAdmin
         local testgroup=`GenerateGroupName`
         rlRun "ipa config-mod --defaultgroup=\"$testgroup\" " 0 "set defaultgroup=[$testgroup]"
@@ -453,7 +453,7 @@ ipaconfig_mod_emaildomain_default()
 # looped data   : 
 # non-loop data : 
     rlPhaseStartTest "ipaconfig_mod_emaildomain_default"
-        rlLog "this is to test for default behave"
+        rlLog "this is to test for default behavior"
         KinitAsAdmin
         local testdomain=`GenerateDomainName`
         rlRun "ipa config-mod --emaildomain=$testdomain" 0 "set emaildomain=[$testdomain]"
@@ -528,7 +528,7 @@ ipaconfig_searchlimit_timelimit_default()
 # looped data   : 
 # non-loop data : 
     rlPhaseStartTest "ipaconfig_searchlimit_timelimit_default"
-        rlLog "this is to test for default behave"
+        rlLog "this is to test for default behavior"
         out=$TmpDir/ipaconfig.searchtimelimit.$RANDOM.out
         KinitAsAdmin
         for value in -1 10 55 100 10000
@@ -590,8 +590,8 @@ ipaconfig_searchlimit_recordslimit_default()
 {
 # looped data   : 
 # non-loop data : 
-    rlPhaseStartTest "ipaconfig_searchlimit_recordsimie_default"
-        rlLog "this is to test for default behave"
+    rlPhaseStartTest "ipaconfig_searchlimit_recordslimit_default"
+        rlLog "this is to test for default behavior"
         KinitAsAdmin
         for value in 0 10 100 10000
         do
@@ -692,7 +692,7 @@ ipaconfig_searchfields_userfields_default()
 # looped data   : 
 # non-loop data : 
     rlPhaseStartTest "ipaconfig_searchfields_userfields_default"
-        rlLog "this is to test for default behave"
+        rlLog "this is to test for default behavior"
         local out=$TmpDir/searchfields.userfields.$RANDOM.out
         # setup special account for this test
         specialvalue=999999999999
@@ -738,7 +738,7 @@ ipaconfig_searchfields_groupfields_default()
 # looped data   : 
 # non-loop data : 
     rlPhaseStartTest "ipaconfig_searchfields_groupfields_default"
-        rlLog "this is to test for default behave"
+        rlLog "this is to test for default behavior"
         local out=$TmpDir/searchfields.groupfields.$RANDOM.out
         # setup special account for this test
         specialvalue=999999999999
@@ -801,7 +801,7 @@ ipaconfig_server_enablemigration()
 # looped data   : 
 # non-loop data : 
     rlPhaseStartTest "ipaconfig_server_enablemigration"
-        rlLog "this is to test for default behave"
+        rlLog "this is to test for default behavior"
         out=$TmpDir/ipaconfig.enablemigration.$RANDOM.out
         KinitAsAdmin
         for value in TRUE FALSE True False true false
@@ -853,7 +853,7 @@ ipaconfig_server_subject()
 # looped data   : 
 # non-loop data : 
     rlPhaseStartTest "ipaconfig_server_subject"
-        rlLog "this is to test for default behave"
+        rlLog "this is to test for default behavior"
         out=$TmpDir/ipaconfig.subject.$RANDOM.out
         KinitAsAdmin
         value="o=ipatest"
