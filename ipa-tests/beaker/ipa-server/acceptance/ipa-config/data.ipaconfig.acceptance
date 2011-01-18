@@ -28,5 +28,5 @@ default_config_sizelimit="0"
 default_config_usersearchfields="uid,givenname,sn,telephonenumber,ou,title"
 default_config_groupsearchfields="cn,description"
 default_config_migrationmode="FALSE"
-default_config_certsubjectbase="O=IPA"
+default_config_certsubjectbase="O=$RELM"
 
