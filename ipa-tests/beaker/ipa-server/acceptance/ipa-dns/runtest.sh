@@ -88,6 +88,7 @@ fi
 		ipa-replica-prepare -p $ADMINPW --ip-address=$ipoc1.$ipoc2.$ipoc3.$newip newfakehost$newip.$DOMAIN
 	rlPhaseEnd
 
+
 	rlPhaseStartTest "ipa-dns-02: ensure that the forward ip of the new fakehost was created in dns correctly with ping"
 		rlRun "ping -c 1 newfakehost$newip.$DOMAIN" 0 "Checking to ensure that the forward for the new fake host was created in dns"
 	rlPhaseEnd
@@ -111,17 +112,17 @@ fi
 
 	
 	zone=newzone
-	email="ipaqa@redhat.com"
+	email="ipaqar.redhat.com"
 	serial=2010010701
-	refresh=300
-	retry=100
-	expire=1200
-	minimum=30
-	maximum=300
-	TTL=50
+	refresh=303
+	retry=101
+	expire=1202
+	minimum=33
+	TTL=55
 	badnum=12345678901234
 	rlPhaseStartTest "ipa-dns-07: create a new zone"
 		rlRun "ipa dnszone-add --name-server=$ipaddr --admin-email=$email --serial=$serial --refresh=$refresh --retry=$retry --expire=$expire --minimum=$minimum --ttl=$ttl $zone" 0 "Checking to ensure that ipa thinks that it can create a zone"
+		rlRun "/usr/sbin/ipactl restart" 0 "Restarting IPA server"
 	rlPhaseEnd
 
 # Neg zone add test cases
@@ -183,6 +184,39 @@ fi
 		rlRun "ipa dnszone-find $zone | grep $ttl" 0 "checking to ensure that the new zone got created with the correct ttl"
 	rlPhaseEnd
 
+	rlPhaseStartTest "ipa-dns-22: checking to with dig to ensure that the new zone got created with the correct name server"
+		rlRun "dig $zone SOA | grep NS | grep $ipaddr" 0 "checking with dig to ensure that the new zone got created with the correct name server"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-23: checking to with dig to ensure that the new zone got created with the correct email"
+		rlRun "dig $zone SOA | grep $email" 0 "checking with dig to ensure that the new zone got created with the correct email"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-24: checking to with dig to ensure that the new zone got created with the correct serial number"
+		rlRun "dig $zone SOA | grep $serial" 0 "checking with dig to ensure that the new zone got created with the correct serial number"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-25: checking to with dig to ensure that the new zone got created with the correct refresh"
+		rlRun "dig $zone SOA | grep $refresh" 0 "checking with dig to ensure that the new zone got created with the correct refresh"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-26: checking to with dig to ensure that the new zone got created with the correct retry interval"
+		rlRun "dig $zone SOA | grep $retry" 0 "checking with dig to ensure that the new zone got created with the correct retry interval"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-27: checking to with dig to ensure that the new zone got created with the correct expire"
+		rlRun "dig $zone SOA | grep $expire" 0 "checking with dig to ensure that the new zone got created with the correct expire"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-28: checking to with dig to ensure that the new zone got created with the correct minimum"
+		rlRun "dig $zone SOA | grep $minimum" 0 "checking with dig to ensure that the new zone got created with the correct minimum"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-29: checking to with dig to ensure that the new zone got created with the correct ttl"
+		rlRun "dig $zone SOA | grep $ttl" 0 "checking with dig to ensure that the new zone got created with the correct ttl"
+	rlPhaseEnd
+
+
 	a="1.2.3.4"
 	a2="1.2.3.4,2.3.4.5"
 	aaaa="fec0:0:a10:6000:10:16ff:fe98:193"
@@ -190,9 +224,7 @@ fi
 	
 	  --a-rec=LIST          comma-separated list of A records
   --aaaa-rec=LIST       comma-separated list of AAAA records
-  --a6-rec=LIST         comma-separated list of A6 records
   --afsdb-rec=LIST      comma-separated list of AFSDB records
-  --apl-rec=LIST        comma-separated list of APL records
   --cert-rec=LIST       comma-separated list of CERT records
   --cname-rec=LIST      comma-separated list of CNAME records
   --dhcid-rec=LIST      comma-separated list of DHCID records
