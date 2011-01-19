@@ -260,8 +260,38 @@ fi
   --tsig-rec=LIST       comma-separated list of TSIG records
   --txt-rec=LIST        comma-separated list of TXT records
 
-	rlPhaseStartTest "ipa-dns-22: add record type A with one record"
-		rlRun "ipa drecord-add " 0 "add record type"
+	rlPhaseStartTest "ipa-dns-30: add record of type A"
+		rlRun "ipa dnsrecord-add $zone a --a-rec $a" 0 "add record type a"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-31: make sure that IPA saved record type A"
+		rlRun "ipa dnsrecord-add $zone a | grep $a" 0 "make sure ipa recieved record type A"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-32: make sure that dig can find the record type A"
+		rlRun "dig a.$zone | grep $a" 0 "make sure dig can find the A record"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-33: add record of type multiple A records"
+		rlRun "ipa dnsrecord-add $zone a2 --a-rec $a2" 0 "add record type a"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-34: make sure that IPA saved the first type A record"
+		thisa=$(echo $a2 | sed s/,/\ /g | awk '{print $1}')
+		rlRun "ipa dnsrecord-add $zone a2 | grep $thisa" 0 "make sure ipa recieved record type A"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-36: make sure that dig can find the first a record"
+		rlRun "dig a2.$zone | grep $thisa" 0 "make sure dig finds the first A record"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-37: make sure that IPA saved the first type A record"
+		thisa=$(echo $a2 | sed s/,/\ /g | awk '{print $2}')
+		rlRun "ipa dnsrecord-add $zone a2 | grep $thisa" 0 "make sure ipa recieved record type A"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-38: make sure that dig can find the first a record"
+		rlRun "dig a2.$zone | grep $thisa" 0 "make sure dig finds the first A record"
 	rlPhaseEnd
 
     makereport
