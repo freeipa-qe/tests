@@ -1,4 +1,15 @@
-
+######################
+# Expected defaults  #
+######################
+default_config_usernamelength=:"32"
+default_config_homebase="/home"
+default_config_shell="/bin/sh"
+default_config_usergroup="ipausers"
+default_config_timelimit="2"
+default_config_sizelimit="100"
+default_config_usersearchfields="uid,givenname,sn,telephonenumber,ou,title"
+default_config_groupsearchfields="cn,description"
+default_config_migrationmode="FALSE"
 ######################
 # test suite         #
 ######################
@@ -65,9 +76,9 @@ ipaconfig_server()
     ipaconfig_server_envsetup
     ipaconfig_server_enablemigration
     ipaconfig_server_enablemigration_negative
-    ipaconfig_server_subject
+    #ipaconfig_server_subject
     #ipaconfig_server_subject_negative - tests no longer valid option to configure has been removed
-    #ipaconfig_server_envcleanup
+    ipaconfig_server_envcleanup
 } #ipaconfig_server
 
 ######################
@@ -86,7 +97,8 @@ ipaconfig_envcleanup()
 {
     rlPhaseStartCleanup "ipaconfig_envcleanup"
         #environment cleanup starts here
-        restore_ipaconfig
+    KinitAsAdmin
+    rlRun "ipa config-mod --maxusername=$default_config_usernamelength --homedirectory=$default_config_homebase --defaultshell=$default_config_shell --defaultgroup=$default_config_usergroup --searchtimelimit=$default_config_timelimit --searchrecordslimit=$default_config_sizelimit --usersearch=$default_config_usersearchfields --groupsearch=$default_config_groupsearchfields --enable-migration=$default_config_migrationmode" 0 "to be save set ipa config back to default"
         #environment cleanup ends   here
     rlPhaseEnd
 } #ipaconfig_envcleanup
@@ -235,7 +247,7 @@ ipaconfig_mod_maxusername_default_logic()
         # fail case: 11, 255 (current max)
 
         local spot=`getrandomint 2 $length` 
-        local username_length="1 $spot $length"
+        local username_length="1 $spot $length 32"
         #when current username < definedLength, test should pass
         expected=0
         for curlen in $username_length ; do
@@ -249,7 +261,7 @@ ipaconfig_mod_maxusername_default_logic()
         local username_length="$longer $config_username_maxlength"
         #when current username>defined, test should fail 
         expected=1
-        for curlen in $username_length ; do
+        for curlen in $username_length 32 ; do
             username=`dataGenerator "username" $curlen`
             rlLog "test: len=[$curlen], username=[$username], expect fail"
             create_ipauser $expected $username
@@ -313,6 +325,9 @@ ipaconfig_mod_homedirectory_default_logic()
         fi
         clear_kticket
         rm $out
+
+	rlRun "ipa config-mod --homedirectory=$default_config_homebase" 0 "set homedirectory=[$default_config_homebase] - back to default"
+	ipa user-del $username
     # test logic ends
 } # ipaconfig_mod_homedirectory_default_logic 
 
@@ -369,6 +384,9 @@ ipaconfig_mod_defaultshell_default_logic()
         fi
         clear_kticket
         rm $out
+
+	rlRun "ipa config-mod --defaultshell=$default_config_shell" 0 "set defaultshell=[$default_config_shell] - back to default"
+	ipa user-del $username
 
     # test logic ends
 } # ipaconfig_mod_defaultshell_default_logic 
@@ -531,7 +549,7 @@ ipaconfig_searchlimit_timelimit_default()
         rlLog "this is to test for default behavior"
         out=$TmpDir/ipaconfig.searchtimelimit.$RANDOM.out
         KinitAsAdmin
-        for value in -1 10 55 100 10000
+        for value in -1 10 55 100 10000 2
         do
             ipa config-mod --searchtimelimit=$value 2>&1 >/dev/null
             ipa config-show > $out
@@ -593,7 +611,7 @@ ipaconfig_searchlimit_recordslimit_default()
     rlPhaseStartTest "ipaconfig_searchlimit_recordslimit_default"
         rlLog "this is to test for default behavior"
         KinitAsAdmin
-        for value in 0 10 100 10000
+        for value in 0 10 97 10000 100
         do
             ipa config-mod --searchrecordslimit=$value 2>&1 >/dev/null
             ipa config-show > $out
@@ -628,7 +646,7 @@ ipaconfig_searchlimit_recordslimit_default()
             rlFail "recordslimit sets to 2, but returned [$returnedNumEntry] entries"
         fi
     rlPhaseEnd
-} #ipaconfig_searchlimit_recordsimie_default
+} #ipaconfig_searchlimit_recordslimit_default
 
 ipaconfig_searchlimit_recordslimit_default_logic()
 {
@@ -646,7 +664,7 @@ ipaconfig_searchlimit_recordslimit_negative()
         rlLog "negative test case"
         out=$TmpDir/ipaconfig.searchrecordlimit.$RANDOM.out
         KinitAsAdmin
-        for value in -1 -10 a abc 
+        for value in -2 -10 a abc 
         do
             ipa config-mod --searchrecordslimit=$value 2>&1 >/dev/null
             ipa config-show > $out
