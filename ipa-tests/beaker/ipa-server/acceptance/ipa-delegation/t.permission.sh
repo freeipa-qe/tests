@@ -6,9 +6,9 @@
 
 permission()
 {
-    permission_add
+#    permission_add
 #    permission_del
-#    permission_find
+    permission_find
 #    permission_mod
 #    permission_show
 } #permission
@@ -118,7 +118,7 @@ permission_add_1001()
         local expectedErrMsg=replace_me
         qaRun "ipa permission-add $testID  --addattr=$addattr_TestValue_Negative " "$tmpout" 1 "$expectedErrMsg" "test options:  [addattr]=[$addattr_TestValue_Negative]" 
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_add_1001
 
@@ -131,7 +131,7 @@ permission_add_1002()
         local addattr_TestValue="replace_me" #addattr;positive;STR
         rlRun "ipa permission-add $testID  --addattr=$addattr_TestValue " 0 "test options:  [addattr]=[$addattr_TestValue]" 
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_add_1002
 
@@ -149,7 +149,7 @@ permission_add_1003()
         local expectedErrMsg="ipa: ERROR: targetattr \"$attrs_TestValue_Negative\" does not exist in schema"
         qaRun "ipa permission-add $testID  --desc=$desc_TestValue  --attrs=$attrs_TestValue_Negative  --memberof=$memberof_TestValue  --permissions=$permissions_TestValue  --filter=$filter_TestValue " "$tmpout" 1 "$expectedErrMsg" "test options:  [desc]=[$desc_TestValue] [attrs]=[$attrs_TestValue_Negative] [memberof]=[$memberof_TestValue] [permissions]=[$permissions_TestValue] [filter]=[$filter_TestValue]" debug
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_add_1003
 
@@ -167,7 +167,7 @@ permission_add_1004()
         local expectedErrMsg="ipa: ERROR: targetattr \"$attrs_TestValue_Negative\" does not exist in schema"
         qaRun "ipa permission-add $testID  --desc=$desc_TestValue  --attrs=$attrs_TestValue_Negative  --memberof=$memberof_TestValue  --permissions=$permissions_TestValue  --subtree=$subtree_TestValue " "$tmpout" 1 "$expectedErrMsg" "test options:  [desc]=[$desc_TestValue] [attrs]=[$attrs_TestValue_Negative] [memberof]=[$memberof_TestValue] [permissions]=[$permissions_TestValue] [subtree]=[$subtree_TestValue]" 
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_add_1004
 
@@ -185,7 +185,7 @@ permission_add_1005()
         local expectedErrMsg="ipa: ERROR: targetattr \"$attrs_TestValue_Negative\" does not exist in schema"
         qaRun "ipa permission-add $testID  --desc=$desc_TestValue  --attrs=$attrs_TestValue_Negative  --memberof=$memberof_TestValue  --permissions=$permissions_TestValue  --targetgroup=$targetgroup_TestValue " "$tmpout" 1 "$expectedErrMsg" "test options:  [desc]=[$desc_TestValue] [attrs]=[$attrs_TestValue_Negative] [memberof]=[$memberof_TestValue] [permissions]=[$permissions_TestValue] [targetgroup]=[$targetgroup_TestValue]" 
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_add_1005
 
@@ -203,7 +203,7 @@ permission_add_1006()
         local expectedErrMsg="ipa: ERROR: targetattr \"$attrs_TestValue_Negative\" does not exist in schema"
         qaRun "ipa permission-add $testID  --desc=$desc_TestValue  --attrs=$attrs_TestValue_Negative  --memberof=$memberof_TestValue  --permissions=$permissions_TestValue  --type=$type_TestValue " "$tmpout" 1 "$expectedErrMsg" "test options:  [desc]=[$desc_TestValue] [attrs]=[$attrs_TestValue_Negative] [memberof]=[$memberof_TestValue] [permissions]=[$permissions_TestValue] [type]=[$type_TestValue]" 
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_add_1006
 
@@ -220,7 +220,7 @@ permission_add_1007()
         local expectedErrMsg="ipa: ERROR: targetattr \"$attrs_TestValue_Negative\" does not exist in schema"
         qaRun "ipa permission-add $testID  --desc=$desc_TestValue  --attrs=$attrs_TestValue_Negative  --permissions=$permissions_TestValue  --filter=$filter_TestValue " "$tmpout" 1 "$expectedErrMsg" "test options:  [desc]=[$desc_TestValue] [attrs]=[$attrs_TestValue_Negative] [permissions]=[$permissions_TestValue] [filter]=[$filter_TestValue]" 
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_add_1007
 
@@ -237,7 +237,7 @@ permission_add_1008()
         local expectedErrMsg="ipa: ERROR: targetattr \"$attrs_TestValue_Negative\" does not exist in schema"
         qaRun "ipa permission-add $testID  --desc=$desc_TestValue  --attrs=$attrs_TestValue_Negative  --permissions=$permissions_TestValue  --subtree=$subtree_TestValue " "$tmpout" 1 "$expectedErrMsg" "test options:  [desc]=[$desc_TestValue] [attrs]=[$attrs_TestValue_Negative] [permissions]=[$permissions_TestValue] [subtree]=[$subtree_TestValue]" 
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_add_1008
 
@@ -254,7 +254,7 @@ permission_add_1009()
         local expectedErrMsg="ipa: ERROR: targetattr \"$attrs_TestValue_Negative\" does not exist in schema"
         qaRun "ipa permission-add $testID  --desc=$desc_TestValue  --attrs=$attrs_TestValue_Negative  --permissions=$permissions_TestValue  --targetgroup=$targetgroup_TestValue " "$tmpout" 1 "$expectedErrMsg" "test options:  [desc]=[$desc_TestValue] [attrs]=[$attrs_TestValue_Negative] [permissions]=[$permissions_TestValue] [targetgroup]=[$targetgroup_TestValue]" debug
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_add_1009
 
@@ -271,7 +271,7 @@ permission_add_1010()
         local expectedErrMsg="ipa: ERROR: targetattr \"$attrs_TestValue_Negative\" does not exist in schema"
         qaRun "ipa permission-add $testID  --desc=$desc_TestValue  --attrs=$attrs_TestValue_Negative  --permissions=$permissions_TestValue  --type=$type_TestValue " "$tmpout" 1 "$expectedErrMsg" "test options:  [desc]=[$desc_TestValue] [attrs]=[$attrs_TestValue_Negative] [permissions]=[$permissions_TestValue] [type]=[$type_TestValue]" debug
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_add_1010
 
@@ -290,7 +290,7 @@ permission_add_1011()
         local errCode=2
         qaRun "ipa permission-add $testID  --desc=$desc_TestValue  --attrs=$attrs_TestValue  --memberof=$memberof_TestValue_Negative  --permissions=$permissions_TestValue  --filter=$filter_TestValue " "$tmpout" $errCode "$expectedErrMsg" "test options:  [desc]=[$desc_TestValue] [attrs]=[$attrs_TestValue] [memberof]=[$memberof_TestValue_Negative] [permissions]=[$permissions_TestValue] [filter]=[$filter_TestValue]" debug
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_add_1011
 
@@ -309,7 +309,7 @@ permission_add_1012()
         local errCode=2
         qaRun "ipa permission-add $testID  --desc=$desc_TestValue  --attrs=$attrs_TestValue  --memberof=$memberof_TestValue_Negative  --permissions=$permissions_TestValue  --subtree=$subtree_TestValue " "$tmpout" $errCode "$expectedErrMsg" "test options:  [desc]=[$desc_TestValue] [attrs]=[$attrs_TestValue] [memberof]=[$memberof_TestValue_Negative] [permissions]=[$permissions_TestValue] [subtree]=[$subtree_TestValue]" 
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_add_1012
 
@@ -328,7 +328,7 @@ permission_add_1013()
         local errCode=2
         qaRun "ipa permission-add $testID  --desc=$desc_TestValue  --attrs=$attrs_TestValue  --memberof=$memberof_TestValue_Negative  --permissions=$permissions_TestValue  --targetgroup=$targetgroup_TestValue " "$tmpout" $errCode "$expectedErrMsg" "test options:  [desc]=[$desc_TestValue] [attrs]=[$attrs_TestValue] [memberof]=[$memberof_TestValue_Negative] [permissions]=[$permissions_TestValue] [targetgroup]=[$targetgroup_TestValue]" 
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_add_1013
 
@@ -347,7 +347,7 @@ permission_add_1014()
         local errCode=2
         qaRun "ipa permission-add $testID  --desc=$desc_TestValue  --attrs=$attrs_TestValue  --memberof=$memberof_TestValue_Negative  --permissions=$permissions_TestValue  --type=$type_TestValue " "$tmpout" $errCode "$expectedErrMsg" "test options:  [desc]=[$desc_TestValue] [attrs]=[$attrs_TestValue] [memberof]=[$memberof_TestValue_Negative] [permissions]=[$permissions_TestValue] [type]=[$type_TestValue]" 
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_add_1014
 
@@ -366,7 +366,7 @@ permission_add_1015()
         local errCode=1
         qaRun "ipa permission-add $testID  --desc=$desc_TestValue  --attrs=$attrs_TestValue  --memberof=$memberof_TestValue  --permissions=$permissions_TestValue_Negative  --filter=$filter_TestValue " "$tmpout" $errCode "$expectedErrMsg" "test options:  [desc]=[$desc_TestValue] [attrs]=[$attrs_TestValue] [memberof]=[$memberof_TestValue] [permissions]=[$permissions_TestValue_Negative] [filter]=[$filter_TestValue]" 
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_add_1015
 
@@ -384,7 +384,7 @@ permission_add_1016()
         local expectedErrMsg="ipa: ERROR: invalid 'permissions': \"$permissions_TestValue_Negative\" is not a valid permission"
         qaRun "ipa permission-add $testID  --desc=$desc_TestValue  --attrs=$attrs_TestValue  --memberof=$memberof_TestValue  --permissions=$permissions_TestValue_Negative  --subtree=$subtree_TestValue " "$tmpout" 1 "$expectedErrMsg" "test options:  [desc]=[$desc_TestValue] [attrs]=[$attrs_TestValue] [memberof]=[$memberof_TestValue] [permissions]=[$permissions_TestValue_Negative] [subtree]=[$subtree_TestValue]" 
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_add_1016
 
@@ -402,7 +402,7 @@ permission_add_1017()
         local expectedErrMsg="ipa: ERROR: invalid 'permissions': \"$permissions_TestValue_Negative\" is not a valid permission"
         qaRun "ipa permission-add $testID  --desc=$desc_TestValue  --attrs=$attrs_TestValue  --memberof=$memberof_TestValue  --permissions=$permissions_TestValue_Negative  --targetgroup=$targetgroup_TestValue " "$tmpout" 1 "$expectedErrMsg" "test options:  [desc]=[$desc_TestValue] [attrs]=[$attrs_TestValue] [memberof]=[$memberof_TestValue] [permissions]=[$permissions_TestValue_Negative] [targetgroup]=[$targetgroup_TestValue]" 
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_add_1017
 
@@ -420,7 +420,7 @@ permission_add_1018()
         local expectedErrMsg="ipa: ERROR: invalid 'permissions': \"$permissions_TestValue_Negative\" is not a valid permission"
         qaRun "ipa permission-add $testID  --desc=$desc_TestValue  --attrs=$attrs_TestValue  --memberof=$memberof_TestValue  --permissions=$permissions_TestValue_Negative  --type=$type_TestValue " "$tmpout" 1 "$expectedErrMsg" "test options:  [desc]=[$desc_TestValue] [attrs]=[$attrs_TestValue] [memberof]=[$memberof_TestValue] [permissions]=[$permissions_TestValue_Negative] [type]=[$type_TestValue]" 
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_add_1018
 
@@ -438,7 +438,7 @@ permission_add_1019()
         local expectedErrMsg=replace_me # empty filter parameter cause ipa server through "internal error" -yizhang 1-18-2011
         qaRun "ipa permission-add $testID  --desc=$desc_TestValue  --attrs=$attrs_TestValue  --memberof=$memberof_TestValue  --permissions=$permissions_TestValue  --filter=$filter_TestValue_Negative " "$tmpout" 1 "$expectedErrMsg" "test options:  [desc]=[$desc_TestValue] [attrs]=[$attrs_TestValue] [memberof]=[$memberof_TestValue] [permissions]=[$permissions_TestValue] [filter]=[$filter_TestValue_Negative]" 
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_add_1019
 
@@ -456,7 +456,7 @@ permission_add_1020()
         rlRun "ipa permission-add $testID  --desc=$desc_TestValue  --attrs=$attrs_TestValue  --memberof=$memberof_TestValue  --permissions=$permissions_TestValue  --filter=$filter_TestValue " 0 "test options:  [desc]=[$desc_TestValue] [attrs]=[$attrs_TestValue] [memberof]=[$memberof_TestValue] [permissions]=[$permissions_TestValue] [filter]=[$filter_TestValue]" 
         deletePermission $testID
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_add_1020
 
@@ -474,7 +474,7 @@ permission_add_1021()
         local expectedErrMsg=replace_me
         qaRun "ipa permission-add $testID  --desc=$desc_TestValue  --attrs=$attrs_TestValue  --memberof=$memberof_TestValue  --permissions=$permissions_TestValue  --subtree=$subtree_TestValue_Negative " "$tmpout" 1 "$expectedErrMsg" "test options:  [desc]=[$desc_TestValue] [attrs]=[$attrs_TestValue] [memberof]=[$memberof_TestValue] [permissions]=[$permissions_TestValue] [subtree]=[$subtree_TestValue_Negative]" 
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_add_1021
 
@@ -491,7 +491,7 @@ permission_add_1022()
         local subtree_TestValue="cn=$testGroup,cn=groups,$testDC" #subtree;positive;STR
         rlRun "ipa permission-add $testID  --desc=$desc_TestValue  --attrs=$attrs_TestValue  --memberof=$memberof_TestValue  --permissions=$permissions_TestValue  --subtree=$subtree_TestValue " 0 "test options:  [desc]=[$desc_TestValue] [attrs]=[$attrs_TestValue] [memberof]=[$memberof_TestValue] [permissions]=[$permissions_TestValue] [subtree]=[$subtree_TestValue]" 
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_add_1022
 
@@ -509,7 +509,7 @@ permission_add_1023()
         local expectedErrMsg="ipa: ERROR: $targetgroup_TestValue_Negative: group not found"
         qaRun "ipa permission-add $testID  --desc=$desc_TestValue  --attrs=$attrs_TestValue  --memberof=$memberof_TestValue  --permissions=$permissions_TestValue  --targetgroup=$targetgroup_TestValue_Negative " "$tmpout" 2 "$expectedErrMsg" "test options:  [desc]=[$desc_TestValue] [attrs]=[$attrs_TestValue] [memberof]=[$memberof_TestValue] [permissions]=[$permissions_TestValue] [targetgroup]=[$targetgroup_TestValue_Negative]" 
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_add_1023
 
@@ -526,7 +526,7 @@ permission_add_1024()
         local targetgroup_TestValue="$testGroup" #targetgroup;positive;STR
         rlRun "ipa permission-add $testID  --desc=$desc_TestValue  --attrs=$attrs_TestValue  --memberof=$memberof_TestValue  --permissions=$permissions_TestValue  --targetgroup=$targetgroup_TestValue " 0 "test options:  [desc]=[$desc_TestValue] [attrs]=[$attrs_TestValue] [memberof]=[$memberof_TestValue] [permissions]=[$permissions_TestValue] [targetgroup]=[$targetgroup_TestValue]" 
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_add_1024
 
@@ -544,7 +544,7 @@ permission_add_1025()
         local expectedErrMsg="ipa: ERROR: invalid 'type'"
         qaRun "ipa permission-add $testID  --desc=$desc_TestValue  --attrs=$attrs_TestValue  --memberof=$memberof_TestValue  --permissions=$permissions_TestValue  --type=$type_TestValue_Negative " "$tmpout" 1 "$expectedErrMsg" "test options:  [desc]=[$desc_TestValue] [attrs]=[$attrs_TestValue] [memberof]=[$memberof_TestValue] [permissions]=[$permissions_TestValue] [type]=[$type_TestValue_Negative]" 
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_add_1025
 
@@ -562,7 +562,7 @@ permission_add_1026()
         rlRun "ipa permission-add $testID  --desc=$desc_TestValue  --attrs=$attrs_TestValue  --memberof=$memberof_TestValue  --permissions=$permissions_TestValue  --type=$type_TestValue " 0 "test options:  [desc]=[$desc_TestValue] [attrs]=[$attrs_TestValue] [memberof]=[$memberof_TestValue] [permissions]=[$permissions_TestValue] [type]=[$type_TestValue]" 
         deletePermission $testID
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_add_1026
 
@@ -579,7 +579,7 @@ permission_add_1027()
         local expectedErrMsg="ipa: ERROR: invalid 'permissions'"
         qaRun "ipa permission-add $testID  --desc=$desc_TestValue  --attrs=$attrs_TestValue  --permissions=$permissions_TestValue_Negative  --filter=$filter_TestValue " "$tmpout" 1 "$expectedErrMsg" "test options:  [desc]=[$desc_TestValue] [attrs]=[$attrs_TestValue] [permissions]=[$permissions_TestValue_Negative] [filter]=[$filter_TestValue]" 
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_add_1027
 
@@ -596,7 +596,7 @@ permission_add_1028()
         local expectedErrMsg="ipa: ERROR: invalid 'permissions'"
         qaRun "ipa permission-add $testID  --desc=$desc_TestValue  --attrs=$attrs_TestValue  --permissions=$permissions_TestValue_Negative  --subtree=$subtree_TestValue " "$tmpout" 1 "$expectedErrMsg" "test options:  [desc]=[$desc_TestValue] [attrs]=[$attrs_TestValue] [permissions]=[$permissions_TestValue_Negative] [subtree]=[$subtree_TestValue]" 
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_add_1028
 
@@ -613,7 +613,7 @@ permission_add_1029()
         local expectedErrMsg="ipa: ERROR: invalid 'permissions'"
         qaRun "ipa permission-add $testID  --desc=$desc_TestValue  --attrs=$attrs_TestValue  --permissions=$permissions_TestValue_Negative  --targetgroup=$targetgroup_TestValue " "$tmpout" 1 "$expectedErrMsg" "test options:  [desc]=[$desc_TestValue] [attrs]=[$attrs_TestValue] [permissions]=[$permissions_TestValue_Negative] [targetgroup]=[$targetgroup_TestValue]" 
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_add_1029
 
@@ -630,7 +630,7 @@ permission_add_1030()
         local expectedErrMsg="ipa: ERROR: invalid 'permissions'"
         qaRun "ipa permission-add $testID  --desc=$desc_TestValue  --attrs=$attrs_TestValue  --permissions=$permissions_TestValue_Negative  --type=$type_TestValue " "$tmpout" 1 "$expectedErrMsg" "test options:  [desc]=[$desc_TestValue] [attrs]=[$attrs_TestValue] [permissions]=[$permissions_TestValue_Negative] [type]=[$type_TestValue]" 
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_add_1030
 
@@ -647,7 +647,7 @@ permission_add_1031()
         local expectedErrMsg=replace_me
         qaRun "ipa permission-add $testID  --desc=$desc_TestValue  --attrs=$attrs_TestValue  --permissions=$permissions_TestValue  --filter=$filter_TestValue_Negative " "$tmpout" 1 "$expectedErrMsg" "test options:  [desc]=[$desc_TestValue] [attrs]=[$attrs_TestValue] [permissions]=[$permissions_TestValue] [filter]=[$filter_TestValue_Negative]" 
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_add_1031
 
@@ -664,7 +664,7 @@ permission_add_1032()
         rlRun "ipa permission-add $testID  --desc=$desc_TestValue  --attrs=$attrs_TestValue  --permissions=$permissions_TestValue  --filter=$filter_TestValue " 0 "test options:  [desc]=[$desc_TestValue] [attrs]=[$attrs_TestValue] [permissions]=[$permissions_TestValue] [filter]=[$filter_TestValue]" 
         deletePermission $testID
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_add_1032
 
@@ -681,7 +681,7 @@ permission_add_1033()
         local expectedErrMsg=replace_me
         qaRun "ipa permission-add $testID  --desc=$desc_TestValue  --attrs=$attrs_TestValue  --permissions=$permissions_TestValue  --subtree=$subtree_TestValue_Negative " "$tmpout" 1 "$expectedErrMsg" "test options:  [desc]=[$desc_TestValue] [attrs]=[$attrs_TestValue] [permissions]=[$permissions_TestValue] [subtree]=[$subtree_TestValue_Negative]" 
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_add_1033
 
@@ -698,7 +698,7 @@ permission_add_1034()
         rlRun "ipa permission-add $testID  --desc=$desc_TestValue  --attrs=$attrs_TestValue  --permissions=$permissions_TestValue  --subtree=$subtree_TestValue " 0 "test options:  [desc]=[$desc_TestValue] [attrs]=[$attrs_TestValue] [permissions]=[$permissions_TestValue] [subtree]=[$subtree_TestValue]" 
         deletePermission $testID
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_add_1034
 
@@ -715,7 +715,7 @@ permission_add_1035()
         local expectedErrMsg="ipa: ERROR: $targetgroup_TestValue_Negative: group not found"
         qaRun "ipa permission-add $testID  --desc=$desc_TestValue  --attrs=$attrs_TestValue  --permissions=$permissions_TestValue  --targetgroup=$targetgroup_TestValue_Negative " "$tmpout" 2 "$expectedErrMsg" "test options:  [desc]=[$desc_TestValue] [attrs]=[$attrs_TestValue] [permissions]=[$permissions_TestValue] [targetgroup]=[$targetgroup_TestValue_Negative]" 
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_add_1035
 
@@ -732,7 +732,7 @@ permission_add_1036()
         rlRun "ipa permission-add $testID  --desc=$desc_TestValue  --attrs=$attrs_TestValue  --permissions=$permissions_TestValue  --targetgroup=$targetgroup_TestValue " 0 "test options:  [desc]=[$desc_TestValue] [attrs]=[$attrs_TestValue] [permissions]=[$permissions_TestValue] [targetgroup]=[$targetgroup_TestValue]" 
         deletePermission $testID
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_add_1036
 
@@ -749,7 +749,7 @@ permission_add_1037()
         local expectedErrMsg="ipa: ERROR: invalid 'type'"
         qaRun "ipa permission-add $testID  --desc=$desc_TestValue  --attrs=$attrs_TestValue  --permissions=$permissions_TestValue  --type=$type_TestValue_Negative " "$tmpout" 1 "$expectedErrMsg" "test options:  [desc]=[$desc_TestValue] [attrs]=[$attrs_TestValue] [permissions]=[$permissions_TestValue] [type]=[$type_TestValue_Negative]" 
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_add_1037
 
@@ -766,7 +766,7 @@ permission_add_1038()
         rlRun "ipa permission-add $testID  --desc=$desc_TestValue  --attrs=$attrs_TestValue  --permissions=$permissions_TestValue  --type=$type_TestValue " 0 "test options:  [desc]=[$desc_TestValue] [attrs]=[$attrs_TestValue] [permissions]=[$permissions_TestValue] [type]=[$type_TestValue]" 
         deletePermission $testID
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_add_1038
 
@@ -783,7 +783,7 @@ permission_add_1039()
         local expectedErrMsg="group not found"
         qaRun "ipa permission-add $testID  --desc=$desc_TestValue  --memberof=$memberof_TestValue_Negative  --permissions=$permissions_TestValue  --filter=$filter_TestValue " "$tmpout" 2 "$expectedErrMsg" "test options:  [desc]=[$desc_TestValue] [memberof]=[$memberof_TestValue_Negative] [permissions]=[$permissions_TestValue] [filter]=[$filter_TestValue]" 
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_add_1039
 
@@ -800,7 +800,7 @@ permission_add_1040()
         local expectedErrMsg="group not found"
         qaRun "ipa permission-add $testID  --desc=$desc_TestValue  --memberof=$memberof_TestValue_Negative  --permissions=$permissions_TestValue  --subtree=$subtree_TestValue " "$tmpout" 2 "$expectedErrMsg" "test options:  [desc]=[$desc_TestValue] [memberof]=[$memberof_TestValue_Negative] [permissions]=[$permissions_TestValue] [subtree]=[$subtree_TestValue]" 
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_add_1040
 
@@ -817,7 +817,7 @@ permission_add_1041()
         local expectedErrMsg="group not found"
         qaRun "ipa permission-add $testID  --desc=$desc_TestValue  --memberof=$memberof_TestValue_Negative  --permissions=$permissions_TestValue  --targetgroup=$targetgroup_TestValue " "$tmpout" 2 "$expectedErrMsg" "test options:  [desc]=[$desc_TestValue] [memberof]=[$memberof_TestValue_Negative] [permissions]=[$permissions_TestValue] [targetgroup]=[$targetgroup_TestValue]" 
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_add_1041
 
@@ -834,7 +834,7 @@ permission_add_1042()
         local expectedErrMsg="group not found"
         qaRun "ipa permission-add $testID  --desc=$desc_TestValue  --memberof=$memberof_TestValue_Negative  --permissions=$permissions_TestValue  --type=$type_TestValue " "$tmpout" 2 "$expectedErrMsg" "test options:  [desc]=[$desc_TestValue] [memberof]=[$memberof_TestValue_Negative] [permissions]=[$permissions_TestValue] [type]=[$type_TestValue]" 
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_add_1042
 
@@ -851,7 +851,7 @@ permission_add_1043()
         local expectedErrMsg="ipa: ERROR: invalid 'permissions'"
         qaRun "ipa permission-add $testID  --desc=$desc_TestValue  --memberof=$memberof_TestValue  --permissions=$permissions_TestValue_Negative  --filter=$filter_TestValue " "$tmpout" 1 "$expectedErrMsg" "test options:  [desc]=[$desc_TestValue] [memberof]=[$memberof_TestValue] [permissions]=[$permissions_TestValue_Negative] [filter]=[$filter_TestValue]" 
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_add_1043
 
@@ -868,7 +868,7 @@ permission_add_1044()
         local expectedErrMsg="ipa: ERROR: invalid 'permissions'"
         qaRun "ipa permission-add $testID  --desc=$desc_TestValue  --memberof=$memberof_TestValue  --permissions=$permissions_TestValue_Negative  --subtree=$subtree_TestValue " "$tmpout" 1 "$expectedErrMsg" "test options:  [desc]=[$desc_TestValue] [memberof]=[$memberof_TestValue] [permissions]=[$permissions_TestValue_Negative] [subtree]=[$subtree_TestValue]" 
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_add_1044
 
@@ -885,7 +885,7 @@ permission_add_1045()
         local expectedErrMsg="ipa: ERROR: invalid 'permissions'"
         qaRun "ipa permission-add $testID  --desc=$desc_TestValue  --memberof=$memberof_TestValue  --permissions=$permissions_TestValue_Negative  --targetgroup=$targetgroup_TestValue " "$tmpout" 1 "$expectedErrMsg" "test options:  [desc]=[$desc_TestValue] [memberof]=[$memberof_TestValue] [permissions]=[$permissions_TestValue_Negative] [targetgroup]=[$targetgroup_TestValue]" 
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_add_1045
 
@@ -902,7 +902,7 @@ permission_add_1046()
         local expectedErrMsg="ipa: ERROR: invalid 'permissions'"
         qaRun "ipa permission-add $testID  --desc=$desc_TestValue  --memberof=$memberof_TestValue  --permissions=$permissions_TestValue_Negative  --type=$type_TestValue " "$tmpout" 1 "$expectedErrMsg" "test options:  [desc]=[$desc_TestValue] [memberof]=[$memberof_TestValue] [permissions]=[$permissions_TestValue_Negative] [type]=[$type_TestValue]" 
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_add_1046
 
@@ -919,7 +919,7 @@ permission_add_1047()
         local expectedErrMsg=replace_me
         qaRun "ipa permission-add $testID  --desc=$desc_TestValue  --memberof=$memberof_TestValue  --permissions=$permissions_TestValue  --filter=$filter_TestValue_Negative " "$tmpout" 1 "$expectedErrMsg" "test options:  [desc]=[$desc_TestValue] [memberof]=[$memberof_TestValue] [permissions]=[$permissions_TestValue] [filter]=[$filter_TestValue_Negative]" 
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_add_1047
 
@@ -936,7 +936,7 @@ permission_add_1048()
         rlRun "ipa permission-add $testID  --desc=$desc_TestValue  --memberof=$memberof_TestValue  --permissions=$permissions_TestValue  --filter=$filter_TestValue " 0 "test options:  [desc]=[$desc_TestValue] [memberof]=[$memberof_TestValue] [permissions]=[$permissions_TestValue] [filter]=[$filter_TestValue]" 
         deletePermission $testID
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_add_1048
 
@@ -953,7 +953,7 @@ permission_add_1049()
         local expectedErrMsg=replace_me
         qaRun "ipa permission-add $testID  --desc=$desc_TestValue  --memberof=$memberof_TestValue  --permissions=$permissions_TestValue  --subtree=$subtree_TestValue_Negative " "$tmpout" 1 "$expectedErrMsg" "test options:  [desc]=[$desc_TestValue] [memberof]=[$memberof_TestValue] [permissions]=[$permissions_TestValue] [subtree]=[$subtree_TestValue_Negative]" 
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_add_1049
 
@@ -970,7 +970,7 @@ permission_add_1050()
         rlRun "ipa permission-add $testID  --desc=$desc_TestValue  --memberof=$memberof_TestValue  --permissions=$permissions_TestValue  --subtree=$subtree_TestValue " 0 "test options:  [desc]=[$desc_TestValue] [memberof]=[$memberof_TestValue] [permissions]=[$permissions_TestValue] [subtree]=[$subtree_TestValue]" 
         deletePermission $testID
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_add_1050
 
@@ -987,7 +987,7 @@ permission_add_1051()
         local expectedErrMsg="ipa: ERROR: $targetgroup_TestValue_Negative: group not found"
         qaRun "ipa permission-add $testID  --desc=$desc_TestValue  --memberof=$memberof_TestValue  --permissions=$permissions_TestValue  --targetgroup=$targetgroup_TestValue_Negative " "$tmpout" 2 "$expectedErrMsg" "test options:  [desc]=[$desc_TestValue] [memberof]=[$memberof_TestValue] [permissions]=[$permissions_TestValue] [targetgroup]=[$targetgroup_TestValue_Negative]" 
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_add_1051
 
@@ -1004,7 +1004,7 @@ permission_add_1052()
         rlRun "ipa permission-add $testID  --desc=$desc_TestValue  --memberof=$memberof_TestValue  --permissions=$permissions_TestValue  --targetgroup=$targetgroup_TestValue " 0 "test options:  [desc]=[$desc_TestValue] [memberof]=[$memberof_TestValue] [permissions]=[$permissions_TestValue] [targetgroup]=[$targetgroup_TestValue]" 
         deletePermission $testID
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_add_1052
 
@@ -1021,7 +1021,7 @@ permission_add_1053()
         local expectedErrMsg="invalid 'type'"
         qaRun "ipa permission-add $testID  --desc=$desc_TestValue  --memberof=$memberof_TestValue  --permissions=$permissions_TestValue  --type=$type_TestValue_Negative " "$tmpout" 1 "$expectedErrMsg" "test options:  [desc]=[$desc_TestValue] [memberof]=[$memberof_TestValue] [permissions]=[$permissions_TestValue] [type]=[$type_TestValue_Negative]" 
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_add_1053
 
@@ -1038,7 +1038,7 @@ permission_add_1054()
         rlRun "ipa permission-add $testID  --desc=$desc_TestValue  --memberof=$memberof_TestValue  --permissions=$permissions_TestValue  --type=$type_TestValue " 0 "test options:  [desc]=[$desc_TestValue] [memberof]=[$memberof_TestValue] [permissions]=[$permissions_TestValue] [type]=[$type_TestValue]" 
         deletePermission $testID
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_add_1054
 
@@ -1054,7 +1054,7 @@ permission_add_1055()
         local expectedErrMsg="invalid 'permissions'"
         qaRun "ipa permission-add $testID  --desc=$desc_TestValue  --permissions=$permissions_TestValue_Negative  --filter=$filter_TestValue " "$tmpout" 1 "$expectedErrMsg" "test options:  [desc]=[$desc_TestValue] [permissions]=[$permissions_TestValue_Negative] [filter]=[$filter_TestValue]" 
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_add_1055
 
@@ -1070,7 +1070,7 @@ permission_add_1056()
         local expectedErrMsg="invalid 'permissions'"
         qaRun "ipa permission-add $testID  --desc=$desc_TestValue  --permissions=$permissions_TestValue_Negative  --subtree=$subtree_TestValue " "$tmpout" 1 "$expectedErrMsg" "test options:  [desc]=[$desc_TestValue] [permissions]=[$permissions_TestValue_Negative] [subtree]=[$subtree_TestValue]" 
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_add_1056
 
@@ -1086,7 +1086,7 @@ permission_add_1057()
         local expectedErrMsg="invalid 'permissions'"
         qaRun "ipa permission-add $testID  --desc=$desc_TestValue  --permissions=$permissions_TestValue_Negative  --targetgroup=$targetgroup_TestValue " "$tmpout" 1 "$expectedErrMsg" "test options:  [desc]=[$desc_TestValue] [permissions]=[$permissions_TestValue_Negative] [targetgroup]=[$targetgroup_TestValue]" 
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_add_1057
 
@@ -1102,7 +1102,7 @@ permission_add_1058()
         local expectedErrMsg="invalid 'permissions'"
         qaRun "ipa permission-add $testID  --desc=$desc_TestValue  --permissions=$permissions_TestValue_Negative  --type=$type_TestValue " "$tmpout" 1 "$expectedErrMsg" "test options:  [desc]=[$desc_TestValue] [permissions]=[$permissions_TestValue_Negative] [type]=[$type_TestValue]" 
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_add_1058
 
@@ -1118,7 +1118,7 @@ permission_add_1059()
         local expectedErrMsg=replace_me
         qaRun "ipa permission-add $testID  --desc=$desc_TestValue  --permissions=$permissions_TestValue  --filter=$filter_TestValue_Negative " "$tmpout" 1 "$expectedErrMsg" "test options:  [desc]=[$desc_TestValue] [permissions]=[$permissions_TestValue] [filter]=[$filter_TestValue_Negative]" 
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_add_1059
 
@@ -1134,7 +1134,7 @@ permission_add_1060()
         rlRun "ipa permission-add $testID  --desc=$desc_TestValue  --permissions=$permissions_TestValue  --filter=$filter_TestValue " 0 "test options:  [desc]=[$desc_TestValue] [permissions]=[$permissions_TestValue] [filter]=[$filter_TestValue]" 
         deletePermission $testID
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_add_1060
 
@@ -1150,7 +1150,7 @@ permission_add_1061()
         local expectedErrMsg=replace_me
         qaRun "ipa permission-add $testID  --desc=$desc_TestValue  --permissions=$permissions_TestValue  --subtree=$subtree_TestValue_Negative " "$tmpout" 1 "$expectedErrMsg" "test options:  [desc]=[$desc_TestValue] [permissions]=[$permissions_TestValue] [subtree]=[$subtree_TestValue_Negative]" 
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_add_1061
 
@@ -1166,7 +1166,7 @@ permission_add_1062()
         rlRun "ipa permission-add $testID  --desc=$desc_TestValue  --permissions=$permissions_TestValue  --subtree=$subtree_TestValue " 0 "test options:  [desc]=[$desc_TestValue] [permissions]=[$permissions_TestValue] [subtree]=[$subtree_TestValue]" 
         deletePermission $testID
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_add_1062
 
@@ -1182,7 +1182,7 @@ permission_add_1063()
         local expectedErrMsg="group not found"
         qaRun "ipa permission-add $testID  --desc=$desc_TestValue  --permissions=$permissions_TestValue  --targetgroup=$targetgroup_TestValue_Negative " "$tmpout" 2 "$expectedErrMsg" "test options:  [desc]=[$desc_TestValue] [permissions]=[$permissions_TestValue] [targetgroup]=[$targetgroup_TestValue_Negative]" 
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_add_1063
 
@@ -1198,7 +1198,7 @@ permission_add_1064()
         rlRun "ipa permission-add $testID  --desc=$desc_TestValue  --permissions=$permissions_TestValue  --targetgroup=$targetgroup_TestValue " 0 "test options:  [desc]=[$desc_TestValue] [permissions]=[$permissions_TestValue] [targetgroup]=[$targetgroup_TestValue]" 
         deletePermission $testID
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_add_1064
 
@@ -1214,7 +1214,7 @@ permission_add_1065()
         local expectedErrMsg="invalid 'type'"
         qaRun "ipa permission-add $testID  --desc=$desc_TestValue  --permissions=$permissions_TestValue  --type=$type_TestValue_Negative " "$tmpout" 1 "$expectedErrMsg" "test options:  [desc]=[$desc_TestValue] [permissions]=[$permissions_TestValue] [type]=[$type_TestValue_Negative]" 
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_add_1065
 
@@ -1230,7 +1230,7 @@ permission_add_1066()
         rlRun "ipa permission-add $testID  --desc=$desc_TestValue  --permissions=$permissions_TestValue  --type=$type_TestValue " 0 "test options:  [desc]=[$desc_TestValue] [permissions]=[$permissions_TestValue] [type]=[$type_TestValue]" 
         deletePermission $testID
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_add_1066
 
@@ -1244,7 +1244,7 @@ permission_add_1067()
         local expectedErrMsg=replace_me
         qaRun "ipa permission-add $testID  --setattr=$setattr_TestValue_Negative " "$tmpout" 1 "$expectedErrMsg" "test options:  [setattr]=[$setattr_TestValue_Negative]" 
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_add_1067
 
@@ -1257,7 +1257,7 @@ permission_add_1068()
         local setattr_TestValue="STR" #setattr;positive;STR
         rlRun "ipa permission-add $testID  --setattr=$setattr_TestValue " 0 "test options:  [setattr]=[$setattr_TestValue]" 
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_add_1068
 
@@ -1277,6 +1277,18 @@ permission_del_envsetup()
 {
     rlPhaseStartSetup "permission_del_envsetup"
         #environment setup starts here
+        # create 3 permission to be deleted
+        KinitAsAdmin
+        for id in 1 2 3 4
+        do
+            permissionName="permission_del_$id"
+            rlRun "ipa permission-add --desc \"permission $id to be delete\" \
+                       --permissions=read,delete\
+                       --type=user\
+                       $permissionName"
+
+        done
+        Kcleanup
         #environment setup ends   here
     rlPhaseEnd
 } #envsetup
@@ -1285,6 +1297,14 @@ permission_del_envcleanup()
 {
     rlPhaseStartCleanup "permission_del_envcleanup"
         #environment cleanup starts here
+        KinitAsAdmin
+        for id in 1 2 3 4
+        do
+            permissionName="permission_del_$id"
+            ipa permission-del $permissionName
+        done
+        Kcleanup
+        rlPass "all permission deleted" #no need to check permissions
         #environment cleanup ends   here
     rlPhaseEnd
 } #envcleanup
@@ -1293,11 +1313,12 @@ permission_del_1001()
 { #test_scenario (positive): --continue
     rlPhaseStartTest "permission_del_1001"
         local testID="permission_del_1001"
-        local tmpout=$TmpDir/permission_del_1001.$RANDOM.out
         KinitAsAdmin
-        rlRun "ipa permission-del $testID --continue " 0 "test options: " 
+        # permission $testID does not exist
+        rlRun "ipa permission-del $testID permission_del_1 --continue " 0 "test options: " 
+        rlRun "ipa permission-del permission_del_2 $testID --continue " 0 "test options: " 
+        rlRun "ipa permission-del permission_del_3 $testID permission_del_4 --continue " 0 "test options: " 
         Kcleanup
-        rm $tmpout
     rlPhaseEnd
 } #permission_del_1001
 
@@ -1309,18 +1330,18 @@ permission_del_1001()
 permission_find()
 {
     permission_find_envsetup
-    permission_find_1001  #test_scenario (positive test): [--all]
-    permission_find_1002  #test_scenario (negative test): [--all --attrs;negative;nonListValue --desc;positive;auto generated description data --filter;positive;STR --memberof;positive;STR --name;positive;STR --permissions;positive;read, write, add, delete, all --raw --sizelimit;positive;INT --subtree;positive;STR --targetgroup;positive;STR --timelimit;positive;INT --type;positive;user, group, host, hostgroup, service, netgroup, dns]
-    permission_find_1003  #test_scenario (negative test): [--all --attrs;positive;LIST --desc;positive;auto generated description data --filter;negative;STR --memberof;positive;STR --name;positive;STR --permissions;positive;read, write, add, delete, all --raw --sizelimit;positive;INT --subtree;positive;STR --targetgroup;positive;STR --timelimit;positive;INT --type;positive;user, group, host, hostgroup, service, netgroup, dns]
-    permission_find_1004  #test_scenario (negative test): [--all --attrs;positive;LIST --desc;positive;auto generated description data --filter;positive;STR --memberof;negative;STR --name;positive;STR --permissions;positive;read, write, add, delete, all --raw --sizelimit;positive;INT --subtree;positive;STR --targetgroup;positive;STR --timelimit;positive;INT --type;positive;user, group, host, hostgroup, service, netgroup, dns]
-    permission_find_1005  #test_scenario (negative test): [--all --attrs;positive;LIST --desc;positive;auto generated description data --filter;positive;STR --memberof;positive;STR --name;negative;STR --permissions;positive;read, write, add, delete, all --raw --sizelimit;positive;INT --subtree;positive;STR --targetgroup;positive;STR --timelimit;positive;INT --type;positive;user, group, host, hostgroup, service, netgroup, dns]
-    permission_find_1006  #test_scenario (negative test): [--all --attrs;positive;LIST --desc;positive;auto generated description data --filter;positive;STR --memberof;positive;STR --name;positive;STR --permissions;negative;nonListValue --raw --sizelimit;positive;INT --subtree;positive;STR --targetgroup;positive;STR --timelimit;positive;INT --type;positive;user, group, host, hostgroup, service, netgroup, dns]
-    permission_find_1007  #test_scenario (negative test): [--all --attrs;positive;LIST --desc;positive;auto generated description data --filter;positive;STR --memberof;positive;STR --name;positive;STR --permissions;positive;read, write, add, delete, all --raw --sizelimit;negative;INT --subtree;positive;STR --targetgroup;positive;STR --timelimit;positive;INT --type;positive;user, group, host, hostgroup, service, netgroup, dns]
-    permission_find_1008  #test_scenario (negative test): [--all --attrs;positive;LIST --desc;positive;auto generated description data --filter;positive;STR --memberof;positive;STR --name;positive;STR --permissions;positive;read, write, add, delete, all --raw --sizelimit;positive;INT --subtree;negative;STR --targetgroup;positive;STR --timelimit;positive;INT --type;positive;user, group, host, hostgroup, service, netgroup, dns]
-    permission_find_1009  #test_scenario (negative test): [--all --attrs;positive;LIST --desc;positive;auto generated description data --filter;positive;STR --memberof;positive;STR --name;positive;STR --permissions;positive;read, write, add, delete, all --raw --sizelimit;positive;INT --subtree;positive;STR --targetgroup;negative;STR --timelimit;positive;INT --type;positive;user, group, host, hostgroup, service, netgroup, dns]
-    permission_find_1010  #test_scenario (negative test): [--all --attrs;positive;LIST --desc;positive;auto generated description data --filter;positive;STR --memberof;positive;STR --name;positive;STR --permissions;positive;read, write, add, delete, all --raw --sizelimit;positive;INT --subtree;positive;STR --targetgroup;positive;STR --timelimit;negative;INT --type;positive;user, group, host, hostgroup, service, netgroup, dns]
-    permission_find_1011  #test_scenario (negative test): [--all --attrs;positive;LIST --desc;positive;auto generated description data --filter;positive;STR --memberof;positive;STR --name;positive;STR --permissions;positive;read, write, add, delete, all --raw --sizelimit;positive;INT --subtree;positive;STR --targetgroup;positive;STR --timelimit;positive;INT --type;negative;nonSTRENUMValue]
-    permission_find_1012  #test_scenario (positive test): [--all --attrs;positive;LIST --desc;positive;auto generated description data --filter;positive;STR --memberof;positive;STR --name;positive;STR --permissions;positive;read, write, add, delete, all --raw --sizelimit;positive;INT --subtree;positive;STR --targetgroup;positive;STR --timelimit;positive;INT --type;positive;user, group, host, hostgroup, service, netgroup, dns]
+#    permission_find_1001  #test_scenario (positive test): [--all]
+#    permission_find_1002  #test_scenario (negative test): [--all --attrs;negative;nonListValue --desc;positive;auto generated description data --filter;positive;STR --memberof;positive;STR --name;positive;STR --permissions;positive;read, write, add, delete, all --raw --sizelimit;positive;INT --subtree;positive;STR --targetgroup;positive;STR --timelimit;positive;INT --type;positive;user, group, host, hostgroup, service, netgroup, dns]
+#    permission_find_1003  #test_scenario (negative test): [--all --attrs;positive;LIST --desc;positive;auto generated description data --filter;negative;STR --memberof;positive;STR --name;positive;STR --permissions;positive;read, write, add, delete, all --raw --sizelimit;positive;INT --subtree;positive;STR --targetgroup;positive;STR --timelimit;positive;INT --type;positive;user, group, host, hostgroup, service, netgroup, dns]
+#    permission_find_1004  #test_scenario (negative test): [--all --attrs;positive;LIST --desc;positive;auto generated description data --filter;positive;STR --memberof;negative;STR --name;positive;STR --permissions;positive;read, write, add, delete, all --raw --sizelimit;positive;INT --subtree;positive;STR --targetgroup;positive;STR --timelimit;positive;INT --type;positive;user, group, host, hostgroup, service, netgroup, dns]
+#    permission_find_1005  #test_scenario (negative test): [--all --attrs;positive;LIST --desc;positive;auto generated description data --filter;positive;STR --memberof;positive;STR --name;negative;STR --permissions;positive;read, write, add, delete, all --raw --sizelimit;positive;INT --subtree;positive;STR --targetgroup;positive;STR --timelimit;positive;INT --type;positive;user, group, host, hostgroup, service, netgroup, dns]
+#    permission_find_1006  #test_scenario (negative test): [--all --attrs;positive;LIST --desc;positive;auto generated description data --filter;positive;STR --memberof;positive;STR --name;positive;STR --permissions;negative;nonListValue --raw --sizelimit;positive;INT --subtree;positive;STR --targetgroup;positive;STR --timelimit;positive;INT --type;positive;user, group, host, hostgroup, service, netgroup, dns]
+#    permission_find_1007  #test_scenario (negative test): [--all --attrs;positive;LIST --desc;positive;auto generated description data --filter;positive;STR --memberof;positive;STR --name;positive;STR --permissions;positive;read, write, add, delete, all --raw --sizelimit;negative;INT --subtree;positive;STR --targetgroup;positive;STR --timelimit;positive;INT --type;positive;user, group, host, hostgroup, service, netgroup, dns]
+#    permission_find_1008  #test_scenario (negative test): [--all --attrs;positive;LIST --desc;positive;auto generated description data --filter;positive;STR --memberof;positive;STR --name;positive;STR --permissions;positive;read, write, add, delete, all --raw --sizelimit;positive;INT --subtree;negative;STR --targetgroup;positive;STR --timelimit;positive;INT --type;positive;user, group, host, hostgroup, service, netgroup, dns]
+#    permission_find_1009  #test_scenario (negative test): [--all --attrs;positive;LIST --desc;positive;auto generated description data --filter;positive;STR --memberof;positive;STR --name;positive;STR --permissions;positive;read, write, add, delete, all --raw --sizelimit;positive;INT --subtree;positive;STR --targetgroup;negative;STR --timelimit;positive;INT --type;positive;user, group, host, hostgroup, service, netgroup, dns]
+#    permission_find_1010  #test_scenario (negative test): [--all --attrs;positive;LIST --desc;positive;auto generated description data --filter;positive;STR --memberof;positive;STR --name;positive;STR --permissions;positive;read, write, add, delete, all --raw --sizelimit;positive;INT --subtree;positive;STR --targetgroup;positive;STR --timelimit;negative;INT --type;positive;user, group, host, hostgroup, service, netgroup, dns]
+#    permission_find_1011  #test_scenario (negative test): [--all --attrs;positive;LIST --desc;positive;auto generated description data --filter;positive;STR --memberof;positive;STR --name;positive;STR --permissions;positive;read, write, add, delete, all --raw --sizelimit;positive;INT --subtree;positive;STR --targetgroup;positive;STR --timelimit;positive;INT --type;negative;nonSTRENUMValue]
+#    permission_find_1012  #test_scenario (positive test): [--all --attrs;positive;LIST --desc;positive;auto generated description data --filter;positive;STR --memberof;positive;STR --name;positive;STR --permissions;positive;read, write, add, delete, all --raw --sizelimit;positive;INT --subtree;positive;STR --targetgroup;positive;STR --timelimit;positive;INT --type;positive;user, group, host, hostgroup, service, netgroup, dns]
     permission_find_1013  #test_scenario (negative test): [--attrs;negative;nonListValue]
     permission_find_1014  #test_scenario (positive test): [--attrs;positive;LIST]
     permission_find_1015  #test_scenario (positive test): [--desc;positive;auto generated description data]
@@ -1372,7 +1393,7 @@ permission_find_1001()
         KinitAsAdmin
         rlRun "ipa permission-find $testID --all " 0 "test options: " 
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_find_1001
 
@@ -1396,7 +1417,7 @@ permission_find_1002()
         local expectedErrMsg=replace_me
         qaRun "ipa permission-find $testID --all  --attrs=$attrs_TestValue_Negative  --desc=$desc_TestValue  --filter=$filter_TestValue  --memberof=$memberof_TestValue  --name=$name_TestValue  --permissions=$permissions_TestValue --raw  --sizelimit=$sizelimit_TestValue  --subtree=$subtree_TestValue  --targetgroup=$targetgroup_TestValue  --timelimit=$timelimit_TestValue  --type=$type_TestValue " "$tmpout" 1 "$expectedErrMsg" "test options:  [attrs]=[$attrs_TestValue_Negative] [desc]=[$desc_TestValue] [filter]=[$filter_TestValue] [memberof]=[$memberof_TestValue] [name]=[$name_TestValue] [permissions]=[$permissions_TestValue] [sizelimit]=[$sizelimit_TestValue] [subtree]=[$subtree_TestValue] [targetgroup]=[$targetgroup_TestValue] [timelimit]=[$timelimit_TestValue] [type]=[$type_TestValue]" 
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_find_1002
 
@@ -1408,7 +1429,7 @@ permission_find_1003()
         KinitAsAdmin
         local attrs_TestValue="uidnumber,gidnumber" #attrs;positive;LIST
         local desc_TestValue="auto_generated_description_$testID" #desc;positive;auto generated description data
-        local filter_TestValue_Negative="cn=NotExist" #filter;negative;STR
+        local filter_TestValue_Negative="" #filter;negative;STR
         local memberof_TestValue="$testGroup" #memberof;positive;STR
         local name_TestValue="$testID" #name;positive;STR
         local permissions_TestValue="add,delete,all" #permissions;positive;read, write, add, delete, all
@@ -1420,7 +1441,7 @@ permission_find_1003()
         local expectedErrMsg=replace_me
         qaRun "ipa permission-find $testID --all  --attrs=$attrs_TestValue  --desc=$desc_TestValue  --filter=$filter_TestValue_Negative  --memberof=$memberof_TestValue  --name=$name_TestValue  --permissions=$permissions_TestValue --raw  --sizelimit=$sizelimit_TestValue  --subtree=$subtree_TestValue  --targetgroup=$targetgroup_TestValue  --timelimit=$timelimit_TestValue  --type=$type_TestValue " "$tmpout" 1 "$expectedErrMsg" "test options:  [attrs]=[$attrs_TestValue] [desc]=[$desc_TestValue] [filter]=[$filter_TestValue_Negative] [memberof]=[$memberof_TestValue] [name]=[$name_TestValue] [permissions]=[$permissions_TestValue] [sizelimit]=[$sizelimit_TestValue] [subtree]=[$subtree_TestValue] [targetgroup]=[$targetgroup_TestValue] [timelimit]=[$timelimit_TestValue] [type]=[$type_TestValue]" 
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_find_1003
 
@@ -1444,7 +1465,7 @@ permission_find_1004()
         local expectedErrMsg=replace_me
         qaRun "ipa permission-find $testID --all  --attrs=$attrs_TestValue  --desc=$desc_TestValue  --filter=$filter_TestValue  --memberof=$memberof_TestValue_Negative  --name=$name_TestValue  --permissions=$permissions_TestValue --raw  --sizelimit=$sizelimit_TestValue  --subtree=$subtree_TestValue  --targetgroup=$targetgroup_TestValue  --timelimit=$timelimit_TestValue  --type=$type_TestValue " "$tmpout" 1 "$expectedErrMsg" "test options:  [attrs]=[$attrs_TestValue] [desc]=[$desc_TestValue] [filter]=[$filter_TestValue] [memberof]=[$memberof_TestValue_Negative] [name]=[$name_TestValue] [permissions]=[$permissions_TestValue] [sizelimit]=[$sizelimit_TestValue] [subtree]=[$subtree_TestValue] [targetgroup]=[$targetgroup_TestValue] [timelimit]=[$timelimit_TestValue] [type]=[$type_TestValue]" 
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_find_1004
 
@@ -1468,7 +1489,7 @@ permission_find_1005()
         local expectedErrMsg=replace_me
         qaRun "ipa permission-find $testID --all  --attrs=$attrs_TestValue  --desc=$desc_TestValue  --filter=$filter_TestValue  --memberof=$memberof_TestValue  --name=$name_TestValue_Negative  --permissions=$permissions_TestValue --raw  --sizelimit=$sizelimit_TestValue  --subtree=$subtree_TestValue  --targetgroup=$targetgroup_TestValue  --timelimit=$timelimit_TestValue  --type=$type_TestValue " "$tmpout" 1 "$expectedErrMsg" "test options:  [attrs]=[$attrs_TestValue] [desc]=[$desc_TestValue] [filter]=[$filter_TestValue] [memberof]=[$memberof_TestValue] [name]=[$name_TestValue_Negative] [permissions]=[$permissions_TestValue] [sizelimit]=[$sizelimit_TestValue] [subtree]=[$subtree_TestValue] [targetgroup]=[$targetgroup_TestValue] [timelimit]=[$timelimit_TestValue] [type]=[$type_TestValue]" 
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_find_1005
 
@@ -1492,7 +1513,7 @@ permission_find_1006()
         local expectedErrMsg=replace_me
         qaRun "ipa permission-find $testID --all  --attrs=$attrs_TestValue  --desc=$desc_TestValue  --filter=$filter_TestValue  --memberof=$memberof_TestValue  --name=$name_TestValue  --permissions=$permissions_TestValue_Negative --raw  --sizelimit=$sizelimit_TestValue  --subtree=$subtree_TestValue  --targetgroup=$targetgroup_TestValue  --timelimit=$timelimit_TestValue  --type=$type_TestValue " "$tmpout" 1 "$expectedErrMsg" "test options:  [attrs]=[$attrs_TestValue] [desc]=[$desc_TestValue] [filter]=[$filter_TestValue] [memberof]=[$memberof_TestValue] [name]=[$name_TestValue] [permissions]=[$permissions_TestValue_Negative] [sizelimit]=[$sizelimit_TestValue] [subtree]=[$subtree_TestValue] [targetgroup]=[$targetgroup_TestValue] [timelimit]=[$timelimit_TestValue] [type]=[$type_TestValue]" 
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_find_1006
 
@@ -1516,7 +1537,7 @@ permission_find_1007()
         local expectedErrMsg=replace_me
         qaRun "ipa permission-find $testID --all  --attrs=$attrs_TestValue  --desc=$desc_TestValue  --filter=$filter_TestValue  --memberof=$memberof_TestValue  --name=$name_TestValue  --permissions=$permissions_TestValue --raw  --sizelimit=$sizelimit_TestValue_Negative  --subtree=$subtree_TestValue  --targetgroup=$targetgroup_TestValue  --timelimit=$timelimit_TestValue  --type=$type_TestValue " "$tmpout" 1 "$expectedErrMsg" "test options:  [attrs]=[$attrs_TestValue] [desc]=[$desc_TestValue] [filter]=[$filter_TestValue] [memberof]=[$memberof_TestValue] [name]=[$name_TestValue] [permissions]=[$permissions_TestValue] [sizelimit]=[$sizelimit_TestValue_Negative] [subtree]=[$subtree_TestValue] [targetgroup]=[$targetgroup_TestValue] [timelimit]=[$timelimit_TestValue] [type]=[$type_TestValue]" 
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_find_1007
 
@@ -1540,7 +1561,7 @@ permission_find_1008()
         local expectedErrMsg=replace_me
         qaRun "ipa permission-find $testID --all  --attrs=$attrs_TestValue  --desc=$desc_TestValue  --filter=$filter_TestValue  --memberof=$memberof_TestValue  --name=$name_TestValue  --permissions=$permissions_TestValue --raw  --sizelimit=$sizelimit_TestValue  --subtree=$subtree_TestValue_Negative  --targetgroup=$targetgroup_TestValue  --timelimit=$timelimit_TestValue  --type=$type_TestValue " "$tmpout" 1 "$expectedErrMsg" "test options:  [attrs]=[$attrs_TestValue] [desc]=[$desc_TestValue] [filter]=[$filter_TestValue] [memberof]=[$memberof_TestValue] [name]=[$name_TestValue] [permissions]=[$permissions_TestValue] [sizelimit]=[$sizelimit_TestValue] [subtree]=[$subtree_TestValue_Negative] [targetgroup]=[$targetgroup_TestValue] [timelimit]=[$timelimit_TestValue] [type]=[$type_TestValue]" 
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_find_1008
 
@@ -1564,7 +1585,7 @@ permission_find_1009()
         local expectedErrMsg=replace_me
         qaRun "ipa permission-find $testID --all  --attrs=$attrs_TestValue  --desc=$desc_TestValue  --filter=$filter_TestValue  --memberof=$memberof_TestValue  --name=$name_TestValue  --permissions=$permissions_TestValue --raw  --sizelimit=$sizelimit_TestValue  --subtree=$subtree_TestValue  --targetgroup=$targetgroup_TestValue_Negative  --timelimit=$timelimit_TestValue  --type=$type_TestValue " "$tmpout" 1 "$expectedErrMsg" "test options:  [attrs]=[$attrs_TestValue] [desc]=[$desc_TestValue] [filter]=[$filter_TestValue] [memberof]=[$memberof_TestValue] [name]=[$name_TestValue] [permissions]=[$permissions_TestValue] [sizelimit]=[$sizelimit_TestValue] [subtree]=[$subtree_TestValue] [targetgroup]=[$targetgroup_TestValue_Negative] [timelimit]=[$timelimit_TestValue] [type]=[$type_TestValue]" 
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_find_1009
 
@@ -1588,7 +1609,7 @@ permission_find_1010()
         local expectedErrMsg=replace_me
         qaRun "ipa permission-find $testID --all  --attrs=$attrs_TestValue  --desc=$desc_TestValue  --filter=$filter_TestValue  --memberof=$memberof_TestValue  --name=$name_TestValue  --permissions=$permissions_TestValue --raw  --sizelimit=$sizelimit_TestValue  --subtree=$subtree_TestValue  --targetgroup=$targetgroup_TestValue  --timelimit=$timelimit_TestValue_Negative  --type=$type_TestValue " "$tmpout" 1 "$expectedErrMsg" "test options:  [attrs]=[$attrs_TestValue] [desc]=[$desc_TestValue] [filter]=[$filter_TestValue] [memberof]=[$memberof_TestValue] [name]=[$name_TestValue] [permissions]=[$permissions_TestValue] [sizelimit]=[$sizelimit_TestValue] [subtree]=[$subtree_TestValue] [targetgroup]=[$targetgroup_TestValue] [timelimit]=[$timelimit_TestValue_Negative] [type]=[$type_TestValue]" 
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_find_1010
 
@@ -1612,7 +1633,7 @@ permission_find_1011()
         local expectedErrMsg=replace_me
         qaRun "ipa permission-find $testID --all  --attrs=$attrs_TestValue  --desc=$desc_TestValue  --filter=$filter_TestValue  --memberof=$memberof_TestValue  --name=$name_TestValue  --permissions=$permissions_TestValue --raw  --sizelimit=$sizelimit_TestValue  --subtree=$subtree_TestValue  --targetgroup=$targetgroup_TestValue  --timelimit=$timelimit_TestValue  --type=$type_TestValue_Negative " "$tmpout" 1 "$expectedErrMsg" "test options:  [attrs]=[$attrs_TestValue] [desc]=[$desc_TestValue] [filter]=[$filter_TestValue] [memberof]=[$memberof_TestValue] [name]=[$name_TestValue] [permissions]=[$permissions_TestValue] [sizelimit]=[$sizelimit_TestValue] [subtree]=[$subtree_TestValue] [targetgroup]=[$targetgroup_TestValue] [timelimit]=[$timelimit_TestValue] [type]=[$type_TestValue_Negative]" 
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_find_1011
 
@@ -1635,7 +1656,7 @@ permission_find_1012()
         local type_TestValue="user group host hostgroup service netgroup dns" #type;positive;user, group, host, hostgroup, service, netgroup, dns
         rlRun "ipa permission-find $testID --all  --attrs=$attrs_TestValue  --desc=$desc_TestValue  --filter=$filter_TestValue  --memberof=$memberof_TestValue  --name=$name_TestValue  --permissions=$permissions_TestValue --raw  --sizelimit=$sizelimit_TestValue  --subtree=$subtree_TestValue  --targetgroup=$targetgroup_TestValue  --timelimit=$timelimit_TestValue  --type=$type_TestValue " 0 "test options:  [attrs]=[$attrs_TestValue] [desc]=[$desc_TestValue] [filter]=[$filter_TestValue] [memberof]=[$memberof_TestValue] [name]=[$name_TestValue] [permissions]=[$permissions_TestValue] [sizelimit]=[$sizelimit_TestValue] [subtree]=[$subtree_TestValue] [targetgroup]=[$targetgroup_TestValue] [timelimit]=[$timelimit_TestValue] [type]=[$type_TestValue]" 
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_find_1012
 
@@ -1645,11 +1666,13 @@ permission_find_1013()
         local testID="permission_find_1013"
         local tmpout=$TmpDir/permission_find_1013.$RANDOM.out
         KinitAsAdmin
+        rlRun "ipa permission-add $testID --desc=4_$testID --attrs=uidnumber --permission=read --type=user" 
         local attrs_TestValue_Negative="noSuchAttrs" #attrs;negative;nonListValue
-        local expectedErrMsg=replace_me
-        qaRun "ipa permission-find $testID  --attrs=$attrs_TestValue_Negative " "$tmpout" 1 "$expectedErrMsg" "test options:  [attrs]=[$attrs_TestValue_Negative]" 
+        local expectedErrMsg="0 permissions matched"
+        qaRun "ipa permission-find --attrs=$attrs_TestValue_Negative " "$tmpout" 1 "$expectedErrMsg" "test options:  [attrs]=[$attrs_TestValue_Negative]" 
+        rlRun "ipa permission-del $testID"
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_find_1013
 
@@ -1659,10 +1682,12 @@ permission_find_1014()
         local testID="permission_find_1014"
         local tmpout=$TmpDir/permission_find_1014.$RANDOM.out
         KinitAsAdmin
-        local attrs_TestValue="uidnumber,gidnumber" #attrs;positive;LIST
-        rlRun "ipa permission-find $testID  --attrs=$attrs_TestValue " 0 "test options:  [attrs]=[$attrs_TestValue]" 
+        local attrs_TestValue="gidnumber" #attrs;positive;LIST
+        rlRun "ipa permission-add $testID --desc=4_$testID --attrs=$attrs_TestValue --permission=all --type=user"
+        qaRun "ipa permission-find --attrs=$attrs_TestValue " 0 "$testID" "test options:  [attrs]=[$attrs_TestValue]" 
+        rlRun "ipa permission-del $testID"
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_find_1014
 
@@ -1673,9 +1698,11 @@ permission_find_1015()
         local tmpout=$TmpDir/permission_find_1015.$RANDOM.out
         KinitAsAdmin
         local desc_TestValue="auto_generated_description_$testID" #desc;positive;auto generated description data
-        rlRun "ipa permission-find $testID  --desc=$desc_TestValue " 0 "test options:  [desc]=[$desc_TestValue]" 
+        rlRun "ipa permission-add $testID --desc=$desc_TestValue  --permission=all --type=group"
+        qaRun "ipa permission-find --desc=$desc_TestValue " 0 "$testID" "test options:  [desc]=[$desc_TestValue]" 
+        rlRun "ipa permission-del $testID"
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_find_1015
 
@@ -1685,11 +1712,13 @@ permission_find_1016()
         local testID="permission_find_1016"
         local tmpout=$TmpDir/permission_find_1016.$RANDOM.out
         KinitAsAdmin
-        local filter_TestValue_Negative="cn=NotExist" #filter;negative;STR
-        local expectedErrMsg=replace_me
-        qaRun "ipa permission-find $testID  --filter=$filter_TestValue_Negative " "$tmpout" 1 "$expectedErrMsg" "test options:  [filter]=[$filter_TestValue_Negative]" 
+        rlRun "ipa permission-add $testID --desc=$desc_TestValue  --permission=all --filter=whatever"
+        local filter_TestValue_Negative="" #filter;negative;STR
+        local expectedErrMsg="0 permissions matched"
+        qaRun "ipa permission-find --filter=$filter_TestValue_Negative " "$tmpout" 0 "$expectedErrMsg" "test options:  [filter]=[$filter_TestValue_Negative]" 
+        rlRun "ipa permission-del $testID"
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_find_1016
 
@@ -1700,9 +1729,11 @@ permission_find_1017()
         local tmpout=$TmpDir/permission_find_1017.$RANDOM.out
         KinitAsAdmin
         local filter_TestValue="cn=$testGroup" #filter;positive;STR
-        rlRun "ipa permission-find $testID  --filter=$filter_TestValue " 0 "test options:  [filter]=[$filter_TestValue]" 
+        rlRun "ipa permission-add $testID --desc=4_$testID --permissions=add,delete --filter=$filter_TestValue"
+        qaRun "ipa permission-find --filter=$filter_TestValue " 0 "$testID" "test options:  [filter]=[$filter_TestValue]" 
+        rlRun "ipa permission-del $testID"
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_find_1017
 
@@ -1712,11 +1743,13 @@ permission_find_1018()
         local testID="permission_find_1018"
         local tmpout=$TmpDir/permission_find_1018.$RANDOM.out
         KinitAsAdmin
+        rlRun "ipa permission-add $testID --desc=4_$testID --permissions=add,delete --memberof=ipausers --type=user"
         local memberof_TestValue_Negative="NotExist" #memberof;negative;STR
-        local expectedErrMsg=replace_me
-        qaRun "ipa permission-find $testID  --memberof=$memberof_TestValue_Negative " "$tmpout" 1 "$expectedErrMsg" "test options:  [memberof]=[$memberof_TestValue_Negative]" 
+        local expectedErrMsg="0 permissions matched"
+        qaRun "ipa permission-find --memberof=$memberof_TestValue_Negative " "$tmpout" 1 "$expectedErrMsg" "test options:  [memberof]=[$memberof_TestValue_Negative]" 
+        rlRun "ipa permission-del $testID"
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_find_1018
 
@@ -1726,10 +1759,14 @@ permission_find_1019()
         local testID="permission_find_1019"
         local tmpout=$TmpDir/permission_find_1019.$RANDOM.out
         KinitAsAdmin
+        createPermissionTestGroup $testGroup "for test: $testID"
         local memberof_TestValue="$testGroup" #memberof;positive;STR
-        rlRun "ipa permission-find $testID  --memberof=$memberof_TestValue " 0 "test options:  [memberof]=[$memberof_TestValue]" 
+        rlRun "ipa permission-add $testID --desc=4_$testID --permissions=add,delete --memberof=$memberof_TestValue --type=user"
+        rlRun "ipa permission-find --memberof=$memberof_TestValue " 0 "test options:  [memberof]=[$memberof_TestValue]" 
+        rlRun "ipa permission-del $testID"
+        deletePermissionTestGroup $testGroup
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_find_1019
 
@@ -1739,11 +1776,15 @@ permission_find_1020()
         local testID="permission_find_1020"
         local tmpout=$TmpDir/permission_find_1020.$RANDOM.out
         KinitAsAdmin
+        createPermissionTestGroup $testGroup "for test: $testID"
+        rlRun "ipa permission-add $testID --desc=4_$testID --permissions=write --type=user"
         local name_TestValue_Negative="NotExist" #name;negative;STR
-        local expectedErrMsg=replace_me
-        qaRun "ipa permission-find $testID  --name=$name_TestValue_Negative " "$tmpout" 1 "$expectedErrMsg" "test options:  [name]=[$name_TestValue_Negative]" 
+        local expectedErrMsg="0 permissions matched"
+        qaRun "ipa permission-find --name=$name_TestValue_Negative " "$tmpout" 1 "$expectedErrMsg" "test options:  [name]=[$name_TestValue_Negative]" 
+        deletePermissionTestGroup $testGroup
+        rlRun "ipa permission-del $testID"
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_find_1020
 
@@ -1753,10 +1794,11 @@ permission_find_1021()
         local testID="permission_find_1021"
         local tmpout=$TmpDir/permission_find_1021.$RANDOM.out
         KinitAsAdmin
+        rlRun "ipa permission-add $testID --desc=4_$testID --permissions=write --type=user"
         local name_TestValue="$testID" #name;positive;STR
-        rlRun "ipa permission-find $testID  --name=$name_TestValue " 0 "test options:  [name]=[$name_TestValue]" 
+        rlRun "ipa permission-find --name=$name_TestValue " 0 "test options:  [name]=[$name_TestValue]" 
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_find_1021
 
@@ -1766,11 +1808,13 @@ permission_find_1022()
         local testID="permission_find_1022"
         local tmpout=$TmpDir/permission_find_1022.$RANDOM.out
         KinitAsAdmin
+        rlRun "ipa permission-add $testID --desc=4_$testID --permissions=write --type=user"
         local permissions_TestValue_Negative="nonListValue" #permissions;negative;nonListValue
-        local expectedErrMsg=replace_me
-        qaRun "ipa permission-find $testID  --permissions=$permissions_TestValue_Negative " "$tmpout" 1 "$expectedErrMsg" "test options:  [permissions]=[$permissions_TestValue_Negative]" 
+        local expectedErrMsg="0 permissions matched"
+        qaRun "ipa permission-find --permissions=$permissions_TestValue_Negative " "$tmpout" 1 "$expectedErrMsg" "test options:  [permissions]=[$permissions_TestValue_Negative]" 
+        rlRun "ipa permission-del $testID"
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_find_1022
 
@@ -1781,9 +1825,11 @@ permission_find_1023()
         local tmpout=$TmpDir/permission_find_1023.$RANDOM.out
         KinitAsAdmin
         local permissions_TestValue="write" #permissions;positive;read, write, add, delete, all
-        rlRun "ipa permission-find $testID  --permissions=$permissions_TestValue " 0 "test options:  [permissions]=[$permissions_TestValue]" 
+        rlRun "ipa permission-add $testID --desc=4_$testID --permissions=$permissions_TestValue --type=user"
+        rlRun "ipa permission-find --permissions=$permissions_TestValue " 0 "test options:  [permissions]=[$permissions_TestValue]" 
+        rlRun "ipa permission-del $testID"
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_find_1023
 
@@ -1793,9 +1839,10 @@ permission_find_1024()
         local testID="permission_find_1024"
         local tmpout=$TmpDir/permission_find_1024.$RANDOM.out
         KinitAsAdmin
+        rlRun "ipa permission-add $testID --desc=4_$testID --permissions=all --type=user"
         rlRun "ipa permission-find $testID --raw " 0 "test options: " 
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_find_1024
 
@@ -1808,7 +1855,7 @@ permission_find_1025()
         local sizelimit_TestValue="0" #sizelimit;boundary;INT
         rlRun "ipa permission-find $testID  --sizelimit=$sizelimit_TestValue " 0 "test options:  [sizelimit]=[$sizelimit_TestValue]" 
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_find_1025
 
@@ -1822,7 +1869,7 @@ permission_find_1026()
         local expectedErrMsg=replace_me
         qaRun "ipa permission-find $testID  --sizelimit=$sizelimit_TestValue_Negative " "$tmpout" 1 "$expectedErrMsg" "test options:  [sizelimit]=[$sizelimit_TestValue_Negative]" 
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_find_1026
 
@@ -1835,7 +1882,7 @@ permission_find_1027()
         local sizelimit_TestValue="2" #sizelimit;positive;INT
         rlRun "ipa permission-find $testID  --sizelimit=$sizelimit_TestValue " 0 "test options:  [sizelimit]=[$sizelimit_TestValue]" 
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_find_1027
 
@@ -1849,7 +1896,7 @@ permission_find_1028()
         local expectedErrMsg=replace_me
         qaRun "ipa permission-find $testID  --subtree=$subtree_TestValue_Negative " "$tmpout" 1 "$expectedErrMsg" "test options:  [subtree]=[$subtree_TestValue_Negative]" 
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_find_1028
 
@@ -1862,7 +1909,7 @@ permission_find_1029()
         local subtree_TestValue="cn=$testGroup,cn=groups,$testDC" #subtree;positive;STR
         rlRun "ipa permission-find $testID  --subtree=$subtree_TestValue " 0 "test options:  [subtree]=[$subtree_TestValue]" 
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_find_1029
 
@@ -1876,7 +1923,7 @@ permission_find_1030()
         local expectedErrMsg=replace_me
         qaRun "ipa permission-find $testID  --targetgroup=$targetgroup_TestValue_Negative " "$tmpout" 1 "$expectedErrMsg" "test options:  [targetgroup]=[$targetgroup_TestValue_Negative]" 
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_find_1030
 
@@ -1889,7 +1936,7 @@ permission_find_1031()
         local targetgroup_TestValue="$testGroup" #targetgroup;positive;STR
         rlRun "ipa permission-find $testID  --targetgroup=$targetgroup_TestValue " 0 "test options:  [targetgroup]=[$targetgroup_TestValue]" 
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_find_1031
 
@@ -1902,7 +1949,7 @@ permission_find_1032()
         local timelimit_TestValue="0" #timelimit;boundary;INT
         rlRun "ipa permission-find $testID  --timelimit=$timelimit_TestValue " 0 "test options:  [timelimit]=[$timelimit_TestValue]" 
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_find_1032
 
@@ -1916,7 +1963,7 @@ permission_find_1033()
         local expectedErrMsg=replace_me
         qaRun "ipa permission-find $testID  --timelimit=$timelimit_TestValue_Negative " "$tmpout" 1 "$expectedErrMsg" "test options:  [timelimit]=[$timelimit_TestValue_Negative]" 
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_find_1033
 
@@ -1929,7 +1976,7 @@ permission_find_1034()
         local timelimit_TestValue="2" #timelimit;positive;INT
         rlRun "ipa permission-find $testID  --timelimit=$timelimit_TestValue " 0 "test options:  [timelimit]=[$timelimit_TestValue]" 
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_find_1034
 
@@ -1943,7 +1990,7 @@ permission_find_1035()
         local expectedErrMsg=replace_me
         qaRun "ipa permission-find $testID  --type=$type_TestValue_Negative " "$tmpout" 1 "$expectedErrMsg" "test options:  [type]=[$type_TestValue_Negative]" 
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_find_1035
 
@@ -1956,7 +2003,7 @@ permission_find_1036()
         local type_TestValue="user group host hostgroup service netgroup dns" #type;positive;user, group, host, hostgroup, service, netgroup, dns
         rlRun "ipa permission-find $testID  --type=$type_TestValue " 0 "test options:  [type]=[$type_TestValue]" 
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_find_1036
 
@@ -1968,17 +2015,17 @@ permission_find_1036()
 permission_mod()
 {
     permission_mod_envsetup
-    permission_mod_1001  #test_scenario (negative test): [--addattr;negative;STR]
-    permission_mod_1002  #test_scenario (positive test): [--addattr;positive;STR]
-    permission_mod_1003  #test_scenario (negative test): [--all --attrs;negative;nonListValue --desc;positive;auto generated description data --filter;positive;STR --memberof;positive;STR --permissions;positive;read, write, add, delete, all --raw --rename;positive;STR --rights --subtree;positive;STR --targetgroup;positive;STR --type;positive;user, group, host, hostgroup, service, netgroup, dns]
-    permission_mod_1004  #test_scenario (negative test): [--all --attrs;positive;LIST --desc;positive;auto generated description data --filter;negative;STR --memberof;positive;STR --permissions;positive;read, write, add, delete, all --raw --rename;positive;STR --rights --subtree;positive;STR --targetgroup;positive;STR --type;positive;user, group, host, hostgroup, service, netgroup, dns]
-    permission_mod_1005  #test_scenario (negative test): [--all --attrs;positive;LIST --desc;positive;auto generated description data --filter;positive;STR --memberof;negative;STR --permissions;positive;read, write, add, delete, all --raw --rename;positive;STR --rights --subtree;positive;STR --targetgroup;positive;STR --type;positive;user, group, host, hostgroup, service, netgroup, dns]
-    permission_mod_1006  #test_scenario (negative test): [--all --attrs;positive;LIST --desc;positive;auto generated description data --filter;positive;STR --memberof;positive;STR --permissions;negative;nonListValue --raw --rename;positive;STR --rights --subtree;positive;STR --targetgroup;positive;STR --type;positive;user, group, host, hostgroup, service, netgroup, dns]
-    permission_mod_1007  #test_scenario (negative test): [--all --attrs;positive;LIST --desc;positive;auto generated description data --filter;positive;STR --memberof;positive;STR --permissions;positive;read, write, add, delete, all --raw --rename;negative;STR --rights --subtree;positive;STR --targetgroup;positive;STR --type;positive;user, group, host, hostgroup, service, netgroup, dns]
-    permission_mod_1008  #test_scenario (negative test): [--all --attrs;positive;LIST --desc;positive;auto generated description data --filter;positive;STR --memberof;positive;STR --permissions;positive;read, write, add, delete, all --raw --rename;positive;STR --rights --subtree;negative;STR --targetgroup;positive;STR --type;positive;user, group, host, hostgroup, service, netgroup, dns]
-    permission_mod_1009  #test_scenario (negative test): [--all --attrs;positive;LIST --desc;positive;auto generated description data --filter;positive;STR --memberof;positive;STR --permissions;positive;read, write, add, delete, all --raw --rename;positive;STR --rights --subtree;positive;STR --targetgroup;negative;STR --type;positive;user, group, host, hostgroup, service, netgroup, dns]
-    permission_mod_1010  #test_scenario (negative test): [--all --attrs;positive;LIST --desc;positive;auto generated description data --filter;positive;STR --memberof;positive;STR --permissions;positive;read, write, add, delete, all --raw --rename;positive;STR --rights --subtree;positive;STR --targetgroup;positive;STR --type;negative;nonSTRENUMValue]
-    permission_mod_1011  #test_scenario (positive test): [--all --attrs;positive;LIST --desc;positive;auto generated description data --filter;positive;STR --memberof;positive;STR --permissions;positive;read, write, add, delete, all --raw --rename;positive;STR --rights --subtree;positive;STR --targetgroup;positive;STR --type;positive;user, group, host, hostgroup, service, netgroup, dns]
+    #permission_mod_1001  #test_scenario (negative test): [--addattr;negative;STR]
+    #permission_mod_1002  #test_scenario (positive test): [--addattr;positive;STR]
+    #permission_mod_1003  #test_scenario (negative test): [--attrs;negative;nonListValue --desc;positive;auto generated description data --filter;positive;STR --memberof;positive;STR --permissions;positive;read, write, add, delete, all --rename;positive;STR --subtree;positive;STR --targetgroup;positive;STR --type;positive;user, group, host, hostgroup, service, netgroup, dns]
+    #permission_mod_1004  #test_scenario (negative test): [--attrs;positive;LIST --desc;positive;auto generated description data --filter;negative;STR --memberof;positive;STR --permissions;positive;read, write, add, delete, all --rename;positive;STR --subtree;positive;STR --targetgroup;positive;STR --type;positive;user, group, host, hostgroup, service, netgroup, dns]
+    #permission_mod_1005  #test_scenario (negative test): [--attrs;positive;LIST --desc;positive;auto generated description data --filter;positive;STR --memberof;negative;STR --permissions;positive;read, write, add, delete, all --rename;positive;STR --subtree;positive;STR --targetgroup;positive;STR --type;positive;user, group, host, hostgroup, service, netgroup, dns]
+    #permission_mod_1006  #test_scenario (negative test): [--attrs;positive;LIST --desc;positive;auto generated description data --filter;positive;STR --memberof;positive;STR --permissions;negative;nonListValue --rename;positive;STR --subtree;positive;STR --targetgroup;positive;STR --type;positive;user, group, host, hostgroup, service, netgroup, dns]
+    #permission_mod_1007  #test_scenario (negative test): [--attrs;positive;LIST --desc;positive;auto generated description data --filter;positive;STR --memberof;positive;STR --permissions;positive;read, write, add, delete, all --rename;negative;STR --subtree;positive;STR --targetgroup;positive;STR --type;positive;user, group, host, hostgroup, service, netgroup, dns]
+    #permission_mod_1008  #test_scenario (negative test): [--attrs;positive;LIST --desc;positive;auto generated description data --filter;positive;STR --memberof;positive;STR --permissions;positive;read, write, add, delete, all --rename;positive;STR --subtree;negative;STR --targetgroup;positive;STR --type;positive;user, group, host, hostgroup, service, netgroup, dns]
+    #permission_mod_1009  #test_scenario (negative test): [--attrs;positive;LIST --desc;positive;auto generated description data --filter;positive;STR --memberof;positive;STR --permissions;positive;read, write, add, delete, all --rename;positive;STR --subtree;positive;STR --targetgroup;negative;STR --type;positive;user, group, host, hostgroup, service, netgroup, dns]
+    #permission_mod_1010  #test_scenario (negative test): [--attrs;positive;LIST --desc;positive;auto generated description data --filter;positive;STR --memberof;positive;STR --permissions;positive;read, write, add, delete, all --rename;positive;STR --subtree;positive;STR --targetgroup;positive;STR --type;negative;nonSTRENUMValue]
+    #permission_mod_1011  #test_scenario (positive test): [--attrs;positive;LIST --desc;positive;auto generated description data --filter;positive;STR --memberof;positive;STR --permissions;positive;read, write, add, delete, all --rename;positive;STR --subtree;positive;STR --targetgroup;positive;STR --type;positive;user, group, host, hostgroup, service, netgroup, dns]
     permission_mod_1012  #test_scenario (negative test): [--attrs;negative;nonListValue]
     permission_mod_1013  #test_scenario (positive test): [--attrs;positive;LIST]
     permission_mod_1014  #test_scenario (positive test): [--desc;positive;auto generated description data]
@@ -2005,6 +2052,7 @@ permission_mod_envsetup()
 {
     rlPhaseStartSetup "permission_mod_envsetup"
         #environment setup starts here
+        createPermissionTestGroup $testGroup "test for permission mod"
         #environment setup ends   here
     rlPhaseEnd
 } #envsetup
@@ -2013,6 +2061,7 @@ permission_mod_envcleanup()
 {
     rlPhaseStartCleanup "permission_mod_envcleanup"
         #environment cleanup starts here
+        deletePermissionTestGroup $testGroup 
         #environment cleanup ends   here
     rlPhaseEnd
 } #envcleanup
@@ -2027,7 +2076,7 @@ permission_mod_1001()
         local expectedErrMsg=replace_me
         qaRun "ipa permission-mod $testID  --addattr=$addattr_TestValue_Negative " "$tmpout" 1 "$expectedErrMsg" "test options:  [addattr]=[$addattr_TestValue_Negative]" 
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_mod_1001
 
@@ -2040,7 +2089,7 @@ permission_mod_1002()
         local addattr_TestValue="replace_me" #addattr;positive;STR
         rlRun "ipa permission-mod $testID  --addattr=$addattr_TestValue " 0 "test options:  [addattr]=[$addattr_TestValue]" 
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_mod_1002
 
@@ -2062,7 +2111,7 @@ permission_mod_1003()
         local expectedErrMsg=replace_me
         qaRun "ipa permission-mod $testID --all  --attrs=$attrs_TestValue_Negative  --desc=$desc_TestValue  --filter=$filter_TestValue  --memberof=$memberof_TestValue  --permissions=$permissions_TestValue --raw  --rename=$rename_TestValue --rights  --subtree=$subtree_TestValue  --targetgroup=$targetgroup_TestValue  --type=$type_TestValue " "$tmpout" 1 "$expectedErrMsg" "test options:  [attrs]=[$attrs_TestValue_Negative] [desc]=[$desc_TestValue] [filter]=[$filter_TestValue] [memberof]=[$memberof_TestValue] [permissions]=[$permissions_TestValue] [rename]=[$rename_TestValue] [subtree]=[$subtree_TestValue] [targetgroup]=[$targetgroup_TestValue] [type]=[$type_TestValue]" 
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_mod_1003
 
@@ -2074,7 +2123,7 @@ permission_mod_1004()
         KinitAsAdmin
         local attrs_TestValue="uidnumber,gidnumber" #attrs;positive;LIST
         local desc_TestValue="auto_generated_description_$testID" #desc;positive;auto generated description data
-        local filter_TestValue_Negative="cn=NotExist" #filter;negative;STR
+        local filter_TestValue_Negative="" #filter;negative;STR
         local memberof_TestValue="$testGroup" #memberof;positive;STR
         local permissions_TestValue="add" #permissions;positive;read, write, add, delete, all
         local rename_TestValue="re$testID" #rename;positive;STR
@@ -2084,7 +2133,7 @@ permission_mod_1004()
         local expectedErrMsg=replace_me
         qaRun "ipa permission-mod $testID --all  --attrs=$attrs_TestValue  --desc=$desc_TestValue  --filter=$filter_TestValue_Negative  --memberof=$memberof_TestValue  --permissions=$permissions_TestValue --raw  --rename=$rename_TestValue --rights  --subtree=$subtree_TestValue  --targetgroup=$targetgroup_TestValue  --type=$type_TestValue " "$tmpout" 1 "$expectedErrMsg" "test options:  [attrs]=[$attrs_TestValue] [desc]=[$desc_TestValue] [filter]=[$filter_TestValue_Negative] [memberof]=[$memberof_TestValue] [permissions]=[$permissions_TestValue] [rename]=[$rename_TestValue] [subtree]=[$subtree_TestValue] [targetgroup]=[$targetgroup_TestValue] [type]=[$type_TestValue]" 
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_mod_1004
 
@@ -2106,7 +2155,7 @@ permission_mod_1005()
         local expectedErrMsg=replace_me
         qaRun "ipa permission-mod $testID --all  --attrs=$attrs_TestValue  --desc=$desc_TestValue  --filter=$filter_TestValue  --memberof=$memberof_TestValue_Negative  --permissions=$permissions_TestValue --raw  --rename=$rename_TestValue --rights  --subtree=$subtree_TestValue  --targetgroup=$targetgroup_TestValue  --type=$type_TestValue " "$tmpout" 1 "$expectedErrMsg" "test options:  [attrs]=[$attrs_TestValue] [desc]=[$desc_TestValue] [filter]=[$filter_TestValue] [memberof]=[$memberof_TestValue_Negative] [permissions]=[$permissions_TestValue] [rename]=[$rename_TestValue] [subtree]=[$subtree_TestValue] [targetgroup]=[$targetgroup_TestValue] [type]=[$type_TestValue]" 
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_mod_1005
 
@@ -2128,7 +2177,7 @@ permission_mod_1006()
         local expectedErrMsg=replace_me
         qaRun "ipa permission-mod $testID --all  --attrs=$attrs_TestValue  --desc=$desc_TestValue  --filter=$filter_TestValue  --memberof=$memberof_TestValue  --permissions=$permissions_TestValue_Negative --raw  --rename=$rename_TestValue --rights  --subtree=$subtree_TestValue  --targetgroup=$targetgroup_TestValue  --type=$type_TestValue " "$tmpout" 1 "$expectedErrMsg" "test options:  [attrs]=[$attrs_TestValue] [desc]=[$desc_TestValue] [filter]=[$filter_TestValue] [memberof]=[$memberof_TestValue] [permissions]=[$permissions_TestValue_Negative] [rename]=[$rename_TestValue] [subtree]=[$subtree_TestValue] [targetgroup]=[$targetgroup_TestValue] [type]=[$type_TestValue]" 
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_mod_1006
 
@@ -2150,7 +2199,7 @@ permission_mod_1007()
         local expectedErrMsg=replace_me
         qaRun "ipa permission-mod $testID --all  --attrs=$attrs_TestValue  --desc=$desc_TestValue  --filter=$filter_TestValue  --memberof=$memberof_TestValue  --permissions=$permissions_TestValue --raw  --rename=$rename_TestValue_Negative --rights  --subtree=$subtree_TestValue  --targetgroup=$targetgroup_TestValue  --type=$type_TestValue " "$tmpout" 1 "$expectedErrMsg" "test options:  [attrs]=[$attrs_TestValue] [desc]=[$desc_TestValue] [filter]=[$filter_TestValue] [memberof]=[$memberof_TestValue] [permissions]=[$permissions_TestValue] [rename]=[$rename_TestValue_Negative] [subtree]=[$subtree_TestValue] [targetgroup]=[$targetgroup_TestValue] [type]=[$type_TestValue]" 
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_mod_1007
 
@@ -2172,7 +2221,7 @@ permission_mod_1008()
         local expectedErrMsg=replace_me
         qaRun "ipa permission-mod $testID --all  --attrs=$attrs_TestValue  --desc=$desc_TestValue  --filter=$filter_TestValue  --memberof=$memberof_TestValue  --permissions=$permissions_TestValue --raw  --rename=$rename_TestValue --rights  --subtree=$subtree_TestValue_Negative  --targetgroup=$targetgroup_TestValue  --type=$type_TestValue " "$tmpout" 1 "$expectedErrMsg" "test options:  [attrs]=[$attrs_TestValue] [desc]=[$desc_TestValue] [filter]=[$filter_TestValue] [memberof]=[$memberof_TestValue] [permissions]=[$permissions_TestValue] [rename]=[$rename_TestValue] [subtree]=[$subtree_TestValue_Negative] [targetgroup]=[$targetgroup_TestValue] [type]=[$type_TestValue]" 
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_mod_1008
 
@@ -2194,7 +2243,7 @@ permission_mod_1009()
         local expectedErrMsg=replace_me
         qaRun "ipa permission-mod $testID --all  --attrs=$attrs_TestValue  --desc=$desc_TestValue  --filter=$filter_TestValue  --memberof=$memberof_TestValue  --permissions=$permissions_TestValue --raw  --rename=$rename_TestValue --rights  --subtree=$subtree_TestValue  --targetgroup=$targetgroup_TestValue_Negative  --type=$type_TestValue " "$tmpout" 1 "$expectedErrMsg" "test options:  [attrs]=[$attrs_TestValue] [desc]=[$desc_TestValue] [filter]=[$filter_TestValue] [memberof]=[$memberof_TestValue] [permissions]=[$permissions_TestValue] [rename]=[$rename_TestValue] [subtree]=[$subtree_TestValue] [targetgroup]=[$targetgroup_TestValue_Negative] [type]=[$type_TestValue]" 
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_mod_1009
 
@@ -2216,7 +2265,7 @@ permission_mod_1010()
         local expectedErrMsg=replace_me
         qaRun "ipa permission-mod $testID --all  --attrs=$attrs_TestValue  --desc=$desc_TestValue  --filter=$filter_TestValue  --memberof=$memberof_TestValue  --permissions=$permissions_TestValue --raw  --rename=$rename_TestValue --rights  --subtree=$subtree_TestValue  --targetgroup=$targetgroup_TestValue  --type=$type_TestValue_Negative " "$tmpout" 1 "$expectedErrMsg" "test options:  [attrs]=[$attrs_TestValue] [desc]=[$desc_TestValue] [filter]=[$filter_TestValue] [memberof]=[$memberof_TestValue] [permissions]=[$permissions_TestValue] [rename]=[$rename_TestValue] [subtree]=[$subtree_TestValue] [targetgroup]=[$targetgroup_TestValue] [type]=[$type_TestValue_Negative]" 
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_mod_1010
 
@@ -2237,7 +2286,7 @@ permission_mod_1011()
         local type_TestValue="user group host hostgroup service netgroup dns" #type;positive;user, group, host, hostgroup, service, netgroup, dns
         rlRun "ipa permission-mod $testID --all  --attrs=$attrs_TestValue  --desc=$desc_TestValue  --filter=$filter_TestValue  --memberof=$memberof_TestValue  --permissions=$permissions_TestValue --raw  --rename=$rename_TestValue --rights  --subtree=$subtree_TestValue  --targetgroup=$targetgroup_TestValue  --type=$type_TestValue " 0 "test options:  [attrs]=[$attrs_TestValue] [desc]=[$desc_TestValue] [filter]=[$filter_TestValue] [memberof]=[$memberof_TestValue] [permissions]=[$permissions_TestValue] [rename]=[$rename_TestValue] [subtree]=[$subtree_TestValue] [targetgroup]=[$targetgroup_TestValue] [type]=[$type_TestValue]" 
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_mod_1011
 
@@ -2247,11 +2296,14 @@ permission_mod_1012()
         local testID="permission_mod_1012"
         local tmpout=$TmpDir/permission_mod_1012.$RANDOM.out
         KinitAsAdmin
+        rlRun "ipa permission-add $testID --desc=for_$testID --attrs=uidnumber,gidnumber --permissions=all --type=user" 0 "add permission for test [$testID]"
         local attrs_TestValue_Negative="noSuchAttrs" #attrs;negative;nonListValue
-        local expectedErrMsg=replace_me
+        local expectedErrMsg="targetattr \"$attrs_TestValue_Negative\" does not exist in schema"
+        rlRun "ipa permission-add $testID --desc=for_$testID --permissions=all --type=user" 0 "add permission for test [$testID]"
         qaRun "ipa permission-mod $testID  --attrs=$attrs_TestValue_Negative " "$tmpout" 1 "$expectedErrMsg" "test options:  [attrs]=[$attrs_TestValue_Negative]" 
+        rlRun "ipa permission-del $testID"
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_mod_1012
 
@@ -2261,10 +2313,12 @@ permission_mod_1013()
         local testID="permission_mod_1013"
         local tmpout=$TmpDir/permission_mod_1013.$RANDOM.out
         KinitAsAdmin
-        local attrs_TestValue="uidnumber,gidnumber" #attrs;positive;LIST
+        rlRun "ipa permission-add $testID --desc=for_$testID --permissions=all --type=user" 0 "add permission for test [$testID]"
+        local attrs_TestValue="gidnumber" #attrs;positive;LIST
         rlRun "ipa permission-mod $testID  --attrs=$attrs_TestValue " 0 "test options:  [attrs]=[$attrs_TestValue]" 
+        rlRun "ipa permission-del $testID"
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_mod_1013
 
@@ -2274,10 +2328,13 @@ permission_mod_1014()
         local testID="permission_mod_1014"
         local tmpout=$TmpDir/permission_mod_1014.$RANDOM.out
         KinitAsAdmin
+        rlRun "ipa permission-add $testID --desc=for_$testID --permissions=all --type=user" 0 "add permission for test [$testID]"
         local desc_TestValue="auto_generated_description_$testID" #desc;positive;auto generated description data
         rlRun "ipa permission-mod $testID  --desc=$desc_TestValue " 0 "test options:  [desc]=[$desc_TestValue]" 
+        checkPermissionInfo $testID "Description" "$desc_TestValue"
+        rlRun "ipa permission-del $testID"
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_mod_1014
 
@@ -2287,11 +2344,13 @@ permission_mod_1015()
         local testID="permission_mod_1015"
         local tmpout=$TmpDir/permission_mod_1015.$RANDOM.out
         KinitAsAdmin
-        local filter_TestValue_Negative="cn=NotExist" #filter;negative;STR
+        rlRun "ipa permission-add $testID --desc=4_$testID --permissions=all --filter=cn=ipausers" 0 "create permission for $testID"
+        local filter_TestValue_Negative="" #filter;negative;STR
         local expectedErrMsg=replace_me
         qaRun "ipa permission-mod $testID  --filter=$filter_TestValue_Negative " "$tmpout" 1 "$expectedErrMsg" "test options:  [filter]=[$filter_TestValue_Negative]" 
+        rlRun "ipa permission-del $testID"
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_mod_1015
 
@@ -2301,10 +2360,13 @@ permission_mod_1016()
         local testID="permission_mod_1016"
         local tmpout=$TmpDir/permission_mod_1016.$RANDOM.out
         KinitAsAdmin
+        rlRun "ipa permission-add $testID --desc=4_$testID --permissions=all --filter=cn=ipausers" 0 "create permission for $testID"
         local filter_TestValue="cn=$testGroup" #filter;positive;STR
         rlRun "ipa permission-mod $testID  --filter=$filter_TestValue " 0 "test options:  [filter]=[$filter_TestValue]" 
+        checkPermissionInfo $testID "Filter" "($filter_TestValue)"
+        rlRun "ipa permission-del $testID"
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_mod_1016
 
@@ -2314,11 +2376,13 @@ permission_mod_1017()
         local testID="permission_mod_1017"
         local tmpout=$TmpDir/permission_mod_1017.$RANDOM.out
         KinitAsAdmin
+        rlRun "ipa permission-add $testID --desc=4_$testID --permissions=all --subtree=cn=ipausers,cn=accounts,$testDC" 0 "create permission for $testID"
         local memberof_TestValue_Negative="NotExist" #memberof;negative;STR
-        local expectedErrMsg=replace_me
-        qaRun "ipa permission-mod $testID  --memberof=$memberof_TestValue_Negative " "$tmpout" 1 "$expectedErrMsg" "test options:  [memberof]=[$memberof_TestValue_Negative]" 
+        local expectedErrMsg="group not found"
+        qaRun "ipa permission-mod $testID  --memberof=$memberof_TestValue_Negative " "$tmpout" 2 "$expectedErrMsg" "test options:  [memberof]=[$memberof_TestValue_Negative]" 
+        rlRun "ipa permission-del $testID"
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_mod_1017
 
@@ -2328,10 +2392,14 @@ permission_mod_1018()
         local testID="permission_mod_1018"
         local tmpout=$TmpDir/permission_mod_1018.$RANDOM.out
         KinitAsAdmin
+        rlRun "ipa permission-add $testID --desc=4_$testID --permissions=all --subtree=cn=ipausers,cn=accounts,$testDC" 0 "create permission for $testID"
         local memberof_TestValue="$testGroup" #memberof;positive;STR
         rlRun "ipa permission-mod $testID  --memberof=$memberof_TestValue " 0 "test options:  [memberof]=[$memberof_TestValue]" 
+        memberofInfo="(memberOf=cn=ipausers,cn=groups,cn=accounts,$testDC)"
+        checkPermissionInfo $testID "Filter" "$memberofInfo"
+        rlRun "ipa permission-del $testID"
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_mod_1018
 
@@ -2341,11 +2409,13 @@ permission_mod_1019()
         local testID="permission_mod_1019"
         local tmpout=$TmpDir/permission_mod_1019.$RANDOM.out
         KinitAsAdmin
+        rlRun "ipa permission-add $testID --desc=4_$testID --permissions=delete --subtree=cn=ipausers,cn=accounts,$testDC" 0 "create permission for $testID"
         local permissions_TestValue_Negative="nonListValue" #permissions;negative;nonListValue
-        local expectedErrMsg=replace_me
+        local expectedErrMsg="invalid 'permissions'"
         qaRun "ipa permission-mod $testID  --permissions=$permissions_TestValue_Negative " "$tmpout" 1 "$expectedErrMsg" "test options:  [permissions]=[$permissions_TestValue_Negative]" 
+        rlRun "ipa permission-del $testID"
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_mod_1019
 
@@ -2355,10 +2425,13 @@ permission_mod_1020()
         local testID="permission_mod_1020"
         local tmpout=$TmpDir/permission_mod_1020.$RANDOM.out
         KinitAsAdmin
-        local permissions_TestValue="write,add,delete" #permissions;positive;read, write, add, delete, all
+        rlRun "ipa permission-add $testID --desc=4_$testID --permissions=delete --subtree=cn=ipausers,cn=accounts,$testDC" 0 "create permission for $testID"
+        local permissions_TestValue="write" #permissions;positive;read, write, add, delete, all
         rlRun "ipa permission-mod $testID  --permissions=$permissions_TestValue " 0 "test options:  [permissions]=[$permissions_TestValue]" 
+        checkPermissionInfo $testID "Permissions" "$permissions_TestValue"
+        rlRun "ipa permission-del $testID"
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_mod_1020
 
@@ -2368,11 +2441,13 @@ permission_mod_1021()
         local testID="permission_mod_1021"
         local tmpout=$TmpDir/permission_mod_1021.$RANDOM.out
         KinitAsAdmin
-        local rename_TestValue_Negative="NotExist" #rename;negative;STR
-        local expectedErrMsg=replace_me
+        rlRun "ipa permission-add $testID --desc=4_$testID --permissions=delete --subtree=cn=ipausers,cn=accounts,$testDC" 0 "create permission for $testID"
+        local rename_TestValue_Negative="+-" #rename;negative;STR
+        local expectedErrMsg="no modifications to be performed"
         qaRun "ipa permission-mod $testID  --rename=$rename_TestValue_Negative " "$tmpout" 1 "$expectedErrMsg" "test options:  [rename]=[$rename_TestValue_Negative]" 
+        rlRun "ipa permission-del $testID"
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_mod_1021
 
@@ -2382,10 +2457,13 @@ permission_mod_1022()
         local testID="permission_mod_1022"
         local tmpout=$TmpDir/permission_mod_1022.$RANDOM.out
         KinitAsAdmin
+        rlRun "ipa permission-add $testID --desc=4_$testID --permissions=delete --subtree=cn=ipausers,cn=accounts,$testDC" 0 "create permission for $testID"
         local rename_TestValue="re$testID" #rename;positive;STR
         rlRun "ipa permission-mod $testID  --rename=$rename_TestValue " 0 "test options:  [rename]=[$rename_TestValue]" 
+        checkPermissionInfo $testID "Permission name" "$rename_TestValue"
+        rlRun "ipa permission-del $rename_TestValue"
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_mod_1022
 
@@ -2395,11 +2473,13 @@ permission_mod_1023()
         local testID="permission_mod_1023"
         local tmpout=$TmpDir/permission_mod_1023.$RANDOM.out
         KinitAsAdmin
-        local setattr_TestValue_Negative="STR" #setattr;negative;STR
-        local expectedErrMsg=replace_me
+        rlRun "ipa permission-add $testID --desc=4_$testID --permissions=write --subtree=cn=ipausers,cn=accounts,$testDC" 0 "create permission for $testID"
+        local setattr_TestValue_Negative="permissions=badPermission" #setattr;negative;STR
+        local expectedErrMsg="no modifications to be performed"
         qaRun "ipa permission-mod $testID  --setattr=$setattr_TestValue_Negative " "$tmpout" 1 "$expectedErrMsg" "test options:  [setattr]=[$setattr_TestValue_Negative]" 
+        rlRun "ipa permission-del $testID"
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_mod_1023
 
@@ -2409,10 +2489,13 @@ permission_mod_1024()
         local testID="permission_mod_1024"
         local tmpout=$TmpDir/permission_mod_1024.$RANDOM.out
         KinitAsAdmin
-        local setattr_TestValue="STR" #setattr;positive;STR
+        rlRun "ipa permission-add $testID --desc=4_$testID --permissions=write --type=group" 0 "create permission for $testID"
+        local setattr_TestValue="permissions=all" #setattr;positive;STR
         rlRun "ipa permission-mod $testID  --setattr=$setattr_TestValue " 0 "test options:  [setattr]=[$setattr_TestValue]" 
+        checkPermissionInfo $testID "Permissions" "all"
+        rlRun "ipa permission-del $testID"
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_mod_1024
 
@@ -2422,11 +2505,13 @@ permission_mod_1025()
         local testID="permission_mod_1025"
         local tmpout=$TmpDir/permission_mod_1025.$RANDOM.out
         KinitAsAdmin
+        rlRun "ipa permission-add $testID --desc=4_$testID --permissions=write --subtree=cn=ipausers,cn=accounts,$testDC" 0 "create permission for $testID"
         local subtree_TestValue_Negative="" #subtree;negative;STR
         local expectedErrMsg=replace_me
         qaRun "ipa permission-mod $testID  --subtree=$subtree_TestValue_Negative " "$tmpout" 1 "$expectedErrMsg" "test options:  [subtree]=[$subtree_TestValue_Negative]" 
+        rlRun "ipa permission-del $testID"
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_mod_1025
 
@@ -2436,10 +2521,22 @@ permission_mod_1026()
         local testID="permission_mod_1026"
         local tmpout=$TmpDir/permission_mod_1026.$RANDOM.out
         KinitAsAdmin
+        rlRun "ipa permission-add $testID --desc=4_$testID --permissions=write --subtree=cn=ipausers,cn=accounts,$testDC" 0 "create permission for $testID"
         local subtree_TestValue="cn=$testGroup,cn=groups,$testDC" #subtree;positive;STR
         rlRun "ipa permission-mod $testID  --subtree=$subtree_TestValue " 0 "test options:  [subtree]=[$subtree_TestValue]" 
+        ipa permission-find $testID > $tmpout
+        if grep -i "ldap:///$subtree_TestValue" $tmpout 2>&1
+        then
+            rlPass "subtree modified as expected"
+        else
+            rlFail "subtree modification failed"
+            echo "---------------------- output --------------"
+            cat $tmpout
+            echo "============================================"
+        fi
+        rlRun "ipa permission-del $testID"
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_mod_1026
 
@@ -2449,11 +2546,13 @@ permission_mod_1027()
         local testID="permission_mod_1027"
         local tmpout=$TmpDir/permission_mod_1027.$RANDOM.out
         KinitAsAdmin
+        rlRun "ipa permission-add $testID --desc=4_$testID --permissions=write --targetgroup=ipausers" 0 "create permission for $testID"
         local targetgroup_TestValue_Negative="NotExist" #targetgroup;negative;STR
-        local expectedErrMsg=replace_me
-        qaRun "ipa permission-mod $testID  --targetgroup=$targetgroup_TestValue_Negative " "$tmpout" 1 "$expectedErrMsg" "test options:  [targetgroup]=[$targetgroup_TestValue_Negative]" 
+        local expectedErrMsg="group not found"
+        qaRun "ipa permission-mod $testID  --targetgroup=$targetgroup_TestValue_Negative " "$tmpout" 2 "$expectedErrMsg" "test options:  [targetgroup]=[$targetgroup_TestValue_Negative]" 
+        rlRun "ipa permission-del $testID"
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_mod_1027
 
@@ -2463,10 +2562,13 @@ permission_mod_1028()
         local testID="permission_mod_1028"
         local tmpout=$TmpDir/permission_mod_1028.$RANDOM.out
         KinitAsAdmin
+        rlRun "ipa permission-add $testID --desc=4_$testID --permissions=write --targetgroup=ipausers" 0 "create permission for $testID"
         local targetgroup_TestValue="$testGroup" #targetgroup;positive;STR
         rlRun "ipa permission-mod $testID  --targetgroup=$targetgroup_TestValue " 0 "test options:  [targetgroup]=[$targetgroup_TestValue]" 
+        checkPermissionInfo $testID "Target group" "$targetgroup_TestValue"
+        rlRun "ipa permission-del $testID"
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_mod_1028
 
@@ -2476,11 +2578,13 @@ permission_mod_1029()
         local testID="permission_mod_1029"
         local tmpout=$TmpDir/permission_mod_1029.$RANDOM.out
         KinitAsAdmin
+        rlRun "ipa permission-add $testID --desc=4_$testID --permissions=read --type=user" 0 "create permission for $testID"
         local type_TestValue_Negative="nonSTRENUMValue" #type;negative;nonSTRENUMValue
-        local expectedErrMsg=replace_me
+        local expectedErrMsg="invalid 'type'"
         qaRun "ipa permission-mod $testID  --type=$type_TestValue_Negative " "$tmpout" 1 "$expectedErrMsg" "test options:  [type]=[$type_TestValue_Negative]" 
+        rlRun "ipa permission-del $testID"
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_mod_1029
 
@@ -2490,10 +2594,13 @@ permission_mod_1030()
         local testID="permission_mod_1030"
         local tmpout=$TmpDir/permission_mod_1030.$RANDOM.out
         KinitAsAdmin
-        local type_TestValue="user group host hostgroup service netgroup dns" #type;positive;user, group, host, hostgroup, service, netgroup, dns
+        local type_TestValue="dns" #type;positive;user, group, host, hostgroup, service, netgroup, dns
+        rlRun "ipa permission-add $testID --desc=4_$testID --permissions=read --type=user" 0 "create permission for $testID"
         rlRun "ipa permission-mod $testID  --type=$type_TestValue " 0 "test options:  [type]=[$type_TestValue]" 
+        checkPermissionInfo $testID "Type" "$type_TestValue"
+        rlRun "ipa permission-del $testID"
         Kcleanup
-        rm $tmpout
+        rm $tmpout 2>&1 >/dev/null
     rlPhaseEnd
 } #permission_mod_1030
 
@@ -2516,6 +2623,10 @@ permission_show_envsetup()
 {
     rlPhaseStartSetup "permission_show_envsetup"
         #environment setup starts here
+        local name="show_only_permission"
+        KinitAsAdmin
+        rlRun "ipa permission-add $name --desc=used_for_show_test --permissions=read,write --type=group"
+        Kcleanup
         #environment setup ends   here
     rlPhaseEnd
 } #envsetup
@@ -2524,6 +2635,11 @@ permission_show_envcleanup()
 {
     rlPhaseStartCleanup "permission_show_envcleanup"
         #environment cleanup starts here
+        local name="show_only_permission"
+        KinitAsAdmin
+        rlRun "ipa permission-add $name --desc=used_for_show_test --permissions=read,write --type=group"
+        rlRun "ipa permission-del $name" 0 "remove the permission for show test"
+        Kcleanup
         #environment cleanup ends   here
     rlPhaseEnd
 } #envcleanup
@@ -2532,11 +2648,10 @@ permission_show_1001()
 { #test_scenario (positive): --all
     rlPhaseStartTest "permission_show_1001"
         local testID="permission_show_1001"
-        local tmpout=$TmpDir/permission_show_1001.$RANDOM.out
+        local name="show_only_permission"
         KinitAsAdmin
-        rlRun "ipa permission-show $testID --all " 0 "test options: " 
+        rlRun "ipa permission-show $name --all " 0 "test options: " 
         Kcleanup
-        rm $tmpout
     rlPhaseEnd
 } #permission_show_1001
 
@@ -2544,11 +2659,10 @@ permission_show_1002()
 { #test_scenario (positive): --all --raw --rights
     rlPhaseStartTest "permission_show_1002"
         local testID="permission_show_1002"
-        local tmpout=$TmpDir/permission_show_1002.$RANDOM.out
+        local name="show_only_permission"
         KinitAsAdmin
-        rlRun "ipa permission-show $testID --all --raw --rights " 0 "test options: " 
+        rlRun "ipa permission-show $name --all --raw --rights " 0 "test options: " 
         Kcleanup
-        rm $tmpout
     rlPhaseEnd
 } #permission_show_1002
 
@@ -2556,11 +2670,10 @@ permission_show_1003()
 { #test_scenario (positive): --raw
     rlPhaseStartTest "permission_show_1003"
         local testID="permission_show_1003"
-        local tmpout=$TmpDir/permission_show_1003.$RANDOM.out
+        local name="show_only_permission"
         KinitAsAdmin
-        rlRun "ipa permission-show $testID --raw " 0 "test options: " 
+        rlRun "ipa permission-show $name --raw " 0 "test options: " 
         Kcleanup
-        rm $tmpout
     rlPhaseEnd
 } #permission_show_1003
 
@@ -2568,11 +2681,10 @@ permission_show_1004()
 { #test_scenario (positive): --rights
     rlPhaseStartTest "permission_show_1004"
         local testID="permission_show_1004"
-        local tmpout=$TmpDir/permission_show_1004.$RANDOM.out
+        local name="show_only_permission"
         KinitAsAdmin
-        rlRun "ipa permission-show $testID --rights " 0 "test options: " 
+        rlRun "ipa permission-show $name --rights " 0 "test options: " 
         Kcleanup
-        rm $tmpout
     rlPhaseEnd
 } #permission_show_1004
 

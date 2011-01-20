@@ -59,9 +59,34 @@ deletePermission()
     if [ -n "$permissionName" ];then
         rlRun "ipa permission-del $permissionName" 0 "delete permission :[$permissionName]"
     else
-        rlLog "permissionName is empty, doing nothing";
+        rlLog "permissionName is not given, doing nothing";
     fi
 } #deletePermission
+
+checkPermissionInfo()
+{
+    local permissionName=$1
+    local attr=$2
+    local attrValue=$3
+    local debug=$4
+    local tmpout=$TmpDir/checkPermissionInfo.$RANDOM.out
+    ipa permission-find $permissionName --all >$tmpout
+    local actualValue=`grep -i $attr $tmpout | cut -d':' -f2 | xargs echo`
+    if [ "$attrValue" = "$actualValue" ];then
+        rlPass "expected information matches [$actualValue]"
+    else
+        rlFail "expected infromation not found"
+        debug=debug
+    fi
+    if [ "$debug" = "debug" ];then
+        echo "expected:[$attrValue]"
+        echo "actual  :[$actualValue]";
+        echo "---------------- output -----------"
+        cat $tmpout
+        echo "============ end of output ========="
+    fi
+    rm $tmpout
+} #checkPermissionInfo
 
 qaRun()
 {
@@ -75,7 +100,7 @@ qaRun()
     rlLog "expect [$expectCode], out=[$out]"
     rlLog "$comment"
     
-    $1 2>$out
+    $1 2>&1 >$out
     actualCode=$?
     if [ "$actualCode" = "$expectCode" ];then
         rlLog "return code matches, now check the message"
