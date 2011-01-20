@@ -221,8 +221,10 @@ fi
 	a2="1.2.3.4,2.3.4.5"
 	aaaa="fec0:0:a10:6000:10:16ff:fe98:193"
 	afsdb="green.femto.edu."
+	cname="m.l.k."
+	txt="none=1.2.3.4"
 	
-	  --a-rec=LIST          comma-separated list of A records
+  --a-rec=LIST          comma-separated list of A records
   --aaaa-rec=LIST       comma-separated list of AAAA records
   --afsdb-rec=LIST      comma-separated list of AFSDB records
   --cert-rec=LIST       comma-separated list of CERT records
@@ -260,39 +262,179 @@ fi
   --tsig-rec=LIST       comma-separated list of TSIG records
   --txt-rec=LIST        comma-separated list of TXT records
 
+	# Type A
 	rlPhaseStartTest "ipa-dns-30: add record of type A"
 		rlRun "ipa dnsrecord-add $zone a --a-rec $a" 0 "add record type a"
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-31: make sure that IPA saved record type A"
-		rlRun "ipa dnsrecord-add $zone a | grep $a" 0 "make sure ipa recieved record type A"
+		rlRun "ipa dnsrecord-find $zone a | grep $a" 0 "make sure ipa recieved record type A"
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-32: make sure that dig can find the record type A"
 		rlRun "dig a.$zone | grep $a" 0 "make sure dig can find the A record"
 	rlPhaseEnd
 
-	rlPhaseStartTest "ipa-dns-33: add record of type multiple A records"
+	rlPhaseStartTest "ipa-dns-33: delete record of type A"
+		rlRun "ipa dnsrecord-del $zone a --a-rec $a" 0 "delete record type a"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-34: make sure that IPA deleted record type A"
+		rlRun "ipa dnsrecord-find $zone a" 1 "make sure ipa deleted record type A"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-35: make sure that dig can not find the record type A"
+		rlRun "dig a.$zone A | grep $a" 1 "make sure dig can not find the A record"
+	rlPhaseEnd
+
+	# Type Multiple A's
+	rlPhaseStartTest "ipa-dns-36: add record of type multiple A records"
 		rlRun "ipa dnsrecord-add $zone a2 --a-rec $a2" 0 "add record type a"
 	rlPhaseEnd
 
-	rlPhaseStartTest "ipa-dns-34: make sure that IPA saved the first type A record"
-		thisa=$(echo $a2 | sed s/,/\ /g | awk '{print $1}')
-		rlRun "ipa dnsrecord-add $zone a2 | grep $thisa" 0 "make sure ipa recieved record type A"
-	rlPhaseEnd
-
-	rlPhaseStartTest "ipa-dns-36: make sure that dig can find the first a record"
-		rlRun "dig a2.$zone | grep $thisa" 0 "make sure dig finds the first A record"
-	rlPhaseEnd
-
 	rlPhaseStartTest "ipa-dns-37: make sure that IPA saved the first type A record"
-		thisa=$(echo $a2 | sed s/,/\ /g | awk '{print $2}')
-		rlRun "ipa dnsrecord-add $zone a2 | grep $thisa" 0 "make sure ipa recieved record type A"
+		thisa=$(echo $a2 | sed s/,/\ /g | awk '{print $1}')
+		rlRun "ipa dnsrecord-find $zone a2 | grep $thisa" 0 "make sure ipa recieved record type A"
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-38: make sure that dig can find the first a record"
 		rlRun "dig a2.$zone | grep $thisa" 0 "make sure dig finds the first A record"
 	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-39: make sure that IPA saved the second type A record"
+		thisa=$(echo $a2 | sed s/,/\ /g | awk '{print $2}')
+		rlRun "ipa dnsrecord-find $zone a2 | grep $thisa" 0 "make sure ipa recieved second record type A"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-40: make sure that dig can find the second a record"
+		rlRun "dig a2.$zone | grep $thisa" 0 "make sure dig finds the first A record"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-41: delete record of type multiple A"
+		rlRun "ipa dnsrecord-del $zone a2 --a-rec $a2" 0 "delete record type multiple a"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-42: make sure that IPA removed the first type A record"
+		thisa=$(echo $a2 | sed s/,/\ /g | awk '{print $1}')
+		rlRun "ipa dnsrecord-find $zone a2 | grep $thisa" 1 "make sure ipa removed record type A"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-43: make sure that dig cannot find the first a record"
+		rlRun "dig a2.$zone | grep $thisa" 1 "make sure dig does not find the first A record"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-44: make sure that IPA removed the second type A record"
+		thisa=$(echo $a2 | sed s/,/\ /g | awk '{print $2}')
+		rlRun "ipa dnsrecord-find $zone a2 | grep $thisa" 1 "make sure ipa removed second record type A"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-45: make sure that dig can not find the second a record"
+		rlRun "dig a2.$zone | grep $thisa" 1 "make sure dig does not finds the first A record"
+	rlPhaseEnd
+
+	# Type AAAA
+	rlPhaseStartTest "ipa-dns-46: add record of type AAAA"
+		rlRun "ipa dnsrecord-add $zone aaaa --aaaa-rec $aaaa" 0 "add record type AAAA"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-47: make sure that IPA saved record type AAAA"
+		rlRun "ipa dnsrecord-find $zone aaaa | grep $aaaa" 0 "make sure ipa recieved record type AAAA"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-48: make sure that dig can find the record type AAAA"
+		rlRun "dig aaaa.$zone | grep $aaaa" 0 "make sure dig can find the AAAA record"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-49: delete record of type AAAA"
+		rlRun "ipa dnsrecord-del $zone aaaa --a-rec $aaaa" 0 "delete record type AAAA"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-50: make sure that IPA deleted record type AAAA"
+		rlRun "ipa dnsrecord-find $zone aaaa" 1 "make sure ipa deleted record type AAAA"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-51: make sure that dig can not find the record type AAAA"
+		rlRun "dig aaaa.$zone AAAA | grep $aaaa" 1 "make sure dig can not find the AAAA record"
+	rlPhaseEnd
+
+	# Type afsbd
+	rlPhaseStartTest "ipa-dns-52: add record of type afsdb"
+		rlRun "ipa dnsrecord-add $zone afsdb --afsdb-rec $afsdb" 0 "add record type afsdb"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-53: make sure that IPA saved record type afsdb"
+		rlRun "ipa dnsrecord-find $zone afsdb | grep $afsdb" 0 "make sure ipa recieved record type afsdb"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-54: make sure that dig can find the record type afsdb"
+		rlRun "dig afsdb.$zone AFSDB | grep $afsdb" 0 "make sure dig can find the afsdb record"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-55: delete record of type afsdb"
+		rlRun "ipa dnsrecord-del $zone afsdb --a-rec $afsdb" 0 "delete record type afsdb"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-56: make sure that IPA deleted record type afsdb"
+		rlRun "ipa dnsrecord-find $zone afsdb" 1 "make sure ipa deleted record type afsdb"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-57: make sure that dig can not find the record type afsdb"
+		rlRun "dig afsdb.$zone AFSDB | grep $afsdb" 1 "make sure dig can not find the afsdb record"
+	rlPhaseEnd
+
+	# Type cname
+	rlPhaseStartTest "ipa-dns-58: add record of type cname"
+		rlRun "ipa dnsrecord-add $zone cname --cname-rec $cname" 0 "add record type cname"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-59: make sure that IPA saved record type cname"
+		rlRun "ipa dnsrecord-find $zone cname | grep $cname" 0 "make sure ipa recieved record type cname"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-59: make sure that dig can find the record type cname"
+		rlRun "dig cname.$zone CNAME | grep $cname" 0 "make sure dig can find the cname record"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-60: delete record of type cname"
+		rlRun "ipa dnsrecord-del $zone cname --a-rec $cname" 0 "delete record type cname"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-61: make sure that IPA deleted record type cname"
+		rlRun "ipa dnsrecord-find $zone cname" 1 "make sure ipa deleted record type cname"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-62: make sure that dig can not find the record type cname"
+		rlRun "dig cname.$zone CNAME | grep $cname" 1 "make sure dig can not find the cname record"
+	rlPhaseEnd
+
+	# TXT Record
+	rlPhaseStartTest "ipa-dns-63: add record of type txt"
+		rlRun "ipa dnsrecord-add $zone txt --txt-rec $txt" 0 "add record type txt"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-64: make sure that IPA saved record type txt"
+		rlRun "ipa dnsrecord-find $zone txt | grep $txt" 0 "make sure ipa recieved record type txt"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-65: make sure that dig can find the record type txt"
+		rlRun "dig txt.$zone TXT | grep $txt" 0 "make sure dig can find the txt record"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-67: delete record of type txt"
+		rlRun "ipa dnsrecord-del $zone txt --a-rec $txt" 0 "delete record type txt"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-68: make sure that IPA deleted record type txt"
+		rlRun "ipa dnsrecord-find $zone txt" 1 "make sure ipa deleted record type txt"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-69: make sure that dig can not find the record type txt"
+		rlRun "dig txt.$zone TXT | grep $txt" 1 "make sure dig can not find the txt record"
+	rlPhaseEnd
+
+
+	# MX record 
+	# How is this supposed to work?
 
     makereport
 rlJournalEnd
