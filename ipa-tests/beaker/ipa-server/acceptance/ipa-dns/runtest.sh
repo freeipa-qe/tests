@@ -224,44 +224,7 @@ fi
 	cname="m.l.k."
 	txt="none=1.2.3.4"
 	
-  --a-rec=LIST          comma-separated list of A records
-  --aaaa-rec=LIST       comma-separated list of AAAA records
-  --afsdb-rec=LIST      comma-separated list of AFSDB records
-  --cert-rec=LIST       comma-separated list of CERT records
-  --cname-rec=LIST      comma-separated list of CNAME records
-  --dhcid-rec=LIST      comma-separated list of DHCID records
-  --dlv-rec=LIST        comma-separated list of DLV records
-  --dname-rec=LIST      comma-separated list of DNAME records
-  --dnskey-rec=LIST     comma-separated list of DNSKEY records
-  --ds-rec=LIST         comma-separated list of DS records
-  --hinfo-rec=LIST      comma-separated list of HINFO records
-  --hip-rec=LIST        comma-separated list of HIP records
-  --ipseckey-rec=LIST   comma-separated list of IPSECKEY records
-  --key-rec=LIST        comma-separated list of KEY records
-  --kx-rec=LIST         comma-separated list of KX records
-  --loc-rec=LIST        comma-separated list of LOC records
-  --md-rec=LIST         comma-separated list of MD records
-  --minfo-rec=LIST      comma-separated list of MINFO records
-  --mx-rec=LIST         comma-separated list of MX records
-  --naptr-rec=LIST      comma-separated list of NAPTR records
-  --ns-rec=LIST         comma-separated list of NS records
-  --nsec-rec=LIST       comma-separated list of NSEC records
-  --nsec3-rec=LIST      comma-separated list of NSEC3 records
-  --nsec3param-rec=LIST
-                        comma-separated list of NSEC3PARAM records
-  --nxt-rec=LIST        comma-separated list of NXT records
-  --ptr-rec=LIST        comma-separated list of PTR records
-  --rrsig-rec=LIST      comma-separated list of RRSIG records
-  --rp-rec=LIST         comma-separated list of RP records
-  --sig-rec=LIST        comma-separated list of SIG records
-  --spf-rec=LIST        comma-separated list of SPF records
-  --srv-rec=LIST        comma-separated list of SRV records
-  --sshfp-rec=LIST      comma-separated list of SSHFP records
-  --ta-rec=LIST         comma-separated list of TA records
-  --tkey-rec=LIST       comma-separated list of TKEY records
-  --tsig-rec=LIST       comma-separated list of TSIG records
-  --txt-rec=LIST        comma-separated list of TXT records
-
+	# record additions and delettion test
 	# Type A
 	rlPhaseStartTest "ipa-dns-30: add record of type A"
 		rlRun "ipa dnsrecord-add $zone a --a-rec $a" 0 "add record type a"
