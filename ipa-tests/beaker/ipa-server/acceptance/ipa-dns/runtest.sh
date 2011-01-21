@@ -384,6 +384,7 @@ fi
 		rlRun "ipa dnsrecord-find $zone cname" 1 "make sure ipa deleted record type cname"
 	rlPhaseEnd
 
+	sleep 5
 	rlPhaseStartTest "ipa-dns-62: make sure that dig can not find the record type cname"
 		rlRun "dig cname.$zone CNAME | grep $cname" 1 "make sure dig can not find the cname record"
 	rlPhaseEnd
@@ -465,11 +466,11 @@ fi
 
 # Neg PTR zone add test cases
 	rlPhaseStartTest "ipa-dns-82: try to create a new ptr zone using a bad serial number"
-		rlRun "ipa dnszone-add --name-server=$ipaddr --admin-email=$pemail --serial=$pbadnum --refresh=$prefresh --retry=$pretry --expire=$pexpire --minimum=$pminimum --ttl=$pttl pzone" 1 "trying to create a zone using a bad serial number"
+		rlRun "ipa dnszone-add --name-server=$ipaddr --admin-email=$pemail --serial=$pbadnum --refresh=$prefresh --retry=$pretry --expire=$pexpire --minimum=$pminimum --ttl=$pttl bpzone" 1 "trying to create a zone using a bad serial number"
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-83: try to create a new zone using a bad refresh"
-		rlRun "ipa dnszone-add --name-server=$ipaddr --admin-email=$pemail --serial=$pserial --refresh=$pbadnum --retry=$pretry --expire=$pexpire --minimum=$pminimum --ttl=$pttl pzone" 1 "trying to create a zone using a bad refresh"
+		rlRun "ipa dnszone-add --name-server=$ipaddr --admin-email=$pemail --serial=$pserial --refresh=$pbadnum --retry=$pretry --expire=$pexpire --minimum=$pminimum --ttl=$pttl bpzone2" 1 "trying to create a zone using a bad refresh"
 	rlPhaseEnd
 # End Neg test cases
 
