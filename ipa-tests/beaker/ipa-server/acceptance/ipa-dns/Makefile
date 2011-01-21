@@ -1,6 +1,6 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-#   Makefile of /CoreOS/tests/Regression/ipa-dns
+#   Makefile of /CoreOS/ipa-tests/acceptance/ipa-dns
 #   Description: Tests setup and exercise of nis integrated ipa tasks
 #   Author: Michael Gregg <mgregg@redhat.com>
 #
