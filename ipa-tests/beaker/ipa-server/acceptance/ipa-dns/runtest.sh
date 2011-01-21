@@ -229,6 +229,7 @@ fi
 	ptr="8"
 	ptrvalue="in.awesome.domain."
 	srv="why.go.here.com."
+	naptr='E2U+msg" "!^.*$!mailto:info@example.com!'
 	
 	# These values are all for creating the ptr zone
 	pzone="ptrzone"
@@ -564,6 +565,31 @@ fi
 
 	rlPhaseStartTest "ipa-dns-106: make sure that dig can not find the record type PTR"
 		rlRun "dig -x $ptroctet.$ptr PTR | grep $ptrvalue" 1 "make sure dig can not find the PTR record"
+	rlPhaseEnd
+
+	# Type NAPTR
+	rlPhaseStartTest "ipa-dns-107: add record of type NAPTR"
+		rlRun "ipa dnsrecord-add $zone naptr --naptr-rec '$naptr'" 0 "add record type NAPTR"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-108: make sure that IPA saved record type NAPTR"
+		rlRun "ipa dnsrecord-find $zone naptr | grep '$naptr'" 0 "make sure ipa recieved record type NAPTR"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-109: make sure that dig can find the record type NAPTR"
+		rlRun "dig naptr.$zone | grep $naptr" 0 "make sure dig can find the NAPTR record"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-110: delete record of type NAPTR"
+		rlRun "ipa dnsrecord-del $zone naptr --naptr-rec '$naptr'" 0 "delete record type NAPTR"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-111: make sure that IPA deleted record type NAPTR"
+		rlRun "ipa dnsrecord-find $zone naptr" 1 "make sure ipa deleted record type NAPTR"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-112: make sure that dig can not find the record type NAPTR"
+		rlRun "dig naptr.$zone NAPTR | grep '$naptr'" 1 "make sure dig can not find the NAPTR record"
 	rlPhaseEnd
 
 
