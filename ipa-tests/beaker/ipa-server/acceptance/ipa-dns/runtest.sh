@@ -118,7 +118,7 @@ fi
 	retry=101
 	expire=1202
 	minimum=33
-	TTL=55
+	ttl=55
 	badnum=12345678901234
 	rlPhaseStartTest "ipa-dns-07: create a new zone"
 		rlRun "ipa dnszone-add --name-server=$ipaddr --admin-email=$email --serial=$serial --refresh=$refresh --retry=$retry --expire=$expire --minimum=$minimum --ttl=$ttl $zone" 0 "Checking to ensure that ipa thinks that it can create a zone"
@@ -223,7 +223,24 @@ fi
 	afsdb="green.femto.edu."
 	cname="m.l.k."
 	txt="none=1.2.3.4"
+	mx="9.78.7.6"
+	ptroctet="4.4.4"
+	ptrzone="$ptroctet.in-addr.arpa"
+	ptr="8"
+	ptrvalue="in.awesome.domain."
+	srv="why.go.here.com."
 	
+	# These values are all for creating the ptr zone
+	pzone="ptrzone"
+	pemail="ipaqar.redhat.com"
+	pserial=2010010799
+	prefresh=393
+	pretry=191
+	pexpire=1292
+	pminimum=39
+	pttl=59
+	pbadnum=123456789012399
+
 	# record additions and delettion test
 	# Type A
 	rlPhaseStartTest "ipa-dns-30: add record of type A"
@@ -309,7 +326,7 @@ fi
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-49: delete record of type AAAA"
-		rlRun "ipa dnsrecord-del $zone aaaa --a-rec $aaaa" 0 "delete record type AAAA"
+		rlRun "ipa dnsrecord-del $zone aaaa --aaaa-rec $aaaa" 0 "delete record type AAAA"
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-50: make sure that IPA deleted record type AAAA"
@@ -334,7 +351,7 @@ fi
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-55: delete record of type afsdb"
-		rlRun "ipa dnsrecord-del $zone afsdb --a-rec $afsdb" 0 "delete record type afsdb"
+		rlRun "ipa dnsrecord-del $zone afsdb --asfdb-rec $afsdb" 0 "delete record type afsdb"
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-56: make sure that IPA deleted record type afsdb"
@@ -359,7 +376,7 @@ fi
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-60: delete record of type cname"
-		rlRun "ipa dnsrecord-del $zone cname --a-rec $cname" 0 "delete record type cname"
+		rlRun "ipa dnsrecord-del $zone cname --cname-rec $cname" 0 "delete record type cname"
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-61: make sure that IPA deleted record type cname"
@@ -384,7 +401,7 @@ fi
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-67: delete record of type txt"
-		rlRun "ipa dnsrecord-del $zone txt --a-rec $txt" 0 "delete record type txt"
+		rlRun "ipa dnsrecord-del $zone txt --txt-rec $txt" 0 "delete record type txt"
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-68: make sure that IPA deleted record type txt"
@@ -395,9 +412,160 @@ fi
 		rlRun "dig txt.$zone TXT | grep $txt" 1 "make sure dig can not find the txt record"
 	rlPhaseEnd
 
+	# SRV Record
+	rlPhaseStartTest "ipa-dns-70: add record of type srv"
+		rlRun "ipa dnsrecord-add $zone _srv --srv-rec $srv" 0 "add record type srv"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-71: make sure that IPA saved record type srv"
+		rlRun "ipa dnsrecord-find $zone _srv | grep $srv" 0 "make sure ipa recieved record type srv"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-72: make sure that dig can find the record type srv"
+		rlRun "dig _srv.$zone SRV | grep $srv" 0 "make sure dig can find the srv record"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-73: delete record of type srv"
+		rlRun "ipa dnsrecord-del $zone _srv --srv-rec $srv" 0 "delete record type srv"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-74: make sure that IPA deleted record type srv"
+		rlRun "ipa dnsrecord-find $zone _srv" 1 "make sure ipa deleted record type srv"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-75: make sure that dig can not find the record type srv"
+		rlRun "dig _srv.$zone SRV | grep $srv" 1 "make sure dig can not find the srv record"
+	rlPhaseEnd
 
 	# MX record 
-	# How is this supposed to work?
+	rlPhaseStartTest "ipa-dns-76: add record of type MX"
+		rlRun "ipa dnsrecord-add $zone @ --mx-rec $mx" 0 "add record type MX"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-77: make sure that IPA saved record type MX"
+		rlRun "ipa dnsrecord-find $zone @ | grep $mx" 0 "make sure ipa recieved record type MX"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-78: make sure that dig can find the record type MX"
+		rlRun "dig $zone MX | grep $mx" 0 "make sure dig can find the MX record"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-79: delete record of type MX"
+		rlRun "ipa dnsrecord-del $zone @ --mx-rec $mx" 0 "delete record type MX"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-80: make sure that IPA deleted record type MX"
+		rlRun "ipa dnsrecord-find $zone @ | grep $mx" 1 "make sure ipa deleted record type MX"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-81: make sure that dig can not find the record type MX"
+		rlRun "dig $zone MX | grep $mx" 1 "make sure dig can not find the MX record"
+	rlPhaseEnd
+
+# Neg PTR zone add test cases
+	rlPhaseStartTest "ipa-dns-82: try to create a new ptr zone using a bad serial number"
+		rlRun "ipa dnszone-add --name-server=$ipaddr --admin-email=$pemail --serial=$pbadnum --refresh=$prefresh --retry=$pretry --expire=$pexpire --minimum=$pminimum --ttl=$pttl pzone" 1 "trying to create a zone using a bad serial number"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-83: try to create a new zone using a bad refresh"
+		rlRun "ipa dnszone-add --name-server=$ipaddr--admin-email=$pemail --serial=$pserial --refresh=$pbadnum --retry=$pretry --expire=$pexpire --minimum=$pminimum --ttl=$pttl pzone" 1 "trying to create a zone using a bad refresh"
+	rlPhaseEnd
+# End Neg test cases
+
+# Create a PTR zone
+	rlPhaseStartTest "ipa-dns-84: try to create a new PTR zone"
+		rlRun "ipa dnszone-add --name-server=$ipaddr--admin-email=$pemail --serial=$pserial --refresh=$prefresh --retry=$pretry --expire=$pexpire --minimum=$pminimum --ttl=$pttl pzone" 1 "trying to create a zone using a bad refresh"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-85: checking to ensure that the new PTR zone got created with the correct name-server"
+		rlRun "ipa dnszone-find $pzone | grep $ipaddr" 0 "checking to ensure that the new PTR zone got created with the correct name-server"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-86: checking to ensure that the new PTR zone got created with the correct email"
+		rlRun "ipa dnszone-find $pzone | grep $email" 0 "checking to ensure that the new PTR zone got created with the correct email"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-87: checking to ensure that the new PTR zone got created with the correct serial number"
+		rlRun "ipa dnszone-find $pzone | grep $serial" 0 "checking to ensure that the new PTR zone got created with the correct serial number"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-88: checking to ensure that the new PTR zone got created with the correct refresh"
+		rlRun "ipa dnszone-find $pzone | grep $refresh" 0 "checking to ensure that the new PTR zone got created with the correct "
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-89: checking to ensure that the new PTR zone got created with the correct retry"
+		rlRun "ipa dnszone-find $pzone | grep $retry" 0 "checking to ensure that the new PTR zone got created with the correct retry"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-90: checking to ensure that the new PTR zone got created with the correct expire"
+		rlRun "ipa dnszone-find $pzone | grep $expire" 0 "checking to ensure that the new PTR zone got created with the correct expire"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-91: checking to ensure that the new PTR zone got created with the correct minimum"
+		rlRun "ipa dnszone-find $pzone | grep $minimum" 0 "checking to ensure that the new PTR zone got created with the correct minimum"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-92: checking to ensure that the new PTR zone got created with the correct ttl"
+		rlRun "ipa dnszone-find $pzone | grep $ttl" 0 "checking to ensure that the new PTR zone got created with the correct ttl"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-93: checking to with dig to ensure that the new PTR zone got created with the correct name server"
+		rlRun "dig $pzone SOA | grep NS | grep $ipaddr" 0 "checking with dig to ensure that the new PTR zone got created with the correct name server"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-94: checking to with dig to ensure that the new PTR zone got created with the correct email"
+		rlRun "dig $pzone SOA | grep $email" 0 "checking with dig to ensure that the new PTR zone got created with the correct email"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-95: checking to with dig to ensure that the new PTR zone got created with the correct serial number"
+		rlRun "dig $pzone SOA | grep $serial" 0 "checking with dig to ensure that the new PTR zone got created with the correct serial number"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-96: checking to with dig to ensure that the new PTR zone got created with the correct refresh"
+		rlRun "dig $pzone SOA | grep $refresh" 0 "checking with dig to ensure that the new PTR zone got created with the correct refresh"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-97: checking to with dig to ensure that the new PTR zone got created with the correct retry interval"
+		rlRun "dig $pzone SOA | grep $retry" 0 "checking with dig to ensure that the new PTR zone got created with the correct retry interval"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-98: checking to with dig to ensure that the new PTR zone got created with the correct expire"
+		rlRun "dig $pzone SOA | grep $expire" 0 "checking with dig to ensure that the new PTR zone got created with the correct expire"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-99: checking to with dig to ensure that the new PTR zone got created with the correct minimum"
+		rlRun "dig $pzone SOA | grep $minimum" 0 "checking with dig to ensure that the new PTR zone got created with the correct minimum"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-100: checking to with dig to ensure that the new PTR zone got created with the correct ttl"
+		rlRun "dig $pzone SOA | grep $ttl" 0 "checking with dig to ensure that the new PTR zone got created with the correct ttl"
+	rlPhaseEnd
+
+	# PTR record 
+	rlPhaseStartTest "ipa-dns-101: add record of type PTR"
+		rlRun "ipa dnsrecord-add $ptrzone $ptr --ptr-rec=$ptrvalue" 0 "add record type PTR"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-102: make sure that IPA saved record type PTR"
+		rlRun "ipa dnsrecord-find $ptrzone $ptr | grep $ptrvalue" 0 "make sure ipa recieved record type PTR"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-103: make sure that dig can find the record type PTR"
+		rlRun "dig -x $ptroctet.$ptr PTR | grep $ptrvalue" 0 "make sure dig can find the PTR record"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-104: delete record of type PTR"
+		rlRun "ipa dnsrecord-del $ptrzone $ptr --ptr-rec $ptrvalue" 0 "delete record type PTR"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-105: make sure that IPA deleted record type PTR"
+		rlRun "ipa dnsrecord-find $ptrzone $ptr | grep $ptrvalue" 1 "make sure ipa deleted record type PTR"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-106: make sure that dig can not find the record type PTR"
+		rlRun "dig -x $ptroctet.$ptr PTR | grep $ptrvalue" 1 "make sure dig can not find the PTR record"
+	rlPhaseEnd
+
 
     makereport
 rlJournalEnd
