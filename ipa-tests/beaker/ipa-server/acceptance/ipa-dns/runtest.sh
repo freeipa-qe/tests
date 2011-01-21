@@ -131,7 +131,7 @@ fi
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-09: try to create a new zone using a bad refresh"
-		rlRun "ipa dnszone-add --name-server=$ipaddr--admin-email=$email --serial=$serial --refresh=$badnum --retry=$retry --expire=$expire --minimum=$minimum --ttl=$ttl zone" 1 "trying to create a zone using a bad refresh"
+		rlRun "ipa dnszone-add --name-server=$ipaddr --admin-email=$email --serial=$serial --refresh=$badnum --retry=$retry --expire=$expire --minimum=$minimum --ttl=$ttl zone" 1 "trying to create a zone using a bad refresh"
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-10: try to create a new zone using a bad retry"
