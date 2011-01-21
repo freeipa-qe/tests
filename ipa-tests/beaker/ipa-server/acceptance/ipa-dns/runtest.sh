@@ -84,7 +84,7 @@ fi
 	echo "IP is $ipoc1 . $ipoc2 . $ipoc3 . $ipoc4"
 
 	rlPhaseStartTest "ipa-dns-01: create a new fake host to test dns add during replica prepare"
-		newip=$ipoc4+1
+		let newip=$ipoc4+1
 		ipa-replica-prepare -p $ADMINPW --ip-address=$ipoc1.$ipoc2.$ipoc3.$newip newfakehost$newip.$DOMAIN
 	rlPhaseEnd
 
