@@ -593,7 +593,11 @@ fi
 	rlPhaseEnd
 
 
-    makereport
+	rlJournalPrintText
+	report=/tmp/rhts.report.$RANDOM.txt
+	makereport $report
+	rhts-submit-log -l $report
+
 rlJournalEnd
 
 
