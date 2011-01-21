@@ -352,7 +352,7 @@ fi
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-55: delete record of type afsdb"
-		rlRun "ipa dnsrecord-del $zone afsdb --asfdb-rec $afsdb" 0 "delete record type afsdb"
+		rlRun "ipa dnsrecord-del $zone afsdb --afsdb-rec $afsdb" 0 "delete record type afsdb"
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-56: make sure that IPA deleted record type afsdb"
