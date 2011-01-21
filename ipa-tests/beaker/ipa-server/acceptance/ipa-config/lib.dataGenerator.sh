@@ -27,7 +27,8 @@ GenerateGroupName()
     if [ "$length" = "" ];then
         length=`getrandomint 1 255` #this is just a safe number
     fi
-    groupname=`make_8bitString $length`
+    #groupname=`make_8bitString $length`
+    groupname=`make_ascii_string $length`
     echo "$groupname"
 } #GenerateShellName
 
@@ -108,7 +109,7 @@ GenerateUserName()
     # and "$" can not be the first char
     local length=$1
     #rlLog "dataGenerator: username, length=[$length]"
-    local chars="0 1 2 3 4 5 6 7 8 9 a b c d e f g h i j k l m n o p q r s t u v w x y z A B C D E F G H I J K L M N O P Q R S T U V W X Y Z _ . - $"
+    local chars="0 1 2 3 4 5 6 7 8 9 a b c d e f g h i j k l m n o p q r s t u v w x y z A B C D E F G H I J K L M N O P Q R S T U V W X Y Z _ -"
     local leadingcharIndex=`getrandomint 1 64` #leading char can not be $
     local leadingchar=`echo $chars | cut -d" " -f$leadingcharIndex`
     local len=1
@@ -135,7 +136,8 @@ GeneratePassword()
     if [ "$classes" = "" ];then
         classes=`getrandomint 1 5`
     fi
-    pw=`make_password $length $classes`
+    #pw=`make_password $length $classes`
+    pw=`make_password $length 3`
     echo $pw
 } #GeneratePassword
 

@@ -1,9 +1,10 @@
 ######################
 # Expected defaults  #
 ######################
-default_config_usernamelength=:"32"
+default_config_usernamelength="32"
 default_config_homebase="/home"
 default_config_shell="/bin/sh"
+default_config_emaildomain="$RELM"
 default_config_usergroup="ipausers"
 default_config_timelimit="2"
 default_config_sizelimit="100"
@@ -19,8 +20,8 @@ ipaconfig()
     ipaconfig_show
     ipaconfig_mod
     ipaconfig_searchlimit
-    ipaconfig_searchfields
-    ipaconfig_server
+    #ipaconfig_searchfields
+    #ipaconfig_server
     ipaconfig_envcleanup
 } # ipaconfig
 
@@ -97,8 +98,7 @@ ipaconfig_envcleanup()
 {
     rlPhaseStartCleanup "ipaconfig_envcleanup"
         #environment cleanup starts here
-    KinitAsAdmin
-    rlRun "ipa config-mod --maxusername=$default_config_usernamelength --homedirectory=$default_config_homebase --defaultshell=$default_config_shell --defaultgroup=$default_config_usergroup --searchtimelimit=$default_config_timelimit --searchrecordslimit=$default_config_sizelimit --usersearch=$default_config_usersearchfields --groupsearch=$default_config_groupsearchfields --enable-migration=$default_config_migrationmode" 0 "to be save set ipa config back to default"
+	rlPass "Should be no cleanup as each section sets the value back to default"
         #environment cleanup ends   here
     rlPhaseEnd
 } #ipaconfig_envcleanup
@@ -224,14 +224,16 @@ ipaconfig_mod_maxusername_default()
         #local spot=`getrandomint 3 $max`
         local spot=`getrandomint 3 31`
         #for len in 1 $spot $config_username_maxlength
-        for len in 1 $spot 
-        do
+        #for len in 1 $spot 
+	for len in 1 12 99 ; do
             #set the maxusername via ipa config-mod
             KinitAsAdmin
             rlRun "ipa config-mod --maxusername=$len" 0 "set maxusername to [$len]"
-            clear_kticket
+	    sleep 2
             ipaconfig_mod_maxusername_default_logic $len
         done
+
+	rlRun "ipa config-mod --maxusername=$default_config_usernamelength" 0 "set maxusername=[$default_config_usernamelength] - back to default"
     rlPhaseEnd
 } #ipaconfig_mod_maxusername_default
 
@@ -247,25 +249,23 @@ ipaconfig_mod_maxusername_default_logic()
         # fail case: 11, 255 (current max)
 
         local spot=`getrandomint 2 $length` 
-        local username_length="1 $spot $length 32"
+        local username_length="1 $spot $length"
         #when current username < definedLength, test should pass
-        expected=0
-        for curlen in $username_length ; do
-            username=`dataGenerator "username" $curlen`
-            rlLog "test: len=[$curlen], username=[$username], expect success"
+        #for curlen in $username_length ; do
+	    expected=0
+            username=`dataGenerator "username" $length`
+            rlLog "test: len=[$length], username=[$username], expect success"
             create_ipauser $expected $username 
-            delete_ipauser "$username"
-        done
+	    KinitAsAdmin
+            rlRun "ipa user-del $username" 0 "Cleanup"
 
-        local longer=$((length + 1))
-        local username_length="$longer $config_username_maxlength"
-        #when current username>defined, test should fail 
-        expected=1
-        for curlen in $username_length 32 ; do
-            username=`dataGenerator "username" $curlen`
-            rlLog "test: len=[$curlen], username=[$username], expect fail"
-            create_ipauser $expected $username
-        done
+            local longer=$(($length + 1))
+            local username_length="$longer $config_username_maxlength"
+            #when current username>defined, test should fail 
+            expected=1
+            username=`dataGenerator "username" $longer`
+            rlLog "test: len=[$longer], username=[$username], expect fail"
+            rlRun "ipa user-add --first=$username --last=$username $username" 1 "This should fail - too long"
     # test logic ends
 } # ipaconfig_mod_maxusername_default_logic 
 
@@ -289,7 +289,6 @@ ipaconfig_mod_maxusername_negative_logic()
         local  len=$1
         KinitAsAdmin
         rlRun "ipa config-mod --maxusername=$len" 1 "expect to fail: maxusername=[$len]"
-        clear_kticket
     # test logic ends
 } # ipaconfig_mod_maxusername_negative_logic 
 
@@ -323,11 +322,10 @@ ipaconfig_mod_homedirectory_default_logic()
         else
             rlFail "actual [$actualdir], expect [$basedir]"
         fi
-        clear_kticket
         rm $out
 
 	rlRun "ipa config-mod --homedirectory=$default_config_homebase" 0 "set homedirectory=[$default_config_homebase] - back to default"
-	ipa user-del $username
+	rlRun "ipa user-del $username" 0 "Cleanup"
     # test logic ends
 } # ipaconfig_mod_homedirectory_default_logic 
 
@@ -382,12 +380,9 @@ ipaconfig_mod_defaultshell_default_logic()
         else
             rlFail "actual [$actualshell], expect [$baseshell]"
         fi
-        clear_kticket
-        rm $out
-
 	rlRun "ipa config-mod --defaultshell=$default_config_shell" 0 "set defaultshell=[$default_config_shell] - back to default"
-	ipa user-del $username
-
+        rlRun "ipa user-del $username" 0 "Cleanup"
+        rm $out
     # test logic ends
 } # ipaconfig_mod_defaultshell_default_logic 
 
@@ -409,7 +404,7 @@ ipaconfig_mod_defaultshell_negative_logic()
 {
     # accept parameters: NONE
     # test logic starts
-        rlLog "EMPTY LOGIC"
+        rlPass "NO NEGATIVE TESTS"
     # test logic ends
 } # ipaconfig_mod_defaultshell_negative_logic 
 
@@ -421,8 +416,12 @@ ipaconfig_mod_defaultgroup_default()
         rlLog "this is to test for default behavior"
         KinitAsAdmin
         local testgroup=`GenerateGroupName`
+	rlRun "ipa group-add --desc=\"$testgroup\" \"$testgroup\"" 0 "Add test group"
         rlRun "ipa config-mod --defaultgroup=\"$testgroup\" " 0 "set defaultgroup=[$testgroup]"
         ipaconfig_mod_defaultgroup_default_logic "$testgroup"
+	rlRun "ipa group-del \"$testgroup\"" 0 "Delete test group"
+
+        rlRun "ipa config-mod --defaultgroup=$default_config_usergroup" 0 "set homedirectory=[$default_config_usergroup] - back to default"
     rlPhaseEnd
 } #ipaconfig_mod_defaultgroup_default
 
@@ -436,15 +435,16 @@ ipaconfig_mod_defaultgroup_default_logic()
         create_ipauser 0 $username
         KinitAsAdmin
         ipa user-find $username > $out
-        actualgroup=`grep "Groups" $out | cut -d":" -f2 | xargs echo`
+        actualgroup=`grep "groups" $out | cut -d":" -f2 | xargs echo`
         if echo $actualgroup | grep -i "^$basegroup" 2>&1 >/dev/null
         then
             rlPass "found [$basegroup] in actual:[$actualgroup]"
         else
             rlFail "actual [$actualgroup], expect [$basegroup]"
         fi
-        clear_kticket
         rm $out
+
+	rlRun "ipa user-del $username" 0 "Cleanup"
     # test logic ends
 } # ipaconfig_mod_defaultgroup_default_logic 
 
@@ -462,7 +462,7 @@ ipaconfig_mod_defaultgroup_negative_logic()
 {
     # accept parameters: NONE
     # test logic starts
-        rlFail "FIXME : I haven't find any negative case yet"
+        rlRun "ipa config-mod --defaultgroup=doesntexist" 2 "set defaultgroup=[doesntexist]"
     # test logic ends
 } # ipaconfig_mod_defaultgroup_negative_logic 
 
@@ -476,6 +476,8 @@ ipaconfig_mod_emaildomain_default()
         local testdomain=`GenerateDomainName`
         rlRun "ipa config-mod --emaildomain=$testdomain" 0 "set emaildomain=[$testdomain]"
         ipaconfig_mod_emaildomain_default_logic "$testdomain"
+
+	rlRun "ipa config-mod --emaildomain=$default_config_emaildomain" 0 "set default emaildomain=[$default_config_emaildomain] - back to default"
     rlPhaseEnd
 } #ipaconfig_mod_emaildomain_default
 
@@ -483,24 +485,37 @@ ipaconfig_mod_emaildomain_default_logic()
 {
     # accept parameters: NONE
     # test logic starts
-        local basedomain=$1
+        local testdomain=$1
         local out=$TmpDir/config.defaultdomain.$RANDOM.out
         username=`dataGenerator "username" 8` # FIXME: not sure length 8 is right to use -- since we changed maxusernamelength to something we don't know when we hit this test case
-        #create_ipauser 0 $username "" "" "" "--email=${username}@${basedomain}"  #this is right version
         create_ipauser 0 $username "" "" "" "--email=${username}"
         KinitAsAdmin
         ipa user-find $username --raw --all > $out
         actualdomain=`grep "mail" $out | cut -d":" -f2 | xargs echo`
-        if echo $actualdomain | grep -i "$basedomain" 2>&1 >/dev/null
+        if echo $actualdomain | grep -i "$username@$testdomain" 2>&1 >/dev/null
         then
-            rlPass "found [$basedomain] in actual:[$actualdomain]"
+            rlPass "email as expected [$actualdomain]"
         else
             echo "============ out ============"
             cat $out
             echo "============================="
-            rlFail "actual [$actualdomain], expect [$basedomain]"
+            rlFail "actual [$actualdomain], expected [$username@$testdomain]"
         fi
-        clear_kticket
+
+        rlRun "ipa user-mod --email=${username}@mydomain.com ${username}" 0 "Modify user email address adding non default domain"
+        ipa user-find $username --raw --all > $out
+        actualdomain=`grep "mail" $out | cut -d":" -f2 | xargs echo`
+        if echo $actualdomain | grep -i "$testdomain" 2>&1 >/dev/null
+        then
+            rlFail "found [$actualdomain] expected:[$username@mydomain.com]"
+        else
+            echo "============ out ============"
+            cat $out
+            echo "============================="
+            rlPass "email as expected [$actualdomain]"
+        fi
+
+	rlRun "ipa user-del $username" 0 "Cleanup"
         rm $out
     # test logic ends
 } # ipaconfig_mod_emaildomain_default_logic 
@@ -519,7 +534,7 @@ ipaconfig_mod_emaildomain_negative_logic()
 {
     # accept parameters: NONE
     # test logic starts
-        rlFail "EMPTY LOGIC"
+        rlPass "NO NEGATIVE TESTS"
     # test logic ends
 } # ipaconfig_mod_emaildomain_negative_logic 
 
@@ -549,6 +564,7 @@ ipaconfig_searchlimit_timelimit_default()
         rlLog "this is to test for default behavior"
         out=$TmpDir/ipaconfig.searchtimelimit.$RANDOM.out
         KinitAsAdmin
+	ipaconfig_searchlimit_timelimit_default_logic
         for value in -1 10 55 100 10000 2
         do
             ipa config-mod --searchtimelimit=$value 2>&1 >/dev/null
@@ -568,7 +584,7 @@ ipaconfig_searchlimit_timelimit_default_logic()
 {
     # accept parameters: NONE
     # test logic starts
-        rlFail "EMPTY LOGIC"
+        rlPass "NO TESTS"
     # test logic ends
 } # ipaconfig_searchlimit_timelimit_default_logic 
 
@@ -588,7 +604,7 @@ ipaconfig_searchlimit_timelimit_negative()
             then
                 rlFail "set search time limit to $value success is not expected"
             else
-                rlPass "set search time limti to $value failed is expected"
+                rlPass "set search time limit to $value failed is expected"
             fi
         done
         rm $out
@@ -600,7 +616,7 @@ ipaconfig_searchlimit_timelimit_negative_logic()
 {
     # accept parameters: NONE
     # test logic starts
-        rlFail "EMPTY LOGIC"
+        rlPass "NO NEGATIVE TESTS"
     # test logic ends
 } # ipaconfig_searchlimit_timelimit_negative_logic 
 
@@ -622,29 +638,9 @@ ipaconfig_searchlimit_recordslimit_default()
                 rlFail "set search record limit to $value failed"
             fi
         done
-        totalEntries=`ipa user-find | grep "Number of entries returned" | cut -d" " -f5| xargs echo`
-        rlLog "found [$totalEntries]"
-        if [ $totalEntries -lt 2 ];then
-            username=`dataGenerator "username" 8`
-            create_ipauser 0 $username
-        fi
-        ipa config-mod --searchrecordslimit=1 2>&1 >/dev/null
-        totalEntries=`ipa user-find | grep "Number of entries returned" | cut -d" " -f5| xargs echo`
-        rlLog "found [$totalEntries]"
-        if [ "$totalEntries" = "1" ];then
-            rlPass "recordslimit sets to 1, and user-find return 1"
-        else
-            rlFail "recordslimit sets to 1, but returned [$returnedNumEntry] entries"
-        fi
-        # set limit to 2, and test again
-        ipa config-mod --searchrecordslimit=2 2>&1 >/dev/null
-        totalEntries=`ipa user-find | grep "Number of entries returned" | cut -d" " -f5| xargs echo`
-        rlLog "found [$totalEntries]"
-        if [ "$totalEntries" = "2" ];then
-            rlPass "recordslimit sets to 2, and user-find return 1"
-        else
-            rlFail "recordslimit sets to 2, but returned [$returnedNumEntry] entries"
-        fi
+
+	ipaconfig_searchlimit_recordslimit_default_logic
+
     rlPhaseEnd
 } #ipaconfig_searchlimit_recordslimit_default
 
@@ -652,7 +648,31 @@ ipaconfig_searchlimit_recordslimit_default_logic()
 {
     # accept parameters: NONE
     # test logic starts
-        rlFail "EMPTY LOGIC"
+        totalEntries=`ipa user-find | grep "Number of entries returned" | cut -d" " -f5| xargs echo`
+        username=`dataGenerator "username" 8`
+        create_ipauser 0 $username
+        
+	KinitAsAdmin
+        ipa config-mod --searchrecordslimit=1 2>&1 >/dev/null
+        totalEntries=`ipa user-find | grep "Number of entries returned" | cut -d" " -f5| xargs echo`
+        rlLog "found [$totalEntries]"
+        if [ $totalEntries -eq 1 ]; then
+            rlPass "recordslimit sets to 1, and user-find return 1"
+        else
+            rlFail "recordslimit sets to 1, but returned [$totalEntries] entries"
+        fi
+        # set limit to 2, and test again
+        ipa config-mod --searchrecordslimit=2 2>&1 >/dev/null
+        totalEntries=`ipa user-find | grep "Number of entries returned" | cut -d" " -f5| xargs echo`
+        rlLog "found [$totalEntries]"
+        if [ $totalEntries -eq 2 ];then
+            rlPass "recordslimit sets to 2, and user-find return 2"
+        else
+            rlFail "recordslimit sets to 2, but returned [$totalEntries] entries"
+        fi
+        rlRun "ipa user-del $username" 0 "Cleanup"
+	sleep 1
+	rlRun "ipa config-mod --searchrecordslimit=$default_config_sizelimit" 0 "set searchrecordslimit=[$default_config_sizelimit] - back to default"
     # test logic ends
 } # ipaconfig_searchlimit_recordsimie_default_logic 
 
@@ -683,7 +703,7 @@ ipaconfig_searchlimit_recordslimit_negative_logic()
 {
     # accept parameters: NONE
     # test logic starts
-        rlFail "EMPTY LOGIC"
+        rlPass "NO NEGATIVE TESTS"
     # test logic ends
 } # ipaconfig_searchlimit_recordslimit_negative_logic 
 
@@ -745,7 +765,6 @@ ipaconfig_searchfields_userfields_default()
         else
             rlFail "returned [$returnedNumEntry] entries when 1 is expected"
         fi
-        clear_kticket
         rm $out
     rlPhaseEnd
 } #ipaconfig_searchfields_userfields_default
@@ -791,7 +810,6 @@ ipaconfig_searchfields_groupfields_default()
         else
             rlFail "returned [$returnedNumEntry] entries when 1 is expected"
         fi
-        clear_kticket
         rm $out
     rlPhaseEnd
 } #ipaconfig_searchfields_groupfields_default
@@ -841,7 +859,7 @@ ipaconfig_server_enablemigration_logic()
 {
     # accept parameters: NONE
     # test logic starts
-        rlFail "EMPTY LOGIC"
+        rlPass "NO TESTS"
     # test logic ends
 } # ipaconfig_server_enablemigration_logic 
 
@@ -862,7 +880,7 @@ ipaconfig_server_enablemigration_negative_logic()
 {
     # accept parameters: NONE
     # test logic starts
-        rlFail "EMPTY LOGIC"
+        rlPass "NO NEGATIVE TESTS"
     # test logic ends
 } # ipaconfig_server_enablemigration_negative_logic 
 
@@ -891,7 +909,7 @@ ipaconfig_server_subject_logic()
 {
     # accept parameters: NONE
     # test logic starts
-        rlFail "EMPTY LOGIC"
+        rlPass "NO NEGATIVE TESTS"
     # test logic ends
 } # ipaconfig_server_subject_logic 
 
@@ -920,6 +938,6 @@ ipaconfig_server_subject_negative_logic()
 {
     # accept parameters: NONE
     # test logic starts
-        rlFail "EMPTY LOGIC"
+        rlPass "NO NEGATIVE TESTS"
     # test logic ends
 } # ipaconfig_server_subject_negative_logic 

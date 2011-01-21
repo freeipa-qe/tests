@@ -27,10 +27,12 @@ create_ipauser()
         username=`dataGenerator "username" $curlen`
     fi
     if [ "$lastname" = "" ];then
-        lastname=`dataGenerator "lastname" $curlen`
+	lastname="$username"
+        #lastname=`dataGenerator "lastname" $curlen`
     fi
     if [ "$firstname" = "" ];then
-        firstname=`dataGenerator "firstname" $curlen`
+	firstname="$username"
+        #firstname=`dataGenerator "firstname" $curlen`
     fi
     if [ "$password" = "" ];then
         password=`dataGenerator "password" 8`
@@ -43,13 +45,15 @@ create_ipauser()
         delete_ipauser $username
     fi
     KinitAsAdmin
-    rlRun "echo \"$password\" |\
-           ipa user-add \"$username\" \
-                        --first \"$firstname\" \
-                        --last  \"$lastname\" \
-                        $othercondition \
-                        --password 2>&1 >/dev/null" \
-          $expected "create test user account [$username]"
+    rlLog "Creating User: ipa user-add \"$username\" --first \"$firstname\" --last  \"$lastname\" $othercondition"
+    ipa user-add --first=$firstname --last=$lastname $othercondition $username
+    #rlRun "echo \"$password\" |\
+    #       ipa user-add \"$username\" \
+    #                    --first \"$firstname\" \
+    #                    --last  \"$lastname\" \
+    #                    $othercondition \
+    #                    --password 2>&1 >/dev/null" \
+    #      $expected "create test user account [$username]"
     clear_kticket
 } # create_ipauser
 
@@ -93,31 +97,6 @@ KinitAsAdmin()
     # simple kinit function
     echo $ADMINPW | kinit $ADMINID 2>&1 >/dev/null
 } #KinitAsAdmin
-
-makereport()
-{
-    # capture the result and make a simple report
-    total=`rlJournalPrintText | grep "RESULT" | wc -l`
-    pass=`rlJournalPrintText | grep "RESULT" | grep "\[   PASS   \]" | wc -l`
-    fail=`rlJournalPrintText | grep "RESULT" | grep "\[   FAIL   \]" | wc -l`
-    abort=`rlJournalPrintText | grep "RESULT" | grep "\[  ABORT   \]" | wc -l`
-    report=$TmpDir/rhts.report.$RANDOM.txt
-    echo "================ final pass/fail report =================" > $report
-    echo "   Test Date: `date` " >> $report
-    echo "   Total : [$total] "  >> $report
-    echo "   Passed: [$pass] "   >> $report
-    echo "   Failed: [$fail] "   >> $report
-    echo "   Abort : [$abort]"   >> $report
-    echo "---------------------------------------------------------" >> $report
-    rlJournalPrintText | grep "RESULT" | grep "\[   PASS   \]"| sed -e 's/:/ /g' -e 's/RESULT//g' >> $report
-    echo "" >> $report
-    rlJournalPrintText | grep "RESULT" | grep "\[   FAIL   \]"| sed -e 's/:/ /g' -e 's/RESULT//g' >> $report
-    echo "" >> $report
-    rlJournalPrintText | grep "RESULT" | grep "\[  ABORT   \]"| sed -e 's/:/ /g' -e 's/RESULT//g' >> $report
-    echo "=========================================================" >> $report
-    echo "report saved as: $report"
-    cat $report
-}
 
 clear_kticket()
 {

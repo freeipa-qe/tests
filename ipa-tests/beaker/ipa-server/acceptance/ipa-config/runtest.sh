@@ -84,13 +84,15 @@ rlJournalStart
     ipaconfig
     # r2d2_test_ends
 
-    makereport
-
     rlPhaseStartCleanup "ipaconfig cleanup"
         rlRun "popd"
         rlRun "rm -r $TmpDir" 0 "Removing tmp directory"
     rlPhaseEnd
 
+    rlJournalPrintText
+    report=/tmp/rhts.report.$RANDOM.txt
+    makereport $report
+    rhts-submit-log -l $report
 rlJournalEnd
 
 
