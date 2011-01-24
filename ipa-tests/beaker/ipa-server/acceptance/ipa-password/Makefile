@@ -29,7 +29,7 @@ export TESTVERSION=1.0
 
 BUILT_FILES=
 
-FILES=$(METADATA) runtest.sh Makefile PURPOSE t.ipapassword.sh data.ipapassword.acceptance
+FILES=$(METADATA) runtest.sh Makefile PURPOSE t.ipapassword.sh data.ipapassword.acceptance lib.ipapassword.sh
 
 .PHONY: all install download clean
 
