@@ -17,11 +17,11 @@ default_config_migrationmode="FALSE"
 ipaconfig()
 {
     ipaconfig_envsetup
-    ipaconfig_show
+    #ipaconfig_show
     ipaconfig_mod
     ipaconfig_searchlimit
-    #ipaconfig_searchfields
-    #ipaconfig_server
+    ipaconfig_searchfields
+    ipaconfig_server
     ipaconfig_envcleanup
 } # ipaconfig
 
@@ -225,7 +225,7 @@ ipaconfig_mod_maxusername_default()
         local spot=`getrandomint 3 31`
         #for len in 1 $spot $config_username_maxlength
         #for len in 1 $spot 
-	for len in 1 12 99 ; do
+	for len in 1 12 54 47 ; do
             #set the maxusername via ipa config-mod
             KinitAsAdmin
             rlRun "ipa config-mod --maxusername=$len" 0 "set maxusername to [$len]"
@@ -259,13 +259,23 @@ ipaconfig_mod_maxusername_default_logic()
 	    KinitAsAdmin
             rlRun "ipa user-del $username" 0 "Cleanup"
 
-            local longer=$(($length + 1))
+            local longer=$(($length + 2))
             local username_length="$longer $config_username_maxlength"
             #when current username>defined, test should fail 
             expected=1
             username=`dataGenerator "username" $longer`
             rlLog "test: len=[$longer], username=[$username], expect fail"
             rlRun "ipa user-add --first=$username --last=$username $username" 1 "This should fail - too long"
+
+	    # just in case user gets added - data generater does not always work and generates a length that is 1 less than requested
+	    ipa user-find $username
+	    if [ $? -eq 0 ] ; then
+		ipa user-del $username
+	    fi
+
+	    unset length
+	    unset username
+	    unset longer
     # test logic ends
 } # ipaconfig_mod_maxusername_default_logic 
 
@@ -738,16 +748,17 @@ ipaconfig_searchfields_userfields_default()
 
         create_ipauser 0 $username
         KinitAsAdmin
-        ipa user-mod $username --setattr=homephone="123-456-${specialvalue}"
+        ipa user-mod --mobile=${specialvalue} ${username}
         totalEntries=`ipa user-find $specialvalue | grep "Number of entries returned" | cut -d" " -f5| xargs echo`
         if [ "$totalEntries" = "0" ];then
-            rlLog "environment checked, good to go"
+            rlPass "special value for moblie, user not found when default search does not include the field mobile"
         else
-            rlFail "environment setup failed, we are not suppose to find any entries for now"
+            rlFail "User found with mobile $specialvalue: mobile not in default search"
         fi
 
         # start configuration change
-        value="uid,givenname,sn,ou,title,homephone"
+	rlLog "Add mobile to default search fields"
+        value="uid,givenname,sn,ou,title,telephonenumber,mobile"
         ipa config-mod --usersearch=$value 2>&1 >/dev/null
         ipa config-show > $out
         if grep -i "User search fields: $value" $out 2>&1 >/dev/null 
@@ -766,10 +777,32 @@ ipaconfig_searchfields_userfields_default()
             rlFail "returned [$returnedNumEntry] entries when 1 is expected"
         fi
         rm $out
+
+	# cleanup and set value back to default
+	rlRun "ipa user-del ${username}" 0 "Cleanup - delete user added"
+	rlRun "ipa config-mod --usersearch=\"${default_config_usersearchfields}\"" 0 "set usersearch=[$default_config_usersearchfields] - back to default"
     rlPhaseEnd
 } #ipaconfig_searchfields_userfields_default
 
-########FIXME : I AM HERE ###########
+ipaconfig_searchfields_userfields_negative()
+{
+    # accept parameters: NONE
+    # test logic starts
+    rlPhaseStartTest "ipaconfig_searchfields_userfields_negative"
+    # add invalid search field to default user search fields
+	rlLog "Add field bogus to user search fields"
+ 	ipa config-mod --usersearch="${default_config_usersearchfields},bogus"
+	if [$? -eq 0 ] ; then
+		rlPass "Attempt failed as expected"
+	else
+		rlFail "Attempt to add invalid field to user default search fields was successful."
+		rlRun "ipa config-mod --usersearch=\"${default_config_usersearchfields}\"" 0 "set usersearch=[$default_config_usersearchfields] - back to default"
+	fi
+    rlPhaseEnd
+    # test logic ends
+} # ipaconfig_searchfields_userfields_negative
+
+
 ipaconfig_searchfields_groupfields_default()
 {
 # looped data   : 
@@ -778,41 +811,62 @@ ipaconfig_searchfields_groupfields_default()
         rlLog "this is to test for default behavior"
         local out=$TmpDir/searchfields.groupfields.$RANDOM.out
         # setup special account for this test
-        specialvalue=999999999999
-        username=`dataGenerator "username" 8`
-
-        create_ipauser 0 $username
-        KinitAsAdmin
-        ipa user-mod $username --setattr=homephone="123-456-${specialvalue}"
-        totalEntries=`ipa user-find $specialvalue | grep "Number of entries returned" | cut -d" " -f5| xargs echo`
-        if [ "$totalEntries" = "0" ];then
-            rlLog "environment checked, good to go"
+        specialvalue="blahblahblah"
+        groupname=`dataGenerator "username" 8`
+	KinitAsAdmin
+        ipa group-add --desc="${specialvalue}" mygroup
+        totalEntries=`ipa group-find $specialvalue | grep "Number of entries returned" | cut -d" " -f5| xargs echo`
+        if [ "$totalEntries" = "1" ];then
+            rlPass "special value found when default search should look for group desc with $specialvalue"
         else
-            rlFail "environment setup failed, we are not suppose to find any entries for now"
+            rlFail "special value NOT found when default search should look for group desc with $specialvalue"
         fi
 
         # start configuration change
-        value="uid,givenname,sn,ou,title,homephone"
-        ipa config-mod --usersearch=$value 2>&1 >/dev/null
+        value="cn"
+        ipa config-mod --groupsearch=$value 2>&1 >/dev/null
         ipa config-show > $out
-        if grep -i "User search fields: $value" $out 2>&1 >/dev/null 
+        if grep -i "Group search fields: $value" $out 2>&1 >/dev/null 
         then
-            rlPass "set user search fields to [$value] success "
+            rlPass "set group search fields to [$value] success "
         else
-            rlFail "set user search fields to [$value] failed"
+            rlFail "set group search fields to [$value] failed"
         fi
 
-        # we should be able to find this user after user search fields search
-        totalEntries=`ipa user-find $specialvalue | grep "Number of entries returned" | cut -d" " -f5| xargs echo`
+        # we should be able to not find this group after group search fields search
+	rlLog "Remove description from group search fields"
+        totalEntries=`ipa group-find $specialvalue | grep "Number of entries returned" | cut -d" " -f5| xargs echo`
         rlLog "found [$totalEntries]"
-        if [ "$totalEntries" = "1" ];then
-            rlPass "user-find return 1"
+        if [ "$totalEntries" = "0" ];then
+            rlPass "group-find return 0"
         else
-            rlFail "returned [$returnedNumEntry] entries when 1 is expected"
+            rlFail "returned [$returnedNumEntry] entries when 0 is expected"
         fi
         rm $out
+
+	# set value back to default
+	rlRun "ipa group-del mygroup" 0 "Cleanup - delete group added."
+        rlRun "ipa config-mod --groupsearch=\"${default_config_groupsearchfields}\"" 0 ""set groupsearch=[$default_config_groupsearchfields] - back to default
     rlPhaseEnd
 } #ipaconfig_searchfields_groupfields_default
+
+ipaconfig_searchfields_groupfields_negative()
+{
+    # accept parameters: NONE
+    # test logic starts
+    rlPhaseStartTest "ipaconfig_searchfields_groupfields_negative"
+    # add invalid search field to default group search fields
+        rlLog "Add field bogus to group search fields"
+        ipa config-mod --groupsearch="${default_config_groupsearchfields},bogus"
+        if [$? -eq 0 ] ; then
+                rlPass "Attempt failed as expected"
+        else
+                rlFail "Attempt to add invalid field to group default search fields was successful."
+                rlRun "ipa config-mod --groupsearch=\"${default_config_groupsearchfields}\"" 0 "set groupsearch=[$default_config_groupsearchfields] - back to default"
+        fi
+    rlPhaseEnd
+    # test logic ends
+} # ipaconfig_searchfields_userfields_negative
 
 ipaconfig_server_envsetup()
 {
