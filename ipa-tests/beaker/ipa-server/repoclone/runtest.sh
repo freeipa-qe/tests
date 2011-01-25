@@ -36,14 +36,20 @@ nfslocation="n0abos-0.bos.redhat.com:/vol/archives_mp1"
 if [ -x $VARIANT ]; then
 	cat /etc/redhat-release | grep Fedora
 	if [ $? -eq 0 ]; then
-		VARIANT="Fedora"
+		export VARIANT="Fedora"
 		export iparepo="http://jdennis.fedorapeople.org/ipa-devel/ipa-devel-fedora.repo"
 	fi
 	cat /etc/redhat-release | grep Red
 	if [ $? -eq 0 ]; then
-		VARIANT="RHEL"
+		export VARIANT="RHEL"
 		export iparepo="http://jdennis.fedorapeople.org/ipa-devel/ipa-devel-rhel.repo"
 	fi
+fi
+echo "variant is $VARIANT, repo is $REPO"
+if [ -x $iparepo ]; then
+	# I'm not sure why that didn't work, assuming that this is fc14.
+	export VARIANT="Fedora"
+	export iparepo="http://jdennis.fedorapeople.org/ipa-devel/ipa-devel-fedora.repo"
 fi
 
 # Include rhts environment
