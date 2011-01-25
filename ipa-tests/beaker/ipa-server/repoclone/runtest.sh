@@ -30,7 +30,13 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+# Include rhts environment
+. /usr/bin/rhts-environment.sh
+. /usr/lib/beakerlib/beakerlib.sh
+
 nfslocation="n0abos-0.bos.redhat.com:/vol/archives_mp1"
+
+rlJournalStart
 
 # Determining OS, variant, and processor type
 if [ -x $VARIANT ]; then
@@ -52,11 +58,6 @@ if [ -x $iparepo ]; then
 	export iparepo="http://jdennis.fedorapeople.org/ipa-devel/ipa-devel-fedora.repo"
 fi
 
-# Include rhts environment
-. /usr/bin/rhts-environment.sh
-. /usr/lib/beakerlib/beakerlib.sh
-
-rlJournalStart
 	rlPhaseStartSetup "list files in /dev/shm"
 		rlRun "ls /dev/shm"
 	rlPhaseEnd
