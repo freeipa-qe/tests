@@ -40,7 +40,7 @@
 . /dev/shm/env.sh
 
 
-PACKAGE="ipa-server"
+PACKAGE="ipa-admintools"
 
 ##########################################
 getServicePIDs()
@@ -63,7 +63,12 @@ getServicePIDs()
 
 rlJournalStart
     rlPhaseStartSetup "ipa-ctl-setup: Check for ipa-server package and add test user"
-        rlAssertRpm $PACKAGE
+        rpm -qa | grep $PACKAGE
+        if [ $? -eq 0 ] ; then
+                rlPass "ipa-admintools package is installed"
+        else
+                rlFail "ipa-admintools package NOT found!"
+        fi
 	rlRun "useradd testuserqa" 0 "Add test user"
 	# get initial service pids
 	getServicePIDs
