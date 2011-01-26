@@ -29,7 +29,7 @@ export TESTVERSION=1.0
 
 BUILT_FILES=
 
-FILES=$(METADATA) runtest.sh Makefile PURPOSE t.ipadelegation.sh
+FILES=$(METADATA) runtest.sh Makefile PURPOSE t.ipadelegation.sh lib.ipadelegation.sh
 
 .PHONY: all install download clean
 
