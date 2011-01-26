@@ -58,9 +58,12 @@ PACKAGE="ipa-admintools"
 
 rlJournalStart
     rlPhaseStartSetup "ipa-host-cli-startup: Check for admintools package and Kinit"
-        rlAssertRpm $PACKAGE
-        rlRun "TmpDir=\`mktemp -d\`" 0 "Creating tmp directory"
-        rlRun "pushd $TmpDir"
+	rpm -qa | grep ipa-admintools
+	if [ $? -eq 0 ] ; then
+		rlPass "ipa-admintools package is installed"
+	else
+		rlFail "ipa-admintools package NOT found!"
+	fi
 	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
     rlPhaseEnd
 
@@ -271,7 +274,7 @@ rlJournalStart
 
     rlPhaseStartTest "ipa-host-cli-25:  Negative - add host not fully qualified DN"
         command="ipa host-add myhost --force"
-        expmsg="ipa: ERROR: invalid 'fqdn': Fully-qualified hostname required"
+        expmsg="ipa: ERROR: invalid 'hostname': Fully-qualified hostname required"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
     rlPhaseEnd
 
@@ -339,15 +342,16 @@ rlJournalStart
 	deleteHost $myhost
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-host-cli-34: Add 100 hosts and test find returns all"
+    rlPhaseStartTest "ipa-host-cli-34: Add 20 hosts and test find returns all"
+	rlRun "ipa config-mod --searchrecordslimit=20" 0 "Set search records limit to 20"
         i=1
-        while [ $i -le 100 ] ; do
+        while [ $i -le 25 ] ; do
                 addHost host$i.$RELM
                 let i=$i+1
         done
         number=`getNumberOfHosts`
-	if [ $number -ne 100 ] ; then
-		rlFail "Number of hosts returned is not as expected.  GOT: $number EXP: 100"
+	if [ $number -ne 20 ] ; then
+		rlFail "Number of hosts returned is not as expected.  GOT: $number EXP: 20"
 	else
 		rlPass "Number of hosts returned is as expected"
 	fi
@@ -357,10 +361,10 @@ rlJournalStart
         ipa host-find --sizelimit=0 > /tmp/hostfind.out
         result=`cat /tmp/hostfind.out | grep "Number of entries returned"`
         number=`echo $result | cut -d " " -f 5`
-        if [ $number -eq 101 ] ; then
+        if [ $number -eq 26 ] ; then
                 rlPass "All hosts returned as expected with size limit of 0"
         else
-                rlFail "Number of hosts returned is not as expected.  GOT: $number EXP: 101"
+                rlFail "Number of hosts returned is not as expected.  GOT: $number EXP: 26"
         fi
     rlPhaseEnd
 
@@ -375,14 +379,14 @@ rlJournalStart
         fi
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-host-cli-37: find 37 groups"
-        ipa host-find --sizelimit=37 > /tmp/hostfind.out
+    rlPhaseStartTest "ipa-host-cli-37: find 17 groups"
+        ipa host-find --sizelimit=17 > /tmp/hostfind.out
         result=`cat /tmp/hostfind.out | grep "Number of entries returned"`
         number=`echo $result | cut -d " " -f 5`
-        if [ $number -eq 37 ] ; then
-                rlPass "Number of hosts returned as expected with size limit of 37"
+        if [ $number -eq 17 ] ; then
+                rlPass "Number of hosts returned as expected with size limit of 17"
         else
-                rlFail "Number of hosts returned is not as expected.  GOT: $number EXP: 37"
+                rlFail "Number of hosts returned is not as expected.  GOT: $number EXP: 17"
         fi
     rlPhaseEnd
 
@@ -390,10 +394,10 @@ rlPhaseStartTest "ipa-host-cli-38: find more hosts than exist"
         ipa host-find --sizelimit=300 > /tmp/hostfind.out
         result=`cat /tmp/hostfind.out | grep "Number of entries returned"`
         number=`echo $result | cut -d " " -f 5`
-        if [ $number -eq 101 ] ; then
+        if [ $number -eq 26 ] ; then
                 rlPass "All hosts returned as expected with size limit of 300"
         else
-                rlFail "Number of hosts returned is not as expected.  GOT: $number EXP: 101"
+                rlFail "Number of hosts returned is not as expected.  GOT: $number EXP: 26"
         fi
     rlPhaseEnd
 
@@ -409,10 +413,10 @@ rlPhaseStartTest "ipa-host-cli-38: find more hosts than exist"
         ipa host-find --timelimit=0 > /tmp/hostfind.out
         result=`cat /tmp/hostfind.out | grep "Number of entries returned"`
         number=`echo $result | cut -d " " -f 5`
-        if [ $number -eq 0 ] ; then
-                rlPass "No hosts returned as expected with time limit of 0"
+        if [ $number -eq 20 ] ; then
+                rlPass "20 hosts returned as expected with time limit of 0"
         else
-                rlFail "Number of hosts returned is not as expected.  GOT: $number EXP: 0"
+                rlFail "Number of hosts returned is not as expected.  GOT: $number EXP: 20"
         fi
     rlPhaseEnd
 
@@ -462,6 +466,7 @@ rlPhaseStartTest "ipa-host-cli-38: find more hosts than exist"
 	short=myhost
 	myhost=$short.$RELM
 	rzone=`getReverseZone`
+	rlLog "Reverse Zone: $rzone"
 	if [ $rzone ] ; then
 		oct=`echo $rzone | cut -d "i" -f 1`
 		oct1=`echo $oct | cut -d "." -f 3`
@@ -469,10 +474,10 @@ rlPhaseStartTest "ipa-host-cli-38: find more hosts than exist"
 		oct3=`echo $oct | cut -d "." -f 1`
 		ipaddr=$oct1.$oct2.$oct3.99
 		export ipaddr
-		rlRun "ipa host-add --ipaddr=$ipaddr $myhost" 0 "Adding host with IP Address $ipaddr"
+		rlRun "ipa host-add --ip-address=$ipaddr $myhost" 0 "Adding host with IP Address $ipaddr"
 		rlRun "findHost $myhost" 0 "Verifying host was added with IP Address."
-		rlRun "ipa dns-find-rr $RELM $short" 0 "Checking for forward DNS entry"
-		rlRun "ipa dns-find-rr $rzone 99" 0 "Checking for reverse DNS entry"
+		rlRun "ipa dnsrecord-find $RELM $short" 0 "Checking for forward DNS entry"
+		rlRun "ipa dnsrecord-find $rzone 99" 0 "Checking for reverse DNS entry"
 	else
 		rlFail "Reverse DNS zone not found."
 	fi	
@@ -482,8 +487,8 @@ rlPhaseStartTest "ipa-host-cli-38: find more hosts than exist"
 	short=myhost
         myhost=$short.$RELM
 	rlRun "deleteHost $myhost" 0 "Deleting host without deleting DNS entries"
-	rlRun "ipa dns-find-rr $RELM $short" 0 "Checking for forward DNS entry"
-	rlRun "ipa dns-find-rr $rzone 99" 0 "Checking for reverse DNS entry"
+	rlRun "ipa dnsrecord-find $RELM $short" 0 "Checking for forward DNS entry"
+	rlRun "ipa dnsrecord-find $rzone 99" 0 "Checking for reverse DNS entry"
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-host-cli-48: Add host without force option - DNS Record Exists"
@@ -491,8 +496,8 @@ rlPhaseStartTest "ipa-host-cli-38: find more hosts than exist"
         myhost=$short.$RELM
 	rlRun "ipa host-add $myhost" 0 "Add host DNS entries exist"
 	rlRun "findHost $myhost" 0 "Verifying host was added when DNS records exist."
-	rlRun "ipa dns-find-rr $RELM $short" 0 "Checking for forward DNS entry"
-        rlRun "ipa dns-find-rr $rzone 99" 0 "Checking for reverse DNS entry"
+	rlRun "ipa dnsrecord-find $RELM $short" 0 "Checking for forward DNS entry"
+        rlRun "ipa dnsrecord-find $rzone 99" 0 "Checking for reverse DNS entry"
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-host-cli-49: Delete Host and Update DNS"
@@ -501,11 +506,11 @@ rlPhaseStartTest "ipa-host-cli-38: find more hosts than exist"
 	ipa host-add --force $myhost
 	rlRun "ipa host-del --updatedns $myhost" 0 "Delete host and update DNS"
 	rlRun "findHost $myhost" 1 "Verifying host was deleted."
-	rlRun "ipa dns-show-rr $RELM $ipaddr" 2 "Checking for forward DNS entry"
-        rlRun "ipa dns-show-rr $rzone 99" 2 "Checking for reverse DNS entry"
+	rlRun "ipa dnsrecord-show $RELM $ipaddr" 2 "Checking for forward DNS entry"
+        rlRun "ipa dnsrecord-show $rzone 99" 2 "Checking for reverse DNS entry"
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-host-cli-50: Delete Host and Update DNS when DNS entriess do not exist"
+    rlPhaseStartTest "ipa-host-cli-50: Delete Host and Update DNS when DNS entries do not exist"
 	short=myhost
         myhost=$short.$RELM
         ipa host-add --force $myhost
@@ -514,8 +519,9 @@ rlPhaseStartTest "ipa-host-cli-38: find more hosts than exist"
     rlPhaseEnd
 
     rlPhaseStartCleanup "ipa-host-cli-cleanup: Destroying admin credentials."
+	rlRun "ipa config-mod --searchrecordslimit=100" 0 "set search records limit back to default"
         i=1
-        while [ $i -le 100 ] ; do
+        while [ $i -le 25 ] ; do
                 deleteHost host$i.$RELM
                 let i=$i+1
         done
@@ -525,7 +531,7 @@ rlPhaseStartTest "ipa-host-cli-38: find more hosts than exist"
     rlPhaseEnd
 
 rlJournalPrintText
-report=$TmpDir/rhts.report.$RANDOM.txt
+report=/tmp/rhts.report.$RANDOM.txt
 makereport $report
 rhts-submit-log -l $report
 rlJournalEnd
