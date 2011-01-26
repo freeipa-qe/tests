@@ -72,7 +72,12 @@ PACKAGE="ipa-admintools"
 
 rlJournalStart
     rlPhaseStartSetup "ipa-group-cli-startup: Check for admintools package and Kinit"
-        rlAssertRpm $PACKAGE
+        rpm -qa | grep $PACKAGE
+        if [ $? -eq 0 ] ; then
+                rlPass "ipa-admintools package is installed"
+        else
+                rlFail "ipa-admintools package NOT found!"
+        fi
         rlRun "TmpDir=\`mktemp -d\`" 0 "Creating tmp directory"
         rlRun "pushd $TmpDir"
 	rlRun "kinitAs $ADMINID $ADMINPWD" 0 "Kinit as admin user"
