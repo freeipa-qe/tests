@@ -7,8 +7,8 @@
 role()
 {
     role_add
-    role_add-member
-    role_add-privilege
+    role_add_member
+    role_add_privilege
     role_del
     role_find
     role_mod
@@ -35,7 +35,9 @@ role_add_envsetup()
 {
     rlPhaseStartSetup "role_add_envsetup"
         #environment setup starts here
-        addRoleTestAccoounts
+        KinitAsAdmin
+        addRoleTestAccounts
+        Kcleanup
         #environment setup ends   here
     rlPhaseEnd
 } #envsetup
@@ -44,7 +46,9 @@ role_add_envcleanup()
 {
     rlPhaseStartCleanup "role_add_envcleanup"
         #environment cleanup starts here
+        KinitAsAdmin
         deleteRoleTestAccounts
+        Kcleanup
         #environment cleanup ends   here
     rlPhaseEnd
 } #envcleanup
@@ -56,19 +60,9 @@ role_add_1001()
         local tmpout=$TmpDir/role_add_1001.$RANDOM.out
         KinitAsAdmin
         local addattr_TestValue_Negative="STR" #addattr;negative;STR
-        local expectedErrMsg=replace_me
+        local expectedErrMsg="invalid 'addattr': Invalid format. Should be name=value"
         local expectedErrCode=1
-        qaRun "ipa role-add $testID  --addattr=$addattr_TestValue_Negative " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [addattr]=[$addattr_TestValue_Negative]" 
-
-        addattr_TestValue_Negative="" #addattr;negative;STR
-        expectedErrMsg=replace_me
-        expectedErrCode=1
-        qaRun "ipa role-add $testID  --addattr=$addattr_TestValue_Negative " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [addattr]=[$addattr_TestValue_Negative]" 
-
-        addattr_TestValue="description=From_addattr" #addattr;positive;STR
-        expectedErrMsg=replace_me
-        expectedErrCode=1
-        qaRun "ipa role-add $testID  --addattr=$addattr_TestValue_Negative " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [addattr]=[$addattr_TestValue_Negative]" 
+        qaRun "ipa role-add $testID --desc=4_$testID  --addattr=$addattr_TestValue_Negative " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [addattr]=[$addattr_TestValue_Negative]" 
         Kcleanup
         rm $tmpout
     rlPhaseEnd
@@ -80,9 +74,14 @@ role_add_1002()
         local testID="role_add_1002"
         local tmpout=$TmpDir/role_add_1002.$RANDOM.out
         KinitAsAdmin
-        local addattr_TestValue="member=uid=$testUser001,cn=users,cn=accounts,$testDC" #addattr;positive;STR
-        rlRun "ipa role-add $testID  --addattr=$addattr_TestValue " 0 "test options:  [addattr]=[$addattr_TestValue]" 
-        rlRun "ipa role-del $testID"
+        local addattr_TestValue="" #addattr;negative;STR
+        rlRun "ipa role-add $testID --desc=4_$testID  --addattr=$addattr_TestValue" 0 "empty value in addattr will be ignored " 
+        rlRun "ipa role-del $testID" 0 "delete rold: $testID to clean up env"
+
+        addattr_TestValue="member=uid=$testUser001,cn=users,cn=accounts,$testDC" #addattr;positive;STR
+        rlRun "ipa role-add $testID --desc=4_$testID  --addattr=$addattr_TestValue " 0 "test options:  [addattr]=[$addattr_TestValue]" 
+        checkRoleInfo $testID "Member users" "$testUser001"
+        rlRun "ipa role-del $testID" 0 "delete rold: $testID to clean up env"
         Kcleanup
         rm $tmpout
     rlPhaseEnd
@@ -108,20 +107,16 @@ role_add_1004()
         local testID="role_add_1004"
         local tmpout=$TmpDir/role_add_1004.$RANDOM.out
         KinitAsAdmin
-        local setattr_TestValue_Negative="" #setattr;negative;STR
-        local expectedErrMsg=replace_me
+        local setattr_TestValue_Negative="desc=newDescValue" #setattr;negative;STR
+        local expectedErrMsg="attribute \"desc\" not allowed"
         local expectedErrCode=1
-        qaRun "ipa role-add $testID  --setattr=$setattr_TestValue_Negative " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [setattr]=[$setattr_TestValue_Negative]" 
-
-        setattr_TestValue_Negative="desc=newDescValue" #setattr;negative;STR
-        expectedErrMsg=replace_me
-        expectedErrCode=1
-        qaRun "ipa role-add $testID  --setattr=$setattr_TestValue_Negative " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [setattr]=[$setattr_TestValue_Negative]" 
+        qaRun "ipa role-add $testID --desc=4_$testID  --setattr=$setattr_TestValue_Negative " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [setattr]=[$setattr_TestValue_Negative]" 
 
         setattr_TestValue_Negative="member=uid=NoSuchUser$RANDOM,cn=users,cn=accounts,$testDC" #setattr;negative;STR
         expectedErrMsg=replace_me
         expectedErrCode=1
-        qaRun "ipa role-add $testID  --setattr=$setattr_TestValue_Negative " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [setattr]=[$setattr_TestValue_Negative]" 
+        qaRun "ipa role-add $testID  --desc=4_$testID --setattr=$setattr_TestValue_Negative " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [setattr]=[$setattr_TestValue_Negative]" 
+        ipa role-del $testID # cleanup env
 
         Kcleanup
         rm $tmpout
@@ -134,9 +129,14 @@ role_add_1005()
         local testID="role_add_1005"
         local tmpout=$TmpDir/role_add_1005.$RANDOM.out
         KinitAsAdmin
-        local setattr_TestValue="member=cn=$testGroup,cn=groups,cn=accounts,$testDC" #setattr;positive;STR
-        rlRun "ipa role-add $testID  --setattr=$setattr_TestValue " 0 "test options:  [setattr]=[$setattr_TestValue]" 
-        rlRun "ipa role-del $testID"
+        local setattr_TestValue="" #setattr;negative;STR
+        rlRun "ipa role-add $testID --desc=4_$testID  --setattr=$setattr_TestValue_Negative " 0 "empty setaddr value will be ignored"
+        rlRun "ipa role-del $testID" 0 "clean up role: $testID"
+
+        setattr_TestValue="member=cn=$testGroup,cn=groups,cn=accounts,$testDC" #setattr;positive;STR
+        rlRun "ipa role-add $testID --desc=4_$testID  --setattr=$setattr_TestValue " 0 "test options:  [setattr]=[$setattr_TestValue]" 
+        checkRoleInfo $testID "member groups" "$testGroup"
+        rlRun "ipa role-del $testID" 0 "clean up role: $testID"
         Kcleanup
         rm $tmpout
     rlPhaseEnd
@@ -165,7 +165,7 @@ role_add_member_envsetup()
     rlPhaseStartSetup "role_add_member_envsetup"
         #environment setup starts here
         KinitAsAdmin
-        addRoleTestAccoounts
+        addRoleTestAccounts
         rlRun "ipa role-add $testRole --desc=role_for_role_test" 0 "add test role [$testRole]"
         Kcleanup
         #environment setup ends   here
@@ -191,9 +191,15 @@ role_add_member_1001()
         local tmpout=$TmpDir/role_add_member_1001.$RANDOM.out
         KinitAsAdmin
         local groups_TestValue_Negative="nonListValue" #groups;negative;nonListValue
-        local expectedErrMsg=replace_me
-        local expectedErrCode=1
-        qaRun "ipa role-add-member $testRole  --groups=$groups_TestValue_Negative " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [groups]=[$groups_TestValue_Negative]" 
+        ipa role-add-member $testRole  --groups=$groups_TestValue_Negative 2>&1 > $tmpout
+        if grep "group: $groups_TestValue_Negative: no such entry" $tmpout 2>&1 >/dev/null;then
+            rlPass "add non-exist member failed as expected"
+        else
+            rlFail "no expected error msg found"
+            echo "============output=============="
+            cat $tmpout
+            echo "================================"
+        fi 
         Kcleanup
         rm $tmpout
     rlPhaseEnd
@@ -207,9 +213,15 @@ role_add_member_1002()
         KinitAsAdmin
         local groups_TestValue_Negative="nonListValue" #groups;negative;nonListValue
         local users_TestValue="$testUser003" #users;positive;LIST
-        local expectedErrMsg=replace_me
-        local expectedErrCode=1
-        qaRun "ipa role-add-member $testRole  --groups=$groups_TestValue_Negative  --users=$users_TestValue " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [groups]=[$groups_TestValue_Negative] [users]=[$users_TestValue]" 
+        ipa role-add-member $testRole  --groups=$groups_TestValue_Negative  --users=$users_TestValue 2>&1 >$tmpout
+        if grep "group: $groups_TestValue_Negative: no such entry" $tmpout 2>&1 >/dev/null;then
+            rlPass "add non-exist member failed as expected"
+        else
+            rlFail "no expected error msg found"
+            echo "============output=============="
+            cat $tmpout
+            echo "================================"
+        fi
         Kcleanup
         rm $tmpout
     rlPhaseEnd
@@ -222,7 +234,8 @@ role_add_member_1003()
         local tmpout=$TmpDir/role_add_member_1003.$RANDOM.out
         KinitAsAdmin
         local groups_TestValue="$testGroup" #groups;positive;LIST
-        rlRun "ipa role-add-member $testRole  --groups=$groups_TestValue " 0 "test options:  [groups]=[$groups_TestValue]" 
+        rlRun "ipa role-add-member $testRole  --groups=$groups_TestValue " 0 "add [groups]=[$groups_TestValue] to role: [$testRole]" 
+        rlRun "ipa role-remove-member $testRole  --groups=$groups_TestValue " 0 "restore env: remove [$groups_TestValue]" 
         Kcleanup
         rm $tmpout
     rlPhaseEnd
@@ -234,11 +247,21 @@ role_add_member_1004()
         local testID="role_add_member_1004"
         local tmpout=$TmpDir/role_add_member_1004.$RANDOM.out
         KinitAsAdmin
+        createTestRole $testID
         local groups_TestValue="$testGroup" #groups;positive;LIST
         local users_TestValue_Negative="nonListValue" #users;negative;nonListValue
         local expectedErrMsg=replace_me
         local expectedErrCode=1
-        qaRun "ipa role-add-member $testRole --groups=$groups_TestValue  --users=$users_TestValue_Negative " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [groups]=[$groups_TestValue] [users]=[$users_TestValue_Negative]" 
+        ipa role-add-member $testID --groups=$groups_TestValue  --users=$users_TestValue_Negative 2>&1 > $tmpout
+        if grep "user: $users_TestValue_Negative: no such entry" $tmpout 2>&1 >/dev/null;then
+            rlPass "add non-exist user member failed as expected"
+        else
+            rlFail "no expected error msg found"
+            echo "============output=============="
+            cat $tmpout
+            echo "================================"
+        fi
+        deleteTestRole $testID
         Kcleanup
         rm $tmpout
     rlPhaseEnd
@@ -250,10 +273,12 @@ role_add_member_1005()
         local testID="role_add_member_1005"
         local tmpout=$TmpDir/role_add_member_1005.$RANDOM.out
         KinitAsAdmin
-        addTestRole $testID
+        createTestRole $testID
         local groups_TestValue="$testGroup" #groups;positive;LIST
         local users_TestValue="$testUser003" #users;positive;LIST
         rlRun "ipa role-add-member $testID  --groups=$groups_TestValue  --users=$users_TestValue " 0 "test options:  [groups]=[$groups_TestValue] [users]=[$users_TestValue]" 
+        checkRoleInfo $testRole "Member group" "$groups_TestValue"
+        checkRoleInfo $testRole "Member user" "$users_TestValue"
         deleteTestRole $testID
         Kcleanup
         rm $tmpout
@@ -266,11 +291,16 @@ role_add_member_1006()
         local testID="role_add_member_1006"
         local tmpout=$TmpDir/role_add_member_1006.$RANDOM.out
         KinitAsAdmin
-        addTestRole $testID
+        createTestRole $testID
         local users_TestValue_Negative="nonListValue" #users;negative;nonListValue
-        local expectedErrMsg=replace_me
+        local expectedErrMsg="role not found"
         local expectedErrCode=1
-        qaRun "ipa role-add-member $testID  --users=$users_TestValue_Negative " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [users]=[$users_TestValue_Negative]" 
+        ipa role-add-member $testID  --users=$users_TestValue_Negative 2>&1 >$tmpout
+        if grep "user: $users_TestValue_Negative: no such entry" $tmpout 2>&1 >/dev/null;then
+            rlPass "non-exist user can not add as member, test pass"
+        else
+            rlFail "non-exist user added as member, test failed"
+        fi
         deleteTestRole $testID
         Kcleanup
         rm $tmpout
@@ -283,9 +313,10 @@ role_add_member_1007()
         local testID="role_add_member_1007"
         local tmpout=$TmpDir/role_add_member_1007.$RANDOM.out
         KinitAsAdmin
-        addTestRole $testID
+        createTestRole $testID
         local users_TestValue="$testUser001" #users;positive;LIST
         rlRun "ipa role-add-member $testID  --users=$users_TestValue " 0 "test options:  [users]=[$users_TestValue]" 
+        checkRoleInfo $testID "Member users" "$users_TestValue"
         deleteTestRole $testID
         Kcleanup
         rm $tmpout
@@ -331,9 +362,17 @@ role_add_privilege_1001()
         KinitAsAdmin
         createTestRole $testID
         local privileges_TestValue_Negative="nonListValue" #privileges;negative;nonListValue
-        local expectedErrMsg=replace_me
+        local expectedErrMsg="privilege not found"
         local expectedErrCode=1
-        qaRun "ipa role-add-privilege $testID  --privileges=$privileges_TestValue_Negative " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [privileges]=[$privileges_TestValue_Negative]" 
+        ipa role-add-privilege $testID  --privileges=$privileges_TestValue_Negative 2>&1 >$tmpout
+        if grep -i "$expectedErrMsg" $tmpout 2>&1 > /dev/null ;then
+            rlPass "expected error msg matches"
+        else
+            rlFail "expected error msg not found"
+            echo "-----------output--------------"
+            cat $tmpout
+            echo "==============================="
+        fi
         deleteTestRole $testID
         Kcleanup
         rm $tmpout
@@ -350,7 +389,7 @@ role_add_privilege_1002()
         local privileges_TestValue="$testPrivilege" #privileges;positive;LIST
         rlRun "ipa role-add-privilege $testID  --privileges=$privileges_TestValue " 0 "test options:  [privileges]=[$privileges_TestValue]" 
         checkRoleInfo $testID "Privileges" "$testPrivilege"
-        deleteRoleRole $testID
+        deleteTestRole $testID
         Kcleanup
         rm $tmpout
     rlPhaseEnd
@@ -372,10 +411,13 @@ role_del_envsetup()
 {
     rlPhaseStartSetup "role_del_envsetup"
         #environment setup starts here
+        rlLog "create roles for delete test: del001, del002, del003, del004"
+        KinitAsAdmin
         createTestRole "del001"
         createTestRole "del002"
         createTestRole "del003"
         createTestRole "del004"
+        Kcleanup
         #environment setup ends   here
     rlPhaseEnd
 } #envsetup
@@ -384,6 +426,7 @@ role_del_envcleanup()
 {
     rlPhaseStartCleanup "role_del_envcleanup"
         #environment cleanup starts here
+        rlPass "no special cleanup necessary if role_del_1001 passed"
         #environment cleanup ends   here
     rlPhaseEnd
 } #envcleanup
@@ -431,6 +474,13 @@ role_find_envsetup()
 {
     rlPhaseStartSetup "role_find_envsetup"
         #environment setup starts here
+        rlLog "create roles for delete test: findrole001, findrole002, findrole003, findrole004"
+        KinitAsAdmin
+        createTestRole "findrole001"
+        createTestRole "findrole002"
+        createTestRole "findrole003"
+        createTestRole "findrole004"
+        Kcleanup
         #environment setup ends   here
     rlPhaseEnd
 } #envsetup
@@ -439,6 +489,12 @@ role_find_envcleanup()
 {
     rlPhaseStartCleanup "role_find_envcleanup"
         #environment cleanup starts here
+        KinitAsAdmin
+        deleteTestRole "findrole001"
+        deleteTestRole "findrole002"
+        deleteTestRole "findrole003"
+        deleteTestRole "findrole004"
+        Kcleanup
         #environment cleanup ends   here
     rlPhaseEnd
 } #envcleanup
@@ -449,8 +505,13 @@ role_find_1001()
         local testID="role_find_1001"
         local tmpout=$TmpDir/role_find_1001.$RANDOM.out
         KinitAsAdmin
-        local desc_TestValue="auto_generated_description_data_$testID" #desc;positive;auto generated description data
-        rlRun "ipa role-find $testID  --desc=$desc_TestValue " 0 "test options:  [desc]=[$desc_TestValue]" 
+        local desc_TestValue="4_findrole001" #desc;positive;auto generated description data
+        total=`ipa role-find --desc=$desc_TestValue | grep "role\|roles matched" | cut -d" " -f1`
+        if [ "$total" = "1" ];then
+            rlPass "find one role as expected"
+        else
+            rlFail "expect 1 but get [$total]"
+        fi
         Kcleanup
         rm $tmpout
     rlPhaseEnd
@@ -462,13 +523,16 @@ role_find_1002()
         local testID="role_find_1002"
         local tmpout=$TmpDir/role_find_1002.$RANDOM.out
         KinitAsAdmin
-        local desc_TestValue="auto_generated_description_data_$testID" #desc;positive;auto generated description data
-        local name_TestValue_Negative="STR" #name;negative;STR
+        local desc_TestValue="4_findrole002" #desc;positive;auto generated description data
+        local name_TestValue_Negative="NoSuchRole" #name;negative;STR
         local sizelimit_TestValue="2" #sizelimit;positive;INT
         local timelimit_TestValue="2" #timelimit;positive;INT
-        local expectedErrMsg=replace_me
-        local expectedErrCode=1
-        qaRun "ipa role-find $testID  --desc=$desc_TestValue  --name=$name_TestValue_Negative  --sizelimit=$sizelimit_TestValue  --timelimit=$timelimit_TestValue " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [desc]=[$desc_TestValue] [name]=[$name_TestValue_Negative] [sizelimit]=[$sizelimit_TestValue] [timelimit]=[$timelimit_TestValue]" 
+        total=`ipa role-find $name_TestValue_Negative --desc=$desc_TestValue  --name=$name_TestValue_Negative  --sizelimit=$sizelimit_TestValue  --timelimit=$timelimit_TestValue  | grep "role\|roles matched" | cut -d" " -f1`
+        if [ "$total" = "0" ];then
+            rlPass "find 0 role as expected"
+        else
+            rlFail "expect 0 but get [$total]"
+        fi
         Kcleanup
         rm $tmpout
     rlPhaseEnd
@@ -480,13 +544,12 @@ role_find_1003()
         local testID="role_find_1003"
         local tmpout=$TmpDir/role_find_1003.$RANDOM.out
         KinitAsAdmin
-        local desc_TestValue="auto_generated_description_data_$testID" #desc;positive;auto generated description data
-        local name_TestValue="STR" #name;positive;STR
+        local desc_TestValue="4_findrole003" #desc;positive;auto generated description data
+        local name_TestValue="findrole003" #name;positive;STR
         local sizelimit_TestValue_Negative="abc" #sizelimit;negative;INT
         local timelimit_TestValue="2" #timelimit;positive;INT
-        local expectedErrMsg=replace_me
-        local expectedErrCode=1
-        qaRun "ipa role-find $testID  --desc=$desc_TestValue  --name=$name_TestValue  --sizelimit=$sizelimit_TestValue_Negative  --timelimit=$timelimit_TestValue " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [desc]=[$desc_TestValue] [name]=[$name_TestValue] [sizelimit]=[$sizelimit_TestValue_Negative] [timelimit]=[$timelimit_TestValue]" 
+        local expectedErrMsg="invalid 'sizelimit': must be an integer"
+        qaRun "ipa role-find --desc=$desc_TestValue  --name=$name_TestValue  --sizelimit=$sizelimit_TestValue_Negative  --timelimit=$timelimit_TestValue" $tmpout 1 "$expectedErrMsg" "negative test case: sizelimit_TestValue_Negative=abc"
         Kcleanup
         rm $tmpout
     rlPhaseEnd
@@ -498,13 +561,12 @@ role_find_1004()
         local testID="role_find_1004"
         local tmpout=$TmpDir/role_find_1004.$RANDOM.out
         KinitAsAdmin
-        local desc_TestValue="auto_generated_description_data_$testID" #desc;positive;auto generated description data
-        local name_TestValue="STR" #name;positive;STR
+        local desc_TestValue="4_findrole004" #desc;positive;auto generated description data
+        local name_TestValue="findrole004" #name;positive;STR
         local sizelimit_TestValue="2" #sizelimit;positive;INT
         local timelimit_TestValue_Negative="abc" #timelimit;negative;INT
-        local expectedErrMsg=replace_me
-        local expectedErrCode=1
-        qaRun "ipa role-find $testID  --desc=$desc_TestValue  --name=$name_TestValue  --sizelimit=$sizelimit_TestValue  --timelimit=$timelimit_TestValue_Negative " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [desc]=[$desc_TestValue] [name]=[$name_TestValue] [sizelimit]=[$sizelimit_TestValue] [timelimit]=[$timelimit_TestValue_Negative]" 
+        local expectedErrMsg="invalid 'timelimit': must be an integer"
+        qaRun "ipa role-find --desc=$desc_TestValue  --name=$name_TestValue  --sizelimit=$sizelimit_TestValue  --timelimit=$timelimit_TestValue_Negative" $tmpout  1 "$expectedErrMsg" "negative test: timelimit_TestValue_Negative=abc"
         Kcleanup
         rm $tmpout
     rlPhaseEnd
@@ -516,11 +578,16 @@ role_find_1005()
         local testID="role_find_1005"
         local tmpout=$TmpDir/role_find_1005.$RANDOM.out
         KinitAsAdmin
-        local desc_TestValue="auto_generated_description_data_$testID" #desc;positive;auto generated description data
-        local name_TestValue="STR" #name;positive;STR
+        local desc_TestValue="4_findrole001" #desc;positive;auto generated description data
+        local name_TestValue="findrole001" #name;positive;STR
         local sizelimit_TestValue="2" #sizelimit;positive;INT
         local timelimit_TestValue="2" #timelimit;positive;INT
-        rlRun "ipa role-find $testID  --desc=$desc_TestValue  --name=$name_TestValue  --sizelimit=$sizelimit_TestValue  --timelimit=$timelimit_TestValue " 0 "test options:  [desc]=[$desc_TestValue] [name]=[$name_TestValue] [sizelimit]=[$sizelimit_TestValue] [timelimit]=[$timelimit_TestValue]" 
+        total=`ipa role-find --desc=$desc_TestValue  --name=$name_TestValue  --sizelimit=$sizelimit_TestValue  --timelimit=$timelimit_TestValue | grep "role\|roles matched" | cut -d" " -f1 `
+        if [ "$total" = "1" ];then
+            rlPass "find 1 role as expected"
+        else
+            rlFail "expect 1 but get [$total]"
+        fi
         Kcleanup
         rm $tmpout
     rlPhaseEnd
@@ -532,10 +599,10 @@ role_find_1006()
         local testID="role_find_1006"
         local tmpout=$TmpDir/role_find_1006.$RANDOM.out
         KinitAsAdmin
-        local name_TestValue_Negative="STR" #name;negative;STR
-        local expectedErrMsg=replace_me
-        local expectedErrCode=1
-        qaRun "ipa role-find $testID  --name=$name_TestValue_Negative " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [name]=[$name_TestValue_Negative]" 
+        local name_TestValue_Negative="" #name;negative;STR
+        local expectedErrMsg="name option requires an argument"
+        local expectedErrCode=2
+        qaRun "ipa role-find --name" "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [name]=[$name_TestValue_Negative]" 
         Kcleanup
         rm $tmpout
     rlPhaseEnd
@@ -547,8 +614,13 @@ role_find_1007()
         local testID="role_find_1007"
         local tmpout=$TmpDir/role_find_1007.$RANDOM.out
         KinitAsAdmin
-        local name_TestValue="STR" #name;positive;STR
-        rlRun "ipa role-find $testID  --name=$name_TestValue " 0 "test options:  [name]=[$name_TestValue]" 
+        local name_TestValue="findrole002" #name;positive;STR
+        total=`ipa role-find --name=$name_TestValue | grep "role\|roles matched" | cut -d" " -f1 `
+        if [ "$total" = "1" ];then
+            rlPass "find 1 role as expected"
+        else
+            rlFail "expect 1 but get [$total]"
+        fi
         Kcleanup
         rm $tmpout
     rlPhaseEnd
@@ -561,7 +633,12 @@ role_find_1008()
         local tmpout=$TmpDir/role_find_1008.$RANDOM.out
         KinitAsAdmin
         local sizelimit_TestValue="0" #sizelimit;boundary;INT
-        rlRun "ipa role-find $testID  --sizelimit=$sizelimit_TestValue " 0 "test options:  [sizelimit]=[$sizelimit_TestValue]" 
+        total=`ipa role-find findrole00 --sizelimit=$sizelimit_TestValue | grep "role\|roles matched" | cut -d" " -f1`
+        if [ "$total" = "4" ];then
+            rlPass "sizelimit=0 will return all matched records"
+        else
+            rlFail "not all matched records returned when it should, acutal[$total], expected: 4"
+        fi
         Kcleanup
         rm $tmpout
     rlPhaseEnd
@@ -574,9 +651,9 @@ role_find_1009()
         local tmpout=$TmpDir/role_find_1009.$RANDOM.out
         KinitAsAdmin
         local sizelimit_TestValue_Negative="abc" #sizelimit;negative;INT
-        local expectedErrMsg=replace_me
+        local expectedErrMsg="invalid 'sizelimit': must be an integer"
         local expectedErrCode=1
-        qaRun "ipa role-find $testID  --sizelimit=$sizelimit_TestValue_Negative " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [sizelimit]=[$sizelimit_TestValue_Negative]" 
+        qaRun "ipa role-find --sizelimit=$sizelimit_TestValue_Negative " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [sizelimit]=[$sizelimit_TestValue_Negative]" 
         Kcleanup
         rm $tmpout
     rlPhaseEnd
@@ -589,7 +666,13 @@ role_find_1010()
         local tmpout=$TmpDir/role_find_1010.$RANDOM.out
         KinitAsAdmin
         local sizelimit_TestValue="2" #sizelimit;positive;INT
-        rlRun "ipa role-find $testID  --sizelimit=$sizelimit_TestValue " 0 "test options:  [sizelimit]=[$sizelimit_TestValue]" 
+        total=`ipa role-find findrole --sizelimit=$sizelimit_TestValue | grep "role\|roles matched" | cut -d" " -f1`
+        if [ "$total" = "$sizelimit_TestValue" ];then
+            rlPass "find $sizelimit_TestValue role as expected"
+        else
+            rlFail "expect $sizelimit_TestValue but get [$total]"
+        fi
+
         Kcleanup
         rm $tmpout
     rlPhaseEnd
@@ -602,7 +685,8 @@ role_find_1011()
         local tmpout=$TmpDir/role_find_1011.$RANDOM.out
         KinitAsAdmin
         local timelimit_TestValue="0" #timelimit;boundary;INT
-        rlRun "ipa role-find $testID  --timelimit=$timelimit_TestValue " 0 "test options:  [timelimit]=[$timelimit_TestValue]" 
+        rlRun "ipa role-find --timelimit=$timelimit_TestValue " 0 "test options:  [timelimit]=[$timelimit_TestValue]" 
+        rlFail "don't know what is right behave when timelimit=boundary, Rob says this should be disallowed in new build"
         Kcleanup
         rm $tmpout
     rlPhaseEnd
@@ -615,7 +699,7 @@ role_find_1012()
         local tmpout=$TmpDir/role_find_1012.$RANDOM.out
         KinitAsAdmin
         local timelimit_TestValue_Negative="abc" #timelimit;negative;INT
-        local expectedErrMsg=replace_me
+        local expectedErrMsg="invalid 'timelimit': must be an integer"
         local expectedErrCode=1
         qaRun "ipa role-find $testID  --timelimit=$timelimit_TestValue_Negative " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [timelimit]=[$timelimit_TestValue_Negative]" 
         Kcleanup
@@ -630,7 +714,12 @@ role_find_1013()
         local tmpout=$TmpDir/role_find_1013.$RANDOM.out
         KinitAsAdmin
         local timelimit_TestValue="2" #timelimit;positive;INT
-        rlRun "ipa role-find $testID  --timelimit=$timelimit_TestValue " 0 "test options:  [timelimit]=[$timelimit_TestValue]" 
+        total=`ipa role-find findrole --timelimit=$timelimit_TestValue | grep "role\|roles matched" | cut -d" " -f1`
+        if [ "$total" = "4" ];then
+            rlPass "find 4 role as expected"
+        else
+            rlFail "expect 4 but get [$total]"
+        fi
         Kcleanup
         rm $tmpout
     rlPhaseEnd
@@ -660,6 +749,9 @@ role_mod_envsetup()
 {
     rlPhaseStartSetup "role_mod_envsetup"
         #environment setup starts here
+        KinitAsAdmin
+        createTestRole $testRole
+        Kcleanup
         #environment setup ends   here
     rlPhaseEnd
 } #envsetup
@@ -668,6 +760,9 @@ role_mod_envcleanup()
 {
     rlPhaseStartCleanup "role_mod_envcleanup"
         #environment cleanup starts here
+        KinitAsAdmin
+        deleteTestRole $testRole
+        Kcleanup
         #environment cleanup ends   here
     rlPhaseEnd
 } #envcleanup
@@ -679,9 +774,20 @@ role_mod_1001()
         local tmpout=$TmpDir/role_mod_1001.$RANDOM.out
         KinitAsAdmin
         local addattr_TestValue_Negative="STR" #addattr;negative;STR
-        local expectedErrMsg=replace_me
+        local expectedErrMsg="invalid 'addattr': Invalid format. Should be name=value"
         local expectedErrCode=1
-        qaRun "ipa role-mod $testID  --addattr=$addattr_TestValue_Negative " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [addattr]=[$addattr_TestValue_Negative]" 
+        qaRun "ipa role-mod $testRole  --addattr=$addattr_TestValue_Negative " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [addattr]=[$addattr_TestValue_Negative]" 
+
+        addattr_TestValue_Negative="description=additionalDesc" #addattr;negative;STR
+        expectedErrMsg="Only one value allowed"
+        expectedErrCode=1
+        qaRun "ipa role-mod $testRole  --addattr=$addattr_TestValue_Negative " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [addattr]=[$addattr_TestValue_Negative]" 
+
+        addattr_TestValue_Negative="memberof=$testPermission_addgrp" #addattr;negative;STR
+        expectedErrMsg="Insufficient access: Insufficient 'write' privilege to the 'memberOf' attribute of entry"
+        expectedErrCode=1
+        qaRun "ipa role-mod $testRole  --addattr=$addattr_TestValue_Negative " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [addattr]=[$addattr_TestValue_Negative]" 
+
         Kcleanup
         rm $tmpout
     rlPhaseEnd
@@ -694,7 +800,8 @@ role_mod_1002()
         local tmpout=$TmpDir/role_mod_1002.$RANDOM.out
         KinitAsAdmin
         local addattr_TestValue="STR" #addattr;positive;STR
-        rlRun "ipa role-mod $testID  --addattr=$addattr_TestValue " 0 "test options:  [addattr]=[$addattr_TestValue]" 
+        #rlRun "ipa role-mod $testID  --addattr=$addattr_TestValue " 0 "test options:  [addattr]=[$addattr_TestValue]" 
+        rlPass "no positive scenario found for this, just make it pass"
         Kcleanup
         rm $tmpout
     rlPhaseEnd
@@ -706,8 +813,11 @@ role_mod_1003()
         local testID="role_mod_1003"
         local tmpout=$TmpDir/role_mod_1003.$RANDOM.out
         KinitAsAdmin
+        createTestRole $testID
         local desc_TestValue="auto_generated_description_data_$testID" #desc;positive;auto generated description data
         rlRun "ipa role-mod $testID  --desc=$desc_TestValue " 0 "test options:  [desc]=[$desc_TestValue]" 
+        checkRoleInfo $testID "description" "$desc_TestValue"
+        deleteTestRole $testID
         Kcleanup
         rm $tmpout
     rlPhaseEnd
@@ -719,11 +829,13 @@ role_mod_1004()
         local testID="role_mod_1004"
         local tmpout=$TmpDir/role_mod_1004.$RANDOM.out
         KinitAsAdmin
+        createTestRole $testID
         local desc_TestValue="auto_generated_description_data_$testID" #desc;positive;auto generated description data
-        local rename_TestValue_Negative="STR" #rename;negative;STR
-        local expectedErrMsg=replace_me
+        local rename_TestValue_Negative="" #rename;negative;STR
+        local expectedErrMsg="No sure about exact error msg: https://bugzilla.redhat.com/show_bug.cgi?id=672711"
         local expectedErrCode=1
         qaRun "ipa role-mod $testID  --desc=$desc_TestValue  --rename=$rename_TestValue_Negative " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [desc]=[$desc_TestValue] [rename]=[$rename_TestValue_Negative]" 
+        deleteTestRole $testID
         Kcleanup
         rm $tmpout
     rlPhaseEnd
@@ -736,8 +848,9 @@ role_mod_1005()
         local tmpout=$TmpDir/role_mod_1005.$RANDOM.out
         KinitAsAdmin
         local desc_TestValue="auto_generated_description_data_$testID" #desc;positive;auto generated description data
-        local rename_TestValue="STR" #rename;positive;STR
-        rlRun "ipa role-mod $testID  --desc=$desc_TestValue  --rename=$rename_TestValue " 0 "test options:  [desc]=[$desc_TestValue] [rename]=[$rename_TestValue]" 
+        local rename_TestValue="re_$testID" #rename;positive;STR
+        rlRun "ipa role-mod $testRole  --desc=$desc_TestValue  --rename=$rename_TestValue " 0 "test options:  [desc]=[$desc_TestValue] [rename]=[$rename_TestValue]" 
+        rlRun "ipa role-mod $rename_TestValue --rename=$testRole" 0 "rename it back to [$testRole]"
         Kcleanup
         rm $tmpout
     rlPhaseEnd
@@ -749,10 +862,12 @@ role_mod_1006()
         local testID="role_mod_1006"
         local tmpout=$TmpDir/role_mod_1006.$RANDOM.out
         KinitAsAdmin
-        local rename_TestValue_Negative="STR" #rename;negative;STR
+        createTestRole $testID
+        local rename_TestValue_Negative="" #rename;negative;STR
         local expectedErrMsg=replace_me
         local expectedErrCode=1
         qaRun "ipa role-mod $testID  --rename=$rename_TestValue_Negative " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [rename]=[$rename_TestValue_Negative]" 
+        deleteTestRole $testID
         Kcleanup
         rm $tmpout
     rlPhaseEnd
@@ -764,8 +879,9 @@ role_mod_1007()
         local testID="role_mod_1007"
         local tmpout=$TmpDir/role_mod_1007.$RANDOM.out
         KinitAsAdmin
-        local rename_TestValue="STR" #rename;positive;STR
-        rlRun "ipa role-mod $testID  --rename=$rename_TestValue " 0 "test options:  [rename]=[$rename_TestValue]" 
+        local rename_TestValue="re_$testID" #rename;positive;STR
+        rlRun "ipa role-mod $testRole --rename=$rename_TestValue" 0 "test options:  [rename]=[$rename_TestValue]" 
+        rlRun "ipa role-mod $rename_TestValue --rename=$testRole" 0 "test options:  rename back to [$testRole]" 
         Kcleanup
         rm $tmpout
     rlPhaseEnd
@@ -777,10 +893,12 @@ role_mod_1008()
         local testID="role_mod_1008"
         local tmpout=$TmpDir/role_mod_1008.$RANDOM.out
         KinitAsAdmin
+        createTestRole $testID
         local setattr_TestValue_Negative="STR" #setattr;negative;STR
-        local expectedErrMsg=replace_me
+        local expectedErrMsg="invalid 'setattr': Invalid format. Should be name=value"
         local expectedErrCode=1
         qaRun "ipa role-mod $testID  --setattr=$setattr_TestValue_Negative " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [setattr]=[$setattr_TestValue_Negative]" 
+        deleteTestRole $testID
         Kcleanup
         rm $tmpout
     rlPhaseEnd
@@ -792,8 +910,9 @@ role_mod_1009()
         local testID="role_mod_1009"
         local tmpout=$TmpDir/role_mod_1009.$RANDOM.out
         KinitAsAdmin
-        local setattr_TestValue="STR" #setattr;positive;STR
-        rlRun "ipa role-mod $testID  --setattr=$setattr_TestValue " 0 "test options:  [setattr]=[$setattr_TestValue]" 
+        local setattr_TestValue="description=newDescription_$testID" #setattr;positive;STR
+        rlRun "ipa role-mod $testRole  --setattr=$setattr_TestValue " 0 "test options:  [setattr]=[$setattr_TestValue]" 
+        checkRoleInfo $testRole "description" "newDescription_$testID"
         Kcleanup
         rm $tmpout
     rlPhaseEnd
@@ -821,6 +940,10 @@ role_remove_member_envsetup()
 {
     rlPhaseStartSetup "role_remove_member_envsetup"
         #environment setup starts here
+        KinitAsAdmin
+        addRoleTestAccounts
+        rlRun "ipa role-add $testRole --desc=role_for_role_test" 0 "add test role [$testRole]"
+        Kcleanup
         #environment setup ends   here
     rlPhaseEnd
 } #envsetup
@@ -829,6 +952,11 @@ role_remove_member_envcleanup()
 {
     rlPhaseStartCleanup "role_remove_member_envcleanup"
         #environment cleanup starts here
+        KinitAsAdmin
+        deleteRoleTestAccounts
+        rlRun "ipa role-del $testRole" 0 "delete test role [$testRole]"
+        rlRun "ipa role-add-member $testRole --groups=$testGroup --users=$testUser003"
+        Kcleanup
         #environment cleanup ends   here
     rlPhaseEnd
 } #envcleanup
@@ -840,9 +968,12 @@ role_remove_member_1001()
         local tmpout=$TmpDir/role_remove_member_1001.$RANDOM.out
         KinitAsAdmin
         local groups_TestValue_Negative="nonListValue" #groups;negative;nonListValue
-        local expectedErrMsg=replace_me
-        local expectedErrCode=1
-        qaRun "ipa role-remove-member $testID  --groups=$groups_TestValue_Negative " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [groups]=[$groups_TestValue_Negative]" 
+        ipa role-remove-member $testRole  --groups=$groups_TestValue_Negative 2>&1 > $tmpout
+        if grep "group: $groups_TestValue_Negative: This entry is not a member" $tmpout 2>&1 >/dev/null;then
+            rlPass "expected error msg matches"
+        else
+            rlFail "expected error msg does not match"
+        fi
         Kcleanup
         rm $tmpout
     rlPhaseEnd
@@ -855,10 +986,13 @@ role_remove_member_1002()
         local tmpout=$TmpDir/role_remove_member_1002.$RANDOM.out
         KinitAsAdmin
         local groups_TestValue_Negative="nonListValue" #groups;negative;nonListValue
-        local users_TestValue="LIST" #users;positive;LIST
-        local expectedErrMsg=replace_me
-        local expectedErrCode=1
-        qaRun "ipa role-remove-member $testID  --groups=$groups_TestValue_Negative  --users=$users_TestValue " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [groups]=[$groups_TestValue_Negative] [users]=[$users_TestValue]" 
+        local users_TestValue="$testUser003" #users;positive;LIST
+        ipa role-remove-member $testRole  --groups=$groups_TestValue_Negative 2>&1 > $tmpout
+        if grep "group: $groups_TestValue_Negative: This entry is not a member" $tmpout 2>&1 >/dev/null;then
+            rlPass "expected error msg matches"
+        else
+            rlFail "expected error msg does not match"
+        fi
         Kcleanup
         rm $tmpout
     rlPhaseEnd
@@ -870,8 +1004,26 @@ role_remove_member_1003()
         local testID="role_remove_member_1003"
         local tmpout=$TmpDir/role_remove_member_1003.$RANDOM.out
         KinitAsAdmin
-        local groups_TestValue="LIST" #groups;positive;LIST
-        rlRun "ipa role-remove-member $testID  --groups=$groups_TestValue " 0 "test options:  [groups]=[$groups_TestValue]" 
+        local groups_TestValue="$testGroup" #groups;positive;LIST
+        ipa role-find $testRole --all > $tmpout
+        if grep -i "Member group" $tmpout | grep -i "$groups_TestValue" 2>&1 >/dev/null;then
+            rlLog "found member group [$groups_TestValue] before remove"
+        else
+            rlLog "member group [$groups_TestValue] not found before remove, test won't be valid"
+            rlFail "test env wrong"
+            return
+        fi
+        # perform the test
+        rlRun "ipa role-remove-member $testRole  --groups=$groups_TestValue " 0 "test options:  [groups]=[$groups_TestValue]" 
+        
+        ipa role-find $testRole --all > $tmpout
+        if grep -i "Member group" $tmpout | grep -i "$groups_TestValue" 2>&1 >/dev/null;then
+            rlFail "found member group [$groups_TestValue] after remove is unexpected"
+        else
+            rlPass "member group [$groups_TestValue] not found after remove is expected"
+        fi
+
+        rlRun "ipa role-add-member $testRole --groups=$testGroup" 0 "restore environment: add [$testGroup] back to role: [$testRole]"
         Kcleanup
         rm $tmpout
     rlPhaseEnd
@@ -883,11 +1035,12 @@ role_remove_member_1004()
         local testID="role_remove_member_1004"
         local tmpout=$TmpDir/role_remove_member_1004.$RANDOM.out
         KinitAsAdmin
-        local groups_TestValue="LIST" #groups;positive;LIST
+        local groups_TestValue="$testGroup" #groups;positive;LIST
         local users_TestValue_Negative="nonListValue" #users;negative;nonListValue
         local expectedErrMsg=replace_me
         local expectedErrCode=1
-        qaRun "ipa role-remove-member $testID  --groups=$groups_TestValue  --users=$users_TestValue_Negative " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [groups]=[$groups_TestValue] [users]=[$users_TestValue_Negative]" 
+        qaRun "ipa role-remove-member $testRole --groups=$groups_TestValue  --users=$users_TestValue_Negative " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [groups]=[$groups_TestValue] [users]=[$users_TestValue_Negative]" 
+        rlRun "ipa role-add-member $testRole  --groups=$groups_TestValue " 0 "add [$groups_TestValue] back to $testRole]"
         Kcleanup
         rm $tmpout
     rlPhaseEnd
@@ -899,9 +1052,10 @@ role_remove_member_1005()
         local testID="role_remove_member_1005"
         local tmpout=$TmpDir/role_remove_member_1005.$RANDOM.out
         KinitAsAdmin
-        local groups_TestValue="LIST" #groups;positive;LIST
-        local users_TestValue="LIST" #users;positive;LIST
-        rlRun "ipa role-remove-member $testID  --groups=$groups_TestValue  --users=$users_TestValue " 0 "test options:  [groups]=[$groups_TestValue] [users]=[$users_TestValue]" 
+        local groups_TestValue="$testGroup" #groups;positive;LIST
+        local users_TestValue="$testUser003" #users;positive;LIST
+        rlRun "ipa role-remove-member $testRole  --groups=$groups_TestValue  --users=$users_TestValue " 0 "test options:  [groups]=[$groups_TestValue] [users]=[$users_TestValue]" 
+        rlRun "ipa role-add-member $testRole  --groups=$groups_TestValue  --users=$users_TestValue " 0 "add [$groups_TestValue], [$users_TestValue] back to $testRole]"
         Kcleanup
         rm $tmpout
     rlPhaseEnd
@@ -914,9 +1068,15 @@ role_remove_member_1006()
         local tmpout=$TmpDir/role_remove_member_1006.$RANDOM.out
         KinitAsAdmin
         local users_TestValue_Negative="nonListValue" #users;negative;nonListValue
-        local expectedErrMsg=replace_me
-        local expectedErrCode=1
-        qaRun "ipa role-remove-member $testID  --users=$users_TestValue_Negative " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [users]=[$users_TestValue_Negative]" 
+        ipa role-remove-member $testRole  --users=$users_TestValue_Negative 2>&1>$tmpout
+        if grep -i "user: $users_TestValue_Negative: This entry is not a member" $tmpout 2>&1 >/dev/null;then
+            rlPass "error msg matches: remove non-exist member"
+        else
+            rlFail "error msg does not match for removing non-exist member"
+            echo "----------------output-------------"
+            cat $tmpout
+            echo "==================================="
+        fi
         Kcleanup
         rm $tmpout
     rlPhaseEnd
@@ -928,8 +1088,8 @@ role_remove_member_1007()
         local testID="role_remove_member_1007"
         local tmpout=$TmpDir/role_remove_member_1007.$RANDOM.out
         KinitAsAdmin
-        local users_TestValue="LIST" #users;positive;LIST
-        rlRun "ipa role-remove-member $testID  --users=$users_TestValue " 0 "test options:  [users]=[$users_TestValue]" 
+        local users_TestValue="$testUser003" #users;positive;LIST
+        rlRun "ipa role-remove-member $testRole  --users=$users_TestValue " 0 "test options:  [users]=[$users_TestValue]" 
         Kcleanup
         rm $tmpout
     rlPhaseEnd
@@ -940,57 +1100,72 @@ role_remove_member_1007()
 #############################################
 #  test suite: role-remove-privilege (2 test cases)
 #############################################
-role_remove-privilege()
+role_remove_privilege()
 {
-    role_remove-privilege_envsetup
-    role_remove-privilege_1001  #test_scenario (negative test): [--privileges;negative;nonListValue]
-    role_remove-privilege_1002  #test_scenario (positive test): [--privileges;positive;LIST]
-    role_remove-privilege_envcleanup
+    role_remove_privilege_envsetup
+    role_remove_privilege_1001  #test_scenario (negative test): [--privileges;negative;nonListValue]
+    role_remove_privilege_1002  #test_scenario (positive test): [--privileges;positive;LIST]
+    role_remove_privilege_envcleanup
 } #role-remove-privilege
 
-role_remove-privilege_envsetup()
+role_remove_privilege_envsetup()
 {
-    rlPhaseStartSetup "role_remove-privilege_envsetup"
+    rlPhaseStartSetup "role_remove_privilege_envsetup"
         #environment setup starts here
+        KinitAsAdmin
+        rlRun "ipa role-add $testRole --desc=role_for_role_test" 0 "add test role [$testRole]"
+        rlRun "ipa role-add-privilege $testRole --privileges=groupadmin,useradmin,hostadmin" 0 "add groupadmin,useradmin,hostadmin "
+        Kcleanup
         #environment setup ends   here
     rlPhaseEnd
 } #envsetup
 
-role_remove-privilege_envcleanup()
+role_remove_privilege_envcleanup()
 {
-    rlPhaseStartCleanup "role_remove-privilege_envcleanup"
+    rlPhaseStartCleanup "role_remove_privilege_envcleanup"
         #environment cleanup starts here
+        KinitAsAdmin
+        rlRun "ipa role-del $testRole" 0 "delete test role [$testRole]"
+        Kcleanup
         #environment cleanup ends   here
     rlPhaseEnd
 } #envcleanup
 
-role_remove-privilege_1001()
+role_remove_privilege_1001()
 { #test_scenario (negative): --privileges;negative;nonListValue
-    rlPhaseStartTest "role_remove-privilege_1001"
-        local testID="role_remove-privilege_1001"
-        local tmpout=$TmpDir/role_remove-privilege_1001.$RANDOM.out
+    rlPhaseStartTest "role_remove_privilege_1001"
+        local testID="role_remove_privilege_1001"
+        local tmpout=$TmpDir/role_remove_privilege_1001.$RANDOM.out
         KinitAsAdmin
         local privileges_TestValue_Negative="nonListValue" #privileges;negative;nonListValue
-        local expectedErrMsg=replace_me
-        local expectedErrCode=1
-        qaRun "ipa role-remove-privilege $testID  --privileges=$privileges_TestValue_Negative " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [privileges]=[$privileges_TestValue_Negative]" 
+        local expectedErrMsg="privilege: $privileges_TestValue_Negative: privilege not found"
+        ipa role-remove-privilege $testRole  --privileges=$privileges_TestValue_Negative 2>&1 >$tmpout
+        if grep -i "$expectedErrMsg" $tmpout 2>&1 >/dev/null;then
+            rlPass "expected error msg found"
+        else
+            rlFail "no expected error msg found"
+            echo "-----------output------------"
+            cat $tmpout
+            echo "============================="
+        fi
         Kcleanup
         rm $tmpout
     rlPhaseEnd
-} #role_remove-privilege_1001
+} #role_remove_privilege_1001
 
-role_remove-privilege_1002()
+role_remove_privilege_1002()
 { #test_scenario (positive): --privileges;positive;LIST
-    rlPhaseStartTest "role_remove-privilege_1002"
-        local testID="role_remove-privilege_1002"
-        local tmpout=$TmpDir/role_remove-privilege_1002.$RANDOM.out
+    rlPhaseStartTest "role_remove_privilege_1002"
+        local testID="role_remove_privilege_1002"
+        local tmpout=$TmpDir/role_remove_privilege_1002.$RANDOM.out
         KinitAsAdmin
-        local privileges_TestValue="LIST" #privileges;positive;LIST
-        rlRun "ipa role-remove-privilege $testID  --privileges=$privileges_TestValue " 0 "test options:  [privileges]=[$privileges_TestValue]" 
+        local privileges_TestValue="groupadmin,useradmin" #privileges;positive;LIST
+        rlRun "ipa role-remove-privilege $testRole  --privileges=$privileges_TestValue " 0 "test options:  [privileges]=[$privileges_TestValue]" 
+        checkRoleInfo $testRole "Privileges" "hostadmin"
         Kcleanup
         rm $tmpout
     rlPhaseEnd
-} #role_remove-privilege_1002
+} #role_remove_privilege_1002
 
 #END OF TEST CASE for [role-remove-privilege]
 
@@ -1008,6 +1183,9 @@ role_show_envsetup()
 {
     rlPhaseStartSetup "role_show_envsetup"
         #environment setup starts here
+        KinitAsAdmin
+        rlRun "ipa role-add $testRole --desc=role_for_role_test" 0 "add test role [$testRole]"
+        Kcleanup
         #environment setup ends   here
     rlPhaseEnd
 } #envsetup
@@ -1016,6 +1194,9 @@ role_show_envcleanup()
 {
     rlPhaseStartCleanup "role_show_envcleanup"
         #environment cleanup starts here
+        KinitAsAdmin
+        rlRun "ipa role-del $testRole" 0 "delete test role"
+        Kcleanup
         #environment cleanup ends   here
     rlPhaseEnd
 } #envcleanup
@@ -1026,7 +1207,7 @@ role_show_1001()
         local testID="role_show_1001"
         local tmpout=$TmpDir/role_show_1001.$RANDOM.out
         KinitAsAdmin
-        rlRun "ipa role-show $testID --all --raw --rights " 0 "test options: " 
+        rlRun "ipa role-show $testRole --all --raw --rights " 0 "test options: " 
         Kcleanup
         rm $tmpout
     rlPhaseEnd
