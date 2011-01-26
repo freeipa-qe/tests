@@ -40,10 +40,8 @@
 . /dev/shm/env.sh
 
 # Include test case file
-#. ./t.ipadelegation.sh
 . ./lib.ipadelegation.sh
-. ./t.permission.sh
-#. ./d.permission.sh
+. ./t.ipadelegation.sh
 
 PACKAGE="ipa-server"
 
@@ -59,8 +57,7 @@ rlJournalStart
     rlPhaseEnd
 
     # r2d2_test_starts
-    permission
-#    ipadelegation
+    delegation
     # r2d2_test_ends
 
     makereport
