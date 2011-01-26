@@ -77,7 +77,13 @@ PACKAGE="ipa-admintools"
 
 rlJournalStart
     rlPhaseStartSetup "ipa-hostgroup-cli-startup: Check for admintools package, Kinit and hosts and user groups"
-        rlAssertRpm $PACKAGE
+	rpm -qa | grep $PACKAGE
+        if [ $? -eq 0 ] ; then
+                rlPass "ipa-admintools package is installed"
+        else
+                rlFail "ipa-admintools package NOT found!"
+        fi
+        rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
         rlRun "TmpDir=\`mktemp -d\`" 0 "Creating tmp directory"
         rlRun "pushd $TmpDir"
 	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
@@ -315,19 +321,20 @@ rlJournalStart
 	rlRun "deleteHostGroup \"$group5\"" 0 "Deleting host group \"$group5\""
     rlPhaseEnd
 
- rlPhaseStartTest "ipa-hostgroup-cli-32: Add 100 host groups and test find returns all"
+ rlPhaseStartTest "ipa-hostgroup-cli-32: Add 25 host groups and test find returns all"
+	rlRun "ipa config-mod --searchrecordslimit=20" 0 "setting search records limit to 20"
         i=1
-        while [ $i -le 100 ] ; do
+        while [ $i -le 25 ] ; do
                 addHostGroup Group$i Group$i
                 let i=$i+1
         done
         ipa hostgroup-find > /tmp/hostgroupfind.out
         result=`cat /tmp/hostgroupfind.out | grep "Number of entries returned"`
         number=`echo $result | cut -d " " -f 5`
-        if [ $number -eq 100 ] ; then
-                rlPass "All host group returned as expected"
+        if [ $number -eq 20 ] ; then
+                rlPass "Limit of 20 host groups returned as expected"
         else
-                rlFail "Number of host groups returned is not as expected.  GOT: $number EXP: 100"
+                rlFail "Number of host groups returned is not as expected.  GOT: $number EXP: 20"
         fi
     rlPhaseEnd
 
@@ -335,10 +342,10 @@ rlJournalStart
         ipa hostgroup-find --sizelimit=0 > /tmp/hostgroupfind.out
         result=`cat /tmp/hostgroupfind.out | grep "Number of entries returned"`
         number=`echo $result | cut -d " " -f 5`
-        if [ $number -eq 100 ] ; then
-                rlPass "All host group returned as expected with size limit of 0"
+        if [ $number -eq 25 ] ; then
+                rlPass "All host groups returned as expected with size limit of 0"
         else
-                rlFail "Number of host groups returned is not as expected.  GOT: $number EXP: 100"
+                rlFail "Number of host groups returned is not as expected.  GOT: $number EXP: 25"
         fi
     rlPhaseEnd
 
@@ -353,14 +360,14 @@ rlJournalStart
         fi
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-hostgroup-cli-35: find 59 host groups"
-        ipa hostgroup-find --sizelimit=59 > /tmp/hostgroupfind.out
+    rlPhaseStartTest "ipa-hostgroup-cli-35: find 21 host groups"
+        ipa hostgroup-find --sizelimit=21 > /tmp/hostgroupfind.out
         result=`cat /tmp/hostgroupfind.out | grep "Number of entries returned"`
         number=`echo $result | cut -d " " -f 5`
-        if [ $number -eq 59 ] ; then
-                rlPass "59 host groups returned as expected with size limit of 59"
+        if [ $number -eq 21 ] ; then
+                rlPass "21 host groups returned as expected with size limit of 21"
         else
-                rlFail "Number of host groups returned is not as expected.  GOT: $number EXP: 59"
+                rlFail "Number of host groups returned is not as expected.  GOT: $number EXP: 21"
         fi
     rlPhaseEnd
 
@@ -376,10 +383,10 @@ rlJournalStart
         ipa hostgroup-find --timelimit=0 > /tmp/hostgroupfind.out
         result=`cat /tmp/hostgroupfind.out | grep "Number of entries returned"`
         number=`echo $result | cut -d " " -f 5`
-        if [ $number -eq 0 ] ; then
-                rlPass "No host groups returned as expected with time limit of 0"
+        if [ $number -eq 20 ] ; then
+                rlPass "Limit of 20 host groups returned as expected with time limit of 0"
         else
-                rlFail "Number of host groups returned is not as expected.  GOT: $number EXP: 0"
+                rlFail "Number of host groups returned is not as expected.  GOT: $number EXP: 20"
         fi
     rlPhaseEnd
 
@@ -392,13 +399,14 @@ rlJournalStart
     rlPhaseEnd
 
     rlPhaseStartCleanup "ipa-hostgroup-cli-cleanup: Delete remaining hosts and Destroying admin credentials"
+	rlRun "ipa config-mod --searchrecordslimit=100" 0 "setting search records limit back to default"
         # delete remaining hosts added to test host members
         for item in $host1 $host3 $host4 $host5 ; do
                 rlRun "deleteHost $item" 0 "Deleting host $item"
         done
 
         i=1
-        while [ $i -le 100 ] ; do
+        while [ $i -le 25 ] ; do
                 deleteHostGroup Group$i
                 let i=$i+1
         done
