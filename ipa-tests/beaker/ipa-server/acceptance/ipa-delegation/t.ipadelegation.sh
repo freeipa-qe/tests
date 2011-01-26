@@ -3,8 +3,8 @@
 
 delegation() {
     permission
-    privilege
-    role
+#    privilege
+#    role
 }
 
 permission()
@@ -2722,6 +2722,7 @@ privilege_add_envsetup()
 {
     rlPhaseStartSetup "privilege_add_envsetup"
         #environment setup starts here
+        rlPass "no special setup necessary"
         #environment setup ends   here
     rlPhaseEnd
 } #envsetup
@@ -2730,6 +2731,7 @@ privilege_add_envcleanup()
 {
     rlPhaseStartCleanup "privilege_add_envcleanup"
         #environment cleanup starts here
+        rlPass "no special clean up necessary"
         #environment cleanup ends   here
     rlPhaseEnd
 } #envcleanup
