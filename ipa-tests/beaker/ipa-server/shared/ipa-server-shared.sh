@@ -346,6 +346,11 @@ KinitAsAdmin()
     echo $adminpassword | $KINITEXEC $admin 2>&1 >/dev/null
 } #KinitAsAdmin
 
+Kcleanup()
+{ #clear all kerberos tickets
+    kdestroy 2>&1 >/dev/null
+} #Kcleanup
+
 KinitAsUser()
 {
     local userlogin=$1
