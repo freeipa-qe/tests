@@ -328,9 +328,9 @@ makereport()
 
 getReverseZone()
 {
-  rzonedn=`ipa dns-find | grep dn: | grep arpa`
+  rzonedn=`ipa dnszone-find | grep "Zone name:" | grep arpa`
   if [ $? -eq 0 ] ; then
-	rzone=`echo $rzonedn | cut -d "=" -f 2 | cut -d "," -f 1`
+	rzone=`echo $rzonedn | cut -d ":" -f 2`
   else
 	rlLog "WARNING: No Reverse DNS zone found"
 	rc=1
