@@ -43,7 +43,7 @@
 # Include test case file
 . ./t.ipa-netgroup.sh
 
-PACKAGE=ipa-server
+PACKAGE="ipa-admintools"
 
 ngroup1=testg1
 ngroup2=testgaga2
@@ -65,7 +65,12 @@ hgroup3=hg3afdsk
 
 rlJournalStart
     rlPhaseStartSetup "ipa-netgroup startup: Check for ipa-server package"
-        rlAssertRpm $PACKAGE
+        rpm -qa | grep $PACKAGE
+        if [ $? -eq 0 ] ; then
+                rlPass "ipa-admintools package is installed"
+        else
+                rlFail "ipa-admintools package NOT found!"
+        fi
         rlRun "TmpDir=\`mktemp -d\`" 0 "Creating tmp directory"
         rlRun "pushd $TmpDir"
 	kdestroy
