@@ -40,7 +40,12 @@ KPWDSERVICE="ipa_kpasswd"
 
 rlJournalStart
 	rlPhaseStartSetup "ipa-initscripts-setup"
-		rlAssertRpm $PACKAGE
+        rpm -qa | grep $PACKAGE
+        if [ $? -eq 0 ] ; then
+                rlPass "ipa-admintools package is installed"
+        else
+                rlFail "ipa-admintools package NOT found!"
+        fi
 	        rlRun "useradd testuserqa" 0 "Add test user"
 	rlPhaseEnd
 
