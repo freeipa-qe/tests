@@ -4,7 +4,8 @@
 #global variables for permission test
 testGroup="permissiongroup$RANDOM"
 testCN="cn=$testGroup"
-testDC="dc=sjc,dc=redhat,dc=com"
+#testDC="dc=sjc,dc=redhat,dc=com"  # for local test
+testDC="dc=$RELM"                  # for beaker execution
 
 # global for privilege test
 testPrivilege="testPrivilege$RANDOM"
