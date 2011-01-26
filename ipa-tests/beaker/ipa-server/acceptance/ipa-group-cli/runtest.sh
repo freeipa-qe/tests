@@ -767,7 +767,7 @@ rlJournalStart
 	rlRun "deleteGroup fish" 0 "Cleanup: Deleting group fish."
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-cli-64: Add 100 groups and test find returns all"
+    rlPhaseStartTest "ipa-group-cli-64: Add 25 groups and test find returns limit of 20"
 	rlRun "ipa config-mod --searchrecordslimit=20" 0 "Set default search records limit to 20"
 	i=1
 	while [ $i -le 25 ] ; do
@@ -789,10 +789,10 @@ rlJournalStart
 	ipa group-find --sizelimit=0 > /tmp/groupfind.out
 	result=`cat /tmp/groupfind.out | grep "Number of entries returned"`
 	number=`echo $result | cut -d " " -f 5`
-	if [ $number -eq 20 ] ; then
-		rlPass "20 groups returned as expected with size limit of 0"
+	if [ $number -eq 28 ] ; then
+		rlPass "All groups returned as expected with size limit of 0"
 	else
-		rlFail "Number of groups returned is not as expected.  GOT: $number EXP: 20"
+		rlFail "Number of groups returned is not as expected.  GOT: $number EXP: 28"
 	fi
     rlPhaseEnd
 
@@ -841,10 +841,10 @@ rlJournalStart
         ipa group-find --timelimit=0 > /tmp/groupfind.out
         result=`cat /tmp/groupfind.out | grep "Number of entries returned"`
         number=`echo $result | cut -d " " -f 5`
-        if [ $number -eq 28 ] ; then
-                rlPass "All groups returned as expected with time limit of 0"
+        if [ $number -eq 20 ] ; then
+                rlPass "Limit of 20 groups returned as expected with time limit of 0"
         else
-                rlFail "Number of groups returned is not as expected.  GOT: $number EXP: 28"
+                rlFail "Number of groups returned is not as expected.  GOT: $number EXP: 20"
         fi
     rlPhaseEnd
 
