@@ -343,7 +343,7 @@ getReverseZone()
 
 KinitAsAdmin()
 {
-    echo $adminpassword | $KINITEXEC $admin 2>&1 >/dev/null
+    echo $ADMINPW | $KINITEXEC $ADMINID 2>&1 >/dev/null
 } #KinitAsAdmin
 
 Kcleanup()
