@@ -22,7 +22,7 @@ create_user()
         rlRun "ipa user-del $login " 0 "remove existing user [$login]"
     fi
     rlRun "ipa user-add $login --first=$f --last=$l" 0 "create ipa user [$login]"
-    clear_kticket    
+    Kcleanup    
 } #create_user
 
 delete_user()
@@ -34,20 +34,8 @@ delete_user()
     fi
     KinitAsAdmin
     rlRun "ipa user-del \"$login\" 2>&1 >/dev/null" 0 "delete test account [$login]"
-    clear_kticket
+    Kcleanup
 } # delete_ipauser
-
-KinitAsAdmin()
-{
-    # simple kinit function
-    echo $adminpassword | kinit $admin 2>&1 >/dev/null
-    #rlRun "echo $adminpassword | kinit $admin"
-} #KinitAsAdmin
-
-clear_kticket()
-{
-    kdestroy 2>&1 >/dev/null
-} #clear_kticket
 
 read_maxlife()
 {
@@ -55,7 +43,7 @@ read_maxlife()
     local maxlife
     KinitAsAdmin
     maxlife=`ipa krbtpolicy-show $login | grep "Max life"| cut -d":" -f2 | xargs echo`
-    clear_kticket
+    Kcleanup
     echo $maxlife
 } #read_maxlife
 
@@ -65,7 +53,7 @@ read_renew()
     local renew
     KinitAsAdmin
     renew=`ipa krbtpolicy-show $login | grep "Max renew"| cut -d":" -f2 | xargs echo`
-    clear_kticket
+    Kcleanup
     echo $renew
 } #read_renew
 
