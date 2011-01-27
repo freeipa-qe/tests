@@ -11,3 +11,6 @@ default_renew=604800
 
 supported_enc="aes256-cts:normal aes256-cts:special aes128-cts:normal aes128-cts:special des3-hmac-sha1:normal des3-hmac-sha1:special arcfour-hmac:normal arcfour-hmac:special des-hmac-sha1:normal des-cbc-md5:normal des-cbc-crc:normal des-cbc-crc:v4 des-cbc-crc:afs3"
 
+maxlifeattr="krbmaxticketlife"
+maxrenewattr="krbmaxrenewableage"
+

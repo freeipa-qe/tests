@@ -7,49 +7,41 @@ ipakrbtpolicy()
     ipakrbt_envsetup
     ipakrbt_show
     ipakrbt_functional
-#    ipakrbt_mod
+    ipakrbt_mod
     ipakrbt_reset
     ipakrbt_envcleanup
-} # ipakrbt
+} 
 
 ######################
-# test set           #
+# test sets          #
 ######################
-ipakrbt_functional()
-{
-    ipakrbt_functional_envsetup
-    ipakrbt_functional_maxlife
-    ipakrbt_functional_maxrenew
-    ipakrbt_functional_envcleanup
-}
 
 ipakrbt_show()
 {
-    ipakrbt_show_envsetup
     ipakrbt_show
-    ipakrbt_show_envcleanup
-} #ipakrbt_show
+} 
 
-ipakrbt_reset()
+ipakrbt_functional()
 {
-    ipakrbt_reset_envsetup
-    ipakrbt_reset_default
-    ipakrbt_reset_envcleanup
-} #ipakrbt_reset
+    ipakrbt_functional_maxlife
+    ipakrbt_functional_maxrenew
+}
 
 ipakrbt_mod()
 {
-    ipakrbt_mod_envsetup
     ipakrbt_mod_maxlife
     ipakrbt_mod_maxlife_negative
     ipakrbt_mod_maxrenew
     ipakrbt_mod_maxrenew_negative
     ipakrbt_mod_setattr
     ipakrbt_mod_setattr_negative
-    ipakrbt_mod_addattr
     ipakrbt_mod_addattr_negative
-    ipakrbt_mod_envcleanup
-} #ipakrbt_mod
+} 
+
+ipakrbt_reset()
+{
+    ipakrbt_reset_default
+}
 
 ######################
 # test cases         #
@@ -57,44 +49,26 @@ ipakrbt_mod()
 ipakrbt_envsetup()
 {
     rlPhaseStartSetup "ipakrbt_envsetup"
-        #environment setup starts here
 	create_ipauser $username $first $last $password
 	create_ipauser $gusername $first $last $password
-        #environment setup ends   here
     rlPhaseEnd
-} #ipakrbt_envsetup
+} 
 
 ipakrbt_envcleanup()
 {
     rlPhaseStartCleanup "ipakrbt_envcleanup"
-        #environment cleanup starts here
         KinitAsAdmin	
 	delete_user $username
 	delete_user $gusername
 	KinitAsAdmin
         rlRun "ipa krbtpolicy-reset" 0 "reset krbtpolicy to default - just in case!"
 	ipactl restart
-        #environment cleanup ends   here
     rlPhaseEnd
-} #ipakrbt_envcleanup
+} 
 
-ipakrbt_show_envsetup()
-{
-    rlPhaseStartSetup "ipakrbt_show_envsetup"
-        #environment setup starts here
-        rlPass "no special env setup required"
-        #environment setup ends   here
-    rlPhaseEnd
-} #ipakrbt_show_envsetup
-
-ipakrbt_show_envcleanup()
-{
-    rlPhaseStartCleanup "ipakrbt_show_envcleanup"
-        #environment cleanup starts here
-        rlPass "no special env clean up required"
-        #environment cleanup ends   here
-    rlPhaseEnd
-} #ipakrbt_show_envcleanup
+##################################################################################
+#  show tests
+##################################################################################
 
 ipakrbt_show()
 {
@@ -143,25 +117,11 @@ ipakrbt_show()
                 fi
         done
     rlPhaseEnd
-} #ipakrbt_show
+} 
 
-ipakrbt_functional_envsetup()
-{
-    rlPhaseStartSetup "ipakrbt_functional_envsetup"
-        #environment setup starts here
-	rlPass "No special setup required"
-        #environment setup ends   here
-    rlPhaseEnd
-}
-
-ipakrbt_functional_envcleanup()
-{
-    rlPhaseStartCleanup "ipakrbt_functional_envcleanup"
-        #environment cleanup starts here
-        rlPass "No special cleanup required"
-        #environment cleanup ends   here
-    rlPhaseEnd
-}
+##########################################################################################################
+#  Functional Tests
+##########################################################################################################
 
 ipakrbt_functional_maxlife()
 {
@@ -179,7 +139,7 @@ ipakrbt_functional_maxlife()
     rlPhaseEnd
 
 rlPhaseStartTest "ipakrbt_functional_maxlife_global"
-        local delay=30 # set maxlife of kerberos ticket life to 1 minute for test account
+        local delay=30 # set maxlife of kerberos ticket life to 30 for test account
         KinitAsAdmin
         rlRun "ipa krbtpolicy-mod --maxlife=$delay" 0 "set global maxlife to $delay second"
 	ipactl restart
@@ -190,7 +150,7 @@ rlPhaseStartTest "ipakrbt_functional_maxlife_global"
         rlRun "ipa user-find $gusername 2>&1 | grep -i 'Ticket expired' " 0 "expect 'user-find' to fail for 'Ticket expired' after [$delay] seconds"
         Kcleanup
     rlPhaseEnd
-} #ipakrbt_functional_maxlife
+} 
 
 ipakrbt_functional_maxrenew()
 {
@@ -250,407 +210,195 @@ ipakrbt_functional_maxrenew()
         rlRun "ipa user-find $gusername 2>&1 | grep -i 'Ticket expired' " 0 "expect 'user-find' to fail for 'Ticket expired' after [$maxlife] seconds"
         Kcleanup
      rlPhaseEnd
-} #ipakrbt_functional_maxrenew
+}
 
-ipakrbt_mod_envsetup()
-{
-    rlPhaseStartSetup "ipakrbt_mod_envsetup"
-        #environment setup starts here
-        create_user    
-        #environment setup ends   here
-    rlPhaseEnd
-} #ipakrbt_mod_envsetup
-
-ipakrbt_mod_envcleanup()
-{
-    rlPhaseStartCleanup "ipakrbt_mod_envcleanup"
-        #environment cleanup starts here
-        delete_user
-        #environment cleanup ends   here
-    rlPhaseEnd
-} #ipakrbt_mod_envcleanup
+################################################################################################
+#  Modify tests
+################################################################################################
 
 ipakrbt_mod_maxlife()
 {
-# looped data   : 
-# non-loop data : 
-    rlPhaseStartTest "ipakrbt_mod_maxlife"
-        rlLog "set the maxlife of kerberos ticket"
-        ipakrbt_mod_maxlife_logic
-    rlPhaseEnd
-} #ipakrbt_mod_maxlife
-
-ipakrbt_mod_maxlife_logic()
-{
-    # accept parameters: NONE
-    # test logic starts
-        rlLog "modify maxlife for given user"
+    rlPhaseStartTest "ipakrbt_mod_maxlife_user"
         KinitAsAdmin
         maxlife=$RANDOM
         rlRun "ipa krbtpolicy-mod $username --maxlife=$maxlife" 0 "set maxlife=[$maxlife] for [$username]"
-        if ipa krbtpolicy-show $username | grep "Max life: $maxlife$" 2>&1 >/dev/null
-        then
-            rlPass "value setting for [$username] success"
+        actualMaxlife=`read_maxlife $username`
+        if [ $actualMaxlife -eq $maxlife ] ; then
+            rlPass "user [$username] max ticket life value modified to [$maxlife] success"
         else
-            rlFail "set maxlife to [$maxlife] for [$username] failed"
+            rlFail "user [$username] max ticket life value modify failed, GOT: [$actualMaxlife] EXPECTED: [$maxlife]"
         fi
-        # FIXME;I need test the bahave of this policy to ensure it really works
+    rlPhaseEnd
 
-        rlLog "modify global krbtpolicy: maxlife "
+    rlPhaseStartTest "ipakrbt_mod_maxlife_global"
         maxlife=$RANDOM
-        rlRun "ipa krbtpolicy-mod --maxlife=$maxlife" 0 "set maxlife=[$maxlife] for [$username]"
-        if ipa krbtpolicy-show | grep "Max life: $maxlife$" 2>&1 >/dev/null
-        then
-            rlPass "value setting for global krbtpolicy success"
+	KinitAsAdmin
+        rlRun "ipa krbtpolicy-mod --maxlife=$maxlife" 0 "set maxlife=[$maxlife] for global policy"
+        actualMaxlife=`read_maxlife`
+        if [ $actualMaxlife -eq $maxlife ] ; then
+            rlPass "global max ticket life value modified to [$maxlife] success"
         else
-            rlFail "set global krbtpolicy : maxlife to [$maxlife] failed"
+            rlFail "global [$username] max ticket life value modify failed, GOT: [$actualMaxlife] EXPECTED: [$maxlife]"
         fi
-        # FIXME;I need test the bahave of this policy to ensure it really works
-
-    # test logic ends
-} # ipakrbt_mod_maxlife_logic 
+    rlPhaseEnd
+} 
 
 ipakrbt_mod_maxlife_negative()
 {
-# looped data   : 
-# non-loop data : 
     rlPhaseStartTest "ipakrbt_mod_maxlife_negative"
         rlLog "set the maxlife of kerberos ticket"
         KinitAsAdmin
         for value in -1 a ab abc
         do
-            ipakrbt_mod_maxlife_negative_logic $value
+        	rlRun "ipa krbtpolicy-mod $username --maxlife=$value" 1 "set maxlife=[$value] for [$username] expect to fail"
+        	rlRun "ipa krbtpolicy-mod --maxlife=$value" 1 "set maxlife=[$value] for global policy expect to fail"
         done
     rlPhaseEnd
-} #ipakrbt_mod_maxlife
-
-ipakrbt_mod_maxlife_negative_logic()
-{
-    # accept parameters: NONE
-    # test logic starts
-        rlLog "modify maxlife for given user negative test case"
-        local maxlife=$1
-        rlRun "ipa krbtpolicy-mod $username --maxlife=$maxlife" 1 "set maxlife=[$maxlife] for [$username] expect to fail"
-        rlLog "modify global maxlife - negative test case"
-        rlRun "ipa krbtpolicy-mod --maxlife=$maxlife" 1 "set maxlife=[$maxlife] for [$username] expect to fail"
-    # test logic ends
-} # ipakrbt_mod_maxlife_negative_logic 
+} 
 
 ipakrbt_mod_maxrenew()
 {
-# looped data   : 
-# non-loop data : 
-    rlPhaseStartTest "ipakrbt_mod_maxrenew"
-        rlLog "set max renew life of kerberos ticket"
-        ipakrbt_mod_maxrenew_logic
-    rlPhaseEnd
-} #ipakrbt_mod_maxrenew
-
-ipakrbt_mod_maxrenew_logic()
-{
-    # accept parameters: NONE
-    # test logic starts
-        rlLog "modify renew for given user"
+    rlPhaseStartTest "ipakrbt_mod_maxrenew_user"
         KinitAsAdmin
         maxrenew=$RANDOM
         rlRun "ipa krbtpolicy-mod $username --maxrenew=$maxrenew" 0 "set maxrenew=[$maxrenew] for [$username]"
-        if ipa krbtpolicy-show $username | grep "Max renew: $maxrenew$" 2>&1 >/dev/null
-        then
-            rlPass "value setting for [$username] success"
+        actualRenew=`read_renew $username`
+        if [ $actualRenew -eq $maxrenew ] ; then
+            rlPass "user [$username] max ticket renew life value modified to [$maxrenew] success"
         else
-            rlFail "set maxrenew to [$maxrenew] for [$username] failed"
+            rlFail "user [$username] max ticket renew life value modify failed, GOT: [$actualRenew] EXPECTED: [$maxrenew]"
         fi
-        # FIXME;I need test the bahave of this policy to ensure it really works
+    rlPhaseEnd
 
-        rlLog "modify global krbtpolicy: maxlife "
-        maxlife=$RANDOM
-        rlRun "ipa krbtpolicy-mod --maxrenew=$maxrenew" 0 "set maxlife=[$maxrenew] for [$username]"
-        if ipa krbtpolicy-show | grep "Max renew: $maxrenew$" 2>&1 >/dev/null
-        then
-            rlPass "value setting for global krbtpolicy success"
+    rlPhaseStartTest "ipakrbt_mod_maxrenew_global"
+        maxrenew=$RANDOM
+        KinitAsAdmin
+        rlRun "ipa krbtpolicy-mod --maxrenew=$maxrenew" 0 "set maxrenew=[$maxrenew] for global policy"
+        actualRenew=`read_renew`
+        if [ $actualRenew -eq $maxrenew ] ; then
+            rlPass "global max ticket renew life value modified to [$maxrenew] success"
         else
-            rlFail "set global krbtpolicy : maxrenew to [$maxrenew] failed"
+            rlFail "global max ticket renrew life value modify failed, GOT: [$actualRenew] EXPECTED: [$maxrenew]"
         fi
-        # FIXME;I need test the bahave of this policy to ensure it really works
-
-
-    # test logic ends
-} # ipakrbt_mod_maxrenew_logic 
+    rlPhaseEnd
+}
 
 ipakrbt_mod_maxrenew_negative()
 {
-# looped data   : 
-# non-loop data : 
     rlPhaseStartTest "ipakrbt_mod_maxrenew_negative"
         rlLog "set max renew life of kerberos ticket negative test case"
         KinitAsAdmin
         for value in -1 a ab abc
         do
-            ipakrbt_mod_maxrenew_negative_logic $value
+        	rlRun "ipa krbtpolicy-mod $username --maxrenew=$value" 1 "set maxrenew=[$value] for [$username]"
+        	rlRun "ipa krbtpolicy-mod --maxrenew=$value" 1 "set maxlife=[$value] for global policy"
         done
-        clear_kticket
     rlPhaseEnd
-} #ipakrbt_mod_maxrenew
+} 
 
-ipakrbt_mod_maxrenew__negative_logic()
-{
-    # accept parameters: NONE
-    # test logic starts
-        rlLog "modify renew for given user"
-        maxrenew=$1
-        rlRun "ipa krbtpolicy-mod $username --maxrenew=$maxrenew" 1 "set maxrenew=[$maxrenew] for [$username]"
-        rlLog "modify renew for global policy"
-        rlRun "ipa krbtpolicy-mod --maxrenew=$maxrenew" 1 "set maxlife=[$maxrenew] for [$username]"
-    # test logic ends
-} # ipakrbt_mod_maxrenew_negative_logic 
-
-ipakrbt_mod_maxrenew()
-{
-# looped data   : 
-# non-loop data : 
-    rlPhaseStartTest "ipakrbt_mod_maxrenew"
-        rlLog "set max renew life of kerberos ticket"
-        ipakrbt_mod_maxrenew_logic
-    rlPhaseEnd
-} #ipakrbt_mod_maxrenew
-
-ipakrbt_mod_maxrenew_logic()
-{
-    # accept parameters: NONE
-    # test logic starts
-        rlLog "modify renew for given user"
-        KinitAsAdmin
-        maxrenew=$RANDOM
-        rlRun "ipa krbtpolicy-mod $username --maxrenew=$maxrenew" 0 "set maxrenew=[$maxrenew] for [$username]"
-        if ipa krbtpolicy-show $username | grep "Max renew: $maxrenew$" 2>&1 >/dev/null
-        then
-            rlPass "value setting for [$username] success"
-        else
-            rlFail "set maxrenew to [$maxrenew] for [$username] failed"
-        fi
-        # FIXME;I need test the bahave of this policy to ensure it really works
-
-        rlLog "modify global krbtpolicy: maxlife "
-        maxlife=$RANDOM
-        rlRun "ipa krbtpolicy-mod --maxrenew=$maxrenew" 0 "set maxlife=[$maxrenew] for [$username]"
-        if ipa krbtpolicy-show | grep "Max renew: $maxrenew$" 2>&1 >/dev/null
-        then
-            rlPass "value setting for global krbtpolicy success"
-        else
-            rlFail "set global krbtpolicy : maxrenew to [$maxrenew] failed"
-        fi
-        # FIXME;I need test the bahave of this policy to ensure it really works
-
-
-    # test logic ends
-} # ipakrbt_mod_maxrenew_logic 
-
-ipakrbt_mod_maxrenew()
-{
-# looped data   : 
-# non-loop data : 
-    rlPhaseStartTest "ipakrbt_mod_maxrenew"
-        rlLog "set max renew life of kerberos ticket"
-        ipakrbt_mod_maxrenew_logic
-    rlPhaseEnd
-} #ipakrbt_mod_maxrenew
-
-ipakrbt_mod_maxrenew_logic()
-{
-    # accept parameters: NONE
-    # test logic starts
-        rlLog "modify renew for given user"
-        KinitAsAdmin
-        maxrenew=$RANDOM
-        rlRun "ipa krbtpolicy-mod $username --maxrenew=$maxrenew" 0 "set maxrenew=[$maxrenew] for [$username]"
-        if ipa krbtpolicy-show $username | grep "Max renew: $maxrenew$" 2>&1 >/dev/null
-        then
-            rlPass "value setting for [$username] success"
-        else
-            rlFail "set maxrenew to [$maxrenew] for [$username] failed"
-        fi
-        # FIXME;I need test the bahave of this policy to ensure it really works
-
-        rlLog "modify global krbtpolicy: maxlife "
-        maxlife=$RANDOM
-        rlRun "ipa krbtpolicy-mod --maxrenew=$maxrenew" 0 "set maxlife=[$maxrenew] for [$username]"
-        if ipa krbtpolicy-show | grep "Max renew: $maxrenew$" 2>&1 >/dev/null
-        then
-            rlPass "value setting for global krbtpolicy success"
-        else
-            rlFail "set global krbtpolicy : maxrenew to [$maxrenew] failed"
-        fi
-        # FIXME;I need test the bahave of this policy to ensure it really works
-
-
-    # test logic ends
-} # ipakrbt_mod_maxrenew_logic 
+########################################################################################################
+#  setattr and addattr tests
+########################################################################################################
 
 ipakrbt_mod_setattr()
 {
-# looped data   : 
-# non-loop data : 
-    rlPhaseStartTest "ipakrbt_mod_setattr"
-        rlLog "setattr"
-        ipakrbt_mod_setattr_logic
-    rlPhaseEnd
-} #ipakrbt_mod_setattr
-
-ipakrbt_mod_setattr_logic()
-{
-    # accept parameters: NONE
-    # test logic starts
-        attrs="krbmaxticketlife krbmaxrenewableage"
+    rlPhaseStartTest "ipakrbt_setattr_maxlife_user"
         KinitAsAdmin
-        for attr in $attrs
-        do
-            rlLog "setattr for given user"
-            value=$RANDOM
-            rlRun "ipa krbtpolicy-mod $username --setattr=$attr=$value" 0 "setattr: $attr=$value"
-            if ipa krbtpolicy-show --raw --all | grep "$attr" | grep "$value"
-            then
-                rlPass "set $attr=$value success"
-            else
-                rlFail "set $attr=$value failed"
-            fi
-            rlLOg "setattr for global policy"
-            value=$RANDOM
-            rlRun "ipa krbtpolicy-mod --setattr=$attr=$value" 0 "setattr: $attr=$value"
-            if ipa krbtpolicy-show --raw --all | grep "$attr" | grep "$value"
-            then
-                rlPass "set $attr=$value success"
-            else
-                rlFail "set $attr=$value failed"
-            fi
-        done
-        clear_kticket
-    # test logic ends
-} # ipakrbt_mod_setattr_logic 
+        maxlife=$RANDOM
+        rlRun "ipa krbtpolicy-mod $username --setattr=$maxlifeattr=$maxlife" 0 "set setattr [$maxlifeattr] to [$maxlife] for [$username]"
+        actualMaxlife=`read_maxlife $username`
+        if [ $actualMaxlife -eq $maxlife ] ; then
+            rlPass "user [$username] max ticket life value setattr $maxlifeattr to [$maxlife] success"
+        else
+            rlFail "user [$username] max ticket life value setattr $maxlifeattr failed, GOT: [$actualMaxlife] EXPECTED: [$maxlife]"
+        fi
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipakrbt_setattr_maxlife_global"
+        KinitAsAdmin 
+        maxlife=$RANDOM
+        rlRun "ipa krbtpolicy-mod --setattr=$maxlifeattr=$maxlife" 0 "set setattr [$maxlifeattr] to [$maxlife] for [$username]"
+	ipactl restart
+        actualMaxlife=`read_maxlife`
+        if [ $actualMaxlife -eq $maxlife ] ; then
+            rlPass "global max ticket life value setattr $maxlifeattr to [$maxlife] success"
+        else
+            rlFail "global max ticket life value setattr $maxlifeattr failed, GOT: [$actualMaxlife] EXPECTED: [$maxlife]"
+        fi  
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipakrbt_setattr_maxrenew_user"
+        KinitAsAdmin
+        maxrenew=$RANDOM
+        rlRun "ipa krbtpolicy-mod $username --setattr=$maxrenewattr=$maxrenew" 0 "set setattr [$maxrenewattr] to [$maxrenew] for [$username]"
+        actualMaxRenew=`read_renew $username`
+        if [ $actualMaxRenew -eq $maxrenew ] ; then
+            rlPass "user [$username] max ticket renew life value setattr $maxrenewattr to [$maxrenew] success"
+        else
+            rlFail "user [$username] max ticket renew life value setattr $maxrenewattr failed, GOT: [$actualMaxRenew] EXPECTED: [$maxrenew]"
+        fi
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipakrbt_setattr_maxrenew_global"
+        KinitAsAdmin
+        maxrenew=$RANDOM
+        rlRun "ipa krbtpolicy-mod --setattr=$maxrenewattr=$maxrenew" 0 "set setattr [$maxrenewattr] to [$maxrenew] for [$username]"
+	ipactl restart
+        actualMaxRenew=`read_renew`
+        if [ $actualMaxRenew -eq $maxrenew ] ; then
+            rlPass "global max ticket renew life value setattr $maxreneweattr to [$maxrenew] success"
+        else
+            rlFail "global max ticket renew life value setattr $maxrenewattr failed, GOT: [$actualRenew] EXPECTED: [$maxrenew]"
+        fi
+    rlPhaseEnd
+
+}
 
 ipakrbt_mod_setattr_negative()
 {
-# looped data   : 
-# non-loop data : 
     rlPhaseStartTest "ipakrbt_mod_setattr_negative"
-        rlLog "setattr"
         KinitAsAdmin
         for value in -1 a ab abc
         do
-            ipakrbt_mod_setattr_negative_logic $value
+                rlRun "ipa krbtpolicy-mod $username --setattr=$maxlifeattr=$value" 1 "set maxlife=[$value] for [$username] expect to fail"
+                rlRun "ipa krbtpolicy-mod --setattr=$maxlifeattr=$value" 1 "set maxlife=[$value] for global policy expect to fail"
         done
-        clear_kticket
+        Kcleanup
     rlPhaseEnd
-} #ipakrbt_mod_setattr_negative
-
-ipakrbt_mod_setattr_negative_logic()
-{
-    # accept parameters: NONE
-    # test logic starts
-        local value=$1
-        attrs="krbmaxticketlife krbmaxrenewableage"
-        for attr in $attrs
-        do
-            rlRun "ipa krbtpolicy-mod $username --setattr=$attr=$value" 1 "setattr: $attr=$value expect to fail"
-            rlRun "ipa krbtpolicy-mod --setattr=$attr=$value" 1 "setattr: $attr=$value expect to fail"
-        done
-    # test logic ends
-} # ipakrbt_mod_setattr_negative_logic 
-
-ipakrbt_mod_addattr()
-{
-# looped data   : 
-# non-loop data : 
-    rlPhaseStartTest "ipakrbt_mod_addattr"
-        rlLog "addattr"
-        ipakrbt_mod_addattr_logic
-    rlPhaseEnd
-} #ipakrbt_mod_addattr
-
-ipakrbt_mod_addattr_logic()
-{
-    # accept parameters: NONE
-    # test logic starts
-        # addattr only success for multi-value attribute, krbmaxticketlife and krbmaxrenewableage are single-value attributes
-        attrs="krbmaxticketlife krbmaxrenewableage"
-        KinitAsAdmin
-        for attr in $attrs
-        do
-            rlLog "addattr for given user"
-            value=$RANDOM
-            rlRun "ipa krbtpolicy-mod $username --addattr=$attr=$value" 1 "addattr: $attr=$value"
-            if ipa krbtpolicy-show $username --raw --all | grep "$attr" | grep "$value"
-            then
-                rlFail "add $attr=$value success for single-value attribute is not expected"
-            else
-                rlPass "add $attr=$value failed for single-value attribute is expected"
-            fi
-
-            rlLog "addattr for global policy"
-            value=$RANDOM
-            rlRun "ipa krbtpolicy-mod --addattr=$attr=$value" 1 "addattr: $attr=$value"
-            if ipa krbtpolicy-show --raw --all | grep "$attr" | grep "$value"
-            then
-                rlFail "add $attr=$value success for single-value attribute is not expected"
-            else
-                rlPass "add $attr=$value failed for single-value attribute is expected"
-            fi
-        done
-        clear_kticket
-    # test logic ends
-} # ipakrbt_mod_addattr_logic 
+} 
 
 ipakrbt_mod_addattr_negative()
 {
-# looped data   : 
-# non-loop data : 
-    rlPhaseStartTest "ipakrbt_mod_addattr_negative"
-        rlLog "addattr"
+    rlPhaseStartTest "ipakrbt_mod_addattr_maxlife_user_negative"
         KinitAsAdmin
-        for value in -1 a ab abc
-        do
-            ipakrbt_mod_addattr_negative_logic $value
-        done
-        clear_kticket
+	expmsg="krbmaxticketlife: Only one value allowed"
+	rlRun "ipa krbtpolicy-mod $username --addattr=$maxlifeattr=100 2>&1 | grep -i '$expmsg' " 0 "addattr for user attribute [$maxlifeattr] should fail with message: \"$expmsg\""
     rlPhaseEnd
-} #ipakrbt_mod_addattr_negative
 
-ipakrbt_mod_addattr_negative_logic()
-{
-    # accept parameters: NONE
-    # test logic starts
-        # addattr only success for multi-value attribute, krbmaxticketlife and krbmaxrenewableage are single-value attributes
-        local value=$1
-        attrs="krbmaxticketlife krbmaxrenewableage"
-        for attr in $attrs
-        do
-            rlRun "ipa krbtpolicy-mod $username --addattr=$attr=$value" 1 "addattr: $attr=$value"
-            rlRun "ipa krbtpolicy-mod --addattr=$attr=$value" 1 "addattr: $attr=$value"
-        done
-        clear_kticket
-    # test logic ends
-} # ipakrbt_mod_addattr_negative_logic
-
-ipakrbt_reset_envsetup()
-{
-    rlPhaseStartSetup "ipakrbt_reset_envsetup"
-        #environment setup starts here
-	rlPass "No special setup required"
-        #environment setup ends   here
+    rlPhaseStartTest "ipakrbt_mod_addattr_maxlife_global_negative"
+        KinitAsAdmin
+        expmsg="$maxlifeattr: Only one value allowed"
+        rlRun "ipa krbtpolicy-mod --addattr=$maxlifeattr=100 2>&1 | grep -i '$expmsg' " 0 "addattr for global policy attribute [$maxlifeattr] should fail with message: \"$expmsg\""
     rlPhaseEnd
-} #ipakrbt_reset_envsetup
 
-ipakrbt_reset_envcleanup()
-{
-    rlPhaseStartCleanup "ipakrbt_reset_envcleanup"
-        #environment cleanup starts here
-	rlPass "No special cleanup required"
-        #environment cleanup ends   here
+    rlPhaseStartTest "ipakrbt_mod_addattr_maxrenew_user_negative"
+        KinitAsAdmin
+        expmsg="$maxrenewattr: Only one value allowed"
+        rlRun "ipa krbtpolicy-mod $username --addattr=$maxrenewattr=100 2>&1 | grep -i '$expmsg' " 0 "addattr for user attribute [$maxlifeattr] should fail with message: \"$expmsg\""
     rlPhaseEnd
-} #ipakrbt_reset_envcleanup
 
+    rlPhaseStartTest "ipakrbt_mod_addattr_maxrenew_global_negative"
+        KinitAsAdmin
+        expmsg="$maxrenewattr: Only one value allowed"
+        rlRun "ipa krbtpolicy-mod --addattr=$maxrenewattr=100 2>&1 | grep -i '$expmsg' " 0 "addattr for global policy attribute [$maxrenewattr] should fail with message: \"$expmsg\""
+    rlPhaseEnd
+}
+
+###############################################################################################
+#  reset tests
+###############################################################################################
 ipakrbt_reset_default()
 {
-
     rlPhaseStartTest "restore the global krbtpolicy"
         KinitAsAdmin
         maxlife=$RANDOM
@@ -722,6 +470,6 @@ ipakrbt_reset_default()
             rlFail "renew reset failed. GOT: [$actualRenew] EXPECTED: [$actualRenew]"
         fi
     rlPhaseEnd
-} # ipakrbt_reset_default
+}
 
 
