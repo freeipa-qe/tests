@@ -772,10 +772,10 @@ rlJournalStart
 	rlRun "deleteGroup fish" 0 "Cleanup: Deleting group fish."
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-cli-64: Add 25 groups and test find returns limit of 20"
-	rlRun "ipa config-mod --searchrecordslimit=20" 0 "Set default search records limit to 20"
+    rlPhaseStartTest "ipa-group-cli-64: Add 10 groups and test find returns limit of 5"
+	rlRun "ipa config-mod --searchrecordslimit=5" 0 "Set default search records limit to 5"
 	i=1
-	while [ $i -le 25 ] ; do
+	while [ $i -le 10 ] ; do
 		addGroup Group$i Group$i
 		let i=$i+1
 	done
@@ -783,10 +783,10 @@ rlJournalStart
 	ipa group-find > /tmp/groupfind.out
         result=`cat /tmp/groupfind.out | grep "Number of entries returned"`
         number=`echo $result | cut -d " " -f 5`
-        if [ $number -eq 20 ] ; then
-                rlPass "20 groups returned as expected with size limit of 0"
+        if [ $number -eq 5 ] ; then
+                rlPass "5 groups returned as expected with size limit of 0"
         else
-                rlFail "Number of groups returned is not as expected.  GOT: $number EXP: 20"
+                rlFail "Number of groups returned is not as expected.  GOT: $number EXP: 5"
         fi
     rlPhaseEnd
 
@@ -794,10 +794,10 @@ rlJournalStart
 	ipa group-find --sizelimit=0 > /tmp/groupfind.out
 	result=`cat /tmp/groupfind.out | grep "Number of entries returned"`
 	number=`echo $result | cut -d " " -f 5`
-	if [ $number -eq 28 ] ; then
+	if [ $number -eq 13 ] ; then
 		rlPass "All groups returned as expected with size limit of 0"
 	else
-		rlFail "Number of groups returned is not as expected.  GOT: $number EXP: 28"
+		rlFail "Number of groups returned is not as expected.  GOT: $number EXP: 13"
 	fi
     rlPhaseEnd
 
@@ -812,25 +812,25 @@ rlJournalStart
         fi
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-cli-67: find 16 groups"
-        ipa group-find --sizelimit=16 > /tmp/groupfind.out
+    rlPhaseStartTest "ipa-group-cli-67: find 9 groups"
+        ipa group-find --sizelimit=9 > /tmp/groupfind.out
         result=`cat /tmp/groupfind.out | grep "Number of entries returned"`
         number=`echo $result | cut -d " " -f 5`
-        if [ $number -eq 16 ] ; then
-                rlPass "All group returned as expected with size limit of 16"
+        if [ $number -eq 9 ] ; then
+                rlPass "All group returned as expected with size limit of 9"
         else
-                rlFail "Number of groups returned is not as expected.  GOT: $number EXP: 16"
+                rlFail "Number of groups returned is not as expected.  GOT: $number EXP: 9"
         fi
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-group-cli-68: find more groups than exist"
-	ipa group-find --sizelimit=200 > /tmp/groupfind.out
+	ipa group-find --sizelimit=20 > /tmp/groupfind.out
         result=`cat /tmp/groupfind.out | grep "Number of entries returned"`
         number=`echo $result | cut -d " " -f 5`
-        if [ $number -eq 28 ] ; then
-                rlPass "All group returned as expected with size limit of 200"
+        if [ $number -eq 13 ] ; then
+                rlPass "All group returned as expected with size limit of 20"
         else
-                rlFail "Number of groups returned is not as expected.  GOT: $number EXP: 28"
+                rlFail "Number of groups returned is not as expected.  GOT: $number EXP: 13"
         fi
     rlPhaseEnd
 
@@ -846,10 +846,10 @@ rlJournalStart
         ipa group-find --timelimit=0 > /tmp/groupfind.out
         result=`cat /tmp/groupfind.out | grep "Number of entries returned"`
         number=`echo $result | cut -d " " -f 5`
-        if [ $number -eq 20 ] ; then
-                rlPass "Limit of 20 groups returned as expected with time limit of 0"
+        if [ $number -eq 5 ] ; then
+                rlPass "Limit of 5 groups returned as expected with time limit of 0"
         else
-                rlFail "Number of groups returned is not as expected.  GOT: $number EXP: 20"
+                rlFail "Number of groups returned is not as expected.  GOT: $number EXP: 5"
         fi
     rlPhaseEnd
 
@@ -866,7 +866,7 @@ rlJournalStart
 	rlRun "ipa user-del trex" 0 "Deleting user trex."
 	rlRun "ipa user-del mdolphin" 0 "Deleting user mdolphin."
         i=1
-        while [ $i -le 25 ] ; do
+        while [ $i -le 10 ] ; do
                 deleteGroup Group$i
                 let i=$i+1
         done
