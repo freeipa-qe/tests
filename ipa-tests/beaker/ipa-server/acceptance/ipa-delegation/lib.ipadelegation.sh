@@ -1,5 +1,6 @@
 #!/bin/sh
 # lib used for ipa permission test
+. /dev/shm/ipa-server-shared.sh
 
 #global variables for permission test
 testGroup="permissiongroup$RANDOM"
