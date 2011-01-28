@@ -58,7 +58,7 @@ PACKAGE="ipa-admintools"
 
 rlJournalStart
     rlPhaseStartSetup "ipa-host-cli-startup: Check for admintools package and Kinit"
-	rpm -qa | grep ipa-admintools
+	rpm -qa | grep $PACKAGE
 	if [ $? -eq 0 ] ; then
 		rlPass "ipa-admintools package is installed"
 	else
@@ -342,16 +342,16 @@ rlJournalStart
 	deleteHost $myhost
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-host-cli-34: Add 20 hosts and test find returns all"
-	rlRun "ipa config-mod --searchrecordslimit=20" 0 "Set search records limit to 20"
+    rlPhaseStartTest "ipa-host-cli-34: Add 10 hosts and test find returns search limit"
+	rlRun "ipa config-mod --searchrecordslimit=5" 0 "Set search records limit to 5"
         i=1
-        while [ $i -le 25 ] ; do
+        while [ $i -le 10 ] ; do
                 addHost host$i.$RELM
                 let i=$i+1
         done
         number=`getNumberOfHosts`
-	if [ $number -ne 20 ] ; then
-		rlFail "Number of hosts returned is not as expected.  GOT: $number EXP: 20"
+	if [ $number -ne 5 ] ; then
+		rlFail "Number of hosts returned is not as expected.  GOT: $number EXP: 5"
 	else
 		rlPass "Number of hosts returned is as expected"
 	fi
@@ -361,43 +361,43 @@ rlJournalStart
         ipa host-find --sizelimit=0 > /tmp/hostfind.out
         result=`cat /tmp/hostfind.out | grep "Number of entries returned"`
         number=`echo $result | cut -d " " -f 5`
-        if [ $number -eq 26 ] ; then
+        if [ $number -eq 11 ] ; then
                 rlPass "All hosts returned as expected with size limit of 0"
         else
-                rlFail "Number of hosts returned is not as expected.  GOT: $number EXP: 26"
+                rlFail "Number of hosts returned is not as expected.  GOT: $number EXP: 11"
         fi
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-host-cli-36: find 10 hosts"
-        ipa host-find --sizelimit=10 > /tmp/hostfind.out
+    rlPhaseStartTest "ipa-host-cli-36: find 7 hosts"
+        ipa host-find --sizelimit=7 > /tmp/hostfind.out
         result=`cat /tmp/hostfind.out | grep "Number of entries returned"`
         number=`echo $result | cut -d " " -f 5`
-        if [ $number -eq 10 ] ; then
-                rlPass "Number of hosts returned as expected with size limit of 10"
+        if [ $number -eq 7 ] ; then
+                rlPass "Number of hosts returned as expected with size limit of 7"
         else
-                rlFail "Number of hosts returned is not as expected.  GOT: $number EXP: 10"
+                rlFail "Number of hosts returned is not as expected.  GOT: $number EXP: 7"
         fi
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-host-cli-37: find 17 groups"
-        ipa host-find --sizelimit=17 > /tmp/hostfind.out
+    rlPhaseStartTest "ipa-host-cli-37: find 9 groups"
+        ipa host-find --sizelimit=9 > /tmp/hostfind.out
         result=`cat /tmp/hostfind.out | grep "Number of entries returned"`
         number=`echo $result | cut -d " " -f 5`
-        if [ $number -eq 17 ] ; then
-                rlPass "Number of hosts returned as expected with size limit of 17"
+        if [ $number -eq 9 ] ; then
+                rlPass "Number of hosts returned as expected with size limit of 9"
         else
-                rlFail "Number of hosts returned is not as expected.  GOT: $number EXP: 17"
+                rlFail "Number of hosts returned is not as expected.  GOT: $number EXP: 9"
         fi
     rlPhaseEnd
 
 rlPhaseStartTest "ipa-host-cli-38: find more hosts than exist"
-        ipa host-find --sizelimit=300 > /tmp/hostfind.out
+        ipa host-find --sizelimit=30 > /tmp/hostfind.out
         result=`cat /tmp/hostfind.out | grep "Number of entries returned"`
         number=`echo $result | cut -d " " -f 5`
-        if [ $number -eq 26 ] ; then
-                rlPass "All hosts returned as expected with size limit of 300"
+        if [ $number -eq 11 ] ; then
+                rlPass "All hosts returned as expected with size limit of 11"
         else
-                rlFail "Number of hosts returned is not as expected.  GOT: $number EXP: 26"
+                rlFail "Number of hosts returned is not as expected.  GOT: $number EXP: 11"
         fi
     rlPhaseEnd
 
@@ -413,10 +413,10 @@ rlPhaseStartTest "ipa-host-cli-38: find more hosts than exist"
         ipa host-find --timelimit=0 > /tmp/hostfind.out
         result=`cat /tmp/hostfind.out | grep "Number of entries returned"`
         number=`echo $result | cut -d " " -f 5`
-        if [ $number -eq 20 ] ; then
-                rlPass "20 hosts returned as expected with time limit of 0"
+        if [ $number -eq 5 ] ; then
+                rlPass "5 hosts returned as expected with time limit of 0"
         else
-                rlFail "Number of hosts returned is not as expected.  GOT: $number EXP: 20"
+                rlFail "Number of hosts returned is not as expected.  GOT: $number EXP: 5"
         fi
     rlPhaseEnd
 
@@ -518,10 +518,33 @@ rlPhaseStartTest "ipa-host-cli-38: find more hosts than exist"
 	rlRun "findHost $myhost" 1 "Verifying host was deleted."
     rlPhaseEnd
 
+    rlPhaseStartTest "ipa-host-cli-51: Add host with DNS Record --no-reverse"
+        short=myhost
+        myhost=$short.$RELM
+        rzone=`getReverseZone`
+        rlLog "Reverse Zone: $rzone"
+        if [ $rzone ] ; then
+                oct=`echo $rzone | cut -d "i" -f 1`
+                oct1=`echo $oct | cut -d "." -f 3`
+                oct2=`echo $oct | cut -d "." -f 2`
+                oct3=`echo $oct | cut -d "." -f 1`
+                ipaddr=$oct1.$oct2.$oct3.99
+                export ipaddr
+                rlRun "ipa host-add --ip-address=$ipaddr --no-reverse $myhost" 0 "Adding host with IP Address $ipaddr and no reverse entry"
+                rlRun "findHost $myhost" 0 "Verifying host was added with IP Address."
+                rlRun "ipa dnsrecord-find $RELM $short" 0 "Checking for forward DNS entry"
+                rlRun "ipa dnsrecord-find $rzone 99" 1 "Checking for reverse DNS entry"
+		rlRun "ipa host-del --updatedns $myhost" 0 "cleanup - delete $myhost"
+        else
+                rlFail "Reverse DNS zone not found."
+        fi
+    rlPhaseEnd
+
+
     rlPhaseStartCleanup "ipa-host-cli-cleanup: Destroying admin credentials."
 	rlRun "ipa config-mod --searchrecordslimit=100" 0 "set search records limit back to default"
         i=1
-        while [ $i -le 25 ] ; do
+        while [ $i -le 10 ] ; do
                 deleteHost host$i.$RELM
                 let i=$i+1
         done
