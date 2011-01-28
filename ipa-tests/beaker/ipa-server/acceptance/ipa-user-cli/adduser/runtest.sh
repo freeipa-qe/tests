@@ -203,22 +203,22 @@ rlJournalStart
 	ipa user-del uid0
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-user-cli-add-015: Add 100 users and test find returns all"
+    rlPhaseStartTest "ipa-user-cli-add-015: Add 10 users and test find returns limit of 5"
         i=1
-        while [ $i -le 25 ] ; do
+        while [ $i -le 10 ] ; do
                 ipa user-add --first=user$i --last=user$i user$i
                 let i=$i+1
         done
 
 	# find should return up to the maxlimit set
-	rlRun "ipa config-mod --searchrecordslimit=20" 0 "Set search recordss limit to 20"
+	rlRun "ipa config-mod --searchrecordslimit=5" 0 "Set search records limit to 5"
         ipa user-find > /tmp/userfind.out
         result=`cat /tmp/userfind.out | grep "Number of entries returned"`
         number=`echo $result | cut -d " " -f 5`
-        if [ $number -eq 20 ] ; then
-                rlPass "20 users returned as expected with no size limit set"
+        if [ $number -eq 5 ] ; then
+                rlPass "5 users returned as expected with no size limit set"
         else
-                rlFail "Number of users returned is not as expected.  GOT: $number EXP: 20"
+                rlFail "Number of users returned is not as expected.  GOT: $number EXP: 5"
         fi
 
     rlPhaseEnd
@@ -227,43 +227,43 @@ rlJournalStart
         ipa user-find --sizelimit=0 > /tmp/userfind.out
         result=`cat /tmp/userfind.out | grep "Number of entries returned"`
         number=`echo $result | cut -d " " -f 5`
-        if [ $number -eq 28 ] ; then
+        if [ $number -eq 13 ] ; then
                 rlPass "All users returned as expected with size limit of 0"
         else
-                rlFail "Number of users returned is not as expected.  GOT: $number EXP: 28"
+                rlFail "Number of users returned is not as expected.  GOT: $number EXP: 13"
         fi
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-user-cli-add-017: find 15 users"
-        ipa user-find --sizelimit=15 > /tmp/userfind.out
+    rlPhaseStartTest "ipa-user-cli-add-017: find 7 users"
+        ipa user-find --sizelimit=7 > /tmp/userfind.out
         result=`cat /tmp/userfind.out | grep "Number of entries returned"`
         number=`echo $result | cut -d " " -f 5`
-        if [ $number -eq 15 ] ; then
-                rlPass "Number of users returned as expected with size limit of 15"
+        if [ $number -eq 7 ] ; then
+                rlPass "Number of users returned as expected with size limit of 7"
         else
-                rlFail "Number of users returned is not as expected.  GOT: $number EXP: 15"
+                rlFail "Number of users returned is not as expected.  GOT: $number EXP: 7"
         fi
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-user-cli-add-018: find 19 users"
-        ipa user-find --sizelimit=19 > /tmp/userfind.out
+    rlPhaseStartTest "ipa-user-cli-add-018: find 9 users"
+        ipa user-find --sizelimit=9 > /tmp/userfind.out
         result=`cat /tmp/userfind.out | grep "Number of entries returned"`
         number=`echo $result | cut -d " " -f 5`
-        if [ $number -eq 19 ] ; then
-                rlPass "Number of users returned as expected with size limit of 19"
+        if [ $number -eq 9 ] ; then
+                rlPass "Number of users returned as expected with size limit of 9"
         else
-                rlFail "Number of userss returned is not as expected.  GOT: $number EXP: 19"
+                rlFail "Number of userss returned is not as expected.  GOT: $number EXP: 9"
         fi
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-user-cli-add-019: find more users than exist"
-        ipa user-find --sizelimit=300 > /tmp/userfind.out
+        ipa user-find --sizelimit=30 > /tmp/userfind.out
         result=`cat /tmp/userfind.out | grep "Number of entries returned"`
         number=`echo $result | cut -d " " -f 5`
-        if [ $number -eq 28 ] ; then
-                rlPass "All users returned as expected with size limit of 300"
+        if [ $number -eq 13 ] ; then
+                rlPass "All users returned as expected with size limit of 30"
         else
-                rlFail "Number of users returned is not as expected.  GOT: $number EXP: 28"
+                rlFail "Number of users returned is not as expected.  GOT: $number EXP: 13"
         fi
     rlPhaseEnd
 
@@ -279,10 +279,10 @@ rlJournalStart
         ipa user-find --timelimit=0 > /tmp/userfind.out
         result=`cat /tmp/userfind.out | grep "Number of entries returned"`
         number=`echo $result | cut -d " " -f 5`
-        if [ $number -eq 20 ] ; then
-                rlPass "20 users returned as expected with time limit of 0"
+        if [ $number -eq 5 ] ; then
+                rlPass "5 users returned as expected with time limit of 0"
         else
-                rlFail "Number of users returned is not as expected.  GOT: $number EXP: 20"
+                rlFail "Number of users returned is not as expected.  GOT: $number EXP: 5"
         fi
     rlPhaseEnd
 
@@ -304,11 +304,11 @@ rlJournalStart
                 rlFail "Number of users returned is not as expected.  GOT: $number EXP: 1"
         fi
 
-        ipa user-find --last=user25 > /tmp/userfind.out
+        ipa user-find --last=user10 > /tmp/userfind.out
         result=`cat /tmp/userfind.out | grep "Number of entries returned"`
         number=`echo $result | cut -d " " -f 5`
         if [ $number -eq 1 ] ; then
-                rlPass "Number of users returned as expected with --last=user25 - 1"
+                rlPass "Number of users returned as expected with --last=user10 - 1"
         else
                 rlFail "Number of users returned is not as expected.  GOT: $number EXP: 1"
         fi
@@ -319,16 +319,16 @@ rlJournalStart
         ipa user-find --shell=/bin/sh > /tmp/userfind.out
         result=`cat /tmp/userfind.out | grep "Number of entries returned"`
         number=`echo $result | cut -d " " -f 5`
-        if [ $number -eq 20 ] ; then
-                rlPass "Number of users returned as expected with --shell=/bin/sh - 20"
+        if [ $number -eq 5 ] ; then
+                rlPass "Number of users returned as expected with --shell=/bin/sh - 5"
         else
-                rlFail "Number of users returned is not as expected.  GOT: $number EXP: 20"
+                rlFail "Number of users returned is not as expected.  GOT: $number EXP: 5"
         fi
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-user-cli-add-025: Delete Users"
 	i=1
-        while [ $i -le 25 ] ; do
+        while [ $i -le 10 ] ; do
                 ipa user-del user$i
 		command="ipa user-show user$i"
                 expmsg="ipa: ERROR: user$i: user not found"
