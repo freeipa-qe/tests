@@ -52,10 +52,16 @@ rlJournalStart
 			sleep 2
 			yum -y install wget 
 		fi
-		rlRun "cd /etc/yum.repos.d;wget http://jdennis.fedorapeople.org/ipa-devel/ipa-devel-fedora.repo"
+		grep Fedora /etc/redhat-release
+		if [ $? -eq 0 ]; then
+			rlRun "cd /etc/yum.repos.d;wget http://jdennis.fedorapeople.org/ipa-devel/ipa-devel-fedora.repo" 0 "downloading ipa repo"
+		else
+			rlRun "cd /etc/yum.repos.d;wget http://jdennis.fedorapeople.org/ipa-devel/ipa-devel-rhel.repo" 0 "downloading ipa repo"
+		fi
+	
 		#rlRun "cd /etc/yum.repos.d;wget http://apoc.dsdev.sjc.redhat.com/tet/ipa-fedora.repo"
-		rlRun "rm -f /dev/shm/set*.exp"
-		rlRun "cd /dev/shm;wget http://apoc.dsdev.sjc.redhat.com/tet/sssd/tests/ipa-server/acceptance/install/set-root-pw.exp"
+		rlRun "rm -f /dev/shm/set*.exp" 0 "removing all old expect scripts"
+		rlRun "cd /dev/shm;wget http://apoc.dsdev.sjc.redhat.com/tet/sssd/tests/ipa-server/acceptance/install/set-root-pw.exp" 0 "getting root password reset script"
 #		rlRun "expect /dev/shm/set-root-pw.exp"
 #		rlRun "yum clean"
 		# Run yum install 3 times because the repos are flaky
