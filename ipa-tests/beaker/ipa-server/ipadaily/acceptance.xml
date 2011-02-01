@@ -18,9 +18,7 @@
 					<distro_arch op="=" value="x86_64"/>
 				</and>
 			</distroRequires>
-			<hostRequires>
-				<and/>
-			</hostRequires>
+			<hostRequires/>
 			<repos>
 			 <repo name="ipa" url="http://jdennis.fedorapeople.org/ipa-devel/fedora/14/x86_64/os/"/>
 			 <repo name="beaker-harness" url="http://beaker-stage.app.eng.bos.redhat.com/harness/Fedora14/\$basearch"/>
@@ -36,7 +34,6 @@
                         <task name="/CoreOS/ipa-server/shared" role="STANDALONE">
                                <params/>
                         </task>
-
 			<task name="/CoreOS/ipa-server/acceptance/install" role="MASTER">
 				<params/>
 			</task>
@@ -67,14 +64,12 @@
 			<task name="/CoreOS/ipa-server/acceptance/nis-cli" role="MASTER">
 				<params/>
 			</task>
-			<task>
 			<task name="/CoreOS/ipa-server/acceptance/ipa-get-rm-keytab" role="MASTER">
 				<params/>
 			</task>
 			<task name="/CoreOS/ipa-server/acceptance/uninstall" role="STANDALONE">
 				<params/>
 			</task>
-
 		</recipe>
 	</recipeSet>
 </job>
