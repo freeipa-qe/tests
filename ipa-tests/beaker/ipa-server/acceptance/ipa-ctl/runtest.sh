@@ -301,7 +301,7 @@ rlJournalStart
 		rlRun "ps xa | grep -v grep |grep pki-ca" 0 "Checking to ensure that pki-cad is still running"	
         rlPhaseEnd
 
-        rlPhaseStartTest "ipa-ctl-23: start services as non-root user"
+        rlPhaseStartTest "ipa-ctl-24: start services as non-root user"
 		rlRun "ipactl stop" 0 "Stop services as root first"
                 rlRun "su testuserqa -c 'ipactl start'" 1 "Insufficient rights, starting service as nonprivileged user"
                 rlRun "ps xa | grep -v grep |grep httpd" 1 "Checking to ensure that httpd is NOT running"
@@ -312,7 +312,7 @@ rlJournalStart
                 rlRun "ps xa | grep -v grep |grep pki-ca" 1 "Checking to ensure that pki-cad is NOT running"
         rlPhaseEnd
 
-rlPhaseStartTest "ipa-ctl-23: restart services as non-root user"
+rlPhaseStartTest "ipa-ctl-25: restart services as non-root user"
                 rlRun "ipactl start" 0 "Start services as root first"
 		getServicePIDs
                 rlRun "su testuserqa -c 'ipactl restart'" 1 "Insufficient rights, starting service as nonprivileged user"
@@ -367,14 +367,43 @@ rlPhaseStartTest "ipa-ctl-23: restart services as non-root user"
                 else
                         rlFail "pki-ca was restarted"
                 fi
+
+		# work around for DS bug
+		getServicePIDs
+		RELMPID=`cat /tmp/slapd_$RELM.out`
+		PKIPID=`cat /tmp/slapd_PKI.out`
+		rlLog "$RELM PID: $RELMPID  PKI PID: $PKIPID"
+		kill -9 $RELMPIK $PKIPID
+		service dirsrv start
+		service dirsrv stop
+		ipactl start
+
+        rlPhaseEnd
+
+        rlPhaseStartTest "ipa-ctl-26: bugzilla 674196 - incorrect status when directory server pki instance not running"
+		rlRun "service dirsrv stop PKI-IPA" 0 "stop the directory server PKI-IPA instance"
+		rlRun "ipactl status > /tmp/status.out" 0 "get ipa services status"
+		cat /tmp/status.out | grep "Directory Service: STOPPED"
+		if [ $? -eq 0 ] ; then
+			rlPass "Found: \"Directory Service: STOPPED\""
+		else
+			rlFail "\"Directory Service: STOPPED\" not found"
+		fi
+		rlRun "service dirsrv start PKI-IPA" 0 "restart the directory server PKI-IPA instance"
+        rlPhaseEnd
+
+        rlPhaseStartTest "ipa-ctl-27: bugzilla 674342 - ipactl status return code 0 on error"
+		rlRun "service dirsrv stop $RELM" 0 "stop the $RELM directory server instance"
+		rlRun "ipactl status" 1 "Get the status of ipactl service and verify non zero return code"
+		rlRun "service dirsrv start $RELM" 0 "restart the $RELM directory server instance"
         rlPhaseEnd
 
     rlPhaseStartCleanup "ipa-ctl cleanup"
 	rlRun "userdel -fr testuserqa" 0 "Remove test user"
-	rlServiceRestore "ipa"
 	PID=`ps -ef | grep slapd | grep -i $RELM | awk '{print $2}'`
 	kill -9 $PID
 	service dirsrv restart
+	ipactl start
     rlPhaseEnd
 
   rlJournalPrintText
