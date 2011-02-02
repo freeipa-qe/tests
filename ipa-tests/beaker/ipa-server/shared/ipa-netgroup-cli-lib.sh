@@ -63,7 +63,7 @@ delNetgroup()
 	ngname=$1
 	rc=0	
 
-	echo "running ipa netgroup-add --desc=$2 --addattr=\'$3\' $1"
+	echo "running ipa netgroup-del --desc=$2 --addattr=\'$3\' $1"
 	ipa netgroup-del $1
 	rc=$?
 	
