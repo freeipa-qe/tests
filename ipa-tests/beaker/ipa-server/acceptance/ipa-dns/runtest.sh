@@ -107,7 +107,7 @@ fi
 
 # incomplete
 	rlPhaseStartTest "ipa-dns-06: ensure that the reverse ip of the new fakehost is resolvable by dns-show"
-		rlRun "ipa dns-sh $DOMAIN newfakehost$newip" 0 "Checking to ensure that ipa dnsrecord-show gives the reverse for fakehost"
+		rlRun "ipa dns-show $DOMAIN newfakehost$newip" 0 "Checking to ensure that ipa dnsrecord-show gives the reverse for fakehost"
 	rlPhaseEnd
 
 	
@@ -220,14 +220,20 @@ fi
 	a="1.2.3.4"
 	a2="1.2.3.4,2.3.4.5"
 	aaaa="fec0:0:a10:6000:10:16ff:fe98:193"
+	aaaabad1="bada:aaaa:real:ly:bad:dude:extr:a"
+	aaaabad2="aaaa:bbbb:cccc:dddd:eeee:fffff"
 	afsdb="green.femto.edu."
+	certa="PGP 0 0"
+	cert="mQGiBECBGdARUDlCcltS/8Xtw=="
 	cname="m.l.k."
+	dname="bar.$zone."
 	txt="none=1.2.3.4"
 	mx="9.78.7.6"
 	ptroctet="4.4.4"
 	ptrzone="$ptroctet.in-addr.arpa"
 	ptr="8"
 	ptrvalue="in.awesome.domain."
+	srva="0 100 389"
 	srv="why.go.here.com."
 	naptr='E2U+msg" "!^.*$!mailto:info@example.com!'
 	
@@ -338,6 +344,8 @@ fi
 		rlRun "dig aaaa.$zone AAAA | grep $aaaa" 1 "make sure dig can not find the AAAA record"
 	rlPhaseEnd
 
+	# There are negitive test cases for AAAA records starting at test #113
+
 	# Type afsbd
 	rlPhaseStartTest "ipa-dns-52: add record of type afsdb"
 		rlRun "ipa dnsrecord-add $zone afsdb --afsdb-rec $afsdb" 0 "add record type afsdb"
@@ -416,7 +424,7 @@ fi
 
 	# SRV Record
 	rlPhaseStartTest "ipa-dns-70: add record of type srv"
-		rlRun "ipa dnsrecord-add $zone _srv --srv-rec $srv" 0 "add record type srv"
+		rlRun "ipa dnsrecord-add $zone _srv --srv-rec \"$srva $srv\"" 0 "add record type srv"
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-71: make sure that IPA saved record type srv"
@@ -594,6 +602,112 @@ fi
 	rlPhaseEnd
 
 
+	# Neg AAAA tests
+	rlPhaseStartTest "ipa-dns-113: add record of type bad AAAA"
+		rlRun "ipa dnsrecord-add $zone aaaab --aaaa-rec $aaaabad1" 1 "add a bad record type AAAA"
+	rlPhaseEnd
+ 	
+	rlPhaseStartTest "ipa-dns-114: make sure that IPA did not save record type AAAA"
+		rlRun "ipa dnsrecord-find $zone aaaab | grep $aaaabad1" 1 "make sure ipa did not record type AAAA"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-115: make sure that dig can not find the record type AAAA"
+		rlRun "dig aaaab.$zone | grep $aaaabad1" 1 "make sure dig can not find the AAAA record"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-116: add record of type bad AAAA"
+		rlRun "ipa dnsrecord-add $zone aaaac --aaaa-rec $aaaabad2" 1 "add a bad record type AAAA"
+	rlPhaseEnd
+ 	
+	rlPhaseStartTest "ipa-dns-117: make sure that IPA did not save record type AAAA"
+		rlRun "ipa dnsrecord-find $zone aaaac | grep $aaaabad2" 1 "make sure ipa did not record type AAAA"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-118: make sure that dig can not find the record type AAAA"
+		rlRun "dig aaaac.$zone | grep $aaaabad2" 1 "make sure dig can not find the AAAA record"
+	rlPhaseEnd
+
+	# Type dname
+	rlPhaseStartTest "ipa-dns-119: add record of type dname"
+		rlRun "ipa dnsrecord-add $zone dname --dname-rec $dname" 0 "add record type dname"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-120: make sure that IPA saved record type dname"
+		rlRun "ipa dnsrecord-find $zone dname | grep $dname" 0 "make sure ipa recieved record type dname"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-121: make sure that dig can find the record type dname"
+		rlRun "dig dname.$zone DNAME | grep $dname" 0 "make sure dig can find the dname record"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-122: delete record of type dname"
+		rlRun "ipa dnsrecord-del $zone dname --dname-rec $dname" 0 "delete record type dname"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-123: make sure that IPA deleted record type dname"
+		rlRun "ipa dnsrecord-find $zone dname" 1 "make sure ipa deleted record type dname"
+	rlPhaseEnd
+
+	sleep 5
+	rlPhaseStartTest "ipa-dns-124: make sure that dig can not find the record type dname"
+		rlRun "dig dname.$zone dNAME | grep $dname" 1 "make sure dig can not find the dname record"
+	rlPhaseEnd
+
+	# Type dname
+	rlPhaseStartTest "ipa-dns-119: add record of type dname"
+		rlRun "ipa dnsrecord-add $zone dname --dname-rec $dname" 0 "add record type dname"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-120: make sure that IPA saved record type dname"
+		rlRun "ipa dnsrecord-find $zone dname | grep $dname" 0 "make sure ipa recieved record type dname"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-121: make sure that dig can find the record type dname"
+		rlRun "dig dname.$zone DNAME | grep $dname" 0 "make sure dig can find the dname record"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-122: delete record of type dname"
+		rlRun "ipa dnsrecord-del $zone dname --dname-rec $dname" 0 "delete record type dname"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-123: make sure that IPA deleted record type dname"
+		rlRun "ipa dnsrecord-find $zone dname" 1 "make sure ipa deleted record type dname"
+	rlPhaseEnd
+
+	sleep 5
+	rlPhaseStartTest "ipa-dns-124: make sure that dig can not find the record type dname"
+		rlRun "dig dname.$zone DNAME | grep $dname" 1 "make sure dig can not find the dname record"
+	rlPhaseEnd
+
+
+	# Type cert
+	rlPhaseStartTest "ipa-dns-125: add record of type cert"
+		rlRun "ipa dnsrecord-add $zone cert --cert-rec \"$certa $cert\"" 0 "add record type cert"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-126: make sure that IPA saved record type cert"
+		rlRun "ipa dnsrecord-find $zone cert | grep $cert" 0 "make sure ipa recieved record type cert"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-127: make sure that dig can find the record type cert"
+		rlRun "dig cert.$zone CERT | grep $cert" 0 "make sure dig can find the cert record"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-128: delete record of type cert"
+		rlRun "ipa dnsrecord-del $zone cert --cert-rec $cert" 0 "delete record type cert"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-129: make sure that IPA deleted record type cert"
+		rlRun "ipa dnsrecord-find $zone cert" 1 "make sure ipa deleted record type cert"
+	rlPhaseEnd
+
+	sleep 5
+	rlPhaseStartTest "ipa-dns-130: make sure that dig can not find the record type cert"
+		rlRun "dig cert.$zone CERT | grep $cert" 1 "make sure dig can not find the cert record"
+	rlPhaseEnd
+
+
+
 	rlJournalPrintText
 	report=/tmp/rhts.report.$RANDOM.txt
 	makereport $report
@@ -602,4 +716,4 @@ fi
 rlJournalEnd
 
 
- 
+
