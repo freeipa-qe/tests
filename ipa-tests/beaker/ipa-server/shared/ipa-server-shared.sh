@@ -172,16 +172,16 @@ verifyErrorMsg()
         rlLog "ERROR: Expected \"$command\" to fail."
         rc=1
    else
-	rc=0
 	rlLog "\"$command\" failed as expected."
         $command 2> /tmp/errormsg.out
 	sed 's/"//g' /tmp/errormsg.out > /tmp/errormsg_clean.out
         actual=`cat /tmp/errormsg_clean.out`
-        if [[ "$actual" == "$expmsg" ]] ; then
+        if [[ "$actual" = "$expmsg" ]] ; then
                 rlLog "Error message as expected: $actual"
+		return 0
         else
                 rlLog "ERROR: Message not as expected. GOT: $actual  EXP: $expmsg"
-                rc=1
+                return 1
         fi
   fi
 
