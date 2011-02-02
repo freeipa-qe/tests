@@ -653,33 +653,6 @@ fi
 		rlRun "dig dname.$zone dNAME | grep $dname" 1 "make sure dig can not find the dname record"
 	rlPhaseEnd
 
-	# Type dname
-	rlPhaseStartTest "ipa-dns-119: add record of type dname"
-		rlRun "ipa dnsrecord-add $zone dname --dname-rec $dname" 0 "add record type dname"
-	rlPhaseEnd
-
-	rlPhaseStartTest "ipa-dns-120: make sure that IPA saved record type dname"
-		rlRun "ipa dnsrecord-find $zone dname | grep $dname" 0 "make sure ipa recieved record type dname"
-	rlPhaseEnd
-
-	rlPhaseStartTest "ipa-dns-121: make sure that dig can find the record type dname"
-		rlRun "dig dname.$zone DNAME | grep $dname" 0 "make sure dig can find the dname record"
-	rlPhaseEnd
-
-	rlPhaseStartTest "ipa-dns-122: delete record of type dname"
-		rlRun "ipa dnsrecord-del $zone dname --dname-rec $dname" 0 "delete record type dname"
-	rlPhaseEnd
-
-	rlPhaseStartTest "ipa-dns-123: make sure that IPA deleted record type dname"
-		rlRun "ipa dnsrecord-find $zone dname" 1 "make sure ipa deleted record type dname"
-	rlPhaseEnd
-
-	sleep 5
-	rlPhaseStartTest "ipa-dns-124: make sure that dig can not find the record type dname"
-		rlRun "dig dname.$zone DNAME | grep $dname" 1 "make sure dig can not find the dname record"
-	rlPhaseEnd
-
-
 	# Type cert
 	rlPhaseStartTest "ipa-dns-125: add record of type cert"
 		rlRun "ipa dnsrecord-add $zone cert --cert-rec \"$certa $cert\"" 0 "add record type cert"
