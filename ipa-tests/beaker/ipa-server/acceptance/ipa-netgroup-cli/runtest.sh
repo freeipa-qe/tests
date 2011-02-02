@@ -46,13 +46,13 @@
 PACKAGE="ipa-admintools"
 
 rlJournalStart
-  rlPhaseStartSetup "ipa-netgroup: Check for ipa-admintools package, run tests and make reports"
-        rpm -qa | grep $PACKAGE
-        if [ $? -eq 0 ] ; then
-                rlPass "ipa-admintools package is installed"
-        else
-                rlFail "ipa-admintools package NOT found!"
-        fi
+  rlLog "ipa-netgroup: Check for ipa-admintools package, run tests and make reports"
+  rpm -qa | grep $PACKAGE
+  if [ $? -eq 0 ] ; then
+  	rlLog "ipa-admintools package is installed"
+  else
+        rlLog "ERROR: ipa-admintools package NOT found!"
+  fi
 
   # run tests
    netgroups
@@ -60,6 +60,4 @@ rlJournalStart
   report=/tmp/rhts.report.$RANDOM.txt
   makereport $report
   rhts-submit-log -l $report
-
-  rlPhaseEnd
 rlJournalEnd
