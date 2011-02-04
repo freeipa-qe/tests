@@ -51,7 +51,7 @@ if [ ! -d $tmpdir ];then
     mkdir -p $tmpdir
 fi
 
-PACKAGE="ipa-server"
+PACKAGE="freeipa-server"
 
 ##########################################
 #   test main 
