@@ -57,8 +57,16 @@ TMP_KEYTAB="/opt/krb5.keytab"
 
 setup() {
 rlPhaseStartTest "Setup for getkeytab and rmkeytab tests"
-        rlAssertRpm $PACKAGE1
-        rlAssertRpm $PACKAGE2
+	# check for packages
+	for item in $PACKAGE1 $PACKAGE2 ; do
+        	rpm -qa | grep $item
+        	if [ $? -eq 0 ] ; then
+                	rlPass "$item package is installed"
+        	else
+                	rlFail "$item package NOT found!"
+        	fi
+	done
+
 	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user" 
 	rlRun "create_ipauser $user1 $user1 $user1 $userpw"
 	sleep 5

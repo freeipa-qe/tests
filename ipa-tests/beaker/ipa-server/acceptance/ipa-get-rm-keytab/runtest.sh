@@ -80,8 +80,8 @@ rlJournalStart
 		rlRun "cleanup"
     rlPhaseEnd
 
+ rlJournalPrintText
+ report=/tmp/rhts.report.$RANDOM.txt
+ makereport $report
+ rhts-submit-log -l $report
 rlJournalEnd
-report=/tmp/rhts.report.$RANDOM.txt
-makereport $report
-rhts-submit-log -l $report
-rlJournalPrintText
