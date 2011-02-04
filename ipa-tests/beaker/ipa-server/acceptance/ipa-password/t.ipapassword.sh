@@ -103,8 +103,7 @@ ipapassword_envcleanup()
     rlPhaseStartCleanup "ipapassword_envcleanup"
         #environment cleanup starts here
         restore_systime
-        #restart_ipa_passwd
-        rlRun "$kdestroy" 0 "clean all possible kerberos ticket"
+        Kcleanup
         #environment cleanup ends   here
     rlPhaseEnd
 } #ipapassword_envcleanup
@@ -113,7 +112,6 @@ ipapassword_globalpolicy_envsetup()
 {
     rlPhaseStartSetup "ipapassword_globalpolicy_envsetup"
         #environment setup starts here
-        restore_systime
         rlRun "ipactl restart" 0 "restart all ipa related service to force sync time between kerberos server and other components, specially DS instance"
         Local_KinitAsAdmin
         reset_global_pwpolicy   # ensure we have defaul setting when we leave
@@ -125,8 +123,6 @@ ipapassword_globalpolicy_envcleanup()
 {
     rlPhaseStartCleanup "ipapassword_globalpolicy_envcleanup"
         #environment cleanup starts here
-        restore_systime
-        #restart_ipa_passwd
         reset_global_pwpolicy
         Kcleanup
         #environment cleanup ends   here
@@ -2742,7 +2738,7 @@ ipapassword_attr_set_logic()
         else
             rlFail "expected [$expected], actual [$ret]";
         fi
-        if [ "$expected" = "1" ] && [ ! -z "$errmsg" ];then
+        if [ "$expected" = "1" ] || [ "$ret" = "1" ] && [ ! -z "$errmsg" ];then
             if grep -i "$errmsg" $out 2>&1 >/dev/null
             then
                 rlPass "error msg matches with output"
@@ -2920,7 +2916,7 @@ ipapassword_attr_add_logic()
         else
             rlFail "addattr expect: [$expected], actual [$ret]"
         fi
-        if [ "$expected" = "1" ] && [ ! -z "$errmsg" ];then
+        if [ "$ret" = "1" ] || [ "$expected" = "1" ] && [ ! -z "$errmsg" ];then
             if grep -i "$errmsg" $out 2>&1 >/dev/null
             then
                 rlPass "error msg matches with output"
