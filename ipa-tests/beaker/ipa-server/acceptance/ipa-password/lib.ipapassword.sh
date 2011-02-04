@@ -242,6 +242,7 @@ add_test_ac()
     fi
     rlRun "$kdestroy"
     KinitAsAdmin
+    rlLog "set up ac with inital pw: [$initialpw]"
     echo $initialpw |\
            ipa user-add $testac\
                         --first $testacFirst\
@@ -249,6 +250,7 @@ add_test_ac()
                         --password 
     rc=$?    
     # set test account password 
+    rlLog "change initialpw to [$testacPW]"
     FirstKinitAs $testac $initialpw $testacPW
     rlRun "$kdestroy"
 
@@ -486,7 +488,7 @@ kinit_aftermaxlife()
     rm $exp
 } #kinit_aftermaxlife
 
-KinitAsAdmin()
+Local_KinitAsAdmin()
 {
     #local pw=$adminpassword
     local pw=$ADMINPW #use the password in env.sh file
@@ -661,6 +663,7 @@ generate_password()
     echo $finalpw
     #rlLog "generated password : [$randompw] classes=[$classes] length=[$length]"
 } #generate_password
+
 get_random()
 {
     local class=$1
@@ -702,31 +705,6 @@ get_random()
     echo -n "${l}" >> $outf 
 } #get_random
 
-makereport()
-{
-    # capture the result and make a simple report
-    total=`rlJournalPrintText | grep "RESULT" | wc -l`
-    pass=`rlJournalPrintText | grep "RESULT" | grep "\[   PASS   \]" | wc -l`
-    fail=`rlJournalPrintText | grep "RESULT" | grep "\[   FAIL   \]" | wc -l`
-    abort=`rlJournalPrintText | grep "RESULT" | grep "\[  ABORT   \]" | wc -l`
-    report=$TmpDir/rhts.report.$RANDOM.txt
-    echo "================ final pass/fail report =================" > $report
-    echo "   Test Date: `date` " >> $report
-    echo "   Total : [$total] "  >> $report
-    echo "   Passed: [$pass] "   >> $report
-    echo "   Failed: [$fail] "   >> $report
-    echo "   Abort : [$abort]"   >> $report
-    echo "---------------------------------------------------------" >> $report
-    rlJournalPrintText | grep "RESULT" | grep "\[   PASS   \]"| sed -e 's/:/ /g' -e 's/RESULT//g' >> $report
-    echo "" >> $report
-    rlJournalPrintText | grep "RESULT" | grep "\[   FAIL   \]"| sed -e 's/:/ /g' -e 's/RESULT//g' >> $report
-    echo "" >> $report
-    rlJournalPrintText | grep "RESULT" | grep "\[  ABORT   \]"| sed -e 's/:/ /g' -e 's/RESULT//g' >> $report
-    echo "=========================================================" >> $report
-    echo "report saved as: $report"
-    cat $report
-}
-
 #####################################################################
 #####################################################################
 #####################################################################
@@ -738,8 +716,8 @@ maxlife_default()
     local midpoint=`echo "($minlife + $maxlife)/2" |bc` 
     rlLog "mid point: [$midpoint]"
     set_systime "+ $midpoint"
-    rlRun "$kdestroy"
-    rlRun "echo $testacPW | kinit $testac" 0 "kinit as same password between minlife and max life should success"
+#    rlRun "$kdestroy"
+    rlRun "echo $testacPW | kinit $testac" 0 "kinit use same password between minlife and max life should success"
     rlRun "$kdestroy"
 
     # when system time > maxlife, ipa server should prompt for password change
