@@ -21,7 +21,7 @@ set_systime()
     rlLog "offset [$offset] seconds"
     now=`date "+%s"`
     desiredtime=`echo "$now $offset" | bc`
-    sudo date "+%a %b %e %H:%M:%S %Y" -s "`perl -le "print scalar localtime $desiredtime"`"
+    date "+%a %b %e %H:%M:%S %Y" -s "`perl -le "print scalar localtime $desiredtime"`"
     after=`date`
     rlLog "after set systime [$after]"
 } # set_systime
