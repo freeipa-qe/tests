@@ -2654,9 +2654,12 @@ ipapassword_attr_set_krbPwdMinDiffChars()
 {
     rlPhaseStartTest "ipapassword_attr_set_krbPwdMinDiffChars"
         local attr=krbPwdMinDiffChars
-        local value=`getrandomint 1 5`
         Local_KinitAsAdmin
-        ipapassword_attr_set_logic $attr $value 0 ""
+        for value in 1 2 3 4 5 0
+        do
+            rlLog "set minimum classes to [$value]"
+            ipapassword_attr_set_logic $attr $value 0 ""
+        done
         rlRun "$kdestroy"
     rlPhaseEnd
 
@@ -2738,7 +2741,7 @@ ipapassword_attr_set_logic()
         else
             rlFail "expected [$expected], actual [$ret]";
         fi
-        if [ "$expected" = "1" ] || [ "$ret" = "1" ] && [ ! -z "$errmsg" ];then
+        if [ "$expected" = "1" ] || [ "$ret" = "1" ] || [ ! -z "$errmsg" ];then
             if grep -i "$errmsg" $out 2>&1 >/dev/null
             then
                 rlPass "error msg matches with output"
@@ -2916,7 +2919,7 @@ ipapassword_attr_add_logic()
         else
             rlFail "addattr expect: [$expected], actual [$ret]"
         fi
-        if [ "$ret" = "1" ] || [ "$expected" = "1" ] && [ ! -z "$errmsg" ];then
+        if [ "$ret" = "1" ] || [ "$expected" = "1" ] || [ ! -z "$errmsg" ];then
             if grep -i "$errmsg" $out 2>&1 >/dev/null
             then
                 rlPass "error msg matches with output"
