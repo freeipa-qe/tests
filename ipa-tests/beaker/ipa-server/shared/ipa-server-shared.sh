@@ -294,10 +294,16 @@ makereport()
 {
     local report=$1
     # some modification here: make report work even the TmpDir removed
-    touch $report
-    if [ ! -f $report ];then
+    if [ -n "$report" ];then
         report=/tmp/rhts.report.$RANDOM.txt
         touch $report
+    else
+        if [ ! -w "$report" ];then
+            report=/tmp/rhts.report.$RANDOM.txt
+            touch $report
+        else
+            touch $report
+        fi
     fi
     # capture the result and make a simple report
     local total=`rlJournalPrintText | grep "RESULT" | wc -l`
