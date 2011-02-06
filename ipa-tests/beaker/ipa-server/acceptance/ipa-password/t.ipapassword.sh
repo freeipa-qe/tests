@@ -2655,7 +2655,7 @@ ipapassword_attr_set_krbPwdMinDiffChars()
     rlPhaseStartTest "ipapassword_attr_set_krbPwdMinDiffChars"
         local attr=krbPwdMinDiffChars
         Local_KinitAsAdmin
-        for value in 1 2 3 4 5 0
+        for value in 5 4 3 2 1
         do
             rlLog "set minimum classes to [$value]"
             ipapassword_attr_set_logic $attr $value 0 ""
