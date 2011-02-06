@@ -5,9 +5,9 @@
 ipapassword()
 {
     ipapassword_envsetup
-    ipapassword_globalpolicy
-    ipapassword_grouppolicy
-    ipapassword_nestedgroup
+#    ipapassword_globalpolicy
+#    ipapassword_grouppolicy
+#    ipapassword_nestedgroup
     ipapassword_attr
     ipapassword_envcleanup
 } # ipapassword
@@ -272,7 +272,7 @@ ipapassword_globalpolicy_minlifetime_default_logic()
             set_systime "+ 2*60*60 - 2*60"
             # before minlife, change password should fail
             rlRun "echo $testacPW | kinit $testac 2>&1 >/dev/null" 0 "make sure currentPW work [$testacPW]"
-            change_password $testac $testacPW "dummy123"
+            change_password $testac $testacPW "Dummyž@123"
             if [ $? = 0 ];then
                 rlFail "password change success, this is not expected"
             else 
@@ -282,7 +282,7 @@ ipapassword_globalpolicy_minlifetime_default_logic()
             # after minlife, change passwod should success
             set_systime "+ 2*60"  # setsystime 2 minutes after
             rlRun "echo $testacPW | kinit $testac 2>&1 >/dev/null" 0 "make sure currentPW work [$testacPW]"
-            change_password $testac $testacPW "dummy123"
+            change_password $testac $testacPW "Dummyž@123"
             if [ $? = 0 ];then
                 rlPass "password change success, this is expected"
             else
@@ -327,7 +327,7 @@ ipapassword_globalpolicy_minlifetime_lowerbound_logic()
             add_test_ac
             rlLog "after set minlife to 0, we should be able to change password anytime we wont"
             oldpw=$testacPW
-            newpw="dummy123"
+            newpw="Dummyž@123"
             #FIXME: I should have more test data right here
             # be aware that after this loop the system time is actually being
             # pushed back total: 0+1+2+4+8+16+32=63 seconds
@@ -549,7 +549,7 @@ ipapassword_globalpolicy_history_lowerbound_logic()
         N=`echo "$number + 2" | bc` # set N >= 2
         counter=0
         currentPW=$testacPW
-        newPW="dummy123"
+        newPW="Dummyž@123"
         rlLog "keep change password [$N] times with two password:[$currentPW] & [$newPW]"
         while [ $counter -lt $N ] #password is $oldpw when out of this loop
         do
@@ -1520,7 +1520,7 @@ ipapassword_grouppolicy_history_lowerbound_logic()
         N=`echo "$number + 2" | bc` # set N >= 2
         counter=0
         currentPW=$testacPW
-        newPW="dummy123"
+        newPW="Dummyž@123"
         rlLog "keep change password [$N] times with two password:[$currentPW] & [$newPW]"
         while [ $counter -lt $N ] #password is $oldpw when out of this loop
         do
@@ -2263,16 +2263,16 @@ ipapassword_nestedgrouppw_minlife_conflict()
         currentPW=$testacPW
         set_systime "+ $minlife * 60 * 60 - 2 * 60" # set system two minutes before minlife
         rlRun "echo $currentPW | kinit $testac 2>&1 > /dev/null" 0  "check password before test"
-        change_password $testac $currentPW "dummy123"
+        change_password $testac $currentPW "Dummyž@123"
         if [ $? -eq 0 ];then
             rlFail "change password success is not expected"
-            currentPW="dummy123"
+            currentPW="Dummyž@123"
         else
             rlPass "change password failed is expected"
         fi 
         set_systime "+ 3 * 60 " # set system one minutes after minlife
         rlRun "echo $currentPW | kinit $testac 2>&1 > /dev/null" 0  "check password before test"
-        change_password $testac $currentPW "again_dummy123"
+        change_password $testac $currentPW "again_Dummyž@123"
         if [ $? -eq 0 ];then
             rlPass "change password success is expected"
         else

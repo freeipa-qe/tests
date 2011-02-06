@@ -68,11 +68,12 @@ rlJournalStart
     ipapassword
     # r2d2_test_ends
 
-    makereport
+    #makereport
     rlPhaseStartCleanup "ipapassword cleanup"
         rlRun "popd"
         rlRun "rm -r $TmpDir" 0 "Removing tmp directory"
     rlPhaseEnd
+    makereport
 rlJournalEnd
 
 
