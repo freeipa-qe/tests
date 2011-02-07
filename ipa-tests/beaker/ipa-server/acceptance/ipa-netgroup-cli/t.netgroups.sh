@@ -58,9 +58,9 @@ setup()
         ipa hostgroup-add --desc=$hgroup3 $hgroup3
 
 	# let's make sure ipa-host-net-manage is disable for the first serious of tests
-	echo $ADMINPW | ipa-host-net-manage disable
-	status=`ipa-host-net-manage status`
-	echo $status | grep "Plugin Disable"
+	execNetgroupPlugin disable
+	status=`execNetgroupPlugin status`
+	echo $status | grep "Plugin Disabled"
 	if [ $? -eq 0 ] ; then
 		rlPass "Host Net Manage Plugin is disabled"
 	else
@@ -122,9 +122,9 @@ cleanup()
 	ipa hostgroup-del $hgroup3
 
 	# disable the plugin
-	echo $ADMINPW | ipa-host-net-manage disable 2>&1 > /dev/null
-        status=`ipa-host-net-manage status`
-        echo $status | grep "Plugin Disable"
+	execNetgroupPlugin disable
+        status=`execNetgroupPlugin status`
+        echo $status | grep "Plugin Disabled"
         if [ $? -eq 0 ] ; then
                 rlPass "Cleanup: Host Net Manage Plugin is disabled"
         else
@@ -535,8 +535,8 @@ del_netgroups_negative()
 manage_netgroups_positive()
 {
         rlPhaseStartTest "ipa-netgroup-051: Enable the manage net groups plugin"
-		echo $ADMINPW | ipa-host-net-manage enable
-		status=`ipa-host-net-manage status`
+		execNetgroupPlugin enable
+		status=`execNetgroupPlugin status`
         	echo $status | grep "Plugin Enabled"
         	if [ $? -eq 0 ] ; then
                 	rlPass "Host Net Manage Plugin is enabled"
