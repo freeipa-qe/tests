@@ -552,7 +552,7 @@ manage_netgroups_positive()
 
 	rlPhaseStartTest "ipa-netgroup-052: Delete host group and verify net group is deleted"
 		rlRun "ipa hostgroup-del mygroup" 0 "Deleting host group with plugin disabled"
-		rlRun "ipa netgroup-find mygroup" 2 "Verify managed net group was deleted"
+		rlRun "ipa netgroup-show mygroup" 2 "Verify managed net group was deleted"
         rlPhaseEnd
 }
 
