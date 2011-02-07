@@ -5,9 +5,9 @@
 ipapassword()
 {
     ipapassword_envsetup
-#    ipapassword_globalpolicy
-#    ipapassword_grouppolicy
-#    ipapassword_nestedgroup
+    ipapassword_globalpolicy
+    ipapassword_grouppolicy
+    ipapassword_nestedgroup
     ipapassword_attr
     ipapassword_envcleanup
 } # ipapassword
