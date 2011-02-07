@@ -67,6 +67,15 @@
 			<task name="/CoreOS/ipa-server/acceptance/ipa-get-rm-keytab" role="MASTER">
 				<params/>
 			</task>
+			<task name="/CoreOS/ipa-server/acceptance/ipa-krbtpolicy" role="MASTER">
+				<params/>
+			</task>
+			<task name="/CoreOS/ipa-server/acceptance/ipa-dns" role="MASTER">
+				<params/>
+			</task>
+			<task name="/CoreOS/ipa-server/acceptance/ipa-ctl" role="MASTER">
+				<params/>
+			</task>
 			<task name="/CoreOS/ipa-server/acceptance/uninstall" role="STANDALONE">
 				<params/>
 			</task>
