@@ -443,3 +443,31 @@ ipauser_exist()
     fi
 } #ipauser_exist
 
+#######################################################################
+# execNetgroupPlugin Usage:
+#       execNetgroupPlugin <enable | disable | status>
+# 
+#####################################################################
+execNetgroupPlugin()
+{
+   local option=$1
+   local password=$ADMINPW
+   local expfile=/tmp/netplugin.exp
+   local outfile=/tmp/netplugin.out
+
+   rm -rf $expfile
+   echo "spawn /usr/sbin/ipa-host-net-manage $option" > $expfile
+   echo 'expect "Directory Manager password: "' >> $expfile
+   echo "send $password" >> $expfile
+   echo 'send \r' >> $expfile
+   echo 'expect eof' >> $expfile
+
+   /usr/bin/expect $expfile > $outfile
+   rc=$?
+
+   status=`cat $outfile`
+   echo $status
+   return $rc
+}
+
+
