@@ -792,11 +792,11 @@ ipaconfig_searchfields_userfields_negative()
     # add invalid search field to default user search fields
 	rlLog "Add field bogus to user search fields"
  	ipa config-mod --usersearch="${default_config_usersearchfields},bogus"
-	if [$? -eq 0 ] ; then
-		rlPass "Attempt failed as expected"
-	else
+	if [ $? -eq 0 ] ; then
 		rlFail "Attempt to add invalid field to user default search fields was successful."
 		rlRun "ipa config-mod --usersearch=\"${default_config_usersearchfields}\"" 0 "set usersearch=[$default_config_usersearchfields] - back to default"
+	else
+		rlPass "Attempt failed as expected"
 	fi
     rlPhaseEnd
     # test logic ends
@@ -858,11 +858,12 @@ ipaconfig_searchfields_groupfields_negative()
     # add invalid search field to default group search fields
         rlLog "Add field bogus to group search fields"
         ipa config-mod --groupsearch="${default_config_groupsearchfields},bogus"
-        if [$? -eq 0 ] ; then
+        if [ $? -eq 0 ] ; then
+		rlFail "Attempt to add invalid field to group default search fields was successful."             
+		rlRun "ipa config-mod --groupsearch=\"${default_config_groupsearchfields}\"" 0 "set groupsearch=[$default_config_groupsearchfields] - back to default"
                 rlPass "Attempt failed as expected"
         else
-                rlFail "Attempt to add invalid field to group default search fields was successful."
-                rlRun "ipa config-mod --groupsearch=\"${default_config_groupsearchfields}\"" 0 "set groupsearch=[$default_config_groupsearchfields] - back to default"
+		rlPass "Attempt failed as expected"
         fi
     rlPhaseEnd
     # test logic ends
