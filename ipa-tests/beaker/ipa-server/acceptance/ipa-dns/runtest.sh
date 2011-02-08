@@ -120,6 +120,10 @@ fi
 	minimum=33
 	ttl=55
 	badnum=12345678901234
+	loclat="121"
+	loclong="59"
+	loc="37 23 30.900 N $loclat $loclong 19.000 W 7.00m 100.00m 100.00m 2.00m"
+	
 	rlPhaseStartTest "ipa-dns-07: create a new zone"
 		rlRun "ipa dnszone-add --name-server=$ipaddr --admin-email=$email --serial=$serial --refresh=$refresh --retry=$retry --expire=$expire --minimum=$minimum --ttl=$ttl $zone" 0 "Checking to ensure that ipa thinks that it can create a zone"
 		rlRun "/usr/sbin/ipactl restart" 0 "Restarting IPA server"
@@ -236,6 +240,9 @@ fi
 	srva="0 100 389"
 	srv="why.go.here.com."
 	naptr='E2U+msg" "!^.*$!mailto:info@example.com!'
+	kxpref1="12345678"
+	kxbadpref1="-1"
+	kxbadpref2="1233456789012345"
 	
 	# These values are all for creating the ptr zone
 	pzone="ptrzone"
@@ -650,7 +657,7 @@ fi
 
 	sleep 5
 	rlPhaseStartTest "ipa-dns-124: make sure that dig can not find the record type dname"
-		rlRun "dig dname.$zone dNAME | grep $dname" 1 "make sure dig can not find the dname record"
+		rlRun "dig dname.$zone DNAME | grep $dname" 1 "make sure dig can not find the dname record"
 	rlPhaseEnd
 
 	# Type cert
@@ -679,6 +686,76 @@ fi
 		rlRun "dig cert.$zone CERT | grep $cert" 1 "make sure dig can not find the cert record"
 	rlPhaseEnd
 
+
+	# Type kx
+	rlPhaseStartTest "ipa-dns-131: add record of type kx"
+		rlRun "ipa dnsrecord-add $zone @ --kx-rec \"$kxpref1 $zone\"" 0 "add record type kx"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-132: make sure that IPA saved record type kx"
+		rlRun "ipa dnsrecord-find $zone @ | grep $kxpref1" 0 "make sure ipa recieved record type kx"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-133: make sure that dig can find the record type kx"
+		rlRun "dig $zone kx | grep $kxpref1" 0 "make sure dig can find the kx record"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-134: delete record of type kx"
+		rlRun "ipa dnsrecord-del $zone @ --kx-rec \"$kxpref1 $zone\"" 0 "delete record type kx"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-135: make sure that IPA deleted record type kx"
+		rlRun "ipa dnsrecord-find $zone kx" 1 "make sure ipa deleted record type kx"
+	rlPhaseEnd
+
+	sleep 5
+	rlPhaseStartTest "ipa-dns-136: make sure that dig can not find the record type kx"
+		rlRun "dig $zone kx | grep $kxpref1" 1 "make sure dig can not find the kx record"
+	rlPhaseEnd
+
+	# Negitive kx tests
+
+	rlPhaseStartTest "ipa-dns-137: add record of type bad kx"
+		rlRun "ipa dnsrecord-add $zone @ --kx-rec \"$kxbadpref1 $zone\"" 1 "add record type bad kx"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-138: make sure that IPA saved record type kx"
+		rlRun "ipa dnsrecord-find $zone @ | grep $kxbadpref1" 1 "make sure ipa recieved record type kx"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-139: add record of type bad kx"
+		rlRun "ipa dnsrecord-add $zone @ --kx-rec \"$kxbadpref2 $zone\"" 1 "add record type bad kx"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-140: make sure that IPA saved record type kx"
+		rlRun "ipa dnsrecord-find $zone @ | grep $kxbadpref2" 1 "make sure ipa recieved record type kx"
+	rlPhaseEnd
+
+	# Type loc
+	rlPhaseStartTest "ipa-dns-141: add record of type loc"
+		rlRun "ipa dnsrecord-add $zone @ --loc-rec \"$loc\"" 0 "add record type loc"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-142: make sure that IPA saved record type loc"
+		rlRun "ipa dnsrecord-find $zone @ | grep $loclong" 0 "make sure ipa recieved record type loc"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-143: make sure that dig can find the record type loc"
+		rlRun "dig $zone loc | grep $loc" 0 "make sure dig can find the loc record"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-144: delete record of type loc"
+		rlRun "ipa dnsrecord-del $zone @ --loc-rec \"$loc\"" 0 "delete record type loc"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-145: make sure that IPA deleted record type loc"
+		rlRun "ipa dnsrecord-find $zone loc" 1 "make sure ipa deleted record type loc"
+	rlPhaseEnd
+
+	sleep 5
+	rlPhaseStartTest "ipa-dns-146: make sure that dig can not find the record type loc"
+		rlRun "dig $zone loc | grep $loclong" 1 "make sure dig can not find the loc record"
+	rlPhaseEnd
 
 
 	rlJournalPrintText
