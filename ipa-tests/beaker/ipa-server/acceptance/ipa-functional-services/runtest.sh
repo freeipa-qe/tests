@@ -51,18 +51,18 @@ PACKAGELIST="ipa-admintools ipa-client httpd mod_nss mod_auth_kerb"
 rlJournalStart
   rlPhaseStartTest "Environment check"
     # call functional tests
-   
-        for item in $PACKAGELIST ; do
-                rpm -qa | grep $item
-                if [ $? -eq 0 ] ; then
-                        rlPass "$item package is installed"
-                else
-                        rlFail "$item package NOT found!"
-                fi
-        done
 
     	echo $CLIENT | grep $HOSTNAME
-    	if [ $? -eq 0 ] ; then
+	rc=$?
+    	if [ $rc -eq 0 ] ; then
+ 		for item in $PACKAGELIST ; do
+                	rpm -qa | grep $item
+                	if [ $? -eq 0 ] ; then
+                        	rlPass "$item package is installed"
+                	else
+                        	rlFail "$item package NOT found!"
+                	fi
+        	done
 		ipafunctionalservices
     	else
 		rlLog "Machine in recipe is not a CLIENT - not running tests"
