@@ -35,6 +35,7 @@
 # Include rhts environment
 . /usr/bin/rhts-environment.sh
 . /usr/share/beakerlib/beakerlib.sh
+. /dev/shm/ipa-server-shared.sh
 
 rlJournalStart
     rlPhaseStartSetup "list files in /dev/shm"
