@@ -6,10 +6,10 @@
 		<cc>ipa-and-samba-team-list@redhat.com</cc>
 	</notify>
 	<whiteboard>
-		ipa-server full run on qe-blade-12 x86_64
+		ipa-server full acceptance - x86_64
 	</whiteboard>
 	<recipeSet>
-		<recipe whiteboard="ipa server on x86_64 on qe-blade-12">
+		<recipe whiteboard="ipa server full acceptance - x86_64">
 			<distroRequires>
 				<and>
 					<distro_family op="=" value="Fedora14"/>
@@ -72,6 +72,11 @@
 			</task>
 			<task name="/CoreOS/ipa-server/acceptance/ipa-config" role="MASTER">
 				<params/>
+			</task>
+			<task name="/CoreOS/ipa-server/acceptance/ipa-password" role="MASTER">
+				<params>
+					<param name="KILLTIMEOVERRIDE" value="8789333"/>
+				</params>
 			</task>
 			<task name="/CoreOS/ipa-server/acceptance/ipa-dns" role="MASTER">
 				<params/>
