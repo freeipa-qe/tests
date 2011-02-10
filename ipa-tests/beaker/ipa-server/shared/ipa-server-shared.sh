@@ -295,7 +295,8 @@ makereport()
     local report=$1
     # some modification here: make report work even the TmpDir removed
     if [ -n "$report" ];then
-        report=/tmp/rhts.report.$RANDOM.txt
+	# this overwriting the existing report
+        #report=/tmp/rhts.report.$RANDOM.txt
         touch $report
     else
         if [ ! -w "$report" ];then
