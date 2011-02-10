@@ -32,7 +32,7 @@
 			</task>
 
 		</recipe>
-		<recipe kernel_options="" kernel_options_post="" ks_meta="" role="MASTER" whiteboard="">
+		<recipe kernel_options="" kernel_options_post="" ks_meta="" role="SLAVE" whiteboard="">
 			<watchdog/>
 			<packages/>
 			<ks_appends/>
@@ -56,7 +56,7 @@
 			<task name="/CoreOS/ipa-server/shared" role="STANDALONE">
 				<params/>
 			</task>
-			<task name="/CoreOS/ipa-server/acceptance/install" role="MASTER">
+			<task name="/CoreOS/ipa-server/acceptance/install" role="SLAVE">
 				<params/>
 			</task>
 		</recipe>
