@@ -37,6 +37,7 @@
 . /usr/bin/rhts-environment.sh
 . /usr/share/beakerlib/beakerlib.sh
 . /dev/shm/ipa-server-shared.sh
+. /dev/shm/env.sh
 
 # Include test case file
 . ./t.r2d2_testsuitename.sh
