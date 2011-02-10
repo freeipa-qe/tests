@@ -58,13 +58,28 @@ setup()
         ipa hostgroup-add --desc=$hgroup3 $hgroup3
 
 	# let's make sure ipa-host-net-manage is disable for the first serious of tests
-	execNetgroupPlugin disable
-	status=`execNetgroupPlugin status`
-	echo $status | grep "Plugin Disabled"
+	echo $CLIENT | grep $HOSTNAME
 	if [ $? -eq 0 ] ; then
-		rlPass "Host Net Manage Plugin is disabled"
+		rlLog "This is a CLIENT"
+		ssh root@$MASTER "echo $ADMINPW | ipa-host-net-manage disable" 
+		ssh root@$MASTER "echo $ADMINPW | ipa-host-net-manage status" > /tmp/plugin.out
+		cat /tmp/plugin.out | grep "Plugin Disabled"
+		if [ $? -eq 0 ] ; then
+			rlPass "Host Net Manager Plugin is disabled"
+		else
+			rlFail "Host Net Manage Plugin is NOT disabled, this may cause test failures."
+		fi
+			
 	else
-		rlFail "Host Net Manage Plugin is NOT disabled, this may cause test failures."
+		rlLog "This is an IPA server"
+		execNetgroupPlugin disable
+		status=`execNetgroupPlugin status`
+		echo $status | grep "Plugin Disabled"
+		if [ $? -eq 0 ] ; then
+			rlPass "Host Net Manage Plugin is disabled"
+		else
+			rlFail "Host Net Manage Plugin is NOT disabled, this may cause test failures."
+		fi
 	fi
     rlPhaseEnd
 }
@@ -122,13 +137,28 @@ cleanup()
 	ipa hostgroup-del $hgroup3
 
 	# disable the plugin
-	execNetgroupPlugin disable
-        status=`execNetgroupPlugin status`
-        echo $status | grep "Plugin Disabled"
+	echo $CLIENT | grep $HOSTNAME
         if [ $? -eq 0 ] ; then
-                rlPass "Cleanup: Host Net Manage Plugin is disabled"
+                rlLog "This is a CLIENT"
+                ssh root@$MASTER "echo $ADMINPW | ipa-host-net-manage disable" 
+                ssh root@$MASTER "echo $ADMINPW | ipa-host-net-manage status" > /tmp/plugin.out
+                cat /tmp/plugin.out | grep "Plugin Disabled"
+                if [ $? -eq 0 ] ; then
+                        rlPass "Host Net Manager Plugin is disabled"
+                else
+                        rlFail "Host Net Manage Plugin is NOT disabled, this may cause test failures."
+                fi
+                        
         else
-                rlFail "Cleanup: Host Net Manage Plugin is NOT disabled"
+                rlLog "This is an IPA server"
+                execNetgroupPlugin disable
+                status=`execNetgroupPlugin status`
+                echo $status | grep "Plugin Disabled"
+                if [ $? -eq 0 ] ; then
+                        rlPass "Host Net Manage Plugin is disabled"
+                else
+                        rlFail "Host Net Manage Plugin is NOT disabled, this may cause test failures."
+                fi
         fi
     rlPhaseEnd
 }
@@ -508,7 +538,7 @@ attr_netgroups_negative()
 # positive show netgroups tests
 del_netgroups_positive()
 {
-        rlPhaseStartTest  "ipa-netgroup-049: Delete Netgroups"
+        rlPhaseStartTest  "ipa-netgroup-043: Delete Netgroups"
                 # verifying hostgroup-del
 		for item in $ngroup1 $ngroup2 ; do
                 	rlRun "ipa netgroup-del $item" 0 "Deleting $item"
@@ -521,7 +551,7 @@ del_netgroups_positive()
 # negative show netgroups tests
 del_netgroups_negative()
 {
-        rlPhaseStartTest "ipa-netgroup-050: Delete netgroup that doesn't exist"
+        rlPhaseStartTest "ipa-netgroup-044: Delete netgroup that doesn't exist"
                 command="ipa netgroup-del ghost"
                 expmsg="ipa: ERROR: ghost: netgroup not found"
                 rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
@@ -534,23 +564,38 @@ del_netgroups_negative()
 # manage netgroups tests
 manage_netgroups_positive()
 {
-        rlPhaseStartTest "ipa-netgroup-051: Enable the manage net groups plugin"
-		execNetgroupPlugin enable
-		status=`execNetgroupPlugin status`
-        	echo $status | grep "Plugin Enabled"
+        rlPhaseStartTest "ipa-netgroup-045: Enable the manage net groups plugin"
+		echo $CLIENT | grep $HOSTNAME
         	if [ $? -eq 0 ] ; then
-                	rlPass "Host Net Manage Plugin is enabled"
+                	rlLog "This is a CLIENT"
+                	ssh root@$MASTER "echo $ADMINPW | ipa-host-net-manage enable" 
+                	ssh root@$MASTER "echo $ADMINPW | ipa-host-net-manage status" > /tmp/plugin.out
+                	cat /tmp/plugin.out | grep "Plugin Enabled"
+                	if [ $? -eq 0 ] ; then
+                        	rlPass "Host Net Manager Plugin is enabled"
+                	else
+                        	rlFail "Host Net Manage Plugin is NOT enabled, this may cause test failures."
+                	fi
+                        
         	else
-                	rlFail "Host Net Manage Plugin is NOT enabled, this will cause test failures."
+                	rlLog "This is an IPA server"
+                	execNetgroupPlugin enable
+                	status=`execNetgroupPlugin status`
+                	echo $status | grep "Plugin Enabled"
+                	if [ $? -eq 0 ] ; then
+                        	rlPass "Host Net Manage Plugin is enabled"
+                	else
+                        	rlFail "Host Net Manage Plugin is NOT enabled, this may cause test failures."
+                	fi
         	fi
 	rlPhaseEnd
 
-	rlPhaseStartTest "ipa-netgroup-051: Add host group and verify net group"
+	rlPhaseStartTest "ipa-netgroup-046: Add host group and verify net group"
 		rlRun "ipa hostgroup-add --desc=mygroup mygroup" 0 "Adding host group with plugin enabled"
 		rlRun "ipa netgroup-find mygroup" 0 "Verify net group was added."
 	rlPhaseEnd
 
-	rlPhaseStartTest "ipa-netgroup-052: Delete host group and verify net group is deleted"
+	rlPhaseStartTest "ipa-netgroup-047: Delete host group and verify net group is deleted"
 		rlRun "ipa hostgroup-del mygroup" 0 "Deleting host group with plugin disabled"
 		rlRun "ipa netgroup-show mygroup" 2 "Verify managed net group was deleted"
         rlPhaseEnd
@@ -558,7 +603,7 @@ manage_netgroups_positive()
 
 manage_netgroups_negative()
 {
-        rlPhaseStartTest "ipa-netgroup-053: Attempt to deleted managed net group"
+        rlPhaseStartTest "ipa-netgroup-048: Attempt to deleted managed net group"
 		# add a host group
 		ipa hostgroup-add --desc=mygroup mygroup
 
