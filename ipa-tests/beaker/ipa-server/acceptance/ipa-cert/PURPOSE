@@ -1,0 +1,3 @@
+PURPOSE of /CoreOS/tests/Regression/ipacert
+Description: IPA certificate operation CLI test
+Author: Yi Zhang <yzhang@redhat.com>
