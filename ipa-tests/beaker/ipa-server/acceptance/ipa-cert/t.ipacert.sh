@@ -5,13 +5,12 @@
 # import local lib file
 . ./lib.ipacert.sh
 
-
 ipacert()
 {
-    cert_remove_hold
-    cert_request
-    cert_revoke
-    cert_show
+#    cert_remove_hold
+#    cert_request
+#    cert_revoke
+#    cert_show
     cert_status
 } #cert
 
@@ -360,7 +359,7 @@ cert_show_1002()
 cert_status()
 {
     cert_status_envsetup
-    cert_status_1001  #test_scenario (positive test): [--cert_id]
+#    cert_status_1001  #test_scenario (positive test): [--cert_id]
     cert_status_envcleanup
 } #cert-status
 
@@ -368,7 +367,7 @@ cert_status_envsetup()
 {
     rlPhaseStartSetup "cert_status_envsetup"
         #environment setup starts here
-        create_cert
+        create_cert 
         #environment setup ends   here
     rlPhaseEnd
 } #envsetup
@@ -377,6 +376,7 @@ cert_status_envcleanup()
 {
     rlPhaseStartCleanup "cert_status_envcleanup"
         #environment cleanup starts here
+        delete_cert 
         #environment cleanup ends   here
     rlPhaseEnd
 } #envcleanup
