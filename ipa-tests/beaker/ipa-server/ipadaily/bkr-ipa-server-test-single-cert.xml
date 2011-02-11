@@ -22,7 +22,7 @@
 				<and>
 
 					<distro_variant op="=" value="Server"/>
-					<distro_name op="=" value="RHEL6.1-20110118.n.0"/>
+					<distro_name op="=" value="RHEL6.1-20110210.n.0"/>
 					<distro_arch op="=" value="x86_64"/>
 					<distro_virt op="=" value=""/>
 					<distro_family op="=" value="RedHatEnterpriseLinux6"/>
