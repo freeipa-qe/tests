@@ -45,7 +45,7 @@ cert_remove_hold_1001()
     rlPhaseStartTest "cert_remove_hold_1001"
         local testID="cert_remove_hold_1001"
         local tmpout=$TmpDir/cert_remove_hold_1001.$RANDOM.out
-        KinitAsAdmin
+        LKinitAsAdmin
         rlRun "ipa cert-remove-hold $testID --cert_id " 0 "test options: " 
         Kcleanup
         rm $tmpout
@@ -94,7 +94,7 @@ cert_request_1001()
     rlPhaseStartTest "cert_request_1001"
         local testID="cert_request_1001"
         local tmpout=$TmpDir/cert_request_1001.$RANDOM.out
-        KinitAsAdmin
+        LKinitAsAdmin
         local principal_TestValue_Negative="replace_me" #principal;negative;STR 
         local request-type_TestValue="replace_me" #request-type;positive;STR
         local expectedErrMsg=replace_me
@@ -110,7 +110,7 @@ cert_request_1002()
     rlPhaseStartTest "cert_request_1002"
         local testID="cert_request_1002"
         local tmpout=$TmpDir/cert_request_1002.$RANDOM.out
-        KinitAsAdmin
+        LKinitAsAdmin
         local principal_TestValue="replace_me" #principal;positive;STR 
         local request-type_TestValue_Negative="replace_me" #request-type;negative;STR
         local expectedErrMsg=replace_me
@@ -126,7 +126,7 @@ cert_request_1003()
     rlPhaseStartTest "cert_request_1003"
         local testID="cert_request_1003"
         local tmpout=$TmpDir/cert_request_1003.$RANDOM.out
-        KinitAsAdmin
+        LKinitAsAdmin
         local principal_TestValue="replace_me" #principal;positive;STR 
         local request-type_TestValue="replace_me" #request-type;positive;STR
         rlRun "ipa cert-request $testID --add  --principal=$principal_TestValue  --request-type=$request-type_TestValue " 0 "test options:  [principal]=[$principal_TestValue] [request-type]=[$request-type_TestValue]" 
@@ -140,7 +140,7 @@ cert_request_1004()
     rlPhaseStartTest "cert_request_1004"
         local testID="cert_request_1004"
         local tmpout=$TmpDir/cert_request_1004.$RANDOM.out
-        KinitAsAdmin
+        LKinitAsAdmin
         local principal_TestValue_Negative="replace_me" #principal;negative;STR
         local expectedErrMsg=replace_me
         local expectedErrCode=1
@@ -155,7 +155,7 @@ cert_request_1005()
     rlPhaseStartTest "cert_request_1005"
         local testID="cert_request_1005"
         local tmpout=$TmpDir/cert_request_1005.$RANDOM.out
-        KinitAsAdmin
+        LKinitAsAdmin
         local principal_TestValue_Negative="replace_me" #principal;negative;STR 
         local request-type_TestValue="replace_me" #request-type;positive;STR
         local expectedErrMsg=replace_me
@@ -171,7 +171,7 @@ cert_request_1006()
     rlPhaseStartTest "cert_request_1006"
         local testID="cert_request_1006"
         local tmpout=$TmpDir/cert_request_1006.$RANDOM.out
-        KinitAsAdmin
+        LKinitAsAdmin
         local principal_TestValue="replace_me" #principal;positive;STR
         rlRun "ipa cert-request $testID  --principal=$principal_TestValue " 0 "test options:  [principal]=[$principal_TestValue]" 
         Kcleanup
@@ -184,7 +184,7 @@ cert_request_1007()
     rlPhaseStartTest "cert_request_1007"
         local testID="cert_request_1007"
         local tmpout=$TmpDir/cert_request_1007.$RANDOM.out
-        KinitAsAdmin
+        LKinitAsAdmin
         local principal_TestValue="replace_me" #principal;positive;STR 
         local request-type_TestValue_Negative="replace_me" #request-type;negative;STR
         local expectedErrMsg=replace_me
@@ -200,7 +200,7 @@ cert_request_1008()
     rlPhaseStartTest "cert_request_1008"
         local testID="cert_request_1008"
         local tmpout=$TmpDir/cert_request_1008.$RANDOM.out
-        KinitAsAdmin
+        LKinitAsAdmin
         local principal_TestValue="replace_me" #principal;positive;STR 
         local request-type_TestValue="replace_me" #request-type;positive;STR
         rlRun "ipa cert-request $testID  --principal=$principal_TestValue  --request-type=$request-type_TestValue " 0 "test options:  [principal]=[$principal_TestValue] [request-type]=[$request-type_TestValue]" 
@@ -214,7 +214,7 @@ cert_request_1009()
     rlPhaseStartTest "cert_request_1009"
         local testID="cert_request_1009"
         local tmpout=$TmpDir/cert_request_1009.$RANDOM.out
-        KinitAsAdmin
+        LKinitAsAdmin
         local request-type_TestValue_Negative="replace_me" #request-type;negative;STR
         local expectedErrMsg=replace_me
         local expectedErrCode=1
@@ -229,7 +229,7 @@ cert_request_1010()
     rlPhaseStartTest "cert_request_1010"
         local testID="cert_request_1010"
         local tmpout=$TmpDir/cert_request_1010.$RANDOM.out
-        KinitAsAdmin
+        LKinitAsAdmin
         local request-type_TestValue="replace_me" #request-type;positive;STR
         rlRun "ipa cert-request $testID  --request-type=$request-type_TestValue " 0 "test options:  [request-type]=[$request-type_TestValue]" 
         Kcleanup
@@ -271,7 +271,7 @@ cert_revoke_1001()
     rlPhaseStartTest "cert_revoke_1001"
         local testID="cert_revoke_1001"
         local tmpout=$TmpDir/cert_revoke_1001.$RANDOM.out
-        KinitAsAdmin
+        LKinitAsAdmin
         local revocation-reason_TestValue_Negative="replace_me" #revocation-reason;negative;-1,11
         local expectedErrMsg=replace_me
         local expectedErrCode=1
@@ -286,7 +286,7 @@ cert_revoke_1002()
     rlPhaseStartTest "cert_revoke_1002"
         local testID="cert_revoke_1002"
         local tmpout=$TmpDir/cert_revoke_1002.$RANDOM.out
-        KinitAsAdmin
+        LKinitAsAdmin
         local revocation-reason_TestValue="replace_me" #revocation-reason;positive;0,1,2,3,4,5,6,7,8,9,10
         rlRun "ipa cert-revoke $testID  --revocation-reason=$revocation-reason_TestValue " 0 "test options:  [revocation-reason]=[$revocation-reason_TestValue]" 
         Kcleanup
@@ -328,7 +328,7 @@ cert_show_1001()
     rlPhaseStartTest "cert_show_1001"
         local testID="cert_show_1001"
         local tmpout=$TmpDir/cert_show_1001.$RANDOM.out
-        KinitAsAdmin
+        LKinitAsAdmin
         local out_TestValue_Negative="replace_me" #out;negative;CertOutFile
         local expectedErrMsg=replace_me
         local expectedErrCode=1
@@ -343,7 +343,7 @@ cert_show_1002()
     rlPhaseStartTest "cert_show_1002"
         local testID="cert_show_1002"
         local tmpout=$TmpDir/cert_show_1002.$RANDOM.out
-        KinitAsAdmin
+        LKinitAsAdmin
         local out_TestValue="replace_me" #out;positive;CertOutFile
         rlRun "ipa cert-show $testID  --out=$out_TestValue " 0 "test options:  [out]=[$out_TestValue]" 
         Kcleanup
@@ -359,7 +359,7 @@ cert_show_1002()
 cert_status()
 {
     cert_status_envsetup
-#    cert_status_1001  #test_scenario (positive test): [--cert_id]
+    cert_status_1001  #test_scenario (positive test): [--cert_id]
     cert_status_envcleanup
 } #cert-status
 
@@ -367,6 +367,7 @@ cert_status_envsetup()
 {
     rlPhaseStartSetup "cert_status_envsetup"
         #environment setup starts here
+        create_cert 
         create_cert 
         #environment setup ends   here
     rlPhaseEnd
@@ -386,8 +387,22 @@ cert_status_1001()
     rlPhaseStartTest "cert_status_1001"
         local testID="cert_status_1001"
         local tmpout=$TmpDir/cert_status_1001.$RANDOM.out
-        KinitAsAdmin
-        rlRun "ipa cert-status $testID --cert_id " 0 "test options: " 
+        LKinitAsAdmin
+        for cert in `cat $certList`
+        do
+            local cert_principal=`echo $cert | cut -d"=" -f1`
+            local cert_id=`echo $cert | cut -d"=" -f2`
+            ipa cert-status $cert_id >$tmpout
+            if     grep -i "Request id: $cert_id" $tmpout \
+                && grep -i "Request status: complete" $tmpout ;then
+                rlPass "status check pass for cert id [$cert_id]"
+            else
+                rlFail "status check failed for cert id [$cert_id]"
+                echo "=========== output ================"
+                cat $tmpout
+                echo "==================================="
+            fi
+        done
         Kcleanup
         rm $tmpout
     rlPhaseEnd
