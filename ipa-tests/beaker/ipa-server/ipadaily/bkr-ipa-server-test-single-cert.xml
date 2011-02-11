@@ -22,14 +22,19 @@
 				<and>
 
 					<distro_variant op="=" value="Server"/>
-					<distro_name op="=" value="RHEL6.1-20110210.n.0"/>
+					<distro_name op="=" value="RHEL6.1-20110211.n.0"/>
 					<distro_arch op="=" value="x86_64"/>
 					<distro_virt op="=" value=""/>
 					<distro_family op="=" value="RedHatEnterpriseLinux6"/>
 					<distro_method op="=" value="nfs"/>
 				</and>
 			</distroRequires>
-			<hostRequires/>
+			<hostRequires>
+				<and>
+					<hostname op="=" value="qe-blade-12.idm.lab.bos.redhat.com"/>
+					<system_type op="=" value="Machine"/>
+				</and>
+			</hostRequires>
 			<partitions/>
 			<task name="/distribution/install" role="STANDALONE">
 				<params/>
