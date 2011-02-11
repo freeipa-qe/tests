@@ -59,6 +59,7 @@ $(METADATA): Makefile
 	@echo "Requires:        mod_nss" >> $(METADATA)
 	@echo "Requires:        httpd" >> $(METADATA)
 	@echo "Requires:        mod_auth_kerb" >> $(METADATA)
+	@echo "Requires:        mod_auth_kerb" >> $(METADATA)
 	@echo "Priority:        Normal" >> $(METADATA)
 	@echo "License:         GPLv2" >> $(METADATA)
 	@echo "Confidential:    no" >> $(METADATA)

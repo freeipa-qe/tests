@@ -42,7 +42,7 @@
 # Include test case file
 . ./t.ipafunctionalservices.sh
 
-PACKAGELIST="ipa-admintools ipa-client httpd mod_nss mod_auth_kerb"
+PACKAGELIST="ipa-admintools ipa-client httpd mod_nss mod_auth_kerb 389-ds-base"
 
 
 ##########################################

@@ -19,7 +19,7 @@ INSTANCECFG="/tmp/instance.inf"
 USERLDIF="/tmp/user.ldif"
 SASLCFG="/tmp/sasl.ldif"
 PWDSCHEME="/tmp/pwdscheme.ldif"
-LDAPPRINC="LDAP/$HOSTNAME"
+LDAPPRINC="ldap/$HOSTNAME"
 LDAPKEYTAB="/etc/dirsrv/ldap_service.keytab"
 USERKEYTAB="/tmp/ldapuser1.keytab"
 
@@ -31,7 +31,7 @@ ipafunctionalservices()
     setup
     http_services
     ldap_services
-    #cleanup
+    cleanup
 } 
 
 ######################
@@ -89,6 +89,8 @@ setup()
 
 		cd /etc/dirsrv
 		rlRun "ipa-getkeytab -s $MASTER -k $LDAPKEYTAB -p $LDAPPRINC" 0 "Get keytab for this host's ldap service"
+		rlRun "chown nobody:nobody $LDAPKEYTAB" 0 "Change keytab ownership to nobody.nobody"
+		rlRun "chmod 0400 $LDAPKEYTAB" 0 "Change keytab permissions to 0400"
 
 		# set up directory server instance
 		rlLog "Setting up Directory Server instance ............."
@@ -157,11 +159,13 @@ setup()
 		rlLog "################################################################################################"
 		rlRun "/usr/bin/ldapmodify -a -x -h $HOSTNAME -p $LDAPPORT -D \"cn=Directory Manager\" -w $ADMINPW -c -f $PWDSCHEME" 0 "Change password scheme for directory server"
 
+		# set the KRB5_KTNAME in /etc/sysconfig/dirsrv
+		echo "KRB5_KTNAME=$LDAPKEYTAB ; export KRB5_KTNAME" >> /etc/sysconfig/dirsrv
 		# restart the directory server
 		rlRun "service dirsrv restart" 0 "Restarting the directory server for changes to take effect"
 
 		# add directory server user
-		echo "dn: uid=ldapuser1,ou=People,$BASEDN" > $USERLDIF
+		echo "dn: uid=ldapuser1,$BASEDN" > $USERLDIF
 		echo "userPassword: Secret123" >> $USERLDIF
 		echo "objectClass: top" >> $USERLDIF
 		echo "objectClass: person" >> $USERLDIF
@@ -174,9 +178,6 @@ setup()
 		rlLog "################################  Adding Directory Server Test user  ###########################"
 		rlLog "################################################################################################"
 		rlRun "/usr/bin/ldapmodify -a -x -h $HOSTNAME -p $LDAPPORT -D \"cn=Directory Manager\" -w $ADMINPW -c -f $USERLDIF" 0 "Add user to directory server"
-		
-		# get a keytab for the user
-		rlRun "ipa-getkeytab -q --server $MASTER --principal ldapuser1 --keytab $USERKEYTAB > /tmp/getkeytab.out 2>&1" 0 "Getting user keytab"
 	rlPhaseEnd
 }
 
@@ -215,17 +216,23 @@ http_services()
 ldap_services()
 {
 	rlPhaseStartTest "ipa-functionalservices-003: Access LDAP service with valid credentials"
-		rlRun "ipa-getkeytab -q --server $MASTER --principal ldapuser1 --keytab /tmp/$USERKEYTAB > $TmpDir/getkeytab.out 2>&1" 0 "Get ldauser1 keytab"
-		rlRun "kinit -k -t /tmp/$USERKEYTAB" 0 "kinit with ldapuser1 keytab"
-		#rlRun "kinitAs ldapuser1 Secret123" 0 "kinit as user to get valid credentials"
+		rlRun "kdestroy" 0 "destroying kerberos credentials"
+		rlRun "kinitAs ldapuser1 Secret123" 0 "kinit as user to get valid credentials"
+		klist
 		rlLog "Executing: ldapsearch -h $HOSTNAME -p $LDAPPORT -Y GSSAPI -s sub -b \"ou=people,$BASEDN\"(uid=*)\" dn"
-		rlRun "ldapsearch -h $HOSTNAME -p $LDAPPORT -Y GSSAPI -s sub -b \"ou=people,$BASEDN\" \"(uid=*)\" dn > /tmp/ldapsearch_003.out" 0 "Verify ldapsearch with valid credentials"
+		rlRun "ldapsearch -h $HOSTNAME -p $LDAPPORT -Y GSSAPI -s sub -b \"uid=ldapuser1,$BASEDN\" \"(uid=*)\" dn > /tmp/ldapsearch_003.out 2>&1" 0 "Verify ldapsearch with valid credentials"
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-functionalservices-004: Access LDAP service with out credentials"
                 rlRun "kdestroy" 0 "destroy kerberos credentials"
                 rlLog "Executing: ldapsearch -h $HOSTNAME -p $LDAPPORT -Y GSSAPI -s sub -b \"ou=people,$BASEDN\"(uid=*)\" dn"
-                rlRun "ldapsearch -h $HOSTNAME -p $LDAPPORT -Y GSSAPI -s sub -b \"ou=people,$BASEDN\" \"(uid=*)\" dn > /tmp/ldapsearch_004.out" 49 "Verify ldapsearch with valid credentials"
+                rlRun "ldapsearch -h $HOSTNAME -p $LDAPPORT -Y GSSAPI -s sub -b \"uid=ldapuser1,$BASEDN\" \"(uid=*)\" dn > /tmp/ldapsearch_004.out 2>&1" 254 "Verify ldapsearch with valid credentials"
+		cat /tmp/ldapsearch_004.out | grep "Credentials cache file '/tmp/krb5cc_0' not found"
+		if [ $? -eq 0 ] ; then
+			rlPass "Error as expected Credentials not found"
+		else
+			rlFail "Error NOT as expected:  Did not find credentials not found message"
+		fi
         rlPhaseEnd
 }
 
