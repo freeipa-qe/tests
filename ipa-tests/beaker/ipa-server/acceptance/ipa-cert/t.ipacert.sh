@@ -7,20 +7,22 @@
 
 ipacert()
 {
-#    cert_remove_hold
+    cert_remove_hold
 #    cert_request
-#    cert_revoke
-#    cert_show
+    cert_revoke
+    cert_show
     cert_status
 } #cert
 
 #############################################
-#  test suite: cert-remove-hold (1 test cases)
+#  test suite: cert-remove-hold (3 test cases)
 #############################################
 cert_remove_hold()
 {
     cert_remove_hold_envsetup
-    cert_remove_hold_1001  #test_scenario (positive test): [--cert_id]
+    cert_remove_hold_1001  #test_scenario (positive test): when cert revoked as reason 6 cert can remove hold
+    cert_remove_hold_1002  #test_scenario (negative test): when cert revoked not as reason 6 cert cannot remove hold
+    cert_remove_hold_1003  #test_scenario (negative test): when invalid cert id is given remove-hold should fail
     cert_remove_hold_envcleanup
 } #cert-remove-hold
 
@@ -28,6 +30,7 @@ cert_remove_hold_envsetup()
 {
     rlPhaseStartSetup "cert_remove_hold_envsetup"
         #environment setup starts here
+        rlPass "no env setup here"
         #environment setup ends   here
     rlPhaseEnd
 } #envsetup
@@ -36,6 +39,7 @@ cert_remove_hold_envcleanup()
 {
     rlPhaseStartCleanup "cert_remove_hold_envcleanup"
         #environment cleanup starts here
+        rlPass "no env cleanup here"
         #environment cleanup ends   here
     rlPhaseEnd
 } #envcleanup
@@ -46,11 +50,94 @@ cert_remove_hold_1001()
         local testID="cert_remove_hold_1001"
         local tmpout=$TmpDir/cert_remove_hold_1001.$RANDOM.out
         LKinitAsAdmin
-        rlRun "ipa cert-remove-hold $testID --cert_id " 0 "test options: " 
+        create_cert
+        local certid=`tail -n1 $certList | cut -d"=" -f2 | xargs echo`
+        rlRun "ipa cert-revoke $certid --revocation-reason=6" 0 "set revoke reason to 6 -- this is only reason we can remove hold"
+        ipa cert-show $certid > $tmpout
+        reason=`grep -i "Revocation reason" $tmpout | cut -d":" -f2 | xargs echo`
+        if [ "$reason" = "6" ];then
+            rlLog "revoke reason set to [6] confirmed"
+        else
+            rlFail "revoke reason expected to be [6], actual [$reason], test can not continue"
+            return
+        fi
+        rlRun "ipa cert-remove-hold $certid " 0 "test options: remove hold " 
+
+        #after remove hold, lets check the content again
+        ipa cert-show $certid > $tmpout
+        if grep -i "Revocation reason" $tmpout
+        then
+            rlFail "revocation reason still found in cert-show, test failed"
+            cat $tmpout
+        else
+            rlPass "revocation reason not found in cert-show, test pass"
+        fi
         Kcleanup
         rm $tmpout
     rlPhaseEnd
 } #cert_remove_hold_1001
+
+cert_remove_hold_1002()
+{ #test_scenario (negative): when cert revoked in reason other than 6, remove-hold should fail
+    rlPhaseStartTest "cert_remove_hold_1002"
+        local testID="cert_remove_hold_1002"
+        local tmpout=$TmpDir/cert_remove_hold_1001.$RANDOM.out
+        LKinitAsAdmin
+        create_cert
+        local certid=`tail -n1 $certList | cut -d"=" -f2 | xargs echo`
+        for revokeCode in 0 1 2 3 4 5 7 8 9 10
+        do
+            rlRun "ipa cert-revoke $certid --revocation-reason=$revokeCode" 0 "set revoke reason to [$revokeCode], cert should not be able to reuse"
+            ipa cert-show $certid > $tmpout
+            reason=`grep -i "Revocation reason" $tmpout | cut -d":" -f2 | xargs echo`
+            if [ "$reason" = "$revokeCode" ];then
+                rlLog "revoke reason set to [$revokeCode] confirmed"
+            else
+                rlFail "revoke reason expected to be [$revokeCode], actual [$reason], test can not continue"
+                return
+            fi
+            rlRun "ipa cert-remove-hold $certid " 1 "test options: remove hold should fail" 
+
+            #after remove hold, lets check the content again
+            ipa cert-show $certid > $tmpout
+            if grep -i "Revocation reason: $revokeCode" $tmpout
+            then
+                rlPass "revocation reason still found in cert-show, test pass"
+            else
+                rlFail "revocation reason not found in cert-show, test failed"
+                cat $tmpout
+            fi
+            Kcleanup
+            rm $tmpout
+        done
+    rlPhaseEnd
+} #cert_remove_hold_1002
+
+cert_remove_hold_1003()
+{ #test_scenario (negative):  remove-hold <invalid cert id>
+    rlPhaseStartTest "cert_remove_hold_1003"
+        local testID="cert_remove_hold_1003"
+        local tmpout=$TmpDir/cert_remove_hold_1001.$RANDOM.out
+        LKinitAsAdmin
+        for certid in 1000000 a abc
+        do
+            expectedErrCode=1
+            expectedErrMsg="Record not found"
+            ipa cert-remove-hold $certid --revocation-reason=6 >$tmpout
+            local ret=$?
+            if [ "$ret" = "1" ];then
+                if grep "$errmsg" $tmpout ;then
+                    rlPass "remove-hold an invalid cert failed as expected"
+                else
+                    rlFail "remove-hold an invalid cert failed, but error msg does not match"
+                    cat $tmpout
+                fi
+            else
+                rlFail "remove-hold an invalid cert success is not expected"
+            fi
+        done
+    rlPhaseEnd
+} #cert_remove_hold_1002
 
 #END OF TEST CASE for [cert-remove-hold]
 
@@ -240,13 +327,14 @@ cert_request_1010()
 #END OF TEST CASE for [cert-request]
 
 #############################################
-#  test suite: cert-revoke (2 test cases)
+#  test suite: cert-revoke (3 test cases)
 #############################################
 cert_revoke()
 {
     cert_revoke_envsetup
     cert_revoke_1001  #test_scenario (negative test): [--revocation-reason;negative;-1,11]
     cert_revoke_1002  #test_scenario (positive test): [--revocation-reason;positive;0,1,2,3,4,5,6,7,8,9,10]
+    cert_revoke_1003  #test_scenario (negative): revoke an non-exist cert
     cert_revoke_envcleanup
 } #cert-revoke
 
@@ -254,6 +342,7 @@ cert_revoke_envsetup()
 {
     rlPhaseStartSetup "cert_revoke_envsetup"
         #environment setup starts here
+        rlPass "no env setup necessare, all certs will be created in each test case"
         #environment setup ends   here
     rlPhaseEnd
 } #envsetup
@@ -262,37 +351,78 @@ cert_revoke_envcleanup()
 {
     rlPhaseStartCleanup "cert_revoke_envcleanup"
         #environment cleanup starts here
+        rlPass "no env cleanup necessary, it is already done in each test case"
         #environment cleanup ends   here
     rlPhaseEnd
 } #envcleanup
 
 cert_revoke_1001()
-{ #test_scenario (negative): --revocation-reason;negative;-1,11
+{ #test_scenario (negative): valid cert id + --revocation-reason;negative;-1,11
     rlPhaseStartTest "cert_revoke_1001"
         local testID="cert_revoke_1001"
         local tmpout=$TmpDir/cert_revoke_1001.$RANDOM.out
-        LKinitAsAdmin
-        local revocation-reason_TestValue_Negative="replace_me" #revocation-reason;negative;-1,11
         local expectedErrMsg=replace_me
         local expectedErrCode=1
-        qaRun "ipa cert-revoke $testID  --revocation-reason=$revocation-reason_TestValue_Negative " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [revocation-reason]=[$revocation-reason_TestValue_Negative]" 
+        create_cert
+        local validCert=`tail -n1 $certList`
+        local cert_id=`echo $validCert| cut -d"=" -f1`
+        LKinitAsAdmin
+        for invalid_revoke_reason in a abc 10000
+        do
+            qaRun "ipa cert-revoke $cert_id --revocation-reason=$invalid_revoke_reason" "$tmpout" "$expectedErrCode" "$expectedErrMsg" "test options:  [revocation-reason]=[$invalid_revoke_reason]" 
+        done
         Kcleanup
+        delete_cert
         rm $tmpout
     rlPhaseEnd
 } #cert_revoke_1001
 
 cert_revoke_1002()
-{ #test_scenario (positive): --revocation-reason;positive;0,1,2,3,4,5,6,7,8,9,10
+{ #test_scenario (positive): valid cert id + --revocation-reason;positive;0,1,2,3,4,5,6,7,8,9,10
     rlPhaseStartTest "cert_revoke_1002"
         local testID="cert_revoke_1002"
-        local tmpout=$TmpDir/cert_revoke_1002.$RANDOM.out
-        LKinitAsAdmin
-        local revocation-reason_TestValue="replace_me" #revocation-reason;positive;0,1,2,3,4,5,6,7,8,9,10
-        rlRun "ipa cert-revoke $testID  --revocation-reason=$revocation-reason_TestValue " 0 "test options:  [revocation-reason]=[$revocation-reason_TestValue]" 
-        Kcleanup
+        local tmpout=$TmpDir/certrevoke1002.$RANDOM.out
+        for reason in 0 1 2 3 4 5 6 7 8 9 10
+        do
+            create_cert
+            local validCert=`tail -n1 $certList`
+            local cert_id=`echo $validCert| cut -d"=" -f1`
+            LKinitAsAdmin
+            ipa cert-revoke $cert_id --revocation-reason=$reason >$tmpout
+            local ret=$?
+            Kcleanup
+            if [ "$ret" = "0" ];then
+                rlLog "revocation success, now check the revocation code"
+                local code=`grep -i "Revocation reason" $tmpout | cut -d":" -f2 | xargs echo`
+                if [ "$reason" = "$code" ];then
+                    rlPass "revocation code matches with expected [$code], pass"
+                else
+                    rlFail "revocation code does NOT match with expected: expected [$reason], actual [$code] "
+                    cat $tmpout
+                fi
+            else
+                rlFail "revocation failed"
+                cat $tmpout
+            fi
+            delete_cert
+        done
         rm $tmpout
     rlPhaseEnd
 } #cert_revoke_1002
+
+cert_revoke_1003()
+{ #test_scenario (negative):revoke a non-exist cert
+    rlPhaseStartTest "cert_revoke_1003"
+        local testID="cert_revoke_1003"
+        LKinitAsAdmin
+        for invalid_cert in a abc 100abc 10000000000
+        do
+            rlRun "ipa cert-revoke $invalid_cert" 1 "revoke non-exist cert should fail cert_id=[$invalid_cert]"
+        done
+        Kcleanup
+    rlPhaseEnd
+} #cert_revoke_1002
+
 
 #END OF TEST CASE for [cert-revoke]
 
@@ -302,8 +432,9 @@ cert_revoke_1002()
 cert_show()
 {
     cert_show_envsetup
-    cert_show_1001  #test_scenario (negative test): [--out;negative;CertOutFile]
+    cert_show_1001  #test_scenario (negative test): give negative cert id 
     cert_show_1002  #test_scenario (positive test): [--out;positive;CertOutFile]
+    cert_show_1003  #test_scenario (negative test): valid cert id + --out;negative;CertOutFile]
     cert_show_envcleanup
 } #cert-show
 
@@ -311,6 +442,7 @@ cert_show_envsetup()
 {
     rlPhaseStartSetup "cert_show_envsetup"
         #environment setup starts here
+        create_cert
         #environment setup ends   here
     rlPhaseEnd
 } #envsetup
@@ -319,20 +451,22 @@ cert_show_envcleanup()
 {
     rlPhaseStartCleanup "cert_show_envcleanup"
         #environment cleanup starts here
+        delete_cert
         #environment cleanup ends   here
     rlPhaseEnd
 } #envcleanup
 
 cert_show_1001()
-{ #test_scenario (negative): --out;negative;CertOutFile
+{ #test_scenario (negative): given invalid cert request id
     rlPhaseStartTest "cert_show_1001"
         local testID="cert_show_1001"
         local tmpout=$TmpDir/cert_show_1001.$RANDOM.out
         LKinitAsAdmin
-        local out_TestValue_Negative="replace_me" #out;negative;CertOutFile
-        local expectedErrMsg=replace_me
+        local expectedErrMsg="Certificate operation cannot be completed"
         local expectedErrCode=1
-        qaRun "ipa cert-show $testID  --out=$out_TestValue_Negative " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [out]=[$out_TestValue_Negative]" 
+        for invalidCertID in 1000 2000 a abc;do
+            qaRun "ipa cert-show $invalidCertID" "$tmpout" $expectedErrCode "$expectedErrMsg" "test options: $invalidCertID" 
+        done
         Kcleanup
         rm $tmpout
     rlPhaseEnd
@@ -344,22 +478,53 @@ cert_show_1002()
         local testID="cert_show_1002"
         local tmpout=$TmpDir/cert_show_1002.$RANDOM.out
         LKinitAsAdmin
-        local out_TestValue="replace_me" #out;positive;CertOutFile
-        rlRun "ipa cert-show $testID  --out=$out_TestValue " 0 "test options:  [out]=[$out_TestValue]" 
+        for cert in `cat $certList`;do
+            local outfile=$TmpDir/certshow1002.$RANDOM.out.file
+            local output=$TmpDir/certshow1002.$RANDOM.output
+            local valid_cert_id=`echo $cert | cut -d"=" -f2`
+            ipa cert-show $valid_cert_id >$output
+            rlRun "ipa cert-show $valid_cert_id --out=$outfile" 0 "output [$valid_cert_id] to file: [$outfile]"
+            #FIXME: do dome validation here to ensure the output file is valid
+            if diff $output $outfile
+            then
+                rlPass "direct output matches with output file, test pass"
+            else
+                rlFail "direct output does NOT match with output file, failed"
+            fi
+            rm $outfile
+            rm $output
+        done
         Kcleanup
         rm $tmpout
     rlPhaseEnd
 } #cert_show_1002
 
+cert_show_1003()
+{ #test_scenario (negative): positive cert id + --out;negative;CertOutFile
+    rlPhaseStartTest "cert_show_1003"
+        local testID="cert_show_1003"
+        local tmpout=$TmpDir/cert_show_1003.$RANDOM.out
+        LKinitAsAdmin
+        for cert in `cat $certList`;do
+            local valid_cert_id=`echo $cert | cut -d"=" -f2`
+            qaRun "ipa cert-show $valid_cert_id --out=" "$tmpout" "1" "out option requires an argument" "test option: give no argument for --out, expect to fail"
+            qaRun "ipa cert-show $valid_cert_id --out=/" "$tmpout" "1" "Is a directory" "test option: give a directory location instead of file name, expecte to fail"
+        done
+        Kcleanup
+        rm $tmpout
+    rlPhaseEnd
+} #cert_show_1003
+
 #END OF TEST CASE for [cert-show]
 
 #############################################
-#  test suite: cert-status (1 test cases)
+#  test suite: cert-status (2 test cases)
 #############################################
 cert_status()
 {
     cert_status_envsetup
-    cert_status_1001  #test_scenario (positive test): [--cert_id]
+    cert_status_1001  #test_scenario (positive test): valid cert id
+    cert_status_1002  #test_scenario (positive test): invalid cert id
     cert_status_envcleanup
 } #cert-status
 
@@ -383,7 +548,7 @@ cert_status_envcleanup()
 } #envcleanup
 
 cert_status_1001()
-{ #test_scenario (positive): --cert_id
+{ #test_scenario (positive): valid cert id
     rlPhaseStartTest "cert_status_1001"
         local testID="cert_status_1001"
         local tmpout=$TmpDir/cert_status_1001.$RANDOM.out
@@ -407,5 +572,31 @@ cert_status_1001()
         rm $tmpout
     rlPhaseEnd
 } #cert_status_1001
+
+cert_status_1002()
+{ #test_scenario (negative): invalid cert id
+    rlPhaseStartTest "cert_status_1002"
+        local testID="cert_status_1002"
+        local tmpout=$TmpDir/cert_status_1002.$RANDOM.out
+        LKinitAsAdmin
+        for cert in a abc 20000 10000000000000
+        do
+            ipa cert-status $cert_id >$tmpout
+            local ret=$?
+            if [ "$ret" = "1" ] && grep -i "Invalid number format" $tmpout
+            then
+                rlPass "error returned as expected for cert id [$cert_id]"
+            else
+                rlFail "no error returned or error msg not match for cert id [$cert_id]"
+                echo "=========== output ================"
+                cat $tmpout
+                echo "==================================="
+            fi
+        done
+        Kcleanup
+        rm $tmpout
+    rlPhaseEnd
+} #cert_status_1002
+
 
 #END OF TEST CASE for [cert-status]

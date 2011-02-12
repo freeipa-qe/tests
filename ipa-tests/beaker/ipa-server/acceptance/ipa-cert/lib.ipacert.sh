@@ -8,12 +8,12 @@ certList=$TmpDir/certlist.$RANDOM.txt
 
 LKinitAsAdmin()
 {
-    echo Secret123 | kinit admin@SJC.REDHAT.COM
+    echo Secret123 | kinit admin@SJC.REDHAT.COM 2>&1 >/dev/null
 } #LKinitAsAdmin
 
 create_cert()
 {
-    local out=$TmpDir/createCert.$RANDOM.txt
+    local tmpout=$TmpDir/createCert.$RANDOM.txt
     local serviceName=service_$RANDOM
     local certRequestFile=$TmpDir/certreq.$RANDOM.csr
     local certPrivateKeyFile=$TmpDir/certprikey.$RANDOM.key
@@ -28,7 +28,7 @@ create_cert()
 
     # step 3: create a cert request
     create_cert_request_file $certRequestFile $certPrivateKeyFile
-    ret=$?
+    local ret=$?
     if [ "$ret" = "0" ];then
         rlLog "cert file creation success, continue"
     else
@@ -36,22 +36,28 @@ create_cert()
         return 1
     fi
     # step 4: process cert request
-    #rlRun "ipa cert-request --principal=$principal $certRequestFile" 0 "process cert request for [$principal]"
-    ipa cert-request --principal=$principal $certRequestFile >$out
-
-    echo "===================================="
-    echo "output of cert-request"
-    cat $out
-    echo "===================================="
-
-    certid=`grep "Serial number" $out| cut -d":" -f2 | xargs echo` 
-    rlLog "create a new cert in ipa db, cert id: $certid"
-    echo "$principal=$certid" >> $certList
-    echo "==== cert list ==="
-    cat $certList
-    echo "=================="
-    # done 
+    ipa cert-request --principal=$principal $certRequestFile >$tmpout
+    local ret=$?
+    if [ "$ret" = "0" ];then
+        local certid=`grep "Serial number" $tmpout| cut -d":" -f2 | xargs echo` 
+        echo "$principal=$certid" >> $certList
+        rlPass "create cert success, cert id :[$certid], principal [$principal]"
+    else
+        rlFail "create cert failed, principal [$principal]"
+    fi
+    rm $tmpout
     Kcleanup
+
+    #debug 
+    #echo "===================================="
+    #echo "output of cert-request"
+    #cat $tmpout
+    #echo "===================================="
+
+    #echo "==== cert list ==="
+    #cat $certList
+    #echo "=================="
+    # done 
 } #create_cert
 
 create_cert_request_file()
@@ -97,13 +103,17 @@ create_cert_request_file()
     echo "send -s -- \"\r\"" >> $exp
 
     echo 'expect eof ' >> $exp
-    rlRun "/usr/bin/expect $exp" 0 "create cert request file"
     
-    echo "===== exp file [$exp] ===="
-    cat $exp
-    echo "========= Request file [$requestFile ]=="
-    cat $requestFile
-    echo "======================================="
+    rlLog "create cert request file [$requestFile]"
+    /usr/bin/expect $exp
+    local ret=$?
+    
+    #echo "===== exp file [$exp] ===="
+    #cat $exp
+    #echo "========= Request file [$requestFile ]=="
+    #cat $requestFile
+    #echo "======================================="
+    return $ret
 } #create_cert_request_file
   
 delete_cert()
@@ -117,5 +127,6 @@ delete_cert()
         rlLog "remove the service and revoke the cert [$cert_principal $cert_id"
         rlRun "ipa service-del $cert_principal" 0 "remove service $cert_principal"
     done
+    echo "" > $certList #clear up the cert list file
     Kcleanup
 } #delete_cert
