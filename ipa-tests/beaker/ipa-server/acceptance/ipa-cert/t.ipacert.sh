@@ -45,7 +45,7 @@ cert_remove_hold_envcleanup()
 } #envcleanup
 
 cert_remove_hold_1001()
-{ #test_scenario (positive): --cert_id
+{ #test_scenario (positive): --certid
     rlPhaseStartTest "cert_remove_hold_1001"
         local testID="cert_remove_hold_1001"
         local tmpout=$TmpDir/cert_remove_hold_1001.$RANDOM.out
@@ -119,21 +119,26 @@ cert_remove_hold_1003()
         local testID="cert_remove_hold_1003"
         local tmpout=$TmpDir/cert_remove_hold_1001.$RANDOM.out
         LKinitAsAdmin
-        for certid in 1000000 a abc
+        # somehow ipa cert-remove-hold always report success regardless
+        # I have to use output msg to determine the pass/fail 
+        local certid=99999999999999
+        ipa cert-remove-hold $certid >$tmpout
+        if grep -i "Record not found" $tmpout 
+        then
+            rlPass "remove non-exist cert reports 'not found' error"
+        else
+            rlFail "no match error msg found"
+        fi
+
+        for certid in a abc
         do
-            expectedErrCode=1
-            expectedErrMsg="Record not found"
-            ipa cert-remove-hold $certid --revocation-reason=6 >$tmpout
-            local ret=$?
-            if [ "$ret" = "1" ];then
-                if grep "$errmsg" $tmpout ;then
-                    rlPass "remove-hold an invalid cert failed as expected"
-                else
-                    rlFail "remove-hold an invalid cert failed, but error msg does not match"
-                    cat $tmpout
-                fi
+            ipa cert-remove-hold $certid >$tmpout
+            local errmsg="replace_me"
+            if grep "$errmsg" $tmpout ;then
+                rlPass "remove-hold an invalid cert failed as expected"
             else
-                rlFail "remove-hold an invalid cert success is not expected"
+                rlFail "remove-hold: error msg does not match"
+                cat $tmpout
             fi
         done
     rlPhaseEnd
@@ -180,7 +185,7 @@ cert_request_envcleanup()
 cert_request_1001()
 { #test_scenario (negative): --add --principal;negative;STR --request-type;positive;STR
     rlPhaseStartTest "cert_request_1001"
-        local testID="cert_request_1001"
+        local testID="cert_request_1001_$RANDOM"
         local tmpout=$TmpDir/cert_request_1001.$RANDOM.out
         local request_type_TestValue="pkcs10" #request-type;positive;STR
         local expectedErrCode=1
@@ -213,7 +218,7 @@ cert_request_1001()
 cert_request_1002()
 { #test_scenario (negative): --add --principal;positive;STR --request-type;negative;STR
     rlPhaseStartTest "cert_request_1002"
-        local testID="cert_request_1002"
+        local testID="cert_request_1002_$RANDOM"
         local tmpout=$TmpDir/cert_request_1002.$RANDOM.out
         local certRequestFile=$TmpDir/certrequest.$RANDOM.certreq.csr
         local certPrivateKeyFile=$TmpDir/certrequest.$RANDOM.prikey.txt
@@ -234,7 +239,7 @@ cert_request_1002()
 cert_request_1003()
 { #test_scenario (positive): --add --principal;positive;STR --request-type;positive;STR
     rlPhaseStartTest "cert_request_1003"
-        local testID="cert_request_1003"
+        local testID="cert_request_1003_$RANDOM"
         local tmpout=$TmpDir/cert_request_1003.$RANDOM.out
         local certRequestFile=$TmpDir/certrequest.$RANDOM.certreq.csr
         local certPrivateKeyFile=$TmpDir/certrequest.$RANDOM.prikey.txt
@@ -253,7 +258,7 @@ cert_request_1003()
 cert_request_1004()
 { #test_scenario (negative): --principal;negative;STR
     rlPhaseStartTest "cert_request_1004"
-        local testID="cert_request_1004"
+        local testID="cert_request_1004_$RANDOM"
         local tmpout=$TmpDir/cert_request_1004.$RANDOM.out
 
         local certRequestFile=$TmpDir/certrequest.$RANDOM.certreq.csr
@@ -284,7 +289,7 @@ cert_request_1004()
 cert_request_1005()
 { #test_scenario (negative): --principal;negative;STR --request-type;positive;STR
     rlPhaseStartTest "cert_request_1005"
-        local testID="cert_request_1005"
+        local testID="cert_request_1005_$RANDOM"
         local tmpout=$TmpDir/cert_request_1005.$RANDOM.out
 
         local certRequestFile=$TmpDir/certrequest.$RANDOM.certreq.csr
@@ -317,7 +322,7 @@ cert_request_1005()
 
 cert_request_1006()
 { #test_scenario (positive): --principal;positive;STR
-    rlPhaseStartTest "cert_request_1006"
+    rlPhaseStartTest "cert_request_1006_$RANDOM"
         local testID="cert_request_1006"
         local tmpout=$TmpDir/cert_request_1006.$RANDOM.out
 
@@ -341,7 +346,7 @@ cert_request_1006()
 cert_request_1007()
 { #test_scenario (negative): --principal;positive;STR --request-type;negative;STR
     rlPhaseStartTest "cert_request_1007"
-        local testID="cert_request_1007"
+        local testID="cert_request_1007_$RANDOM"
         local tmpout=$TmpDir/cert_request_1007.$RANDOM.out
         LKinitAsAdmin
         local principal_TestValue="service$testID/$hostname" #principal;positive;STR
@@ -366,7 +371,7 @@ cert_request_1007()
 cert_request_1008()
 { #test_scenario (positive): --principal;positive;STR --request-type;positive;STR
     rlPhaseStartTest "cert_request_1008"
-        local testID="cert_request_1008"
+        local testID="cert_request_1008_$RANDOM"
         local tmpout=$TmpDir/cert_request_1008.$RANDOM.out
         LKinitAsAdmin
         local principal_TestValue="service$testID/$hostname" #principal;positive;STR
@@ -389,7 +394,7 @@ cert_request_1008()
 cert_request_1009()
 { #test_scenario (negative): use same cert request file and principle twice, the first will be revoked with reason 4
     rlPhaseStartTest "cert_request_1009"
-        local testID="cert_request_1009"
+        local testID="cert_request_1009_$RANDOM"
         local tmpout=$TmpDir/cert_request_1009.$RANDOM.out
         LKinitAsAdmin
         local principal="service$testID/$hostname" #principal;positive;STR
@@ -496,16 +501,21 @@ cert_revoke_1001()
     rlPhaseStartTest "cert_revoke_1001"
         local testID="cert_revoke_1001"
         local tmpout=$TmpDir/cert_revoke_1001.$RANDOM.out
-        local expectedErrMsg=replace_me
+        local expectedErrMsg="invalid 'revocation_reason': must be an integer"
         local expectedErrCode=1
         create_cert
         local validCert=`tail -n1 $certList`
-        local cert_id=`echo $validCert| cut -d"=" -f1`
+        local certid=`echo $validCert| cut -d"=" -f1`
         LKinitAsAdmin
-        for invalid_revoke_reason in a abc 10000
+        # when pass a non-integer
+        for invalid_revoke_reason in a abc
         do
-            qaRun "ipa cert-revoke $cert_id --revocation-reason=$invalid_revoke_reason" "$tmpout" "$expectedErrCode" "$expectedErrMsg" "test options:  [revocation-reason]=[$invalid_revoke_reason]" 
+            qaRun "ipa cert-revoke $certid --revocation-reason=$invalid_revoke_reason" "$tmpout" "$expectedErrCode" "$expectedErrMsg" "test options:  [revocation-reason]=[$invalid_revoke_reason]" 
         done
+
+        # when interger does pass in, error msg indicates max value
+        expectedErrMsg="invalid 'revocation_reason': can be at most 10"
+        qaRun "ipa cert-revoke $certid --revocation-reason=$invalid_revoke_reason" "$tmpout" "$expectedErrCode" "$expectedErrMsg" "test options:  [revocation-reason]=[$invalid_revoke_reason]" 
         Kcleanup
         delete_cert
         rm $tmpout
@@ -521,9 +531,10 @@ cert_revoke_1002()
         do
             create_cert
             local validCert=`tail -n1 $certList`
-            local cert_id=`echo $validCert| cut -d"=" -f1`
+            local certid=`echo $validCert| cut -d"=" -f2`
             LKinitAsAdmin
-            ipa cert-revoke $cert_id --revocation-reason=$reason >$tmpout
+            rlLog "revoke cert [$certid] with revoke reason [$reason]"
+            ipa cert-revoke $certid --revocation-reason=$reason >$tmpout
             local ret=$?
             Kcleanup
             if [ "$ret" = "0" ];then
@@ -552,7 +563,7 @@ cert_revoke_1003()
         LKinitAsAdmin
         for invalid_cert in a abc 100abc 10000000000
         do
-            rlRun "ipa cert-revoke $invalid_cert" 1 "revoke non-exist cert should fail cert_id=[$invalid_cert]"
+            rlRun "ipa cert-revoke $invalid_cert" 1 "revoke non-exist cert should fail certid=[$invalid_cert]"
         done
         Kcleanup
     rlPhaseEnd
@@ -616,9 +627,9 @@ cert_show_1002()
         for cert in `cat $certList`;do
             local outfile=$TmpDir/certshow1002.$RANDOM.out.file
             local output=$TmpDir/certshow1002.$RANDOM.output
-            local valid_cert_id=`echo $cert | cut -d"=" -f2`
-            ipa cert-show $valid_cert_id >$output
-            rlRun "ipa cert-show $valid_cert_id --out=$outfile" 0 "output [$valid_cert_id] to file: [$outfile]"
+            local valid_certid=`echo $cert | cut -d"=" -f2`
+            ipa cert-show $valid_certid >$output
+            rlRun "ipa cert-show $valid_certid --out=$outfile" 0 "output [$valid_certid] to file: [$outfile]"
             #FIXME: do dome validation here to ensure the output file is valid
             if diff $output $outfile
             then
@@ -641,9 +652,9 @@ cert_show_1003()
         local tmpout=$TmpDir/cert_show_1003.$RANDOM.out
         LKinitAsAdmin
         for cert in `cat $certList`;do
-            local valid_cert_id=`echo $cert | cut -d"=" -f2`
-            qaRun "ipa cert-show $valid_cert_id --out=" "$tmpout" "1" "out option requires an argument" "test option: give no argument for --out, expect to fail"
-            qaRun "ipa cert-show $valid_cert_id --out=/" "$tmpout" "1" "Is a directory" "test option: give a directory location instead of file name, expecte to fail"
+            local valid_certid=`echo $cert | cut -d"=" -f2`
+            qaRun "ipa cert-show $valid_certid --out=" "$tmpout" "1" "out option requires an argument" "test option: give no argument for --out, expect to fail"
+            qaRun "ipa cert-show $valid_certid --out=/" "$tmpout" "1" "Is a directory" "test option: give a directory location instead of file name, expecte to fail"
         done
         Kcleanup
         rm $tmpout
@@ -691,13 +702,13 @@ cert_status_1001()
         for cert in `cat $certList`
         do
             local cert_principal=`echo $cert | cut -d"=" -f1`
-            local cert_id=`echo $cert | cut -d"=" -f2`
-            ipa cert-status $cert_id >$tmpout
-            if     grep -i "Request id: $cert_id" $tmpout \
+            local certid=`echo $cert | cut -d"=" -f2`
+            ipa cert-status $certid >$tmpout
+            if     grep -i "Request id: $certid" $tmpout \
                 && grep -i "Request status: complete" $tmpout ;then
-                rlPass "status check pass for cert id [$cert_id]"
+                rlPass "status check pass for cert id [$certid]"
             else
-                rlFail "status check failed for cert id [$cert_id]"
+                rlFail "status check failed for cert id [$certid]"
                 echo "=========== output ================"
                 cat $tmpout
                 echo "==================================="
@@ -714,15 +725,33 @@ cert_status_1002()
         local testID="cert_status_1002"
         local tmpout=$TmpDir/cert_status_1002.$RANDOM.out
         LKinitAsAdmin
-        for cert in a abc 20000 10000000000000
+        # scenario 1: give chars and char-integer mix
+        for certid in a abc 1a0
         do
-            ipa cert-status $cert_id >$tmpout
+            ipa cert-status $certid 2>&1 >$tmpout
             local ret=$?
             if [ "$ret" = "1" ] && grep -i "Invalid number format" $tmpout
             then
-                rlPass "error returned as expected for cert id [$cert_id]"
+                rlPass "error returned as expected for cert id [$certid]"
             else
-                rlFail "no error returned or error msg not match for cert id [$cert_id]"
+                rlFail "no error returned or error msg not match for cert id [$certid]"
+                echo "=========== output ================"
+                cat $tmpout
+                echo "==================================="
+            fi
+        done
+
+        # scenario: give integer, but there are no such cert in ipa
+        for certid in 999 1999
+        do
+            local errmsg="Request ID \d* was not found in the request queue"
+            ipa cert-status $certid 2>&1 >$tmpout
+            local ret=$?
+            if [ "$ret" = "1" ] && grep -i "$errmsg" $tmpout
+            then
+                rlPass "error returned as expected for cert id [$certid]"
+            else
+                rlFail "no error returned or error msg not match for cert id [$certid]"
                 echo "=========== output ================"
                 cat $tmpout
                 echo "==================================="
