@@ -614,5 +614,14 @@ manage_netgroups_negative()
 		# clean up
 		ipa hostgroup-del mygroup
 	rlPhaseEnd
-}
 
+	rlPhaseStartTest "ipa-netgroup-049: manage netgroups: Incorrect directory manager password"
+		rlRun "ssh root@$MASTER \"echo badpassword | ipa-host-net-manage status\" > /tmp/pluginerr.out 2>&1" 1 "ipa manage net group status with incorrect directory manager password."
+		cat /tmp/pluginerr.out | grep "Traceback"
+		if [ $? -eq 0 ] ; then
+			rlFail "ERROR: Traceback returned with bad directory manager password."
+		else
+			rlPass "No Traceback returned with incorrect directory manager password."
+		fi
+	rlPhaseEnd
+}
