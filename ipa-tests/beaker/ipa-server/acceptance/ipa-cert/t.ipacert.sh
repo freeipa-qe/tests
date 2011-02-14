@@ -122,17 +122,18 @@ cert_remove_hold_1003()
         # somehow ipa cert-remove-hold always report success regardless
         # I have to use output msg to determine the pass/fail 
         local certid=99999999999999
-        ipa cert-remove-hold $certid >$tmpout
+        ipa cert-remove-hold $certid 2>&1 >$tmpout
         if grep -i "Record not found" $tmpout 
         then
             rlPass "remove non-exist cert reports 'not found' error"
         else
             rlFail "no match error msg found"
+            cat $tmpout
         fi
 
         for certid in a abc
         do
-            ipa cert-remove-hold $certid >$tmpout
+            ipa cert-remove-hold $certid 2>&1 >$tmpout
             local errmsg="replace_me"
             if grep "$errmsg" $tmpout ;then
                 rlPass "remove-hold an invalid cert failed as expected"
@@ -203,7 +204,7 @@ cert_request_1001()
         expectedErrMsg="Service principal is not of the form: service/fully-qualified host name: missing service"
         qaRun "ipa cert-request $certRequestFile --add  --principal=$principal_TestValue_Negative  --request-type=$request_type_TestValue " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [principal]=[$principal_TestValue_Negative] [request-type]=[$request_type_TestValue]" 
 
-        principal_TestValue_Negative="does.not.match.csr.host.com" #principal;negative;STR 
+        principal_TestValue_Negative="whateverservice/does.not.match.csr.host.com" #principal;negative;STR 
         expectedErrMsg="Insufficient access: hostname in subject of request 'works4me.sjc.redhat.com' does not match principal hostname 'does.not.match.csr.host.com'"
         qaRun "ipa cert-request $certRequestFile --add  --principal=$principal_TestValue_Negative  --request-type=$request_type_TestValue " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [principal]=[$principal_TestValue_Negative] [request-type]=[$request_type_TestValue]" 
 
@@ -265,6 +266,7 @@ cert_request_1004()
         local certPrivateKeyFile=$TmpDir/certrequest.$RANDOM.prikey.txt
         create_cert_request_file $certRequestFile $certPrivateKeyFile
 
+        local expectedErrCode=1
         LKinitAsAdmin
         local principal_TestValue_Negative="/$hostname" #principal;negative;STR 
         local expectedErrMsg="The service principal for this request doesn't exist"
@@ -274,7 +276,7 @@ cert_request_1004()
         expectedErrMsg="Service principal is not of the form: service/fully-qualified host name: missing service"
         qaRun "ipa cert-request $certRequestFile --principal=$principal_TestValue_Negative" "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [principal]=[$principal_TestValue_Negative]"
 
-        principal_TestValue_Negative="does.not.match.csr.host.com" #principal;negative;STR 
+        principal_TestValue_Negative="whateverservice/does.not.match.csr.host.com" #principal;negative;STR 
         expectedErrMsg="Insufficient access: hostname in subject of request 'works4me.sjc.redhat.com' does not match principal hostname 'does.not.match.csr.host.com'"
         qaRun "ipa cert-request $certRequestFile --principal=$principal_TestValue_Negative" "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [principal]=[$principal_TestValue_Negative]"
 
@@ -296,6 +298,9 @@ cert_request_1005()
         local certPrivateKeyFile=$TmpDir/certrequest.$RANDOM.prikey.txt
         create_cert_request_file $certRequestFile $certPrivateKeyFile
         local request_type_TestValue="pkcs10" #request-type;positive;STR
+
+        local expectedErrCode=1
+
         LKinitAsAdmin
         local principal_TestValue_Negative="/$hostname" #principal;negative;STR 
         local expectedErrMsg="The service principal for this request doesn't exist"
@@ -305,12 +310,13 @@ cert_request_1005()
         expectedErrMsg="Service principal is not of the form: service/fully-qualified host name: missing service"
         qaRun "ipa cert-request $certRequestFile --principal=$principal_TestValue_Negative  --request-type=$request_type_TestValue " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [principal]=[$principal_TestValue_Negative] [request-type]=[$request_type_TestValue]" 
 
-        principal_TestValue_Negative="does.not.match.csr.host.com" #principal;negative;STR 
+        principal_TestValue_Negative="whateverservice/does.not.match.csr.host.com" #principal;negative;STR 
         expectedErrMsg="Insufficient access: hostname in subject of request 'works4me.sjc.redhat.com' does not match principal hostname 'does.not.match.csr.host.com'"
         qaRun "ipa cert-request $certRequestFile --principal=$principal_TestValue_Negative  --request-type=$request_type_TestValue " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [principal]=[$principal_TestValue_Negative] [request-type]=[$request_type_TestValue]" 
 
         principal_TestValue_Negative="service$testID/$hostname" # legal principal name, just not pre-exist;negative;STR 
         expectedErrMsg="replace_me"
+        expectedErrCode=2
         qaRun "ipa cert-request $certRequestFile --principal=$principal_TestValue_Negative  --request-type=$request_type_TestValue " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [principal]=[$principal_TestValue_Negative] [request-type]=[$request_type_TestValue]" 
         Kcleanup
 
@@ -322,13 +328,13 @@ cert_request_1005()
 
 cert_request_1006()
 { #test_scenario (positive): --principal;positive;STR
-    rlPhaseStartTest "cert_request_1006_$RANDOM"
-        local testID="cert_request_1006"
+    rlPhaseStartTest "cert_request_1006"
+        local testID="cert_request_1006_$RANDOM"
         local tmpout=$TmpDir/cert_request_1006.$RANDOM.out
 
         LKinitAsAdmin
         local principal_TestValue="service$testID/$hostname" #principal;positive;STR
-        rlRun "ipa-service-add $principal_TestValue" 0 "add service principal: [$incipal_TestValue] before add cert"
+        rlRun "ipa service-add $principal_TestValue" 0 "add service principal: [$principal_TestValue] before add cert"
 
         local certRequestFile=$TmpDir/certrequest.$RANDOM.certreq.csr
         local certPrivateKeyFile=$TmpDir/certrequest.$RANDOM.prikey.txt
@@ -350,7 +356,7 @@ cert_request_1007()
         local tmpout=$TmpDir/cert_request_1007.$RANDOM.out
         LKinitAsAdmin
         local principal_TestValue="service$testID/$hostname" #principal;positive;STR
-        rlRun "ipa-service-add $principal_TestValue" 0 "add service principal: [$incipal_TestValue] before add cert"
+        rlRun "ipa service-add $principal_TestValue" 0 "add service principal: [$principal_TestValue] before add cert"
 
         local certRequestFile=$TmpDir/certrequest.$RANDOM.certreq.csr
         local certPrivateKeyFile=$TmpDir/certrequest.$RANDOM.prikey.txt
@@ -375,7 +381,7 @@ cert_request_1008()
         local tmpout=$TmpDir/cert_request_1008.$RANDOM.out
         LKinitAsAdmin
         local principal_TestValue="service$testID/$hostname" #principal;positive;STR
-        rlRun "ipa-service-add $principal_TestValue" 0 "add service principal: [$incipal_TestValue] before add cert"
+        rlRun "ipa service-add $principal_TestValue" 0 "add service principal: [$principal_TestValue] before add cert"
         local request_type_TestValue="pkcs10" #request-type;positive;STR
 
         local certRequestFile=$TmpDir/certrequest.$RANDOM.certreq.csr
@@ -397,15 +403,15 @@ cert_request_1009()
         local testID="cert_request_1009_$RANDOM"
         local tmpout=$TmpDir/cert_request_1009.$RANDOM.out
         LKinitAsAdmin
-        local principal="service$testID/$hostname" #principal;positive;STR
-        rlRun "ipa-service-add $principal_TestValue" 0 "add service principal: [$incipal_TestValue] before add cert"
+        local principal_TestValue="service$testID/$hostname" #principal;positive;STR
+        rlRun "ipa service-add $principal_TestValue" 0 "add service principal: [$principal_TestValue] before add cert"
 
         local certRequestFile=$TmpDir/certrequest.$RANDOM.certreq.csr
         local certPrivateKeyFile=$TmpDir/certrequest.$RANDOM.prikey.txt
         create_cert_request_file $certRequestFile $certPrivateKeyFile
 
         # create the first cert, expect success
-        ipa cert-request --principal=$principal $certRequestFile >$tmpout
+        ipa cert-request --principal=$principal $certRequestFile 2>&1 >$tmpout
         local ret=$?
         if [ "$ret" = "0" ];then
             local certid=`grep "Serial number" $tmpout| cut -d":" -f2 | xargs echo` 
@@ -413,10 +419,11 @@ cert_request_1009()
             rlLog "create first cert success, cert id :[$certid], principal [$principal]"
         else
             rlFail "create first cert failed, principal [$principal]"
+            cat $tmpout
         fi
 
         # create the second cert with same csr file and principal name, expect success as well
-        ipa cert-request --principal=$principal $certRequestFile >$tmpout
+        ipa cert-request --principal=$principal $certRequestFile 2>&1 >$tmpout
         local ret=$?
         if [ "$ret" = "0" ];then
             local certid=`grep "Serial number" $tmpout| cut -d":" -f2 | xargs echo` 
@@ -424,6 +431,7 @@ cert_request_1009()
             rlLog "create second cert success, cert id :[$certid], principal [$principal]"
         else
             rlFail "create second cert failed, principal [$principal]"
+            cat $tmpout
             return
         fi
 
@@ -514,6 +522,7 @@ cert_revoke_1001()
         done
 
         # when interger does pass in, error msg indicates max value
+        invalid_revoke_reason=99999
         expectedErrMsg="invalid 'revocation_reason': can be at most 10"
         qaRun "ipa cert-revoke $certid --revocation-reason=$invalid_revoke_reason" "$tmpout" "$expectedErrCode" "$expectedErrMsg" "test options:  [revocation-reason]=[$invalid_revoke_reason]" 
         Kcleanup
@@ -534,7 +543,7 @@ cert_revoke_1002()
             local certid=`echo $validCert| cut -d"=" -f2`
             LKinitAsAdmin
             rlLog "revoke cert [$certid] with revoke reason [$reason]"
-            ipa cert-revoke $certid --revocation-reason=$reason >$tmpout
+            ipa cert-revoke $certid --revocation-reason=$reason 2>&1 >$tmpout
             local ret=$?
             Kcleanup
             if [ "$ret" = "0" ];then
@@ -703,7 +712,7 @@ cert_status_1001()
         do
             local cert_principal=`echo $cert | cut -d"=" -f1`
             local certid=`echo $cert | cut -d"=" -f2`
-            ipa cert-status $certid >$tmpout
+            ipa cert-status $certid 2>&1 >$tmpout
             if     grep -i "Request id: $certid" $tmpout \
                 && grep -i "Request status: complete" $tmpout ;then
                 rlPass "status check pass for cert id [$certid]"
@@ -729,12 +738,13 @@ cert_status_1002()
         for certid in a abc 1a0
         do
             ipa cert-status $certid 2>&1 >$tmpout
-            local ret=$?
-            if [ "$ret" = "1" ] && grep -i "Invalid number format" $tmpout
+            local errmsg="Invalid number format"
+            if grep -i "$errmsg" $tmpout
             then
-                rlPass "error returned as expected for cert id [$certid]"
+                rlPass "error returned as expected for cert id [$certid], errmsg [$errmsg]"
             else
                 rlFail "no error returned or error msg not match for cert id [$certid]"
+                rlLog "expected errmsg: [$errmsg]"
                 echo "=========== output ================"
                 cat $tmpout
                 echo "==================================="
@@ -744,14 +754,15 @@ cert_status_1002()
         # scenario: give integer, but there are no such cert in ipa
         for certid in 999 1999
         do
-            local errmsg="Request ID \d* was not found in the request queue"
+            local errmsg="Request ID $certid was not found in the request queue"
             ipa cert-status $certid 2>&1 >$tmpout
             local ret=$?
-            if [ "$ret" = "1" ] && grep -i "$errmsg" $tmpout
+            if grep -i "$errmsg" $tmpout
             then
                 rlPass "error returned as expected for cert id [$certid]"
             else
                 rlFail "no error returned or error msg not match for cert id [$certid]"
+                rlLog "expected errmsg: [$errmsg]"
                 echo "=========== output ================"
                 cat $tmpout
                 echo "==================================="

@@ -41,7 +41,7 @@
 # Include test case file
 . ./t.ipacert.sh
 
-PACKAGE="ipa-server"
+PACKAGE="freeipa-server"
 
 ##########################################
 #   test main 
