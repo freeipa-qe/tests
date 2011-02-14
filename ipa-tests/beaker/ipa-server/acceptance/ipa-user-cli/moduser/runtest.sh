@@ -204,7 +204,7 @@ rlJournalStart
 
     rlPhaseStartTest "ipa-user-cli-mod-024: addattr on Email Address"
 	rlRun "addAttribute user mail fsmith@abcd.com $superuser" 0 "Adding additional email"
-	rlRun "verifyUserAttr $superuser \"Email address\" fsmith@abcd.com" 0 "Verify user's email address"
+	rlRun "verifyUserAttr $superuser \"Email address\" \"fred@abc.net, fsmith@abcd.com\"" 0 "Verify user's email address"
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-user-cli-mod-025: setattr on Street Address"
@@ -237,14 +237,19 @@ rlJournalStart
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-user-cli-mod-029: setattr and addattr on cn"
+    rlPhaseStartTest "ipa-user-cli-mod-029: setattr on cn"
         rlRun "setAttribute user cn \"Fredrick Smith\" $superuser" 0 "Setting cn"
-        rlRun "verifyUserAttr $superuser cn \"Fredrick Smith\"" 0 "Verify user's cn"
-        rlRun "addAttribute user cn \"Smithie\" $superuser" 0 "Setting cn"
-        rlRun "verifyUserAttr $superuser cn \"Fredrick Smith, Smithie\"" 0 "Verify user's cn"
+        rlRun "verifyUserAttr $superuser \"Full name\" \"Fredrick Smith\"" 0 "Verify user's cn"
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-user-cli-mod-030: setattr and addattr on member"
+    rlPhaseStartTest "ipa-user-cli-mod-030: addattr on cn"
+	command="ipa user-mod --addattr cn=Smithie $superuser"
+        expmsg="ipa: ERROR: cn: Only one value allowed."
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
+
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-user-cli-mod-031: setattr and addattr on member"
 	command="ipa user-mod --setattr member=\"uid=admin,cn=users,cn=accounts,dc=$RELM\" $superuser"
         expmsg="ipa: ERROR: attribute \"member\" not allowed"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
@@ -252,7 +257,7 @@ rlJournalStart
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-user-cli-mod-031: setattr and addattr on ipauniqueid"
+    rlPhaseStartTest "ipa-user-cli-mod-032: setattr and addattr on ipauniqueid"
         command="ipa user-mod --setattr ipauniqueid=mynew-unique-id $superuser"
         expmsg="ipa: ERROR: Insufficient access: Only the Directory Manager can set arbitrary values for ipaUniqueID"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
@@ -260,7 +265,7 @@ rlJournalStart
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-user-cli-mod-032: setattr and addattr on invalid attribute"
+    rlPhaseStartTest "ipa-user-cli-mod-033: setattr and addattr on invalid attribute"
         command="ipa user-mod --setattr bad=test $superuser"
         expmsg="ipa: ERROR: attribute \"bad\" not allowed"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
@@ -268,7 +273,7 @@ rlJournalStart
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-user-cli-mod-033: setattr and addattr krbPwdPolicyReference"
+    rlPhaseStartTest "ipa-user-cli-mod-034: setattr and addattr krbPwdPolicyReference"
         command="ipa user-mod --setattr krbPwdPolicyReference=test $superuser"
         expmsg="ipa: ERROR: Insufficient access: Insufficient 'write' privilege to the 'krbPwdPolicyReference' attribute of entry 'uid=$superuser,cn=users,cn=accounts,dc=$RELM'."
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
@@ -276,7 +281,7 @@ rlJournalStart
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-user-cli-mod-034: setattr and addattr krbPrincipalName"
+    rlPhaseStartTest "ipa-user-cli-mod-035: setattr and addattr krbPrincipalName"
         command="ipa user-mod --setattr krbPrincipalName=test $superuser"
         expmsg="ipa: ERROR: Insufficient access: Insufficient 'write' privilege to the 'krbPrincipalName' attribute of entry 'uid=$superuser,cn=users,cn=accounts,dc=$RELM'."
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
@@ -284,7 +289,7 @@ rlJournalStart
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-user-cli-mod-035: setattr and addattr on User Private Group's gidNumber"
+    rlPhaseStartTest "ipa-user-cli-mod-036: setattr and addattr on User Private Group's gidNumber"
 	command="ipa group-mod --setattr gidNumber=12345678 $superuser"
 	expmsg="ipa: ERROR: Server is unwilling to perform: Modifying a mapped attribute  in a managed entry is not allowed. The \"gidNumber\" attribute is mapped for this entry."
 	rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
@@ -293,21 +298,35 @@ rlJournalStart
 	rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-user-cli-mod-036: setattr and addattr nsAccountLock"
-        command="ipa user-mod --setattr nsAccountLock=true $superuser"
-        expmsg="ipa: ERROR: attribute \"nsAccountLock\" not allowed"
-        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
-        command="ipa user-mod --addattr nsAccountLock=test $superuser"
-        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
+    rlPhaseStartTest "ipa-user-cli-mod-037: setattr nsAccountLock"
+	for item in TRUE FALSE True False true false ; do
+        	rlRun "ipa user-mod --setattr nsAccountLock=$item $superuser" 0 "Set user nsAccountLock to true"
+		rlRun "verifyUserAttr $superuser \"Account disabled\" $item" 0 "Verify user's nsAccountLock"
+	done
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-user-cli-mod-037: setattr on uidNumber and Verify UPG gidNumber now matches"
+    rlPhaseStartTest "ipa-user-cli-mod-038: setattr and addattr nsAccountLock Invalid Value"
+        command="ipa user-mod --setattr nsAccountLock=test $superuser"
+        expmsg="ipa: ERROR: invalid 'nsAccountLock': must be True or False"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
+	command="ipa user-mod --addattr nsAccountLock=test $superuser"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
+    rlPhaseEnd
+
+
+    rlPhaseStartTest "ipa-user-cli-mod-039: addattr nsAccountLock "
+        command="ipa user-mod --addattr nsAccountLock=true $superuser"
+        expmsg="ipa: ERROR: nsAccountLock: Only one value allowed."
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-user-cli-mod-040: setattr on uidNumber and Verify UPG gidNumber now matches"
 	rlRun "setAttribute user uidNumber 99999999 $superuser" 0 "setattr on uidNumber"
 	rlRun "verifyUserAttr $superuser UID 99999999" 0 "Verify user's uidNumber"
 	rlRun "verifyGroupAttr $superuser GID 99999999" 0 "Verify private group's gidNumber"
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-user-cli-mod-038: setattr and add addattr on telephoneNumber"
+    rlPhaseStartTest "ipa-user-cli-mod-041: setattr and add addattr on telephoneNumber"
         rlRun "setAttribute user telephoneNumber 111-111-1111 $superuser" 0 "Setting phone number"
         rlRun "verifyUserAttr $superuser \"Telephone Number\" 111-111-1111" 0 "Verify user's phone number"
 	for item in 222-222-2222 333-333-3333 444-444-4444 ; do
@@ -316,7 +335,7 @@ rlJournalStart
 	rlRun "verifyUserAttr $superuser \"Telephone Number\" \"111-111-1111, 222-222-2222, 333-333-3333, 444-444-4444\"" 0 "Verifying phone numbers"
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-user-cli-mod-039: setattr and add addattr on mobile"
+    rlPhaseStartTest "ipa-user-cli-mod-042: setattr and add addattr on mobile"
         rlRun "setAttribute user mobile 111-111-1111 $superuser" 0 "Setting setting mobile number"
         rlRun "verifyUserAttr $superuser \"Mobile Telephone Number\" 111-111-1111" 0 "Verify user's mobile phone number"
         for item in 222-222-2222 333-333-3333 444-444-4444 ; do
@@ -325,7 +344,7 @@ rlJournalStart
         rlRun "verifyUserAttr $superuser \"Mobile Telephone Number\" \"111-111-1111, 222-222-2222, 333-333-3333, 444-444-4444\"" 0 "Verifying mobile phone numbers"
     rlPhaseEnd 
 
-    rlPhaseStartTest "ipa-user-cli-mod-040: setattr and add addattr on fax"
+    rlPhaseStartTest "ipa-user-cli-mod-043: setattr and add addattr on fax"
         rlRun "setAttribute user facsimileTelephoneNumber 111-111-1111 $superuser" 0 "Setting fax number"
         rlRun "verifyUserAttr $superuser \"Fax Number\" 111-111-1111" 0 "Verify user's fax number"
         for item in 222-222-2222 333-333-3333 444-444-4444 ; do
@@ -334,7 +353,7 @@ rlJournalStart
         rlRun "verifyUserAttr $superuser \"Fax Number\" \"111-111-1111, 222-222-2222, 333-333-3333, 444-444-4444\"" 0 "Verifying fax numbers"
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-user-cli-mod-041: setattr and add addattr on pager"
+    rlPhaseStartTest "ipa-user-cli-mod-044: setattr and add addattr on pager"
         rlRun "setAttribute user pager 111-111-1111 $superuser" 0 "Setting pager number"
         rlRun "verifyUserAttr $superuser \"Pager Number\" 111-111-1111" 0 "Verify user's pager number"
         for item in 222-222-2222 333-333-3333 444-444-4444 ; do
@@ -343,9 +362,9 @@ rlJournalStart
         rlRun "verifyUserAttr $superuser \"Pager Number\" \"111-111-1111, 222-222-2222, 333-333-3333, 444-444-4444\"" 0 "Verifying pager numbers"
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-user-cli-mod-042: uid 0"
+    rlPhaseStartTest "ipa-user-cli-mod-045: uid 0"
         command="ipa user-mod --setattr uidNumber=0 $superuser"
-        expmsg="ipa: ERROR: uid 0 not allowed"
+        expmsg="ipa: ERROR: invalid 'uid': must be at least 1"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
         command="ipa user-mod --uid=0 $superuser"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --uid."
