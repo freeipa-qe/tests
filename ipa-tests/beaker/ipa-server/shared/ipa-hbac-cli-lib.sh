@@ -665,12 +665,12 @@ verifyHBACGroupMember()
 
   # construct memberDN
   memberCN="cn=$member"
-  memberDN="$memberCN,cn=hbacservices,cn=accounts,dc=$RELM"
+  memberDN="$memberCN,cn=hbacservices,cn=hbac,dc=$RELM"
   rlLog "Verifying Service: $memberDN"
 
   # construct groupDN
   mygroupCN="cn=$mygroup"
-  groupDN="$mygroupCN,cn=hbacservicegroups,cn=accounts,dc=$RELM"
+  groupDN="$mygroupCN,cn=hbacservicegroups,cn=hbac,dc=$RELM"
   rlLog "Verifying Service Group: $groupDN"
 
   # verify member attribute for group
