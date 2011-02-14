@@ -278,13 +278,18 @@ rlJournalStart
 
     rlPhaseStartTest "ipa-hostgroup-cli-27: setattr and addattr on member"
         attr="member"
+	member1short="new.testrelm"
+	member2short="new2.testrelm"
+	ipa host-add --force $member1short
+	ipa host-add --force $member2short
         member1="fqdn=new.testrelm,$HOSTRDN"
         member2="fqdn=new2.testrelm,$HOSTRDN"
         rlRun "setAttribute hostgroup member \"$member1\" $group1" 0 "Setting member attribute"
-	rlRun "verifyHostGroupMember \"$member1\" host \"$group1\"" 0 "Verify member was added"
+	rlRun "verifyHostGroupMember \"$member1short\" host \"$group1\"" 0 "Verify member was added"
 	rlRun "addAttribute hostgroup member \"$member2\" $group1" 0 "Adding additional member attribute"
-        #ipa hostgroup-mod --addattr $attr="$member2" "$group1"
-	rlRun "verifyHostGroupMember \"$member2\" host \"$group1\"" 0 "Verify member was added"
+	rlRun "verifyHostGroupMember \"$member2short\" host \"$group1\"" 0 "Verify member was added"
+	ipa host-del new.testrelm
+	ipa host-del new2.testrelm
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-hostgroup-cli-28: setattr and addattr on memberOf"
