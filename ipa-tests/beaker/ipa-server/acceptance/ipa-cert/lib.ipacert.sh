@@ -66,8 +66,8 @@ create_cert_request_file()
     local keyFile=$2
     # command to use:
     local certCmd="openssl req -out $requestFile -new -newkey rsa:2048 -nodes -keyout $keyFile"
-    #local exp=$TmpDir/createCertRequestFile.$RANDOM.exp # beaker test
-    local exp=/tmp/createCertRequestFile.$RANDOM.exp  # local test
+    local exp=$TmpDir/createCertRequestFile.$RANDOM.exp # beaker test
+    #local exp=/tmp/createCertRequestFile.$RANDOM.exp  # local test
 
     echo "set timeout 5" > $exp
     echo "set force_conservative 0" >> $exp

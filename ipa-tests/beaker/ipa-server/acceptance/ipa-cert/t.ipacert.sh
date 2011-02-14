@@ -8,7 +8,7 @@
 ipacert()
 {
     cert_remove_hold
-#    cert_request
+    cert_request
     cert_revoke
     cert_show
     cert_status
@@ -137,12 +137,12 @@ cert_remove_hold_1003()
             fi
         done
     rlPhaseEnd
-} #cert_remove_hold_1002
+} #cert_remove_hold_1003
 
 #END OF TEST CASE for [cert-remove-hold]
 
 #############################################
-#  test suite: cert-request (10 test cases)
+#  test suite: cert-request (9 test cases)
 #############################################
 cert_request()
 {
@@ -155,8 +155,7 @@ cert_request()
     cert_request_1006  #test_scenario (positive test): [--principal;positive;STR]
     cert_request_1007  #test_scenario (negative test): [--principal;positive;STR --request-type;negative;STR]
     cert_request_1008  #test_scenario (positive test): [--principal;positive;STR --request-type;positive;STR]
-    cert_request_1009  #test_scenario (negative test): [--request-type;negative;STR]
-    cert_request_1010  #test_scenario (positive test): [--request-type;positive;STR]
+    cert_request_1009  #test_scenario (negative): use same cert request file and principle twice, the first will be revoked with reason 4
     cert_request_envcleanup
 } #cert-request
 
@@ -164,6 +163,7 @@ cert_request_envsetup()
 {
     rlPhaseStartSetup "cert_request_envsetup"
         #environment setup starts here
+        rlPass "no env setup necessary"
         #environment setup ends   here
     rlPhaseEnd
 } #envsetup
@@ -172,6 +172,7 @@ cert_request_envcleanup()
 {
     rlPhaseStartCleanup "cert_request_envcleanup"
         #environment cleanup starts here
+        rlPass "no env cleanup necessary"
         #environment cleanup ends   here
     rlPhaseEnd
 } #envcleanup
@@ -181,14 +182,31 @@ cert_request_1001()
     rlPhaseStartTest "cert_request_1001"
         local testID="cert_request_1001"
         local tmpout=$TmpDir/cert_request_1001.$RANDOM.out
-        LKinitAsAdmin
-        local principal_TestValue_Negative="replace_me" #principal;negative;STR 
-        local request-type_TestValue="replace_me" #request-type;positive;STR
-        local expectedErrMsg=replace_me
+        local request_type_TestValue="pkcs10" #request-type;positive;STR
         local expectedErrCode=1
-        qaRun "ipa cert-request $testID --add  --principal=$principal_TestValue_Negative  --request-type=$request-type_TestValue " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [principal]=[$principal_TestValue_Negative] [request-type]=[$request-type_TestValue]" 
+
+        local certRequestFile=$TmpDir/certrequest.$RANDOM.certreq.csr
+        local certPrivateKeyFile=$TmpDir/certrequest.$RANDOM.prikey.txt
+        create_cert_request_file $certRequestFile $certPrivateKeyFile
+
+        LKinitAsAdmin
+        local principal_TestValue_Negative="/$hostname" #principal;negative;STR 
+        local expectedErrMsg="The service principal for this request doesn't exist"
+        qaRun "ipa cert-request $certRequestFile --add  --principal=$principal_TestValue_Negative  --request-type=$request_type_TestValue " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [principal]=[$principal_TestValue_Negative] [request-type]=[$request_type_TestValue]" 
+
+        principal_TestValue_Negative="noHostNamePricipal" #principal;negative;STR 
+        expectedErrMsg="Service principal is not of the form: service/fully-qualified host name: missing service"
+        qaRun "ipa cert-request $certRequestFile --add  --principal=$principal_TestValue_Negative  --request-type=$request_type_TestValue " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [principal]=[$principal_TestValue_Negative] [request-type]=[$request_type_TestValue]" 
+
+        principal_TestValue_Negative="does.not.match.csr.host.com" #principal;negative;STR 
+        expectedErrMsg="Insufficient access: hostname in subject of request 'works4me.sjc.redhat.com' does not match principal hostname 'does.not.match.csr.host.com'"
+        qaRun "ipa cert-request $certRequestFile --add  --principal=$principal_TestValue_Negative  --request-type=$request_type_TestValue " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [principal]=[$principal_TestValue_Negative] [request-type]=[$request_type_TestValue]" 
+
         Kcleanup
+
         rm $tmpout
+        rm $certRequestFile 
+        rm $certPrivateKeyFile
     rlPhaseEnd
 } #cert_request_1001
 
@@ -197,14 +215,19 @@ cert_request_1002()
     rlPhaseStartTest "cert_request_1002"
         local testID="cert_request_1002"
         local tmpout=$TmpDir/cert_request_1002.$RANDOM.out
+        local certRequestFile=$TmpDir/certrequest.$RANDOM.certreq.csr
+        local certPrivateKeyFile=$TmpDir/certrequest.$RANDOM.prikey.txt
+        create_cert_request_file $certRequestFile $certPrivateKeyFile
         LKinitAsAdmin
-        local principal_TestValue="replace_me" #principal;positive;STR 
-        local request-type_TestValue_Negative="replace_me" #request-type;negative;STR
-        local expectedErrMsg=replace_me
+        local principal_TestValue="sevice$testID/$hostname" #principal;positive;STR 
+        local request_type_TestValue_Negative="invalidType100" #request-type;negative;STR
+        local expectedErrMsg="Unknown Certificate Request Type"
         local expectedErrCode=1
-        qaRun "ipa cert-request $testID --add  --principal=$principal_TestValue  --request-type=$request-type_TestValue_Negative " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [principal]=[$principal_TestValue] [request-type]=[$request-type_TestValue_Negative]" 
+        qaRun "ipa cert-request $certRequestFile --add  --principal=$principal_TestValue  --request-type=$request_type_TestValue_Negative " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [principal]=[$principal_TestValue] [request-type]=[$request_type_TestValue_Negative]" 
         Kcleanup
         rm $tmpout
+        rm $certRequestFile 
+        rm $certPrivateKeyFile
     rlPhaseEnd
 } #cert_request_1002
 
@@ -213,12 +236,17 @@ cert_request_1003()
     rlPhaseStartTest "cert_request_1003"
         local testID="cert_request_1003"
         local tmpout=$TmpDir/cert_request_1003.$RANDOM.out
+        local certRequestFile=$TmpDir/certrequest.$RANDOM.certreq.csr
+        local certPrivateKeyFile=$TmpDir/certrequest.$RANDOM.prikey.txt
+        create_cert_request_file $certRequestFile $certPrivateKeyFile
         LKinitAsAdmin
-        local principal_TestValue="replace_me" #principal;positive;STR 
-        local request-type_TestValue="replace_me" #request-type;positive;STR
-        rlRun "ipa cert-request $testID --add  --principal=$principal_TestValue  --request-type=$request-type_TestValue " 0 "test options:  [principal]=[$principal_TestValue] [request-type]=[$request-type_TestValue]" 
+        local principal_TestValue="service$testID/$hostname" #principal;positive;STR 
+        local request_type_TestValue="pkcs10" #request-type;positive;STR
+        rlRun "ipa cert-request $certRequestFile --add  --principal=$principal_TestValue  --request-type=$request_type_TestValue " 0 "test options:  [principal]=[$principal_TestValue] [request-type]=[$request_type_TestValue]" 
         Kcleanup
         rm $tmpout
+        rm $certRequestFile 
+        rm $certPrivateKeyFile
     rlPhaseEnd
 } #cert_request_1003
 
@@ -227,13 +255,29 @@ cert_request_1004()
     rlPhaseStartTest "cert_request_1004"
         local testID="cert_request_1004"
         local tmpout=$TmpDir/cert_request_1004.$RANDOM.out
+
+        local certRequestFile=$TmpDir/certrequest.$RANDOM.certreq.csr
+        local certPrivateKeyFile=$TmpDir/certrequest.$RANDOM.prikey.txt
+        create_cert_request_file $certRequestFile $certPrivateKeyFile
+
         LKinitAsAdmin
-        local principal_TestValue_Negative="replace_me" #principal;negative;STR
-        local expectedErrMsg=replace_me
-        local expectedErrCode=1
-        qaRun "ipa cert-request $testID  --principal=$principal_TestValue_Negative " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [principal]=[$principal_TestValue_Negative]" 
+        local principal_TestValue_Negative="/$hostname" #principal;negative;STR 
+        local expectedErrMsg="The service principal for this request doesn't exist"
+        qaRun "ipa cert-request $certRequestFile  --principal=$principal_TestValue_Negative" "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [principal]=[$principal_TestValue_Negative]"
+
+        principal_TestValue_Negative="noHostNamePricipal" #principal;negative;STR 
+        expectedErrMsg="Service principal is not of the form: service/fully-qualified host name: missing service"
+        qaRun "ipa cert-request $certRequestFile --principal=$principal_TestValue_Negative" "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [principal]=[$principal_TestValue_Negative]"
+
+        principal_TestValue_Negative="does.not.match.csr.host.com" #principal;negative;STR 
+        expectedErrMsg="Insufficient access: hostname in subject of request 'works4me.sjc.redhat.com' does not match principal hostname 'does.not.match.csr.host.com'"
+        qaRun "ipa cert-request $certRequestFile --principal=$principal_TestValue_Negative" "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [principal]=[$principal_TestValue_Negative]"
+
         Kcleanup
+
         rm $tmpout
+        rm $certRequestFile 
+        rm $certPrivateKeyFile
     rlPhaseEnd
 } #cert_request_1004
 
@@ -242,14 +286,32 @@ cert_request_1005()
     rlPhaseStartTest "cert_request_1005"
         local testID="cert_request_1005"
         local tmpout=$TmpDir/cert_request_1005.$RANDOM.out
+
+        local certRequestFile=$TmpDir/certrequest.$RANDOM.certreq.csr
+        local certPrivateKeyFile=$TmpDir/certrequest.$RANDOM.prikey.txt
+        create_cert_request_file $certRequestFile $certPrivateKeyFile
+        local request_type_TestValue="pkcs10" #request-type;positive;STR
         LKinitAsAdmin
-        local principal_TestValue_Negative="replace_me" #principal;negative;STR 
-        local request-type_TestValue="replace_me" #request-type;positive;STR
-        local expectedErrMsg=replace_me
-        local expectedErrCode=1
-        qaRun "ipa cert-request $testID  --principal=$principal_TestValue_Negative  --request-type=$request-type_TestValue " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [principal]=[$principal_TestValue_Negative] [request-type]=[$request-type_TestValue]" 
+        local principal_TestValue_Negative="/$hostname" #principal;negative;STR 
+        local expectedErrMsg="The service principal for this request doesn't exist"
+        qaRun "ipa cert-request $certRequestFile --principal=$principal_TestValue_Negative  --request-type=$request_type_TestValue " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [principal]=[$principal_TestValue_Negative] [request-type]=[$request_type_TestValue]" 
+
+        principal_TestValue_Negative="noHostNamePricipal" #principal;negative;STR 
+        expectedErrMsg="Service principal is not of the form: service/fully-qualified host name: missing service"
+        qaRun "ipa cert-request $certRequestFile --principal=$principal_TestValue_Negative  --request-type=$request_type_TestValue " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [principal]=[$principal_TestValue_Negative] [request-type]=[$request_type_TestValue]" 
+
+        principal_TestValue_Negative="does.not.match.csr.host.com" #principal;negative;STR 
+        expectedErrMsg="Insufficient access: hostname in subject of request 'works4me.sjc.redhat.com' does not match principal hostname 'does.not.match.csr.host.com'"
+        qaRun "ipa cert-request $certRequestFile --principal=$principal_TestValue_Negative  --request-type=$request_type_TestValue " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [principal]=[$principal_TestValue_Negative] [request-type]=[$request_type_TestValue]" 
+
+        principal_TestValue_Negative="service$testID/$hostname" # legal principal name, just not pre-exist;negative;STR 
+        expectedErrMsg="replace_me"
+        qaRun "ipa cert-request $certRequestFile --principal=$principal_TestValue_Negative  --request-type=$request_type_TestValue " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [principal]=[$principal_TestValue_Negative] [request-type]=[$request_type_TestValue]" 
         Kcleanup
+
         rm $tmpout
+        rm $certRequestFile 
+        rm $certPrivateKeyFile
     rlPhaseEnd
 } #cert_request_1005
 
@@ -258,11 +320,21 @@ cert_request_1006()
     rlPhaseStartTest "cert_request_1006"
         local testID="cert_request_1006"
         local tmpout=$TmpDir/cert_request_1006.$RANDOM.out
+
         LKinitAsAdmin
-        local principal_TestValue="replace_me" #principal;positive;STR
-        rlRun "ipa cert-request $testID  --principal=$principal_TestValue " 0 "test options:  [principal]=[$principal_TestValue]" 
+        local principal_TestValue="service$testID/$hostname" #principal;positive;STR
+        rlRun "ipa-service-add $principal_TestValue" 0 "add service principal: [$incipal_TestValue] before add cert"
+
+        local certRequestFile=$TmpDir/certrequest.$RANDOM.certreq.csr
+        local certPrivateKeyFile=$TmpDir/certrequest.$RANDOM.prikey.txt
+        create_cert_request_file $certRequestFile $certPrivateKeyFile
+
+        rlRun "ipa cert-request $certRequestFile --principal=$principal_TestValue " 0 "test options:  [principal]=[$principal_TestValue]" 
         Kcleanup
+
         rm $tmpout
+        rm $certRequestFile 
+        rm $certPrivateKeyFile
     rlPhaseEnd
 } #cert_request_1006
 
@@ -272,13 +344,22 @@ cert_request_1007()
         local testID="cert_request_1007"
         local tmpout=$TmpDir/cert_request_1007.$RANDOM.out
         LKinitAsAdmin
-        local principal_TestValue="replace_me" #principal;positive;STR 
-        local request-type_TestValue_Negative="replace_me" #request-type;negative;STR
-        local expectedErrMsg=replace_me
+        local principal_TestValue="service$testID/$hostname" #principal;positive;STR
+        rlRun "ipa-service-add $principal_TestValue" 0 "add service principal: [$incipal_TestValue] before add cert"
+
+        local certRequestFile=$TmpDir/certrequest.$RANDOM.certreq.csr
+        local certPrivateKeyFile=$TmpDir/certrequest.$RANDOM.prikey.txt
+        create_cert_request_file $certRequestFile $certPrivateKeyFile
+
+        local request_type_TestValue_Negative="invalidType102" #request-type;negative;STR
+        local expectedErrMsg="Unknown Certificate Request Type invalidtype10"
         local expectedErrCode=1
-        qaRun "ipa cert-request $testID  --principal=$principal_TestValue  --request-type=$request-type_TestValue_Negative " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [principal]=[$principal_TestValue] [request-type]=[$request-type_TestValue_Negative]" 
+        qaRun "ipa cert-request $certRequestFile --principal=$principal_TestValue  --request-type=$request_type_TestValue_Negative " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [principal]=[$principal_TestValue] [request-type]=[$request_type_TestValue_Negative]" 
         Kcleanup
+
         rm $tmpout
+        rm $certRequestFile 
+        rm $certPrivateKeyFile
     rlPhaseEnd
 } #cert_request_1007
 
@@ -288,41 +369,95 @@ cert_request_1008()
         local testID="cert_request_1008"
         local tmpout=$TmpDir/cert_request_1008.$RANDOM.out
         LKinitAsAdmin
-        local principal_TestValue="replace_me" #principal;positive;STR 
-        local request-type_TestValue="replace_me" #request-type;positive;STR
-        rlRun "ipa cert-request $testID  --principal=$principal_TestValue  --request-type=$request-type_TestValue " 0 "test options:  [principal]=[$principal_TestValue] [request-type]=[$request-type_TestValue]" 
+        local principal_TestValue="service$testID/$hostname" #principal;positive;STR
+        rlRun "ipa-service-add $principal_TestValue" 0 "add service principal: [$incipal_TestValue] before add cert"
+        local request_type_TestValue="pkcs10" #request-type;positive;STR
+
+        local certRequestFile=$TmpDir/certrequest.$RANDOM.certreq.csr
+        local certPrivateKeyFile=$TmpDir/certrequest.$RANDOM.prikey.txt
+        create_cert_request_file $certRequestFile $certPrivateKeyFile
+
+        rlRun "ipa cert-request $certRequestFile --principal=$principal_TestValue  --request-type=$request_type_TestValue " 0 "test options:  [principal]=[$principal_TestValue] [request-type]=[$request_type_TestValue]" 
         Kcleanup
+
         rm $tmpout
+        rm $certRequestFile 
+        rm $certPrivateKeyFile
     rlPhaseEnd
 } #cert_request_1008
 
 cert_request_1009()
-{ #test_scenario (negative): --request-type;negative;STR
+{ #test_scenario (negative): use same cert request file and principle twice, the first will be revoked with reason 4
     rlPhaseStartTest "cert_request_1009"
         local testID="cert_request_1009"
         local tmpout=$TmpDir/cert_request_1009.$RANDOM.out
         LKinitAsAdmin
-        local request-type_TestValue_Negative="replace_me" #request-type;negative;STR
-        local expectedErrMsg=replace_me
-        local expectedErrCode=1
-        qaRun "ipa cert-request $testID  --request-type=$request-type_TestValue_Negative " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [request-type]=[$request-type_TestValue_Negative]" 
+        local principal="service$testID/$hostname" #principal;positive;STR
+        rlRun "ipa-service-add $principal_TestValue" 0 "add service principal: [$incipal_TestValue] before add cert"
+
+        local certRequestFile=$TmpDir/certrequest.$RANDOM.certreq.csr
+        local certPrivateKeyFile=$TmpDir/certrequest.$RANDOM.prikey.txt
+        create_cert_request_file $certRequestFile $certPrivateKeyFile
+
+        # create the first cert, expect success
+        ipa cert-request --principal=$principal $certRequestFile >$tmpout
+        local ret=$?
+        if [ "$ret" = "0" ];then
+            local certid=`grep "Serial number" $tmpout| cut -d":" -f2 | xargs echo` 
+            echo "$principal=$certid" >> $certList
+            rlLog "create first cert success, cert id :[$certid], principal [$principal]"
+        else
+            rlFail "create first cert failed, principal [$principal]"
+        fi
+
+        # create the second cert with same csr file and principal name, expect success as well
+        ipa cert-request --principal=$principal $certRequestFile >$tmpout
+        local ret=$?
+        if [ "$ret" = "0" ];then
+            local certid=`grep "Serial number" $tmpout| cut -d":" -f2 | xargs echo` 
+            echo "$principal=$certid" >> $certList
+            rlLog "create second cert success, cert id :[$certid], principal [$principal]"
+        else
+            rlFail "create second cert failed, principal [$principal]"
+            return
+        fi
+
+        # verification: (1) total success cert count should be 2 in $certList file
+        total=`cat $certList | wc -l` 
+        if [ "$total" = "2" ];then
+            rlLog "total certs matches : [$total]";
+        else
+            rlFail "total certs should be 2, but [$total]"
+            cat $certList
+            return
+        fi
+        oldCert=`cat $certList | head -n1`
+        newCert=`cat $certList | tail -n1` 
+        revokeReasonOld=`ipa cert-show $oldCert | grep "Revocation reason" | cut -d":" -f2 | xargs echo`
+        if [ "$revokeReasonOld" = "4" ];then
+            rlLog "old cert [$oldCert] revoked as reason 4, this is expected, verification continue"
+            revokeReasonNew=`ipa cert-show $newCert | grep "Revocation reason" | cut -d":" -f2 | xargs echo`
+            if [ "$revokeReasonNew" = "" ];then
+                rlPass "newer cert does not being revoked, this is eppected, test pass"
+            else
+                rlFail "newer cert revoked, this is not expected"
+                echo "==========================================="
+                echo "--------------- old cert ------------------"
+                ipa cert-show $oldCert
+                echo "--------------- new cert ------------------"
+                ipa cert-show $newCert
+                echo "==========================================="
+            fi
+        else
+            rlFail "first cert [$firstCert] Does not being revoked, or not as reason 4, this is not expected"
+        fi
+
         Kcleanup
         rm $tmpout
+        rm $certRequestFile 
+        rm $certPrivateKeyFile
     rlPhaseEnd
 } #cert_request_1009
-
-cert_request_1010()
-{ #test_scenario (positive): --request-type;positive;STR
-    rlPhaseStartTest "cert_request_1010"
-        local testID="cert_request_1010"
-        local tmpout=$TmpDir/cert_request_1010.$RANDOM.out
-        LKinitAsAdmin
-        local request-type_TestValue="replace_me" #request-type;positive;STR
-        rlRun "ipa cert-request $testID  --request-type=$request-type_TestValue " 0 "test options:  [request-type]=[$request-type_TestValue]" 
-        Kcleanup
-        rm $tmpout
-    rlPhaseEnd
-} #cert_request_1010
 
 #END OF TEST CASE for [cert-request]
 
