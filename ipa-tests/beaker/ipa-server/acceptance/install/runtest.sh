@@ -56,7 +56,17 @@ rlJournalStart
 		if [ $? -eq 0 ]; then
 			rlRun "cd /etc/yum.repos.d;wget http://jdennis.fedorapeople.org/ipa-devel/ipa-devel-fedora.repo" 0 "downloading ipa repo"
 		else
-			rlRun "cd /etc/yum.repos.d;wget http://jdennis.fedorapeople.org/ipa-devel/ipa-devel-rhel.repo" 0 "downloading ipa repo"
+			# This is rhel
+			grep release\ 5 /etc/redhat-release
+			if [ $? -eq 0 ]; then
+				# This is RHEL 5
+				rlRun "cd /etc/yum.repos.d;wget http://jdennis.fedorapeople.org/ipa-devel/ipa-devel-rhel.repo" 0 "downloading ipa repo"
+			else
+				# This is likley rhel6
+				rlRun "cd /etc/yum.repos.d;wget http://apoc.dsdev.sjc.redhat.com/tet/ipa2/ipa-tests/beaker/ipa-server/shared/rhel6-mickey.repo" 0 " deleting any previously existing beta2 rep"
+				rlRun "rm -f /etc/yum/repos.d/rhel6-beta2.repo" 0 " deleting any previously existing beta2 rep"
+				rlRun "cp /dev/shm/rhel6-beta2.repo /etc/yum.repos.d/." 0 "copying the rhel6 beta2 repo to the repos.d dir. It should be coming from the shated lib"
+			fi
 		fi
 	
 		#rlRun "cd /etc/yum.repos.d;wget http://apoc.dsdev.sjc.redhat.com/tet/ipa-fedora.repo"
@@ -123,7 +133,15 @@ rlJournalStart
 		echo $MASTER | grep $HOSTNAME
 		if [ $? -eq 0 ]; then 
 			# This is the master server, set up ipa-server
+			grep release\ 5 /etc/redhat-release
+			if [ $? -eq 0 ]; then
+				# This is RHEL 5
 			echo "ipa-server-install --setup-dns --forwarder=$DNSFORWARD --hostname=$hostname_s.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U --no-pkinit" > /dev/shm/installipa.bash
+			else
+				# This is likley rhel6
+			echo "ipa-server-install --setup-dns --forwarder=$DNSFORWARD --hostname=$hostname_s.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U" > /dev/shm/installipa.bash
+			fi
+
 			setenforce 0
 			/bin/bash /dev/shm/installipa.bash
 		else
