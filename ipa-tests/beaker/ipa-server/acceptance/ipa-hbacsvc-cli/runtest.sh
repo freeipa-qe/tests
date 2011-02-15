@@ -123,7 +123,7 @@ rlJournalStart
 
     rlPhaseStartTest "ipa-hbacsvc-cli-007: Negative - Service - setattr and addattr on memberOf"
         command="ipa hbacsvc-mod --setattr memberOf=SUDO $service1"
-        expmsg="ipa: ERROR: Insufficient access: Insufficient 'write' privilege to the 'memberOf' attribute of entry 'cn=$service1,cn=hbacservices,cn=hbac,dc=$RELM'."
+	expmsg="ipa: ERROR: Insufficient access: Insufficient 'write' privilege to the 'memberOf' attribute of entry 'cn=$service1,cn=hbacservices,cn=hbac,dc=$RELM'."
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message"
         command="ipa hbacsvc-mod --addattr memberOf=SUDO $service1"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message"
