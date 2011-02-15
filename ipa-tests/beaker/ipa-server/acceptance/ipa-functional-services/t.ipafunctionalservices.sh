@@ -30,9 +30,18 @@ ipafunctionalservices()
 {
     setup
     http_services
+    https
     ldap_services
+    #ldaps
     cleanup
 } 
+
+https()
+{
+    https_setup
+    https_tests
+    https_cleanup
+}
 
 ######################
 # SETUP              #
@@ -182,9 +191,8 @@ setup()
 }
 
 ########################
-#  TEST CASES          #
+#  HTTP TEST CASES     #
 ########################
-# HTTP
 http_services()
 {
         rlPhaseStartTest "ipa-functionalservices-001: Access HTTP service with valid credentials"
@@ -212,10 +220,113 @@ http_services()
         rlPhaseEnd
 }
 
-# LDAP
+#######################
+#  HTTPS TEST CASES   #
+#######################
+https_setup()
+{
+   	# add the IPA CA Cert as a trusted certificate to the apache server's certificate database
+   	rlLog "Adding the IPA CA certificate to the web server's certificate database ............"
+   	cd /etc/httpd/alias
+   	wget http://$MASTER/ipa/config/ca.crt
+   	certutil -A -d . -n 'IPA CA' -t CT,, -a < ca.crt
+
+   	rlRun "certutil -L -d . -n 'IPA CA'" 0 "Verify the IPA CA certificate was added to the apache server's certificate database"
+
+	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials"
+
+   	# Get certificate subject
+   	certsubj=`ipa config-show | grep "Certificate Subject base" | cut -d ":" -f2`
+	# trim whitespace
+	certsubj=`echo $certsubj`
+	rlLog "Certificate Subject: $certsubj"
+
+	# generate a certificate request for the web server
+	certutil -R -s "CN=$HOSTNAME,$certsubj" -d . -a -z /etc/group > $HOSTNAME.csr
+	cat $HOSTNAME.csr
+
+	# submit the certificate request
+	rlRun "ipa cert-request --principal=$HTTPPRINC $HOSTNAME.csr" 0 "Submitting certificate request for HTTP server"
+	# get certificate into PEM file
+	rlRun "ipa cert-show $HTTPPRINC --out $HOSTNAME.crt" 0 "Get HTTP server cert into a PEM file"
+
+	# add the HTTP server cert to the certificate database
+	certutil -A -n $HOSTNAME -d . -t u,u,u -a < $HOSTNAME.crt
+
+	# Validate the certificate
+	rlRun "certutil -V -u V -d . -n $HOSTNAME > /tmp/certvalid.out 2>&1" 0 "Validating HTTP Server certificate"
+	cat /tmp/certvalid.out | grep "certificate is valid"
+	if [ $? -eq 0 ] ; then
+		rlPass "SUCCESS: HTTP Server Certificate is valid"
+	else
+		rlRun "ERROR: HTTP Server Certificate is not valid."
+	fi
+
+	# configuring http server for SSL
+	sed -e "s/#NSSNicknameServer-Cert/NSSNickname $HOSTNAME" /etc/httpd/conf.d/nss.conf /tmp/nss.conf
+	rlFileBackup /etc/httpd/conf.d/nss.conf
+	cp -f /tmp/nss.conf /etc/httpd/conf.d/nss.conf
+
+	# restart the apache server
+	rlRun "service httpd restart" 0 "Restarting apache for SSL configuration to take affect"
+}
+
+https_tests()
+{
+
+	rlPhaseStartTest "ipa-functionalservices-003: Access HTTPS service with valid credentials"
+                rlRun "kinitAs httpuser1 Secret123" 0 "kinit as user to get valid credentials"
+                rlLog "Executing: curl -v --negotiate -u: https://$HOSTNAME/ipatest/"
+                curl -v --negotiate -u: https://$HOSTNAME/ipatest/ > /tmp/curl_001.out
+                cat /tmp/curl_001.out | grep "404 Not Found"
+                if [ $? -eq 0 ] ; then
+                        rlPass "User was authenticated"
+                else
+                        rlFail "User was NOT authenticated"
+                fi
+        rlPhaseEnd
+
+        rlPhaseStartTest "ipa-functionalservices-004: Access HTTPS service with out credentials"
+                rlRun "kdestroy" 0 "destroy kerberos credentials"
+                rlLog "Executing: curl -v --negotiate -u: https://$HOSTNAME/ipatest/"
+                curl -v --negotiate -u: https://$HOSTNAME/ipatest/ > /tmp/curl_002.out
+                cat /tmp/curl_002.out | grep "401 Authorization Required"
+                if [ $? -eq 0 ] ; then
+                        rlPass "User was NOT authenticated"
+                else
+                        rlFail "User was authenticated"
+                fi
+        rlPhaseEnd
+
+}
+
+https_cleanup()
+{
+	# revoke the HTTP server's certificate - first need the certificate's serial number
+	certutil -L -d . -n "$HOSTNAME" > /tmp/certout.txt
+	serialno=`cat /tmp/certout.txt | grep "Serial Number" | cut -d ":" -f 2 | cut -d "(" -f 1`
+	serialno=`echo $serialno`
+	rlRun "ipa cert-revoke $serialno" 0 "Revoke HTTP server's certificate"
+
+	# remove cert files
+	rm -rf /etc/httpd/alias/$HOSTNAME.csr /etc/httpd/alias/ca.crt /etc/httpd/alias/$HOSTNAME.crt
+
+	# remove the certificates from the web server's database
+	cd /etc/httpd/alias/
+	certutil -d . -D -n "$HOSTNAME"
+	certutil -d . -D -n "IPA CA"	
+
+	# restore nss.conf
+	rlFileRestore /etc/httpd/conf.d/nss.conf
+	rlRun "service httpd restart" 0 "Restarting apache server"
+}
+
+#######################
+# LDAP TEST CASES     #
+#######################
 ldap_services()
 {
-	rlPhaseStartTest "ipa-functionalservices-003: Access LDAP service with valid credentials"
+	rlPhaseStartTest "ipa-functionalservices-005: Access LDAP service with valid credentials"
 		rlRun "kdestroy" 0 "destroying kerberos credentials"
 		rlRun "kinitAs ldapuser1 Secret123" 0 "kinit as user to get valid credentials"
 		klist
@@ -223,7 +334,7 @@ ldap_services()
 		rlRun "ldapsearch -h $HOSTNAME -p $LDAPPORT -Y GSSAPI -s sub -b \"uid=ldapuser1,$BASEDN\" \"(uid=*)\" dn > /tmp/ldapsearch_003.out 2>&1" 0 "Verify ldapsearch with valid credentials"
 	rlPhaseEnd
 
-	rlPhaseStartTest "ipa-functionalservices-004: Access LDAP service with out credentials"
+	rlPhaseStartTest "ipa-functionalservices-006: Access LDAP service with out credentials"
                 rlRun "kdestroy" 0 "destroy kerberos credentials"
                 rlLog "Executing: ldapsearch -h $HOSTNAME -p $LDAPPORT -Y GSSAPI -s sub -b \"ou=people,$BASEDN\"(uid=*)\" dn"
                 rlRun "ldapsearch -h $HOSTNAME -p $LDAPPORT -Y GSSAPI -s sub -b \"uid=ldapuser1,$BASEDN\" \"(uid=*)\" dn > /tmp/ldapsearch_004.out 2>&1" 254 "Verify ldapsearch with valid credentials"
@@ -236,6 +347,20 @@ ldap_services()
         rlPhaseEnd
 }
 
+########################
+# LDAPS TEST CASES     #
+########################
+ldaps_setup()
+{
+}
+
+ldaps_tests()
+{
+}
+
+ldaps_cleanup()
+{
+}
 ########################
 # CLEANUP	       #
 ########################
