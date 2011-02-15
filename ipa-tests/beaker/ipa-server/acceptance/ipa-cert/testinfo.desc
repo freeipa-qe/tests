@@ -1,7 +1,7 @@
 Owner:           Yi Zhang <yzhang@redhat.com>
-Name:            /CoreOS/ipa-server/acceptance/ipacert
+Name:            /CoreOS/ipa-server/acceptance/ipa-cert
 TestVersion:     1.0
-Path:            /mnt/tests/CoreOS/ipa-server/acceptance/ipacert
+Path:            /mnt/tests/CoreOS/ipa-server/acceptance/ipa-cert
 Description:     IPA certificate operation CLI test
 Type:            Regression
 TestTime:        15m
