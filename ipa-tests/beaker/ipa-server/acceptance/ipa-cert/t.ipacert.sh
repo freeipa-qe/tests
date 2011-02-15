@@ -536,29 +536,30 @@ cert_revoke_1002()
     rlPhaseStartTest "cert_revoke_1002"
         local testID="cert_revoke_1002"
         local tmpout=$TmpDir/certrevoke1002.$RANDOM.out
-        for reason in 0 1 2 3 4 5 6 7 8 9 10
+        for reason in 0 1 2 3 4 5 6 8 9 10
         do
             create_cert
             local validCert=`tail -n1 $certList`
             local certid=`echo $validCert| cut -d"=" -f2`
-            LKinitAsAdmin
             rlLog "revoke cert [$certid] with revoke reason [$reason]"
-            ipa cert-revoke $certid --revocation-reason=$reason 2>&1 >$tmpout
+            LKinitAsAdmin
+            ipa cert-revoke $certid --revocation-reason=$reason
             local ret=$?
-            Kcleanup
             if [ "$ret" = "0" ];then
+                ipa cert-show $certid > $tmpout
                 rlLog "revocation success, now check the revocation code"
-                local code=`grep -i "Revocation reason" $tmpout | cut -d":" -f2 | xargs echo`
-                if [ "$reason" = "$code" ];then
-                    rlPass "revocation code matches with expected [$code], pass"
+                local actual=`grep -i "Revocation reason" $tmpout | cut -d":" -f2 | xargs echo`
+                if [ "$reason" = "$actual" ];then
+                    rlPass "revocation code matches with expected [$acutal], pass"
                 else
-                    rlFail "revocation code does NOT match with expected: expected [$reason], actual [$code] "
-                    cat $tmpout
+                    rlFail "revocation code doesnot match with expected: expected [$reason], actual [$actual] "
+                    ipa cert-show $certid 
                 fi
             else
-                rlFail "revocation failed"
-                cat $tmpout
+                rlFail "revocation failed, cert show:"
+                ipa cert-show $certid 
             fi
+            Kcleanup
             delete_cert
         done
         rm $tmpout
@@ -737,7 +738,7 @@ cert_status_1002()
         # scenario 1: give chars and char-integer mix
         for certid in a abc 1a0
         do
-            ipa cert-status $certid 2>&1 >$tmpout
+            ipa cert-status $certid 2>$tmpout
             local errmsg="Invalid number format"
             if grep -i "$errmsg" $tmpout
             then
@@ -755,7 +756,7 @@ cert_status_1002()
         for certid in 999 1999
         do
             local errmsg="Request ID $certid was not found in the request queue"
-            ipa cert-status $certid 2>&1 >$tmpout
+            ipa cert-status $certid 2>$tmpout
             local ret=$?
             if grep -i "$errmsg" $tmpout
             then

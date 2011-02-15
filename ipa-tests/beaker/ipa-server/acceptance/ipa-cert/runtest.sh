@@ -42,7 +42,8 @@
 . ./t.ipacert.sh
 
 PACKAGE="freeipa-server"
-
+startDate=`date "+%F %r"`
+satrtEpoch=`date "+%s"`
 ##########################################
 #   test main 
 #########################################
