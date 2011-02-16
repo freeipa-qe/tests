@@ -38,7 +38,7 @@
 			</task>
 			<task name="/CoreOS/ipa-server/acceptance/ipa-cert" role="MASTER">
 				<params>
-					<param name="KILLTIMEOVERRIDE" value="8789333"/>
+					<param name="KILLTIMEOVERRIDE" value="1800"/>
 				</params>
 			</task>
 			<task name="/CoreOS/ipa-server/acceptance/uninstall" role="STANDALONE">

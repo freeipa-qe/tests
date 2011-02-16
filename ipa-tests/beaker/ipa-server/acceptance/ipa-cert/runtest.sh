@@ -37,9 +37,22 @@
 . /usr/bin/rhts-environment.sh
 . /usr/share/beakerlib/beakerlib.sh
 . /dev/shm/ipa-server-shared.sh
+. /dev/shm/env.sh
 
 # Include test case file
 . ./t.ipacert.sh
+
+########### temp fix ########
+bugfix()
+{
+    local file=/var/lib/pki-ca/profiles/ca/caIPAserviceCert.cfg
+    rlLog "fix bug: file: $file"
+    rlRun "ls -l $file" 0 "before fix"
+    chown pkiuser.pkiuser $file
+    rlRun "ls -l $file" 0 "after fix"
+    rlRun "ipactl restart" 0 "check the file and restart ipa"
+} # bigfix
+##############################
 
 PACKAGE="freeipa-server"
 startDate=`date "+%F %r"`
@@ -47,6 +60,8 @@ satrtEpoch=`date "+%s"`
 ##########################################
 #   test main 
 #########################################
+
+bugfix #this is a temp fix, once bug-fix officially checked in, i should remove this one
 
 rlJournalStart
     rlPhaseStartSetup "ipacert startup: Check for ipa-server package"
@@ -66,7 +81,6 @@ rlJournalStart
 
     makereport
 rlJournalEnd
-
 
  
 # manifest:

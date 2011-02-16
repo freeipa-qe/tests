@@ -49,7 +49,7 @@ cert_remove_hold_1001()
     rlPhaseStartTest "cert_remove_hold_1001"
         local testID="cert_remove_hold_1001"
         local tmpout=$TmpDir/cert_remove_hold_1001.$RANDOM.out
-        LKinitAsAdmin
+        KinitAsAdmin
         create_cert
         local certid=`tail -n1 $certList | cut -d"=" -f2 | xargs echo`
         rlRun "ipa cert-revoke $certid --revocation-reason=6" 0 "set revoke reason to 6 -- this is only reason we can remove hold"
@@ -82,7 +82,7 @@ cert_remove_hold_1002()
     rlPhaseStartTest "cert_remove_hold_1002"
         local testID="cert_remove_hold_1002"
         local tmpout=$TmpDir/cert_remove_hold_1001.$RANDOM.out
-        LKinitAsAdmin
+        KinitAsAdmin
         create_cert
         local certid=`tail -n1 $certList | cut -d"=" -f2 | xargs echo`
         for revokeCode in 0 1 2 3 4 5 7 8 9 10
@@ -118,7 +118,7 @@ cert_remove_hold_1003()
     rlPhaseStartTest "cert_remove_hold_1003"
         local testID="cert_remove_hold_1003"
         local tmpout=$TmpDir/cert_remove_hold_1001.$RANDOM.out
-        LKinitAsAdmin
+        KinitAsAdmin
         # somehow ipa cert-remove-hold always report success regardless
         # I have to use output msg to determine the pass/fail 
         local certid=99999999999999
@@ -195,7 +195,7 @@ cert_request_1001()
         local certPrivateKeyFile=$TmpDir/certrequest.$RANDOM.prikey.txt
         create_cert_request_file $certRequestFile $certPrivateKeyFile
 
-        LKinitAsAdmin
+        KinitAsAdmin
         local principal_TestValue_Negative="/$hostname" #principal;negative;STR 
         local expectedErrMsg="The service principal for this request doesn't exist"
         qaRun "ipa cert-request $certRequestFile --add  --principal=$principal_TestValue_Negative  --request-type=$request_type_TestValue " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [principal]=[$principal_TestValue_Negative] [request-type]=[$request_type_TestValue]" 
@@ -224,7 +224,7 @@ cert_request_1002()
         local certRequestFile=$TmpDir/certrequest.$RANDOM.certreq.csr
         local certPrivateKeyFile=$TmpDir/certrequest.$RANDOM.prikey.txt
         create_cert_request_file $certRequestFile $certPrivateKeyFile
-        LKinitAsAdmin
+        KinitAsAdmin
         local principal_TestValue="sevice$testID/$hostname" #principal;positive;STR 
         local request_type_TestValue_Negative="invalidType100" #request-type;negative;STR
         local expectedErrMsg="Unknown Certificate Request Type"
@@ -245,7 +245,7 @@ cert_request_1003()
         local certRequestFile=$TmpDir/certrequest.$RANDOM.certreq.csr
         local certPrivateKeyFile=$TmpDir/certrequest.$RANDOM.prikey.txt
         create_cert_request_file $certRequestFile $certPrivateKeyFile
-        LKinitAsAdmin
+        KinitAsAdmin
         local principal_TestValue="service$testID/$hostname" #principal;positive;STR 
         local request_type_TestValue="pkcs10" #request-type;positive;STR
         rlRun "ipa cert-request $certRequestFile --add  --principal=$principal_TestValue  --request-type=$request_type_TestValue " 0 "test options:  [principal]=[$principal_TestValue] [request-type]=[$request_type_TestValue]" 
@@ -267,7 +267,7 @@ cert_request_1004()
         create_cert_request_file $certRequestFile $certPrivateKeyFile
 
         local expectedErrCode=1
-        LKinitAsAdmin
+        KinitAsAdmin
         local principal_TestValue_Negative="/$hostname" #principal;negative;STR 
         local expectedErrMsg="The service principal for this request doesn't exist"
         qaRun "ipa cert-request $certRequestFile  --principal=$principal_TestValue_Negative" "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [principal]=[$principal_TestValue_Negative]"
@@ -301,7 +301,7 @@ cert_request_1005()
 
         local expectedErrCode=1
 
-        LKinitAsAdmin
+        KinitAsAdmin
         local principal_TestValue_Negative="/$hostname" #principal;negative;STR 
         local expectedErrMsg="The service principal for this request doesn't exist"
         qaRun "ipa cert-request $certRequestFile --principal=$principal_TestValue_Negative  --request-type=$request_type_TestValue " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [principal]=[$principal_TestValue_Negative] [request-type]=[$request_type_TestValue]" 
@@ -332,7 +332,7 @@ cert_request_1006()
         local testID="cert_request_1006_$RANDOM"
         local tmpout=$TmpDir/cert_request_1006.$RANDOM.out
 
-        LKinitAsAdmin
+        KinitAsAdmin
         local principal_TestValue="service$testID/$hostname" #principal;positive;STR
         rlRun "ipa service-add $principal_TestValue" 0 "add service principal: [$principal_TestValue] before add cert"
 
@@ -354,7 +354,7 @@ cert_request_1007()
     rlPhaseStartTest "cert_request_1007"
         local testID="cert_request_1007_$RANDOM"
         local tmpout=$TmpDir/cert_request_1007.$RANDOM.out
-        LKinitAsAdmin
+        KinitAsAdmin
         local principal_TestValue="service$testID/$hostname" #principal;positive;STR
         rlRun "ipa service-add $principal_TestValue" 0 "add service principal: [$principal_TestValue] before add cert"
 
@@ -379,7 +379,7 @@ cert_request_1008()
     rlPhaseStartTest "cert_request_1008"
         local testID="cert_request_1008_$RANDOM"
         local tmpout=$TmpDir/cert_request_1008.$RANDOM.out
-        LKinitAsAdmin
+        KinitAsAdmin
         local principal_TestValue="service$testID/$hostname" #principal;positive;STR
         rlRun "ipa service-add $principal_TestValue" 0 "add service principal: [$principal_TestValue] before add cert"
         local request_type_TestValue="pkcs10" #request-type;positive;STR
@@ -402,7 +402,7 @@ cert_request_1009()
     rlPhaseStartTest "cert_request_1009"
         local testID="cert_request_1009_$RANDOM"
         local tmpout=$TmpDir/cert_request_1009.$RANDOM.out
-        LKinitAsAdmin
+        KinitAsAdmin
         local principal_TestValue="service$testID/$hostname" #principal;positive;STR
         rlRun "ipa service-add $principal_TestValue" 0 "add service principal: [$principal_TestValue] before add cert"
 
@@ -514,7 +514,7 @@ cert_revoke_1001()
         create_cert
         local validCert=`tail -n1 $certList`
         local certid=`echo $validCert| cut -d"=" -f1`
-        LKinitAsAdmin
+        KinitAsAdmin
         # when pass a non-integer
         for invalid_revoke_reason in a abc
         do
@@ -542,7 +542,7 @@ cert_revoke_1002()
             local validCert=`tail -n1 $certList`
             local certid=`echo $validCert| cut -d"=" -f2`
             rlLog "revoke cert [$certid] with revoke reason [$reason]"
-            LKinitAsAdmin
+            KinitAsAdmin
             ipa cert-revoke $certid --revocation-reason=$reason
             local ret=$?
             if [ "$ret" = "0" ];then
@@ -570,7 +570,7 @@ cert_revoke_1003()
 { #test_scenario (negative):revoke a non-exist cert
     rlPhaseStartTest "cert_revoke_1003"
         local testID="cert_revoke_1003"
-        LKinitAsAdmin
+        KinitAsAdmin
         for invalid_cert in a abc 100abc 10000000000
         do
             rlRun "ipa cert-revoke $invalid_cert" 1 "revoke non-exist cert should fail certid=[$invalid_cert]"
@@ -617,7 +617,7 @@ cert_show_1001()
     rlPhaseStartTest "cert_show_1001"
         local testID="cert_show_1001"
         local tmpout=$TmpDir/cert_show_1001.$RANDOM.out
-        LKinitAsAdmin
+        KinitAsAdmin
         local expectedErrMsg="Certificate operation cannot be completed"
         local expectedErrCode=1
         for invalidCertID in 1000 2000 a abc;do
@@ -633,7 +633,7 @@ cert_show_1002()
     rlPhaseStartTest "cert_show_1002"
         local testID="cert_show_1002"
         local tmpout=$TmpDir/cert_show_1002.$RANDOM.out
-        LKinitAsAdmin
+        KinitAsAdmin
         for cert in `cat $certList`;do
             local outfile=$TmpDir/certshow1002.$RANDOM.out.file
             local output=$TmpDir/certshow1002.$RANDOM.output
@@ -660,7 +660,7 @@ cert_show_1003()
     rlPhaseStartTest "cert_show_1003"
         local testID="cert_show_1003"
         local tmpout=$TmpDir/cert_show_1003.$RANDOM.out
-        LKinitAsAdmin
+        KinitAsAdmin
         for cert in `cat $certList`;do
             local valid_certid=`echo $cert | cut -d"=" -f2`
             qaRun "ipa cert-show $valid_certid --out=" "$tmpout" "1" "out option requires an argument" "test option: give no argument for --out, expect to fail"
@@ -708,7 +708,7 @@ cert_status_1001()
     rlPhaseStartTest "cert_status_1001"
         local testID="cert_status_1001"
         local tmpout=$TmpDir/cert_status_1001.$RANDOM.out
-        LKinitAsAdmin
+        KinitAsAdmin
         for cert in `cat $certList`
         do
             local cert_principal=`echo $cert | cut -d"=" -f1`
@@ -734,7 +734,7 @@ cert_status_1002()
     rlPhaseStartTest "cert_status_1002"
         local testID="cert_status_1002"
         local tmpout=$TmpDir/cert_status_1002.$RANDOM.out
-        LKinitAsAdmin
+        KinitAsAdmin
         # scenario 1: give chars and char-integer mix
         for certid in a abc 1a0
         do

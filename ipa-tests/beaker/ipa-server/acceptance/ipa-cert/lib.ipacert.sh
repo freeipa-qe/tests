@@ -9,7 +9,7 @@ certList=$TmpDir/certlist.$RANDOM.txt
 LKinitAsAdmin()
 {
     echo Secret123 | kinit admin@SJC.REDHAT.COM 2>&1 >/dev/null
-} #LKinitAsAdmin
+} #KinitAsAdmin
 
 create_cert()
 {
@@ -19,7 +19,7 @@ create_cert()
     local certPrivateKeyFile=$TmpDir/certprikey.$RANDOM.key
     local principal=$serviceName/$hostname
     rlLog "cert req [$certRequestFile]"
-    LKinitAsAdmin
+    KinitAsAdmin
     # step 1: create/add a host
     #        this should already done
     
@@ -118,7 +118,7 @@ create_cert_request_file()
   
 delete_cert()
 {
-    LKinitAsAdmin
+    KinitAsAdmin
     for cert in `cat $certList`
     do
         echo "line:[$cert]"
