@@ -21,7 +21,7 @@
 			<distroRequires>
 				<and>
 					<distro_variant op="=" value="Server"/>
-					<distro_name op="=" value="RHEL6-Server-6.0"/>
+					<distro_name op="=" value="RHEL6-6.1"/>
 					<distro_arch op="=" value="x86_64"/>
 					<distro_virt op="=" value=""/>
 					<distro_family op="=" value="RedHatEnterpriseLinux6"/>
@@ -30,15 +30,12 @@
 			</distroRequires>
 			<hostRequires>
                                 <and>
-                                <hostname op="=" value="qe-blade-12.idm.lab.bos.redhat.com"/>
+                                <hostname op="=" value="ipaqavmg.idm.lab.bos.redhat.com"/>
  
 				</and>
 			</hostRequires>
 			<repos/>
 			<task name="/distribution/install" role="STANDALONE">
-				<params/>
-			</task>
-			<task name="/CoreOS/ipa-server/repoclone" role="MASTER">
 				<params/>
 			</task>
 

@@ -33,7 +33,7 @@
 			</repos>
 			<hostRequires>
                                 <and>
-                                <hostname op="=" value="qe-blade-12.idm.lab.bos.redhat.com"/>
+                                <hostname op="=" value="ipaqavmh.idm.lab.bos.redhat.com"/>
  
 				</and>
 			</hostRequires>
