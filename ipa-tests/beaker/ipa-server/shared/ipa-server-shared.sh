@@ -13,8 +13,9 @@
 #	AddToKnowHosts
 #	setAttribute
 #	addAttribute
-#   create_ipauser
-#   delete_ipauser
+#       create_ipauser
+#       delete_ipauser
+#       fixResolv
 ######################################################################
 KINITEXEC=/usr/bin/kinit
 #######################################################################
@@ -220,14 +221,21 @@ send -s "yes\r"
 expect eof' >> $TET_TMP_DIR/setup-ssh-remote.exp
 		chmod 755 $TET_TMP_DIR/setup-ssh-remote.exp
 		rlLog "Running expect script to add $1 to known hosts file"
-		$TET_TMP_DIR/setup-ssh-remote.exp
+		# Clearing known_hosts file of previous entries
+		if [ ! -d ~/.ssh ]; then
+			mkdir -p ~/.ssh
+			chmod 600 ~/.ssh
+		fi
+		cat ~/.ssh/known_hosts | grep -v $1 > /dev/shm/known_hosts
+		cat /dev/shm/known_hosts > ~/.ssh/known_hosts
+		chmod 600 ~/.ssh/known_hosts
+		chmod 777 $TET_TMP_DIR/setup-ssh-remote.exp
+		expect $TET_TMP_DIR/setup-ssh-remote.exp &> /dev/shm/ssh-known-setup-update.txt
+		return 0
 	else
 		rlLog "AddToKnownHosts called improperly, please see shared lib for usage"
 		return 1
 	fi
-	chmod 777 $TET_TMP_DIR/setup-ssh-remote.exp
-	expect $TET_TMP_DIR/setup-ssh-remote.exp &> /dev/shm/ssh-known-setup-update.txt
-	return 0
 }
 
 #######################################################################
