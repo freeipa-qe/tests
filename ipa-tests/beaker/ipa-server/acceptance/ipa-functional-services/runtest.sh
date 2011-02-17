@@ -40,9 +40,10 @@
 . /dev/shm/env.sh
 
 # Include test case file
-. ./t.ipafunctionalservices.sh
+. ./t.ipafunctionalservices_http.sh
+. ./t.ipafunctionalservices_ldap.sh
 
-PACKAGELIST="ipa-admintools ipa-client httpd mod_nss mod_auth_kerb 389-ds-base"
+PACKAGELIST="ipa-admintools ipa-client httpd mod_nss mod_auth_kerb 389-ds-base expect"
 
 
 ##########################################
@@ -63,7 +64,8 @@ rlJournalStart
                         	rlFail "$item package NOT found!"
                 	fi
         	done
-		ipafunctionalservices
+		ipafunctionalservices_http
+		ipafunctionalservices_ldap
     	else
 		rlLog "Machine in recipe is not a CLIENT - not running tests"
 	fi

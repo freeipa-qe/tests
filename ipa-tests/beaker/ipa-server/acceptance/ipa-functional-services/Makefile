@@ -29,7 +29,7 @@ export TESTVERSION=1.0
 
 BUILT_FILES=
 
-FILES=$(METADATA) runtest.sh Makefile PURPOSE t.ipafunctionalservices.sh
+FILES=$(METADATA) runtest.sh Makefile PURPOSE t.ipafunctionalservices_http.sh t.ipafunctionalservices_ldap.sh
 
 .PHONY: all install download clean
 
@@ -59,7 +59,7 @@ $(METADATA): Makefile
 	@echo "Requires:        mod_nss" >> $(METADATA)
 	@echo "Requires:        httpd" >> $(METADATA)
 	@echo "Requires:        mod_auth_kerb" >> $(METADATA)
-	@echo "Requires:        mod_auth_kerb" >> $(METADATA)
+	@echo "Requires:        389-ds-base" >> $(METADATA)
 	@echo "Priority:        Normal" >> $(METADATA)
 	@echo "License:         GPLv2" >> $(METADATA)
 	@echo "Confidential:    no" >> $(METADATA)
