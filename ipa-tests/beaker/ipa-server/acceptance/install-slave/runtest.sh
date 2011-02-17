@@ -64,8 +64,11 @@ rlJournalStart
 					fi
 				fi
 			fi
+			rlRun "ls /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg" 0 "Checking for existance of replica gpg file"
+		else
+			echo "This is the master, sleeping for 1.5 minutes"
+			sleep 90
 		fi
-		rlRun "ls /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg" 0 "Checking for existance of replica gpg file"
 	rlPhaseEnd
 
 	rlPhaseStartTest "IPA start test section"
