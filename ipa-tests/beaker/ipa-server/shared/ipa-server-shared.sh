@@ -485,6 +485,7 @@ fixResolv()
 	if [ -x $MASTER ]; then
 		sed -i s/^nameserver/#nameserver/g /etc/resolv.conf
 		echo "nameserver $MASTER" >> /etc/resolv.conf
+		return 0
 	else
 		echo "ERROR - MASTER not set in env"
 		return 1
