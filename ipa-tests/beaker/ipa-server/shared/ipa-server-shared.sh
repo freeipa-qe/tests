@@ -472,3 +472,22 @@ execNetgroupPlugin()
 }
 
 
+#######################################################################
+# fixResolv
+# This copies resolv.conf to a backup location, then modifies the 
+# contentes of the main resolv.conf to point at the MASTER server
+# mgregg 2-17-2010
+#######################################################################
+fixResolv()
+{
+	rm -f /dev/shm/ipa-resolv.conf-backup
+	cat /etc/resolv.conf > /dev/shm/ipa-resolv.conf-backup
+	if [ -x $MASTER ]; then
+		sed -i s/^nameserver/#nameserver/g /etc/resolv.conf
+		echo "nameserver $MASTER" >> /etc/resolv.conf
+	else
+		echo "ERROR - MASTER not set in env"
+		return 1
+	fi
+}
+
