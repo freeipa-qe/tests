@@ -1,4 +1,4 @@
-<job retention_tag="scratch">
+<job>
 	<notify>
 		<cc>mgregg@redhat.com</cc>
 		<cc>jgalipea@redhat.com</cc>
@@ -31,7 +31,6 @@
 			</distroRequires>
 			<hostRequires>
 				<and>
-					<hostname op="=" value="qe-blade-12.idm.lab.bos.redhat.com"/>
 					<system_type op="=" value="Machine"/>
 				</and>
 			</hostRequires>
