@@ -61,6 +61,7 @@ rlJournalStart
 			if [ $? -eq 0 ]; then
 				# This is RHEL 5
 				rlRun "cd /etc/yum.repos.d;wget http://jdennis.fedorapeople.org/ipa-devel/ipa-devel-rhel.repo" 0 "downloading ipa repo"
+				rlRun "cd /etc/yum.repos.d;wget http://apoc.dsdev.sjc.redhat.com/tet/beakerlib-fc14/fedora-beaker.repo" 0 "downloading fedora beakerlib repo"
 			else
 				# This is likley rhel6
 				rlRun "cd /etc/yum.repos.d;wget http://apoc.dsdev.sjc.redhat.com/tet/ipa2/ipa-tests/beaker/ipa-server/shared/rhel6-mickey.repo" 0 " deleting any previously existing beta2 rep"
@@ -75,7 +76,7 @@ rlJournalStart
 #		rlRun "expect /dev/shm/set-root-pw.exp"
 #		rlRun "yum clean"
 		# Run yum install 3 times because the repos are flaky
-		packages="ipa-server ipa-client ipa-admintools bind caching-nameserver expect krb5-workstation bind-dyndb-ldap ntpdate krb5-pkinit-openssl" 
+		packages="ipa-server ipa-client ipa-admintools bind caching-nameserver expect krb5-workstation bind-dyndb-ldap ntpdate krb5-pkinit-openssl rhts-test-env beaker-client beaker-redhat" 
 		yum -y install $packages
 		if [ $? -ne 0 ]; then
 			sleep 100
