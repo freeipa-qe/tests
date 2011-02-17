@@ -41,8 +41,9 @@ rlJournalStart
 		/etc/init.d/ntpd stop
 		ntpdate $NTPSERVER
 		# Backing up resolv.conf
-		rlRun "rm -f /dev/shm/resolv.conf.ipabackup"
-		
+		rlRun "rm -f /dev/shm/resolv.conf.ipabackup" 0 "Backing up resolv.conf"
+		rlRun "fixResolv" 0 "fixing the reoslv.conf to contain the correct nameserver lines"
+	
 		rlRun "ls /dev/shm/ipa-server-shared.sh" 0 "Checking for existance of shared libs"
 		if [ ! -f /dev/shm/ipa-server-shared.sh ]; then
 			echo "ERROR - /dev/shm/ipa-server-shared.sh does not exist, did the shared libs get installed?"
