@@ -54,16 +54,21 @@ rlJournalStart
 		fi
 		grep Fedora /etc/redhat-release
 		if [ $? -eq 0 ]; then
+			# this is fedora
+			export redhat="fedora"
 			rlRun "cd /etc/yum.repos.d;wget http://jdennis.fedorapeople.org/ipa-devel/ipa-devel-fedora.repo" 0 "downloading ipa repo"
+			rlRun "cd /etc/yum.repos.d;wget http://apoc.dsdev.sjc.redhat.com/tet/beakerlib-fc14/fedora-beaker.repo" 0 "downloading fedora beakerlib repo"
 		else
 			# This is rhel
+			export redhat="rhel"
 			grep release\ 5 /etc/redhat-release
 			if [ $? -eq 0 ]; then
 				# This is RHEL 5
+				export ver="5"
 				rlRun "cd /etc/yum.repos.d;wget http://jdennis.fedorapeople.org/ipa-devel/ipa-devel-rhel.repo" 0 "downloading ipa repo"
-				rlRun "cd /etc/yum.repos.d;wget http://apoc.dsdev.sjc.redhat.com/tet/beakerlib-fc14/fedora-beaker.repo" 0 "downloading fedora beakerlib repo"
 			else
 				# This is likley rhel6
+				export ver="6"
 				rlRun "cd /etc/yum.repos.d;wget http://apoc.dsdev.sjc.redhat.com/tet/ipa2/ipa-tests/beaker/ipa-server/shared/ipa-rhel6-mickey.repo" 0 " deleting any previously existing beta2 rep"
 				rlRun "rm -f /etc/yum/repos.d/rhel6-beta2.repo" 0 " deleting any previously existing beta2 rep"
 				rlRun "cp /dev/shm/rhel6-beta2.repo /etc/yum.repos.d/." 0 "copying the rhel6 beta2 repo to the repos.d dir. It should be coming from the shated lib"
@@ -76,7 +81,7 @@ rlJournalStart
 #		rlRun "expect /dev/shm/set-root-pw.exp"
 #		rlRun "yum clean"
 		# Run yum install 3 times because the repos are flaky
-		packages="ipa-server ipa-client ipa-admintools bind caching-nameserver expect krb5-workstation bind-dyndb-ldap ntpdate krb5-pkinit-openssl rhts-test-env beaker-client beaker-redhat" 
+		packages="ipa-server ipa-client ipa-admintools bind caching-nameserver expect krb5-workstation bind-dyndb-ldap ntpdate krb5-pkinit-openssl rhts-test-env" 
 		yum -y install $packages
 		if [ $? -ne 0 ]; then
 			sleep 100
@@ -92,8 +97,14 @@ rlJournalStart
 				fi
 			fi
 		fi
+		if [ $redhat = "rhel" ]; then
+			if [ $ver = "6" ]; then
+				# download repo for beakerlib deps for later tests only if we are on rhel
+				rlRun "cd /etc/yum/repos.d;wget http://apoc.dsdev.sjc.redhat.com/tet/ipa2/ipa-tests/beaker/ipa-server/shared/rhel6-beaker.repo" 0 "Downloading the rhel beaker repos, includes epel"
+			fi
+		fi
 		# Because I want to. 
-		yum -y install vim-enhanced&
+		yum -y install vim-enhanced beaker-client beaker-redhat&
 		/etc/init.d/ntpd stop
 		ntpdate $NTPSERVER
 		rlRun "rpm -qa | grep ipa-server" 0 "checking for ipa server package installation" 
