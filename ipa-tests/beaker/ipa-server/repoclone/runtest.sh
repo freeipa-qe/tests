@@ -48,7 +48,7 @@ if [ -x $VARIANT ]; then
 	cat /etc/redhat-release | grep Red
 	if [ $? -eq 0 ]; then
 		export VARIANT="RHEL"
-		export iparepo="http://jdennis.fedorapeople.org/ipa-devel/ipa-devel-rhel.repo"
+		export iparepo="http://apoc.dsdev.sjc.redhat.com/tet/ipa2/ipa-tests/beaker/ipa-server/shared/rhel6-mickey.repo"
 	fi
 fi
 echo "variant is $VARIANT, repo is $REPO"
