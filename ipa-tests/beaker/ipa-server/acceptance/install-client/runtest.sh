@@ -28,7 +28,7 @@
 
 # Include rhts environment
 . /usr/bin/rhts-environment.sh
-. /usr/lib/beakerlib/beakerlib.sh
+. /usr/share/beakerlib/beakerlib.sh
 . /dev/shm/ipa-server-shared.sh
 . /dev/shm/env.sh
 
@@ -46,15 +46,15 @@ rlJournalStart
 		if [ $? -eq 0 ]; then
 			echo "this is a client, wait for the ldap port to be open on the master"
 			nmap -p 389 $MASTER | grep 389
-			if [ $! -ne 0 ]; then
+			if [ $? -ne 0 ]; then
 				echo "ldap not open on master yet"
 				sleep 300
 				nmap -p 389 $MASTER | grep 389
-				if [ $! -ne 0 ]; then
+				if [ $? -ne 0 ]; then
 				echo "ldap not open on master yet"
 					sleep 300
 					nmap -p 389 $MASTER | grep 389
-					if [ $! -ne 0 ]; then
+					if [ $? -ne 0 ]; then
 						echo "ERROR - ldap not open on master. Is everything alright?"
 						# This next line will produyce a error
 						rlRun "ls /dev/shm/replica-info-$HOSTNAME.gpg"
@@ -62,7 +62,7 @@ rlJournalStart
 				fi
 			fi
 		fi
-		sleep 100
+		sleep 10
 		echo "Fixing resolv.con to point to master"
 		sed -i s/^nameserver/#nameserver/g /etc/resolv.conf
 		echo "nameserver $MASTER" >> /etc/resolv.conf
@@ -72,10 +72,11 @@ rlJournalStart
 		echo "$CLIENT" | grep "$HOSTNAME"
 		if [ $? -eq 0 ]; then
 			# This machine is a client
-			echo "I am a client"
-			echo "ipa-client-install --domain=$DOMAIN --realm=$RELM --ntp-server=$NTPSERVER -w $ADMINPW -U --server=$MASTER" > /dev/shm/client-install.bash
-			chmod 755 /dev/shm/client-install.bash
-			bash /dev/shm/client-install.bash
+			rlLog "I am a client"
+			rlRun "ipa-client-install --domain=$RELM --realm=$DOMAIN --ntp-server=$NTPSERVER -p $ADMINID -w $ADMINPW -U --server=$MASTER" 0 "Installing ipa client and configuring"
+			rlLog "ipa-client-install --domain=$RELM --realm=$DOMAIN --ntp-server=$NTPSERVER -p $ADMINID -w $ADMINPW -U --server=$MASTER"
+			#chmod 755 /dev/shm/client-install.bash
+			#bash /dev/shm/client-install.bash
 		else
 			echo "not a client, CLIENT is $CLIENT"
 		fi
