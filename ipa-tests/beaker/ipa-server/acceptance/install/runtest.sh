@@ -64,7 +64,7 @@ rlJournalStart
 				rlRun "cd /etc/yum.repos.d;wget http://apoc.dsdev.sjc.redhat.com/tet/beakerlib-fc14/fedora-beaker.repo" 0 "downloading fedora beakerlib repo"
 			else
 				# This is likley rhel6
-				rlRun "cd /etc/yum.repos.d;wget http://apoc.dsdev.sjc.redhat.com/tet/ipa2/ipa-tests/beaker/ipa-server/shared/rhel6-mickey.repo" 0 " deleting any previously existing beta2 rep"
+				rlRun "cd /etc/yum.repos.d;wget http://apoc.dsdev.sjc.redhat.com/tet/ipa2/ipa-tests/beaker/ipa-server/shared/ipa-rhel6-mickey.repo" 0 " deleting any previously existing beta2 rep"
 				rlRun "rm -f /etc/yum/repos.d/rhel6-beta2.repo" 0 " deleting any previously existing beta2 rep"
 				rlRun "cp /dev/shm/rhel6-beta2.repo /etc/yum.repos.d/." 0 "copying the rhel6 beta2 repo to the repos.d dir. It should be coming from the shated lib"
 			fi
