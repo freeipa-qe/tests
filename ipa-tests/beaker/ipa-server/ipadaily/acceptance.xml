@@ -61,9 +61,6 @@
 			<task name="/CoreOS/ipa-server/acceptance/ipa-hbacsvc-cli" role="MASTER">
 				<params/>
 			</task>
-			<task name="/CoreOS/ipa-server/acceptance/nis-cli" role="MASTER">
-				<params/>
-			</task>
 			<task name="/CoreOS/ipa-server/acceptance/ipa-get-rm-keytab" role="MASTER">
 				<params/>
 			</task>
