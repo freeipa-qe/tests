@@ -73,8 +73,8 @@ rlJournalStart
 		if [ $? -eq 0 ]; then
 			# This machine is a client
 			rlLog "I am a client"
-			rlRun "ipa-client-install --domain=$RELM --realm=$DOMAIN --ntp-server=$NTPSERVER -p $ADMINID -w $ADMINPW -U --server=$MASTER" 0 "Installing ipa client and configuring"
-			rlLog "ipa-client-install --domain=$RELM --realm=$DOMAIN --ntp-server=$NTPSERVER -p $ADMINID -w $ADMINPW -U --server=$MASTER"
+			rlRun "ipa-client-install --domain=$DOMAIN --realm=$RELM --ntp-server=$NTPSERVER -p $ADMINID -w $ADMINPW -U --server=$MASTER" 0 "Installing ipa client and configuring"
+			rlLog "ipa-client-install --domain=$DOMAIN --realm=$RELM --ntp-server=$NTPSERVER -p $ADMINID -w $ADMINPW -U --server=$MASTER"
 			#chmod 755 /dev/shm/client-install.bash
 			#bash /dev/shm/client-install.bash
 		else
@@ -105,7 +105,7 @@ expect eof' > /dev/shm/kinit-admin.exp
 	rlPhaseEnd
 
 	rlPhaseStartTest "Verify that krb5.conf was set up properly"
-		rlRun  "grep $DOMAIN /etc/krb5.conf" 0 "Checking to ensure that krb5.conf was set up correctly"
+		rlRun  "grep $RELM /etc/krb5.conf" 0 "Checking to ensure that krb5.conf was set up correctly"
 		echo " " 
 		echo " " 
 		echo " " 
