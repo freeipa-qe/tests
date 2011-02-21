@@ -79,6 +79,7 @@ rlJournalStart
 			#bash /dev/shm/client-install.bash
 		else
 			echo "not a client, CLIENT is $CLIENT"
+			echo "SLAVE list is $SLAVE, MASTER list is $MASTER, CLIENT list is $CLIENT"
 		fi
 
 		# Create expect file to kinit with
@@ -101,6 +102,18 @@ send -- "Secret123\r"
 expect eof' > /dev/shm/kinit-admin.exp
 		rlRun "cat /dev/shm/kinit-admin.exp"
 		rlRun "kdestroy"
+	rlPhaseEnd
+
+	rlPhaseStartTest "Verify that krb5.conf was set up properly"
+		rlRun  "grep $DOMAIN /etc/krb5.conf" 0 "Checking to ensure that krb5.conf was set up correctly"
+		echo " " 
+		echo " " 
+		echo " " 
+		echo "Contents of krb5.conf:"
+		cat /etc/krb5.conf
+		echo " " 
+		echo " " 
+		echo " " 
 	rlPhaseEnd
 
 	rlPhaseStartCleanup

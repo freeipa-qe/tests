@@ -67,6 +67,7 @@ rlJournalStart
 			rlRun "ls /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg" 0 "Checking for existance of replica gpg file"
 		else
 			echo "This is the master, sleeping for 1.5 minutes"
+			echo "SLAVE list is $SLAVE, MASTER list is $MASTER, CLIENT list is $CLIENT"
 			sleep 90
 		fi
 	rlPhaseEnd
@@ -104,6 +105,18 @@ send -- "Secret123\r"
 expect eof' > /dev/shm/kinit-admin.exp
 		rlRun "cat /dev/shm/kinit-admin.exp"
 		rlRun "kdestroy"
+	rlPhaseEnd
+
+	rlPhaseStartTest "Verify that krb5.conf was set up properly"
+		rlRun  "grep $DOMAIN /etc/krb5.conf" 0 "Checking to ensure that krb5.conf was set up correctly"
+		echo " " 
+		echo " " 
+		echo " " 
+		echo "Contents of krb5.conf:"
+		cat /etc/krb5.conf
+		echo " " 
+		echo " " 
+		echo " " 
 	rlPhaseEnd
 
 	rlPhaseStartCleanup
