@@ -197,7 +197,7 @@ setenforce 0
 mkdir -p /mnt/nfslocation
 mount $nfslocation /mnt/nfslocation
 
-# Creating dir on nef server, and copying files to it. 
+# Creating dir on nfs server, and copying files to it. 
 rlRun "ls /mnt/nfslocation/archives/ipa" 0" Checking to ensure that the destination directory exists"
 mkdir /mnt/nfslocation/archives/ipa/$datecode
 cd /root/dist;rsync -av * /mnt/nfslocation/archives/ipa/$datecode/.
