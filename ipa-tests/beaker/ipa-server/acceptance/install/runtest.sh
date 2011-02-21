@@ -125,15 +125,15 @@ rlJournalStart
 		# Remove any existing hostname entries from the hosts file
 		sed -i s/$hostname//g /dev/shm/hosts
 		sed -i s/$hostname_s//g /dev/shm/hosts
-		echo "$ipaddr $hostname_s.$DOMAIN $hostname $hostname_s" >> /dev/shm/hosts
+		echo "$ipaddr $hostname_s.$RELM $hostname $hostname_s" >> /dev/shm/hosts
 		cat /dev/shm/hosts > /etc/hosts
 		echo "hosts file contains"
 		cat /etc/hosts
 		# Fix hostname
-		rlRun "hostname $hostname_s.$DOMAIN"
-		hostname $hostname_s.$DOMAIN
+		rlRun "hostname $hostname_s.$RELM"
+		hostname $hostname_s.$RELM
 		cat /etc/sysconfig/network | grep -v $hostname_s > /dev/shm/network
-		echo "HOSTNAME=$hostname_s.$DOMAIN" >> /dev/shm/network
+		echo "HOSTNAME=$hostname_s.$RELM" >> /dev/shm/network
 		mv /etc/sysconfig/network /etc/sysconfig/network-ipabackup
 		cat /dev/shm/network > /etc/sysconfig/network
 		echo "/etc/sysconfig/network contains"
@@ -148,10 +148,10 @@ rlJournalStart
 			grep release\ 5 /etc/redhat-release
 			if [ $? -eq 0 ]; then
 				# This is RHEL 5
-			echo "ipa-server-install --setup-dns --forwarder=$DNSFORWARD --hostname=$hostname_s.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U" > /dev/shm/installipa.bash
+			echo "ipa-server-install --setup-dns --forwarder=$DNSFORWARD --hostname=$hostname_s.$RELM -r $DOMAIN -n $RELM -p $ADMINPW -P $ADMINPW -a $ADMINPW -U" > /dev/shm/installipa.bash
 			else
 				# This is likley rhel6
-			echo "ipa-server-install --setup-dns --forwarder=$DNSFORWARD --hostname=$hostname_s.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U" > /dev/shm/installipa.bash
+			echo "ipa-server-install --setup-dns --forwarder=$DNSFORWARD --hostname=$hostname_s.$RELM -r $DOMAIN -n $RELM -p $ADMINPW -P $ADMINPW -a $ADMINPW -U" > /dev/shm/installipa.bash
 			fi
 
 			setenforce 0
@@ -212,9 +212,9 @@ expect eof' > /dev/shm/kinit-admin.exp
 					# put the short form of the hostname for server $s into s_short
 					s_short=$(echo $s | cut -d. -f1)
 					echo "IP of server $s is resolving as $ipofs, using short hostname of $s_short" 
-					ipa-replica-prepare -p $ADMINPW --ip-address=$ipofs $s_short.$DOMAIN
+					ipa-replica-prepare -p $ADMINPW --ip-address=$ipofs $s_short.$RELM
 					# Copy the replica info to the slave
-					rlRun "scp /var/lib/ipa/replica-info-$s_short.$DOMAIN.gpg root@$s:/dev/shm/."
+					rlRun "scp /var/lib/ipa/replica-info-$s_short.$RELM.gpg root@$s:/dev/shm/."
 				fi
 			done
 		fi
