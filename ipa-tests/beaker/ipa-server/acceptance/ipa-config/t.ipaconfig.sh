@@ -4,7 +4,7 @@
 default_config_usernamelength="32"
 default_config_homebase="/home"
 default_config_shell="/bin/sh"
-default_config_emaildomain="$RELM"
+default_config_emaildomain="$DOMAIN"
 default_config_usergroup="ipausers"
 default_config_timelimit="2"
 default_config_sizelimit="100"

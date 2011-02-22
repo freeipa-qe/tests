@@ -52,7 +52,7 @@
 #ADMINID="admin"
 ADMINPWD=$ADMINPW
 
-BASEDN="dc=$RELM"
+BASEDN="dc=$DOMAIN"
 USERRDN="cn=users,cn=accounts,"
 USERDN="$USERRDN$BASEDN"
 USERRDN="cn=users,cn=accounts,"

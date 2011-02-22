@@ -49,7 +49,7 @@
 # Test Suite Globals
 ########################################################################
 
-BASEDN="dc=$RELM"
+BASEDN="dc=$DOMAIN"
 HOSTGRPDN="cn=hostgroups,cn=accounts,"
 HOSTGRPRDN="$HOSTGRPDN$BASEDN"
 HOSTDN="cn=computers,cn=accounts,"
@@ -258,10 +258,10 @@ rlJournalStart
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-hostgroup-cli-25: Negative - setattr and addattr on cn"
-        command="ipa hostgroup-mod --setattr cn=\"cn=new,cn=groups,dc=$RELM\" $group1"
+        command="ipa hostgroup-mod --setattr cn=\"cn=new,cn=groups,dc=$DOMAIN\" $group1"
         expmsg="ipa: ERROR: modifying primary key is not allowed"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
-        command="ipa hostgroup-mod --addattr cn=\"cn=new,cn=groups,dc=$RELM\" $group1"
+        command="ipa hostgroup-mod --addattr cn=\"cn=new,cn=groups,dc=$DOMAIN\" $group1"
 	expmsg="ipa: ERROR: cn: Only one value allowed."
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
     rlPhaseEnd

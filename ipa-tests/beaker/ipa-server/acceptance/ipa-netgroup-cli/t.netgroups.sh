@@ -18,7 +18,7 @@ hgroup1=hg144335566
 hgroup2=hg2
 hgroup3=hg3afdsk
 
-BASEDN="dc=$RELM"
+BASEDN="dc=$DOMAIN"
 NETGRPDN="cn=ng,cn=alt,dc=$BASEDN"
 
 #########################################################################
