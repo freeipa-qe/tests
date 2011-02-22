@@ -322,10 +322,10 @@ rlJournalStart
     rlPhaseStartTest "ipa-host-cli-32: Negative - setattr and addattr on cn"
         myhost="mytest.$DOMAIN"
         addHost $myhost
-        expmsg="ipa: ERROR: attribute cn not allowed"
+        expmsg="ipa: ERROR: Insufficient access: cn is immutable"
         command="ipa host-mod --setattr cn=mytest2.$DOMAIN $myhost"
 	rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
-	expmsg="ipa: ERROR: cn: Only one value allowed."
+	expmsg="ipa: ERROR: Insufficient access: cn is immutable"
         command="ipa host-mod --addattr cn=mytest3.$DOMAIN $myhost"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
 	deleteHost $myhost
