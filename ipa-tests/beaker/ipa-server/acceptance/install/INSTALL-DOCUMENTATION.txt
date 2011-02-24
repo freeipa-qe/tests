@@ -1,0 +1,29 @@
+###############################################################################
+# This Document should help to explain how ipa installs work in the 
+# beaker framework.
+# 
+# Sections: 
+# 1: gross overview
+# 2: Enviroment vars
+# 3: Manual installs
+# 4: Example xml's
+###############################################################################
+
+
+###############################################################################
+# Section 1
+#   Gross Overview
+###############################################################################
+
+The install tests are split up into three different parts:
+
+1. install
+2. install-slave
+3. install-client
+
+The Install tests does all of the package installs, and must be run before either of the subsuiquent tests. Every package needed in later tests is installed in this test. 
+Following the package installs, if the machine that the test is being run on is a master server, the Install tests sets up and installs a ipa server. 
+The options specified vary depending on what is currently needed to make installs work. Generally, pki is disbaled because it causes too many problems. A forwarding DNS server is configured at server install time. 
+Slave and Client machines should get configured should have one "nameserver" entry in /etc/resolv.conf that points only at the MASTER server.
+
+The install test should get run on every server that you will use in your test. If the instll test is run on a slave or master server, it does not configure ipa-server. 
