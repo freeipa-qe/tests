@@ -21,9 +21,119 @@ The install tests are split up into three different parts:
 2. install-slave
 3. install-client
 
-The Install tests does all of the package installs, and must be run before either of the subsuiquent tests. Every package needed in later tests is installed in this test. 
-Following the package installs, if the machine that the test is being run on is a master server, the Install tests sets up and installs a ipa server. 
-The options specified vary depending on what is currently needed to make installs work. Generally, pki is disbaled because it causes too many problems. A forwarding DNS server is configured at server install time. 
-Slave and Client machines should get configured should have one "nameserver" entry in /etc/resolv.conf that points only at the MASTER server.
+The Install tests does all of the package installs, and must be run before 
+either of the subsuiquent tests. Every package needed in later tests is 
+installed in this test. 
+Following the package installs, if the machine that the test is being run on is 
+a master server, the Install tests sets up and installs a ipa server. 
+The options specified vary depending on what is currently needed to make 
+installs work. Generally, pki is disbaled because it causes too many problems. 
+A forwarding DNS server is configured at server install time. 
+Slave and Client machines should get configured should have one "nameserver" 
+entry in /etc/resolv.conf that points only at the MASTER server.
 
-The install test should get run on every server that you will use in your test. If the instll test is run on a slave or master server, it does not configure ipa-server. 
+The install test should get run on every server that you will use in your test.
+If the install test is run on a slave or master server, it does not configure 
+ ipa-server.
+
+###############################################################################
+# Section 2
+#   Enviroment Variables
+###############################################################################
+The shared test should copy the start of the enviroment into /dev/shm/env.sh 
+
+This sh file will contain some useful vars like the name of the domain, the name
+ of the relm, and password information. 
+
+Other variables that are usefull to install are MASTER, SLAVE, and CLIENT
+These variables are normally set in the xml file that runs a job, but you'll need to set them manually when you run a manual install.
+
+MASTER is a single, fully qualified hostname that is the master server in this 
+ipa setup.
+SLAVE is a space delimited list of FQDN's of slave servers in this installation. 
+CLIENT is a space delimited list of FQDN's of client installations. 
+
+It is important to note that the INSTALL tests adds the MASTER, SLAVE, and 
+CLIENT entries to the end of /dev/shm/env.sh.
+
+###############################################################################
+# Section 3
+#   Manual Installs
+###############################################################################
+The following is a example of installing a master, slave and client from the 
+command line on all four machines. 
+
+I'll use the machines in the following roles:
+Master: master.mydomain.com
+Slaves: slave1.mydomain.com
+        slave2.mydomain.com
+Client: client1.mydomain.com
+
+Start by opening a ssh terminal to all of the machines, then, on every machine
+check out the svn tree
+[machine]# svn co https://svn.devel.redhat.com/repos/ipa-tests/trunk/ipa-tests/beaker/ipa-server
+
+change to the shared dir:
+[machine]# cd ipa-server/shared
+
+You'll now need to get the rhts-test-env
+If the machine is a rhel6 machine, copy the rhel6 beaker repo to /etc/yum.repos.d
+[machine]# cp ./rhel6-beaker.repo /etc/yum.repos.d/.
+If you have a fedora machine copy the fedora repo to /etc/yum.repos.d
+[machine]# cp ./fedora-beaker.repo /etc/yum.repos.d/.
+
+Now, you should be able to install rhts-test-env
+[machine]# yum install rhts-test-env
+
+Assuming that rhts-test-env installed, you should be able to run make in the shared dir
+[machine]# make
+This should copy all of the shared libs to /dev/shm, doing a "ls /dev/shm" should look something like this:
+
+[root@ipaqa64vmf ~]# ls /dev/shm
+env.sh                    ipa-server-shared.sh
+hosts                     kinit-admin.exp
+id_dsa                    known_hosts
+id_dsa.pub                lib.user-cli.sh
+id_rsa                    
+id_rsa.pub                
+ipa-group-cli-lib.sh      
+ipa-hbac-cli-lib.sh       rhel6-beta2.repo
+ipa-host-cli-lib.sh       
+ipa-hostgroup-cli-lib.sh  set-root-pw.exp
+ipa-netgroup-cli-lib.sh   setup-ssh-remote.exp
+ipa-resolv.conf-backup    ssh-known-setup-update.txt
+
+Notice the env.sh amd ipa-* libs are there.
+
+Now, you chan run the install test on every master, slave and client machine:
+
+[machine]# cd ../acceptance/install
+
+You will need to get the enviroment variables set.
+It is important to run the same export commands on every machine:
+
+[machine]# export MASTER="master.mydomain.com"
+[machine]# export SLAVE="slave1.mydomain.com slave2.mydomain.com"
+[machine]# export CLIENT="client1.mydomain.com"
+
+You should now be ready to run the install test on all of the machines. 
+
+You'll be in the ipa-server/acceptance/install dir:
+[machine]# make
+
+This should install all of the correct repos for your distro, and install ipa-server, ipa-admintools, and ipa-client.
+On the MASTER, this test will set up a ipa server with the commands it deposits in /dev/shm/installipa.bash
+ 
+After install finishes, you should be able to kinit as admin on the master. Password is Secret123
+You should also have a gpg file in /dev/shm on all of the slaves. The file will look similar to this: /dev/shm/replica-info-ipaqa64vmf.testrelm.gpg
+
+You can now run the slave and client tests on the slave machines:
+[machine]# cd ../install-slave
+[machine]# make
+
+After the slave test runs on all of the slaves, you should be able to kinit as admin on them. 
+
+Finally, you can run the client test on the client macines.
+[machine]# cd ../install-client
+[machine]# make
+ 
