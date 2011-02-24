@@ -36,6 +36,13 @@ The install test should get run on every server that you will use in your test.
 If the install test is run on a slave or master server, it does not configure 
  ipa-server.
 
+One important thing to note, a bit of machine preperaion for the client and 
+slave tests is done in the install test as it gets difficult to have all of the 
+keys ready if the same steps are done in later tests. So, you'll need to run the
+install test on every machine before you run the slave or client install tests.
+This includes all of the package installs slave and client rpms are installed in
+the install test, not in the install-slave or install-client tests.
+
 ###############################################################################
 # Section 2
 #   Enviroment Variables
