@@ -1,0 +1,3 @@
+PURPOSE of /CoreOS/tests/Regression/ipajoin
+Description: IPA ipa-join script (CLI) test
+Author: Yi Zhang <yzhang@redhat.com>
