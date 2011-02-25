@@ -85,7 +85,7 @@ ipa_join_1001()
         local bindpw_TestValue_Negative="replace_me" #bindpw;negative;InvalidPW
         local expectedErrMsg=replace_me
         local expectedErrCode=1
-        qaRun "ipa ipa-join $testID  --bindpw=$bindpw_TestValue_Negative " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [bindpw]=[$bindpw_TestValue_Negative]" 
+        qaRun "ipa-join --bindpw=$bindpw_TestValue_Negative " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [bindpw]=[$bindpw_TestValue_Negative]" 
         Kcleanup
         rm $tmpout
     rlPhaseEnd
@@ -98,7 +98,7 @@ ipa_join_1002()
         local tmpout=$TmpDir/ipa_join_1002.$RANDOM.out
         KinitAsAdmin
         local bindpw_TestValue="replace_me" #bindpw;positive;ValidPW
-        rlRun "ipa ipa-join $testID  --bindpw=$bindpw_TestValue " 0 "test options:  [bindpw]=[$bindpw_TestValue]" 
+        rlRun "ipa-join --bindpw=$bindpw_TestValue " 0 "test options:  [bindpw]=[$bindpw_TestValue]" 
         Kcleanup
         rm $tmpout
     rlPhaseEnd
@@ -113,7 +113,7 @@ ipa_join_1003()
         local hostname_TestValue_Negative="replace_me" #hostname;negative;NoSuchDomain
         local expectedErrMsg=replace_me
         local expectedErrCode=1
-        qaRun "ipa ipa-join $testID  --hostname=$hostname_TestValue_Negative " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [hostname]=[$hostname_TestValue_Negative]" 
+        qaRun "ipa-join --hostname=$hostname_TestValue_Negative " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [hostname]=[$hostname_TestValue_Negative]" 
         Kcleanup
         rm $tmpout
     rlPhaseEnd
@@ -130,7 +130,7 @@ ipa_join_1004()
         local bindpw_TestValue="replace_me" #bindpw;positive;ValidPW
         local expectedErrMsg=replace_me
         local expectedErrCode=1
-        qaRun "ipa ipa-join $testID  --hostname=$hostname_TestValue_Negative  --keytab=$keytab_TestValue  --bindpw=$bindpw_TestValue " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [hostname]=[$hostname_TestValue_Negative] [keytab]=[$keytab_TestValue] [bindpw]=[$bindpw_TestValue]" 
+        qaRun "ipa-join --hostname=$hostname_TestValue_Negative  --keytab=$keytab_TestValue  --bindpw=$bindpw_TestValue " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [hostname]=[$hostname_TestValue_Negative] [keytab]=[$keytab_TestValue] [bindpw]=[$bindpw_TestValue]" 
         Kcleanup
         rm $tmpout
     rlPhaseEnd
@@ -146,7 +146,7 @@ ipa_join_1005()
         local server_TestValue="replace_me" #server;positive;FQDN
         local expectedErrMsg=replace_me
         local expectedErrCode=1
-        qaRun "ipa ipa-join $testID  --hostname=$hostname_TestValue_Negative  --server=$server_TestValue " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [hostname]=[$hostname_TestValue_Negative] [server]=[$server_TestValue]" 
+        qaRun "ipa-join --hostname=$hostname_TestValue_Negative  --server=$server_TestValue " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [hostname]=[$hostname_TestValue_Negative] [server]=[$server_TestValue]" 
         Kcleanup
         rm $tmpout
     rlPhaseEnd
@@ -163,7 +163,7 @@ ipa_join_1006()
         local bindpw_TestValue="replace_me" #bindpw;positive;ValidPW
         local expectedErrMsg=replace_me
         local expectedErrCode=1
-        qaRun "ipa ipa-join $testID  --hostname=$hostname_TestValue_Negative  --server=$server_TestValue  --bindpw=$bindpw_TestValue " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [hostname]=[$hostname_TestValue_Negative] [server]=[$server_TestValue] [bindpw]=[$bindpw_TestValue]" 
+        qaRun "ipa-join --hostname=$hostname_TestValue_Negative  --server=$server_TestValue  --bindpw=$bindpw_TestValue " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [hostname]=[$hostname_TestValue_Negative] [server]=[$server_TestValue] [bindpw]=[$bindpw_TestValue]" 
         Kcleanup
         rm $tmpout
     rlPhaseEnd
@@ -180,7 +180,7 @@ ipa_join_1007()
         local keytab_TestValue="replace_me" #keytab;positive;ValidKeytab
         local expectedErrMsg=replace_me
         local expectedErrCode=1
-        qaRun "ipa ipa-join $testID  --hostname=$hostname_TestValue_Negative  --server=$server_TestValue  --keytab=$keytab_TestValue " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [hostname]=[$hostname_TestValue_Negative] [server]=[$server_TestValue] [keytab]=[$keytab_TestValue]" 
+        qaRun "ipa-join --hostname=$hostname_TestValue_Negative  --server=$server_TestValue  --keytab=$keytab_TestValue " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [hostname]=[$hostname_TestValue_Negative] [server]=[$server_TestValue] [keytab]=[$keytab_TestValue]" 
         Kcleanup
         rm $tmpout
     rlPhaseEnd
@@ -198,7 +198,7 @@ ipa_join_1008()
         local bindpw_TestValue="replace_me" #bindpw;positive;ValidPW
         local expectedErrMsg=replace_me
         local expectedErrCode=1
-        qaRun "ipa ipa-join $testID  --hostname=$hostname_TestValue_Negative  --server=$server_TestValue  --keytab=$keytab_TestValue  --bindpw=$bindpw_TestValue " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [hostname]=[$hostname_TestValue_Negative] [server]=[$server_TestValue] [keytab]=[$keytab_TestValue] [bindpw]=[$bindpw_TestValue]" 
+        qaRun "ipa-join --hostname=$hostname_TestValue_Negative  --server=$server_TestValue  --keytab=$keytab_TestValue  --bindpw=$bindpw_TestValue " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [hostname]=[$hostname_TestValue_Negative] [server]=[$server_TestValue] [keytab]=[$keytab_TestValue] [bindpw]=[$bindpw_TestValue]" 
         Kcleanup
         rm $tmpout
     rlPhaseEnd
@@ -214,7 +214,7 @@ ipa_join_1009()
         local bindpw_TestValue="replace_me" #bindpw;positive;ValidPW
         local expectedErrMsg=replace_me
         local expectedErrCode=1
-        qaRun "ipa ipa-join $testID  --hostname=$hostname_TestValue_Negative  --bindpw=$bindpw_TestValue " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [hostname]=[$hostname_TestValue_Negative] [bindpw]=[$bindpw_TestValue]" 
+        qaRun "ipa-join --hostname=$hostname_TestValue_Negative  --bindpw=$bindpw_TestValue " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [hostname]=[$hostname_TestValue_Negative] [bindpw]=[$bindpw_TestValue]" 
         Kcleanup
         rm $tmpout
     rlPhaseEnd
@@ -230,7 +230,7 @@ ipa_join_1010()
         local keytab_TestValue="replace_me" #keytab;positive;ValidKeytab
         local expectedErrMsg=replace_me
         local expectedErrCode=1
-        qaRun "ipa ipa-join $testID  --hostname=$hostname_TestValue_Negative  --keytab=$keytab_TestValue " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [hostname]=[$hostname_TestValue_Negative] [keytab]=[$keytab_TestValue]" 
+        qaRun "ipa-join --hostname=$hostname_TestValue_Negative  --keytab=$keytab_TestValue " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [hostname]=[$hostname_TestValue_Negative] [keytab]=[$keytab_TestValue]" 
         Kcleanup
         rm $tmpout
     rlPhaseEnd
@@ -243,7 +243,7 @@ ipa_join_1011()
         local tmpout=$TmpDir/ipa_join_1011.$RANDOM.out
         KinitAsAdmin
         local hostname_TestValue="replace_me" #hostname;positive;FQDN
-        rlRun "ipa ipa-join $testID  --hostname=$hostname_TestValue " 0 "test options:  [hostname]=[$hostname_TestValue]" 
+        rlRun "ipa-join --hostname=$hostname_TestValue " 0 "test options:  [hostname]=[$hostname_TestValue]" 
         Kcleanup
         rm $tmpout
     rlPhaseEnd
@@ -259,7 +259,7 @@ ipa_join_1012()
         local bindpw_TestValue_Negative="replace_me" #bindpw;negative;InvalidPW
         local expectedErrMsg=replace_me
         local expectedErrCode=1
-        qaRun "ipa ipa-join $testID  --hostname=$hostname_TestValue  --bindpw=$bindpw_TestValue_Negative " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [hostname]=[$hostname_TestValue] [bindpw]=[$bindpw_TestValue_Negative]" 
+        qaRun "ipa-join --hostname=$hostname_TestValue  --bindpw=$bindpw_TestValue_Negative " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [hostname]=[$hostname_TestValue] [bindpw]=[$bindpw_TestValue_Negative]" 
         Kcleanup
         rm $tmpout
     rlPhaseEnd
@@ -273,7 +273,7 @@ ipa_join_1013()
         KinitAsAdmin
         local hostname_TestValue="replace_me" #hostname;positive;FQDN 
         local bindpw_TestValue="replace_me" #bindpw;positive;ValidPW
-        rlRun "ipa ipa-join $testID  --hostname=$hostname_TestValue  --bindpw=$bindpw_TestValue " 0 "test options:  [hostname]=[$hostname_TestValue] [bindpw]=[$bindpw_TestValue]" 
+        rlRun "ipa-join --hostname=$hostname_TestValue  --bindpw=$bindpw_TestValue " 0 "test options:  [hostname]=[$hostname_TestValue] [bindpw]=[$bindpw_TestValue]" 
         Kcleanup
         rm $tmpout
     rlPhaseEnd
@@ -289,7 +289,7 @@ ipa_join_1014()
         local keytab_TestValue_Negative="replace_me" #keytab;negative;InvalidKeytab
         local expectedErrMsg=replace_me
         local expectedErrCode=1
-        qaRun "ipa ipa-join $testID  --hostname=$hostname_TestValue  --keytab=$keytab_TestValue_Negative " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [hostname]=[$hostname_TestValue] [keytab]=[$keytab_TestValue_Negative]" 
+        qaRun "ipa-join --hostname=$hostname_TestValue  --keytab=$keytab_TestValue_Negative " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [hostname]=[$hostname_TestValue] [keytab]=[$keytab_TestValue_Negative]" 
         Kcleanup
         rm $tmpout
     rlPhaseEnd
@@ -306,7 +306,7 @@ ipa_join_1015()
         local bindpw_TestValue="replace_me" #bindpw;positive;ValidPW
         local expectedErrMsg=replace_me
         local expectedErrCode=1
-        qaRun "ipa ipa-join $testID  --hostname=$hostname_TestValue  --keytab=$keytab_TestValue_Negative  --bindpw=$bindpw_TestValue " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [hostname]=[$hostname_TestValue] [keytab]=[$keytab_TestValue_Negative] [bindpw]=[$bindpw_TestValue]" 
+        qaRun "ipa-join --hostname=$hostname_TestValue  --keytab=$keytab_TestValue_Negative  --bindpw=$bindpw_TestValue " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [hostname]=[$hostname_TestValue] [keytab]=[$keytab_TestValue_Negative] [bindpw]=[$bindpw_TestValue]" 
         Kcleanup
         rm $tmpout
     rlPhaseEnd
@@ -320,7 +320,7 @@ ipa_join_1016()
         KinitAsAdmin
         local hostname_TestValue="replace_me" #hostname;positive;FQDN 
         local keytab_TestValue="replace_me" #keytab;positive;ValidKeytab
-        rlRun "ipa ipa-join $testID  --hostname=$hostname_TestValue  --keytab=$keytab_TestValue " 0 "test options:  [hostname]=[$hostname_TestValue] [keytab]=[$keytab_TestValue]" 
+        rlRun "ipa-join --hostname=$hostname_TestValue  --keytab=$keytab_TestValue " 0 "test options:  [hostname]=[$hostname_TestValue] [keytab]=[$keytab_TestValue]" 
         Kcleanup
         rm $tmpout
     rlPhaseEnd
@@ -337,7 +337,7 @@ ipa_join_1017()
         local bindpw_TestValue_Negative="replace_me" #bindpw;negative;InvalidPW
         local expectedErrMsg=replace_me
         local expectedErrCode=1
-        qaRun "ipa ipa-join $testID  --hostname=$hostname_TestValue  --keytab=$keytab_TestValue  --bindpw=$bindpw_TestValue_Negative " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [hostname]=[$hostname_TestValue] [keytab]=[$keytab_TestValue] [bindpw]=[$bindpw_TestValue_Negative]" 
+        qaRun "ipa-join --hostname=$hostname_TestValue  --keytab=$keytab_TestValue  --bindpw=$bindpw_TestValue_Negative " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [hostname]=[$hostname_TestValue] [keytab]=[$keytab_TestValue] [bindpw]=[$bindpw_TestValue_Negative]" 
         Kcleanup
         rm $tmpout
     rlPhaseEnd
@@ -352,7 +352,7 @@ ipa_join_1018()
         local hostname_TestValue="replace_me" #hostname;positive;FQDN 
         local keytab_TestValue="replace_me" #keytab;positive;ValidKeytab 
         local bindpw_TestValue="replace_me" #bindpw;positive;ValidPW
-        rlRun "ipa ipa-join $testID  --hostname=$hostname_TestValue  --keytab=$keytab_TestValue  --bindpw=$bindpw_TestValue " 0 "test options:  [hostname]=[$hostname_TestValue] [keytab]=[$keytab_TestValue] [bindpw]=[$bindpw_TestValue]" 
+        rlRun "ipa-join --hostname=$hostname_TestValue  --keytab=$keytab_TestValue  --bindpw=$bindpw_TestValue " 0 "test options:  [hostname]=[$hostname_TestValue] [keytab]=[$keytab_TestValue] [bindpw]=[$bindpw_TestValue]" 
         Kcleanup
         rm $tmpout
     rlPhaseEnd
@@ -368,7 +368,7 @@ ipa_join_1019()
         local server_TestValue_Negative="replace_me" #server;negative;NoSuchDomain
         local expectedErrMsg=replace_me
         local expectedErrCode=1
-        qaRun "ipa ipa-join $testID  --hostname=$hostname_TestValue  --server=$server_TestValue_Negative " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [hostname]=[$hostname_TestValue] [server]=[$server_TestValue_Negative]" 
+        qaRun "ipa-join --hostname=$hostname_TestValue  --server=$server_TestValue_Negative " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [hostname]=[$hostname_TestValue] [server]=[$server_TestValue_Negative]" 
         Kcleanup
         rm $tmpout
     rlPhaseEnd
@@ -385,7 +385,7 @@ ipa_join_1020()
         local bindpw_TestValue="replace_me" #bindpw;positive;ValidPW
         local expectedErrMsg=replace_me
         local expectedErrCode=1
-        qaRun "ipa ipa-join $testID  --hostname=$hostname_TestValue  --server=$server_TestValue_Negative  --bindpw=$bindpw_TestValue " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [hostname]=[$hostname_TestValue] [server]=[$server_TestValue_Negative] [bindpw]=[$bindpw_TestValue]" 
+        qaRun "ipa-join --hostname=$hostname_TestValue  --server=$server_TestValue_Negative  --bindpw=$bindpw_TestValue " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [hostname]=[$hostname_TestValue] [server]=[$server_TestValue_Negative] [bindpw]=[$bindpw_TestValue]" 
         Kcleanup
         rm $tmpout
     rlPhaseEnd
@@ -402,7 +402,7 @@ ipa_join_1021()
         local keytab_TestValue="replace_me" #keytab;positive;ValidKeytab
         local expectedErrMsg=replace_me
         local expectedErrCode=1
-        qaRun "ipa ipa-join $testID  --hostname=$hostname_TestValue  --server=$server_TestValue_Negative  --keytab=$keytab_TestValue " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [hostname]=[$hostname_TestValue] [server]=[$server_TestValue_Negative] [keytab]=[$keytab_TestValue]" 
+        qaRun "ipa-join --hostname=$hostname_TestValue  --server=$server_TestValue_Negative  --keytab=$keytab_TestValue " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [hostname]=[$hostname_TestValue] [server]=[$server_TestValue_Negative] [keytab]=[$keytab_TestValue]" 
         Kcleanup
         rm $tmpout
     rlPhaseEnd
@@ -420,7 +420,7 @@ ipa_join_1022()
         local bindpw_TestValue="replace_me" #bindpw;positive;ValidPW
         local expectedErrMsg=replace_me
         local expectedErrCode=1
-        qaRun "ipa ipa-join $testID  --hostname=$hostname_TestValue  --server=$server_TestValue_Negative  --keytab=$keytab_TestValue  --bindpw=$bindpw_TestValue " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [hostname]=[$hostname_TestValue] [server]=[$server_TestValue_Negative] [keytab]=[$keytab_TestValue] [bindpw]=[$bindpw_TestValue]" 
+        qaRun "ipa-join --hostname=$hostname_TestValue  --server=$server_TestValue_Negative  --keytab=$keytab_TestValue  --bindpw=$bindpw_TestValue " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [hostname]=[$hostname_TestValue] [server]=[$server_TestValue_Negative] [keytab]=[$keytab_TestValue] [bindpw]=[$bindpw_TestValue]" 
         Kcleanup
         rm $tmpout
     rlPhaseEnd
@@ -434,7 +434,7 @@ ipa_join_1023()
         KinitAsAdmin
         local hostname_TestValue="replace_me" #hostname;positive;FQDN 
         local server_TestValue="replace_me" #server;positive;FQDN
-        rlRun "ipa ipa-join $testID  --hostname=$hostname_TestValue  --server=$server_TestValue " 0 "test options:  [hostname]=[$hostname_TestValue] [server]=[$server_TestValue]" 
+        rlRun "ipa-join --hostname=$hostname_TestValue  --server=$server_TestValue " 0 "test options:  [hostname]=[$hostname_TestValue] [server]=[$server_TestValue]" 
         Kcleanup
         rm $tmpout
     rlPhaseEnd
@@ -451,7 +451,7 @@ ipa_join_1024()
         local bindpw_TestValue_Negative="replace_me" #bindpw;negative;InvalidPW
         local expectedErrMsg=replace_me
         local expectedErrCode=1
-        qaRun "ipa ipa-join $testID  --hostname=$hostname_TestValue  --server=$server_TestValue  --bindpw=$bindpw_TestValue_Negative " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [hostname]=[$hostname_TestValue] [server]=[$server_TestValue] [bindpw]=[$bindpw_TestValue_Negative]" 
+        qaRun "ipa-join --hostname=$hostname_TestValue  --server=$server_TestValue  --bindpw=$bindpw_TestValue_Negative " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [hostname]=[$hostname_TestValue] [server]=[$server_TestValue] [bindpw]=[$bindpw_TestValue_Negative]" 
         Kcleanup
         rm $tmpout
     rlPhaseEnd
@@ -466,7 +466,7 @@ ipa_join_1025()
         local hostname_TestValue="replace_me" #hostname;positive;FQDN 
         local server_TestValue="replace_me" #server;positive;FQDN 
         local bindpw_TestValue="replace_me" #bindpw;positive;ValidPW
-        rlRun "ipa ipa-join $testID  --hostname=$hostname_TestValue  --server=$server_TestValue  --bindpw=$bindpw_TestValue " 0 "test options:  [hostname]=[$hostname_TestValue] [server]=[$server_TestValue] [bindpw]=[$bindpw_TestValue]" 
+        rlRun "ipa-join --hostname=$hostname_TestValue  --server=$server_TestValue  --bindpw=$bindpw_TestValue " 0 "test options:  [hostname]=[$hostname_TestValue] [server]=[$server_TestValue] [bindpw]=[$bindpw_TestValue]" 
         Kcleanup
         rm $tmpout
     rlPhaseEnd
@@ -483,7 +483,7 @@ ipa_join_1026()
         local keytab_TestValue_Negative="replace_me" #keytab;negative;InvalidKeytab
         local expectedErrMsg=replace_me
         local expectedErrCode=1
-        qaRun "ipa ipa-join $testID  --hostname=$hostname_TestValue  --server=$server_TestValue  --keytab=$keytab_TestValue_Negative " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [hostname]=[$hostname_TestValue] [server]=[$server_TestValue] [keytab]=[$keytab_TestValue_Negative]" 
+        qaRun "ipa-join --hostname=$hostname_TestValue  --server=$server_TestValue  --keytab=$keytab_TestValue_Negative " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [hostname]=[$hostname_TestValue] [server]=[$server_TestValue] [keytab]=[$keytab_TestValue_Negative]" 
         Kcleanup
         rm $tmpout
     rlPhaseEnd
@@ -501,7 +501,7 @@ ipa_join_1027()
         local bindpw_TestValue="replace_me" #bindpw;positive;ValidPW
         local expectedErrMsg=replace_me
         local expectedErrCode=1
-        qaRun "ipa ipa-join $testID  --hostname=$hostname_TestValue  --server=$server_TestValue  --keytab=$keytab_TestValue_Negative  --bindpw=$bindpw_TestValue " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [hostname]=[$hostname_TestValue] [server]=[$server_TestValue] [keytab]=[$keytab_TestValue_Negative] [bindpw]=[$bindpw_TestValue]" 
+        qaRun "ipa-join --hostname=$hostname_TestValue  --server=$server_TestValue  --keytab=$keytab_TestValue_Negative  --bindpw=$bindpw_TestValue " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [hostname]=[$hostname_TestValue] [server]=[$server_TestValue] [keytab]=[$keytab_TestValue_Negative] [bindpw]=[$bindpw_TestValue]" 
         Kcleanup
         rm $tmpout
     rlPhaseEnd
@@ -516,7 +516,7 @@ ipa_join_1028()
         local hostname_TestValue="replace_me" #hostname;positive;FQDN 
         local server_TestValue="replace_me" #server;positive;FQDN 
         local keytab_TestValue="replace_me" #keytab;positive;ValidKeytab
-        rlRun "ipa ipa-join $testID  --hostname=$hostname_TestValue  --server=$server_TestValue  --keytab=$keytab_TestValue " 0 "test options:  [hostname]=[$hostname_TestValue] [server]=[$server_TestValue] [keytab]=[$keytab_TestValue]" 
+        rlRun "ipa-join --hostname=$hostname_TestValue  --server=$server_TestValue  --keytab=$keytab_TestValue " 0 "test options:  [hostname]=[$hostname_TestValue] [server]=[$server_TestValue] [keytab]=[$keytab_TestValue]" 
         Kcleanup
         rm $tmpout
     rlPhaseEnd
@@ -534,7 +534,7 @@ ipa_join_1029()
         local bindpw_TestValue_Negative="replace_me" #bindpw;negative;InvalidPW
         local expectedErrMsg=replace_me
         local expectedErrCode=1
-        qaRun "ipa ipa-join $testID  --hostname=$hostname_TestValue  --server=$server_TestValue  --keytab=$keytab_TestValue  --bindpw=$bindpw_TestValue_Negative " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [hostname]=[$hostname_TestValue] [server]=[$server_TestValue] [keytab]=[$keytab_TestValue] [bindpw]=[$bindpw_TestValue_Negative]" 
+        qaRun "ipa-join --hostname=$hostname_TestValue  --server=$server_TestValue  --keytab=$keytab_TestValue  --bindpw=$bindpw_TestValue_Negative " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [hostname]=[$hostname_TestValue] [server]=[$server_TestValue] [keytab]=[$keytab_TestValue] [bindpw]=[$bindpw_TestValue_Negative]" 
         Kcleanup
         rm $tmpout
     rlPhaseEnd
@@ -550,7 +550,7 @@ ipa_join_1030()
         local server_TestValue="replace_me" #server;positive;FQDN 
         local keytab_TestValue="replace_me" #keytab;positive;ValidKeytab 
         local bindpw_TestValue="replace_me" #bindpw;positive;ValidPW
-        rlRun "ipa ipa-join $testID  --hostname=$hostname_TestValue  --server=$server_TestValue  --keytab=$keytab_TestValue  --bindpw=$bindpw_TestValue " 0 "test options:  [hostname]=[$hostname_TestValue] [server]=[$server_TestValue] [keytab]=[$keytab_TestValue] [bindpw]=[$bindpw_TestValue]" 
+        rlRun "ipa-join --hostname=$hostname_TestValue  --server=$server_TestValue  --keytab=$keytab_TestValue  --bindpw=$bindpw_TestValue " 0 "test options:  [hostname]=[$hostname_TestValue] [server]=[$server_TestValue] [keytab]=[$keytab_TestValue] [bindpw]=[$bindpw_TestValue]" 
         Kcleanup
         rm $tmpout
     rlPhaseEnd
@@ -565,7 +565,7 @@ ipa_join_1031()
         local keytab_TestValue_Negative="replace_me" #keytab;negative;InvalidKeytab
         local expectedErrMsg=replace_me
         local expectedErrCode=1
-        qaRun "ipa ipa-join $testID  --keytab=$keytab_TestValue_Negative " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [keytab]=[$keytab_TestValue_Negative]" 
+        qaRun "ipa-join --keytab=$keytab_TestValue_Negative " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [keytab]=[$keytab_TestValue_Negative]" 
         Kcleanup
         rm $tmpout
     rlPhaseEnd
@@ -581,7 +581,7 @@ ipa_join_1032()
         local bindpw_TestValue="replace_me" #bindpw;positive;ValidPW
         local expectedErrMsg=replace_me
         local expectedErrCode=1
-        qaRun "ipa ipa-join $testID  --keytab=$keytab_TestValue_Negative  --bindpw=$bindpw_TestValue " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [keytab]=[$keytab_TestValue_Negative] [bindpw]=[$bindpw_TestValue]" 
+        qaRun "ipa-join --keytab=$keytab_TestValue_Negative  --bindpw=$bindpw_TestValue " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [keytab]=[$keytab_TestValue_Negative] [bindpw]=[$bindpw_TestValue]" 
         Kcleanup
         rm $tmpout
     rlPhaseEnd
@@ -594,7 +594,7 @@ ipa_join_1033()
         local tmpout=$TmpDir/ipa_join_1033.$RANDOM.out
         KinitAsAdmin
         local keytab_TestValue="replace_me" #keytab;positive;ValidKeytab
-        rlRun "ipa ipa-join $testID  --keytab=$keytab_TestValue " 0 "test options:  [keytab]=[$keytab_TestValue]" 
+        rlRun "ipa-join --keytab=$keytab_TestValue " 0 "test options:  [keytab]=[$keytab_TestValue]" 
         Kcleanup
         rm $tmpout
     rlPhaseEnd
@@ -610,7 +610,7 @@ ipa_join_1034()
         local bindpw_TestValue_Negative="replace_me" #bindpw;negative;InvalidPW
         local expectedErrMsg=replace_me
         local expectedErrCode=1
-        qaRun "ipa ipa-join $testID  --keytab=$keytab_TestValue  --bindpw=$bindpw_TestValue_Negative " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [keytab]=[$keytab_TestValue] [bindpw]=[$bindpw_TestValue_Negative]" 
+        qaRun "ipa-join --keytab=$keytab_TestValue  --bindpw=$bindpw_TestValue_Negative " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [keytab]=[$keytab_TestValue] [bindpw]=[$bindpw_TestValue_Negative]" 
         Kcleanup
         rm $tmpout
     rlPhaseEnd
@@ -624,7 +624,7 @@ ipa_join_1035()
         KinitAsAdmin
         local keytab_TestValue="replace_me" #keytab;positive;ValidKeytab 
         local bindpw_TestValue="replace_me" #bindpw;positive;ValidPW
-        rlRun "ipa ipa-join $testID  --keytab=$keytab_TestValue  --bindpw=$bindpw_TestValue " 0 "test options:  [keytab]=[$keytab_TestValue] [bindpw]=[$bindpw_TestValue]" 
+        rlRun "ipa-join --keytab=$keytab_TestValue  --bindpw=$bindpw_TestValue " 0 "test options:  [keytab]=[$keytab_TestValue] [bindpw]=[$bindpw_TestValue]" 
         Kcleanup
         rm $tmpout
     rlPhaseEnd
@@ -639,7 +639,7 @@ ipa_join_1036()
         local server_TestValue_Negative="replace_me" #server;negative;NoSuchDomain
         local expectedErrMsg=replace_me
         local expectedErrCode=1
-        qaRun "ipa ipa-join $testID  --server=$server_TestValue_Negative " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [server]=[$server_TestValue_Negative]" 
+        qaRun "ipa-join --server=$server_TestValue_Negative " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [server]=[$server_TestValue_Negative]" 
         Kcleanup
         rm $tmpout
     rlPhaseEnd
@@ -655,7 +655,7 @@ ipa_join_1037()
         local bindpw_TestValue="replace_me" #bindpw;positive;ValidPW
         local expectedErrMsg=replace_me
         local expectedErrCode=1
-        qaRun "ipa ipa-join $testID  --server=$server_TestValue_Negative  --bindpw=$bindpw_TestValue " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [server]=[$server_TestValue_Negative] [bindpw]=[$bindpw_TestValue]" 
+        qaRun "ipa-join --server=$server_TestValue_Negative  --bindpw=$bindpw_TestValue " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [server]=[$server_TestValue_Negative] [bindpw]=[$bindpw_TestValue]" 
         Kcleanup
         rm $tmpout
     rlPhaseEnd
@@ -671,7 +671,7 @@ ipa_join_1038()
         local keytab_TestValue="replace_me" #keytab;positive;ValidKeytab
         local expectedErrMsg=replace_me
         local expectedErrCode=1
-        qaRun "ipa ipa-join $testID  --server=$server_TestValue_Negative  --keytab=$keytab_TestValue " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [server]=[$server_TestValue_Negative] [keytab]=[$keytab_TestValue]" 
+        qaRun "ipa-join --server=$server_TestValue_Negative  --keytab=$keytab_TestValue " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [server]=[$server_TestValue_Negative] [keytab]=[$keytab_TestValue]" 
         Kcleanup
         rm $tmpout
     rlPhaseEnd
@@ -684,7 +684,7 @@ ipa_join_1039()
         local tmpout=$TmpDir/ipa_join_1039.$RANDOM.out
         KinitAsAdmin
         local server_TestValue="replace_me" #server;positive;FQDN
-        rlRun "ipa ipa-join $testID  --server=$server_TestValue " 0 "test options:  [server]=[$server_TestValue]" 
+        rlRun "ipa-join --server=$server_TestValue " 0 "test options:  [server]=[$server_TestValue]" 
         Kcleanup
         rm $tmpout
     rlPhaseEnd
@@ -700,7 +700,7 @@ ipa_join_1040()
         local bindpw_TestValue_Negative="replace_me" #bindpw;negative;InvalidPW
         local expectedErrMsg=replace_me
         local expectedErrCode=1
-        qaRun "ipa ipa-join $testID  --server=$server_TestValue  --bindpw=$bindpw_TestValue_Negative " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [server]=[$server_TestValue] [bindpw]=[$bindpw_TestValue_Negative]" 
+        qaRun "ipa-join --server=$server_TestValue  --bindpw=$bindpw_TestValue_Negative " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [server]=[$server_TestValue] [bindpw]=[$bindpw_TestValue_Negative]" 
         Kcleanup
         rm $tmpout
     rlPhaseEnd
@@ -714,7 +714,7 @@ ipa_join_1041()
         KinitAsAdmin
         local server_TestValue="replace_me" #server;positive;FQDN 
         local bindpw_TestValue="replace_me" #bindpw;positive;ValidPW
-        rlRun "ipa ipa-join $testID  --server=$server_TestValue  --bindpw=$bindpw_TestValue " 0 "test options:  [server]=[$server_TestValue] [bindpw]=[$bindpw_TestValue]" 
+        rlRun "ipa-join --server=$server_TestValue  --bindpw=$bindpw_TestValue " 0 "test options:  [server]=[$server_TestValue] [bindpw]=[$bindpw_TestValue]" 
         Kcleanup
         rm $tmpout
     rlPhaseEnd
@@ -730,7 +730,7 @@ ipa_join_1042()
         local keytab_TestValue_Negative="replace_me" #keytab;negative;InvalidKeytab
         local expectedErrMsg=replace_me
         local expectedErrCode=1
-        qaRun "ipa ipa-join $testID  --server=$server_TestValue  --keytab=$keytab_TestValue_Negative " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [server]=[$server_TestValue] [keytab]=[$keytab_TestValue_Negative]" 
+        qaRun "ipa-join --server=$server_TestValue  --keytab=$keytab_TestValue_Negative " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [server]=[$server_TestValue] [keytab]=[$keytab_TestValue_Negative]" 
         Kcleanup
         rm $tmpout
     rlPhaseEnd
@@ -744,7 +744,7 @@ ipa_join_1043()
         KinitAsAdmin
         local server_TestValue="replace_me" #server;positive;FQDN 
         local keytab_TestValue="replace_me" #keytab;positive;ValidKeytab
-        rlRun "ipa ipa-join $testID  --server=$server_TestValue  --keytab=$keytab_TestValue " 0 "test options:  [server]=[$server_TestValue] [keytab]=[$keytab_TestValue]" 
+        rlRun "ipa-join --server=$server_TestValue  --keytab=$keytab_TestValue " 0 "test options:  [server]=[$server_TestValue] [keytab]=[$keytab_TestValue]" 
         Kcleanup
         rm $tmpout
     rlPhaseEnd
@@ -756,7 +756,7 @@ ipa_join_1044()
         local testID="ipa_join_1044"
         local tmpout=$TmpDir/ipa_join_1044.$RANDOM.out
         KinitAsAdmin
-        rlRun "ipa ipa-join $testID --unenroll " 0 "test options: " 
+        rlRun "ipa-join --unenroll " 0 "test options: " 
         Kcleanup
         rm $tmpout
     rlPhaseEnd
