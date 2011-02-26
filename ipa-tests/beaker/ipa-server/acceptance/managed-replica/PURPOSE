@@ -1,0 +1,3 @@
+PURPOSE of /CoreOS/tests/Regression/manage-replica
+Description: IPA managed replica tests
+Author: Michael Gregg <mgregg@redhat.com>
