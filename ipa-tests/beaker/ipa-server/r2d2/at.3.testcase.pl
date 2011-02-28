@@ -41,7 +41,7 @@ if ($totalArgs == 0){
         $ipacmd =~ s/ /_/;
     }
     $testcasefile = "$basedir/t.".$ipacmd.".sh";
-    $testdatafile = "$basedir/d.".$ipacmd.".sh";
+    $testdatafile = "$basedir/d.".$ipacmd;
 }else{
     usage();
     exit;
@@ -56,7 +56,6 @@ else{
     exit;
 }
 
-writeTestDataFileHeader($testdatafile);
 writeTestCaseFileHeader($testcasefile, \%scenario);
 
 foreach my $ipasubcmd (sort keys %scenario){
@@ -69,7 +68,6 @@ foreach my $ipasubcmd (sort keys %scenario){
 
     #print "\n------------ $ipasubcmd ---------------";
     #printArray(@scenarioList);
-    @dataArray = (); # re-init for data array holder
     foreach (0..$#scenarioList){
         my %testcase;
         my $index = 1001 + $_;
@@ -91,8 +89,10 @@ foreach my $ipasubcmd (sort keys %scenario){
         print "\n[$index]=>[$testname]";
         $total=$_+1;
     }#foreach to parse each scenario under ipa sub command
-    appendToTestFiles ($testcasefile, $testdatafile, $ipasubcmd, \%tc, $total);
+    appendToTestFiles ($testcasefile,$ipasubcmd, \%tc, $total);
 }#foreach to walk through scenario hash table
+
+writeTestDataFile($testdatafile, @dataArray);
 
 print "\nEND of test case generator\n";
 
@@ -134,10 +134,8 @@ sub writeTestCaseFileHeader {
     close DEST;
 } #writeTestFileHeader
 
-
-sub writeTestDataFileHeader {
-    my ($testdatafile) = shift;
-
+sub writeTestDataFile{
+    my ($testdatafile, @testData) = @_;
     if (open (DATA,">$testdatafile")){
         print "\ntestdata file is ready to write: [$testdatafile]";
     }else{
@@ -149,11 +147,21 @@ sub writeTestDataFileHeader {
     print DATA "\n# Date: $now_string";
     print DATA "\n";
 
+    # sort the data array and write into data file
+    print DATA "\n#TEST DATA file for IPA command: $ipacmd";
+    my @sortedDataArray = sortArray(@testData);
+    foreach (@sortedDataArray){
+        #print "\nin data ARRAY: $_";
+        print DATA "\n$_";
+    }
+    print DATA "\n#END OF TEST DATA for [$ipacmd]\n";
+
+    # end of program, close files and exit
     close DATA;
 } #writeTestFileHeader
 
 sub appendToTestFiles {
-    my ($testcasefile, $testdatafile, $ipasubcmd, $testcase_ref, $total) = @_;
+    my ($testcasefile,$ipasubcmd, $testcase_ref, $total) = @_;
     my %tc = %$testcase_ref;
     my $ipasubcmdF= $ipasubcmd;
     $ipasubcmdF=~ s/-/_/;
@@ -162,13 +170,6 @@ sub appendToTestFiles {
         print "\ntestcase file is ready to write: [$testcasefile]";
     }else{
         print "\ntestcase file is not be able to open for write [$testcasefile]";
-        exit;
-    }
-
-    if (open (DATA,">>$testdatafile")){
-        print "\ntestdata file is ready to write: [$testdatafile]";
-    }else{
-        print "\ntestdata file is not be able to open for write [$testdatafile]";
         exit;
     }
 
@@ -201,7 +202,7 @@ sub appendToTestFiles {
     print DEST "$indent"."rlPhaseEnd";
     print DEST "\n} #envsetup\n";
 
-    print DEST "\n$ipasubcmd"."_envcleanup()";
+    print DEST "\n$ipasubcmdF"."_envcleanup()";
     print DEST "\n{";
     print DEST "$indent"."rlPhaseStartCleanup \"$ipasubcmdF"."_envcleanup\"";
     print DEST "$indent2"."#environment cleanup starts here";
@@ -218,22 +219,11 @@ sub appendToTestFiles {
         print DEST "\n";
     }# parse the tc hash data and generate test case content
 
-
     # test case file part 3: end of test file
     print DEST "\n#END OF TEST CASE for [$ipasubcmd]\n";
-
-    # sort the data array and write into data file
-    print DATA "\n#TEST DATA file for IPA sub command: $ipasubcmd";
-    my @sortedDataArray = sortArray(@dataArray);
-    foreach (@sortedDataArray){
-        print DATA "\n$_";
-    }
-    print DATA "\n#END OF TEST DATA for [$ipasubcmd]\n";
-
     # end of program, close files and exit
     close DEST;
-    close DATA;
-}#
+}# appendTestFiles
 
 sub fileToArray {
     # lines start with '#' will be ignored
@@ -260,8 +250,9 @@ sub sortArray {
     my (@a) = @_;
     my %h;
     foreach (@a){
-        next if exists $h{$_};
-        $h{$_}="1";
+        my $thisA = clearSpaces($_);
+        next if exists $h{$thisA};
+        $h{$thisA}="1";
     }
     my @sorted = sort keys %h;
     return @sorted;
@@ -284,14 +275,17 @@ sub createTestCase{
     my $tc_type = $testcase{"testtype"};
     my $tc="";
     $tc .= "\n$name()";
-    $tc .= "\n{ #test_scenario ($tc_type): $scenario";
-    $tc .= "$indent"."rlPhaseStartTest \"$name\"";
+    $tc .= "\n{";
+    $tc .= "$indent"."rlPhaseStartTest \"$name #($tc_type test),scenario: $scenario\"";
+    $tc .= "$indent2"."local testID=\"$name\"";
+    $tc .= "$indent2"."local tmpout=\$TmpDir/$name".".\$RANDOM.out";
     $tc .= "$indent2"."KinitAsAdmin";
     my @ipatestcommand = buildTestStatement($subcmd, $scenario);
     foreach my $ipatestcommand_parts (@ipatestcommand){
         $tc .="$indent2"."$ipatestcommand_parts";
     }
     $tc .= "$indent2"."Kcleanup";
+    $tc .= "$indent2"."rm \$tmpout";
     $tc .= "$indent"."rlPhaseEnd";
     $tc .= "\n} #$name";
     return $tc;
@@ -303,7 +297,7 @@ sub buildTestStatement{
 
     my @localVariableDeclarition = (); # local veriable declarition block
     my $testExpectedResult=0; #default expection: 0 = pass
-    my $testCmdStatement = "ipa $subcmd ";
+    my $testCmdStatement = "ipa $subcmd \$testID "; #the syntax of ipa sub command
     my $testCommentStatement = "test options: ";
     my @eachOptions=();
 
@@ -323,18 +317,21 @@ sub buildTestStatement{
             $testCmdStatement .= "--$optionName ";
         }elsif ($#optionParts == 2){ #if 3 elements in option line,
             my $optionName = $optionParts[0];
-            my $optionVariableName = "$optionName"."TestValue";
+            my $optionVariableName = "$optionName"."_TestValue";
             my $expectedResult = $optionParts[1];
             if ($expectedResult =~ /negative/){
                 $testExpectedResult = 1;
+                $optionVariableName = "$optionName"."_TestValue_Negative";
             }
             my $optionData = $optionParts[2];
-
-            my $localVariableStatement = "local $optionVariableName=`getTestValue \"$subcmd;$option\" \"$testdatafile\"` ";
-            my $str = clearSpaces("$subcmd;$option");
-            push @dataArray, "$str=replace_me";
+            my $localVariableStatement = "";
+            $localVariableStatement = "local $optionVariableName=\"replace_me\" #$option";
+          
+            my $optstr = clearSpaces("$option");
+            my $datastr = clearSpaces("$optionData");
+            push @dataArray, "$optstr~~$datastr";
             push @localVariableDeclarition, $localVariableStatement;
-            $testCmdStatement .= " --$optionName \$$optionVariableName ";
+            $testCmdStatement .= " --$optionName=\$$optionVariableName ";
             $testCommentStatement .=" [$optionName]=[\$$optionVariableName]";
         }else{
             print "\nformat error in [$option], expect 3 parts";
@@ -344,6 +341,11 @@ sub buildTestStatement{
         } 
     }#walk  through each option 
     my $fullTestStatement = "rlRun \"$testCmdStatement\" $testExpectedResult \"$testCommentStatement\" ";
+    if ($testExpectedResult eq "1" ){
+        push @localVariableDeclarition, "local expectedErrMsg=replace_me";
+        push @localVariableDeclarition, "local expectedErrCode=1";
+        $fullTestStatement = "qaRun \"$testCmdStatement\" \"\$tmpout\" \$expectedErrCode \"\$expectedErrMsg\" \"$testCommentStatement\" ";
+    }
     push @returnArray, @localVariableDeclarition;
     push @returnArray, $fullTestStatement;
     return @returnArray;
