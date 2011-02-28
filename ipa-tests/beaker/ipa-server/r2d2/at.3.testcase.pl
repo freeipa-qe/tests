@@ -276,7 +276,7 @@ sub createTestCase{
     my $tc="";
     $tc .= "\n$name()";
     $tc .= "\n{";
-    $tc .= "$indent"."rlPhaseStartTest \"$name #($tc_type test),scenario: $scenario\"";
+    $tc .= "$indent"."rlPhaseStartTest \"$name [$tc_type test] $scenario\"";
     $tc .= "$indent2"."local testID=\"$name\"";
     $tc .= "$indent2"."local tmpout=\$TmpDir/$name".".\$RANDOM.out";
     $tc .= "$indent2"."KinitAsAdmin";
