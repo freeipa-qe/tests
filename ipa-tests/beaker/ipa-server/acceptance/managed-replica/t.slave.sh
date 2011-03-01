@@ -237,3 +237,9 @@ password_history_negative()
         done
     rlPhaseEnd
 } #password_history_negative
+
+# Main test case
+run_slave_tests()
+{
+	rlPass "this is the master suite place holder"
+}

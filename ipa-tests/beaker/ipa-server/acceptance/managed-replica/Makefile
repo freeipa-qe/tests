@@ -29,7 +29,7 @@ export TESTVERSION=1.0
 
 BUILT_FILES=
 
-FILES=$(METADATA) runtest.sh Makefile PURPOSE t.manage-replica.sh
+FILES=$(METADATA) runtest.sh Makefile PURPOSE t.master.sh t.slave.sh
 
 .PHONY: all install download clean
 
