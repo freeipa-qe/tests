@@ -72,7 +72,6 @@ rlJournalStart
 		echo "This machine appears to be a slave."
 		run_slave_tests
 	fi		
-    #manage-replica
     # r2d2_test_ends
 
     rlPhaseStartCleanup "manage-replica cleanup"
@@ -80,10 +79,12 @@ rlJournalStart
         rlRun "rm -r $TmpDir" 0 "Removing tmp directory"
     rlPhaseEnd
 
-    makereport
+	rlJournalPrintText
+	report=/tmp/rhts.report.$RANDOM.txt
+	makereport $report
+	rhts-submit-log -l $report
+
 rlJournalEnd
-
-
  
 # manifest:
 # teststuie   : ipasample
