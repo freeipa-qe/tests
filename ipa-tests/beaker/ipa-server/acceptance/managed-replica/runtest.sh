@@ -39,8 +39,9 @@
 . /dev/shm/ipa-server-shared.sh
 . /dev/shm/env.sh
 
-# Include test case file
-. ./t.manage-replica.sh
+# Include test cases files
+. ./t.master.sh
+. ./t.slave.sh
 
 PACKAGE="ipa-server"
 
@@ -55,7 +56,22 @@ rlJournalStart
         rlRun "pushd $TmpDir"
     rlPhaseEnd
 
+	if [ "$SLAVE" = "" ]; then
+		echo "Error! this test requires that you have at least one slave server" 
+		rlFail "Error! this test requires that you have at least one slave server" 
+	else
+		rlPass "Pass, this setup contains at least one slave server"
+	fi
+
     # r2d2_test_starts
+	echo $MASTER | grep $HOSTNAME
+	if [ $? -eq 0 ]; then
+		echo "This appears to be a master, run the master tests"
+		run_master_tests
+	else
+		echo "This machine appears to be a slave."
+		run_slave_tests
+	fi		
     #manage-replica
     # r2d2_test_ends
 
