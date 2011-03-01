@@ -1,12 +1,3 @@
-
-. /usr/bin/rhts-environment.sh
-. /usr/share/beakerlib/beakerlib.sh
-. /dev/shm/ipa-server-shared.sh
-. /dev/shm/env.sh
-
-# Include test cases files
-. ./t.master.sh
-. ./t.slave.sh
 . ./t.tests.common.sh
 
 ######################
