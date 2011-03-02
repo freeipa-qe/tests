@@ -12,37 +12,30 @@ ipajoin()
     ipa_join_1011  #test_scenario (positive test): [--hostname;positive;FQDN]
     ipa_join_1012  #test_scenario (negative test): [--hostname;positive;FQDN --bindpw;negative;InvalidPW]
     ipa_join_1013  #test_scenario (positive test): [--hostname;positive;FQDN --bindpw;positive;ValidPW]
-    ipa_join_1014  #test_scenario (negative test): [--hostname;positive;FQDN --keytab;negative;InvalidKeytab]
-    ipa_join_1015  #test_scenario (negative test): [--hostname;positive;FQDN --keytab;negative;InvalidKeytab --bindpw;positive;ValidPW]
     ipa_join_1016  #test_scenario (positive test): [--hostname;positive;FQDN --keytab;positive;ValidKeytab]
-#    ipa_join_1017  #test_scenario (negative test): [--hostname;positive;FQDN --keytab;positive;ValidKeytab --bindpw;negative;InvalidPW]
-#    ipa_join_1018  #test_scenario (positive test): [--hostname;positive;FQDN --keytab;positive;ValidKeytab --bindpw;positive;ValidPW]
-#    ipa_join_1019  #test_scenario (negative test): [--hostname;positive;FQDN --server;negative;NoSuchDomain]
-#    ipa_join_1020  #test_scenario (negative test): [--hostname;positive;FQDN --server;negative;NoSuchDomain --bindpw;positive;ValidPW]
-#    ipa_join_1021  #test_scenario (negative test): [--hostname;positive;FQDN --server;negative;NoSuchDomain --keytab;positive;ValidKeytab]
-#    ipa_join_1022  #test_scenario (negative test): [--hostname;positive;FQDN --server;negative;NoSuchDomain --keytab;positive;ValidKeytab --bindpw;positive;ValidPW]
-#    ipa_join_1023  #test_scenario (positive test): [--hostname;positive;FQDN --server;positive;FQDN]
-#    ipa_join_1024  #test_scenario (negative test): [--hostname;positive;FQDN --server;positive;FQDN --bindpw;negative;InvalidPW]
-#    ipa_join_1025  #test_scenario (positive test): [--hostname;positive;FQDN --server;positive;FQDN --bindpw;positive;ValidPW]
-#    ipa_join_1026  #test_scenario (negative test): [--hostname;positive;FQDN --server;positive;FQDN --keytab;negative;InvalidKeytab]
-#    ipa_join_1027  #test_scenario (negative test): [--hostname;positive;FQDN --server;positive;FQDN --keytab;negative;InvalidKeytab --bindpw;positive;ValidPW]
-#    ipa_join_1028  #test_scenario (positive test): [--hostname;positive;FQDN --server;positive;FQDN --keytab;positive;ValidKeytab]
-#    ipa_join_1029  #test_scenario (negative test): [--hostname;positive;FQDN --server;positive;FQDN --keytab;positive;ValidKeytab --bindpw;negative;InvalidPW]
-#    ipa_join_1030  #test_scenario (positive test): [--hostname;positive;FQDN --server;positive;FQDN --keytab;positive;ValidKeytab --bindpw;positive;ValidPW]
-#    ipa_join_1031  #test_scenario (negative test): [--keytab;negative;InvalidKeytab]
-#    ipa_join_1032  #test_scenario (negative test): [--keytab;negative;InvalidKeytab --bindpw;positive;ValidPW]
-#    ipa_join_1033  #test_scenario (positive test): [--keytab;positive;ValidKeytab]
-#    ipa_join_1034  #test_scenario (negative test): [--keytab;positive;ValidKeytab --bindpw;negative;InvalidPW]
-#    ipa_join_1035  #test_scenario (positive test): [--keytab;positive;ValidKeytab --bindpw;positive;ValidPW]
-#    ipa_join_1036  #test_scenario (negative test): [--server;negative;NoSuchDomain]
-#    ipa_join_1037  #test_scenario (negative test): [--server;negative;NoSuchDomain --bindpw;positive;ValidPW]
-#    ipa_join_1038  #test_scenario (negative test): [--server;negative;NoSuchDomain--keytab;positive;ValidKeytab]
-#    ipa_join_1039  #test_scenario (positive test): [--server;positive;FQDN]
-#    ipa_join_1040  #test_scenario (negative test): [--server;positive;FQDN --bindpw;negative;InvalidPW]
-#    ipa_join_1041  #test_scenario (positive test): [--server;positive;FQDN --bindpw;positive;ValidPW]
-#    ipa_join_1042  #test_scenario (negative test): [--server;positive;FQDN --keytab;negative;InvalidKeytab]
-#    ipa_join_1043  #test_scenario (positive test): [--server;positive;FQDN --keytab;positive;ValidKeytab]
-#    ipa_join_1044  #test_scenario (negative test): [--bindpw;negative;InvalidPW]
+    ipa_join_1017  #test_scenario (negative test): [--hostname;positive;FQDN --keytab;positive;ValidKeytab --bindpw;negative;InvalidPW]
+    ipa_join_1018  #test_scenario (positive test): [--hostname;positive;FQDN --keytab;positive;ValidKeytab --bindpw;positive;ValidPW]
+    ipa_join_1019  #test_scenario (negative test): [--hostname;positive;FQDN --server;negative;NoSuchDomain]
+    ipa_join_1020  #test_scenario (negative test): [--hostname;positive;FQDN --server;negative;NoSuchDomain --bindpw;positive;ValidPW]
+    ipa_join_1021  #test_scenario (negative test): [--hostname;positive;FQDN --server;negative;NoSuchDomain --keytab;positive;ValidKeytab]
+    ipa_join_1022  #test_scenario (negative test): [--hostname;positive;FQDN --server;negative;NoSuchDomain --keytab;positive;ValidKeytab --bindpw;positive;ValidPW]
+    ipa_join_1023  #test_scenario (positive test): [--hostname;positive;FQDN --server;positive;FQDN]
+    ipa_join_1024  #test_scenario (negative test): [--hostname;positive;FQDN --server;positive;FQDN --bindpw;negative;InvalidPW]
+    ipa_join_1025  #test_scenario (positive test): [--hostname;positive;FQDN --server;positive;FQDN --bindpw;positive;ValidPW]
+    ipa_join_1028  #test_scenario (positive test): [--hostname;positive;FQDN --server;positive;FQDN --keytab;positive;ValidKeytab]
+    ipa_join_1029  #test_scenario (negative test): [--hostname;positive;FQDN --server;positive;FQDN --keytab;positive;ValidKeytab --bindpw;negative;InvalidPW]
+    ipa_join_1030  #test_scenario (positive test): [--hostname;positive;FQDN --server;positive;FQDN --keytab;positive;ValidKeytab --bindpw;positive;ValidPW]
+    ipa_join_1033  #test_scenario (positive test): [--keytab;positive;ValidKeytab]
+    ipa_join_1034  #test_scenario (negative test): [--keytab;positive;ValidKeytab --bindpw;negative;InvalidPW]
+    ipa_join_1035  #test_scenario (positive test): [--keytab;positive;ValidKeytab --bindpw;positive;ValidPW]
+    ipa_join_1036  #test_scenario (negative test): [--server;negative;NoSuchDomain]
+    ipa_join_1037  #test_scenario (negative test): [--server;negative;NoSuchDomain --bindpw;positive;ValidPW]
+    ipa_join_1038  #test_scenario (negative test): [--server;negative;NoSuchDomain--keytab;positive;ValidKeytab]
+    ipa_join_1039  #test_scenario (positive test): [--server;positive;FQDN]
+    ipa_join_1040  #test_scenario (negative test): [--server;positive;FQDN --bindpw;negative;InvalidPW]
+    ipa_join_1041  #test_scenario (positive test): [--server;positive;FQDN --bindpw;positive;ValidPW]
+    ipa_join_1043  #test_scenario (positive test): [--server;positive;FQDN --keytab;positive;ValidKeytab]
+    ipa_join_1044  #test_scenario (negative test): [--bindpw;negative;InvalidPW]
     ipa_join_envcleanup
 } #ipajoin
 
@@ -116,51 +109,12 @@ ipa_join_1013()
         local tmpout=$TmpDir/ipa_join_1013.$RANDOM.out
         #KinitAsAdmin
         local hostname_TestValue="$clientFQDN" #hostname;positive;FQDN
-        local bindpw_TestValue=$testID #bindpw;positive;ValidPW
+        local bindpw_TestValue=$OTP #bindpw;positive;ValidPW
         rlRun "ipa-join --hostname=$hostname_TestValue  --bindpw=$OTP" 0 "test options:  [hostname]=[$hostname_TestValue] [bindpw]=[$bindpw_TestValue]" 
         #Kcleanup
         rm $tmpout
     rlPhaseEnd
 } #ipa_join_1013
-
-ipa_join_1014()
-{
-    rlPhaseStartTest "ipa_join_1014 [negative test] --hostname;positive;FQDN --keytab;negative;InvalidKeytab"
-        local testID="ipa_join_1014"
-        local tmpout=$TmpDir/ipa_join_1014.$RANDOM.out
-        KinitAsAdmin
-        local hostname_TestValue="$clientFQDN" #hostname;positive;FQDN
-        local keytab_TestValue_Negative="/tmp/NoSuchKeytabFile.keytab" #keytab;negative;InvalidKeytab
-        local expectedErrMsg="No permission to join this host to the IPA domain"
-        local expectedErrCode=17
-        rlRun "ssh root@$serverFQDN \"ipa host-del $clientFQDN\"" 0 "we have to un-join before test starts"
-        #remove the client host record
-        ssh root@$serverFQDN "ipa host-add $clientFQDN --password=$OTP"
-        qaRun "ipa-join --hostname=$hostname_TestValue  --keytab=$keytab_TestValue_Negative " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [hostname]=[$hostname_TestValue] [keytab]=[$keytab_TestValue_Negative]" 
-        Kcleanup
-        rm $tmpout
-    rlPhaseEnd
-} #ipa_join_1014
-
-ipa_join_1015()
-{
-    rlPhaseStartTest "ipa_join_1015 [negative test] --hostname;positive;FQDN --keytab;negative;InvalidKeytab --bindpw;positive;ValidPW"
-        local testID="ipa_join_1015"
-        local tmpout=$TmpDir/ipa_join_1015.$RANDOM.out
-        #KinitAsAdmin
-        local hostname_TestValue="$clientFQDN" #hostname;positive;FQDN
-        local keytab_TestValue_Negative="/tmp/NoSuchKeytabFile.keytab" #keytab;negative;InvalidKeytab
-        local bindpw_TestValue=$testID #bindpw;positive;ValidPW
-        local expectedErrMsg="Incorrect password"
-        local expectedErrCode=15
-        rlRun "ssh root@$serverFQDN \"ipa host-del $clientFQDN\"" 0 "we have to un-join before test starts"
-        #remove the client host record
-        ssh root@$serverFQDN "ipa host-add $clientFQDN --password=$OTP"
-        qaRun "ipa-join --hostname=$hostname_TestValue  --keytab=$keytab_TestValue_Negative  --bindpw=$bindpw_TestValue " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [hostname]=[$hostname_TestValue] [keytab]=[$keytab_TestValue_Negative] [bindpw]=[$bindpw_TestValue]" 
-        #Kcleanup
-        rm $tmpout
-    rlPhaseEnd
-} #ipa_join_1015
 
 ipa_join_1016()
 {
@@ -168,9 +122,9 @@ ipa_join_1016()
         local testID="ipa_join_1016"
         local tmpout=$TmpDir/ipa_join_1016.$RANDOM.out
         KinitAsAdmin
+        rlRun "ssh root@$serverFQDN \"ipa host-del $clientFQDN\"" 0 "delete $clientFQDN from ipa server"
         local hostname_TestValue="$clientFQDN" #hostname;positive;FQDN
-        #local keytab_TestValue="$testKeytabfile" #keytab;positive;ValidKeytab
-        local keytab_TestValue="$defaultKeytabFile" #keytab;positive;ValidKeytab
+        local keytab_TestValue="$testKeytabfile" #keytab;positive;ValidKeytab
         rlRun "ipa-join --hostname=$hostname_TestValue  --keytab=$keytab_TestValue " 0 "test options:  [hostname]=[$hostname_TestValue] [keytab]=[$keytab_TestValue]" 
         Kcleanup
         rm $tmpout
@@ -182,14 +136,17 @@ ipa_join_1017()
     rlPhaseStartTest "ipa_join_1017 [negative test] --hostname;positive;FQDN --keytab;positive;ValidKeytab --bindpw;negative;InvalidPW"
         local testID="ipa_join_1017"
         local tmpout=$TmpDir/ipa_join_1017.$RANDOM.out
-        #KinitAsAdmin
+        KinitAsAdmin
+
+        rlRun "ssh root@$serverFQDN \"ipa host-del $clientFQDN\"" 0 "delete $clientFQDN from ipa server"
+        rlRun "ssh root@$serverFQDN \"ipa host-add $clientFQDN\" --password=$OTP" 0 "add $clientFQDN and set OTP"
         local hostname_TestValue="$clientFQDN" #hostname;positive;FQDN
         local keytab_TestValue="$testKeytabfile" #keytab;positive;ValidKeytab
         local bindpw_TestValue_Negative="WrongPassword" #bindpw;negative;InvalidPW
-        local expectedErrMsg=replace_me
-        local expectedErrCode=1
+        local expectedErrMsg="Incorrect password"
+        local expectedErrCode=15
         qaRun "ipa-join --hostname=$hostname_TestValue  --keytab=$keytab_TestValue  --bindpw=$bindpw_TestValue_Negative " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [hostname]=[$hostname_TestValue] [keytab]=[$keytab_TestValue] [bindpw]=[$bindpw_TestValue_Negative]" 
-        #Kcleanup
+        Kcleanup
         rm $tmpout
     rlPhaseEnd
 } #ipa_join_1017
@@ -202,7 +159,7 @@ ipa_join_1018()
         #KinitAsAdmin
         local hostname_TestValue="$clientFQDN" #hostname;positive;FQDN
         local keytab_TestValue="$testKeytabfile" #keytab;positive;ValidKeytab
-        local bindpw_TestValue=$testID #bindpw;positive;ValidPW
+        local bindpw_TestValue=$OTP #bindpw;positive;ValidPW
         rlRun "ipa-join --hostname=$hostname_TestValue  --keytab=$keytab_TestValue  --bindpw=$bindpw_TestValue " 0 "test options:  [hostname]=[$hostname_TestValue] [keytab]=[$keytab_TestValue] [bindpw]=[$bindpw_TestValue]" 
         #Kcleanup
         rm $tmpout
@@ -214,13 +171,13 @@ ipa_join_1019()
     rlPhaseStartTest "ipa_join_1019 [negative test] --hostname;positive;FQDN --server;negative;NoSuchDomain"
         local testID="ipa_join_1019"
         local tmpout=$TmpDir/ipa_join_1019.$RANDOM.out
-        #KinitAsAdmin
+        KinitAsAdmin
         local hostname_TestValue="$clientFQDN" #hostname;positive;FQDN
         local server_TestValue_Negative="No.Such.IPA.Server.Domain.com" #server;negative;NoSuchDomain
-        local expectedErrMsg=replace_me
-        local expectedErrCode=1
+        local expectedErrMsg="libcurl failed to execute the HTTP POST transaction"
+        local expectedErrCode=17
         qaRun "ipa-join --hostname=$hostname_TestValue  --server=$server_TestValue_Negative " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [hostname]=[$hostname_TestValue] [server]=[$server_TestValue_Negative]" 
-        #Kcleanup
+        Kcleanup
         rm $tmpout
     rlPhaseEnd
 } #ipa_join_1019
@@ -233,9 +190,9 @@ ipa_join_1020()
         #KinitAsAdmin
         local hostname_TestValue="$clientFQDN" #hostname;positive;FQDN
         local server_TestValue_Negative="No.Such.IPA.Server.Domain.com" #server;negative;NoSuchDomain
-        local bindpw_TestValue=$testID #bindpw;positive;ValidPW
-        local expectedErrMsg=replace_me
-        local expectedErrCode=1
+        local bindpw_TestValue=$OTP #bindpw;positive;ValidPW
+        local expectedErrMsg="Unable to determine root DN of $server_TestValue_Negative"
+        local expectedErrCode=14
         qaRun "ipa-join --hostname=$hostname_TestValue  --server=$server_TestValue_Negative  --bindpw=$bindpw_TestValue " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [hostname]=[$hostname_TestValue] [server]=[$server_TestValue_Negative] [bindpw]=[$bindpw_TestValue]" 
         #Kcleanup
         rm $tmpout
@@ -247,14 +204,14 @@ ipa_join_1021()
     rlPhaseStartTest "ipa_join_1021 [negative test] --hostname;positive;FQDN --server;negative;NoSuchDomain --keytab;positive;ValidKeytab"
         local testID="ipa_join_1021"
         local tmpout=$TmpDir/ipa_join_1021.$RANDOM.out
-        #KinitAsAdmin
+        KinitAsAdmin
         local hostname_TestValue="$clientFQDN" #hostname;positive;FQDN
         local server_TestValue_Negative="No.Such.IPA.Server.Domain.com" #server;negative;NoSuchDomain
         local keytab_TestValue="$testKeytabfile" #keytab;positive;ValidKeytab
-        local expectedErrMsg=replace_me
-        local expectedErrCode=1
+        local expectedErrMsg="libcurl failed to execute the HTTP POST transaction"
+        local expectedErrCode=17
         qaRun "ipa-join --hostname=$hostname_TestValue  --server=$server_TestValue_Negative  --keytab=$keytab_TestValue " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [hostname]=[$hostname_TestValue] [server]=[$server_TestValue_Negative] [keytab]=[$keytab_TestValue]" 
-        #Kcleanup
+        Kcleanup
         rm $tmpout
     rlPhaseEnd
 } #ipa_join_1021
@@ -264,15 +221,15 @@ ipa_join_1022()
     rlPhaseStartTest "ipa_join_1022 [negative test] --hostname;positive;FQDN --server;negative;NoSuchDomain --keytab;positive;ValidKeytab --bindpw;positive;ValidPW"
         local testID="ipa_join_1022"
         local tmpout=$TmpDir/ipa_join_1022.$RANDOM.out
-        #KinitAsAdmin
+        KinitAsAdmin
         local hostname_TestValue="$clientFQDN" #hostname;positive;FQDN
         local server_TestValue_Negative="No.Such.IPA.Server.Domain.com" #server;negative;NoSuchDomain
         local keytab_TestValue="$testKeytabfile" #keytab;positive;ValidKeytab
-        local bindpw_TestValue=$testID #bindpw;positive;ValidPW
-        local expectedErrMsg=replace_me
-        local expectedErrCode=1
+        local bindpw_TestValue=$OTP #bindpw;positive;ValidPW
+        local expectedErrMsg="Unable to determine root DN of $server_TestValue_Negative"
+        local expectedErrCode=14
         qaRun "ipa-join --hostname=$hostname_TestValue  --server=$server_TestValue_Negative  --keytab=$keytab_TestValue  --bindpw=$bindpw_TestValue " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [hostname]=[$hostname_TestValue] [server]=[$server_TestValue_Negative] [keytab]=[$keytab_TestValue] [bindpw]=[$bindpw_TestValue]" 
-        #Kcleanup
+        Kcleanup
         rm $tmpout
     rlPhaseEnd
 } #ipa_join_1022
@@ -282,11 +239,12 @@ ipa_join_1023()
     rlPhaseStartTest "ipa_join_1023 [positive test] --hostname;positive;FQDN --server;positive;FQDN"
         local testID="ipa_join_1023"
         local tmpout=$TmpDir/ipa_join_1023.$RANDOM.out
-        #KinitAsAdmin
+        KinitAsAdmin
         local hostname_TestValue="$clientFQDN" #hostname;positive;FQDN
-        local server_TestValue="$sererFQDN" #server;positive;FQDN
+        local server_TestValue="$serverFQDN" #server;positive;FQDN
+        rlRun "ssh root@$serverFQDN \"ipa host-del $clientFQDN\"" 0 "delete $clientFQDN from ipa server"
         rlRun "ipa-join --hostname=$hostname_TestValue  --server=$server_TestValue " 0 "test options:  [hostname]=[$hostname_TestValue] [server]=[$server_TestValue]" 
-        #Kcleanup
+        Kcleanup
         rm $tmpout
     rlPhaseEnd
 } #ipa_join_1023
@@ -298,10 +256,12 @@ ipa_join_1024()
         local tmpout=$TmpDir/ipa_join_1024.$RANDOM.out
         #KinitAsAdmin
         local hostname_TestValue="$clientFQDN" #hostname;positive;FQDN
-        local server_TestValue="$sererFQDN" #server;positive;FQDN
+        local server_TestValue="$serverFQDN" #server;positive;FQDN
         local bindpw_TestValue_Negative="WrongPassword" #bindpw;negative;InvalidPW
-        local expectedErrMsg=replace_me
-        local expectedErrCode=1
+        local expectedErrMsg="Incorrect password"
+        local expectedErrCode=15
+        rlRun "ssh root@$serverFQDN \"ipa host-del $clientFQDN\"" 0 "delete $clientFQDN from ipa server"
+        rlRun "ssh root@$serverFQDN \"ipa host-add $clientFQDN --password=$OTP \"" 0 "add $clientFQDN from ipa server"
         qaRun "ipa-join --hostname=$hostname_TestValue  --server=$server_TestValue  --bindpw=$bindpw_TestValue_Negative " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [hostname]=[$hostname_TestValue] [server]=[$server_TestValue] [bindpw]=[$bindpw_TestValue_Negative]" 
         #Kcleanup
         rm $tmpout
@@ -315,60 +275,29 @@ ipa_join_1025()
         local tmpout=$TmpDir/ipa_join_1025.$RANDOM.out
         #KinitAsAdmin
         local hostname_TestValue="$clientFQDN" #hostname;positive;FQDN
-        local server_TestValue="$sererFQDN" #server;positive;FQDN
-        local bindpw_TestValue=$testID #bindpw;positive;ValidPW
+        local server_TestValue="$serverFQDN" #server;positive;FQDN
+        local bindpw_TestValue=$OTP #bindpw;positive;ValidPW
+        rlRun "ssh root@$serverFQDN \"ipa host-del $clientFQDN\"" 0 "delete $clientFQDN from ipa server"
+        rlRun "ssh root@$serverFQDN \"ipa host-add $clientFQDN --password=$OTP \"" 0 "add $clientFQDN from ipa server"
         rlRun "ipa-join --hostname=$hostname_TestValue  --server=$server_TestValue  --bindpw=$bindpw_TestValue " 0 "test options:  [hostname]=[$hostname_TestValue] [server]=[$server_TestValue] [bindpw]=[$bindpw_TestValue]" 
         #Kcleanup
         rm $tmpout
     rlPhaseEnd
 } #ipa_join_1025
 
-ipa_join_1026()
-{
-    rlPhaseStartTest "ipa_join_1026 [negative test] --hostname;positive;FQDN --server;positive;FQDN --keytab;negative;InvalidKeytab"
-        local testID="ipa_join_1026"
-        local tmpout=$TmpDir/ipa_join_1026.$RANDOM.out
-        #KinitAsAdmin
-        local hostname_TestValue="$clientFQDN" #hostname;positive;FQDN
-        local server_TestValue="$sererFQDN" #server;positive;FQDN
-        local keytab_TestValue_Negative="/tmp/NoSuchKeytabFile.keytab" #keytab;negative;InvalidKeytab
-        local expectedErrMsg=replace_me
-        local expectedErrCode=1
-        qaRun "ipa-join --hostname=$hostname_TestValue  --server=$server_TestValue  --keytab=$keytab_TestValue_Negative " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [hostname]=[$hostname_TestValue] [server]=[$server_TestValue] [keytab]=[$keytab_TestValue_Negative]" 
-        #Kcleanup
-        rm $tmpout
-    rlPhaseEnd
-} #ipa_join_1026
-
-ipa_join_1027()
-{
-    rlPhaseStartTest "ipa_join_1027 [negative test] --hostname;positive;FQDN --server;positive;FQDN --keytab;negative;InvalidKeytab --bindpw;positive;ValidPW"
-        local testID="ipa_join_1027"
-        local tmpout=$TmpDir/ipa_join_1027.$RANDOM.out
-        #KinitAsAdmin
-        local hostname_TestValue="$clientFQDN" #hostname;positive;FQDN
-        local server_TestValue="$sererFQDN" #server;positive;FQDN
-        local keytab_TestValue_Negative="/tmp/NoSuchKeytabFile.keytab" #keytab;negative;InvalidKeytab
-        local bindpw_TestValue=$testID #bindpw;positive;ValidPW
-        local expectedErrMsg=replace_me
-        local expectedErrCode=1
-        qaRun "ipa-join --hostname=$hostname_TestValue  --server=$server_TestValue  --keytab=$keytab_TestValue_Negative  --bindpw=$bindpw_TestValue " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [hostname]=[$hostname_TestValue] [server]=[$server_TestValue] [keytab]=[$keytab_TestValue_Negative] [bindpw]=[$bindpw_TestValue]" 
-        #Kcleanup
-        rm $tmpout
-    rlPhaseEnd
-} #ipa_join_1027
-
 ipa_join_1028()
 {
     rlPhaseStartTest "ipa_join_1028 [positive test] --hostname;positive;FQDN --server;positive;FQDN --keytab;positive;ValidKeytab"
         local testID="ipa_join_1028"
         local tmpout=$TmpDir/ipa_join_1028.$RANDOM.out
-        #KinitAsAdmin
+        KinitAsAdmin
         local hostname_TestValue="$clientFQDN" #hostname;positive;FQDN
-        local server_TestValue="$sererFQDN" #server;positive;FQDN
+        local server_TestValue="$serverFQDN" #server;positive;FQDN
         local keytab_TestValue="$testKeytabfile" #keytab;positive;ValidKeytab
+        rlRun "ssh root@$serverFQDN \"ipa host-del $clientFQDN\"" 0 "delete $clientFQDN from ipa server"
+        rlRun "ssh root@$serverFQDN \"ipa host-add $clientFQDN \"" 0 "add $clientFQDN from ipa server"
         rlRun "ipa-join --hostname=$hostname_TestValue  --server=$server_TestValue  --keytab=$keytab_TestValue " 0 "test options:  [hostname]=[$hostname_TestValue] [server]=[$server_TestValue] [keytab]=[$keytab_TestValue]" 
-        #Kcleanup
+        Kcleanup
         rm $tmpout
     rlPhaseEnd
 } #ipa_join_1028
@@ -380,11 +309,13 @@ ipa_join_1029()
         local tmpout=$TmpDir/ipa_join_1029.$RANDOM.out
         #KinitAsAdmin
         local hostname_TestValue="$clientFQDN" #hostname;positive;FQDN
-        local server_TestValue="$sererFQDN" #server;positive;FQDN
+        local server_TestValue="$serverFQDN" #server;positive;FQDN
         local keytab_TestValue="$testKeytabfile" #keytab;positive;ValidKeytab
         local bindpw_TestValue_Negative="WrongPassword" #bindpw;negative;InvalidPW
-        local expectedErrMsg=replace_me
-        local expectedErrCode=1
+        local expectedErrMsg="Incorrect password"
+        local expectedErrCode=15
+        rlRun "ssh root@$serverFQDN \"ipa host-del $clientFQDN\"" 0 "delete $clientFQDN from ipa server"
+        rlRun "ssh root@$serverFQDN \"ipa host-add $clientFQDN --password=$OTP \"" 0 "add $clientFQDN from ipa server"
         qaRun "ipa-join --hostname=$hostname_TestValue  --server=$server_TestValue  --keytab=$keytab_TestValue  --bindpw=$bindpw_TestValue_Negative " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [hostname]=[$hostname_TestValue] [server]=[$server_TestValue] [keytab]=[$keytab_TestValue] [bindpw]=[$bindpw_TestValue_Negative]" 
         #Kcleanup
         rm $tmpout
@@ -398,55 +329,28 @@ ipa_join_1030()
         local tmpout=$TmpDir/ipa_join_1030.$RANDOM.out
         #KinitAsAdmin
         local hostname_TestValue="$clientFQDN" #hostname;positive;FQDN
-        local server_TestValue="$sererFQDN" #server;positive;FQDN
+        local server_TestValue="$serverFQDN" #server;positive;FQDN
         local keytab_TestValue="$testKeytabfile" #keytab;positive;ValidKeytab
-        local bindpw_TestValue=$testID #bindpw;positive;ValidPW
+        local bindpw_TestValue=$OTP #bindpw;positive;ValidPW
+        rlRun "ssh root@$serverFQDN \"ipa host-del $clientFQDN\"" 0 "delete $clientFQDN from ipa server"
+        rlRun "ssh root@$serverFQDN \"ipa host-add $clientFQDN --password=$OTP \"" 0 "add $clientFQDN from ipa server"
         rlRun "ipa-join --hostname=$hostname_TestValue  --server=$server_TestValue  --keytab=$keytab_TestValue  --bindpw=$bindpw_TestValue " 0 "test options:  [hostname]=[$hostname_TestValue] [server]=[$server_TestValue] [keytab]=[$keytab_TestValue] [bindpw]=[$bindpw_TestValue]" 
         #Kcleanup
         rm $tmpout
     rlPhaseEnd
 } #ipa_join_1030
 
-ipa_join_1031()
-{
-    rlPhaseStartTest "ipa_join_1031 [negative test] --keytab;negative;InvalidKeytab"
-        local testID="ipa_join_1031"
-        local tmpout=$TmpDir/ipa_join_1031.$RANDOM.out
-        #KinitAsAdmin
-        local keytab_TestValue_Negative="/tmp/NoSuchKeytabFile.keytab" #keytab;negative;InvalidKeytab
-        local expectedErrMsg=replace_me
-        local expectedErrCode=1
-        qaRun "ipa-join --keytab=$keytab_TestValue_Negative " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [keytab]=[$keytab_TestValue_Negative]" 
-        #Kcleanup
-        rm $tmpout
-    rlPhaseEnd
-} #ipa_join_1031
-
-ipa_join_1032()
-{
-    rlPhaseStartTest "ipa_join_1032 [negative test] --keytab;negative;InvalidKeytab --bindpw;positive;ValidPW"
-        local testID="ipa_join_1032"
-        local tmpout=$TmpDir/ipa_join_1032.$RANDOM.out
-        #KinitAsAdmin
-        local keytab_TestValue_Negative="/tmp/NoSuchKeytabFile.keytab" #keytab;negative;InvalidKeytab
-        local bindpw_TestValue=$testID #bindpw;positive;ValidPW
-        local expectedErrMsg=replace_me
-        local expectedErrCode=1
-        qaRun "ipa-join --keytab=$keytab_TestValue_Negative  --bindpw=$bindpw_TestValue " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [keytab]=[$keytab_TestValue_Negative] [bindpw]=[$bindpw_TestValue]" 
-        #Kcleanup
-        rm $tmpout
-    rlPhaseEnd
-} #ipa_join_1032
-
 ipa_join_1033()
 {
     rlPhaseStartTest "ipa_join_1033 [positive test] --keytab;positive;ValidKeytab"
         local testID="ipa_join_1033"
         local tmpout=$TmpDir/ipa_join_1033.$RANDOM.out
-        #KinitAsAdmin
+        KinitAsAdmin
         local keytab_TestValue="$testKeytabfile" #keytab;positive;ValidKeytab
+        rlRun "ssh root@$serverFQDN \"ipa host-del $clientFQDN\"" 0 "delete $clientFQDN from ipa server"
+        rlRun "ssh root@$serverFQDN \"ipa host-add $clientFQDN \"" 0 "add $clientFQDN from ipa server"
         rlRun "ipa-join --keytab=$keytab_TestValue " 0 "test options:  [keytab]=[$keytab_TestValue]" 
-        #Kcleanup
+        Kcleanup
         rm $tmpout
     rlPhaseEnd
 } #ipa_join_1033
@@ -459,8 +363,10 @@ ipa_join_1034()
         #KinitAsAdmin
         local keytab_TestValue="$testKeytabfile" #keytab;positive;ValidKeytab
         local bindpw_TestValue_Negative="WrongPassword" #bindpw;negative;InvalidPW
-        local expectedErrMsg=replace_me
-        local expectedErrCode=1
+        local expectedErrMsg="Incorrect password"
+        local expectedErrCode=15
+        rlRun "ssh root@$serverFQDN \"ipa host-del $clientFQDN\"" 0 "delete $clientFQDN from ipa server"
+        rlRun "ssh root@$serverFQDN \"ipa host-add $clientFQDN --password=$OTP \"" 0 "add $clientFQDN from ipa server"
         qaRun "ipa-join --keytab=$keytab_TestValue  --bindpw=$bindpw_TestValue_Negative " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [keytab]=[$keytab_TestValue] [bindpw]=[$bindpw_TestValue_Negative]" 
         #Kcleanup
         rm $tmpout
@@ -474,7 +380,9 @@ ipa_join_1035()
         local tmpout=$TmpDir/ipa_join_1035.$RANDOM.out
         #KinitAsAdmin
         local keytab_TestValue="$testKeytabfile" #keytab;positive;ValidKeytab
-        local bindpw_TestValue=$testID #bindpw;positive;ValidPW
+        local bindpw_TestValue=$OTP #bindpw;positive;ValidPW
+        rlRun "ssh root@$serverFQDN \"ipa host-del $clientFQDN\"" 0 "delete $clientFQDN from ipa server"
+        rlRun "ssh root@$serverFQDN \"ipa host-add $clientFQDN --password=$OTP \"" 0 "add $clientFQDN from ipa server"
         rlRun "ipa-join --keytab=$keytab_TestValue  --bindpw=$bindpw_TestValue " 0 "test options:  [keytab]=[$keytab_TestValue] [bindpw]=[$bindpw_TestValue]" 
         #Kcleanup
         rm $tmpout
@@ -486,12 +394,12 @@ ipa_join_1036()
     rlPhaseStartTest "ipa_join_1036 [negative test] --server;negative;NoSuchDomain"
         local testID="ipa_join_1036"
         local tmpout=$TmpDir/ipa_join_1036.$RANDOM.out
-        #KinitAsAdmin
+        KinitAsAdmin
         local server_TestValue_Negative="No.Such.IPA.Server.Domain.com" #server;negative;NoSuchDomain
-        local expectedErrMsg=replace_me
-        local expectedErrCode=1
+        local expectedErrMsg="libcurl failed to execute the HTTP POST transaction"
+        local expectedErrCode=17
         qaRun "ipa-join --server=$server_TestValue_Negative " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [server]=[$server_TestValue_Negative]" 
-        #Kcleanup
+        Kcleanup
         rm $tmpout
     rlPhaseEnd
 } #ipa_join_1036
@@ -503,9 +411,9 @@ ipa_join_1037()
         local tmpout=$TmpDir/ipa_join_1037.$RANDOM.out
         #KinitAsAdmin
         local server_TestValue_Negative="No.Such.IPA.Server.Domain.com" #server;negative;NoSuchDomain
-        local bindpw_TestValue=$testID #bindpw;positive;ValidPW
-        local expectedErrMsg=replace_me
-        local expectedErrCode=1
+        local bindpw_TestValue=$OTP #bindpw;positive;ValidPW
+        local expectedErrMsg="Unable to determine root DN of $server_TestValue_Negative"
+        local expectedErrCode=14
         qaRun "ipa-join --server=$server_TestValue_Negative  --bindpw=$bindpw_TestValue " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [server]=[$server_TestValue_Negative] [bindpw]=[$bindpw_TestValue]" 
         #Kcleanup
         rm $tmpout
@@ -517,13 +425,13 @@ ipa_join_1038()
     rlPhaseStartTest "ipa_join_1038 [negative test] --server;negative;NoSuchDomain--keytab;positive;ValidKeytab"
         local testID="ipa_join_1038"
         local tmpout=$TmpDir/ipa_join_1038.$RANDOM.out
-        #KinitAsAdmin
+        KinitAsAdmin
         local server_TestValue_Negative="No.Such.IPA.Server.Domain.com" #server;negative;NoSuchDomain
         local keytab_TestValue="$testKeytabfile" #keytab;positive;ValidKeytab
-        local expectedErrMsg=replace_me
-        local expectedErrCode=1
+        local expectedErrMsg="libcurl failed to execute the HTTP POST transaction"
+        local expectedErrCode=17
         qaRun "ipa-join --server=$server_TestValue_Negative  --keytab=$keytab_TestValue " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [server]=[$server_TestValue_Negative] [keytab]=[$keytab_TestValue]" 
-        #Kcleanup
+        Kcleanup
         rm $tmpout
     rlPhaseEnd
 } #ipa_join_1038
@@ -533,10 +441,12 @@ ipa_join_1039()
     rlPhaseStartTest "ipa_join_1039 [positive test] --server;positive;FQDN"
         local testID="ipa_join_1039"
         local tmpout=$TmpDir/ipa_join_1039.$RANDOM.out
-        #KinitAsAdmin
-        local server_TestValue="$sererFQDN" #server;positive;FQDN
+        KinitAsAdmin
+        local server_TestValue="$serverFQDN" #server;positive;FQDN
+        rlRun "ssh root@$serverFQDN \"ipa host-del $clientFQDN\"" 0 "delete $clientFQDN from ipa server"
+        rlRun "ssh root@$serverFQDN \"ipa host-add $clientFQDN \"" 0 "add $clientFQDN from ipa server"
         rlRun "ipa-join --server=$server_TestValue " 0 "test options:  [server]=[$server_TestValue]" 
-        #Kcleanup
+        Kcleanup
         rm $tmpout
     rlPhaseEnd
 } #ipa_join_1039
@@ -547,10 +457,12 @@ ipa_join_1040()
         local testID="ipa_join_1040"
         local tmpout=$TmpDir/ipa_join_1040.$RANDOM.out
         #KinitAsAdmin
-        local server_TestValue="$sererFQDN" #server;positive;FQDN
+        local server_TestValue="$serverFQDN" #server;positive;FQDN
         local bindpw_TestValue_Negative="WrongPassword" #bindpw;negative;InvalidPW
-        local expectedErrMsg=replace_me
-        local expectedErrCode=1
+        local expectedErrMsg="Incorrect password"
+        local expectedErrCode=15
+        rlRun "ssh root@$serverFQDN \"ipa host-del $clientFQDN\"" 0 "delete $clientFQDN from ipa server"
+        rlRun "ssh root@$serverFQDN \"ipa host-add $clientFQDN --password=$OTP\"" 0 "add $clientFQDN from ipa server"
         qaRun "ipa-join --server=$server_TestValue  --bindpw=$bindpw_TestValue_Negative " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [server]=[$server_TestValue] [bindpw]=[$bindpw_TestValue_Negative]" 
         #Kcleanup
         rm $tmpout
@@ -563,40 +475,26 @@ ipa_join_1041()
         local testID="ipa_join_1041"
         local tmpout=$TmpDir/ipa_join_1041.$RANDOM.out
         #KinitAsAdmin
-        local server_TestValue="$sererFQDN" #server;positive;FQDN
-        local bindpw_TestValue=$testID #bindpw;positive;ValidPW
+        local server_TestValue="$serverFQDN" #server;positive;FQDN
+        local bindpw_TestValue=$OTP #bindpw;positive;ValidPW
         rlRun "ipa-join --server=$server_TestValue  --bindpw=$bindpw_TestValue " 0 "test options:  [server]=[$server_TestValue] [bindpw]=[$bindpw_TestValue]" 
         #Kcleanup
         rm $tmpout
     rlPhaseEnd
 } #ipa_join_1041
 
-ipa_join_1042()
-{
-    rlPhaseStartTest "ipa_join_1042 [negative test] --server;positive;FQDN --keytab;negative;InvalidKeytab"
-        local testID="ipa_join_1042"
-        local tmpout=$TmpDir/ipa_join_1042.$RANDOM.out
-        #KinitAsAdmin
-        local server_TestValue="$sererFQDN" #server;positive;FQDN
-        local keytab_TestValue_Negative="/tmp/NoSuchKeytabFile.keytab" #keytab;negative;InvalidKeytab
-        local expectedErrMsg=replace_me
-        local expectedErrCode=1
-        qaRun "ipa-join --server=$server_TestValue  --keytab=$keytab_TestValue_Negative " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [server]=[$server_TestValue] [keytab]=[$keytab_TestValue_Negative]" 
-        #Kcleanup
-        rm $tmpout
-    rlPhaseEnd
-} #ipa_join_1042
-
 ipa_join_1043()
 {
     rlPhaseStartTest "ipa_join_1043 [positive test] --server;positive;FQDN --keytab;positive;ValidKeytab"
         local testID="ipa_join_1043"
         local tmpout=$TmpDir/ipa_join_1043.$RANDOM.out
-        #KinitAsAdmin
-        local server_TestValue="$sererFQDN" #server;positive;FQDN
+        KinitAsAdmin
+        local server_TestValue="$serverFQDN" #server;positive;FQDN
         local keytab_TestValue="$testKeytabfile" #keytab;positive;ValidKeytab
+        rlRun "ssh root@$serverFQDN \"ipa host-del $clientFQDN\"" 0 "delete $clientFQDN from ipa server"
+        rlRun "ssh root@$serverFQDN \"ipa host-add $clientFQDN \"" 0 "add $clientFQDN from ipa server"
         rlRun "ipa-join --server=$server_TestValue  --keytab=$keytab_TestValue " 0 "test options:  [server]=[$server_TestValue] [keytab]=[$keytab_TestValue]" 
-        #Kcleanup
+        Kcleanup
         rm $tmpout
     rlPhaseEnd
 } #ipa_join_1043
@@ -607,8 +505,10 @@ ipa_join_1044()
         local tmpout=$TmpDir/ipa_join_1044.$RANDOM.out
         #KinitAsAdmin
         local bindpw_TestValue_Negative="WrongPassword" #bindpw;negative;InvalidPW
-        local expectedErrMsg=replace_me
-        local expectedErrCode=1
+        local expectedErrMsg="Incorrect password"
+        local expectedErrCode=15
+        rlRun "ssh root@$serverFQDN \"ipa host-del $clientFQDN\"" 0 "delete $clientFQDN from ipa server"
+        rlRun "ssh root@$serverFQDN \"ipa host-add $clientFQDN --password=$OTP \"" 0 "add $clientFQDN from ipa server"
         qaRun "ipa-join --bindpw=$bindpw_TestValue_Negative " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [bindpw]=[$bindpw_TestValue_Negative]" 
         #Kcleanup
         rm $tmpout
