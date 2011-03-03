@@ -4,5 +4,5 @@
 run_slave_tests()
 {
 	rlPass "this is the master suite place holder"
-	check_list
+	rlRun check_list 0 "checking to ensure that all machines are viewable by replica manage" 
 }
