@@ -67,7 +67,8 @@ rlJournalStart
 	hfile="manage-replica-master-complete.txt"
 	file="/var/www/html/$hfile"
 	rm -f $file
-	echo $MASTER | grep $HOSTNAME
+	simple_hostname=$(hostname -s)
+	echo $MASTER | grep $simple_hostname
 	if [ $? -eq 0 ]; then
 		echo "This appears to be a master, run the master tests"
 		run_master_tests
