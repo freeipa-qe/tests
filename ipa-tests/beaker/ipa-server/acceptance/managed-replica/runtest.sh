@@ -64,13 +64,32 @@ rlJournalStart
 	fi
 
     # r2d2_test_starts
+	hfile="manage-replica-master-complete.txt"
+	file="/var/www/html/$hfile"
+	rm -f $file
 	echo $MASTER | grep $HOSTNAME
 	if [ $? -eq 0 ]; then
 		echo "This appears to be a master, run the master tests"
 		run_master_tests
+		touch $file # Touch the file to tell all of the slaves that everything is complete
 	else
 		echo "This machine appears to be a slave."
-		run_slave_tests
+		count=0
+		while [ $count -lt 11 ]; do
+			echo "checking to see if http://$MASTER/$hfile exists on the server $MASTER"
+			wget http://$MASTER/$hfile
+			if [ $? -eq 0 ]; then
+				count=15
+				run_slave_tests
+			else 
+				let count=$count+1;
+				sleep 60
+			fi
+		done
+		if [ $count -eq 11 ]; then
+			echo "The slave seems to have run out of time, sorry!"
+			rlFail "master server managed-replica test failed, unable to get http://$MASTER/$hfile"
+		fi
 	fi		
     # r2d2_test_ends
 
