@@ -3,6 +3,6 @@
 # Main test case
 run_master_tests()
 {
-	rlPass "this is the master suite place holder"
+	rlPass "this is the master server managed replica test suite"
 	rlRun check_list 0 "checking to ensure that all machines are viewable by replica manage" 
 }
