@@ -8,8 +8,9 @@ run_master_tests()
 
 	# Disconnect from a slave server
 	serverfull=$(echo $SLAVE | cut -d\  -f1)	
-	serversimple=$(echo $serverfull | cut -d\  -f1)
-	server=$(echo serversimple | cut -d\. -f1)
+	serveralone=$(echo $serverfull | cut -d\  -f1)
+	serversimple=$(echo serversimple | cut -d\. -f1)
+	server=$(host $server) # This should be the servername in the servername.relm format
 	echo "Server I am going to disconnect is: $server"
 	
 }
