@@ -1,6 +1,6 @@
 <job>
 	<whiteboard>
-		ipa-server x86_64 RHEL6 multihost(master, slave, client) on pool machines
+		ipa-server i386 RHEL6 multihost(master, slave, client) on pool machines
 	</whiteboard>
 	<recipeSet>
 		<recipe kernel_options="" kernel_options_post="" ks_meta="" role="MASTER" whiteboard="">
@@ -11,8 +11,8 @@
 			<distroRequires>
 				<and>
 					<distro_variant op="=" value="Server"/>
-					<distro_name op="=" value="RHEL6.1-20110211.n.0"/>
-					<distro_arch op="=" value="x86_64"/>
+					<distro_name op="=" value="RHEL6.1-20110221.n.0"/>
+					<distro_arch op="=" value="i386"/>
 					<distro_virt op="=" value=""/>
 					<distro_family op="=" value="RedHatEnterpriseLinux6"/>
 					<distro_method op="=" value="nfs"/>
@@ -47,8 +47,8 @@
 			<distroRequires>
 				<and>
 					<distro_variant op="=" value="Server"/>
-					<distro_name op="=" value="RHEL6.1-20110211.n.0"/>
-					<distro_arch op="=" value="x86_64"/>
+					<distro_name op="=" value="RHEL6.1-20110221.n.0"/>
+					<distro_arch op="=" value="i386"/>
 					<distro_virt op="=" value=""/>
 					<distro_family op="=" value="RedHatEnterpriseLinux6"/>
 					<distro_method op="=" value="nfs"/>
@@ -83,8 +83,8 @@
 			<distroRequires>
 				<and>
 					<distro_variant op="=" value="Server"/>
-					<distro_name op="=" value="RHEL6.1-20110211.n.0"/>
-					<distro_arch op="=" value="x86_64"/>
+					<distro_name op="=" value="RHEL6.1-20110221.n.0"/>
+					<distro_arch op="=" value="i386"/>
 					<distro_virt op="=" value=""/>
 					<distro_family op="=" value="RedHatEnterpriseLinux6"/>
 					<distro_method op="=" value="nfs"/>

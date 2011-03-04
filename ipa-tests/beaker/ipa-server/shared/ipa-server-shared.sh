@@ -493,7 +493,9 @@ fixResolv()
 	if [ $MASTER ]; then
 		ipofmaster=`ping $MASTER -c 1 | grep PING | sed s/\(//g | sed s/\)//g | cut -d\  -f3`
 		sed -i s/^nameserver/#nameserver/g /etc/resolv.conf
+		sed -i s/^search/#search/g /etc/resolv.conf
 		echo "nameserver $ipofmaster" >> /etc/resolv.conf
+		echo "search $DOMAIN" >> /etc/resolv.conf
 		return 0
 	else
 		echo "ERROR - MASTER not set in env"
