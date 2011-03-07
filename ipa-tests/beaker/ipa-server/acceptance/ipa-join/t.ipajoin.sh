@@ -44,6 +44,7 @@ ipa_join_envsetup()
     rlPhaseStartSetup "ipa_join_envsetup"
         #environment setup starts here
         install_ipa_client
+        rlRun "ssh root@$serverFQDN \"echo $ADMINPW | kinit $ADMINID" 0 "kinit at remote ipa server as admin"
         #environment setup ends   here
     rlPhaseEnd
 } #envsetup
@@ -58,6 +59,7 @@ ipa_join_envcleanup()
             rm $testKeytabfile
         fi
         delete_clientHostEntry_FromIPAServer
+        rlRun "ssh root@$serverFQDN \"kdestroy" 0 "remove kerboros ticket in remote server"
         #environment cleanup ends   here
     rlPhaseEnd
 } #envcleanup
