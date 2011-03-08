@@ -40,12 +40,14 @@
 . /dev/shm/env.sh
 
 # Include test case file
+. ./lib.ipajoin.sh
 . ./t.ipajoin.sh
+. ./t.ipaotp.sh
 
-PACKAGE1="ipa-server"
-PACKAGE2="ipa-client"
-PACKAGE3="ipa-admintools"
+PACKAGELIST="ipa-admintools ipa-client httpd mod_nss mod_auth_kerb 389-ds-base expect"
 
+startDate=`date "+%F %r"`
+satrtEpoch=`date "+%s"`
 ##########################################
 #   test main 
 #########################################
@@ -60,7 +62,23 @@ rlJournalStart
     rlPhaseEnd
 
     # r2d2_test_starts
-    ipajoin
+    # for multi-host test, we need host role detecting
+    echo $CLIENT | grep $HOSTNAME
+    rc=$?
+    if [ $rc -eq 0 ];then
+        for item in $PACKAGELIST ; do
+            rpm -qa | grep $item
+            if [ $? -eq 0 ] ; then
+                rlPass "$item package is installed"
+            else
+                rlFail "$item package NOT found!"
+            fi
+        done
+        ipajoin
+        ipaotp
+    else
+        rlLog "Client defined as [$CLIENT], while Machine is [$HOSTNAME] not test run"
+    fi
     # r2d2_test_ends
 
     rlPhaseStartCleanup "ipajoin cleanup"
@@ -71,6 +89,4 @@ rlJournalStart
     makereport
 rlJournalEnd
 
-
- 
 # manifest:

@@ -3,7 +3,7 @@
 # Date: Mon Feb 28 10:07:10 2011
 
 #############################################
-#  test suite: ipa-join (44 test cases)
+#  test suite: ipa-join (28 test cases)
 #############################################
 ipajoin()
 {
@@ -43,7 +43,7 @@ ipa_join_envsetup()
 {
     rlPhaseStartSetup "ipa_join_envsetup"
         #environment setup starts here
-        install_ipa_client
+        #install_ipa_client #ipa client host configuration has been take care of by ipa install script
         rlRun "ssh root@$serverFQDN \"echo $ADMINPW | kinit $ADMINID" 0 "kinit at remote ipa server as admin"
         #environment setup ends   here
     rlPhaseEnd
@@ -90,7 +90,7 @@ ipa_join_1003()
     rlPhaseStartTest "ipa_join_1003 [negative test] --hostname;positive;FQDN --bindpw;negative;InvalidPW"
         local testID="ipa_join_1003"
         local tmpout=$TmpDir/ipa_join_1003.$RANDOM.out
-        KinitAsAdmin
+        #KinitAsAdmin
         local hostname_TestValue="$clientFQDN" #hostname;positive;FQDN
         local bindpw_TestValue_Negative="WrongPassword" #bindpw;negative;InvalidPW
         local expectedErrMsg="Incorrect password"
@@ -99,7 +99,7 @@ ipa_join_1003()
         #remove the client host record
         ssh root@$serverFQDN "ipa host-add $clientFQDN --password=$OTP"
         qaRun "ipa-join --hostname=$hostname_TestValue  --bindpw=$bindpw_TestValue_Negative " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [hostname]=[$hostname_TestValue] [bindpw]=[$bindpw_TestValue_Negative]" 
-        Kcleanup
+        #Kcleanup
         rm $tmpout
     rlPhaseEnd
 } #ipa_join_1003
@@ -138,7 +138,7 @@ ipa_join_1006()
     rlPhaseStartTest "ipa_join_1006 [negative test] --hostname;positive;FQDN --keytab;positive;ValidKeytab --bindpw;negative;InvalidPW"
         local testID="ipa_join_1006"
         local tmpout=$TmpDir/ipa_join_1006.$RANDOM.out
-        KinitAsAdmin
+        #KinitAsAdmin
 
         rlRun "ssh root@$serverFQDN \"ipa host-del $clientFQDN\"" 0 "delete $clientFQDN from ipa server"
         rlRun "ssh root@$serverFQDN \"ipa host-add $clientFQDN\" --password=$OTP" 0 "add $clientFQDN and set OTP"
@@ -148,7 +148,7 @@ ipa_join_1006()
         local expectedErrMsg="Incorrect password"
         local expectedErrCode=15
         qaRun "ipa-join --hostname=$hostname_TestValue  --keytab=$keytab_TestValue  --bindpw=$bindpw_TestValue_Negative " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [hostname]=[$hostname_TestValue] [keytab]=[$keytab_TestValue] [bindpw]=[$bindpw_TestValue_Negative]" 
-        Kcleanup
+        #Kcleanup
         rm $tmpout
     rlPhaseEnd
 } #ipa_join_1006
@@ -223,7 +223,7 @@ ipa_join_1011()
     rlPhaseStartTest "ipa_join_1011 [negative test] --hostname;positive;FQDN --server;negative;NoSuchDomain --keytab;positive;ValidKeytab --bindpw;positive;ValidPW"
         local testID="ipa_join_1011"
         local tmpout=$TmpDir/ipa_join_1011.$RANDOM.out
-        KinitAsAdmin
+        #KinitAsAdmin
         local hostname_TestValue="$clientFQDN" #hostname;positive;FQDN
         local server_TestValue_Negative="No.Such.IPA.Server.Domain.com" #server;negative;NoSuchDomain
         local keytab_TestValue="$testKeytabfile" #keytab;positive;ValidKeytab
@@ -231,7 +231,7 @@ ipa_join_1011()
         local expectedErrMsg="Unable to determine root DN of $server_TestValue_Negative"
         local expectedErrCode=14
         qaRun "ipa-join --hostname=$hostname_TestValue  --server=$server_TestValue_Negative  --keytab=$keytab_TestValue  --bindpw=$bindpw_TestValue " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [hostname]=[$hostname_TestValue] [server]=[$server_TestValue_Negative] [keytab]=[$keytab_TestValue] [bindpw]=[$bindpw_TestValue]" 
-        Kcleanup
+        #Kcleanup
         rm $tmpout
     rlPhaseEnd
 } #ipa_join_1011
