@@ -1,0 +1,3 @@
+PURPOSE of /CoreOS/sssd/ipa-server/acceptance/quickinstall
+Description: Quick installation for ipa master slave and clieny
+Author: Jenny Galipeau <jgalipea@redhat.com>
