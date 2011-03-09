@@ -46,8 +46,8 @@ rlJournalStart
 	#####################################################################
 	rc=0
 	echo $MASTER | grep $HOSTNAME
-	if [ $rc -eq 0 ] ; then
-		installPkgs
+	if [ $? -eq 0 ] ; then
+		yum -y install $SERVER_PACKAGES
 		for item in $SERVER_PACKAGES ; do
 			rpm -qa | grep $item
 			if [ $? -eq 0 ] ; then
@@ -57,12 +57,15 @@ rlJournalStart
 				rc=1
 			fi
 		done
+
+		if [ $rc -eq 0 ] ; then
+			rhts-sync-set -s READY
+			rhts-sync-block -s DONE $SLAVE
+			rhts-sync-block -s DONE $CLIENT
+			installMaster
+		fi
 	else
 		rlLog "Machine in recipe in not a MASTER"
-	fi
-
-	if [ $rc -eq 0 ] ; then
-		installMaster
 	fi
 
 	#####################################################################
@@ -70,8 +73,8 @@ rlJournalStart
 	#####################################################################
 	rc=0
         echo $SLAVE | grep $HOSTNAME
-        if [ $rc -eq 0 ] ; then
-		installPkgs
+        if [ $? -eq 0 ] ; then
+		yum -y install $SERVER_PACKAGES
                 for item in $SERVER_PACKAGES ; do
                         rpm -qa | grep $item
                         if [ $? -eq 0 ] ; then
@@ -81,21 +84,23 @@ rlJournalStart
                                 rc=1
                         fi
                 done
+
+		if [ $rc -eq 0 ] ; then
+			rhts-sync-set -s READY
+			rhts-sync-block -s READY $MASTER
+                	installSlave
+        	fi
         else
                 rlLog "Machine in recipe in not a MASTER"
-        fi
-
-        if [ $rc -eq 0 ] ; then
-                installSlave
         fi
 
 	#####################################################################
 	# 		IS THIS MACHINE A CLIENT?                           #
 	#####################################################################
+	rc=0
         echo $CLIENT | grep $HOSTNAME
-        rc=0
-        if [ $rc -eq 0 ] ; then
-		installPkgs
+        if [ $? -eq 0 ] ; then
+		yum -y install $CLIENT_PACKAGES
                 for item in $CLIENT_PACKAGES ; do
 		rpm -qa | grep $item
                         if [ $? -eq 0 ] ; then
@@ -105,12 +110,14 @@ rlJournalStart
                                 rc=1
                         fi
                 done
+
+		if [ $rc -eq 0 ] ; then
+			rhts-sync-set -s READY
+                        rhts-sync-block -s READY $MASTER
+                	installClient
+        	fi
         else
                 rlLog "Machine in recipe in not a CLIENT"
-        fi
-
-        if [ $rc -eq 0 ] ; then
-                installClient
         fi
 
    rlJournalPrintText

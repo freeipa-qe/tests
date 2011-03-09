@@ -1,70 +1,4 @@
 ######################################
-#   	packages install             #
-######################################
-installPkgs()
-{
-   SERVER_PACKAGES="ipa-server bind bind-dyndb-ldap expect"
-   CLIENT_PACKAGES="ipa-admintools ipa-client httpd mod_nss mod_auth_kerb 389-ds-base expect"
-   rc=0
-
-   echo $MASTER | grep $HOSTNAME
-   if [ $? -eq 0 ] ; then
-	rlLog "Machine is a MASTER"
-	rlLog "Installing server packages"
-	yum -y install $SERVER_PACKGES
-   	for item in $SERVER_PACKAGES ; do
-   		rpm -qa | grep $item
-        	if [ $? -eq 0 ] ; then
-        		rlLog "$item package is installed"
-        	else
-        		rlLog "ERROR: $item package is NOT installed"
-        		rc=1
-        	fi
-   	done
-   else
-   	rlLog "Machine in recipe in not a MASTER"
-   fi
-
-   echo $SLAVE | grep $HOSTNAME
-   if [ $? -eq 0 ] ; then
-        rlLog "Machine is a SLAVE"
- 	rlLog "Installing server packages"
-	yum -y install $SERVER_PACKAGES
-        for item in $SERVER_PACKAGES ; do
-                rpm -qa | grep $item
-                if [ $? -eq 0 ] ; then
-                        rlLog "$item package is installed"
-                else
-                        rlLog "ERROR: $item package is NOT installed"
-                        rc=1
-                fi
-        done
-   else
-        rlLog "Machine in recipe in not a SLAVE"
-   fi 
-
-   echo $CLIENT | grep $HOSTNAME
-        if [ $? -eq 0 ] ; then
-		rlLog "Machine is a CLIENT"
-		rlLog "installing client packages"
-		yum -y install $CLIENT_PACKAGES
-                for item in $CLIENT_PACKAGES ; do
-                rpm -qa | grep $item
-                        if [ $? -eq 0 ] ; then
-                                rlLog "$item package is installed"
-                        else
-                                rlLog "ERROR: $item package is NOT installed"
-                                rc=1
-                        fi
-                done
-        else
-                rlLog "Machine in recipe in not a CLIENT"
-        fi
-
-   return $rc
-}
-
-######################################
 #  	fix /etc/hosts		     #
 ######################################
 fixHostFile()
@@ -144,6 +78,12 @@ appendEnv()
 {
   ipaddr=$(dig +noquestion $MASTER  | grep $MASTER | grep IN | awk '{print $5}')
   # Adding MASTER and SLAVE bits to env.sh
+  master_short=`echo $MASTER | cut -d "." -f1`
+  slave_short=`echo $SLAVE | cut -d "." -f1`
+  client_short=`echo $CLIENT | cut -d "." -f1`
+  MASTER=$master_short.$DOMAIN
+  SLAVE=$slave_short.$DOMAIN
+  CLIENT=$client_short.$DOMAI
   echo "export MASTER=$MASTER" >> /dev/shm/env.sh
   echo "export MASTERIP=$ipaddr" >> /dev/shm/env.sh
   echo "export SLAVE=$SLAVE" >> /dev/shm/env.sh
