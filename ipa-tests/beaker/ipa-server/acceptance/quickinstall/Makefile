@@ -46,7 +46,7 @@ clean:
 include /usr/share/rhts/lib/rhts-make.include
 
 $(METADATA): Makefile
-	@echo "Owner:           Michael Gregg <mgregg@redhat.com>" > $(METADATA)
+	@echo "Owner:           Jenny Galipeau <jgalipea@redhat.com>" > $(METADATA)
 	@echo "Name:            $(TEST)" >> $(METADATA)
 	@echo "TestVersion:     $(TESTVERSION)" >> $(METADATA)
 	@echo "Path:            $(TEST_DIR)" >> $(METADATA)
@@ -54,7 +54,6 @@ $(METADATA): Makefile
 	@echo "Type:            Acceptance" >> $(METADATA)
 	@echo "TestTime:        45m" >> $(METADATA)
 	@echo "RunFor:          ipa-server" >> $(METADATA)
-	@echo "Requires:	bind bind-dyndb-ldap" >> $(METADATA)
 	@echo "Priority:        Normal" >> $(METADATA)
 	@echo "License:         GPLv2" >> $(METADATA)
 	@echo "Confidential:    no" >> $(METADATA)
