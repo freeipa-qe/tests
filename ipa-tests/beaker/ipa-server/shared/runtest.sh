@@ -46,7 +46,7 @@ rlJournalStart
 	rlRun "ls /dev/shm/ipa-server-shared.sh" 0 "Checking for shared library"
     rlPhaseEnd
 
-    rlPhaseEnd "Setup SSH Keys"
+    rlPhaseStartTest "Setup SSH Keys"
 	# setup ssh key files
                 for s in $CLIENT; do
                         if [ "$s" != "" ]; then
