@@ -93,7 +93,7 @@ $(METADATA): Makefile
 	@echo "Type:            Acceptance" >> $(METADATA)
 	@echo "TestTime:        2m" >> $(METADATA)
 	@echo "RunFor:          ipa-server" >> $(METADATA)
-	@echo "Requires:        ipa-server" >> $(METADATA)
+	@echo "Requires:        expect" >> $(METADATA)
 	@echo "Priority:        Normal" >> $(METADATA)
 	@echo "License:         GPLv2" >> $(METADATA)
 	@echo "Confidential:    no" >> $(METADATA)
