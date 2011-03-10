@@ -65,10 +65,10 @@ rlJournalStart
 		done
 
 		if [ $rc -eq 0 ] ; then
+			installMaster
 			rhts-sync-set -s READY
 			rhts-sync-block -s DONE $SLAVE
 			rhts-sync-block -s DONE $CLIENT
-			installMaster
 		fi
 	else
 		rlLog "Machine in recipe in not a MASTER"
@@ -92,9 +92,9 @@ rlJournalStart
                 done
 
 		if [ $rc -eq 0 ] ; then
-			rhts-sync-set -s READY
 			rhts-sync-block -s READY $MASTER
                 	installSlave
+			rhts-sync-set -s READY
         	fi
         else
                 rlLog "Machine in recipe in not a SLAVE"
@@ -118,9 +118,9 @@ rlJournalStart
                 done
 
 		if [ $rc -eq 0 ] ; then
-			rhts-sync-set -s READY
                         rhts-sync-block -s READY $MASTER
                 	installClient
+			rhts-sync-set -s READY
         	fi
         else
                 rlLog "Machine in recipe in not a CLIENT"
