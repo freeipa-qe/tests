@@ -256,12 +256,12 @@ verifyHostGroupMember()
 
   # construct groupDN
   mygroup="cn=$group"
-  groupDN="$mygroup,cn=hostgroups,cn=accounts,dc=$RELM"
+  groupDN="$mygroup,cn=hostgroups,cn=accounts,dc=$DOMAIN"
 
   # construct memberDN and verify host group returned with find and show
   if [[ $membertype == "host" ]] ; then
         mymember="fqdn=$member"
-        memberDN="$mymember,cn=computers,cn=accounts,dc=$RELM"
+        memberDN="$mymember,cn=computers,cn=accounts,dc=$DOMAIN"
 
         ipa hostgroup-find "$group" > /tmp/findhostgroup.out
         members=`cat /tmp/findhostgroup.out | grep "Member hosts:" | cut -d ":" -f2`
@@ -287,7 +287,7 @@ verifyHostGroupMember()
 
   elif [[ $membertype == "hostgroup" ]] ; then
         mymember="cn=$member"
-        memberDN="$mymember,cn=hostgroups,cn=accounts,dc=$RELM"
+        memberDN="$mymember,cn=hostgroups,cn=accounts,dc=$DOMAIN"
 
 	ipa hostgroup-find "$member" > /tmp/findhostgroup.out
         members=`cat /tmp/findhostgroup.out | grep "Member of host-groups:" | cut -d ":" -f2`
