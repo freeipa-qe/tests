@@ -40,6 +40,12 @@ SERVER_PACKAGES="ipa-server ipa-client ipa-admintools bind expect krb5-workstati
 CLIENT_PACKAGES="ipa-admintools ipa-client httpd mod_nss mod_auth_kerb 389-ds-base expect"
 
 rlJournalStart
+        myhostname=`hostname`
+        rlLog "hostname command: $myhostname"
+        rlLog "HOSTNAME: $HOSTNAME"
+        rlLog "MASTER: $MASTER"
+        rlLog "SLAVE: $SLAVE"
+        rlLog "CLIENT: $CLIENT"
 
 	#####################################################################
 	# 		IS THIS MACHINE A MASTER?                           #
@@ -91,7 +97,7 @@ rlJournalStart
                 	installSlave
         	fi
         else
-                rlLog "Machine in recipe in not a MASTER"
+                rlLog "Machine in recipe in not a SLAVE"
         fi
 
 	#####################################################################
