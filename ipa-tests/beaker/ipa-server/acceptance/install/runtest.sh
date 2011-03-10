@@ -81,7 +81,7 @@ rlJournalStart
 #		rlRun "expect /dev/shm/set-root-pw.exp"
 #		rlRun "yum clean"
 		# Run yum install 3 times because the repos are flaky
-		packages="ipa-server ipa-client ipa-admintools bind caching-nameserver expect krb5-workstation bind-dyndb-ldap ntpdate krb5-pkinit-openssl rhts-test-env" 
+		packages="ipa-server ipa-client ipa-admintools ds-replication dsbind caching-nameserver expect krb5-workstation bind-dyndb-ldap ntpdate krb5-pkinit-openssl rhts-test-env" 
 		yum -y install $packages
 		if [ $? -ne 0 ]; then
 			sleep 100
