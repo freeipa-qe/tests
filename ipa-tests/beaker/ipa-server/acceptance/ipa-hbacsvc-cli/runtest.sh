@@ -213,8 +213,8 @@ rlJournalStart
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-hbacsvc-cli-019: Verify Default SUDO Service Members"
-	rlRun "verifyHBACGroupMember sudo SUDO" 0 "Verifying service group member."
-	rlRun "verifyHBACGroupMember sudo-i SUDO" 0 "Verifying service group member."
+	rlRun "verifyHBACGroupMember sudo sudo" 0 "Verifying service group member."
+	rlRun "verifyHBACGroupMember sudo-i sudo" 0 "Verifying service group member."
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-hbacsvc-cli-020: Verify Add Existing Services to New Service Group"
