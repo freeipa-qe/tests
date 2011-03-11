@@ -7,7 +7,6 @@ installMaster()
    rlPhaseStartTest "Install IPA MASTER Server"
 	rlRun "/etc/init.d/ntpd stop" 0 "Stopping the ntp server"
 	rlRun "ntpdate $NTPSERVER" 0 "Synchronzing clock with valid time server"
-	rlRun "appendEnv" 0 "Append the machine information to the env.sh with the information for the machines in the recipe set"
 	rlRun "fixHostFile" 0 "Set up /etc/hosts"
 	rlRun "fixhostname" 0 "Fix hostname"
 	echo "ipa-server-install --setup-dns --forwarder=$DNSFORWARD --hostname=$hostname_s.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U" > /dev/shm/installipa.bash
