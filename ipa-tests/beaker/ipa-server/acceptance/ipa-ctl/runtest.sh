@@ -353,9 +353,9 @@ rlPhaseStartTest "ipa-ctl-25: restart services as non-root user"
                 oldPID=`cat /tmp/slapd_PKI.out | awk '{print $1}'`
                 rlLog "current PKI DS instance pid is $oldPID"
                 if [ $newPID -eq $oldPID ] ; then
-                        rlFail "PKI DS instance did not restart"
+                        rlPass "PKI DS instance did not restart"
                 else
-                        rlPass "PKI DS instance was restarted"
+                        rlFail "PKI DS instance was restarted"
                 fi
 		# verify pki-cad was not restarted
 		newPID=`ps -ef | grep pki-ca | grep tomcat | awk '{print $2}'`
