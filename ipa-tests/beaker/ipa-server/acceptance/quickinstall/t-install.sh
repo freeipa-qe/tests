@@ -28,7 +28,7 @@ installMaster()
                                 # put the short form of the hostname for server $s into s_short
                                 hostname_s=$(echo $s | cut -d. -f1)
                                 rlLog "IP of server $s is resolving as $ipofs, using short hostname of $hostname_s" 
-                                ipa-replica-prepare -p $ADMINPW --ip-address=$ipofs $hostname_s.$DOMAIN
+                                rlRun "ipa-replica-prepare -p $ADMINPW --ip-address=$ipofs $hostname_s.$DOMAIN" 0 "Creating replica package"
                      	fi
                 done
 	fi
