@@ -310,6 +310,7 @@ rlJournalStart
         expmsg="ipa: ERROR: invalid 'nsaccountlock': must be TRUE or FALSE"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
 	command="ipa user-mod --addattr nsAccountLock=test $superuser"
+	expmsg="ipa: ERROR: nsaccountlock: Only one value allowed."
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
     rlPhaseEnd
 
