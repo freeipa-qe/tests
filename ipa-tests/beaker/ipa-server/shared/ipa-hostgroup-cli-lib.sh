@@ -300,7 +300,7 @@ verifyHostGroupMember()
         fi
 
         ipa hostgroup-show --all "$group" > /tmp/showhostgroup.out
-        members=`cat /tmp/showhostgroup.out | grep "member_hostgroup:" | cut -d ":" -f2`
+        members=`cat /tmp/showhostgroup.out | grep "Member host-groups:" | cut -d ":" -f2`
         echo $members | grep "$member"
         if [ $? -eq 0 ] ; then
                 rlLog "$membertype \"$member\" returned with hostgroup-show"
