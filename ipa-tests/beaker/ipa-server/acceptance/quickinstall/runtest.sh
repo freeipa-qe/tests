@@ -66,11 +66,13 @@ rlJournalStart
 
 		if [ $rc -eq 0 ] ; then
 			installMaster
-			rhts-sync-set -s READY
-			if [ "$SLAVE" != "" ]; then
+			if [ -n $SLAVE ] || [ -n $CLIENT ] then
+				rhts-sync-set -s READY
+			fi
+			if [ -n $SLAVE ]; then
 				rhts-sync-block -s DONE $SLAVE
 			fi
-			if [ "$CLIENT" != "" ]; then
+			if [ -n $CLIENT ]; then
 				rhts-sync-block -s DONE $CLIENT
 			fi
 		fi
