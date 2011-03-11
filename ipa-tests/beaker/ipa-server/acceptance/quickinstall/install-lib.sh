@@ -79,11 +79,15 @@ appendEnv()
   ipaddr=$(dig +noquestion $MASTER  | grep $MASTER | grep IN | awk '{print $5}')
   # Adding MASTER and SLAVE bits to env.sh
   master_short=`echo $MASTER | cut -d "." -f1`
-  slave_short=`echo $SLAVE | cut -d "." -f1`
-  client_short=`echo $CLIENT | cut -d "." -f1`
   MASTER=$master_short.$DOMAIN
-  SLAVE=$slave_short.$DOMAIN
-  CLIENT=$client_short.$DOMAI
+  if [ "$SLAVE" != "" ]; then
+	slave_short=`echo $SLAVE | cut -d "." -f1`
+  	SLAVE=$slave_short.$DOMAIN
+  fi
+  if [ "$SLAVE" != "" ]; then
+  	CLIENT=$client_short.$DOMAIN
+	slave_short=`echo $SLAVE | cut -d "." -f1`
+  fi
   echo "export MASTER=$MASTER" >> /dev/shm/env.sh
   echo "export MASTERIP=$ipaddr" >> /dev/shm/env.sh
   echo "export SLAVE=$SLAVE" >> /dev/shm/env.sh
