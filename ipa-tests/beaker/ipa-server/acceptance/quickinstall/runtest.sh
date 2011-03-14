@@ -66,9 +66,7 @@ rlJournalStart
 
 		if [ $rc -eq 0 ] ; then
 			installMaster
-			if [ -n $SLAVE ] || [ -n $CLIENT ] ; then
-				rhts-sync-set -s READY
-			fi
+			rhts-sync-set -s READY
 		fi
 	else
 		rlLog "Machine in recipe in not a MASTER"
