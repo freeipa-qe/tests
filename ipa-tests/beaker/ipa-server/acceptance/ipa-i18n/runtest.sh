@@ -46,6 +46,10 @@ PACKAGE="ipa-server"
 
 startDate=`date "+%F %r"`
 satrtEpoch=`date "+%s"`
+name1="Çándide Rùiz"
+name2="Rôséñe"
+name3="Älka Màrzella"
+name4="Feâtlëss Watérmân"
 ##########################################
 #   test main 
 #########################################
