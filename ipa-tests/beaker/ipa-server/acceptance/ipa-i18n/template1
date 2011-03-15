@@ -1,4 +1,4 @@
-rlPhaseStartTest "ipa-i18n-%num: Changing firstname of $uname1 to %char"'
+rlPhaseStartTest "ipa-i18n-%num: Changing firstname of $uname1 to %char"
     rlRun "ipa user-mod --first='%char' $uname1" 0 "Modifying firstname of $uname1 to %char"
 rlPhaseEnd
 
