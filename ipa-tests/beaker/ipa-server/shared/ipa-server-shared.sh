@@ -238,6 +238,47 @@ expect eof' >> $TET_TMP_DIR/setup-ssh-remote.exp
 	fi
 }
 
+SetUpAuthKeys()
+{
+   PUBKEY=/dev/shm/id_rsa_global.pub
+   PRIVATEKEY=/dev/shm/id_rsa_global
+   SSHROOT=/root/.ssh/
+   PUBKEYFILE=$SSHRROT/id_rsa
+   AUTHKEYFILE=$SSHROOT/authorized_keys
+   ls $SSHROOT
+   if [ $? -ne 0 ] ; then
+	make dir $SSHROOT
+   else
+	rlLog "/root/.ssh/ directory exists"
+   fi
+
+   # set up authorized keys
+   cp -f $PUBKEY $PUBKEYFILE
+   cat $PUBKEY >> $AUTHKEYFILE
+   sed -i -e "s/localhost/$MASTER/g" $AUTHKEYFILE
+
+   for s in $SLAVE ; do
+	cat $PUBKEY  >> $SSHROOT/authorized_keys
+	sed -i -e "s/localhost/$s/g" $AUTHKEYFILE
+   done
+
+   for s in $CLIENT ; do
+	cat $PUBKEY  >> $SSHROOT/authorized_keys
+        sed -i -e "s/localhost/$s/g" $AUTHKEYFILE
+   done
+
+   rlLog "Authorized Keys are:"
+   authkeys=`cat $AUTHKEYFILE`
+   rlLog "$authkeys"
+
+   # copy corresponding public key
+   cp -f $PUBKEY $PUBKEYFILE
+   rlLog: "Private key is:"
+   privatekey=`cat $SSHROOT/id_rsa`
+   rlLog "$privatekey"
+	
+}
+
 #######################################################################
 # setAttribute Usage:
 #       setAttribute <topic> <attribute> <value> <object>
