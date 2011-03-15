@@ -9,17 +9,19 @@ installMaster()
 	rlRun "ntpdate $NTPSERVER" 0 "Synchronzing clock with valid time server"
 	rlRun "fixHostFile" 0 "Set up /etc/hosts"
 	rlRun "fixhostname" 0 "Fix hostname"
-	echo "ipa-server-install --setup-dns --forwarder=$DNSFORWARD --hostname=$hostname_s.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U" > /dev/shm/installipa.bash
-	rlLog "EXECUTING: ipa-server-install --setup-dns --forwarder=$DNSFORWARD --hostname=$hostname_s.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U"
-        setenforce 0
-	chmod 755 /dev/shm/installipa.bash
-        rlRun "/bin/bash /dev/shm/installipa.bash" 0 "Installing IPA Server"
-	# test kinit
-	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
+	if [ -z $SKIPINSTALL ] ; then
+		echo "ipa-server-install --setup-dns --forwarder=$DNSFORWARD --hostname=$hostname_s.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U" > /dev/shm/installipa.bash
+		rlLog "EXECUTING: ipa-server-install --setup-dns --forwarder=$DNSFORWARD --hostname=$hostname_s.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U"
+        	setenforce 0
+		chmod 755 /dev/shm/installipa.bash
+        	rlRun "/bin/bash /dev/shm/installipa.bash" 0 "Installing IPA Server"
+		# test kinit
+		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
+	fi
    rlPhaseEnd
 
    rlPhaseStartTest "Create Replica Package(s)"
-   	if [ "$MASTER" = "$HOSTNAME" ]; then
+	if [ -z $SKIPINSTALL ] ; then
         	for s in $SLAVE; do
                 	if [ "$s" != "" ]; then
                         	# Determine the IP of the slave to be used when creating the replica file.
@@ -57,13 +59,15 @@ installSlave()
 	if [ $? -ne 0 ] ; then
 		rlFail "ERROR: Replica Package not found"
 	else
-		echo "ipa-replica-install -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg" > /dev/shm/replica-install.bash
-                chmod 755 /dev/shm/replica-install.bash
-                rlLog "EXECUTING: ipa-replica-install -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg"
-		rlRun "bash /dev/shm/replica-install.bash" 0 "Replica installation"
-        fi
+		if [ -z $SKIPINSTALL ] ; then
+			echo "ipa-replica-install -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg" > /dev/shm/replica-install.bash
+                	chmod 755 /dev/shm/replica-install.bash
+                	rlLog "EXECUTING: ipa-replica-install -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg"
+			rlRun "bash /dev/shm/replica-install.bash" 0 "Replica installation"
+		fi
 
-	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
+		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
+	fi
 	rlRun "appendEnv $MASTERIP" 0 "Append the machine information to the env.sh with the information for the machines in the recipe set"
    rlPhaseEnd
  
@@ -77,9 +81,11 @@ installClient()
 	rlRun "fixHostFile" 0 "Set up /etc/hosts"
 	rlRun "fixhostname" 0 "Fix hostname"
         rlRun "fixResolv" 0 "fixing the reoslv.conf to contain the correct nameserver lines"
-	rlLog "EXECUTING: ipa-client-install --domain=$DOMAIN --realm=$RELM --ntp-server=$NTPSERVER -p $ADMINID -w $ADMINPW -U --server=$MASTER"
-        rlRun "ipa-client-install --domain=$DOMAIN --realm=$RELM --ntp-server=$NTPSERVER -p $ADMINID -w $ADMINPW -U --server=$MASTER" 0 "Installing ipa client and configuring"
-	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
+	if [ -z $SKIPINSTALL ] ; then
+		rlLog "EXECUTING: ipa-client-install --domain=$DOMAIN --realm=$RELM --ntp-server=$NTPSERVER -p $ADMINID -w $ADMINPW -U --server=$MASTER"
+        	rlRun "ipa-client-install --domain=$DOMAIN --realm=$RELM --ntp-server=$NTPSERVER -p $ADMINID -w $ADMINPW -U --server=$MASTER" 0 "Installing ipa client and configuring"
+		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
+	fi
    rlPhaseEnd
 }
 
