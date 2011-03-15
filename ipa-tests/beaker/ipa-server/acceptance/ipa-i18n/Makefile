@@ -29,7 +29,7 @@ export TESTVERSION=1.0
 
 BUILT_FILES=
 
-FILES=$(METADATA) runtest.sh Makefile PURPOSE t.ipa-i18n.sh cns.txt firstnames.list rejection.txt testenv.sh firstname-tests.sh template1 create-firstname-tests.bash 
+FILES=$(METADATA) runtest.sh Makefile PURPOSE t.ipa-i18n.sh cns.txt firstnames.list rejection.txt testenv.sh firstname-tests.sh template1 create-tests.bash 
 
 .PHONY: all install download clean
 
