@@ -42,6 +42,7 @@
 # Include test case file
 . ./t.ipa-i18n.sh
 . ./testenv.sh
+. ./create-firstname-tests.bash
 
 PACKAGE="ipa-server"
 
@@ -60,7 +61,7 @@ rlJournalStart
     rlPhaseEnd
 
 # Add all of the users to be used in this test
-rlPhaseStartTest "Adding usernames"
+rlPhaseStartTest "ipa-i18n-1: Adding usernames"
 #	echo running "ipa user-add --first='$name1f' --last='$name1l' $uname1"
 	rlRun "ipa user-add --first='$name1f' --last='$name1l' $uname1" 0 "Adding username $uname1 with full name $name1"
 	rlRun "ipa user-add --first='$name2f' --last='$name2l' $uname2" 0 "Adding username $uname2 with full name $name2"
@@ -68,7 +69,7 @@ rlPhaseStartTest "Adding usernames"
 	rlRun "ipa user-add --first='$name4f' --last='$name4l' $uname4" 0 "Adding username $uname4 with full name $name4"
 rlPhaseEnd
 
-rlPhaseStartTest "checking to ensuer that $uname1 was added correctly"
+rlPhaseStartTest "ipa-i18n-2:checking to ensuer that $uname1 was added correctly"
 #	echo "running ipa user-find $uname1 | grep '$name1'"
 	rlRun "ipa user-find --all $uname1 | grep '$name1'" 0 "Checking to ensure that $uname1 has the full name of $name1"
 	rlRun "ipa user-find --all $uname2 | grep '$name2'" 0 "Checking to ensure that $uname2 has the full name of $name2"
@@ -78,6 +79,7 @@ rlPhaseEnd
 
     # r2d2_test_starts
 #    ipa-i18n
+	run_firstname_tests
     # r2d2_test_ends
 
     rlPhaseStartCleanup "ipa-i18n cleanup"
