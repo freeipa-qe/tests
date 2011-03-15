@@ -70,10 +70,10 @@ rlPhaseEnd
 
 rlPhaseStartTest "checking to ensuer that $uname1 was added correctly"
 #	echo "running ipa user-find $uname1 | grep '$name1'"
-	rlRun "ipa user-find $uname1 | grep '$name1'" 0 "Checking to ensure that $uname1 has the full name of $name1"
-	rlRun "ipa user-find $uname2 | grep '$name2'" 0 "Checking to ensure that $uname2 has the full name of $name2"
-	rlRun "ipa user-find $uname3 | grep '$name3'" 0 "Checking to ensure that $uname3 has the full name of $name3"
-	rlRun "ipa user-find $uname4 | grep '$name4'" 0 "Checking to ensure that $uname4 has the full name of $name4"
+	rlRun "ipa user-find --all $uname1 | grep '$name1'" 0 "Checking to ensure that $uname1 has the full name of $name1"
+	rlRun "ipa user-find --all $uname2 | grep '$name2'" 0 "Checking to ensure that $uname2 has the full name of $name2"
+	rlRun "ipa user-find --all $uname3 | grep '$name3'" 0 "Checking to ensure that $uname3 has the full name of $name3"
+	rlRun "ipa user-find --all $uname4 | grep '$name4'" 0 "Checking to ensure that $uname4 has the full name of $name4"
 rlPhaseEnd
 
     # r2d2_test_starts
