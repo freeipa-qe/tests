@@ -42,7 +42,7 @@
 # Include test case file
 . ./t.ipa-i18n.sh
 . ./testenv.sh
-. ./create-firstname-tests.bash
+. ./firstname-tests.sh
 
 PACKAGE="ipa-server"
 
