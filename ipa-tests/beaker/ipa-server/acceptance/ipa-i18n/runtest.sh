@@ -41,15 +41,13 @@
 
 # Include test case file
 . ./t.ipa-i18n.sh
+. ./testenv.sh
 
 PACKAGE="ipa-server"
 
 startDate=`date "+%F %r"`
 satrtEpoch=`date "+%s"`
-name1="Çándide Rùiz"
-name2="Rôséñe"
-name3="Älka Màrzella"
-name4="Feâtlëss Watérmân"
+
 ##########################################
 #   test main 
 #########################################
@@ -61,11 +59,25 @@ rlJournalStart
         rlRun "pushd $TmpDir"
     rlPhaseEnd
 
+# Add all of the users to be used in this test
+rlPhaseStartTest "Adding $uname1"
+	echo running "ipa user-add --first=\'$name1f\' --last=\'$name1l\' $uname1"
+	rlRun "ipa user-add --first=\'$name1f\' --last=\'$name1l\' $uname1" 0 "Adding username $uname1 with full name $name1"
+rlPhaseEnd
+
+rlPhaseStartTest "checking to ensuer that $uname1 was added correctly"
+	rlRun "ipa user-find $uname1 | grep \'$name1\'" 0 "Checking to ensure that $uname1 has the full name of $name1"
+rlPhaseEnd
+
+ipa user-find $uname1
+
     # r2d2_test_starts
-    ipa-i18n
+#    ipa-i18n
     # r2d2_test_ends
 
     rlPhaseStartCleanup "ipa-i18n cleanup"
+	rlRun "ipa user-del $uname1" 0 "Removing $uname1" 
+	rlRun "ipa user-find $uname1 | grep $uname1" 1 "Confirming remove of $uname1" 
         rlRun "popd"
         rlRun "rm -r $TmpDir" 0 "Removing tmp directory"
     rlPhaseEnd
