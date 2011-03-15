@@ -66,6 +66,7 @@ rlPhaseStartTest "Adding $uname1"
 rlPhaseEnd
 
 rlPhaseStartTest "checking to ensuer that $uname1 was added correctly"
+	echo "running ipa user-find $uname1 | grep \'$name1\'"
 	rlRun "ipa user-find $uname1 | grep \'$name1\'" 0 "Checking to ensure that $uname1 has the full name of $name1"
 rlPhaseEnd
 
