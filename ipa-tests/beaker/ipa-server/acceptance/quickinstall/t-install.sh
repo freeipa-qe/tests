@@ -18,6 +18,9 @@ installMaster()
 		# test kinit
 		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
 	fi
+
+	rlRun "appendEnv" 0 "Append the machine information to the env.sh with the information for the machines in the recipe set"
+	rlRun "SetUpAuthKeys" 0 "Setting up authorized keys file"
    rlPhaseEnd
 
    rlPhaseStartTest "Create Replica Package(s)"
@@ -36,7 +39,6 @@ installMaster()
                 done
 	fi
 
-	rlRun "appendEnv" 0 "Append the machine information to the env.sh with the information for the machines in the recipe set"
    rlPhaseEnd
 
 }
@@ -50,6 +52,7 @@ installSlave()
         rlRun "fixHostFile" 0 "Set up /etc/hosts"
         rlRun "fixhostname" 0 "Fix hostname"
         rlRun "fixResolv" 0 "fixing the reoslv.conf to contain the correct nameserver lines"
+	rlRun "SetUpAuthKeys" 0 "Setting up authorized keys file"
 	
 	cd /dev/shm/
 	hostname_s=$(hostname -s)
@@ -77,7 +80,6 @@ installClient()
 {
    rlPhaseStartSetup "Install IPA Client"
         rlRun "ntpdate $NTPSERVER" 0 "Synchronzing clock with valid time server"
-	rlRun "appendEnv" 0 "Append the machine information to the env.sh with the information for the machines in the recipe set"
 	rlRun "fixHostFile" 0 "Set up /etc/hosts"
 	rlRun "fixhostname" 0 "Fix hostname"
         rlRun "fixResolv" 0 "fixing the reoslv.conf to contain the correct nameserver lines"
@@ -86,6 +88,9 @@ installClient()
         	rlRun "ipa-client-install --domain=$DOMAIN --realm=$RELM --ntp-server=$NTPSERVER -p $ADMINID -w $ADMINPW -U --server=$MASTER" 0 "Installing ipa client and configuring"
 		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
 	fi
+
+	rlRun "SetUpAuthKeys" 0 "Setting up authorized keys file"
+	rlRun "appendEnv" 0 "Append the machine information to the env.sh with the information for the machines in the recipe set"
    rlPhaseEnd
 }
 

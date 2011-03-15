@@ -121,24 +121,6 @@ rlJournalStart
         else
                 rlLog "Machine in recipe in not a CLIENT"
         fi
-
-	# setup ssh key files
-        for s in $CLIENT; do
-        	if [ "$s" != "" ]; then
-                	rlRun "AddToKnownHosts $s" 0 "SSH key setup for CLIENT"
-                fi
-        done
-        for s in $MASTER; do
-        	if [ "$s" != "" ]; then
-                	rlRun "AddToKnownHosts $s" 0 "SSH key setup for MASTER"
-                fi
-        done
-        for s in $SLAVE; do
-        	if [ "$s" != "" ]; then
-                	rlRun "AddToKnownHosts $s" 0 "SSH key setup for SLAVE"
-                fi
-        done
-
    rlJournalPrintText
    report=/tmp/rhts.report.$RANDOM.txt
    makereport $report
