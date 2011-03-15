@@ -1,8 +1,8 @@
-rlPhaseStartTest "ipa-i18n-%num: Changing firstname of $uname1 to %char"
-    rlRun "ipa user-mod --first='%char' $uname1" 0 "Modifying firstname of $uname1 to %char"
+rlPhaseStartTest "ipa-i18n-%num: Changing lastname of $uname1 to %char"
+    rlRun "ipa user-mod --last='%char' $uname1" 0 "Modifying lastname of $uname1 to %char"
 rlPhaseEnd
 
-rlPhaseStartTest "ipa-i18n-%bnum: checking to ensuer that the firstname of $uname1 is %char"
-        rlRun "ipa user-find --all $uname1 | grep '%char'" 0 "Checking to ensure that the firstname of $uname1 is %char"
+rlPhaseStartTest "ipa-i18n-%bnum: checking to ensuer that the lastname of $uname1 is %char"
+        rlRun "ipa user-find --all $uname1 | grep '%char'" 0 "Checking to ensure that the lastname of $uname1 is %char"
 rlPhaseEnd
 

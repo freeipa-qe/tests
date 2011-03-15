@@ -42,6 +42,8 @@
 # Include test case file
 . ./t.ipa-i18n.sh
 . ./testenv.sh
+. ./cns-tests.sh
+. ./rejection-tests.sh
 . ./firstname-tests.sh
 
 PACKAGE="ipa-server"
