@@ -303,362 +303,308 @@ rlPhaseStartTest "ipa-i18n-102: checking to ensuer that the firstname of $uname3
 rlPhaseEnd
 
 
-rlPhaseStartTest "ipa-i18n-103: Changing firstname of $uname3 to É"
-    rlRun "ipa user-mod --first='É' $uname3" 0 "Modifying firstname of $uname3 to É"
-rlPhaseEnd
-
-rlPhaseStartTest "ipa-i18n-104: checking to ensuer that the firstname of $uname3 is É"
-        rlRun "ipa user-find --all $uname3 | grep 'É'" 0 "Checking to ensure that the firstname of $uname3 is É"
-rlPhaseEnd
-
-
-rlPhaseStartTest "ipa-i18n-105: Changing firstname of $uname3 to Ê"
+rlPhaseStartTest "ipa-i18n-103: Changing firstname of $uname3 to Ê"
     rlRun "ipa user-mod --first='Ê' $uname3" 0 "Modifying firstname of $uname3 to Ê"
 rlPhaseEnd
 
-rlPhaseStartTest "ipa-i18n-106: checking to ensuer that the firstname of $uname3 is Ê"
+rlPhaseStartTest "ipa-i18n-104: checking to ensuer that the firstname of $uname3 is Ê"
         rlRun "ipa user-find --all $uname3 | grep 'Ê'" 0 "Checking to ensure that the firstname of $uname3 is Ê"
 rlPhaseEnd
 
 
-rlPhaseStartTest "ipa-i18n-107: Changing firstname of $uname3 to Ë"
+rlPhaseStartTest "ipa-i18n-105: Changing firstname of $uname3 to Ë"
     rlRun "ipa user-mod --first='Ë' $uname3" 0 "Modifying firstname of $uname3 to Ë"
 rlPhaseEnd
 
-rlPhaseStartTest "ipa-i18n-108: checking to ensuer that the firstname of $uname3 is Ë"
+rlPhaseStartTest "ipa-i18n-106: checking to ensuer that the firstname of $uname3 is Ë"
         rlRun "ipa user-find --all $uname3 | grep 'Ë'" 0 "Checking to ensure that the firstname of $uname3 is Ë"
 rlPhaseEnd
 
 
-rlPhaseStartTest "ipa-i18n-109: Changing firstname of $uname3 to Í"
+rlPhaseStartTest "ipa-i18n-107: Changing firstname of $uname3 to Í"
     rlRun "ipa user-mod --first='Í' $uname3" 0 "Modifying firstname of $uname3 to Í"
 rlPhaseEnd
 
-rlPhaseStartTest "ipa-i18n-110: checking to ensuer that the firstname of $uname3 is Í"
+rlPhaseStartTest "ipa-i18n-108: checking to ensuer that the firstname of $uname3 is Í"
         rlRun "ipa user-find --all $uname3 | grep 'Í'" 0 "Checking to ensure that the firstname of $uname3 is Í"
 rlPhaseEnd
 
 
-rlPhaseStartTest "ipa-i18n-111: Changing firstname of $uname3 to Î"
+rlPhaseStartTest "ipa-i18n-109: Changing firstname of $uname3 to Î"
     rlRun "ipa user-mod --first='Î' $uname3" 0 "Modifying firstname of $uname3 to Î"
 rlPhaseEnd
 
-rlPhaseStartTest "ipa-i18n-112: checking to ensuer that the firstname of $uname3 is Î"
+rlPhaseStartTest "ipa-i18n-110: checking to ensuer that the firstname of $uname3 is Î"
         rlRun "ipa user-find --all $uname3 | grep 'Î'" 0 "Checking to ensure that the firstname of $uname3 is Î"
 rlPhaseEnd
 
 
-rlPhaseStartTest "ipa-i18n-113: Changing firstname of $uname3 to Ï"
+rlPhaseStartTest "ipa-i18n-111: Changing firstname of $uname3 to Ï"
     rlRun "ipa user-mod --first='Ï' $uname3" 0 "Modifying firstname of $uname3 to Ï"
 rlPhaseEnd
 
-rlPhaseStartTest "ipa-i18n-114: checking to ensuer that the firstname of $uname3 is Ï"
+rlPhaseStartTest "ipa-i18n-112: checking to ensuer that the firstname of $uname3 is Ï"
         rlRun "ipa user-find --all $uname3 | grep 'Ï'" 0 "Checking to ensure that the firstname of $uname3 is Ï"
 rlPhaseEnd
 
 
-rlPhaseStartTest "ipa-i18n-115: Changing firstname of $uname3 to Ñ"
+rlPhaseStartTest "ipa-i18n-113: Changing firstname of $uname3 to Ñ"
     rlRun "ipa user-mod --first='Ñ' $uname3" 0 "Modifying firstname of $uname3 to Ñ"
 rlPhaseEnd
 
-rlPhaseStartTest "ipa-i18n-116: checking to ensuer that the firstname of $uname3 is Ñ"
+rlPhaseStartTest "ipa-i18n-114: checking to ensuer that the firstname of $uname3 is Ñ"
         rlRun "ipa user-find --all $uname3 | grep 'Ñ'" 0 "Checking to ensure that the firstname of $uname3 is Ñ"
 rlPhaseEnd
 
 
-rlPhaseStartTest "ipa-i18n-117: Changing firstname of $uname3 to Ó"
+rlPhaseStartTest "ipa-i18n-115: Changing firstname of $uname3 to Ó"
     rlRun "ipa user-mod --first='Ó' $uname3" 0 "Modifying firstname of $uname3 to Ó"
 rlPhaseEnd
 
-rlPhaseStartTest "ipa-i18n-118: checking to ensuer that the firstname of $uname3 is Ó"
+rlPhaseStartTest "ipa-i18n-116: checking to ensuer that the firstname of $uname3 is Ó"
         rlRun "ipa user-find --all $uname3 | grep 'Ó'" 0 "Checking to ensure that the firstname of $uname3 is Ó"
 rlPhaseEnd
 
 
-rlPhaseStartTest "ipa-i18n-119: Changing firstname of $uname3 to Ô"
+rlPhaseStartTest "ipa-i18n-117: Changing firstname of $uname3 to Ô"
     rlRun "ipa user-mod --first='Ô' $uname3" 0 "Modifying firstname of $uname3 to Ô"
 rlPhaseEnd
 
-rlPhaseStartTest "ipa-i18n-120: checking to ensuer that the firstname of $uname3 is Ô"
+rlPhaseStartTest "ipa-i18n-118: checking to ensuer that the firstname of $uname3 is Ô"
         rlRun "ipa user-find --all $uname3 | grep 'Ô'" 0 "Checking to ensure that the firstname of $uname3 is Ô"
 rlPhaseEnd
 
 
-rlPhaseStartTest "ipa-i18n-121: Changing firstname of $uname3 to Ö"
+rlPhaseStartTest "ipa-i18n-119: Changing firstname of $uname3 to Ö"
     rlRun "ipa user-mod --first='Ö' $uname3" 0 "Modifying firstname of $uname3 to Ö"
 rlPhaseEnd
 
-rlPhaseStartTest "ipa-i18n-122: checking to ensuer that the firstname of $uname3 is Ö"
+rlPhaseStartTest "ipa-i18n-120: checking to ensuer that the firstname of $uname3 is Ö"
         rlRun "ipa user-find --all $uname3 | grep 'Ö'" 0 "Checking to ensure that the firstname of $uname3 is Ö"
 rlPhaseEnd
 
 
-rlPhaseStartTest "ipa-i18n-123: Changing firstname of $uname3 to Ù"
+rlPhaseStartTest "ipa-i18n-121: Changing firstname of $uname3 to Ù"
     rlRun "ipa user-mod --first='Ù' $uname3" 0 "Modifying firstname of $uname3 to Ù"
 rlPhaseEnd
 
-rlPhaseStartTest "ipa-i18n-124: checking to ensuer that the firstname of $uname3 is Ù"
+rlPhaseStartTest "ipa-i18n-122: checking to ensuer that the firstname of $uname3 is Ù"
         rlRun "ipa user-find --all $uname3 | grep 'Ù'" 0 "Checking to ensure that the firstname of $uname3 is Ù"
 rlPhaseEnd
 
 
-rlPhaseStartTest "ipa-i18n-125: Changing firstname of $uname3 to Ú"
+rlPhaseStartTest "ipa-i18n-123: Changing firstname of $uname3 to Ú"
     rlRun "ipa user-mod --first='Ú' $uname3" 0 "Modifying firstname of $uname3 to Ú"
 rlPhaseEnd
 
-rlPhaseStartTest "ipa-i18n-126: checking to ensuer that the firstname of $uname3 is Ú"
+rlPhaseStartTest "ipa-i18n-124: checking to ensuer that the firstname of $uname3 is Ú"
         rlRun "ipa user-find --all $uname3 | grep 'Ú'" 0 "Checking to ensure that the firstname of $uname3 is Ú"
 rlPhaseEnd
 
 
-rlPhaseStartTest "ipa-i18n-127: Changing firstname of $uname3 to Û"
+rlPhaseStartTest "ipa-i18n-125: Changing firstname of $uname3 to Û"
     rlRun "ipa user-mod --first='Û' $uname3" 0 "Modifying firstname of $uname3 to Û"
 rlPhaseEnd
 
-rlPhaseStartTest "ipa-i18n-128: checking to ensuer that the firstname of $uname3 is Û"
+rlPhaseStartTest "ipa-i18n-126: checking to ensuer that the firstname of $uname3 is Û"
         rlRun "ipa user-find --all $uname3 | grep 'Û'" 0 "Checking to ensure that the firstname of $uname3 is Û"
 rlPhaseEnd
 
 
-rlPhaseStartTest "ipa-i18n-129: Changing firstname of $uname3 to Ü"
+rlPhaseStartTest "ipa-i18n-127: Changing firstname of $uname3 to Ü"
     rlRun "ipa user-mod --first='Ü' $uname3" 0 "Modifying firstname of $uname3 to Ü"
 rlPhaseEnd
 
-rlPhaseStartTest "ipa-i18n-130: checking to ensuer that the firstname of $uname3 is Ü"
+rlPhaseStartTest "ipa-i18n-128: checking to ensuer that the firstname of $uname3 is Ü"
         rlRun "ipa user-find --all $uname3 | grep 'Ü'" 0 "Checking to ensure that the firstname of $uname3 is Ü"
 rlPhaseEnd
 
 
-rlPhaseStartTest "ipa-i18n-131: Changing firstname of $uname3 to Ü"
-    rlRun "ipa user-mod --first='Ü' $uname3" 0 "Modifying firstname of $uname3 to Ü"
-rlPhaseEnd
-
-rlPhaseStartTest "ipa-i18n-132: checking to ensuer that the firstname of $uname3 is Ü"
-        rlRun "ipa user-find --all $uname3 | grep 'Ü'" 0 "Checking to ensure that the firstname of $uname3 is Ü"
-rlPhaseEnd
-
-
-rlPhaseStartTest "ipa-i18n-133: Changing firstname of $uname3 to Ü"
-    rlRun "ipa user-mod --first='Ü' $uname3" 0 "Modifying firstname of $uname3 to Ü"
-rlPhaseEnd
-
-rlPhaseStartTest "ipa-i18n-134: checking to ensuer that the firstname of $uname3 is Ü"
-        rlRun "ipa user-find --all $uname3 | grep 'Ü'" 0 "Checking to ensure that the firstname of $uname3 is Ü"
-rlPhaseEnd
-
-
-rlPhaseStartTest "ipa-i18n-135: Changing firstname of $uname3 to ß"
+rlPhaseStartTest "ipa-i18n-129: Changing firstname of $uname3 to ß"
     rlRun "ipa user-mod --first='ß' $uname3" 0 "Modifying firstname of $uname3 to ß"
 rlPhaseEnd
 
-rlPhaseStartTest "ipa-i18n-136: checking to ensuer that the firstname of $uname3 is ß"
+rlPhaseStartTest "ipa-i18n-130: checking to ensuer that the firstname of $uname3 is ß"
         rlRun "ipa user-find --all $uname3 | grep 'ß'" 0 "Checking to ensure that the firstname of $uname3 is ß"
 rlPhaseEnd
 
 
-rlPhaseStartTest "ipa-i18n-137: Changing firstname of $uname3 to à"
+rlPhaseStartTest "ipa-i18n-131: Changing firstname of $uname3 to à"
     rlRun "ipa user-mod --first='à' $uname3" 0 "Modifying firstname of $uname3 to à"
 rlPhaseEnd
 
-rlPhaseStartTest "ipa-i18n-138: checking to ensuer that the firstname of $uname3 is à"
+rlPhaseStartTest "ipa-i18n-132: checking to ensuer that the firstname of $uname3 is à"
         rlRun "ipa user-find --all $uname3 | grep 'à'" 0 "Checking to ensure that the firstname of $uname3 is à"
 rlPhaseEnd
 
 
-rlPhaseStartTest "ipa-i18n-139: Changing firstname of $uname3 to á"
+rlPhaseStartTest "ipa-i18n-133: Changing firstname of $uname3 to á"
     rlRun "ipa user-mod --first='á' $uname3" 0 "Modifying firstname of $uname3 to á"
 rlPhaseEnd
 
-rlPhaseStartTest "ipa-i18n-140: checking to ensuer that the firstname of $uname3 is á"
+rlPhaseStartTest "ipa-i18n-134: checking to ensuer that the firstname of $uname3 is á"
         rlRun "ipa user-find --all $uname3 | grep 'á'" 0 "Checking to ensure that the firstname of $uname3 is á"
 rlPhaseEnd
 
 
-rlPhaseStartTest "ipa-i18n-141: Changing firstname of $uname3 to â"
+rlPhaseStartTest "ipa-i18n-135: Changing firstname of $uname3 to â"
     rlRun "ipa user-mod --first='â' $uname3" 0 "Modifying firstname of $uname3 to â"
 rlPhaseEnd
 
-rlPhaseStartTest "ipa-i18n-142: checking to ensuer that the firstname of $uname3 is â"
+rlPhaseStartTest "ipa-i18n-136: checking to ensuer that the firstname of $uname3 is â"
         rlRun "ipa user-find --all $uname3 | grep 'â'" 0 "Checking to ensure that the firstname of $uname3 is â"
 rlPhaseEnd
 
 
-rlPhaseStartTest "ipa-i18n-143: Changing firstname of $uname3 to ä"
+rlPhaseStartTest "ipa-i18n-137: Changing firstname of $uname3 to ä"
     rlRun "ipa user-mod --first='ä' $uname3" 0 "Modifying firstname of $uname3 to ä"
 rlPhaseEnd
 
-rlPhaseStartTest "ipa-i18n-144: checking to ensuer that the firstname of $uname3 is ä"
+rlPhaseStartTest "ipa-i18n-138: checking to ensuer that the firstname of $uname3 is ä"
         rlRun "ipa user-find --all $uname3 | grep 'ä'" 0 "Checking to ensure that the firstname of $uname3 is ä"
 rlPhaseEnd
 
 
-rlPhaseStartTest "ipa-i18n-145: Changing firstname of $uname3 to ç"
+rlPhaseStartTest "ipa-i18n-139: Changing firstname of $uname3 to ç"
     rlRun "ipa user-mod --first='ç' $uname3" 0 "Modifying firstname of $uname3 to ç"
 rlPhaseEnd
 
-rlPhaseStartTest "ipa-i18n-146: checking to ensuer that the firstname of $uname3 is ç"
+rlPhaseStartTest "ipa-i18n-140: checking to ensuer that the firstname of $uname3 is ç"
         rlRun "ipa user-find --all $uname3 | grep 'ç'" 0 "Checking to ensure that the firstname of $uname3 is ç"
 rlPhaseEnd
 
 
-rlPhaseStartTest "ipa-i18n-147: Changing firstname of $uname3 to è"
+rlPhaseStartTest "ipa-i18n-141: Changing firstname of $uname3 to è"
     rlRun "ipa user-mod --first='è' $uname3" 0 "Modifying firstname of $uname3 to è"
 rlPhaseEnd
 
-rlPhaseStartTest "ipa-i18n-148: checking to ensuer that the firstname of $uname3 is è"
+rlPhaseStartTest "ipa-i18n-142: checking to ensuer that the firstname of $uname3 is è"
         rlRun "ipa user-find --all $uname3 | grep 'è'" 0 "Checking to ensure that the firstname of $uname3 is è"
 rlPhaseEnd
 
 
-rlPhaseStartTest "ipa-i18n-149: Changing firstname of $uname3 to é"
+rlPhaseStartTest "ipa-i18n-143: Changing firstname of $uname3 to é"
     rlRun "ipa user-mod --first='é' $uname3" 0 "Modifying firstname of $uname3 to é"
 rlPhaseEnd
 
-rlPhaseStartTest "ipa-i18n-150: checking to ensuer that the firstname of $uname3 is é"
+rlPhaseStartTest "ipa-i18n-144: checking to ensuer that the firstname of $uname3 is é"
         rlRun "ipa user-find --all $uname3 | grep 'é'" 0 "Checking to ensure that the firstname of $uname3 is é"
 rlPhaseEnd
 
 
-rlPhaseStartTest "ipa-i18n-151: Changing firstname of $uname3 to é"
-    rlRun "ipa user-mod --first='é' $uname3" 0 "Modifying firstname of $uname3 to é"
-rlPhaseEnd
-
-rlPhaseStartTest "ipa-i18n-152: checking to ensuer that the firstname of $uname3 is é"
-        rlRun "ipa user-find --all $uname3 | grep 'é'" 0 "Checking to ensure that the firstname of $uname3 is é"
-rlPhaseEnd
-
-
-rlPhaseStartTest "ipa-i18n-153: Changing firstname of $uname3 to ê"
+rlPhaseStartTest "ipa-i18n-145: Changing firstname of $uname3 to ê"
     rlRun "ipa user-mod --first='ê' $uname3" 0 "Modifying firstname of $uname3 to ê"
 rlPhaseEnd
 
-rlPhaseStartTest "ipa-i18n-154: checking to ensuer that the firstname of $uname3 is ê"
+rlPhaseStartTest "ipa-i18n-146: checking to ensuer that the firstname of $uname3 is ê"
         rlRun "ipa user-find --all $uname3 | grep 'ê'" 0 "Checking to ensure that the firstname of $uname3 is ê"
 rlPhaseEnd
 
 
-rlPhaseStartTest "ipa-i18n-155: Changing firstname of $uname3 to ë"
+rlPhaseStartTest "ipa-i18n-147: Changing firstname of $uname3 to ë"
     rlRun "ipa user-mod --first='ë' $uname3" 0 "Modifying firstname of $uname3 to ë"
 rlPhaseEnd
 
-rlPhaseStartTest "ipa-i18n-156: checking to ensuer that the firstname of $uname3 is ë"
+rlPhaseStartTest "ipa-i18n-148: checking to ensuer that the firstname of $uname3 is ë"
         rlRun "ipa user-find --all $uname3 | grep 'ë'" 0 "Checking to ensure that the firstname of $uname3 is ë"
 rlPhaseEnd
 
 
-rlPhaseStartTest "ipa-i18n-157: Changing firstname of $uname3 to í"
+rlPhaseStartTest "ipa-i18n-149: Changing firstname of $uname3 to í"
     rlRun "ipa user-mod --first='í' $uname3" 0 "Modifying firstname of $uname3 to í"
 rlPhaseEnd
 
-rlPhaseStartTest "ipa-i18n-158: checking to ensuer that the firstname of $uname3 is í"
+rlPhaseStartTest "ipa-i18n-150: checking to ensuer that the firstname of $uname3 is í"
         rlRun "ipa user-find --all $uname3 | grep 'í'" 0 "Checking to ensure that the firstname of $uname3 is í"
 rlPhaseEnd
 
 
-rlPhaseStartTest "ipa-i18n-159: Changing firstname of $uname3 to î"
+rlPhaseStartTest "ipa-i18n-151: Changing firstname of $uname3 to î"
     rlRun "ipa user-mod --first='î' $uname3" 0 "Modifying firstname of $uname3 to î"
 rlPhaseEnd
 
-rlPhaseStartTest "ipa-i18n-160: checking to ensuer that the firstname of $uname3 is î"
+rlPhaseStartTest "ipa-i18n-152: checking to ensuer that the firstname of $uname3 is î"
         rlRun "ipa user-find --all $uname3 | grep 'î'" 0 "Checking to ensure that the firstname of $uname3 is î"
 rlPhaseEnd
 
 
-rlPhaseStartTest "ipa-i18n-161: Changing firstname of $uname3 to ï"
+rlPhaseStartTest "ipa-i18n-153: Changing firstname of $uname3 to ï"
     rlRun "ipa user-mod --first='ï' $uname3" 0 "Modifying firstname of $uname3 to ï"
 rlPhaseEnd
 
-rlPhaseStartTest "ipa-i18n-162: checking to ensuer that the firstname of $uname3 is ï"
+rlPhaseStartTest "ipa-i18n-154: checking to ensuer that the firstname of $uname3 is ï"
         rlRun "ipa user-find --all $uname3 | grep 'ï'" 0 "Checking to ensure that the firstname of $uname3 is ï"
 rlPhaseEnd
 
 
-rlPhaseStartTest "ipa-i18n-163: Changing firstname of $uname3 to ñ"
+rlPhaseStartTest "ipa-i18n-155: Changing firstname of $uname3 to ñ"
     rlRun "ipa user-mod --first='ñ' $uname3" 0 "Modifying firstname of $uname3 to ñ"
 rlPhaseEnd
 
-rlPhaseStartTest "ipa-i18n-164: checking to ensuer that the firstname of $uname3 is ñ"
+rlPhaseStartTest "ipa-i18n-156: checking to ensuer that the firstname of $uname3 is ñ"
         rlRun "ipa user-find --all $uname3 | grep 'ñ'" 0 "Checking to ensure that the firstname of $uname3 is ñ"
 rlPhaseEnd
 
 
-rlPhaseStartTest "ipa-i18n-165: Changing firstname of $uname3 to ó"
+rlPhaseStartTest "ipa-i18n-157: Changing firstname of $uname3 to ó"
     rlRun "ipa user-mod --first='ó' $uname3" 0 "Modifying firstname of $uname3 to ó"
 rlPhaseEnd
 
-rlPhaseStartTest "ipa-i18n-166: checking to ensuer that the firstname of $uname3 is ó"
+rlPhaseStartTest "ipa-i18n-158: checking to ensuer that the firstname of $uname3 is ó"
         rlRun "ipa user-find --all $uname3 | grep 'ó'" 0 "Checking to ensure that the firstname of $uname3 is ó"
 rlPhaseEnd
 
 
-rlPhaseStartTest "ipa-i18n-167: Changing firstname of $uname3 to ô"
+rlPhaseStartTest "ipa-i18n-159: Changing firstname of $uname3 to ô"
     rlRun "ipa user-mod --first='ô' $uname3" 0 "Modifying firstname of $uname3 to ô"
 rlPhaseEnd
 
-rlPhaseStartTest "ipa-i18n-168: checking to ensuer that the firstname of $uname3 is ô"
+rlPhaseStartTest "ipa-i18n-160: checking to ensuer that the firstname of $uname3 is ô"
         rlRun "ipa user-find --all $uname3 | grep 'ô'" 0 "Checking to ensure that the firstname of $uname3 is ô"
 rlPhaseEnd
 
 
-rlPhaseStartTest "ipa-i18n-169: Changing firstname of $uname3 to ö"
+rlPhaseStartTest "ipa-i18n-161: Changing firstname of $uname3 to ö"
     rlRun "ipa user-mod --first='ö' $uname3" 0 "Modifying firstname of $uname3 to ö"
 rlPhaseEnd
 
-rlPhaseStartTest "ipa-i18n-170: checking to ensuer that the firstname of $uname3 is ö"
+rlPhaseStartTest "ipa-i18n-162: checking to ensuer that the firstname of $uname3 is ö"
         rlRun "ipa user-find --all $uname3 | grep 'ö'" 0 "Checking to ensure that the firstname of $uname3 is ö"
 rlPhaseEnd
 
 
-rlPhaseStartTest "ipa-i18n-171: Changing firstname of $uname3 to ù"
+rlPhaseStartTest "ipa-i18n-163: Changing firstname of $uname3 to ù"
     rlRun "ipa user-mod --first='ù' $uname3" 0 "Modifying firstname of $uname3 to ù"
 rlPhaseEnd
 
-rlPhaseStartTest "ipa-i18n-172: checking to ensuer that the firstname of $uname3 is ù"
+rlPhaseStartTest "ipa-i18n-164: checking to ensuer that the firstname of $uname3 is ù"
         rlRun "ipa user-find --all $uname3 | grep 'ù'" 0 "Checking to ensure that the firstname of $uname3 is ù"
 rlPhaseEnd
 
 
-rlPhaseStartTest "ipa-i18n-173: Changing firstname of $uname3 to ú"
+rlPhaseStartTest "ipa-i18n-165: Changing firstname of $uname3 to ú"
     rlRun "ipa user-mod --first='ú' $uname3" 0 "Modifying firstname of $uname3 to ú"
 rlPhaseEnd
 
-rlPhaseStartTest "ipa-i18n-174: checking to ensuer that the firstname of $uname3 is ú"
+rlPhaseStartTest "ipa-i18n-166: checking to ensuer that the firstname of $uname3 is ú"
         rlRun "ipa user-find --all $uname3 | grep 'ú'" 0 "Checking to ensure that the firstname of $uname3 is ú"
 rlPhaseEnd
 
 
-rlPhaseStartTest "ipa-i18n-175: Changing firstname of $uname3 to û"
+rlPhaseStartTest "ipa-i18n-167: Changing firstname of $uname3 to û"
     rlRun "ipa user-mod --first='û' $uname3" 0 "Modifying firstname of $uname3 to û"
 rlPhaseEnd
 
-rlPhaseStartTest "ipa-i18n-176: checking to ensuer that the firstname of $uname3 is û"
+rlPhaseStartTest "ipa-i18n-168: checking to ensuer that the firstname of $uname3 is û"
         rlRun "ipa user-find --all $uname3 | grep 'û'" 0 "Checking to ensure that the firstname of $uname3 is û"
 rlPhaseEnd
 
 
-rlPhaseStartTest "ipa-i18n-177: Changing firstname of $uname3 to ü"
+rlPhaseStartTest "ipa-i18n-169: Changing firstname of $uname3 to ü"
     rlRun "ipa user-mod --first='ü' $uname3" 0 "Modifying firstname of $uname3 to ü"
 rlPhaseEnd
 
-rlPhaseStartTest "ipa-i18n-178: checking to ensuer that the firstname of $uname3 is ü"
-        rlRun "ipa user-find --all $uname3 | grep 'ü'" 0 "Checking to ensure that the firstname of $uname3 is ü"
-rlPhaseEnd
-
-
-rlPhaseStartTest "ipa-i18n-179: Changing firstname of $uname3 to ü"
-    rlRun "ipa user-mod --first='ü' $uname3" 0 "Modifying firstname of $uname3 to ü"
-rlPhaseEnd
-
-rlPhaseStartTest "ipa-i18n-180: checking to ensuer that the firstname of $uname3 is ü"
-        rlRun "ipa user-find --all $uname3 | grep 'ü'" 0 "Checking to ensure that the firstname of $uname3 is ü"
-rlPhaseEnd
-
-
-rlPhaseStartTest "ipa-i18n-181: Changing firstname of $uname3 to ü"
-    rlRun "ipa user-mod --first='ü' $uname3" 0 "Modifying firstname of $uname3 to ü"
-rlPhaseEnd
-
-rlPhaseStartTest "ipa-i18n-182: checking to ensuer that the firstname of $uname3 is ü"
+rlPhaseStartTest "ipa-i18n-170: checking to ensuer that the firstname of $uname3 is ü"
         rlRun "ipa user-find --all $uname3 | grep 'ü'" 0 "Checking to ensure that the firstname of $uname3 is ü"
 rlPhaseEnd
 
