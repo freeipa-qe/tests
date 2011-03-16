@@ -28,7 +28,7 @@ export TESTVERSION=1.0
 
 BUILT_FILES=
 
-FILES=$(METADATA) ipa-server-shared.sh runtest.sh ipa-host-cli-lib.sh ipa-group-cli-lib.sh ipa-hostgroup-cli-lib.sh ipa-netgroup-cli-lib.sh ipa-hbac-cli-lib.sh lib.user-cli.sh Makefile PURPOSE set-root-pw.exp id_rsa.pub id_rsa id_dsa.pub id_dsa env.sh rhel6-beta2.repo id_rsa_global.pub id_rsa_global
+FILES=$(METADATA) ipa-server-shared.sh runtest.sh ipa-host-cli-lib.sh ipa-group-cli-lib.sh ipa-hostgroup-cli-lib.sh ipa-netgroup-cli-lib.sh ipa-hbac-cli-lib.sh lib.user-cli.sh Makefile PURPOSE set-root-pw.exp id_rsa.pub id_rsa id_dsa.pub id_dsa env.sh rhel6-beta2.repo id_rsa_global.pub id_rsa_global known_hosts
 
 .PHONY: all install download clean
 
@@ -67,6 +67,7 @@ run: $(FILES) build
 	cp /root/.ssh/id_dsa.pub /root/.ssh/authorized_keys2
 	cp -f ./id_rsa_global.pub /dev/shm/.
 	cp -f ./id_rsa_global /dev/shm/.
+	cp -f ./known_hosts /dev/shm/.
 	chmod 600 /root/.ssh
 	chmod 600 /root/.ssh/id*
 	chmod 600 /root/.ssh/authorized_keys

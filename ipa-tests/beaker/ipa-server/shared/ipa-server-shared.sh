@@ -238,12 +238,16 @@ expect eof' >> $TET_TMP_DIR/setup-ssh-remote.exp
 	fi
 }
 
+#################################################################
+#  SetUpAuthKeys ... all hosts will have the same public and    #
+#    private key for the root user				#
+#################################################################
 SetUpAuthKeys()
 {
    PUBKEY=/dev/shm/id_rsa_global.pub
    PRIVATEKEY=/dev/shm/id_rsa_global
    SSHROOT=/root/.ssh/
-   PUBKEYFILE=$SSHRROT/id_rsa
+   PUBKEYFILE=$SSHR0OT/id_rsa
    AUTHKEYFILE=$SSHROOT/authorized_keys
    ls $SSHROOT
    if [ $? -ne 0 ] ; then
@@ -273,10 +277,44 @@ SetUpAuthKeys()
 
    # copy corresponding public key
    cp -f $PUBKEY $PUBKEYFILE
-   rlLog: "Private key is:"
+   rlLog "Private key is:"
    privatekey=`cat $SSHROOT/id_rsa`
    rlLog "$privatekey"
 	
+}
+
+##########################################################
+#  SetUpKnowHosts  ... all hosts will share the same key #
+##########################################################
+SetUpKnownHosts()
+{
+   GLOBALKWNHSTS=/dev/shm/known_hosts
+   SSHROOT=/root/.ssh/
+   KNOWNHOSTS=$SSHROOT/known_hosts
+
+   ls $SSHROOT
+   if [ $? -ne 0 ] ; then
+        make dir $SSHROOT
+   else
+        rlLog "/root/.ssh/ directory exists"
+   fi
+
+   cat $GLOBALKWNHSTS > $KNOWNHOSTS
+   sed -i -e "s/localhost/$MASTER/g" $KNOWNHOSTS
+
+   for s in $SLAVE ; do
+	cat $GLOBALKWNHSTS >> $KNOWNHOSTS
+	sed -i -e "s/localhost/$SLAVE/g" $KNOWNHOSTS
+   done
+
+   for s in $CLIENT ; do
+        cat $GLOBALKWNHSTS >> $KNOWNHOSTS
+        sed -i -e "s/localhost/$CLIENT/g" $KNOWNHOSTS 
+   done
+
+   rlLog "Known Hosts are:"
+   knownhosts=`cat $KNOWNHOSTS`
+   rlLog "$knownhosts"
 }
 
 #######################################################################
@@ -288,23 +326,23 @@ SetUpAuthKeys()
 
 setAttribute()
 {
-    local topic=$1
-    local attr=$2
-    local value=$3
-    local object=$4
-    local rc=0
+	local topic=$1
+		local attr=$2
+		local value=$3
+		local object=$4
+		local rc=0
 
-    rlLog "Executing: ipa $topic-mod --setattr $attr=\"$value\" $object"
-    ipa $topic-mod --setattr $attr="$value" $object
-    rc=$?
-    if [ $rc -ne 0 ] ; then
-        rlLog "ERROR: Failed to set value for attribute $attr."
-        rc=1
-    else
-        rlLog "Successfully set attribute $attr to \"$value\""
-    fi
+		rlLog "Executing: ipa $topic-mod --setattr $attr=\"$value\" $object"
+		ipa $topic-mod --setattr $attr="$value" $object
+		rc=$?
+		if [ $rc -ne 0 ] ; then
+			rlLog "ERROR: Failed to set value for attribute $attr."
+				rc=1
+		else
+			rlLog "Successfully set attribute $attr to \"$value\""
+				fi
 
-    return $rc
+				return $rc
 } #setAttribute
 
 #######################################################################
@@ -316,22 +354,22 @@ setAttribute()
 
 addAttribute()
 {
-    local topic=$1
-    local attr=$2
-    local value=$3
-    local object=$4
-    local rc=0
+	local topic=$1
+		local attr=$2
+		local value=$3
+		local object=$4
+		local rc=0
 
-    rlLog "Executing: ipa $topic-mod --addattr $attr=\"$value\" $object"
-    ipa $topic-mod --addattr $attr="$value" $object
-    rc=$?
-    if [ $rc -ne 0 ] ; then
-        rlLog "ERROR: Failed to add additional attribute value for attribute $attr."
-        rc=1
-    else
-        rlLog "Successfully added additional attribute $attr with value \"$value\""
-    fi
-    return $rc
+		rlLog "Executing: ipa $topic-mod --addattr $attr=\"$value\" $object"
+		ipa $topic-mod --addattr $attr="$value" $object
+		rc=$?
+		if [ $rc -ne 0 ] ; then
+			rlLog "ERROR: Failed to add additional attribute value for attribute $attr."
+				rc=1
+		else
+			rlLog "Successfully added additional attribute $attr with value \"$value\""
+				fi
+				return $rc
 } #addAttribute
 
 #############################################################################
@@ -341,40 +379,40 @@ addAttribute()
 
 makereport()
 {
-    local report=$1
-    # some modification here: make report work even the TmpDir removed
-    if [ -n "$report" ];then
-	# this overwriting the existing report
-        #report=/tmp/rhts.report.$RANDOM.txt
-        touch $report
-    else
-        if [ ! -w "$report" ];then
-            report=/tmp/rhts.report.$RANDOM.txt
-            touch $report
-        else
-            touch $report
-        fi
-    fi
-    # capture the result and make a simple report
-    local total=`rlJournalPrintText | grep "RESULT" | wc -l`
-    local pass=`rlJournalPrintText | grep "RESULT" | grep "\[   PASS   \]" | wc -l`
-    local fail=`rlJournalPrintText | grep "RESULT" | grep "\[   FAIL   \]" | wc -l`
-    local abort=`rlJournalPrintText | grep "RESULT" | grep "\[  ABORT   \]" | wc -l`
-    echo "================ final pass/fail report =================" > $report
-    echo "   Test Date: `date` " >> $report
-    echo "   Total : [$total] "  >> $report
-    echo "   Passed: [$pass] "   >> $report
-    echo "   Failed: [$fail] "   >> $report
-    echo "   Abort : [$abort]"   >> $report
-    echo "---------------------------------------------------------" >> $report
-    rlJournalPrintText | grep "RESULT" | grep "\[   PASS   \]"| sed -e 's/:/ /g' -e 's/RESULT//g' >> $report
-    echo "" >> $report
-    rlJournalPrintText | grep "RESULT" | grep "\[   FAIL   \]"| sed -e 's/:/ /g' -e 's/RESULT//g' >> $report
-    echo "" >> $report
-    rlJournalPrintText | grep "RESULT" | grep "\[  ABORT   \]"| sed -e 's/:/ /g' -e 's/RESULT//g' >> $report
-    echo "=========================================================" >> $report
-    echo "report saved as: $report"
-    cat $report
+	local report=$1
+# some modification here: make report work even the TmpDir removed
+		if [ -n "$report" ];then
+# this overwriting the existing report
+#report=/tmp/rhts.report.$RANDOM.txt
+			touch $report
+		else
+			if [ ! -w "$report" ];then
+				report=/tmp/rhts.report.$RANDOM.txt
+					touch $report
+			else
+				touch $report
+					fi
+					fi
+# capture the result and make a simple report
+					local total=`rlJournalPrintText | grep "RESULT" | wc -l`
+					local pass=`rlJournalPrintText | grep "RESULT" | grep "\[   PASS   \]" | wc -l`
+					local fail=`rlJournalPrintText | grep "RESULT" | grep "\[   FAIL   \]" | wc -l`
+					local abort=`rlJournalPrintText | grep "RESULT" | grep "\[  ABORT   \]" | wc -l`
+					echo "================ final pass/fail report =================" > $report
+					echo "   Test Date: `date` " >> $report
+					echo "   Total : [$total] "  >> $report
+					echo "   Passed: [$pass] "   >> $report
+					echo "   Failed: [$fail] "   >> $report
+					echo "   Abort : [$abort]"   >> $report
+					echo "---------------------------------------------------------" >> $report
+					rlJournalPrintText | grep "RESULT" | grep "\[   PASS   \]"| sed -e 's/:/ /g' -e 's/RESULT//g' >> $report
+					echo "" >> $report
+					rlJournalPrintText | grep "RESULT" | grep "\[   FAIL   \]"| sed -e 's/:/ /g' -e 's/RESULT//g' >> $report
+					echo "" >> $report
+					rlJournalPrintText | grep "RESULT" | grep "\[  ABORT   \]"| sed -e 's/:/ /g' -e 's/RESULT//g' >> $report
+					echo "=========================================================" >> $report
+					echo "report saved as: $report"
+					cat $report
 } #makereport
 
 ############################################################################
@@ -384,22 +422,22 @@ makereport()
 
 getReverseZone()
 {
-  rzonedn=`ipa dnszone-find | grep "Zone name:" | grep arpa`
-  if [ $? -eq 0 ] ; then
-	rzone=`echo $rzonedn | cut -d ":" -f 2`
-  else
-	rlLog "WARNING: No Reverse DNS zone found"
-	rc=1
-  fi
+	rzonedn=`ipa dnszone-find | grep "Zone name:" | grep arpa`
+		if [ $? -eq 0 ] ; then
+			rzone=`echo $rzonedn | cut -d ":" -f 2`
+		else
+			rlLog "WARNING: No Reverse DNS zone found"
+				rc=1
+				fi
 
-  echo $rzone
-  return $rc
+				echo $rzone
+				return $rc
 } #getReverseZone
 
 
 KinitAsAdmin()
 {
-    echo $ADMINPW | $KINITEXEC $ADMINID 2>&1 >/dev/null
+	echo $ADMINPW | $KINITEXEC $ADMINID 2>&1 >/dev/null
 } #KinitAsAdmin
 
 Kcleanup()
