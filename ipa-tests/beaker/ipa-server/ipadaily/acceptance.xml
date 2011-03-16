@@ -3,7 +3,7 @@
 		<cc>mgregg@redhat.com</cc>
 		<cc>jgalipea@redhat.com</cc>
 		<cc>yzhang@redhat.com</cc>
-		<cc>ipa-and-samba-team-list@redhat.com</cc>
+		<cc>ipa-and-samba-team-automation-list@redhat.com</cc>
 	</notify>
 	<whiteboard>
 		ipa-server full acceptance - x86_64 - master only
