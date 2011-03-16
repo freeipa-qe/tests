@@ -6,12 +6,12 @@
 run_rejection_tests()
 {
 
-rlPhaseStartTest "ipa-i18n-29: Changing firstname of $uname2 to Rôséñe"
-    rlRun "ipa user-mod --first='Rôséñe' $uname2" 0 "Modifying firstname of $uname2 to Rôséñe"
+rlPhaseStartTest "ipa-i18n-29: Changing firstname of $uname2 to Rôséñel"
+    rlRun "ipa user-mod --first='Rôséñel' $uname2" 0 "Modifying firstname of $uname2 to Rôséñel"
 rlPhaseEnd
 
-rlPhaseStartTest "ipa-i18n-30: checking to ensuer that the firstname of $uname2 is Rôséñe"
-        rlRun "ipa user-find --all $uname2 | grep First | grep 'Rôséñe'" 0 "Checking to ensure that the firstname of $uname2 is Rôséñe"
+rlPhaseStartTest "ipa-i18n-30: checking to ensuer that the firstname of $uname2 is Rôséñel"
+        rlRun "ipa user-find --all $uname2 | grep First | grep 'Rôséñel'" 0 "Checking to ensure that the firstname of $uname2 is Rôséñel"
 rlPhaseEnd
 
 
