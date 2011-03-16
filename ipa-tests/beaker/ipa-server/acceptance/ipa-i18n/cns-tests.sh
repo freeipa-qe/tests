@@ -11,7 +11,7 @@ rlPhaseStartTest "ipa-i18n-3: Changing lastname of $uname1 to Oskar"
 rlPhaseEnd
 
 rlPhaseStartTest "ipa-i18n-4: checking to ensuer that the lastname of $uname1 is Oskar"
-        rlRun "ipa user-find --all $uname1 | | grep Last | grep 'Oskar'" 0 "Checking to ensure that the lastname of $uname1 is Oskar"
+        rlRun "ipa user-find --all $uname1 | grep Last | grep 'Oskar'" 0 "Checking to ensure that the lastname of $uname1 is Oskar"
 rlPhaseEnd
 
 
@@ -20,7 +20,7 @@ rlPhaseStartTest "ipa-i18n-5: Changing lastname of $uname1 to Anders"
 rlPhaseEnd
 
 rlPhaseStartTest "ipa-i18n-6: checking to ensuer that the lastname of $uname1 is Anders"
-        rlRun "ipa user-find --all $uname1 | | grep Last | grep 'Anders'" 0 "Checking to ensure that the lastname of $uname1 is Anders"
+        rlRun "ipa user-find --all $uname1 | grep Last | grep 'Anders'" 0 "Checking to ensure that the lastname of $uname1 is Anders"
 rlPhaseEnd
 
 
@@ -29,7 +29,7 @@ rlPhaseStartTest "ipa-i18n-7: Changing lastname of $uname1 to Örjan"
 rlPhaseEnd
 
 rlPhaseStartTest "ipa-i18n-8: checking to ensuer that the lastname of $uname1 is Örjan"
-        rlRun "ipa user-find --all $uname1 | | grep Last | grep 'Örjan'" 0 "Checking to ensure that the lastname of $uname1 is Örjan"
+        rlRun "ipa user-find --all $uname1 | grep Last | grep 'Örjan'" 0 "Checking to ensure that the lastname of $uname1 is Örjan"
 rlPhaseEnd
 
 
@@ -38,7 +38,7 @@ rlPhaseStartTest "ipa-i18n-9: Changing lastname of $uname1 to Jonas"
 rlPhaseEnd
 
 rlPhaseStartTest "ipa-i18n-10: checking to ensuer that the lastname of $uname1 is Jonas"
-        rlRun "ipa user-find --all $uname1 | | grep Last | grep 'Jonas'" 0 "Checking to ensure that the lastname of $uname1 is Jonas"
+        rlRun "ipa user-find --all $uname1 | grep Last | grep 'Jonas'" 0 "Checking to ensure that the lastname of $uname1 is Jonas"
 rlPhaseEnd
 
 
@@ -47,7 +47,7 @@ rlPhaseStartTest "ipa-i18n-11: Changing lastname of $uname1 to Ulf"
 rlPhaseEnd
 
 rlPhaseStartTest "ipa-i18n-12: checking to ensuer that the lastname of $uname1 is Ulf"
-        rlRun "ipa user-find --all $uname1 | | grep Last | grep 'Ulf'" 0 "Checking to ensure that the lastname of $uname1 is Ulf"
+        rlRun "ipa user-find --all $uname1 | grep Last | grep 'Ulf'" 0 "Checking to ensure that the lastname of $uname1 is Ulf"
 rlPhaseEnd
 
 
@@ -56,7 +56,7 @@ rlPhaseStartTest "ipa-i18n-13: Changing lastname of $uname1 to Äke"
 rlPhaseEnd
 
 rlPhaseStartTest "ipa-i18n-14: checking to ensuer that the lastname of $uname1 is Äke"
-        rlRun "ipa user-find --all $uname1 | | grep Last | grep 'Äke'" 0 "Checking to ensure that the lastname of $uname1 is Äke"
+        rlRun "ipa user-find --all $uname1 | grep Last | grep 'Äke'" 0 "Checking to ensure that the lastname of $uname1 is Äke"
 rlPhaseEnd
 
 
@@ -65,7 +65,7 @@ rlPhaseStartTest "ipa-i18n-15: Changing lastname of $uname1 to Bertold"
 rlPhaseEnd
 
 rlPhaseStartTest "ipa-i18n-16: checking to ensuer that the lastname of $uname1 is Bertold"
-        rlRun "ipa user-find --all $uname1 | | grep Last | grep 'Bertold'" 0 "Checking to ensure that the lastname of $uname1 is Bertold"
+        rlRun "ipa user-find --all $uname1 | grep Last | grep 'Bertold'" 0 "Checking to ensure that the lastname of $uname1 is Bertold"
 rlPhaseEnd
 
 
@@ -74,7 +74,7 @@ rlPhaseStartTest "ipa-i18n-17: Changing lastname of $uname1 to Bruno"
 rlPhaseEnd
 
 rlPhaseStartTest "ipa-i18n-18: checking to ensuer that the lastname of $uname1 is Bruno"
-        rlRun "ipa user-find --all $uname1 | | grep Last | grep 'Bruno'" 0 "Checking to ensure that the lastname of $uname1 is Bruno"
+        rlRun "ipa user-find --all $uname1 | grep Last | grep 'Bruno'" 0 "Checking to ensure that the lastname of $uname1 is Bruno"
 rlPhaseEnd
 
 
@@ -83,7 +83,7 @@ rlPhaseStartTest "ipa-i18n-19: Changing lastname of $uname1 to Didier"
 rlPhaseEnd
 
 rlPhaseStartTest "ipa-i18n-20: checking to ensuer that the lastname of $uname1 is Didier"
-        rlRun "ipa user-find --all $uname1 | | grep Last | grep 'Didier'" 0 "Checking to ensure that the lastname of $uname1 is Didier"
+        rlRun "ipa user-find --all $uname1 | grep Last | grep 'Didier'" 0 "Checking to ensure that the lastname of $uname1 is Didier"
 rlPhaseEnd
 
 
@@ -92,7 +92,7 @@ rlPhaseStartTest "ipa-i18n-21: Changing lastname of $uname1 to Éric"
 rlPhaseEnd
 
 rlPhaseStartTest "ipa-i18n-22: checking to ensuer that the lastname of $uname1 is Éric"
-        rlRun "ipa user-find --all $uname1 | | grep Last | grep 'Éric'" 0 "Checking to ensure that the lastname of $uname1 is Éric"
+        rlRun "ipa user-find --all $uname1 | grep Last | grep 'Éric'" 0 "Checking to ensure that the lastname of $uname1 is Éric"
 rlPhaseEnd
 
 
@@ -101,7 +101,7 @@ rlPhaseStartTest "ipa-i18n-23: Changing lastname of $uname1 to Jean-Luc"
 rlPhaseEnd
 
 rlPhaseStartTest "ipa-i18n-24: checking to ensuer that the lastname of $uname1 is Jean-Luc"
-        rlRun "ipa user-find --all $uname1 | | grep Last | grep 'Jean-Luc'" 0 "Checking to ensure that the lastname of $uname1 is Jean-Luc"
+        rlRun "ipa user-find --all $uname1 | grep Last | grep 'Jean-Luc'" 0 "Checking to ensure that the lastname of $uname1 is Jean-Luc"
 rlPhaseEnd
 
 
@@ -110,7 +110,7 @@ rlPhaseStartTest "ipa-i18n-25: Changing lastname of $uname1 to Laurent"
 rlPhaseEnd
 
 rlPhaseStartTest "ipa-i18n-26: checking to ensuer that the lastname of $uname1 is Laurent"
-        rlRun "ipa user-find --all $uname1 | | grep Last | grep 'Laurent'" 0 "Checking to ensure that the lastname of $uname1 is Laurent"
+        rlRun "ipa user-find --all $uname1 | grep Last | grep 'Laurent'" 0 "Checking to ensure that the lastname of $uname1 is Laurent"
 rlPhaseEnd
 
 
@@ -119,7 +119,7 @@ rlPhaseStartTest "ipa-i18n-27: Changing lastname of $uname1 to Têko"
 rlPhaseEnd
 
 rlPhaseStartTest "ipa-i18n-28: checking to ensuer that the lastname of $uname1 is Têko"
-        rlRun "ipa user-find --all $uname1 | | grep Last | grep 'Têko'" 0 "Checking to ensure that the lastname of $uname1 is Têko"
+        rlRun "ipa user-find --all $uname1 | grep Last | grep 'Têko'" 0 "Checking to ensure that the lastname of $uname1 is Têko"
 rlPhaseEnd
 
 
