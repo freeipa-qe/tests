@@ -110,7 +110,7 @@ fi
 		rlRun "ipa dns-show $DOMAIN newfakehost$newip" 0 "Checking to ensure that ipa dnsrecord-show gives the reverse for fakehost"
 	rlPhaseEnd
 
-	
+	ipaddr=`hostname`	
 	zone=newzone
 	email="ipaqar.redhat.com"
 	serial=2010010701
