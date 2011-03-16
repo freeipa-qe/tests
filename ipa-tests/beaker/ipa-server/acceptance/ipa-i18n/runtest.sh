@@ -81,9 +81,9 @@ rlPhaseEnd
 
     # r2d2_test_starts
 #    ipa-i18n
-	run_firstname_tests
 	run_cns_tests
 	run_rejection_tests
+	run_firstname_tests
     # r2d2_test_ends
 
     rlPhaseStartCleanup "ipa-i18n cleanup"

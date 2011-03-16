@@ -3,6 +3,6 @@ rlPhaseStartTest "ipa-i18n-%num: Changing firstname of $uname2 to %char"
 rlPhaseEnd
 
 rlPhaseStartTest "ipa-i18n-%bnum: checking to ensuer that the firstname of $uname2 is %char"
-        rlRun "ipa user-find --all $uname2 | grep '%char'" 0 "Checking to ensure that the firstname of $uname1 is %char"
+        rlRun "ipa user-find --all $uname2 | grep First | grep '%char'" 0 "Checking to ensure that the firstname of $uname2 is %char"
 rlPhaseEnd
 
