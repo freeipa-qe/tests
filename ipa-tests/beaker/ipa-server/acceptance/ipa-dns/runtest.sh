@@ -431,7 +431,7 @@ fi
 
 	# SRV Record
 	rlPhaseStartTest "ipa-dns-70: add record of type srv"
-		rlRun "ipa dnsrecord-add $zone _srv --srv-rec \"$srva $srv\"" 0 "add record type srv"
+		rlRun "ipa dnsrecord-add $zone _srv --srv-rec '$srva $srv'" 0 "add record type srv"
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-71: make sure that IPA saved record type srv"
@@ -662,7 +662,7 @@ fi
 
 	# Type cert
 	rlPhaseStartTest "ipa-dns-125: add record of type cert"
-		rlRun "ipa dnsrecord-add $zone cert --cert-rec \"$certa $cert\"" 0 "add record type cert"
+		rlRun "ipa dnsrecord-add $zone cert --cert-rec '$certa $cert'" 0 "add record type cert"
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-126: make sure that IPA saved record type cert"
@@ -689,7 +689,7 @@ fi
 
 	# Type kx
 	rlPhaseStartTest "ipa-dns-131: add record of type kx"
-		rlRun "ipa dnsrecord-add $zone @ --kx-rec \"$kxpref1 $zone\"" 0 "add record type kx"
+		rlRun "ipa dnsrecord-add $zone @ --kx-rec '$kxpref1 $zone'" 0 "add record type kx"
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-132: make sure that IPA saved record type kx"
@@ -701,7 +701,7 @@ fi
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-134: delete record of type kx"
-		rlRun "ipa dnsrecord-del $zone @ --kx-rec \"$kxpref1 $zone\"" 0 "delete record type kx"
+		rlRun "ipa dnsrecord-del $zone @ --kx-rec '$kxpref1 $zone'" 0 "delete record type kx"
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-135: make sure that IPA deleted record type kx"
@@ -716,7 +716,7 @@ fi
 	# Negitive kx tests
 
 	rlPhaseStartTest "ipa-dns-137: add record of type bad kx"
-		rlRun "ipa dnsrecord-add $zone @ --kx-rec \"$kxbadpref1 $zone\"" 1 "add record type bad kx"
+		rlRun "ipa dnsrecord-add $zone @ --kx-rec '$kxbadpref1 $zone'" 1 "add record type bad kx"
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-138: make sure that IPA saved record type kx"
@@ -724,7 +724,7 @@ fi
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-139: add record of type bad kx"
-		rlRun "ipa dnsrecord-add $zone @ --kx-rec \"$kxbadpref2 $zone\"" 1 "add record type bad kx"
+		rlRun "ipa dnsrecord-add $zone @ --kx-rec '$kxbadpref2 $zone'" 1 "add record type bad kx"
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-140: make sure that IPA saved record type kx"
@@ -733,19 +733,19 @@ fi
 
 	# Type loc
 	rlPhaseStartTest "ipa-dns-141: add record of type loc"
-		rlRun "ipa dnsrecord-add $zone @ --loc-rec \"$loc\"" 0 "add record type loc"
+		rlRun "ipa dnsrecord-add $zone @ --loc-rec '$loc'" 0 "add record type loc"
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-142: make sure that IPA saved record type loc"
-		rlRun "ipa dnsrecord-find $zone @ | grep $loclong" 0 "make sure ipa recieved record type loc"
+		rlRun "ipa dnsrecord-find $zone @ | grep '$loclong'" 0 "make sure ipa recieved record type loc"
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-143: make sure that dig can find the record type loc"
-		rlRun "dig $zone loc | grep $loc" 0 "make sure dig can find the loc record"
+		rlRun "dig $zone loc | grep '$loc'" 0 "make sure dig can find the loc record"
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-144: delete record of type loc"
-		rlRun "ipa dnsrecord-del $zone @ --loc-rec \"$loc\"" 0 "delete record type loc"
+		rlRun "ipa dnsrecord-del $zone @ --loc-rec '$loc'" 0 "delete record type loc"
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-145: make sure that IPA deleted record type loc"
