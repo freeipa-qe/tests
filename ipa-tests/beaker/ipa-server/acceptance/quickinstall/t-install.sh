@@ -21,6 +21,7 @@ installMaster()
 
 	rlRun "appendEnv" 0 "Append the machine information to the env.sh with the information for the machines in the recipe set"
 	rlRun "SetUpAuthKeys" 0 "Setting up authorized keys file"
+	rlRun "SetUpKnownHosts" 0 "Setting up known hosts file"
    rlPhaseEnd
 
    rlPhaseStartTest "Create Replica Package(s)"
@@ -53,6 +54,7 @@ installSlave()
         rlRun "fixhostname" 0 "Fix hostname"
         rlRun "fixResolv" 0 "fixing the reoslv.conf to contain the correct nameserver lines"
 	rlRun "SetUpAuthKeys" 0 "Setting up authorized keys file"
+	rlRun "SetUpKnownHosts" 0 "Setting up known hosts file"
 	
 	cd /dev/shm/
 	hostname_s=$(hostname -s)
@@ -79,18 +81,19 @@ installSlave()
 installClient()
 {
    rlPhaseStartSetup "Install IPA Client"
+	rlRun "ntpdate $NTPSERVER" 0 "Synchronzing clock with corporate time server"
 	rlRun "fixHostFile" 0 "Set up /etc/hosts"
 	rlRun "fixhostname" 0 "Fix hostname"
         rlRun "fixResolv" 0 "fixing the reoslv.conf to contain the correct nameserver lines"
 	if [ -n $SKIPINSTALL ] ; then
-		rlLog "EXECUTING: ipa-client-install --domain=$DOMAIN --realm=$RELM --ntp-server=$NTPSERVER -p $ADMINID -w $ADMINPW -U --server=$MASTER"
-        	rlRun "ipa-client-install --domain=$DOMAIN --realm=$RELM --ntp-server=$NTPSERVER -p $ADMINID -w $ADMINPW -U --server=$MASTER" 0 "Installing ipa client and configuring"
+		rlLog "EXECUTING: ipa-client-install --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW -U --server=$MASTER"
+        	rlRun "ipa-client-install --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW -U --server=$MASTER" 0 "Installing ipa client and configuring"
 		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
 	fi
 
 	rlRun "SetUpAuthKeys" 0 "Setting up authorized keys file"
+	rlRun "SetUpKnownHosts" 0 "Setting up known hosts file"
 	rlRun "appendEnv" 0 "Append the machine information to the env.sh with the information for the machines in the recipe set"
-	rlRun "ntpdate $MASTER" 0 "Synchronzing clock with master time server"
    rlPhaseEnd
 }
 
