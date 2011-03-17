@@ -44,6 +44,23 @@ rlJournalStart
 
     rlPhaseStartTest "Verify shared libraries are available"
 	rlRun "ls /dev/shm/ipa-server-shared.sh" 0 "Checking for shared library"
+
+	# Setup ssh keys for machines in the recipe
+        for s in $CLIENT; do
+                if [ "$s" != "" ]; then
+                        AddToKnownHosts $s
+                fi
+        done
+        for s in $MASTER; do
+                if [ "$s" != "" ]; then
+                        AddToKnownHosts $s
+                fi
+        done
+        for s in $SLAVE; do
+                if [ "$s" != "" ]; then
+                        AddToKnownHosts $s
+                fi
+        done
     rlPhaseEnd
 
 rlJournalPrintText
