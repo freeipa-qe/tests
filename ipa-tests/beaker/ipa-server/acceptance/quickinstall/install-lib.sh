@@ -80,18 +80,19 @@ appendEnv()
   # Adding MASTER and SLAVE bits to env.sh
   master_short=`echo $MASTER | cut -d "." -f1`
   MASTER=$master_short.$DOMAIN
+  echo "export MASTER=$MASTER" >> /dev/shm/env.sh
+  echo "export MASTERIP=$ipaddr" >> /dev/shm/env.sh
   if [ "$SLAVE" != "" ]; then
 	slave_short=`echo $SLAVE | cut -d "." -f1`
   	SLAVE=$slave_short.$DOMAIN
+	echo "export SLAVE=$SLAVE" >> /dev/shm/env.sh
   fi
-  if [ "$SLAVE" != "" ]; then
-  	CLIENT=$client_short.$DOMAIN
-	slave_short=`echo $SLAVE | cut -d "." -f1`
+  if [ "$CLIENT" != "" ]; then
+	client_short=`echo $CLIENT | cut -d "." -f1`
+	CLIENT=$client_short.$DOMAIN
+	echo "export CLIENT=$CLIENT" >> /dev/shm/env.sh
   fi
-  echo "export MASTER=$MASTER" >> /dev/shm/env.sh
-  echo "export MASTERIP=$ipaddr" >> /dev/shm/env.sh
-  echo "export SLAVE=$SLAVE" >> /dev/shm/env.sh
-  echo "export CLIENT=$CLIENT" >> /dev/shm/env.sh
+
   rlLog "Contents of env.sh are"
   output=`cat /dev/shm/env.sh`
   rlLog "$output"
@@ -147,6 +148,7 @@ SetUpAuthKeys()
 ##########################################################
 SetUpKnownHosts()
 {
+  KNOWNHOSTS=/root/.ssh/known_hosts
   for s in $CLIENT; do
   	if [ "$s" != "" ]; then
   		AddToKnownHosts $s
