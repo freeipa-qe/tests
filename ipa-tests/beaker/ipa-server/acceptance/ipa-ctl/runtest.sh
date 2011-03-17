@@ -394,7 +394,7 @@ rlPhaseStartTest "ipa-ctl-25: restart services as non-root user"
 
         rlPhaseStartTest "ipa-ctl-27: bugzilla 674342 - ipactl status return code 0 on error"
 		rlRun "service dirsrv stop $RELM" 0 "stop the $RELM directory server instance"
-		rlRun "ipactl status" 1 "Get the status of ipactl service and verify non zero return code"
+		rlRun "ipactl status" 3 "Get the status of ipactl service and verify non zero return code"
 		rlRun "service dirsrv start $RELM" 0 "restart the $RELM directory server instance"
         rlPhaseEnd
 
