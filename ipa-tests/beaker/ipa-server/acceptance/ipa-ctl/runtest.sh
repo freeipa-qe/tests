@@ -292,7 +292,7 @@ rlJournalStart
         rlPhaseEnd
 
 	rlPhaseStartTest "ipa-ctl-23: stop services as non-root user"
-		rlRun "su testuserqa -c 'ipactl stop'" 1 "Insufficient rights, starting service as nonprivileged user"
+		rlRun "su testuserqa -c 'ipactl stop'" 4 "Insufficient rights, starting service as nonprivileged user"
 		rlRun "ps xa | grep -v grep |grep httpd" 0 "Checking to ensure that httpd is still running"
 		rlRun "ps xa | grep -v grep |grep named" 0 "Checking to ensure that named is still running"
 		rlRun "ps xa | grep -v grep |grep ipa_kpasswd" 0 "Checking to ensure that is still running"
@@ -303,7 +303,7 @@ rlJournalStart
 
         rlPhaseStartTest "ipa-ctl-24: start services as non-root user"
 		rlRun "ipactl stop" 0 "Stop services as root first"
-                rlRun "su testuserqa -c 'ipactl start'" 1 "Insufficient rights, starting service as nonprivileged user"
+                rlRun "su testuserqa -c 'ipactl start'" 4 "Insufficient rights, starting service as nonprivileged user"
                 rlRun "ps xa | grep -v grep |grep httpd" 1 "Checking to ensure that httpd is NOT running"
                 rlRun "ps xa | grep -v grep |grep named" 1 "Checking to ensure that named is NOT running"
                 rlRun "ps xa | grep -v grep |grep ipa_kpasswd" 1 "Checking to ensure that is NOT running"
@@ -315,7 +315,7 @@ rlJournalStart
 rlPhaseStartTest "ipa-ctl-25: restart services as non-root user"
                 rlRun "ipactl start" 0 "Start services as root first"
 		getServicePIDs
-                rlRun "su testuserqa -c 'ipactl restart'" 1 "Insufficient rights, starting service as nonprivileged user"
+                rlRun "su testuserqa -c 'ipactl restart'" 4 "Insufficient rights, starting service as nonprivileged user"
 		# verify kpasswd was not restarted
 		newPID=`ps -e | grep ipa_kpasswd | awk '{print $1}'`
                 rlLog "previous ipa_kpasswd pid is $newPID"
