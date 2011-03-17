@@ -67,6 +67,10 @@ rlJournalStart
 		if [ $rc -eq 0 ] ; then
 			installMaster
 			rhts-sync-set -s READY
+			rlLog "Setting up Authorized keys"
+        		SetUpAuthKey
+        		rlLog "Setting up known hosts file"
+        		SetUpKnownHosts
 		fi
 	else
 		rlLog "Machine in recipe in not a MASTER"
@@ -92,6 +96,10 @@ rlJournalStart
 		if [ $rc -eq 0 ] ; then
 			rhts-sync-block -s READY $MASTER
                 	installSlave
+			rlLog "Setting up Authorized keys"
+                        SetUpAuthKey
+                        rlLog "Setting up known hosts file"
+                        SetUpKnownHosts
         	fi
         else
                 rlLog "Machine in recipe in not a SLAVE"
@@ -117,15 +125,14 @@ rlJournalStart
 		if [ $rc -eq 0 ] ; then
                         rhts-sync-block -s READY $MASTER
                 	installClient
+			rlLog "Setting up Authorized keys"
+                        SetUpAuthKey
+                        rlLog "Setting up known hosts file"
+                        SetUpKnownHosts
         	fi
         else
                 rlLog "Machine in recipe in not a CLIENT"
         fi
-
-	rlLog "Setting up Authorized keys"
-	SetUpAuthKey
-	rlLog "Setting up known hosts file"
-        SetUpKnownHosts
 
    rlJournalPrintText
    report=/tmp/rhts.report.$RANDOM.txt
