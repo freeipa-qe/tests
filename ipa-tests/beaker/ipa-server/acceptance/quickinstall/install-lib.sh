@@ -95,8 +95,77 @@ appendEnv()
   rlLog "Contents of env.sh are"
   output=`cat /dev/shm/env.sh`
   rlLog "$output"
+}
 
-  return
+#################################################################
+#  SetUpAuthKeys ... all hosts will have the same public and    #
+#    private key for the root user                              #
+#################################################################
+SetUpAuthKeys()
+{
+   PUBKEY=/dev/shm/id_rsa_global.pub
+   PRIVATEKEY=/dev/shm/id_rsa_global
+   SSHROOT=/root/.ssh/
+   PUBKEYFILE=$SSHR0OT/id_rsa
+   AUTHKEYFILE=$SSHROOT/authorized_keys
+   ls $SSHROOT
+   if [ $? -ne 0 ] ; then
+        make dir $SSHROOT
+   else
+        rlLog "/root/.ssh/ directory exists"
+   fi
+
+   # set up authorized keys
+   cp -f $PUBKEY $PUBKEYFILE
+   cat $PUBKEY >> $AUTHKEYFILE
+   sed -i -e "s/localhost/$MASTER/g" $AUTHKEYFILE
+
+   for s in $SLAVE ; do
+        cat $PUBKEY  >> $SSHROOT/authorized_keys
+        sed -i -e "s/localhost/$s/g" $AUTHKEYFILE
+   done
+
+   for s in $CLIENT ; do
+        cat $PUBKEY  >> $SSHROOT/authorized_keys
+        sed -i -e "s/localhost/$s/g" $AUTHKEYFILE
+   done
+
+   rlLog "Authorized Keys are:"
+   authkeys=`cat $AUTHKEYFILE`
+   rlLog "$authkeys"
+
+   # copy corresponding public key
+   cp -f $PUBKEY $PUBKEYFILE
+   rlLog "Private key is:"
+   privatekey=`cat $SSHROOT/id_rsa`
+   rlLog "$privatekey"
+
+}
+
+##########################################################
+#  SetUpKnowHosts  ... all hosts will share the same key #
+##########################################################
+SetUpKnownHosts()
+{
+  for s in $CLIENT; do
+  	if [ "$s" != "" ]; then
+  		AddToKnownHosts $s
+  	fi
+  done
+  for s in $MASTER; do
+  	if [ "$s" != "" ]; then
+  		AddToKnownHosts $s
+  	fi
+  done
+  for s in $SLAVE; do
+  	if [ "$s" != "" ]; then
+  		AddToKnownHosts $s
+  	fi
+  done
+
+   rlLog "Known Hosts are:"
+   knownhosts=`cat $KNOWNHOSTS`
+   rlLog "$knownhosts"
 }
 
 
