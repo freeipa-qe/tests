@@ -19,7 +19,6 @@ installMaster()
 		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
 	fi
 
-	rlRun "appendEnv" 0 "Append the machine information to the env.sh with the information for the machines in the recipe set"
 	rlRun "SetUpAuthKeys" 0 "Setting up authorized keys file"
 	rlRun "SetUpKnownHosts" 0 "Setting up know hosts file"
    rlPhaseEnd
@@ -40,6 +39,10 @@ installMaster()
                 done
 	fi
 
+	rlRun "appendEnv" 0 "Append the machine information to the env.sh with the information for the machines in the recipe set"
+        rlRun "SetUpAuthKeys" 0 "Setting up authorized keys file"
+        rlRun "SetUpKnownHosts" 0 "Setting up know hosts file"
+
    rlPhaseEnd
 
 }
@@ -50,7 +53,6 @@ installSlave()
 	rlRun "/etc/init.d/ntpd stop" 0 "Stopping the ntp server"
 	rlRun "ntpdate $NTPSERVER" 0 "Synchronzing clock with valid time server"
         rlRun "AddToKnownHosts $MASTER" 0 "Adding master to known hosts"
-        rlRun "SetUpAuthKeys" 0 "Setting up authorized keys file"
         cd /dev/shm/
         hostname_s=$(hostname -s)
         rlRun "sftp root@$MASTER:/var/lib/ipa/replica-info-$hostname_s.$DOMAINi.gpg" 0 "Get replica package"
@@ -92,8 +94,6 @@ installClient()
 		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
 	fi
 
-	rlRun "SetUpAuthKeys" 0 "Setting up authorized keys file"
-	rlRun "SetUpKnownHosts" 0 "Setting up known hosts file"
 	rlRun "appendEnv" 0 "Append the machine information to the env.sh with the information for the machines in the recipe set"
    rlPhaseEnd
 }

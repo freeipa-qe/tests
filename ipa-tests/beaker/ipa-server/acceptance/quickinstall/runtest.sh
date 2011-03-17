@@ -121,6 +121,12 @@ rlJournalStart
         else
                 rlLog "Machine in recipe in not a CLIENT"
         fi
+
+	rlLog "Setting up Authorized keys"
+	SetUpAuthKey
+	rlLog "Setting up known hosts file"
+        SetUpKnownHosts
+
    rlJournalPrintText
    report=/tmp/rhts.report.$RANDOM.txt
    makereport $report
