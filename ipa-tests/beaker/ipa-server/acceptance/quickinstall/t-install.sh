@@ -12,15 +12,12 @@ installMaster()
 	if [ -z $SKIPINSTALL ] ; then
 		echo "ipa-server-install --setup-dns --forwarder=$DNSFORWARD --hostname=$hostname_s.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U" > /dev/shm/installipa.bash
 		rlLog "EXECUTING: ipa-server-install --setup-dns --forwarder=$DNSFORWARD --hostname=$hostname_s.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U"
-        	setenforce 0
+        	setenforce 1
 		chmod 755 /dev/shm/installipa.bash
         	rlRun "/bin/bash /dev/shm/installipa.bash" 0 "Installing IPA Server"
 		# test kinit
 		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
 	fi
-
-	rlRun "SetUpAuthKeys" 0 "Setting up authorized keys file"
-	rlRun "SetUpKnownHosts" 0 "Setting up know hosts file"
    rlPhaseEnd
 
    rlPhaseStartTest "Create Replica Package(s)"
@@ -40,8 +37,7 @@ installMaster()
 	fi
 
 	rlRun "appendEnv" 0 "Append the machine information to the env.sh with the information for the machines in the recipe set"
-        rlRun "SetUpAuthKeys" 0 "Setting up authorized keys file"
-        rlRun "SetUpKnownHosts" 0 "Setting up know hosts file"
+	service iptables stop
 
    rlPhaseEnd
 
@@ -55,7 +51,7 @@ installSlave()
         rlRun "AddToKnownHosts $MASTER" 0 "Adding master to known hosts"
         cd /dev/shm/
         hostname_s=$(hostname -s)
-        rlRun "sftp root@$MASTER:/var/lib/ipa/replica-info-$hostname_s.$DOMAINi.gpg" 0 "Get replica package"
+        rlRun "sftp root@$MASTER:/var/lib/ipa/replica-info-$hostname_s.$DOMAIN.gpg" 0 "Get replica package"
         rlLog "Checking for existance of replica gpg file"
         ls /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg
         if [ $? -ne 0 ] ; then
