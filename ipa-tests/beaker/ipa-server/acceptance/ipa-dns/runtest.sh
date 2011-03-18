@@ -270,15 +270,17 @@ fi
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-33: delete record of type A"
-		rlRun "ipa dnsrecord-del $zone a --a-rec $a" 0 "delete record type a"
+		rlRun "ipa dnsrecord-del $zone allll --a-rec $a" 0 "delete record type a"
 	rlPhaseEnd
 
+	/etc/init.d/named restart
+
 	rlPhaseStartTest "ipa-dns-34: make sure that IPA deleted record type A"
-		rlRun "ipa dnsrecord-find $zone a" 1 "make sure ipa deleted record type A"
+		rlRun "ipa dnsrecord-find $zone allll" 1 "make sure ipa deleted record type A"
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-35: make sure that dig can not find the record type A"
-		rlRun "dig a.$zone A | grep $a" 1 "make sure dig can not find the A record"
+		rlRun "dig allll.$zone A | grep $a" 1 "make sure dig can not find the A record"
 	rlPhaseEnd
 
 	# Type Multiple A's
@@ -307,6 +309,8 @@ fi
 	rlPhaseStartTest "ipa-dns-41: delete record of type multiple A"
 		rlRun "ipa dnsrecord-del $zone a2 --a-rec $a2" 0 "delete record type multiple a"
 	rlPhaseEnd
+
+	/etc/init.d/named restart
 
 	rlPhaseStartTest "ipa-dns-42: make sure that IPA removed the first type A record"
 		thisa=$(echo $a2 | sed s/,/\ /g | awk '{print $1}')
@@ -343,6 +347,8 @@ fi
 		rlRun "ipa dnsrecord-del $zone aaaa --aaaa-rec $aaaa" 0 "delete record type AAAA"
 	rlPhaseEnd
 
+	/etc/init.d/named restart
+
 	rlPhaseStartTest "ipa-dns-50: make sure that IPA deleted record type AAAA"
 		rlRun "ipa dnsrecord-find $zone aaaa" 1 "make sure ipa deleted record type AAAA"
 	rlPhaseEnd
@@ -370,6 +376,8 @@ fi
 		rlRun "ipa dnsrecord-del $zone afsdb --afsdb-rec $afsdb" 0 "delete record type afsdb"
 	rlPhaseEnd
 
+	/etc/init.d/named restart
+
 	rlPhaseStartTest "ipa-dns-56: make sure that IPA deleted record type afsdb"
 		rlRun "ipa dnsrecord-find $zone afsdb" 1 "make sure ipa deleted record type afsdb"
 	rlPhaseEnd
@@ -394,6 +402,8 @@ fi
 	rlPhaseStartTest "ipa-dns-60: delete record of type cname"
 		rlRun "ipa dnsrecord-del $zone cname --cname-rec $cname" 0 "delete record type cname"
 	rlPhaseEnd
+
+	/etc/init.d/named restart
 
 	rlPhaseStartTest "ipa-dns-61: make sure that IPA deleted record type cname"
 		rlRun "ipa dnsrecord-find $zone cname" 1 "make sure ipa deleted record type cname"
@@ -421,6 +431,8 @@ fi
 		rlRun "ipa dnsrecord-del $zone txt --txt-rec $txt" 0 "delete record type txt"
 	rlPhaseEnd
 
+	/etc/init.d/named restart
+
 	rlPhaseStartTest "ipa-dns-68: make sure that IPA deleted record type txt"
 		rlRun "ipa dnsrecord-find $zone txt" 1 "make sure ipa deleted record type txt"
 	rlPhaseEnd
@@ -443,8 +455,10 @@ fi
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-73: delete record of type srv"
-		rlRun "ipa dnsrecord-del $zone _srv --srv-rec $srv" 0 "delete record type srv"
+		rlRun "ipa dnsrecord-del --del-all $zone _srv" 0 "delete record type srv"
 	rlPhaseEnd
+
+	/etc/init.d/named restart
 
 	rlPhaseStartTest "ipa-dns-74: make sure that IPA deleted record type srv"
 		rlRun "ipa dnsrecord-find $zone _srv" 1 "make sure ipa deleted record type srv"
@@ -470,6 +484,8 @@ fi
 	rlPhaseStartTest "ipa-dns-79: delete record of type MX"
 		rlRun "ipa dnsrecord-del $zone @ --mx-rec $mx" 0 "delete record type MX"
 	rlPhaseEnd
+
+	/etc/init.d/named restart
 
 	rlPhaseStartTest "ipa-dns-80: make sure that IPA deleted record type MX"
 		rlRun "ipa dnsrecord-find $zone @ | grep $mx" 1 "make sure ipa deleted record type MX"
@@ -575,6 +591,8 @@ fi
 		rlRun "ipa dnsrecord-del $ptrzone $ptr --ptr-rec $ptrvalue" 0 "delete record type PTR"
 	rlPhaseEnd
 
+	/etc/init.d/named restart
+
 	rlPhaseStartTest "ipa-dns-105: make sure that IPA deleted record type PTR"
 		rlRun "ipa dnsrecord-find $ptrzone $ptr | grep $ptrvalue" 1 "make sure ipa deleted record type PTR"
 	rlPhaseEnd
@@ -599,6 +617,8 @@ fi
 	rlPhaseStartTest "ipa-dns-110: delete record of type NAPTR"
 		rlRun "ipa dnsrecord-del $zone naptr --naptr-rec '$naptr'" 0 "delete record type NAPTR"
 	rlPhaseEnd
+
+	/etc/init.d/named restart
 
 	rlPhaseStartTest "ipa-dns-111: make sure that IPA deleted record type NAPTR"
 		rlRun "ipa dnsrecord-find $zone naptr" 1 "make sure ipa deleted record type NAPTR"
@@ -651,6 +671,8 @@ fi
 		rlRun "ipa dnsrecord-del $zone dname --dname-rec $dname" 0 "delete record type dname"
 	rlPhaseEnd
 
+	/etc/init.d/named restart
+
 	rlPhaseStartTest "ipa-dns-123: make sure that IPA deleted record type dname"
 		rlRun "ipa dnsrecord-find $zone dname" 1 "make sure ipa deleted record type dname"
 	rlPhaseEnd
@@ -676,6 +698,8 @@ fi
 	rlPhaseStartTest "ipa-dns-128: delete record of type cert"
 		rlRun "ipa dnsrecord-del $zone cert --cert-rec $cert" 0 "delete record type cert"
 	rlPhaseEnd
+
+	/etc/init.d/named restart
 
 	rlPhaseStartTest "ipa-dns-129: make sure that IPA deleted record type cert"
 		rlRun "ipa dnsrecord-find $zone cert" 1 "make sure ipa deleted record type cert"
@@ -703,6 +727,8 @@ fi
 	rlPhaseStartTest "ipa-dns-134: delete record of type kx"
 		rlRun "ipa dnsrecord-del $zone @ --kx-rec '$kxpref1 $zone'" 0 "delete record type kx"
 	rlPhaseEnd
+
+	/etc/init.d/named restart
 
 	rlPhaseStartTest "ipa-dns-135: make sure that IPA deleted record type kx"
 		rlRun "ipa dnsrecord-find $zone kx" 1 "make sure ipa deleted record type kx"
@@ -748,6 +774,8 @@ fi
 		rlRun "ipa dnsrecord-del $zone @ --loc-rec '$loc'" 0 "delete record type loc"
 	rlPhaseEnd
 
+	/etc/init.d/named restart
+
 	rlPhaseStartTest "ipa-dns-145: make sure that IPA deleted record type loc"
 		rlRun "ipa dnsrecord-find $zone loc" 1 "make sure ipa deleted record type loc"
 	rlPhaseEnd
@@ -757,6 +785,13 @@ fi
 		rlRun "dig $zone loc | grep $loclong" 1 "make sure dig can not find the loc record"
 	rlPhaseEnd
 
+	rlPhaseStartTest "ipa-dns-147: Delete the created zone"
+		rlRun "ipa dnszone-del $zone" 0 "Delete the zone created for this test"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-148: Make sure zone got deleted properly"
+		rlRun "ipa dnszone-find $zone" 1 "Make sure zone delete happened properly"
+	rlPhaseEnd
 
 	rlJournalPrintText
 	report=/tmp/rhts.report.$RANDOM.txt
