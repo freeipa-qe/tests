@@ -68,7 +68,7 @@ rlJournalStart
 			installMaster
 			rhts-sync-set -s READY
 			rlLog "Setting up Authorized keys"
-        		SetUpAuthKey
+        		SetUpAuthKeys
         		rlLog "Setting up known hosts file"
         		SetUpKnownHosts
 		fi
@@ -96,8 +96,9 @@ rlJournalStart
 		if [ $rc -eq 0 ] ; then
 			rhts-sync-block -s READY $MASTER
                 	installSlave
-			rlLog "Setting up Authorized keys"
-                        SetUpAuthKey
+			rhts-sync-set -s READY
+                        rlLog "Setting up Authorized keys"
+                        SetUpAuthKeys
                         rlLog "Setting up known hosts file"
                         SetUpKnownHosts
         	fi
@@ -125,8 +126,9 @@ rlJournalStart
 		if [ $rc -eq 0 ] ; then
                         rhts-sync-block -s READY $MASTER
                 	installClient
-			rlLog "Setting up Authorized keys"
-                        SetUpAuthKey
+			rhts-sync-set -s READY
+                        rlLog "Setting up Authorized keys"
+                        SetUpAuthKeys
                         rlLog "Setting up known hosts file"
                         SetUpKnownHosts
         	fi
