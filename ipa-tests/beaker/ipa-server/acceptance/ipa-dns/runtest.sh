@@ -232,7 +232,7 @@ fi
 	cname="m.l.k."
 	dname="bar.$zone."
 	txt="none=1.2.3.4"
-	mx="9.78.7.6"
+	mx="10 9.78.7.6"
 	ptroctet="4.4.4"
 	ptrzone="$ptroctet.in-addr.arpa"
 	ptr="8"
