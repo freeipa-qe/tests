@@ -45,6 +45,8 @@ installSlave()
 {
    rlPhaseStartSetup "Install IPA REPLICA Server"
 	rlRun "/etc/init.d/ntpd stop" 0 "Stopping the ntp server"
+	# stop the firewall
+        service iptables stop
 	rlRun "ntpdate $NTPSERVER" 0 "Synchronzing clock with valid time server"
         rlRun "AddToKnownHosts $MASTER" 0 "Adding master to known hosts"
         cd /dev/shm/
@@ -70,9 +72,6 @@ installSlave()
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
                 rlRun "appendEnv" 0 "Append the machine information to the env.sh with the information for the machines in the recipe set"
         fi
-
-	# stop the firewall
-	service iptables stop
    rlPhaseEnd
  
 }
