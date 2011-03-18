@@ -36,7 +36,7 @@
 # include tests
 . ./t-install.sh
 
-SERVER_PACKAGES="ipa-server ipa-client ipa-admintools ds-replication bind expect krb5-workstation bind-dyndb-ldap ntpdate krb5-pkinit-openssl ds-replication"
+SERVER_PACKAGES="ipa-server ipa-client ipa-admintools bind expect krb5-workstation bind-dyndb-ldap ntpdate krb5-pkinit-openssl"
 CLIENT_PACKAGES="ipa-admintools ipa-client httpd mod_nss mod_auth_kerb 389-ds-base expect ntpdate"
 
 rlJournalStart
@@ -53,7 +53,14 @@ rlJournalStart
 	rc=0
 	echo $MASTER | grep $HOSTNAME
 	if [ $? -eq 0 ] ; then
-		yum -y install $SERVER_PACKAGES
+		if [ -n $SNAPSHOT ] ; then
+			yum -y install $SERVER_PACKAGES
+			yum -y install ds-replication
+		else
+			yum -y install --disablerepo=ipa --disablerepo=ipa_noarch $SERVER_PACKAGES
+			yum -y install ds-replication
+		fi
+
 		for item in $SERVER_PACKAGES ; do
 			rpm -qa | grep $item
 			if [ $? -eq 0 ] ; then
@@ -82,7 +89,14 @@ rlJournalStart
 	rc=0
         echo $SLAVE | grep $HOSTNAME
         if [ $? -eq 0 ] ; then
-		yum -y install $SERVER_PACKAGES
+		if [ -n $SNAPSHOT ] ; then
+                        yum -y install $SERVER_PACKAGES 
+                        yum -y install ds-replication
+                else
+                        yum -y install --disablerepo=ipa --disablerepo=ipa_noarch $SERVER_PACKAGES
+                        yum -y install ds-replication
+                fi
+
                 for item in $SERVER_PACKAGES ; do
                         rpm -qa | grep $item
                         if [ $? -eq 0 ] ; then
