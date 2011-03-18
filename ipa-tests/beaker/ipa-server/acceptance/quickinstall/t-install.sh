@@ -85,6 +85,8 @@ installClient()
 	rlRun "fixhostname" 0 "Fix hostname"
         rlRun "fixResolv" 0 "fixing the reoslv.conf to contain the correct nameserver lines"
 	if [ -n $SKIPINSTALL ] ; then
+		master_short=`echo $MASTER | cut -d "." -f1`
+  		MASTER=$master_short.$DOMAIN
 		rlLog "EXECUTING: ipa-client-install --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW -U --server=$MASTER"
         	rlRun "ipa-client-install --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW -U --server=$MASTER" 0 "Installing ipa client and configuring"
 		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
