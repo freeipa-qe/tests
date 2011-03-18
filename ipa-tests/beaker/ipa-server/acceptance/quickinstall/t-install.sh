@@ -9,7 +9,7 @@ installMaster()
 	rlRun "ntpdate $NTPSERVER" 0 "Synchronzing clock with valid time server"
 	rlRun "fixHostFile" 0 "Set up /etc/hosts"
 	rlRun "fixhostname" 0 "Fix hostname"
-	if [ -z $SKIPINSTALL ] ; then
+	if [ -n $SKIPINSTALL ] ; then
 		echo "ipa-server-install --setup-dns --forwarder=$DNSFORWARD --hostname=$hostname_s.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U" > /dev/shm/installipa.bash
 		rlLog "EXECUTING: ipa-server-install --setup-dns --forwarder=$DNSFORWARD --hostname=$hostname_s.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U"
         	setenforce 1
@@ -21,24 +21,22 @@ installMaster()
    rlPhaseEnd
 
    rlPhaseStartTest "Create Replica Package(s)"
-	if [ -n $SKIPINSTALL ] ; then
-        	for s in $SLAVE; do
-                	if [ "$s" != "" ]; then
-                        	# Determine the IP of the slave to be used when creating the replica file.
-                                ipofs=$(dig +noquestion $s  | grep $s | grep IN | awk '{print $5}')
-                                # put the short form of the hostname for server $s into s_short
-                                hostname_s=$(echo $s | cut -d. -f1)
-                                rlLog "IP of server $s is resolving as $ipofs, using short hostname of $hostname_s" 
-                                rlRun "ipa-replica-prepare -p $ADMINPW --ip-address=$ipofs $hostname_s.$DOMAIN" 0 "Creating replica package"
-			else
-				rlLog "No SLAVES in current recipe set."
-                     	fi
-                done
-	fi
+       	for s in $SLAVE; do
+               	if [ "$s" != "" ]; then
+                       	# Determine the IP of the slave to be used when creating the replica file.
+                        ipofs=$(dig +noquestion $s  | grep $s | grep IN | awk '{print $5}')
+                        # put the short form of the hostname for server $s into s_short
+                        hostname_s=$(echo $s | cut -d. -f1)
+                        rlLog "IP of server $s is resolving as $ipofs, using short hostname of $hostname_s" 
+                        rlRun "ipa-replica-prepare -p $ADMINPW --ip-address=$ipofs $hostname_s.$DOMAIN" 0 "Creating replica package"
+		else
+			rlLog "No SLAVES in current recipe set."
+              	fi
+        done
 
 	rlRun "appendEnv" 0 "Append the machine information to the env.sh with the information for the machines in the recipe set"
+	# stop the firewall
 	service iptables stop
-
    rlPhaseEnd
 
 }
@@ -73,6 +71,8 @@ installSlave()
                 rlRun "appendEnv" 0 "Append the machine information to the env.sh with the information for the machines in the recipe set"
         fi
 
+	# stop the firewall
+	service iptables stop
    rlPhaseEnd
  
 }
