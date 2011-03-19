@@ -507,7 +507,7 @@ fi
 
 # Create a PTR zone
 	rlPhaseStartTest "ipa-dns-84: try to create a new PTR zone"
-		rlRun "ipa dnszone-add --name-server=$ipaddr --admin-email=$pemail --serial=$pserial --refresh=$prefresh --retry=$pretry --expire=$pexpire --minimum=$pminimum --ttl=$pttl pzone" 1 "trying to create a zone using a bad refresh"
+		rlRun "ipa dnszone-add --name-server=$ipaddr --admin-email=$pemail --serial=$pserial --refresh=$prefresh --retry=$pretry --expire=$pexpire --minimum=$pminimum --ttl=$pttl $pzone" 1 "trying to create a zone using a bad refresh"
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-85: checking to ensure that the new PTR zone got created with the correct name-server"
