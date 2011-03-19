@@ -789,8 +789,16 @@ fi
 		rlRun "ipa dnszone-del $zone" 0 "Delete the zone created for this test"
 	rlPhaseEnd
 
-	rlPhaseStartTest "ipa-dns-148: Make sure zone got deleted properly"
-		rlRun "ipa dnszone-find $zone" 1 "Make sure zone delete happened properly"
+	rlPhaseStartTest "ipa-dns-148: Make sure zone the got deleted properly"
+		rlRun "ipa dnszone-find $zone" 1 "Make sure the zone delete happened properly"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-149: Delete the created ptr zone"
+		rlRun "ipa dnszone-del pzone" 0 "Delete the ptr zone created for this test"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-150: Make sure the ptr zone got deleted properly"
+		rlRun "ipa dnszone-find $zone" 1 "Make sure the ptr zone delete happened properly"
 	rlPhaseEnd
 
 	rlJournalPrintText
