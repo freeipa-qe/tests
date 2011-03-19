@@ -228,7 +228,7 @@ fi
 	aaaabad2="aaaa:bbbb:cccc:dddd:eeee:fffff"
 	afsdb="green.femto.edu."
 	certa="PGP 0 0"
-	cert="mQGiBECBGdARUDlCcltS/8Xtw=="
+	cert="HC1AAH5t0b9xzRojScUBtVOUObTkFdb/tN81G2MmDL8AXr+tFlJ4J76cckH45wgSRVpIIiH6xdG8pifxp5+D2g=="
 	cname="m.l.k."
 	dname="bar.$zone."
 	txt="none=1.2.3.4"
@@ -332,7 +332,7 @@ fi
 
 	# Type AAAA
 	rlPhaseStartTest "ipa-dns-46: add record of type AAAA"
-		rlRun "ipa dnsrecord-add $zone aaaa --aaaa-rec $aaaa" 0 "add record type AAAA"
+		rlRun "ipa dnsrecord-add $zone aaaa --aaaa-rec='$aaaa'" 0 "add record type AAAA"
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-47: make sure that IPA saved record type AAAA"
@@ -340,7 +340,7 @@ fi
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-48: make sure that dig can find the record type AAAA"
-		rlRun "dig aaaa.$zone | grep $aaaa" 0 "make sure dig can find the AAAA record"
+		rlRun "dig aaaa.$zone AAAA | grep $aaaa" 0 "make sure dig can find the AAAA record"
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-49: delete record of type AAAA"
@@ -470,7 +470,7 @@ fi
 
 	# MX record 
 	rlPhaseStartTest "ipa-dns-76: add record of type MX"
-		rlRun "ipa dnsrecord-add $zone @ --mx-rec $mx" 0 "add record type MX"
+		rlRun "ipa dnsrecord-add $zone @ --mx-rec '$mx'" 0 "add record type MX"
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-77: make sure that IPA saved record type MX"
@@ -763,7 +763,7 @@ fi
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-142: make sure that IPA saved record type loc"
-		rlRun "ipa dnsrecord-find $zone @ | grep '$loclong'" 0 "make sure ipa recieved record type loc"
+		rlRun "ipa dnsrecord-find $zone | grep '$loclong'" 0 "make sure ipa recieved record type loc"
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-143: make sure that dig can find the record type loc"
