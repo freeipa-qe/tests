@@ -361,7 +361,7 @@ fi
 
 	# Type afsbd
 	rlPhaseStartTest "ipa-dns-52: add record of type afsdb"
-		rlRun "ipa dnsrecord-add $zone afsdb --afsdb-rec $afsdb" 0 "add record type afsdb"
+		rlRun "ipa dnsrecord-add $zone afsdb --afsdb-rec='0 $afsdb'" 0 "add record type afsdb"
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-53: make sure that IPA saved record type afsdb"
@@ -373,7 +373,7 @@ fi
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-55: delete record of type afsdb"
-		rlRun "ipa dnsrecord-del $zone afsdb --afsdb-rec $afsdb" 0 "delete record type afsdb"
+		rlRun "ipa dnsrecord-del $zone afsdb --afsdb-rec='0 $afsdb'" 0 "delete record type afsdb"
 	rlPhaseEnd
 
 	/etc/init.d/named restart
