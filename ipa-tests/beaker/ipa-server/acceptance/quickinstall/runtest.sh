@@ -36,6 +36,7 @@
 # include tests
 . ./t-install.sh
 
+PACKAGE="ipa-server"
 SERVER_PACKAGES="ipa-server ipa-client ipa-admintools bind expect krb5-workstation bind-dyndb-ldap ntpdate krb5-pkinit-openssl"
 CLIENT_PACKAGES="ipa-admintools ipa-client httpd mod_nss mod_auth_kerb 389-ds-base expect ntpdate"
 
