@@ -9,7 +9,7 @@ installMaster()
 	rlRun "ntpdate $NTPSERVER" 0 "Synchronzing clock with valid time server"
 	rlRun "fixHostFile" 0 "Set up /etc/hosts"
 	rlRun "fixhostname" 0 "Fix hostname"
-	if [ -n $SKIPINSTALL ] ; then
+	if [[ "$SKIPINSTALL" != "TRUE" ]] ; then
 		echo "ipa-server-install --setup-dns --forwarder=$DNSFORWARD --hostname=$hostname_s.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U" > /dev/shm/installipa.bash
 		rlLog "EXECUTING: ipa-server-install --setup-dns --forwarder=$DNSFORWARD --hostname=$hostname_s.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U"
         	setenforce 1
@@ -64,7 +64,7 @@ installSlave()
         	rlRun "fixhostname" 0 "Fix hostname"
         	rlRun "fixResolv" 0 "fixing the reoslv.conf to contain the correct nameserver lines"
 	
-		if [ -n $SKIPINSTALL ] ; then
+		if [[ "$SKIPINSTALL" != "TRUE" ]] ; then
 			echo "ipa-replica-install -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg" > /dev/shm/replica-install.bash
                 	chmod 755 /dev/shm/replica-install.bash
                 	rlLog "EXECUTING: ipa-replica-install -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg"
@@ -89,7 +89,7 @@ installClient()
 	rlRun "fixhostname" 0 "Fix hostname"
         rlRun "fixResolv" 0 "fixing the reoslv.conf to contain the correct nameserver lines"
 	rlLog "SKIPINSTALL: $SKIPINSTALL"
-	if [ -n $SKIPINSTALL ] ; then
+	if [[ "$SKIPINSTALL" != "TRUE" ]] ; then	
 		master_short=`echo $MASTER | cut -d "." -f1`
   		MASTER=$master_short.$DOMAIN
 		rlLog "EXECUTING: ipa-client-install --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW -U --server=$MASTER"
