@@ -51,27 +51,31 @@ installSlave()
         rlRun "AddToKnownHosts $MASTER" 0 "Adding master to known hosts"
         cd /dev/shm/
         hostname_s=$(hostname -s)
-        rlRun "sftp root@$MASTER:/var/lib/ipa/replica-info-$hostname_s.$DOMAIN.gpg" 0 "Get replica package"
+        rlRun "sftp root@$MASTER:/var/lib/ipa/replica-info-$hostname_s.$DOMAIN" 0 "Get replica package"
         rlLog "Checking for existance of replica gpg file"
         ls /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg
         if [ $? -ne 0 ] ; then
                 rlFail "ERROR: Replica Package not found"
         else
-                MASTERIP=$(dig +noquestion $MASTER  | grep $MASTER | grep IN | awk '{print $5}')
-                rlRun "fixHostFile" 0 "Set up /etc/hosts"
-                rlRun "fixhostname" 0 "Fix hostname"
-                rlRun "fixResolv" 0 "fixing the reoslv.conf to contain the correct nameserver lines"
+       		rlRun "/etc/init.d/ntpd stop" 0 "Stopping the ntp server"
+        	rlRun "ntpdate $NTPSERVER" 0 "Synchronzing clock with valid time server"
+		MASTERIP=$(dig +noquestion $MASTER  | grep $MASTER | grep IN | awk '{print $5}')
+        	rlRun "fixHostFile" 0 "Set up /etc/hosts"
+        	rlRun "fixhostname" 0 "Fix hostname"
+        	rlRun "fixResolv" 0 "fixing the reoslv.conf to contain the correct nameserver lines"
+	
+		if [ -n $SKIPINSTALL ] ; then
+			echo "ipa-replica-install -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg" > /dev/shm/replica-install.bash
+                	chmod 755 /dev/shm/replica-install.bash
+                	rlLog "EXECUTING: ipa-replica-install -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg"
+			rlRun "bash /dev/shm/replica-install.bash" 0 "Replica installation"
+		fi
 
-                if [ -n $SKIPINSTALL ] ; then
-                        echo "ipa-replica-install -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg" > /dev/shm/replica-install.bash
-                        chmod 755 /dev/shm/replica-install.bash
-                        rlLog "EXECUTING: ipa-replica-install -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg"
-                        rlRun "bash /dev/shm/replica-install.bash" 0 "Replica installation"
-                fi
-
-                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
-                rlRun "appendEnv" 0 "Append the machine information to the env.sh with the information for the machines in the recipe set"
-        fi
+		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
+		rlRun "appendEnv" 0 "Append the machine information to the env.sh with the information for the machines in the recipe set"
+	fi
+	# stop the firewall
+	service iptables stop
    rlPhaseEnd
  
 }
@@ -79,7 +83,8 @@ installSlave()
 installClient()
 {
    rlPhaseStartSetup "Install IPA Client"
-	rlRun "ntpdate $NTPSERVER" 0 "Synchronzing clock with corporate time server"
+	rlRun "/etc/init.d/ntpd stop" 0 "Stopping the ntp server"
+	rlRun "ntpdate $NTPSERVER" 0 "Synchronzing clock with corp time server"
 	rlRun "fixHostFile" 0 "Set up /etc/hosts"
 	rlRun "fixhostname" 0 "Fix hostname"
         rlRun "fixResolv" 0 "fixing the reoslv.conf to contain the correct nameserver lines"
@@ -90,7 +95,6 @@ installClient()
         	rlRun "ipa-client-install --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW -U --server=$MASTER" 0 "Installing ipa client and configuring"
 		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
 	fi
-
 	rlRun "appendEnv" 0 "Append the machine information to the env.sh with the information for the machines in the recipe set"
    rlPhaseEnd
 }
