@@ -126,7 +126,12 @@ rlJournalStart
 	rc=0
         echo $CLIENT | grep $HOSTNAME
         if [ $? -eq 0 ] ; then
-		yum -y install $CLIENT_PACKAGES
+		if [ -n $SNAPSHOT ] ; then
+			yum -y install --disablerepo=ipa --disablerepo=ipa_noarch $CLIENT_PACKAGES
+		else
+			yum -y install $CLIENT_PACKAGES
+		fi
+
                 for item in $CLIENT_PACKAGES ; do
 		rpm -qa | grep $item
                         if [ $? -eq 0 ] ; then
