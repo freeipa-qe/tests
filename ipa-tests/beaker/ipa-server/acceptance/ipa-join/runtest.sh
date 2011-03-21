@@ -44,7 +44,8 @@
 . ./t.ipajoin.sh
 . ./t.ipaotp.sh
 
-PACKAGELIST="ipa-admintools ipa-client httpd mod_nss mod_auth_kerb 389-ds-base expect"
+PACKAGE1="ipa-admintools"
+PACKAGE2="ipa-client"
 
 startDate=`date "+%F %r"`
 satrtEpoch=`date "+%s"`
@@ -56,16 +57,16 @@ rlJournalStart
     rlPhaseStartSetup "ipajoin startup: Check for ipa-server package"
         rlAssertRpm $PACKAGE1
         rlAssertRpm $PACKAGE2
-        rlAssertRpm $PACKAGE3
         rlRun "TmpDir=\`mktemp -d\`" 0 "Creating tmp directory"
         rlRun "pushd $TmpDir"
     rlPhaseEnd
 
     # r2d2_test_starts
     # for multi-host test, we need host role detecting
-    echo $CLIENT | grep $HOSTNAME
-    rc=$?
-    if [ $rc -eq 0 ];then
+    Client_hostname=`echo $CLIENT | cut -d"." -f1`
+    Machine_hostname=`echo $HOSTNAME| cut -d"." -f1`
+    if [ "$Client_hostname" = "$Machine_hostname" ]
+    then
         for item in $PACKAGELIST ; do
             rpm -qa | grep $item
             if [ $? -eq 0 ] ; then
@@ -75,7 +76,6 @@ rlJournalStart
             fi
         done
         ipajoin
-        ipaotp
     else
         rlLog "Client defined as [$CLIENT], while Machine is [$HOSTNAME] not test run"
     fi

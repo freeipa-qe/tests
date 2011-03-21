@@ -36,6 +36,7 @@ ipajoin()
     ipa_join_1026  #test_scenario (positive test): [--server;positive;FQDN --bindpw;positive;ValidPW]
     ipa_join_1027  #test_scenario (positive test): [--server;positive;FQDN --keytab;positive;ValidKeytab]
     ipa_join_1028  #test_scenario (negative test): [--bindpw;negative;InvalidPW]
+    ipaotp         # run OTP (one time password) test here
     ipa_join_envcleanup
 } #ipajoin
 

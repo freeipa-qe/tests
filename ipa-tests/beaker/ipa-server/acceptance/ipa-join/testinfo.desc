@@ -1,7 +1,7 @@
 Owner:           Yi Zhang <yzhang@redhat.com>
-Name:            /CoreOS/ipa-server/acceptance/ipajoin
+Name:            /CoreOS/ipa-server/acceptance/ipa-join
 TestVersion:     1.0
-Path:            /mnt/tests/CoreOS/ipa-server/acceptance/ipajoin
+Path:            /mnt/tests/CoreOS/ipa-server/acceptance/ipa-join
 Description:     IPA ipa-join script (CLI) test
 Type:            Regression
 TestTime:        15m

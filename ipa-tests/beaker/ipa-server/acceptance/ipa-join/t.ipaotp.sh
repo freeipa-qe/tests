@@ -11,8 +11,7 @@ ipaotp()
     ipa_otp_1001
     ipa_otp_1002
     ipa_otp_1003
-#    ipa_otp_1004
-#    ipa_otp_1005
+    ipa_otp_1004
     ipa_otp_envcleanup
 } #ipaotp
 
@@ -22,7 +21,7 @@ ipa_otp_envsetup()
         #environment setup starts here
         rlRun "ssh root@$serverFQDN \"echo $ADMINPW | kinit $ADMINID" 0 "kinit at remote ipa server as admin"
         rlRun "ssh root@$serverFQDN \"ipa host-del $clientFQDN\"" 0 "we have to un-join before test starts"
-        rlRun "ssh root@$serverFQDN \"ipa host-add $clientFQDN --password-$OTP\"" 0 "add host back to ipa server and set OTP to [$OTP]"
+        rlRun "ssh root@$serverFQDN \"ipa host-add $clientFQDN --password=$OTP\"" 0 "add host back to ipa server and set OTP to [$OTP]"
         #environment setup ends   here
     rlPhaseEnd
 } #envsetup
@@ -53,8 +52,8 @@ ipa_otp_1001()
 
 ipa_otp_1002()
 {
-    rlPhaseStartTest "ipa_otp_1001: negative, wrong OTP password provided" 
-        local testID="ipa_otp_1001"
+    rlPhaseStartTest "ipa_otp_1002: negative, wrong OTP password provided" 
+        local testID="ipa_otp_1002"
         local tmpout=$TmpDir/ipa_otp_1001.$RANDOM.out
         local hostname_TestValue="$clientFQDN" #hostname;positive;FQDN
         local bindpw_TestValue_Negative="WrongPassword" #bindpw;negative;InvalidPW
@@ -76,4 +75,19 @@ ipa_otp_1003()
         rm $tmpout
     rlPhaseEnd
 } #ipa_otp_1003
+
+ipa_otp_1004()
+{
+    rlPhaseStartTest "ipa_otp_1004 [negative test] use same OTP second time should fail"
+        local testID="ipa_otp_1004"
+        local tmpout=$TmpDir/ipa_otp_1004.$RANDOM.out
+        local hostname_TestValue="$clientFQDN" #hostname;positive;FQDN
+        local bindpw_TestValue=$OTP #bindpw;positive;ValidPW
+        rlRun "ipa-join --hostname=$hostname_TestValue  --bindpw=$OTP" 0 "test options:  [hostname]=[$hostname_TestValue] [bindpw]=[$bindpw_TestValue]" 
+        local expectedErrMsg="Host is already joined"
+        local expectedErrCode=13
+        qaRun "ipa-join --hostname=$hostname_TestValue  --bindpw=$OTP" "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [hostname]=[$hostname_TestValue] [bindpw]=[$OTP]" 
+        rm $tmpout
+    rlPhaseEnd
+} #ipa_otp_1004
 
