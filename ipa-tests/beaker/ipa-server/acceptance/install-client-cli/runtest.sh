@@ -36,7 +36,6 @@
 . ./data.ipaclientinstall.acceptance
 
 # Include test case file
-. ../ipa-delegation/lib.ipadelegation.sh
 . ./t.ipa-client-install.sh
 . ./lib.ipaclientverify.sh
 
@@ -49,34 +48,21 @@ SERVICE="ipa_kpasswd"
 #########################################
 
 rlJournalStart
-    rlPhaseStartSetup "ipadelegation startup: Check for ipa-server package"
-        rlRun "TmpDir=\`mktemp -d\`" 0 "Creating tmp directory"
-        rlRun "pushd $TmpDir"
-    rlPhaseEnd
-
-
-	rlPhaseStartTest "Environment check"
-		echo "$CLIENT" | grep "$HOSTNAME"
-		if [ $? -eq 0 ]; then
-			# This machine is a client
-			rlLog "I am a client"
-                        ipaclientinstall
-		else
-			echo "not a client, CLIENT is $CLIENT"
-			echo "SLAVE list is $SLAVE, MASTER list is $MASTER, CLIENT list is $CLIENT"
-		fi
-	rlPhaseEnd
-
-	rlPhaseStartCleanup
-            # TODO: Should client be uninstalled at end of these tests.
-            # But I do not have a setup piece....so maybe no cleanup piece
-	rlPhaseEnd
-
-#    rlPhaseStartCleanup "ipaclientinstall cleanup"
-#        rlRun "popd"
-#        rlRun "rm -r $TmpDir" 0 "Removing tmp directory"
-#    rlPhaseEnd
-
+   rlPhaseStartTest "Environment Check"
+	echo "$CLIENT" | grep "$HOSTNAME"
+	if [ $? -eq 0 ]; then
+           # This machine is a client
+	   rlLog "I am a client"
+           rlLog "Creating tmp directory"
+           TmpDir=`mktemp -d`
+           pushd $TmpDir
+           ipaclientinstall
+	else
+	   rlLog "Not a client, CLIENT is $CLIENT - not running tests"
+	fi
+   rlPhaseEnd
+#TODO: Should clean TmpDir created above, but will I need it to look at outputs later?
+        
 rlJournalPrintText
 	report=/tmp/rhts.report.$RANDOM.txt
 	makereport $report

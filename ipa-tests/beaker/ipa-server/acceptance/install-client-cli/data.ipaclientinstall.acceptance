@@ -33,6 +33,8 @@ id_provider_nosssd="ldap"
 cache_credentials_nosssd="True"
 auth_provider_nosssd="krb5"
 chpass_provider_nosssd="krb5"
+ipa_dyndns_update="True"
+access_provider_permit="permit"
 
 
 
@@ -61,3 +63,9 @@ USESSSD="yes"
 USESSSDAUTH_nosssd="no"
 USEKERBEROS_nosssd="yes"
 USESSSD_nosssd="no"
+USEMKHOMEDIR="yes"
+
+
+# User used in these tests
+testuser="TestUser"
+testpwd="TestPassword"

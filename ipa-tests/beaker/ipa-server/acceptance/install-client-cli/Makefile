@@ -24,19 +24,16 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-export TEST=/CoreOS/ipa-server/acceptance/install-client
+export TEST=/CoreOS/ipa-server/acceptance/install-client-cli
 export TESTVERSION=1.0
 
 BUILT_FILES=
 
-FILES=$(METADATA) runtest.sh Makefile PURPOSE
+FILES=$(METADATA) runtest.sh Makefile PURPOSE data.ipaclientinstall.acceptance ipaclientinstall.exp lib.ipaclientverify.sh t.ipa-client-install.sh
 
 .PHONY: all install download clean
 
 run: $(FILES) build
-	#yum -y install expect
-	#expect ./set-root-pw.exp
-	#wget http://apoc.dsdev.sjc.redhat.com/tet/rhts-get.txt
 	./runtest.sh
 
 build: $(BUILT_FILES)
@@ -49,16 +46,14 @@ clean:
 include /usr/share/rhts/lib/rhts-make.include
 
 $(METADATA): Makefile
-	@echo "Owner:           Michael Gregg <mgregg@redhat.com>" > $(METADATA)
+	@echo "Owner:           Namita Krishnan <nsoman@redhat.com>" > $(METADATA)
 	@echo "Name:            $(TEST)" >> $(METADATA)
 	@echo "TestVersion:     $(TESTVERSION)" >> $(METADATA)
 	@echo "Path:            $(TEST_DIR)" >> $(METADATA)
 	@echo "Description:     install of a ipa client machine" >> $(METADATA)
 	@echo "Type:            Acceptance" >> $(METADATA)
-	@echo "TestTime:        30m" >> $(METADATA)
+	@echo "TestTime:        45m" >> $(METADATA)
 	@echo "RunFor:          ipa-client" >> $(METADATA)
-	@echo "RunFor:          expect" >> $(METADATA)
-	@echo "Requires:        nmap" >> $(METADATA)
 	@echo "Priority:        Normal" >> $(METADATA)
 	@echo "License:         GPLv2" >> $(METADATA)
 	@echo "Confidential:    no" >> $(METADATA)
