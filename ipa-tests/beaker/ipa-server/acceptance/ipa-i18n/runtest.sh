@@ -60,6 +60,7 @@ rlJournalStart
         rlAssertRpm $PACKAGE
         rlRun "TmpDir=\`mktemp -d\`" 0 "Creating tmp directory"
         rlRun "pushd $TmpDir"
+	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
     rlPhaseEnd
 
 # Add all of the users to be used in this test
