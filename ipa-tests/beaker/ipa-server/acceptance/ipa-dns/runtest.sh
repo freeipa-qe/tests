@@ -232,9 +232,8 @@ fi
 	cname="m.l.k."
 	dname="bar.$zone."
 	txt="none=1.2.3.4"
-	mx="10 9.78.7.6"
+	mx="9.78.7.6"
 	ptroctet="4.4.4"
-	ptrzone="$ptroctet.in-addr.arpa"
 	ptr="8"
 	ptrvalue="in.awesome.domain."
 	srva="0 100 389"
@@ -245,7 +244,9 @@ fi
 	kxbadpref2="1233456789012345"
 	
 	# These values are all for creating the ptr zone
-	pzone="ptrzone"
+	ptrzone="$ptroctet.in-addr.arpa"
+	# Bad ptr zone
+	bptrzone="1.2.3.in-addr.arpa"
 	pemail="ipaqar.redhat.com"
 	pserial=2010010799
 	prefresh=393
@@ -470,7 +471,7 @@ fi
 
 	# MX record 
 	rlPhaseStartTest "ipa-dns-76: add record of type MX"
-		rlRun "ipa dnsrecord-add $zone @ --mx-rec '$mx'" 0 "add record type MX"
+		rlRun "ipa dnsrecord-add $zone @ --mx-rec '10 $mx'" 0 "add record type MX"
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-77: make sure that IPA saved record type MX"
@@ -482,7 +483,7 @@ fi
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-79: delete record of type MX"
-		rlRun "ipa dnsrecord-del $zone @ --mx-rec $mx" 0 "delete record type MX"
+		rlRun "ipa dnsrecord-del $zone @ --mx-rec '10 $mx'" 0 "delete record type MX"
 	rlPhaseEnd
 
 	/etc/init.d/named restart
@@ -497,81 +498,81 @@ fi
 
 # Neg PTR zone add test cases
 	rlPhaseStartTest "ipa-dns-82: try to create a new ptr zone using a bad serial number"
-		rlRun "ipa dnszone-add --name-server=$ipaddr --admin-email=$pemail --serial=$pbadnum --refresh=$prefresh --retry=$pretry --expire=$pexpire --minimum=$pminimum --ttl=$pttl bpzone" 1 "trying to create a zone using a bad serial number"
+		rlRun "ipa dnszone-add --name-server=$ipaddr --admin-email=$pemail --serial=$pbadnum --refresh=$prefresh --retry=$pretry --expire=$pexpire --minimum=$pminimum --ttl=$pttl $bptrzone" 1 "trying to create a zone using a bad serial number"
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-83: try to create a new zone using a bad refresh"
-		rlRun "ipa dnszone-add --name-server=$ipaddr --admin-email=$pemail --serial=$pserial --refresh=$pbadnum --retry=$pretry --expire=$pexpire --minimum=$pminimum --ttl=$pttl bpzone2" 1 "trying to create a zone using a bad refresh"
+		rlRun "ipa dnszone-add --name-server=$ipaddr --admin-email=$pemail --serial=$pserial --refresh=$pbadnum --retry=$pretry --expire=$pexpire --minimum=$pminimum --ttl=$pttl $bptrzone" 1 "trying to create a zone using a bad refresh"
 	rlPhaseEnd
 # End Neg test cases
 
 # Create a PTR zone
 	rlPhaseStartTest "ipa-dns-84: try to create a new PTR zone"
-		rlRun "ipa dnszone-add --name-server=$ipaddr --admin-email=$pemail --serial=$pserial --refresh=$prefresh --retry=$pretry --expire=$pexpire --minimum=$pminimum --ttl=$pttl $pzone" 1 "trying to create a zone using a bad refresh"
+		rlRun "ipa dnszone-add --name-server=$ipaddr --admin-email=$pemail --serial=$pserial --refresh=$prefresh --retry=$pretry --expire=$pexpire --minimum=$pminimum --ttl=$pttl $ptrzone" 1 "Creating a new PTR zone for use in following tests"
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-85: checking to ensure that the new PTR zone got created with the correct name-server"
-		rlRun "ipa dnszone-find --all $pzone | grep $ipaddr" 0 "checking to ensure that the new PTR zone got created with the correct name-server"
+		rlRun "ipa dnszone-find --all $ptrzone | grep $ipaddr" 0 "checking to ensure that the new PTR zone got created with the correct name-server"
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-86: checking to ensure that the new PTR zone got created with the correct email"
-		rlRun "ipa dnszone-find --all $pzone | grep $pemail" 0 "checking to ensure that the new PTR zone got created with the correct email"
+		rlRun "ipa dnszone-find --all $ptrzone | grep $pemail" 0 "checking to ensure that the new PTR zone got created with the correct email"
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-87: checking to ensure that the new PTR zone got created with the correct serial number"
-		rlRun "ipa dnszone-find --all $pzone | grep $pserial" 0 "checking to ensure that the new PTR zone got created with the correct serial number"
+		rlRun "ipa dnszone-find --all $ptrzone | grep $pserial" 0 "checking to ensure that the new PTR zone got created with the correct serial number"
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-88: checking to ensure that the new PTR zone got created with the correct refresh"
-		rlRun "ipa dnszone-find --all $pzone | grep $prefresh" 0 "checking to ensure that the new PTR zone got created with the correct "
+		rlRun "ipa dnszone-find --all $ptrzone | grep $prefresh" 0 "checking to ensure that the new PTR zone got created with the correct "
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-89: checking to ensure that the new PTR zone got created with the correct retry"
-		rlRun "ipa dnszone-find --all $pzone | grep $pretry" 0 "checking to ensure that the new PTR zone got created with the correct retry"
+		rlRun "ipa dnszone-find --all $ptrzone | grep $pretry" 0 "checking to ensure that the new PTR zone got created with the correct retry"
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-90: checking to ensure that the new PTR zone got created with the correct expire"
-		rlRun "ipa dnszone-find --all $pzone | grep $pexpire" 0 "checking to ensure that the new PTR zone got created with the correct expire"
+		rlRun "ipa dnszone-find --all $ptrzone | grep $pexpire" 0 "checking to ensure that the new PTR zone got created with the correct expire"
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-91: checking to ensure that the new PTR zone got created with the correct minimum"
-		rlRun "ipa dnszone-find --all $pzone | grep $pminimum" 0 "checking to ensure that the new PTR zone got created with the correct minimum"
+		rlRun "ipa dnszone-find --all $ptrzone | grep $pminimum" 0 "checking to ensure that the new PTR zone got created with the correct minimum"
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-92: checking to ensure that the new PTR zone got created with the correct ttl"
-		rlRun "ipa dnszone-find --all $pzone | grep $pttl" 0 "checking to ensure that the new PTR zone got created with the correct ttl"
+		rlRun "ipa dnszone-find --all $ptrzone | grep $pttl" 0 "checking to ensure that the new PTR zone got created with the correct ttl"
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-93: checking to with dig to ensure that the new PTR zone got created with the correct name server"
-		rlRun "dig $pzone SOA | grep NS | grep $ipaddr" 0 "checking with dig to ensure that the new PTR zone got created with the correct name server"
+		rlRun "dig $ptrzone SOA | grep NS | grep $ipaddr" 0 "checking with dig to ensure that the new PTR zone got created with the correct name server"
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-94: checking to with dig to ensure that the new PTR zone got created with the correct email"
-		rlRun "dig $pzone SOA | grep $email" 0 "checking with dig to ensure that the new PTR zone got created with the correct email"
+		rlRun "dig $ptrzone SOA | grep $email" 0 "checking with dig to ensure that the new PTR zone got created with the correct email"
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-95: checking to with dig to ensure that the new PTR zone got created with the correct serial number"
-		rlRun "dig $pzone SOA | grep $serial" 0 "checking with dig to ensure that the new PTR zone got created with the correct serial number"
+		rlRun "dig $ptrzone SOA | grep $serial" 0 "checking with dig to ensure that the new PTR zone got created with the correct serial number"
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-96: checking to with dig to ensure that the new PTR zone got created with the correct refresh"
-		rlRun "dig $pzone SOA | grep $refresh" 0 "checking with dig to ensure that the new PTR zone got created with the correct refresh"
+		rlRun "dig $ptrzone SOA | grep $refresh" 0 "checking with dig to ensure that the new PTR zone got created with the correct refresh"
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-97: checking to with dig to ensure that the new PTR zone got created with the correct retry interval"
-		rlRun "dig $pzone SOA | grep $retry" 0 "checking with dig to ensure that the new PTR zone got created with the correct retry interval"
+		rlRun "dig $ptrzone SOA | grep $retry" 0 "checking with dig to ensure that the new PTR zone got created with the correct retry interval"
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-98: checking to with dig to ensure that the new PTR zone got created with the correct expire"
-		rlRun "dig $pzone SOA | grep $expire" 0 "checking with dig to ensure that the new PTR zone got created with the correct expire"
+		rlRun "dig $ptrzone SOA | grep $expire" 0 "checking with dig to ensure that the new PTR zone got created with the correct expire"
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-99: checking to with dig to ensure that the new PTR zone got created with the correct minimum"
-		rlRun "dig $pzone SOA | grep $minimum" 0 "checking with dig to ensure that the new PTR zone got created with the correct minimum"
+		rlRun "dig $ptrzone SOA | grep $minimum" 0 "checking with dig to ensure that the new PTR zone got created with the correct minimum"
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-100: checking to with dig to ensure that the new PTR zone got created with the correct ttl"
-		rlRun "dig $pzone SOA | grep $ttl" 0 "checking with dig to ensure that the new PTR zone got created with the correct ttl"
+		rlRun "dig $ptrzone SOA | grep $ttl" 0 "checking with dig to ensure that the new PTR zone got created with the correct ttl"
 	rlPhaseEnd
 
 	# PTR record 
@@ -794,11 +795,11 @@ fi
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-149: Delete the created ptr zone"
-		rlRun "ipa dnszone-del $pzone" 0 "Delete the ptr zone created for this test"
+		rlRun "ipa dnszone-del $ptrzone" 0 "Delete the ptr zone created for this test"
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-150: Make sure the ptr zone got deleted properly"
-		rlRun "ipa dnszone-find $pzone" 1 "Make sure the ptr zone delete happened properly"
+		rlRun "ipa dnszone-find $ptrzone" 1 "Make sure the ptr zone delete happened properly"
 	rlPhaseEnd
 
 	rlJournalPrintText
