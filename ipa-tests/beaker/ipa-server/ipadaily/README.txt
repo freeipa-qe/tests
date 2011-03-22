@@ -12,4 +12,5 @@ Put the following into the root's cron.
 
 
 For the ipa-server certification, I want it to run every 3 hours during work hours only, mon-fri only
-1 5,8,11,14,16 * * 1-5 /root/ipa-server-rhel6.1-cert.bash
+1 5 * * 1-5 /root/ipa-server-rhel6.1-cert.bash
+#1 5,8,11,14,16 * * 1-5 /root/ipa-server-rhel6.1-cert.bash # previous use

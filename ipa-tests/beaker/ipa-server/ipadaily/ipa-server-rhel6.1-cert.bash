@@ -14,4 +14,4 @@ svn co https://svn.devel.redhat.com/repos/ipa-tests/trunk/ipa-tests/beaker
 # submit beaker jobs
 cd $DAILY
 	bkr job-submit bkr-ipa-server-test-single-cert.xml
-
+	bkr job-submit bkr-ipa-server-test-multihost-blades.xml
