@@ -14,9 +14,9 @@
 			<packages/>
 			<ks_appends/>
 			<repos>
-				<repo name="ipa" url="http://jdennis.fedorapeople.org/ipa-devel/fedora/14/x86_64/os/"/>
-				<repo name="beaker-harness" url="http://beaker-stage.app.eng.bos.redhat.com/harness/Fedora14/\$basearch"/>
-			<repos/>
+				<repo name="ipa" url="http://jdennis.fedorapeople.org/ipa-devel/fedora/14/x86_64/os"/>
+				<repo name="beaker-harness" url="http://beaker-stage.app.eng.bos.redhat.com/harness/Fedora14/x86_64"/>
+			</repos>
 			<distroRequires>
 				<and>
 					<distro_variant op="=" value="Server"/>
@@ -35,19 +35,24 @@
 			<task name="/CoreOS/ipa-server/shared" role="STANDALONE">
 				<params/>
 			</task>
-			<task name="/CoreOS/ipa-server/acceptance/install" role="MASTER">
+			<task name="/CoreOS/ipa-server/acceptance/quickinstall" role="MASTER">
 				<params/>
 			</task>
-			<task name="/CoreOS/ipa-server/acceptance/install-slave" role="MASTER">
+			<task name="/CoreOS/ipa-server/acceptance/ipa-host-cli" role="MASTER">
 				<params/>
 			</task>
-			<task name="/CoreOS/ipa-server/acceptance/install-client" role="MASTER">
+			<task name="/CoreOS/ipa-server/acceptance/ipa-hostgroup-cli" role="MASTER">
+				<params/>
+			</task>
+			<task name="/CoreOS/ipa-server/acceptance/ipa-user-cli/adduser" role="MASTER">
+				<params/>
+			</task>
+			<task name="/CoreOS/ipa-server/acceptance/ipa-user-cli/moduser" role="MASTER">
 				<params/>
 			</task>
 			<task name="/CoreOS/ipa-server/acceptance/nis-cli" role="MASTER">
 				<params/>
 			</task>
-
 			<task name="/CoreOS/ipa-server/acceptance/uninstall" role="STANDALONE">
 				<params/>
 			</task>
@@ -59,8 +64,8 @@
 			<ks_appends/>
 			<repos>
 				<repo name="ipa" url="http://jdennis.fedorapeople.org/ipa-devel/fedora/14/x86_64/os/"/>
-			        <repo name="beaker-harness" url="http://beaker-stage.app.eng.bos.redhat.com/harness/Fedora14/\$basearch"/>
-			<repos/>
+			        <repo name="beaker-harness" url="http://beaker-stage.app.eng.bos.redhat.com/harness/Fedora14/x86_64"/>
+			</repos>
 			<distroRequires>
 				<and>
 					<distro_variant op="=" value="Server"/>
@@ -80,15 +85,22 @@
 			<task name="/CoreOS/ipa-server/shared" role="STANDALONE">
 				<params/>
 			</task>
-			<task name="/CoreOS/ipa-server/acceptance/install" role="SLAVE">
+			<task name="/CoreOS/ipa-server/acceptance/quickinstall" role="SLAVE">
 				<params/>
 			</task>
-			<task name="/CoreOS/ipa-server/acceptance/install-slave" role="SLAVE">
+			<task name="/CoreOS/ipa-server/acceptance/ipa-host-cli" role="SLAVE">
 				<params/>
 			</task>
-			<task name="/CoreOS/ipa-server/acceptance/install-client" role="SLAVE">
+			<task name="/CoreOS/ipa-server/acceptance/ipa-hostgroup-cli" role="SLAVE">
 				<params/>
 			</task>
+			<task name="/CoreOS/ipa-server/acceptance/ipa-user-cli/adduser" role="SLAVE">
+				<params/>
+			</task>
+			<task name="/CoreOS/ipa-server/acceptance/ipa-user-cli/moduser" role="SLAVE">
+				<params/>
+			</task>
+
 			<task name="/CoreOS/ipa-server/acceptance/nis-cli" role="SLAVE">
 				<params/>
 			</task>
@@ -104,8 +116,8 @@
 			<ks_appends/>
 			<repos>
 				<repo name="ipa" url="http://jdennis.fedorapeople.org/ipa-devel/fedora/14/x86_64/os/"/>
-				<repo name="beaker-harness" url="http://beaker-stage.app.eng.bos.redhat.com/harness/Fedora14/\$basearch"/>
-			<repos/>
+				<repo name="beaker-harness" url="http://beaker-stage.app.eng.bos.redhat.com/harness/Fedora14/x86_64"/>
+			</repos>
 			<distroRequires>
 				<and>
 					<distro_variant op="=" value="Server"/>
@@ -125,16 +137,23 @@
 			<task name="/CoreOS/ipa-server/shared" role="STANDALONE">
 				<params/>
 			</task>
-			<task name="/CoreOS/ipa-server/acceptance/install" role="CLIENT">
+			<task name="/CoreOS/ipa-server/acceptance/quickinstall" role="CLIENT">
 				<params/>
 			</task>
-			<task name="/CoreOS/ipa-server/acceptance/install-slave" role="CLIENT">
+			<task name="/CoreOS/ipa-server/acceptance/ipa-host-cli" role="CLIENT">
 				<params/>
 			</task>
-			<task name="/CoreOS/ipa-server/acceptance/install-client" role="CLIENT">
+			<task name="/CoreOS/ipa-server/acceptance/ipa-hostgroup-cli" role="CLIENT">
 				<params/>
 			</task>
-			<task name="/CoreOS/ipa-server/acceptance/nis-cli" role="SLAVE">
+			<task name="/CoreOS/ipa-server/acceptance/ipa-user-cli/adduser" role="CLIENT">
+				<params/>
+			</task>
+			<task name="/CoreOS/ipa-server/acceptance/ipa-user-cli/moduser" role="CLIENT">
+				<params/>
+			</task>
+
+			<task name="/CoreOS/ipa-server/acceptance/nis-cli" role="CLIENT">
 				<params/>
 			</task>
 			<task name="/CoreOS/ipa-server/acceptance/uninstall" role="STANDALONE">

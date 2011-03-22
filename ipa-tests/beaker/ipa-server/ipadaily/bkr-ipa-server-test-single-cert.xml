@@ -35,13 +35,7 @@
 			<task name="/CoreOS/ipa-server/shared" role="STANDALONE">
 				<params/>
 			</task>
-			<task name="/CoreOS/ipa-server/acceptance/install" role="MASTER">
-				<params/>
-			</task>
-			<task name="/CoreOS/ipa-server/acceptance/install-slave" role="MASTER">
-				<params/>
-			</task>
-			<task name="/CoreOS/ipa-server/acceptance/install-client" role="MASTER">
+			<task name="/CoreOS/ipa-server/acceptance/quickinstall" role="MASTER">
 				<params/>
 			</task>
 		</recipe>
@@ -70,13 +64,7 @@
 			<task name="/CoreOS/ipa-server/shared" role="STANDALONE">
 				<params/>
 			</task>
-			<task name="/CoreOS/ipa-server/acceptance/install" role="SLAVE">
-				<params/>
-			</task>
-			<task name="/CoreOS/ipa-server/acceptance/install-slave" role="SLAVE">
-				<params/>
-			</task>
-			<task name="/CoreOS/ipa-server/acceptance/install-client" role="SLAVE">
+			<task name="/CoreOS/ipa-server/acceptance/quickinstall" role="SLAVE">
 				<params/>
 			</task>
 		</recipe>
@@ -105,13 +93,7 @@
 			<task name="/CoreOS/ipa-server/shared" role="STANDALONE">
 				<params/>
 			</task>
-			<task name="/CoreOS/ipa-server/acceptance/install" role="CLIENT">
-				<params/>
-			</task>
-			<task name="/CoreOS/ipa-server/acceptance/install-slave" role="CLIENT">
-				<params/>
-			</task>
-			<task name="/CoreOS/ipa-server/acceptance/install-client" role="CLIENT">
+			<task name="/CoreOS/ipa-server/acceptance/quickinstall" role="CLIENT">
 				<params/>
 			</task>
 		</recipe>
