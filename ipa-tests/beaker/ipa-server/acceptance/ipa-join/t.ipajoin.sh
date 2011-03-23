@@ -60,7 +60,7 @@ ipa_join_envcleanup()
             rm $testKeytabfile
         fi
         delete_clientHostEntry_FromIPAServer
-        rlRun "ssh root@$serverFQDN \"kdestroy" 0 "remove kerboros ticket in remote server"
+        rlRun "ssh root@$serverFQDN \"kdestroy\"" 0 "remove kerboros ticket in remote server"
         #environment cleanup ends   here
     rlPhaseEnd
 } #envcleanup
