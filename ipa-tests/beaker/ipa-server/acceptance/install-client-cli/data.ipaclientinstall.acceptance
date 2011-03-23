@@ -35,6 +35,10 @@ auth_provider_nosssd="krb5"
 chpass_provider_nosssd="krb5"
 ipa_dyndns_update="True"
 access_provider_permit="permit"
+chpass_provider_force="ipa"
+auth_provider_force="ipa"
+cache_credentials_force="True"
+
 
 
 
@@ -47,9 +51,12 @@ ticket_lifetime="24h 36000"
 forwardable="yes true"
 pkinit_anchors="FILE:/etc/ipa/ca.crt"
 domain_realm="$RELM $RELM"
-debug="false"
+debug_krb5="false"
 renew_lifetime="36000"
 krb4_convert="false"
+dns_lookup_kdc_force="false"
+dns_lookup_realm_force="false"
+domain_realm_force="$MASTER:88 $MASTER:749 ${RELM,,} $RELM $RELM"
 
 #ntp.conf updates
 ntpserver="server $NTPSERVER" 

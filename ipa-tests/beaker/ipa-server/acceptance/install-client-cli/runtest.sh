@@ -61,10 +61,15 @@ rlJournalStart
 	   rlLog "Not a client, CLIENT is $CLIENT - not running tests"
 	fi
    rlPhaseEnd
-#TODO: Should clean TmpDir created above, but will I need it to look at outputs later?
+
+rlPhaseStartCleanup "install-client-cli cleanup"
+     rlRun "popd"
+     rlRun "rm -r $TmpDir" 0 "Removing tmp directory"
+rlPhaseEnd
         
 rlJournalPrintText
 	report=/tmp/rhts.report.$RANDOM.txt
 	makereport $report
 	rhts-submit-log -l $report
+        save_logs
 rlJournalEnd 
