@@ -46,7 +46,7 @@
 . ./rejection-tests.sh
 . ./firstname-tests.sh
 
-PACKAGE="ipa-server"
+PACKAGE="ipa-admintools"
 
 startDate=`date "+%F %r"`
 satrtEpoch=`date "+%s"`
