@@ -38,6 +38,7 @@
 # Include test case file
 . ./t.ipa-client-install.sh
 . ./lib.ipaclientverify.sh
+. ../ipa-delegation/lib.ipadelegation.sh
 
 
 PACKAGE="ipa-client"
@@ -49,13 +50,13 @@ SERVICE="ipa_kpasswd"
 
 rlJournalStart
    rlPhaseStartTest "Environment Check"
+        rlLog "Creating tmp directory"
+        TmpDir=`mktemp -d`
+        pushd $TmpDir
 	echo "$CLIENT" | grep "$HOSTNAME"
 	if [ $? -eq 0 ]; then
            # This machine is a client
 	   rlLog "I am a client"
-           rlLog "Creating tmp directory"
-           TmpDir=`mktemp -d`
-           pushd $TmpDir
            ipaclientinstall
 	else
 	   rlLog "Not a client, CLIENT is $CLIENT - not running tests"

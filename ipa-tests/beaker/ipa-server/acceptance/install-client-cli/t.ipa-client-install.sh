@@ -9,6 +9,7 @@
 
 ipaclientinstall()
 {
+
 #   -U, --unattended  Unattended installation. The user will not be prompted.
    ipaclientinstall_adminpwd
 
@@ -33,9 +34,7 @@ ipaclientinstall()
 #   --server=SERVER Set the IPA server to connect to
 #   ipaclientinstall_server_casesensitive #TODO: No test yet 
    ipaclientinstall_server_nodomain 
-   ipaclientinstall_server_invalidresolvconf1 
-   ipaclientinstall_server_invalidresolvconf2 
-   ipaclientinstall_server_invalidresolvconf3
+   ipaclientinstall_server_invalidresolvconf
 
 
 #   --realm=REALM_NAME Set the IPA realm name to REALM_NAME 
@@ -209,9 +208,9 @@ ipa-client-install: error: --server cannot be used without providing --domain"
     rlPhaseEnd
 }
 
-ipaclientinstall_server_invalidresolvconf1()
+ipaclientinstall_server_invalidresolvconf()
 {
-    rlPhaseStartTest "[Negative] IPA Install with invalid server, with invalid resolv.conf 1"
+    rlPhaseStartTest "[Negative] IPA Install with invalid server, with invalid resolv.conf"
        uninstall_fornexttest
        rlLog "EXECUTING: ipa-client-install --server=xxx --domain=xxx "
 
@@ -224,73 +223,8 @@ ipaclientinstall_server_invalidresolvconf1()
        command="ipa-client-install --server=xxx --domain=xxx"
        expmsg="Retrieving CA from xxx failed."
        local tmpout=$TmpDir/ipaclientinstall_server_invalidresolvconf1.$RANDOM.out
-       qaRun "$command" "$tmpout" 1 "$expmsg" "Verify expected error message for IPA Install with invalid resolv.conf 1"
+       qaRun "$command" "$tmpout" 1 $expmsg "Verify expected error message for IPA Install with invalid resolv.conf" 
 
-       # restore back the resolv.conf
-       update_resolvconf $ipaddr true 
-
-    rlPhaseEnd
-}
-
-ipaclientinstall_server_invalidresolvconf2()
-{
-    rlPhaseStartTest "[Negative] IPA Install with the server, but with invalid resolv.conf 2"
-       uninstall_fornexttest
-
-      # for this negative test, invalidate resolv.conf 
-      # get the Master's IP address
-      ipaddr=$(dig +noquestion $MASTER  | grep $MASTER | grep IN | grep A | awk '{print $5}')
-      rlLog "MASTER IP address is $ipaddr"
-      update_resolvconf $ipaddr false 
-
-       serverparam=`echo $MASTER  | cut -d "." -f1 | xargs echo`
-       command="ipa-client-install --server=$serverparam --domain=$DOMAIN"
-       expmsg="root        : ERROR    LDAP Error: Connect error: TLS: hostname does not match CN in peer certificate
-Failed to verify that rhel61-server is an IPA Server.
-This may mean that the remote server is not up or is not reachable
-due to network or firewall settings." 
-       rlLog "EXECUTING: ipa-client-install --server=$serverparam --domain=$DOMAIN "
-       rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for IPA Install with invalid resolv.conf 2"
-      
-       # restore back the resolv.conf
-       update_resolvconf $ipaddr true 
-
-    rlPhaseEnd
-}
-
-ipaclientinstall_server_invalidresolvconf3()
-{
-    rlPhaseStartTest "[Negative] IPA Install with the server, but with invalid resolv.conf 3"
-       uninstall_fornexttest
-       rlLog "EXECUTING: ipa-client-install --server=$MASTER  --domain=$DOMAIN"
-
-       # for this negative test, invalidate resolv.conf 
-       # get the Master's IP address
-       ipaddr=$(dig +noquestion $MASTER  | grep $MASTER | grep IN | grep A | awk '{print $5}')
-       rlLog "MASTER IP address is $ipaddr"
-       update_resolvconf $ipaddr false 
-
-       local expfile=/tmp/ipaclientinstall.exp
-       rm -rf $expfile
-       command="ipa-client-install --server=$MASTER --domain=$DOMAIN"
-       echo "spawn -noecho $command" >> $expfile
-       echo 'expect "*: "' >> $expfile
-       echo 'send -- "\r"' >> $expfile
-       echo 'expect eof ' >> $expfile
-       expectcommand="/usr/bin/expect $expfile"
-       local tmpout=$TmpDir/ipaclientinstall_server_invalidresolvconf3.$RANDOM.out
-       expmsg="The failure to use DNS to find your IPA server indicates that your
-resolv.conf file is not properly configured.
-
-Autodiscovery of servers for failover cannot work with this configuration.
-
-If you proceed with the installation, services will be configured to always
-access the discovered server for all operation and will not fail over to
-other servers in case of failure.
-
-Proceed with fixed values and no DNS discovery? [no]: "
-       qaExpectedRun "$expectcommand" "$tmpout" 0 "Verify expected error message for IPA Install with invalid resolv.conf" "$expmsg"
-      
        # restore back the resolv.conf
        update_resolvconf $ipaddr true 
 
