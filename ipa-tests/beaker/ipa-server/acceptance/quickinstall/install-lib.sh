@@ -51,7 +51,7 @@ setupBeakerEnv()
    # the beaker server available as a variable or better proxy thru lab controller - so
    # we only need the lab controller
 
-   BEAKER_SERVER=beaker.engineering.redhat.com
+   BEAKER_SERVER="beaker-01.app.eng.bos.redhat.com"
    bs_ipaddr=$(dig +noquestion $BEAKER_SERVER  | grep $BEAKER_SERVER | grep IN | awk '{print $5}')
    rlLog "BEAKER SERVER HOST NAME: $BEAKER_SERVER"
    rlLog "BEAKER SERVER IP ADDRESS: $bs_ipaddr"
