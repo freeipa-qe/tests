@@ -592,12 +592,12 @@ manage_netgroups_positive()
 
 	rlPhaseStartTest "ipa-netgroup-046: Add host group and verify net group"
 		rlRun "ipa hostgroup-add --desc=mygroup mygroup" 0 "Adding host group with plugin enabled"
-		rlRun "ipa netgroup-find mygroup" 0 "Verify net group was added."
+		rlRun "ipa netgroup-find --private mygroup" 0 "Verify net group was added."
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-netgroup-047: Delete host group and verify net group is deleted"
 		rlRun "ipa hostgroup-del mygroup" 0 "Deleting host group with plugin disabled"
-		rlRun "ipa netgroup-show mygroup" 2 "Verify managed net group was deleted"
+		rlRun "ipa netgroup-show --private mygroup" 2 "Verify managed net group was deleted"
         rlPhaseEnd
 }
 
