@@ -8,7 +8,6 @@ installMaster()
 	rlRun "/etc/init.d/ntpd stop" 0 "Stopping the ntp server"
 	rlRun "ntpdate $NTPSERVER" 0 "Synchronzing clock with valid time server"
 	rlRun "fixHostFile" 0 "Set up /etc/hosts"
-	rlRun "setupBeakerEnv" 0 "Get lab controller and beaker server in /etc/hosts before we change DNS"
 	rlRun "fixhostname" 0 "Fix hostname"
 	if [[ "$SKIPINSTALL" != "TRUE" ]] ; then
 		echo "ipa-server-install --setup-dns --forwarder=$DNSFORWARD --hostname=$hostname_s.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U" > /dev/shm/installipa.bash
@@ -66,7 +65,6 @@ installSlave()
         	rlRun "ntpdate $NTPSERVER" 0 "Synchronzing clock with valid time server"
 		MASTERIP=$(dig +noquestion $MASTER  | grep $MASTER | grep IN | awk '{print $5}')
         	rlRun "fixHostFile" 0 "Set up /etc/hosts"
-		rlRun "setupBeakerEnv" 0 "Get lab controller and beaker server in /etc/hosts before we change DNS"
         	rlRun "fixhostname" 0 "Fix hostname"
         	rlRun "fixResolv" 0 "fixing the reoslv.conf to contain the correct nameserver lines"
 	
@@ -96,7 +94,6 @@ installClient()
 	rlRun "/etc/init.d/ntpd stop" 0 "Stopping the ntp server"
 	rlRun "ntpdate $NTPSERVER" 0 "Synchronzing clock with corp time server"
 	rlRun "fixHostFile" 0 "Set up /etc/hosts"
-	rlRun "setupBeakerEnv" 0 "Get lab controller and beaker server in /etc/hosts before we change DNS"
 	rlRun "fixhostname" 0 "Fix hostname"
         rlRun "fixResolv" 0 "fixing the reoslv.conf to contain the correct nameserver lines"
 	rlLog "SKIPINSTALL: $SKIPINSTALL"
