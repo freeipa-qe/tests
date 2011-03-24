@@ -8,6 +8,7 @@ installMaster()
 	rlRun "/etc/init.d/ntpd stop" 0 "Stopping the ntp server"
 	rlRun "ntpdate $NTPSERVER" 0 "Synchronzing clock with valid time server"
 	rlRun "fixHostFile" 0 "Set up /etc/hosts"
+	rlRun "setupBeakerEnv" 0 "Get lab controller and beaker server in /etc/hosts before we change DNS"
 	rlRun "fixhostname" 0 "Fix hostname"
 	if [[ "$SKIPINSTALL" != "TRUE" ]] ; then
 		echo "ipa-server-install --setup-dns --forwarder=$DNSFORWARD --hostname=$hostname_s.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U" > /dev/shm/installipa.bash
@@ -18,6 +19,10 @@ installMaster()
 		# test kinit
 		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
 	fi
+
+	if [ -f /var/log/ipaserver-install.log ]; then
+        	rhts-submit-log -l /var/log/ipaserver-install.log
+        fi
    rlPhaseEnd
 
    rlPhaseStartTest "Create Replica Package(s)"
@@ -61,6 +66,7 @@ installSlave()
         	rlRun "ntpdate $NTPSERVER" 0 "Synchronzing clock with valid time server"
 		MASTERIP=$(dig +noquestion $MASTER  | grep $MASTER | grep IN | awk '{print $5}')
         	rlRun "fixHostFile" 0 "Set up /etc/hosts"
+		rlRun "setupBeakerEnv" 0 "Get lab controller and beaker server in /etc/hosts before we change DNS"
         	rlRun "fixhostname" 0 "Fix hostname"
         	rlRun "fixResolv" 0 "fixing the reoslv.conf to contain the correct nameserver lines"
 	
@@ -74,6 +80,10 @@ installSlave()
 		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
 		rlRun "appendEnv" 0 "Append the machine information to the env.sh with the information for the machines in the recipe set"
 	fi
+
+        if [ -f /var/log/ipareplica-install.log ]; then
+                rhts-submit-log -l /var/log/ipareplica-install.log
+        f
 	# stop the firewall
 	service iptables stop
    rlPhaseEnd
@@ -86,6 +96,7 @@ installClient()
 	rlRun "/etc/init.d/ntpd stop" 0 "Stopping the ntp server"
 	rlRun "ntpdate $NTPSERVER" 0 "Synchronzing clock with corp time server"
 	rlRun "fixHostFile" 0 "Set up /etc/hosts"
+	rlRun "setupBeakerEnv" 0 "Get lab controller and beaker server in /etc/hosts before we change DNS"
 	rlRun "fixhostname" 0 "Fix hostname"
         rlRun "fixResolv" 0 "fixing the reoslv.conf to contain the correct nameserver lines"
 	rlLog "SKIPINSTALL: $SKIPINSTALL"
@@ -97,6 +108,10 @@ installClient()
 		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
 	fi
 	rlRun "appendEnv" 0 "Append the machine information to the env.sh with the information for the machines in the recipe set"
+
+        if [ -f /var/log/ipaclient-install.log ]; then
+                rhts-submit-log -l /var/log/ipaclient-install.log
+        f
    rlPhaseEnd
 }
 
