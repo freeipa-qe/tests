@@ -513,6 +513,8 @@ fi
 		rlRun "ipa dnszone-add --name-server=$ipaddr --admin-email=$pemail --serial=$pserial --refresh=$prefresh --retry=$pretry --expire=$pexpire --minimum=$pminimum --ttl=$pttl $ptrzone" 1 "Creating a new PTR zone for use in following tests"
 	rlPhaseEnd
 
+	/etc/init.d/named restart
+
 	rlPhaseStartTest "ipa-dns-85: checking to ensure that the new PTR zone got created with the correct name-server"
 		rlRun "ipa dnszone-find --all $ptrzone | grep $ipaddr" 0 "checking to ensure that the new PTR zone got created with the correct name-server"
 	rlPhaseEnd
@@ -550,31 +552,31 @@ fi
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-94: checking to with dig to ensure that the new PTR zone got created with the correct email"
-		rlRun "dig $ptrzone SOA | grep $email" 0 "checking with dig to ensure that the new PTR zone got created with the correct email"
+		rlRun "dig $ptrzone SOA | grep $pemail" 0 "checking with dig to ensure that the new PTR zone got created with the correct email"
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-95: checking to with dig to ensure that the new PTR zone got created with the correct serial number"
-		rlRun "dig $ptrzone SOA | grep $serial" 0 "checking with dig to ensure that the new PTR zone got created with the correct serial number"
+		rlRun "dig $ptrzone SOA | grep $pserial" 0 "checking with dig to ensure that the new PTR zone got created with the correct serial number"
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-96: checking to with dig to ensure that the new PTR zone got created with the correct refresh"
-		rlRun "dig $ptrzone SOA | grep $refresh" 0 "checking with dig to ensure that the new PTR zone got created with the correct refresh"
+		rlRun "dig $ptrzone SOA | grep $prefresh" 0 "checking with dig to ensure that the new PTR zone got created with the correct refresh"
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-97: checking to with dig to ensure that the new PTR zone got created with the correct retry interval"
-		rlRun "dig $ptrzone SOA | grep $retry" 0 "checking with dig to ensure that the new PTR zone got created with the correct retry interval"
+		rlRun "dig $ptrzone SOA | grep $pretry" 0 "checking with dig to ensure that the new PTR zone got created with the correct retry interval"
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-98: checking to with dig to ensure that the new PTR zone got created with the correct expire"
-		rlRun "dig $ptrzone SOA | grep $expire" 0 "checking with dig to ensure that the new PTR zone got created with the correct expire"
+		rlRun "dig $ptrzone SOA | grep $pexpire" 0 "checking with dig to ensure that the new PTR zone got created with the correct expire"
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-99: checking to with dig to ensure that the new PTR zone got created with the correct minimum"
-		rlRun "dig $ptrzone SOA | grep $minimum" 0 "checking with dig to ensure that the new PTR zone got created with the correct minimum"
+		rlRun "dig $ptrzone SOA | grep $pminimum" 0 "checking with dig to ensure that the new PTR zone got created with the correct minimum"
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-100: checking to with dig to ensure that the new PTR zone got created with the correct ttl"
-		rlRun "dig $ptrzone SOA | grep $ttl" 0 "checking with dig to ensure that the new PTR zone got created with the correct ttl"
+		rlRun "dig $ptrzone SOA | grep $pttl" 0 "checking with dig to ensure that the new PTR zone got created with the correct ttl"
 	rlPhaseEnd
 
 	# PTR record 
@@ -687,7 +689,7 @@ fi
 
 	# Type cert
 	rlPhaseStartTest "ipa-dns-125: add record of type cert"
-		rlRun "ipa dnsrecord-add $zone cert --cert-rec '$certa $cert'" 0 "add record type cert"
+		rlRun "ipa dnsrecord-add $zone cert --cert-rec='$certa $cert'" 0 "add record type cert"
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-126: make sure that IPA saved record type cert"
@@ -699,7 +701,7 @@ fi
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-128: delete record of type cert"
-		rlRun "ipa dnsrecord-del $zone cert --cert-rec $cert" 0 "delete record type cert"
+		rlRun "ipa dnsrecord-del $zone cert --cert-rec='$certa $cert'" 0 "delete record type cert"
 	rlPhaseEnd
 
 	/etc/init.d/named restart
