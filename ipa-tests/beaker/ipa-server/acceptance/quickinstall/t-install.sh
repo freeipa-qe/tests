@@ -108,7 +108,7 @@ installClient()
 
         if [ -f /var/log/ipaclient-install.log ]; then
                 rhts-submit-log -l /var/log/ipaclient-install.log
-        f
+        fi
    rlPhaseEnd
 }
 
