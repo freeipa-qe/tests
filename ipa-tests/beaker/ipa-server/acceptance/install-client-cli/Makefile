@@ -29,7 +29,7 @@ export TESTVERSION=1.0
 
 BUILT_FILES=
 
-FILES=$(METADATA) runtest.sh Makefile PURPOSE data.ipaclientinstall.acceptance ipaclientinstall.exp lib.ipaclientverify.sh t.ipa-client-install.sh ../ipa-delegation/lib.ipadelegation.sh
+FILES=$(METADATA) runtest.sh Makefile PURPOSE data.ipaclientinstall.acceptance ipaclientinstall.exp lib.ipaclientverify.sh t.ipa-client-install.sh
 
 .PHONY: all install download clean
 
