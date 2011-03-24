@@ -4,7 +4,7 @@
 	</whiteboard>
 	<recipeSet>
 		<recipe kernel_options="" kernel_options_post="" ks_meta="" role="MASTER" whiteboard="MASTER for IPA Client Install Tests">
-			<autopick random="true"/>
+			<autopick random="false"/>
 			<watchdog panic="None"/>
 			<packages/>
 			<ks_appends/>
@@ -42,7 +42,7 @@
 			</task>
 		</recipe>
 		<recipe kernel_options="" kernel_options_post="" ks_meta="" role="SLAVE" whiteboard="SLAVE for IPA Client Install Tests">
-			<autopick random="true"/>
+			<autopick random="false"/>
 			<watchdog panic="None"/>
 			<packages/>
 			<ks_appends/>
