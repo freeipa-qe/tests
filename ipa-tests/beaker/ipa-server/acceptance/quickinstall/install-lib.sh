@@ -32,6 +32,41 @@ fixHostFile()
 }
 
 ######################################
+#    set lab controller and server   #
+#    cuz we much with DNS            #
+######################################
+setupBeakerEnv()
+{
+   HOSTSFILE="/etc/hosts"
+
+   # get lab controller's IP address
+   lc_ipaddr=$(dig +noquestion $LAB_CONTROLLER  | grep $LAB_CONTROLLER | grep IN | awk '{print $5}')
+   rlLog "LAB CONTROLLER HOST NAME: $LAB_CONTROLLER"
+   rlLog "LAB CONTROLLER IP ADDRESS: $ic_ipaddr"
+
+   # add to /etc/hosts
+   echo "$ic_ipaddr $LAB_CONTROLLER" >> $HOSTSFILE
+
+   # for now we need to hard code the beaker server, but Bill Peck is working on getting
+   # the beaker server available as a variable or better proxy thru lab controller - so
+   # we only need the lab controller
+
+   BEAKER_SERVER=beaker.engineering.redhat.com
+   bs_ipaddr=$(dig +noquestion $BEAKER_SERVER  | grep $BEAKER_SERVER | grep IN | awk '{print $5}')
+   rlLog "BEAKER SERVER HOST NAME: $BEAKER_SERVER"
+   rlLog "BEAKER SERVER IP ADDRESS: $bs_ipaddr"
+
+   # add to /etc/hosts
+   echo "$bs_ipaddr $BEAKER_SERVER" >> $HOSTSFILE
+
+   hostfile=`cat $HOSTFILE`
+   rlLog "HOST FILE CONTAINS ...."
+   rlLog "$hostfile"
+
+   return
+}
+
+######################################
 #       fix hostname                 #
 ######################################
 fixhostname()
