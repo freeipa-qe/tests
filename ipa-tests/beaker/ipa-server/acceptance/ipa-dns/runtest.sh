@@ -510,7 +510,7 @@ fi
 
 # Create a PTR zone
 	rlPhaseStartTest "ipa-dns-84: try to create a new PTR zone"
-		rlRun "ipa dnszone-add --name-server=$ipaddr --admin-email=$pemail --serial=$pserial --refresh=$prefresh --retry=$pretry --expire=$pexpire --minimum=$pminimum --ttl=$pttl $ptrzone" 1 "Creating a new PTR zone for use in following tests"
+		rlRun "ipa dnszone-add --name-server=$ipaddr --admin-email=$pemail --serial=$pserial --refresh=$prefresh --retry=$pretry --expire=$pexpire --minimum=$pminimum --ttl=$pttl $ptrzone" 0 "Creating a new PTR zone for use in following tests"
 	rlPhaseEnd
 
 	/etc/init.d/named restart
