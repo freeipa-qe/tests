@@ -9,7 +9,7 @@
 		ipa-server x86_64 daily multihost 
 	</whiteboard>
 	<recipeSet>
-		<recipe kernel_options="" kernel_options_post="" ks_meta="" role="MASTER" whiteboard="">
+		<recipe kernel_options="" kernel_options_post="" ks_meta="" role="MASTER" whiteboard="IPA MASTER SERVER">
 			<watchdog/>
 			<packages/>
 			<ks_appends/>
@@ -58,7 +58,7 @@
 			</task>
 
 		</recipe>
-		<recipe kernel_options="" kernel_options_post="" ks_meta="" role="SLAVE" whiteboard="">
+		<recipe kernel_options="" kernel_options_post="" ks_meta="" role="SLAVE" whiteboard="IPA REPLICA SERVER">
 			<watchdog/>
 			<packages/>
 			<ks_appends/>
@@ -110,7 +110,7 @@
 			</task>
 
 		</recipe>
-		<recipe kernel_options="" kernel_options_post="" ks_meta="" role="CLIENT" whiteboard="">
+		<recipe kernel_options="" kernel_options_post="" ks_meta="" role="CLIENT" whiteboard="IPA CLIENT">
 			<watchdog/>
 			<packages/>
 			<ks_appends/>
