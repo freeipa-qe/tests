@@ -503,3 +503,58 @@ fixResolv()
 	fi
 }
 
+
+
+
+
+###################################################################
+# qaRun
+#  In an an error condition, this checks the return code received, 
+#  and if that matches the expected, then checks the message.
+#  This method greps for the error messsage - so only 
+#  partial expected message can be checked.
+#
+#  $1 the command to run
+#  $2 the temp file to use to write the output of command to
+#  $3 the expected retun code when the command runs
+#  $4 expected messages to verify the output. A list of these 
+#  $5 a comment to indicate what the command does
+#  $6 set the debug flag, by passing the parameter as "debug" 
+#     (without the quotes)
+###################################################################
+qaRun()
+{
+    local cmd="$1"
+    local out="$2"
+    local expectCode="$3"
+    local expectMsg="$4"
+    local comment="$5"
+    local debug=$6
+    rlLog "cmd=[$cmd]"
+    rlLog "expect [$expectCode], out=[$out]"
+    rlLog "$comment"
+    
+    $1 2>$out
+    actualCode=$?
+    if [ "$actualCode" = "$expectCode" ];then
+        rlLog "return code matches, now check the message"
+        if grep -i "$expectMsg" $out 2>&1 >/dev/null
+        then 
+            rlPass "expected return code and msg matches"
+        else
+            rlFail "return code matches,but message does not match expection";
+            debug="debug"
+        fi
+    else
+        rlFail "expect [$expectCode] actual [$actualCode]"
+        debug="debug"
+    fi
+    # if debug is defined
+    if [ "$debug" = "debug" ];then
+        echo "--------- expected msg ---------"
+        echo "[$expectMsg]"
+        echo "========== execution output ==============="
+        cat $out
+        echo "============== end of output =============="
+    fi
+} #checkErrorMsg
