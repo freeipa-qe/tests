@@ -81,7 +81,7 @@ installSlave()
 
         if [ -f /var/log/ipareplica-install.log ]; then
                 rhts-submit-log -l /var/log/ipareplica-install.log
-        f
+        fi
 	# stop the firewall
 	service iptables stop
    rlPhaseEnd
