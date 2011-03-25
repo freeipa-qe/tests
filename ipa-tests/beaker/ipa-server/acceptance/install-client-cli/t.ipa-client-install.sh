@@ -1,7 +1,4 @@
 
-
-
-
 ##################################################################
 #                      test suite                                #
 #   perform the various combinations of install and uninstall    #
@@ -13,6 +10,7 @@ ipaclientinstall()
 #   -U, --unattended  Unattended installation. The user will not be prompted.
    ipaclientinstall_adminpwd
 
+#   install with multiple params including
 #   --ntp-server=NTP_SERVER Configure ntpd to use this NTP server.
    ipaclientinstall_allparam
 
@@ -28,13 +26,11 @@ ipaclientinstall()
    ipaclientinstall_nosssd
 
 #   --domain=DOMAIN Set the domain name to DOMAIN 
-#   ipaclientinstall_domain #TODO: No test yet
-#   ipaclientinstall_domain_casesensitive #TODO: No test yet
+    ipaclientinstall_invaliddomain
 
 #   --server=SERVER Set the IPA server to connect to
-#   ipaclientinstall_server_casesensitive #TODO: No test yet 
    ipaclientinstall_server_nodomain 
-   ipaclientinstall_server_invalidresolvconf
+   ipaclientinstall_server_invalidserver
 
 
 #   --realm=REALM_NAME Set the IPA realm name to REALM_NAME 
@@ -60,6 +56,9 @@ ipaclientinstall()
    ipaclientinstall_nonadminprincipal
    ipaclientinstall_principalwithinvalidpassword
 
+#   --permit Configure  SSSD  to  permit all access. Otherwise the machine will be controlled by the Host-based Access Controls (HBAC) on the IPA server.
+    ipaclientinstall_permit
+
 
 #   --mkhomedir  Configure pam to create a users home directory if it does not exist.
     ipaclientinstall_mkhomedir
@@ -69,9 +68,6 @@ ipaclientinstall()
 ####  Manual test ####
      ipaclientinstall_enablednsupdates
 
-#   --permit Configure  SSSD  to  permit all access. Otherwise the machine will be controlled by the Host-based Access Controls (HBAC) on the IPA server.
-    ipaclientinstall_permit
-
 
 #   Install client with master down
    ipaclientinstall_withmasterdown
@@ -80,14 +76,45 @@ ipaclientinstall()
 #  --f, --force Force the settings even if errors occur
    ipaclientinstall_force 
 
+
 }
+
+
+
+#############################################################################
+#   -U, --unattended  Unattended installation. The user will not be prompted.
+#############################################################################
+ipaclientinstall_adminpwd()
+{
+    rlPhaseStartTest "ipa-client-install: 01: [Positive] Install with admin & password - with -U"
+        uninstall_fornexttest
+        rlLog "EXECUTING: ipa-client-install -p $ADMINID -w $ADMINPW -U "
+        rlRun "ipa-client-install -p $ADMINID -w $ADMINPW -U " 0 "Installing ipa client and configuring - passing admin and password"
+        verify_install true nontpspecified 
+    rlPhaseEnd
+}
+
+
+
+############################################################
+
+ipaclientinstall_allparam()
+{
+    rlPhaseStartTest "ipa-client-install: 02: [Positive] Install with all param"
+        uninstall_fornexttest
+        rlLog "EXECUTING: ipa-client-install --domain=$DOMAIN --realm=$RELM --ntp-server=$NTPSERVER -p $ADMINID -w $ADMINPW --unattended --server=$MASTER"
+        rlRun "ipa-client-install --domain=$DOMAIN --realm=$RELM --ntp-server=$NTPSERVER -p $ADMINID -w $ADMINPW --unattended --server=$MASTER" 0 "Installing ipa client and configuring - with all params"
+        verify_install true
+    rlPhaseEnd
+}
+
 
 #################################################################################################
 #   --uninstall Remove the IPA client software and restore the configuration to the pre-IPA state.
 #################################################################################################
 ipaclientinstall_uninstall()
 {
-    rlPhaseStartTest "[Positive] IPA Uninstall"
+    rlPhaseStartTest "ipa-client-install: 03: [Positive] Uninstall"
         install_fornexttest
         rlLog "EXECUTING: ipa-client-install --uninstall -U"
         # before uninstalling ipa client, first remove its references from server
@@ -98,41 +125,16 @@ ipaclientinstall_uninstall()
     rlPhaseEnd
 }
 
-
-#############################################################################
-#   -U, --unattended  Unattended installation. The user will not be prompted.
-#############################################################################
-ipaclientinstall_adminpwd()
-{
-    rlPhaseStartTest "[Positive] IPA Install with admin & password - with -U"
-        uninstall_fornexttest
-        rlLog "EXECUTING: ipa-client-install -p $ADMINID -w $ADMINPW -U "
-        rlRun "ipa-client-install -p $ADMINID -w $ADMINPW -U " 0 "Installing ipa client and configuring - passing admin and password"
-        verify_install true nontpspecified 
-    rlPhaseEnd
-}
-
+#######################################################
 
 ipaclientinstall_noparam()
 {
-    rlPhaseStartTest "[Negative] IPA Install with no param"
+    rlPhaseStartTest "ipa-client-install: 04: [Negative] Install with no param"
         uninstall_fornexttest
         rlLog "EXECUTING: ipa-client-install -U "
         command="ipa-client-install -U"
         expmsg="One of password and principal are required."
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for IPA Install with no param"
-    rlPhaseEnd
-}
-
-############################################################
-
-ipaclientinstall_allparam()
-{
-    rlPhaseStartTest "[Positive] IPA Install with all param"
-        uninstall_fornexttest
-        rlLog "EXECUTING: ipa-client-install --domain=$DOMAIN --realm=$RELM --ntp-server=$NTPSERVER -p $ADMINID -w $ADMINPW --unattended --server=$MASTER"
-        rlRun "ipa-client-install --domain=$DOMAIN --realm=$RELM --ntp-server=$NTPSERVER -p $ADMINID -w $ADMINPW --unattended --server=$MASTER" 0 "Installing ipa client and configuring - with all params"
-        verify_install true
     rlPhaseEnd
 }
 
@@ -142,13 +144,13 @@ ipaclientinstall_allparam()
 ################################################
 ipaclientinstall_noNTP()
 {
-    rlPhaseStartTest "[Positive] IPA Install with no NTP configured"
+    rlPhaseStartTest "ipa-client-install: 05: [Positive] Install with no NTP configured"
         uninstall_fornexttest
         rlLog "EXECUTING: ipa-client-install --domain=$DOMAIN --realm=$RELM -N -p $ADMINID -w $ADMINPW -U --server=$MASTER"
         rlRun "ipa-client-install --domain=$DOMAIN --realm=$RELM -N -p $ADMINID -w $ADMINPW -U --server=$MASTER" 0 "Installing ipa client and configuring - with no NTP configured"
         verify_install true nontp
     rlPhaseEnd
-    #TODO: Repeat for --no-ntp
+    #TODO: Repeat for --no-ntp?
 }
 
 ####################################################################################################
@@ -156,48 +158,38 @@ ipaclientinstall_noNTP()
 ####################################################################################################
 ipaclientinstall_nosssd()
 {
-    rlPhaseStartTest "[Positive] IPA Install with no SSSD configured"
+    rlPhaseStartTest "ipa-client-install: 06: [Positive] Install with no SSSD configured"
         uninstall_fornexttest
         rlLog "EXECUTING: ipa-client-install --domain=$DOMAIN --realm=$RELM --ntp-server=$NTPSERVER -p $ADMINID -w $ADMINPW -U --server=$MASTER --no-sssd"
         rlRun "ipa-client-install --domain=$DOMAIN --realm=$RELM --ntp-server=$NTPSERVER -p $ADMINID -w $ADMINPW -U --server=$MASTER --no-sssd" 0 "Installing ipa client and configuring - with no SSSD configured"
         verify_install true nosssd
     rlPhaseEnd
-    #TODO: Repeat for --no-sssd
+    #TODO: Repeat for --no-sssd?
 }
+
 
 #################################################
 #   --domain=DOMAIN Set the domain name to DOMAIN 
 #################################################
 #negative tests for --domain option
-ipaclientinstall_domain()
+ipaclientinstall_invaliddomain()
 {
-    rlPhaseStartTest "[Negative] IPA Install with invalid domain"
-    #Bug 684780
+    rlPhaseStartTest "ipa-client-install: 07: [Negative] Install with invalid domain"
+       uninstall_fornexttest
+       rlLog "EXECUTING: ipa-client-install --domain=xxx -p $ADMINID -w $ADMINPW -U"
+       command="ipa-client-install --domain=xxx -p $ADMINID -w $ADMINPW -U"
+       expmsg="Unable to find IPA Server to join"
+       rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for IPA Install with invalid domain"
     rlPhaseEnd
 }
-
-ipaclientinstall_domain_casesensitive()
-{
-    rlPhaseStartTest "[Negative] IPA Install with incorrect case domainname"
-    #Bug 684780
-    rlPhaseEnd
-}
-
 
 ####################################################
 #   --server=SERVER Set the IPA server to connect to
 ####################################################
 #negative tests for --server option
-ipaclientinstall_server_casesensitive()
-{
-    rlPhaseStartTest "[Negative] IPA Install with incorrect case servername"
-    #Bug 684780
-    rlPhaseEnd
-}
-
 ipaclientinstall_server_nodomain()
 {
-    rlPhaseStartTest "[Negative] IPA Install with the server, but without the required param - domain - specified"
+    rlPhaseStartTest "ipa-client-install: 08: [Negative] Install with the server, but without the required param - domain - specified"
        uninstall_fornexttest
        rlLog "EXECUTING: ipa-client-install --server=xxx "
        command="ipa-client-install --server=xxx"
@@ -208,26 +200,15 @@ ipa-client-install: error: --server cannot be used without providing --domain"
     rlPhaseEnd
 }
 
-ipaclientinstall_server_invalidresolvconf()
+ipaclientinstall_server_invalidserver()
 {
-    rlPhaseStartTest "[Negative] IPA Install with invalid server, with invalid resolv.conf"
+    rlPhaseStartTest "ipa-client-install: 09: [Negative] Install with invalid server"
        uninstall_fornexttest
        rlLog "EXECUTING: ipa-client-install --server=xxx --domain=xxx "
-
-       # for this negative test, invalidate resolv.conf 
-       # get the Master's IP address
-       ipaddr=$(dig +noquestion $MASTER  | grep $MASTER | grep IN | grep A | awk '{print $5}')
-       rlLog "MASTER IP address is $ipaddr"
-       update_resolvconf $ipaddr false 
-
        command="ipa-client-install --server=xxx --domain=xxx"
        expmsg="Retrieving CA from xxx failed."
-       local tmpout=$TmpDir/ipaclientinstall_server_invalidresolvconf1.$RANDOM.out
-       qaRun "$command" "$tmpout" 1 $expmsg "Verify expected error message for IPA Install with invalid resolv.conf" 
-
-       # restore back the resolv.conf
-       update_resolvconf $ipaddr true 
-
+       local tmpout=$TmpDir/ipaclientinstall_server_invalidresolvconf1.out
+       qaRun "$command" "$tmpout" 1 $expmsg "Verify expected error message for IPA Install with invalid server" 
     rlPhaseEnd
 }
 
@@ -238,7 +219,8 @@ ipaclientinstall_server_invalidresolvconf()
 #negative tests for --realm option
 ipaclientinstall_realm_casesensitive()
 {
-    rlPhaseStartTest "[Negative] IPA Install with incorrect case realmname"
+    rlPhaseStartTest "ipa-client-install: 10: [Negative] Install with incorrect case realmname"
+       uninstall_fornexttest
        relminlowercase=`echo ${RELM,,}`
        rlLog "EXECUTING: ipa-client-install --realm=$relminlowercase"
        command="ipa-client-install --realm=$relminlowercase"
@@ -250,7 +232,7 @@ ipaclientinstall_realm_casesensitive()
 
 ipaclientinstall_invalidrealm()
 {
-    rlPhaseStartTest "[Negative] IPA Install with invalid realm"
+    rlPhaseStartTest "ipa-client-install: 11: [Negative] Install with invalid realm"
        uninstall_fornexttest
        rlLog "EXECUTING: ipa-client-install --realm=xxx"
        command="ipa-client-install --realm=xxx"
@@ -267,7 +249,7 @@ ipaclientinstall_invalidrealm()
 ## in the case below - client is installed, but a DNS entry is not available on server for this client.
 ipaclientinstall_hostname()
 {
-    rlPhaseStartTest "[Positive-Negative] IPA Install with invalid hostname"
+    rlPhaseStartTest "ipa-client-install: 12: [Positive-Negative] IPA Install with invalid hostname"
        uninstall_fornexttest
        rlLog "EXECUTING: ipa-client-install --hostname=$CLIENT"
        local tmpout=$TmpDir/ipaclientinstall_hostname.$RANDOM.out
@@ -294,42 +276,6 @@ ipaclientinstall_hostname()
 
 }
 
-#######################################################
-#  --f, --force Force the settings even if errors occur
-#######################################################
-# includes positive and negative tests to force reinstalling and uninsatlling multiple times.
-ipaclientinstall_force()
-{
-    rlPhaseStartTest "[Negative] Reinstall IPA Client" 
-      install_fornexttest
-      # A second install will indicate it is already installed.
-      command="ipa-client-install --domain=$DOMAIN --realm=$RELM --ntp-server=$NTPSERVER -p $ADMINID -w $ADMINPW -U --server=$MASTER"
-      expmsg="IPA client is already configured on this system."
-      rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for reinstall of IPA Install"
-    rlPhaseEnd
-    rlPhaseStartTest "[Positive] IPA Client with force" 
-      # But now force it to install even though it has been previously installed here.
-      rlLog "EXECUTING: ipa-client-install --domain=$DOMAIN --realm=$RELM --ntp-server=$NTPSERVER -p $ADMINID -w $ADMINPW -U --server=$MASTER -f"
-      rlRun "ipa-client-install --domain=$DOMAIN --realm=$RELM --ntp-server=$NTPSERVER -p $ADMINID -w $ADMINPW -U --server=$MASTER -f" 0 "Installing ipa client and configuring - second time - force it"
-      verify_install true force
-    rlPhaseEnd
-    rlPhaseStartTest "[Negative] Uninstall IPA Client twice" 
-       rlLog "EXECUTING: ipa-client-install --uninstall -U"
-       command="ipa-client-install --uninstall -U"
-       rlRun "$command" 0 "Uninstalling ipa client - after a force install"
-       verify_install false
-       expmsg="IPA client is not configured on this system."
-       local tmpout=$TmpDir/ipaclientinstall_force.$RANDOM.out
-       rlLog "EXECUTING: ipa-client-install --uninstall -U"
-       qaExpectedRun "$command" "$tmpout" 2 "Verify expected error message for non-existent IPA Install" "$expmsg"
-    rlPhaseEnd
-    rlPhaseStartTest "[Positive] Uninstall non-existent IPA Client with force" 
-      # But now force it to install even though it has been previously uninstalled here.
-      rlLog "EXECUTING: ipa-client-install --uninstall -U -f"
-      rlRun "ipa-client-install --uninstall -U --force" 0 "Uninstalling ipa client - second time - force it"
-      verify_install false
-    rlPhaseEnd
-}
 
 ####################################################################################
 #   -w PASSWORD, --password=PASSWORD Password for joining a machine to the IPA realm.
@@ -337,7 +283,7 @@ ipaclientinstall_force()
 ####################################################################################
 ipaclientinstall_password()
 {
-    rlPhaseStartTest "[Negative] IPA Install with password, but missing principal"
+    rlPhaseStartTest "ipa-client-install: 13: [Negative] Install with password, but missing principal"
        uninstall_fornexttest
        rlLog "EXECUTING: ipa-client-install --password=$ADMINPW"
        command="ipa-client-install --password $ADMINPW -U"
@@ -365,7 +311,7 @@ Certificate subject base is: O=$RELM"
 #
 ipaclientinstall_bulkpassword()
 {
-    rlPhaseStartTest "[Positive] IPA Install with bulk password"
+    rlPhaseStartTest "ipa-client-install: 14: [Positive] IPA Install with bulk password"
        install_fornexttest
        rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials after installing"
        rlRun "ipa host-del $CLIENT" 0 " Delete host record from server, and leave DNS entries intact on server"
@@ -379,7 +325,7 @@ ipaclientinstall_bulkpassword()
        rlRun "ipa-client-install --ntp-server=$NTPSERVER  --password=\"$randompwd\" -U"
        verify_install true
     rlPhaseEnd
-    rlPhaseStartTest "[Positive] IPA Uninstall with bulk password"
+    rlPhaseStartTest "ipa-client-install: 15: [Positive] Uninstall with bulk password"
        rlLog "EXECUTING: ipa-client-install --uninstall -U --password=\"$randompwd\""
        rlRun "ipa-client-install --uninstall -U --password=\"$randompwd\" " 0 "Uninstalling ipa client using the random password used to install this client."
     rlPhaseEnd
@@ -400,7 +346,7 @@ ipaclientinstall_bulkpassword()
 #negative tests for --principal option
 ipaclientinstall_nonexistentprincipal()
 {
-    rlPhaseStartTest "[Negative] IPA Install with non-existent principal"
+    rlPhaseStartTest "ipa-client-install: 16: [Negative] Install with non-existent principal"
         uninstall_fornexttest
         command="ipa-client-install --ntp-server=$NTPSERVER -p $testuser -w $testpwd -U" 
         expmsg="kinit: Client '$testuser@$RELM' not found in Kerberos database while getting initial credentials"
@@ -412,7 +358,7 @@ ipaclientinstall_nonexistentprincipal()
 # using --principal
 ipaclientinstall_nonadminprincipal()
 {
-    rlPhaseStartTest "[Negative] IPA Install with principal with no admin priviliges"
+    rlPhaseStartTest "ipa-client-install: 17: [Negative] Install with principal with no admin priviliges"
        install_fornexttest
        rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials after installing"
        rlRun "ipa user-add --first=$testuser --last=$testuser $testuser" 0 "Add new user"
@@ -434,7 +380,7 @@ ipaclientinstall_nonadminprincipal()
 
 ipaclientinstall_principalwithinvalidpassword()
 {
-    rlPhaseStartTest "[Negative] IPA Install with principal with invalid password"
+    rlPhaseStartTest "ipa-client-install: 18: [Negative] Install with principal with invalid password"
        uninstall_fornexttest
        rlLog "EXECUTING: ipa-client-install --ntp-server=$NTPSERVER -p $ADMINID -w $testpwd -U" 
        command="ipa-client-install --ntp-server=$NTPSERVER -p $ADMINID -w $testpwd -U" 
@@ -452,13 +398,13 @@ ipaclientinstall_principalwithinvalidpassword()
 #############################################################################################
 ipaclientinstall_permit()
 {
-    rlPhaseStartTest "[Positive] IPA Install and configure SSSD to permit all access"
+    rlPhaseStartTest "ipa-client-install: 19: [Positive] Install and configure SSSD to permit all access"
         uninstall_fornexttest
         rlLog "EXECUTING: ipa-client-install --ntp-server=$NTPSERVER -p $ADMINID -w $ADMINPW -U --permit"
         rlRun "ipa-client-install --ntp-server=$NTPSERVER -p $ADMINID -w $ADMINPW -U --permit" 0 "Installing ipa client and configure SSSD to permit all access"
         verify_install true permit
     rlPhaseEnd
-    rlPhaseStartTest "[Positive] IPA Uninstall and disable SSSD to permit all access "
+    rlPhaseStartTest "ipa-client-install: 20: [Positive] Uninstall and disable SSSD to permit all access "
         rlLog "EXECUTING: ipa-client-install --uninstall -U"
         rlRun "ipa-client-install --uninstall -U" 0 "Uninstalling ipa client and disable SSSD to permit all access"
         verify_install false permit
@@ -470,13 +416,13 @@ ipaclientinstall_permit()
 ######################################################################################
 ipaclientinstall_mkhomedir()
 {
-    rlPhaseStartTest "[Positive] IPA Install and configure pam to create home dir if it does not exist"
+    rlPhaseStartTest "ipa-client-install: 21: [Positive] Install and configure pam to create home dir if it does not exist"
         uninstall_fornexttest
         rlLog "EXECUTING: ipa-client-install --ntp-server=$NTPSERVER -p $ADMINID -w $ADMINPW -U --mkhomedir"
         rlRun "ipa-client-install --ntp-server=$NTPSERVER -p $ADMINID -w $ADMINPW -U --mkhomedir" 0 "Installing ipa client and configuring pam to create home dir if it does not exist"
         verify_install true mkhomedir
     rlPhaseEnd
-    rlPhaseStartTest "[Positive] IPA Uninstall and remove configuration for pam to create home dir"
+    rlPhaseStartTest "ipa-client-install: 22: [Positive] Uninstall and remove configuration for pam to create home dir"
         rlLog "EXECUTING: ipa-client-install --uninstall -U"
         rlRun "ipa-client-install --uninstall -U" 0 "Uninstalling ipa client and remove configuration for pam to create home dir"
         verify_install false mkhomedir
@@ -491,13 +437,13 @@ ipaclientinstall_mkhomedir()
 ###############################################################################################################
 ipaclientinstall_enablednsupdates()
 {
-    rlPhaseStartTest "[Positive] IPA Install and enable dynamic dns updates"
+    rlPhaseStartTest "ipa-client-install: 23: [Positive] Install and enable dynamic dns updates"
         uninstall_fornexttest
         rlLog "EXECUTING: ipa-client-install --ntp-server=$NTPSERVER -p $ADMINID -w $ADMINPW -U --enable-dns-updates"
         rlRun "ipa-client-install --ntp-server=$NTPSERVER -p $ADMINID -w $ADMINPW -U --enable-dns-updates" 0 "Installing ipa client and enable dynamic dns updates"
         verify_install true enablednsupdates
     rlPhaseEnd
-    rlPhaseStartTest "[Positive] IPA Uninstall and disable dynamic dns updates"
+    rlPhaseStartTest "ipa-client-install: 24: [Positive] Uninstall and disable dynamic dns updates"
         rlLog "EXECUTING: ipa-client-install --uninstall -U"
         rlRun "ipa-client-install --uninstall -U" 0 "Uninstalling ipa client and disable dynamic dns updates"
         verify_install false enablednsupdates
@@ -505,24 +451,12 @@ ipaclientinstall_enablednsupdates()
 }
 
 
-
-
-#####################################
-# TODO: When server is not configured with DNS Discovery
-######################################
-
-
-######################################
-# TODO: Server and Client in different domain
-######################################
-
-
 ##########################################
 # Client Install with primary down, replica up
 ##########################################
 ipaclientinstall_withmasterdown()
 {
-    rlPhaseStartTest "[Positive] IPA Install with MASTER down, SLAVE up"
+    rlPhaseStartTest "ipa-client-install: 25: [Positive] Install with MASTER down, SLAVE up"
 #        uninstall_fornexttest
        
         # Stop the MASTER 
@@ -535,6 +469,43 @@ ipaclientinstall_withmasterdown()
         rlRun "ssh root@$MASTER \"ipactl start\"" 0 "Stop MASTER IPA server"
 
         verify_install true
+    rlPhaseEnd
+}
+
+#######################################################
+#  --f, --force Force the settings even if errors occur
+#######################################################
+# includes positive and negative tests to force reinstalling and uninsatlling multiple times.
+ipaclientinstall_force()
+{
+    rlPhaseStartTest "ipa-client-install: 26: [Negative] Reinstall IPA Client" 
+      install_fornexttest
+      # A second install will indicate it is already installed.
+      command="ipa-client-install --domain=$DOMAIN --realm=$RELM --ntp-server=$NTPSERVER -p $ADMINID -w $ADMINPW -U --server=$MASTER"
+      expmsg="IPA client is already configured on this system."
+      rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for reinstall of IPA Install"
+    rlPhaseEnd
+    rlPhaseStartTest "ipa-client-install: 27: [Positive] Reinstall Client with force" 
+      # But now force it to install even though it has been previously installed here.
+      rlLog "EXECUTING: ipa-client-install --domain=$DOMAIN --realm=$RELM --ntp-server=$NTPSERVER -p $ADMINID -w $ADMINPW -U --server=$MASTER -f"
+      rlRun "ipa-client-install --domain=$DOMAIN --realm=$RELM --ntp-server=$NTPSERVER -p $ADMINID -w $ADMINPW -U --server=$MASTER -f" 0 "Installing ipa client and configuring - second time - force it"
+      verify_install true force
+    rlPhaseEnd
+    rlPhaseStartTest "ipa-client-install: 28: [Negative] Uninstall IPA Client twice" 
+       rlLog "EXECUTING: ipa-client-install --uninstall -U"
+       command="ipa-client-install --uninstall -U"
+       rlRun "$command" 0 "Uninstalling ipa client - after a force install"
+       verify_install false
+       expmsg="IPA client is not configured on this system."
+       local tmpout=$TmpDir/ipaclientinstall_force.$RANDOM.out
+       rlLog "EXECUTING: ipa-client-install --uninstall -U"
+       qaExpectedRun "$command" "$tmpout" 2 "Verify expected error message for non-existent IPA Install" "$expmsg"
+    rlPhaseEnd
+    rlPhaseStartTest "ipa-client-install: 29: [Positive] Uninstall non-existent IPA Client with force" 
+      # But now force it to install even though it has been previously uninstalled here.
+      rlLog "EXECUTING: ipa-client-install --uninstall -U -f"
+      rlRun "ipa-client-install --uninstall -U --force" 0 "Uninstalling ipa client - second time - force it"
+      verify_install false
     rlPhaseEnd
 }
 
