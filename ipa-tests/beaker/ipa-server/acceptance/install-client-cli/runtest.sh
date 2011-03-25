@@ -38,7 +38,7 @@
 # Include test case file
 . ./t.ipa-client-install.sh
 . ./lib.ipaclientverify.sh
-. ../ipa-delegation/lib.ipadelegation.sh
+. ../quickinstall/install-lib.sh
 
 
 PACKAGE="ipa-client"
