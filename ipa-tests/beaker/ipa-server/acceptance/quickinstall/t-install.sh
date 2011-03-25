@@ -73,6 +73,8 @@ installSlave()
                 	chmod 755 /dev/shm/replica-install.bash
                 	rlLog "EXECUTING: ipa-replica-install -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg"
 			rlRun "bash /dev/shm/replica-install.bash" 0 "Replica installation"
+		else
+                	rlRun "setupBeakerServer" 0 "Add beaker server to hosts file so test rpm can be downloaded"
 		fi
 
 		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
@@ -103,6 +105,8 @@ installClient()
 		rlLog "EXECUTING: ipa-client-install --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW -U --server=$MASTER"
         	rlRun "ipa-client-install --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW -U --server=$MASTER" 0 "Installing ipa client and configuring"
 		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
+	else
+		rlRun "setupBeakerServer" 0 "Add beaker server to hosts file so test rpm can be downloaded"
 	fi
 	rlRun "appendEnv" 0 "Append the machine information to the env.sh with the information for the machines in the recipe set"
 
