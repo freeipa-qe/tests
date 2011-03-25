@@ -73,9 +73,8 @@ installSlave()
                 	rlLog "EXECUTING: ipa-replica-install -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg"
 			rlRun "bash /dev/shm/replica-install.bash" 0 "Replica installation"
 			rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
+			rlRun "appendEnv" 0 "Append the machine information to the env.sh with the information for the machines in the recipe set"
 		fi
-
-		rlRun "appendEnv" 0 "Append the machine information to the env.sh with the information for the machines in the recipe set"
 	fi
 
         if [ -f /var/log/ipareplica-install.log ]; then
@@ -102,8 +101,8 @@ installClient()
 		rlLog "EXECUTING: ipa-client-install --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW -U --server=$MASTER"
         	rlRun "ipa-client-install --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW -U --server=$MASTER" 0 "Installing ipa client and configuring"
 		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
+		rlRun "appendEnv" 0 "Append the machine information to the env.sh with the information for the machines in the recipe set"
 	fi
-	rlRun "appendEnv" 0 "Append the machine information to the env.sh with the information for the machines in the recipe set"
 
         if [ -f /var/log/ipaclient-install.log ]; then
                 rhts-submit-log -l /var/log/ipaclient-install.log
