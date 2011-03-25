@@ -83,6 +83,7 @@ ipaclientinstall()
 setup()
 {
     # edit hosts file and resolv file before starting tests
+    rlRun "appendEnv" 0 "Append the machine information to the env.sh with the information for the machines in the recipe set"
     rlRun "fixHostFile" 0 "Set up /etc/hosts"
     rlRun "fixhostname" 0 "Fix hostname"
     rlRun "fixResolv" 0 "fixing the reoslv.conf to contain the correct nameserver lines"
