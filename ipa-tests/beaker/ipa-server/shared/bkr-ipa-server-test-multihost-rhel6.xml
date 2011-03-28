@@ -31,7 +31,7 @@
 			</task>
 			<task name="/distribution/pkginstall" role="STANDALONE">
 				<params>
-					<param name="PKGARGNAME" value="ipa-server ipa-client ipa-admintools ds-replication  caching-nameserver expect krb5-workstation bind-dyndb-ldap ntpdate krb5-pkinit-openssl rhts-test-env"/>
+					<param name="PKGARGNAME" value="ipa-server ipa-client ipa-admintools ds-replication  expect krb5-workstation bind-dyndb-ldap ntpdate krb5-pkinit-openssl rhts-test-env"/>
 				</params>
 			</task>
 
@@ -70,7 +70,7 @@
 			</task>
 			<task name="/distribution/pkginstall" role="STANDALONE">
 				<params>
-					<param name="PKGARGNAME" value="ipa-server ipa-client ipa-admintools ds-replication  caching-nameserver expect krb5-workstation bind-dyndb-ldap ntpdate krb5-pkinit-openssl rhts-test-env"/>
+					<param name="PKGARGNAME" value="ipa-server ipa-client ipa-admintools ds-replication  expect krb5-workstation bind-dyndb-ldap ntpdate krb5-pkinit-openssl rhts-test-env"/>
 				</params>
 			</task>
 
@@ -108,7 +108,7 @@
 			</task>
 			<task name="/distribution/pkginstall" role="STANDALONE">
 				<params>
-					<param name="PKGARGNAME" value="ipa-server ipa-client ipa-admintools ds-replication  caching-nameserver expect krb5-workstation bind-dyndb-ldap ntpdate krb5-pkinit-openssl rhts-test-env"/>
+					<param name="PKGARGNAME" value="ipa-server ipa-client ipa-admintools ds-replication  expect krb5-workstation bind-dyndb-ldap ntpdate krb5-pkinit-openssl rhts-test-env"/>
 				</params>
 			</task>
 
