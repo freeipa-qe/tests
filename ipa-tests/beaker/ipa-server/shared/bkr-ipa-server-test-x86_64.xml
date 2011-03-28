@@ -17,7 +17,6 @@
 			<repos>
 				<repo name="ipa" url="http://mickey.dsdev.sjc.redhat.com/repos/pki/ipa/devel/rhel6/devel_x86_64/x86_64"/>
 				<repo name="ipa-noarch" url="http://mickey.dsdev.sjc.redhat.com/repos/pki/ipa/devel/rhel6/devel_x86_64/noarch"/>
-				<repo name="beaker-harness" url="https://beaker-devel.app.eng.bos.redhat.com/harness/RedHatEnterpriseLinux6/x86_64"/>
 			</repos>
 			<hostRequires>
 				<and/>
@@ -27,7 +26,7 @@
 			</task>
 			<task name="/distribution/pkginstall" role="STANDALONE">
 				<params>
-					<param name="PKGARGNAME" value="ipa-server ipa-client ipa-admintools ds-replication dsbind caching-nameserver expect krb5-workstation bind-dyndb-ldap ntpdate krb5-pkinit-openssl rhts-test-env"/>
+					<param name="PKGARGNAME" value="ipa-server ipa-client ipa-admintools ds-replication  caching-nameserver expect krb5-workstation bind-dyndb-ldap ntpdate krb5-pkinit-openssl rhts-test-env"/>
 				</params>
 			</task>
 			<task name="/CoreOS/ipa-server/shared" role="STANDALONE">
