@@ -84,10 +84,11 @@ setup()
     # edit hosts file and resolv file before starting tests
     rlRun "fixHostFile" 0 "Set up /etc/hosts"
     rlRun "fixhostname" 0 "Fix hostname"
-    rlRun "fixResolv" 0 "fixing the reoslv.conf to contain the correct nameserver lines"
+    rlRun "fixResolv" 0 "fixing the resolv.conf to contain the correct nameserver lines"
     rlRun "appendEnv" 0 "Append the machine information to the env.sh with the information for the machines in the recipe set"
-    master_short=`echo $MASTER | cut -d "." -f1`
-    MASTER=$master_short.$DOMAIN
+    rlRun "`grep "export MASTER=" /dev/shm/env.sh`" 0 "Export MASTER"
+    rlRun "`grep "export MASTERIP=" /dev/shm/env.sh`" 0 "Export MASTERIP"
+    rlRun "`grep "export CLIENT=" /dev/shm/env.sh`" 0 "Export CLIENT"
 }
 
 
@@ -377,11 +378,11 @@ ipaclientinstall_permit()
         rlRun "ipa-client-install --ntp-server=$NTPSERVER -p $ADMINID -w $ADMINPW -U --permit" 0 "Installing ipa client and configure SSSD to permit all access"
         verify_install true permit
     rlPhaseEnd
-    rlPhaseStartTest "ipa-client-install: 19: [Positive] Uninstall and disable SSSD to permit all access "
-        rlLog "EXECUTING: ipa-client-install --uninstall -U"
-        rlRun "ipa-client-install --uninstall -U" 0 "Uninstalling ipa client and disable SSSD to permit all access"
-        verify_install false permit
-    rlPhaseEnd
+#    rlPhaseStartTest "ipa-client-install: 19: [Positive] Uninstall and disable SSSD to permit all access "
+#        rlLog "EXECUTING: ipa-client-install --uninstall -U"
+#        rlRun "ipa-client-install --uninstall -U" 0 "Uninstalling ipa client and disable SSSD to permit all access"
+#        verify_install false permit
+#    rlPhaseEnd
 }
 
 ######################################################################################
