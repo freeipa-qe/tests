@@ -8,7 +8,7 @@ ipaclientinstall()
 {
 
    setup
-##   -U, --unattended  Unattended installation. The user will not be prompted.
+#   -U, --unattended  Unattended installation. The user will not be prompted.
    ipaclientinstall_adminpwd
 
 #   install with multiple params including
@@ -48,7 +48,6 @@ ipaclientinstall()
 
 #   -w PASSWORD, --password=PASSWORD Password for joining a machine to the IPA realm. Assumes bulk password unless principal is also set.
     ipaclientinstall_password
-    ipaclientinstall_bulkpassword
 
 #   -W  Prompt for the password for joining a machine to the IPA realm.
 
@@ -83,10 +82,12 @@ ipaclientinstall()
 setup()
 {
     # edit hosts file and resolv file before starting tests
-    rlRun "appendEnv" 0 "Append the machine information to the env.sh with the information for the machines in the recipe set"
     rlRun "fixHostFile" 0 "Set up /etc/hosts"
     rlRun "fixhostname" 0 "Fix hostname"
     rlRun "fixResolv" 0 "fixing the reoslv.conf to contain the correct nameserver lines"
+    rlRun "appendEnv" 0 "Append the machine information to the env.sh with the information for the machines in the recipe set"
+    master_short=`echo $MASTER | cut -d "." -f1`
+    MASTER=$master_short.$DOMAIN
 }
 
 
@@ -302,41 +303,6 @@ Certificate subject base is: O=$RELM"
     rlPhaseEnd
 }
 
-
-
-# To use as bulk pwd:
-# On server, 
-# ipa host-del rhel61-client.testrelm
-#
-# and leave DNS entries intact.
-# Then,
-# ipa host-add --random rhel61-client.testrelm
-#
-# this generates a bulk pwd. Use this (if needed within quotes) to install client with just -w
-# ipa-client-install -w "Q*<DW%3#%[ x" -d
-#
-# Uninstall this client using this same password.
-#
-#
-ipaclientinstall_bulkpassword()
-{
-    rlPhaseStartTest "ipa-client-install: 14: [Positive] IPA Install with bulk password"
-       install_fornexttest
-       rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials after installing"
-       rlRun "ipa host-del $CLIENT" 0 " Delete host record from server, and leave DNS entries intact on server"
-       hostadd_cmd="ipa host-add --random $CLIENT"
-       tmpout=$TmpDir/ipaclientinstall_bulkpassword.out
-       rlLog "Add host record  and generate random password"
-       $hostadd_cmd > $tmpout       
-       randompwd=`grep "Random " $tmpout | cut -d ":" -f2 | xargs -0 echo`
-       uninstall_fornexttest
-       rlLog "EXECUTING: ipa-client-install --password=\"$randompwd\""
-       rlRun "ipa-client-install --ntp-server=$NTPSERVER  --password=\"$randompwd\" -U"
-       verify_install true
-       rlLog "EXECUTING: ipa-client-install --uninstall -U "
-       rlRun "ipa-client-install --uninstall -U " 0 "Uninstalling ipa client"
-    rlPhaseEnd
-}
 
 
 #######################################################################

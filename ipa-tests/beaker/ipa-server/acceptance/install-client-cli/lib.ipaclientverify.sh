@@ -117,7 +117,7 @@ verify_sssd()
        ipacompare_forinstalluninstall "id_provider " "$id_provider" "$testidprovider" "$1" 
        testipadomain=`grep "^ipa_domain" $SSSD | cut -d "=" -f2 | xargs echo`
        ipacompare_forinstalluninstall "ipa_domain " "$ipa_domain" "$testipadomain" "$1" 
-       if [ $installcheck -a "$2" != "force"] ; then
+       if [  $installcheck  -a  "$2" != "force" ] ; then
           testkrb5realm=`grep "^krb5_realm" $SSSD | cut -d "=" -f2 | xargs echo`
           ipacompare_forinstalluninstall "krb5_realm " "$krb5_realm" "$testkrb5realm" "$1" 
        fi
@@ -348,6 +348,7 @@ update_resolvconf()
 
    return
 }
+
 
 # Note: To use this call, have to install ipa client
 # So Keytab now for this client is true
