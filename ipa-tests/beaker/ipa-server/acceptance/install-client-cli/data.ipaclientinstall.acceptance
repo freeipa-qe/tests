@@ -27,7 +27,6 @@ id_provider="ipa"
 auth_provider="ipa krb5"
 access_provider="ipa"
 chpass_provider="ipa krb5"
-ipa_server="_srv_, $MASTER"
 krb5_realm=$RELM
 id_provider_nosssd="ldap"
 cache_credentials_nosssd="True"
@@ -56,7 +55,6 @@ renew_lifetime="36000"
 krb4_convert="false"
 dns_lookup_kdc_force="false"
 dns_lookup_realm_force="false"
-domain_realm_force="$MASTER:88 $MASTER:749 ${RELM,,} $RELM $RELM"
 
 #ntp.conf updates
 ntpserver="server $NTPSERVER" 

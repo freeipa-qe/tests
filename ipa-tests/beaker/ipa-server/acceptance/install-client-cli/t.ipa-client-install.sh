@@ -86,9 +86,12 @@ setup()
     rlRun "fixhostname" 0 "Fix hostname"
     rlRun "fixResolv" 0 "fixing the resolv.conf to contain the correct nameserver lines"
     rlRun "appendEnv" 0 "Append the machine information to the env.sh with the information for the machines in the recipe set"
-    rlRun "`grep "export MASTER=" /dev/shm/env.sh`" 0 "Export MASTER"
-    rlRun "`grep "export MASTERIP=" /dev/shm/env.sh`" 0 "Export MASTERIP"
-    rlRun "`grep "export CLIENT=" /dev/shm/env.sh`" 0 "Export CLIENT"
+    
+    ## Lines to expect to be changed during the isnatllation process
+    ## which reference the MASTER. 
+    ## Moved them here from data.ipaclientinstall.acceptance since MASTER is not set there.
+    ipa_server="_srv_, $MASTER" # sssd.conf updates
+    domain_realm_force="$MASTER:88 $MASTER:749 ${RELM,,} $RELM $RELM" # krb5.conf updates
 }
 
 
@@ -337,9 +340,10 @@ ipaclientinstall_nonadminprincipal()
        rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials after installing"
        rlRun "ipa user-add --first=$testuser --last=$testuser $testuser" 0 "Add new user"
        rlRun "ipa passwd $testuser $testpwd" 0 "Set new user's password"
+       rlRun "FirstKinitAs $testuser $testpwd $ADMINPW" 0 "Get administrator credentials after installing"
        uninstall_fornexttest
-       rlLog "EXECUTING: ipa-client-install --ntp-server=$NTPSERVER --principal $testuser -w $testpwd -U"
-       command="ipa-client-install --ntp-server=$NTPSERVER --principal $testuser -w $testpwd -U" 
+       rlLog "EXECUTING: ipa-client-install --ntp-server=$NTPSERVER --principal $testuser -w $ADMINPW -U"
+       command="ipa-client-install --ntp-server=$NTPSERVER --principal $testuser -w $ADMINPW -U" 
        expmsg="Joining realm failed because of failing XML-RPC request.
   This error may be caused by incompatible server/client major versions."
        tmpout=$TmpDir/ipaclientinstall_nonadminprincipal.out
@@ -361,7 +365,6 @@ ipaclientinstall_principalwithinvalidpassword()
        expmsg="kinit: Password incorrect while getting initial credentials"
        tmpout=$TmpDir/ipaclientinstall_principalwithinvalidpassword.out
        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for IPA Install with principal with invalid password"
-       #qaExpectedRun "$command" "$tmpout" 1 "Verify expected error message for IPA Install with principal with invalid password" "$expmsg"
     rlPhaseEnd
 }
 
@@ -378,11 +381,11 @@ ipaclientinstall_permit()
         rlRun "ipa-client-install --ntp-server=$NTPSERVER -p $ADMINID -w $ADMINPW -U --permit" 0 "Installing ipa client and configure SSSD to permit all access"
         verify_install true permit
     rlPhaseEnd
-#    rlPhaseStartTest "ipa-client-install: 19: [Positive] Uninstall and disable SSSD to permit all access "
-#        rlLog "EXECUTING: ipa-client-install --uninstall -U"
-#        rlRun "ipa-client-install --uninstall -U" 0 "Uninstalling ipa client and disable SSSD to permit all access"
-#        verify_install false permit
-#    rlPhaseEnd
+    rlPhaseStartTest "ipa-client-install: 19: [Positive] Uninstall and disable SSSD to permit all access "
+        rlLog "EXECUTING: ipa-client-install --uninstall -U"
+        rlRun "ipa-client-install --uninstall -U" 0 "Uninstalling ipa client and disable SSSD to permit all access"
+        verify_install false permit
+    rlPhaseEnd
 }
 
 ######################################################################################
