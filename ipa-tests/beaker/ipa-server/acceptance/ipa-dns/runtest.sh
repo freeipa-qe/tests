@@ -246,9 +246,9 @@ fi
 	kxbadpref2="1233456789012345"
 	
 	# These values are all for creating the ptr zone
-	ptrzone="$ptroctet.in-addr.arpa"
+	ptrzone="$ptroctet.in-addr.arpa."
 	# Bad ptr zone
-	bptrzone="1.2.3.in-addr.arpa"
+	bptrzone="1.2.3.in-addr.arpa."
 	pemail="ipaqar.redhat.com"
 	pserial=2010010799
 	prefresh=393
