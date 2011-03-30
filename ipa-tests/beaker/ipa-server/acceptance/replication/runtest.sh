@@ -66,15 +66,13 @@ rlJournalStart
         rlRun "pushd $TmpDir"
     rlPhaseEnd
 
-    # r2d2_test_starts
-	if [ -n $SLAVE ]; then
+	if [ -z $SLAVE ]; then
 		echo "ERROR - This test suite must be run on a setup involving at lease one master, and one replica server"
 		rlFail "This test suite must be run on a setup involving at lease one master, and one replica server"
 	else
 		setupApache
 		replication
 	fi
-    # r2d2_test_ends
 
     rlPhaseStartCleanup "replication cleanup"
         rlRun "popd"
