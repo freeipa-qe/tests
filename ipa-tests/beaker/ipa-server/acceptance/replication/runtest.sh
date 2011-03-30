@@ -46,6 +46,15 @@ PACKAGE="ipa-admintools"
 
 startDate=`date "+%F %r"`
 satrtEpoch=`date "+%s"`
+hdir=/var/www/html
+
+setupApache()
+{
+	rm -Rf $hdir/rt
+	mkdir $hdir/rt
+	chmod 755 $hdir/rt
+	service httpd restart
+}
 ##########################################
 #   test main 
 #########################################
@@ -58,10 +67,11 @@ rlJournalStart
     rlPhaseEnd
 
     # r2d2_test_starts
-	if [ $SLAVE -eq "" ]; then
+	if [ -n $SLAVE ]; then
 		echo "ERROR - This test suite must be run on a setup involving at lease one master, and one replica server"
 		rlFail "This test suite must be run on a setup involving at lease one master, and one replica server"
 	else
+		setupApache
 		replication
 	fi
     # r2d2_test_ends
