@@ -473,7 +473,7 @@ fi
 
 	# MX record 
 	rlPhaseStartTest "ipa-dns-76: add record of type MX"
-		rlRun "ipa dnsrecord-add $zone @ --mx-rec '10 $mx'" 0 "add record type MX"
+		rlRun "ipa dnsrecord-add $zone @ --mx-rec '10 $mx.'" 0 "add record type MX"
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-77: make sure that IPA saved record type MX"
@@ -485,7 +485,7 @@ fi
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-79: delete record of type MX"
-		rlRun "ipa dnsrecord-del $zone @ --mx-rec '10 $mx'" 0 "delete record type MX"
+		rlRun "ipa dnsrecord-del $zone @ --mx-rec '10 $mx.'" 0 "delete record type MX"
 	rlPhaseEnd
 
 	/etc/init.d/named restart
