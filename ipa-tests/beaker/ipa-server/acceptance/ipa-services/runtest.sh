@@ -60,6 +60,7 @@ service-add()
 	"service_add_008"
 	"service_add_009"
 	"service_add_010"
+	"service_add_011"
 }
 
 service-add-host()
@@ -87,7 +88,6 @@ service-disable()
 	"service_disable_001"
 	"service_disable_002"
 	"service_disable_003"
-	"service_disable_004"
 }
 
 service-find()
@@ -111,6 +111,7 @@ service-mod()
 	"service_mod_004"
 	"service_mod_005"
 	"service_mod_006"
+	"service_mod_007"
 }
 
 service-remove-host()
@@ -132,27 +133,41 @@ service-show()
 
 rlJournalStart
 
-    rlPhaseStartSetup "ipa-services-startup: Check for admintools package and Kinit"
-		rlRun "setup"
-    rlPhaseEnd
+rlPhaseStartTest "Environment check"
+    # call functional tests
+	rlLog "CLIENT: $CLIENT"
+        rlLog "HOSTNAME: $HOSTNAME"
+        echo $CLIENT | grep $HOSTNAME
+        rc=$?
+        if [ $rc -eq 0 ] ; then
+                for item in $PACKAGELIST ; do
+                        rpm -qa | grep $item
+                        if [ $? -eq 0 ] ; then
+                                rlPass "$item package is installed"
+                        else
+                                rlFail "$item package NOT found!"
+				rc=1
+                        fi
+                done
+		if [ $rc -eq 0 ] ; then
+			setup
+        		service-add          # Add a new IPA new service.
+        		service-add-host     # Add hosts that can manage this service.
+        		service-del          # Delete an IPA service.
+        		service-disable      # Disable the Kerberos key of a service.
+        		service-find         # Search for IPA services.
+        		service-mod          # Modify an existing IPA service.
+        		service-remove-host  # Remove hosts that can manage this service.
+        		service-show         # Display information about an IPA service.
+		fi
+        else
+                rlLog "Machine in recipe is not a CLIENT - not running tests"
+        fi
+   rlPhaseEnd
 
-	# tests start...
-	service-add          # Add a new IPA new service.
-	service-add-host     # Add hosts that can manage this service.
-	service-del          # Delete an IPA service.
-	service-disable      # Disable the Kerberos key of a service.
-	service-find         # Search for IPA services.
-	service-mod          # Modify an existing IPA service.
-	service-remove-host  # Remove hosts that can manage this service.
-	service-show         # Display information about an IPA service.
-	# tests end.
-
-    rlPhaseStartCleanup "ipa-services-cleanup: Destroying admin credentials."
-		rlRun "cleanup"
-    rlPhaseEnd
+  rlJournalPrintText
+  report=/tmp/rhts.report.$RANDOM.txt
+  makereport $report
+  rhts-submit-log -l $report
 
 rlJournalEnd
-report=/tmp/rhts.report.$RANDOM.txt
-makereport $report
-rhts-submit-log -l $report
-rlJournalPrintText
