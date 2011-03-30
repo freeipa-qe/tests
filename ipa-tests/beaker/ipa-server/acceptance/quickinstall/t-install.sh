@@ -55,7 +55,7 @@ installSlave()
         rlRun "AddToKnownHosts $MASTER" 0 "Adding master to known hosts"
         cd /dev/shm/
         hostname_s=$(hostname -s)
-        rlRun "sftp root@$MASTER:/var/lib/ipa/replica-info-$hostname_s.$DOMAIN" 0 "Get replica package"
+        rlRun "sftp root@$MASTER:/var/lib/ipa/replica-info-$hostname_s.$DOMAIN.gpg" 0 "Get replica package"
         rlLog "Checking for existance of replica gpg file"
         ls /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg
         if [ $? -ne 0 ] ; then
@@ -68,7 +68,7 @@ installSlave()
 			rlRun "fixHostFile" 0 "Set up /etc/hosts"
                 	rlRun "fixhostname" 0 "Fix hostname"
                 	rlRun "fixResolv" 0 "fixing the reoslv.conf to contain the correct nameserver lines"
-			echo "ipa-replica-install -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg" > /dev/shm/replica-install.bash
+			echo "ipa-replica-install --setup-dns -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg" > /dev/shm/replica-install.bash
                 	chmod 755 /dev/shm/replica-install.bash
                 	rlLog "EXECUTING: ipa-replica-install -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg"
 			rlRun "bash /dev/shm/replica-install.bash" 0 "Replica installation"
