@@ -21,7 +21,6 @@ ipafunctionalservices_http()
     setup_ipa_http
     setup_http
     http_tests
-    https_tests
     cleanup_http
     cleanup_ipa_http
 } 
@@ -124,10 +123,12 @@ setup_http()
 
 http_tests()
 {
-        rlPhaseStartTest "ipa-functionalservices-001: Access HTTP service with valid credentials"
+        rlPhaseStartTest "ipa-functionalservices-http-001: Access HTTP service with valid credentials"
                 rlRun "kinitAs httpuser1 Secret123" 0 "kinit as user to get valid credentials"
                 rlLog "Executing: curl -v --negotiate -u: http://$HOSTNAME/ipatest/"
-                curl -v --negotiate -u: http://$HOSTNAME/ipatest/ > /tmp/curl_001.out
+                curl -v --negotiate -u: http://$HOSTNAME/ipatest/ > /tmp/curl_001.out 2>&1
+		output=`cat /tmp/curl_001.out`
+		rlLog "OUTPUT: $output"
                 cat /tmp/curl_001.out | grep "404 Not Found"
                 if [ $? -eq 0 ] ; then
                         rlPass "User was authenticated"
@@ -136,42 +137,48 @@ http_tests()
                 fi
         rlPhaseEnd
 
-        rlPhaseStartTest "ipa-functionalservices-002: Access HTTP service with out credentials"
+        rlPhaseStartTest "ipa-functionalservices-http-002: Access HTTP service with out credentials"
                 rlRun "kdestroy" 0 "destroy kerberos credentials"
                 rlLog "Executing: curl -v --negotiate -u: http://$HOSTNAME/ipatest/"
-                curl -v --negotiate -u: http://$HOSTNAME/ipatest/ > /tmp/curl_002.out
-                cat /tmp/curl_002.out | grep "401 Authorization Required"
-                if [ $? -eq 0 ] ; then
-                        rlPass "User was NOT authenticated"
-                else
-                        rlFail "User was authenticated"
-                fi
+                curl -v --negotiate -u: http://$HOSTNAME/ipatest/ > /tmp/curl_002.out 2>&1
+		output=`cat /tmp/curl_002.out`
+                rlLog "OUTPUT: $output"
+		rlAssertGrep "401 Authorization Required" "/tmp/curl_002.out"
         rlPhaseEnd
 
-	rlPhaseStartTest "ipa-functionalservices-003: Access HTTPS service with valid credentials"
+	rlPhaseStartTest "ipa-functionalservices-http-003: Access HTTPS service with valid credentials"
                 rlRun "kinitAs httpuser1 Secret123" 0 "kinit as user to get valid credentials"
                 rlLog "Executing: curl -kv --negotiate --cacert \"IPA CA\" -u: https://$HOSTNAME/ipatest/"
-                curl -kv --negotiate --cacert "IPA CA" -u: https://$HOSTNAME/ipatest/ > /tmp/curl_003.out
-                cat /tmp/curl_003.out | grep "404 Not Found"
-                if [ $? -eq 0 ] ; then
-                        rlPass "User was authenticated"
-                else
-                        rlFail "User was NOT authenticated"
-                fi
+                curl -kv --negotiate --cacert "IPA CA" -u: https://$HOSTNAME/ipatest/ > /tmp/curl_003.out 2>&1
+		output=`cat /tmp/curl_003.out`
+                rlLog "OUTPUT: $output"
+                rlAssertGrep "404 Not Found" "/tmp/curl_003.out"
         rlPhaseEnd
 
-        rlPhaseStartTest "ipa-functionalservices-004: Access HTTPS service with out credentials"
+        rlPhaseStartTest "ipa-functionalservices-http-004: Access HTTPS service with out credentials"
                 rlRun "kdestroy" 0 "destroy kerberos credentials"
                 rlLog "Executing: curl -kv --negotiate --cacert \"IPA CA\" -u: https://$HOSTNAME/ipatest/"
-                curl -kv --negotiate --cacert "IPA CA" -u: https://$HOSTNAME/ipatest/ > /tmp/curl_004.out
-                cat /tmp/curl_004.out | grep "401 Authorization Required"
-                if [ $? -eq 0 ] ; then
-                        rlPass "User was NOT authenticated"
-                else
-                        rlFail "User was authenticated"
-                fi
+                curl -kv --negotiate --cacert "IPA CA" -u: https://$HOSTNAME/ipatest/ > /tmp/curl_004.out 2>&1
+		output=`cat /tmp/curl_004.out`
+                rlLog "OUTPUT: $output"
+		rlAssertGrep "401 Authorization Required" "/tmp/curl_004.out"
         rlPhaseEnd
 
+	rlPhaseStartTest "ipa-functionalservices-http-005: Disable Service"
+		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials"
+		rlRun "ipa service-disable $HTTPPRINC > /tmp/disable_service.out 2>&1" 0 "Disable HTTP service for this client host"
+		rlAssertGrep "Disabled service \"$HTTPPRINC@$RELM\"" "/tmp/disable_service.out"
+		# verify service is disabled and certificate removed
+		rlRun "ipa service-show --all $HTTPPRINC > /tmp/disable_http.out"
+		rlAssertGrep "has_keytab: False" "/tmp/disable_http.out"
+		rlAssertNotGrep "Certificate" "/tmp/disable_http.out"
+		rlRun "kinitAs httpuser1 Secret123" 0 "kinit as user to get valid credentials"
+                rlLog "Executing: curl -kv --negotiate -u: http://$HOSTNAME/ipatest/"
+                curl -kv --negotiate -u: http://$HOSTNAME/ipatest/ > /tmp/curl_005.out 2>&1
+		output=`cat /tmp/curl_005.out`
+                rlLog "OUTPUT: $output"
+		rlAssertGrep "401 Authorization Required" "/tmp/curl_004.out"
+	rlPhaseEnd
 }
 
 cleanup_http()
@@ -200,12 +207,6 @@ cleanup_ipa_http()
 {
 	rlPhaseStartTest "CLEANUP: IPA Server - HTTP"
 		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials"
-		# revoke the HTTP server's certificate - first need the certificate's serial number
-        	ipa service-show --all $HTTPPRINC > /tmp/certout.txt
-        	serialno=`cat /tmp/certout.txt | grep "serial_number" | cut -d ":" -f 2 | cut -d ":" -f 2`
-        	serialno=`echo $serialno`
-		rlLog "$HTTPPRINC certificate serial number: $serialno"
-        	rlRun "ipa cert-revoke $serialno" 0 "Revoke HTTP server's certificate"
 		rlRun "ipa user-del httpuser1" 0 "Delete the http test user"
 		rlRun "service httpd stop" 0 "stopping apache server"
 		rlRun "ipa-rmkeytab -p $HTTPPRINC -k $HTTPKEYTAB" 0 "removing http keytab"
