@@ -44,22 +44,10 @@
 			<task name="/CoreOS/ipa-server/acceptance/quickinstall" role="MASTER">
 				<params/>
 			</task>
-			<task name="/CoreOS/ipa-server/acceptance/ipa-host-cli" role="MASTER">
+			<task name="/CoreOS/ipa-server/acceptance/ipa-services" role="MASTER">
 				<params/>
 			</task>
-			<task name="/CoreOS/ipa-server/acceptance/ipa-hostgroup-cli" role="MASTER">
-				<params/>
-			</task>
-			<task name="/CoreOS/ipa-server/acceptance/ipa-user-cli/adduser" role="MASTER">
-				<params/>
-			</task>
-			<task name="/CoreOS/ipa-server/acceptance/ipa-user-cli/moduser" role="MASTER">
-				<params/>
-			</task>
-			<task name="/CoreOS/ipa-server/acceptance/nis-cli" role="MASTER">
-				<params/>
-			</task>
-			<task name="/CoreOS/ipa-server/acceptance/uninstall" role="STANDALONE">
+			<task name="/CoreOS/ipa-server/acceptance/ipa-functional-services" role="MASTER">
 				<params/>
 			</task>
 
@@ -100,24 +88,10 @@
 			<task name="/CoreOS/ipa-server/acceptance/quickinstall" role="SLAVE">
 				<params/>
 			</task>
-			<task name="/CoreOS/ipa-server/acceptance/ipa-host-cli" role="SLAVE">
+			<task name="/CoreOS/ipa-server/acceptance/ipa-services" role="SLAVE">
 				<params/>
 			</task>
-			<task name="/CoreOS/ipa-server/acceptance/ipa-hostgroup-cli" role="SLAVE">
-				<params/>
-			</task>
-			<task name="/CoreOS/ipa-server/acceptance/ipa-user-cli/adduser" role="SLAVE">
-				<params/>
-			</task>
-			<task name="/CoreOS/ipa-server/acceptance/ipa-user-cli/moduser" role="SLAVE">
-				<params/>
-			</task>
-
-			<task name="/CoreOS/ipa-server/acceptance/nis-cli" role="SLAVE">
-				<params/>
-			</task>
-
-			<task name="/CoreOS/ipa-server/acceptance/uninstall" role="STANDALONE">
+			<task name="/CoreOS/ipa-server/acceptance/ipa-functional-services" role="SLAVE">
 				<params/>
 			</task>
 
@@ -158,26 +132,12 @@
 			<task name="/CoreOS/ipa-server/acceptance/quickinstall" role="CLIENT">
 				<params/>
 			</task>
-			<task name="/CoreOS/ipa-server/acceptance/ipa-host-cli" role="CLIENT">
+			<task name="/CoreOS/ipa-server/acceptance/ipa-services" role="CLIENT">
 				<params/>
 			</task>
-			<task name="/CoreOS/ipa-server/acceptance/ipa-hostgroup-cli" role="CLIENT">
+			<task name="/CoreOS/ipa-server/acceptance/ipa-functional-services" role="CLIENT">
 				<params/>
 			</task>
-			<task name="/CoreOS/ipa-server/acceptance/ipa-user-cli/adduser" role="CLIENT">
-				<params/>
-			</task>
-			<task name="/CoreOS/ipa-server/acceptance/ipa-user-cli/moduser" role="CLIENT">
-				<params/>
-			</task>
-
-			<task name="/CoreOS/ipa-server/acceptance/nis-cli" role="CLIENT">
-				<params/>
-			</task>
-			<task name="/CoreOS/ipa-server/acceptance/uninstall" role="STANDALONE">
-				<params/>
-			</task>
-
 		</recipe>
 
 	</recipeSet>
