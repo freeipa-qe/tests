@@ -32,7 +32,7 @@ ipafunctionalservices_http()
 setup_ipa_http()
 {
 	rlPhaseStartTest "SETUP: IPA server - HTTP"
-
+		
 		# create a test http user
 		rlRun "create_ipauser httpuser1 httpuser1 httpuser1 Secret123" 0 "Creating a test http user"
 
@@ -53,7 +53,7 @@ setup_ipa_http()
 setup_http()
 {
 	rlPhaseStartTest "SETUP: HTTP server"
-
+		service iptables stop
 		service httpd stop
 		rlLog "Setting up $HTTPKRBCFG  ..............."
 		rm -rf $HTTPKRBCFG
@@ -177,7 +177,7 @@ http_tests()
                 curl -kv --negotiate -u: http://$HOSTNAME/ipatest/ > /tmp/curl_005.out 2>&1
 		output=`cat /tmp/curl_005.out`
                 rlLog "OUTPUT: $output"
-		rlAssertGrep "401 Authorization Required" "/tmp/curl_004.out"
+		rlAssertGrep "401 Authorization Required" "/tmp/curl_005.out"
 	rlPhaseEnd
 }
 
@@ -213,6 +213,7 @@ cleanup_ipa_http()
 		# delete keytab file
                 rlRun "rm -rf $HTTPKEYTAB" 0 "Delete the HTTP keytab file"
 		rlRun "ipa service-del $HTTPPRINC" 0 "Remove the HTTP service for this client host"
+		service iptables start
 	rlPhaseEnd
 }
 	
