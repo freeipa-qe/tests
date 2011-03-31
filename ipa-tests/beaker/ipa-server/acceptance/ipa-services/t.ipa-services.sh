@@ -452,7 +452,7 @@ rlPhaseStartTest "service_disable_002: ipa service-disable: Disabling service."
         rlRun "ipa service-add $SERVICE/$CLIENT@$RELM"
         rlRun "ipa-getkeytab --server $MASTER --principal $SERVICE/$CLIENT@$RELM --keytab /opt/$SERVICE.$CLIENT.$RELM.keytab"
         rlRun "ipa service-disable $SERVICE/$CLIENT@$RELM > $TmpDir/service_disable_002.out 2>&1"
-	rlAssertGrep "Disabled service \"vpn/dhcp-100-19-173.testrelm@TESTRELM\"" "$TmpDir/service_disable_002.out"
+	rlAssertGrep "Disabled service \"vpn/$CLIENT@$RELM\"" "$TmpDir/service_disable_002.out"
         rlRun "ipa service-find $SERVICE/$CLIENT@$RELM >> $TmpDir/service_disable_002.out"
 	rlAssertGrep "Keytab: False" "$TmpDir/service_disable_002.out"
 rlPhaseEnd
