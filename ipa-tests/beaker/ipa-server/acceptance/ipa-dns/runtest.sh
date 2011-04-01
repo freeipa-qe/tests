@@ -476,6 +476,8 @@ fi
 		rlRun "ipa dnsrecord-add $zone @ --mx-rec '10 $mx.'" 0 "add record type MX"
 	rlPhaseEnd
 
+	/etc/init.d/named restart
+
 	rlPhaseStartTest "ipa-dns-77: make sure that IPA saved record type MX"
 		rlRun "ipa dnsrecord-find $zone @ | grep $mx" 0 "make sure ipa recieved record type MX"
 	rlPhaseEnd
@@ -488,11 +490,11 @@ fi
 		rlRun "ipa dnsrecord-del $zone @ --mx-rec '10 $mx.'" 0 "delete record type MX"
 	rlPhaseEnd
 
-	/etc/init.d/named restart
-
 	rlPhaseStartTest "ipa-dns-80: make sure that IPA deleted record type MX"
 		rlRun "ipa dnsrecord-find $zone @ | grep $mx" 1 "make sure ipa deleted record type MX"
 	rlPhaseEnd
+
+	/etc/init.d/named restart
 
 	rlPhaseStartTest "ipa-dns-81: make sure that dig can not find the record type MX"
 		rlRun "dig $zone MX | grep $mx" 1 "make sure dig can not find the MX record"
@@ -721,6 +723,8 @@ fi
 		rlRun "ipa dnsrecord-add $zone @ --kx-rec '$kxpref1 $zone'" 0 "add record type kx"
 	rlPhaseEnd
 
+	/etc/init.d/named restart
+
 	rlPhaseStartTest "ipa-dns-132: make sure that IPA saved record type kx"
 		rlRun "ipa dnsrecord-find $zone @ | grep $kxpref1" 0 "make sure ipa recieved record type kx"
 	rlPhaseEnd
@@ -732,8 +736,6 @@ fi
 	rlPhaseStartTest "ipa-dns-134: delete record of type kx"
 		rlRun "ipa dnsrecord-del $zone @ --kx-rec '$kxpref1 $zone'" 0 "delete record type kx"
 	rlPhaseEnd
-
-	/etc/init.d/named restart
 
 	rlPhaseStartTest "ipa-dns-135: make sure that IPA deleted record type kx"
 		rlRun "ipa dnsrecord-find $zone kx" 1 "make sure ipa deleted record type kx"
@@ -749,6 +751,8 @@ fi
 	rlPhaseStartTest "ipa-dns-137: add record of type bad kx"
 		rlRun "ipa dnsrecord-add $zone @ --kx-rec '$kxbadpref1 $zone'" 1 "add record type bad kx"
 	rlPhaseEnd
+
+	/etc/init.d/named restart
 
 	rlPhaseStartTest "ipa-dns-138: make sure that IPA saved record type kx"
 		rlRun "ipa dnsrecord-find $zone @ | grep $kxbadpref1" 1 "make sure ipa recieved record type kx"
@@ -766,6 +770,8 @@ fi
 	rlPhaseStartTest "ipa-dns-141: add record of type loc"
 		rlRun "ipa dnsrecord-add $zone @ --loc-rec '$loc'" 0 "add record type loc"
 	rlPhaseEnd
+
+	/etc/init.d/named restart
 
 	rlPhaseStartTest "ipa-dns-142: make sure that IPA saved record type loc"
 		rlRun "ipa dnsrecord-find $zone | grep '$loclong'" 0 "make sure ipa recieved record type loc"
