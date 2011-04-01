@@ -148,8 +148,8 @@ http_tests()
 
 	rlPhaseStartTest "ipa-functionalservices-http-003: Access HTTPS service with valid credentials"
                 rlRun "kinitAs httpuser1 Secret123" 0 "kinit as user to get valid credentials"
-                rlLog "Executing: curl -kv --negotiate --cacert \"IPA CA\" -u: https://$HOSTNAME/ipatest/"
-                curl -kv --negotiate --cacert "IPA CA" -u: https://$HOSTNAME/ipatest/ > /tmp/curl_003.out 2>&1
+                rlLog "Executing: curl -v --negotiate --cacert \"/etc/ipa/ca.crt\" -u: https://$HOSTNAME/ipatest/"
+                curl -v --negotiate --cacert "/etc/ipa/ca.crt" -u: https://$HOSTNAME/ipatest/ > /tmp/curl_003.out 2>&1
 		output=`cat /tmp/curl_003.out`
                 rlLog "OUTPUT: $output"
                 rlAssertGrep "404 Not Found" "/tmp/curl_003.out"
@@ -157,8 +157,8 @@ http_tests()
 
         rlPhaseStartTest "ipa-functionalservices-http-004: Access HTTPS service with out credentials"
                 rlRun "kdestroy" 0 "destroy kerberos credentials"
-                rlLog "Executing: curl -kv --negotiate --cacert \"IPA CA\" -u: https://$HOSTNAME/ipatest/"
-                curl -kv --negotiate --cacert "IPA CA" -u: https://$HOSTNAME/ipatest/ > /tmp/curl_004.out 2>&1
+                rlLog "Executing: curl -v --negotiate --cacert \"/etc/ipa/ca.crt\" -u: https://$HOSTNAME/ipatest/"
+                curl -v --negotiate --cacert "/etc/ipa/ca.crt" -u: https://$HOSTNAME/ipatest/ > /tmp/curl_004.out 2>&1
 		output=`cat /tmp/curl_004.out`
                 rlLog "OUTPUT: $output"
 		rlAssertGrep "401 Authorization Required" "/tmp/curl_004.out"
