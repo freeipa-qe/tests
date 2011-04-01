@@ -203,7 +203,10 @@ member_netgroups_positive()
                 # Checking to ensure that it happened.
                 rlRun "ipa netgroup-show --all $ngroup1|grep $user1" 0 "Verifying that $user1 is in $ngroup1"
                 rlRun "ipa netgroup-show --all $ngroup1|grep $user2" 0 "Verifying that $user2 is in $ngroup1"
-                rlRun "ipa netgroup-show --all $ngroup1|grep $user3" 0 "Verifying that $user3 is in Rngroup1"
+                rlRun "ipa netgroup-show --all $ngroup1|grep $user3" 0 "Verifying that $user3 is in $ngroup1"
+		rlRun "ipa user-show $user1 | grep netgroup | grep $ngroup1" 0 "Verify that netgroup enrollment with user-show for $user1"
+		rlRun "ipa user-show $user2 | grep netgroup | grep $ngroup1" 0 "Verify that netgroup enrollment with user-show for $user2"
+		rlRun "ipa user-show $user3 | grep netgroup | grep $ngroup1" 0 "Verify that netgroup enrollment with user-show for $user3"
         rlPhaseEnd
 
         rlPhaseStartTest  "ipa-netgroup-004: Add groups to netgroup"
