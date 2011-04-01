@@ -45,7 +45,7 @@ ipa_join_envsetup()
     rlPhaseStartSetup "ipa_join_envsetup"
         #environment setup starts here
         #install_ipa_client #ipa client host configuration has been take care of by ipa install script
-        rlRun "ssh root@$serverFQDN \"echo $ADMINPW | kinit $ADMINID" 0 "kinit at remote ipa server as admin"
+        rlRun "ssh root@$serverFQDN \"echo $ADMINPW | kinit $ADMINID\" " 0 "kinit at remote ipa server as admin"
         #environment setup ends   here
     rlPhaseEnd
 } #envsetup

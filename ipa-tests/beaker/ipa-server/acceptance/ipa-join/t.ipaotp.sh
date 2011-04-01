@@ -19,7 +19,7 @@ ipa_otp_envsetup()
 {
     rlPhaseStartSetup "ipa_otp_envsetup"
         #environment setup starts here
-        rlRun "ssh root@$serverFQDN \"echo $ADMINPW | kinit $ADMINID" 0 "kinit at remote ipa server as admin"
+        rlRun "ssh root@$serverFQDN \"echo $ADMINPW | kinit $ADMINID\" " 0 "kinit at remote ipa server as admin"
         rlRun "ssh root@$serverFQDN \"ipa host-del $clientFQDN\"" 0 "we have to un-join before test starts"
         rlRun "ssh root@$serverFQDN \"ipa host-add $clientFQDN --password=$OTP\"" 0 "add host back to ipa server and set OTP to [$OTP]"
         #environment setup ends   here
@@ -31,7 +31,7 @@ ipa_otp_envcleanup()
     rlPhaseStartCleanup "ipa_otp_envcleanup"
         #environment cleanup starts here
         uninstall_ipa_client
-        rlRun "ssh root@$serverFQDN \"kdestroy" 0 "remove kerboros ticket in remote server"
+        rlRun "ssh root@$serverFQDN \"kdestroy\"" 0 "remove kerboros ticket in remote server"
         #environment cleanup ends   here
     rlPhaseEnd
 } #envcleanup
