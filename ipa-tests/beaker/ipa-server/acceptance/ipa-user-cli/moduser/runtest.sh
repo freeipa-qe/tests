@@ -371,6 +371,47 @@ rlJournalStart
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --uid."
     rlPhaseEnd
 
+    rlPhaseStartTest "ipa-user-cli-mod-046: modify user's state"
+        rlRun "ipa user-mod --state=MA $superuser" 0 "Setting user state"
+        rlRun "verifyUserAttr $superuser \"State/Province\" MA" 0 "Verify user's state"
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-user-cli-mod-047: modify user's postalcode - bug 692945"
+        rlRun "ipa user-mod --postalcode=01730 $superuser" 0 "Setting user postalcode - code beginning with 0"
+        rlRun "verifyUserAttr $superuser \"ZIP\" 01730" 0 "Verify user's postalcode"
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-user-cli-mod-048: modify user's postalcode"
+        rlRun "ipa user-mod --postalcode=99887111 $superuser" 0 "Setting user postalcode"
+        rlRun "verifyUserAttr $superuser \"ZIP\" 99887111" 0 "Verify user's postalcode"
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-user-cli-mod-049: modify user's city"
+        rlRun "ipa user-mod --city=Bedford $superuser" 0 "Setting user city"
+        rlRun "verifyUserAttr $superuser \"City\" Bedford" 0 "Verify user's city"
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-user-cli-mod-050: modify user's orgunit"
+        rlRun "ipa user-mod --orgunit=QE $superuser" 0 "Setting user orgunit"
+        rlRun "verifyUserAttr $superuser \"Org. Unit\" QE" 0 "Verify user's orgunit"
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-user-cli-mod-051: modify user's manager"
+	manager="uid=test,cn=users,cn=accounts,dc=$DOMAIN"
+        rlRun "ipa user-mod --manager=\"$manager\" $superuser" 0 "Setting user boss"
+        rlRun "verifyUserAttr $superuser \"Manager\" \"$manager\"" 0 "Verify user's boss"
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-user-cli-mod-052: modify user's title"
+        rlRun "ipa user-mod --title=engineer $superuser" 0 "Setting user title"
+        rlRun "verifyUserAttr $superuser \"Job Title\" engineer" 0 "Verify user's title"
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-user-cli-mod-053: modify user's carlicense"
+        rlRun "ipa user-mod --carlicense=\"012 ABC\" $superuser" 0 "Setting user carlicense"
+        rlRun "verifyUserAttr $superuser \"Car License\" \"012 ABC\"" 0 "Verify user's car license"
+    rlPhaseEnd
+
     rlPhaseStartCleanup "ipa-user-cli-mod-cleanup"
         rlRun "ipa user-del $superuser" 0 "delete $superuser account"
     rlPhaseEnd
