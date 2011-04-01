@@ -1,9 +1,6 @@
 <job>
 	<notify>
 		<cc>mgregg@redhat.com</cc>
-		<cc>jgalipea@redhat.com</cc>
-		<cc>yzhang@redhat.com</cc>
-		<cc>ckannan@redhat.com</cc>
 	</notify>
 
 	<whiteboard>

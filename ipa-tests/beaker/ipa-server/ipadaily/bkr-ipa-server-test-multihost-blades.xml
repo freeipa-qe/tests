@@ -50,6 +50,9 @@
 			<task name="/CoreOS/ipa-server/acceptance/ipa-functional-services" role="MASTER">
 				<params/>
 			</task>
+			<task name="/CoreOS/ipa-server/acceptance/replication" role="MASTER">
+				<params/>
+			</task>
 
 		</recipe>
 		<recipe kernel_options="" kernel_options_post="" ks_meta="" role="SLAVE" whiteboard="IPA REPLICA SERVER">
@@ -92,6 +95,9 @@
 				<params/>
 			</task>
 			<task name="/CoreOS/ipa-server/acceptance/ipa-functional-services" role="SLAVE">
+				<params/>
+			</task>
+			<task name="/CoreOS/ipa-server/acceptance/replication" role="SLAVE">
 				<params/>
 			</task>
 
@@ -138,6 +144,10 @@
 			<task name="/CoreOS/ipa-server/acceptance/ipa-functional-services" role="CLIENT">
 				<params/>
 			</task>
+			<task name="/CoreOS/ipa-server/acceptance/replication" role="CLIENT">
+				<params/>
+			</task>
+
 		</recipe>
 
 	</recipeSet>
