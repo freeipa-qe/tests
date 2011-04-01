@@ -394,6 +394,12 @@ rlJournalStart
 	ipa user-del jennyg
     rlPhaseEnd
 
+    rlPhaseStartTest "ipa-user-cli-add-032: setattr on RDN when user doesn't exist - trac ticket 558"	
+        expmsg="ipa: ERROR: test1: user not found"
+        command="ipa user-mod --setattr=uid=test2 test1"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message - alpha characters."
+    rlPhaseEnd
+
     rlPhaseStartCleanup "ipa-user-cli-add-cleanup"
 	rlRun "ipa config-mod --searchrecordslimit=100" 0 "set default search records limit back to default"
         rlRun "ipa user-del $superuser " 0 "delete $superuser account"
