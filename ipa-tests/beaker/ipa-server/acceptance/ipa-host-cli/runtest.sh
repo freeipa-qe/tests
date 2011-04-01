@@ -540,6 +540,13 @@ rlPhaseStartTest "ipa-host-cli-38: find more hosts than exist"
         fi
     rlPhaseEnd
 
+    rlPhaseStartTest "ipa-host-cli-52: host name ending in . - trac ticket 797"
+	myhost="myhost.$DOMAIN."
+	rlRun "ipa host-add --force $myhost" 0 "Adding host with hostname ending in .: $myhost"
+	rlRun "ipa host-find $myhost" 0 "Making sure host is found"
+	rlRun "ipa host-mod --desc=test $myhost" 0 "Modifying host with hostname ending in ."
+	rlRun "ipa host-del $myhost" 0 "Deleting host with hostname ending in ."
+    rlPhaseEnd
 
     rlPhaseStartCleanup "ipa-host-cli-cleanup: Destroying admin credentials."
 	rlRun "ipa config-mod --searchrecordslimit=100" 0 "set search records limit back to default"
