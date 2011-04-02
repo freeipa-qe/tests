@@ -13,6 +13,13 @@ else
 	export master=0
 fi
 
+forceSyncToSlaves()
+{
+	for s in $SLAVE; do
+		ipa-replica-manage -p $ADMINPW force-sync $s
+	done
+}
+
 replication()
 {
 	user1=u34va
@@ -23,6 +30,7 @@ replication()
 	rlPhaseStartTest "ipa-replication-1: check basic user-add replication"
 		if [ $master -eq 1 ]; then 
 			rlRun "ipa user-add --first=f --last=l $user1" 0 "Create a user on the master"
+			forceSyncToSlaves
 			# Populate the notification file to let the slave know to proceed
 			touch $hdir/rt/$hfile
 		else # This is a slave
@@ -35,6 +43,7 @@ replication()
 					sleep 5
 				fi
 			done
+			ipa-replica-manage -p $ADMINPW force-sync $MASTER
 			# Now, we are don waiting for the master, the slave can proceed.
 			rlRun "ipa user-find $user1 | grep $user1" 0 "Check to ensure that the user is searchable on the slave"
 		fi 
@@ -45,6 +54,7 @@ replication()
 	rlPhaseStartTest "ipa-replication-2: change the first name of user1"
 		if [ $master -eq 1 ]; then 
 			rlRun "ipa user-mod --first=$fname $user1" 0 "modify the name of user1"
+			forceSyncToSlaves
 			# Populate the notification file to let the slave know to proceed
 			touch $hdir/rt/$hfile
 		else # This is a slave
@@ -57,6 +67,7 @@ replication()
 					sleep 5
 				fi
 			done
+			ipa-replica-manage -p $ADMINPW force-sync $MASTER
 			# Now, we are don waiting for the master, the slave can proceed.
 			rlRun "ipa user-find --all $user1 | grep $fname" 0 "Check to ensure that the first name of user1 changed on the slave"
 		fi 
@@ -67,6 +78,7 @@ replication()
 	rlPhaseStartTest "ipa-replication-3: change the last name of user1"
 		if [ $master -eq 1 ]; then 
 			rlRun "ipa user-mod --last=$lname $user1" 0 "modify the name of user1"
+			forceSyncToSlaves
 			# Populate the notification file to let the slave know to proceed
 			touch $hdir/rt/$hfile
 		else # This is a slave
@@ -79,6 +91,7 @@ replication()
 					sleep 5
 				fi
 			done
+			ipa-replica-manage -p $ADMINPW force-sync $MASTER
 			# Now, we are don waiting for the master, the slave can proceed.
 			rlRun "ipa user-find --all $user1 | grep $lname" 0 "Check to ensure that the last name of user1 changed on the slave"
 		fi 
@@ -90,6 +103,7 @@ replication()
 			rlRun "ipa user-add --first=f$user2 --last=l$user2 $user2" 0 "Create a user on the master"
 			rlRun "ipa user-add --first=f$user3 --last=l$user3 $user3" 0 "Create a user on the master"
 			rlRun "ipa user-add --first=f$user4 --last=l$user4 $user4" 0 "Create a user on the master"
+			forceSyncToSlaves
 			# Populate the notification file to let the slave know to proceed
 			touch $hdir/rt/$hfile
 		else # This is a slave
@@ -102,6 +116,7 @@ replication()
 					sleep 5
 				fi
 			done
+			ipa-replica-manage -p $ADMINPW force-sync $MASTER
 			# Now, we are don waiting for the master, the slave can proceed.
 			rlRun "ipa user-find $user2 | grep $user2" 0 "Check to ensure that user2 is searchable on the slave"
 			rlRun "ipa user-find $user3 | grep $user3" 0 "Check to ensure that user3 is searchable on the slave"
@@ -115,6 +130,7 @@ replication()
 			rlRun "ipa user-del $user2" 0 "Create a user on the master"
 			rlRun "ipa user-del $user3" 0 "Create a user on the master"
 			rlRun "ipa user-del $user4" 0 "Create a user on the master"
+			forceSyncToSlaves
 			# Populate the notification file to let the slave know to proceed
 			touch $hdir/rt/$hfile
 		else # This is a slave
@@ -127,6 +143,7 @@ replication()
 					sleep 5
 				fi
 			done
+			ipa-replica-manage -p $ADMINPW force-sync $MASTER
 			# Now, we are don waiting for the master, the slave can proceed.
 			rlRun "ipa user-find $user2" 1 "Check to ensure that user2 is not searchable on the slave"
 			rlRun "ipa user-find $user3" 1 "Check to ensure that user3 is not searchable on the slave"
@@ -138,6 +155,7 @@ replication()
 	rlPhaseStartTest "ipa-replication-: delete user1"
 		if [ $master -eq 1 ]; then 
 			rlRun "ipa user-del $user1" 0 "destroy user user1 on master"
+			forceSyncToSlaves
 			# Populate the notification file to let the slave know to proceed
 			touch $hdir/rt/$hfile
 		else # This is a slave
@@ -150,6 +168,7 @@ replication()
 					sleep 5
 				fi
 			done
+			ipa-replica-manage -p $ADMINPW force-sync $MASTER
 			# Now, we are don waiting for the master, the slave can proceed.
 			rlRun "ipa user-find $user1 | grep $user1" 1 "Check to ensure that the user is not searchable on the slave"
 		fi 
