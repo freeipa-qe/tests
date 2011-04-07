@@ -68,9 +68,9 @@ installSlave()
 			rlRun "fixHostFile" 0 "Set up /etc/hosts"
                 	rlRun "fixhostname" 0 "Fix hostname"
                 	rlRun "fixResolv" 0 "fixing the reoslv.conf to contain the correct nameserver lines"
-			echo "ipa-replica-install --setup-dns --forwarder=$DNSFORWARD -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg" > /dev/shm/replica-install.bash
+			echo "ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg" > /dev/shm/replica-install.bash
                 	chmod 755 /dev/shm/replica-install.bash
-                	rlLog "EXECUTING: ipa-replica-install -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg"
+                	rlLog "EXECUTING: ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg"
 			rlRun "bash /dev/shm/replica-install.bash" 0 "Replica installation"
 			rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
 			rlRun "appendEnv" 0 "Append the machine information to the env.sh with the information for the machines in the recipe set"
