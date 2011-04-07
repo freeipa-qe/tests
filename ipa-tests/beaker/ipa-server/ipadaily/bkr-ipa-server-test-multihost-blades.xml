@@ -1,12 +1,10 @@
 <job>
 	<notify>
-		<cc>mgregg@redhat.com</cc>
-		<cc>jgalipea@redhat.com</cc>
-		<cc>yzhang@redhat.com</cc>
+		<cc>ipa-and-samba-team-automation@redhat.com</cc>
 	</notify>
 
 	<whiteboard>
-		ipa-server x86_64 daily multihost 
+		 IPA Multi-Server Install Test x86_64
 	</whiteboard>
 	<recipeSet>
 		<recipe kernel_options="" kernel_options_post="" ks_meta="" role="MASTER" whiteboard="IPA MASTER SERVER">
@@ -34,7 +32,7 @@
 			</task>
 			<task name="/distribution/pkginstall" role="STANDALONE">
 				<params>
-					<param name="PKGARGNAME" value="ipa-server ipa-client ipa-admintools ds-replication  expect krb5-workstation bind-dyndb-ldap ntpdate krb5-pkinit-openssl rhts-test-env"/>
+					<param name="PKGARGNAME" value="expect"/>
 				</params>
 			</task>
 
@@ -42,7 +40,9 @@
 				<params/>
 			</task>
 			<task name="/CoreOS/ipa-server/acceptance/quickinstall" role="MASTER">
-				<params/>
+				<params>
+					<param name="SNAPSHOT" value="TRUE"/>
+				</params>
 			</task>
 			<task name="/CoreOS/ipa-server/acceptance/ipa-services" role="MASTER">
 				<params/>
@@ -50,10 +50,6 @@
 			<task name="/CoreOS/ipa-server/acceptance/ipa-functional-services" role="MASTER">
 				<params/>
 			</task>
-			<task name="/CoreOS/ipa-server/acceptance/replication" role="MASTER">
-				<params/>
-			</task>
-
 		</recipe>
 		<recipe kernel_options="" kernel_options_post="" ks_meta="" role="SLAVE" whiteboard="IPA REPLICA SERVER">
 			<watchdog/>
@@ -81,7 +77,7 @@
 			</task>
 			<task name="/distribution/pkginstall" role="STANDALONE">
 				<params>
-					<param name="PKGARGNAME" value="ipa-server ipa-client ipa-admintools ds-replication  expect krb5-workstation bind-dyndb-ldap ntpdate krb5-pkinit-openssl rhts-test-env"/>
+					<param name="PKGARGNAME" value="expect"/>
 				</params>
 			</task>
 
@@ -89,7 +85,9 @@
 				<params/>
 			</task>
 			<task name="/CoreOS/ipa-server/acceptance/quickinstall" role="SLAVE">
-				<params/>
+				<params>
+					<param name="SNAPSHOT" value="TRUE"/>
+				</params>
 			</task>
 			<task name="/CoreOS/ipa-server/acceptance/ipa-services" role="SLAVE">
 				<params/>
@@ -97,10 +95,6 @@
 			<task name="/CoreOS/ipa-server/acceptance/ipa-functional-services" role="SLAVE">
 				<params/>
 			</task>
-			<task name="/CoreOS/ipa-server/acceptance/replication" role="SLAVE">
-				<params/>
-			</task>
-
 		</recipe>
 		<recipe kernel_options="" kernel_options_post="" ks_meta="" role="CLIENT" whiteboard="IPA CLIENT">
 			<watchdog/>
@@ -128,7 +122,7 @@
 			</task>
 			<task name="/distribution/pkginstall" role="STANDALONE">
 				<params>
-					<param name="PKGARGNAME" value="ipa-server ipa-client ipa-admintools ds-replication  expect krb5-workstation bind-dyndb-ldap ntpdate krb5-pkinit-openssl rhts-test-env"/>
+					<param name="PKGARGNAME" value="expect"/>
 				</params>
 			</task>
 
@@ -136,7 +130,9 @@
 				<params/>
 			</task>
 			<task name="/CoreOS/ipa-server/acceptance/quickinstall" role="CLIENT">
-				<params/>
+				<params>
+					<param name="SNAPSHOT" value="TRUE"/>
+				</params>
 			</task>
 			<task name="/CoreOS/ipa-server/acceptance/ipa-services" role="CLIENT">
 				<params/>
@@ -144,10 +140,6 @@
 			<task name="/CoreOS/ipa-server/acceptance/ipa-functional-services" role="CLIENT">
 				<params/>
 			</task>
-			<task name="/CoreOS/ipa-server/acceptance/replication" role="CLIENT">
-				<params/>
-			</task>
-
 		</recipe>
 
 	</recipeSet>
