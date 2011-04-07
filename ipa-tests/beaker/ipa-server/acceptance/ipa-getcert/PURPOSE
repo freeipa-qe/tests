@@ -1,0 +1,3 @@
+PURPOSE of /CoreOS/tests/Regression/ipa-getcert
+Description: IPA client tool ipa-getcert test
+Author: Yi Zhang <yzhang@redhat.com>

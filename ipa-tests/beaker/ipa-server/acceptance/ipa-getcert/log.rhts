@@ -1,0 +1,84 @@
+===============================
+#  starts at  [2011-04-07 11:02:58 AM]
+===============================
+
+
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:: [   LOG    ] :: ipa-getcert startup: Check for ipa-server package
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+package ipa-server is not installed
+:: [   FAIL   ] :: Checking for the presence of ipa-server rpm 
+:: [   PASS   ] :: Creating tmp directory
+/tmp/tmp.kQdps7Knpd /iparhts/acceptance/ipa-getcert
+:: [   PASS   ] :: Running 'pushd /tmp/tmp.kQdps7Knpd'
+
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:: [   LOG    ] :: request_envsetup
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:: [   LOG    ] :: request_1001 [negative test] scenario: [ipa-getcert request -d -n -t -P]	data: [NSSDBDIR negative] used
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+:: [11:03:00] ::  cmd=[ipa-getcert request -d /etc/pki/nssdb/cert8.db -n TestCert-Name -t TestCert-Name -P __NOTFOUNDINDB__]
+:: [11:03:00] ::  expect [__replace_me], out=[/tmp/tmp.kQdps7Knpd/request_1001.6660.out]
+:: [11:03:00] ::  scenario: [ipa-getcert request -d -n -t -P]	data: [NSSDBDIR negative] used
+The location "/etc/pki/nssdb/cert8.db" must be a directory.
+:: [   FAIL   ] :: expect [__replace_me] actual [1] 
+--------- expected msg ---------
+[__replace_me]
+========== execution output ===============
+============== end of output ==============
+
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:: [   LOG    ] :: request_1002 [negative test] scenario: [ipa-getcert request -d -n -t -P -I -R -N -U -K -D -E -S]	data: [NSSDBDIR negative] used
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+:: [11:03:01] ::  cmd=[ipa-getcert request -d /etc/pki/nssdb/cert8.db -n TestCert-Name -t TestCert-Name -P __NOTFOUNDINDB__ -I TestCert-Name -R -N __NOTFOUNDINDB__ -U __NOTFOUNDINDB__ -K __NOTFOUNDINDB__ -D test.redhat.com -E testqa@redhat.com -S]
+:: [11:03:01] ::  expect [__replace_me], out=[/tmp/tmp.kQdps7Knpd/request_1002.14251.out]
+:: [11:03:01] ::  scenario: [ipa-getcert request -d -n -t -P -I -R -N -U -K -D -E -S]	data: [NSSDBDIR negative] used
+Could not evaluate OID "__NOTFOUNDINDB__".
+:: [   FAIL   ] :: expect [__replace_me] actual [1] 
+--------- expected msg ---------
+[__replace_me]
+========== execution output ===============
+============== end of output ==============
+
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:: [   LOG    ] :: request_1003 [negative test] scenario: [ipa-getcert request -d -n -t -P -I -R -N -U -K -D -E -s]	data: [NSSDBDIR negative] used
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+:: [11:03:02] ::  cmd=[ipa-getcert request -d /etc/pki/nssdb/cert8.db -n TestCert-Name -t TestCert-Name -P __NOTFOUNDINDB__ -I TestCert-Name -R -N __NOTFOUNDINDB__ -U __NOTFOUNDINDB__ -K __NOTFOUNDINDB__ -D test.redhat.com -E testqa@redhat.com -s]
+:: [11:03:02] ::  expect [__replace_me], out=[/tmp/tmp.kQdps7Knpd/request_1003.32755.out]
+:: [11:03:02] ::  scenario: [ipa-getcert request -d -n -t -P -I -R -N -U -K -D -E -s]	data: [NSSDBDIR negative] used
+Could not evaluate OID "__NOTFOUNDINDB__".
+:: [   FAIL   ] :: expect [__replace_me] actual [1] 
+--------- expected msg ---------
+[__replace_me]
+========== execution output ===============
+============== end of output ==============
+
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:: [   LOG    ] :: request_1004 [negative test] scenario: [ipa-getcert request -d -n -t -P -I -r -N -U -K -D -E -S]	data: [NSSDBDIR negative] used
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+:: [11:03:03] ::  cmd=[ipa-getcert request -d /etc/pki/nssdb/cert8.db -n TestCert-Name -t TestCert-Name -P __NOTFOUNDINDB__ -I TestCert-Name -r -N __NOTFOUNDINDB__ -U __NOTFOUNDINDB__ -K __NOTFOUNDINDB__ -D test.redhat.com -E testqa@redhat.com -S]
+:: [11:03:03] ::  expect [__replace_me], out=[/tmp/tmp.kQdps7Knpd/request_1004.23823.out]
+:: [11:03:03] ::  scenario: [ipa-getcert request -d -n -t -P -I -r -N -U -K -D -E -S]	data: [NSSDBDIR negative] used
+Could not evaluate OID "__NOTFOUNDINDB__".
+:: [   FAIL   ] :: expect [__replace_me] actual [1] 
+--------- expected msg ---------
+[__replace_me]
+========== execution output ===============
+============== end of output ==============
+
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:: [   LOG    ] :: request_1005 [negative test] scenario: [ipa-getcert request -d -n -t -P -I -r -N -U -K -D -E -s]	data: [NSSDBDIR negative] used
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+:: [11:03:03] ::  cmd=[ipa-getcert request -d /etc/pki/nssdb/cert8.db -n TestCert-Name -t TestCert-Name -P __NOTFOUNDINDB__ -I TestCert-Name -r -N __NOTFOUNDINDB__ -U __NOTFOUNDINDB__ -K __NOTFOUNDINDB__ -D test.redhat.com -E testqa@redhat.com -s]
+:: [11:03:04] ::  expect [__replace_me], out=[/tmp/tmp.kQdps7Knpd/request_1005.10850.out]
+:: [11:03:04] ::  scenario: [ipa-getcert request -d -n -t -P -I -r -N -U -K -D -E -s]	data: [NSSDBDIR negative] used
+
