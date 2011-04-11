@@ -145,8 +145,10 @@ rlJournalStart
 
 		if [ $rc -eq 0 ] ; then
                         rhts-sync-block -s READY $MASTER
+			if [ $SLAVE != "" ] ; then
+				rhts-sync-block -s READY $SLAVE
+			fi
                 	installClient
-			rhts-sync-set -s READY
                         rlLog "Setting up Authorized keys"
                         SetUpAuthKeys
                         rlLog "Setting up known hosts file"
