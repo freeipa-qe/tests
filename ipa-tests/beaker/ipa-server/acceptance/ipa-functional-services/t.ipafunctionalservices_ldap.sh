@@ -284,6 +284,18 @@ ldap_tests()
                 rlLog "Executing: ldapsearch -x -H ldaps://$HOSTNAME:$LDAPSPORT -D \"cn=Directory Manager\" -w $ADMINPW -b \"o=sasl.com\""
                 rlRun "ldapsearch -x -H ldaps://$HOSTNAME:$LDAPSPORT -D \"cn=Directory Manager\" -w $ADMINPW -b \"o=sasl.com\"" 0 "Verify ldapsearch SSL Simple Bind"
         rlPhaseEnd
+
+        rlPhaseStartTest "ipa-functionalservices-010: Revoke certificate"
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials"
+		# revoke the HTTP server's certificate - first need the certificate's serial number
+                ipa service-show --all $LDAPPRINC > /tmp/certout.txt
+                serialno=`cat /tmp/certout.txt | grep "serial_number" | cut -d ":" -f 2 | cut -d ":" -f 2`
+                serialno=`echo $serialno`
+                rlLog "$LDAPPRINC certificate serial number: $serialno"
+                rlRun "ipa cert-revoke $serialno" 0 "Revoke LDAP server's certificate"
+                rlLog "Executing: ldapsearch -x -H ldaps://$HOSTNAME:$LDAPSPORT -D \"cn=Directory Manager\" -w $ADMINPW -b \"o=sasl.com\""
+                rlRun "ldapsearch -x -H ldaps://$HOSTNAME:$LDAPSPORT -D \"cn=Directory Manager\" -w $ADMINPW -b \"o=sasl.com\"" 0 "Verify ldapsearch SSL Simple Bind with revoked certificate"
+        rlPhaseEnd
 }
 
 cleanup_ldap()
@@ -298,12 +310,6 @@ cleanup_ipa_ldap()
 {
 	rlPhaseStartTest "CLEANUP: IPA Server - LDAP"
 		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials"
-		# revoke the HTTP server's certificate - first need the certificate's serial number
-                ipa service-show --all $LDAPPRINC > /tmp/certout.txt
-                serialno=`cat /tmp/certout.txt | grep "serial_number" | cut -d ":" -f 2 | cut -d ":" -f 2`
-                serialno=`echo $serialno`
-                rlLog "$LDAPPRINC certificate serial number: $serialno"
-                rlRun "ipa cert-revoke $serialno" 0 "Revoke LDAP server's certificate"
 		rlRun "ipa user-del ldapuser1" 0 "Delete the ldap test user"
 		rlRun "ipa-rmkeytab -p $LDAPPRINC -k $LDAPKEYTAB" 0 "removing http keytab"
 		rlRun "rm -rf $LDAPKEYTAB" 0 "removing ldap keytab file"
@@ -314,5 +320,3 @@ cleanup_ipa_ldap()
 		rm -rf /etc/openldap/ldap.conf.orig
 	rlPhaseEnd
 }
-	
-
