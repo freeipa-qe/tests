@@ -64,6 +64,7 @@ rlJournalStart
                         	rlFail "$item package NOT found!"
                 	fi
         	done
+ 		rlRun "service iptables stop" 0 "Stop the firewall on the client"
 		ipafunctionalservices_http
 		ipafunctionalservices_ldap
     	else

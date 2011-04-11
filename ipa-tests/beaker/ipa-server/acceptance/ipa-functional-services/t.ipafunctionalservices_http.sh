@@ -53,7 +53,6 @@ setup_ipa_http()
 setup_http()
 {
 	rlPhaseStartTest "SETUP: HTTP server"
-		service iptables stop
 		service httpd stop
 		rlLog "Setting up $HTTPKRBCFG  ..............."
 		rm -rf $HTTPKRBCFG
@@ -213,7 +212,6 @@ cleanup_ipa_http()
 		# delete keytab file
                 rlRun "rm -rf $HTTPKEYTAB" 0 "Delete the HTTP keytab file"
 		rlRun "ipa service-del $HTTPPRINC" 0 "Remove the HTTP service for this client host"
-		service iptables start
 	rlPhaseEnd
 }
 	

@@ -53,9 +53,6 @@ setup_ipa_ldap()
                 #  add LDAP service for this client host
                 rlRun "ipa service-add $LDAPPRINC" 0 "Add LDAP service for this client host"
 
-		# stop the firewall
-		rlRun "service iptables stop" 0 "Stop the firewall"
-
 		# semanage ldap ssl port
 		rlRun "semanage port -a -t ldap_port_t -p tcp $LDAPSPORT" 0 "Semanage - add LDAP SSL port"
 		
@@ -311,7 +308,6 @@ cleanup_ipa_ldap()
 		rlRun "ipa-rmkeytab -p $LDAPPRINC -k $LDAPKEYTAB" 0 "removing http keytab"
 		rlRun "rm -rf $LDAPKEYTAB" 0 "removing ldap keytab file"
 		rlRun "ipa service-del $LDAPPRINC" 0 "Remove the LDAP service for this client host"
-		rlRun "service iptables start" 0 "Start the firewall"
 
 		# restore ldap configuration file
                 cp -f /etc/openldap/ldap.conf.orig /etc/openldap/ldap.conf
