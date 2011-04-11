@@ -522,7 +522,11 @@ rlPhaseStartTest "service_find_004: ipa service-find with --not-man-by-host opti
         rlRun "ipa service-add-host --hosts=$TESTHOST $SERVICE/$CLIENT@$RELM > $TmpDir/service_find_004.out 2>&1"
         rlRun "ipa service-find --not-man-by-hosts=$TESTHOST > $TmpDir/service_find_004.out 2>&1"
         rlRun "cat $TmpDir/service_find_004.out"
-        rlAssertGrep "Number of entries returned 4" "$TmpDir/service_find_004.out"
+	if [ $SLAVE = "" ] ; then
+        	rlAssertGrep "Number of entries returned 4" "$TmpDir/service_find_004.out"
+	else
+		rlAssertGrep "Number of entries returned 7" "$TmpDir/service_find_004.out"
+	fi
 rlPhaseEnd
 }
 
@@ -557,11 +561,19 @@ rlPhaseStartTest "service_find_007: ipa service-find with --timelimit option"
         rlRun "ipa service-find --timelimit=0 > $TmpDir/service_find_007.out 2>&1"
         result=`cat $TmpDir/service_find_007.out | grep "Number of entries returned"`
         number=`echo $result | cut -d " " -f 5`
-        if [ $number -eq 5 ] ; then
-                rlPass "Number of 5 services returned as expected with time limit of 0"
-        else
-                rlFail "Number of services returned is not as expected.  GOT: $number EXP: 5"
-        fi
+	if [ $SLAVE = "" ] ; then
+        	if [ $number -eq 5 ] ; then
+                	rlPass "Number of 5 services returned as expected with time limit of 0"
+        	else
+                	rlFail "Number of services returned is not as expected.  GOT: $number EXP: 5"
+        	fi
+	else
+                if [ $number -eq 7 ] ; then
+                        rlPass "Number of 7 services returned as expected with time limit of 0"
+                else
+                        rlFail "Number of services returned is not as expected.  GOT: $number EXP: 7"
+                fi
+	fi
 rlPhaseEnd
 }
 
