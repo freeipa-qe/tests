@@ -49,8 +49,8 @@ cert_remove_hold_1001()
     rlPhaseStartTest "cert_remove_hold_1001"
         local testID="cert_remove_hold_1001"
         local tmpout=$TmpDir/cert_remove_hold_1001.$RANDOM.out
-        KinitAsAdmin
         create_cert
+        KinitAsAdmin
         local certid=`tail -n1 $certList | cut -d"=" -f2 | xargs echo`
         rlRun "ipa cert-revoke $certid --revocation-reason=6" 0 "set revoke reason to 6 -- this is only reason we can remove hold"
         ipa cert-show $certid > $tmpout
@@ -82,8 +82,8 @@ cert_remove_hold_1002()
     rlPhaseStartTest "cert_remove_hold_1002"
         local testID="cert_remove_hold_1002"
         local tmpout=$TmpDir/cert_remove_hold_1001.$RANDOM.out
-        KinitAsAdmin
         create_cert
+        KinitAsAdmin
         local certid=`tail -n1 $certList | cut -d"=" -f2 | xargs echo`
         for revokeCode in 0 1 2 3 4 5 7 8 9 10
         do
@@ -197,7 +197,7 @@ cert_request_1001()
 
         KinitAsAdmin
         local principal_TestValue_Negative="/$hostname" #principal;negative;STR 
-        local expectedErrMsg="The service principal for this request doesn't exist"
+        local expectedErrMsg="Service principal is not of the form: service/fully-qualified"
         qaRun "ipa cert-request $certRequestFile --add  --principal=$principal_TestValue_Negative  --request-type=$request_type_TestValue " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [principal]=[$principal_TestValue_Negative] [request-type]=[$request_type_TestValue]" 
 
         principal_TestValue_Negative="noHostNamePricipal" #principal;negative;STR 
@@ -205,7 +205,7 @@ cert_request_1001()
         qaRun "ipa cert-request $certRequestFile --add  --principal=$principal_TestValue_Negative  --request-type=$request_type_TestValue " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [principal]=[$principal_TestValue_Negative] [request-type]=[$request_type_TestValue]" 
 
         principal_TestValue_Negative="whateverservice/does.not.match.csr.host.com" #principal;negative;STR 
-        expectedErrMsg="Insufficient access: hostname in subject of request 'works4me.sjc.redhat.com' does not match principal hostname 'does.not.match.csr.host.com'"
+        expectedErrMsg="Insufficient access: hostname in subject of request '$hostname' does not match principal hostname 'does.not.match.csr.host.com'"
         qaRun "ipa cert-request $certRequestFile --add  --principal=$principal_TestValue_Negative  --request-type=$request_type_TestValue " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [principal]=[$principal_TestValue_Negative] [request-type]=[$request_type_TestValue]" 
 
         Kcleanup
@@ -269,7 +269,7 @@ cert_request_1004()
         local expectedErrCode=1
         KinitAsAdmin
         local principal_TestValue_Negative="/$hostname" #principal;negative;STR 
-        local expectedErrMsg="The service principal for this request doesn't exist"
+        local expectedErrMsg="Service principal is not of the form: service/fully-qualified host name"
         qaRun "ipa cert-request $certRequestFile  --principal=$principal_TestValue_Negative" "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [principal]=[$principal_TestValue_Negative]"
 
         principal_TestValue_Negative="noHostNamePricipal" #principal;negative;STR 
@@ -277,7 +277,7 @@ cert_request_1004()
         qaRun "ipa cert-request $certRequestFile --principal=$principal_TestValue_Negative" "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [principal]=[$principal_TestValue_Negative]"
 
         principal_TestValue_Negative="whateverservice/does.not.match.csr.host.com" #principal;negative;STR 
-        expectedErrMsg="Insufficient access: hostname in subject of request 'works4me.sjc.redhat.com' does not match principal hostname 'does.not.match.csr.host.com'"
+        expectedErrMsg="Insufficient access: hostname in subject of request '$hostname' does not match principal hostname 'does.not.match.csr.host.com'"
         qaRun "ipa cert-request $certRequestFile --principal=$principal_TestValue_Negative" "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [principal]=[$principal_TestValue_Negative]"
 
         Kcleanup
@@ -298,12 +298,10 @@ cert_request_1005()
         local certPrivateKeyFile=$TmpDir/certrequest.$RANDOM.prikey.txt
         create_cert_request_file $certRequestFile $certPrivateKeyFile
         local request_type_TestValue="pkcs10" #request-type;positive;STR
-
         local expectedErrCode=1
-
         KinitAsAdmin
         local principal_TestValue_Negative="/$hostname" #principal;negative;STR 
-        local expectedErrMsg="The service principal for this request doesn't exist"
+        local expectedErrMsg="Service principal is not of the form: service/fully-qualified host name"
         qaRun "ipa cert-request $certRequestFile --principal=$principal_TestValue_Negative  --request-type=$request_type_TestValue " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [principal]=[$principal_TestValue_Negative] [request-type]=[$request_type_TestValue]" 
 
         principal_TestValue_Negative="noHostNamePricipal" #principal;negative;STR 
@@ -311,11 +309,11 @@ cert_request_1005()
         qaRun "ipa cert-request $certRequestFile --principal=$principal_TestValue_Negative  --request-type=$request_type_TestValue " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [principal]=[$principal_TestValue_Negative] [request-type]=[$request_type_TestValue]" 
 
         principal_TestValue_Negative="whateverservice/does.not.match.csr.host.com" #principal;negative;STR 
-        expectedErrMsg="Insufficient access: hostname in subject of request 'works4me.sjc.redhat.com' does not match principal hostname 'does.not.match.csr.host.com'"
+        expectedErrMsg="Insufficient access: hostname in subject of request '$hostname' does not match principal hostname 'does.not.match.csr.host.com'"
         qaRun "ipa cert-request $certRequestFile --principal=$principal_TestValue_Negative  --request-type=$request_type_TestValue " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [principal]=[$principal_TestValue_Negative] [request-type]=[$request_type_TestValue]" 
 
         principal_TestValue_Negative="service$testID/$hostname" # legal principal name, just not pre-exist;negative;STR 
-        expectedErrMsg="replace_me"
+        expectedErrMsg="The service principal for this request doesn't exist"
         expectedErrCode=2
         qaRun "ipa cert-request $certRequestFile --principal=$principal_TestValue_Negative  --request-type=$request_type_TestValue " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [principal]=[$principal_TestValue_Negative] [request-type]=[$request_type_TestValue]" 
         Kcleanup
@@ -403,7 +401,7 @@ cert_request_1009()
         local testID="cert_request_1009_$RANDOM"
         local tmpout=$TmpDir/cert_request_1009.$RANDOM.out
         KinitAsAdmin
-        local principal_TestValue="service$testID/$hostname" #principal;positive;STR
+        local principal="service$testID/$hostname" #principal;positive;STR
         rlRun "ipa service-add $principal_TestValue" 0 "add service principal: [$principal_TestValue] before add cert"
 
         local certRequestFile=$TmpDir/certrequest.$RANDOM.certreq.csr
@@ -522,7 +520,7 @@ cert_revoke_1001()
         done
 
         # when interger does pass in, error msg indicates max value
-        invalid_revoke_reason=99999
+        invalid_revoke_reason=99
         expectedErrMsg="invalid 'revocation_reason': can be at most 10"
         qaRun "ipa cert-revoke $certid --revocation-reason=$invalid_revoke_reason" "$tmpout" "$expectedErrCode" "$expectedErrMsg" "test options:  [revocation-reason]=[$invalid_revoke_reason]" 
         Kcleanup
@@ -571,7 +569,7 @@ cert_revoke_1003()
     rlPhaseStartTest "cert_revoke_1003"
         local testID="cert_revoke_1003"
         KinitAsAdmin
-        for invalid_cert in a abc 100abc 10000000000
+        for invalid_cert in z abc 100abc 10000000000
         do
             rlRun "ipa cert-revoke $invalid_cert" 1 "revoke non-exist cert should fail certid=[$invalid_cert]"
         done
@@ -620,7 +618,7 @@ cert_show_1001()
         KinitAsAdmin
         local expectedErrMsg="Certificate operation cannot be completed"
         local expectedErrCode=1
-        for invalidCertID in 1000 2000 a abc;do
+        for invalidCertID in 1000 2000 z abc;do
             qaRun "ipa cert-show $invalidCertID" "$tmpout" $expectedErrCode "$expectedErrMsg" "test options: $invalidCertID" 
         done
         Kcleanup
@@ -663,7 +661,7 @@ cert_show_1003()
         KinitAsAdmin
         for cert in `cat $certList`;do
             local valid_certid=`echo $cert | cut -d"=" -f2`
-            qaRun "ipa cert-show $valid_certid --out=" "$tmpout" "1" "out option requires an argument" "test option: give no argument for --out, expect to fail"
+            qaRun "ipa cert-show $valid_certid --out=" "$tmpout" "1" "Filename is empty" "test option: give no argument for --out, expect to fail"
             qaRun "ipa cert-show $valid_certid --out=/" "$tmpout" "1" "Is a directory" "test option: give a directory location instead of file name, expecte to fail"
         done
         Kcleanup
