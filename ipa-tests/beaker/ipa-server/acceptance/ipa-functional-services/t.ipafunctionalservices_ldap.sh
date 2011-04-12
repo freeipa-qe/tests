@@ -249,7 +249,7 @@ ldap_tests()
 		rlRun "ldapsearch -h $HOSTNAME -p $LDAPPORT -Y GSSAPI -s sub -b \"uid=ldapuser1,$BASEDN\" \"(uid=*)\" dn" 0 "Verify ldapsearch with valid credentials"
 	rlPhaseEnd
 
-	rlPhaseStartTest "ipa-functionalservices-006: Access LDAP service with out credentials"
+	rlPhaseStartTest "ipa-functionalservices-ldap-002: Access LDAP service with out credentials"
         
         rlRun "kdestroy" 0 "destroy kerberos credentials"
                 rlLog "Executing: ldapsearch -h $HOSTNAME -p $LDAPPORT -Y GSSAPI -s sub -b \"ou=people,$BASEDN\" \"(uid=*)\" dn"
@@ -262,13 +262,13 @@ ldap_tests()
 		fi
         rlPhaseEnd
 
-	rlPhaseStartTest "ipa-functionalservices-ldap-002: Access LDAPS service with credentials"
+	rlPhaseStartTest "ipa-functionalservices-ldap-003: Access LDAPS service with credentials"
 		rlRun "kinitAs ldapuser1 Secret123" 0 "kinit as user to get valid credentials"
                 rlLog "Executing: ldapsearch -H ldaps://$HOSTNAME:$LDAPSPORT -Y GSSAPI -s sub -b  \"uid=ldapuser1,$BASEDN\" \"(uid=*)\" dn"
                 rlRun "ldapsearch -H ldaps://$HOSTNAME:$LDAPSPORT -Y GSSAPI -s sub -b \"uid=ldapuser1,$BASEDN\" \"(uid=*)\" dn" 0 "Verify ldapsearch with valid credentials"
         rlPhaseEnd
 
-	rlPhaseStartTest "ipa-functionalservices-ldap-003: Access LDAPS service without credentials"
+	rlPhaseStartTest "ipa-functionalservices-ldap-004: Access LDAPS service without credentials"
                 rlRun "kdestroy" 0 "destroy kerberos credentials"
                 rlLog "Executing: ldapsearch -H ldaps://$HOSTNAME:$LDAPSPORT -Y GSSAPI -s sub -b \"ou=people,$BASEDN\" \"(uid=*)\" dn"
                 rlRun "ldapsearch -H ldaps://$HOSTNAME:$LDAPSPORT -Y GSSAPI -s sub -b \"uid=ldapuser1,$BASEDN\" \"(uid=*)\" dn > /tmp/ldapsearch_008.out 2>&1" 254 "Verify ldapsearch with valid credentials"
@@ -280,13 +280,13 @@ ldap_tests()
                 fi
         rlPhaseEnd
 
-	rlPhaseStartTest "ipa-functionalservices-ldap-004: LDAPS simple bind"
+	rlPhaseStartTest "ipa-functionalservices-ldap-005: LDAPS simple bind"
                 rlRun "kdestroy" 0 "destroy kerberos credentials"
                 rlLog "Executing: ldapsearch -x -H ldaps://$HOSTNAME:$LDAPSPORT -D \"cn=Directory Manager\" -w $ADMINPW -b \"o=sasl.com\""
                 rlRun "ldapsearch -x -H ldaps://$HOSTNAME:$LDAPSPORT -D \"cn=Directory Manager\" -w $ADMINPW -b \"o=sasl.com\"" 0 "Verify ldapsearch SSL Simple Bind"
         rlPhaseEnd
 
-        rlPhaseStartTest "ipa-functionalservices-ldap-005: Revoke certificate"
+        rlPhaseStartTest "ipa-functionalservices-ldap-006: Revoke certificate"
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials"
 		# revoke the HTTP server's certificate - first need the certificate's serial number
                 ipa service-show --all $LDAPPRINC > /tmp/certout.txt
