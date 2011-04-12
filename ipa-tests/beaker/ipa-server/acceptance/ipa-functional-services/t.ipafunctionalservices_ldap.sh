@@ -242,7 +242,7 @@ EOF
 
 ldap_tests()
 {
-	rlPhaseStartTest "ipa-functionalservices-005: Access LDAP service with valid credentials"
+	rlPhaseStartTest "ipa-functionalservices-ldap-001: Access LDAP service with valid credentials"
 		rlRun "kinitAs ldapuser1 Secret123" 0 "kinit as user to get valid credentials"
 		klist
 		rlLog "Executing: ldapsearch -h $HOSTNAME -p $LDAPPORT -Y GSSAPI -s sub -b \"ou=people,$BASEDN\" \"(uid=*)\" dn"
@@ -250,7 +250,8 @@ ldap_tests()
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-functionalservices-006: Access LDAP service with out credentials"
-                rlRun "kdestroy" 0 "destroy kerberos credentials"
+        
+        rlRun "kdestroy" 0 "destroy kerberos credentials"
                 rlLog "Executing: ldapsearch -h $HOSTNAME -p $LDAPPORT -Y GSSAPI -s sub -b \"ou=people,$BASEDN\" \"(uid=*)\" dn"
                 rlRun "ldapsearch -h $HOSTNAME -p $LDAPPORT -Y GSSAPI -s sub -b \"uid=ldapuser1,$BASEDN\" \"(uid=*)\" dn > /tmp/ldapsearch_006.out 2>&1" 254 "Verify ldapsearch with out valid credentials"
 		cat /tmp/ldapsearch_006.out | grep "Credentials cache file '/tmp/krb5cc_0' not found"
@@ -261,13 +262,13 @@ ldap_tests()
 		fi
         rlPhaseEnd
 
-	rlPhaseStartTest "ipa-functionalservices-007: Access LDAPS service with credentials"
+	rlPhaseStartTest "ipa-functionalservices-ldap-002: Access LDAPS service with credentials"
 		rlRun "kinitAs ldapuser1 Secret123" 0 "kinit as user to get valid credentials"
                 rlLog "Executing: ldapsearch -H ldaps://$HOSTNAME:$LDAPSPORT -Y GSSAPI -s sub -b  \"uid=ldapuser1,$BASEDN\" \"(uid=*)\" dn"
                 rlRun "ldapsearch -H ldaps://$HOSTNAME:$LDAPSPORT -Y GSSAPI -s sub -b \"uid=ldapuser1,$BASEDN\" \"(uid=*)\" dn" 0 "Verify ldapsearch with valid credentials"
         rlPhaseEnd
 
-	rlPhaseStartTest "ipa-functionalservices-008: Access LDAPS service without credentials"
+	rlPhaseStartTest "ipa-functionalservices-ldap-003: Access LDAPS service without credentials"
                 rlRun "kdestroy" 0 "destroy kerberos credentials"
                 rlLog "Executing: ldapsearch -H ldaps://$HOSTNAME:$LDAPSPORT -Y GSSAPI -s sub -b \"ou=people,$BASEDN\" \"(uid=*)\" dn"
                 rlRun "ldapsearch -H ldaps://$HOSTNAME:$LDAPSPORT -Y GSSAPI -s sub -b \"uid=ldapuser1,$BASEDN\" \"(uid=*)\" dn > /tmp/ldapsearch_008.out 2>&1" 254 "Verify ldapsearch with valid credentials"
@@ -279,13 +280,13 @@ ldap_tests()
                 fi
         rlPhaseEnd
 
-	rlPhaseStartTest "ipa-functionalservices-009: LDAPS simple bind"
+	rlPhaseStartTest "ipa-functionalservices-ldap-004: LDAPS simple bind"
                 rlRun "kdestroy" 0 "destroy kerberos credentials"
                 rlLog "Executing: ldapsearch -x -H ldaps://$HOSTNAME:$LDAPSPORT -D \"cn=Directory Manager\" -w $ADMINPW -b \"o=sasl.com\""
                 rlRun "ldapsearch -x -H ldaps://$HOSTNAME:$LDAPSPORT -D \"cn=Directory Manager\" -w $ADMINPW -b \"o=sasl.com\"" 0 "Verify ldapsearch SSL Simple Bind"
         rlPhaseEnd
 
-        rlPhaseStartTest "ipa-functionalservices-010: Revoke certificate"
+        rlPhaseStartTest "ipa-functionalservices-ldap-005: Revoke certificate"
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials"
 		# revoke the HTTP server's certificate - first need the certificate's serial number
                 ipa service-show --all $LDAPPRINC > /tmp/certout.txt
@@ -293,8 +294,10 @@ ldap_tests()
                 serialno=`echo $serialno`
                 rlLog "$LDAPPRINC certificate serial number: $serialno"
                 rlRun "ipa cert-revoke $serialno" 0 "Revoke LDAP server's certificate"
-                rlLog "Executing: ldapsearch -x -H ldaps://$HOSTNAME:$LDAPSPORT -D \"cn=Directory Manager\" -w $ADMINPW -b \"o=sasl.com\""
-                rlRun "ldapsearch -x -H ldaps://$HOSTNAME:$LDAPSPORT -D \"cn=Directory Manager\" -w $ADMINPW -b \"o=sasl.com\"" 0 "Verify ldapsearch SSL Simple Bind with revoked certificate"
+		rlLog "Checking certificate revokation via OCSP"
+		rlLog "EXECUTING: /usr/lib64/nss/unsupported-tools/ocspclnt -S \"$HOSTNAME\" -d /etc/dirsrv/$INSTANCE/"
+		rlRun "/usr/lib64/nss/unsupported-tools/ocspclnt -S \"$HOSTNAME\" -d /etc/dirsrv/$INSTANCE/ > /tmp/ocsp.out" 0 "Running ocspclnt"
+		rlAssertGrep "Peer's Certificate has been revoked." "/tmp/ocsp.out"
         rlPhaseEnd
 }
 
@@ -314,7 +317,6 @@ cleanup_ipa_ldap()
 		rlRun "ipa-rmkeytab -p $LDAPPRINC -k $LDAPKEYTAB" 0 "removing http keytab"
 		rlRun "rm -rf $LDAPKEYTAB" 0 "removing ldap keytab file"
 		rlRun "ipa service-del $LDAPPRINC" 0 "Remove the LDAP service for this client host"
-
 		# restore ldap configuration file
                 cp -f /etc/openldap/ldap.conf.orig /etc/openldap/ldap.conf
 		rm -rf /etc/openldap/ldap.conf.orig

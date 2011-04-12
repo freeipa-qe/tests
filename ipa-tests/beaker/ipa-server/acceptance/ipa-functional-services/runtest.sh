@@ -52,7 +52,6 @@ PACKAGELIST="ipa-admintools ipa-client httpd mod_nss mod_auth_kerb 389-ds-base e
 rlJournalStart
   rlPhaseStartTest "Environment check"
     # call functional tests
-
     	echo $CLIENT | grep $HOSTNAME
 	rc=$?
     	if [ $rc -eq 0 ] ; then
