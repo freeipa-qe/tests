@@ -525,7 +525,7 @@ rlPhaseStartTest "service_find_004: ipa service-find with --not-man-by-host opti
 	if [ $SLAVE = "" ] ; then
         	rlAssertGrep "Number of entries returned 4" "$TmpDir/service_find_004.out"
 	else
-		rlAssertGrep "Number of entries returned 7" "$TmpDir/service_find_004.out"
+		rlAssertGrep "Number of entries returned 8" "$TmpDir/service_find_004.out"
 	fi
 rlPhaseEnd
 }
@@ -568,10 +568,10 @@ rlPhaseStartTest "service_find_007: ipa service-find with --timelimit option"
                 	rlFail "Number of services returned is not as expected.  GOT: $number EXP: 5"
         	fi
 	else
-                if [ $number -eq 7 ] ; then
-                        rlPass "Number of 7 services returned as expected with time limit of 0"
+                if [ $number -eq 9 ] ; then
+                        rlPass "Number of 9 services returned as expected with time limit of 0"
                 else
-                        rlFail "Number of services returned is not as expected.  GOT: $number EXP: 7"
+                        rlFail "Number of services returned is not as expected.  GOT: $number EXP: 9"
                 fi
 	fi
 rlPhaseEnd
