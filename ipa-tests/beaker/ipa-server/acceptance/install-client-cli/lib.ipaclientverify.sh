@@ -31,6 +31,28 @@ ipacompare_forinstalluninstall()
     fi
 }
 
+ipacompare_forinstalluninstall_withmasterslave()
+{
+    local label="$1"
+    local expected_master="$2"
+    local expected_slave="$3"
+    local actual="$4"
+    local installcheck="$5"
+    if [ "$actual" = "$expected_master" -o "$actual" = "$expected_slave" ];then
+        if $installcheck ; then
+            rlPass "[$label] matches :[$actual]"
+        else
+            rlFail "[$label] still has value: [$actual]. Should have been reset."
+        fi
+    else
+        if $installcheck ; then 
+          rlFail "[$label] does NOT match"
+          rlLog "expect [$expected_master] or [$expected_slave], actual got [$actual]"
+        else
+          rlPass "Value has been cleared and reset for $label"
+        fi
+    fi
+}
 
 
 uninstall_fornexttest()
@@ -122,7 +144,7 @@ verify_sssd()
           ipacompare_forinstalluninstall "krb5_realm " "$krb5_realm" "$testkrb5realm" "$1" 
        fi
        testipaserver=`grep "^ipa_server" $SSSD | cut -d "=" -f2 | xargs echo`
-       ipacompare_forinstalluninstall "ipa_server " "$ipa_server" "$testipaserver" "$1" 
+       ipacompare_forinstalluninstall_withmasterslave "ipa_server " "$ipa_server_master" "$ipa_server_slave" "$testipaserver" "$1"
        if [ "$2" == "enablednsupdates" ] ; then
           testipadyndnsupdate=`grep "^ipa_dyndns_update" $SSSD | cut -d "=" -f2 | xargs echo`
           ipacompare_forinstalluninstall "ipa_dyndns_update " "$ipa_dyndns_update" "$testipadyndnsupdate" "$1" 
@@ -163,7 +185,7 @@ verify_krb5()
        testdnslookuprealm=`grep "dns_lookup_realm" $KRB5 | cut -d "=" -f2 | xargs echo` 
        ipacompare_forinstalluninstall "dns_lookup_realm " "$dns_lookup_realm_force" "$testdnslookuprealm" "$1" 
        testdomain=`grep "$DOMAIN" $KRB5 | cut -d "=" -f2 | xargs echo` 
-       ipacompare_forinstalluninstall "domain_realm " "$domain_realm_force" "$testdomain" "$1" 
+       ipacompare_forinstalluninstall_withmasterslave "domain_realm " "$domain_realm_force_master" "$domain_realm_force_slave" "$testdomain" "$1" 
     else
        testdnslookupkdc=`grep "dns_lookup_kdc" $KRB5 | cut -d "=" -f2 | xargs echo` 
        ipacompare_forinstalluninstall "dns_lookup_kdc " "$dns_lookup_kdc" "$testdnslookupkdc" "$1" 

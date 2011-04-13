@@ -62,7 +62,6 @@ ipaclientinstall()
 
 
 #   --enable-dns-updates This option tells SSSD to automatically update DNS with the IP address of this client.
-####  Manual test ####
      ipaclientinstall_enablednsupdates
 
 
@@ -82,17 +81,21 @@ ipaclientinstall()
 
 setup()
 {
-    # edit hosts file and resolv file before starting tests
-    rlRun "fixHostFile" 0 "Set up /etc/hosts"
-    rlRun "fixhostname" 0 "Fix hostname"
-    rlRun "fixResolv" 0 "fixing the resolv.conf to contain the correct nameserver lines"
-    rlRun "appendEnv" 0 "Append the machine information to the env.sh with the information for the machines in the recipe set"
+    rlPhaseStartSetup "ipa-client-install: Setup "
+        # edit hosts file and resolv file before starting tests
+        rlRun "fixHostFile" 0 "Set up /etc/hosts"
+        rlRun "fixhostname" 0 "Fix hostname"
+        rlRun "fixResolv" 0 "fixing the resolv.conf to contain the correct nameserver lines"
+        rlRun "appendEnv" 0 "Append the machine information to the env.sh with the information for the machines in the recipe set"
     
-    ## Lines to expect to be changed during the isnatllation process
-    ## which reference the MASTER. 
-    ## Moved them here from data.ipaclientinstall.acceptance since MASTER is not set there.
-    ipa_server="_srv_, $MASTER" # sssd.conf updates
-    domain_realm_force="$MASTER:88 $MASTER:749 ${RELM,,} $RELM $RELM" # krb5.conf updates
+        ## Lines to expect to be changed during the isnatllation process
+        ## which reference the MASTER. 
+        ## Moved them here from data.ipaclientinstall.acceptance since MASTER is not set there.
+        ipa_server_master="_srv_, $MASTER" # sssd.conf updates
+        domain_realm_force_master="$MASTER:88 $MASTER:749 ${RELM,,} $RELM $RELM" # krb5.conf updates
+        ipa_server_slave="_srv_, $SLAVE" # sssd.conf updates
+        domain_realm_force_slave="$SLAVE:88 $MASTER:749 ${RELM,,} $RELM $RELM" # krb5.conf updates
+    rlPhaseEnd
 }
 
 
@@ -432,8 +435,8 @@ ipaclientinstall_withmasterdown()
         # Stop the MASTER 
         rlRun "ssh root@$MASTER \"ipactl stop\"" 0 "Stop MASTER IPA server"
 
-        rlLog "EXECUTING: ipa-client-install --domain=$DOMAIN --realm=$RELM --ntp-server=$NTPSERVER -p $ADMINID -w $ADMINPW --unattended --server=$MASTER"
-        rlRun "ipa-client-install --domain=$DOMAIN --realm=$RELM --ntp-server=$NTPSERVER -p $ADMINID -w $ADMINPW --unattended --server=$MASTER" 0 "Installing ipa client and configuring - with all params"
+        rlLog "EXECUTING: ipa-client-install --domain=$DOMAIN --realm=$RELM --ntp-server=$NTPSERVER -p $ADMINID -w $ADMINPW --unattended "
+        rlRun "ipa-client-install --domain=$DOMAIN --realm=$RELM --ntp-server=$NTPSERVER -p $ADMINID -w $ADMINPW --unattended " 0 "Installing ipa client and configuring - with all params"
 
         # Start the MASTER back
         rlRun "ssh root@$MASTERIP \"ipactl start\"" 0 "Start MASTER IPA server"
