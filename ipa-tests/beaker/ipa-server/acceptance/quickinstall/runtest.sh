@@ -55,11 +55,11 @@ rlJournalStart
 	echo $MASTER | grep $HOSTNAME
 	if [ $? -eq 0 ] ; then
 		if [ "$SNAPSHOT" = "TRUE" ] ; then
-			yum -y install $SERVER_PACKAGES
-			yum -y install ds-replication
-		else
 			yum -y install --disablerepo=ipa --disablerepo=ipa_noarch $SERVER_PACKAGES
-			yum -y install ds-replication
+                        yum -y install ds-replication
+		else
+			yum -y install $SERVER_PACKAGES
+                        yum -y install ds-replication
 		fi
 
 		for item in $SERVER_PACKAGES ; do
@@ -91,10 +91,10 @@ rlJournalStart
         echo $SLAVE | grep $HOSTNAME
         if [ $? -eq 0 ] ; then
 		if [ "$SNAPSHOT" = "TRUE" ] ; then
-                        yum -y install $SERVER_PACKAGES 
+			yum -y install --disablerepo=ipa --disablerepo=ipa_noarch $SERVER_PACKAGES
                         yum -y install ds-replication
                 else
-                        yum -y install --disablerepo=ipa --disablerepo=ipa_noarch $SERVER_PACKAGES
+                        yum -y install $SERVER_PACKAGES
                         yum -y install ds-replication
                 fi
 
