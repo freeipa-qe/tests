@@ -134,7 +134,7 @@ cert_remove_hold_1003()
         for certid in a abc
         do
             ipa cert-remove-hold $certid 2>&1 >$tmpout
-            local errmsg="replace_me"
+            local errmsg="Record not found"
             if grep "$errmsg" $tmpout ;then
                 rlPass "remove-hold an invalid cert failed as expected"
             else
