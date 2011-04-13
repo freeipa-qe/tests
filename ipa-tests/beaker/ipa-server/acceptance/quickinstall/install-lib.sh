@@ -64,6 +64,14 @@ fixResolv()
    rlLog "MASTER IP address is $ipaddr"
    sed -i s/^nameserver/#nameserver/g /etc/resolv.conf
    echo "nameserver $ipaddr" >> /etc/resolv.conf
+
+   # get the Slave's IP address
+   if [ "$SLAVE" != "" ]; then
+      slaveipaddr=$(dig +noquestion $SLAVE  | grep $SLAVE | grep IN | awk '{print $5}')
+      rlLog "SLAVE IP address is $slaveipaddr"
+      echo "nameserver $slaveipaddr" >> /etc/resolv.conf
+   fi
+
    rlLog "/etc/resolv.conf contains:"
    output=`cat /etc/resolv.conf`
    rlLog "$output"
