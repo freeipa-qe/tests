@@ -81,12 +81,12 @@ cert_remove_hold_1002()
 { #test_scenario (negative): when cert revoked in reason other than 6, remove-hold should fail
     rlPhaseStartTest "cert_remove_hold_1002"
         local testID="cert_remove_hold_1002"
-        local tmpout=$TmpDir/cert_remove_hold_1001.$RANDOM.out
+        local tmpout=$TmpDir/cert_remove_hold_1002.$RANDOM.out
         create_cert
-        KinitAsAdmin
         local certid=`tail -n1 $certList | cut -d"=" -f2 | xargs echo`
         for revokeCode in 0 1 2 3 4 5 7 8 9 10
         do
+            KinitAsAdmin
             rlRun "ipa cert-revoke $certid --revocation-reason=$revokeCode" 0 "set revoke reason to [$revokeCode], cert should not be able to reuse"
             ipa cert-show $certid > $tmpout
             reason=`grep -i "Revocation reason" $tmpout | cut -d":" -f2 | xargs echo`
@@ -142,6 +142,7 @@ cert_remove_hold_1003()
                 cat $tmpout
             fi
         done
+        Kcleanup
     rlPhaseEnd
 } #cert_remove_hold_1003
 
