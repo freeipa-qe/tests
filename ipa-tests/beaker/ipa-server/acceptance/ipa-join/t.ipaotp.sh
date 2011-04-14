@@ -30,7 +30,6 @@ ipa_otp_envcleanup()
 {
     rlPhaseStartCleanup "ipa_otp_envcleanup"
         #environment cleanup starts here
-        uninstall_ipa_client
         rlRun "ssh root@$serverFQDN \"kdestroy\"" 0 "remove kerboros ticket in remote server"
         #environment cleanup ends   here
     rlPhaseEnd
