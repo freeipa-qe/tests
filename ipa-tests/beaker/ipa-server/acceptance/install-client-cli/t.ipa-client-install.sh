@@ -9,72 +9,72 @@ ipaclientinstall()
 
    setup
 #   -U, --unattended  Unattended installation. The user will not be prompted.
-   ipaclientinstall_adminpwd
-
-#   install with multiple params including
-#   --ntp-server=NTP_SERVER Configure ntpd to use this NTP server.
-   ipaclientinstall_allparam
-
-#   --uninstall Remove the IPA client software and restore the configuration to the pre-IPA state.
-   ipaclientinstall_uninstall
-
-   ipaclientinstall_noparam
-
-#   -N, --no-ntp  Do not configure or enable NTP.
-   ipaclientinstall_noNTP
-
-#   --domain=DOMAIN Set the domain name to DOMAIN 
-    ipaclientinstall_invaliddomain
-
-#   --server=SERVER Set the IPA server to connect to
-   ipaclientinstall_server_nodomain 
-   ipaclientinstall_server_invalidserver
-
-
-#   --realm=REALM_NAME Set the IPA realm name to REALM_NAME 
-   ipaclientinstall_realm_casesensitive 
-   ipaclientinstall_invalidrealm 
-
-#   --hostname The hostname of this server (FQDN). By default of nodename from uname(2) is used. 
-   ipaclientinstall_hostname 
-
-
-#  --on-master The client is being configured on an IPA server.
-####   IPA Server uses this to install client on server machine.   #####
-####   End user will not use it. So no tests here for this option. #####
-
-#   -w PASSWORD, --password=PASSWORD Password for joining a machine to the IPA realm. Assumes bulk password unless principal is also set.
-    ipaclientinstall_password
-
-#   -W  Prompt for the password for joining a machine to the IPA realm.
-
-#   -p, --principal  Authorized kerberos principal to use to join the IPA realm.
-   ipaclientinstall_nonexistentprincipal
-   ipaclientinstall_nonadminprincipal
-   ipaclientinstall_principalwithinvalidpassword
-
-#   --permit Configure  SSSD  to  permit all access. Otherwise the machine will be controlled by the Host-based Access Controls (HBAC) on the IPA server.
-    ipaclientinstall_permit
-
-
-#   --mkhomedir  Configure pam to create a users home directory if it does not exist.
-    ipaclientinstall_mkhomedir
-
-
-#   --enable-dns-updates This option tells SSSD to automatically update DNS with the IP address of this client.
-     ipaclientinstall_enablednsupdates
-
-
-#   Install client with master down
+#   ipaclientinstall_adminpwd
+#
+##   install with multiple params including
+##   --ntp-server=NTP_SERVER Configure ntpd to use this NTP server.
+#   ipaclientinstall_allparam
+#
+##   --uninstall Remove the IPA client software and restore the configuration to the pre-IPA state.
+#   ipaclientinstall_uninstall
+#
+#   ipaclientinstall_noparam
+#
+##   -N, --no-ntp  Do not configure or enable NTP.
+#   ipaclientinstall_noNTP
+#
+##   --domain=DOMAIN Set the domain name to DOMAIN 
+#    ipaclientinstall_invaliddomain
+#
+##   --server=SERVER Set the IPA server to connect to
+#   ipaclientinstall_server_nodomain 
+#   ipaclientinstall_server_invalidserver
+#
+#
+##   --realm=REALM_NAME Set the IPA realm name to REALM_NAME 
+#   ipaclientinstall_realm_casesensitive 
+#   ipaclientinstall_invalidrealm 
+#
+##   --hostname The hostname of this server (FQDN). By default of nodename from uname(2) is used. 
+#   ipaclientinstall_hostname 
+#
+#
+##  --on-master The client is being configured on an IPA server.
+#####   IPA Server uses this to install client on server machine.   #####
+#####   End user will not use it. So no tests here for this option. #####
+#
+##   -w PASSWORD, --password=PASSWORD Password for joining a machine to the IPA realm. Assumes bulk password unless principal is also set.
+#    ipaclientinstall_password
+#
+##   -W  Prompt for the password for joining a machine to the IPA realm.
+#
+##   -p, --principal  Authorized kerberos principal to use to join the IPA realm.
+#   ipaclientinstall_nonexistentprincipal
+#   ipaclientinstall_nonadminprincipal
+#   ipaclientinstall_principalwithinvalidpassword
+#
+##   --permit Configure  SSSD  to  permit all access. Otherwise the machine will be controlled by the Host-based Access Controls (HBAC) on the IPA server.
+#    ipaclientinstall_permit
+#
+#
+##   --mkhomedir  Configure pam to create a users home directory if it does not exist.
+#    ipaclientinstall_mkhomedir
+#
+#
+##   --enable-dns-updates This option tells SSSD to automatically update DNS with the IP address of this client.
+#     ipaclientinstall_enablednsupdates
+#
+#
+##   Install client with master down
    ipaclientinstall_withmasterdown
-
-#   -S, --no-sssd  Do not configure the client to use SSSD for authentication, use nss_ldap instead.
-   ipaclientinstall_nosssd
-
-
-
-#  --f, --force Force the settings even if errors occur
-   ipaclientinstall_force 
+#
+##   -S, --no-sssd  Do not configure the client to use SSSD for authentication, use nss_ldap instead.
+#   ipaclientinstall_nosssd
+#
+#
+#
+##  --f, --force Force the settings even if errors occur
+#   ipaclientinstall_force 
 
 
 }
@@ -430,7 +430,22 @@ ipaclientinstall_enablednsupdates()
 ipaclientinstall_withmasterdown()
 {
     rlPhaseStartTest "ipa-client-install: 23: [Positive] Install with MASTER down, SLAVE up"
+   PUBKEY=/dev/shm/id_rsa_global.pub
+   PRIVATEKEY=/dev/shm/id_rsa_global
+   SSHROOT=/root/.ssh/
+   PUBKEYFILE=$SSHR0OT/id_rsa
+   AUTHKEYFILE=$SSHROOT/authorized_keys
+rlLog "Before Uninstall"
+rlLog "PUBKEY: `cat $PUBKEY`"
+rlLog "PRIVATEKEY: `cat $PRIVATEKEY`"
+rlLog "PUBKEYFILE: `cat $PUBKEYFILE`"
+rlLog "AUTHKEYFILE: `cat $AUTHKEYFILE`"
         uninstall_fornexttest
+rlLog "After Uninstall"
+rlLog "PUBKEY: `cat $PUBKEY`"
+rlLog "PRIVATEKEY: `cat $PRIVATEKEY`"
+rlLog "PUBKEYFILE: `cat $PUBKEYFILE`"
+rlLog "AUTHKEYFILE: `cat $AUTHKEYFILE`"
        
         # Stop the MASTER 
         rlRun "ssh root@$MASTER \"ipactl stop\"" 0 "Stop MASTER IPA server"
