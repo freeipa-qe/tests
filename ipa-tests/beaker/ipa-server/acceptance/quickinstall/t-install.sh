@@ -102,10 +102,6 @@ installClient()
         	rlRun "ipa-client-install --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW -U --server=$MASTER" 0 "Installing ipa client and configuring"
 		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
 		rlRun "appendEnv" 0 "Append the machine information to the env.sh with the information for the machines in the recipe set"
-                rlLog "Setting up Authorized keys"
-                SetUpAuthKeys
-                rlLog "Setting up known hosts file"
-                SetUpKnownHosts
 	fi
 
         if [ -f /var/log/ipaclient-install.log ]; then
