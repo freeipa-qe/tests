@@ -55,11 +55,12 @@ rlJournalStart
 	echo $MASTER | grep $HOSTNAME
 	if [ $? -eq 0 ] ; then
 		if [ "$SNAPSHOT" = "TRUE" ] ; then
-			yum -y install --disablerepo=ipa --disablerepo=ipa_noarch ipa-server bind bind-dyndb-ldap
-			yum -y install --disablerepo=ipa --disablerepo=ipa_noarch bind-dyndb-ldap
+			yum clean all
+			yum -y install --disablerepo=ipa --disablerepo=ipa_noarch $SERVER_PACKAGES
                         yum -y install ds-replication
 		else
-			yum -y install ipa-server bind bind-dyndb-ldap
+			yum clean all
+			yum -y install $SERVER_PACKAGES
                         yum -y install ds-replication
 		fi
 
@@ -92,8 +93,8 @@ rlJournalStart
         echo $SLAVE | grep $HOSTNAME
         if [ $? -eq 0 ] ; then
 		if [ "$SNAPSHOT" = "TRUE" ] ; then
+			yum clean all
 			yum -y install --disablerepo=ipa --disablerepo=ipa_noarch $SERVER_PACKAGES
-			yum -y install --disablerepo=ipa --disablerepo=ipa_noarch bind-dyndb-ldap
                         yum -y install ds-replication
                 else
                         yum -y install $SERVER_PACKAGES
@@ -130,8 +131,10 @@ rlJournalStart
         echo $CLIENT | grep $HOSTNAME
         if [ $? -eq 0 ] ; then
 		if [ "$SNAPSHOT" = "TRUE" ] ; then
+			yum clean all
 			yum -y install --disablerepo=ipa --disablerepo=ipa_noarch $CLIENT_PACKAGES
 		else
+			yum clean all
 			yum -y install $CLIENT_PACKAGES
 		fi
 
