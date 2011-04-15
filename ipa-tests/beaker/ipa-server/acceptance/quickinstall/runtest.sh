@@ -56,7 +56,7 @@ rlJournalStart
 	if [ $? -eq 0 ] ; then
 		if [ "$SNAPSHOT" = "TRUE" ] ; then
 			yum clean all
-			yum -y install --disablerepo=ipa --disablerepo=ipa_noarch $SERVER_PACKAGES
+			yum -y install --disablerepo=ipa $SERVER_PACKAGES
                         yum -y install ds-replication
 		else
 			yum clean all
@@ -94,7 +94,7 @@ rlJournalStart
         if [ $? -eq 0 ] ; then
 		if [ "$SNAPSHOT" = "TRUE" ] ; then
 			yum clean all
-			yum -y install --disablerepo=ipa --disablerepo=ipa_noarch $SERVER_PACKAGES
+			yum -y install --disablerepo=ipa $SERVER_PACKAGES
                         yum -y install ds-replication
                 else
                         yum -y install $SERVER_PACKAGES
