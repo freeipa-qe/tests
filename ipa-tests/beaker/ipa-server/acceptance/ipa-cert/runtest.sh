@@ -54,7 +54,7 @@ bugfix()
 } # bigfix
 ##############################
 
-PACKAGE="freeipa-server"
+PACKAGE="ipa-admintools"
 startDate=`date "+%F %r"`
 satrtEpoch=`date "+%s"`
 ##########################################
