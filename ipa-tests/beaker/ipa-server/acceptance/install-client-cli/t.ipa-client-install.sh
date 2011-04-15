@@ -8,73 +8,73 @@ ipaclientinstall()
 {
 
    setup
-#   -U, --unattended  Unattended installation. The user will not be prompted.
-   ipaclientinstall_adminpwd
-
-#   install with multiple params including
-#   --ntp-server=NTP_SERVER Configure ntpd to use this NTP server.
-   ipaclientinstall_allparam
-
-#   --uninstall Remove the IPA client software and restore the configuration to the pre-IPA state.
-   ipaclientinstall_uninstall
-
-   ipaclientinstall_noparam
-
-#   -N, --no-ntp  Do not configure or enable NTP.
-   ipaclientinstall_noNTP
-
-#   --domain=DOMAIN Set the domain name to DOMAIN 
-    ipaclientinstall_invaliddomain
-
-#   --server=SERVER Set the IPA server to connect to
-   ipaclientinstall_server_nodomain 
-   ipaclientinstall_server_invalidserver
-
-
-#   --realm=REALM_NAME Set the IPA realm name to REALM_NAME 
-   ipaclientinstall_realm_casesensitive 
-   ipaclientinstall_invalidrealm 
-
-#   --hostname The hostname of this server (FQDN). By default of nodename from uname(2) is used. 
-   ipaclientinstall_hostname 
-
-
-#  --on-master The client is being configured on an IPA server.
-####   IPA Server uses this to install client on server machine.   #####
-####   End user will not use it. So no tests here for this option. #####
-
-#   -w PASSWORD, --password=PASSWORD Password for joining a machine to the IPA realm. Assumes bulk password unless principal is also set.
-    ipaclientinstall_password
-
-#   -W  Prompt for the password for joining a machine to the IPA realm.
-
-#   -p, --principal  Authorized kerberos principal to use to join the IPA realm.
-   ipaclientinstall_nonexistentprincipal
-   ipaclientinstall_nonadminprincipal
-   ipaclientinstall_principalwithinvalidpassword
-
-#   --permit Configure  SSSD  to  permit all access. Otherwise the machine will be controlled by the Host-based Access Controls (HBAC) on the IPA server.
-    ipaclientinstall_permit
-
-
-#   --mkhomedir  Configure pam to create a users home directory if it does not exist.
-    ipaclientinstall_mkhomedir
-
-
-#   --enable-dns-updates This option tells SSSD to automatically update DNS with the IP address of this client.
-     ipaclientinstall_enablednsupdates
-
-
-#   Install client with master down
+##   -U, --unattended  Unattended installation. The user will not be prompted.
+#   ipaclientinstall_adminpwd
+#
+##   install with multiple params including
+##   --ntp-server=NTP_SERVER Configure ntpd to use this NTP server.
+#   ipaclientinstall_allparam
+#
+##   --uninstall Remove the IPA client software and restore the configuration to the pre-IPA state.
+#   ipaclientinstall_uninstall
+#
+#   ipaclientinstall_noparam
+#
+##   -N, --no-ntp  Do not configure or enable NTP.
+#   ipaclientinstall_noNTP
+#
+##   --domain=DOMAIN Set the domain name to DOMAIN 
+#    ipaclientinstall_invaliddomain
+#
+##   --server=SERVER Set the IPA server to connect to
+#   ipaclientinstall_server_nodomain 
+#   ipaclientinstall_server_invalidserver
+#
+#
+##   --realm=REALM_NAME Set the IPA realm name to REALM_NAME 
+#   ipaclientinstall_realm_casesensitive 
+#   ipaclientinstall_invalidrealm 
+#
+##   --hostname The hostname of this server (FQDN). By default of nodename from uname(2) is used. 
+#   ipaclientinstall_hostname 
+#
+#
+##  --on-master The client is being configured on an IPA server.
+#####   IPA Server uses this to install client on server machine.   #####
+#####   End user will not use it. So no tests here for this option. #####
+#
+##   -w PASSWORD, --password=PASSWORD Password for joining a machine to the IPA realm. Assumes bulk password unless principal is also set.
+#    ipaclientinstall_password
+#
+##   -W  Prompt for the password for joining a machine to the IPA realm.
+#
+##   -p, --principal  Authorized kerberos principal to use to join the IPA realm.
+#   ipaclientinstall_nonexistentprincipal
+#   ipaclientinstall_nonadminprincipal
+#   ipaclientinstall_principalwithinvalidpassword
+#
+##   --permit Configure  SSSD  to  permit all access. Otherwise the machine will be controlled by the Host-based Access Controls (HBAC) on the IPA server.
+#    ipaclientinstall_permit
+#
+#
+##   --mkhomedir  Configure pam to create a users home directory if it does not exist.
+#    ipaclientinstall_mkhomedir
+#
+#
+##   --enable-dns-updates This option tells SSSD to automatically update DNS with the IP address of this client.
+#     ipaclientinstall_enablednsupdates
+#
+#
+##   Install client with master down
    ipaclientinstall_withmasterdown
-
-#   -S, --no-sssd  Do not configure the client to use SSSD for authentication, use nss_ldap instead.
-   ipaclientinstall_nosssd
-
-
-
-#  --f, --force Force the settings even if errors occur
-   ipaclientinstall_force 
+#
+##   -S, --no-sssd  Do not configure the client to use SSSD for authentication, use nss_ldap instead.
+#   ipaclientinstall_nosssd
+#
+#
+#
+##  --f, --force Force the settings even if errors occur
+#   ipaclientinstall_force 
 
 
 }
@@ -87,10 +87,12 @@ setup()
         rlRun "fixhostname" 0 "Fix hostname"
         rlRun "fixResolv" 0 "fixing the resolv.conf to contain the correct nameserver lines"
         rlRun "appendEnv" 0 "Append the machine information to the env.sh with the information for the machines in the recipe set"
+rlLog "DEBUG: BEFORE : Known hosts on client : `cat ~/.ssh/known_hosts`"
         rlLog "Setting up Authorized keys"
         SetUpAuthKeys
         rlLog "Setting up known hosts file"
         SetUpKnownHosts
+rlLog "DEBUG: AFTER: Known hosts on client : `cat ~/.ssh/known_hosts`"
 
     
         ## Lines to expect to be changed during the isnatllation process
@@ -440,7 +442,10 @@ ipaclientinstall_withmasterdown()
         rlRun "ipa-client-install --domain=$DOMAIN --realm=$RELM --ntp-server=$NTPSERVER -p $ADMINID -w $ADMINPW --unattended " 0 "Installing ipa client and configuring - with all params"
 
         # Start the MASTER back
+rlLog "DEBUG: $MASTERIP"
+rlLog "DEBUG: Known hosts on client : `cat ~/.ssh/known_hosts`"
         rlRun "ssh root@$MASTERIP \"ipactl start\"" 0 "Start MASTER IPA server"
+        rlRun "ssh root@$MASTER \"ipactl status\"" 0 "DEBUG: CHECK MASTER IPA server STATUS"
 
         verify_install true
     rlPhaseEnd
