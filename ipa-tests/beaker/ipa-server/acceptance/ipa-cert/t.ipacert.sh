@@ -403,7 +403,7 @@ cert_request_1009()
         local tmpout=$TmpDir/cert_request_1009.$RANDOM.out
         KinitAsAdmin
         local principal="service$testID/$hostname" #principal;positive;STR
-        rlRun "ipa service-add $principal_TestValue" 0 "add service principal: [$principal_TestValue] before add cert"
+        rlRun "ipa service-add $principal" 0 "add service principal: [$principal_TestValue] before add cert"
 
         local certRequestFile=$TmpDir/certrequest.$RANDOM.certreq.csr
         local certPrivateKeyFile=$TmpDir/certrequest.$RANDOM.prikey.txt
