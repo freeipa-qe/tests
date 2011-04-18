@@ -162,7 +162,7 @@ cert_request()
     cert_request_1006  #test_scenario (positive test): [--principal;positive;STR]
     cert_request_1007  #test_scenario (negative test): [--principal;positive;STR --request-type;negative;STR]
     cert_request_1008  #test_scenario (positive test): [--principal;positive;STR --request-type;positive;STR]
-    cert_request_1009  #test_scenario (negative): use same cert request file and principle twice, the first will be revoked with reason 4
+    #cert_request_1009  #test_scenario (negative): use same cert request file and principle twice, the first will be revoked with reason 4
     cert_request_envcleanup
 } #cert-request
 
@@ -398,7 +398,7 @@ cert_request_1008()
 
 cert_request_1009()
 { #test_scenario (negative): use same cert request file and principle twice, the first will be revoked with reason 4
-    rlPhaseStartTest "cert_request_1009"
+    rlPhaseStartTest "cert_request_1009 debug"
         local testID="cert_request_1009_$RANDOM"
         local tmpout=$TmpDir/cert_request_1009.$RANDOM.out
         KinitAsAdmin
