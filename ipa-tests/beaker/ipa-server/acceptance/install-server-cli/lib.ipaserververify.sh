@@ -67,6 +67,14 @@ uninstall_fornexttest()
     fi
 }
 
+install_fornexttest()
+{
+    if [ -f $DEFAULT  ] ; then
+        rlLog "EXECUTING: ipa-server-install --setup-dns --forwarder=$DNSFORWARD --hostname=$HOSTNAME -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U"
+        rlRun "ipa-server-install --setup-dns --forwarder=$DNSFORWARD --hostname=$HOSTNAME -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U" 0 "Installing ipa server" 
+    fi
+}
+
 verify_kinit()
 {
    rlLog "Verify kinit"
@@ -76,7 +84,7 @@ verify_kinit()
      if $installcheck ; then 
         rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials after installing"
      else
-        rlRun "kinitAs $ADMINID $ADMINPW" 1 "Get administrator credentials after uninstalling"
+        rlRun "kinitAs $ADMINID $ADMINPW" 1 "Did not get administrator credentials after uninstalling"
      fi 
 }
 
@@ -289,7 +297,7 @@ verify_ipactl_status()
 {
    rlLog "Verify ipactl status"
 
-   out=$1
+   out=$2
    command="ipactl status"
    $command > $out
    status_DS=`grep "Directory Service" $out | cut -d ":" -f2 | xargs echo`
@@ -297,20 +305,32 @@ verify_ipactl_status()
    status_KPASSWD=`grep "KPASSWD Service" $out | cut -d ":" -f2 | xargs echo`
    status_DNS=`grep "DNS Service" $out | cut -d ":" -f2 | xargs echo`
    status_HTTP=`grep "HTTP Service" $out | cut -d ":" -f2 | xargs echo`
-   if [ $status_DS == "RUNNING" -a $status_KDC == "RUNNING" -a $status_KPASSWD == "RUNNING" -a $status_DNS == "RUNNING" -a $status_HTTP == "RUNNING" ] ; then 
-      rlPass "ipactl status as expected for DS, KDC, KPASSWD, DNS, HTTP"
-   else
-      rlPass "ipactl status not as expected for DS, KDC, KPASSWD, DNS, HTTP"
-      rlLog "ipactl status:\n`cat $out`"
-   fi
-   if [ "$2" != "selfsign" ]; then
-      status_CA=`grep "CA Service" $out | cut -d ":" -f2 | xargs echo`
-      if [ $status_CA == "RUNNING" ] ; then
-         rlPass "ipctl status as expected for CA"
+   local installcheck="$1"
+   if $installcheck ; then
+      if [ $status_DS == "RUNNING" -a $status_KDC == "RUNNING" -a $status_KPASSWD == "RUNNING" -a $status_DNS == "RUNNING" -a $status_HTTP == "RUNNING" ] ; then 
+         rlPass "ipactl status as expected for DS, KDC, KPASSWD, DNS, HTTP"
       else
-         rlFail "ipctl status not as expected for CA"
+         rlPass "ipactl status not as expected for DS, KDC, KPASSWD, DNS, HTTP"
+         rlLog "ipactl status:\n`cat $out`"
       fi
-   fi 
+      if [ "$2" != "selfsign" ]; then
+         status_CA=`grep "CA Service" $out | cut -d ":" -f2 | xargs echo`
+         if [ $status_CA == "RUNNING" ] ; then
+            rlPass "ipctl status as expected for CA"
+         else
+            rlFail "ipctl status not as expected for CA"
+         fi
+      fi 
+  else
+     $command 2> $out
+     ipactl_result=`cat $out`
+     if [ "$ipactl_result" == "$ipactl_uninstall" ] ; then
+        rlPass "ipactl status not available since server has been uninstalled"
+     else
+       rlFail "Not expecting to get ipactl status"
+       rlLog "Found status to be: $ipactl_result"
+     fi
+  fi
 }
 
 
@@ -341,7 +361,7 @@ verify_ntp()
    command_out=`echo $command | sed 's/ //g'`
    nontp_out="ntpd0:off1:off2:off3:off4:off5:off6:off"
    ntp_out="ntpd0:off1:off2:on3:on4:on5:on6:off"
-   if [ "$2" == "nontp" ] ; then
+   if [ "$1" == "false" -o "$2" == "nontp" ] ; then
      if [ $command_out == $nontp_out ]; then
          rlPass "Verified NTP is not configured"
      else
@@ -359,7 +379,10 @@ verify_ntp()
 
 verify_zonemgr()
 {
-  rlLog "Verify zonemgr addr"
+   if [ "$1" == "false" ]; then
+     return
+   fi
+   rlLog "Verify zonemgr addr"
 
    out=$2
    command="ipa dnszone-find"
@@ -392,7 +415,7 @@ verify_forwarder()
   else
       $command > $out
       testforwarder=`grep "ping statistics " $out | xargs echo`
-      ipacompare_forinstalluninstall "Forwarder: " "$good_ping" "$testforwarder" $1
+      ipacompare_forinstalluninstall "Forwarder: " "$good_ping" "$testforwarder" true 
   fi
 }
 
@@ -414,6 +437,9 @@ verify_newip()
 
 verify_subject()
 {
+   if [ "$1" == "false" ]; then
+     return
+   fi
    rlLog "Verify Cerificate Subject base for server install"
 
    out=$2
@@ -429,6 +455,78 @@ verify_subject()
       else
          testsubject=`grep "Certificate Subject base" $out | cut -d ":" -f2 | xargs echo`
          ipacompare_forinstalluninstall "Certificate Subject base" "$default_subject" "$testsubject" $1
+      fi
+   fi
+}
+
+verify_ldapsearch()
+{
+  out_error=$1
+  tmpout=$TmpDir/ipaserverinstall_ldapsearch.out
+   ldaperror="ldap_bind: Invalid credentials (49)"
+   ldapsearch -x -D "cn=Directory Manager" -w $2 -b "dc=$DOMAIN" > $tmpout 2> $out
+   if [ "$3" == "allow" ] ; then
+     error_size=`stat -c%s $out`
+     if [ $error_size == 0 ]; then
+       rlPass "ldapsearch accepted password - $2"
+     else
+       rlFail "ldapsearch failed to accept password - $2"
+       rlFail "Error: `cat $out`"
+     fi
+   else
+     result=`cat $out`
+     rlLog " result: $result"
+     if [ "$result" == "$ldaperror" ] ; then
+        rlPass "ldapsearch failed as expected with password - $2"
+     else
+        rlFail "ldapsearch accepted password - $2"
+        rlLog "ldapsearch result: $result"
+     fi
+   fi
+}
+
+verify_password()
+{
+  if [ "$1" == "false" ]; then
+    return
+  fi
+  out=$2
+  if [ "$3" == "password" ]; then 
+     # ldapsearch with three passwords 
+     verify_ldapsearch $out $dm_pw allow
+     verify_ldapsearch $out $ADMINPW 
+     verify_ldapsearch $out $master_pw
+    
+     # kinit with DM_PWD, MASTER_PWD  will fail
+     command_dm="kinitAs $ADMINID $dm_pw"
+     command_master="kinitAs $ADMINID $master_pw"
+     expmsg="kinit: Password incorrect while getting initial credentials"
+     qaExpectedRun "$command_dm" "$out" 1 "Verify kinit error for DM Password " "$expmsg" 
+     qaExpectedRun "$command_master" "$out" 1 "Verify kinit error for Master Password " "$expmsg" 
+  else
+     verify_ldapsearch $out $ADMINPW allow
+  fi
+}
+
+
+verify_reverse()
+{
+  if [ "$1" == "false" ]; then
+    return
+  fi
+   out=$2
+   testreversedns=`ipa dnszone-find --all | grep arpa | grep Zone | cut -d ":" -f2 | xargs echo`
+   if [ "$3" == "noreverse" ] ; then
+      if [ $testreversedns == "" ] ; then 
+         rlPass "No Reverse DNS found"
+      else
+        rlFail "Unexpected Reverse DNS found: $testreversedns "
+      fi
+   else
+      if [ $testreversedns != "" ] ; then 
+         rlPass "Reverse DNS found : $testreversedns"
+      else
+        rlFail "No Reverse DNS found"
       fi
    fi
 }

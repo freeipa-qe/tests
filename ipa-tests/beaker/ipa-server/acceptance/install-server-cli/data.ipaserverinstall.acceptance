@@ -54,6 +54,14 @@ basedn="dc=${MYREALM,,}"
 realm="$MYREALM"
 domain=$DOMAIN
 
+#uninstall check
+ipactl_uninstall="IPA is not configured (see man pages of ipa-server-install for help)"
+
+
+# password checks
+dm_pw="DSSecret123"
+master_pw="MasterSecret123"
+
 # cert check
 selfsign_cert="type=NSSDB,location=/etc/dirsrv/slapd-$RELM,nickname=Server-Cert,token=NSS Certificate DB type=NSSDB,location=/etc/httpd/alias,nickname=Server-Cert,token=NSS Certificate DB"
 selfsign_issuer="CN=TESTRELM Certificate Authority CN=TESTRELM Certificate Authority"
