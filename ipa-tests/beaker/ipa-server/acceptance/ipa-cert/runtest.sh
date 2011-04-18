@@ -61,7 +61,7 @@ satrtEpoch=`date "+%s"`
 #   test main 
 #########################################
 
-bugfix #this is a temp fix, once bug-fix officially checked in, i should remove this one
+#bugfix #this is a temp fix, once bug-fix officially checked in, i should remove this one
 
 rlJournalStart
     rlPhaseStartSetup "ipacert startup: Check for ipa-server package"
