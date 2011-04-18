@@ -13,7 +13,6 @@
 			<ks_appends/>
 			<repos>
 				<repo name="ipa" url="http://mickey.dsdev.sjc.redhat.com/repos/pki/ipa/devel/rhel6/devel_x86_64/x86_64"/>
-				<repo name="ipa-noarch" url="http://mickey.dsdev.sjc.redhat.com/repos/pki/ipa/devel/rhel6/devel_x86_64/noarch"/>
 			</repos>
 			<distroRequires>
 				<and>
@@ -57,7 +56,6 @@
 			<ks_appends/>
 			<repos>
 				<repo name="ipa" url="http://mickey.dsdev.sjc.redhat.com/repos/pki/ipa/devel/rhel6/devel_x86_64/x86_64"/>
-				<repo name="ipa-noarch" url="http://mickey.dsdev.sjc.redhat.com/repos/pki/ipa/devel/rhel6/devel_x86_64/noarch"/>
 			</repos>
 			<distroRequires>
 				<and>
@@ -102,7 +100,6 @@
 			<ks_appends/>
 			<repos>
 				<repo name="ipa" url="http://mickey.dsdev.sjc.redhat.com/repos/pki/ipa/devel/rhel6/devel_x86_64/x86_64"/>
-				<repo name="ipa-noarch" url="http://mickey.dsdev.sjc.redhat.com/repos/pki/ipa/devel/rhel6/devel_x86_64/noarch"/>
 			</repos>
 			<distroRequires>
 				<and>
