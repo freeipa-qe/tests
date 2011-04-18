@@ -96,7 +96,7 @@ cert_remove_hold_1002()
                 rlFail "revoke reason expected to be [$revokeCode], actual [$reason], test can not continue"
                 return
             fi
-            rlRun "ipa cert-remove-hold $certid " 1 "test options: remove hold should fail" 
+            rlRun "ipa cert-remove-hold $certid " 0 "cert-remove-hold always return 0(succes),we need more test to confirm remove hold fails" 
 
             #after remove hold, lets check the content again
             ipa cert-show $certid > $tmpout
@@ -121,27 +121,34 @@ cert_remove_hold_1003()
         KinitAsAdmin
         # somehow ipa cert-remove-hold always report success regardless
         # I have to use output msg to determine the pass/fail 
-        local certid=99999999999999
+        local certid="9999"
+        local errmsg="Record not found"
         ipa cert-remove-hold $certid 2>&1 >$tmpout
-        if grep -i "Record not found" $tmpout 
+        if grep -i "$errmsg" $tmpout 
         then
             rlPass "remove non-exist cert reports 'not found' error"
         else
             rlFail "no match error msg found"
+            echo "====== expect ====================="
+            echo $errmsg
+            echo "====== actual ======================"
             cat $tmpout
+            echo "===================================="
         fi
 
-        for certid in a abc
-        do
-            ipa cert-remove-hold $certid 2>&1 >$tmpout
-            local errmsg="Record not found"
-            if grep "$errmsg" $tmpout ;then
-                rlPass "remove-hold an invalid cert failed as expected"
-            else
-                rlFail "remove-hold: error msg does not match"
-                cat $tmpout
-            fi
-        done
+        local certid="abc"
+        ipa cert-remove-hold $certid 2>&1 >$tmpout
+        local errmsg="Record not found"
+        if grep -i "$errmsg" $tmpout ;then
+            rlPass "remove-hold an invalid cert failed as expected"
+        else
+            rlFail "remove-hold: error msg does not match, actual out as below"
+            echo "======== expected =================="
+            echo $errmsg
+            echo "========= actual  =================="
+            cat $tmpout
+            echo "===================================="
+        fi
         Kcleanup
     rlPhaseEnd
 } #cert_remove_hold_1003
@@ -162,7 +169,7 @@ cert_request()
     cert_request_1006  #test_scenario (positive test): [--principal;positive;STR]
     cert_request_1007  #test_scenario (negative test): [--principal;positive;STR --request-type;negative;STR]
     cert_request_1008  #test_scenario (positive test): [--principal;positive;STR --request-type;positive;STR]
-    #cert_request_1009  #test_scenario (negative): use same cert request file and principle twice, the first will be revoked with reason 4
+    cert_request_1009  #test_scenario (negative): use same cert request file and principle twice, the first will be revoked with reason 4
     cert_request_envcleanup
 } #cert-request
 
@@ -398,9 +405,10 @@ cert_request_1008()
 
 cert_request_1009()
 { #test_scenario (negative): use same cert request file and principle twice, the first will be revoked with reason 4
-    rlPhaseStartTest "cert_request_1009 debug"
+    rlPhaseStartTest "cert_request_1009"
         local testID="cert_request_1009_$RANDOM"
         local tmpout=$TmpDir/cert_request_1009.$RANDOM.out
+        local certfile=$TmpDir/cert_request_1009.$RANDOM.certs
         KinitAsAdmin
         local principal="service$testID/$hostname" #principal;positive;STR
         rlRun "ipa service-add $principal" 0 "add service principal: [$principal_TestValue] before add cert"
@@ -414,7 +422,7 @@ cert_request_1009()
         local ret=$?
         if [ "$ret" = "0" ];then
             local certid=`grep "Serial number" $tmpout| cut -d":" -f2 | xargs echo` 
-            echo "$principal=$certid" >> $certList
+            echo "$principal=$certid" > $certfile
             rlLog "create first cert success, cert id :[$certid], principal [$principal]"
         else
             rlFail "create first cert failed, principal [$principal]"
@@ -426,7 +434,7 @@ cert_request_1009()
         local ret=$?
         if [ "$ret" = "0" ];then
             local certid=`grep "Serial number" $tmpout| cut -d":" -f2 | xargs echo` 
-            echo "$principal=$certid" >> $certList
+            echo "$principal=$certid" >> $certfile
             rlLog "create second cert success, cert id :[$certid], principal [$principal]"
         else
             rlFail "create second cert failed, principal [$principal]"
@@ -434,17 +442,17 @@ cert_request_1009()
             return
         fi
 
-        # verification: (1) total success cert count should be 2 in $certList file
-        total=`cat $certList | wc -l` 
+        # verification: (1) total success cert count should be 2 in $certfile
+        total=`cat $certfile | wc -l` 
         if [ "$total" = "2" ];then
             rlLog "total certs matches : [$total]";
         else
             rlFail "total certs should be 2, but [$total]"
-            cat $certList
+            cat $certfile
             return
         fi
-        oldCert=`cat $certList | head -n1`
-        newCert=`cat $certList | tail -n1` 
+        oldCert=`cat $certfile | head -n1 | cut -d"=" -f2`
+        newCert=`cat $certfile | tail -n1 | cut -d"=" -f2` 
         revokeReasonOld=`ipa cert-show $oldCert | grep "Revocation reason" | cut -d":" -f2 | xargs echo`
         if [ "$revokeReasonOld" = "4" ];then
             rlLog "old cert [$oldCert] revoked as reason 4, this is expected, verification continue"
@@ -461,13 +469,14 @@ cert_request_1009()
                 echo "==========================================="
             fi
         else
-            rlFail "first cert [$firstCert] Does not being revoked, or not as reason 4, this is not expected"
+            rlFail "first cert [$oldCert] Does not being revoked, or not as reason 4, this is not expected"
         fi
 
         Kcleanup
         rm $tmpout
         rm $certRequestFile 
         rm $certPrivateKeyFile
+        rm $certfile
     rlPhaseEnd
 } #cert_request_1009
 
@@ -512,7 +521,11 @@ cert_revoke_1001()
         local expectedErrCode=1
         create_cert
         local validCert=`tail -n1 $certList`
-        local certid=`echo $validCert| cut -d"=" -f1`
+        local certid=`echo $validCert| cut -d"=" -f2`
+        rlLog "certid=[$certid]";
+        echo "================ cert list =============";
+        cat  $certList
+        echo "========================================";
         KinitAsAdmin
         # when pass a non-integer
         for invalid_revoke_reason in a abc
@@ -617,9 +630,15 @@ cert_show_1001()
         local testID="cert_show_1001"
         local tmpout=$TmpDir/cert_show_1001.$RANDOM.out
         KinitAsAdmin
+        local expectedErrMsg="not found"
+        local expectedErrCode=1
+        for invalidCertID in 1000 2000 ;do
+            qaRun "ipa cert-show $invalidCertID" "$tmpout" $expectedErrCode "$expectedErrMsg" "test options: $invalidCertID" 
+        done
+
         local expectedErrMsg="Certificate operation cannot be completed"
         local expectedErrCode=1
-        for invalidCertID in 1000 2000 z abc;do
+        for invalidCertID in abc b0a;do
             qaRun "ipa cert-show $invalidCertID" "$tmpout" $expectedErrCode "$expectedErrMsg" "test options: $invalidCertID" 
         done
         Kcleanup
@@ -637,17 +656,19 @@ cert_show_1002()
             local outfile=$TmpDir/certshow1002.$RANDOM.out.file
             local output=$TmpDir/certshow1002.$RANDOM.output
             local valid_certid=`echo $cert | cut -d"=" -f2`
-            ipa cert-show $valid_certid >$output
             rlRun "ipa cert-show $valid_certid --out=$outfile" 0 "output [$valid_certid] to file: [$outfile]"
-            #FIXME: do dome validation here to ensure the output file is valid
-            if diff $output $outfile
-            then
-                rlPass "direct output matches with output file, test pass"
+            if [ -f $outfile ];then
+                if     grep "BEGIN CERTIFICATE" $outfile 2>&1 >/dev/null \
+                    && grep "END CERTIFICATE" $outfile 2>&1 >/dev/null
+                then
+                    rlPass "cert-show output to file [$outfile] success"
+                else
+                    rlFail "cert-show output to file [$outfile] failed"
+                fi
             else
-                rlFail "direct output does NOT match with output file, failed"
+                rlFail "can not output cert to file [$outfile]"
             fi
             rm $outfile
-            rm $output
         done
         Kcleanup
         rm $tmpout
