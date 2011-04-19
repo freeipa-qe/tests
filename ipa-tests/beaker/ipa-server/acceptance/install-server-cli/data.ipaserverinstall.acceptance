@@ -57,6 +57,10 @@ domain=$DOMAIN
 #uninstall check
 ipactl_uninstall="IPA is not configured (see man pages of ipa-server-install for help)"
 
+#id check
+idstart="5000"
+idmax="5010"
+
 
 # password checks
 dm_pw="DSSecret123"

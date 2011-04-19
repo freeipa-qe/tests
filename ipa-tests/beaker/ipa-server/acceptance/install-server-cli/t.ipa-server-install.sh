@@ -52,6 +52,10 @@ ipaserverinstall()
 #  --subject=SUBJECT     The certificate subject base (default O=<realm-name>)
      ipaserverinstall_subject
 
+#  --idstart=IDSTART     The starting value for the IDs range (default random)
+#  --idmax=IDMAX         The max value value for the IDs range (default: idstart+199999)
+    ipaserverinstall_id
+
 #  --selfsign            Configure a self-signed CA instance rather than a dogtag CA
     ipaserverinstall_selfsign
 # This should be last test - then run IPA Functional tests against this server
@@ -71,7 +75,6 @@ setup()
        ## which reference the MASTER. 
        ## Moved them here from data.ipaclientinstall.acceptance since MASTER is not set there.
        ipa_server="_srv_, $MASTER" # sssd.conf updates
-       ipa_server_slave="_srv_, $SLAVE" # sssd.conf updates
     rlPhaseEnd
 }
 
@@ -301,6 +304,22 @@ ipaserverinstall_subject()
         rlLog "EXECUTING: ipa-server-install --setup-dns --forwarder=$DNSFORWARD  -r $RELM -p $ADMINPW -P $ADMINPW -a $ADMINPW --subject=$cert_subject -U" 
         rlRun "ipa-server-install --setup-dns --forwarder=$DNSFORWARD  -r $RELM -p $ADMINPW -P $ADMINPW -a $ADMINPW --subject=$cert_subject -U" 0 "Installing ipa server with subject" 
         verify_install true tmpout subject 
+    rlPhaseEnd
+}
+
+########################################################################################
+##  --idstart=IDSTART     The starting value for the IDs range (default random)
+##  --idmax=IDMAX         The max value value for the IDs range (default: idstart+199999)
+########################################################################################
+ipaserverinstall_id()
+{
+    rlPhaseStartTest "ipa-server-install: 01: [Positive] Install with id start and id max specified" 
+        uninstall_fornexttest
+        local tmpout=$TmpDir/ipaserverinstall_id.out
+        rlLog "ipa-server-install --setup-dns --forwarder=$DNSFORWARD  -r $RELM -p $ADMINPW -P $ADMINPW -a $ADMINPW --idstart=$idstart --idmax=$idmax -U"
+        rlRun "ipa-server-install --setup-dns --forwarder=$DNSFORWARD  -r $RELM -p $ADMINPW -P $ADMINPW -a $ADMINPW --idstart=5000 --idmax=5010 -U" 0 "Installing ipa server with id start and id max specified" 
+        verify_install true tmpout
+#        verify_useradd
     rlPhaseEnd
 }
 

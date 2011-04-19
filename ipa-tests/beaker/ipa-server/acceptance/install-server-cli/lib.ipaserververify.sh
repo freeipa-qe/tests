@@ -32,33 +32,6 @@ ipacompare_forinstalluninstall()
     fi
 }
 
-# this call available in install-client-cli also
-# and is called only once here....TODO: revisit
-ipacompare_forinstalluninstall_withmasterslave()
-{
-    local label="$1"
-    local expected_master="$2"
-    local expected_slave="$3"
-    local actual="$4"
-    local installcheck="$5"
-    if [ "$actual" = "$expected_master" -o "$actual" = "$expected_slave" ];then
-        if $installcheck ; then
-            rlPass "[$label] matches :[$actual]"
-        else
-            rlFail "[$label] still has value: [$actual]. Should have been reset."
-        fi
-    else
-        if $installcheck ; then
-          rlFail "[$label] does NOT match"
-          rlLog "expect [$expected_master] or [$expected_slave], actual got [$actual]"
-        else
-          rlPass "Value has been cleared and reset for $label"
-        fi
-    fi
-}
-
-
-
 uninstall_fornexttest()
 {
     if [ -f $DEFAULT  ] ; then
@@ -141,7 +114,7 @@ verify_sssd()
      testchpassprovider=`grep "^chpass_provider" $SSSD | cut -d "=" -f2 | xargs echo`
      ipacompare_forinstalluninstall "chpass_provider " "$chpass_provider" "$testchpassprovider" "$1" 
      testipaserver=`grep "^ipa_server" $SSSD | cut -d "=" -f2 | xargs echo`
-     ipacompare_forinstalluninstall_withmasterslave "ipa_server " "$ipa_server" "$testipaserver" "$1" 
+     ipacompare_forinstalluninstall "ipa_server " "$ipa_server" "$testipaserver" "$1" 
 }
 
 verify_krb5()
