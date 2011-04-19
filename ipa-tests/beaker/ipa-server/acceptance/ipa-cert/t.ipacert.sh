@@ -197,7 +197,7 @@ cert_request_1001()
         local testID="cert_request_1001_$RANDOM"
         local tmpout=$TmpDir/cert_request_1001.$RANDOM.out
         local request_type_TestValue="pkcs10" #request-type;positive;STR
-        local expectedErrCode=1
+        local expectedErrCode=0
 
         local certRequestFile=$TmpDir/certrequest.$RANDOM.certreq.csr
         local certPrivateKeyFile=$TmpDir/certrequest.$RANDOM.prikey.txt
@@ -236,7 +236,7 @@ cert_request_1002()
         local principal_TestValue="sevice$testID/$hostname" #principal;positive;STR 
         local request_type_TestValue_Negative="invalidType100" #request-type;negative;STR
         local expectedErrMsg="Unknown Certificate Request Type"
-        local expectedErrCode=1
+        local expectedErrCode=0
         qaRun "ipa cert-request $certRequestFile --add  --principal=$principal_TestValue  --request-type=$request_type_TestValue_Negative " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [principal]=[$principal_TestValue] [request-type]=[$request_type_TestValue_Negative]" 
         Kcleanup
         rm $tmpout
@@ -274,7 +274,7 @@ cert_request_1004()
         local certPrivateKeyFile=$TmpDir/certrequest.$RANDOM.prikey.txt
         create_cert_request_file $certRequestFile $certPrivateKeyFile
 
-        local expectedErrCode=1
+        local expectedErrCode=0
         KinitAsAdmin
         local principal_TestValue_Negative="/$hostname" #principal;negative;STR 
         local expectedErrMsg="Service principal is not of the form: service/fully-qualified host name"
@@ -306,7 +306,7 @@ cert_request_1005()
         local certPrivateKeyFile=$TmpDir/certrequest.$RANDOM.prikey.txt
         create_cert_request_file $certRequestFile $certPrivateKeyFile
         local request_type_TestValue="pkcs10" #request-type;positive;STR
-        local expectedErrCode=1
+        local expectedErrCode=0
         KinitAsAdmin
         local principal_TestValue_Negative="/$hostname" #principal;negative;STR 
         local expectedErrMsg="Service principal is not of the form: service/fully-qualified host name"
@@ -322,7 +322,7 @@ cert_request_1005()
 
         principal_TestValue_Negative="service$testID/$hostname" # legal principal name, just not pre-exist;negative;STR 
         expectedErrMsg="The service principal for this request doesn't exist"
-        expectedErrCode=2
+        expectedErrCode=0
         qaRun "ipa cert-request $certRequestFile --principal=$principal_TestValue_Negative  --request-type=$request_type_TestValue " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [principal]=[$principal_TestValue_Negative] [request-type]=[$request_type_TestValue]" 
         Kcleanup
 
@@ -370,7 +370,7 @@ cert_request_1007()
 
         local request_type_TestValue_Negative="invalidType102" #request-type;negative;STR
         local expectedErrMsg="Unknown Certificate Request Type invalidtype10"
-        local expectedErrCode=1
+        local expectedErrCode=0
         qaRun "ipa cert-request $certRequestFile --principal=$principal_TestValue  --request-type=$request_type_TestValue_Negative " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [principal]=[$principal_TestValue] [request-type]=[$request_type_TestValue_Negative]" 
         Kcleanup
 
@@ -518,7 +518,7 @@ cert_revoke_1001()
         local testID="cert_revoke_1001"
         local tmpout=$TmpDir/cert_revoke_1001.$RANDOM.out
         local expectedErrMsg="invalid 'revocation_reason': must be an integer"
-        local expectedErrCode=1
+        local expectedErrCode=0
         create_cert
         local validCert=`tail -n1 $certList`
         local certid=`echo $validCert| cut -d"=" -f2`
@@ -631,13 +631,13 @@ cert_show_1001()
         local tmpout=$TmpDir/cert_show_1001.$RANDOM.out
         KinitAsAdmin
         local expectedErrMsg="not found"
-        local expectedErrCode=1
+        local expectedErrCode=0
         for invalidCertID in 1000 2000 ;do
             qaRun "ipa cert-show $invalidCertID" "$tmpout" $expectedErrCode "$expectedErrMsg" "test options: $invalidCertID" 
         done
 
         local expectedErrMsg="Certificate operation cannot be completed"
-        local expectedErrCode=1
+        local expectedErrCode=0
         for invalidCertID in abc b0a;do
             qaRun "ipa cert-show $invalidCertID" "$tmpout" $expectedErrCode "$expectedErrMsg" "test options: $invalidCertID" 
         done
@@ -680,11 +680,12 @@ cert_show_1003()
     rlPhaseStartTest "cert_show_1003"
         local testID="cert_show_1003"
         local tmpout=$TmpDir/cert_show_1003.$RANDOM.out
+        local errcode=0;
         KinitAsAdmin
         for cert in `cat $certList`;do
             local valid_certid=`echo $cert | cut -d"=" -f2`
-            qaRun "ipa cert-show $valid_certid --out=" "$tmpout" "1" "Filename is empty" "test option: give no argument for --out, expect to fail"
-            qaRun "ipa cert-show $valid_certid --out=/" "$tmpout" "1" "Is a directory" "test option: give a directory location instead of file name, expecte to fail"
+            qaRun "ipa cert-show $valid_certid --out=" "$tmpout" "$errcode" "Filename is empty" "test option: give no argument for --out, expect to fail"
+            qaRun "ipa cert-show $valid_certid --out=/" "$tmpout" "$errcode" "Is a directory" "test option: give a directory location instead of file name, expecte to fail"
         done
         Kcleanup
         rm $tmpout
