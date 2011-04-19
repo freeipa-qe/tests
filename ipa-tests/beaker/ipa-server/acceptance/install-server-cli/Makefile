@@ -29,7 +29,7 @@ export TESTVERSION=1.0
 
 BUILT_FILES=
 
-FILES=$(METADATA) runtest.sh Makefile PURPOSE lib.ipaserververify.sh t.ipa-server-install.sh 
+FILES=$(METADATA) runtest.sh Makefile PURPOSE lib.ipaserververify.sh t.ipa-server-install.sh data.ipaserverinstall.acceptance 
 
 .PHONY: all install download clean
 
