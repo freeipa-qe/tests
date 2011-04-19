@@ -4,7 +4,7 @@ TestVersion:     1.0
 Path:            /mnt/tests/CoreOS/ipa-server/acceptance/r2d2_testsuitename
 Description:     r2d2_description
 Type:            Regression
-TestTime:        15m
+TestTime:        30m
 RunFor:          ipa-server
 Requires:        ipa-admintools
 Requires:        expect
