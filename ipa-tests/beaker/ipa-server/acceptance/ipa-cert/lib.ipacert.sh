@@ -135,6 +135,7 @@ qaRun()
 {
     local cmd="$1"
     local out="$2"
+    local errout=$TmpDir/qarun.$RANDOM.out
     local expectCode="$3"
     local expectMsg="$4"
     local comment="$5"
@@ -143,7 +144,8 @@ qaRun()
     rlLog "expect [$expectCode], out=[$out]"
     rlLog "$comment"
     
-    $1 2>$out
+    $1 2>$errout >$out
+    cat $errout >> $out
     actualCode=$?
     if [ "$actualCode" = "$expectCode" ];then
         rlLog "return code matches, now check the message"
@@ -166,4 +168,5 @@ qaRun()
         cat $out
         echo "============== end of output =============="
     fi
+    rm $errout
 } #qaRun
