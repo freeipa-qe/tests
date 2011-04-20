@@ -239,7 +239,7 @@ ipaclientinstall_realm_casesensitive()
        relminlowercase=`echo ${RELM,,}`
        rlLog "EXECUTING: ipa-client-install --realm=$relminlowercase"
        command="ipa-client-install --realm=$relminlowercase"
-       expmsg="ERROR: The provided realm name: [$relminlowercase] does not match with the discovered one- [$RELM]"
+       expmsg="ERROR: The provided realm name: [$relminlowercase] does not match with the discovered one: [$RELM]"
        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for IPA Install with incorrect case realmname"
 
     rlPhaseEnd
@@ -251,7 +251,7 @@ ipaclientinstall_invalidrealm()
        uninstall_fornexttest
        rlLog "EXECUTING: ipa-client-install --realm=xxx"
        command="ipa-client-install --realm=xxx"
-       expmsg="ERROR: The provided realm name: [xxx] does not match with the discovered one- [$RELM]"
+       expmsg="ERROR: The provided realm name: [xxx] does not match with the discovered one: [$RELM]"
        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for IPA Install with invalid realmname"
     rlPhaseEnd
 }
