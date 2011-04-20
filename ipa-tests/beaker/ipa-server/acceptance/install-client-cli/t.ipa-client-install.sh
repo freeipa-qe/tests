@@ -65,8 +65,8 @@ ipaclientinstall()
      ipaclientinstall_enablednsupdates
 
 
-#   Install client with master down
-   ipaclientinstall_withmasterdown
+#   Install client with master down #bug 696193
+#   ipaclientinstall_withmasterdown
 
 #   -S, --no-sssd  Do not configure the client to use SSSD for authentication, use nss_ldap instead.
    ipaclientinstall_nosssd
