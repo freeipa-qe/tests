@@ -38,9 +38,13 @@
 . /usr/share/beakerlib/beakerlib.sh
 . /dev/shm/ipa-server-shared.sh
 . /dev/shm/env.sh
+. /dev/shm/lib.user-cli.sh
+
+#Include the data file for the tests
+. ./data.replication
 
 # Include test case file
-. ./t.replication.sh
+. ./t.replicationonmasterslave.sh
 
 PACKAGE="ipa-admintools"
 
@@ -70,8 +74,8 @@ rlJournalStart
 		echo "ERROR - This test suite must be run on a setup involving at lease one master, and one replica server"
 		rlFail "This test suite must be run on a setup involving at lease one master, and one replica server"
 	else
-		setupApache
-		replication
+#		setupApache
+	        testReplicationOnMasterAndSlave
 	fi
 
     rlPhaseStartCleanup "replication cleanup"
