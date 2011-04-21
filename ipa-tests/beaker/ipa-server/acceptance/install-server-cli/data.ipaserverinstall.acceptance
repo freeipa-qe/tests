@@ -4,6 +4,8 @@ SSSD="/etc/sssd/sssd.conf"
 KRB5="/etc/krb5.conf"
 DEFAULT="/etc/ipa/default.conf"
 AUTHCONFIG="/etc/sysconfig/authconfig"
+SLAPD_PKI="/etc/dirsrv/slapd-PKI-IPA"
+NTP="/etc/ntp.conf"
 VERSION="2.0.0"
 
 #Realm used in these tests
@@ -54,6 +56,11 @@ USESSSD="yes"
 basedn="dc=${MYREALM,,}"
 realm="$MYREALM"
 domain=$DOMAIN
+
+
+#ntp.conf updates
+ntpserver="server 127.127.1.0"
+ntpfudgeserver="fudge 127.127.1.0 stratum 10"
 
 #uninstall check
 ipactl_uninstall="IPA is not configured (see man pages of ipa-server-install for help)"

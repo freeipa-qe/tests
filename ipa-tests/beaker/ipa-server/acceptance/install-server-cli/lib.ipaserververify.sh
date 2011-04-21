@@ -335,22 +335,19 @@ verify_ntp()
 {
    rlLog "Verify ntp config"
 
-   command=`/sbin/chkconfig --list ntpd`
-   command_out=`echo $command | sed 's/ //g'`
-   nontp_out="ntpd0:off1:off2:off3:off4:off5:off6:off"
-   ntp_out="ntpd0:off1:off2:on3:on4:on5:on6:off"
    if [ "$1" == "false" -o "$2" == "nontp" ] ; then
-     if [ $command_out == $nontp_out ]; then
-         rlPass "Verified NTP is not configured"
-     else
-        rlFail "Did not expect NTP to be configured"
-     fi
+      rlLog "Verify ntp.conf -with no ntp"
+      nontp=false
+      testntpserver=`grep "$ntpserver" $NTP`
+      ipacompare_forinstalluninstall "ntpserver: " "$ntpserver" "$testntpserver" "$nontp"
+      testntpfudgeserver=`grep "$ntpfudgeserver" $NTP`
+      ipacompare_forinstalluninstall "ntpfudgeserver: " "$ntpfudgeserver" "$testntpfudgeserver" "$nontp"
    else
-     if [ $command_out == $ntp_out ]; then
-         rlPass "Verified NTP is configured"
-     else
-        rlFail "Expected NTP to be configured"
-     fi
+      rlLog "Verify ntp.conf"
+      testntpserver=`grep "$ntpserver" $NTP`
+      ipacompare_forinstalluninstall "ntpserver: " "$ntpserver" "$testntpserver" "$1"
+      testntplocalserver=`grep "$ntplocalserver" $NTP`
+      ipacompare_forinstalluninstall "ntplocalserver: " "$ntplocalserver" "$testntplocalserver" "$1"
    fi
 }
 
@@ -377,11 +374,15 @@ verify_zonemgr()
 
 verify_forwarder()
 {
+   if [ "$1" == "false" ]; then
+     return
+   fi
+
   rlLog "Verify forwarder"
 
   out=$2
   command="ping -c 1 -w 3 redhat.com"
-  if [ "$1" == "false" -o "$3" == "noforwarders" ]; then
+  if [ "$3" == "noforwarders" ]; then
       $command 2> $out
       ping_result=`cat $out`
       if [ "$ping_result" == "$bad_ping" ] ; then
