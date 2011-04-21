@@ -121,8 +121,13 @@ verify_krb5()
 {
     rlLog "Verify krb5.conf"
 
-    testdefaultrealm=`grep "default_realm" $KRB5 | cut -d "=" -f2 | xargs echo` 
-    ipacompare_forinstalluninstall "default_realm " "$default_realm" "$testdefaultrealm" "$1" 
+    if [ "$2" == "realm" ] ; then
+       testdefaultrealm=`grep "default_realm" $KRB5 | cut -d "=" -f2 | xargs echo` 
+       ipacompare_forinstalluninstall "default_realm " "$default_myrealm" "$testdefaultrealm" "$1" 
+    else
+       testdefaultrealm=`grep "default_realm" $KRB5 | cut -d "=" -f2 | xargs echo` 
+       ipacompare_forinstalluninstall "default_realm " "$default_realm" "$testdefaultrealm" "$1" 
+    fi
     testrdns=`grep "rdns" $KRB5 | cut -d "=" -f2 | xargs echo` 
     ipacompare_forinstalluninstall "rdns " "$rdns" "$testrdns" "$1" 
     testticketlifetime=`grep "ticket_lifetime" $KRB5 | cut -d "=" -f2 | xargs echo` 
@@ -496,7 +501,7 @@ verify_reverse()
         rlFail "Unexpected Reverse DNS found: $testreversedns "
       fi
    else
-      if [ $testreversedns != "" ] ; then 
+      if [ -n $testreversedns ] ; then 
          rlPass "Reverse DNS found : $testreversedns"
       else
         rlFail "No Reverse DNS found"

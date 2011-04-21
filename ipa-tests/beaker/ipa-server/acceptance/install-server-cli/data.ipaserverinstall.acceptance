@@ -43,6 +43,7 @@ pkinit_anchors="FILE:/etc/ipa/ca.crt"
 debug_krb5="false"
 renew_lifetime="36000"
 krb4_convert="false"
+default_myrealm=$MYREALM
 
 #authconfig updates
 USESSSDAUTH="yes"

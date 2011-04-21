@@ -72,5 +72,4 @@ rlJournalPrintText
 	report=/tmp/rhts.report.$RANDOM.txt
 	makereport $report
 	rhts-submit-log -l $report
-        save_logs
 rlJournalEnd 
