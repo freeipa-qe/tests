@@ -29,7 +29,7 @@ export TESTVERSION=1.0
 
 BUILT_FILES=
 
-FILES=$(METADATA) runtest.sh Makefile PURPOSE 
+FILES=$(METADATA) runtest.sh t.nistests.sh Makefile PURPOSE 
 
 .PHONY: all install download clean
 
@@ -52,7 +52,7 @@ $(METADATA): Makefile
 	@echo "Path:            $(TEST_DIR)" >> $(METADATA)
 	@echo "Description:     IPA nis-cli acceptance tests" >> $(METADATA)
 	@echo "Type:            Regression" >> $(METADATA)
-	@echo "TestTime:        15m" >> $(METADATA)
+	@echo "TestTime:        45m" >> $(METADATA)
 	@echo "RunFor:          ipa-server" >> $(METADATA)
 	@echo "Requires:        ipa-admintools" >> $(METADATA)
 	@echo "Requires:        expect" >> $(METADATA)
