@@ -42,7 +42,7 @@ uninstall_fornexttest()
 
 install_fornexttest()
 {
-    if [ -f $DEFAULT  ] ; then
+    if [ ! -f $DEFAULT  ] ; then
         rlLog "EXECUTING: ipa-server-install --setup-dns --forwarder=$DNSFORWARD --hostname=$HOSTNAME -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U"
         rlRun "ipa-server-install --setup-dns --forwarder=$DNSFORWARD --hostname=$HOSTNAME -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U" 0 "Installing ipa server" 
     fi
@@ -381,7 +381,7 @@ verify_forwarder()
 
   out=$2
   command="ping -c 1 -w 3 redhat.com"
-  if [ "$3" == "noforwarders" ]; then
+  if [ "$1" == "false" -o "$3" == "noforwarders" ]; then
       $command 2> $out
       ping_result=`cat $out`
       if [ "$ping_result" == "$bad_ping" ] ; then
