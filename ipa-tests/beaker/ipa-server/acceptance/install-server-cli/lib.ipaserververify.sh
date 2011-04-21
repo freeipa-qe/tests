@@ -335,20 +335,15 @@ verify_ntp()
 {
    rlLog "Verify ntp config"
 
-   if [ "$1" == "false" -o "$2" == "nontp" ] ; then
-      rlLog "Verify ntp.conf -with no ntp"
-      nontp=false
-      testntpserver=`grep "$ntpserver" $NTP`
-      ipacompare_forinstalluninstall "ntpserver: " "$ntpserver" "$testntpserver" "$nontp"
-      testntpfudgeserver=`grep "$ntpfudgeserver" $NTP`
-      ipacompare_forinstalluninstall "ntpfudgeserver: " "$ntpfudgeserver" "$testntpfudgeserver" "$nontp"
-   else
-      rlLog "Verify ntp.conf"
-      testntpserver=`grep "$ntpserver" $NTP`
-      ipacompare_forinstalluninstall "ntpserver: " "$ntpserver" "$testntpserver" "$1"
-      testntplocalserver=`grep "$ntplocalserver" $NTP`
-      ipacompare_forinstalluninstall "ntplocalserver: " "$ntplocalserver" "$testntplocalserver" "$1"
+   ntpcheck=$1
+
+   if [ "$2" == "nontp" ] ; then
+     ntpcheck=false
    fi
+   testntpserver=`grep "$ntpserver" $NTP`
+   ipacompare_forinstalluninstall "ntpserver: " "$ntpserver" "$testntpserver" "$ntpcheck"
+   testntpfudgeserver=`grep "$ntpfudgeserver" $NTP`
+   ipacompare_forinstalluninstall "ntpfudgeserver: " "$ntpfudgeserver" "$testntpfudgeserver" "$ntpcheck"
 }
 
 
