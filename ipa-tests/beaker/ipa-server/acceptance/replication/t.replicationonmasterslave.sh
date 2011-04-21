@@ -22,6 +22,19 @@ testReplicationOnMasterAndSlave()
            config="client"
         fi
      fi
+   
+   if [ $config == "slave" ] ; then
+     slaveIsInstalled=false
+     while [ $slaveIsInstalled == "false" ] ; do  
+       kinitAs $ADMINID $ADMINPW
+       if [ $? != 0 ] ; then
+        sleep 500
+       else 
+         slaveIsInstalled=true
+       fi
+     done
+     rhts-sync-set -s READY
+   fi
 
     # add objects from master
     if [ $config == "master" ] ; then 
