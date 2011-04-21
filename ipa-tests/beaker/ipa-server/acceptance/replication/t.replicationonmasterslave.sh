@@ -25,6 +25,7 @@ testReplicationOnMasterAndSlave()
 
     # add objects from master
     if [ $config == "master" ] ; then 
+      rhts-sync-block -s READY $SLAVE
       add_objects 
       rhts-sync-set -s MASTERADDEDOBJS
     fi
