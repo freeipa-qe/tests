@@ -44,7 +44,7 @@ cleanup_pem_keyfile()
     local id=$1
     local keyfile=$pem_dir/${id}.key.pem
     rm $keyfile
-    rm $?
+    return $?
 } #cleanup_pme
 
 cleanup_pem_certfile()
@@ -52,7 +52,7 @@ cleanup_pem_certfile()
     local id=$1
     local certfile=$pem_dir/${id}.cert.pem
     rm $keyfile
-    rm $?
+    return $?
 } #cleanup_pme
 
 prepare_pin()
@@ -209,7 +209,9 @@ certRun()
         cat $out
         echo "============== end of output =============="
     fi
-    rm $errout
+    if [ -f $errout ];then
+        rm $errout
+    fi
 } #qaRun
 
 qaRun()
@@ -249,5 +251,7 @@ qaRun()
         cat $out
         echo "============== end of output =============="
     fi
-    rm $errout
+    if [ -f $errout ];then
+        rm $errout
+    fi
 } #qaRun
