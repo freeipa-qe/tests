@@ -4,6 +4,9 @@
 testReplicationOnMasterAndSlave()
 {
 
+     rlLog "MASTER: $MASTER"
+     rlLog "SLAVE: $SLAVE"
+
      # Determine if this is a master
      hostname=`hostname -s`
      echo $MASTER | grep $hostname
@@ -33,21 +36,31 @@ testReplicationOnMasterAndSlave()
          slaveIsInstalled=true
        fi
      done
+     rlLog "SLAVE: Will be READY"
      rhts-sync-set -s READY
+     rlLog "SLAVE: Is READY"
    fi
 
     # add objects from master
     if [ $config == "master" ] ; then 
+      rlLog "MASTER: Blocked till slave is READY"
       rhts-sync-block -s READY $SLAVE
+      rlLog "MASTER: Slave is ready"
       add_objects 
+      rlLog "MASTER: Will be MASTERADDEDOBJS"
       rhts-sync-set -s MASTERADDEDOBJS
+      rlLog "MASTER: Is MASTERADDEDOBJS"
     fi
 
     # check objects from replica
    if [ $config == "slave" ] ; then
+     rlLog "SLAVE: Blocked till master is MASTERADDEDOBJS"
      rhts-sync-block -s MASTERADDEDOBJS $MASTER
+     rlLog "SLAVE: Master is MASTERADDEDOBJS"
      check_objects 
+     rlLog "SLAVE: Will be slavecheckedobjs"
      rhts-sync-set -s SLAVECHECKEDOBJS
+     rlLog "SLAVE: Is slavecheckedobjs"
    fi
 
    # add objects from replica
