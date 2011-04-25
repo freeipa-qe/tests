@@ -36,36 +36,36 @@ testReplicationOnMasterAndSlave()
          slaveIsInstalled=true
        fi
      done
-     rlLog "SLAVE: Will be READY"
-     rhts-sync-set -s READY
-     rlLog "SLAVE: Is READY"
+     rlLog "$SLAVE: Will be READY"
+     rhts-sync-set -s "READY"
+     rlLog "$SLAVE: Is READY"
    fi
 
     # add objects from master
     if [ $config == "master" ] ; then 
-      rlLog "MASTER: Blocked till slave is READY"
-      rhts-sync-block -s READY $SLAVE
-      rlLog "MASTER: Slave is ready"
+      rlLog "$MASTER: Blocked till slave is READY"
+      rhts-sync-block -s "READY" $SLAVE
+      rlLog "$MASTER: Slave is ready"
       add_objects 
-      rlLog "MASTER: Will be MASTERADDEDOBJS"
-      rhts-sync-set -s MASTERADDEDOBJS
-      rlLog "MASTER: Is MASTERADDEDOBJS"
+      rlLog "$MASTER: Will be ADD"
+      rhts-sync-set -s "ADD"
+      rlLog "$MASTER: Is ADD"
     fi
 
     # check objects from replica
    if [ $config == "slave" ] ; then
-     rlLog "SLAVE: Blocked till master is MASTERADDEDOBJS"
-     rhts-sync-block -s MASTERADDEDOBJS $MASTER
-     rlLog "SLAVE: Master is MASTERADDEDOBJS"
+     rlLog "$SLAVE: Blocked till master is ADD"
+     rhts-sync-block -s "ADD" $MASTER
+     rlLog "$SLAVE: Master is ADD"
      check_objects 
-     rlLog "SLAVE: Will be slavecheckedobjs"
-     rhts-sync-set -s SLAVECHECKEDOBJS
-     rlLog "SLAVE: Is slavecheckedobjs"
+     rlLog "$SLAVE: Will be CHECK"
+     rhts-sync-set -s "CHECK"
+     rlLog "$SLAVE: Is CHECK"
    fi
 
    # add objects from replica
    if [ $config == "slave" ] ; then
-      rhts-sync-block -s SLAVECHECKEDOBJS $SLAVE
+      rhts-sync-block -s "CHECK" $SLAVE
       add_objects 
       rhts-sync-set -s SLAVEADDEDOBJS
    fi
