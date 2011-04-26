@@ -133,15 +133,28 @@ testReplicationOnMasterAndSlave()
 getBeakerNames()
 {
 
+
     thishost=`hostname`
+    rlLog "thishost: $thishost"
 
     recordNameRemote=`ipa-replica-manage list | grep -v $thishost | cut -d "." -f1`
+    rlLog "recordNameRemote: $recordNameRemote"
+
     ipaddrRemote=`ipa dnsrecord-show testrelm $recordNameRemote | grep record | cut -d ":" -f2`
+    rlLog "ipaddrRemote: $ipaddrRemote"
+
     beakerRemote=`nslookup $ipaddrRemote | grep "name =" | cut -d " " -f3`
+    rlLog "beakerRemote: $beakerRemote"
 
     recordNameLocal=`hostname -s`
+    rlLog "recordNameLocal: $recordNameLocal"
+
     ipaddrLocal=`ipa dnsrecord-show testrelm $recordNameLocal | grep record | cut -d ":" -f2`
+    rlLog "ipaddrLocal: $ipaddrLocal"
+
     beakerLocal=`nslookup $ipaddrLocal | grep "name =" | cut -d " " -f3 | xargs echo`
+    rlLog "beakerLocal: $beakerLocal"
+
 
 
     if [ $config == "master" ] ; then 
