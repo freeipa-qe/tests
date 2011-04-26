@@ -4,7 +4,7 @@
 
 cert_subject=`echo $ADMINPW | kinit $ADMINID 2>&1 >/dev/null; ipa config-show | grep "Certificate Subject base" | cut -d":" -f2 | xargs echo;kdestroy 2>&1 >/dev/null`
 fqdn=`hostname --fqdn`
-pem_dir="tmp/getcert$RANDOM"
+pem_dir="/tmp/getcert$RANDOM"
 #REALM="SJC.REDHAT.COM"
 
 prepare_certrequest(){
@@ -12,9 +12,8 @@ prepare_certrequest(){
     local TrackingNickName=$id
     local NSSDBDIR_positive="/etc/pki/nssdb"
     local CertNickName_positive="PrepCertReq-${id}-${RANDOM}"
-    local CertTokenName_positive="NSS Certificate DB"
     rlRun "ipa-getcert request -n $CertNickName_positive -d $NSSDBDIR_positive" 0 "create a cert request"
-    rlRun "ipa-getcert start-tracking -d $NSSDBDIR_positive -n $CertNickName_positive -t $CertTokenName_positive -I $TrackingNickName" 0 "create a tracking request: [$TrackingNickName]"  
+    rlRun "ipa-getcert start-tracking -d $NSSDBDIR_positive -n $CertNickName_positive -I $TrackingNickName" 0 "create a tracking request: [$TrackingNickName]"  
 } #prepare_certrequeest
 
 prepare_pem_certfile()
