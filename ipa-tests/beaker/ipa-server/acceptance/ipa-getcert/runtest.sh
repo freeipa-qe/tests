@@ -43,7 +43,7 @@
 . ./lib.ipa-getcert.sh
 . ./t.ipa-getcert.sh
 
-PACKAGE="ipa-server"
+PACKAGE="ipa-client"
 
 startDate=`date "+%F %r"`
 satrtEpoch=`date "+%s"`
