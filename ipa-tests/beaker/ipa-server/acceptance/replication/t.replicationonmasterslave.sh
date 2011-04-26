@@ -37,7 +37,7 @@ testReplicationOnMasterAndSlave()
        fi
      done
      rlLog "$SLAVE: Will be READY"
-     rhts-sync-set -s "READY"
+     rhts-sync-set -m $SLAVE -s "READY"
      rlLog "$SLAVE: Is READY"
    fi
 
@@ -48,7 +48,7 @@ testReplicationOnMasterAndSlave()
       rlLog "$MASTER: Slave is ready"
       add_objects 
       rlLog "$MASTER: Will be ADD"
-      rhts-sync-set -s "ADD"
+      rhts-sync-set -m $MASTER -s "ADD"
       rlLog "$MASTER: Is ADD"
     fi
 
@@ -134,7 +134,8 @@ add_objects()
    # perform actions to add objects
    rlLog "Adding objects on $hostname"
    # Add a user
-   create_ipauser ${user}$config ${user}$config ${user}$config ${user}$config
+   #create_ipauser ${user}$config ${user}$config ${user}$config ${user}$config
+   addUserWithPassword ${user}$config ${user}$config ${user}$config ${user}$config
    # Add a group
    # Add a host
    # Add a hostgroup
