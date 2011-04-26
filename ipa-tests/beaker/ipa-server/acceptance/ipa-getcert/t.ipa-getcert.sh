@@ -3,7 +3,7 @@
 #author    : Yi Zhang (yzhang@redhat.com)
 #testplan  : IPA client tool ipa-getcert Test Plan
 #testplan version: 0.02
-#last update time: 2011-04-25 14:59:24
+#last update time: 2011-04-25 15:00:34
 #sequence number : 1
 
 ipagetcert() #total test cases: 179
@@ -11,7 +11,7 @@ ipagetcert() #total test cases: 179
     request
     start_tracking
     stop_tracking
-    resubmit
+#    resubmit
     list
     list_cas
 } #ipagetcert
@@ -3919,7 +3919,7 @@ start_tracking_1016()  #ipa-getcert start-tracking -i [ExistingTrackingRequestNi
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
         local expectedErrCode="1" 
-        local expectedErrMsg="No request found that matched arguments" 
+        local expectedErrMsg="None of database directory and nickname or certificate file specified" 
         local comment="scenario: [ipa-getcert start-tracking -i]	data: [ExistingTrackingRequestNickName negative]" 
 
 
@@ -3955,7 +3955,7 @@ start_tracking_1017()  #ipa-getcert start-tracking -i [ExistingTrackingRequestNi
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
         local expectedErrCode="1" 
-        local expectedErrMsg="No request found that matched arguments" 
+        local expectedErrMsg="None of database directory and nickname or certificate file specified" 
         local comment="scenario: [ipa-getcert start-tracking -i -I -U -K -D -E -R]	data: [ExistingTrackingRequestNickName negative]" 
 
 
@@ -3991,7 +3991,7 @@ start_tracking_1018()  #ipa-getcert start-tracking -i [ExistingTrackingRequestNi
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
         local expectedErrCode="1" 
-        local expectedErrMsg="No request found that matched arguments" 
+        local expectedErrMsg="None of database directory and nickname or certificate file specified" 
         local comment="scenario: [ipa-getcert start-tracking -i -I -U -K -D -E -r]	data: [ExistingTrackingRequestNickName negative]" 
 
 
@@ -5353,7 +5353,7 @@ stop_tracking_1004()  #ipa-getcert stop-tracking -i [ExistingTrackingRequestNick
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
         local expectedErrCode="1" 
-        local expectedErrMsg="No request found that matched arguments" 
+        local expectedErrMsg="None of database directory and nickname or certificate file specified" 
         local comment="scenario: [ipa-getcert stop-tracking -i]	data: [ExistingTrackingRequestNickName negative]" 
 
 
