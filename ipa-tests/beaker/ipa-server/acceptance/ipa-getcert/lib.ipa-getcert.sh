@@ -5,13 +5,14 @@
 cert_subject=`echo $ADMINPW | kinit $ADMINID 2>&1 >/dev/null; ipa config-show | grep "Certificate Subject base" | cut -d":" -f2 | xargs echo;kdestroy 2>&1 >/dev/null`
 fqdn=`hostname --fqdn`
 pem_dir="/tmp/getcert$RANDOM"
-#REALM="SJC.REDHAT.COM"
+REALM="SJC.REDHAT.COM"
 
 prepare_certrequest(){
     local id=$1
     local TrackingNickName=$id
     local NSSDBDIR_positive="/etc/pki/nssdb"
-    local CertNickName_positive="PrepCertReq-${id}-${RANDOM}"
+    #local CertNickName_positive="PrepCertReq-${id}-${RANDOM}"
+    local CertNickName_positive=$id #make cert nickname same as tracking nickname
     rlRun "ipa-getcert request -n $CertNickName_positive -d $NSSDBDIR_positive" 0 "create a cert request"
     rlRun "ipa-getcert start-tracking -d $NSSDBDIR_positive -n $CertNickName_positive -I $TrackingNickName" 0 "create a tracking request: [$TrackingNickName]"  
 } #prepare_certrequeest
@@ -50,7 +51,7 @@ cleanup_pem_certfile()
 {
     local id=$1
     local certfile=$pem_dir/${id}.cert.pem
-    rm $keyfile
+    rm $certfile
     return $?
 } #cleanup_pme
 
@@ -129,6 +130,10 @@ verifyCert(){
     then
         rlLog "cert is in submitting status, we need sleep 3 seconds and come back to check"
         return 2
+    elif grep "GENERATING_KEY_PAIR" $recordfile 2>&1 >/dev/null
+    then
+        rlLog "cert is generating key pair, we need sleep 3 seconds and come back to check"
+        return 2
     fi
     if grep "$verifyString" $recordfile 2>&1 >/dev/null
     then
@@ -186,12 +191,22 @@ certRun()
                         sleep 2
                         verifyCert $certname "$verifyString"
                     fi
+                elif grep -i "Request .* modified" $out 2>&1 >/dev/null
+                then
+                    rlLog "Modified request detected, check verify string [$verifyString]"
+                    local certname=`grep -i "Request .* modified" $out | cut -d"\"" -f2 | xargs echo`
+                    verifyCert $certname "$verifyString"
+                    if [ "$ret" = "2" ];then
+                        rlLog "sleep 2 seconds"
+                        sleep 2
+                        verifyCert $certname "$verifyString"
+                    fi
                 else
                     rlFail "No new signing/tracking request detected, this test is failed"
                     debug="debug"
                 fi
             else
-                rlFail "return code matches,but error message does not match as expected";
+                rlFail "error message does not match as expected";
                 debug="debug"
             fi
         fi
