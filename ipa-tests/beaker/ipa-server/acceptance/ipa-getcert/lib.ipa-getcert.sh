@@ -4,8 +4,8 @@
 
 cert_subject=`echo $ADMINPW | kinit $ADMINID 2>&1 >/dev/null; ipa config-show | grep "Certificate Subject base" | cut -d":" -f2 | xargs echo;kdestroy 2>&1 >/dev/null`
 fqdn=`hostname --fqdn`
-pem_dir="/tmp/getcert$RANDOM"
-REALM="SJC.REDHAT.COM"
+pem_dir="tmp/getcert$RANDOM"
+#REALM="SJC.REDHAT.COM"
 
 prepare_certrequest(){
     local id=$1
