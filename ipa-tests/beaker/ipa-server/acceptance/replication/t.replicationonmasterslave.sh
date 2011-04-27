@@ -39,36 +39,26 @@ testReplicationOnMasterAndSlave()
          slaveIsInstalled=true
        fi
      done
-     rlLog "$SLAVE: Will be READY"
-     rhts-sync-set -m $BEAKERSLAVE -s "READY"
-     rlLog "$SLAVE: Is READY"
+     rhts-sync-set -m $BEAKERSLAVE -s READY
    fi
 
     # add objects from master
     if [ $config == "master" ] ; then 
-      rlLog "$MASTER: Blocked till slave is READY"
-      rhts-sync-block -s "READY" $BEAKERSLAVE
-      rlLog "$MASTER: Slave is ready"
+      rhts-sync-block -s READY $BEAKERSLAVE
       add_objects 
-      rlLog "$MASTER: Will be ADD"
-      rhts-sync-set -m $BEAKERMASTER -s "ADD"
-      rlLog "$MASTER: Is ADD"
+      rhts-sync-set -m $BEAKERMASTER -s MASTERADDEDOBJS
     fi
 
     # check objects from replica
    if [ $config == "slave" ] ; then
-     rlLog "$SLAVE: Blocked till master is ADD"
-     rhts-sync-block -s "ADD" $BEAKERMASTER
-     rlLog "$SLAVE: Master is ADD"
+     rhts-sync-block -s MASTERADDEDOBJS $BEAKERMASTER
      check_objects 
-     rlLog "$SLAVE: Will be CHECK"
-     rhts-sync-set -m $BEAKERSLAVE -s "CHECK"
-     rlLog "$SLAVE: Is CHECK"
+     rhts-sync-set -m $BEAKERSLAVE -s SLAVECHECKEDOBJS
    fi
 
    # add objects from replica
    if [ $config == "slave" ] ; then
-      rhts-sync-block -s "CHECK" $BEAKERSLAVE
+      rhts-sync-block -s SLAVECHECKEDOBJS $BEAKERSLAVE
       add_objects 
       rhts-sync-set -m $BEAKERSLAVE -s SLAVEADDEDOBJS
    fi
