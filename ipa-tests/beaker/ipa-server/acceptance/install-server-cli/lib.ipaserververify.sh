@@ -504,3 +504,63 @@ verify_reverse()
       fi
    fi
 }
+
+
+
+verify_useradd()
+{
+
+   # add users without specifying uid....uids will be assigned within the range used when installed.
+   for x in {1..8}
+   do
+     rlLog "EXECUTING: ipa user-add --first=${testuser}$x --last=${testuser}$x ${testuser}$x"
+     rlRun "ipa user-add --first=${testuser}$x --last=${testuser}$x ${testuser}$x" 0 " Added new user within given uid range"
+   done
+ 
+   # test adding user with uid with manual override
+   largeuid="20"
+   uidBeyondRange=$((idstart+20))
+   rlRun "ipa user-add --first=${testuser}$largeuid --last=${testuser}$largeuid ${testuser}$largeuid --uid=$uidBeyondRange" 0 " Added new user outside uid range"
+
+   # verify the users were added with expected uids
+   for y in {3..10}
+   do 
+    assigneduid=$((idstart+$((y))))
+     rlLog "EXECUTING: ipa user-find --uid=$assigneduid"
+     rlRun "ipa user-find --uid=$assigneduid" 0 "Verifying user with expected uid"
+   done
+  
+   # verify the gids were also assigned within the given range
+   for z in {0..2}
+   do 
+    assignedgid=$((idstart+$((z))))
+     rlLog "EXECUTING: ipa group-find --gid=$assignedgid"
+     rlRun "ipa group-find --gid=$assignedgid" 0 "Verifying group with expected gid"
+   done
+
+   # Negative tests:
+    command="ipa user-add --first=${testuser} --last=${testuser} ${testuser}" 
+    expmsg="ipa: ERROR: Operations error: Allocation of a new value for range cn=posix ids,cn=distributed numeric assignment plugin,cn=plugins,cn=config failed! Unable to proceed."
+    rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message when adding users after uid range is depleted" 
+
+}
+
+
+verify_hbac()
+{
+  rlLog "Verify HBAC rules"
+
+  if [ "$1" == "false" ]; then
+    return
+  fi
+
+  rlLog "EXECUTING: ipa hbacrule-find --name=allow_all"
+  if [ "$2" == "nohbac" ] ; then
+    rlRun "ipa hbacrule-find --name=allow_all" 1 "hbac rule - allow_all is not installed" 
+  else
+    rlRun "ipa hbacrule-find --name=allow_all" 0 "hbac rule - allow_all is installed" 
+  fi
+}
+
+
+

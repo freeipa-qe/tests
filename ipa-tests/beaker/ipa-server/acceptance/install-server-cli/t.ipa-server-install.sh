@@ -59,6 +59,12 @@ ipaserverinstall()
 #  --idmax=IDMAX         The max value value for the IDs range (default: idstart+199999)
     ipaserverinstall_id
 
+#  --no_hbac_allow       Don't install allow_all HBAC rule
+     ipaserverinstall_nohbacallow
+
+#  --no-host-dns         Do not use DNS for hostname lookup during installation
+      ipaserverinstall_nohostdns
+
 #  --selfsign            Configure a self-signed CA instance rather than a dogtag CA
     ipaserverinstall_selfsign
 # This should be last test - then run IPA Functional tests against this server
@@ -312,10 +318,39 @@ ipaserverinstall_id()
         rlLog "EXECUTING: ipa-server-install --setup-dns --forwarder=$DNSFORWARD  -r $RELM -p $ADMINPW -P $ADMINPW -a $ADMINPW --idstart=$idstart --idmax=$idmax -U"
         rlRun "ipa-server-install --setup-dns --forwarder=$DNSFORWARD  -r $RELM -p $ADMINPW -P $ADMINPW -a $ADMINPW --idstart=5000 --idmax=5010 -U" 0 "Installing ipa server with id start and id max specified" 
         verify_install true tmpout
-#        verify_useradd
+        verify_useradd
     rlPhaseEnd
 }
 
+
+###########################################################
+#  --no_hbac_allow       Don't install allow_all HBAC rule
+###########################################################
+ipaserverinstall_nohbacallow()
+{
+    rlPhaseStartTest "ipa-server-install - 17 - [Positive] Do not Install allow_all HBAC rule"
+        uninstall_fornexttest
+        local tmpout=$TmpDir/ipaserverinstall_nohbacallow.out
+        rlLog "EXECUTING: ipa-server-install --setup-dns --forwarder=$DNSFORWARD  -r $RELM -p $ADMINPW -P $ADMINPW -a $ADMINPW --no_hbac_allow -U"
+        rlRun "ipa-server-install --setup-dns --forwarder=$DNSFORWARD  -r $RELM -p $ADMINPW -P $ADMINPW -a $ADMINPW --no_hbac_allow -U" 0 "Do not install allow_all hbac rule"
+        verify_install true tmpout nohbac
+    rlPhaseEnd
+}
+
+
+###############################################################################
+#  --no-host-dns         Do not use DNS for hostname lookup during installation
+###############################################################################
+ipaserverinstall_nohostdns()
+{
+    rlPhaseStartTest "ipa-server-install - 18 - [Positive] Install with no host dns" 
+        uninstall_fornexttest
+        local tmpout=$TmpDir/ipaserverinstall_nohostdns.out
+        rlLog "EXECUTING: ipa-server-install --setup-dns --forwarder=$DNSFORWARD  -r $RELM -p $ADMINPW -P $ADMINPW -a $ADMINPW --no-host-dns -U"
+        rlRun "ipa-server-install --setup-dns --forwarder=$DNSFORWARD  -r $RELM -p $ADMINPW -P $ADMINPW -a $ADMINPW --no-host-dns -U" 0 "Install with no-host-dns"
+        verify_install true tmpout
+    rlPhaseEnd
+}
 
 
 ####################################################################################
@@ -323,7 +358,7 @@ ipaserverinstall_id()
 ####################################################################################
 ipaserverinstall_selfsign()
 {
-    rlPhaseStartTest "ipa-server-install - 17 - [Positive] Install with selfsign "
+    rlPhaseStartTest "ipa-server-install - 19 - [Positive] Install with selfsign "
         uninstall_fornexttest
         local tmpout=$TmpDir/ipaserverinstall_selfsign.out
         rlLog "EXECUTING: ipa-server-install --setup-dns --forwarder=$DNSFORWARD --selfsign -r $RELM -p $ADMINPW -P $ADMINPW -a $ADMINPW -U"
@@ -355,17 +390,11 @@ verify_install()
    verify_krb5 $1 $3 
    verify_nsswitch $1
    verify_authconfig $1
+   verify_hbac $1 $3
 }
 
 
 #  -n DOMAIN_NAME, --domain=DOMAIN_NAME       domain name
-#  -h, --help            show this help message and exit
-#  -d, --debug           print debugging information
-#  --no-host-dns         Do not use DNS for hostname lookup during installation
-#  --idstart=IDSTART     The starting value for the IDs range (default random)
-#  --idmax=IDMAX         The max value value for the IDs range (default:
-#                        idstart+199999)
-#  --no_hbac_allow       Don't install allow_all HBAC rule
 
 
 ### TODO: Later - when testing with external certs
