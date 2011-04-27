@@ -93,7 +93,9 @@ appendEnv()
   if [ "$SLAVE" != "" ]; then
 	slave_short=`echo $SLAVE | cut -d "." -f1`
   	SLAVE=$slave_short.$DOMAIN
+        slaveipaddr=$(dig +noquestion $SLAVE  | grep $SLAVE | grep IN | awk '{print $5}')
 	echo "export SLAVE=$SLAVE" >> /dev/shm/env.sh
+        echo "export SLAVEIP=$slaveipaddr" >> /dev/shm/env.sh
   fi
   if [ "$CLIENT" != "" ]; then
 	client_short=`echo $CLIENT | cut -d "." -f1`
