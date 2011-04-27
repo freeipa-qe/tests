@@ -47,6 +47,9 @@ rlJournalStart
         rlLog "MASTER: $MASTER"
         rlLog "SLAVE: $SLAVE"
         rlLog "CLIENT: $CLIENT"
+   
+        echo "export BEAKERMASTER=$MASTER" >> /dev/shm/env.sh
+        echo "export BEAKERSLAVE=$SLAVE" >> /dev/shm/env.sh
 
 	#####################################################################
 	# 		IS THIS MACHINE A MASTER?                           #
@@ -132,7 +135,7 @@ rlJournalStart
         if [ $? -eq 0 ] ; then
 		if [ "$SNAPSHOT" = "TRUE" ] ; then
 			yum clean all
-			yum -y install --disablerepo=ipa --disablerepo=ipa_noarch $CLIENT_PACKAGES
+			yum -y install --disablerepo=ipa $CLIENT_PACKAGES
 		else
 			yum clean all
 			yum -y install $CLIENT_PACKAGES
@@ -154,10 +157,6 @@ rlJournalStart
 				rhts-sync-block -s READY $SLAVE
 			fi
                 	installClient
-                        rlLog "Setting up Authorized keys"
-                        SetUpAuthKeys
-                        rlLog "Setting up known hosts file"
-                        SetUpKnownHosts
         	fi
         else
                 rlLog "Machine in recipe in not a CLIENT"
