@@ -6452,7 +6452,7 @@ resubmit()
     resubmit_1002	#scenario: [ipa-getcert resubmit -d -n  -t -N -U -K -D -E -I]	data: [NSSDBDIR negative]
     #resubmit_1003	#scenario: [ipa-getcert resubmit -d -n -N -U -K -D -E]	data: [CertSubjectName negative]
     resubmit_1004	#scenario: [ipa-getcert resubmit -d -n -N -U -K -D -E]	data: [EXTUSAGE negative]
-    resubmit_1005	#scenario: [ipa-getcert resubmit -d -n -N -U -K -D -E]	data: [CertPrincipalName negative]
+    #resubmit_1005	#scenario: [ipa-getcert resubmit -d -n -N -U -K -D -E]	data: [CertPrincipalName negative]
     resubmit_1006	#scenario: [ipa-getcert resubmit -d -n -N -U -K -D -E]	data: all positive
     #resubmit_1007	#scenario: [ipa-getcert resubmit -d -n  -t -N -U -K -D -E -I]	data: [CertTokenName negative]
     #resubmit_1008	#scenario: [ipa-getcert resubmit -d -n  -t -N -U -K -D -E -I]	data: [CertSubjectName negative]
