@@ -293,7 +293,7 @@ verify_ipactl_status()
       fi
       if [ "$2" != "selfsign" ]; then
          status_CA=`grep "CA Service" $out | cut -d ":" -f2 | xargs echo`
-         if [ $status_CA == "RUNNING" ] ; then
+         if [ -n $status_CA ] ; then
             rlPass "ipctl status as expected for CA"
          else
             rlFail "ipctl status not as expected for CA"
@@ -491,7 +491,7 @@ verify_reverse()
    out=$2
    testreversedns=`ipa dnszone-find --all | grep arpa | grep Zone | cut -d ":" -f2 | xargs echo`
    if [ "$3" == "noreverse" ] ; then
-      if [ $testreversedns == "" ] ; then 
+      if [ -z $testreversedns ] ; then 
          rlPass "No Reverse DNS found"
       else
         rlFail "Unexpected Reverse DNS found: $testreversedns "

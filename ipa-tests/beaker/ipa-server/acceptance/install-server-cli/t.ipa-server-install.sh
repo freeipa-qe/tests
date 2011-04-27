@@ -386,6 +386,7 @@ verify_install()
    verify_forwarder $1 $2 $3
    verify_subject $1 $2 $3
    verify_password $1 $2 $3
+   verify_kinit $1
    verify_reverse $1 $2 $3
    verify_krb5 $1 $3 
    verify_nsswitch $1
