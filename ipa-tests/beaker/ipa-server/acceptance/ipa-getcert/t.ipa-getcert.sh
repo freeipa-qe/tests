@@ -6144,13 +6144,13 @@ stop_tracking()
     stop_tracking_envsetup
     stop_tracking_1001	#scenario: [ipa-getcert stop-tracking -d -n -t]	data: [NSSDBDIR negative]
     stop_tracking_1002	#scenario: [ipa-getcert stop-tracking -d -n -t]	data: [ExistingCertNickName negative]
-    stop_tracking_1003	#scenario: [ipa-getcert stop-tracking -d -n -t]	data: [StopTrackingCertTokenName negative]
-    stop_tracking_1004	#scenario: [ipa-getcert stop-tracking -d -n -t]	data: all positive
+    #stop_tracking_1003	#scenario: [ipa-getcert stop-tracking -d -n -t]	data: [StopTrackingCertTokenName negative]
+    #stop_tracking_1004	#scenario: [ipa-getcert stop-tracking -d -n -t]	data: all positive
     stop_tracking_1005	#scenario: [ipa-getcert stop-tracking -i]	data: [ExistingTrackingRequestNickName negative]
     stop_tracking_1006	#scenario: [ipa-getcert stop-tracking -i]	data: all positive
     stop_tracking_1007	#scenario: [ipa-getcert stop-tracking -k -f]	data: [PemKeyFile negative]
     stop_tracking_1008	#scenario: [ipa-getcert stop-tracking -k -f]	data: [PemCertFile negative]
-    stop_tracking_1009	#scenario: [ipa-getcert stop-tracking -k -f]	data: all positive
+    #stop_tracking_1009	#scenario: [ipa-getcert stop-tracking -k -f]	data: all positive
     stop_tracking_envcleanup
 } #stop_tracking
 stop_tracking_envsetup()
@@ -6450,38 +6450,38 @@ resubmit()
     resubmit_envsetup
     resubmit_1001	#scenario: [ipa-getcert resubmit -d -n -N -U -K -D -E]	data: [NSSDBDIR negative]
     resubmit_1002	#scenario: [ipa-getcert resubmit -d -n  -t -N -U -K -D -E -I]	data: [NSSDBDIR negative]
-    resubmit_1003	#scenario: [ipa-getcert resubmit -d -n -N -U -K -D -E]	data: [CertSubjectName negative]
+    #resubmit_1003	#scenario: [ipa-getcert resubmit -d -n -N -U -K -D -E]	data: [CertSubjectName negative]
     resubmit_1004	#scenario: [ipa-getcert resubmit -d -n -N -U -K -D -E]	data: [EXTUSAGE negative]
     resubmit_1005	#scenario: [ipa-getcert resubmit -d -n -N -U -K -D -E]	data: [CertPrincipalName negative]
     resubmit_1006	#scenario: [ipa-getcert resubmit -d -n -N -U -K -D -E]	data: all positive
-    resubmit_1007	#scenario: [ipa-getcert resubmit -d -n  -t -N -U -K -D -E -I]	data: [CertTokenName negative]
-    resubmit_1008	#scenario: [ipa-getcert resubmit -d -n  -t -N -U -K -D -E -I]	data: [CertSubjectName negative]
+    #resubmit_1007	#scenario: [ipa-getcert resubmit -d -n  -t -N -U -K -D -E -I]	data: [CertTokenName negative]
+    #resubmit_1008	#scenario: [ipa-getcert resubmit -d -n  -t -N -U -K -D -E -I]	data: [CertSubjectName negative]
     resubmit_1009	#scenario: [ipa-getcert resubmit -d -n  -t -N -U -K -D -E -I]	data: [EXTUSAGE negative]
-    resubmit_1010	#scenario: [ipa-getcert resubmit -d -n  -t -N -U -K -D -E -I]	data: [CertPrincipalName negative]
+    #resubmit_1010	#scenario: [ipa-getcert resubmit -d -n  -t -N -U -K -D -E -I]	data: [CertPrincipalName negative]
     resubmit_1011	#scenario: [ipa-getcert resubmit -d -n  -t -N -U -K -D -E -I]	data: [EXTUSAGE negative]
-    resubmit_1012	#scenario: [ipa-getcert resubmit -d -n  -t -N -U -K -D -E -I]	data: all positive
+    #resubmit_1012	#scenario: [ipa-getcert resubmit -d -n  -t -N -U -K -D -E -I]	data: all positive
     resubmit_1013	#scenario: [ipa-getcert resubmit -f -N -U -K -D -E]	data: [PemCertFile negative]
     resubmit_1014	#scenario: [ipa-getcert resubmit -f  -P -N -U -K -D -E -I]	data: [PemCertFile negative]
-    resubmit_1015	#scenario: [ipa-getcert resubmit -f -N -U -K -D -E]	data: [CertSubjectName negative]
+    #resubmit_1015	#scenario: [ipa-getcert resubmit -f -N -U -K -D -E]	data: [CertSubjectName negative]
     resubmit_1016	#scenario: [ipa-getcert resubmit -f -N -U -K -D -E]	data: [EXTUSAGE negative]
-    resubmit_1017	#scenario: [ipa-getcert resubmit -f -N -U -K -D -E]	data: [CertPrincipalName negative]
-    resubmit_1018	#scenario: [ipa-getcert resubmit -f -N -U -K -D -E]	data: all positive
-    resubmit_1019	#scenario: [ipa-getcert resubmit -f  -P -N -U -K -D -E -I]	data: [CertSubjectName negative]
+    #resubmit_1017	#scenario: [ipa-getcert resubmit -f -N -U -K -D -E]	data: [CertPrincipalName negative]
+    #resubmit_1018	#scenario: [ipa-getcert resubmit -f -N -U -K -D -E]	data: all positive
+    #resubmit_1019	#scenario: [ipa-getcert resubmit -f  -P -N -U -K -D -E -I]	data: [CertSubjectName negative]
     resubmit_1020	#scenario: [ipa-getcert resubmit -f  -P -N -U -K -D -E -I]	data: [EXTUSAGE negative]
-    resubmit_1021	#scenario: [ipa-getcert resubmit -f  -P -N -U -K -D -E -I]	data: [CertPrincipalName negative]
+    #resubmit_1021	#scenario: [ipa-getcert resubmit -f  -P -N -U -K -D -E -I]	data: [CertPrincipalName negative]
     resubmit_1022	#scenario: [ipa-getcert resubmit -f  -P -N -U -K -D -E -I]	data: [EXTUSAGE negative]
-    resubmit_1023	#scenario: [ipa-getcert resubmit -f  -P -N -U -K -D -E -I]	data: all positive
-    resubmit_1024	#scenario: [ipa-getcert resubmit -i -N -U -K -D -E]	data: [TrackingRequestNickName negative]
-    resubmit_1025	#scenario: [ipa-getcert resubmit -i -N -U -K -D -E -I]	data: [TrackingRequestNickName negative]
-    resubmit_1026	#scenario: [ipa-getcert resubmit -i -N -U -K -D -E]	data: [CertSubjectName negative]
-    resubmit_1027	#scenario: [ipa-getcert resubmit -i -N -U -K -D -E -I]	data: [CertSubjectName negative]
+    #resubmit_1023	#scenario: [ipa-getcert resubmit -f  -P -N -U -K -D -E -I]	data: all positive
+    #resubmit_1024	#scenario: [ipa-getcert resubmit -i -N -U -K -D -E]	data: [TrackingRequestNickName negative]
+    #resubmit_1025	#scenario: [ipa-getcert resubmit -i -N -U -K -D -E -I]	data: [TrackingRequestNickName negative]
+    #resubmit_1026	#scenario: [ipa-getcert resubmit -i -N -U -K -D -E]	data: [CertSubjectName negative]
+    #resubmit_1027	#scenario: [ipa-getcert resubmit -i -N -U -K -D -E -I]	data: [CertSubjectName negative]
     resubmit_1028	#scenario: [ipa-getcert resubmit -i -N -U -K -D -E]	data: [EXTUSAGE negative]
     resubmit_1029	#scenario: [ipa-getcert resubmit -i -N -U -K -D -E -I]	data: [EXTUSAGE negative]
-    resubmit_1030	#scenario: [ipa-getcert resubmit -i -N -U -K -D -E]	data: [CertPrincipalName negative]
-    resubmit_1031	#scenario: [ipa-getcert resubmit -i -N -U -K -D -E -I]	data: [CertPrincipalName negative]
-    resubmit_1032	#scenario: [ipa-getcert resubmit -i -N -U -K -D -E]	data: all positive
+    #resubmit_1030	#scenario: [ipa-getcert resubmit -i -N -U -K -D -E]	data: [CertPrincipalName negative]
+    #resubmit_1031	#scenario: [ipa-getcert resubmit -i -N -U -K -D -E -I]	data: [CertPrincipalName negative]
+    #resubmit_1032	#scenario: [ipa-getcert resubmit -i -N -U -K -D -E]	data: all positive
     resubmit_1033	#scenario: [ipa-getcert resubmit -i -N -U -K -D -E -I]	data: [EXTUSAGE negative]
-    resubmit_1034	#scenario: [ipa-getcert resubmit -i -N -U -K -D -E -I]	data: all positive
+    #resubmit_1034	#scenario: [ipa-getcert resubmit -i -N -U -K -D -E -I]	data: all positive
     resubmit_envcleanup
 } #resubmit
 resubmit_envsetup()
