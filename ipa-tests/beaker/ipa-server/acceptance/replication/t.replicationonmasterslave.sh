@@ -5,8 +5,9 @@ testReplicationOnMasterAndSlave()
 {
 
      rlLog "MASTER: $MASTER; MASTERIP: $MASTERIP"
+     rlLog "BEAKERMASTER: $BEAKERMASTER"
      rlLog "SLAVE: $SLAVE; SLAVEIP: $SLAVEIP"
-     kinitAs $ADMINID $ADMINPW
+     rlLog "BEAKERSLAVE: $BEAKERSLAVE"
 
      # Determine if this is a master
      hostname=`hostname -s`
@@ -27,7 +28,6 @@ testReplicationOnMasterAndSlave()
         fi
      fi
 
-     getBeakerNames
    
    if [ $config == "slave" ] ; then
      slaveIsInstalled=false
@@ -40,72 +40,72 @@ testReplicationOnMasterAndSlave()
        fi
      done
      rlLog "$SLAVE: Will be READY"
-     rhts-sync-set -m $beakerSlave -s "READY"
+     rhts-sync-set -m $BEAKERSLAVE -s "READY"
      rlLog "$SLAVE: Is READY"
    fi
 
     # add objects from master
     if [ $config == "master" ] ; then 
       rlLog "$MASTER: Blocked till slave is READY"
-      rhts-sync-block -s "READY" $beakerSlave
+      rhts-sync-block -s "READY" $BEAKERSLAVE
       rlLog "$MASTER: Slave is ready"
       add_objects 
       rlLog "$MASTER: Will be ADD"
-      rhts-sync-set -m $beakerMaster -s "ADD"
+      rhts-sync-set -m $BEAKERMASTER -s "ADD"
       rlLog "$MASTER: Is ADD"
     fi
 
     # check objects from replica
    if [ $config == "slave" ] ; then
      rlLog "$SLAVE: Blocked till master is ADD"
-     rhts-sync-block -s "ADD" $beakerMaster
+     rhts-sync-block -s "ADD" $BEAKERMASTER
      rlLog "$SLAVE: Master is ADD"
      check_objects 
      rlLog "$SLAVE: Will be CHECK"
-     rhts-sync-set -m $beakerSlave -s "CHECK"
+     rhts-sync-set -m $BEAKERSLAVE -s "CHECK"
      rlLog "$SLAVE: Is CHECK"
    fi
 
    # add objects from replica
    if [ $config == "slave" ] ; then
-      rhts-sync-block -s "CHECK" $beakerSlave
+      rhts-sync-block -s "CHECK" $BEAKERSLAVE
       add_objects 
-      rhts-sync-set -m $beakerSlave -s SLAVEADDEDOBJS
+      rhts-sync-set -m $BEAKERSLAVE -s SLAVEADDEDOBJS
    fi
  
    # check objects from master
     if [ $config == "master" ] ; then 
-      rhts-sync-block -s SLAVEADDEDOBJS $beakerSlave
+      rhts-sync-block -s SLAVEADDEDOBJS $BEAKERSLAVE
       check_objects
-      rhts-sync-set -m $beakerMaster -s MASTERCHECKEDOBJS
+      rhts-sync-set -m $BEAKERMASTER -s MASTERCHECKEDOBJS
     fi
 
    # modify - update/delete objects on master
     if [ $config == "master" ] ; then 
-      rhts-sync-block -s MASTERCHECKEDOBJS $beakerMaster
+      rhts-sync-block -s MASTERCHECKEDOBJS $BEAKERMASTER
       update_objects
-      rhts-sync-set -m $beakerMaster -s MASTERUPDATEDOBJS
+      rhts-sync-set -m $BEAKERMASTER -s MASTERUPDATEDOBJS
     fi
 
    # check objects from replica
    if [ $config == "slave" ] ; then
-      rhts-sync-block -s MASTERUPDATEDOBJS $beakerMaster
+      rhts-sync-block -s MASTERUPDATEDOBJS $BEAKERMASTER
       check_updated_objects
-      rhts-sync-set -m $beakerSlave -s SLAVECHECKEDUPDATEDOBJS
+      rhts-sync-set -m $BEAKERSLAVE -s SLAVECHECKEDUPDATEDOBJS
    fi
 
    # modify - update/delete objects on replica 
    if [ $config == "slave" ] ; then
-      rhts-sync-block -s SLAVECHECKEDUPDATEDOBJS $beakerSlave
+      rhts-sync-block -s SLAVECHECKEDUPDATEDOBJS $BEAKERSLAVE
       update_objects
-      rhts-sync-set -m $beakerSlave -s SLAVEUPDATEDOBJS
+      rhts-sync-set -m $BEAKERSLAVE -s SLAVEUPDATEDOBJS
    fi
 
    # check objects from master
     if [ $config == "master" ] ; then 
-      rhts-sync-block -s SLAVEUPDATEDOBJS $beakerSlave
+      rhts-sync-block -s SLAVEUPDATEDOBJS $BEAKERSLAVE
       check_updated_objects
-      rhts-sync-set -m beakerMaster -s MASTERCHECKEDUPDATEDOBJS
+      rhts-sync-set -m $BEAKERMASTER -s MASTERCHECKEDUPDATEDOBJS
     fi
 #
 #   # kinit user from client to master
@@ -128,52 +128,6 @@ testReplicationOnMasterAndSlave()
 #   # ....and so on
 
 }
-
-
-getBeakerNames()
-{
-
-
-    thishost=`hostname`
-    rlLog "thishost: $thishost"
-
-    recordNameRemote=`ipa-replica-manage list | grep -v $thishost | cut -d "." -f1`
-    rlLog "recordNameRemote: $recordNameRemote"
-
-    ipaddrRemote=`ipa dnsrecord-show testrelm $recordNameRemote | grep record | cut -d ":" -f2`
-    rlLog "ipaddrRemote: $ipaddrRemote"
-
-    beakerRemote=`nslookup $ipaddrRemote | grep "name =" | cut -d " " -f3`
-    rlLog "beakerRemote: $beakerRemote"
-
-    recordNameLocal=`hostname -s`
-    rlLog "recordNameLocal: $recordNameLocal"
-
-    ipaddrLocal=`ipa dnsrecord-show testrelm $recordNameLocal | grep record | cut -d ":" -f2`
-    rlLog "ipaddrLocal: $ipaddrLocal"
-
-    beakerLocal=`nslookup $ipaddrLocal | grep "name =" | cut -d " " -f3 | xargs echo`
-    rlLog "beakerLocal: $beakerLocal"
-
-
-
-    if [ $config == "master" ] ; then 
-      beakerMaster=$beakerLocal
-      beakerSlave=$beakerRemote
-    else
-      if [ $config == "slave" ] ; then 
-         beakerSlave=$beakerLocal
-         beakerMaster=$beakerRemote
-      fi
-    fi
-
-    rlLog "Beaker Master: $beakerMaster"
-    rlLog "Beaker Slave: $beakerSlave"
-
-}
-
-
-
 
 add_objects()
 {
