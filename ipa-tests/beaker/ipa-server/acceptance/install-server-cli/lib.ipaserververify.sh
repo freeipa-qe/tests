@@ -7,9 +7,8 @@
 #  $1 Label in the file being checked
 #  $2 Value being expected to be in the file for this label
 #  $3 Value actually available in the file for this label
-#  $4 if true, indicates IPA Client was installed
+#  $4 if true, indicates IPA Server was installed
 ####################################################################
-# this call available in install-client-cli also
 ipacompare_forinstalluninstall()
 {
     local label="$1"
@@ -239,36 +238,6 @@ qaExpectedRun()
         echo "============== end of output =============="
     fi
 } 
-
-
-########################################################
-#  For some negative tests, the resolv.conf 
-#  should be invalid.
-#  IPA Client install uses this file to do 
-#  its Discovery.
-#  The method below invalidates or recovers 
-#  based on
-#  $2 - if true, recover, and have a valid resolv.conf
-########################################################
-update_resolvconf()
-{
-    ipaddr=$1
-    recover=$2
-
-    if $recover ; then 
-       rlLog "Recovering resolv.conf after negative tests"
-       sed -i s/"^#nameserver $ipaddr"/"nameserver $ipaddr"/g /etc/resolv.conf
-    else
-       rlLog "Invalidating resolv.conf for negative tests"
-       sed -i s/"^nameserver $ipaddr"/"#nameserver $ipaddr"/g /etc/resolv.conf
-    fi
-
-   rlLog "/etc/resolv.conf contains:"
-   output=`cat /etc/resolv.conf`
-   rlLog "$output"
-
-   return
-}
 
 
 verify_ipactl_status()

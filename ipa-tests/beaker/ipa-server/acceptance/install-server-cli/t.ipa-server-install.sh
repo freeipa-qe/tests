@@ -253,7 +253,7 @@ ipaserverinstall_noforwarders()
 #######################################################
 ipaserverinstall_noreverse()
 {
-    rlPhaseStartTest "ipa-server-install - 12 - [Positive] Install with no reverse zone [Bug 692950]"
+    rlPhaseStartTest "ipa-server-install - 12 - [Positive] Install with no reverse zone"
         uninstall_fornexttest
         local tmpout=$TmpDir/ipaserverinstall_noreverse.out
         rlLog "EXECUTING: ipa-server-install --setup-dns --forwarder=$DNSFORWARD --no-reverse -r $RELM -p $ADMINPW -P $ADMINPW -a $ADMINPW -U"
@@ -373,7 +373,8 @@ ipaserverinstall_selfsign()
 # Also does kinit to verify the install
 # $1: true for install; false for uninstall
 # $2: the temp file used to write out ipactl status 
-# $3: can be one of selfsign, realm. 
+# $3: can be one of selfsign, realm, nontp, zonemgr, noforwarders, 
+#     newip, subject, allow, password, noreverse, nohbac.
 ##############################################################
 verify_install()
 {
@@ -394,8 +395,6 @@ verify_install()
    verify_hbac $1 $3
 }
 
-
-#  -n DOMAIN_NAME, --domain=DOMAIN_NAME       domain name
 
 
 ### TODO: Later - when testing with external certs
