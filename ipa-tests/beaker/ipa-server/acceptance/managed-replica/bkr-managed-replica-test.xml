@@ -1,6 +1,6 @@
 <job>
 	<whiteboard>
-		ipa-client install test
+		ipa managed replica test
 	</whiteboard>
 	<recipeSet>
 		<recipe kernel_options="" kernel_options_post="" ks_meta="" role="MASTER" whiteboard="MASTER for IPA Client Install Tests">
@@ -32,10 +32,14 @@
 			<task name="/CoreOS/ipa-server/shared" role="STANDALONE">
 				<params/>
 			</task>
-			<task name="/CoreOS/ipa-server/acceptance/quickinstall" role="MASTER">
+		<task name="/distribution/pkginstall" role="STANDALONE">
 				<params>
-					<param name="SNAPSHOT" value="TRUE"/>
+					<param name="PKGARGNAME" value="ipa-server ipa-client ipa-admintools ds-replication expect krb5-workstation bind-dyndb-ldap ntpdate krb5-pkinit-openssl rhts-test-env"/>
 				</params>
+			</task>
+
+			<task name="/CoreOS/ipa-server/acceptance/quickinstall" role="MASTER">
+				<params/>
 			</task>
 			<task name="/CoreOS/ipa-server/acceptance/manage-replica" role="MASTER">
 				<params/>
@@ -70,10 +74,14 @@
 			<task name="/CoreOS/ipa-server/shared" role="STANDALONE">
 				<params/>
 			</task>
-			<task name="/CoreOS/ipa-server/acceptance/quickinstall" role="SLAVE">
+			<task name="/distribution/pkginstall" role="STANDALONE">
 				<params>
-					<param name="SNAPSHOT" value="TRUE"/>
+					<param name="PKGARGNAME" value="ipa-server ipa-client ipa-admintools ds-replication expect krb5-workstation bind-dyndb-ldap ntpdate krb5-pkinit-openssl rhts-test-env"/>
 				</params>
+			</task>
+
+			<task name="/CoreOS/ipa-server/acceptance/quickinstall" role="SLAVE">
+				<params/>
 			</task>
 			<task name="/CoreOS/ipa-server/acceptance/manage-replica" role="SLAVE">
 				<params/>
