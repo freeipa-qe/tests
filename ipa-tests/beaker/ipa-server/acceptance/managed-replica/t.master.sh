@@ -10,7 +10,7 @@ run_master_tests()
 	serverfull=$(echo $SLAVE | cut -d\  -f1)
 	serveralone=$(echo $serverfull | cut -d\  -f1)
 	serversimple=$(echo $serveralone | cut -d\. -f1)
-	server=$($serversimple.$DOMAIN) # This should be the servername in the servername.relm format
+	server=$(echo $serversimple.$DOMAIN) # This should be the servername in the servername.relm format
 	echo "Server I am going to disconnect is: $server"
 
 	echo "running ipa-replica-manage -p $ADMINPW re-initialize --from=$server"
