@@ -42,9 +42,12 @@
 
 #Include the data file for the tests
 . ./data.replication
+. ./data.replication.master
+. ./data.replication.slave
 
 # Include test case file
 . ./t.replicationonmasterslave.sh
+. ./lib.replication.sh
 
 PACKAGE="ipa-admintools"
 

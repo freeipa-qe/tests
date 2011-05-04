@@ -29,7 +29,7 @@ export TESTVERSION=1.0
 
 BUILT_FILES=
 
-FILES=$(METADATA) runtest.sh Makefile PURPOSE t.replicationonmasterslave.sh data.replication
+FILES=$(METADATA) runtest.sh Makefile PURPOSE t.replicationonmasterslave.sh data.replication.master data.replication.slave data.replication lib.replication.sh
 
 .PHONY: all install download clean
 
