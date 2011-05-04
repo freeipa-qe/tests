@@ -11,7 +11,6 @@ prepare_certrequest(){
     local id=$1
     local TrackingNickName=$id
     local NSSDBDIR_positive="/etc/pki/nssdb"
-    #local CertNickName_positive="PrepCertReq-${id}-${RANDOM}"
     local CertNickName_positive=$id #make cert nickname same as tracking nickname
     rlRun "ipa-getcert request -n $CertNickName_positive -d $NSSDBDIR_positive" 0 "create a cert request"
     rlRun "ipa-getcert start-tracking -d $NSSDBDIR_positive -n $CertNickName_positive -I $TrackingNickName" 0 "create a tracking request: [$TrackingNickName]"  
