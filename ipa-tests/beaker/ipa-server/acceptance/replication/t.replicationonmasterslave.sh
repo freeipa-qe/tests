@@ -7,8 +7,8 @@ testReplicationOnMasterAndSlave()
         rlLog "BEAKERMASTER: $BEAKERMASTER"
         rlLog "SLAVE: $SLAVE; SLAVEIP: $SLAVEIP"
         rlLog "BEAKERSLAVE: $BEAKERSLAVE"
-        masterDatafile="/home/nk/beaker/ipa-server/acceptance/replication/data.replication.master"
-        slaveDatafile="/home/nk/beaker/ipa-server/acceptance/replication/data.replication.slave"
+        masterDatafile="./data.replication.master"
+        slaveDatafile="./data.replication.slave"
 
         # Determine if this is a master
         hostname=`hostname -s`
@@ -16,13 +16,11 @@ testReplicationOnMasterAndSlave()
         if [ $? -eq 0 ]; then
            echo "this is a MASTER"
            config="master"  
-           notconfig="slave"
         else
            echo $SLAVE | grep $hostname
            if [ $? -eq 0 ]; then
               echo "This is a SLAVE"
               config="slave"
-              notconfig="master"
            else
               echo "This is a CLIENT"
               config="client"
