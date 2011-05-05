@@ -55,3 +55,24 @@ title="Editor"
 manager="\"uid=Elizabeth,cn=users,dc=testrelm\""
 carlicense="78403"
 login="aclark"
+
+
+# attributes for a new group modified from slave
+groupName_updated="evaluator"
+desc_updated="\"users in this group can evaluate contents of this book\""
+groupMember1_updated="eileen"
+groupMember2_updated="karen"
+groupName_nonposix_updated="publisher"
+
+# attributes for a new group added from slave 
+groupName="subscriber"
+dn="cn=$groupName,cn=groups,cn=accounts,dc=$DOMAIN"
+desc="\"users in this group can subscribe to get updates\""
+gid="5003"
+groupMember1="patrick"
+groupMember2="sara"
+
+
+# attributes for a new non-posix group added from master
+groupName_nonposix="printer"
+desc_nonposix="\"users in this group print the book\""

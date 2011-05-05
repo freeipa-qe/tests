@@ -52,3 +52,24 @@ title_updated="Publisher"
 manager_updated="\"uid=Leefolt,cn=users,dc=testrelm\""
 carlicense_updated="78403"
 login_updated="aclarkson"
+
+# attributes for a new group added from master
+groupName="reviewer"
+dn="cn=$groupName,cn=groups,cn=accounts,dc=$DOMAIN"
+desc="\"users in this group can review the book\""
+gid="5002"
+groupMember1="eileen"
+groupMember2="karen"
+
+
+# attributes for a new non-posix group added from master
+groupName_nonposix="publisher"
+desc_nonposix="\"users in this group publish the book\""
+
+# attributes for anew group modified from master
+groupName_updated="reader"
+desc_updated="\"users in this group get updates\""
+groupMember1_updated="patrick"
+groupMember2_updated="sara"
+groupName_nonposix_updated="printer"
+

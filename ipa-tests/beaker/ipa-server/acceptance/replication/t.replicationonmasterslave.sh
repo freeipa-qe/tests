@@ -107,9 +107,11 @@ testReplicationOnMasterAndSlave()
       rhts-sync-block -s MASTERCHECKEDOBJS $BEAKERMASTER
 
       rlPhaseStartTest "Modify objects (added from slave) on master"
+         # save away data to check before sourcing datafile
          loginToUpdate=$login
+         groupToUpdate=$groupName
          source $masterDatafile
-         update_objects $loginToUpdate
+         update_objects $loginToUpdate $groupToUpdate 
          rlRun "ipa pwpolicy-mod --minlife=0" 0 "Modify password policy to allow password change immediately"
          rlRun "ipa passwd $login_updated $passwordChange" 0 "Modify password for the updated user"
          rlRun "FirstKinitAs $login_updated $passwordChange $updatedPassword" 0 "kinit as user with updated password"
@@ -139,9 +141,11 @@ testReplicationOnMasterAndSlave()
       rhts-sync-block -s SLAVECHECKEDUPDATEDOBJS $BEAKERSLAVE
 
       rlPhaseStartTest "Modify objects (added from master) on slave"
+         # save away data to check before sourcing datafile
          loginToUpdate=$login
+         groupToUpdate=$groupName
          source $slaveDatafile
-         update_objects $loginToUpdate
+         update_objects $loginToUpdate $groupToUpdate
          # updated pwpolicy to allow immediate password change from master, so do not have to do it here,
          rlRun "ipa passwd $login_updated $passwordChange" 0 "Modify password for the updated user"
          rlRun "FirstKinitAs $login_updated $passwordChange $updatedPassword" 0 "kinit as user with updated password"
@@ -245,9 +249,10 @@ add_objects()
    # perform actions to add objects
    rlLog "Adding objects on $hostname"
    # Add a user
-   add_newuser
+#   add_newuser
 
    # Add a group
+    add_newgroup
    # Add a host
    # Add a hostgroup
    # Add a netgroup
@@ -275,34 +280,36 @@ check_objects()
 {
 
    rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials  to update objects"
-   # check for those objects
-   rlLog "Checking objects on $hostname"
-   check_newuser
-
+#   check_newuser
+    check_newgroup
 }
 
 update_objects()
 {
    rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials  to update objects"
-   modify_newuser $1
+#   modify_newuser $1
+   modify_newgroup $2
 }
 
 
 check_updated_objects()
 {
    rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials  to verify updated objects"
-   check_modifieduser
+#   check_modifieduser
+    check_modifiedgroup
 }
 
 
 delete_objects()
 {
    rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials  to verify updated objects"
-   delete_user
+#   delete_user
+    delete_group
 }
 
 check_deletedobjects()
 {
    rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials  to verify updated objects"
-   check_deleteduser
+#   check_deleteduser
+    check_deletedgroup
 }

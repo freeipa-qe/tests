@@ -1,5 +1,5 @@
 
-# Add a user
+# User-related actions
 add_newuser()
 {
   rlRun "ipa user-add --first=$firstName \
@@ -29,9 +29,6 @@ add_newuser()
                       $login" \
                       0 \
                       "Add a new user"
-
-# use kinitAsFirstUser from shared to set password
-
 }
 
 
@@ -93,9 +90,6 @@ modify_newuser()
                       $1" \
                       0 \
                       "Modify the new user"
-
-# use kinitAsFirstUser from shared to set password
-
 }
 
 
@@ -128,38 +122,69 @@ check_modifieduser()
 
 delete_user()
 {
-  rlLog "delete user"
   rlRun "ipa user-del $login_updated" 0 "Deleted user"
 }
 
 check_deleteduser()
 {
-   command="ipa user-del $login_updated"
+   command="ipa user-show $login_updated"
    expmsg="ipa: ERROR: $login_updated: user not found"
    rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify error when checking for deleted user"
 }
 
-# Add a group
+
+# Group-related actions
 add_newgroup()
 {
-  rlLog "modify group"
-# Add a host
-# Add a hostgroup
-# Add a netgroup
-# Add a service
-
-# Add a delegation
-# Add a DNS record 
-# Add a HBAC service
-# Add a HBAC service group
-# Add a HBAC rule 
-# Add a permission
-# Add a privilege
-# Add a group password policy
-# Add a role
-# Add a selfservice permission
-# Add a SUDO rule
-# Add a sudo command group
-# Add a sudo command
-
+   rlRun "ipa group-add --desc=$desc --gid=$gid $groupName" 0 "Add a new group"
+   rlRun "ipa group-add --desc=$desc_nonposix --nonposix $groupName_nonposix" 0 "Add a new non-posixgroup"
+   rlRun "ipa user-add --first=$groupMember1 --last=$groupMember1 $groupMember1" 0 "Add users to be added as members to the group"
+   rlRun "ipa user-add --first=$groupMember2 --last=$groupMember2 $groupMember2" 0 "Add users to be added as members to the group"
+   rlRun "ipa group-add-member --users=$groupMember1,$groupMember2 --groups=$groupName_nonposix $groupName" 0 "add members to this new group"
 }
+
+check_newgroup()
+{
+   rlRun "verifyGroupAttr $groupName \"dn\" $dn" 0 "Verify group's dn"
+   rlRun "verifyGroupAttr $groupName \"Group name\" $groupName" 0 "Verify group's name"
+   rlRun "verifyGroupAttr $groupName \"Description\" $desc" 0 "Verify group's description"
+   if [ "$1" == "nonposix" ] ; then 
+       # should not have a GID
+       rlLog "TODO"
+   else
+      rlRun "verifyGroupAttr $groupName \"GID\" $gid" 0 "Verify group's gid"
+   fi
+   rlRun "verifyGroupAttr $groupName \"Member users\" \"$groupMember1, $groupMember2\"" 0 "Verify group's user members"
+   rlRun "verifyGroupAttr $groupName \"Member groups\" $groupName_nonposix" 0 "Verify group's group members"
+}
+
+modify_newgroup()
+{
+
+    rlRun "ipa group-mod $1 --desc=$desc_updated --rename=$groupName_updated" 0 "Modify the group"
+    rlRun "ipa group-remove-member $groupName_updated --users=$groupMember1_updated --groups=$group_nonposix_updated" 0 "remove members from this group"
+}
+
+check_modifiedgroup()
+{
+   rlRun "verifyGroupAttr $groupName_updated \"dn\" $dn_updated" 0 "Verify group's dn"
+   rlRun "verifyGroupAttr $groupName_updated \"Group name\" $groupName_updated" 0 "Verify group's name"
+   rlRun "verifyGroupAttr $groupName_updated \"Description\" $desc_updated" 0 "Verify group's description"
+   rlRun "verifyGroupAttr $groupName_updated \"Member users\" $groupMember2_updated" 0 "Verify group's user members"
+}
+
+delete_group()
+{
+
+  rlRun "ipa group-del $groupName_updated" 0 "Deleted group"
+}
+
+
+check_deletedgroup()
+{
+   command="ipa group-show $groupName_updated"
+   expmsg="ipa: ERROR: $groupName_updated: group not found"
+   rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify error when checking for deleted group"
+}
+
+
