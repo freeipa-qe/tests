@@ -26,6 +26,7 @@ ipapassword_globalpolicy()
     ipapassword_globalpolicy_minlifetime_lowerbound
     ipapassword_globalpolicy_minlifetime_upperbound
     ipapassword_globalpolicy_minlifetime_negative
+    ipapassword_globalpolicy_minlifetime_greater_maxlife_negative
     ipapassword_globalpolicy_history_default
     ipapassword_globalpolicy_history_lowerbound
     ipapassword_globalpolicy_history_upperbound
@@ -368,6 +369,7 @@ ipapassword_globalpolicy_minlifetime_upperbound()
 
 ipapassword_globalpolicy_minlifetime_upperbound_logic()
 {
+    rlPhaseStartTest "ipapassword_globalpolicy_minlifetime_upperbound_logic"
     # accept parameters: NONE
     # test logic starts
         rlLog "reset global pwpolicy"
@@ -391,12 +393,30 @@ ipapassword_globalpolicy_minlifetime_upperbound_logic()
             fi
         done
         rlRun "$kdestroy" 0 "clear all kerberos ticket"
+    rlPhaseEnd
     # test logic ends
 } # ipapassword_globalpolicy_minlifetime_upperbound_logic 
 
+# Added by mgregg 5-5-11
+# This is a test to ensure that bug https://bugzilla.redhat.com/show_bug.cgi?id=461325 and
+# https://bugzilla.redhat.com/show_bug.cgi?id=461332 are closed
+ipapassword_globalpolicy_minlifetime_greater_maxlife_negative()
+{
+	rlPhaseStartTest "ipapassword_globalpolicy_minlifetime_greater_maxlife_negative"
+		rlLog "attempt to set minlife greater than maxlife"
+		rlRun "ipa pwpolicy-mod --maxlife=5" 0 "set pw maxlife to 5 days"
+		rlRun "ipa pwpolicy-show | grep Max\ life | grep 5" 0 "ensure that the maxlife seems to be 5 days"
+		rlRun "ipa pwpolicy-mod --minlife=150" 1 "ensure that we are unable to set the minlife to a value over 5 days"
+		rlRun "ipa pwpolicy-mod --minlife=200" 1 "ensure that we are unable to set the minlife to a value over 5 days"
+		rlRun "ipa pwpolicy-mod --minlife=300" 1 "ensure that we are unable to set the minlife to a value over 5 days"
+		rlLog "reset global pwpolicy"
+        	reset_global_pwpolicy
+	rlPhaseEnd
+}
+
 ipapassword_globalpolicy_minlifetime_negative()
 {
-# looped data   : 
+# looped data   :
 # non-loop data : 
     rlPhaseStartTest "ipapassword_globalpolicy_minlifetime_negative"
         rlLog "minlife should only accept integer >=0"
