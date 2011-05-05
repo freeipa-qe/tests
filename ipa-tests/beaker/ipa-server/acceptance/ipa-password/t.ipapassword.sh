@@ -328,7 +328,6 @@ ipapassword_globalpolicy_minlifetime_lowerbound_logic()
             rlLog "after set minlife to 0, we should be able to change password anytime we wont"
             oldpw=$testacPW
             newpw="Dummyž@123"
-            #FIXME: I should have more test data right here
             # be aware that after this loop the system time is actually being
             # pushed back total: 0+1+2+4+8+16+32=63 seconds
             #for offset in 0 1 2 4 8 16 32
@@ -2185,7 +2184,6 @@ ipapassword_nestedgrouppw_maxlife_conflict()
         # testgrp group-pwpolicy has priority 6
         # nestedgrp group-pwpolicy has prioirty 7
         # therefore user "testac" should follow testgrp (the one has lower number)
-#FIXME
         maxlife=`getrandomint 2 10` # in days
         below=$((maxlife - 1 ))
         above=$((maxlife + 1 ))
@@ -2337,7 +2335,7 @@ ipapassword_nestedgrouppw_history_conflict_logic()
         local newPW=""
 
         while [ $counter -lt $history ];do
-            newPW=`generate_password 4 10` #FIXME
+            newPW=`generate_password 4 10`
             rlRun "echo $currentPW | kinit $testac 2>&1 >/dev/null"
             change_password $testac $currentPW "$newPW"
             if [ $? -eq 0 ];then
@@ -2364,7 +2362,7 @@ ipapassword_nestedgrouppw_history_conflict_logic()
             fi
         done 
         # once we out of above loop, we should be able to change password
-        newPW=`generate_password 4 10` #FIXME
+        newPW=`generate_password 4 10` 
         rlRun "echo $currentPW | kinit $testac 2>&1 >/dev/null"
         change_password $testac $currentPW "$newPW"
         if [ $? -eq 0 ];then
