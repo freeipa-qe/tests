@@ -50,7 +50,7 @@ host1="nightcrawler."$DOMAIN
 host2="NIGHTCRAWLER."$DOMAIN
 host3="SHADOWFALL."$DOMAIN
 host4="shadowfall."$DOMAIN
-host5="qe-blade-01."$DOMAIN
+host5="qe-blade-23."$DOMAIN
 
 ########################################################################
 
