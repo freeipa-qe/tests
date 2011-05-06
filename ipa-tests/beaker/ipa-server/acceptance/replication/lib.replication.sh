@@ -188,3 +188,78 @@ check_deletedgroup()
 }
 
 
+
+# Host-related actions
+
+add_newhost()
+{
+ rlRun "ipa host-add --desc=$hostDesc \
+                     --location=$hostLocation \
+                     --platform=$hostPlatform \
+                     --os=$hostOS \
+                     --password=$hostPassword \
+                     --ip-address=$hostIPaddress \
+                     --no-reverse \
+                     $newHost" \
+                     0 \
+                     "Add a new host"
+  rlRun "ipa host-add --no-reverse \
+                      --ip-address=$managedByHostIP \
+                      $managedByHost" \
+                      0 \
+                     "Add new host to use as managed-by host"
+  rlRun "ipa  host-add-managedby --hosts=$managedByHost $newHost" 0 "Add managed-by host"
+}
+
+check_newhost()
+{
+   rlRun "verifyHostAttr $newHost \"Host name\" $newHost" 0 "Verify host's name"
+   rlRun "verifyHostAttr $newHost \"Description\" $hostDesc" 0 "Verify host's description"
+   rlRun "verifyHostAttr $newHost \"Location\" $hostLocation" 0 "Verify host's location"
+   rlRun "verifyHostAttr $newHost \"Platform\" $hostPlatform" 0 "Verify host's platform"
+   rlRun "verifyHostAttr $newHost \"Operating system\" $hostOS" 0 "Verify host's OS"
+   rlRun "verifyHostAttr $newHost \"Managed by\" \"$newHost, $managedByHost\"" 0 "Verify host's Managed-by list"
+}
+
+
+modify_newhost()
+{
+ rlRun "ipa host-mod --location=$hostLocation_updated \
+                     --platform=$hostPlatform_updated \
+                     --os=$hostOS_updated \
+                     --addattr=locality=$hostLocality_updated \
+                     --setattr=description=$hostDesc_updated \
+                     $newHost_updated" \
+                     0 \
+                     "Modify the host"
+ rlRun "ipa host-remove-managedby --hosts=$managedByHost_updated $newHost_updated" 0 "Remove managed-by host"
+}
+
+
+check_modifiedhost()
+{
+   rlRun "verifyHostAttr $newHost_updated \"Description\" $hostDesc_updated" 0 "Verify host's description"
+   rlRun "verifyHostAttr $newHost_updated \"Locality\" $hostLocality_updated" 0 "Verify host's locality"
+   rlRun "verifyHostAttr $newHost_updated \"Location\" $hostLocation_updated" 0 "Verify host's location"
+   rlRun "verifyHostAttr $newHost_updated \"Platform\" $hostPlatform_updated" 0 "Verify host's platform"
+   rlRun "verifyHostAttr $newHost_updated \"Operating system\" $hostOS_updated" 0 "Verify host's OS"
+   rlRun "verifyHostAttr $newHost_updated \"Managed by\" $newHost_updated" 0 "Verify host's Managed-by list"
+}
+
+
+delete_host()
+{
+   rlRun "ipa host-del $newHost" 0 "Delete host"
+}
+
+
+check_deletedhost()
+{
+   command="ipa host-show $newHost"
+   expmsg="ipa: ERROR: $newHost: host not found"
+   rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify error when checking for deleted host"
+}
+
+
+
+

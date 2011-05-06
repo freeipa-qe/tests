@@ -73,6 +73,31 @@ groupMember1="patrick"
 groupMember2="sara"
 
 
-# attributes for a new non-posix group added from master
+# attributes for a new non-posix group added from slave
 groupName_nonposix="printer"
 desc_nonposix="\"users in this group print the book\""
+
+# attributes for a new host added from slave
+newHost="row.$DOMAIN"
+hostDesc="\"For the Subscriber team\"" 
+#hostLocality="Westford"
+hostLocation="\"1st Floor Lab\"" 
+hostPlatform="\"Lenovo T90\""
+hostOS="\"RHEL 6.1\""
+hostPassword="Secret123"
+hostIPaddress="\"10.16.84.15\""
+
+# atributes for a new host to use as managed-by host
+managedByHost="penguin.$DOMAIN"
+managedByHostIP="\"10.16.84.18\""
+
+# attributes for a new host modified from a slave
+newHost_updated="harper.$DOMAIN"
+hostDesc_updated="\"For the Printer team\"" 
+hostLocality_updated="Raleigh"
+hostLocation_updated="\"4th Floor Lab\"" 
+hostPlatform_updated="\"Lenovo T400\""
+hostOS_updated="\"RHEL 6.0\""
+#hostPassword_updated="Secret789"
+managedByHost_updated="dreamworks.$DOMAIN"
+

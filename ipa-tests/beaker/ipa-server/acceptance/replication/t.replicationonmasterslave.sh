@@ -111,7 +111,7 @@ testReplicationOnMasterAndSlave()
          loginToUpdate=$login
          groupToUpdate=$groupName
          source $masterDatafile
-         update_objects $loginToUpdate $groupToUpdate 
+         update_objects $loginToUpdate $groupToUpdate
          rlRun "ipa pwpolicy-mod --minlife=0" 0 "Modify password policy to allow password change immediately"
          rlRun "ipa passwd $login_updated $passwordChange" 0 "Modify password for the updated user"
          rlRun "FirstKinitAs $login_updated $passwordChange $updatedPassword" 0 "kinit as user with updated password"
@@ -215,7 +215,7 @@ testReplicationOnMasterAndSlave()
       rlPhaseStartTest "Check objects (deleted from slave) on master"
          source $slaveDatafile
          check_deletedobjects
-      rlPhaseEnd
+     rlPhaseEnd
 
       rhts-sync-set -m $BEAKERMASTER -s MASTERCHECKDELETEDOBJS
    fi
@@ -249,11 +249,12 @@ add_objects()
    # perform actions to add objects
    rlLog "Adding objects on $hostname"
    # Add a user
-#   add_newuser
+    add_newuser
 
    # Add a group
     add_newgroup
    # Add a host
+    add_newhost
    # Add a hostgroup
    # Add a netgroup
    # Add a service
@@ -280,36 +281,41 @@ check_objects()
 {
 
    rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials  to update objects"
-#   check_newuser
-    check_newgroup
+   check_newuser
+   check_newgroup
+   check_newhost
 }
 
 update_objects()
 {
    rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials  to update objects"
-#   modify_newuser $1
+   modify_newuser $1
    modify_newgroup $2
+   modify_newhost $3
 }
 
 
 check_updated_objects()
 {
    rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials  to verify updated objects"
-#   check_modifieduser
-    check_modifiedgroup
+   check_modifieduser
+   check_modifiedgroup
+   check_modifiedhost $1
 }
 
 
 delete_objects()
 {
    rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials  to verify updated objects"
-#   delete_user
-    delete_group
+   delete_user
+   delete_group
+   delete_host
 }
 
 check_deletedobjects()
 {
    rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials  to verify updated objects"
-#   check_deleteduser
-    check_deletedgroup
+   check_deleteduser
+   check_deletedgroup
+   check_deletedhost
 }

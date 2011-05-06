@@ -26,6 +26,7 @@ title="Writer"
 manager="\"uid=Celia,cn=users,dc=testrelm\""
 carlicense="1234"
 login="mjackson"
+# TODO: addattr, setattr, changes brought by user-disable, user-enable
 
 
 # attributes for new user modified from master
@@ -60,6 +61,7 @@ desc="\"users in this group can review the book\""
 gid="5002"
 groupMember1="eileen"
 groupMember2="karen"
+# TODO: addattr, setattr, changes brought by group-detach 
 
 
 # attributes for a new non-posix group added from master
@@ -73,3 +75,32 @@ groupMember1_updated="patrick"
 groupMember2_updated="sara"
 groupName_nonposix_updated="printer"
 
+
+# attributes for a new host added from master
+newHost="harper.$DOMAIN"
+hostDesc="\"For the Reviewer team\"" 
+#hostLocality="Westford"
+hostLocation="\"3rd Floor Lab\"" 
+hostPlatform="\"Lenovo T510\""
+hostOS="\"RHEL 6.1\""
+hostPassword="Secret123"
+hostIPaddress="\"10.16.84.13\""
+# TODO:  --password=$hostPassword_updated \
+#        --principalname=$hostPrincipal_updated \
+# changes brought by host-disable
+
+
+# atributes for a new host to use as managed-by host
+managedByHost="dreamworks.$DOMAIN"
+managedByHostIP="\"10.16.84.17\""
+
+# attributes for a new host modified from a master
+newHost_updated="row.$DOMAIN"
+hostDesc_updated="\"For the Publisher team\"" 
+hostLocality_updated="Raleigh"
+hostLocation_updated="\"2nd Floor Lab\"" 
+hostPlatform_updated="\"Lenovo T6\""
+hostOS_updated="\"RHEL 6.0\""
+#hostPassword_updated="Secret456"
+managedByHost_updated="penguin.$DOMAIN"
+hostPrincipal_updated="host/$newHost_updated@$RELM"
