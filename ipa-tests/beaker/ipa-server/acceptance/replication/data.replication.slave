@@ -112,3 +112,15 @@ hostgroup_updated="westford"
 hostgroup_desc_updated="MA hosts"
 hostgroup_groupMember1_updated="bldg1_hosts"
 
+
+######### attributes for a new netgroup added from slave
+netgroup="hradmins"
+netgroup_desc="\"HR Admins\""
+netgroup_groupMember1="benefitsadmins"
+
+########### attributes for a new netgroup modified from slave
+netgroup_updated="admins"
+netgroup_desc_updated="\"NFS admin\""
+netgroup_groupMember1_updated="mailadmins"
+
+

@@ -272,9 +272,9 @@ check_deletedhost()
 
 
 
-#########################
+#############################
 # Hostgroup-related actions
-#########################
+#############################
 
 add_newhostgroup()
 {
@@ -331,4 +331,60 @@ check_deletedhostgroup()
    command="ipa hostgroup-show $hostgroup_updated"
    expmsg="ipa: ERROR: $hostgroup_updated: hostgroup not found"
    rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify error when checking for deleted hostgroup"
+}
+
+
+###########################
+# Netgroup-related actions
+###########################
+
+add_newnetgroup()
+{
+   rlRun "ipa netgroup-add --desc=$netgroup_groupMember1 $netgroup_groupMember1" 0 "Add netgroup to be added as a member"
+   rlRun "ipa netgroup-add --desc=$netgroup_desc --nisdomain=$DOMAIN --usercat=all --hostcat=all $netgroup" 0 "Add new netgroup"
+   rlRun "ipa netgroup-add-member --users=$groupMember1 --groups=$groupName_nonposix --hosts=$managedByHost --hostgroups=$hostgroup_groupMember1 --netgroups=$netgroup_groupMember1 $netgroup" 0 "Add members to netgroup"
+}
+
+
+check_newnetgroup()
+{
+   rlRun "verifyNetgroupAttr $netgroup \"Netgroup name\" $netgroup" 0 "Verify netgroup's name"
+   rlRun "verifyNetgroupAttr $netgroup \"Description\" $netgroup_desc" 0 "Verify netgroup's Description"
+   rlRun "verifyNetgroupAttr $netgroup \"NIS domain name\" $DOMAIN" 0 "Verify netgroup's NIS domain name"
+   rlRun "verifyNetgroupAttr $netgroup \"User category\" \"all\"" 0 "Verify netgroup's User category"
+   rlRun "verifyNetgroupAttr $netgroup \"Host category\" \"all\"" 0 "Verify netgroup's Host category"
+   rlRun "verifyNetgroupAttr $netgroup \"Member netgroups\" $netgroup_groupMember1" 0 "Verify netgroup's Member netgroups"
+   rlRun "verifyNetgroupAttr $netgroup \"Member User\" $groupMember1" 0 "Verify netgroup's Member User"
+   rlRun "verifyNetgroupAttr $netgroup \"Member Group\" $groupName_nonposix" 0 "Verify netgroup's Member Group"
+   rlRun "verifyNetgroupAttr $netgroup \"Member Host\" $managedByHost" 0 "Verify netgroup's Member Host"
+   rlRun "verifyNetgroupAttr $netgroup \"Member Hostgroup\" $hostgroup_groupMember1" 0 "Verify netgroup's Member Hostgroup"
+}
+
+
+modify_newnetgroup()
+{
+   rlRun "ipa netgroup-mod --desc=$netgroup_desc_updated --usercat="" --hostcat="" $netgroup_updated" 0 "Modify netgroup"
+   rlRun "ipa netgroup-remove-member --hosts=$managedByHost_updated $netgroup_updated" 0 "Remove host member from netgroup"
+}
+
+
+check_modifiednetgroup()
+{
+   rlRun "verifyNetgroupAttr $netgroup_updated \"Description\" $netgroup_desc_updated" 0 "Verify netgroup's Description"
+   rlRun "ipa netgroup-show --all $netgroup_updated | grep \"User category\"" 1 "Verifying user catagory was removed for $netgroup_updated"
+   rlRun "ipa netgroup-show --all $netgroup_updated | grep \"Host category\"" 1 "Verifying Host catagory was removed for $netgroup_updated"
+   rlRun "ipa netgroup-show --all $netgroup_updated | grep \"Member Host\" | grep $managedByHost_updated" 1 "Verifying that $managedByHost_updated is not in $netgroup_updated"
+}
+
+delete_netgroup()
+{
+   rlRun "ipa netgroup-del $netgroup_updated" 0 "Delete the netgroup" 
+}
+
+
+check_deletednetgroup()
+{
+   command="ipa netgroup-show $netgroup_updated"
+   expmsg="ipa: ERROR: $netgroup_updated: netgroup not found"
+   rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify error when checking for deleted netgroup"
 }

@@ -119,3 +119,12 @@ hostgroup_groupMember1_updated="bldg2_hosts"
 
 
 
+######### attributes for a new netgroup added from master
+netgroup="admins"
+netgroup_desc="\"NFS admins\""
+netgroup_groupMember1="mailadmins"
+
+######### attributes for a new netgroup modified from master
+netgroup_updated="hradmins"
+netgroup_desc_updated="\"HR admin\""
+netgroup_groupMember1_updated="benefitsadmins"

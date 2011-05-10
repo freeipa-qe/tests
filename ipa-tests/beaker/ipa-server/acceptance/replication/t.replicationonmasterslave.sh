@@ -312,6 +312,8 @@ add_objects()
     add_newhostgroup
 
    # Add a netgroup
+    add_newnetgroup
+
    # Add a service
    # Add a delegation
    # Add a DNS record 
@@ -339,6 +341,7 @@ check_objects()
    check_newgroup
    check_newhost
    check_newhostgroup
+   check_newnetgroup
 }
 
 update_objects()
@@ -348,6 +351,7 @@ update_objects()
    modify_newgroup $2
    modify_newhost $3
    modify_newhostgroup
+   modify_newnetgroup
 }
 
 
@@ -358,6 +362,7 @@ check_updated_objects()
    check_modifiedgroup
    check_modifiedhost $1
    check_modifiedhostgroup
+   check_modifiednetgroup
 }
 
 
@@ -368,6 +373,7 @@ delete_objects()
    delete_group
    delete_host
    delete_hostgroup
+   delete_netgroup
 }
 
 check_deletedobjects()
@@ -377,4 +383,5 @@ check_deletedobjects()
    check_deletedgroup
    check_deletedhost
    check_deletedhostgroup
+   check_deletednetgroup
 }
