@@ -85,3 +85,35 @@ delNetgroup()
 
 
 
+#######################################################################
+# verifyNetgroupAttr Usage:
+#       verifyNetgroupAttr <netgroupname> <attribute> <value>
+######################################################################
+
+verifyNetgroupAttr()
+{
+   mygroup=$1
+   attribute=$2
+   value=$3
+   rc=0
+
+   attribute="$attribute:"
+   tmpfile="/tmp/netgroupshow.out"
+
+   ipa netgroup-show $mygroup > $tmpfile
+   rc=$?
+   if [ $rc -eq 0 ] ; then
+        myval=`cat $tmpfile | grep "$attribute $value" | xargs echo`
+	cat $tmpfile | grep "$attribute $value"
+   	if [ $? -ne 0 ] ; then
+        	rlLog "ERROR: $mygroup verification failed: Value of $attribute - GOT: $myval EXPECTED: $value"
+                rc=1
+   	else
+		rlLog "Value of $attribute for $mygroup is as expected - $myval"
+   	fi
+   else
+	rlLog "WARNING: ipa host-show command failed."
+   fi
+
+   return $rc
+}
