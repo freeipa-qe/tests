@@ -1,0 +1,3 @@
+PURPOSE of /CoreOS/tests/Regression/ipa-automount
+Description: automount configuration tests for autofs
+Author: Gowrishankar Rajaiyan <gsr@redhat.com>
