@@ -1,4 +1,4 @@
-Owner:           Namita Krishnan<nsoman@redhat.com>
+Owner:           Namita Soman<nsoman@redhat.com>
 Name:            /CoreOS/ipa-server/acceptance/replication
 TestVersion:     1.0
 Path:            /mnt/tests/CoreOS/ipa-server/acceptance/replication
