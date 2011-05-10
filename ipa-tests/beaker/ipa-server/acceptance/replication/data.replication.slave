@@ -101,3 +101,14 @@ hostOS_updated="\"RHEL 6.0\""
 #hostPassword_updated="Secret789"
 managedByHost_updated="dreamworks.$DOMAIN"
 
+######### attributes for a new hostgroup added from slave
+hostgroup="raleigh"
+hostgroup_desc="Raleigh hosts"
+hostgroup_groupMember1="bldg2"
+
+
+########### attributes for a new hostgroup modified from a slave
+hostgroup_updated="westford"
+hostgroup_desc_updated="MA hosts"
+hostgroup_groupMember1_updated="bldg1_hosts"
+

@@ -2,13 +2,17 @@
 testReplicationOnMasterAndSlave()
 {
 
+################################################
+#     setup   
+################################################
+
      rlPhaseStartSetup "Replication tests setup"
         rlLog "MASTER: $MASTER; MASTERIP: $MASTERIP"
         rlLog "BEAKERMASTER: $BEAKERMASTER"
         rlLog "SLAVE: $SLAVE; SLAVEIP: $SLAVEIP"
         rlLog "BEAKERSLAVE: $BEAKERSLAVE"
-        masterDatafile="./data.replication.master"
-        slaveDatafile="./data.replication.slave"
+        masterDatafile="/mnt/tests/CoreOS/ipa-server/acceptance/replication/data.replication.master"
+        slaveDatafile="/mnt/tests/CoreOS/ipa-server/acceptance/replication/data.replication.slave"
 
         # Determine if this is a master
         hostname=`hostname -s`
@@ -42,7 +46,12 @@ testReplicationOnMasterAndSlave()
       fi
     rlPhaseEnd
 
-    # add objects from master
+
+
+################################################
+#    add objects from master
+################################################
+
     if [ $config == "master" ] ; then 
       rhts-sync-block -s READY $BEAKERSLAVE
 
@@ -56,7 +65,11 @@ testReplicationOnMasterAndSlave()
       rhts-sync-set -m $BEAKERMASTER -s MASTERADDEDOBJS
     fi
 
-    # check objects from replica
+
+################################################
+#    check objects from replica
+################################################
+
    if [ $config == "slave" ] ; then
       rhts-sync-block -s MASTERADDEDOBJS $BEAKERMASTER
      
@@ -72,7 +85,11 @@ testReplicationOnMasterAndSlave()
       rhts-sync-set -m $BEAKERSLAVE -s SLAVECHECKEDOBJS
    fi
    
-   # add objects from replica
+
+################################################
+#    add objects from replica
+################################################
+
    if [ $config == "slave" ] ; then
       rhts-sync-block -s SLAVECHECKEDOBJS $BEAKERSLAVE
 
@@ -86,7 +103,11 @@ testReplicationOnMasterAndSlave()
       rhts-sync-set -m $BEAKERSLAVE -s SLAVEADDEDOBJS
    fi
  
-   # check objects from master
+
+################################################
+#   check objects from master
+################################################
+
     if [ $config == "master" ] ; then 
       rhts-sync-block -s SLAVEADDEDOBJS $BEAKERSLAVE
 
@@ -102,7 +123,11 @@ testReplicationOnMasterAndSlave()
       rhts-sync-set -m $BEAKERMASTER -s MASTERCHECKEDOBJS
     fi
 
-   # update objects on master
+
+################################################
+#    update objects on master
+################################################
+
     if [ $config == "master" ] ; then 
       rhts-sync-block -s MASTERCHECKEDOBJS $BEAKERMASTER
 
@@ -120,7 +145,11 @@ testReplicationOnMasterAndSlave()
       rhts-sync-set -m $BEAKERMASTER -s MASTERUPDATEDOBJS
     fi
 
-   # check objects from replica
+
+################################################
+#   check updated objects from replica
+################################################
+
    if [ $config == "slave" ] ; then
       rhts-sync-block -s MASTERUPDATEDOBJS $BEAKERMASTER
 
@@ -136,7 +165,11 @@ testReplicationOnMasterAndSlave()
       rhts-sync-set -m $BEAKERSLAVE -s SLAVECHECKEDUPDATEDOBJS
    fi
 
-   # update objects on replica 
+
+################################################
+#   update objects on replica 
+################################################
+
    if [ $config == "slave" ] ; then
       rhts-sync-block -s SLAVECHECKEDUPDATEDOBJS $BEAKERSLAVE
 
@@ -154,7 +187,11 @@ testReplicationOnMasterAndSlave()
       rhts-sync-set -m $BEAKERSLAVE -s SLAVEUPDATEDOBJS
    fi
 
-   # check objects from master
+
+################################################
+#   check updated objects from master
+################################################
+
     if [ $config == "master" ] ; then 
       rhts-sync-block -s SLAVEUPDATEDOBJS $BEAKERSLAVE
 
@@ -171,7 +208,10 @@ testReplicationOnMasterAndSlave()
     fi
 
 
-   # delete object (added from slave, modified from master) from master
+###########################################################################
+#   delete object (added from replica, modified from master) from master
+###########################################################################
+
     if [ $config == "master" ] ; then 
       rhts-sync-block -s MASTERCHECKEDUPDATEDOBJS $BEAKERMASTER
 
@@ -184,7 +224,10 @@ testReplicationOnMasterAndSlave()
     fi
 
 
-   # check deleted objects not available on slave
+###################################################
+#   check deleted objects not available on replica
+###################################################
+
    if [ $config == "slave" ] ; then
       rhts-sync-block -s MASTERDELETEDOBJS $BEAKERMASTER
      
@@ -196,7 +239,11 @@ testReplicationOnMasterAndSlave()
       rhts-sync-set -m $BEAKERSLAVE -s SLAVECHECKDELETEDOBJS
    fi
 
-   # delete object (added from master, modified from slave) from slave
+
+###########################################################################
+#   delete object (added from master, modified from replica) from replica
+###########################################################################
+
     if [ $config == "slave" ] ; then 
       rhts-sync-block -s SLAVECHECKDELETEDOBJS $BEAKERSLAVE
 
@@ -208,7 +255,11 @@ testReplicationOnMasterAndSlave()
       rhts-sync-set -m $BEAKERSLAVE -s SLAVEDELETEDOBJS
     fi
 
-   # check deleted objects not available on master 
+
+################################################
+#   check deleted objects not available on master 
+################################################
+
    if [ $config == "master" ] ; then
       rhts-sync-block -s SLAVEDELETEDOBJS $BEAKERSLAVE
      
@@ -253,12 +304,15 @@ add_objects()
 
    # Add a group
     add_newgroup
+
    # Add a host
     add_newhost
+
    # Add a hostgroup
+    add_newhostgroup
+
    # Add a netgroup
    # Add a service
-
    # Add a delegation
    # Add a DNS record 
    # Add a HBAC service
@@ -284,6 +338,7 @@ check_objects()
    check_newuser
    check_newgroup
    check_newhost
+   check_newhostgroup
 }
 
 update_objects()
@@ -292,6 +347,7 @@ update_objects()
    modify_newuser $1
    modify_newgroup $2
    modify_newhost $3
+   modify_newhostgroup
 }
 
 
@@ -301,6 +357,7 @@ check_updated_objects()
    check_modifieduser
    check_modifiedgroup
    check_modifiedhost $1
+   check_modifiedhostgroup
 }
 
 
@@ -310,6 +367,7 @@ delete_objects()
    delete_user
    delete_group
    delete_host
+   delete_hostgroup
 }
 
 check_deletedobjects()
@@ -318,4 +376,5 @@ check_deletedobjects()
    check_deleteduser
    check_deletedgroup
    check_deletedhost
+   check_deletedhostgroup
 }

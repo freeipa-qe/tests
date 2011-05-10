@@ -1,5 +1,9 @@
 
+
+#########################
 # User-related actions
+#########################
+
 add_newuser()
 {
   rlRun "ipa user-add --first=$firstName \
@@ -133,7 +137,10 @@ check_deleteduser()
 }
 
 
+#########################
 # Group-related actions
+#########################
+
 add_newgroup()
 {
    rlRun "ipa group-add --desc=$desc --gid=$gid $groupName" 0 "Add a new group"
@@ -189,7 +196,9 @@ check_deletedgroup()
 
 
 
+#########################
 # Host-related actions
+#########################
 
 add_newhost()
 {
@@ -263,3 +272,63 @@ check_deletedhost()
 
 
 
+#########################
+# Hostgroup-related actions
+#########################
+
+add_newhostgroup()
+{
+   rlRun "ipa hostgroup-add --desc=$hostgroup_groupMember1  $hostgroup_groupMember1" 0 "Add a hostgroup to be added as member"
+   rlRun "ipa hostgroup-add --desc=$hostgroup_groupMember1_updated  $hostgroup_groupMember1_updated" 0 "Add another hostgroup to be added as member"
+
+   rlRun "ipa hostgroup-add --desc=\"$hostgroup_desc\" \
+                            --addattr member=\"cn=$hostgroup_groupMember1,cn=hostgroups,cn=accounts,dc=$DOMAIN\" \
+                            $hostgroup " \
+                            0 \
+                            "Add a new hostgroup, with a hostgroup member"
+   rlRun "ipa hostgroup-add-member --hosts=$managedByHost $hostgroup" 0 "Add a host member"
+ 
+}
+
+check_newhostgroup()
+{
+   rlRun "verifyHostGroupAttr $hostgroup \"Host-group\" $hostgroup" 0 "Verify Hostgroup's name" 
+   rlRun "verifyHostGroupAttr $hostgroup \"Description\" $hostgroup_desc" 0 "Verify Hostgroup's description" 
+   rlRun "verifyHostGroupMember $managedByHost host $hostgroup" 0 "Verify Hostgroup's Member hosts" 
+   rlRun "verifyHostGroupMember $hostgroup_groupMember1 hostgroup $hostgroup" 0 "Verify Hostgroup's Member hosts" 
+}
+
+
+
+modify_newhostgroup()
+{
+    rlRun "ipa hostgroup-mod --desc=\"$hostgroup_desc_updated\" \
+                             $hostgroup_updated" \
+                             0 \
+                             "Modify hostgroup"
+    rlRun "ipa hostgroup-remove-member --hosts=$managedByHost_updated $hostgroup_updated" 0 "Remove a host member"
+# TODO: --setattr member=\"cn=$hostgroup_groupMember1_updated,cn=hostgroups,cn=accounts,dc=$DOMAIN\" \
+}
+
+
+check_modifiedhostgroup()
+{
+   rlRun "verifyHostGroupAttr $hostgroup_updated \"Host-group\" $hostgroup_updated" 0 "Verify Hostgroup's name" 
+   rlRun "verifyHostGroupAttr $hostgroup_updated \"Description\" $hostgroup_desc_updated" 0 "Verify Hostgroup's description" 
+# TODO:    rlRun "verifyHostGroupMember $hostgroup_groupMember1_updated hostgroup $hostgroup_updated" 0 "Verify Hostgroup's Member hosts" 
+}
+
+
+
+delete_hostgroup()
+{
+   rlRun "ipa hostgroup-del $hostgroup_updated" 0 "Delete the hostgroup" 
+}
+
+
+check_deletedhostgroup()
+{
+   command="ipa hostgroup-show $hostgroup_updated"
+   expmsg="ipa: ERROR: $hostgroup_updated: hostgroup not found"
+   rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify error when checking for deleted hostgroup"
+}

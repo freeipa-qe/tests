@@ -41,6 +41,7 @@
 . /dev/shm/lib.user-cli.sh
 . /dev/shm/ipa-group-cli-lib.sh
 . /dev/shm/ipa-host-cli-lib.sh
+. /dev/shm/ipa-hostgroup-cli-lib.sh
 
 #Include the data file for the tests
 . ./data.replication

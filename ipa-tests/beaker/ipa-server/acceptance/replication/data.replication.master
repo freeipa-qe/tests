@@ -1,5 +1,5 @@
 
-# attributes for new user added from master
+######### attributes for new user added from master
 firstName="Minny"
 lastName="Jackson"
 cn="\"Minny Jackson\""
@@ -29,7 +29,7 @@ login="mjackson"
 # TODO: addattr, setattr, changes brought by user-disable, user-enable
 
 
-# attributes for new user modified from master
+######### attributes for new user modified from master
 firstName_updated="Abby"
 lastName_updated="Clarkson"
 cn_updated="\"Abby Clarkson\""
@@ -54,7 +54,7 @@ manager_updated="\"uid=Leefolt,cn=users,dc=testrelm\""
 carlicense_updated="78403"
 login_updated="aclarkson"
 
-# attributes for a new group added from master
+######### attributes for a new group added from master
 groupName="reviewer"
 dn="cn=$groupName,cn=groups,cn=accounts,dc=$DOMAIN"
 desc="\"users in this group can review the book\""
@@ -64,11 +64,11 @@ groupMember2="karen"
 # TODO: addattr, setattr, changes brought by group-detach 
 
 
-# attributes for a new non-posix group added from master
+######### attributes for a new non-posix group added from master
 groupName_nonposix="publisher"
 desc_nonposix="\"users in this group publish the book\""
 
-# attributes for anew group modified from master
+######### attributes for anew group modified from master
 groupName_updated="reader"
 desc_updated="\"users in this group get updates\""
 groupMember1_updated="patrick"
@@ -76,7 +76,7 @@ groupMember2_updated="sara"
 groupName_nonposix_updated="printer"
 
 
-# attributes for a new host added from master
+######### attributes for a new host added from master
 newHost="harper.$DOMAIN"
 hostDesc="\"For the Reviewer team\"" 
 #hostLocality="Westford"
@@ -94,7 +94,7 @@ hostIPaddress="\"10.16.84.13\""
 managedByHost="dreamworks.$DOMAIN"
 managedByHostIP="\"10.16.84.17\""
 
-# attributes for a new host modified from a master
+######### attributes for a new host modified from a master
 newHost_updated="row.$DOMAIN"
 hostDesc_updated="\"For the Publisher team\"" 
 hostLocality_updated="Raleigh"
@@ -104,3 +104,18 @@ hostOS_updated="\"RHEL 6.0\""
 #hostPassword_updated="Secret456"
 managedByHost_updated="penguin.$DOMAIN"
 hostPrincipal_updated="host/$newHost_updated@$RELM"
+
+
+######### attributes for a new hostgroup added from master
+hostgroup="westford"
+hostgroup_desc="Westford hosts"
+hostgroup_groupMember1="bldg1"
+
+
+######### attributes for a new host modified from a master
+hostgroup_updated="raleigh"
+hostgroup_desc_updated="NC hosts"
+hostgroup_groupMember1_updated="bldg2_hosts"
+
+
+
