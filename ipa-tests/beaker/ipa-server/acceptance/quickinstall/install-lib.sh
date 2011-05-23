@@ -22,7 +22,7 @@ fixHostFile()
     # Remove any existing hostname entries from the hosts file
     sed -i s/$hostname//g /dev/shm/hosts
     sed -i s/$hostname_s//g /dev/shm/hosts
-    echo "$ipaddr $hostname_s.$DOMAIN $hostname $hostname_s" >> /dev/shm/hosts
+    echo "$ipaddr $hostname_s.$DOMAIN $hostname_s" >> /dev/shm/hosts
     cat /dev/shm/hosts > /etc/hosts
     rlLog "Hosts file contains:"
     output=`cat /etc/hosts`
