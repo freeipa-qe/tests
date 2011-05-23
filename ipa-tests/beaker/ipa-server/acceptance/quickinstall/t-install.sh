@@ -65,9 +65,9 @@ installSlave()
         	rlRun "ntpdate $NTPSERVER" 0 "Synchronzing clock with valid time server"
 		rlLog "SKIPINSTALL: $SKIPINSTALL"	
 		if [[ "$SKIPINSTALL" != "TRUE" ]] ; then
+			rlRun "fixResolv" 0 "fixing the reoslv.conf to contain the correct nameserver lines"
 			rlRun "fixHostFile" 0 "Set up /etc/hosts"
                 	rlRun "fixhostname" 0 "Fix hostname"
-                	rlRun "fixResolv" 0 "fixing the reoslv.conf to contain the correct nameserver lines"
 			echo "ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg" > /dev/shm/replica-install.bash
                 	chmod 755 /dev/shm/replica-install.bash
                 	rlLog "EXECUTING: ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg"
