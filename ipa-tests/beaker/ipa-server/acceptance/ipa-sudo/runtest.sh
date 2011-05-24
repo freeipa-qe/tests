@@ -48,14 +48,22 @@ PACKAGE="ipa-server"
 #   test main 
 #########################################
 
-#automount_location() {
-#"automount_location_001"
-#"automount_location_002"
-#}
+sudocmd() {
+"sudocmd_001"
+"sudocmd_002"
+"sudocmd_003"
+"sudocmd_004"
+"sudocmd_005"
+"sudocmd_006"
+"sudocmd_007"
+"sudocmd_008"
+"sudocmd_009"
+"sudocmd_010"
+}
 
-#automount_map() {
-#"automount_map_001"
-#}
+sudocmdgroup() {
+"sudocmdgroup_001"
+}
 
 sudorule() {
 "sudorule_add_001"
@@ -66,17 +74,19 @@ sudorule() {
 rlJournalStart
 
     rlPhaseStartSetup "ipa-sudo-startup: Check for admintools package, kinit and enabling nis"
-		rlRun "setup"
+#		rlRun "setup"
 		rlRun "echo setup"
     rlPhaseEnd
 
 	# tests start...
 sudo_001
+sudocmd
+sudocmdgroup
 sudorule
 	# tests end.
 
     rlPhaseStartCleanup "ipa-sudo-cleanup: Destroying admin credentials & and disabling nis."
-		rlRun "cleanup"
+#		rlRun "cleanup"
 		rlRun "echo cleanup"
     rlPhaseEnd
 
