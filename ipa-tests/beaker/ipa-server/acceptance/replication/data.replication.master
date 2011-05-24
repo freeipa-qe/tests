@@ -128,3 +128,17 @@ netgroup_groupMember1="mailadmins"
 netgroup_updated="hradmins"
 netgroup_desc_updated="\"HR admin\""
 netgroup_groupMember1_updated="benefitsadmins"
+
+
+
+######### attributes for new service added from master
+service=vpn/$MASTER@$RELM
+keytab=False
+subject="CN=rhel61-server4.testrelm,O=TESTRELM"
+issuer="CN=Certificate Authority,O=TESTRELM"
+
+######### attributes for a new service modified from master
+service_updated=ntpd/$SLAVE@$RELM
+subject_updated="CN=rhel61-server3.testrelm,O=TESTRELM"
+service_managedby_attr="fqdn=$managedByHost_updated,cn=computers,cn=accounts,dc=testrelm"
+service_managedby_attr2="fqdn=$managedByHost,cn=computers,cn=accounts,dc=testrelm"

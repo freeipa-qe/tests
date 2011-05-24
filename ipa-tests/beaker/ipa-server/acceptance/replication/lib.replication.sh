@@ -388,3 +388,53 @@ check_deletednetgroup()
    expmsg="ipa: ERROR: $netgroup_updated: netgroup not found"
    rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify error when checking for deleted netgroup"
 }
+
+
+###########################
+# Service-related actions
+###########################
+
+
+add_newservice()
+{
+   rlRun "ipa service-add $service --certificate=$certificate" 0 "Add new service"
+   rlRun "ipa service-add-host --hosts=$managedByHost $service" 0 "Add service host"
+}
+
+check_newservice()
+{
+   rlRun "verifyServiceAttr $service \"Principal\" $service" 0 "Verify service's name"
+   rlRun "verifyServiceAttr $service \"Certificate\" $certificate" 0 "Verify service's certificate"
+   rlRun "verifyServiceAttr $service \"Keytab\" $keytab" 0 "Verify service's Keytab"
+   rlRun "verifyServiceAttr $service \"Subject\" $subject" 0 "Verify service's Subject"
+   rlRun "verifyServiceAttr $service \"Issuer\" $issuer" 0 "Verify service's Issuer"
+   rlRun "verifyServiceAttr $service \"Managed by\" $service_managedby" 0 "Verify service's managed hosts"
+}
+
+modify_newservice()
+{
+   rlRun "ipa service-disable $service_updated" 0 "Disable service" 
+   rlRun "ipa service-mod $service_updated --certificate=$updatedcertificate " 0 "Modify service's certificate"
+   rlRun "ipa service-mod $service_updated --setattr=managedBy=$service_managedby_attr2" 0 "Set service's managed by"
+   rlRun "ipa service-mod $service_updated --addattr=managedBy=$service_managedby_attr" 0 "Add service's managed by"
+}
+
+check_modifiedservice()
+{
+   rlRun "verifyServiceAttr $service_updated \"Certificate\" $updatedcertificate" 0 "Verify service's certificate"
+   rlRun "verifyServiceAttr $service_updated \"Subject\" $subject_updated" 0 "Verify service's Subject"
+   rlRun "verifyServiceAttr $service_updated \"Managed by\" \"$managedByHost, $managedByHost_updated\"" 0 "Verify service's managed hosts"
+}
+
+delete_service()
+{
+   rlRun "ipa service-del $service_updated" 0 "Delete the service" 
+
+}
+
+check_deletedservice()
+{
+   command="ipa service-show $service_updated"
+   expmsg="ipa: ERROR: $service_updated: service not found"
+   rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify error when checking for deleted service"
+}

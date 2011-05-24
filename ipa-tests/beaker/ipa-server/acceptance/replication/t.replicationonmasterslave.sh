@@ -296,7 +296,7 @@ testReplicationOnMasterAndSlave()
 add_objects()
 {
 
-   rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials  to update objects"
+   rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials  to add objects"
    # perform actions to add objects
    rlLog "Adding objects on $hostname"
    # Add a user
@@ -315,6 +315,8 @@ add_objects()
     add_newnetgroup
 
    # Add a service
+    add_newservice
+
    # Add a delegation
    # Add a DNS record 
    # Add a HBAC service
@@ -336,12 +338,13 @@ add_objects()
 check_objects()
 {
 
-   rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials  to update objects"
+   rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials  to check objects"
    check_newuser
    check_newgroup
    check_newhost
    check_newhostgroup
    check_newnetgroup
+   check_newservice
 }
 
 update_objects()
@@ -352,6 +355,7 @@ update_objects()
    modify_newhost $3
    modify_newhostgroup
    modify_newnetgroup
+   modify_newservice
 }
 
 
@@ -363,25 +367,28 @@ check_updated_objects()
    check_modifiedhost $1
    check_modifiedhostgroup
    check_modifiednetgroup
+   check_modifiedservice
 }
 
 
 delete_objects()
 {
-   rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials  to verify updated objects"
+   rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials  to delete objects"
    delete_user
    delete_group
    delete_host
    delete_hostgroup
    delete_netgroup
+   delete_service
 }
 
 check_deletedobjects()
 {
-   rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials  to verify updated objects"
+   rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials  to verify deleted objects"
    check_deleteduser
    check_deletedgroup
    check_deletedhost
    check_deletedhostgroup
    check_deletednetgroup
+   check_deletedservice
 }
