@@ -33,6 +33,7 @@ installMaster()
                         hostname_s=$(echo $s | cut -d. -f1)
                         rlLog "IP of server $s is resolving as $ipofs, using short hostname of $hostname_s" 
                         rlRun "ipa-replica-prepare -p $ADMINPW --ip-address=$ipofs $hostname_s.$DOMAIN" 0 "Creating replica package"
+			rlRun "service named restart" 0 "Restarting named as work around when adding new reverse zone"
 		else
 			rlLog "No SLAVES in current recipe set."
               	fi
