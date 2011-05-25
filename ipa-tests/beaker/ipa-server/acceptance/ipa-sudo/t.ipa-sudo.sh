@@ -327,17 +327,202 @@ rlPhaseEnd
 }
 
 
+sudocmdgroup_003() {
+
+rlPhaseStartTest "sudocmdgroup_003: ipa sudocmdgroup-add-member --sudocmds=commands sudogrp"
+
+	rlRun "ipa sudocmd-add /bin/ls"
+	rlRun "ipa sudocmdgroup-add-member --sudocmds=/bin/ls sudogrp1 > $TmpDir/sudocmdgroup_003.txt 2>&1"
+	rlAssertGrep "Sudo Command Group: sudogrp1" "$TmpDir/sudocmdgroup_003.txt"
+	rlAssertGrep "Description: sudo group1" "$TmpDir/sudocmdgroup_003.txt"
+	rlAssertGrep "Member Sudo commands: /bin/ls" "$TmpDir/sudocmdgroup_003.txt"
+	rlAssertGrep "Number of members added 1" "$TmpDir/sudocmdgroup_003.txt"
+	rlRun "cat $TmpDir/sudocmdgroup_003.txt"
+
+rlPhaseEnd
+}
 
 
+sudocmdgroup_004() {
+
+rlPhaseStartTest "sudocmdgroup_004: ipa sudocmdgroup-add-member --sudocmds=commands again to sudogrp"
+
+	rlRun "ipa sudocmd-add /bin/df"
+	rlRun "ipa sudocmdgroup-add-member --sudocmds=/bin/df sudogrp1 > $TmpDir/sudocmdgroup_004.txt 2>&1"
+        rlAssertGrep "Sudo Command Group: sudogrp1" "$TmpDir/sudocmdgroup_004.txt"
+        rlAssertGrep "Description: sudo group1" "$TmpDir/sudocmdgroup_004.txt"
+        rlAssertGrep "Member Sudo commands: /bin/ls, /bin/df" "$TmpDir/sudocmdgroup_004.txt"
+        rlAssertGrep "Number of members added 1" "$TmpDir/sudocmdgroup_004.txt"
+        rlRun "cat $TmpDir/sudocmdgroup_004.txt"
+
+rlPhaseEnd
+}
 
 
+sudocmdgroup_005() {
+
+rlPhaseStartTest "sudocmdgroup_005: ipa sudocmdgroup-remove-member --sudocmds=commands sudogrp"
+
+	rlRun "ipa sudocmdgroup-remove-member --sudocmds=/bin/df sudogrp1 > $TmpDir/sudocmdgroup_005.txt 2>&1"
+	rlAssertGrep "Sudo Command Group: sudogrp1" "$TmpDir/sudocmdgroup_005.txt"
+	rlAssertGrep "Description: sudo group1" "$TmpDir/sudocmdgroup_005.txt"
+	rlAssertGrep "Member Sudo commands: /bin/ls" "$TmpDir/sudocmdgroup_005.txt"
+	rlAssertGrep "Number of members removed 1" "$TmpDir/sudocmdgroup_005.txt"
+	rlRun "cat $TmpDir/sudocmdgroup_005.txt"
+
+rlPhaseEnd
+}
 
 
+sudocmdgroup_006() {
+
+rlPhaseStartTest "sudocmdgroup_006: ipa sudocmdgroup-remove-member --sudocmds=commands again from sudogrp"
+
+	rlRun "ipa sudocmdgroup-remove-member --sudocmds=/bin/ls sudogrp1 > $TmpDir/sudocmdgroup_006.txt 2>&1"
+        rlAssertGrep "Sudo Command Group: sudogrp1" "$TmpDir/sudocmdgroup_006.txt"
+        rlAssertGrep "Description: sudo group1" "$TmpDir/sudocmdgroup_006.txt"
+        rlAssertGrep "Number of members removed 1" "$TmpDir/sudocmdgroup_005.txt"
+        rlRun "cat $TmpDir/sudocmdgroup_006.txt"
+
+rlPhaseEnd
+}
+
+sudocmdgroup_007() {
+
+rlPhaseStartTest "sudocmdgroup_007: ipa sudocmdgroup-add-member --sudocmds=multiplecommands to sudogrp"
+
+	rlRun "ipa sudocmdgroup-add-member --sudocmds=/bin/df,/bin/ls sudogrp1  > $TmpDir/sudocmdgroup_007.txt 2>&1"
+        rlAssertGrep "Sudo Command Group: sudogrp1" "$TmpDir/sudocmdgroup_007.txt"
+        rlAssertGrep "Description: sudo group1" "$TmpDir/sudocmdgroup_007.txt"
+        rlAssertGrep "Member Sudo commands: /bin/df, /bin/ls" "$TmpDir/sudocmdgroup_007.txt"
+        rlAssertGrep "Number of members added 2" "$TmpDir/sudocmdgroup_007.txt"
+        rlRun "cat $TmpDir/sudocmdgroup_007.txt"
+
+rlPhaseEnd
+}
+
+sudocmdgroup_008() {
+
+rlPhaseStartTest "sudocmdgroup_008: ipa sudocmdgroup-remove-member --sudocmds=multiplecommands from sudogrp"
+
+	rlRun "ipa sudocmdgroup-remove-member --sudocmds=/bin/df,/bin/ls sudogrp1 > $TmpDir/sudocmdgroup_008.txt 2>&1"
+        rlAssertGrep "Sudo Command Group: sudogrp1" "$TmpDir/sudocmdgroup_008.txt"
+        rlAssertGrep "Description: sudo group1" "$TmpDir/sudocmdgroup_008.txt"
+        rlAssertGrep "Number of members removed 2" "$TmpDir/sudocmdgroup_008.txt"
+	rlRun "cat $TmpDir/sudocmdgroup_008.txt"
+
+rlPhaseEnd
+}
 
 
+sudocmdgroup_009() {
+
+rlPhaseStartTest "sudocmdgroup_009: ipa sudocmdgroup-find"
+
+	rlRun "ipa sudocmdgroup-add-member --sudocmds=/bin/df,/bin/ls sudogrp1"
+	rlRun "ipa sudocmdgroup-find > $TmpDir/sudocmdgroup_009.txt 2>&1"
+	rlAssertGrep "Sudo Command Group: sudogrp1" "$TmpDir/sudocmdgroup_009.txt"
+	rlAssertGrep "Description: sudo group1" "$TmpDir/sudocmdgroup_009.txt"
+	rlAssertGrep "Member Sudo commands: /bin/df, /bin/ls" "$TmpDir/sudocmdgroup_009.txt"
+	rlAssertGrep "Number of entries returned 1" "$TmpDir/sudocmdgroup_009.txt"
+	rlRun "cat $TmpDir/sudocmdgroup_009.txt"
+
+rlPhaseEnd
+}
 
 
+sudocmdgroup_010() {
 
+rlPhaseStartTest "sudocmdgroup_010: ipa sudocmdgroup-find sudogrp"
+
+	rlRun "ipa sudocmdgroup-find sudogrp1 > $TmpDir/sudocmdgroup_010.txt 2>&1"
+        rlAssertGrep "1 sudo command group matched" "$TmpDir/sudocmdgroup_010.txt"
+	rlAssertGrep "Sudo Command Group: sudogrp" "$TmpDir/sudocmdgroup_010.txt"
+        rlAssertGrep "Description: sudo group1" "$TmpDir/sudocmdgroup_010.txt"
+        rlAssertGrep "Member Sudo commands: /bin/df, /bin/ls" "$TmpDir/sudocmdgroup_010.txt"
+        rlAssertGrep "Number of entries returned 1" "$TmpDir/sudocmdgroup_010.txt"
+	rlRun "cat $TmpDir/sudocmdgroup_010.txt"
+
+rlPhaseEnd
+}
+
+sudocmdgroup_011() {
+
+rlPhaseStartTest "sudocmdgroup_011: ipa sudocmdgroup-show sudogrp1"
+
+	rlRun "ipa sudocmdgroup-show sudogrp1  > $TmpDir/sudocmdgroup_011.txt 2>&1"
+	rlAssertGrep "Sudo Command Group: sudogrp1" "$TmpDir/sudocmdgroup_011.txt"
+	rlAssertGrep "Description: sudo group1" "$TmpDir/sudocmdgroup_011.txt"
+	rlAssertGrep "Member Sudo commands: /bin/df, /bin/ls" "$TmpDir/sudocmdgroup_011.txt"
+	rlRun "cat $TmpDir/sudocmdgroup_011.txt"
+
+rlPhaseEnd
+}
+
+
+sudocmdgroup_012() {
+
+rlPhaseStartTest "sudocmdgroup_012: ipa sudocmdgroup-find sudogrp --all --raw"
+
+	rlRun "ipa sudocmdgroup-find sudogrp1 --raw --all > $TmpDir/sudocmdgroup_012.txt 2>&1"
+	rlAssertGrep "dn: cn=sudogrp1,cn=sudocmdgroups,cn=sudo,$BASE" "$TmpDir/sudocmdgroup_012.txt"
+	rlAssertGrep "cn: sudogrp1" "$TmpDir/sudocmdgroup_012.txt"
+	rlAssertGrep "description: sudo group1" "$TmpDir/sudocmdgroup_012.txt"
+	rlAssertGrep "member: sudocmd=/bin/df,cn=sudocmds,cn=sudo,$BASE" "$TmpDir/sudocmdgroup_012.txt"
+	rlAssertGrep "member: sudocmd=/bin/ls,cn=sudocmds,cn=sudo,$BASE" "$TmpDir/sudocmdgroup_012.txt"
+	rlAssertGrep "ipauniqueid: " "$TmpDir/sudocmdgroup_012.txt"
+	rlAssertGrep "objectclass: ipaobject" "$TmpDir/sudocmdgroup_012.txt"
+	rlAssertGrep "objectclass: ipasudocmdgrp" "$TmpDir/sudocmdgroup_012.txt"
+	rlAssertGrep "objectclass: groupOfNames" "$TmpDir/sudocmdgroup_012.txt"
+	rlAssertGrep "objectclass: top" "$TmpDir/sudocmdgroup_012.txt"
+	rlRun "cat $TmpDir/sudocmdgroup_012.txt"
+
+rlPhaseEnd
+}
+
+
+sudocmdgroup_013() {
+
+rlPhaseStartTest "sudocmdgroup_013: ipa sudocmdgroup-mod sudogrp1 --addattr"
+
+	rlRun "ipa sudocmdgroup-mod sudogrp1 --addattr member=sudocmd=/bin/vi,cn=sudocmds,cn=sudo,$BASE > $TmpDir/sudocmdgroup_013.txt"
+	rlAssertGrep "Modified sudo command group \"sudogrp1\"" "$TmpDir/sudocmdgroup_013.txt"
+	rlAssertGrep "Sudo Command Group: sudogrp1" "$TmpDir/sudocmdgroup_013.txt"
+	rlAssertGrep "Description: sudo group1" "$TmpDir/sudocmdgroup_013.txt"
+	rlAssertGrep "Member Sudo commands: /bin/df, /bin/ls, /bin/vi" "$TmpDir/sudocmdgroup_013.txt"
+	rlRun "cat $TmpDir/sudocmdgroup_013.txt"
+
+rlPhaseEnd
+}
+
+
+sudocmdgroup_014() {
+
+rlPhaseStartTest "sudocmdgroup_014: ipa sudocmdgroup-mod sudogrp1 --setattr"
+
+	rlRun "ipa sudocmdgroup-mod sudogrp1 --setattr member=sudocmd=/bin/dd,cn=sudocmds,cn=sudo,$BASE > $TmpDir/sudocmdgroup_014.txt"
+	rlAssertGrep "Modified sudo command group \"sudogrp1\"" "$TmpDir/sudocmdgroup_014.txt"
+	rlAssertGrep "Sudo Command Group: sudogrp1" "$TmpDir/sudocmdgroup_014.txt"
+	rlAssertGrep "Description: sudo group1" "$TmpDir/sudocmdgroup_014.txt"
+	rlAssertGrep "Member Sudo commands: /bin/dd" "$TmpDir/sudocmdgroup_014.txt"
+	rlRun "cat $TmpDir/sudocmdgroup_014.txt"
+
+rlPhaseEnd
+}
+
+
+sudocmdgroup_015() {
+
+rlPhaseStartTest "sudocmdgroup_015: ipa sudocmdgroup-del sudogrp1"
+
+	rlRun "ipa sudocmd-del /bin/ls"
+	rlRun "ipa sudocmd-del /bin/df"
+	rlRun "ipa sudocmdgroup-del sudogrp1 > $TmpDir/sudocmdgroup_015.txt"
+	rlAssertGrep "Deleted sudo command group \"sudogrp1\"" "$TmpDir/sudocmdgroup_015.txt"
+	rlRun "cat $TmpDir/sudocmdgroup_015.txt"
+
+rlPhaseEnd
+}
 
 
 ##################################################################################

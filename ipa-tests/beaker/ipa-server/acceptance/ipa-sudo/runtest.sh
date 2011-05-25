@@ -63,6 +63,20 @@ sudocmd() {
 
 sudocmdgroup() {
 "sudocmdgroup_001"
+"sudocmdgroup_002"
+"sudocmdgroup_003"
+"sudocmdgroup_004"
+"sudocmdgroup_005"
+"sudocmdgroup_006"
+"sudocmdgroup_007"
+"sudocmdgroup_008"
+"sudocmdgroup_009"
+"sudocmdgroup_010"
+"sudocmdgroup_011"
+"sudocmdgroup_012"
+"sudocmdgroup_013"
+"sudocmdgroup_014"
+"sudocmdgroup_015"
 }
 
 sudorule() {
