@@ -63,7 +63,7 @@ host1="nightcrawler."$DOMAIN
 host2="ivanova."$DOMAIN
 host3="samwise."$DOMAIN
 host4="shadowfall."$DOMAIN
-host5="qe-blade-01."$DOMAIN
+host5="qe-blade-23."$DOMAIN
 
 group1="hostgrp1"
 group2="host group 2"
