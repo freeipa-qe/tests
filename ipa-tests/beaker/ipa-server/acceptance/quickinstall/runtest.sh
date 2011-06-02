@@ -61,10 +61,12 @@ rlJournalStart
 			yum clean all
 			yum -y install --disablerepo=ipa $SERVER_PACKAGES
                         yum -y install ds-replication
+                        yum -y update
 		else
 			yum clean all
 			yum -y install $SERVER_PACKAGES
                         yum -y install ds-replication
+                        yum -y update
 		fi
 
 		for item in $SERVER_PACKAGES ; do
