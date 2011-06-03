@@ -166,8 +166,8 @@ verifyHostAttr()
    ipa host-show $myhost > $tmpfile
    rc=$?
    if [ $rc -eq 0 ] ; then
-        myval=`cat $tmpfile | grep "$attribute $value" | xargs echo`
-	cat $tmpfile | grep "$attribute $value"
+        myval=`cat $tmpfile | grep -i "$attribute $value" | xargs echo`
+	cat $tmpfile | grep -i "$attribute $value"
    	if [ $? -ne 0 ] ; then
         	rlLog "ERROR: $myhost verification failed: Value of $attribute - GOT: $myval EXPECTED: $value"
                 rc=1
