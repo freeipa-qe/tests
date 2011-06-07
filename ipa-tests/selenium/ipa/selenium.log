@@ -1,0 +1,60 @@
+15:05:29.263 INFO [10] org.openqa.selenium.server.SeleniumServer - Writing debug logs to /home/nk/ipa/selenium.log
+15:05:29.265 INFO [10] org.openqa.selenium.server.SeleniumServer - Java: Sun Microsystems Inc. 19.0-b09
+15:05:29.265 INFO [10] org.openqa.selenium.server.SeleniumServer - OS: Linux 2.6.32-131.0.13.el6.x86_64 amd64
+15:05:29.273 INFO [10] org.openqa.selenium.server.SeleniumServer - v2.0 [b3], with Core v2.0 [b3]
+15:05:29.294 DEBUG [10] org.openqa.jetty.util.Container - add component: SocketListener0@0.0.0.0:4444
+15:05:29.324 DEBUG [10] org.openqa.jetty.util.Container - add component: org.openqa.jetty.http.ResourceCache@8d80be3
+15:05:29.331 DEBUG [10] org.openqa.jetty.util.Container - add component: org.openqa.selenium.server.ProxyHandler in HttpContext[/,/]
+15:05:29.335 DEBUG [10] org.openqa.jetty.util.Container - add component: HttpContext[/,/]
+15:05:29.336 DEBUG [10] org.openqa.jetty.http.HttpServer - Added HttpContext[/,/] for host *
+15:05:29.337 DEBUG [10] org.openqa.jetty.util.Container - add component: org.openqa.jetty.http.ResourceCache@18a61164
+15:05:29.340 DEBUG [10] org.openqa.jetty.http.HttpContext - added SC{BASIC,null,user,CONFIDENTIAL} at /tests/html/basicAuth/*
+15:05:29.350 DEBUG [10] org.openqa.jetty.util.Container - add component: org.openqa.jetty.http.handler.SecurityHandler in HttpContext[/selenium-server,/selenium-server]
+15:05:29.354 DEBUG [10] org.openqa.jetty.util.Container - add component: org.openqa.selenium.server.StaticContentHandler in HttpContext[/selenium-server,/selenium-server]
+15:05:29.356 DEBUG [10] org.openqa.jetty.util.Container - add component: org.openqa.selenium.server.SessionExtensionJsHandler in HttpContext[/selenium-server,/selenium-server]
+15:05:29.357 DEBUG [10] org.openqa.jetty.util.Container - add component: org.openqa.selenium.server.htmlrunner.SingleTestSuiteResourceHandler in HttpContext[/selenium-server,/selenium-server]
+15:05:29.359 DEBUG [10] org.openqa.jetty.util.Container - add component: org.openqa.selenium.server.htmlrunner.SeleniumHTMLRunnerResultsHandler@394a8cd1
+15:05:29.363 DEBUG [10] org.openqa.jetty.util.Container - add component: org.openqa.selenium.server.CachedContentTestHandler@21551f60
+15:05:29.364 DEBUG [10] org.openqa.jetty.util.Container - add component: HttpContext[/selenium-server,/selenium-server]
+15:05:29.364 DEBUG [10] org.openqa.jetty.http.HttpServer - Added HttpContext[/selenium-server,/selenium-server] for host *
+15:05:29.364 DEBUG [10] org.openqa.jetty.util.Container - add component: org.openqa.jetty.http.ResourceCache@4ac4aad3
+15:05:29.381 DEBUG [10] org.openqa.jetty.util.Container - add component: org.openqa.selenium.server.SeleniumDriverResourceHandler in HttpContext[/selenium-server,/selenium-server]
+15:05:29.381 DEBUG [10] org.openqa.jetty.util.Container - add component: HttpContext[/selenium-server/driver,/selenium-server/driver]
+15:05:29.382 DEBUG [10] org.openqa.jetty.http.HttpServer - Added HttpContext[/selenium-server/driver,/selenium-server/driver] for host *
+15:05:29.382 DEBUG [10] org.openqa.jetty.util.Container - add component: org.openqa.jetty.http.ResourceCache@79f6f296
+15:05:29.475 DEBUG [10] org.openqa.jetty.util.Container - add component: WebDriver remote server
+15:05:29.481 DEBUG [10] org.openqa.jetty.util.Container - add component: org.openqa.jetty.jetty.servlet.HashSessionManager@70ba9340
+15:05:29.481 DEBUG [10] org.openqa.jetty.util.Container - add component: org.openqa.jetty.jetty.servlet.ServletHandler@69198891
+15:05:29.484 INFO [10] org.openqa.selenium.server.SeleniumServer - RemoteWebDriver instances should connect to: http://127.0.0.1:4444/wd/hub
+15:05:29.485 DEBUG [10] org.openqa.jetty.util.Container - add component: HttpContext[/wd,/wd]
+15:05:29.485 DEBUG [10] org.openqa.jetty.http.HttpServer - Added HttpContext[/wd,/wd] for host *
+15:05:29.485 DEBUG [10] org.openqa.jetty.util.Container - Starting org.openqa.jetty.jetty.Server@7d2a1e44
+15:05:29.486 INFO [10] org.openqa.jetty.http.HttpServer - Version Jetty/5.1.x
+15:05:29.487 DEBUG [10] org.openqa.jetty.http.HttpServer - LISTENERS: [SocketListener0@0.0.0.0:4444]
+15:05:29.487 DEBUG [10] org.openqa.jetty.http.HttpServer - HANDLER: {null={/selenium-server/driver/*=[HttpContext[/selenium-server/driver,/selenium-server/driver]], /selenium-server/*=[HttpContext[/selenium-server,/selenium-server]], /=[HttpContext[/,/]], /wd/*=[HttpContext[/wd,/wd]]}}
+15:05:29.488 DEBUG [10] org.openqa.jetty.util.Container - Starting HttpContext[/selenium-server/driver,/selenium-server/driver]
+15:05:29.488 DEBUG [10] org.openqa.jetty.http.HttpContext - Init classloader from null, sun.misc.Launcher$AppClassLoader@61ba34f2 for HttpContext[/selenium-server/driver,/selenium-server/driver]
+15:05:29.488 INFO [10] org.openqa.jetty.util.Container - Started HttpContext[/selenium-server/driver,/selenium-server/driver]
+15:05:29.488 DEBUG [10] org.openqa.jetty.util.Container - Starting HttpContext[/selenium-server,/selenium-server]
+15:05:29.489 DEBUG [10] org.openqa.jetty.http.HttpContext - Init classloader from null, sun.misc.Launcher$AppClassLoader@61ba34f2 for HttpContext[/selenium-server,/selenium-server]
+15:05:29.490 DEBUG [10] org.openqa.jetty.http.handler.AbstractHttpHandler - Started org.openqa.jetty.http.handler.SecurityHandler in HttpContext[/selenium-server,/selenium-server]
+15:05:29.490 DEBUG [10] org.openqa.jetty.http.handler.AbstractHttpHandler - Started org.openqa.selenium.server.StaticContentHandler in HttpContext[/selenium-server,/selenium-server]
+15:05:29.490 DEBUG [10] org.openqa.jetty.http.handler.AbstractHttpHandler - Started org.openqa.selenium.server.SessionExtensionJsHandler in HttpContext[/selenium-server,/selenium-server]
+15:05:29.490 DEBUG [10] org.openqa.jetty.http.handler.AbstractHttpHandler - Started org.openqa.selenium.server.htmlrunner.SingleTestSuiteResourceHandler in HttpContext[/selenium-server,/selenium-server]
+15:05:29.490 DEBUG [10] org.openqa.jetty.http.handler.AbstractHttpHandler - Started org.openqa.selenium.server.SeleniumDriverResourceHandler in HttpContext[/selenium-server,/selenium-server]
+15:05:29.490 INFO [10] org.openqa.jetty.util.Container - Started HttpContext[/selenium-server,/selenium-server]
+15:05:29.491 DEBUG [10] org.openqa.jetty.util.Container - Starting HttpContext[/,/]
+15:05:29.491 DEBUG [10] org.openqa.jetty.http.HttpContext - Init classloader from null, sun.misc.Launcher$AppClassLoader@61ba34f2 for HttpContext[/,/]
+15:05:29.491 DEBUG [10] org.openqa.jetty.http.handler.AbstractHttpHandler - Started org.openqa.selenium.server.ProxyHandler in HttpContext[/,/]
+15:05:29.491 INFO [10] org.openqa.jetty.util.Container - Started HttpContext[/,/]
+15:05:29.491 DEBUG [10] org.openqa.jetty.util.Container - Starting HttpContext[/wd,/wd]
+15:05:29.492 DEBUG [10] org.openqa.jetty.http.HttpContext - Init classloader from null, sun.misc.Launcher$AppClassLoader@61ba34f2 for HttpContext[/wd,/wd]
+15:05:29.492 DEBUG [10] org.openqa.jetty.util.Container - Starting org.openqa.jetty.jetty.servlet.ServletHandler@69198891
+15:05:29.492 DEBUG [10] org.openqa.jetty.jetty.servlet.AbstractSessionManager - New random session seed
+15:05:29.525 DEBUG [10] org.openqa.jetty.jetty.servlet.Holder - Started holder of class org.openqa.selenium.remote.server.DriverServlet
+15:05:29.526 INFO [10] org.openqa.jetty.util.Container - Started org.openqa.jetty.jetty.servlet.ServletHandler@69198891
+15:05:29.526 INFO [10] org.openqa.jetty.util.Container - Started HttpContext[/wd,/wd]
+15:05:29.529 DEBUG [11] org.openqa.jetty.jetty.servlet.AbstractSessionManager - Session scavenger period = 30s
+15:05:29.541 INFO [10] org.openqa.jetty.http.SocketListener - Started SocketListener on 0.0.0.0:4444
+15:05:29.542 INFO [10] org.openqa.jetty.util.Container - Started org.openqa.jetty.jetty.Server@7d2a1e44
+15:22:08.106 INFO [12] org.openqa.selenium.server.SeleniumServer - Shutting down...
