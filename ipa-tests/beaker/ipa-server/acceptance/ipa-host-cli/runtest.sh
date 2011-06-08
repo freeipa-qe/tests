@@ -104,19 +104,21 @@ rlJournalStart
 
     rlPhaseStartTest "ipa-host-cli-06: Modify host os"
         for item in $host1 $host3 $host5 ; do
-		attr="os"
+		attrToModify="os"
+		attrToVerify="Operating System"
                 value="Fedora 11"
-                rlRun "modifyHost $item $attr \"$value\"" 0 "Modifying host $item $attr."
-                rlRun "verifyHostAttr $item $attr \"$value\"" 0 "Verifying host $attr was modified."
+                rlRun "modifyHost $item $attrToModify \"$value\"" 0 "Modifying host $item $attr."
+                rlRun "verifyHostAttr $item $attrToVerify \"$value\"" 0 "Verifying host $attr was modified."
         done
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-host-cli-07: Modify host description"
         for item in $host1 $host3 $host5 ; do
-		attr="desc"
+		attrToModify="desc"
+		attrToVerify="Description"
                 value="interesting description"
-                rlRun "modifyHost $item $attr \"$value\"" 0 "Modifying host $item $attr."
-                rlRun "verifyHostAttr $item $attr \"$value\"" 0 "Verifying host $attr was modified."
+                rlRun "modifyHost $item $attrToModify \"$value\"" 0 "Modifying host $item $attr."
+                rlRun "verifyHostAttr $item $attrToVerify \"$value\"" 0 "Verifying host $attr was modified."
         done
     rlPhaseEnd
 
@@ -155,12 +157,14 @@ rlJournalStart
 
     rlPhaseStartTest "ipa-host-cli-11: Regression test for bug 499016"
 	for item in $host1 $host3 $host5 ; do
-        	attr="desc"
+		attrToModify="desc"
+		attrToVerify1="Description"
+                attrToVerify2="Operating System"
         	value="this is a very interesting description"
 		os="Fedora 11"
-        	rlRun "modifyHost $item $attr \"$value\"" 0 "Modifying host $item $attr."
-        	rlRun "verifyHostAttr $item $attr \"$value\"" 0 "Verifying host $attr was modified."
-		rlRun "verifyHostAttr $item os \"$os\"" 0 "Verifying host OS was not modified."
+        	rlRun "modifyHost $item $attrToModify \"$value\"" 0 "Modifying host $item $attr."
+        	rlRun "verifyHostAttr $item $attrToVerify1 \"$value\"" 0 "Verifying host $attr was modified."
+		rlRun "verifyHostAttr $item $attrToVerify2 \"$os\"" 0 "Verifying host OS was not modified."
 	done
     rlPhaseEnd
 
@@ -212,7 +216,7 @@ rlJournalStart
     rlPhaseStartTest "ipa-host-cli-18: setattr and addattr on nsHostLocation"
 	attr="nsHostLocation"
 	rlRun "setAttribute host $attr mars $host1" 0 "Setting attribute $attr to value of mars."
-	rlRun "verifyHostAttr $host1 location \"$value\"" 0 "Verifying host $attr was modified."
+	rlRun "verifyHostAttr $host1 Location \"$value\"" 0 "Verifying host $attr was modified."
 	# shouldn't be multivalue - additional add should fail
         command="ipa host-mod --addattr nsHostLocation=jupiter $host1"
 	expmsg="ipa: ERROR: nshostlocation: Only one value allowed."
@@ -231,8 +235,9 @@ rlJournalStart
 
     rlPhaseStartTest "ipa-host-cli-20: setattr and addattr on nsOsVersion"
         attr="nsOsVersion"
+        attrToVerify="Operating System"
         rlRun "setAttribute host $attr RHEL6 $host1" 0 "Setting attribute $attr to value of RHEL6."
-        rlRun "verifyHostAttr $host1 os RHEL6" 0 "Verifying host $attr was modified."
+        rlRun "verifyHostAttr $host1 attrToVerify RHEL6" 0 "Verifying host $attr was modified."
 	# shouldn't be multivalue - additional add should fail
         command="ipa host-mod --addattr nsOsVersion=RHEL5 $host1"
 	expmsg="ipa: ERROR: nsosversion: Only one value allowed."
@@ -258,7 +263,7 @@ rlJournalStart
     rlPhaseStartTest "ipa-host-cli-23: setattr and addattr on description"
         attr="description"
         rlRun "setAttribute host $attr new $host1" 0 "Setting attribute $attr to value of new."
-        rlRun "verifyHostAttr $host1 desc RHEL6" 0 "Verifying host $attr was modified."
+        rlRun "verifyHostAttr $host1 Description RHEL6" 0 "Verifying host $attr was modified."
         # shouldn't be multivalue - additional add should fail
         command="ipa host-mod --addattr description=newer $host1"
 	expmsg="ipa: ERROR: description: Only one value allowed."
