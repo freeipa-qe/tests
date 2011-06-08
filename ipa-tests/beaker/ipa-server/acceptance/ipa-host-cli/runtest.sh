@@ -237,7 +237,7 @@ rlJournalStart
         attr="nsOsVersion"
         attrToVerify="\"Operating system\""
         rlRun "setAttribute host $attr RHEL6 $host1" 0 "Setting attribute $attr to value of RHEL6."
-        rlRun "verifyHostAttr $host1 attrToVerify RHEL6" 0 "Verifying host $attr was modified."
+        rlRun "verifyHostAttr $host1 $attrToVerify RHEL6" 0 "Verifying host $attr was modified."
 	# shouldn't be multivalue - additional add should fail
         command="ipa host-mod --addattr nsOsVersion=RHEL5 $host1"
 	expmsg="ipa: ERROR: nsosversion: Only one value allowed."
