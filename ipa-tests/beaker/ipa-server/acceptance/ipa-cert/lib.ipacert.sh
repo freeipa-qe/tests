@@ -19,7 +19,7 @@ create_cert()
     local certPrivateKeyFile=$TmpDir/certprikey.$RANDOM.key
     local principal=$serviceName/$hostname
     rlLog "cert req [$certRequestFile]"
-    KinitAsAdmin
+    rlRun "KinitAsAdmin" 0 "kinit as admin"
     # step 1: create/add a host
     #        this should already done
     
@@ -46,7 +46,7 @@ create_cert()
         rlFail "create cert failed, principal [$principal]"
     fi
     rm $tmpout
-    Kcleanup
+    rlRun "Kcleanup" 0 "clear kerberos tkts"
 
     #debug 
     #echo "===================================="
@@ -118,7 +118,7 @@ create_cert_request_file()
   
 delete_cert()
 {
-    KinitAsAdmin
+    rlRun "KinitAsAdmin" 0 "kinit as admin"
     for cert in `cat $certList`
     do
         echo "line:[$cert]"
@@ -128,7 +128,7 @@ delete_cert()
         rlRun "ipa service-del $cert_principal" 0 "remove service $cert_principal"
     done
     echo "" > $certList #clear up the cert list file
-    Kcleanup
+    rlRun "Kcleanup" 0 "clear kerberos tkts"
 } #delete_cert
 
 qaRun()
