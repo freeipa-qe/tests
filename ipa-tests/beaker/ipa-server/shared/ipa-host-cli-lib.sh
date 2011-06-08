@@ -164,13 +164,7 @@ verifyHostAttr()
    attribute="$attribute:"
    tmpfile="/tmp/hostshow_$myhost.out"
 
-   rlLog "Value of myhost: $myhost"
-   rlLog "Value of attribute: $attribute"
-   rlLog "Value of value: $value"
-
    ipa host-show $myhost > $tmpfile
-   tempcat=`cat $tmpfile`
-   rlLog "Output of host-show command:  $tempcat"
 
    rc=$?
    if [ $rc -eq 0 ] ; then
