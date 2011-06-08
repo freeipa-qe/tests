@@ -105,7 +105,7 @@ rlJournalStart
     rlPhaseStartTest "ipa-host-cli-06: Modify host os"
         for item in $host1 $host3 $host5 ; do
 		attrToModify="os"
-		attrToVerify="Operating System"
+		attrToVerify="\"Operating system\""
                 value="Fedora 11"
                 rlRun "modifyHost $item $attrToModify \"$value\"" 0 "Modifying host $item $attr."
                 rlRun "verifyHostAttr $item $attrToVerify \"$value\"" 0 "Verifying host $attr was modified."
@@ -159,7 +159,7 @@ rlJournalStart
 	for item in $host1 $host3 $host5 ; do
 		attrToModify="desc"
 		attrToVerify1="Description"
-                attrToVerify2="Operating System"
+                attrToVerify2="\"Operating system\""
         	value="this is a very interesting description"
 		os="Fedora 11"
         	rlRun "modifyHost $item $attrToModify \"$value\"" 0 "Modifying host $item $attr."
@@ -216,7 +216,7 @@ rlJournalStart
     rlPhaseStartTest "ipa-host-cli-18: setattr and addattr on nsHostLocation"
 	attr="nsHostLocation"
 	rlRun "setAttribute host $attr mars $host1" 0 "Setting attribute $attr to value of mars."
-	rlRun "verifyHostAttr $host1 Location \"$value\"" 0 "Verifying host $attr was modified."
+	rlRun "verifyHostAttr $host1 Location mars" 0 "Verifying host $attr was modified."
 	# shouldn't be multivalue - additional add should fail
         command="ipa host-mod --addattr nsHostLocation=jupiter $host1"
 	expmsg="ipa: ERROR: nshostlocation: Only one value allowed."
@@ -235,7 +235,7 @@ rlJournalStart
 
     rlPhaseStartTest "ipa-host-cli-20: setattr and addattr on nsOsVersion"
         attr="nsOsVersion"
-        attrToVerify="Operating System"
+        attrToVerify="\"Operating system\""
         rlRun "setAttribute host $attr RHEL6 $host1" 0 "Setting attribute $attr to value of RHEL6."
         rlRun "verifyHostAttr $host1 attrToVerify RHEL6" 0 "Verifying host $attr was modified."
 	# shouldn't be multivalue - additional add should fail
@@ -263,7 +263,7 @@ rlJournalStart
     rlPhaseStartTest "ipa-host-cli-23: setattr and addattr on description"
         attr="description"
         rlRun "setAttribute host $attr new $host1" 0 "Setting attribute $attr to value of new."
-        rlRun "verifyHostAttr $host1 Description RHEL6" 0 "Verifying host $attr was modified."
+        rlRun "verifyHostAttr $host1 Description new" 0 "Verifying host $attr was modified."
         # shouldn't be multivalue - additional add should fail
         command="ipa host-mod --addattr description=newer $host1"
 	expmsg="ipa: ERROR: description: Only one value allowed."
