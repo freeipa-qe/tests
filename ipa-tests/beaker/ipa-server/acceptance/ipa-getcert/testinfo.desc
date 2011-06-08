@@ -4,7 +4,7 @@ TestVersion:     1.0
 Path:            /mnt/tests/CoreOS/ipa-server/acceptance/ipa-getcert
 Description:     IPA client tool ipa-getcert test
 Type:            Regression
-TestTime:        15m
+TestTime:        30m
 RunFor:          ipa-server
 Requires:        ipa-admintools
 Requires:        expect
