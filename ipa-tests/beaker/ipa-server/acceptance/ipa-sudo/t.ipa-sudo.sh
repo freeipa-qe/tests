@@ -28,7 +28,7 @@
 # sudorule-remove-runasgroup     Remove group for Sudo to execute as.
 # sudorule-remove-runasuser      Remove user for Sudo to execute as.
 # sudorule-remove-user           Remove users and groups affected by Sudo Rule.
-# sudorule-show                  Dispaly Sudo Rule.
+# sudorule-show                  Display Sudo Rule.
 #
 # sudocmdgroup-add            	 Create new sudo command group.
 # sudocmdgroup-add-member     	 Add members to sudo command group.
@@ -128,6 +128,8 @@ rlPhaseEnd
 sudo_001() {
 
 rlPhaseStartTest "sudo_001: ipa sudo help."
+        rlRun "TmpDir=\`mktemp -d\`" 0 "Creating tmp directory"
+        rlRun "pushd $TmpDir"
 
 	rlRun "ipa help sudo > $TmpDir/sudo_001.txt 2>&1"
 	rlAssertGrep "sudorule      Sudo (su \"do\") allows a system administrator to delegate authority to" "$TmpDir/sudo_001.txt"
@@ -555,7 +557,7 @@ rlPhaseStartTest "sudorule_001: ipa sudorule help."
 	rlAssertGrep "sudorule-remove-runasgroup     Remove group for Sudo to execute as." "$TmpDir/sudorule_001.txt"
 	rlAssertGrep "sudorule-remove-runasuser      Remove user for Sudo to execute as." "$TmpDir/sudorule_001.txt"
 	rlAssertGrep "sudorule-remove-user           Remove users and groups affected by Sudo Rule." "$TmpDir/sudorule_001.txt"
-	rlAssertGrep "sudorule-show                  Dispaly Sudo Rule." "$TmpDir/sudorule_001.txt"
+	rlAssertGrep "sudorule-show                  Display Sudo Rule." "$TmpDir/sudorule_001.txt"
 	rlAssertGrep "uid=sudo,cn=sysaccounts,cn=etc,dc=example,dc=com" "$TmpDir/sudorule_001.txt"
 	rlAssertGrep "LDAPTLS_CACERT=/etc/ipa/ca.crt /usr/bin/ldappasswd -S -W -h ipa.example.com -ZZ -D \"cn=Directory Manager\" uid=sudo,cn=sysaccounts,cn=etc,dc=example,dc=com" "$TmpDir/sudorule_001.txt"
 	rlRun "cat $TmpDir/sudo_002.txt"
@@ -568,31 +570,938 @@ sudorule_add_001() {
 rlPhaseStartTest "sudorule_add_001: Add new sudo rule."
 
 	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user" 
-	rlRun "ipa sudorule-add testrule1 > $TmpDir/sudorule_add_001.txt 2>&1"
-	rlAssertGrep "Added sudo rule \"testrule1\"" "$TmpDir/sudorule_add_001.txt"
-	rlAssertGrep "Rule name: testrule1" "$TmpDir/sudorule_add_001.txt"
+	rlRun "ipa sudorule-add sudorule1 > $TmpDir/sudorule_add_001.txt 2>&1"
+	rlAssertGrep "Added sudo rule \"sudorule1\"" "$TmpDir/sudorule_add_001.txt"
+	rlAssertGrep "Rule name: sudorule1" "$TmpDir/sudorule_add_001.txt"
 	rlAssertGrep "Enabled: TRUE" "$TmpDir/sudorule_add_001.txt"
 	rlRun "cat $TmpDir/sudorule_add_001.txt"
-	rlRun "/usr/bin/ldapsearch -x -h localhost -D \"cn=Directory Manager\" -w Secret123 -b cn=testrule1,ou=sudoers,$BASE > $TmpDir/sudorule_add_001.txt 2>&1"
-	rlAssertGrep "dn: cn=testrule1,ou=sudoers,$BASE" "$TmpDir/sudorule_add_001.txt"
+	rlRun "/usr/bin/ldapsearch -x -h localhost -D \"cn=Directory Manager\" -w Secret123 -b cn=sudorule1,ou=sudoers,$BASE > $TmpDir/sudorule_add_001.txt 2>&1"
+	rlAssertGrep "dn: cn=sudorule1,ou=sudoers,$BASE" "$TmpDir/sudorule_add_001.txt"
 	rlAssertGrep "objectClass: sudoRole" "$TmpDir/sudorule_add_001.txt"
-	rlAssertGrep "cn: testrule1" "$TmpDir/sudorule_add_001.txt"
+	rlAssertGrep "cn: sudorule1" "$TmpDir/sudorule_add_001.txt"
 	rlRun "cat $TmpDir/sudorule_add_001.txt"
+	rlRun "ipa sudorule-del sudorule1"
 
 rlPhaseEnd
 }
+
+
+sudorule_add_002() {
+
+
+rlPhaseStartTest "sudorule_add_002: ipa sudorule-add  sudorule"
+
+	rlRun "ipa sudorule-add  sudorule1 > $TmpDir/sudorule_add_002.txt 2>&1"
+	rlAssertGrep "Added sudo rule \"sudorule1\"" "$TmpDir/sudorule_add_002.txt"
+	rlAssertGrep "Rule name: sudorule1" "$TmpDir/sudorule_add_002.txt"
+	rlAssertGrep "Enabled: TRUE" "$TmpDir/sudorule_add_002.txt"
+	rlRun "cat $TmpDir/sudorule_add_002.txt"
+	rlRun "ipa sudorule-del sudorule1"
+
+rlPhaseEnd
+}
+
+sudorule_add_003() {
+
+rlPhaseStartTest "sudorule_add_003: ipa  sudorule-add --desc=desc sudorule"
+
+	rlRun "ipa sudorule-add --desc=\"sudo rule 1\" sudorule1 > $TmpDir/sudorule_add_003.txt 2>&1"
+        rlAssertGrep "Added sudo rule \"sudorule1\"" "$TmpDir/sudorule_add_003.txt"
+	rlAssertGrep "Rule name: sudorule1" "$TmpDir/sudorule_add_003.txt"
+        rlAssertGrep "Description: sudo rule 1" "$TmpDir/sudorule_add_003.txt"
+        rlAssertGrep "Enabled: TRUE" "$TmpDir/sudorule_add_003.txt"
+	rlRun "cat $TmpDir/sudorule_add_003.txt"
+	rlRun "ipa sudorule-del sudorule1"
+
+rlPhaseEnd
+}
+
+sudorule_add_004() {
+
+rlPhaseStartTest "sudorule_add_004: ipa sudorule-add sudorule1 --desc=desc --usercat"
+
+	rlRun "ipa sudorule-add sudorule1 --desc=\"sudo rule 1\" --usercat=all > $TmpDir/sudorule_add_004.txt 2>&1"
+	rlAssertGrep "Added sudo rule \"sudorule1\"" "$TmpDir/sudorule_add_004.txt"
+	rlAssertGrep "Rule name: sudorule1" "$TmpDir/sudorule_add_004.txt"
+	rlAssertGrep "Description: sudo rule 1" "$TmpDir/sudorule_add_004.txt"
+	rlAssertGrep "Enabled: TRUE" "$TmpDir/sudorule_add_004.txt"
+	rlAssertGrep "User category: all" "$TmpDir/sudorule_add_004.txt"
+	rlRun "cat $TmpDir/sudorule_add_004.txt"
+	rlRun "ipa sudorule-del sudorule1"
+
+rlPhaseEnd
+}
+
+sudorule_add_005() {
+
+rlPhaseStartTest "sudorule_add_005: ipa sudorule-add sudorule1 --desc=desc --usercat --hostcat"
+
+	rlRun "ipa sudorule-add sudorule1 --desc=\"sudo rule 1\" --usercat=all --hostcat=all > $TmpDir/sudorule_add_005.txt 2>&1"
+        rlAssertGrep "Added sudo rule \"sudorule1\"" "$TmpDir/sudorule_add_005.txt"
+        rlAssertGrep "Rule name: sudorule1" "$TmpDir/sudorule_add_005.txt"
+        rlAssertGrep "Description: sudo rule 1" "$TmpDir/sudorule_add_005.txt"
+        rlAssertGrep "Enabled: TRUE" "$TmpDir/sudorule_add_005.txt"
+        rlAssertGrep "User category: all" "$TmpDir/sudorule_add_005.txt"
+        rlAssertGrep "Host category: all" "$TmpDir/sudorule_add_005.txt"
+	rlRun "cat $TmpDir/sudorule_add_005.txt"
+        rlRun "ipa sudorule-del sudorule1"
+
+rlPhaseEnd
+}
+
+
+sudorule_add_006() {
+
+rlPhaseStartTest "sudorule_add_006: ipa sudorule-add sudorule1 --desc=desc --usercat --hostcat --cmdcat"
+
+	rlRun "ipa sudorule-add sudorule1 --desc=\"sudo rule 1\" --usercat=all --hostcat=all --cmdcat=all > $TmpDir/sudorule_add_006.txt 2>&1"
+        rlAssertGrep "Added sudo rule \"sudorule1\"" "$TmpDir/sudorule_add_006.txt"
+        rlAssertGrep "Rule name: sudorule1" "$TmpDir/sudorule_add_006.txt"
+        rlAssertGrep "Description: sudo rule 1" "$TmpDir/sudorule_add_006.txt"
+        rlAssertGrep "Enabled: TRUE" "$TmpDir/sudorule_add_006.txt"
+        rlAssertGrep "User category: all" "$TmpDir/sudorule_add_006.txt"
+        rlAssertGrep "Host category: all" "$TmpDir/sudorule_add_006.txt"
+        rlAssertGrep "Command category: all" "$TmpDir/sudorule_add_006.txt"
+	rlRun "cat $TmpDir/sudorule_add_006.txt"
+        rlRun "ipa sudorule-del sudorule1"
+
+rlPhaseEnd
+}
+
+sudorule_add_007() {
+
+rlPhaseStartTest "sudorule_add_007: ipa sudorule-add sudorule1 --desc=desc --usercat --hostcat --cmdcat --runasusercat"
+
+        rlRun "ipa sudorule-add sudorule1 --desc=\"sudo rule 1\" --usercat=all --hostcat=all --cmdcat=all --runasusercat=all > $TmpDir/sudorule_add_007.txt 2>&1"
+        rlAssertGrep "Added sudo rule \"sudorule1\"" "$TmpDir/sudorule_add_007.txt"
+        rlAssertGrep "Rule name: sudorule1" "$TmpDir/sudorule_add_007.txt"
+        rlAssertGrep "Description: sudo rule 1" "$TmpDir/sudorule_add_007.txt"
+        rlAssertGrep "Enabled: TRUE" "$TmpDir/sudorule_add_007.txt"
+        rlAssertGrep "User category: all" "$TmpDir/sudorule_add_007.txt"
+        rlAssertGrep "Host category: all" "$TmpDir/sudorule_add_007.txt"
+        rlAssertGrep "Command category: all" "$TmpDir/sudorule_add_007.txt"
+        rlAssertGrep "Run As User category: all" "$TmpDir/sudorule_add_007.txt"
+        rlRun "cat $TmpDir/sudorule_add_007.txt"
+        rlRun "ipa sudorule-del sudorule1"
+
+rlPhaseEnd
+}
+
+sudorule_add_008() {
+
+rlPhaseStartTest "sudorule_add_008: ipa sudorule-add sudorule1 --desc=desc --usercat --hostcat --cmdcat --runasusercat --externaluser"
+
+        rlRun "ipa sudorule-add sudorule1 --desc=\"sudo rule 1\" --usercat=all --hostcat=all --cmdcat=all --runasusercat=all --externaluser=all > $TmpDir/sudorule_add_008.txt 2>&1"
+        rlAssertGrep "Added sudo rule \"sudorule1\"" "$TmpDir/sudorule_add_008.txt"
+        rlAssertGrep "Rule name: sudorule1" "$TmpDir/sudorule_add_008.txt"
+        rlAssertGrep "Description: sudo rule 1" "$TmpDir/sudorule_add_008.txt"
+        rlAssertGrep "Enabled: TRUE" "$TmpDir/sudorule_add_008.txt"
+        rlAssertGrep "User category: all" "$TmpDir/sudorule_add_008.txt"
+        rlAssertGrep "Host category: all" "$TmpDir/sudorule_add_008.txt"
+        rlAssertGrep "Command category: all" "$TmpDir/sudorule_add_008.txt"
+        rlAssertGrep "Run As User category: all" "$TmpDir/sudorule_add_008.txt"
+        rlAssertGrep "External User: all" "$TmpDir/sudorule_add_008.txt"
+        rlRun "cat $TmpDir/sudorule_add_008.txt"
+        rlRun "ipa sudorule-del sudorule1"
+
+rlPhaseEnd
+}
+
+sudorule_add_009() {
+
+rlPhaseStartTest "sudorule_add_009: ipa sudorule-add sudorule1 --desc=desc --usercat --hostcat --cmdcat --runasusercat --externaluser --all --raw"
+
+	rlRun "ipa sudorule-add sudorule1 --desc=\"sudo rule 1\" --usercat=all --hostcat=all --cmdcat=all --runasusercat=all --externaluser=all --all --raw > $TmpDir/sudorule_add_009.txt 2>&1"
+        rlAssertGrep "Added sudo rule \"sudorule1\"" "$TmpDir/sudorule_add_009.txt"
+        rlAssertGrep "dn: ipauniqueid=" "$TmpDir/sudorule_add_009.txt"
+        rlAssertGrep "cn: sudorule1" "$TmpDir/sudorule_add_009.txt"
+        rlAssertGrep "description: sudo rule 1" "$TmpDir/sudorule_add_009.txt"
+        rlAssertGrep "ipaenabledflag: TRUE" "$TmpDir/sudorule_add_009.txt"
+        rlAssertGrep "usercategory: all" "$TmpDir/sudorule_add_009.txt"
+        rlAssertGrep "hostcategory: all" "$TmpDir/sudorule_add_009.txt"
+        rlAssertGrep "cmdcategory: all" "$TmpDir/sudorule_add_009.txt"
+        rlAssertGrep "ipasudorunasusercategory: all" "$TmpDir/sudorule_add_009.txt"
+        rlAssertGrep "externaluser: all" "$TmpDir/sudorule_add_009.txt"
+        rlAssertGrep "objectclass: ipaassociation" "$TmpDir/sudorule_add_009.txt"
+        rlAssertGrep "objectclass: ipasudorule" "$TmpDir/sudorule_add_009.txt"
+        rlRun "cat $TmpDir/sudorule_add_009.txt"
+
+rlPhaseEnd
+}
+
+
+sudorule-add-allow-command_001() {
+
+rlPhaseStartTest "sudorule-add-allow-command_001: ipa sudorule-add-allow-command sudorule1 --sudocmds --sudocmdgroups"
+
+	# Adding sudo commands for further tests.
+	rlRun "ipa sudocmd-add /bin/ls"
+	rlRun "ipa sudocmd-add /bin/df"
+	rlRun "ipa sudocmdgroup-add sudogrp1 --desc=\"group 1\""
+	rlRun "ipa sudocmdgroup-add sudogrp2 --desc=\"group 2\""
+
+	rlRun "ipa sudorule-add-allow-command sudorule1 --sudocmds=/bin/ls --sudocmdgroups=sudogrp1 > $TmpDir/sudorule-add-allow-command_001.txt 2>&1"
+	rlAssertGrep "Rule name: sudorule1" "$TmpDir/sudorule-add-allow-command_001.txt"
+	rlAssertGrep "Enabled: TRUE" "$TmpDir/sudorule-add-allow-command_001.txt"
+	rlAssertGrep "Sudo Allow Commands: /bin/ls" "$TmpDir/sudorule-add-allow-command_001.txt"
+	rlAssertGrep "Sudo Command Groups: sudogrp1" "$TmpDir/sudorule-add-allow-command_001.txt"
+	rlAssertGrep "Number of members added 2" "$TmpDir/sudorule-add-allow-command_001.txt"
+	rlRun "cat $TmpDir/sudorule-add-allow-command_001.txt"
+
+rlPhaseEnd
+}
+
+sudorule-remove-allow-command_001() {
+
+rlPhaseStartTest "sudorule-remove-allow-command_001: ipa sudorule-remove-allow-command sudorule1 --sudocmds --sudocmdgroups"
+
+        rlRun "ipa sudorule-remove-allow-command sudorule1 --sudocmds=/bin/ls --sudocmdgroups=sudogrp1 > $TmpDir/sudorule-remove-allow-command_001.txt 2>&1"
+        rlAssertGrep "Rule name: sudorule1" "$TmpDir/sudorule-remove-allow-command_001.txt"
+        rlAssertGrep "Enabled: TRUE" "$TmpDir/sudorule-remove-allow-command_001.txt"
+        rlAssertGrep "Number of members removed 2" "$TmpDir/sudorule-remove-allow-command_001.txt"
+        rlRun "cat $TmpDir/sudorule-remove-allow-command_001.txt"
+
+rlPhaseEnd
+}
+
+
+sudorule-add-allow-command_002() {
+
+rlPhaseStartTest "sudorule-add-allow-command_002: ipa sudorule-add-allow-command sudorule1 --sudocmds=multiple-commands --sudocmdgroups=multiple-groups"
+
+	rlRun "ipa sudorule-add-allow-command sudorule1 --sudocmds=/bin/ls,/bin/df --sudocmdgroups=sudogrp1,sudogrp2 > $TmpDir/sudorule-add-allow-command_002.txt 2>&1"
+        rlAssertGrep "Rule name: sudorule1" "$TmpDir/sudorule-add-allow-command_002.txt"
+        rlAssertGrep "Enabled: TRUE" "$TmpDir/sudorule-add-allow-command_002.txt"
+        rlAssertGrep "Sudo Allow Commands: /bin/ls, /bin/df" "$TmpDir/sudorule-add-allow-command_002.txt"
+	rlAssertGrep "Sudo Command Groups: sudogrp1, sudogrp2" "$TmpDir/sudorule-add-allow-command_002.txt"
+        rlAssertGrep "Number of members added 4" "$TmpDir/sudorule-add-allow-command_002.txt"
+        rlRun "cat $TmpDir/sudorule-add-allow-command_002.txt"
+
+rlPhaseEnd
+}
+
+
+sudorule-remove-allow-command_002() {
+
+rlPhaseStartTest "sudorule-remove-allow-command_002: ipa sudorule-remove-allow-command sudorule1 --sudocmds=multiple-commands --sudocmdgroups=multiple-groups"
+
+        rlRun "ipa sudorule-remove-allow-command sudorule1 --sudocmds=/bin/ls,/bin/df --sudocmdgroups=sudogrp1,sudogrp2 > $TmpDir/sudorule-remove-allow-command_002.txt 2>&1"
+        rlAssertGrep "Rule name: sudorule1" "$TmpDir/sudorule-remove-allow-command_002.txt"
+        rlAssertGrep "Enabled: TRUE" "$TmpDir/sudorule-remove-allow-command_002.txt"
+        rlAssertGrep "Number of members removed 4" "$TmpDir/sudorule-remove-allow-command_002.txt"
+        rlRun "cat $TmpDir/sudorule-remove-allow-command_002.txt"
+
+	rlRun "ipa sudorule-del sudorule1"
+	rlRun "ipa sudocmd-del /bin/ls"
+	rlRun "ipa sudocmd-del /bin/df"
+	rlRun "ipa sudocmdgroup-del sudogrp1"
+	rlRun "ipa sudocmdgroup-del sudogrp2"
+rlPhaseEnd
+}
+
+
+sudorule-add-allow-command_003() {
+
+rlPhaseStartTest "sudorule-add-allow-command_003: ipa help sudorule-add-allow-command"
+
+	rlRun "ipa help sudorule-add-allow-command > $TmpDir/sudorule-add-allow-command_003.txt 2>&1"
+	rlAssertGrep "Purpose: Add commands and sudo command groups affected by Sudo Rule." "$TmpDir/sudorule-add-allow-command_003.txt"
+	rlAssertGrep "Usage: ipa \[global-options\] sudorule-add-allow-command SUDORULE-NAME \[options\]" "$TmpDir/sudorule-add-allow-command_003.txt"
+	rlAssertGrep "\-h, \--help            show this help message and exit" "$TmpDir/sudorule-add-allow-command_003.txt"
+	rlAssertGrep "\--all                 Retrieve and print all attributes from the server." "$TmpDir/sudorule-add-allow-command_003.txt"
+	rlAssertGrep "\--raw                 Print entries as stored on the server." "$TmpDir/sudorule-add-allow-command_003.txt"
+	rlAssertGrep "\--sudocmds=LIST       comma-separated list of sudocmds to add" "$TmpDir/sudorule-add-allow-command_003.txt"
+	rlAssertGrep "\--sudocmdgroups=LIST  comma-separated list of sudocmdgroups to add" "$TmpDir/sudorule-add-allow-command_003.txt"
+	rlRun "cat $TmpDir/sudorule-add-allow-command_003.txt"
+
+rlPhaseEnd
+}
+
+sudorule-remove-allow-command_003() {
+
+rlPhaseStartTest "sudorule-remove-allow-command_003: ipa help sudorule-remove-allow-command"
+
+        rlRun "ipa help sudorule-remove-allow-command > $TmpDir/sudorule-remove-allow-command_003.txt 2>&1"
+        rlAssertGrep "Purpose: Remove commands and sudo command groups affected by Sudo Rule." "$TmpDir/sudorule-remove-allow-command_003.txt"
+        rlAssertGrep "Usage: ipa \[global-options\] sudorule-remove-allow-command SUDORULE-NAME \[options\]" "$TmpDir/sudorule-remove-allow-command_003.txt"
+        rlAssertGrep "\-h, \--help            show this help message and exit" "$TmpDir/sudorule-remove-allow-command_003.txt"
+        rlAssertGrep "\--all                 Retrieve and print all attributes from the server." "$TmpDir/sudorule-remove-allow-command_003.txt"
+        rlAssertGrep "\--raw                 Print entries as stored on the server." "$TmpDir/sudorule-remove-allow-command_003.txt"
+        rlAssertGrep "\--sudocmds=LIST       comma-separated list of sudocmds to remove" "$TmpDir/sudorule-remove-allow-command_003.txt"
+        rlAssertGrep "\--sudocmdgroups=LIST  comma-separated list of sudocmdgroups to remove" "$TmpDir/sudorule-remove-allow-command_003.txt"
+        rlRun "cat $TmpDir/sudorule-add-allow-command_003.txt"
+
+rlPhaseEnd
+}
+
+
+sudorule-add-host_001() {
+
+rlPhaseStartTest "sudorule-add-host_001: Add host help to sudorule."
+
+	rlRun "ipa help sudorule-add-host > $TmpDir/sudorule-add-host_001.txt 2>&1"
+	rlAssertGrep "Purpose: Add hosts and hostgroups affected by Sudo Rule." "$TmpDir/sudorule-add-host_001.txt"
+	rlAssertGrep "Usage: ipa \[global-options\] sudorule-add-host SUDORULE-NAME \[options\]" "$TmpDir/sudorule-add-host_001.txt"
+	rlAssertGrep "\-h, \--help         show this help message and exit" "$TmpDir/sudorule-add-host_001.txt"
+	rlAssertGrep "\--all              Retrieve and print all attributes from the server." "$TmpDir/sudorule-add-host_001.txt"
+	rlAssertGrep "\--raw              Print entries as stored on the server." "$TmpDir/sudorule-add-host_001.txt"
+	rlAssertGrep "\--hosts=LIST       comma-separated list of hosts to add" "$TmpDir/sudorule-add-host_001.txt"
+	rlAssertGrep "\--hostgroups=LIST  comma-separated list of hostgroups to add" "$TmpDir/sudorule-add-host_001.txt"
+	rlRun "cat $TmpDir/sudorule-add-host_001.txt"
+
+rlPhaseEnd
+}
+
+sudorule-add-host_002() {
+
+rlPhaseStartTest "sudorule-add-host_002: Add host to sudorule."
+
+	rlRun "ipa sudorule-add sudorule1"
+
+	rlRun "ipa sudorule-add-host sudorule1 --hosts=test1.example.com > $TmpDir/sudorule-add-host_002.txt 2>&1"
+	rlAssertGrep "Rule name: sudorule1" "$TmpDir/sudorule-add-host_002.txt"
+	rlAssertGrep "Enabled: TRUE" "$TmpDir/sudorule-add-host_002.txt"
+	rlAssertGrep "External host: test1.example.com" "$TmpDir/sudorule-add-host_002.txt"
+	rlAssertGrep "Number of members added 1" "$TmpDir/sudorule-add-host_002.txt"
+	rlRun "cat $TmpDir/sudorule-add-host_002.txt"
+
+rlPhaseEnd
+}
+
+
+sudorule-add-host_003() {
+
+rlPhaseStartTest "sudorule-add-host_003: Add muliple hosts to sudorule."
+
+        rlRun "ipa sudorule-add-host sudorule1 --hosts=test2.example.com,test3.example2.com > $TmpDir/sudorule-add-host_003.txt 2>&1"
+        rlAssertGrep "Rule name: sudorule1" "$TmpDir/sudorule-add-host_003.txt"
+        rlAssertGrep "Enabled: TRUE" "$TmpDir/sudorule-add-host_003.txt"
+        rlAssertGrep "External host: test1.example.com, test2.example.com, test3.example2.com" "$TmpDir/sudorule-add-host_003.txt"
+        rlAssertGrep "Number of members added 2" "$TmpDir/sudorule-add-host_003.txt"
+        rlRun "cat $TmpDir/sudorule-add-host_003.txt"
+
+rlPhaseEnd
+}
+
+sudorule-add-host_004() {
+
+rlPhaseStartTest "sudorule-add-host_004: Add hostgroup to sudorule."
+
+	rlRun "ipa hostgroup-add hostgroup1 --desc=\"hostgroup 1\""
+	rlRun "ipa hostgroup-add hostgroup2 --desc=\"hostgroup 2\""
+	rlRun "ipa hostgroup-add hostgroup3 --desc=\"hostgroup 3\""
+	rlRun "ipa hostgroup-add hostgroup4 --desc=\"hostgroup 4\""
+	rlRun "ipa hostgroup-add hostgroup5 --desc=\"hostgroup 5\""
+
+	rlRun "ipa sudorule-add-host sudorule1 --hostgroups=hostgroup1  > $TmpDir/sudorule-add-host_004.txt 2>&1"
+        rlAssertGrep "Rule name: sudorule1" "$TmpDir/sudorule-add-host_004.txt"
+        rlAssertGrep "Enabled: TRUE" "$TmpDir/sudorule-add-host_004.txt"
+        rlAssertGrep "Host Groups: hostgroup1" "$TmpDir/sudorule-add-host_004.txt"
+        rlAssertGrep "Number of members added 1" "$TmpDir/sudorule-add-host_004.txt"
+        rlRun "cat $TmpDir/sudorule-add-host_004.txt"
+
+rlPhaseEnd
+}
+
+
+sudorule-add-host_005() {
+
+rlPhaseStartTest "sudorule-add-host_005: Add multiple hostgroups to sudorule."
+
+	rlRun "ipa sudorule-add-host sudorule1 --hostgroups=hostgroup2,hostgroup3 > $TmpDir/sudorule-add-host_005.txt 2>&1"
+	rlAssertGrep "Rule name: sudorule1" "$TmpDir/sudorule-add-host_005.txt"
+	rlAssertGrep "Enabled: TRUE" "$TmpDir/sudorule-add-host_005.txt"
+	rlAssertGrep "Host Groups: hostgroup1, hostgroup2, hostgroup3" "$TmpDir/sudorule-add-host_005.txt"
+	rlAssertGrep "Number of members added 2" "$TmpDir/sudorule-add-host_005.txt"
+	rlRun "cat $TmpDir/sudorule-add-host_005.txt"
+
+rlPhaseEnd
+}
+
+sudorule-add-host_006() {
+
+rlPhaseStartTest "sudorule-add-host_006: Add both host and hostgroup to sudorule."
+
+	rlRun "ipa sudorule-add-host sudorule1 --hosts=test4.example.com,test5.example --hostgroups=hostgroup4,hostgroup5 > $TmpDir/sudorule-add-host_006.txt 2>&1"
+	rlAssertGrep "Rule name: sudorule1" "$TmpDir/sudorule-add-host_006.txt"
+	rlAssertGrep "Enabled: TRUE" "$TmpDir/sudorule-add-host_006.txt"
+	rlAssertGrep "Host Groups: hostgroup1, hostgroup2, hostgroup3, hostgroup4, hostgroup5" "$TmpDir/sudorule-add-host_006.txt"
+	rlAssertGrep "External host: test1.example.com, test2.example.com, test3.example2.com, test4.example.com, test5.example" "$TmpDir/sudorule-add-host_006.txt"
+	rlAssertGrep "Number of members added 4" "$TmpDir/sudorule-add-host_006.txt"
+	rlRun "cat $TmpDir/sudorule-add-host_006.txt"
+
+rlPhaseEnd
+}
+
+sudorule-remove-host_001() {
+
+rlPhaseStartTest "sudorule-remove-host_001: Remove host help to sudorule."
+
+	rlRun "ipa help sudorule-remove-host > $TmpDir/sudorule-remove-host_001.txt 2>&1"
+	rlAssertGrep "Purpose: Remove hosts and hostgroups affected by Sudo Rule." "$TmpDir/sudorule-remove-host_001.txt"
+	rlAssertGrep "Usage: ipa \[global-options\] sudorule-remove-host SUDORULE-NAME \[options\]" "$TmpDir/sudorule-remove-host_001.txt"
+	rlAssertGrep "\-h, \--help         show this help message and exit" "$TmpDir/sudorule-remove-host_001.txt"
+	rlAssertGrep "\--all              Retrieve and print all attributes from the server." "$TmpDir/sudorule-remove-host_001.txt"
+	rlAssertGrep "\--raw              Print entries as stored on the server." "$TmpDir/sudorule-remove-host_001.txt"
+	rlAssertGrep "\--hosts=LIST       comma-separated list of hosts to remove" "$TmpDir/sudorule-remove-host_001.txt"
+	rlAssertGrep "\--hostgroups=LIST  comma-separated list of hostgroups to remove" "$TmpDir/sudorule-remove-host_001.txt"
+	rlRun "cat $TmpDir/sudorule-remove-host_001.txt"
+
+rlPhaseEnd
+}
+
+
+sudorule-remove-host_002() {
+
+rlPhaseStartTest "sudorule-remove-host_002: Remove host from sudorule."
+
+	rlRun "ipa sudorule-remove-host sudorule1 --hosts=test1.example.com > $TmpDir/sudorule-remove-host_002.txt 2>&1"
+	rlAssertGrep "Rule name: sudorule1" "$TmpDir/sudorule-remove-host_002.txt"
+	rlAssertGrep "Enabled: TRUE" "$TmpDir/sudorule-remove-host_002.txt"
+	rlLog "Verifying https://bugzilla.redhat.com/show_bug.cgi?id=709645"
+	rlAssertGrep "External Host: test2.example.com, test3.example2.com" "$TmpDir/sudorule-remove-host_002.txt"
+	rlAssertGrep "Host Groups: hostgroup1, hostgroup2, hostgroup3" "$TmpDir/sudorule-remove-host_002.txt"
+	rlAssertGrep "Number of members removed 1" "$TmpDir/sudorule-remove-host_002.txt"
+	rlRun "cat $TmpDir/sudorule-remove-host_002.txt"
+
+rlPhaseEnd
+}
+
+sudorule-remove-host_003() {
+
+rlPhaseStartTest "sudorule-remove-host_003: Remove multiple hosts from sudorule."
+
+	rlRun "ipa sudorule-remove-host sudorule1 --hosts=test2.example.com,test3.example2.com --all > $TmpDir/sudorule-remove-host_003.txt 2>&1"
+	rlAssertGrep "Rule name: sudorule1" "$TmpDir/sudorule-remove-host_003.txt"
+	rlAssertGrep "Enabled: TRUE" "$TmpDir/sudorule-remove-host_003.txt"
+	rlLog "Verifying https://bugzilla.redhat.com/show_bug.cgi?id=709665"
+	rlAssertGrep "External Host: test2.example.com, test3.example2.com" 1 "$TmpDir/sudorule-remove-host_003.txt"
+	rlAssertGrep "Host Groups: hostgroup1, hostgroup2, hostgroup3" "$TmpDir/sudorule-remove-host_003.txt"
+	rlAssertGrep "Number of members removed 2" "$TmpDir/sudorule-remove-host_003.txt"
+	rlRun "cat $TmpDir/sudorule-remove-host_003.txt"
+
+rlPhaseEnd
+}
+
+
+sudorule-remove-host_004() {
+
+rlPhaseStartTest "sudorule-remove-host_004: Remove hostgroup from sudorule."
+
+	rlRun "ipa sudorule-remove-host sudorule1 --hostgroup=hostgroup1 > $TmpDir/sudorule-remove-host_004.txt 2>&1"
+        rlAssertGrep "Rule name: sudorule1" "$TmpDir/sudorule-remove-host_004.txt"
+        rlAssertGrep "Enabled: TRUE" "$TmpDir/sudorule-remove-host_004.txt"
+        rlAssertGrep "Host Groups: hostgroup2, hostgroup3" "$TmpDir/sudorule-remove-host_004.txt"
+        rlAssertGrep "Number of members removed 1" "$TmpDir/sudorule-remove-host_004.txt"
+        rlRun "cat $TmpDir/sudorule-remove-host_004.txt"
+
+rlPhaseEnd
+}
+
+
+sudorule-remove-host_005() {
+
+rlPhaseStartTest "sudorule-remove-host_005: Remove multiple hostgroup from sudorule."
+
+	rlRun "ipa sudorule-remove-host sudorule1 --hostgroup=hostgroup2,hostgroup3 > $TmpDir/sudorule-remove-host_005.txt 2>&1"
+        rlAssertGrep "Rule name: sudorule1" "$TmpDir/sudorule-remove-host_005.txt"
+        rlAssertGrep "Enabled: TRUE" "$TmpDir/sudorule-remove-host_005.txt"
+	rlAssertGrep "Number of members removed 2" "$TmpDir/sudorule-remove-host_005.txt"
+
+rlPhaseEnd
+}
+
+sudorule-remove-host_006() {
+
+rlPhaseStartTest "sudorule-remove-host_006: Remove both host and hostgroup from sudorule."
+
+        rlRun "ipa sudorule-remove-host sudorule1 --hosts=test4.example.com,test5.example --hostgroups=hostgroup4,hostgroup5 > $TmpDir/sudorule-remove-host_006.txt 2>&1"
+        rlAssertGrep "Rule name: sudorule1" "$TmpDir/sudorule-remove-host_006.txt"
+        rlAssertGrep "Enabled: TRUE" "$TmpDir/sudorule-remove-host_006.txt"
+        rlAssertGrep "Number of members removed 4" "$TmpDir/sudorule-remove-host_006.txt"
+        rlRun "cat $TmpDir/sudorule-add-host_006.txt"
+
+	rlRun "ipa hostgroup-del hostgroup1"
+	rlRun "ipa hostgroup-del hostgroup2"
+	rlRun "ipa hostgroup-del hostgroup3"
+	rlRun "ipa hostgroup-del hostgroup4"
+	rlRun "ipa hostgroup-del hostgroup5"
+
+rlPhaseEnd
+}
+
+
+sudorule_enable_flag_001() {
+
+
+rlPhaseStartTest "sudorule_enable_flag_001: ipa sudorule-disable sudorulename"
+
+	rlRun "ipa sudorule-add sudorule5"
+
+	rlRun "ipa sudorule-disable sudorule5 > $TmpDir/sudorule_enable_flag_001.txt 2>&1"
+	rlAssertGrep "Disabled Sudo rule \"sudorule5\"." "$TmpDir/sudorule_enable_flag_001.txt"
+	rlRun "cat $TmpDir/sudorule_enable_flag_001.txt"
+	rlRun "ipa sudorule-find sudorule5 --all --raw > $TmpDir/sudorule_enable_flag_001.txt"
+	rlAssertGrep "ipaenabledflag: FALSE" "$TmpDir/sudorule_enable_flag_001.txt"
+	rlRun "cat $TmpDir/sudorule_enable_flag_001.txt"
+
+rlPhaseEnd
+}
+
+
+sudorule_enable_flag_002() {
+
+rlPhaseStartTest "sudorule_enable_flag_002: ipa sudorule-enable sudorulename"
+
+	rlRun "ipa sudorule-enable sudorule5 > $TmpDir/sudorule_enable_flag_002.txt 2>&1"
+        rlAssertGrep "Enabled Sudo rule \"sudorule5\"." "$TmpDir/sudorule_enable_flag_002.txt"
+        rlRun "cat $TmpDir/sudorule_enable_flag_002.txt"
+        rlRun "ipa sudorule-find sudorule5 --all --raw > $TmpDir/sudorule_enable_flag_002.txt"
+        rlAssertGrep "ipaenabledflag: TRUE" "$TmpDir/sudorule_enable_flag_002.txt"
+        rlRun "cat $TmpDir/sudorule_enable_flag_002.txt"
+
+	rlRun "ipa sudorule-del sudorule5"
+
+rlPhaseEnd
+}
+
+
+sudorule-add-user_001() {
+
+rlPhaseStartTest "sudorule-add-user_001: ipa help sudorule-add-user"
+
+	rlRun "ipa help sudorule-add-user > $TmpDir/sudorule-add-user_001.txt 2>&1"
+	rlAssertGrep "Purpose: Add users and groups affected by Sudo Rule." "$TmpDir/sudorule-add-user_001.txt"
+	rlAssertGrep "Usage: ipa \[global-options\] sudorule-add-user SUDORULE-NAME \[options\]" "$TmpDir/sudorule-add-user_001.txt"
+	rlAssertGrep "\-h, \--help     show this help message and exit" "$TmpDir/sudorule-add-user_001.txt"
+	rlAssertGrep "\--all          Retrieve and print all attributes from the server." "$TmpDir/sudorule-add-user_001.txt"
+	rlAssertGrep "\--raw          Print entries as stored on the server." "$TmpDir/sudorule-add-user_001.txt"
+	rlAssertGrep "\--users=LIST   comma-separated list of users to add" "$TmpDir/sudorule-add-user_001.txt"
+	rlAssertGrep "\--groups=LIST  comma-separated list of groups to add" "$TmpDir/sudorule-add-user_001.txt"
+	rlRun "cat $TmpDir/sudorule-add-user_001.txt"
+
+rlPhaseEnd
+}
+
+sudorule-add-user_002() {
+
+rlPhaseStartTest "sudorule-add-user_002: ipa sudorule-add-user sudorule --users"
+
+	rlRun "ipa sudorule-add-user sudorule1 --users=user1,user2,user3,user4 > $TmpDir/sudorule-add-user_002.txt 2>&1"
+	rlAssertGrep "Rule name: sudorule1" "$TmpDir/sudorule-add-user_002.txt"
+	rlAssertGrep "Enabled: TRUE" "$TmpDir/sudorule-add-user_002.txt"
+	rlAssertGrep "External User: user1, user2, user3, user4" "$TmpDir/sudorule-add-user_002.txt"
+	rlAssertGrep "Number of members added 4" "$TmpDir/sudorule-add-user_002.txt"
+	rlRun "cat $TmpDir/sudorule-add-user_002.txt"
+
+rlPhaseEnd
+}
+
+
+sudorule-add-user_003() {
+
+rlPhaseStartTest "sudorule-add-user_003: ipa sudorule-add-user sudorule --groups"
+
+	rlRun "ipa group-add group7 --desc=group7"
+	rlRun "ipa group-add group8 --desc=group8"
+	rlRun "ipa group-add group9 --desc=group9"
+
+	rlRun "ipa sudorule-add-user sudorule1 --groups=group7,group8,group9 > $TmpDir/sudorule-add-user_003.txt 2>&1"
+	rlAssertGrep "Rule name: sudorule1" "$TmpDir/sudorule-add-user_003.txt"
+	rlAssertGrep "Enabled: TRUE" "$TmpDir/sudorule-add-user_003.txt"
+	rlAssertGrep "Groups: group7, group8, group9" "$TmpDir/sudorule-add-user_003.txt"
+	rlRun "cat $TmpDir/sudorule-add-user_003.txt"
+
+rlPhaseEnd
+}
+
+
+sudorule-remove-user_001() {
+
+rlPhaseStartTest "sudorule-remove-user_001: ipa help sudorule-remove-user"
+
+        rlRun "ipa help sudorule-remove-user > $TmpDir/sudorule-remove-user_001.txt 2>&1"
+        rlAssertGrep "Purpose: Remove users and groups affected by Sudo Rule." "$TmpDir/sudorule-remove-user_001.txt"
+        rlAssertGrep "Usage: ipa \[global-options\] sudorule-remove-user SUDORULE-NAME \[options\]" "$TmpDir/sudorule-remove-user_001.txt"
+        rlAssertGrep "\-h, \--help     show this help message and exit" "$TmpDir/sudorule-remove-user_001.txt"
+        rlAssertGrep "\--all          Retrieve and print all attributes from the server." "$TmpDir/sudorule-remove-user_001.txt"
+        rlAssertGrep "\--raw          Print entries as stored on the server." "$TmpDir/sudorule-remove-user_001.txt"
+        rlAssertGrep "\--users=LIST   comma-separated list of users to remove" "$TmpDir/sudorule-remove-user_001.txt"
+        rlAssertGrep "\--groups=LIST  comma-separated list of groups to remove" "$TmpDir/sudorule-remove-user_001.txt"
+        rlRun "cat $TmpDir/sudorule-remove-user_001.txt"
+
+rlPhaseEnd
+}
+
+sudorule-remove-user_002() {
+
+rlPhaseStartTest "sudorule-remove-user_002: ipa sudorule-remove-user sudorule --users"
+        
+        rlRun "ipa sudorule-remove-user sudorule1 --users=user1,user2,user3,user4 > $TmpDir/sudorule-remove-user_002.txt 2>&1"
+        rlAssertGrep "Rule name: sudorule1" "$TmpDir/sudorule-remove-user_002.txt"
+        rlAssertGrep "Enabled: TRUE" "$TmpDir/sudorule-remove-user_002.txt"
+#        rlAssertGrep "External User: user1, user2, user3, user4" "$TmpDir/sudorule-remove-user_002.txt"
+        rlAssertGrep "Number of members removed 4" "$TmpDir/sudorule-remove-user_002.txt"
+        rlRun "cat $TmpDir/sudorule-remove-user_002.txt"
+
+rlPhaseEnd
+}
+
+
+sudorule-remove-user_003() {
+
+rlPhaseStartTest "sudorule-remove-user_003: ipa sudorule-remove-user sudorule --groups"
+
+        rlRun "ipa sudorule-remove-user sudorule1 --groups=group7,group8,group9 > $TmpDir/sudorule-remove-user_003.txt 2>&1"
+        rlAssertGrep "Rule name: sudorule1" "$TmpDir/sudorule-remove-user_003.txt"
+        rlAssertGrep "Enabled: TRUE" "$TmpDir/sudorule-remove-user_003.txt"
+        rlRun "cat $TmpDir/sudorule-remove-user_003.txt"
+
+        rlRun "ipa group-del group7"
+        rlRun "ipa group-del group8"
+        rlRun "ipa group-del group9"
+
+rlPhaseEnd
+}
+
+
+sudorule-show_001() {
+
+rlPhaseStartTest "sudorule-show_001: ipa help sudorule-show"
+
+	rlRun "ipa help sudorule-show > $TmpDir/sudorule-show_001.txt 2>&1"
+	rlAssertGrep "Purpose: Display Sudo Rule." "$TmpDir/sudorule-show_001.txt"
+	rlAssertGrep "Usage: ipa \[global-options\] sudorule-show SUDORULE-NAME \[options\]" "$TmpDir/sudorule-show_001.txt"
+	rlAssertGrep "\-h, \--help  show this help message and exit" "$TmpDir/sudorule-show_001.txt"
+	rlAssertGrep "\--rights    Display the access rights of this entry (requires \--all)." "$TmpDir/sudorule-show_001.txt"
+	rlAssertGrep "\--all       Retrieve and print all attributes from the server." "$TmpDir/sudorule-show_001.txt"
+	rlAssertGrep "\--raw       Print entries as stored on the server." "$TmpDir/sudorule-show_001.txt"
+	rlRun "cat $TmpDir/sudorule-show_001.txt"
+
+rlPhaseEnd
+}
+
+
+sudorule-show_002() {
+
+rlPhaseStartTest "sudorule-show_002: ipa sudorule-show sudorule"
+
+	rlRun "ipa sudorule-show sudorule1 > $TmpDir/sudorule-show_002.txt 2>&1"
+        rlAssertGrep "Rule name: sudorule1" "$TmpDir/sudorule-show_002.txt"
+	rlAssertGrep "Enabled: TRUE" "$TmpDir/sudorule-show_002.txt"
+	rlRun "cat $TmpDir/sudorule-show_002.txt"
+
+rlPhaseEnd
+}
+
+sudorule-show_003() {
+
+rlPhaseStartTest "sudorule-show_003: ipa sudorule-show sudorule --all"
+
+	rlRun "ipa sudorule-show sudorule1 --all > $TmpDir/sudorule-show_003.txt 2>&1"
+        rlAssertGrep "Rule name: sudorule1" "$TmpDir/sudorule-show_003.txt"
+        rlAssertGrep "Enabled: TRUE" "$TmpDir/sudorule-show_003.txt"
+	rlAssertGrep "objectclass: ipaassociation, ipasudorule"  "$TmpDir/sudorule-show_003.txt"
+        rlRun "cat $TmpDir/sudorule-show_003.txt"
+
+rlPhaseEnd
+}
+
+sudorule-show_004() {
+
+rlPhaseStartTest "sudorule-show_004: ipa sudorule-show sudorule --all --rights"
+
+	rlRun "ipa sudorule-show sudorule1 --all --rights > $TmpDir/sudorule-show_004.txt 2>&1"
+	rlAssertGrep "Rule name: sudorule1" "$TmpDir/sudorule-show_004.txt"
+        rlAssertGrep "Enabled: TRUE" "$TmpDir/sudorule-show_004.txt"
+        rlAssertGrep "objectclass: ipaassociation, ipasudorule"  "$TmpDir/sudorule-show_004.txt"
+	rlAssertGrep "attributelevelrights: {'cn': u'rscwo', 'hostmask': u'rscwo', 'memberdenycmd': u'rscwo', 'memberallowcmd': u'rscwo', 'ipasudorunas': u'rscwo', 'cmdcategory': u'rscwo', 'ipasudoopt': u'rscwo', 'nsaccountlock': u'rscwo', 'ipasudorunasextuser': u'rscwo', 'externaluser': u'rscwo', 'memberhost': u'rscwo', 'description': u'rscwo', 'externalhost': u'rscwo', 'hostcategory': u'rscwo', 'ipauniqueid': u'rsc', 'ipaenabledflag': u'rscwo', 'ipasudorunasgroup': u'rscwo', 'ipasudorunasgroupcategory': u'rscwo', 'ipasudorunasextgroup': u'rscwo', 'aci': u'rscwo', 'memberuser': u'rscwo', 'usercategory': u'rscwo', 'ipasudorunasusercategory': u'rscwo'}" "$TmpDir/sudorule-show_004.txt"
+        rlRun "cat $TmpDir/sudorule-show_004.txt"
+
+rlPhaseEnd
+}
+
+sudorule-show_005() {
+
+rlPhaseStartTest "sudorule-show_005: ipa sudorule-show sudorule --all --raw"
+
+	rlRun "ipa sudorule-show sudorule1 --all --raw > $TmpDir/sudorule-show_005.txt 2>&1"
+	rlAssertGrep "cn: sudorule1" "$TmpDir/sudorule-show_005.txt"
+	rlAssertGrep "ipaenabledflag: TRUE" "$TmpDir/sudorule-show_005.txt"
+	rlAssertGrep "objectclass: ipaassociation" "$TmpDir/sudorule-show_005.txt"
+	rlAssertGrep "objectclass: ipasudorule" "$TmpDir/sudorule-show_005.txt"
+	rlRun "cat $TmpDir/sudorule-show_005.txt"
+
+rlPhaseEnd
+}
+
+
+sudorule-add-option_001() {
+
+rlPhaseStartTest "sudorule-add-option_001: ipa help sudorule-add-option"
+
+	rlRun "ipa help sudorule-add-option > $TmpDir/sudorule-add-option_001.txt 2>&1"
+	rlAssertGrep "Purpose: Add an option to the Sudo rule." "$TmpDir/sudorule-add-option_001.txt"
+	rlAssertGrep "Usage: ipa \[global-options\] sudorule-add-option SUDORULE-NAME \[options\]" "$TmpDir/sudorule-add-option_001.txt"
+	rlAssertGrep "\-h, \--help        show this help message and exit" "$TmpDir/sudorule-add-option_001.txt"
+	rlAssertGrep "\--sudooption=STR  Sudo Option" "$TmpDir/sudorule-add-option_001.txt"
+	rlRun "cat $TmpDir/sudorule-add-option_001.txt"
+
+rlPhaseEnd
+}
+
+
+sudorule-add-option_002() {
+
+rlPhaseStartTest "sudorule-add-option_002: ipa sudorule-add-option sudorule1 --sudooption=logfile=/var/log/sudolog"
+
+        rlRun "ipa sudorule-add-option sudorule1 --sudooption=\"logfile=/var/log/sudolog\" > $TmpDir/sudorule-add-option_002.txt 2>&1"
+        rlAssertGrep "Added option \"logfile=/var/log/sudolog\" to Sudo rule \"sudorule1\"" "$TmpDir/sudorule-add-option_002.txt"
+        rlRun "cat $TmpDir/sudorule-add-option_002.txt"
+
+        rlRun "ipa sudorule-find sudorule1 --all > $TmpDir/sudorule-add-option_002.txt 2>&1"
+        rlAssertGrep "ipasudoopt: logfile=/var/log/sudolog" "$TmpDir/sudorule-add-option_002.txt"
+        rlRun "cat $TmpDir/sudorule-add-option_002.txt"
+
+rlPhaseEnd
+}
+
+
+sudorule-add-option_003() {
+
+rlPhaseStartTest "sudorule-add-option_003: ipa sudorule-add-option --sudooption=env_keep"
+
+        rlRun "ipa sudorule-add-option sudorule1 --sudooption=\"env_keep = LANG LC_ADDRESS LC_CTYPE LC_COLLATE LC_IDENTIFICATION LC_MEASUREMENT LC_MESSAGES LC_MONETARY LC_NAME LC_NUMERIC LC_PAPER LC_TELEPHONE LC_TIME LC_ALL LANGUAGE LINGUAS XDG_SESSION_COOKIE\" > $TmpDir/sudorule-add-option_003.txt  2>&1"
+        rlAssertGrep "Added option \"env_keep = LANG LC_ADDRESS LC_CTYPE LC_COLLATE LC_IDENTIFICATION LC_MEASUREMENT LC_MESSAGES LC_MONETARY LC_NAME LC_NUMERIC LC_PAPER LC_TELEPHONE LC_TIME LC_ALL LANGUAGE LINGUAS XDG_SESSION_COOKIE\" to Sudo rule \"sudorule1\"" "$TmpDir/sudorule-add-option_003.txt"
+        rlRun "cat $TmpDir/sudorule-add-option_003.txt"
+
+        rlRun "ipa sudorule-find sudorule1 --all > $TmpDir/sudorule-add-option_003.txt 2>&1"
+        rlAssertGrep "ipasudoopt: logfile=/var/log/sudolog, env_keep = LANG LC_ADDRESS LC_CTYPE LC_COLLATE LC_IDENTIFICATION LC_MEASUREMENT LC_MESSAGES LC_MONETARY LC_NAME LC_NUMERIC LC_PAPER LC_TELEPHONE LC_TIME LC_ALL LANGUAGE LINGUAS XDG_SESSION_COOKIE" "$TmpDir/sudorule-add-option_003.txt"
+        rlRun "cat $TmpDir/sudorule-add-option_003.txt"
+
+rlPhaseEnd
+}
+
+
+sudorule-add-option_004() {
+
+rlPhaseStartTest "sudorule-add-option_004: ipa sudorule-add-option --sudooption=!authenticate"
+
+        rlRun "ipa sudorule-add-option sudorule1 --sudooption='!authenticate' > $TmpDir/sudorule-add-option_004.txt 2>&1"
+        rlAssertGrep "Added option" "$TmpDir/sudorule-add-option_004.txt"
+        rlRun "cat $TmpDir/sudorule-add-option_004.txt"
+
+        rlRun "ipa sudorule-find sudorule1 --all > $TmpDir/sudorule-add-option_004.txt 2>&1"
+        rlAssertGrep "ipasudoopt: logfile=/var/log/sudolog, env_keep = LANG LC_ADDRESS LC_CTYPE LC_COLLATE LC_IDENTIFICATION LC_MEASUREMENT LC_MESSAGES LC_MONETARY LC_NAME LC_NUMERIC LC_PAPER LC_TELEPHONE LC_TIME LC_ALL LANGUAGE LINGUAS XDG_SESSION_COOKIE, !authenticate" "$TmpDir/sudorule-add-option_004.txt"
+        rlRun "cat $TmpDir/sudorule-add-option_004.txt"
+
+rlPhaseEnd
+}
+
+
+sudorule-remove-option_001() {
+
+rlPhaseStartTest "sudorule-remove-option_001: ipa help sudorule-remove-option"
+
+        rlRun "ipa help sudorule-remove-option > $TmpDir/sudorule-remove-option_001.txt 2>&1"
+        rlAssertGrep "Purpose: Remove an option from Sudo rule." "$TmpDir/sudorule-remove-option_001.txt"
+        rlAssertGrep "Usage: ipa \[global-options\] sudorule-remove-option SUDORULE-NAME \[options\]" "$TmpDir/sudorule-remove-option_001.txt"
+        rlAssertGrep "\-h, \--help        show this help message and exit" "$TmpDir/sudorule-remove-option_001.txt"
+        rlAssertGrep "\--sudooption=STR  Sudo Option" "$TmpDir/sudorule-remove-option_001.txt"
+        rlRun "cat $TmpDir/sudorule-remove-option_001.txt"
+
+rlPhaseEnd
+}
+
+
+sudorule-remove-option_002() {
+
+rlPhaseStartTest "sudorule-remove-option_002: ipa sudorule-remove-option sudorule1 --sudooption=\"logfile=/var/log/sudolog\""
+
+        rlRun "ipa sudorule-remove-option sudorule1 --sudooption=logfile=/var/log/sudolog > $TmpDir/sudorule-remove-option_002.txt 2>&1"
+        rlAssertGrep "Removed option \"logfile=/var/log/sudolog\" from Sudo rule \"sudorule1\"" "$TmpDir/sudorule-remove-option_002.txt"
+        rlRun "cat $TmpDir/sudorule-remove-option_002.txt"
+
+rlPhaseEnd
+}
+
+
+sudorule-remove-option_003() {
+
+rlPhaseStartTest "sudorule-remove-option_003: ipa sudorule-remove-option --sudooption=env_keep"
+
+        rlRun "ipa sudorule-remove-option sudorule1 --sudooption=\"env_keep = LANG LC_ADDRESS LC_CTYPE LC_COLLATE LC_IDENTIFICATION LC_MEASUREMENT LC_MESSAGES LC_MONETARY LC_NAME LC_NUMERIC LC_PAPER LC_TELEPHONE LC_TIME LC_ALL LANGUAGE LINGUAS XDG_SESSION_COOKIE\" > $TmpDir/sudorule-remove-option_003.txt  2>&1"
+        rlAssertGrep "Removed option \"env_keep = LANG LC_ADDRESS LC_CTYPE LC_COLLATE LC_IDENTIFICATION LC_MEASUREMENT LC_MESSAGES LC_MONETARY LC_NAME LC_NUMERIC LC_PAPER LC_TELEPHONE LC_TIME LC_ALL LANGUAGE LINGUAS XDG_SESSION_COOKIE\" from Sudo rule \"sudorule1\"" "$TmpDir/sudorule-remove-option_003.txt"
+        rlRun "cat $TmpDir/sudorule-remove-option_003.txt"
+
+rlPhaseEnd
+}
+
+
+sudorule-remove-option_004() {
+
+rlPhaseStartTest "sudorule-remove-option_004: ipa sudorule-remove-option --sudooption=!authenticate"
+
+        rlRun "ipa sudorule-remove-option sudorule1 --sudooption=\'!authenticate\' > $TmpDir/sudorule-remove-option_004.txt 2>&1"
+        rlAssertGrep "Removed option \"'!authenticate'\" from Sudo rule \"sudorule1\"" "$TmpDir/sudorule-remove-option_004.txt"
+        rlRun "cat $TmpDir/sudorule-remove-option_004.txt"
+
+rlPhaseEnd
+}
+
+#TODO
+#sudorule-add-runasgroup
+#sudorule-add-runasuser
+#sudorule-remove-runasgroup
+#sudorule-remove-runasuser
+
+sudorule-find_001() {
+
+rlPhaseStartTest "sudorule-find_001: ipa help sudorule-find"
+
+	rlRun "ipa help sudorule-find > $TmpDir/sudorule-find_001.txt 2>&1"
+	rlAssertGrep "Purpose: Search for Sudo Rule." "$TmpDir/sudorule-find_001.txt"
+	rlAssertGrep "Usage: ipa \[global-options\] sudorule-find \[CRITERIA\] \[options\]" "$TmpDir/sudorule-find_001.txt"
+	rlAssertGrep "\-h, \--help            show this help message and exit" "$TmpDir/sudorule-find_001.txt"
+	rlAssertGrep "\--sudorule-name=STR   Rule name" "$TmpDir/sudorule-find_001.txt"
+	rlAssertGrep "\--desc=STR            Description" "$TmpDir/sudorule-find_001.txt"
+	rlAssertGrep "\--usercat=STRENUM     User category the rule applies to" "$TmpDir/sudorule-find_001.txt"
+	rlAssertGrep "\--hostcat=STRENUM     Host category the rule applies to" "$TmpDir/sudorule-find_001.txt"
+	rlAssertGrep "\--runasusercat=STRENUM" "$TmpDir/sudorule-find_001.txt"
+	rlAssertGrep "Run As User category the rule applies to" "$TmpDir/sudorule-find_001.txt"
+	rlAssertGrep "\--runasgroupcat=STRENUM" "$TmpDir/sudorule-find_001.txt"
+	rlAssertGrep "Run As Group category the rule applies to" "$TmpDir/sudorule-find_001.txt"
+	rlAssertGrep "\--externaluser=STR    External User the rule applies to" "$TmpDir/sudorule-find_001.txt"
+	rlAssertGrep "\--runasexternaluser=STR" "$TmpDir/sudorule-find_001.txt"
+	rlAssertGrep "External User the commands can run as" "$TmpDir/sudorule-find_001.txt"
+	rlAssertGrep "\--runasexternalgroup=STR" "$TmpDir/sudorule-find_001.txt"
+	rlAssertGrep "External Group the commands can run as" "$TmpDir/sudorule-find_001.txt"
+	rlAssertGrep "\--timelimit=INT       Time limit of search in seconds" "$TmpDir/sudorule-find_001.txt"
+	rlAssertGrep "\--sizelimit=INT       Maximum number of entries returned" "$TmpDir/sudorule-find_001.txt"
+	rlAssertGrep "\--all                 Retrieve and print all attributes from the server." "$TmpDir/sudorule-find_001.txt"
+	rlAssertGrep "\--raw                 Print entries as stored on the server." "$TmpDir/sudorule-find_001.txt"
+	rlRun "cat $TmpDir/sudorule-find_001.txt"
+
+rlPhaseEnd
+}
+
+
+sudorule-mod_001() {
+
+rlPhaseStartTest "sudorule-mod_001: ipa help sudorule-mod"
+
+	rlRun "ipa help sudorule-mod > $TmpDir/sudorule-mod_001.txt 2>&1"
+	rlAssertGrep "Purpose: Modify Sudo Rule." "$TmpDir/sudorule-mod_001.txt"
+	rlAssertGrep "Usage: ipa \[global-options\] sudorule-mod SUDORULE-NAME \[options\]" "$TmpDir/sudorule-mod_001.txt"
+	rlAssertGrep "-h, --help            show this help message and exit" "$TmpDir/sudorule-mod_001.txt"
+	rlAssertGrep "--desc=STR            Description" "$TmpDir/sudorule-mod_001.txt"
+	rlAssertGrep "--usercat=STRENUM     User category the rule applies to" "$TmpDir/sudorule-mod_001.txt"
+	rlAssertGrep "--hostcat=STRENUM     Host category the rule applies to" "$TmpDir/sudorule-mod_001.txt"
+	rlAssertGrep "--cmdcat=STRENUM      Command category the rule applies to" "$TmpDir/sudorule-mod_001.txt"
+	rlAssertGrep "--runasusercat=STRENUM" "$TmpDir/sudorule-mod_001.txt"
+	rlAssertGrep "Run As User category the rule applies to" "$TmpDir/sudorule-mod_001.txt"
+	rlAssertGrep "--runasgroupcat=STRENUM" "$TmpDir/sudorule-mod_001.txt"
+	rlAssertGrep "Run As Group category the rule applies to" "$TmpDir/sudorule-mod_001.txt"
+	rlAssertGrep "--externaluser=STR    External User the rule applies to" "$TmpDir/sudorule-mod_001.txt"
+	rlAssertGrep "--runasexternaluser=STR" "$TmpDir/sudorule-mod_001.txt"
+	rlAssertGrep "External User the commands can run as" "$TmpDir/sudorule-mod_001.txt"
+	rlAssertGrep "--runasexternalgroup=STR" "$TmpDir/sudorule-mod_001.txt"
+	rlAssertGrep "External Group the commands can run as" "$TmpDir/sudorule-mod_001.txt"
+	rlAssertGrep "--addattr=STR         Add an attribute/value pair. Format is attr=value." "$TmpDir/sudorule-mod_001.txt"
+	rlAssertGrep "--setattr=STR         Set an attribute to a name/value pair." "$TmpDir/sudorule-mod_001.txt"
+	rlAssertGrep "--rights              Display the access rights of this entry" "$TmpDir/sudorule-mod_001.txt"
+	rlAssertGrep "--all                 Retrieve and print all attributes from the server." "$TmpDir/sudorule-mod_001.txt"
+	rlAssertGrep "--raw                 Print entries as stored on the server." "$TmpDir/sudorule-mod_001.txt"
+	rlRun "cat $TmpDir/sudorule-mod_001.txt"
+
+rlPhaseEnd
+}
+
+
+sudorule-find_002() {
+
+rlPhaseStartTest "sudorule-find_002: ipa sudorule-find --sudorule-name"
+
+	rlRun "ipa sudorule-find --sudorule-name=sudorule1 > $TmpDir/sudorule-find_002.txt 2>&1"
+	rlAssertGrep "Number of entries returned 1" "$TmpDir/sudorule-find_002.txt"
+	rlRun "cat $TmpDir/sudorule-find_002.txt"
+
+rlPhaseEnd
+}
+
+sudorule-find_003() {
+
+rlPhaseStartTest "sudorule-find_003: ipa sudorule-find --desc"
+
+	rlRun "ipa sudorule-add --desc=\"sudo rule9\" sudorule9"
+	rlRun "ipa sudorule-add --desc=\"sudo rule10\" sudorule10"
+
+	rlRun "ipa sudorule-find --desc=\"sudo rule9\" > $TmpDir/sudorule-find_003.txt 2>&1"
+        rlAssertGrep "Rule name: sudorule9" "$TmpDir/sudorule-find_003.txt"
+	rlAssertGrep "Number of entries returned 1" "$TmpDir/sudorule-find_003.txt"
+        rlRun "cat $TmpDir/sudorule-find_003.txt"
+
+rlPhaseEnd
+}
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 sudorule_del_001() {
 
-rlPhaseStartTest "sudorule_del_003: Del new sudo rule."
+rlPhaseStartTest "sudorule_del_001: ipa help sudodel"
 
-	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user" 
-	rlRun "ipa sudorule-del testrule1"
-	rlRun "/usr/bin/ldapsearch -x -h localhost -D \"cn=Directory Manager\" -w Secret123 -b cn=testrule1,ou=sudoers,$BASE" 32
+	rlRun "ipa help sudorule-del > $TmpDir/sudorule_del_001.txt 2>&1"
+	rlAssertGrep "Purpose: Delete Sudo Rule." "$TmpDir/sudorule_del_001.txt"
+	rlAssertGrep "Usage: ipa \[global-options\] sudorule-del SUDORULE-NAME... \[options\]" "$TmpDir/sudorule_del_001.txt"
+	rlAssertGrep "\-h, \--help  show this help message and exit" "$TmpDir/sudorule_del_001.txt"
+	rlAssertGrep "\--continue  Continuous mode: Don't stop on errors." "$TmpDir/sudorule_del_001.txt"
+	rlRun "cat $TmpDir/sudorule_del_001.txt"
 
 rlPhaseEnd
 }
+
+sudorule_del_002() {
+
+rlPhaseStartTest "sudorule_del_002: Del new sudo rule."
+
+	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user" 
+	rlRun "ipa sudorule-del sudorule1"
+	rlRun "/usr/bin/ldapsearch -x -h localhost -D \"cn=Directory Manager\" -w Secret123 -b cn=sudorule1,ou=sudoers,$BASE" 32
+
+rlPhaseEnd
+}
+
+
+sudorule_del_003() {
+
+rlPhaseStartTest "sudorule_del_003: Del sudo rule with --continue option."
+
+	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user" 
+	rlRun "ipa sudorule-add sudorule2"
+	rlRun "ipa sudorule-del invalidrule sudorule2 > $TmpDir/sudorule_del_003.txt 2>&1" 2
+	rlAssertGrep "ipa: ERROR: invalidrule: Sudo Rule not found" "$TmpDir/sudorule_del_003.txt"
+	rlRun "cat $TmpDir/sudorule_del_003.txt"
+	rlRun "ipa sudorule-find sudorule2"
+	rlRun "ipa sudorule-del invalidrule sudorule2 --continue > $TmpDir/sudorule_del_003.txt 2>&1"
+	rlAssertGrep "Failed to remove: invalidrule" "$TmpDir/sudorule_del_003.txt"
+	rlRun "ipa sudorule-find sudorule2" 1
+	rlRun "cat $TmpDir/sudorule_del_003.txt"
+
+rlPhaseEnd
+}
+
+
 
 cleanup() {
 rlPhaseStartTest "Clean up for automount configuration tests"
