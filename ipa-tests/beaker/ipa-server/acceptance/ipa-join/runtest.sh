@@ -54,39 +54,57 @@ satrtEpoch=`date "+%s"`
 #########################################
 
 rlJournalStart
-    rlPhaseStartSetup "ipajoin startup: Check for ipa-server package"
-        rlAssertRpm $PACKAGE1
-        rlAssertRpm $PACKAGE2
-        rlRun "TmpDir=\`mktemp -d\`" 0 "Creating tmp directory"
-        rlRun "pushd $TmpDir"
-    rlPhaseEnd
+        myhostname=`hostname`
+        rlLog "hostname command: $myhostname"
+        rlLog "HOSTNAME: $HOSTNAME"
+        rlLog "MASTER: $MASTER"
+        rlLog "SLAVE: $SLAVE"
+        rlLog "CLIENT: $CLIENT"
+   
+        echo "export BEAKERMASTER=$MASTER" >> /dev/shm/env.sh
+        echo "export BEAKERSLAVE=$SLAVE" >> /dev/shm/env.sh
 
-    # r2d2_test_starts
-    # for multi-host test, we need host role detecting
-    Client_hostname=`echo $CLIENT | cut -d"." -f1`
-    Machine_hostname=`echo $HOSTNAME| cut -d"." -f1`
-    if [ "$Client_hostname" = "$Machine_hostname" ]
-    then
-        for item in $PACKAGELIST ; do
-            rpm -qa | grep $item
-            if [ $? -eq 0 ] ; then
-                rlPass "$item package is installed"
-            else
-                rlFail "$item package NOT found!"
-            fi
-        done
-        ipajoin
-    else
-        rlLog "Client defined as [$CLIENT], while Machine is [$HOSTNAME] not test run"
-    fi
-    # r2d2_test_ends
+        #####################################################################
+        #               IS THIS MACHINE A CLIENT?                           #
+        #####################################################################
+        rc=0
+        echo $CLIENT | grep $HOSTNAME
+        if [ $? -eq 0 ] ; then
+                if [ $rc -eq 0 ] ; then
+			ipajoin
+			rhts-sync-set -s DONE
+                fi
+        else
+                rlLog "Machine in recipe in not a CLIENT"
+        fi
 
-    rlPhaseStartCleanup "ipajoin cleanup"
-        rlRun "popd"
-        rlRun "rm -r $TmpDir" 0 "Removing tmp directory"
-    rlPhaseEnd
 
-    makereport
+	#####################################################################
+	# 		IS THIS MACHINE A MASTER?                           #
+	#####################################################################
+	rc=0
+	echo $MASTER | grep $HOSTNAME
+	if [ $? -eq 0 ] ; then
+		rhts-sync-block -s DONE $CLIENT
+	else
+		rlLog "Machine in recipe in not a MASTER"
+	fi
+
+	#####################################################################
+	# 		IS THIS MACHINE A SLAVE?                            #
+	#####################################################################
+	rc=0
+        echo $SLAVE | grep $HOSTNAME
+        if [ $? -eq 0 ] ; then
+		rhts-sync-block -s DONE $CLIENT
+        else
+                rlLog "Machine in recipe in not a SLAVE"
+        fi
+
+   rlJournalPrintText
+   report=/tmp/rhts.report.$RANDOM.txt
+   makereport $report
+   rhts-submit-log -l $report
 rlJournalEnd
 
 # manifest:
