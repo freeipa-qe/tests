@@ -50,25 +50,55 @@ PACKAGELIST="ipa-admintools ipa-client httpd mod_nss mod_auth_kerb 389-ds-base e
 #   test main 
 #########################################
 rlJournalStart
-  rlPhaseStartTest "Environment check"
-    # call functional tests
-    	echo $CLIENT | grep $HOSTNAME
-	rc=$?
-    	if [ $rc -eq 0 ] ; then
- 		for item in $PACKAGELIST ; do
-                	rpm -qa | grep $item
-                	if [ $? -eq 0 ] ; then
-                        	rlPass "$item package is installed"
-                	else
-                        	rlFail "$item package NOT found!"
-                	fi
-        	done
- 		rlRun "service iptables stop" 0 "Stop the firewall on the client"
-		ipafunctionalservices_http
-		ipafunctionalservices_ldap
-    	else
-		rlLog "Machine in recipe is not a CLIENT - not running tests"
+  rlPhaseStartTest "Machine environment check"
+
+        #####################################################################
+        #               IS THIS MACHINE A CLIENT?                           #
+        #####################################################################
+        rc=0
+        echo $CLIENT | grep $HOSTNAME
+        if [ $? -eq 0 ] ; then
+                if [ $rc -eq 0 ] ; then
+               		for item in $PACKAGELIST ; do
+                        	rpm -qa | grep $item
+                        	if [ $? -eq 0 ] ; then
+                                	rlPass "$item package is installed"
+                        	else
+                                	rlFail "$item package NOT found!"
+                        	fi
+                	done
+                	rlRun "service iptables stop" 0 "Stop the firewall on the client"
+                	ipafunctionalservices_http
+                	ipafunctionalservices_ldap
+			rhts-sync-set -s DONE
+                fi
+        else
+                rlLog "Machine in recipe in not a CLIENT"
+        fi
+
+
+	#####################################################################
+	# 		IS THIS MACHINE A MASTER?                           #
+	#####################################################################
+	rc=0
+	echo $MASTER | grep $HOSTNAME
+	if [ $? -eq 0 ] ; then
+		rhts-sync-block -s DONE $CLIENT
+	else
+		rlLog "Machine in recipe in not a MASTER"
 	fi
+
+	#####################################################################
+	# 		IS THIS MACHINE A SLAVE?                            #
+	#####################################################################
+	rc=0
+        echo $SLAVE | grep $HOSTNAME
+        if [ $? -eq 0 ] ; then
+		rhts-sync-block -s DONE $CLIENT
+        else
+                rlLog "Machine in recipe in not a SLAVE"
+        fi
+
    rlPhaseEnd
     
    rlJournalPrintText
