@@ -403,6 +403,14 @@ rlJournalStart
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message - special characters."
     rlPhaseEnd
 
+    rlPhaseStartTest "ipa-hostgroup-cli-39: add host group as member to itself - bugzilla 501377"
+	expmsg="A group may not be added as a member of itself"
+        rlrun "ipa hostgroup-add-member --hosts="$group1" $group1 > /tmp/error.out" 1
+        cat /tmp/error.out | grep "$expmsg"
+        rc=$?
+        rlAssert0 "$expmsg" $rc
+    rlPhaseEnd
+
     rlPhaseStartCleanup "ipa-hostgroup-cli-cleanup: Delete remaining hosts and Destroying admin credentials"
 	rlRun "ipa config-mod --searchrecordslimit=100" 0 "setting search records limit back to default"
         # delete remaining hosts added to test host members
