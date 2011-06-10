@@ -9,6 +9,7 @@
 		<recipe whiteboard="ipa server - Certificate CLI Tests">
 			<distroRequires>
 				<and>
+					<distro_variant op="=" value="Server"/>
 					<distro_family op="=" value="RedHatEnterpriseLinux6"/>
 					<distro_method op="=" value="nfs"/>
 					<distro_tag op="=" value="STABLE"/>
@@ -22,7 +23,6 @@
 			</hostRequires>
             <repos>
                 <repo name="ipa" url="http://mickey.dsdev.sjc.redhat.com/repos/pki/ipa/devel/rhel6/devel_x86_64/x86_64/"/>
-                <repo name="ipa_noarch" url="http://mickey.dsdev.sjc.redhat.com/repos/pki/ipa/devel/rhel6/devel_x86_64/noarch/"/>
             </repos>
 
 			<task name="/distribution/install" role="STANDALONE">
@@ -36,14 +36,13 @@
             <task name="/CoreOS/ipa-server/shared" role="STANDALONE">
                 <params/>
             </task>
-
 			<task name="/CoreOS/ipa-server/acceptance/quickinstall" role="MASTER">
-				<params/>
+				<params>
+					<param name="SNAPSHOT" value="TRUE"/>
+				</params>
 			</task>
 			<task name="/CoreOS/ipa-server/acceptance/ipa-cert" role="MASTER">
-				<params>
-					<param name="KILLTIMEOVERRIDE" value="1800"/>
-				</params>
+				<params/>
 			</task>
 			<task name="/CoreOS/ipa-server/acceptance/uninstall" role="STANDALONE">
 				<params/>

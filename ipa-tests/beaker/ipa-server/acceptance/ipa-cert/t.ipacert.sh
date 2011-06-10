@@ -82,10 +82,12 @@ cert_remove_hold_1002()
     rlPhaseStartTest "cert_remove_hold_1002"
         local testID="cert_remove_hold_1002"
         local tmpout=$TmpDir/cert_remove_hold_1002.$RANDOM.out
-        create_cert
-        local certid=`tail -n1 $certList | cut -d"=" -f2 | xargs echo`
+        #create_cert
+        #local certid=`tail -n1 $certList | cut -d"=" -f2 | xargs echo`
         for revokeCode in 0 1 2 3 4 5 7 8 9 10
         do
+            create_cert
+            local certid=`tail -n1 $certList | cut -d"=" -f2 | xargs echo`
             KinitAsAdmin
             rlRun "ipa cert-revoke $certid --revocation-reason=$revokeCode" 0 "set revoke reason to [$revokeCode], cert should not be able to reuse"
             ipa cert-show $certid > $tmpout
