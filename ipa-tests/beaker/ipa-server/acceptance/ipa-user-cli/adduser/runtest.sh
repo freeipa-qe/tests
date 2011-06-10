@@ -400,10 +400,18 @@ rlJournalStart
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message - alpha characters."
     rlPhaseEnd
 
-   rlPhaseStartTest "ipa-user-cli-add-033: size limit too large - bugzilla 643182"
+    rlPhaseStartTest "ipa-user-cli-add-033: size limit too large - bugzilla 643182"
         expmsg="ipa: ERROR: invalid 'sizelimit': can be at most 2147483647"
         command="ipa user-find --sizelimit=20000000000"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message - size limit too large."
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-user-cli-add-034: show user that doesn't exist - bugzilla 569735"
+	myuser=baduser
+        expmsg="ipa: ERROR: $myuser: user not found"
+        command="ipa user-show $baduser"
+	rlRun "$command" 2 "Check that return code is 2"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message - show user that doesn't exist."
     rlPhaseEnd
 
     rlPhaseStartCleanup "ipa-user-cli-add-cleanup"
