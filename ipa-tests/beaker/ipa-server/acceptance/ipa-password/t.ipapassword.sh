@@ -403,6 +403,7 @@ ipapassword_globalpolicy_minlifetime_upperbound_logic()
 ipapassword_globalpolicy_minlifetime_greater_maxlife_negative()
 {
 	rlPhaseStartTest "ipapassword_globalpolicy_minlifetime_greater_maxlife_negative"
+                Local_KinitAsAdmin
 		rlLog "attempt to set minlife greater than maxlife"
 		rlRun "ipa pwpolicy-mod --maxlife=5" 0 "set pw maxlife to 5 days"
 		rlRun "ipa pwpolicy-show | grep Max\ life | grep 5" 0 "ensure that the maxlife seems to be 5 days"
@@ -2323,7 +2324,7 @@ ipapassword_nestedgrouppw_history_conflict()
         history=`getrandomint 2 20` 
         below=$((history - 1))
         above=$((history + 1))
-        rlRun "ipa pwpolicy-mod --history=$history $testgrp"  0 "set history to [$history] for [$tesgrp]"
+        rlRun "ipa pwpolicy-mod --history=$history $testgrp"  0 "set history to [$history] for [$testgrp]"
         rlRun "ipa pwpolicy-mod --history=$below $nestedgrp"  0 "set history to [$below] for [$nestedgrp]"
         rlRun "$kdestroy"
 
