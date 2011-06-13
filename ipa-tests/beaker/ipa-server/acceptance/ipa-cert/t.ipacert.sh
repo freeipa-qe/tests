@@ -96,7 +96,8 @@ cert_remove_hold_1002()
                 rlLog "revoke reason set to [$revokeCode] confirmed"
             else
                 rlFail "revoke reason expected to be [$revokeCode], actual [$reason], test can not continue"
-                return
+                #return
+                # commenting out the return in middle of test, causing the failure not to be logged
             fi
             rlRun "ipa cert-remove-hold $certid " 0 "cert-remove-hold always return 0(succes),we need more test to confirm remove hold fails" 
 
