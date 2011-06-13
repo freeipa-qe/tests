@@ -82,10 +82,10 @@ cert_remove_hold_1002()
     rlPhaseStartTest "cert_remove_hold_1002"
         local testID="cert_remove_hold_1002"
         local tmpout=$TmpDir/cert_remove_hold_1002.$RANDOM.out
-        #create_cert
-        #local certid=`tail -n1 $certList | cut -d"=" -f2 | xargs echo`
+        rlLog "iterating revokation reason from 0 -> 10 (skip 6) "
         for revokeCode in 0 1 2 3 4 5 7 8 9 10
         do
+            rlLog "============= [revocation reason = $revokeCode ] ==============="
             create_cert
             local certid=`tail -n1 $certList | cut -d"=" -f2 | xargs echo`
             KinitAsAdmin
@@ -96,8 +96,6 @@ cert_remove_hold_1002()
                 rlLog "revoke reason set to [$revokeCode] confirmed"
             else
                 rlFail "revoke reason expected to be [$revokeCode], actual [$reason], test can not continue"
-                #return
-                # commenting out the return in middle of test, causing the failure not to be logged
             fi
             rlRun "ipa cert-remove-hold $certid " 0 "cert-remove-hold always return 0(succes),we need more test to confirm remove hold fails" 
 
