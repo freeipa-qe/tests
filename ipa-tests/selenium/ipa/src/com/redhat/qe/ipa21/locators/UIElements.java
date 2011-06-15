@@ -30,12 +30,29 @@ public class UIElements extends UILocatorStrategies  {
 		
 	}
 
-/*	public ExtendedSelenium sel(){
+	public ExtendedSelenium sel(){
 		return SeleniumTestScript.selenium;
-	}*/
+	}
 	
 	// Locator Strategies
-	public LocatorStrategy link = 
-		new StringSandwichLocatorStrategy("link", "link=");
+	public LocatorStrategy link = new StringSandwichLocatorStrategy("link", "link=");
 	
+	public Element addButton = new Element("//button[@type='button']");
+	
+	
+	//User Page
+	public Element userNameInput = new Element ("uid");
+	public Element givennameInput = new Element ("givenname");
+	public Element snInput = new Element ("sn");
+	public Element titleInput = new Element ("title");
+	public Element mailInput = new Element ("mail");
+	public LocatorStrategy userMailLink = new StringSandwichLocatorStrategy("userMailLink", "css=span[name=mail] a[name=add]");
+	public LocatorStrategy updateLink = new StringSandwichLocatorStrategy("updateLink", "css=span.input_link");
+	
+	
+	
+	//Group Page
+	public Element groupNameInput = new Element ("cn");
+	public Element descriptionInput = new Element ("description");
+		
 }
