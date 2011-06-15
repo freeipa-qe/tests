@@ -57,4 +57,7 @@ public class UIElements extends UILocatorStrategies  {
 	public Element groupNameInput = new Element ("cn");
 	public Element groupDescriptionInput = new Element ("description");
 		
+	//Identity - Host - Add	
+	public Element hostNameInput = new Element ("fqdn");
+	public Element forceFlag = new Element ("force");
 }
