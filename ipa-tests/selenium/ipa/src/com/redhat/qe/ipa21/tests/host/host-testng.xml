@@ -1,0 +1,25 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+<suite name="IPAHostTestSuite">
+	
+	<test name="Start Host Tests">
+		<packages>
+		    <package name="com.redhat.qe.ipa.base" />
+		    <package name="com.redhat.qe.ipa21" />
+		</packages>
+		<groups>
+			<run>
+			    <include name="setup" />
+			    <include name="init" />
+				<include name="hostTests" />
+			</run>
+		</groups>
+		<classes>		    
+		    <class name="com.redhat.qe.ipa21.tests.host.HostTests" />
+		</classes>
+	</test>
+	
+	<listeners>        
+  		<listener class-name="com.redhat.qe.auto.testng.TestNGListener" />	
+	</listeners>
+
+</suite>
