@@ -40,10 +40,12 @@ public class UIElements extends UILocatorStrategies  {
 	public Element addButton = new Element("//button[@type='button']");
 	
 	
-	//User Page
+	//User Add Page
 	public Element userNameInput = new Element ("uid");
 	public Element givennameInput = new Element ("givenname");
 	public Element snInput = new Element ("sn");
+	
+	//User Modify Page
 	public Element titleInput = new Element ("title");
 	public Element mailInput = new Element ("mail");
 	public LocatorStrategy userMailLink = new StringSandwichLocatorStrategy("userMailLink", "css=span[name=mail] a[name=add]");
@@ -51,8 +53,8 @@ public class UIElements extends UILocatorStrategies  {
 	
 	
 	
-	//Group Page
+	//Group Add Page
 	public Element groupNameInput = new Element ("cn");
-	public Element descriptionInput = new Element ("description");
+	public Element groupDescriptionInput = new Element ("description");
 		
 }

@@ -13,7 +13,7 @@ public class GroupTasks {
 	public static void createGroup(ExtendedSelenium selenium, String groupName, String description) {
 		selenium.click(new Element(UI.link,"Add"));
 		selenium.type(UI.groupNameInput, groupName);
-		selenium.type(UI.descriptionInput, description);
+		selenium.type(UI.groupDescriptionInput, description);
 		selenium.click(UI.addButton);	
 	}
 
