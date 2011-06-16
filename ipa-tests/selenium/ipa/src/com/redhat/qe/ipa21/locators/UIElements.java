@@ -38,22 +38,25 @@ public class UIElements extends UILocatorStrategies  {
 	public LocatorStrategy link = new StringSandwichLocatorStrategy("link", "link=");
 	
 	public Element addButton = new Element("//button[@type='button']");
+	public Element button = new Element("//button[@type='button']");
 	
 	
-	//User Add Page
+	//Identity - User - Add
 	public Element userNameInput = new Element ("uid");
 	public Element givennameInput = new Element ("givenname");
 	public Element snInput = new Element ("sn");
 	
-	//User Modify Page
+	//Identity - User - Edit
 	public Element titleInput = new Element ("title");
 	public Element mailInput = new Element ("mail");
+	public Element undoInput = new Element ("undo");
 	public LocatorStrategy userMailLink = new StringSandwichLocatorStrategy("userMailLink", "css=span[name=mail] a[name=add]");
 	public LocatorStrategy updateLink = new StringSandwichLocatorStrategy("updateLink", "css=span.input_link");
 	
+	//Identity - User - Delete
+	public Element testuserDeleteLink = new Element("css=.entity[name='user'] .facet[name='search'] input[value='testuser']");
 	
-	
-	//Group Add Page
+	//Identity - Group - Add
 	public Element groupNameInput = new Element ("cn");
 	public Element groupDescriptionInput = new Element ("description");
 		
