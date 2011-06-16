@@ -85,14 +85,13 @@ RELM=`echo $RELM | tr "[a-z]" "[A-Z]"`
 user1="user1"
 user2="user2"
 userpw="Secret123"
-mount_homedir="/ipahome"
 
 PACKAGE1="ipa-admintools"
 PACKAGE2="ipa-client"
 BASE=`hostname -f | sed 's/\./,dc=/g' | cut -d "," -f 2,3,4,5,6,7,8,9,10`
 
 setup() {
-rlPhaseStartTest "Setup for sudo configuration tests"
+rlPhaseStartTest "Setup for sudo sanity tests"
 
 	# check for packages
 	for item in $PACKAGE1 $PACKAGE2 ; do
@@ -105,11 +104,11 @@ rlPhaseStartTest "Setup for sudo configuration tests"
 	done
 
 	# kinit as admin and creating users
-	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user" 
-	rlRun "create_ipauser $user1 $user1 $user1 $userpw"
-	sleep 5
-	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-	rlRun "create_ipauser $user2 $user2 $user2 $userpw"
+#	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user" 
+#	rlRun "create_ipauser $user1 $user1 $user1 $userpw"
+#	sleep 5
+#	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+#	rlRun "create_ipauser $user2 $user2 $user2 $userpw"
         rlRun "TmpDir=\`mktemp -d\`" 0 "Creating tmp directory"
         rlRun "pushd $TmpDir"
 
@@ -975,7 +974,7 @@ rlPhaseStartTest "sudorule-remove-host_003: Remove multiple hosts from sudorule.
 	rlAssertGrep "Rule name: sudorule1" "$TmpDir/sudorule-remove-host_003.txt"
 	rlAssertGrep "Enabled: TRUE" "$TmpDir/sudorule-remove-host_003.txt"
 	rlLog "Verifying https://bugzilla.redhat.com/show_bug.cgi?id=709665"
-	rlAssertGrep "External Host: test2.example.com, test3.example2.com" 1 "$TmpDir/sudorule-remove-host_003.txt"
+	rlAssertGrep "External Host: test2.example.com, test3.example2.com" "$TmpDir/sudorule-remove-host_003.txt" 1
 	rlAssertGrep "Host Groups: hostgroup1, hostgroup2, hostgroup3" "$TmpDir/sudorule-remove-host_003.txt"
 	rlAssertGrep "Number of members removed 2" "$TmpDir/sudorule-remove-host_003.txt"
 	rlRun "cat $TmpDir/sudorule-remove-host_003.txt"
@@ -1087,10 +1086,10 @@ sudorule-add-user_002() {
 
 rlPhaseStartTest "sudorule-add-user_002: ipa sudorule-add-user sudorule --users"
 
-	rlRun "ipa sudorule-add-user sudorule1 --users=user1,user2,user3,user4 > $TmpDir/sudorule-add-user_002.txt 2>&1"
+	rlRun "ipa sudorule-add-user sudorule1 --users=tuser1,tuser2,tuser3,tuser4 > $TmpDir/sudorule-add-user_002.txt 2>&1"
 	rlAssertGrep "Rule name: sudorule1" "$TmpDir/sudorule-add-user_002.txt"
 	rlAssertGrep "Enabled: TRUE" "$TmpDir/sudorule-add-user_002.txt"
-	rlAssertGrep "External User: user1, user2, user3, user4" "$TmpDir/sudorule-add-user_002.txt"
+	rlAssertGrep "External User: tuser1, tuser2, tuser3, tuser4" "$TmpDir/sudorule-add-user_002.txt"
 	rlAssertGrep "Number of members added 4" "$TmpDir/sudorule-add-user_002.txt"
 	rlRun "cat $TmpDir/sudorule-add-user_002.txt"
 
@@ -1137,7 +1136,7 @@ sudorule-remove-user_002() {
 
 rlPhaseStartTest "sudorule-remove-user_002: ipa sudorule-remove-user sudorule --users"
         
-        rlRun "ipa sudorule-remove-user sudorule1 --users=user1,user2,user3,user4 > $TmpDir/sudorule-remove-user_002.txt 2>&1"
+        rlRun "ipa sudorule-remove-user sudorule1 --users=tuser1,tuser2,tuser3,tuser4 > $TmpDir/sudorule-remove-user_002.txt 2>&1"
         rlAssertGrep "Rule name: sudorule1" "$TmpDir/sudorule-remove-user_002.txt"
         rlAssertGrep "Enabled: TRUE" "$TmpDir/sudorule-remove-user_002.txt"
 #        rlAssertGrep "External User: user1, user2, user3, user4" "$TmpDir/sudorule-remove-user_002.txt"
@@ -1345,42 +1344,353 @@ rlPhaseStartTest "sudorule-remove-option_004: ipa sudorule-remove-option --sudoo
         rlRun "ipa sudorule-remove-option sudorule1 --sudooption=\'!authenticate\' > $TmpDir/sudorule-remove-option_004.txt 2>&1"
         rlAssertGrep "Removed option \"'!authenticate'\" from Sudo rule \"sudorule1\"" "$TmpDir/sudorule-remove-option_004.txt"
         rlRun "cat $TmpDir/sudorule-remove-option_004.txt"
+	rlRun "ipa sudorule-del sudorule1"
 
 rlPhaseEnd
 }
 
-#TODO
-#sudorule-add-runasgroup
-#sudorule-add-runasuser
-#sudorule-remove-runasgroup
-#sudorule-remove-runasuser
 
-sudorule-find_001() {
 
-rlPhaseStartTest "sudorule-find_001: ipa help sudorule-find"
+sudorule-add-runasuser_001() {
 
-	rlRun "ipa help sudorule-find > $TmpDir/sudorule-find_001.txt 2>&1"
-	rlAssertGrep "Purpose: Search for Sudo Rule." "$TmpDir/sudorule-find_001.txt"
-	rlAssertGrep "Usage: ipa \[global-options\] sudorule-find \[CRITERIA\] \[options\]" "$TmpDir/sudorule-find_001.txt"
-	rlAssertGrep "\-h, \--help            show this help message and exit" "$TmpDir/sudorule-find_001.txt"
-	rlAssertGrep "\--sudorule-name=STR   Rule name" "$TmpDir/sudorule-find_001.txt"
-	rlAssertGrep "\--desc=STR            Description" "$TmpDir/sudorule-find_001.txt"
-	rlAssertGrep "\--usercat=STRENUM     User category the rule applies to" "$TmpDir/sudorule-find_001.txt"
-	rlAssertGrep "\--hostcat=STRENUM     Host category the rule applies to" "$TmpDir/sudorule-find_001.txt"
-	rlAssertGrep "\--runasusercat=STRENUM" "$TmpDir/sudorule-find_001.txt"
-	rlAssertGrep "Run As User category the rule applies to" "$TmpDir/sudorule-find_001.txt"
-	rlAssertGrep "\--runasgroupcat=STRENUM" "$TmpDir/sudorule-find_001.txt"
-	rlAssertGrep "Run As Group category the rule applies to" "$TmpDir/sudorule-find_001.txt"
-	rlAssertGrep "\--externaluser=STR    External User the rule applies to" "$TmpDir/sudorule-find_001.txt"
-	rlAssertGrep "\--runasexternaluser=STR" "$TmpDir/sudorule-find_001.txt"
-	rlAssertGrep "External User the commands can run as" "$TmpDir/sudorule-find_001.txt"
-	rlAssertGrep "\--runasexternalgroup=STR" "$TmpDir/sudorule-find_001.txt"
-	rlAssertGrep "External Group the commands can run as" "$TmpDir/sudorule-find_001.txt"
-	rlAssertGrep "\--timelimit=INT       Time limit of search in seconds" "$TmpDir/sudorule-find_001.txt"
-	rlAssertGrep "\--sizelimit=INT       Maximum number of entries returned" "$TmpDir/sudorule-find_001.txt"
-	rlAssertGrep "\--all                 Retrieve and print all attributes from the server." "$TmpDir/sudorule-find_001.txt"
-	rlAssertGrep "\--raw                 Print entries as stored on the server." "$TmpDir/sudorule-find_001.txt"
-	rlRun "cat $TmpDir/sudorule-find_001.txt"
+rlPhaseStartTest "sudorule-add-runasuser_001: ipa help sudorule-add-runasuser"
+
+	rlLog "Verifying bug https://bugzilla.redhat.com/show_bug.cgi?id=711705"
+	rlRun "ipa help sudorule-add-runasuser > $TmpDir/sudorule-add-runasuser_001.txt 2>&1"
+	rlAssertGrep "Purpose: Add users and groups for Sudo to execute as." "$TmpDir/sudorule-add-runasuser_001.txt"
+	rlAssertGrep "Usage: ipa \[global-options\] sudorule-add-runasuser SUDORULE-NAME \[options\]" "$TmpDir/sudorule-add-runasuser_001.txt"
+	rlAssertGrep "\-h, \--help     show this help message and exit" "$TmpDir/sudorule-add-runasuser_001.txt"
+	rlAssertGrep "\--all          Retrieve and print all attributes from the server." "$TmpDir/sudorule-add-runasuser_001.txt"
+	rlAssertGrep "\--raw          Print entries as stored on the server." "$TmpDir/sudorule-add-runasuser_001.txt"
+	rlAssertGrep "\--users=LIST   comma-separated list of users to add" "$TmpDir/sudorule-add-runasuser_001.txt"
+	rlAssertGrep "\--groups=LIST  comma-separated list of groups to add" "$TmpDir/sudorule-add-runasuser_001.txt"
+	rlRun "cat $TmpDir/sudorule-add-runasuser_001.txt"
+
+rlPhaseEnd
+}
+
+
+sudorule-add-runasuser_002() {
+
+rlPhaseStartTest "sudorule-add-runasuser_002: ipa sudorule-add-runasuser --users"
+
+	rlRun "ipa user-add sudouser1 --first=sudo --last=user1"
+	rlRun "ipa user-add sudouser2 --first=sudo --last=user2"
+	rlRun "ipa sudorule-add rule1"
+
+	rlRun "ipa sudorule-add-runasuser rule1 --users=sudouser1,sudouser2 > $TmpDir/sudorule-add-runasuser_002.txt 2>&1"
+	rlAssertGrep "Rule name: rule1" "$TmpDir/sudorule-add-runasuser_002.txt"
+	rlAssertGrep "Run As User: sudouser1, sudouser2" "$TmpDir/sudorule-add-runasuser_002.txt"
+	rlAssertGrep "Number of members added 2" "$TmpDir/sudorule-add-runasuser_002.txt"
+	rlRun "cat $TmpDir/sudorule-add-runasuser_002.txt"
+
+        rlRun "ipa user-del sudouser1"
+        rlRun "ipa user-del sudouser2"
+        rlRun "ipa sudorule-del rule1"
+
+rlPhaseEnd
+}
+
+
+sudorule-add-runasuser_003() {
+
+rlPhaseStartTest "sudorule-add-runasuser_003: ipa sudorule-add-runasuser --groups"
+
+        rlRun "ipa group-add sudogrp1 --desc=grp1"
+        rlRun "ipa group-add sudogrp2 --desc=grp2"
+        rlRun "ipa sudorule-add rule1"
+
+	rlRun "ipa sudorule-add-runasuser rule1 --groups=sudogrp1,sudogrp2 > $TmpDir/sudorule-add-runasuser_003.txt 2>&1"
+        rlAssertGrep "Rule name: rule1" "$TmpDir/sudorule-add-runasuser_003.txt"
+	rlLog "Verifying bug https://bugzilla.redhat.com/show_bug.cgi?id=710253"
+        rlAssertGrep "RunAs Group: sudogrp1, sudogrp2" "$TmpDir/sudorule-add-runasuser_003.txt"
+	rlAssertGrep "Number of members added 2" "$TmpDir/sudorule-add-runasuser_003.txt"
+	rlRun "cat $TmpDir/sudorule-add-runasuser_003.txt"
+
+	rlLog "Verifying bug https://bugzilla.redhat.com/show_bug.cgi?id=713385"
+	rlRun "ipa sudorule-find rule1 --all > $TmpDir/sudorule-add-runasuser_003.txt 2>&1"
+	rlAssertGrep "Run As Group: sudogrp1, sudogrp2" "$TmpDir/sudorule-add-runasuser_003.txt"
+	rlRun "cat $TmpDir/sudorule-add-runasuser_003.txt"
+
+        rlRun "ipa sudorule-del rule1"
+	rlRun "ipa group-del sudogrp1"
+	rlRun "ipa group-del sudogrp2"
+
+rlPhaseEnd
+}
+
+
+sudorule-remove-runasuser_001() {
+
+rlPhaseStartTest "sudorule-remove-runasuser_001: ipa sudorule-remove-runasuser --help"
+
+	rlRun "ipa help sudorule-remove-runasuser > $TmpDir/sudorule-remove-runasuser_001.txt 2>&1"
+
+	rlLog "Verifying bug https://bugzilla.redhat.com/show_bug.cgi?id=713374"
+	rlAssertGrep "Purpose: Remove users and groups for Sudo to execute as." "$TmpDir/sudorule-remove-runasuser_001.txt"
+	rlAssertGrep "Usage: ipa \[global-options\] sudorule-remove-runasuser SUDORULE-NAME \[options\]" "$TmpDir/sudorule-remove-runasuser_001.txt"
+	rlAssertGrep "\-h, \--help     show this help message and exit" "$TmpDir/sudorule-remove-runasuser_001.txt"
+	rlAssertGrep "\--all          Retrieve and print all attributes from the server." "$TmpDir/sudorule-remove-runasuser_001.txt"
+	rlAssertGrep "\--raw          Print entries as stored on the server." "$TmpDir/sudorule-remove-runasuser_001.txt"
+	rlAssertGrep "\--users=LIST   comma-separated list of users to remove" "$TmpDir/sudorule-remove-runasuser_001.txt"
+	rlAssertGrep "\--groups=LIST  comma-separated list of groups to remove" "$TmpDir/sudorule-remove-runasuser_001.txt"
+	rlRun "cat $TmpDir/sudorule-remove-runasuser_001.txt"
+
+rlPhaseEnd
+}
+
+
+sudorule-remove-runasuser_002() {
+
+rlPhaseStartTest "sudorule-remove-runasuser_002: ipa sudorule-remove-runasuser --users"
+
+        rlRun "ipa user-add sudouser1 --first=sudo --last=user1"
+        rlRun "ipa user-add sudouser2 --first=sudo --last=user2"
+        rlRun "ipa sudorule-add rule1"
+        rlRun "ipa sudorule-add-runasuser rule1 --users=sudouser1,sudouser2"
+
+
+	rlRun "ipa sudorule-remove-runasuser rule1 --users=sudouser1,sudouser2 > $TmpDir/sudorule-remove-runasuser_002.txt 2>&1"
+        rlAssertGrep "Rule name: rule1" "$TmpDir/sudorule-remove-runasuser_002.txt"
+        rlAssertGrep "Number of members removed 2" "$TmpDir/sudorule-remove-runasuser_002.txt"
+        rlRun "cat $TmpDir/sudorule-add-runasuser_002.txt"
+
+        rlRun "ipa user-del sudouser1"
+        rlRun "ipa user-del sudouser2"
+        rlRun "ipa sudorule-del rule1"
+
+rlPhaseEnd
+}
+
+
+sudorule-remove-runasuser_003() {
+
+rlPhaseStartTest "sudorule-remove-runasuser_003: ipa sudorule-remove-runasuser --groups"
+
+        rlRun "ipa group-add sudogrp1 --desc=grp1"
+        rlRun "ipa group-add sudogrp2 --desc=grp2"
+        rlRun "ipa sudorule-add rule1"
+        rlRun "ipa sudorule-add-runasuser rule1 --groups=sudogrp1,sudogrp2"
+
+	rlRun "ipa sudorule-remove-runasuser rule1 --groups=sudogrp1,sudogrp2 > $TmpDir/sudorule-remove-runasuser_003.txt 2>&1"
+        rlAssertGrep "Rule name: rule1" "$TmpDir/sudorule-remove-runasuser_003.txt"
+        rlAssertGrep "Number of members removed 2" "$TmpDir/sudorule-remove-runasuser_003.txt"
+        rlRun "cat $TmpDir/sudorule-remove-runasuser_003.txt"
+
+        rlRun "ipa sudorule-del rule1"
+        rlRun "ipa group-del sudogrp1"
+        rlRun "ipa group-del sudogrp2"
+
+rlPhaseEnd
+}
+
+
+sudorule-remove-runasuser_004() {
+
+rlPhaseStartTest "sudorule-remove-runasuser_004: ipa sudorule-remove-runasuser --groups=single group"
+
+        rlRun "ipa group-add sudogrp1 --desc=grp1"
+        rlRun "ipa group-add sudogrp2 --desc=grp2"
+        rlRun "ipa sudorule-add rule1"
+        rlRun "ipa sudorule-add-runasuser rule1 --groups=sudogrp1,sudogrp2"
+
+	rlLog "Verifying bug https://bugzilla.redhat.com/show_bug.cgi?id=713380"
+        rlRun "ipa sudorule-remove-runasuser rule1 --groups=sudogrp1 > $TmpDir/sudorule-remove-runasuser_004.txt 2>&1"
+        rlAssertGrep "Rule name: rule1" "$TmpDir/sudorule-remove-runasuser_004.txt"
+	rlAssertGrep "Run As Group: sudogrp2" "$TmpDir/sudorule-remove-runasuser_004.txt"
+        rlAssertGrep "Number of members removed 1" "$TmpDir/sudorule-remove-runasuser_004.txt"
+        rlRun "cat $TmpDir/sudorule-remove-runasuser_004.txt"
+
+
+        rlRun "ipa sudorule-del rule1"
+        rlRun "ipa group-del sudogrp1"
+        rlRun "ipa group-del sudogrp2"
+
+rlPhaseEnd
+}
+
+sudorule-remove-runasuser_005() {
+
+rlPhaseStartTest "sudorule-remove-runasuser_005: ipa sudorule-remove-runasuser --users=single user"
+
+        rlRun "ipa user-add sudouser1 --first=sudo --last=user1"
+        rlRun "ipa user-add sudouser2 --first=sudo --last=user2"
+        rlRun "ipa sudorule-add rule1"
+        rlRun "ipa sudorule-add-runasuser rule1 --users=sudouser1,sudouser2"
+
+
+        rlRun "ipa sudorule-remove-runasuser rule1 --users=sudouser1 > $TmpDir/sudorule-remove-runasuser_005.txt 2>&1"
+        rlAssertGrep "Rule name: rule1" "$TmpDir/sudorule-remove-runasuser_005.txt"
+	rlAssertGrep "Run As User: sudouser2" "$TmpDir/sudorule-remove-runasuser_005.txt"
+        rlAssertGrep "Number of members removed 1" "$TmpDir/sudorule-remove-runasuser_005.txt"
+        rlRun "cat $TmpDir/sudorule-remove-runasuser_005.txt"
+
+	rlRun "ipa sudorule-find rule1 --all > $TmpDir/sudorule-remove-runasuser_005.txt 2>&1"
+	rlAssertGrep "Run As User: sudouser2" "$TmpDir/sudorule-remove-runasuser_005.txt"
+        rlRun "cat $TmpDir/sudorule-remove-runasuser_005.txt"
+
+        rlRun "ipa user-del sudouser1"
+        rlRun "ipa user-del sudouser2"
+        rlRun "ipa sudorule-del rule1"
+
+rlPhaseEnd
+}
+
+
+sudorule-add-runasgroup_001() {
+
+rlPhaseStartTest "sudorule-add-runasgroup_001: ipa help sudorule-add-runasgroup"
+
+	rlRun "ipa help sudorule-add-runasgroup > $TmpDir/sudorule-add-runasgroup_001.txt 2>&1"
+	rlAssertGrep "Purpose: Add group for Sudo to execute as." "$TmpDir/sudorule-add-runasgroup_001.txt"
+	rlAssertGrep "Usage: ipa \[global-options\] sudorule-add-runasgroup SUDORULE-NAME \[options\]" "$TmpDir/sudorule-add-runasgroup_001.txt"
+	rlAssertGrep "\-h, \--help     show this help message and exit" "$TmpDir/sudorule-add-runasgroup_001.txt"
+	rlAssertGrep "\--all          Retrieve and print all attributes from the server." "$TmpDir/sudorule-add-runasgroup_001.txt"
+	rlAssertGrep "\--raw          Print entries as stored on the server." "$TmpDir/sudorule-add-runasgroup_001.txt"
+	rlAssertGrep "\--groups=LIST  comma-separated list of groups to add" "$TmpDir/sudorule-add-runasgroup_001.txt"
+	rlRun "cat $TmpDir/sudorule-add-runasgroup_001.txt"
+
+rlPhaseEnd
+}
+
+sudorule-add-runasgroup_002() {
+
+rlPhaseStartTest "sudorule-add-runasgroup_002: ipa sudorule-add-runasgroup rule1 --groups --all --raw"
+
+	rlRun "ipa sudorule-add rule1"
+	rlRun "ipa sudorule-add-runasgroup rule1 --groups=tgroup1 > $TmpDir/sudorule-add-runasgroup_002.txt 2>&1"
+	rlAssertGrep "Rule name: rule1" "$TmpDir/sudorule-add-runasgroup_002.txt"
+	rlAssertGrep "RunAs External Group: tgroup1" "$TmpDir/sudorule-add-runasgroup_002.txt"
+	rlAssertGrep "Number of members added 1" "$TmpDir/sudorule-add-runasgroup_002.txt"
+	rlRun "cat $TmpDir/sudorule-add-runasgroup_002.txt"
+
+	rlRun "ipa sudorule-add-runasgroup rule1 --groups=tgroup2 --all > $TmpDir/sudorule-add-runasgroup_002.txt 2>&1"
+	rlAssertGrep "Rule name: rule1" "$TmpDir/sudorule-add-runasgroup_002.txt"
+        rlAssertGrep "RunAs External Group: tgroup1, tgroup2" "$TmpDir/sudorule-add-runasgroup_002.txt"
+        rlRun "cat $TmpDir/sudorule-add-runasgroup_002.txt"
+
+	rlRun "ipa sudorule-add-runasgroup rule1 --groups=tgroup3 --all --raw > $TmpDir/sudorule-add-runasgroup_002.txt 2>&1"
+        rlAssertGrep "cn: rule1" "$TmpDir/sudorule-add-runasgroup_002.txt"
+        rlAssertGrep "ipasudorunasextgroup: tgroup1" "$TmpDir/sudorule-add-runasgroup_002.txt"
+        rlAssertGrep "ipasudorunasextgroup: tgroup2" "$TmpDir/sudorule-add-runasgroup_002.txt"
+        rlAssertGrep "ipasudorunasextgroup: tgroup3" "$TmpDir/sudorule-add-runasgroup_002.txt"
+        rlRun "cat $TmpDir/sudorule-add-runasgroup_002.txt"
+
+	rlRun "ipa group-add sudogrp1 --desc=grp1"
+	rlRun "ipa group-add sudogrp2 --desc=grp2"
+	rlRun "ipa group-add sudogrp3 --desc=grp3"
+	rlRun "ipa group-add sudogrp4 --desc=grp4"
+	rlRun "ipa group-add sudogrp5 --desc=grp5"
+	rlRun "ipa group-add sudogrp6 --desc=grp6"
+
+        rlRun "ipa sudorule-add-runasgroup rule1 --groups=sudogrp1 > $TmpDir/sudorule-add-runasgroup_002.txt 2>&1"
+        rlAssertGrep "Rule name: rule1" "$TmpDir/sudorule-add-runasgroup_002.txt"
+        rlAssertGrep "Run As Group: sudogrp1" "$TmpDir/sudorule-add-runasgroup_002.txt"
+        rlAssertGrep "Number of members added 1" "$TmpDir/sudorule-add-runasgroup_002.txt"
+        rlRun "cat $TmpDir/sudorule-add-runasgroup_002.txt"
+
+        rlRun "ipa sudorule-add-runasgroup rule1 --groups=sudogrp2 --all > $TmpDir/sudorule-add-runasgroup_002.txt 2>&1"
+        rlAssertGrep "Rule name: rule1" "$TmpDir/sudorule-add-runasgroup_002.txt"
+        rlAssertGrep "Run As Group: sudogrp1, sudogrp2" "$TmpDir/sudorule-add-runasgroup_002.txt"
+        rlRun "cat $TmpDir/sudorule-add-runasgroup_002.txt"
+
+        rlRun "ipa sudorule-add-runasgroup rule1 --groups=sudogrp3 --all --raw > $TmpDir/sudorule-add-runasgroup_002.txt 2>&1"
+        rlAssertGrep "cn: rule1" "$TmpDir/sudorule-add-runasgroup_002.txt"
+        rlAssertGrep "ipasudorunasgroup: cn=sudogrp1,cn=groups,cn=accounts," "$TmpDir/sudorule-add-runasgroup_002.txt"
+        rlAssertGrep "ipasudorunasgroup: cn=sudogrp2,cn=groups,cn=accounts," "$TmpDir/sudorule-add-runasgroup_002.txt"
+        rlAssertGrep "ipasudorunasgroup: cn=sudogrp3,cn=groups,cn=accounts," "$TmpDir/sudorule-add-runasgroup_002.txt"
+        rlRun "cat $TmpDir/sudorule-add-runasgroup_002.txt"
+
+	rlRun "ipa sudorule-add-runasgroup rule1 --groups=tgroup4,tgroup5,tgroup6 > $TmpDir/sudorule-add-runasgroup_002.txt 2>&1"
+	rlAssertGrep "Rule name: rule1" "$TmpDir/sudorule-add-runasgroup_002.txt"
+	rlAssertGrep "RunAs External Group: tgroup1, tgroup2, tgroup3, tgroup4, tgroup5, tgroup6" "$TmpDir/sudorule-add-runasgroup_002.txt"
+        rlAssertGrep "Number of members added 3" "$TmpDir/sudorule-add-runasgroup_002.txt"
+        rlRun "cat $TmpDir/sudorule-add-runasgroup_002.txt"
+
+        rlRun "ipa sudorule-add-runasgroup rule1 --groups=sudogrp4,sudogrp5,sudogrp6 > $TmpDir/sudorule-add-runasgroup_002.txt 2>&1"
+        rlAssertGrep "Rule name: rule1" "$TmpDir/sudorule-add-runasgroup_002.txt"
+        rlAssertGrep "Run As Group: sudogrp1, sudogrp2, sudogrp3, sudogrp4, sudogrp5, sudogrp6" "$TmpDir/sudorule-add-runasgroup_002.txt"
+        rlAssertGrep "Number of members added 3" "$TmpDir/sudorule-add-runasgroup_002.txt"
+        rlRun "cat $TmpDir/sudorule-add-runasgroup_002.txt"
+
+rlPhaseEnd
+}
+
+sudorule-remove-runasgroup_001() {
+
+rlPhaseStartTest "sudorule-remove-runasgroup_001: ipa help sudorule-remove-runasgroup"
+
+	rlRun "ipa help sudorule-remove-runasgroup > $TmpDir/sudorule-remove-runasgroup_001.txt 2>&1"
+	rlAssertGrep "Purpose: Remove group for Sudo to execute as." "$TmpDir/sudorule-remove-runasgroup_001.txt"
+	rlAssertGrep "Usage: ipa \[global-options\] sudorule-remove-runasgroup SUDORULE-NAME \[options\]" "$TmpDir/sudorule-remove-runasgroup_001.txt"
+	rlAssertGrep "\-h, \--help     show this help message and exit" "$TmpDir/sudorule-remove-runasgroup_001.txt"
+        rlAssertGrep "\--all          Retrieve and print all attributes from the server." "$TmpDir/sudorule-remove-runasgroup_001.txt"
+        rlAssertGrep "\--groups=LIST  comma-separated list of groups to remove" "$TmpDir/sudorule-remove-runasgroup_001.txt"
+	rlRun "cat $TmpDir/sudorule-remove-runasgroup_001.txt"
+
+rlPhaseEnd
+}
+
+
+sudorule-remove-runasgroup_002() {
+
+rlPhaseStartTest "sudorule-remove-runasgroup_002: ipa sudorule-remove-runasgroup --groups --all --raw"
+
+        rlRun "ipa sudorule-remove-runasgroup rule1 --groups=tgroup1 > $TmpDir/sudorule-remove-runasgroup_002.txt 2>&1"
+        rlAssertGrep "Rule name: rule1" "$TmpDir/sudorule-remove-runasgroup_002.txt"
+        rlAssertGrep "Number of members removed 1" "$TmpDir/sudorule-remove-runasgroup_002.txt"
+        rlRun "cat $TmpDir/sudorule-remove-runasgroup_002.txt"
+
+        rlRun "ipa sudorule-remove-runasgroup rule1 --groups=tgroup2 --all > $TmpDir/sudorule-remove-runasgroup_002.txt 2>&1"
+        rlAssertGrep "Rule name: rule1" "$TmpDir/sudorule-remove-runasgroup_002.txt"
+        rlAssertGrep "objectclass: ipaassociation, ipasudorule" "$TmpDir/sudorule-remove-runasgroup_002.txt"
+        rlAssertGrep "Number of members removed 1" "$TmpDir/sudorule-remove-runasgroup_002.txt"
+        rlRun "cat $TmpDir/sudorule-remove-runasgroup_002.txt"
+
+        rlRun "ipa sudorule-remove-runasgroup rule1 --groups=tgroup3 --all --raw > $TmpDir/sudorule-remove-runasgroup_002.txt 2>&1"
+        rlAssertGrep "cn: rule1" "$TmpDir/sudorule-remove-runasgroup_002.txt"
+	rlLog "Verifying bug https://bugzilla.redhat.com/show_bug.cgi?id=713481"
+        rlAssertNotGrep "ipasudorunasextgroup: tgroup3" "$TmpDir/sudorule-remove-runasgroup_002.txt"
+        rlAssertGrep "ipasudorunasextgroup: tgroup4" "$TmpDir/sudorule-remove-runasgroup_002.txt"
+        rlAssertGrep "ipasudorunasextgroup: tgroup5" "$TmpDir/sudorule-remove-runasgroup_002.txt"
+        rlAssertGrep "ipasudorunasextgroup: tgroup6" "$TmpDir/sudorule-remove-runasgroup_002.txt"
+        rlRun "cat $TmpDir/sudorule-remove-runasgroup_002.txt"
+
+        rlRun "ipa sudorule-remove-runasgroup rule1 --groups=sudogrp1 > $TmpDir/sudorule-remove-runasgroup_002.txt 2>&1"
+        rlAssertGrep "Rule name: rule1" "$TmpDir/sudorule-remove-runasgroup_002.txt"
+        rlAssertGrep "Number of members removed 1" "$TmpDir/sudorule-remove-runasgroup_002.txt"
+        rlRun "cat $TmpDir/sudorule-remove-runasgroup_002.txt"
+
+        rlRun "ipa sudorule-remove-runasgroup rule1 --groups=sudogrp2 --all > $TmpDir/sudorule-remove-runasgroup_002.txt 2>&1"
+        rlAssertGrep "Rule name: rule1" "$TmpDir/sudorule-remove-runasgroup_002.txt"
+        rlAssertGrep "Run As Group: sudogrp3, sudogrp4, sudogrp5, sudogrp6" "$TmpDir/sudorule-remove-runasgroup_002.txt"
+        rlRun "cat $TmpDir/sudorule-remove-runasgroup_002.txt"
+
+        rlRun "ipa sudorule-remove-runasgroup rule1 --groups=sudogrp3 --all --raw > $TmpDir/sudorule-remove-runasgroup_002.txt 2>&1"
+        rlAssertGrep "cn: rule1" "$TmpDir/sudorule-remove-runasgroup_002.txt"
+        rlAssertGrep "ipasudorunasgroup: cn=sudogrp4,cn=groups,cn=accounts," "$TmpDir/sudorule-remove-runasgroup_002.txt"
+        rlAssertGrep "ipasudorunasgroup: cn=sudogrp5,cn=groups,cn=accounts," "$TmpDir/sudorule-remove-runasgroup_002.txt"
+        rlAssertGrep "ipasudorunasgroup: cn=sudogrp6,cn=groups,cn=accounts," "$TmpDir/sudorule-remove-runasgroup_002.txt"
+        rlRun "cat $TmpDir/sudorule-remove-runasgroup_002.txt"
+
+        rlRun "ipa sudorule-remove-runasgroup rule1 --groups=tgroup4,tgroup5,tgroup6 > $TmpDir/sudorule-remove-runasgroup_002.txt 2>&1"
+        rlAssertGrep "Rule name: rule1" "$TmpDir/sudorule-remove-runasgroup_002.txt"
+        rlAssertGrep "Number of members removed 3" "$TmpDir/sudorule-remove-runasgroup_002.txt"
+        rlRun "cat $TmpDir/sudorule-remove-runasgroup_002.txt"
+
+        rlRun "ipa sudorule-remove-runasgroup rule1 --groups=sudogrp4,sudogrp5,sudogrp6 > $TmpDir/sudorule-remove-runasgroup_002.txt 2>&1"
+        rlAssertGrep "Rule name: rule1" "$TmpDir/sudorule-remove-runasgroup_002.txt"
+        rlAssertGrep "Number of members removed 3" "$TmpDir/sudorule-remove-runasgroup_002.txt"
+        rlRun "cat $TmpDir/sudorule-remove-runasgroup_002.txt"
+
+
+	rlRun "ipa group-del sudogrp1"
+	rlRun "ipa group-del sudogrp2"
+	rlRun "ipa group-del sudogrp3"
+	rlRun "ipa group-del sudogrp4"
+	rlRun "ipa group-del sudogrp5"
+	rlRun "ipa group-del sudogrp6"
+	rlRun "ipa sudorule-del rule1"
 
 rlPhaseEnd
 }
@@ -1393,38 +1703,301 @@ rlPhaseStartTest "sudorule-mod_001: ipa help sudorule-mod"
 	rlRun "ipa help sudorule-mod > $TmpDir/sudorule-mod_001.txt 2>&1"
 	rlAssertGrep "Purpose: Modify Sudo Rule." "$TmpDir/sudorule-mod_001.txt"
 	rlAssertGrep "Usage: ipa \[global-options\] sudorule-mod SUDORULE-NAME \[options\]" "$TmpDir/sudorule-mod_001.txt"
-	rlAssertGrep "-h, --help            show this help message and exit" "$TmpDir/sudorule-mod_001.txt"
-	rlAssertGrep "--desc=STR            Description" "$TmpDir/sudorule-mod_001.txt"
-	rlAssertGrep "--usercat=STRENUM     User category the rule applies to" "$TmpDir/sudorule-mod_001.txt"
-	rlAssertGrep "--hostcat=STRENUM     Host category the rule applies to" "$TmpDir/sudorule-mod_001.txt"
-	rlAssertGrep "--cmdcat=STRENUM      Command category the rule applies to" "$TmpDir/sudorule-mod_001.txt"
-	rlAssertGrep "--runasusercat=STRENUM" "$TmpDir/sudorule-mod_001.txt"
+	rlAssertGrep "\-h, \--help            show this help message and exit" "$TmpDir/sudorule-mod_001.txt"
+	rlAssertGrep "\--desc=STR            Description" "$TmpDir/sudorule-mod_001.txt"
+	rlAssertGrep "\--usercat=STRENUM     User category the rule applies to" "$TmpDir/sudorule-mod_001.txt"
+	rlAssertGrep "\--hostcat=STRENUM     Host category the rule applies to" "$TmpDir/sudorule-mod_001.txt"
+	rlAssertGrep "\--cmdcat=STRENUM      Command category the rule applies to" "$TmpDir/sudorule-mod_001.txt"
+	rlAssertGrep "\--runasusercat=STRENUM" "$TmpDir/sudorule-mod_001.txt"
 	rlAssertGrep "Run As User category the rule applies to" "$TmpDir/sudorule-mod_001.txt"
-	rlAssertGrep "--runasgroupcat=STRENUM" "$TmpDir/sudorule-mod_001.txt"
+	rlAssertGrep "\--runasgroupcat=STRENUM" "$TmpDir/sudorule-mod_001.txt"
 	rlAssertGrep "Run As Group category the rule applies to" "$TmpDir/sudorule-mod_001.txt"
-	rlAssertGrep "--externaluser=STR    External User the rule applies to" "$TmpDir/sudorule-mod_001.txt"
-	rlAssertGrep "--runasexternaluser=STR" "$TmpDir/sudorule-mod_001.txt"
+	rlAssertGrep "\--externaluser=STR    External User the rule applies to" "$TmpDir/sudorule-mod_001.txt"
+	rlAssertGrep "\--runasexternaluser=STR" "$TmpDir/sudorule-mod_001.txt"
 	rlAssertGrep "External User the commands can run as" "$TmpDir/sudorule-mod_001.txt"
-	rlAssertGrep "--runasexternalgroup=STR" "$TmpDir/sudorule-mod_001.txt"
+	rlAssertGrep "\--runasexternalgroup=STR" "$TmpDir/sudorule-mod_001.txt"
 	rlAssertGrep "External Group the commands can run as" "$TmpDir/sudorule-mod_001.txt"
-	rlAssertGrep "--addattr=STR         Add an attribute/value pair. Format is attr=value." "$TmpDir/sudorule-mod_001.txt"
-	rlAssertGrep "--setattr=STR         Set an attribute to a name/value pair." "$TmpDir/sudorule-mod_001.txt"
-	rlAssertGrep "--rights              Display the access rights of this entry" "$TmpDir/sudorule-mod_001.txt"
-	rlAssertGrep "--all                 Retrieve and print all attributes from the server." "$TmpDir/sudorule-mod_001.txt"
-	rlAssertGrep "--raw                 Print entries as stored on the server." "$TmpDir/sudorule-mod_001.txt"
+	rlAssertGrep "\--addattr=STR         Add an attribute/value pair. Format is attr=value." "$TmpDir/sudorule-mod_001.txt"
+	rlAssertGrep "\--setattr=STR         Set an attribute to a name/value pair." "$TmpDir/sudorule-mod_001.txt"
+	rlAssertGrep "\--rights              Display the access rights of this entry" "$TmpDir/sudorule-mod_001.txt"
+	rlAssertGrep "\--all                 Retrieve and print all attributes from the server." "$TmpDir/sudorule-mod_001.txt"
+	rlAssertGrep "\--raw                 Print entries as stored on the server." "$TmpDir/sudorule-mod_001.txt"
 	rlRun "cat $TmpDir/sudorule-mod_001.txt"
 
 rlPhaseEnd
 }
 
 
+sudorule-mod_002() {
+
+rlPhaseStartTest "sudorule-mod_002: ipa sudorule-mod --desc"
+
+	rlRun "ipa sudorule-add --desc=\"rule 1\" rule1"
+
+	rlRun "ipa sudorule-mod rule1 --desc=\"sudorule rule 1\" > $TmpDir/sudorule-mod_002.txt 2>&1"
+	rlAssertGrep "Description: sudorule rule 1" "$TmpDir/sudorule-mod_002.txt"
+	rlRun "ipa sudorule-find rule1 --all --raw | grep \"description: sudorule rule 1\""
+
+	rlRun "ipa sudorule-del rule1"
+
+rlPhaseEnd
+}
+
+sudorule-mod_003() {
+
+rlPhaseStartTest "sudorule-mod_003: ipa sudorule-mod --usercat"
+
+        rlRun "ipa sudorule-add --desc=\"rule 1\" rule1"
+
+	rlRun "ipa sudorule-mod rule1 --usercat=all > $TmpDir/sudorule-mod_003.txt 2>&1"
+	rlAssertGrep "Rule name: rule1" "$TmpDir/sudorule-mod_003.txt"
+	rlAssertGrep "Enabled: TRUE" "$TmpDir/sudorule-mod_003.txt"
+        rlAssertGrep "User category: all" "$TmpDir/sudorule-mod_003.txt"
+	rlRun "cat $TmpDir/sudorule-mod_003.txt"
+
+        rlRun "ipa sudorule-del rule1"
+
+rlPhaseEnd
+}
+
+sudorule-mod_004() {
+
+rlPhaseStartTest "sudorule-mod_004: ipa sudorule-mod --hostcat"
+
+        rlRun "ipa sudorule-add --desc=\"rule 1\" rule1"
+
+	rlRun "ipa sudorule-mod rule1 --hostcat=all > $TmpDir/sudorule-mod_004.txt 2>&1"
+        rlAssertGrep "Rule name: rule1" "$TmpDir/sudorule-mod_004.txt"
+        rlAssertGrep "Enabled: TRUE" "$TmpDir/sudorule-mod_004.txt"
+        rlAssertGrep "Host category: all" "$TmpDir/sudorule-mod_004.txt"
+        rlRun "cat $TmpDir/sudorule-mod_004.txt"
+
+        rlRun "ipa sudorule-del rule1"
+
+rlPhaseEnd
+}
+
+sudorule-mod_005() {
+
+rlPhaseStartTest "sudorule-mod_005: ipa sudorule-mod --cmdcat"
+
+        rlRun "ipa sudorule-add --desc=\"rule 1\" rule1"
+
+        rlRun "ipa sudorule-mod rule1 --hostcat=all > $TmpDir/sudorule-mod_005.txt 2>&1"
+        rlAssertGrep "Rule name: rule1" "$TmpDir/sudorule-mod_005.txt"
+        rlAssertGrep "Enabled: TRUE" "$TmpDir/sudorule-mod_005.txt"
+        rlAssertGrep "Host category: all" "$TmpDir/sudorule-mod_005.txt"
+        rlRun "cat $TmpDir/sudorule-mod_005.txt"
+
+        rlRun "ipa sudorule-del rule1"
+
+rlPhaseEnd
+}
+
+sudorule-mod_006() {
+
+rlPhaseStartTest "sudorule-mod_006: ipa sudorule-mod --runasusercat"
+
+        rlRun "ipa sudorule-add --desc=\"rule 1\" rule1"
+
+        rlRun "ipa sudorule-mod rule1 --runasusercat=all > $TmpDir/sudorule-mod_006.txt 2>&1"
+        rlAssertGrep "Rule name: rule1" "$TmpDir/sudorule-mod_006.txt"
+        rlAssertGrep "Enabled: TRUE" "$TmpDir/sudorule-mod_006.txt"
+        rlAssertGrep "Run As User category: all" "$TmpDir/sudorule-mod_006.txt"
+        rlRun "cat $TmpDir/sudorule-mod_006.txt"
+
+        rlRun "ipa sudorule-del rule1"
+
+rlPhaseEnd
+}
+
+sudorule-mod_007() {
+
+rlPhaseStartTest "sudorule-mod_007: ipa sudorule-mod --runasgroupcat"
+
+        rlRun "ipa sudorule-add --desc=\"rule 1\" rule1"
+
+        rlRun "ipa sudorule-mod rule1 --runasusercat=all > $TmpDir/sudorule-mod_007.txt 2>&1"
+        rlAssertGrep "Rule name: rule1" "$TmpDir/sudorule-mod_007.txt"
+        rlAssertGrep "Enabled: TRUE" "$TmpDir/sudorule-mod_007.txt"
+        rlAssertGrep "Run As User category: all" "$TmpDir/sudorule-mod_007.txt"
+        rlRun "cat $TmpDir/sudorule-mod_007.txt"
+
+        rlRun "ipa sudorule-del rule1"
+
+rlPhaseEnd
+}
+
+sudorule-mod_008() {
+
+rlPhaseStartTest "sudorule-mod_008: ipa sudorule-mod --externaluser"
+
+        rlRun "ipa sudorule-add --desc=\"rule 1\" rule1"
+
+	rlRun "ipa sudorule-mod rule1 --externaluser=test1,test2 > $TmpDir/sudorule-mod_008.txt 2>&1"
+	rlAssertGrep "Rule name: rule1" "$TmpDir/sudorule-mod_008.txt"
+	rlAssertGrep "External User: test1,test2" "$TmpDir/sudorule-mod_008.txt"
+	rlRun "cat $TmpDir/sudorule-mod_008.txt"
+
+	rlLog "https://bugzilla.redhat.com/show_bug.cgi?id=713069"
+	rlRun "ipa sudorule-find rule1 --all --raw > $TmpDir/sudorule-mod_008.txt 2>&1"
+	rlAssertGrep "externaluser: test1" "$TmpDir/sudorule-mod_008.txt"
+	rlAssertGrep "externaluser: test2" "$TmpDir/sudorule-mod_008.txt"
+	rlRun "cat $TmpDir/sudorule-mod_008.txt"
+
+        rlRun "ipa sudorule-del rule1"
+
+rlPhaseEnd
+}
+
+
+sudorule-mod_009() {
+
+rlPhaseStartTest "sudorule-mod_009: ipa sudorule-mod --runasexternaluser"
+
+        rlRun "ipa sudorule-add --desc=\"rule 1\" rule1"
+	rlRun "ipa sudorule-add-runasuser rule1 --users=extuser1,extuser2,extuser3"
+	rlRun "ipa sudorule-find rule1 --all --raw | grep \"ipasudorunasextuser: extuser1\""
+	rlRun "ipa sudorule-find rule1 --all --raw | grep \"ipasudorunasextuser: extuser2\""
+	rlRun "ipa sudorule-find rule1 --all --raw | grep \"ipasudorunasextuser: extuser3\""
+
+	rlRun "ipa sudorule-mod rule1 --runasexternaluser=extuser2,extuser3,extuser4"
+	
+	rlLog "Verifying bug https://bugzilla.redhat.com/show_bug.cgi?id=711667"
+	rlRun "ipa sudorule-find rule1 --all --raw | grep \"ipasudorunasextuser: extuser2\""
+        rlRun "ipa sudorule-find rule1 --all --raw | grep \"ipasudorunasextuser: extuser3\""
+        rlRun "ipa sudorule-find rule1 --all --raw | grep \"ipasudorunasextuser: extuser4\""
+
+        rlRun "ipa sudorule-del rule1"
+
+rlPhaseEnd
+}
+
+
+sudorule-mod_010() {
+
+rlPhaseStartTest "sudorule-mod_010: ipa sudorule-mod --runasexternalgroup"
+
+        rlRun "ipa sudorule-add --desc=\"rule 1\" rule1"
+        rlRun "ipa sudorule-add-runasgroup rule1 --groups=extgrp1,extgrp2,extgrp3"
+        rlRun "ipa sudorule-find rule1 --all --raw | grep \"ipasudorunasextgroup: extgrp1\""
+        rlRun "ipa sudorule-find rule1 --all --raw | grep \"ipasudorunasextgroup: extgrp2\""
+        rlRun "ipa sudorule-find rule1 --all --raw | grep \"ipasudorunasextgroup: extgrp3\""
+
+        rlRun "ipa sudorule-mod rule1 --runasexternaluser=extgrp2,extgrp3,extgrp4"
+
+	rlLog "Verifying bug https://bugzilla.redhat.com/show_bug.cgi?id=711671"
+        rlRun "ipa sudorule-find rule1 --all --raw | grep \"ipasudorunasextgroup: extgrp2\""
+        rlRun "ipa sudorule-find rule1 --all --raw | grep \"ipasudorunasextgroup: extgrp3\""
+        rlRun "ipa sudorule-find rule1 --all --raw | grep \"ipasudorunasextgroup: extgrp4\""
+
+        rlRun "ipa sudorule-del rule1"
+        
+rlPhaseEnd
+}
+
+sudorule-mod_011() {
+
+rlPhaseStartTest "sudorule-mod_011: ipa sudorule-mod --setattr"
+
+        rlRun "ipa sudorule-add --desc=\"rule 1\" rule1"
+
+	rlRun "ipa sudorule-add-user rule1 --users=test1"
+	rlRun "ipa sudorule-mod rule1 --setattr=externaluser=test2 > $TmpDir/sudorule-mod_011.txt 2>&1"
+	rlAssertGrep "Rule name: rule1" "$TmpDir/sudorule-mod_011.txt"
+	rlAssertGrep "External User: test2" "$TmpDir/sudorule-mod_011.txt"
+	rlRun "cat $TmpDir/sudorule-mod_011.txt"
+
+	rlRun "ipa sudorule-find rule1 --all --raw > $TmpDir/sudorule-mod_011.txt 2>&1"
+	rlAssertGrep "externaluser: test2" "$TmpDir/sudorule-mod_011.txt"
+	rlRun "cat $TmpDir/sudorule-mod_011.txt"
+
+        rlRun "ipa sudorule-del rule1"
+
+rlPhaseEnd
+}
+
+
+sudorule-mod_012() {
+
+rlPhaseStartTest "sudorule-mod_012: ipa sudorule-mod --addattr"
+
+        rlRun "ipa sudorule-add --desc=\"rule 1\" rule1"
+  	rlRun "ipa user-add sudorule11 --first=sudo --last=rule11"
+
+ 	rlRun "ipa sudorule-mod rule1 --addattr=\"memberuser=uid=sudorule11,cn=users,cn=accounts,$BASE\" > $TmpDir/sudorule-mod_012.txt 2>&1" 
+	rlAssertGrep "Rule name: rule1" "$TmpDir/sudorule-mod_012.txt"
+	rlAssertGrep "Users: sudorule11" "$TmpDir/sudorule-mod_012.txt"
+	rlRun "cat $TmpDir/sudorule-mod_012.txt"
+
+	rlRun "ipa sudorule-find rule1 --all --raw > $TmpDir/sudorule-mod_012.txt 2>&1"
+	rlAssertGrep " memberuser: uid=sudorule11,cn=users,cn=accounts,$BASE" "$TmpDir/sudorule-mod_012.txt"
+	rlRun "cat $TmpDir/sudorule-mod_012.txt"
+
+        rlRun "ipa sudorule-del rule1"
+	rlRun "ipa user-del sudorule11"
+
+rlPhaseEnd
+}
+
+sudorule-mod_013() {
+
+rlPhaseStartTest "sudorule-mod_013: ipa sudorule-mod --rights --all"
+
+        rlRun "ipa sudorule-add --desc=\"rule 1\" rule1"
+	rlRun "ipa user-add sudorule11 --first=sudo --last=rule11"
+
+        rlRun "ipa sudorule-mod rule1 --addattr=\"memberuser=uid=sudorule11,cn=users,cn=accounts,$BASE\" --rights --all > $TmpDir/sudorule-mod_013.txt 2>&1"
+        rlAssertGrep "Rule name: rule1" "$TmpDir/sudorule-mod_013.txt"
+        rlAssertGrep "Users: sudorule11" "$TmpDir/sudorule-mod_013.txt"
+        rlAssertGrep "attributelevelrights: {'cn': u'rscwo', 'hostmask': u'rscwo', 'memberdenycmd': u'rscwo', 'memberallowcmd': u'rscwo', 'ipasudorunas': u'rscwo', 'cmdcategory': u'rscwo', 'ipasudoopt': u'rscwo', 'nsaccountlock': u'rscwo', 'ipasudorunasextuser': u'rscwo', 'externaluser': u'rscwo', 'memberhost': u'rscwo', 'description': u'rscwo', 'externalhost': u'rscwo', 'hostcategory': u'rscwo', 'ipauniqueid': u'rsc', 'ipaenabledflag': u'rscwo', 'ipasudorunasgroup': u'rscwo', 'ipasudorunasgroupcategory': u'rscwo', 'ipasudorunasextgroup': u'rscwo', 'aci': u'rscwo', 'memberuser': u'rscwo', 'usercategory': u'rscwo', 'ipasudorunasusercategory': u'rscwo'}" "$TmpDir/sudorule-mod_013.txt"
+        rlRun "cat $TmpDir/sudorule-mod_013.txt"
+
+        rlRun "ipa sudorule-del rule1"
+        rlRun "ipa user-del sudorule11"
+
+rlPhaseEnd
+}
+
+sudorule-find_001() {
+
+rlPhaseStartTest "sudorule-find_001: ipa help sudorule-find"
+
+        rlRun "ipa help sudorule-find > $TmpDir/sudorule-find_001.txt 2>&1"
+        rlAssertGrep "Purpose: Search for Sudo Rule." "$TmpDir/sudorule-find_001.txt"
+        rlAssertGrep "Usage: ipa \[global-options\] sudorule-find \[CRITERIA\] \[options\]" "$TmpDir/sudorule-find_001.txt"
+        rlAssertGrep "\-h, \--help            show this help message and exit" "$TmpDir/sudorule-find_001.txt"
+        rlAssertGrep "\--sudorule-name=STR   Rule name" "$TmpDir/sudorule-find_001.txt"
+        rlAssertGrep "\--desc=STR            Description" "$TmpDir/sudorule-find_001.txt"
+        rlAssertGrep "\--usercat=STRENUM     User category the rule applies to" "$TmpDir/sudorule-find_001.txt"
+        rlAssertGrep "\--hostcat=STRENUM     Host category the rule applies to" "$TmpDir/sudorule-find_001.txt"
+        rlAssertGrep "\--runasusercat=STRENUM" "$TmpDir/sudorule-find_001.txt"
+        rlAssertGrep "Run As User category the rule applies to" "$TmpDir/sudorule-find_001.txt"
+        rlAssertGrep "\--runasgroupcat=STRENUM" "$TmpDir/sudorule-find_001.txt"
+        rlAssertGrep "Run As Group category the rule applies to" "$TmpDir/sudorule-find_001.txt"
+        rlAssertGrep "\--externaluser=STR    External User the rule applies to" "$TmpDir/sudorule-find_001.txt"
+        rlAssertGrep "\--runasexternaluser=STR" "$TmpDir/sudorule-find_001.txt"
+        rlAssertGrep "External User the commands can run as" "$TmpDir/sudorule-find_001.txt"
+        rlAssertGrep "\--runasexternalgroup=STR" "$TmpDir/sudorule-find_001.txt"
+        rlAssertGrep "External Group the commands can run as" "$TmpDir/sudorule-find_001.txt"
+        rlAssertGrep "\--timelimit=INT       Time limit of search in seconds" "$TmpDir/sudorule-find_001.txt"
+        rlAssertGrep "\--sizelimit=INT       Maximum number of entries returned" "$TmpDir/sudorule-find_001.txt"
+        rlAssertGrep "\--all                 Retrieve and print all attributes from the server." "$TmpDir/sudorule-find_001.txt"
+        rlAssertGrep "\--raw                 Print entries as stored on the server." "$TmpDir/sudorule-find_001.txt"
+        rlRun "cat $TmpDir/sudorule-find_001.txt"
+
+rlPhaseEnd
+}
+
 sudorule-find_002() {
 
 rlPhaseStartTest "sudorule-find_002: ipa sudorule-find --sudorule-name"
 
+	rlRun "ipa sudorule-add --desc=\"sudo rule1\" sudorule1"
 	rlRun "ipa sudorule-find --sudorule-name=sudorule1 > $TmpDir/sudorule-find_002.txt 2>&1"
 	rlAssertGrep "Number of entries returned 1" "$TmpDir/sudorule-find_002.txt"
 	rlRun "cat $TmpDir/sudorule-find_002.txt"
+	rlRun "ipa sudorule-del sudorule1"
 
 rlPhaseEnd
 }
@@ -1441,20 +2014,272 @@ rlPhaseStartTest "sudorule-find_003: ipa sudorule-find --desc"
 	rlAssertGrep "Number of entries returned 1" "$TmpDir/sudorule-find_003.txt"
         rlRun "cat $TmpDir/sudorule-find_003.txt"
 
+	rlRun "ipa sudorule-del  sudorule9"
+	rlRun "ipa sudorule-del  sudorule10"
+rlPhaseEnd
+}
+
+sudorule-find_004() {
+ 
+rlPhaseStartTest "sudorule-find_004: ipa sudorule-find --usercat"
+ 
+        rlRun "ipa sudorule-add sudorule1"
+        rlRun "ipa sudorule-add sudorule2"
+        rlRun "ipa sudorule-mod sudorule1 --usercat=all"
+ 
+        rlRun "ipa sudorule-find --usercat=all > $TmpDir/sudorule-find_004.txt 2>&1"
+        rlAssertGrep "Number of entries returned 1" "$TmpDir/sudorule-find_004.txt"
+        rlRun "cat $TmpDir/sudorule-find_004.txt"
+ 
+        rlRun "ipa sudorule-find --usercat=all --all > $TmpDir/sudorule-find_004.txt"
+        rlAssertGrep "Rule name: sudorule1" "$TmpDir/sudorule-find_004.txt"
+        rlAssertGrep "User category: all" "$TmpDir/sudorule-find_004.txt"
+        rlAssertGrep "Number of entries returned 1" "$TmpDir/sudorule-find_004.txt"
+        rlRun "cat $TmpDir/sudorule-find_004.txt"
+ 
+        rlRun "ipa sudorule-del  sudorule1"
+        rlRun "ipa sudorule-del  sudorule2"
 rlPhaseEnd
 }
 
 
 
+sudorule-find_005() {
+ 
+rlPhaseStartTest "sudorule-find_005: ipa sudorule-find --hostcat"
+ 
+        rlRun "ipa sudorule-add sudorule1"
+        rlRun "ipa sudorule-add sudorule2"
+        rlRun "ipa sudorule-mod sudorule1 --hostcat=all"
+ 
+        rlRun "ipa sudorule-find --hostcat=all > $TmpDir/sudorule-find_005.txt 2>&1"
+        rlAssertGrep "Number of entries returned 1" "$TmpDir/sudorule-find_005.txt"
+        rlRun "cat $TmpDir/sudorule-find_005.txt"
+ 
+        rlRun "ipa sudorule-find --hostcat=all --all > $TmpDir/sudorule-find_005.txt"
+        rlAssertGrep "Rule name: sudorule1" "$TmpDir/sudorule-find_005.txt"
+        rlAssertGrep "Host category: all" "$TmpDir/sudorule-find_005.txt"
+        rlAssertGrep "Number of entries returned 1" "$TmpDir/sudorule-find_005.txt"
+        rlRun "cat $TmpDir/sudorule-find_005.txt"
+ 
+        rlRun "ipa sudorule-del  sudorule1"
+        rlRun "ipa sudorule-del  sudorule2"
+rlPhaseEnd
+}
 
 
+sudorule-find_006() {
+ 
+rlPhaseStartTest "sudorule-find_006: ipa sudorule-find --cmdcat"
+ 
+        rlRun "ipa sudorule-add sudorule1"
+        rlRun "ipa sudorule-add sudorule2"
+        rlRun "ipa sudorule-mod sudorule1 --cmdcat=all"
+ 
+        rlRun "ipa sudorule-find --cmdcat=all > $TmpDir/sudorule-find_006.txt 2>&1"
+        rlAssertGrep "Number of entries returned 1" "$TmpDir/sudorule-find_006.txt"
+        rlRun "cat $TmpDir/sudorule-find_006.txt"
+ 
+        rlRun "ipa sudorule-find sudorule1 --all > $TmpDir/sudorule-find_006.txt"
+        rlAssertGrep "Rule name: sudorule1" "$TmpDir/sudorule-find_006.txt"
+        rlAssertGrep "Command category: all" "$TmpDir/sudorule-find_006.txt"
+        rlAssertGrep "Number of entries returned 1" "$TmpDir/sudorule-find_006.txt"
+        rlRun "cat $TmpDir/sudorule-find_006.txt"
+ 
+        rlRun "ipa sudorule-del  sudorule1"
+        rlRun "ipa sudorule-del  sudorule2"
+rlPhaseEnd
+}
 
 
+sudorule-find_007() {
+ 
+rlPhaseStartTest "sudorule-find_007: ipa sudorule-find --runasusercat"
+ 
+        rlRun "ipa sudorule-add sudorule1"
+        rlRun "ipa sudorule-add sudorule2"
+        rlRun "ipa sudorule-mod sudorule1 --runasusercat=all"
+ 
+        rlRun "ipa sudorule-find --runasusercat=all > $TmpDir/sudorule-find_007.txt 2>&1"
+        rlAssertGrep "Number of entries returned 1" "$TmpDir/sudorule-find_007.txt"
+        rlRun "cat $TmpDir/sudorule-find_007.txt"
+ 
+        rlRun "ipa sudorule-find --runasusercat=all --all > $TmpDir/sudorule-find_007.txt"
+        rlAssertGrep "Rule name: sudorule1" "$TmpDir/sudorule-find_007.txt"
+        rlAssertGrep "Run As User category: all" "$TmpDir/sudorule-find_007.txt"
+        rlAssertGrep "Number of entries returned 1" "$TmpDir/sudorule-find_007.txt"
+        rlRun "cat $TmpDir/sudorule-find_007.txt"
+ 
+        rlRun "ipa sudorule-del  sudorule1"
+        rlRun "ipa sudorule-del  sudorule2"
+rlPhaseEnd
+}
+
+sudorule-find_008() {
+ 
+rlPhaseStartTest "sudorule-find_008: ipa sudorule-find --runasgroupcat"
+ 
+        rlRun "ipa sudorule-add sudorule1"
+        rlRun "ipa sudorule-add sudorule2"
+        rlRun "ipa sudorule-mod sudorule1 --runasgroupcat=all"
+ 
+        rlRun "ipa sudorule-find --runasgroupcat=all > $TmpDir/sudorule-find_008.txt 2>&1"
+        rlAssertGrep "Number of entries returned 1" "$TmpDir/sudorule-find_008.txt"
+        rlRun "cat $TmpDir/sudorule-find_008.txt"
+ 
+        rlRun "ipa sudorule-find --runasgroupcat=all --all > $TmpDir/sudorule-find_008.txt"
+        rlAssertGrep "Rule name: sudorule1" "$TmpDir/sudorule-find_008.txt"
+        rlAssertGrep "Run As Group category: all" "$TmpDir/sudorule-find_008.txt"
+        rlAssertGrep "Number of entries returned 1" "$TmpDir/sudorule-find_008.txt"
+        rlRun "cat $TmpDir/sudorule-find_008.txt"
+ 
+        rlRun "ipa sudorule-del  sudorule1"
+        rlRun "ipa sudorule-del  sudorule2"
+rlPhaseEnd
+}
 
 
+sudorule-find_009() {
+ 
+rlPhaseStartTest "sudorule-find_009: ipa sudorule-find --externaluser"
+ 
+        rlRun "ipa sudorule-add sudorule1"
+        rlRun "ipa sudorule-add sudorule2"
+        rlRun "ipa sudorule-add-user sudorule1 --users=testinguser1,testinguser2"
+ 
+        rlRun "ipa sudorule-find --externaluser=testinguser1 > $TmpDir/sudorule-find_009.txt 2>&1"
+        rlAssertGrep "Number of entries returned 1" "$TmpDir/sudorule-find_009.txt"
+        rlRun "cat $TmpDir/sudorule-find_009.txt"
+ 
+        rlRun "ipa sudorule-find --externaluser=testinguser2 > $TmpDir/sudorule-find_009.txt 2>&1"
+        rlAssertGrep "Number of entries returned 1" "$TmpDir/sudorule-find_009.txt"
+        rlRun "cat $TmpDir/sudorule-find_009.txt"
+ 
+        rlRun "ipa sudorule-find --externaluser=testinguser1 --all > $TmpDir/sudorule-find_009.txt"
+        rlAssertGrep "Rule name: sudorule1" "$TmpDir/sudorule-find_009.txt"
+        rlAssertGrep "External User: testinguser2, testinguser1" "$TmpDir/sudorule-find_009.txt"
+        rlAssertGrep "Number of entries returned 1" "$TmpDir/sudorule-find_009.txt"
+        rlRun "cat $TmpDir/sudorule-find_009.txt"
+ 
+        rlRun "ipa sudorule-del  sudorule1"
+        rlRun "ipa sudorule-del  sudorule2"
+ 
+rlPhaseEnd
+}
 
 
+sudorule-find_010() {
+ 
+rlPhaseStartTest "sudorule-find_010: ipa sudorule-find --runasexternaluser"
+ 
+        rlRun "ipa sudorule-add sudorule1"
+        rlRun "ipa sudorule-add sudorule2"
+        rlRun "ipa sudorule-add-runasuser sudorule1 --users=testinguser3,testinguser4"
+ 
+        rlRun "ipa sudorule-find --runasexternaluser=testinguser3 > $TmpDir/sudorule-find_010.txt 2>&1"
+        rlAssertGrep "Number of entries returned 1" "$TmpDir/sudorule-find_010.txt"
+        rlRun "cat $TmpDir/sudorule-find_010.txt"
+ 
+        rlRun "ipa sudorule-find --runasexternaluser=testinguser4 > $TmpDir/sudorule-find_010.txt 2>&1"
+        rlAssertGrep "Number of entries returned 1" "$TmpDir/sudorule-find_010.txt"
+        rlRun "cat $TmpDir/sudorule-find_010.txt"
+ 
+        rlRun "ipa sudorule-find --runasexternaluser=testinguser3 --all > $TmpDir/sudorule-find_010.txt"
+        rlAssertGrep "Rule name: sudorule1" "$TmpDir/sudorule-find_010.txt"
+        rlAssertGrep "RunAs External User: testinguser3, testinguser4" "$TmpDir/sudorule-find_010.txt"
+        rlAssertGrep "Number of entries returned 1" "$TmpDir/sudorule-find_010.txt"
+        rlRun "cat $TmpDir/sudorule-find_010.txt"
+ 
+        rlRun "ipa sudorule-del  sudorule1"
+        rlRun "ipa sudorule-del  sudorule2"
+ 
+rlPhaseEnd
+}
 
+
+sudorule-find_011() {
+ 
+rlPhaseStartTest "sudorule-find_011: ipa sudorule-find --runasexternalgroup"
+ 
+        rlRun "ipa sudorule-add sudorule1"
+        rlRun "ipa sudorule-add sudorule2"
+        rlRun "ipa sudorule-add-runasgroup sudorule1 --groups=testinggroup3,testinggroup4"
+ 
+        rlRun "ipa sudorule-find --runasexternalgroup=testinggroup3 > $TmpDir/sudorule-find_011.txt 2>&1"
+        rlAssertGrep "Number of entries returned 1" "$TmpDir/sudorule-find_011.txt"
+        rlRun "cat $TmpDir/sudorule-find_011.txt"
+ 
+        rlRun "ipa sudorule-find --runasexternalgroup=testinggroup4 > $TmpDir/sudorule-find_011.txt 2>&1"
+        rlAssertGrep "Number of entries returned 1" "$TmpDir/sudorule-find_011.txt"
+        rlRun "cat $TmpDir/sudorule-find_011.txt"
+ 
+        rlRun "ipa sudorule-find --runasexternalgroup=testinggroup3 --all > $TmpDir/sudorule-find_011.txt"
+        rlAssertGrep "Rule name: sudorule1" "$TmpDir/sudorule-find_011.txt"
+        rlAssertGrep "RunAs External Group: testinggroup3, testinggroup4" "$TmpDir/sudorule-find_011.txt"
+        rlAssertGrep "Number of entries returned 1" "$TmpDir/sudorule-find_011.txt"
+        rlRun "cat $TmpDir/sudorule-find_011.txt"
+ 
+        rlRun "ipa sudorule-del  sudorule1"
+        rlRun "ipa sudorule-del  sudorule2"
+ 
+rlPhaseEnd
+}
+
+#TODO
+sudorule-find_012() {
+ 
+rlPhaseStartTest "sudorule-find_012: ipa sudorule-find --timelimit"
+ 
+        rlRun "ipa sudorule-add sudorule1"
+        rlRun "ipa sudorule-add sudorule2"
+ 
+ 
+ 
+ 
+ 
+ 
+        rlRun "ipa sudorule-del  sudorule1"
+        rlRun "ipa sudorule-del  sudorule2"
+ 
+rlPhaseEnd
+}
+
+
+sudorule-find_013() {
+
+rlPhaseStartTest "sudorule-find_013: ipa sudorule-find --sizelimit"
+
+        rlRun "ipa sudorule-add sudorule1"
+        rlRun "ipa sudorule-add sudorule2"
+        rlRun "ipa sudorule-add sudorule3"
+        rlRun "ipa sudorule-add sudorule4"
+        rlRun "ipa sudorule-add sudorule5"
+
+
+	rlRun "ipa sudorule-find --sizelimit=1 > $TmpDir/sudorule-find_013.txt 2>&1"
+	rlAssertGrep "Number of entries returned 1" "$TmpDir/sudorule-find_013.txt"
+	rlRun "cat $TmpDir/sudorule-find_013.txt"
+
+        rlRun "ipa sudorule-find --sizelimit=2 > $TmpDir/sudorule-find_013.txt 2>&1"
+        rlAssertGrep "Number of entries returned 2" "$TmpDir/sudorule-find_013.txt"
+        rlRun "cat $TmpDir/sudorule-find_013.txt"
+
+        rlRun "ipa sudorule-find --sizelimit=4 > $TmpDir/sudorule-find_013.txt 2>&1"
+        rlAssertGrep "Number of entries returned 4" "$TmpDir/sudorule-find_013.txt"
+        rlRun "cat $TmpDir/sudorule-find_013.txt"
+
+        rlRun "ipa sudorule-find --sizelimit=5 > $TmpDir/sudorule-find_013.txt 2>&1"
+        rlAssertGrep "Number of entries returned 5" "$TmpDir/sudorule-find_013.txt"
+        rlRun "cat $TmpDir/sudorule-find_013.txt"
+
+        rlRun "ipa sudorule-del  sudorule1"
+        rlRun "ipa sudorule-del  sudorule2"
+        rlRun "ipa sudorule-del  sudorule3"
+        rlRun "ipa sudorule-del  sudorule4"
+        rlRun "ipa sudorule-del  sudorule5"
+
+rlPhaseEnd
+}
 
 
 sudorule_del_001() {
@@ -1475,8 +2300,10 @@ sudorule_del_002() {
 
 rlPhaseStartTest "sudorule_del_002: Del new sudo rule."
 
+	rlRun "ipa sudorule-add sudorule1"
 	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user" 
 	rlRun "ipa sudorule-del sudorule1"
+	rlRun "sleep 10"
 	rlRun "/usr/bin/ldapsearch -x -h localhost -D \"cn=Directory Manager\" -w Secret123 -b cn=sudorule1,ou=sudoers,$BASE" 32
 
 rlPhaseEnd
@@ -1504,12 +2331,12 @@ rlPhaseEnd
 
 
 cleanup() {
-rlPhaseStartTest "Clean up for automount configuration tests"
+rlPhaseStartTest "Clean up for sudo sanity tests"
 
 	rlRun "kinitAs $ADMINID $ADMINPW" 0
-	rlRun "ipa user-del $user1"
-	sleep 5
-	rlRun "ipa user-del $user2"
+#	rlRun "ipa user-del $user1"
+#	sleep 5
+#	rlRun "ipa user-del $user2"
 	rlRun "kdestroy" 0 "Destroying admin credentials."
 
 	# enabling NIS

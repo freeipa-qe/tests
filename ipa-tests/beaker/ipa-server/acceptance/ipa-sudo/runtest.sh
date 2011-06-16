@@ -41,11 +41,12 @@
 
 # Include test case file
 . ./t.ipa-sudo.sh
+. ./t.ipa-sudo-func.sh
 
 PACKAGE="ipa-server"
 
 ##########################################
-#   test main 
+#   Sanity Tests
 #########################################
 
 sudocmd() {
@@ -140,15 +141,60 @@ sudorule() {
 "sudorule-remove-option_003"
 "sudorule-remove-option_004"
 
+"sudorule-add-runasuser_001"
+"sudorule-add-runasuser_002"
+"sudorule-add-runasuser_003"
+
+"sudorule-remove-runasuser_001"
+"sudorule-remove-runasuser_002"
+"sudorule-remove-runasuser_003"
+"sudorule-remove-runasuser_004"
+"sudorule-remove-runasuser_005"
+
+"sudorule-add-runasgroup_001"
+"sudorule-add-runasgroup_002"
+
+"sudorule-remove-runasgroup_001"
+"sudorule-remove-runasgroup_002"
+
+"sudorule-mod_001"
+"sudorule-mod_002"
+"sudorule-mod_003"
+"sudorule-mod_004"
+"sudorule-mod_005"
+"sudorule-mod_006"
+"sudorule-mod_007"
+"sudorule-mod_008"
+"sudorule-mod_009"
+"sudorule-mod_010"
+"sudorule-mod_011"
+"sudorule-mod_012"
+"sudorule-mod_013"
+
+"sudorule-find_001"
+"sudorule-find_002"
+"sudorule-find_003"
+"sudorule-find_004"
+"sudorule-find_005"
+"sudorule-find_006"
+"sudorule-find_007"
+"sudorule-find_008"
+"sudorule-find_009"
+"sudorule-find_010"
+"sudorule-find_011"
+#"sudorule-find_012"
+"sudorule-find_013"
+
 "sudorule_del_001"
 "sudorule_del_002"
 "sudorule_del_003"
+
 }
 
 rlJournalStart
 
     rlPhaseStartSetup "ipa-sudo-startup: Check for admintools package, kinit and enabling nis"
-#		rlRun "setup"
+		rlRun "setup"
 		rlRun "echo setup"
     rlPhaseEnd
 
@@ -160,9 +206,30 @@ sudorule
 	# tests end.
 
     rlPhaseStartCleanup "ipa-sudo-cleanup: Destroying admin credentials & and disabling nis."
-#		rlRun "cleanup"
+		rlRun "cleanup"
 		rlRun "echo cleanup"
     rlPhaseEnd
+
+
+    rlPhaseStartSetup "ipa-sudo-func-startup: Check for admintools package, kinit, enabling nis, setting up binddn pwd and configuring nss_ldap.conf"
+		rlRun "func_setup"
+                rlRun "echo func_setup"
+    rlPhaseEnd
+
+        # tests start...
+bug711786
+bug710601
+bug710598
+bug710592
+bug710245
+bug710240
+        # tests end.
+
+    rlPhaseStartCleanup "ipa-sudo-func-cleanup: Destroying admin credentials & and disabling nis."
+                rlRun "func_cleanup"
+                rlRun "echo func_cleanup"
+    rlPhaseEnd
+
 
 rlJournalPrintText
 report=/tmp/rhts.report.$RANDOM.txt
