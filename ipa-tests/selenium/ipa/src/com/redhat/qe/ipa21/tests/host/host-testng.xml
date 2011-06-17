@@ -10,7 +10,8 @@
 			<run>
 			    <include name="setup" />
 			    <include name="init" />
-				<include name="hostTests" />
+				<include name="hostAddTests" />
+				<include name="hostEditTests" />
 			</run>
 		</groups>
 		<classes>		    

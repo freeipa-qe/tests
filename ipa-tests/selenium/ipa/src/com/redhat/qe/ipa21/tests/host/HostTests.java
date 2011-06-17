@@ -21,6 +21,7 @@ import com.redhat.qe.auto.testng.TestScript;
 import com.redhat.qe.ipa.base.SeleniumTestScript;
 import com.redhat.qe.ipa21.tasks.CommonTasks;
 import com.redhat.qe.ipa21.tasks.HostTasks;
+import com.redhat.qe.ipa21.tasks.UserTasks;
 
 
 public class HostTests extends TestScript{	
@@ -30,14 +31,14 @@ public class HostTests extends TestScript{
 		@BeforeClass (groups={"init"}, description="Initialize app for this test suite run", alwaysRun=true)
 		public void intialize() throws CloneNotSupportedException {		
 			selenium = CommonTasks.sel();		
-			selenium.open(SeleniumTestScript.ipaServerURL + "/ipa/ui/#identity=2&navigation=0");
+			selenium.open(SeleniumTestScript.ipaServerURL + "/ipa/ui/#identity=host&navigation=identity");
 			//selenium.open("/ipa/ui/#identity=1&navigation=0");
 		}
 		
 		/*
-		 * Force Add/Delete Host
+		 * Force Add Host
 		 */
-		@Test (groups={"hostTests"}, dataProvider="getHostTestObjects")	
+		@Test (groups={"hostAddTests"}, dataProvider="getHostAddTestObjects")	
 		public void testForceAddHost(String testName, String hostName) throws Exception {
 			// wait for the User Groups page to be loaded
 			CommonTasks.waitForRefreshTillTextPresent(selenium, "Add");
@@ -64,22 +65,62 @@ public class HostTests extends TestScript{
 			//com.redhat.qe.auto.testng.Assert.assertFalse(selenium.isTextPresent(hostName), hostName + " added successfully");
 		}
 		
-		/*
-		 * Data to be used when adding groups
-		 */
-		@DataProvider(name="getHostTestObjects")
-		public Object[][] getHostTestObjects() {
-			return TestNGUtils.convertListOfListsTo2dArray(createHostTestObjects());
+		@Test (groups={"hostEditTests"}, dataProvider="getHostEditTestObjects")	
+		public void testHostEditDescription(String testName, String hostName, String hostDescription) throws Exception {
+			//selenium.open(SeleniumTestScript.ipaServerURL + "/ipa/ui/#identity=host&navigation=identity");
+			// wait for the Host page to be loaded
+			CommonTasks.waitForRefreshTillTextPresent(selenium, "Add");
+			
+			// wait for the users to be listed before checking if the hosts to be added exists already
+			CommonTasks.waitForRefresh(selenium);
+
+			// verify host be edited exists
+			com.redhat.qe.auto.testng.Assert.assertTrue(selenium.isTextPresent(hostName), hostName + " is available for editing");
+			
+			//modify this host
+			HostTasks.modifyHost(selenium, hostName, hostDescription);
+			CommonTasks.waitForRefresh(selenium);
+			
+			com.redhat.qe.auto.testng.Assert.assertTrue(selenium.isTextPresent(hostDescription), hostName + " description " + hostDescription + "modified successfully.");
+			
+			selenium.click("css=span.back-link");
+			
+			com.redhat.qe.auto.testng.Assert.assertTrue(selenium.isTextPresent(hostDescription), hostName + " description " + hostDescription + "on host list page.");
 		}
-		protected List<List<Object>> createHostTestObjects() {
+		
+		/*
+		 * Data to be used when adding hosts
+		 */
+		@DataProvider(name="getHostAddTestObjects")
+		public Object[][] getHostAddTestObjects() {
+			return TestNGUtils.convertListOfListsTo2dArray(createHostAddTestObjects());
+		}
+		protected List<List<Object>> createHostAddTestObjects() {
 			
 			List<List<Object>> ll = new ArrayList<List<Object>>();
 			//String sLongName = "auto_" + tasks.generateRandomString(251);
 			
-	        //										testname					hostname      
+	        //										testname					hostname      	
 			ll.add(Arrays.asList(new Object[]{ "force_addhost_nodns",			"myhost1.testrelm" } ));
-			ll.add(Arrays.asList(new Object[]{ "force_addhost_uppercase",			"MYHOST2.testrelm" } ));
-			ll.add(Arrays.asList(new Object[]{ "force_addhost_mixedcase",			"MyHost3.testrelm" } ));
+			ll.add(Arrays.asList(new Object[]{ "force_addhost_uppercase",	    "MYHOST2.testrelm" } ));
+			ll.add(Arrays.asList(new Object[]{ "force_addhost_mixedcase",		"MyHost3.testrelm" } ));
+	        
+			return ll;	
+		}
+		
+		@DataProvider(name="getHostEditTestObjects")
+		public Object[][] getHostEditTestObjects() {
+			return TestNGUtils.convertListOfListsTo2dArray(createHostEditTestObjects());
+		}
+		protected List<List<Object>> createHostEditTestObjects() {
+			
+			List<List<Object>> ll = new ArrayList<List<Object>>();
+			//String sLongName = "auto_" + tasks.generateRandomString(251);
+			
+	        //										testname					hostname      			hostDescription
+			ll.add(Arrays.asList(new Object[]{ "edit_host1_desc",			"myhost1.testrelm",		"my new description" } ));
+			ll.add(Arrays.asList(new Object[]{ "edit_host2_desc",		    "MYHOST2.testrelm",		"my New Decscription" } ));
+			ll.add(Arrays.asList(new Object[]{ "edit_host3_desc",			"MyHost3.testrelm",		"MY NEW DESCRIPTION" } ));
 	        
 			return ll;	
 		}
