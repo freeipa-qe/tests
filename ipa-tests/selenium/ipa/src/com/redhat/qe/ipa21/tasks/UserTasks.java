@@ -37,7 +37,7 @@ public class UserTasks {
 		//TODO: have to wait....can do this when stepping through
 		selenium.type(UI.mailInput, mail);
 		selenium.click(new Element(UI.link,"Update"));
-		selenium.click(new Element(UI.updateLink));
+		selenium.click(UI.backToList);
 	}
 	
 	/*
