@@ -35,8 +35,4 @@ public class UserUIElements {
 	public LocatorStrategy userMailLink = new StringSandwichLocatorStrategy("userMailLink", "css=span[name=mail] a[name=add]");
 	public LocatorStrategy updateLink = new StringSandwichLocatorStrategy("updateLink", "css=span.input_link");
 	
-	//Identity - User - Delete
-	//TODO: username is hardcoded here....to test delete temporarily
-	public Element testuserDeleteLink = new Element("css=.entity[name='user'] .facet[name='search'] input[value='testuser']");	
-
 }

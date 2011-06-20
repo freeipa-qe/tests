@@ -40,6 +40,7 @@ public class UIElements extends UILocatorStrategies  {
 	public Element addButton = new Element("//button[@type='button']");
 	public Element button = new Element("//button[@type='button']");
 	public Element backToList = new Element("css=span.back-link");	
+	public LocatorStrategy checkbox = new LocatorTemplate("checkbox", "//input[@value='$1']");
 	
 	//Identity - Group - Add
 	public Element groupNameInput = new Element ("cn");

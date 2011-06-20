@@ -48,7 +48,7 @@ public class UserTasks {
 	 * @param uid - the uid of user to be deleted
 	 */
 	public static void deleteUser(ExtendedSelenium selenium, String uid) {
-		selenium.click(UserUI.testuserDeleteLink);
+		selenium.check(new Element(UI.checkbox, uid));
 		selenium.click(new Element(UI.link,"Delete"));
 		selenium.click(UI.button);
 	}
