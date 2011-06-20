@@ -16,12 +16,12 @@ import com.redhat.qe.ipa21.tasks.UserTasks;
 
 public class UserTests {
 	public  ExtendedSelenium selenium = null;	
-	private String userPage = SeleniumTestScript.ipaServerURL + "/ipa/ui/#identity=0&navigation=0";
+	private String userPage = "/ipa/ui/#identity=user&navigation=identity";
 	
 	@BeforeClass (groups={"init"}, description="Initialize app for this test suite run", alwaysRun=true)
 	public void intialize() throws CloneNotSupportedException {		
 		selenium = CommonTasks.sel();	
-		selenium.open(SeleniumTestScript.ipaServerURL + "/ipa/ui/#identity=0&navigation=0");
+		selenium.open(SeleniumTestScript.ipaServerURL + userPage);		
 	}
 	
 
