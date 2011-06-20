@@ -13,9 +13,7 @@
 			    <include name="init" />
 				<include name="userAddTests" />
 				<include name="userEditTests" />
-			    <!--
 				<include name="userDeleteTests" />
-			    -->
 			</run>
 		</groups>
 		<classes>		    
