@@ -407,13 +407,13 @@ rlJournalStart
 #        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message - size limit too large."
 #    rlPhaseEnd
 
-    rlPhaseStartTest "ipa-user-cli-add-034: show user that doesn't exist - bugzilla 569735"
-	myuser=baduser
-        expmsg="ipa: ERROR: $myuser: user not found"
-        command="ipa user-show $baduser"
-	rlRun "$command" 2 "Check that return code is 2"
-        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message - show user that doesn't exist."
-    rlPhaseEnd
+#    rlPhaseStartTest "ipa-user-cli-add-034: show user that doesn't exist - bugzilla 569735"
+#	myuser=baduser
+#        expmsg="ipa: ERROR: $myuser: user not found"
+#        command="ipa user-show $baduser"
+#	rlRun "$command" 2 "Check that return code is 2"
+#        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message - show user that doesn't exist."
+#    rlPhaseEnd
 
     rlPhaseStartCleanup "ipa-user-cli-add-cleanup"
 	rlRun "ipa config-mod --searchrecordslimit=100" 0 "set default search records limit back to default"
