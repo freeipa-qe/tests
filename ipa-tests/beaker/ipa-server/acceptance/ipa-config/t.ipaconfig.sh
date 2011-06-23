@@ -444,7 +444,7 @@ ipaconfig_mod_defaultgroup_default_logic()
         username=`dataGenerator "username" 8` # FIXME: not sure length 8 is right to use -- since we changed maxusernamelength to something we don't know when we hit this test case
         create_ipauser 0 $username
         KinitAsAdmin
-        ipa user-find $username > $out
+        ipa user-show $username > $out
         actualgroup=`grep "groups" $out | cut -d":" -f2 | xargs echo`
         if echo $actualgroup | grep -i "^$basegroup" 2>&1 >/dev/null
         then
