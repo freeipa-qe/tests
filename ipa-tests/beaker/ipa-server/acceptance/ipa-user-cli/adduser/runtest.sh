@@ -400,11 +400,12 @@ rlJournalStart
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message - alpha characters."
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-user-cli-add-033: size limit too large - bugzilla 643182"
-        expmsg="ipa: ERROR: invalid 'sizelimit': can be at most 2147483647"
-        command="ipa user-find --sizelimit=20000000000"
-        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message - size limit too large."
-    rlPhaseEnd
+#  Disabling this test for now, causing beaker-lib to crash
+#    rlPhaseStartTest "ipa-user-cli-add-033: size limit too large - bugzilla 643182"
+#        expmsg="ipa: ERROR: invalid 'sizelimit': can be at most 2147483647"
+#        command="ipa user-find --sizelimit=20000000000"
+#        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message - size limit too large."
+#    rlPhaseEnd
 
     rlPhaseStartTest "ipa-user-cli-add-034: show user that doesn't exist - bugzilla 569735"
 	myuser=baduser
