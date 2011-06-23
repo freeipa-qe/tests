@@ -397,9 +397,12 @@ rlJournalStart
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-user-cli-mod-051: modify user's manager"
-	manager="uid=test,cn=users,cn=accounts,dc=$DOMAIN"
+        # add a user to set as manager
+        rlRun "ipa user-add --first=MY --last=Boss myboss" 0 "Add user to be set as manager."
+        manager="myboss"
         rlRun "ipa user-mod --manager=\"$manager\" $superuser" 0 "Setting user boss"
         rlRun "verifyUserAttr $superuser \"Manager\" \"$manager\"" 0 "Verify user's boss"
+	rlRun "ipa user-del myboss" 0 "Delete the boss user"
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-user-cli-mod-052: modify user's title"
