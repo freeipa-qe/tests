@@ -15,6 +15,13 @@ CIPHERS="-rsa_null_md5,+rsa_fips_3des_sha,+rsa_fips_des_sha,+rsa_3des_sha,+rsa_r
 INSTANCE="slapd-instance1"
 PWDFILE="/tmp/pwdfile.txt"
 
+ARCH=`uname -p`
+if [$ARCH == ""] ; then
+	OCSPCLT=/usr/lib64/nss/unsupported-tools/ocspclnt
+else
+	OCSPCLT=/usr/lib/nss/unsupported-tools/ocspclnt
+fi
+
 echo "Base DN: $BASEDN"
 echo "LDAP port: $LDAPPORT"
 echo "Instance configuration file: $INSTANCECFG"
@@ -24,6 +31,7 @@ echo "Password scheme ldif file: $PWDSCHEME"
 echo "LDAP principal: $LDAPPRINC"
 echo "LDAP keytab file: $LDAPKEYTAB"
 echo "LDAP instance: $INSTANCE"
+echo "OSCP test client is $OCSPCLT"
 
 ######################
 # test suite         #
@@ -295,8 +303,8 @@ ldap_tests()
                 rlLog "$LDAPPRINC certificate serial number: $serialno"
                 rlRun "ipa cert-revoke $serialno" 0 "Revoke LDAP server's certificate"
 		rlLog "Checking certificate revokation via OCSP"
-		rlLog "EXECUTING: /usr/lib64/nss/unsupported-tools/ocspclnt -S \"$HOSTNAME\" -d /etc/dirsrv/$INSTANCE/"
-		rlRun "/usr/lib64/nss/unsupported-tools/ocspclnt -S \"$HOSTNAME\" -d /etc/dirsrv/$INSTANCE/ > /tmp/ocsp.out" 0 "Running ocspclnt"
+		rlLog "EXECUTING: $OCSPCLT -S \"$HOSTNAME\" -d /etc/dirsrv/$INSTANCE/"
+		rlRun "$OCSPCLT -S \"$HOSTNAME\" -d /etc/dirsrv/$INSTANCE/ > /tmp/ocsp.out" 0 "Running ocspclnt"
 		rlAssertGrep "Peer's Certificate has been revoked." "/tmp/ocsp.out"
         rlPhaseEnd
 }
