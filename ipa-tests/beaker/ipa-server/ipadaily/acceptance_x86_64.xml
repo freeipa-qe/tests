@@ -77,6 +77,12 @@
 			<task name="/CoreOS/ipa-server/acceptance/ipa-i18n" role="MASTER">
 				<params/>
 			</task>
+			<task name="/CoreOS/ipa-server/acceptance/ipa-cert" role="MASTER">
+				<params/>
+			</task>
+			<task name="/CoreOS/ipa-server/acceptance/ipa-getcert" role="MASTER">
+				<params/>
+			</task>
 			<task name="/CoreOS/ipa-server/acceptance/ipa-ctl" role="MASTER">
 				<params/>
 			</task>
