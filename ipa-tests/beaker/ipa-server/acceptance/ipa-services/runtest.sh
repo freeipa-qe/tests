@@ -42,7 +42,7 @@
 # Include test case file
 . ./t.ipa-services.sh
 
-PACKAGE="freeipa-server"
+PACKAGELIST="ipa-admintools"
 
 ##########################################
 #   test main 
@@ -134,10 +134,14 @@ service-show()
 rlJournalStart
 
 rlPhaseStartTest "Environment check"
-    # call functional tests
-	rlLog "CLIENT: $CLIENT"
+
+        #####################################################################
+        #               IS THIS MACHINE A MASTER?                           #
+        #####################################################################
+
+	rlLog "MASTER: $MASTER"
         rlLog "HOSTNAME: $HOSTNAME"
-        echo $CLIENT | grep $HOSTNAME
+        echo $MASTER | grep $HOSTNAME
         rc=$?
         if [ $rc -eq 0 ] ; then
                 for item in $PACKAGELIST ; do
@@ -160,9 +164,33 @@ rlPhaseStartTest "Environment check"
         		service-remove-host  # Remove hosts that can manage this service.
         		service-show         # Display information about an IPA service.
 		fi
+		rhts-sync-set -s DONE
         else
                 rlLog "Machine in recipe is not a CLIENT - not running tests"
         fi
+
+        #####################################################################
+        #               IS THIS MACHINE A CLIENT?                           #
+        #####################################################################
+        rc=0
+        echo $CLIENT | grep $HOSTNAME
+        if [ $? -eq 0 ] ; then
+                rhts-sync-block -s DONE $MASTER
+        else
+                rlLog "This machine is a CLIENT."
+        fi
+
+        #####################################################################
+        #               IS THIS MACHINE A SLAVE?                            #
+        #####################################################################
+        rc=0
+        echo $SLAVE | grep $HOSTNAME
+        if [ $? -eq 0 ] ; then
+                rhts-sync-block -s DONE $MASTER
+        else
+                rlLog "This machine is a SLAVE"
+        fi
+
    rlPhaseEnd
 
   rlJournalPrintText
