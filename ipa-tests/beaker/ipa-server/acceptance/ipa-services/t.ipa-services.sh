@@ -419,14 +419,14 @@ rlPhaseStartTest "service_del_004: ipa service-del: with --continue option."
         rlRun "ipa service-add IMAP/$HOSTNAME@$RELM"
 	rlRun "ipa service-add VM/$HOSTNAME@$RELM"
 
-        rlRun "ipa service-del VM/$HOSTNAME@$RELM unknown/$CLIENT@$RELM IMAP/$CLIENT@$RELM" 2
+        rlRun "ipa service-del VM/$HOSTNAME@$RELM unknown/$HOSTNAME@$RELM IMAP/$HOSTNAME@$RELM" 2
         rlRun "ipa service-show VM/$HOSTNAME@$RELM" 2 "Service should have been deleted because first in list without --continue"
 	rlRun "ipa service-show IMAP/$HOSTNAME@$RELM" 0 "Service should not have been deleted without --continue"
 
         # re-adding VM service for --continue option test
         rlRun "ipa service-add VM/$HOSTNAME@$RELM"
-        rlRun "ipa service-del unknown/$HOSTNAME@$RELM VM/$CLIENT@$RELM IMAP/$CLIENT@$RELM --continue > $TmpDir/service_del_004.out 2>&1"
-        rlAssertGrep "Deleted service \"VM/$HOSTNAME@$RELM,IMAP/$CLIENT@$RELM\"" "$TmpDir/service_del_004.out"
+        rlRun "ipa service-del unknown/$HOSTNAME@$RELM VM/$HOSTNAME@$RELM IMAP/$HOSTNAME@$RELM --continue > $TmpDir/service_del_004.out 2>&1"
+        rlAssertGrep "Deleted service \"VM/$HOSTNAME@$RELM,IMAP/$HOSTNAME@$RELM\"" "$TmpDir/service_del_004.out"
         rlAssertGrep "Failed to remove: unknown/$HOSTNAME@$RELM" "$TmpDir/service_del_004.out"
 	rlRun "cat $TmpDir/service_del_004.out"
 
@@ -450,7 +450,7 @@ service_disable_002() {
         # ipa service-disable: Disabling service vpn. 
 rlPhaseStartTest "service_disable_002: ipa service-disable: Disabling service."
         rlRun "ipa service-add $SERVICE/$HOSTNAME@$RELM"
-        rlRun "ipa-getkeytab --server $MASTER --principal $SERVICE/$HOSTNAME@$RELM --keytab /opt/$SERVICE.$CLIENT.$RELM.keytab"
+        rlRun "ipa-getkeytab --server $MASTER --principal $SERVICE/$HOSTNAME@$RELM --keytab /opt/$SERVICE.$HOSTNAME.$RELM.keytab"
         rlRun "ipa service-disable $SERVICE/$HOSTNAME@$RELM > $TmpDir/service_disable_002.out 2>&1"
 	rlAssertGrep "Disabled service \"vpn/$HOSTNAME@$RELM\"" "$TmpDir/service_disable_002.out"
         rlRun "ipa service-find $SERVICE/$HOSTNAME@$RELM >> $TmpDir/service_disable_002.out"
