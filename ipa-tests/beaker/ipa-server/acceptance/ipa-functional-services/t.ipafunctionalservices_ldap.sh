@@ -16,7 +16,7 @@ INSTANCE="slapd-instance1"
 PWDFILE="/tmp/pwdfile.txt"
 
 ARCH=`uname -p`
-if [$ARCH == ""] ; then
+if [[ "$ARCH" == "x86_64" ]] ; then
 	OCSPCLT=/usr/lib64/nss/unsupported-tools/ocspclnt
 else
 	OCSPCLT=/usr/lib/nss/unsupported-tools/ocspclnt
