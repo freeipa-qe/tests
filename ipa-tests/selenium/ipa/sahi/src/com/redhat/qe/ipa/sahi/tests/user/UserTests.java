@@ -2,6 +2,7 @@ package com.redhat.qe.ipa.sahi.tests.user;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -55,7 +56,8 @@ public class UserTests extends SahiTestScript{
 		//modify this user
 		UserTasks.modifyUser(sahiTasks, uid, title, mail);
 		
-		//TODO: verify changes		
+		//TODO: verify changes	
+		UserTasks.verifyUserUpdates(sahiTasks, uid, title, mail);
 	}
 	
 	/*
@@ -66,7 +68,7 @@ public class UserTests extends SahiTestScript{
 		//verify user exists already
 		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(uid).exists(), "Verify user " + uid + "  to be readded exists");
 		
-		//new test user can be added now
+		//add repeat test user 
 		UserTasks.recreateUser(sahiTasks, uid, givenname, sn);		
 		
 	}
@@ -88,6 +90,25 @@ public class UserTests extends SahiTestScript{
 	
 	
 	/*
+	 * Delete multiple users - for positive tests
+	 */
+	@Test (groups={"chooseUserMultipleDeleteTests"}, dataProvider="getMultipleUserDeleteTestObjects", dependsOnGroups={"userAddTests","userReaddTests"})
+	public void setMultipleUserDelete(String testName, String uid) throws Exception {		
+		//verify user to be deleted exists
+		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(uid).exists(), "Verify user " + uid + "  to be deleted exists");	
+		
+		//mark this user for deletion
+		UserTasks.chooseMultipleUsers(sahiTasks, uid);		
+	}
+	
+	@Test (groups={"userMultipleDeleteTests"}, dependsOnGroups="chooseUserMultipleDeleteTests")
+	public void testMultipleUserDelete() throws Exception {		
+		//delete the multiple chosen users
+		UserTasks.deleteMultipleUser(sahiTasks);	
+	}
+	
+	
+	/*
 	 * Data to be used when adding users
 	 */
 	@DataProvider(name="getUserTestObjects")
@@ -99,9 +120,12 @@ public class UserTests extends SahiTestScript{
 		//String sLongName = "auto_" + tasks.generateRandomString(251);
 		
         //										testname					uid              		givenname	sn   
-		ll.add(Arrays.asList(new Object[]{ "create_good_user",				"testuser", 			"Test",		"User"     } ));
+		ll.add(Arrays.asList(new Object[]{ "create_good_user",				"testuser", 			"Test",		"User"      } ));
 		ll.add(Arrays.asList(new Object[]{ "create_user2",				    "user2", 			    "Test2",	"User2"     } ));
 		ll.add(Arrays.asList(new Object[]{ "create_user3",				    "user3", 			    "Test3",	"User3"     } ));
+		ll.add(Arrays.asList(new Object[]{ "create_user4",				    "user4", 			    "Test4",	"User4"     } ));
+		ll.add(Arrays.asList(new Object[]{ "create_user5",				    "user5", 			    "Test5",	"User5"     } ));
+		ll.add(Arrays.asList(new Object[]{ "create_user6",				    "user6", 			    "Test6",	"User6"     } ));
 		        
 		return ll;	
 	}
@@ -115,7 +139,6 @@ public class UserTests extends SahiTestScript{
 	}
 	protected List<List<Object>> recreateUserTestObjects() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
-		//String sLongName = "auto_" + tasks.generateRandomString(251);
 		
         //										testname					uid              		givenname	sn   
 		ll.add(Arrays.asList(new Object[]{ "create_good_user",				"testuser", 			"Test",		"User"     } ));
@@ -151,7 +174,6 @@ public class UserTests extends SahiTestScript{
 	}
 	protected List<List<Object>> deleteUserTestObjects() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
-		//String sLongName = "auto_" + tasks.generateRandomString(251);
 		
         //										testname					uid              		
 		ll.add(Arrays.asList(new Object[]{ "delete_good_user",				"testuser"     } ));
@@ -160,5 +182,24 @@ public class UserTests extends SahiTestScript{
 		        
 		return ll;	
 	}
+	
+	/*
+	 * Data to be used when deleting multiple users
+	 */
+	@DataProvider(name="getMultipleUserDeleteTestObjects")
+	public Object[][] getMultipleUserDeleteTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(deleteMultipleUserTestObjects());
+	}
+	protected List<List<Object>> deleteMultipleUserTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();		
+		
+        //										testname					uid              		
+		ll.add(Arrays.asList(new Object[]{ "delete_multiple_users",			"user4"     } ));
+		ll.add(Arrays.asList(new Object[]{ "delete_multiple_users",			"user5"     } ));
+		ll.add(Arrays.asList(new Object[]{ "delete_multiple_users",			"user6"     } ));
+		
+		return ll;	
+	}
+	
 
 }

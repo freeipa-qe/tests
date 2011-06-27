@@ -45,6 +45,26 @@ public class UserTasks {
 		sahiTasks.span("\u25c0 Back to List").click();
 	}
 	
+	
+	/* Verify changes made for the user. 
+	 * @param sahiTasks
+	 * @param uid - the uid of user to be edited
+	 * @param title - title string being edited for this user
+	 * @param mail - mail string being edited for this user
+	 */
+	public static void verifyUserUpdates(SahiTasks sahiTasks, String uid, String title, String mail) {
+		//click on user to edit
+		sahiTasks.link(uid).click();
+		
+		//verify user's job title
+		com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("title").value(), title, "Verified updated title for user " + uid);
+		
+		//verify mail address for user
+		com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("mail").value(), mail, "Verified updated mail for user " + uid);
+	
+		sahiTasks.span("\u25c0 Back to List").click();
+	}
+	
 	/*
 	 * Delete the user. Check if user is available for deleting before calling this.
 	 * @param sahiTasks
@@ -52,6 +72,25 @@ public class UserTasks {
 	 */
 	public static void deleteUser(SahiTasks sahiTasks, String uid) {
 		sahiTasks.checkbox(uid).click();
+		sahiTasks.link("Delete").click();
+		sahiTasks.button("Delete").click();
+	}
+	
+	/*
+	 * Choose multiple users. 
+	 * @param sahiTasks
+	 * @param uid - the uid of user to be deleted
+	 */
+	public static void chooseMultipleUsers(SahiTasks sahiTasks, String uid) {		
+		sahiTasks.checkbox(uid).click();		
+	}
+	
+	/*
+	 * Delete multiple users. 
+	 * @param sahiTasks
+	 * @param uid - the uid of user to be deleted
+	 */
+	public static void deleteMultipleUser(SahiTasks sahiTasks) {		
 		sahiTasks.link("Delete").click();
 		sahiTasks.button("Delete").click();
 	}
