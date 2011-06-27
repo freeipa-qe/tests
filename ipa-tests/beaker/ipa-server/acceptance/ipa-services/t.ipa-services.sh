@@ -78,12 +78,12 @@ rlPhaseEnd
 service_add_001() {
 	# ipa service-add : add service for $SERVICE
 rlPhaseStartTest "service_add_001: ipa service-add : add service for $SERVICE"
-	rlRun "ipa -v service-add $SERVICE/$CLIENT@$RELM > $TmpDir/service_add_001.out 2>&1"
-	rlAssertGrep "Added service \"$SERVICE\/$CLIENT@$RELM\"" "$TmpDir/service_add_001.out"
+	rlRun "ipa -v service-add $SERVICE/$HOSTNAME@$RELM > $TmpDir/service_add_001.out 2>&1"
+	rlAssertGrep "Added service \"$SERVICE\/$HOSTNAME@$RELM\"" "$TmpDir/service_add_001.out"
 	rlRun "cat $TmpDir/service_add_001.out"
 
 	# Deleting this service for future test cases
-	rlRun "ipa service-del $SERVICE/$CLIENT@$RELM"
+	rlRun "ipa service-del $SERVICE/$HOSTNAME@$RELM"
 rlPhaseEnd
 }
 
@@ -91,15 +91,15 @@ service_add_002() {
 	# ipa service-add : add service for $SERVICE with all option
 rlPhaseStartTest "service_add_002: ipa service-add : add service for $SERVICE with all option"
 
-	rlRun "ipa service-add $SERVICE/$CLIENT@$RELM --all > $TmpDir/service_add_002.out 2>&1"
-	rlAssertGrep "Added service \"$SERVICE\/$CLIENT@$RELM\"" "$TmpDir/service_add_002.out"
-	rlAssertGrep "Principal: $SERVICE/$CLIENT@$RELM" "$TmpDir/service_add_002.out"
-	rlAssertGrep "Managed by: $CLIENT" "$TmpDir/service_add_002.out"
+	rlRun "ipa service-add $SERVICE/$HOSTNAME@$RELM --all > $TmpDir/service_add_002.out 2>&1"
+	rlAssertGrep "Added service \"$SERVICE\/$HOSTNAME@$RELM\"" "$TmpDir/service_add_002.out"
+	rlAssertGrep "Principal: $SERVICE/$HOSTNAME@$RELM" "$TmpDir/service_add_002.out"
+	rlAssertGrep "Managed by: $HOSTNAME" "$TmpDir/service_add_002.out"
 	rlAssertGrep "objectclass: krbprincipal, krbprincipalaux, krbticketpolicyaux, ipaobject, ipaservice, pkiuser, top" "$TmpDir/service_add_002.out"
 	rlRun "cat $TmpDir/service_add_002.out"
 
 	# Deleting this service for future test cases
-	rlRun "ipa service-del $SERVICE/$CLIENT@$RELM"
+	rlRun "ipa service-del $SERVICE/$HOSTNAME@$RELM"
 rlPhaseEnd
 
 }
@@ -108,27 +108,27 @@ service_add_003() {
 	# ipa service-add : add service for vpn with cert bytes
 rlPhaseStartTest "service_add_003: ipa service-add : add service for $SERVICE with cert bytes"
 
-	rlRun "ipa service-add $SERVICE/$CLIENT@$RELM --certificate=wrong > $TmpDir/service_add_003.out 2>&1" 1
+	rlRun "ipa service-add $SERVICE/$HOSTNAME@$RELM --certificate=wrong > $TmpDir/service_add_003.out 2>&1" 1
 	rlAssertGrep "ipa: ERROR: Certificate format error: improperly formatted DER-encoded certificate" "$TmpDir/service_add_003.out"
 	rlRun "cat $TmpDir/service_add_003.out"
 
-	rlRun "ipa service-add $SERVICE/$CLIENT@$RELM --certificate=MIIC9jCCAd6gAwIBAgIBCTANBgkqhkiG9w0BAQ0FADA5MRIwEAYDVQQKEwlzaWxlbnRkb20xIzAhBgNVBAMTGkNlcnRpZmljYXRlIEF1dGhvcml0eWNhLXQxMB4XDTExMDExOTEyMjc1M1oXDTEzMDEwODEyMjc1M1owJjERMA8GA1UEAxMIYWNjb3VudHMxETAPBgNVBAMTCHNlcnZpY2VzMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDbcRxo0/tfpoJEzCLmfTDy9AYQIyubgwo2ErV+6unEKY2OW3YHIBW6Th6xg62tMzqQatIqqJKse9AnVoObWAiqhpjPdr2FuL6LiyRb1Aez9E5MVndfbsto0F7OYSs6y1yICSBAfA1CFAdRm+WOnBDI1e3hcg3UHXUukifKg4XaLQIDAQABo4GfMIGcMB8GA1UdIwQYMBaAFEoAQIQqOuqP8Ilyez9pzQCblEmWMEoGCCsGAQUFBwEBBD4wPDA6BggrBgEFBQcwAYYuaHR0cDovL2JldGEuZHNkZXYuc2pjLnJlZGhhdC5jb206NDgxODAvY2Evb2NzcDAOBgNVHQ8BAf8EBAMCBPAwHQYDVR0lBBYwFAYIKwYBBQUHAwEGCCsGAQUFBwMCMA0GCSqGSIb3DQEBDQUAA4IBAQCWk7YuyH6NTqILzmGK3qjIkreCpXnbNE99yrc7UQka9btrq2FWoFSxteU2JFD3+EGG8tXuDyDuWlgs8F3X/CBB4N+ZV4fAzHpIp2aIRQMapLKvu/mEiGPjFWFYJqk/HiNSQk8qefI6XqLvWIVY4LxMn4m1ZsQ/XXBzNbWsf9W3jnwCY0cLygJIgZZt2uQH/KxoQ3/oE0gp1wYITeKAKvaQrwUc4YgshlxMZAN4z5FuXdtDQqAIrJYcg9q+j6zYHNtXTcLuCFO0CcFto8CaUGXUJ0B5IrV2xsnRegHRxBy+C+3lfYiW2DelWI3exiYgdlU5wJSlkX37HQxA9cP+/kIb > $TmpDir/service_add_003.out"  
+	rlRun "ipa service-add $SERVICE/$HOSTNAME@$RELM --certificate=MIIC9jCCAd6gAwIBAgIBCTANBgkqhkiG9w0BAQ0FADA5MRIwEAYDVQQKEwlzaWxlbnRkb20xIzAhBgNVBAMTGkNlcnRpZmljYXRlIEF1dGhvcml0eWNhLXQxMB4XDTExMDExOTEyMjc1M1oXDTEzMDEwODEyMjc1M1owJjERMA8GA1UEAxMIYWNjb3VudHMxETAPBgNVBAMTCHNlcnZpY2VzMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDbcRxo0/tfpoJEzCLmfTDy9AYQIyubgwo2ErV+6unEKY2OW3YHIBW6Th6xg62tMzqQatIqqJKse9AnVoObWAiqhpjPdr2FuL6LiyRb1Aez9E5MVndfbsto0F7OYSs6y1yICSBAfA1CFAdRm+WOnBDI1e3hcg3UHXUukifKg4XaLQIDAQABo4GfMIGcMB8GA1UdIwQYMBaAFEoAQIQqOuqP8Ilyez9pzQCblEmWMEoGCCsGAQUFBwEBBD4wPDA6BggrBgEFBQcwAYYuaHR0cDovL2JldGEuZHNkZXYuc2pjLnJlZGhhdC5jb206NDgxODAvY2Evb2NzcDAOBgNVHQ8BAf8EBAMCBPAwHQYDVR0lBBYwFAYIKwYBBQUHAwEGCCsGAQUFBwMCMA0GCSqGSIb3DQEBDQUAA4IBAQCWk7YuyH6NTqILzmGK3qjIkreCpXnbNE99yrc7UQka9btrq2FWoFSxteU2JFD3+EGG8tXuDyDuWlgs8F3X/CBB4N+ZV4fAzHpIp2aIRQMapLKvu/mEiGPjFWFYJqk/HiNSQk8qefI6XqLvWIVY4LxMn4m1ZsQ/XXBzNbWsf9W3jnwCY0cLygJIgZZt2uQH/KxoQ3/oE0gp1wYITeKAKvaQrwUc4YgshlxMZAN4z5FuXdtDQqAIrJYcg9q+j6zYHNtXTcLuCFO0CcFto8CaUGXUJ0B5IrV2xsnRegHRxBy+C+3lfYiW2DelWI3exiYgdlU5wJSlkX37HQxA9cP+/kIb > $TmpDir/service_add_003.out"  
 
 	rlRun "cat $TmpDir/service_add_003.out"
-	rlAssertGrep "Added service \"$SERVICE/$CLIENT@$RELM\"" "$TmpDir/service_add_003.out"
-	rlAssertGrep "Principal: $SERVICE/$CLIENT@$RELM" "$TmpDir/service_add_003.out"
+	rlAssertGrep "Added service \"$SERVICE/$HOSTNAME@$RELM\"" "$TmpDir/service_add_003.out"
+	rlAssertGrep "Principal: $SERVICE/$HOSTNAME@$RELM" "$TmpDir/service_add_003.out"
 	rlAssertGrep "Certificate: MIIC9jCCAd6gAwIBAgIBCTANBgkqhkiG9w0BAQ0FADA5MRIwEAYDVQQKEwlzaWxlbnRkb20xIzAhBgNVBAMTGkNlcnRpZmljYXRlIEF1dGhvcml0eWNhLXQxMB4XDTExMDExOTEyMjc1M1oXDTEzMDEwODEyMjc1M1owJjERMA8GA1UEAxMIYWNjb3VudHMxETAPBgNVBAMTCHNlcnZpY2VzMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDbcRxo0/tfpoJEzCLmfTDy9AYQIyubgwo2ErV+6unEKY2OW3YHIBW6Th6xg62tMzqQatIqqJKse9AnVoObWAiqhpjPdr2FuL6LiyRb1Aez9E5MVndfbsto0F7OYSs6y1yICSBAfA1CFAdRm+WOnBDI1e3hcg3UHXUukifKg4XaLQIDAQABo4GfMIGcMB8GA1UdIwQYMBaAFEoAQIQqOuqP8Ilyez9pzQCblEmWMEoGCCsGAQUFBwEBBD4wPDA6BggrBgEFBQcwAYYuaHR0cDovL2JldGEuZHNkZXYuc2pjLnJlZGhhdC5jb206NDgxODAvY2Evb2NzcDAOBgNVHQ8BAf8EBAMCBPAwHQYDVR0lBBYwFAYIKwYBBQUHAwEGCCsGAQUFBwMCMA0GCSqGSIb3DQEBDQUAA4IBAQCWk7YuyH6NTqILzmGK3qjIkreCpXnbNE99yrc7UQka9btrq2FWoFSxteU2JFD3+EGG8tXuDyDuWlgs8F3X/CBB4N+ZV4fAzHpIp2aIRQMapLKvu/mEiGPjFWFYJqk/HiNSQk8qefI6XqLvWIVY4LxMn4m1ZsQ/XXBzNbWsf9W3jnwCY0cLygJIgZZt2uQH/KxoQ3/oE0gp1wYITeKAKvaQrwUc4YgshlxMZAN4z5FuXdtDQqAIrJYcg9q+j6zYHNtXTcLuCFO0CcFto8CaUGXUJ0B5IrV2xsnRegHRxBy+C+3lfYiW2DelWI3exiYgdlU5wJSlkX37HQxA9cP+/kIb" "$TmpDir/service_add_003.out"
-	rlAssertGrep "Managed by: $CLIENT" "$TmpDir/service_add_003.out"
+	rlAssertGrep "Managed by: $HOSTNAME" "$TmpDir/service_add_003.out"
 
-	ipa service-del $SERVICE/$CLIENT@$RELM > /tmp/certerr.out 2>&1
+	ipa service-del $SERVICE/$HOSTNAME@$RELM > /tmp/certerr.out 2>&1
 	cat /tmp/certerr.out | grep "ipa: ERROR: Certificate operation cannot be completed"
 	if [ $? -eq 0 ] ; then
-		ipa service-mod --certificate="" $SERVICE/$CLIENT@$RELM
-		ipa service-del $SERVICE/$CLIENT@$RELM
+		ipa service-mod --certificate="" $SERVICE/$HOSTNAME@$RELM
+		ipa service-del $SERVICE/$HOSTNAME@$RELM
 	fi
 
 	# lets make sure service is deleted here because of above work around for bug 691488
-	rlRun "ipa service-show $SERVICE/$CLIENT@$RELM" 2 "Checking to make sure service is deleted"
+	rlRun "ipa service-show $SERVICE/$HOSTNAME@$RELM" 2 "Checking to make sure service is deleted"
 	
 rlPhaseEnd
 }
@@ -170,13 +170,13 @@ service_add_005() {
 
 rlPhaseStartTest "service_add_005: ipa service-add : add service for $SERVICE with --raw option"
 
-        rlRun "ipa service-add $SERVICE/$CLIENT@$RELM --raw > $TmpDir/service_add_005.out 2>&1"
-        rlAssertGrep "Added service \"$SERVICE/$CLIENT@$RELM\"" "$TmpDir/service_add_005.out"
-	rlAssertGrep "krbprincipalname: $SERVICE/$CLIENT@$RELM" "$TmpDir/service_add_005.out"
+        rlRun "ipa service-add $SERVICE/$HOSTNAME@$RELM --raw > $TmpDir/service_add_005.out 2>&1"
+        rlAssertGrep "Added service \"$SERVICE/$HOSTNAME@$RELM\"" "$TmpDir/service_add_005.out"
+	rlAssertGrep "krbprincipalname: $SERVICE/$HOSTNAME@$RELM" "$TmpDir/service_add_005.out"
         rlRun "cat $TmpDir/service_add_005.out"
 
 	#deleting for the added service for the next test case
-	rlRun "ipa service-del $SERVICE/$CLIENT@$RELM"
+	rlRun "ipa service-del $SERVICE/$HOSTNAME@$RELM"
 rlPhaseEnd
 
 }
@@ -201,13 +201,13 @@ service_add_007() {
 
 	# ipa service-add : re-add service for vpn
 rlPhaseStartTest "service_add_007: ipa service-add: re-add service for $SERVICE"
-	rlRun "ipa service-add $SERVICE/$CLIENT@$RELM"
-	rlRun "ipa service-add $SERVICE/$CLIENT@$RELM > $TmpDir/service_add_007.out 2>&1" 1
-	rlAssertGrep "ipa: ERROR: service with name \"$SERVICE/$CLIENT@$RELM\" already exists" "$TmpDir/service_add_007.out"
+	rlRun "ipa service-add $SERVICE/$HOSTNAME@$RELM"
+	rlRun "ipa service-add $SERVICE/$HOSTNAME@$RELM > $TmpDir/service_add_007.out 2>&1" 1
+	rlAssertGrep "ipa: ERROR: service with name \"$SERVICE/$HOSTNAME@$RELM\" already exists" "$TmpDir/service_add_007.out"
 	rlRun "cat $TmpDir/service_add_007.out"
 
 	#deleting for the added service for the next test case
-	rlRun "ipa service-del $SERVICE/$CLIENT@$RELM"
+	rlRun "ipa service-del $SERVICE/$HOSTNAME@$RELM"
 rlPhaseEnd
 
 }
@@ -228,7 +228,7 @@ service_add_009() {
 	# service_add_009: Adding service with missing service name.
 
 rlPhaseStartTest "service_add_009: ipa service-add: Adding service with missing service name."
-        rlRun "ipa service-add $CLIENT@$RELM > $TmpDir/service_add_009.out 2>&1" 1
+        rlRun "ipa service-add $HOSTNAME@$RELM > $TmpDir/service_add_009.out 2>&1" 1
         rlAssertGrep "ipa: ERROR: Service principal is not of the form: service\/fully-qualified host name: missing service" "$TmpDir/service_add_009.out"
         rlRun "cat $TmpDir/service_add_009.out"
 rlPhaseEnd
@@ -239,12 +239,12 @@ service_add_010() {
 	# service_add_010: Adding service with missing host domain
 
 rlPhaseStartTest "service_add_010: ipa service-add: Adding service with missing fqdn."
-	rlRun "ipa -v service-add $SERVICE/$CLIENT > $TmpDir/service_add_010.out 2>&1"
-        rlAssertGrep "Added service \"$SERVICE\/$CLIENT@$RELM\"" "$TmpDir/service_add_010.out"
+	rlRun "ipa -v service-add $SERVICE/$HOSTNAME > $TmpDir/service_add_010.out 2>&1"
+        rlAssertGrep "Added service \"$SERVICE\/$HOSTNAME@$RELM\"" "$TmpDir/service_add_010.out"
         rlRun "cat $TmpDir/service_add_010.out"
 
         # Deleting this service for future test cases
-        rlRun "ipa service-del $SERVICE/$CLIENT@$RELM"
+        rlRun "ipa service-del $SERVICE/$HOSTNAME@$RELM"
 rlPhaseEnd
 }
 
@@ -260,7 +260,7 @@ rlPhaseEnd
 service_add_host_001() {
         # ipa service-add-host : add host to manage service for vpn - host does not exist.
 rlPhaseStartTest "service_add_host_001: ipa service-add-host : add host to manage service for HTTP/$SERVICE - host does not exist."
-        rlRun "ipa service-add-host --hosts=$TESTHOST $SERVICE/$CLIENT@$RELM > $TmpDir/service_add_host_001.out 2>&1" 2
+        rlRun "ipa service-add-host --hosts=$TESTHOST $SERVICE/$HOSTNAME@$RELM > $TmpDir/service_add_host_001.out 2>&1" 2
         rlRun "cat $TmpDir/service_add_host_001.out"
         rlAssertNotGrep "Number of members added 0" "$TmpDir/service_add_host_001.out"
 rlPhaseEnd
@@ -270,12 +270,12 @@ service_add_host_002() {
 rlPhaseStartTest "service_add_host_002: ipa service-add-host: add host to manage service - host does exist."
         # adding host for further test
         rlRun "ipa host-add $TESTHOST --force"
-	rlRun "ipa service-add $SERVICE/$CLIENT@$RELM"
+	rlRun "ipa service-add $SERVICE/$HOSTNAME@$RELM"
         # ipa service-add-host : add host to manage service for vpn - host exists
-        rlRun "ipa service-add-host --hosts=$TESTHOST $SERVICE/$CLIENT@$RELM > $TmpDir/service_add_host_002.out 2>&1"
+        rlRun "ipa service-add-host --hosts=$TESTHOST $SERVICE/$HOSTNAME@$RELM > $TmpDir/service_add_host_002.out 2>&1"
         rlAssertGrep "Number of members added 1" "$TmpDir/service_add_host_002.out"
 
-        rlRun "ipa service-remove-host --hosts=$TESTHOST $SERVICE/$CLIENT@$RELM" 0 "Removing the managed host for further testing"
+        rlRun "ipa service-remove-host --hosts=$TESTHOST $SERVICE/$HOSTNAME@$RELM" 0 "Removing the managed host for further testing"
 rlPhaseEnd
 }
 
@@ -283,34 +283,34 @@ service_add_host_003() {
         # ipa service-add-host : add host to manage service for vpn with all option
 	
 rlPhaseStartTest "service_add_host_003: ipa service-add-host : add host to manage service with all option."
-        rlRun "ipa service-add-host --hosts=$TESTHOST $SERVICE/$CLIENT@$RELM --all > $TmpDir/service_add_host_003.out 2>&1"
+        rlRun "ipa service-add-host --hosts=$TESTHOST $SERVICE/$HOSTNAME@$RELM --all > $TmpDir/service_add_host_003.out 2>&1"
         rlAssertGrep "Managed by: $HOSTNAME, $TESTHOST" "$TmpDir/service_add_host_003.out"
         rlAssertGrep "ipauniqueid:" "$TmpDir/service_add_host_003.out"
         rlAssertGrep "objectclass: krbprincipal, krbprincipalaux, krbticketpolicyaux, ipaobject, ipaservice, pkiuser, top" "$TmpDir/service_add_host_003.out"
         rlAssertGrep "Number of members added 1" "$TmpDir/service_add_host_003.out"
         rlRun "cat $TmpDir/service_add_host_003.out"
 
-        rlRun "ipa service-remove-host --hosts=$TESTHOST $SERVICE/$CLIENT@$RELM" 0 "Removing the managed host for further testing"
+        rlRun "ipa service-remove-host --hosts=$TESTHOST $SERVICE/$HOSTNAME@$RELM" 0 "Removing the managed host for further testing"
 rlPhaseEnd
 }
 
 service_add_host_004() {
         # ipa service-add-host : add host to manage service for $SERVICE with raw option
 rlPhaseStartTest "service_add_host_004: ipa service-add-host : add host to manage service with raw option."
-        rlRun "ipa service-add-host --hosts=$TESTHOST $SERVICE/$CLIENT@$RELM --raw > $TmpDir/service_add_host_004.out 2>&1"
-        rlAssertGrep "krbprincipalname: $SERVICE/$CLIENT@$RELM" "$TmpDir/service_add_host_004.out"
+        rlRun "ipa service-add-host --hosts=$TESTHOST $SERVICE/$HOSTNAME@$RELM --raw > $TmpDir/service_add_host_004.out 2>&1"
+        rlAssertGrep "krbprincipalname: $SERVICE/$HOSTNAME@$RELM" "$TmpDir/service_add_host_004.out"
         rlAssertGrep "Number of members added 1" "$TmpDir/service_add_host_004.out"
         rlRun "cat $TmpDir/service_add_host_004.out"
 
-        rlRun "ipa service-remove-host --hosts=$TESTHOST $SERVICE/$CLIENT@$RELM" 0 "Removing the managed host for further testing"
+        rlRun "ipa service-remove-host --hosts=$TESTHOST $SERVICE/$HOSTNAME@$RELM" 0 "Removing the managed host for further testing"
 rlPhaseEnd
 }
 
 service_add_host_005() {
         # ipa service-add-host : add host to manage service for HTTP/$SERVICE with raw and all options
 rlPhaseStartTest "service_add_host_005: ipa service-add-host : add host to manage service with raw and all options"
-        rlRun "ipa service-add-host --hosts=$TESTHOST $SERVICE/$CLIENT@$RELM --raw --all > $TmpDir/service_add_host_005.out 2>&1"
-        rlAssertGrep "krbprincipalname: $SERVICE/$CLIENT@$RELM" "$TmpDir/service_add_host_005.out"
+        rlRun "ipa service-add-host --hosts=$TESTHOST $SERVICE/$HOSTNAME@$RELM --raw --all > $TmpDir/service_add_host_005.out 2>&1"
+        rlAssertGrep "krbprincipalname: $SERVICE/$HOSTNAME@$RELM" "$TmpDir/service_add_host_005.out"
         rlRun "grep -i \"managedby: fqdn=$TESTHOST,cn=computers,cn=accounts,dc=$RELM\" $TmpDir/service_add_host_005.out"
         rlAssertGrep "objectclass: krbticketpolicyaux" "$TmpDir/service_add_host_005.out"
         rlAssertGrep "objectclass: krbprincipalaux" "$TmpDir/service_add_host_005.out"
@@ -318,7 +318,7 @@ rlPhaseStartTest "service_add_host_005: ipa service-add-host : add host to manag
         rlAssertGrep "Number of members added 1" "$TmpDir/service_add_host_005.out"
         rlRun "cat $TmpDir/service_add_host_005.out"
 
-        rlRun "ipa service-remove-host --hosts=$TESTHOST $SERVICE/$CLIENT@$RELM" 0 "Removing the managed host for further testing"
+        rlRun "ipa service-remove-host --hosts=$TESTHOST $SERVICE/$HOSTNAME@$RELM" 0 "Removing the managed host for further testing"
         rlRun "ipa host-del $TESTHOST" 0 "removing host test.example.com for further tests"
 rlPhaseEnd
 }
@@ -332,13 +332,13 @@ LCAPSHOST=`echo $CAPSHOST | tr "[A-Z]" "[a-z]"`
 rlPhaseStartTest "service_add_host_006: ipa service-add-host : add host with caps/dash to manage service."
         rlRun "ipa host-add $CAPSHOST --force"
 	rlRun "ipa host-add --force $DASHHOST"
-        rlRun "ipa service-add-host --hosts=$CAPSHOST,$DASHHOST $SERVICE/$CLIENT@$RELM > $TmpDir/service_add_host_006.out 2>&1"
+        rlRun "ipa service-add-host --hosts=$CAPSHOST,$DASHHOST $SERVICE/$HOSTNAME@$RELM > $TmpDir/service_add_host_006.out 2>&1"
         rlAssertGrep "Number of members added 2" "$TmpDir/service_add_host_006.out"
-	rlAssertGrep "Managed by: $CLIENT, $LCAPSHOST, $DASHHOST" "$TmpDir/service_add_host_006.out"
-        rlRun "ipa service-remove-host --hosts=$CAPSHOST,$DASHHOST $SERVICE/$CLIENT@$RELM" 0 "Removing the managed host for further testing"
+	rlAssertGrep "Managed by: $HOSTNAME, $LCAPSHOST, $DASHHOST" "$TmpDir/service_add_host_006.out"
+        rlRun "ipa service-remove-host --hosts=$CAPSHOST,$DASHHOST $SERVICE/$HOSTNAME@$RELM" 0 "Removing the managed host for further testing"
         rlRun "ipa host-del $CAPSHOST" 0 "removing the first host added"
 	rlRun "ipa host-del $DASHHOST" 0 "removing the second host added"
-	rlRun "ipa service-del $SERVICE/$CLIENT@$RELM"
+	rlRun "ipa service-del $SERVICE/$HOSTNAME@$RELM"
 rlPhaseEnd
 }
 
@@ -349,16 +349,16 @@ HOST2="test2.$DOMAIN"
 
 rlPhaseStartTest "service_add_host_007: ipa service-add-host : with multiple hosts to manage service."
 
-	rlRun "ipa service-add $SERVICE/$CLIENT@$RELM"
+	rlRun "ipa service-add $SERVICE/$HOSTNAME@$RELM"
 	rlRun "ipa host-add $HOST1 --force"
 	rlRun "ipa host-add $HOST2 --force"
-        rlRun "ipa service-add-host --hosts=$HOST2,$HOST1 $SERVICE/$CLIENT@$RELM > $TmpDir/service_add_host_007.out 2>&1"
+        rlRun "ipa service-add-host --hosts=$HOST2,$HOST1 $SERVICE/$HOSTNAME@$RELM > $TmpDir/service_add_host_007.out 2>&1"
         rlAssertGrep "Number of members added 2" "$TmpDir/service_add_host_007.out"
         rlRun "cat $TmpDir/service_add_host_007.out"
 
         rlRun "ipa host-del $HOST1" 0 "removing the added host $HOST1"
         rlRun "ipa host-del $HOST2" 0 "removing the added host $HOST2"
-        rlRun "ipa service-del $SERVICE/$CLIENT@$RELM" 
+        rlRun "ipa service-del $SERVICE/$HOSTNAME@$RELM" 
 
 rlPhaseEnd
 }
@@ -395,10 +395,10 @@ service_del_002() {
         # ipa service-del: del service for vpn 
 
 rlPhaseStartTest "service_del_002: delete service"
-	rlRun "ipa service-add $SERVICE/$CLIENT@$RELM"
-        rlRun "ipa service-del $SERVICE/$CLIENT@$RELM > $TmpDir/service_del_002.out"
+	rlRun "ipa service-add $SERVICE/$HOSTNAME@$RELM"
+        rlRun "ipa service-del $SERVICE/$HOSTNAME@$RELM > $TmpDir/service_del_002.out"
         rlRun "cat $TmpDir/service_del_002.out"
-        rlAssertGrep "Deleted service \"$SERVICE/$CLIENT@$RELM\"" "$TmpDir/service_del_002.out"
+        rlAssertGrep "Deleted service \"$SERVICE/$HOSTNAME@$RELM\"" "$TmpDir/service_del_002.out"
 rlPhaseEnd
 }
 
@@ -406,7 +406,7 @@ service_del_003() {
         # ipa service-del: re-delete the same or unknown service
 
 rlPhaseStartTest "service_del_003: re-delete the same or unknown service."
-        rlRun "ipa service-del $SERVICE/$CLIENT@$RELM > $TmpDir/service_del_003.out 2>&1" 2
+        rlRun "ipa service-del $SERVICE/$HOSTNAME@$RELM > $TmpDir/service_del_003.out 2>&1" 2
         rlAssertGrep "ipa: ERROR: no such entry" "$TmpDir/service_del_003.out"
         rlRun "cat $TmpDir/service_del_003.out"
 rlPhaseEnd
@@ -416,22 +416,22 @@ service_del_004() {
         # ipa service-del: with --continue option
 rlPhaseStartTest "service_del_004: ipa service-del: with --continue option."
         # Adding service for this test
-        rlRun "ipa service-add IMAP/$CLIENT@$RELM"
-	rlRun "ipa service-add VM/$CLIENT@$RELM"
+        rlRun "ipa service-add IMAP/$HOSTNAME@$RELM"
+	rlRun "ipa service-add VM/$HOSTNAME@$RELM"
 
-        rlRun "ipa service-del VM/$CLIENT@$RELM unknown/$CLIENT@$RELM IMAP/$CLIENT@$RELM" 2
-        rlRun "ipa service-show VM/$CLIENT@$RELM" 2 "Service should have been deleted because first in list without --continue"
-	rlRun "ipa service-show IMAP/$CLIENT@$RELM" 0 "Service should not have been deleted without --continue"
+        rlRun "ipa service-del VM/$HOSTNAME@$RELM unknown/$CLIENT@$RELM IMAP/$CLIENT@$RELM" 2
+        rlRun "ipa service-show VM/$HOSTNAME@$RELM" 2 "Service should have been deleted because first in list without --continue"
+	rlRun "ipa service-show IMAP/$HOSTNAME@$RELM" 0 "Service should not have been deleted without --continue"
 
         # re-adding VM service for --continue option test
-        rlRun "ipa service-add VM/$CLIENT@$RELM"
-        rlRun "ipa service-del unknown/$CLIENT@$RELM VM/$CLIENT@$RELM IMAP/$CLIENT@$RELM --continue > $TmpDir/service_del_004.out 2>&1"
-        rlAssertGrep "Deleted service \"VM/$CLIENT@$RELM,IMAP/$CLIENT@$RELM\"" "$TmpDir/service_del_004.out"
-        rlAssertGrep "Failed to remove: unknown/$CLIENT@$RELM" "$TmpDir/service_del_004.out"
+        rlRun "ipa service-add VM/$HOSTNAME@$RELM"
+        rlRun "ipa service-del unknown/$HOSTNAME@$RELM VM/$CLIENT@$RELM IMAP/$CLIENT@$RELM --continue > $TmpDir/service_del_004.out 2>&1"
+        rlAssertGrep "Deleted service \"VM/$HOSTNAME@$RELM,IMAP/$CLIENT@$RELM\"" "$TmpDir/service_del_004.out"
+        rlAssertGrep "Failed to remove: unknown/$HOSTNAME@$RELM" "$TmpDir/service_del_004.out"
 	rlRun "cat $TmpDir/service_del_004.out"
 
-        rlRun "ipa service-show IMAP/$CLIENT@$RELM" 2
-        rlRun "ipa service-show VM/$CLIENT@$RELM" 2
+        rlRun "ipa service-show IMAP/$HOSTNAME@$RELM" 2
+        rlRun "ipa service-show VM/$HOSTNAME@$RELM" 2
 rlPhaseEnd
 }
 
@@ -449,11 +449,11 @@ rlPhaseEnd
 service_disable_002() {
         # ipa service-disable: Disabling service vpn. 
 rlPhaseStartTest "service_disable_002: ipa service-disable: Disabling service."
-        rlRun "ipa service-add $SERVICE/$CLIENT@$RELM"
-        rlRun "ipa-getkeytab --server $MASTER --principal $SERVICE/$CLIENT@$RELM --keytab /opt/$SERVICE.$CLIENT.$RELM.keytab"
-        rlRun "ipa service-disable $SERVICE/$CLIENT@$RELM > $TmpDir/service_disable_002.out 2>&1"
-	rlAssertGrep "Disabled service \"vpn/$CLIENT@$RELM\"" "$TmpDir/service_disable_002.out"
-        rlRun "ipa service-find $SERVICE/$CLIENT@$RELM >> $TmpDir/service_disable_002.out"
+        rlRun "ipa service-add $SERVICE/$HOSTNAME@$RELM"
+        rlRun "ipa-getkeytab --server $MASTER --principal $SERVICE/$HOSTNAME@$RELM --keytab /opt/$SERVICE.$CLIENT.$RELM.keytab"
+        rlRun "ipa service-disable $SERVICE/$HOSTNAME@$RELM > $TmpDir/service_disable_002.out 2>&1"
+	rlAssertGrep "Disabled service \"vpn/$HOSTNAME@$RELM\"" "$TmpDir/service_disable_002.out"
+        rlRun "ipa service-find $SERVICE/$HOSTNAME@$RELM >> $TmpDir/service_disable_002.out"
 	rlAssertGrep "Keytab: False" "$TmpDir/service_disable_002.out"
 rlPhaseEnd
 }
@@ -461,10 +461,10 @@ rlPhaseEnd
 service_disable_003() {
         # ipa service-disable: Disabling an already disabled service
 rlPhaseStartTest "service_disable_003: ipa service-disable: Disabling an already disabled service."
-        rlRun "ipa service-disable $SERVICE/$CLIENT@$RELM > $TmpDir/service_disable_003.out 2>&1" 1
+        rlRun "ipa service-disable $SERVICE/$HOSTNAME@$RELM > $TmpDir/service_disable_003.out 2>&1" 1
         rlAssertGrep "ipa: ERROR: This entry is already disabled" "$TmpDir/service_disable_003.out"
 
-	rlRun "ipa service-del $SERVICE/$CLIENT@$RELM"
+	rlRun "ipa service-del $SERVICE/$HOSTNAME@$RELM"
 rlPhaseEnd
 }
 
@@ -493,11 +493,11 @@ service_find_002() {
         # ipa service-find with --principal option
 rlPhaseStartTest "service_find_002: ipa service-find with --principal option"
 
-	rlRun "ipa service-add $SERVICE/$CLIENT@$RELM"
+	rlRun "ipa service-add $SERVICE/$HOSTNAME@$RELM"
 
-        rlRun "ipa service-find --principal=$SERVICE/$CLIENT@$RELM > $TmpDir/service_find_002.out 2>&1"
+        rlRun "ipa service-find --principal=$SERVICE/$HOSTNAME@$RELM > $TmpDir/service_find_002.out 2>&1"
         rlAssertGrep "Number of entries returned 1" "$TmpDir/service_find_002.out"
-        rlAssertGrep "Principal: $SERVICE/$CLIENT@$RELM" "$TmpDir/service_find_002.out"
+        rlAssertGrep "Principal: $SERVICE/$HOSTNAME@$RELM" "$TmpDir/service_find_002.out"
         rlRun "cat $TmpDir/service_find_002.out"
 rlPhaseEnd
 }
@@ -505,7 +505,7 @@ rlPhaseEnd
 service_find_003() {
         # ipa service-find with --principal and --all options
 rlPhaseStartTest "service_find_003: ipa service-find with --principal and --all options."
-        rlRun "ipa service-find --principal=$SERVICE/$CLIENT@$RELM --all > $TmpDir/service_find_003.out 2>&1"
+        rlRun "ipa service-find --principal=$SERVICE/$HOSTNAME@$RELM --all > $TmpDir/service_find_003.out 2>&1"
         rlAssertGrep "objectclass: krbprincipal, krbprincipalaux, krbticketpolicyaux, ipaobject, ipaservice, pkiuser, top" "$TmpDir/service_find_003.out"
         rlAssertGrep "ipauniqueid:" "$TmpDir/service_find_003.out"
         rlAssertGrep "Keytab:" "$TmpDir/service_find_003.out"
@@ -519,7 +519,7 @@ service_find_004() {
 
 rlPhaseStartTest "service_find_004: ipa service-find with --not-man-by-host option"
         rlRun "ipa host-add $TESTHOST --force"
-        rlRun "ipa service-add-host --hosts=$TESTHOST $SERVICE/$CLIENT@$RELM > $TmpDir/service_find_004.out 2>&1"
+        rlRun "ipa service-add-host --hosts=$TESTHOST $SERVICE/$HOSTNAME@$RELM > $TmpDir/service_find_004.out 2>&1"
         rlRun "ipa service-find --not-man-by-hosts=$TESTHOST > $TmpDir/service_find_004.out 2>&1"
         rlRun "cat $TmpDir/service_find_004.out"
 	if [ $SLAVE = "" ] ; then
@@ -589,7 +589,7 @@ rlPhaseStartTest "service_find_008: ipa service-find with --timelimit option wit
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message - special characters."
 
 	#Cleaning up for service-find test cases
-	rlRun "ipa service-del $SERVICE/$CLIENT@$RELM"
+	rlRun "ipa service-del $SERVICE/$HOSTNAME@$RELM"
 	rlRun "ipa host-del $TESTHOST"
 rlPhaseEnd
 }
@@ -617,24 +617,24 @@ service_mod_002() {
 
 	# ipa service-mod --rights, to display the rights while modifying a service
 rlPhaseStartTest "service_mod_002: ipa service-mod --rights, to display the rights while modifying a service."
-	rlRun "ipa service-add $SERVICE/$CLIENT@$RELM" 0 "Creating a service for this test"
+	rlRun "ipa service-add $SERVICE/$HOSTNAME@$RELM" 0 "Creating a service for this test"
 
-	rlRun "ipa service-mod $SERVICE/$CLIENT@$RELM --certificate=MIICdzCCAeCgAwIBAgICA+4wDQYJKoZIhvcNAQEFBQAwKTEnMCUGA1UEAxMeVEVTVFJFTE0gQ2VydGlmaWNhdGUgQXV0aG9yaXR5MB4XDTExMDIwOTA5MzE1M1oXDTIxMDIwOTA5MzE1M1owMTERMA8GA1UEChMIVEVTVFJFTE0xHDAaBgNVBAMTE2dzcmYxNGlwYXMudGVzdHJlbG0wggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDiHg3uWywDB1BWm7dy005eQGPecuOcpjp1ZX7Bc7FHxarF03IIsBT4DWvZlp1TbCDuHESBgTWExvr+xeeVfh+foMdUe2UuJJ+DdWsJ1JZMBRKyTDmdd90nuXWWROYwgyrmwAf+3CFHmB5QaVnbAEyD8Hf3sC8k1VLkJACtxSLWx/5WMGzFJV30Xok82KrfPml4z4i6kelnz6KNWfgcM0yQkoohhbLmPqwnj2C4LpwM3QgeUltDCpEwCQCMXeTMDm8Kr6tFtjGmGjW5ncNhk7QLZDVwB++CGbERSCPRBqWSNtZ4yO2P+AOTjPreX6/XQOSMrAe+810YilJbTwx3vZBbAgMBAAGjIjAgMBEGCWCGSAGG+EIBAQQEAwIGQDALBgNVHQ8EBAMCBSAwDQYJKoZIhvcNAQEFBQADgYEAdK33A68CrIfM/BmH8MYGDrdGLK7x54Kkez+nlz9WAv6KEIDiWJXw4HY3iIPkJoYIvOhYT4lIdYiOlDgd3yABjGb0g/iglZ4u2qRDQc9nAYul9o5X8/Mlv38d+0QO5NxOtwk6Cvnt4UTtqoRUeZ8244inmPSBdZr6XHUVlePCNiw= --rights --all > $TmpDir/service_mod_002.out"
+	rlRun "ipa service-mod $SERVICE/$HOSTNAME@$RELM --certificate=MIICdzCCAeCgAwIBAgICA+4wDQYJKoZIhvcNAQEFBQAwKTEnMCUGA1UEAxMeVEVTVFJFTE0gQ2VydGlmaWNhdGUgQXV0aG9yaXR5MB4XDTExMDIwOTA5MzE1M1oXDTIxMDIwOTA5MzE1M1owMTERMA8GA1UEChMIVEVTVFJFTE0xHDAaBgNVBAMTE2dzcmYxNGlwYXMudGVzdHJlbG0wggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDiHg3uWywDB1BWm7dy005eQGPecuOcpjp1ZX7Bc7FHxarF03IIsBT4DWvZlp1TbCDuHESBgTWExvr+xeeVfh+foMdUe2UuJJ+DdWsJ1JZMBRKyTDmdd90nuXWWROYwgyrmwAf+3CFHmB5QaVnbAEyD8Hf3sC8k1VLkJACtxSLWx/5WMGzFJV30Xok82KrfPml4z4i6kelnz6KNWfgcM0yQkoohhbLmPqwnj2C4LpwM3QgeUltDCpEwCQCMXeTMDm8Kr6tFtjGmGjW5ncNhk7QLZDVwB++CGbERSCPRBqWSNtZ4yO2P+AOTjPreX6/XQOSMrAe+810YilJbTwx3vZBbAgMBAAGjIjAgMBEGCWCGSAGG+EIBAQQEAwIGQDALBgNVHQ8EBAMCBSAwDQYJKoZIhvcNAQEFBQADgYEAdK33A68CrIfM/BmH8MYGDrdGLK7x54Kkez+nlz9WAv6KEIDiWJXw4HY3iIPkJoYIvOhYT4lIdYiOlDgd3yABjGb0g/iglZ4u2qRDQc9nAYul9o5X8/Mlv38d+0QO5NxOtwk6Cvnt4UTtqoRUeZ8244inmPSBdZr6XHUVlePCNiw= --rights --all > $TmpDir/service_mod_002.out"
 	rlRun "cat $TmpDir/service_mod_002.out"
-	rlAssertGrep "Modified service \"$SERVICE/$CLIENT@$RELM\"" "$TmpDir/service_mod_002.out"
+	rlAssertGrep "Modified service \"$SERVICE/$HOSTNAME@$RELM\"" "$TmpDir/service_mod_002.out"
 	rlAssertGrep "attributelevelrights: {'krbextradata': u'rsc', 'krbcanonicalname': u'rsc', 'usercertificate': u'rscwo', 'krbupenabled': u'rsc', 'krbticketflags': u'rsc', 'krbprincipalexpiration': u'rsc', 'krbobjectreferences': u'rscwo', 'krbmaxrenewableage': u'rscwo', 'nsaccountlock': u'rscwo', 'managedby': u'rscwo', 'krblastsuccessfulauth': u'rsc', 'krbprincipaltype': u'rsc', 'krbprincipalkey': u'wo', 'memberof': u'rsc', 'krbmaxticketlife': u'rscwo', 'krbpwdpolicyreference': u'rsc', 'krbprincipalname': u'rsc', 'krbticketpolicyreference': u'rsc', 'krblastadminunlock': u'rscwo', 'krbpasswordexpiration': u'rsc', 'krblastfailedauth': u'rsc', 'objectclass': u'rscwo', 'aci': u'rscwo', 'krbpwdhistory': u'rsc', 'krbprincipalaliases': u'rsc', 'krbloginfailedcount': u'rsc', 'krblastpwdchange': u'rscwo', 'ipauniqueid': u'rsc'}" "$TmpDir/service_mod_002.out"
 	rlAssertGrep "objectclass: krbprincipal, krbprincipalaux, krbticketpolicyaux, ipaobject, ipaservice, pkiuser, top" "$TmpDir/service_mod_002.out"
 
 	#deleting for the added service for the next test case
-        ipa service-del $SERVICE/$CLIENT@$RELM > /tmp/certerr.out 2>&1
+        ipa service-del $SERVICE/$HOSTNAME@$RELM > /tmp/certerr.out 2>&1
         cat /tmp/certerr.out | grep "ipa: ERROR: Certificate operation cannot be completed"
         if [ $? -eq 0 ] ; then
-                ipa service-mod --certificate="" $SERVICE/$CLIENT@$RELM
-                ipa service-del $SERVICE/$CLIENT@$RELM
+                ipa service-mod --certificate="" $SERVICE/$HOSTNAME@$RELM
+                ipa service-del $SERVICE/$HOSTNAME@$RELM
         fi
 
         # lets make sure service is deleted here because of above work around for bug 691488
-        rlRun "ipa service-show $SERVICE/$CLIENT@$RELM" 2 "Checking to make sure service is deleted"
+        rlRun "ipa service-show $SERVICE/$HOSTNAME@$RELM" 2 "Checking to make sure service is deleted"
 
 rlPhaseEnd
 }
@@ -644,17 +644,17 @@ service_mod_003() {
 	# ipa service-mod --certificate, adding certificate to an existing service.
 rlPhaseStartTest "service_mod_003: ipa service-mod --certificate, adding certificate to an existing service."
 
-        rlRun "ipa service-add $SERVICE/$CLIENT@$RELM" 0 "Creating a service for this test"
+        rlRun "ipa service-add $SERVICE/$HOSTNAME@$RELM" 0 "Creating a service for this test"
 
-        rlRun "ipa service-mod $SERVICE/$CLIENT@$RELM --certificate=MIICdzCCAeCgAwIBAgICA+4wDQYJKoZIhvcNAQEFBQAwKTEnMCUGA1UEAxMeVEVTVFJFTE0gQ2VydGlmaWNhdGUgQXV0aG9yaXR5MB4XDTExMDIwOTA5MzE1M1oXDTIxMDIwOTA5MzE1M1owMTERMA8GA1UEChMIVEVTVFJFTE0xHDAaBgNVBAMTE2dzcmYxNGlwYXMudGVzdHJlbG0wggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDiHg3uWywDB1BWm7dy005eQGPecuOcpjp1ZX7Bc7FHxarF03IIsBT4DWvZlp1TbCDuHESBgTWExvr+xeeVfh+foMdUe2UuJJ+DdWsJ1JZMBRKyTDmdd90nuXWWROYwgyrmwAf+3CFHmB5QaVnbAEyD8Hf3sC8k1VLkJACtxSLWx/5WMGzFJV30Xok82KrfPml4z4i6kelnz6KNWfgcM0yQkoohhbLmPqwnj2C4LpwM3QgeUltDCpEwCQCMXeTMDm8Kr6tFtjGmGjW5ncNhk7QLZDVwB++CGbERSCPRBqWSNtZ4yO2P+AOTjPreX6/XQOSMrAe+810YilJbTwx3vZBbAgMBAAGjIjAgMBEGCWCGSAGG+EIBAQQEAwIGQDALBgNVHQ8EBAMCBSAwDQYJKoZIhvcNAQEFBQADgYEAdK33A68CrIfM/BmH8MYGDrdGLK7x54Kkez+nlz9WAv6KEIDiWJXw4HY3iIPkJoYIvOhYT4lIdYiOlDgd3yABjGb0g/iglZ4u2qRDQc9nAYul9o5X8/Mlv38d+0QO5NxOtwk6Cvnt4UTtqoRUeZ8244inmPSBdZr6XHUVlePCNiw= > $TmpDir/service_mod_003.out 2>&1"
+        rlRun "ipa service-mod $SERVICE/$HOSTNAME@$RELM --certificate=MIICdzCCAeCgAwIBAgICA+4wDQYJKoZIhvcNAQEFBQAwKTEnMCUGA1UEAxMeVEVTVFJFTE0gQ2VydGlmaWNhdGUgQXV0aG9yaXR5MB4XDTExMDIwOTA5MzE1M1oXDTIxMDIwOTA5MzE1M1owMTERMA8GA1UEChMIVEVTVFJFTE0xHDAaBgNVBAMTE2dzcmYxNGlwYXMudGVzdHJlbG0wggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDiHg3uWywDB1BWm7dy005eQGPecuOcpjp1ZX7Bc7FHxarF03IIsBT4DWvZlp1TbCDuHESBgTWExvr+xeeVfh+foMdUe2UuJJ+DdWsJ1JZMBRKyTDmdd90nuXWWROYwgyrmwAf+3CFHmB5QaVnbAEyD8Hf3sC8k1VLkJACtxSLWx/5WMGzFJV30Xok82KrfPml4z4i6kelnz6KNWfgcM0yQkoohhbLmPqwnj2C4LpwM3QgeUltDCpEwCQCMXeTMDm8Kr6tFtjGmGjW5ncNhk7QLZDVwB++CGbERSCPRBqWSNtZ4yO2P+AOTjPreX6/XQOSMrAe+810YilJbTwx3vZBbAgMBAAGjIjAgMBEGCWCGSAGG+EIBAQQEAwIGQDALBgNVHQ8EBAMCBSAwDQYJKoZIhvcNAQEFBQADgYEAdK33A68CrIfM/BmH8MYGDrdGLK7x54Kkez+nlz9WAv6KEIDiWJXw4HY3iIPkJoYIvOhYT4lIdYiOlDgd3yABjGb0g/iglZ4u2qRDQc9nAYul9o5X8/Mlv38d+0QO5NxOtwk6Cvnt4UTtqoRUeZ8244inmPSBdZr6XHUVlePCNiw= > $TmpDir/service_mod_003.out 2>&1"
 	rlRun "cat $TmpDir/service_mod_003.out"
-	rlAssertGrep "Modified service \"$SERVICE/$CLIENT@$RELM\"" "$TmpDir/service_mod_003.out"
+	rlAssertGrep "Modified service \"$SERVICE/$HOSTNAME@$RELM\"" "$TmpDir/service_mod_003.out"
 	rlAssertGrep "Certificate: MIICdzCCAeCgAwIBAgICA+4wDQYJKoZIhvcNAQEFBQAwKTEnMCUGA1UEAxMeVEVTVFJFTE0gQ2VydGlmaWNhdGUgQXV0aG9yaXR5MB4XDTExMDIwOTA5MzE1M1oXDTIxMDIwOTA5MzE1M1owMTERMA8GA1UEChMIVEVTVFJFTE0xHDAaBgNVBAMTE2dzcmYxNGlwYXMudGVzdHJlbG0wggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDiHg3uWywDB1BWm7dy005eQGPecuOcpjp1ZX7Bc7FHxarF03IIsBT4DWvZlp1TbCDuHESBgTWExvr+xeeVfh+foMdUe2UuJJ+DdWsJ1JZMBRKyTDmdd90nuXWWROYwgyrmwAf+3CFHmB5QaVnbAEyD8Hf3sC8k1VLkJACtxSLWx/5WMGzFJV30Xok82KrfPml4z4i6kelnz6KNWfgcM0yQkoohhbLmPqwnj2C4LpwM3QgeUltDCpEwCQCMXeTMDm8Kr6tFtjGmGjW5ncNhk7QLZDVwB++CGbERSCPRBqWSNtZ4yO2P+AOTjPreX6/XQOSMrAe+810YilJbTwx3vZBbAgMBAAGjIjAgMBEGCWCGSAGG+EIBAQQEAwIGQDALBgNVHQ8EBAMCBSAwDQYJKoZIhvcNAQEFBQADgYEAdK33A68CrIfM/BmH8MYGDrdGLK7x54Kkez+nlz9WAv6KEIDiWJXw4HY3iIPkJoYIvOhYT4lIdYiOlDgd3yABjGb0g/iglZ4u2qRDQc9nAYul9o5X8/Mlv38d+0QO5NxOtwk6Cvnt4UTtqoRUeZ8244inmPSBdZr6XHUVlePCNiw=" "$TmpDir/service_mod_003.out"
 	rlAssertGrep "Fingerprint (MD5):" "$TmpDir/service_mod_003.out"
 	rlAssertGrep "Fingerprint (SHA1):" "$TmpDir/service_mod_003.out"
 
 
-	rlRun "ipa service-show $SERVICE/$CLIENT@$RELM > $TmpDir/service_mod_003.out 2>&1"
+	rlRun "ipa service-show $SERVICE/$HOSTNAME@$RELM > $TmpDir/service_mod_003.out 2>&1"
 	rlRun "cat $TmpDir/service_mod_003.out"
 	rlAssertGrep "Certificate: MIICdzCCAeCgAwIBAgICA+4wDQYJKoZIhvcNAQEFBQAwKTEnMCUGA1UEAxMeVEVTVFJFTE0gQ2VydGlmaWNhdGUgQXV0aG9yaXR5MB4XDTExMDIwOTA5MzE1M1oXDTIxMDIwOTA5MzE1M1owMTERMA8GA1UEChMIVEVTVFJFTE0xHDAaBgNVBAMTE2dzcmYxNGlwYXMudGVzdHJlbG0wggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDiHg3uWywDB1BWm7dy005eQGPecuOcpjp1ZX7Bc7FHxarF03IIsBT4DWvZlp1TbCDuHESBgTWExvr+xeeVfh+foMdUe2UuJJ+DdWsJ1JZMBRKyTDmdd90nuXWWROYwgyrmwAf+3CFHmB5QaVnbAEyD8Hf3sC8k1VLkJACtxSLWx/5WMGzFJV30Xok82KrfPml4z4i6kelnz6KNWfgcM0yQkoohhbLmPqwnj2C4LpwM3QgeUltDCpEwCQCMXeTMDm8Kr6tFtjGmGjW5ncNhk7QLZDVwB++CGbERSCPRBqWSNtZ4yO2P+AOTjPreX6/XQOSMrAe+810YilJbTwx3vZBbAgMBAAGjIjAgMBEGCWCGSAGG+EIBAQQEAwIGQDALBgNVHQ8EBAMCBSAwDQYJKoZIhvcNAQEFBQADgYEAdK33A68CrIfM/BmH8MYGDrdGLK7x54Kkez+nlz9WAv6KEIDiWJXw4HY3iIPkJoYIvOhYT4lIdYiOlDgd3yABjGb0g/iglZ4u2qRDQc9nAYul9o5X8/Mlv38d+0QO5NxOtwk6Cvnt4UTtqoRUeZ8244inmPSBdZr6XHUVlePCNiw=" "$TmpDir/service_mod_003.out"
 
@@ -665,20 +665,20 @@ service_mod_004() {
 
 	# ipa service-mod: updating service with a non-standard certificate format.
 rlPhaseStartTest "service_mod_004: ipa service-mod: updating service with a non-standard certificate format."
-	rlRun "ipa service-mod $SERVICE/$CLIENT@$RELM --certificate=MIICdzCCAeCgAwIBAgICA+4wDQYJKoZIhvcNAQEFBQAwKTEnMCUGA1UEAxMeVEVTVFJFTE0gQ2VydGlmaWNhdGUgQXV0aG9yaXR5MB4XDTExMDIwOTA5MzE1M1oXDTIxMDIwOTA5MzE1M1owMTERMA8GA1UEChMIVEVTVFJFTE0xHDAaBgNVBAMTE2dzcmYxNGlwYXMudGVzdHJlbG0wggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDiHg3uWywDB1BWm7dy005eQGPecuOcpjp1ZX7Bc7FHxarF03IIsBT4DWvZlp1TbCDuHESBgTWExvr > $TmpDir/service_mod_004.out 2>&1" 1
+	rlRun "ipa service-mod $SERVICE/$HOSTNAME@$RELM --certificate=MIICdzCCAeCgAwIBAgICA+4wDQYJKoZIhvcNAQEFBQAwKTEnMCUGA1UEAxMeVEVTVFJFTE0gQ2VydGlmaWNhdGUgQXV0aG9yaXR5MB4XDTExMDIwOTA5MzE1M1oXDTIxMDIwOTA5MzE1M1owMTERMA8GA1UEChMIVEVTVFJFTE0xHDAaBgNVBAMTE2dzcmYxNGlwYXMudGVzdHJlbG0wggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDiHg3uWywDB1BWm7dy005eQGPecuOcpjp1ZX7Bc7FHxarF03IIsBT4DWvZlp1TbCDuHESBgTWExvr > $TmpDir/service_mod_004.out 2>&1" 1
 	rlRun "cat $TmpDir/service_mod_004.out"
 	rlAssertGrep "ipa: ERROR: Certificate format error: improperly formatted DER-encoded certificate" "$TmpDir/service_mod_004.out"
 
         #deleting for the added service for the next test case
-        ipa service-del $SERVICE/$CLIENT@$RELM > /tmp/certerr.out 2>&1
+        ipa service-del $SERVICE/$HOSTNAME@$RELM > /tmp/certerr.out 2>&1
         cat /tmp/certerr.out | grep "ipa: ERROR: Certificate operation cannot be completed"
         if [ $? -eq 0 ] ; then
-                ipa service-mod --certificate="" $SERVICE/$CLIENT@$RELM
-                ipa service-del $SERVICE/$CLIENT@$RELM
+                ipa service-mod --certificate="" $SERVICE/$HOSTNAME@$RELM
+                ipa service-del $SERVICE/$HOSTNAME@$RELM
         fi
 
         # lets make sure service is deleted here because of above work around for bug 691488
-        rlRun "ipa service-show $SERVICE/$CLIENT@$RELM" 2 "Checking to make sure service is deleted"
+        rlRun "ipa service-show $SERVICE/$HOSTNAME@$RELM" 2 "Checking to make sure service is deleted"
 rlPhaseEnd
 }
 
@@ -686,9 +686,9 @@ service_mod_005() {
 
 	# ipa service-mod: modifying the service with --raw option
 rlPhaseStartTest "service_mod_005: ipa service-mod: modifying the service with --raw option"
-        rlRun "ipa service-add $SERVICE/$CLIENT@$RELM" 0 "Creating a service for this test"
+        rlRun "ipa service-add $SERVICE/$HOSTNAME@$RELM" 0 "Creating a service for this test"
 
-        rlRun "ipa service-mod $SERVICE/$CLIENT@$RELM --certificate=MIICdzCCAeCgAwIBAgICA+4wDQYJKoZIhvcNAQEFBQAwKTEnMCUGA1UEAxMeVEVTVFJFTE0gQ2VydGlmaWNhdGUgQXV0aG9yaXR5MB4XDTExMDIwOTA5MzE1M1oXDTIxMDIwOTA5MzE1M1owMTERMA8GA1UEChMIVEVTVFJFTE0xHDAaBgNVBAMTE2dzcmYxNGlwYXMudGVzdHJlbG0wggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDiHg3uWywDB1BWm7dy005eQGPecuOcpjp1ZX7Bc7FHxarF03IIsBT4DWvZlp1TbCDuHESBgTWExvr+xeeVfh+foMdUe2UuJJ+DdWsJ1JZMBRKyTDmdd90nuXWWROYwgyrmwAf+3CFHmB5QaVnbAEyD8Hf3sC8k1VLkJACtxSLWx/5WMGzFJV30Xok82KrfPml4z4i6kelnz6KNWfgcM0yQkoohhbLmPqwnj2C4LpwM3QgeUltDCpEwCQCMXeTMDm8Kr6tFtjGmGjW5ncNhk7QLZDVwB++CGbERSCPRBqWSNtZ4yO2P+AOTjPreX6/XQOSMrAe+810YilJbTwx3vZBbAgMBAAGjIjAgMBEGCWCGSAGG+EIBAQQEAwIGQDALBgNVHQ8EBAMCBSAwDQYJKoZIhvcNAQEFBQADgYEAdK33A68CrIfM/BmH8MYGDrdGLK7x54Kkez+nlz9WAv6KEIDiWJXw4HY3iIPkJoYIvOhYT4lIdYiOlDgd3yABjGb0g/iglZ4u2qRDQc9nAYul9o5X8/Mlv38d+0QO5NxOtwk6Cvnt4UTtqoRUeZ8244inmPSBdZr6XHUVlePCNiw= --raw > $TmpDir/service_mod_005.out 2>&1"
+        rlRun "ipa service-mod $SERVICE/$HOSTNAME@$RELM --certificate=MIICdzCCAeCgAwIBAgICA+4wDQYJKoZIhvcNAQEFBQAwKTEnMCUGA1UEAxMeVEVTVFJFTE0gQ2VydGlmaWNhdGUgQXV0aG9yaXR5MB4XDTExMDIwOTA5MzE1M1oXDTIxMDIwOTA5MzE1M1owMTERMA8GA1UEChMIVEVTVFJFTE0xHDAaBgNVBAMTE2dzcmYxNGlwYXMudGVzdHJlbG0wggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDiHg3uWywDB1BWm7dy005eQGPecuOcpjp1ZX7Bc7FHxarF03IIsBT4DWvZlp1TbCDuHESBgTWExvr+xeeVfh+foMdUe2UuJJ+DdWsJ1JZMBRKyTDmdd90nuXWWROYwgyrmwAf+3CFHmB5QaVnbAEyD8Hf3sC8k1VLkJACtxSLWx/5WMGzFJV30Xok82KrfPml4z4i6kelnz6KNWfgcM0yQkoohhbLmPqwnj2C4LpwM3QgeUltDCpEwCQCMXeTMDm8Kr6tFtjGmGjW5ncNhk7QLZDVwB++CGbERSCPRBqWSNtZ4yO2P+AOTjPreX6/XQOSMrAe+810YilJbTwx3vZBbAgMBAAGjIjAgMBEGCWCGSAGG+EIBAQQEAwIGQDALBgNVHQ8EBAMCBSAwDQYJKoZIhvcNAQEFBQADgYEAdK33A68CrIfM/BmH8MYGDrdGLK7x54Kkez+nlz9WAv6KEIDiWJXw4HY3iIPkJoYIvOhYT4lIdYiOlDgd3yABjGb0g/iglZ4u2qRDQc9nAYul9o5X8/Mlv38d+0QO5NxOtwk6Cvnt4UTtqoRUeZ8244inmPSBdZr6XHUVlePCNiw= --raw > $TmpDir/service_mod_005.out 2>&1"
         rlRun "cat $TmpDir/service_mod_005.out"
 	rlAssertGrep "serial_number: 1006" "$TmpDir/service_mod_005.out"
 	rlAssertGrep "md5_fingerprint:" "$TmpDir/service_mod_005.out"
@@ -696,15 +696,15 @@ rlPhaseStartTest "service_mod_005: ipa service-mod: modifying the service with -
 	rlAssertGrep "valid_not_before:" "$TmpDir/service_mod_005.out"
 	rlAssertGrep "valid_not_after:" "$TmpDir/service_mod_005.out"
 
-	ipa service-del $SERVICE/$CLIENT@$RELM > /tmp/certerr.out 2>&1
+	ipa service-del $SERVICE/$HOSTNAME@$RELM > /tmp/certerr.out 2>&1
         cat /tmp/certerr.out | grep "ipa: ERROR: Certificate operation cannot be completed"
         if [ $? -eq 0 ] ; then
-                ipa service-mod --certificate="" $SERVICE/$CLIENT@$RELM
-                ipa service-del $SERVICE/$CLIENT@$RELM
+                ipa service-mod --certificate="" $SERVICE/$HOSTNAME@$RELM
+                ipa service-del $SERVICE/$HOSTNAME@$RELM
         fi
 
         # lets make sure service is deleted here because of above work around for bug 691488
-        rlRun "ipa service-show $SERVICE/$CLIENT@$RELM" 2 "Checking to make sure service is deleted"
+        rlRun "ipa service-show $SERVICE/$HOSTNAME@$RELM" 2 "Checking to make sure service is deleted"
 rlPhaseEnd
 }
 
@@ -716,23 +716,23 @@ rlPhaseStartTest "service_mod_006: ipa service-mod: modifying the service with -
 	ipa host-add --force $TESTHOST
 	hostmanagedn="fqdn=$TESTHOST,cn=computers,cn=accounts,dc=$DOMAIN"
 
-	rlRun "ipa service-add $SERVICE/$CLIENT@$RELM"
-	rlRun "ipa service-mod --addattr=managedBy=\"$hostmanagedn\" $SERVICE/$CLIENT@$RELM"
+	rlRun "ipa service-add $SERVICE/$HOSTNAME@$RELM"
+	rlRun "ipa service-mod --addattr=managedBy=\"$hostmanagedn\" $SERVICE/$HOSTNAME@$RELM"
 
-	rlRun "ipa service-show --all $SERVICE/$CLIENT@$RELM > $TmpDir/service_mod_006.out 2>&1"
-        rlAssertGrep "managedby_host: $CLIENT, $TESTHOST" "$TmpDir/service_mod_006.out"
+	rlRun "ipa service-show --all $SERVICE/$HOSTNAME@$RELM > $TmpDir/service_mod_006.out 2>&1"
+        rlAssertGrep "managedby_host: $HOSTNAME, $TESTHOST" "$TmpDir/service_mod_006.out"
 rlPhaseEnd
 }
 
 service_mod_007() {
 rlPhaseStartTest "service_mod_007: ipa service-mod: modifying the service with --setattr on managedBy"
-	selfmanagedn="fqdn=$CLIENT,cn=computers,cn=accounts,dc=$DOMAIN"
-	rlRun "ipa service-mod --setattr=managedBy=\"$selfmanagedn\" $SERVICE/$CLIENT@$RELM"
+	selfmanagedn="fqdn=$HOSTNAME,cn=computers,cn=accounts,dc=$DOMAIN"
+	rlRun "ipa service-mod --setattr=managedBy=\"$selfmanagedn\" $SERVICE/$HOSTNAME@$RELM"
 
-	rlRun "ipa service-show --all $SERVICE/$CLIENT@$RELM > $TmpDir/service_mod_007.out 2>&1"
-	rlAssertGrep "managedby_host: $CLIENT" "$TmpDir/service_mod_007.out"
+	rlRun "ipa service-show --all $SERVICE/$HOSTNAME@$RELM > $TmpDir/service_mod_007.out 2>&1"
+	rlAssertGrep "managedby_host: $HOSTNAME" "$TmpDir/service_mod_007.out"
 
-        rlRun "ipa service-del $SERVICE/$CLIENT@$RELM"
+        rlRun "ipa service-del $SERVICE/$HOSTNAME@$RELM"
 	ipa host-del $TESTHOST
 rlPhaseEnd
 }
@@ -755,11 +755,11 @@ service_remove_host_002() {
         # ipa service-remove-host for services
 rlPhaseStartTest "service_remove_host_002: ipa service-remove-host for services"
         rlRun "ipa host-add test.example.com --force" 0 "adding host for service_remove_host test cases"
-	rlRun "ipa service-add $SERVICE/$CLIENT@$RELM"
-        rlRun "ipa service-add-host --hosts=test.example.com $SERVICE/$CLIENT@$RELM"
+	rlRun "ipa service-add $SERVICE/$HOSTNAME@$RELM"
+        rlRun "ipa service-add-host --hosts=test.example.com $SERVICE/$HOSTNAME@$RELM"
 
-        rlRun "ipa service-remove-host --hosts=test.example.com $SERVICE/$CLIENT@$RELM > $TmpDir/service_remove_host_002.out 2>&1"
-        rlAssertGrep "Principal: $SERVICE/$CLIENT@$RELM" "$TmpDir/service_remove_host_002.out"
+        rlRun "ipa service-remove-host --hosts=test.example.com $SERVICE/$HOSTNAME@$RELM > $TmpDir/service_remove_host_002.out 2>&1"
+        rlAssertGrep "Principal: $SERVICE/$HOSTNAME@$RELM" "$TmpDir/service_remove_host_002.out"
         rlAssertGrep "Number of members removed 1" "$TmpDir/service_remove_host_002.out"
         rlRun "cat $TmpDir/service_remove_host_002.out"
 rlPhaseEnd
@@ -771,10 +771,10 @@ service_remove_host_003() {
         # ipa service-remove-host for services with --all option
 rlPhaseStartTest "service_remove_host_003: ipa service-remove-host for services with --all option"
 
-        rlRun "ipa service-add-host --hosts=test.example.com $SERVICE/$CLIENT@$RELM"
+        rlRun "ipa service-add-host --hosts=test.example.com $SERVICE/$HOSTNAME@$RELM"
 
-        rlRun "ipa service-remove-host --hosts=test.example.com $SERVICE/$CLIENT@$RELM --all > $TmpDir/service_remove_host_003.out 2>&1"
-        rlAssertGrep "Principal: $SERVICE/$CLIENT@$RELM" "$TmpDir/service_remove_host_003.out"
+        rlRun "ipa service-remove-host --hosts=test.example.com $SERVICE/$HOSTNAME@$RELM --all > $TmpDir/service_remove_host_003.out 2>&1"
+        rlAssertGrep "Principal: $SERVICE/$HOSTNAME@$RELM" "$TmpDir/service_remove_host_003.out"
         rlAssertGrep "ipauniqueid:" "$TmpDir/service_remove_host_003.out"
         rlAssertGrep "objectclass: krbprincipal, krbprincipalaux, krbticketpolicyaux, ipaobject, ipaservice, pkiuser, top" "$TmpDir/service_remove_host_003.out"
         rlAssertGrep "Number of members removed 1" "$TmpDir/service_remove_host_003.out"
@@ -788,11 +788,11 @@ service_remove_host_004() {
         # ipa service-remove-host for services with --all and --raw options
 rlPhaseStartTest "service_remove_host_004: ipa service-remove-host for services with --all and --raw options"
 
-        rlRun "ipa service-add-host --hosts=test.example.com $SERVICE/$CLIENT@$RELM"
+        rlRun "ipa service-add-host --hosts=test.example.com $SERVICE/$HOSTNAME@$RELM"
 
-        rlRun "ipa service-remove-host --hosts=test.example.com $SERVICE/$CLIENT@$RELM --all --raw > $TmpDir/service_remove_host_004.out 2>&1"
-        rlAssertGrep "krbprincipalname: $SERVICE/$CLIENT@$RELM" "$TmpDir/service_remove_host_004.out"
-        rlAssertGrep "managedby: fqdn=$CLIENT,cn=computers,cn=accounts,dc=testrelm" "$TmpDir/service_remove_host_004.out" -i
+        rlRun "ipa service-remove-host --hosts=test.example.com $SERVICE/$HOSTNAME@$RELM --all --raw > $TmpDir/service_remove_host_004.out 2>&1"
+        rlAssertGrep "krbprincipalname: $SERVICE/$HOSTNAME@$RELM" "$TmpDir/service_remove_host_004.out"
+        rlAssertGrep "managedby: fqdn=$HOSTNAME,cn=computers,cn=accounts,dc=testrelm" "$TmpDir/service_remove_host_004.out" -i
         rlAssertGrep "objectclass: ipaobject" "$TmpDir/service_remove_host_004.out"
         rlAssertGrep "objectclass: top" "$TmpDir/service_remove_host_004.out"
         rlAssertGrep "objectclass: ipaservice" "$TmpDir/service_remove_host_004.out"
@@ -803,7 +803,7 @@ rlPhaseStartTest "service_remove_host_004: ipa service-remove-host for services 
 
         rlRun "cat $TmpDir/service_remove_host_004.out"
 	# Cleaning up hosts and services
-	rlRun "ipa service-del $SERVICE/$CLIENT@$RELM"
+	rlRun "ipa service-del $SERVICE/$HOSTNAME@$RELM"
 	rlRun "ipa host-del test.example.com"
 rlPhaseEnd
 }
