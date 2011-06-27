@@ -2,6 +2,7 @@ package com.redhat.qe.ipa.sahi.base;
 
 import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeSuite;
+import org.testng.annotations.Test;
 
 import com.redhat.qe.ipa.sahi.tasks.SahiTasks;
 import com.redhat.qe.auto.testng.TestScript;
@@ -34,9 +35,9 @@ public abstract class SahiTestScript extends TestScript {
 		return sahiTasks;
 	}
 
-
+	
 	@BeforeSuite(groups={"setup"})
-	public void openBrowser() {
+	public static void openBrowser() {
 		log.finer("Opening browser");
 		sahiTasks.open();
 		log.finer("Accessing: IPA Server URL");
@@ -44,10 +45,10 @@ public abstract class SahiTestScript extends TestScript {
 	}
 
 	
-
+/*
 	@AfterSuite(groups={"teardown"})
 	public void closeBrowser() {
 		log.finer("Closing browser");
 		sahiTasks.close();
-	}
+	}*/
 }

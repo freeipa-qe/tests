@@ -3,6 +3,7 @@ package com.redhat.qe.ipa.sahi.tests.user;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Logger;
 
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
@@ -13,12 +14,13 @@ import com.redhat.qe.ipa.sahi.base.SahiTestScript;
 import com.redhat.qe.ipa.sahi.tasks.SahiTasks;
 import com.redhat.qe.ipa.sahi.tasks.UserTasks;
 
-public class UserTests {
+public class UserTests extends SahiTestScript{
+	private static Logger log = Logger.getLogger(UserTests.class.getName());
 	public static SahiTasks sahiTasks = null;	
 	private String userPage = "/ipa/ui/#identity=user&navigation=identity";
 	
-	@BeforeClass (groups={"init"}, description="Initialize app for this test suite run", alwaysRun=true)
-	public void intialize() throws CloneNotSupportedException {					
+	@BeforeClass (groups={"init"}, description="Initialize app for this test suite run", alwaysRun=true, dependsOnGroups="setup")
+	public void initialize() throws CloneNotSupportedException {	
 		sahiTasks = SahiTestScript.getSahiTasks();	
 		sahiTasks.navigateTo(System.getProperty("ipa.server.url")+userPage, true);
 	}
@@ -29,21 +31,26 @@ public class UserTests {
 	 */
 	@Test (groups={"userAddTests"}, dataProvider="getUserTestObjects")	
 	public void testUseradd(String testName, String uid, String givenname, String sn) throws Exception {
-		//TODO: verify user doesn't exist
+		//verify user doesn't exist
+		com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(uid).exists(), "Verify user " + uid + " doesn't already exist");
 		
 		//new test user can be added now
 		UserTasks.createUser(sahiTasks, uid, givenname, sn);		
 		
-		//TODO: verify user was added successfully
+		//verify user was added successfully
+		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(uid).exists(), "Added user " + uid + "  successfully");
 	}
+	
+	
+	
 	
 	/*
 	 * Edit users - for positive tests
 	 */
-	@Test (groups={"userEditTests"}, dataProvider="getUserEditTestObjects")	
-	public void testUserEdit(String testName, String uid, String title, String mail) throws Exception {
-		
-		//TODO:  verify user to be edited exists
+	@Test (groups={"userEditTests"}, dataProvider="getUserEditTestObjects", dependsOnGroups="userAddTests")	
+	public void testUserEdit(String testName, String uid, String title, String mail) throws Exception {		
+		//verify user to be edited exists
+		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(uid).exists(), "Verify user " + uid + " to be edited exists");
 		
 		//modify this user
 		UserTasks.modifyUser(sahiTasks, uid, title, mail);
@@ -51,20 +58,32 @@ public class UserTests {
 		//TODO: verify changes		
 	}
 	
+	/*
+	 * Readd users - for negative tests
+	 */
+	@Test (groups={"userReaddTests"}, dataProvider="getUserReaddTestObjects", dependsOnGroups={"userAddTests","userEditTests"})	
+	public void testUserReadd(String testName, String uid, String givenname, String sn) throws Exception {
+		//verify user exists already
+		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(uid).exists(), "Verify user " + uid + "  to be readded exists");
+		
+		//new test user can be added now
+		UserTasks.recreateUser(sahiTasks, uid, givenname, sn);		
+		
+	}
 	
 	/*
-	 * Delete users - for positive tests
+	 * Delete users - one at a time - for positive tests
 	 */
-	@Test (groups={"userDeleteTests"}, dataProvider="getUserDeleteTestObjects")	
+	@Test (groups={"userDeleteTests"}, dataProvider="getUserDeleteTestObjects", dependsOnGroups={"userAddTests","userReaddTests"})	
 	public void testUserDelete(String testName, String uid) throws Exception {
-		
-
-		//TODO: verify user to be edited exists
+		//verify user to be deleted exists
+		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(uid).exists(), "Verify user " + uid + "  to be deleted exists");
 		
 		//modify this user
 		UserTasks.deleteUser(sahiTasks, uid);
 		
-		//TODO:  verify user is deleted
+		//verify user is deleted
+		com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(uid).exists(), "User " + uid + "  deleted successfully");
 	}
 	
 	
@@ -83,6 +102,24 @@ public class UserTests {
 		ll.add(Arrays.asList(new Object[]{ "create_good_user",				"testuser", 			"Test",		"User"     } ));
 		ll.add(Arrays.asList(new Object[]{ "create_user2",				    "user2", 			    "Test2",	"User2"     } ));
 		ll.add(Arrays.asList(new Object[]{ "create_user3",				    "user3", 			    "Test3",	"User3"     } ));
+		        
+		return ll;	
+	}
+	
+	/*
+	 * Data to be used when readding users
+	 */
+	@DataProvider(name="getUserReaddTestObjects")
+	public Object[][] getUserReaddTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(recreateUserTestObjects());
+	}
+	protected List<List<Object>> recreateUserTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		//String sLongName = "auto_" + tasks.generateRandomString(251);
+		
+        //										testname					uid              		givenname	sn   
+		ll.add(Arrays.asList(new Object[]{ "create_good_user",				"testuser", 			"Test",		"User"     } ));
+		
 		        
 		return ll;	
 	}
@@ -118,6 +155,8 @@ public class UserTests {
 		
         //										testname					uid              		
 		ll.add(Arrays.asList(new Object[]{ "delete_good_user",				"testuser"     } ));
+		ll.add(Arrays.asList(new Object[]{ "delete_good_user",				"user2"     } ));
+		ll.add(Arrays.asList(new Object[]{ "delete_good_user",				"user3"     } ));
 		        
 		return ll;	
 	}
