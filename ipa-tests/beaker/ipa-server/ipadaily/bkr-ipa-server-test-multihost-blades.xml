@@ -43,9 +43,6 @@
 					<param name="SNAPSHOT" value="TRUE"/>
 				</params>
 			</task>
-			<task name="/CoreOS/ipa-server/acceptance/ipa-services" role="MASTER">
-				<params/>
-			</task>
 			<task name="/CoreOS/ipa-server/acceptance/ipa-functional-services" role="MASTER">
 				<params/>
 			</task>
@@ -87,9 +84,6 @@
 					<param name="SNAPSHOT" value="TRUE"/>
 				</params>
 			</task>
-			<task name="/CoreOS/ipa-server/acceptance/ipa-services" role="SLAVE">
-				<params/>
-			</task>
 			<task name="/CoreOS/ipa-server/acceptance/ipa-functional-services" role="SLAVE">
 				<params/>
 			</task>
@@ -130,9 +124,6 @@
 				<params>
 					<param name="SNAPSHOT" value="TRUE"/>
 				</params>
-			</task>
-			<task name="/CoreOS/ipa-server/acceptance/ipa-services" role="CLIENT">
-				<params/>
 			</task>
 			<task name="/CoreOS/ipa-server/acceptance/ipa-functional-services" role="CLIENT">
 				<params/>
