@@ -12,6 +12,7 @@ import org.testng.annotations.Test;
 
 import com.redhat.qe.auto.testng.TestNGUtils;
 import com.redhat.qe.ipa.sahi.base.SahiTestScript;
+import com.redhat.qe.ipa.sahi.tasks.CommonTasks;
 import com.redhat.qe.ipa.sahi.tasks.SahiTasks;
 import com.redhat.qe.ipa.sahi.tasks.UserTasks;
 
@@ -56,7 +57,7 @@ public class UserTests extends SahiTestScript{
 		//modify this user
 		UserTasks.modifyUser(sahiTasks, uid, title, mail);
 		
-		//TODO: verify changes	
+		//verify changes	
 		UserTasks.verifyUserUpdates(sahiTasks, uid, title, mail);
 	}
 	
@@ -74,9 +75,45 @@ public class UserTests extends SahiTestScript{
 	}
 	
 	/*
+	 * Edit users - for positive tests
+	 */
+	@Test (groups={"userSetPasswordTests"}, dataProvider="getUserSetPasswordTestObjects", dependsOnGroups="userAddTests")	
+	public void testUserSetPassword(String testName, String uid, String password, String newPassword) throws Exception {		
+		//verify user to be edited exists
+		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(uid).exists(), "Verify user " + uid + " to be edited exists");
+		
+		//modify this user
+		UserTasks.modifyUserPassword(sahiTasks, uid, password);
+		
+		//verify changes	
+		com.redhat.qe.auto.testng.Assert.assertTrue(CommonTasks.kinitAsNewUserFirstTime(uid, password, newPassword), "Logged in and reset password for " + uid);
+		
+		// kinit back as admin to continue tests
+		com.redhat.qe.auto.testng.Assert.assertTrue(CommonTasks.kinitAsAdmin(), "Logged back in as admin to continue tests");
+	}
+
+	/*
+	 * Deactivate users - for positive tests
+	 */
+	@Test (groups={"userDeactivateTests"}, dataProvider="getUserDeactivateTestObjects", dependsOnGroups={"userAddTests", "userSetPasswordTests"})	
+	public void testUserDeactivate(String testName, String uid) throws Exception {		
+		//verify user to be edited exists
+		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(uid).exists(), "Verify user " + uid + " to be deactivated exists");
+		
+		//verify expected status	
+		UserTasks.verifyUserStatus(sahiTasks, uid, true);
+		
+		//modify this user
+		UserTasks.modifyUserStatus(sahiTasks, uid);
+		
+		//verify changes to status	
+		UserTasks.verifyUserStatus(sahiTasks, uid, false);
+	}
+	
+	/*
 	 * Delete users - one at a time - for positive tests
 	 */
-	@Test (groups={"userDeleteTests"}, dataProvider="getUserDeleteTestObjects", dependsOnGroups={"userAddTests","userReaddTests"})	
+	@Test (groups={"userDeleteTests"}, dataProvider="getUserDeleteTestObjects", dependsOnGroups={"userAddTests", "userEditTests", "userSetPasswordTests", "userReaddTests", "userDeactivateTests"})	
 	public void testUserDelete(String testName, String uid) throws Exception {
 		//verify user to be deleted exists
 		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(uid).exists(), "Verify user " + uid + "  to be deleted exists");
@@ -161,6 +198,42 @@ public class UserTests extends SahiTestScript{
 		
         //										testname					uid              		title					mail   
 		ll.add(Arrays.asList(new Object[]{ "edit_good_user",				"testuser", 			"Software Engineer",	"testuser@example.com"     } ));
+		        
+		return ll;	
+	}
+	
+	
+	/*
+	 * Data to be used when setting password for user
+	 */
+	@DataProvider(name="getUserSetPasswordTestObjects")
+	public Object[][] getUserSetPasswordTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(setUserPasswordTestObjects());
+	}
+	protected List<List<Object>> setUserPasswordTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		//String sLongName = "auto_" + tasks.generateRandomString(251);
+		
+        //										testname					uid				password		newpassword   
+		ll.add(Arrays.asList(new Object[]{ "set_user_password",				"testuser",  	"testuser",		"Secret123"   } ));
+		        
+		return ll;	
+	}
+	
+	
+	
+	/*
+	 * Data to be used when deactivating user
+	 */
+	@DataProvider(name="getUserDeactivateTestObjects")
+	public Object[][] getUserDeactivateTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(deactivateUserTestObjects());
+	}
+	protected List<List<Object>> deactivateUserTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname					     uid              		
+		ll.add(Arrays.asList(new Object[]{ "deactivate_test_user",				"testuser"     } ));
 		        
 		return ll;	
 	}

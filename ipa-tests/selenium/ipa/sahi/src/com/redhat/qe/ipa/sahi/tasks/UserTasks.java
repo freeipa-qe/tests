@@ -65,6 +65,62 @@ public class UserTasks {
 		sahiTasks.span("\u25c0 Back to List").click();
 	}
 	
+	
+	/* Verify status for the user. 
+	 * @param sahiTasks
+	 * @param uid - the uid of user to be edited
+	 */
+	public static void verifyUserStatus(SahiTasks sahiTasks, String uid, boolean status) {
+		//click on user to edit
+		sahiTasks.link(uid).click();
+		
+		//verify user's status
+		if (status)
+			com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link("Active: Click to Deactivate").exists(), "Verified Active status for user " + uid);
+		else
+			com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link("Inactive: Click to Activate").exists(), "Verified Inactive status for user " + uid);
+		
+		sahiTasks.span("\u25c0 Back to List").click();
+	}
+	
+	/* Update the user status. 
+	 * @param sahiTasks
+	 * @param uid - the uid of user to be edited
+	 */
+	public static void modifyUserStatus(SahiTasks sahiTasks, String uid) {		
+		//click on user to edit
+		sahiTasks.link(uid).click();
+		
+		//edit user's job title
+		sahiTasks.link("Active: Click to Deactivate").click();
+		
+		// Update and go back to user list
+		// FIXME: BUG 
+		// sahiTasks.link("Update").click();
+		sahiTasks.span("\u25c0 Back to List").click();
+	}
+	
+	
+	/* Reset user password. 
+	 * @param sahiTasks
+	 * @param uid - the uid of user to be edited
+	 */
+	public static void modifyUserPassword(SahiTasks sahiTasks, String uid, String password) {
+		//click on user to edit
+		sahiTasks.link(uid).click();
+		
+		//reset user's password
+		sahiTasks.link("Reset Password").click();
+		sahiTasks.password(0).setValue(password);
+		sahiTasks.password(1).setValue(password);
+		sahiTasks.button("Reset Password").click();
+		
+		// Update and go back to user list
+		// FIXME: BUG 
+		// sahiTasks.link("Update").click();
+		sahiTasks.span("\u25c0 Back to List").click();
+	}
+	
 	/*
 	 * Delete the user. Check if user is available for deleting before calling this.
 	 * @param sahiTasks

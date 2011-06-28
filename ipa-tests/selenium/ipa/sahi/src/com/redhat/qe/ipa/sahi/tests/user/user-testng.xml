@@ -1,6 +1,6 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
 <suite name="IPAUserTestSuite">	
-	<test name="User Add Tests">
+	<test name="User Tests">
 		<packages>
 		    <package name="com.redhat.qe.ipa.sahi.*" />
 		</packages>
@@ -11,6 +11,8 @@
 				<include name="userAddTests" />
 				<include name="userEditTests" />
 				<include name="userReaddTests" />
+				<include name="userSetPasswordTests" />
+				<include name="userDeactivateTests" />
 				<include name="userDeleteTests" />
 				<include name="chooseUserMultipleDeleteTests" />
 				<include name="userMultipleDeleteTests" />

@@ -4,6 +4,7 @@ import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
 
+import com.redhat.qe.ipa.sahi.tasks.CommonTasks;
 import com.redhat.qe.ipa.sahi.tasks.SahiTasks;
 import com.redhat.qe.auto.testng.TestScript;
 
@@ -38,6 +39,8 @@ public abstract class SahiTestScript extends TestScript {
 	
 	@BeforeSuite(groups={"setup"})
 	public static void openBrowser() {
+		log.finer("kinit as admin");
+		com.redhat.qe.auto.testng.Assert.assertTrue(CommonTasks.kinitAsAdmin(), "Logged in successfully as admin");
 		log.finer("Opening browser");
 		sahiTasks.open();
 		log.finer("Accessing: IPA Server URL");
