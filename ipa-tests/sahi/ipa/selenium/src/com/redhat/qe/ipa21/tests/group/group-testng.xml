@@ -1,0 +1,26 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+<suite name="IPAGroupTestSuite">
+	
+	
+	<test name="Start Group Tests">
+		<packages>
+		    <package name="com.redhat.qe.ipa.base" />
+		    <package name="com.redhat.qe.ipa21" />
+		</packages>
+		<groups>
+			<run>
+			    <include name="setup" />
+			    <include name="init" />
+				<include name="groupTests" />
+			</run>
+		</groups>
+		<classes>		    
+		    <class name="com.redhat.qe.ipa21.tests.group.GroupTests" />
+		</classes>
+	</test>
+	
+	<listeners>        
+  		<listener class-name="com.redhat.qe.auto.testng.TestNGListener" />	
+	</listeners>
+	
+</suite>
