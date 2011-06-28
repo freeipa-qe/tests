@@ -23,21 +23,45 @@ public class UserTasks {
 	}
 	
 	/*
-	 * Create a new invalid user. Check if user already exists before calling this.
+	 * Create a new invalid user.
 	 * @param sahiTasks 
 	 * @param uid - uid for the new user
 	 * @param givenName - first name for the new user
 	 * @param sn - last name for the new user
+	 * @param expectedError - the error thrown when an invalid user is being attempted to be added
 	 */
 	public static void createInvalidUser(SahiTasks sahiTasks, String uid, String givenName, String sn, String expectedError) {
 		sahiTasks.link("Add").click();
 		sahiTasks.textbox("uid").setValue(uid);
 		sahiTasks.textbox("givenname").setValue(givenName);
 		sahiTasks.textbox("sn").setValue(sn);
-		sahiTasks.button("Add").click();	
+		sahiTasks.button("Add").click();
 		//Check for expected error
 		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.div(expectedError).exists(), "Verified expected error when adding invalid user " + uid);
-		sahiTasks.button("Cancel").click();
+		// since the add user window and the message window have Cancel buttons
+		// specify which cancel button to hit by indicating what is near it.
+		// TODO: Remove ref later: http://sahi.co.in/w/sahi-api-examples
+		// TODO: Remove ref later: http://sahi.co.in/java/javadocs/net/sf/sahi/client/ElementStub.html#near%28net.sf.sahi.client.ElementStub%29
+		sahiTasks.button("Cancel").near(sahiTasks.button("Retry")).click();
+		sahiTasks.button("Cancel").near(sahiTasks.button("Add and Edit")).click();
+	}
+	
+	/*
+	 * Create a new invalid user with invalid char in uid
+	 * @param sahiTasks 
+	 * @param uid - uid for the new user
+	 * @param givenName - first name for the new user
+	 * @param sn - last name for the new user
+	 * @param expectedError - the error thrown when an invalid user is being attempted to be added
+	 */
+	public static void createInvalidCharUser(SahiTasks sahiTasks, String uid, String givenName, String sn, String expectedError) {
+		sahiTasks.link("Add").click();
+		sahiTasks.textbox("uid").setValue(uid);
+		sahiTasks.textbox("givenname").setValue(givenName);
+		sahiTasks.textbox("sn").setValue(sn);
+		//Check for expected error
+		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.span(expectedError).exists(), "Verified expected error when adding invalid user " + uid);
+		sahiTasks.button("Cancel").near(sahiTasks.button("Add and Edit")).click();
 	}
 	
 	/* Edit the user. Check if user is available for editing before calling this.

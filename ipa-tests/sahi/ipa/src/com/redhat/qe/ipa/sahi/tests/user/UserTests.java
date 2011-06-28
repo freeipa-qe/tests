@@ -52,6 +52,17 @@ public class UserTests extends SahiTestScript{
 		UserTasks.createInvalidUser(sahiTasks, uid, givenname, sn, expectedError);		
 	}
 	
+	/*
+	 * Add users with invalid chars - for negative tests
+	 * Separate from above because - the error is not in a message box, but is indicated 
+	 * in red, as soon as an invalid char is typed into the textbox
+	 */
+	@Test (groups={"invalidCharUserAddTests"}, dataProvider="getInvalidCharUserTestObjects")	
+	public void testInvalidCharUseradd(String testName, String uid, String givenname, String sn, String expectedError) throws Exception {
+		//new test user can be added now
+		UserTasks.createInvalidCharUser(sahiTasks, uid, givenname, sn, expectedError);		
+	}
+	
 	
 	/*
 	 * Edit users - for positive tests
@@ -66,19 +77,6 @@ public class UserTests extends SahiTestScript{
 		
 		//verify changes	
 		UserTasks.verifyUserUpdates(sahiTasks, uid, title, mail);
-	}
-	
-	/*
-	 * Readd users - for negative tests
-	 */
-	@Test (groups={"userReaddTests"}, dataProvider="getUserReaddTestObjects", dependsOnGroups={"userAddTests","userEditTests"})	
-	public void testUserReadd(String testName, String uid, String givenname, String sn) throws Exception {
-		//verify user exists already
-		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(uid).exists(), "Verify user " + uid + "  to be readded exists");
-		
-		//add repeat test user 
-		UserTasks.recreateUser(sahiTasks, uid, givenname, sn);		
-		
 	}
 	
 	/*
@@ -225,21 +223,25 @@ public class UserTests extends SahiTestScript{
 	}
 	
 	/*
-	 * Data to be used when readding users
+	 * Data to be used when adding users - for negative cases
 	 */
-	@DataProvider(name="getUserReaddTestObjects")
-	public Object[][] getUserReaddTestObjects() {
-		return TestNGUtils.convertListOfListsTo2dArray(recreateUserTestObjects());
+	@DataProvider(name="getInvalidCharUserTestObjects")
+	public Object[][] getInvalidCharUserTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createInvalidCharUserTestObjects());
 	}
-	protected List<List<Object>> recreateUserTestObjects() {		
+	protected List<List<Object>> createInvalidCharUserTestObjects() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-        //										testname					uid              		givenname	sn   
-		ll.add(Arrays.asList(new Object[]{ "create_good_user",				"testuser", 			"Test",		"User"     } ));
+        //										testname		uid										givenname	sn   		 ExpectedError
 		
-		        
+		ll.add(Arrays.asList(new Object[]{ "invalid_char_#",	"abcd#", 								"Test",		"User",		 "may only include letters, numbers, _, -, . and $"	} ));
+		ll.add(Arrays.asList(new Object[]{ "invalid_char_@",	"abcd@", 								"Test",		"User",		 "may only include letters, numbers, _, -, . and $"	} ));
+		ll.add(Arrays.asList(new Object[]{ "invalid_char_*",	"abcd*", 								"Test",		"User",		 "may only include letters, numbers, _, -, . and $"	} ));
+		ll.add(Arrays.asList(new Object[]{ "invalid_char_?",	"abcd?", 								"Test",		"User",		 "may only include letters, numbers, _, -, . and $"	} ));
+		
 		return ll;	
 	}
+	
 	
 	
 	/*
