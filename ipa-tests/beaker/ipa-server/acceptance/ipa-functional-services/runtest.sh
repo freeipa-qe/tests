@@ -85,6 +85,7 @@ rlJournalStart
 	if [ $? -eq 0 ] ; then
 		rhts-sync-set -s MASTERFIRST
 		rhts-sync-block -s DONE $CLIENT
+		rlPass
 	else
 		rlLog "Machine in recipe in not a MASTER"
 	fi
@@ -96,6 +97,7 @@ rlJournalStart
         echo $SLAVE | grep $HOSTNAME
         if [ $? -eq 0 ] ; then
 		rhts-sync-block -s MASTERFIRST $MASTER
+		rlPass
         else
                 rlLog "Machine in recipe in not a SLAVE"
         fi
