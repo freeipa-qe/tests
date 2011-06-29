@@ -412,6 +412,7 @@ create_ipauser()
           #0 "add test user account" 2>&1 >/dev/null
     # set test account password 
     #FirstKinitAs $login $dummypw $password 2>&1 >/dev/null
+    sleep 2  # adding sleep think that first kinit hits slave sometimes and the user is not replicated yet.
     FirstKinitAs $login $dummypw $password 
     /usr/bin/kdestroy 2>&1 >/dev/null #clear admin's kerberos ticket
     echo $login
