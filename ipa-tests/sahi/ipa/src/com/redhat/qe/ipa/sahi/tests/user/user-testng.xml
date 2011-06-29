@@ -9,8 +9,10 @@
 			    <include name="setup" />
 			    <include name="init" />
 				<include name="userAddTests" />
+				<!--
 				<include name="invalidUserAddTests" />
-				<include name="invalidCharUserAddTests" /
+				<include name="invalidCharUserAddTests" />
+				-->
 				<include name="userEditTests" />
 				<include name="userSetPasswordTests" />
 				<include name="userDeactivateTests" />

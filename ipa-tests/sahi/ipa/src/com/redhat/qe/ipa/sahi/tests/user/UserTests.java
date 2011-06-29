@@ -67,7 +67,7 @@ public class UserTests extends SahiTestScript{
 	/*
 	 * Edit users - for positive tests
 	 */
-	@Test (groups={"userEditTests"}, dataProvider="getUserEditTestObjects", dependsOnGroups="userAddTests")	
+	@Test (groups={"userEditTests"}, dataProvider="getUserEditTestObjects", dependsOnGroups={"userAddTests", "invalidUserAddTests"})	
 	public void testUserEdit(String testName, String uid, String title, String mail) throws Exception {		
 		//verify user to be edited exists
 		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(uid).exists(), "Verify user " + uid + " to be edited exists");
@@ -147,7 +147,7 @@ public class UserTests extends SahiTestScript{
 	 * note: make sure tests that use testuser are run before testuser gets deleted here
 	 */
 	@Test (groups={"userDeleteTests"}, dataProvider="getUserDeleteTestObjects", 
-			dependsOnGroups={"userAddTests", "userEditTests", "userSetPasswordTests", "userReaddTests", "userDeactivateTests", "userReactivateTests"})	
+			dependsOnGroups={"userAddTests", "userEditTests", "userSetPasswordTests", "userDeactivateTests", "userReactivateTests", "invalidUserAddTests"})	
 	public void testUserDelete(String testName, String uid) throws Exception {
 		//verify user to be deleted exists
 		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(uid).exists(), "Verify user " + uid + "  to be deleted exists");
@@ -163,7 +163,7 @@ public class UserTests extends SahiTestScript{
 	/*
 	 * Delete multiple users - for positive tests
 	 */
-	@Test (groups={"chooseUserMultipleDeleteTests"}, dataProvider="getMultipleUserDeleteTestObjects", dependsOnGroups={"userAddTests","userReaddTests"})
+	@Test (groups={"chooseUserMultipleDeleteTests"}, dataProvider="getMultipleUserDeleteTestObjects", dependsOnGroups={"userAddTests"})
 	public void setMultipleUserDelete(String testName, String uid) throws Exception {		
 		//verify user to be deleted exists
 		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(uid).exists(), "Verify user " + uid + "  to be deleted exists");	

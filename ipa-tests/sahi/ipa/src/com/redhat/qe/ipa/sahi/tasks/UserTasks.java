@@ -16,6 +16,7 @@ public class UserTasks {
 	 */
 	public static void createUser(SahiTasks sahiTasks, String uid, String givenName, String sn) {
 		sahiTasks.link("Add").click();
+		sahiTasks.link("Optional field: click to show").click();
 		sahiTasks.textbox("uid").setValue(uid);
 		sahiTasks.textbox("givenname").setValue(givenName);
 		sahiTasks.textbox("sn").setValue(sn);
@@ -31,18 +32,40 @@ public class UserTasks {
 	 * @param expectedError - the error thrown when an invalid user is being attempted to be added
 	 */
 	public static void createInvalidUser(SahiTasks sahiTasks, String uid, String givenName, String sn, String expectedError) {
+		
+		// TODO: NK
+		// trying out the below
+		// having trouble if error doesn't match
+		// then cancel buttons are not hit
+		// but running in this case, when doing a ant run. can run from eclipse fine.
+		if (sahiTasks.button("Retry").exists()) {
+			sahiTasks.button("Cancel").near(sahiTasks.button("Retry")).click();
+		}
+		if (sahiTasks.button("Add and Edit").exists()) {
+			sahiTasks.button("Cancel").near(sahiTasks.button("Add and Edit")).click();
+		}
+		
+		
+		log.fine("Add");
 		sahiTasks.link("Add").click();
+		log.fine("uid");
 		sahiTasks.textbox("uid").setValue(uid);
+		log.fine("givenname");
 		sahiTasks.textbox("givenname").setValue(givenName);
+		log.fine("sn");
 		sahiTasks.textbox("sn").setValue(sn);
+		log.fine("add");
 		sahiTasks.button("Add").click();
 		//Check for expected error
-		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.div(expectedError).exists(), "Verified expected error when adding invalid user " + uid);
+		log.fine("error check");
+		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.div(expectedError).exists(), "Verified expected error when adding invalid user " + uid);	
 		// since the add user window and the message window have Cancel buttons
 		// specify which cancel button to hit by indicating what is near it.
 		// TODO: Remove ref later: http://sahi.co.in/w/sahi-api-examples
 		// TODO: Remove ref later: http://sahi.co.in/java/javadocs/net/sf/sahi/client/ElementStub.html#near%28net.sf.sahi.client.ElementStub%29
+		log.fine("cancel(near retry)");
 		sahiTasks.button("Cancel").near(sahiTasks.button("Retry")).click();
+		log.fine("cancel");
 		sahiTasks.button("Cancel").near(sahiTasks.button("Add and Edit")).click();
 	}
 	
@@ -83,8 +106,7 @@ public class UserTasks {
 		
 		//Update and go back to user list
 		sahiTasks.link("Update").click();
-		// u25c0 is the Unicode Character for the Black left-pointing triangle that shows up in Sahi Automation
-		sahiTasks.span("\u25c0 Back to List").click();
+		sahiTasks.link("Users[1]").click();
 	}
 	
 	
@@ -103,8 +125,7 @@ public class UserTasks {
 		
 		//verify mail address for user
 		com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("mail").value(), mail, "Verified updated mail for user " + uid);
-		// u25c0 is the Unicode Character for the Black left-pointing triangle that shows up in Sahi Automation
-		sahiTasks.span("\u25c0 Back to List").click();
+		sahiTasks.link("Users[1]").click();
 	}
 	
 	
@@ -122,7 +143,7 @@ public class UserTasks {
 		else
 			com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link("Inactive: Click to Activate").exists(), "Verified Inactive status for user " + uid);
 		
-		sahiTasks.span("\u25c0 Back to List").click();
+		sahiTasks.link("Users[1]").click();
 	}
 	
 	/* Update the user status. 
@@ -142,8 +163,7 @@ public class UserTasks {
 		// Update and go back to user list
 		// FIXME: BUG 
 		// sahiTasks.link("Update").click();
-		// u25c0 is the Unicode Character for the Black left-pointing triangle that shows up in Sahi Automation
-		sahiTasks.span("\u25c0 Back to List").click();
+		sahiTasks.link("Users[1]").click();
 	}
 	
 	
@@ -164,8 +184,7 @@ public class UserTasks {
 		// Update and go back to user list
 		// FIXME: BUG 
 		// sahiTasks.link("Update").click();
-		// u25c0 is the Unicode Character for the Black left-pointing triangle that shows up in Sahi Automation
-		sahiTasks.span("\u25c0 Back to List").click();
+		sahiTasks.link("Users[1]").click();
 	}
 	
 	/*
