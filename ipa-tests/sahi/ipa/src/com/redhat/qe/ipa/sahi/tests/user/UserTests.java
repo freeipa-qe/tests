@@ -67,7 +67,7 @@ public class UserTests extends SahiTestScript{
 	/*
 	 * Edit users - for positive tests
 	 */
-	@Test (groups={"userEditTests"}, dataProvider="getUserEditTestObjects", dependsOnGroups={"userAddTests", "invalidUserAddTests"})	
+	@Test (groups={"userEditTests"}, dataProvider="getUserEditTestObjects", dependsOnGroups={"userAddTests"})	
 	public void testUserEdit(String testName, String uid, String title, String mail) throws Exception {		
 		//verify user to be edited exists
 		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(uid).exists(), "Verify user " + uid + " to be edited exists");
@@ -163,7 +163,7 @@ public class UserTests extends SahiTestScript{
 	/*
 	 * Delete multiple users - for positive tests
 	 */
-	@Test (groups={"chooseUserMultipleDeleteTests"}, dataProvider="getMultipleUserDeleteTestObjects", dependsOnGroups={"userAddTests"})
+	@Test (groups={"chooseUserMultipleDeleteTests"}, dataProvider="getMultipleUserDeleteTestObjects", dependsOnGroups={"userAddTests", "invalidUserAddTests"})
 	public void setMultipleUserDelete(String testName, String uid) throws Exception {		
 		//verify user to be deleted exists
 		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(uid).exists(), "Verify user " + uid + "  to be deleted exists");	

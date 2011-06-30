@@ -32,33 +32,15 @@ public class UserTasks {
 	 * @param expectedError - the error thrown when an invalid user is being attempted to be added
 	 */
 	public static void createInvalidUser(SahiTasks sahiTasks, String uid, String givenName, String sn, String expectedError) {
-		
-		// TODO: NK
-		// trying out the below
-		// having trouble if error doesn't match
-		// then cancel buttons are not hit
-		// but running in this case, when doing a ant run. can run from eclipse fine.
-		if (sahiTasks.button("Retry").exists()) {
-			sahiTasks.button("Cancel").near(sahiTasks.button("Retry")).click();
-		}
-		if (sahiTasks.button("Add and Edit").exists()) {
-			sahiTasks.button("Cancel").near(sahiTasks.button("Add and Edit")).click();
-		}
-		
-		
-		log.fine("Add");
 		sahiTasks.link("Add").click();
-		log.fine("uid");
-		sahiTasks.textbox("uid").setValue(uid);
-		log.fine("givenname");
-		sahiTasks.textbox("givenname").setValue(givenName);
-		log.fine("sn");
-		sahiTasks.textbox("sn").setValue(sn);
-		log.fine("add");
-		sahiTasks.button("Add").click();
+		sahiTasks.link("Optional field: click to show").click();
+		sahiTasks.textbox("uid").near(sahiTasks.label("User login:")).setValue(uid);
+		sahiTasks.textbox("givenname").near(sahiTasks.label("First name:")).setValue(givenName);
+		sahiTasks.textbox("sn").near(sahiTasks.label("Last name:")).setValue(sn);
+		sahiTasks.button("Add").near(sahiTasks.button("Add and Add Another")).click();
 		//Check for expected error
 		log.fine("error check");
-		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.div(expectedError).exists(), "Verified expected error when adding invalid user " + uid);	
+		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.div(expectedError).exists(), "Verified expected error when adding invalid user " + uid);
 		// since the add user window and the message window have Cancel buttons
 		// specify which cancel button to hit by indicating what is near it.
 		// TODO: Remove ref later: http://sahi.co.in/w/sahi-api-examples
@@ -79,9 +61,10 @@ public class UserTasks {
 	 */
 	public static void createInvalidCharUser(SahiTasks sahiTasks, String uid, String givenName, String sn, String expectedError) {
 		sahiTasks.link("Add").click();
-		sahiTasks.textbox("uid").setValue(uid);
-		sahiTasks.textbox("givenname").setValue(givenName);
-		sahiTasks.textbox("sn").setValue(sn);
+		sahiTasks.link("Optional field: click to show").click();
+		sahiTasks.textbox("uid").near(sahiTasks.label("User login:")).setValue(uid);
+		sahiTasks.textbox("givenname").near(sahiTasks.label("First name:")).setValue(givenName);
+		sahiTasks.textbox("sn").near(sahiTasks.label("Last name:")).setValue(sn);
 		//Check for expected error
 		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.span(expectedError).exists(), "Verified expected error when adding invalid user " + uid);
 		sahiTasks.button("Cancel").near(sahiTasks.button("Add and Edit")).click();
