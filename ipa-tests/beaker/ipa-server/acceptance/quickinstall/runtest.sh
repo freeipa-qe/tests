@@ -50,6 +50,7 @@ rlJournalStart
    
         echo "export BEAKERMASTER=$MASTER" >> /dev/shm/env.sh
         echo "export BEAKERSLAVE=$SLAVE" >> /dev/shm/env.sh
+	echo "export BEAKERCLIENT=$CLIENT" >> /dev/shm/env.sh
 
 	#####################################################################
 	# 		IS THIS MACHINE A MASTER?                           #
