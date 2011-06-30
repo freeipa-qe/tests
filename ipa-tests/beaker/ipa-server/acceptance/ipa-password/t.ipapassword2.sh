@@ -43,7 +43,7 @@ ipapassword2_negative()
 
 ipapassword2_positive()
 {
-  ipapassword2_failinterval_positive
+  ipapassword2_maxfail_positive
 }
 
 ###########################
@@ -233,7 +233,7 @@ ipapassword2_lockouttime_negative()
 ###########################
 # MAX FAIL POSITIVE TESTS #
 ###########################
-ipapassword2_failinterval_positive()
+ipapassword2_maxfail_positive()
 {
 
    rlPhaseStartTest "Verify Valid Max Failures Values"
