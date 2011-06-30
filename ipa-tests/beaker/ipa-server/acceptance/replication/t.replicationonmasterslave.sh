@@ -300,24 +300,26 @@ add_objects()
    # perform actions to add objects
    rlLog "Adding objects on $hostname"
    # Add a user
-    add_newuser
+	add_newuser
 
    # Add a group
-    add_newgroup
+	add_newgroup
 
    # Add a host
-    add_newhost
+	add_newhost
 
    # Add a hostgroup
-    add_newhostgroup
+	add_newhostgroup
 
    # Add a netgroup
-    add_newnetgroup
+	add_newnetgroup
 
    # Add a service
-    add_newservice
+	add_newservice
 
    # Add a delegation
+#	add_delegation
+
    # Add a DNS record 
    # Add a HBAC service
    # Add a HBAC service group

@@ -438,3 +438,9 @@ check_deletedservice()
    expmsg="ipa: ERROR: $service_updated: service not found"
    rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify error when checking for deleted service"
 }
+
+################################
+# Delegation bits
+################################
+
+
