@@ -52,7 +52,7 @@ $(METADATA): Makefile
 	@echo "Path:            $(TEST_DIR)" >> $(METADATA)
 	@echo "Description:     IPA Services Functional tests" >> $(METADATA)
 	@echo "Type:            Regression" >> $(METADATA)
-	@echo "TestTime:        60m" >> $(METADATA)
+	@echo "TestTime:        90m" >> $(METADATA)
 	@echo "RunFor:          ipa-client" >> $(METADATA)
 	@echo "Requires:        ipa-admintools" >> $(METADATA)
 	@echo "Requires:        expect" >> $(METADATA)
