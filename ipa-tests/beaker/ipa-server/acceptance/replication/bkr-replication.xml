@@ -1,6 +1,6 @@
 <job>
 	<whiteboard>
-		ipa-server FC14 multihost(master, slave) replication test
+		ipa-server RHEL6 multihost(master, slave) replication test
 	</whiteboard>
 	<recipeSet>
 		<recipe kernel_options="" kernel_options_post="" ks_meta="" role="MASTER" whiteboard="">
