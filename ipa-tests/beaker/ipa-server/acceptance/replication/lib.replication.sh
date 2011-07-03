@@ -442,5 +442,32 @@ check_deletedservice()
 ################################
 # Delegation bits
 ################################
+add_delegation()
+{ #test_scenario (positive): --desc;positive;auto generated description data --attrs;positive;LIST --permissions;positive;read, write, add, delete, all --targetgroup;positive;STR
+    rlPhaseStartTest "permission_add_1036"
+        local testID="permission_add_1036"
+        local tmpout=$TmpDir/permission_add_1036.replicationtest.out
+        KinitAsAdmin
+        local desc_TestValue="auto_generated_description_$testID" #desc;positive;auto generated description data
+        local attrs_TestValue="uidnumber,gidnumber" #attrs;positive;LIST
+        local permissions_TestValue="read,write,add,delete,all" #permissions;positive;read, write, add, delete, all
+        local targetgroup_TestValue="$testGroup" #targetgroup;positive;STR
+        rlRun "ipa permission-add $testID  --desc=$desc_TestValue  --attrs=$attrs_TestValue  --permissions=$permissions_TestValue  --targetgroup=$targetgroup_TestValue " 0 "test options:  [desc]=[$desc_TestValue] [attrs]=[$attrs_TestValue] [permissions]=[$permissions_TestValue] [targetgroup]=[$targetgroup_TestValue]"
+        deletePermission $testID
+        rm $tmpout 2>&1 >/dev/null
+    rlPhaseEnd
+} #permission_add_1036
+
+check_delegation()
+{ #test_scenario (positive): --type;positive;user, group, host, hostgroup, service, netgroup, dns
+    rlPhaseStartTest "permission_find_1036"
+        local testID="permission_find_1036"
+        local tmpout=$TmpDir/permission_find_1036.replicationtest.out
+        KinitAsAdmin
+        local type_TestValue="user group host hostgroup service netgroup dns" #type;positive;user, group, host, hostgroup, service, netgroup, dns
+        rlRun "ipa permission-find $testID  --type=$type_TestValue " 0 "test options:  [type]=[$type_TestValue]"
+        rm $tmpout 2>&1 >/dev/null
+    rlPhaseEnd
+} #permission_find_1036
 
 

@@ -318,7 +318,7 @@ add_objects()
 	add_newservice
 
    # Add a delegation
-#	add_delegation
+	add_delegation
 
    # Add a DNS record 
    # Add a HBAC service
@@ -347,6 +347,7 @@ check_objects()
    check_newhostgroup
    check_newnetgroup
    check_newservice
+   check_delegation
 }
 
 update_objects()
