@@ -495,27 +495,30 @@ add_dns()
 		rlRun "/usr/sbin/ipactl restart" 0 "Restarting IPA server"
 		rlRun "ipa dnsrecord-add $zone $arec --a-rec $a" 0 "add record type a to $zone"
 	rlPhaseEnd
-
 }
 
 check_dns()
 {
 	rlPhaseStartTest "make sure that the $arec entry is on this server"
 		rlRun "ipa dnsrecord-find $zone $arec | grep $a" 0 "make sure ipa recieved record type A"
+		rlRun "dig $arec.$zone | grep $a" 0 "make sure dig can find the A record"
 	rlPhaseEnd
 }
 
 delete_dns()
 {
-	rlPhaseStartTest "delete the record $arec from $zone"
+	rlPhaseStartTest "delete the record $arec from $zone, as well as the dns zone"
 		rlRun "ipa dnsrecord-del $zone $arec --a-rec $a" 0 "delete record type a"
+		rlRun "ipa dnszone-del $zone" 0 "Delete the zone created for this test"
 	rlPhaseEnd
 }
 
 check_deleteddns()
 {
 	rlPhaseStartTest "make sure that the $arec entry is removed from this server"
+		/etc/init.d/named restart
 		rlRun "ipa dnsrecord-find $zone $arec | grep $a" 1 "make sure the record $arec is removed from this server"
+		rlRun "dig $arec.$zone | grep $a" 1 "make sure dig can not find the A record"
 	rlPhaseEnd
 }
 
