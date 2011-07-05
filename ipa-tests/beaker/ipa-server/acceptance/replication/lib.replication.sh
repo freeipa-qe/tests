@@ -444,18 +444,20 @@ check_deletedservice()
 ################################
 add_delegation()
 { #test_scenario (positive): --desc;positive;auto generated description data --attrs;positive;LIST --permissions;positive;read, write, add, delete, all --targetgroup;positive;STR
-    rlPhaseStartTest "permission_add_1036"
-        local testID="permission_add_1036"
-        local tmpout=$TmpDir/permission_add_1036.replicationtest.out
-        KinitAsAdmin
-        local desc_TestValue="auto_generated_description_$testID" #desc;positive;auto generated description data
-        local attrs_TestValue="uidnumber,gidnumber" #attrs;positive;LIST
-        local permissions_TestValue="read,write,add,delete,all" #permissions;positive;read, write, add, delete, all
-        local targetgroup_TestValue="$testGroup" #targetgroup;positive;STR
-        rlRun "ipa permission-add $testID  --desc=$desc_TestValue  --attrs=$attrs_TestValue  --permissions=$permissions_TestValue  --targetgroup=$targetgroup_TestValue " 0 "test options:  [desc]=[$desc_TestValue] [attrs]=[$attrs_TestValue] [permissions]=[$permissions_TestValue] [targetgroup]=[$targetgroup_TestValue]"
-        deletePermission $testID
-        rm $tmpout 2>&1 >/dev/null
-    rlPhaseEnd
+	if [ $config == "master" ] ; then
+		rlPhaseStartTest "permission_add_1036"
+			local testID="permission_add_1036"
+			local tmpout=$TmpDir/permission_add_1036.replicationtest.out
+			KinitAsAdmin
+			local desc_TestValue="auto_generated_description_$testID" #desc;positive;auto generated description data
+			local attrs_TestValue="uidnumber,gidnumber" #attrs;positive;LIST
+			local permissions_TestValue="read,write,add,delete,all" #permissions;positive;read, write, add, delete, all
+			local targetgroup_TestValue="$testGroup" #targetgroup;positive;STR
+			rlRun "ipa permission-add $testID  --desc=$desc_TestValue  --attrs=$attrs_TestValue  --permissions=$permissions_TestValue  --targetgroup=$targetgroup_TestValue " 0 "test options:  [desc]=[$desc_TestValue] [attrs]=[$attrs_TestValue] [permissions]=[$permissions_TestValue] [targetgroup]=[$targetgroup_TestValue]"
+			deletePermission $testID
+			rm $tmpout 2>&1 >/dev/null
+		rlPhaseEnd
+	fi
 } #permission_add_1036
 
 check_delegation()
@@ -470,4 +472,29 @@ check_delegation()
     rlPhaseEnd
 } #permission_find_1036
 
+################################
+# DNS section
+################################
+add_dns()
+{
+	if [ $config == "master" ] ; then
+		a="1.2.3.4"
+		ipaddr=`hostname`	
+		zone=newzone
+		email="ipaqar.redhat.com"
+		serial=2010010701
+		refresh=303
+		retry=101
+		expire=1202
+		minimum=33
+		ttl=55
+	
+        	KinitAsAdmin
+		rlPhaseStartTest "create a new zone to be used in a replication dns test."
+			rlRun "ipa dnszone-add --name-server=$ipaddr --admin-email=$email --serial=$serial --refresh=$refresh --retry=$retry --expire=$expire --minimum=$minimum --ttl=$ttl $zone" 0 "Checking to ensure that ipa thinks that it can create a zone"
+			rlRun "/usr/sbin/ipactl restart" 0 "Restarting IPA server"
+		rlPhaseEnd
 
+	fi
+}
+}

@@ -321,6 +321,8 @@ add_objects()
 	add_delegation
 
    # Add a DNS record 
+	add_dns
+
    # Add a HBAC service
    # Add a HBAC service group
    # Add a HBAC rule 
@@ -348,6 +350,7 @@ check_objects()
    check_newnetgroup
    check_newservice
    check_delegation
+   check_dns
 }
 
 update_objects()
@@ -359,6 +362,7 @@ update_objects()
    modify_newhostgroup
    modify_newnetgroup
    modify_newservice
+   modify_dns
 }
 
 
@@ -371,6 +375,7 @@ check_updated_objects()
    check_modifiedhostgroup
    check_modifiednetgroup
    check_modifiedservice
+   check_modifieddns
 }
 
 
@@ -383,6 +388,7 @@ delete_objects()
    delete_hostgroup
    delete_netgroup
    delete_service
+   delete dns
 }
 
 check_deletedobjects()
