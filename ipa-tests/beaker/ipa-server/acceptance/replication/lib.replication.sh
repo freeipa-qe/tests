@@ -475,26 +475,47 @@ check_delegation()
 ################################
 # DNS section
 ################################
+export zone=repnewzone
+export arec="alpha2.$zone"
+export a="1.2.3.4"
 add_dns()
 {
-	if [ $config == "master" ] ; then
-		a="1.2.3.4"
-		ipaddr=`hostname`	
-		zone=newzone
-		email="ipaqar.redhat.com"
-		serial=2010010701
-		refresh=303
-		retry=101
-		expire=1202
-		minimum=33
-		ttl=55
+	ipaddr=`hostname`	
+	email="ipaqar.redhat.com"
+	serial=2010010701
+	refresh=303
+	retry=101
+	expire=1202
+	minimum=33
+	ttl=55
 	
-        	KinitAsAdmin
-		rlPhaseStartTest "create a new zone to be used in a replication dns test."
-			rlRun "ipa dnszone-add --name-server=$ipaddr --admin-email=$email --serial=$serial --refresh=$refresh --retry=$retry --expire=$expire --minimum=$minimum --ttl=$ttl $zone" 0 "Checking to ensure that ipa thinks that it can create a zone"
-			rlRun "/usr/sbin/ipactl restart" 0 "Restarting IPA server"
-		rlPhaseEnd
+       	KinitAsAdmin
+	rlPhaseStartTest "create a new zone $zone to be used in a replication dns test. It could contain the $zrec record"
+		rlRun "ipa dnszone-add --name-server=$ipaddr --admin-email=$email --serial=$serial --refresh=$refresh --retry=$retry --expire=$expire --minimum=$minimum --ttl=$ttl $zone" 0 "Checking to ensure that ipa thinks that it can create a zone"
+		rlRun "/usr/sbin/ipactl restart" 0 "Restarting IPA server"
+		rlRun "ipa dnsrecord-add $zone $arec --a-rec $a" 0 "add record type a to $zone"
+	rlPhaseEnd
 
-	fi
 }
+
+check_dns()
+{
+	rlPhaseStartTest "make sure that the $arec entry is on this server"
+		rlRun "ipa dnsrecord-find $zone $arec | grep $a" 0 "make sure ipa recieved record type A"
+	rlPhaseEnd
 }
+
+delete_dns()
+{
+	rlPhaseStartTest "delete the record $arec from $zone"
+		rlRun "ipa dnsrecord-del $zone $arec --a-rec $a" 0 "delete record type a"
+	rlPhaseEnd
+}
+
+check_deleteddns()
+{
+	rlPhaseStartTest "make sure that the $arec entry is removed from this server"
+		rlRun "ipa dnsrecord-find $zone $arec | grep $a" 1 "make sure the record $arec is removed from this server"
+	rlPhaseEnd
+}
+

@@ -362,7 +362,6 @@ update_objects()
    modify_newhostgroup
    modify_newnetgroup
    modify_newservice
-   modify_dns
 }
 
 
@@ -375,7 +374,6 @@ check_updated_objects()
    check_modifiedhostgroup
    check_modifiednetgroup
    check_modifiedservice
-   check_modifieddns
 }
 
 
@@ -388,7 +386,7 @@ delete_objects()
    delete_hostgroup
    delete_netgroup
    delete_service
-   delete dns
+   delete_dns
 }
 
 check_deletedobjects()
@@ -400,4 +398,5 @@ check_deletedobjects()
    check_deletedhostgroup
    check_deletednetgroup
    check_deletedservice
+   check_deleteddns
 }
