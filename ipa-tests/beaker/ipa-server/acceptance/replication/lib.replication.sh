@@ -522,3 +522,94 @@ check_deleteddns()
 	rlPhaseEnd
 }
 
+################################
+# hbac section
+################################
+
+REALM=`os_getdomainname | tr "[a-z]" "[A-Z]"`
+DOMAIN=`os_getdomainname`
+
+host1="dev_host_hbac."$DOMAIN
+
+user1="dev_hbac"
+
+usergroup1="dev_ugrp_hbac"
+
+hostgroup1="dev_hosts_hbac"
+
+servicegroup="remote_access_hbac"
+
+hbac_setup()
+{
+	rlRun "TmpDir=\`mktemp -d\`" 0 "Creating tmp directory"
+	rlRun "pushd $TmpDir"
+       	KinitAsAdmin
+	# add host for testing
+	rlRun "addHost $host1" 0 "SETUP: Adding host $host1 for testing."
+	# add host group for testing
+	rlRun "addHostGroup $hostgroup1 $hostgroup1" 0 "SETUP: Adding host group $hostgroup1 for testing."
+	# add user for testing
+	rlRun "ipa user-add --first=$user1 --last=$user1 $user1" 0 "SETUP: Adding user $user1."
+	# add group for testing
+	rlRun "addGroup $usergroup1 $usergroup1" 0 "SETUP: Adding user $usergroup1."
+	# add service group
+	rlRun "addHBACServiceGroup $servicegroup $servicegroup" 0 "SETUP: Adding service group $servicegroup"
+}
+
+add_hbac()
+{
+	hbac_setup
+	rlPhaseStartTest "Add host to Rule"
+		rlRun "addHBACRule allow \" \" \" \" \" \" \" \" Engineering" 0 "Adding HBAC rule."
+		rlRun "addToHBAC Engineering host hosts $host1" 0 "Adding host $host1 to Engineering rule."
+		rlRun "verifyHBACAssoc Engineering Hosts $host1" 0 "Verifying host $host1 is associated with the Engineering rule."
+	rlPhaseEnd
+
+	rlPhaseStartTest "Add host group to Rule"
+		rlRun "addToHBAC Engineering host hostgroups $hostgroup1" 0 "Adding host group $hostgroup1 to Engineering rule."
+		rlRun "verifyHBACAssoc Engineering \"Host Groups\" $hostgroup1" 0 "Verifying host group $hostgroup1 is associated with the Engineering rule."
+	rlPhaseEnd
+}
+
+check_hbac()
+{
+	rlPhaseStartTest "Verify HBAC rules exist"
+		rlRun "verifyHBACAssoc Engineering Hosts $host1" 0 "Verifying host $host1 is associated with the Engineering rule."
+		rlRun "verifyHBACAssoc Engineering \"Host Groups\" $hostgroup1" 0 "Verifying host group $hostgroup1 is associated with the Engineering rule."
+	rlPhaseEnd
+
+}
+
+modify_hbac()
+{
+	rlPhaseStartTest "Modify hbac Description"
+		rlRun "modifyHBACRule Engineering desc \"My New Description\"" 0 "Modifying Engineering Rule's Description"
+		rlRun "verifyHBACAssoc Engineering Description \"My New Description\"" 0 "Verifying Description"
+	rlPhaseEnd
+}
+
+check_modifiedhbac()
+{
+	rlPhaseStartTest "Check modified hbac Description"
+		rlRun "verifyHBACAssoc Engineering Description \"My New Description\"" 0 "Verifying Description"
+	rlPhaseEnd
+
+}
+
+delete_hbac()
+{
+	rlPhaseStartTest "delete hba entries from hosts"
+		rlRun "deleteGroup $usergroup1" 0 "Deleting User Group associated with rule."
+		rlRun "deleteHost $host1" 0 "Deleting Host associated with rule."
+		rlRun "deleteHostGroup $hostgroup1" 0 "Deleting Host Group associated with rule."
+		rlRun "deleteHBACRule Engineering" 0 "CLEANUP: Deleting Rule"
+	rlPhaseEnd
+}
+
+check_deletedhbac()
+{
+	rlPhaseStartTest "verify that hostgroup1 was deleted"
+		rlRun "verifyHBACAssoc Engineering \"Host Groups\" $hostgroup1" 1 "Verifying host group $hostgroup1 is no longer associated with the Engineering rule."
+	rlPhaseEnd
+}
+

@@ -44,6 +44,7 @@
 . /dev/shm/ipa-hostgroup-cli-lib.sh
 . /dev/shm/ipa-netgroup-cli-lib.sh
 . /dev/shm/ipa-service-cli-lib.sh
+. /dev/shm/ipa-hbac-cli-lib.sh
 
 #Include the data file for the tests
 . ./data.replication
