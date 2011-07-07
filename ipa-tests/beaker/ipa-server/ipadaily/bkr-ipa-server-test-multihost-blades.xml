@@ -39,9 +39,7 @@
 				<params/>
 			</task>
 			<task name="/CoreOS/ipa-server/acceptance/quickinstall" role="MASTER">
-				<params>
-					<param name="SNAPSHOT" value="TRUE"/>
-				</params>
+				<params/>
 			</task>
 			<task name="/CoreOS/ipa-server/acceptance/ipa-functional-services" role="MASTER">
 				<params/>
@@ -80,9 +78,7 @@
 				<params/>
 			</task>
 			<task name="/CoreOS/ipa-server/acceptance/quickinstall" role="SLAVE">
-				<params>
-					<param name="SNAPSHOT" value="TRUE"/>
-				</params>
+				<params/>
 			</task>
 			<task name="/CoreOS/ipa-server/acceptance/ipa-functional-services" role="SLAVE">
 				<params/>
@@ -121,9 +117,7 @@
 				<params/>
 			</task>
 			<task name="/CoreOS/ipa-server/acceptance/quickinstall" role="CLIENT">
-				<params>
-					<param name="SNAPSHOT" value="TRUE"/>
-				</params>
+				<params/>
 			</task>
 			<task name="/CoreOS/ipa-server/acceptance/ipa-functional-services" role="CLIENT">
 				<params/>
