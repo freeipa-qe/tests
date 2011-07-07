@@ -200,31 +200,31 @@ rlJournalStart
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-hostgroup-cli-16: show hostgroup doesn't exist"
-        expmsg="ipa: ERROR: \"$group3\": hostgroup not found"
+        expmsg="ipa: ERROR: \"$group3\": host group not found"
         command="ipa hostgroup-show \"$group3\""
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-hostgroup-cli-17: modify hostgroup doesn't exist"
-        expmsg="ipa: ERROR: \"$group3\": hostgroup not found"
+        expmsg="ipa: ERROR: \"$group3\": host group not found"
         command="ipa hostgroup-mod --desc=test \"$group3\""
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-hostgroup-cli-18: delete hostgroup doesn't exist"
+    rlPhaseStartTest "ipa-hostgroup-cli-18: delete host group doesn't exist"
         expmsg="ipa: ERROR: \"$group3\": hostgroup not found"
         command="ipa hostgroup-del \"$group3\""
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-hostgroup-cli-19: add host member hostgroup doesn't exist"
-        expmsg="ipa: ERROR: \"$group3\": hostgroup not found"
+        expmsg="ipa: ERROR: \"$group3\": host group not found"
         command="ipa hostgroup-add-member --hosts=$host1 \"$group3\""
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-hostgroup-cli-20: remove host member hostgroup doesn't exist"
-        expmsg="ipa: ERROR: \"$group3\": hostgroup not found"
+        expmsg="ipa: ERROR: \"$group3\": host group not found"
         command="ipa hostgroup-remove-member --hosts=$host1  \"$group3\""
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
     rlPhaseEnd
@@ -244,7 +244,7 @@ rlJournalStart
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-hostgroup-cli-23: Add duplicate host group"
-        expmsg="ipa: ERROR: hostgroup with name $group1 already exists"
+        expmsg="ipa: ERROR: host group with name $group1 already exists"
         command="ipa hostgroup-add --desc=test \"$group1\""
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
     rlPhaseEnd
