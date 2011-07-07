@@ -75,13 +75,13 @@ rlJournalStart
 
     rlPhaseStartTest "ipa-hbacsvc-cli-001: Negative - Add HBAC Service that already exists"
         command="ipa hbacsvc-add sshd"
-        expmsg="ipa: ERROR: hbacsvc with name sshd already exists"
+        expmsg="ipa: ERROR: HBAC service with name sshd already exists"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for empty Rule Type"
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-hbacsvc-cli-002: Negative - HBAC Service doesn't exists"
         command="ipa hbacsvc-mod --desc=doesntexist doesntexist"
-        expmsg="ipa: ERROR: doesntexist: hbacsvc not found"
+        expmsg="ipa: ERROR: doesntexist: HBAC service not found"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message"
 	command="ipa hbacsvc-show --all doesntexist"
 	rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message"
@@ -144,13 +144,13 @@ rlJournalStart
 
     rlPhaseStartTest "ipa-hbacsvc-cli-010: Negative - Add HBAC Service Group that already exists"
         command="ipa hbacsvcgroup-add --desc=test SUDO"
-        expmsg="ipa: ERROR: hbacsvcgroup with name sudo already exists"
+        expmsg="ipa: ERROR: HBAC service group with name sudo already exists"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for empty Rule Type"
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-hbacsvc-cli-011: Negative - HBAC Service Group doesn't exists"
         command="ipa hbacsvcgroup-mod --desc=doesntexist doesntexist"
-        expmsg="ipa: ERROR: doesntexist: hbacsvcgroup not found"
+        expmsg="ipa: ERROR: doesntexist: HBAC service group not found"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message"
         command="ipa hbacsvcgroup-show --all doesntexist"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message"
