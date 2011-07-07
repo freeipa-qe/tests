@@ -32,9 +32,7 @@
 				<params/>
 			</task>
 			<task name="/CoreOS/ipa-server/acceptance/quickinstall" role="MASTER">
-				<params>
-					<param name="SNAPSHOT" value="TRUE"/>
-				</params>
+				<params/>
 			</task>
 			<task name="/CoreOS/ipa-server/acceptance/replication" role="MASTER">
 				<params/>
@@ -71,9 +69,7 @@
 				<params/>
 			</task>
 			<task name="/CoreOS/ipa-server/acceptance/quickinstall" role="SLAVE">
-				<params>
-					<param name="SNAPSHOT" value="TRUE"/>
-				</params>
+				<params/>
 			</task>
 			<task name="/CoreOS/ipa-server/acceptance/replication" role="SLAVE">
 				<params/>
