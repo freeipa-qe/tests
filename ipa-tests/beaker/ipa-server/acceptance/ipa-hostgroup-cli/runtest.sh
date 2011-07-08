@@ -212,7 +212,7 @@ rlJournalStart
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-hostgroup-cli-18: delete host group doesn't exist"
-        expmsg="ipa: ERROR: \"$group3\": hostgroup not found"
+        expmsg="ipa: ERROR: \"$group3\": host group not found"
         command="ipa hostgroup-del \"$group3\""
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
     rlPhaseEnd
