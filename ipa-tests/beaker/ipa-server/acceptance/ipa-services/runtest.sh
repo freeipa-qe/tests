@@ -159,7 +159,7 @@ rlJournalStart
         service-remove-host  # Remove hosts that can manage this service.
         service-show         # Display information about an IPA service.
   else
-                rlFail "Environment not correct - not running tests"
+                rlLog "Environment not correct - not running tests"
   fi 
 
   rlJournalPrintText
