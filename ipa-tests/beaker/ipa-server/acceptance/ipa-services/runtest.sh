@@ -133,65 +133,34 @@ service-show()
 
 rlJournalStart
 
-rlPhaseStartTest "Environment check"
+  rlPhaseStartTest "Environment check"
 
-        #####################################################################
-        #               IS THIS MACHINE A MASTER?                           #
-        #####################################################################
-
-	rlLog "MASTER: $MASTER"
-        rlLog "HOSTNAME: $HOSTNAME"
-        echo $MASTER | grep $HOSTNAME
-        rc=$?
-        if [ $rc -eq 0 ] ; then
-                for item in $PACKAGELIST ; do
-                        rpm -qa | grep $item
-                        if [ $? -eq 0 ] ; then
-                                rlPass "$item package is installed"
-                        else
-                                rlFail "$item package NOT found!"
-				rc=1
-                        fi
-                done
-		if [ $rc -eq 0 ] ; then
-			setup
-        		service-add          # Add a new IPA new service.
-        		service-add-host     # Add hosts that can manage this service.
-        		service-del          # Delete an IPA service.
-        		service-disable      # Disable the Kerberos key of a service.
-        		service-find         # Search for IPA services.
-        		service-mod          # Modify an existing IPA service.
-        		service-remove-host  # Remove hosts that can manage this service.
-        		service-show         # Display information about an IPA service.
+	for item in $PACKAGELIST ; do
+		rpm -qa | grep $item
+		if [ $? -eq 0 ] ; then
+			rlPass "$item package is installed"
+		else
+			rlFail "$item package NOT found!"
+			rc=1
 		fi
-		rhts-sync-set -s DONE
-        else
-                rlLog "Machine in recipe is not a CLIENT - not running tests"
-        fi
+	done
 
-        #####################################################################
-        #               IS THIS MACHINE A CLIENT?                           #
-        #####################################################################
-        rc=0
-        echo $CLIENT | grep $HOSTNAME
-        if [ $? -eq 0 ] ; then
-                rhts-sync-block -s DONE $MASTER
-        else
-                rlLog "This machine is a CLIENT."
-        fi
+  rlPhaseEnd
 
-        #####################################################################
-        #               IS THIS MACHINE A SLAVE?                            #
-        #####################################################################
-        rc=0
-        echo $SLAVE | grep $HOSTNAME
-        if [ $? -eq 0 ] ; then
-                rhts-sync-block -s DONE $MASTER
-        else
-                rlLog "This machine is a SLAVE"
-        fi
-
-   rlPhaseEnd
+  #run Tests
+  if [ $rc -eq 0 ] ; then
+	setup
+        service-add          # Add a new IPA new service.
+        service-add-host     # Add hosts that can manage this service.
+        service-del          # Delete an IPA service.
+        service-disable      # Disable the Kerberos key of a service.
+        service-find         # Search for IPA services.
+        service-mod          # Modify an existing IPA service.
+        service-remove-host  # Remove hosts that can manage this service.
+        service-show         # Display information about an IPA service.
+  else
+                rlFail "Environment not correct - not running tests"
+  fi 
 
   rlJournalPrintText
   report=/tmp/rhts.report.$RANDOM.txt
