@@ -134,7 +134,7 @@ service-show()
 rlJournalStart
 
   rlPhaseStartTest "Environment check"
-
+	rc=0
 	for item in $PACKAGELIST ; do
 		rpm -qa | grep $item
 		if [ $? -eq 0 ] ; then
