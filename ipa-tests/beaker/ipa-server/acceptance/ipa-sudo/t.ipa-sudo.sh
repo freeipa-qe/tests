@@ -104,11 +104,11 @@ rlPhaseStartTest "Setup for sudo sanity tests"
 	done
 
 	# kinit as admin and creating users
-#	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user" 
-#	rlRun "create_ipauser $user1 $user1 $user1 $userpw"
-#	sleep 5
-#	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-#	rlRun "create_ipauser $user2 $user2 $user2 $userpw"
+	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user" 
+	rlRun "create_ipauser $user1 $user1 $user1 $userpw"
+	sleep 5
+	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+	rlRun "create_ipauser $user2 $user2 $user2 $userpw"
         rlRun "TmpDir=\`mktemp -d\`" 0 "Creating tmp directory"
         rlRun "pushd $TmpDir"
 
@@ -2225,8 +2225,9 @@ rlPhaseStartTest "sudorule-find_011: ipa sudorule-find --runasexternalgroup"
 rlPhaseEnd
 }
 
-#TODO
 sudorule-find_012() {
+# The output of sudorule-find with --timelimit option is inconsistent to be included in
+# automation.
  
 rlPhaseStartTest "sudorule-find_012: ipa sudorule-find --timelimit"
  
@@ -2334,12 +2335,16 @@ cleanup() {
 rlPhaseStartTest "Clean up for sudo sanity tests"
 
 	rlRun "kinitAs $ADMINID $ADMINPW" 0
-#	rlRun "ipa user-del $user1"
-#	sleep 5
-#	rlRun "ipa user-del $user2"
+	rlRun "ipa user-del $user1"
+	sleep 5
+	rlRun "ipa user-del $user2"
+	rlRun "rm -fr /tmp/krb5cc_1*"
+	rlRun "ipa sudocmd-find"
+	rlRun "ipa sudocmdgroup-find"
+	rlRun "ipa sudorule-find"
 	rlRun "kdestroy" 0 "Destroying admin credentials."
 
-	# enabling NIS
+	# disabling NIS
 	rlRun "echo -n Secret123 > $TmpDir/passwd.txt"
 	rlRun "ipa-nis-manage -y $TmpDir/passwd.txt disable"
 	rlRun "ipactl restart"
