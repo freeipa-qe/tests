@@ -71,10 +71,10 @@
 			<task name="/CoreOS/ipa-server/acceptance/ipa-krbtpolicy" role="MASTER">
 				<params/>
 			</task>
-			<task name="/CoreOS/ipa-server/acceptance/ipa-config" role="MASTER">
+			<task name="/CoreOS/ipa-server/acceptance/ipa-krblockout" role="MASTER">
 				<params/>
 			</task>
-			<task name="/CoreOS/ipa-server/acceptance/ipa-dns" role="MASTER">
+			<task name="/CoreOS/ipa-server/acceptance/ipa-config" role="MASTER">
 				<params/>
 			</task>
 			<task name="/CoreOS/ipa-server/acceptance/ipa-i18n" role="MASTER">
