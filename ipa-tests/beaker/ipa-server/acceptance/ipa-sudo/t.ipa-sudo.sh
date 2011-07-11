@@ -543,6 +543,7 @@ rlPhaseStartTest "sudorule_001: ipa sudorule help."
 	rlAssertGrep "sudorule-add-option            Add an option to the Sudo rule." "$TmpDir/sudorule_001.txt"
 	rlAssertGrep "sudorule-add-runasgroup        Add group for Sudo to execute as." "$TmpDir/sudorule_001.txt"
 	rlAssertGrep "sudorule-add-runasuser         Add user for Sudo to execute as." "$TmpDir/sudorule_001.txt"
+	rlLog "Covers test https://bugzilla.redhat.com/show_bug.cgi?id=711705"
 	rlAssertGrep "sudorule-add-user              Add users and groups affected by Sudo Rule." "$TmpDir/sudorule_001.txt"
 	rlAssertGrep "sudorule-del                   Delete Sudo Rule." "$TmpDir/sudorule_001.txt"
 	rlAssertGrep "sudorule-disable               Disable a Sudo rule." "$TmpDir/sudorule_001.txt"
@@ -559,7 +560,7 @@ rlPhaseStartTest "sudorule_001: ipa sudorule help."
 	rlAssertGrep "sudorule-show                  Display Sudo Rule." "$TmpDir/sudorule_001.txt"
 	rlAssertGrep "uid=sudo,cn=sysaccounts,cn=etc,dc=example,dc=com" "$TmpDir/sudorule_001.txt"
 	rlAssertGrep "LDAPTLS_CACERT=/etc/ipa/ca.crt /usr/bin/ldappasswd -S -W -h ipa.example.com -ZZ -D \"cn=Directory Manager\" uid=sudo,cn=sysaccounts,cn=etc,dc=example,dc=com" "$TmpDir/sudorule_001.txt"
-	rlRun "cat $TmpDir/sudo_002.txt"
+	rlRun "cat $TmpDir/sudo_001.txt"
 
 rlPhaseEnd
 }
@@ -809,8 +810,8 @@ rlPhaseStartTest "sudorule-add-allow-command_003: ipa help sudorule-add-allow-co
 	rlAssertGrep "\-h, \--help            show this help message and exit" "$TmpDir/sudorule-add-allow-command_003.txt"
 	rlAssertGrep "\--all                 Retrieve and print all attributes from the server." "$TmpDir/sudorule-add-allow-command_003.txt"
 	rlAssertGrep "\--raw                 Print entries as stored on the server." "$TmpDir/sudorule-add-allow-command_003.txt"
-	rlAssertGrep "\--sudocmds=LIST       comma-separated list of sudocmds to add" "$TmpDir/sudorule-add-allow-command_003.txt"
-	rlAssertGrep "\--sudocmdgroups=LIST  comma-separated list of sudocmdgroups to add" "$TmpDir/sudorule-add-allow-command_003.txt"
+	rlAssertGrep "\--sudocmds=LIST       comma-separated list of sudo commands to add" "$TmpDir/sudorule-add-allow-command_003.txt"
+	rlAssertGrep "\--sudocmdgroups=LIST  comma-separated list of sudo command groups to add" "$TmpDir/sudorule-add-allow-command_003.txt"
 	rlRun "cat $TmpDir/sudorule-add-allow-command_003.txt"
 
 rlPhaseEnd
@@ -826,8 +827,8 @@ rlPhaseStartTest "sudorule-remove-allow-command_003: ipa help sudorule-remove-al
         rlAssertGrep "\-h, \--help            show this help message and exit" "$TmpDir/sudorule-remove-allow-command_003.txt"
         rlAssertGrep "\--all                 Retrieve and print all attributes from the server." "$TmpDir/sudorule-remove-allow-command_003.txt"
         rlAssertGrep "\--raw                 Print entries as stored on the server." "$TmpDir/sudorule-remove-allow-command_003.txt"
-        rlAssertGrep "\--sudocmds=LIST       comma-separated list of sudocmds to remove" "$TmpDir/sudorule-remove-allow-command_003.txt"
-        rlAssertGrep "\--sudocmdgroups=LIST  comma-separated list of sudocmdgroups to remove" "$TmpDir/sudorule-remove-allow-command_003.txt"
+        rlAssertGrep "\--sudocmds=LIST       comma-separated list of sudo commands to remove" "$TmpDir/sudorule-remove-allow-command_003.txt"
+        rlAssertGrep "\--sudocmdgroups=LIST  comma-separated list of sudo commands groups to remove" "$TmpDir/sudorule-remove-allow-command_003.txt"
         rlRun "cat $TmpDir/sudorule-add-allow-command_003.txt"
 
 rlPhaseEnd
@@ -845,7 +846,7 @@ rlPhaseStartTest "sudorule-add-host_001: Add host help to sudorule."
 	rlAssertGrep "\--all              Retrieve and print all attributes from the server." "$TmpDir/sudorule-add-host_001.txt"
 	rlAssertGrep "\--raw              Print entries as stored on the server." "$TmpDir/sudorule-add-host_001.txt"
 	rlAssertGrep "\--hosts=LIST       comma-separated list of hosts to add" "$TmpDir/sudorule-add-host_001.txt"
-	rlAssertGrep "\--hostgroups=LIST  comma-separated list of hostgroups to add" "$TmpDir/sudorule-add-host_001.txt"
+	rlAssertGrep "\--hostgroups=LIST  comma-separated list of host groups to add" "$TmpDir/sudorule-add-host_001.txt"
 	rlRun "cat $TmpDir/sudorule-add-host_001.txt"
 
 rlPhaseEnd
@@ -943,7 +944,7 @@ rlPhaseStartTest "sudorule-remove-host_001: Remove host help to sudorule."
 	rlAssertGrep "\--all              Retrieve and print all attributes from the server." "$TmpDir/sudorule-remove-host_001.txt"
 	rlAssertGrep "\--raw              Print entries as stored on the server." "$TmpDir/sudorule-remove-host_001.txt"
 	rlAssertGrep "\--hosts=LIST       comma-separated list of hosts to remove" "$TmpDir/sudorule-remove-host_001.txt"
-	rlAssertGrep "\--hostgroups=LIST  comma-separated list of hostgroups to remove" "$TmpDir/sudorule-remove-host_001.txt"
+	rlAssertGrep "\--hostgroups=LIST  comma-separated list of host groups to remove" "$TmpDir/sudorule-remove-host_001.txt"
 	rlRun "cat $TmpDir/sudorule-remove-host_001.txt"
 
 rlPhaseEnd
@@ -1341,8 +1342,8 @@ sudorule-remove-option_004() {
 
 rlPhaseStartTest "sudorule-remove-option_004: ipa sudorule-remove-option --sudooption=!authenticate"
 
-        rlRun "ipa sudorule-remove-option sudorule1 --sudooption=\'!authenticate\' > $TmpDir/sudorule-remove-option_004.txt 2>&1"
-        rlAssertGrep "Removed option \"'!authenticate'\" from Sudo rule \"sudorule1\"" "$TmpDir/sudorule-remove-option_004.txt"
+        rlRun "ipa sudorule-remove-option sudorule1 --sudooption='!authenticate' > $TmpDir/sudorule-remove-option_004.txt 2>&1"
+        rlAssertGrep "Removed option '!authenticate' from Sudo rule \"sudorule1\"" "$TmpDir/sudorule-remove-option_004.txt"
         rlRun "cat $TmpDir/sudorule-remove-option_004.txt"
 	rlRun "ipa sudorule-del sudorule1"
 
@@ -2318,11 +2319,11 @@ rlPhaseStartTest "sudorule_del_003: Del sudo rule with --continue option."
 	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user" 
 	rlRun "ipa sudorule-add sudorule2"
 	rlRun "ipa sudorule-del invalidrule sudorule2 > $TmpDir/sudorule_del_003.txt 2>&1" 2
-	rlAssertGrep "ipa: ERROR: invalidrule: Sudo Rule not found" "$TmpDir/sudorule_del_003.txt"
+	rlAssertGrep "ipa: ERROR: invalidrule: Sudo Rule not found" "$TmpDir/sudorule_del_003.txt" -i
 	rlRun "cat $TmpDir/sudorule_del_003.txt"
 	rlRun "ipa sudorule-find sudorule2"
 	rlRun "ipa sudorule-del invalidrule sudorule2 --continue > $TmpDir/sudorule_del_003.txt 2>&1"
-	rlAssertGrep "Failed to remove: invalidrule" "$TmpDir/sudorule_del_003.txt"
+	rlAssertGrep "Failed to remove: invalidrule" "$TmpDir/sudorule_del_003.txt" -i
 	rlRun "ipa sudorule-find sudorule2" 1
 	rlRun "cat $TmpDir/sudorule_del_003.txt"
 

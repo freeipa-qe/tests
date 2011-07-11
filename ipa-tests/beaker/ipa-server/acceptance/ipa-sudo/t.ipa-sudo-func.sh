@@ -173,15 +173,15 @@ send -- "\r"
 expect eof
 EOF
 
-	rlFileBackup /var/log/dirsrv/slapd-$DSINST/errors
-	rlRun "> /var/log/dirsrv/slapd-$DSINST/errors"
+	rlFileBackup /var/log/dirsrv/slapd-$RELM/errors
+	rlRun "> /var/log/dirsrv/slapd-$RELM/errors"
 
 	rlRun "chmod 755 $TmpDir/bindchpwd.exp"
 	rlRun "$TmpDir/bindchpwd.exp" 0 "Setting sudo binddn password"
 
 	rlLog "Verifying bug https://bugzilla.redhat.com/show_bug.cgi?id=712109"
-	rlAssertNotGrep "Entry \"uid=sudo,cn=sysaccounts,cn=etc,$BASE\" -- attribute \"krbExtraData\" not allowed" "/var/log/dirsrv/slapd-$DSINST/errors"
-	rlFileRestore /var/log/dirsrv/slapd-$DSINST/errors
+	rlAssertNotGrep "Entry \"uid=sudo,cn=sysaccounts,cn=etc,$BASE\" -- attribute \"krbExtraData\" not allowed" "/var/log/dirsrv/slapd-$RELM/errors"
+	rlFileRestore /var/log/dirsrv/slapd-$RELM/errors
 
 	rlAssertNotGrep "sudoers" "/etc/nsswitch.conf"
 		if [ $? = 0 ]; then
@@ -237,7 +237,7 @@ set timeout 30
 set send_slow {1 .1}
 match_max 100000
 
-spawn ssh -l $1 localhost
+spawn ssh -o StrictHostKeyChecking=no -l $1 localhost
 expect "*: "
 send -s "$userpw\r"
 expect "*$ "
@@ -265,7 +265,7 @@ set timeout 30
 set send_slow {1 .1}
 match_max 100000
 
-spawn ssh -l $1 localhost
+spawn ssh -o StrictHostKeyChecking=no -l $1 localhost
 expect "*: "
 send -s "$userpw\r"
 expect "*$ "
@@ -760,7 +760,7 @@ cat > $TmpDir/sudo_list.exp << EOF
 set timeout 30
 set send_slow {1 .1}
 match_max 100000
-spawn ssh -l $1 localhost
+spawn ssh -o StrictHostKeyChecking=no -l $1 localhost
 expect "*: "
 send -s "$userpw\r"
 expect "*$ "
@@ -822,7 +822,7 @@ set timeout 30
 set send_slow {1 .1}
 match_max 100000
 
-spawn ssh -l $1 localhost
+spawn ssh -o StrictHostKeyChecking=no -l $1 localhost
 expect "*: "
 send -s "$userpw\r"
 expect "*$ "
