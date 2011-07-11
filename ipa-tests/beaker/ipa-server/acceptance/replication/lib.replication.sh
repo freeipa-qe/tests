@@ -613,3 +613,54 @@ check_deletedhbac()
 	rlPhaseEnd
 }
 
+################################
+# hbac service section
+################################
+service1="rlogin"
+add_hbac_service()
+{
+	rlPhaseStartTest "add hbac service"
+		rlRun "addHBACService $service1 $service1" 0 "Adding HBAC service $service1."
+		rlRun "findHBACService $service1" 0 "Verifying HBAC service $service1 is found."
+		rlRun "verifyHBACService $service1 \"Service name\" $service1" 0 "Verify New Service name"
+		rlRun "verifyHBACService $service1 \"Description\" $service1" 0 "Verify New Service Description"
+	rlPhaseEnd
+}
+
+check_hbac_service()
+{
+	rlPhaseStartTest "check hbac service"
+		rlRun "findHBACService $service1" 0 "Verifying HBAC service $service1 is found."
+	rlPhaseEnd
+
+}
+
+mod_hbac_service()
+{
+    rlPhaseStartTest "Modify hbac-service Description with --desc"
+        rlRun "modifyHBACService $service1 desc \"Newer Description\"" 0 "Modify with --desc service description"
+        rlRun "verifyHBACService $service1 Description \"Newer Description\"" 0 "Verify New Service Description"
+    rlPhaseEnd
+}
+
+check_modifiedhbacservice()
+{
+    rlPhaseStartTest "Check modified hbac-service Description with --desc"
+        rlRun "verifyHBACService $service1 Description \"Newer Description\"" 0 "Verify New Service Description"
+    rlPhaseEnd
+}
+
+delete_hbac_service()
+{
+    rlPhaseStartTest "delete hbac serivce $service1"
+	rlRun "deleteHBACService $service1" 0 "CLEANUP: Deleting service $service1"
+    rlPhaseEnd
+}
+
+check_deletedhbacservice()
+{
+	rlPhaseStartTest "check hbac service is removed"
+		rlRun "findHBACService $service1" 1 "Verifying HBAC service $service1 is not found."
+	rlPhaseEnd
+}
+
