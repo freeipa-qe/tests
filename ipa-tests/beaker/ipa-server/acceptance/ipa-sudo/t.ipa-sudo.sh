@@ -2346,9 +2346,9 @@ rlPhaseStartTest "Clean up for sudo sanity tests"
 	rlRun "kdestroy" 0 "Destroying admin credentials."
 
 	# disabling NIS
-	rlRun "echo -n Secret123 > $TmpDir/passwd.txt"
-	rlRun "ipa-nis-manage -y $TmpDir/passwd.txt disable"
-	rlRun "ipactl restart"
+	#rlRun "echo -n Secret123 > $TmpDir/passwd.txt"
+	#rlRun "ipa-nis-manage -y $TmpDir/passwd.txt disable"
+	#rlRun "ipactl restart"
 
         rlRun "popd"
         rlRun "rm -r $TmpDir" 0 "Removing tmp directory"

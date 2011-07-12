@@ -100,8 +100,7 @@ bindpw="bind123"
 
 PACKAGE1="ipa-admintools"
 PACKAGE2="ipa-client"
-BASE=`hostname -f | sed 's/\./,dc=/g' | cut -d "," -f 2,3,4,5,6,7,8,9,10`
-DSINST=`hostname -f | sed 's/\./-/g' | cut -d "-" -f 2,3,4,5,6,7,8,9,10 | tr "[a-z]" "[A-Z]"`
+basedn=`getBaseDN`
 
 func_setup() {
 rlPhaseStartTest "Setup for sudo functional tests"
@@ -127,20 +126,22 @@ rlPhaseStartTest "Setup for sudo functional tests"
         rlRun "create_ipauser $user3 $user3 $user3 $userpw"
         rlRun "TmpDir=\`mktemp -d\`" 0 "Creating tmp directory"
         rlRun "pushd $TmpDir"
-	
+
+	# Add the machine with the hostname in $1 to the sshknown hosts file.
+	AddToKnownHosts $MASTER	
         # stopping firewall
         rlRun "service iptables stop"
 
         # enabling NIS
-        rlRun "echo -n Secret123 > $TmpDir/passwd.txt"
-        rlLog "Verifying bug https://bugzilla.redhat.com/show_bug.cgi?id=707133"
-        rlRun "ipa-nis-manage -y $TmpDir/passwd.txt enable"
-        rlRun "ipactl restart"
+#        rlRun "echo -n Secret123 > $TmpDir/passwd.txt"
+#        rlLog "Verifying bug https://bugzilla.redhat.com/show_bug.cgi?id=707133"
+#        rlRun "ipa-nis-manage -y $TmpDir/passwd.txt enable"
+#        rlRun "ipactl restart"
 
 cat > /etc/nss_ldap.conf << EOF
 bind_policy soft
-sudoers_base ou=SUDOers,$BASE
-binddn uid=sudo,cn=sysaccounts,cn=etc,$BASE
+sudoers_base ou=SUDOers,$basedn
+binddn uid=sudo,cn=sysaccounts,cn=etc,$basedn
 bindpw $bindpw
 ssl no
 
@@ -149,9 +150,9 @@ tls_checkpeer yes
 bind_timelimit 5
 timelimit 15
 sudoers_debug 5
-BASE cn=ng,cn=alt,$BASE
+BASE cn=ng,cn=alt,$basedn
 TLS_CACERTDIR /etc/ipa
-uri ldap://$HOSTNAME
+uri ldap://$MASTER
 EOF
 
 	rlRun "LDAPTLS_CACERT=/etc/ipa/ca.crt"
@@ -161,7 +162,7 @@ cat > $TmpDir/bindchpwd.exp << EOF
 #!/usr/bin/expect
 
 set timeout 30
-spawn /usr/bin/ldappasswd -S -W -h $HOSTNAME -ZZ -D "$ROOTDN" uid=sudo,cn=sysaccounts,cn=etc,$BASE
+spawn /usr/bin/ldappasswd -S -W -h $MASTER -ZZ -D "$ROOTDN" uid=sudo,cn=sysaccounts,cn=etc,$basedn
 match_max 100000
 expect "*: "
 send -- "$bindpw\r"
@@ -180,7 +181,7 @@ EOF
 	rlRun "$TmpDir/bindchpwd.exp" 0 "Setting sudo binddn password"
 
 	rlLog "Verifying bug https://bugzilla.redhat.com/show_bug.cgi?id=712109"
-	rlAssertNotGrep "Entry \"uid=sudo,cn=sysaccounts,cn=etc,$BASE\" -- attribute \"krbExtraData\" not allowed" "/var/log/dirsrv/slapd-$RELM/errors"
+	rlAssertNotGrep "Entry \"uid=sudo,cn=sysaccounts,cn=etc,$basedn\" -- attribute \"krbExtraData\" not allowed" "/var/log/dirsrv/slapd-$RELM/errors"
 	rlFileRestore /var/log/dirsrv/slapd-$RELM/errors
 
 	rlAssertNotGrep "sudoers" "/etc/nsswitch.conf"
@@ -209,7 +210,7 @@ rlPhaseStartTest "Bug 711786: sudorunasgroup automatically picks up incorrect va
 	rlRun "ipa user-add shanks --first=shanks --last=r"
 	rlRun "ipa sudorule-add rule1"
 	rlRun "ipa sudorule-add-runasuser rule1 --users=shanks"
-	rlRun "/usr/bin/ldapsearch -x -h localhost -D \"$ROOTDN\" -w $ROOTDNPWD -b cn=rule1,ou=sudoers,$BASE > $TmpDir/bug711786.ldif"
+	rlRun "/usr/bin/ldapsearch -x -h $MASTER -D \"$ROOTDN\" -w $ROOTDNPWD -b cn=rule1,ou=sudoers,$basedn > $TmpDir/bug711786.ldif"
 
 	rlAssertNotGrep "sudorunasgroup: shanks r" "$TmpDir/bug711786.ldif"
 	rlRun "cat $TmpDir/bug711786.ldif"
@@ -237,7 +238,7 @@ set timeout 30
 set send_slow {1 .1}
 match_max 100000
 
-spawn ssh -o StrictHostKeyChecking=no -l $1 localhost
+spawn ssh -o StrictHostKeyChecking=no -l $1 $MASTER
 expect "*: "
 send -s "$userpw\r"
 expect "*$ "
@@ -265,7 +266,7 @@ set timeout 30
 set send_slow {1 .1}
 match_max 100000
 
-spawn ssh -o StrictHostKeyChecking=no -l $1 localhost
+spawn ssh -o StrictHostKeyChecking=no -l $1 $MASTER
 expect "*: "
 send -s "$userpw\r"
 expect "*$ "
@@ -295,14 +296,14 @@ cat $sudoout
 	rlRun "ipa sudocmdgroup-add sudogrp1 --desc=sudogrp1"
 	rlRun "ipa sudocmdgroup-add-member sudogrp1 --sudocmds=/bin/date,/bin/touch,/bin/uname"
 	rlRun "ipa sudorule-add sudorule1"
-	rlRun "ipa sudorule-add-host  sudorule1 --hosts=$HOSTNAME"
+	rlRun "ipa sudorule-add-host  sudorule1 --hosts=$MASTER"
 	rlRun "ipa sudorule-add-user sudorule1 --users=user1"
 
 	rlRun "ipa sudorule-add-allow-command --sudocmds=/bin/mkdir sudorule1"
         rlRun "sudo_list user1"
 	rlAssertGrep "sudo: user_matches=1" "$sudoout"
 	rlAssertGrep "sudo: host_matches=1" "$sudoout"
-	rlAssertGrep "sudo: ldap sudoHost '$HOSTNAME' ... MATCH" "$sudoout"
+	rlAssertGrep "sudo: ldap sudoHost '$MASTER' ... MATCH" "$sudoout"
 	rlAssertGrep "User user1 may run the following commands on this host:" "$sudoout"
 	rlAssertGrep "(root) /bin/mkdir" "$sudoout"
 	rlRun "cat $sudoout"
@@ -320,7 +321,7 @@ rlPhaseStartTest "sudorule-add-allow-commandgrp_001: Add command groups availabl
         rlRun "sudo_list user1"
 	rlAssertGrep "sudo: user_matches=1" "$sudoout"
 	rlAssertGrep "sudo: host_matches=1" "$sudoout"
-	rlAssertGrep "sudo: ldap sudoHost '$HOSTNAME' ... MATCH" "$sudoout"
+	rlAssertGrep "sudo: ldap sudoHost '$MASTER' ... MATCH" "$sudoout"
 	rlAssertGrep "User user1 may run the following commands on this host:" "$sudoout"
 	rlAssertGrep "(root) /bin/mkdir" "$sudoout"
 	rlRun "cat $sudoout"
@@ -339,7 +340,7 @@ rlPhaseStartTest "sudorule-remove-allow-command_001: Remove commands available f
         rlRun "sudo_list user1"
 	rlAssertGrep "sudo: user_matches=1" "$sudoout"
 	rlAssertGrep "sudo: host_matches=1" "$sudoout"
-	rlAssertGrep "sudo: ldap sudoHost '$HOSTNAME' ... MATCH" "$sudoout"
+	rlAssertGrep "sudo: ldap sudoHost '$MASTER' ... MATCH" "$sudoout"
 	rlAssertNotGrep "/bin/mkdir" "$sudoout"
 	rlRun "cat $sudoout"
 
@@ -357,7 +358,7 @@ rlPhaseStartTest "sudorule-remove-allow-commandgrp_001: Remove command groups av
         rlRun "sudo_list user1"
 	rlAssertGrep "sudo: user_matches=1" "$sudoout"
 	rlAssertGrep "sudo: host_matches=1" "$sudoout"
-	rlAssertGrep "sudo: ldap sudoHost '$HOSTNAME' ... MATCH" "$sudoout"
+	rlAssertGrep "sudo: ldap sudoHost '$MASTER' ... MATCH" "$sudoout"
 	rlAssertNotGrep "/bin/mkdir" "$sudoout"
 	rlRun "cat $sudoout"
 
@@ -377,7 +378,7 @@ rlPhaseStartTest "sudorule-add-deny-command_001: Deny commands available for sud
         rlRun "sudo_list user1"
 	rlAssertGrep "sudo: user_matches=1" "$sudoout"
 	rlAssertGrep "sudo: host_matches=1" "$sudoout"
-	rlAssertGrep "sudo: ldap sudoHost '$HOSTNAME' ... MATCH" "$sudoout"
+	rlAssertGrep "sudo: ldap sudoHost '$MASTER' ... MATCH" "$sudoout"
 	rlAssertGrep "User user1 may run the following commands on this host:" "$sudoout"
 	rlAssertGrep "(root) !/bin/mkdir" "$sudoout"
 	rlRun "cat $sudoout"
@@ -397,7 +398,7 @@ rlPhaseStartTest "sudorule-remove-deny-command_001: Deny commands removed from s
         rlRun "sudo_list user1"
         rlAssertGrep "sudo: user_matches=1" "$sudoout"
         rlAssertGrep "sudo: host_matches=1" "$sudoout"
-        rlAssertGrep "sudo: ldap sudoHost '$HOSTNAME' ... MATCH" "$sudoout"
+        rlAssertGrep "sudo: ldap sudoHost '$MASTER' ... MATCH" "$sudoout"
         rlAssertNotGrep "(root) !/bin/mkdir" "$sudoout"
         rlRun "cat $sudoout"
 
@@ -416,7 +417,7 @@ rlPhaseStartTest "sudorule-add-deny-commandgrp_001: Deny command groups availabl
         rlRun "sudo_list user1"
 	rlAssertGrep "sudo: user_matches=1" "$sudoout"
 	rlAssertGrep "sudo: host_matches=1" "$sudoout"
-	rlAssertGrep "sudo: ldap sudoHost '$HOSTNAME' ... MATCH" "$sudoout"
+	rlAssertGrep "sudo: ldap sudoHost '$MASTER' ... MATCH" "$sudoout"
 	rlAssertGrep "User user1 may run the following commands on this host:" "$sudoout"
 	rlAssertGrep "(root) !/bin/date, !/bin/touch, !/bin/uname" "$sudoout"
 	rlRun "cat $sudoout"
@@ -436,7 +437,7 @@ rlPhaseStartTest "sudorule-remove-deny-commandgrp_001: Remove denied command gro
         rlRun "sudo_list user1"
 	rlAssertGrep "sudo: user_matches=1" "$sudoout"
 	rlAssertGrep "sudo: host_matches=1" "$sudoout"
-	rlAssertGrep "sudo: ldap sudoHost '$HOSTNAME' ... MATCH" "$sudoout"
+	rlAssertGrep "sudo: ldap sudoHost '$MASTER' ... MATCH" "$sudoout"
 	rlAssertNotGrep "(root) !/bin/mkdir" "$sudoout"
 	rlRun "cat $sudoout"
 
@@ -486,8 +487,8 @@ rlPhaseStartTest "sudorule-add-hostgrp_001: Adding hostgroup and verifying from 
 	domain=`hostname -d`
 	rlRun "domainname $domain"
 	rlRun "ipa hostgroup-add hostgrp1 --desc=test_hostgrp"
-	rlRun "ipa sudorule-remove-host sudorule1 --hosts=$HOSTNAME"
-	rlRun "ipa hostgroup-add-member hostgrp1 --hosts=$HOSTNAME"
+	rlRun "ipa sudorule-remove-host sudorule1 --hosts=$MASTER"
+	rlRun "ipa hostgroup-add-member hostgrp1 --hosts=$MASTER"
 
 	rlRun "ipa sudorule-add-host sudorule1 --hostgroup=hostgrp1"
 	rlRun "rm -fr /var/lib/sss/db/cache_*"
@@ -517,7 +518,7 @@ rlPhaseStartTest "sudorule-remove-hostgrp_001: Removing hostgroup and verifying 
         rlRun "sudo_list user1"
         rlAssertNotGrep "sudo: ldap sudoHost '+hostgrp1' ... MATCH" "$sudoout"
         
-	rlRun "ipa sudorule-add-host sudorule1 --hosts=$HOSTNAME"
+	rlRun "ipa sudorule-add-host sudorule1 --hosts=$MASTER"
         rlRun "rm -fr $sudoout"
 
 rlPhaseEnd
@@ -760,7 +761,7 @@ cat > $TmpDir/sudo_list.exp << EOF
 set timeout 30
 set send_slow {1 .1}
 match_max 100000
-spawn ssh -o StrictHostKeyChecking=no -l $1 localhost
+spawn ssh -o StrictHostKeyChecking=no -l $1 $MASTER
 expect "*: "
 send -s "$userpw\r"
 expect "*$ "
@@ -822,7 +823,7 @@ set timeout 30
 set send_slow {1 .1}
 match_max 100000
 
-spawn ssh -o StrictHostKeyChecking=no -l $1 localhost
+spawn ssh -o StrictHostKeyChecking=no -l $1 $MASTER
 expect "*: "
 send -s "$userpw\r"
 expect "*$ "
