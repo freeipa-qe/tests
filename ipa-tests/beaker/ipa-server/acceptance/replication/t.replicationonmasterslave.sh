@@ -330,6 +330,8 @@ add_objects()
 	add_hbac_service
 
    # Add a permission
+	add_permission
+
    # Add a privilege
    # Add a group password policy
    # Add a role
@@ -356,6 +358,7 @@ check_objects()
    check_dns
    check_hbac
    check_hbac_service
+   check_permission
 }
 
 update_objects()
@@ -369,8 +372,8 @@ update_objects()
    modify_newservice
    modify_hbac
    modify_hbac_service
+   modify_permission
 }
-
 
 check_updated_objects()
 {
@@ -383,6 +386,7 @@ check_updated_objects()
    check_modifiedservice
    check_modifiedhbac
    check_modifiedhbacservice
+   check_modifiedpermission
 }
 
 
@@ -398,6 +402,7 @@ delete_objects()
    delete_dns
    delete_hbac
    delete_hbac_service
+   delete_permission
 }
 
 check_deletedobjects()
@@ -412,4 +417,5 @@ check_deletedobjects()
    check_deleteddns
    check_deletedhbac
    check_deletedhbacservice
+   check_deletedpermission
 }

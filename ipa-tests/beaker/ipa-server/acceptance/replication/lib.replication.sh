@@ -664,3 +664,47 @@ check_deletedhbacservice()
 	rlPhaseEnd
 }
 
+################################
+# permission section
+################################
+puser1="puser"
+add_permission()
+{
+	rlPhaseStartTest "add a user, and add a permission to that user"
+		rlRun "ipa user-add --first=$puser1 --last=$puser1 $puser1" 0 "SETUP: Adding user $puser1."		
+		rlRun "ipa permission-add $puser1 --type=user --permissions=delete"
+	rlPhaseEnd
+}
+check_permission()
+{
+	rlPhaseStartTest "check to ensure that the permission exists"
+		rlRun "ipa permission-show $puser1 | grep delete" 0 "checking to make sure that the permission got installed on the user"		
+	rlPhaseEnd
+}
+mod_permission()
+{
+	rlPhaseStartTest "mod puser1's permissions"
+		rlRun "ipa permission-mod $puser1 --type=user --permissions=add"
+	rlPhaseEnd
+}
+check_modpermission()
+{
+	rlPhaseStartTest "check to ensure that the permission has been modified"
+		rlRun "ipa permission-show $puser1 | grep add" 0 "checking to make sure that the permission got installed on the user"		
+	rlPhaseEnd
+}
+
+delete_permission()
+{
+	rlPhaseStartTest "add a user, and add a permission to that user"
+		rlRun "ipa permission-del $puser1" 0 " deleting the permission for $puser1"
+		rlRun "ipa user-del $user1" 0 "deleting user $user1."			
+	rlPhaseEnd
+}
+check_deletedpermission()
+{
+	rlPhaseStartTest "add a user, and add a permission to that user"
+		rlRun "ipa permission-show $puser1 | grep add" 1 "checking to make sure that the permission is not arund any more"
+		rlRun "ipa user-find $puser" 1 "making sure that the user is gone"
+	rlPhaseEnd
+}
