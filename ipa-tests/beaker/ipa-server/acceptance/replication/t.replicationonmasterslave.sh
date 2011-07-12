@@ -337,7 +337,7 @@ add_objects()
    # Add a SUDO rule
    # Add a sudo command group
    # Add a sudo command
-
+   # Add or modify a config value
 
 }
 
