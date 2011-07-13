@@ -8,9 +8,10 @@
 			<run>
 			    <include name="setup" />
 			    <include name="init" />
-				<include name="hostForceAddFQDNTests" />
-				<include name="hostDeleteTests" />
-				<!--
+			    <include name="invalidhostAddTests" />
+			    <!--
+				<include name="addHostTests" />
+				<include name="deleteHostTests" />
 				<include name="teardown"/>
 				-->
 			</run>

@@ -31,22 +31,24 @@ public class HostTests extends SahiTestScript{
 	/*
 	 * Force add hosts - for positive tests
 	 */
-	@Test (groups={"hostForceAddFQDNTests"}, dataProvider="getHostFQDNTestObjects")	
-	public void testHostForceAddFQDN(String testName, String fqdn) throws Exception {
+	@Test (groups={"addHostTests"}, dataProvider="getHostTestObjects")	
+	public void testHostForceAdd(String testName, String fqdn, String ipadr) throws Exception {
 		//verify host doesn't exist
 		com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(fqdn).exists(), "Verify host " + fqdn + " doesn't already exist");
 		
 		//add new host
-		HostTasks.forceCreateHostFQDN(sahiTasks, fqdn);
+		HostTasks.addHost(sahiTasks, fqdn, ipadr);
 		
+		String lowerdn = fqdn.toLowerCase();
+
 		//verify host was added
-		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(fqdn).exists(), "Added host " + fqdn + "  successfully");
+		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(lowerdn).exists(), "Added host " + fqdn + "  successfully");
 	}
 	
 	/*
 	 * delete hosts
 	 */
-	@Test (groups={"hostDeleteTests"}, dataProvider="getHostDeleteTestObjects")	
+	@Test (groups={"deleteHostTests"}, dataProvider="getHostDeleteTestObjects",  dependsOnGroups="addHostTests")	
 	public void testHostDelete(String testName, String fqdn) throws Exception {
 		//verify host exists
 		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(fqdn).exists(), "Verify host " + fqdn + " already exist");
@@ -61,10 +63,10 @@ public class HostTests extends SahiTestScript{
 	/*
 	 * Add host - for negative tests
 	 */
-	@Test (groups={"invalidhostForceAddTests"}, dataProvider="getInvalidHostTestObjects",  dependsOnGroups="hostAddTests")	
-	public void testInvalidUseradd(String testName, String hostname, String domain, String fqdn, String ipadr, String expectedError) throws Exception {
+	@Test (groups={"invalidhostAddTests"}, dataProvider="getInvalidHostTestObjects")	
+	public void testInvalidHostadd(String testName, String hostname, String ipadr, String expectedError) throws Exception {
 		//new test user can be added now
-		HostTasks.createInvalidHostForce(sahiTasks, hostname, domain, ipadr, expectedError);		
+		HostTasks.addInvalidHost(sahiTasks, hostname, ipadr, expectedError);
 	}
 	
 	/*******************************************************
@@ -74,35 +76,17 @@ public class HostTests extends SahiTestScript{
 	/*
 	 * Data to be used when adding hosts - for positive cases
 	 */
-	@DataProvider(name="getHostFQDNTestObjects")
-	public Object[][] getHostFQDNTestObjects() {
-		return TestNGUtils.convertListOfListsTo2dArray(createHostFQDNTestObjects());
-	}
-	protected List<List<Object>> createHostFQDNTestObjects() {		
-		List<List<Object>> ll = new ArrayList<List<Object>>();
-		
-        //										testname					fqdn				
-		ll.add(Arrays.asList(new Object[]{ "create_host_lowercase",		"myhost1.testrelm"} ));
-		ll.add(Arrays.asList(new Object[]{ "create_host_uppercase",		"myhost2.testrelm"} ));
-		ll.add(Arrays.asList(new Object[]{ "create_host_mixedcase",		"myhost3.testrelm"} ));
-		        
-		return ll;	
-	}
-	
-	/*
-	 * Data to be used when adding hosts - for positive cases - none FQDN
-	 */
 	@DataProvider(name="getHostTestObjects")
-	public Object[][] getHostTestObjects() {
+	public Object[][] getHostFQDNTestObjects() {
 		return TestNGUtils.convertListOfListsTo2dArray(createHostTestObjects());
 	}
 	protected List<List<Object>> createHostTestObjects() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-        //										testname					hostname        domain			fqdn				
-		ll.add(Arrays.asList(new Object[]{ "create_host_lowercase",			"myhost1", 		"testrelm",		"myhost1.testrelm"} ));
-		ll.add(Arrays.asList(new Object[]{ "create_host_uppercase",			"MYHOST2", 		"testrelm",		"myhost2.testrelm"} ));
-		ll.add(Arrays.asList(new Object[]{ "create_host_mixedcase",			"mYHost3", 		"testrelm",		"myhost3.testrelm"} ));
+        //										testname					fqdn				ipadr
+		ll.add(Arrays.asList(new Object[]{ "create_host_lowercase",		"myhost1.testrelm",		"" } ));
+		ll.add(Arrays.asList(new Object[]{ "create_host_uppercase",		"MYHOST2.TESTRELM",		"" } ));
+		ll.add(Arrays.asList(new Object[]{ "create_host_mixedcase",		"MyHost3.testrelm", 	"" } ));
 		        
 		return ll;	
 	}
@@ -117,10 +101,10 @@ public class HostTests extends SahiTestScript{
 	protected List<List<Object>> createHostDeleteTestObjects() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-        //										testname				fqdn				
-		ll.add(Arrays.asList(new Object[]{ "delete_host_lowercase",		"myhost1.testrelm"} ));
-		ll.add(Arrays.asList(new Object[]{ "create_host_uppercase",		"myhost2.testrelm"} ));
-		ll.add(Arrays.asList(new Object[]{ "create_host_mixedcase",		"myhost3.testrelm"} ));
+        //										testname				fqdn		
+		ll.add(Arrays.asList(new Object[]{ "delete_host_lowercase",		"myhost1.testrelm" } ));
+		ll.add(Arrays.asList(new Object[]{ "create_host_uppercase",		"myhost2.testrelm" } ));
+		ll.add(Arrays.asList(new Object[]{ "create_host_mixedcase",		"myhost3.testrelm" } ));
 		        
 		return ll;	
 	}
@@ -135,9 +119,10 @@ public class HostTests extends SahiTestScript{
 	protected List<List<Object>> createInvalidHostTestObjects() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-        //										testname					hostname        domain			fqdn			ipadr   expectedError
-		ll.add(Arrays.asList(new Object[]{ "missing_domain_name",			"myhost1", 		"",				"myhost1",		"",		"invalid 'hostname': Fully-qualified hostname required"		} ));
-		ll.add(Arrays.asList(new Object[]{ "missing_hostname",				"", 			"testrelm",		"testrelm",		"",		"invalid 'hostname': Fully-qualified hostname required"		} ));	        
+        //										testname					hostname        ipadr   		expectedError
+		ll.add(Arrays.asList(new Object[]{ "missing_host_and_domain",		"myhost1", 		"",				"invalid 'hostname': Fully-qualified hostname required"		} ));
+		ll.add(Arrays.asList(new Object[]{ "missing_domain_name",			"myhost1.", 	"",				"invalid 'hostname': Fully-qualified hostname required"		} ));
+		ll.add(Arrays.asList(new Object[]{ "missing_hostname",				".testrelm", 	"",				"invalid 'hostname': Fully-qualified hostname required"		} ));	        
 		return ll;	
 	}
 }
