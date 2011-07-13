@@ -11,43 +11,39 @@ public class HostTasks {
 	/*
 	 * Create a host without dns records defined.
 	 * @param sahiTasks 
-	 * @param hostname - shortname
-	 * @param domain - domain name
+	 * @param hostname - hostname
+	 * @param ipadr -  ipaddress
 	 */
-	public static void forceCreateHost(SahiTasks sahiTasks, String hostname, String domain) {
+	public static void addHost(SahiTasks sahiTasks, String fqdn, String ipadr) {
 		sahiTasks.link("Add").click();
-		sahiTasks.textbox("Host Name:").setValue(hostname);
-		//sahiTasks.textbox() - need to add selecting correct domain from list
-		sahiTasks.checkbox("Force:").click();
-		sahiTasks.button("Add").click();
-	}
-	
-	/*
-	 * Create a host without dns records defined.
-	 * @param sahiTasks 
-	 * @param fqdn - fully qualified hostname
-	 */
-	public static void forceCreateHostFQDN(SahiTasks sahiTasks, String fqdn) {
-		sahiTasks.link("Add").click();
-		sahiTasks.textbox("Host name").setValue(fqdn);
-		//sahiTasks.textbox("Host name").near(sahiTasks.label("Host Name:")).setValue(fqdn);
-		sahiTasks.checkbox("force").click();
+		sahiTasks.isVisible(sahiTasks.textbox("fqdn"), true);
+		sahiTasks.textbox("fqdn").near(sahiTasks.label("Host Name: ")).setValue(fqdn);
+		if(ipadr == null){ 
+			sahiTasks.checkbox("force").near(sahiTasks.label("Force:")).click();
+		}
+		if (ipadr != null){
+			sahiTasks.textbox("ip_address").setValue(ipadr);
+		}
+		//sahiTasks.checkbox("force").click();
 		sahiTasks.button("Add").click();
 	}
 	
 	/*
 	 * Create a new invalid host.
 	 * @param sahiTasks 
-	 * @param hostname - shortname
-	 * @param domain - domain name
+	 * @param hostname - hostname
 	 * @param ipadr - ip address for the host
 	 * @param expectedError - the error thrown when an invalid host is being attempted to be added
 	 */
-	public static void createInvalidHostForce(SahiTasks sahiTasks, String hostname, String domain, String ipadr, String expectedError) {
+	public static void addInvalidHost(SahiTasks sahiTasks, String hostname, String ipadr, String expectedError) {
 		sahiTasks.link("Add").click();
-		sahiTasks.select("fqdn-entity-select").choose(domain);
-		sahiTasks.textbox("Host name").near(sahiTasks.label("Host Name:")).setValue(hostname);
-		sahiTasks.checkbox("force").near(sahiTasks.label("Force:")).click();
+		sahiTasks.textbox("fqdn").near(sahiTasks.label("Host Name:")).setValue(hostname);
+		if(ipadr == null){ 
+			sahiTasks.checkbox("force").near(sahiTasks.label("Force:")).click();
+		}
+		if (ipadr != null){
+			sahiTasks.textbox("ip_address").setValue(ipadr);
+		}
 		sahiTasks.button("Add").click();
 		//Check for expected error
 		log.fine("error check");
@@ -65,7 +61,8 @@ public class HostTasks {
 	 * @param fqdn - the fqdn of the host to be deleted
 	 */
 	public static void deleteHost(SahiTasks sahiTasks, String fqdn) {
-		sahiTasks.checkbox(fqdn).click();
+		String lowerdn = fqdn.toLowerCase();
+		sahiTasks.checkbox(lowerdn).click();
 		sahiTasks.link("Delete").click();
 		sahiTasks.button("Delete").click();
 	}
