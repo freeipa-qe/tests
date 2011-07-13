@@ -301,6 +301,13 @@ rlJournalStart
     rlPhaseStartTest "ipa-user-cli-mod-037: setattr nsAccountLock"
 	for item in TRUE FALSE True False true false ; do
         	rlRun "ipa user-mod --setattr nsAccountLock=$item $superuser" 0 "Set user nsAccountLock to true"
+		caseitem=`echo $item | tr "[A-Z]" "[a-z]"`
+		if [[ "$caseitem" == "true" ]]	; then
+			item="True"
+		else
+			item="False"
+		fi
+		rlLog "Checking nsAccountLock value : $item"
 		rlRun "verifyUserAttr $superuser \"Account disabled\" $item" 0 "Verify user's nsAccountLock"
 	done
     rlPhaseEnd
