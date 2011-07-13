@@ -116,7 +116,7 @@ rlJournalStart
         if [ $? -ne 0 ];then
             rlFail "ERROR - ipa user-disable failed "
         else
-            rlRun "verifyUserAttr $lusr \"Account disabled\" TRUE" 0 "Verify user's account disabled status"
+            rlRun "verifyUserAttr $lusr \"Account disabled\" True" 0 "Verify user's account disabled status"
             kinitAs $lusr $lusrpw
             if [ $? -ne 0 ];then
                 rlPass "kinit as $lusr failed as expected"
@@ -138,7 +138,7 @@ rlJournalStart
         if [ $? -ne 0 ];then
             rlFail "ERROR - ipa user-enable failed "
         else
-	    rlRun "verifyUserAttr $lusr \"Account disabled\" FALSE" 0 "Verify user's account disabled status"
+	    rlRun "verifyUserAttr $lusr \"Account disabled\" False" 0 "Verify user's account disabled status"
             kinitAs $lusr $lusrpw
             if [ $? -ne 0 ];then
                 rlFail "ERROR - kinit as $lusr failed after unlock. expect success "
@@ -156,7 +156,7 @@ rlJournalStart
 	rlRun "cat $tmpfile | grep \"Last name: $superuserlast\"" 0 "Verify Last name"
 	rlRun "cat $tmpfile | grep \"Home directory: /home/$lusr\"" 0 "Verify home directory"
 	rlRun "cat $tmpfile | grep \"Login shell: /bin/sh\"" 0 "Verify Login shell"
-	rlRun "cat $tmpfile | grep \"Account disabled: FALSE\"" 0 "Verify account status"
+	rlRun "cat $tmpfile | grep \"Account disabled: False\"" 0 "Verify account status"
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-user-cli-add-008: Unlock an unlocked user"
