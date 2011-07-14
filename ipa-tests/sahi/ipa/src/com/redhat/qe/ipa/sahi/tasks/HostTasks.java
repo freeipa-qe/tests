@@ -29,6 +29,44 @@ public class HostTasks {
 	}
 	
 	/*
+	 * Add and Edit a host
+	 * @param sahiTasks 
+	 * @param hostname - hostname
+	 * @param ipadr -  ipaddress
+	 * @param description - description for host
+	 */
+	public static void addHostAndEdit(SahiTasks sahiTasks, String hostname, String ipadr, String description, String otp) {
+		sahiTasks.link("Add").click();
+		sahiTasks.isVisible(sahiTasks.textbox("fqdn"), true);
+		sahiTasks.textbox("fqdn").near(sahiTasks.label("Host Name: ")).setValue(hostname);
+		if(ipadr == ""){ 
+			sahiTasks.checkbox("force").near(sahiTasks.label("Force:")).click();
+		}
+		if (ipadr != ""){
+			sahiTasks.textbox("ip_address").setValue(ipadr);
+		}
+		sahiTasks.button("Add and Edit").click();
+		sahiTasks.textbox("enroll").setValue(otp);
+		sahiTasks.textbox("description").setValue(description);
+		sahiTasks.button("Update").click();
+		sahiTasks.button("Hosts").click();
+	}
+	
+	/*
+	 * Add and Edit a host
+	 * @param sahiTasks 
+	 * @param hostname - hostname
+	 * @param ipadr -  ipaddress
+	 * @param description - description for host
+	 */
+	public static void verifyHost(SahiTasks sahiTasks, String hostname, String description, String otp) {
+		sahiTasks.link(hostname).click();
+		sahiTasks.containsText(sahiTasks.textbox("description"), description);
+		sahiTasks.containsText(sahiTasks.textbox("enroll"), otp);
+		sahiTasks.button("Hosts").click();
+	}
+	
+	/*
 	 * Create a new invalid host.
 	 * @param sahiTasks 
 	 * @param hostname - hostname
