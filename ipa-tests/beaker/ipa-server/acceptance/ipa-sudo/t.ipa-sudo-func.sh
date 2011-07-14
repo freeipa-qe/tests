@@ -223,7 +223,7 @@ rlPhaseEnd
 
 sudorule-add-allow-command_func001() {
 
-rlPhaseStartTest "sudorule-add-allow-command_001: Allowed commands available from sudo client"
+rlPhaseStartTest "sudorule-add-allow-command_func001: Allowed commands available from sudo client"
 
 #set up for fcuntional tests
 
@@ -315,7 +315,7 @@ rlPhaseEnd
 
 sudorule-add-allow-commandgrp_func001() {
 
-rlPhaseStartTest "sudorule-add-allow-commandgrp_001: Add command groups available for sudo client"
+rlPhaseStartTest "sudorule-add-allow-commandgrp_func001: Add command groups available for sudo client"
 
 	rlRun "ipa sudorule-add-allow-command --sudocmdgroups=sudogrp1 sudorule1"
         rlRun "sudo_list user1"
@@ -334,7 +334,7 @@ rlPhaseEnd
 
 sudorule-remove-allow-command_func001() {
 
-rlPhaseStartTest "sudorule-remove-allow-command_001: Remove commands available from sudo client"
+rlPhaseStartTest "sudorule-remove-allow-command_func001: Remove commands available from sudo client"
 
 	rlRun "ipa sudorule-remove-allow-command --sudocmds=/bin/mkdir sudorule1"
         rlRun "sudo_list user1"
@@ -352,7 +352,7 @@ rlPhaseEnd
 
 sudorule-remove-allow-commandgrp_func001() {
 
-rlPhaseStartTest "sudorule-remove-allow-commandgrp_001: Remove command groups available from sudo client"
+rlPhaseStartTest "sudorule-remove-allow-commandgrp_func001: Remove command groups available from sudo client"
 
 	rlRun "ipa sudorule-remove-allow-command --sudocmdgroups=sudogrp1 sudorule1"
         rlRun "sudo_list user1"
@@ -370,7 +370,7 @@ rlPhaseEnd
 
 sudorule-add-deny-command_func001() {
 
-rlPhaseStartTest "sudorule-add-deny-command_001: Deny commands available for sudo client"
+rlPhaseStartTest "sudorule-add-deny-command_func001: Deny commands available for sudo client"
 
         rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 
@@ -390,7 +390,7 @@ rlPhaseEnd
 
 sudorule-remove-deny-command_func001() {
 
-rlPhaseStartTest "sudorule-remove-deny-command_001: Deny commands removed from sudo client"
+rlPhaseStartTest "sudorule-remove-deny-command_func001: Deny commands removed from sudo client"
 
         rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 
@@ -409,7 +409,7 @@ rlPhaseEnd
 
 sudorule-add-deny-commandgrp_func001() {
 
-rlPhaseStartTest "sudorule-add-deny-commandgrp_001: Deny command groups available for sudo client"
+rlPhaseStartTest "sudorule-add-deny-commandgrp_func001: Deny command groups available for sudo client"
 
         rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 
@@ -429,7 +429,7 @@ rlPhaseEnd
 
 sudorule-remove-deny-commandgrp_func001() {
 
-rlPhaseStartTest "sudorule-remove-deny-commandgrp_001: Remove denied command groups from sudo client"
+rlPhaseStartTest "sudorule-remove-deny-commandgrp_func001: Remove denied command groups from sudo client"
 
         rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 
@@ -448,7 +448,7 @@ rlPhaseEnd
 
 sudorule-add-host_func001() {
 
-rlPhaseStartTest "sudorule-add-host_001: Adding host and verifying from sudo client."
+rlPhaseStartTest "sudorule-add-host_func001: Adding host and verifying from sudo client."
 
 	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 
@@ -465,7 +465,7 @@ rlPhaseEnd
 
 sudorule-remove-host_func001() {
 
-rlPhaseStartTest "sudorule-remove-host_001: removing host and verifying from sudo client."
+rlPhaseStartTest "sudorule-remove-host_func001: removing host and verifying from sudo client."
 
 	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 
@@ -481,7 +481,7 @@ rlPhaseEnd
 
 sudorule-add-hostgrp_func001() {
 
-rlPhaseStartTest "sudorule-add-hostgrp_001: Adding hostgroup and verifying from sudo client."
+rlPhaseStartTest "sudorule-add-hostgrp_func001: Adding hostgroup and verifying from sudo client."
 
 	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 	domain=`hostname -d`
@@ -507,7 +507,7 @@ rlPhaseEnd
 
 sudorule-remove-hostgrp_func001() {
 
-rlPhaseStartTest "sudorule-remove-hostgrp_001: Removing hostgroup and verifying from sudo client."
+rlPhaseStartTest "sudorule-remove-hostgrp_func001: Removing hostgroup and verifying from sudo client."
 
         rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 	rlRun "ipa sudorule-remove-host sudorule1 --hostgroup=hostgrp1"
@@ -528,7 +528,7 @@ rlPhaseEnd
 
 sudorule-add-option_func001() {
 
-rlPhaseStartTest "sudorule-add-option_001: Adding sudo option /var/log/sudolog and verifying from sudo client."
+rlPhaseStartTest "sudorule-add-option_func001: Adding sudo option /var/log/sudolog and verifying from sudo client."
 
 	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 
@@ -545,7 +545,7 @@ rlPhaseEnd
 
 sudorule-add-option_func002() {
 
-rlPhaseStartTest "sudorule-add-option_002: Adding sudo option env_keep and verifying from sudo client."
+rlPhaseStartTest "sudorule-add-option_func002: Adding sudo option env_keep and verifying from sudo client."
 
 	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 
@@ -562,7 +562,7 @@ rlPhaseEnd
 
 sudorule-add-option_func003() {
 
-rlPhaseStartTest "sudorule-add-option_003: Adding sudo option !authenticate and verifying from sudo client."
+rlPhaseStartTest "sudorule-add-option_func003: Adding sudo option !authenticate and verifying from sudo client."
 
 	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 
@@ -578,7 +578,7 @@ rlPhaseEnd
 
 sudorule-remove-option_func001() {
 
-rlPhaseStartTest "sudorule-remove-option_001: Removing sudo option /var/log/sudolog and verifying from sudo client."
+rlPhaseStartTest "sudorule-remove-option_func001: Removing sudo option /var/log/sudolog and verifying from sudo client."
 
         rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 
@@ -595,7 +595,7 @@ rlPhaseEnd
 
 sudorule-remove-option_func002() {
 
-rlPhaseStartTest "sudorule-remove-option_002: Removing sudo option env_keep and verifying from sudo client."
+rlPhaseStartTest "sudorule-remove-option_func002: Removing sudo option env_keep and verifying from sudo client."
 
         rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 
@@ -611,7 +611,7 @@ rlPhaseEnd
 
 sudorule-remove-option_func003() {
 
-rlPhaseStartTest "sudorule-remove-option_003: Removing sudo option !authenticate and verifying from sudo client."
+rlPhaseStartTest "sudorule-remove-option_func003: Removing sudo option !authenticate and verifying from sudo client."
 
         rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 
@@ -627,7 +627,7 @@ rlPhaseEnd
 
 sudorule-add-runasuser_func001() {
 
-rlPhaseStartTest "sudorule-add-runasuser_001: Adding RunAs user and verifying from sudo client."
+rlPhaseStartTest "sudorule-add-runasuser_func001: Adding RunAs user and verifying from sudo client."
 
 	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
         rlRun "ipa sudorule-add-allow-command --sudocmdgroups=sudogrp1 sudorule1"
@@ -643,7 +643,7 @@ rlPhaseEnd
 
 sudorule-remove-runasuser_func001() {
 
-rlPhaseStartTest "sudorule-remove-runasuser_001: Removing RunAs user and verifying from sudo client."
+rlPhaseStartTest "sudorule-remove-runasuser_func001: Removing RunAs user and verifying from sudo client."
 
         rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 
@@ -658,7 +658,7 @@ rlPhaseEnd
 
 sudorule-add-runasuser_func002() {
 
-rlPhaseStartTest "sudorule-add-runasuser_002: Adding RunAs group and verifying from sudo client."
+rlPhaseStartTest "sudorule-add-runasuser_func002: Adding RunAs group and verifying from sudo client."
 
         rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 
@@ -673,7 +673,7 @@ rlPhaseEnd
 
 sudorule-remove-runasuser_func002() {
 
-rlPhaseStartTest "sudorule-remove-runasuser_002: Removing RunAs group and verifying from sudo client."
+rlPhaseStartTest "sudorule-remove-runasuser_func002: Removing RunAs group and verifying from sudo client."
 
         rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 
@@ -688,7 +688,7 @@ rlPhaseEnd
 
 sudorule-add-runasuser_func003() {
 
-rlPhaseStartTest "sudorule-add-runasuser_003: Adding comma-separated list of RunAs user and verifying from sudo client."
+rlPhaseStartTest "sudorule-add-runasuser_func003: Adding comma-separated list of RunAs user and verifying from sudo client."
 
         rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 
@@ -703,7 +703,7 @@ rlPhaseEnd
 
 sudorule-remove-runasuser_func003() {
 
-rlPhaseStartTest "sudorule-remove-runasuser_003: Removing comma-separated list of RunAs user and verifying from sudo client."
+rlPhaseStartTest "sudorule-remove-runasuser_func003: Removing comma-separated list of RunAs user and verifying from sudo client."
 
         rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 
@@ -718,7 +718,7 @@ rlPhaseEnd
 
 sudorule-add-runasuser_func004() {
 
-rlPhaseStartTest "sudorule-add-runasuser_004: Adding comma-separated list of RunAs group and verifying from sudo client."
+rlPhaseStartTest "sudorule-add-runasuser_func004: Adding comma-separated list of RunAs group and verifying from sudo client."
 
         rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 
@@ -733,7 +733,7 @@ rlPhaseEnd
 
 sudorule-remove-runasuser_func004() {
 
-rlPhaseStartTest "sudorule-remove-runasuser_004: Removing comma-separated list of RunAs group and verifying from sudo client."
+rlPhaseStartTest "sudorule-remove-runasuser_func004: Removing comma-separated list of RunAs group and verifying from sudo client."
 
         rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 
@@ -792,7 +792,7 @@ rlPhaseEnd
                                                                                                                                            
 sudorule-remove-runasuser_func005() {
 
-rlPhaseStartTest "sudorule-remove-runasuser_005: Removing the special value ALL from runasusers and verifying from sudo client."
+rlPhaseStartTest "sudorule-remove-runasuser_func005: Removing the special value ALL from runasusers and verifying from sudo client."
 
         rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
         rlRun "ipa sudorule-remove-runasuser sudorule1 --users=ALL"
@@ -809,7 +809,7 @@ rlPhaseEnd
 
 sudorule-add-runasgroup_func001() {
 
-rlPhaseStartTest "sudorule-add-runasgroup_001: Adding RunAs group and verifying from sudo client."
+rlPhaseStartTest "sudorule-add-runasgroup_func001: Adding RunAs group and verifying from sudo client."
 
 	rlLog "Bug 719009: sudorule-add-runasuser does not match valid users when --users=ALL."
         rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
@@ -854,7 +854,7 @@ rlPhaseEnd
 
 sudorule-remove-runasgroup_func001() {
 
-rlPhaseStartTest "sudorule-remove-runasgroup_001: Removing RunAs group and verifying from sudo client."
+rlPhaseStartTest "sudorule-remove-runasgroup_func001: Removing RunAs group and verifying from sudo client."
 
         rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 
@@ -870,7 +870,7 @@ rlPhaseEnd
 
 sudorule-disable_func001() {
 
-rlPhaseStartTest "sudorule-disable_001: Disabling sudorule and verifying from sudo client."
+rlPhaseStartTest "sudorule-disable_func001: Disabling sudorule and verifying from sudo client."
 
 	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 
@@ -885,7 +885,7 @@ rlPhaseEnd
 
 sudorule-enable_func001() {
 
-rlPhaseStartTest "sudorule-enable_001: Enabling sudorule and verifying from sudo client."
+rlPhaseStartTest "sudorule-enable_func001: Enabling sudorule and verifying from sudo client."
 
         rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 
