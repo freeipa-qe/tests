@@ -18,10 +18,10 @@ public class HostTasks {
 		sahiTasks.link("Add").click();
 		sahiTasks.isVisible(sahiTasks.textbox("fqdn"), true);
 		sahiTasks.textbox("fqdn").near(sahiTasks.label("Host Name: ")).setValue(fqdn);
-		if(ipadr == null){ 
+		if(ipadr == ""){ 
 			sahiTasks.checkbox("force").near(sahiTasks.label("Force:")).click();
 		}
-		if (ipadr != null){
+		if (ipadr != ""){
 			sahiTasks.textbox("ip_address").setValue(ipadr);
 		}
 		//sahiTasks.checkbox("force").click();
