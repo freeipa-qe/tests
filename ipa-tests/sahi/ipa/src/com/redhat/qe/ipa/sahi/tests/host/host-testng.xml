@@ -9,9 +9,9 @@
 			    <include name="setup" />
 			    <include name="init" />
 			    <include name="invalidhostAddTests" />
-			    <!--
 				<include name="addHostTests" />
 				<include name="deleteHostTests" />
+				<!--
 				<include name="teardown"/>
 				-->
 			</run>
