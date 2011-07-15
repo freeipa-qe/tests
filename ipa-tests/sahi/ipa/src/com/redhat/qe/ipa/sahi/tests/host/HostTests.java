@@ -48,6 +48,28 @@ public class HostTests extends SahiTestScript{
 	}
 	
 	/*
+	 * Add and edit hosts - for positive tests
+	 */
+	@Test (groups={"addAndEditHostTests"}, dataProvider="getAddEditHostTestObjects")	
+	public void testHostAddAndEdit(String testName, String hostname, String ipadr, String description) throws Exception {
+		String lowerdn = hostname.toLowerCase();
+		
+		//verify host doesn't exist
+		com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(lowerdn).exists(), "Verify host " + hostname + " doesn't already exist");
+		
+		//add and edit new host
+		HostTasks.addHostAndEdit(sahiTasks, hostname, ipadr, description);
+		
+
+		sahiTasks.navigateTo(System.getProperty("ipa.server.url")+hostPage, true);
+		//verify host was added
+		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(lowerdn).exists(), "Added host " + hostname + "  successfully");
+		
+		//verify all host fields
+		HostTasks.verifyHostSettings(sahiTasks, hostname, description);
+	}
+	
+	/*
 	 * delete hosts
 	 */
 	@Test (groups={"deleteHostTests"}, dataProvider="getHostDeleteTestObjects",  dependsOnGroups="addHostTests")	
@@ -189,6 +211,22 @@ public class HostTests extends SahiTestScript{
 		ll.add(Arrays.asList(new Object[]{ "addhost_dnsArecord_exists",		"validdns.testrelm", 			"10.10.10.10",		 "10.10" } ));
 		ll.add(Arrays.asList(new Object[]{ "addhost_nodns_force",			"myhost1.", 		"" 										 } ));
 		ll.add(Arrays.asList(new Object[]{ "missing_hostname",				"ddd.testrelm", 	"10.10.10.10" } ));	        
+		return ll;	
+	}
+	
+	/*
+	 * Data to be used when adding and editing hosts - for positive cases
+	 */
+	@DataProvider(name="getAddEditHostTestObjects")
+	public Object[][] getAddEditHostFQDNTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createAddEditHostTestObjects());
+	}
+	protected List<List<Object>> createAddEditHostTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname					hostname			ipadr		description							
+		ll.add(Arrays.asList(new Object[]{ "add_and_edit_host",			"myhost1.testrelm",		"",		 	"MY host descipta098yhf;  jkhrtoryt"	} ));
+		        
 		return ll;	
 	}
 }
