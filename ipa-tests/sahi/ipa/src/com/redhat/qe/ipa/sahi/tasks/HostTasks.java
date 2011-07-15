@@ -35,7 +35,7 @@ public class HostTasks {
 	 * @param ipadr -  ipaddress
 	 * @param description - description for host
 	 */
-	public static void addHostAndEdit(SahiTasks sahiTasks, String hostname, String ipadr, String description, String otp) {
+	public static void addHostAndEdit(SahiTasks sahiTasks, String hostname, String ipadr, String description) {
 		sahiTasks.link("Add").click();
 		sahiTasks.isVisible(sahiTasks.textbox("fqdn"), true);
 		sahiTasks.textbox("fqdn").near(sahiTasks.label("Host Name: ")).setValue(hostname);
@@ -46,24 +46,27 @@ public class HostTasks {
 			sahiTasks.textbox("ip_address").setValue(ipadr);
 		}
 		sahiTasks.button("Add and Edit").click();
-		sahiTasks.textbox("enroll").setValue(otp);
 		sahiTasks.textbox("description").setValue(description);
-		sahiTasks.button("Update").click();
-		sahiTasks.button("Hosts").click();
+		sahiTasks.link("Update").click();
 	}
 	
 	/*
-	 * Add and Edit a host
+	 * Verify host fields
 	 * @param sahiTasks 
 	 * @param hostname - hostname
-	 * @param ipadr -  ipaddress
 	 * @param description - description for host
+	 * @param provisioned - TRUE or FALSE string (kerberos key exists)
+	 * @param otp - if one time password has been issued for pending enrollment, the otp value
+	 * @param certificate - TRUE or FALSE or REVOKED
 	 */
-	public static void verifyHost(SahiTasks sahiTasks, String hostname, String description, String otp) {
-		sahiTasks.link(hostname).click();
-		sahiTasks.containsText(sahiTasks.textbox("description"), description);
-		sahiTasks.containsText(sahiTasks.textbox("enroll"), otp);
-		sahiTasks.button("Hosts").click();
+	public static void verifyHostSettings(SahiTasks sahiTasks, String hostname, String description) {
+		String[] components = hostname.split ("\\.");
+		String shortname = components[0];
+		String principal = "host/"+shortname+"@TESTRELM";	
+		sahiTasks.link(hostname).click(); 
+		com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("fqdn").containsText(hostname), "Verified fqdn for host: "+ hostname);
+		com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("krbprincipalname").value(), principal, "Verified principal for host: " + principal);
+		com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("description").value(), description, "Verified description for host: " + description);
 	}
 	
 	/*
