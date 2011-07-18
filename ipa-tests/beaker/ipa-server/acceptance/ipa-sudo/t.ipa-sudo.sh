@@ -88,7 +88,7 @@ userpw="Secret123"
 
 PACKAGE1="ipa-admintools"
 PACKAGE2="ipa-client"
-BASE=`hostname -f | sed 's/\./,dc=/g' | cut -d "," -f 2,3,4,5,6,7,8,9,10`
+basedn=`getBaseDN`
 
 setup() {
 rlPhaseStartTest "Setup for sudo sanity tests"
@@ -226,7 +226,7 @@ rlPhaseStartTest "sudocmd_006: ipa sudocmd-find command --all"
 	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user" 
 	rlRun "ipa sudocmd-find /bin/ls --all > $TmpDir/sudocmd_006.txt 2>&1"
 	rlAssertGrep "1 sudo command matched" "$TmpDir/sudocmd_006.txt"
-	rlAssertGrep "dn: sudocmd=/bin/ls,cn=sudocmds,cn=sudo,$BASE" "$TmpDir/sudocmd_006.txt"
+	rlAssertGrep "dn: sudocmd=/bin/ls,cn=sudocmds,cn=sudo,$basedn" "$TmpDir/sudocmd_006.txt"
 	rlAssertGrep "Description: listing files and folders" "$TmpDir/sudocmd_006.txt"
 	rlAssertGrep "Sudo Command: /bin/ls" "$TmpDir/sudocmd_006.txt"
 	rlAssertGrep "ipauniqueid: " "$TmpDir/sudocmd_006.txt"
@@ -242,7 +242,7 @@ rlPhaseStartTest "sudocmd_007: ipa sudocmd-find command --all --raw"
 
 	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user" 
         rlRun "ipa sudocmd-find /bin/ls --all --raw > $TmpDir/sudocmd_007.txt 2>&1"
-	rlAssertGrep "dn: sudocmd=/bin/ls,cn=sudocmds,cn=sudo,$BASE" "$TmpDir/sudocmd_007.txt"
+	rlAssertGrep "dn: sudocmd=/bin/ls,cn=sudocmds,cn=sudo,$basedn" "$TmpDir/sudocmd_007.txt"
 	rlAssertGrep "description: listing files and folders" "$TmpDir/sudocmd_007.txt"
 	rlAssertGrep "sudocmd: /bin/ls" "$TmpDir/sudocmd_007.txt"
 	rlAssertGrep "objectclass: ipaobject" "$TmpDir/sudocmd_007.txt"
@@ -260,7 +260,7 @@ rlPhaseStartTest "sudocmd_008: ipa sudocmd-show command --rights --all"
 
 	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user" 
 	rlRun "ipa sudocmd-show /bin/ls --right --all > $TmpDir/sudocmd_008.txt 2>&1"
-	rlAssertGrep "dn: sudocmd=/bin/ls,cn=sudocmds,cn=sudo,$BASE" "$TmpDir/sudocmd_008.txt"
+	rlAssertGrep "dn: sudocmd=/bin/ls,cn=sudocmds,cn=sudo,$basedn" "$TmpDir/sudocmd_008.txt"
 	rlAssertGrep "Description: listing files and folders" "$TmpDir/sudocmd_008.txt"
 	rlAssertGrep "Sudo Command: /bin/ls" "$TmpDir/sudocmd_008.txt"
 	rlAssertGrep "attributelevelrights: {'description': u'rscwo', 'memberof': u'rsc', 'aci': u'rscwo', 'ipauniqueid': u'rsc', 'sudocmd': u'rscwo', 'nsaccountlock': u'rscwo'}" "$TmpDir/sudocmd_008.txt"
@@ -466,11 +466,11 @@ sudocmdgroup_012() {
 rlPhaseStartTest "sudocmdgroup_012: ipa sudocmdgroup-find sudogrp --all --raw"
 
 	rlRun "ipa sudocmdgroup-find sudogrp1 --raw --all > $TmpDir/sudocmdgroup_012.txt 2>&1"
-	rlAssertGrep "dn: cn=sudogrp1,cn=sudocmdgroups,cn=sudo,$BASE" "$TmpDir/sudocmdgroup_012.txt"
+	rlAssertGrep "dn: cn=sudogrp1,cn=sudocmdgroups,cn=sudo,$basedn" "$TmpDir/sudocmdgroup_012.txt"
 	rlAssertGrep "cn: sudogrp1" "$TmpDir/sudocmdgroup_012.txt"
 	rlAssertGrep "description: sudo group1" "$TmpDir/sudocmdgroup_012.txt"
-	rlAssertGrep "member: sudocmd=/bin/df,cn=sudocmds,cn=sudo,$BASE" "$TmpDir/sudocmdgroup_012.txt"
-	rlAssertGrep "member: sudocmd=/bin/ls,cn=sudocmds,cn=sudo,$BASE" "$TmpDir/sudocmdgroup_012.txt"
+	rlAssertGrep "member: sudocmd=/bin/df,cn=sudocmds,cn=sudo,$basedn" "$TmpDir/sudocmdgroup_012.txt"
+	rlAssertGrep "member: sudocmd=/bin/ls,cn=sudocmds,cn=sudo,$basedn" "$TmpDir/sudocmdgroup_012.txt"
 	rlAssertGrep "ipauniqueid: " "$TmpDir/sudocmdgroup_012.txt"
 	rlAssertGrep "objectclass: ipaobject" "$TmpDir/sudocmdgroup_012.txt"
 	rlAssertGrep "objectclass: ipasudocmdgrp" "$TmpDir/sudocmdgroup_012.txt"
@@ -486,7 +486,7 @@ sudocmdgroup_013() {
 
 rlPhaseStartTest "sudocmdgroup_013: ipa sudocmdgroup-mod sudogrp1 --addattr"
 
-	rlRun "ipa sudocmdgroup-mod sudogrp1 --addattr member=sudocmd=/bin/vi,cn=sudocmds,cn=sudo,$BASE > $TmpDir/sudocmdgroup_013.txt"
+	rlRun "ipa sudocmdgroup-mod sudogrp1 --addattr member=sudocmd=/bin/vi,cn=sudocmds,cn=sudo,$basedn > $TmpDir/sudocmdgroup_013.txt"
 	rlAssertGrep "Modified sudo command group \"sudogrp1\"" "$TmpDir/sudocmdgroup_013.txt"
 	rlAssertGrep "Sudo Command Group: sudogrp1" "$TmpDir/sudocmdgroup_013.txt"
 	rlAssertGrep "Description: sudo group1" "$TmpDir/sudocmdgroup_013.txt"
@@ -501,7 +501,7 @@ sudocmdgroup_014() {
 
 rlPhaseStartTest "sudocmdgroup_014: ipa sudocmdgroup-mod sudogrp1 --setattr"
 
-	rlRun "ipa sudocmdgroup-mod sudogrp1 --setattr member=sudocmd=/bin/dd,cn=sudocmds,cn=sudo,$BASE > $TmpDir/sudocmdgroup_014.txt"
+	rlRun "ipa sudocmdgroup-mod sudogrp1 --setattr member=sudocmd=/bin/dd,cn=sudocmds,cn=sudo,$basedn > $TmpDir/sudocmdgroup_014.txt"
 	rlAssertGrep "Modified sudo command group \"sudogrp1\"" "$TmpDir/sudocmdgroup_014.txt"
 	rlAssertGrep "Sudo Command Group: sudogrp1" "$TmpDir/sudocmdgroup_014.txt"
 	rlAssertGrep "Description: sudo group1" "$TmpDir/sudocmdgroup_014.txt"
@@ -575,8 +575,8 @@ rlPhaseStartTest "sudorule_add_001: Add new sudo rule."
 	rlAssertGrep "Rule name: sudorule1" "$TmpDir/sudorule_add_001.txt"
 	rlAssertGrep "Enabled: TRUE" "$TmpDir/sudorule_add_001.txt"
 	rlRun "cat $TmpDir/sudorule_add_001.txt"
-	rlRun "/usr/bin/ldapsearch -x -h localhost -D \"cn=Directory Manager\" -w Secret123 -b cn=sudorule1,ou=sudoers,$BASE > $TmpDir/sudorule_add_001.txt 2>&1"
-	rlAssertGrep "dn: cn=sudorule1,ou=sudoers,$BASE" "$TmpDir/sudorule_add_001.txt"
+	rlRun "/usr/bin/ldapsearch -x -h localhost -D \"cn=Directory Manager\" -w Secret123 -b cn=sudorule1,ou=sudoers,$basedn > $TmpDir/sudorule_add_001.txt 2>&1"
+	rlAssertGrep "dn: cn=sudorule1,ou=sudoers,$basedn" "$TmpDir/sudorule_add_001.txt"
 	rlAssertGrep "objectClass: sudoRole" "$TmpDir/sudorule_add_001.txt"
 	rlAssertGrep "cn: sudorule1" "$TmpDir/sudorule_add_001.txt"
 	rlRun "cat $TmpDir/sudorule_add_001.txt"
@@ -1926,13 +1926,13 @@ rlPhaseStartTest "sudorule-mod_012: ipa sudorule-mod --addattr"
         rlRun "ipa sudorule-add --desc=\"rule 1\" rule1"
   	rlRun "ipa user-add sudorule11 --first=sudo --last=rule11"
 
- 	rlRun "ipa sudorule-mod rule1 --addattr=\"memberuser=uid=sudorule11,cn=users,cn=accounts,$BASE\" > $TmpDir/sudorule-mod_012.txt 2>&1" 
+ 	rlRun "ipa sudorule-mod rule1 --addattr=\"memberuser=uid=sudorule11,cn=users,cn=accounts,$basedn\" > $TmpDir/sudorule-mod_012.txt 2>&1" 
 	rlAssertGrep "Rule name: rule1" "$TmpDir/sudorule-mod_012.txt"
 	rlAssertGrep "Users: sudorule11" "$TmpDir/sudorule-mod_012.txt"
 	rlRun "cat $TmpDir/sudorule-mod_012.txt"
 
 	rlRun "ipa sudorule-find rule1 --all --raw > $TmpDir/sudorule-mod_012.txt 2>&1"
-	rlAssertGrep " memberuser: uid=sudorule11,cn=users,cn=accounts,$BASE" "$TmpDir/sudorule-mod_012.txt"
+	rlAssertGrep " memberuser: uid=sudorule11,cn=users,cn=accounts,$basedn" "$TmpDir/sudorule-mod_012.txt"
 	rlRun "cat $TmpDir/sudorule-mod_012.txt"
 
         rlRun "ipa sudorule-del rule1"
@@ -1948,7 +1948,7 @@ rlPhaseStartTest "sudorule-mod_013: ipa sudorule-mod --rights --all"
         rlRun "ipa sudorule-add --desc=\"rule 1\" rule1"
 	rlRun "ipa user-add sudorule11 --first=sudo --last=rule11"
 
-        rlRun "ipa sudorule-mod rule1 --addattr=\"memberuser=uid=sudorule11,cn=users,cn=accounts,$BASE\" --rights --all > $TmpDir/sudorule-mod_013.txt 2>&1"
+        rlRun "ipa sudorule-mod rule1 --addattr=\"memberuser=uid=sudorule11,cn=users,cn=accounts,$basedn\" --rights --all > $TmpDir/sudorule-mod_013.txt 2>&1"
         rlAssertGrep "Rule name: rule1" "$TmpDir/sudorule-mod_013.txt"
         rlAssertGrep "Users: sudorule11" "$TmpDir/sudorule-mod_013.txt"
         rlAssertGrep "attributelevelrights: {'cn': u'rscwo', 'hostmask': u'rscwo', 'memberdenycmd': u'rscwo', 'memberallowcmd': u'rscwo', 'ipasudorunas': u'rscwo', 'cmdcategory': u'rscwo', 'ipasudoopt': u'rscwo', 'nsaccountlock': u'rscwo', 'ipasudorunasextuser': u'rscwo', 'externaluser': u'rscwo', 'memberhost': u'rscwo', 'description': u'rscwo', 'externalhost': u'rscwo', 'hostcategory': u'rscwo', 'ipauniqueid': u'rsc', 'ipaenabledflag': u'rscwo', 'ipasudorunasgroup': u'rscwo', 'ipasudorunasgroupcategory': u'rscwo', 'ipasudorunasextgroup': u'rscwo', 'aci': u'rscwo', 'memberuser': u'rscwo', 'usercategory': u'rscwo', 'ipasudorunasusercategory': u'rscwo'}" "$TmpDir/sudorule-mod_013.txt"
@@ -2306,7 +2306,7 @@ rlPhaseStartTest "sudorule_del_002: Del new sudo rule."
 	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user" 
 	rlRun "ipa sudorule-del sudorule1"
 	rlRun "sleep 10"
-	rlRun "/usr/bin/ldapsearch -x -h localhost -D \"cn=Directory Manager\" -w Secret123 -b cn=sudorule1,ou=sudoers,$BASE" 32
+	rlRun "/usr/bin/ldapsearch -x -h localhost -D \"cn=Directory Manager\" -w Secret123 -b cn=sudorule1,ou=sudoers,$basedn" 32
 
 rlPhaseEnd
 }
