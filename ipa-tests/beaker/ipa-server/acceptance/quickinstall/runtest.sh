@@ -156,9 +156,9 @@ rlJournalStart
 
 		if [ $rc -eq 0 ] ; then
                         rhts-sync-block -s READY $BEAKERMASTER
-			if [ $SLAVE != "" ] ; then
-				rhts-sync-block -s READY $BEAKERSLAVE
-			fi
+			#if [ $SLAVE != "" ] ; then
+			#	rhts-sync-block -s READY $BEAKERSLAVE
+			#fi
                 	installClient
         	fi
         else
