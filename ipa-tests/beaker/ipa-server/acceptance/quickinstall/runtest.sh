@@ -118,7 +118,7 @@ rlJournalStart
                 done
 
 		if [ $rc -eq 0 ] ; then
-			rhts-sync-block -s READY $BEAKERMASTER
+			rhts-sync-block -s READY $MASTER
                 	installSlave
 			rhts-sync-set -s READY
                         rlLog "Setting up Authorized keys"
@@ -155,10 +155,10 @@ rlJournalStart
                 done
 
 		if [ $rc -eq 0 ] ; then
-                        rhts-sync-block -s READY $BEAKERMASTER
-			#if [ $SLAVE != "" ] ; then
-			#	rhts-sync-block -s READY $BEAKERSLAVE
-			#fi
+                        rhts-sync-block -s READY $MASTER
+			if [ $SLAVE != "" ] ; then
+				rhts-sync-block -s READY $SLAVE
+			fi
                 	installClient
         	fi
         else
