@@ -48,6 +48,28 @@ PACKAGE="ipa-server"
 #   test main 
 #########################################
 
+automount_help() {
+	"automount_001"
+	"automount_002"
+	"automount_003"
+	"automount_004"
+	"automount_005"
+	"automount_006"
+	"automount_007"
+	"automount_008"
+	"automount_009"
+	"automount_010"
+	"automount_011"
+	"automount_012"
+	"automount_013"
+	"automount_014"
+	"automount_015"
+	"automount_016"
+	"automount_017"
+	"automount_018"
+	"automount_019"
+}
+
 #automount_location() {
 #"automount_location_001"
 #"automount_location_002"
@@ -69,7 +91,7 @@ rlJournalStart
     rlPhaseEnd
 
 	# tests start...
-automount_001
+automount_help
 	# tests end.
 
     rlPhaseStartCleanup "ipa-automount-cleanup: Destroying admin credentials & and disabling nis."

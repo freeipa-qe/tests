@@ -27,7 +27,8 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
 #   Author: Gowrishankar Rajaiyan <gsr@redhat.com>
-#   Date: Mon May  9 20:56:29 IST 2011
+#   Date: Mon May  9 20:56:29 IST 2011 (Initial check-in)
+#   Date: Mon Jul 18 05:15:51 EDT 2011 
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
@@ -66,6 +67,8 @@ user1="user1"
 user2="user2"
 userpw="Secret123"
 mount_homedir="/ipahome"
+direct_mount="/direct_mount"
+RELM="RHTS-ENG-BRQ-REDHAT-COM"
 
 PACKAGE1="ipa-admintools"
 PACKAGE2="ipa-client"
@@ -100,11 +103,391 @@ automount_001() {
 
 rlPhaseStartTest "automount_001: Schema file check."
 
-	INST=`hostname | tr "[:lower:]" "[:upper:]" | cut -d "." -f 2,3,4,5,6,7,8,9,10 | sed 's/\./-/g'`
-	rlRun "rlAssertExists /etc/dirsrv/slapd-$INST/schema/60autofs.ldif"
+	rlRun "rlAssertExists /etc/dirsrv/slapd-$RELM/schema/60autofs.ldif"
 
 rlPhaseEnd
 }
+
+automount_002() {
+
+rlPhaseStartTest "automount_002: ipa help automount."
+
+	rlRun "ipa help automount > $TmpDir/automount_002.out 2>&1"
+	rlAssertGrep "Create a named location, \"Baltimore\":" "$TmpDir/automount_002.out"
+	rlAssertGrep "ipa automountlocation-add baltimore" "$TmpDir/automount_002.out"
+	rlAssertGrep "Display the new location:" "$TmpDir/automount_002.out"
+	rlAssertGrep "ipa automountlocation-show baltimore" "$TmpDir/automount_002.out"
+	rlAssertGrep "Find available locations:" "$TmpDir/automount_002.out"
+	rlAssertGrep "ipa automountlocation-find" "$TmpDir/automount_002.out"
+	rlAssertGrep "Remove a named automount location:" "$TmpDir/automount_002.out"
+	rlAssertGrep "ipa automountlocation-del baltimore" "$TmpDir/automount_002.out"
+	rlAssertGrep "Show what the automount maps would look like if they were in the filesystem:" "$TmpDir/automount_002.out"
+	rlAssertGrep "ipa automountlocation-tofiles baltimore" "$TmpDir/automount_002.out"
+	rlAssertGrep "Import an existing configuration into a location:" "$TmpDir/automount_002.out"
+	rlAssertGrep "ipa automountlocation-import baltimore /etc/auto.master" "$TmpDir/automount_002.out"
+	rlAssertGrep "Create a new map, \"auto.share\":" "$TmpDir/automount_002.out"
+	rlAssertGrep "ipa automountmap-add baltimore auto.share" "$TmpDir/automount_002.out"
+	rlAssertGrep "Display the new map:" "$TmpDir/automount_002.out"
+	rlAssertGrep "ipa automountmap-show baltimore auto.share" "$TmpDir/automount_002.out"
+	rlAssertGrep "Find maps in the location baltimore:" "$TmpDir/automount_002.out"
+	rlAssertGrep "ipa automountmap-find baltimore" "$TmpDir/automount_002.out"
+	rlAssertGrep "Remove the auto.share map:" "$TmpDir/automount_002.out"
+	rlAssertGrep "ipa automountmap-del baltimore auto.share" "$TmpDir/automount_002.out"
+	rlAssertGrep "Create a new key for the auto.share map in location baltimore." "$TmpDir/automount_002.out"
+	rlAssertGrep "ipa automountkey-add baltimore auto.master --key=/share --info=auto.share" "$TmpDir/automount_002.out"
+	rlAssertGrep "Create a new key for our auto.share map, an NFS mount for man pages:" "$TmpDir/automount_002.out"
+	rlAssertGrep "ipa automountkey-add baltimore auto.share --key=man --info=\"-ro,soft,rsize=8192,wsize=8192 ipa.example.com:/shared/man\"" "$TmpDir/automount_002.out"
+	rlAssertGrep "Find all keys for the auto.share map:" "$TmpDir/automount_002.out"
+	rlAssertGrep "ipa automountkey-find baltimore auto.share" "$TmpDir/automount_002.out"
+	rlAssertGrep "Find all direct automount keys:" "$TmpDir/automount_002.out"
+	rlAssertGrep "ipa automountkey-find baltimore --key=/-" "$TmpDir/automount_002.out"
+	rlAssertGrep "Remove the man key from the auto.share map:" "$TmpDir/automount_002.out"
+	rlAssertGrep "ipa automountkey-del baltimore auto.share --key=man" "$TmpDir/automount_002.out"
+	rlAssertGrep "automountkey-add           Create a new automount key." "$TmpDir/automount_002.out"
+	rlAssertGrep "automountkey-del           Delete an automount key." "$TmpDir/automount_002.out"
+	rlAssertGrep "automountkey-find          Search for an automount key." "$TmpDir/automount_002.out"
+	rlAssertGrep "automountkey-mod           Modify an automount key." "$TmpDir/automount_002.out"
+	rlAssertGrep "automountkey-show          Display an automount key." "$TmpDir/automount_002.out"
+	rlAssertGrep "automountlocation-add      Create a new automount location." "$TmpDir/automount_002.out"
+	rlAssertGrep "automountlocation-find     Search for an automount location." "$TmpDir/automount_002.out"
+	rlAssertGrep "automountlocation-import   Import automount files for a specific location." "$TmpDir/automount_002.out"
+	rlAssertGrep "automountlocation-show     Display an automount location." "$TmpDir/automount_002.out"
+	rlAssertGrep "automountlocation-tofiles  Generate automount files for a specific location." "$TmpDir/automount_002.out"
+	rlAssertGrep "automountmap-add           Create a new automount map." "$TmpDir/automount_002.out"
+	rlAssertGrep "automountmap-add-indirect  Create a new indirect mount point." "$TmpDir/automount_002.out"
+	rlAssertGrep "automountmap-del           Delete an automount map." "$TmpDir/automount_002.out"
+	rlAssertGrep "automountmap-find          Search for an automount map." "$TmpDir/automount_002.out"
+	rlAssertGrep "automountmap-mod           Modify an automount map." "$TmpDir/automount_002.out"
+	rlAssertGrep "automountmap-show          Display an automount map." "$TmpDir/automount_002.out"
+
+	rlRun "cat $TmpDir/automount_002.out"
+
+rlPhaseEnd
+}
+
+automount_003() {
+
+rlPhaseStartTest "ipa help automountkey-add"
+
+	rlRun "automount_003: ipa help automountkey-add > $TmpDir/automount_003.out"
+
+	rlAssertGrep "Purpose: Create a new automount key." "$TmpDir/automount_003.out"
+	rlAssertGrep "Usage: ipa \[global-options\] automountkey-add AUTOMOUNTLOCATION AUTOMOUNTMAP \[options\]" "$TmpDir/automount_003.out"
+	rlAssertGrep "\-h, \--help     show this help message and exit" "$TmpDir/automount_003.out"
+	rlAssertGrep "\--key=IA5STR   Automount key name." "$TmpDir/automount_003.out"
+	rlAssertGrep "\--info=IA5STR  Mount information" "$TmpDir/automount_003.out"
+	rlAssertGrep "\--addattr=STR  Add an attribute/value pair. Format is attr=value." "$TmpDir/automount_003.out"
+	rlAssertGrep "\--setattr=STR  Set an attribute to a name/value pair. Format is attr=value." "$TmpDir/automount_003.out"
+	rlAssertGrep "\--all          Retrieve and print all attributes from the server." "$TmpDir/automount_003.out"
+	rlAssertGrep "\--raw          Print entries as stored on the server." "$TmpDir/automount_003.out"
+
+	rlRun "cat $TmpDir/automount_003.out"
+
+rlPhaseEnd
+}
+
+automount_004() {
+
+rlPhaseStartTest "automount_004: ipa help automountkey-del"
+
+        rlRun "ipa help automountkey-del > $TmpDir/automount_004.out"
+
+        rlAssertGrep "Usage: ipa \[global-options\] automountkey-del AUTOMOUNTLOCATION AUTOMOUNTMAP \[options\]" "$TmpDir/automount_004.out"
+        rlAssertGrep "\-h, \--help     show this help message and exit" "$TmpDir/automount_004.out"
+        rlAssertGrep "\--continue     Continuous mode: Don't stop on errors." "$TmpDir/automount_004.out"
+        rlAssertGrep "\--key=IA5STR   Automount key name." "$TmpDir/automount_004.out"
+        rlAssertGrep "\--info=IA5STR  Mount information" "$TmpDir/automount_004.out"
+
+	rlRun "cat $TmpDir/automount_004.out"
+
+rlPhaseEnd
+}
+
+automount_005() {
+
+rlPhaseStartTest "automount_005: ipa help automountkey-find"
+
+	rlRun "ipa help automountkey-find > $TmpDir/automount_005.out"
+
+	rlAssertGrep "Purpose: Search for an automount key." "$TmpDir/automount_005.out"
+	rlAssertGrep "Usage: ipa \[global-options\] automountkey-find AUTOMOUNTLOCATION AUTOMOUNTMAP \[CRITERIA\] \[options\]" "$TmpDir/automount_005.out"
+	rlAssertGrep "\-h, \--help       show this help message and exit" "$TmpDir/automount_005.out"
+	rlAssertGrep "\--key=IA5STR     Automount key name." "$TmpDir/automount_005.out"
+	rlAssertGrep "\--info=IA5STR    Mount information" "$TmpDir/automount_005.out"
+	rlAssertGrep "\--timelimit=INT  Time limit of search in seconds" "$TmpDir/automount_005.out"
+	rlAssertGrep "\--sizelimit=INT  Maximum number of entries returned" "$TmpDir/automount_005.out"
+	rlAssertGrep "\--all            Retrieve and print all attributes from the server." "$TmpDir/automount_005.out"
+	rlAssertGrep "\--raw            Print entries as stored on the server." "$TmpDir/automount_005.out"
+
+	rlRun "cat $TmpDir/automount_005.out"
+
+rlPhaseEnd
+}
+
+automount_006() {
+
+rlPhaseStartTest "automount_006: ipa help automountkey-mod"
+
+	rlRun "ipa help automountkey-mod > $TmpDir/automount_006.out 2>&1"
+
+	rlAssertGrep "Purpose: Modify an automount key." "$TmpDir/automount_006.out"
+	rlAssertGrep "Usage: ipa \[global-options\] automountkey-mod AUTOMOUNTLOCATION AUTOMOUNTMAP \[options\]" "$TmpDir/automount_006.out"
+	rlAssertGrep "\-h, \--help        show this help message and exit" "$TmpDir/automount_006.out"
+	rlAssertGrep "\--key=IA5STR      Automount key name." "$TmpDir/automount_006.out"
+	rlAssertGrep "\--info=IA5STR     Mount information" "$TmpDir/automount_006.out"
+	rlAssertGrep "\--addattr=STR     Add an attribute/value pair. Format is attr=value." "$TmpDir/automount_006.out"
+	rlAssertGrep "\--setattr=STR     Set an attribute to a name/value pair." "$TmpDir/automount_006.out"
+	rlAssertGrep "\--rights          Display the access rights of this entry (requires \--all)." "$TmpDir/automount_006.out"
+	rlAssertGrep "\--newinfo=IA5STR  New mount information" "$TmpDir/automount_006.out"
+	rlAssertGrep "\--all             Retrieve and print all attributes from the server." "$TmpDir/automount_006.out"
+	rlAssertGrep "\--raw             Print entries as stored on the server." "$TmpDir/automount_006.out"
+	rlAssertGrep "\--rename=STR      Rename the automount key object" "$TmpDir/automount_006.out"
+
+	rlRun "cat $TmpDir/automount_006.out"
+
+rlPhaseEnd
+}
+
+automount_007() {
+
+rlPhaseStartTest "automount_007: ipa help automountkey-show"
+
+	rlRun "ipa help automountkey-show > $TmpDir/automount_007.out 2>&1"
+
+        rlAssertGrep "Purpose: Display an automount key." "$TmpDir/automount_007.out"
+        rlAssertGrep "Usage: ipa \[global-options\] automountkey-show AUTOMOUNTLOCATION AUTOMOUNTMAP \[options\]" "$TmpDir/automount_007.out"
+        rlAssertGrep "\-h, \--help     show this help message and exit" "$TmpDir/automount_007.out"
+        rlAssertGrep "\--rights       Display the access rights of this entry (requires --all)." "$TmpDir/automount_007.out"
+        rlAssertGrep "\--key=IA5STR   Automount key name." "$TmpDir/automount_007.out"
+        rlAssertGrep "\--info=IA5STR  Mount information" "$TmpDir/automount_007.out"
+        rlAssertGrep "\--all          Retrieve and print all attributes from the server." "$TmpDir/automount_007.out"
+        rlAssertGrep "\--raw          Print entries as stored on the server." "$TmpDir/automount_007.out"
+
+	rlRun "cat $TmpDir/automount_007.out"
+
+rlPhaseEnd
+}
+
+automount_008() {
+
+rlPhaseStartTest "automount_008: ipa help automountlocation-add"
+
+	rlRun "ipa help automountlocation-add > $TmpDir/automount_008.out 2>&1"
+	
+	rlAssertGrep "Purpose: Create a new automount location." "$TmpDir/automount_008.out"
+	rlAssertGrep "Usage: ipa \[global-options\] automountlocation-add LOCATION \[options\]" "$TmpDir/automount_008.out"
+	rlAssertGrep "\-h, \--help     show this help message and exit" "$TmpDir/automount_008.out"
+	rlAssertGrep "\--addattr=STR  Add an attribute/value pair. Format is attr=value." "$TmpDir/automount_008.out"
+	rlAssertGrep "\--setattr=STR  Set an attribute to a name/value pair." "$TmpDir/automount_008.out"
+	rlAssertGrep "\--all          Retrieve and print all attributes from the server." "$TmpDir/automount_008.out"
+	rlAssertGrep "\--raw          Print entries as stored on the server." "$TmpDir/automount_008.out"
+	rlAssertGrep "" "$TmpDir/automount_008.out"
+
+	rlRun "cat $TmpDir/automount_008.out"
+
+rlPhaseEnd
+}
+
+automount_009() {
+
+rlPhaseStartTest "automount_009: ipa help automountlocation-del"
+
+	rlRun "ipa help automountlocation-del > $TmpDir/automount_009.out 2>&1"
+
+	rlAssertGrep "Purpose: Delete an automount location." "$TmpDir/automount_009.out"
+	rlAssertGrep "Usage: ipa \[global-options\] automountlocation-del LOCATION... \[options\]" "$TmpDir/automount_009.out"
+	rlAssertGrep "\-h, \--help  show this help message and exit" "$TmpDir/automount_009.out"
+	rlAssertGrep "\--continue  Continuous mode: Don't stop on errors." "$TmpDir/automount_009.out"
+
+	rlRun "cat $TmpDir/automount_009.out"
+
+rlPhaseEnd
+}
+
+automount_010() {
+
+rlPhaseStartTest "automount_010: ipa help automountlocation-find"
+
+	rlRun "ipa help automountlocation-find > $TmpdDir/automount_010.out 2>&1"
+
+	rlAssertGrep "Purpose: Search for an automount location." "$TmpdDir/automount_010.out"
+	rlAssertGrep "Usage: ipa \[global-options\] automountlocation-find \[CRITERIA\] \[options\]" "$TmpdDir/automount_010.out"
+	rlAssertGrep "\-h, \--help       show this help message and exit" "$TmpdDir/automount_010.out"
+	rlAssertGrep "\--location=STR   Automount location name." "$TmpdDir/automount_010.out"
+	rlAssertGrep "\--timelimit=INT  Time limit of search in seconds" "$TmpdDir/automount_010.out"
+	rlAssertGrep "\--sizelimit=INT  Maximum number of entries returned" "$TmpdDir/automount_010.out"
+	rlAssertGrep "\--all            Retrieve and print all attributes from the server." "$TmpdDir/automount_010.out"
+	rlAssertGrep "\--raw            Print entries as stored on the server." "$TmpdDir/automount_010.out"
+
+	rlRun "cat $TmpdDir/automount_010.out"
+
+rlPhaseEnd
+}
+
+automount_011() {
+
+rlPhaseStartTest "automount_011: ipa help automountlocation-import"
+
+	rlRun "ipa help automountlocation-import > $TmpDir/automount_011.out 2>&1"
+
+	rlAssertGrep "Purpose: Import automount files for a specific location." "$TmpDir/automount_011.out"
+	rlAssertGrep "Usage: ipa \[global-options\] automountlocation-import LOCATION MASTERFILE \[options\]" "$TmpDir/automount_011.out"
+	rlAssertGrep "\-h, \--help  show this help message and exit" "$TmpDir/automount_011.out"
+	rlAssertGrep "\--continue  Continuous operation mode." "$TmpDir/automount_011.out"
+
+	rlRun "cat $TmpDir/automount_011.out"
+
+rlPhaseEnd
+}
+
+automount_012() {
+
+rlPhaseStartTest "automount_012: ipa help automountlocation-show"
+
+	rlRun "ipa help automountlocation-show > $TmpDir/automount_012.out 2>&1"
+
+	rlAssertGrep "Purpose: Display an automount location." "$TmpDir/automount_012.out"
+	rlAssertGrep "Usage: ipa \[global-options\] automountlocation-show LOCATION \[options\]" "$TmpDir/automount_012.out"
+	rlAssertGrep "\-h, \--help  show this help message and exit" "$TmpDir/automount_012.out"
+	rlAssertGrep "\--rights    Display the access rights of this entry (requires --all)." "$TmpDir/automount_012.out"
+	rlAssertGrep "\--all       Retrieve and print all attributes from the server." "$TmpDir/automount_012.out"
+	rlAssertGrep "\--raw       Print entries as stored on the server." "$TmpDir/automount_012.out"
+
+	rlRun "cat $TmpDir/automount_012.out"
+
+rlPhaseEnd
+}
+
+automount_013() {
+
+rlPhaseStartTest "automount_013: ipa help automountlocation-tofiles"
+
+	rlRun "ipa help automountlocation-tofiles > $TmpDir/automount_013.out 2>&1"
+
+	rlAssertGrep "Purpose: Generate automount files for a specific location." "$TmpDir/automount_013.out"
+	rlAssertGrep "Usage: ipa \[global-options\] automountlocation-tofiles LOCATION \[options\]" "$TmpDir/automount_013.out"
+	rlAssertGrep "\-h, \--help  show this help message and exit" "$TmpDir/automount_012.out"
+
+	rlRun "cat $TmpDir/automount_013.out"
+
+rlPhaseEnd
+}
+
+automount_014() {
+
+rlPhaseStartTest "automount_014: ipa help automountmap-add"
+
+	rlRun "ipa help automountmap-add > $TmpDir/automount_014.out  2>&1"
+
+        rlAssertGrep "Purpose: Create a new automount map." "$TmpDir/automount_014.out"
+        rlAssertGrep "Usage: ipa \[global-options\] automountmap-add AUTOMOUNTLOCATION MAP \[options\]" "$TmpDir/automount_014.out"
+        rlAssertGrep "\-h, \--help     show this help message and exit" "$TmpDir/automount_014.out"
+        rlAssertGrep "\--desc=STR     Description" "$TmpDir/automount_014.out"
+        rlAssertGrep "\--addattr=STR  Add an attribute/value pair. Format is attr=value." "$TmpDir/automount_014.out"
+        rlAssertGrep "\--setattr=STR  Set an attribute to a name/value pair. Format is attr=value." "$TmpDir/automount_014.out"
+        rlAssertGrep "\--all          Retrieve and print all attributes from the server." "$TmpDir/automount_014.out"
+        rlAssertGrep "\--raw          Print entries as stored on the server." "$TmpDir/automount_014.out"
+
+	rlRun "cat $TmpDir/automount_014.out"
+
+rlPhaseEnd
+}
+
+automount_015() {
+
+rlPhaseStartTest "automount_015: ipa help automountmap-add-indirect"
+
+	rlRun "ipa help automountmap-add-indirect > $TmpDir/automount_015.out 2>&1"
+
+	rlAssertGrep "Purpose: Create a new indirect mount point." "$TmpDir/automount_015.out"
+	rlAssertGrep "Usage: ipa \[global-options\] automountmap-add-indirect AUTOMOUNTLOCATION MAP \[options\]" "$TmpDir/automount_015.out"
+	rlAssertGrep "\-h, \--help       show this help message and exit" "$TmpDir/automount_015.out"
+	rlAssertGrep "\--desc=STR       Description" "$TmpDir/automount_015.out"
+	rlAssertGrep "\--addattr=STR    Add an attribute/value pair. Format is attr=value." "$TmpDir/automount_015.out"
+	rlAssertGrep "\--setattr=STR    Set an attribute to a name/value pair." "$TmpDir/automount_015.out"
+	rlAssertGrep "\--mount=STR      Mount point" "$TmpDir/automount_015.out"
+	rlAssertGrep "\--parentmap=STR  Name of parent automount map (default: auto.master)." "$TmpDir/automount_015.out"
+	rlAssertGrep "\--all            Retrieve and print all attributes from the server." "$TmpDir/automount_015.out"
+	rlAssertGrep "\--raw            Print entries as stored on the server." "$TmpDir/automount_015.out"
+
+	rlRun "cat $TmpDir/automount_015.out"
+
+rlPhaseEnd
+}
+
+automount_016() {
+
+rlPhaseStartTest "automount_016: ipa help automountlocation-del"
+
+	rlRun "ipa help automountlocation-del > $TmpDir/automount_016.out 2>&1"
+
+        rlAssertGrep "Purpose: Delete an automount location." "$TmpDir/automount_016.out"
+        rlAssertGrep "Usage: ipa \[global-options\] automountlocation-del LOCATION... \[options\]" "$TmpDir/automount_016.out"
+        rlAssertGrep "\-h, \--help  show this help message and exit" "$TmpDir/automount_016.out"
+        rlAssertGrep "\--continue  Continuous mode: Don't stop on errors." "$TmpDir/automount_016.out"
+
+	rlRun "cat $TmpDir/automount_016.out"
+
+rlPhaseEnd
+}
+
+automount_017() {
+
+rlPhaseStartTest "automount_017: ipa help automountlocation-find"
+
+	rlRun "ipa help automountlocation-find > $TmpDir/automount_017.out 2>&1"
+
+        rlAssertGrep "Purpose: Search for an automount location." "$TmpDir/automount_017.out"
+        rlAssertGrep "Usage: ipa \[global-options\] automountlocation-find \[CRITERIA\] \[options\]" "$TmpDir/automount_017.out"
+        rlAssertGrep "\-h, \--help       show this help message and exit" "$TmpDir/automount_017.out"
+        rlAssertGrep "\--location=STR   Automount location name." "$TmpDir/automount_017.out"
+        rlAssertGrep "\--timelimit=INT  Time limit of search in seconds" "$TmpDir/automount_017.out"
+        rlAssertGrep "\--sizelimit=INT  Maximum number of entries returned" "$TmpDir/automount_017.out"
+        rlAssertGrep "\--all            Retrieve and print all attributes from the server." "$TmpDir/automount_017.out"
+        rlAssertGrep "\--raw            Print entries as stored on the server." "$TmpDir/automount_017.out"
+
+	rlRun "cat $TmpDir/automount_017.out"
+
+rlPhaseEnd
+}
+
+automount_018() {
+
+rlPhaseStartTest "automount_018: ipa help automountlocation-mod"
+
+	rlRun "ipa help automountlocation-mod > $TmpDir/automount_018.out 2>&1"
+
+        rlAssertGrep "Purpose: Modify an automount map." "$TmpDir/automount_018.out"
+        rlAssertGrep "Usage: ipa \[global-options\] automountmap-mod AUTOMOUNTLOCATION MAP \[options\]" "$TmpDir/automount_018.out"
+        rlAssertGrep "\-h, \--help     show this help message and exit" "$TmpDir/automount_018.out"
+        rlAssertGrep "\--desc=STR     Description" "$TmpDir/automount_018.out"
+        rlAssertGrep "\--addattr=STR  Add an attribute/value pair. Format is attr=value." "$TmpDir/automount_018.out"
+        rlAssertGrep "\--setattr=STR  Set an attribute to a name/value pair. Format is attr=value." "$TmpDir/automount_018.out"
+        rlAssertGrep "\--rights       Display the access rights of this entry (requires --all)." "$TmpDir/automount_018.out"
+        rlAssertGrep "\--all          Retrieve and print all attributes from the server." "$TmpDir/automount_018.out"
+        rlAssertGrep "\--raw          Print entries as stored on the server." "$TmpDir/automount_018.out"
+
+	rlRun "cat $TmpDir/automount_018.out"
+
+rlPhaseEnd
+}
+
+automount_019() {
+
+rlPhaseStartTest "automount_019: ipa help automountlocation-show"
+
+	rlRun "ipa help automountlocation-show > $TmpDir/automount_019.out 2>&1"
+
+        rlAssertGrep "Purpose: Display an automount map." "$TmpDir/automount_019.out"
+        rlAssertGrep "Usage: ipa \[global-options\] automountmap-show AUTOMOUNTLOCATION MAP \[options\]" "$TmpDir/automount_019.out"
+        rlAssertGrep "\-h, \--help  show this help message and exit" "$TmpDir/automount_019.out"
+        rlAssertGrep "\--rights    Display the access rights of this entry (requires --all)." "$TmpDir/automount_019.out"
+        rlAssertGrep "\--all       Retrieve and print all attributes from the server." "$TmpDir/automount_019.out"
+        rlAssertGrep "\--raw       Print entries as stored on the server." "$TmpDir/automount_019.out"
+
+rlPhaseEnd
+}
+
 
 cleanup() {
 rlPhaseStartTest "Clean up for automount configuration tests"
@@ -116,6 +499,7 @@ rlPhaseStartTest "Clean up for automount configuration tests"
 
         rlRun "popd"
         rlRun "rm -r $TmpDir" 0 "Removing tmp directory"
+	rlRun "rm -fr /tmp/krb5_1*"
 	rlRun "service iptables start"
 rlPhaseEnd
 }
