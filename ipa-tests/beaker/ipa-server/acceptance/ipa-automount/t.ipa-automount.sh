@@ -169,7 +169,7 @@ automount_003() {
 
 rlPhaseStartTest "ipa help automountkey-add"
 
-	rlRun "automount_003: ipa help automountkey-add > $TmpDir/automount_003.out"
+	rlRun "ipa help automountkey-add > $TmpDir/automount_003.out"
 
 	rlAssertGrep "Purpose: Create a new automount key." "$TmpDir/automount_003.out"
 	rlAssertGrep "Usage: ipa \[global-options\] automountkey-add AUTOMOUNTLOCATION AUTOMOUNTMAP \[options\]" "$TmpDir/automount_003.out"
@@ -417,12 +417,12 @@ rlPhaseEnd
 
 automount_016() {
 
-rlPhaseStartTest "automount_016: ipa help automountlocation-del"
+rlPhaseStartTest "automount_016: ipa help automountmap-del"
 
-	rlRun "ipa help automountlocation-del > $TmpDir/automount_016.out 2>&1"
+	rlRun "ipa help automountmap-del > $TmpDir/automount_016.out 2>&1"
 
-        rlAssertGrep "Purpose: Delete an automount location." "$TmpDir/automount_016.out"
-        rlAssertGrep "Usage: ipa \[global-options\] automountlocation-del LOCATION... \[options\]" "$TmpDir/automount_016.out"
+        rlAssertGrep "Purpose: Delete an automount map." "$TmpDir/automount_016.out"
+        rlAssertGrep "Usage: ipa \[global-options\] automountmap-del AUTOMOUNTLOCATION MAP... \[options\]" "$TmpDir/automount_016.out"
         rlAssertGrep "\-h, \--help  show this help message and exit" "$TmpDir/automount_016.out"
         rlAssertGrep "\--continue  Continuous mode: Don't stop on errors." "$TmpDir/automount_016.out"
 
@@ -433,14 +433,15 @@ rlPhaseEnd
 
 automount_017() {
 
-rlPhaseStartTest "automount_017: ipa help automountlocation-find"
+rlPhaseStartTest "automount_017: ipa help automountmap-find"
 
-	rlRun "ipa help automountlocation-find > $TmpDir/automount_017.out 2>&1"
+	rlRun "ipa help automountmap-find > $TmpDir/automount_017.out 2>&1"
 
-        rlAssertGrep "Purpose: Search for an automount location." "$TmpDir/automount_017.out"
-        rlAssertGrep "Usage: ipa \[global-options\] automountlocation-find \[CRITERIA\] \[options\]" "$TmpDir/automount_017.out"
+        rlAssertGrep "Purpose: Search for an automount map." "$TmpDir/automount_017.out"
+        rlAssertGrep "Usage: ipa \[global-options\] automountmap-find AUTOMOUNTLOCATION \[CRITERIA\] \[options\]" "$TmpDir/automount_017.out"
         rlAssertGrep "\-h, \--help       show this help message and exit" "$TmpDir/automount_017.out"
-        rlAssertGrep "\--location=STR   Automount location name." "$TmpDir/automount_017.out"
+        rlAssertGrep "\--map=IA5STR     Automount map name." "$TmpDir/automount_017.out"
+        rlAssertGrep "\--desc=STR       Description" "$TmpDir/automount_017.out"
         rlAssertGrep "\--timelimit=INT  Time limit of search in seconds" "$TmpDir/automount_017.out"
         rlAssertGrep "\--sizelimit=INT  Maximum number of entries returned" "$TmpDir/automount_017.out"
         rlAssertGrep "\--all            Retrieve and print all attributes from the server." "$TmpDir/automount_017.out"
@@ -453,9 +454,9 @@ rlPhaseEnd
 
 automount_018() {
 
-rlPhaseStartTest "automount_018: ipa help automountlocation-mod"
+rlPhaseStartTest "automount_018: ipa help automountmap-mod"
 
-	rlRun "ipa help automountlocation-mod > $TmpDir/automount_018.out 2>&1"
+	rlRun "ipa help automountmap-mod > $TmpDir/automount_018.out 2>&1"
 
         rlAssertGrep "Purpose: Modify an automount map." "$TmpDir/automount_018.out"
         rlAssertGrep "Usage: ipa \[global-options\] automountmap-mod AUTOMOUNTLOCATION MAP \[options\]" "$TmpDir/automount_018.out"
@@ -474,9 +475,9 @@ rlPhaseEnd
 
 automount_019() {
 
-rlPhaseStartTest "automount_019: ipa help automountlocation-show"
+rlPhaseStartTest "automount_019: ipa help automountmap-show"
 
-	rlRun "ipa help automountlocation-show > $TmpDir/automount_019.out 2>&1"
+	rlRun "ipa help automountmap-show > $TmpDir/automount_019.out 2>&1"
 
         rlAssertGrep "Purpose: Display an automount map." "$TmpDir/automount_019.out"
         rlAssertGrep "Usage: ipa \[global-options\] automountmap-show AUTOMOUNTLOCATION MAP \[options\]" "$TmpDir/automount_019.out"
