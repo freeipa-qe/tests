@@ -70,10 +70,10 @@ automount_help() {
 	"automount_019"
 }
 
-#automount_location() {
-#"automount_location_001"
-#"automount_location_002"
-#}
+automount_location() {
+	"automount_location_001"
+	"automount_location_002"
+}
 
 #automount_map() {
 #"automount_map_001"
@@ -91,7 +91,9 @@ rlJournalStart
     rlPhaseEnd
 
 	# tests start...
-automount_help
+#automount_help
+automount_location
+automount_location_del
 	# tests end.
 
     rlPhaseStartCleanup "ipa-automount-cleanup: Destroying admin credentials & and disabling nis."

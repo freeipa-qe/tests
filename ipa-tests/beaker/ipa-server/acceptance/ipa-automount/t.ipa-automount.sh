@@ -490,6 +490,37 @@ rlPhaseEnd
 }
 
 
+
+##############################################
+### SANITY TESTS START HERE...
+##############################################
+
+automount_location_001() {
+
+rlPhaseStartTest "automount_location_001: ipa automountlocation-add LOCATION"
+
+	rlRun "ipa automountlocation-add pune"
+
+
+rlPhaseEnd
+}
+
+
+
+automount_location_del() {
+
+rlPhaseStartTest "automount_location_del: ipa automountlocation-del LOCATION"
+
+	rlRun "ipa automountlocation-del pune"
+
+
+rlPhaseEnd
+}
+
+
+
+
+
 cleanup() {
 rlPhaseStartTest "Clean up for automount configuration tests"
 	rlRun "kinitAs $ADMINID $ADMINPW" 0
