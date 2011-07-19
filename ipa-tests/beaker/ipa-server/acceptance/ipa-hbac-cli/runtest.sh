@@ -112,30 +112,30 @@ rlJournalStart
 
     rlPhaseStartTest "ipa-hbacrule-cli-002: Rule Type Required - unknown type"
         command="ipa hbacrule-add --type=\"bad\" test"
-        expmsg="ipa: ERROR: invalid 'type': must be one of (u'allow', u'deny')"
+        expmsg="ipa: ERROR: invalid 'type': must be (u'allow')"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for Unknown Rule Type"
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-hbacrule-cli-003: User Category - unknown"
-        command="ipa hbacrule-add --type=deny --usercat=bad test"
-        expmsg="ipa: ERROR: invalid 'usercat': must be one of (u'all',)"
+        command="ipa hbacrule-add --type=allow --usercat=bad test"
+        expmsg="ipa: ERROR: invalid 'type': must be (u'allow')"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for Unknown user category"
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-hbacrule-cli-004: Service Category - unknown"
-        command="ipa hbacrule-add --type=deny --servicecat=bad test"
-        expmsg="ipa: ERROR: invalid 'servicecat': must be one of (u'all',)"
+        command="ipa hbacrule-add --type=allow --servicecat=bad test"
+        expmsg="ipa: ERROR: invalid 'type': must be (u'allow')"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for Unknown service category"
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-hbacrule-cli-005: Host Category - unknown"
-        command="ipa hbacrule-add --type=deny --hostcat=bad test"
+        command="ipa hbacrule-add --type=allow --hostcat=bad test"
         expmsg="ipa: ERROR: invalid 'hostcat': must be one of (u'all',)"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for Unknown host category"
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-hbacrule-cli-006: Source Host Category - unknown"
-        command="ipa hbacrule-add --type=deny --srchostcat=bad test"
+        command="ipa hbacrule-add --type=allow --srchostcat=bad test"
         expmsg="ipa: ERROR: invalid 'srchostcat': must be one of (u'all',)"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for Unknown source host category"
     rlPhaseEnd
