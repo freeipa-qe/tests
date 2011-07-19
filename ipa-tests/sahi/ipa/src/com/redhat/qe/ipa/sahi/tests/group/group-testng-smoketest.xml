@@ -1,0 +1,23 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+<suite name="IPAGroupTestSuite">	
+	<test name="Group Smoke Tests">
+		<packages>
+		    <package name="com.redhat.qe.ipa.sahi.*" />
+		</packages>
+		<groups>
+			<run>
+			    <include name="firefoxSetup" />
+			    <include name="init" />
+				<include name="smokeTest" /> 
+			</run>
+		</groups>
+		<classes>
+		    <class name="com.redhat.qe.ipa.sahi.tests.group.GroupTests" />
+		</classes>
+	</test>
+	
+	<listeners>        
+  		<listener class-name="com.redhat.qe.auto.testng.TestNGListener" />	
+	</listeners>
+	
+</suite>
