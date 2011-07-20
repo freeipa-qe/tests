@@ -7,7 +7,6 @@ import com.redhat.qe.ipa.sahi.tasks.SahiTasks;
 
 public class HostTasks {
 	private static Logger log = Logger.getLogger(HostTasks.class.getName());
-	private static String realm = System.getProperty("ipa.server.realm");
 	
 	/*
 	 * Create a host without dns records defined.
@@ -61,6 +60,31 @@ public class HostTasks {
 	}
 	
 	/*
+	 * add a host and add another
+	 * @param sahiTasks 
+	 * @param hostname - hostname1
+	 * @param hostname - hostname2
+	 * @param hostname - hostname2
+	 */
+	public static void addAndAddAnotherHost(SahiTasks sahiTasks, String hostname1, String hostname2, String hostname3) {
+		sahiTasks.link("Add[1]").click();
+		sahiTasks.isVisible(sahiTasks.textbox("fqdn"), true);
+		sahiTasks.textbox("fqdn").near(sahiTasks.label("Host Name: ")).setValue(hostname1);
+		sahiTasks.checkbox("force").near(sahiTasks.label("Force:")).click();
+		sahiTasks.button("Add and Add Another").click();
+		
+		sahiTasks.isVisible(sahiTasks.textbox("fqdn"), true);
+		sahiTasks.textbox("fqdn").near(sahiTasks.label("Host Name: ")).setValue(hostname2);
+		sahiTasks.checkbox("force").near(sahiTasks.label("Force:")).click();
+		sahiTasks.button("Add and Add Another").click();
+		
+		sahiTasks.isVisible(sahiTasks.textbox("fqdn"), true);
+		sahiTasks.textbox("fqdn").near(sahiTasks.label("Host Name: ")).setValue(hostname3);
+		sahiTasks.checkbox("force").near(sahiTasks.label("Force:")).click();
+		sahiTasks.button("Add").click();
+	}
+	
+	/*
 	 * Verify host fields
 	 * @param sahiTasks 
 	 * @param hostname - hostname
@@ -71,12 +95,7 @@ public class HostTasks {
 	 * @param os - example: Red Hat Enterprise Linux 6
 	 */
 	public static void verifyHostSettings(SahiTasks sahiTasks, String hostname, String description, String local, String location, String platform, String os) {
-		//String[] components = hostname.split ("\\.");
-		//String shortname = components[0];
-		//String principal = "host/"+shortname+"@"+realm;	
 		sahiTasks.link(hostname).click(); 
-		//com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.label(hostname).containsText(hostname), "Verified fqdn for host: "+ hostname);
-		//com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.label(principal).value(), principal, "Verified principal for host: " + principal);
 		com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("description").value(), description, "Verified description for host: " + description);
 		com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("l").value(), local, "Verified local for host: " + local);
 		com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("nshostlocation").value(), location, "Verified location for host: " + location);
@@ -112,6 +131,75 @@ public class HostTasks {
 	}
 	
 	/*
+	 * Modify a host
+	 * @param sahiTasks
+	 * @param field - the field of the host to be modify (description, local, location, platform or os)
+	 */
+	public static void modifyHost(SahiTasks sahiTasks, String hostname, String field, String value) {
+		sahiTasks.link(hostname).click();
+
+		if (field == "description"){
+			sahiTasks.textbox("description").setValue(value);
+		}
+		if (field == "local"){
+			sahiTasks.textbox("l").setValue(value);
+		}
+		if (field == "location"){
+			sahiTasks.textbox("nshostlocation").setValue(value);
+		}
+		if (field == "platform"){
+			sahiTasks.textbox("nshardwareplatform").setValue(value);
+		}
+		if (field == "os"){
+			sahiTasks.textbox("nsosversion").setValue(value);
+		}
+		
+		sahiTasks.link("Update").click();
+		sahiTasks.link("Hosts[1]").click();
+	}
+	
+	/*
+	 * Set Host OTP
+	 * @param sahiTasks
+	 * @param value - value to set for OTP
+	 */
+	public static void modifyHost(SahiTasks sahiTasks, String hostname, String otp) {
+		sahiTasks.link(hostname).click();
+		sahiTasks.textbox("otp").setValue(otp);
+		sahiTasks.span("Set OTP").click();
+		sahiTasks.link("Hosts[1]").click();
+	}
+	
+	/*
+	 * Verify a host field
+	 * @param sahiTasks
+	 * @param field - the field of the host to be modify (description, local, location, platform or os)
+	 */
+	public static void verifyHostField(SahiTasks sahiTasks, String hostname, String field, String value) {
+		sahiTasks.link(hostname).click();
+		if (field == "description"){
+			com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("description").value(), value, "Verified description for host: " + value);
+		}
+		if (field == "local"){
+			com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("l").value(), value, "Verified local for host: " + value);
+		}
+		if (field == "location"){
+			com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("nshostlocation").value(), value, "Verified location for host: " + value);
+		}
+		if (field == "platform"){
+			com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("nshardwareplatform").value(), value, "Verified hardware platform for host: " + value);
+		}
+		if (field == "os"){
+			com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("nsosversion").value(), value, "Verified operating system for host: " + value);
+		}
+		if (field == "otp"){
+			com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("otp").value(), value, "Verified One Time Password for host: " + value);
+		}
+
+		sahiTasks.link("Hosts[1]").click();
+	}
+	
+	/*
 	 * Delete the host.
 	 * @param sahiTasks
 	 * @param fqdn - the fqdn of the host to be deleted
@@ -119,6 +207,19 @@ public class HostTasks {
 	public static void deleteHost(SahiTasks sahiTasks, String fqdn) {
 		String lowerdn = fqdn.toLowerCase();
 		sahiTasks.checkbox(lowerdn).click();
+		sahiTasks.link("Delete[1]").click();
+		sahiTasks.button("Delete").click();
+	}
+	
+	/*
+	 * Delete multiple hosts.
+	 * @param sahiTasks
+	 * @param hostnames - the array of hostnames to delete
+	 */
+	public static void deleteHost(SahiTasks sahiTasks, String [] hostnames) {
+		for (String hostname : hostnames) {
+			sahiTasks.checkbox(hostname).click();
+		}
 		sahiTasks.link("Delete[1]").click();
 		sahiTasks.button("Delete").click();
 	}
