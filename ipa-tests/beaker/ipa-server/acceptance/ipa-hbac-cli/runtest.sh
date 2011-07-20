@@ -143,7 +143,7 @@ rlJournalStart
     rlPhaseStartTest "ipa-hbacrule-cli-007: Add Duplicate Rule"
         command="ipa hbacrule-add --type=allow --srchostcat=all test"
         expmsg="ipa: ERROR: HBAC rule with name test already exists"
-	rlRun "addHBACRule deny all all all all test" 0 "Adding HBAC test rule."
+	rlRun "addHBACRule allow all all all all test" 0 "Adding HBAC test rule."
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for adding duplicate rule"
     rlPhaseEnd
 
@@ -199,7 +199,7 @@ rlJournalStart
 
     rlPhaseStartTest "ipa-hbacrule-cli-014: Negative - setattr and addattr accessRuleType"
         command="ipa hbacrule-mod --setattr accessruletype=bad test"
-        expmsg="ipa: ERROR: invalid 'type': must be one of (u'allow', u'deny')"
+        expmsg="ipa: ERROR: invalid 'type': must be one of (u'allow')"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
         command="ipa hbacrule-mod --addattr accessruletype=bad test"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
@@ -229,7 +229,7 @@ rlJournalStart
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-hbacrule-cli-017: Negative - Rule Does Not Exist - modify"
-	 command="ipa hbacrule-mod --type=deny doesntexist"
+	 command="ipa hbacrule-mod --type=allow doesntexist"
 	 expmsg="ipa: ERROR: doesntexist: HBAC rule not found"
 	 rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for hbacrule-mod rule doesn't exist"
     rlPhaseEnd
@@ -369,9 +369,10 @@ rlJournalStart
         rlRun "verifyHBACAssoc Engineering \"Source host category\" all" 0 "Verifying Source Host Category"
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-hbacrule-cli-042: Modify Type"
-        rlRun "modifyHBACRule Engineering type deny" 0 "Modifying Engineering Rule's Type"
-        rlRun "verifyHBACAssoc Engineering \"Rule type\" deny" 0 "Verifying Type"
+    rlPhaseStartTest "ipa-hbacrule-cli-042: Deprecation of deny rule"
+        command="ipa hbacrule-add --type=deny --usercat=all newtest"
+        expmsg="ipa: ERROR: invalid 'type': The deny type has been deprecated."
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for deprecated deny rule"
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-hbacrule-cli-043: Delete User Associated with a Rule"
@@ -408,21 +409,23 @@ rlJournalStart
 
     rlPhaseStartTest "ipa-hbacrule-cli-047: Find Rules by name"
 	rlRun "addHBACRule allow \" \" \" \" \" \" \" \" test1" 0 "Adding HBAC rule."
-	rlRun "addHBACRule deny all all all all test2" 0 "Adding HBAC rule."
+	rlRun "addHBACRule allow all all all all test2" 0 "Adding HBAC rule."
 	rlRun "addHBACRule allow all all all all test3" 0 "Adding HBAC rule."
-	rlRun "addHBACRule deny \" \" \" \" \" \" \" \" test4" 0 "Adding HBAC rule."
+	rlRun "addHBACRule allow \" \" \" \" \" \" \" \" test4" 0 "Adding HBAC rule."
 
 	for item in test1 test2 test3 test4 ; do
 		rlRun "findHBACRuleByOption name $item $item" 0 "Finding rule $item by name"	
 	done
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-hbacrule-cli-047: Find Rules by type"
-	rlRun "findHBACRuleByOption type allow \"allow_all test1 test3\"" 0 "Finding rule by type"
-	rlRun "findHBACRuleByOption type allow \"test2 test4\"" 1 "Finding rule by type"
-	rlRun "findHBACRuleByOption type deny \"test2 test4\"" 0 "Finding rule by type"
-	rlRun "findHBACRuleByOption type deny \"allow_all test1 test3\"" 1 "Finding rule by type"
-    rlPhaseEnd
+    # now that deny rule is deprecated : finding by type doesn't make sense - only one type "allow"
+
+    #rlPhaseStartTest "ipa-hbacrule-cli-047: Find Rules by type"
+    #	rlRun "findHBACRuleByOption type allow \"allow_all test1 test3\"" 0 "Finding rule by type"
+    #	rlRun "findHBACRuleByOption type allow \"test2 test4\"" 1 "Finding rule by type"
+    #	rlRun "findHBACRuleByOption type deny \"test2 test4\"" 0 "Finding rule by type"
+    #	rlRun "findHBACRuleByOption type deny \"allow_all test1 test3\"" 1 "Finding rule by type"
+    #rlPhaseEnd
 
     rlPhaseStartTest "ipa-hbacrule-cli-048: Find Rules by user category"
 	rlRun "findHBACRuleByOption usercat all \"allow_all test2 test3\"" 0 "Finding rules by user category all"
