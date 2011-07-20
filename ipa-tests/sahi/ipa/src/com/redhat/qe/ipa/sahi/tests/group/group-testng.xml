@@ -7,9 +7,8 @@
 		<groups>
 			<run>
 			    <include name="firefoxSetup" />
-			    <include name="init" />
-				<include name="addGroup" /> 
-				<include name="addExtensiveGroup" /> 				
+			    <include name="init" /> 
+				<include name="acceptanceTest" /> 				
 			</run>
 		</groups>
 		<classes>
