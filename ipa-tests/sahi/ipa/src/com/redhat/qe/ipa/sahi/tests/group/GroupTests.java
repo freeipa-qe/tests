@@ -30,24 +30,24 @@ public class GroupTests extends SahiTestScript{
 	/*
 	 * Add groups - positive tests
 	 */
-	@Test (groups={"addGroup"}, dataProvider="getGroupObjects")	
-	public void testAddGroup(String testName, String groupName, String groupDescription) throws Exception {
+	@Test (groups={"acceptanceTest"}, dataProvider="getGroupObjects")	
+	public void groupAcceptanceTest(String testName, String groupName, String groupDescription) throws Exception {
 
-		//add new host
-		GroupTasks.createGroup(sahiTasks, groupName, groupDescription);
+		GroupTasks.simpleAddGroup(sahiTasks, groupName, groupDescription);
+		GroupTasks.addAndAddAnotherGroup(sahiTasks, groupName, groupDescription);
+		GroupTasks.addAndEditGroup(sahiTasks, groupName, groupDescription);
 		 
-	}//testAddGroup
+	}//groupAcceptanceTest
 	
 	/*
 	 * Add groups - positive tests
 	 */
-	@Test (groups={"addExtensiveGroup"}, dataProvider="getGroupObjects")	
-	public void testAddExtensiveGroup(String testName, String groupName, String groupDescription) throws Exception {
+	@Test (groups={"smokeTest"}, dataProvider="getGroupObjects")	
+	public void groupSmokeTest(String testName, String groupName, String groupDescription) throws Exception {
 
-		//add new host
-		GroupTasks.smokeTest(sahiTasks, groupName, groupDescription);
+		GroupTasks.smokeTest(sahiTasks);
 		 
-	}//testAddExtensiveGroup
+	}//groupSmokeTest
 	
 	/*******************************************************
 	 ************      DATA PROVIDERS     ***********
