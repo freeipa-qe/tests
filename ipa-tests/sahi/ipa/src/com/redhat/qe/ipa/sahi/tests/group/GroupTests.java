@@ -33,10 +33,14 @@ public class GroupTests extends SahiTestScript{
 	@Test (groups={"acceptanceTest"}, dataProvider="getGroupObjects")	
 	public void groupAcceptanceTest(String testName, String groupName, String groupDescription) throws Exception {
 
-		GroupTasks.simpleAddGroup(sahiTasks, groupName, groupDescription);
-		GroupTasks.addAndAddAnotherGroup(sahiTasks, groupName, groupDescription);
-		GroupTasks.addAndEditGroup(sahiTasks, groupName, groupDescription);
+		// add group test
+		//GroupTasks.simpleAddGroup(sahiTasks, groupName, groupDescription);
+		//GroupTasks.addAndAddAnotherGroup(sahiTasks, groupName, groupDescription);
+		//GroupTasks.addAndEditGroup(sahiTasks, groupName, groupDescription);
+		 //GroupTasks.editGroup(sahiTasks, groupName, groupDescription);
+		 GroupTasks.membershipGroup(sahiTasks, groupName, groupDescription);
 		 
+		//edit group test
 	}//groupAcceptanceTest
 	
 	/*
