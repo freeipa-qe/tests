@@ -782,7 +782,7 @@ mod_sudocmd()
 
 check_modsudocmd()
 {
-	rlPhaseStartTest "check to make sure that the sudo rule exists, and is disabled"
+	rlPhaseStartTest "check to make sure that the sudo cmd is moddified"
 		rlRun "ipa sudocmd-find $cmdrule1 | grep newdesc" 0 "finding sudo rule $cmdrule1 and making sure it is disabled"
 	rlPhaseEnd
 }
@@ -796,7 +796,53 @@ delete_sudocmd()
 
 check_deletedsudocmd()
 {
-	rlPhaseStartTest "check to make sure that the sudo rule does not exist"
+	rlPhaseStartTest "check to make sure that the sudo cmd does not exist"
 		rlRun "ipa sudocmd-find $cmdrule1" 1 "finding sudo cmd $cmdrule1"
+	rlPhaseEnd
+}
+
+################################
+# sudo cmd group
+################################
+cmdgrp1=repadmins
+add_sudocmdgroup()
+{
+	rlPhaseStartTest "add a sudo cmd group"
+		rlRun "ipa sudocmdgroup-add --desc='replication admins' $cmdgrp1" 0 "creating $cmdgrp1 for replication testing"
+	rlPhaseEnd
+}
+
+check_sudocmdgroup()
+{
+	rlPhaseStartTest "check to make sure that the sudo cmd group exists"
+		rlRun "ipa sudocmdgroup-find $cmdgrp1" 0 "finding sudo cmd group $cmdgrp1"
+	rlPhaseEnd
+}
+
+mod_sudocmdgroup()
+{
+	rlPhaseStartTest "modding $cmdgrp1 for replication testing"
+		rlRun "ipa sudocmdgroup-mod --desc=newdesc $cmdgrp1" 0 "modding $cmdgrp1"
+	rlPhaseEnd
+}
+
+check_modsudocmdgroup()
+{
+	rlPhaseStartTest "check to make sure that the sudo cmd group is moddified"
+		rlRun "ipa sudocmdgroup-find $cmdgrp1 | grep newdesc" 0 "finding sudo group $cmdgrp1 and making sure it is disabled"
+	rlPhaseEnd
+}
+
+delete_sudocmdgroup()
+{
+	rlPhaseStartTest "deleting $cmdgrp1"
+		rlRun "ipa sudocmdgroup-del $cmdgrp1" 0 "deleteing sudo cmd group $cmdgrp1"
+	rlPhaseEnd
+}
+
+check_deletedsudocmdgroup()
+{
+	rlPhaseStartTest "check to make sure that the sudo command group does not exist"
+		rlRun "ipa sudocmdgroup-find $cmdgrp1" 1 "finding sudo cmd $cmdgrp1"
 	rlPhaseEnd
 }
