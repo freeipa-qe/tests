@@ -86,6 +86,9 @@
 			<task name="/CoreOS/ipa-server/acceptance/ipa-getcert" role="MASTER">
 				<params/>
 			</task>
+			 <task name="/CoreOS/ipa-server/acceptance/ipa-dns" role="MASTER">
+			 	<params/>
+			 </task>
 			<task name="/CoreOS/ipa-server/acceptance/ipa-ctl" role="MASTER">
 				<params/>
 			</task>
