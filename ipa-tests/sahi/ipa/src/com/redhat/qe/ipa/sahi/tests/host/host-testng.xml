@@ -11,6 +11,7 @@
 			    <include name="invalidhostAddTests" />
 				<include name="addHostTests" />
 				<include name="deleteHostTests" />
+				<include name="addAndEditHostTests" />
 				<!--
 				<include name="teardown"/>
 				-->

@@ -17,11 +17,13 @@ import com.redhat.qe.ipa.sahi.tasks.DNSTasks;
 import com.redhat.qe.ipa.sahi.tasks.SahiTasks;
 import com.redhat.qe.ipa.sahi.tasks.HostTasks;
 
+
 public class HostTests extends SahiTestScript{
-	private static Logger log = Logger.getLogger(HostTests.class.getName());
+	private static Logger log = Logger.getLogger(HostTasks.class.getName());
 	public static SahiTasks sahiTasks = null;	
 	private String hostPage = "/ipa/ui/#identity=host&navigation=identity";
 	private String dnsPage = "/ipa/ui/#identity=dnszone&navigation=policy";
+	private String domain = System.getProperty("ipa.server.domain");
 	
 	@BeforeClass (groups={"init"}, description="Initialize app for this test suite run", alwaysRun=true, dependsOnGroups="setup")
 	public void initialize() throws CloneNotSupportedException {	
@@ -51,14 +53,14 @@ public class HostTests extends SahiTestScript{
 	 * Add and edit hosts - for positive tests
 	 */
 	@Test (groups={"addAndEditHostTests"}, dataProvider="getAddEditHostTestObjects")	
-	public void testHostAddAndEdit(String testName, String hostname, String ipadr, String description) throws Exception {
+	public void testHostAddAndEdit(String testName, String hostname, String ipadr, String description, String local, String location, String platform, String os) throws Exception {
 		String lowerdn = hostname.toLowerCase();
 		
 		//verify host doesn't exist
 		com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(lowerdn).exists(), "Verify host " + hostname + " doesn't already exist");
 		
 		//add and edit new host
-		HostTasks.addHostAndEdit(sahiTasks, hostname, ipadr, description);
+		HostTasks.addHostAndEdit(sahiTasks, hostname, ipadr, description, local, location, platform, os);
 		
 
 		sahiTasks.navigateTo(System.getProperty("ipa.server.url")+hostPage, true);
@@ -66,7 +68,10 @@ public class HostTests extends SahiTestScript{
 		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(lowerdn).exists(), "Added host " + hostname + "  successfully");
 		
 		//verify all host fields
-		HostTasks.verifyHostSettings(sahiTasks, hostname, description);
+		HostTasks.verifyHostSettings(sahiTasks, hostname, description, local, location, platform, os);
+		
+		sahiTasks.navigateTo(System.getProperty("ipa.server.url")+hostPage, true);
+		HostTasks.deleteHost(sahiTasks, hostname);
 	}
 	
 	/*
@@ -77,7 +82,7 @@ public class HostTests extends SahiTestScript{
 		//verify host exists
 		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(fqdn).exists(), "Verify host " + fqdn + " already exist");
 		
-		//add new host
+		//delete new host
 		HostTasks.deleteHost(sahiTasks, fqdn);
 		
 		//verify host was deleted
@@ -93,17 +98,18 @@ public class HostTests extends SahiTestScript{
 		
 		if (testName == "duplicate_hostname"){
 			//add a host for duplicate testing
-			HostTasks.addHost(sahiTasks, hostname, "");
+			HostTasks.addHost(sahiTasks, hostname, ipadr);
 
 			//new test user can be added now
 			HostTasks.addInvalidHost(sahiTasks, hostname, ipadr, expectedError);
 			
 			//clean up remove duplicate host
-			HostTasks.deleteHost(sahiTasks, "duplicate.testrelm");
+			HostTasks.deleteHost(sahiTasks, hostname);
 		}
 		
 		else {
-			//new test user can be added now
+			//new test host can be added now
+			sahiTasks.navigateTo(System.getProperty("ipa.server.url")+hostPage, true);
 			HostTasks.addInvalidHost(sahiTasks, hostname, ipadr, expectedError);
 		
 			sahiTasks.navigateTo(System.getProperty("ipa.server.url")+hostPage, true);
@@ -151,10 +157,12 @@ public class HostTests extends SahiTestScript{
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
         //										testname					fqdn				ipadr
-		ll.add(Arrays.asList(new Object[]{ "create_host_lowercase",		"myhost1.testrelm",		"" } ));
-		ll.add(Arrays.asList(new Object[]{ "create_host_uppercase",		"MYHOST2.TESTRELM",		"" } ));
-		ll.add(Arrays.asList(new Object[]{ "create_host_mixedcase",		"MyHost3.testrelm", 	"" } ));
+		ll.add(Arrays.asList(new Object[]{ "add_host_lowercase",		"myhost1."+domain,		"" } ));
+		ll.add(Arrays.asList(new Object[]{ "add_host_uppercase",		"MYHOST2."+domain,		"" } ));
+		ll.add(Arrays.asList(new Object[]{ "add_host_mixedcase",		"MyHost3."+domain, 		"" } ));
 		ll.add(Arrays.asList(new Object[]{ "externaldns_host",			"external.example", 	"" } ));
+		ll.add(Arrays.asList(new Object[]{ "add_host_tilde",			"test~"+domain, 		"" } ));
+		ll.add(Arrays.asList(new Object[]{ "add_host_dash",				"test-"+domain, 		"" } ));
 		        
 		return ll;	
 	}
@@ -170,10 +178,12 @@ public class HostTests extends SahiTestScript{
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
         //										testname				fqdn		
-		ll.add(Arrays.asList(new Object[]{ "delete_host_lowercase",		"myhost1.testrelm" } ));
-		ll.add(Arrays.asList(new Object[]{ "delete_host_uppercase",		"myhost2.testrelm" } ));
-		ll.add(Arrays.asList(new Object[]{ "delete_host_mixedcase",		"myhost3.testrelm" } ));
-		ll.add(Arrays.asList(new Object[]{ "delete_host_externaldns",	"external.example" } ));
+		ll.add(Arrays.asList(new Object[]{ "delete_host_lowercase",		"myhost1."+domain 	} ));
+		ll.add(Arrays.asList(new Object[]{ "delete_host_uppercase",		"myhost2."+domain 	} ));
+		ll.add(Arrays.asList(new Object[]{ "delete_host_mixedcase",		"myhost3."+domain 	} ));
+		ll.add(Arrays.asList(new Object[]{ "delete_host_externaldns",	"external.example" 	} ));
+		ll.add(Arrays.asList(new Object[]{ "delete_host_tilde",			"test~"+domain     	} ));
+		ll.add(Arrays.asList(new Object[]{ "delete_host_dash",			"test-"+domain		} ));
 		        
 		return ll;	
 	}
@@ -189,11 +199,11 @@ public class HostTests extends SahiTestScript{
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
         //										testname					hostname        		ipadr   			expectedError
-		ll.add(Arrays.asList(new Object[]{ "duplicate_hostname",			"duplicate.testrelm", 	"9.9.9.9",			"host with name \"duplicate.testrelm\" already exists"		} ));
-		ll.add(Arrays.asList(new Object[]{ "missing_host_and_domain",		"myhost1", 				"",					"invalid 'hostname': Fully-qualified hostname required"		} ));
-		ll.add(Arrays.asList(new Object[]{ "missing_domain_name",			"myhost1.", 			"",					"Host does not have corresponding DNS A record"		} ));
-		//ll.add(Arrays.asList(new Object[]{ "invalidipadr_hostname",			"ddd.testrelm", 		"10.10.10.10",		"The host was added but the DNS update failed with: DNS reverse zone for IP address 10.10.10.10 not found"		} ));	
-		//ll.add(Arrays.asList(new Object[]{ "duplicate_ipaddress",			"aaa.testrelm", 		"10.10.10.10",		"This IP address is already assigned."		} ));
+		ll.add(Arrays.asList(new Object[]{ "missing_host_and_domain",		"test", 				"",					"invalid 'hostname': Fully-qualified hostname required"		} ));
+		ll.add(Arrays.asList(new Object[]{ "invalidipadr_alpha_chars",		"test."+domain, 		"null",				"invalid 'ip_address': invalid IP address"				} ));
+		ll.add(Arrays.asList(new Object[]{ "invalidipadr_too_many_octets",	"test."+domain, 		"10.10.10.10.10",	"invalid 'ip_address': invalid IP address"		} ));	
+		ll.add(Arrays.asList(new Object[]{ "invalidipadr_bad_octects",		"test."+domain, 		"999.999.999.999",	"invalid 'ip_address': invalid IP address"		} ));
+		ll.add(Arrays.asList(new Object[]{ "invalidipadr_special_chars",	"test."+domain, 		"~.&.#.^",			"invalid 'ip_address': invalid IP address"		} ));
 		return ll;	
 	}
 
@@ -208,9 +218,9 @@ public class HostTests extends SahiTestScript{
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 	
 		//										testname					hostname        				ipadr   			ptr
-		ll.add(Arrays.asList(new Object[]{ "addhost_dnsArecord_exists",		"validdns.testrelm", 			"10.10.10.10",		 "10.10" } ));
+		ll.add(Arrays.asList(new Object[]{ "addhost_dnsArecord_exists",		"validdns."+domain, 			"10.10.10.10",		 "10.10" } ));
 		ll.add(Arrays.asList(new Object[]{ "addhost_nodns_force",			"myhost1.", 		"" 										 } ));
-		ll.add(Arrays.asList(new Object[]{ "missing_hostname",				"ddd.testrelm", 	"10.10.10.10" } ));	        
+		ll.add(Arrays.asList(new Object[]{ "missing_hostname",				"ddd."+domain, 	"10.10.10.10" } ));	        
 		return ll;	
 	}
 	
@@ -224,8 +234,8 @@ public class HostTests extends SahiTestScript{
 	protected List<List<Object>> createAddEditHostTestObjects() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-        //										testname					hostname			ipadr		description							
-		ll.add(Arrays.asList(new Object[]{ "add_and_edit_host",			"myhost1.testrelm",		"",		 	"MY host descipta098yhf;  jkhrtoryt"	} ));
+        //										testname					hostname			ipadr		description								local								location						platform	os
+		ll.add(Arrays.asList(new Object[]{ "add_and_edit_host",			"myhost1."+domain,		"",		 	"MY host descipta098yhf;  jkhrtoryt",	"314 Littleton Road, Westford, MA",	"3rd Floor under Jenny's Desk",	"x86_64",	"Fedora 15" } ));
 		        
 		return ll;	
 	}
