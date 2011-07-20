@@ -743,8 +743,8 @@ check_modsudorule()
 
 delete_sudorule()
 {
-	rlPhaseStartTest "check to make sure that the sudo rule does not exist"
-		rlRun "ipa sudorule-del $rule1" 0 "finding sudo rule $rule1"
+	rlPhaseStartTest "deleting $rule1"
+		rlRun "ipa sudorule-del $rule1" 0 "deleting $rule1"
 	rlPhaseEnd
 }
 
@@ -752,5 +752,51 @@ check_deletedsudorule()
 {
 	rlPhaseStartTest "check to make sure that the sudo rule does not exist"
 		rlRun "ipa sudorule-find $rule1" 1 "finding sudo rule $rule1"
+	rlPhaseEnd
+}
+
+################################
+# sudo cmd
+################################
+cmdrule1=/use/local/bin/nonexist
+add_sudocmd()
+{
+	rlPhaseStartTest "add a sudo cmd"
+		rlRun "ipa sudocmd-add --desc='for testing' $cmdrule1" 0 "creating $cmdrule1 for replication testing"
+	rlPhaseEnd
+}
+
+check_sudocmd()
+{
+	rlPhaseStartTest "check to make sure that the sudo cmd exists"
+		rlRun "ipa sudocmd-find $cmdrule1" 0 "finding sudo cmd $cmdrule1"
+	rlPhaseEnd
+}
+
+mod_sudocmd()
+{
+	rlPhaseStartTest "modding $cmdrule1 for replication testing"
+		rlRun "ipa sudocmd-mod --desc=newdesc $cmdrule1" 0 "modding $cmdrule1"
+	rlPhaseEnd
+}
+
+check_modsudocmd()
+{
+	rlPhaseStartTest "check to make sure that the sudo rule exists, and is disabled"
+		rlRun "ipa sudocmd-find $cmdrule1 | grep newdesc" 0 "finding sudo rule $cmdrule1 and making sure it is disabled"
+	rlPhaseEnd
+}
+
+delete_sudocmd()
+{
+	rlPhaseStartTest "deleting $cmdrule1"
+		rlRun "ipa sudocmd-del $cmdrule1" 0 "deleteing sudo cmd $cmdrule1"
+	rlPhaseEnd
+}
+
+check_deletedsudocmd()
+{
+	rlPhaseStartTest "check to make sure that the sudo rule does not exist"
+		rlRun "ipa sudocmd-find $cmdrule1" 1 "finding sudo cmd $cmdrule1"
 	rlPhaseEnd
 }
