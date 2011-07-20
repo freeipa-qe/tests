@@ -708,3 +708,49 @@ check_deletedpermission()
 		rlRun "ipa user-find $puser" 1 "making sure that the user is gone"
 	rlPhaseEnd
 }
+
+################################
+# sudo rule
+################################
+rule1=sudorule1
+add_sudorule()
+{
+	rlPhaseStartTest "add a sudo rule"
+		rlRun "ipa sudorule-add $rule1" 0 "creating $rule1 for replication testing"
+	rlPhaseEnd
+}
+
+check_sudorule()
+{
+	rlPhaseStartTest "check to make sure that the sudo rule exists"
+		rlRun "ipa sudorule-find $rule1" 0 "finding sudo rule $rule1"
+	rlPhaseEnd
+}
+
+mod_sudorule()
+{
+	rlPhaseStartTest "disabling $rule1 for replication testing"
+		rlRun "ipa sudorule-disable $rule1" 0 "disabling $rule1"
+	rlPhaseEnd
+}
+
+check_modsudorule()
+{
+	rlPhaseStartTest "check to make sure that the sudo rule exists, and is disabled"
+		rlRun "ipa sudorule-find $rule1 | grep Enabled | grep FALSE" 0 "finding sudo rule $rule1 and making sure it is disabled"
+	rlPhaseEnd
+}
+
+delete_sudorule()
+{
+	rlPhaseStartTest "check to make sure that the sudo rule does not exist"
+		rlRun "ipa sudorule-del $rule1" 0 "finding sudo rule $rule1"
+	rlPhaseEnd
+}
+
+check_deletedsudorule()
+{
+	rlPhaseStartTest "check to make sure that the sudo rule does not exist"
+		rlRun "ipa sudorule-find $rule1" 1 "finding sudo rule $rule1"
+	rlPhaseEnd
+}

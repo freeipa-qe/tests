@@ -337,6 +337,7 @@ add_objects()
    # Add a role
    # Add a selfservice permission
    # Add a SUDO rule
+	add_sudorule
    # Add a sudo command group
    # Add a sudo command
    # Add or modify a config value
@@ -359,6 +360,7 @@ check_objects()
    check_hbac
    check_hbac_service
    check_permission
+   check_sudorule
 }
 
 update_objects()
@@ -373,6 +375,7 @@ update_objects()
    modify_hbac
    modify_hbac_service
    modify_permission
+   modify_sudorule
 }
 
 check_updated_objects()
@@ -387,6 +390,7 @@ check_updated_objects()
    check_modifiedhbac
    check_modifiedhbacservice
    check_modifiedpermission
+   check_modifiedsudorule
 }
 
 
@@ -403,6 +407,7 @@ delete_objects()
    delete_hbac
    delete_hbac_service
    delete_permission
+   delete_sudorule
 }
 
 check_deletedobjects()
@@ -418,4 +423,5 @@ check_deletedobjects()
    check_deletedhbac
    check_deletedhbacservice
    check_deletedpermission
+   check_deletedsudorule
 }
