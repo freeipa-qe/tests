@@ -234,9 +234,9 @@ functional() {
 	"sudorule-remove-runasuser_func003"
 	"sudorule-add-runasuser_func004"
 	"sudorule-remove-runasuser_func004"
-	"sudorule-add-runasuser_func005"
+#	"sudorule-add-runasuser_func005" # the following ticket to be address in the future https://fedorahosted.org/freeipa/ticket/1496.
 	"sudorule-remove-runasuser_func005"
-	"sudorule-add-runasgroup_func001"
+#	"sudorule-add-runasgroup_func001" # the following ticket to be address in the future https://fedorahosted.org/freeipa/ticket/1496.
 	"sudorule-remove-runasgroup_func001"
 	"sudorule-disable_func001"
 	"sudorule-enable_func001"
