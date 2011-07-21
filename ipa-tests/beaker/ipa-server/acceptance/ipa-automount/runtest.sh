@@ -104,7 +104,7 @@ rlJournalStart
     rlPhaseEnd
 
 	# tests start...
-#automount_help
+automount_help
 automount_location_add
 automount_location_find
 automount_location_del
