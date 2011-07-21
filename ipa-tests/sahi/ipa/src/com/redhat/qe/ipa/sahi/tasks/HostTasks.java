@@ -159,6 +159,37 @@ public class HostTasks {
 	}
 	
 	/*
+	 * Undo Modify a host
+	 * @param sahiTasks
+	 * @param field - the field of the host to be modify (description, local, location, platform or os)
+	 */
+	public static void undoModifyHost(SahiTasks sahiTasks, String hostname, String olddesc, String newdesc, String oldlocal, String newlocal, String oldlocation, String newlocation, String oldplatform, String newplatform, String oldos, String newos) {
+		sahiTasks.link(hostname).click();
+
+		com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("description").value(), olddesc, "Verified existing description for host: " + olddesc);
+		sahiTasks.textbox("description").setValue(newdesc);
+		sahiTasks.span("undo[1]").click();
+		
+		com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("l").value(), oldlocal, "Verified existing local for host: " + oldlocal);
+		sahiTasks.textbox("l").setValue(newlocal);
+		sahiTasks.span("undo[2]").click();
+		
+		com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("nshostlocation").value(), oldlocation, "Verified existing location for host: " + oldlocation);
+		sahiTasks.textbox("nshostlocation").setValue(newlocation);
+		sahiTasks.span("undo[3]").click();
+		
+		com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("nshardwareplatform").value(), oldplatform, "Verified existing hardware platform for host: " + oldplatform);
+		sahiTasks.textbox("nshardwareplatform").setValue(newplatform);
+		sahiTasks.span("undo[4]").click();
+		
+		com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("nsosversion").value(), oldos, "Verified existing operating system for host: " + oldos);
+		sahiTasks.textbox("nsosversion").setValue(newos);
+		sahiTasks.span("undo[5]").click();
+		
+		sahiTasks.link("Hosts[1]").click();
+	}
+	
+	/*
 	 * Set Host OTP
 	 * @param sahiTasks
 	 * @param value - value to set for OTP
@@ -197,6 +228,60 @@ public class HostTasks {
 		}
 
 		sahiTasks.link("Hosts[1]").click();
+	}
+	
+	/*
+	 * Set Managed by Host.
+	 * @param sahiTasks
+	 * @param managed - host that will be managed
+	 * @param managedby - host managing the other host
+	 * @param button - Enroll or Cancel
+	 */
+	public static void setManagedByHost(SahiTasks sahiTasks, String managed, String managedby, String button) {
+		String checkbox = managedby+"[1]";
+		sahiTasks.link(managed).click();
+		sahiTasks.link("managedby_host").click();
+		sahiTasks.span("Enroll").click();
+		sahiTasks.checkbox(checkbox).click();
+		sahiTasks.span(">>").click();
+		sahiTasks.button(button).click();
+		sahiTasks.link("Hosts[2]").click();
+	}
+	
+	/*
+	 * Remove Managed by Host.
+	 * @param sahiTasks
+	 * @param managed - host that will be managed
+	 * @param managedby - host managing the other host
+	 * @param button - Delete or Cancel
+	 */
+	public static void removeManagedByHost(SahiTasks sahiTasks, String managed, String managedby, String button) {
+		String checkbox = managedby+"[1]";
+		sahiTasks.link(managed).click();
+		sahiTasks.link("managedby_host").click();
+		sahiTasks.checkbox(checkbox).click();
+		sahiTasks.span("Delete[2]").click();
+		sahiTasks.button(button).click();
+		sahiTasks.link("Hosts[2]").click();
+
+	}
+	
+	/*
+	 * Verify managed by hsot
+	 * @param sahiTasks
+	 * @param managed - host that will be managed
+	 * @param managedby - host managing the other host
+	 */
+	public static void verifyManagedByHost(SahiTasks sahiTasks, String managed, String managedby, String exists ) {
+		sahiTasks.link(managed).click();
+		sahiTasks.link("managedby_host").click();
+		if (exists == "YES"){
+			com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(managedby+"[1]").exists(), "Host " + managed + " is managed by " + managedby);
+		}
+		if (exists == "NO"){
+			com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(managedby+"[1]").exists(), "Host " + managed + " is NOT managed by " + managedby);
+		}	
+		sahiTasks.link("Hosts[2]").click();
 	}
 	
 	/*
