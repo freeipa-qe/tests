@@ -846,3 +846,38 @@ check_deletedsudocmdgroup()
 		rlRun "ipa sudocmdgroup-find $cmdgrp1" 1 "finding sudo cmd $cmdgrp1"
 	rlPhaseEnd
 }
+
+################################
+# config section
+################################
+add_config()
+{
+	rlPhaseStartTest "modify a config entry to ensure that the change takes everywhere."
+		rlRun "ipa config-mod --maxusername=994" 0 "modifying max username length"
+	rlPhaseEnd
+
+}
+
+check_config()
+{
+	rlPhaseStartTest "making sure that the new max usernames is shown"
+		rlRun "ipa config-show | grep 994" 0 "making sure that the new max usernames is specified"
+	rlPhaseEnd
+}
+
+delete_config()
+{
+	rlPhaseStartTest "modify a config entry back to something a little more sane"
+		rlRun "ipa config-mod --maxusername=25" 0 "modifying max username length"
+	rlPhaseEnd
+
+}
+
+check_deletedconfig()
+{
+	rlPhaseStartTest "making sure that the new max usernames is shown"
+		rlRun "ipa config-show | grep 25" 0 "making sure that the new max usernames is specified correctly"
+	rlPhaseEnd
+}
+
+

@@ -343,6 +343,7 @@ add_objects()
    # Add a sudo command
 	add_sudocmd
    # Add or modify a config value
+	add_config
 
 }
 
@@ -365,6 +366,7 @@ check_objects()
    check_sudorule
    check_sudocmdgroup
    check_sudocmd
+   check_config
 
 }
 
@@ -419,6 +421,7 @@ delete_objects()
    delete_sudorule
    delete_sudocmdgroup
    delete_sudocmd
+   delete_config
 }
 
 check_deletedobjects()
@@ -437,4 +440,5 @@ check_deletedobjects()
    check_deletedsudorule
    check_deletedsudocmdgroup
    check_deletedsudocmd
+   check_deleteconfig
 }
