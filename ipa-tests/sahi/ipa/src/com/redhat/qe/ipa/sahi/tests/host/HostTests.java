@@ -165,6 +165,73 @@ public class HostTests extends SahiTestScript{
 		sahiTasks.navigateTo(System.getProperty("ipa.server.url")+hostPage, true);
 		HostTasks.deleteHost(sahiTasks, hostname);
 	}
+	
+	/*
+	 * Undo Modify 
+	 */
+	@Test (groups={"undoModifyHostTests"}, dataProvider="getUndoModifyHostTestObjects")	
+	public void tesUndoModifyHost(String testName, String hostname, String ipadr, String olddesc, String newdesc, String oldlocal, String newlocal, String oldlocation, String newlocation, String oldplatform, String newplatform, String oldos, String newos ) throws Exception {
+		
+		//add the host
+		com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(hostname).exists(), "Verify host " + hostname + " doesn't already exist");
+		HostTasks.addHostAndEdit(sahiTasks, hostname, ipadr, olddesc, oldlocal, oldlocation, oldplatform, oldos);
+		sahiTasks.navigateTo(System.getProperty("ipa.server.url")+hostPage, true);
+		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(hostname).exists(), "Added host " + hostname + "  successfully");
+		
+		//modify the host
+		HostTasks.undoModifyHost(sahiTasks, hostname, olddesc, newdesc, oldlocal, newlocal, oldlocation, newlocation, oldplatform, newplatform, oldos, newos);
+		
+		//verify all host field
+		HostTasks.verifyHostSettings(sahiTasks, hostname, olddesc, oldlocal, oldlocation, oldplatform, oldos);
+		
+		sahiTasks.navigateTo(System.getProperty("ipa.server.url")+hostPage, true);
+		HostTasks.deleteHost(sahiTasks, hostname);
+	}
+	
+	/*
+	 * Set Managed By test
+	 */
+	@Test (groups={"setManagedByHostTests"}, dataProvider="getSetManageByHostTests")	
+	public void testManagedByHost(String testName, String managed, String managedby, String exists, String button ) throws Exception {
+		// add managed host
+		HostTasks.addHost(sahiTasks, managed, "");
+		// add managed by host
+		HostTasks.addHost(sahiTasks, managedby, "");
+
+		HostTasks.setManagedByHost(sahiTasks, managed, managedby, button);
+		
+		// verify managed by host
+		HostTasks.verifyManagedByHost(sahiTasks, managed, managedby, exists);
+		
+		//delete the hosts
+		String [] hostnames = {managed, managedby};
+		HostTasks.deleteHost(sahiTasks, hostnames);
+		
+	}
+	
+	/*
+	 * Remove Managed By test
+	 */
+	@Test (groups={"removeManagedByHostTests"}, dataProvider="getRemoveManageByHostTests")	
+	public void testRemoveManagedByHost(String testName, String managed, String managedby, String exists, String button ) throws Exception {
+		// add managed host
+		HostTasks.addHost(sahiTasks, managed, "");
+		// add managed by host
+		HostTasks.addHost(sahiTasks, managedby, "");
+		
+		HostTasks.setManagedByHost(sahiTasks, managed, managedby, "Enroll");
+
+		HostTasks.removeManagedByHost(sahiTasks, managed, managedby, button);
+		
+		// verify managed by host
+		HostTasks.verifyManagedByHost(sahiTasks, managed, managedby, exists);
+		
+		//delete the hosts
+		String [] hostnames = {managed, managedby};
+		HostTasks.deleteHost(sahiTasks, hostnames);
+		
+	}
+	
 	/*
 	 * Add host - for negative tests
 	 */
@@ -336,7 +403,7 @@ public class HostTests extends SahiTestScript{
 	}
 	
 	/*
-	 * Data to be used when modifying hosts - for positive tests
+	 * Data to be used when setting OTP for hosts - for positive tests
 	 */
 	@DataProvider(name="getOTPHostTestObjects")
 	public Object[][] getOTPHostTestObjects() {
@@ -351,6 +418,56 @@ public class HostTests extends SahiTestScript{
 		ll.add(Arrays.asList(new Object[]{ "OTP_alphanumeric",				"alphanumeric."+domain, 	"",			"kjasdoa58gshoty7475p759burtsyrta436756878"		} ));	
 		ll.add(Arrays.asList(new Object[]{ "OTP_special_chars",				"special."+domain, 			"", 		"#$%^&()&(^%$*^$+"	} ));
 		ll.add(Arrays.asList(new Object[]{ "OTP_mixed",						"mixed."+domain, 			"",			"#kajfa8ga89pajh0b6q<ejt} j&b7q9nbti*"		} ));
+		return ll;	
+	}
+	
+	/*
+	 * Data to be used when undoing host modifications - for positive tests
+	 */
+	@DataProvider(name="getUndoModifyHostTestObjects")
+	public Object[][] getUndoModifyHostTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createUndoModifyHostTestObjects());
+	}
+	protected List<List<Object>> createUndoModifyHostTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname				hostname        	ipadr		olddesc  					newdesc																oldlocal				newlocal						oldlocationoldplatform		newlocation	newplatform		oldos			newos
+		ll.add(Arrays.asList(new Object[]{ 		"modify_description",	"undo."+domain, 	"",			"Old description",			"My new host value $#* - abcdefghijklmnopqrstuvwxyz 1234567890",	"Boston Massachusetts",	"Mountain View, California",	"Lab 10 - Building 3",		"Basement Lab - Rack 150 - number 13",		"ia64",			"x86_64",		"Fedora 15",	"Red Hat Enterprise Linux 6.0 Client"	} ));
+		return ll;	
+	}
+	
+	
+	/*
+	 * Data to be used when setting managed host - for positive cases
+	 */
+	@DataProvider(name="getSetManageByHostTests")
+	public Object[][] getSetManageHostTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createSetManageHostTestObjects());
+	}
+	protected List<List<Object>> createSetManageHostTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname				managed				 managedby					exists	button
+		ll.add(Arrays.asList(new Object[]{ "set_managedby_cancel",			"managed."+domain,	 "managedby."+domain, 	"No",	"Cancel" } ));
+		ll.add(Arrays.asList(new Object[]{ "set_managedby_enroll",			"managed."+domain,	 "managedby."+domain, 	"Yes",	"Enroll" } ));
+		        
+		return ll;	
+	}
+	
+	/*
+	 * Data to be used when removing managed host - for positive cases
+	 */
+	@DataProvider(name="getRemoveManageByHostTests")
+	public Object[][] getRemoveManageHostTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createRemoveManageHostTestObjects());
+	}
+	protected List<List<Object>> createRemoveManageHostTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname				managed				 managedby				exists	button
+		ll.add(Arrays.asList(new Object[]{ "remove_managedby_cancel",	"managed."+domain,	 "managedby."+domain, 	"Yes",	"Cancel" } ));
+		ll.add(Arrays.asList(new Object[]{ "remove_managedby_delete",	"managed."+domain,	 "managedby."+domain, 	"No",	"Delete" } ));
+		        
 		return ll;	
 	}
 }
