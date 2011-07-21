@@ -70,11 +70,24 @@ automount_help() {
 	"automount_019"
 }
 
-automount_location() {
-	"automount_location_001"
-	"automount_location_002"
+automount_location_add() {
+	"automount_location_add_001"
+	"automount_location_add_002"
+	"automount_location_add_003"
 }
 
+automount_location_find() {
+	"automount_location_find_001"
+	"automount_location_find_002"
+	"automount_location_find_003"
+	"automount_location_find_004"
+	"automount_location_find_005"
+}
+
+automount_location_del() {
+	"automount_location_del_001"
+	"automount_location_del_002"
+}
 #automount_map() {
 #"automount_map_001"
 #}
@@ -92,7 +105,8 @@ rlJournalStart
 
 	# tests start...
 #automount_help
-automount_location
+automount_location_add
+automount_location_find
 automount_location_del
 	# tests end.
 
