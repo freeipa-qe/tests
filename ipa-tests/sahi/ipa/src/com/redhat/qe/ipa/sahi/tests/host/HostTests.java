@@ -21,6 +21,9 @@ public class HostTests extends SahiTestScript{
 	private String hostPage = "/ipa/ui/#identity=host&navigation=identity";
 	private String dnsPage = "/ipa/ui/#identity=dnszone&navigation=policy";
 	private String domain = System.getProperty("ipa.server.domain");
+	private String csr = "MIIBcDCB2gIBADAxMRMwEQYDVQQKEwpRRS5MQUIuSVBBMRowGAYDVQQDExFteWhv"+ "\n" + "c3QucWUubGFiLmlwYTCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEA4lXS4N0r"+ "\n" + "lvJOwhv7eZdWLoaH5BwNoNgBObTAde4MYRejx75f3Ovo+8WVChRs/xDemDPGfWj0"+ "\n" + "9BW4BDXpX0Vaa3N4akIfKoxDnYckZlifuHxbyrZB9XX8eAZDMwtBzi30elEp5Cf5"+ "\n" + "SWMJ9WBOoXu/YCC58aegXKJjPXLlzvrIoEsCAwEAAaAAMA0GCSqGSIb3DQEBBQUA"+ "\n" + "A4GBABK4TVlwNx4LzQvX/rgfqWTv33iIgkPFY4TsXiR2XL74HAhDDk5JYJM3DGHP"+ "\n" + "4Si7E/vX6ea6IZuNAul0koIJtT2etUo8oebOKQPFb1F1AY+h6sW/QC3DH20hT85H"+ "\n" + "KhPLOBcjOSY/T9M4eu5xsjVtzqZMJCdFKFRg9pLBUrCZhu3Z";
+	private String badcsr = "MIIBcDCB2gIBADAxMRMwEQYDVQQKEwpRRS5MQUIuSVBBMRowGAYDVQQDExFteWdhv"+ "\n" + "c3QucWUubGFiLmlYTCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEA4lXS4N0r"+ "\n" + "lvJOwhv7eZdWLoaH5BwNoNgBObTAde4MYRejx75f3Ovo+8WVChRs/xDemDPGfWj0"+ "\n" + "9BW4BDXpX0Vaa3N4akIfKoxDnYckZlifuHxbyrZB9XX8eAZDMwtBzi30elEp5Cf5"+ "\n" + "SWMJ9WBOoXu/YIFOCC58aegXKJjPXLlzvrIoEsCAwEAAaAAMA0GCSqGSIb3DQEBBQUA"+ "\n" + "A4GBABK4TVlwNx4LzQvX/rgfqWTv33iIgkPFY4TLsXiR2XL74HAhDDk5JYJM3DGHP"+ "\n" + "4Si7E/vX6ea6IZuNAul0koIJtT2etUo8oebOKQPFb1F1AY+h6sW/QC3DH20hT85H"+ "\n" + "KhPLOBcjOSY/T9M4u5xsjVtzqZMJCdFKFRg9pLBUrCZhu3Z";
+	private String wronghostcsr = "MIIBbDCB1gIBADAtMRMwEQYDVQQKEwpRRS5MQUIuSVBBMRYwFAYDVQQDEw1ob3N0"+ "\n" +"LnRlc3RyZWxtMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDvu8wcVthKZCa/"+ "\n" +"KZ30fKPC1jMZ+PUXE/xJNfKVKG9olVSswk4RG8AD0yCApMJ5u6yXU4pT6RbxVHFg"+ "\n" +"X4xA1e006HIdOKrw5pcKhndMyc21rFaUVb66P8z7FXqiVvx3imgZrbM6rr1rfXvH"+ "\n" +"xTeTwL20Lor5Ym9ypajxGTU7IDaXMwIDAQABoAAwDQYJKoZIhvcNAQEFBQADgYEA"+ "\n" +"1IwWyrFEkXuT1vbiDU1urfSazFObEnMUR4vvIraEdhKqJySq9gB/F3j7h+EomKna"+ "\n" +"+G55hsJN7Ct0dhHks0MVIydCnSj364n2vLtfvidn1OgTYOqg4bWTmIMa/ejyV6pX"+ "\n" +"+tYey0wVg+uXyqSPZr/ZJZtmqkKIzCkzrMpxYDlUNk0=";
 	
 	@BeforeClass (groups={"init"}, description="Initialize app for this test suite run", alwaysRun=true, dependsOnGroups="setup")
 	public void initialize() throws CloneNotSupportedException {	
@@ -193,32 +196,25 @@ public class HostTests extends SahiTestScript{
 	 */
 	@Test (groups={"setManagedByHostTests"}, dataProvider="getSetManageByHostTests")	
 	public void testManagedByHost(String testName, String managed, String managedby, String exists, String button ) throws Exception {
-		// add managed host
-		HostTasks.addHost(sahiTasks, managed, "");
-		// add managed by host
-		HostTasks.addHost(sahiTasks, managedby, "");
-
+		if (testName == "set_managedby_cancel"){
+			// add managed host
+			HostTasks.addHost(sahiTasks, managed, "");
+			// add managed by host
+			HostTasks.addHost(sahiTasks, managedby, "");
+		}
+		
 		HostTasks.setManagedByHost(sahiTasks, managed, managedby, button);
 		
 		// verify managed by host
 		HostTasks.verifyManagedByHost(sahiTasks, managed, managedby, exists);
-		
-		//delete the hosts
-		String [] hostnames = {managed, managedby};
-		HostTasks.deleteHost(sahiTasks, hostnames);
-		
 	}
 	
 	/*
 	 * Remove Managed By test
 	 */
-	@Test (groups={"removeManagedByHostTests"}, dataProvider="getRemoveManageByHostTests")	
+	@Test (groups={"removeManagedByHostTests"}, dataProvider="getRemoveManageByHostTests",  dependsOnGroups="setManagedByHostTests")	
 	public void testRemoveManagedByHost(String testName, String managed, String managedby, String exists, String button ) throws Exception {
-		// add managed host
-		HostTasks.addHost(sahiTasks, managed, "");
-		// add managed by host
-		HostTasks.addHost(sahiTasks, managedby, "");
-		
+	
 		HostTasks.setManagedByHost(sahiTasks, managed, managedby, "Enroll");
 
 		HostTasks.removeManagedByHost(sahiTasks, managed, managedby, button);
@@ -226,12 +222,79 @@ public class HostTests extends SahiTestScript{
 		// verify managed by host
 		HostTasks.verifyManagedByHost(sahiTasks, managed, managedby, exists);
 		
-		//delete the hosts
-		String [] hostnames = {managed, managedby};
-		HostTasks.deleteHost(sahiTasks, hostnames);
+		if (testName == "remove_managedby_delete"){
+			//delete the hosts
+			String [] hostnames = {managed, managedby};
+			HostTasks.deleteHost(sahiTasks, hostnames);
+		}
+	}
+	
+	/*
+	 * Certificate Tests
+	 */
+	@Test (groups={"hostCertificateTests"}, dataProvider="getHostCertificateTests")	
+	public void testHostCertificates(String testName, String hostname, String reason ) throws Exception {
+		// add managed host
+		HostTasks.addHost(sahiTasks, hostname, "");
+		
+		// add request certificate
+		HostTasks.addHostCertificate(sahiTasks, hostname, csr);
+		
+		// verify valid certificate
+		HostTasks.verifyHostCertificate(sahiTasks, hostname);
+		
+		// cancel hold certificate
+		HostTasks.revokeHostCertificate(sahiTasks, hostname, "Certificate Hold", "Cancel");
+		HostTasks.verifyHostCertificate(sahiTasks, hostname);
+		
+		// put certificate on hold
+		HostTasks.revokeHostCertificate(sahiTasks, hostname, "Certificate Hold", "Revoke");
+		HostTasks.verifyHostCertificate(sahiTasks, hostname, "Hold", "Certificate Hold");
+		
+		// cancel restore certificate
+		HostTasks.restoreHostCertificate(sahiTasks, hostname, "Cancel");
+		HostTasks.verifyHostCertificate(sahiTasks, hostname, "Hold", "Certificate Hold");
+		
+		//restore certificate
+		HostTasks.restoreHostCertificate(sahiTasks, hostname, "Restore");
+		HostTasks.verifyHostCertificate(sahiTasks, hostname);
+		
+		//cancel revoking certificate
+		HostTasks.revokeHostCertificate(sahiTasks, hostname, reason, "Cancel");
+		HostTasks.verifyHostCertificate(sahiTasks, hostname);
+		
+		//revoke certificate
+		HostTasks.revokeHostCertificate(sahiTasks, hostname, reason, "Revoke");
+		HostTasks.verifyHostCertificate(sahiTasks, hostname, "Revoked", reason);
+		
+		// cancel request for new certificate
+		HostTasks.newHostCertificate(sahiTasks, hostname, csr, "Cancel");
+		HostTasks.verifyHostCertificate(sahiTasks, hostname, "Revoked", reason);
+		
+		// request for new certificate
+		HostTasks.newHostCertificate(sahiTasks, hostname, csr, "Issue");
+		HostTasks.verifyHostCertificate(sahiTasks, hostname);
+		
+		//delete the host
+		HostTasks.deleteHost(sahiTasks, hostname);
 		
 	}
 	
+	/*
+	 * Invalid Certificate Request Tests
+	 */
+	@Test (groups={"hostInvalidCSRTests"}, dataProvider="getInvalidHostCSRTestObjects")	
+	public void testHostInvalidCSR(String testName, String hostname, String csr, String expectedError ) throws Exception {
+		// add host
+		HostTasks.addHost(sahiTasks, hostname, "");
+		
+		// add request certificate
+		HostTasks.invalidHostCSR(sahiTasks, hostname, csr, expectedError);
+		
+		// deleted host
+		HostTasks.deleteHost(sahiTasks, hostname);
+	}
+
 	/*
 	 * Add host - for negative tests
 	 */
@@ -468,6 +531,39 @@ public class HostTests extends SahiTestScript{
 		ll.add(Arrays.asList(new Object[]{ "remove_managedby_cancel",	"managed."+domain,	 "managedby."+domain, 	"Yes",	"Cancel" } ));
 		ll.add(Arrays.asList(new Object[]{ "remove_managedby_delete",	"managed."+domain,	 "managedby."+domain, 	"No",	"Delete" } ));
 		        
+		return ll;	
+	}
+	
+	/*
+	 * Data to be used for host certificate tests - for positive cases
+	 */
+	@DataProvider(name="getHostCertificateTests")
+	public Object[][] getHostCertificateTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createHostCertificateTestObjects());
+	}
+	protected List<List<Object>> createHostCertificateTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname							hostname			reason
+		ll.add(Arrays.asList(new Object[]{ "add_view_hold_revoke_new_certificate",	"myhost.qe.lab.ipa", 	"Key Compromise"  } ));
+		        
+		return ll;	
+	}
+	
+	/*
+	 * Data to be used for invalid CSR tests - for negative cases
+	 */
+	@DataProvider(name="getInvalidHostCSRTestObjects")
+	public Object[][] getInvalidHostCSRTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createInvalidHostCSRTestObjects());
+	}
+	protected List<List<Object>> createInvalidHostCSRTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname					hostname        		csr   			expectedError
+		ll.add(Arrays.asList(new Object[]{ "csr_blank",				"myhost.qe.lab.ipa", 		"",				"Certificate operation cannot be completed: Failure decoding Certificate Signing Request" } ));
+		ll.add(Arrays.asList(new Object[]{ "csr_invalid_format",		"myhost.qe.lab.ipa", 		badcsr,			"Base64 decoding failed: Incorrect padding"	} ));
+		ll.add(Arrays.asList(new Object[]{ "csr_wrong_host",			"myhost.qe.lab.ipa", 		wronghostcsr,	"Insufficient access: hostname in subject of request 'host.testrelm' does not match principal hostname 'myhost.qe.lab.ipa'"	} ));	
 		return ll;	
 	}
 }
