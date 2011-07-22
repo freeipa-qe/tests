@@ -2,13 +2,16 @@
 
 #IPA parameters
 ipa.version=2.1
-ipa.server.url=http://rhel61-server5.testrelm
+ipa.server.url=http://optimus.lab.eng.pnq.redhat.com
 ipa.server.admin=admin
 ipa.server.password=Secret123
 #ipa.server.url=http://rhel62-server.testrelm
-
-
-
+ipa.browser.path=/usr/bin/firefox
+ipa.browser.type=firefox
+ipa.browser.name=firefox
+ipa.browser.opt=
+ipa.sahi.base.dir=/root/sahi
+ipa.sahi.userdata.dir=/root/sahi/userdata
 
 #Selenium parameters
 #selenium.address=rhel61-server5.testrelm:4444
@@ -21,9 +24,8 @@ ipa.server.password=Secret123
 #selenium.screenshot.dir=/var/www/html/IPATests
 
 #Sahi parameters
-SAHI_USERDATA_DIR=/home/nk/sahi/userdata
-SAHI_BASE=/home/nk/sahi
-
+SAHI_USERDATA_DIR=/root/sahi/userdata
+SAHI_BASE=/root/sahi
 
 ##distro-specific settings
 #cob.distro.name=RHEL5-i386

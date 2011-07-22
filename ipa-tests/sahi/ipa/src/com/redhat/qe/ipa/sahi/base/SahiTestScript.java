@@ -13,21 +13,20 @@ public abstract class SahiTestScript extends TestScript {
 	public static SahiTasks sahiTasks = null;
 
 	
+	protected String browserType			= System.getProperty("ipa.browser.type");
+	protected String browserPath			= System.getProperty("ipa.browser.path");
+	protected String browserName			= System.getProperty("ipa.browser.name");
+	protected String browserOpt				= System.getProperty("ipa.browser.opt");
 
-
-	protected String browserPath			= System.getProperty("ipa.browser.path", "/usr/bin/firefox");
-	protected String browserName			= System.getProperty("ipa.browser.name", "firefox");
-	protected String browserOpt				= System.getProperty("ipa.browser.opt", "");
-
-	protected String sahiBaseDir			= System.getProperty("ipa.sahi.base.dir", "/home/nk/sahi");
-	protected String sahiUserdataDir		= System.getProperty("ipa.sahi.userdata.dir", sahiBaseDir+"/userdata");
+	protected String sahiBaseDir			= System.getProperty("ipa.sahi.base.dir");
+	protected String sahiUserdataDir		= System.getProperty("ipa.sahi.userdata.dir");
 
 	protected String bundleHostURL			= System.getProperty("ipa.bundleServer.url");
 
 	public SahiTestScript() {
 		super();
 
-		sahiTasks = new SahiTasks(browserPath, browserName, browserOpt, sahiBaseDir, sahiUserdataDir);
+		sahiTasks = new SahiTasks(browserType, browserPath, browserName, browserOpt, sahiBaseDir, sahiUserdataDir);
 	}
 	
 	public static SahiTasks getSahiTasks() {
