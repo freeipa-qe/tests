@@ -4,7 +4,7 @@
 	</notify>
 
 	<whiteboard>
-		 IPA Multi-Server Install Test x86_64
+		 IPA :: Multi-Server :: Functional Services Tests :: x86_64
 	</whiteboard>
 	<recipeSet>
 		<recipe kernel_options="" kernel_options_post="" ks_meta="" role="MASTER" whiteboard="IPA MASTER SERVER">

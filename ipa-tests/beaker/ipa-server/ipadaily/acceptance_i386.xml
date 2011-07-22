@@ -3,10 +3,10 @@
 		<cc>ipa-and-samba-team-automation@redhat.com</cc>
 	</notify>
 	<whiteboard>
-		ipa-server full acceptance - i386 - master only
+		IPA :: Full CLI Acceptance :: i386
 	</whiteboard>
 	<recipeSet>
-		<recipe whiteboard="ipa server full acceptance - i386">
+		<recipe whiteboard="IPA :: Full CLI Acceptacne :: i386">
 			<distroRequires>
 				<and>
 					<distro_variant op="=" value="Server"/>
