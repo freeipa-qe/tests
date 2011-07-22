@@ -6,7 +6,7 @@
 		IPA :: Full CLI Acceptance :: i386
 	</whiteboard>
 	<recipeSet>
-		<recipe whiteboard="IPA :: Full CLI Acceptacne :: i386">
+		<recipe whiteboard="IPA MASTER SERVER :: i386">
 			<distroRequires>
 				<and>
 					<distro_variant op="=" value="Server"/>

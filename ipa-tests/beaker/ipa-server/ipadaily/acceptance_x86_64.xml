@@ -6,7 +6,7 @@
 		IPA :: Full CLI Acceptacne :: x86_64
 	</whiteboard>
 	<recipeSet>
-		<recipe whiteboard="IPA :: Full CLI Acceptacne :: x86_64">
+		<recipe whiteboard="IPA MASTER SERVER :: x86_64">
 			<distroRequires>
 				<and>
 					<distro_variant op="=" value="Server"/>
