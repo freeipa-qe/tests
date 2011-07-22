@@ -15,9 +15,11 @@
 #  automountlocation-add      Create a new automount location.
 #  automountlocation-del      Delete an automount location.
 #  automountlocation-find     Search for an automount location.
-#  automountlocation-import   Import automount files for a specific location.
+#  automountlocation-import   Import automount files for a specific location. 
+	# No sanity tests for automountlocation-import.
 #  automountlocation-show     Display an automount location.
 #  automountlocation-tofiles  Generate automount files for a specific location.
+	# No sanity tests for automountlocation-tofiles.
 #  automountmap-add           Create a new automount map.
 #  automountmap-add-indirect  Create a new indirect mount point.
 #  automountmap-del           Delete an automount map.
@@ -572,6 +574,7 @@ rlPhaseStartTest "automount_location_find_001: ipa automountlocation-find"
 	rlAssertGrep "Location: pune" "$TmpDir/automount_location_find_001.out"
 	rlAssertGrep "Number of entries returned 2" "$TmpDir/automount_location_find_001.out"
 
+	rlRun "cat $TmpDir/automount_location_find_001.out"
 	rlRun "ipa automountlocation-del pune"
 
 rlPhaseEnd
@@ -587,6 +590,7 @@ rlPhaseStartTest "automount_location_find_002: ipa automountlocation-find LOCATI
         rlAssertGrep "Location: pune" "$TmpDir/automount_location_find_002.out"
 	rlAssertGrep "Number of entries returned 1" "$TmpDir/automount_location_find_002.out"
 
+	rlRun "cat $TmpDir/automount_location_find_002.out"
         rlRun "ipa automountlocation-del pune"
 
 rlPhaseEnd
@@ -602,6 +606,7 @@ rlPhaseStartTest "automount_location_find_003: ipa automountlocation-find --loca
         rlAssertGrep "Location: pune" "$TmpDir/automount_location_find_003.out"
         rlAssertGrep "Number of entries returned 1" "$TmpDir/automount_location_find_003.out"
 
+	rlRun "cat $TmpDir/automount_location_find_003.out"
         rlRun "ipa automountlocation-del pune"
 
 rlPhaseEnd
@@ -619,6 +624,7 @@ rlPhaseStartTest "automount_location_find_004: ipa automountlocation-find --loca
 	rlAssertGrep "objectclass: nscontainer, top" "$TmpDir/automount_location_find_004.out"
         rlAssertGrep "Number of entries returned 1" "$TmpDir/automount_location_find_004.out"
 
+	rlRun "cat $TmpDir/automount_location_find_004.out"
 	rlRun "ipa automountlocation-del pune"
 
 rlPhaseEnd
@@ -637,10 +643,154 @@ rlPhaseStartTest "automount_location_find_005: ipa automountlocation-find --loca
         rlAssertGrep "objectclass: top" "$TmpDir/automount_location_find_005.out"
         rlAssertGrep "Number of entries returned 1" "$TmpDir/automount_location_find_005.out"
 
+	rlRun "cat $TmpDir/automount_location_find_005.out"
         rlRun "ipa automountlocation-del pune"
 
 rlPhaseEnd
 }
+
+automount_location_show_001() {
+
+rlPhaseStartTest "automount_location_show_001: ipa automountlocation-show LOCATION"
+
+        rlRun "ipa automountlocation-add pune"
+
+        rlRun "ipa automountlocation-show pune > $TmpDir/automount_location_show_001.out 2>&1"
+	rlAssertGrep "Location: pune" "$TmpDir/automount_location_show_001.out"
+
+	rlRun "cat $TmpDir/automount_location_show_001.out"
+	rlRun "ipa automountlocation-del pune"
+
+rlPhaseEnd
+}
+
+automount_location_show_002() {
+
+rlPhaseStartTest "automount_location_show_002: ipa automountlocation-show LOCATION --all"
+
+        rlRun "ipa automountlocation-add pune"
+
+        rlRun "ipa automountlocation-show pune --all > $TmpDir/automount_location_show_002.out 2>&1"
+        rlAssertGrep "dn: cn=pune,cn=automount,$basedn" "$TmpDir/automount_location_show_002.out"
+        rlAssertGrep "objectclass: nscontainer, top" "$TmpDir/automount_location_show_002.out"
+        rlAssertGrep "Location: pune" "$TmpDir/automount_location_show_002.out"
+
+	rlRun "cat $TmpDir/automount_location_show_002.out"
+        rlRun "ipa automountlocation-del pune"
+
+rlPhaseEnd
+}
+
+automount_location_show_003() {
+
+rlPhaseStartTest "automount_location_show_003: ipa automountlocation-show LOCATION --all --raw"
+
+        rlRun "ipa automountlocation-add pune"
+
+	rlRun "ipa automountlocation-show pune --all --raw > $TmpDir/automount_location_show_003.out 2>&1"
+	rlAssertGrep "dn: cn=pune,cn=automount,$basedn" "$TmpDir/automount_location_show_003.out"
+        rlAssertGrep "objectclass: nscontainer" "$TmpDir/automount_location_show_003.out"
+        rlAssertGrep "objectclass: top" "$TmpDir/automount_location_show_003.out"
+        rlAssertGrep "cn: pune" "$TmpDir/automount_location_show_003.out"
+
+	rlRun "cat $TmpDir/automount_location_show_003.out"
+        rlRun "ipa automountlocation-del pune"
+
+rlPhaseEnd
+}
+
+automount_location_show_004() {
+
+rlPhaseStartTest "automount_location_show_004: ipa automountlocation-show LOCATION --all --raw --rights"
+
+        rlRun "ipa automountlocation-add pune"
+
+        rlRun "ipa automountlocation-show pune --all --raw --rights > $TmpDir/automount_location_show_004.out 2>&1"
+	rlAssertGrep "dn: cn=pune,cn=automount,$basedn" "$TmpDir/automount_location_show_004.out"
+	rlAssertGrep "cn: pune" "$TmpDir/automount_location_show_004.out"
+        rlAssertGrep "objectclass: nscontainer" "$TmpDir/automount_location_show_004.out"
+        rlAssertGrep "objectclass: top" "$TmpDir/automount_location_show_004.out"
+        rlAssertGrep "attributelevelrights: {'objectclass': u'rscwo', 'aci': u'rscwo', 'cn': u'rscwo', 'nsaccountlock': u'rscwo'}" "$TmpDir/automount_location_show_004.out"
+
+        rlRun "cat $TmpDir/automount_location_show_004.out"
+        rlRun "ipa automountlocation-del pune"
+
+rlPhaseEnd
+}
+
+automountmap_add_001() {
+
+rlPhaseStartTest "automountmap_add_001: ipa automountmap-add LOCATION MAP"
+
+	rlRun "ipa automountlocation-add pune"
+
+	rlRun "ipa automountmap-add pune auto.pune > $TmpDir/automountmap_add_001.out 2>&1"
+	rlAssertGrep "Added automount map \"auto.pune\"" "$TmpDir/automountmap_add_001.out"
+	rlAssertGrep "Map: pune.map" "$TmpDir/automountmap_add_001.out"
+
+	rlRun "cat $TmpDir/automountmap_add_001.out"
+	rlRun "ipa automountlocation-del pune"
+
+rlPhaseEnd
+}
+
+automountmap_add_002() {
+
+rlPhaseStartTest "automountmap_add_002: ipa automountmap-add LOCATION MAP --all"
+
+	rlRun "ipa automountlocation-add pune"
+
+        rlRun "ipa automountmap-add pune auto.pune --all > $TmpDir/automountmap_add_002.out 2>&1"
+        rlAssertGrep "Added automount map \"auto.pune\"" "$TmpDir/automountmap_add_002.out"
+	rlAssertGrep "dn: automountmapname=auto.pune,cn=pune,cn=automount,$basedn" "$TmpDir/automountmap_add_002.out"
+        rlAssertGrep "automountmapname: auto.pune" "$TmpDir/automountmap_add_002.out"
+        rlAssertGrep "objectclass: automountmap, top" "$TmpDir/automountmap_add_002.out"
+
+        rlRun "cat $TmpDir/automountmap_add_002.out"
+        rlRun "ipa automountlocation-del pune"
+
+rlPhaseEnd
+}
+
+automountmap_add_003() {
+
+rlPhaseStartTest "automountmap_add_003: ipa automountmap-add LOCATION MAP --all --raw"
+
+        rlRun "ipa automountlocation-add pune"
+
+        rlRun "ipa automountmap-add pune auto.pune --all --raw > $TmpDir/automountmap_add_003.out 2>&1"
+        rlAssertGrep "Added automount map \"auto.pune\"" "$TmpDir/automountmap_add_003.out"
+	rlAssertGrep "dn: automountmapname=auto.pune,cn=pune,cn=automount,$basedn" "$TmpDir/automountmap_add_003.out"
+        rlAssertGrep "automountmapname: auto.pune" "$TmpDir/automountmap_add_003.out"
+        rlAssertGrep "objectclass: automountmap" "$TmpDir/automountmap_add_003.out"
+        rlAssertGrep "objectclass: top" "$TmpDir/automountmap_add_003.out"
+
+        rlRun "cat $TmpDir/automountmap_add_003.out"
+        rlRun "ipa automountlocation-del pune"
+
+rlPhaseEnd
+}
+
+automountmap_add_004() {
+
+rlPhaseStartTest "automountmap_add_004: ipa automountmap-add LOCATION MAP --all --raw --desc"
+
+        rlRun "ipa automountlocation-add pune"
+
+        rlRun "ipa automountmap-add pune auto.pune --all --raw --desc=\"pune automount map\" > > $TmpDir/automountmap_add_004.out 2>&1"
+        rlAssertGrep "Added automount map \"auto.pune\"" "$TmpDir/automountmap_add_004.out"
+        rlAssertGrep "dn: automountmapname=auto.pune,cn=pune,cn=automount,$basedn" "$TmpDir/automountmap_add_004.out"
+        rlAssertGrep "automountmapname: auto.pune" "$TmpDir/automountmap_add_004.out"
+	rlAssertGrep "description: pune automount map" "$TmpDir/automountmap_add_004.out"
+        rlAssertGrep "objectclass: automountmap" "$TmpDir/automountmap_add_004.out"
+        rlAssertGrep "objectclass: top" "$TmpDir/automountmap_add_004.out"
+
+        rlRun "cat $TmpDir/automountmap_add_004.out"
+        rlRun "ipa automountlocation-del pune"
+
+rlPhaseEnd
+}
+
 
 
 
@@ -681,10 +831,6 @@ rlPhaseStartTest "automount_location_del_002: ipa automountlocation-del LOCATION
 
 rlPhaseEnd
 }
-
-
-
-
 
 cleanup() {
 rlPhaseStartTest "Clean up for automount configuration tests"

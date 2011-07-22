@@ -84,6 +84,13 @@ automount_location_find() {
 	"automount_location_find_005"
 }
 
+automount_location_show() {
+	"automount_location_show_001"
+	"automount_location_show_002"
+	"automount_location_show_003"
+	"automount_location_show_004"
+}
+
 automount_location_del() {
 	"automount_location_del_001"
 	"automount_location_del_002"
