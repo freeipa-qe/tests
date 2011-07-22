@@ -33,14 +33,20 @@ public class UserTests extends SahiTestScript{
 	 */
 	@Test (groups={"userAddTests"}, dataProvider="getUserTestObjects")	
 	public void testUseradd(String testName, String uid, String givenname, String sn) throws Exception {
+		String expectedUID=uid;
+		if (uid.length() == 0) {
+			expectedUID=(givenname.substring(0,1)+sn).toLowerCase();
+			log.fine("ExpectedUID: " + expectedUID);
+		}
+		
 		//verify user doesn't exist
-		com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(uid).exists(), "Verify user " + uid + " doesn't already exist");
+		com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(expectedUID).exists(), "Verify user " + expectedUID + " doesn't already exist");
 		
 		//new test user can be added now
 		UserTasks.createUser(sahiTasks, uid, givenname, sn);		
 		
 		//verify user was added successfully
-		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(uid).exists(), "Added user " + uid + "  successfully");
+		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(expectedUID).exists(), "Added user " + expectedUID + "  successfully");
 	}
 	
 	/*
@@ -163,7 +169,7 @@ public class UserTests extends SahiTestScript{
 	/*
 	 * Delete multiple users - for positive tests
 	 */
-	@Test (groups={"chooseUserMultipleDeleteTests"}, dataProvider="getMultipleUserDeleteTestObjects", dependsOnGroups={"userAddTests", "invalidUserAddTests"})
+	@Test (groups={"chooseUserMultipleDeleteTests"}, dataProvider="getMultipleUserDeleteTestObjects", dependsOnGroups={"userAddTests", "invalidUserAddTests", "userAddAndEditTests", "userAddAndAddAnotherTests"})
 	public void setMultipleUserDelete(String testName, String uid) throws Exception {		
 		//verify user to be deleted exists
 		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(uid).exists(), "Verify user " + uid + "  to be deleted exists");	
@@ -178,6 +184,53 @@ public class UserTests extends SahiTestScript{
 		UserTasks.deleteMultipleUser(sahiTasks);	
 	}
 	
+	
+	/*
+	 * Add and Add another user
+	 */
+	@Test (groups={"userAddAndAddAnotherTests"}, dataProvider="getUserAddAndAddAnotherTestObjects")	
+	public void testUserAddAndAddAnother(String testName, String givenname1, String sn1, String givenname2, String sn2) throws Exception {
+		String expectedUID1=(givenname1.substring(0,1)+sn1).toLowerCase();
+		String expectedUID2=(givenname2.substring(0,1)+sn2).toLowerCase();
+		log.fine("ExpectedUID1: " + expectedUID1 + " and ExpectedUID2: " + expectedUID2);		
+		
+		//verify users don't exist
+		com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(expectedUID1).exists(), "Verify user " + expectedUID1 + " doesn't already exist");
+		com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(expectedUID2).exists(), "Verify user " + expectedUID2 + " doesn't already exist");
+		
+		//new test user can be added now
+		UserTasks.createUserThenAddAnother(sahiTasks, givenname1, sn1, givenname2, sn2);				
+		
+		//verify users were added successfully
+		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(expectedUID1).exists(), "Added user " + expectedUID1 + "  successfully");
+		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(expectedUID2).exists(), "Added user " + expectedUID2 + "  successfully");
+	}
+	
+	
+	/*
+	 * Add and Edit user
+	 */
+	@Test (groups={"userAddAndEditTests"}, dataProvider="getUserAddAndEditTestObjects",  dependsOnGroups="userAddTests")	
+	public void testUserAddAndEdit(String testName, String uid, String givenname, String sn, String title, String mail) throws Exception {
+		
+		//verify users don't exist
+		com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(uid).exists(), "Verify user " + uid + " doesn't already exist");
+		
+		//new test user can be added now
+		UserTasks.createUserThenEdit(sahiTasks, uid, givenname, sn, title, mail);				
+		
+		//verify changes	
+		UserTasks.verifyUserUpdates(sahiTasks, uid, title, mail);
+	}
+	
+	/*
+	 * Add, but Cancel
+	 */
+	
+	
+	/*
+	 * Search
+	 */
 	
 	/*******************************************************
 	 ************      DATA PROVIDERS     ******************
@@ -195,6 +248,7 @@ public class UserTests extends SahiTestScript{
 		
         //										testname					uid              		givenname	sn   
 		ll.add(Arrays.asList(new Object[]{ "create_good_user",				"testuser", 			"Test",		"User"      } ));
+		ll.add(Arrays.asList(new Object[]{ "create_user_with_optional_login","", 					"Test",		"User"      } ));
 		ll.add(Arrays.asList(new Object[]{ "create_user2",				    "user2", 			    "Test2",	"User2"     } ));
 		ll.add(Arrays.asList(new Object[]{ "create_user3",				    "user3", 			    "Test3",	"User3"     } ));
 		ll.add(Arrays.asList(new Object[]{ "create_user4",				    "user4", 			    "Test4",	"User4"     } ));
@@ -214,10 +268,11 @@ public class UserTests extends SahiTestScript{
 	protected List<List<Object>> createInvalidUserTestObjects() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-        //										testname		uid										givenname	sn   		 ExpectedError
+        //										testname						uid										givenname	sn   		 ExpectedError
 		
-		ll.add(Arrays.asList(new Object[]{ "create_long_user",	"abcdefghijklmnopqrstuvwxyx12345678", 	"Long",		"User",      "invalid 'login': can be at most 32 characters"	} ));
-		ll.add(Arrays.asList(new Object[]{ "recreate_user",		"testuser", 							"Test",		"User",		 "user with name \"testuser\" already exists"	} ));
+		ll.add(Arrays.asList(new Object[]{ "create_long_user",					"abcdefghijklmnopqrstuvwxyx12345678", 	"Long",		"User",      "invalid 'login': can be at most 32 characters"	} ));
+		ll.add(Arrays.asList(new Object[]{ "recreate_user",						"testuser", 							"Test",		"User",		 "user with name \"testuser\" already exists"	} ));
+		ll.add(Arrays.asList(new Object[]{ "create_user_with_optional_login",	"", 									"Testing",	"User",		 "user with name \"tuser\" already exists"	} ));
 		
 		return ll;	
 	}
@@ -295,6 +350,8 @@ public class UserTests extends SahiTestScript{
 		return ll;	
 	}
 	
+	
+	
 	/*
 	 * Data to be used when deleting users
 	 */
@@ -327,9 +384,45 @@ public class UserTests extends SahiTestScript{
 		ll.add(Arrays.asList(new Object[]{ "delete_multiple_users",			"user4"     } ));
 		ll.add(Arrays.asList(new Object[]{ "delete_multiple_users",			"user5"     } ));
 		ll.add(Arrays.asList(new Object[]{ "delete_multiple_users",			"user6"     } ));
+		ll.add(Arrays.asList(new Object[]{ "delete_multiple_users",			"tuser"     } ));
+		ll.add(Arrays.asList(new Object[]{ "delete_multiple_users",			"user9"     } ));
 		
 		return ll;	
 	}
+	
+	/*
+	 * Data to be used when adding and then adding users again
+	 */
+	@DataProvider(name="getUserAddAndAddAnotherTestObjects")
+	public Object[][] getUserAddAndAddAnotherTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createUserAndAddAnotherTestObjects());
+	}
+	protected List<List<Object>> createUserAndAddAnotherTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname					givenname1		sn1			givenname2		sn2   
+		ll.add(Arrays.asList(new Object[]{ "add_two_users",					"Test",			"User7",	"Test",			"User8"     } ));
+		        
+		return ll;	
+	}
+	
+	
+	/*
+	 * Data to be used when editing users
+	 */
+	@DataProvider(name="getUserAddAndEditTestObjects")
+	public Object[][] getUserAddAndEditTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(addAndEditUserTestObjects());
+	}
+	protected List<List<Object>> addAndEditUserTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname			uid				givenname		sn			title					mail   
+		ll.add(Arrays.asList(new Object[]{ "add_and_edit_user",		"user9",		"Test",			"User",		"Software Engineer",	"testuser@example.com"     } ));
+		        
+		return ll;	
+	}
+	
 	
 
 }

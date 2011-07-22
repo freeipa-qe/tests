@@ -20,7 +20,7 @@ public class UserTasks {
 		sahiTasks.textbox("uid").setValue(uid);
 		sahiTasks.textbox("givenname").setValue(givenName);
 		sahiTasks.textbox("sn").setValue(sn);
-		sahiTasks.button("Add").click();	
+		sahiTasks.button("Add").click();
 	}
 	
 	/*
@@ -219,4 +219,48 @@ public class UserTasks {
 		sahiTasks.button("Cancel").click();
 	}
 
+	/*
+	 * Create a new user. Then add another user. Check if users already exists before calling this.
+	 * @param sahiTasks 
+	 * @param givenName1 - first name for the first user to be added
+	 * @param sn1 - last name for the first user to be added
+	 * @param givenName2 - first name for the second user to be added
+	 * @param sn2 - last name for the second user to be added
+	 */
+	public static void createUserThenAddAnother(SahiTasks sahiTasks, String givenName1, String sn1, String givenName2, String sn2) {
+		sahiTasks.span("Add").click();
+		sahiTasks.textbox("givenname").setValue(givenName1);
+		sahiTasks.textbox("sn").setValue(sn1);
+		sahiTasks.button("Add and Add Another").click();
+		sahiTasks.textbox("givenname").setValue(givenName2);
+		sahiTasks.textbox("sn").setValue(sn2);
+		sahiTasks.button("Add").click();	
+	}
+	
+	
+	/*
+	 * Create a new user. Then edit this user. Check if users already exists before calling this.
+	 * @param sahiTasks 
+	 * @param givenName - first name for the new user to be added
+	 * @param sn - last name for the new user to be added
+	 * 
+	 */
+	public static void createUserThenEdit(SahiTasks sahiTasks, String uid, String givenName, String sn, String title, String mail) {
+		sahiTasks.span("Add").click();
+		sahiTasks.link("Optional field: click to show").click();
+		sahiTasks.textbox("uid").setValue(uid);
+		sahiTasks.textbox("givenname").setValue(givenName);
+		sahiTasks.textbox("sn").setValue(sn);
+		sahiTasks.button("Add and Edit").click();
+		sahiTasks.textbox("title").setValue(title);
+		sahiTasks.link("Add[1]").click();
+		sahiTasks.textbox("mail").setValue(mail);
+		sahiTasks.span("Update").click();
+		sahiTasks.link("Users[1]").click();
+	}
+	
+	
+	
+	
+	
 }

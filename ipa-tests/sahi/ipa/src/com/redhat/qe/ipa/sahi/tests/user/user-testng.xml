@@ -2,7 +2,7 @@
 <suite name="IPAUserTestSuite">	
 	<test name="User Tests">
 		<packages>
-		    <package name="com.redhat.qe.ipa.sahi.*" />
+		     <package name="com.redhat.qe.ipa.sahi.*" />
 		</packages>
 		<groups>
 			<run>
@@ -15,6 +15,8 @@
 				<include name="userSetPasswordTests" />
 				<include name="userDeactivateTests" />
 				<include name="userReactivateTests" />
+				<include name="userAddAndAddAnotherTests" />
+				<include name="userAddAndEditTests" />
 				<include name="userDeleteTests" />
 				<include name="chooseUserMultipleDeleteTests" />
 				<include name="userMultipleDeleteTests" />
