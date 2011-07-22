@@ -500,6 +500,8 @@ automount_location_add_001() {
 
 rlPhaseStartTest "automount_location_add_001: ipa automountlocation-add LOCATION"
 
+	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user" 
+
 	rlRun "ipa automountlocation-add pune > $TmpDir/automount_location_001.out 2>&1"
 	rlLog "Verifying bug https://bugzilla.redhat.com/show_bug.cgi?id=723781"
 	rlAssertGrep "Added automount location \"pune\"" "$TmpDir/automount_location_001.out"
