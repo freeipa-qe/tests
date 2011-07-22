@@ -8,9 +8,9 @@ public class SudoTasks {
 	private static Logger log = Logger.getLogger(SudoTasks.class.getName());
 	
 	/*
-	 * Create a new sudorule. Check if user already exists before calling this.
+	 * Create a new sudorule. Check if sudorule already exists before calling this.
 	 * @param sahiTasks 
-	 * @param cn - sudo rule name
+	 * @param cn - sudorule name
 	 */
 	public static void createSudorule(SahiTasks sahiTasks, String cn) {
 
