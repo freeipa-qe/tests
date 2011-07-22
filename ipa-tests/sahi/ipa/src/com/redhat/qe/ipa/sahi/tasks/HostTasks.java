@@ -308,5 +308,119 @@ public class HostTasks {
 		sahiTasks.link("Delete[1]").click();
 		sahiTasks.button("Delete").click();
 	}
+	
+	/*
+	 * Add a certificate
+	 * @param sahiTasks
+	 * @param hostname - host to add certificate for
+	 * @param csr - certificate request
+	 */
+	public static void addHostCertificate(SahiTasks sahiTasks, String hostname, String csr) {
+		sahiTasks.link(hostname).click();
+		sahiTasks.span("New Certificate[2]").click();
+		sahiTasks.textarea(0).setValue(csr);
+		sahiTasks.button("Issue").click();
+		sahiTasks.link("Hosts[1]").click();
+	}
+	
+	/*
+	 * Verify Valid Certificate Status
+	 * @param sahiTasks
+	 * @param hostname - hostname
+	 */
+	public static void verifyHostCertificate(SahiTasks sahiTasks, String hostname) {
+		sahiTasks.link(hostname).click();
+		sahiTasks.span("Get").isVisible();
+		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.span("Get").exists(), "Host certificate verify Get button");
+		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.span("View").exists(), "Host certificate verify View button");
+		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.span("Revoke").exists(), "Host certificate verify Revoke button");
+		
+		//view certificate
+		sahiTasks.span("View").click();
+		sahiTasks.button("Close").click();
+		
+		//get certificate
+		sahiTasks.span("Get").click();
+		sahiTasks.button("Close").click();
+		
+		sahiTasks.link("Hosts[1]").click();
+
+	}
+	
+	/*
+	 * Revoke a certificate
+	 * @param sahiTasks
+	 * @param hostname - host to add certificate for
+	 * @param reason - reason for revokation - match exact string to reason in drop down menu
+	 * @param button - Revoke or Cancel
+	 */
+	public static void revokeHostCertificate(SahiTasks sahiTasks, String hostname, String reason, String button) {
+		sahiTasks.link(hostname).click();
+		sahiTasks.span("Revoke").click();
+		sahiTasks.select(0).choose(reason);
+		sahiTasks.button(button).click();
+		sahiTasks.link("Hosts[1]").click();
+	}
+	
+	/*
+	 * Verify Revoked Certificate Status
+	 * @param sahiTasks
+	 * @param hostname - hostname
+	 * @param status - Revoked or Hold
+	 * @param reason - If revoked or held, reason string to look for
+	 */
+	public static void verifyHostCertificate(SahiTasks sahiTasks, String hostname, String status, String reason) {
+		sahiTasks.link(hostname).click();
+		if (status == "Hold"){
+			com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.span("Restore").exists(), "Host certificate on hold, verify Restore button");
+			com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.span("Certificate Hold").exists(), "Verifying Certificate Hold status.");
+		}
+		if (status == "Revoked"){
+			com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.span("New Certificate[1]").exists(), "Host certificate revoked, verify New Certificate button");
+			com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.span(reason).exists(), "Verifying Certificate Revoked status: " + reason);
+		}
+	}
+	
+	/*
+	 * Restore a certificate
+	 * @param sahiTasks
+	 * @param hostname - host to add certificate for
+	 * @param button - Restore or Cancel
+	 */
+	public static void restoreHostCertificate(SahiTasks sahiTasks, String hostname, String button) {
+		sahiTasks.link(hostname).click();
+		sahiTasks.span("Restore").click();
+		sahiTasks.button(button).click();
+		sahiTasks.link("Hosts[1]").click();
+	}
+	/*
+	 * Request new certificate
+	 * @param sahiTasks
+	 * @param hostname - host to add certificate for
+	 * @param button - Issue or Cancel
+	 */
+	public static void newHostCertificate(SahiTasks sahiTasks, String hostname, String csr, String button) {
+		sahiTasks.link(hostname).click();
+		sahiTasks.span("New Certificate[1]").click();
+		sahiTasks.textarea(0).setValue(csr);
+		sahiTasks.button(button).click();
+		sahiTasks.link("Hosts[1]").click();
+	}
+	
+	/* Request new certificate
+	 * @param sahiTasks
+	 * @param hostname - host to add certificate for
+	 * @param button - Issue or Cancel
+	 */
+	public static void invalidHostCSR(SahiTasks sahiTasks, String hostname, String csr, String expectedError) {
+		sahiTasks.link(hostname).click();
+		sahiTasks.span("New Certificate[1]").click();
+		sahiTasks.textarea(0).setValue(csr);
+		sahiTasks.button("Issue").click();
+		
+		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.div(expectedError).exists(), "Verified expected error with invalid csr.");
+		sahiTasks.button("Cancel").click();
+		sahiTasks.link("Hosts[1]").click();
+	}
 }
 
