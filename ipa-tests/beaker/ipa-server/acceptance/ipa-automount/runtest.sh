@@ -99,7 +99,7 @@ automount_location_del() {
 rlJournalStart
 
     rlPhaseStartSetup "ipa-automount-startup: Check for admintools package, kinit and enabling nis"
-#		rlRun "setup"
+		rlRun "setup"
 		rlRun "echo setup"
     rlPhaseEnd
 
@@ -111,7 +111,7 @@ automount_location_del
 	# tests end.
 
     rlPhaseStartCleanup "ipa-automount-cleanup: Destroying admin credentials & and disabling nis."
-#		rlRun "cleanup"
+		rlRun "cleanup"
 		rlRun "echo cleanup"
     rlPhaseEnd
 
