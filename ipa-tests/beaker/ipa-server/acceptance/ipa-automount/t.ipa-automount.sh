@@ -510,7 +510,7 @@ rlPhaseStartTest "automount_location_add_001: ipa automountlocation-add LOCATION
 
 	rlRun "ldapsearch -LLL -x -h localhost  -b cn=pune,cn=automount,$basedn > $TmpDir/automount_location_001.out 2>&1"
 
-	rlAssertGrep "dn: cn=pune,cn=automount,dc=rhts,dc=eng,dc=brq,dc=redhat,dc=com" "$TmpDir/automount_location_001.out"
+	rlAssertGrep "dn: cn=pune,cn=automount,$basedn" "$TmpDir/automount_location_001.out"
 	rlAssertGrep "dn: automountmapname=auto.master,cn=pune,cn=automount," "$TmpDir/automount_location_001.out"
 	rlAssertGrep "automountMapName: auto.master" "$TmpDir/automount_location_001.out"
 	rlAssertGrep "dn: automountmapname=auto.direct,cn=pune,cn=automount," "$TmpDir/automount_location_001.out"
@@ -697,6 +697,5 @@ rlPhaseStartTest "Clean up for automount configuration tests"
         rlRun "popd"
         rlRun "rm -r $TmpDir" 0 "Removing tmp directory"
 	rlRun "rm -fr /tmp/krb5_1*"
-	rlRun "service iptables start"
 rlPhaseEnd
 }
