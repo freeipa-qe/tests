@@ -68,7 +68,7 @@ user2="user2"
 userpw="Secret123"
 mount_homedir="/ipahome"
 direct_mount="/direct_mount"
-RELM="RHTS-ENG-BRQ-REDHAT-COM"
+#RELM="RHTS-ENG-BRQ-REDHAT-COM"
 basedn=`getBaseDN`
 
 PACKAGE1="ipa-admintools"
