@@ -68,6 +68,7 @@ run: $(FILES) build
 	cp -f ./id_rsa_global.pub /dev/shm/.
 	cp -f ./id_rsa_global /dev/shm/.
 	cp -f ./known_hosts /dev/shm/.
+	chmod 755 /dev/shm/*.sh
 	chmod 600 /root/.ssh
 	chmod 600 /root/.ssh/id*
 	chmod 600 /root/.ssh/authorized_keys
