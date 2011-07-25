@@ -15,7 +15,7 @@ public class HostTasks {
 	 * @param ipadr -  ipaddress
 	 */
 	public static void addHost(SahiTasks sahiTasks, String fqdn, String ipadr) {
-		sahiTasks.link("Add[1]").click();
+		sahiTasks.span("Add[1]").click();
 		sahiTasks.isVisible(sahiTasks.textbox("fqdn"), true);
 		sahiTasks.textbox("fqdn").near(sahiTasks.label("Host Name: ")).setValue(fqdn);
 		if(ipadr == ""){ 
@@ -40,7 +40,7 @@ public class HostTasks {
 	 * @param os - example: Red Hat Enterprise Linux 6
 	 */
 	public static void addHostAndEdit(SahiTasks sahiTasks, String hostname, String ipadr, String description, String local, String location, String platform, String os) {
-		sahiTasks.link("Add[1]").click();
+		sahiTasks.span("Add[1]").click();
 		sahiTasks.isVisible(sahiTasks.textbox("fqdn"), true);
 		sahiTasks.textbox("fqdn").near(sahiTasks.label("Host Name: ")).setValue(hostname);
 		if(ipadr == ""){ 
@@ -67,7 +67,7 @@ public class HostTasks {
 	 * @param hostname - hostname2
 	 */
 	public static void addAndAddAnotherHost(SahiTasks sahiTasks, String hostname1, String hostname2, String hostname3) {
-		sahiTasks.link("Add[1]").click();
+		sahiTasks.span("Add[1]").click();
 		sahiTasks.isVisible(sahiTasks.textbox("fqdn"), true);
 		sahiTasks.textbox("fqdn").near(sahiTasks.label("Host Name: ")).setValue(hostname1);
 		sahiTasks.checkbox("force").near(sahiTasks.label("Force:")).click();
@@ -111,7 +111,7 @@ public class HostTasks {
 	 * @param expectedError - the error thrown when an invalid host is being attempted to be added
 	 */
 	public static void addInvalidHost(SahiTasks sahiTasks, String hostname, String ipadr, String expectedError) {
-		sahiTasks.link("Add[1]").click();
+		sahiTasks.span("Add[1]").click();
 		sahiTasks.textbox("fqdn").near(sahiTasks.label("Host Name:")).setValue(hostname);
 		if(ipadr == ""){ 
 			sahiTasks.checkbox("force").near(sahiTasks.label("Force:")).click();
