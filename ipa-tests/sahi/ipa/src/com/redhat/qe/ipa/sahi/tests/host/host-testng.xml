@@ -20,7 +20,7 @@
 				<include name="setManagedByHostTests" />
 				<include name="removeManagedByHostTests" />
 				<include name="hostCertificateTests" />
-				<include name="hostInvalidCSRTests" />
+				
 				<!--
 				<include name="teardown"/>
 				-->
