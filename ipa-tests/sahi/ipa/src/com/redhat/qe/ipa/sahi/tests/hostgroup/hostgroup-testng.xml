@@ -1,6 +1,6 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
-<suite name="IPAHostTestSuite">	
-	<test name="Host Tests">
+<suite name="IPAHostgroupTestSuite">	
+	<test name="Host Group Tests">
 		<packages>
 		    <package name="com.redhat.qe.ipa.sahi.*" />
 		</packages>
@@ -8,26 +8,17 @@
 			<run>
 			    <include name="setup" />
 			    <include name="init" />
-			    <include name="invalidhostAddTests" />
-				<include name="addHostTests" />
-				<include name="deleteHostTests" />
-				<include name="addAndEditHostTests" />
-				<include name="addAndAddAnotherHostTests" />
-				<include name="deleteMultipleHostTests" />
-				<include name="modifyHostTests" />
-				<include name="otpHostTests" />
-				<include name="undoModifyHostTests" />
-				<include name="setManagedByHostTests" />
-				<include name="removeManagedByHostTests" />
-				<include name="hostCertificateTests" />
-				
+			    <include name="addAndAddAnotherHostGroupTests" />
+			    <include name="deleteMultipleHostGroupTests" />
+				<include name="addHostGroupTests" />	
+				<include name="deleteHostGroupTests" />	
 				<!--
 				<include name="teardown"/>
 				-->
 			</run>
 		</groups>
 		<classes>
-		    <class name="com.redhat.qe.ipa.sahi.tests.host.HostTests" />
+		    <class name="com.redhat.qe.ipa.sahi.tests.hostgroup.HostgroupTests" />
 		</classes>
 	</test>
 	
