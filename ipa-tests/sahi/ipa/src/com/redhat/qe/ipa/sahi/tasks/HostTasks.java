@@ -15,7 +15,7 @@ public class HostTasks {
 	 * @param ipadr -  ipaddress
 	 */
 	public static void addHost(SahiTasks sahiTasks, String fqdn, String ipadr) {
-		sahiTasks.span("Add[1]").click();
+		sahiTasks.span("Add").click();
 		sahiTasks.isVisible(sahiTasks.textbox("fqdn"), true);
 		sahiTasks.textbox("fqdn").near(sahiTasks.label("Host Name: ")).setValue(fqdn);
 		if(ipadr == ""){ 
@@ -40,7 +40,7 @@ public class HostTasks {
 	 * @param os - example: Red Hat Enterprise Linux 6
 	 */
 	public static void addHostAndEdit(SahiTasks sahiTasks, String hostname, String ipadr, String description, String local, String location, String platform, String os) {
-		sahiTasks.span("Add[1]").click();
+		sahiTasks.span("Add").click();
 		sahiTasks.isVisible(sahiTasks.textbox("fqdn"), true);
 		sahiTasks.textbox("fqdn").near(sahiTasks.label("Host Name: ")).setValue(hostname);
 		if(ipadr == ""){ 
@@ -56,7 +56,7 @@ public class HostTasks {
 		sahiTasks.textbox("nshardwareplatform").setValue(platform);
 		sahiTasks.textbox("nsosversion").setValue(os);
 		sahiTasks.link("Update").click();
-		sahiTasks.link("Hosts[1]").click();
+		sahiTasks.link("Hosts").click();
 	}
 	
 	/*
@@ -67,7 +67,7 @@ public class HostTasks {
 	 * @param hostname - hostname2
 	 */
 	public static void addAndAddAnotherHost(SahiTasks sahiTasks, String hostname1, String hostname2, String hostname3) {
-		sahiTasks.span("Add[1]").click();
+		sahiTasks.span("Add").click();
 		sahiTasks.isVisible(sahiTasks.textbox("fqdn"), true);
 		sahiTasks.textbox("fqdn").near(sahiTasks.label("Host Name: ")).setValue(hostname1);
 		sahiTasks.checkbox("force").near(sahiTasks.label("Force:")).click();
@@ -100,7 +100,7 @@ public class HostTasks {
 		com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("l").value(), local, "Verified local for host: " + local);
 		com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("nshostlocation").value(), location, "Verified location for host: " + location);
 		com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("nshardwareplatform").value(), platform, "Verified platform for host: " + platform);
-		sahiTasks.link("Hosts[1]").click();
+		sahiTasks.link("Hosts").click();
 	}
 	
 	/*
@@ -111,7 +111,7 @@ public class HostTasks {
 	 * @param expectedError - the error thrown when an invalid host is being attempted to be added
 	 */
 	public static void addInvalidHost(SahiTasks sahiTasks, String hostname, String ipadr, String expectedError) {
-		sahiTasks.span("Add[1]").click();
+		sahiTasks.span("Add").click();
 		sahiTasks.textbox("fqdn").near(sahiTasks.label("Host Name:")).setValue(hostname);
 		if(ipadr == ""){ 
 			sahiTasks.checkbox("force").near(sahiTasks.label("Force:")).click();
@@ -186,11 +186,11 @@ public class HostTasks {
 		sahiTasks.textbox("nsosversion").setValue(newos);
 		sahiTasks.span("undo[5]").click();
 		
-		sahiTasks.link("Hosts[1]").click();
+		sahiTasks.link("Hosts").click();
 	}
 	
 	/*
-	 * Set Host OTP
+	 * Set otp
 	 * @param sahiTasks
 	 * @param value - value to set for OTP
 	 */
@@ -198,7 +198,7 @@ public class HostTasks {
 		sahiTasks.link(hostname).click();
 		sahiTasks.textbox("otp").setValue(otp);
 		sahiTasks.span("Set OTP").click();
-		sahiTasks.link("Hosts[1]").click();
+		sahiTasks.link("Hosts").click();
 	}
 	
 	/*
@@ -227,7 +227,7 @@ public class HostTasks {
 			com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("otp").value(), value, "Verified One Time Password for host: " + value);
 		}
 
-		sahiTasks.link("Hosts[1]").click();
+		sahiTasks.link("Hosts").click();
 	}
 	
 	/*
@@ -238,14 +238,14 @@ public class HostTasks {
 	 * @param button - Enroll or Cancel
 	 */
 	public static void setManagedByHost(SahiTasks sahiTasks, String managed, String managedby, String button) {
-		String checkbox = managedby+"[1]";
+		//String checkbox = managedby+"[1]";
 		sahiTasks.link(managed).click();
 		sahiTasks.link("managedby_host").click();
 		sahiTasks.span("Enroll").click();
-		sahiTasks.checkbox(checkbox).click();
+		sahiTasks.checkbox(managedby).click();
 		sahiTasks.span(">>").click();
 		sahiTasks.button(button).click();
-		sahiTasks.link("Hosts[2]").click();
+		sahiTasks.link("Hosts").click();
 	}
 	
 	/*
@@ -256,18 +256,18 @@ public class HostTasks {
 	 * @param button - Delete or Cancel
 	 */
 	public static void removeManagedByHost(SahiTasks sahiTasks, String managed, String managedby, String button) {
-		String checkbox = managedby+"[1]";
+		//String checkbox = managedby+"[1]";
 		sahiTasks.link(managed).click();
 		sahiTasks.link("managedby_host").click();
-		sahiTasks.checkbox(checkbox).click();
-		sahiTasks.span("Delete[2]").click();
+		sahiTasks.checkbox(managedby).click();
+		sahiTasks.span("Delete").click();
 		sahiTasks.button(button).click();
-		sahiTasks.link("Hosts[2]").click();
+		sahiTasks.link("Hosts").near(sahiTasks.span("» " + managed)).click();
 
 	}
 	
 	/*
-	 * Verify managed by hsot
+	 * Verify managed by host
 	 * @param sahiTasks
 	 * @param managed - host that will be managed
 	 * @param managedby - host managing the other host
@@ -276,12 +276,13 @@ public class HostTasks {
 		sahiTasks.link(managed).click();
 		sahiTasks.link("managedby_host").click();
 		if (exists == "YES"){
-			com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(managedby+"[1]").exists(), "Host " + managed + " is managed by " + managedby);
+			com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(managedby).exists(), "Host " + managed + " is managed by " + managedby);
 		}
 		if (exists == "NO"){
-			com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(managedby+"[1]").exists(), "Host " + managed + " is NOT managed by " + managedby);
+			com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(managedby).exists(), "Host " + managed + " is NOT managed by " + managedby);
 		}	
-		sahiTasks.link("Hosts[2]").click();
+		
+		sahiTasks.link("Hosts").click();
 	}
 	
 	/*
@@ -292,7 +293,7 @@ public class HostTasks {
 	public static void deleteHost(SahiTasks sahiTasks, String fqdn) {
 		String lowerdn = fqdn.toLowerCase();
 		sahiTasks.checkbox(lowerdn).click();
-		sahiTasks.link("Delete[1]").click();
+		sahiTasks.link("Delete").click();
 		sahiTasks.button("Delete").click();
 	}
 	
@@ -305,7 +306,7 @@ public class HostTasks {
 		for (String hostname : hostnames) {
 			sahiTasks.checkbox(hostname).click();
 		}
-		sahiTasks.link("Delete[1]").click();
+		sahiTasks.link("Delete").click();
 		sahiTasks.button("Delete").click();
 	}
 	
@@ -317,10 +318,10 @@ public class HostTasks {
 	 */
 	public static void addHostCertificate(SahiTasks sahiTasks, String hostname, String csr) {
 		sahiTasks.link(hostname).click();
-		sahiTasks.span("New Certificate[2]").click();
+		sahiTasks.span("New Certificate").click();
 		sahiTasks.textarea(0).setValue(csr);
 		sahiTasks.button("Issue").click();
-		sahiTasks.link("Hosts[1]").click();
+		sahiTasks.link("Hosts").click();
 	}
 	
 	/*
@@ -343,7 +344,7 @@ public class HostTasks {
 		sahiTasks.span("Get").click();
 		sahiTasks.button("Close").click();
 		
-		sahiTasks.link("Hosts[1]").click();
+		sahiTasks.link("Hosts").click();
 
 	}
 	
@@ -359,7 +360,7 @@ public class HostTasks {
 		sahiTasks.span("Revoke").click();
 		sahiTasks.select(0).choose(reason);
 		sahiTasks.button(button).click();
-		sahiTasks.link("Hosts[1]").click();
+		sahiTasks.link("Hosts").click();
 	}
 	
 	/*
@@ -391,7 +392,7 @@ public class HostTasks {
 		sahiTasks.link(hostname).click();
 		sahiTasks.span("Restore").click();
 		sahiTasks.button(button).click();
-		sahiTasks.link("Hosts[1]").click();
+		sahiTasks.link("Hosts").click();
 	}
 	/*
 	 * Request new certificate
@@ -401,10 +402,10 @@ public class HostTasks {
 	 */
 	public static void newHostCertificate(SahiTasks sahiTasks, String hostname, String csr, String button) {
 		sahiTasks.link(hostname).click();
-		sahiTasks.span("New Certificate[1]").click();
+		sahiTasks.span("New Certificate").click();
 		sahiTasks.textarea(0).setValue(csr);
 		sahiTasks.button(button).click();
-		sahiTasks.link("Hosts[1]").click();
+		sahiTasks.link("Hosts").click();
 	}
 	
 	/* Request new certificate
@@ -414,13 +415,13 @@ public class HostTasks {
 	 */
 	public static void invalidHostCSR(SahiTasks sahiTasks, String hostname, String csr, String expectedError) {
 		sahiTasks.link(hostname).click();
-		sahiTasks.span("New Certificate[1]").click();
+		sahiTasks.span("New Certificate").click();
 		sahiTasks.textarea(0).setValue(csr);
 		sahiTasks.button("Issue").click();
 		
 		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.div(expectedError).exists(), "Verified expected error with invalid csr.");
 		sahiTasks.button("Cancel").click();
-		sahiTasks.link("Hosts[1]").click();
+		sahiTasks.link("Hosts").click();
 	}
 }
 
