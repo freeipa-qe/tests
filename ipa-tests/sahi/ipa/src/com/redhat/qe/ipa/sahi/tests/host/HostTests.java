@@ -29,6 +29,7 @@ public class HostTests extends SahiTestScript{
 	public void initialize() throws CloneNotSupportedException {	
 		sahiTasks = SahiTestScript.getSahiTasks();	
 		sahiTasks.navigateTo(System.getProperty("ipa.server.url")+hostPage, true);
+		sahiTasks.setStrictVisibilityCheck(true);
 	}
 
 	/*
