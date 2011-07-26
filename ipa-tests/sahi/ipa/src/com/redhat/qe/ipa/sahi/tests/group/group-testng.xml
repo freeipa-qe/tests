@@ -6,9 +6,13 @@
 		</packages>
 		<groups>
 			<run>
-			    <include name="firefoxSetup" />
+			    <include name="setup" />
 			    <include name="init" /> 
-				<include name="acceptanceTest" /> 				
+				<include name="addGroupTests" /> 
+				<include name="deleteGroupTests" />
+				<!--
+				<include name="teardown"/>
+				-->				
 			</run>
 		</groups>
 		<classes>
