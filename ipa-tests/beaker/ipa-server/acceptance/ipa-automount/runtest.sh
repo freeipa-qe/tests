@@ -95,13 +95,60 @@ automount_location_del() {
 	"automount_location_del_001"
 	"automount_location_del_002"
 }
-#automount_map() {
-#"automount_map_001"
-#}
+automount_map_add() {
+	"automountmap_add_001"
+	"automountmap_add_002"
+	"automountmap_add_003"
+	"automountmap_add_004"
+	"automountmap_add_005"
+	"automountmap_add_006"
+	"automountmap_add_007"
+	"automountmap_add_008"
+}
 
-#automount_key() {
-#"automount_key_001"
-#}
+automountmap_find() {
+	"automountmap_find_001"
+	"automountmap_find_002"
+	"automountmap_find_003"
+	"automountmap_find_004"
+	"automountmap_find_005"
+}
+
+automountmap_show() {
+	"automountmap_show_001"
+	"automountmap_show_002"
+	"automountmap_show_003"
+}
+
+automountkey_add() {
+	"automountkey_add_001"
+	"automountkey_add_002"
+	"automountkey_add_003"
+}
+
+automountkey_mod() {
+	"automountkey_mod_001"
+	"automountkey_mod_002"
+	"automountkey_mod_003"
+	"automountkey_mod_004"
+}
+
+automountkey_find() {
+	"automountkey_find_001"
+	"automountkey_find_002"
+	"automountkey_find_003"
+	"automountkey_find_004"
+	"automountkey_find_005"
+	"automountkey_find_006"
+}
+
+automountkey_show() {
+	"automountkey_show_001"
+	"automountkey_show_002"
+	"automountkey_show_003"
+	"automountkey_show_004"
+	"automountkey_show_005"
+}
 
 rlJournalStart
 
@@ -114,7 +161,17 @@ rlJournalStart
 automount_help
 automount_location_add
 automount_location_find
+automount_location_show
+automount_map_add 
+automountmap_find
+automountmap_show
+automountkey_add
+automountkey_mod
+automountkey_find
+automountkey_show
 automount_location_del
+automountkey_del
+automountmap_del
 	# tests end.
 
     rlPhaseStartCleanup "ipa-automount-cleanup: Destroying admin credentials & and disabling nis."

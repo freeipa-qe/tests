@@ -311,18 +311,18 @@ automount_010() {
 
 rlPhaseStartTest "automount_010: ipa help automountlocation-find"
 
-	rlRun "ipa help automountlocation-find > $TmpdDir/automount_010.out 2>&1"
+	rlRun "ipa help automountlocation-find > $TmpDir/automount_010.out 2>&1"
 
-	rlAssertGrep "Purpose: Search for an automount location." "$TmpdDir/automount_010.out"
-	rlAssertGrep "Usage: ipa \[global-options\] automountlocation-find \[CRITERIA\] \[options\]" "$TmpdDir/automount_010.out"
-	rlAssertGrep "\-h, \--help       show this help message and exit" "$TmpdDir/automount_010.out"
-	rlAssertGrep "\--location=STR   Automount location name." "$TmpdDir/automount_010.out"
-	rlAssertGrep "\--timelimit=INT  Time limit of search in seconds" "$TmpdDir/automount_010.out"
-	rlAssertGrep "\--sizelimit=INT  Maximum number of entries returned" "$TmpdDir/automount_010.out"
-	rlAssertGrep "\--all            Retrieve and print all attributes from the server." "$TmpdDir/automount_010.out"
-	rlAssertGrep "\--raw            Print entries as stored on the server." "$TmpdDir/automount_010.out"
+	rlAssertGrep "Purpose: Search for an automount location." "$TmpDir/automount_010.out"
+	rlAssertGrep "Usage: ipa \[global-options\] automountlocation-find \[CRITERIA\] \[options\]" "$TmpDir/automount_010.out"
+	rlAssertGrep "\-h, \--help       show this help message and exit" "$TmpDir/automount_010.out"
+	rlAssertGrep "\--location=STR   Automount location name." "$TmpDir/automount_010.out"
+	rlAssertGrep "\--timelimit=INT  Time limit of search in seconds" "$TmpDir/automount_010.out"
+	rlAssertGrep "\--sizelimit=INT  Maximum number of entries returned" "$TmpDir/automount_010.out"
+	rlAssertGrep "\--all            Retrieve and print all attributes from the server." "$TmpDir/automount_010.out"
+	rlAssertGrep "\--raw            Print entries as stored on the server." "$TmpDir/automount_010.out"
 
-	rlRun "cat $TmpdDir/automount_010.out"
+	rlRun "cat $TmpDir/automount_010.out"
 
 rlPhaseEnd
 }
@@ -777,7 +777,7 @@ rlPhaseStartTest "automountmap_add_004: ipa automountmap-add LOCATION MAP --all 
 
         rlRun "ipa automountlocation-add pune"
 
-        rlRun "ipa automountmap-add pune auto.pune --all --raw --desc=\"pune automount map\" > > $TmpDir/automountmap_add_004.out 2>&1"
+        rlRun "ipa automountmap-add pune auto.pune --all --raw --desc=\"pune automount map\" > $TmpDir/automountmap_add_004.out 2>&1"
         rlAssertGrep "Added automount map \"auto.pune\"" "$TmpDir/automountmap_add_004.out"
         rlAssertGrep "dn: automountmapname=auto.pune,cn=pune,cn=automount,$basedn" "$TmpDir/automountmap_add_004.out"
         rlAssertGrep "automountmapname: auto.pune" "$TmpDir/automountmap_add_004.out"
@@ -791,8 +791,582 @@ rlPhaseStartTest "automountmap_add_004: ipa automountmap-add LOCATION MAP --all 
 rlPhaseEnd
 }
 
+automountmap_add_005() {
+
+rlPhaseStartTest "automountmap_add_005: ipa automountmap-add-indirect LOCATION MAP --mount"
+
+	rlRun "ipa automountlocation-add pune"
+
+	rlRun "ipa automountmap-add-indirect pune punechild.map --mount=/usr/share/man > $TmpDir/automountmap_add_005.out 2>&1"
+	rlAssertGrep "Added automount map \"punechild.map\"" "$TmpDir/automountmap_add_005.out"
+	rlAssertGrep "Map: punechild.map" "$TmpDir/automountmap_add_005.out"
+
+	rlRun "cat $TmpDir/automountmap_add_005.out"
+        rlRun "ipa automountlocation-del pune"
+
+rlPhaseEnd
+}
+
+automountmap_add_006() {
+
+rlPhaseStartTest "automountmap_add_006: ipa automountmap-add-indirect LOCATION MAP --mount --parentmap"
+
+	rlRun "ipa automountlocation-add pune"
+	rlRun "ipa automountmap-add pune pune.map"
+
+        rlRun "ipa automountmap-add-indirect pune punechild.map --mount=/usr/share/man --parentmap=pune.map > $TmpDir/automountmap_add_006.out"
+	rlAssertGrep "Added automount map \"punechild.map\"" "$TmpDir/automountmap_add_006.out"
+	rlAssertGrep "Map: punechild.map" "$TmpDir/automountmap_add_006.out"
+
+        rlRun "cat $TmpDir/automountmap_add_006.out"
+        rlRun "ipa automountlocation-del pune"
+
+rlPhaseEnd
+}
+
+automountmap_add_007() {
+
+rlPhaseStartTest "automountmap_add_007: ipa automountmap-add-indirect LOCATION MAP --mount --parentmap --all"
+
+        rlRun "ipa automountlocation-add pune"
+        rlRun "ipa automountmap-add pune pune.map"
+
+        rlRun "ipa automountmap-add-indirect pune punechild.map --mount=/usr/share/man --parentmap=pune.map --all > $TmpDir/automountmap_add_007.out"
+	rlAssertGrep "dn: automountmapname=punechild.map,cn=pune,cn=automount,$basedn" "$TmpDir/automountmap_add_007.out"
+	rlAssertGrep "Map: punechild.map" "$TmpDir/automountmap_add_007.out"
+	rlAssertGrep "objectclass: automountmap, top" "$TmpDir/automountmap_add_007.out"
+
+        rlRun "cat $TmpDir/automountmap_add_007.out"
+        rlRun "ipa automountlocation-del pune"
+
+rlPhaseEnd
+}
+
+automountmap_add_008() {
+
+rlPhaseStartTest "automountmap_add_008: ipa automountmap-add-indirect LOCATION MAP --mount --parentmap --all --raw"
+
+	rlRun "ipa automountlocation-add pune"
+        rlRun "ipa automountmap-add pune pune.map"
+
+        rlRun "ipa automountmap-add-indirect pune punechild.map --mount=/usr/share/man --parentmap=pune.map --all --raw > $TmpDir/automountmap_add_008.out"
+	rlAssertGrep "dn: automountmapname=punechild.map,cn=pune,cn=automount,$basedn" "$automountmap_add_008.out"
+	rlAssertGrep "Map: punechild.map" "$automountmap_add_008.out"
+	rlAssertGrep "objectclass: automountmap" "$automountmap_add_008.out"
+	rlAssertGrep "objectclass: top" "$automountmap_add_008.out"
+
+        rlRun "cat $TmpDir/automountmap_add_008.out"
+        rlRun "ipa automountlocation-del pune"
+
+rlPhaseEnd
+}
+
+automountmap_find_001() {
+
+rlPhaseStartTest "automountmap_find_001: ipa automountmap-del AUTOMOUNTLOCATION"
+
+	# Setup for automountmap-find.
+	rlRun "ipa automountlocation-add pune"
+        rlRun "ipa automountmap-add pune pune.map"
+        rlRun "ipa automountmap-add pune pune2.map"
+        rlRun "ipa automountmap-add pune pune3.map"
+
+	rlRun "ipa automountmap-find pune > $ $TmpDir/automountmap_find_001.out 2>&1"
+	rlAssertGrep "5 automount maps matched" "$TmpDir/automountmap_find_001.out"
+	rlAssertGrep "Map: auto.direct" "$TmpDir/automountmap_find_001.out"
+	rlAssertGrep "Map: auto.master" "$TmpDir/automountmap_find_001.out"
+	rlAssertGrep "Map: pune.map" "$TmpDir/automountmap_find_001.out"
+	rlAssertGrep "Map: pune2.map" "$TmpDir/automountmap_find_001.out"
+	rlAssertGrep "Map: pune3.map" "$TmpDir/automountmap_find_001.out"
+	rlAssertGrep "Number of entries returned 5" "$TmpDir/automountmap_find_001.out"
+
+	rlRun "cat $TmpDir/automountmap_find_001.out"
+	rlRun "ipa automountlocation-del pune"
+
+rlPhaseEnd
+}
+
+automountmap_find_002() {
+
+rlPhaseStartTest "automountmap_find_002: ipa automountmap-del AUTOMOUNTLOCATION MAP"
+
+	rlRun "ipa automountmap-find pune --map=pune.map > $TmpDir/automountmap_find_002.out 2>&1"
+	rlAssertGrep "1 automount map matched" "$TmpDir/automountmap_find_002.out"
+	rlAssertGrep "Map: pune.map" "$TmpDir/automountmap_find_002.out"
+	rlAssertGrep "Number of entries returned 1" "$TmpDir/automountmap_find_002.out"
+
+        rlRun "cat $TmpDir/automountmap_find_002.out"
+
+rlPhaseEnd
+}
+
+automountmap_find_003() {
+
+rlPhaseStartTest "automountmap_find_003: ipa automountmap-del AUTOMOUNTLOCATION MAP --all"
+
+        rlRun "ipa automountmap-find pune --map=pune.map --all > $TmpDir/automountmap_find_003.out 2>&1"
+        rlAssertGrep "1 automount map matched" "$TmpDir/automountmap_find_003.out"
+        rlAssertGrep "dn: automountmapname=pune.map,cn=pune,cn=automount,$basedn" "$TmpDir/automountmap_find_003.out"
+	rlAssertGrep "Map: pune.map" "$TmpDir/automountmap_find_003.out"
+	rlAssertGrep "objectclass: automountmap, top" "$TmpDir/automountmap_find_003.out"
+        rlAssertGrep "Number of entries returned 1" "$TmpDir/automountmap_find_003.out"
+
+	rlRun "cat $TmpDir/automountmap_find_003.out"
+
+rlPhaseEnd
+}
+
+automountmap_find_004() {
+
+rlPhaseStartTest "automountmap_find_004: ipa automountmap-del AUTOMOUNTLOCATION MAP --all --raw"
+
+	rlRun "ipa automountmap-find pune --map=pune.map --all --raw > $TmpDir/automountmap_find_004.out 2>&1"
+        rlAssertGrep "1 automount map matched" "$TmpDir/automountmap_find_004.out"
+        rlAssertGrep "dn: automountmapname=pune.map,cn=pune,cn=automount,$basedn" "$TmpDir/automountmap_find_004.out"
+        rlAssertGrep "automountmapname: pune.map" "$TmpDir/automountmap_find_004.out"
+        rlAssertGrep "objectclass: automountmap" "$TmpDir/automountmap_find_004.out"
+        rlAssertGrep "objectclass: top" "$TmpDir/automountmap_find_004.out"
+	rlAssertGrep "Number of entries returned 1" "$TmpDir/automountmap_find_004.out"
+
+        rlRun "cat $TmpDir/automountmap_find_004.out"
+
+rlPhaseEnd
+}
 
 
+automountmap_find_005() {
+
+rlPhaseStartTest "automountmap_find_005: ipa automountmap-del AUTOMOUNTLOCATION MAP --all --raw --sizelimit"
+
+	rlRun "ipa automountmap-find pune --map=pune.map --all --raw --sizelimit=2 > $TmpDir/automountmap_find_005.out 2>&1"
+
+        rlAssertGrep "2 automount maps matched" "$TmpDir/automountmap_find_005.out"
+        rlAssertGrep "dn: automountmapname=auto.direct,cn=pune,cn=automount,$basedn" "$TmpDir/automountmap_find_005.out"
+        rlAssertGrep "automountmapname: auto.direct" "$TmpDir/automountmap_find_005.out"
+        rlAssertGrep "objectclass: automountmap" "$TmpDir/automountmap_find_005.out"
+        rlAssertGrep "objectclass: top" "$TmpDir/automountmap_find_005.out"
+        rlAssertGrep "dn: automountmapname=auto.master,cn=pune,cn=automount,$basedn" "$TmpDir/automountmap_find_005.out"
+        rlAssertGrep "automountmapname: auto.master" "$TmpDir/automountmap_find_005.out"
+        rlAssertGrep "objectclass: automountmap" "$TmpDir/automountmap_find_005.out"
+        rlAssertGrep "objectclass: top" "$TmpDir/automountmap_find_005.out"
+        rlAssertGrep "Number of entries returned 2" "$TmpDir/automountmap_find_005.out"
+
+	rlRun "cat $TmpDir/automountmap_find_005.out"
+
+	rlRun "ipa automountmap-find pune --map=pune.map --all --raw --sizelimit=3 > $TmpDir/automountmap_find_005.out 2>&1"
+
+	rlAssertGrep "3 automount maps matched" "$TmpDir/automountmap_find_005.out"
+        rlAssertGrep "dn: automountmapname=auto.direct,cn=pune,cn=automount,$basedn" "$TmpDir/automountmap_find_005.out"
+        rlAssertGrep "automountmapname: auto.direct" "$TmpDir/automountmap_find_005.out"
+        rlAssertGrep "objectclass: automountmap" "$TmpDir/automountmap_find_005.out"
+        rlAssertGrep "objectclass: top" "$TmpDir/automountmap_find_005.out"
+        rlAssertGrep "dn: automountmapname=auto.master,cn=pune,cn=automount,$basedn" "$TmpDir/automountmap_find_005.out"
+        rlAssertGrep "automountmapname: auto.master" "$TmpDir/automountmap_find_005.out"
+        rlAssertGrep "objectclass: automountmap" "$TmpDir/automountmap_find_005.out"
+        rlAssertGrep "objectclass: top" "$TmpDir/automountmap_find_005.out"
+	rlAssertGrep "dn: automountmapname=pune.map,cn=pune,cn=automount,$basedn" "$TmpDir/automountmap_find_005.out"
+	rlAssertGrep "automountmapname: pune.map" "$TmpDir/automountmap_find_005.out"
+        rlAssertGrep "objectclass: automountmap" "$TmpDir/automountmap_find_005.out"
+	rlAssertGrep "objectclass: top" "$TmpDir/automountmap_find_005.out"
+	rlAssertGrep "Number of entries returned 3" "$TmpDir/automountmap_find_005.out"
+
+	rlRun "cat $TmpDir/automountmap_find_005.out"
+
+        rlRun "ipa automountlocation-del pune"
+
+rlPhaseEnd
+}
+
+automountmap_show_001() {
+
+rlPhaseStartTest "automountmap_show_001: ipa automountmap-show LOCATION MAP"
+
+        # Setup for automountmap-show.
+	rlRun "ipa automountlocation-add pune"
+	rlRun "ipa automountmap-add pune.map --desc=\"map file for pune location\""
+
+	rlRun "ipa automountmap-show pune pune.map > $TmpDir/automountmap_show_001.out 2>&1"
+	rlAssertGrep "Map: pune.map" "$TmpDir/automountmap_show_001.out"
+	rlAssertGrep "Description: map file for pune location" "$TmpDir/automountmap_show_001.out"
+
+	rlRun "cat $TmpDir/automountmap_show_001.out"
+
+rlPhaseEnd
+}
+
+automountmap_show_002() {
+
+rlPhaseStartTest "automountmap_show_002: ipa automountmap-show LOCATION MAP --all"
+
+	rlRun "ipa automountmap-show pune pune.map --all > $TmpDir/automountmap_show_002.out 2>&1"
+	rlAssertGrep "dn: automountmapname=pune4.map,cn=pune,cn=automount,$basedn" "$TmpDir/automountmap_show_002.out"
+	rlAssertGrep "Map: pune.map" "$TmpDir/automountmap_show_002.out"
+	rlAssertGrep "Description: map file for pune location" "$TmpDir/automountmap_show_002.out"
+        rlAssertGrep "objectclass: automountmap, top" "$TmpDir/automountmap_show_002.out"
+
+	rlRun "cat $TmpDir/automountmap_show_002.out"
+
+rlPhaseEnd
+}
+
+automountmap_show_003() {
+
+rlPhaseStartTest "automountmap_show_003: ipa automountmap-show LOCATION MAP --all --raw"
+
+	rlRun "ipa automountmap-show pune pune.map --all --raw > $TmpDir/automountmap_show_003.out 2>&1"
+        rlAssertGrep "dn: automountmapname=pune4.map,cn=pune,cn=automount,$basedn" "$TmpDir/automountmap_show_003.out"
+        rlAssertGrep "automountmapname: pune.map" "$TmpDir/automountmap_show_003.out"
+        rlAssertGrep "description: map file for pune location" "$TmpDir/automountmap_show_003.out"
+        rlAssertGrep "objectclass: automountmap" "$TmpDir/automountmap_show_003.out"
+        rlAssertGrep "objectclass: top" "$TmpDir/automountmap_show_003.out"
+
+	rlRun "cat $TmpDir/automountmap_show_003.out"
+	rlRun "ipa automountlocation-del pune"
+
+rlPhaseEnd
+}
+
+automountkey_add_001() {
+
+rlPhaseStartTest "automountkey_add_001: ipa automountkey-add LOCATION MASTERMAP --key --info"
+
+	rlRun "ipa automountlocation-add baltimore"
+	rlRun "ipa automountmap-add auto.baltimore"
+
+	# Create a new key for the auto.share map in location baltimore. This ties
+	# the map we previously created to auto.master.
+
+	rlRun "ipa automountkey-add baltimore auto.master --key=/share --info=auto.share > $TmpDir/automountkey_add_001.out 2>&1"
+	rlLog "Verifies bug https://bugzilla.redhat.com/show_bug.cgi?id=725763"
+	rlAssertGrep "Added automount key \"/share\"" "$TmpDir/automountkey_add_001.out"
+	rlAssertGrep "Key: /share" "$TmpDir/automountkey_add_001.out"
+	rlAssertGrep "Mount information: auto.share" "$TmpDir/automountkey_add_001.out"
+
+	rlRun "cat $TmpDir/automountkey_add_001.out"
+	rlRun "ipa automountlocation-del baltimore"
+
+rlPhaseEnd
+}
+
+automountkey_add_002() {
+
+rlPhaseStartTest "automountkey_add_002: ipa automountkey-add LOCATION MASTERMAP --key --info --all"
+
+	rlRun "ipa automountlocation-add baltimore"
+        rlRun "ipa automountmap-add auto.baltimore"
+
+        # Create a new key for the auto.share map in location baltimore. This ties
+        # the map we previously created to auto.master.
+
+        rlRun "ipa automountkey-add baltimore auto.master --key=/share --info=auto.share --all > $TmpDir/automountkey_add_002.out 2>&1"
+	rlAssertGrep "Added automount key \"/share\"" "$TmpDir/automountkey_add_002.out"
+	rlAssertGrep "dn: description=/share,automountmapname=auto.master,cn=baltimore,cn=automount,$basedn" "$TmpDir/automountkey_add_002.out"
+	rlAssertGrep "Key: /share" "$TmpDir/automountkey_add_002.out"
+	rlAssertGrep "Mount information: auto.share" "$TmpDir/automountkey_add_002.out"
+	rlAssertGrep "description: /share" "$TmpDir/automountkey_add_002.out"
+	rlAssertGrep "objectclass: automount, top" "$TmpDir/automountkey_add_002.out"
+
+        rlRun "cat $TmpDir/automountkey_add_002.out"
+        rlRun "ipa automountlocation-del baltimore"
+
+rlPhaseEnd
+}
+
+automountkey_add_003() {
+
+rlPhaseStartTest "automountkey_add_003: ipa automountkey-add LOCATION MASTERMAP --key --info --all --raw"
+
+        rlRun "ipa automountlocation-add baltimore"
+        rlRun "ipa automountmap-add auto.baltimore"
+
+        # Create a new key for the auto.share map in location baltimore. This ties
+        # the map we previously created to auto.master.
+
+        rlRun "ipa automountkey-add baltimore auto.master --key=/share --info=auto.share --all --raw > $TmpDir/automountkey_add_003.out 2>&1"
+	rlAssertGrep "dn: description=/share,automountmapname=auto.master,cn=baltimore,cn=automount,$basedn" "$TmpDir/automountkey_add_003.out"
+	rlAssertGrep "automountkey: /share" "$TmpDir/automountkey_add_003.out"
+	rlAssertGrep "automountinformation: auto.share" "$TmpDir/automountkey_add_003.out"
+	rlAssertGrep "description: /share" "$TmpDir/automountkey_add_003.out"
+	rlAssertGrep "objectclass: automount" "$TmpDir/automountkey_add_003.out"
+	rlAssertGrep "objectclass: top" "$TmpDir/automountkey_add_003.out"
+
+        rlRun "cat $TmpDir/automountkey_add_003.out"
+        rlRun "ipa automountlocation-del baltimore"
+
+rlPhaseEnd
+}
+
+automountkey_mod_001() {
+
+rlPhaseStartTest "automountkey_mod_001: ipa automountkey-mod LOCATION MAP --key --rename --info --newinfo"
+
+        rlRun "ipa automountlocation-add baltimore"
+	rlRun "ipa automountkey-add baltimore auto.master --key=/share --info=auto.share"
+
+	rlRun "ipa automountkey-mod baltimore auto.master --key=/share --rename=/ipashare --info=auto.share --newinfo=auto.ipashare > $TmpDir/automountkey_mod_001.out 2>&1"
+	rlLog "Verifies bug https://bugzilla.redhat.com/show_bug.cgi?id=726028"
+	rlAssertNotGrep "Key: /share" "$TmpDir/automountkey_mod_001.out"
+	rlAssertGrep "Key: /ipashare" "$TmpDir/automountkey_mod_001.out"
+	rlAssertGrep "Mount information: auto.ipashare" "$TmpDir/automountkey_mod_001.out"
+
+	rlRun "cat $TmpDir/automountkey_mod_001.out"
+	rlRun "ipa automountlocation-del baltimore"
+
+rlPhaseEnd
+}
+
+automountkey_mod_002() {
+
+rlPhaseStartTest "automountkey_mod_002: ipa automountkey-mod LOCATION MAP MAP --key --rename --info --newinfo --all"
+
+	rlRun "ipa automountlocation-add baltimore"
+        rlRun "ipa automountkey-add baltimore auto.master --key=/share --info=auto.share"
+
+        rlRun "ipa automountkey-mod baltimore auto.master --key=/share --rename=/ipashare --info=auto.share --newinfo=auto.ipashare --all > $TmpDir/automountkey_mod_002.out 2>&1"
+	rlAssertNotGrep "Key: /share" "$TmpDir/automountkey_mod_002.out"
+	rlAssertGrep "Key: /ipashare" "$TmpDir/automountkey_mod_002.out"
+	rlAssertGrep "Mount information: auto.ipashare" "$TmpDir/automountkey_mod_002.out"
+	rlAssertGrep "description: /ipashare" "$TmpDir/automountkey_mod_002.out"
+	rlAssertGrep "objectclass: automount, top" "$TmpDir/automountkey_mod_002.out"
+
+	rlRun "cat $TmpDir/automountkey_mod_002.out"
+	rlRun "ipa automountlocation-del baltimore"
+
+rlPhaseEnd
+}
+
+automountkey_mod_003() {
+
+rlPhaseStartTest "automountkey_mod_003: ipa automountkey-mod LOCATION MAP MAP --key --rename --info --newinfo --all --raw"
+
+        rlRun "ipa automountlocation-add baltimore"
+        rlRun "ipa automountkey-add baltimore auto.master --key=/share --info=auto.share"
+
+        rlRun "ipa automountkey-mod baltimore auto.master --key=/share --rename=/ipashare --info=auto.share --newinfo=auto.ipashare --all --raw > $TmpDir/automountkey_mod_003.out 2>&1"
+	rlAssertGrep "automountkey: /ipashare" "$TmpDir/automountkey_mod_003.out"
+	rlAssertGrep "automountinformation: auto.ipashare" "$TmpDir/automountkey_mod_003.out"
+	rlAssertGrep "description: /ipashare" "$TmpDir/automountkey_mod_003.out"
+	rlAssertGrep "objectclass: automount" "$TmpDir/automountkey_mod_003.out"
+	rlAssertGrep "objectclass: top" "$TmpDir/automountkey_mod_003.out"
+
+	rlRun "cat $TmpDir/automountkey_mod_003.out"
+	rlRun "ipa automountlocation-del baltimore"
+
+rlPhaseEnd
+}
+
+automountkey_mod_004() {
+
+rlPhaseStartTest "automountkey_mod_004: ipa automountkey-mod LOCATION MAP MAP --key --rename --info --newinfo --all --raw --rights"
+
+        rlRun "ipa automountlocation-add baltimore"
+        rlRun "ipa automountkey-add baltimore auto.master --key=/share --info=auto.share"
+
+        rlRun "ipa automountkey-mod baltimore auto.master --key=/share --rename=/ipashare --info=auto.share --newinfo=auto.ipashare --all --raw --rights > $TmpDir/automountkey_mod_004.out 2>&1"
+        rlAssertGrep "automountkey: /ipashare" "$TmpDir/automountkey_mod_004.out"
+        rlAssertGrep "automountinformation: auto.ipashare" "$TmpDir/automountkey_mod_004.out"
+        rlAssertGrep "attributelevelrights: {'description': u'rscwo', 'objectclass': u'rscwo', 'aci': u'rscwo', 'nsaccountlock': u'rscwo', 'automountkey': u'rscwo', 'automountinformation': u'rscwo'}" "$TmpDir/automountkey_mod_004.out"
+        rlAssertGrep "description: /ipashare" "$TmpDir/automountkey_mod_004.out"
+        rlAssertGrep "objectclass: automount" "$TmpDir/automountkey_mod_004.out"
+        rlAssertGrep "objectclass: top" "$TmpDir/automountkey_mod_004.out"
+
+        rlRun "cat $TmpDir/automountkey_mod_004.out"
+        rlRun "ipa automountlocation-del baltimore"
+
+rlPhaseEnd
+}
+
+automountkey_find_001() {
+
+rlPhaseStartTest "automountkey_find_001: ipa automountkey-find LOCATION MAP"
+
+	rlRun "ipa automountlocation-add baltimore"
+        rlRun "ipa automountkey-add baltimore auto.master --key=/share --info=auto.share"
+
+	rlRun "ipa automountkey-find baltimore auto.master > $TmpDir/automountkey_find_001.out 2>&1"
+	rlAssertGrep "2 automount keys matched" "$TmpDir/automountkey_find_001.out"
+	rlAssertGrep "Key: /-" "$TmpDir/automountkey_find_001.out"
+	rlAssertGrep "Mount information: auto.direct" "$TmpDir/automountkey_find_001.out"
+	rlAssertGrep "Key: /share" "$TmpDir/automountkey_find_001.out"
+	rlAssertGrep "Mount information: auto.share" "$TmpDir/automountkey_find_001.out"
+
+	rlRun "cat $TmpDir/automountkey_find_001.out"
+
+rlPhaseEnd
+}
+
+automountkey_find_002() {
+
+rlPhaseStartTest "automountkey_find_002: ipa automountkey-find LOCATION MAP --all"
+
+	rlRun "ipa automountkey-find baltimore auto.master --all > $TmpDir/automountkey_find_002.out 2>&1"
+        rlAssertGrep "2 automount keys matched" "$TmpDir/automountkey_find_002.out"
+        rlAssertGrep "dn: description=/- auto.direct,automountmapname=auto.master,cn=baltimore,cn=automount,$basedn" "$TmpDir/automountkey_find_002.out"
+	rlAssertGrep "Key: /-" "$TmpDir/automountkey_find_002.out"
+	rlAssertGrep "Mount information: auto.direct" "$TmpDir/automountkey_find_002.out"
+	rlAssertGrep "description: /- auto.direct" "$TmpDir/automountkey_find_002.out"
+	rlAssertGrep "objectclass: automount, top" "$TmpDir/automountkey_find_002.out"
+	rlAssertGrep "dn: description=/share,automountmapname=auto.master,cn=baltimore,cn=automount,$basedn" "$TmpDir/automountkey_find_002.out"
+	rlAssertGrep "Key: /share" "$TmpDir/automountkey_find_002.out"
+	rlAssertGrep "Mount information: auto.share" "$TmpDir/automountkey_find_002.out"
+	rlAssertGrep "description: /share" "$TmpDir/automountkey_find_002.out"
+	rlAssertGrep "objectclass: automount, top" "$TmpDir/automountkey_find_002.out"
+	rlAssertGrep "Number of entries returned 2" "$TmpDir/automountkey_find_002.out"
+
+	rlRun "cat $TmpDir/automountkey_find_002.out"
+
+rlPhaseEnd
+}
+
+automountkey_find_003() {
+
+rlPhaseStartTest "automountkey_find_003: ipa automountkey-find LOCATION MAP --all --raw"
+
+	rlRun "ipa automountkey-find baltimore auto.master --all --raw > $TmpDir/automountkey_find_003.out 2>&1"
+        rlAssertGrep "2 automount keys matched" "$TmpDir/automountkey_find_003.out"
+        rlAssertGrep "dn: description=/- auto.direct,automountmapname=auto.master,cn=baltimore,cn=automount,$basedn" "$TmpDir/automountkey_find_003.out"
+	rlAssertGrep "automountkey: /-" "$TmpDir/automountkey_find_003.out"
+	rlAssertGrep "automountinformation: auto.direct" "$TmpDir/automountkey_find_003.out"
+	rlAssertGrep "description: /- auto.direct" "$TmpDir/automountkey_find_003.out"
+	rlAssertGrep "objectclass: automount" "$TmpDir/automountkey_find_003.out"
+	rlAssertGrep "objectclass: top" "$TmpDir/automountkey_find_003.out"
+	rlAssertGrep "dn: description=/share,automountmapname=auto.master,cn=baltimore,cn=automount,$basedn" "$TmpDir/automountkey_find_003.out"
+	rlAssertGrep "automountkey: /share" "$TmpDir/automountkey_find_003.out"
+	rlAssertGrep "automountinformation: auto.share" "$TmpDir/automountkey_find_003.out"
+	rlAssertGrep "description: /share" "$TmpDir/automountkey_find_003.out"
+	rlAssertGrep "objectclass: automount" "$TmpDir/automountkey_find_003.out"
+	rlAssertGrep "objectclass: top" "$TmpDir/automountkey_find_003.out"
+
+	rlRun "cat $TmpDir/automountkey_find_003.out"
+
+rlPhaseEnd
+}
+
+automountkey_find_004() {
+
+rlPhaseStartTest "automountkey_find_004: ipa automountkey-find LOCATION MAP --all --sizelimit"
+
+	rlRun "ipa automountkey-find baltimore auto.master --all --sizelimit=1 > $TmpDir/automountkey_find_004.out 2>&1"
+	rlAssertGrep "1 automount key matched" "$TmpDir/automountkey_find_004.out"
+	rlAssertGrep "dn: description=/- auto.direct,automountmapname=auto.master,cn=baltimore,cn=automount,$basedn" "$TmpDir/automountkey_find_004.out"
+	rlAssertGrep "Key: /-" "$TmpDir/automountkey_find_004.out"
+	rlAssertGrep "Mount information: auto.direct" "$TmpDir/automountkey_find_004.out"
+	rlAssertGrep "description: /- auto.direct" "$TmpDir/automountkey_find_004.out"
+	rlAssertGrep "objectclass: automount, top" "$TmpDir/automountkey_find_004.out"
+	rlAssertGrep "Number of entries returned 1" "$TmpDir/automountkey_find_004.out"
+
+	rlRun "cat $TmpDir/automountkey_find_004.out"
+
+rlPhaseEnd
+}
+
+automountkey_find_005() {
+
+rlPhaseStartTest "automountkey_find_005: ipa automountkey-find LOCATION MAP --all --key"
+
+	rlRun "ipa automountkey-find baltimore auto.master --all --key=/share > $TmpDir/automountkey_find_005.out 2>&1"
+	rlAssertGrep "1 automount key matched" "$TmpDir/automountkey_find_005.out"
+	rlAssertGrep "Key: /share" "$TmpDir/automountkey_find_005.out"
+	rlAssertGrep "Mount information: auto.share" "$TmpDir/automountkey_find_005.out"
+	rlAssertGrep "Number of entries returned 1" "$TmpDir/automountkey_find_005.out"
+
+	rlRun "cat $TmpDir/automountkey_find_005.out"
+
+rlPhaseEnd
+}
+
+automountkey_find_006() {
+
+rlPhaseStartTest "automountkey_find_006: ipa automountkey-find LOCATION MAP --all --info"
+
+	rlRun "ipa automountkey-find baltimore auto.master --all --info=auto.share > $TmpDir/automountkey_find_006.out 2>&1"
+        rlAssertGrep "1 automount key matched" "$TmpDir/automountkey_find_006.out"
+        rlAssertGrep "Key: /share" "$TmpDir/automountkey_find_006.out"
+        rlAssertGrep "Mount information: auto.share" "$TmpDir/automountkey_find_006.out"
+        rlAssertGrep "Number of entries returned 1" "$TmpDir/automountkey_find_006.out"
+
+        rlRun "cat $TmpDir/automountkey_find_006.out"
+
+rlPhaseEnd
+}
+
+automountkey_show_001() {
+
+rlPhaseStartTest "automountkey_show_001: ipa automountkey-show LOCATION MAP --key"
+
+        rlRun "ipa automountkey-show baltimore auto.master --key=/share > $TmpDir/automountkey_show_001.out 2>&1"
+        rlAssertGrep "Key: /share" "$TmpDir/automountkey_show_001.out"
+        rlAssertGrep "Mount information: auto.share" "$TmpDir/automountkey_show_001.out"
+
+	rlRun "cat $TmpDir/automountkey_show_001.out"
+
+rlPhaseEnd
+}
+
+automountkey_show_002() {
+
+rlPhaseStartTest "automountkey_show_002: ipa automountkey-show LOCATION MAP --key --info"
+
+	rlRun "ipa automountkey-show baltimore auto.master --key=/share --info=auto.share > $TmpDir/automountkey_show_002.out 2>&1"
+        rlAssertGrep "Key: /share" "$TmpDir/automountkey_show_002.out"
+        rlAssertGrep "Mount information: auto.share" "$TmpDir/automountkey_show_002.out"
+
+	rlRun "cat $TmpDir/automountkey_show_002.out"
+
+rlPhaseEnd
+}
+
+automountkey_show_003() {
+
+rlPhaseStartTest "automountkey_show_003: ipa automountkey-show LOCATION MAP --key --info --all"
+
+	rlRun "ipa automountkey-show baltimore auto.master --key=/share --info=auto.share --all > $TmpDir/automountkey_show_003.out 2>&1"
+        rlAssertGrep " dn: description=/share,automountmapname=auto.master,cn=baltimore,cn=automount,$basedn" "$TmpDir/automountkey_show_003.out"
+        rlAssertGrep "Key: /share" "$TmpDir/automountkey_show_003.out"
+        rlAssertGrep "Mount information: auto.share" "$TmpDir/automountkey_show_003.out"
+        rlAssertGrep "description: /share" "$TmpDir/automountkey_show_003.out"
+        rlAssertGrep "objectclass: automount, top" "$TmpDir/automountkey_show_003.out"
+
+	rlRun "cat $TmpDir/automountkey_show_003.out"
+
+rlPhaseEnd
+}
+
+automountkey_show_004() {
+
+rlPhaseStartTest "automountkey_show_004: ipa automountkey-show LOCATION MAP --key --info --all --raw"
+
+        rlRun "ipa automountkey-show baltimore auto.master --key=/share --info=auto.share --all --raw > $TmpDir/automountkey_show_004.out 2>&1"
+        rlAssertGrep "dn: description=/share,automountmapname=auto.master,cn=baltimore,cn=automount,$basedn" "$TmpDir/automountkey_show_004.out"
+        rlAssertGrep "automountkey: /share" "$TmpDir/automountkey_show_004.out"
+        rlAssertGrep "automountinformation: auto.share" "$TmpDir/automountkey_show_004.out"
+        rlAssertGrep "description: /share" "$TmpDir/automountkey_show_004.out"
+        rlAssertGrep "objectclass: automount" "$TmpDir/automountkey_show_004.out"
+        rlAssertGrep "objectclass: top" "$TmpDir/automountkey_show_004.out"
+
+	rlRun "cat $TmpDir/automountkey_show_004.out"
+
+rlPhaseEnd
+}
+
+automountkey_show_005() {
+
+rlPhaseStartTest "automountkey_show_005: ipa automountkey-show LOCATION MAP --key --info --all --raw --rights"
+
+        rlRun "ipa automountkey-show baltimore auto.master --key=/share --info=auto.share --all --raw --rights > $TmpDir/automountkey_show_005.out 2>&1"
+	rlAssertGrep "dn: description=/share,automountmapname=auto.master,cn=baltimore,cn=automount,$basedn" "$TmpDir/automountkey_show_005.out"
+	rlAssertGrep "automountkey: /share" "$TmpDir/automountkey_show_005.out"
+	rlAssertGrep "automountinformation: auto.share" "$TmpDir/automountkey_show_005.out"
+	rlAssertGrep "attributelevelrights: {'description': u'rscwo', 'objectclass': u'rscwo', 'aci': u'rscwo', 'nsaccountlock': u'rscwo', 'automountkey': u'rscwo', 'automountinformation': u'rscwo'}" "$TmpDir/automountkey_show_005.out"
+	rlAssertGrep "description: /share" "$TmpDir/automountkey_show_005.out"
+	rlAssertGrep "objectclass: automount" "$TmpDir/automountkey_show_005.out"
+	rlAssertGrep "objectclass: top" "$TmpDir/automountkey_show_005.out"
+
+	rlRun "cat $TmpDir/automountkey_show_005.out"
+	rlRun "ipa automountlocation-del baltimore"
+
+rlPhaseEnd
+}
 
 automount_location_del_001() {
 
@@ -828,6 +1402,47 @@ rlPhaseStartTest "automount_location_del_002: ipa automountlocation-del LOCATION
 
         rlRun "cat $TmpDir/automount_location_del.out"
 
+
+rlPhaseEnd
+}
+
+automountkey_del() {
+
+rlPhaseStartTest "automountkey_del: ipa automountkey-del AUTOMOUNTLOCATION AUTOMOUNTMAP"
+
+	rlRun "ipa automountlocation-add baltimore"
+	rlRun "ipa automountkey-add baltimore auto.master --key=/share"
+
+	rlRun "ipa  automountkey-add baltimore auto.master --key=/share --info=auto.share > $TmpDir/automountkey_del.out 2>&1"
+	rlAssertGrep "Deleted automount key \"/share\"" "$TmpDir/automountkey_del.out"
+	rlRun "cat $TmpDir/automountkey_del.out"
+
+	rlRun "ipa automountkey-add baltimore auto.master --key=/share --info=auto.share"
+	rlAssertGrep "" "$TmpDir/automountkey_del.out"
+	rlRun "cat $TmpDir/automountkey_del.out"
+
+rlPhaseEnd
+}
+
+automountmap_del() {
+
+rlPhaseStartTest "automountmap_del: ipa automountmap-del LOCATION MAP"
+
+        rlRun "ipa automountlocation-add baltimore"
+	rlRun "ipa automountmap-add baltimore auto.map1"
+	rlRun "ipa automountmap-add baltimore auto.map2"
+
+	rlRun "ipa automountmap-del baltimore auto.map1 > $TmpDir/automountmap_del.out 2>&1"
+	rlAssertGrep "Deleted automount map \"auto.map1\"" "$TmpDir/automountmap_del.out"
+	rlRun "cat $TmpDir/automountmap_del.out"
+
+	rlRun "ipa automountmap-del baltimore auto.map1 auto.map2 > $TmpDir/automountmap_del.out 2>&1"
+        rlAssertGrep "ipa: ERROR: auto.map1: automount map not found" "$TmpDir/automountmap_del.out"
+        rlRun "cat $TmpDir/automountmap_del.out"
+
+        rlRun "ipa automountmap-del baltimore auto.map1 auto.map2 --continue> $TmpDir/automountmap_del.out 2>&1"
+        rlAssertGrep "Deleted automount map \"auto.map2\"" "$TmpDir/automountmap_del.out"
+	rlAssertGrep "Failed to remove: auto.map1" "$TmpDir/automountmap_del.out"
 
 rlPhaseEnd
 }
