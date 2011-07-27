@@ -880,4 +880,31 @@ check_deletedconfig()
 	rlPhaseEnd
 }
 
+################################
+# pwpolicy section
+################################
+add_pwpolicy()
+{
+}
+
+check_pwpolicy()
+{
+}
+
+mod_pwpolicy()
+{
+}
+
+check_modpwpolicy()
+{
+}
+
+delete_pwpolicy()
+{
+}
+
+check_deletedpwpolicy()
+{
+}
+
 
