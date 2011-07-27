@@ -38,16 +38,15 @@
 
 addHBACRule()
 {
-   type=$1
-   usercat=$2
-   hostcat=$3
-   srchostcat=$4
-   servicecat=$5
-   rulename=$6
+   usercat=$1
+   hostcat=$2
+   srchostcat=$3
+   servicecat=$4
+   rulename=$5
    rc=0
 
-	rlLog "Executing: ipa hbacrule-add --type=$type --usercat=$usercat --hostcat=$hostcat --srchostcat=$srchostcat --servicecat=$servicecat $rulename"
-	ipa hbacrule-add --type=$type --usercat=$usercat --hostcat=$hostcat --srchostcat=$srchostcat --servicecat=$servicecat $rulename
+	rlLog "Executing: ipa hbacrule-add --usercat=$usercat --hostcat=$hostcat --srchostcat=$srchostcat --servicecat=$servicecat $rulename"
+	ipa hbacrule-add --usercat=$usercat --hostcat=$hostcat --srchostcat=$srchostcat --servicecat=$servicecat $rulename
 	rc=$?
    	if [ $rc -ne 0 ] ; then
         	rlLog "WARNING: Adding new hbac rule $rulename failed."
