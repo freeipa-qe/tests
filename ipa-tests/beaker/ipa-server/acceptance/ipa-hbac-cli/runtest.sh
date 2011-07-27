@@ -104,46 +104,47 @@ rlJournalStart
     rlPhaseEnd
 
     # hbacrule-add negative testing 
-    rlPhaseStartTest "ipa-hbacrule-cli-001: Rule Type Required - send empty string"
-        command="ipa hbacrule-add --type=\"\" test"
-        expmsg="ipa: ERROR: 'type' is required"
-        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for empty Rule Type"
-    rlPhaseEnd
 
-    rlPhaseStartTest "ipa-hbacrule-cli-002: Rule Type Required - unknown type"
-        command="ipa hbacrule-add --type=\"bad\" test"
-        expmsg="ipa: ERROR: invalid 'type': must be (u'allow')"
-        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for Unknown Rule Type"
+    # DISABLING TEST --type no longer an option after deny rule deprecation only type left is allow
+    #rlPhaseStartTest "ipa-hbacrule-cli-001: Rule Type Required - send empty string"
+    #    command="ipa hbacrule-add --type=\"\" test"
+    #    expmsg="ipa: ERROR: 'type' is required"
+    #    rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for empty Rule Type"
+    #rlPhaseEnd
+
+    rlPhaseStartTest "ipa-hbacrule-cli-002: Rule type option removed"
+	rlRun "ipa hbacrule-add --type=deny testrule > /tmp/error_hbac_002.out 2>&1" 2
+	rlAssertGrep "ipa: error: no such option: --type" "/tmp/error_hbac_002.out"
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-hbacrule-cli-003: User Category - unknown"
-        command="ipa hbacrule-add --type=allow --usercat=bad test"
-        expmsg="ipa: ERROR: invalid 'type': must be (u'allow')"
+        command="ipa hbacrule-add --usercat=bad test"
+        expmsg="ipa: ERROR: invalid 'usercat': must be one of (u'all',)"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for Unknown user category"
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-hbacrule-cli-004: Service Category - unknown"
-        command="ipa hbacrule-add --type=allow --servicecat=bad test"
-        expmsg="ipa: ERROR: invalid 'type': must be (u'allow')"
+        command="ipa hbacrule-add --servicecat=bad test"
+        expmsg="ipa: ERROR: invalid 'servicecat': must be one of (u'all',)"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for Unknown service category"
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-hbacrule-cli-005: Host Category - unknown"
-        command="ipa hbacrule-add --type=allow --hostcat=bad test"
+        command="ipa hbacrule-add --hostcat=bad test"
         expmsg="ipa: ERROR: invalid 'hostcat': must be one of (u'all',)"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for Unknown host category"
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-hbacrule-cli-006: Source Host Category - unknown"
-        command="ipa hbacrule-add --type=allow --srchostcat=bad test"
+        command="ipa hbacrule-add --srchostcat=bad test"
         expmsg="ipa: ERROR: invalid 'srchostcat': must be one of (u'all',)"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for Unknown source host category"
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-hbacrule-cli-007: Add Duplicate Rule"
-        command="ipa hbacrule-add --type=allow --srchostcat=all test"
+        command="ipa hbacrule-add --srchostcat=all test"
         expmsg="ipa: ERROR: HBAC rule with name test already exists"
-	rlRun "addHBACRule allow all all all all test" 0 "Adding HBAC test rule."
+	rlRun "addHBACRule all all all all test" 0 "Adding HBAC test rule."
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for adding duplicate rule"
     rlPhaseEnd
 
@@ -229,7 +230,7 @@ rlJournalStart
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-hbacrule-cli-017: Negative - Rule Does Not Exist - modify"
-	 command="ipa hbacrule-mod --type=allow doesntexist"
+	 command="ipa hbacrule-mod --usercat=all doesntexist"
 	 expmsg="ipa: ERROR: doesntexist: HBAC rule not found"
 	 rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for hbacrule-mod rule doesn't exist"
     rlPhaseEnd
@@ -284,7 +285,7 @@ rlJournalStart
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-hbacrule-cli-025: Add host to Rule"
-	rlRun "addHBACRule allow \" \" \" \" \" \" \" \" Engineering" 0 "Adding HBAC rule."
+	rlRun "addHBACRule \" \" \" \" \" \" \" \" Engineering" 0 "Adding HBAC rule."
 	rlRun "addToHBAC Engineering host hosts $host1" 0 "Adding host $host1 to Engineering rule."
 	rlRun "verifyHBACAssoc Engineering Hosts $host1" 0 "Verifying host $host1 is associated with the Engineering rule."
     rlPhaseEnd
@@ -369,11 +370,11 @@ rlJournalStart
         rlRun "verifyHBACAssoc Engineering \"Source host category\" all" 0 "Verifying Source Host Category"
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-hbacrule-cli-042: Deprecation of deny rule"
-        command="ipa hbacrule-add --type=deny --usercat=all newtest"
-        expmsg="ipa: ERROR: invalid 'type': The deny type has been deprecated."
-        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for deprecated deny rule"
-    rlPhaseEnd
+    # disabling test .. --type has now been removed
+    #rlPhaseStartTest "ipa-hbacrule-cli-042: Deprecation of deny rule"
+    #	rlRun "ipa hbacrule-add --type=deny --usercat=all newtest > /tmp/error_hbac_042.out 2>&1" 2
+    #    rlAssertGrep "ipa: ERROR: invalid 'type': The deny type has been deprecated." "/tmp/error_hbac_042.out"
+    #rlPhaseEnd
 
     rlPhaseStartTest "ipa-hbacrule-cli-043: Delete User Associated with a Rule"
 	rlRun "modifyHBACRule Engineering usercat \"\" " 0 "Modifying Engineering Rule's User Category"
@@ -408,10 +409,10 @@ rlJournalStart
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-hbacrule-cli-047: Find Rules by name"
-	rlRun "addHBACRule allow \" \" \" \" \" \" \" \" test1" 0 "Adding HBAC rule."
-	rlRun "addHBACRule allow all all all all test2" 0 "Adding HBAC rule."
-	rlRun "addHBACRule allow all all all all test3" 0 "Adding HBAC rule."
-	rlRun "addHBACRule allow \" \" \" \" \" \" \" \" test4" 0 "Adding HBAC rule."
+	rlRun "addHBACRule \" \" \" \" \" \" \" \" test1" 0 "Adding HBAC rule."
+	rlRun "addHBACRule all all all all test2" 0 "Adding HBAC rule."
+	rlRun "addHBACRule all all all all test3" 0 "Adding HBAC rule."
+	rlRun "addHBACRule \" \" \" \" \" \" \" \" test4" 0 "Adding HBAC rule."
 
 	for item in test1 test2 test3 test4 ; do
 		rlRun "findHBACRuleByOption name $item $item" 0 "Finding rule $item by name"	
