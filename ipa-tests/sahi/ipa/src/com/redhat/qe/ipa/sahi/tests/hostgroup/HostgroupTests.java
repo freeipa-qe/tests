@@ -17,13 +17,16 @@ import com.redhat.qe.ipa.sahi.tasks.SahiTasks;
 public class HostgroupTests extends SahiTestScript{
 	public static SahiTasks sahiTasks = null;	
 	private String hostgroupPage = "/ipa/ui/#identity=hostgroup&navigation=identity";
+	private String hostPage = "/ipa/ui/#identity=host&navigation=identity";
+	private String domain = System.getProperty("ipa.server.domain");
 	
 	@BeforeClass (groups={"init"}, description="Initialize app for this test suite run", alwaysRun=true, dependsOnGroups="setup")
 	public void initialize() throws CloneNotSupportedException {	
 		sahiTasks = SahiTestScript.getSahiTasks();	
 		sahiTasks.navigateTo(System.getProperty("ipa.server.url")+hostgroupPage, true);
+		sahiTasks.setStrictVisibilityCheck(true);
 	}
-
+	
 	/*
 	 * Add host group positive tests
 	 */
@@ -78,7 +81,7 @@ public class HostgroupTests extends SahiTestScript{
 		com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(groupName3).exists(), "Verify host group " + groupName3 + " doesn't already exist");
 		
 		//add new host group
-		HostgroupTasks.addAndAddAnotherHost(sahiTasks, groupName1, groupName2, groupName3);
+		HostgroupTasks.addAndAddAnotherHostGroup(sahiTasks, groupName1, groupName2, groupName3);
 	
 		//verify host group exists
 		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(groupName1).exists(), "Verify host group " + groupName1 + " exists");
@@ -107,13 +110,93 @@ public class HostgroupTests extends SahiTestScript{
 		com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(groupName3).exists(), "Verify host group " + groupName3 + " was deleted successfully");
 		
 	}
+	
+	/*
+	 * Add and edit host group settings
+	 */
+	@Test (groups={"addAndEditHostGroupSettingsTest"}, dataProvider="getAddAndEditHostGroupTestObjects")	
+	public void testHostGroupAddAndEdit(String testName, String groupName, String description1, String description2) throws Exception {
+		//verify host group doesn't exist
+		com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(groupName).exists(), "Verify host group " + groupName + " doesn't already exist");
+		
+		//add new host group
+		HostgroupTasks.addAndEditHostGroup(sahiTasks, groupName, description1, description2);
+		
+		//verify the host group exists
+		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(groupName).exists(), "Verify host group " + groupName + " exists");
+		
+		//verify the description setting
+		HostgroupTasks.verifyHostGroupSettings(sahiTasks, groupName, description2);
+		
+		//clean up delete host group
+		HostgroupTasks.deleteHostgroup(sahiTasks, groupName, "Delete");
+
+	}
+	
+	/*
+	 * Add and edit host group settings
+	 */
+	@Test (groups={"hostMembersTests"}, dataProvider="getHostMembersTestObjects")
+	public void testHostMembers(String testName) throws Exception {
+		String devwebserver = "webserver_dev." + domain;
+		String qewebserver = "webserver_qe." + domain;
+		String devhost = "laptop_dev." + domain;
+		String qehost = "laptop_qa." + domain;
+		String engwebserver = "webserver_eng." + domain;
+		
+		String [] hostnames = {devwebserver, qewebserver, devhost, qehost, engwebserver};
+		
+		String devgroup = "development hosts";
+		String qegroup = "quality hosts";
+		String enggroup = "engineering hosts";
+		
+		String [] hostgroups = {devgroup, qegroup, enggroup};
+		
+		//add hosts for host group members
+		sahiTasks.navigateTo(System.getProperty("ipa.server.url")+hostPage, true);
+		for (String hostname : hostnames) {
+			HostTasks.addHost(sahiTasks, hostname, "");
+		}
+		
+		//add host groups
+		sahiTasks.navigateTo(System.getProperty("ipa.server.url")+hostgroupPage, true);
+		for (String hostgroup : hostgroups) {
+			String description = hostgroup + " group";
+			HostgroupTasks.addHostGroup(sahiTasks, hostgroup, description, "Add");
+		}
+		
+		String [] devhosts = {devwebserver, devhost};
+		String [] qehosts = {qewebserver, qehost};
+		String [] enghosts = {engwebserver};
+		
+		// add the members
+		HostgroupTasks.addHostMember(sahiTasks, devgroup, devhosts, "Enroll");
+		HostgroupTasks.addHostMember(sahiTasks, qegroup, qehosts, "Enroll");
+		HostgroupTasks.addHostMember(sahiTasks, enggroup, enghosts, "Enroll");
+		
+		//verify the members
+		HostgroupTasks.verifyHostMember(sahiTasks, devgroup, devhosts);
+		HostgroupTasks.verifyHostMember(sahiTasks, qegroup, qehosts);
+		HostgroupTasks.verifyHostMember(sahiTasks, enggroup, enghosts);
+		
+		//Now let's nest the groups and verify direct and indirect members
+		
+		//delete hosts
+		sahiTasks.navigateTo(System.getProperty("ipa.server.url")+hostPage, true);
+		HostTasks.deleteHost(sahiTasks, hostnames);
+		
+		//delete host groups
+		sahiTasks.navigateTo(System.getProperty("ipa.server.url")+hostgroupPage, true);
+		HostgroupTasks.deleteHostgroup(sahiTasks, hostgroups);
+
+	}
 
 /*******************************************************
  ************      DATA PROVIDERS     ******************
  *******************************************************/
 
 	/*
-	 * Data to be used when adding hostgroups - for positive cases
+	 * Data to be used when adding host groups 
 	 */
 	@DataProvider(name="getAddHostGroupTestObjects")
 	public Object[][] getAddHostGroupTestObjects() {
@@ -131,7 +214,7 @@ public class HostgroupTests extends SahiTestScript{
 	}
 	
 	/*
-	 * Data to be used when deleting hostgroups - for positive cases
+	 * Data to be used when deleting host groups 
 	 */
 	@DataProvider(name="getDeleteHostGroupTestObjects")
 	public Object[][] getDeleteHostGroupTestObjects() {
@@ -149,7 +232,7 @@ public class HostgroupTests extends SahiTestScript{
 	}
 	
 	/*
-	 * Data to be used when adding hostgroups - for positive cases
+	 * Data to be used when adding host groups
 	 */
 	@DataProvider(name="getAddAndAddAnotherHostGroupTestObjects")
 	public Object[][] getAddAndAddAnotherHostGroupTestObjects() {
@@ -160,6 +243,36 @@ public class HostgroupTests extends SahiTestScript{
 	
 		//										testname									groupanme1					groupname2			groupname3
 		ll.add(Arrays.asList(new Object[]{ 		"add_and_add_another_then_del_multiple",	"this is group one",		"engineering",	 	"sales" } ));
+		return ll;	
+	}
+	
+	/*
+	 * Data to be used when adding and editing host groups
+	 */
+	@DataProvider(name="getAddAndEditHostGroupTestObjects")
+	public Object[][] getAddAndEditHostGroupTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createAddAndEditHostGroupTestObjects());
+	}
+	protected List<List<Object>> createAddAndEditHostGroupTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+	
+		//										testname						groupanme1			description1					description2			
+		ll.add(Arrays.asList(new Object[]{ 		"add_and_edit_setting",			"engineering",		"engineering host group",	 	"red hat engineering host group" } ));
+		return ll;	
+	}
+	
+	/*
+	 * Data to be used when adding host members
+	 */
+	@DataProvider(name="getHostMembersTestObjects")
+	public Object[][] getHostMembersTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createHostMembersTestObjects());
+	}
+	protected List<List<Object>> createHostMembersTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+	
+		//										testname					
+		ll.add(Arrays.asList(new Object[]{ 		"host_membershipsts" } ));
 		return ll;	
 	}
 }
