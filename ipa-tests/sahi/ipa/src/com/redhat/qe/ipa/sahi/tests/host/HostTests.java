@@ -152,18 +152,19 @@ public class HostTests extends SahiTestScript{
 	 * Set host OTP
 	 */
 	@Test (groups={"otpHostTests"}, dataProvider="getOTPHostTestObjects")	
-	public void testHostAddAndEdit(String testName, String hostname, String ipadr, String otp ) throws Exception {
+	public void testHostOTP(String testName, String hostname, String ipadr, String otp ) throws Exception {
 		
 		//add the host
 		com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(hostname).exists(), "Verify host " + hostname + " doesn't already exist");
 		HostTasks.addHost(sahiTasks, hostname, ipadr);
-		sahiTasks.navigateTo(System.getProperty("ipa.server.url")+hostPage, true);
+		
 		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(hostname).exists(), "Added host " + hostname + "  successfully");
 		
 		//modify the host
-		HostTasks.modifyHost(sahiTasks, hostname, otp);
+		HostTasks.modifyHostOTP(sahiTasks, hostname, otp);
 		
 		//verify all host field
+		sahiTasks.navigateTo(System.getProperty("ipa.server.url")+hostPage, true);
 		HostTasks.verifyHostField(sahiTasks, hostname, "otp", otp);
 		
 		sahiTasks.navigateTo(System.getProperty("ipa.server.url")+hostPage, true);
@@ -197,25 +198,31 @@ public class HostTests extends SahiTestScript{
 	 */
 	@Test (groups={"setManagedByHostTests"}, dataProvider="getSetManageByHostTests")	
 	public void testManagedByHost(String testName, String managed, String managedby, String exists, String button ) throws Exception {
-		if (testName == "set_managedby_cancel"){
-			// add managed host
-			HostTasks.addHost(sahiTasks, managed, "");
-			// add managed by host
-			HostTasks.addHost(sahiTasks, managedby, "");
-		}
+		// add managed host
+		HostTasks.addHost(sahiTasks, managed, "");
+		// add managed by host
+		HostTasks.addHost(sahiTasks, managedby, "");
 		
 		HostTasks.setManagedByHost(sahiTasks, managed, managedby, button);
 		
 		// verify managed by host
 		HostTasks.verifyManagedByHost(sahiTasks, managed, managedby, exists);
+		
+		//delete the hosts
+		String [] hostnames = {managed, managedby};
+		HostTasks.deleteHost(sahiTasks, hostnames);
 	}
 	
 	/*
 	 * Remove Managed By test
 	 */
-	@Test (groups={"removeManagedByHostTests"}, dataProvider="getRemoveManageByHostTests",  dependsOnGroups="setManagedByHostTests")	
+	@Test (groups={"removeManagedByHostTests"}, dataProvider="getRemoveManageByHostTests" )	
 	public void testRemoveManagedByHost(String testName, String managed, String managedby, String exists, String button ) throws Exception {
-	
+		// add managed host
+		HostTasks.addHost(sahiTasks, managed, "");
+		// add managed by host
+		HostTasks.addHost(sahiTasks, managedby, "");
+		
 		HostTasks.setManagedByHost(sahiTasks, managed, managedby, "Enroll");
 
 		HostTasks.removeManagedByHost(sahiTasks, managed, managedby, button);
@@ -223,11 +230,9 @@ public class HostTests extends SahiTestScript{
 		// verify managed by host
 		HostTasks.verifyManagedByHost(sahiTasks, managed, managedby, exists);
 		
-		if (testName == "remove_managedby_delete"){
-			//delete the hosts
-			String [] hostnames = {managed, managedby};
-			HostTasks.deleteHost(sahiTasks, hostnames);
-		}
+		//delete the hosts
+		String [] hostnames = {managed, managedby};
+		HostTasks.deleteHost(sahiTasks, hostnames);
 	}
 	
 	/*
