@@ -56,7 +56,7 @@ public class HostTasks {
 		sahiTasks.textbox("nshardwareplatform").setValue(platform);
 		sahiTasks.textbox("nsosversion").setValue(os);
 		sahiTasks.link("Update").click();
-		sahiTasks.link("Hosts").click();
+		sahiTasks.link("Hosts[1]").click();
 	}
 	
 	/*
@@ -155,7 +155,7 @@ public class HostTasks {
 		}
 		
 		sahiTasks.link("Update").click();
-		sahiTasks.link("Hosts[1]").click();
+		sahiTasks.link("Hosts").click();
 	}
 	
 	/*
@@ -168,25 +168,25 @@ public class HostTasks {
 
 		com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("description").value(), olddesc, "Verified existing description for host: " + olddesc);
 		sahiTasks.textbox("description").setValue(newdesc);
-		sahiTasks.span("undo[1]").click();
+		sahiTasks.span("undo").click();
 		
 		com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("l").value(), oldlocal, "Verified existing local for host: " + oldlocal);
 		sahiTasks.textbox("l").setValue(newlocal);
-		sahiTasks.span("undo[2]").click();
+		sahiTasks.span("undo").click();
 		
 		com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("nshostlocation").value(), oldlocation, "Verified existing location for host: " + oldlocation);
 		sahiTasks.textbox("nshostlocation").setValue(newlocation);
-		sahiTasks.span("undo[3]").click();
+		sahiTasks.span("undo").click();
 		
 		com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("nshardwareplatform").value(), oldplatform, "Verified existing hardware platform for host: " + oldplatform);
 		sahiTasks.textbox("nshardwareplatform").setValue(newplatform);
-		sahiTasks.span("undo[4]").click();
+		sahiTasks.span("undo").click();
 		
 		com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("nsosversion").value(), oldos, "Verified existing operating system for host: " + oldos);
 		sahiTasks.textbox("nsosversion").setValue(newos);
-		sahiTasks.span("undo[5]").click();
+		sahiTasks.span("undo").click();
 		
-		sahiTasks.link("Hosts").click();
+		sahiTasks.link("Hosts[1]").click();
 	}
 	
 	/*
@@ -194,7 +194,7 @@ public class HostTasks {
 	 * @param sahiTasks
 	 * @param value - value to set for OTP
 	 */
-	public static void modifyHost(SahiTasks sahiTasks, String hostname, String otp) {
+	public static void modifyHostOTP(SahiTasks sahiTasks, String hostname, String otp) {
 		sahiTasks.link(hostname).click();
 		sahiTasks.textbox("otp").setValue(otp);
 		sahiTasks.span("Set OTP").click();
@@ -227,7 +227,7 @@ public class HostTasks {
 			com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("otp").value(), value, "Verified One Time Password for host: " + value);
 		}
 
-		sahiTasks.link("Hosts").click();
+		sahiTasks.link("Hosts[1]").click();
 	}
 	
 	/*
@@ -245,7 +245,7 @@ public class HostTasks {
 		sahiTasks.checkbox(managedby).click();
 		sahiTasks.span(">>").click();
 		sahiTasks.button(button).click();
-		sahiTasks.link("Hosts").click();
+		sahiTasks.link("Hosts[1]").click();
 	}
 	
 	/*
@@ -262,7 +262,7 @@ public class HostTasks {
 		sahiTasks.checkbox(managedby).click();
 		sahiTasks.span("Delete").click();
 		sahiTasks.button(button).click();
-		sahiTasks.link("Hosts").near(sahiTasks.span("» " + managed)).click();
+		sahiTasks.link("Hosts").click();
 
 	}
 	
@@ -282,7 +282,7 @@ public class HostTasks {
 			com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(managedby).exists(), "Host " + managed + " is NOT managed by " + managedby);
 		}	
 		
-		sahiTasks.link("Hosts").click();
+		sahiTasks.link("Hosts[1]").click();
 	}
 	
 	/*
@@ -321,7 +321,7 @@ public class HostTasks {
 		sahiTasks.span("New Certificate").click();
 		sahiTasks.textarea(0).setValue(csr);
 		sahiTasks.button("Issue").click();
-		sahiTasks.link("Hosts").click();
+		sahiTasks.link("Hosts[1]").click();
 	}
 	
 	/*
@@ -344,7 +344,7 @@ public class HostTasks {
 		sahiTasks.span("Get").click();
 		sahiTasks.button("Close").click();
 		
-		sahiTasks.link("Hosts").click();
+		sahiTasks.link("Hosts[1]").click();
 
 	}
 	
@@ -360,7 +360,7 @@ public class HostTasks {
 		sahiTasks.span("Revoke").click();
 		sahiTasks.select(0).choose(reason);
 		sahiTasks.button(button).click();
-		sahiTasks.link("Hosts").click();
+		sahiTasks.link("Hosts[1]").click();
 	}
 	
 	/*
@@ -377,9 +377,11 @@ public class HostTasks {
 			com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.span("Certificate Hold").exists(), "Verifying Certificate Hold status.");
 		}
 		if (status == "Revoked"){
-			com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.span("New Certificate[1]").exists(), "Host certificate revoked, verify New Certificate button");
+			com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.span("New Certificate").exists(), "Host certificate revoked, verify New Certificate button");
 			com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.span(reason).exists(), "Verifying Certificate Revoked status: " + reason);
 		}
+		
+		sahiTasks.link("Hosts[1]").click();
 	}
 	
 	/*
@@ -392,7 +394,7 @@ public class HostTasks {
 		sahiTasks.link(hostname).click();
 		sahiTasks.span("Restore").click();
 		sahiTasks.button(button).click();
-		sahiTasks.link("Hosts").click();
+		sahiTasks.link("Hosts[1]").click();
 	}
 	/*
 	 * Request new certificate
@@ -405,7 +407,7 @@ public class HostTasks {
 		sahiTasks.span("New Certificate").click();
 		sahiTasks.textarea(0).setValue(csr);
 		sahiTasks.button(button).click();
-		sahiTasks.link("Hosts").click();
+		sahiTasks.link("Hosts[1]").click();
 	}
 	
 	/* Request new certificate
@@ -421,7 +423,7 @@ public class HostTasks {
 		
 		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.div(expectedError).exists(), "Verified expected error with invalid csr.");
 		sahiTasks.button("Cancel").click();
-		sahiTasks.link("Hosts").click();
+		sahiTasks.link("Hosts[1]").click();
 	}
 }
 
