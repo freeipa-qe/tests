@@ -883,28 +883,49 @@ check_deletedconfig()
 ################################
 # pwpolicy section
 ################################
+tg="pwtestg"
 add_pwpolicy()
 {
+	ipa group-add --desc=tg $tg
+	rlPhaseStartTest ""
+		rlRun "ipa pwpolicy-add --maxlife=999  --priority=10 $tg" 0 "setting password policy to something high"
+	rlPhaseEnd
 }
 
 check_pwpolicy()
 {
+	rlPhaseStartTest ""
+		rlRun "ipa pwpolicy-find $tg | grep 999" 0 "Searching for added pwpolicy"
+	rlPhaseEnd
 }
 
 mod_pwpolicy()
-{
+{	rlPhaseStartTest ""
+		rlRun "ipa pwpolicy-mod --maxlife=384 $tg" 0 "modifying pwpolicy for test group"
+	rlPhaseEnd
 }
 
 check_modpwpolicy()
 {
+	rlPhaseStartTest ""
+		rlRun "ipa pwpolicy-find $tg | grep 384" 0 "Searching for modified pwpolicy in tg"
+	rlPhaseEnd
 }
+
 
 delete_pwpolicy()
 {
+	rlPhaseStartTest ""
+		rlRun "ipa pwpolicy-del $tg" 0 "Deleting the password policy for the testgroup"
+	rlPhaseEnd
 }
 
 check_deletedpwpolicy()
 {
+	rlPhaseStartTest ""
+		rlRun "ipa pwpolicy-find $tg" 1 "Making sure that the test group pwpolicy doesn't seem to be searchable"
+	rlPhaseEnd
+	# Cleanup of test group
+	ipa group-del $tg
 }
-
 
