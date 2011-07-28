@@ -941,11 +941,11 @@ bug710601() {
 
 rlPhaseStartTest "Bug 710601: ipa sudorule-add accepts blank spaces as sudorule name."
 
-	rlRun "ipa sudorule-add \" \" > $TmpDir/bug710601.txt 2>&1"
+	rlRun "ipa sudorule-add \" \" > $TmpDir/bug710601.txt 2>&1" 1
 	rlAssertNotGrep "Added sudo rule \" \"" "$TmpDir/bug710601.txt"
 
 	rlRun "cat $TmpDir/bug710601.txt"
-	rlRun "ipa sudorule-del \" \""
+	rlRun "ipa sudorule-del \" \"" 1
 
 rlPhaseEnd
 }
@@ -955,11 +955,11 @@ bug710598() {
 
 rlPhaseStartTest "Bug 710598: ipa sudocmdgroup-add accepts blank spaces as sudocmdgroup name."
 
-	rlRun "ipa sudocmdgroup-add \" \" --desc=blankcmdgroup > $TmpDir/bug710598.txt 2>&1"
+	rlRun "ipa sudocmdgroup-add \" \" --desc=blankcmdgroup > $TmpDir/bug710598.txt 2>&1" 1
         rlAssertNotGrep "Added sudo command group \" \"" "$TmpDir/bug710598.txt"
 
 	rlRun "cat $TmpDir/bug710598.txt"
-	rlRun "ipa sudocmdgroup-del \" \""
+	rlRun "ipa sudocmdgroup-del \" \"" 1
 
 rlPhaseEnd
 }
@@ -969,11 +969,11 @@ bug710592() {
 
 rlPhaseStartTest "Bug 710592: ipa sudocmd-add accepts blank spaces as sudo commands."
 
-	rlRun "ipa sudocmd-add \" \" > $TmpDir/bug710592.txt 2>&1"
+	rlRun "ipa sudocmd-add \" \" > $TmpDir/bug710592.txt 2>&1" 1
 	rlAssertNotGrep "Added sudo command \" \"" "$TmpDir/bug710592.txt"
 
 	rlRun "cat $TmpDir/bug710592.txt"
-	rlRun "ipa sudocmd-del \" \""
+	rlRun "ipa sudocmd-del \" \"" 1
 
 rlPhaseEnd
 }
@@ -984,7 +984,7 @@ rlPhaseStartTest "Bug 710245: Removed option from Sudo rule message is displayed
 
 	rlRun "ipa sudorule-add rule1"
 
-	rlRun "ipa sudorule-remove-option rule1 --sudooption=invalid > $TmpDir/bug710245.txt 2>&1"
+	rlRun "ipa sudorule-remove-option rule1 --sudooption=invalid > $TmpDir/bug710245.txt 2>&1" 1
 	rlAssertNotGrep "Removed option \"invalid\" from Sudo rule \"rule1\"" "$TmpDir/bug710245.txt"
 
 	rlRun "cat $TmpDir/bug710245.txt"
@@ -1000,7 +1000,7 @@ rlPhaseStartTest "Bug 710240 - Added option to Sudo rule message is displayed ev
 	rlRun "ipa sudorule-add rule1"
 	rlRun "ipa sudorule-add-option rule1 --sudooption=always_set_home"
 
-	rlRun "ipa sudorule-add-option rule1 --sudooption=always_set_home > $TmpDir/bug710240.txt 2>&1"
+	rlRun "ipa sudorule-add-option rule1 --sudooption=always_set_home > $TmpDir/bug710240.txt 2>&1" 1
 	rlAssertNotGrep "Added option \"always_set_home\" to Sudo rule \"rule1\"" "$TmpDir/bug710240.txt"
 
 	rlRun "cat $TmpDir/bug710240.txt"

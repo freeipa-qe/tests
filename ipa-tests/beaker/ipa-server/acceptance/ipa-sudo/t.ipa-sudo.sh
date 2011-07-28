@@ -560,7 +560,7 @@ rlPhaseStartTest "sudorule_001: ipa sudorule help."
 	rlAssertGrep "sudorule-show                  Display Sudo Rule." "$TmpDir/sudorule_001.txt"
 	rlAssertGrep "uid=sudo,cn=sysaccounts,cn=etc,dc=example,dc=com" "$TmpDir/sudorule_001.txt"
 	rlAssertGrep "LDAPTLS_CACERT=/etc/ipa/ca.crt /usr/bin/ldappasswd -S -W -h ipa.example.com -ZZ -D \"cn=Directory Manager\" uid=sudo,cn=sysaccounts,cn=etc,dc=example,dc=com" "$TmpDir/sudorule_001.txt"
-	rlRun "cat $TmpDir/sudo_001.txt"
+	rlRun "cat $TmpDir/sudorule_001.txt"
 
 rlPhaseEnd
 }
@@ -828,8 +828,9 @@ rlPhaseStartTest "sudorule-remove-allow-command_003: ipa help sudorule-remove-al
         rlAssertGrep "\--all                 Retrieve and print all attributes from the server." "$TmpDir/sudorule-remove-allow-command_003.txt"
         rlAssertGrep "\--raw                 Print entries as stored on the server." "$TmpDir/sudorule-remove-allow-command_003.txt"
         rlAssertGrep "\--sudocmds=LIST       comma-separated list of sudo commands to remove" "$TmpDir/sudorule-remove-allow-command_003.txt"
-        rlAssertGrep "\--sudocmdgroups=LIST  comma-separated list of sudo commands groups to remove" "$TmpDir/sudorule-remove-allow-command_003.txt"
-        rlRun "cat $TmpDir/sudorule-add-allow-command_003.txt"
+        rlAssertGrep "\--sudocmdgroups=LIST  comma-separated list of sudo command groups to remove" "$TmpDir/sudorule-remove-allow-command_003.txt"
+
+        rlRun "cat $TmpDir/sudorule-remove-allow-command_003.txt"
 
 rlPhaseEnd
 }
@@ -959,7 +960,7 @@ rlPhaseStartTest "sudorule-remove-host_002: Remove host from sudorule."
 	rlAssertGrep "Rule name: sudorule1" "$TmpDir/sudorule-remove-host_002.txt"
 	rlAssertGrep "Enabled: TRUE" "$TmpDir/sudorule-remove-host_002.txt"
 	rlLog "Verifying https://bugzilla.redhat.com/show_bug.cgi?id=709645"
-	rlAssertGrep "External Host: test2.example.com, test3.example2.com" "$TmpDir/sudorule-remove-host_002.txt"
+	rlAssertGrep "External host: test2.example.com, test3.example2.com" "$TmpDir/sudorule-remove-host_002.txt"
 	rlAssertGrep "Host Groups: hostgroup1, hostgroup2, hostgroup3" "$TmpDir/sudorule-remove-host_002.txt"
 	rlAssertGrep "Number of members removed 1" "$TmpDir/sudorule-remove-host_002.txt"
 	rlRun "cat $TmpDir/sudorule-remove-host_002.txt"
@@ -975,7 +976,9 @@ rlPhaseStartTest "sudorule-remove-host_003: Remove multiple hosts from sudorule.
 	rlAssertGrep "Rule name: sudorule1" "$TmpDir/sudorule-remove-host_003.txt"
 	rlAssertGrep "Enabled: TRUE" "$TmpDir/sudorule-remove-host_003.txt"
 	rlLog "Verifying https://bugzilla.redhat.com/show_bug.cgi?id=709665"
-	rlAssertGrep "External Host: test2.example.com, test3.example2.com" "$TmpDir/sudorule-remove-host_003.txt" 1
+	rlAssertNotGrep "test2.example.com" "$TmpDir/sudorule-remove-host_003.txt" 1
+	rlAssertNotGrep "test3.example2.com" "$TmpDir/sudorule-remove-host_003.txt" 1
+	rlAssertGrep "External host: test5.example, test4.example.com" "$TmpDir/sudorule-remove-host_003.txt" 
 	rlAssertGrep "Host Groups: hostgroup1, hostgroup2, hostgroup3" "$TmpDir/sudorule-remove-host_003.txt"
 	rlAssertGrep "Number of members removed 2" "$TmpDir/sudorule-remove-host_003.txt"
 	rlRun "cat $TmpDir/sudorule-remove-host_003.txt"
@@ -1884,6 +1887,7 @@ rlPhaseStartTest "sudorule-mod_010: ipa sudorule-mod --runasexternalgroup"
         rlRun "ipa sudorule-find rule1 --all --raw | grep \"ipasudorunasextgroup: extgrp1\""
         rlRun "ipa sudorule-find rule1 --all --raw | grep \"ipasudorunasextgroup: extgrp2\""
         rlRun "ipa sudorule-find rule1 --all --raw | grep \"ipasudorunasextgroup: extgrp3\""
+        rlRun "ipa sudorule-find rule1 --all --raw"
 
         rlRun "ipa sudorule-mod rule1 --runasexternaluser=extgrp2,extgrp3,extgrp4"
 
@@ -1891,6 +1895,7 @@ rlPhaseStartTest "sudorule-mod_010: ipa sudorule-mod --runasexternalgroup"
         rlRun "ipa sudorule-find rule1 --all --raw | grep \"ipasudorunasextgroup: extgrp2\""
         rlRun "ipa sudorule-find rule1 --all --raw | grep \"ipasudorunasextgroup: extgrp3\""
         rlRun "ipa sudorule-find rule1 --all --raw | grep \"ipasudorunasextgroup: extgrp4\""
+        rlRun "ipa sudorule-find rule1 --all --raw"
 
         rlRun "ipa sudorule-del rule1"
         
