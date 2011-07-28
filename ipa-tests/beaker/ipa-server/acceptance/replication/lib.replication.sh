@@ -1018,3 +1018,48 @@ check_deletedprivilege()
 	rlPhaseEnd
 }
 
+################################
+# role section
+################################
+role="rep-rtst"
+add_role()
+{
+	rlPhaseStartTest "Add a role"
+		rlRun "ipa role-add --desc testrole $role" 0 "adding a role"
+	rlPhaseEnd
+}
+
+check_role()
+{
+	rlPhaseStartTest "check to ensure that the role exists"
+		rlRun "ipa role-find $role | grep testrole" 0 "Searching for that added role"
+	rlPhaseEnd
+}
+
+mod_role()
+{	rlPhaseStartTest "Modify the role"
+		rlRun "ipa role-mod --desc='altdesc' $role" 0 "modifying role"
+	rlPhaseEnd
+}
+
+check_modrole()
+{
+	rlPhaseStartTest "Find the modified role"
+		rlRun "ipa role-find $role | grep altdesc" 0 "Searching for modified role"
+	rlPhaseEnd
+}
+
+delete_role()
+{
+	rlPhaseStartTest "deleting role"
+		rlRun "ipa role-del $role" 0 "Deleting the role"
+	rlPhaseEnd
+}
+
+check_deletedrole()
+{
+	rlPhaseStartTest "check to ensure that role was deleted."
+		rlRun "ipa role-find $role" 1 "Searching for removed role"
+	rlPhaseEnd
+}
+

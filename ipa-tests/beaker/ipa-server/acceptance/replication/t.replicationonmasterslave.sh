@@ -340,6 +340,7 @@ add_objects()
 	add_pwpolicy
 
    # Add a role
+	add_role
 
    # Add a selfservice permission
 	add_selfservice
@@ -376,6 +377,7 @@ check_objects()
    check_permission
    check_privilege
    check_pwpolicy
+   check_role
    check_selfservice
    check_sudorule
    check_sudocmdgroup
@@ -398,6 +400,7 @@ update_objects()
    modify_permission
    modify_privilege
    modify_pwpolicy
+   modify_role
    modift_selfservice
    modify_sudorule
    modify_sudocmdgroup
@@ -418,6 +421,7 @@ check_updated_objects()
    check_modifiedpermission
    check_modifiedprivilege
    check_modifiedpwpolicy
+   check_modifiedrole
    check_modifiedselfservice
    check_modifiedsudorule
    check_modifiedsudocmdgroup
@@ -439,6 +443,7 @@ delete_objects()
    delete_hbac_service
    delete_permission
    delete_privilege
+   delete_role
    delete_pwpolicy
    delete_selfservice
    delete_sudorule
@@ -462,6 +467,7 @@ check_deletedobjects()
    check_deletedpermission
    check_deletedprivilege
    check_deletedpwpolicy
+   check_deletedrole
    check_deletedselfservice
    check_deletedsudorule
    check_deletedsudocmdgroup
