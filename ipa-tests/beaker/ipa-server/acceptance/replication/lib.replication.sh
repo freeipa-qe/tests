@@ -912,7 +912,6 @@ check_modpwpolicy()
 	rlPhaseEnd
 }
 
-
 delete_pwpolicy()
 {
 	rlPhaseStartTest ""
@@ -960,7 +959,6 @@ check_modselfservice()
 	rlPhaseEnd
 }
 
-
 delete_selfservice()
 {
 	rlPhaseStartTest ""
@@ -972,6 +970,51 @@ check_deletedselfservice()
 {
 	rlPhaseStartTest ""
 		rlRun "ipa selfservice-find $ss" 1 "Searching for removed selfservice"
+	rlPhaseEnd
+}
+
+################################
+# privilege section
+################################
+priv="rep-priv"
+add_privilege()
+{
+	rlPhaseStartTest "Add a privilege"
+		rlRun "ipa privilege-add --desc='test desc' $priv" 0 "adding a priviege"
+	rlPhaseEnd
+}
+
+check_privilege()
+{
+	rlPhaseStartTest "check to ensure that the privilege exists"
+		rlRun "ipa privilege-find $priv | grep 'test desc'" 0 "Searching for that added privilege"
+	rlPhaseEnd
+}
+
+mod_privilege()
+{	rlPhaseStartTest "Modify the privilege"
+		rlRun "ipa privilege-mod --desc='newdesc' $priv" 0 "modifying privilege"
+	rlPhaseEnd
+}
+
+check_modprivilege()
+{
+	rlPhaseStartTest "Find the modified privilege"
+		rlRun "ipa privilege-find $priv | grep newdesc" 0 "Searching for modified privilege"
+	rlPhaseEnd
+}
+
+delete_privilege()
+{
+	rlPhaseStartTest "deleting privilege"
+		rlRun "ipa privilege-del $priv" 0 "Deleting the privilege"
+	rlPhaseEnd
+}
+
+check_deletedprivilege()
+{
+	rlPhaseStartTest "check to ensure that privilege was deleted."
+		rlRun "ipa privilege-find $priv" 1 "Searching for removed privilege"
 	rlPhaseEnd
 }
 

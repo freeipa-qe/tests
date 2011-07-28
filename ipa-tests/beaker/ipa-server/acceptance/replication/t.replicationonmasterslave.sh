@@ -53,6 +53,7 @@ testReplicationOnMasterAndSlave()
 ################################################
 
     if [ $config == "master" ] ; then 
+      echo "starting master add objects section"
       rhts-sync-block -s READY $BEAKERSLAVE
 
       rlPhaseStartTest "Add objects from master"
@@ -333,17 +334,25 @@ add_objects()
 	add_permission
 
    # Add a privilege
+	add_privilege
+
    # Add a password policy
 	add_pwpolicy
+
    # Add a role
+
    # Add a selfservice permission
 	add_selfservice
+
    # Add a SUDO rule
 	add_sudorule
+
    # Add a sudo command group
 	add_sudocmdgroup
+
    # Add a sudo command
 	add_sudocmd
+
    # Add or modify a config value
 	add_config
 
@@ -365,6 +374,7 @@ check_objects()
    check_hbac
    check_hbac_service
    check_permission
+   check_privilege
    check_pwpolicy
    check_selfservice
    check_sudorule
@@ -386,6 +396,7 @@ update_objects()
    modify_hbac
    modify_hbac_service
    modify_permission
+   modify_privilege
    modify_pwpolicy
    modift_selfservice
    modify_sudorule
@@ -405,6 +416,7 @@ check_updated_objects()
    check_modifiedhbac
    check_modifiedhbacservice
    check_modifiedpermission
+   check_modifiedprivilege
    check_modifiedpwpolicy
    check_modifiedselfservice
    check_modifiedsudorule
@@ -426,6 +438,7 @@ delete_objects()
    delete_hbac
    delete_hbac_service
    delete_permission
+   delete_privilege
    delete_pwpolicy
    delete_selfservice
    delete_sudorule
@@ -447,6 +460,7 @@ check_deletedobjects()
    check_deletedhbac
    check_deletedhbacservice
    check_deletedpermission
+   check_deletedprivilege
    check_deletedpwpolicy
    check_deletedselfservice
    check_deletedsudorule
