@@ -929,3 +929,49 @@ check_deletedpwpolicy()
 	ipa group-del $tg
 }
 
+################################
+# selfservice section
+################################
+ss="users-self-s"
+add_selfservice()
+{
+	rlPhaseStartTest ""
+		rlRun "ipa selfservice-add --permissions=write --attrs=street,postalCode,l,c,st $ss" 0 "adding a selfservice section"
+	rlPhaseEnd
+}
+
+check_selfservice()
+{
+	rlPhaseStartTest ""
+		rlRun "ipa selfservice-find $ss | grep postalCode" 0 "Searching for added selfservice"
+	rlPhaseEnd
+}
+
+mod_selfservice()
+{	rlPhaseStartTest ""
+		rlRun "ipa selfservice-mod --attrs=street,postalCode,l,c,st,telephoneNumber $ss" 0 "modifying selfservice rule"
+	rlPhaseEnd
+}
+
+check_modselfservice()
+{
+	rlPhaseStartTest ""
+		rlRun "ipa selfservice-find $ss | grep telephoneNumber" 0 "Searching for modified selfservice policy"
+	rlPhaseEnd
+}
+
+
+delete_selfservice()
+{
+	rlPhaseStartTest ""
+		rlRun "ipa selfservice-del $ss" 0 "Deleting the self service"
+	rlPhaseEnd
+}
+
+check_deletedselfservice()
+{
+	rlPhaseStartTest ""
+		rlRun "ipa selfservice-find $ss" 1 "Searching for removed selfservice"
+	rlPhaseEnd
+}
+
