@@ -6,6 +6,7 @@
 
 add_newuser()
 {
+	rlPhaseStartTest "add user"
   rlRun "ipa user-add --first=$firstName \
                       --last=$lastName  \
                       --cn=$cn \
@@ -33,11 +34,12 @@ add_newuser()
                       $login" \
                       0 \
                       "Add a new user"
+	rlPhaseEnd
 }
-
 
 check_newuser()
 {
+	rlPhaseStartTest "check added user"
    rlRun "verifyUserAttr $login \"First name\" $firstName" 0 "Verify user's first name"
    rlRun "verifyUserAttr $login \"Last name\" $lastName" 0 "Verify user's last name"
    rlRun "verifyUserAttr $login \"Full name\" $cn" 0 "Verify user's full name"
@@ -62,13 +64,12 @@ check_newuser()
    rlRun "verifyUserAttr $login \"Job Title\" $title" 0 "Verify user's Job Title"
    rlRun "verifyUserAttr $login \"Manager\" $manager" 0 "Verify user's Manager"
    rlRun "verifyUserAttr $login \"Car License\" $carlicense" 0 "Verify user's Car License"
+	rlPhaseEnd
 }
-
-
 
 modify_newuser()
 {
-  
+	rlPhaseStartTest "modify new user"  
   rlRun "ipa user-mod --first=$firstName_updated \
                       --last=$lastName_updated  \
                       --cn=$cn_updated \
@@ -94,12 +95,12 @@ modify_newuser()
                       $1" \
                       0 \
                       "Modify the new user"
+	rlPhaseEnd
 }
-
-
 
 check_modifieduser()
 {
+	rlPhaseStartTest "check modified user"
    rlRun "verifyUserAttr $login_updated \"First name\" $firstName_updated" 0 "Verify user's first name"
    rlRun "verifyUserAttr $login_updated \"Last name\" $lastName_updated" 0 "Verify user's last name"
    rlRun "verifyUserAttr $login_updated \"Full name\" $cn_updated" 0 "Verify user's full name"
@@ -121,19 +122,24 @@ check_modifieduser()
    rlRun "verifyUserAttr $login_updated \"Job Title\" $title_updated" 0 "Verify user's Job Title"
    rlRun "verifyUserAttr $login_updated \"Manager\" $manager_updated" 0 "Verify user's Manager"
    rlRun "verifyUserAttr $login_updated \"Car License\" $carlicense_updated" 0 "Verify user's Car License"
+	rlPhaseEnd
 }
 
 
 delete_user()
 {
+	rlPhaseStartTest "delete new user"
   rlRun "ipa user-del $login_updated" 0 "Deleted user"
+	rlPhaseEnd
 }
 
 check_deleteduser()
 {
+	rlPhaseStartTest "check deleted user"
    command="ipa user-show $login_updated"
    expmsg="ipa: ERROR: $login_updated: user not found"
    rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify error when checking for deleted user"
+	rlPhaseEnd
 }
 
 
@@ -143,15 +149,18 @@ check_deleteduser()
 
 add_newgroup()
 {
+	rlPhaseStartTest "add new group"
    rlRun "ipa group-add --desc=$desc --gid=$gid $groupName" 0 "Add a new group"
    rlRun "ipa group-add --desc=$desc_nonposix --nonposix $groupName_nonposix" 0 "Add a new non-posixgroup"
    rlRun "ipa user-add --first=$groupMember1 --last=$groupMember1 $groupMember1" 0 "Add users to be added as members to the group"
    rlRun "ipa user-add --first=$groupMember2 --last=$groupMember2 $groupMember2" 0 "Add users to be added as members to the group"
    rlRun "ipa group-add-member --users=$groupMember1,$groupMember2 --groups=$groupName_nonposix $groupName" 0 "add members to this new group"
+	rlPhaseEnd
 }
 
 check_newgroup()
 {
+	rlPhaseStartTest "check new group"
    rlRun "verifyGroupAttr $groupName \"dn\" $dn" 0 "Verify group's dn"
    rlRun "verifyGroupAttr $groupName \"Group name\" $groupName" 0 "Verify group's name"
    rlRun "verifyGroupAttr $groupName \"Description\" $desc" 0 "Verify group's description"
@@ -163,38 +172,43 @@ check_newgroup()
    fi
    rlRun "verifyGroupAttr $groupName \"Member users\" \"$groupMember1, $groupMember2\"" 0 "Verify group's user members"
    rlRun "verifyGroupAttr $groupName \"Member groups\" $groupName_nonposix" 0 "Verify group's group members"
+	rlPhaseEnd
 }
 
 modify_newgroup()
 {
-
+	rlPhaseStartTest "modify new group"
     rlRun "ipa group-mod $1 --desc=$desc_updated --rename=$groupName_updated" 0 "Modify the group"
     rlRun "ipa group-remove-member $groupName_updated --users=$groupMember1_updated --groups=$group_nonposix_updated" 0 "remove members from this group"
+	rlPhaseEnd
 }
 
 check_modifiedgroup()
 {
+	rlPhaseStartTest "check modified group"
    rlRun "verifyGroupAttr $groupName_updated \"dn\" $dn_updated" 0 "Verify group's dn"
    rlRun "verifyGroupAttr $groupName_updated \"Group name\" $groupName_updated" 0 "Verify group's name"
    rlRun "verifyGroupAttr $groupName_updated \"Description\" $desc_updated" 0 "Verify group's description"
    rlRun "verifyGroupAttr $groupName_updated \"Member users\" $groupMember2_updated" 0 "Verify group's user members"
+	rlPhaseEnd
 }
 
 delete_group()
 {
-
+	rlPhaseStartTest "delete group"
   rlRun "ipa group-del $groupName_updated" 0 "Deleted group"
+	rlPhaseEnd
 }
 
 
 check_deletedgroup()
 {
+	rlPhaseStartTest "check deleted group"
    command="ipa group-show $groupName_updated"
    expmsg="ipa: ERROR: $groupName_updated: group not found"
    rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify error when checking for deleted group"
+	rlPhaseEnd
 }
-
-
 
 #########################
 # Host-related actions
@@ -202,6 +216,7 @@ check_deletedgroup()
 
 add_newhost()
 {
+	rlPhaseStartTest "add new host"
  rlRun "ipa host-add --desc=$hostDesc \
                      --location=$hostLocation \
                      --platform=$hostPlatform \
@@ -218,22 +233,26 @@ add_newhost()
                       0 \
                      "Add new host to use as managed-by host"
   rlRun "ipa  host-add-managedby --hosts=$managedByHost $newHost" 0 "Add managed-by host"
+	rlPhaseEnd
 }
 
 check_newhost()
 {
+	rlPhaseStartTest "check new host"
    rlRun "verifyHostAttr $newHost \"Host name\" $newHost" 0 "Verify host's name"
    rlRun "verifyHostAttr $newHost \"Description\" $hostDesc" 0 "Verify host's description"
    rlRun "verifyHostAttr $newHost \"Location\" $hostLocation" 0 "Verify host's location"
    rlRun "verifyHostAttr $newHost \"Platform\" $hostPlatform" 0 "Verify host's platform"
    rlRun "verifyHostAttr $newHost \"Operating system\" $hostOS" 0 "Verify host's OS"
    rlRun "verifyHostAttr $newHost \"Managed by\" \"$newHost, $managedByHost\"" 0 "Verify host's Managed-by list"
+	rlPhaseEnd
 }
 
 
 modify_newhost()
 {
- rlRun "ipa host-mod --location=$hostLocation_updated \
+	rlPhaseStartTest "modify new host"
+   rlRun "ipa host-mod --location=$hostLocation_updated \
                      --platform=$hostPlatform_updated \
                      --os=$hostOS_updated \
                      --addattr=locality=$hostLocality_updated \
@@ -241,36 +260,37 @@ modify_newhost()
                      $newHost_updated" \
                      0 \
                      "Modify the host"
- rlRun "ipa host-remove-managedby --hosts=$managedByHost_updated $newHost_updated" 0 "Remove managed-by host"
+   rlRun "ipa host-remove-managedby --hosts=$managedByHost_updated $newHost_updated" 0 "Remove managed-by host"
+	rlPhaseEnd
 }
-
 
 check_modifiedhost()
 {
+	rlPhaseStartTest "check modified host"
    rlRun "verifyHostAttr $newHost_updated \"Description\" $hostDesc_updated" 0 "Verify host's description"
    rlRun "verifyHostAttr $newHost_updated \"Locality\" $hostLocality_updated" 0 "Verify host's locality"
    rlRun "verifyHostAttr $newHost_updated \"Location\" $hostLocation_updated" 0 "Verify host's location"
    rlRun "verifyHostAttr $newHost_updated \"Platform\" $hostPlatform_updated" 0 "Verify host's platform"
    rlRun "verifyHostAttr $newHost_updated \"Operating system\" $hostOS_updated" 0 "Verify host's OS"
    rlRun "verifyHostAttr $newHost_updated \"Managed by\" $newHost_updated" 0 "Verify host's Managed-by list"
+	rlPhaseEnd
 }
-
 
 delete_host()
 {
+	rlPhaseStartTest "delete host"
    rlRun "ipa host-del $newHost" 0 "Delete host"
+	rlPhaseEnd
 }
-
 
 check_deletedhost()
 {
+	rlPhaseStartTest "check for deleted host"
    command="ipa host-show $newHost"
    expmsg="ipa: ERROR: $newHost: host not found"
    rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify error when checking for deleted host"
+	rlPhaseEnd
 }
-
-
-
 
 #############################
 # Hostgroup-related actions
@@ -278,6 +298,7 @@ check_deletedhost()
 
 add_newhostgroup()
 {
+	rlPhaseStartTest "add hostgroup"
    rlRun "ipa hostgroup-add --desc=$hostgroup_groupMember1  $hostgroup_groupMember1" 0 "Add a hostgroup to be added as member"
    rlRun "ipa hostgroup-add --desc=$hostgroup_groupMember1_updated  $hostgroup_groupMember1_updated" 0 "Add another hostgroup to be added as member"
 
@@ -287,52 +308,55 @@ add_newhostgroup()
                             0 \
                             "Add a new hostgroup, with a hostgroup member"
    rlRun "ipa hostgroup-add-member --hosts=$managedByHost $hostgroup" 0 "Add a host member"
- 
+	rlPhaseEnd
 }
 
 check_newhostgroup()
 {
+	rlPhaseStartTest "add new hostgroup"
    rlRun "verifyHostGroupAttr $hostgroup \"Host-group\" $hostgroup" 0 "Verify Hostgroup's name" 
    rlRun "verifyHostGroupAttr $hostgroup \"Description\" $hostgroup_desc" 0 "Verify Hostgroup's description" 
    rlRun "verifyHostGroupMember $managedByHost host $hostgroup" 0 "Verify Hostgroup's Member hosts" 
    rlRun "verifyHostGroupMember $hostgroup_groupMember1 hostgroup $hostgroup" 0 "Verify Hostgroup's Member hosts" 
+	rlPhaseEnd
 }
-
-
 
 modify_newhostgroup()
 {
+	rlPhaseStartTest "modify hostgroup"
     rlRun "ipa hostgroup-mod --desc=\"$hostgroup_desc_updated\" \
                              $hostgroup_updated" \
                              0 \
                              "Modify hostgroup"
     rlRun "ipa hostgroup-remove-member --hosts=$managedByHost_updated $hostgroup_updated" 0 "Remove a host member"
 # TODO: --setattr member=\"cn=$hostgroup_groupMember1_updated,cn=hostgroups,cn=accounts,dc=$DOMAIN\" \
+	rlPhaseEnd
 }
-
 
 check_modifiedhostgroup()
 {
+	rlPhaseStartTest "check modified hostgroup"
    rlRun "verifyHostGroupAttr $hostgroup_updated \"Host-group\" $hostgroup_updated" 0 "Verify Hostgroup's name" 
    rlRun "verifyHostGroupAttr $hostgroup_updated \"Description\" $hostgroup_desc_updated" 0 "Verify Hostgroup's description" 
 # TODO:    rlRun "verifyHostGroupMember $hostgroup_groupMember1_updated hostgroup $hostgroup_updated" 0 "Verify Hostgroup's Member hosts" 
+	rlPhaseEnd
 }
-
-
 
 delete_hostgroup()
 {
+	rlPhaseStartTest "delete hostgroup"
    rlRun "ipa hostgroup-del $hostgroup_updated" 0 "Delete the hostgroup" 
+	rlPhaseEnd
 }
-
 
 check_deletedhostgroup()
 {
+	rlPhaseStartTest "check deleted hostgroup"
    command="ipa hostgroup-show $hostgroup_updated"
    expmsg="ipa: ERROR: $hostgroup_updated: hostgroup not found"
    rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify error when checking for deleted hostgroup"
+	rlPhaseEnd
 }
-
 
 ###########################
 # Netgroup-related actions
@@ -340,14 +364,16 @@ check_deletedhostgroup()
 
 add_newnetgroup()
 {
+	rlPhaseStartTest "add netgroup"
    rlRun "ipa netgroup-add --desc=$netgroup_groupMember1 $netgroup_groupMember1" 0 "Add netgroup to be added as a member"
    rlRun "ipa netgroup-add --desc=$netgroup_desc --nisdomain=$DOMAIN --usercat=all --hostcat=all $netgroup" 0 "Add new netgroup"
    rlRun "ipa netgroup-add-member --users=$groupMember1 --groups=$groupName_nonposix --hosts=$managedByHost --hostgroups=$hostgroup_groupMember1 --netgroups=$netgroup_groupMember1 $netgroup" 0 "Add members to netgroup"
+	rlPhaseEnd
 }
-
 
 check_newnetgroup()
 {
+	rlPhaseStartTest "check netgroup"
    rlRun "verifyNetgroupAttr $netgroup \"Netgroup name\" $netgroup" 0 "Verify netgroup's name"
    rlRun "verifyNetgroupAttr $netgroup \"Description\" $netgroup_desc" 0 "Verify netgroup's Description"
    rlRun "verifyNetgroupAttr $netgroup \"NIS domain name\" $DOMAIN" 0 "Verify netgroup's NIS domain name"
@@ -358,85 +384,101 @@ check_newnetgroup()
    rlRun "verifyNetgroupAttr $netgroup \"Member Group\" $groupName_nonposix" 0 "Verify netgroup's Member Group"
    rlRun "verifyNetgroupAttr $netgroup \"Member Host\" $managedByHost" 0 "Verify netgroup's Member Host"
    rlRun "verifyNetgroupAttr $netgroup \"Member Hostgroup\" $hostgroup_groupMember1" 0 "Verify netgroup's Member Hostgroup"
+	rlPhaseEnd
 }
-
 
 modify_newnetgroup()
 {
+	rlPhaseStartTest "modify netgroup"
    rlRun "ipa netgroup-mod --desc=$netgroup_desc_updated --usercat="" --hostcat="" $netgroup_updated" 0 "Modify netgroup"
    rlRun "ipa netgroup-remove-member --hosts=$managedByHost_updated $netgroup_updated" 0 "Remove host member from netgroup"
+	rlPhaseEnd
 }
-
 
 check_modifiednetgroup()
 {
+	rlPhaseStartTest "check modified netgroup"
    rlRun "verifyNetgroupAttr $netgroup_updated \"Description\" $netgroup_desc_updated" 0 "Verify netgroup's Description"
    rlRun "ipa netgroup-show --all $netgroup_updated | grep \"User category\"" 1 "Verifying user catagory was removed for $netgroup_updated"
    rlRun "ipa netgroup-show --all $netgroup_updated | grep \"Host category\"" 1 "Verifying Host catagory was removed for $netgroup_updated"
    rlRun "ipa netgroup-show --all $netgroup_updated | grep \"Member Host\" | grep $managedByHost_updated" 1 "Verifying that $managedByHost_updated is not in $netgroup_updated"
+	rlPhaseEnd
 }
 
 delete_netgroup()
 {
+	rlPhaseStartTest "delete netgroup"
    rlRun "ipa netgroup-del $netgroup_updated" 0 "Delete the netgroup" 
+	rlPhaseEnd
 }
-
 
 check_deletednetgroup()
 {
+	rlPhaseStartTest "check deleted netgroup"
    command="ipa netgroup-show $netgroup_updated"
    expmsg="ipa: ERROR: $netgroup_updated: netgroup not found"
    rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify error when checking for deleted netgroup"
+	rlPhaseEnd
 }
-
 
 ###########################
 # Service-related actions
 ###########################
 
-
 add_newservice()
 {
+	rlPhaseStartTest "add service"
    rlRun "ipa service-add $service --certificate=$certificate" 0 "Add new service"
    rlRun "ipa service-add-host --hosts=$managedByHost $service" 0 "Add service host"
+	rlPhaseEnd
 }
 
 check_newservice()
 {
+	rlPhaseStartTest "check service"
    rlRun "verifyServiceAttr $service \"Principal\" $service" 0 "Verify service's name"
    rlRun "verifyServiceAttr $service \"Certificate\" $certificate" 0 "Verify service's certificate"
    rlRun "verifyServiceAttr $service \"Keytab\" $keytab" 0 "Verify service's Keytab"
    rlRun "verifyServiceAttr $service \"Subject\" $subject" 0 "Verify service's Subject"
    rlRun "verifyServiceAttr $service \"Issuer\" $issuer" 0 "Verify service's Issuer"
    rlRun "verifyServiceAttr $service \"Managed by\" $service_managedby" 0 "Verify service's managed hosts"
+	rlPhaseEnd
 }
 
 modify_newservice()
 {
+	rlPhaseStartTest "modify service"
    rlRun "ipa service-disable $service_updated" 0 "Disable service" 
    rlRun "ipa service-mod $service_updated --certificate=$updatedcertificate " 0 "Modify service's certificate"
    rlRun "ipa service-mod $service_updated --setattr=managedBy=$service_managedby_attr2" 0 "Set service's managed by"
    rlRun "ipa service-mod $service_updated --addattr=managedBy=$service_managedby_attr" 0 "Add service's managed by"
+	rlPhaseEnd
 }
 
 check_modifiedservice()
 {
+	rlPhaseStartTest "check modified service"
    rlRun "verifyServiceAttr $service_updated \"Certificate\" $updatedcertificate" 0 "Verify service's certificate"
    rlRun "verifyServiceAttr $service_updated \"Subject\" $subject_updated" 0 "Verify service's Subject"
    rlRun "verifyServiceAttr $service_updated \"Managed by\" \"$managedByHost, $managedByHost_updated\"" 0 "Verify service's managed hosts"
+	rlPhaseEnd
 }
 
 delete_service()
 {
+	rlPhaseStartTest "delete service"
    rlRun "ipa service-del $service_updated" 0 "Delete the service" 
+	rlPhaseEnd
 
 }
 
 check_deletedservice()
 {
+	rlPhaseStartTest "check deleted service"
    command="ipa service-show $service_updated"
    expmsg="ipa: ERROR: $service_updated: service not found"
    rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify error when checking for deleted service"
+	rlPhaseEnd
 }
 
 ################################
