@@ -169,18 +169,23 @@ public class HostgroupTests extends SahiTestScript{
 		String [] qehosts = {qewebserver, qehost};
 		String [] enghosts = {engwebserver};
 		
-		// add the members
-		HostgroupTasks.addHostMember(sahiTasks, devgroup, devhosts, "Enroll");
-		HostgroupTasks.addHostMember(sahiTasks, qegroup, qehosts, "Enroll");
-		HostgroupTasks.addHostMember(sahiTasks, enggroup, enghosts, "Enroll");
+		// add the host members
+		HostgroupTasks.addMembers(sahiTasks, devgroup, "host", devhosts, "Enroll");
+		HostgroupTasks.addMembers(sahiTasks, qegroup, "host", qehosts, "Enroll");
+		HostgroupTasks.addMembers(sahiTasks, enggroup, "host", enghosts, "Enroll");
 		
-		//verify the members
-		HostgroupTasks.verifyHostMember(sahiTasks, devgroup, devhosts);
-		HostgroupTasks.verifyHostMember(sahiTasks, qegroup, qehosts);
-		HostgroupTasks.verifyHostMember(sahiTasks, enggroup, enghosts);
+		//verify the host members
+		HostgroupTasks.verifyMembers(sahiTasks, devgroup, "host", devhosts, "direct", "YES");
+		HostgroupTasks.verifyMembers(sahiTasks, qegroup, "host", qehosts, "direct", "YES");
+		HostgroupTasks.verifyMembers(sahiTasks, enggroup, "host", enghosts, "direct", "YES");
 		
-		//Now let's nest the groups and verify direct and indirect members
-		
+		//Now let's nest the groups and verify direct host group members and indirect host members
+		String [] enggroups = {devgroup, qegroup};
+		HostgroupTasks.addMembers(sahiTasks, enggroup, "hostgroup", enggroups, "Enroll");
+		HostgroupTasks.verifyMembers(sahiTasks, enggroup, "hostgroup", enggroups, "direct", "YES");
+		HostgroupTasks.verifyMembers(sahiTasks, enggroup, "host", qehosts, "indirect", "YES");
+		HostgroupTasks.verifyMembers(sahiTasks, enggroup, "host", devhosts, "indirect", "YES");
+		 
 		//delete hosts
 		sahiTasks.navigateTo(System.getProperty("ipa.server.url")+hostPage, true);
 		HostTasks.deleteHost(sahiTasks, hostnames);
@@ -188,6 +193,122 @@ public class HostgroupTests extends SahiTestScript{
 		//delete host groups
 		sahiTasks.navigateTo(System.getProperty("ipa.server.url")+hostgroupPage, true);
 		HostgroupTasks.deleteHostgroup(sahiTasks, hostgroups);
+
+	}
+	
+	/*
+	 * Verify memberof
+	 */
+	//TODO add in sudorule and hbacrule when those tasks are developed
+	@Test (groups={"memberofTest"}, dataProvider="getMemberofTestObjects")	
+	public void testMemberof(String testName) throws Exception {
+		sahiTasks.navigateTo(System.getProperty("ipa.server.url")+hostgroupPage, true);
+		
+		String devgroup = "development hosts";
+		String qegroup = "quality hosts";
+		String enggroup = "engineering hosts";
+		String [] hostgroups = {devgroup, qegroup, enggroup};
+		
+		//add host groups
+		sahiTasks.navigateTo(System.getProperty("ipa.server.url")+hostgroupPage, true);
+		for (String hostgroup : hostgroups) {
+			String description = hostgroup + " group";
+			HostgroupTasks.addHostGroup(sahiTasks, hostgroup, description, "Add");
+		}
+		
+		String [] enggroups = {devgroup, qegroup};
+		HostgroupTasks.addMembers(sahiTasks, enggroup, "hostgroup", enggroups, "Enroll");
+		
+		//verify member of
+		String [] devnames = {enggroup};
+		HostgroupTasks.verifyMemberOf(sahiTasks, devgroup, "hostgroup", devnames, "direct", "YES");
+		
+		String [] qenames = {enggroup};
+		HostgroupTasks.verifyMemberOf(sahiTasks, qegroup, "hostgroup", qenames, "direct", "YES");
+		
+		//clean up
+		HostgroupTasks.deleteHostgroup(sahiTasks, hostgroups);
+};
+	
+	/*
+	 * Cancel add members test
+	 */
+	@Test (groups={"cancelAddMembersTest"}, dataProvider="getCancelAddMemberTestObjects")	
+	public void testCancelAddMembers(String testName, String groupName, String membertype, String member) throws Exception {
+		sahiTasks.navigateTo(System.getProperty("ipa.server.url")+hostgroupPage, true);
+		String description = "cancel host group tests";
+		//add new host group
+		HostgroupTasks.addHostGroup(sahiTasks, groupName, description, "Add");
+		
+		if (membertype == "host"){
+			sahiTasks.navigateTo(System.getProperty("ipa.server.url")+hostPage, true);
+			HostTasks.addHost(sahiTasks, member, "");
+		}
+		if (membertype == "hostgroup"){
+			HostgroupTasks.addHostGroup(sahiTasks, member, description, "Add");
+		}
+		
+		//verify the host group exists
+		sahiTasks.navigateTo(System.getProperty("ipa.server.url")+hostgroupPage, true);
+		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(groupName).exists(), "Verify host group " + groupName + " exists");
+		
+		//cancel adding member
+		String [] members = {member};
+		HostgroupTasks.addMembers(sahiTasks, groupName, membertype, members, "Cancel");
+		
+		//verify the member is not a member
+		HostgroupTasks.verifyMembers(sahiTasks, groupName, membertype, members, "direct", "NO");
+		
+		//clean up delete host group
+		HostgroupTasks.deleteHostgroup(sahiTasks, groupName, "Delete");
+		if (membertype == "host"){
+			sahiTasks.navigateTo(System.getProperty("ipa.server.url")+hostPage, true);
+			HostTasks.deleteHost(sahiTasks, member);
+		}
+		if(membertype == "hostgroup"){
+			sahiTasks.navigateTo(System.getProperty("ipa.server.url")+hostgroupPage, true);
+			HostgroupTasks.deleteHostgroup(sahiTasks, member, "Delete");
+		}
+		
+	}
+		/*
+		 * Cancel remove members test
+		 */
+		@Test (groups={"cancelRemoveMembersTest"}, dataProvider="getCancelRemoveMemberTestObjects")	
+		public void testCancelRemoveMembers(String testName, String groupName, String membertype, String member) throws Exception {
+			sahiTasks.navigateTo(System.getProperty("ipa.server.url")+hostgroupPage, true);
+			String description = "cancel host group tests";
+			//add new host group
+			HostgroupTasks.addHostGroup(sahiTasks, groupName, description, "Add");
+			
+			if (membertype == "host"){
+				sahiTasks.navigateTo(System.getProperty("ipa.server.url")+hostPage, true);
+				HostTasks.addHost(sahiTasks, member, "");
+				
+			}
+			if (membertype == "hostgroup"){
+				HostgroupTasks.addHostGroup(sahiTasks, member, description, "Add");
+			}
+			
+			String [] members = {member};
+			sahiTasks.navigateTo(System.getProperty("ipa.server.url")+hostgroupPage, true);
+			HostgroupTasks.addMembers(sahiTasks, groupName, membertype, members, "Enroll");
+			HostgroupTasks.verifyMembers(sahiTasks, groupName, membertype, members, "direct", "YES");
+			
+			//cancel removing member
+			HostgroupTasks.removeMember(sahiTasks, groupName, membertype, members, "Cancel");
+			HostgroupTasks.verifyMembers(sahiTasks, groupName, membertype, members, "direct", "YES");
+			
+			//clean up delete host group
+			HostgroupTasks.deleteHostgroup(sahiTasks, groupName, "Delete");
+			if (membertype == "host"){
+				sahiTasks.navigateTo(System.getProperty("ipa.server.url")+hostPage, true);
+				HostTasks.deleteHost(sahiTasks, member);
+			}
+			if(membertype == "hostgroup"){
+				sahiTasks.navigateTo(System.getProperty("ipa.server.url")+hostgroupPage, true);
+				HostgroupTasks.deleteHostgroup(sahiTasks, member, "Delete");
+			}
 
 	}
 
@@ -272,7 +393,54 @@ public class HostgroupTests extends SahiTestScript{
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 	
 		//										testname					
-		ll.add(Arrays.asList(new Object[]{ 		"host_membershipsts" } ));
+		ll.add(Arrays.asList(new Object[]{ 		"host_memberships" } ));
+		return ll;	
+	}
+	
+	/*
+	 * Data to be cancel adding member
+	 */
+	@DataProvider(name="getCancelAddMemberTestObjects")
+	public Object[][] getCancelAddMemberTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createCancelAddMemberTestObjects());
+	}
+	protected List<List<Object>> createCancelAddMemberTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+	
+		//										testname						groupname	membertype		member	
+		ll.add(Arrays.asList(new Object[]{ 		"cancel_addhostmember", 		"mygroup", 	"host", 		"myhost." + domain  } ));
+		ll.add(Arrays.asList(new Object[]{ 		"cancel_addhostgroupmember",	"mygroup",	"hostgroup", 	"membergroup"} ));
+		return ll;	
+	}
+	
+	/*
+	 * Data to be cancel removing member
+	 */
+	@DataProvider(name="getCancelRemoveMemberTestObjects")
+	public Object[][] getCancelRemoveMemberTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createCancelRemoveMemberTestObjects());
+	}
+	protected List<List<Object>> createCancelRemoveMemberTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+	
+		//										testname						groupname	membertype		member	
+		ll.add(Arrays.asList(new Object[]{ 		"cancel_removehostmember",		"mygroup",	"host",			"myhost." + domain } ));
+		ll.add(Arrays.asList(new Object[]{ 		"cancel_removehostgroupmember",	"mygroup",	"hostgroup",	"membergroup" } ));
+		return ll;	
+	}
+	
+	/*
+	 * Data to be used when verifying memberof
+	 */
+	@DataProvider(name="getMemberofTestObjects")
+	public Object[][] getMemberofTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createMemberofTestObjects());
+	}
+	protected List<List<Object>> createMemberofTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+	
+		//										testname					
+		ll.add(Arrays.asList(new Object[]{ 		"host_memberof" } ));
 		return ll;	
 	}
 }
