@@ -337,6 +337,7 @@ add_objects()
 	add_pwpolicy
    # Add a role
    # Add a selfservice permission
+	add_selfservice
    # Add a SUDO rule
 	add_sudorule
    # Add a sudo command group
@@ -365,6 +366,7 @@ check_objects()
    check_hbac_service
    check_permission
    check_pwpolicy
+   check_selfservice
    check_sudorule
    check_sudocmdgroup
    check_sudocmd
@@ -385,6 +387,7 @@ update_objects()
    modify_hbac_service
    modify_permission
    modify_pwpolicy
+   modift_selfservice
    modify_sudorule
    modify_sudocmdgroup
    modify_sudocmd
@@ -403,6 +406,7 @@ check_updated_objects()
    check_modifiedhbacservice
    check_modifiedpermission
    check_modifiedpwpolicy
+   check_modifiedselfservice
    check_modifiedsudorule
    check_modifiedsudocmdgroup
    check_modifiedsudocmd
@@ -423,6 +427,7 @@ delete_objects()
    delete_hbac_service
    delete_permission
    delete_pwpolicy
+   delete_selfservice
    delete_sudorule
    delete_sudocmdgroup
    delete_sudocmd
@@ -443,6 +448,7 @@ check_deletedobjects()
    check_deletedhbacservice
    check_deletedpermission
    check_deletedpwpolicy
+   check_deletedselfservice
    check_deletedsudorule
    check_deletedsudocmdgroup
    check_deletedsudocmd
