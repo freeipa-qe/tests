@@ -2,105 +2,80 @@ package com.redhat.qe.ipa.sahi.tests.group;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Logger;
+
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
+
 import com.redhat.qe.auto.testng.TestNGUtils;
 import com.redhat.qe.ipa.sahi.base.SahiTestScript;
+import com.redhat.qe.ipa.sahi.tasks.CommonTasks;
 import com.redhat.qe.ipa.sahi.tasks.SahiTasks;
 import com.redhat.qe.ipa.sahi.tasks.GroupTasks;
 
 public class GroupTests extends SahiTestScript{
+	private static Logger log = Logger.getLogger(GroupTests.class.getName());
 	public static SahiTasks sahiTasks = null;	
-	private String groupPage = "/ipa/ui/#identity=group&navigation=identity";
+	public static String groupPage = "/ipa/ui/#nagivation=identity&identity=group";
 	
-	@BeforeClass (groups={"init"}, description="Initialize app for this test suite run", alwaysRun=true, dependsOnGroups="setup")
+	@BeforeClass (groups={"init"}, description="Initialize app for this test suite run", alwaysRun=true, dependsOnGroups="firefoxSetup")
 	public void initialize() throws CloneNotSupportedException {	
 		sahiTasks = SahiTestScript.getSahiTasks();	
 		sahiTasks.navigateTo(System.getProperty("ipa.server.url")+groupPage, true);
+		sahiTasks.setStrictVisibilityCheck(true);
 	}
 	
 	/*
 	 * Add groups - positive tests
 	 */
-	@Test (groups={"addGroupTests"}, dataProvider="getAddGroupObjects")	
-	public void groupAcceptanceTest(String testname, String groupname, String description, String posix, String gidnumber, String button) throws Exception {
-		//verify group doesn't exist
-		com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(groupname).exists(), "Verify user group " + groupname + " doesn't already exist");
+	@Test (groups={"acceptanceTest"}, dataProvider="getGroupObjects")	
+	public void groupAcceptanceTest(String testName, String groupName, String groupDescription) throws Exception {
+		GroupTasks.simpleAddGroup(sahiTasks, groupName, groupDescription);
+		GroupTasks.addAndAddAnotherGroup(sahiTasks, groupName, groupDescription);
+		GroupTasks.addAndEditGroup(sahiTasks, groupName, groupDescription);
+		GroupTasks.editGroup(sahiTasks, groupName, groupDescription);
+		GroupTasks.membershipGroup(sahiTasks, groupName, groupDescription);
 		
-		// add group test
-		GroupTasks.addGroup(sahiTasks, groupname, description, posix, gidnumber, button);
-		
-		//verify the group exists
-		if (testname == "addgroup_cancel"){
-			com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(groupname).exists(), "Verify user group " + groupname + " does NOT exist - action cancelled");
-		}
-		else {
-			com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(groupname).exists(), "Verify user group " + groupname + " was added successfully");
-		}
-	}
+		// Notes: Yi Zhang 7.28.2011
+		// 1. what is missed: search box inside "enroll dialogbox" and pagenation are missing
+		// 2. how to extend current test
+		// 	(1) currently, test use only fixed data, to extend, we sholuld apply data driven mechanism
+		// 	(2) no negative test here
+		// 	(3) no i18n test here
+		//
+	}//groupAcceptanceTest
 	
 	/*
 	 * Add groups - positive tests
 	 */
-	@Test (groups={"deleteGroupTests"}, dataProvider="getDeleteGroupObjects",   dependsOnGroups="addGroupTests")	
-	public void groupAcceptanceTest(String testname, String groupname, String button) throws Exception {
-		//verify group doesn't exist
-		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(groupname).exists(), "Verify user group " + groupname + " exists");
-		
-		// add group test
-		GroupTasks.deleteGroup(sahiTasks, groupname, button);
-		
-		//verify the group exists
-		if (testname == "deletegroup_cancel"){
-			com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(groupname).exists(), "Verify user group " + groupname + " still exists - action cancelled");
-		}
-		else {
-			com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(groupname).exists(), "Verify user group " + groupname + " was deleted successfully");
-		}
-	}
-	
-	
+	@Test (groups={"smokeTest"}, dataProvider="getGroupObjects")	
+	public void groupSmokeTest(String testName, String groupName, String groupDescription) throws Exception {
+
+		GroupTasks.smokeTest(sahiTasks);
+		 
+	}//groupSmokeTest
 	
 	/*******************************************************
 	 ************      DATA PROVIDERS     ***********
 	 *******************************************************/
 
 	/*
-	 * Data to be used when adding user groups
+	 * Data to be used when adding hosts - for positive cases
 	 */
-	@DataProvider(name="getAddGroupObjects")
-	public Object[][] getAddGroupObjects() {
-		return TestNGUtils.convertListOfListsTo2dArray(createAddGroupObjects());
+	@DataProvider(name="getGroupObjects")
+	public Object[][] getGroupObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createGroupObjects());
 	}
-	protected List<List<Object>> createAddGroupObjects() {		
+	protected List<List<Object>> createGroupObjects() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-        //									testname 			groupname			description									posix	gidnumber		button
-		ll.add(Arrays.asList(new Object[]{ "addgroup_cancel",	"sahi_auto_001",	"auto generated by sahi, group 001", 		"YES",	"",				"Cancel"	} )); 
-		ll.add(Arrays.asList(new Object[]{ "addgroup_posix",	"myposixgroup",		"This is a posix group", 					"YES",	"",				"Add"		} ));   
-		ll.add(Arrays.asList(new Object[]{ "addgroup_nonposix",	"mynonposixgroup",	"This is a non posix group", 				"NO",	"",				"Add"		} ));
-		ll.add(Arrays.asList(new Object[]{ "addgroup_setgid",	"gidnumbergroup",	"group with gid number set", 				"YES",	"9999999",		"Add"		} ));
+        //	test name, groupName, groupDescription				
+		ll.add(Arrays.asList(new Object[]{ "addgroup","sahi_auto_001","auto generated by sahi, group 001"} )); 
+		        
 		return ll;	
-	}
+	}//createGroupObject
 	
-	/*
-	 * Data to be used when deleting user groups
-	 */
-	@DataProvider(name="getDeleteGroupObjects")
-	public Object[][] getDeleteGroupObjects() {
-		return TestNGUtils.convertListOfListsTo2dArray(createDeleteGroupObjects());
-	}
-	protected List<List<Object>> createDeleteGroupObjects() {		
-		List<List<Object>> ll = new ArrayList<List<Object>>();
-		
-        //									testname 				groupname				button
-		ll.add(Arrays.asList(new Object[]{ "deletegroup_cancel",	"myposixgroup",			"Cancel"	} )); 
-		ll.add(Arrays.asList(new Object[]{ "deletegroup_posix",		"myposixgroup",			"Delete"	} ));   
-		ll.add(Arrays.asList(new Object[]{ "deletegroup_nonposix",	"mynonposixgroup",		"Delete"	} ));
-		ll.add(Arrays.asList(new Object[]{ "deletegroup_setgid",	"gidnumbergroup",		"Delete"	} ));
-		return ll;	
-	}
-	
-}
+}//class GroupTest
