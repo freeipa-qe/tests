@@ -3,8 +3,6 @@ package com.redhat.qe.ipa.sahi.tasks;
 import java.util.logging.Logger;
 import com.redhat.qe.ipa.sahi.tasks.SahiTasks;
 
-
-
 public class HostTasks {
 	private static Logger log = Logger.getLogger(HostTasks.class.getName());
 	
@@ -56,7 +54,7 @@ public class HostTasks {
 		sahiTasks.textbox("nshardwareplatform").setValue(platform);
 		sahiTasks.textbox("nsosversion").setValue(os);
 		sahiTasks.link("Update").click();
-		sahiTasks.link("Hosts[1]").click();
+		sahiTasks.link("Hosts").in(sahiTasks.div("content")).click();
 	}
 	
 	/*
@@ -100,7 +98,7 @@ public class HostTasks {
 		com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("l").value(), local, "Verified local for host: " + local);
 		com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("nshostlocation").value(), location, "Verified location for host: " + location);
 		com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("nshardwareplatform").value(), platform, "Verified platform for host: " + platform);
-		sahiTasks.link("Hosts").click();
+		sahiTasks.link("Hosts").in(sahiTasks.div("content")).click();
 	}
 	
 	/*
@@ -155,7 +153,7 @@ public class HostTasks {
 		}
 		
 		sahiTasks.link("Update").click();
-		sahiTasks.link("Hosts").click();
+		sahiTasks.link("Hosts").in(sahiTasks.div("content")).click();
 	}
 	
 	/*
@@ -186,7 +184,7 @@ public class HostTasks {
 		sahiTasks.textbox("nsosversion").setValue(newos);
 		sahiTasks.span("undo").click();
 		
-		sahiTasks.link("Hosts[1]").click();
+		sahiTasks.link("Hosts").in(sahiTasks.div("content")).click();
 	}
 	
 	/*
@@ -198,7 +196,7 @@ public class HostTasks {
 		sahiTasks.link(hostname).click();
 		sahiTasks.textbox("otp").setValue(otp);
 		sahiTasks.span("Set OTP").click();
-		sahiTasks.link("Hosts").click();
+		sahiTasks.link("Hosts").in(sahiTasks.div("content")).click();
 	}
 	
 	/*
@@ -227,7 +225,7 @@ public class HostTasks {
 			com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("otp").value(), value, "Verified One Time Password for host: " + value);
 		}
 
-		sahiTasks.link("Hosts[1]").click();
+		sahiTasks.link("Hosts").in(sahiTasks.div("content")).click();
 	}
 	
 	/*
@@ -245,7 +243,7 @@ public class HostTasks {
 		sahiTasks.checkbox(managedby).click();
 		sahiTasks.span(">>").click();
 		sahiTasks.button(button).click();
-		sahiTasks.link("Hosts[1]").click();
+		sahiTasks.link("Hosts").in(sahiTasks.div("content")).click();
 	}
 	
 	/*
@@ -262,7 +260,7 @@ public class HostTasks {
 		sahiTasks.checkbox(managedby).click();
 		sahiTasks.span("Delete").click();
 		sahiTasks.button(button).click();
-		sahiTasks.link("Hosts").click();
+		sahiTasks.link("Hosts").in(sahiTasks.div("content")).click();
 
 	}
 	
@@ -282,7 +280,7 @@ public class HostTasks {
 			com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(managedby).exists(), "Host " + managed + " is NOT managed by " + managedby);
 		}	
 		
-		sahiTasks.link("Hosts[1]").click();
+		sahiTasks.link("Hosts").in(sahiTasks.div("content")).click();
 	}
 	
 	/*
@@ -321,7 +319,7 @@ public class HostTasks {
 		sahiTasks.span("New Certificate").click();
 		sahiTasks.textarea(0).setValue(csr);
 		sahiTasks.button("Issue").click();
-		sahiTasks.link("Hosts[1]").click();
+		sahiTasks.link("Hosts").in(sahiTasks.div("content")).click();
 	}
 	
 	/*
@@ -344,7 +342,7 @@ public class HostTasks {
 		sahiTasks.span("Get").click();
 		sahiTasks.button("Close").click();
 		
-		sahiTasks.link("Hosts[1]").click();
+		sahiTasks.link("Hosts").in(sahiTasks.div("content")).click();
 
 	}
 	
@@ -360,7 +358,7 @@ public class HostTasks {
 		sahiTasks.span("Revoke").click();
 		sahiTasks.select(0).choose(reason);
 		sahiTasks.button(button).click();
-		sahiTasks.link("Hosts[1]").click();
+		sahiTasks.link("Hosts").in(sahiTasks.div("content")).click();
 	}
 	
 	/*
@@ -381,7 +379,7 @@ public class HostTasks {
 			com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.span(reason).exists(), "Verifying Certificate Revoked status: " + reason);
 		}
 		
-		sahiTasks.link("Hosts[1]").click();
+		sahiTasks.link("Hosts").in(sahiTasks.div("content")).click();
 	}
 	
 	/*
@@ -394,7 +392,7 @@ public class HostTasks {
 		sahiTasks.link(hostname).click();
 		sahiTasks.span("Restore").click();
 		sahiTasks.button(button).click();
-		sahiTasks.link("Hosts[1]").click();
+		sahiTasks.link("Hosts").in(sahiTasks.div("content")).click();
 	}
 	/*
 	 * Request new certificate
@@ -407,7 +405,7 @@ public class HostTasks {
 		sahiTasks.span("New Certificate").click();
 		sahiTasks.textarea(0).setValue(csr);
 		sahiTasks.button(button).click();
-		sahiTasks.link("Hosts[1]").click();
+		sahiTasks.link("Hosts").in(sahiTasks.div("content")).click();
 	}
 	
 	/* Request new certificate
@@ -423,7 +421,7 @@ public class HostTasks {
 		
 		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.div(expectedError).exists(), "Verified expected error with invalid csr.");
 		sahiTasks.button("Cancel").click();
-		sahiTasks.link("Hosts[1]").click();
+		sahiTasks.link("Hosts").in(sahiTasks.div("content")).click();
 	}
 }
 
