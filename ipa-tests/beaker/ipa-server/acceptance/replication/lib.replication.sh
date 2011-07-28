@@ -887,41 +887,41 @@ tg="pwtestg"
 add_pwpolicy()
 {
 	ipa group-add --desc=tg $tg
-	rlPhaseStartTest ""
+	rlPhaseStartTest "adding pwpolicy"
 		rlRun "ipa pwpolicy-add --maxlife=999  --priority=10 $tg" 0 "setting password policy to something high"
 	rlPhaseEnd
 }
 
 check_pwpolicy()
 {
-	rlPhaseStartTest ""
+	rlPhaseStartTest "Searching for added pwpolicy"
 		rlRun "ipa pwpolicy-find $tg | grep 999" 0 "Searching for added pwpolicy"
 	rlPhaseEnd
 }
 
 mod_pwpolicy()
-{	rlPhaseStartTest ""
+{	rlPhaseStartTest "modifying pwpolicy for test group"
 		rlRun "ipa pwpolicy-mod --maxlife=384 $tg" 0 "modifying pwpolicy for test group"
 	rlPhaseEnd
 }
 
 check_modpwpolicy()
 {
-	rlPhaseStartTest ""
+	rlPhaseStartTest "Searching for modified pwpolicy in tg"
 		rlRun "ipa pwpolicy-find $tg | grep 384" 0 "Searching for modified pwpolicy in tg"
 	rlPhaseEnd
 }
 
 delete_pwpolicy()
 {
-	rlPhaseStartTest ""
+	rlPhaseStartTest "Deleting the password policy for the testgroup"
 		rlRun "ipa pwpolicy-del $tg" 0 "Deleting the password policy for the testgroup"
 	rlPhaseEnd
 }
 
 check_deletedpwpolicy()
 {
-	rlPhaseStartTest ""
+	rlPhaseStartTest "Making sure that the test group pwpolicy doesn't seem to be searchable"
 		rlRun "ipa pwpolicy-find $tg" 1 "Making sure that the test group pwpolicy doesn't seem to be searchable"
 	rlPhaseEnd
 	# Cleanup of test group
@@ -934,41 +934,41 @@ check_deletedpwpolicy()
 ss="users-self-s"
 add_selfservice()
 {
-	rlPhaseStartTest ""
+	rlPhaseStartTest "adding a selfservice section"
 		rlRun "ipa selfservice-add --permissions=write --attrs=street,postalCode,l,c,st $ss" 0 "adding a selfservice section"
 	rlPhaseEnd
 }
 
 check_selfservice()
 {
-	rlPhaseStartTest ""
+	rlPhaseStartTest "Searching for added selfservice"
 		rlRun "ipa selfservice-find $ss | grep postalCode" 0 "Searching for added selfservice"
 	rlPhaseEnd
 }
 
 mod_selfservice()
-{	rlPhaseStartTest ""
+{	rlPhaseStartTest "modifying selfservice rule"
 		rlRun "ipa selfservice-mod --attrs=street,postalCode,l,c,st,telephoneNumber $ss" 0 "modifying selfservice rule"
 	rlPhaseEnd
 }
 
 check_modselfservice()
 {
-	rlPhaseStartTest ""
+	rlPhaseStartTest "Searching for modified selfservice policy"
 		rlRun "ipa selfservice-find $ss | grep telephoneNumber" 0 "Searching for modified selfservice policy"
 	rlPhaseEnd
 }
 
 delete_selfservice()
 {
-	rlPhaseStartTest ""
+	rlPhaseStartTest "Deleting the self service"
 		rlRun "ipa selfservice-del $ss" 0 "Deleting the self service"
 	rlPhaseEnd
 }
 
 check_deletedselfservice()
 {
-	rlPhaseStartTest ""
+	rlPhaseStartTest "Searching for removed selfservice"
 		rlRun "ipa selfservice-find $ss" 1 "Searching for removed selfservice"
 	rlPhaseEnd
 }
