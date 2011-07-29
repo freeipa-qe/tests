@@ -135,6 +135,40 @@ public class HostgroupTasks {
 	}
 	
 	/*
+	 * Add host members
+	 * @param sahiTasks
+	 * @param groupname - name of host group
+	 * @param membertype - host or hostgroup
+	 * @param names - enrolled group
+	 * @param button - YES if want to hide enrolled groups
+	 */
+	public static void hideAlreadyEnrolled(SahiTasks sahiTasks, String groupName, String membertype, String enrolledgroup, String hide, String searchstr) {
+		sahiTasks.link(groupName).click();
+		if (membertype == "host"){
+			sahiTasks.link("member_host").click();
+		}
+		if (membertype == "hostgroup"){
+			sahiTasks.link("member_hostgroup").click();
+		}
+		
+		sahiTasks.link("Enroll").click();
+		if( hide == "YES" ){
+			sahiTasks.checkbox("hidememb").check();
+			sahiTasks.textbox("filter").setValue(searchstr);
+			sahiTasks.span("Find").click();
+			com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(enrolledgroup).exists(), "enrolled group" + enrolledgroup + " is hidden");
+		}
+		else {
+			sahiTasks.checkbox("hidememb").uncheck();
+			sahiTasks.textbox("filter").setValue(searchstr);
+			com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(enrolledgroup).exists(), "enrolled group" + enrolledgroup + " is NOT hidden");
+		}
+		
+		sahiTasks.button("Cancel").click();
+		sahiTasks.link("Host Groups").in(sahiTasks.div("content")).click();
+	}
+	
+	/*
 	 * verify members
 	 * @param sahiTasks
 	 * @param groupname - name of host group
