@@ -267,6 +267,16 @@ testReplicationOnMasterAndSlave()
    fi
 
 
+   if [ $config == "master" ] ; then
+     
+      rlPhaseStartTest "Check deleted objects on master"
+         source $masterDatafile
+         check_deletedobjects
+      rlPhaseEnd
+
+   fi
+
+
 ##
 ##   # kinit user from client to master
 ##     rhts-sync-block -s READYFORCLIENT {$MASTER, $SLAVE}
@@ -356,6 +366,7 @@ add_objects()
 
 slave_objects_add()
 {
+	add_slave_user
 }
 
 check_objects()
@@ -428,10 +439,12 @@ check_updated_objects()
 
 slave_update_objects()
 {
+	slave_modify_user
 }
 
 check_updated_slave_objects()
 {
+	check_slave_modifieduser
 }
 
 delete_objects()
@@ -459,6 +472,7 @@ delete_objects()
 
 delete_slave_objects()
 {
+	delete_slave_user
 }
 
 check_deletedobjects()

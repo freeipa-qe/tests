@@ -39,9 +39,44 @@ add_newuser()
 	rlPhaseEnd
 }
 
+add_slave_user()
+{
+	rlPhaseStartTest "add user on slave"
+		# add manager user
+		rlRun "ipa user-add --first=$firstName \
+		                   --last=$lastName  \
+		                   --cn=$cn \
+		                   --displayname=$displayName  \
+		                   --initials=$initials  \
+		                   --homedir=$homedir  \
+		                   --gecos=$gecos  \
+		                   --shell=$shell  \
+		                   --principal=$principal  \
+		                   --email=$email  \
+		                   --uid=$uid  \
+		                   --gidnumber=$gidnumber  \
+		                   --street=$street  \
+		                   --city=$city  \
+		                   --state=$state  \
+		                   --postalcode=$postalcode  \
+		                   --phone=$phone  \
+		                   --mobile=$mobile  \
+		                   --pager=$pager  \
+		                   --fax=$fax  \
+		                   --orgunit=$orgunit  \
+		                   --title=$title  \
+		                   --manager=$manager  \
+		                   --carlicense=$carlicense \
+		                   slogin" \
+		                   0 \
+		                   "Add a new user on the slave"
+	rlPhaseEnd
+
+}
+
 check_newuser()
 {
-	rlPhaseStartTest "check added user"
+	rlPhaseStartTest "check added user on master and slave"
 		rlRun "verifyUserAttr $login \"First name\" $firstName" 0 "Verify user's first name"
 		rlRun "verifyUserAttr $login \"Last name\" $lastName" 0 "Verify user's last name"
 		rlRun "verifyUserAttr $login \"Full name\" $cn" 0 "Verify user's full name"
@@ -66,6 +101,32 @@ check_newuser()
 		rlRun "verifyUserAttr $login \"Job Title\" $title" 0 "Verify user's Job Title"
 		rlRun "verifyUserAttr $login \"Manager\" $manager" 0 "Verify user's Manager"
 		rlRun "verifyUserAttr $login \"Car License\" $carlicense" 0 "Verify user's Car License"
+
+		rlRun "verifyUserAttr slogin \"First name\" $firstName" 0 "Verify user's first name"
+		rlRun "verifyUserAttr slogin \"Last name\" $lastName" 0 "Verify user's last name"
+		rlRun "verifyUserAttr slogin \"Full name\" $cn" 0 "Verify user's full name"
+		rlRun "verifyUserAttr slogin \"Display name\" $displayName" 0 "Verify user's display name"
+		rlRun "verifyUserAttr slogin \"Initials\" $initials" 0 "Verify user's initials"
+		rlRun "verifyUserAttr slogin \"Home directory\" $homedir" 0 "Verify user's home dir"
+		rlRun "verifyUserAttr slogin \"GECOS field\" $gecos" 0 "Verify user's gecos field"
+		rlRun "verifyUserAttr slogin \"Login shell\" $shell" 0 "Verify user's login shell"
+		rlRun "verifyUserAttr slogin \"Kerberos principal\" $principal" 0 "Verify user's kerberos principal"
+		rlRun "verifyUserAttr slogin \"Email address\" $email" 0 "Verify user's email addr"
+		rlRun "verifyUserAttr slogin \"UID\" $uid" 0 "Verify user's uid"
+		rlRun "verifyUserAttr slogin \"GID\" $gidnumber" 0 "Verify user's gid"
+		rlRun "verifyUserAttr slogin \"Street address\" $street" 0 "Verify user's street address"
+		rlRun "verifyUserAttr slogin \"City\" $city" 0 "Verify user's city"
+		rlRun "verifyUserAttr slogin \"State/Province\" $state" 0 "Verify user's State"
+		rlRun "verifyUserAttr slogin \"ZIP\" $postalcode" 0 "Verify user's zip"
+		rlRun "verifyUserAttr slogin \"Telephone Number\" $phone" 0 "Verify user's Telephone Number"
+		rlRun "verifyUserAttr slogin \"Mobile Telephone Number\" $mobile" 0 "Verify user's Mobile Telephone Number"
+		rlRun "verifyUserAttr slogin \"Pager Number\" $pager" 0 "Verify user's Pager Number"
+		rlRun "verifyUserAttr slogin \"Fax Number\" $fax" 0 "Verify user's Fax Number"
+		rlRun "verifyUserAttr slogin \"Org. Unit\" $orgunit" 0 "Verify user's Org. Unit"
+		rlRun "verifyUserAttr slogin \"Job Title\" $title" 0 "Verify user's Job Title"
+		rlRun "verifyUserAttr slogin \"Manager\" $manager" 0 "Verify user's Manager"
+		rlRun "verifyUserAttr slogin \"Car License\" $carlicense" 0 "Verify user's Car License"
+
 	rlPhaseEnd
 }
 
@@ -102,6 +163,39 @@ modify_newuser()
 	rlPhaseEnd
 }
 
+slave_modify_user()
+{
+	rlPhaseStartTest "modify new user"  
+		# add new manager user
+		rlRun "ipa user-mod --first=$firstName_updated \
+		                   --last=$lastName_updated  \
+		                   --cn=$cn_updated \
+		                   --displayname=$displayName_updated  \
+		                   --initials=$initials_updated  \
+		                   --homedir=$homedir_updated  \
+		                   --gecos=$gecos_updated  \
+		                   --shell=$shell_updated  \
+		                   --email=$email_updated  \
+		                   --street=$street_updated  \
+		                   --city=$city_updated  \
+		                   --state=$state_updated  \
+		                   --postalcode=$postalcode_updated  \
+		                   --phone=$phone_updated  \
+		                   --mobile=$mobile_updated  \
+		                   --pager=$pager_updated  \
+		                   --fax=$fax_updated  \
+		                   --orgunit=$orgunit_updated  \
+		                   --title=$title_updated  \
+		                   --manager=$manager_updated  \
+		                   --carlicense=$carlicense_updated \
+		                   --rename=$login_updated \
+		                   suser" \
+		                   0 \
+		                   "Modify the new user"
+	rlPhaseEnd
+}
+
+
 check_modifieduser()
 {
 	rlPhaseStartTest "check modified user"
@@ -129,6 +223,33 @@ check_modifieduser()
 	rlPhaseEnd
 }
 
+check_slave_modifieduser()
+{
+	rlPhaseStartTest "check user modified on slave"
+		rlRun "verifyUserAttr slogin \"First name\" $firstName_updated" 0 "Verify user's first name"
+		rlRun "verifyUserAttr slogin \"Last name\" $lastName_updated" 0 "Verify user's last name"
+		rlRun "verifyUserAttr slogin \"Full name\" $cn_updated" 0 "Verify user's full name"
+		rlRun "verifyUserAttr slogin \"Display name\" $displayName_updated" 0 "Verify user's display name"
+		rlRun "verifyUserAttr slogin \"Initials\" $initials_updated" 0 "Verify user's initials"
+		rlRun "verifyUserAttr slogin \"Home directory\" $homedir_updated" 0 "Verify user's home dir"
+		rlRun "verifyUserAttr slogin \"GECOS field\" $gecos_updated" 0 "Verify user's gecos field"
+		rlRun "verifyUserAttr slogin \"Login shell\" $shell_updated" 0 "Verify user's login_updated shell"
+		rlRun "verifyUserAttr slogin \"Email address\" $email_updated" 0 "Verify user's email addr"
+		rlRun "verifyUserAttr slogin \"Street address\" $street_updated" 0 "Verify user's street address"
+		rlRun "verifyUserAttr slogin \"City\" $city_updated" 0 "Verify user's city"
+		rlRun "verifyUserAttr slogin \"State/Province\" $state_updated" 0 "Verify user's State"
+		rlRun "verifyUserAttr slogin \"ZIP\" $postalcode_updated" 0 "Verify user's zip"
+		rlRun "verifyUserAttr slogin \"Telephone Number\" $phone_updated" 0 "Verify user's Telephone Number"
+		rlRun "verifyUserAttr slogin \"Mobile Telephone Number\" $mobile_updated" 0 "Verify user's Mobile Telephone Number"
+		rlRun "verifyUserAttr slogin \"Pager Number\" $pager_updated" 0 "Verify user's Pager Number"
+		rlRun "verifyUserAttr slogin \"Fax Number\" $fax_updated" 0 "Verify user's Fax Number"
+		rlRun "verifyUserAttr slogin \"Org. Unit\" $orgunit_updated" 0 "Verify user's Org. Unit"
+		rlRun "verifyUserAttr slogin \"Job Title\" $title_updated" 0 "Verify user's Job Title"
+		rlRun "verifyUserAttr slogin \"Manager\" $manager_updated" 0 "Verify user's Manager"
+		rlRun "verifyUserAttr slogin \"Car License\" $carlicense_updated" 0 "Verify user's Car License"
+	rlPhaseEnd
+}
+
 
 delete_user()
 {
@@ -136,6 +257,13 @@ delete_user()
 		rlRun "ipa user-del $login_updated" 0 "Deleted user: $login_updated"
 		rlRun "ipa user-del $manager" 0 "Delete original manager user: $manager"
 		rlRun "ipa user-del $manager_updated" 0 "Delete udpated manager user: $manager_updated"
+	rlPhaseEnd
+}
+
+delete_slave_user()
+{
+	rlPhaseStartTest "delete new user from slave"
+		rlRun "ipa user-del slogin" 0 "Deleted user: $login_updated"
 	rlPhaseEnd
 }
 
@@ -153,14 +281,17 @@ check_deleteduser()
 		command="ipa user-show $manager_updated"
                 expmsg="ipa: ERROR: $manager_updated: user not found"
                 rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify error when checking for deleted updated manager user"
+
+		command="ipa user-show slogin"
+		expmsg="ipa: ERROR: $login_updated: user not found"
+		rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify error when checking for deleted user"
+
 	rlPhaseEnd
 }
-
 
 #########################
 # Group-related actions
 #########################
-
 add_newgroup()
 {
 	rlPhaseStartTest "add new group"
@@ -308,7 +439,6 @@ check_deletedhost()
 #############################
 # Hostgroup-related actions
 #############################
-
 add_newhostgroup()
 {
 	rlPhaseStartTest "add hostgroup"
@@ -374,7 +504,6 @@ check_deletedhostgroup()
 ###########################
 # Netgroup-related actions
 ###########################
-
 add_newnetgroup()
 {
 	rlPhaseStartTest "add netgroup"
@@ -437,7 +566,6 @@ check_deletednetgroup()
 ###########################
 # Service-related actions
 ###########################
-
 add_newservice()
 {
 	rlPhaseStartTest "add service"
@@ -580,7 +708,6 @@ check_deleteddns()
 ################################
 # hbac section
 ################################
-
 REALM=`os_getdomainname | tr "[a-z]" "[A-Z]"`
 DOMAIN=`os_getdomainname`
 
@@ -754,14 +881,14 @@ delete_permission()
 {
 	rlPhaseStartTest "add a user, and add a permission to that user"
 		rlRun "ipa permission-del $puser1" 0 " deleting the permission for $puser1"
-		rlRun "ipa user-del $user1" 0 "deleting user $user1."			
+		rlRun "ipa user-del $puser1" 0 "deleting user $puser1."			
 	rlPhaseEnd
 }
 check_deletedpermission()
 {
 	rlPhaseStartTest "add a user, and add a permission to that user"
 		rlRun "ipa permission-show $puser1 | grep add" 1 "checking to make sure that the permission is not arund any more"
-		rlRun "ipa user-find $puser" 1 "making sure that the user is gone"
+		rlRun "ipa user-find $puser1" 1 "making sure that the user is gone"
 	rlPhaseEnd
 }
 
