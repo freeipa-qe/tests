@@ -7,6 +7,8 @@
 add_newuser()
 {
 	rlPhaseStartTest "add user"
+		# add manager user
+		rlRun "ipa user-add --first=$manager --last=$manager $manager" 0 "Adding manager user: $manager"
 		rlRun "ipa user-add --first=$firstName \
 		                   --last=$lastName  \
 		                   --cn=$cn \
@@ -70,6 +72,8 @@ check_newuser()
 modify_newuser()
 {
 	rlPhaseStartTest "modify new user"  
+		# add new manager user
+		rlRun "ipa user-add --first=$manager_updated --last=$manager_updated $manager_updated" 0 "Adding new manager user: $manager_updated"
 		rlRun "ipa user-mod --first=$firstName_updated \
 		                   --last=$lastName_updated  \
 		                   --cn=$cn_updated \
@@ -129,7 +133,9 @@ check_modifieduser()
 delete_user()
 {
 	rlPhaseStartTest "delete new user"
-		rlRun "ipa user-del $login_updated" 0 "Deleted user"
+		rlRun "ipa user-del $login_updated" 0 "Deleted user: $login_updated"
+		rlRun "ipa user-del $manager" 0 "Delete original manager user: $manager"
+		rlRun "ipa user-del $manager_updated" 0 "Delete udpated manager user: $manager_updated"
 	rlPhaseEnd
 }
 
@@ -139,6 +145,14 @@ check_deleteduser()
 		command="ipa user-show $login_updated"
 		expmsg="ipa: ERROR: $login_updated: user not found"
 		rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify error when checking for deleted user"
+
+		command="ipa user-show $manager"
+                expmsg="ipa: ERROR: $manager: user not found"
+                rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify error when checking for deleted original manager user"
+
+		command="ipa user-show $manager_updated"
+                expmsg="ipa: ERROR: $manager_updated: user not found"
+                rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify error when checking for deleted updated manager user"
 	rlPhaseEnd
 }
 
@@ -603,7 +617,7 @@ add_hbac()
 {
 	hbac_setup
 	rlPhaseStartTest "Add host to Rule"
-		rlRun "addHBACRule allow \" \" \" \" \" \" \" \" Engineering" 0 "Adding HBAC rule."
+		rlRun "addHBACRule \" \" \" \" \" \" \" \" Engineering" 0 "Adding HBAC rule."
 		rlRun "addToHBAC Engineering host hosts $host1" 0 "Adding host $host1 to Engineering rule."
 		rlRun "verifyHBACAssoc Engineering Hosts $host1" 0 "Verifying host $host1 is associated with the Engineering rule."
 	rlPhaseEnd
