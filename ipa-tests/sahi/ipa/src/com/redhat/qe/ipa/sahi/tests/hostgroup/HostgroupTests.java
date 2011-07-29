@@ -248,9 +248,7 @@ public class HostgroupTests extends SahiTestScript{
 			HostgroupTasks.addHostGroup(sahiTasks, member, description, "Add");
 		}
 		
-		//verify the host group exists
 		sahiTasks.navigateTo(System.getProperty("ipa.server.url")+hostgroupPage, true);
-		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(groupName).exists(), "Verify host group " + groupName + " exists");
 		
 		//cancel adding member
 		String [] members = {member};
@@ -274,7 +272,7 @@ public class HostgroupTests extends SahiTestScript{
 		/*
 		 * Cancel remove members test
 		 */
-		@Test (groups={"cancelRemoveMembersTest"}, dataProvider="getCancelRemoveMemberTestObjects")	
+		@Test (groups={"cancelRemoveMembersTest"}, dataProvider="getCancelRemoveMemberTestObjects",  dependsOnGroups="cancelAddMembersTest")	
 		public void testCancelRemoveMembers(String testName, String groupName, String membertype, String member) throws Exception {
 			sahiTasks.navigateTo(System.getProperty("ipa.server.url")+hostgroupPage, true);
 			String description = "cancel host group tests";
@@ -310,6 +308,77 @@ public class HostgroupTests extends SahiTestScript{
 				HostgroupTasks.deleteHostgroup(sahiTasks, member, "Delete");
 			}
 
+	}
+		
+		/*
+		 * Hide enrolled host group tests
+		 */
+		@Test (groups={"hideAlreadyEnrolledGroupsTests"}, dataProvider="getHideAlreadyEnrolledGroupsTestObjects")	
+		public void testHideAlreadyEnrolledGroups (String testName) throws Exception {
+			sahiTasks.navigateTo(System.getProperty("ipa.server.url")+hostgroupPage, true);
+			String parent = "engineering";
+			String qechild1 = "1qe";
+			String qechild2 = "2qe";
+			String devchild1 = "1dev";
+			String devchild2 = "2dev";
+			
+			String [] hostgroups = {parent, qechild1, qechild2, devchild1, devchild2};
+			String [] enrolled = {qechild1, devchild1};
+			
+			for (String hostgroup : hostgroups){
+				HostgroupTasks.addHostGroup(sahiTasks, hostgroup, hostgroup, "Add");
+			}
+			HostgroupTasks.addMembers(sahiTasks, parent, "hostgroup", enrolled, "Enroll");
+			
+			HostgroupTasks.hideAlreadyEnrolled(sahiTasks, parent, "hostgroup", qechild1, "YES", "qe");
+			
+			HostgroupTasks.hideAlreadyEnrolled(sahiTasks, parent, "hostgroup", devchild1, "YES", "dev");
+			
+			HostgroupTasks.hideAlreadyEnrolled(sahiTasks, parent, "hostgroup", qechild1, "NO", "qe");
+			
+			HostgroupTasks.hideAlreadyEnrolled(sahiTasks, parent, "hostgroup", qechild1, "NO", "dev");
+			
+			//clean up
+			HostgroupTasks.deleteHostgroup(sahiTasks, hostgroups);
+	}
+		
+		/*
+		 * Hide enrolled host tests
+		 */
+		@Test (groups={"hideAlreadyEnrolledHostsTests"}, dataProvider="getHideAlreadyEnrolledHostsTestObjects")	
+		public void testHideAlreadyEnrolledHosts (String testName) throws Exception {
+			sahiTasks.navigateTo(System.getProperty("ipa.server.url")+hostgroupPage, true);
+			String groupname = "application servers";
+			String devappserver = "appserver_dev." + domain;
+			String devwebserver = "webserver_dev." + domain;
+			String qeappserver = "appserver_qe." + domain;
+			String qewebserver = "webserver_qe." + domain;
+			String [] hostnames = {devappserver, devwebserver, qeappserver, qewebserver};
+			
+			HostgroupTasks.addHostGroup(sahiTasks, groupname, groupname, "Add");
+			
+			sahiTasks.navigateTo(System.getProperty("ipa.server.url")+hostPage, true);
+			for (String hostname : hostnames){
+				HostTasks.addHost(sahiTasks, hostname, "");
+			}
+		
+			sahiTasks.navigateTo(System.getProperty("ipa.server.url")+hostgroupPage, true);
+			String [] enrolled = {devappserver, qeappserver};
+			HostgroupTasks.addMembers(sahiTasks, groupname, "host", enrolled, "Enroll");
+			
+			HostgroupTasks.hideAlreadyEnrolled(sahiTasks, groupname, "host", devappserver, "YES", "dev");
+			
+			HostgroupTasks.hideAlreadyEnrolled(sahiTasks, groupname, "host", qeappserver, "YES", "qe");
+			
+			HostgroupTasks.hideAlreadyEnrolled(sahiTasks, groupname, "host", devappserver, "NO", "dev");
+			
+			HostgroupTasks.hideAlreadyEnrolled(sahiTasks, groupname, "host", qeappserver, "NO", "qe");
+			
+			//clean up
+			HostgroupTasks.deleteHostgroup(sahiTasks, groupname, "Delete");
+			
+			sahiTasks.navigateTo(System.getProperty("ipa.server.url")+hostgroupPage, true);
+			HostTasks.deleteHost(sahiTasks, hostnames);
 	}
 
 /*******************************************************
@@ -441,6 +510,36 @@ public class HostgroupTests extends SahiTestScript{
 	
 		//										testname					
 		ll.add(Arrays.asList(new Object[]{ 		"host_memberof" } ));
+		return ll;	
+	}
+	
+	/*
+	 * Data to be used when verifying hide already enrolled host groups
+	 */
+	@DataProvider(name="getHideAlreadyEnrolledGroupsTestObjects")
+	public Object[][] getHideAlreadyEnrolledGroupsTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createHideAlreadyEnrolledGroupsTestObjects());
+	}
+	protected List<List<Object>> createHideAlreadyEnrolledGroupsTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+	
+		//										testname					
+		ll.add(Arrays.asList(new Object[]{ 		"hide_enrolled_hostgroups" } ));
+		return ll;	
+	}
+	
+	/*
+	 * Data to be used when verifying hide already enrolled hosts
+	 */
+	@DataProvider(name="getHideAlreadyEnrolledHostsTestObjects")
+	public Object[][] getHideAlreadyEnrolledHostsTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createHideAlreadyEnrolledHostsTestObjects());
+	}
+	protected List<List<Object>> createHideAlreadyEnrolledHostsTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+	
+		//										testname					
+		ll.add(Arrays.asList(new Object[]{ 		"hide_enrolled_hosts" } ));
 		return ll;	
 	}
 }
