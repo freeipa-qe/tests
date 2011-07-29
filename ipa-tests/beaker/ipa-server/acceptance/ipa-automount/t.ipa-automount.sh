@@ -851,7 +851,7 @@ rlPhaseStartTest "automountmap_add_008: ipa automountmap-add-indirect LOCATION M
 
         rlRun "ipa -d automountmap-add-indirect pune punechild.map --mount=/usr/share/man --parentmap=pune.map --all --raw > $TmpDir/automountmap_add_008.out"
 	rlAssertGrep "dn: automountmapname=punechild.map,cn=pune,cn=automount,$basedn" "$TmpDir/automountmap_add_008.out"
-	rlAssertGrep "Map: punechild.map" "$TmpDir/automountmap_add_008.out"
+	rlAssertGrep "automountmapname: punechild.map" "$TmpDir/automountmap_add_008.out"
 	rlAssertGrep "objectclass: automountmap" "$TmpDir/automountmap_add_008.out"
 	rlAssertGrep "objectclass: top" "$TmpDir/automountmap_add_008.out"
 
@@ -937,7 +937,7 @@ automountmap_find_005() {
 
 rlPhaseStartTest "automountmap_find_005: ipa automountmap-del AUTOMOUNTLOCATION MAP --all --raw --sizelimit"
 
-	rlRun "ipa automountmap-find pune --map=pune.map --all --raw --sizelimit=2 > $TmpDir/automountmap_find_005.out 2>&1"
+	rlRun "ipa automountmap-find pune --all --raw --sizelimit=2 > $TmpDir/automountmap_find_005.out 2>&1"
 
         rlAssertGrep "2 automount maps matched" "$TmpDir/automountmap_find_005.out"
         rlAssertGrep "dn: automountmapname=auto.direct,cn=pune,cn=automount,$basedn" "$TmpDir/automountmap_find_005.out"
@@ -952,7 +952,7 @@ rlPhaseStartTest "automountmap_find_005: ipa automountmap-del AUTOMOUNTLOCATION 
 
 	rlRun "cat $TmpDir/automountmap_find_005.out"
 
-	rlRun "ipa automountmap-find pune --map=pune.map --all --raw --sizelimit=3 > $TmpDir/automountmap_find_005.out 2>&1"
+	rlRun "ipa automountmap-find pune --all --raw --sizelimit=3 > $TmpDir/automountmap_find_005.out 2>&1"
 
 	rlAssertGrep "3 automount maps matched" "$TmpDir/automountmap_find_005.out"
         rlAssertGrep "dn: automountmapname=auto.direct,cn=pune,cn=automount,$basedn" "$TmpDir/automountmap_find_005.out"
