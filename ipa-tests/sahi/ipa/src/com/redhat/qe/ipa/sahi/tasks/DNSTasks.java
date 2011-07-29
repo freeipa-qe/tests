@@ -1,14 +1,25 @@
 package com.redhat.qe.ipa.sahi.tasks;
 
-import java.util.logging.Logger;
 import com.redhat.qe.ipa.sahi.tasks.SahiTasks;
-import com.thoughtworks.selenium.Wait;
+
 
 
 public class DNSTasks {
-	private static Logger log = Logger.getLogger(DNSTasks.class.getName());
-	public static String frealm = "testrelm";
-	public static String rrealm = "16.10.in-addr.arpa.";
+
+	/*
+	 * Add DNS forward address for a host
+	 * @param sahiTasks 
+	 * @param hostname - hostname
+	 * @param ipadr -  ipaddress
+	 */
+	public static void addRecord(SahiTasks sahiTasks, String zone, String name, String type, String data) {
+		sahiTasks.link(zone).click();
+		sahiTasks.button("Add").click();
+		sahiTasks.textbox("idnsname").setValue(name);
+		sahiTasks.select("dns-record-type").choose(type);
+		sahiTasks.textarea("record_data").setValue(data);
+		sahiTasks.button("Add").click();
+	}
 	
 	/*
 	 * Add DNS forward address for a host
@@ -16,40 +27,18 @@ public class DNSTasks {
 	 * @param hostname - hostname
 	 * @param ipadr -  ipaddress
 	 */
-	public static void addArecord(SahiTasks sahiTasks, String hostname, String ipadr) {
-		sahiTasks.link(frealm).click();
-		sahiTasks.button("Add").click();
-		sahiTasks.textbox(3).near(sahiTasks.label("Record name")).setValue(hostname);
-		sahiTasks.select("dns-record-type").choose("A");
-		sahiTasks.textarea(0).setValue(ipadr);
-		sahiTasks.button("Add").click();
-	}
-	
-	/*
-	 * Add DNS reverse address for a host
-	 * @param sahiTasks 
-	 * @param hostname - hostname
-	 * @param ptr -  ptr record value
-	 */
-	public static void addPTRrecord(SahiTasks sahiTasks, String hostname, String ptr) {
-		sahiTasks.link(frealm).click();
-		sahiTasks.button("Add").click();
-		sahiTasks.textbox(3).near(sahiTasks.label("Record name")).setValue(hostname);
-		sahiTasks.select("dns-record-type").choose("PTR");
-		sahiTasks.textarea(0).setValue(ptr);
-		sahiTasks.button("Add").click();
-	}
-	
-	/*
-	 * Delete DNS forward address for a host
-	 * @param sahiTasks 
-	 * @param hostname - hostname
-	 */
-	public static void deleteArecord(SahiTasks sahiTasks, String hostname ) {
-		sahiTasks.link(frealm).click();
-		sahiTasks.checkbox(hostname).click();
-		sahiTasks.link("Delete").click();
-		sahiTasks.button("Delete").click();
+	public static void verifyRecord(SahiTasks sahiTasks, String zone, String name, String type, String data, String exists) {
+		sahiTasks.link(zone).click();
+		if (exists == "YES"){
+			com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(name).exists(), "Verify record " + name + " of type " + type + " exists");
+			sahiTasks.link(name).click();
+			com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox(type).value(), data, "Verify record " + name + " has record type " + type + " with a value of " + data);
+			sahiTasks.link("dnszone").in(sahiTasks.div("content")).click();
+		}
+		else {
+			com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(name).exists(), "Verify record " + name + " of type " + type + " does NOT exists");
+		}		
+		sahiTasks.link("DNS Zones").in(sahiTasks.div("content")).click();
 	}
 	
 	/*
@@ -57,9 +46,9 @@ public class DNSTasks {
 	 * @param sahiTasks 
 	 * @param ptr - ptr
 	 */
-	public static void deletePTRrecord(SahiTasks sahiTasks, String ptr ) {
-		sahiTasks.link(rrealm).click();
-		sahiTasks.checkbox(ptr).click();
+	public static void deleteRecord(SahiTasks sahiTasks, String zone, String name) {
+		sahiTasks.link(zone).click();
+		sahiTasks.checkbox(name).click();
 		sahiTasks.link("Delete").click();
 		sahiTasks.button("Delete").click();
 	}
