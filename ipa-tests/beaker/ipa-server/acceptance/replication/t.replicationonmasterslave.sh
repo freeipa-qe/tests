@@ -367,6 +367,7 @@ add_objects()
 slave_objects_add()
 {
 	add_slave_user
+	add_slave_group
 }
 
 check_objects()
@@ -439,12 +440,14 @@ check_updated_objects()
 
 slave_update_objects()
 {
-	slave_modify_user
+	modify_slave_user
+	modify_slave_group
 }
 
 check_updated_slave_objects()
 {
 	check_slave_modifieduser
+	check_slave_modifiedgroup
 }
 
 delete_objects()
@@ -473,6 +476,7 @@ delete_objects()
 delete_slave_objects()
 {
 	delete_slave_user
+	delete_slave_group
 }
 
 check_deletedobjects()

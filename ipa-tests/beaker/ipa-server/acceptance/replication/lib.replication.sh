@@ -163,7 +163,7 @@ modify_newuser()
 	rlPhaseEnd
 }
 
-slave_modify_user()
+modify_slave_user()
 {
 	rlPhaseStartTest "modify new user"  
 		# add new manager user
@@ -303,11 +303,20 @@ add_newgroup()
 	rlPhaseEnd
 }
 
+add_slave_group()
+{
+	rlPhaseStartTest "add new group"
+		rlRun "ipa group-add --desc=$desc --gid=$slaveGid $slaveGroupName" 0 "Add a new group"
+		rlRun "ipa group-add-member --users=$groupMember1,$groupMember2 --groups=$groupName_nonposix $slaveGroupName" 0 "add members to this new group on the slave"
+	rlPhaseEnd
+}
+
 check_newgroup()
 {
 	rlPhaseStartTest "check new group"
 		rlRun "verifyGroupAttr $groupName \"dn\" $dn" 0 "Verify group's dn"
 		rlRun "verifyGroupAttr $groupName \"Group name\" $groupName" 0 "Verify group's name"
+		rlRun "verifyGroupAttr $slaveGroupName \"Group name\" $slaveGroupName" 0 "Verify group's name"
 		rlRun "verifyGroupAttr $groupName \"Description\" $desc" 0 "Verify group's description"
 		if [ "$1" == "nonposix" ] ; then 
 		    # should not have a GID
@@ -316,6 +325,7 @@ check_newgroup()
 		   rlRun "verifyGroupAttr $groupName \"GID\" $gid" 0 "Verify group's gid"
 		fi
 		rlRun "verifyGroupAttr $groupName \"Member users\" \"$groupMember1, $groupMember2\"" 0 "Verify group's user members"
+		rlRun "verifyGroupAttr $slaveGroupName \"Member users\" \"$groupMember1, $groupMember2\"" 0 "Verify group's user members"
 		rlRun "verifyGroupAttr $groupName \"Member groups\" $groupName_nonposix" 0 "Verify group's group members"
 	rlPhaseEnd
 }
@@ -328,20 +338,45 @@ modify_newgroup()
 	rlPhaseEnd
 }
 
+modify_slave_group()
+{
+	rlPhaseStartTest "modify group added on the slave"
+		 rlRun "ipa group-mod $slaveGroupName --desc=$desc_updated --rename=$slave_groupName_updated" 0 "Modify the group"
+		 rlRun "ipa group-remove-member $slave_groupName_updated --users=$groupMember1_updated --groups=$group_nonposix_updated" 0 "remove members from this group"
+	rlPhaseEnd
+}
+
 check_modifiedgroup()
 {
 	rlPhaseStartTest "check modified group"
-		rlRun "verifyGroupAttr $groupName_updated \"dn\" $dn_updated" 0 "Verify group's dn"
+		#rlRun "verifyGroupAttr $groupName_updated \"dn\" $dn_updated" 0 "Verify group's dn"
 		rlRun "verifyGroupAttr $groupName_updated \"Group name\" $groupName_updated" 0 "Verify group's name"
 		rlRun "verifyGroupAttr $groupName_updated \"Description\" $desc_updated" 0 "Verify group's description"
 		rlRun "verifyGroupAttr $groupName_updated \"Member users\" $groupMember2_updated" 0 "Verify group's user members"
 	rlPhaseEnd
 }
 
+check_slave_modifiedgroup()
+{
+	rlPhaseStartTest "check group modifed on slave"
+		#rlRun "verifyGroupAttr $slave_groupName_updated \"dn\" $slave_dn_updated" 0 "Verify group's dn"
+		rlRun "verifyGroupAttr $slave_groupName_updated \"Group name\" $groupName_updated" 0 "Verify group's name"
+		rlRun "verifyGroupAttr $slave_groupName_updated \"Description\" $desc_updated" 0 "Verify group's description"
+		rlRun "verifyGroupAttr $slave_groupName_updated \"Member users\" $groupMember2_updated" 0 "Verify group's user members"
+	rlPhaseEnd
+}
+
 delete_group()
 {
 	rlPhaseStartTest "delete group"
-  rlRun "ipa group-del $groupName_updated" 0 "Deleted group"
+		rlRun "ipa group-del $groupName_updated" 0 "Deleted group"
+	rlPhaseEnd
+}
+
+delete_slave_objects()
+{
+	rlPhaseStartTest "delete group"
+		rlRun "ipa group-del $slave_groupName_updated" 0 "Deleted group"
 	rlPhaseEnd
 }
 
@@ -350,6 +385,11 @@ check_deletedgroup()
 	rlPhaseStartTest "check deleted group"
 		command="ipa group-show $groupName_updated"
 		expmsg="ipa: ERROR: $groupName_updated: group not found"
+		rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify error when checking for deleted group"
+	rlPhaseEnd
+	rlPhaseStartTest "check deleted group from slave"
+		command="ipa group-show $slave_groupName_updated"
+		expmsg="ipa: ERROR: $slave_groupName_updated: group not found"
 		rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify error when checking for deleted group"
 	rlPhaseEnd
 }
