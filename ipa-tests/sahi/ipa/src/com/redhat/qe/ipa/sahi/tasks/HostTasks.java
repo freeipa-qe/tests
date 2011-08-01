@@ -296,6 +296,22 @@ public class HostTasks {
 	}
 	
 	/*
+	 * Delete the host.
+	 * @param sahiTasks
+	 * @param fqdn - the fqdn of the host to be deleted
+	 * @param updatedns - YES
+	 */
+	public static void deleteHost(SahiTasks sahiTasks, String fqdn, String updatedns) {
+		String lowerdn = fqdn.toLowerCase();
+		sahiTasks.checkbox(lowerdn).click();
+		sahiTasks.link("Delete").click();
+		if (updatedns == "YES"){
+			sahiTasks.checkbox("updatedns").click();
+		}
+		sahiTasks.button("Delete").click();
+	}
+	
+	/*
 	 * Delete multiple hosts.
 	 * @param sahiTasks
 	 * @param hostnames - the array of hostnames to delete
@@ -306,6 +322,23 @@ public class HostTasks {
 		}
 		sahiTasks.link("Delete").click();
 		sahiTasks.button("Delete").click();
+	}
+	
+	/*
+	 * Verify DNS host link
+	 * @param sahiTasks
+	 * @param hostname
+	 * @param exists - YES if you expect the link to exist otherwise NO
+	 */
+	public static void verifyHostDNSLink(SahiTasks sahiTasks, String hostname, String exists) {
+		sahiTasks.link(hostname).click();
+		if (exists == "YES"){
+			com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(hostname).exists(), "Host " + hostname + " link to DNS exists");
+		}
+		else {
+			com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(hostname).exists(), "Host " + hostname + " link to DNS does NOT exists");
+		}
+		sahiTasks.link("Hosts").in(sahiTasks.div("content")).click();
 	}
 	
 	/*
