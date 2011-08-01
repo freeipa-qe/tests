@@ -785,6 +785,8 @@ rlPhaseStartTest "Bug 719009: sudorule-add-runasuser does not match valid users 
         rlAssertNotGrep "is not allowed to execute" "$sudoout"
 
         rlRun "rm -fr $sudoout"
+	rlRun "cat $sudoout"
+        rlRun "ipa sudorule-remove-runasuser sudorule1 --users=ALL"
 
 rlPhaseEnd
 }
@@ -794,6 +796,8 @@ sudorule-remove-runasuser_func005() {
 rlPhaseStartTest "sudorule-remove-runasuser_func005: Removing the special value ALL from runasusers and verifying from sudo client."
 
         rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+        rlRun "ipa sudorule-add-runasuser sudorule1 --users=ALL"
+
         rlRun "ipa sudorule-remove-runasuser sudorule1 --users=ALL"
 
         rlRun "sudorun_withusr user1"

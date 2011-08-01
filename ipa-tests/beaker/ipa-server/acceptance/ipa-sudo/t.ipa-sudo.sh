@@ -978,7 +978,7 @@ rlPhaseStartTest "sudorule-remove-host_003: Remove multiple hosts from sudorule.
 	rlLog "Verifying https://bugzilla.redhat.com/show_bug.cgi?id=709665"
 	rlAssertNotGrep "test2.example.com" "$TmpDir/sudorule-remove-host_003.txt" 1
 	rlAssertNotGrep "test3.example2.com" "$TmpDir/sudorule-remove-host_003.txt" 1
-	rlAssertGrep "test5.example.com" "$TmpDir/sudorule-remove-host_003.txt" 
+	rlAssertGrep "test5.example" "$TmpDir/sudorule-remove-host_003.txt" 
 	rlAssertGrep "test4.example.com" "$TmpDir/sudorule-remove-host_003.txt" 
 	rlAssertGrep "Host Groups: hostgroup1, hostgroup2, hostgroup3" "$TmpDir/sudorule-remove-host_003.txt"
 	rlAssertGrep "Number of members removed 2" "$TmpDir/sudorule-remove-host_003.txt"
