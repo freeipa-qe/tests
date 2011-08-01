@@ -168,7 +168,7 @@ automountmap_show
 automountkey_add
 automountkey_mod
 automountkey_find
-automountkey_show
+#automountkey_show
 automount_location_del
 automountkey_del
 automountmap_del
