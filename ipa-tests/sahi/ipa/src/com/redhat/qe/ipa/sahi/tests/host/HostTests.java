@@ -19,11 +19,12 @@ import com.redhat.qe.ipa.sahi.tasks.HostTasks;
 public class HostTests extends SahiTestScript{
 	public static SahiTasks sahiTasks = null;	
 	private String hostPage = "/ipa/ui/#identity=host&navigation=identity";
-	private String dnsPage = "/ipa/ui/#identity=dnszone&navigation=policy";
+	private String dnsPage = "/ipa/ui/#dns=dnszone&identity=dns&navigation=identity";
 	private String domain = System.getProperty("ipa.server.domain");
 	private String csr = "MIIBcDCB2gIBADAxMRMwEQYDVQQKEwpRRS5MQUIuSVBBMRowGAYDVQQDExFteWhv"+ "\n" + "c3QucWUubGFiLmlwYTCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEA4lXS4N0r"+ "\n" + "lvJOwhv7eZdWLoaH5BwNoNgBObTAde4MYRejx75f3Ovo+8WVChRs/xDemDPGfWj0"+ "\n" + "9BW4BDXpX0Vaa3N4akIfKoxDnYckZlifuHxbyrZB9XX8eAZDMwtBzi30elEp5Cf5"+ "\n" + "SWMJ9WBOoXu/YCC58aegXKJjPXLlzvrIoEsCAwEAAaAAMA0GCSqGSIb3DQEBBQUA"+ "\n" + "A4GBABK4TVlwNx4LzQvX/rgfqWTv33iIgkPFY4TsXiR2XL74HAhDDk5JYJM3DGHP"+ "\n" + "4Si7E/vX6ea6IZuNAul0koIJtT2etUo8oebOKQPFb1F1AY+h6sW/QC3DH20hT85H"+ "\n" + "KhPLOBcjOSY/T9M4eu5xsjVtzqZMJCdFKFRg9pLBUrCZhu3Z";
 	private String badcsr = "MIIBcDCB2gIBADAxMRMwEQYDVQQKEwpRRS5MQUIuSVBBMRowGAYDVQQDExFteWdhv"+ "\n" + "c3QucWUubGFiLmlYTCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEA4lXS4N0r"+ "\n" + "lvJOwhv7eZdWLoaH5BwNoNgBObTAde4MYRejx75f3Ovo+8WVChRs/xDemDPGfWj0"+ "\n" + "9BW4BDXpX0Vaa3N4akIfKoxDnYckZlifuHxbyrZB9XX8eAZDMwtBzi30elEp5Cf5"+ "\n" + "SWMJ9WBOoXu/YIFOCC58aegXKJjPXLlzvrIoEsCAwEAAaAAMA0GCSqGSIb3DQEBBQUA"+ "\n" + "A4GBABK4TVlwNx4LzQvX/rgfqWTv33iIgkPFY4TLsXiR2XL74HAhDDk5JYJM3DGHP"+ "\n" + "4Si7E/vX6ea6IZuNAul0koIJtT2etUo8oebOKQPFb1F1AY+h6sW/QC3DH20hT85H"+ "\n" + "KhPLOBcjOSY/T9M4u5xsjVtzqZMJCdFKFRg9pLBUrCZhu3Z";
 	private String wronghostcsr = "MIIBbDCB1gIBADAtMRMwEQYDVQQKEwpRRS5MQUIuSVBBMRYwFAYDVQQDEw1ob3N0"+ "\n" +"LnRlc3RyZWxtMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDvu8wcVthKZCa/"+ "\n" +"KZ30fKPC1jMZ+PUXE/xJNfKVKG9olVSswk4RG8AD0yCApMJ5u6yXU4pT6RbxVHFg"+ "\n" +"X4xA1e006HIdOKrw5pcKhndMyc21rFaUVb66P8z7FXqiVvx3imgZrbM6rr1rfXvH"+ "\n" +"xTeTwL20Lor5Ym9ypajxGTU7IDaXMwIDAQABoAAwDQYJKoZIhvcNAQEFBQADgYEA"+ "\n" +"1IwWyrFEkXuT1vbiDU1urfSazFObEnMUR4vvIraEdhKqJySq9gB/F3j7h+EomKna"+ "\n" +"+G55hsJN7Ct0dhHks0MVIydCnSj364n2vLtfvidn1OgTYOqg4bWTmIMa/ejyV6pX"+ "\n" +"+tYey0wVg+uXyqSPZr/ZJZtmqkKIzCkzrMpxYDlUNk0=";
+	private String reversezone = System.getProperty("ipa.server.reversezone");
 	
 	@BeforeClass (groups={"init"}, description="Initialize app for this test suite run", alwaysRun=true, dependsOnGroups="setup")
 	public void initialize() throws CloneNotSupportedException {	
@@ -163,9 +164,10 @@ public class HostTests extends SahiTestScript{
 		//modify the host
 		HostTasks.modifyHostOTP(sahiTasks, hostname, otp);
 		
+		//TODO need to verify otp is set when bug is fixed that shows there is an existing OTP
 		//verify all host field
-		sahiTasks.navigateTo(System.getProperty("ipa.server.url")+hostPage, true);
-		HostTasks.verifyHostField(sahiTasks, hostname, "otp", otp);
+		//sahiTasks.navigateTo(System.getProperty("ipa.server.url")+hostPage, true);
+		//HostTasks.verifyHostField(sahiTasks, hostname, "otp", otp);
 		
 		sahiTasks.navigateTo(System.getProperty("ipa.server.url")+hostPage, true);
 		HostTasks.deleteHost(sahiTasks, hostname);
@@ -329,13 +331,51 @@ public class HostTests extends SahiTestScript{
 			// check if host was added , if it was delete it
 			if (sahiTasks.exists(sahiTasks.link(hostname))) {
 				HostTasks.deleteHost(sahiTasks, hostname);
-				String[] components = hostname.split ("\\.");
-				String shortname = components[0];
-			
-				sahiTasks.navigateTo(System.getProperty("ipa.server.url")+dnsPage, true);
-				DNSTasks.deleteArecord(sahiTasks, shortname);
 			}
 		}
+	}
+	
+	/*
+	 * Host Add DNS tests
+	 */
+	@Test (groups={"hostAddDNSTests"}, dataProvider="getHostAddDNSTestObjects")	
+	public void testHostAddDNS(String testName, String hostname, String ipend, String updatedns ) throws Exception {
+		String [] dcs = reversezone.split("\\.");
+		String ipprefix = dcs[2] + "." + dcs[1] + "." + dcs[0] + ".";
+		String ipaddr = ipprefix + ipend;
+		String fqdn = hostname + "." + domain;
+		
+		// add host
+		sahiTasks.navigateTo(System.getProperty("ipa.server.url")+hostPage, true);
+		HostTasks.addHost(sahiTasks, fqdn, ipaddr);
+		
+		// verify host was added
+		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(fqdn).exists(), "Added host " + fqdn + "  successfully");
+		
+		// verify host link to dns and dns records
+		HostTasks.verifyHostDNSLink(sahiTasks, fqdn, "YES");
+		sahiTasks.navigateTo(System.getProperty("ipa.server.url")+dnsPage, true);
+		DNSTasks.verifyRecord(sahiTasks, domain, hostname, "arecord", ipaddr, "YES");
+		DNSTasks.verifyRecord(sahiTasks, reversezone, ipend, "ptrrecord", fqdn + ".", "YES");
+		
+		// deleted host
+		sahiTasks.navigateTo(System.getProperty("ipa.server.url")+hostPage, true);
+		HostTasks.deleteHost(sahiTasks, fqdn, updatedns);
+		
+		if( updatedns == "YES"){
+			sahiTasks.navigateTo(System.getProperty("ipa.server.url")+dnsPage, true);
+			DNSTasks.verifyRecord(sahiTasks, domain, hostname, "arecord", ipaddr, "NO");
+			DNSTasks.verifyRecord(sahiTasks, reversezone, ipend, "ptrrecord", fqdn + ".", "NO");
+		}
+		else{
+			sahiTasks.navigateTo(System.getProperty("ipa.server.url")+dnsPage, true);
+			DNSTasks.verifyRecord(sahiTasks, domain, hostname, "arecord", ipaddr, "YES");
+			DNSTasks.verifyRecord(sahiTasks, reversezone, ipend, "ptrrecord", fqdn + ".", "YES");
+			DNSTasks.deleteRecord(sahiTasks, domain, hostname);
+			DNSTasks.deleteRecord(sahiTasks, reversezone, ipend);
+		}
+		
+		sahiTasks.navigateTo(System.getProperty("ipa.server.url")+hostPage, true);
 	}
 	
 	
@@ -567,9 +607,26 @@ public class HostTests extends SahiTestScript{
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
         //										testname					hostname        		csr   			expectedError
-		ll.add(Arrays.asList(new Object[]{ "csr_blank",				"myhost.qe.lab.ipa", 		"",				"Certificate operation cannot be completed: Failure decoding Certificate Signing Request" } ));
+		ll.add(Arrays.asList(new Object[]{ "csr_blank",					"myhost.qe.lab.ipa", 		"",				"Certificate operation cannot be completed: Failure decoding Certificate Signing Request" } ));
 		ll.add(Arrays.asList(new Object[]{ "csr_invalid_format",		"myhost.qe.lab.ipa", 		badcsr,			"Base64 decoding failed: Incorrect padding"	} ));
 		ll.add(Arrays.asList(new Object[]{ "csr_wrong_host",			"myhost.qe.lab.ipa", 		wronghostcsr,	"Insufficient access: hostname in subject of request 'host.testrelm' does not match principal hostname 'myhost.qe.lab.ipa'"	} ));	
+		return ll;	
+	}
+	
+	/*
+	 * Data to be used for host DNS tests 
+	 */
+	@DataProvider(name="getHostAddDNSTests")
+	public Object[][] getHostAddDNSTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createHostAddDNSTestObjects());
+	}
+	protected List<List<Object>> createHostAddDNSTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname						hostname		 ip address end		updatedns
+		ll.add(Arrays.asList(new Object[]{ "host_add_del_updatedns",			"myhost",  		"99",			 	"YES" } ));
+		ll.add(Arrays.asList(new Object[]{ "host_add_del_noupdatedns",			"myhost",  		"99",				"NO" } ));
+		        
 		return ll;	
 	}
 }
