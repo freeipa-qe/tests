@@ -980,7 +980,7 @@ automountmap_show_001() {
 
 rlPhaseStartTest "automountmap_show_001: ipa automountmap-show LOCATION MAP"
 
-        # Setup for automountmap-show.
+        # Setup for automountmap-show
 	rlRun "ipa automountlocation-add pune"
 	rlRun "ipa automountmap-add pune pune.map --desc=\"map file for pune location\""
 
