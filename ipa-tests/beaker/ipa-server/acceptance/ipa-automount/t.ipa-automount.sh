@@ -982,7 +982,7 @@ rlPhaseStartTest "automountmap_show_001: ipa automountmap-show LOCATION MAP"
 
         # Setup for automountmap-show.
 	rlRun "ipa automountlocation-add pune"
-	rlRun "ipa automountmap-add pune.map --desc=\"map file for pune location\""
+	rlRun "ipa automountmap-add pune pune.map --desc=\"map file for pune location\""
 
 	rlRun "ipa automountmap-show pune pune.map > $TmpDir/automountmap_show_001.out 2>&1"
 	rlAssertGrep "Map: pune.map" "$TmpDir/automountmap_show_001.out"
