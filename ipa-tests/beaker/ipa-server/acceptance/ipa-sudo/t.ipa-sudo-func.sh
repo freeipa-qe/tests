@@ -226,6 +226,32 @@ sudorule-add-allow-command_func001() {
 rlPhaseStartTest "sudorule-add-allow-command_func001: Allowed commands available from sudo client"
 
 #set up for fcuntional tests
+sudorun_withusr() {
+cat > $TmpDir/sudo_list.exp << EOF
+#!/usr/bin/expect -f
+
+set timeout 30
+set send_slow {1 .1}
+match_max 100000
+spawn ssh -o StrictHostKeyChecking=no -l $1 $MASTER
+expect "*: "
+send -s "$userpw\r"
+expect "*$ "
+send -s "sudo -l \r"
+expect "$1: "
+send -s "$userpw\r"
+expect "*$ "
+send -s "sudo -u user2 /bin/date > $sudoout 2>&1 \r"
+expect "$1: "
+send -s "$userpw\r"
+expect eof
+EOF
+
+chmod 755 $TmpDir/sudo_list.exp
+cat $TmpDir/sudo_list.exp
+$TmpDir/sudo_list.exp
+cat $sudoout
+}
 
 sudo_list() {
 
@@ -753,33 +779,6 @@ rlPhaseStartTest "Bug 719009: sudorule-add-runasuser does not match valid users 
 
 	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 	rlRun "ipa sudorule-add-runasuser sudorule1 --users=ALL"
-
-sudorun_withusr() {
-cat > $TmpDir/sudo_list.exp << EOF
-#!/usr/bin/expect -f
-
-set timeout 30
-set send_slow {1 .1}
-match_max 100000
-spawn ssh -o StrictHostKeyChecking=no -l $1 $MASTER
-expect "*: "
-send -s "$userpw\r"
-expect "*$ "
-send -s "sudo -l \r"
-expect "$1: "
-send -s "$userpw\r"
-expect "*$ "
-send -s "sudo -u user2 /bin/date > $sudoout 2>&1 \r"
-expect "$1: "
-send -s "$userpw\r"
-expect eof
-EOF
-
-chmod 755 $TmpDir/sudo_list.exp
-cat $TmpDir/sudo_list.exp
-$TmpDir/sudo_list.exp
-cat $sudoout
-}
 
         rlRun "sudorun_withusr user1"
         rlAssertGrep "sudo: ldap sudoRunAsUser 'all' ... MATCH" "$sudoout"

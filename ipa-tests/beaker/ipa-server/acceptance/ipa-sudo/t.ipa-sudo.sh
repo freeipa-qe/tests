@@ -847,7 +847,7 @@ rlPhaseStartTest "sudorule-add-host_001: Add host help to sudorule."
 	rlAssertGrep "\--all              Retrieve and print all attributes from the server." "$TmpDir/sudorule-add-host_001.txt"
 	rlAssertGrep "\--raw              Print entries as stored on the server." "$TmpDir/sudorule-add-host_001.txt"
 	rlAssertGrep "\--hosts=LIST       comma-separated list of hosts to add" "$TmpDir/sudorule-add-host_001.txt"
-	rlAssertGrep "\--hostgroups=LIST  comma-separated list of host groups to add" "$TmpDir/sudorule-add-host_001.txt"
+	rlAssertGrep "\--hostgroups=LIST  comma-separated list of hostgroups to add" "$TmpDir/sudorule-add-host_001.txt"
 	rlRun "cat $TmpDir/sudorule-add-host_001.txt"
 
 rlPhaseEnd
@@ -945,7 +945,7 @@ rlPhaseStartTest "sudorule-remove-host_001: Remove host help to sudorule."
 	rlAssertGrep "\--all              Retrieve and print all attributes from the server." "$TmpDir/sudorule-remove-host_001.txt"
 	rlAssertGrep "\--raw              Print entries as stored on the server." "$TmpDir/sudorule-remove-host_001.txt"
 	rlAssertGrep "\--hosts=LIST       comma-separated list of hosts to remove" "$TmpDir/sudorule-remove-host_001.txt"
-	rlAssertGrep "\--hostgroups=LIST  comma-separated list of host groups to remove" "$TmpDir/sudorule-remove-host_001.txt"
+	rlAssertGrep "\--hostgroups=LIST  comma-separated list of hostgroups to remove" "$TmpDir/sudorule-remove-host_001.txt"
 	rlRun "cat $TmpDir/sudorule-remove-host_001.txt"
 
 rlPhaseEnd
@@ -978,7 +978,8 @@ rlPhaseStartTest "sudorule-remove-host_003: Remove multiple hosts from sudorule.
 	rlLog "Verifying https://bugzilla.redhat.com/show_bug.cgi?id=709665"
 	rlAssertNotGrep "test2.example.com" "$TmpDir/sudorule-remove-host_003.txt" 1
 	rlAssertNotGrep "test3.example2.com" "$TmpDir/sudorule-remove-host_003.txt" 1
-	rlAssertGrep "External host: test5.example, test4.example.com" "$TmpDir/sudorule-remove-host_003.txt" 
+	rlAssertGrep "test5.example.com" "$TmpDir/sudorule-remove-host_003.txt" 
+	rlAssertGrep "test4.example.com" "$TmpDir/sudorule-remove-host_003.txt" 
 	rlAssertGrep "Host Groups: hostgroup1, hostgroup2, hostgroup3" "$TmpDir/sudorule-remove-host_003.txt"
 	rlAssertGrep "Number of members removed 2" "$TmpDir/sudorule-remove-host_003.txt"
 	rlRun "cat $TmpDir/sudorule-remove-host_003.txt"
@@ -1346,7 +1347,7 @@ sudorule-remove-option_004() {
 rlPhaseStartTest "sudorule-remove-option_004: ipa sudorule-remove-option --sudooption=!authenticate"
 
         rlRun "ipa sudorule-remove-option sudorule1 --sudooption='!authenticate' > $TmpDir/sudorule-remove-option_004.txt 2>&1"
-        rlAssertGrep "Removed option '!authenticate' from Sudo rule \"sudorule1\"" "$TmpDir/sudorule-remove-option_004.txt"
+        rlAssertGrep "Removed option \"!authenticate\" from Sudo rule \"sudorule1\"" "$TmpDir/sudorule-remove-option_004.txt"
         rlRun "cat $TmpDir/sudorule-remove-option_004.txt"
 	rlRun "ipa sudorule-del sudorule1"
 
