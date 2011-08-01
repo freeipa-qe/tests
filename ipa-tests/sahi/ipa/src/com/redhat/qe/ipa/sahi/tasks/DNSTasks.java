@@ -51,6 +51,7 @@ public class DNSTasks {
 		sahiTasks.checkbox(name).click();
 		sahiTasks.link("Delete").click();
 		sahiTasks.button("Delete").click();
+		sahiTasks.link("DNS Zones").in(sahiTasks.div("content")).click();
 	}
 	
 }
