@@ -851,6 +851,8 @@ cat $sudoout
 	rlAssertNotGrep "is not allowed to execute" "$sudoout"
 
         rlRun "rm -fr $sudoout"
+	rlRun "cat $sudoout"
+        rlRun "ipa sudorule-remove-runasgroup sudorule1 --groups=ALL"
 
 rlPhaseEnd
 }
@@ -860,6 +862,7 @@ sudorule-remove-runasgroup_func001() {
 rlPhaseStartTest "sudorule-remove-runasgroup_func001: Removing RunAs group and verifying from sudo client."
 
         rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+	rlRun "ipa sudorule-add-runasgroup sudorule1 --groups=ALL"
 
         rlRun "ipa sudorule-remove-runasgroup sudorule1 --groups=ALL"
         rlRun "sudo_list user1"
