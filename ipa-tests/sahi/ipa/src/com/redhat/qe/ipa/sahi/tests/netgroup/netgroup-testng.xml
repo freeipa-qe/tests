@@ -1,0 +1,27 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+<suite name="IPANetgroupTestSuite">	
+	<test name="Net Group Tests">
+		<packages>
+		    <package name="com.redhat.qe.ipa.sahi.*" />
+		</packages>
+		<groups>
+			<run>
+			    <include name="setup" />
+			    <include name="init" />	  
+			    <include name="addNetGroupTests" />
+			    <include name="deleteNetGroupTests" />
+				<!--
+				<include name="teardown"/>
+				-->
+			</run>
+		</groups>
+		<classes>
+		    <class name="com.redhat.qe.ipa.sahi.tests.netgroup.NetgroupTests" />
+		</classes>
+	</test>
+	
+	<listeners>        
+  		<listener class-name="com.redhat.qe.auto.testng.TestNGListener" />	
+	</listeners>
+	
+</suite>
