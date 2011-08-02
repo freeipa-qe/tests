@@ -134,7 +134,7 @@ public class HostgroupTests extends SahiTestScript{
 	}
 	
 	/*
-	 * Add and edit host group settings
+	 * Host Members tests
 	 */
 	@Test (groups={"hostMembersTests"}, dataProvider="getHostMembersTestObjects")
 	public void testHostMembers(String testName) throws Exception {
