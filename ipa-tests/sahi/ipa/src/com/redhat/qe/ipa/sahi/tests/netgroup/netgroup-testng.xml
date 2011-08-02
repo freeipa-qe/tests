@@ -7,10 +7,15 @@
 		<groups>
 			<run>
 			    <include name="setup" />
-			    <include name="init" />	  
+			    <include name="init" />	
 			    <include name="addNetGroupTests" />
 			    <include name="deleteNetGroupTests" />
-				<!--
+			    <include name="addAndAddAnotherNetGroupTests" />
+			    <include name="deleteMultipleNetGroupTests" />
+			    <include name="addAndEditNetGroupSettingsTest" />
+			    <include name="netGroupHostMembersTests" />
+			    <include name="netGroupHostGroupMembersTests" />
+			    <!--
 				<include name="teardown"/>
 				-->
 			</run>
