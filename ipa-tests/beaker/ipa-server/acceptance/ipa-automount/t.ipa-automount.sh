@@ -1030,7 +1030,7 @@ automountkey_add_001() {
 rlPhaseStartTest "automountkey_add_001: ipa automountkey-add LOCATION MASTERMAP --key --info"
 
 	rlRun "ipa automountlocation-add baltimore"
-	rlRun "ipa automountmap-add auto.baltimore"
+	rlRun "ipa automountmap-add baltimore auto.baltimore"
 
 	# Create a new key for the auto.share map in location baltimore. This ties
 	# the map we previously created to auto.master.
@@ -1052,7 +1052,7 @@ automountkey_add_002() {
 rlPhaseStartTest "automountkey_add_002: ipa automountkey-add LOCATION MASTERMAP --key --info --all"
 
 	rlRun "ipa automountlocation-add baltimore"
-        rlRun "ipa automountmap-add auto.baltimore"
+        rlRun "ipa automountmap-add baltimore auto.baltimore"
 
         # Create a new key for the auto.share map in location baltimore. This ties
         # the map we previously created to auto.master.
@@ -1076,7 +1076,7 @@ automountkey_add_003() {
 rlPhaseStartTest "automountkey_add_003: ipa automountkey-add LOCATION MASTERMAP --key --info --all --raw"
 
         rlRun "ipa automountlocation-add baltimore"
-        rlRun "ipa automountmap-add auto.baltimore"
+        rlRun "ipa automountmap-add baltimore auto.baltimore"
 
         # Create a new key for the auto.share map in location baltimore. This ties
         # the map we previously created to auto.master.
@@ -1389,7 +1389,7 @@ rlPhaseStartTest "automount_location_del_002: ipa automountlocation-del LOCATION
 	rlRun "ipa automountlocation-del pune"
         rlRun "ldapsearch -LLL -x -h localhost  -b cn=pune,cn=automount,$basedn > $TmpDir/automount_location_del.out 2>&1" 32
         
-        rlAssertNotGrep "dn: cn=pune,cn=automount,dc=rhts,dc=eng,dc=brq,dc=redhat,dc=com" "$TmpDir/automount_location_del.out"
+        rlAssertNotGrep "dn: cn=pune,cn=automount,$basedn" "$TmpDir/automount_location_del.out"
         rlAssertNotGrep "dn: automountmapname=auto.master,cn=pune,cn=automount," "$TmpDir/automount_location_del.out"
         rlAssertNotGrep "automountMapName: auto.master" "$TmpDir/automount_location_del.out"
         rlAssertNotGrep "dn: automountmapname=auto.direct,cn=pune,cn=automount," "$TmpDir/automount_location_del.out"
