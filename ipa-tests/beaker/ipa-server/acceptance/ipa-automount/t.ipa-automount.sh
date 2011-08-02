@@ -998,7 +998,7 @@ automountmap_show_002() {
 rlPhaseStartTest "automountmap_show_002: ipa automountmap-show LOCATION MAP --all"
 
 	rlRun "ipa automountmap-show pune pune.map --all > $TmpDir/automountmap_show_002.out 2>&1"
-	rlAssertGrep "dn: automountmapname=pune4.map,cn=pune,cn=automount,$basedn" "$TmpDir/automountmap_show_002.out"
+	rlAssertGrep "dn: automountmapname=pune.map,cn=pune,cn=automount,$basedn" "$TmpDir/automountmap_show_002.out"
 	rlAssertGrep "Map: pune.map" "$TmpDir/automountmap_show_002.out"
 	rlAssertGrep "Description: map file for pune location" "$TmpDir/automountmap_show_002.out"
         rlAssertGrep "objectclass: automountmap, top" "$TmpDir/automountmap_show_002.out"
@@ -1013,7 +1013,7 @@ automountmap_show_003() {
 rlPhaseStartTest "automountmap_show_003: ipa automountmap-show LOCATION MAP --all --raw"
 
 	rlRun "ipa automountmap-show pune pune.map --all --raw > $TmpDir/automountmap_show_003.out 2>&1"
-        rlAssertGrep "dn: automountmapname=pune4.map,cn=pune,cn=automount,$basedn" "$TmpDir/automountmap_show_003.out"
+        rlAssertGrep "dn: automountmapname=pune.map,cn=pune,cn=automount,$basedn" "$TmpDir/automountmap_show_003.out"
         rlAssertGrep "automountmapname: pune.map" "$TmpDir/automountmap_show_003.out"
         rlAssertGrep "description: map file for pune location" "$TmpDir/automountmap_show_003.out"
         rlAssertGrep "objectclass: automountmap" "$TmpDir/automountmap_show_003.out"
