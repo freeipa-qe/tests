@@ -521,7 +521,6 @@ rlPhaseStartTest "sudorule-add-hostgrp_func001: Adding hostgroup and verifying f
 	rlRun "service sssd restart"
 	sleep 5
 	rlRun "getent netgroup hostgrp1"
-	rlRun "ipa netgroup-find --private"
 
 	rlRun "sudo_list user1"
 	rlAssertGrep "sudo: ldap sudoHost '+hostgrp1' ... MATCH" "$sudoout"

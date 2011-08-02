@@ -542,7 +542,7 @@ rlPhaseStartTest "sudorule_001: ipa sudorule help."
 	rlAssertGrep "sudorule-add-host              Add hosts and hostgroups affected by Sudo Rule." "$TmpDir/sudorule_001.txt"
 	rlAssertGrep "sudorule-add-option            Add an option to the Sudo rule." "$TmpDir/sudorule_001.txt"
 	rlAssertGrep "sudorule-add-runasgroup        Add group for Sudo to execute as." "$TmpDir/sudorule_001.txt"
-	rlAssertGrep "sudorule-add-runasuser         Add user for Sudo to execute as." "$TmpDir/sudorule_001.txt"
+	rlAssertGrep "sudorule-add-runasuser         Add users and groups for Sudo to execute as." "$TmpDir/sudorule_001.txt"
 	rlLog "Covers test https://bugzilla.redhat.com/show_bug.cgi?id=711705"
 	rlAssertGrep "sudorule-add-user              Add users and groups affected by Sudo Rule." "$TmpDir/sudorule_001.txt"
 	rlAssertGrep "sudorule-del                   Delete Sudo Rule." "$TmpDir/sudorule_001.txt"
@@ -555,7 +555,7 @@ rlPhaseStartTest "sudorule_001: ipa sudorule help."
 	rlAssertGrep "sudorule-remove-host           Remove hosts and hostgroups affected by Sudo Rule." "$TmpDir/sudorule_001.txt"
 	rlAssertGrep "sudorule-remove-option         Remove an option from Sudo rule." "$TmpDir/sudorule_001.txt"
 	rlAssertGrep "sudorule-remove-runasgroup     Remove group for Sudo to execute as." "$TmpDir/sudorule_001.txt"
-	rlAssertGrep "sudorule-remove-runasuser      Remove user for Sudo to execute as." "$TmpDir/sudorule_001.txt"
+	rlAssertGrep "sudorule-remove-runasuser      Remove users and groups for Sudo to execute as." "$TmpDir/sudorule_001.txt"
 	rlAssertGrep "sudorule-remove-user           Remove users and groups affected by Sudo Rule." "$TmpDir/sudorule_001.txt"
 	rlAssertGrep "sudorule-show                  Display Sudo Rule." "$TmpDir/sudorule_001.txt"
 	rlAssertGrep "uid=sudo,cn=sysaccounts,cn=etc,dc=example,dc=com" "$TmpDir/sudorule_001.txt"
@@ -725,6 +725,7 @@ rlPhaseStartTest "sudorule_add_009: ipa sudorule-add sudorule1 --desc=desc --use
         rlAssertGrep "objectclass: ipaassociation" "$TmpDir/sudorule_add_009.txt"
         rlAssertGrep "objectclass: ipasudorule" "$TmpDir/sudorule_add_009.txt"
         rlRun "cat $TmpDir/sudorule_add_009.txt"
+	rlRun "ipa sudorule-del sudorule1"
 
 rlPhaseEnd
 }
@@ -739,6 +740,7 @@ rlPhaseStartTest "sudorule-add-allow-command_001: ipa sudorule-add-allow-command
 	rlRun "ipa sudocmd-add /bin/df"
 	rlRun "ipa sudocmdgroup-add sudogrp1 --desc=\"group 1\""
 	rlRun "ipa sudocmdgroup-add sudogrp2 --desc=\"group 2\""
+	rlRun "ipa sudorule-add sudorule1 --desc=\"sudo rule 1\""
 
 	rlRun "ipa sudorule-add-allow-command sudorule1 --sudocmds=/bin/ls --sudocmdgroups=sudogrp1 > $TmpDir/sudorule-add-allow-command_001.txt 2>&1"
 	rlAssertGrep "Rule name: sudorule1" "$TmpDir/sudorule-add-allow-command_001.txt"
@@ -847,7 +849,7 @@ rlPhaseStartTest "sudorule-add-host_001: Add host help to sudorule."
 	rlAssertGrep "\--all              Retrieve and print all attributes from the server." "$TmpDir/sudorule-add-host_001.txt"
 	rlAssertGrep "\--raw              Print entries as stored on the server." "$TmpDir/sudorule-add-host_001.txt"
 	rlAssertGrep "\--hosts=LIST       comma-separated list of hosts to add" "$TmpDir/sudorule-add-host_001.txt"
-	rlAssertGrep "\--hostgroups=LIST  comma-separated list of hostgroups to add" "$TmpDir/sudorule-add-host_001.txt"
+	rlAssertGrep "\--hostgroups=LIST  comma-separated list of host groups to add" "$TmpDir/sudorule-add-host_001.txt"
 	rlRun "cat $TmpDir/sudorule-add-host_001.txt"
 
 rlPhaseEnd
@@ -945,7 +947,7 @@ rlPhaseStartTest "sudorule-remove-host_001: Remove host help to sudorule."
 	rlAssertGrep "\--all              Retrieve and print all attributes from the server." "$TmpDir/sudorule-remove-host_001.txt"
 	rlAssertGrep "\--raw              Print entries as stored on the server." "$TmpDir/sudorule-remove-host_001.txt"
 	rlAssertGrep "\--hosts=LIST       comma-separated list of hosts to remove" "$TmpDir/sudorule-remove-host_001.txt"
-	rlAssertGrep "\--hostgroups=LIST  comma-separated list of hostgroups to remove" "$TmpDir/sudorule-remove-host_001.txt"
+	rlAssertGrep "\--hostgroups=LIST  comma-separated list of host groups to remove" "$TmpDir/sudorule-remove-host_001.txt"
 	rlRun "cat $TmpDir/sudorule-remove-host_001.txt"
 
 rlPhaseEnd
