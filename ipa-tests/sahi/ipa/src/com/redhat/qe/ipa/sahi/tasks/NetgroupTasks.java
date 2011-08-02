@@ -53,13 +53,14 @@ public class NetgroupTasks {
 	 * @param description2 - new description for edit
 	 * @param undo - YES NO
 	 */
-	public static void addAndEditHetGroup(SahiTasks sahiTasks, String groupName, String description1, String description2) {
+	public static void addAndEditNetGroup(SahiTasks sahiTasks, String groupName, String description1, String description2, String nisdomain) {
 		sahiTasks.span("Add").click();
 		sahiTasks.textbox("cn").setValue(groupName);
 		sahiTasks.textbox("description").setValue(description1);
 		sahiTasks.button("Add and Edit").click();
 		sahiTasks.link("Settings").click();
 		sahiTasks.textbox("description").setValue(description2);
+		sahiTasks.textbox("nisdomainname").setValue(nisdomain);
 		sahiTasks.span("Update").click();
 		sahiTasks.link("Netgroups").in(sahiTasks.div("content")).click();
 	}
@@ -69,12 +70,14 @@ public class NetgroupTasks {
 	 * @param sahiTasks 
 	 * @param groupName - name of net group
 	 * @param description
+	 * @param nisdomain - nis domain
 	 */
-	public static void verifyNetGroupSettings(SahiTasks sahiTasks, String groupName, String description) {
+	public static void verifyNetGroupSettings(SahiTasks sahiTasks, String groupName, String description, String nisdomain) {
 		sahiTasks.link(groupName).click();
 		sahiTasks.link("Settings").click();
-		com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("description").value(), description, "Verified existing description for host group: " + groupName);
-		sahiTasks.link("Host Groups").in(sahiTasks.div("content")).click();
+		com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("description").value(), description, "Verified existing description for net group: " + groupName);
+		com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("nisdomainname").value(), nisdomain, "Verified existing nis domain for net group: " + groupName);
+		sahiTasks.link("Netgroups").in(sahiTasks.div("content")).click();
 		
 	}
 	
@@ -195,7 +198,7 @@ public class NetgroupTasks {
 	 * @param type - direct or indirect
 	 * @param exists - whether or not they should be members YES if they should be
 	 */
-	public static void verifyMembers(SahiTasks sahiTasks, String groupName, String membertype, String [] names, String type, String exists) {
+	public static void verifyMembers(SahiTasks sahiTasks, String groupName, String membertype, String [] names, String exists) {
 		sahiTasks.link(groupName).click();
 		if (membertype == "host"){
 			sahiTasks.link("memberhost_host").click();
@@ -212,8 +215,6 @@ public class NetgroupTasks {
 		if (membertype == "netgroup"){
 			sahiTasks.link("member_netgroup").click();
 		}
-		
-		sahiTasks.radio(type).click();
 		
 		for (String name : names) {
 			if (exists == "YES"){
