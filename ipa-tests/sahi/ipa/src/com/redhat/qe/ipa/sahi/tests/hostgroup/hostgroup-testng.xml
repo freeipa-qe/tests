@@ -8,13 +8,12 @@
 			<run>
 			    <include name="setup" />
 			    <include name="init" />	  
-			    <include name="hostMembersTests" />
 			    <include name="addAndAddAnotherHostGroupTests" />
 			    <include name="deleteMultipleHostGroupTests" />
 				<include name="addHostGroupTests" />	
 				<include name="deleteHostGroupTests" />	
 				<include name="addAndEditHostGroupSettingsTest" />
-				<include name="hostMembersTests" />
+				<include name="hostGroupMembersTests" />
 				<include name="cancelAddMembersTest" />
 				<include name="cancelRemoveMembersTest" />
 				<include name="memberofTest" />
