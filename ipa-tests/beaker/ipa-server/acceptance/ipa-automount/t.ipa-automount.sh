@@ -1410,14 +1410,14 @@ automountkey_del() {
 rlPhaseStartTest "automountkey_del: ipa automountkey-del AUTOMOUNTLOCATION AUTOMOUNTMAP"
 
 	rlRun "ipa automountlocation-add baltimore"
-	rlRun "ipa automountkey-add baltimore auto.master --key=/share"
+	rlRun "ipa automountkey-add baltimore auto.master --key=/share --info=-rw"
 
-	rlRun "ipa  automountkey-add baltimore auto.master --key=/share --info=auto.share > $TmpDir/automountkey_del.out 2>&1"
+	rlRun "ipa automountkey-del baltimore auto.master --key=/share --info=-rw > $TmpDir/automountkey_del.out 2>&1"
 	rlAssertGrep "Deleted automount key \"/share\"" "$TmpDir/automountkey_del.out"
 	rlRun "cat $TmpDir/automountkey_del.out"
 
-	rlRun "ipa automountkey-add baltimore auto.master --key=/share --info=auto.share"
-	rlAssertGrep "" "$TmpDir/automountkey_del.out"
+	rlRun "ipa automountkey-del baltimore auto.master --key=/share --info=-rw > $TmpDir/automountkey_del.out 2>&1"
+	rlAssertGrep "ipa: ERROR: no such entry" "$TmpDir/automountkey_del.out"
 	rlRun "cat $TmpDir/automountkey_del.out"
 
 rlPhaseEnd
