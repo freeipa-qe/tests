@@ -259,8 +259,75 @@ public class UserTasks {
 		sahiTasks.link("Users[1]").click();
 	}
 	
+	/*
+	 * Verify User membership in a group or rule
+	 * @param sahiTasks 
+	 * @param uid
+	 * @param membertype - "User Groups" or "Netgroups" or "Roles" or "HBAC Rules" or "Sudo Rules"
+	 * @param grprulename - group or rule name 
+	 * @param exists - "YES" if the membership is expected to exist
+	 */
+	public static void verifyUserMemberOf(SahiTasks sahiTasks, String uid, String membertype, String grprulename, String exists) {
+		sahiTasks.link(uid).click();
+		if (membertype == "User Groups"){
+			sahiTasks.link("memberof_group").click();
+		}
+		if (membertype == "Netgroups"){
+			sahiTasks.link("memberof_netgroup").click();
+		}
+		if (membertype =="Roles"){
+			sahiTasks.link("memberof_role").click();
+		}
+		if (membertype == "HBAC Rules"){
+			sahiTasks.link("memberof_hbacrule").click();
+		}
+		if (membertype == "Sudo Rules"){
+			sahiTasks.link("memberof_sudorule").click();
+		}
 	
+		if (exists == "YES"){
+			com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(grprulename).exists(), "User " + uid + " is a member of " + membertype + " " + grprulename);
+		}
+		else {
+			com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(grprulename).exists(), "User " + uid + " is NOT member of " + membertype + " "+ grprulename);
+		}
+		sahiTasks.link("Users").in(sahiTasks.div("content")).click();
+	}
 	
-	
+	/*
+	 * Verify User membership in a group or rule
+	 * @param sahiTasks 
+	 * @param uid
+	 * @param membertype - "User Groups" or "Netgroups" or "Roles" or "HBAC Rules" or "Sudo Rules"
+	 * @param grprulenames - array of group or rule names 
+	 * @param exists - "YES" if the membership is expected to exist
+	 */
+	public static void verifyUserMemberOf(SahiTasks sahiTasks, String uid, String membertype, String [] grprulenames, String exists) {
+		sahiTasks.link(uid).click();
+		if (membertype == "User Groups"){
+			sahiTasks.link("memberof_group").click();
+		}
+		if (membertype == "Netgroups"){
+			sahiTasks.link("memberof_netgroup").click();
+		}
+		if (membertype =="Roles"){
+			sahiTasks.link("memberof_role").click();
+		}
+		if (membertype == "HBAC Rules"){
+			sahiTasks.link("memberof_hbacrule").click();
+		}
+		if (membertype == "Sudo Rules"){
+			sahiTasks.link("memberof_sudorule").click();
+		}
+		for (String grprulename : grprulenames){
+			if (exists == "YES"){
+			com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(grprulename).exists(), "User " + uid + " is a member of " + membertype + " " + grprulename);
+			}
+			else {
+				com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(grprulename).exists(), "User " + uid + " is NOT member of " + membertype + " "+ grprulename);
+			}
+		}
+		sahiTasks.link("Users").in(sahiTasks.div("content")).click();
+	}
 	
 }
