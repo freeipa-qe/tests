@@ -1,8 +1,8 @@
 # Testing plan:
 # 1) add all objects from master
-# 2) verify all objects on slave
-# 3) add all (different) objects on slave
-# 4) verify on master
+# 2) add all (different) objects on slave
+# 3) verify all objects on slave
+# 4) verify all objects on master
 # 5) modify objects from the master data on master
 # 6) verify modifications on the slave
 # 7) modify objects rrom the slave data on slave
@@ -80,7 +80,7 @@ testReplicationOnMasterAndSlave()
 
 
 ################################################
-# 3   add objects on replica
+# 2   add objects on replica
 ################################################
 
    if [ $config == "slave" ] ; then
@@ -97,7 +97,7 @@ testReplicationOnMasterAndSlave()
    fi
  
 ################################################
-# 2   verify objects from replica
+# 3   verify objects from replica
 ################################################
 
    if [ $config == "slave" ] ; then
@@ -361,13 +361,13 @@ add_objects()
 
    # Add or modify a config value
 	add_config
-
 }
 
 slave_objects_add()
 {
 	add_slave_user
 	add_slave_group
+	add_slave_host
 }
 
 check_objects()
@@ -393,7 +393,6 @@ check_objects()
    check_sudocmdgroup
    check_sudocmd
    check_config
-
 }
 
 update_objects()
@@ -442,12 +441,14 @@ slave_update_objects()
 {
 	modify_slave_user
 	modify_slave_group
+	modify_slave_host
 }
 
 check_updated_slave_objects()
 {
 	check_slave_modifieduser
 	check_slave_modifiedgroup
+	check_slave_modifiedhost
 }
 
 delete_objects()
@@ -477,6 +478,7 @@ delete_slave_objects()
 {
 	delete_slave_user
 	delete_slave_group
+	delete_slave_host
 }
 
 check_deletedobjects()

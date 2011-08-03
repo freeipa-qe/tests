@@ -420,6 +420,22 @@ add_newhost()
 	rlPhaseEnd
 }
 
+slaveHost="nhl2"
+add_slave_host()
+{
+	rlPhaseStartTest "add new host"
+		rlRun "ipa host-add --desc=$hostDesc \
+		                  --location=$hostLocation \
+		                  --platform=$hostPlatform \
+		                  --os=$hostOS \
+		                  --password=$hostPassword \
+		                  --ip-address=$hostIPaddress \
+		                  --no-reverse \
+		                  $slaveHost" \
+		                  0 \
+		                  "Add a new host"
+}
+
 check_newhost()
 {
 	rlPhaseStartTest "check new host"
@@ -428,10 +444,14 @@ check_newhost()
 		rlRun "verifyHostAttr $newHost \"Location\" $hostLocation" 0 "Verify host's location"
 		rlRun "verifyHostAttr $newHost \"Platform\" $hostPlatform" 0 "Verify host's platform"
 		rlRun "verifyHostAttr $newHost \"Operating system\" $hostOS" 0 "Verify host's OS"
-		rlRun "verifyHostAttr $newHost \"Managed by\" \"$newHost, $managedByHost\"" 0 "Verify host's Managed-by list"
+		rlRun "verifyHostAttr $slaveHost \"Host name\" $slaveHost" 0 "Verify host's name"
+		rlRun "verifyHostAttr $slaveHost \"Description\" $hostDesc" 0 "Verify host's description"
+		rlRun "verifyHostAttr $slaveHost \"Location\" $hostLocation" 0 "Verify host's location"
+		rlRun "verifyHostAttr $slaveHost \"Platform\" $hostPlatform" 0 "Verify host's platform"
+		rlRun "verifyHostAttr $slaveHost \"Operating system\" $hostOS" 0 "Verify host's OS"
+
 	rlPhaseEnd
 }
-
 
 modify_newhost()
 {
@@ -448,6 +468,19 @@ modify_newhost()
 	rlPhaseEnd
 }
 
+modify_slave_host()
+{
+	rlPhaseStartTest "modify new host"
+		rlRun "ipa host-mod --location=$hostLocation_updated \
+		                  --platform=$hostPlatform_updated \
+		                  --os=$hostOS_updated \
+		                  --addattr=locality=$hostLocality_updated \
+		                  --setattr=description=$hostDesc_updated \
+		                  $slaveHost" \
+		                  0 \
+		                  "Modify the host"
+}
+
 check_modifiedhost()
 {
 	rlPhaseStartTest "check modified host"
@@ -460,10 +493,28 @@ check_modifiedhost()
 	rlPhaseEnd
 }
 
+check_slave_modifiedhost()
+{
+	rlPhaseStartTest "check modified host"
+		rlRun "verifyHostAttr $slaveHost \"Description\" $hostDesc_updated" 0 "Verify host's description"
+		rlRun "verifyHostAttr $slaveHost \"Locality\" $hostLocality_updated" 0 "Verify host's locality"
+		rlRun "verifyHostAttr $slaveHost \"Location\" $hostLocation_updated" 0 "Verify host's location"
+		rlRun "verifyHostAttr $slaveHost \"Platform\" $hostPlatform_updated" 0 "Verify host's platform"
+		rlRun "verifyHostAttr $slaveHost \"Operating system\" $hostOS_updated" 0 "Verify host's OS"
+	rlPhaseEnd
+}
+
 delete_host()
 {
-	rlPhaseStartTest "delete host"
-		rlRun "ipa host-del $newHost" 0 "Delete host"
+	rlPhaseStartTest "Deleting host"
+		rlRun "ipa host-del $newHost_updated" 0 "Deleting $newHost_updated"
+	rlPhaseEnd
+}
+
+delete_slave_host()
+{
+	rlPhaseStartTest "Deleting host from slave"
+		rlRun "ipa host-del $slaveHost" 0 "Deleting $slaveHost"
 	rlPhaseEnd
 }
 
@@ -473,6 +524,10 @@ check_deletedhost()
 		command="ipa host-show $newHost"
 		expmsg="ipa: ERROR: $newHost: host not found"
 		rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify error when checking for deleted host"
+		command="ipa host-show $slaveHost"
+		expmsg="ipa: ERROR: $slaveHost: host not found"
+		rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify error when checking for deleted host"
+
 	rlPhaseEnd
 }
 
