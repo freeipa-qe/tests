@@ -69,7 +69,7 @@ rlPhaseStartTest "Setup for automount configuration tests"
                         rlPass "$item package is installed"
                 else   
                         rlLog "$item package NOT found!"
-			rRun "yum install -y $item"
+			rlRun "yum install -y $item"
                 fi
         done
 
