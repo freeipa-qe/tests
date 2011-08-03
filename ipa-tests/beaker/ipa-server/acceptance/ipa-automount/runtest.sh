@@ -41,6 +41,7 @@
 
 # Include test case file
 . ./t.ipa-automount.sh
+. ./t.ipa-automount-func.sh
 
 PACKAGE="ipa-server"
 
@@ -157,7 +158,7 @@ rlJournalStart
 		rlRun "echo setup"
     rlPhaseEnd
 
-	# tests start...
+	# sanity tests start...
 automount_help
 automount_location_add
 automount_location_find
@@ -172,12 +173,36 @@ automountkey_show
 automount_location_del
 automountkey_del
 automountmap_del
-	# tests end.
+	# sanity tests end.
 
     rlPhaseStartCleanup "ipa-automount-cleanup: Destroying admin credentials & and disabling nis."
 		rlRun "cleanup"
 		rlRun "echo cleanup"
     rlPhaseEnd
+
+
+    rlPhaseStartSetup "ipa-automount-func-startup: Check for admintools package, kinit, configuring nfs, configure autofs"
+                rlRun "func_setup"
+                rlRun "echo func_setup"
+    rlPhaseEnd
+
+        # func tests start...
+automountlocation-add_func_001
+automountlocation-del_func_001
+automountlocation-import_func_001
+automountmap-add_func_001
+automountmap-del_func_001
+automountmap-mod_func_001
+direct_mount_functionality_001
+indirect_mount_functionality_001
+        # func tests end.
+
+    rlPhaseStartCleanup "ipa-automount-func-cleanup: Destroying admin credentials and removing users and configs."
+                rlRun "func_cleanup"
+                rlRun "echo func_cleanup"
+    rlPhaseEnd
+
+
 
 rlJournalPrintText
 report=/tmp/rhts.report.$RANDOM.txt
