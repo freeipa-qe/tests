@@ -6,7 +6,7 @@
 		</packages>
 		<groups>
 			<run>
-			    <include name="firefoxSetup" />
+			    <include name="setup" />
 			    <include name="init" />
 				<include name="smokeTest" /> 
 			</run>

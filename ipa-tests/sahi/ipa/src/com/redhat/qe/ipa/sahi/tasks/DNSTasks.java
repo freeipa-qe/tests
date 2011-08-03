@@ -7,6 +7,133 @@ import com.redhat.qe.ipa.sahi.tasks.SahiTasks;
 public class DNSTasks {
 
 	/*
+	 * Add DNS zone
+	 * @param sahiTasks 
+	 * @param hostname - hostname
+	 * @param ipadr -  ipaddress
+	 */
+	public static boolean addDNSzone(SahiTasks browser, String zoneName, String authoritativeNameserver, String rootEmail) {
+		boolean created=false;
+		/*** original recorded steps
+		browser.link("DNS").click();
+		browser.span("Add[1]").click();
+		browser.textbox("idnsname").setValue("sahi.zone.001");
+		browser.textbox("idnssoamname").setValue("dhcp121.sjc.redhat.com");
+		browser.textbox("idnssoarname").setValue("root.dhcp-121.sjc.redhat.com");
+		browser.textbox("idnssoamname").setValue("dhcp-121.sjc.redhat.com");
+		browser.button("Add").click();
+		browser.checkbox("select[4]").click();
+		browser.span("Delete[1]").click();
+		browser.button("Delete").click();
+		*/
+		 
+		browser.span("Add").click();
+		browser.textbox("idnsname").setValue(zoneName);
+		browser.textbox("idnssoamname").setValue(authoritativeNameserver);
+		browser.textbox("idnssoarname").setValue(rootEmail); 
+		browser.button("Add").click();
+		browser.checkbox(zoneName).click();
+		browser.span("Delete").click();
+		browser.button("Delete").click();
+		return created;
+	}//addDNSzone
+	
+	/*
+	 * Add DNS zone
+	 * @param sahiTasks 
+	 * @param hostname - hostname
+	 * @param ipadr -  ipaddress
+	 */
+	public static boolean delDNSzone(SahiTasks browser, String zoneName, String authoritativeNameserver, String rootEmail) {
+		boolean deleted=false; 
+		
+		browser.span("Add").click();
+		browser.textbox("idnsname").setValue(zoneName);
+		browser.textbox("idnssoamname").setValue(authoritativeNameserver);
+		browser.textbox("idnssoarname").setValue(rootEmail); 
+		browser.button("Add").click();
+		browser.checkbox(zoneName).click();
+		browser.span("Delete").click();
+		browser.button("Delete").click();
+		return deleted;
+	}//delDNSzone
+	
+	/*
+	 * Add DNS reverse zone
+	 * @param sahiTasks 
+	 * @param hostname - hostname
+	 * @param ipadr -  ipaddress
+	 */
+	public static boolean addDNSReversezone(SahiTasks sahiTasks, String zone, String name, String type, String data) {
+		boolean created=false;
+		sahiTasks.link(zone).click();
+		sahiTasks.button("Add").click();
+		sahiTasks.textbox("idnsname").setValue(name);
+		sahiTasks.select("dns-record-type").choose(type);
+		sahiTasks.textarea("record_data").setValue(data);
+		sahiTasks.button("Add").click(); 
+		return created;
+	}//addDNSResersezone
+	
+	/*
+	 * Add DNS zone
+	 * @param sahiTasks 
+	 * @param hostname - hostname
+	 * @param ipadr -  ipaddress
+	 */
+	public static boolean delDNSReversezone(SahiTasks sahiTasks, String zone, String name, String type, String data) {
+		boolean deleted=false;
+		sahiTasks.link(zone).click();
+		sahiTasks.button("Add").click();
+		sahiTasks.textbox("idnsname").setValue(name);
+		sahiTasks.select("dns-record-type").choose(type);
+		sahiTasks.textarea("record_data").setValue(data);
+		sahiTasks.button("Add").click();
+		return deleted;
+	}//delDNSReversezone
+	
+	/*
+	 * Modify dns zone records
+	 * @param browser  
+	 * @param zoneName - dna zone name
+	 */
+	public static boolean zoneRecordsModification(SahiTasks browser, String zoneName) {
+		boolean deleted=false; 
+		return deleted;
+	}//zoneRecordsModification
+	
+	/*
+	 * Modify dns zone settings
+	 * @param browser  
+	 * @param zoneName - dns zone name
+	 */
+	public static boolean zoneSettingsModification(SahiTasks browser, String zoneName) {
+		boolean deleted=false; 
+		return deleted;
+	}//zoneSettingsModification
+	
+	/*
+	 * Modify dns zone records
+	 * @param browser  
+	 * @param reverseZoneName - dna reverse zone name
+	 */
+	public static boolean reverseZoneRecordsModification(SahiTasks browser, String reverseZoneName) {
+		boolean deleted=false; 
+		return deleted;
+	}//reverseZoneRecordsModification
+	
+	/*
+	 * Modify dns zone settings
+	 * @param browser  
+	 * @param zoneName - dna zone name
+	 */
+	public static boolean reverseZoneSettingsModification(SahiTasks browser, String zoneName) {
+		boolean deleted=false; 
+		return deleted;
+	}//reverseZoneSettingsModification
+	
+	
+	/*
 	 * Add DNS forward address for a host
 	 * @param sahiTasks 
 	 * @param hostname - hostname
@@ -54,5 +181,5 @@ public class DNSTasks {
 		sahiTasks.link("DNS Zones").in(sahiTasks.div("content")).click();
 	}
 	
-}
+}// Class: DNSTasks
 
