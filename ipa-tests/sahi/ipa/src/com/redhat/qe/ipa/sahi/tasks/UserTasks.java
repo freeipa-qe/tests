@@ -93,12 +93,180 @@ public class UserTasks {
 	}
 	
 	
+	public static void modifyUserIdentitySettings(SahiTasks sahiTasks, String uid, String givenname, String sn, 
+			String fullname, String displayName, String initials) {
+		//click on user to edit
+		sahiTasks.link(uid).click();
+		
+		sahiTasks.textbox("givenname").setValue(givenname);
+		sahiTasks.textbox("sn").setValue(sn);
+		sahiTasks.textbox("cn").setValue(fullname);
+		sahiTasks.textbox("displayname").setValue(displayName);
+		sahiTasks.textbox("initials").setValue(initials);
+				
+		//Update and go back to user list
+		sahiTasks.link("Update").click();
+		sahiTasks.link("Users").in(sahiTasks.div("content")).click();
+	}
+	
+	public static void modifyUserAccountSettings(SahiTasks sahiTasks, String uid, String uidnumber, String gidnumber, String loginshell, String homedirectory) {
+		//click on user to edit
+		sahiTasks.link(uid).click();
+		
+		sahiTasks.textbox("uidnumber").setValue(uidnumber);
+		sahiTasks.textbox("gidnumber").setValue(gidnumber);
+		sahiTasks.textbox("loginshell").setValue(loginshell);
+		sahiTasks.textbox("homedirectory").setValue(homedirectory);
+				
+		//Update and go back to user list
+		sahiTasks.link("Update").click();
+		sahiTasks.link("Users").in(sahiTasks.div("content")).click();
+	}
+	
+	
+	public static void modifyUserAccountSettingsForInvalidUID(SahiTasks sahiTasks, String uid, String invalidUID, String expectedError) {
+		//click on user to edit
+		sahiTasks.link(uid).click();
+		
+		sahiTasks.textbox("uidnumber").setValue(invalidUID);
+		//Check for expected error
+		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.span(expectedError).exists(), "Verified expected error when changing UID to " + invalidUID);
+						
+		//Undo and go back to user list
+		sahiTasks.span("undo").click();
+		sahiTasks.link("Users").in(sahiTasks.div("content")).click();
+	}
+	
+	public static void modifyUserMailingAddress(SahiTasks sahiTasks, String uid, String street, String city, String state, String zip) {
+		//click on user to edit
+		sahiTasks.link(uid).click();
+		
+		sahiTasks.textbox("street").setValue(street);
+		sahiTasks.textbox("l").setValue(city);
+		sahiTasks.textbox("st").setValue(state);
+		sahiTasks.textbox("postalcode").setValue(zip);
+				
+		//Update and go back to user list
+		sahiTasks.link("Update").click();
+		sahiTasks.link("Users").in(sahiTasks.div("content")).click();
+	}
+	
+	
+	public static void modifyUserEmpMiscInfo(SahiTasks sahiTasks, String uid, String org, String manager, String carlicense) {
+		//click on user to edit
+		sahiTasks.link(uid).click();
+		
+		sahiTasks.textbox("ou").setValue(org);
+		sahiTasks.select("list").choose(manager);
+		sahiTasks.textbox("carlicense").setValue(carlicense);
+				
+		//Update and go back to user list
+		sahiTasks.link("Update").click();
+		sahiTasks.link("Users").in(sahiTasks.div("content")).click();
+	}
+	
+	public static void addMultipleUserData(SahiTasks sahiTasks, String uid, String mail1, String mail2, String	mail3, 
+			String phone1, String phone2, String pager1, String pager2, String mobile1, String mobile2, String fax1, String fax2) {
+		//click on user to edit
+		sahiTasks.link(uid).click();
+		
+		
+		sahiTasks.link("Add").click();
+		sahiTasks.textbox("mail").setValue(mail1);
+		sahiTasks.link("Add").click();
+		sahiTasks.textbox("mail[1]").setValue(mail2);
+		sahiTasks.link("Add").click();
+		sahiTasks.textbox("mail[2]").setValue(mail3);
+		
+		sahiTasks.link("Add[1]").click();
+		sahiTasks.textbox("telephonenumber").setValue(phone1);
+		sahiTasks.link("Add[1]").click();
+		sahiTasks.textbox("telephonenumber[1]").setValue(phone2);
+		
+		sahiTasks.link("Add[2]").click();
+		sahiTasks.textbox("pager").setValue(pager1);
+		sahiTasks.link("Add[2]").click();
+		sahiTasks.textbox("pager[1]").setValue(pager2);
+		
+		sahiTasks.link("Add[3]").click();
+		sahiTasks.textbox("mobile").setValue(mobile1);
+		sahiTasks.link("Add[3]").click();
+		sahiTasks.textbox("mobile[1]").setValue(mobile2);
+		
+		sahiTasks.link("Add[4]").click();
+		sahiTasks.textbox("facsimiletelephonenumber").setValue(fax1);
+		sahiTasks.link("Add[4]").click();
+		sahiTasks.textbox("facsimiletelephonenumber[1]").setValue(fax2);
+		
+		//Update and go back to user list
+		sahiTasks.link("Update").click();
+		sahiTasks.link("Users").in(sahiTasks.div("content")).click();
+	}
+	
+	
 	/* Verify changes made for the user. 
 	 * @param sahiTasks
 	 * @param uid - the uid of user to be edited
 	 * @param title - title string being edited for this user
 	 * @param mail - mail string being edited for this user
 	 */
+	public static void verifyUserContactData(SahiTasks sahiTasks, String uid, String mail1, String mail2, String	mail3, 
+			String phone1, String phone2, String pager1, String pager2, String mobile1, String mobile2, String fax1, String fax2) {
+		//click on user to edit
+		sahiTasks.link(uid).click();
+		
+		//verify mail address for user
+		com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("mail").value(), mail1, "Verified mail for user " + uid + ": " + mail1);
+		com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("mail[1]").value(), mail2, "Verified mail for user " + uid + ": " + mail2);
+		com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("mail[2]").value(), mail3, "Verified mail for user " + uid + ": " + mail3);
+		
+		com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("telephonenumber").value(), phone1, "Verified phone for user " + uid + ": " + phone1);
+		com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("telephonenumber[1]").value(), phone2, "Verified phone for user " + uid + ": " + phone2);
+		
+		com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("pager").value(), pager1, "Verified pager for user " + uid + ": " + pager1);
+		com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("pager[1]").value(), pager2, "Verified pager for user " + uid + ": " + pager2);
+	
+		com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("mobile").value(), mobile1, "Verified mobile for user " + uid  + ": " + mobile1);
+		com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("mobile[1]").value(), mobile2, "Verified mobile for user " + uid + ": " + mobile2);
+	
+		com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("facsimiletelephonenumber").value(), fax1, "Verified fax for user " + uid  + ": " + fax1);
+		com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("facsimiletelephonenumber[1]").value(), fax2, "Verified fax for user " + uid + ": " + fax2);
+	
+		sahiTasks.link("Users").in(sahiTasks.div("content")).click();
+	}
+	
+	
+	public static void addDeleteUndoResetContactData(SahiTasks sahiTasks, String uid, String mail, String phone) {
+		//click on user to edit
+		sahiTasks.link(uid).click();
+		
+		//Add but Reset		
+		sahiTasks.link("Add").click();
+		sahiTasks.span("Reset").click();
+		
+		//Delete but Reset
+		sahiTasks.link("Delete").click();
+		sahiTasks.span("Reset").click();
+		
+		//Edit - then Reset
+		sahiTasks.textbox("mail").setValue(mail+mail);
+		sahiTasks.span("Reset").click();
+		
+		//Add - then undo
+		sahiTasks.link("Add").click();
+		sahiTasks.span("undo").click();
+		
+		//Delete - then undo
+		sahiTasks.link("Delete").click();
+		sahiTasks.span("undo").click();
+		
+		//Edit - then undo
+		sahiTasks.textbox("telephonenumber").setValue(phone+phone);
+		sahiTasks.span("undo").click();
+		
+		sahiTasks.link("Users").in(sahiTasks.div("content")).click();
+	}
+	
 	public static void verifyUserUpdates(SahiTasks sahiTasks, String uid, String title, String mail) {
 		//click on user to edit
 		sahiTasks.link(uid).click();
@@ -108,9 +276,68 @@ public class UserTasks {
 		
 		//verify mail address for user
 		com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("mail").value(), mail, "Verified updated mail for user " + uid);
+		
 		sahiTasks.link("Users").in(sahiTasks.div("content")).click();
 	}
 	
+	
+	
+	public static void verifyUserIdentitySettings(SahiTasks sahiTasks, String uid, String givenname, String sn, String fullname, String displayName, String initials) {
+		//click on user to edit
+		sahiTasks.link(uid).click();
+		
+		//verify user's job title
+		com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("givenname").value(), givenname, "Verified updated First name for user " + uid + ": " + givenname);
+		com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("sn").value(), sn, "Verified updated Last name for user " + uid + ": " + sn);
+		com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("cn").value(), fullname, "Verified updated Full Name for user " + uid + ": " + fullname);
+		com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("displayname").value(), displayName, "Verified updated Display name for user " + uid + ": " + displayName);
+		com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("initials").value(), initials, "Verified updated firstname for user " + uid + ": " + initials);
+		
+		
+		sahiTasks.link("Users").in(sahiTasks.div("content")).click();
+	}
+	
+	
+	public static void verifyUserAccountSettings(SahiTasks sahiTasks, String uid, String uidnumber, String gidnumber, String loginshell, String homedirectory) {
+		//click on user to edit
+		sahiTasks.link(uid).click();
+		
+		//verify user's job title
+		com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("uidnumber").value(), uidnumber, "Verified updated UID for user " + uid + ": " + uidnumber);
+		com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("gidnumber").value(), gidnumber, "Verified updated GID for user " + uid + ": " + gidnumber);
+		com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("loginshell").value(), loginshell, "Verified updated Login Shell for user " + uid + ": " + loginshell);
+		com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("homedirectory").value(), homedirectory, "Verified updated Home directory for user " + uid + ": " + homedirectory);
+		
+		
+		sahiTasks.link("Users").in(sahiTasks.div("content")).click();
+	}
+	
+	
+	public static void verifyUserMailingAddress(SahiTasks sahiTasks, String uid, String street, String city, String state, String zip) {
+		//click on user to edit
+		sahiTasks.link(uid).click();
+		
+		//verify user's job title
+		com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("street").value(), street, "Verified updated street for user " + uid + ": " + street);
+		com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("l").value(), city, "Verified updated city for user " + uid + ": " + city);
+		com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("st").value(), state, "Verified updated State for user " + uid + ": " + state);
+		com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("postalcode").value(), zip, "Verified updated Zip for user " + uid + ": " + zip);
+		
+		
+		sahiTasks.link("Users").in(sahiTasks.div("content")).click();
+	}
+	
+	public static void verifyUserEmpMiscInfo(SahiTasks sahiTasks, String uid, String org, String manager, String carlicense) {
+		//click on user to edit
+		sahiTasks.link(uid).click();
+		
+		//verify user's job title
+		com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("ou").value(), org, "Verified updated Org. Unit for user " + uid + ": " + org);
+		com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("manager").value(), manager, "Verified updated Manager for user " + uid + ": " + manager);
+		com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("carlicense").value(), carlicense, "Verified updated car license for user " + uid + ": " + carlicense);
+		
+		sahiTasks.link("Users").in(sahiTasks.div("content")).click();
+	}
 	
 	/* Verify status for the user. 
 	 * @param sahiTasks
@@ -196,24 +423,6 @@ public class UserTasks {
 		sahiTasks.button("Delete").click();
 	}
 	
-	/*
-	 * Recreate a user. Check if user already exists before calling this.
-	 * @param selenium 
-	 * @param userName - uid for the existing user
-	 * @param givenName - first name for the existing user
-	 * @param sn - last name for the existing user
-	 */
-	public static void recreateUser(SahiTasks sahiTasks, String uid, String givenName, String sn) {		
-		sahiTasks.link("Add").click();
-		sahiTasks.textbox("uid[1]").setValue(uid);
-		sahiTasks.textbox("givenname[1]").setValue(givenName);
-		sahiTasks.textbox("sn[1]").setValue(sn);
-		sahiTasks.button("Add").click();
-		//Check for expected error
-		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.div("user with name \"" + uid + "\" already exists").exists(), "Verified expected error when readding user " + uid);
-		sahiTasks.button("Cancel").click();
-		sahiTasks.button("Cancel").click();
-	}
 
 	/*
 	 * Create a new user. Then add another user. Check if users already exists before calling this.
@@ -254,6 +463,37 @@ public class UserTasks {
 		sahiTasks.span("Update").click();
 		sahiTasks.link("Users").in(sahiTasks.div("content")).click();
 	}
+	
+	public static void searchUser(SahiTasks sahiTasks, String uid) {
+		sahiTasks.textbox("filter").setValue(uid);
+		sahiTasks.span("icon search-icon").click();
+	}	
+	
+	
+	public static void expandCollapseUser(SahiTasks sahiTasks, String uid) {
+		//click on user to edit
+		sahiTasks.link(uid).click();
+		
+		sahiTasks.span("Collapse All").click();
+		sahiTasks.waitFor(1000);
+
+		//Verify no data is visible
+		com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.textbox("title").exists(), "No data is visible");
+		
+		
+		sahiTasks.heading2("Account Settings").click();
+		//Verify only data for account settings is displayed
+		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.label(uid).exists(), "Verified data available for user " + uid);
+		
+		
+		sahiTasks.span("Expand All").click();
+		sahiTasks.waitFor(1000);
+		//Verify data is visible
+		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.textbox("title").exists(), "Now Data is visible");
+		
+		sahiTasks.link("Users").in(sahiTasks.div("content")).click();	
+	}
+	
 	
 	/*
 	 * Verify User membership in a group or rule

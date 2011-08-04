@@ -100,6 +100,104 @@ public class UserTests extends SahiTestScript{
 		UserTasks.verifyUserUpdates(sahiTasks, uid, title, mail);
 	}
 	
+	
+	/*
+	 * Edit users to add multiple data for Contact - for positive tests
+	 */
+	@Test (groups={"userMultipleDataTests"}, dataProvider="getUserMultipleDataTestObjects", dependsOnGroups={"userAddTests", "userEditTests"})	
+	public void testUserAddMultipleData(String testName, String uid, String mail1, String mail2, String	mail3, 
+			String phone1, String phone2, String pager1, String pager2, String mobile1, String mobile2, 
+			String fax1, String fax2) throws Exception {		
+		//verify user to be edited exists
+		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(uid).exists(), "Verify user " + uid + " to be edited exists");
+		
+		//modify this user
+		UserTasks.addMultipleUserData(sahiTasks, uid, mail1, mail2, mail3, phone1, phone2, pager1, pager2, mobile1, mobile2, fax1, fax2);
+		
+		//verify changes	
+		UserTasks.verifyUserContactData(sahiTasks, uid, mail3, mail2, mail1, phone1, phone2, pager1, pager2, mobile1, mobile2, fax1, fax2);
+	}
+	
+	@Test (groups={"userAddDeleteUndoResetTests"}, dataProvider="getUserMultipleDataTestObjects", dependsOnGroups={"userAddTests", "userEditTests", "userMultipleDataTests"})	
+	public void testUserAddDeleteUndoReset(String testName, String uid, String mail1, String mail2, String	mail3, 
+			String phone1, String phone2, String pager1, String pager2, String mobile1, String mobile2, 
+			String fax1, String fax2) throws Exception {		
+		//verify user to be edited exists
+		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(uid).exists(), "Verify user " + uid + " to be edited exists");
+		
+		//Add, Delete, Undo and Reset Contact Data
+		UserTasks.addDeleteUndoResetContactData(sahiTasks, uid, mail1, phone1);
+		
+		//verify nothing changed	
+		UserTasks.verifyUserContactData(sahiTasks, uid, mail3, mail2, mail1, phone1, phone2, pager1, pager2, mobile1, mobile2, fax1, fax2);
+	}
+	
+	/*
+	 * Update Identity Settings
+	 */
+	@Test (groups={"userEditIdentitySettingsTests"}, dataProvider="getUserEditIdentitySettingsTestObjects", dependsOnGroups={"userAddTests"})	
+	public void testUserEditIdentitySettings(String testName, String uid, String givenname, String sn, String fullname, String displayName, String initials) throws Exception {		
+		//verify user to be edited exists
+		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(uid).exists(), "Verify user " + uid + " to be edited exists");
+		
+		//modify this user
+		UserTasks.modifyUserIdentitySettings(sahiTasks, uid, givenname, sn, fullname, displayName, initials);
+		
+		//verify changes	
+		UserTasks.verifyUserIdentitySettings(sahiTasks, uid, givenname, sn, fullname, displayName, initials);
+	}
+	
+	
+	/*
+	 * Update Account Settings
+	 */
+	@Test (groups={"userEditAccountSettingsTests"}, dataProvider="getUserEditAccountSettingsTestObjects", dependsOnGroups={"userAddTests"})	
+	public void testUserEditAccountSettings(String testName, String uid, String uidnumber, String gidnumber, String loginshell, String homedirectory) throws Exception {		
+		//verify user to be edited exists
+		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(uid).exists(), "Verify user " + uid + " to be edited exists");
+		
+		String invalidUID = "-1";
+		String expectedError = "Minimum value is 1";
+		UserTasks.modifyUserAccountSettingsForInvalidUID(sahiTasks, uid, invalidUID, expectedError);
+		
+		//modify this user
+		UserTasks.modifyUserAccountSettings(sahiTasks, uid, uidnumber, gidnumber, loginshell, homedirectory);
+		
+		//verify changes	
+		UserTasks.verifyUserAccountSettings(sahiTasks, uid, uidnumber, gidnumber, loginshell, homedirectory);
+	}
+
+	/*
+	 * Update Mailing Address
+	 */
+	@Test (groups={"userEditMailingAddressTests"}, dataProvider="getUserEditMailingAddressTestObjects", dependsOnGroups={"userAddTests"})	
+	public void testUserEditMailingAddress(String testName, String uid, String street, String city, String state, String zip) throws Exception {		
+		//verify user to be edited exists
+		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(uid).exists(), "Verify user " + uid + " to be edited exists");
+			
+		//modify this user
+		UserTasks.modifyUserMailingAddress(sahiTasks, uid, street, city, state, zip);
+		
+		//verify changes	
+		UserTasks.verifyUserMailingAddress(sahiTasks, uid, street, city, state, zip);
+	}
+	
+	/*
+	 * Update Employee & Misc Info
+	 */
+	@Test (groups={"userEditEmpMiscInfoTests"}, dataProvider="getUserEditEmpMiscInfoTestObjects", dependsOnGroups={"userAddTests"})	
+	public void testUserEditEmpMiscInfo(String testName, String uid, String org, String manager, String carlicense) throws Exception {		
+		//verify user to be edited exists
+		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(uid).exists(), "Verify user " + uid + " to be edited exists");
+			
+		//modify this user
+		UserTasks.modifyUserEmpMiscInfo(sahiTasks, uid, org, manager, carlicense);
+		
+		//verify changes	
+		UserTasks.verifyUserEmpMiscInfo(sahiTasks, uid, org, manager, carlicense);
+	}
+	
+	
 	/*
 	 * Set user's password - for positive tests
 	 */
@@ -289,10 +387,27 @@ public class UserTests extends SahiTestScript{
 	/*
 	 * Search
 	 */
-	@Test (groups={"userSearchTests"}, dataProvider="getUserSearchTestObjects",  dependsOnGroups={"userAddTests", "userAddAndEditTests", "userAddAndAddAnotherTests"})	
-	public void testUserSearch(String testName, String uid) throws Exception {
+	//@Test (groups={"userSearchTests"}, dataProvider="getUserSearchTestObjects",  dependsOnGroups="userAddTests")
+	@Test (groups={"userSearchTests"}, dataProvider="getUserSearchTestObjects")
+	public void testUserSearch(String testName, String uid, String multipleResult) throws Exception {
 		
-		//UserTasks.searchUser(sahiTasks, uid);
+		UserTasks.searchUser(sahiTasks, uid);
+		
+		//verify users was found
+		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(uid).exists(), "Searched and found user " + uid + "  successfully");
+		if (!multipleResult.equals(""))
+			com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(multipleResult).exists(), "Searched and found another user " + multipleResult + "  successfully");
+	}
+	
+	
+	/*
+	 * Expand/Collapse
+	 */	
+	@Test (groups={"userExpandCollapseTests"}, dataProvider="getUserExpandCollapseTestObjects",  dependsOnGroups="userAddTests")
+	public void testUserExpandCollapse(String testName, String uid) throws Exception {
+		
+		UserTasks.expandCollapseUser(sahiTasks, uid);		
+		
 	}
 	
 	
@@ -324,13 +439,13 @@ public class UserTests extends SahiTestScript{
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
         //										testname					uid              		givenname	sn   
-		ll.add(Arrays.asList(new Object[]{ "create_good_user",				"testuser", 			"Test",		"User"      } ));
+		//ll.add(Arrays.asList(new Object[]{ "create_good_user",				"testuser", 			"Test",		"User"      } ));
 		ll.add(Arrays.asList(new Object[]{ "create_user_with_optional_login","", 					"Test",		"User"      } ));
-		ll.add(Arrays.asList(new Object[]{ "create_user2",				    "user2", 			    "Test2",	"User2"     } ));
-		ll.add(Arrays.asList(new Object[]{ "create_user3",				    "user3", 			    "Test3",	"User3"     } ));
-		ll.add(Arrays.asList(new Object[]{ "create_user4",				    "user4", 			    "Test4",	"User4"     } ));
-		ll.add(Arrays.asList(new Object[]{ "create_user5",				    "user5", 			    "Test5",	"User5"     } ));
-		ll.add(Arrays.asList(new Object[]{ "create_user6",				    "user6", 			    "Test6",	"User6"     } ));
+		//ll.add(Arrays.asList(new Object[]{ "create_user2",				    "user2", 			    "Test2",	"User2"     } ));
+		//ll.add(Arrays.asList(new Object[]{ "create_user3",				    "user3", 			    "Test3",	"User3"     } ));
+		//ll.add(Arrays.asList(new Object[]{ "create_user4",				    "user4", 			    "Test4",	"User4"     } ));
+		//ll.add(Arrays.asList(new Object[]{ "create_user5",				    "user5", 			    "Test5",	"User5"     } ));
+		//ll.add(Arrays.asList(new Object[]{ "create_user6",				    "user6", 			    "Test6",	"User6"     } ));
 		        
 		return ll;	
 	}
@@ -392,6 +507,22 @@ public class UserTests extends SahiTestScript{
 		return ll;	
 	}
 	
+	
+	/*
+	 * Data to be used when adding multiple Contact infor for users
+	 */
+	@DataProvider(name="getUserMultipleDataTestObjects")
+	public Object[][] getUserMultipleDataTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(addUserMultipleDataTestObjects());
+	}
+	protected List<List<Object>> addUserMultipleDataTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname					uid              		mail1			mail2			mail3 				phone1		phone2  		pager1		pager2			mobile1		mobile2			fax1		fax2
+		ll.add(Arrays.asList(new Object[]{ "add_multiple_contactdata",		"testuser", 			"one@testrelm",	"two@testrelm", "three@testrelm",   "1234567", 	"7654321",		"9876543",	"3456789",		"135790",	"097531", 		"1122334", 	"4332211"	 } ));
+		        
+		return ll;	
+	}
 	
 	/*
 	 * Data to be used when setting password for user
@@ -513,11 +644,94 @@ public class UserTests extends SahiTestScript{
 	protected List<List<Object>> searchUserTestObjects() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-        //										testname					uid              		
-		ll.add(Arrays.asList(new Object[]{ "search_good_user",				"testuser"     } ));
-		ll.add(Arrays.asList(new Object[]{ "search_good_user2",				"user2"     } ));
-		ll.add(Arrays.asList(new Object[]{ "search_good_user7",				"tuser7"     } ));
+        //										testname					uid       		multiple_result1	       		
+		ll.add(Arrays.asList(new Object[]{ "search_good_user",				"testuser",		""    				} ));
+		ll.add(Arrays.asList(new Object[]{ "search_good_user2",				"user2",		""	     			} ));
+		ll.add(Arrays.asList(new Object[]{ "search_good_tuser",				"tuser",		"testuser"     		} ));
 		        
+		return ll;	
+	}
+	
+	/*
+	 * Data to be used when searching for users
+	 */
+	@DataProvider(name="getUserExpandCollapseTestObjects")
+	public Object[][] getUserExpandCollapseTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(expandCollapseUserTestObjects());
+	}
+	protected List<List<Object>> expandCollapseUserTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname					uid       			       		
+		ll.add(Arrays.asList(new Object[]{ "expand_collapse_user",			"testuser"    				} ));
+		  
+		return ll;	
+	}
+	
+	
+	/*
+	 * Data to be used when updating Identity Settings for users
+	 */
+	@DataProvider(name="getUserEditIdentitySettingsTestObjects")
+	public Object[][] getUserEditIdentitySettingsTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(editIdentitySettingsTestObjects());
+	}
+	protected List<List<Object>> editIdentitySettingsTestObjects() {			
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname						uid    		givenname		sn				fullname			displayName		initials   			       		
+		ll.add(Arrays.asList(new Object[]{ "identity_settings_user",			"tuser",	"Mickey",		"Mouse",		"Mickey Mouse",		"Mickey M.",	"MM"	  				} ));
+		  
+		return ll;	
+	}
+	
+	
+	/*
+	 * Data to be used when updating Account Settings for users
+	 */
+	@DataProvider(name="getUserEditAccountSettingsTestObjects")
+	public Object[][] getUserEditAccountSettingsTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(editAccountSettingsTestObjects());
+	}
+	protected List<List<Object>> editAccountSettingsTestObjects() {			
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname						uid    		uidnumber		gidnumber		loginshell		homedirectory   			       		
+		ll.add(Arrays.asList(new Object[]{ "account_settings_user",				"tuser",	"123456789",	"987654321",	"/bin/csh",		"/home/newtuser"		} ));
+		  
+		return ll;	
+	}
+	
+	/*
+	 * Data to be used when updating Mailing Address for users
+	 */
+	@DataProvider(name="getUserEditMailingAddressTestObjects")
+	public Object[][] getUserEditMailingAddressTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(editMailingAddressTestObjects());
+	}
+	protected List<List<Object>> editMailingAddressTestObjects() {			
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname						uid    		street					city			state		zip   			       		
+		ll.add(Arrays.asList(new Object[]{ "account_settings_user",				"tuser",	"200 Broadway Ave",		"Bedford",		"MA",		"01730"		} ));
+		  
+		return ll;	
+	}
+	
+	
+	/*
+	 * Data to be used when updating Mailing Address for users
+	 */
+	@DataProvider(name="getUserEditEmpMiscInfoTestObjects")
+	public Object[][] getUserEditEmpMiscInfoTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(editEmpMiscInfoTestObjects());
+	}
+	protected List<List<Object>> editEmpMiscInfoTestObjects() {			
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname				uid    		org			manager			car  			       		
+		ll.add(Arrays.asList(new Object[]{ "emp_misc_user",				"tuser",	"QE",		"testuser",		"012 ABC"		} ));
+		  
 		return ll;	
 	}
 	
