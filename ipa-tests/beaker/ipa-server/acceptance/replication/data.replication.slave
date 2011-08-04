@@ -118,13 +118,16 @@ hostgroup_groupMember2_updated="bldf2_hosts"
 
 ######### attributes for a new netgroup added from slave
 netgroup="hradmins"
+netgroup2="notadmins"
 netgroup_desc="\"HR Admins\""
 netgroup_groupMember1="benefitsadmins"
 
 ########### attributes for a new netgroup modified from slave
 netgroup_updated="admins"
+netgroup2_updated="donkeyadmins"
 netgroup_desc_updated="\"NFS admin\""
 netgroup_groupMember1_updated="mailadmins"
+netgroup_groupMember2_updated="eviladmins"
 
 ######### attributes for new service added from slave
 service=ntpd/$SLAVE@$RELM

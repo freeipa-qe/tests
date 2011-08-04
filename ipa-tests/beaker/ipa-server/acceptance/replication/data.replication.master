@@ -124,14 +124,16 @@ hostgroup_groupMember2_updated="bldf2_hosts"
 
 ######### attributes for a new netgroup added from master
 netgroup="admins"
+netgroup2="notadmins"
 netgroup_desc="\"NFS admins\""
 netgroup_groupMember1="mailadmins"
 
 ######### attributes for a new netgroup modified from master
 netgroup_updated="hradmins"
+netgroup2_updated="donkeyadmins"
 netgroup_desc_updated="\"HR admin\""
 netgroup_groupMember1_updated="benefitsadmins"
-
+netgroup_groupMember2_updated="eviladmins"
 
 
 ######### attributes for new service added from master

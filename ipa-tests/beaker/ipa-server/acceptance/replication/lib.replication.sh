@@ -660,6 +660,15 @@ add_newnetgroup()
 	rlPhaseEnd
 }
 
+add_slave_netgroup()
+{
+	rlPhaseStartTest "add netgroup"
+		rlRun "ipa netgroup-add --desc=$netgroup_groupMember1 $netgroup_groupMember2" 0 "Add netgroup to be added as a member"
+		rlRun "ipa netgroup-add --desc=$netgroup_desc --nisdomain=$DOMAIN --usercat=all --hostcat=all $netgroup" 0 "Add new netgroup"
+		rlRun "ipa netgroup-add-member --users=$groupMember2 --groups=$groupName_nonposix --hosts=$managedByHost --hostgroups=$hostgroup_groupMember1 --netgroups=$netgroup_groupMember1 $netgroup2" 0 "Add members to netgroup"
+	rlPhaseEnd
+}
+
 check_newnetgroup()
 {
 	rlPhaseStartTest "check netgroup"
@@ -673,6 +682,17 @@ check_newnetgroup()
 		rlRun "verifyNetgroupAttr $netgroup \"Member Group\" $groupName_nonposix" 0 "Verify netgroup's Member Group"
 		rlRun "verifyNetgroupAttr $netgroup \"Member Host\" $managedByHost" 0 "Verify netgroup's Member Host"
 		rlRun "verifyNetgroupAttr $netgroup \"Member Hostgroup\" $hostgroup_groupMember1" 0 "Verify netgroup's Member Hostgroup"
+		rlRun "verifyNetgroupAttr $netgroup2 \"Netgroup name\" $netgroup2" 0 "Verify netgroup's name"
+		rlRun "verifyNetgroupAttr $netgroup2 \"Description\" $netgroup_desc" 0 "Verify netgroup's Description"
+		rlRun "verifyNetgroupAttr $netgroup2 \"NIS domain name\" $DOMAIN" 0 "Verify netgroup's NIS domain name"
+		rlRun "verifyNetgroupAttr $netgroup2 \"User category\" \"all\"" 0 "Verify netgroup's User category"
+		rlRun "verifyNetgroupAttr $netgroup2 \"Host category\" \"all\"" 0 "Verify netgroup's Host category"
+		rlRun "verifyNetgroupAttr $netgroup2 \"Member netgroups\" $netgroup_groupMember1" 0 "Verify netgroup's Member netgroups"
+		rlRun "verifyNetgroupAttr $netgroup2 \"Member User\" $groupMember1" 0 "Verify netgroup's Member User"
+		rlRun "verifyNetgroupAttr $netgroup2 \"Member Group\" $groupName_nonposix" 0 "Verify netgroup's Member Group"
+		rlRun "verifyNetgroupAttr $netgroup2 \"Member Host\" $managedByHost" 0 "Verify netgroup's Member Host"
+		rlRun "verifyNetgroupAttr $netgroup2 \"Member Hostgroup\" $hostgroup_groupMember1" 0 "Verify netgroup's Member Hostgroup"
+
 	rlPhaseEnd
 }
 
@@ -681,6 +701,14 @@ modify_newnetgroup()
 	rlPhaseStartTest "modify netgroup"
 		rlRun "ipa netgroup-mod --desc=$netgroup_desc_updated --usercat="" --hostcat="" $netgroup_updated" 0 "Modify netgroup"
 		rlRun "ipa netgroup-remove-member --hosts=$managedByHost_updated $netgroup_updated" 0 "Remove host member from netgroup"
+	rlPhaseEnd
+}
+
+modify_slave_netgroup()
+{
+	rlPhaseStartTest "modify slave netgroup"
+		rlRun "ipa netgroup-mod --desc=$netgroup_desc_updated --usercat="" --hostcat="" $netgroup2_updated" 0 "Modify netgroup"
+		rlRun "ipa netgroup-remove-member --hosts=$managedByHost_updated $netgroup2_updated" 0 "Remove host member from netgroup"
 	rlPhaseEnd
 }
 
@@ -694,10 +722,27 @@ check_modifiednetgroup()
 	rlPhaseEnd
 }
 
+check_slave_modifiednetgroup()
+{
+	rlPhaseStartTest "check modified netgroup"
+		rlRun "verifyNetgroupAttr $netgroup2_updated \"Description\" $netgroup_desc_updated" 0 "Verifyi slave netgroup's Description"
+		rlRun "ipa netgroup-show --all $netgroup2_updated | grep \"User category\"" 1 "Verifying user catagory was removed for $netgroup_updated"
+		rlRun "ipa netgroup-show --all $netgroup2_updated | grep \"Host category\"" 1 "Verifying Host catagory was removed for $netgroup_updated"
+		rlRun "ipa netgroup-show --all $netgroup2_updated | grep \"Member Host\" | grep $managedByHost_updated" 1 "Verifying that $managedByHost_updated is not in $netgroup_updated2"
+	rlPhaseEnd
+}
+
 delete_netgroup()
 {
 	rlPhaseStartTest "delete netgroup"
 		rlRun "ipa netgroup-del $netgroup_updated" 0 "Delete the netgroup" 
+	rlPhaseEnd
+}
+
+delete_slave_netgroup()
+{
+	rlPhaseStartTest "delete netgroup"
+		rlRun "ipa netgroup-del $netgroup2_updated" 0 "Delete the netgroup" 
 	rlPhaseEnd
 }
 
@@ -707,6 +752,10 @@ check_deletednetgroup()
 		command="ipa netgroup-show $netgroup_updated"
 		expmsg="ipa: ERROR: $netgroup_updated: netgroup not found"
 		rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify error when checking for deleted netgroup"
+		command="ipa netgroup-show $netgroup2_updated"
+		expmsg="ipa: ERROR: $netgroup2_updated: netgroup not found"
+		rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify error when checking for deleted netgroup"
+
 	rlPhaseEnd
 }
 
