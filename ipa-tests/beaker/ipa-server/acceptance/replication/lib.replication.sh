@@ -902,7 +902,9 @@ check_delegation()
 ################################
 export zone=repnewzone
 export arec="alpha2.$zone"
+export slavearec="beta2.$zone"
 export a="1.2.3.4"
+export slavea="6.5.4.3"
 add_dns()
 {
 	ipaddr=`hostname`	
@@ -922,11 +924,21 @@ add_dns()
 	rlPhaseEnd
 }
 
+add_slave_dns()
+{
+	rlPhaseStartTest "create a new a record in $zone on the dns zone"
+		rlRun "ipa dnsrecord-add $zone $slavearec --a-rec $slavea" 0 "add record type a to $zone"
+	rlPhaseEnd
+}
+
 check_dns()
 {
 	rlPhaseStartTest "make sure that the $arec entry is on this server"
 		rlRun "ipa dnsrecord-find $zone $arec | grep $a" 0 "make sure ipa recieved record type A"
 		rlRun "dig $arec.$zone | grep $a" 0 "make sure dig can find the A record"
+		rlRun "ipa dnsrecord-find $zone $slavearec | grep $slavea" 0 "make sure ipa recieved record type A"
+		rlRun "dig $slavearec.$zone | grep $slavea" 0 "make sure dig can find the A record"
+
 	rlPhaseEnd
 }
 
@@ -938,11 +950,20 @@ delete_dns()
 	rlPhaseEnd
 }
 
+delete_slave_dns()
+{
+	rlPhaseStartTest "delete the record $arec from $zone, as well as the dns zone"
+		rlRun "ipa dnsrecord-del $zone $slavearec --a-rec $slavea" 0 "delete record type a"
+	rlPhaseEnd
+}
+
+
 check_deleteddns()
 {
 	rlPhaseStartTest "make sure that the $arec entry is removed from this server"
 		/etc/init.d/named restart
 		rlRun "ipa dnsrecord-find $zone $arec | grep $a" 1 "make sure the record $arec is removed from this server"
+		rlRun "ipa dnsrecord-find $zone $slavearec | grep $slavea" 1 "make sure the record $arec is removed from this server"
 		rlRun "dig $arec.$zone | grep $a" 1 "make sure dig can not find the A record"
 	rlPhaseEnd
 }
@@ -961,6 +982,8 @@ usergroup1="dev_ugrp_hbac"
 
 hostgroup1="dev_hosts_hbac"
 
+hostgroup2="dev_slave_hbac"
+
 servicegroup="remote_access_hbac"
 
 hbac_setup()
@@ -973,6 +996,7 @@ hbac_setup()
 		rlRun "addHost $host1" 0 "SETUP: Adding host $host1 for testing."
 		# add host group for testing
 		rlRun "addHostGroup $hostgroup1 $hostgroup1" 0 "SETUP: Adding host group $hostgroup1 for testing."
+		rlRun "addHostGroup $hostgroup2 $hostgroup2" 0 "SETUP: Adding host group $hostgroup2 for testing."
 		# add user for testing
 		rlRun "ipa user-add --first=$user1 --last=$user1 $user1" 0 "SETUP: Adding user $user1."
 		# add group for testing
@@ -997,14 +1021,30 @@ add_hbac()
 	rlPhaseEnd
 }
 
+slave_add_hba()
+{
+	rlPhaseStartTest "Add host group to Rule"
+		rlRun "addToHBAC Engineering host hostgroups $hostgroup2" 0 "Adding host group $hostgroup2 to Engineering rule."
+		rlRun "verifyHBACAssoc Engineering \"Host Groups\" $hostgroup2" 0 "Verifying host group $hostgroup2 is associated with the Engineering rule."
+	rlPhaseEnd
+
+}
+
 check_hbac()
 {
 	rlPhaseStartTest "Verify HBAC rules exist"
 		rlRun "verifyHBACAssoc Engineering Hosts $host1" 0 "Verifying host $host1 is associated with the Engineering rule."
 		rlRun "verifyHBACAssoc Engineering \"Host Groups\" $hostgroup1" 0 "Verifying host group $hostgroup1 is associated with the Engineering rule."
 	rlPhaseEnd
-
 }
+
+check_slave_hbac()
+{
+	rlPhaseStartTest "Verify slave HBAC rules exist"
+		rlRun "verifyHBACAssoc Engineering \"Host Groups\" $hostgroup2" 0 "Verifying host group $hostgroup2 is associated with the Engineering rule."
+	rlPhaseEnd
+}
+
 
 modify_hbac()
 {
@@ -1031,10 +1071,19 @@ delete_hbac()
 	rlPhaseEnd
 }
 
+delete_slave_hbac()
+{
+	rlPhaseStartTest "delete hba entries from hosts"
+		rlRun "deleteHostGroup $hostgroup2" 0 "Deleting Host Group associated with rule."
+	rlPhaseEnd
+}
+
+
 check_deletedhbac()
 {
 	rlPhaseStartTest "verify that hostgroup1 was deleted"
 		rlRun "verifyHBACAssoc Engineering \"Host Groups\" $hostgroup1" 1 "Verifying host group $hostgroup1 is no longer associated with the Engineering rule."
+		rlRun "verifyHBACAssoc Engineering \"Host Groups\" $hostgroup2" 1 "Verifying host group $hostgroup2 is no longer associated with the Engineering rule."
 	rlPhaseEnd
 }
 
@@ -1042,6 +1091,7 @@ check_deletedhbac()
 # hbac service section
 ################################
 service1="rlogin"
+service2="qlogin"
 add_hbac_service()
 {
 	rlPhaseStartTest "add hbac service"
@@ -1052,15 +1102,26 @@ add_hbac_service()
 	rlPhaseEnd
 }
 
+add_hbac_slave_service()
+{
+	rlPhaseStartTest "add hbac slave service"
+		rlRun "addHBACService $service2 $service2" 0 "Adding HBAC service $service2."
+		rlRun "findHBACService $service2" 0 "Verifying HBAC service $service2 is found."
+		rlRun "verifyHBACService $service2 \"Service name\" $service2" 0 "Verify New Service name"
+		rlRun "verifyHBACService $service2 \"Description\" $service2" 0 "Verify New Service Description"
+	rlPhaseEnd
+}
+
 check_hbac_service()
 {
 	rlPhaseStartTest "check hbac service"
 		rlRun "findHBACService $service1" 0 "Verifying HBAC service $service1 is found."
+		rlRun "findHBACService $service2" 0 "Verifying HBAC service $service2 is found."
 	rlPhaseEnd
 
 }
 
-mod_hbac_service()
+modify_hbac_service()
 {
 	rlPhaseStartTest "Modify hbac-service Description with --desc"
 		rlRun "modifyHBACService $service1 desc \"Newer Description\"" 0 "Modify with --desc service description"
@@ -1068,10 +1129,26 @@ mod_hbac_service()
 	rlPhaseEnd
 }
 
+modify_slave_hbacservice()
+{
+	rlPhaseStartTest "Modify hbac-service Description with --desc"
+		rlRun "modifyHBACService $service2 desc \"Newer Description\"" 0 "Modify with --desc service description"
+		rlRun "verifyHBACService $service2 Description \"Newer Description\"" 0 "Verify New Service Description"
+	rlPhaseEnd
+}
+
+
 check_modifiedhbacservice()
 {
 	rlPhaseStartTest "Check modified hbac-service Description with --desc"
 		rlRun "verifyHBACService $service1 Description \"Newer Description\"" 0 "Verify New Service Description"
+	rlPhaseEnd
+}
+
+check_slave_modifiedhbacservice()
+{
+	rlPhaseStartTest "Check modified hbac-service Description with --desc"
+		rlRun "verifyHBACService $service2 Description \"Newer Description\"" 0 "Verify New Service Description"
 	rlPhaseEnd
 }
 
@@ -1082,10 +1159,19 @@ delete_hbac_service()
 	 rlPhaseEnd
 }
 
+delete_slave_hbac_service()
+{
+	rlPhaseStartTest "delete hbac serivce $service2"
+		rlRun "deleteHBACService $service2" 0 "CLEANUP: Deleting service $service2"
+	 rlPhaseEnd
+}
+
+
 check_deletedhbacservice()
 {
 	rlPhaseStartTest "check hbac service is removed"
 		rlRun "findHBACService $service1" 1 "Verifying HBAC service $service1 is not found."
+		rlRun "findHBACService $service2" 1 "Verifying HBAC service $service2 is not found."
 	rlPhaseEnd
 }
 
@@ -1093,6 +1179,7 @@ check_deletedhbacservice()
 # permission section
 ################################
 puser1="puser"
+puser2="ruser"
 add_permission()
 {
 	rlPhaseStartTest "add a user, and add a permission to that user"
@@ -1100,10 +1187,18 @@ add_permission()
 		rlRun "ipa permission-add $puser1 --type=user --permissions=delete"
 	rlPhaseEnd
 }
+add_slave_permission()
+{
+	rlPhaseStartTest "add a user, and add a permission to that user"
+		rlRun "ipa user-add --first=$puser2 --last=$puser2 $puser2" 0 "SETUP: Adding user $puser2."		
+		rlRun "ipa permission-add $puser2 --type=user --permissions=delete"
+	rlPhaseEnd
+}
 check_permission()
 {
 	rlPhaseStartTest "check to ensure that the permission exists"
 		rlRun "ipa permission-show $puser1 | grep delete" 0 "checking to make sure that the permission got installed on the user"		
+		rlRun "ipa permission-show $puser2 | grep delete" 0 "checking to make sure that the permission got installed on the user"		
 	rlPhaseEnd
 }
 mod_permission()
@@ -1112,18 +1207,36 @@ mod_permission()
 		rlRun "ipa permission-mod $puser1 --type=user --permissions=add"
 	rlPhaseEnd
 }
-check_modpermission()
+mod_slave_permission()
+{
+	rlPhaseStartTest "mod puser1's permissions"
+		rlRun "ipa permission-mod $puser2 --type=user --permissions=add"
+	rlPhaseEnd
+}
+check_modifiedpermission()
 {
 	rlPhaseStartTest "check to ensure that the permission has been modified"
 		rlRun "ipa permission-show $puser1 | grep add" 0 "checking to make sure that the permission got installed on the user"		
 	rlPhaseEnd
 }
-
+check_slave_modifiedpermission()
+{
+	rlPhaseStartTest "check to ensure that the permission has been modified"
+		rlRun "ipa permission-show $puser2 | grep add" 0 "checking to make sure that the permission got installed on the user"		
+	rlPhaseEnd
+}
 delete_permission()
 {
-	rlPhaseStartTest "add a user, and add a permission to that user"
+	rlPhaseStartTest "delete added user from master"
 		rlRun "ipa permission-del $puser1" 0 " deleting the permission for $puser1"
 		rlRun "ipa user-del $puser1" 0 "deleting user $puser1."			
+	rlPhaseEnd
+}
+delete_slave_permission()
+{
+	rlPhaseStartTest "delete added user from slave"
+		rlRun "ipa permission-del $puser2" 0 " deleting the permission for $puser2"
+		rlRun "ipa user-del $puser2" 0 "deleting user $puser2."
 	rlPhaseEnd
 }
 check_deletedpermission()
@@ -1131,6 +1244,8 @@ check_deletedpermission()
 	rlPhaseStartTest "add a user, and add a permission to that user"
 		rlRun "ipa permission-show $puser1 | grep add" 1 "checking to make sure that the permission is not arund any more"
 		rlRun "ipa user-find $puser1" 1 "making sure that the user is gone"
+		rlRun "ipa permission-show $puser2 | grep add" 1 "checking to make sure that the permission added on the slave is not arund any more"
+		rlRun "ipa user-find $puser2" 1 "making sure that the user is gone"
 	rlPhaseEnd
 }
 
@@ -1138,91 +1253,135 @@ check_deletedpermission()
 # sudo rule
 ################################
 rule1=sudorule1
+rule2=sudorule1
 add_sudorule()
 {
 	rlPhaseStartTest "add a sudo rule"
 		rlRun "ipa sudorule-add $rule1" 0 "creating $rule1 for replication testing"
 	rlPhaseEnd
 }
-
+add_slave_sudorule()
+{
+	rlPhaseStartTest "add a sudo rule to the slave"
+		rlRun "ipa sudorule-add $rule2" 0 "creating $rule2 for replication testing"
+	rlPhaseEnd
+}
 check_sudorule()
 {
 	rlPhaseStartTest "check to make sure that the sudo rule exists"
 		rlRun "ipa sudorule-find $rule1" 0 "finding sudo rule $rule1"
+		rlRun "ipa sudorule-find $rule2" 0 "finding sudo rule $rule2"
 	rlPhaseEnd
 }
-
-mod_sudorule()
+modify_sudorule()
 {
 	rlPhaseStartTest "disabling $rule1 for replication testing"
 		rlRun "ipa sudorule-disable $rule1" 0 "disabling $rule1"
 	rlPhaseEnd
 }
-
-check_modsudorule()
+modify_slave_sudorule()
+{
+	rlPhaseStartTest "disabling $rule2 for replication testing"
+		rlRun "ipa sudorule-disable $rule2" 0 "disabling $rule2"
+	rlPhaseEnd
+}
+check_modifiedsudorule()
 {
 	rlPhaseStartTest "check to make sure that the sudo rule exists, and is disabled"
 		rlRun "ipa sudorule-find $rule1 | grep Enabled | grep FALSE" 0 "finding sudo rule $rule1 and making sure it is disabled"
 	rlPhaseEnd
 }
-
+check_slave_modifiedsudorule()
+{
+	rlPhaseStartTest "check to make sure that the sudo rule exists, and is disabled"
+		rlRun "ipa sudorule-find $rule2 | grep Enabled | grep FALSE" 0 "finding sudo rule $rule2 and making sure it is disabled"
+	rlPhaseEnd
+}
 delete_sudorule()
 {
 	rlPhaseStartTest "deleting $rule1"
 		rlRun "ipa sudorule-del $rule1" 0 "deleting $rule1"
 	rlPhaseEnd
 }
-
+delete_slave_sudorule()
+{
+	rlPhaseStartTest "deleting $rule2"
+		rlRun "ipa sudorule-del $rule2" 0 "deleting $rule2"
+	rlPhaseEnd
+}
 check_deletedsudorule()
 {
 	rlPhaseStartTest "check to make sure that the sudo rule does not exist"
 		rlRun "ipa sudorule-find $rule1" 1 "finding sudo rule $rule1"
+		rlRun "ipa sudorule-find $rule2" 1 "finding sudo rule $rule2"
 	rlPhaseEnd
 }
 
 ################################
 # sudo cmd
 ################################
-cmdrule1=/use/local/bin/nonexist
+cmdrule1="/use/local/bin/nonexist"
+cmdrule2="/use/local/bin/alsononexist"
 add_sudocmd()
 {
 	rlPhaseStartTest "add a sudo cmd"
 		rlRun "ipa sudocmd-add --desc='for testing' $cmdrule1" 0 "creating $cmdrule1 for replication testing"
 	rlPhaseEnd
 }
-
+add_slave_sudocmd()
+{
+	rlPhaseStartTest "add a sudo cmd"
+		rlRun "ipa sudocmd-add --desc='for testing' $cmdrule2" 0 "creating $cmdrule2 for replication testing"
+	rlPhaseEnd
+}
 check_sudocmd()
 {
 	rlPhaseStartTest "check to make sure that the sudo cmd exists"
 		rlRun "ipa sudocmd-find $cmdrule1" 0 "finding sudo cmd $cmdrule1"
+		rlRun "ipa sudocmd-find $cmdrule2" 0 "finding sudo cmd $cmdrule2"
 	rlPhaseEnd
 }
-
-mod_sudocmd()
+modify_sudocmd()
 {
 	rlPhaseStartTest "modding $cmdrule1 for replication testing"
 		rlRun "ipa sudocmd-mod --desc=newdesc $cmdrule1" 0 "modding $cmdrule1"
 	rlPhaseEnd
 }
-
-check_modsudocmd()
+modify_slave_sudocmd()
+{
+	rlPhaseStartTest "modding $cmdrule2 for replication testing"
+		rlRun "ipa sudocmd-mod --desc=newdesc $cmdrule2" 0 "modding $cmdrule2"
+	rlPhaseEnd
+}
+check_modifiedsudocmd()
 {
 	rlPhaseStartTest "check to make sure that the sudo cmd is moddified"
 		rlRun "ipa sudocmd-find $cmdrule1 | grep newdesc" 0 "finding sudo rule $cmdrule1 and making sure it is disabled"
 	rlPhaseEnd
 }
-
+check_slave_modifiedsudocmd()
+{
+	rlPhaseStartTest "check to make sure that the sudo cmd moddified on the slave is moddified"
+		rlRun "ipa sudocmd-find $cmdrule2 | grep newdesc" 0 "finding sudo rule $cmdrule2 and making sure it is disabled"
+	rlPhaseEnd
+}
 delete_sudocmd()
 {
 	rlPhaseStartTest "deleting $cmdrule1"
 		rlRun "ipa sudocmd-del $cmdrule1" 0 "deleteing sudo cmd $cmdrule1"
 	rlPhaseEnd
 }
-
+delete_slave_sudocmd()
+{
+	rlPhaseStartTest "deleting $cmdrule2"
+		rlRun "ipa sudocmd-del $cmdrule2" 0 "deleteing sudo cmd $cmdrule2"
+	rlPhaseEnd
+}
 check_deletedsudocmd()
 {
 	rlPhaseStartTest "check to make sure that the sudo cmd does not exist"
 		rlRun "ipa sudocmd-find $cmdrule1" 1 "finding sudo cmd $cmdrule1"
+		rlRun "ipa sudocmd-find $cmdrule2" 1 "finding sudo cmd $cmdrule2"
 	rlPhaseEnd
 }
 
@@ -1230,45 +1389,67 @@ check_deletedsudocmd()
 # sudo cmd group
 ################################
 cmdgrp1=repadmins
+cmdgrp2=loosingadmins
 add_sudocmdgroup()
 {
 	rlPhaseStartTest "add a sudo cmd group"
 		rlRun "ipa sudocmdgroup-add --desc='replication admins' $cmdgrp1" 0 "creating $cmdgrp1 for replication testing"
 	rlPhaseEnd
 }
-
+add_slave_sudocmdgroup()
+{
+	rlPhaseStartTest "add a sudo cmd group on the slave"
+		rlRun "ipa sudocmdgroup-add --desc='replication admins' $cmdgrp2" 0 "creating $cmdgrp2 for replication testing"
+	rlPhaseEnd
+}
 check_sudocmdgroup()
 {
 	rlPhaseStartTest "check to make sure that the sudo cmd group exists"
 		rlRun "ipa sudocmdgroup-find $cmdgrp1" 0 "finding sudo cmd group $cmdgrp1"
+		rlRun "ipa sudocmdgroup-find $cmdgrp2" 0 "finding sudo cmd group $cmdgrp2"
 	rlPhaseEnd
 }
-
-mod_sudocmdgroup()
+modify_sudocmdgroup()
 {
 	rlPhaseStartTest "modding $cmdgrp1 for replication testing"
 		rlRun "ipa sudocmdgroup-mod --desc=newdesc $cmdgrp1" 0 "modding $cmdgrp1"
 	rlPhaseEnd
 }
-
-check_modsudocmdgroup()
+modify_slave_sudocmdgroup()
+{
+	rlPhaseStartTest "modding $cmdgrp2 for replication testing"
+		rlRun "ipa sudocmdgroup-mod --desc=newdesc $cmdgrp2" 0 "modding $cmdgrp2"
+	rlPhaseEnd
+}
+check_modifiedsudocmdgroup()
 {
 	rlPhaseStartTest "check to make sure that the sudo cmd group is moddified"
 		rlRun "ipa sudocmdgroup-find $cmdgrp1 | grep newdesc" 0 "finding sudo group $cmdgrp1 and making sure it is disabled"
 	rlPhaseEnd
 }
-
+check_slave_modifiedsudocmdgroup()
+{
+	rlPhaseStartTest "check to make sure that the sudo cmd group modified on the slave is moddified"
+		rlRun "ipa sudocmdgroup-find $cmdgrp2 | grep newdesc" 0 "finding sudo group $cmdgrp2 and making sure it is disabled"
+	rlPhaseEnd
+}
 delete_sudocmdgroup()
 {
 	rlPhaseStartTest "deleting $cmdgrp1"
 		rlRun "ipa sudocmdgroup-del $cmdgrp1" 0 "deleteing sudo cmd group $cmdgrp1"
 	rlPhaseEnd
 }
-
+delete_slave_sudocmdgroup()
+{
+	rlPhaseStartTest "deleting $cmdgrp2"
+		rlRun "ipa sudocmdgroup-del $cmdgrp2" 0 "deleteing sudo cmd group $cmdgrp2"
+	rlPhaseEnd
+}
 check_deletedsudocmdgroup()
 {
 	rlPhaseStartTest "check to make sure that the sudo command group does not exist"
 		rlRun "ipa sudocmdgroup-find $cmdgrp1" 1 "finding sudo cmd $cmdgrp1"
+		rlRun "ipa sudocmdgroup-find $cmdgrp2" 1 "finding sudo cmd $cmdgrp2"
 	rlPhaseEnd
 }
 
@@ -1283,10 +1464,20 @@ add_config()
 
 }
 
+####  Fix later
+add_slave_config()
+{
+	rlPhaseStartTest "modify a config entry to ensure that the change takes everywhere."
+		rlRun "ipa config-mod --maxusername=994" 0 "modifying max username length"
+	rlPhaseEnd
+
+}
+
 check_config()
 {
 	rlPhaseStartTest "making sure that the new max usernames is shown"
 		rlRun "ipa config-show | grep 994" 0 "making sure that the new max usernames is specified"
+# update later		rlRun "ipa config-show | grep 994" 0 "making sure that the new max usernames is specified"
 	rlPhaseEnd
 }
 
@@ -1295,13 +1486,19 @@ delete_config()
 	rlPhaseStartTest "modify a config entry back to something a little more sane"
 		rlRun "ipa config-mod --maxusername=25" 0 "modifying max username length"
 	rlPhaseEnd
-
+}
+delete_slave_config()
+{
+	rlPhaseStartTest "modify a config entry back to something a little more sane"
+# update later		rlRun "ipa config-mod --maxusername=25" 0 "modifying max username length"
+	rlPhaseEnd
 }
 
 check_deletedconfig()
 {
 	rlPhaseStartTest "making sure that the new max usernames is shown"
 		rlRun "ipa config-show | grep 25" 0 "making sure that the new max usernames is specified correctly"
+# update later		rlRun "ipa config-show | grep 25" 0 "making sure that the new max usernames is specified correctly"
 	rlPhaseEnd
 }
 
@@ -1309,6 +1506,7 @@ check_deletedconfig()
 # pwpolicy section
 ################################
 tg="pwtestg"
+ts="pwtests"
 add_pwpolicy()
 {
 	ipa group-add --desc=tg $tg
@@ -1316,41 +1514,63 @@ add_pwpolicy()
 		rlRun "ipa pwpolicy-add --maxlife=999  --priority=10 $tg" 0 "setting password policy to something high"
 	rlPhaseEnd
 }
-
+add_slave_pwpolicy()
+{
+	ipa group-add --desc=tg $ts
+	rlPhaseStartTest "adding pwpolicy to a user on the slave server"
+		rlRun "ipa pwpolicy-add --maxlife=999  --priority=10 $ts" 0 "setting password policy to something high"
+	rlPhaseEnd
+}
 check_pwpolicy()
 {
 	rlPhaseStartTest "Searching for added pwpolicy"
 		rlRun "ipa pwpolicy-find $tg | grep 999" 0 "Searching for added pwpolicy"
+		rlRun "ipa pwpolicy-find $ts | grep 999" 0 "Searching for added pwpolicy"
 	rlPhaseEnd
 }
-
-mod_pwpolicy()
+modify_pwpolicy()
 {	rlPhaseStartTest "modifying pwpolicy for test group"
 		rlRun "ipa pwpolicy-mod --maxlife=384 $tg" 0 "modifying pwpolicy for test group"
 	rlPhaseEnd
 }
-
-check_modpwpolicy()
+modify_slave_pwpolicy()
+{	rlPhaseStartTest "modifying pwpolicy for test group on slave"
+		rlRun "ipa pwpolicy-mod --maxlife=384 $ts" 0 "modifying pwpolicy for test group"
+	rlPhaseEnd
+}
+check_modifiedpwpolicy()
 {
 	rlPhaseStartTest "Searching for modified pwpolicy in tg"
 		rlRun "ipa pwpolicy-find $tg | grep 384" 0 "Searching for modified pwpolicy in tg"
 	rlPhaseEnd
 }
-
+check_slave_modifiedpwpolicy()
+{
+	rlPhaseStartTest "Searching for modified pwpolicy in the slave for user $ts"
+		rlRun "ipa pwpolicy-find $ts | grep 384" 0 "Searching for modified pwpolicy in ts"
+	rlPhaseEnd
+}
 delete_pwpolicy()
 {
 	rlPhaseStartTest "Deleting the password policy for the testgroup"
 		rlRun "ipa pwpolicy-del $tg" 0 "Deleting the password policy for the testgroup"
 	rlPhaseEnd
 }
-
+delete_slave_pwpolicy()
+{
+	rlPhaseStartTest "Deleting the password policy for the testgroup added to the slave"
+		rlRun "ipa pwpolicy-del $ts" 0 "Deleting the password policy for the testgroup added to the slave"
+	rlPhaseEnd
+}
 check_deletedpwpolicy()
 {
-	rlPhaseStartTest "Making sure that the test group pwpolicy doesn't seem to be searchable"
+	rlPhaseStartTest "Making sure that the test groups pwpolicy doesn't seem to be searchable"
 		rlRun "ipa pwpolicy-find $tg" 1 "Making sure that the test group pwpolicy doesn't seem to be searchable"
+		rlRun "ipa pwpolicy-find $ts" 1 "Making sure that the test group pwpolicy doesn't seem to be searchable"
 	rlPhaseEnd
 	# Cleanup of test group
 	ipa group-del $tg
+	ipa group-del $ts
 }
 
 ################################
@@ -1371,13 +1591,13 @@ check_selfservice()
 	rlPhaseEnd
 }
 
-mod_selfservice()
+modify_selfservice()
 {	rlPhaseStartTest "modifying selfservice rule"
 		rlRun "ipa selfservice-mod --attrs=street,postalCode,l,c,st,telephoneNumber $ss" 0 "modifying selfservice rule"
 	rlPhaseEnd
 }
 
-check_modselfservice()
+check_modifiedselfservice()
 {
 	rlPhaseStartTest "Searching for modified selfservice policy"
 		rlRun "ipa selfservice-find $ss | grep telephoneNumber" 0 "Searching for modified selfservice policy"
@@ -1416,13 +1636,13 @@ check_privilege()
 	rlPhaseEnd
 }
 
-mod_privilege()
+modify_privilege()
 {	rlPhaseStartTest "Modify the privilege"
 		rlRun "ipa privilege-mod --desc='newdesc' $priv" 0 "modifying privilege"
 	rlPhaseEnd
 }
 
-check_modprivilege()
+check_modifiedprivilege()
 {
 	rlPhaseStartTest "Find the modified privilege"
 		rlRun "ipa privilege-find $priv | grep newdesc" 0 "Searching for modified privilege"
@@ -1461,13 +1681,13 @@ check_role()
 	rlPhaseEnd
 }
 
-mod_role()
+modify_role()
 {	rlPhaseStartTest "Modify the role"
 		rlRun "ipa role-mod --desc='altdesc' $role" 0 "modifying role"
 	rlPhaseEnd
 }
 
-check_modrole()
+check_modifiedrole()
 {
 	rlPhaseStartTest "Find the modified role"
 		rlRun "ipa role-find $role | grep altdesc" 0 "Searching for modified role"

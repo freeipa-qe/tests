@@ -353,11 +353,11 @@ add_objects()
    # Add a SUDO rule
 	add_sudorule
 
-   # Add a sudo command group
-	add_sudocmdgroup
-
    # Add a sudo command
 	add_sudocmd
+
+   # Add a sudo command group
+	add_sudocmdgroup
 
    # Add or modify a config value
 	add_config
@@ -371,6 +371,15 @@ slave_objects_add()
 	add_slave_hostgroup
 	add_slave_netgroup
 	add_slave_newservice
+	add_slave_dns
+	add_slave_hbac
+	add_slave_hbac_service
+	add_slave_permission
+	add_slave_sudorule
+	add_slave_sudocmd
+	add_slave_sudocmdgroup
+	add_slave_config
+	add_slave_pwpolicy
 }
 
 check_objects()
@@ -413,7 +422,7 @@ update_objects()
    modify_privilege
    modify_pwpolicy
    modify_role
-   modift_selfservice
+   modify_selfservice
    modify_sudorule
    modify_sudocmdgroup
    modify_sudocmd
@@ -448,6 +457,12 @@ slave_update_objects()
 	modify_slave_hostgroup
 	modify_slave_netgroup
 	modify_slave_newservice
+	modify_slave_hbacservice
+	modify_slave_service
+	modify_slave_sudorule
+	modify_slave_sudocmd
+	modify_slave_sudocmdgroup
+	modify_slave_pwpolicy
 }
 
 check_updated_slave_objects()
@@ -458,6 +473,12 @@ check_updated_slave_objects()
 	check_slave_modifiedhostgroup
 	check_slave_modifiednetgroup
 	check_slave_modifiednewservice
+	check_slave_modifiedhbacservice
+	check_slave_modifiedservice
+	check_slave_modifiedsudorule
+	check_slave_modifiedsudocmd
+	check_slave_modifiedsudocmdgroup
+	check_slave_modifiedpwpolicy
 }
 
 delete_objects()
@@ -491,6 +512,15 @@ delete_slave_objects()
 	delete_slave_hostgroup
 	delete_slave_netgroup
 	delete_slave_newservice
+	delete_slave_dns
+	delete_slave_hbac
+	delete_slave_hbac_service
+	delete_slave_service
+	delete_slave_sudorule
+	delete_slave_sudocmd
+	delete_slave_sudocmdgroup
+	delete_slave_config
+	delete_slave_pwpolicy
 }
 
 check_deletedobjects()
