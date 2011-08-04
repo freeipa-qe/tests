@@ -674,7 +674,7 @@ rlPhaseStartTest "sudorule-remove-runasuser_func001: Removing RunAs user and ver
 
         rlRun "ipa sudorule-remove-runasuser sudorule1 --users=$user2"
         rlRun "sudo_list user1"
-        rlAssertNotGrep "(user2 : user2 user2) /bin/date, /bin/touch, /bin/uname" "$sudoout"
+        rlAssertNotGrep "(user2) /bin/date, /bin/touch, /bin/uname" "$sudoout"
 
         rlRun "rm -fr $sudoout"
 
@@ -704,7 +704,7 @@ rlPhaseStartTest "sudorule-remove-runasuser_func002: Removing RunAs group and ve
 
         rlRun "ipa sudorule-remove-runasuser sudorule1 --groups=$user2"
         rlRun "sudo_list user1"
-        rlAssertNotGrep "(%user2 : user2) /bin/date, /bin/touch, /bin/uname" "$sudoout"
+        rlAssertNotGrep "(%user2) /bin/date, /bin/touch, /bin/uname" "$sudoout"
 
         rlRun "rm -fr $sudoout"
 
@@ -734,7 +734,7 @@ rlPhaseStartTest "sudorule-remove-runasuser_func003: Removing comma-separated li
 
         rlRun "ipa sudorule-remove-runasuser sudorule1 --users=$user2,$user3"
         rlRun "sudo_list user1"
-        rlAssertNotGrep "(user2, user3 : user2 user2, user3 user3) /bin/date, /bin/touch, /bin/uname" "$sudoout"
+        rlAssertNotGrep "(user2, user3) /bin/date, /bin/touch, /bin/uname" "$sudoout"
 
         rlRun "rm -fr $sudoout"
 
@@ -764,7 +764,7 @@ rlPhaseStartTest "sudorule-remove-runasuser_func004: Removing comma-separated li
 
         rlRun "ipa sudorule-remove-runasuser sudorule1 --groups=$user2,$user3"
         rlRun "sudo_list user1"
-        rlAssertNotGrep "(%user2, %user3 : user2, user3) /bin/date, /bin/touch, /bin/uname" "$sudoout"
+        rlAssertNotGrep "(%user2, %user3) /bin/date, /bin/touch, /bin/uname" "$sudoout"
 
         rlRun "rm -fr $sudoout"
 
