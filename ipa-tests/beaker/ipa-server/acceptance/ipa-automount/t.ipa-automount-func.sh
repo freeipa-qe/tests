@@ -150,10 +150,10 @@ rlPhaseStartTest "automountlocation-add_func_001: ipa automountlocation-add LOCA
         rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 	rlRun "ipa automountlocation-add loc1"
 
-	rlRun "/usr/bin/ldapsearch -LLL -x -h localhost -D $ROOTDN -w $ROOTDNPWD -b cn=loc1,cn=automount,$basedn"
-	rlRun "/usr/bin/ldapsearch -LLL -x -h localhost -D $ROOTDN -w $ROOTDNPWD -b cn=loc1,cn=automount,$basedn \"objectClass=nsContainer\" \"cn=loc1\""
-	rlRun "/usr/bin/ldapsearch -LLL -x -h localhost -D $ROOTDN -w $ROOTDNPWD -b cn=loc1,cn=automount,$basedn \"objectClass=automountmap\" \"automountMapName=auto.master\""
-	rlRun "/usr/bin/ldapsearch -LLL -x -h localhost -D $ROOTDN -w $ROOTDNPWD -b cn=loc1,cn=automount,$basedn \"objectClass=automount\" \"automountInformation=auto.direct\" \"automountKey=/-\""
+	rlRun "/usr/bin/ldapsearch -LLL -x -h localhost -D \"$ROOTDN\" -w $ROOTDNPWD -b cn=loc1,cn=automount,$basedn"
+	rlRun "/usr/bin/ldapsearch -LLL -x -h localhost -D \"$ROOTDN\" -w $ROOTDNPWD -b cn=loc1,cn=automount,$basedn \"objectClass=nsContainer\" \"cn=loc1\""
+	rlRun "/usr/bin/ldapsearch -LLL -x -h localhost -D \"$ROOTDN\" -w $ROOTDNPWD -b cn=loc1,cn=automount,$basedn \"objectClass=automountmap\" \"automountMapName=auto.master\""
+	rlRun "/usr/bin/ldapsearch -LLL -x -h localhost -D \"$ROOTDN\"w $ROOTDNPWD -b cn=loc1,cn=automount,$basedn \"objectClass=automount\" \"automountInformation=auto.direct\" \"automountKey=/-\""
 
         rlRun "ipa automountlocation-del loc1"
 
@@ -167,10 +167,10 @@ rlPhaseStartTest "automountlocation-del_func_001: ipa automountlocation-del LOCA
         rlRun "ipa automountlocation-add loc1"
 	rlRun "ipa automountlocation-del loc1"
 
-        rlRun "/usr/bin/ldapsearch -LLL -x -h localhost -D $ROOTDN -w $ROOTDNPWD -b cn=loc1,cn=automount,$basedn" 32
-        rlRun "/usr/bin/ldapsearch -LLL -x -h localhost -D $ROOTDN -w $ROOTDNPWD -b cn=loc1,cn=automount,$basedn \"objectClass=nsContainer\" \"cn=loc1\"" 32
-        rlRun "/usr/bin/ldapsearch -LLL -x -h localhost -D $ROOTDN -w $ROOTDNPWD -b cn=loc1,cn=automount,$basedn \"objectClass=automountmap\" \"automountMapName=auto.master\"" 32
-        rlRun "/usr/bin/ldapsearch -LLL -x -h localhost -D $ROOTDN -w $ROOTDNPWD -b cn=loc1,cn=automount,$basedn \"objectClass=automount\" \"automountInformation=auto.direct\" \"automountKey=/-\"" 32
+        rlRun "/usr/bin/ldapsearch -LLL -x -h localhost -D \"$ROOTDN\" -w $ROOTDNPWD -b cn=loc1,cn=automount,$basedn" 32
+        rlRun "/usr/bin/ldapsearch -LLL -x -h localhost -D \"$ROOTDN\" -w $ROOTDNPWD -b cn=loc1,cn=automount,$basedn \"objectClass=nsContainer\" \"cn=loc1\"" 32
+        rlRun "/usr/bin/ldapsearch -LLL -x -h localhost -D \"$ROOTDN\" -w $ROOTDNPWD -b cn=loc1,cn=automount,$basedn \"objectClass=automountmap\" \"automountMapName=auto.master\"" 32
+        rlRun "/usr/bin/ldapsearch -LLL -x -h localhost -D \"$ROOTDN\" -w $ROOTDNPWD -b cn=loc1,cn=automount,$basedn \"objectClass=automount\" \"automountInformation=auto.direct\" \"automountKey=/-\"" 32
 
 rlPhaseEnd
 }
@@ -204,11 +204,11 @@ rlPhaseStartTest "automountlocation-import_func_001: ipa automountlocation-impor
 
 	rlRun "cat $TmpDir/automountlocation-import_func_001.out"
 
-        rlRun "/usr/bin/ldapsearch -LLL -x -h localhost -D $ROOTDN -w $ROOTDNPWD -b cn=loc1,cn=automount,$basedn" 
-        rlRun "/usr/bin/ldapsearch -LLL -x -h localhost -D $ROOTDN -w $ROOTDNPWD -b automountmapname=auto.loc1,cn=loc1,cn=automount,$basedn"
-        rlRun "/usr/bin/ldapsearch -LLL -x -h localhost -D $ROOTDN -w $ROOTDNPWD -b description=/share,automountmapname=auto.direct,cn=loc1,cn=automount,$basedn"
-	rlRun "/usr/bin/ldapsearch -LLL -x -h localhost -D $ROOTDN -w $ROOTDNPWD -b description=/ipashare,automountmapname=auto.master,cn=loc1,cn=automount,$basedn"
-        rlRun "/usr/bin/ldapsearch -LLL -x -h localhost -D $ROOTDN -w $ROOTDNPWD -b \"description=/- auto.direct,automountmapname=auto.master,cn=loc1,cn=automount,$basedn\""
+        rlRun "/usr/bin/ldapsearch -LLL -x -h localhost -D \"$ROOTDN\" -w $ROOTDNPWD -b cn=loc1,cn=automount,$basedn" 
+        rlRun "/usr/bin/ldapsearch -LLL -x -h localhost -D \"$ROOTDN\" -w $ROOTDNPWD -b automountmapname=auto.loc1,cn=loc1,cn=automount,$basedn"
+        rlRun "/usr/bin/ldapsearch -LLL -x -h localhost -D \"$ROOTDN\" -w $ROOTDNPWD -b description=/share,automountmapname=auto.direct,cn=loc1,cn=automount,$basedn"
+	rlRun "/usr/bin/ldapsearch -LLL -x -h localhost -D \"$ROOTDN\" -w $ROOTDNPWD -b description=/ipashare,automountmapname=auto.master,cn=loc1,cn=automount,$basedn"
+        rlRun "/usr/bin/ldapsearch -LLL -x -h localhost -D \"$ROOTDN\" -w $ROOTDNPWD -b \"description=/- auto.direct,automountmapname=auto.master,cn=loc1,cn=automount,$basedn\""
 
 	rlRun "ipa automountlocation-del loc1"
 
@@ -222,7 +222,7 @@ rlPhaseStartTest "automountmap-add_func_001: ipa automountmap-add LOCATION MAP"
 	rlRun "ipa automountlocation-add loc1"
 
 	rlRun "ipa automountmap-add loc1 auto.loc1"
-	rlRun "/usr/bin/ldapsearch -LLL -x -h localhost -D $ROOTDN -w $ROOTDNPWD -b automountmapname=auto.loc1,cn=loc1,cn=automount,$basedn \"objectClass=automountmap\" \"automountMapName=auto.loc1\""
+	rlRun "/usr/bin/ldapsearch -LLL -x -h localhost -D \"$ROOTDN\" -w $ROOTDNPWD -b automountmapname=auto.loc1,cn=loc1,cn=automount,$basedn \"objectClass=automountmap\" \"automountMapName=auto.loc1\""
 
 	rlRun "ipa automountlocation-del loc1"
 
@@ -235,11 +235,11 @@ rlPhaseStartTest "automountmap-del_func_001: ipa automountmap-del LOCATION MAP"
 
         rlRun "ipa automountlocation-add loc1"
         rlRun "ipa automountmap-add loc1 auto.loc1"
-        rlRun "/usr/bin/ldapsearch -LLL -x -h localhost -D $ROOTDN -w $ROOTDNPWD -b automountmapname=auto.loc1,cn=loc1,cn=automount,$basedn \"objectClass=automountmap\" \"automountMapName=auto.loc1\""
+        rlRun "/usr/bin/ldapsearch -LLL -x -h localhost -D \"$ROOTDN\" -w $ROOTDNPWD -b automountmapname=auto.loc1,cn=loc1,cn=automount,$basedn \"objectClass=automountmap\" \"automountMapName=auto.loc1\""
 
 
         rlRun "ipa automountlocation-del loc1"
-        rlRun "/usr/bin/ldapsearch -LLL -x -h localhost -D $ROOTDN -w $ROOTDNPWD -b automountmapname=auto.loc1,cn=loc1,cn=automount,$basedn \"objectClass=automountmap\" \"automountMapName=auto.loc1\"" 32
+        rlRun "/usr/bin/ldapsearch -LLL -x -h localhost -D \"$ROOTDN\" -w $ROOTDNPWD -b automountmapname=auto.loc1,cn=loc1,cn=automount,$basedn \"objectClass=automountmap\" \"automountMapName=auto.loc1\"" 32
 
 rlPhaseEnd
 }
@@ -253,7 +253,7 @@ rlPhaseStartTest "automountmap-mod_func_001: ipa automountmap-mod LOCATION MAP"
 
 	# Testing --desc option
 	rlRun "ipa automountmap-mod loc1 auto.loc1 --desc=loc1"
-	rlRun "/usr/bin/ldapsearch  -x -h localhost -D $ROOTDN -w $ROOTDNPWD -b automountmapname=auto.loc1,cn=loc1,cn=automount,$basedn > $TmpDir/automountmap-mod_func_001.out 2>&1"
+	rlRun "/usr/bin/ldapsearch  -x -h localhost -D \"$ROOTDN\" -w $ROOTDNPWD -b automountmapname=auto.loc1,cn=loc1,cn=automount,$basedn > $TmpDir/automountmap-mod_func_001.out 2>&1"
 	rlAssertGrep "objectClass: automountmap" "$TmpDir/automountmap-mod_func_001.out"
 	rlAssertGrep "automountMapName: auto.loc1" "$TmpDir/automountmap-mod_func_001.out"
 	rlAssertGrep "description: loc1" "$TmpDir/automountmap-mod_func_001.out"
@@ -261,7 +261,7 @@ rlPhaseStartTest "automountmap-mod_func_001: ipa automountmap-mod LOCATION MAP"
 
 	# Testing --setattr
 	rlRun "ipa automountmap-mod loc1 auto.loc1 --setattr=description=testmod"
-	rlRun "/usr/bin/ldapsearch  -x -h localhost -D $ROOTDN -w $ROOTDNPWD -b automountmapname=auto.loc1,cn=loc1,cn=automount,$basedn > $TmpDir/automountmap-mod_func_001.out 2>&1"
+	rlRun "/usr/bin/ldapsearch  -x -h localhost -D \"$ROOTDN\" -w $ROOTDNPWD -b automountmapname=auto.loc1,cn=loc1,cn=automount,$basedn > $TmpDir/automountmap-mod_func_001.out 2>&1"
         rlAssertGrep "objectClass: automountmap" "$TmpDir/automountmap-mod_func_001.out"
         rlAssertGrep "automountMapName: auto.loc1" "$TmpDir/automountmap-mod_func_001.out"
         rlAssertGrep "description: testmod" "$TmpDir/automountmap-mod_func_001.out"
@@ -269,16 +269,16 @@ rlPhaseStartTest "automountmap-mod_func_001: ipa automountmap-mod LOCATION MAP"
 
         # Testing --addattr
 	rlRun "ipa automountmap-mod loc1 auto.loc1 --setattr=description="
-	rlRun "/usr/bin/ldapsearch  -x -h localhost -D $ROOTDN -w $ROOTDNPWD -b automountmapname=auto.loc1,cn=loc1,cn=automount,$basedn > $TmpDir/automountmap-mod_func_001.out 2>&1"
+	rlRun "/usr/bin/ldapsearch  -x -h localhost -D \"$ROOTDN\" -w $ROOTDNPWD -b automountmapname=auto.loc1,cn=loc1,cn=automount,$basedn > $TmpDir/automountmap-mod_func_001.out 2>&1"
         rlAssertNotGrep "description: testmod" "$TmpDir/automountmap-mod_func_001.out"
         rlRun "ipa automountmap-mod loc1 auto.loc1 --addattr=description=testmod"
-        rlRun "/usr/bin/ldapsearch  -x -h localhost -D $ROOTDN -w $ROOTDNPWD -b automountmapname=auto.loc1,cn=loc1,cn=automount,$basedn > $TmpDir/automountmap-mod_func_001.out 2>&1"
+        rlRun "/usr/bin/ldapsearch  -x -h localhost -D \"$ROOTDN\" -w $ROOTDNPWD -b automountmapname=auto.loc1,cn=loc1,cn=automount,$basedn > $TmpDir/automountmap-mod_func_001.out 2>&1"
         rlAssertGrep "description: testmod" "$TmpDir/automountmap-mod_func_001.out"
         rlRun "cat $TmpDir/automountmap-mod_func_001.out"
 
 	# Testing --all --raw --rights
         rlRun "ipa automountmap-mod loc1 auto.loc1 --setattr=description="
-        rlRun "/usr/bin/ldapsearch  -x -h localhost -D $ROOTDN -w $ROOTDNPWD -b automountmapname=auto.loc1,cn=loc1,cn=automount,$basedn > $TmpDir/automountmap-mod_func_001.out 2>&1"
+        rlRun "/usr/bin/ldapsearch  -x -h localhost -D \"$ROOTDN\" -w $ROOTDNPWD -b automountmapname=auto.loc1,cn=loc1,cn=automount,$basedn > $TmpDir/automountmap-mod_func_001.out 2>&1"
         rlAssertNotGrep "description: testmod" "$TmpDir/automountmap-mod_func_001.out"
         rlRun "ipa automountmap-mod loc1 auto.loc1 --addattr=description=testmod --all --rights --raw > $TmpDir/automountmap-mod_func_001.out 2>&1"
 	rlAssertGrep "Modified automount map \"auto.loc1\"" "$TmpDir/automountmap-mod_func_001.out"
