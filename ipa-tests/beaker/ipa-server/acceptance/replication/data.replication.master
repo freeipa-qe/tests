@@ -108,14 +108,17 @@ hostPrincipal_updated="host/$newHost_updated@$RELM"
 
 ######### attributes for a new hostgroup added from master
 hostgroup="westford"
+hostgroup2="cambridge"
 hostgroup_desc="Westford hosts"
 hostgroup_groupMember1="bldg1"
+hostgroup_groupMember2="bldf1"
 
 
 ######### attributes for a new host modified from a master
 hostgroup_updated="raleigh"
 hostgroup_desc_updated="NC hosts"
 hostgroup_groupMember1_updated="bldg2_hosts"
+hostgroup_groupMember2_updated="bldf2_hosts"
 
 
 

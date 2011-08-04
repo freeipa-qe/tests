@@ -105,15 +105,16 @@ managedByHost_updated="dreamworks.$DOMAIN"
 
 ######### attributes for a new hostgroup added from slave
 hostgroup="raleigh"
+hostgroup2="cambridge"
 hostgroup_desc="Raleigh hosts"
 hostgroup_groupMember1="bldg2"
-
+hostgroup_groupMember2="bldf1"
 
 ########### attributes for a new hostgroup modified from a slave
 hostgroup_updated="westford"
 hostgroup_desc_updated="MA hosts"
 hostgroup_groupMember1_updated="bldg1_hosts"
-
+hostgroup_groupMember2_updated="bldf2_hosts"
 
 ######### attributes for a new netgroup added from slave
 netgroup="hradmins"

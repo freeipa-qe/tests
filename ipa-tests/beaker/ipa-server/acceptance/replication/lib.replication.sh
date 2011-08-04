@@ -549,6 +549,22 @@ add_newhostgroup()
 	rlPhaseEnd
 }
 
+add_slave_hostgroup()
+{
+	rlPhaseStartTest "add hostgroup on slave"
+		rlRun "ipa hostgroup-add --desc=$hostgroup_groupMember2  $hostgroup_groupMember2" 0 "Add a hostgroup to be added as member"
+		rlRun "ipa hostgroup-add --desc=$hostgroup_groupMember2_updated  $hostgroup_groupMember2_updated" 0 "Add another hostgroup to be added as member"
+
+		rlRun "ipa hostgroup-add --desc=\"$hostgroup_desc\" \
+		                         --addattr member=\"cn=$hostgroup_groupMember2,cn=hostgroups,cn=accounts,dc=$DOMAIN\" \
+		                         $hostgroup2 " \
+		                         0 \
+		                         "Add a new hostgroup, with a hostgroup member"
+		rlRun "ipa hostgroup-add-member --hosts=$managedByHost $hostgroup2" 0 "Add a host member"
+	rlPhaseEnd
+
+}
+
 check_newhostgroup()
 {
 	rlPhaseStartTest "add new hostgroup"
@@ -556,6 +572,11 @@ check_newhostgroup()
 		rlRun "verifyHostGroupAttr $hostgroup \"Description\" $hostgroup_desc" 0 "Verify Hostgroup's description" 
 		rlRun "verifyHostGroupMember $managedByHost host $hostgroup" 0 "Verify Hostgroup's Member hosts" 
 		rlRun "verifyHostGroupMember $hostgroup_groupMember1 hostgroup $hostgroup" 0 "Verify Hostgroup's Member hosts" 
+		rlRun "verifyHostGroupAttr $hostgroup2 \"Host-group\" $hostgroup2" 0 "Verify Hostgroup's name" 
+		rlRun "verifyHostGroupAttr $hostgroup2 \"Description\" $hostgroup_desc" 0 "Verify Hostgroup's description" 
+		rlRun "verifyHostGroupMember $managedByHost host $hostgroup2" 0 "Verify Hostgroup's Member hosts" 
+		rlRun "verifyHostGroupMember $hostgroup_groupMember2 hostgroup $hostgroup2" 0 "Verify Hostgroup's Member hosts" 
+
 	rlPhaseEnd
 }
 
@@ -571,12 +592,32 @@ modify_newhostgroup()
 	rlPhaseEnd
 }
 
+modify_slave_hostgroup()
+{
+	rlPhaseStartTest "modify hostgroup on slave"
+		rlRun "ipa hostgroup-mod --desc=\"$hostgroup_desc_updated\" \
+		                          $hostgroup2" \
+		                          0 \
+		                          "Modify hostgroup"
+		rlRun "ipa hostgroup-remove-member --hosts=$managedByHost_updated $hostgroup2" 0 "Remove a host member"
+# TODO: --setattr member=\"cn=$hostgroup_groupMember1_updated,cn=hostgroups,cn=accounts,dc=$DOMAIN\" \
+	rlPhaseEnd
+}
+
 check_modifiedhostgroup()
 {
 	rlPhaseStartTest "check modified hostgroup"
 		rlRun "verifyHostGroupAttr $hostgroup_updated \"Host-group\" $hostgroup_updated" 0 "Verify Hostgroup's name" 
 		rlRun "verifyHostGroupAttr $hostgroup_updated \"Description\" $hostgroup_desc_updated" 0 "Verify Hostgroup's description" 
 # TODO:    rlRun "verifyHostGroupMember $hostgroup_groupMember1_updated hostgroup $hostgroup_updated" 0 "Verify Hostgroup's Member hosts" 
+	rlPhaseEnd
+}
+
+check_slave_modifedhostgroup()
+{
+	rlPhaseStartTest "check modified hostgroup from slave"
+		rlRun "verifyHostGroupAttr $hostgroup2 \"Host-group\" $hostgroup_updated" 0 "Verify Hostgroup's name" 
+		rlRun "verifyHostGroupAttr $hostgroup2 \"Description\" $hostgroup_desc_updated" 0 "Verify Hostgroup's description" 
 	rlPhaseEnd
 }
 
@@ -587,12 +628,23 @@ delete_hostgroup()
 	rlPhaseEnd
 }
 
+delete_slave_hostgroup()
+{
+	rlPhaseStartTest "delete hostgroup"
+		rlRun "ipa hostgroup-del $hostgroup2" 0 "Delete the hostgroup" 
+	rlPhaseEnd
+}
+
 check_deletedhostgroup()
 {
 	rlPhaseStartTest "check deleted hostgroup"
 		command="ipa hostgroup-show $hostgroup_updated"
 		expmsg="ipa: ERROR: $hostgroup_updated: hostgroup not found"
 		rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify error when checking for deleted hostgroup"
+		command="ipa hostgroup-show $hostgroup1"
+		expmsg="ipa: ERROR: $hostgroup2: hostgroup not found"
+		rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify error when checking for deleted hostgroup"
+
 	rlPhaseEnd
 }
 
