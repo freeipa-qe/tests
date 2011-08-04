@@ -12,6 +12,9 @@ import java.util.logging.Logger;
 public class CommonTasks {
 	private static Logger log = Logger.getLogger(CommonTasks.class.getName());
 	
+	public static String userPage = "/ipa/ui/#identity=user&navigation=identity";
+	
+	
     public static boolean kinitAsAdmin() {    	
         String admin=System.getProperty("ipa.server.admin");
         String password=System.getProperty("ipa.server.password");        

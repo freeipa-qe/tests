@@ -18,13 +18,13 @@ import com.redhat.qe.ipa.sahi.tasks.UserTasks;
 
 public class UserTests extends SahiTestScript{
 	private static Logger log = Logger.getLogger(UserTests.class.getName());
-	public static SahiTasks sahiTasks = null;	
-	private String userPage = "/ipa/ui/#identity=user&navigation=identity";
+	public static SahiTasks sahiTasks = null;
 	
 	@BeforeClass (groups={"init"}, description="Initialize app for this test suite run", alwaysRun=true, dependsOnGroups="setup")
 	public void initialize() throws CloneNotSupportedException {	
 		sahiTasks = SahiTestScript.getSahiTasks();	
-		sahiTasks.navigateTo(System.getProperty("ipa.server.url")+userPage, true);
+		sahiTasks.navigateTo(System.getProperty("ipa.server.url")+ CommonTasks.userPage, true);
+		sahiTasks.setStrictVisibilityCheck(true);
 	}
 	
 
@@ -43,10 +43,25 @@ public class UserTests extends SahiTestScript{
 		com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(expectedUID).exists(), "Verify user " + expectedUID + " doesn't already exist");
 		
 		//new test user can be added now
-		UserTasks.createUser(sahiTasks, uid, givenname, sn);		
+		UserTasks.createUser(sahiTasks, uid, givenname, sn, "Add");		
 		
 		//verify user was added successfully
 		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(expectedUID).exists(), "Added user " + expectedUID + "  successfully");
+	}
+	
+	/*
+	 * Add users - for positive tests
+	 */
+	@Test (groups={"userCancelAddTests"}, dataProvider="getSingleUserTestObjects")	
+	public void testUserCancelAdd(String testName, String uid, String givenname, String sn) throws Exception {
+		//verify user doesn't exist
+		com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(uid).exists(), "Verify user " + uid + " doesn't already exist");
+		
+		//new test user can be added now
+		UserTasks.createUser(sahiTasks, uid, givenname, sn, "Cancel");		
+		
+		//verify user was added successfully
+		com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(uid).exists(), "Verify user " + uid + "  was not added");
 	}
 	
 	/*
@@ -102,6 +117,31 @@ public class UserTests extends SahiTestScript{
 		// kinit back as admin to continue tests
 		com.redhat.qe.auto.testng.Assert.assertTrue(CommonTasks.kinitAsAdmin(), "Logged back in as admin to continue tests");
 	}
+	
+	
+	/*
+	 * Cancel when deactivating users - for positive tests
+	 */
+	@Test (groups={"userCancelDeactivateTests"}, dataProvider="getUserStatusTestObjects", dependsOnGroups={"userAddTests", "userSetPasswordTests"})	
+	public void testUserCancelDeactivate(String testName, String uid, String password) throws Exception {		
+		//verify user to be edited exists
+		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(uid).exists(), "Verify user " + uid + " to be deactivated exists");
+		
+		//verify expected status	
+		UserTasks.verifyUserStatus(sahiTasks, uid, true);
+		
+		//modify this user
+		UserTasks.modifyUserStatus(sahiTasks, uid, false, "Cancel");
+		
+		//verify status	
+		UserTasks.verifyUserStatus(sahiTasks, uid, true);
+		// verify user can still kinit
+		com.redhat.qe.auto.testng.Assert.assertTrue(CommonTasks.kinitAsUser(uid, password), "Verify " + uid + " can still kinit");
+		
+		// kinit back as admin to continue tests
+		com.redhat.qe.auto.testng.Assert.assertTrue(CommonTasks.kinitAsAdmin(), "Logged back in as admin to continue tests");
+	}
+	
 
 	/*
 	 * Deactivate users - for positive tests
@@ -115,7 +155,7 @@ public class UserTests extends SahiTestScript{
 		UserTasks.verifyUserStatus(sahiTasks, uid, true);
 		
 		//modify this user
-		UserTasks.modifyUserStatus(sahiTasks, uid, false);
+		UserTasks.modifyUserStatus(sahiTasks, uid, false, "Deactivate");
 		
 		//verify changes to status	
 		UserTasks.verifyUserStatus(sahiTasks, uid, false);
@@ -126,18 +166,40 @@ public class UserTests extends SahiTestScript{
 	}
 	
 	/*
-	 * Reactivate users - for positive tests
+	 * Cancel when reactivating users - for positive tests
 	 */
-	@Test (groups={"userReactivateTests"}, dataProvider="getUserStatusTestObjects", dependsOnGroups={"userAddTests", "userDeactivateTests", "userSetPasswordTests"})	
-	public void testUserReactivate(String testName, String uid, String password) throws Exception {		
+	@Test (groups={"userCancelReactivateTests"}, dataProvider="getUserStatusTestObjects", dependsOnGroups={"userAddTests", "userDeactivateTests", "userSetPasswordTests"})	
+	public void testUserCancelReactivate(String testName, String uid, String password) throws Exception {		
 		//verify user to be edited exists
-		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(uid).exists(), "Verify user " + uid + " to be deactivated exists");
+		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(uid).exists(), "Verify user " + uid + " to be reactivated exists");
 		
 		//verify expected status	
 		UserTasks.verifyUserStatus(sahiTasks, uid, false);
 		
 		//modify this user
-		UserTasks.modifyUserStatus(sahiTasks, uid, true);
+		UserTasks.modifyUserStatus(sahiTasks, uid, true, "Cancel");
+		
+		//verify changes to status	
+		UserTasks.verifyUserStatus(sahiTasks, uid, false);
+		// verify user cannot kinit
+		com.redhat.qe.auto.testng.Assert.assertFalse(CommonTasks.kinitAsUser(uid, password), "Verify " + uid + " cannot kinit");
+		
+	}
+	
+	
+	/*
+	 * Reactivate users - for positive tests
+	 */
+	@Test (groups={"userReactivateTests"}, dataProvider="getUserStatusTestObjects", dependsOnGroups={"userAddTests", "userDeactivateTests", "userSetPasswordTests"})	
+	public void testUserReactivate(String testName, String uid, String password) throws Exception {		
+		//verify user to be edited exists
+		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(uid).exists(), "Verify user " + uid + " to be reactivated exists");
+		
+		//verify expected status	
+		UserTasks.verifyUserStatus(sahiTasks, uid, false);
+		
+		//modify this user
+		UserTasks.modifyUserStatus(sahiTasks, uid, true, "Activate");
 		
 		//verify changes to status	
 		UserTasks.verifyUserStatus(sahiTasks, uid, true);
@@ -223,14 +285,16 @@ public class UserTests extends SahiTestScript{
 		UserTasks.verifyUserUpdates(sahiTasks, uid, title, mail);
 	}
 	
-	/*
-	 * Add, but Cancel
-	 */
-	
-	
+		
 	/*
 	 * Search
 	 */
+	@Test (groups={"userSearchTests"}, dataProvider="getUserSearchTestObjects",  dependsOnGroups={"userAddTests", "userAddAndEditTests", "userAddAndAddAnotherTests"})	
+	public void testUserSearch(String testName, String uid) throws Exception {
+		
+		//UserTasks.searchUser(sahiTasks, uid);
+	}
+	
 	
 	/*******************************************************
 	 ************      DATA PROVIDERS     ******************
@@ -239,6 +303,19 @@ public class UserTests extends SahiTestScript{
 	/*
 	 * Data to be used when adding users - for positive cases
 	 */
+	@DataProvider(name="getSingleUserTestObjects")
+	public Object[][] getSingleUserTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createSingleUserTestObjects());
+	}
+	protected List<List<Object>> createSingleUserTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname					uid              	givenname		sn   
+		ll.add(Arrays.asList(new Object[]{ "create_single_user",				"user1", 			"Test1",		"User1"      } ));
+		
+		return ll;	
+	}
+	
 	@DataProvider(name="getUserTestObjects")
 	public Object[][] getUserTestObjects() {
 		return TestNGUtils.convertListOfListsTo2dArray(createUserTestObjects());
@@ -386,6 +463,8 @@ public class UserTests extends SahiTestScript{
 		ll.add(Arrays.asList(new Object[]{ "delete_multiple_users",			"user6"     } ));
 		ll.add(Arrays.asList(new Object[]{ "delete_multiple_users",			"tuser"     } ));
 		ll.add(Arrays.asList(new Object[]{ "delete_multiple_users",			"user9"     } ));
+		ll.add(Arrays.asList(new Object[]{ "delete_multiple_users",			"tuser7"     } ));
+		ll.add(Arrays.asList(new Object[]{ "delete_multiple_users",			"tuser8"     } ));
 		
 		return ll;	
 	}
@@ -423,6 +502,24 @@ public class UserTests extends SahiTestScript{
 		return ll;	
 	}
 	
+	
+	/*
+	 * Data to be used when searching for users
+	 */
+	@DataProvider(name="getUserSearchTestObjects")
+	public Object[][] getUserSearchTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(searchUserTestObjects());
+	}
+	protected List<List<Object>> searchUserTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname					uid              		
+		ll.add(Arrays.asList(new Object[]{ "search_good_user",				"testuser"     } ));
+		ll.add(Arrays.asList(new Object[]{ "search_good_user2",				"user2"     } ));
+		ll.add(Arrays.asList(new Object[]{ "search_good_user7",				"tuser7"     } ));
+		        
+		return ll;	
+	}
 	
 
 }

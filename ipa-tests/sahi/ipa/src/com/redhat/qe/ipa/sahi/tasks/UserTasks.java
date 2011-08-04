@@ -14,13 +14,13 @@ public class UserTasks {
 	 * @param givenName - first name for the new user
 	 * @param sn - last name for the new user
 	 */
-	public static void createUser(SahiTasks sahiTasks, String uid, String givenName, String sn) {
+	public static void createUser(SahiTasks sahiTasks, String uid, String givenName, String sn, String buttonToClick) {
 		sahiTasks.link("Add").click();
 		sahiTasks.link("Optional field: click to show").click();
 		sahiTasks.textbox("uid").setValue(uid);
 		sahiTasks.textbox("givenname").setValue(givenName);
 		sahiTasks.textbox("sn").setValue(sn);
-		sahiTasks.button("Add").click();
+		sahiTasks.button(buttonToClick).click();
 	}
 	
 	/*
@@ -84,12 +84,12 @@ public class UserTasks {
 		sahiTasks.textbox("title").setValue(title);
 		
 		//add a mail address for user
-		sahiTasks.link("Add[1]").click();
+		sahiTasks.link("Add").click();
 		sahiTasks.textbox("mail").setValue(mail);
 		
 		//Update and go back to user list
 		sahiTasks.link("Update").click();
-		sahiTasks.link("Users[1]").click();
+		sahiTasks.link("Users").in(sahiTasks.div("content")).click();
 	}
 	
 	
@@ -108,7 +108,7 @@ public class UserTasks {
 		
 		//verify mail address for user
 		com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("mail").value(), mail, "Verified updated mail for user " + uid);
-		sahiTasks.link("Users[1]").click();
+		sahiTasks.link("Users").in(sahiTasks.div("content")).click();
 	}
 	
 	
@@ -122,31 +122,29 @@ public class UserTasks {
 		
 		//verify user's status
 		if (status)
-			com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link("Active: Click to Deactivate").exists(), "Verified Active status for user " + uid);
+			com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link("Click to Deactivate").exists(), "Verified Active status for user " + uid);
 		else
-			com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link("Inactive: Click to Activate").exists(), "Verified Inactive status for user " + uid);
-		
-		sahiTasks.link("Users[1]").click();
+			com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link("Click to Activate").exists(), "Verified Inactive status for user " + uid);
+	
+		sahiTasks.link("Users").in(sahiTasks.div("content")).click();
 	}
 	
 	/* Update the user status. 
 	 * @param sahiTasks
 	 * @param uid - the uid of user to be edited
 	 */
-	public static void modifyUserStatus(SahiTasks sahiTasks, String uid, boolean newStatus) {		
+	public static void modifyUserStatus(SahiTasks sahiTasks, String uid, boolean newStatus, String buttonToClick) {		
 		//click on user to edit
 		sahiTasks.link(uid).click();
 		
 		//edit user's job title
 		if (newStatus)
-			sahiTasks.link("Inactive: Click to Activate").click();
+			sahiTasks.link("Click to Activate").click();
 		else
-			sahiTasks.link("Active: Click to Deactivate").click();
-		
-		// Update and go back to user list
-		// FIXME: BUG 
-		// sahiTasks.link("Update").click();
-		sahiTasks.link("Users[1]").click();
+			sahiTasks.link("Click to Deactivate").click();
+		sahiTasks.button(buttonToClick).click();
+		//go back to user list
+		sahiTasks.link("Users").in(sahiTasks.div("content")).click();
 	}
 	
 	
@@ -164,10 +162,8 @@ public class UserTasks {
 		sahiTasks.password(1).setValue(password);
 		sahiTasks.button("Reset Password").click();
 		
-		// Update and go back to user list
-		// FIXME: BUG 
-		// sahiTasks.link("Update").click();
-		sahiTasks.link("Users[1]").click();
+		// go back to user list
+		sahiTasks.link("Users").in(sahiTasks.div("content")).click();
 	}
 	
 	/*
@@ -253,10 +249,10 @@ public class UserTasks {
 		sahiTasks.textbox("sn").setValue(sn);
 		sahiTasks.button("Add and Edit").click();
 		sahiTasks.textbox("title").setValue(title);
-		sahiTasks.link("Add[1]").click();
+		sahiTasks.link("Add").click();
 		sahiTasks.textbox("mail").setValue(mail);
 		sahiTasks.span("Update").click();
-		sahiTasks.link("Users[1]").click();
+		sahiTasks.link("Users").in(sahiTasks.div("content")).click();
 	}
 	
 	/*
