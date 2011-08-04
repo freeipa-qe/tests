@@ -370,6 +370,7 @@ slave_objects_add()
 	add_slave_host
 	add_slave_hostgroup
 	add_slave_netgroup
+	add_slave_newservice
 }
 
 check_objects()
@@ -446,6 +447,7 @@ slave_update_objects()
 	modify_slave_host
 	modify_slave_hostgroup
 	modify_slave_netgroup
+	modify_slave_newservice
 }
 
 check_updated_slave_objects()
@@ -453,8 +455,9 @@ check_updated_slave_objects()
 	check_slave_modifieduser
 	check_slave_modifiedgroup
 	check_slave_modifiedhost
-	check_slave_modifedhostgroup
-	check_slave_modifienetgroup
+	check_slave_modifiedhostgroup
+	check_slave_modifiednetgroup
+	check_slave_modifiednewservice
 }
 
 delete_objects()
@@ -487,6 +490,7 @@ delete_slave_objects()
 	delete_slave_host
 	delete_slave_hostgroup
 	delete_slave_netgroup
+	delete_slave_newservice
 }
 
 check_deletedobjects()

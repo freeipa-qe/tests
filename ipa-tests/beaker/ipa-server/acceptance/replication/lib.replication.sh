@@ -770,6 +770,14 @@ add_newservice()
 	rlPhaseEnd
 }
 
+add_slave_newservice()
+{
+	rlPhaseStartTest "add service to slave"
+		rlRun "ipa service-add $service2 --certificate=$certificate" 0 "Add new service"
+		rlRun "ipa service-add-host --hosts=$managedByHost $service2" 0 "Add service host"
+	rlPhaseEnd
+}
+
 check_newservice()
 {
 	rlPhaseStartTest "check service"
@@ -779,6 +787,13 @@ check_newservice()
 		rlRun "verifyServiceAttr $service \"Subject\" $subject" 0 "Verify service's Subject"
 		rlRun "verifyServiceAttr $service \"Issuer\" $issuer" 0 "Verify service's Issuer"
 		rlRun "verifyServiceAttr $service \"Managed by\" $service_managedby" 0 "Verify service's managed hosts"
+		rlRun "verifyServiceAttr $service2 \"Principal\" $service2" 0 "Verify service's name"
+		rlRun "verifyServiceAttr $service2 \"Certificate\" $certificate" 0 "Verify service's certificate"
+		rlRun "verifyServiceAttr $service2 \"Keytab\" $keytab" 0 "Verify service's Keytab"
+		rlRun "verifyServiceAttr $service2 \"Subject\" $subject" 0 "Verify service's Subject"
+		rlRun "verifyServiceAttr $service2 \"Issuer\" $issuer" 0 "Verify service's Issuer"
+		rlRun "verifyServiceAttr $service2 \"Managed by\" $service_managedby" 0 "Verify service's managed hosts"
+
 	rlPhaseEnd
 }
 
@@ -792,12 +807,31 @@ modify_newservice()
 	rlPhaseEnd
 }
 
+modify_slave_newservice()
+{
+	rlPhaseStartTest "modify service on slave"
+		rlRun "ipa service-disable $service2_updated" 0 "Disable service" 
+		rlRun "ipa service-mod $service2_updated --certificate=$updatedcertificate " 0 "Modify service's certificate"
+		rlRun "ipa service-mod $service2_updated --setattr=managedBy=$service_managedby_attr2" 0 "Set service's managed by"
+		rlRun "ipa service-mod $service2_updated --addattr=managedBy=$service_managedby_attr" 0 "Add service's managed by"
+	rlPhaseEnd
+}
+
 check_modifiedservice()
 {
 	rlPhaseStartTest "check modified service"
 		rlRun "verifyServiceAttr $service_updated \"Certificate\" $updatedcertificate" 0 "Verify service's certificate"
 		rlRun "verifyServiceAttr $service_updated \"Subject\" $subject_updated" 0 "Verify service's Subject"
 		rlRun "verifyServiceAttr $service_updated \"Managed by\" \"$managedByHost, $managedByHost_updated\"" 0 "Verify service's managed hosts"
+	rlPhaseEnd
+}
+
+check_slave_modifiedservice()
+{
+	rlPhaseStartTest "check modified service"
+		rlRun "verifyServiceAttr $service2_updated \"Certificate\" $updatedcertificate" 0 "Verify service's certificate"
+		rlRun "verifyServiceAttr $service2_updated \"Subject\" $subject_updated" 0 "Verify service's Subject"
+		rlRun "verifyServiceAttr $service2_updated \"Managed by\" \"$managedByHost, $managedByHost_updated\"" 0 "Verify service's managed hosts"
 	rlPhaseEnd
 }
 
@@ -809,12 +843,24 @@ delete_service()
 
 }
 
+delete_slave_service()
+{
+	rlPhaseStartTest "delete service"
+		rlRun "ipa service-del $service2_updated" 0 "Delete the service" 
+	rlPhaseEnd
+
+}
+
 check_deletedservice()
 {
 	rlPhaseStartTest "check deleted service"
 		command="ipa service-show $service_updated"
 		expmsg="ipa: ERROR: $service_updated: service not found"
 		rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify error when checking for deleted service"
+		command="ipa service-show $service2_updated"
+		expmsg="ipa: ERROR: $service2_updated: service not found"
+		rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify error when checking for deleted service"
+
 	rlPhaseEnd
 }
 
