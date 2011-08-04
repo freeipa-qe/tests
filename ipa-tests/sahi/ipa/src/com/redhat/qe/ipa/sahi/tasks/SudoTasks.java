@@ -23,10 +23,46 @@ public class SudoTasks {
 
 	public static void deleteSudorule(SahiTasks sahiTasks, String cn) {
 		
+		sahiTasks.link("Sudo Rules").click();
 		sahiTasks.checkbox("select[1]").click();
 		sahiTasks.span("Delete").click();
 		sahiTasks.button("Delete").click();
 		
+	}
+	
+	public static void createSudoruleCommandAdd(SahiTasks sahiTasks, String cn, String description) {
+		
+		sahiTasks.link("Sudo Commands").click();
+		sahiTasks.span("Add[1]").click();
+		sahiTasks.textbox("sudocmd").setValue(cn);
+		sahiTasks.textbox("description").setValue(description);
+		sahiTasks.button("Add").click();
+	}
+	
+	public static void deleteSudoruleCommandDel(SahiTasks sahiTasks, String cn, String description) {
+		
+		sahiTasks.link("Sudo Commands").click();
+		sahiTasks.checkbox("select[2]").click();
+		sahiTasks.span("Delete[1]").click();
+		sahiTasks.button("Delete").click();
+	}
+	
+	public static void createSudoCommandGroupAdd(SahiTasks sahiTasks, String cn, String description) {
+
+		sahiTasks.link("Sudo Command Groups").click();
+		sahiTasks.span("Add[1]").click();
+		sahiTasks.textbox("cn").setValue(cn);
+		sahiTasks.textbox("description").setValue(description);
+		sahiTasks.button("Add").click();
+		
+	}
+	
+	public static void deleteSudoCommandGroupDel(SahiTasks sahiTasks, String cn, String description) {
+		
+		sahiTasks.link("Sudo Command Groups").click();
+		sahiTasks.checkbox("select[2]").click();
+		sahiTasks.span("Delete[1]").click();
+		sahiTasks.button("Delete").click();
 	}
 	
 }
