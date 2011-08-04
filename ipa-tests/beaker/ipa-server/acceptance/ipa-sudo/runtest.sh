@@ -84,6 +84,7 @@ PACKAGE="ipa-server"
 	sudorule() {
 		"sudorule_001"
 	
+		"sudorule_add_000"
 		"sudorule_add_001"
 		"sudorule_add_002"
 		"sudorule_add_003"

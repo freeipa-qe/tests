@@ -659,7 +659,7 @@ rlPhaseStartTest "sudorule-add-runasuser_func001: Adding RunAs user and verifyin
 
         rlRun "ipa sudorule-add-runasuser sudorule1 --users=$user2"
 	rlRun "sudo_list user1"
-	rlAssertGrep "(user2 : user2 user2) /bin/date, /bin/touch, /bin/uname" "$sudoout"
+	rlAssertGrep "(user2) /bin/date, /bin/touch, /bin/uname" "$sudoout"
 
 	rlRun "rm -fr $sudoout"
 
@@ -689,7 +689,7 @@ rlPhaseStartTest "sudorule-add-runasuser_func002: Adding RunAs group and verifyi
 
         rlRun "ipa sudorule-add-runasuser sudorule1 --groups=$user2"
         rlRun "sudo_list user1"
-        rlAssertGrep "(%user2 : user2) /bin/date, /bin/touch, /bin/uname" "$sudoout"
+        rlAssertGrep "(%user2) /bin/date, /bin/touch, /bin/uname" "$sudoout"
 
         rlRun "rm -fr $sudoout"
 
@@ -719,7 +719,7 @@ rlPhaseStartTest "sudorule-add-runasuser_func003: Adding comma-separated list of
 
         rlRun "ipa sudorule-add-runasuser sudorule1 --users=$user2,$user3"
         rlRun "sudo_list user1"
-        rlAssertGrep "(user2, user3 : user2 user2, user3 user3) /bin/date, /bin/touch, /bin/uname" "$sudoout"
+        rlAssertGrep "(user2, user3) /bin/date, /bin/touch, /bin/uname" "$sudoout"
 
         rlRun "rm -fr $sudoout"
 
@@ -749,7 +749,7 @@ rlPhaseStartTest "sudorule-add-runasuser_func004: Adding comma-separated list of
 
         rlRun "ipa sudorule-add-runasuser sudorule1 --groups=$user2,$user3"
         rlRun "sudo_list user1"
-        rlAssertGrep "(%user2, %user3 : user2, user3) /bin/date, /bin/touch, /bin/uname" "$sudoout"
+        rlAssertGrep "(%user2, %user3) /bin/date, /bin/touch, /bin/uname" "$sudoout"
 
         rlRun "rm -fr $sudoout"
 

@@ -565,6 +565,35 @@ rlPhaseStartTest "sudorule_001: ipa sudorule help."
 rlPhaseEnd
 }
 
+sudorule_add_000() {
+
+rlPhaseStartTest "sudorule_add_000: ipa help sudorule-add."
+
+	rlRun "ipa help sudorule-add > $TmpDir/sudorule_add_000.txt 2>&1"
+	rlAssertGrep "Purpose: Create new Sudo Rule." "$TmpDir/sudorule_add_000.txt"
+	rlAssertGrep "Usage: ipa \[global-options\] sudorule-add SUDORULE-NAME \[options\]" "$TmpDir/sudorule_add_000.txt"
+	rlAssertGrep "\-h, \--help            show this help message and exit" "$TmpDir/sudorule_add_000.txt"
+	rlAssertGrep "\--desc=STR            Description" "$TmpDir/sudorule_add_000.txt"
+	rlAssertGrep "\--usercat=STRENUM     User category the rule applies to" "$TmpDir/sudorule_add_000.txt"
+	rlAssertGrep "\--hostcat=STRENUM     Host category the rule applies to" "$TmpDir/sudorule_add_000.txt"
+	rlAssertGrep "\--cmdcat=STRENUM      Command category the rule applies to" "$TmpDir/sudorule_add_000.txt"
+	rlAssertGrep "\--runasusercat=STRENUM" "$TmpDir/sudorule_add_000.txt"
+	rlAssertGrep "RunAs Group category the rule applies to" "$TmpDir/sudorule_add_000.txt"
+	rlAssertGrep "\--externaluser=STR    External User the rule applies to (sudorule-find only)" "$TmpDir/sudorule_add_000.txt"
+	rlAssertGrep "\--runasexternaluser=STR" "$TmpDir/sudorule_add_000.txt"
+	rlAssertGrep "External User the commands can run as (sudorule-find" "$TmpDir/sudorule_add_000.txt"
+	rlAssertGrep "\--runasexternalgroup=STR" "$TmpDir/sudorule_add_000.txt"
+	rlAssertGrep "External Group the commands can run as (sudorule-find" "$TmpDir/sudorule_add_000.txt"
+	rlAssertGrep "\--addattr=STR         Add an attribute/value pair. Format is attr=value." "$TmpDir/sudorule_add_000.txt"
+	rlAssertGrep "\--setattr=STR         Set an attribute to a name/value pair." "$TmpDir/sudorule_add_000.txt"
+	rlAssertGrep "\--all                 Retrieve and print all attributes from the server." "$TmpDir/sudorule_add_000.txt"
+	rlAssertGrep "\--raw                 Print entries as stored on the server." "$TmpDir/sudorule_add_000.txt"
+
+	rlRun "cat $TmpDir/sudorule_add_000.txt"
+
+rlPhaseEnd
+}
+
 sudorule_add_001() {
 
 rlPhaseStartTest "sudorule_add_001: Add new sudo rule."
@@ -689,18 +718,24 @@ rlPhaseEnd
 
 sudorule_add_008() {
 
+# The following comments are because of https://fedorahosted.org/freeipa/ticket/1320
+# In short: --externaluser option is depricated.
+
 rlPhaseStartTest "sudorule_add_008: ipa sudorule-add sudorule1 --desc=desc --usercat --hostcat --cmdcat --runasusercat --externaluser"
 
         rlRun "ipa sudorule-add sudorule1 --desc=\"sudo rule 1\" --usercat=all --hostcat=all --cmdcat=all --runasusercat=all --externaluser=all > $TmpDir/sudorule_add_008.txt 2>&1"
-        rlAssertGrep "Added sudo rule \"sudorule1\"" "$TmpDir/sudorule_add_008.txt"
-        rlAssertGrep "Rule name: sudorule1" "$TmpDir/sudorule_add_008.txt"
-        rlAssertGrep "Description: sudo rule 1" "$TmpDir/sudorule_add_008.txt"
-        rlAssertGrep "Enabled: TRUE" "$TmpDir/sudorule_add_008.txt"
-        rlAssertGrep "User category: all" "$TmpDir/sudorule_add_008.txt"
-        rlAssertGrep "Host category: all" "$TmpDir/sudorule_add_008.txt"
-        rlAssertGrep "Command category: all" "$TmpDir/sudorule_add_008.txt"
-        rlAssertGrep "RunAs User category: all" "$TmpDir/sudorule_add_008.txt"
-        rlAssertGrep "External User: all" "$TmpDir/sudorule_add_008.txt"
+#        rlAssertGrep "Added sudo rule \"sudorule1\"" "$TmpDir/sudorule_add_008.txt"
+#        rlAssertGrep "Rule name: sudorule1" "$TmpDir/sudorule_add_008.txt"
+#        rlAssertGrep "Description: sudo rule 1" "$TmpDir/sudorule_add_008.txt"
+#        rlAssertGrep "Enabled: TRUE" "$TmpDir/sudorule_add_008.txt"
+#        rlAssertGrep "User category: all" "$TmpDir/sudorule_add_008.txt"
+#        rlAssertGrep "Host category: all" "$TmpDir/sudorule_add_008.txt"
+#        rlAssertGrep "Command category: all" "$TmpDir/sudorule_add_008.txt"
+#        rlAssertGrep "RunAs User category: all" "$TmpDir/sudorule_add_008.txt"
+#        rlAssertGrep "External User: all" "$TmpDir/sudorule_add_008.txt"
+
+	rlAssertGrep "ipa: ERROR: invalid 'externaluser': this option has been deprecated." "$TmpDir/sudorule_add_008.txt" 1
+
         rlRun "cat $TmpDir/sudorule_add_008.txt"
         rlRun "ipa sudorule-del sudorule1"
 
@@ -709,21 +744,27 @@ rlPhaseEnd
 
 sudorule_add_009() {
 
+# The following comments are because of https://fedorahosted.org/freeipa/ticket/1320
+# In short: --externaluser option is depricated.
+
 rlPhaseStartTest "sudorule_add_009: ipa sudorule-add sudorule1 --desc=desc --usercat --hostcat --cmdcat --runasusercat --externaluser --all --raw"
 
 	rlRun "ipa sudorule-add sudorule1 --desc=\"sudo rule 1\" --usercat=all --hostcat=all --cmdcat=all --runasusercat=all --externaluser=all --all --raw > $TmpDir/sudorule_add_009.txt 2>&1"
-        rlAssertGrep "Added sudo rule \"sudorule1\"" "$TmpDir/sudorule_add_009.txt"
-        rlAssertGrep "dn: ipauniqueid=" "$TmpDir/sudorule_add_009.txt"
-        rlAssertGrep "cn: sudorule1" "$TmpDir/sudorule_add_009.txt"
-        rlAssertGrep "description: sudo rule 1" "$TmpDir/sudorule_add_009.txt"
-        rlAssertGrep "ipaenabledflag: TRUE" "$TmpDir/sudorule_add_009.txt"
-        rlAssertGrep "usercategory: all" "$TmpDir/sudorule_add_009.txt"
-        rlAssertGrep "hostcategory: all" "$TmpDir/sudorule_add_009.txt"
-        rlAssertGrep "cmdcategory: all" "$TmpDir/sudorule_add_009.txt"
-        rlAssertGrep "ipasudorunasusercategory: all" "$TmpDir/sudorule_add_009.txt"
-        rlAssertGrep "externaluser: all" "$TmpDir/sudorule_add_009.txt"
-        rlAssertGrep "objectclass: ipaassociation" "$TmpDir/sudorule_add_009.txt"
-        rlAssertGrep "objectclass: ipasudorule" "$TmpDir/sudorule_add_009.txt"
+#        rlAssertGrep "Added sudo rule \"sudorule1\"" "$TmpDir/sudorule_add_009.txt"
+#        rlAssertGrep "dn: ipauniqueid=" "$TmpDir/sudorule_add_009.txt"
+#        rlAssertGrep "cn: sudorule1" "$TmpDir/sudorule_add_009.txt"
+#        rlAssertGrep "description: sudo rule 1" "$TmpDir/sudorule_add_009.txt"
+#        rlAssertGrep "ipaenabledflag: TRUE" "$TmpDir/sudorule_add_009.txt"
+#        rlAssertGrep "usercategory: all" "$TmpDir/sudorule_add_009.txt"
+#        rlAssertGrep "hostcategory: all" "$TmpDir/sudorule_add_009.txt"
+#        rlAssertGrep "cmdcategory: all" "$TmpDir/sudorule_add_009.txt"
+#        rlAssertGrep "ipasudorunasusercategory: all" "$TmpDir/sudorule_add_009.txt"
+#        rlAssertGrep "externaluser: all" "$TmpDir/sudorule_add_009.txt"
+#        rlAssertGrep "objectclass: ipaassociation" "$TmpDir/sudorule_add_009.txt"
+#        rlAssertGrep "objectclass: ipasudorule" "$TmpDir/sudorule_add_009.txt"
+
+        rlAssertGrep "ipa: ERROR: invalid 'externaluser': this option has been deprecated." "$TmpDir/sudorule_add_008.txt" 1
+
         rlRun "cat $TmpDir/sudorule_add_009.txt"
 	rlRun "ipa sudorule-del sudorule1"
 
@@ -1598,6 +1639,7 @@ rlPhaseStartTest "sudorule-add-runasgroup_002: ipa sudorule-add-runasgroup rule1
 
         rlRun "ipa sudorule-add-runasgroup rule1 --groups=sudogrp2 --all > $TmpDir/sudorule-add-runasgroup_002.txt 2>&1"
         rlAssertGrep "Rule name: rule1" "$TmpDir/sudorule-add-runasgroup_002.txt"
+	rlLog "Verified regression bug https://bugzilla.redhat.com/show_bug.cgi?id=728118"
         rlAssertGrep "RunAs Group: sudogrp1, sudogrp2" "$TmpDir/sudorule-add-runasgroup_002.txt"
         rlRun "cat $TmpDir/sudorule-add-runasgroup_002.txt"
 
@@ -1719,11 +1761,11 @@ rlPhaseStartTest "sudorule-mod_001: ipa help sudorule-mod"
 	rlAssertGrep "RunAs User category the rule applies to" "$TmpDir/sudorule-mod_001.txt"
 	rlAssertGrep "\--runasgroupcat=STRENUM" "$TmpDir/sudorule-mod_001.txt"
 	rlAssertGrep "RunAs Group category the rule applies to" "$TmpDir/sudorule-mod_001.txt"
-	rlAssertGrep "\--externaluser=STR    External User the rule applies to" "$TmpDir/sudorule-mod_001.txt"
+	rlAssertGrep "\--externaluser=STR    External User the rule applies to (sudorule-find only)" "$TmpDir/sudorule-mod_001.txt"
 	rlAssertGrep "\--runasexternaluser=STR" "$TmpDir/sudorule-mod_001.txt"
-	rlAssertGrep "External User the commands can run as" "$TmpDir/sudorule-mod_001.txt"
+	rlAssertGrep "External User the commands can run as (sudorule-find" "$TmpDir/sudorule-mod_001.txt"
 	rlAssertGrep "\--runasexternalgroup=STR" "$TmpDir/sudorule-mod_001.txt"
-	rlAssertGrep "External Group the commands can run as" "$TmpDir/sudorule-mod_001.txt"
+	rlAssertGrep "External Group the commands can run as (sudorule-find" "$TmpDir/sudorule-mod_001.txt"
 	rlAssertGrep "\--addattr=STR         Add an attribute/value pair. Format is attr=value." "$TmpDir/sudorule-mod_001.txt"
 	rlAssertGrep "\--setattr=STR         Set an attribute to a name/value pair." "$TmpDir/sudorule-mod_001.txt"
 	rlAssertGrep "\--rights              Display the access rights of this entry" "$TmpDir/sudorule-mod_001.txt"
@@ -1839,17 +1881,21 @@ sudorule-mod_008() {
 
 rlPhaseStartTest "sudorule-mod_008: ipa sudorule-mod --externaluser"
 
+# The following comments are because of https://fedorahosted.org/freeipa/ticket/1320
+# In short: --externaluser option is depricated.
+
         rlRun "ipa sudorule-add --desc=\"rule 1\" rule1"
 
 	rlRun "ipa sudorule-mod rule1 --externaluser=test1,test2 > $TmpDir/sudorule-mod_008.txt 2>&1"
-	rlAssertGrep "Rule name: rule1" "$TmpDir/sudorule-mod_008.txt"
-	rlAssertGrep "External User: test1,test2" "$TmpDir/sudorule-mod_008.txt"
+	rlAssertGrep "ipa: ERROR: invalid 'externaluser': this option has been deprecated." "$TmpDir/sudorule-mod_008.txt"
+#	rlAssertGrep "Rule name: rule1" "$TmpDir/sudorule-mod_008.txt"
+#	rlAssertGrep "External User: test1,test2" "$TmpDir/sudorule-mod_008.txt"
 	rlRun "cat $TmpDir/sudorule-mod_008.txt"
 
 	rlLog "https://bugzilla.redhat.com/show_bug.cgi?id=713069"
-	rlRun "ipa sudorule-find rule1 --all --raw > $TmpDir/sudorule-mod_008.txt 2>&1"
-	rlAssertGrep "externaluser: test1" "$TmpDir/sudorule-mod_008.txt"
-	rlAssertGrep "externaluser: test2" "$TmpDir/sudorule-mod_008.txt"
+#	rlRun "ipa sudorule-find rule1 --all --raw > $TmpDir/sudorule-mod_008.txt 2>&1"
+#	rlAssertGrep "externaluser: test1" "$TmpDir/sudorule-mod_008.txt"
+#	rlAssertGrep "externaluser: test2" "$TmpDir/sudorule-mod_008.txt"
 	rlRun "cat $TmpDir/sudorule-mod_008.txt"
 
         rlRun "ipa sudorule-del rule1"
@@ -1862,18 +1908,25 @@ sudorule-mod_009() {
 
 rlPhaseStartTest "sudorule-mod_009: ipa sudorule-mod --runasexternaluser"
 
+# The following comments are because of https://fedorahosted.org/freeipa/ticket/1320
+# In short: --externaluser option is depricated.
+
         rlRun "ipa sudorule-add --desc=\"rule 1\" rule1"
 	rlRun "ipa sudorule-add-runasuser rule1 --users=extuser1,extuser2,extuser3"
 	rlRun "ipa sudorule-find rule1 --all --raw | grep \"ipasudorunasextuser: extuser1\""
 	rlRun "ipa sudorule-find rule1 --all --raw | grep \"ipasudorunasextuser: extuser2\""
 	rlRun "ipa sudorule-find rule1 --all --raw | grep \"ipasudorunasextuser: extuser3\""
 
-	rlRun "ipa sudorule-mod rule1 --runasexternaluser=extuser2,extuser3,extuser4"
+#	rlRun "ipa sudorule-mod rule1 --runasexternaluser=extuser2,extuser3,extuser4"
 	
 	rlLog "Verifying bug https://bugzilla.redhat.com/show_bug.cgi?id=711667"
-	rlRun "ipa sudorule-find rule1 --all --raw | grep \"ipasudorunasextuser: extuser2\""
-        rlRun "ipa sudorule-find rule1 --all --raw | grep \"ipasudorunasextuser: extuser3\""
-        rlRun "ipa sudorule-find rule1 --all --raw | grep \"ipasudorunasextuser: extuser4\""
+#	 rlRun "ipa sudorule-find rule1 --all --raw | grep \"ipasudorunasextuser: extuser2\""
+#        rlRun "ipa sudorule-find rule1 --all --raw | grep \"ipasudorunasextuser: extuser3\""
+#        rlRun "ipa sudorule-find rule1 --all --raw | grep \"ipasudorunasextuser: extuser4\""
+
+	rlRun "ipa sudorule-find rule1 --runasexternaluser=extuser1"
+	rlRun "ipa sudorule-find rule1 --runasexternaluser=extuser2"
+	rlRun "ipa sudorule-find rule1 --runasexternaluser=extuser3"
 
         rlRun "ipa sudorule-del rule1"
 
@@ -1885,6 +1938,9 @@ sudorule-mod_010() {
 
 rlPhaseStartTest "sudorule-mod_010: ipa sudorule-mod --runasexternalgroup"
 
+# The following comments are because of https://fedorahosted.org/freeipa/ticket/1320
+# In short: --externaluser option is depricated.
+
         rlRun "ipa sudorule-add --desc=\"rule 1\" rule1"
         rlRun "ipa sudorule-add-runasgroup rule1 --groups=extgrp1,extgrp2,extgrp3"
         rlRun "ipa sudorule-find rule1 --all --raw | grep \"ipasudorunasextgroup: extgrp1\""
@@ -1892,12 +1948,17 @@ rlPhaseStartTest "sudorule-mod_010: ipa sudorule-mod --runasexternalgroup"
         rlRun "ipa sudorule-find rule1 --all --raw | grep \"ipasudorunasextgroup: extgrp3\""
         rlRun "ipa sudorule-find rule1 --all --raw"
 
-        rlRun "ipa sudorule-mod rule1 --runasexternaluser=extgrp2,extgrp3,extgrp4"
+#        rlRun "ipa sudorule-mod rule1 --runasexternaluser=extgrp2,extgrp3,extgrp4"
 
 	rlLog "Verifying bug https://bugzilla.redhat.com/show_bug.cgi?id=711671"
-        rlRun "ipa sudorule-find rule1 --all --raw | grep \"ipasudorunasextgroup: extgrp2\""
-        rlRun "ipa sudorule-find rule1 --all --raw | grep \"ipasudorunasextgroup: extgrp3\""
-        rlRun "ipa sudorule-find rule1 --all --raw | grep \"ipasudorunasextgroup: extgrp4\""
+#        rlRun "ipa sudorule-find rule1 --all --raw | grep \"ipasudorunasextgroup: extgrp2\""
+#        rlRun "ipa sudorule-find rule1 --all --raw | grep \"ipasudorunasextgroup: extgrp3\""
+#        rlRun "ipa sudorule-find rule1 --all --raw | grep \"ipasudorunasextgroup: extgrp4\""
+
+	rlRun "ipa sudorule-find rule1 --runasexternalgroup=extgrp1"
+        rlRun "ipa sudorule-find rule1 --runasexternalgroup=extgrp2"
+        rlRun "ipa sudorule-find rule1 --runasexternalgroup=extgrp3"
+
         rlRun "ipa sudorule-find rule1 --all --raw"
 
         rlRun "ipa sudorule-del rule1"
@@ -1909,17 +1970,22 @@ sudorule-mod_011() {
 
 rlPhaseStartTest "sudorule-mod_011: ipa sudorule-mod --setattr"
 
+# The following comments are because of https://fedorahosted.org/freeipa/ticket/1320
+# In short: --externaluser option is depricated.
+
         rlRun "ipa sudorule-add --desc=\"rule 1\" rule1"
 
 	rlRun "ipa sudorule-add-user rule1 --users=test1"
 	rlRun "ipa sudorule-mod rule1 --setattr=externaluser=test2 > $TmpDir/sudorule-mod_011.txt 2>&1"
-	rlAssertGrep "Rule name: rule1" "$TmpDir/sudorule-mod_011.txt"
-	rlAssertGrep "External User: test2" "$TmpDir/sudorule-mod_011.txt"
+
+#	rlAssertGrep "Rule name: rule1" "$TmpDir/sudorule-mod_011.txt"
+#	rlAssertGrep "External User: test2" "$TmpDir/sudorule-mod_011.txt"
+	rlAssertGrep "ipa: ERROR: invalid 'externaluser': this option has been deprecated." "$TmpDir/sudorule-mod_011.txt"
 	rlRun "cat $TmpDir/sudorule-mod_011.txt"
 
-	rlRun "ipa sudorule-find rule1 --all --raw > $TmpDir/sudorule-mod_011.txt 2>&1"
-	rlAssertGrep "externaluser: test2" "$TmpDir/sudorule-mod_011.txt"
-	rlRun "cat $TmpDir/sudorule-mod_011.txt"
+#	rlRun "ipa sudorule-find rule1 --all --raw > $TmpDir/sudorule-mod_011.txt 2>&1"
+#	rlAssertGrep "externaluser: test2" "$TmpDir/sudorule-mod_011.txt"
+#	rlRun "cat $TmpDir/sudorule-mod_011.txt"
 
         rlRun "ipa sudorule-del rule1"
 
