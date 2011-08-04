@@ -197,7 +197,8 @@ rlPhaseStartTest "automount_004: ipa help automountkey-del"
 
         rlAssertGrep "Usage: ipa \[global-options\] automountkey-del AUTOMOUNTLOCATION AUTOMOUNTMAP \[options\]" "$TmpDir/automount_004.out"
         rlAssertGrep "\-h, \--help     show this help message and exit" "$TmpDir/automount_004.out"
-        rlAssertGrep "\--continue     Continuous mode: Don't stop on errors." "$TmpDir/automount_004.out"
+	rlLog "Verifies https://bugzilla.redhat.com/show_bug.cgi?id=726123"
+        rlAssertNotGrep "\--continue     Continuous mode: Don't stop on errors." "$TmpDir/automount_004.out"
         rlAssertGrep "\--key=IA5STR   Automount key name." "$TmpDir/automount_004.out"
         rlAssertGrep "\--info=IA5STR  Mount information" "$TmpDir/automount_004.out"
 
@@ -1416,9 +1417,11 @@ rlPhaseStartTest "automountkey_del: ipa automountkey-del AUTOMOUNTLOCATION AUTOM
 	rlAssertGrep "Deleted automount key \"/share\"" "$TmpDir/automountkey_del.out"
 	rlRun "cat $TmpDir/automountkey_del.out"
 
-	rlRun "ipa automountkey-del baltimore auto.master --key=/share --info=-rw > $TmpDir/automountkey_del.out 2>&1"
+	rlRun "ipa automountkey-del baltimore auto.master --key=/share --info=-rw > $TmpDir/automountkey_del.out 2>&1" 2
 	rlAssertGrep "ipa: ERROR: no such entry" "$TmpDir/automountkey_del.out"
 	rlRun "cat $TmpDir/automountkey_del.out"
+
+	rlRun "ipa automountlocation-del baltimore"
 
 rlPhaseEnd
 }
@@ -1435,7 +1438,7 @@ rlPhaseStartTest "automountmap_del: ipa automountmap-del LOCATION MAP"
 	rlAssertGrep "Deleted automount map \"auto.map1\"" "$TmpDir/automountmap_del.out"
 	rlRun "cat $TmpDir/automountmap_del.out"
 
-	rlRun "ipa automountmap-del baltimore auto.map1 auto.map2 > $TmpDir/automountmap_del.out 2>&1"
+	rlRun "ipa automountmap-del baltimore auto.map1 auto.map2 > $TmpDir/automountmap_del.out 2>&1" 2
         rlAssertGrep "ipa: ERROR: auto.map1: automount map not found" "$TmpDir/automountmap_del.out"
         rlRun "cat $TmpDir/automountmap_del.out"
 

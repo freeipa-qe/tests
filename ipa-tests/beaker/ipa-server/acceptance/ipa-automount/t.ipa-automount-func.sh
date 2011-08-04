@@ -147,6 +147,7 @@ automountlocation-add_func_001() {
 
 rlPhaseStartTest "automountlocation-add_func_001: ipa automountlocation-add LOCATION"
 
+        rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 	rlRun "ipa automountlocation-add loc1"
 
 	rlRun "/usr/bin/ldapsearch -LLL -x -h localhost -D $ROOTDN -w $ROOTDNPWD -b cn=loc1,cn=automount,$basedn"
