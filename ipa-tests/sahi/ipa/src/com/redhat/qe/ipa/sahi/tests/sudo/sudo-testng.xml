@@ -9,13 +9,10 @@
 			    <include name="setup" />
 			    <include name="init" />
 				<include name="sudoruleAddTests" />
-				
 				<include name="sudoruleCommandAddTests" />
 				<include name="sudoruleCommandDelTests" />
-				<!--
-				<include name="sudoCommandGroupAddTests" />
-				<include name="sudoCommandGroupDelTests" />
-				-->
+				<include name="sudoruleCommandGroupAddTests" />
+				<include name="sudoruleCommandGroupDelTests" />
 				<include name="sudoruleDeleteTests" />
 			</run>
 		</groups>

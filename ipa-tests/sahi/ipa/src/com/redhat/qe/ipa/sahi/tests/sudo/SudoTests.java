@@ -105,30 +105,30 @@ public class SudoTests extends SahiTestScript{
 	/*
 	 * Add Sudo Command Groups - positive tests
 	 */
-	@Test (groups={"sudoCommandGroupAddTests"}, dataProvider="getSudoCommandGroupAddTestObjects", 
+	@Test (groups={"sudoruleCommandGroupAddTests"}, dataProvider="getSudoruleCommandGroupAddTestObjects", 
 			dependsOnGroups={"sudoruleAddTests"})	
-			public void testSudoCommandGroupAdd(String testName, String cn, String description) throws Exception {
+			public void testSudoruleCommandGroupAdd(String testName, String cn, String description) throws Exception {
 				//verify command group to be added doesn't exist
 				com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(cn).exists(), "Verify sudocommand group " + cn + "  doesn't already exist");
 				
 				//new sudo rule command can be added now
-				SudoTasks.createSudoCommandGroupAdd(sahiTasks, cn, description);
+				SudoTasks.createSudoruleCommandGroupAdd(sahiTasks, cn, description);
 				
 				//verify sudo command group was added successfully
 				com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(cn).exists(), "Added Sudo Command Group" + cn + "  successfully");
 	} 
 	
 	/*
-	 * Del Sudo Commands - positive tests
+	 * Del Sudo Command Group - positive tests
 	 */
-	@Test (groups={"sudoCommandGroupDelTests"}, dataProvider="getSudoCommandGroupDelTestObjects", 
-			dependsOnGroups={"sudoCommandGroupAddTests"})	
-			public void testSudoCommandGroupDel(String testName, String cn, String description) throws Exception {
+	@Test (groups={"sudoruleCommandGroupDelTests"}, dataProvider="getSudoruleCommandGroupDelTestObjects", 
+			dependsOnGroups={"sudoruleCommandGroupAddTests"})	
+			public void testSudoruleCommandGroupDel(String testName, String cn, String description) throws Exception {
 				//verify command group to be deleted exists
 				com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(cn).exists(), "Verify sudocommand group" + cn + "  to be deleted exists");
 				
 				//new sudo command group can be deleted now
-				SudoTasks.deleteSudoCommandGroupDel(sahiTasks, cn, description);
+				SudoTasks.deleteSudoruleCommandGroupDel(sahiTasks, cn, description);
 				
 				//verify sudo rule command group was added successfully
 				com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(cn).exists(), "Sudorule Command Group" + cn + "  deleted successfully");
@@ -211,11 +211,11 @@ public class SudoTests extends SahiTestScript{
 	/*
 	 * Data to be used when adding sudo command groups - for positive cases
 	 */
-	@DataProvider(name="getSudoCommandGroupAddTestObjects")
-	public Object[][] getSudoCommandGroupAddTestObjects() {
-		return TestNGUtils.convertListOfListsTo2dArray(createSudoCommandGroupAddTestObjects());
+	@DataProvider(name="getSudoruleCommandGroupAddTestObjects")
+	public Object[][] getSudoruleCommandGroupAddTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createSudoruleCommandGroupAddTestObjects());
 	}
-	protected List<List<Object>> createSudoCommandGroupAddTestObjects() {		
+	protected List<List<Object>> createSudoruleCommandGroupAddTestObjects() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
         //										testname					cn   			description
@@ -227,11 +227,11 @@ public class SudoTests extends SahiTestScript{
 	/*
 	 * Data to be used when deleting sudo command groups - for positive cases
 	 */
-	@DataProvider(name="getSudoCommandGroupDelTestObjects")
-	public Object[][] getSudoCommandGroupDelTestObjects() {
-		return TestNGUtils.convertListOfListsTo2dArray(createSudoruleCommandDelTestObjects());
+	@DataProvider(name="getSudoruleCommandGroupDelTestObjects")
+	public Object[][] getSudoruleCommandGroupDelTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(deleteSudoruleCommandGroupDelTestObjects());
 	}
-	protected List<List<Object>> createSudoCommandGroupDelTestObjects() {		
+	protected List<List<Object>> deleteSudoruleCommandGroupDelTestObjects() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
         //										testname					cn   			description
