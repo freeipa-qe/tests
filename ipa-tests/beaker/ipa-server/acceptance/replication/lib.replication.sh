@@ -1463,7 +1463,6 @@ add_config()
 	rlPhaseEnd
 
 }
-
 ####  Fix later
 add_slave_config()
 {
@@ -1472,7 +1471,6 @@ add_slave_config()
 	rlPhaseEnd
 
 }
-
 check_config()
 {
 	rlPhaseStartTest "making sure that the new max usernames is shown"
@@ -1480,7 +1478,6 @@ check_config()
 # update later		rlRun "ipa config-show | grep 994" 0 "making sure that the new max usernames is specified"
 	rlPhaseEnd
 }
-
 delete_config()
 {
 	rlPhaseStartTest "modify a config entry back to something a little more sane"
@@ -1577,44 +1574,65 @@ check_deletedpwpolicy()
 # selfservice section
 ################################
 ss="users-self-s"
+sr="users-self-r"
 add_selfservice()
 {
 	rlPhaseStartTest "adding a selfservice section"
 		rlRun "ipa selfservice-add --permissions=write --attrs=street,postalCode,l,c,st $ss" 0 "adding a selfservice section"
 	rlPhaseEnd
 }
-
+add_slave_selfservice()
+{
+	rlPhaseStartTest "adding a selfservice to the slave"
+		rlRun "ipa selfservice-add --permissions=write --attrs=street,postalCode,l,c,st $sr" 0 "adding a selfservice to the slave"
+	rlPhaseEnd
+}
 check_selfservice()
 {
 	rlPhaseStartTest "Searching for added selfservice"
 		rlRun "ipa selfservice-find $ss | grep postalCode" 0 "Searching for added selfservice"
+		rlRun "ipa selfservice-find $sr | grep postalCode" 0 "Searching for added selfservice"
 	rlPhaseEnd
 }
-
 modify_selfservice()
 {	rlPhaseStartTest "modifying selfservice rule"
 		rlRun "ipa selfservice-mod --attrs=street,postalCode,l,c,st,telephoneNumber $ss" 0 "modifying selfservice rule"
 	rlPhaseEnd
 }
-
+modify_slave_selfservice()
+{	rlPhaseStartTest "modifying selfservice rule on the slave"
+		rlRun "ipa selfservice-mod --attrs=street,postalCode,l,c,st,telephoneNumber $sr" 0 "modifying selfservice rule on the slave"
+	rlPhaseEnd
+}
 check_modifiedselfservice()
 {
 	rlPhaseStartTest "Searching for modified selfservice policy"
 		rlRun "ipa selfservice-find $ss | grep telephoneNumber" 0 "Searching for modified selfservice policy"
 	rlPhaseEnd
 }
-
+check_slave_modifiedselfservice()
+{
+	rlPhaseStartTest "Searching for modified selfservice policy on the slave"
+		rlRun "ipa selfservice-find $sr | grep telephoneNumber" 0 "Searching for modified selfservice policy on the slave"
+	rlPhaseEnd
+}
 delete_selfservice()
 {
 	rlPhaseStartTest "Deleting the self service"
 		rlRun "ipa selfservice-del $ss" 0 "Deleting the self service"
 	rlPhaseEnd
 }
-
+delete_slave_selfservice()
+{
+	rlPhaseStartTest "Deleting the self service from the slave"
+		rlRun "ipa selfservice-del $sr" 0 "Deleting the self service from the slave"
+	rlPhaseEnd
+}
 check_deletedselfservice()
 {
-	rlPhaseStartTest "Searching for removed selfservice"
+		lPhaseStartTest "Searching for removed selfservice"
 		rlRun "ipa selfservice-find $ss" 1 "Searching for removed selfservice"
+		rlRun "ipa selfservice-find $sr" 1 "Searching for the selfservice removed from the slave"
 	rlPhaseEnd
 }
 
@@ -1622,44 +1640,65 @@ check_deletedselfservice()
 # privilege section
 ################################
 priv="rep-priv"
+priv2="dem-priv"
 add_privilege()
 {
 	rlPhaseStartTest "Add a privilege"
 		rlRun "ipa privilege-add --desc='test desc' $priv" 0 "adding a priviege"
 	rlPhaseEnd
 }
-
+add_slave_privilege()
+{
+	rlPhaseStartTest "Add a privilege to the slave"
+		rlRun "ipa privilege-add --desc='test desc' $priv2" 0 "adding a priviege to the slave"
+	rlPhaseEnd
+}
 check_privilege()
 {
 	rlPhaseStartTest "check to ensure that the privilege exists"
 		rlRun "ipa privilege-find $priv | grep 'test desc'" 0 "Searching for that added privilege"
+		rlRun "ipa privilege-find $priv2 | grep 'test desc'" 0 "Searching for that privilege added to the slave"
 	rlPhaseEnd
 }
-
 modify_privilege()
 {	rlPhaseStartTest "Modify the privilege"
 		rlRun "ipa privilege-mod --desc='newdesc' $priv" 0 "modifying privilege"
 	rlPhaseEnd
 }
-
+modify_slave_privilege()
+{	rlPhaseStartTest "Modify the privilege added to the slave"
+		rlRun "ipa privilege-mod --desc='newdesc' $priv2" 0 "modifying privilege on slave"
+	rlPhaseEnd
+}
 check_modifiedprivilege()
 {
 	rlPhaseStartTest "Find the modified privilege"
 		rlRun "ipa privilege-find $priv | grep newdesc" 0 "Searching for modified privilege"
 	rlPhaseEnd
 }
-
+check_slave_modifiedprivilege()
+{
+	rlPhaseStartTest "Find the modified privilege from the slave"
+		rlRun "ipa privilege-find $priv2 | grep newdesc" 0 "Searching for modified privilege from the slave"
+	rlPhaseEnd
+}
 delete_privilege()
 {
 	rlPhaseStartTest "deleting privilege"
 		rlRun "ipa privilege-del $priv" 0 "Deleting the privilege"
 	rlPhaseEnd
 }
-
+delete_slave_privilege()
+{
+	rlPhaseStartTest "deleting privilege from the slave"
+		rlRun "ipa privilege-del $priv2" 0 "Deleting the privilege from the slave"
+	rlPhaseEnd
+}
 check_deletedprivilege()
 {
 	rlPhaseStartTest "check to ensure that privilege was deleted."
 		rlRun "ipa privilege-find $priv" 1 "Searching for removed privilege"
+		rlRun "ipa privilege-find $priv2" 1 "Searching for privilege removed from the slave"
 	rlPhaseEnd
 }
 
@@ -1667,44 +1706,65 @@ check_deletedprivilege()
 # role section
 ################################
 role="rep-rtst"
+role2="dem-rtst"
 add_role()
 {
 	rlPhaseStartTest "Add a role"
 		rlRun "ipa role-add --desc testrole $role" 0 "adding a role"
 	rlPhaseEnd
 }
-
+add_slave_role()
+{
+	rlPhaseStartTest "Add a role to the slave"
+		rlRun "ipa role-add --desc testrole $role2" 0 "adding a role to the slave"
+	rlPhaseEnd
+}
 check_role()
 {
 	rlPhaseStartTest "check to ensure that the role exists"
 		rlRun "ipa role-find $role | grep testrole" 0 "Searching for that added role"
+		rlRun "ipa role-find $role2 | grep testrole" 0 "Searching for the role added on the slave"
 	rlPhaseEnd
 }
-
 modify_role()
 {	rlPhaseStartTest "Modify the role"
 		rlRun "ipa role-mod --desc='altdesc' $role" 0 "modifying role"
 	rlPhaseEnd
 }
-
+modify_slave_role()
+{	rlPhaseStartTest "Modify the role on the slave"
+		rlRun "ipa role-mod --desc='altdesc' $role2" 0 "modifying role on the slave"
+	rlPhaseEnd
+}
 check_modifiedrole()
 {
 	rlPhaseStartTest "Find the modified role"
 		rlRun "ipa role-find $role | grep altdesc" 0 "Searching for modified role"
 	rlPhaseEnd
 }
-
+check_slave_modifiedrole()
+{
+	rlPhaseStartTest "Find the modified role from the slave"
+		rlRun "ipa role-find $role2 | grep altdesc" 0 "Searching for modified role from the slave"
+	rlPhaseEnd
+}
 delete_role()
 {
 	rlPhaseStartTest "deleting role"
 		rlRun "ipa role-del $role" 0 "Deleting the role"
 	rlPhaseEnd
 }
-
+delete_slave_role()
+{
+	rlPhaseStartTest "deleting role"
+		rlRun "ipa role-del $role2" 0 "Deleting the role from the slave"
+	rlPhaseEnd
+}
 check_deletedrole()
 {
 	rlPhaseStartTest "check to ensure that role was deleted."
 		rlRun "ipa role-find $role" 1 "Searching for removed role"
+		rlRun "ipa role-find $role2" 1 "Searching for role removed from the server"
 	rlPhaseEnd
 }
 

@@ -380,6 +380,9 @@ slave_objects_add()
 	add_slave_sudocmdgroup
 	add_slave_config
 	add_slave_pwpolicy
+	add_slave_selfservice
+	add_slave_privilege
+	add_slave_role
 }
 
 check_objects()
@@ -463,6 +466,9 @@ slave_update_objects()
 	modify_slave_sudocmd
 	modify_slave_sudocmdgroup
 	modify_slave_pwpolicy
+	modify_slave_selfservice
+	modify_slave_privilege
+	modify_slave_role
 }
 
 check_updated_slave_objects()
@@ -479,6 +485,9 @@ check_updated_slave_objects()
 	check_slave_modifiedsudocmd
 	check_slave_modifiedsudocmdgroup
 	check_slave_modifiedpwpolicy
+	check_slave_modifiedselfservice
+	check_slave_modifiedprivilege
+	check_slave_modifiedrole
 }
 
 delete_objects()
@@ -521,6 +530,9 @@ delete_slave_objects()
 	delete_slave_sudocmdgroup
 	delete_slave_config
 	delete_slave_pwpolicy
+	delete_slave_selfservice
+	delete_slave_privilege
+	delete_slave_role
 }
 
 check_deletedobjects()
