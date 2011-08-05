@@ -156,7 +156,9 @@ public class SudoTests extends SahiTestScript{
 		
         //										testname					cn   
 		ll.add(Arrays.asList(new Object[]{ "create_sudorule",				"testrule1"	} ));
-				        
+		ll.add(Arrays.asList(new Object[]{ "create_sudorule",				"testrule2"	} ));
+		ll.add(Arrays.asList(new Object[]{ "create_sudorule",				"testrule3"	} ));
+		
 		return ll;	
 	}
 	
@@ -172,6 +174,8 @@ public class SudoTests extends SahiTestScript{
 		
         //										testname					cn              		
 		ll.add(Arrays.asList(new Object[]{ "delete_good_sudorule",				"testrule1"     } ));
+		ll.add(Arrays.asList(new Object[]{ "delete_good_sudorule",				"testrule2"     } ));
+		ll.add(Arrays.asList(new Object[]{ "delete_good_sudorule",				"testrule3"     } ));
 		        
 		return ll;	
 	}
@@ -188,7 +192,14 @@ public class SudoTests extends SahiTestScript{
 		
         //										testname					cn   			description
 		ll.add(Arrays.asList(new Object[]{ "create_sudorule_command",		"/bin/date",		"date command"	} ));
-				        
+		ll.add(Arrays.asList(new Object[]{ "create_sudorule_command",		"/bin/cat",			"cat command"	} ));
+		ll.add(Arrays.asList(new Object[]{ "create_sudorule_command",		"/bin/find",		"find command"	} ));
+		ll.add(Arrays.asList(new Object[]{ "create_sudorule_command",		"/bin/more",		"more command"	} ));
+		ll.add(Arrays.asList(new Object[]{ "create_sudorule_command",		"/usr/bin/less",	"less command"	} ));
+		ll.add(Arrays.asList(new Object[]{ "create_sudorule_command",		"/bin/ln",			"symlink command"	} ));
+		ll.add(Arrays.asList(new Object[]{ "create_sudorule_command",		"/bin/sleep",		"sleep command"	} ));
+		ll.add(Arrays.asList(new Object[]{ "create_sudorule_command",		"/bin/mkdir",		"mkdir command"	} ));
+						        
 		return ll;	
 	}
 
@@ -204,7 +215,14 @@ public class SudoTests extends SahiTestScript{
 		
         //										testname					cn   			description
 		ll.add(Arrays.asList(new Object[]{ "delete_sudorule_command",		"/bin/date",		"date command"	} ));
-				        
+		ll.add(Arrays.asList(new Object[]{ "delete_sudorule_command",		"/bin/cat",			"cat command"	} ));
+		ll.add(Arrays.asList(new Object[]{ "delete_sudorule_command",		"/bin/find",		"find command"	} ));
+		ll.add(Arrays.asList(new Object[]{ "delete_sudorule_command",		"/bin/more",		"more command"	} ));
+		ll.add(Arrays.asList(new Object[]{ "delete_sudorule_command",		"/usr/bin/less",	"less command"	} ));
+		ll.add(Arrays.asList(new Object[]{ "delete_sudorule_command",		"/bin/ln",			"symlink command"	} ));
+		ll.add(Arrays.asList(new Object[]{ "delete_sudorule_command",		"/bin/sleep",		"sleep command"	} ));
+		ll.add(Arrays.asList(new Object[]{ "delete_sudorule_command",		"/bin/mkdir",		"mkdir command"	} ));
+				
 		return ll;	
 	}
 
@@ -219,7 +237,11 @@ public class SudoTests extends SahiTestScript{
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
         //										testname					cn   			description
-		ll.add(Arrays.asList(new Object[]{ "create_sudo_commandgroup",		"sudo group1",		"group with basic commands"	} ));
+		ll.add(Arrays.asList(new Object[]{ "create_sudo_commandgroup",		"sudo group1",		"group1 with basic commands"	} ));
+		ll.add(Arrays.asList(new Object[]{ "create_sudo_commandgroup",		"sudo group2",		"group2 with basic commands"	} ));
+		ll.add(Arrays.asList(new Object[]{ "create_sudo_commandgroup",		"sudo group3",		"group3 with basic commands"	} ));
+		ll.add(Arrays.asList(new Object[]{ "create_sudo_commandgroup",		"sudo group4",		"group4 with basic commands"	} ));
+		ll.add(Arrays.asList(new Object[]{ "create_sudo_commandgroup",		"sudo group5",		"group5 with basic commands"	} ));
 				        
 		return ll;	
 	}
@@ -235,7 +257,11 @@ public class SudoTests extends SahiTestScript{
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
         //										testname					cn   			description
-		ll.add(Arrays.asList(new Object[]{ "delete_sudo_commandgroup",		"sudo group1",		"group with basic commands"	} ));
+		ll.add(Arrays.asList(new Object[]{ "delete_sudo_commandgroup",		"sudo group1",		"group1 with basic commands"	} ));
+		ll.add(Arrays.asList(new Object[]{ "delete_sudo_commandgroup",		"sudo group2",		"group2 with basic commands"	} ));
+		ll.add(Arrays.asList(new Object[]{ "delete_sudo_commandgroup",		"sudo group3",		"group3 with basic commands"	} ));
+		ll.add(Arrays.asList(new Object[]{ "delete_sudo_commandgroup",		"sudo group4",		"group4 with basic commands"	} ));
+		ll.add(Arrays.asList(new Object[]{ "delete_sudo_commandgroup",		"sudo group5",		"group5 with basic commands"	} ));
 				        
 		return ll;	
 	}

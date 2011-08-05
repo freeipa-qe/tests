@@ -8,7 +8,7 @@
 			<run>
 			    <include name="setup" />
 			    <include name="init" />
-				<include name="sudoruleAddTests" />
+			    <include name="sudoruleAddTests" />
 				<include name="sudoruleCommandAddTests" />
 				<include name="sudoruleCommandDelTests" />
 				<include name="sudoruleCommandGroupAddTests" />

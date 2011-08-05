@@ -3,7 +3,6 @@ package com.redhat.qe.ipa.sahi.tasks;
 import java.util.logging.Logger;
 import com.redhat.qe.ipa.sahi.tasks.SahiTasks;
 
-
 public class SudoTasks {
 	private static Logger log = Logger.getLogger(SudoTasks.class.getName());
 	
@@ -24,7 +23,7 @@ public class SudoTasks {
 	public static void deleteSudorule(SahiTasks sahiTasks, String cn) {
 		
 		sahiTasks.link("Sudo Rules").click();
-		sahiTasks.checkbox("select[1]").click();
+		sahiTasks.checkbox(cn).click();
 		sahiTasks.span("Delete").click();
 		sahiTasks.button("Delete").click();
 		
@@ -42,9 +41,11 @@ public class SudoTasks {
 	public static void deleteSudoruleCommandDel(SahiTasks sahiTasks, String cn, String description) {
 		
 		sahiTasks.link("Sudo Commands").click();
-		sahiTasks.checkbox("select[2]").click();
-		sahiTasks.span("Delete[1]").click();
+		
+		sahiTasks.checkbox(cn).click();
+		sahiTasks.link("Delete[1]").click();
 		sahiTasks.button("Delete").click();
+			
 	}
 	
 	public static void createSudoruleCommandGroupAdd(SahiTasks sahiTasks, String cn, String description) {
@@ -60,9 +61,10 @@ public class SudoTasks {
 	public static void deleteSudoruleCommandGroupDel(SahiTasks sahiTasks, String cn, String description) {
 		
 		sahiTasks.link("Sudo Command Groups").click();
-		sahiTasks.checkbox("select[4]").click();
+		sahiTasks.checkbox(cn).click();
 		sahiTasks.span("Delete[2]").click();
 		sahiTasks.button("Delete").click();
+		
 	}
 	
 }
