@@ -47,21 +47,21 @@ public class SudoTasks {
 		sahiTasks.button("Delete").click();
 	}
 	
-	public static void createSudoCommandGroupAdd(SahiTasks sahiTasks, String cn, String description) {
+	public static void createSudoruleCommandGroupAdd(SahiTasks sahiTasks, String cn, String description) {
 
 		sahiTasks.link("Sudo Command Groups").click();
-		sahiTasks.span("Add[1]").click();
+		sahiTasks.span("Add[2]").click();
 		sahiTasks.textbox("cn").setValue(cn);
 		sahiTasks.textbox("description").setValue(description);
 		sahiTasks.button("Add").click();
-		
+				
 	}
 	
-	public static void deleteSudoCommandGroupDel(SahiTasks sahiTasks, String cn, String description) {
+	public static void deleteSudoruleCommandGroupDel(SahiTasks sahiTasks, String cn, String description) {
 		
 		sahiTasks.link("Sudo Command Groups").click();
-		sahiTasks.checkbox("select[2]").click();
-		sahiTasks.span("Delete[1]").click();
+		sahiTasks.checkbox("select[4]").click();
+		sahiTasks.span("Delete[2]").click();
 		sahiTasks.button("Delete").click();
 	}
 	
