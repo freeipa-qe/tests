@@ -749,7 +749,7 @@ sudorule_add_009() {
 
 rlPhaseStartTest "sudorule_add_009: ipa sudorule-add sudorule1 --desc=desc --usercat --hostcat --cmdcat --runasusercat --externaluser --all --raw"
 
-	rlRun "ipa sudorule-add sudorule1 --desc=\"sudo rule 1\" --usercat=all --hostcat=all --cmdcat=all --runasusercat=all --externaluser=all --all --raw > $TmpDir/sudorule_add_009.txt 2>&1"
+	rlRun "ipa sudorule-add sudorule1 --desc=\"sudo rule 1\" --usercat=all --hostcat=all --cmdcat=all --runasusercat=all --externaluser=all --all --raw > $TmpDir/sudorule_add_009.txt 2>&1" 1
 #        rlAssertGrep "Added sudo rule \"sudorule1\"" "$TmpDir/sudorule_add_009.txt"
 #        rlAssertGrep "dn: ipauniqueid=" "$TmpDir/sudorule_add_009.txt"
 #        rlAssertGrep "cn: sudorule1" "$TmpDir/sudorule_add_009.txt"
@@ -763,7 +763,7 @@ rlPhaseStartTest "sudorule_add_009: ipa sudorule-add sudorule1 --desc=desc --use
 #        rlAssertGrep "objectclass: ipaassociation" "$TmpDir/sudorule_add_009.txt"
 #        rlAssertGrep "objectclass: ipasudorule" "$TmpDir/sudorule_add_009.txt"
 
-        rlAssertGrep "ipa: ERROR: invalid 'externaluser': this option has been deprecated." "$TmpDir/sudorule_add_008.txt" 1
+        rlAssertGrep "ipa: ERROR: invalid 'externaluser': this option has been deprecated." "$TmpDir/sudorule_add_009.txt" 
 
         rlRun "cat $TmpDir/sudorule_add_009.txt"
 	rlRun "ipa sudorule-del sudorule1"
@@ -1886,7 +1886,7 @@ rlPhaseStartTest "sudorule-mod_008: ipa sudorule-mod --externaluser"
 
         rlRun "ipa sudorule-add --desc=\"rule 1\" rule1"
 
-	rlRun "ipa sudorule-mod rule1 --externaluser=test1,test2 > $TmpDir/sudorule-mod_008.txt 2>&1"
+	rlRun "ipa sudorule-mod rule1 --externaluser=test1,test2 > $TmpDir/sudorule-mod_008.txt 2>&1" 1
 	rlAssertGrep "ipa: ERROR: invalid 'externaluser': this option has been deprecated." "$TmpDir/sudorule-mod_008.txt"
 #	rlAssertGrep "Rule name: rule1" "$TmpDir/sudorule-mod_008.txt"
 #	rlAssertGrep "External User: test1,test2" "$TmpDir/sudorule-mod_008.txt"
@@ -1976,7 +1976,7 @@ rlPhaseStartTest "sudorule-mod_011: ipa sudorule-mod --setattr"
         rlRun "ipa sudorule-add --desc=\"rule 1\" rule1"
 
 	rlRun "ipa sudorule-add-user rule1 --users=test1"
-	rlRun "ipa sudorule-mod rule1 --setattr=externaluser=test2 > $TmpDir/sudorule-mod_011.txt 2>&1"
+	rlRun "ipa sudorule-mod rule1 --setattr=externaluser=test2 > $TmpDir/sudorule-mod_011.txt 2>&1" 1
 
 #	rlAssertGrep "Rule name: rule1" "$TmpDir/sudorule-mod_011.txt"
 #	rlAssertGrep "External User: test2" "$TmpDir/sudorule-mod_011.txt"
