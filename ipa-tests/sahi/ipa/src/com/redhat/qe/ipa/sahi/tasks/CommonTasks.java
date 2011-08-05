@@ -1,6 +1,8 @@
 package com.redhat.qe.ipa.sahi.tasks;
 
 import java.io.BufferedReader;
+import java.io.DataInputStream;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -92,5 +94,46 @@ public class CommonTasks {
 		return true;		
 		
 	}
+    
+    /*
+     * Generates and returns a CSR for the provided hostname
+     * Example:
+     * String csr = CommonTasks.generateCSR("hp-dl360g5-02.testrelm");
+     * 
+     */
+    public static String generateCSR(String hostname) {
+    	String csr="";
+    	Process process;
+    	
+		try {
+			process = Runtime.getRuntime().exec(System.getProperty("user.dir") + "/scripts/generateCSR.sh " + hostname);
+
+			FileInputStream fstream = new FileInputStream("/tmp/"+hostname+".csr");
+		
+			DataInputStream in = new DataInputStream(fstream);
+			BufferedReader br = new BufferedReader(new InputStreamReader(in));
+			String strLine;
+			boolean createcsr = false;
+		  
+			while ((strLine = br.readLine()) != null)   {
+				if (strLine.equals("-----END NEW CERTIFICATE REQUEST-----") ){
+					createcsr = false;
+				}
+				if (createcsr) {
+					csr = csr + strLine + "\n"; 
+				}
+				if (strLine.equals("-----BEGIN NEW CERTIFICATE REQUEST-----")) {
+					createcsr = true;
+				}
+			}
+			
+			in.close();
+			    
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		return csr;
+    }
 
 }

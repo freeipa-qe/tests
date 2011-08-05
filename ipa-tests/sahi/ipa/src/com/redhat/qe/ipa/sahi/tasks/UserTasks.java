@@ -157,7 +157,7 @@ public class UserTasks {
 		sahiTasks.link(uid).click();
 		
 		sahiTasks.textbox("ou").setValue(org);
-		sahiTasks.select("list").choose(manager);
+		//TODO: sahiTasks.select("manager").choose(manager);
 		sahiTasks.textbox("carlicense").setValue(carlicense);
 				
 		//Update and go back to user list
@@ -333,7 +333,7 @@ public class UserTasks {
 		
 		//verify user's job title
 		com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("ou").value(), org, "Verified updated Org. Unit for user " + uid + ": " + org);
-		com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("manager").value(), manager, "Verified updated Manager for user " + uid + ": " + manager);
+		//TODO: com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("manager").value(), manager, "Verified updated Manager for user " + uid + ": " + manager);
 		com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("carlicense").value(), carlicense, "Verified updated car license for user " + uid + ": " + carlicense);
 		
 		sahiTasks.link("Users").in(sahiTasks.div("content")).click();
