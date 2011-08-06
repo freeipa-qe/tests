@@ -142,6 +142,7 @@ cat > /etc/auto.loc1 << EOF
 EOF
 
         rlRun "mkdir /share /ipashare"
+	rlRun "perl -pi -e 's/automount:  files/automount:  ldap/g'  /etc/nsswitch.conf"
         rlRun "service nfs restart"
         rlRun "service autofs restart"
 	rlRun "showmount -e $MASTER"
@@ -216,6 +217,7 @@ rlPhaseStartTest "automountlocation-import_func_001: ipa automountlocation-impor
         rlRun "/usr/bin/ldapsearch -LLL -x -h localhost -D \"$ROOTDN\" -w $ROOTDNPWD -b \"description=/- auto.direct,automountmapname=auto.master,cn=loc1,cn=automount,$basedn\""
 
 	rlRun "ipa automountlocation-del loc1"
+	rlRun "rm -fr /etc/auto.master /etc/auto.direct /etc/auto.loc1"
 
 rlPhaseEnd
 }
