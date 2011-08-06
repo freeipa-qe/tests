@@ -75,7 +75,7 @@ rlPhaseStartTest "Setup for automount configuration tests"
 
 
         # Setup /etc/sysconfig/autofs & /etc/autofs_ldap_auth.conf
-cat /etc/autofs_ldap_auth.conf << EOF
+cat > /etc/autofs_ldap_auth.conf << EOF
 <?xml version="1.0" ?>
 <!--
 This files contains a single entry with multiple attributes tied to it.
@@ -91,7 +91,9 @@ See autofs_ldap_auth.conf(5) for more information.
 />
 EOF
 
-cat /etc/sysconfig/autofs << EOF
+	rlRun "cat /etc/autofs_ldap_auth.conf"
+
+cat > /etc/sysconfig/autofs << EOF
 TIMEOUT=60
 BROWSE_MODE="no"
 MOUNT_NFS_DEFAULT_PROTOCOL=4
@@ -105,6 +107,9 @@ ENTRY_ATTRIBUTE="automountKey"
 VALUE_ATTRIBUTE="automountInformation"
 AUTH_CONF_FILE="/etc/autofs_ldap_auth.conf"
 EOF
+
+	rlRun "cat /etc/sysconfig/autofs"
+
         # kinit as admin and creating users
         rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
         rlRun "create_ipauser $user1 $user1 $user1 $userpw"
@@ -301,9 +306,9 @@ rlPhaseStartTest "direct_mount_functionality_001: functionaly testing direct mou
 	rlRun "ipa automountkey-add loc1 auto.direct --key=/share --info=\"-rw,fsid=0,insecure,no_root_squash,sync,anonuid=65534,anongid=65534 $MASTER:/usr/share/man\""
 	rlRun "ipa automountlocation-tofiles loc1"
 	rlRun "touch /usr/share/man/test"
+	rlRun "> /var/log/messages"
 	rlRun "service autofs restart"
 
-	rlRun "> /var/log/messages"
 	rlAssertExists "/share/test"
 	rlAssertGrep " mounting root /share, mountpoint /share, what $MASTER:/usr/share/man, fstype nfs, options rw,fsid=0,insecure,no_root_squash,sync,anonuid=65534,anongid=65534" "/var/log/messages"
 	rlAssertGrep "mount(nfs): /share is local, attempt bind mount" "/var/log/messages"
@@ -324,8 +329,8 @@ rlPhaseStartTest "indirect_mount_functionality_001: functionality testing indire
 	rlRun "ipa automountkey-add loc1 auto.master --key=/ipashare --info=auto.shanks"
 	rlRun "ipa automountkey-add loc1 auto.shanks --key=* --info=-rw,fsid=0,insecure,no_root_squash,sync,anonuid=65534,anongid=65534 $MASTER:/tmp"
 	rlRun "ipa automountlocation-tofiles loc1"
-	rlRun "service autofs restart"
 	rlRun "> /var/log/messages"
+	rlRun "service autofs restart"
 
 	rlRun "touch /tmp/shanks.txt"
 	rlRun "ipa user-mod $user1 --homedir=/ipashare/$user1"
