@@ -358,7 +358,7 @@ cat $TmpDir/test_list.exp
 $TmpDir/test_list.exp
 cat $testout
 
-	rlAssertGrep "/tmp/shanks" "$testout"
+	rlAssertGrep "shanks.txt" "$testout"
 	rlAssertGrep "mounting root /ipashare, mountpoint $user1, what $MASTER:/tmp, fstype nfs, options rw,fsid=0,insecure,no_root_squash,sync,anonuid=65534,anongid=65534" "/var/log/messages"
 	rlAssertGrep "mount(nfs): root=/ipashare name=$user1 what=$MASTER:/tmp, fstype=nfs, options=rw,fsid=0,insecure,no_root_squash,sync,anonuid=65534,anongid=65534" "/var/log/messages"
 	rlAssertGrep "mount(nfs): nfs options=\"rw,fsid=0,insecure,no_root_squash,sync,anonuid=65534,anongid=65534\", nosymlink=0, ro=0" "/var/log/messages"
