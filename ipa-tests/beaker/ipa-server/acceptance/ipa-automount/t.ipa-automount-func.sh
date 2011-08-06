@@ -153,7 +153,7 @@ rlPhaseStartTest "automountlocation-add_func_001: ipa automountlocation-add LOCA
 	rlRun "/usr/bin/ldapsearch -LLL -x -h localhost -D \"$ROOTDN\" -w $ROOTDNPWD -b cn=loc1,cn=automount,$basedn"
 	rlRun "/usr/bin/ldapsearch -LLL -x -h localhost -D \"$ROOTDN\" -w $ROOTDNPWD -b cn=loc1,cn=automount,$basedn \"objectClass=nsContainer\" \"cn=loc1\""
 	rlRun "/usr/bin/ldapsearch -LLL -x -h localhost -D \"$ROOTDN\" -w $ROOTDNPWD -b cn=loc1,cn=automount,$basedn \"objectClass=automountmap\" \"automountMapName=auto.master\""
-	rlRun "/usr/bin/ldapsearch -LLL -x -h localhost -D \"$ROOTDN\"w $ROOTDNPWD -b cn=loc1,cn=automount,$basedn \"objectClass=automount\" \"automountInformation=auto.direct\" \"automountKey=/-\""
+	rlRun "/usr/bin/ldapsearch -LLL -x -h localhost -D \"$ROOTDN\" -w $ROOTDNPWD -b cn=loc1,cn=automount,$basedn \"objectClass=automount\" \"automountInformation=auto.direct\" \"automountKey=/-\""
 
         rlRun "ipa automountlocation-del loc1"
 
@@ -310,6 +310,7 @@ rlPhaseStartTest "direct_mount_functionality_001: functionaly testing direct mou
 	rlAssertGrep "mount_mount: mount(bind): calling mount --bind -s  -o defaults /usr/share/man /share" "/var/log/messages"
 	rlAssertGrep "mount_mount: mount(bind): mounted /usr/share/man type bind on /share" "/var/log/messages"
 
+	rlRun "cat /var/log/messages"
 	rlRun "ipa automountlocation-del loc1"
 
 rlPhaseEnd
@@ -339,7 +340,7 @@ set timeout 30
 set send_slow {1 .1}
 match_max 100000
 
-spawn ssh -o StrictHostKeyChecking=no -l $1 $MASTER
+spawn ssh -o StrictHostKeyChecking=no -l $user1 $MASTER
 expect "*: "
 send -s "$userpw\r"
 expect "*$ "
@@ -361,6 +362,7 @@ cat $testout
 	rlAssertGrep "mount(bind): mounted /tmp type bind on /ipashare/$user1" "/var/log/messages"
 	rlAssertGrep "mounted /ipashare/$user1" "/var/log/messages"
 
+	rlRun "cat /var/log/messages"
 	rlRun "ipa automountlocation-del loc1"
 
 rlPhaseEnd
