@@ -723,7 +723,7 @@ sudorule_add_008() {
 
 rlPhaseStartTest "sudorule_add_008: ipa sudorule-add sudorule1 --desc=desc --usercat --hostcat --cmdcat --runasusercat --externaluser"
 
-        rlRun "ipa sudorule-add sudorule1 --desc=\"sudo rule 1\" --usercat=all --hostcat=all --cmdcat=all --runasusercat=all --externaluser=all > $TmpDir/sudorule_add_008.txt 2>&1"
+        rlRun "ipa sudorule-add sudorule1 --desc=\"sudo rule 1\" --usercat=all --hostcat=all --cmdcat=all --runasusercat=all --externaluser=all > $TmpDir/sudorule_add_008.txt 2>&1" 1
 #        rlAssertGrep "Added sudo rule \"sudorule1\"" "$TmpDir/sudorule_add_008.txt"
 #        rlAssertGrep "Rule name: sudorule1" "$TmpDir/sudorule_add_008.txt"
 #        rlAssertGrep "Description: sudo rule 1" "$TmpDir/sudorule_add_008.txt"
@@ -734,10 +734,10 @@ rlPhaseStartTest "sudorule_add_008: ipa sudorule-add sudorule1 --desc=desc --use
 #        rlAssertGrep "RunAs User category: all" "$TmpDir/sudorule_add_008.txt"
 #        rlAssertGrep "External User: all" "$TmpDir/sudorule_add_008.txt"
 
-	rlAssertGrep "ipa: ERROR: invalid 'externaluser': this option has been deprecated." "$TmpDir/sudorule_add_008.txt" 1
+	rlAssertGrep "ipa: ERROR: sudorule1: sudo rule not found" "$TmpDir/sudorule_add_008.txt"
 
         rlRun "cat $TmpDir/sudorule_add_008.txt"
-        rlRun "ipa sudorule-del sudorule1"
+        rlRun "ipa sudorule-del sudorule1" 2
 
 rlPhaseEnd
 }
@@ -763,10 +763,10 @@ rlPhaseStartTest "sudorule_add_009: ipa sudorule-add sudorule1 --desc=desc --use
 #        rlAssertGrep "objectclass: ipaassociation" "$TmpDir/sudorule_add_009.txt"
 #        rlAssertGrep "objectclass: ipasudorule" "$TmpDir/sudorule_add_009.txt"
 
-        rlAssertGrep "ipa: ERROR: invalid 'externaluser': this option has been deprecated." "$TmpDir/sudorule_add_009.txt" 
+        rlAssertGrep "ipa: ERROR: sudorule1: sudo rule not found" "$TmpDir/sudorule_add_009.txt"
 
         rlRun "cat $TmpDir/sudorule_add_009.txt"
-	rlRun "ipa sudorule-del sudorule1"
+	rlRun "ipa sudorule-del sudorule1" 2
 
 rlPhaseEnd
 }
