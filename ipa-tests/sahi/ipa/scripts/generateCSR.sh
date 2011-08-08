@@ -2,6 +2,9 @@
 MYHOST=$1
 PWDFILE="/tmp/pwdfile.txt"
 
+# make sure certificate databases do not already exist
+rm -rf /tmp/cert8.db /tmp/key3.db /tmp/secmod.db
+
 # SSL setup
 # generate a noise file for key generation
 echo "Creating noise file ....................................................."
