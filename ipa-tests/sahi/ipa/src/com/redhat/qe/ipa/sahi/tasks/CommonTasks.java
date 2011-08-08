@@ -107,7 +107,15 @@ public class CommonTasks {
     	
 		try {
 			process = Runtime.getRuntime().exec(System.getProperty("user.dir") + "/scripts/generateCSR.sh " + hostname);
-
+			try
+			{
+			Thread.sleep(5000); // do nothing for 5000 miliseconds (5 second)
+			}
+			catch(InterruptedException e)
+			{
+			e.printStackTrace();
+			}
+			
 			FileInputStream fstream = new FileInputStream("/tmp/"+hostname+".csr");
 		
 			DataInputStream in = new DataInputStream(fstream);
