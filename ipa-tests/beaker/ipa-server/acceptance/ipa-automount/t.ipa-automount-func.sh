@@ -328,6 +328,7 @@ indirect_mount_functionality_001() {
 rlPhaseStartTest "indirect_mount_functionality_001: functionality testing indirect mount."
 
         rlRun "ipa automountlocation-add loc1"
+	rlRun "ipa automountmap-add loc1 auto.shanks"
 	rlRun "ipa automountkey-add loc1 auto.master --key=/ipashare --info=auto.shanks"
 	rlRun "ipa automountkey-add loc1 auto.shanks --key=* --info=\"-rw,fsid=0,insecure,no_root_squash,sync,anonuid=65534,anongid=65534 $MASTER:/tmp\""
 	rlRun "ipa automountlocation-tofiles loc1"
