@@ -31,7 +31,6 @@
 				<include name="userDeleteTests" />
 				<include name="chooseUserMultipleDeleteTests" />
 				<include name="userMultipleDeleteTests" />
-				-->
 				<!--
 				<include name="teardown"/>
 				-->

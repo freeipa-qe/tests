@@ -185,8 +185,7 @@ public class UserTests extends SahiTestScript{
 	/*
 	 * Update Employee & Misc Info
 	 */
-	//@Test (groups={"userEditEmpMiscInfoTests"}, dataProvider="getUserEditEmpMiscInfoTestObjects", dependsOnGroups={"userAddTests"})	
-	@Test (groups={"userEditEmpMiscInfoTests"}, dataProvider="getUserEditEmpMiscInfoTestObjects")
+	@Test (groups={"userEditEmpMiscInfoTests"}, dataProvider="getUserEditEmpMiscInfoTestObjects", dependsOnGroups={"userAddTests"})	
 	public void testUserEditEmpMiscInfo(String testName, String uid, String org, String manager, String carlicense) throws Exception {		
 		//verify user to be edited exists
 		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(uid).exists(), "Verify user " + uid + " to be edited exists");
@@ -314,7 +313,7 @@ public class UserTests extends SahiTestScript{
 	 * note: make sure tests that use testuser are run before testuser gets deleted here
 	 */
 	@Test (groups={"userDeleteTests"}, dataProvider="getUserDeleteTestObjects", 
-			dependsOnGroups={"userAddTests", "userEditTests", "userSetPasswordTests", "userDeactivateTests", "userReactivateTests", "invalidUserAddTests"})	
+			dependsOnGroups={"userAddTests", "userEditTests", "userSetPasswordTests", "userDeactivateTests", "userReactivateTests", "invalidUserAddTests", "userSearchTests"})	
 	public void testUserDelete(String testName, String uid) throws Exception {
 		//verify user to be deleted exists
 		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(uid).exists(), "Verify user " + uid + "  to be deleted exists");
@@ -330,7 +329,8 @@ public class UserTests extends SahiTestScript{
 	/*
 	 * Delete multiple users - for positive tests
 	 */
-	@Test (groups={"chooseUserMultipleDeleteTests"}, dataProvider="getMultipleUserDeleteTestObjects", dependsOnGroups={"userAddTests", "invalidUserAddTests", "userAddAndEditTests", "userAddAndAddAnotherTests"})
+	@Test (groups={"chooseUserMultipleDeleteTests"}, dataProvider="getMultipleUserDeleteTestObjects", dependsOnGroups={"userAddTests", "invalidUserAddTests", "userAddAndEditTests", "userAddAndAddAnotherTests",
+			"userEditIdentitySettingsTests", "userEditAccountSettingsTests", "userEditMailingAddressTests", "userEditEmpMiscInfoTests", "userSearchTests" })
 	public void setMultipleUserDelete(String testName, String uid) throws Exception {		
 		//verify user to be deleted exists
 		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(uid).exists(), "Verify user " + uid + "  to be deleted exists");	
@@ -388,8 +388,7 @@ public class UserTests extends SahiTestScript{
 	/*
 	 * Search
 	 */
-	//@Test (groups={"userSearchTests"}, dataProvider="getUserSearchTestObjects",  dependsOnGroups="userAddTests")
-	@Test (groups={"userSearchTests"}, dataProvider="getUserSearchTestObjects")
+	@Test (groups={"userSearchTests"}, dataProvider="getUserSearchTestObjects",  dependsOnGroups="userAddTests")
 	public void testUserSearch(String testName, String uid, String multipleResult) throws Exception {
 		
 		UserTasks.searchUser(sahiTasks, uid);
@@ -398,6 +397,8 @@ public class UserTests extends SahiTestScript{
 		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(uid).exists(), "Searched and found user " + uid + "  successfully");
 		if (!multipleResult.equals(""))
 			com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(multipleResult).exists(), "Searched and found another user " + multipleResult + "  successfully");
+		
+		UserTasks.clearSearch(sahiTasks);
 	}
 	
 	
@@ -440,13 +441,13 @@ public class UserTests extends SahiTestScript{
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
         //										testname					uid              		givenname	sn   
-		//ll.add(Arrays.asList(new Object[]{ "create_good_user",				"testuser", 			"Test",		"User"      } ));
+		ll.add(Arrays.asList(new Object[]{ "create_good_user",				"testuser", 			"Test",		"User"      } ));
 		ll.add(Arrays.asList(new Object[]{ "create_user_with_optional_login","", 					"Test",		"User"      } ));
-		//ll.add(Arrays.asList(new Object[]{ "create_user2",				    "user2", 			    "Test2",	"User2"     } ));
-		//ll.add(Arrays.asList(new Object[]{ "create_user3",				    "user3", 			    "Test3",	"User3"     } ));
-		//ll.add(Arrays.asList(new Object[]{ "create_user4",				    "user4", 			    "Test4",	"User4"     } ));
-		//ll.add(Arrays.asList(new Object[]{ "create_user5",				    "user5", 			    "Test5",	"User5"     } ));
-		//ll.add(Arrays.asList(new Object[]{ "create_user6",				    "user6", 			    "Test6",	"User6"     } ));
+		ll.add(Arrays.asList(new Object[]{ "create_user2",				    "user2", 			    "Test2",	"User2"     } ));
+		ll.add(Arrays.asList(new Object[]{ "create_user3",				    "user3", 			    "Test3",	"User3"     } ));
+		ll.add(Arrays.asList(new Object[]{ "create_user4",				    "user4", 			    "Test4",	"User4"     } ));
+		ll.add(Arrays.asList(new Object[]{ "create_user5",				    "user5", 			    "Test5",	"User5"     } ));
+		ll.add(Arrays.asList(new Object[]{ "create_user6",				    "user6", 			    "Test6",	"User6"     } ));
 		        
 		return ll;	
 	}

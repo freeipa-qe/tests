@@ -469,6 +469,10 @@ public class UserTasks {
 		sahiTasks.span("icon search-icon").click();
 	}	
 	
+	public static void clearSearch(SahiTasks sahiTasks) {
+		sahiTasks.textbox("filter").setValue("");
+		sahiTasks.span("icon search-icon").click();
+	}
 	
 	public static void expandCollapseUser(SahiTasks sahiTasks, String uid) {
 		//click on user to edit
