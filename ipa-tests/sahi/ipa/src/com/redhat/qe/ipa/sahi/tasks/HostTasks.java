@@ -451,5 +451,85 @@ public class HostTasks {
 		sahiTasks.button("Cancel").click();
 		sahiTasks.link("Hosts").in(sahiTasks.div("content")).click();
 	}
+	
+	/*
+	 * Verify host membership in a group or rule
+	 * @param sahiTasks 
+	 * @param hostname
+	 * @param membertype - "Host Groups" or "Netgroups" or "Roles" or "HBAC Rules" or "Sudo Rules"
+	 * @param grprulename - group or rule name
+	 * @param type - direct or indirect
+	 * @param exists - "YES" if the membership is expected to exist
+	 */
+	public static void verifyHostMemberOf(SahiTasks sahiTasks, String hostname, String membertype, String grprulename, String type, String exists) {
+		sahiTasks.link(hostname).click();
+		if (membertype == "Host Groups"){
+			sahiTasks.link("memberof_hostgroup").click();
+		}
+		if (membertype == "Netgroups"){
+			sahiTasks.link("memberof_netgroup").click();
+		}
+		if (membertype =="Roles"){
+			sahiTasks.link("memberof_role").click();
+		}
+		if (membertype == "HBAC Rules"){
+			sahiTasks.link("memberof_hbacrule").click();
+		}
+		if (membertype == "Sudo Rules"){
+			sahiTasks.link("memberof_sudorule").click();
+		}
+		
+		sahiTasks.radio(type).click();
+
+
+		if (exists == "YES"){
+			com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(grprulename).exists(), "Host " + hostname + " is a member of " + membertype + " " + grprulename);
+		}
+		else {
+			com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(grprulename).exists(), "Host " + hostname + " is NOT member of " + membertype + " "+ grprulename);
+		}
+		sahiTasks.link("Hosts").in(sahiTasks.div("content")).click();
+	}
+	
+	/*
+	 * Verify host membership in a group or rule
+	 * @param sahiTasks 
+	 * @param hostname
+	 * @param membertype - "Host Groups" or "Netgroups" or "Roles" or "HBAC Rules" or "Sudo Rules"
+	 * @param grprulenames - array of group or rule names 
+	 * @param type - direct or indirect
+	 * @param exists - "YES" if the membership is expected to exist
+	 */
+	public static void verifyHostMemberOf(SahiTasks sahiTasks, String hostname, String membertype, String [] grprulenames, String type, String exists) {
+		sahiTasks.link(hostname).click();
+		if (membertype == "Host Groups"){
+			sahiTasks.link("memberof_hostgroup").click();
+		}
+		if (membertype == "Netgroups"){
+			sahiTasks.link("memberof_netgroup").click();
+		}
+		if (membertype =="Roles"){
+			sahiTasks.link("memberof_role").click();
+		}
+		if (membertype == "HBAC Rules"){
+			sahiTasks.link("memberof_hbacrule").click();
+		}
+		if (membertype == "Sudo Rules"){
+			sahiTasks.link("memberof_sudorule").click();
+		}
+		
+		sahiTasks.radio(type).click();
+
+		
+		for (String grprulename : grprulenames){
+			if (exists == "YES"){
+			com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(grprulename).exists(), "Host " + hostname + " is a member of " + membertype + " " + grprulename);
+			}
+			else {
+				com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(grprulename).exists(), "Host " + hostname + " is NOT member of " + membertype + " "+ grprulename);
+			}
+		}
+		sahiTasks.link("Hosts").in(sahiTasks.div("content")).click();
+	}
 }
 
