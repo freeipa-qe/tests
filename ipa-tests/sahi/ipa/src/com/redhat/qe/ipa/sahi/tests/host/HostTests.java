@@ -12,6 +12,7 @@ import org.testng.annotations.AfterClass;
 
 import com.redhat.qe.auto.testng.TestNGUtils;
 import com.redhat.qe.ipa.sahi.base.SahiTestScript;
+import com.redhat.qe.ipa.sahi.tasks.CommonTasks;
 import com.redhat.qe.ipa.sahi.tasks.DNSTasks;
 import com.redhat.qe.ipa.sahi.tasks.SahiTasks;
 import com.redhat.qe.ipa.sahi.tasks.HostTasks;
@@ -24,15 +25,7 @@ public class HostTests extends SahiTestScript{
 	private String domain = System.getProperty("ipa.server.domain");
 	private String reversezone = System.getProperty("ipa.server.reversezone");
 	
-	//MIIBbDCB1gIBADAtMREwDwYDVQQKEwhURVNUUkVMTTEYMBYGA1UEAxMPbXlob3N0
-	//LnRlc3RyZWxtMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDdegHkkCMdcET1
-	//a+q+Edxn4KA5bcXMZeu2yjqokHFqRDNtdB6aLmec20XoW6kt9/lZDf47Mcm23M1H
-	//xyJC+u5F0clbU7ojdaxbRqhO/D1MHDiLEH87VPqd6fhwDiV92tkWh68gKxEW29u/
-	//COJcscYFf9X37jowYlYENY1i9mxjywIDAQABoAAwDQYJKoZIhvcNAQEFBQADgYEA
-	//r9wrR2dn+b07GYfL1nIFsWryp1sb4pO8rr5UmGPNPQLVmm8zih25UKK96/yxe50w
-	//z0mZoPCN6phMkHVNhINHa5laOsXwsLg+7aLfQEoOu1XWbWuNAjDA14g+JPB8wzlm
-	//980PmlW3kOiJEA6EIzrTEhr5UiXSkv1yEevYNABK9Ys=
-	private String csr = "MIIBbDCB1gIBADAtMREwDwYDVQQKEwhURVNUUkVMTTEYMBYGA1UEAxMPbXlob3N0"+ "\n" + "LnRlc3RyZWxtMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDdegHkkCMdcET1"+ "\n" + "a+q+Edxn4KA5bcXMZeu2yjqokHFqRDNtdB6aLmec20XoW6kt9/lZDf47Mcm23M1H"+ "\n" + "xyJC+u5F0clbU7ojdaxbRqhO/D1MHDiLEH87VPqd6fhwDiV92tkWh68gKxEW29u/"+ "\n" + "COJcscYFf9X37jowYlYENY1i9mxjywIDAQABoAAwDQYJKoZIhvcNAQEFBQADgYEA"+ "\n" + "r9wrR2dn+b07GYfL1nIFsWryp1sb4pO8rr5UmGPNPQLVmm8zih25UKK96/yxe50w"+ "\n" + "z0mZoPCN6phMkHVNhINHa5laOsXwsLg+7aLfQEoOu1XWbWuNAjDA14g+JPB8wzlm"+ "\n" + "980PmlW3kOiJEA6EIzrTEhr5UiXSkv1yEevYNABK9Ys=";
+	//private String csr = "MIIBbDCB1gIBADAtMREwDwYDVQQKEwhURVNUUkVMTTEYMBYGA1UEAxMPbXlob3N0"+ "\n" + "LnRlc3RyZWxtMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDdegHkkCMdcET1"+ "\n" + "a+q+Edxn4KA5bcXMZeu2yjqokHFqRDNtdB6aLmec20XoW6kt9/lZDf47Mcm23M1H"+ "\n" + "xyJC+u5F0clbU7ojdaxbRqhO/D1MHDiLEH87VPqd6fhwDiV92tkWh68gKxEW29u/"+ "\n" + "COJcscYFf9X37jowYlYENY1i9mxjywIDAQABoAAwDQYJKoZIhvcNAQEFBQADgYEA"+ "\n" + "r9wrR2dn+b07GYfL1nIFsWryp1sb4pO8rr5UmGPNPQLVmm8zih25UKK96/yxe50w"+ "\n" + "z0mZoPCN6phMkHVNhINHa5laOsXwsLg+7aLfQEoOu1XWbWuNAjDA14g+JPB8wzlm"+ "\n" + "980PmlW3kOiJEA6EIzrTEhr5UiXSkv1yEevYNABK9Ys=";
 	private String badcsr = "MIIBcDCB2gIBADAxMRMwEQYDVQQKEwpRRS5MQUIuSVBBMRowGAYDVQQDExFteWdhv"+ "\n" + "c3QucWUubGFiLmlYTCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEA4lXS4N0r"+ "\n" + "lvJOwhv7eZdWLoaH5BwNoNgBObTAde4MYRejx75f3Ovo+8WVChRs/xDemDPGfWj0"+ "\n" + "9BW4BDXpX0Vaa3N4akIfKoxDnYckZlifuHxbyrZB9XX8eAZDMwtBzi30elEp5Cf5"+ "\n" + "SWMJ9WBOoXu/YIFOCC58aegXKJjPXLlzvrIoEsCAwEAAaAAMA0GCSqGSIb3DQEBBQUA"+ "\n" + "A4GBABK4TVlwNx4LzQvX/rgfqWTv33iIgkPFY4TLsXiR2XL74HAhDDk5JYJM3DGHP"+ "\n" + "4Si7E/vX6ea6IZuNAul0koIJtT2etUo8oebOKQPFb1F1AY+h6sW/QC3DH20hT85H"+ "\n" + "KhPLOBcjOSY/T9M4u5xsjVtzqZMJCdFKFRg9pLBUrCZhu3Z";
 	private String wronghostcsr = "MIIBbDCB1gIBADAtMRMwEQYDVQQKEwpRRS5MQUIuSVBBMRYwFAYDVQQDEw1ob3N0"+ "\n" +"LnRlc3RyZWxtMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDvu8wcVthKZCa/"+ "\n" +"KZ30fKPC1jMZ+PUXE/xJNfKVKG9olVSswk4RG8AD0yCApMJ5u6yXU4pT6RbxVHFg"+ "\n" +"X4xA1e006HIdOKrw5pcKhndMyc21rFaUVb66P8z7FXqiVvx3imgZrbM6rr1rfXvH"+ "\n" +"xTeTwL20Lor5Ym9ypajxGTU7IDaXMwIDAQABoAAwDQYJKoZIhvcNAQEFBQADgYEA"+ "\n" +"1IwWyrFEkXuT1vbiDU1urfSazFObEnMUR4vvIraEdhKqJySq9gB/F3j7h+EomKna"+ "\n" +"+G55hsJN7Ct0dhHks0MVIydCnSj364n2vLtfvidn1OgTYOqg4bWTmIMa/ejyV6pX"+ "\n" +"+tYey0wVg+uXyqSPZr/ZJZtmqkKIzCkzrMpxYDlUNk0=";
 	
@@ -195,15 +188,15 @@ public class HostTests extends SahiTestScript{
 	 * Undo Modify 
 	 */
 	@Test (groups={"undoModifyHostTests"}, dataProvider="getUndoModifyHostTestObjects")	
-	public void tesUndoModifyHost(String testName, String olddesc, String newdesc, String oldlocal, String newlocal, String oldlocation, String newlocation, String oldplatform, String newplatform, String oldos, String newos ) throws Exception {
+	public void tesUndoModifyHost(String testName, String newdesc, String newlocal, String newlocation, String newplatform, String newos ) throws Exception {
 		
 		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(undotesthost).exists(),  undotesthost + "  exists");
 		
 		//modify the host
-		HostTasks.undoModifyHost(sahiTasks, undotesthost, olddesc, newdesc, oldlocal, newlocal, oldlocation, newlocation, oldplatform, newplatform, oldos, newos);
+		HostTasks.undoModifyHost(sahiTasks, undotesthost, newdesc, newlocal, newlocation, newplatform, newos);
 		
 		//verify all host field
-		HostTasks.verifyHostSettings(sahiTasks, undotesthost, olddesc, oldlocal, oldlocation, oldplatform, oldos);
+		HostTasks.verifyHostSettings(sahiTasks, undotesthost, olddescription, oldlocal, oldlocation, oldplatform, oldos);
 		
 	}
 	
@@ -238,6 +231,9 @@ public class HostTests extends SahiTestScript{
 	 */
 	@Test (groups={"hostCertificateTests"}, dataProvider="getHostCertificateTests")	
 	public void testHostCertificates(String testName, String reason ) throws Exception {
+		
+		//Get CSR for testhost
+		String csr = CommonTasks.generateCSR(testhost);
 		
 		// add request certificate
 		HostTasks.addHostCertificate(sahiTasks, testhost, csr);
@@ -510,8 +506,8 @@ public class HostTests extends SahiTestScript{
 	protected List<List<Object>> createUndoModifyHostTestObjects() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-        //										testname				hostname        	ipadr		olddesc  					newdesc																oldlocal				newlocal						oldlocationoldplatform		newlocation	newplatform		oldos			newos
-		ll.add(Arrays.asList(new Object[]{ 		"modify_description",	"undo."+domain, 	"",			"Old description",			"My new host value $#* - abcdefghijklmnopqrstuvwxyz 1234567890",	"Boston Massachusetts",	"Mountain View, California",	"Lab 10 - Building 3",		"Basement Lab - Rack 150 - number 13",		"ia64",			"x86_64",		"Fedora 15",	"Red Hat Enterprise Linux 6.0 Client"	} ));
+        //										testname		newdesc																newlocal						newlocation								newplatform		newos	
+		ll.add(Arrays.asList(new Object[]{ 		"test_undo",	"My new host value $#* - abcdefghijklmnopqrstuvwxyz 1234567890",	"Mountain View, California",	"Third Floor Lab - Row 16 - Rack 122",	"x86_64",		"Red Hat Enterprise Linux 6.0 Client"	} ));
 		return ll;	
 	}
 	
