@@ -734,7 +734,7 @@ rlPhaseStartTest "sudorule_add_008: ipa sudorule-add sudorule1 --desc=desc --use
 #        rlAssertGrep "RunAs User category: all" "$TmpDir/sudorule_add_008.txt"
 #        rlAssertGrep "External User: all" "$TmpDir/sudorule_add_008.txt"
 
-	rlAssertGrep "ipa: ERROR: sudorule1: sudo rule not found" "$TmpDir/sudorule_add_008.txt"
+	rlAssertGrep "ipa: ERROR: invalid 'externaluser': this option has been deprecated." "$TmpDir/sudorule_add_008.txt"
 
         rlRun "cat $TmpDir/sudorule_add_008.txt"
         rlRun "ipa sudorule-del sudorule1" 2
@@ -763,7 +763,7 @@ rlPhaseStartTest "sudorule_add_009: ipa sudorule-add sudorule1 --desc=desc --use
 #        rlAssertGrep "objectclass: ipaassociation" "$TmpDir/sudorule_add_009.txt"
 #        rlAssertGrep "objectclass: ipasudorule" "$TmpDir/sudorule_add_009.txt"
 
-        rlAssertGrep "ipa: ERROR: sudorule1: sudo rule not found" "$TmpDir/sudorule_add_009.txt"
+        rlAssertGrep "ipa: ERROR: invalid 'externaluser': this option has been deprecated." "$TmpDir/sudorule_add_009.txt"
 
         rlRun "cat $TmpDir/sudorule_add_009.txt"
 	rlRun "ipa sudorule-del sudorule1" 2
