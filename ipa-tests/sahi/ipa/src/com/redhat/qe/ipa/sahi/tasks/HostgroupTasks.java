@@ -198,17 +198,16 @@ public class HostgroupTasks {
 		}
 		sahiTasks.link("Host Groups").in(sahiTasks.div("content")).click();
 	}
-	
 	/*
 	 * verify member of
 	 * @param sahiTasks
 	 * @param groupname - name of host group
 	 * @param memberoftype - hostgroup, hbacrule or sudorule
-	 * @param names - array of names to verify
+	 * @param name - group name or rule of membership
 	 * @param type - direct or indirect
 	 * @param exists - whether or not they should be members of the enroll type - YES if they should be
 	 */
-	public static void verifyMemberOf(SahiTasks sahiTasks, String groupName, String memberoftype, String [] names, String type, String exists) {
+	public static void verifyMemberOf(SahiTasks sahiTasks, String groupName, String memberoftype, String grprulename, String type, String exists) {
 		sahiTasks.link(groupName).click();
 		if (memberoftype == "hostgroup"){
 			sahiTasks.link("memberof_hostgroup").click();
@@ -221,12 +220,43 @@ public class HostgroupTasks {
 		}
 		sahiTasks.radio(type).click();
 		
-		for (String name : names) {
+		if (exists == "YES"){
+			com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(grprulename).exists(), "Host group " + groupName + " is a memberof host group " + memberoftype + ": " + grprulename);
+		}
+		else {
+			com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(grprulename).exists(), "Host group " + groupName + " is NOT a memberof host group " + memberoftype + ": " + grprulename);
+		}
+
+		sahiTasks.link("Host Groups").in(sahiTasks.div("content")).click();
+	}
+	/*
+	 * verify member of
+	 * @param sahiTasks
+	 * @param groupname - name of host group
+	 * @param memberoftype - hostgroup, hbacrule or sudorule
+	 * @param names - array of group or rule names to verify
+	 * @param type - direct or indirect
+	 * @param exists - whether or not they should be members of the enroll type - YES if they should be
+	 */
+	public static void verifyMemberOf(SahiTasks sahiTasks, String groupName, String memberoftype, String [] grprulenames, String type, String exists) {
+		sahiTasks.link(groupName).click();
+		if (memberoftype == "hostgroup"){
+			sahiTasks.link("memberof_hostgroup").click();
+		}
+		if (memberoftype == "hbacrule"){
+			sahiTasks.link("memberof_hbacrule").click();
+		}
+		if (memberoftype == "sudorule"){
+			sahiTasks.link("memberof_sudorule").click();
+		}
+		sahiTasks.radio(type).click();
+		
+		for (String grprulename : grprulenames) {
 			if (exists == "YES"){
-				com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(name).exists(), "Host group " + groupName + " is a memberof host group " + memberoftype + ": " + name);
+				com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(grprulename).exists(), "Host group " + groupName + " is a memberof host group " + memberoftype + ": " + grprulename);
 			}
 			else {
-				com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(name).exists(), "Host group " + groupName + " is NOT a memberof host group " + memberoftype + ": " + name);
+				com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(grprulename).exists(), "Host group " + groupName + " is NOT a memberof host group " + memberoftype + ": " + grprulename);
 			}
 		}
 		sahiTasks.link("Host Groups").in(sahiTasks.div("content")).click();
