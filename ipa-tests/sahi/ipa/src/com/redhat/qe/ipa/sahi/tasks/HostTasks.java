@@ -161,26 +161,21 @@ public class HostTasks {
 	 * @param sahiTasks
 	 * @param field - the field of the host to be modify (description, local, location, platform or os)
 	 */
-	public static void undoModifyHost(SahiTasks sahiTasks, String hostname, String olddesc, String newdesc, String oldlocal, String newlocal, String oldlocation, String newlocation, String oldplatform, String newplatform, String oldos, String newos) {
+	public static void undoModifyHost(SahiTasks sahiTasks, String hostname, String newdesc, String newlocal, String newlocation, String newplatform, String newos) {
 		sahiTasks.link(hostname).click();
 
-		com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("description").value(), olddesc, "Verified existing description for host: " + olddesc);
 		sahiTasks.textbox("description").setValue(newdesc);
 		sahiTasks.span("undo").click();
 		
-		com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("l").value(), oldlocal, "Verified existing local for host: " + oldlocal);
 		sahiTasks.textbox("l").setValue(newlocal);
 		sahiTasks.span("undo").click();
 		
-		com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("nshostlocation").value(), oldlocation, "Verified existing location for host: " + oldlocation);
 		sahiTasks.textbox("nshostlocation").setValue(newlocation);
 		sahiTasks.span("undo").click();
 		
-		com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("nshardwareplatform").value(), oldplatform, "Verified existing hardware platform for host: " + oldplatform);
 		sahiTasks.textbox("nshardwareplatform").setValue(newplatform);
 		sahiTasks.span("undo").click();
 		
-		com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("nsosversion").value(), oldos, "Verified existing operating system for host: " + oldos);
 		sahiTasks.textbox("nsosversion").setValue(newos);
 		sahiTasks.span("undo").click();
 		
