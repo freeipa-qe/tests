@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -20,8 +19,7 @@ import com.redhat.qe.ipa.sahi.tasks.HostTasks;
 
 public class HostTests extends SahiTestScript{
 	public static SahiTasks sahiTasks = null;	
-	private String hostPage = "/ipa/ui/#identity=host&navigation=identity";
-	private String dnsPage = "/ipa/ui/#dns=dnszone&identity=dns&navigation=identity";
+
 	private String domain = System.getProperty("ipa.server.domain");
 	private String reversezone = System.getProperty("ipa.server.reversezone");
 	
@@ -42,7 +40,7 @@ public class HostTests extends SahiTestScript{
 	@BeforeClass (groups={"init"}, description="Initialize app for this test suite run", alwaysRun=true, dependsOnGroups="setup")
 	public void initialize() throws CloneNotSupportedException {	
 		sahiTasks = SahiTestScript.getSahiTasks();	
-		sahiTasks.navigateTo(System.getProperty("ipa.server.url")+hostPage, true);
+		sahiTasks.navigateTo(System.getProperty("ipa.server.url")+ CommonTasks.hostPage, true);
 		sahiTasks.setStrictVisibilityCheck(true);
 		
 		//add the test hosts
@@ -319,15 +317,15 @@ public class HostTests extends SahiTestScript{
 		
 		// verify host link to dns and dns records
 		HostTasks.verifyHostDNSLink(sahiTasks, fqdn, "YES");
-		sahiTasks.navigateTo(System.getProperty("ipa.server.url")+dnsPage, true);
+		sahiTasks.navigateTo(System.getProperty("ipa.server.url")+ CommonTasks.dnsPage, true);
 		DNSTasks.verifyRecord(sahiTasks, domain, hostname, "arecord", ipaddr, "YES");
 		DNSTasks.verifyRecord(sahiTasks, reversezone, ipend, "ptrrecord", fqdn + ".", "YES");
 		
 		// deleted host
-		sahiTasks.navigateTo(System.getProperty("ipa.server.url")+hostPage, true);
+		sahiTasks.navigateTo(System.getProperty("ipa.server.url")+ CommonTasks.hostPage, true);
 		HostTasks.deleteHost(sahiTasks, fqdn, updatedns);
 		
-		sahiTasks.navigateTo(System.getProperty("ipa.server.url")+dnsPage, true);
+		sahiTasks.navigateTo(System.getProperty("ipa.server.url")+ CommonTasks.dnsPage, true);
 		if( updatedns == "YES"){
 			DNSTasks.verifyRecord(sahiTasks, domain, hostname, "arecord", ipaddr, "NO");
 			DNSTasks.verifyRecord(sahiTasks, reversezone, ipend, "ptrrecord", fqdn + ".", "NO");
@@ -340,7 +338,7 @@ public class HostTests extends SahiTestScript{
 			
 		}
 		
-		sahiTasks.navigateTo(System.getProperty("ipa.server.url")+hostPage, true);
+		sahiTasks.navigateTo(System.getProperty("ipa.server.url")+ CommonTasks.hostPage, true);
 	}
 	
 	
