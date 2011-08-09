@@ -14,7 +14,17 @@ import java.util.logging.Logger;
 public class CommonTasks {
 	private static Logger log = Logger.getLogger(CommonTasks.class.getName());
 	
-	public static String userPage = "/ipa/ui/#identity=user&navigation=identity";
+	public static String userPage = "/ipa/ui/#identity=user&navigation=identity";	
+	public static String groupPage = "/ipa/ui/#nagivation=identity&identity=group";
+	public static String hostPage = "/ipa/ui/#identity=host&navigation=identity";
+	public static String hostgroupPage = "/ipa/ui/#identity=hostgroup&navigation=identity";
+	public static String netgroupPage = "/ipa/ui/#identity=netgroup&navigation=identity";
+	public static String dnsPage = "/ipa/ui/#dns=dnszone&identity=dns&navigation=identity";
+	
+	
+	public static String hbacPage = "/ipa/ui/#hbac=hbacrule&policy=hbac&navigation=policy";	
+	public static String sudoPage = "/ipa/ui/#navigation=policy&policy=sudo";
+	
 	
 	
     public static boolean kinitAsAdmin() {    	
