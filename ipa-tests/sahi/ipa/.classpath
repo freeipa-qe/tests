@@ -2,9 +2,8 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry exported="true" kind="lib" path="/home/nk/webui-framework/lib/selenium-java-client-driver.jar"/>
-	<classpathentry exported="true" kind="lib" path="/home/nk/webui-framework/lib/testng-5.9-jdk15.jar"/>
+	<classpathentry kind="lib" path="/home/yi/webui-framework/lib/testng-5.9-jdk15.jar"/>
 	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/webui-framework"/>
-	<classpathentry exported="true" kind="lib" path="/home/nk/webui-framework/lib/sahi.jar"/>
+	<classpathentry kind="lib" path="/home/yi/webui-framework/lib/sahi.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

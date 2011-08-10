@@ -1,5 +1,6 @@
 package com.redhat.qe.ipa.sahi.tasks;
 
+import com.redhat.qe.auto.testng.Assert;
 import com.redhat.qe.ipa.sahi.tasks.SahiTasks;
 
 
@@ -8,108 +9,161 @@ public class DNSTasks {
 
 	/*
 	 * Add DNS zone
-	 * @param sahiTasks 
-	 * @param hostname - hostname
-	 * @param ipadr -  ipaddress
+	 * @param browser 
+	 * @param zoneName
+	 * @param authoritativeNameserver
+	 * @param rootEmail
 	 */
-	public static boolean addDNSzone(SahiTasks browser, String zoneName, String authoritativeNameserver, String rootEmail) {
-		boolean created=false;
-		/*** original recorded steps
-		browser.link("DNS").click();
-		browser.span("Add[1]").click();
-		browser.textbox("idnsname").setValue("sahi.zone.001");
-		browser.textbox("idnssoamname").setValue("dhcp121.sjc.redhat.com");
-		browser.textbox("idnssoarname").setValue("root.dhcp-121.sjc.redhat.com");
-		browser.textbox("idnssoamname").setValue("dhcp-121.sjc.redhat.com");
-		browser.button("Add").click();
-		browser.checkbox("select[4]").click();
-		browser.span("Delete[1]").click();
-		browser.button("Delete").click();
-		*/
-		 
+	public static void addDNSzone(SahiTasks browser, String zoneName, String authoritativeNameserver, String rootEmail) {
 		browser.span("Add").click();
 		browser.textbox("idnsname").setValue(zoneName);
 		browser.textbox("idnssoamname").setValue(authoritativeNameserver);
 		browser.textbox("idnssoarname").setValue(rootEmail); 
-		browser.button("Add").click();
-		browser.checkbox(zoneName).click();
-		browser.span("Delete").click();
-		browser.button("Delete").click();
-		return created;
+		browser.button("Add").click();  
+		// self-check
+		Assert.assertTrue(browser.link(zoneName).exists(),"assert new zone in the zone list");
 	}//addDNSzone
 	
 	/*
 	 * Add DNS zone
-	 * @param sahiTasks 
-	 * @param hostname - hostname
-	 * @param ipadr -  ipaddress
+	 * @param browser - sahi browser instance 
+	 * @param zoneName - dns zone name (to be deleted) 
 	 */
-	public static boolean delDNSzone(SahiTasks browser, String zoneName, String authoritativeNameserver, String rootEmail) {
-		boolean deleted=false; 
-		
-		browser.span("Add").click();
-		browser.textbox("idnsname").setValue(zoneName);
-		browser.textbox("idnssoamname").setValue(authoritativeNameserver);
-		browser.textbox("idnssoarname").setValue(rootEmail); 
-		browser.button("Add").click();
+	public static void delDNSzone(SahiTasks browser, String zoneName) { 
 		browser.checkbox(zoneName).click();
 		browser.span("Delete").click();
-		browser.button("Delete").click();
-		return deleted;
+		browser.button("Delete").click(); 
+		
+		// self-check
+		Assert.assertFalse(browser.link(zoneName).exists(),"assert new zone not in the zone list"); 
 	}//delDNSzone
 	
 	/*
 	 * Add DNS reverse zone
-	 * @param sahiTasks 
-	 * @param hostname - hostname
-	 * @param ipadr -  ipaddress
+	 * @param browser 
+	 * @param reverseZoneName - 
+	 * @param authoritativeNameserver -  authoritative nameserver
+	 * @param rootEmail - email address for root
 	 */
-	public static boolean addDNSReversezone(SahiTasks sahiTasks, String zone, String name, String type, String data) {
-		boolean created=false;
-		sahiTasks.link(zone).click();
-		sahiTasks.button("Add").click();
-		sahiTasks.textbox("idnsname").setValue(name);
-		sahiTasks.select("dns-record-type").choose(type);
-		sahiTasks.textarea("record_data").setValue(data);
-		sahiTasks.button("Add").click(); 
-		return created;
+	public static void addDNSReversezone(SahiTasks browser, String reverseZoneName, String authoritativeNameserver, String rootEmail) {
+		browser.span("Add").click();
+		browser.textbox("idnsname").setValue(reverseZoneName);
+		browser.checkbox("name_from_ip").click();
+		browser.textbox("idnssoamname").setValue(authoritativeNameserver);
+		browser.textbox("idnssoarname").setValue(rootEmail); 
+		browser.button("Add").click();  
+		if (browser.div("/IPA Error */").exists()){
+			browser.button("Cancel").click();
+			Assert.assertTrue(false, "ipa error occures");
+		}else if (browser.span("Required field").exists()){
+			browser.button("Cancel").click();
+			Assert.assertTrue(false, "missing required field");
+		}else{
+			Assert.assertTrue(browser.link("reverseZone").exists(), "create reverse zone success");
+		}
 	}//addDNSResersezone
 	
 	/*
 	 * Add DNS zone
-	 * @param sahiTasks 
-	 * @param hostname - hostname
-	 * @param ipadr -  ipaddress
+	 * @param browser 
+	 * @param hostname - reverse dns zone name (that to be deleted 
 	 */
-	public static boolean delDNSReversezone(SahiTasks sahiTasks, String zone, String name, String type, String data) {
-		boolean deleted=false;
-		sahiTasks.link(zone).click();
-		sahiTasks.button("Add").click();
-		sahiTasks.textbox("idnsname").setValue(name);
-		sahiTasks.select("dns-record-type").choose(type);
-		sahiTasks.textarea("record_data").setValue(data);
-		sahiTasks.button("Add").click();
-		return deleted;
+	public static void delDNSReversezone(SahiTasks browser, String reverseZoneName) {
+		browser.checkbox(reverseZoneName).click();
+		browser.span("Delete").click();
+		browser.button("Delete").click(); 
 	}//delDNSReversezone
 	
 	/*
 	 * Modify dns zone records
 	 * @param browser  
 	 * @param zoneName - dna zone name
+	 * @param record_name
+	 * @param record_data
+	 * @param record_type
 	 */
-	public static boolean zoneRecordsModification(SahiTasks browser, String zoneName) {
-		boolean deleted=false; 
-		return deleted;
+	public static void zoneRecordsModification(SahiTasks browser, String zoneName,String record_name, String record_data, String record_type) {
+		DNSTasks.recordsModify(browser, record_name, record_data, record_type);
 	}//zoneRecordsModification
+	
+	/*
+	 * Modify DNS zone record: A record
+	 * @param browser 
+	 * @param record_name
+	 * @param record_data
+	 * @param record_type
+	 */
+	public static void recordsModify(SahiTasks browser, String record_name, String record_data, String record_type){
+		// assume the page is already in the dns modification page
+		browser.span("Add").click();
+		browser.textbox("idnsname").setValue(record_name); 
+		browser.select("record_type").choose(record_type);
+		browser.textbox("record_data").setValue(record_data);
+		browser.button("Add").click(); 
+		if (browser.div("/IPA Error */").exists()){
+			System.out.println("IPA error dialog appears, usually this is data format error");
+			// there will be two cancel button here
+			browser.button("Cancel").click();
+			browser.button("Cancel").click();
+			//Assert.assertTrue(false, "ipa error ( dialog )occures");
+		}else if (browser.span("Required field").exists()){
+			System.out.println ("Required field msg appears, usually this means missing data input");
+			browser.button("Cancel").click();
+			//Assert.assertTrue(false, "missing required field");
+		}else{
+			// self-check to verify the newly added record
+			Assert.assertTrue(browser.link(record_name).exists(),"assert new record name: (" + record_name + ") in the list"); 
+		} 
+	}//zoneRecordModify
 	
 	/*
 	 * Modify dns zone settings
 	 * @param browser  
 	 * @param zoneName - dns zone name
 	 */
-	public static boolean zoneSettingsModification(SahiTasks browser, String zoneName) {
-		boolean deleted=false; 
-		return deleted;
+	public static void zoneSettingsModification(SahiTasks browser, String zoneName, String fieldName, String fieldValue) {
+
+		// get into setting page
+		browser.link("Settings").click();
+		
+		// save the original value
+		String originalValue = browser.textbox(fieldName).getValue();
+		
+		// test for undo
+		browser.textbox(fieldName).setValue(fieldValue);
+		browser.span("undo").click(); 
+		String undoValue = browser.textbox(fieldName).getValue();
+		
+		// check undo value with original value
+		if (originalValue.equals(undoValue)){
+			System.out.println("Undo works");
+		}else{
+			System.out.println("Undo failed");
+		}
+		
+		// test for reset
+		browser.textbox(fieldName).setValue(fieldValue);
+		browser.span("Reset").click(); 
+		String resetValue = browser.textbox(fieldName).getValue();
+		// check undo value with original value
+		if (originalValue.equals(resetValue)){
+			System.out.println("Reset works");
+		}else{
+			System.out.println("Reset failed");
+		}
+		
+		// test for update
+		browser.textbox(fieldName).setValue(fieldValue);
+		browser.span("Update").click();
+		String updateValue = browser.textbox(fieldName).getValue();
+
+		// check update value with original value
+		if (fieldValue.equals(updateValue)){
+			System.out.println("Update works");
+		}else{
+			System.out.println("Update failed");
+		}
+		
 	}//zoneSettingsModification
 	
 	/*
@@ -117,9 +171,8 @@ public class DNSTasks {
 	 * @param browser  
 	 * @param reverseZoneName - dna reverse zone name
 	 */
-	public static boolean reverseZoneRecordsModification(SahiTasks browser, String reverseZoneName) {
-		boolean deleted=false; 
-		return deleted;
+	public static void reverseZoneRecordsModification(SahiTasks browser, String reverseZoneName) {
+ 
 	}//reverseZoneRecordsModification
 	
 	/*
@@ -127,9 +180,8 @@ public class DNSTasks {
 	 * @param browser  
 	 * @param zoneName - dna zone name
 	 */
-	public static boolean reverseZoneSettingsModification(SahiTasks browser, String zoneName) {
-		boolean deleted=false; 
-		return deleted;
+	public static void reverseZoneSettingsModification(SahiTasks browser, String zoneName) {
+ 
 	}//reverseZoneSettingsModification
 	
 	
