@@ -27,6 +27,12 @@ public class GroupTasks {
 
     }//createGroupService
 
+    
+    public static void deleteGroup(SahiTasks sahiTasks, String groupName) {
+    	sahiTasks.checkbox(groupName).click();
+        sahiTasks.link("Delete").click();
+        sahiTasks.button("Delete").click();
+    }
 
     /*
      * Test for: Simple add Group
