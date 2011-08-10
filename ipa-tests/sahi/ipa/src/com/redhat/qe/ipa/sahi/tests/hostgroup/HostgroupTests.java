@@ -50,18 +50,18 @@ public class HostgroupTests extends SahiTestScript{
 		sahiTasks.setStrictVisibilityCheck(true);
 		
 		//add host groups
-		//for (String hostgroup : allhostgroups) {
-			//String description = hostgroup + " group";
-			//HostgroupTasks.addHostGroup(sahiTasks, hostgroup, description, "Add");
-		//}
+		for (String hostgroup : allhostgroups) {
+			String description = hostgroup + " group";
+			HostgroupTasks.addHostGroup(sahiTasks, hostgroup, description, "Add");
+		}
 		
 		//add hosts for host group members
-		//sahiTasks.navigateTo(System.getProperty("ipa.server.url")+ CommonTasks.hostPage, true);
-		//for (String hostname : hostnames) {
-			//HostTasks.addHost(sahiTasks, hostname, "");
-		//}
+		sahiTasks.navigateTo(System.getProperty("ipa.server.url")+ CommonTasks.hostPage, true);
+		for (String hostname : hostnames) {
+			HostTasks.addHost(sahiTasks, hostname, "");
+		}
 		
-		//sahiTasks.navigateTo(System.getProperty("ipa.server.url")+ CommonTasks.hostgroupPage, true);
+		sahiTasks.navigateTo(System.getProperty("ipa.server.url")+ CommonTasks.hostgroupPage, true);
 	}
 	
 	@AfterClass (groups={"cleanup"}, description="Delete objects added for the tests", alwaysRun=true)
