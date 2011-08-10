@@ -112,6 +112,33 @@ public class HostgroupTasks {
 	 * @param sahiTasks
 	 * @param groupname - name of host group
 	 * @param membertype - host or hostgroup
+	 * @param name - name to add as member
+	 * @param button - Enroll or Cancel
+	 */
+	public static void addMembers(SahiTasks sahiTasks, String groupName, String membertype, String name, String button) {
+		sahiTasks.link(groupName).click();
+		if (membertype == "host"){
+			sahiTasks.link("member_host").click();
+		}
+		if (membertype == "hostgroup"){
+			sahiTasks.link("member_hostgroup").click();
+		}
+		
+		sahiTasks.radio("direct").click();
+		sahiTasks.link("Enroll").click();
+		
+		sahiTasks.checkbox(name).click();
+		
+		sahiTasks.span(">>").click();
+		sahiTasks.button(button).click();
+		sahiTasks.link("Host Groups").in(sahiTasks.div("content")).click();
+	}
+	
+	/*
+	 * Add host members
+	 * @param sahiTasks
+	 * @param groupname - name of host group
+	 * @param membertype - host or hostgroup
 	 * @param names - array of names to add as members
 	 * @param button - Enroll or Cancel
 	 */
@@ -124,6 +151,7 @@ public class HostgroupTasks {
 			sahiTasks.link("member_hostgroup").click();
 		}
 		
+		sahiTasks.radio("direct").click();
 		sahiTasks.link("Enroll").click();
 		
 		for (String name : names) {
@@ -150,21 +178,50 @@ public class HostgroupTasks {
 		if (membertype == "hostgroup"){
 			sahiTasks.link("member_hostgroup").click();
 		}
-		
+		sahiTasks.radio("direct").click();
 		sahiTasks.link("Enroll").click();
 		if( hide == "YES" ){
 			sahiTasks.checkbox("hidememb").check();
 			sahiTasks.textbox("filter").setValue(searchstr);
 			sahiTasks.span("Find").click();
-			com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(enrolledgroup).exists(), "enrolled group" + enrolledgroup + " is hidden");
+			com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.checkbox(enrolledgroup).exists(), "enrolled group" + enrolledgroup + " is hidden");
 		}
 		else {
 			sahiTasks.checkbox("hidememb").uncheck();
 			sahiTasks.textbox("filter").setValue(searchstr);
-			com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(enrolledgroup).exists(), "enrolled group" + enrolledgroup + " is NOT hidden");
+			com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.checkbox(enrolledgroup).exists(), "enrolled group" + enrolledgroup + " is NOT hidden");
 		}
 		
 		sahiTasks.button("Cancel").click();
+		sahiTasks.link("Host Groups").in(sahiTasks.div("content")).click();
+	}
+	
+	/*
+	 * verify members
+	 * @param sahiTasks
+	 * @param groupname - name of host group
+	 * @param membertype - host or hostgroup
+	 * @param name - name to verify
+	 * @param type - direct or indirect
+	 * @param exists - whether or not they should be members YES if they should be
+	 */
+	public static void verifyMembers(SahiTasks sahiTasks, String groupName, String membertype, String name, String type, String exists) {
+		sahiTasks.link(groupName).click();
+		if (membertype == "host"){
+			sahiTasks.link("member_host").click();
+		}
+		if (membertype == "hostgroup"){
+			sahiTasks.link("member_hostgroup").click();
+		}
+		
+		sahiTasks.radio(type).click();
+		
+		if (exists == "YES"){
+			com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(name).exists(), membertype + " " + name + " is a member of host group " + groupName);
+		}
+		else {
+			com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(name).exists(), membertype + " " + name + " is NOT member of host group " + groupName);
+		}
 		sahiTasks.link("Host Groups").in(sahiTasks.div("content")).click();
 	}
 	
@@ -266,10 +323,33 @@ public class HostgroupTasks {
 	 * Remove host members
 	 * @param sahiTasks
 	 * @param groupname - name of host group
-	 * @param hostnames - array of hostnames to remove as members
+	 * @param hostnames - names to remove as member
 	 * @param button - Delete or Cancel
 	 */
-	public static void removeMember(SahiTasks sahiTasks, String groupName, String membertype, String [] names, String button) {
+	public static void removeMembers(SahiTasks sahiTasks, String groupName, String membertype, String name, String button) {
+		sahiTasks.link(groupName).click();
+		if (membertype == "host"){
+			sahiTasks.link("member_host").click();
+		}
+		if (membertype == "hostgroup"){
+			sahiTasks.link("member_hostgroup").click();
+		}
+		
+		sahiTasks.checkbox(name).click();
+
+		sahiTasks.span("Delete").click();
+		sahiTasks.button(button).click();
+		sahiTasks.link("Host Groups").in(sahiTasks.div("content")).click();
+	}
+	
+	/*
+	 * Remove host members
+	 * @param sahiTasks
+	 * @param groupname - name of host group
+	 * @param hostnames - array of names to remove as members
+	 * @param button - Delete or Cancel
+	 */
+	public static void removeMembers(SahiTasks sahiTasks, String groupName, String membertype, String [] names, String button) {
 		sahiTasks.link(groupName).click();
 		if (membertype == "host"){
 			sahiTasks.link("member_host").click();
