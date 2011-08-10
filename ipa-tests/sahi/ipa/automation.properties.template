@@ -2,11 +2,12 @@
 
 #IPA parameters
 ipa.version=2.1
-ipa.server.url=http://optimus.lab.eng.pnq.redhat.com
+ipa.server.url=http://hp-dl360g5-02.rhts.eng.bos.redhat.com
 ipa.server.admin=admin
 ipa.server.password=Secret123
 ipa.server.realm=TESTRELM
 ipa.server.domain=testrelm
+ipa.server.reversezone=64.16.10.in-addr.arpa.
 
 #ipa.server.url=http://rhel62-server.testrelm
 ipa.browser.path=/usr/bin/firefox
