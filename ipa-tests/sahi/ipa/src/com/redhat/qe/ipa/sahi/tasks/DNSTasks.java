@@ -1,12 +1,14 @@
 package com.redhat.qe.ipa.sahi.tasks;
 
+import java.util.logging.Logger;
+
 import com.redhat.qe.auto.testng.Assert;
 import com.redhat.qe.ipa.sahi.tasks.SahiTasks;
 
 
 
 public class DNSTasks {
-
+	private static Logger log = Logger.getLogger(HostTasks.class.getName());
 	/*
 	 * Add DNS zone
 	 * @param browser 
@@ -52,15 +54,15 @@ public class DNSTasks {
 		browser.textbox("idnssoamname").setValue(authoritativeNameserver);
 		browser.textbox("idnssoarname").setValue(rootEmail); 
 		browser.button("Add").click();  
-		if (browser.div("/IPA Error */").exists()){
-			browser.button("Cancel").click();
-			Assert.assertTrue(false, "ipa error occures");
-		}else if (browser.span("Required field").exists()){
-			browser.button("Cancel").click();
-			Assert.assertTrue(false, "missing required field");
-		}else{
-			Assert.assertTrue(browser.link("reverseZone").exists(), "create reverse zone success");
-		}
+//		if (browser.div("/IPA Error */").exists()){
+//			browser.button("Cancel").click();
+//			Assert.assertTrue(false, "ipa error occures");
+//		}else if (browser.span("Required field").exists()){
+//			browser.button("Cancel").click();
+//			Assert.assertTrue(false, "missing required field");
+//		}else{
+//			Assert.assertTrue(browser.link("reverseZone").exists(), "create reverse zone success");
+//		}
 	}//addDNSResersezone
 	
 	/*
@@ -82,7 +84,7 @@ public class DNSTasks {
 	 * @param record_data
 	 * @param record_type
 	 */
-	public static void zoneRecordsModification(SahiTasks browser, String zoneName,String record_name, String record_data, String record_type) {
+	public static void zoneRecordsModification(SahiTasks browser,String record_name, String record_data, String record_type) {
 		DNSTasks.recordsModify(browser, record_name, record_data, record_type);
 	}//zoneRecordsModification
 	
@@ -101,13 +103,13 @@ public class DNSTasks {
 		browser.textbox("record_data").setValue(record_data);
 		browser.button("Add").click(); 
 		if (browser.div("/IPA Error */").exists()){
-			System.out.println("IPA error dialog appears, usually this is data format error");
+			log.info("IPA error dialog appears, usually this is data format error");
 			// there will be two cancel button here
 			browser.button("Cancel").click();
 			browser.button("Cancel").click();
 			//Assert.assertTrue(false, "ipa error ( dialog )occures");
 		}else if (browser.span("Required field").exists()){
-			System.out.println ("Required field msg appears, usually this means missing data input");
+			log.info ("Required field msg appears, usually this means missing data input");
 			browser.button("Cancel").click();
 			//Assert.assertTrue(false, "missing required field");
 		}else{
@@ -136,9 +138,10 @@ public class DNSTasks {
 		
 		// check undo value with original value
 		if (originalValue.equals(undoValue)){
-			System.out.println("Undo works");
+			log.info("Undo works");
 		}else{
-			System.out.println("Undo failed");
+			log.info("Undo failed");
+			Assert.fail("Undo failed");
 		}
 		
 		// test for reset
@@ -147,22 +150,31 @@ public class DNSTasks {
 		String resetValue = browser.textbox(fieldName).getValue();
 		// check undo value with original value
 		if (originalValue.equals(resetValue)){
-			System.out.println("Reset works");
+			log.info("Reset works");
 		}else{
-			System.out.println("Reset failed");
+			log.info("Reset failed");
+			Assert.fail("Reset failed");
 		}
 		
 		// test for update
 		browser.textbox(fieldName).setValue(fieldValue);
 		browser.span("Update").click();
-		String updateValue = browser.textbox(fieldName).getValue();
-
-		// check update value with original value
-		if (fieldValue.equals(updateValue)){
-			System.out.println("Update works");
-		}else{
-			System.out.println("Update failed");
-		}
+		if (browser.div("error_dialog").exists()){ 
+			String errormsg = browser.div("error_dialog").getText(); 
+			log.info("ERROR update failed: " + errormsg);
+			Assert.fail("Update failed");
+			browser.button("Cancel").click(); 
+			//Assert.assertTrue(false, "ipa error ( dialog )occurs");
+		}else { 
+			String updateValue = browser.textbox(fieldName).getValue();
+			// check update value with original value
+			if (fieldValue.equals(updateValue)){
+				log.info("Update works, updated value matches");
+			}else{
+				log.info("Update failed, updated value does not match with passin value");
+				Assert.fail("Update failed, passin:"+fieldValue + " actual field :"+updateValue);
+			}
+		}// if no error appears, it should pass
 		
 	}//zoneSettingsModification
 	

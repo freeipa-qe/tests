@@ -7,19 +7,24 @@
 	<groups>
 	    <run>
 	        <include name="setup" />
-	        <include name="init" />  
-	        <!-- <include name="dnsZoneBaseTest" /> -->
+	        <include name="init" />   
+	       
+	        <include name="addDNSZoneTest" /> 
+            <include name="dnsZoneRecordsTest" /> 
+            <include name="dnsZoneSettingsTest" />
+           <include name="delDNSZoneTest" />
+           
+	        <include name="addReverseDNSZone" />
+	        <include name="dnsReverseZoneRecordsTest" />
+	        <include name="dnsReverseZoneSettingsTest" />
+	        <include name="deleteReverseDNSZone" />
 	        
-	        <include name="addDNSZoneTest" />
-	        
-	        <!--  <include name="dnsZoneRecordsTest" /> temp disable -->
-	        
-	        <include name="dnsZoneSettingsTest" />
-	        <!-- <include name="delDNSZoneTest" /> -->
 	        
 	        <!--  the following are premature, comment out 
 	        
-             <include name="dnsReverseZoneBaseTest" />
+	        <include name="dnsZoneBaseTest" />
+	        <include name="dnsReverseZoneBaseTest" />
+
               end of comment out tests -->
              
 	    </run>
