@@ -21,6 +21,7 @@ public class HostgroupTests extends SahiTestScript{
 	private String domain = System.getProperty("ipa.server.domain");
 	
 	// hosts and host arrays
+	private String myhost = "testhost." + domain;
 	private String devwebserver = "webserver_dev." + domain;
 	private String qewebserver = "webserver_qe." + domain;
 	private String devhost = "laptop_dev." + domain;
@@ -29,7 +30,7 @@ public class HostgroupTests extends SahiTestScript{
 	private String [] devhosts = {devwebserver, devhost};
 	private String [] qehosts = {qewebserver, qehost};
 	private String [] enghosts = {engwebserver};
-	private String [] hostnames = {devwebserver, qewebserver, devhost, qehost, engwebserver};
+	private String [] hostnames = {myhost, devwebserver, qewebserver, devhost, qehost, engwebserver};
 	
 	//host groups and host group arrays
 	private String myhostgroup = "myhostgroup";
@@ -49,29 +50,29 @@ public class HostgroupTests extends SahiTestScript{
 		sahiTasks.setStrictVisibilityCheck(true);
 		
 		//add host groups
-		for (String hostgroup : allhostgroups) {
-			String description = hostgroup + " group";
-			HostgroupTasks.addHostGroup(sahiTasks, hostgroup, description, "Add");
-		}
+		//for (String hostgroup : allhostgroups) {
+			//String description = hostgroup + " group";
+			//HostgroupTasks.addHostGroup(sahiTasks, hostgroup, description, "Add");
+		//}
 		
 		//add hosts for host group members
-		sahiTasks.navigateTo(System.getProperty("ipa.server.url")+ CommonTasks.hostPage, true);
-		for (String hostname : hostnames) {
-			HostTasks.addHost(sahiTasks, hostname, "");
-		}
+		//sahiTasks.navigateTo(System.getProperty("ipa.server.url")+ CommonTasks.hostPage, true);
+		//for (String hostname : hostnames) {
+			//HostTasks.addHost(sahiTasks, hostname, "");
+		//}
 		
-		sahiTasks.navigateTo(System.getProperty("ipa.server.url")+ CommonTasks.hostgroupPage, true);
+		//sahiTasks.navigateTo(System.getProperty("ipa.server.url")+ CommonTasks.hostgroupPage, true);
 	}
 	
 	@AfterClass (groups={"cleanup"}, description="Delete objects added for the tests", alwaysRun=true)
 	public void cleanup() throws Exception {	
 		// delete the hosts added for testing
-		sahiTasks.navigateTo(System.getProperty("ipa.server.url")+ CommonTasks.hostPage, true);
-		HostTasks.deleteHost(sahiTasks, hostnames);
+		//sahiTasks.navigateTo(System.getProperty("ipa.server.url")+ CommonTasks.hostPage, true);
+		//HostTasks.deleteHost(sahiTasks, hostnames);
 		
 		//delete the host groups added for testing
-		sahiTasks.navigateTo(System.getProperty("ipa.server.url")+ CommonTasks.hostgroupPage, true);
-		HostgroupTasks.deleteHostgroup(sahiTasks, allhostgroups);
+		//sahiTasks.navigateTo(System.getProperty("ipa.server.url")+ CommonTasks.hostgroupPage, true);
+		//HostgroupTasks.deleteHostgroup(sahiTasks, allhostgroups);
 	}
 	
 	/*
@@ -218,7 +219,7 @@ public class HostgroupTests extends SahiTestScript{
 	/*
 	 * Verify Host member of
 	 */
-	@Test (groups={"hostMemberofTest"}, dataProvider="getHostMemberofTestObjects",  dependsOnGroups="AddHostMembersTests")	
+	@Test (groups={"hostMemberofTest"}, dataProvider="getHostMemberofTestObjects",  dependsOnGroups="hostGroupMemberofTest")	
 	public void testHostMemberof(String testName) throws Exception {
 		
 		//verify member of for hosts
@@ -233,100 +234,74 @@ public class HostgroupTests extends SahiTestScript{
 	}
 	
 	/*
+	 * Hide enrolled host group tests
+	 */
+	@Test (groups={"hideAlreadyEnrolledGroupsTests"}, dataProvider="getHideAlreadyEnrolledGroupsTestObjects")	
+	public void testHideAlreadyEnrolledGroups (String testName) throws Exception {
+		
+		HostgroupTasks.hideAlreadyEnrolled(sahiTasks, enggroup, "hostgroup", qegroup, "YES", "qe");
+		HostgroupTasks.hideAlreadyEnrolled(sahiTasks, enggroup, "hostgroup", devgroup, "YES", "dev");
+	}
+	
+
+	/*
+	 * Hide enrolled host tests
+	 */
+	@Test (groups={"hideAlreadyEnrolledHostsTests"}, dataProvider="getHideAlreadyEnrolledHostsTestObjects")	
+	public void testHideAlreadyEnrolledHosts (String testName) throws Exception {
+
+		HostgroupTasks.hideAlreadyEnrolled(sahiTasks, enggroup, "host", engwebserver, "YES", "eng");		
+		HostgroupTasks.hideAlreadyEnrolled(sahiTasks, qegroup, "host", qewebserver, "YES", "qe");		
+		HostgroupTasks.hideAlreadyEnrolled(sahiTasks, devgroup, "host", devwebserver, "NO", "dev");		
+		HostgroupTasks.hideAlreadyEnrolled(sahiTasks, qegroup, "host", devwebserver, "NO", "qe");	
+		HostgroupTasks.hideAlreadyEnrolled(sahiTasks, devgroup, "host", qewebserver, "NO", "dev");
+}
+	
+	/*
 	 * Cancel add members test
 	 */
-	@Test (groups={"cancelAddMembersTest"}, dataProvider="getCancelAddMemberTestObjects")	
+	@Test (groups={"cancelAddMembersTest"}, dataProvider="getCancelAddMemberTestObjects", dependsOnGroups="hostGroupMemberofTest")	
 	public void testCancelAddMembers(String testName, String groupName, String membertype, String member) throws Exception {
 		
-		String [] members = {member};
-		HostgroupTasks.addMembers(sahiTasks, groupName, membertype, members, "Cancel");
+		HostgroupTasks.addMembers(sahiTasks, groupName, membertype, member, "Cancel");
 		
 		//verify the member is not a member
-		HostgroupTasks.verifyMembers(sahiTasks, groupName, membertype, members, "direct", "NO");
+		HostgroupTasks.verifyMembers(sahiTasks, groupName, membertype, member, "direct", "NO");
 	}
 	
 	/*
 	 * Cancel remove members test
 	 */
-	@Test (groups={"cancelRemoveMembersTest"}, dataProvider="getCancelRemoveMemberTestObjects",  dependsOnGroups="AddHostMembersTests")	
+	@Test (groups={"cancelRemoveMembersTest"}, dataProvider="getCancelRemoveMemberTestObjects",  dependsOnGroups="hostGroupMemberofTest")	
 	public void testCancelRemoveMembers(String testName, String groupName, String membertype, String member) throws Exception {
 			
-	String [] members = {member};
-			
 	//cancel removing member
-	HostgroupTasks.removeMember(sahiTasks, groupName, membertype, members, "Cancel");
-	HostgroupTasks.verifyMembers(sahiTasks, groupName, membertype, members, "direct", "YES");
-
+	HostgroupTasks.removeMembers(sahiTasks, groupName, membertype, member, "Cancel");
+	HostgroupTasks.verifyMembers(sahiTasks, groupName, membertype, member, "direct", "YES");
+	}
+	
+	/*
+	 * Remove member hosts test
+	 */
+	@Test (groups={"removeHostMembersTest"}, dataProvider="getRemoveHostMemberTestObjects",  dependsOnGroups="cancelRemoveMembersTest")	
+	public void testRemoveHostMembers(String testName, String groupName, String [] members) throws Exception {
+			
+	// remove host members
+	HostgroupTasks.removeMembers(sahiTasks, groupName, "host", members, "Delete");
+	HostgroupTasks.verifyMembers(sahiTasks, groupName, "host", members, "direct", "NO");
+	}
+	
+	/*
+	 * Remove member host groups test
+	 */
+	@Test (groups={"removeHostGroupMembersTest"}, dataProvider="getRemoveHostGroupMemberTestObjects",  dependsOnGroups="removeHostMembersTest")	
+	public void testRemoveHostGroupMembers(String testName, String groupName, String member) throws Exception {
+			
+	//remove host group member
+	HostgroupTasks.removeMembers(sahiTasks, groupName, "host", member, "Delete");
+	HostgroupTasks.verifyMembers(sahiTasks, groupName, "host", member, "direct", "NO");
 	}
 		
-		/*
-		 * Hide enrolled host group tests
-		 */
-		@Test (groups={"hideAlreadyEnrolledGroupsTests"}, dataProvider="getHideAlreadyEnrolledGroupsTestObjects")	
-		public void testHideAlreadyEnrolledGroups (String testName) throws Exception {
-			String parent = "engineering";
-			String qechild1 = "1qe";
-			String qechild2 = "2qe";
-			String devchild1 = "1dev";
-			String devchild2 = "2dev";
-			
-			String [] hostgroups = {parent, qechild1, qechild2, devchild1, devchild2};
-			String [] enrolled = {qechild1, devchild1};
-			
-			for (String hostgroup : hostgroups){
-				HostgroupTasks.addHostGroup(sahiTasks, hostgroup, hostgroup, "Add");
-			}
-			HostgroupTasks.addMembers(sahiTasks, parent, "hostgroup", enrolled, "Enroll");
-			
-			HostgroupTasks.hideAlreadyEnrolled(sahiTasks, parent, "hostgroup", qechild1, "YES", "qe");
-			
-			HostgroupTasks.hideAlreadyEnrolled(sahiTasks, parent, "hostgroup", devchild1, "YES", "dev");
-			
-			HostgroupTasks.hideAlreadyEnrolled(sahiTasks, parent, "hostgroup", qechild1, "NO", "qe");
-			
-			HostgroupTasks.hideAlreadyEnrolled(sahiTasks, parent, "hostgroup", qechild1, "NO", "dev");
-			
-			//clean up
-			HostgroupTasks.deleteHostgroup(sahiTasks, hostgroups);
-	}
-		
-		/*
-		 * Hide enrolled host tests
-		 */
-		@Test (groups={"hideAlreadyEnrolledHostsTests"}, dataProvider="getHideAlreadyEnrolledHostsTestObjects")	
-		public void testHideAlreadyEnrolledHosts (String testName) throws Exception {
-			String groupname = "application servers";
-			String devappserver = "appserver_dev." + domain;
-			String devwebserver = "webserver_dev." + domain;
-			String qeappserver = "appserver_qe." + domain;
-			String qewebserver = "webserver_qe." + domain;
-			String [] hostnames = {devappserver, devwebserver, qeappserver, qewebserver};
-			
-			HostgroupTasks.addHostGroup(sahiTasks, groupname, groupname, "Add");
-			
-			sahiTasks.navigateTo(System.getProperty("ipa.server.url")+ CommonTasks.hostPage, true);
-			for (String hostname : hostnames){
-				HostTasks.addHost(sahiTasks, hostname, "");
-			}
-		
-			sahiTasks.navigateTo(System.getProperty("ipa.server.url")+ CommonTasks.hostgroupPage, true);
-			String [] enrolled = {devappserver, qeappserver};
-			HostgroupTasks.addMembers(sahiTasks, groupname, "host", enrolled, "Enroll");
-			
-			HostgroupTasks.hideAlreadyEnrolled(sahiTasks, groupname, "host", devappserver, "YES", "dev");
-			
-			HostgroupTasks.hideAlreadyEnrolled(sahiTasks, groupname, "host", qeappserver, "YES", "qe");
-			
-			HostgroupTasks.hideAlreadyEnrolled(sahiTasks, groupname, "host", devappserver, "NO", "dev");
-			
-			HostgroupTasks.hideAlreadyEnrolled(sahiTasks, groupname, "host", qeappserver, "NO", "qe");
-			
-			//clean up
-			HostgroupTasks.deleteHostgroup(sahiTasks, groupname, "Delete");
-			
-			sahiTasks.navigateTo(System.getProperty("ipa.server.url")+ CommonTasks.hostPage, true);;
-			HostTasks.deleteHost(sahiTasks, hostnames);
-	}
 
 /*******************************************************
  ************      DATA PROVIDERS     ******************
@@ -424,7 +399,7 @@ public class HostgroupTests extends SahiTestScript{
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 	
 		//										testname						groupname		membertype		member	
-		ll.add(Arrays.asList(new Object[]{ 		"cancel_addhostmember", 		myhostgroup, 	"host", 		engwebserver  } ));
+		ll.add(Arrays.asList(new Object[]{ 		"cancel_addhostmember", 		myhostgroup, 	"host", 		myhost  } ));
 		ll.add(Arrays.asList(new Object[]{ 		"cancel_addhostgroupmember",	myhostgroup,	"hostgroup", 	enggroup } ));
 		return ll;	
 	}
@@ -502,6 +477,39 @@ public class HostgroupTests extends SahiTestScript{
 	
 		//										testname					
 		ll.add(Arrays.asList(new Object[]{ 		"hide_enrolled_hosts" } ));
+		return ll;	
+	}
+	
+	/*
+	 * Data to be removing host member
+	 */
+	@DataProvider(name="getRemoveHostMemberTestObjects")
+	public Object[][] getRemoveHostMemberTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createRemoveHostMemberTestObjects());
+	}
+	protected List<List<Object>> createRemoveHostMemberTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+	
+		//										testname						groupname	member	
+		ll.add(Arrays.asList(new Object[]{ 		"removehostmembers_qe",			qegroup,	qehosts } ));
+		ll.add(Arrays.asList(new Object[]{ 		"removehostmembers_dev",		devgroup,	devhosts } ));
+		ll.add(Arrays.asList(new Object[]{ 		"removehostmembers_eng",		enggroup,	enghosts } ));
+		return ll;	
+	}
+	
+	/*
+	 * Data to be removing host member
+	 */
+	@DataProvider(name="getRemoveHostGroupMemberTestObjects")
+	public Object[][] getRemoveHostMemberGroupTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createRemoveHostGroupMemberTestObjects());
+	}
+	protected List<List<Object>> createRemoveHostGroupMemberTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+	
+		//										testname						groupname	member	
+		ll.add(Arrays.asList(new Object[]{ 		"removehostgroup_qe",			enggroup,	qegroup } ));
+		ll.add(Arrays.asList(new Object[]{ 		"removehostgroup_qe",			enggroup,	devgroup } ));
 		return ll;	
 	}
 }
