@@ -30,6 +30,9 @@ public class CommonTasks {
 	public static String hbacPage = "/ipa/ui/#hbac=hbacrule&policy=hbac&navigation=policy";	
 	public static String sudoPage = "/ipa/ui/#navigation=policy&policy=sudo";
 	
+	public static String ipadomain = System.getProperty("ipa.server.domain");
+	public static String reversezone = System.clearProperty("ipa.server.reversezone");
+	
 	// to check if unexpected error was thrown in a test
 	public static boolean errorFlag = false;
 	
