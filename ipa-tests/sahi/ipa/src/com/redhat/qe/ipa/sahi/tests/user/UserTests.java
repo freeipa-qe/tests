@@ -325,6 +325,8 @@ public class UserTests extends SahiTestScript{
 		com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(uid).exists(), "User " + uid + "  deleted successfully");
 	}
 	
+	// TODO: Nkrishnan: Add test for Delete - but cancel
+	
 	
 	/*
 	 * Delete multiple users - for positive tests

@@ -2,6 +2,10 @@ package com.redhat.qe.ipa.sahi.tasks;
 
 import java.util.logging.Logger;
 
+/**
+ * @author root
+ *
+ */
 public class HBACTasks {
 	private static Logger log = Logger.getLogger(HBACTasks.class.getName());
 	
@@ -54,6 +58,23 @@ public class HBACTasks {
 	}
 	
 	
+	
+	/**
+	 * Delete an HBAC Rule
+	 * @param sahiTasks
+	 * @param cn - the rule to be deleted
+	 */
+	public static void deleteHBACRule(SahiTasks sahiTasks, String cn, String buttonToClick) {
+		sahiTasks.checkbox(cn).click();
+		sahiTasks.link("Delete").click();
+		sahiTasks.button(buttonToClick).click();
+		
+		
+		if (buttonToClick.equals("Cancel")) {
+			//Uncheck the box for this Rule
+			sahiTasks.checkbox(cn).click();
+		}
+	}
 
 	/**
 	 * Add and edit an HBAC Rule
@@ -90,7 +111,21 @@ public class HBACTasks {
 		sahiTasks.link("Update").click();
 		sahiTasks.link("HBAC Rules").in(sahiTasks.div("content")).click();		
 	}
-	
+
+
+	/**
+	 * Add HBAC rule, and Add Another
+	 * @param sahiTasks
+	 * @param cn1 - Rule to be added
+	 * @param cn2 - Next Rule to be added
+	 */
+	public static void addHBACRuleThenAddAnother(SahiTasks sahiTasks, String cn1, String cn2) {
+		sahiTasks.span("Add").click();
+		sahiTasks.textbox("cn").setValue(cn1);
+		sahiTasks.button("Add and Add Another").click();
+		sahiTasks.textbox("cn").setValue(cn2);
+		sahiTasks.button("Add").click();
+	}
 	
 	public static void verifyHBACRuleUpdates(SahiTasks sahiTasks, String cn, String uid, String hostgroupName, String service) {
 		//click on rule to edit
@@ -102,6 +137,27 @@ public class HBACTasks {
 		
 		sahiTasks.link("HBAC Rules").in(sahiTasks.div("content")).click();	
 	}
+
+
+
+
+	/**
+	 * Search for an HBAC Rule
+	 * @param sahiTasks
+	 * @param cn - the rule to serach for
+	 */
+	public static void searchHBACRule(SahiTasks sahiTasks, String cn) {
+		
+		
+	}
+
+
+
+
+
+
+
+	
 	
 	
 	

@@ -24,6 +24,7 @@ public class CommonTasks {
 	public static String hostgroupPage = "/ipa/ui/#identity=hostgroup&navigation=identity";
 	public static String netgroupPage = "/ipa/ui/#identity=netgroup&navigation=identity";
 	public static String dnsPage = "/ipa/ui/#dns=dnszone&identity=dns&navigation=identity";
+	public static String alternateDNSpage = dnsPage + "&dnszone-facet=search";
 	
 	
 	public static String hbacPage = "/ipa/ui/#hbac=hbacrule&policy=hbac&navigation=policy";	
@@ -213,8 +214,12 @@ public class CommonTasks {
 		if (sahiTasks.div("/IPA Error */").exists()){
 			log.fine("IPA error dialog appears, usually this is data format error");
 			// there will be two cancel button here
-			sahiTasks.button("Cancel").click();
-			sahiTasks.button("Cancel").click();
+			if (sahiTasks.button("Cancel").exists()) {
+				sahiTasks.button("Cancel").click();
+			}
+			if (sahiTasks.button("Cancel").exists()) {
+				sahiTasks.button("Cancel").click();
+			}
 			setErrorFlag(true);
 			return true;
 		}	
