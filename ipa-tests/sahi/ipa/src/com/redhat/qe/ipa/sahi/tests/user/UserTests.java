@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -20,13 +21,28 @@ public class UserTests extends SahiTestScript{
 	private static Logger log = Logger.getLogger(UserTests.class.getName());
 	public static SahiTasks sahiTasks = null;
 	
+	private String currentPage = "";
+	private String alternateCurrentPage = "";
+	
 	@BeforeClass (groups={"init"}, description="Initialize app for this test suite run", alwaysRun=true, dependsOnGroups="setup")
 	public void initialize() throws CloneNotSupportedException {	
 		sahiTasks = SahiTestScript.getSahiTasks();	
 		sahiTasks.navigateTo(System.getProperty("ipa.server.url")+ CommonTasks.userPage, true);
 		sahiTasks.setStrictVisibilityCheck(true);
+		currentPage = sahiTasks.fetch("top.location.href");
+		alternateCurrentPage = sahiTasks.fetch("top.location.href") + "&user-facet=search" ;
 	}
 	
+	@BeforeMethod (alwaysRun=true)
+	public void checkCurrentPage() {
+	    String currentPageNow = sahiTasks.fetch("top.location.href");
+	    System.out.println("CurrentPageNow: " + currentPageNow);
+		if (!currentPageNow.equals(currentPage) && !currentPageNow.equals(alternateCurrentPage)) {
+			CommonTasks.checkError(sahiTasks);
+			System.out.println("Not on expected Page....navigating back from : " + currentPageNow);
+			sahiTasks.navigateTo(System.getProperty("ipa.server.url")+ CommonTasks.userPage, true);
+		}		
+	}
 
 	/*
 	 * Add users - for positive tests
@@ -220,7 +236,8 @@ public class UserTests extends SahiTestScript{
 	/*
 	 * Cancel when deactivating users - for positive tests
 	 */
-	@Test (groups={"userCancelDeactivateTests"}, dataProvider="getUserStatusTestObjects", dependsOnGroups={"userAddTests", "userSetPasswordTests"})	
+	@Test (groups={"userCancelDeactivateTests"}, dataProvider="getUserStatusTestObjects", dependsOnGroups={"userAddTests",
+			"userSetPasswordTests"})	
 	public void testUserCancelDeactivate(String testName, String uid, String password) throws Exception {		
 		//verify user to be edited exists
 		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(uid).exists(), "Verify user " + uid + " to be deactivated exists");
@@ -244,7 +261,8 @@ public class UserTests extends SahiTestScript{
 	/*
 	 * Deactivate users - for positive tests
 	 */
-	@Test (groups={"userDeactivateTests"}, dataProvider="getUserStatusTestObjects", dependsOnGroups={"userAddTests", "userSetPasswordTests"})	
+	@Test (groups={"userDeactivateTests"}, dataProvider="getUserStatusTestObjects", dependsOnGroups={"userAddTests", "userCancelDeactivateTests", 
+			"userSetPasswordTests"})	
 	public void testUserDeactivate(String testName, String uid, String password) throws Exception {		
 		//verify user to be edited exists
 		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(uid).exists(), "Verify user " + uid + " to be deactivated exists");
@@ -288,7 +306,7 @@ public class UserTests extends SahiTestScript{
 	/*
 	 * Reactivate users - for positive tests
 	 */
-	@Test (groups={"userReactivateTests"}, dataProvider="getUserStatusTestObjects", dependsOnGroups={"userAddTests", "userDeactivateTests", "userSetPasswordTests"})	
+	@Test (groups={"userReactivateTests"}, dataProvider="getUserStatusTestObjects", dependsOnGroups={"userAddTests", "userDeactivateTests", "userSetPasswordTests", "userCancelReactivateTests"})	
 	public void testUserReactivate(String testName, String uid, String password) throws Exception {		
 		//verify user to be edited exists
 		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(uid).exists(), "Verify user " + uid + " to be reactivated exists");
@@ -313,7 +331,8 @@ public class UserTests extends SahiTestScript{
 	 * note: make sure tests that use testuser are run before testuser gets deleted here
 	 */
 	@Test (groups={"userDeleteTests"}, dataProvider="getUserDeleteTestObjects", 
-			dependsOnGroups={"userAddTests", "userEditTests", "userSetPasswordTests", "userDeactivateTests", "userReactivateTests", "invalidUserAddTests", "userSearchTests"})	
+			dependsOnGroups={"userAddTests", "userEditTests", "userSetPasswordTests", "userDeactivateTests", 
+			"userReactivateTests", "invalidUserAddTests", "userSearchTests", "userMultipleDataTests", "userAddDeleteUndoResetTests"})	
 	public void testUserDelete(String testName, String uid) throws Exception {
 		//verify user to be deleted exists
 		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(uid).exists(), "Verify user " + uid + "  to be deleted exists");
