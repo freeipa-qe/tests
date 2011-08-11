@@ -11,7 +11,8 @@
 			    <include name="hbacRuleCancelAddTests" />
 			    <include name="hbacRuleAddAndEditTests" />
 			    <include name="hbacRuleCancelDeleteTests" />
-			    <include name="hbacRuleAddAndAddAnotherTests" />			    
+			    <include name="hbacRuleAddAndAddAnotherTests" />
+			    <include name="hbacRuleSearchTests" />
 			    <include name="hbacRuleDeleteTests" />
 			    <include name="chooseHBACRulesMultipleDeleteTests" />			   
 			    <include name="hbacRuleMultipleDeleteTests" />

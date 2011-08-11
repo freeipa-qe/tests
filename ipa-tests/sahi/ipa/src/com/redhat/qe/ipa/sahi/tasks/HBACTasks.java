@@ -63,6 +63,7 @@ public class HBACTasks {
 	 * Delete an HBAC Rule
 	 * @param sahiTasks
 	 * @param cn - the rule to be deleted
+	 * @param buttonToClick - Possible values - "Delete" or "Cancel"
 	 */
 	public static void deleteHBACRule(SahiTasks sahiTasks, String cn, String buttonToClick) {
 		sahiTasks.checkbox(cn).click();
@@ -88,6 +89,12 @@ public class HBACTasks {
 		sahiTasks.textbox("cn").setValue(cn);
 		sahiTasks.button("Add and Edit").click();
 		
+		try {
+			Thread.sleep(5000);
+		} catch (InterruptedException e) {
+			
+			e.printStackTrace();
+		}
 		//Click to Add Users from "Who" section
 		sahiTasks.span("Add").click();
 		sahiTasks.checkbox(uid).click();
