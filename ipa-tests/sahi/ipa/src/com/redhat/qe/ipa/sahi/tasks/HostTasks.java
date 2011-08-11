@@ -12,12 +12,29 @@ public class HostTasks {
 	 * @param hostname - hostname
 	 * @param ipadr -  ipaddress
 	 */
-	public static void addHost(SahiTasks sahiTasks, String fqdn, String ipadr) {
+	public static void addHost(SahiTasks sahiTasks, String hostname, String ipadr) {
 		sahiTasks.span("Add").click();
-		sahiTasks.isVisible(sahiTasks.textbox("fqdn"), true);
-		sahiTasks.textbox("fqdn").near(sahiTasks.label("Host Name: ")).setValue(fqdn);
+		sahiTasks.textbox("hostname").setValue(hostname);
+		sahiTasks.textbox("dnszone").setValue(CommonTasks.ipadomain);
+		sahiTasks.checkbox("force").click();
+		sahiTasks.textbox("ip_address").setValue(ipadr);
+		sahiTasks.button("Add").click();
+	}
+	
+	/*
+	 * Create a host without dns records defined.
+	 * @param sahiTasks 
+	 * @param hostname - hostname
+	 * @param domain - dns domain
+	 * @param ipadr -  ipaddress
+	 */
+	public static void addHost(SahiTasks sahiTasks, String hostname, String hostdomain, String ipadr) {
+		sahiTasks.span("Add").click();
+		sahiTasks.textbox("hostname").setValue(hostname);
+		sahiTasks.textbox("dnsdomain").setValue(hostdomain);
+			
 		if(ipadr == ""){ 
-			sahiTasks.checkbox("force").near(sahiTasks.label("Force:")).click();
+			sahiTasks.checkbox("force").click();
 		}
 		if (ipadr != ""){
 			sahiTasks.textbox("ip_address").setValue(ipadr);
@@ -39,10 +56,11 @@ public class HostTasks {
 	 */
 	public static void addHostAndEdit(SahiTasks sahiTasks, String hostname, String ipadr, String description, String local, String location, String platform, String os) {
 		sahiTasks.span("Add").click();
-		sahiTasks.isVisible(sahiTasks.textbox("fqdn"), true);
-		sahiTasks.textbox("fqdn").near(sahiTasks.label("Host Name: ")).setValue(hostname);
+		sahiTasks.textbox("hostname").setValue(hostname);
+		sahiTasks.span("icon combobox-icon").click();
+		sahiTasks.select("list").choose(CommonTasks.ipadomain);
 		if(ipadr == ""){ 
-			sahiTasks.checkbox("force").near(sahiTasks.label("Force:")).click();
+			sahiTasks.checkbox("force").click();
 		}
 		if (ipadr != ""){
 			sahiTasks.textbox("ip_address").setValue(ipadr);
@@ -66,19 +84,23 @@ public class HostTasks {
 	 */
 	public static void addAndAddAnotherHost(SahiTasks sahiTasks, String hostname1, String hostname2, String hostname3) {
 		sahiTasks.span("Add").click();
-		sahiTasks.isVisible(sahiTasks.textbox("fqdn"), true);
-		sahiTasks.textbox("fqdn").near(sahiTasks.label("Host Name: ")).setValue(hostname1);
-		sahiTasks.checkbox("force").near(sahiTasks.label("Force:")).click();
+		sahiTasks.textbox("hostname").setValue(hostname1);
+		sahiTasks.span("icon combobox-icon").click();
+		sahiTasks.select("list").choose(CommonTasks.ipadomain);
+		sahiTasks.checkbox("force").click();
 		sahiTasks.button("Add and Add Another").click();
 		
-		sahiTasks.isVisible(sahiTasks.textbox("fqdn"), true);
-		sahiTasks.textbox("fqdn").near(sahiTasks.label("Host Name: ")).setValue(hostname2);
-		sahiTasks.checkbox("force").near(sahiTasks.label("Force:")).click();
+		sahiTasks.textbox("hostname").setValue(hostname2);
+		sahiTasks.span("icon combobox-icon").click();
+		sahiTasks.select("list").choose(CommonTasks.ipadomain);
+		
+		sahiTasks.checkbox("force").click();
 		sahiTasks.button("Add and Add Another").click();
 		
-		sahiTasks.isVisible(sahiTasks.textbox("fqdn"), true);
-		sahiTasks.textbox("fqdn").near(sahiTasks.label("Host Name: ")).setValue(hostname3);
-		sahiTasks.checkbox("force").near(sahiTasks.label("Force:")).click();
+		sahiTasks.textbox("hostname").setValue(hostname3);
+		sahiTasks.span("icon combobox-icon").click();
+		sahiTasks.select("list").choose(CommonTasks.ipadomain);
+		sahiTasks.checkbox("force").click();
 		sahiTasks.button("Add").click();
 	}
 	
@@ -108,11 +130,13 @@ public class HostTasks {
 	 * @param ipadr - ip address for the host
 	 * @param expectedError - the error thrown when an invalid host is being attempted to be added
 	 */
-	public static void addInvalidHost(SahiTasks sahiTasks, String hostname, String ipadr, String expectedError) {
+	public static void addInvalidHost(SahiTasks sahiTasks, String hostname, String hostdomain, String ipadr, String expectedError) {
 		sahiTasks.span("Add").click();
-		sahiTasks.textbox("fqdn").near(sahiTasks.label("Host Name:")).setValue(hostname);
+		sahiTasks.textbox("hostname").setValue(hostname);
+		sahiTasks.span("icon combobox-icon").click();
+		sahiTasks.select("list").choose(hostdomain);
 		if(ipadr == ""){ 
-			sahiTasks.checkbox("force").near(sahiTasks.label("Force:")).click();
+			sahiTasks.checkbox("force").click();
 		}
 		if (ipadr != ""){
 			sahiTasks.textbox("ip_address").setValue(ipadr);
