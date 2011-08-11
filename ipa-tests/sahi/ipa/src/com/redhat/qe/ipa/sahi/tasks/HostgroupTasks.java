@@ -167,10 +167,10 @@ public class HostgroupTasks {
 	 * @param sahiTasks
 	 * @param groupname - name of host group
 	 * @param membertype - host or hostgroup
-	 * @param names - enrolled group
+	 * @param enrolled - enrolled host or host group
 	 * @param button - YES if want to hide enrolled groups
 	 */
-	public static void hideAlreadyEnrolled(SahiTasks sahiTasks, String groupName, String membertype, String enrolledgroup, String hide, String searchstr) {
+	public static void hideAlreadyEnrolled(SahiTasks sahiTasks, String groupName, String membertype, String enrolled, String hide, String searchstr) {
 		sahiTasks.link(groupName).click();
 		if (membertype == "host"){
 			sahiTasks.link("member_host").click();
@@ -184,12 +184,13 @@ public class HostgroupTasks {
 			sahiTasks.checkbox("hidememb").check();
 			sahiTasks.textbox("filter").setValue(searchstr);
 			sahiTasks.span("Find").click();
-			com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.checkbox(enrolledgroup).exists(), "enrolled group" + enrolledgroup + " is hidden");
+			com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.span(enrolled+"[1]").exists(), "enrolled " + membertype + " " + enrolled + " is hidden");
 		}
-		else {
+		if ( hide == "NO") {
 			sahiTasks.checkbox("hidememb").uncheck();
 			sahiTasks.textbox("filter").setValue(searchstr);
-			com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.checkbox(enrolledgroup).exists(), "enrolled group" + enrolledgroup + " is NOT hidden");
+			sahiTasks.span("Find").click();
+			com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.span(enrolled+"[1]").exists(), "enrolled " + membertype + " " + enrolled + " is NOT hidden");
 		}
 		
 		sahiTasks.button("Cancel").click();
@@ -335,6 +336,7 @@ public class HostgroupTasks {
 			sahiTasks.link("member_hostgroup").click();
 		}
 		
+		sahiTasks.radio("direct").click();
 		sahiTasks.checkbox(name).click();
 
 		sahiTasks.span("Delete").click();
@@ -358,6 +360,7 @@ public class HostgroupTasks {
 			sahiTasks.link("member_hostgroup").click();
 		}
 		
+		sahiTasks.radio("direct").click();
 		for (String name : names) {
 			sahiTasks.checkbox(name).click();
 		}
