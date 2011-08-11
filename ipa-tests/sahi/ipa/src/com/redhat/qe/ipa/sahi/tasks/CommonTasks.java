@@ -9,6 +9,8 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.logging.Logger;
 
+import com.redhat.qe.auto.testng.Assert;
+
 
 
 public class CommonTasks {
@@ -25,9 +27,18 @@ public class CommonTasks {
 	public static String hbacPage = "/ipa/ui/#hbac=hbacrule&policy=hbac&navigation=policy";	
 	public static String sudoPage = "/ipa/ui/#navigation=policy&policy=sudo";
 	
+	// to check if unexpected error was thrown in a test
+	public static boolean errorFlag = false;
 	
-	
-    public static boolean kinitAsAdmin() {    	
+    public static boolean isErrorFlag() {
+		return errorFlag;
+	}
+
+	public static void setErrorFlag(boolean errorFlag) {
+		CommonTasks.errorFlag = errorFlag;
+	}
+
+	public static boolean kinitAsAdmin() {    	
         String admin=System.getProperty("ipa.server.admin");
         String password=System.getProperty("ipa.server.password");        
         return kinitAsUser(admin, password);    	
@@ -153,5 +164,51 @@ public class CommonTasks {
 		
 		return csr;
     }
+    
+    /**
+     * Search for an object - a user/host/group....
+     * @param sahiTasks
+     * @param objectToSearch - search string
+     */
+    public static void search(SahiTasks sahiTasks, String objectToSearch) {
+		sahiTasks.textbox("filter").setValue(objectToSearch);
+		sahiTasks.span("icon search-icon").click();
+	}	
+	
+	/**
+	 * Clear the search - so that all objects are listed
+	 * @param sahiTasks
+	 */
+	public static void clearSearch(SahiTasks sahiTasks) {
+		sahiTasks.textbox("filter").setValue("");
+		sahiTasks.span("icon search-icon").click();
+	}
+	
+	
+	/*
+	 * If a test throws an unexpected error, it will leave the test in that page, and tests 
+	 * that follow it, will not start from the page they expect to be on.
+	 * This method allows you to check for any unexpected error, and sets a flag
+	 * Example:
+	 * In your task - 
+	 * if (CommonTasks.checkError(browser)){
+	 * 		Assert.fail("Unexpected error when testing with Name: " + record_name + ", Data: " + record_data + ", Type: " + record_type);
+	 * 	}
+	 * 	At the start of your test -
+	 * 	if (CommonTasks.isErrorFlag())
+	 * 		sahiTasks.navigateTo(CommonTasks.dnsPage);
+	 */
+	public static boolean checkError(SahiTasks sahiTasks) {
+		if (sahiTasks.div("/IPA Error */").exists()){
+			log.fine("IPA error dialog appears, usually this is data format error");
+			// there will be two cancel button here
+			sahiTasks.button("Cancel").click();
+			sahiTasks.button("Cancel").click();
+			setErrorFlag(true);
+			return true;
+		}	
+		return false;
+	}
+	
 
 }
