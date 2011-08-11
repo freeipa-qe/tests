@@ -9,6 +9,8 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.logging.Logger;
 
+import org.testng.annotations.BeforeMethod;
+
 import com.redhat.qe.auto.testng.Assert;
 
 
@@ -189,14 +191,23 @@ public class CommonTasks {
 	 * If a test throws an unexpected error, it will leave the test in that page, and tests 
 	 * that follow it, will not start from the page they expect to be on.
 	 * This method allows you to check for any unexpected error, and sets a flag
+	 * 
 	 * Example:
 	 * In your task - 
-	 * if (CommonTasks.checkError(browser)){
+	 * if (CommonTasks.checkError(sahiTasks)){
 	 * 		Assert.fail("Unexpected error when testing with Name: " + record_name + ", Data: " + record_data + ", Type: " + record_type);
 	 * 	}
-	 * 	At the start of your test -
-	 * 	if (CommonTasks.isErrorFlag())
-	 * 		sahiTasks.navigateTo(CommonTasks.dnsPage);
+	 * 
+	 * In your test class -
+	 * import org.testng.annotations.BeforeMethod;
+	 * @BeforeMethod (alwaysRun=true)
+	 * 	public void checkErrorFlag() {
+	 * 		if (CommonTasks.isErrorFlag())
+	 * 			sahiTasks.navigateTo(CommonTasks.dnsPage);
+	 * 	}
+	 * 
+	 * The BeforeMethod will always run before every test method, ensuring you always 
+	 * start from expected page
 	 */
 	public static boolean checkError(SahiTasks sahiTasks) {
 		if (sahiTasks.div("/IPA Error */").exists()){
