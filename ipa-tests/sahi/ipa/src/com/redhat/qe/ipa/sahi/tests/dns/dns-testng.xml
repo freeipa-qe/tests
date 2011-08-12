@@ -10,20 +10,32 @@
 	        <include name="init" />   
 	       
 	        <include name="addDNSZoneTest" /> 
-            <include name="dnsZoneRecordsTest" /> 
+            <include name="dnsZoneRecordsTest_add" />
+            <include name="dnsZoneRecordsTest_addandaddanother" />
+            <include name="dnsZoneRecordsTest_addandaddedit" />
+            <include name="dnsZoneRecordsTest_add_then_cancel" />
             <include name="dnsZoneSettingsTest" />
-           <include name="delDNSZoneTest" />
+            <!-- <include name="delDNSZoneTest" /> -->
            
-	        <include name="addReverseDNSZone" />
-	        <include name="dnsReverseZoneRecordsTest" />
-	        <include name="dnsReverseZoneSettingsTest" />
-	        <include name="deleteReverseDNSZone" />
+            <include name="addReverseDNSZone" />
+            <include name="reverseDNSZoneRecordsTest_add" /> 
+            <include name="reverseDNSZoneRecordsTest_addandaddanother" /> 
+            <include name="reverseDNSZoneRecordsTest_addandedit" /> 
+            <include name="reverseDNSZoneRecordsTest_add_then_cancel" />
+            <include name="dnsReverseZoneSettingsTest" />
+            <!-- <include name="deleteReverseDNSZone" /> -->
 	        
 	        
 	        <!--  the following are premature, comment out 
 	        
 	        <include name="dnsZoneBaseTest" />
 	        <include name="dnsReverseZoneBaseTest" />
+
+            
+ 
+
+
+
 
               end of comment out tests -->
              
