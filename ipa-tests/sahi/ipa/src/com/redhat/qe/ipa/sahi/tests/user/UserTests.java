@@ -11,6 +11,7 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
+import com.redhat.qe.auto.testng.Assert;
 import com.redhat.qe.auto.testng.TestNGUtils;
 import com.redhat.qe.ipa.sahi.base.SahiTestScript;
 import com.redhat.qe.ipa.sahi.tasks.CommonTasks;
@@ -56,13 +57,13 @@ public class UserTests extends SahiTestScript{
 		}
 		
 		//verify user doesn't exist
-		com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(expectedUID).exists(), "Verify user " + expectedUID + " doesn't already exist");
+		Assert.assertFalse(sahiTasks.link(expectedUID).exists(), "Verify user " + expectedUID + " doesn't already exist");
 		
 		//new test user can be added now
 		UserTasks.createUser(sahiTasks, uid, givenname, sn, "Add");		
 		
 		//verify user was added successfully
-		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(expectedUID).exists(), "Added user " + expectedUID + "  successfully");
+		Assert.assertTrue(sahiTasks.link(expectedUID).exists(), "Added user " + expectedUID + "  successfully");
 	}
 	
 	/*
@@ -71,13 +72,13 @@ public class UserTests extends SahiTestScript{
 	@Test (groups={"userCancelAddTests"}, dataProvider="getSingleUserTestObjects")	
 	public void testUserCancelAdd(String testName, String uid, String givenname, String sn) throws Exception {
 		//verify user doesn't exist
-		com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(uid).exists(), "Verify user " + uid + " doesn't already exist");
+		Assert.assertFalse(sahiTasks.link(uid).exists(), "Verify user " + uid + " doesn't already exist");
 		
 		//new test user can be added now
 		UserTasks.createUser(sahiTasks, uid, givenname, sn, "Cancel");		
 		
 		//verify user was added successfully
-		com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(uid).exists(), "Verify user " + uid + "  was not added");
+		Assert.assertFalse(sahiTasks.link(uid).exists(), "Verify user " + uid + "  was not added");
 	}
 	
 	/*
@@ -107,7 +108,7 @@ public class UserTests extends SahiTestScript{
 	@Test (groups={"userEditTests"}, dataProvider="getUserEditTestObjects", dependsOnGroups={"userAddTests"})	
 	public void testUserEdit(String testName, String uid, String title, String mail) throws Exception {		
 		//verify user to be edited exists
-		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(uid).exists(), "Verify user " + uid + " to be edited exists");
+		Assert.assertTrue(sahiTasks.link(uid).exists(), "Verify user " + uid + " to be edited exists");
 		
 		//modify this user
 		UserTasks.modifyUser(sahiTasks, uid, title, mail);
@@ -125,7 +126,7 @@ public class UserTests extends SahiTestScript{
 			String phone1, String phone2, String pager1, String pager2, String mobile1, String mobile2, 
 			String fax1, String fax2) throws Exception {		
 		//verify user to be edited exists
-		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(uid).exists(), "Verify user " + uid + " to be edited exists");
+		Assert.assertTrue(sahiTasks.link(uid).exists(), "Verify user " + uid + " to be edited exists");
 		
 		//modify this user
 		UserTasks.addMultipleUserData(sahiTasks, uid, mail1, mail2, mail3, phone1, phone2, pager1, pager2, mobile1, mobile2, fax1, fax2);
@@ -139,7 +140,7 @@ public class UserTests extends SahiTestScript{
 			String phone1, String phone2, String pager1, String pager2, String mobile1, String mobile2, 
 			String fax1, String fax2) throws Exception {		
 		//verify user to be edited exists
-		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(uid).exists(), "Verify user " + uid + " to be edited exists");
+		Assert.assertTrue(sahiTasks.link(uid).exists(), "Verify user " + uid + " to be edited exists");
 		
 		//Add, Delete, Undo and Reset Contact Data
 		UserTasks.addDeleteUndoResetContactData(sahiTasks, uid, mail1, phone1);
@@ -154,7 +155,7 @@ public class UserTests extends SahiTestScript{
 	@Test (groups={"userEditIdentitySettingsTests"}, dataProvider="getUserEditIdentitySettingsTestObjects", dependsOnGroups={"userAddTests"})	
 	public void testUserEditIdentitySettings(String testName, String uid, String givenname, String sn, String fullname, String displayName, String initials) throws Exception {		
 		//verify user to be edited exists
-		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(uid).exists(), "Verify user " + uid + " to be edited exists");
+		Assert.assertTrue(sahiTasks.link(uid).exists(), "Verify user " + uid + " to be edited exists");
 		
 		//modify this user
 		UserTasks.modifyUserIdentitySettings(sahiTasks, uid, givenname, sn, fullname, displayName, initials);
@@ -170,7 +171,7 @@ public class UserTests extends SahiTestScript{
 	@Test (groups={"userEditAccountSettingsTests"}, dataProvider="getUserEditAccountSettingsTestObjects", dependsOnGroups={"userAddTests"})	
 	public void testUserEditAccountSettings(String testName, String uid, String uidnumber, String gidnumber, String loginshell, String homedirectory) throws Exception {		
 		//verify user to be edited exists
-		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(uid).exists(), "Verify user " + uid + " to be edited exists");
+		Assert.assertTrue(sahiTasks.link(uid).exists(), "Verify user " + uid + " to be edited exists");
 		
 		String invalidUID = "-1";
 		String expectedError = "Minimum value is 1";
@@ -189,7 +190,7 @@ public class UserTests extends SahiTestScript{
 	@Test (groups={"userEditMailingAddressTests"}, dataProvider="getUserEditMailingAddressTestObjects", dependsOnGroups={"userAddTests"})	
 	public void testUserEditMailingAddress(String testName, String uid, String street, String city, String state, String zip) throws Exception {		
 		//verify user to be edited exists
-		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(uid).exists(), "Verify user " + uid + " to be edited exists");
+		Assert.assertTrue(sahiTasks.link(uid).exists(), "Verify user " + uid + " to be edited exists");
 			
 		//modify this user
 		UserTasks.modifyUserMailingAddress(sahiTasks, uid, street, city, state, zip);
@@ -204,7 +205,7 @@ public class UserTests extends SahiTestScript{
 	@Test (groups={"userEditEmpMiscInfoTests"}, dataProvider="getUserEditEmpMiscInfoTestObjects", dependsOnGroups={"userAddTests"})	
 	public void testUserEditEmpMiscInfo(String testName, String uid, String org, String manager, String carlicense) throws Exception {		
 		//verify user to be edited exists
-		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(uid).exists(), "Verify user " + uid + " to be edited exists");
+		Assert.assertTrue(sahiTasks.link(uid).exists(), "Verify user " + uid + " to be edited exists");
 			
 		//modify this user
 		UserTasks.modifyUserEmpMiscInfo(sahiTasks, uid, org, manager, carlicense);
@@ -220,16 +221,16 @@ public class UserTests extends SahiTestScript{
 	@Test (groups={"userSetPasswordTests"}, dataProvider="getUserSetPasswordTestObjects", dependsOnGroups={"userAddTests"})	
 	public void testUserSetPassword(String testName, String uid, String password, String newPassword) throws Exception {		
 		//verify user to be edited exists
-		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(uid).exists(), "Verify user " + uid + " to be edited exists");
+		Assert.assertTrue(sahiTasks.link(uid).exists(), "Verify user " + uid + " to be edited exists");
 		
 		//modify this user
 		UserTasks.modifyUserPassword(sahiTasks, uid, password);
 		
 		//verify changes	
-		com.redhat.qe.auto.testng.Assert.assertTrue(CommonTasks.kinitAsNewUserFirstTime(uid, password, newPassword), "Logged in and reset password for " + uid);
+		Assert.assertTrue(CommonTasks.kinitAsNewUserFirstTime(uid, password, newPassword), "Logged in and reset password for " + uid);
 		
 		// kinit back as admin to continue tests
-		com.redhat.qe.auto.testng.Assert.assertTrue(CommonTasks.kinitAsAdmin(), "Logged back in as admin to continue tests");
+		Assert.assertTrue(CommonTasks.kinitAsAdmin(), "Logged back in as admin to continue tests");
 	}
 	
 	
@@ -240,7 +241,7 @@ public class UserTests extends SahiTestScript{
 			"userSetPasswordTests"})	
 	public void testUserCancelDeactivate(String testName, String uid, String password) throws Exception {		
 		//verify user to be edited exists
-		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(uid).exists(), "Verify user " + uid + " to be deactivated exists");
+		Assert.assertTrue(sahiTasks.link(uid).exists(), "Verify user " + uid + " to be deactivated exists");
 		
 		//verify expected status	
 		UserTasks.verifyUserStatus(sahiTasks, uid, true);
@@ -251,10 +252,10 @@ public class UserTests extends SahiTestScript{
 		//verify status	
 		UserTasks.verifyUserStatus(sahiTasks, uid, true);
 		// verify user can still kinit
-		com.redhat.qe.auto.testng.Assert.assertTrue(CommonTasks.kinitAsUser(uid, password), "Verify " + uid + " can still kinit");
+		Assert.assertTrue(CommonTasks.kinitAsUser(uid, password), "Verify " + uid + " can still kinit");
 		
 		// kinit back as admin to continue tests
-		com.redhat.qe.auto.testng.Assert.assertTrue(CommonTasks.kinitAsAdmin(), "Logged back in as admin to continue tests");
+		Assert.assertTrue(CommonTasks.kinitAsAdmin(), "Logged back in as admin to continue tests");
 	}
 	
 
@@ -265,7 +266,7 @@ public class UserTests extends SahiTestScript{
 			"userSetPasswordTests"})	
 	public void testUserDeactivate(String testName, String uid, String password) throws Exception {		
 		//verify user to be edited exists
-		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(uid).exists(), "Verify user " + uid + " to be deactivated exists");
+		Assert.assertTrue(sahiTasks.link(uid).exists(), "Verify user " + uid + " to be deactivated exists");
 		
 		//verify expected status	
 		UserTasks.verifyUserStatus(sahiTasks, uid, true);
@@ -276,7 +277,7 @@ public class UserTests extends SahiTestScript{
 		//verify changes to status	
 		UserTasks.verifyUserStatus(sahiTasks, uid, false);
 		// verify user cannot kinit
-		com.redhat.qe.auto.testng.Assert.assertFalse(CommonTasks.kinitAsUser(uid, password), "Verify " + uid + " cannot kinit");
+		Assert.assertFalse(CommonTasks.kinitAsUser(uid, password), "Verify " + uid + " cannot kinit");
 		
 		
 	}
@@ -287,7 +288,7 @@ public class UserTests extends SahiTestScript{
 	@Test (groups={"userCancelReactivateTests"}, dataProvider="getUserStatusTestObjects", dependsOnGroups={"userAddTests", "userDeactivateTests", "userSetPasswordTests"})	
 	public void testUserCancelReactivate(String testName, String uid, String password) throws Exception {		
 		//verify user to be edited exists
-		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(uid).exists(), "Verify user " + uid + " to be reactivated exists");
+		Assert.assertTrue(sahiTasks.link(uid).exists(), "Verify user " + uid + " to be reactivated exists");
 		
 		//verify expected status	
 		UserTasks.verifyUserStatus(sahiTasks, uid, false);
@@ -298,7 +299,7 @@ public class UserTests extends SahiTestScript{
 		//verify changes to status	
 		UserTasks.verifyUserStatus(sahiTasks, uid, false);
 		// verify user cannot kinit
-		com.redhat.qe.auto.testng.Assert.assertFalse(CommonTasks.kinitAsUser(uid, password), "Verify " + uid + " cannot kinit");
+		Assert.assertFalse(CommonTasks.kinitAsUser(uid, password), "Verify " + uid + " cannot kinit");
 		
 	}
 	
@@ -309,7 +310,7 @@ public class UserTests extends SahiTestScript{
 	@Test (groups={"userReactivateTests"}, dataProvider="getUserStatusTestObjects", dependsOnGroups={"userAddTests", "userDeactivateTests", "userSetPasswordTests", "userCancelReactivateTests"})	
 	public void testUserReactivate(String testName, String uid, String password) throws Exception {		
 		//verify user to be edited exists
-		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(uid).exists(), "Verify user " + uid + " to be reactivated exists");
+		Assert.assertTrue(sahiTasks.link(uid).exists(), "Verify user " + uid + " to be reactivated exists");
 		
 		//verify expected status	
 		UserTasks.verifyUserStatus(sahiTasks, uid, false);
@@ -320,10 +321,10 @@ public class UserTests extends SahiTestScript{
 		//verify changes to status	
 		UserTasks.verifyUserStatus(sahiTasks, uid, true);
 		// verify user can kinit
-		com.redhat.qe.auto.testng.Assert.assertTrue(CommonTasks.kinitAsUser(uid, password), "Verify " + uid + " can kinit");
+		Assert.assertTrue(CommonTasks.kinitAsUser(uid, password), "Verify " + uid + " can kinit");
 		
 		// kinit back as admin to continue tests
-		com.redhat.qe.auto.testng.Assert.assertTrue(CommonTasks.kinitAsAdmin(), "Logged back in as admin to continue tests");
+		Assert.assertTrue(CommonTasks.kinitAsAdmin(), "Logged back in as admin to continue tests");
 	}
 	
 	/*
@@ -335,13 +336,13 @@ public class UserTests extends SahiTestScript{
 			"userReactivateTests", "invalidUserAddTests", "userSearchTests", "userMultipleDataTests", "userAddDeleteUndoResetTests"})	
 	public void testUserDelete(String testName, String uid) throws Exception {
 		//verify user to be deleted exists
-		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(uid).exists(), "Verify user " + uid + "  to be deleted exists");
+		Assert.assertTrue(sahiTasks.link(uid).exists(), "Verify user " + uid + "  to be deleted exists");
 		
 		//modify this user
 		UserTasks.deleteUser(sahiTasks, uid);
 		
 		//verify user is deleted
-		com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(uid).exists(), "User " + uid + "  deleted successfully");
+		Assert.assertFalse(sahiTasks.link(uid).exists(), "User " + uid + "  deleted successfully");
 	}
 	
 	// TODO: Nkrishnan: Add test for Delete - but cancel
@@ -350,20 +351,23 @@ public class UserTests extends SahiTestScript{
 	/*
 	 * Delete multiple users - for positive tests
 	 */
-	@Test (groups={"chooseUserMultipleDeleteTests"}, dataProvider="getMultipleUserDeleteTestObjects", dependsOnGroups={"userAddTests", "invalidUserAddTests", "userAddAndEditTests", "userAddAndAddAnotherTests",
+	@Test (groups={"userMultipleDeleteTests"}, dataProvider="getMultipleUserDeleteTestObjects", dependsOnGroups={"userAddTests", "invalidUserAddTests", "userAddAndEditTests", "userAddAndAddAnotherTests",
 			"userEditIdentitySettingsTests", "userEditAccountSettingsTests", "userEditMailingAddressTests", "userEditEmpMiscInfoTests", "userSearchTests" })
-	public void setMultipleUserDelete(String testName, String uid) throws Exception {		
-		//verify user to be deleted exists
-		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(uid).exists(), "Verify user " + uid + "  to be deleted exists");	
+	public void testMultipleUserDelete(String testName, String uid1, String uid2, String uid3, String uid4) throws Exception {		
+		String uids[] = {uid1, uid2, uid3, uid4};
 		
+		//verify user to be deleted exists
+		for (String uid : uids) {
+			Assert.assertTrue(sahiTasks.link(uid).exists(), "Verify user " + uid + "  to be deleted exists");
+		}
+					
 		//mark this user for deletion
-		UserTasks.chooseMultipleUsers(sahiTasks, uid);		
-	}
-	
-	@Test (groups={"userMultipleDeleteTests"}, dependsOnGroups="chooseUserMultipleDeleteTests")
-	public void testMultipleUserDelete() throws Exception {		
-		//delete the multiple chosen users
+		UserTasks.chooseMultipleUsers(sahiTasks, uids);		
 		UserTasks.deleteMultipleUser(sahiTasks);	
+		//verify user is deleted 
+		for (String uid : uids) {
+			Assert.assertFalse(sahiTasks.link(uid).exists(), "Verify user " + uid + "  is deleted");
+		}
 	}
 	
 	
@@ -377,15 +381,15 @@ public class UserTests extends SahiTestScript{
 		log.fine("ExpectedUID1: " + expectedUID1 + " and ExpectedUID2: " + expectedUID2);		
 		
 		//verify users don't exist
-		com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(expectedUID1).exists(), "Verify user " + expectedUID1 + " doesn't already exist");
-		com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(expectedUID2).exists(), "Verify user " + expectedUID2 + " doesn't already exist");
+		Assert.assertFalse(sahiTasks.link(expectedUID1).exists(), "Verify user " + expectedUID1 + " doesn't already exist");
+		Assert.assertFalse(sahiTasks.link(expectedUID2).exists(), "Verify user " + expectedUID2 + " doesn't already exist");
 		
 		//new test user can be added now
 		UserTasks.createUserThenAddAnother(sahiTasks, givenname1, sn1, givenname2, sn2);				
 		
 		//verify users were added successfully
-		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(expectedUID1).exists(), "Added user " + expectedUID1 + "  successfully");
-		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(expectedUID2).exists(), "Added user " + expectedUID2 + "  successfully");
+		Assert.assertTrue(sahiTasks.link(expectedUID1).exists(), "Added user " + expectedUID1 + "  successfully");
+		Assert.assertTrue(sahiTasks.link(expectedUID2).exists(), "Added user " + expectedUID2 + "  successfully");
 	}
 	
 	
@@ -396,7 +400,7 @@ public class UserTests extends SahiTestScript{
 	public void testUserAddAndEdit(String testName, String uid, String givenname, String sn, String title, String mail) throws Exception {
 		
 		//verify users don't exist
-		com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(uid).exists(), "Verify user " + uid + " doesn't already exist");
+		Assert.assertFalse(sahiTasks.link(uid).exists(), "Verify user " + uid + " doesn't already exist");
 		
 		//new test user can be added now
 		UserTasks.createUserThenEdit(sahiTasks, uid, givenname, sn, title, mail);				
@@ -415,9 +419,9 @@ public class UserTests extends SahiTestScript{
 		UserTasks.searchUser(sahiTasks, uid);
 		
 		//verify users was found
-		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(uid).exists(), "Searched and found user " + uid + "  successfully");
+		Assert.assertTrue(sahiTasks.link(uid).exists(), "Searched and found user " + uid + "  successfully");
 		if (!multipleResult.equals(""))
-			com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(multipleResult).exists(), "Searched and found another user " + multipleResult + "  successfully");
+			Assert.assertTrue(sahiTasks.link(multipleResult).exists(), "Searched and found another user " + multipleResult + "  successfully");
 		
 		UserTasks.clearSearch(sahiTasks);
 	}
@@ -465,11 +469,7 @@ public class UserTests extends SahiTestScript{
 		ll.add(Arrays.asList(new Object[]{ "create_good_user",				"testuser", 			"Test",		"User"      } ));
 		ll.add(Arrays.asList(new Object[]{ "create_user_with_optional_login","", 					"Test",		"User"      } ));
 		ll.add(Arrays.asList(new Object[]{ "create_user2",				    "user2", 			    "Test2",	"User2"     } ));
-		ll.add(Arrays.asList(new Object[]{ "create_user3",				    "user3", 			    "Test3",	"User3"     } ));
-		ll.add(Arrays.asList(new Object[]{ "create_user4",				    "user4", 			    "Test4",	"User4"     } ));
-		ll.add(Arrays.asList(new Object[]{ "create_user5",				    "user5", 			    "Test5",	"User5"     } ));
-		ll.add(Arrays.asList(new Object[]{ "create_user6",				    "user6", 			    "Test6",	"User6"     } ));
-		        
+		      
 		return ll;	
 	}
 	
@@ -596,7 +596,6 @@ public class UserTests extends SahiTestScript{
         //										testname					uid              		
 		ll.add(Arrays.asList(new Object[]{ "delete_good_user",				"testuser"     } ));
 		ll.add(Arrays.asList(new Object[]{ "delete_good_user",				"user2"     } ));
-		ll.add(Arrays.asList(new Object[]{ "delete_good_user",				"user3"     } ));
 		        
 		return ll;	
 	}
@@ -611,14 +610,9 @@ public class UserTests extends SahiTestScript{
 	protected List<List<Object>> deleteMultipleUserTestObjects() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();		
 		
-        //										testname					uid              		
-		ll.add(Arrays.asList(new Object[]{ "delete_multiple_users",			"user4"     } ));
-		ll.add(Arrays.asList(new Object[]{ "delete_multiple_users",			"user5"     } ));
-		ll.add(Arrays.asList(new Object[]{ "delete_multiple_users",			"user6"     } ));
-		ll.add(Arrays.asList(new Object[]{ "delete_multiple_users",			"tuser"     } ));
-		ll.add(Arrays.asList(new Object[]{ "delete_multiple_users",			"user9"     } ));
-		ll.add(Arrays.asList(new Object[]{ "delete_multiple_users",			"tuser7"     } ));
-		ll.add(Arrays.asList(new Object[]{ "delete_multiple_users",			"tuser8"     } ));
+        //										testname					uid1		uid2		uid3		uid4              		
+		ll.add(Arrays.asList(new Object[]{ "delete_multiple_users",			"tuser",	"user9",	"tuser7",	"tuser8"     } ));
+		
 		
 		return ll;	
 	}

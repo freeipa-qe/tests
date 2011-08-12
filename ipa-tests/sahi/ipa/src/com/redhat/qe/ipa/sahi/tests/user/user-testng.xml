@@ -29,7 +29,6 @@
 				<include name="userAddAndAddAnotherTests" />
 				<include name="userAddAndEditTests" />
 				<include name="userDeleteTests" />
-				<include name="chooseUserMultipleDeleteTests" />
 				<include name="userMultipleDeleteTests" />
 				<!--
 				<include name="teardown"/>

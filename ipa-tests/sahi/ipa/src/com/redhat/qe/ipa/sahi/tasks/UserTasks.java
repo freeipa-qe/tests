@@ -1,6 +1,8 @@
 package com.redhat.qe.ipa.sahi.tasks;
 
 import java.util.logging.Logger;
+
+import com.redhat.qe.auto.testng.Assert;
 import com.redhat.qe.ipa.sahi.tasks.SahiTasks;
 
 
@@ -40,7 +42,7 @@ public class UserTasks {
 		sahiTasks.button("Add").near(sahiTasks.button("Add and Add Another")).click();
 		//Check for expected error
 		log.fine("error check");
-		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.div(expectedError).exists(), "Verified expected error when adding invalid user " + uid);
+		Assert.assertTrue(sahiTasks.div(expectedError).exists(), "Verified expected error when adding invalid user " + uid);
 		// since the add user window and the message window have Cancel buttons
 		// specify which cancel button to hit by indicating what is near it.
 		// TODO: Remove ref later: http://sahi.co.in/w/sahi-api-examples
@@ -66,7 +68,7 @@ public class UserTasks {
 		sahiTasks.textbox("givenname").near(sahiTasks.label("First name:")).setValue(givenName);
 		sahiTasks.textbox("sn").near(sahiTasks.label("Last name:")).setValue(sn);
 		//Check for expected error
-		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.span(expectedError).exists(), "Verified expected error when adding invalid user " + uid);
+		Assert.assertTrue(sahiTasks.span(expectedError).exists(), "Verified expected error when adding invalid user " + uid);
 		sahiTasks.button("Cancel").near(sahiTasks.button("Add and Edit")).click();
 	}
 	
@@ -130,7 +132,7 @@ public class UserTasks {
 		
 		sahiTasks.textbox("uidnumber").setValue(invalidUID);
 		//Check for expected error
-		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.span(expectedError).exists(), "Verified expected error when changing UID to " + invalidUID);
+		Assert.assertTrue(sahiTasks.span(expectedError).exists(), "Verified expected error when changing UID to " + invalidUID);
 						
 		//Undo and go back to user list
 		sahiTasks.span("undo").click();
@@ -216,21 +218,21 @@ public class UserTasks {
 		sahiTasks.link(uid).click();
 		
 		//verify mail address for user
-		com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("mail").value(), mail1, "Verified mail for user " + uid + ": " + mail1);
-		com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("mail[1]").value(), mail2, "Verified mail for user " + uid + ": " + mail2);
-		com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("mail[2]").value(), mail3, "Verified mail for user " + uid + ": " + mail3);
+		Assert.assertEquals(sahiTasks.textbox("mail").value(), mail1, "Verified mail for user " + uid + ": " + mail1);
+		Assert.assertEquals(sahiTasks.textbox("mail[1]").value(), mail2, "Verified mail for user " + uid + ": " + mail2);
+		Assert.assertEquals(sahiTasks.textbox("mail[2]").value(), mail3, "Verified mail for user " + uid + ": " + mail3);
 		
-		com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("telephonenumber").value(), phone1, "Verified phone for user " + uid + ": " + phone1);
-		com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("telephonenumber[1]").value(), phone2, "Verified phone for user " + uid + ": " + phone2);
+		Assert.assertEquals(sahiTasks.textbox("telephonenumber").value(), phone1, "Verified phone for user " + uid + ": " + phone1);
+		Assert.assertEquals(sahiTasks.textbox("telephonenumber[1]").value(), phone2, "Verified phone for user " + uid + ": " + phone2);
 		
-		com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("pager").value(), pager1, "Verified pager for user " + uid + ": " + pager1);
-		com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("pager[1]").value(), pager2, "Verified pager for user " + uid + ": " + pager2);
+		Assert.assertEquals(sahiTasks.textbox("pager").value(), pager1, "Verified pager for user " + uid + ": " + pager1);
+		Assert.assertEquals(sahiTasks.textbox("pager[1]").value(), pager2, "Verified pager for user " + uid + ": " + pager2);
 	
-		com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("mobile").value(), mobile1, "Verified mobile for user " + uid  + ": " + mobile1);
-		com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("mobile[1]").value(), mobile2, "Verified mobile for user " + uid + ": " + mobile2);
+		Assert.assertEquals(sahiTasks.textbox("mobile").value(), mobile1, "Verified mobile for user " + uid  + ": " + mobile1);
+		Assert.assertEquals(sahiTasks.textbox("mobile[1]").value(), mobile2, "Verified mobile for user " + uid + ": " + mobile2);
 	
-		com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("facsimiletelephonenumber").value(), fax1, "Verified fax for user " + uid  + ": " + fax1);
-		com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("facsimiletelephonenumber[1]").value(), fax2, "Verified fax for user " + uid + ": " + fax2);
+		Assert.assertEquals(sahiTasks.textbox("facsimiletelephonenumber").value(), fax1, "Verified fax for user " + uid  + ": " + fax1);
+		Assert.assertEquals(sahiTasks.textbox("facsimiletelephonenumber[1]").value(), fax2, "Verified fax for user " + uid + ": " + fax2);
 	
 		sahiTasks.link("Users").in(sahiTasks.div("content")).click();
 	}
@@ -272,10 +274,10 @@ public class UserTasks {
 		sahiTasks.link(uid).click();
 		
 		//verify user's job title
-		com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("title").value(), title, "Verified updated title for user " + uid);
+		Assert.assertEquals(sahiTasks.textbox("title").value(), title, "Verified updated title for user " + uid);
 		
 		//verify mail address for user
-		com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("mail").value(), mail, "Verified updated mail for user " + uid);
+		Assert.assertEquals(sahiTasks.textbox("mail").value(), mail, "Verified updated mail for user " + uid);
 		
 		sahiTasks.link("Users").in(sahiTasks.div("content")).click();
 	}
@@ -287,11 +289,11 @@ public class UserTasks {
 		sahiTasks.link(uid).click();
 		
 		//verify user's job title
-		com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("givenname").value(), givenname, "Verified updated First name for user " + uid + ": " + givenname);
-		com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("sn").value(), sn, "Verified updated Last name for user " + uid + ": " + sn);
-		com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("cn").value(), fullname, "Verified updated Full Name for user " + uid + ": " + fullname);
-		com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("displayname").value(), displayName, "Verified updated Display name for user " + uid + ": " + displayName);
-		com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("initials").value(), initials, "Verified updated firstname for user " + uid + ": " + initials);
+		Assert.assertEquals(sahiTasks.textbox("givenname").value(), givenname, "Verified updated First name for user " + uid + ": " + givenname);
+		Assert.assertEquals(sahiTasks.textbox("sn").value(), sn, "Verified updated Last name for user " + uid + ": " + sn);
+		Assert.assertEquals(sahiTasks.textbox("cn").value(), fullname, "Verified updated Full Name for user " + uid + ": " + fullname);
+		Assert.assertEquals(sahiTasks.textbox("displayname").value(), displayName, "Verified updated Display name for user " + uid + ": " + displayName);
+		Assert.assertEquals(sahiTasks.textbox("initials").value(), initials, "Verified updated firstname for user " + uid + ": " + initials);
 		
 		
 		sahiTasks.link("Users").in(sahiTasks.div("content")).click();
@@ -303,10 +305,10 @@ public class UserTasks {
 		sahiTasks.link(uid).click();
 		
 		//verify user's job title
-		com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("uidnumber").value(), uidnumber, "Verified updated UID for user " + uid + ": " + uidnumber);
-		com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("gidnumber").value(), gidnumber, "Verified updated GID for user " + uid + ": " + gidnumber);
-		com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("loginshell").value(), loginshell, "Verified updated Login Shell for user " + uid + ": " + loginshell);
-		com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("homedirectory").value(), homedirectory, "Verified updated Home directory for user " + uid + ": " + homedirectory);
+		Assert.assertEquals(sahiTasks.textbox("uidnumber").value(), uidnumber, "Verified updated UID for user " + uid + ": " + uidnumber);
+		Assert.assertEquals(sahiTasks.textbox("gidnumber").value(), gidnumber, "Verified updated GID for user " + uid + ": " + gidnumber);
+		Assert.assertEquals(sahiTasks.textbox("loginshell").value(), loginshell, "Verified updated Login Shell for user " + uid + ": " + loginshell);
+		Assert.assertEquals(sahiTasks.textbox("homedirectory").value(), homedirectory, "Verified updated Home directory for user " + uid + ": " + homedirectory);
 		
 		
 		sahiTasks.link("Users").in(sahiTasks.div("content")).click();
@@ -318,10 +320,10 @@ public class UserTasks {
 		sahiTasks.link(uid).click();
 		
 		//verify user's job title
-		com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("street").value(), street, "Verified updated street for user " + uid + ": " + street);
-		com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("l").value(), city, "Verified updated city for user " + uid + ": " + city);
-		com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("st").value(), state, "Verified updated State for user " + uid + ": " + state);
-		com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("postalcode").value(), zip, "Verified updated Zip for user " + uid + ": " + zip);
+		Assert.assertEquals(sahiTasks.textbox("street").value(), street, "Verified updated street for user " + uid + ": " + street);
+		Assert.assertEquals(sahiTasks.textbox("l").value(), city, "Verified updated city for user " + uid + ": " + city);
+		Assert.assertEquals(sahiTasks.textbox("st").value(), state, "Verified updated State for user " + uid + ": " + state);
+		Assert.assertEquals(sahiTasks.textbox("postalcode").value(), zip, "Verified updated Zip for user " + uid + ": " + zip);
 		
 		
 		sahiTasks.link("Users").in(sahiTasks.div("content")).click();
@@ -332,9 +334,9 @@ public class UserTasks {
 		sahiTasks.link(uid).click();
 		
 		//verify user's job title
-		com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("ou").value(), org, "Verified updated Org. Unit for user " + uid + ": " + org);
-		//TODO: com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("manager").value(), manager, "Verified updated Manager for user " + uid + ": " + manager);
-		com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("carlicense").value(), carlicense, "Verified updated car license for user " + uid + ": " + carlicense);
+		Assert.assertEquals(sahiTasks.textbox("ou").value(), org, "Verified updated Org. Unit for user " + uid + ": " + org);
+		//TODO: Assert.assertEquals(sahiTasks.textbox("manager").value(), manager, "Verified updated Manager for user " + uid + ": " + manager);
+		Assert.assertEquals(sahiTasks.textbox("carlicense").value(), carlicense, "Verified updated car license for user " + uid + ": " + carlicense);
 		
 		sahiTasks.link("Users").in(sahiTasks.div("content")).click();
 	}
@@ -349,9 +351,9 @@ public class UserTasks {
 		
 		//verify user's status
 		if (status)
-			com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link("Click to Deactivate").exists(), "Verified Active status for user " + uid);
+			Assert.assertTrue(sahiTasks.link("Click to Deactivate").exists(), "Verified Active status for user " + uid);
 		else
-			com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link("Click to Activate").exists(), "Verified Inactive status for user " + uid);
+			Assert.assertTrue(sahiTasks.link("Click to Activate").exists(), "Verified Inactive status for user " + uid);
 	
 		sahiTasks.link("Users").in(sahiTasks.div("content")).click();
 	}
@@ -409,8 +411,10 @@ public class UserTasks {
 	 * @param sahiTasks
 	 * @param uid - the uid of user to be deleted
 	 */
-	public static void chooseMultipleUsers(SahiTasks sahiTasks, String uid) {		
-		sahiTasks.checkbox(uid).click();		
+	public static void chooseMultipleUsers(SahiTasks sahiTasks, String[] uids) {
+		for (String uid : uids) {
+			sahiTasks.checkbox(uid).click();
+		}		
 	}
 	
 	/*
@@ -482,18 +486,18 @@ public class UserTasks {
 		sahiTasks.waitFor(1000);
 
 		//Verify no data is visible
-		com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.textbox("title").exists(), "No data is visible");
+		Assert.assertFalse(sahiTasks.textbox("title").exists(), "No data is visible");
 		
 		
 		sahiTasks.heading2("Account Settings").click();
 		//Verify only data for account settings is displayed
-		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.label(uid).exists(), "Verified data available for user " + uid);
+		Assert.assertTrue(sahiTasks.label(uid).exists(), "Verified data available for user " + uid);
 		
 		
 		sahiTasks.span("Expand All").click();
 		sahiTasks.waitFor(1000);
 		//Verify data is visible
-		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.textbox("title").exists(), "Now Data is visible");
+		Assert.assertTrue(sahiTasks.textbox("title").exists(), "Now Data is visible");
 		
 		sahiTasks.link("Users").in(sahiTasks.div("content")).click();	
 	}
@@ -526,10 +530,10 @@ public class UserTasks {
 		}
 	
 		if (exists == "YES"){
-			com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(grprulename).exists(), "User " + uid + " is a member of " + membertype + " " + grprulename);
+			Assert.assertTrue(sahiTasks.link(grprulename).exists(), "User " + uid + " is a member of " + membertype + " " + grprulename);
 		}
 		else {
-			com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(grprulename).exists(), "User " + uid + " is NOT member of " + membertype + " "+ grprulename);
+			Assert.assertFalse(sahiTasks.link(grprulename).exists(), "User " + uid + " is NOT member of " + membertype + " "+ grprulename);
 		}
 		sahiTasks.link("Users").in(sahiTasks.div("content")).click();
 	}
@@ -561,10 +565,10 @@ public class UserTasks {
 		}
 		for (String grprulename : grprulenames){
 			if (exists == "YES"){
-			com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(grprulename).exists(), "User " + uid + " is a member of " + membertype + " " + grprulename);
+			Assert.assertTrue(sahiTasks.link(grprulename).exists(), "User " + uid + " is a member of " + membertype + " " + grprulename);
 			}
 			else {
-				com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(grprulename).exists(), "User " + uid + " is NOT member of " + membertype + " "+ grprulename);
+				Assert.assertFalse(sahiTasks.link(grprulename).exists(), "User " + uid + " is NOT member of " + membertype + " "+ grprulename);
 			}
 		}
 		sahiTasks.link("Users").in(sahiTasks.div("content")).click();

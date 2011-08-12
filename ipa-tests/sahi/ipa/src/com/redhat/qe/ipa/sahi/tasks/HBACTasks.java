@@ -2,6 +2,8 @@ package com.redhat.qe.ipa.sahi.tasks;
 
 import java.util.logging.Logger;
 
+import com.redhat.qe.auto.testng.Assert;
+
 /**
  * @author root
  *
@@ -14,13 +16,13 @@ public class HBACTasks {
 	 */
 	public static void checkIfObjectsReqdByTestExist(SahiTasks sahiTasks, String uid, String groupName, String fqdn, String hostgroupName) {
 		sahiTasks.navigateTo(System.getProperty("ipa.server.url")+ CommonTasks.userPage, true);
-		com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(uid).exists(), "Verify User " + uid + " doesn't already exist");
+		Assert.assertFalse(sahiTasks.link(uid).exists(), "Verify User " + uid + " doesn't already exist");
 		sahiTasks.navigateTo(System.getProperty("ipa.server.url")+ CommonTasks.groupPage, true);
-		com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(groupName).exists(), "Verify Group " + groupName + " doesn't already exist");
+		Assert.assertFalse(sahiTasks.link(groupName).exists(), "Verify Group " + groupName + " doesn't already exist");
 		sahiTasks.navigateTo(System.getProperty("ipa.server.url")+ CommonTasks.hostPage, true);
-		com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(fqdn.toLowerCase()).exists(), "Verify host " + fqdn + " doesn't already exist");
+		Assert.assertFalse(sahiTasks.link(fqdn.toLowerCase()).exists(), "Verify host " + fqdn + " doesn't already exist");
 		sahiTasks.navigateTo(System.getProperty("ipa.server.url")+ CommonTasks.hostgroupPage, true);
-		com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(hostgroupName).exists(), "Verify Hostgroup " + hostgroupName + " doesn't already exist");		
+		Assert.assertFalse(sahiTasks.link(hostgroupName).exists(), "Verify Hostgroup " + hostgroupName + " doesn't already exist");		
 	}
 	
 
@@ -44,8 +46,10 @@ public class HBACTasks {
 	 * @param sahiTasks
 	 * @param cn -  cn of the rule to be deleted
 	 */
-	public static void chooseMultipleRules(SahiTasks sahiTasks, String cn) {		
-		sahiTasks.checkbox(cn).click();		
+	public static void chooseMultipleRules(SahiTasks sahiTasks, String[] cns) {		
+		for (String cn : cns) {
+			sahiTasks.checkbox(cn).click();		
+		}		
 	}
 	
 	/*
@@ -138,9 +142,9 @@ public class HBACTasks {
 		//click on rule to edit
 		sahiTasks.link(cn).click();
 		
-		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.checkbox(uid).exists(), "Verified user added for Rule " + cn);
-		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.checkbox(hostgroupName).exists(), "Verified Host Group  added for Rule " + cn);
-		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.checkbox(service).exists(), "Verified Service  added for Rule " + cn);
+		Assert.assertTrue(sahiTasks.checkbox(uid).exists(), "Verified user added for Rule " + cn);
+		Assert.assertTrue(sahiTasks.checkbox(hostgroupName).exists(), "Verified Host Group  added for Rule " + cn);
+		Assert.assertTrue(sahiTasks.checkbox(service).exists(), "Verified Service  added for Rule " + cn);
 		
 		sahiTasks.link("HBAC Rules").in(sahiTasks.div("content")).click();	
 	}
@@ -149,11 +153,85 @@ public class HBACTasks {
 
 
 	/**
-	 * Search for an HBAC Rule
+	 * Modify General Section for an HBAC Rule
 	 * @param sahiTasks
-	 * @param cn - the rule to serach for
+	 * @param cn - the rule to modify for
 	 */
-	public static void searchHBACRule(SahiTasks sahiTasks, String cn) {
+	public static void modifyHBACRuleGeneralSection(SahiTasks sahiTasks, String cn, String description) {
+		sahiTasks.link(cn).click();
+		
+		sahiTasks.textarea("description").setValue(description);
+		sahiTasks.radio("ipaenabledflag[1]").click();
+		
+		sahiTasks.span("Update").click();
+		sahiTasks.link("HBAC Rules").in(sahiTasks.div("content")).click();	
+		
+	}
+	
+	/**
+	 * Verify General Section for an HBAC Rule
+	 * @param sahiTasks
+	 * @param cn - the rule to verify
+	 */
+	public static void verifyHBACRuleGeneralSection(SahiTasks sahiTasks, String cn, String description) {
+		sahiTasks.link(cn).click();
+		
+		Assert.assertTrue(sahiTasks.textarea("description").containsText(description), "Verified description is set correctly");
+		Assert.assertTrue(sahiTasks.radio("ipaenabledflag[1]").checked(), "Verified rule is disabled");		
+		
+		sahiTasks.link("HBAC Rules").in(sahiTasks.div("content")).click();			
+	}
+
+	/**
+	 * Modify Who Section for an HBAC Rule
+	 * @param sahiTasks
+	 * @param cn - the rule to modify for
+	 */
+	public static void modifyHBACRuleWhoSection(SahiTasks sahiTasks, String cn, String user, String usergroup ) {
+		sahiTasks.link(cn).click();
+		
+		sahiTasks.checkbox(user).click();
+		sahiTasks.span("Delete").click();
+		sahiTasks.button("Delete").click();
+		sahiTasks.span("Add[1]").click();
+		sahiTasks.checkbox(usergroup).click();
+		sahiTasks.span(">>").click();
+		sahiTasks.button("Enroll").click();
+		
+		sahiTasks.span("Update").click();
+		sahiTasks.link("HBAC Rules").in(sahiTasks.div("content")).click();			
+	}
+	
+	/**
+	 * Verify Who Section for an HBAC Rule
+	 * @param sahiTasks
+	 * @param cn - the rule to verify
+	 */
+	public static void verifyHBACRuleWhoSection(SahiTasks sahiTasks, String cn, String user, String usergroup) {
+		sahiTasks.link(cn).click();
+		
+		Assert.assertFalse(sahiTasks.checkbox(user).exists(), "Verified user: " + user + " not on list for rule: " + cn);
+		Assert.assertTrue(sahiTasks.checkbox(usergroup).exists(), "Verified usergroup: " + usergroup + " is on list for rule: " + cn);
+		
+		sahiTasks.link("HBAC Rules").in(sahiTasks.div("content")).click();	
+	}
+	
+	/**
+	 * Modify Who Section for an HBAC Rule
+	 * @param sahiTasks
+	 * @param cn - the rule to modify for
+	 */
+	public static void modifyHBACRuleAccessingSection(SahiTasks sahiTasks, String cn, String user, String usergroup ) {
+		
+		
+	}
+	
+	/**
+	 * Verify Who Section for an HBAC Rule
+	 * @param sahiTasks
+	 * @param cn - the rule to verify
+	 */
+	public static void verifyHBACRuleAccessingSection(SahiTasks sahiTasks, String cn, String user, String usergroup) {
 		
 		
 	}
@@ -162,8 +240,7 @@ public class HBACTasks {
 
 
 
-
-
+	
 	
 	
 	

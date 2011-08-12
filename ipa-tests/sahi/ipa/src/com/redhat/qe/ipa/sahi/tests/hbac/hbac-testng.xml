@@ -9,12 +9,13 @@
 			    <include name="setup" />
 			    <include name="hbacRuleAddTests" />
 			    <include name="hbacRuleCancelAddTests" />
-			    <include name="hbacRuleAddAndEditTests" />
+			    <include name="hbacRuleAddAndEditTests" /> 
 			    <include name="hbacRuleCancelDeleteTests" />
 			    <include name="hbacRuleAddAndAddAnotherTests" />
+			    <include name="hbacRuleGeneralSettingsTests" />
+			    <include name="hbacRuleWhoSettingsTests" />
 			    <include name="hbacRuleSearchTests" />
-			    <include name="hbacRuleDeleteTests" />
-			    <include name="chooseHBACRulesMultipleDeleteTests" />			   
+			    <include name="hbacRuleDeleteTests" />			   
 			    <include name="hbacRuleMultipleDeleteTests" />
 				<!--
 				<include name="teardown"/>

@@ -12,6 +12,7 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
+import com.redhat.qe.auto.testng.Assert;
 import com.redhat.qe.auto.testng.TestNGUtils;
 import com.redhat.qe.ipa.sahi.base.SahiTestScript;
 import com.redhat.qe.ipa.sahi.tasks.CommonTasks;
@@ -110,12 +111,12 @@ public class HBACTests extends SahiTestScript {
 	@Test (groups={"hbacRuleAddTests"}, dataProvider="getHBACRuleTestObjects")	
 	public void testHBACRuleAdd(String testName, String cn) throws Exception {
 		//verify user, user group, host, host group doesn't exist
-		com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(cn).exists(), "Verify HBAC Rule " + cn + " doesn't already exist");
+		Assert.assertFalse(sahiTasks.link(cn).exists(), "Verify HBAC Rule " + cn + " doesn't already exist");
 		
 		HBACTasks.addHBACRule(sahiTasks, cn, "Add");
 		
 		//verify user, user group, host, host group were added
-		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(cn).exists(), "Added HBAC Rule " + cn + "  successfully");
+		Assert.assertTrue(sahiTasks.link(cn).exists(), "Added HBAC Rule " + cn + "  successfully");
 	}
 	
 	/*
@@ -124,24 +125,25 @@ public class HBACTests extends SahiTestScript {
 	@Test (groups={"hbacRuleAddAndAddAnotherTests"}, dataProvider="getHBACRuleAddAndAddAnotherTestObjects")	
 	public void testHBACRuleAddAndAddAnother(String testName, String cn1, String cn2) throws Exception {
 		//verify user, user group, host, host group doesn't exist
-		com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(cn1).exists(), "Verify HBAC Rule " + cn1 + " doesn't already exist");
-		com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(cn2).exists(), "Verify HBAC Rule " + cn2 + " doesn't already exist");
+		Assert.assertFalse(sahiTasks.link(cn1).exists(), "Verify HBAC Rule " + cn1 + " doesn't already exist");
+		Assert.assertFalse(sahiTasks.link(cn2).exists(), "Verify HBAC Rule " + cn2 + " doesn't already exist");
 		
 		HBACTasks.addHBACRuleThenAddAnother(sahiTasks, cn1, cn2);
 		
 		//verify user, user group, host, host group were added
-		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(cn1).exists(), "Added HBAC Rule " + cn1 + "  successfully");
-		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(cn2).exists(), "Added HBAC Rule " + cn2 + "  successfully");
+		Assert.assertTrue(sahiTasks.link(cn1).exists(), "Added HBAC Rule " + cn1 + "  successfully");
+		Assert.assertTrue(sahiTasks.link(cn2).exists(), "Added HBAC Rule " + cn2 + "  successfully");
 	}
 	
 	/*
 	 * Add, and edit HBACRule
 	 */	
-	@Test (groups={"hbacRuleAddAndEditTests"}, dataProvider="getSingleHBACRuleTestObjects", dependsOnGroups="hbacRuleCancelAddTests")	
+	//@Test (groups={"hbacRuleAddAndEditTests"}, dataProvider="getSingleHBACRuleTestObjects", dependsOnGroups="hbacRuleCancelAddTests")	
+	@Test (groups={"hbacRuleAddAndEditTests"}, dataProvider="getSingleHBACRuleTestObjects")
 	public void testHBACRuleAddAndEdit(String testName, String cn) throws Exception {
 		
 		//verify rule doesn't exist
-		com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(cn).exists(), "Verify rule " + cn + " doesn't already exist");
+		Assert.assertFalse(sahiTasks.link(cn).exists(), "Verify rule " + cn + " doesn't already exist");
 		
 		// Add service category for this rule
 		String service = "ftp" ;
@@ -159,13 +161,13 @@ public class HBACTests extends SahiTestScript {
 	@Test (groups={"hbacRuleCancelAddTests"}, dataProvider="getSingleHBACRuleTestObjects")	
 	public void testHBACRuleCancelAdd(String testName, String cn) throws Exception {
 		//verify rule doesn't exist
-		com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(cn).exists(), "Verify HBAC Rule " + cn + " doesn't already exist");
+		Assert.assertFalse(sahiTasks.link(cn).exists(), "Verify HBAC Rule " + cn + " doesn't already exist");
 		
 		//new test rule can be added now
 		HBACTasks.addHBACRule(sahiTasks, cn, "Cancel");
 		
 		//verify rule was added successfully
-		com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(cn).exists(), "Verify HBAC Rule " + cn + "  was not added");
+		Assert.assertFalse(sahiTasks.link(cn).exists(), "Verify HBAC Rule " + cn + "  was not added");
 	}
 	
 	/*
@@ -174,33 +176,32 @@ public class HBACTests extends SahiTestScript {
 	@Test (groups={"hbacRuleDeleteTests"}, dataProvider="getHBACRuleDeleteTestObjects", dependsOnGroups={"hbacRuleAddAndEditTests", "hbacRuleAddAndAddAnotherTests", "hbacRuleSearchTests" })	
 	public void testHBACRuleDelete(String testName, String cn) throws Exception {
 		//verify rule to be deleted exists
-		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(cn).exists(), "Verify HBAC Rule " + cn + "  to be deleted exists");
+		Assert.assertTrue(sahiTasks.link(cn).exists(), "Verify HBAC Rule " + cn + "  to be deleted exists");
 		
 		//modify this user
 		HBACTasks.deleteHBACRule(sahiTasks, cn, "Delete");
 		
 		//verify user is deleted
-		com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(cn).exists(), "HBAC Rule " + cn + "  deleted successfully");
+		Assert.assertFalse(sahiTasks.link(cn).exists(), "HBAC Rule " + cn + "  deleted successfully");
 	}
 	
 	/*
 	 * Delete multiple HBACRule
 	 */
-	@Test (groups={"chooseHBACRulesMultipleDeleteTests"}, dataProvider="getHBACRuleTestObjects", dependsOnGroups={"hbacRuleAddTests", "hbacRuleSearchTests" })
-	public void setMultipleHBACRulesDelete(String testName, String cn) throws Exception {		
-		//verify rule to be deleted exists
-		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(cn).exists(), "Verify HBAC Rule " + cn + "  to be deleted exists");	
+	@Test (groups={"hbacRuleMultipleDeleteTests"}, dataProvider="getMultipleHBACRuleTestObjects", dependsOnGroups={"hbacRuleAddTests", "hbacRuleSearchTests" })
+	public void testMultipleHBACRuleDelete(String testName, String cn1, String cn2, String cn3, String cn4) throws Exception {	
+		String cns[] = {cn1, cn2, cn3, cn4};
 		
+		
+		//verify rule to be deleted exists
+		for (String cn : cns) {
+			Assert.assertTrue(sahiTasks.link(cn).exists(), "Verify HBAC Rule " + cn + "  to be deleted exists");
+		}			
 		//mark this rule for deletion
-		HBACTasks.chooseMultipleRules(sahiTasks, cn);		
+		HBACTasks.chooseMultipleRules(sahiTasks, cns);		
+		HBACTasks.deleteMultipleRules(sahiTasks);
 	}
-	
-	@Test (groups={"hbacRuleMultipleDeleteTests"}, dependsOnGroups="chooseHBACRulesMultipleDeleteTests")
-	public void testMultipleHBACRuleDelete() throws Exception {		
-		//delete the multiple chosen rules
-		HBACTasks.deleteMultipleRules(sahiTasks);	
-	}
-	
+		
 		
 	/*
 	 * Delete, but Cancel deleting an HBACRule
@@ -208,18 +209,19 @@ public class HBACTests extends SahiTestScript {
 	@Test (groups={"hbacRuleCancelDeleteTests"}, dataProvider="getSingleHBACRuleTestObjects", dependsOnGroups={"hbacRuleAddAndEditTests" })	
 	public void testHBACRuleCancelDelete(String testName, String cn) throws Exception {
 		//verify rule to be deleted exists
-		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(cn).exists(), "Verify HBAC Rule " + cn + "  to be deleted exists");
+		Assert.assertTrue(sahiTasks.link(cn).exists(), "Verify HBAC Rule " + cn + "  to be deleted exists");
 		
 		//modify this user
 		HBACTasks.deleteHBACRule(sahiTasks, cn, "Cancel");
 		
 		//verify user is deleted
-		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(cn).exists(), "HBAC Rule " + cn + "  was not deleted");
+		Assert.assertTrue(sahiTasks.link(cn).exists(), "HBAC Rule " + cn + "  was not deleted");
 	}
 	
 	/*
 	 * Edit an HBACRule
 	 */
+	
 	
 	/*
 	 * Edit, but Reset an HBACRule
@@ -229,10 +231,33 @@ public class HBACTests extends SahiTestScript {
 	/*
 	 * Edit the General Section for the HBACRule
 	 */
+	@Test (groups={"hbacRuleGeneralSettingsTests"}, dataProvider="getHBACRuleGeneralSettingsTestObjects", dependsOnGroups={"hbacRuleAddAndEditTests"})	
+	public void testHBACRuleGeneralSettings(String testName, String cn, String description) throws Exception {		
+		//verify rule to be edited exists
+		Assert.assertTrue(sahiTasks.link(cn).exists(), "Verify Rule " + cn + " to be edited exists");
+		
+		//modify this rule
+		HBACTasks.modifyHBACRuleGeneralSection(sahiTasks, cn, description);
+		
+		//verify changes	
+		HBACTasks.verifyHBACRuleGeneralSection(sahiTasks, cn, description);
+	}
+	
 	
 	/*
 	 * Edit the Who Section for the HBACRule
 	 */
+	@Test (groups={"hbacRuleWhoSettingsTests"}, dataProvider="getSingleHBACRuleTestObjects", dependsOnGroups={"hbacRuleAddAndEditTests"})	
+	public void testHBACRuleWhoSettings(String testName, String cn) throws Exception {		
+		//verify rule to be edited exists
+		Assert.assertTrue(sahiTasks.link(cn).exists(), "Verify Rule " + cn + " to be edited exists");
+		
+		//modify this rule
+		HBACTasks.modifyHBACRuleWhoSection(sahiTasks, cn, uid, groupName);
+		
+		//verify changes	
+		HBACTasks.verifyHBACRuleWhoSection(sahiTasks, cn, uid, groupName);
+	}
 	
 	/*
 	 * Edit...undo changes for an HBACRule
@@ -257,15 +282,14 @@ public class HBACTests extends SahiTestScript {
 	/*
 	 * Search an HBACRule
 	 */
-	//@Test (groups={"hbacRuleSearchTests"}, dataProvider="getHBACRuleSearchTestObjects",  dependsOnGroups={"hbacRuleAddTests", "hbacRuleAddAndEditTests", "hbacRuleAddAndAddAnotherTests"})
-	@Test (groups={"hbacRuleSearchTests"}, dataProvider="getHBACRuleSearchTestObjects")
+	@Test (groups={"hbacRuleSearchTests"}, dataProvider="getHBACRuleSearchTestObjects",  dependsOnGroups={"hbacRuleAddTests", "hbacRuleAddAndEditTests", "hbacRuleAddAndAddAnotherTests"})
 	public void testHBACRuleSearch(String testName, String cn, String multipleResult) throws Exception {		
 		CommonTasks.search(sahiTasks, cn);
 		
 		//verify rules were found
-		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(cn).exists(), "Searched and found Rule " + cn + "  successfully");
+		Assert.assertTrue(sahiTasks.link(cn).exists(), "Searched and found Rule " + cn + "  successfully");
 		if (!multipleResult.equals(""))
-			com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(multipleResult).exists(), "Searched and found another Rule " + multipleResult + "  successfully");
+			Assert.assertTrue(sahiTasks.link(multipleResult).exists(), "Searched and found another Rule " + multipleResult + "  successfully");
 		
 		CommonTasks.clearSearch(sahiTasks);
 	}
@@ -407,6 +431,18 @@ public class HBACTests extends SahiTestScript {
 		return ll;	
 	}
 	
+	@DataProvider(name="getMultipleHBACRuleTestObjects")
+	public Object[][] getMultipleHBACRuleTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(deleteMultipleHBACRuleTestObjects());
+	}
+	protected List<List<Object>> deleteMultipleHBACRuleTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname					cn1					cn2					cn3																																	cn4   
+		ll.add(Arrays.asList(new Object[]{ "delete_multiple_hbacrule",		"dev_hbacRule",		"hbacRule1",		"abcdefghijklmnopqrstuvwxyz123456789ANDAGAINabcdefghijklmnopqrstuvwxyz123456789ANDAGAINabcdefghijklmnopqrstuvwxyz123456789",		"h@ba*c#Ru?le"      } ));
+		
+		return ll;	
+	}
 	
 
 	/*
@@ -421,6 +457,22 @@ public class HBACTests extends SahiTestScript {
 		
         //										testname					cn   
 		ll.add(Arrays.asList(new Object[]{ "create_good_hbacrule",			"eng_hbacRule"      } ));
+		
+		return ll;	
+	}
+	
+	/*
+	 * Data to be used when adding rules 
+	 */
+	@DataProvider(name="getHBACRuleGeneralSettingsTestObjects")
+	public Object[][] getHBACRuleGeneralSettingsTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(editHBACRuleGeneralSettingsTestObject());
+	}
+	protected List<List<Object>> editHBACRuleGeneralSettingsTestObject() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname					cn   				description
+		ll.add(Arrays.asList(new Object[]{ "create_good_hbacrule",			"eng_hbacRule",		"This rule is for eng"      } ));
 		
 		return ll;	
 	}
