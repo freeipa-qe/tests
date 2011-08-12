@@ -37,7 +37,6 @@
 . /dev/shm/ipa-hostgroup-cli-lib.sh
 . /dev/shm/ipa-hbac-cli-lib.sh
 . /dev/shm/ipa-server-shared.sh
-. /dev/shm/env.sh
 
 ########################################################################
 # Test Suite Globals

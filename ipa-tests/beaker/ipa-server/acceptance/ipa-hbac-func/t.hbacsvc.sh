@@ -37,7 +37,6 @@
 . /usr/bin/rhts-environment.sh
 . /usr/share/beakerlib/beakerlib.sh
 . /dev/shm/ipa-server-shared.sh
-. /dev/shm/env.sh
 
 
 hbacsvc_setup() {
@@ -84,7 +83,6 @@ rlPhaseEnd
         rlRun "ipa hbacsvcgroup-del $servicegroup" 0 "CLEANUP: Deleting service group $servicegroup"
 
         rlRun "kdestroy" 0 "Destroying admin credentials."
-        rhts-submit-log -l /var/log/httpd/error_log
     rlPhaseEnd
 
 
