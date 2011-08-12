@@ -56,7 +56,7 @@ public class DNSTasks {
 		browser.button("Add").click();  
 //		if (browser.div("/IPA Error */").exists()){
 //			browser.button("Cancel").click();
-//			Assert.assertTrue(false, "ipa error occures");
+//			Assert.assertTrue(false, "ipa error occurs");
 //		}else if (browser.span("Required field").exists()){
 //			browser.button("Cancel").click();
 //			Assert.assertTrue(false, "missing required field");
@@ -77,25 +77,13 @@ public class DNSTasks {
 	}//delDNSReversezone
 	
 	/*
-	 * Modify dns zone records
-	 * @param browser  
-	 * @param zoneName - dna zone name
-	 * @param record_name
-	 * @param record_data
-	 * @param record_type
-	 */
-	public static void zoneRecordsModification(SahiTasks browser,String record_name, String record_data, String record_type) {
-		DNSTasks.recordsModify(browser, record_name, record_data, record_type);
-	}//zoneRecordsModification
-	
-	/*
-	 * Modify DNS zone record: A record
+	 * Modify DNS zone record: Add one record
 	 * @param browser 
 	 * @param record_name
 	 * @param record_data
 	 * @param record_type
 	 */
-	public static void recordsModify(SahiTasks browser, String record_name, String record_data, String record_type){
+	public static void zoneRecords_add(SahiTasks browser, String record_name, String record_data, String record_type){
 		// assume the page is already in the dns modification page
 		browser.span("Add").click();
 		browser.textbox("idnsname").setValue(record_name); 
@@ -107,21 +95,144 @@ public class DNSTasks {
 			// there will be two cancel button here
 			browser.button("Cancel").click();
 			browser.button("Cancel").click();
-			//Assert.assertTrue(false, "ipa error ( dialog )occures");
+			//Assert.assertTrue(false, "ipa error ( dialog )occurs");
 		}else if (browser.span("Required field").exists()){
 			log.info ("Required field msg appears, usually this means missing data input");
 			browser.button("Cancel").click();
 			//Assert.assertTrue(false, "missing required field");
 		}else{
 			// self-check to verify the newly added record
-			Assert.assertTrue(browser.link(record_name).exists(),"assert new record name: (" + record_name + ") in the list"); 
+			Assert.assertTrue(browser.link(record_name).exists(),"ensure new record name: (" + record_name + ") in the list");
+			// delete the newly created record
+			browser.checkbox(record_name).click();
+			browser.link("Delete").click();
+			browser.button("Delete").click();
+			Assert.assertFalse(browser.link(record_name).exists(),"delete newly created record: (" + record_name + ")"); 
 		} 
-	}//zoneRecordModify
+	}//zoneRecords_add
+	
+	/*
+	 * Modify DNS zone record : "Add and Add another"
+	 * @param browser 
+	 * @param record_name
+	 * @param record_data
+	 * @param record_type
+	 */
+	public static void zoneRecords_addandaddanother(SahiTasks browser, 
+													String first_record_name, String first_record_data, String first_record_type,
+													String second_record_name, String second_record_data, String second_record_type){
+		// assume the page is already in the dns modification page
+		browser.span("Add").click();
+		browser.textbox("idnsname").setValue(first_record_name); 
+		browser.select("record_type").choose(first_record_type);
+		browser.textbox("record_data").setValue(first_record_data);
+		browser.button("Add and Add Another").click(); 
+		
+		// after click this button, we should stay in the same dialog box. so we can continue add the second one. 
+		browser.textbox("idnsname").setValue(second_record_name); 
+		browser.select("record_type").choose(second_record_type);
+		browser.textbox("record_data").setValue(second_record_data);
+		browser.button("Add and Add Another").click();
+		
+		// after click the same button the second time, we shouls still stay in the same dialog, we can now "cancel" it
+		browser.button("Cancel").click();
+		
+		if (browser.div("/IPA Error */").exists()){
+			log.info("IPA error dialog appears, usually this is data format error");
+			// there will be two cancel button here
+			browser.button("Cancel").click();
+			browser.button("Cancel").click();
+			//Assert.assertTrue(false, "ipa error ( dialog )occurs");
+		}else if (browser.span("Required field").exists()){
+			log.info ("Required field msg appears, usually this means missing data input");
+			browser.button("Cancel").click();
+			//Assert.assertTrue(false, "missing required field");
+		}else{
+			// self-check to verify the newly added record
+			if  (browser.link(first_record_name).exists()){
+				log.info("new record name: (" + first_record_name + ") found in the list");  
+				//delete this record
+				browser.checkbox(first_record_name).click();
+				browser.link("Delete").click();
+				browser.button("Delete").click();
+				Assert.assertFalse(browser.link(first_record_name).exists(),"assert new record name: (" + second_record_name + ") in the list"); 
+
+			}else{
+				Assert.fail("new record name: (" + first_record_name + ") NOT found in the list"); 
+			}
+			if (browser.link(second_record_name).exists()){
+				log.info("assert new record name: (" + second_record_name + ") in the list");
+				//delete this record 
+				browser.checkbox(second_record_name).click();
+				browser.link("Delete").click();
+				browser.button("Delete").click(); 
+				Assert.assertFalse(browser.link(second_record_name).exists(),"assert new record name: (" + second_record_name + ") in the list"); 
+			}else{
+				Assert.fail("new record name: (" + second_record_name + ") NOT found in the list"); 
+			}  
+		}//if no error detected  
+	}//zoneRecords_addandaddanother
+	
+	/*
+	 * Modify DNS zone record: Add one record and switch to Edit mode
+	 * @param browser 
+	 * @param record_name
+	 * @param record_data
+	 * @param record_type
+	 */
+	public static void zoneRecords_addandedit(SahiTasks browser, String record_name, String record_data, String record_type){
+		// assume the page is already in the dns modification page
+		browser.span("Add").click();
+		browser.textbox("idnsname").setValue(record_name); 
+		browser.select("record_type").choose(record_type);
+		browser.textbox("record_data").setValue(record_data);
+		browser.button("Add and Edit").click();  
+		
+		//we are now suppose to be in detail editing page
+		if (browser.heading3("DNS Resource Record: " + record_data).exists()){
+			log.info("verified: we are in record detail editing mode");
+			// go back to zone record list
+			browser.link("dnszone").click();
+			// self-check to verify the newly added record
+			Assert.assertTrue(browser.link(record_name).exists(),"ensure new record name: (" + record_name + ") in the list");
+			// delete the newly created record
+			browser.checkbox(record_name).click();
+			browser.link("Delete").click();
+			browser.button("Delete").click();
+			Assert.assertFalse(browser.link(record_name).exists(),"delete newly created record: (" + record_name + ")");
+		
+		}
+		
+		//Notes from yi zhang: we don't care about how this record is being edited, as long as we are in the right place.
+		// 						verifying the functionality of this page would be another test case. 
+	
+	}//zoneRecords_addandedit
+	
+	/*
+	 * Modify DNS zone record: Add one record and switch to Edit mode
+	 * @param browser 
+	 * @param record_name
+	 * @param record_data
+	 * @param record_type
+	 */
+	public static void zoneRecords_add_then_cancel(SahiTasks browser, String record_name, String record_data, String record_type){
+		// assume the page is already in the dns modification page
+		browser.span("Add").click();
+		browser.textbox("idnsname").setValue(record_name); 
+		browser.select("record_type").choose(record_type);
+		browser.textbox("record_data").setValue(record_data);
+		browser.button("Cancel").click();   
+		Assert.assertFalse(browser.link(record_data).exists(),"make sure the data does not get into ipa server");  
+	
+	}//zoneRecords_add_then_cancel
+	
 	
 	/*
 	 * Modify dns zone settings
 	 * @param browser  
 	 * @param zoneName - dns zone name
+	 * @param fieldName - dns setting field type name 
+	 * @param fieldValue - dns setting field value
 	 */
 	public static void zoneSettingsModification(SahiTasks browser, String zoneName, String fieldName, String fieldValue) {
 
@@ -179,25 +290,6 @@ public class DNSTasks {
 	}//zoneSettingsModification
 	
 	/*
-	 * Modify dns zone records
-	 * @param browser  
-	 * @param reverseZoneName - dna reverse zone name
-	 */
-	public static void reverseZoneRecordsModification(SahiTasks browser, String reverseZoneName) {
- 
-	}//reverseZoneRecordsModification
-	
-	/*
-	 * Modify dns zone settings
-	 * @param browser  
-	 * @param zoneName - dna zone name
-	 */
-	public static void reverseZoneSettingsModification(SahiTasks browser, String zoneName) {
- 
-	}//reverseZoneSettingsModification
-	
-	
-	/*
 	 * Add DNS forward address for a host
 	 * @param sahiTasks 
 	 * @param hostname - hostname
@@ -237,12 +329,12 @@ public class DNSTasks {
 	 * @param sahiTasks 
 	 * @param ptr - ptr
 	 */
-	public static void deleteRecord(SahiTasks sahiTasks, String zone, String name) {
-		sahiTasks.link(zone).click();
-		sahiTasks.checkbox(name).click();
-		sahiTasks.link("Delete").click();
-		sahiTasks.button("Delete").click();
-		sahiTasks.link("DNS Zones").in(sahiTasks.div("content")).click();
+	public static void deleteRecord(SahiTasks browser, String zone, String name) {
+		browser.link(zone).click();
+		browser.checkbox(name).click();
+		browser.link("Delete").click();
+		browser.button("Delete").click();
+		browser.link("DNS Zones").in(browser.div("content")).click();
 	}
 	
 }// Class: DNSTasks
