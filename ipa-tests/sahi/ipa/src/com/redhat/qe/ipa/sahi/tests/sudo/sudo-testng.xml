@@ -8,11 +8,14 @@
 			<run>
 			    <include name="setup" />
 			    <include name="init" />
+			    <include name="sudoruleCommandAddTests" />
 			    <include name="sudoruleAddTests" />
-				<include name="sudoruleCommandAddTests" />
+			    <include name="sudoruleEditTests" />
 				<include name="sudoruleCommandDelTests" />
+				<!--
 				<include name="sudoruleCommandGroupAddTests" />
 				<include name="sudoruleCommandGroupDelTests" />
+				-->
 				<include name="sudoruleDeleteTests" />
 			</run>
 		</groups>

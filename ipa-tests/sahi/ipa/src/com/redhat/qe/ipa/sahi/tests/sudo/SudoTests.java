@@ -53,11 +53,27 @@ public class SudoTests extends SahiTestScript{
 	
 
 	/*
+	 * Edit Sudorule - for positive tests
+	 */
+	@Test (groups={"sudoruleEditTests"}, dataProvider="getsudoruleEditTestObjects", dependsOnGroups={"sudoruleCommandAddTests"})	
+	public void testsudoruleEdit(String testName, String cn, String description, String ipasudoopt) throws Exception {		
+		//verify sudorule to be edited exists
+		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(cn).exists(), "Verify sudorule " + cn + " to be edited exists");
+		
+		//add sudo option to this rule
+		SudoTasks.modifySudorule(sahiTasks, cn, description, ipasudoopt);
+		
+		//verify changes	
+		SudoTasks.verifySudoruledescUpdates(sahiTasks, cn, description, ipasudoopt);
+		
+	}
+	
+	/*
 	 * Delete sudo rule - positive tests
 	 * note: make sure tests that use testrule1 are run before testrule1 gets deleted here
 	 */
 	@Test (groups={"sudoruleDeleteTests"}, dataProvider="getSudoruleDeleteTestObjects", 
-			dependsOnGroups={"sudoruleAddTests"})	
+			dependsOnGroups={"sudoruleEditTests"})	
 	public void testSudoruleDelete(String testName, String cn) throws Exception {
 		//verify rule to be deleted exists
 		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(cn).exists(), "Verify sudorule " + cn + "  to be deleted exists");
@@ -89,7 +105,7 @@ public class SudoTests extends SahiTestScript{
 	 * Del Sudo Commands - positive tests
 	 */
 	@Test (groups={"sudoruleCommandDelTests"}, dataProvider="getSudoruleCommandDelTestObjects", 
-			dependsOnGroups={"sudoruleCommandAddTests"})	
+			dependsOnGroups={"sudoruleEditTests"})	
 			public void testSudoruleCommandDel(String testName, String cn, String description) throws Exception {
 				//verify command to be deleted exists
 				com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(cn).exists(), "Verify sudocommand " + cn + "  to be deleted exists");
@@ -156,11 +172,29 @@ public class SudoTests extends SahiTestScript{
 		
         //										testname					cn   
 		ll.add(Arrays.asList(new Object[]{ "create_sudorule",				"testrule1"	} ));
+		/*
 		ll.add(Arrays.asList(new Object[]{ "create_sudorule",				"testrule2"	} ));
 		ll.add(Arrays.asList(new Object[]{ "create_sudorule",				"testrule3"	} ));
-		
+		*/
 		return ll;	
 	}
+
+	/*
+	 * Data to be used when editing sudorule - for positive cases
+	 */
+	@DataProvider(name="getsudoruleEditTestObjects")
+	public Object[][] getSudoruleCommandEditTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(editSudoruleCommandEditTestObjects());
+	}
+	protected List<List<Object>> editSudoruleCommandEditTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname					cn   			description						ipasudoopt
+		ll.add(Arrays.asList(new Object[]{ "edit_sudorule1",		"testrule1",		"Test description for testrule1",	"/var/log/sudolog"	} ));
+								        
+		return ll;	
+	}
+	
 	
 	/*
 	 * Data to be used when deleting sudo rules
@@ -174,9 +208,10 @@ public class SudoTests extends SahiTestScript{
 		
         //										testname					cn              		
 		ll.add(Arrays.asList(new Object[]{ "delete_good_sudorule",				"testrule1"     } ));
+		/*
 		ll.add(Arrays.asList(new Object[]{ "delete_good_sudorule",				"testrule2"     } ));
 		ll.add(Arrays.asList(new Object[]{ "delete_good_sudorule",				"testrule3"     } ));
-		        
+		*/        
 		return ll;	
 	}
 
@@ -193,16 +228,19 @@ public class SudoTests extends SahiTestScript{
         //										testname					cn   			description
 		ll.add(Arrays.asList(new Object[]{ "create_sudorule_command",		"/bin/date",		"date command"	} ));
 		ll.add(Arrays.asList(new Object[]{ "create_sudorule_command",		"/bin/cat",			"cat command"	} ));
+		/*
 		ll.add(Arrays.asList(new Object[]{ "create_sudorule_command",		"/bin/find",		"find command"	} ));
 		ll.add(Arrays.asList(new Object[]{ "create_sudorule_command",		"/bin/more",		"more command"	} ));
 		ll.add(Arrays.asList(new Object[]{ "create_sudorule_command",		"/usr/bin/less",	"less command"	} ));
 		ll.add(Arrays.asList(new Object[]{ "create_sudorule_command",		"/bin/ln",			"symlink command"	} ));
 		ll.add(Arrays.asList(new Object[]{ "create_sudorule_command",		"/bin/sleep",		"sleep command"	} ));
 		ll.add(Arrays.asList(new Object[]{ "create_sudorule_command",		"/bin/mkdir",		"mkdir command"	} ));
-						        
+		*/
+						   
 		return ll;	
 	}
 
+	
 	/*
 	 * Data to be used when deleting sudo rule commands - for positive cases
 	 */
@@ -216,13 +254,14 @@ public class SudoTests extends SahiTestScript{
         //										testname					cn   			description
 		ll.add(Arrays.asList(new Object[]{ "delete_sudorule_command",		"/bin/date",		"date command"	} ));
 		ll.add(Arrays.asList(new Object[]{ "delete_sudorule_command",		"/bin/cat",			"cat command"	} ));
+		/*
 		ll.add(Arrays.asList(new Object[]{ "delete_sudorule_command",		"/bin/find",		"find command"	} ));
 		ll.add(Arrays.asList(new Object[]{ "delete_sudorule_command",		"/bin/more",		"more command"	} ));
 		ll.add(Arrays.asList(new Object[]{ "delete_sudorule_command",		"/usr/bin/less",	"less command"	} ));
 		ll.add(Arrays.asList(new Object[]{ "delete_sudorule_command",		"/bin/ln",			"symlink command"	} ));
 		ll.add(Arrays.asList(new Object[]{ "delete_sudorule_command",		"/bin/sleep",		"sleep command"	} ));
 		ll.add(Arrays.asList(new Object[]{ "delete_sudorule_command",		"/bin/mkdir",		"mkdir command"	} ));
-				
+		*/	
 		return ll;	
 	}
 
@@ -239,9 +278,11 @@ public class SudoTests extends SahiTestScript{
         //										testname					cn   			description
 		ll.add(Arrays.asList(new Object[]{ "create_sudo_commandgroup",		"sudo group1",		"group1 with basic commands"	} ));
 		ll.add(Arrays.asList(new Object[]{ "create_sudo_commandgroup",		"sudo group2",		"group2 with basic commands"	} ));
+		/*
 		ll.add(Arrays.asList(new Object[]{ "create_sudo_commandgroup",		"sudo group3",		"group3 with basic commands"	} ));
 		ll.add(Arrays.asList(new Object[]{ "create_sudo_commandgroup",		"sudo group4",		"group4 with basic commands"	} ));
 		ll.add(Arrays.asList(new Object[]{ "create_sudo_commandgroup",		"sudo group5",		"group5 with basic commands"	} ));
+		*/
 				        
 		return ll;	
 	}
@@ -259,13 +300,13 @@ public class SudoTests extends SahiTestScript{
         //										testname					cn   			description
 		ll.add(Arrays.asList(new Object[]{ "delete_sudo_commandgroup",		"sudo group1",		"group1 with basic commands"	} ));
 		ll.add(Arrays.asList(new Object[]{ "delete_sudo_commandgroup",		"sudo group2",		"group2 with basic commands"	} ));
+		/*
 		ll.add(Arrays.asList(new Object[]{ "delete_sudo_commandgroup",		"sudo group3",		"group3 with basic commands"	} ));
 		ll.add(Arrays.asList(new Object[]{ "delete_sudo_commandgroup",		"sudo group4",		"group4 with basic commands"	} ));
 		ll.add(Arrays.asList(new Object[]{ "delete_sudo_commandgroup",		"sudo group5",		"group5 with basic commands"	} ));
+		*/
 				        
 		return ll;	
 	}
-
-		
 	
 }
