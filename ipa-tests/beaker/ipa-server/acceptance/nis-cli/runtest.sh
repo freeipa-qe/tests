@@ -38,6 +38,7 @@
 . /usr/share/beakerlib/beakerlib.sh
 . /dev/shm/ipa-server-shared.sh
 . /dev/shm/ipa-netgroup-cli-lib.sh
+. /dev/shm/nis-scripts.sh
 . /dev/shm/env.sh
 
 # Include test case file
@@ -81,6 +82,7 @@ rlJournalStart
         echo $SLAVE | grep $HOSTNAME
         rc=$?
         if [ $rc -eq 0 ] ; then
+		setup-nis-server
 		rhts-sync-block -s READY $MASTER
 		setup
 		runtests

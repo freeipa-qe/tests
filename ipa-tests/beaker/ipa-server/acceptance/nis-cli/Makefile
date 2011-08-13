@@ -29,7 +29,7 @@ export TESTVERSION=1.0
 
 BUILT_FILES=
 
-FILES=$(METADATA) runtest.sh t.nistests.sh Makefile PURPOSE 
+FILES=$(METADATA) runtest.sh t.nistests.sh Makefile PURPOSE bkr-replication.xml 
 
 .PHONY: all install download clean
 
