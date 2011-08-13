@@ -62,6 +62,7 @@ echo "The hostname of IPA Server is $MASTER"
 echo "The hostname of IPA Client 1 is $CLIENT1"
 echo "The hostname of IPA Client 2 is $CLIENT2"
 
+cat /dev/shm/env.sh #TODO
 ########################################################################
 
 
@@ -73,6 +74,8 @@ PACKAGELIST="ipa-admintools ipa-client httpd mod_nss mod_auth_kerb 389-ds-base e
         #               IS THIS MACHINE A CLIENT1?                          #
         #####################################################################
         rc=0
+	echo $HOSTNAME
+	echo $CLIENT1
         echo $CLIENT1 | grep $HOSTNAME
         if [ $? -eq 0 ] ; then
                 if [ $rc -eq 0 ] ; then
@@ -101,6 +104,8 @@ PACKAGELIST="ipa-admintools ipa-client httpd mod_nss mod_auth_kerb 389-ds-base e
         #               IS THIS MACHINE A CLIENT2?                          #
         #####################################################################
         rc=0
+	echo $HOSTNAME
+	echo $CLIENT2
         echo $CLIENT2 | grep $HOSTNAME
         if [ $? -eq 0 ] ; then
                 if [ $rc -eq 0 ] ; then
@@ -138,6 +143,8 @@ PACKAGELIST="ipa-admintools ipa-client httpd mod_nss mod_auth_kerb 389-ds-base e
         #               IS THIS MACHINE A MASTER?                           #
         #####################################################################
         rc=0
+	echo $HOSTNAME
+	echo $MASTER
         echo $MASTER | grep $HOSTNAME
         if [ $? -eq 0 ] ; then
 
