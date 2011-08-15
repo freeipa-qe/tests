@@ -20,22 +20,22 @@ import com.redhat.qe.ipa.sahi.tasks.HostTasks;
 public class HostTests extends SahiTestScript{
 	public static SahiTasks sahiTasks = null;	
 
-	private String domain = System.getProperty("ipa.server.domain");
+	private String domain = CommonTasks.ipadomain;
 	private String reversezone = System.getProperty("ipa.server.reversezone");
 	
 	//private String csr = "MIIBbDCB1gIBADAtMREwDwYDVQQKEwhURVNUUkVMTTEYMBYGA1UEAxMPbXlob3N0"+ "\n" + "LnRlc3RyZWxtMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDdegHkkCMdcET1"+ "\n" + "a+q+Edxn4KA5bcXMZeu2yjqokHFqRDNtdB6aLmec20XoW6kt9/lZDf47Mcm23M1H"+ "\n" + "xyJC+u5F0clbU7ojdaxbRqhO/D1MHDiLEH87VPqd6fhwDiV92tkWh68gKxEW29u/"+ "\n" + "COJcscYFf9X37jowYlYENY1i9mxjywIDAQABoAAwDQYJKoZIhvcNAQEFBQADgYEA"+ "\n" + "r9wrR2dn+b07GYfL1nIFsWryp1sb4pO8rr5UmGPNPQLVmm8zih25UKK96/yxe50w"+ "\n" + "z0mZoPCN6phMkHVNhINHa5laOsXwsLg+7aLfQEoOu1XWbWuNAjDA14g+JPB8wzlm"+ "\n" + "980PmlW3kOiJEA6EIzrTEhr5UiXSkv1yEevYNABK9Ys=";
 	private String badcsr = "MIIBcDCB2gIBADAxMRMwEQYDVQQKEwpRRS5MQUIuSVBBMRowGAYDVQQDExFteWdhv"+ "\n" + "c3QucWUubGFiLmlYTCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEA4lXS4N0r"+ "\n" + "lvJOwhv7eZdWLoaH5BwNoNgBObTAde4MYRejx75f3Ovo+8WVChRs/xDemDPGfWj0"+ "\n" + "9BW4BDXpX0Vaa3N4akIfKoxDnYckZlifuHxbyrZB9XX8eAZDMwtBzi30elEp5Cf5"+ "\n" + "SWMJ9WBOoXu/YIFOCC58aegXKJjPXLlzvrIoEsCAwEAAaAAMA0GCSqGSIb3DQEBBQUA"+ "\n" + "A4GBABK4TVlwNx4LzQvX/rgfqWTv33iIgkPFY4TLsXiR2XL74HAhDDk5JYJM3DGHP"+ "\n" + "4Si7E/vX6ea6IZuNAul0koIJtT2etUo8oebOKQPFb1F1AY+h6sW/QC3DH20hT85H"+ "\n" + "KhPLOBcjOSY/T9M4u5xsjVtzqZMJCdFKFRg9pLBUrCZhu3Z";
 	private String wronghostcsr = "MIIBbDCB1gIBADAtMRMwEQYDVQQKEwpRRS5MQUIuSVBBMRYwFAYDVQQDEw1ob3N0"+ "\n" +"LnRlc3RyZWxtMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDvu8wcVthKZCa/"+ "\n" +"KZ30fKPC1jMZ+PUXE/xJNfKVKG9olVSswk4RG8AD0yCApMJ5u6yXU4pT6RbxVHFg"+ "\n" +"X4xA1e006HIdOKrw5pcKhndMyc21rFaUVb66P8z7FXqiVvx3imgZrbM6rr1rfXvH"+ "\n" +"xTeTwL20Lor5Ym9ypajxGTU7IDaXMwIDAQABoAAwDQYJKoZIhvcNAQEFBQADgYEA"+ "\n" +"1IwWyrFEkXuT1vbiDU1urfSazFObEnMUR4vvIraEdhKqJySq9gB/F3j7h+EomKna"+ "\n" +"+G55hsJN7Ct0dhHks0MVIydCnSj364n2vLtfvidn1OgTYOqg4bWTmIMa/ejyV6pX"+ "\n" +"+tYey0wVg+uXyqSPZr/ZJZtmqkKIzCkzrMpxYDlUNk0=";
 	
-	private String testhost = "myhost."+domain;
-	private String undotesthost = "undohost."+domain;
+	private String testhost = "myhost";
+	private String undotesthost = "undohost";
 	private String olddescription = "Old description";
 	private String oldlocal = "Boston Massachusetts";
 	private String oldlocation = "Basement Lab - Rack 150 - number 13";
 	private String oldplatform = "ia64";
 	private String oldos = "Fedora 15";
-	private String managed = "managed." + domain;
-	private String managedby = "managedby."+domain;
+	private String managed = "managed";
+	private String managedby = "managedby";
 	
 	@BeforeClass (groups={"init"}, description="Initialize app for this test suite run", alwaysRun=true, dependsOnGroups="setup")
 	public void initialize() throws CloneNotSupportedException {	
@@ -44,7 +44,7 @@ public class HostTests extends SahiTestScript{
 		sahiTasks.setStrictVisibilityCheck(true);
 		
 		//add the test hosts
-		HostTasks.addHost(sahiTasks, testhost, "");
+		HostTasks.addHost(sahiTasks, testhost, domain, "");
 		HostTasks.addHostAndEdit(sahiTasks, undotesthost, "", olddescription, oldlocal, oldlocation, oldplatform, oldos);
 		HostTasks.addHost(sahiTasks, managed, "");
 		HostTasks.addHost(sahiTasks, managedby, "");
@@ -52,7 +52,7 @@ public class HostTests extends SahiTestScript{
 	
 	@AfterClass (groups={"cleanup"}, description="Delete objects added for the tests", alwaysRun=true)
 	public void cleanup() throws Exception {	
-		String [] delhosts = {testhost, undotesthost, managed, managedby };
+		String [] delhosts = {testhost + "." + domain, undotesthost + "." + domain, managed + "." + domain, managedby + "." + domain };
 		//delete the hosts
 		HostTasks.deleteHost(sahiTasks, delhosts);
 	}
@@ -61,14 +61,15 @@ public class HostTests extends SahiTestScript{
 	 * Add hosts - for positive tests
 	 */
 	@Test (groups={"addHostTests"}, dataProvider="getHostTestObjects")	
-	public void testHostForceAdd(String testName, String fqdn, String ipadr) throws Exception {
+	public void testHostForceAdd(String testName, String hostname, String ipadr) throws Exception {
+		String fqdn = hostname + "." + domain;
+		String lowerdn = fqdn.toLowerCase();
+		
 		//verify host doesn't exist
-		com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(fqdn).exists(), "Verify host " + fqdn + " doesn't already exist");
+		com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(lowerdn).exists(), "Verify host " + fqdn + " doesn't already exist");
 		
 		//add new host
-		HostTasks.addHost(sahiTasks, fqdn, ipadr);
-		
-		String lowerdn = fqdn.toLowerCase();
+		HostTasks.addHost(sahiTasks, hostname, ipadr);
 
 		//verify host was added
 		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(lowerdn).exists(), "Added host " + fqdn + "  successfully");
@@ -104,7 +105,7 @@ public class HostTests extends SahiTestScript{
 		
 		for (String hostname : hostnames){
 			//verify host was added
-			com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(hostname).exists(), "Added host " + hostname + "  successfully");
+			com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(hostname+"."+domain).exists(), "Added host " + hostname + "  successfully");
 		}
 	}
 	
@@ -120,6 +121,7 @@ public class HostTests extends SahiTestScript{
 		}
 		//delete the hosts
 		HostTasks.deleteHost(sahiTasks, hostnames);
+		
 		for (String hostname : hostnames) {
 			//verify host was deleted
 			com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(hostname).exists(), "Deleted host " + hostname + "  successfully");
@@ -131,7 +133,8 @@ public class HostTests extends SahiTestScript{
 	 */
 	@Test (groups={"addAndEditHostTests"}, dataProvider="getAddEditHostTestObjects")	
 	public void testHostAddAndEdit(String testName, String hostname, String ipadr, String description, String local, String location, String platform, String os) throws Exception {
-		String lowerdn = hostname.toLowerCase();
+		String fqdn = hostname + "." + domain;
+		String lowerdn = fqdn.toLowerCase();
 		
 		//verify host doesn't exist
 		com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(lowerdn).exists(), "Verify host " + hostname + " doesn't already exist");
@@ -143,24 +146,24 @@ public class HostTests extends SahiTestScript{
 		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(lowerdn).exists(), "Added host " + hostname + "  successfully");
 		
 		//verify all host fields
-		HostTasks.verifyHostSettings(sahiTasks, hostname, description, local, location, platform, os);
+		HostTasks.verifyHostSettings(sahiTasks, lowerdn, description, local, location, platform, os);
 		
-		HostTasks.deleteHost(sahiTasks, hostname);
+		HostTasks.deleteHost(sahiTasks, lowerdn);
 	}
 	
 	/*
 	 * Modify host fields
 	 */
 	@Test (groups={"modifyHostTests"}, dataProvider="getModifyHostTestObjects")	
-	public void testHostAddAndEdit(String testName, String ipadr, String field, String value) throws Exception {
-		
-		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(testhost).exists(), "Host " + testhost + "  exists");
+	public void testModifyHost(String testName, String field, String value) throws Exception {
+		String fqdn = testhost + "." + domain;
+		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(fqdn).exists(), "Host " + testhost + "  exists");
 		
 		//modify the host
-		HostTasks.modifyHost(sahiTasks, testhost, field, value);
+		HostTasks.modifyHost(sahiTasks, fqdn, field, value);
 		
 		//verify all host field
-		HostTasks.verifyHostField(sahiTasks, testhost, field, value);
+		HostTasks.verifyHostField(sahiTasks, fqdn, field, value);
 		
 	}
 	
@@ -169,11 +172,11 @@ public class HostTests extends SahiTestScript{
 	 */
 	@Test (groups={"otpHostTests"}, dataProvider="getOTPHostTestObjects")	
 	public void testHostOTP(String testName, String otp ) throws Exception {
-		
-		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(testhost).exists(), "Host " + testhost + "  exists");
+		String fqdn = testhost + "." + domain;
+		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(fqdn).exists(), "Host " + fqdn + "  exists");
 		
 		//modify the host
-		HostTasks.modifyHostOTP(sahiTasks, testhost, otp);
+		HostTasks.modifyHostOTP(sahiTasks, fqdn, otp);
 		
 		//TODO need to verify otp is set when bug is fixed that shows there is an existing OTP
 		//verify all host field
@@ -187,15 +190,14 @@ public class HostTests extends SahiTestScript{
 	 */
 	@Test (groups={"undoModifyHostTests"}, dataProvider="getUndoModifyHostTestObjects")	
 	public void tesUndoModifyHost(String testName, String newdesc, String newlocal, String newlocation, String newplatform, String newos ) throws Exception {
-		
-		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(undotesthost).exists(),  undotesthost + "  exists");
+		String fqdn = undotesthost + "." + domain;
+		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(fqdn).exists(),  fqdn + "  exists");
 		
 		//modify the host
-		HostTasks.undoModifyHost(sahiTasks, undotesthost, newdesc, newlocal, newlocation, newplatform, newos);
+		HostTasks.undoModifyHost(sahiTasks, fqdn, newdesc, newlocal, newlocation, newplatform, newos);
 		
 		//verify all host field
-		HostTasks.verifyHostSettings(sahiTasks, undotesthost, olddescription, oldlocal, oldlocation, oldplatform, oldos);
-		
+		HostTasks.verifyHostSettings(sahiTasks, fqdn, olddescription, oldlocal, oldlocation, oldplatform, oldos);
 	}
 	
 	/*
@@ -203,11 +205,13 @@ public class HostTests extends SahiTestScript{
 	 */
 	@Test (groups={"setManagedByHostTests"}, dataProvider="getSetManageByHostTests")	
 	public void testManagedByHost(String testName, String exists, String button ) throws Exception {
+		String managed_fqdn = managed + "." + domain;
+		String managedby_fqdn = managedby + "." + domain;
 		
-		HostTasks.setManagedByHost(sahiTasks, managed, managedby, button);
+		HostTasks.setManagedByHost(sahiTasks, managed_fqdn, managedby_fqdn, button);
 		
 		// verify managed by host
-		HostTasks.verifyManagedByHost(sahiTasks, managed, managedby, exists);
+		HostTasks.verifyManagedByHost(sahiTasks, managed_fqdn, managedby_fqdn, exists);
 		
 	}
 	
@@ -216,11 +220,13 @@ public class HostTests extends SahiTestScript{
 	 */
 	@Test (groups={"removeManagedByHostTests"}, dataProvider="getRemoveManageByHostTests",  dependsOnGroups="setManagedByHostTests" )	
 	public void testRemoveManagedByHost(String testName, String exists, String button ) throws Exception {
-
-		HostTasks.removeManagedByHost(sahiTasks, managed, managedby, button);
+		String managed_fqdn = managed + "." + domain;
+		String managedby_fqdn = managedby + "." + domain;
+		
+		HostTasks.removeManagedByHost(sahiTasks, managed_fqdn, managedby_fqdn, button);
 		
 		// verify managed by host
-		HostTasks.verifyManagedByHost(sahiTasks, managed, managedby, exists);
+		HostTasks.verifyManagedByHost(sahiTasks, managed_fqdn, managedby_fqdn, exists);
 
 	}
 	
@@ -229,47 +235,47 @@ public class HostTests extends SahiTestScript{
 	 */
 	@Test (groups={"hostCertificateTests"}, dataProvider="getHostCertificateTests")	
 	public void testHostCertificates(String testName, String reason ) throws Exception {
-		
+		String fqdn = testhost + "." + domain;
 		//Get CSR for testhost
-		String csr = CommonTasks.generateCSR(testhost);
+		String csr = CommonTasks.generateCSR(fqdn);
 		
 		// add request certificate
-		HostTasks.addHostCertificate(sahiTasks, testhost, csr);
+		HostTasks.addHostCertificate(sahiTasks, fqdn, csr);
 		
 		// verify valid certificate
-		HostTasks.verifyHostCertificate(sahiTasks, testhost);
+		HostTasks.verifyHostCertificate(sahiTasks, fqdn);
 		
 		// cancel hold certificate
-		HostTasks.revokeHostCertificate(sahiTasks, testhost, "Certificate Hold", "Cancel");
-		HostTasks.verifyHostCertificate(sahiTasks, testhost);
+		HostTasks.revokeHostCertificate(sahiTasks, fqdn, "Certificate Hold", "Cancel");
+		HostTasks.verifyHostCertificate(sahiTasks, fqdn);
 		
 		// put certificate on hold
-		HostTasks.revokeHostCertificate(sahiTasks, testhost, "Certificate Hold", "Revoke");
-		HostTasks.verifyHostCertificate(sahiTasks, testhost, "Hold", "Certificate Hold");
+		HostTasks.revokeHostCertificate(sahiTasks, fqdn, "Certificate Hold", "Revoke");
+		HostTasks.verifyHostCertificate(sahiTasks, fqdn, "Hold", "Certificate Hold");
 		
 		// cancel restore certificate
-		HostTasks.restoreHostCertificate(sahiTasks, testhost, "Cancel");
-		HostTasks.verifyHostCertificate(sahiTasks, testhost, "Hold", "Certificate Hold");
+		HostTasks.restoreHostCertificate(sahiTasks, fqdn, "Cancel");
+		HostTasks.verifyHostCertificate(sahiTasks, fqdn, "Hold", "Certificate Hold");
 		
 		//restore certificate
-		HostTasks.restoreHostCertificate(sahiTasks, testhost, "Restore");
-		HostTasks.verifyHostCertificate(sahiTasks, testhost);
+		HostTasks.restoreHostCertificate(sahiTasks, fqdn, "Restore");
+		HostTasks.verifyHostCertificate(sahiTasks, fqdn);
 		
 		//cancel revoking certificate
-		HostTasks.revokeHostCertificate(sahiTasks, testhost, reason, "Cancel");
-		HostTasks.verifyHostCertificate(sahiTasks, testhost);
+		HostTasks.revokeHostCertificate(sahiTasks, fqdn, reason, "Cancel");
+		HostTasks.verifyHostCertificate(sahiTasks, fqdn);
 		
 		//revoke certificate
-		HostTasks.revokeHostCertificate(sahiTasks, testhost, reason, "Revoke");
-		HostTasks.verifyHostCertificate(sahiTasks, testhost, "Revoked", reason);
+		HostTasks.revokeHostCertificate(sahiTasks, fqdn, reason, "Revoke");
+		HostTasks.verifyHostCertificate(sahiTasks, fqdn, "Revoked", reason);
 		
 		// cancel request for new certificate
-		HostTasks.newHostCertificate(sahiTasks, testhost, csr, "Cancel");
-		HostTasks.verifyHostCertificate(sahiTasks, testhost, "Revoked", reason);
+		HostTasks.newHostCertificate(sahiTasks, fqdn, csr, "Cancel");
+		HostTasks.verifyHostCertificate(sahiTasks, fqdn, "Revoked", reason);
 		
 		// request for new certificate
-		HostTasks.newHostCertificate(sahiTasks, testhost, csr, "Issue");
-		HostTasks.verifyHostCertificate(sahiTasks, testhost);
+		HostTasks.newHostCertificate(sahiTasks, fqdn, csr, "Issue");
+		HostTasks.verifyHostCertificate(sahiTasks, fqdn);
 		
 	}
 	
@@ -279,8 +285,9 @@ public class HostTests extends SahiTestScript{
 	@Test (groups={"hostInvalidCSRTests"}, dataProvider="getInvalidHostCSRTestObjects")	
 	public void testHostInvalidCSR(String testName, String csr, String expectedError ) throws Exception {
 		
+		String fqdn = testhost + "." + domain;
 		// add request certificate
-		HostTasks.invalidHostCSR(sahiTasks, testhost, csr, expectedError);
+		HostTasks.invalidHostCSR(sahiTasks, fqdn, csr, expectedError);
 		
 	}
 
@@ -288,15 +295,10 @@ public class HostTests extends SahiTestScript{
 	 * Add host - for negative tests
 	 */
 	@Test (groups={"invalidhostAddTests"}, dataProvider="getInvalidHostTestObjects")	
-	public void testInvalidHostadd(String testName, String hostname, String ipadr, String expectedError) throws Exception {
+	public void testInvalidHostadd(String testName, String hostname, String hostdomain, String ipadr, String expectedError) throws Exception {
 		
-		if (testName == "duplicate_hostname"){
-			HostTasks.addInvalidHost(sahiTasks, hostname, ipadr, expectedError);
-		}
-		else {
-			HostTasks.addInvalidHost(sahiTasks, hostname, ipadr, expectedError);
-			
-		}
+		HostTasks.addInvalidHost(sahiTasks, hostname, hostdomain, ipadr, expectedError);
+
 	}
 	
 	/*
@@ -310,7 +312,7 @@ public class HostTests extends SahiTestScript{
 		String fqdn = hostname + "." + domain;
 		
 		// add host
-		HostTasks.addHost(sahiTasks, fqdn, ipaddr);
+		HostTasks.addHost(sahiTasks, hostname, domain, ipaddr);
 		
 		// verify host was added
 		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(fqdn).exists(), "Added host " + fqdn + "  successfully");
@@ -356,13 +358,12 @@ public class HostTests extends SahiTestScript{
 	protected List<List<Object>> createHostTestObjects() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-        //										testname					fqdn				ipadr
-		ll.add(Arrays.asList(new Object[]{ "add_host_lowercase",		"myhost1."+domain,		"" } ));
-		ll.add(Arrays.asList(new Object[]{ "add_host_uppercase",		"MYHOST2."+domain,		"" } ));
-		ll.add(Arrays.asList(new Object[]{ "add_host_mixedcase",		"MyHost3."+domain, 		"" } ));
-		ll.add(Arrays.asList(new Object[]{ "externaldns_host",			"external.example", 	"" } ));
-		ll.add(Arrays.asList(new Object[]{ "add_host_tilde",			"test~."+domain, 		"" } ));
-		ll.add(Arrays.asList(new Object[]{ "add_host_dash",				"test-."+domain, 		"" } ));
+        //										testname				hostname		ipadr
+		ll.add(Arrays.asList(new Object[]{ "add_host_lowercase",		"myhost1",		"" } ));
+		ll.add(Arrays.asList(new Object[]{ "add_host_uppercase",		"MYHOST2",		"" } ));
+		ll.add(Arrays.asList(new Object[]{ "add_host_mixedcase",		"MyHost3", 		"" } ));
+		ll.add(Arrays.asList(new Object[]{ "add_host_tilde",			"test~", 		"" } ));
+		ll.add(Arrays.asList(new Object[]{ "add_host_dash",				"test-", 		"" } ));
 		        
 		return ll;	
 	}
@@ -381,7 +382,6 @@ public class HostTests extends SahiTestScript{
 		ll.add(Arrays.asList(new Object[]{ "delete_host_lowercase",		"myhost1."+domain 	} ));
 		ll.add(Arrays.asList(new Object[]{ "delete_host_uppercase",		"myhost2."+domain 	} ));
 		ll.add(Arrays.asList(new Object[]{ "delete_host_mixedcase",		"myhost3."+domain 	} ));
-		ll.add(Arrays.asList(new Object[]{ "delete_host_externaldns",	"external.example" 	} ));
 		ll.add(Arrays.asList(new Object[]{ "delete_host_tilde",			"test~."+domain     	} ));
 		ll.add(Arrays.asList(new Object[]{ "delete_host_dash",			"test-."+domain		} ));
 		        
@@ -398,8 +398,8 @@ public class HostTests extends SahiTestScript{
 	protected List<List<Object>> createAddEditHostTestObjects() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-        //										testname					hostname			ipadr		description								local								location						platform	os
-		ll.add(Arrays.asList(new Object[]{ "add_and_edit_host",			"myhost1."+domain,		"",		 	"MY host descipta098yhf;  jkhrtoryt",	"314 Littleton Road, Westford, MA",	"3rd Floor under Jenny's Desk",	"x86_64",	"Fedora 15" } ));
+        //										testname			hostname		ipadr		description								local								location						platform	os
+		ll.add(Arrays.asList(new Object[]{ "add_and_edit_host",		"myhost1",		"",		 	"MY host descipta098yhf;  jkhrtoryt",	"314 Littleton Road, Westford, MA",	"3rd Floor under Jenny's Desk",	"x86_64",	"Fedora 15" } ));
 		        
 		return ll;	
 	}
@@ -414,8 +414,8 @@ public class HostTests extends SahiTestScript{
 	protected List<List<Object>> createAddAndAddAnotherHostTestObjects() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-        //										testname				hostname1			hostname2			hostname3
-		ll.add(Arrays.asList(new Object[]{ "add_and_add_another_host",	"myhost1."+domain,	 "myhost2."+domain, "myhost3."+domain } ));
+        //										testname				hostname1		hostname2		hostname3
+		ll.add(Arrays.asList(new Object[]{ "add_and_add_another_host",	"myhost1",	 	"myhost2", 		"myhost3" } ));
 		        
 		return ll;	
 	}
@@ -446,13 +446,13 @@ public class HostTests extends SahiTestScript{
 	protected List<List<Object>> createInvalidHostTestObjects() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-        //										testname					hostname        		ipadr   			expectedError
-		ll.add(Arrays.asList(new Object[]{ "missing_host_and_domain",		"test", 				"",					"invalid 'hostname': Fully-qualified hostname required"		} ));
-		ll.add(Arrays.asList(new Object[]{ "invalidipadr_alpha_chars",		"test."+domain, 		"null",				"invalid 'ip_address': invalid IP address"				} ));
-		ll.add(Arrays.asList(new Object[]{ "invalidipadr_too_many_octets",	"test."+domain, 		"10.10.10.10.10",	"invalid 'ip_address': invalid IP address"		} ));	
-		ll.add(Arrays.asList(new Object[]{ "invalidipadr_bad_octects",		"test."+domain, 		"999.999.999.999",	"invalid 'ip_address': invalid IP address"		} ));
-		ll.add(Arrays.asList(new Object[]{ "invalidipadr_special_chars",	"test."+domain, 		"~.&.#.^",			"invalid 'ip_address': invalid IP address"		} ));
-		ll.add(Arrays.asList(new Object[]{ "duplicate_hostname",			testhost, 				"",					"host with name \""+ testhost +"\" already exists"	} ));
+        //										testname					hostname     hostdomain    	ipadr   			expectedError
+		ll.add(Arrays.asList(new Object[]{ "missing_hostname",				"", 	 	 domain,		"",					"'fqdn' is required"} ));
+		ll.add(Arrays.asList(new Object[]{ "invalidipadr_alpha_chars",		"test",		 domain, 		"null",				"invalid 'ip_address': invalid IP address"	} ));
+		ll.add(Arrays.asList(new Object[]{ "invalidipadr_too_many_octets",	"test",		 domain, 		"10.10.10.10.10",	"invalid 'ip_address': invalid IP address"	} ));	
+		ll.add(Arrays.asList(new Object[]{ "invalidipadr_bad_octects",		"test",		 domain, 		"999.999.999.999",	"invalid 'ip_address': invalid IP address"	} ));
+		ll.add(Arrays.asList(new Object[]{ "invalidipadr_special_chars",	"test",		 domain, 		"~.&.#.^",			"invalid 'ip_address': invalid IP address"	} ));
+		ll.add(Arrays.asList(new Object[]{ "duplicate_hostname",			testhost,	 domain, 		"",					"host with name \""+ testhost + "." + domain + "\" already exists"	} ));
 		return ll;	
 	}
 	
@@ -466,12 +466,12 @@ public class HostTests extends SahiTestScript{
 	protected List<List<Object>> createModifyHostTestObjects() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-        //										testname				ipadr		field  					value
-		ll.add(Arrays.asList(new Object[]{ "modify_description",		"",			"description",			"My new host value - abcdefghijklmnopqrstuvwxyz 1234567890"	} ));
-		ll.add(Arrays.asList(new Object[]{ "modify_local",				"",			"local",				"United States - Massachusetts - Westford"	} ));
-		ll.add(Arrays.asList(new Object[]{ "modify_location",			"",			"location",				"West Wing - Lab 41 - Rack 143"		} ));	
-		ll.add(Arrays.asList(new Object[]{ "modify_platform",			"", 		"platform",				"ppc64"	} ));
-		ll.add(Arrays.asList(new Object[]{ "modify_os",					"",			"os",					"Red Hat Enterprise Linux 6 Update 1"		} ));
+        //										testname			field  					value
+		ll.add(Arrays.asList(new Object[]{ "modify_description",	"description",			"My new host value - abcdefghijklmnopqrstuvwxyz 1234567890"	} ));
+		ll.add(Arrays.asList(new Object[]{ "modify_local",			"local",				"United States - Massachusetts - Westford"	} ));
+		ll.add(Arrays.asList(new Object[]{ "modify_location",		"location",				"West Wing - Lab 41 - Rack 143"		} ));	
+		ll.add(Arrays.asList(new Object[]{ "modify_platform",		"platform",				"ppc64"	} ));
+		ll.add(Arrays.asList(new Object[]{ "modify_os",				"os",					"Red Hat Enterprise Linux 6 Update 1"		} ));
 		return ll;	
 	}
 	
@@ -488,9 +488,9 @@ public class HostTests extends SahiTestScript{
         //										testname			otp
 		ll.add(Arrays.asList(new Object[]{ "OTP_alpha",				"kjfghaoihetoiharitharighp"	} ));
 		ll.add(Arrays.asList(new Object[]{ "OTP_numeric",			"20892750975047735451"	} ));
-		ll.add(Arrays.asList(new Object[]{ "OTP_alphanumeric",		"kjasdoa58gshoty7475p759burtsyrta436756878"		} ));	
+		ll.add(Arrays.asList(new Object[]{ "OTP_alphanumeric",		"kjasdoa58gshoty7475p759burtsyrta436756878"	} ));	
 		ll.add(Arrays.asList(new Object[]{ "OTP_special_chars",		"#$%^&()&(^%$*^$+"	} ));
-		ll.add(Arrays.asList(new Object[]{ "OTP_mixed",				"#kajfa8ga89pajh0b6q<ejt} j&b7q9nbti*"		} ));
+		ll.add(Arrays.asList(new Object[]{ "OTP_mixed",				"#kajfa8ga89pajh0b6q<ejt} j&b7q9nbti*"	} ));
 		return ll;	
 	}
 	
@@ -573,7 +573,7 @@ public class HostTests extends SahiTestScript{
         //										testname			csr   			expectedError
 		ll.add(Arrays.asList(new Object[]{ "csr_blank",				"",				"Certificate operation cannot be completed: Failure decoding Certificate Signing Request" } ));
 		ll.add(Arrays.asList(new Object[]{ "csr_invalid_format",	badcsr,			"Base64 decoding failed: Incorrect padding"	} ));
-		ll.add(Arrays.asList(new Object[]{ "csr_wrong_host",		wronghostcsr,	"Insufficient access: hostname in subject of request 'host.testrelm' does not match principal hostname '" + testhost + "'"	} ));	
+		ll.add(Arrays.asList(new Object[]{ "csr_wrong_host",		wronghostcsr,	"Insufficient access: hostname in subject of request 'host.testrelm' does not match principal hostname '" + testhost + "." + domain + "'" } ));	
 		return ll;	
 	}
 	
