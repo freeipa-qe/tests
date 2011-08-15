@@ -132,13 +132,6 @@ PACKAGELIST="ipa-admintools ipa-client httpd mod_nss mod_auth_kerb 389-ds-base e
                         done
                         rlRun "service iptables stop" 0 "Stop the firewall on the client"
 
-        rpm -qa | grep $PACKAGE
-	        if [ $? -eq 0 ] ; then
-        	        rlPass "ipa-admintools package is installed"
-	        else
-        	        rlFail "ipa-admintools package NOT found!"
-	        fi
-
 
                         rhts-sync-set -s DONE
 			rhts-sync-block -s HBACSVC_SETUP $MASTER 
