@@ -77,12 +77,13 @@ PACKAGELIST="ipa-admintools ipa-client httpd mod_nss mod_auth_kerb 389-ds-base e
 
 	# Checking if CLIENT1 and CLIENT2 can be identified #TODO	
 	SHORT_HOST1=`cat /dev/shm/env.sh | grep BEAKERCLIENT |  cut -d "=" -f 2 | cut -d " " -f 1 | cut -d . -f 1`
-	CLIENT1=$SHORT_HOST.$REALM
+	CLIENT1=$SHORT_HOST1.$REALM
 
 	echo $HOSTNAME
 	echo $CLIENT1
         echo $CLIENT1 | grep $HOSTNAME
         if [ $? -eq 0 ] ; then
+                rlLog "Machine in recipe is CLIENT1"
                 if [ $rc -eq 0 ] ; then
                         for item in $PACKAGELIST ; do
                                 rpm -qa | grep $item
@@ -111,13 +112,14 @@ PACKAGELIST="ipa-admintools ipa-client httpd mod_nss mod_auth_kerb 389-ds-base e
         rc=0
 
         # Checking if CLIENT1 and CLIENT2 can be identified #TODO       
-        SHORT_HOST2=`cat /dev/shm/env.sh | grep BEAKERCLIENT | cut -d " " -f 2 | cut -d . -f 1`
+        SHORT_HOST2=`cat /dev/shm/env.sh | grep BEAKERCLIENT | cut -d " " -f 3 | cut -d . -f 1`
         CLIENT2=$SHORT_HOST2.$REALM
 
 	echo $HOSTNAME
 	echo $CLIENT2
         echo $CLIENT2 | grep $HOSTNAME
         if [ $? -eq 0 ] ; then
+                rlLog "Machine in recipe is CLIENT2"
                 if [ $rc -eq 0 ] ; then
                         for item in $PACKAGELIST ; do
                                 rpm -qa | grep $item
@@ -157,6 +159,7 @@ PACKAGELIST="ipa-admintools ipa-client httpd mod_nss mod_auth_kerb 389-ds-base e
 	echo $MASTER
         echo $MASTER | grep `hostname -s`
         if [ $? -eq 0 ] ; then
+                rlLog "Machine in recipe is MASTER"
 
                 rhts-sync-block -s DONE -s DONE $CLIENT1 $CLIENT2
                 rlPass
