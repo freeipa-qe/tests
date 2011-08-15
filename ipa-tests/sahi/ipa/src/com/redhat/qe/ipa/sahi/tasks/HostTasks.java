@@ -31,7 +31,7 @@ public class HostTasks {
 	public static void addHost(SahiTasks sahiTasks, String hostname, String hostdomain, String ipadr) {
 		sahiTasks.span("Add").click();
 		sahiTasks.textbox("hostname").setValue(hostname);
-		sahiTasks.textbox("dnsdomain").setValue(hostdomain);
+		sahiTasks.textbox("dnszone").setValue(hostdomain);
 			
 		if(ipadr == ""){ 
 			sahiTasks.checkbox("force").click();
@@ -57,8 +57,7 @@ public class HostTasks {
 	public static void addHostAndEdit(SahiTasks sahiTasks, String hostname, String ipadr, String description, String local, String location, String platform, String os) {
 		sahiTasks.span("Add").click();
 		sahiTasks.textbox("hostname").setValue(hostname);
-		sahiTasks.span("icon combobox-icon").click();
-		sahiTasks.select("list").choose(CommonTasks.ipadomain);
+		sahiTasks.textbox("dnszone").setValue(CommonTasks.ipadomain);
 		if(ipadr == ""){ 
 			sahiTasks.checkbox("force").click();
 		}
@@ -85,21 +84,18 @@ public class HostTasks {
 	public static void addAndAddAnotherHost(SahiTasks sahiTasks, String hostname1, String hostname2, String hostname3) {
 		sahiTasks.span("Add").click();
 		sahiTasks.textbox("hostname").setValue(hostname1);
-		sahiTasks.span("icon combobox-icon").click();
-		sahiTasks.select("list").choose(CommonTasks.ipadomain);
+		sahiTasks.textbox("dnszone").setValue(CommonTasks.ipadomain);
 		sahiTasks.checkbox("force").click();
 		sahiTasks.button("Add and Add Another").click();
 		
 		sahiTasks.textbox("hostname").setValue(hostname2);
-		sahiTasks.span("icon combobox-icon").click();
-		sahiTasks.select("list").choose(CommonTasks.ipadomain);
+		sahiTasks.textbox("dnszone").setValue(CommonTasks.ipadomain);
 		
 		sahiTasks.checkbox("force").click();
 		sahiTasks.button("Add and Add Another").click();
 		
 		sahiTasks.textbox("hostname").setValue(hostname3);
-		sahiTasks.span("icon combobox-icon").click();
-		sahiTasks.select("list").choose(CommonTasks.ipadomain);
+		sahiTasks.textbox("dnszone").setValue(CommonTasks.ipadomain);
 		sahiTasks.checkbox("force").click();
 		sahiTasks.button("Add").click();
 	}
@@ -133,8 +129,7 @@ public class HostTasks {
 	public static void addInvalidHost(SahiTasks sahiTasks, String hostname, String hostdomain, String ipadr, String expectedError) {
 		sahiTasks.span("Add").click();
 		sahiTasks.textbox("hostname").setValue(hostname);
-		sahiTasks.span("icon combobox-icon").click();
-		sahiTasks.select("list").choose(hostdomain);
+		sahiTasks.textbox("dnszone").setValue(CommonTasks.ipadomain);
 		if(ipadr == ""){ 
 			sahiTasks.checkbox("force").click();
 		}
