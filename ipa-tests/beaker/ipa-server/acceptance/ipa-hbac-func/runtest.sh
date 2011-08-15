@@ -74,6 +74,11 @@ PACKAGELIST="ipa-admintools ipa-client httpd mod_nss mod_auth_kerb 389-ds-base e
         #               IS THIS MACHINE A CLIENT1?                          #
         #####################################################################
         rc=0
+
+	# Checking if CLIENT1 and CLIENT2 can be identified #TODO	
+	SHORT_HOST1=`cat /dev/shm/env.sh | grep BEAKERCLIENT |  cut -d "=" -f 2 | cut -d " " -f 1 | cut -d . -f 1`
+	CLIENT1=$SHORT_HOST.$REALM
+
 	echo $HOSTNAME
 	echo $CLIENT1
         echo $CLIENT1 | grep $HOSTNAME
@@ -104,6 +109,11 @@ PACKAGELIST="ipa-admintools ipa-client httpd mod_nss mod_auth_kerb 389-ds-base e
         #               IS THIS MACHINE A CLIENT2?                          #
         #####################################################################
         rc=0
+
+        # Checking if CLIENT1 and CLIENT2 can be identified #TODO       
+        SHORT_HOST2=`cat /dev/shm/env.sh | grep BEAKERCLIENT | cut -d " " -f 2 | cut -d . -f 1
+        CLIENT2=$SHORT_HOST2.$REALM
+
 	echo $HOSTNAME
 	echo $CLIENT2
         echo $CLIENT2 | grep $HOSTNAME
@@ -145,7 +155,7 @@ PACKAGELIST="ipa-admintools ipa-client httpd mod_nss mod_auth_kerb 389-ds-base e
         rc=0
 	echo $HOSTNAME
 	echo $MASTER
-        echo $MASTER | grep $HOSTNAME
+        echo $MASTER | grep `hostname -s`
         if [ $? -eq 0 ] ; then
 
                 rhts-sync-block -s DONE -s DONE $CLIENT1 $CLIENT2
