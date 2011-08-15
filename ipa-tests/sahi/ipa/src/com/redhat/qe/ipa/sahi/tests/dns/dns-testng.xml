@@ -1,53 +1,47 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
-<suite name="IPAGroupTestSuite">	
-    <test name="Group Tests">
-	<packages>
-	    <package name="com.redhat.qe.ipa.sahi.*" />
-	</packages>
-	<groups>
-	    <run>
-	        <include name="setup" />
-	        <include name="init" />   
-	       
-	        <include name="addDNSZoneTest" /> 
-            <include name="dnsZoneRecordsTest_add" />
-            <include name="dnsZoneRecordsTest_addandaddanother" />
-            <include name="dnsZoneRecordsTest_addandaddedit" />
-            <include name="dnsZoneRecordsTest_add_then_cancel" />
-            <include name="dnsZoneSettingsTest" />
-            <!-- <include name="delDNSZoneTest" /> -->
-           
-            <include name="addReverseDNSZone" />
-            <include name="reverseDNSZoneRecordsTest_add" /> 
-            <include name="reverseDNSZoneRecordsTest_addandaddanother" /> 
-            <include name="reverseDNSZoneRecordsTest_addandedit" /> 
-            <include name="reverseDNSZoneRecordsTest_add_then_cancel" />
-            <include name="dnsReverseZoneSettingsTest" />
-            <!-- <include name="deleteReverseDNSZone" /> -->
-	        
-	        
-	        <!--  the following are premature, comment out 
-	        
-	        <include name="dnsZoneBaseTest" />
-	        <include name="dnsReverseZoneBaseTest" />
-
-            
- 
-
-
-
-
-              end of comment out tests -->
+<suite name="IPADNSTestSuite">	
+    <test name="DNS Tests" preserve-order="true">
+            	<packages>
+            	    <package name="com.redhat.qe.ipa.sahi.*" />
+            	</packages>
+            	<groups>
+            	    <run>
+            	        <include name="setup" />
+            	        <include name="init" />   
+            	       
+            	        <include name="addDNSZoneTest" /> 
+                        <include name="dnsZoneRecordsTest_add" />
+                        <include name="dnsZoneRecordsTest_addandaddanother" />
+                        <include name="dnsZoneRecordsTest_addandaddedit" />
+                        <include name="dnsZoneRecordsTest_add_then_cancel" />
+                        <include name="dnsZoneSettingsTest" />
+                        <include name="delDNSZoneTest" />
+                       
+                        <include name="addReverseDNSZone" />
+                        <include name="reverseDNSZoneRecordsTest_add" /> 
+                        <include name="reverseDNSZoneRecordsTest_addandaddanother" /> 
+                        <include name="reverseDNSZoneRecordsTest_addandedit" /> 
+                        <include name="reverseDNSZoneRecordsTest_add_then_cancel" />
+                        <include name="dnsReverseZoneSettingsTest" />
+                        <include name="deleteReverseDNSZone" />
+            	        
+            	        
+            	        <!--  the following are premature, comment out 
+            	        
+            	        <include name="dnsZoneBaseTest" />
+            	        <include name="dnsReverseZoneBaseTest" />
              
-	    </run>
-	</groups>
-	<classes>
-	    <class name="com.redhat.qe.ipa.sahi.tests.dns.DNSTests" />
-	</classes>
+                          end of comment out tests -->
+                         
+            	    </run>
+            	</groups>
+            	<classes>
+            	    <class name="com.redhat.qe.ipa.sahi.tests.dns.DNSTests" />
+            	</classes>
     </test>
 	
     <listeners>        
-  	<listener class-name="com.redhat.qe.auto.testng.TestNGListener" />	
+  	             <listener class-name="com.redhat.qe.auto.testng.TestNGListener" />	
     </listeners>
 	
 </suite>
