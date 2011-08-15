@@ -31,6 +31,7 @@ public class CommonTasks {
 	public static String sudoPage = "/ipa/ui/#navigation=policy&policy=sudo";
 	
 	public static String ipadomain = System.getProperty("ipa.server.domain");
+	public static String ipafqdn= System.getProperty("ipa.server.fqdn");
 	public static String reversezone = System.clearProperty("ipa.server.reversezone");
 	
 	// to check if unexpected error was thrown in a test
