@@ -306,6 +306,33 @@ public class HostgroupTests extends SahiTestScript{
 	HostgroupTasks.removeMembers(sahiTasks, groupName, "hostgroup", member, "Delete");
 	HostgroupTasks.verifyMembers(sahiTasks, groupName, "hostgroup", member, "direct", "NO");
 	}
+	
+	/*
+	 * negative add host group tests
+	 */
+	@Test (groups={"invalidHostGroupAddTests"}, dataProvider="getAddInvalidHostGroupTestObjects")	
+	public void testInvalidHostadd(String testName, String groupname, String description, String expectedError) throws Exception {
+		
+		HostgroupTasks.addInvalidHostGroup(sahiTasks, groupname, description, expectedError);
+	}
+	
+	/*
+	 * negative add host group characters tests
+	 */
+	@Test (groups={"invalidCharHostGroupAddTests"}, dataProvider="getAddInvalidHostCharGroupTestObjects")	
+	public void testInvalidCharHostadd(String testName, String groupname, String description, String expectedError) throws Exception {
+		
+		HostgroupTasks.addInvalidCharHostGroup(sahiTasks, groupname, description, expectedError);
+	}
+	
+	/*
+	 * negative modify host group characters tests
+	 */
+	@Test (groups={"invalidHostGroupModifyTests"}, dataProvider="getModifyInvalidHostGroupTestObjects")	
+	public void testInvalidHostModify(String testName, String groupname, String description, String expectedError) throws Exception {
+		
+		HostgroupTasks.modifyInvalidDirtyHostGroup(sahiTasks, groupname, description, expectedError);
+	}
 		
 
 /*******************************************************
@@ -515,6 +542,62 @@ public class HostgroupTests extends SahiTestScript{
 		//										testname						groupname	member	
 		ll.add(Arrays.asList(new Object[]{ 		"removehostgroup_qe",			enggroup,	qegroup } ));
 		ll.add(Arrays.asList(new Object[]{ 		"removehostgroup_qe",			enggroup,	devgroup } ));
+		return ll;	
+	}
+	
+	/*
+	 * Data to be used when adding host groups 
+	 */
+	@DataProvider(name="getAddInvalidHostGroupTestObjects")
+	public Object[][] getInvalidHostGroupTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createInvalidHostGroupTestObjects());
+	}
+	protected List<List<Object>> createInvalidHostGroupTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+	
+		//										testname							groupanme			description				expectedError
+		ll.add(Arrays.asList(new Object[]{ 		"duplicate_hostgroup",				myhostgroup,		"my description",	 	"host group with name \"" + myhostgroup + "\" already exists" } ));
+		ll.add(Arrays.asList(new Object[]{ 		"addinvalid_name_space",			" ",				"my description",	 	"invalid 'hostgroup_name': Leading and trailing spaces are not allowed" } ));
+		ll.add(Arrays.asList(new Object[]{ 		"addinvalid_name_leading_space",	" newgroup",		"my description",	 	"invalid 'hostgroup_name': Leading and trailing spaces are not allowed" } ));
+		ll.add(Arrays.asList(new Object[]{ 		"addinvalid_name_trailing_space",	"newgroup ",		"my description",	 	"invalid 'hostgroup_name': Leading and trailing spaces are not allowed" } ));
+		ll.add(Arrays.asList(new Object[]{ 		"addinvalid_desc_space",			"newgroup",			" ",	 				"invalid 'desc': Leading and trailing spaces are not allowed" } ));
+		ll.add(Arrays.asList(new Object[]{ 		"addinvalid_desc_leading_space",	"newgroup",			" my description",	 	"invalid 'desc': Leading and trailing spaces are not allowed" } ));
+		ll.add(Arrays.asList(new Object[]{ 		"addinvalid_name_trailing_space",	"newgroup",			"my description ",	 	"invalid 'desc': Leading and trailing spaces are not allowed" } ));
+		return ll;	
+	}
+	
+	/*
+	 * Data to be used when adding invalid character host groups 
+	 */
+	@DataProvider(name="getAddInvalidHostCharGroupTestObjects")
+	public Object[][] getInvalidCharHostGroupTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createInvalidCharHostGroupTestObjects());
+	}
+	protected List<List<Object>> createInvalidCharHostGroupTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+	
+		//										testname							groupanme			description						expectedError
+		ll.add(Arrays.asList(new Object[]{ 		"addinvalid_no_name_or_description",	"",					"",	 						"Required field" } ));
+		ll.add(Arrays.asList(new Object[]{ 		"addinvalid_no_name",					"",					"my description",	 		"Required field" } ));  
+		ll.add(Arrays.asList(new Object[]{ 		"addinvalid_no_description",			"asdfjaskl",		"",							"Required field" } ));
+		
+		return ll;	
+	}
+	
+	/*
+	 * Data to be used when modify host groups - negative 
+	 */
+	@DataProvider(name="getModifyInvalidHostGroupTestObjects")
+	public Object[][] getInvalidHostGroupModifyTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createInvalidHostGroupModifyTestObjects());
+	}
+	protected List<List<Object>> createInvalidHostGroupModifyTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+	
+		//										testname										groupanme			description			expectedError
+		ll.add(Arrays.asList(new Object[]{ 		"modify_invalid_description_empty",				myhostgroup,		"",	 				 "no modifications to be performed" } ));
+		ll.add(Arrays.asList(new Object[]{ 		"modify_invalid_description_leadingspace",		myhostgroup,		" my description",	 "invalid 'desc': Leading and trailing spaces are not allowed" } ));
+		ll.add(Arrays.asList(new Object[]{ 		"modify_invalid_description_trailingspace",		myhostgroup,		"my description ",	 "invalid 'desc': Leading and trailing spaces are not allowed" } ));
 		return ll;	
 	}
 }

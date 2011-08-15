@@ -7,7 +7,7 @@
 		<groups>
 			<run>
 			    <include name="setup" />
-			    <include name="init" />	     
+			    <include name="init" />	   
 			    <include name="addHostGroupTests" />	
 				<include name="deleteHostGroupTests" />
 				<include name="addAndAddAnotherHostGroupTests" />
@@ -22,8 +22,11 @@
 			    <include name="cancelRemoveMembersTest" />
 			    <include name="removeHostMembersTest" />
 			    <include name="removeHostGroupMembersTest" />
+			    <include name="invalidCharHostGroupAddTests" />
+			    <include name="invalidHostGroupAddTests" />
+			    <include name="invalidHostGroupModifyTests" />
 			    <include name="cleanup" />
-			    <!--
+			    <!-- 
 				<include name="teardown"/>
 				-->
 			</run>
