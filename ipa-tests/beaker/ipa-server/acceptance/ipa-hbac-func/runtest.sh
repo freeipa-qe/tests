@@ -77,7 +77,7 @@ PACKAGELIST="ipa-admintools ipa-client httpd mod_nss mod_auth_kerb 389-ds-base e
 
 	# Checking if CLIENT1 and CLIENT2 can be identified #TODO	
 	SHORT_HOST1=`cat /dev/shm/env.sh | grep BEAKERCLIENT |  cut -d "=" -f 2 | cut -d " " -f 1 | cut -d . -f 1`
-	CLIENT1=$SHORT_HOST1.$REALM
+	CLIENT1=$SHORT_HOST1.$DOMAIN
 
 	echo $HOSTNAME
 	echo $CLIENT1
@@ -113,7 +113,7 @@ PACKAGELIST="ipa-admintools ipa-client httpd mod_nss mod_auth_kerb 389-ds-base e
 
         # Checking if CLIENT1 and CLIENT2 can be identified #TODO       
         SHORT_HOST2=`cat /dev/shm/env.sh | grep BEAKERCLIENT | cut -d " " -f 3 | cut -d . -f 1`
-        CLIENT2=$SHORT_HOST2.$REALM
+        CLIENT2=$SHORT_HOST2.$DOMAIN
 
 	echo $HOSTNAME
 	echo $CLIENT2
