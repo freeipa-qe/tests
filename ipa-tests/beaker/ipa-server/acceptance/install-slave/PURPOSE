@@ -1,3 +1,0 @@
-PURPOSE of /CoreOS/sssd/ipa-server/acceptance/install-slave
-Description: Basic Install test of a IPA SLAVE. ipa-server/accpetance/install needs to have been run first.
-Author: Michael Gregg <mgregg@redhat.com>
