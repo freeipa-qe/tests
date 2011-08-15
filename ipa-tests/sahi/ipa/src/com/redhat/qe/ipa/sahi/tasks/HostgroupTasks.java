@@ -1,10 +1,13 @@
 package com.redhat.qe.ipa.sahi.tasks;
+import java.util.logging.Logger;
 
+import com.redhat.qe.auto.testng.Assert;
 import com.redhat.qe.ipa.sahi.tasks.SahiTasks;
 
 
 
 public class HostgroupTasks {
+	private static Logger log = Logger.getLogger(UserTasks.class.getName());
 	
 	/*
 	 * Create a host group
@@ -367,5 +370,77 @@ public class HostgroupTasks {
 		sahiTasks.span("Delete").click();
 		sahiTasks.button(button).click();
 		sahiTasks.link("Host Groups").in(sahiTasks.div("content")).click();
+	}
+	
+	/*
+	 * add invalid host group
+	 * @param sahiTasks 
+	 * @param groupname - group name
+	 * @param description - description for group
+	 * @param expectedError - the error thrown when an invalid host group is being attempted to be added
+	 */
+	public static void addInvalidHostGroup(SahiTasks sahiTasks, String groupname, String description, String expectedError) {
+		sahiTasks.span("Add").click();
+		sahiTasks.textbox("cn").setValue(groupname);
+		sahiTasks.textbox("description").setValue(description);
+	
+		sahiTasks.button("Add").click();
+		//Check for expected error
+		log.fine("error check");
+		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.div(expectedError).exists(), "Verified expected error when adding invalid host group :: " + expectedError);
+	
+		log.fine("cancel(near retry)");
+		sahiTasks.button("Cancel").near(sahiTasks.button("Retry")).click();
+		log.fine("cancel");
+		sahiTasks.button("Cancel").near(sahiTasks.button("Add and Edit")).click();
+	}
+	
+	/*
+	 * Add invalid host group.
+	 * @param sahiTasks 
+	 * @param groupname - group name
+	 * @param description - description for host group
+	 * @param expectedError - the error thrown when an invalid host group is being attempted to be added
+	 */
+	public static void addInvalidCharHostGroup(SahiTasks sahiTasks, String groupname, String description, String expectedError) {
+		
+		sahiTasks.span("Add").click();
+		sahiTasks.textbox("cn").setValue(groupname);
+		sahiTasks.textbox("description").setValue(description);
+	
+		sahiTasks.button("Add").click();
+		//Check for expected error
+		log.fine("error check");
+		Assert.assertTrue(sahiTasks.span(expectedError).exists(), "Verified expected error when adding invalid host group :: " + expectedError);
+	
+		log.fine("cancel(near retry)");
+		sahiTasks.button("Cancel").click();
+	}
+	
+	/*
+	 * modify host group - invalid description - dirty page
+	 * @param sahiTasks 
+	 * @param groupname - group name
+	 * @param description - description for host group
+	 * @param expectedError - the error thrown when an invalid host group is being attempted to be added
+	 */
+	public static void modifyInvalidDirtyHostGroup(SahiTasks sahiTasks, String groupname, String description, String expectedError) {
+		
+		sahiTasks.link(groupname).click();
+		sahiTasks.link("Settings").click();
+		sahiTasks.textbox("description").setValue(description);
+		sahiTasks.span("Update").click();
+
+		//Check for expected error
+		log.fine("error check");
+		Assert.assertTrue(sahiTasks.div(expectedError).exists(), "Verified expected error when adding modifying host group :: " + expectedError);
+	
+		log.fine("cancel(near retry)");
+		sahiTasks.button("Cancel").click();
+		
+		sahiTasks.link("Host Groups").in(sahiTasks.div("content")).click();
+		if (sahiTasks.button("Reset").exists()) {
+			sahiTasks.button("Reset").click();
+		}
 	}
 }
