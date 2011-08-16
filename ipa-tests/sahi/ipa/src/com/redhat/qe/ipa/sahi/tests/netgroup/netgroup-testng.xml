@@ -15,6 +15,9 @@
 			    <include name="addAndEditNetGroupSettingsTest" />
 			    <include name="netGroupHostMembersTests" />
 			    <include name="netGroupHostGroupMembersTests" />
+			    <include name="netGroupUserGroupMembersTests" />
+			    <include name="netGroupUserMembersTests" />
+			    <include name="cleanup" />
 			    <!--
 				<include name="teardown"/>
 				-->
