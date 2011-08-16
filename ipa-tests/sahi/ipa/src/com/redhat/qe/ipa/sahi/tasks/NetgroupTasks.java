@@ -256,6 +256,39 @@ public class NetgroupTasks {
 	 * @param sahiTasks
 	 * @param groupname - name of host group
 	 * @param membertype - host hostgroup user usergroup netgroup
+	 * @param name - names of member to remove
+	 * @param button - Delete or Cancel
+	 */
+	public static void removeMember(SahiTasks sahiTasks, String groupName, String membertype, String name, String button) {
+		sahiTasks.link(groupName).click();
+		if (membertype == "host"){
+			sahiTasks.link("memberhost_host").click();
+		}
+		if (membertype == "hostgroup"){
+			sahiTasks.link("memberhost_hostgroup").click();
+		}
+		if (membertype == "user"){
+			sahiTasks.link("memberuser_user").click();
+		}
+		if (membertype == "usergroup"){
+			sahiTasks.link("memberuser_group").click();
+		}
+		if (membertype == "netgroup"){
+			sahiTasks.link("member_netgroup").click();
+		}
+		
+		sahiTasks.checkbox(name).click();
+
+		sahiTasks.span("Delete").click();
+		sahiTasks.button(button).click();
+		sahiTasks.link("Netgroups").in(sahiTasks.div("content")).click();
+	}
+	
+	/*
+	 * Remove net group members
+	 * @param sahiTasks
+	 * @param groupname - name of host group
+	 * @param membertype - host hostgroup user usergroup netgroup
 	 * @param names - array of names to remove as members
 	 * @param button - Delete or Cancel
 	 */
