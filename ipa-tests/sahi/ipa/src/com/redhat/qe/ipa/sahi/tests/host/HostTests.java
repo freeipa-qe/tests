@@ -21,7 +21,7 @@ public class HostTests extends SahiTestScript{
 	public static SahiTasks sahiTasks = null;	
 
 	private String domain = CommonTasks.ipadomain;
-	private String reversezone = System.getProperty("ipa.server.reversezone");
+	private String reversezone = CommonTasks.reversezone;
 	
 	//private String csr = "MIIBbDCB1gIBADAtMREwDwYDVQQKEwhURVNUUkVMTTEYMBYGA1UEAxMPbXlob3N0"+ "\n" + "LnRlc3RyZWxtMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDdegHkkCMdcET1"+ "\n" + "a+q+Edxn4KA5bcXMZeu2yjqokHFqRDNtdB6aLmec20XoW6kt9/lZDf47Mcm23M1H"+ "\n" + "xyJC+u5F0clbU7ojdaxbRqhO/D1MHDiLEH87VPqd6fhwDiV92tkWh68gKxEW29u/"+ "\n" + "COJcscYFf9X37jowYlYENY1i9mxjywIDAQABoAAwDQYJKoZIhvcNAQEFBQADgYEA"+ "\n" + "r9wrR2dn+b07GYfL1nIFsWryp1sb4pO8rr5UmGPNPQLVmm8zih25UKK96/yxe50w"+ "\n" + "z0mZoPCN6phMkHVNhINHa5laOsXwsLg+7aLfQEoOu1XWbWuNAjDA14g+JPB8wzlm"+ "\n" + "980PmlW3kOiJEA6EIzrTEhr5UiXSkv1yEevYNABK9Ys=";
 	private String badcsr = "MIIBcDCB2gIBADAxMRMwEQYDVQQKEwpRRS5MQUIuSVBBMRowGAYDVQQDExFteWdhv"+ "\n" + "c3QucWUubGFiLmlYTCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEA4lXS4N0r"+ "\n" + "lvJOwhv7eZdWLoaH5BwNoNgBObTAde4MYRejx75f3Ovo+8WVChRs/xDemDPGfWj0"+ "\n" + "9BW4BDXpX0Vaa3N4akIfKoxDnYckZlifuHxbyrZB9XX8eAZDMwtBzi30elEp5Cf5"+ "\n" + "SWMJ9WBOoXu/YIFOCC58aegXKJjPXLlzvrIoEsCAwEAAaAAMA0GCSqGSIb3DQEBBQUA"+ "\n" + "A4GBABK4TVlwNx4LzQvX/rgfqWTv33iIgkPFY4TLsXiR2XL74HAhDDk5JYJM3DGHP"+ "\n" + "4Si7E/vX6ea6IZuNAul0koIJtT2etUo8oebOKQPFb1F1AY+h6sW/QC3DH20hT85H"+ "\n" + "KhPLOBcjOSY/T9M4u5xsjVtzqZMJCdFKFRg9pLBUrCZhu3Z";
