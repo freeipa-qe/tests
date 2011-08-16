@@ -304,6 +304,9 @@ public class HostgroupTasks {
 		if (memberoftype == "hostgroup"){
 			sahiTasks.link("memberof_hostgroup").click();
 		}
+		if (memberoftype == "netgroup"){
+			sahiTasks.link("memberof_netgroup").click();
+		}
 		if (memberoftype == "hbacrule"){
 			sahiTasks.link("memberof_hbacrule").click();
 		}
@@ -314,10 +317,10 @@ public class HostgroupTasks {
 		
 		for (String grprulename : grprulenames) {
 			if (exists == "YES"){
-				com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(grprulename).exists(), "Host group " + groupName + " is a memberof host group " + memberoftype + ": " + grprulename);
+				com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(grprulename).exists(), "Host group " + groupName + " is a memberof " + memberoftype + ": " + grprulename);
 			}
 			else {
-				com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(grprulename).exists(), "Host group " + groupName + " is NOT a memberof host group " + memberoftype + ": " + grprulename);
+				com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(grprulename).exists(), "Host group " + groupName + " is NOT a memberof " + memberoftype + ": " + grprulename);
 			}
 		}
 		sahiTasks.link("Host Groups").in(sahiTasks.div("content")).click();
