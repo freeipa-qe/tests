@@ -7,7 +7,177 @@ import com.redhat.qe.ipa.sahi.tests.group.GroupTests;
 
 public class GroupTasks {
     private static Logger log = Logger.getLogger(GroupTasks.class.getName());
-        
+     
+    /*
+     * Add a Group
+     * @param sahiTasks 
+     * @param groupName - user group name
+     * @param groupDescription - group description
+     */
+    public static void addGroup(SahiTasks sahiTasks, String groupName, String groupDescription) {
+        sahiTasks.span("Add").click();
+        sahiTasks.textbox("cn").setValue(groupName);
+        sahiTasks.textbox("description").setValue(groupDescription);
+        sahiTasks.button("Add").click();
+    }
+    
+    /*
+     * Delete a Group
+     * @param sahiTasks 
+     * @param groupname - name of group to delete
+     */
+    public static void deleteGroup(SahiTasks sahiTasks, String groupName) {
+    	sahiTasks.checkbox(groupName).click();
+        sahiTasks.link("Delete").click();
+        sahiTasks.button("Delete").click();
+    }
+    
+    /*
+     * Delete a Group
+     * @param sahiTasks 
+     * @param groupnames - array of group names to delete
+     */
+    public static void deleteGroup(SahiTasks sahiTasks, String [] groupnames) {
+    	for (String groupname : groupnames) {
+    		sahiTasks.checkbox(groupname).click();
+    	}
+        sahiTasks.link("Delete").click();
+        sahiTasks.button("Delete").click();
+    }
+    
+    /*
+	 * verify members
+	 * @param sahiTasks
+	 * @param groupname - name of user group
+	 * @param membertype - user or usergroup
+	 * @param name - name of member to verify
+	 * @param type - direct or indirect
+	 * @param exists - whether or not they should be members YES if they should be
+	 */
+	public static void verifyMembers(SahiTasks sahiTasks, String groupName, String membertype, String name, String exists) {
+		sahiTasks.link(groupName).click();
+		if (membertype == "user"){
+			sahiTasks.link("member_user").click();
+		}
+		if (membertype == "usergroup"){
+			sahiTasks.link("member_group").click();
+		}	
+
+		if (exists == "YES"){
+			com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(name).exists(), membertype + " " + name + " is a member of user group " + groupName);
+		}
+		else {
+			com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(name).exists(), membertype + " " + name + " is NOT member of user group " + groupName);
+		}
+
+		sahiTasks.link("User Groups").in(sahiTasks.div("content")).click();
+	}
+    
+    /*
+	 * verify members
+	 * @param sahiTasks
+	 * @param groupname - name of user group
+	 * @param membertype - user or usergroup
+	 * @param names - array of names to verify
+	 * @param type - direct or indirect
+	 * @param exists - whether or not they should be members YES if they should be
+	 */
+	public static void verifyMembers(SahiTasks sahiTasks, String groupName, String membertype, String [] names, String exists) {
+		sahiTasks.link(groupName).click();
+		if (membertype == "user"){
+			sahiTasks.link("member_user").click();
+		}
+		if (membertype == "usergroup"){
+			sahiTasks.link("member_group").click();
+		}	
+		for (String name : names) {
+			if (exists == "YES"){
+				com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(name).exists(), membertype + " " + name + " is a member of user group " + groupName);
+			}
+			else {
+				com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(name).exists(), membertype + " " + name + " is NOT member of user group " + groupName);
+			}
+		}
+		sahiTasks.link("User Groups").in(sahiTasks.div("content")).click();
+	}
+	
+	/*
+	 * verify member of
+	 * @param sahiTasks
+	 * @param groupname - name of host group
+	 * @param memberoftype - usergroups, netgroups, roles, hbacrules or sudorules
+	 * @param names - array of group or rule names to verify
+	 * @param type - direct or indirect
+	 * @param exists - whether or not they should be members of the enroll type - YES if they should be
+	 */
+	public static void verifyMemberOf(SahiTasks sahiTasks, String groupName, String memberoftype, String [] grprulenames, String type, String exists) {
+		sahiTasks.link(groupName).click();
+		if (memberoftype == "usergroups"){
+			sahiTasks.link("memberof_hostgroup").click();
+		}
+		if (memberoftype == "netgroups"){
+			sahiTasks.link("memberof_netgroup").click();
+		}
+		if (memberoftype == "roles"){
+			sahiTasks.link("memberof_rule").click();
+		}
+		if (memberoftype == "hbacrules"){
+			sahiTasks.link("memberof_hbacrule").click();
+		}
+		if (memberoftype == "sudorules"){
+			sahiTasks.link("memberof_sudorule").click();
+		}
+		sahiTasks.radio(type).click();
+		
+		for (String grprulename : grprulenames) {
+			if (exists == "YES"){
+				com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(grprulename).exists(), "User group " + groupName + " is a memberof " + memberoftype + ": " + grprulename);
+			}
+			else {
+				com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(grprulename).exists(), "User group " + groupName + " is NOT a memberof " + memberoftype + ": " + grprulename);
+			}
+		}
+		sahiTasks.link("User Groups").in(sahiTasks.div("content")).click();
+	}
+	
+	/*
+	 * verify member of
+	 * @param sahiTasks
+	 * @param groupname - name of host group
+	 * @param memberoftype - usergroups, netgroups, roles, hbacrules or sudorules
+	 * @param name - name of rule or group that user group to verify member of
+	 * @param type - direct or indirect
+	 * @param exists - whether or not they should be members of the enroll type - YES if they should be
+	 */
+	public static void verifyMemberOf(SahiTasks sahiTasks, String groupName, String memberoftype, String grprulename, String type, String exists) {
+		sahiTasks.link(groupName).click();
+		if (memberoftype == "usergroups"){
+			sahiTasks.link("memberof_hostgroup").click();
+		}
+		if (memberoftype == "netgroups"){
+			sahiTasks.link("memberof_netgroup").click();
+		}
+		if (memberoftype == "roles"){
+			sahiTasks.link("memberof_rule").click();
+		}
+		if (memberoftype == "hbacrules"){
+			sahiTasks.link("memberof_hbacrule").click();
+		}
+		if (memberoftype == "sudorules"){
+			sahiTasks.link("memberof_sudorule").click();
+		}
+		sahiTasks.radio(type).click();
+		
+		if (exists == "YES"){
+			com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(grprulename).exists(), "User group " + groupName + " is a memberof " + memberoftype + ": " + grprulename);
+		}
+		else {
+			com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(grprulename).exists(), "User group " + groupName + " is NOT a memberof " + memberoftype + ": " + grprulename);
+		}
+
+		sahiTasks.link("User Groups").in(sahiTasks.div("content")).click();
+	}
+    
     /*
      * Create a Group, the purpose of this is to provide a public interface to other test suite to create a new group.
      * @param sahiTasks 
@@ -27,12 +197,6 @@ public class GroupTasks {
 
     }//createGroupService
 
-    
-    public static void deleteGroup(SahiTasks sahiTasks, String groupName) {
-    	sahiTasks.checkbox(groupName).click();
-        sahiTasks.link("Delete").click();
-        sahiTasks.button("Delete").click();
-    }
 
     /*
      * Test for: Simple add Group
