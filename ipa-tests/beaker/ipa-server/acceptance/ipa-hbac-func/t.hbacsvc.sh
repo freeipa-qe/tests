@@ -41,31 +41,6 @@
 
 hbacsvc_setup() {
 
-
-rlPhaseStartSetup "ipa-hbacsvc-func: Setup of users"
-
-	rlRun "cat /dev/shm/env.sh" #TODO
-        rlRun "TmpDir=\`mktemp -d\`" 0 "Creating tmp directory"
-        rlRun "pushd $TmpDir"
-        rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-
-        # add host for testing
-        rlRun "addHost $CLIENT1" 0 "SETUP: Adding host $CLIENT1 for testing."
-        rlRun "addHost $CLIENT2" 0 "SETUP: Adding host $CLIENT2 for testing."
-
-        # kinit as admin and creating users
-        rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-        rlRun "create_ipauser $user1 $user1 $user1 $userpw"
-        sleep 5
-        rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-        rlRun "create_ipauser $user2 $user2 $user2 $userpw"
-        sleep 5
-        rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-        rlRun "create_ipauser $user3 $user3 $user3 $userpw"
-
-rlPhaseEnd
-
-
 	rlPhaseStartTest "ipa-hbacsvc-001: Setup IPA Server HBAC - SSHD Service"
 
         	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
@@ -77,18 +52,7 @@ rlPhaseEnd
 		rlRun "ipa hbacrule-add-service rule1 --hbacsvcs=sshd"
 		rlRun "ipa hbacrule-show rule1 --all"
 	rlPhaseEnd
-
-
-    rlPhaseStartCleanup "ipa-hbacrule-func-cleanup: Destroying admin credentials."
-        # delete service group
-        rlRun "ipa hbacsvcgroup-del $servicegroup" 0 "CLEANUP: Deleting service group $servicegroup"
-
-        rlRun "kdestroy" 0 "Destroying admin credentials."
-    rlPhaseEnd
-
-
 }
-
 
 
 hbac_client1() {
@@ -122,7 +86,7 @@ EOF
    }
 
                 rlRun "auth_success $user1 testpw123@ipa.com"
-
+	rlPhaseEnd
 }
 
 
@@ -157,7 +121,7 @@ EOF
    }
 
                 rlRun "auth_failure $user1 testpw123@ipa.com"
-
+	rlPhaseEnd
 }
 
 

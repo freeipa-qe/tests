@@ -130,11 +130,42 @@ PACKAGELIST="ipa-admintools ipa-client httpd mod_nss mod_auth_kerb 389-ds-base e
         if [ $? -eq 0 ] ; then
                 rlLog "Machine in recipe is MASTER"
 
+	rlPhaseStartSetup "ipa-hbacsvc-func: Setup of users"
+
+        	rlRun "cat /dev/shm/env.sh" #TODO
+	        rlRun "TmpDir=\`mktemp -d\`" 0 "Creating tmp directory"
+        	rlRun "pushd $TmpDir"
+	        rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+
+	        # add host for testing
+	        rlRun "addHost $CLIENT1" 0 "SETUP: Adding host $CLIENT1 for testing."
+	        rlRun "addHost $CLIENT2" 0 "SETUP: Adding host $CLIENT2 for testing."
+
+        	# kinit as admin and creating users
+	        rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+	        rlRun "create_ipauser $user1 $user1 $user1 $userpw"
+	        sleep 5
+	        rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+	        rlRun "create_ipauser $user2 $user2 $user2 $userpw"
+	        sleep 5
+	        rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+	        rlRun "create_ipauser $user3 $user3 $user3 $userpw"
+
+	rlPhaseEnd
+
+
                 rhts-sync-block -s DONE -s DONE $CLIENT1 $CLIENT2
-                rlPass
-			hbacsvc_setup
-			rhts-sync-set -s HBACSVC_SETUP
-                	rhts-sync-block -s HBACSVC_DONE -s HBACSVC_DONE $CLIENT1 $CLIENT2
+		hbacsvc_setup
+		rhts-sync-set -s HBACSVC_SETUP
+               	rhts-sync-block -s HBACSVC_DONE -s HBACSVC_DONE $CLIENT1 $CLIENT2
+
+	rlPhaseStartCleanup "ipa-hbacrule-func-cleanup: Destroying admin credentials."
+        	# delete service group
+	        rlRun "ipa hbacsvcgroup-del $servicegroup" 0 "CLEANUP: Deleting service group $servicegroup"
+
+	        rlRun "kdestroy" 0 "Destroying admin credentials."
+	rlPhaseEnd
+
 
         else
                 rlLog "Machine in recipe in not a MASTER"
