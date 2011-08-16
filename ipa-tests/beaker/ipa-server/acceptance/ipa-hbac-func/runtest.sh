@@ -69,7 +69,7 @@ cat /dev/shm/env.sh #TODO
 
 PACKAGELIST="ipa-admintools ipa-client httpd mod_nss mod_auth_kerb 389-ds-base expect"
 
-
+rlJournalStart
         #####################################################################
         #               IS THIS MACHINE A CLIENT1?                          #
         #####################################################################
@@ -83,14 +83,21 @@ PACKAGELIST="ipa-admintools ipa-client httpd mod_nss mod_auth_kerb 389-ds-base e
 	echo $CLIENT1
         echo $CLIENT1 | grep $HOSTNAME
         if [ $? -eq 0 ] ; then
+
+	rlPhaseStartSetup "ipa-hbacsvc-func: Checking client"
                 rlLog "Machine in recipe is CLIENT1"
                 rlRun "service iptables stop" 0 "Stop the firewall on the client"
+	rlPhaseEnd
+
                 rhts-sync-set -s DONE
 		rhts-sync-block -s HBACSVC_SETUP $MASTER 
 		hbacsvc_client1
 		rhts-sync-set -s HBACSVC_DONE
+
         else
+
                 rlLog "Machine in recipe in not a CLIENT1"
+
         fi
 
         #####################################################################
@@ -108,14 +115,21 @@ PACKAGELIST="ipa-admintools ipa-client httpd mod_nss mod_auth_kerb 389-ds-base e
 	echo $CLIENT2
         echo $CLIENT2 | grep $HOSTNAME
         if [ $? -eq 0 ] ; then
+
+	rlPhaseStartSetup "ipa-hbacsvc-func: Checking client"
                 rlLog "Machine in recipe is CLIENT2"
                 rlRun "service iptables stop" 0 "Stop the firewall on the client"
+	rlPhaseEnd
+
                 rhts-sync-set -s DONE
 		rhts-sync-block -s HBACSVC_SETUP $MASTER 
 		hbacsvc_client2
 		rhts-sync-set -s HBACSVC_DONE
+
         else
+
                 rlLog "Machine in recipe in not a CLIENT2"
+
         fi
 
         #####################################################################
@@ -124,9 +138,11 @@ PACKAGELIST="ipa-admintools ipa-client httpd mod_nss mod_auth_kerb 389-ds-base e
         #               IS THIS MACHINE A MASTER?                           #
         #####################################################################
         rc=0
+
 	echo $HOSTNAME
 	echo $MASTER
-        echo $MASTER | grep `hostname -s`
+        echo $MASTER | grep $HOSTNAME
+        #echo $MASTER | grep `hostname -s`
         if [ $? -eq 0 ] ; then
                 rlLog "Machine in recipe is MASTER"
 
@@ -153,15 +169,14 @@ PACKAGELIST="ipa-admintools ipa-client httpd mod_nss mod_auth_kerb 389-ds-base e
 
 	rlPhaseEnd
 
-
                 rhts-sync-block -s DONE -s DONE $CLIENT1 $CLIENT2
 		hbacsvc_setup
 		rhts-sync-set -s HBACSVC_SETUP
                	rhts-sync-block -s HBACSVC_DONE -s HBACSVC_DONE $CLIENT1 $CLIENT2
 
 	rlPhaseStartCleanup "ipa-hbacrule-func-cleanup: Destroying admin credentials."
-        	# delete service group
-	        rlRun "ipa hbacsvcgroup-del $servicegroup" 0 "CLEANUP: Deleting service group $servicegroup"
+        	# delete hbac service 
+	        rlRun "ipa hbacrule-del rule1" 0 "CLEANUP: Deleting rule rule1"
 
 	        rlRun "kdestroy" 0 "Destroying admin credentials."
 	rlPhaseEnd
