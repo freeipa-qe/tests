@@ -28,7 +28,7 @@ export TESTVERSION=1.0
 
 BUILT_FILES=
 
-FILES=$(METADATA) ipa-server-shared.sh runtest.sh ipa-host-cli-lib.sh ipa-group-cli-lib.sh ipa-hostgroup-cli-lib.sh ipa-service-cli-lib.sh ipa-netgroup-cli-lib.sh ipa-hbac-cli-lib.sh lib.user-cli.sh Makefile PURPOSE set-root-pw.exp nis-scripts.sh id_rsa.pub id_rsa id_dsa.pub id_dsa env.sh id_rsa_global.pub id_rsa_global known_hosts
+FILES=$(METADATA) ipa-server-shared.sh runtest.sh ipa-host-cli-lib.sh ipa-group-cli-lib.sh ipa-hostgroup-cli-lib.sh ipa-service-cli-lib.sh ipa-netgroup-cli-lib.sh ipa-hbac-cli-lib.sh lib.user-cli.sh Makefile PURPOSE set-root-pw.exp nis.sh id_rsa.pub id_rsa id_dsa.pub id_dsa env.sh id_rsa_global.pub id_rsa_global known_hosts
 
 .PHONY: all install download clean
 
@@ -52,8 +52,8 @@ run: $(FILES) build
 	cp ./ipa-hbac-cli-lib.sh /dev/shm/.
 	rm -f /dev/shm/lib.user-cli.sh
 	cp ./ipa-service-cli-lib.sh /dev/shm/.
-	rm -f /dev/shm/nis-scripts.sh
-	cp ./nis-scripts.sh /dev/shm/.
+	rm -f /dev/shm/nis.sh
+	cp ./nis.sh /dev/shm/.
 	rm -f /dev/shm/ipa-service-cli-lib.sh
 	cp ./lib.user-cli.sh /dev/shm/.
 	rm -f /dev/shm/set-root-pw.exp
