@@ -75,7 +75,7 @@ rlJournalStart
         #####################################################################
         rc=0
 
-	# Checking if CLIENT1 and CLIENT2 can be identified #TODO	
+	# Checking if CLIENT1 and CLIENT2 can be identified
 	SHORT_HOST1=`cat /dev/shm/env.sh | grep BEAKERCLIENT |  cut -d "=" -f 2 | cut -d " " -f 1 | cut -d . -f 1`
 	CLIENT1=$SHORT_HOST1.$DOMAIN
 
@@ -87,12 +87,12 @@ rlJournalStart
 	rlPhaseStartSetup "ipa-hbacsvc-func: Checking client"
                 rlLog "Machine in recipe is CLIENT1"
                 rlRun "service iptables stop" 0 "Stop the firewall on the client"
-	rlPhaseEnd
 
                 rhts-sync-set -s DONE
 		rhts-sync-block -s HBACSVC_SETUP $MASTER 
 		hbacsvc_client1
 		rhts-sync-set -s HBACSVC_DONE
+	rlPhaseEnd
 
         else
 
@@ -107,7 +107,7 @@ rlJournalStart
         #####################################################################
         rc=0
 
-        # Checking if CLIENT1 and CLIENT2 can be identified #TODO       
+        # Checking if CLIENT1 and CLIENT2 can be identified 
         SHORT_HOST2=`cat /dev/shm/env.sh | grep BEAKERCLIENT | cut -d " " -f 3 | cut -d . -f 1`
         CLIENT2=$SHORT_HOST2.$DOMAIN
 
@@ -119,12 +119,12 @@ rlJournalStart
 	rlPhaseStartSetup "ipa-hbacsvc-func: Checking client"
                 rlLog "Machine in recipe is CLIENT2"
                 rlRun "service iptables stop" 0 "Stop the firewall on the client"
-	rlPhaseEnd
 
                 rhts-sync-set -s DONE
 		rhts-sync-block -s HBACSVC_SETUP $MASTER 
 		hbacsvc_client2
 		rhts-sync-set -s HBACSVC_DONE
+	rlPhaseEnd
 
         else
 
@@ -148,7 +148,7 @@ rlJournalStart
 
 	rlPhaseStartSetup "ipa-hbacsvc-func: Setup of users"
 
-        	rlRun "cat /dev/shm/env.sh" #TODO
+        	rlRun "cat /dev/shm/env.sh"
 	        rlRun "TmpDir=\`mktemp -d\`" 0 "Creating tmp directory"
         	rlRun "pushd $TmpDir"
 	        rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
@@ -167,12 +167,11 @@ rlJournalStart
 	        rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 	        rlRun "create_ipauser $user3 $user3 $user3 $userpw"
 
-	rlPhaseEnd
-
                 rhts-sync-block -s DONE -s DONE $CLIENT1 $CLIENT2
 		hbacsvc_setup
 		rhts-sync-set -s HBACSVC_SETUP
                	rhts-sync-block -s HBACSVC_DONE -s HBACSVC_DONE $CLIENT1 $CLIENT2
+	rlPhaseEnd
 
 	rlPhaseStartCleanup "ipa-hbacrule-func-cleanup: Destroying admin credentials."
         	# delete hbac service 
