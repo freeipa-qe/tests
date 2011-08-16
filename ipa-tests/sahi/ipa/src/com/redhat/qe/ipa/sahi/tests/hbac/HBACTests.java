@@ -43,7 +43,8 @@ public class HBACTests extends SahiTestScript {
 	
 	//Host  used in this testsuite
 	private String domain = System.getProperty("ipa.server.domain");
-	private String fqdn = "hbachost." + domain;
+	private String hostname = "hbachost";
+	private String fqdn = hostname + "." + domain;
 	private String ipadr = "";
 	
 	//Hostgroup used in this testsuite
@@ -64,7 +65,7 @@ public class HBACTests extends SahiTestScript {
 		sahiTasks = SahiTestScript.getSahiTasks();	
 		sahiTasks.setStrictVisibilityCheck(true);
 		
-/*		//verify objects required for this suite do not already exist
+		//verify objects required for this suite do not already exist
 		HBACTasks.checkIfObjectsReqdByTestExist(sahiTasks, uid, groupName, fqdn, hostgroupName);
 		
 		//add new user, user group, host, host group
@@ -76,11 +77,11 @@ public class HBACTests extends SahiTestScript {
 		
 
 		sahiTasks.navigateTo(System.getProperty("ipa.server.url")+ CommonTasks.hostPage, true);
-		HostTasks.addHost(sahiTasks, fqdn, ipadr);
+		HostTasks.addHost(sahiTasks, hostname, ipadr);
 		
 		sahiTasks.navigateTo(System.getProperty("ipa.server.url")+ CommonTasks.hostgroupPage, true);
 		HostgroupTasks.addHostGroup(sahiTasks, hostgroupName, description, "Add");
-		HostgroupTasks.addMembers(sahiTasks, hostgroupName, membertype, names, "Enroll");*/
+		HostgroupTasks.addMembers(sahiTasks, hostgroupName, membertype, names, "Enroll");
 		
 		
 		sahiTasks.navigateTo(System.getProperty("ipa.server.url")+ CommonTasks.hbacPage, true);
@@ -138,8 +139,7 @@ public class HBACTests extends SahiTestScript {
 	/*
 	 * Add, and edit HBACRule
 	 */	
-	//@Test (groups={"hbacRuleAddAndEditTests"}, dataProvider="getSingleHBACRuleTestObjects", dependsOnGroups="hbacRuleCancelAddTests")	
-	@Test (groups={"hbacRuleAddAndEditTests"}, dataProvider="getSingleHBACRuleTestObjects")
+	@Test (groups={"hbacRuleAddAndEditTests"}, dataProvider="getSingleHBACRuleTestObjects", dependsOnGroups="hbacRuleCancelAddTests")	
 	public void testHBACRuleAddAndEdit(String testName, String cn) throws Exception {
 		
 		//verify rule doesn't exist
@@ -149,10 +149,10 @@ public class HBACTests extends SahiTestScript {
 		String service = "ftp" ;
 		
 		//new test rule can be added now
-		HBACTasks.addAndEditHBACRule(sahiTasks, cn, uid, hostgroupName, service);				
+		HBACTasks.addAndEditHBACRule(sahiTasks, cn, uid, hostgroupName, service, fqdn);				
 		
 		//verify changes	
-		HBACTasks.verifyHBACRuleUpdates(sahiTasks, cn, uid, hostgroupName, service);
+		HBACTasks.verifyHBACRuleUpdates(sahiTasks, cn, uid, hostgroupName, service, fqdn);
 	}
 	
 	/*
@@ -173,7 +173,9 @@ public class HBACTests extends SahiTestScript {
 	/*
 	 * Delete an HBACRule
 	 */
-	@Test (groups={"hbacRuleDeleteTests"}, dataProvider="getHBACRuleDeleteTestObjects", dependsOnGroups={"hbacRuleAddAndEditTests", "hbacRuleAddAndAddAnotherTests", "hbacRuleSearchTests" })	
+	@Test (groups={"hbacRuleDeleteTests"}, dataProvider="getHBACRuleDeleteTestObjects", dependsOnGroups={"hbacRuleAddAndEditTests",
+			"hbacRuleAddAndAddAnotherTests", "hbacRuleSearchTests", "hbacRuleViaServiceSettingsTests", "hbacRuleWhoSettingsTests", 
+			"hbacRuleGeneralSettingsTests", "hbacRuleFromSettingsTests" })	
 	public void testHBACRuleDelete(String testName, String cn) throws Exception {
 		//verify rule to be deleted exists
 		Assert.assertTrue(sahiTasks.link(cn).exists(), "Verify HBAC Rule " + cn + "  to be deleted exists");
@@ -219,13 +221,18 @@ public class HBACTests extends SahiTestScript {
 	}
 	
 	/*
-	 * Edit an HBACRule
+	 * Edit, but Reset/Undo an HBACRule
 	 */
+	@Test (groups={"hbacRuleResetUndoSettingsTests"}, dataProvider="getSingleHBACRuleTestObjects", dependsOnGroups={"hbacRuleAddAndEditTests"})	
+	public void testHBACRuleResetSettings(String testName, String cn) throws Exception {		
+		//verify rule to be edited exists
+		Assert.assertTrue(sahiTasks.link(cn).exists(), "Verify Rule " + cn + " to be edited exists");
+		
+		//modify this rule, then reset/undo
+		HBACTasks.resetUndoHBACRuleSections(sahiTasks, cn);
+		
+	}
 	
-	
-	/*
-	 * Edit, but Reset an HBACRule
-	 */
 	
 	
 	/*
@@ -259,25 +266,63 @@ public class HBACTests extends SahiTestScript {
 		HBACTasks.verifyHBACRuleWhoSection(sahiTasks, cn, uid, groupName);
 	}
 	
-	/*
-	 * Edit...undo changes for an HBACRule
-	 */
 	
 	/*
 	 * Edit the Accessing Section for the HBACRule
 	 */
+	@Test (groups={"hbacRuleAccessingSettingsTests"}, dataProvider="getSingleHBACRuleTestObjects", dependsOnGroups={"hbacRuleAddAndEditTests"})	
+	public void testHBACRuleAccessingSettings(String testName, String cn) throws Exception {		
+		//verify rule to be edited exists
+		Assert.assertTrue(sahiTasks.link(cn).exists(), "Verify Rule " + cn + " to be edited exists");
+		
+		//modify this rule
+		HBACTasks.modifyHBACRuleAccessingSection(sahiTasks, cn, fqdn, hostgroupName);
+		
+		//verify changes	
+		HBACTasks.verifyHBACRuleAccessingSection(sahiTasks, cn, fqdn, hostgroupName);
+	}
 	
 	/*
 	 * Edit the From Section for the HBACRule
 	 */
+	@Test (groups={"hbacRuleFromSettingsTests"}, dataProvider="getSingleHBACRuleTestObjects", dependsOnGroups={"hbacRuleAddAndEditTests"})	
+	public void testHBACRuleFromSettings(String testName, String cn) throws Exception {		
+		//verify rule to be edited exists
+		Assert.assertTrue(sahiTasks.link(cn).exists(), "Verify Rule " + cn + " to be edited exists");
+		
+		//modify this rule
+		HBACTasks.modifyHBACRuleFromSection(sahiTasks, cn, fqdn, hostgroupName);
+		
+		//verify changes	
+		HBACTasks.verifyHBACRuleFromSection(sahiTasks, cn, fqdn, hostgroupName);
+	}
 	
 	/*
 	 * Edit the Via Service Section for the HBACRule
 	 */
+	@Test (groups={"hbacRuleViaServiceSettingsTests"}, dataProvider="getSingleHBACRuleTestObjects", dependsOnGroups={"hbacRuleAddAndEditTests"})	
+	public void testHBACRuleViaServiceSettings(String testName, String cn) throws Exception {		
+		//verify rule to be edited exists
+		Assert.assertTrue(sahiTasks.link(cn).exists(), "Verify Rule " + cn + " to be edited exists");
+		
+		//modify this rule
+		String searchString = "dm";
+		String searchResult[] = {"gdm", "gdm-password", "kdm" };
+		HBACTasks.modifyHBACRuleViaServiceSection(sahiTasks, cn, searchString, searchResult );
+		
+		//verify changes	
+		HBACTasks.verifyHBACRuleViaServiceSection(sahiTasks, cn, searchResult);
+	}
 	
 	/*
 	 * Expand/Collapse details of an HBACRule
 	 */
+	@Test (groups={"hbacRuleExpandCollapseTests"}, dataProvider="getSingleHBACRuleTestObjects",  dependsOnGroups="hbacRuleAddAndEditTests")
+	public void testHBACRuleExpandCollapse(String testName, String cn) throws Exception {
+		
+		HBACTasks.expandCollapseRule(sahiTasks, cn);		
+		
+	}
 	
 	/*
 	 * Search an HBACRule
