@@ -84,22 +84,11 @@ PACKAGELIST="ipa-admintools ipa-client httpd mod_nss mod_auth_kerb 389-ds-base e
         echo $CLIENT1 | grep $HOSTNAME
         if [ $? -eq 0 ] ; then
                 rlLog "Machine in recipe is CLIENT1"
-                if [ $rc -eq 0 ] ; then
-                        for item in $PACKAGELIST ; do
-                                rpm -qa | grep $item
-                                if [ $? -eq 0 ] ; then
-                                        rlPass "$item package is installed"
-                                else
-                                        rlLog "$item package NOT found!"
-                                        rlRun "yum install -y $item"
-                                fi
-                        done
-                        rlRun "service iptables stop" 0 "Stop the firewall on the client"
-                        rhts-sync-set -s DONE
-			rhts-sync-block -s HBACSVC_SETUP $MASTER 
-			hbacsvc_client1
-			rhts-sync-set -s HBACSVC_DONE
-                fi
+                rlRun "service iptables stop" 0 "Stop the firewall on the client"
+                rhts-sync-set -s DONE
+		rhts-sync-block -s HBACSVC_SETUP $MASTER 
+		hbacsvc_client1
+		rhts-sync-set -s HBACSVC_DONE
         else
                 rlLog "Machine in recipe in not a CLIENT1"
         fi
@@ -120,24 +109,11 @@ PACKAGELIST="ipa-admintools ipa-client httpd mod_nss mod_auth_kerb 389-ds-base e
         echo $CLIENT2 | grep $HOSTNAME
         if [ $? -eq 0 ] ; then
                 rlLog "Machine in recipe is CLIENT2"
-                if [ $rc -eq 0 ] ; then
-                        for item in $PACKAGELIST ; do
-                                rpm -qa | grep $item
-                                if [ $? -eq 0 ] ; then
-                                        rlPass "$item package is installed"
-                                else
-                                        rlLog "$item package NOT found!"
-                                        rlRun "yum install -y $item"
-                                fi
-                        done
-                        rlRun "service iptables stop" 0 "Stop the firewall on the client"
-
-
-                        rhts-sync-set -s DONE
-			rhts-sync-block -s HBACSVC_SETUP $MASTER 
-			hbacsvc_client2
-			rhts-sync-set -s HBACSVC_DONE
-                fi
+                rlRun "service iptables stop" 0 "Stop the firewall on the client"
+                rhts-sync-set -s DONE
+		rhts-sync-block -s HBACSVC_SETUP $MASTER 
+		hbacsvc_client2
+		rhts-sync-set -s HBACSVC_DONE
         else
                 rlLog "Machine in recipe in not a CLIENT2"
         fi
