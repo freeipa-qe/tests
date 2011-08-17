@@ -1,10 +1,14 @@
 package com.redhat.qe.ipa.sahi.tasks;
 
+import java.util.logging.Logger;
+
+import com.redhat.qe.auto.testng.Assert;
 import com.redhat.qe.ipa.sahi.tasks.SahiTasks;
 
 
 
 public class NetgroupTasks {
+	private static Logger log = Logger.getLogger(UserTasks.class.getName());
 	
 	/*
 	 * Create a net group
@@ -316,5 +320,50 @@ public class NetgroupTasks {
 		sahiTasks.span("Delete").click();
 		sahiTasks.button(button).click();
 		sahiTasks.link("Netgroups").in(sahiTasks.div("content")).click();
+	}
+	
+	/*
+	 * add invalid net group
+	 * @param sahiTasks 
+	 * @param groupname - group name
+	 * @param description - description for group
+	 * @param expectedError - the error thrown when an invalid net group is being attempted to be added
+	 */
+	public static void addInvalidNetGroup(SahiTasks sahiTasks, String groupname, String description, String expectedError) {
+		sahiTasks.span("Add").click();
+		sahiTasks.textbox("cn").setValue(groupname);
+		sahiTasks.textbox("description").setValue(description);
+	
+		sahiTasks.button("Add").click();
+		//Check for expected error
+		log.fine("error check");
+		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.div(expectedError).exists(), "Verified expected error when adding invalid host group :: " + expectedError);
+	
+		log.fine("cancel(near retry)");
+		sahiTasks.button("Cancel").near(sahiTasks.button("Retry")).click();
+		log.fine("cancel");
+		sahiTasks.button("Cancel").near(sahiTasks.button("Add and Edit")).click();
+	}
+	
+	/*
+	 * Add invalid net group.
+	 * @param sahiTasks 
+	 * @param groupname - group name
+	 * @param description - description for host group
+	 * @param expectedError - the error thrown when an invalid net group is being attempted to be added
+	 */
+	public static void addInvalidCharNetGroup(SahiTasks sahiTasks, String groupname, String description, String expectedError) {
+		
+		sahiTasks.span("Add").click();
+		sahiTasks.textbox("cn").setValue(groupname);
+		sahiTasks.textbox("description").setValue(description);
+	
+		sahiTasks.button("Add").click();
+		//Check for expected error
+		log.fine("error check");
+		Assert.assertTrue(sahiTasks.span(expectedError).exists(), "Verified expected error when adding invalid net group :: " + expectedError);
+	
+		log.fine("cancel(near retry)");
+		sahiTasks.button("Cancel").click();
 	}
 }
