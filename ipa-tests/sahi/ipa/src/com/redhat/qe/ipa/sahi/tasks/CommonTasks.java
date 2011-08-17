@@ -25,7 +25,8 @@ public class CommonTasks {
 	public static String netgroupPage = "/ipa/ui/#identity=netgroup&navigation=identity";
 	public static String dnsPage = "/ipa/ui/#dns=dnszone&identity=dns&navigation=identity";
 	public static String alternateDNSpage = dnsPage + "&dnszone-facet=search";
-	
+	public static String passwordPolicyPage = "/ipa/ui/#policy=pwpolicy&navigation=policy";
+	public static String kerberosTicketPolicyPage = "/ipa/ui/#policy=krbtpolicy&navigation=policy";
 	
 	public static String hbacPage = "/ipa/ui/#hbac=hbacrule&policy=hbac&navigation=policy";	
 	public static String sudoPage = "/ipa/ui/#navigation=policy&policy=sudo";

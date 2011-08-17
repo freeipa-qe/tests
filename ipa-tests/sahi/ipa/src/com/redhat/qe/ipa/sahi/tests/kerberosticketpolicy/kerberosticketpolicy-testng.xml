@@ -1,0 +1,30 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+<suite name="IPAKerberosTicketPolicyTestSuite">	
+    <test name="IPAKerberosTicketPolicy Tests" preserve-order="true">
+            	<packages>
+            	    <package name="com.redhat.qe.ipa.sahi.*" />
+            	</packages>
+            	<groups>
+            	    <run>
+            	        <include name="setup" />
+            	        <include name="init" />   
+            	         
+            	         <include name="modifyKerberosTicketPolicy" /> 
+            	         <include name="modifyKerberosTicketPolicyNegative" />
+            	         
+            	        <!--  the following are premature, comment out 
+                       
+                          end of comment out tests -->
+                         
+            	    </run>
+            	</groups>
+            	<classes>
+            	    <class name="com.redhat.qe.ipa.sahi.tests.kerberosticketpolicy.KerberosTicketPolicyTests" />
+            	</classes>
+    </test>
+	
+    <listeners>        
+  	             <listener class-name="com.redhat.qe.auto.testng.TestNGListener" />	
+    </listeners>
+	
+</suite>
