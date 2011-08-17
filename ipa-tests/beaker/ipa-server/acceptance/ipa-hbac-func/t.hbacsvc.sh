@@ -60,6 +60,7 @@ hbacsvc_client1() {
         rlPhaseStartTest "ipa-hbacsvc-client1-001: $user1 accessing $CLIENT1 from $CLIENT1 using SSHD service."
 
 		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+		rlRun "getent -s sss passwd $user1"
 
 auth_success()
    {
@@ -95,6 +96,7 @@ hbacsvc_client2() {
         rlPhaseStartTest "ipa-hbacsvc-client2-001: $user1 accessing $CLIENT1 from $CLIENT2 using SSHD service."
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+		rlRun "getent -s sss passwd $user1"
 
 auth_failure()
    {
