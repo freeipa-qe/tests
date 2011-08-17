@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 import org.testng.annotations.AfterClass;
@@ -23,7 +24,11 @@ public class HostTests extends SahiTestScript{
 	private String domain = CommonTasks.ipadomain;
 	private String reversezone = CommonTasks.reversezone;
 	
-	//private String csr = "MIIBbDCB1gIBADAtMREwDwYDVQQKEwhURVNUUkVMTTEYMBYGA1UEAxMPbXlob3N0"+ "\n" + "LnRlc3RyZWxtMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDdegHkkCMdcET1"+ "\n" + "a+q+Edxn4KA5bcXMZeu2yjqokHFqRDNtdB6aLmec20XoW6kt9/lZDf47Mcm23M1H"+ "\n" + "xyJC+u5F0clbU7ojdaxbRqhO/D1MHDiLEH87VPqd6fhwDiV92tkWh68gKxEW29u/"+ "\n" + "COJcscYFf9X37jowYlYENY1i9mxjywIDAQABoAAwDQYJKoZIhvcNAQEFBQADgYEA"+ "\n" + "r9wrR2dn+b07GYfL1nIFsWryp1sb4pO8rr5UmGPNPQLVmm8zih25UKK96/yxe50w"+ "\n" + "z0mZoPCN6phMkHVNhINHa5laOsXwsLg+7aLfQEoOu1XWbWuNAjDA14g+JPB8wzlm"+ "\n" + "980PmlW3kOiJEA6EIzrTEhr5UiXSkv1yEevYNABK9Ys=";
+	private String hostPage = CommonTasks.hostPage;
+	private String dnsPage = CommonTasks.dnsPage;
+	private String currentPage = sahiTasks.fetch("top.location.href");
+	private String alternateCurrentPage = sahiTasks.fetch("top.location.href") + "&host-facet=search" ;
+	
 	private String badcsr = "MIIBcDCB2gIBADAxMRMwEQYDVQQKEwpRRS5MQUIuSVBBMRowGAYDVQQDExFteWdhv"+ "\n" + "c3QucWUubGFiLmlYTCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEA4lXS4N0r"+ "\n" + "lvJOwhv7eZdWLoaH5BwNoNgBObTAde4MYRejx75f3Ovo+8WVChRs/xDemDPGfWj0"+ "\n" + "9BW4BDXpX0Vaa3N4akIfKoxDnYckZlifuHxbyrZB9XX8eAZDMwtBzi30elEp5Cf5"+ "\n" + "SWMJ9WBOoXu/YIFOCC58aegXKJjPXLlzvrIoEsCAwEAAaAAMA0GCSqGSIb3DQEBBQUA"+ "\n" + "A4GBABK4TVlwNx4LzQvX/rgfqWTv33iIgkPFY4TLsXiR2XL74HAhDDk5JYJM3DGHP"+ "\n" + "4Si7E/vX6ea6IZuNAul0koIJtT2etUo8oebOKQPFb1F1AY+h6sW/QC3DH20hT85H"+ "\n" + "KhPLOBcjOSY/T9M4u5xsjVtzqZMJCdFKFRg9pLBUrCZhu3Z";
 	private String wronghostcsr = "MIIBbDCB1gIBADAtMRMwEQYDVQQKEwpRRS5MQUIuSVBBMRYwFAYDVQQDEw1ob3N0"+ "\n" +"LnRlc3RyZWxtMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDvu8wcVthKZCa/"+ "\n" +"KZ30fKPC1jMZ+PUXE/xJNfKVKG9olVSswk4RG8AD0yCApMJ5u6yXU4pT6RbxVHFg"+ "\n" +"X4xA1e006HIdOKrw5pcKhndMyc21rFaUVb66P8z7FXqiVvx3imgZrbM6rr1rfXvH"+ "\n" +"xTeTwL20Lor5Ym9ypajxGTU7IDaXMwIDAQABoAAwDQYJKoZIhvcNAQEFBQADgYEA"+ "\n" +"1IwWyrFEkXuT1vbiDU1urfSazFObEnMUR4vvIraEdhKqJySq9gB/F3j7h+EomKna"+ "\n" +"+G55hsJN7Ct0dhHks0MVIydCnSj364n2vLtfvidn1OgTYOqg4bWTmIMa/ejyV6pX"+ "\n" +"+tYey0wVg+uXyqSPZr/ZJZtmqkKIzCkzrMpxYDlUNk0=";
 	
@@ -40,7 +45,7 @@ public class HostTests extends SahiTestScript{
 	@BeforeClass (groups={"init"}, description="Initialize app for this test suite run", alwaysRun=true, dependsOnGroups="setup")
 	public void initialize() throws CloneNotSupportedException {	
 		sahiTasks = SahiTestScript.getSahiTasks();	
-		sahiTasks.navigateTo(System.getProperty("ipa.server.url")+ CommonTasks.hostPage, true);
+		sahiTasks.navigateTo(hostPage, true);
 		sahiTasks.setStrictVisibilityCheck(true);
 		
 		//add the test hosts
@@ -55,6 +60,17 @@ public class HostTests extends SahiTestScript{
 		String [] delhosts = {testhost + "." + domain, undotesthost + "." + domain, managed + "." + domain, managedby + "." + domain };
 		//delete the hosts
 		HostTasks.deleteHost(sahiTasks, delhosts);
+	}
+	
+	@BeforeMethod (alwaysRun=true)
+	public void checkCurrentPage() {
+	    String currentPageNow = sahiTasks.fetch("top.location.href");
+	    System.out.println("CurrentPageNow: " + currentPageNow);
+		if (!currentPageNow.equals(currentPage) && !currentPageNow.equals(alternateCurrentPage)) {
+			CommonTasks.checkError(sahiTasks);
+			System.out.println("Not on expected Page....navigating back from : " + currentPageNow);
+			sahiTasks.navigateTo(hostPage, true);
+		}		
 	}
 
 	/*
@@ -319,15 +335,15 @@ public class HostTests extends SahiTestScript{
 		
 		// verify host link to dns and dns records
 		HostTasks.verifyHostDNSLink(sahiTasks, fqdn, "YES");
-		sahiTasks.navigateTo(System.getProperty("ipa.server.url")+ CommonTasks.dnsPage, true);
+		sahiTasks.navigateTo(dnsPage, true);
 		DNSTasks.verifyRecord(sahiTasks, domain, hostname, "arecord", ipaddr, "YES");
 		DNSTasks.verifyRecord(sahiTasks, reversezone, ipend, "ptrrecord", fqdn + ".", "YES");
 		
 		// deleted host
-		sahiTasks.navigateTo(System.getProperty("ipa.server.url")+ CommonTasks.hostPage, true);
+		sahiTasks.navigateTo(hostPage, true);
 		HostTasks.deleteHost(sahiTasks, fqdn, updatedns);
 		
-		sahiTasks.navigateTo(System.getProperty("ipa.server.url")+ CommonTasks.dnsPage, true);
+		sahiTasks.navigateTo(dnsPage, true);
 		if( updatedns == "YES"){
 			DNSTasks.verifyRecord(sahiTasks, domain, hostname, "arecord", ipaddr, "NO");
 			DNSTasks.verifyRecord(sahiTasks, reversezone, ipend, "ptrrecord", fqdn + ".", "NO");
@@ -340,7 +356,7 @@ public class HostTests extends SahiTestScript{
 			
 		}
 		
-		sahiTasks.navigateTo(System.getProperty("ipa.server.url")+ CommonTasks.hostPage, true);
+		sahiTasks.navigateTo(hostPage, true);
 	}
 	
 	
