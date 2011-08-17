@@ -65,23 +65,25 @@ public class HBACTests extends SahiTestScript {
 		sahiTasks = SahiTestScript.getSahiTasks();	
 		sahiTasks.setStrictVisibilityCheck(true);
 		
-		//verify objects required for this suite do not already exist
-		HBACTasks.checkIfObjectsReqdByTestExist(sahiTasks, uid, groupName, fqdn, hostgroupName);
-		
 		//add new user, user group, host, host group
 		sahiTasks.navigateTo(System.getProperty("ipa.server.url")+ CommonTasks.userPage, true);
-		UserTasks.createUser(sahiTasks, uid, givenName, sn, "Add");
+		if (!sahiTasks.link(uid).exists())
+			UserTasks.createUser(sahiTasks, uid, givenName, sn, "Add");
 
 		sahiTasks.navigateTo(System.getProperty("ipa.server.url")+ CommonTasks.groupPage, true);
-		GroupTasks.createGroupService(sahiTasks, groupName, groupDescription, CommonTasks.groupPage);
+		if (!sahiTasks.link(groupName).exists())
+			GroupTasks.createGroupService(sahiTasks, groupName, groupDescription, CommonTasks.groupPage);
 		
 
 		sahiTasks.navigateTo(System.getProperty("ipa.server.url")+ CommonTasks.hostPage, true);
-		HostTasks.addHost(sahiTasks, hostname, ipadr);
+		if (!sahiTasks.link(fqdn.toLowerCase()).exists())
+			HostTasks.addHost(sahiTasks, hostname, ipadr);
 		
 		sahiTasks.navigateTo(System.getProperty("ipa.server.url")+ CommonTasks.hostgroupPage, true);
-		HostgroupTasks.addHostGroup(sahiTasks, hostgroupName, description, "Add");
-		HostgroupTasks.addMembers(sahiTasks, hostgroupName, membertype, names, "Enroll");
+		if (!sahiTasks.link(hostgroupName).exists()) {
+			HostgroupTasks.addHostGroup(sahiTasks, hostgroupName, description, "Add");
+			HostgroupTasks.addMembers(sahiTasks, hostgroupName, membertype, names, "Enroll");
+		}
 		
 		
 		sahiTasks.navigateTo(System.getProperty("ipa.server.url")+ CommonTasks.hbacPage, true);
@@ -432,23 +434,25 @@ public class HBACTests extends SahiTestScript {
 	@AfterClass (groups={"cleanup"}, description="Delete objects created for this test suite", alwaysRun=true, dependsOnGroups="init")
 	public void cleanup() throws CloneNotSupportedException {
 		//delete user, user group, host, host group added for this suite
-	/*	sahiTasks.navigateTo(System.getProperty("ipa.server.url")+ CommonTasks.userPage, true);
-		UserTasks.deleteUser(sahiTasks, uid);
+		sahiTasks.navigateTo(System.getProperty("ipa.server.url")+ CommonTasks.userPage, true);
+		if (sahiTasks.link(uid).exists())
+			UserTasks.deleteUser(sahiTasks, uid);
 
 		sahiTasks.navigateTo(System.getProperty("ipa.server.url")+ CommonTasks.groupPage, true);
-		GroupTasks.deleteGroup(sahiTasks, groupName);
+		if (sahiTasks.link(groupName).exists())
+			GroupTasks.deleteGroup(sahiTasks, groupName);
 		
 
 		sahiTasks.navigateTo(System.getProperty("ipa.server.url")+ CommonTasks.hostPage, true);
-		HostTasks.deleteHost(sahiTasks, fqdn);
+		if (sahiTasks.link(fqdn.toLowerCase()).exists())
+			HostTasks.deleteHost(sahiTasks, fqdn);
 		
 		sahiTasks.navigateTo(System.getProperty("ipa.server.url")+ CommonTasks.hostgroupPage, true);
-		HostgroupTasks.deleteHostgroup(sahiTasks, hostgroupName, "Delete");
+		if (sahiTasks.link(hostgroupName).exists())
+			HostgroupTasks.deleteHostgroup(sahiTasks, hostgroupName, "Delete");
 		
-		// verify objects added for this suite are successfully cleaned
-		HBACTasks.checkIfObjectsReqdByTestExist(sahiTasks, uid, groupName, fqdn, hostgroupName);
 		
-		sahiTasks.navigateTo(System.getProperty("ipa.server.url")+ CommonTasks.hbacPage, true);*/
+		sahiTasks.navigateTo(System.getProperty("ipa.server.url")+ CommonTasks.hbacPage, true);
 	}
 	
 	

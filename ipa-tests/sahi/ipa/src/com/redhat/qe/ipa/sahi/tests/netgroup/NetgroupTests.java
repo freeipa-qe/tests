@@ -270,11 +270,11 @@ public class NetgroupTests extends SahiTestScript{
 		
 		//verify member of for hosts
 		sahiTasks.navigateTo(hostPage, true);
-		HostTasks.verifyHostMemberOf(sahiTasks, devwebserver + "." + domain, "Netgroups", devgroup, "direct", "YES");
-		HostTasks.verifyHostMemberOf(sahiTasks, devwebserver + "." + domain, "Netgroups", enggroup, "indirect", "YES");
-		HostTasks.verifyHostMemberOf(sahiTasks, qewebserver + "." + domain, "Netgroups", qegroup, "direct", "YES");
-		HostTasks.verifyHostMemberOf(sahiTasks, qewebserver + "." + domain, "Netgroups", enggroup, "indirect", "YES");
-		HostTasks.verifyHostMemberOf(sahiTasks, engwebserver + "." + domain, "Netgroups", enggroup, "direct", "YES");
+		HostTasks.verifyHostMemberOf(sahiTasks, devwebserver + "." + domain, "Netgroups", devgroup, "direct", "YES", false);
+		HostTasks.verifyHostMemberOf(sahiTasks, devwebserver + "." + domain, "Netgroups", enggroup, "indirect", "YES", false);
+		HostTasks.verifyHostMemberOf(sahiTasks, qewebserver + "." + domain, "Netgroups", qegroup, "direct", "YES", false);
+		HostTasks.verifyHostMemberOf(sahiTasks, qewebserver + "." + domain, "Netgroups", enggroup, "indirect", "YES", false);
+		HostTasks.verifyHostMemberOf(sahiTasks, engwebserver + "." + domain, "Netgroups", enggroup, "direct", "YES", false);
 		
 		//cancel remove members
 		sahiTasks.navigateTo(netgroupPage, true);
@@ -389,9 +389,9 @@ public class NetgroupTests extends SahiTestScript{
 		
 		//verify user member of net group
 		sahiTasks.navigateTo(userPage, true);
-		UserTasks.verifyUserMemberOf(sahiTasks, user1, "Netgroups", devgroup, "YES");
-		UserTasks.verifyUserMemberOf(sahiTasks, user2, "Netgroups", devgroup, "YES");
-		UserTasks.verifyUserMemberOf(sahiTasks, user3, "Netgroups", qegroup, "YES");
+		UserTasks.verifyUserMemberOf(sahiTasks, user1, "Netgroups", devgroup, "direct", "YES", false);
+		UserTasks.verifyUserMemberOf(sahiTasks, user2, "Netgroups", devgroup, "direct", "YES", false);
+		UserTasks.verifyUserMemberOf(sahiTasks, user3, "Netgroups", qegroup, "direct", "YES", false);
 		
 		//cancel remove member
 		sahiTasks.navigateTo(netgroupPage, true);

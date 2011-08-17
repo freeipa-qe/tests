@@ -480,8 +480,10 @@ public class HostTasks {
 	 * @param type - direct or indirect
 	 * @param exists - "YES" if the membership is expected to exist
 	 */
-	public static void verifyHostMemberOf(SahiTasks sahiTasks, String hostname, String membertype, String grprulename, String type, String exists) {
-		sahiTasks.link(hostname).click();
+	public static void verifyHostMemberOf(SahiTasks sahiTasks, String hostname, String membertype, String grprulename, String type, 
+			String exists, boolean onPage) {
+		if (!onPage) 
+			sahiTasks.link(hostname).click();
 		if (membertype == "Host Groups"){
 			sahiTasks.link("memberof_hostgroup").click();
 		}
@@ -507,7 +509,8 @@ public class HostTasks {
 		else {
 			com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(grprulename).exists(), "Host " + hostname + " is NOT member of " + membertype + " "+ grprulename);
 		}
-		sahiTasks.link("Hosts").in(sahiTasks.div("content")).click();
+		if (!onPage) 
+			sahiTasks.link("Hosts").in(sahiTasks.div("content")).click();
 	}
 	
 	/*

@@ -11,23 +11,6 @@ import com.redhat.qe.auto.testng.Assert;
 public class HBACTasks {
 	private static Logger log = Logger.getLogger(HBACTasks.class.getName());
 	
-	/*
-	 * Verify user, user group, host, host group do not exist
-	 */
-	public static void checkIfObjectsReqdByTestExist(SahiTasks sahiTasks, String uid, String groupName, String fqdn, String hostgroupName) {
-		sahiTasks.navigateTo(System.getProperty("ipa.server.url")+ CommonTasks.userPage, true);
-		Assert.assertFalse(sahiTasks.link(uid).exists(), "Verify User " + uid + " doesn't already exist");
-		sahiTasks.navigateTo(System.getProperty("ipa.server.url")+ CommonTasks.groupPage, true);
-		Assert.assertFalse(sahiTasks.link(groupName).exists(), "Verify Group " + groupName + " doesn't already exist");
-		sahiTasks.navigateTo(System.getProperty("ipa.server.url")+ CommonTasks.hostPage, true);
-		Assert.assertFalse(sahiTasks.link(fqdn.toLowerCase()).exists(), "Verify host " + fqdn + " doesn't already exist");
-		sahiTasks.navigateTo(System.getProperty("ipa.server.url")+ CommonTasks.hostgroupPage, true);
-		Assert.assertFalse(sahiTasks.link(hostgroupName).exists(), "Verify Hostgroup " + hostgroupName + " doesn't already exist");		
-	}
-	
-
-	
-	
 	/**
 	 * Add an HBAC Rule
 	 * 
@@ -100,25 +83,25 @@ public class HBACTasks {
 			e.printStackTrace();
 		}
 		//Click to Add Users from "Who" section
-		sahiTasks.span("Add").click();
+		sahiTasks.span("Add").under(sahiTasks.heading2(("Who"))).near(sahiTasks.span("Users")).click();
 		sahiTasks.checkbox(uid).click();
 		sahiTasks.link(">>").click();
 		sahiTasks.button("Enroll").click();
 		
 		//Click to add Host groups from "Accessing" section
-		sahiTasks.span("Add[3]").click();
+		sahiTasks.span("Add").under(sahiTasks.heading2(("Accessing"))).near(sahiTasks.span("Host Groups")).click();
 		sahiTasks.checkbox(hostgroupName).click();
 		sahiTasks.span(">>").click();
 		sahiTasks.button("Enroll").click();
 		
 		//Click to add HBAC Service from "Via Service" Section
-		sahiTasks.span("Add[4]").click();
+		sahiTasks.span("Add").under(sahiTasks.heading2(("Via Service"))).near(sahiTasks.span("HBAC Services")).click();
 		sahiTasks.checkbox(service).click();
 		sahiTasks.span(">>").click();
 		sahiTasks.button("Enroll").click();
 		
 		//Click to add HBAC Service from "From" Section
-		sahiTasks.span("Add[6]").click();
+		sahiTasks.span("Add").under(sahiTasks.heading2(("From"))).near(sahiTasks.span("Hosts")).click();
 		sahiTasks.checkbox(fqdn).click();
 		sahiTasks.span(">>").click();
 		sahiTasks.button("Enroll").click();
@@ -147,11 +130,22 @@ public class HBACTasks {
 	public static void verifyHBACRuleUpdates(SahiTasks sahiTasks, String cn, String uid, String hostgroupName, String service, String fqdn) {
 		//click on rule to edit
 		sahiTasks.link(cn).click();
-		
+		String currentPageNow = sahiTasks.fetch("top.location.href");
 		Assert.assertTrue(sahiTasks.checkbox(uid).exists(), "Verified user " + uid + " added for Rule " + cn);
 		Assert.assertTrue(sahiTasks.checkbox(hostgroupName).exists(), "Verified Host Group " + hostgroupName + " added for Rule " + cn);
 		Assert.assertTrue(sahiTasks.checkbox(service).exists(), "Verified Service " + service + " added for Rule " + cn);
 		Assert.assertTrue(sahiTasks.checkbox(fqdn).exists(), "Verified From: Host " + fqdn + " added for Rule " + cn);
+		
+		//Also verify from other pages
+		sahiTasks.link(uid).click();
+		UserTasks.verifyUserMemberOf(sahiTasks, uid, "HBAC Rules", cn, "direct", "YES", true);
+		sahiTasks.link(cn).click();
+		sahiTasks.link(hostgroupName).click();
+		HostgroupTasks.verifyMemberOf(sahiTasks, hostgroupName, "hbacrule", cn, "direct", "YES", true);
+		sahiTasks.link(cn).click();
+		sahiTasks.link(fqdn).click();
+		HostTasks.verifyHostMemberOf(sahiTasks, fqdn, "HBAC Rules", cn, "indirect", "YES", true);		
+		sahiTasks.link(cn).click();
 		
 		sahiTasks.link("HBAC Rules").in(sahiTasks.div("content")).click();	
 	}
@@ -245,7 +239,7 @@ public class HBACTasks {
 		
 		//TODO: nkrishnan - should the suffix be used? Currently - there is a host added in the From Section, 
 		// and so the suffix is needed here in the Accessing section
-		sahiTasks.checkbox(fqdn+"[1]").click(); 		
+		sahiTasks.checkbox(fqdn).under(sahiTasks.heading2(("Accessing"))).under(sahiTasks.span("Hosts")).click(); 		
 		sahiTasks.span(">>").click();
 		sahiTasks.button("Enroll").click();
 		
@@ -328,7 +322,7 @@ public class HBACTasks {
 		sahiTasks.link(cn).click();
 		
 		Assert.assertFalse(sahiTasks.checkbox(fqdn).under(sahiTasks.heading2(("From"))).near(sahiTasks.span("Hosts")).exists(), "Verified Host: " + fqdn + " is not on list for rule: " + cn);
-		Assert.assertTrue(sahiTasks.checkbox(hostgroupname).under(sahiTasks.heading2(("From"))).near(sahiTasks.span("Hosts")).exists(), "Verified Host Group: " + hostgroupname + " is on list for rule: " + cn);
+		Assert.assertTrue(sahiTasks.checkbox(hostgroupname).under(sahiTasks.heading2(("From"))).under(sahiTasks.span("Hosts")).exists(), "Verified Host Group: " + hostgroupname + " is on list for rule: " + cn);
 				
 		sahiTasks.link("HBAC Rules").in(sahiTasks.div("content")).click();			
 	}

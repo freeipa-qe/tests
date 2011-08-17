@@ -218,8 +218,8 @@ public class HostgroupTests extends SahiTestScript{
 	public void testGroupHostMemberof(String testName) throws Exception {
 		
 		//verify member of host group member of
-		HostgroupTasks.verifyMemberOf(sahiTasks, devgroup, "hostgroup", enggroup, "direct", "YES");
-		HostgroupTasks.verifyMemberOf(sahiTasks, qegroup, "hostgroup", enggroup, "direct", "YES");
+		HostgroupTasks.verifyMemberOf(sahiTasks, devgroup, "hostgroup", enggroup, "direct", "YES", false);
+		HostgroupTasks.verifyMemberOf(sahiTasks, qegroup, "hostgroup", enggroup, "direct", "YES", false);
 	}
 	
 	/*
@@ -230,11 +230,11 @@ public class HostgroupTests extends SahiTestScript{
 		
 		//verify member of for hosts
 		sahiTasks.navigateTo(System.getProperty("ipa.server.url")+ CommonTasks.hostPage, true);
-		HostTasks.verifyHostMemberOf(sahiTasks, devwebserver, "Host Groups", devgroup, "direct", "YES");
-		HostTasks.verifyHostMemberOf(sahiTasks, devwebserver, "Host Groups", enggroup, "indirect", "YES");
-		HostTasks.verifyHostMemberOf(sahiTasks, qewebserver, "Host Groups", qegroup, "direct", "YES");
-		HostTasks.verifyHostMemberOf(sahiTasks, qewebserver, "Host Groups", enggroup, "indirect", "YES");
-		HostTasks.verifyHostMemberOf(sahiTasks, engwebserver, "Host Groups", enggroup, "direct", "YES");
+		HostTasks.verifyHostMemberOf(sahiTasks, devwebserver, "Host Groups", devgroup, "direct", "YES", false);
+		HostTasks.verifyHostMemberOf(sahiTasks, devwebserver, "Host Groups", enggroup, "indirect", "YES", false);
+		HostTasks.verifyHostMemberOf(sahiTasks, qewebserver, "Host Groups", qegroup, "direct", "YES", false);
+		HostTasks.verifyHostMemberOf(sahiTasks, qewebserver, "Host Groups", enggroup, "indirect", "YES", false);
+		HostTasks.verifyHostMemberOf(sahiTasks, engwebserver, "Host Groups", enggroup, "direct", "YES", false);
 		
 		sahiTasks.navigateTo(System.getProperty("ipa.server.url")+ CommonTasks.hostgroupPage, true);
 	}

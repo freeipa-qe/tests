@@ -511,8 +511,10 @@ public class UserTasks {
 	 * @param grprulename - group or rule name 
 	 * @param exists - "YES" if the membership is expected to exist
 	 */
-	public static void verifyUserMemberOf(SahiTasks sahiTasks, String uid, String membertype, String grprulename, String exists) {
-		sahiTasks.link(uid).click();
+	public static void verifyUserMemberOf(SahiTasks sahiTasks, String uid, String membertype, String grprulename,
+			String type, String exists, boolean onPage) {
+		if (!onPage) 
+			sahiTasks.link(uid).click();
 		if (membertype == "User Groups"){
 			sahiTasks.link("memberof_group").click();
 		}
@@ -529,14 +531,19 @@ public class UserTasks {
 			sahiTasks.link("memberof_sudorule").click();
 		}
 	
+		sahiTasks.radio(type).click();
+		
 		if (exists == "YES"){
 			Assert.assertTrue(sahiTasks.link(grprulename).exists(), "User " + uid + " is a member of " + membertype + " " + grprulename);
 		}
 		else {
 			Assert.assertFalse(sahiTasks.link(grprulename).exists(), "User " + uid + " is NOT member of " + membertype + " "+ grprulename);
 		}
-		sahiTasks.link("Users").in(sahiTasks.div("content")).click();
+		
+		if (!onPage)
+			sahiTasks.link("Users").in(sahiTasks.div("content")).click();
 	}
+	
 	
 	/*
 	 * Verify User membership in a group or rule
