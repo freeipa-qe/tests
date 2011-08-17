@@ -79,8 +79,9 @@ rlJournalStart
 	SHORT_HOST1=`cat /dev/shm/env.sh | grep BEAKERCLIENT |  cut -d "=" -f 2 | cut -d " " -f 1 | cut -d . -f 1`
 	CLIENT1=$SHORT_HOST1.$DOMAIN
 
-	echo $HOSTNAME
-	echo $CLIENT1
+	echo "Hostname of this machine is $HOSTNAME"
+	echo "Hostname of client is $CLIENT1"
+
         echo $CLIENT1 | grep $HOSTNAME
         if [ $? -eq 0 ] ; then
 
@@ -88,10 +89,10 @@ rlJournalStart
                 rlLog "Machine in recipe is CLIENT1"
                 rlRun "service iptables stop" 0 "Stop the firewall on the client"
 
-                rhts-sync-set -s DONE
-		rhts-sync-block -s HBACSVC_SETUP $MASTER 
+                rlRun "rhts-sync-set -s DONE"
+		rlRun "rhts-sync-block -s HBACSVC_SETUP $MASTER"
 		hbacsvc_client1
-		rhts-sync-set -s HBACSVC_DONE
+		rlRun "rhts-sync-set -s HBACSVC_DONE"
 	rlPhaseEnd
 
         else
@@ -111,8 +112,9 @@ rlJournalStart
         SHORT_HOST2=`cat /dev/shm/env.sh | grep BEAKERCLIENT | cut -d " " -f 3 | cut -d . -f 1`
         CLIENT2=$SHORT_HOST2.$DOMAIN
 
-	echo $HOSTNAME
-	echo $CLIENT2
+	echo "Hostname of this machine is $HOSTNAME"
+	echo "Hostname of client2 is $CLIENT2"
+
         echo $CLIENT2 | grep $HOSTNAME
         if [ $? -eq 0 ] ; then
 
@@ -120,10 +122,10 @@ rlJournalStart
                 rlLog "Machine in recipe is CLIENT2"
                 rlRun "service iptables stop" 0 "Stop the firewall on the client"
 
-                rhts-sync-set -s DONE
-		rhts-sync-block -s HBACSVC_SETUP $MASTER 
+                rlRun "rhts-sync-set -s DONE"
+		rlRun "rhts-sync-block -s HBACSVC_SETUP $MASTER"
 		hbacsvc_client2
-		rhts-sync-set -s HBACSVC_DONE
+		rlRun "rhts-sync-set -s HBACSVC_DONE"
 	rlPhaseEnd
 
         else
@@ -139,8 +141,9 @@ rlJournalStart
         #####################################################################
         rc=0
 
-	echo $HOSTNAME
-	echo $MASTER
+	echo "Hostname of this machine is $HOSTNAME"
+	echo "Hostname of master is $MASTER"
+
         echo $MASTER | grep $HOSTNAME
         #echo $MASTER | grep `hostname -s`
         if [ $? -eq 0 ] ; then
@@ -167,10 +170,10 @@ rlJournalStart
 	        rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 	        rlRun "create_ipauser $user3 $user3 $user3 $userpw"
 
-                rhts-sync-block -s DONE -s DONE $CLIENT1 $CLIENT2
+                rlRun "rhts-sync-block -s DONE -s DONE $CLIENT1 $CLIENT2"
 		hbacsvc_setup
-		rhts-sync-set -s HBACSVC_SETUP
-               	rhts-sync-block -s HBACSVC_DONE -s HBACSVC_DONE $CLIENT1 $CLIENT2
+		rlRun "rhts-sync-set -s HBACSVC_SETUP"
+               	rlRun "rhts-sync-block -s HBACSVC_DONE -s HBACSVC_DONE $CLIENT1 $CLIENT2"
 	rlPhaseEnd
 
 	rlPhaseStartCleanup "ipa-hbacrule-func-cleanup: Destroying admin credentials."

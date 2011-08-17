@@ -55,7 +55,7 @@ hbacsvc_setup() {
 }
 
 
-hbac_client1() {
+hbacsvc_client1() {
 
         rlPhaseStartTest "ipa-hbacsvc-client1-001: $user1 accessing $CLIENT1 from $CLIENT1 using SSHD service."
 
@@ -90,7 +90,7 @@ EOF
 }
 
 
-hbac_client2() {
+hbacsvc_client2() {
 
         rlPhaseStartTest "ipa-hbacsvc-client2-001: $user1 accessing $CLIENT1 from $CLIENT2 using SSHD service."
 
