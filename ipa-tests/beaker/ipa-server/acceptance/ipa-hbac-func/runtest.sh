@@ -37,7 +37,7 @@
 . /dev/shm/ipa-hostgroup-cli-lib.sh
 . /dev/shm/ipa-hbac-cli-lib.sh
 . /dev/shm/ipa-server-shared.sh
-
+. /dev/shm/env.sh
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 # Include tests file
@@ -89,10 +89,10 @@ rlJournalStart
                 rlLog "Machine in recipe is CLIENT1"
                 rlRun "service iptables stop" 0 "Stop the firewall on the client"
 
-		rlRun "rhts-sync-block -s MASTER_SETUP $MASTER"
+		rlRun "rhts-sync-block -s MASTER_SETUP -m $MASTER"
 		rlRun "service sssd restart"
 		hbacsvc_client1
-                rlRun "rhts-sync-set -s DONE"
+                rlRun "rhts-sync-set -s DONE -m $CLIENT1"
 		#rlRun "rhts-sync-block -s HBACSVC_SETUP $MASTER"
 		#rlRun "rhts-sync-set -s HBACSVC_DONE"
 	rlPhaseEnd
@@ -124,10 +124,10 @@ rlJournalStart
                 rlLog "Machine in recipe is CLIENT2"
                 rlRun "service iptables stop" 0 "Stop the firewall on the client"
 
-		rlRun "rhts-sync-block -s MASTER_SETUP $MASTER"
+		rlRun "rhts-sync-block -s MASTER_SETUP -m $MASTER"
 		rlRun "service sssd restart"
 		hbacsvc_client2
-                rlRun "rhts-sync-set -s DONE"
+                rlRun "rhts-sync-set -s DONE -m $CLIENT2"
 		#rlRun "rhts-sync-block -s HBACSVC_SETUP $MASTER"
 		#rlRun "rhts-sync-set -s HBACSVC_DONE"
 	rlPhaseEnd
@@ -175,8 +175,8 @@ rlJournalStart
 	        rlRun "create_ipauser $user3 $user3 $user3 $userpw"
 
 		hbacsvc_setup
-		rlRun "rhts-sync-set -s MASTER_SETUP"
-                rlRun "rhts-sync-block -s DONE -s DONE $CLIENT1 $CLIENT2"
+		rlRun "rhts-sync-set -m $MASTER -s MASTER_SETUP"
+                rlRun "rhts-sync-block -s DONE -s DONE -m $CLIENT1 -m $CLIENT2"
 		#rlRun "rhts-sync-set -s HBACSVC_SETUP"
                	#rlRun "rhts-sync-block -s HBACSVC_DONE -s HBACSVC_DONE $CLIENT1 $CLIENT2"
 	rlPhaseEnd
