@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -19,6 +20,11 @@ import com.redhat.qe.ipa.sahi.tasks.SahiTasks;
 public class HostgroupTests extends SahiTestScript{
 	public static SahiTasks sahiTasks = null;	
 	
+	private String hostgroupPage = CommonTasks.hostgroupPage;
+	private String hostPage = CommonTasks.hostPage;	
+	private String currentPage = "";
+	private String alternateCurrentPage = "";
+	
 	// hosts and host arrays
 	private String myhost_short = "testhost";
 	private String devwebserver_short = "webserver_dev";
@@ -26,12 +32,14 @@ public class HostgroupTests extends SahiTestScript{
 	private String devhost_short = "laptop_dev";
 	private String qehost_short = "laptop_qa";
 	private String engwebserver_short = "webserver_eng";
+	
 	private String myhost = "testhost." + CommonTasks.ipadomain;
 	private String devwebserver = "webserver_dev." + CommonTasks.ipadomain;
 	private String qewebserver = "webserver_qe." + CommonTasks.ipadomain;
 	private String devhost = "laptop_dev." + CommonTasks.ipadomain;
 	private String qehost = "laptop_qa." + CommonTasks.ipadomain;
 	private String engwebserver = "webserver_eng." + CommonTasks.ipadomain;
+	
 	private String [] devhosts = {devwebserver, devhost};
 	private String [] qehosts = {qewebserver, qehost};
 	private String [] enghosts = {engwebserver};
@@ -52,7 +60,7 @@ public class HostgroupTests extends SahiTestScript{
 	@BeforeClass (groups={"init"}, description="Initialize app for this test suite run", alwaysRun=true, dependsOnGroups="setup")
 	public void initialize() throws CloneNotSupportedException {	
 		sahiTasks = SahiTestScript.getSahiTasks();	
-		sahiTasks.navigateTo(System.getProperty("ipa.server.url")+ CommonTasks.hostgroupPage, true);
+		sahiTasks.navigateTo(hostgroupPage, true);
 		sahiTasks.setStrictVisibilityCheck(true);
 		
 		//add host groups
@@ -62,23 +70,34 @@ public class HostgroupTests extends SahiTestScript{
 		}
 		
 		//add hosts for host group members
-		sahiTasks.navigateTo(System.getProperty("ipa.server.url")+ CommonTasks.hostPage, true);
+		sahiTasks.navigateTo(hostPage, true);
 		for (String hostname : hostnames_short) {
 			HostTasks.addHost(sahiTasks, hostname, "");
 		}
 		
-		sahiTasks.navigateTo(System.getProperty("ipa.server.url")+ CommonTasks.hostgroupPage, true);
+		sahiTasks.navigateTo(hostgroupPage, true);
 	}
 	
 	@AfterClass (groups={"cleanup"}, description="Delete objects added for the tests", alwaysRun=true)
 	public void cleanup() throws Exception {	
 		// delete the hosts added for testing
-		sahiTasks.navigateTo(System.getProperty("ipa.server.url")+ CommonTasks.hostPage, true);
+		sahiTasks.navigateTo(hostPage, true);
 		HostTasks.deleteHost(sahiTasks, hostnames);
 		
 		//delete the host groups added for testing
-		sahiTasks.navigateTo(System.getProperty("ipa.server.url")+ CommonTasks.hostgroupPage, true);
+		sahiTasks.navigateTo(hostgroupPage, true);
 		HostgroupTasks.deleteHostgroup(sahiTasks, allhostgroups);
+	}
+	
+	@BeforeMethod (alwaysRun=true)
+	public void checkCurrentPage() {
+	    String currentPageNow = sahiTasks.fetch("top.location.href");
+	    System.out.println("CurrentPageNow: " + currentPageNow);
+		if (!currentPageNow.equals(currentPage) && !currentPageNow.equals(alternateCurrentPage)) {
+			CommonTasks.checkError(sahiTasks);
+			System.out.println("Not on expected Page....navigating back from : " + currentPageNow);
+			sahiTasks.navigateTo(hostgroupPage, true);
+		}		
 	}
 	
 	/*
@@ -229,14 +248,14 @@ public class HostgroupTests extends SahiTestScript{
 	public void testHostMemberof(String testName) throws Exception {
 		
 		//verify member of for hosts
-		sahiTasks.navigateTo(System.getProperty("ipa.server.url")+ CommonTasks.hostPage, true);
+		sahiTasks.navigateTo(hostPage, true);
 		HostTasks.verifyHostMemberOf(sahiTasks, devwebserver, "Host Groups", devgroup, "direct", "YES", false);
 		HostTasks.verifyHostMemberOf(sahiTasks, devwebserver, "Host Groups", enggroup, "indirect", "YES", false);
 		HostTasks.verifyHostMemberOf(sahiTasks, qewebserver, "Host Groups", qegroup, "direct", "YES", false);
 		HostTasks.verifyHostMemberOf(sahiTasks, qewebserver, "Host Groups", enggroup, "indirect", "YES", false);
 		HostTasks.verifyHostMemberOf(sahiTasks, engwebserver, "Host Groups", enggroup, "direct", "YES", false);
 		
-		sahiTasks.navigateTo(System.getProperty("ipa.server.url")+ CommonTasks.hostgroupPage, true);
+		sahiTasks.navigateTo(hostgroupPage, true);
 	}
 	
 	/*
