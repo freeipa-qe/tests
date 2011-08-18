@@ -61,7 +61,7 @@ rlJournalStart
         if [ $rc -eq 0 ] ; then
 		pwdfile=/dev/shm/password.txt
 		echo $ADMINPW > $pwdfile
-		yum -y install yptools rpcbind
+		yum -y install yptools rpcbind ypbind ypserv yp-tools
         	ipa-compat-manage -y $pwdfile enable
         	rlRun "ipa-nis-manage -y $pwdfile enable" 0 "Enable the NIS plugin"
 		setup-nis-server
