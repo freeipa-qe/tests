@@ -11,7 +11,7 @@ public class KerberosTicketPolicyTasks {
 	
 
 	/*
-	 * Modify password field : test "undo", "error field msg", "reset" and update"
+	 * Modify password field : test "undo", "reset" and update"
 	 * @param browser - sahi browser instance 
 	 * @param testName - test case message
 	 * @param fieldName - which field to be tested
@@ -68,7 +68,6 @@ public class KerberosTicketPolicyTasks {
 	public static void modifyKerberosTicketPolicyNegative(SahiTasks browser, String testName, String fieldName, String fieldNegValue, String expectedErrorMsg){
  
 		// enter negative data to trigger error msg report
-		String originalValue = browser.textbox(fieldName).getText();
 		browser.textbox(fieldName).setValue(fieldNegValue);
 		
 		if (browser.span(expectedErrorMsg).exists()){ 

@@ -59,7 +59,7 @@ public class KerberosTicketPolicyTests extends SahiTestScript{
 
 		KerberosTicketPolicyTasks.modifyKerberosTicketPolicyNegative(sahiTasks, testName, fieldName, fieldNegValue, expectedErrorMsg);
 
-	}//modifyKerberosTicketPolicy
+	}//modifyKerberosTicketPolicyNegative
 	
 	
 	/***************************************************************************
@@ -93,16 +93,4 @@ public class KerberosTicketPolicyTests extends SahiTestScript{
 		return ll;	
 	}//Data provider: createKerberosTicketPolicyDetailsNegative 
 	 
-	@DataProvider(name="getKerberosTicketPolicy")
-	public Object[][] getKerberosTicketPolicyObjects() {
-		return TestNGUtils.convertListOfListsTo2dArray(createKerberosTicketPolicy());
-	}
-	protected List<List<Object>> createKerberosTicketPolicy() {		
-		List<List<Object>> ll = new ArrayList<List<Object>>();  
-		ll.add(Arrays.asList(new Object[]{
-				// testName, password policy name, priority 	
-				"password policy base test", "editors","5"} )); 
-		return ll;	
-	}//Data provider: createKerberosTicketPolicy 
-	
-}//class DNSTest
+}//class KerberosTicketPolicyTests

@@ -8,14 +8,8 @@
             	    <run>
             	        <include name="setup" />
             	        <include name="init" />   
-            	         
             	         <include name="modifyKerberosTicketPolicy" /> 
             	         <include name="modifyKerberosTicketPolicyNegative" />
-            	         
-            	        <!--  the following are premature, comment out 
-                       
-                          end of comment out tests -->
-                         
             	    </run>
             	</groups>
             	<classes>
