@@ -51,6 +51,19 @@ hbacsvc_setup() {
 		rlRun "ipa hbacrule-add-sourcehost rule1 --hosts=$CLIENT1"
 		rlRun "ipa hbacrule-add-service rule1 --hbacsvcs=sshd"
 		rlRun "ipa hbacrule-show rule1 --all"
+
+	# ipa hbactest:
+		
+		rlRun "ipa hbactest --user=$user1 --srchost=$CLEINT1 --host=$CLIENT1 --service=sshd | grep -E '(Access granted: True|matched: rule1)'"
+		rlRun "ipa hbactest --user=$user2 --srchost=$CLEINT1 --host=$CLIENT1 --service=sshd | grep -i \"Access granted: False\"" 
+		rlRun "ipa hbactest --user=$user1 --srchost=$CLEINT2 --host=$CLIENT1 --service=sshd | grep -i \"Access granted: False\"" 
+		rlRun "ipa hbactest --user=$user1 --srchost=$CLEINT1 --host=$CLIENT2 --service=sshd | grep -i \"Access granted: False\"" 
+
+		rlRun "ipa hbactest --user=$user1 --srchost=$CLEINT1 --host=$CLIENT1 --service=sshd --rule=rule1 | grep -E '(Access granted: True|matched: rule1)'"
+		rlRun "ipa hbactest --user=$user1 --srchost=$CLEINT1 --host=$CLIENT1 --service=sshd --rule=rule2 | grep -E '(Access granted: True|notmatched: rule2)'"
+		rlRun "ipa hbactest --user=$user2 --srchost=$CLEINT1 --host=$CLIENT1 --service=sshd --rule=rule1 | grep -E '(Access granted: False|notmatched: rule1)'"
+
+
 	rlPhaseEnd
 }
 
@@ -61,7 +74,6 @@ hbacsvc_client1() {
 
 		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 		rlRun "getent -s sss passwd $user1"
-
                 rlRun "ssh_auth_success $user1 testpw123@ipa.com $CLIENT1"
 	rlPhaseEnd
 }
