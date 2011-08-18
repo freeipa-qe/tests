@@ -86,9 +86,7 @@ rlJournalStart
         if [ $? -eq 0 ] ; then
 
 	rlPhaseStartSetup "ipa-hbacsvc-func: Checking client"
-		rlRun "yum install -y screen"
                 rlLog "Machine in recipe is CLIENT1"
-		rlRun "screen"
                 rlRun "service iptables stop" 0 "Stop the firewall on the client"
 
 		rlRun "rhts-sync-block -s MASTER_SETUP $MASTER"
@@ -123,9 +121,7 @@ rlJournalStart
         if [ $? -eq 0 ] ; then
 
 	rlPhaseStartSetup "ipa-hbacsvc-func: Checking client"
-		rlRun "yum install -y screen"
                 rlLog "Machine in recipe is CLIENT2"
-		rlRun "screen"
                 rlRun "service iptables stop" 0 "Stop the firewall on the client"
 
 		rlRun "rhts-sync-block -s MASTER_SETUP $MASTER"
@@ -159,8 +155,6 @@ rlJournalStart
 
 	rlPhaseStartSetup "ipa-hbacsvc-func: Setup of users"
 
-		rlRun "yum install -y screen"
-		rlRun "screen"
         	rlRun "cat /dev/shm/env.sh"
 	        rlRun "TmpDir=\`mktemp -d\`" 0 "Creating tmp directory"
         	rlRun "pushd $TmpDir"

@@ -62,7 +62,8 @@ hbacsvc_setup() {
 		rlRun "ipa hbactest --user=$user1 --srchost=$CLEINT1 --host=$CLIENT1 --service=sshd --rule=rule1 | grep -E '(Access granted: True|matched: rule1)'"
 		rlRun "ipa hbactest --user=$user1 --srchost=$CLEINT1 --host=$CLIENT1 --service=sshd --rule=rule2 | grep -E '(Access granted: True|notmatched: rule2)'"
 		rlRun "ipa hbactest --user=$user2 --srchost=$CLEINT1 --host=$CLIENT1 --service=sshd --rule=rule1 | grep -E '(Access granted: False|notmatched: rule1)'"
-
+		rlRun "ipa hbactest --srchost=$CLIENT1 --host=$CLIENT1 --service=sshd  --user=$user1 --rule=rule1 --nodetail | grep -i \"Access granted: True\""
+		rlRun "ipa hbactest --srchost=$CLIENT1 --host=$CLIENT1 --service=sshd  --user=$user1 --rule=rule1 --nodetail | grep -i \"matched: rule1\"" 1
 
 	rlPhaseEnd
 }
