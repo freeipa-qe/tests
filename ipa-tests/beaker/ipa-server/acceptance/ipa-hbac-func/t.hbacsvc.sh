@@ -62,31 +62,7 @@ hbacsvc_client1() {
 		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 		rlRun "getent -s sss passwd $user1"
 
-auth_success()
-   {
-        {
-		expect -f - <<-EOF | grep -C 77 '^login successful'
-                	spawn ssh -q -l "$1" $CLIENT1 echo 'login successful'
-                        expect {
-                        	"Are you sure you want to continue connecting (yes/no)? " {
-                                send -- "yes\r"
-                                exp_continue
-                                	}
-                                "*assword: " {
-                                send -- "$2\r"
-                                	     }
-                                }
-                                expect eof
-EOF
-                                if [ $? = 0 ]; then
-                                        rlPass "Authentication successful, as expected"
-                                else
-                                        rlFail "ERROR: Authentication failed."
-                                fi
-        }
-   }
-
-                rlRun "auth_success $user1 testpw123@ipa.com"
+                rlRun "ssh_auth_success $user1 testpw123@ipa.com $CLIENT1"
 	rlPhaseEnd
 }
 
@@ -98,31 +74,7 @@ hbacsvc_client2() {
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 		rlRun "getent -s sss passwd $user1"
 
-auth_failure()
-   {
-        {
-                        expect -f - <<-EOF | grep -C 77 '^login successful'
-                                spawn ssh -q -l "$1" $CLIENT1 echo 'login successful'
-                                expect {
-                                "Are you sure you want to continue connecting (yes/no)? " {
-                                send -- "yes\r"
-                                exp_continue
-                                }
-                                "*assword: " {
-                                send -- "$2\r"
-                                }
-                                }
-                                expect eof
-EOF
-                                if [ $? = 0 ]; then
-                                        rlFail "ERROR: Authentication success."
-                                else
-                                        rlPass "Authentication failed, as expected"
-                                fi
-        }
-   }
-
-                rlRun "auth_failure $user1 testpw123@ipa.com"
+                rlRun "ssh_auth_failure $user1 testpw123@ipa.com $CLIENT2"
 	rlPhaseEnd
 }
 

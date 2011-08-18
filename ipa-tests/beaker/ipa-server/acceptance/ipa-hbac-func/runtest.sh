@@ -91,6 +91,8 @@ rlJournalStart
 		rlRun "screen"
                 rlRun "service iptables stop" 0 "Stop the firewall on the client"
 
+		rlRun "rhts-sync-block -s MASTER_SETUP $MASTER"
+		rlRun "service sssd restart"
 		hbacsvc_client1
                 rlRun "rhts-sync-set -s DONE"
 		#rlRun "rhts-sync-block -s HBACSVC_SETUP $MASTER"
@@ -126,6 +128,8 @@ rlJournalStart
 		rlRun "screen"
                 rlRun "service iptables stop" 0 "Stop the firewall on the client"
 
+		rlRun "rhts-sync-block -s MASTER_SETUP $MASTER"
+		rlRun "service sssd restart"
 		hbacsvc_client2
                 rlRun "rhts-sync-set -s DONE"
 		#rlRun "rhts-sync-block -s HBACSVC_SETUP $MASTER"
@@ -176,6 +180,7 @@ rlJournalStart
 	        rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 	        rlRun "create_ipauser $user3 $user3 $user3 $userpw"
 
+		rlRun "rhts-sync-set -s MASTER_SETUP"
 		hbacsvc_setup
                 rlRun "rhts-sync-block -s DONE -s DONE $CLIENT1 $CLIENT2"
 		#rlRun "rhts-sync-set -s HBACSVC_SETUP"
