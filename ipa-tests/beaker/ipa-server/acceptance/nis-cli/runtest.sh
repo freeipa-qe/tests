@@ -38,7 +38,7 @@
 . /usr/share/beakerlib/beakerlib.sh
 . /dev/shm/ipa-server-shared.sh
 . /dev/shm/ipa-netgroup-cli-lib.sh
-. /dev/shm/nis-scripts.sh
+. /dev/shm/nis.sh
 . /dev/shm/env.sh
 
 # Include test case file
@@ -64,6 +64,7 @@ rlJournalStart
 		yum -y install yptools rpcbind
         	ipa-compat-manage -y $pwdfile enable
         	rlRun "ipa-nis-manage -y $pwdfile enable" 0 "Enable the NIS plugin"
+		setup-nis-server
         	/etc/init.d/rpcbind restart
         	/etc/init.d/dirsrv restart
 		setup
@@ -82,7 +83,6 @@ rlJournalStart
         echo $SLAVE | grep $HOSTNAME
         rc=$?
         if [ $rc -eq 0 ] ; then
-		setup-nis-server
 		rhts-sync-block -s READY $MASTER
 		setup
 		runtests
