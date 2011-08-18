@@ -16,16 +16,8 @@ public class PasswordPolicyTasks {
 	 * @param policyName
 	 * @param priority 
 	 */
-	public static void addPasswordPolicy(SahiTasks browser, String policyName, String priority) {
-//		browser.span("Add[2]").click();
-//		browser.span("icon combobox-icon").click();
-//		browser.select("list").choose("editors");
-//		browser.textbox("cospriority").setValue("5");
-//		browser.button("Add").click();
-//		browser.checkbox("select[5]").click();
-//		browser.span("Delete[2]").click();
-//		browser.button("Delete").click();
-		
+	public static void add_PasswordPolicy(SahiTasks browser, String policyName, String priority) {
+		// blokced here, 
 		browser.span("Add").click();
 		browser.textbox("cospriority").setValue(priority);
 		
@@ -34,20 +26,21 @@ public class PasswordPolicyTasks {
 		browser.button("Add").click();  
 		// self-check
 		Assert.assertTrue(browser.link(policyName).exists(),"new policy ["+policyName + "] added");
-	}//addPasswordPolicy
+	}//add_PasswordPolicy
+	//FIXME: I need extend addPasswordPolicy to "add_and_add_other, add_and_edit, add_then_cancel"
 	
 	/*
 	 * Delete password policy
 	 * @param browser - sahi browser instance 
-	 * @param zoneName - dns zone name (to be deleted) 
+	 * @param policyName - password policy to be deleted 
 	 */
-	public static void delPasswordPolicy(SahiTasks browser, String policyName) { 
+	public static void delete_PasswordPolicy(SahiTasks browser, String policyName) { 
 		browser.checkbox(policyName).click();
 		browser.span("Delete").click();
 		browser.button("Delete").click(); 
 		// self-check
 		Assert.assertFalse(browser.link(policyName).exists(),"policy ["+policyName+"] deleted"); 
-	}//delPasswordPolicy
+	}//delete_PasswordPolicy
 	
 	/*
 	 * Modify password field : test "undo", "error field msg", "reset" and update"
@@ -57,7 +50,7 @@ public class PasswordPolicyTasks {
 	 * @param fieldName - which field to be tested
 	 * @param fieldValue - positive value, used for "update","reset" and "undo" test 
 	 */
-	public static void modifyPasswordPolicy(SahiTasks browser, String testName, String policyName, String fieldName, String fieldValue){
+	public static void modify_PasswordPolicy(SahiTasks browser, String testName, String policyName, String fieldName, String fieldValue){
 				
 		// test for undo
 		String originalValue = browser.textbox(fieldName).getText();
@@ -95,7 +88,7 @@ public class PasswordPolicyTasks {
 			}
 		}
 		
-	}//modifyPasswordPolicy
+	}//modify_PasswordPolicy
 	
 	/*
 	 * Modify password field : test "error field msg", this is negative test
@@ -106,21 +99,44 @@ public class PasswordPolicyTasks {
 	 * @param fieldNegValue - negative value, used for "update","reset" and "undo" test 
 	 * @param expectedErrorMsg - when wrong data entered, we expect an error field appears and output some error msg
 	 */
-	public static void modifyPasswordPolicyNegative(SahiTasks browser, String testName, String policyName, 
-													String fieldName, String fieldNegValue, String expectedErrorMsg){
- 
+	public static void modify_PasswordPolicy_Negative(SahiTasks browser, String testName, String policyName, 
+													String fieldName, String fieldNegValue, 
+													String expectedErrorMsg_field, String expectedErrorMsg_dialog){
+ //FIXME: NEED somem major work here
 		// enter negative data to trigger error msg report
-		String originalValue = browser.textbox(fieldName).getText();
 		browser.textbox(fieldName).setValue(fieldNegValue);
 		
-		if (browser.span(expectedErrorMsg).exists()){ 
-			log.info("error triggered, error msg match as expected, test pass"); 
-		}else{
-			Assert.fail("wrong format data entered, but no error msg triggered, report failure");
+		// check error msg field, only when expectedErrorMsg_field != ""
+		if (!expectedErrorMsg_field.equals("")){
+			if (browser.span(expectedErrorMsg_field).exists()){ 
+				log.info("error msg field triggered, error msg match as expected, test continue for error dialog box check"); 
+			}else{
+				Assert.fail("error msg field expected, but not triggered OR not appear at all, test failed"); 
+			}
 		}
 		
+		//  click 'update' to trigger error dialog
+		browser.span("Update").click();
+		if (browser.div("error_dialog").exists()){
+			// if dialog appears, we will continue check the error msg
+			String errmsg_dialog = browser.div("error_dialog").getText();
+			if (errmsg_dialog.equals(expectedErrorMsg_dialog)){
+				log.info("update trigger the error dialog as expected, the error msg match as expected, test pass");
+			}else{
+				log.info("update trigger the error dialog as expected, but the error msg does NOT match, test failed");
+				log.info("expected error msg:["+ expectedErrorMsg_dialog +"]");
+				log.info("actual   error msg:["+errmsg_dialog+"]");
+				Assert.fail("mis-match error msg, test failed");
+			}
+			// as long as the error dialog appears, we need click it away after checking error msg
+			browser.button("Cancel").click();
+		}else{
+			log.info("click update does NOT trigger error dialog as expected, test failed");
+			Assert.fail("wrong format data entered, but no error msg triggered, report failure");
+		}//inner if-else 
+		
 		// click password policy link to trigger "dirty" report
-		browser.link("Password Policies").click();
+		browser.span("Password Policies").click();
 		if (browser.span("ui-dialog-title").near(browser.div("This page has unsaved changes. Please save or revert.")).exists()){
 			log.info("Dirty dialog appears as expected, click 'reset' and back to password policy list");
 			browser.button("Reset").click();
@@ -129,7 +145,7 @@ public class PasswordPolicyTasks {
 			Assert.fail("no dirty dialog appear");
 		}
 		 
-	}//modifyPasswordPolicyNegative
+	}//modify_PasswordPolicy_Negative
 	
 }// Class: PasswordPolicyTasks
 
