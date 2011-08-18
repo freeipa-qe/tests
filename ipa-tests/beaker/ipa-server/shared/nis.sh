@@ -20,7 +20,7 @@ export NISUSER1PASSWD2 NISUSER2PASSWD2 NISUSER3PASSWD2 NISUSER4PASSWD2
 
 setup-nis-server()
 {
-	if [ -d /usr/lib64 ]; 
+	if [ -d /usr/lib64 ]; then 
 		LIBDIR=/usr/lib64
 	else
 		LIBDIR=/usr/lib
