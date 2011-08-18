@@ -1,4 +1,5 @@
 #!/bin/sh
+. /dev/shm/env.sh
 
 ########################################################################
 #  HOST CLI SHARED LIBRARY
@@ -735,5 +736,4 @@ deleteHBACServiceGroup()
 
    return $rc
 }
-
 
