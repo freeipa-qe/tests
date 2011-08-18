@@ -20,13 +20,20 @@ export NISUSER1PASSWD2 NISUSER2PASSWD2 NISUSER3PASSWD2 NISUSER4PASSWD2
 
 setup-nis-server()
 {
+	if [ -d /usr/lib64 ]; 
+		LIBDIR=/usr/lib64
+	else
+		LIBDIR=/usr/lib
+	fi
 	/bin/domainname $NISDOMAIN 
 	/bin/ypdomainname $NISDOMAIN 
-	echo "$SLAVE" | /usr/lib64/yp/ypinit -m	
+	echo "$SLAVE" | $LIBDIR/yp/ypinit -m	
 	echo "domain $NISDOMAIN server $MASTER"
 	/etc/init.d/ypbind restart
 	sed -i s/^NISDOMAIN/#NISDOMAIN/g /etc/sysconfig/network
-	echo 'NISDOMAIN="internal"' >>  /etc/sysconfig/network
+	echo "NISDOMAIN=\"$NISDOMAIN\"" >>  /etc/sysconfig/network
+	sed -i s/^domain/#domain/g /etc/yp.conf
+	echo "domain $NISDOMAIN server $MASTER" >> /etc/yp.conf
 	# Create securenets file
 	echo '255.0.0.0       127.0.0.0
 # This line gives access to everybody. 
@@ -35,7 +42,7 @@ setup-nis-server()
 	adduser --password $NISUSER2PASSWD $NISUSER2
 	adduser --password $NISUSER3PASSWD $NISUSER3
 	adduser --password $NISUSER4PASSWD $NISUSER4
-	echo "$SLAVE" | /usr/lib64/yp/ypinit -m	
+	echo "$SLAVE" | $LIBDIR/yp/ypinit -m	
 	/etc/init.d/ypbind restart
 	service ypbind start
 	service yppasswdd start
@@ -50,6 +57,6 @@ setup-nis-server()
 	echo "trustedhost ($NISHOST1,-)" /etc/netgroup
 	# Enable netgroups in the yp makefile
 	sed -i s/^"all:  passwd group hosts rpc services netid protocols mail"/"all:  passwd group hosts rpc services netid protocols netgrp mail"\\/g /var/yp/Makefile
-	echo "$SLAVE" | /usr/lib64/yp/ypinit -m 
+	echo "$SLAVE" | $LIBDIR/yp/ypinit -m 
 
 }
