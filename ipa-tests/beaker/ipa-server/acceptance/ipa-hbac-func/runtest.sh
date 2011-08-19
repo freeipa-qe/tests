@@ -33,15 +33,15 @@
 
 
 # HACKING env.sh FOR HBAC AUTOMATION
-ENV_DOMAIN=`cat /dev/shm/env.sh | grep ^"DOMAIN=" | cut -d = -f 2`
-SHORT_HOST1=`cat /dev/shm/env.sh | grep BEAKERCLIENT |  cut -d "=" -f 2 | cut -d " " -f 1 | cut -d . -f 1`
-echo "export CLIENT1=$SHORT_HOST1.$ENV_DOMAIN" >> /dev/shm/env.sh
-
-SHORT_HOST2=`cat /dev/shm/env.sh | grep BEAKERCLIENT | cut -d " " -f 3 | cut -d . -f 1`
-echo "export CLIENT2=$SHORT_HOST2.$ENV_DOMAIN" >> /dev/shm/env.sh
-
-sed -e 's/export BEAKERCLIENT/#export BEAKERCLIENT/' /dev/shm/env.sh > /dev/shm/env.sh.new
-sed -e 's/export CLIENT=/#export CLIENT=/' /dev/shm/env.sh.new > /dev/shm/env.sh
+#ENV_DOMAIN=`cat /dev/shm/env.sh | grep ^"DOMAIN=" | cut -d = -f 2`
+#SHORT_HOST1=`cat /dev/shm/env.sh | grep BEAKERCLIENT |  cut -d "=" -f 2 | cut -d " " -f 1 | cut -d . -f 1`
+#echo "export CLIENT1=$SHORT_HOST1.$ENV_DOMAIN" >> /dev/shm/env.sh
+#
+#SHORT_HOST2=`cat /dev/shm/env.sh | grep BEAKERCLIENT | cut -d " " -f 3 | cut -d . -f 1`
+#echo "export CLIENT2=$SHORT_HOST2.$ENV_DOMAIN" >> /dev/shm/env.sh
+#
+#sed -e 's/export BEAKERCLIENT/#export BEAKERCLIENT/' /dev/shm/env.sh > /dev/shm/env.sh.new
+#sed -e 's/export CLIENT=/#export CLIENT=/' /dev/shm/env.sh.new > /dev/shm/env.sh
 
 
 ##########################################################################
@@ -74,6 +74,9 @@ user2="user2"
 user3="user3"
 
 ########################################################################
+
+CLIENT=CLIENT1
+SLAVE=CLIENT2
 
 #Checking hostnames of all hosts
 echo "The hostname of IPA Server is $MASTER"
@@ -110,7 +113,7 @@ rlJournalStart
 		rlRun "sleep 5"
 		rlRun "ping -c 3 $MASTER"
 		rlLog "WHY THE HECK AM I WAITING HERE?"
-		rlRun "rhts-sync-block -s MASTER_SETUP $MASTER"
+		rlRun "rhts-sync-block -s ONLINE $MASTER"
 		rlRun "service sssd restart"
 		hbacsvc_client1
                 rlRun "rhts-sync-set -s DONE -m $CLIENT1"
