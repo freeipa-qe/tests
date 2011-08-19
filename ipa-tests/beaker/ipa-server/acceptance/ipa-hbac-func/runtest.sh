@@ -107,6 +107,9 @@ rlJournalStart
                 rlLog "Machine in recipe is CLIENT1"
                 rlRun "service iptables stop" 0 "Stop the firewall on the client"
 
+		rlRun "sleep 5"
+		rlRun "ping -c 3 $MASTER"
+		rlLog "WHY THE HECK AM I WAITING HERE?"
 		rlRun "rhts-sync-block -s MASTER_SETUP $MASTER"
 		rlRun "service sssd restart"
 		hbacsvc_client1
@@ -142,7 +145,10 @@ rlJournalStart
                 rlLog "Machine in recipe is CLIENT2"
                 rlRun "service iptables stop" 0 "Stop the firewall on the client"
 
-		rlRun "rhts-sync-block -s MASTER_SETUP $MASTER"
+		rlRun "sleep 5"
+		rlRun "ping -c 3 $MASTER"
+		rlLog "WHY THE HECK AM I WAITING HERE?"
+		rlRun "rhts-sync-block -s ONLINE $MASTER"
 		rlRun "service sssd restart"
 		hbacsvc_client2
                 rlRun "rhts-sync-set -s DONE -m $CLIENT2"
@@ -173,6 +179,7 @@ rlJournalStart
 
 	rlPhaseStartSetup "ipa-hbacsvc-func: Setup of users"
 
+                rlRun "service iptables stop" 0 "Stop the firewall on the client"
         	rlRun "cat /dev/shm/env.sh"
 	        rlRun "TmpDir=\`mktemp -d\`" 0 "Creating tmp directory"
         	rlRun "pushd $TmpDir"
@@ -193,7 +200,10 @@ rlJournalStart
 	        rlRun "create_ipauser $user3 $user3 $user3 $userpw"
 
 		hbacsvc_setup
-		rlRun "rhts-sync-set -s MASTER_SETUP -m $MASTER"
+		rlRun "rhts-sync-set -s ONLINE -m $MASTER"
+		rlRun "ping -c 3 $CLIENT1"
+		rlRun "ping -c 3 $CLIENT2"
+		rlLog "I AM WAITING FOR THE CLIENTS TO FINISH THEIR JOB"
                 rlRun "rhts-sync-block -s DONE -s DONE $CLIENT1 $CLIENT2"
 		#rlRun "rhts-sync-set -s HBACSVC_SETUP"
                	#rlRun "rhts-sync-block -s HBACSVC_DONE -s HBACSVC_DONE $CLIENT1 $CLIENT2"
