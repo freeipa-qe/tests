@@ -193,7 +193,7 @@ rlJournalStart
 	        rlRun "create_ipauser $user3 $user3 $user3 $userpw"
 
 		hbacsvc_setup
-		rlRun "rhts-sync-set -m $MASTER -s MASTER_SETUP"
+		rlRun "rhts-sync-set -s MASTER_SETUP -m $MASTER"
                 rlRun "rhts-sync-block -s DONE -s DONE $CLIENT1 $CLIENT2"
 		#rlRun "rhts-sync-set -s HBACSVC_SETUP"
                	#rlRun "rhts-sync-block -s HBACSVC_DONE -s HBACSVC_DONE $CLIENT1 $CLIENT2"
