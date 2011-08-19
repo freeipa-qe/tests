@@ -25,6 +25,7 @@ setup-nis-server()
 	else
 		LIBDIR=/usr/lib
 	fi
+	setenforce 0 # This seems to mak ehe installs work faster
 	/bin/domainname $NISDOMAIN 
 	/bin/ypdomainname $NISDOMAIN 
 	echo "$SLAVE" | $LIBDIR/yp/ypinit -m	
@@ -58,5 +59,6 @@ setup-nis-server()
 	# Enable netgroups in the yp makefile
 	sed -i s/^"all:  passwd group hosts rpc services netid protocols mail"/"all:  passwd group hosts rpc services netid protocols netgrp mail"\\/g /var/yp/Makefile
 	echo "$SLAVE" | $LIBDIR/yp/ypinit -m 
+	setenforce 1
 
 }
