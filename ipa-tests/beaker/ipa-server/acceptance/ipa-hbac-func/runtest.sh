@@ -174,10 +174,6 @@ rlJournalStart
         	rlRun "pushd $TmpDir"
 	        rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 
-	        # add host for testing
-	        rlRun "addHost $CLIENT1" 0 "SETUP: Adding host $CLIENT1 for testing."
-	        rlRun "addHost $CLIENT2" 0 "SETUP: Adding host $CLIENT2 for testing."
-
         	# kinit as admin and creating users
 	        rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 	        rlRun "create_ipauser $user1 $user1 $user1 $userpw"
