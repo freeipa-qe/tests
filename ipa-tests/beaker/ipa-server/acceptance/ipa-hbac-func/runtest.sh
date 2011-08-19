@@ -33,15 +33,19 @@
 
 
 # HACKING env.sh FOR HBAC AUTOMATION
-#ENV_DOMAIN=`cat /dev/shm/env.sh | grep ^"DOMAIN=" | cut -d = -f 2`
-#SHORT_HOST1=`cat /dev/shm/env.sh | grep BEAKERCLIENT |  cut -d "=" -f 2 | cut -d " " -f 1 | cut -d . -f 1`
-#echo "export CLIENT1=$SHORT_HOST1.$ENV_DOMAIN" >> /dev/shm/env.sh
-#
-#SHORT_HOST2=`cat /dev/shm/env.sh | grep BEAKERCLIENT | cut -d " " -f 3 | cut -d . -f 1`
-#echo "export CLIENT2=$SHORT_HOST2.$ENV_DOMAIN" >> /dev/shm/env.sh
-#
-#sed -e 's/export BEAKERCLIENT/#export BEAKERCLIENT/' /dev/shm/env.sh > /dev/shm/env.sh.new
-#sed -e 's/export CLIENT=/#export CLIENT=/' /dev/shm/env.sh.new > /dev/shm/env.sh
+ENV_DOMAIN=`cat /dev/shm/env.sh | grep ^"DOMAIN=" | cut -d = -f 2`
+SHORT_HOST1=`cat /dev/shm/env.sh | grep BEAKERCLIENT |  cut -d "=" -f 2 | cut -d " " -f 1 | cut -d . -f 1`
+LONG_HOST1=`cat /dev/shm/env.sh | grep BEAKERCLIENT | awk '{print $2}' | cut -d = -f 2`
+echo "export CLIENT1=$SHORT_HOST1.$ENV_DOMAIN" >> /dev/shm/env.sh
+echo "export BEAKERCLIENT1=$LONG_HOST1"
+
+SHORT_HOST2=`cat /dev/shm/env.sh | grep BEAKERCLIENT | cut -d " " -f 3 | cut -d . -f 1`
+LONG_HOST2=`cat /tmp/env.sh | grep BEAKERCLIENT | awk '{print $3}'`
+echo "export CLIENT2=$SHORT_HOST2.$ENV_DOMAIN" >> /dev/shm/env.sh
+echo "export BEAKERCLIENT2=$LONG_HOST2"
+
+sed -e 's/export BEAKERCLIENT=/#export BEAKERCLIENT=/' /dev/shm/env.sh > /dev/shm/env.sh.new
+sed -e 's/export CLIENT=/#export CLIENT=/' /dev/shm/env.sh.new > /dev/shm/env.sh
 
 
 ##########################################################################
@@ -75,13 +79,14 @@ user3="user3"
 
 ########################################################################
 
-CLIENT1=CLIENT
-CLIENT2=SLAVE
-
 #Checking hostnames of all hosts
 echo "The hostname of IPA Server is $MASTER"
 echo "The hostname of IPA Client 1 is $CLIENT1"
 echo "The hostname of IPA Client 2 is $CLIENT2"
+
+echo "The beaker hostname of IPA Server is $BEAKERMASTER"
+echo "The beaker hostname of IPA Client 1 is $BEAKERCLIENT1"
+echo "The beaker hostname of IPA Client 2 is $BEAKERCLIENT2"
 
 cat /dev/shm/env.sh #TODO
 ########################################################################
@@ -110,13 +115,10 @@ rlJournalStart
                 rlLog "Machine in recipe is CLIENT1"
                 rlRun "service iptables stop" 0 "Stop the firewall on the client"
 
-		rlRun "sleep 5"
-		rlRun "ping -c 3 $MASTER"
-		rlLog "WHY THE HECK AM I WAITING HERE?"
-		rlRun "rhts-sync-block -s ONLINE $MASTER"
+		rlRun "rhts-sync-block -s ONLINE $BEAKERMASTER"
 		rlRun "service sssd restart"
 		hbacsvc_client1
-                rlRun "rhts-sync-set -s DONE -m $CLIENT1"
+                rlRun "rhts-sync-set -s DONE -m $BEAKERCLIENT1"
 		#rlRun "rhts-sync-block -s HBACSVC_SETUP $MASTER"
 		#rlRun "rhts-sync-set -s HBACSVC_DONE"
 	rlPhaseEnd
@@ -148,13 +150,10 @@ rlJournalStart
                 rlLog "Machine in recipe is CLIENT2"
                 rlRun "service iptables stop" 0 "Stop the firewall on the client"
 
-		rlRun "sleep 5"
-		rlRun "ping -c 3 $MASTER"
-		rlLog "WHY THE HECK AM I WAITING HERE?"
-		rlRun "rhts-sync-block -s ONLINE $MASTER"
+		rlRun "rhts-sync-block -s ONLINE $BEAKERMASTER"
 		rlRun "service sssd restart"
 		hbacsvc_client2
-                rlRun "rhts-sync-set -s DONE -m $CLIENT2"
+                rlRun "rhts-sync-set -s DONE -m $BEAKERCLIENT2"
 		#rlRun "rhts-sync-block -s HBACSVC_SETUP $MASTER"
 		#rlRun "rhts-sync-set -s HBACSVC_DONE"
 	rlPhaseEnd
@@ -203,11 +202,8 @@ rlJournalStart
 	        rlRun "create_ipauser $user3 $user3 $user3 $userpw"
 
 		hbacsvc_setup
-		rlRun "rhts-sync-set -s ONLINE -m $MASTER"
-		rlRun "ping -c 3 $CLIENT1"
-		rlRun "ping -c 3 $CLIENT2"
-		rlLog "I AM WAITING FOR THE CLIENTS TO FINISH THEIR JOB"
-                rlRun "rhts-sync-block -s DONE -s DONE $CLIENT1 $CLIENT2"
+		rlRun "rhts-sync-set -s ONLINE -m $BEAKERMASTER"
+                rlRun "rhts-sync-block -s DONE -s DONE $BEAKERCLIENT1 $BEAKERCLIENT2"
 		#rlRun "rhts-sync-set -s HBACSVC_SETUP"
                	#rlRun "rhts-sync-block -s HBACSVC_DONE -s HBACSVC_DONE $CLIENT1 $CLIENT2"
 	rlPhaseEnd
