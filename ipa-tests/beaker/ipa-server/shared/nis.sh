@@ -45,14 +45,17 @@ setup-nis-server()
 	adduser --password $NISUSER3PASSWD $NISUSER3
 	adduser --password $NISUSER4PASSWD $NISUSER4
 	echo "$SLAVE" | $LIBDIR/yp/ypinit -m	
-	service ypserv restart
-	service ypbind restart
 	service yppasswdd start
 	service ypxfrd start
 	chkconfig ypserv on
 	chkconfig ypbind on
 	chkconfig yppasswdd on
 	chkconfig ypxfrd on
+	service ypserv restart
+	service ypbind restart
+	service ypserv restart
+	service ypbind restart
+	ypcat passwd
 
 	# configuring netgroups
 	echo "trustedhost ($NISHOST1,-)" /etc/netgroup
