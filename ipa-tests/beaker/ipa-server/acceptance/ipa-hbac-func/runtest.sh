@@ -88,7 +88,7 @@ echo "The beaker hostname of IPA Server is $BEAKERMASTER"
 echo "The beaker hostname of IPA Client 1 is $BEAKERCLIENT1"
 echo "The beaker hostname of IPA Client 2 is $BEAKERCLIENT2"
 
-cat /dev/shm/env.sh #TODO
+cat /dev/shm/env.sh
 ########################################################################
 
 
@@ -100,10 +100,6 @@ rlJournalStart
         #               IS THIS MACHINE A CLIENT1?                          #
         #####################################################################
         rc=0
-
-	# Checking if CLIENT1 and CLIENT2 can be identified
-#	SHORT_HOST1=`cat /dev/shm/env.sh | grep BEAKERCLIENT |  cut -d "=" -f 2 | cut -d " " -f 1 | cut -d . -f 1`
-#	CLIENT1=$SHORT_HOST1.$DOMAIN
 
 	echo "Hostname of this machine is $HOSTNAME"
 	echo "Hostname of client is $CLIENT1"
@@ -119,8 +115,6 @@ rlJournalStart
 		rlRun "service sssd restart"
 		hbacsvc_client1
                 rlRun "rhts-sync-set -s DONE -m $BEAKERCLIENT1"
-		#rlRun "rhts-sync-block -s HBACSVC_SETUP $MASTER"
-		#rlRun "rhts-sync-set -s HBACSVC_DONE"
 	rlPhaseEnd
 
         else
@@ -136,10 +130,6 @@ rlJournalStart
         #####################################################################
         rc=0
 
-        # Checking if CLIENT1 and CLIENT2 can be identified 
-#        SHORT_HOST2=`cat /dev/shm/env.sh | grep BEAKERCLIENT | cut -d " " -f 3 | cut -d . -f 1`
-#        CLIENT2=$SHORT_HOST2.$DOMAIN
-
 	echo "Hostname of this machine is $HOSTNAME"
 	echo "Hostname of client2 is $CLIENT2"
 
@@ -154,8 +144,6 @@ rlJournalStart
 		rlRun "service sssd restart"
 		hbacsvc_client2
                 rlRun "rhts-sync-set -s DONE -m $BEAKERCLIENT2"
-		#rlRun "rhts-sync-block -s HBACSVC_SETUP $MASTER"
-		#rlRun "rhts-sync-set -s HBACSVC_DONE"
 	rlPhaseEnd
 
         else
@@ -175,7 +163,6 @@ rlJournalStart
 	echo "Hostname of master is $MASTER"
 
         echo $MASTER | grep $HOSTNAME
-        #echo $MASTER | grep `hostname -s`
         if [ $? -eq 0 ] ; then
                 rlLog "Machine in recipe is MASTER"
 
@@ -188,8 +175,8 @@ rlJournalStart
 	        rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 
 	        # add host for testing
-	        #rlRun "addHost $CLIENT1" 0 "SETUP: Adding host $CLIENT1 for testing."
-	        #rlRun "addHost $CLIENT2" 0 "SETUP: Adding host $CLIENT2 for testing."
+	        rlRun "addHost $CLIENT1" 0 "SETUP: Adding host $CLIENT1 for testing."
+	        rlRun "addHost $CLIENT2" 0 "SETUP: Adding host $CLIENT2 for testing."
 
         	# kinit as admin and creating users
 	        rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
@@ -204,8 +191,6 @@ rlJournalStart
 		hbacsvc_setup
 		rlRun "rhts-sync-set -s ONLINE -m $BEAKERMASTER"
                 rlRun "rhts-sync-block -s DONE -s DONE $BEAKERCLIENT1 $BEAKERCLIENT2"
-		#rlRun "rhts-sync-set -s HBACSVC_SETUP"
-               	#rlRun "rhts-sync-block -s HBACSVC_DONE -s HBACSVC_DONE $CLIENT1 $CLIENT2"
 	rlPhaseEnd
 
 	rlPhaseStartCleanup "ipa-hbacrule-func-cleanup: Destroying admin credentials."
