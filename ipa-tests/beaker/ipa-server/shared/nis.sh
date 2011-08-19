@@ -30,6 +30,7 @@ setup-nis-server()
 	/bin/ypdomainname $NISDOMAIN 
 	echo "$SLAVE" | $LIBDIR/yp/ypinit -m	
 	echo "domain $NISDOMAIN server $MASTER"
+	service ypserv restart
 	/etc/init.d/ypbind restart
 	sed -i s/^NISDOMAIN/#NISDOMAIN/g /etc/sysconfig/network
 	echo "NISDOMAIN=\"$NISDOMAIN\"" >>  /etc/sysconfig/network
@@ -44,11 +45,10 @@ setup-nis-server()
 	adduser --password $NISUSER3PASSWD $NISUSER3
 	adduser --password $NISUSER4PASSWD $NISUSER4
 	echo "$SLAVE" | $LIBDIR/yp/ypinit -m	
-	/etc/init.d/ypbind restart
-	service ypbind start
+	service ypserv restart
+	service ypbind restart
 	service yppasswdd start
 	service ypxfrd start
-	service ypserv start
 	chkconfig ypserv on
 	chkconfig ypbind on
 	chkconfig yppasswdd on
