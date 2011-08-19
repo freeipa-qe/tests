@@ -16,6 +16,8 @@
 #       create_ipauser
 #       delete_ipauser
 #       fixResolv
+# 	ssh_auth_success
+# 	ssh_auth_failure
 ######################################################################
 KINITEXEC=/usr/bin/kinit
 #######################################################################
@@ -559,3 +561,58 @@ qaRun()
         echo "============== end of output =============="
     fi
 } #checkErrorMsg
+
+
+####################################################################
+## ssh_auth_success
+## Usage: ssh_auth_success user password host
+
+ssh_auth_success()
+   {
+        {
+	expect -f - <<-EOF | grep -C 77 '^login successful'
+        	spawn ssh -q -o StrictHostKeyChecking=no -l "$1" $3 echo 'login successful'
+                expect {
+                	"*assword: " {
+                        send -- "$2\r"
+                        	}
+                       }
+                expect eof
+EOF
+
+if [ $? = 0 ]; then
+	rlPass "Authentication successful, as expected"
+	else   
+        rlFail "ERROR: Authentication failed."
+fi
+        }
+   }
+
+
+####################################################################
+## ssh_auth_failure
+## Usage: ssh_auth_failure user password host
+
+ssh_auth_failure()
+   {
+        {
+        expect -f - <<-EOF | grep -C 77 '^login successful'
+                spawn ssh -q -l "$1" $CLIENT1 echo 'login successful'
+                expect {
+ 	                "*assword: " {
+                        send -- "$2\r"
+                                }
+                       }
+                expect eof
+EOF
+
+if [ $? = 0 ]; then
+	rlFail "ERROR: Authentication success."
+        else
+        rlPass "Authentication failed, as expected"
+fi
+        }
+   }
+
+
+####################################################################
