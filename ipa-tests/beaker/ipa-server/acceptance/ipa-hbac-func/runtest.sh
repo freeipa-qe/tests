@@ -29,6 +29,24 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+##########################################################################
+
+
+# HACKING env.sh FOR HBAC AUTOMATION
+ENV_DOMAIN=`cat /dev/shm/env.sh | grep ^"DOMAIN=" | cut -d = -f 2`
+SHORT_HOST1=`cat /dev/shm/env.sh | grep BEAKERCLIENT |  cut -d "=" -f 2 | cut -d " " -f 1 | cut -d . -f 1`
+echo "export CLIENT1=$SHORT_HOST1.$ENV_DOMAIN" >> /dev/shm/env.sh
+
+SHORT_HOST2=`cat /dev/shm/env.sh | grep BEAKERCLIENT | cut -d " " -f 3 | cut -d . -f 1`
+echo "export CLIENT2=$SHORT_HOST2.$ENV_DOMAIN" >> /dev/shm/env.sh
+
+sed -e 's/export BEAKERCLIENT/#export BEAKERCLIENT/' /dev/shm/env.sh > /dev/shm/env.sh.new
+sed -e 's/export CLIENT=/#export CLIENT=/' /dev/shm/env.sh.new > /dev/shm/env.sh
+
+
+##########################################################################
+
+
 # Include rhts environment
 . /usr/bin/rhts-environment.sh
 . /usr/share/beakerlib/beakerlib.sh
@@ -76,8 +94,8 @@ rlJournalStart
         rc=0
 
 	# Checking if CLIENT1 and CLIENT2 can be identified
-	SHORT_HOST1=`cat /dev/shm/env.sh | grep BEAKERCLIENT |  cut -d "=" -f 2 | cut -d " " -f 1 | cut -d . -f 1`
-	CLIENT1=$SHORT_HOST1.$DOMAIN
+#	SHORT_HOST1=`cat /dev/shm/env.sh | grep BEAKERCLIENT |  cut -d "=" -f 2 | cut -d " " -f 1 | cut -d . -f 1`
+#	CLIENT1=$SHORT_HOST1.$DOMAIN
 
 	echo "Hostname of this machine is $HOSTNAME"
 	echo "Hostname of client is $CLIENT1"
@@ -89,7 +107,7 @@ rlJournalStart
                 rlLog "Machine in recipe is CLIENT1"
                 rlRun "service iptables stop" 0 "Stop the firewall on the client"
 
-		rlRun "rhts-sync-block -s MASTER_SETUP -m $MASTER"
+		rlRun "rhts-sync-block -s MASTER_SETUP $MASTER"
 		rlRun "service sssd restart"
 		hbacsvc_client1
                 rlRun "rhts-sync-set -s DONE -m $CLIENT1"
@@ -111,8 +129,8 @@ rlJournalStart
         rc=0
 
         # Checking if CLIENT1 and CLIENT2 can be identified 
-        SHORT_HOST2=`cat /dev/shm/env.sh | grep BEAKERCLIENT | cut -d " " -f 3 | cut -d . -f 1`
-        CLIENT2=$SHORT_HOST2.$DOMAIN
+#        SHORT_HOST2=`cat /dev/shm/env.sh | grep BEAKERCLIENT | cut -d " " -f 3 | cut -d . -f 1`
+#        CLIENT2=$SHORT_HOST2.$DOMAIN
 
 	echo "Hostname of this machine is $HOSTNAME"
 	echo "Hostname of client2 is $CLIENT2"
@@ -124,7 +142,7 @@ rlJournalStart
                 rlLog "Machine in recipe is CLIENT2"
                 rlRun "service iptables stop" 0 "Stop the firewall on the client"
 
-		rlRun "rhts-sync-block -s MASTER_SETUP -m $MASTER"
+		rlRun "rhts-sync-block -s MASTER_SETUP $MASTER"
 		rlRun "service sssd restart"
 		hbacsvc_client2
                 rlRun "rhts-sync-set -s DONE -m $CLIENT2"
@@ -161,8 +179,8 @@ rlJournalStart
 	        rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 
 	        # add host for testing
-	        rlRun "addHost $CLIENT1" 0 "SETUP: Adding host $CLIENT1 for testing."
-	        rlRun "addHost $CLIENT2" 0 "SETUP: Adding host $CLIENT2 for testing."
+	        #rlRun "addHost $CLIENT1" 0 "SETUP: Adding host $CLIENT1 for testing."
+	        #rlRun "addHost $CLIENT2" 0 "SETUP: Adding host $CLIENT2 for testing."
 
         	# kinit as admin and creating users
 	        rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
@@ -176,7 +194,7 @@ rlJournalStart
 
 		hbacsvc_setup
 		rlRun "rhts-sync-set -m $MASTER -s MASTER_SETUP"
-                rlRun "rhts-sync-block -s DONE -s DONE -m $CLIENT1 -m $CLIENT2"
+                rlRun "rhts-sync-block -s DONE -s DONE $CLIENT1 $CLIENT2"
 		#rlRun "rhts-sync-set -s HBACSVC_SETUP"
                	#rlRun "rhts-sync-block -s HBACSVC_DONE -s HBACSVC_DONE $CLIENT1 $CLIENT2"
 	rlPhaseEnd
