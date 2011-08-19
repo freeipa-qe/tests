@@ -75,8 +75,8 @@ user3="user3"
 
 ########################################################################
 
-CLIENT=CLIENT1
-SLAVE=CLIENT2
+CLIENT1=CLIENT
+CLIENT2=SLAVE
 
 #Checking hostnames of all hosts
 echo "The hostname of IPA Server is $MASTER"
