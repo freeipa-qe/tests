@@ -37,12 +37,12 @@ ENV_DOMAIN=`cat /dev/shm/env.sh | grep ^"DOMAIN=" | cut -d = -f 2`
 SHORT_HOST1=`cat /dev/shm/env.sh | grep BEAKERCLIENT |  cut -d "=" -f 2 | cut -d " " -f 1 | cut -d . -f 1`
 LONG_HOST1=`cat /dev/shm/env.sh | grep BEAKERCLIENT | awk '{print $2}' | cut -d = -f 2`
 echo "export CLIENT1=$SHORT_HOST1.$ENV_DOMAIN" >> /dev/shm/env.sh
-echo "export BEAKERCLIENT1=$LONG_HOST1"
+echo "export BEAKERCLIENT1=$LONG_HOST1" >> /dev/shm/env.sh
 
 SHORT_HOST2=`cat /dev/shm/env.sh | grep BEAKERCLIENT | cut -d " " -f 3 | cut -d . -f 1`
-LONG_HOST2=`cat /tmp/env.sh | grep BEAKERCLIENT | awk '{print $3}'`
+LONG_HOST2=`cat /tmp/env.sh | grep BEAKERCLIENT | cut -d " " -f 3`
 echo "export CLIENT2=$SHORT_HOST2.$ENV_DOMAIN" >> /dev/shm/env.sh
-echo "export BEAKERCLIENT2=$LONG_HOST2"
+echo "export BEAKERCLIENT2=$LONG_HOST2" >> /dev/shm/env.sh
 
 sed -e 's/export BEAKERCLIENT=/#export BEAKERCLIENT=/' /dev/shm/env.sh > /dev/shm/env.sh.new
 sed -e 's/export CLIENT=/#export CLIENT=/' /dev/shm/env.sh.new > /dev/shm/env.sh
