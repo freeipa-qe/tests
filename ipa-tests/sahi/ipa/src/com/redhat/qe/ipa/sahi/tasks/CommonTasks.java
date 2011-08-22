@@ -20,7 +20,7 @@ public class CommonTasks {
 	
 	public static String userPage = "/ipa/ui/#identity=user&navigation=identity";	
 	public static String groupPage = "/ipa/ui/#nagivation=identity&identity=group";
-	public static String hostPage = "/ipa/ui/#identity=host&navigation=identity";
+	public String hostPage = "/ipa/ui/#identity=host&navigation=identity";
 	public static String hostgroupPage = "/ipa/ui/#identity=hostgroup&navigation=identity";
 	public static String netgroupPage = "/ipa/ui/#identity=netgroup&navigation=identity";
 	public static String dnsPage = "/ipa/ui/#dns=dnszone&identity=dns&navigation=identity";
@@ -31,9 +31,16 @@ public class CommonTasks {
 	public static String hbacPage = "/ipa/ui/#hbac=hbacrule&policy=hbac&navigation=policy";	
 	public static String sudoPage = "/ipa/ui/#navigation=policy&policy=sudo";
 	
-	public static String ipadomain = System.getProperty("ipa.server.domain");
-	public static String ipafqdn= System.getProperty("ipa.server.fqdn");
-	public static String reversezone = System.clearProperty("ipa.server.reversezone");
+	public static String ipadomain = "";
+	public static String ipafqdn= "";
+	public static String reversezone = "";
+	
+	public CommonTasks() {
+		setErrorFlag(false);
+		setIpadomain(System.getProperty("ipa.server.domain"));
+		setIpafqdn(System.getProperty("ipa.server.fqdn"));
+		setReversezone(System.getProperty("ipa.server.reversezone"));
+	}
 	
 	// to check if unexpected error was thrown in a test
 	public static boolean errorFlag = false;
@@ -44,6 +51,32 @@ public class CommonTasks {
 
 	public static void setErrorFlag(boolean errorFlag) {
 		CommonTasks.errorFlag = errorFlag;
+	}
+	
+	
+
+	public String getIpadomain() {
+		return ipadomain;
+	}
+
+	public static void setIpadomain(String ipadomain) {
+		CommonTasks.ipadomain = ipadomain;
+	}
+
+	public static String getIpafqdn() {
+		return ipafqdn;
+	}
+
+	public static void setIpafqdn(String ipafqdn) {
+		CommonTasks.ipafqdn = ipafqdn;
+	}
+
+	public String getReversezone() {
+		return reversezone;
+	}
+
+	public static void setReversezone(String reversezone) {
+		CommonTasks.reversezone = reversezone;
 	}
 
 	public static boolean kinitAsAdmin() {    	

@@ -12,14 +12,14 @@ public class HostTasks {
 	 * @param hostname - hostname
 	 * @param ipadr -  ipaddress
 	 */
-	public static void addHost(SahiTasks sahiTasks, String hostname, String ipadr) {
+	/*public static void addHost(SahiTasks sahiTasks, String hostname, String domain, String ipadr) {
 		sahiTasks.span("Add").click();
 		sahiTasks.textbox("hostname").setValue(hostname);
-		sahiTasks.textbox("dnszone").setValue(CommonTasks.ipadomain);
+		sahiTasks.textbox("dnszone").setValue(domain);
 		sahiTasks.checkbox("force").click();
 		sahiTasks.textbox("ip_address").setValue(ipadr);
 		sahiTasks.button("Add").click();
-	}
+	}*/
 	
 	/*
 	 * Create a host without dns records defined.
@@ -54,10 +54,10 @@ public class HostTasks {
 	 * @param platform - example: x86_64
 	 * @param os - example: Red Hat Enterprise Linux 6
 	 */
-	public static void addHostAndEdit(SahiTasks sahiTasks, String hostname, String ipadr, String description, String local, String location, String platform, String os) {
+	public static void addHostAndEdit(SahiTasks sahiTasks, String domain, String hostname, String ipadr, String description, String local, String location, String platform, String os) {
 		sahiTasks.span("Add").click();
 		sahiTasks.textbox("hostname").setValue(hostname);
-		sahiTasks.textbox("dnszone").setValue(CommonTasks.ipadomain);
+		sahiTasks.textbox("dnszone").setValue(domain);
 		if(ipadr == ""){ 
 			sahiTasks.checkbox("force").click();
 		}
@@ -81,10 +81,10 @@ public class HostTasks {
 	 * @param hostname - hostname2
 	 * @param hostname - hostname2
 	 */
-	public static void addAndAddAnotherHost(SahiTasks sahiTasks, String hostname1, String hostname2, String hostname3) {
+	public static void addAndAddAnotherHost(SahiTasks sahiTasks, String hostname1, String hostname2, String hostname3, String domain) {
 		sahiTasks.span("Add").click();
 		sahiTasks.textbox("hostname").setValue(hostname1);
-		sahiTasks.textbox("dnszone").setValue(CommonTasks.ipadomain);
+		sahiTasks.textbox("dnszone").setValue(domain);
 		sahiTasks.checkbox("force").click();
 		sahiTasks.button("Add and Add Another").click();
 		

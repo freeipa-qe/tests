@@ -22,7 +22,8 @@ import com.redhat.qe.ipa.sahi.tasks.UserTasks;
 public class NetgroupTests extends SahiTestScript{
 	public static SahiTasks sahiTasks = null;	
 	private String hostgroupPage = CommonTasks.hostgroupPage;
-	private String hostPage = CommonTasks.hostPage;
+	//TODO: nkrishnan: FIXME for CommonTasks
+	private String hostPage = ""; //CommonTasks.hostPage;
 	private String netgroupPage = CommonTasks.netgroupPage;
 	private String groupPage = CommonTasks.groupPage;
 	private String userPage = CommonTasks.userPage;
@@ -82,9 +83,10 @@ public class NetgroupTests extends SahiTestScript{
 		
 		//add hosts for host group members
 		sahiTasks.navigateTo(hostPage, true);
-		for (String hostname : hostnames) {
+		//TODO: nkrishnan: FIXME for CommonTasks
+		/*for (String hostname : hostnames) {
 			HostTasks.addHost(sahiTasks, hostname, "");
-		}
+		}*/
 		
 		//add host groups for net group members
 		sahiTasks.navigateTo(hostgroupPage, true);

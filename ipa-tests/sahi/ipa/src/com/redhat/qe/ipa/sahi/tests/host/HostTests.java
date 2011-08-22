@@ -20,12 +20,20 @@ import com.redhat.qe.ipa.sahi.tasks.HostTasks;
 
 public class HostTests extends SahiTestScript{
 	public static SahiTasks sahiTasks = null;	
+	public static CommonTasks commonTasks = null;
 
-	private String domain = CommonTasks.ipadomain;
+	/*private String domain = CommonTasks.ipadomain;
 	private String reversezone = CommonTasks.reversezone;
 	
 	private String hostPage = CommonTasks.hostPage;
-	private String dnsPage = CommonTasks.dnsPage;
+	private String dnsPage = CommonTasks.dnsPage;*/
+	
+	private String domain = ""; 
+	private String reversezone = "";  
+	
+	private String hostPage = "";
+	private String dnsPage = "";
+	
 	private String currentPage = "";
 	private String alternateCurrentPage = "";
 	
@@ -44,7 +52,17 @@ public class HostTests extends SahiTestScript{
 	
 	@BeforeClass (groups={"init"}, description="Initialize app for this test suite run", alwaysRun=true, dependsOnGroups="setup")
 	public void initialize() throws CloneNotSupportedException {	
-		sahiTasks = SahiTestScript.getSahiTasks();	
+		sahiTasks = SahiTestScript.getSahiTasks();
+		commonTasks = SahiTestScript.getCommonTasks();	
+		
+		
+		domain = commonTasks.getIpadomain();
+		reversezone = commonTasks.getReversezone();
+		System.out.println("NAMITA: ReverseZone: " + reversezone);
+		
+		hostPage = commonTasks.hostPage;
+		dnsPage = CommonTasks.dnsPage; //TODO:nkrishnan
+		
 		sahiTasks.navigateTo(hostPage, true);
 		sahiTasks.setStrictVisibilityCheck(true);
 		
@@ -54,9 +72,9 @@ public class HostTests extends SahiTestScript{
 		
 		//add the test hosts
 		HostTasks.addHost(sahiTasks, testhost, domain, "");
-		HostTasks.addHostAndEdit(sahiTasks, undotesthost, "", olddescription, oldlocal, oldlocation, oldplatform, oldos);
-		HostTasks.addHost(sahiTasks, managed, "");
-		HostTasks.addHost(sahiTasks, managedby, "");
+		HostTasks.addHostAndEdit(sahiTasks, domain, undotesthost, "", olddescription, oldlocal, oldlocation, oldplatform, oldos);
+		HostTasks.addHost(sahiTasks, managed, domain, "");
+		HostTasks.addHost(sahiTasks,managedby, domain, "");
 	}
 	
 	@AfterClass (groups={"cleanup"}, description="Delete objects added for the tests", alwaysRun=true)
@@ -89,7 +107,7 @@ public class HostTests extends SahiTestScript{
 		com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(lowerdn).exists(), "Verify host " + fqdn + " doesn't already exist");
 		
 		//add new host
-		HostTasks.addHost(sahiTasks, hostname, ipadr);
+		HostTasks.addHost(sahiTasks, hostname, domain, ipadr);
 
 		//verify host was added
 		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(lowerdn).exists(), "Added host " + fqdn + "  successfully");
@@ -113,15 +131,15 @@ public class HostTests extends SahiTestScript{
 	/*
 	 * Add and add another host - for positive tests
 	 */
-	@Test (groups={"addAndAddAnotherHostTests"}, dataProvider="getAddAndAddAnotherHostTests")	
+	@Test (groups={"addAndAddAnotherHostTests"}, dataProvider="getAddAndAddAnotherHostTests", dependsOnGroups="deleteHostTests")	
 	public void testHostForceAdd(String testName, String hostname1, String hostname2, String hostname3) throws Exception {
 		String [] hostnames = {hostname1, hostname2, hostname3};
 		for (String hostname : hostnames){
-			com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(hostname).exists(), "Verify host " + hostname + " doesn't already exist");
+			com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(hostname + "." + domain).exists(), "Verify host " + hostname + " doesn't already exist");
 		}
 
 		//add new hosts
-		HostTasks.addAndAddAnotherHost(sahiTasks, hostname1, hostname2, hostname3);
+		HostTasks.addAndAddAnotherHost(sahiTasks, hostname1, hostname2, hostname3, domain);
 		
 		for (String hostname : hostnames){
 			//verify host was added
@@ -160,7 +178,7 @@ public class HostTests extends SahiTestScript{
 		com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(lowerdn).exists(), "Verify host " + hostname + " doesn't already exist");
 		
 		//add and edit new host
-		HostTasks.addHostAndEdit(sahiTasks, hostname, ipadr, description, local, location, platform, os);
+		HostTasks.addHostAndEdit(sahiTasks, domain, hostname, ipadr, description, local, location, platform, os);
 		
 		//verify host was added
 		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(lowerdn).exists(), "Added host " + hostname + "  successfully");

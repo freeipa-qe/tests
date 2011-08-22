@@ -11,6 +11,7 @@ import java.util.logging.Logger;
 public abstract class SahiTestScript extends TestScript {
 	private static Logger log = Logger.getLogger(SahiTestScript.class.getName());
 	public static SahiTasks sahiTasks = null;
+	public static CommonTasks commonTasks = null;
 
 	
 	protected String browserType			= System.getProperty("ipa.browser.type");
@@ -25,12 +26,16 @@ public abstract class SahiTestScript extends TestScript {
 
 	public SahiTestScript() {
 		super();
-
+		commonTasks = new CommonTasks();
 		sahiTasks = new SahiTasks(browserType, browserPath, browserName, browserOpt, sahiBaseDir, sahiUserdataDir);
 	}
 	
 	public static SahiTasks getSahiTasks() {
 		return sahiTasks;
+	}
+	
+	public static CommonTasks getCommonTasks() {
+		return commonTasks;
 	}
 
 	

@@ -74,10 +74,10 @@ public class HBACTests extends SahiTestScript {
 		if (!sahiTasks.link(groupName).exists())
 			GroupTasks.createGroupService(sahiTasks, groupName, groupDescription, CommonTasks.groupPage);
 		
-
-		sahiTasks.navigateTo(System.getProperty("ipa.server.url")+ CommonTasks.hostPage, true);
+//TODO: nkrishnan: FIXME for CommonTasks
+		/*sahiTasks.navigateTo(System.getProperty("ipa.server.url")+ CommonTasks.hostPage, true);
 		if (!sahiTasks.link(fqdn.toLowerCase()).exists())
-			HostTasks.addHost(sahiTasks, hostname, ipadr);
+			HostTasks.addHost(sahiTasks, hostname, ipadr);*/
 		
 		sahiTasks.navigateTo(System.getProperty("ipa.server.url")+ CommonTasks.hostgroupPage, true);
 		if (!sahiTasks.link(hostgroupName).exists()) {
@@ -442,8 +442,8 @@ public class HBACTests extends SahiTestScript {
 		if (sahiTasks.link(groupName).exists())
 			GroupTasks.deleteGroup(sahiTasks, groupName);
 		
-
-		sahiTasks.navigateTo(System.getProperty("ipa.server.url")+ CommonTasks.hostPage, true);
+		//TODO: nkrishnan: FIXME for CommonTasks
+		//sahiTasks.navigateTo(System.getProperty("ipa.server.url")+ CommonTasks.hostPage, true);
 		if (sahiTasks.link(fqdn.toLowerCase()).exists())
 			HostTasks.deleteHost(sahiTasks, fqdn);
 		

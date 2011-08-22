@@ -8,6 +8,7 @@
 			<run>
 			    <include name="setup" />
 			    <include name="init" />	 
+			    <!--
 				<include name="addHostTests" />
 				<include name="deleteHostTests" />
 				<include name="addAndAddAnotherHostTests" />
@@ -21,6 +22,7 @@
 				<include name="invalidhostAddTests" />
 				<include name="hostCertificateTests" />
 				<include name="hostInvalidCSRTests" />
+				-->
 				<include name="hostAddDNSTests" />
 				<include name="cleanup" />
 				<!--
