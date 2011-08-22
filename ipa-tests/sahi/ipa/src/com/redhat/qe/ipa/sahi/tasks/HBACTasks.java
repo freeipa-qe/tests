@@ -2,6 +2,8 @@ package com.redhat.qe.ipa.sahi.tasks;
 
 import java.util.logging.Logger;
 
+import org.testng.annotations.Test;
+
 import com.redhat.qe.auto.testng.Assert;
 
 /**
@@ -29,7 +31,7 @@ public class HBACTasks {
 	 * @param sahiTasks
 	 * @param cn -  cn of the rule to be deleted
 	 */
-	public static void chooseMultipleRules(SahiTasks sahiTasks, String[] cns) {		
+	public static void chooseMultiple(SahiTasks sahiTasks, String[] cns) {		
 		for (String cn : cns) {
 			sahiTasks.checkbox(cn).click();		
 		}		
@@ -39,7 +41,7 @@ public class HBACTasks {
 	 * Delete multiple rules. 
 	 * @param sahiTasks
 	 */
-	public static void deleteMultipleRules(SahiTasks sahiTasks) {		
+	public static void deleteMultiple(SahiTasks sahiTasks) {		
 		sahiTasks.link("Delete").click();
 		sahiTasks.button("Delete").click();
 	}
@@ -127,6 +129,16 @@ public class HBACTasks {
 		sahiTasks.button("Add").click();
 	}
 	
+	public static void createInvalidRule(SahiTasks sahiTasks, String cn, String expectedError) {
+		sahiTasks.span("Add").click();
+		sahiTasks.textbox("cn").setValue(cn);
+		sahiTasks.button("Add").click();
+		Assert.assertTrue(sahiTasks.div(expectedError).exists(), "Verified expected error when adding invalid rule " + cn);
+		sahiTasks.button("Cancel").near(sahiTasks.button("Retry")).click();
+		sahiTasks.button("Cancel").near(sahiTasks.button("Add and Edit")).click();
+		
+	}
+	
 	public static void verifyHBACRuleUpdates(SahiTasks sahiTasks, String cn, String uid, String hostgroupName, String service, String fqdn) {
 		//click on rule to edit
 		sahiTasks.link(cn).click();
@@ -195,7 +207,7 @@ public class HBACTasks {
 		sahiTasks.span("Add").under(sahiTasks.heading2(("Who"))).near(sahiTasks.span("Users")).click();
 		sahiTasks.checkbox("hidememb").click();
 		sahiTasks.link("Find").click();
-		//FIXME: Bug 729665
+		//FIXME: nkrishnan: Bug 729665
 		//Assert.assertFalse(sahiTasks.checkbox(user).exists(), "Enrolled user not listed");
 		sahiTasks.button("Cancel").click();		
 		sahiTasks.span("Delete").click();
@@ -239,14 +251,15 @@ public class HBACTasks {
 		
 		//TODO: nkrishnan - should the suffix be used? Currently - there is a host added in the From Section, 
 		// and so the suffix is needed here in the Accessing section
-		sahiTasks.checkbox(fqdn).under(sahiTasks.heading2(("Accessing"))).under(sahiTasks.span("Hosts")).click(); 		
+		//sahiTasks.checkbox(fqdn).under(sahiTasks.heading2(("Accessing"))).under(sahiTasks.span("Hosts")).click();
+		sahiTasks.checkbox(fqdn+"[1]").click();
 		sahiTasks.span(">>").click();
 		sahiTasks.button("Enroll").click();
 		
 		sahiTasks.span("Add").under(sahiTasks.heading2(("Accessing"))).near(sahiTasks.span("Host Groups")).click();
 		sahiTasks.checkbox("hidememb").click();
 		sahiTasks.link("Find").click();
-		//FIXME: Bug 729665
+		//FIXME: nkrishnan: Bug 729665
 		//Assert.assertFalse(sahiTasks.checkbox(hostgroupname).exists(), "Enrolled host group not listed");
 		sahiTasks.button("Cancel").click();
 		
@@ -300,7 +313,7 @@ public class HBACTasks {
 		sahiTasks.span("Add").under(sahiTasks.heading2(("From"))).near(sahiTasks.span("Hosts")).click();
 		sahiTasks.checkbox("hidememb").click();
 		sahiTasks.link("Find").click();
-		//FIXME: Bug 729665
+		//FIXME: nkrishnan: Bug 729665
 		//Assert.assertFalse(sahiTasks.checkbox(fqdn).exists(), "Enrolled host not listed");
 		sahiTasks.button("Cancel").click();
 		
@@ -322,7 +335,7 @@ public class HBACTasks {
 		sahiTasks.link(cn).click();
 		
 		Assert.assertFalse(sahiTasks.checkbox(fqdn).under(sahiTasks.heading2(("From"))).near(sahiTasks.span("Hosts")).exists(), "Verified Host: " + fqdn + " is not on list for rule: " + cn);
-		Assert.assertTrue(sahiTasks.checkbox(hostgroupname).under(sahiTasks.heading2(("From"))).under(sahiTasks.span("Hosts")).exists(), "Verified Host Group: " + hostgroupname + " is on list for rule: " + cn);
+		Assert.assertTrue(sahiTasks.checkbox(hostgroupname+"[1]").exists(), "Verified Host Group: " + hostgroupname + " is on list for rule: " + cn);
 				
 		sahiTasks.link("HBAC Rules").in(sahiTasks.div("content")).click();			
 	}
@@ -433,5 +446,64 @@ public class HBACTasks {
 		
 		sahiTasks.link("HBAC Rules").in(sahiTasks.div("content")).click();
 	}
+	
+	
+	
+	
+	
+	/*****************************************************************************************
+	 *********************** 		Tasks for HBAC Services				********************** 
+	 *****************************************************************************************/
+	
+	
+	public static void addHBACService(SahiTasks sahiTasks, String cn, String description, String buttonToClick) {
+		sahiTasks.span("Add").click();
+		sahiTasks.textbox("cn").setValue(cn);
+		sahiTasks.textbox("description").setValue(description);
+		sahiTasks.button(buttonToClick).click();
+	}
+	
+	
+	public static void addHBACServiceThenAddAnother(SahiTasks sahiTasks, String cn1, String cn2, String description) {
+		sahiTasks.span("Add").click();
+		sahiTasks.textbox("cn").setValue(cn1);
+		sahiTasks.textbox("description").setValue(description);
+		sahiTasks.button("Add and Add Another").click();
+		sahiTasks.textbox("cn").setValue(cn2);
+		sahiTasks.textbox("description").setValue(description);
+		sahiTasks.button("Add").click();		
+	}
+
+	public static void addAndEditHBACService(SahiTasks sahiTasks, String cn, String description) {
+
+		sahiTasks.span("Add").click();
+		sahiTasks.textbox("cn").setValue(cn);
+		sahiTasks.button("Add and Edit").click();
+		sahiTasks.textbox("description").setValue(description);
+		
+		sahiTasks.span("Update").click();
+		sahiTasks.link("HBAC Services").in(sahiTasks.div("content")).click();
+	}
+
+	public static void verifyHBACServiceUpdates(SahiTasks sahiTasks, String cn,	String description) {
+		sahiTasks.link(cn).click();
+		
+		//verify Service description
+		Assert.assertEquals(sahiTasks.textbox("description").value(), description, "Verified description for service " + cn);
+
+		sahiTasks.link("HBAC Services").in(sahiTasks.div("content")).click();
+	}
+
+	public static void createInvalidService(SahiTasks sahiTasks, String cn, String expectedError) {
+		sahiTasks.span("Add").click();
+		sahiTasks.textbox("cn").setValue(cn);
+		sahiTasks.button("Add").click();
+		Assert.assertTrue(sahiTasks.div(expectedError).exists(), "Verified expected error when adding invalid service " + cn);
+		sahiTasks.button("Cancel").near(sahiTasks.button("Retry")).click();
+		sahiTasks.button("Cancel").near(sahiTasks.button("Add and Edit")).click();
+	}
+	
+
+	
 	
 }

@@ -1,13 +1,16 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
 <suite name="IPAHBACTestSuite">	
-	<test name="HBAC Tests">
+	<test name="HBAC Rule Tests">
 		<packages>
 		    <package name="com.redhat.qe.ipa.sahi.*" />
 		</packages>
 		<groups>
 			<run>
 			    <include name="setup" />
+			    
+			    <!-- HBAC Rules -->
 			    <include name="hbacRuleAddTests" />
+			    <include name="invalidhbacRuleAddTests" />
 			    <include name="hbacRuleCancelAddTests" />
 			    <include name="hbacRuleAddAndEditTests" />
 			    <include name="hbacRuleCancelDeleteTests" />
@@ -22,15 +25,38 @@
 			    <include name="hbacRuleSearchTests" />
 			    <include name="hbacRuleDeleteTests" />			   
 			    <include name="hbacRuleMultipleDeleteTests" />
+			   
 				<!--
 				<include name="teardown"/>
 				-->
 			</run>
 		</groups>
+		
 		<classes>
 		    <class name="com.redhat.qe.ipa.sahi.tests.hbac.HBACTests" />
 		</classes>
 	</test>
+	
+	<test name="HBAC Services Tests">
+		<groups>
+			<run>
+			<!-- HBAC Service -->
+			    <include name="hbacServiceAddTests" />
+			    <include name="hbacServiceAddAndAddAnotherTests" />
+			    <include name="hbacServiceAddAndEditTests" />
+			    <include name="hbacServiceCancelAddTests" />
+			    <include name="invalidhbacServiceAddTests" />
+			    <include name="hbacServiceSearchTests" />
+			    <include name="hbacServiceMultipleDeleteTests" />
+			</run>
+		</groups>
+		<classes>
+		    <class name="com.redhat.qe.ipa.sahi.tests.hbac.HBACServiceTests" />
+		</classes>
+	</test>
+	
+	
+		
 	
 	<listeners>        
   		<listener class-name="com.redhat.qe.auto.testng.TestNGListener" />	

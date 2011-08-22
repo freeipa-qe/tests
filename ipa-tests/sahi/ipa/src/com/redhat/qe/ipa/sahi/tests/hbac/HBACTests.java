@@ -27,6 +27,7 @@ public class HBACTests extends SahiTestScript {
 	
 	private static Logger log = Logger.getLogger(HBACTests.class.getName());
 	public static SahiTasks sahiTasks = null;
+	public static CommonTasks commonTasks = null;
 
 	
 	/*
@@ -62,7 +63,8 @@ public class HBACTests extends SahiTestScript {
 	
 	@BeforeClass (groups={"init"}, description="Initialize app for this test suite run", alwaysRun=true, dependsOnGroups="setup")
 	public void initialize() throws CloneNotSupportedException {	
-		sahiTasks = SahiTestScript.getSahiTasks();	
+		sahiTasks = SahiTestScript.getSahiTasks();
+		commonTasks = SahiTestScript.getCommonTasks();
 		sahiTasks.setStrictVisibilityCheck(true);
 		
 		//add new user, user group, host, host group
@@ -75,9 +77,9 @@ public class HBACTests extends SahiTestScript {
 			GroupTasks.createGroupService(sahiTasks, groupName, groupDescription, CommonTasks.groupPage);
 		
 //TODO: nkrishnan: FIXME for CommonTasks
-		/*sahiTasks.navigateTo(System.getProperty("ipa.server.url")+ CommonTasks.hostPage, true);
+		sahiTasks.navigateTo(System.getProperty("ipa.server.url")+ CommonTasks.hostPage, true);
 		if (!sahiTasks.link(fqdn.toLowerCase()).exists())
-			HostTasks.addHost(sahiTasks, hostname, ipadr);*/
+			HostTasks.addHost(sahiTasks, hostname, commonTasks.getIpadomain(), ipadr);
 		
 		sahiTasks.navigateTo(System.getProperty("ipa.server.url")+ CommonTasks.hostgroupPage, true);
 		if (!sahiTasks.link(hostgroupName).exists()) {
@@ -113,12 +115,12 @@ public class HBACTests extends SahiTestScript {
 	 */
 	@Test (groups={"hbacRuleAddTests"}, dataProvider="getHBACRuleTestObjects")	
 	public void testHBACRuleAdd(String testName, String cn) throws Exception {
-		//verify user, user group, host, host group doesn't exist
+		//verify rule doesn't exist
 		Assert.assertFalse(sahiTasks.link(cn).exists(), "Verify HBAC Rule " + cn + " doesn't already exist");
 		
 		HBACTasks.addHBACRule(sahiTasks, cn, "Add");
 		
-		//verify user, user group, host, host group were added
+		//verify rule were added
 		Assert.assertTrue(sahiTasks.link(cn).exists(), "Added HBAC Rule " + cn + "  successfully");
 	}
 	
@@ -172,6 +174,16 @@ public class HBACTests extends SahiTestScript {
 		Assert.assertFalse(sahiTasks.link(cn).exists(), "Verify HBAC Rule " + cn + "  was not added");
 	}
 	
+	
+	/*
+	 * Add Rules - for negative tests
+	 */
+	@Test (groups={"invalidhbacRuleAddTests"}, dataProvider="getInvalidHBACRuleTestObjects", dependsOnGroups="hbacRuleAddTests")	
+	public void testInvalidHBACRuleadd(String testName, String cn, String expectedError) throws Exception {
+		//new test user can be added now
+		HBACTasks.createInvalidRule(sahiTasks, cn, expectedError);		
+	}
+	
 	/*
 	 * Delete an HBACRule
 	 */
@@ -192,7 +204,7 @@ public class HBACTests extends SahiTestScript {
 	/*
 	 * Delete multiple HBACRule
 	 */
-	@Test (groups={"hbacRuleMultipleDeleteTests"}, dataProvider="getMultipleHBACRuleTestObjects", dependsOnGroups={"hbacRuleAddTests", "hbacRuleSearchTests" })
+	@Test (groups={"hbacRuleMultipleDeleteTests"}, dataProvider="getMultipleHBACRuleTestObjects", dependsOnGroups={"hbacRuleAddTests", "hbacRuleSearchTests", "invalidhbacRuleAddTests" })
 	public void testMultipleHBACRuleDelete(String testName, String cn1, String cn2, String cn3, String cn4) throws Exception {	
 		String cns[] = {cn1, cn2, cn3, cn4};
 		
@@ -202,8 +214,8 @@ public class HBACTests extends SahiTestScript {
 			Assert.assertTrue(sahiTasks.link(cn).exists(), "Verify HBAC Rule " + cn + "  to be deleted exists");
 		}			
 		//mark this rule for deletion
-		HBACTasks.chooseMultipleRules(sahiTasks, cns);		
-		HBACTasks.deleteMultipleRules(sahiTasks);
+		HBACTasks.chooseMultiple(sahiTasks, cns);		
+		HBACTasks.deleteMultiple(sahiTasks);
 	}
 		
 		
@@ -346,30 +358,11 @@ public class HBACTests extends SahiTestScript {
 	 *********************** 			HBAC Services					********************** 
 	 *****************************************************************************************/
 	
-	/*
-	 * Add a HBACService
-	 */
-	
-	/*
-	 * Add, and then add another HBACService
-	 */
-	
-	/*
-	 * Add, and edit HBACService
-	 */
-	
-	/*
-	 * Add, but Cancel adding HBACService
-	 */
 	
 	/*
 	 * Delete an HBACService
 	 */
-	
-	/*
-	 * Delete multiple HBACService
-	 */
-	
+		
 	/*
 	 * Delete, but Cancel deleting an HBACService
 	 */
@@ -443,7 +436,7 @@ public class HBACTests extends SahiTestScript {
 			GroupTasks.deleteGroup(sahiTasks, groupName);
 		
 		//TODO: nkrishnan: FIXME for CommonTasks
-		//sahiTasks.navigateTo(System.getProperty("ipa.server.url")+ CommonTasks.hostPage, true);
+		sahiTasks.navigateTo(System.getProperty("ipa.server.url")+ CommonTasks.hostPage, true);
 		if (sahiTasks.link(fqdn.toLowerCase()).exists())
 			HostTasks.deleteHost(sahiTasks, fqdn);
 		
@@ -506,6 +499,23 @@ public class HBACTests extends SahiTestScript {
 		
         //										testname					cn   
 		ll.add(Arrays.asList(new Object[]{ "create_good_hbacrule",			"eng_hbacRule"      } ));
+		
+		return ll;	
+	}
+	
+	
+	/*
+	 * Data to be used when adding rules 
+	 */
+	@DataProvider(name="getInvalidHBACRuleTestObjects")
+	public Object[][] getInvalidHBACRuleTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createInvalidHBACRuleTestObject());
+	}
+	protected List<List<Object>> createInvalidHBACRuleTestObject() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname					cn					expected_Error   
+		ll.add(Arrays.asList(new Object[]{ "create_duplicate_hbacrule",		"dev_hbacRule",		"HBAC rule with name \"dev_hbacRule\" already exists"      } ));
 		
 		return ll;	
 	}
@@ -579,4 +589,7 @@ public class HBACTests extends SahiTestScript {
 		
 		return ll;	
 	}
+	
+	
+	
 }

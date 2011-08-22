@@ -20,7 +20,7 @@ public class CommonTasks {
 	
 	public static String userPage = "/ipa/ui/#identity=user&navigation=identity";	
 	public static String groupPage = "/ipa/ui/#nagivation=identity&identity=group";
-	public String hostPage = "/ipa/ui/#identity=host&navigation=identity";
+	public static String hostPage = "/ipa/ui/#identity=host&navigation=identity";
 	public static String hostgroupPage = "/ipa/ui/#identity=hostgroup&navigation=identity";
 	public static String netgroupPage = "/ipa/ui/#identity=netgroup&navigation=identity";
 	public static String dnsPage = "/ipa/ui/#dns=dnszone&identity=dns&navigation=identity";
@@ -29,6 +29,8 @@ public class CommonTasks {
 	public static String kerberosTicketPolicyPage = "/ipa/ui/#policy=krbtpolicy&navigation=policy";
 	
 	public static String hbacPage = "/ipa/ui/#hbac=hbacrule&policy=hbac&navigation=policy";	
+	public static String hbacServicePage = "/ipa/ui/#hbac=hbacsvc&policy=hbac&navigation=policy";
+	public static String hbacServiceGroupsPage = "/ipa/ui/#hbac=hbacsvcgroup&policy=hbac&navigation=policy";
 	public static String sudoPage = "/ipa/ui/#navigation=policy&policy=sudo";
 	
 	public static String ipadomain = "";

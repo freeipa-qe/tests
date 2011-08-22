@@ -60,8 +60,8 @@ public class HostTests extends SahiTestScript{
 		reversezone = commonTasks.getReversezone();
 		System.out.println("NAMITA: ReverseZone: " + reversezone);
 		
-		hostPage = commonTasks.hostPage;
-		dnsPage = CommonTasks.dnsPage; //TODO:nkrishnan
+		hostPage = CommonTasks.hostPage;
+		dnsPage = CommonTasks.dnsPage; 
 		
 		sahiTasks.navigateTo(hostPage, true);
 		sahiTasks.setStrictVisibilityCheck(true);

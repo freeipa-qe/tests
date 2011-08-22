@@ -335,7 +335,7 @@ public class UserTasks {
 		
 		//verify user's job title
 		Assert.assertEquals(sahiTasks.textbox("ou").value(), org, "Verified updated Org. Unit for user " + uid + ": " + org);
-		//TODO: Assert.assertEquals(sahiTasks.textbox("manager").value(), manager, "Verified updated Manager for user " + uid + ": " + manager);
+		//TODO: nkrishnan: Assert.assertEquals(sahiTasks.textbox("manager").value(), manager, "Verified updated Manager for user " + uid + ": " + manager);
 		Assert.assertEquals(sahiTasks.textbox("carlicense").value(), carlicense, "Verified updated car license for user " + uid + ": " + carlicense);
 		
 		sahiTasks.link("Users").in(sahiTasks.div("content")).click();
