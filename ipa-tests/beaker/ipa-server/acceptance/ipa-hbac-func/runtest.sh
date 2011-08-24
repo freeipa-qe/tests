@@ -184,6 +184,7 @@ rlJournalStart
 	        rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 	        rlRun "create_ipauser $user3 $user3 $user3 $userpw"
 
+		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 		rlRun "ipa hbacrule-disable allow_all"
 
 		hbacsvc_setup
