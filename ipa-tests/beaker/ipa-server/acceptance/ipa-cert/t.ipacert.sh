@@ -83,7 +83,8 @@ cert_remove_hold_1002()
         local testID="cert_remove_hold_1002"
         local tmpout=$TmpDir/cert_remove_hold_1002.$RANDOM.out
         rlLog "iterating revokation reason from 0 -> 10 (skip 6) "
-        for revokeCode in 0 1 2 3 4 5 7 8 9 10
+        # by rfc 5280, revokeCode = 7 is not being used
+        for revokeCode in 0 1 2 3 4 5 6 8 9 10
         do
             rlLog "============= [revocation reason = $revokeCode ] ==============="
             create_cert
