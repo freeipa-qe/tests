@@ -53,16 +53,48 @@ hbacsvc_setup() {
 
 	# ipa hbactest:
 		
-#		rlRun "ipa hbactest --user=$user1 --srchost=$CLEINT1 --host=$CLIENT1 --service=sshd | grep -E '(Access granted: True|matched: rule1)'"
-#		rlRun "ipa hbactest --user=$user2 --srchost=$CLEINT1 --host=$CLIENT1 --service=sshd | grep -i \"Access granted: False\"" 
-#		rlRun "ipa hbactest --user=$user1 --srchost=$CLEINT2 --host=$CLIENT1 --service=sshd | grep -i \"Access granted: False\"" 
-#		rlRun "ipa hbactest --user=$user1 --srchost=$CLEINT1 --host=$CLIENT2 --service=sshd | grep -i \"Access granted: False\"" 
-#
-#		rlRun "ipa hbactest --user=$user1 --srchost=$CLEINT1 --host=$CLIENT1 --service=sshd --rule=rule1 | grep -E '(Access granted: True|matched: rule1)'"
-#		rlRun "ipa hbactest --user=$user1 --srchost=$CLEINT1 --host=$CLIENT1 --service=sshd --rule=rule2 | grep -E '(Access granted: True|notmatched: rule2)'"
-#		rlRun "ipa hbactest --user=$user2 --srchost=$CLEINT1 --host=$CLIENT1 --service=sshd --rule=rule1 | grep -E '(Access granted: False|notmatched: rule1)'"
-#		rlRun "ipa hbactest --srchost=$CLIENT1 --host=$CLIENT1 --service=sshd  --user=$user1 --rule=rule1 --nodetail | grep -i \"Access granted: True\""
-#		rlRun "ipa hbactest --srchost=$CLIENT1 --host=$CLIENT1 --service=sshd  --user=$user1 --rule=rule1 --nodetail | grep -i \"matched: rule1\"" 1
+		rlRun "ipa hbactest --user=$user1 --srchost=$CLIENT1 --host=$CLIENT1 --service=sshd | grep -E '(Access granted: True|matched: rule1)'"
+		rlRun "ipa hbactest --user=$user2 --srchost=$CLIENT1 --host=$CLIENT1 --service=sshd | grep -i \"Access granted: False\"" 
+		rlRun "ipa hbactest --user=$user1 --srchost=$CLIENT2 --host=$CLIENT1 --service=sshd | grep -i \"Access granted: False\"" 
+		rlRun "ipa hbactest --user=$user1 --srchost=$CLIENT1 --host=$CLIENT2 --service=sshd | grep -i \"Access granted: False\"" 
+
+		rlRun "ipa hbactest --user=$user1 --srchost=$CLIENT1 --host=$CLIENT1 --service=sshd --rule=rule1 | grep -E '(Access granted: True|matched: rule1)'"
+		rlRun "ipa hbactest --user=$user1 --srchost=$CLIENT1 --host=$CLIENT1 --service=sshd --rule=rule2 | grep -E '(Access granted: True|notmatched: rule2)'"
+		rlRun "ipa hbactest --user=$user2 --srchost=$CLIENT1 --host=$CLIENT1 --service=sshd --rule=rule1 | grep -E '(Access granted: False|notmatched: rule1)'"
+		rlRun "ipa hbactest --srchost=$CLIENT1 --host=$CLIENT1 --service=sshd  --user=$user1 --rule=rule1 --nodetail | grep -i \"Access granted: True\""
+		rlRun "ipa hbactest --srchost=$CLIENT1 --host=$CLIENT1 --service=sshd  --user=$user1 --rule=rule1 --nodetail | grep -i \"matched: rule1\"" 1
+
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-hbacsvc-002: Setup IPA Server HBAC - FTP Service"
+
+        	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+
+		rlRun "yum install ftp vsftpd -y"
+		rlRun "setsebool -P ftp_home_dir on"
+		rlRun "service vsftpd start"
+
+		rlRun "ipa hbacrule-add rule2"
+		rlRun "ipa hbacsvc-add vsftpd --desc=\"vsftpd\""
+		rlRun "ipa hbacrule-add-user rule2 --users=$user1"
+		rlRun "ipa hbacrule-add-host rule2 --hosts=$MASTER"
+		rlRun "ipa hbacrule-add-sourcehost rule2 --hosts=$CLIENT2"
+		rlRun "ipa hbacrule-add-service rule2 --hbacsvcs=vsftpd"
+		rlRun "ipa hbacrule-show rule2 --all"
+
+	# ipa hbactest:
+
+                rlRun "ipa hbactest --user=$user1 --srchost=$CLIENT2 --host=$MASTER --service=vsftpd | grep -E '(Access granted: True|matched: rule2)'"
+                rlRun "ipa hbactest --user=$user2 --srchost=$CLIENT2 --host=$MASTER --service=vsftpd | grep -i \"Access granted: False\""
+                rlRun "ipa hbactest --user=$user1 --srchost=$CLIENT1 --host=$MASTER --service=vsftpd | grep -i \"Access granted: False\""
+                rlRun "ipa hbactest --user=$user1 --srchost=$CLIENT2 --host=$CLIENT1 --service=vsftpd | grep -i \"Access granted: False\""
+                rlRun "ipa hbactest --user=$user1 --srchost=$CLIENT1 --host=$CLIENT2 --service=vsftpd | grep -i \"Access granted: False\""
+
+                rlRun "ipa hbactest --user=$user1 --srchost=$CLIENT2 --host=$MASTER --service=vsftpd --rule=rule2 | grep -E '(Access granted: True|matched: rule2)'"
+                rlRun "ipa hbactest --user=$user1 --srchost=$CLIENT1 --host=$MASTER --service=vsftpd --rule=rule1 | grep -E '(Access granted: False|notmatched: rule1)'"
+                rlRun "ipa hbactest --user=$user2 --srchost=$CLIENT2 --host=$MASTER --service=vsftpd --rule=rule1 | grep -E '(Access granted: False|notmatched: rule1)'"
+                rlRun "ipa hbactest --srchost=$CLIENT2 --host=$MASTER --service=vsftpd  --user=$user1 --rule=rule1 --nodetail | grep -i \"Access granted: True\""
+                rlRun "ipa hbactest --srchost=$CLIENT2 --host=$MASTER --service=vsftpd  --user=$user1 --rule=rule1 --nodetail | grep -i \"matched: rule2\"" 1
 
 	rlPhaseEnd
 }
@@ -75,6 +107,15 @@ hbacsvc_client1() {
 		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 		rlRun "getent -s sss passwd $user1"
                 rlRun "ssh_auth_success $user1 testpw123@ipa.com $CLIENT1"
+                rlRun "ssh_auth_failure $user2 testpw123@ipa.com $CLIENT1"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-hbacsvc-client1-002: $user1 accessing $MASTER from $CLIENT2 using FTP service"
+
+		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                rlRun "getent -s sss passwd $user1"
+		rlRun "ftp_auth_failure $user1 testpw123@ipa.com $MASTER"
+
 	rlPhaseEnd
 }
 
@@ -85,9 +126,19 @@ hbacsvc_client2() {
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 		rlRun "getent -s sss passwd $user1"
-
                 rlRun "ssh_auth_failure $user1 testpw123@ipa.com $CLIENT2"
+
 	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-hbacsvc-client2-002: $user1 accessing $MASTER from $CLIENT2 using FTP service"
+
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                rlRun "getent -s sss passwd $user1"
+                rlRun "ftp_auth_success $user1 testpw123@ipa.com $MASTER"
+		rlRun "ftp_auth_failure $user2 testpw123@ipa.com $MASTER"
+
+        rlPhaseEnd
+
 }
 
 
