@@ -98,45 +98,6 @@ hbacsvc_setup() {
 
 	rlPhaseEnd
 
-	rlPhaseStartTest "ipa-hbacsvc-003: Setup IPA Server HBAC - su"
-
-		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-
-                rlRun "ipa hbacrule-add rule3"
-                rlRun "ipa hbacrule-add-user rule3 --users=$user3"
-                rlRun "ipa hbacrule-add-host rule3 --hosts=$CLIENT2"
-		rlRun "ipa hbacrule-add-sourcehost rule3 --hosts=$CLIENT2"
-                rlRun "ipa hbacrule-add-service rule3 --hbacsvcs=su"
-
-	rlPhaseEnd
-
-	rlPhaseStartTest "ipa-hbacsvc-004: Setup IPA Server HBAC - su-l"
-
-		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-
-                rlRun "ipa hbacrule-add rule4"
-
-	rlPhaseEnd
-
-	rlPhaseStartTest "ipa-hbacsvc-005: Setup IPA Server HBAC - sudo"
-
-                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-
-                rlRun "ipa hbacrule-add rule4"
-                rlRun "ipa hbacrule-add-user rule4 --users=$user4"
-                rlRun "ipa hbacrule-add-host rule4 --hosts=$CLIENT1"
-                rlRun "ipa hbacrule-add-sourcehost rule4 --hosts=$CLIENT1"
-                rlRun "ipa hbacrule-add-service rule3 --hbacsvcs=sudo"
-
-	rlPhaseEnd
-
-	rlPhaseStartTest "ipa-hbacsvc-006: Setup IPA Server HBAC - sudo-i"
-
-                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-
-                rlRun "ipa hbacrule-add rule5"
-
-	rlPhaseEnd
 
 }
 

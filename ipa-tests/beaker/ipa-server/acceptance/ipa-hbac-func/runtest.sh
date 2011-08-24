@@ -175,17 +175,13 @@ rlJournalStart
 	        rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 
         	# kinit as admin and creating users
+	for i in {1..10}; do
 	        rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-	        rlRun "create_ipauser $user1 $user1 $user1 $userpw"
+	        rlRun "create_ipauser user$i user$i user$i $userpw"
 	        sleep 5
-	        rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-	        rlRun "create_ipauser $user2 $user2 $user2 $userpw"
-	        sleep 5
-	        rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-	        rlRun "create_ipauser $user3 $user3 $user3 $userpw"
-
+	done
 		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-		rlRun "ipa hbacrule-disable allow_all"
+		#rlRun "ipa hbacrule-disable allow_all"
 
 		hbacsvc_setup
 
