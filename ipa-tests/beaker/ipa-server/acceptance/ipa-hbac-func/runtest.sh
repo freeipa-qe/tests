@@ -32,7 +32,7 @@
 ##########################################################################
 
 
-# HACKING env.sh FOR HBAC AUTOMATION
+# HACKING env.sh FOR HBAC FUNCTIONAL AUTOMATION
 ENV_DOMAIN=`cat /dev/shm/env.sh | grep ^"DOMAIN=" | cut -d = -f 2`
 SHORT_HOST1=`cat /dev/shm/env.sh | grep BEAKERCLIENT |  cut -d "=" -f 2 | cut -d " " -f 1 | cut -d . -f 1`
 LONG_HOST1=`cat /dev/shm/env.sh | grep BEAKERCLIENT | awk '{print $2}' | cut -d = -f 2`
