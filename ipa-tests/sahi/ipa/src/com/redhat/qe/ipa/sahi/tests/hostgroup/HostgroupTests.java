@@ -58,7 +58,7 @@ public class HostgroupTests extends SahiTestScript{
 		sahiTasks.navigateTo(commonTasks.hostgroupPage, true);
 		sahiTasks.setStrictVisibilityCheck(true);
 		currentPage = sahiTasks.fetch("top.location.href");
-		alternateCurrentPage = sahiTasks.fetch("top.location.href") + "&host-facet=search" ;
+		alternateCurrentPage = sahiTasks.fetch("top.location.href") + "&hostgroup-facet=search" ;
 		
 		//add host groups
 		for (String hostgroup : allhostgroups) {
