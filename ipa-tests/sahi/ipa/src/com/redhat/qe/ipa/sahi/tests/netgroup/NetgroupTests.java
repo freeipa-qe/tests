@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -22,6 +23,8 @@ import com.redhat.qe.ipa.sahi.tasks.UserTasks;
 public class NetgroupTests extends SahiTestScript{
 
 	private String domain = CommonTasks.ipadomain;
+	private String currentPage = "";
+	private String alternateCurrentPage = "";
 	
 	private String devwebserver = "webserver_dev";
 	private String qewebserver = "webserver_qe";
@@ -73,6 +76,8 @@ public class NetgroupTests extends SahiTestScript{
 	@BeforeClass (groups={"init"}, description="Initialize app for this test suite run", alwaysRun=true, dependsOnGroups="setup")
 	public void initialize() throws CloneNotSupportedException {	
 		sahiTasks.setStrictVisibilityCheck(true);
+		currentPage = sahiTasks.fetch("top.location.href");
+		alternateCurrentPage = sahiTasks.fetch("top.location.href") + "&netgroup-facet=search" ;
 		
 		//add hosts for host group members
 		sahiTasks.navigateTo(commonTasks.hostPage, true);
@@ -135,7 +140,15 @@ public class NetgroupTests extends SahiTestScript{
 	}
 	
 	
-	//TODO: jgalipeau: Add BeforeMethod
+	@BeforeMethod (alwaysRun=true)
+	public void checkCurrentPage() {
+	    String currentPageNow = sahiTasks.fetch("top.location.href");
+		if (!currentPageNow.equals(currentPage) && !currentPageNow.equals(alternateCurrentPage)) {
+			CommonTasks.checkError(sahiTasks);
+			System.out.println("Not on expected Page....navigating back from : " + currentPageNow);
+			sahiTasks.navigateTo(commonTasks.netgroupPage, true);
+		}		
+	}
 	
 	/*
 	 * Add net group positive tests
