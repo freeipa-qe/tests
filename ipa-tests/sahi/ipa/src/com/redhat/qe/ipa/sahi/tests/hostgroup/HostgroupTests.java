@@ -57,6 +57,8 @@ public class HostgroupTests extends SahiTestScript{
 	public void initialize() throws CloneNotSupportedException {
 		sahiTasks.navigateTo(commonTasks.hostgroupPage, true);
 		sahiTasks.setStrictVisibilityCheck(true);
+		currentPage = sahiTasks.fetch("top.location.href");
+		alternateCurrentPage = sahiTasks.fetch("top.location.href") + "&host-facet=search" ;
 		
 		//add host groups
 		for (String hostgroup : allhostgroups) {
@@ -87,7 +89,6 @@ public class HostgroupTests extends SahiTestScript{
 	@BeforeMethod (alwaysRun=true)
 	public void checkCurrentPage() {
 	    String currentPageNow = sahiTasks.fetch("top.location.href");
-	    //TODO: jgalipeau: alternateCurrentPage is not set
 		if (!currentPageNow.equals(currentPage) && !currentPageNow.equals(alternateCurrentPage)) {
 			CommonTasks.checkError(sahiTasks);
 			System.out.println("Not on expected Page....navigating back from : " + currentPageNow);
