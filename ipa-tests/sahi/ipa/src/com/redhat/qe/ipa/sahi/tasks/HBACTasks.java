@@ -502,6 +502,24 @@ public class HBACTasks {
 		sahiTasks.button("Cancel").near(sahiTasks.button("Retry")).click();
 		sahiTasks.button("Cancel").near(sahiTasks.button("Add and Edit")).click();
 	}
+
+	public static void expandCollapseService(SahiTasks sahiTasks, String cn) {
+		sahiTasks.link(cn).click();
+		
+		sahiTasks.span("Collapse All").click();
+		sahiTasks.waitFor(1000);
+
+		//Verify no data is visible
+		Assert.assertFalse(sahiTasks.textarea("description").exists(), "No data is visible");
+		
+		sahiTasks.span("Expand All").click();
+		sahiTasks.waitFor(1000);
+		//Verify data is visible
+		Assert.assertTrue(sahiTasks.label(cn).exists(), "Now Data is visible");
+		
+		sahiTasks.link("HBAC Services").in(sahiTasks.div("content")).click();
+		
+	}
 	
 
 	

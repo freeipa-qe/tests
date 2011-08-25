@@ -20,15 +20,13 @@ import com.redhat.qe.ipa.sahi.tasks.UserTasks;
 
 public class UserTests extends SahiTestScript{
 	private static Logger log = Logger.getLogger(UserTests.class.getName());
-	public static SahiTasks sahiTasks = null;
 	
 	private String currentPage = "";
 	private String alternateCurrentPage = "";
 	
 	@BeforeClass (groups={"init"}, description="Initialize app for this test suite run", alwaysRun=true, dependsOnGroups="setup")
-	public void initialize() throws CloneNotSupportedException {	
-		sahiTasks = SahiTestScript.getSahiTasks();	
-		sahiTasks.navigateTo(System.getProperty("ipa.server.url")+ CommonTasks.userPage, true);
+	public void initialize() throws CloneNotSupportedException {
+		sahiTasks.navigateTo(commonTasks.userPage, true);
 		sahiTasks.setStrictVisibilityCheck(true);
 		currentPage = sahiTasks.fetch("top.location.href");
 		alternateCurrentPage = sahiTasks.fetch("top.location.href") + "&user-facet=search" ;
@@ -37,11 +35,10 @@ public class UserTests extends SahiTestScript{
 	@BeforeMethod (alwaysRun=true)
 	public void checkCurrentPage() {
 	    String currentPageNow = sahiTasks.fetch("top.location.href");
-	    System.out.println("CurrentPageNow: " + currentPageNow);
 		if (!currentPageNow.equals(currentPage) && !currentPageNow.equals(alternateCurrentPage)) {
 			CommonTasks.checkError(sahiTasks);
 			System.out.println("Not on expected Page....navigating back from : " + currentPageNow);
-			sahiTasks.navigateTo(System.getProperty("ipa.server.url")+ CommonTasks.userPage, true);
+			sahiTasks.navigateTo(commonTasks.userPage, true);
 		}		
 	}
 

@@ -21,23 +21,21 @@ import com.redhat.qe.auto.testng.*;
 
 public class PasswordPolicyTests extends SahiTestScript{
 	private static Logger log = Logger.getLogger(PasswordPolicyTests.class.getName());
-	public static SahiTasks sahiTasks = null;	 
-	public static String url = System.getProperty("ipa.server.url")+CommonTasks.passwordPolicyPage; 
-	
+		
 	
 	@BeforeClass (groups={"init"}, description="Initialize app for this test suite run", alwaysRun=true, dependsOnGroups="setup")
-	public void initialize() throws CloneNotSupportedException {	
-		sahiTasks = SahiTestScript.getSahiTasks();
-		sahiTasks.navigateTo(url, true);
+	public void initialize() throws CloneNotSupportedException {
+		sahiTasks.navigateTo(commonTasks.passwordPolicyPage, true);
 		sahiTasks.setStrictVisibilityCheck(true);
 	}
 	
 	@BeforeMethod (alwaysRun=true)
 	public void checkURL(){
 		String currentURL = sahiTasks.fetch("top.location.href");
-		if (!currentURL.equals(url)){
-			log.info("current url=("+currentURL + "), is not a starting position, move to url=("+url +")");
-			sahiTasks.navigateTo(url, true);
+		//TODO: yi: check alternate page
+		if (!currentURL.equals(commonTasks.passwordPolicyPage)){
+			log.info("current url=("+currentURL + "), is not a starting position, move to url=("+commonTasks.passwordPolicyPage +")");
+			sahiTasks.navigateTo(commonTasks.passwordPolicyPage, true);
 		}
 	}//checkURL
 	

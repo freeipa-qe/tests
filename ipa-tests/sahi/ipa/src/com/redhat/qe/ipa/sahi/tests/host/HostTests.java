@@ -19,20 +19,9 @@ import com.redhat.qe.ipa.sahi.tasks.HostTasks;
 
 
 public class HostTests extends SahiTestScript{
-	public static SahiTasks sahiTasks = null;	
-	public static CommonTasks commonTasks = null;
 
-	/*private String domain = CommonTasks.ipadomain;
-	private String reversezone = CommonTasks.reversezone;
-	
-	private String hostPage = CommonTasks.hostPage;
-	private String dnsPage = CommonTasks.dnsPage;*/
-	
-	private String domain = ""; 
-	private String reversezone = "";  
-	
-	private String hostPage = "";
-	private String dnsPage = "";
+	private String domain = "";
+	private String reversezone = "";
 	
 	private String currentPage = "";
 	private String alternateCurrentPage = "";
@@ -52,18 +41,11 @@ public class HostTests extends SahiTestScript{
 	
 	@BeforeClass (groups={"init"}, description="Initialize app for this test suite run", alwaysRun=true, dependsOnGroups="setup")
 	public void initialize() throws CloneNotSupportedException {	
-		sahiTasks = SahiTestScript.getSahiTasks();
-		commonTasks = SahiTestScript.getCommonTasks();	
-		
 		
 		domain = commonTasks.getIpadomain();
 		reversezone = commonTasks.getReversezone();
-		System.out.println("NAMITA: ReverseZone: " + reversezone);
 		
-		hostPage = CommonTasks.hostPage;
-		dnsPage = CommonTasks.dnsPage; 
-		
-		sahiTasks.navigateTo(hostPage, true);
+		sahiTasks.navigateTo(commonTasks.hostPage, true);
 		sahiTasks.setStrictVisibilityCheck(true);
 		
 		currentPage = sahiTasks.fetch("top.location.href");
@@ -87,11 +69,10 @@ public class HostTests extends SahiTestScript{
 	@BeforeMethod (alwaysRun=true)
 	public void checkCurrentPage() {
 	    String currentPageNow = sahiTasks.fetch("top.location.href");
-	    System.out.println("CurrentPageNow: " + currentPageNow);
 		if (!currentPageNow.equals(currentPage) && !currentPageNow.equals(alternateCurrentPage)) {
 			CommonTasks.checkError(sahiTasks);
 			System.out.println("Not on expected Page....navigating back from : " + currentPageNow);
-			sahiTasks.navigateTo(hostPage, true);
+			sahiTasks.navigateTo(commonTasks.hostPage, true);
 		}		
 	}
 
@@ -357,15 +338,15 @@ public class HostTests extends SahiTestScript{
 		
 		// verify host link to dns and dns records
 		HostTasks.verifyHostDNSLink(sahiTasks, fqdn, "YES");
-		sahiTasks.navigateTo(dnsPage, true);
+		sahiTasks.navigateTo(commonTasks.dnsPage, true);
 		DNSTasks.verifyRecord(sahiTasks, domain, hostname, "arecord", ipaddr, "YES");
 		DNSTasks.verifyRecord(sahiTasks, reversezone, ipend, "ptrrecord", fqdn + ".", "YES");
 		
 		// deleted host
-		sahiTasks.navigateTo(hostPage, true);
+		sahiTasks.navigateTo(commonTasks.hostPage, true);
 		HostTasks.deleteHost(sahiTasks, fqdn, updatedns);
 		
-		sahiTasks.navigateTo(dnsPage, true);
+		sahiTasks.navigateTo(commonTasks.dnsPage, true);
 		if( updatedns == "YES"){
 			DNSTasks.verifyRecord(sahiTasks, domain, hostname, "arecord", ipaddr, "NO");
 			DNSTasks.verifyRecord(sahiTasks, reversezone, ipend, "ptrrecord", fqdn + ".", "NO");
@@ -378,7 +359,7 @@ public class HostTests extends SahiTestScript{
 			
 		}
 		
-		sahiTasks.navigateTo(hostPage, true);
+		sahiTasks.navigateTo(commonTasks.hostPage, true);
 	}
 	
 	

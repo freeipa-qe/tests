@@ -18,17 +18,15 @@ import com.redhat.qe.ipa.sahi.tasks.HBACTasks;
 import com.redhat.qe.ipa.sahi.tasks.SahiTasks;
 import com.redhat.qe.ipa.sahi.tests.user.UserTests;
 
-public class HBACServiceTests {
+public class HBACServiceTests  extends SahiTestScript{
 	private static Logger log = Logger.getLogger(UserTests.class.getName());
-	public static SahiTasks sahiTasks = null;
 	
 	private String currentPage = "";
 	private String alternateCurrentPage = "";
 	
 	@BeforeClass (groups={"init"}, description="Initialize app for this test suite run", alwaysRun=true, dependsOnGroups="setup")
 	public void initialize() throws CloneNotSupportedException {	
-		sahiTasks = SahiTestScript.getSahiTasks();	
-		sahiTasks.navigateTo(System.getProperty("ipa.server.url")+ CommonTasks.hbacServicePage, true);
+		sahiTasks.navigateTo(commonTasks.hbacServicePage, true);
 		sahiTasks.setStrictVisibilityCheck(true);
 		currentPage = sahiTasks.fetch("top.location.href");
 		alternateCurrentPage = sahiTasks.fetch("top.location.href") + "&hbacsvc-facet=search" ;
@@ -41,7 +39,7 @@ public class HBACServiceTests {
 		if (!currentPageNow.equals(currentPage) && !currentPageNow.equals(alternateCurrentPage)) {
 			CommonTasks.checkError(sahiTasks);
 			System.out.println("Not on expected Page....navigating back from : " + currentPageNow);
-			sahiTasks.navigateTo(System.getProperty("ipa.server.url")+ CommonTasks.hbacServicePage, true);
+			sahiTasks.navigateTo(commonTasks.hbacServicePage, true);
 		}		
 	}
 
@@ -149,9 +147,18 @@ public class HBACServiceTests {
 			Assert.assertTrue(sahiTasks.link(multipleResult).exists(), "Verify HBAC Service " + multipleResult + " was found while searching");
 		}
 			
-		//CommonTasks.clearSearch(sahiTasks);
+		CommonTasks.clearSearch(sahiTasks);
 	}
 	
+	/*
+	 * Expand/Collapse details of an HBAC Service
+	 */
+	@Test (groups={"hbacServiceExpandCollapseTests"}, dataProvider="getSingleHBACServiceTestObjects",  dependsOnGroups="hbacRuleAddAndEditTests")	
+	public void testHBACServiceExpandCollapse(String testName, String cn, String description) throws Exception {
+		
+		HBACTasks.expandCollapseService(sahiTasks, cn);		
+		
+	}
 	
 	/*******************************************************
 	 ************      DATA PROVIDERS     ******************

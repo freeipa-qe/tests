@@ -18,11 +18,6 @@ import com.redhat.qe.ipa.sahi.tasks.HostgroupTasks;
 import com.redhat.qe.ipa.sahi.tasks.SahiTasks;
 
 public class HostgroupTests extends SahiTestScript{
-	public static SahiTasks sahiTasks = null;	
-	
-	private String hostgroupPage = CommonTasks.hostgroupPage;
-	//TODO: nkrishnan: FIXME for CommonTasks
-	private String hostPage = ""; // CommonTasks.hostPage;	
 	private String currentPage = "";
 	private String alternateCurrentPage = "";
 	
@@ -59,9 +54,8 @@ public class HostgroupTests extends SahiTestScript{
 	
 	
 	@BeforeClass (groups={"init"}, description="Initialize app for this test suite run", alwaysRun=true, dependsOnGroups="setup")
-	public void initialize() throws CloneNotSupportedException {	
-		sahiTasks = SahiTestScript.getSahiTasks();	
-		sahiTasks.navigateTo(hostgroupPage, true);
+	public void initialize() throws CloneNotSupportedException {
+		sahiTasks.navigateTo(commonTasks.hostgroupPage, true);
 		sahiTasks.setStrictVisibilityCheck(true);
 		
 		//add host groups
@@ -71,34 +65,33 @@ public class HostgroupTests extends SahiTestScript{
 		}
 		
 		//add hosts for host group members
-		sahiTasks.navigateTo(hostPage, true);
-		//TODO: nkrishnan: FIXME for CommonTasks
-		/*for (String hostname : hostnames_short) {
-			HostTasks.addHost(sahiTasks, hostname, "");
-		}*/
+		sahiTasks.navigateTo(commonTasks.hostPage, true);
+		for (String hostname : hostnames_short) {
+			HostTasks.addHost(sahiTasks, hostname, commonTasks.getIpadomain(), "");
+		}
 		
-		sahiTasks.navigateTo(hostgroupPage, true);
+		sahiTasks.navigateTo(commonTasks.hostgroupPage, true);
 	}
 	
 	@AfterClass (groups={"cleanup"}, description="Delete objects added for the tests", alwaysRun=true)
 	public void cleanup() throws Exception {	
 		// delete the hosts added for testing
-		sahiTasks.navigateTo(hostPage, true);
+		sahiTasks.navigateTo(commonTasks.hostPage, true);
 		HostTasks.deleteHost(sahiTasks, hostnames);
 		
 		//delete the host groups added for testing
-		sahiTasks.navigateTo(hostgroupPage, true);
+		sahiTasks.navigateTo(commonTasks.hostgroupPage, true);
 		HostgroupTasks.deleteHostgroup(sahiTasks, allhostgroups);
 	}
 	
 	@BeforeMethod (alwaysRun=true)
 	public void checkCurrentPage() {
 	    String currentPageNow = sahiTasks.fetch("top.location.href");
-	    System.out.println("CurrentPageNow: " + currentPageNow);
+	    //TODO: jgalipeau: alternateCurrentPage is not set
 		if (!currentPageNow.equals(currentPage) && !currentPageNow.equals(alternateCurrentPage)) {
 			CommonTasks.checkError(sahiTasks);
 			System.out.println("Not on expected Page....navigating back from : " + currentPageNow);
-			sahiTasks.navigateTo(hostgroupPage, true);
+			sahiTasks.navigateTo(commonTasks.hostgroupPage, true);
 		}		
 	}
 	
@@ -250,14 +243,14 @@ public class HostgroupTests extends SahiTestScript{
 	public void testHostMemberof(String testName) throws Exception {
 		
 		//verify member of for hosts
-		sahiTasks.navigateTo(hostPage, true);
+		sahiTasks.navigateTo(commonTasks.hostPage, true);
 		HostTasks.verifyHostMemberOf(sahiTasks, devwebserver, "Host Groups", devgroup, "direct", "YES", false);
 		HostTasks.verifyHostMemberOf(sahiTasks, devwebserver, "Host Groups", enggroup, "indirect", "YES", false);
 		HostTasks.verifyHostMemberOf(sahiTasks, qewebserver, "Host Groups", qegroup, "direct", "YES", false);
 		HostTasks.verifyHostMemberOf(sahiTasks, qewebserver, "Host Groups", enggroup, "indirect", "YES", false);
 		HostTasks.verifyHostMemberOf(sahiTasks, engwebserver, "Host Groups", enggroup, "direct", "YES", false);
 		
-		sahiTasks.navigateTo(hostgroupPage, true);
+		sahiTasks.navigateTo(commonTasks.hostgroupPage, true);
 	}
 	
 	/*

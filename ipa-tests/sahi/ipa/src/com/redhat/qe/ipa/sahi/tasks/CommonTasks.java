@@ -18,32 +18,38 @@ import com.redhat.qe.auto.testng.Assert;
 public class CommonTasks {
 	private static Logger log = Logger.getLogger(CommonTasks.class.getName());
 	
-	public static String userPage = "/ipa/ui/#identity=user&navigation=identity";	
-	public static String groupPage = "/ipa/ui/#nagivation=identity&identity=group";
-	public static String hostPage = "/ipa/ui/#identity=host&navigation=identity";
-	public static String hostgroupPage = "/ipa/ui/#identity=hostgroup&navigation=identity";
-	public static String netgroupPage = "/ipa/ui/#identity=netgroup&navigation=identity";
-	public static String dnsPage = "/ipa/ui/#dns=dnszone&identity=dns&navigation=identity";
-	public static String alternateDNSpage = dnsPage + "&dnszone-facet=search";
-	public static String passwordPolicyPage = "/ipa/ui/#policy=pwpolicy&navigation=policy";
-	public static String kerberosTicketPolicyPage = "/ipa/ui/#policy=krbtpolicy&navigation=policy";
+	public static String serverUrl = System.getProperty("ipa.server.url");
 	
-	public static String hbacPage = "/ipa/ui/#hbac=hbacrule&policy=hbac&navigation=policy";	
-	public static String hbacServicePage = "/ipa/ui/#hbac=hbacsvc&policy=hbac&navigation=policy";
-	public static String hbacServiceGroupsPage = "/ipa/ui/#hbac=hbacsvcgroup&policy=hbac&navigation=policy";
-	public static String sudoPage = "/ipa/ui/#navigation=policy&policy=sudo";
+	public String userPage = serverUrl + "/ipa/ui/#identity=user&navigation=identity";	
+	public String groupPage = serverUrl +  "/ipa/ui/#nagivation=identity&identity=group";
+	public String hostPage =  serverUrl + "/ipa/ui/#identity=host&navigation=identity";
+	public String hostgroupPage =  serverUrl + "/ipa/ui/#identity=hostgroup&navigation=identity";
+	public String netgroupPage =  serverUrl + "/ipa/ui/#identity=netgroup&navigation=identity";
+	public String dnsPage =  serverUrl + "/ipa/ui/#dns=dnszone&identity=dns&navigation=identity";
+	public String alternateDNSpage = dnsPage + "&dnszone-facet=search";
+	public String passwordPolicyPage =  serverUrl + "/ipa/ui/#policy=pwpolicy&navigation=policy";
+	public String kerberosTicketPolicyPage =  serverUrl + "/ipa/ui/#policy=krbtpolicy&navigation=policy";
+	
+	public String hbacPage =  serverUrl + "/ipa/ui/#hbac=hbacrule&policy=hbac&navigation=policy";	
+	public String hbacServicePage =  serverUrl + "/ipa/ui/#hbac=hbacsvc&policy=hbac&navigation=policy";
+	public String hbacServiceGroupsPage =  serverUrl + "/ipa/ui/#hbac=hbacsvcgroup&policy=hbac&navigation=policy";
+	public String sudoPage =  serverUrl + "/ipa/ui/#navigation=policy&policy=sudo";
 	
 	public static String ipadomain = "";
 	public static String ipafqdn= "";
 	public static String reversezone = "";
 	
+	
 	public CommonTasks() {
 		setErrorFlag(false);
+		serverUrl = System.getProperty("ipa.server.url");
 		setIpadomain(System.getProperty("ipa.server.domain"));
 		setIpafqdn(System.getProperty("ipa.server.fqdn"));
 		setReversezone(System.getProperty("ipa.server.reversezone"));
 	}
 	
+	
+
 	// to check if unexpected error was thrown in a test
 	public static boolean errorFlag = false;
 	
@@ -80,7 +86,7 @@ public class CommonTasks {
 	public static void setReversezone(String reversezone) {
 		CommonTasks.reversezone = reversezone;
 	}
-
+	
 	public static boolean kinitAsAdmin() {    	
         String admin=System.getProperty("ipa.server.admin");
         String password=System.getProperty("ipa.server.password");        

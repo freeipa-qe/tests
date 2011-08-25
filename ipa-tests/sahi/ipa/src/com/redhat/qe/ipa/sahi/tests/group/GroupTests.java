@@ -17,16 +17,18 @@ import com.redhat.qe.ipa.sahi.tasks.SahiTasks;
 import com.redhat.qe.ipa.sahi.tasks.GroupTasks;
 
 public class GroupTests extends SahiTestScript{
+	
 	private static Logger log = Logger.getLogger(GroupTests.class.getName());
-	public static SahiTasks sahiTasks = null;	
-	public static String groupPage = "/ipa/ui/#nagivation=identity&identity=group";
+	public static String groupPage = commonTasks.groupPage; 
+	
 	
 	@BeforeClass (groups={"init"}, description="Initialize app for this test suite run", alwaysRun=true, dependsOnGroups="setup")
-	public void initialize() throws CloneNotSupportedException {	
-		sahiTasks = SahiTestScript.getSahiTasks();	
-		sahiTasks.navigateTo(System.getProperty("ipa.server.url")+groupPage, true);
+	public void initialize() throws CloneNotSupportedException {			
+		sahiTasks.navigateTo(commonTasks.groupPage, true);
 		sahiTasks.setStrictVisibilityCheck(true);
 	}
+	
+	//TODO: yi: BeforeMethod
 	
 	/*
 	 * Add groups - positive tests

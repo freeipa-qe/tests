@@ -20,13 +20,7 @@ import com.redhat.qe.ipa.sahi.tasks.SahiTasks;
 import com.redhat.qe.ipa.sahi.tasks.UserTasks;
 
 public class NetgroupTests extends SahiTestScript{
-	public static SahiTasks sahiTasks = null;	
-	private String hostgroupPage = CommonTasks.hostgroupPage;
-	//TODO: nkrishnan: FIXME for CommonTasks
-	private String hostPage = ""; //CommonTasks.hostPage;
-	private String netgroupPage = CommonTasks.netgroupPage;
-	private String groupPage = CommonTasks.groupPage;
-	private String userPage = CommonTasks.userPage;
+
 	private String domain = CommonTasks.ipadomain;
 	
 	private String devwebserver = "webserver_dev";
@@ -78,38 +72,36 @@ public class NetgroupTests extends SahiTestScript{
 	
 	@BeforeClass (groups={"init"}, description="Initialize app for this test suite run", alwaysRun=true, dependsOnGroups="setup")
 	public void initialize() throws CloneNotSupportedException {	
-		sahiTasks = SahiTestScript.getSahiTasks();	
 		sahiTasks.setStrictVisibilityCheck(true);
 		
 		//add hosts for host group members
-		sahiTasks.navigateTo(hostPage, true);
-		//TODO: nkrishnan: FIXME for CommonTasks
-		/*for (String hostname : hostnames) {
-			HostTasks.addHost(sahiTasks, hostname, "");
-		}*/
+		sahiTasks.navigateTo(commonTasks.hostPage, true);
+		for (String hostname : hostnames) {
+			HostTasks.addHost(sahiTasks, hostname, commonTasks.getIpadomain(), "");
+		}
 		
 		//add host groups for net group members
-		sahiTasks.navigateTo(hostgroupPage, true);
+		sahiTasks.navigateTo(commonTasks.hostgroupPage, true);
 		for (String hostgroup : hostgroups) {
 			String description = hostgroup + " description";
 			HostgroupTasks.addHostGroup(sahiTasks, hostgroup, description, "Add");
 		}
 		
 		//add user groups for net group members 
-		sahiTasks.navigateTo(groupPage, true);
+		sahiTasks.navigateTo(commonTasks.groupPage, true);
 		for (String groupname : usergroups){
 			String groupDescription = groupname + " description";
 			GroupTasks.addGroup(sahiTasks, groupname, groupDescription);
 		}
 		
 		//add users for net group members 
-		sahiTasks.navigateTo(userPage, true);
+		sahiTasks.navigateTo(commonTasks.userPage, true);
 		for (String username : users){
 			UserTasks.createUser(sahiTasks, username, username, username, "Add");
 		}
 		
 		//add net groups
-		sahiTasks.navigateTo(netgroupPage, true);
+		sahiTasks.navigateTo(commonTasks.netgroupPage, true);
 		for (String netgroup : netgroups) {
 			String description = netgroup + " group";
 			NetgroupTasks.addNetGroup(sahiTasks, netgroup, description, "Add");
@@ -120,27 +112,30 @@ public class NetgroupTests extends SahiTestScript{
 	public void cleanup() throws Exception {	
 		//delete hosts
 		final String [] delhosts = {devwebserver + "." + domain, qewebserver + "." + domain, devhost + "." + domain, qehost + "." + domain, engwebserver + "." + domain };
-		sahiTasks.navigateTo(hostPage, true);
+		sahiTasks.navigateTo(commonTasks.hostPage, true);
 		HostTasks.deleteHost(sahiTasks, delhosts);
 		
 		//delete host groups
-		sahiTasks.navigateTo(hostgroupPage, true);
+		sahiTasks.navigateTo(commonTasks.hostgroupPage, true);
 		HostgroupTasks.deleteHostgroup(sahiTasks, hostgroups);
 		
 		//delete user groups
-		sahiTasks.navigateTo(groupPage, true);
+		sahiTasks.navigateTo(commonTasks.groupPage, true);
 		GroupTasks.deleteGroup(sahiTasks, usergroups);
 		
 		//delete users
-		sahiTasks.navigateTo(userPage, true);
+		sahiTasks.navigateTo(commonTasks.userPage, true);
 		for (String username : users){
 			UserTasks.deleteUser(sahiTasks, username);
 		}
 		
 		//delete net groups
-		sahiTasks.navigateTo(netgroupPage, true);
+		sahiTasks.navigateTo(commonTasks.netgroupPage, true);
 		NetgroupTasks.deleteNetgroup(sahiTasks, netgroups);
 	}
+	
+	
+	//TODO: jgalipeau: Add BeforeMethod
 	
 	/*
 	 * Add net group positive tests
@@ -271,7 +266,7 @@ public class NetgroupTests extends SahiTestScript{
 		NetgroupTasks.addMembers(sahiTasks, enggroup, "netgroup", nestedmembers, "Enroll");
 		
 		//verify member of for hosts
-		sahiTasks.navigateTo(hostPage, true);
+		sahiTasks.navigateTo(commonTasks.hostPage, true);
 		HostTasks.verifyHostMemberOf(sahiTasks, devwebserver + "." + domain, "Netgroups", devgroup, "direct", "YES", false);
 		HostTasks.verifyHostMemberOf(sahiTasks, devwebserver + "." + domain, "Netgroups", enggroup, "indirect", "YES", false);
 		HostTasks.verifyHostMemberOf(sahiTasks, qewebserver + "." + domain, "Netgroups", qegroup, "direct", "YES", false);
@@ -279,7 +274,7 @@ public class NetgroupTests extends SahiTestScript{
 		HostTasks.verifyHostMemberOf(sahiTasks, engwebserver + "." + domain, "Netgroups", enggroup, "direct", "YES", false);
 		
 		//cancel remove members
-		sahiTasks.navigateTo(netgroupPage, true);
+		sahiTasks.navigateTo(commonTasks.netgroupPage, true);
 		NetgroupTasks.removeMember(sahiTasks, enggroup, "host", enghosts, "Cancel");
 		NetgroupTasks.verifyMembers(sahiTasks, enggroup, "host", enghosts, "YES");
 		
@@ -293,7 +288,7 @@ public class NetgroupTests extends SahiTestScript{
 		NetgroupTasks.verifyMembers(sahiTasks, qegroup, "host", qehosts, "NO");
 		NetgroupTasks.verifyMembers(sahiTasks, enggroup, "host", enghosts, "NO");
 		
-		sahiTasks.navigateTo(netgroupPage, true);
+		sahiTasks.navigateTo(commonTasks.netgroupPage, true);
 	}
 	
 	/*
@@ -321,7 +316,7 @@ public class NetgroupTests extends SahiTestScript{
 		//HostgroupTasks.verifyMemberOf(sahiTasks, hostgroup2, "netgroups", qegroup, "direct", "YES");
 		
 		//cancel remove member
-		sahiTasks.navigateTo(netgroupPage, true);
+		sahiTasks.navigateTo(commonTasks.netgroupPage, true);
 		NetgroupTasks.removeMember(sahiTasks, devgroup, "hostgroup", grp1members, "Cancel");
 		NetgroupTasks.verifyMembers(sahiTasks, devgroup, "hostgroup", grp1members, "YES");
 		
@@ -353,13 +348,13 @@ public class NetgroupTests extends SahiTestScript{
 		NetgroupTasks.verifyMembers(sahiTasks, qegroup, "usergroup", ugroup2members, "YES");
 		
 		//verify user group member of net group
-		sahiTasks.navigateTo(groupPage, true);
+		sahiTasks.navigateTo(commonTasks.groupPage, true);
 		GroupTasks.verifyMemberOf(sahiTasks, usergroup1A, "netgroups", devgroup, "direct", "YES");
 		GroupTasks.verifyMemberOf(sahiTasks, usergroup1B, "netgroups", devgroup, "direct", "YES");
 		GroupTasks.verifyMemberOf(sahiTasks, usergroup2, "netgroups", qegroup, "direct", "YES");
 		
 		//cancel remove member
-		sahiTasks.navigateTo(netgroupPage, true);
+		sahiTasks.navigateTo(commonTasks.netgroupPage, true);
 		NetgroupTasks.removeMember(sahiTasks, devgroup, "usergroup", ugroup1members, "Cancel");
 		NetgroupTasks.verifyMembers(sahiTasks, devgroup, "usergroup", ugroup1members, "YES");
 		
@@ -390,13 +385,13 @@ public class NetgroupTests extends SahiTestScript{
 		NetgroupTasks.verifyMembers(sahiTasks, qegroup, "user", qeusers, "YES");
 		
 		//verify user member of net group
-		sahiTasks.navigateTo(userPage, true);
+		sahiTasks.navigateTo(commonTasks.userPage, true);
 		UserTasks.verifyUserMemberOf(sahiTasks, user1, "Netgroups", devgroup, "direct", "YES", false);
 		UserTasks.verifyUserMemberOf(sahiTasks, user2, "Netgroups", devgroup, "direct", "YES", false);
 		UserTasks.verifyUserMemberOf(sahiTasks, user3, "Netgroups", qegroup, "direct", "YES", false);
 		
 		//cancel remove member
-		sahiTasks.navigateTo(netgroupPage, true);
+		sahiTasks.navigateTo(commonTasks.netgroupPage, true);
 		NetgroupTasks.removeMember(sahiTasks, devgroup, "user", devusers, "Cancel");
 		NetgroupTasks.verifyMembers(sahiTasks, devgroup, "user", devusers, "YES");
 		

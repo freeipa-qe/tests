@@ -20,13 +20,10 @@ import com.redhat.qe.ipa.sahi.tests.sudo.SudoTests;
 
 public class SudoTests extends SahiTestScript{
 	private static Logger log = Logger.getLogger(SudoTests.class.getName());
-	public static SahiTasks sahiTasks = null;	
-	private String userPage = "/ipa/ui/#navigation=policy&policy=sudo";
 	
 	@BeforeClass (groups={"init"}, description="Initialize app for this test suite run", alwaysRun=true, dependsOnGroups="setup")
-	public void initialize() throws CloneNotSupportedException {	
-		sahiTasks = SahiTestScript.getSahiTasks();	
-		sahiTasks.navigateTo(System.getProperty("ipa.server.url")+userPage, true);
+	public void initialize() throws CloneNotSupportedException {
+		sahiTasks.navigateTo(commonTasks.sudoPage, true);
 	}
 	
 

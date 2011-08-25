@@ -5,9 +5,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
 
-import org.apache.commons.lang.StringEscapeUtils;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -20,16 +19,12 @@ import com.redhat.qe.ipa.sahi.tasks.GroupTasks;
 import com.redhat.qe.ipa.sahi.tasks.HBACTasks;
 import com.redhat.qe.ipa.sahi.tasks.HostTasks;
 import com.redhat.qe.ipa.sahi.tasks.HostgroupTasks;
-import com.redhat.qe.ipa.sahi.tasks.SahiTasks;
 import com.redhat.qe.ipa.sahi.tasks.UserTasks;
 
 public class HBACTests extends SahiTestScript {
 	
 	private static Logger log = Logger.getLogger(HBACTests.class.getName());
-	public static SahiTasks sahiTasks = null;
-	public static CommonTasks commonTasks = null;
-
-	
+		
 	/*
 	 * PreRequisite - 
 	 */
@@ -63,32 +58,33 @@ public class HBACTests extends SahiTestScript {
 	
 	@BeforeClass (groups={"init"}, description="Initialize app for this test suite run", alwaysRun=true, dependsOnGroups="setup")
 	public void initialize() throws CloneNotSupportedException {	
-		sahiTasks = SahiTestScript.getSahiTasks();
-		commonTasks = SahiTestScript.getCommonTasks();
 		sahiTasks.setStrictVisibilityCheck(true);
 		
 		//add new user, user group, host, host group
-		sahiTasks.navigateTo(System.getProperty("ipa.server.url")+ CommonTasks.userPage, true);
+		System.out.println("Check CurrentPage: " + commonTasks.userPage);
+		sahiTasks.navigateTo(commonTasks.userPage, true);
 		if (!sahiTasks.link(uid).exists())
 			UserTasks.createUser(sahiTasks, uid, givenName, sn, "Add");
 
-		sahiTasks.navigateTo(System.getProperty("ipa.server.url")+ CommonTasks.groupPage, true);
+		System.out.println("Check CurrentPage: " + commonTasks.groupPage);
+		sahiTasks.navigateTo(commonTasks.groupPage, true);
 		if (!sahiTasks.link(groupName).exists())
-			GroupTasks.createGroupService(sahiTasks, groupName, groupDescription, CommonTasks.groupPage);
+			GroupTasks.createGroupService(sahiTasks, groupName, groupDescription, commonTasks.groupPage);
 		
-//TODO: nkrishnan: FIXME for CommonTasks
-		sahiTasks.navigateTo(System.getProperty("ipa.server.url")+ CommonTasks.hostPage, true);
+		System.out.println("Check CurrentPage: " + commonTasks.hostPage);
+		sahiTasks.navigateTo(commonTasks.hostPage, true);
 		if (!sahiTasks.link(fqdn.toLowerCase()).exists())
 			HostTasks.addHost(sahiTasks, hostname, commonTasks.getIpadomain(), ipadr);
 		
-		sahiTasks.navigateTo(System.getProperty("ipa.server.url")+ CommonTasks.hostgroupPage, true);
+		System.out.println("Check CurrentPage: " + commonTasks.hostgroupPage);
+		sahiTasks.navigateTo(commonTasks.hostgroupPage, true);
 		if (!sahiTasks.link(hostgroupName).exists()) {
 			HostgroupTasks.addHostGroup(sahiTasks, hostgroupName, description, "Add");
 			HostgroupTasks.addMembers(sahiTasks, hostgroupName, membertype, names, "Enroll");
 		}
 		
-		
-		sahiTasks.navigateTo(System.getProperty("ipa.server.url")+ CommonTasks.hbacPage, true);
+		System.out.println("Check CurrentPage: " + commonTasks.hbacPage);
+		sahiTasks.navigateTo(commonTasks.hbacPage, true);
 		currentPage = sahiTasks.fetch("top.location.href");
 		alternateCurrentPage1 = sahiTasks.fetch("top.location.href") + "&hbacrule-facet=search" ;
 		alternateCurrentPage2 = sahiTasks.fetch("top.location.href") + "&hbacsvc-facet=search";
@@ -103,7 +99,7 @@ public class HBACTests extends SahiTestScript {
 				&& !currentPageNow.equals(alternateCurrentPage2) && !currentPageNow.equals(alternateCurrentPage3)) {
 			CommonTasks.checkError(sahiTasks);
 			System.out.println("Not on expected Page....navigating back from : " + currentPageNow);
-			sahiTasks.navigateTo(System.getProperty("ipa.server.url")+ CommonTasks.hbacPage, true);
+			sahiTasks.navigateTo(commonTasks.hbacPage, true);
 		}		
 	}
 	
@@ -375,9 +371,7 @@ public class HBACTests extends SahiTestScript {
 	 * Expand/Collapse details of an HBACService
 	 */
 	
-	/*
-	 * Search an HBACService
-	 */
+	
 	
 	
 	/*****************************************************************************************
@@ -427,25 +421,24 @@ public class HBACTests extends SahiTestScript {
 	@AfterClass (groups={"cleanup"}, description="Delete objects created for this test suite", alwaysRun=true, dependsOnGroups="init")
 	public void cleanup() throws CloneNotSupportedException {
 		//delete user, user group, host, host group added for this suite
-		sahiTasks.navigateTo(System.getProperty("ipa.server.url")+ CommonTasks.userPage, true);
+		sahiTasks.navigateTo(commonTasks.userPage, true);
 		if (sahiTasks.link(uid).exists())
 			UserTasks.deleteUser(sahiTasks, uid);
 
-		sahiTasks.navigateTo(System.getProperty("ipa.server.url")+ CommonTasks.groupPage, true);
+		sahiTasks.navigateTo(commonTasks.groupPage, true);
 		if (sahiTasks.link(groupName).exists())
 			GroupTasks.deleteGroup(sahiTasks, groupName);
 		
-		//TODO: nkrishnan: FIXME for CommonTasks
-		sahiTasks.navigateTo(System.getProperty("ipa.server.url")+ CommonTasks.hostPage, true);
+		sahiTasks.navigateTo(commonTasks.hostPage, true);
 		if (sahiTasks.link(fqdn.toLowerCase()).exists())
 			HostTasks.deleteHost(sahiTasks, fqdn);
 		
-		sahiTasks.navigateTo(System.getProperty("ipa.server.url")+ CommonTasks.hostgroupPage, true);
+		sahiTasks.navigateTo(commonTasks.hostgroupPage, true);
 		if (sahiTasks.link(hostgroupName).exists())
 			HostgroupTasks.deleteHostgroup(sahiTasks, hostgroupName, "Delete");
 		
 		
-		sahiTasks.navigateTo(System.getProperty("ipa.server.url")+ CommonTasks.hbacPage, true);
+		sahiTasks.navigateTo(commonTasks.hbacPage, true);
 	}
 	
 	
@@ -516,6 +509,7 @@ public class HBACTests extends SahiTestScript {
 		
         //										testname					cn					expected_Error   
 		ll.add(Arrays.asList(new Object[]{ "create_duplicate_hbacrule",		"dev_hbacRule",		"HBAC rule with name \"dev_hbacRule\" already exists"      } ));
+		ll.add(Arrays.asList(new Object[]{ "create_blank_hbacrule",			"",					"Required field"      } ));
 		
 		return ll;	
 	}

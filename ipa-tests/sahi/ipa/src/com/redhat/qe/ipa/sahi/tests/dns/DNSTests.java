@@ -21,26 +21,27 @@ import com.redhat.qe.auto.testng.*;
 
 public class DNSTests extends SahiTestScript{
 	private static Logger log = Logger.getLogger(DNSTests.class.getName());
-	public static SahiTasks sahiTasks = null;	
-	//private static String dnsPage = "/ipa/ui/#dns=dnszone&identity=dns&navigation=identity"; 
-	public static String url = System.getProperty("ipa.server.url")+CommonTasks.dnsPage;
+	
 	public static String dnszone= "sahi_dns_testzone_001";
-	public static String reversezone= DNSTests.reversezone;
+	//TODO: nkrishnan: yi...is this right?
+	public static String reversezone= commonTasks.getReversezone();
 	public static String dummyHost="dummyhost." + CommonTasks.ipadomain;
+	
 	
 	@BeforeClass (groups={"init"}, description="Initialize app for this test suite run", alwaysRun=true, dependsOnGroups="setup")
 	public void initialize() throws CloneNotSupportedException {	
-		sahiTasks = SahiTestScript.getSahiTasks();
-		sahiTasks.navigateTo(url, true);
+		
+		sahiTasks.navigateTo(commonTasks.dnsPage, true);
 		sahiTasks.setStrictVisibilityCheck(true);
 	}
 	
 	@BeforeMethod (alwaysRun=true)
 	public void checkURL(){
 		String currentURL = sahiTasks.fetch("top.location.href");
-		if (!currentURL.equals(url)){
-			log.info("current url=("+currentURL + "), is not a starting position, move to url=("+url +")");
-			sahiTasks.navigateTo(url, true);
+		//TODO: yi: check for the alternateDNSpage url as well
+		if (!currentURL.equals(commonTasks.dnsPage)){
+			log.info("current url=("+currentURL + "), is not a starting position, move to url=("+ commonTasks.dnsPage +")");
+			sahiTasks.navigateTo(commonTasks.dnsPage, true);
 		}
 	}//checkURL
 	

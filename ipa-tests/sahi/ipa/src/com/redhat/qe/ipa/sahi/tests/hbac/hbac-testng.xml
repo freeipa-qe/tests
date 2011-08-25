@@ -47,6 +47,7 @@
 			    <include name="hbacServiceCancelAddTests" />
 			    <include name="invalidhbacServiceAddTests" />
 			    <include name="hbacServiceSearchTests" />
+			    <include name="hbacServiceExpandCollapseTests" />
 			    <include name="hbacServiceMultipleDeleteTests" />
 			</run>
 		</groups>
