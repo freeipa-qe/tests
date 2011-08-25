@@ -103,6 +103,13 @@ appendEnv()
 	echo "export CLIENT=$CLIENT" >> /dev/shm/env.sh
   fi
 
+  if [ "$CLIENT2" != "" ]; then
+        client2_short=`echo $CLIENT2 | cut -d "." -f1`
+        CLIENT2=$client2_short.$DOMAIN
+        echo "export CLIENT2=$CLIENT2" >> /dev/shm/env.sh
+  fi
+
+
   rlLog "Contents of env.sh are"
   output=`cat /dev/shm/env.sh`
   rlLog "$output"

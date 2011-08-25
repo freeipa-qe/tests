@@ -47,10 +47,12 @@ rlJournalStart
         rlLog "MASTER: $MASTER"
         rlLog "SLAVE: $SLAVE"
         rlLog "CLIENT: $CLIENT"
+        rlLog "CLIENT2: $CLIENT2"
    
         echo "export BEAKERMASTER=$MASTER" >> /dev/shm/env.sh
         echo "export BEAKERSLAVE=$SLAVE" >> /dev/shm/env.sh
 	echo "export BEAKERCLIENT=$CLIENT" >> /dev/shm/env.sh
+	echo "export BEAKERCLIENT2=$CLIENT2" >> /dev/shm/env.sh
 
 	#####################################################################
 	# 		IS THIS MACHINE A MASTER?                           #
@@ -164,6 +166,42 @@ rlJournalStart
         else
                 rlLog "Machine in recipe in not a CLIENT"
         fi
+
+        #####################################################################
+        #               IS THIS MACHINE CLIENT2?                            #
+        #####################################################################
+        rc=0
+        echo $CLIENT2 | grep $HOSTNAME
+        if [ $? -eq 0 ] ; then
+                if [ "$SNAPSHOT" = "TRUE" ] ; then
+                        yum clean all
+                        yum -y install --disablerepo=ipa $CLIENT_PACKAGES
+                else
+                        yum clean all
+                        yum -y install $CLIENT_PACKAGES
+                fi
+
+                for item in $CLIENT_PACKAGES ; do
+                rpm -qa | grep $item
+                        if [ $? -eq 0 ] ; then
+                                rlLog "$item package is installed"
+                        else
+                                rlLog "ERROR: $item package is NOT installed"
+                                rc=1
+                        fi
+                done
+
+                if [ $rc -eq 0 ] ; then
+                        rhts-sync-block -s READY $MASTER
+                        if [ $SLAVE != "" ] ; then
+                                rhts-sync-block -s READY $SLAVE
+                        fi
+                        installClient
+                fi
+        else
+                rlLog "Machine in recipe in not a CLIENT2"
+        fi
+
 
    rlJournalPrintText
    report=/tmp/rhts.report.$RANDOM.txt
