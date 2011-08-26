@@ -469,7 +469,7 @@ public class NetgroupTests extends SahiTestScript{
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 	
 		//										testname									groupanme1					groupname2			groupname3
-		ll.add(Arrays.asList(new Object[]{ 		"add_and_add_another_then_del_multiple",	"this is group one",		"engineering",	 	"sales" } ));
+		ll.add(Arrays.asList(new Object[]{ 		"add_and_add_another_then_del_multiple",	"this is group one",		"marketing",	 	"sales" } ));
 		return ll;	
 	}
 	
@@ -484,7 +484,7 @@ public class NetgroupTests extends SahiTestScript{
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 	
 		//										testname						groupanme1			description1				description2						nisdomain
-		ll.add(Arrays.asList(new Object[]{ 		"add_and_edit_setting",			"engineering",		"engineering net group",	"red hat engineering net group",  	"new.nis.domain"} ));
+		ll.add(Arrays.asList(new Object[]{ 		"add_and_edit_setting",			"engineering2",		"engineering net group",	"red hat engineering net group",  	"new.nis.domain"} ));
 		return ll;	
 	}
 	
