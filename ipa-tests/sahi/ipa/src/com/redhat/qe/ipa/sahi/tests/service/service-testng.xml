@@ -1,0 +1,30 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+<suite name="IPAServiceTestSuite">	
+	<test name="Service Tests">
+		<packages>
+		    <package name="com.redhat.qe.ipa.sahi.*" />
+		</packages>
+		<groups>
+			<run>
+			    <include name="setup" />
+			    <include name="init" />	 
+				<include name="serviceAddTests" />
+				<include name="customServiceAddTests" />
+				<include name="deleteSingleServiceTests" />
+				<include name="deleteMultipleServiceTests" />
+				<include name="cleanup" />
+				<!--
+				<include name="teardown" />
+				-->
+			</run>
+		</groups>
+		<classes>
+		    <class name="com.redhat.qe.ipa.sahi.tests.service.ServiceTests" />
+		</classes>
+	</test>
+	
+	<listeners>        
+  		<listener class-name="com.redhat.qe.auto.testng.TestNGListener" />	
+	</listeners>
+	
+</suite>
