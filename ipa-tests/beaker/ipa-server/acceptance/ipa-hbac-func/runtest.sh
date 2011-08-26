@@ -33,19 +33,19 @@
 
 
 # HACKING env.sh FOR HBAC FUNCTIONAL AUTOMATION
-ENV_DOMAIN=`cat /dev/shm/env.sh | grep ^"DOMAIN=" | cut -d = -f 2`
-SHORT_HOST1=`cat /dev/shm/env.sh | grep BEAKERCLIENT |  cut -d "=" -f 2 | cut -d " " -f 1 | cut -d . -f 1`
-LONG_HOST1=`cat /dev/shm/env.sh | grep BEAKERCLIENT | awk '{print $2}' | cut -d = -f 2`
-echo "export CLIENT1=$SHORT_HOST1.$ENV_DOMAIN" >> /dev/shm/env.sh
-echo "export BEAKERCLIENT1=$LONG_HOST1" >> /dev/shm/env.sh
-
-SHORT_HOST2=`cat /dev/shm/env.sh | grep BEAKERCLIENT | cut -d " " -f 3 | cut -d . -f 1`
-LONG_HOST2=`cat /dev/shm/env.sh | grep BEAKERCLIENT | cut -d " " -f 3`
-echo "export CLIENT2=$SHORT_HOST2.$ENV_DOMAIN" >> /dev/shm/env.sh
-echo "export BEAKERCLIENT2=$LONG_HOST2" >> /dev/shm/env.sh
-
-sed -e 's/export BEAKERCLIENT=/#export BEAKERCLIENT=/' /dev/shm/env.sh > /dev/shm/env.sh.new
-sed -e 's/export CLIENT=/#export CLIENT=/' /dev/shm/env.sh.new > /dev/shm/env.sh
+#ENV_DOMAIN=`cat /dev/shm/env.sh | grep ^"DOMAIN=" | cut -d = -f 2`
+#SHORT_HOST1=`cat /dev/shm/env.sh | grep BEAKERCLIENT |  cut -d "=" -f 2 | cut -d " " -f 1 | cut -d . -f 1`
+#LONG_HOST1=`cat /dev/shm/env.sh | grep BEAKERCLIENT | awk '{print $2}' | cut -d = -f 2`
+#echo "export CLIENT1=$SHORT_HOST1.$ENV_DOMAIN" >> /dev/shm/env.sh
+#echo "export BEAKERCLIENT1=$LONG_HOST1" >> /dev/shm/env.sh
+#
+#SHORT_HOST2=`cat /dev/shm/env.sh | grep BEAKERCLIENT | cut -d " " -f 3 | cut -d . -f 1`
+#LONG_HOST2=`cat /dev/shm/env.sh | grep BEAKERCLIENT | cut -d " " -f 3`
+#echo "export CLIENT2=$SHORT_HOST2.$ENV_DOMAIN" >> /dev/shm/env.sh
+#echo "export BEAKERCLIENT2=$LONG_HOST2" >> /dev/shm/env.sh
+#
+#sed -e 's/export BEAKERCLIENT=/#export BEAKERCLIENT=/' /dev/shm/env.sh > /dev/shm/env.sh.new
+#sed -e 's/export CLIENT=/#export CLIENT=/' /dev/shm/env.sh.new > /dev/shm/env.sh
 
 
 ##########################################################################
@@ -81,11 +81,11 @@ user3="user3"
 
 #Checking hostnames of all hosts
 echo "The hostname of IPA Server is $MASTER"
-echo "The hostname of IPA Client 1 is $CLIENT1"
+echo "The hostname of IPA Client 1 is $CLIENT"
 echo "The hostname of IPA Client 2 is $CLIENT2"
 
 echo "The beaker hostname of IPA Server is $BEAKERMASTER"
-echo "The beaker hostname of IPA Client 1 is $BEAKERCLIENT1"
+echo "The beaker hostname of IPA Client 1 is $BEAKERCLIENT"
 echo "The beaker hostname of IPA Client 2 is $BEAKERCLIENT2"
 
 cat /dev/shm/env.sh
@@ -97,36 +97,42 @@ PACKAGELIST="ipa-admintools ipa-client httpd mod_nss mod_auth_kerb 389-ds-base e
 
 rlJournalStart
         #####################################################################
-        #               IS THIS MACHINE A CLIENT1?                          #
+        #               IS THIS MACHINE CLIENT1?                            #
         #####################################################################
         rc=0
 
 	echo "Hostname of this machine is $HOSTNAME"
-	echo "Hostname of client is $CLIENT1"
+	echo "Hostname of client is $CLIENT"
 
-        echo $CLIENT1 | grep $HOSTNAME
+        echo $CLIENT | grep $HOSTNAME
         if [ $? -eq 0 ] ; then
 
 	rlPhaseStartSetup "ipa-hbacsvc-func: Checking client"
-                rlLog "Machine in recipe is CLIENT1"
+                rlLog "Machine in recipe is CLIENT"
                 rlRun "service iptables stop" 0 "Stop the firewall on the client"
 
-		rlRun "rhts-sync-block -s ONLINE $BEAKERMASTER"
-		rlRun "service sssd restart"
-		hbacsvc_client1
-                rlRun "rhts-sync-set -s DONE -m $BEAKERCLIENT1"
+	# hbacsvc_client_001
+                rlRun "rhts-sync-block -s DONE_hbacsvc_master_001 $BEAKERMASTER"
+                hbacsvc_client_001
+                rlRun "rhts-sync-set -s DONE_hbacsvc_client_001 -m $BEAKERCLIENT"
+
+        # hbacsvc_client_002
+                rlRun "rhts-sync-block -s DONE_hbacsvc_master_002 $BEAKERMASTER"
+                hbacsvc_client_002
+                rlRun "rhts-sync-set -s DONE_hbacsvc_client_002 -m $BEAKERCLIENT"
+
 	rlPhaseEnd
 
         else
 
-                rlLog "Machine in recipe in not a CLIENT1"
+                rlLog "Machine in recipe in not a CLIENT"
 
         fi
 
         #####################################################################
 
         #####################################################################
-        #               IS THIS MACHINE A CLIENT2?                          #
+        #               IS THIS MACHINE CLIENT2?                            #
         #####################################################################
         rc=0
 
@@ -140,10 +146,17 @@ rlJournalStart
                 rlLog "Machine in recipe is CLIENT2"
                 rlRun "service iptables stop" 0 "Stop the firewall on the client"
 
-		rlRun "rhts-sync-block -s ONLINE $BEAKERMASTER"
-		rlRun "service sssd restart"
-		hbacsvc_client2
-                rlRun "rhts-sync-set -s DONE -m $BEAKERCLIENT2"
+	# hbacsvc_client2_001
+		rlRun "rhts-sync-block -s DONE_hbacsvc_master_001 $BEAKERMASTER"
+		hbacsvc_client2_001
+                rlRun "rhts-sync-set -s DONE_hbacsvc_client2_001 -m $BEAKERCLIENT2"
+
+        # hbacsvc_client2_002
+                rlRun "rhts-sync-block -s DONE_hbacsvc_master_002 $BEAKERMASTER"
+                hbacsvc_client2_001
+                rlRun "rhts-sync-set -s DONE_hbacsvc_client2_002 -m $BEAKERCLIENT2"
+
+
 	rlPhaseEnd
 
         else
@@ -180,13 +193,21 @@ rlJournalStart
 	        rlRun "create_ipauser user$i user$i user$i $userpw"
 	        sleep 5
 	done
-		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-		#rlRun "ipa hbacrule-disable allow_all"
+	rlPhaseEnd
 
-		hbacsvc_setup
+	rlPhaseStartTest "MASTER tests start"
 
-		rlRun "rhts-sync-set -s ONLINE -m $BEAKERMASTER"
-                rlRun "rhts-sync-block -s DONE -s DONE $BEAKERCLIENT1 $BEAKERCLIENT2"
+	# hbacsvc_master_001
+		hbacsvc_master_001
+		rlRun "rhts-sync-set -s DONE_hbacsvc_master_001 -m $BEAKERMASTER"
+                rlRun "rhts-sync-block -s DONE_hbacsvc_client_001 -s DONE_hbacsvc_client2_001 $BEAKERCLIENT $BEAKERCLIENT2"
+
+	# hbacsvc_master_002
+		hbacsvc_master_002
+		rlRun "rhts-sync-set -s DONE_hbacsvc_master_002 -m $BEAKERMASTER"
+                rlRun "rhts-sync-block -s DONE_hbacsvc_client_002 -s DONE_hbacsvc_client2_002 $BEAKERCLIENT $BEAKERCLIENT2"
+
+
 	rlPhaseEnd
 
 	rlPhaseStartCleanup "ipa-hbacrule-func-cleanup: Destroying admin credentials."
