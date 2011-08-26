@@ -54,7 +54,7 @@ public class HBACTasks {
 	 * @param cn - the rule to be deleted
 	 * @param buttonToClick - Possible values - "Delete" or "Cancel"
 	 */
-	public static void deleteHBACRule(SahiTasks sahiTasks, String cn, String buttonToClick) {
+	public static void deleteHBAC(SahiTasks sahiTasks, String cn, String buttonToClick) {
 		sahiTasks.checkbox(cn).click();
 		sahiTasks.link("Delete").click();
 		sahiTasks.button(buttonToClick).click();
@@ -531,6 +531,19 @@ public class HBACTasks {
 		
 		sahiTasks.link("HBAC Services").in(sahiTasks.div("content")).click();
 		
+	}
+	
+	
+	
+	/*****************************************************************************************
+	 *********************** 		Tasks for HBAC Service Groups		********************** 
+	 *****************************************************************************************/
+
+	public static void addHBACServiceGroup(SahiTasks sahiTasks, String cn, String description, String buttonToClick) {
+		sahiTasks.span("Add").click();
+		sahiTasks.textbox("cn").setValue(cn);
+		sahiTasks.textbox("description").setValue(description);
+		sahiTasks.button(buttonToClick).click();		
 	}
 
 

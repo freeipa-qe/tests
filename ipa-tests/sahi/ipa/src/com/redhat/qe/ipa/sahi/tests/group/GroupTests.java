@@ -19,13 +19,15 @@ import com.redhat.qe.ipa.sahi.tasks.GroupTasks;
 public class GroupTests extends SahiTestScript{
 	
 	private static Logger log = Logger.getLogger(GroupTests.class.getName());
-	public static String groupPage = commonTasks.groupPage; 
+	public static String groupPage = ""; 
 	
 	
 	@BeforeClass (groups={"init"}, description="Initialize app for this test suite run", alwaysRun=true, dependsOnGroups="setup")
 	public void initialize() throws CloneNotSupportedException {			
 		sahiTasks.navigateTo(commonTasks.groupPage, true);
 		sahiTasks.setStrictVisibilityCheck(true);
+		
+		groupPage = commonTasks.groupPage; 
 	}
 	
 	//TODO: yi: BeforeMethod

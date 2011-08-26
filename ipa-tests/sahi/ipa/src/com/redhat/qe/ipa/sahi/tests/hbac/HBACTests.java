@@ -200,7 +200,7 @@ public class HBACTests extends SahiTestScript {
 		Assert.assertTrue(sahiTasks.link(cn).exists(), "Verify HBAC Rule " + cn + "  to be deleted exists");
 		
 		//modify this user
-		HBACTasks.deleteHBACRule(sahiTasks, cn, "Delete");
+		HBACTasks.deleteHBAC(sahiTasks, cn, "Delete");
 		
 		//verify user is deleted
 		Assert.assertFalse(sahiTasks.link(cn).exists(), "HBAC Rule " + cn + "  deleted successfully");
@@ -233,7 +233,7 @@ public class HBACTests extends SahiTestScript {
 		Assert.assertTrue(sahiTasks.link(cn).exists(), "Verify HBAC Rule " + cn + "  to be deleted exists");
 		
 		//modify this user
-		HBACTasks.deleteHBACRule(sahiTasks, cn, "Cancel");
+		HBACTasks.deleteHBAC(sahiTasks, cn, "Cancel");
 		
 		//verify user is deleted
 		Assert.assertTrue(sahiTasks.link(cn).exists(), "HBAC Rule " + cn + "  was not deleted");

@@ -32,8 +32,10 @@ public class CommonTasks {
 	
 	public String hbacPage =  serverUrl + "/ipa/ui/#hbac=hbacrule&policy=hbac&navigation=policy";	
 	public String hbacServicePage =  serverUrl + "/ipa/ui/#hbac=hbacsvc&policy=hbac&navigation=policy";
-	public String hbacServiceGroupsPage =  serverUrl + "/ipa/ui/#hbac=hbacsvcgroup&policy=hbac&navigation=policy";
+	public String hbacServiceGroupPage =  serverUrl + "/ipa/ui/#hbac=hbacsvcgroup&policy=hbac&navigation=policy";
 	public String sudoPage =  serverUrl + "/ipa/ui/#navigation=policy&policy=sudo";
+
+	
 	
 	public static String ipadomain = "";
 	public static String ipafqdn= "";

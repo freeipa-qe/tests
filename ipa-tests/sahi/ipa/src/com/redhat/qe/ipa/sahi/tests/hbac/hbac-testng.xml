@@ -1,5 +1,16 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
 <suite name="IPAHBACTestSuite">	
+<test name="HBAC Setup Tests">
+		<packages>
+		    <package name="com.redhat.qe.ipa.sahi.*" />
+		</packages>
+		<groups>
+			<run>
+			    <include name="setup" />
+		    </run>
+		</groups>
+</test>
+
 	<test name="HBAC Rule Tests">
 		<packages>
 		    <package name="com.redhat.qe.ipa.sahi.*" />
@@ -8,7 +19,7 @@
 			<run>
 			    <include name="setup" />
 			    
-			    <!-- HBAC Rules -->
+			     <!-- HBAC Rules --> 
 			    <include name="hbacRuleAddTests" />
 			    <include name="invalidhbacRuleAddTests" />
 			    <include name="hbacRuleRequiredFieldAddTests" />
@@ -26,7 +37,7 @@
 			    <include name="hbacRuleSearchTests" />
 			    <include name="hbacRuleDeleteTests" />			   
 			    <include name="hbacRuleMultipleDeleteTests" />
-				<!--
+			    <!--
 				<include name="teardown"/>
 				-->
 			</run>
@@ -36,11 +47,12 @@
 		    <class name="com.redhat.qe.ipa.sahi.tests.hbac.HBACTests" />
 		</classes>
 	</test>
-	<!--
+	
+	
 	<test name="HBAC Services Tests">
 		<groups>
 			<run>
-			 HBAC Service 
+			<!--  HBAC Service --> 
 			    <include name="hbacServiceAddTests" />
 			    <include name="hbacServiceAddAndAddAnotherTests" />
 			    <include name="hbacServiceAddAndEditTests" />
@@ -55,7 +67,28 @@
 		    <class name="com.redhat.qe.ipa.sahi.tests.hbac.HBACServiceTests" />
 		</classes>
 	</test>
-	-->
+	
+	
+	<test name="HBAC Service Groups Tests">
+		<groups>
+			<run>
+			 <!-- HBAC Service Groups --> 
+			    <include name="hbacServiceGroupAddTests" />
+			    <!--
+			    <include name="hbacServiceAddAndAddAnotherTests" />
+			    <include name="hbacServiceAddAndEditTests" />
+			    <include name="hbacServiceCancelAddTests" />
+			    <include name="invalidhbacServiceAddTests" />
+			    <include name="hbacServiceSearchTests" />
+			    <include name="hbacServiceExpandCollapseTests" />
+			    <include name="hbacServiceMultipleDeleteTests" />
+			    -->
+			</run>
+		</groups>
+		<classes>
+		    <class name="com.redhat.qe.ipa.sahi.tests.hbac.HBACServiceGroupTests" />
+		</classes>
+	</test>
 	
 		
 	

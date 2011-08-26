@@ -187,7 +187,7 @@ public class GroupTasks {
     public static void createGroupService(SahiTasks sahiTasks, String groupName, String groupDescription, String originalURL) {
 	// negative to group creation page, but there might be a bug here	
     	//TODO: yi: navigate in tests before starting task
-    	sahiTasks.navigateTo(GroupTests.groupPage, true);
+    	//sahiTasks.navigateTo(GroupTests.groupPage, true);
         sahiTasks.span("Add").click();
         sahiTasks.textbox("cn").setValue(groupName);
         sahiTasks.textbox("description").setValue(groupDescription);

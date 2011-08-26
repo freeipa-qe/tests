@@ -135,8 +135,7 @@ public class HBACServiceTests  extends SahiTestScript{
 	/*
 	 * Search an HBAC Service
 	 */
-	//@Test (groups={"hbacServiceSearchTests"}, dataProvider="getHBACServiceSearchTestObjects",  dependsOnGroups={"hbacServiceAddTests", "hbacServiceAddAndEditTests", "hbacServiceAddAndAddAnotherTests"})
-	@Test (groups={"hbacServiceSearchTests"}, dataProvider="getHBACServiceSearchTestObjects")
+	@Test (groups={"hbacServiceSearchTests"}, dataProvider="getHBACServiceSearchTestObjects",  dependsOnGroups={"hbacServiceAddTests", "hbacServiceAddAndEditTests", "hbacServiceAddAndAddAnotherTests"})
 	public void testHBACServiceSearch(String testName, String searchString, String multipleResult1, String multipleResult2, String multipleResult3, String multipleResult4, String multipleResult5) throws Exception {		
 		String[] multipleResults = {multipleResult1, multipleResult2, multipleResult3, multipleResult4, multipleResult5}; 
 		CommonTasks.search(sahiTasks, searchString);
@@ -153,12 +152,30 @@ public class HBACServiceTests  extends SahiTestScript{
 	/*
 	 * Expand/Collapse details of an HBAC Service
 	 */
-	@Test (groups={"hbacServiceExpandCollapseTests"}, dataProvider="getSingleHBACServiceTestObjects",  dependsOnGroups="hbacRuleAddAndEditTests")	
+	@Test (groups={"hbacServiceExpandCollapseTests"}, dataProvider="getSingleHBACServiceTestObjects",  dependsOnGroups="hbacServiceAddAndEditTests")	
 	public void testHBACServiceExpandCollapse(String testName, String cn, String description) throws Exception {
 		
 		HBACTasks.expandCollapseService(sahiTasks, cn);		
 		
 	}
+	
+	/*
+	 * Delete an HBAC Service
+	 */
+	@Test (groups={"hbacServiceDeleteTests"}, dataProvider="getHBACServiceDeleteTestObjects", dependsOnGroups={"hbacServiceAddAndEditTests",
+			"hbacServiceAddAndAddAnotherTests", "hbacServiceSearchTests" })	
+	public void testHBACServiceDelete(String testName, String cn) throws Exception {
+		//verify rule to be deleted exists
+		Assert.assertTrue(sahiTasks.link(cn).exists(), "Verify HBAC Service " + cn + "  to be deleted exists");
+		
+		//modify this user
+		HBACTasks.deleteHBAC(sahiTasks, cn, "Delete");
+		
+		//verify user is deleted
+		Assert.assertFalse(sahiTasks.link(cn).exists(), "HBAC Service " + cn + "  deleted successfully");
+	}
+	
+	
 	
 	/*******************************************************
 	 ************      DATA PROVIDERS     ******************
