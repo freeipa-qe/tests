@@ -463,9 +463,9 @@ public class UserTests extends SahiTestScript{
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
         //										testname					uid              		givenname	sn   
-		ll.add(Arrays.asList(new Object[]{ "create_good_user",				"testuser", 			"Test",		"User"      } ));
+		ll.add(Arrays.asList(new Object[]{ "create_good_user1",				"testuser", 			"Test",		"User"      } ));
 		ll.add(Arrays.asList(new Object[]{ "create_user_with_optional_login","", 					"Test",		"User"      } ));
-		ll.add(Arrays.asList(new Object[]{ "create_user2",				    "user2", 			    "Test2",	"User2"     } ));
+		ll.add(Arrays.asList(new Object[]{ "create_good_user2",				    "user2", 			    "Test2",	"User2"     } ));
 		      
 		return ll;	
 	}
@@ -591,8 +591,8 @@ public class UserTests extends SahiTestScript{
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
         //										testname					uid              		
-		ll.add(Arrays.asList(new Object[]{ "delete_good_user",				"testuser"     } ));
-		ll.add(Arrays.asList(new Object[]{ "delete_good_user",				"user2"     } ));
+		ll.add(Arrays.asList(new Object[]{ "delete_good_user1",				"testuser"     } ));
+		ll.add(Arrays.asList(new Object[]{ "delete_good_user2",				"user2"     } ));
 		        
 		return ll;	
 	}
@@ -659,9 +659,9 @@ public class UserTests extends SahiTestScript{
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
         //										testname					uid       		multiple_result1	       		
-		ll.add(Arrays.asList(new Object[]{ "search_good_user",				"testuser",		""    				} ));
+		ll.add(Arrays.asList(new Object[]{ "search_good_user1",				"testuser",		""    				} ));
 		ll.add(Arrays.asList(new Object[]{ "search_good_user2",				"user2",		""	     			} ));
-		ll.add(Arrays.asList(new Object[]{ "search_good_tuser",				"tuser",		"testuser"     		} ));
+		ll.add(Arrays.asList(new Object[]{ "search_good_tuser_multipleresult",				"tuser",		"testuser"     		} ));
 		        
 		return ll;	
 	}
@@ -727,7 +727,7 @@ public class UserTests extends SahiTestScript{
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
         //										testname						uid    		street					city			state		zip   			       		
-		ll.add(Arrays.asList(new Object[]{ "account_settings_user",				"tuser",	"200 Broadway Ave",		"Bedford",		"MA",		"01730"		} ));
+		ll.add(Arrays.asList(new Object[]{ "MailingAddress_settings_user",				"tuser",	"200 Broadway Ave",		"Bedford",		"MA",		"01730"		} ));
 		  
 		return ll;	
 	}

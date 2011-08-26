@@ -181,6 +181,15 @@ public class HBACTests extends SahiTestScript {
 	}
 	
 	/*
+	 * Add Rules - check required fields - for negative tests
+	 */
+	@Test (groups={"hbacRuleRequiredFieldAddTests"}, dataProvider="getHBACRuleRequiredFieldTestObjects")	
+	public void testHBACRuleRequiredFieldAdd(String testName, String cn, String expectedError) throws Exception {
+		//new test user can be added now
+		HBACTasks.createRuleWithRequiredField(sahiTasks, cn, expectedError);		
+	}
+	
+	/*
 	 * Delete an HBACRule
 	 */
 	@Test (groups={"hbacRuleDeleteTests"}, dataProvider="getHBACRuleDeleteTestObjects", dependsOnGroups={"hbacRuleAddAndEditTests",
@@ -201,8 +210,8 @@ public class HBACTests extends SahiTestScript {
 	 * Delete multiple HBACRule
 	 */
 	@Test (groups={"hbacRuleMultipleDeleteTests"}, dataProvider="getMultipleHBACRuleTestObjects", dependsOnGroups={"hbacRuleAddTests", "hbacRuleSearchTests", "invalidhbacRuleAddTests" })
-	public void testMultipleHBACRuleDelete(String testName, String cn1, String cn2, String cn3, String cn4) throws Exception {	
-		String cns[] = {cn1, cn2, cn3, cn4};
+	public void testMultipleHBACRuleDelete(String testName, String cn1, String cn2, String cn3) throws Exception {	
+		String cns[] = {cn1, cn2, cn3};
 		
 		
 		//verify rule to be deleted exists
@@ -459,7 +468,6 @@ public class HBACTests extends SahiTestScript {
 		
         //										testname					cn   
 		ll.add(Arrays.asList(new Object[]{ "good_hbacrule",					"dev_hbacRule"      } ));
-		ll.add(Arrays.asList(new Object[]{ "hbacrule_1",					"hbacRule1"      } ));
 		ll.add(Arrays.asList(new Object[]{ "hbacrule_long",					"abcdefghijklmnopqrstuvwxyz123456789ANDAGAINabcdefghijklmnopqrstuvwxyz123456789ANDAGAINabcdefghijklmnopqrstuvwxyz123456789"      } ));
 		ll.add(Arrays.asList(new Object[]{ "hbacrule_specialchar",			"h@ba*c#Ru?le"      } ));
 		
@@ -473,8 +481,8 @@ public class HBACTests extends SahiTestScript {
 	protected List<List<Object>> deleteMultipleHBACRuleTestObjects() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-        //										testname					cn1					cn2					cn3																																	cn4   
-		ll.add(Arrays.asList(new Object[]{ "delete_multiple_hbacrule",		"dev_hbacRule",		"hbacRule1",		"abcdefghijklmnopqrstuvwxyz123456789ANDAGAINabcdefghijklmnopqrstuvwxyz123456789ANDAGAINabcdefghijklmnopqrstuvwxyz123456789",		"h@ba*c#Ru?le"      } ));
+        //										testname					cn1					cn2																																	cn3   
+		ll.add(Arrays.asList(new Object[]{ "delete_multiple_hbacrule",		"dev_hbacRule",		"abcdefghijklmnopqrstuvwxyz123456789ANDAGAINabcdefghijklmnopqrstuvwxyz123456789ANDAGAINabcdefghijklmnopqrstuvwxyz123456789",		"h@ba*c#Ru?le"      } ));
 		
 		return ll;	
 	}
@@ -509,6 +517,21 @@ public class HBACTests extends SahiTestScript {
 		
         //										testname					cn					expected_Error   
 		ll.add(Arrays.asList(new Object[]{ "create_duplicate_hbacrule",		"dev_hbacRule",		"HBAC rule with name \"dev_hbacRule\" already exists"      } ));
+		
+		return ll;	
+	}
+	
+	/*
+	 * Data to be used when adding rules with required fields 
+	 */
+	@DataProvider(name="getHBACRuleRequiredFieldTestObjects")
+	public Object[][] getHBACRuleRequiredFieldTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createHBACRuleRequiredFieldTestObject());
+	}
+	protected List<List<Object>> createHBACRuleRequiredFieldTestObject() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname					cn					expected_Error   
 		ll.add(Arrays.asList(new Object[]{ "create_blank_hbacrule",			"",					"Required field"      } ));
 		
 		return ll;	
@@ -525,7 +548,7 @@ public class HBACTests extends SahiTestScript {
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
         //										testname					cn   				description
-		ll.add(Arrays.asList(new Object[]{ "create_good_hbacrule",			"eng_hbacRule",		"This rule is for eng"      } ));
+		ll.add(Arrays.asList(new Object[]{ "edit_general_hbacrule",			"eng_hbacRule",		"This rule is for eng"      } ));
 		
 		return ll;	
 	}
@@ -541,9 +564,9 @@ public class HBACTests extends SahiTestScript {
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
         //										testname					cn   
-		ll.add(Arrays.asList(new Object[]{ "create_good_hbacrule",			"eng_hbacRule"      } ));
-		ll.add(Arrays.asList(new Object[]{ "create_good_hbacrule",			"doc_hbacRule"      } ));
-		ll.add(Arrays.asList(new Object[]{ "create_good_hbacrule",			"doc_hbacRule1"      } ));
+		ll.add(Arrays.asList(new Object[]{ "delete_hbacrule1",			"eng_hbacRule"      } ));
+		ll.add(Arrays.asList(new Object[]{ "delete_hbacrule2",			"doc_hbacRule"      } ));
+		ll.add(Arrays.asList(new Object[]{ "delete_hbacrule3",			"doc_hbacRule1"      } ));
 		
 		return ll;	
 	}
@@ -578,8 +601,8 @@ public class HBACTests extends SahiTestScript {
 		
         //										testname					cn       				multiple_result1  
 		ll.add(Arrays.asList(new Object[]{ "search_good_hbacrule",			"eng_hbacRule",			""  } ));		
-		ll.add(Arrays.asList(new Object[]{ "search_good_hbacrule",			"h@ba*c#Ru?le",			""  } ));
-		ll.add(Arrays.asList(new Object[]{ "search_good_hbacrule",			"doc_hbacRule",			"doc_hbacRule1"  } ));
+		ll.add(Arrays.asList(new Object[]{ "search_specialchar_hbacrule",	"h@ba*c#Ru?le",			""  } ));
+		ll.add(Arrays.asList(new Object[]{ "search_multiple_hbacrule",			"doc_hbacRule",			"doc_hbacRule1"  } ));
 		
 		return ll;	
 	}

@@ -23,9 +23,9 @@ public class DNSTests extends SahiTestScript{
 	private static Logger log = Logger.getLogger(DNSTests.class.getName());
 	
 	public static String dnszone= "sahi_dns_testzone_001";
-	//TODO: nkrishnan: yi...is this right?
-	public static String reversezone= commonTasks.getReversezone();
-	public static String dummyHost="dummyhost." + CommonTasks.ipadomain;
+	
+	public static String reversezone= ""; 
+	public static String dummyHost="" ; 
 	
 	
 	@BeforeClass (groups={"init"}, description="Initialize app for this test suite run", alwaysRun=true, dependsOnGroups="setup")
@@ -33,6 +33,11 @@ public class DNSTests extends SahiTestScript{
 		
 		sahiTasks.navigateTo(commonTasks.dnsPage, true);
 		sahiTasks.setStrictVisibilityCheck(true);
+		
+		//TODO: nkrishnan: yi...is this right?
+		reversezone= commonTasks.getReversezone();
+		dummyHost= "dummyhost." + CommonTasks.ipadomain;
+			
 	}
 	
 	@BeforeMethod (alwaysRun=true)

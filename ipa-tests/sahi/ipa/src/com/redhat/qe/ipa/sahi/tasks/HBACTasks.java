@@ -252,7 +252,8 @@ public class HBACTasks {
 		//TODO: nkrishnan - should the suffix be used? Currently - there is a host added in the From Section, 
 		// and so the suffix is needed here in the Accessing section
 		//sahiTasks.checkbox(fqdn).under(sahiTasks.heading2(("Accessing"))).under(sahiTasks.span("Hosts")).click();
-		sahiTasks.checkbox(fqdn+"[1]").click();
+		sahiTasks.checkbox(fqdn).under(sahiTasks.div("Available")).click();
+		//sahiTasks.checkbox(fqdn+"[1]").click();
 		sahiTasks.span(">>").click();
 		sahiTasks.button("Enroll").click();
 		
@@ -305,7 +306,7 @@ public class HBACTasks {
 		sahiTasks.textbox("filter").setValue(filterBy);
 		sahiTasks.span("Find").click();
 		Assert.assertTrue(sahiTasks.checkbox(hostgroupname).exists(), "Found Host Group - " + hostgroupname);
-		sahiTasks.checkbox(hostgroupname).click();
+		sahiTasks.checkbox(hostgroupname).under(sahiTasks.div("Available")).click();
 		sahiTasks.span(">>").click();
 		sahiTasks.button("Enroll").click();
 		
@@ -503,6 +504,17 @@ public class HBACTasks {
 		sahiTasks.button("Cancel").near(sahiTasks.button("Add and Edit")).click();
 	}
 
+	
+	public static void createRuleWithRequiredField(SahiTasks sahiTasks,	String cn, String expectedError) {		
+		sahiTasks.span("Add").click();
+		sahiTasks.textbox("cn").setValue(cn);
+		sahiTasks.button("Add").click();
+		Assert.assertTrue(sahiTasks.span(expectedError).exists(), "Verified expected error when adding invalid rule " + cn);
+		sahiTasks.button("Cancel").near(sahiTasks.button("Add and Edit")).click();
+	}
+	
+
+	
 	public static void expandCollapseService(SahiTasks sahiTasks, String cn) {
 		sahiTasks.link(cn).click();
 		
@@ -520,8 +532,7 @@ public class HBACTasks {
 		sahiTasks.link("HBAC Services").in(sahiTasks.div("content")).click();
 		
 	}
-	
 
-	
+
 	
 }

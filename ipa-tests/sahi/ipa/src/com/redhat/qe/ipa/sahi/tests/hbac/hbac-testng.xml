@@ -11,6 +11,7 @@
 			    <!-- HBAC Rules -->
 			    <include name="hbacRuleAddTests" />
 			    <include name="invalidhbacRuleAddTests" />
+			    <include name="hbacRuleRequiredFieldAddTests" />
 			    <include name="hbacRuleCancelAddTests" />
 			    <include name="hbacRuleAddAndEditTests" />
 			    <include name="hbacRuleCancelDeleteTests" />
@@ -25,7 +26,6 @@
 			    <include name="hbacRuleSearchTests" />
 			    <include name="hbacRuleDeleteTests" />			   
 			    <include name="hbacRuleMultipleDeleteTests" />
-			   
 				<!--
 				<include name="teardown"/>
 				-->
@@ -36,11 +36,11 @@
 		    <class name="com.redhat.qe.ipa.sahi.tests.hbac.HBACTests" />
 		</classes>
 	</test>
-	
+	<!--
 	<test name="HBAC Services Tests">
 		<groups>
 			<run>
-			<!-- HBAC Service -->
+			 HBAC Service 
 			    <include name="hbacServiceAddTests" />
 			    <include name="hbacServiceAddAndAddAnotherTests" />
 			    <include name="hbacServiceAddAndEditTests" />
@@ -55,7 +55,7 @@
 		    <class name="com.redhat.qe.ipa.sahi.tests.hbac.HBACServiceTests" />
 		</classes>
 	</test>
-	
+	-->
 	
 		
 	
