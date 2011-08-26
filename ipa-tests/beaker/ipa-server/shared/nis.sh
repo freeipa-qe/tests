@@ -28,7 +28,7 @@ setup-nis-server()
 	setenforce 0 # This seems to mak ehe installs work faster
 	/bin/domainname $NISDOMAIN 
 	/bin/ypdomainname $NISDOMAIN 
-	echo "$SLAVE" | $LIBDIR/yp/ypinit -m	
+	echo "$MASTER" | $LIBDIR/yp/ypinit -m	
 	echo "domain $NISDOMAIN server $MASTER"
 	service ypserv restart
 	/etc/init.d/ypbind restart
@@ -44,7 +44,7 @@ setup-nis-server()
 	adduser --password $NISUSER2PASSWD $NISUSER2
 	adduser --password $NISUSER3PASSWD $NISUSER3
 	adduser --password $NISUSER4PASSWD $NISUSER4
-	echo "$SLAVE" | $LIBDIR/yp/ypinit -m	
+	echo "$MASTER" | $LIBDIR/yp/ypinit -m	
 	service yppasswdd start
 	service ypxfrd start
 	chkconfig ypserv on
@@ -58,10 +58,26 @@ setup-nis-server()
 	ypcat passwd
 
 	# configuring netgroups
-	echo "trustedhost ($NISHOST1,-)" /etc/netgroup
+	echo "convertpeople (-,$NISUSER1,$NISDOMAIN) (-,$NISUSER2,$NISDOMAIN) (-,$NISUSER3,$NISDOMAIN) (-,$NISUSER4,$NISDOMAIN)" > /etc/netgroup
 	# Enable netgroups in the yp makefile
-	sed -i s/^"all:  passwd group hosts rpc services netid protocols mail"/"all:  passwd group hosts rpc services netid protocols netgrp mail"\\/g /var/yp/Makefile
-	echo "$SLAVE" | $LIBDIR/yp/ypinit -m 
+	sedin='^all:\ \ passwd\ group\ hosts\ rpc\ services\ netid\ protocols\ mail'
+	sedout='all:\ \ passwd\ group\ hosts\ rpc\ services\ netid\ protocols\ netgrp\ mail'
+	cat /var/yp/Makefile > /var/yp/backup-Makefile
+	sed -i s/"$sedin"/"$sedout"/g /var/yp/Makefile
+
+	echo "$MASTER" | $LIBDIR/yp/ypinit -m 
+	service ypserv restart
+	service ypbind restart
+	
+	# Checking to ensure that it worked
+	rlRun "/usr/bin/ypcat passwd | grep $NISUSER1" 0 "Checking to ensure that nis user 1 was added to the passwd map" 
+	rlRun "/usr/bin/ypcat passwd | grep $NISUSER2" 0 "Checking to ensure that nis user 2 was added to the passwd map" 
+	rlRun "/usr/bin/ypcat passwd | grep $NISUSER3" 0 "Checking to ensure that nis user 3 was added to the passwd map" 
+	rlRun "/usr/bin/ypcat passwd | grep $NISUSER4" 0 "Checking to ensure that nis user 4 was added to the passwd map" 
+	rlRun "/usr/bin/ypcat netgroup | grep $NISUSER1" 0 "Checking to ensure that nis user 1 was added to the netgroup" 
+	rlRun "/usr/bin/ypcat netgroup | grep $NISUSER2" 0 "Checking to ensure that nis user 2 was added to the netgroup" 
+	rlRun "/usr/bin/ypcat netgroup | grep $NISUSER3" 0 "Checking to ensure that nis user 3 was added to the netgroup" 
+	rlRun "/usr/bin/ypcat netgroup | grep $NISUSER4" 0 "Checking to ensure that nis user 4 was added to the netgroup" 
 	setenforce 1
 
 }
