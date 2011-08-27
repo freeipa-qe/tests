@@ -108,7 +108,7 @@ hbacsvc_master_002() {
 }
 
 
-hbacsvc_client1_001() {
+hbacsvc_client_001() {
 
         rlPhaseStartTest "ipa-hbacsvc-client1-001: $user1 accessing $CLIENT from $CLIENT using SSHD service."
 
@@ -119,7 +119,7 @@ hbacsvc_client1_001() {
 	rlPhaseEnd
 }
 
-hbacsvc_client1_002() {
+hbacsvc_client_002() {
 
 	rlPhaseStartTest "ipa-hbacsvc-client1-002: $user1 accessing $MASTER from $CLIENT2 using FTP service"
 
