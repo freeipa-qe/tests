@@ -188,7 +188,7 @@ rlJournalStart
 	        rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 
         	# kinit as admin and creating users
-	for i in {1..10}; do
+	for i in {1..15}; do
 	        rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 	        rlRun "create_ipauser user$i user$i user$i $userpw"
 	        sleep 5
