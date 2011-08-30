@@ -16,8 +16,6 @@
 			    <include name="AddHostMembersTests" />	
 			    <include name="hostGroupMemberofTest" />
 			    <include name="hostMemberofTest" />
-			    <include name="hideAlreadyEnrolledHostsTests" />
-				<include name="hideAlreadyEnrolledGroupsTests" />
 			    <include name="cancelAddMembersTest" />
 			    <include name="cancelRemoveMembersTest" />
 			    <include name="removeHostMembersTest" />
