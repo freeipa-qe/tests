@@ -255,32 +255,9 @@ public class HostgroupTests extends SahiTestScript{
 	}
 	
 	/*
-	 * Hide enrolled host group tests
-	 */
-	@Test (groups={"hideAlreadyEnrolledGroupsTests"}, dataProvider="getHideAlreadyEnrolledGroupsTestObjects",  dependsOnGroups="hostMemberofTest")	
-	public void testHideAlreadyEnrolledGroups (String testName) throws Exception {
-		
-		HostgroupTasks.hideAlreadyEnrolled(sahiTasks, enggroup, "hostgroup", qegroup, "YES", "qe");
-		HostgroupTasks.hideAlreadyEnrolled(sahiTasks, enggroup, "hostgroup", devgroup, "YES", "dev");
-	}
-	
-
-	/*
-	 * Hide enrolled host tests
-	 */
-	@Test (groups={"hideAlreadyEnrolledHostsTests"}, dataProvider="getHideAlreadyEnrolledHostsTestObjects", dependsOnGroups="hideAlreadyEnrolledGroupsTests")	
-	public void testHideAlreadyEnrolledHosts (String testName) throws Exception {
-
-		HostgroupTasks.hideAlreadyEnrolled(sahiTasks, enggroup, "host", engwebserver, "YES", "eng");		
-		HostgroupTasks.hideAlreadyEnrolled(sahiTasks, qegroup, "host", qewebserver, "YES", "qe");		
-		HostgroupTasks.hideAlreadyEnrolled(sahiTasks, devgroup, "host", devwebserver, "NO", "dev");		
-		HostgroupTasks.hideAlreadyEnrolled(sahiTasks, qegroup, "host", qewebserver, "NO", "qe");	
-}
-	
-	/*
 	 * Cancel add members test
 	 */
-	@Test (groups={"cancelAddMembersTest"}, dataProvider="getCancelAddMemberTestObjects", dependsOnGroups="hideAlreadyEnrolledHostsTests")	
+	@Test (groups={"cancelAddMembersTest"}, dataProvider="getCancelAddMemberTestObjects", dependsOnGroups="hostGroupMemberofTest")	
 	public void testCancelAddMembers(String testName, String groupName, String membertype, String member) throws Exception {
 		
 		HostgroupTasks.addMembers(sahiTasks, groupName, membertype, member, "Cancel");
@@ -494,36 +471,6 @@ public class HostgroupTests extends SahiTestScript{
 	
 		//										testname					
 		ll.add(Arrays.asList(new Object[]{ 		"host_memberof" } ));
-		return ll;	
-	}
-	
-	/*
-	 * Data to be used when verifying hide already enrolled host groups
-	 */
-	@DataProvider(name="getHideAlreadyEnrolledGroupsTestObjects")
-	public Object[][] getHideAlreadyEnrolledGroupsTestObjects() {
-		return TestNGUtils.convertListOfListsTo2dArray(createHideAlreadyEnrolledGroupsTestObjects());
-	}
-	protected List<List<Object>> createHideAlreadyEnrolledGroupsTestObjects() {		
-		List<List<Object>> ll = new ArrayList<List<Object>>();
-	
-		//										testname					
-		ll.add(Arrays.asList(new Object[]{ 		"hide_enrolled_hostgroups" } ));
-		return ll;	
-	}
-	
-	/*
-	 * Data to be used when verifying hide already enrolled hosts
-	 */
-	@DataProvider(name="getHideAlreadyEnrolledHostsTestObjects")
-	public Object[][] getHideAlreadyEnrolledHostsTestObjects() {
-		return TestNGUtils.convertListOfListsTo2dArray(createHideAlreadyEnrolledHostsTestObjects());
-	}
-	protected List<List<Object>> createHideAlreadyEnrolledHostsTestObjects() {		
-		List<List<Object>> ll = new ArrayList<List<Object>>();
-	
-		//										testname					
-		ll.add(Arrays.asList(new Object[]{ 		"hide_enrolled_hosts" } ));
 		return ll;	
 	}
 	
