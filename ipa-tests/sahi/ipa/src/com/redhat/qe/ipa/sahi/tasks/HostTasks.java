@@ -1,6 +1,8 @@
 package com.redhat.qe.ipa.sahi.tasks;
 
 import java.util.logging.Logger;
+
+import com.redhat.qe.auto.testng.Assert;
 import com.redhat.qe.ipa.sahi.tasks.SahiTasks;
 
 public class HostTasks {
@@ -204,12 +206,42 @@ public class HostTasks {
 	/*
 	 * Set otp
 	 * @param sahiTasks
+	 * @param hostname - fqdn of host
 	 * @param value - value to set for OTP
+	 * @param set - true or false - is there already one set?
+	 * @param button - "Reset OTP" "Set OTP" or "Cancel"
 	 */
-	public static void modifyHostOTP(SahiTasks sahiTasks, String hostname, String otp) {
+	public static void modifyHostOTP(SahiTasks sahiTasks, String hostname, String otp, boolean set, String button) {
 		sahiTasks.link(hostname).click();
-		sahiTasks.textbox("otp").setValue(otp);
-		sahiTasks.span("Set OTP").click();
+		if (set == true)
+			sahiTasks.span("Reset OTP").click();
+		else 
+			sahiTasks.span("Set OTP").click();
+		
+		sahiTasks.password(0).setValue(otp);
+		sahiTasks.password(1).setValue(otp);
+		
+		sahiTasks.button(button).click();
+		sahiTasks.link("Hosts").in(sahiTasks.div("content")).click();
+	}
+	
+	/*
+	 * Verify a host otp
+	 * @param sahiTasks
+	 * @param hostname - fqdn of host
+	 * @param set - true or false
+	 */
+	public static void verifyHostOTP(SahiTasks sahiTasks, String hostname, boolean otpset ) {
+		sahiTasks.link(hostname).click();
+		if (otpset == true) {
+			Assert.assertTrue(sahiTasks.span("One-Time-Password Present").exists(), "Host " + hostname + " one time password exists");
+			Assert.assertTrue(sahiTasks.span("Reset OTP").exists(), "Host " + hostname + " can reset OTP");
+		}
+		else {
+			Assert.assertTrue(sahiTasks.span("One-Time-Password Not Present").exists(), "Host " + hostname + " one time password does not exist");
+			Assert.assertTrue(sahiTasks.span("Set OTP").exists(), "Host " + hostname + " can set OTP");
+		}
+			
 		sahiTasks.link("Hosts").in(sahiTasks.div("content")).click();
 	}
 	
