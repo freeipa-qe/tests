@@ -190,17 +190,15 @@ public class HostTests extends SahiTestScript{
 	 * Set host OTP
 	 */
 	@Test (groups={"otpHostTests"}, dataProvider="getOTPHostTestObjects")	
-	public void testHostOTP(String testName, String otp ) throws Exception {
+	public void testHostOTP(String testName, String otp, boolean set, boolean verifyset, String button) throws Exception {
 		String fqdn = testhost + "." + domain;
 		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(fqdn).exists(), "Host " + fqdn + "  exists");
 		
 		//modify the host
-		HostTasks.modifyHostOTP(sahiTasks, fqdn, otp);
+		HostTasks.modifyHostOTP(sahiTasks, fqdn, otp, set, button);
 		
-		//TODO need to verify otp is set when bug is fixed that shows there is an existing OTP
-		//verify all host field
-		//sahiTasks.navigateTo(System.getProperty("ipa.server.url")+hostPage, true);
-		//HostTasks.verifyHostField(sahiTasks, hostname, "otp", otp);
+		//verify all host otp settings
+		HostTasks.verifyHostOTP(sahiTasks, fqdn, verifyset);
 	
 	}
 	
@@ -504,12 +502,14 @@ public class HostTests extends SahiTestScript{
 	protected List<List<Object>> createOTPHostTestObjects() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-        //										testname			otp
-		ll.add(Arrays.asList(new Object[]{ "OTP_alpha",				"kjfghaoihetoiharitharighp"	} ));
-		ll.add(Arrays.asList(new Object[]{ "OTP_numeric",			"20892750975047735451"	} ));
-		ll.add(Arrays.asList(new Object[]{ "OTP_alphanumeric",		"kjasdoa58gshoty7475p759burtsyrta436756878"	} ));	
-		ll.add(Arrays.asList(new Object[]{ "OTP_special_chars",		"#$%^&()&(^%$*^$+"	} ));
-		ll.add(Arrays.asList(new Object[]{ "OTP_mixed",				"#kajfa8ga89pajh0b6q<ejt} j&b7q9nbti*"	} ));
+        //										testname			otp												set			verifyset		button
+		ll.add(Arrays.asList(new Object[]{ "cancel_set_otp",		"kjfghaoihetoiharitharighp",					false,  	false,			"Cancel" } ));
+		ll.add(Arrays.asList(new Object[]{ "set_OTP_alpha",			"kjfghaoihetoiharitharighp",					false,		true,			"Set OTP" } ));
+		ll.add(Arrays.asList(new Object[]{ "set_OTP_numeric",		"20892750975047735451",							true,		true,			"Reset OTP"	} ));
+		ll.add(Arrays.asList(new Object[]{ "set_OTP_alphanumeric",	"kjasdoa58gshoty7475p759burtsyrta436756878",	true,		true,			"Reset OTP" } ));	
+		ll.add(Arrays.asList(new Object[]{ "set_OTP_special_chars",	"#$%^&()&(^%$*^$+",								true,		true,			"Reset OTP"	} ));
+		ll.add(Arrays.asList(new Object[]{ "set_OTP_mixed",			"#kajfa8ga89pajh0b6q<ejt} j&b7q9nbti*",			true,		true,			"Reset OTP"	} ));
+		ll.add(Arrays.asList(new Object[]{ "cancel_reset_otp",		"blahblahcancel",								true,		true,			"Cancel"	} ));
 		return ll;	
 	}
 	
