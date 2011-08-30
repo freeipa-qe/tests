@@ -9,7 +9,6 @@ import com.redhat.qe.ipa.sahi.tasks.SahiTasks;
 public class KerberosTicketPolicyTasks {
 	private static Logger log = Logger.getLogger(HostTasks.class.getName());
 	
-
 	/*
 	 * Modify password field : test "undo", "reset" and update"
 	 * @param browser - sahi browser instance 
@@ -17,13 +16,13 @@ public class KerberosTicketPolicyTasks {
 	 * @param fieldName - which field to be tested
 	 * @param fieldValue - positive value, used for "update","reset" and "undo" test 
 	 */
-	public static void modifyKerberosTicketPolicy(SahiTasks browser, String testName, String fieldName, String fieldValue){
+	public static void modifyDetails(SahiTasks browser, String test_description, String name, String value){
 				
 		// test for undo
-		String originalValue = browser.textbox(fieldName).getText();
-		browser.textbox(fieldName).setValue(fieldValue);
+		String originalValue = browser.textbox(name).getText();
+		browser.textbox(name).setValue(value);
 		browser.span("undo").click();
-		if (originalValue.equals(browser.textbox(fieldName).getText())){
+		if (originalValue.equals(browser.textbox(name).getText())){
 			log.info("after 'undo', the original value being restored");
 		}else{
 			log.info("after 'undo', the original value is NOT being restored, report failure");
@@ -31,9 +30,9 @@ public class KerberosTicketPolicyTasks {
 		}
 		
 		// test for reset
-		browser.textbox(fieldName).setValue(fieldValue);
+		browser.textbox(name).setValue(value);
 		browser.span("Reset").click();
-		if (originalValue.equals(browser.textbox(fieldName).getText())){
+		if (originalValue.equals(browser.textbox(name).getText())){
 			log.info("after 'Reset', the original value being restored");
 		}else{
 			log.info("after 'Reset', the original value is NOT being restored, report failure");
@@ -41,15 +40,15 @@ public class KerberosTicketPolicyTasks {
 		}
 		
 		// test for update
-		browser.textbox(fieldName).setValue(fieldValue);
+		browser.textbox(name).setValue(value);
 		browser.span("Update").click();
-		String after = browser.textbox(fieldName).getText();
+		String after = browser.textbox(name).getText();
 		if (originalValue.equals(after)){
 			log.info("after 'update', the field value not changed, report failure");
 			Assert.fail("'update' failed");
 		}else{
-			if (after.equals(fieldValue)){
-				log.info("'Update' test passed, field ["+fieldName+"]'s value changed to ["+fieldValue+"] as expected");
+			if (after.equals(value)){
+				log.info("'Update' test passed, field ["+name+"]'s value changed to ["+value+"] as expected");
 			}else{
 				Assert.fail("'Reset' failed");
 			}
@@ -65,10 +64,10 @@ public class KerberosTicketPolicyTasks {
 	 * @param fieldNegValue - negative value, used for "update","reset" and "undo" test 
 	 * @param expectedErrorMsg - when wrong data entered, we expect an error field appears and output some error msg
 	 */
-	public static void modifyKerberosTicketPolicyNegative(SahiTasks browser, String testName, String fieldName, String fieldNegValue, String expectedErrorMsg){
+	public static void modifyDetails_negative(SahiTasks browser, String test_description, String name, String negative_value, String expectedErrorMsg){
  
 		// enter negative data to trigger error msg report
-		browser.textbox(fieldName).setValue(fieldNegValue);
+		browser.textbox(name).setValue(negative_value);
 		
 		if (browser.span(expectedErrorMsg).exists()){ 
 			log.info("error triggered, error msg match as expected, test pass"); 
@@ -86,7 +85,20 @@ public class KerberosTicketPolicyTasks {
 			Assert.fail("no dirty dialog appear");
 		}
 		 
-	}//modifyKerberosTicketPolicyNegative
+	}//modifyKerberosTicketPolicyNega
+
+	/*
+	 * Modify password field : test "undo", "reset" and update"
+	 * @param browser - sahi browser instance  
+	 * @param name - which field to be tested
+	 * @param value - positive value 
+	 */
+	public static void setDetails(SahiTasks browser, String name, String value){
+				  
+		browser.textbox(name).setValue(value);
+		browser.span("Update").click(); 
+		
+	}//setDetails
 	
 }// Class: KerberosTicketPolicyTasks
 
