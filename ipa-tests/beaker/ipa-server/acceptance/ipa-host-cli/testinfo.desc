@@ -4,8 +4,7 @@ TestVersion:     1.0
 Path:            /mnt/tests/CoreOS/ipa-server/acceptance/ipa-host-cli
 Description:     IPA host CLI acceptance tests
 Type:            Regression
-TestTime:        15m
-RunFor:          ipa-server
+TestTime:        60m
 Requires:        ipa-admintools
 Requires:        expect
 Priority:        Normal
