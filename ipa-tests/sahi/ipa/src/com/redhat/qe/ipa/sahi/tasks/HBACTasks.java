@@ -486,20 +486,22 @@ public class HBACTasks {
 		sahiTasks.link("HBAC Services").in(sahiTasks.div("content")).click();
 	}
 
-	public static void verifyHBACServiceUpdates(SahiTasks sahiTasks, String cn,	String description) {
+	public static void verifyHBACServiceUpdates(SahiTasks sahiTasks, String cn,	String newdescription) {
 		sahiTasks.link(cn).click();
 		
 		//verify Service description
-		Assert.assertEquals(sahiTasks.textbox("description").value(), description, "Verified description for service " + cn);
+		Assert.assertEquals(sahiTasks.textbox("description").value(), newdescription, "Verified description for service " + cn);
 
 		sahiTasks.link("HBAC Services").in(sahiTasks.div("content")).click();
 	}
 
-	public static void createInvalidService(SahiTasks sahiTasks, String cn, String expectedError) {
+	public static void createInvalidService(SahiTasks sahiTasks, String cn, String description, String expectedError) {
 		sahiTasks.span("Add").click();
 		sahiTasks.textbox("cn").setValue(cn);
+		sahiTasks.textbox("description").setValue(description);
+		
 		sahiTasks.button("Add").click();
-		Assert.assertTrue(sahiTasks.div(expectedError).exists(), "Verified expected error when adding invalid service " + cn);
+		Assert.assertTrue(sahiTasks.div(expectedError).exists(), "Verified expected error when adding invalid service group " + cn);
 		sahiTasks.button("Cancel").near(sahiTasks.button("Retry")).click();
 		sahiTasks.button("Cancel").near(sahiTasks.button("Add and Edit")).click();
 	}
@@ -515,8 +517,12 @@ public class HBACTasks {
 	
 
 	
-	public static void expandCollapseService(SahiTasks sahiTasks, String cn) {
+	public static void expandCollapseService(SahiTasks sahiTasks, String cn, boolean isServiceGroup) {
 		sahiTasks.link(cn).click();
+		
+		if (isServiceGroup) {
+			sahiTasks.link("Settings").click();
+		}
 		
 		sahiTasks.span("Collapse All").click();
 		sahiTasks.waitFor(1000);
@@ -529,23 +535,140 @@ public class HBACTasks {
 		//Verify data is visible
 		Assert.assertTrue(sahiTasks.label(cn).exists(), "Now Data is visible");
 		
-		sahiTasks.link("HBAC Services").in(sahiTasks.div("content")).click();
+		if (isServiceGroup) 
+			sahiTasks.link("HBAC Service Groups").in(sahiTasks.div("content")).click();
+		else
+			sahiTasks.link("HBAC Services").in(sahiTasks.div("content")).click();
 		
 	}
 	
+
+	public static void editHBACService(SahiTasks sahiTasks, String cn,	String description, String buttonToClick, boolean isServiceGroup) {
+		
+        String newDescription = "New testing description";
+		sahiTasks.link(cn).click();
+		if (isServiceGroup) {
+			sahiTasks.link("Settings").click();
+		}
+		sahiTasks.textbox("description").setValue(newDescription);
+		
+		if (isServiceGroup) 
+			sahiTasks.link("HBAC Service Groups").in(sahiTasks.div("content")).click();
+		else
+			sahiTasks.link("HBAC Services").in(sahiTasks.div("content")).click();
+		
+		Assert.assertTrue(sahiTasks.span("Unsaved Changes").exists(), "Verified Error message title");
+		Assert.assertTrue(sahiTasks.div("This page has unsaved changes. Please save or revert.").exists(), "Verified expected error");
+		
+		sahiTasks.button(buttonToClick).click();
+		
+
+		if (buttonToClick.equals("Cancel")){
+			sahiTasks.textbox("description").getValue().equals(newDescription);
+			Assert.assertEquals(sahiTasks.textbox("description").value(), newDescription, "Verified description for service " + cn + " after Cancel");
+			
+			if (isServiceGroup) {
+				sahiTasks.link("HBAC Service Groups").in(sahiTasks.div("content")).click();
+				sahiTasks.button("Reset").click();
+			}
+			else {
+				sahiTasks.link("HBAC Services").in(sahiTasks.div("content")).click();
+			    sahiTasks.button("Reset").click();
+			}
+		}
+		else if (buttonToClick.equals("Reset")) {
+			sahiTasks.link(cn).click();
+			if (isServiceGroup) {
+				sahiTasks.link("Settings").click();
+			}
+			Assert.assertEquals(sahiTasks.textbox("description").value(), description, "Verified description for service " + cn + " after Reset");
+			if (isServiceGroup) 
+				sahiTasks.link("HBAC Service Groups").in(sahiTasks.div("content")).click();
+			else
+				sahiTasks.link("HBAC Services").in(sahiTasks.div("content")).click();
+		}
+		else {
+			sahiTasks.link(cn).click();
+			if (isServiceGroup) {
+				sahiTasks.link("Settings").click();
+			}
+			Assert.assertEquals(sahiTasks.textbox("description").value(), newDescription, "Verified description for service " + cn + " after Reset");
+			if (isServiceGroup) 
+				sahiTasks.link("HBAC Service Groups").in(sahiTasks.div("content")).click();
+			else
+				sahiTasks.link("HBAC Services").in(sahiTasks.div("content")).click();
+		}
+	}
+
 	
 	
 	/*****************************************************************************************
 	 *********************** 		Tasks for HBAC Service Groups		********************** 
 	 *****************************************************************************************/
 
-	public static void addHBACServiceGroup(SahiTasks sahiTasks, String cn, String description, String buttonToClick) {
+	public static void addAndEditHBACServiceGroup(SahiTasks sahiTasks, String cn, String description, String newdescription) {
+
 		sahiTasks.span("Add").click();
 		sahiTasks.textbox("cn").setValue(cn);
 		sahiTasks.textbox("description").setValue(description);
-		sahiTasks.button(buttonToClick).click();		
+		sahiTasks.button("Add and Edit").click();
+		
+		sahiTasks.span("Enroll").click();
+		sahiTasks.checkbox("su").click();
+		sahiTasks.checkbox("su-l").click();
+		sahiTasks.span(">>").click();
+		sahiTasks.button("Enroll").click();
+		
+		sahiTasks.link("Settings").click();
+		sahiTasks.textbox("description").setValue(newdescription);
+		
+		sahiTasks.span("Update").click();
+		sahiTasks.link("HBAC Service Groups").in(sahiTasks.div("content")).click();
+	}
+	
+
+	public static void verifyHBACServiceGroupUpdates(SahiTasks sahiTasks, String cn, String description) {
+		sahiTasks.link(cn).click();
+		
+		Assert.assertTrue(sahiTasks.checkbox("su").exists(), "Verified service su is enrolled in " + cn);
+		Assert.assertTrue(sahiTasks.checkbox("su-l").exists(), "Verified service su-l is enrolled in " + cn);
+		
+		//verify Service Group description
+		sahiTasks.link("Settings").click();
+		Assert.assertEquals(sahiTasks.textbox("description").value(), description, "Verified description for service " + cn);
+
+		sahiTasks.link("HBAC Service Groups").in(sahiTasks.div("content")).click();
 	}
 
+	public static void verifyHBACServiceGroupNavigation(SahiTasks sahiTasks, String cn) {
+		sahiTasks.link(cn).click();
+		sahiTasks.link("su").click();
+		Assert.assertEquals(sahiTasks.textbox("description").value(), "su", "Verified description for service su");
+		sahiTasks.link("memberof_hbacsvcgroup").click();
+		Assert.assertTrue(sahiTasks.link(cn).exists(), "Verified service group for service su");
+		sahiTasks.link(cn ).click();
 
+		sahiTasks.link("HBAC Service Groups").in(sahiTasks.div("content")).click();
+	}
+
+	public static void enrollServiceinServiceGroup(SahiTasks sahiTasks,
+			String svcgrp2, String service) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public static void verifyServicesInServiceGroup(SahiTasks sahiTasks,
+			String service, String svcgrp1, boolean b) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public static void deleteServiceFromServiceGroup(SahiTasks sahiTasks,
+			String service, String svcgrp1) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	
 	
 }

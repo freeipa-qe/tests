@@ -360,35 +360,9 @@ public class HBACTests extends SahiTestScript {
 	
 	
 	/*****************************************************************************************
-	 *********************** 			HBAC Services					********************** 
-	 *****************************************************************************************/
-	
-	
-	/*
-	 * Delete an HBACService
-	 */
-		
-	/*
-	 * Delete, but Cancel deleting an HBACService
-	 */
-	
-	/*
-	 * Edit an HBACService
-	 */
-	
-	/*
-	 * Expand/Collapse details of an HBACService
-	 */
-	
-	
-	
-	
-	/*****************************************************************************************
 	 *********************** 			HBAC Service Groups				********************** 
 	 *****************************************************************************************/
-	/*
-	 * Add a HBACServiceGroup
-	 */
+	
 	
 	/*
 	 * Add, and then add another HBACServiceGroup

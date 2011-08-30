@@ -19,8 +19,9 @@
 			<run>
 			    <include name="setup" />
 			    
-			     <!-- HBAC Rules --> 
+			   <!--   HBAC Rules --> 
 			    <include name="hbacRuleAddTests" />
+			    
 			    <include name="invalidhbacRuleAddTests" />
 			    <include name="hbacRuleRequiredFieldAddTests" />
 			    <include name="hbacRuleCancelAddTests" />
@@ -40,6 +41,7 @@
 			    <!--
 				<include name="teardown"/>
 				-->
+				
 			</run>
 		</groups>
 		
@@ -47,49 +49,55 @@
 		    <class name="com.redhat.qe.ipa.sahi.tests.hbac.HBACTests" />
 		</classes>
 	</test>
-	
+
 	
 	<test name="HBAC Services Tests">
 		<groups>
 			<run>
-			<!--  HBAC Service --> 
+			  <!-- HBAC Service -->  
 			    <include name="hbacServiceAddTests" />
 			    <include name="hbacServiceAddAndAddAnotherTests" />
 			    <include name="hbacServiceAddAndEditTests" />
+			    <include name="hbacServiceEditTests" />
 			    <include name="hbacServiceCancelAddTests" />
 			    <include name="invalidhbacServiceAddTests" />
 			    <include name="hbacServiceSearchTests" />
 			    <include name="hbacServiceExpandCollapseTests" />
+			    <include name="hbacServiceCancelDeleteTests" />
 			    <include name="hbacServiceMultipleDeleteTests" />
+			    <include name="hbacServiceDeleteTests" />
 			</run>
 		</groups>
 		<classes>
 		    <class name="com.redhat.qe.ipa.sahi.tests.hbac.HBACServiceTests" />
 		</classes>
 	</test>
-	
-	
+
+
 	<test name="HBAC Service Groups Tests">
 		<groups>
 			<run>
-			 <!-- HBAC Service Groups --> 
+			  <!-- HBAC Service Groups -->
 			    <include name="hbacServiceGroupAddTests" />
-			    <!--
-			    <include name="hbacServiceAddAndAddAnotherTests" />
-			    <include name="hbacServiceAddAndEditTests" />
-			    <include name="hbacServiceCancelAddTests" />
-			    <include name="invalidhbacServiceAddTests" />
-			    <include name="hbacServiceSearchTests" />
-			    <include name="hbacServiceExpandCollapseTests" />
-			    <include name="hbacServiceMultipleDeleteTests" />
-			    -->
+			    <include name="hbacServiceGroupAddAndAddAnotherTests" />
+			    <include name="hbacServiceGroupAddAndEditTests" />
+			    <include name="hbacServiceGroupCancelAddTests" />
+			    <include name="hbacServiceGroupNavigateTests" />
+			    <include name="hbacServiceGroupOneServiceTwoGroupsTests" />
+			    <include name="invalidhbacServiceGroupAddTests" />
+			    <include name="hbacServiceGroupSearchTests" />
+			    <include name="hbacServiceGroupExpandCollapseTests" />
+			    <include name="hbacServiceGroupEditTests" />
+			    <include name="hbacServiceGroupCancelDeleteTests" />
+			    <include name="hbacServiceGroupDeleteTests" />
+			    <include name="hbacServiceGroupMultipleDeleteTests" />			    
 			</run>
 		</groups>
 		<classes>
 		    <class name="com.redhat.qe.ipa.sahi.tests.hbac.HBACServiceGroupTests" />
 		</classes>
 	</test>
-	
+
 		
 	
 	<listeners>        
