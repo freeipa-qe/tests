@@ -193,7 +193,7 @@ public class HBACServiceTests  extends SahiTestScript{
 	/*
 	 * Delete, but Cancel deleting an HBACRule
 	 */
-	@Test (groups={"hbacServiceCancelDeleteTests"}, dataProvider="getHBACServiceDeleteTestObjects", dependsOnGroups={"hbacServiceAddAndEditTests" })	
+	@Test (groups={"hbacServiceCancelDeleteTests"}, dataProvider="getHBACServiceDeleteTestObjects", dependsOnGroups={"hbacServiceAddAndAddAnotherTests" })	
 	public void testHBACServiceCancelDelete(String testName, String cn) throws Exception {
 		//verify rule to be deleted exists
 		Assert.assertTrue(sahiTasks.link(cn).exists(), "Verify HBAC Rule " + cn + "  to be deleted exists");

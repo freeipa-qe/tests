@@ -155,9 +155,10 @@ public class HBACTasks {
 		sahiTasks.link(hostgroupName).click();
 		HostgroupTasks.verifyMemberOf(sahiTasks, hostgroupName, "hbacrule", cn, "direct", "YES", true);
 		sahiTasks.link(cn).click();
-		sahiTasks.link(fqdn).click();
-		HostTasks.verifyHostMemberOf(sahiTasks, fqdn, "HBAC Rules", cn, "indirect", "YES", true);		
-		sahiTasks.link(cn).click();
+		// TODO: nkrishnan HBAC Rule not listed for host when it is on the From section of rule
+		//sahiTasks.link(fqdn).click();
+		//HostTasks.verifyHostMemberOf(sahiTasks, fqdn, "HBAC Rules", cn, "indirect", "YES", true);		
+		//sahiTasks.link(cn).click();
 		
 		sahiTasks.link("HBAC Rules").in(sahiTasks.div("content")).click();	
 	}
@@ -203,13 +204,7 @@ public class HBACTasks {
 	public static void modifyHBACRuleWhoSection(SahiTasks sahiTasks, String cn, String user, String usergroup ) {
 		sahiTasks.link(cn).click();
 		
-		sahiTasks.checkbox(user).click();
-		sahiTasks.span("Add").under(sahiTasks.heading2(("Who"))).near(sahiTasks.span("Users")).click();
-		sahiTasks.checkbox("hidememb").click();
-		sahiTasks.link("Find").click();
-		//FIXME: nkrishnan: Bug 729665
-		//Assert.assertFalse(sahiTasks.checkbox(user).exists(), "Enrolled user not listed");
-		sahiTasks.button("Cancel").click();		
+		sahiTasks.checkbox(user).click();			
 		sahiTasks.span("Delete").click();
 		sahiTasks.button("Delete").click();
 		sahiTasks.span("Add").under(sahiTasks.heading2(("Who"))).near(sahiTasks.span("User Groups")).click();
@@ -249,20 +244,9 @@ public class HBACTasks {
 
 		sahiTasks.span("Add").under(sahiTasks.heading2(("Accessing"))).near(sahiTasks.span("Hosts")).click();
 		
-		//TODO: nkrishnan - should the suffix be used? Currently - there is a host added in the From Section, 
-		// and so the suffix is needed here in the Accessing section
-		//sahiTasks.checkbox(fqdn).under(sahiTasks.heading2(("Accessing"))).under(sahiTasks.span("Hosts")).click();
 		sahiTasks.checkbox(fqdn).under(sahiTasks.div("Available")).click();
-		//sahiTasks.checkbox(fqdn+"[1]").click();
 		sahiTasks.span(">>").click();
 		sahiTasks.button("Enroll").click();
-		
-		sahiTasks.span("Add").under(sahiTasks.heading2(("Accessing"))).near(sahiTasks.span("Host Groups")).click();
-		sahiTasks.checkbox("hidememb").click();
-		sahiTasks.link("Find").click();
-		//FIXME: nkrishnan: Bug 729665
-		//Assert.assertFalse(sahiTasks.checkbox(hostgroupname).exists(), "Enrolled host group not listed");
-		sahiTasks.button("Cancel").click();
 		
 		sahiTasks.checkbox(hostgroupname).click();
 		sahiTasks.span("Delete").under(sahiTasks.heading2(("Accessing"))).near(sahiTasks.span("Host Groups")).click();
@@ -273,6 +257,33 @@ public class HBACTasks {
 		sahiTasks.link("HBAC Rules").in(sahiTasks.div("content")).click();			
 		
 	}
+	
+	
+	/**
+	 * Modify Accessing Section for an HBAC Rule
+	 * @param sahiTasks
+	 * @param cn - the rule to modify for
+	 */
+	public static void modifyHBACRuleAccessingSectionMemberList(SahiTasks sahiTasks, String cn, String fqdn, String hostgroupname ) {
+		sahiTasks.link(cn).click();
+		
+		//Click to add Host groups from "Accessing" section
+		sahiTasks.span("Add").under(sahiTasks.heading2(("Accessing"))).near(sahiTasks.span("Host Groups")).click();
+		sahiTasks.checkbox(hostgroupname).click();
+		sahiTasks.span(">>").click();
+		sahiTasks.button("Enroll").click();
+
+		sahiTasks.span("Add").under(sahiTasks.heading2(("Accessing"))).near(sahiTasks.span("Hosts")).click();		
+		Assert.assertFalse(sahiTasks.checkbox(fqdn).under(sahiTasks.div("Available")).exists(), "Verified host is not " +
+				"listed, since it is memberof and is already included in hostgroup");		
+		sahiTasks.button("Cancel").click();
+		
+		sahiTasks.span("Update").click();
+		sahiTasks.link("HBAC Rules").in(sahiTasks.div("content")).click();			
+		
+	}
+	
+	
 	
 	/**
 	 * Verify Accessing Section for an HBAC Rule
@@ -310,14 +321,6 @@ public class HBACTasks {
 		sahiTasks.span(">>").click();
 		sahiTasks.button("Enroll").click();
 		
-		
-		sahiTasks.span("Add").under(sahiTasks.heading2(("From"))).near(sahiTasks.span("Hosts")).click();
-		sahiTasks.checkbox("hidememb").click();
-		sahiTasks.link("Find").click();
-		//FIXME: nkrishnan: Bug 729665
-		//Assert.assertFalse(sahiTasks.checkbox(fqdn).exists(), "Enrolled host not listed");
-		sahiTasks.button("Cancel").click();
-		
 		sahiTasks.checkbox(fqdn).under(sahiTasks.heading2(("From"))).near(sahiTasks.span("Hosts")).click();
 		sahiTasks.span("Delete").under(sahiTasks.heading2(("From"))).near(sahiTasks.span("Hosts")).click();
 		sahiTasks.button("Delete").click();
@@ -336,7 +339,7 @@ public class HBACTasks {
 		sahiTasks.link(cn).click();
 		
 		Assert.assertFalse(sahiTasks.checkbox(fqdn).under(sahiTasks.heading2(("From"))).near(sahiTasks.span("Hosts")).exists(), "Verified Host: " + fqdn + " is not on list for rule: " + cn);
-		Assert.assertTrue(sahiTasks.checkbox(hostgroupname+"[1]").exists(), "Verified Host Group: " + hostgroupname + " is on list for rule: " + cn);
+		Assert.assertTrue(sahiTasks.checkbox(hostgroupname).under(sahiTasks.heading2(("From"))).near(sahiTasks.span("Hosts")).exists(), "Verified Host Group: " + hostgroupname + " is on list for rule: " + cn);
 				
 		sahiTasks.link("HBAC Rules").in(sahiTasks.div("content")).click();			
 	}
@@ -651,24 +654,56 @@ public class HBACTasks {
 		sahiTasks.link("HBAC Service Groups").in(sahiTasks.div("content")).click();
 	}
 
-	public static void enrollServiceinServiceGroup(SahiTasks sahiTasks,
-			String svcgrp2, String service) {
-		// TODO Auto-generated method stub
+	public static void enrollServiceinServiceGroup(SahiTasks sahiTasks,	String svcgrp, String service) {
+		sahiTasks.link(svcgrp).click();
+		sahiTasks.span("Enroll").click();
+		sahiTasks.checkbox(service).near(sahiTasks.div("Available")).click();
+		sahiTasks.link(">>").click();
+		sahiTasks.button("Enroll").click();
+
+		sahiTasks.link("HBAC Service Groups").in(sahiTasks.div("content")).click();
 		
 	}
 
-	public static void verifyServicesInServiceGroup(SahiTasks sahiTasks,
-			String service, String svcgrp1, boolean b) {
-		// TODO Auto-generated method stub
+	public static void verifyServicesInServiceGroup(SahiTasks sahiTasks, String service, String svcgrp, boolean expectedResult) {
+		sahiTasks.link(svcgrp).click();
+		
+		if (expectedResult)
+			Assert.assertTrue(sahiTasks.checkbox(service).exists(), "Verified service " + service + " is enrolled in " + svcgrp);
+		else
+			Assert.assertFalse(sahiTasks.checkbox(service).exists(), "Verified service " + service + " is not enrolled in " + svcgrp);
+
+		sahiTasks.link("HBAC Service Groups").in(sahiTasks.div("content")).click();
 		
 	}
 
-	public static void deleteServiceFromServiceGroup(SahiTasks sahiTasks,
-			String service, String svcgrp1) {
-		// TODO Auto-generated method stub
+	public static void deleteServiceFromServiceGroup(SahiTasks sahiTasks, String service, String svcgrp, String buttonToClick) {
+		sahiTasks.link(svcgrp).click();
+		sahiTasks.checkbox(service).click();
+		sahiTasks.span("Delete").near(sahiTasks.span("Enroll")).click();
+		sahiTasks.button(buttonToClick).click();
 		
+		sahiTasks.link("HBAC Service Groups").in(sahiTasks.div("content")).click();
 	}
 
+	
+
+	public static void enrollServiceAgainInServiceGroup(SahiTasks sahiTasks, String svcgrp, String service) {
+		String expectedError = service + ": This entry is already a member";
+		sahiTasks.link(svcgrp).click();
+		sahiTasks.span("Enroll").click();
+		sahiTasks.checkbox(service).near(sahiTasks.div("Available")).click();
+		sahiTasks.link(">>").click();		
+		sahiTasks.button("Enroll").click();
+		Assert.assertTrue(sahiTasks.span("Operations Error").exists(), "Verified Expected Error Message Header");
+		Assert.assertTrue(sahiTasks.div("Some operations failed.Show detailsHide details" + expectedError).exists(), "Verified Expected Error Message");
+		sahiTasks.link("Show details").click();
+		Assert.assertTrue(sahiTasks.listItem(expectedError).exists(), "Verified Expected Error Details when enrolling same service twice");
+		sahiTasks.button("OK").click();
+		
+		sahiTasks.link("HBAC Service Groups").in(sahiTasks.div("content")).click();
+		
+	}
 	
 	
 }

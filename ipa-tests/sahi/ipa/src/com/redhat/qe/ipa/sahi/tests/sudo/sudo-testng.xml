@@ -7,20 +7,43 @@
 		<groups>
 			<run>
 			    <include name="setup" />
-			    <include name="init" />
-			    <include name="sudoruleCommandAddTests" />
 			    <include name="sudoruleAddTests" />
-			    <include name="sudoruleEditTests" />
-				<include name="sudoruleCommandDelTests" />
-				<!--
-				<include name="sudoruleCommandGroupAddTests" />
-				<include name="sudoruleCommandGroupDelTests" />
-				-->
+			    <include name="sudoruleEditTests" />				
 				<include name="sudoruleDeleteTests" />
 			</run>
 		</groups>
 		<classes>
 		    <class name="com.redhat.qe.ipa.sahi.tests.sudo.SudoTests" />
+		</classes>
+	</test>
+	
+		
+	<test name="Sudo Command Tests">
+		<groups>
+			<run>
+			   <!-- Sudo Commands --> 			   
+			    <include name="sudoruleCommandAddTests" />
+				<include name="sudoruleCommandDelTests" />
+			</run>
+		</groups>
+		<classes>
+		    <class name="com.redhat.qe.ipa.sahi.tests.sudo.SudoCommandTests" />
+		</classes>
+	</test>
+	
+		
+	<test name="Sudo Command Group Tests">
+		<groups>
+			<run>
+			   <!-- Sudo Command Groups --> 
+			   <!--
+				<include name="sudoruleCommandGroupAddTests" />
+				<include name="sudoruleCommandGroupDelTests" />
+				-->
+			</run>
+		</groups>
+		<classes>
+		    <class name="com.redhat.qe.ipa.sahi.tests.sudo.SudoCommandTests" />
 		</classes>
 	</test>
 	

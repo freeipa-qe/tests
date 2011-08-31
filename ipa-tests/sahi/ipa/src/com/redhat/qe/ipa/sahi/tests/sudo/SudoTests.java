@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -21,9 +22,25 @@ import com.redhat.qe.ipa.sahi.tests.sudo.SudoTests;
 public class SudoTests extends SahiTestScript{
 	private static Logger log = Logger.getLogger(SudoTests.class.getName());
 	
+	private String currentPage = "";
+	private String alternateCurrentPage = "";
+	
 	@BeforeClass (groups={"init"}, description="Initialize app for this test suite run", alwaysRun=true, dependsOnGroups="setup")
 	public void initialize() throws CloneNotSupportedException {
-		sahiTasks.navigateTo(commonTasks.sudoPage, true);
+		sahiTasks.setStrictVisibilityCheck(true);
+		sahiTasks.navigateTo(commonTasks.sudoRulePage, true);
+		currentPage = sahiTasks.fetch("top.location.href");
+		alternateCurrentPage = sahiTasks.fetch("top.location.href") + "&sudorule-facet=search" ;
+	}
+	
+	@BeforeMethod (alwaysRun=true)
+	public void checkCurrentPage() {
+	    String currentPageNow = sahiTasks.fetch("top.location.href");
+		if (!currentPageNow.equals(currentPage) && !currentPageNow.equals(alternateCurrentPage)) {
+			CommonTasks.checkError(sahiTasks);
+			System.out.println("Not on expected Page....navigating back from : " + currentPageNow);
+			sahiTasks.navigateTo(commonTasks.hbacPage, true);
+		}		
 	}
 	
 
@@ -82,76 +99,7 @@ public class SudoTests extends SahiTestScript{
 		com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(cn).exists(), "Sudorule " + cn + "  deleted successfully");
 	}
 	
-	/*
-	 * Add Sudo Commands - positive tests
-	 */
-	@Test (groups={"sudoruleCommandAddTests"}, dataProvider="getSudoruleCommandAddTestObjects", 
-			dependsOnGroups={"sudoruleAddTests"})	
-			public void testSudoruleCommandAdd(String testName, String cn, String description) throws Exception {
-				//verify command to be added doesn't exist
-				com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(cn).exists(), "Verify sudocommand " + cn + "  doesn't already exist");
-				
-				//new sudo rule command can be added now
-				SudoTasks.createSudoruleCommandAdd(sahiTasks, cn, description);
-				
-				//verify sudo rule command was added successfully
-				com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(cn).exists(), "Added Sudorule Command " + cn + "  successfully");
-	} 
 	
-	/*
-	 * Del Sudo Commands - positive tests
-	 */
-	@Test (groups={"sudoruleCommandDelTests"}, dataProvider="getSudoruleCommandDelTestObjects", 
-			dependsOnGroups={"sudoruleEditTests"})	
-			public void testSudoruleCommandDel(String testName, String cn, String description) throws Exception {
-				//verify command to be deleted exists
-				com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(cn).exists(), "Verify sudocommand " + cn + "  to be deleted exists");
-				
-				//new sudo rule command can be deleted now
-				SudoTasks.deleteSudoruleCommandDel(sahiTasks, cn, description);
-				
-				//verify sudo rule command was added successfully
-				com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(cn).exists(), "Sudorule Command " + cn + "  deleted successfully");
-	} 
-	
-	
-	/*
-	 * Add Sudo Command Groups - positive tests
-	 */
-	@Test (groups={"sudoruleCommandGroupAddTests"}, dataProvider="getSudoruleCommandGroupAddTestObjects", 
-			dependsOnGroups={"sudoruleAddTests"})	
-			public void testSudoruleCommandGroupAdd(String testName, String cn, String description) throws Exception {
-				//verify command group to be added doesn't exist
-				com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(cn).exists(), "Verify sudocommand group " + cn + "  doesn't already exist");
-				
-				//new sudo rule command can be added now
-				SudoTasks.createSudoruleCommandGroupAdd(sahiTasks, cn, description);
-				
-				//verify sudo command group was added successfully
-				com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(cn).exists(), "Added Sudo Command Group" + cn + "  successfully");
-	} 
-	
-	/*
-	 * Del Sudo Command Group - positive tests
-	 */
-	@Test (groups={"sudoruleCommandGroupDelTests"}, dataProvider="getSudoruleCommandGroupDelTestObjects", 
-			dependsOnGroups={"sudoruleCommandGroupAddTests"})	
-			public void testSudoruleCommandGroupDel(String testName, String cn, String description) throws Exception {
-				//verify command group to be deleted exists
-				com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(cn).exists(), "Verify sudocommand group" + cn + "  to be deleted exists");
-				
-				//new sudo command group can be deleted now
-				SudoTasks.deleteSudoruleCommandGroupDel(sahiTasks, cn, description);
-				
-				//verify sudo rule command group was added successfully
-				com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(cn).exists(), "Sudorule Command Group" + cn + "  deleted successfully");
-	} 
-	
-	
-	
-	/*
-	 * Search
-	 */
 	
 	/*******************************************************
 	 ************      DATA PROVIDERS     ******************
@@ -212,98 +160,8 @@ public class SudoTests extends SahiTestScript{
 		return ll;	
 	}
 
-	/*
-	 * Data to be used when adding sudo rule commands - for positive cases
-	 */
-	@DataProvider(name="getSudoruleCommandAddTestObjects")
-	public Object[][] getSudoruleCommandAddTestObjects() {
-		return TestNGUtils.convertListOfListsTo2dArray(createSudoruleCommandAddTestObjects());
-	}
-	protected List<List<Object>> createSudoruleCommandAddTestObjects() {		
-		List<List<Object>> ll = new ArrayList<List<Object>>();
-		
-        //										testname					cn   			description
-		ll.add(Arrays.asList(new Object[]{ "create_sudorule_command",		"/bin/date",		"date command"	} ));
-		ll.add(Arrays.asList(new Object[]{ "create_sudorule_command",		"/bin/cat",			"cat command"	} ));
-		/*
-		ll.add(Arrays.asList(new Object[]{ "create_sudorule_command",		"/bin/find",		"find command"	} ));
-		ll.add(Arrays.asList(new Object[]{ "create_sudorule_command",		"/bin/more",		"more command"	} ));
-		ll.add(Arrays.asList(new Object[]{ "create_sudorule_command",		"/usr/bin/less",	"less command"	} ));
-		ll.add(Arrays.asList(new Object[]{ "create_sudorule_command",		"/bin/ln",			"symlink command"	} ));
-		ll.add(Arrays.asList(new Object[]{ "create_sudorule_command",		"/bin/sleep",		"sleep command"	} ));
-		ll.add(Arrays.asList(new Object[]{ "create_sudorule_command",		"/bin/mkdir",		"mkdir command"	} ));
-		*/
-						   
-		return ll;	
-	}
+	
 
 	
-	/*
-	 * Data to be used when deleting sudo rule commands - for positive cases
-	 */
-	@DataProvider(name="getSudoruleCommandDelTestObjects")
-	public Object[][] getSudoruleCommandDelTestObjects() {
-		return TestNGUtils.convertListOfListsTo2dArray(createSudoruleCommandDelTestObjects());
-	}
-	protected List<List<Object>> createSudoruleCommandDelTestObjects() {		
-		List<List<Object>> ll = new ArrayList<List<Object>>();
-		
-        //										testname					cn   			description
-		ll.add(Arrays.asList(new Object[]{ "delete_sudorule_command",		"/bin/date",		"date command"	} ));
-		ll.add(Arrays.asList(new Object[]{ "delete_sudorule_command",		"/bin/cat",			"cat command"	} ));
-		/*
-		ll.add(Arrays.asList(new Object[]{ "delete_sudorule_command",		"/bin/find",		"find command"	} ));
-		ll.add(Arrays.asList(new Object[]{ "delete_sudorule_command",		"/bin/more",		"more command"	} ));
-		ll.add(Arrays.asList(new Object[]{ "delete_sudorule_command",		"/usr/bin/less",	"less command"	} ));
-		ll.add(Arrays.asList(new Object[]{ "delete_sudorule_command",		"/bin/ln",			"symlink command"	} ));
-		ll.add(Arrays.asList(new Object[]{ "delete_sudorule_command",		"/bin/sleep",		"sleep command"	} ));
-		ll.add(Arrays.asList(new Object[]{ "delete_sudorule_command",		"/bin/mkdir",		"mkdir command"	} ));
-		*/	
-		return ll;	
-	}
-
-	/*
-	 * Data to be used when adding sudo command groups - for positive cases
-	 */
-	@DataProvider(name="getSudoruleCommandGroupAddTestObjects")
-	public Object[][] getSudoruleCommandGroupAddTestObjects() {
-		return TestNGUtils.convertListOfListsTo2dArray(createSudoruleCommandGroupAddTestObjects());
-	}
-	protected List<List<Object>> createSudoruleCommandGroupAddTestObjects() {		
-		List<List<Object>> ll = new ArrayList<List<Object>>();
-		
-        //										testname					cn   			description
-		ll.add(Arrays.asList(new Object[]{ "create_sudo_commandgroup",		"sudo group1",		"group1 with basic commands"	} ));
-		ll.add(Arrays.asList(new Object[]{ "create_sudo_commandgroup",		"sudo group2",		"group2 with basic commands"	} ));
-		/*
-		ll.add(Arrays.asList(new Object[]{ "create_sudo_commandgroup",		"sudo group3",		"group3 with basic commands"	} ));
-		ll.add(Arrays.asList(new Object[]{ "create_sudo_commandgroup",		"sudo group4",		"group4 with basic commands"	} ));
-		ll.add(Arrays.asList(new Object[]{ "create_sudo_commandgroup",		"sudo group5",		"group5 with basic commands"	} ));
-		*/
-				        
-		return ll;	
-	}
-
-	/*
-	 * Data to be used when deleting sudo command groups - for positive cases
-	 */
-	@DataProvider(name="getSudoruleCommandGroupDelTestObjects")
-	public Object[][] getSudoruleCommandGroupDelTestObjects() {
-		return TestNGUtils.convertListOfListsTo2dArray(deleteSudoruleCommandGroupDelTestObjects());
-	}
-	protected List<List<Object>> deleteSudoruleCommandGroupDelTestObjects() {		
-		List<List<Object>> ll = new ArrayList<List<Object>>();
-		
-        //										testname					cn   			description
-		ll.add(Arrays.asList(new Object[]{ "delete_sudo_commandgroup",		"sudo group1",		"group1 with basic commands"	} ));
-		ll.add(Arrays.asList(new Object[]{ "delete_sudo_commandgroup",		"sudo group2",		"group2 with basic commands"	} ));
-		/*
-		ll.add(Arrays.asList(new Object[]{ "delete_sudo_commandgroup",		"sudo group3",		"group3 with basic commands"	} ));
-		ll.add(Arrays.asList(new Object[]{ "delete_sudo_commandgroup",		"sudo group4",		"group4 with basic commands"	} ));
-		ll.add(Arrays.asList(new Object[]{ "delete_sudo_commandgroup",		"sudo group5",		"group5 with basic commands"	} ));
-		*/
-				        
-		return ll;	
-	}
 	
 }

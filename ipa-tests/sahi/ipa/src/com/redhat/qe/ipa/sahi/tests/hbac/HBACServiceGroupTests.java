@@ -155,12 +155,15 @@ private static Logger log = Logger.getLogger(UserTests.class.getName());
 	}
 	
 	/*
-	 * Enroll same service in 2 different groups, then delete from one group, then delete the service (thus deleting from the other group)
+	 * Enroll same service in 2 different groups, then delete from one group, then delete 
+	 * the service (thus deleting from the other group)
 	 */
 	@Test (groups={"hbacServiceGroupOneServiceTwoGroupsTests"}, dataProvider="getHBACServiceGroupOneServiceTwoGroupsTestObjects", dependsOnGroups={"hbacServiceGroupAddAndAddAnotherTests" })	
 	public void testHBACServiceGroupOneServiceTwoGroups(String testName, String service, String svcgrp1, String svcgrp2, String svcDescription) throws Exception {
 		//add a service - rlogin
+		sahiTasks.navigateTo(commonTasks.hbacServicePage, true);
 		HBACTasks.addHBACService(sahiTasks, service, svcDescription, "Add");
+		sahiTasks.navigateTo(commonTasks.hbacServiceGroupPage, true);
 		
 		//enroll rlogin into login1, login2
 		HBACTasks.enrollServiceinServiceGroup(sahiTasks, svcgrp1, service);
@@ -169,21 +172,58 @@ private static Logger log = Logger.getLogger(UserTests.class.getName());
 		HBACTasks.verifyServicesInServiceGroup(sahiTasks, service, svcgrp1, true);
 		HBACTasks.verifyServicesInServiceGroup(sahiTasks, service, svcgrp2, true);
 		
-		HBACTasks.deleteServiceFromServiceGroup(sahiTasks, service, svcgrp1);
+		HBACTasks.deleteServiceFromServiceGroup(sahiTasks, service, svcgrp1, "Delete");
 		HBACTasks.verifyServicesInServiceGroup(sahiTasks, service, svcgrp1, false);
+		HBACTasks.verifyServicesInServiceGroup(sahiTasks, service, svcgrp2, true);
 		
+		sahiTasks.navigateTo(commonTasks.hbacServicePage, true);
 		HBACTasks.deleteHBAC(sahiTasks, service, "Delete");
+		sahiTasks.navigateTo(commonTasks.hbacServiceGroupPage, true);
 		HBACTasks.verifyServicesInServiceGroup(sahiTasks, service, svcgrp2, false);
+	}
+	
+	
+	/*
+	 * Enroll same service twice - negative
+	 */
+	@Test (groups={"hbacServiceGroupEnrollServiceTwiceTests"}, dataProvider="getHBACServiceInServiceGroupTestObjects", dependsOnGroups={"hbacServiceGroupAddTests" })	
+	public void testHBACServiceGroupEnrollServiceTwice(String testName, String service, String svcgrp) throws Exception {
+		Assert.assertTrue(sahiTasks.link(svcgrp).exists(), "Verify HBAC Service Group " + svcgrp + "  to be edited exists");
+		
+		HBACTasks.enrollServiceinServiceGroup(sahiTasks, svcgrp, service);
+		HBACTasks.verifyServicesInServiceGroup(sahiTasks, service, svcgrp, true);
+		HBACTasks.enrollServiceAgainInServiceGroup(sahiTasks, svcgrp, service);
 	}
 	
 	
 	/*
 	 * Edit an HBAC Service Group to delete a service
 	 */
+	@Test (groups={"hbacServiceGroupDeleteServiceTests"}, dataProvider="getHBACServiceInServiceGroupTestObjects", dependsOnGroups={"hbacServiceGroupAddTests", "hbacServiceGroupEnrollServiceTwiceTests", "hbacServiceGroupCancelDeleteServiceTests" })	
+	public void testHBACServiceGroupDeleteService(String testName, String service, String svcgrp) throws Exception {
+		Assert.assertTrue(sahiTasks.link(svcgrp).exists(), "Verify HBAC Service Group " + svcgrp + "  to be edited exists");
+		HBACTasks.verifyServicesInServiceGroup(sahiTasks, service, svcgrp, true);
+		
+		HBACTasks.deleteServiceFromServiceGroup(sahiTasks, service, svcgrp, "Delete");
+		HBACTasks.verifyServicesInServiceGroup(sahiTasks, service, svcgrp, false);
+	}
+	
+		
 	
 	/*
 	 * Edit an HBAC Service Group to cancel deleting a service
 	 */
+	@Test (groups={"hbacServiceGroupCancelDeleteServiceTests"}, dataProvider="getHBACServiceInServiceGroupTestObjects", dependsOnGroups={"hbacServiceGroupAddTests", "hbacServiceGroupEnrollServiceTwiceTests" })	
+	public void testHBACServiceGroupCancelDeleteService(String testName, String service, String svcgrp) throws Exception {
+		Assert.assertTrue(sahiTasks.link(svcgrp).exists(), "Verify HBAC Service Group " + svcgrp + "  to be edited exists");
+		HBACTasks.verifyServicesInServiceGroup(sahiTasks, service, svcgrp, true);
+		
+		HBACTasks.deleteServiceFromServiceGroup(sahiTasks, service, svcgrp, "Cancel");
+		HBACTasks.verifyServicesInServiceGroup(sahiTasks, service, svcgrp, true);
+	}
+	
+	
+	
 	
 	/*
 	 * Edit an HBAC Service Group
@@ -234,7 +274,8 @@ private static Logger log = Logger.getLogger(UserTests.class.getName());
 	/*
 	 * Delete multiple HBAC Service Groups
 	 */
-	@Test (groups={"hbacServiceGroupMultipleDeleteTests"}, dataProvider="getMultipleHBACServiceGroupTestObjects", dependsOnGroups={"hbacServiceGroupAddTests", "hbacServiceGroupAddAndEditTests", "invalidhbacServiceGroupAddTests", "hbacServiceGroupSearchTests", "hbacServiceGroupEditTests" })
+	@Test (groups={"hbacServiceGroupMultipleDeleteTests"}, dataProvider="getMultipleHBACServiceGroupTestObjects", dependsOnGroups={"hbacServiceGroupAddTests", "hbacServiceGroupAddAndEditTests", "invalidhbacServiceGroupAddTests", 
+			"hbacServiceGroupSearchTests", "hbacServiceGroupEditTests", "hbacServiceGroupCancelDeleteServiceTests", "hbacServiceGroupDeleteServiceTests" })
 	public void testMultipleHBACServiceGroupDelete(String testName, String cn1, String cn2, String cn3) throws Exception {	
 		String cns[] = {cn1, cn2, cn3};
 		
@@ -380,8 +421,24 @@ private static Logger log = Logger.getLogger(UserTests.class.getName());
 	protected List<List<Object>> createHBACServiceGroupOneServiceTwoGroupsTestObjects() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-        //										testname							service			svcgrp1			svcgrp2			description																																	cn4   
+        //										testname							service			svcgrp1			svcgrp2			description	   
 		ll.add(Arrays.asList(new Object[]{ "one_hbacservice_two_hbacservicegroups",	"rlogin",		"login1",		"login2",		"testing rlogin service"      } ));
+		
+		return ll;	
+	}
+	
+	/*
+	 * Data to be used when enrolling/deleting service from service group 
+	 */
+	@DataProvider(name="getHBACServiceInServiceGroupTestObjects")
+	public Object[][] getHBACServiceInServiceGroupTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(useServiceInHBACServiceGroupTestObjects());
+	}
+	protected List<List<Object>> useServiceInHBACServiceGroupTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname						service		svcgrp   
+		ll.add(Arrays.asList(new Object[]{ "hbacservice_in_hbacservicegroup",	"gdm",		"web"		      } ));
 		
 		return ll;	
 	}

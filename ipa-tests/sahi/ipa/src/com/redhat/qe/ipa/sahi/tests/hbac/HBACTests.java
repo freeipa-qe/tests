@@ -80,7 +80,6 @@ public class HBACTests extends SahiTestScript {
 		sahiTasks.navigateTo(commonTasks.hostgroupPage, true);
 		if (!sahiTasks.link(hostgroupName).exists()) {
 			HostgroupTasks.addHostGroup(sahiTasks, hostgroupName, description, "Add");
-			HostgroupTasks.addMembers(sahiTasks, hostgroupName, membertype, names, "Enroll");
 		}
 		
 		System.out.println("Check CurrentPage: " + commonTasks.hbacPage);
@@ -209,7 +208,7 @@ public class HBACTests extends SahiTestScript {
 	/*
 	 * Delete multiple HBACRule
 	 */
-	@Test (groups={"hbacRuleMultipleDeleteTests"}, dataProvider="getMultipleHBACRuleTestObjects", dependsOnGroups={"hbacRuleAddTests", "hbacRuleSearchTests", "invalidhbacRuleAddTests" })
+	@Test (groups={"hbacRuleMultipleDeleteTests"}, dataProvider="getMultipleHBACRuleTestObjects", dependsOnGroups={"hbacRuleAddTests", "hbacRuleSearchTests", "invalidhbacRuleAddTests", "hbacRuleMemberListTests" })
 	public void testMultipleHBACRuleDelete(String testName, String cn1, String cn2, String cn3) throws Exception {	
 		String cns[] = {cn1, cn2, cn3};
 		
@@ -273,7 +272,7 @@ public class HBACTests extends SahiTestScript {
 	/*
 	 * Edit the Who Section for the HBACRule
 	 */
-	@Test (groups={"hbacRuleWhoSettingsTests"}, dataProvider="getSingleHBACRuleTestObjects", dependsOnGroups={"hbacRuleAddAndEditTests"})	
+	@Test (groups={"hbacRuleWhoSettingsTests"}, dataProvider="getSingleHBACRuleTestObjects", dependsOnGroups={"hbacRuleAddAndEditTests", "hbacRuleMemberListTests"})	
 	public void testHBACRuleWhoSettings(String testName, String cn) throws Exception {		
 		//verify rule to be edited exists
 		Assert.assertTrue(sahiTasks.link(cn).exists(), "Verify Rule " + cn + " to be edited exists");
@@ -289,7 +288,7 @@ public class HBACTests extends SahiTestScript {
 	/*
 	 * Edit the Accessing Section for the HBACRule
 	 */
-	@Test (groups={"hbacRuleAccessingSettingsTests"}, dataProvider="getSingleHBACRuleTestObjects", dependsOnGroups={"hbacRuleAddAndEditTests"})	
+	@Test (groups={"hbacRuleAccessingSettingsTests"}, dataProvider="getSingleHBACRuleTestObjects", dependsOnGroups={"hbacRuleAddAndEditTests", "hbacRuleMemberListTests"})	
 	public void testHBACRuleAccessingSettings(String testName, String cn) throws Exception {		
 		//verify rule to be edited exists
 		Assert.assertTrue(sahiTasks.link(cn).exists(), "Verify Rule " + cn + " to be edited exists");
@@ -301,10 +300,11 @@ public class HBACTests extends SahiTestScript {
 		HBACTasks.verifyHBACRuleAccessingSection(sahiTasks, cn, fqdn, hostgroupName);
 	}
 	
+
 	/*
 	 * Edit the From Section for the HBACRule
 	 */
-	@Test (groups={"hbacRuleFromSettingsTests"}, dataProvider="getSingleHBACRuleTestObjects", dependsOnGroups={"hbacRuleAddAndEditTests"})	
+	@Test (groups={"hbacRuleFromSettingsTests"}, dataProvider="getSingleHBACRuleTestObjects", dependsOnGroups={"hbacRuleAddAndEditTests", "hbacRuleMemberListTests"})	
 	public void testHBACRuleFromSettings(String testName, String cn) throws Exception {		
 		//verify rule to be edited exists
 		Assert.assertTrue(sahiTasks.link(cn).exists(), "Verify Rule " + cn + " to be edited exists");
@@ -333,6 +333,32 @@ public class HBACTests extends SahiTestScript {
 		HBACTasks.verifyHBACRuleViaServiceSection(sahiTasks, cn, searchResult);
 	}
 	
+	
+	/*
+	 * Verify member list for the HBACRule
+	 * fqdn is added as member of hostgroupName
+	 * hostgroupName is added to From list for Rule
+	 * When choosing to add Hosts to From list for Rule, verify that fqdn 
+	 * is not listed since it already is in the list for this Rule, because
+	 * the it is memberof hostgroupName
+	 */
+	@Test (groups={"hbacRuleMemberListTests"}, dataProvider="getHBACRuleMemberListTestObjects", dependsOnGroups={"hbacRuleAddTests"})	
+	public void testHBACRuleMemberList(String testName, String cn) throws Exception {		
+		//verify rule to be edited exists
+		Assert.assertTrue(sahiTasks.link(cn).exists(), "Verify Rule " + cn + " to be edited exists");
+		
+		sahiTasks.navigateTo(commonTasks.hostgroupPage, true);
+		HostgroupTasks.addMembers(sahiTasks, hostgroupName, membertype, names, "Enroll");
+		sahiTasks.navigateTo(commonTasks.hbacPage, true);
+		//modify this rule
+		HBACTasks.modifyHBACRuleAccessingSectionMemberList(sahiTasks, cn, fqdn, hostgroupName);
+		
+		sahiTasks.navigateTo(commonTasks.hostgroupPage, true);
+		HostgroupTasks.removeMembers(sahiTasks, hostgroupName, membertype, names, "Delete");
+		sahiTasks.navigateTo(commonTasks.hbacPage, true);
+		
+	}
+	
 	/*
 	 * Expand/Collapse details of an HBACRule
 	 */
@@ -358,49 +384,6 @@ public class HBACTests extends SahiTestScript {
 		CommonTasks.clearSearch(sahiTasks);
 	}
 	
-	
-	/*****************************************************************************************
-	 *********************** 			HBAC Service Groups				********************** 
-	 *****************************************************************************************/
-	
-	
-	/*
-	 * Add, and then add another HBACServiceGroup
-	 */
-	
-	/*
-	 * Add, and edit HBACServiceGroup
-	 */
-	
-	/*
-	 * Add, but Cancel adding HBACServiceGroup
-	 */
-	
-	/*
-	 * Delete an HBACServiceGroup
-	 */
-	
-	/*
-	 * Delete multiple HBACServiceGroup
-	 */
-	
-	/*
-	 * Delete, but Cancel deleting an HBACServiceGroup
-	 */
-	
-	/*
-	 * Edit an HBACServiceGroup
-	 */
-	
-	/*
-	 * Expand/Collapse details of an HBACServiceGroup
-	 */
-	
-	/*
-	 * Search an HBACServiceGroup
-	 */
-	
-		
 	@AfterClass (groups={"cleanup"}, description="Delete objects created for this test suite", alwaysRun=true, dependsOnGroups="init")
 	public void cleanup() throws CloneNotSupportedException {
 		//delete user, user group, host, host group added for this suite
@@ -478,6 +461,21 @@ public class HBACTests extends SahiTestScript {
 		return ll;	
 	}
 	
+	/*
+	 * Data to be used when adding rules 
+	 */
+	@DataProvider(name="getHBACRuleMemberListTestObjects")
+	public Object[][] getHBACRuleMemberListTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createHBACRuleMemberListTestObject());
+	}
+	protected List<List<Object>> createHBACRuleMemberListTestObject() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname					cn   
+		ll.add(Arrays.asList(new Object[]{ "create_good_hbacrule",			"dev_hbacRule"      } ));
+		
+		return ll;	
+	}
 	
 	/*
 	 * Data to be used when adding rules 
