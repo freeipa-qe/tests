@@ -29,6 +29,7 @@ public class CommonTasks {
 	public String alternateDNSpage = dnsPage + "&dnszone-facet=search";
 	public String passwordPolicyPage =  serverUrl + "/ipa/ui/#policy=pwpolicy&navigation=policy";
 	public String kerberosTicketPolicyPage =  serverUrl + "/ipa/ui/#policy=krbtpolicy&navigation=policy";
+	public String servicePage =  serverUrl + "/ipa/ui/#identity=service&navigation=identity";
 	
 	public String hbacPage =  serverUrl + "/ipa/ui/#hbac=hbacrule&policy=hbac&navigation=policy";	
 	public String hbacServicePage =  serverUrl + "/ipa/ui/#hbac=hbacsvc&policy=hbac&navigation=policy";
