@@ -10,6 +10,55 @@ public class KerberosTicketPolicyTasks {
 	private static Logger log = Logger.getLogger(HostTasks.class.getName());
 	
 	/*
+	 * Modify password field : test  update", this is a wraper for modifyPolicy_update, this is more like a service provide to other class
+	 * @param browser - sahi browser instance 
+	 * @param testDescription - test case message
+	 * @param textboxName - which text box (field) to be tested
+	 * @param textboxValue - what value will it set to 
+	 */
+	public static void modifyPolicy(SahiTasks browser,String textboxName, String textboxValue){
+		String testDescription="Modify policy";
+		KerberosTicketPolicyTasks.modifyPolicy_update(browser, testDescription, textboxName, textboxValue);
+	}//modifyPolicy
+	
+	/*
+	 * Modify password field : test "undo", "reset" and update"
+	 * @param browser - sahi browser instance 
+	 * @param testDescription - test case message
+	 * @param textboxName - which text box (field) to be tested
+	 * @param textboxValue - what value will it set to 
+	 */
+	public static void modifyPolicy_update(SahiTasks browser, String testDescription, String textboxName, String textboxValue){
+		browser.textbox(textboxName).setValue(textboxValue);
+		browser.span("Update").click();
+	}//modifyPolicy_update
+	
+	/*
+	 * Modify password field : test "undo", "reset" and update"
+	 * @param browser - sahi browser instance 
+	 * @param testDescription - test case message
+	 * @param textboxName - which text box (field) to be tested
+	 * @param textboxValue - what value will it set to 
+	 */
+	public static void modifyPolicy_undo(SahiTasks browser, String testDescription, String textboxName, String textboxValue){
+		browser.textbox(textboxName).setValue(textboxValue);
+		browser.span("undo").click();	
+	}//modifyPolicy_undo
+	
+	/*
+	 * Modify password field : test "reset" button, it should discard the changes. 
+	 * @param browser - sahi browser instance 
+	 * @param testDescription - test case message
+	 * @param textboxName - which text box (field) to be tested
+	 * @param textboxValue - what value will it set to 
+	 */
+	public static void modifyPolicy_reset(SahiTasks browser, String test_description, String textboxName, String textboxValue){
+		browser.textbox(textboxName).setValue(textboxValue);
+		browser.span("Reset").click();
+	}//modifyPolicy_reset
+	
+	
+	/*
 	 * Modify password field : test "undo", "reset" and update"
 	 * @param browser - sahi browser instance 
 	 * @param testName - test case message
