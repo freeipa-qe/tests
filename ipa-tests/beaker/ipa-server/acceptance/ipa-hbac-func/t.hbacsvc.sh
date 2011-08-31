@@ -43,6 +43,8 @@ hbacsvc_master_001() {
 	rlPhaseStartTest "ipa-hbacsvc-001: $user1 part of rule1 is allowed to access $CLIENT from $CLIENT - SSHD Service"
 
         	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+		rlRun "ipa hbacrule-add admin_allow_all --hostcat=all --srchostcat=all --servicecat=all"
+		rlRun "ipa hbacrule-add-user admin_allow_all --groups=admin"
                 rlRun "ipa hbacrule-disable allow_all"
 
 		rlRun "ipa hbacrule-add rule1"
@@ -319,4 +321,897 @@ hbacsvc_client2_005() {
         rlPhaseEnd
 }
 
+hbacsvc_master_006() {
+        rlPhaseStartTest "ipa-hbacsvc-006: $user6 part of rule6 is allowed to access hostgroup from hostgroup2"
+
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                rlRun "ipa hbacrule-disable allow_all"
+
+		rlRun "ipa hostgroup-add hostgrp6-1 --desc=hostgrp6-1"
+		rlRun "ipa hostgroup-add-member hostgrp6-1 --hosts=$CLIENT"
+		rlRun "ipa hostgroup-add hostgrp6-2 --desc=hostgrp6-2"
+		rlRun "ipa hostgroup-add-member hostgrp6-2 --hosts=$CLIENT2"
+
+                rlRun "ipa hbacrule-add rule6"
+                rlRun "ipa hbacrule-add-service rule6 --hbacsvcs=sshd"
+                rlRun "ipa hbacrule-add-user rule6 --users=$user6"
+                rlRun "ipa hbacrule-add-host rule6 --hostgroups=hostgrp6-1"
+                rlRun "ipa hbacrule-add-sourcehost rule6 --hostgroups=hostgrp6-2"
+                rlRun "ipa hbacrule-show rule6 --all"
+
+        # ipa hbactest:
+
+                rlRun "ipa hbactest --user=$user6 --srchost=hostgrp6-2 --host=hostgrp6-1 --service=sshd | grep -E '(Access granted: True|matched: rule6)'"
+                rlRun "ipa hbactest --user=$user2 --srchost=hostgrp6-2 --host=hostgrp6-1 --service=sshd | grep -i \"Access granted: False\""
+                rlRun "ipa hbactest --user=$user6 --srchost=hostgrp6-1 --host=hostgrp6-2 --service=sshd | grep -i \"Access granted: False\""
+                rlRun "ipa hbactest --user=$user6 --srchost=hostgrp6-2 --host=hostgrp6-2 --service=sshd | grep -i \"Access granted: False\""
+
+                rlRun "ipa hbactest --user=$user6 --srchost=hostgrp6-2 --host=hostgrp6-1 --service=sshd --rule=rule6 | grep -E '(Access granted: True|matched: rule6)'"
+                rlRun "ipa hbactest --user=$user6 --srchost=hostgrp6-2 --host=$MASTER --service=sshd --rule=rule6 | grep -E '(Access granted: False|notmatched: rule6)'"
+                rlRun "ipa hbactest --user=$user2 --srchost=hostgrp6-2 --host=hostgrp6-1 --service=sshd --rule=rule6 | grep -E '(Access granted: False|notmatched: rule6)'"
+                rlRun "ipa hbactest --srchost=$CLIENT2 --host=hostgrp6-1 --service=sshd  --user=$user6 --rule=rule6 --nodetail | grep -i \"Access granted: True\""
+                rlRun "ipa hbactest --srchost=$CLIENT2 --host=hostgrp6-1 --service=sshd  --user=$user6 --rule=rule6 --nodetail | grep -i \"matched: rule6\"" 1
+
+        rlPhaseEnd
+}
+
+hbacsvc_client_006() {
+
+        rlPhaseStartTest "ipa-hbacsvc-client1-006: $user6 accessing hostgroup2 from hostgroup"
+
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                rlRun "getent -s sss passwd $user6"
+                rlRun "ssh_auth_failure $user6 testpw123@ipa.com $CLIENT2"
+
+        rlPhaseEnd
+}
+
+hbacsvc_client2_006() {
+
+        rlPhaseStartTest "ipa-hbacsvc-client2-006: $user6 accessing hostgroup2 from hostgroup"
+
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                rlRun "getent -s sss passwd $user6"
+                rlRun "ssh_auth_success $user6 testpw123@ipa.com $CLIENT"
+
+        rlPhaseEnd
+
+}
+
+hbacsvc_master_007() {
+        rlPhaseStartTest "ipa-hbacsvc-007: $user7 part of rule7 is allowed to access hostgroup from hostgroup2 with hbacsvcgrp"
+
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                rlRun "ipa hbacrule-disable allow_all"
+
+		rlRun "ipa hostgroup-add hostgrp7 --desc=hostgrp7"
+		rlRun "ipa hostgroup-add-member hostgrp7 --hosts=$CLIENT"
+		rlRun "ipa hostgroup-add hostgrp7-2 --desc=hostgrp7-2"
+		rlRun "ipa hostgroup-add-member hostgrp7-2 --hosts=$CLIENT2"
+
+
+                rlRun "ipa hbacrule-add rule7"
+                rlRun "ipa hbacrule-add-user rule7 --users=$user7"
+                rlRun "ipa hbacrule-add-host rule7 --hostgroups=hostgrp7"
+                rlRun "ipa hbacrule-add-sourcehost rule7 --hostgroups=hostgrp7-2"
+		rlRun "ipa hbacrule-add-service rule7 --hbacsvcgroups=sshd"
+                rlRun "ipa hbacrule-show rule7 --all"
+
+        # ipa hbactest:
+
+                rlRun "ipa hbactest --user=$user7 --srchost=hostgrp7-2 --host=hostgrp7 --service=sshd | grep -E '(Access granted: True|matched: rule7)'"
+                rlRun "ipa hbactest --user=$user2 --srchost=hostgrp7-2 --host=hostgrp7 --service=sshd | grep -i \"Access granted: False\""
+                rlRun "ipa hbactest --user=$user7 --srchost=hostgrp6-1 --host=hostgrp7 --service=sshd | grep -i \"Access granted: False\""
+                rlRun "ipa hbactest --user=$user7 --srchost=hostgrp7 --host=hostgrp7-2 --service=sshd | grep -i \"Access granted: False\""
+
+                rlRun "ipa hbactest --user=$user7 --srchost=hostgrp7-2 --host=hostgrp7 --service=sshd --rule=rule7 | grep -E '(Access granted: True|matched: rule7)'"
+                rlRun "ipa hbactest --user=$user7 --srchost=hostgrp7-2 --host=$MASTER --service=sshd --rule=rule7 | grep -E '(Access granted: False|notmatched: rule7)'"
+                rlRun "ipa hbactest --user=$user2 --srchost=hostgrp7-2 --host=hostgrp7 --service=sshd --rule=rule7 | grep -E '(Access granted: False|notmatched: rule7)'"
+                rlRun "ipa hbactest --srchost=$CLIENT2 --host=hostgrp7-2 --service=sshd  --user=$user7 --rule=rule7 --nodetail | grep -i \"Access granted: True\""
+                rlRun "ipa hbactest --srchost=$CLIENT2 --host=hostgrp7-2 --service=sshd  --user=$user7 --rule=rule7 --nodetail | grep -i \"matched: rule7\"" 1
+
+        rlPhaseEnd
+}
+
+hbacsvc_client_007() {
+
+        rlPhaseStartTest "ipa-hbacsvc-client1-007: $user7 accessing hostgroup2 from hostgroup - hbacsvcgrp"
+
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                rlRun "getent -s sss passwd $user7"
+                rlRun "ssh_auth_failure $user7 testpw123@ipa.com $CLIENT"
+
+        rlPhaseEnd
+}
+
+hbacsvc_client2_007() {
+
+        rlPhaseStartTest "ipa-hbacsvc-client2-007: $user7 accessing hostgroup2 from hostgroup - hbacsvcgrp"
+
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                rlRun "getent -s sss passwd $user7"
+                rlRun "ssh_auth_success $user7 testpw123@ipa.com $CLIENT"
+
+        rlPhaseEnd
+
+}
+
+hbacsvc_master_008() {
+        rlPhaseStartTest "ipa-hbacsvc-008: $user8 from grp8 part of rule8 is allowed to access $CLIENT2 from $CLIENT"
+
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                rlRun "ipa hbacrule-disable allow_all"
+
+		rlRun "ipa group-add group8 --desc=group8"
+		rlRun "ipa group-add-member group8 --users=$user8"
+
+                rlRun "ipa hbacrule-add rule8"
+                rlRun "ipa hbacrule-add-user rule8 --groups=group8"
+                rlRun "ipa hbacrule-add-host rule8 --hosts=$CLIENT2"
+                rlRun "ipa hbacrule-add-sourcehost rule8 --hosts=$CLIENT"
+		rlRun "ipa hbacrule-add-service rule8 --hbacsvc=sshd"
+                rlRun "ipa hbacrule-show rule8 --all"
+
+        # ipa hbactest:
+
+                rlRun "ipa hbactest --user=$user8 --srchost=$CLIENT --host=$CLIENT2 --service=sshd | grep -E '(Access granted: True|matched: rule8)'"
+                rlRun "ipa hbactest --user=$user2 --srchost=$CLIENT --host=$CLIENT2 --service=sshd | grep -i \"Access granted: False\""
+                rlRun "ipa hbactest --user=$user8 --srchost=$CLIENT2 --host=$CLIENT --service=sshd | grep -i \"Access granted: False\""
+                rlRun "ipa hbactest --user=$user8 --srchost=$CLIENT --host=$CLIENT --service=sshd | grep -i \"Access granted: False\""
+                rlRun "ipa hbactest --user=$user8 --srchost=$CLIENT2 --host=$CLIENT2 --service=sshd | grep -i \"Access granted: False\""
+
+                rlRun "ipa hbactest --user=$user8 --srchost=$CLIENT --host=$CLIENT2 --service=sshd --rule=rule8 | grep -E '(Access granted: True|matched: rule8)'"
+                rlRun "ipa hbactest --user=$user8 --srchost=$CLIENT --host=$MASTER --service=sshd --rule=rule8 | grep -E '(Access granted: False|notmatched: rule8)'"
+                rlRun "ipa hbactest --user=$user2 --srchost=$CLIENT --host=$CLIENT2 --service=sshd --rule=rule8 | grep -E '(Access granted: False|notmatched: rule8)'"
+                rlRun "ipa hbactest --user=$user8 --srchost=$CLIENT --host=$CLIENT2 --service=sshd --rule=rule8 --nodetail | grep -i \"Access granted: True\""
+                rlRun "ipa hbactest --user=$user8 --srchost=$CLIENT --host=$CLIENT2 --service=sshd --rule=rule8 --nodetail | grep -i \"matched: rule8\"" 1
+
+        rlPhaseEnd
+}
+
+hbacsvc_client_008() {
+
+        rlPhaseStartTest "ipa-hbacsvc-client1-008: $user8 from grp8 part of rule8 is allowed to access $CLIENT2 from $CLIENT"
+
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                rlRun "getent -s sss passwd $user8"
+                rlRun "ssh_auth_success $user8 testpw123@ipa.com $CLIENT2"
+
+        rlPhaseEnd
+}
+
+hbacsvc_client2_008() {
+
+        rlPhaseStartTest "ipa-hbacsvc-client2-008: $user8 from grp8 part of rule8 is allowed to access $CLIENT2 from $CLIENT"
+
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                rlRun "getent -s sss passwd $user8"
+                rlRun "ssh_auth_failure $user8 testpw123@ipa.com $CLIENT2"
+
+        rlPhaseEnd
+
+}
+
+
+hbacsvc_master_009() {
+        rlPhaseStartTest "ipa-hbacsvc-009: $user9 from grp9 part of rule9 is allowed to access $CLIENT2 from $CLIENT - hbacsvcgrp"
+
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                rlRun "ipa hbacrule-disable allow_all"
+
+                rlRun "ipa group-add group9 --desc=group9"
+                rlRun "ipa group-add-member group9 --users=$user9"
+
+                rlRun "ipa hbacrule-add rule9"
+                rlRun "ipa hbacrule-add-user rule9 --groups=group9"
+                rlRun "ipa hbacrule-add-host rule9 --hosts=$CLIENT2"
+                rlRun "ipa hbacrule-add-sourcehost rule9 --hosts=$CLIENT"
+		rlRun "ipa hbacrule-add-service rule9 --hbacsvcgroup=sshd"
+                rlRun "ipa hbacrule-show rule9 --all"
+
+        # ipa hbactest:
+
+                rlRun "ipa hbactest --user=$user9 --srchost=$CLIENT --host=$CLIENT2 --service=sshd | grep -E '(Access granted: True|matched: rule9)'"
+                rlRun "ipa hbactest --user=$user2 --srchost=$CLIENT --host=$CLIENT2 --service=sshd | grep -i \"Access granted: False\""
+                rlRun "ipa hbactest --user=$user9 --srchost=$CLIENT2 --host=$CLIENT --service=sshd | grep -i \"Access granted: False\""
+                rlRun "ipa hbactest --user=$user9 --srchost=$CLIENT --host=$CLIENT --service=sshd | grep -i \"Access granted: False\""
+                rlRun "ipa hbactest --user=$user9 --srchost=$CLIENT2 --host=$CLIENT2 --service=sshd | grep -i \"Access granted: False\""
+
+                rlRun "ipa hbactest --user=$user9 --srchost=$CLIENT --host=$CLIENT2 --service=sshd --rule=rule9 | grep -E '(Access granted: True|matched: rule9)'"
+                rlRun "ipa hbactest --user=$user9 --srchost=$CLIENT --host=$MASTER --service=sshd --rule=rule9 | grep -E '(Access granted: False|notmatched: rule9)'"
+                rlRun "ipa hbactest --user=$user2 --srchost=$CLIENT --host=$CLIENT2 --service=sshd --rule=rule9 | grep -E '(Access granted: False|notmatched: rule9)'"
+                rlRun "ipa hbactest --user=$user9 --srchost=$CLIENT --host=$CLIENT2 --service=sshd --rule=rule9 --nodetail | grep -i \"Access granted: True\""
+                rlRun "ipa hbactest --user=$user9 --srchost=$CLIENT --host=$CLIENT2 --service=sshd --rule=rule9 --nodetail | grep -i \"matched: rule9\"" 1
+
+        rlPhaseEnd
+}
+
+hbacsvc_client_009() {
+
+        rlPhaseStartTest "ipa-hbacsvc-client1-009: $user9 from grp9 part of rule9 is allowed to access $CLIENT2 from $CLIENT"
+
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                rlRun "getent -s sss passwd $user9"
+                rlRun "ssh_auth_success $user9 testpw123@ipa.com $CLIENT2"
+
+        rlPhaseEnd
+}
+
+hbacsvc_client2_009() {
+
+        rlPhaseStartTest "ipa-hbacsvc-client2-009: $user9 from grp9 part of rule9 is allowed to access $CLIENT2 from $CLIENT"
+
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                rlRun "getent -s sss passwd $user9"
+                rlRun "ssh_auth_failure $user9 testpw123@ipa.com $CLIENT2"
+
+        rlPhaseEnd
+
+}
+
+
+hbacsvc_master_010() {
+        rlPhaseStartTest "ipa-hbacsvc-010: $user10 from grp10 part of rule10 is allowed to access hostgrp from $CLIENT"
+
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                rlRun "ipa hbacrule-disable allow_all"
+
+                rlRun "ipa group-add group10 --desc=group10"
+                rlRun "ipa group-add-member group10 --users=$user10"
+		rlRun "ipa hostgroup-add hostgroup10 --desc=hostgroup10"
+		rlRun "ipa hostgroup-add-member hostgroup10 --hosts=$CLIENT2"
+
+                rlRun "ipa hbacrule-add rule10"
+                rlRun "ipa hbacrule-add-user rule10 --groups=group10"
+                rlRun "ipa hbacrule-add-host rule10 --hosts=hostgroup10"
+                rlRun "ipa hbacrule-add-sourcehost rule10 --hosts=$CLIENT"
+		rlRun "ipa hbacrule-add-service rule10 --hbacsvc=sshd"
+                rlRun "ipa hbacrule-show rule10 --all"
+
+        # ipa hbactest:
+
+                rlRun "ipa hbactest --user=$user10 --srchost=$CLIENT --host=hostgroup10 --service=sshd | grep -E '(Access granted: True|matched: rule10)'"
+                rlRun "ipa hbactest --user=$user2 --srchost=$CLIENT --host=hostgroup10 --service=sshd | grep -i \"Access granted: False\""
+                rlRun "ipa hbactest --user=$user10 --srchost=hostgroup10 --host=$CLIENT --service=sshd | grep -i \"Access granted: False\""
+                rlRun "ipa hbactest --user=$user10 --srchost=$CLIENT --host=$CLIENT --service=sshd | grep -i \"Access granted: False\""
+                rlRun "ipa hbactest --user=$user10 --srchost=hostgroup10 --host=hostgroup10 --service=sshd | grep -i \"Access granted: False\""
+
+                rlRun "ipa hbactest --user=$user10 --srchost=$CLIENT --host=hostgroup10 --service=sshd --rule=rule10 | grep -E '(Access granted: True|matched: rule10)'"
+                rlRun "ipa hbactest --user=$user10 --srchost=$CLIENT --host=$MASTER --service=sshd --rule=rule10 | grep -E '(Access granted: False|notmatched: rule10)'"
+                rlRun "ipa hbactest --user=$user2 --srchost=$CLIENT --host=hostgroup10 --service=sshd --rule=rule10 | grep -E '(Access granted: False|notmatched: rule10)'"
+                rlRun "ipa hbactest --user=$user10 --srchost=$CLIENT --host=hostgroup10 --service=sshd --rule=rule10 --nodetail | grep -i \"Access granted: True\""
+                rlRun "ipa hbactest --user=$user10 --srchost=$CLIENT --host=hostgroup10 --service=sshd --rule=rule10 --nodetail | grep -i \"matched: rule10\"" 1
+
+        rlPhaseEnd
+}
+
+hbacsvc_client_010() {
+
+        rlPhaseStartTest "ipa-hbacsvc-client1-010: $user10 from grp10 part of rule10 is allowed to access hostgrp from $CLIENT"
+
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                rlRun "getent -s sss passwd $user10"
+                rlRun "ssh_auth_success $user10 testpw123@ipa.com $CLIENT2"
+
+        rlPhaseEnd
+}
+
+hbacsvc_client2_010() {
+
+        rlPhaseStartTest "ipa-hbacsvc-client2-010: $user10 from grp10 part of rule10 is allowed to access hostgrp from $CLIENT"
+
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                rlRun "getent -s sss passwd $user10"
+                rlRun "ssh_auth_failure $user10 testpw123@ipa.com $CLIENT2"
+
+        rlPhaseEnd
+
+}
+
+hbacsvc_master_011() {
+        rlPhaseStartTest "ipa-hbacsvc-011: $user11 from grp11 part of rule11 is allowed to access $CLIENT2 from hostgrp - hbacsvcgrp"
+
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                rlRun "ipa hbacrule-disable allow_all"
+
+                rlRun "ipa group-add group11 --desc=group11"
+                rlRun "ipa group-add-member group11 --users=$user11"
+		rlRun "ipa hostgroup-add hostgroup11 --desc=hostgroup11"
+		rlRun "ipa hostgroup-add-member hostgroup11 --hosts=$CLIENT"
+
+                rlRun "ipa hbacrule-add rule11"
+                rlRun "ipa hbacrule-add-user rule11 --groups=group11"
+                rlRun "ipa hbacrule-add-host rule11 --hosts=$CLIENT2"
+                rlRun "ipa hbacrule-add-sourcehost rule11 --hosts=hostgroup11"
+		rlRun "ipa hbacrule-add-service rule11 --hbacsvcgroup=sshd"
+                rlRun "ipa hbacrule-show rule11 --all"
+
+        # ipa hbactest:
+
+                rlRun "ipa hbactest --user=$user11 --srchost=hostgroup11 --host=$CLIENT2 --service=sshd | grep -E '(Access granted: True|matched: rule11)'"
+                rlRun "ipa hbactest --user=$user2 --srchost=$CLIENT --host=hostgroup11 --service=sshd | grep -i \"Access granted: False\""
+                rlRun "ipa hbactest --user=$user11 --srchost=hostgroup11 --host=$CLIENT --service=sshd | grep -i \"Access granted: False\""
+                rlRun "ipa hbactest --user=$user11 --srchost=$CLIENT --host=$CLIENT --service=sshd | grep -i \"Access granted: False\""
+                rlRun "ipa hbactest --user=$user11 --srchost=hostgroup11 --host=hostgroup11 --service=sshd | grep -i \"Access granted: False\""
+
+                rlRun "ipa hbactest --user=$user11 --srchost=hostgroup11 --host=$CLIENT2 --service=sshd --rule=rule11 | grep -E '(Access granted: True|matched: rule11)'"
+                rlRun "ipa hbactest --user=$user11 --srchost=hostgroup11 --host=$MASTER --service=sshd --rule=rule11 | grep -E '(Access granted: False|notmatched: rule11)'"
+                rlRun "ipa hbactest --user=$user2 --srchost=hostgroup11 --host=$CLIENT2 --service=sshd --rule=rule11 | grep -E '(Access granted: False|notmatched: rule11)'"
+                rlRun "ipa hbactest --user=$user11 --srchost=hostgroup11 --host=$CLIENT --service=sshd --rule=rule11 --nodetail | grep -i \"Access granted: True\""
+                rlRun "ipa hbactest --user=$user11 --srchost=hostgroup11 --host=$CLIENT --service=sshd --rule=rule11 --nodetail | grep -i \"matched: rule11\"" 1
+
+        rlPhaseEnd
+}
+
+hbacsvc_client_011() {
+
+        rlPhaseStartTest "ipa-hbacsvc-client1-011: $user11 from grp11 part of rule11 is allowed to access $CLIENT2 from hostgrp - hbacsvcgrp"
+
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                rlRun "getent -s sss passwd $user11"
+                rlRun "ssh_auth_success $user11 testpw123@ipa.com $CLIENT2"
+
+        rlPhaseEnd
+}
+
+hbacsvc_client2_011() {
+
+        rlPhaseStartTest "ipa-hbacsvc-client2-011: $user11 from grp11 part of rule11 is allowed to access hostgrp from $CLIENT"
+
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                rlRun "getent -s sss passwd $user11"
+                rlRun "ssh_auth_failure $user11 testpw123@ipa.com $CLIENT2"
+
+        rlPhaseEnd
+
+}
+
+
+hbacsvc_master_012() {
+        rlPhaseStartTest "ipa-hbacsvc-012: $user12 from grp12 part of rule12 is allowed to access $CLIENT2 from hostgrp - hbacsvcgrp"
+
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                rlRun "ipa hbacrule-disable allow_all"
+
+                rlRun "ipa group-add group12 --desc=group12"
+                rlRun "ipa group-add-member group12 --users=$user12"
+		rlRun "ipa hostgroup-add hostgroup12 --desc=hostgroup12"
+		rlRun "ipa hostgroup-add-member hostgroup12 --hosts=$CLIENT"
+
+                rlRun "ipa hbacrule-add rule12"
+                rlRun "ipa hbacrule-add-user rule12 --groups=group12"
+                rlRun "ipa hbacrule-add-host rule12 --hosts=$CLIENT2"
+                rlRun "ipa hbacrule-add-sourcehost rule12 --hosts=hostgroup12"
+		rlRun "ipa hbacrule-add-service rule12 --hbacsvcgroup=sshd"
+                rlRun "ipa hbacrule-show rule12 --all"
+
+        # ipa hbactest:
+
+                rlRun "ipa hbactest --user=$user12 --srchost=hostgroup12 --host=$CLIENT2 --service=sshd | grep -E '(Access granted: True|matched: rule12)'"
+                rlRun "ipa hbactest --user=$user2 --srchost=$CLIENT --host=hostgroup12 --service=sshd | grep -i \"Access granted: False\""
+                rlRun "ipa hbactest --user=$user12 --srchost=hostgroup12 --host=$CLIENT --service=sshd | grep -i \"Access granted: False\""
+                rlRun "ipa hbactest --user=$user12 --srchost=$CLIENT --host=$CLIENT --service=sshd | grep -i \"Access granted: False\""
+                rlRun "ipa hbactest --user=$user12 --srchost=hostgroup12 --host=hostgroup12 --service=sshd | grep -i \"Access granted: False\""
+
+                rlRun "ipa hbactest --user=$user12 --srchost=hostgroup12 --host=$CLIENT2 --service=sshd --rule=rule12 | grep -E '(Access granted: True|matched: rule12)'"
+                rlRun "ipa hbactest --user=$user12 --srchost=hostgroup12 --host=$MASTER --service=sshd --rule=rule12 | grep -E '(Access granted: False|notmatched: rule12)'"
+                rlRun "ipa hbactest --user=$user2 --srchost=hostgroup12 --host=$CLIENT2 --service=sshd --rule=rule12 | grep -E '(Access granted: False|notmatched: rule12)'"
+                rlRun "ipa hbactest --user=$user12 --srchost=hostgroup12 --host=$CLIENT --service=sshd --rule=rule12 --nodetail | grep -i \"Access granted: True\""
+                rlRun "ipa hbactest --user=$user12 --srchost=hostgroup12 --host=$CLIENT --service=sshd --rule=rule12 --nodetail | grep -i \"matched: rule12\"" 1
+
+        rlPhaseEnd
+}
+
+hbacsvc_client_012() {
+
+        rlPhaseStartTest "ipa-hbacsvc-client1-012: $user12 from grp12 part of rule12 is allowed to access $CLIENT2 from hostgrp - hbacsvcgrp"
+
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                rlRun "getent -s sss passwd $user12"
+                rlRun "ssh_auth_failure $user12 testpw123@ipa.com $CLIENT"
+
+        rlPhaseEnd
+}
+
+hbacsvc_client2_012() {
+
+        rlPhaseStartTest "ipa-hbacsvc-client2-012: $user12 from grp12 part of rule12 is allowed to access hostgrp from $CLIENT"
+
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                rlRun "getent -s sss passwd $user12"
+                rlRun "ssh_auth_success $user12 testpw123@ipa.com $CLIENT"
+
+        rlPhaseEnd
+
+}
+
+
+hbacsvc_master_013() {
+        rlPhaseStartTest "ipa-hbacsvc-013: $user13 from grp13 part of rule13 is allowed to access hostgrp from hostgrp2"
+
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                rlRun "ipa hbacrule-disable allow_all"
+
+                rlRun "ipa group-add group13 --desc=group13"
+                rlRun "ipa group-add-member group13 --users=$user13"
+		rlRun "ipa hostgroup-add hostgroup13 --desc=hostgroup13"
+		rlRun "ipa hostgroup-add-member hostgroup13 --hosts=$CLIENT"
+		rlRun "ipa hostgroup-add hostgroup13-2 --desc=hostgroup13-2"
+		rlRun "ipa hostgroup-add-member hostgroup13-2 --hosts=$CLIENT2"
+
+                rlRun "ipa hbacrule-add rule13"
+                rlRun "ipa hbacrule-add-user rule13 --groups=group13"
+                rlRun "ipa hbacrule-add-host rule13 --hosts=hostgroup13"
+                rlRun "ipa hbacrule-add-sourcehost rule13 --hosts=hostgroup13-2"
+		rlRun "ipa hbacrule-add-service rule13 --hbacsvc=sshd"
+                rlRun "ipa hbacrule-show rule13 --all"
+
+        # ipa hbactest:
+
+                rlRun "ipa hbactest --user=$user13 --srchost=hostgroup13-2 --host=hostgroup13 --service=sshd | grep -E '(Access granted: True|matched: rule13)'"
+                rlRun "ipa hbactest --user=$user2 --srchost=hostgroup13-2 --host=hostgroup13 --service=sshd | grep -i \"Access granted: False\""
+                rlRun "ipa hbactest --user=$user13 --srchost=hostgroup13 --host=hostgroup13 --service=sshd | grep -i \"Access granted: False\""
+                rlRun "ipa hbactest --user=$user13 --srchost=hostgroup13-2 --host=hostgroup13-2 --service=sshd | grep -i \"Access granted: False\""
+                rlRun "ipa hbactest --user=$user13 --srchost=hostgroup13 --host=hostgroup13 --service=sshd | grep -i \"Access granted: False\""
+
+                rlRun "ipa hbactest --user=$user13 --srchost=hostgroup13-2 --host=hostgroup13 --service=sshd --rule=rule13 | grep -E '(Access granted: True|matched: rule13)'"
+                rlRun "ipa hbactest --user=$user13 --srchost=hostgroup13 --host=$MASTER --service=sshd --rule=rule13 | grep -E '(Access granted: False|notmatched: rule13)'"
+                rlRun "ipa hbactest --user=$user2 --srchost=hostgroup13-2 --host=hostgroup13 --service=sshd --rule=rule13 | grep -E '(Access granted: False|notmatched: rule13)'"
+                rlRun "ipa hbactest --user=$user13 --srchost=hostgroup13-2 --host=hostgroup13 --service=sshd --rule=rule13 --nodetail | grep -i \"Access granted: True\""
+                rlRun "ipa hbactest --user=$user13 --srchost=hostgroup13-2 --host=hostgroup13 --service=sshd --rule=rule13 --nodetail | grep -i \"matched: rule13\"" 1
+
+        rlPhaseEnd
+}
+
+hbacsvc_client_013() {
+
+        rlPhaseStartTest "ipa-hbacsvc-client1-013: $user13 from grp13 part of rule13 is allowed to access hostgrp from hostgrp2"
+
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                rlRun "getent -s sss passwd $user13"
+                rlRun "ssh_auth_success $user13 testpw133@ipa.com $CLIENT2"
+
+        rlPhaseEnd
+}
+
+hbacsvc_client2_013() {
+
+        rlPhaseStartTest "ipa-hbacsvc-client2-013: $user13 from grp13 part of rule13 is allowed to access hostgrp from hostgrp2"
+
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                rlRun "getent -s sss passwd $user13"
+                rlRun "ssh_auth_failure $user13 testpw133@ipa.com $CLIENT2"
+
+        rlPhaseEnd
+
+}
+
+
+
+hbacsvc_master_014() {
+        rlPhaseStartTest "ipa-hbacsvc-014: $user14 from grp14 part of rule14 is allowed to access hostgrp from hostgrp2 - hbacsvcgrp"
+
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                rlRun "ipa hbacrule-disable allow_all"
+
+                rlRun "ipa group-add group14 --desc=group14"
+                rlRun "ipa group-add-member group14 --users=$user14"
+		rlRun "ipa hostgroup-add hostgroup14 --desc=hostgroup14"
+		rlRun "ipa hostgroup-add-member hostgroup14 --hosts=$CLIENT"
+		rlRun "ipa hostgroup-add hostgroup14-2 --desc=hostgroup14-2"
+		rlRun "ipa hostgroup-add-member hostgroup14-2 --hosts=$CLIENT2"
+
+                rlRun "ipa hbacrule-add rule14"
+                rlRun "ipa hbacrule-add-user rule14 --groups=group14"
+                rlRun "ipa hbacrule-add-host rule14 --hosts=hostgroup14"
+                rlRun "ipa hbacrule-add-sourcehost rule14 --hosts=hostgroup14-2"
+		rlRun "ipa hbacrule-add-service rule14 --hbacsvcgroup=sshd"
+                rlRun "ipa hbacrule-show rule14 --all"
+
+        # ipa hbactest:
+
+                rlRun "ipa hbactest --user=$user14 --srchost=hostgroup14-2 --host=hostgroup14 --service=sshd | grep -E '(Access granted: True|matched: rule14)'"
+                rlRun "ipa hbactest --user=$user2 --srchost=hostgroup14-2 --host=hostgroup14 --service=sshd | grep -i \"Access granted: False\""
+                rlRun "ipa hbactest --user=$user14 --srchost=hostgroup14 --host=hostgroup14 --service=sshd | grep -i \"Access granted: False\""
+                rlRun "ipa hbactest --user=$user14 --srchost=hostgroup14-2 --host=hostgroup14-2 --service=sshd | grep -i \"Access granted: False\""
+                rlRun "ipa hbactest --user=$user14 --srchost=hostgroup14 --host=hostgroup14 --service=sshd | grep -i \"Access granted: False\""
+
+                rlRun "ipa hbactest --user=$user14 --srchost=hostgroup14-2 --host=hostgroup14 --service=sshd --rule=rule14 | grep -E '(Access granted: True|matched: rule14)'"
+                rlRun "ipa hbactest --user=$user14 --srchost=hostgroup14 --host=$MASTER --service=sshd --rule=rule14 | grep -E '(Access granted: False|notmatched: rule14)'"
+                rlRun "ipa hbactest --user=$user2 --srchost=hostgroup14-2 --host=hostgroup14 --service=sshd --rule=rule14 | grep -E '(Access granted: False|notmatched: rule14)'"
+                rlRun "ipa hbactest --user=$user14 --srchost=hostgroup14-2 --host=hostgroup14 --service=sshd --rule=rule14 --nodetail | grep -i \"Access granted: True\""
+                rlRun "ipa hbactest --user=$user14 --srchost=hostgroup14-2 --host=hostgroup14 --service=sshd --rule=rule14 --nodetail | grep -i \"matched: rule14\"" 1
+
+        rlPhaseEnd
+}
+
+hbacsvc_client_014() {
+
+        rlPhaseStartTest "ipa-hbacsvc-client1-014: $user14 from grp14 part of rule14 is allowed to access hostgrp from hostgrp2"
+
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                rlRun "getent -s sss passwd $user14"
+                rlRun "ssh_auth_success $user14 testpw143@ipa.com $CLIENT2"
+
+        rlPhaseEnd
+}
+
+hbacsvc_client2_014() {
+
+        rlPhaseStartTest "ipa-hbacsvc-client2-014: $user14 from grp14 part of rule14 is allowed to access hostgrp from hostgrp2"
+
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                rlRun "getent -s sss passwd $user14"
+                rlRun "ssh_auth_failure $user14 testpw143@ipa.com $CLIENT2"
+
+        rlPhaseEnd
+
+}
+
+
+hbacsvc_master_015() {
+
+	rlPhaseStartTest "ipa-hbacsvc-015: $user15 from nestgrp15 part of rule15 is allowed to access $CLIENT from $CLIENT2"
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                rlRun "ipa hbacrule-disable allow_all"
+
+                rlRun "ipa group-add group15 --desc=group15"
+                rlRun "ipa group-add group15-2 --desc=group15-2"
+                rlRun "ipa group-add-member group15-2 --users=$user15"
+		rlRun "ipa group-add-member group15 --groups=group15-2"
+
+                rlRun "ipa hbacrule-add rule15"
+                rlRun "ipa hbacrule-add-user rule15 --groups=group15"
+                rlRun "ipa hbacrule-add-host rule15 --hosts=$CLIENT"
+                rlRun "ipa hbacrule-add-sourcehost rule15 --hosts=$CLIENT2"
+		rlRun "ipa hbacrule-add-service rule15 --hbacsvc=sshd"
+                rlRun "ipa hbacrule-show rule15 --all"
+
+        # ipa hbactest:
+
+                rlRun "ipa hbactest --user=$user15 --srchost=$CLIENT2 --host=$CLIENT --service=sshd | grep -E '(Access granted: True|matched: rule15)'"
+                rlRun "ipa hbactest --user=$user2 --srchost=$CLIENT2 --host=$CLIENT --service=sshd | grep -i \"Access granted: False\""
+                rlRun "ipa hbactest --user=$user15 --srchost=$CLIENT2 --host=$CLIENT2 --service=sshd | grep -i \"Access granted: False\""
+                rlRun "ipa hbactest --user=$user15 --srchost=$CLIENT --host=$CLIENT2 --service=sshd | grep -i \"Access granted: False\""
+
+                rlRun "ipa hbactest --user=$user15 --srchost=$CLIENT2 --host=$CLIENT --service=sshd --rule=rule15 | grep -E '(Access granted: True|matched: rule15)'"
+                rlRun "ipa hbactest --user=$user15 --srchost=$CLIENT2 --host=$MASTER --service=sshd --rule=rule15 | grep -E '(Access granted: False|notmatched: rule15)'"
+                rlRun "ipa hbactest --user=$user2 --srchost=$CLIENT2 --host=$CLIENT2 --service=sshd --rule=rule15 | grep -E '(Access granted: False|notmatched: rule15)'"
+                rlRun "ipa hbactest --user=$user15 --srchost=$CLIENT2 --host=$CLIENT --service=sshd --rule=rule15 --nodetail | grep -i \"Access granted: True\""
+                rlRun "ipa hbactest --user=$user15 --srchost=$CLIENT2 --host=$CLIENT --service=sshd --rule=rule15 --nodetail | grep -i \"matched: rule15\"" 1
+
+        rlPhaseEnd
+}
+
+hbacsvc_client_015() {
+
+        rlPhaseStartTest "ipa-hbacsvc-client1-015: $user15 from grp15 part of rule15 is allowed to access hostgrp from hostgrp2"
+
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                rlRun "getent -s sss passwd $user15"
+                rlRun "ssh_auth_failure $user15 testpw153@ipa.com $CLIENT"
+
+        rlPhaseEnd
+}
+
+hbacsvc_client2_015() {
+
+        rlPhaseStartTest "ipa-hbacsvc-client2-015: $user15 from grp15 part of rule15 is allowed to access hostgrp from hostgrp2"
+
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                rlRun "getent -s sss passwd $user15"
+                rlRun "ssh_auth_success $user15 testpw153@ipa.com $CLIENT"
+
+        rlPhaseEnd
+
+}
+
+
+hbacsvc_master_016() {
+
+	rlPhaseStartTest "ipa-hbacsvc-016: $user16 from nestgrp16 part of rule16 is allowed to access $CLIENT from $CLIENT2 - hbacsvcgroup"
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                rlRun "ipa hbacrule-disable allow_all"
+
+                rlRun "ipa group-add group16 --desc=group16"
+                rlRun "ipa group-add group16-2 --desc=group16-2"
+                rlRun "ipa group-add-member group16-2 --users=$user16"
+		rlRun "ipa group-add-member group16 --groups=group16-2"
+
+                rlRun "ipa hbacrule-add rule16"
+                rlRun "ipa hbacrule-add-user rule16 --groups=group16"
+                rlRun "ipa hbacrule-add-host rule16 --hosts=$CLIENT"
+                rlRun "ipa hbacrule-add-sourcehost rule16 --hosts=$CLIENT2"
+		rlRun "ipa hbacrule-add-service rule16 --hbacsvcgroup=sshd"
+                rlRun "ipa hbacrule-show rule16 --all"
+
+        # ipa hbactest:
+
+                rlRun "ipa hbactest --user=$user16 --srchost=$CLIENT2 --host=$CLIENT --service=sshd | grep -E '(Access granted: True|matched: rule16)'"
+                rlRun "ipa hbactest --user=$user2 --srchost=$CLIENT2 --host=$CLIENT --service=sshd | grep -i \"Access granted: False\""
+                rlRun "ipa hbactest --user=$user16 --srchost=$CLIENT2 --host=$CLIENT2 --service=sshd | grep -i \"Access granted: False\""
+                rlRun "ipa hbactest --user=$user16 --srchost=$CLIENT --host=$CLIENT2 --service=sshd | grep -i \"Access granted: False\""
+
+                rlRun "ipa hbactest --user=$user16 --srchost=$CLIENT2 --host=$CLIENT --service=sshd --rule=rule16 | grep -E '(Access granted: True|matched: rule16)'"
+                rlRun "ipa hbactest --user=$user16 --srchost=$CLIENT2 --host=$MASTER --service=sshd --rule=rule16 | grep -E '(Access granted: False|notmatched: rule16)'"
+                rlRun "ipa hbactest --user=$user2 --srchost=$CLIENT2 --host=$CLIENT2 --service=sshd --rule=rule16 | grep -E '(Access granted: False|notmatched: rule16)'"
+                rlRun "ipa hbactest --user=$user16 --srchost=$CLIENT2 --host=$CLIENT --service=sshd --rule=rule16 --nodetail | grep -i \"Access granted: True\""
+                rlRun "ipa hbactest --user=$user16 --srchost=$CLIENT2 --host=$CLIENT --service=sshd --rule=rule16 --nodetail | grep -i \"matched: rule16\"" 1
+
+        rlPhaseEnd
+}
+
+hbacsvc_client_016() {
+
+        rlPhaseStartTest "ipa-hbacsvc-client1-016: $user16 from grp16 part of rule16 is allowed to access hostgrp from hostgrp2 - hbacsvcgrp"
+
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                rlRun "getent -s sss passwd $user16"
+                rlRun "ssh_auth_failure $user16 testpw163@ipa.com $CLIENT"
+
+        rlPhaseEnd
+}
+
+hbacsvc_client2_016() {
+
+        rlPhaseStartTest "ipa-hbacsvc-client2-016: $user16 from grp16 part of rule16 is allowed to access hostgrp from hostgrp2 - hbacsvcgrp"
+
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                rlRun "getent -s sss passwd $user16"
+                rlRun "ssh_auth_success $user16 testpw163@ipa.com $CLIENT"
+
+        rlPhaseEnd
+
+}
+
+
+hbacsvc_master_017() {
+
+	rlPhaseStartTest "ipa-hbacsvc-017: $user17 from nestgrp17 part of rule17 is allowed to access host from hostgrp2"
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                rlRun "ipa hbacrule-disable allow_all"
+
+                rlRun "ipa group-add group17 --desc=group17"
+                rlRun "ipa group-add group17-2 --desc=group17-2"
+                rlRun "ipa group-add-member group17-2 --users=$user17"
+		rlRun "ipa group-add-member group17 --groups=group17-2"
+
+		rlRun "ipa hostgroup-add hostgroup17 --desc=hostgroup17"
+		rlRun "ipa hostgroup-add-member hostgroup17 --hosts=$CLIENT2"
+
+                rlRun "ipa hbacrule-add rule17"
+                rlRun "ipa hbacrule-add-user rule17 --groups=group17"
+                rlRun "ipa hbacrule-add-host rule17 --hosts=$CLIENT"
+                rlRun "ipa hbacrule-add-sourcehost rule17 --hosts=hostgroup17"
+		rlRun "ipa hbacrule-add-service rule17 --hbacsvc=sshd"
+                rlRun "ipa hbacrule-show rule17 --all"
+
+        # ipa hbactest:
+
+                rlRun "ipa hbactest --user=$user17 --srchost=hostgroup17 --host=$CLIENT --service=sshd | grep -E '(Access granted: True|matched: rule17)'"
+                rlRun "ipa hbactest --user=$user2 --srchost=hostgroup17 --host=$CLIENT --service=sshd | grep -i \"Access granted: False\""
+                rlRun "ipa hbactest --user=$user17 --srchost=hostgroup17 --host=hostgroup17 --service=sshd | grep -i \"Access granted: False\""
+                rlRun "ipa hbactest --user=$user17 --srchost=$CLIENT --host=hostgroup17 --service=sshd | grep -i \"Access granted: False\""
+
+                rlRun "ipa hbactest --user=$user17 --srchost=hostgroup17 --host=$CLIENT --service=sshd --rule=rule17 | grep -E '(Access granted: True|matched: rule17)'"
+                rlRun "ipa hbactest --user=$user17 --srchost=hostgroup17 --host=$MASTER --service=sshd --rule=rule17 | grep -E '(Access granted: False|notmatched: rule17)'"
+                rlRun "ipa hbactest --user=$user2 --srchost=hostgroup17 --host=hostgroup17 --service=sshd --rule=rule17 | grep -E '(Access granted: False|notmatched: rule17)'"
+                rlRun "ipa hbactest --user=$user17 --srchost=hostgroup17 --host=$CLIENT --service=sshd --rule=rule17 --nodetail | grep -i \"Access granted: True\""
+                rlRun "ipa hbactest --user=$user17 --srchost=hostgroup17-2 --host=$CLIENT --service=sshd --rule=rule17 --nodetail | grep -i \"matched: rule17\"" 1
+
+        rlPhaseEnd
+}
+
+hbacsvc_client_017() {
+
+        rlPhaseStartTest "ipa-hbacsvc-client1-017: $user17 from grp17 part of rule17 is allowed to access hostgrp from hostgrp2"
+
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                rlRun "getent -s sss passwd $user17"
+                rlRun "ssh_auth_success $user17 testpw173@ipa.com $CLIENT2"
+
+        rlPhaseEnd
+}
+
+hbacsvc_client2_017() {
+
+        rlPhaseStartTest "ipa-hbacsvc-client2-017: $user17 from grp17 part of rule17 is allowed to access hostgrp from hostgrp2"
+
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                rlRun "getent -s sss passwd $user17"
+                rlRun "ssh_auth_failure $user17 testpw173@ipa.com $CLIENT2"
+
+        rlPhaseEnd
+
+}
+
+
+hbacsvc_master_018() {
+
+	rlPhaseStartTest "ipa-hbacsvc-018: $user18 from nestgrp18 part of rule18 is allowed to access host from hostgrp2 - hbacsvcgrp"
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                rlRun "ipa hbacrule-disable allow_all"
+
+                rlRun "ipa group-add group18 --desc=group18"
+                rlRun "ipa group-add group18-2 --desc=group18-2"
+                rlRun "ipa group-add-member group18-2 --users=$user18"
+		rlRun "ipa group-add-member group18 --groups=group18-2"
+
+		rlRun "ipa hostgroup-add hostgroup18 --desc=hostgroup18"
+		rlRun "ipa hostgroup-add-member hostgroup18 --hosts=$CLIENT2"
+
+                rlRun "ipa hbacrule-add rule18"
+                rlRun "ipa hbacrule-add-user rule18 --groups=group18"
+                rlRun "ipa hbacrule-add-host rule18 --hosts=$CLIENT"
+                rlRun "ipa hbacrule-add-sourcehost rule18 --hosts=hostgroup18"
+		rlRun "ipa hbacrule-add-service rule18 --hbacsvcgroup=sshd"
+                rlRun "ipa hbacrule-show rule18 --all"
+
+        # ipa hbactest:
+
+                rlRun "ipa hbactest --user=$user18 --srchost=hostgroup18 --host=$CLIENT --service=sshd | grep -E '(Access granted: True|matched: rule18)'"
+                rlRun "ipa hbactest --user=$user2 --srchost=hostgroup18 --host=$CLIENT --service=sshd | grep -i \"Access granted: False\""
+                rlRun "ipa hbactest --user=$user18 --srchost=hostgroup18 --host=hostgroup18 --service=sshd | grep -i \"Access granted: False\""
+                rlRun "ipa hbactest --user=$user18 --srchost=$CLIENT --host=hostgroup18 --service=sshd | grep -i \"Access granted: False\""
+
+                rlRun "ipa hbactest --user=$user18 --srchost=hostgroup18 --host=$CLIENT --service=sshd --rule=rule18 | grep -E '(Access granted: True|matched: rule18)'"
+                rlRun "ipa hbactest --user=$user18 --srchost=hostgroup18 --host=$MASTER --service=sshd --rule=rule18 | grep -E '(Access granted: False|notmatched: rule18)'"
+                rlRun "ipa hbactest --user=$user2 --srchost=hostgroup18 --host=hostgroup18 --service=sshd --rule=rule18 | grep -E '(Access granted: False|notmatched: rule18)'"
+                rlRun "ipa hbactest --user=$user18 --srchost=hostgroup18 --host=$CLIENT --service=sshd --rule=rule18 --nodetail | grep -i \"Access granted: True\""
+                rlRun "ipa hbactest --user=$user18 --srchost=hostgroup18-2 --host=$CLIENT --service=sshd --rule=rule18 --nodetail | grep -i \"matched: rule18\"" 1
+
+        rlPhaseEnd
+}
+
+hbacsvc_client_018() {
+
+        rlPhaseStartTest "ipa-hbacsvc-client1-018: $user18 from grp18 part of rule18 is allowed to access hostgrp from hostgrp2 - hbacsvcgrp"
+
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                rlRun "getent -s sss passwd $user18"
+                rlRun "ssh_auth_success $user18 testpw183@ipa.com $CLIENT2"
+
+        rlPhaseEnd
+}
+
+hbacsvc_client2_018() {
+
+        rlPhaseStartTest "ipa-hbacsvc-client2-018: $user18 from grp18 part of rule18 is allowed to access hostgrp from hostgrp2 - hbacsvcgrp"
+
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                rlRun "getent -s sss passwd $user18"
+                rlRun "ssh_auth_failure $user18 testpw183@ipa.com $CLIENT2"
+
+        rlPhaseEnd
+
+}
+
+
+hbacsvc_master_019() {
+
+	rlPhaseStartTest "ipa-hbacsvc-019: $user19 from nestgrp19 part of rule19 is allowed to access hostgrp from hostgrp2"
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                rlRun "ipa hbacrule-disable allow_all"
+
+                rlRun "ipa group-add group19 --desc=group19"
+                rlRun "ipa group-add group19-2 --desc=group19-2"
+                rlRun "ipa group-add-member group19-2 --users=$user19"
+		rlRun "ipa group-add-member group19 --groups=group19-2"
+
+		rlRun "ipa hostgroup-add hostgroup19 --desc=hostgroup19"
+		rlRun "ipa hostgroup-add-member hostgroup19 --hosts=$CLIENT"
+		rlRun "ipa hostgroup-add hostgroup19-2 --desc=hostgroup19-2"
+		rlRun "ipa hostgroup-add-member hostgroup19-2 --hosts=$CLIENT2"
+
+                rlRun "ipa hbacrule-add rule19"
+                rlRun "ipa hbacrule-add-user rule19 --groups=group19-2"
+                rlRun "ipa hbacrule-add-host rule19 --hosts=hostgroup19"
+                rlRun "ipa hbacrule-add-sourcehost rule19 --hosts=hostgroup19-2"
+		rlRun "ipa hbacrule-add-service rule19 --hbacsvc=sshd"
+                rlRun "ipa hbacrule-show rule19 --all"
+
+        # ipa hbactest:
+
+                rlRun "ipa hbactest --user=$user19 --srchost=hostgroup19-2 --host=hostgroup19 --service=sshd | grep -E '(Access granted: True|matched: rule19)'"
+                rlRun "ipa hbactest --user=$user2 --srchost=hostgroup19-2 --host=hostgroup19 --service=sshd | grep -i \"Access granted: False\""
+                rlRun "ipa hbactest --user=$user19 --srchost=hostgroup19 --host=hostgroup19 --service=sshd | grep -i \"Access granted: False\""
+                rlRun "ipa hbactest --user=$user19 --srchost=hostgroup19-2 --host=hostgroup19-2 --service=sshd | grep -i \"Access granted: False\""
+                rlRun "ipa hbactest --user=$user19 --srchost=hostgroup19 --host=hostgroup19 --service=sshd | grep -i \"Access granted: False\""
+
+                rlRun "ipa hbactest --user=$user19 --srchost=hostgroup19-2 --host=hostgroup19 --service=sshd --rule=rule19 | grep -E '(Access granted: True|matched: rule19)'"
+                rlRun "ipa hbactest --user=$user19 --srchost=hostgroup19 --host=$MASTER --service=sshd --rule=rule19 | grep -E '(Access granted: False|notmatched: rule19)'"
+                rlRun "ipa hbactest --user=$user2 --srchost=hostgroup19-2 --host=hostgroup19 --service=sshd --rule=rule19 | grep -E '(Access granted: False|notmatched: rule19)'"
+                rlRun "ipa hbactest --user=$user19 --srchost=hostgroup19-2 --host=hostgroup19 --service=sshd --rule=rule19 --nodetail | grep -i \"Access granted: True\""
+                rlRun "ipa hbactest --user=$user19 --srchost=hostgroup19-2 --host=hostgroup19 --service=sshd --rule=rule19 --nodetail | grep -i \"matched: rule19\"" 1
+
+        rlPhaseEnd
+}
+
+hbacsvc_client_019() {
+
+        rlPhaseStartTest "ipa-hbacsvc-client1-019: $user19 from grp19 part of rule19 is allowed to access hostgrp from hostgrp2"
+
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                rlRun "getent -s sss passwd $user19"
+                rlRun "ssh_auth_success $user19 testpw193@ipa.com $CLIENT2"
+
+        rlPhaseEnd
+}
+
+hbacsvc_client2_019() {
+
+        rlPhaseStartTest "ipa-hbacsvc-client2-019: $user19 from grp19 part of rule19 is allowed to access hostgrp from hostgrp2"
+
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                rlRun "getent -s sss passwd $user19"
+                rlRun "ssh_auth_failure $user19 testpw193@ipa.com $CLIENT2"
+
+        rlPhaseEnd
+
+}
+
+
+
+hbacsvc_master_020() {
+
+	rlPhaseStartTest "ipa-hbacsvc-020: $user20 from nestgrp20 part of rule20 is allowed to access hostgrp from hostgrp2 - hbacsvcgrp"
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                rlRun "ipa hbacrule-disable allow_all"
+
+                rlRun "ipa group-add group20 --desc=group20"
+                rlRun "ipa group-add group20-2 --desc=group20-2"
+                rlRun "ipa group-add-member group20-2 --users=$user20"
+		rlRun "ipa group-add-member group20 --groups=group20-2"
+
+		rlRun "ipa hostgroup-add hostgroup20 --desc=hostgroup20"
+		rlRun "ipa hostgroup-add-member hostgroup20 --hosts=$CLIENT"
+		rlRun "ipa hostgroup-add hostgroup20-2 --desc=hostgroup20-2"
+		rlRun "ipa hostgroup-add-member hostgroup20-2 --hosts=$CLIENT2"
+
+                rlRun "ipa hbacrule-add rule20"
+                rlRun "ipa hbacrule-add-user rule20 --groups=group20-2"
+                rlRun "ipa hbacrule-add-host rule20 --hosts=hostgroup20"
+                rlRun "ipa hbacrule-add-sourcehost rule20 --hosts=hostgroup20-2"
+		rlRun "ipa hbacrule-add-service rule20 --hbacsvcgroup=sshd"
+                rlRun "ipa hbacrule-show rule20 --all"
+
+        # ipa hbactest:
+
+                rlRun "ipa hbactest --user=$user20 --srchost=hostgroup20-2 --host=hostgroup20 --service=sshd | grep -E '(Access granted: True|matched: rule20)'"
+                rlRun "ipa hbactest --user=$user2 --srchost=hostgroup20-2 --host=hostgroup20 --service=sshd | grep -i \"Access granted: False\""
+                rlRun "ipa hbactest --user=$user20 --srchost=hostgroup20 --host=hostgroup20 --service=sshd | grep -i \"Access granted: False\""
+                rlRun "ipa hbactest --user=$user20 --srchost=hostgroup20-2 --host=hostgroup20-2 --service=sshd | grep -i \"Access granted: False\""
+                rlRun "ipa hbactest --user=$user20 --srchost=hostgroup20 --host=hostgroup20 --service=sshd | grep -i \"Access granted: False\""
+
+                rlRun "ipa hbactest --user=$user20 --srchost=hostgroup20-2 --host=hostgroup20 --service=sshd --rule=rule20 | grep -E '(Access granted: True|matched: rule20)'"
+                rlRun "ipa hbactest --user=$user20 --srchost=hostgroup20 --host=$MASTER --service=sshd --rule=rule20 | grep -E '(Access granted: False|notmatched: rule20)'"
+                rlRun "ipa hbactest --user=$user2 --srchost=hostgroup20-2 --host=hostgroup20 --service=sshd --rule=rule20 | grep -E '(Access granted: False|notmatched: rule20)'"
+                rlRun "ipa hbactest --user=$user20 --srchost=hostgroup20-2 --host=hostgroup20 --service=sshd --rule=rule20 --nodetail | grep -i \"Access granted: True\""
+                rlRun "ipa hbactest --user=$user20 --srchost=hostgroup20-2 --host=hostgroup20 --service=sshd --rule=rule20 --nodetail | grep -i \"matched: rule20\"" 1
+
+        rlPhaseEnd
+}
+
+hbacsvc_client_020() {
+
+        rlPhaseStartTest "ipa-hbacsvc-client1-020: $user20 from grp20 part of rule20 is allowed to access hostgrp from hostgrp2 - hbacsvcgrp"
+
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                rlRun "getent -s sss passwd $user20"
+                rlRun "ssh_auth_success $user20 testpw203@ipa.com $CLIENT2"
+
+        rlPhaseEnd
+}
+
+hbacsvc_client2_020() {
+
+        rlPhaseStartTest "ipa-hbacsvc-client2-020: $user20 from grp20 part of rule20 is allowed to access hostgrp from hostgrp2 - hbacsvcgrp"
+
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                rlRun "getent -s sss passwd $user20"
+                rlRun "ssh_auth_failure $user20 testpw203@ipa.com $CLIENT2"
+
+        rlPhaseEnd
+
+}
 
