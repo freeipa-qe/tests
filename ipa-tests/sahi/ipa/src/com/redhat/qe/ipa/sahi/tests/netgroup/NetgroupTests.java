@@ -362,9 +362,9 @@ public class NetgroupTests extends SahiTestScript{
 		
 		//verify user group member of net group
 		sahiTasks.navigateTo(commonTasks.groupPage, true);
-		GroupTasks.verifyMemberOf(sahiTasks, usergroup1A, "netgroups", devgroup, "direct", "YES");
-		GroupTasks.verifyMemberOf(sahiTasks, usergroup1B, "netgroups", devgroup, "direct", "YES");
-		GroupTasks.verifyMemberOf(sahiTasks, usergroup2, "netgroups", qegroup, "direct", "YES");
+		GroupTasks.verifyMemberOf(sahiTasks, usergroup1A, "netgroups", devgroup, "direct", "YES", false);
+		GroupTasks.verifyMemberOf(sahiTasks, usergroup1B, "netgroups", devgroup, "direct", "YES", false);
+		GroupTasks.verifyMemberOf(sahiTasks, usergroup2, "netgroups", qegroup, "direct", "YES", false);
 		
 		//cancel remove member
 		sahiTasks.navigateTo(commonTasks.netgroupPage, true);

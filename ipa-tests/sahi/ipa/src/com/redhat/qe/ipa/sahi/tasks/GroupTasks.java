@@ -149,8 +149,10 @@ public class GroupTasks {
 	 * @param type - direct or indirect
 	 * @param exists - whether or not they should be members of the enroll type - YES if they should be
 	 */
-	public static void verifyMemberOf(SahiTasks sahiTasks, String groupName, String memberoftype, String grprulename, String type, String exists) {
-		sahiTasks.link(groupName).click();
+	public static void verifyMemberOf(SahiTasks sahiTasks, String groupName, String memberoftype, String grprulename,
+			String type, String exists, boolean onPage) {
+		if (!onPage) 
+			sahiTasks.link(groupName).click();
 		if (memberoftype == "usergroups"){
 			sahiTasks.link("memberof_hostgroup").click();
 		}
@@ -175,7 +177,9 @@ public class GroupTasks {
 			com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(grprulename).exists(), "User group " + groupName + " is NOT a memberof " + memberoftype + ": " + grprulename);
 		}
 
-		sahiTasks.link("User Groups").in(sahiTasks.div("content")).click();
+		if (!onPage) 
+			sahiTasks.link("User Groups").in(sahiTasks.div("content")).click();
+		
 	}
     
     /*

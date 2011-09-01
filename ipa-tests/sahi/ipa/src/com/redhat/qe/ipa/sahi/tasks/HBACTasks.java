@@ -2,14 +2,8 @@ package com.redhat.qe.ipa.sahi.tasks;
 
 import java.util.logging.Logger;
 
-import org.testng.annotations.Test;
-
 import com.redhat.qe.auto.testng.Assert;
 
-/**
- * @author root
- *
- */
 public class HBACTasks {
 	private static Logger log = Logger.getLogger(HBACTasks.class.getName());
 	
@@ -142,7 +136,6 @@ public class HBACTasks {
 	public static void verifyHBACRuleUpdates(SahiTasks sahiTasks, String cn, String uid, String hostgroupName, String service, String fqdn) {
 		//click on rule to edit
 		sahiTasks.link(cn).click();
-		String currentPageNow = sahiTasks.fetch("top.location.href");
 		Assert.assertTrue(sahiTasks.checkbox(uid).exists(), "Verified user " + uid + " added for Rule " + cn);
 		Assert.assertTrue(sahiTasks.checkbox(hostgroupName).exists(), "Verified Host Group " + hostgroupName + " added for Rule " + cn);
 		Assert.assertTrue(sahiTasks.checkbox(service).exists(), "Verified Service " + service + " added for Rule " + cn);
@@ -155,7 +148,7 @@ public class HBACTasks {
 		sahiTasks.link(hostgroupName).click();
 		HostgroupTasks.verifyMemberOf(sahiTasks, hostgroupName, "hbacrule", cn, "direct", "YES", true);
 		sahiTasks.link(cn).click();
-		// TODO: nkrishnan HBAC Rule not listed for host when it is on the From section of rule
+		// FIXME: nkrishnan: Bug 735185 - MemberOf not listed for HBAC Rules (Source host/hostgroup) and Sudo Rules (RunAs user/usergroups)
 		//sahiTasks.link(fqdn).click();
 		//HostTasks.verifyHostMemberOf(sahiTasks, fqdn, "HBAC Rules", cn, "indirect", "YES", true);		
 		//sahiTasks.link(cn).click();

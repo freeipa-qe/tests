@@ -1,15 +1,20 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
 <suite name="IPASudoTestSuite">	
-	<test name="Sudo Tests">
+	<test name="Sudo Tests" preserve-order="true">
 		<packages>
 		     <package name="com.redhat.qe.ipa.sahi.*" />
 		</packages>
 		<groups>
 			<run>
 			    <include name="setup" />
-			    <include name="sudoruleAddTests" />
+			    <include name="sudoruleAddTests" />					    
+			    <include name="sudoRuleAddAndAddAnotherTests" />
+			    <include name="sudoRuleAddAndEditTests" />
+			    <include name="sudoRuleRequiredFieldAddTests" />
+			    <!--
 			    <include name="sudoruleEditTests" />				
 				<include name="sudoruleDeleteTests" />
+				-->
 			</run>
 		</groups>
 		<classes>
@@ -17,11 +22,11 @@
 		</classes>
 	</test>
 	
-		
+<!--		
 	<test name="Sudo Command Tests">
 		<groups>
 			<run>
-			   <!-- Sudo Commands --> 			   
+			    Sudo Commands 		   
 			    <include name="sudoruleCommandAddTests" />
 				<include name="sudoruleCommandDelTests" />
 			</run>
@@ -35,18 +40,18 @@
 	<test name="Sudo Command Group Tests">
 		<groups>
 			<run>
-			   <!-- Sudo Command Groups --> 
-			   <!--
+			    Sudo Command Groups 
+			   
 				<include name="sudoruleCommandGroupAddTests" />
 				<include name="sudoruleCommandGroupDelTests" />
-				-->
+				
 			</run>
 		</groups>
 		<classes>
 		    <class name="com.redhat.qe.ipa.sahi.tests.sudo.SudoCommandTests" />
 		</classes>
 	</test>
-	
+-->	
 	<listeners>        
   		<listener class-name="com.redhat.qe.auto.testng.TestNGListener" />	
 	</listeners>
