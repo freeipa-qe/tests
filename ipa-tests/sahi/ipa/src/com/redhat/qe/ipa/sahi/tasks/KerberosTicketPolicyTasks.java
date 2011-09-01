@@ -10,144 +10,58 @@ public class KerberosTicketPolicyTasks {
 	private static Logger log = Logger.getLogger(HostTasks.class.getName());
 	
 	/*
-	 * Modify password field : test  update", this is a wraper for modifyPolicy_update, this is more like a service provide to other class
+	 * verify the kerberos ticket policy value 
 	 * @param browser - sahi browser instance 
-	 * @param testDescription - test case message
-	 * @param textboxName - which text box (field) to be tested
-	 * @param textboxValue - what value will it set to 
+	 * @param textboxName - which text box (field) to be verify
+	 * @param expectedValue - what value expected  
 	 */
-	public static void modifyPolicy(SahiTasks browser,String textboxName, String textboxValue){
-		String testDescription="Modify policy";
-		KerberosTicketPolicyTasks.modifyPolicy_update(browser, testDescription, textboxName, textboxValue);
+	public static boolean verifyPolicy(SahiTasks browser,String textboxName, String expectedValue){ 
+		String currentValue = browser.textbox(textboxName).getText();
+		return expectedValue.equals(currentValue); 
+	}//verifyPolicy
+	
+	/*
+	 * Modify password field : test  update", this is a wrapper for modifyPolicy_update, this is more like a service provide to other class
+	 * @param browser - sahi browser instance 
+	 * @param textboxName - which text box (field) to be tested
+	 * @param value - what value will it set to 
+	 */
+	public static void modifyPolicy(SahiTasks browser,String textboxName, String value){
+		KerberosTicketPolicyTasks.modifyPolicy_update(browser, textboxName, value);
 	}//modifyPolicy
 	
 	/*
 	 * Modify password field : test "undo", "reset" and update"
 	 * @param browser - sahi browser instance 
-	 * @param testDescription - test case message
 	 * @param textboxName - which text box (field) to be tested
-	 * @param textboxValue - what value will it set to 
+	 * @param value - what value will it set to 
 	 */
-	public static void modifyPolicy_update(SahiTasks browser, String testDescription, String textboxName, String textboxValue){
-		browser.textbox(textboxName).setValue(textboxValue);
+	public static void modifyPolicy_update(SahiTasks browser, String textboxName, String value){
+		browser.textbox(textboxName).setValue(value);
 		browser.span("Update").click();
 	}//modifyPolicy_update
 	
 	/*
 	 * Modify password field : test "undo", "reset" and update"
 	 * @param browser - sahi browser instance 
-	 * @param testDescription - test case message
 	 * @param textboxName - which text box (field) to be tested
-	 * @param textboxValue - what value will it set to 
+	 * @param value - what value will it set to 
 	 */
-	public static void modifyPolicy_undo(SahiTasks browser, String testDescription, String textboxName, String textboxValue){
-		browser.textbox(textboxName).setValue(textboxValue);
+	public static void modifyPolicy_undo(SahiTasks browser, String textboxName, String value){
+		browser.textbox(textboxName).setValue(value);
 		browser.span("undo").click();	
 	}//modifyPolicy_undo
 	
 	/*
 	 * Modify password field : test "reset" button, it should discard the changes. 
 	 * @param browser - sahi browser instance 
-	 * @param testDescription - test case message
 	 * @param textboxName - which text box (field) to be tested
-	 * @param textboxValue - what value will it set to 
+	 * @param value - what value will it set to 
 	 */
-	public static void modifyPolicy_reset(SahiTasks browser, String test_description, String textboxName, String textboxValue){
-		browser.textbox(textboxName).setValue(textboxValue);
+	public static void modifyPolicy_reset(SahiTasks browser,String textboxName, String value){
+		browser.textbox(textboxName).setValue(value);
 		browser.span("Reset").click();
 	}//modifyPolicy_reset
-	
-	
-	/*
-	 * Modify password field : test "undo", "reset" and update"
-	 * @param browser - sahi browser instance 
-	 * @param testName - test case message
-	 * @param fieldName - which field to be tested
-	 * @param fieldValue - positive value, used for "update","reset" and "undo" test 
-	 */
-	public static void modifyDetails(SahiTasks browser, String test_description, String name, String value){
-				
-		// test for undo
-		String originalValue = browser.textbox(name).getText();
-		browser.textbox(name).setValue(value);
-		browser.span("undo").click();
-		if (originalValue.equals(browser.textbox(name).getText())){
-			log.info("after 'undo', the original value being restored");
-		}else{
-			log.info("after 'undo', the original value is NOT being restored, report failure");
-			Assert.fail("'undo' failed");
-		}
-		
-		// test for reset
-		browser.textbox(name).setValue(value);
-		browser.span("Reset").click();
-		if (originalValue.equals(browser.textbox(name).getText())){
-			log.info("after 'Reset', the original value being restored");
-		}else{
-			log.info("after 'Reset', the original value is NOT being restored, report failure");
-			Assert.fail("'Reset' failed");
-		}
-		
-		// test for update
-		browser.textbox(name).setValue(value);
-		browser.span("Update").click();
-		String after = browser.textbox(name).getText();
-		if (originalValue.equals(after)){
-			log.info("after 'update', the field value not changed, report failure");
-			Assert.fail("'update' failed");
-		}else{
-			if (after.equals(value)){
-				log.info("'Update' test passed, field ["+name+"]'s value changed to ["+value+"] as expected");
-			}else{
-				Assert.fail("'Reset' failed");
-			}
-		}
-		
-	}//modifyKerberosTicketPolicy
-	
-	/*
-	 * Modify password field : test "error field msg", this is negative test
-	 * @param browser - sahi browser instance 
-	 * @param testName - test case message
-	 * @param fieldName - which field to be tested
-	 * @param fieldNegValue - negative value, used for "update","reset" and "undo" test 
-	 * @param expectedErrorMsg - when wrong data entered, we expect an error field appears and output some error msg
-	 */
-	public static void modifyDetails_negative(SahiTasks browser, String test_description, String name, String negative_value, String expectedErrorMsg){
- 
-		// enter negative data to trigger error msg report
-		browser.textbox(name).setValue(negative_value);
-		
-		if (browser.span(expectedErrorMsg).exists()){ 
-			log.info("error triggered, error msg match as expected, test pass"); 
-		}else{
-			Assert.fail("wrong format data entered, but no error msg triggered, report failure");
-		}
-		
-		// click password policy link to trigger "dirty" report
-		browser.link("Password Policies").click();
-		if (browser.span("ui-dialog-title").near(browser.div("This page has unsaved changes. Please save or revert.")).exists()){
-			log.info("Dirty dialog appears as expected, click 'reset' and back to password policy list");
-			browser.button("Reset").click();
-		}else{
-			log.info("Dirty dialog does NOT appear as expected, report failure");
-			Assert.fail("no dirty dialog appear");
-		}
-		 
-	}//modifyKerberosTicketPolicyNega
-
-	/*
-	 * Modify password field : test "undo", "reset" and update"
-	 * @param browser - sahi browser instance  
-	 * @param name - which field to be tested
-	 * @param value - positive value 
-	 */
-	public static void setDetails(SahiTasks browser, String name, String value){
-				  
-		browser.textbox(name).setValue(value);
-		browser.span("Update").click(); 
-		
-	}//setDetails
-	
+	 
 }// Class: KerberosTicketPolicyTasks
 
