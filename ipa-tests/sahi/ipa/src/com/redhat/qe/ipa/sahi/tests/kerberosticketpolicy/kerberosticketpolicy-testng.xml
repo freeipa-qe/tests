@@ -8,8 +8,13 @@
             	    <run>
             	        <include name="setup" />
             	        <include name="init" />   
-            	         <include name="modifyKerberosTicketPolicy" /> 
-            	         <include name="modifyKerberosTicketPolicyNegative" />
+            	        <include name="modifyPolicy_PositiveTest" />
+            	        <include name="modifyPolicy_NegativeTest" />
+            	        
+            	        <!-- 
+            	        	<include name="modifyKerberosTicketPolicy" /> 
+            	            <include name="modifyKerberosTicketPolicyNegative" />
+            	         --> 
             	         <include name="restoreDefault" />
             	    </run>
             	</groups>
