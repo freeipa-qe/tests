@@ -35,7 +35,7 @@ public class SudoCommandGroupTests extends SahiTestScript{
 		if (!currentPageNow.equals(currentPage) && !currentPageNow.equals(alternateCurrentPage)) {
 			CommonTasks.checkError(sahiTasks);
 			System.out.println("Not on expected Page....navigating back from : " + currentPageNow);
-			sahiTasks.navigateTo(commonTasks.hbacPage, true);
+			sahiTasks.navigateTo(commonTasks.sudoCommandGroupPage, true);
 		}		
 	}		
 	

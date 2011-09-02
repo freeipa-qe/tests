@@ -21,6 +21,15 @@ public class SudoTasks {
 
 	}
 	
+	public static void createInvalidRule(SahiTasks sahiTasks, String cn, String expectedError) {
+		sahiTasks.span("Add").click();
+		sahiTasks.textbox("cn").setValue(cn);
+		sahiTasks.button("Add").click();
+		Assert.assertTrue(sahiTasks.div(expectedError).exists(), "Verified expected error when adding invalid rule " + cn);
+		sahiTasks.button("Cancel").near(sahiTasks.button("Retry")).click();
+		sahiTasks.button("Cancel").near(sahiTasks.button("Add and Edit")).click();
+		
+	}
 	
 	public static void createRuleWithRequiredField(SahiTasks sahiTasks,	String cn, String expectedError) {		
 		sahiTasks.span("Add").click();
@@ -49,7 +58,7 @@ public class SudoTasks {
 	 * Add and edit an Sudo Rule
 	 * 
 	 * @param sahiTasks
-	 * @param cn - new HBACRule name
+	 * @param cn - new Sudo Rule name
 	 * @param buttonToClick - Possible values - "Add" or "Cancel"
 	 */
 	public static void addAndEditSudoRule(SahiTasks sahiTasks, String cn, String uid, String hostgroupName, String commandName, String runAsGroupName) {
@@ -75,26 +84,26 @@ public class SudoTasks {
 		sahiTasks.link(">>").click();
 		sahiTasks.button("Enroll").click();
 		
-		//Click to add Host groups from "Accessing" section
+		//Click to add Host groups from "Access this host" section
 		sahiTasks.span("Add").under(sahiTasks.heading2(("Access this host"))).near(sahiTasks.span("Host Groups")).click();
 		sahiTasks.checkbox(hostgroupName).click();
 		sahiTasks.span(">>").click();
 		sahiTasks.button("Enroll").click();
 		
-		//Click to add HBAC Service from "Via Service" Section
+		//Click to add Sudo Command from "Allow" Section
 		sahiTasks.span("Add").under(sahiTasks.heading2(("Run Commands"))).under(sahiTasks.heading3("Allow")).near(sahiTasks.span("Sudo Commands")).click();
 		sahiTasks.checkbox(commandName).click();
 		sahiTasks.span(">>").click();
 		sahiTasks.button("Enroll").click();
 		
-		//Click to add HBAC Service from "From" Section
+		//Click to add RunAs User from "As whom" Section
 		sahiTasks.span("Add").under(sahiTasks.heading2(("As Whom"))).near(sahiTasks.span("User Groups[1]")).click();
 		sahiTasks.checkbox(runAsGroupName).click();
 		sahiTasks.span(">>").click();
 		sahiTasks.button("Enroll").click();
 		
 		
-		//Update and go back to HBAC Rules list
+		//Update and go back to Sudo Rules list
 		sahiTasks.link("Update").click();
 		sahiTasks.link("Sudo Rules").in(sahiTasks.div("content")).click();		
 	}
@@ -125,6 +134,30 @@ public class SudoTasks {
 		sahiTasks.link("Sudo Rules").in(sahiTasks.div("content")).click();	
 	}
 
+	
+	public static void expandCollapseRule(SahiTasks sahiTasks, String cn) {
+		sahiTasks.link(cn).click();
+		
+		sahiTasks.span("Collapse All").click();
+		sahiTasks.waitFor(1000);
+
+		//Verify no data is visible
+		Assert.assertFalse(sahiTasks.textarea("description").exists(), "No data is visible");
+		
+		
+		sahiTasks.heading2("Who").click();
+		//Verify only data for account settings is displayed
+		Assert.assertTrue(sahiTasks.span("Users").exists(), "Verified data available for Rule " + cn);
+		
+		
+		sahiTasks.span("Expand All").click();
+		sahiTasks.waitFor(1000);
+		//Verify data is visible
+		Assert.assertTrue(sahiTasks.span("Add").under(sahiTasks.heading2(("Access this host"))).near(sahiTasks.span("Host Groups")).exists(), "Now Data is visible");
+		
+		sahiTasks.link("Sudo Rules").in(sahiTasks.div("content")).click();
+	}
+	
 	
 	public static void modifySudorule(SahiTasks sahiTasks, String cn, String description, String ipasudoopt) {
 		
@@ -197,7 +230,7 @@ public class SudoTasks {
 				
 		sahiTasks.link("Sudo Rules").in(sahiTasks.div("content")).click();
 	}
-	
+	/* shanks
 	public static void deleteSudorule(SahiTasks sahiTasks, String cn) {
 		
 		sahiTasks.link("Sudo Rules").click();
@@ -205,8 +238,48 @@ public class SudoTasks {
 		sahiTasks.span("Delete").click();
 		sahiTasks.button("Delete").click();
 		
+	}*/
+	
+	/*
+	 * Choose multiple rules. 
+	 * @param sahiTasks
+	 * @param cn -  cn of the rule to be deleted
+	 */
+	public static void chooseMultiple(SahiTasks sahiTasks, String[] cns) {		
+		for (String cn : cns) {
+			sahiTasks.checkbox(cn).click();		
+		}		
 	}
 	
+	/*
+	 * Delete multiple rules. 
+	 * @param sahiTasks
+	 */
+	public static void deleteMultiple(SahiTasks sahiTasks) {		
+		sahiTasks.link("Delete").click();
+		sahiTasks.button("Delete").click();
+	}
+	
+	
+	
+	
+	/**
+	 * Delete an Sudo Rule
+	 * @param sahiTasks
+	 * @param cn - the rule to be deleted
+	 * @param buttonToClick - Possible values - "Delete" or "Cancel"
+	 */
+	public static void deleteSudo(SahiTasks sahiTasks, String cn, String buttonToClick) {
+		sahiTasks.checkbox(cn).click();
+		sahiTasks.link("Delete").click();
+		sahiTasks.button(buttonToClick).click();
+		
+		
+		if (buttonToClick.equals("Cancel")) {
+			sahiTasks.checkbox(cn).click();
+		}
+	}
+
 
 	
 	
@@ -218,7 +291,6 @@ public class SudoTasks {
 		sahiTasks.link("Sudo Commands").click();
 		sahiTasks.span("Add").click();
 		sahiTasks.textbox("sudocmd").setValue(cn);
-		sahiTasks.textbox("description").setValue(description);
 		sahiTasks.button("Add").click();
 	}
 	

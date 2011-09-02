@@ -1,25 +1,24 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
 <suite name="IPASudoTestSuite">	
-	<test name="Sudo Tests" preserve-order="true">
+	<test name="Sudo Tests">
 		<packages>
 		     <package name="com.redhat.qe.ipa.sahi.*" />
 		</packages>
 		<groups>
 			<run>
 			    <include name="setup" />
-			    <include name="sudoruleAddTests" />					    
-			    <include name="sudoRuleAddAndAddAnotherTests" />
+			    <include name="sudoRuleAddTests" />	
+			    <include name="sudoRuleCancelAddTests" />
+			    <include name="sudoRuleAddAndAddAnotherTests" />			    
 			    <include name="sudoRuleAddAndEditTests" />
+			    <include name="invalidSudoRuleAddTests" />
 			    <include name="sudoRuleRequiredFieldAddTests" />
-			    <!--
-			    <include name="sudoruleEditTests" />				
-				<include name="sudoruleDeleteTests" />
-				-->
+			    <include name="sudoRuleExpandCollapseTests" />
+			    <include name="sudoRuleSearchTests" />
+			    <include name="sudoRuleDeleteTests" />
+			    <include name="sudoRuleMultipleDeleteTests" />
 			</run>
 		</groups>
-		<classes>
-		    <class name="com.redhat.qe.ipa.sahi.tests.sudo.SudoTests" />
-		</classes>
 	</test>
 	
 <!--		

@@ -136,6 +136,21 @@ public class HBACTests extends SahiTestScript {
 	}
 	
 	/*
+	 * Add, but Cancel adding HBACRule
+	 */
+	@Test (groups={"hbacRuleCancelAddTests"}, dataProvider="getSingleHBACRuleTestObjects")	
+	public void testHBACRuleCancelAdd(String testName, String cn) throws Exception {
+		//verify rule doesn't exist
+		Assert.assertFalse(sahiTasks.link(cn).exists(), "Verify HBAC Rule " + cn + " doesn't already exist");
+		
+		//new test rule can be added now
+		HBACTasks.addHBACRule(sahiTasks, cn, "Cancel");
+		
+		//verify rule was added successfully
+		Assert.assertFalse(sahiTasks.link(cn).exists(), "Verify HBAC Rule " + cn + "  was not added");
+	}
+	
+	/*
 	 * Add, and edit HBACRule
 	 */	
 	@Test (groups={"hbacRuleAddAndEditTests"}, dataProvider="getSingleHBACRuleTestObjects", dependsOnGroups="hbacRuleCancelAddTests")	
@@ -153,22 +168,6 @@ public class HBACTests extends SahiTestScript {
 		//verify changes	
 		HBACTasks.verifyHBACRuleUpdates(sahiTasks, cn, uid, hostgroupName, service, fqdn);
 	}
-	
-	/*
-	 * Add, but Cancel adding HBACRule
-	 */
-	@Test (groups={"hbacRuleCancelAddTests"}, dataProvider="getSingleHBACRuleTestObjects")	
-	public void testHBACRuleCancelAdd(String testName, String cn) throws Exception {
-		//verify rule doesn't exist
-		Assert.assertFalse(sahiTasks.link(cn).exists(), "Verify HBAC Rule " + cn + " doesn't already exist");
-		
-		//new test rule can be added now
-		HBACTasks.addHBACRule(sahiTasks, cn, "Cancel");
-		
-		//verify rule was added successfully
-		Assert.assertFalse(sahiTasks.link(cn).exists(), "Verify HBAC Rule " + cn + "  was not added");
-	}
-	
 	
 	/*
 	 * Add Rules - for negative tests
@@ -388,18 +387,30 @@ public class HBACTests extends SahiTestScript {
 	public void cleanup() throws CloneNotSupportedException {
 		//delete user, user group, host, host group added for this suite
 		sahiTasks.navigateTo(commonTasks.userPage, true);
+		//Since memberships were checked previously, may not be in the front page for User
+		if (sahiTasks.link("Users").in(sahiTasks.div("content")).exists())
+			sahiTasks.link("Users").in(sahiTasks.div("content")).click();
 		if (sahiTasks.link(uid).exists())
 			UserTasks.deleteUser(sahiTasks, uid);
 
 		sahiTasks.navigateTo(commonTasks.groupPage, true);
+		//Since memberships were checked previously, may not be in the front page for User Group
+		if (sahiTasks.link("User Groups").in(sahiTasks.div("content")).exists())
+			sahiTasks.link("User Groups").in(sahiTasks.div("content")).click();
 		if (sahiTasks.link(groupName).exists())
 			GroupTasks.deleteGroup(sahiTasks, groupName);
 		
 		sahiTasks.navigateTo(commonTasks.hostPage, true);
+		//Since memberships were checked previously, may not be in the front page for Hosts
+		if (sahiTasks.link("Hosts").in(sahiTasks.div("content")).exists())
+			sahiTasks.link("Hosts").in(sahiTasks.div("content")).click();
 		if (sahiTasks.link(fqdn.toLowerCase()).exists())
 			HostTasks.deleteHost(sahiTasks, fqdn);
 		
 		sahiTasks.navigateTo(commonTasks.hostgroupPage, true);
+		//Since memberships were checked previously, may not be in the front page for Host Groups
+		if (sahiTasks.link("Host Groups").in(sahiTasks.div("content")).exists())
+			sahiTasks.link("Host Groups").in(sahiTasks.div("content")).click();
 		if (sahiTasks.link(hostgroupName).exists())
 			HostgroupTasks.deleteHostgroup(sahiTasks, hostgroupName, "Delete");
 		
@@ -566,9 +577,9 @@ public class HBACTests extends SahiTestScript {
 	 */
 	@DataProvider(name="getHBACRuleSearchTestObjects")
 	public Object[][] getHBACRuleSearchTestObjects() {
-		return TestNGUtils.convertListOfListsTo2dArray(searchHBACRuleTestObject());
+		return TestNGUtils.convertListOfListsTo2dArray(createSearchHBACRuleTestObject());
 	}
-	protected List<List<Object>> searchHBACRuleTestObject() {		
+	protected List<List<Object>> createSearchHBACRuleTestObject() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
         //										testname					cn       				multiple_result1  
