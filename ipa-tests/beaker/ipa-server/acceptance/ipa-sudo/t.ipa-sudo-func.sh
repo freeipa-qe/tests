@@ -155,6 +155,7 @@ TLS_CACERTDIR /etc/ipa
 uri ldap://$MASTER
 EOF
 
+	rlRun "cat /etc/nss_ldap.conf"
 	rlRun "LDAPTLS_CACERT=/etc/ipa/ca.crt"
 	rlRun "export LDAPTLS_CACERT"
 
@@ -190,6 +191,7 @@ EOF
 			rlRun "echo \"sudoers:    ldap\" >> /etc/nsswitch.conf"
 		fi
 
+	rlRun "grep ^[^#] /etc/nsswitch.conf"
 
 rlPhaseEnd
 }
