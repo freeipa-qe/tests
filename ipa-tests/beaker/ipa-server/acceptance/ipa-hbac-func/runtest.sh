@@ -7,7 +7,7 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-#   Author: Gowrishankar Rajaiyan <grajaiya@redhat.com>
+#   Author: Gowrishankar Rajaiyan <gsr@redhat.com>
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
@@ -110,6 +110,7 @@ rlJournalStart
 	rlPhaseStartSetup "ipa-hbacsvc-func: Checking client"
                 rlLog "Machine in recipe is CLIENT"
                 rlRun "service iptables stop" 0 "Stop the firewall on the client"
+		rlRun "cat /etc/krb5.conf"
 
 	# hbacsvc_client_001
                 rlRun "rhts-sync-block -s DONE_hbacsvc_master_001 $BEAKERMASTER"
@@ -145,6 +146,7 @@ rlJournalStart
 	rlPhaseStartSetup "ipa-hbacsvc-func: Checking client"
                 rlLog "Machine in recipe is CLIENT2"
                 rlRun "service iptables stop" 0 "Stop the firewall on the client"
+		rlRun "cat /etc/krb5.conf"
 
 	# hbacsvc_client2_001
 		rlRun "rhts-sync-block -s DONE_hbacsvc_master_001 $BEAKERMASTER"
