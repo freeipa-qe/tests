@@ -10,8 +10,7 @@ import com.redhat.qe.ipa.sahi.tests.passwordpolicy.PasswordPolicyTests;
 
 public class PasswordPolicyTasks {
 	private static Logger log = Logger.getLogger(HostTasks.class.getName());
-	
-	
+	 
 	public static void createUserGroupsForTest(SahiTasks browser, String[] groupNames){ 
 		for (int i=0;i<groupNames.length;i++){
 			String groupName = groupNames[i];
@@ -40,7 +39,6 @@ public class PasswordPolicyTasks {
 		browser.textbox("cn").click();
 		browser.select("list").choose(policyName); 
 		browser.button("Add").click();  
-
 	}//add_PasswordPolicy
 	
 	/*
