@@ -1,124 +1,142 @@
 package com.redhat.qe.ipa.sahi.tests.passwordpolicy;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.util.logging.Logger;
-
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
-import org.testng.annotations.BeforeMethod;
-
-import com.redhat.qe.auto.testng.Assert;
-import com.redhat.qe.auto.testng.TestNGUtils;
+import org.testng.annotations.*;
 import com.redhat.qe.ipa.sahi.base.SahiTestScript;
-import com.redhat.qe.ipa.sahi.tasks.CommonTasks;
-import com.redhat.qe.ipa.sahi.tasks.SahiTasks;
-import com.redhat.qe.ipa.sahi.tasks.PasswordPolicyTasks;
+import com.redhat.qe.ipa.sahi.tasks.*;
 import com.redhat.qe.auto.testng.*;
 
 public class PasswordPolicyTests extends SahiTestScript{
 	private static Logger log = Logger.getLogger(PasswordPolicyTests.class.getName());
-		
+	private static SahiTasks browser=null;
+	
+	private static String[] testGroups = new String[]{
+					"passwordpolicygrp000","passwordpolicygrp001","passwordpolicygrp002",
+					"passwordpolicygrp003","passwordpolicygrp004","passwordpolicygrp005" }; 
 	
 	@BeforeClass (groups={"init"}, description="Initialize app for this test suite run", alwaysRun=true, dependsOnGroups="setup")
 	public void initialize() throws CloneNotSupportedException {
-		sahiTasks.navigateTo(commonTasks.passwordPolicyPage, true);
-		sahiTasks.setStrictVisibilityCheck(true);
-	}
+		browser=sahiTasks;
+		browser.setStrictVisibilityCheck(true);
+		
+		// create test group
+		browser.navigateTo(commonTasks.groupPage, true);
+		PasswordPolicyTasks.createUserGroupsForTest(browser, testGroups);
+		
+		// ready for test
+		browser.navigateTo(commonTasks.passwordPolicyPage, true);
+		
+	}//initialize
+	
+	@AfterClass (groups={"cleanup"}, description="delete test group", alwaysRun=true)
+	public void cleanup()  {
+		try{
+			browser.navigateTo(commonTasks.groupPage, true);
+			PasswordPolicyTasks.deleteUserGroupsForTest(browser, testGroups); 
+		}catch (Exception e){
+			log.info("there might be a sahi bug here, the above 'navigateTo' does not refresh page and therefore deleteUserGroupsForTest failed");
+			e.printStackTrace();
+		}
+	}//cleanup
 	
 	@BeforeMethod (alwaysRun=true)
 	public void checkURL(){
-		String currentURL = sahiTasks.fetch("top.location.href");
-		//TODO: yi: check alternate page
+		String currentURL = browser.fetch("top.location.href");
 		if (!currentURL.equals(commonTasks.passwordPolicyPage)){
 			log.info("current url=("+currentURL + "), is not a starting position, move to url=("+commonTasks.passwordPolicyPage +")");
-			sahiTasks.navigateTo(commonTasks.passwordPolicyPage, true);
+			browser.navigateTo(commonTasks.passwordPolicyPage, true);
 		}
 	}//checkURL
 	
 	/*
 	 * Add & Delete password policy
 	 */
-	@Test (groups={"passwordPolicyBaseTest"}, dataProvider="getPasswordPolicy")	
+	@Test (groups={"passwordPolicyBaseTest"}, dataProvider="basicPasswordPolicy")	
 	public void passwordPolicyBaseTest(String testName, String policyName, String priority) throws Exception {
-		PasswordPolicyTasks.add_PasswordPolicy(sahiTasks, policyName,priority); 
-		PasswordPolicyTasks.delete_PasswordPolicy(sahiTasks, policyName);
+		PasswordPolicyTasks.add_PasswordPolicy(browser, policyName,priority); 
+		PasswordPolicyTasks.delete_PasswordPolicy(browser, policyName);
 	}
 
 	/*
 	 * Add password policy
 	 */
-	@Test (groups={"test_add_PasswordPolicy"}, dataProvider="getPasswordPolicy")	
-	public void test_add_PasswordPolicy(String testName, String policyName, String priority) throws Exception {
-		PasswordPolicyTasks.add_PasswordPolicy(sahiTasks, policyName,priority);  
-	}//test_add_PasswordPolicy
+	@Test (groups={"addPolicy"}, dataProvider="1stPolicy")	
+	public void addPolicy(String testName, String policyName, String priority) throws Exception {
+		Assert.assertFalse(browser.link(policyName).exists(),"policy ["+policyName + "] does not exist before add");
+		PasswordPolicyTasks.add_PasswordPolicy(browser, policyName,priority);  
+		Assert.assertTrue(browser.link(policyName).exists(),"new policy ["+policyName + "] has been added");
+	}//addPolicy
 	
 	/*
 	 * Add password policy, and then add another in the same dialog box
 	 */
-	@Test (groups={"test_add_and_add_another_PasswordPolicy"}, dataProvider="getPasswordPolicy")	
-	public void test_add_and_add_another_PasswordPolicy(String testName, String policyName, String priority) throws Exception {
-		//FIXME : need work on this method and data provider
-		//PasswordPolicyTasks.add_and_add_another_PasswordPolicy(sahiTasks, policyName,priority);  
+	@Test (groups={"addPolicy"}, dataProvider="2nd_5thPolicy")	
+	public void test_add_and_add_another_PasswordPolicy(String testName, String firstPolicyName, String firstPolicyPriority, String secondPolicyName, String secondPolicyPriority) throws Exception {
+		Assert.assertFalse(browser.link(firstPolicyName).exists(), "policy ["+ firstPolicyName  + "] does not exist before test");
+		Assert.assertFalse(browser.link(secondPolicyName).exists(),"policy ["+ secondPolicyName + "] does not exist before test");
+		PasswordPolicyTasks.add_and_add_another(browser, firstPolicyName, firstPolicyPriority, secondPolicyName, secondPolicyPriority);  
+		Assert.assertTrue(browser.link(firstPolicyName).exists(), "new policy ["+ firstPolicyName  + "] has been added");
+		Assert.assertTrue(browser.link(secondPolicyName).exists(),"new policy ["+ secondPolicyName + "] has been added");
 	}//test_add_and_add_another_PasswordPolicy
 	
 	/*
 	 * Add password policy, then switch to editing mode immediately 
 	 */
-	@Test (groups={"test_add_and_edit_PasswordPolicy"}, dataProvider="getPasswordPolicy")	
+	@Test (groups={"addPolicy"}, dataProvider="6thPolicy")	
 	public void test_add_and_edit_PasswordPolicy(String testName, String policyName, String priority) throws Exception {
-		//FIXME : need work on this method and data provider
-		//PasswordPolicyTasks.add_and_edit_PasswordPolicy(sahiTasks, policyName,priority);  
+		Assert.assertFalse(browser.link(policyName).exists(), "policy ["+ policyName  + "] does not exist before test");
+		PasswordPolicyTasks.add_and_edit(browser, policyName,priority); 
+		Assert.assertTrue(browser.link("Password Policies").exists());
+		browser.link("Password Policies").click();
+		Assert.assertTrue(browser.link(policyName).exists(), "new policy [" + policyName +"] has been added");
 	}//test_add_and_edit_PasswordPolicy
 	
 	/*
 	 * Add then cancel password policy
 	 */
-	@Test (groups={"test_add_then_cancel_PasswordPolicy"}, dataProvider="getPasswordPolicy")	
+	@Test (groups={"addPolicy"}, dataProvider="editorPolicy")	
 	public void test_add_then_cancel_PasswordPolicy(String testName, String policyName, String priority) throws Exception {
-		//FIXME : need work on this method and data provider
-		//PasswordPolicyTasks.add_then_cancel_PasswordPolicy(sahiTasks, policyName,priority);  
+		Assert.assertFalse(browser.link(policyName).exists(), "policy ["+ policyName  + "] does not exist before test");
+		PasswordPolicyTasks.add_then_cancel(browser, policyName,priority);  
+		Assert.assertFalse(browser.link(policyName).exists(), "policy ["+ policyName  + "] does not exist after test");		
 	}//test_add_then_cancel_PasswordPolicy
 	
 	
 	/*
 	 * Delete password policy
 	 */
-	@Test (groups={"test_delete_PasswordPolicy"}, dataProvider="getPasswordPolicy")	
-	public void test_delete_PasswordPolicy(String testName, String policyName, String priority) throws Exception {
-		
-		PasswordPolicyTasks.delete_PasswordPolicy(sahiTasks, policyName);
-		
+	@Test (groups={"deletePolicy"}, dataProvider="allTestPolicies", dependsOnGroups="modifyPolicy")	
+	public void deletePolicy(String policyName) throws Exception {
+		log.info("delete test policy:["+policyName+"]");
+		PasswordPolicyTasks.delete_PasswordPolicy(browser, policyName);
+		Assert.assertFalse(browser.link(policyName).exists(), "policy ["+ policyName  + "] does not exist after test");		
 	}//test_delete_PasswordPolicy
 	
 	/*
 	 * Modify password policy details, positive test cases
 	 */
-	@Test (groups={"test_modify_PasswordPolicy"}, dataProvider="getPasswordPolicyDetails")	
-	public void test_modify_PasswordPolicy(String testName, String policyName, String fieldName, String fieldValue) throws Exception {
+	@Test (groups={"modifyPolicy"}, dataProvider="positivePolicyData", dependsOnGroups="addPolicy")	
+	public void modifyPolicy_PositiveTest(String testName, String policyName, String fieldName, String fieldValue) throws Exception {
 		// get into password policy detail page
-		sahiTasks.link(policyName).click();
+		browser.link(policyName).click();
 		// performing test here
-		PasswordPolicyTasks.modify_PasswordPolicy(sahiTasks, testName, policyName, fieldName, fieldValue);  
+		PasswordPolicyTasks.modify_PasswordPolicy_Positive(browser, testName, policyName, fieldName, fieldValue);  
 		//go back to password policy list
-		sahiTasks.link("Password Policies").click();
+		browser.link("Password Policies").in(browser.div("content")).click();
 	}//test_modify_PasswordPolicy
 	
 	/*
 	 * Modify password policy details, negative test cases
 	 */
-	@Test (groups={"test_modify_PasswordPolicy_Negative"}, dataProvider="getPasswordPolicyDetailsNegative")	
-	public void test_modify_PasswordPolicy_Negative(String testName, String policyName, String fieldName, 
-											 String fieldNegValue, String expectedErrorMsg_field, String expectedErrorMsg_dialog) throws Exception {
+	@Test (groups={"modifyPolicy"}, dataProvider="negativePolicyData", dependsOnGroups="addPolicy")	
+	public void modifyPolicy_NegativeTest(String testName, String policyName, String fieldName, 
+											 String fieldNegValue, String expectedErrorMsg) throws Exception {
 		// get into password policy detail page
-		sahiTasks.link(policyName).click();
+		browser.link(policyName).click();
 		// performing test here 
-		PasswordPolicyTasks.modify_PasswordPolicy_Negative(sahiTasks, testName, policyName, fieldName, fieldNegValue, expectedErrorMsg_field, expectedErrorMsg_dialog);
-		//go back to password policy list
-		//sahiTasks.link("Password Policies").click();
+		PasswordPolicyTasks.modify_PasswordPolicy_Negative(browser, testName, policyName, fieldName, fieldNegValue, expectedErrorMsg);
+		
 	}//test_modify_PasswordPolicy_Negative
 	
 	
@@ -126,76 +144,90 @@ public class PasswordPolicyTests extends SahiTestScript{
 	 *                          Data providers                                 *
 	 ***************************************************************************/
 	 
-	@DataProvider(name="getPasswordPolicyDetails")
-	public Object[][] getPasswordPolicyDetails() {
-		return TestNGUtils.convertListOfListsTo2dArray(createPasswordPolicyDetails());
-	}
-	protected List<List<Object>> createPasswordPolicyDetails() {		
-		List<List<Object>> ll = new ArrayList<List<Object>>();  
-											// testName, policy name, fieldName, fieldValue
-		ll.add(Arrays.asList(new Object[]{"password policy detail field: krbmaxpwdlife", "editors","krbmaxpwdlife","50"} )); 
-		ll.add(Arrays.asList(new Object[]{"password policy detail field: krbminpwdlife", "editors","krbminpwdlife","5"} )); 
-		ll.add(Arrays.asList(new Object[]{"password policy detail field: krbpwdhistorylength", "editors","krbpwdhistorylength","6"} )); 
-		ll.add(Arrays.asList(new Object[]{"password policy detail field: krbpwdmindiffchars", "editors","krbpwdmindiffchars","3"} )); 
-		ll.add(Arrays.asList(new Object[]{"password policy detail field: krbpwdminlength", "editors","krbpwdminlength","12"} ));  
-		return ll;	
+	@DataProvider(name="positivePolicyData")
+	public Object[][] getPositivePolicyData() {
+		String policy = PasswordPolicyTests.testGroups[0];
+		String testData[][]=
+			{
+				{"test field: krbmaxpwdlife", policy,"krbmaxpwdlife","50"} ,
+				{"test field: krbminpwdlife", policy,"krbminpwdlife","5"} ,
+				{"test field: krbpwdhistorylength", policy,"krbpwdhistorylength","6"} ,
+				{"test field: krbpwdmindiffchars", policy,"krbpwdmindiffchars","3"} ,
+				{"test field: krbpwdminlength", policy,"krbpwdminlength","12"}
+			};
+		return testData;	
 	}//Data provider: getPasswordPolicyDetails 
 	
-	@DataProvider(name="getPasswordPolicyDetailsNegative")
-	public Object[][] getPasswordPolicyDetailsNegative() {
-		return TestNGUtils.convertListOfListsTo2dArray(createPasswordPolicyDetailsNegative());
-	}
-	protected List<List<Object>> createPasswordPolicyDetailsNegative() {		
-		//FIXME: not I have anything wrong here, but a bug has been reported for in-consistency error msg : https://bugzilla.redhat.com/show_bug.cgi?id=731805
-		List<List<Object>> ll = new ArrayList<List<Object>>();  
-											// testName, policy name, fieldName, fieldValue
-		ll.add(Arrays.asList(new Object[]{"password policy detail mod test: krbmaxpwdlife: non-integer",  
-											"editors","krbmaxpwdlife","abc", "Must be an integer", "invalid 'krbmaxpwdlife': must be an integer"} )); 
-		ll.add(Arrays.asList(new Object[]{"password policy detail mod test: krbmaxpwdlife: upper range integer", 
-											"editors","krbmaxpwdlife","2147483648", "Maximum value is 2147483647", "invalid 'maxlife': can be at most 2147483647"} ));
-		ll.add(Arrays.asList(new Object[]{"password policy detail mod test: krbmaxpwdlife: lower range integer", 
-											"editors","krbmaxpwdlife","-1","" , "invalid 'maxlife': must be at least 0"} ));		
+	@DataProvider(name="negativePolicyData")
+	public Object[][] getNegativePolicyData() {
 		
-		ll.add(Arrays.asList(new Object[]{"password policy detail mod test: krbminpwdlife: non-integer", 
-											"editors","krbminpwdlife","edf", "Must be an integer", "invalid 'krbminpwdlife': must be an integer"} )); 
-		ll.add(Arrays.asList(new Object[]{"password policy detail mod test: krbminpwdlife: upper range integer", 
-											"editors","krbminpwdlife","2147483648", "Maximum value is 2147483647","invalid 'minlife': can be at most 2147483647"} ));
-		ll.add(Arrays.asList(new Object[]{"password policy detail mod test: krbminpwdlife: lower range integer", 
-											"editors","krbminpwdlife","-1","", "invalid 'minlife': must be at least 0"} ));
+		String policy = PasswordPolicyTests.testGroups[0]; 
+								// testName, policy name, fieldName, fieldValue(negative), expected error msg
+		String testData[][] = 
+			{	
+				{"krbmaxpwdlife: non-integer", 		  policy,"krbmaxpwdlife","abc", "Must be an integer"}, 
+				{"krbmaxpwdlife: upper range integer",policy,"krbmaxpwdlife","2147483648", "Maximum value is 2147483647"},
+				{"krbmaxpwdlife: lower range integer",policy,"krbmaxpwdlife","-1","Minimum value is 0"},		
+				
+				{"krbminpwdlife: non-integer",		  policy,"krbminpwdlife","edf", "Must be an integer"},
+				{"krbminpwdlife: upper range integer",policy,"krbminpwdlife","2147483648", "Maximum value is 2147483647"},
+				{"krbminpwdlife: lower range integer",policy,"krbminpwdlife","-1","Minimum value is 0"},
 		
-		ll.add(Arrays.asList(new Object[]{"password policy detail mod test: krbpwdhistorylength: non-integer", 
-											"editors","krbpwdhistorylength","HIJ", "Must be an integer", "invalid 'krbpwdhistorylength': must be an integer"} )); 
-		ll.add(Arrays.asList(new Object[]{"password policy detail mod test: krbpwdhistorylength: upper range integer", 
-											"editors","krbpwdhistorylength","2147483648", "Maximum value is 2147483647", "invalid 'history': can be at most 2147483647"} ));
-		ll.add(Arrays.asList(new Object[]{"password policy detail mod test: krbpwdhistorylength: lower range integer", 
-											"editors","krbpwdhistorylength","-1", "","invalid 'history': must be at least 0"} ));
+				{"krbpwdhistorylength: non-integer",	    policy,"krbpwdhistorylength","HIJ", "Must be an integer"}, 
+				{"krbpwdhistorylength: upper range integer",policy,"krbpwdhistorylength","2147483648", "Maximum value is 2147483647"},
+				{"krbpwdhistorylength: lower range integer",policy,"krbpwdhistorylength","-1", "Minimum value is 0"},
 		
-		ll.add(Arrays.asList(new Object[]{"password policy detail mod test: krbpwdmindiffchars: noon-integer", 
-											"editors","krbpwdmindiffchars","3lm", "Must be an integer", "invalid 'krbpwdmindiffchars': must be an integer"} )); 
-		ll.add(Arrays.asList(new Object[]{"password policy detail mod test: krbpwdmindiffchars: upper range integer", 
-											"editors","krbpwdmindiffchars","2147483648", "Maximum value is 2147483647", "invalid 'minclasses': can be at most 5"} ));
-		ll.add(Arrays.asList(new Object[]{"password policy detail mod test: krbpwdmindiffchars: lower range integer", 
-											"editors","krbpwdmindiffchars","-1","", "invalid 'minclasses': must be at least 0"} ));
+				{"krbpwdmindiffchars: noon-integer",	   policy,"krbpwdmindiffchars","3lm", "Must be an integer"}, 
+				{"krbpwdmindiffchars: upper range integer",policy,"krbpwdmindiffchars","2147483648", "Maximum value is 5"},
+				{"krbpwdmindiffchars: lower range integer",policy,"krbpwdmindiffchars","-1","Minimum value is 0"},
 		
-		ll.add(Arrays.asList(new Object[]{"password policy detail mod test: krbpwdminlength: non-integer", 
-											"editors","krbpwdminlength","n0p", "Must be an integer", "invalid 'krbpwdminlength': must be an integer"} ));  
-		ll.add(Arrays.asList(new Object[]{"password policy detail mod test: krbpwdminlength: upper range integer", 
-											"editors","krbpwdminlength","2147483648", "Maximum value is 2147483647", "invalid 'minlength': can be at most 2147483647"} ));
-		ll.add(Arrays.asList(new Object[]{"password policy detail mod test: krbpwdminlength: lower range integer", 
-											"editors","krbpwdminlength","-1", "", "invalid 'minlength': must be at least 0"} ));	
-		return ll;	
+				{"krbpwdminlength: non-integer",		policy,"krbpwdminlength","n0p", "Must be an integer"},  
+				{"krbpwdminlength: upper range integer",policy,"krbpwdminlength","2147483648", "Maximum value is 2147483647"},
+				{"krbpwdminlength: lower range integer",policy,"krbpwdminlength","-1", "Minimum value is 0"}
+			};
+		return testData;	
 	}//Data provider: createPasswordPolicyDetailsNegative 
 	 
-	@DataProvider(name="getPasswordPolicy")
-	public Object[][] getPasswordPolicyObjects() {
-		return TestNGUtils.convertListOfListsTo2dArray(createPasswordPolicy());
-	}
-	protected List<List<Object>> createPasswordPolicy() {		
-		List<List<Object>> ll = new ArrayList<List<Object>>();  
-		ll.add(Arrays.asList(new Object[]{
-				// testName, password policy name, priority 	
-				"password policy base test", "editors","5"} )); 
-		return ll;	
+	@DataProvider(name="basicPasswordPolicy")
+	public Object[][] getBasicPasswordPolicy() {
+		String testData[][] ={{"password policy base test", "editors","15"}}; 
+		return testData;	
 	}//Data provider: createPasswordPolicy 
 	
+	@DataProvider(name="1stPolicy")
+	public Object[][] get_1stPolicy() {
+		String[][] policy =  { {"1st password policy", PasswordPolicyTests.testGroups[0],"0"} };
+		return policy; 
+	}//singlePolicy;
+	
+	@DataProvider(name="2nd_5thPolicy")
+	public Object[][] get_2nd_5thPolicy() {
+		String[][] policy = { {"2nd and 3rd password policy", PasswordPolicyTests.testGroups[1],"1", PasswordPolicyTests.testGroups[2],"2"},
+							  {"4th and 5th password policy", PasswordPolicyTests.testGroups[3],"3", PasswordPolicyTests.testGroups[4],"4"},
+							};
+		return policy; 
+	}//singlePolicy;
+	
+	@DataProvider(name="6thPolicy")
+	public Object[][] get_6thPolicy() {
+		String[][] policy = { {"6th password policy", PasswordPolicyTests.testGroups[5],"5"}};
+		return policy; 
+	}//get_6thPolicy;
+	
+	@DataProvider(name="editorPolicy")
+	public Object[][] get_7thPolicy() {
+		String[][] policy = { {"password policy for group 'editors'", "editors","6"}};
+		return policy; 
+	}//get_7thPolicy;
+	
+	@DataProvider (name="allTestPolicies")
+	public Object[][] getAllTestPolicies(){
+		String[][] policies = { {"passwordpolicygrp000"},{"passwordpolicygrp001"},{"passwordpolicygrp002"},
+								{"passwordpolicygrp003"},{"passwordpolicygrp004"},{"passwordpolicygrp005"}};
+//		String[][] policies = new String[PasswordPolicyTests.testGroups.length][1];
+//		for (int i=0;i<PasswordPolicyTests.testGroups.length; i++){
+//			policies[i][0]= PasswordPolicyTests.testGroups[i];
+//		}
+		return policies;
+	}
 }//class DNSTest
