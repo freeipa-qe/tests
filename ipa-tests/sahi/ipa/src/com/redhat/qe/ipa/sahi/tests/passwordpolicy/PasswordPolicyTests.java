@@ -102,6 +102,37 @@ public class PasswordPolicyTests extends SahiTestScript{
 		Assert.assertFalse(browser.link(policyName).exists(), "policy ["+ policyName  + "] does not exist after test");		
 	}//test_add_then_cancel_PasswordPolicy
 	
+	@Test (groups={"addPolicy"})
+	public void addPolicy_NegativeTest() throws Exception {
+		browser.span("Add").click();
+		
+		// scenario:  non integer for policy priority
+		String nonInteger="abc";
+		String nonInteger_errorMsg = "Must be an integer"; 
+		browser.textbox("cospriority").setValue(nonInteger);
+		Assert.assertTrue(browser.span(nonInteger_errorMsg).exists(),"non integer priority data should trigger error msg");
+		
+		// scenario: lower bound of data range
+		String lowerThanMin = "-1";
+		String lowerThanMin_errorMsg = "Minimum value is 0";
+		browser.textbox("cospriority").setValue(lowerThanMin);
+		Assert.assertTrue(browser.span(lowerThanMin_errorMsg).exists(),"data range check: lower than min");
+		
+		// Scenario: upper bound of data range
+		String biggerThanMax="2147483648";
+		String biggerThanMax_errorMsg="Maximum value is 2147483647";
+		browser.textbox("cospriority").setValue(biggerThanMax);
+		Assert.assertTrue(browser.span(biggerThanMax_errorMsg).exists(),"data range check: bigger than max");
+		
+		// Scenario: empty policy name
+		browser.textbox("cn").click();
+		browser.select("list").choose(""); 
+		browser.textbox("cospriority").setValue("100");
+		browser.button("Add").click();
+		Assert.assertTrue(browser.div("error_dialog").exists(),"select empty string should trigger error dialog box");
+		browser.button("Cancel").click(); // click away the ipa error dialog box
+		browser.button("Cancel").click(); // click away the add policy dialog box, end of test
+	}
 	
 	/*
 	 * Delete password policy
