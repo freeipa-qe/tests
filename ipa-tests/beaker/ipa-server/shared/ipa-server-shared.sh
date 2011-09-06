@@ -581,9 +581,9 @@ ssh_auth_success()
 EOF
 
 if [ $? = 0 ]; then
-	rlPass "Authentication successful, as expected"
+	rlPass "Authentication successful for $i, as expected"
 	else   
-        rlFail "ERROR: Authentication failed."
+        rlFail "ERROR: Authentication failed for $1, expected success."
 fi
         }
    }
@@ -607,9 +607,9 @@ ssh_auth_failure()
 EOF
 
 if [ $? = 0 ]; then
-	rlFail "ERROR: Authentication success."
+	rlFail "ERROR: Authentication success for $1, expected failure."
         else
-        rlPass "Authentication failed, as expected"
+        rlPass "Authentication failed for $1, as expected"
 fi
         }
    }
