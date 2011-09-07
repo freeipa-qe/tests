@@ -1,6 +1,5 @@
 package com.redhat.qe.ipa.sahi.tests.passwordpolicy;
 
-import java.util.*;
 import java.util.logging.Logger;
 import org.testng.annotations.*;
 import com.redhat.qe.ipa.sahi.base.SahiTestScript;
@@ -11,7 +10,7 @@ public class PasswordPolicyTests extends SahiTestScript{
 	private static Logger log = Logger.getLogger(PasswordPolicyTests.class.getName());
 	private static SahiTasks browser=null;
 	
-	private static String[] testGroups = new String[]{
+	private static String[] testUserGroups = new String[]{
 					"passwordpolicygrp000","passwordpolicygrp001","passwordpolicygrp002",
 					"passwordpolicygrp003","passwordpolicygrp004","passwordpolicygrp005" }; 
 	
@@ -20,25 +19,24 @@ public class PasswordPolicyTests extends SahiTestScript{
 		browser=sahiTasks;
 		browser.setStrictVisibilityCheck(true);
 		
-		// create test group
 		browser.navigateTo(commonTasks.groupPage, true);
-		PasswordPolicyTasks.createUserGroupsForTest(browser, testGroups);
+		PasswordPolicyTasks.createUserGroupsForTest(browser, testUserGroups);
 		
 		// ready for test
 		browser.navigateTo(commonTasks.passwordPolicyPage, true);
 		
 	}//initialize
 	
-	@AfterClass (groups={"cleanup"}, description="delete test group", alwaysRun=true)
+	@AfterClass (groups={"cleanup"}, description="delete test user groups", alwaysRun=true)
 	public void cleanup()  {
 		try{
 			browser.navigateTo(commonTasks.groupPage, true);
-			PasswordPolicyTasks.deleteUserGroupsForTest(browser, testGroups); 
+			PasswordPolicyTasks.deleteUserGroupsForTest(browser, testUserGroups); 
 		}catch (Exception e){
 			log.info("there might be a sahi bug here, the above 'navigateTo' does not refresh page and therefore deleteUserGroupsForTest failed");
 			e.printStackTrace();
 		}
-	}//cleanup
+	}
 	
 	@BeforeMethod (alwaysRun=true)
 	public void checkURL(){
@@ -47,60 +45,49 @@ public class PasswordPolicyTests extends SahiTestScript{
 			log.info("current url=("+currentURL + "), is not a starting position, move to url=("+commonTasks.passwordPolicyPage +")");
 			browser.navigateTo(commonTasks.passwordPolicyPage, true);
 		}
-	}//checkURL
-	
-	/*
-	 * Add & Delete password policy
-	 */
-	@Test (groups={"passwordPolicyBaseTest"}, dataProvider="basicPasswordPolicy")	
-	public void passwordPolicyBaseTest(String testName, String policyName, String priority) throws Exception {
-		PasswordPolicyTasks.add_PasswordPolicy(browser, policyName,priority); 
-		PasswordPolicyTasks.delete_PasswordPolicy(browser, policyName);
 	}
 
-	/*
-	 * Add password policy
-	 */
+	@Test (groups={"passwordPolicyBaseTest"}, dataProvider="basicPasswordPolicy")	
+	public void passwordPolicyBaseTest(String testName, String policyName, String priority) throws Exception {
+		PasswordPolicyTasks.add_Policy(browser, policyName,priority); 
+		PasswordPolicyTasks.delete_Policy(browser, policyName);
+	}
+
 	@Test (groups={"addPolicy"}, dataProvider="1stPolicy")	
-	public void addPolicy(String testName, String policyName, String priority) throws Exception {
+	public void addPolicy_add(String testName, String policyName, String priority) throws Exception {
 		Assert.assertFalse(browser.link(policyName).exists(),"policy ["+policyName + "] does not exist before add");
-		PasswordPolicyTasks.add_PasswordPolicy(browser, policyName,priority);  
+		PasswordPolicyTasks.add_Policy(browser, policyName,priority);  
 		Assert.assertTrue(browser.link(policyName).exists(),"new policy ["+policyName + "] has been added");
-	}//addPolicy
-	
-	/*
-	 * Add password policy, and then add another in the same dialog box
-	 */
+	}
+
 	@Test (groups={"addPolicy"}, dataProvider="2nd_5thPolicy")	
-	public void test_add_and_add_another_PasswordPolicy(String testName, String firstPolicyName, String firstPolicyPriority, String secondPolicyName, String secondPolicyPriority) throws Exception {
+	public void addPolicy_add_and_add_another(String testName, String firstPolicyName, String firstPolicyPriority, String secondPolicyName, String secondPolicyPriority) throws Exception {
 		Assert.assertFalse(browser.link(firstPolicyName).exists(), "policy ["+ firstPolicyName  + "] does not exist before test");
 		Assert.assertFalse(browser.link(secondPolicyName).exists(),"policy ["+ secondPolicyName + "] does not exist before test");
-		PasswordPolicyTasks.add_and_add_another(browser, firstPolicyName, firstPolicyPriority, secondPolicyName, secondPolicyPriority);  
+		
+		PasswordPolicyTasks.add_and_add_another_Policy(browser, firstPolicyName, firstPolicyPriority, secondPolicyName, secondPolicyPriority); 
+		
 		Assert.assertTrue(browser.link(firstPolicyName).exists(), "new policy ["+ firstPolicyName  + "] has been added");
 		Assert.assertTrue(browser.link(secondPolicyName).exists(),"new policy ["+ secondPolicyName + "] has been added");
-	}//test_add_and_add_another_PasswordPolicy
-	
-	/*
-	 * Add password policy, then switch to editing mode immediately 
-	 */
+	}
+
 	@Test (groups={"addPolicy"}, dataProvider="6thPolicy")	
-	public void test_add_and_edit_PasswordPolicy(String testName, String policyName, String priority) throws Exception {
+	public void addPolicy_add_and_edit(String testName, String policyName, String priority) throws Exception {
 		Assert.assertFalse(browser.link(policyName).exists(), "policy ["+ policyName  + "] does not exist before test");
-		PasswordPolicyTasks.add_and_edit(browser, policyName,priority); 
+		
+		PasswordPolicyTasks.add_and_edit_Policy(browser, policyName,priority); 
+		
 		Assert.assertTrue(browser.link("Password Policies").exists());
 		browser.link("Password Policies").click();
 		Assert.assertTrue(browser.link(policyName).exists(), "new policy [" + policyName +"] has been added");
-	}//test_add_and_edit_PasswordPolicy
-	
-	/*
-	 * Add then cancel password policy
-	 */
+	}
+
 	@Test (groups={"addPolicy"}, dataProvider="editorPolicy")	
-	public void test_add_then_cancel_PasswordPolicy(String testName, String policyName, String priority) throws Exception {
+	public void addPolicy_add_then_cancel(String testName, String policyName, String priority) throws Exception {
 		Assert.assertFalse(browser.link(policyName).exists(), "policy ["+ policyName  + "] does not exist before test");
-		PasswordPolicyTasks.add_then_cancel(browser, policyName,priority);  
+		PasswordPolicyTasks.add_then_cancel_Policy(browser, policyName,priority);  
 		Assert.assertFalse(browser.link(policyName).exists(), "policy ["+ policyName  + "] does not exist after test");		
-	}//test_add_then_cancel_PasswordPolicy
+	}
 	
 	@Test (groups={"addPolicy"})
 	public void addPolicy_NegativeTest() throws Exception {
@@ -132,42 +119,41 @@ public class PasswordPolicyTests extends SahiTestScript{
 		Assert.assertTrue(browser.div("error_dialog").exists(),"select empty string should trigger error dialog box");
 		browser.button("Cancel").click(); // click away the ipa error dialog box
 		browser.button("Cancel").click(); // click away the add policy dialog box, end of test
-	}
-	
-	/*
-	 * Delete password policy
-	 */
+	}//addPolicy_NegativeTest
+
 	@Test (groups={"deletePolicy"}, dataProvider="allTestPolicies", dependsOnGroups="modifyPolicy")	
 	public void deletePolicy(String policyName) throws Exception {
 		log.info("delete test policy:["+policyName+"]");
-		PasswordPolicyTasks.delete_PasswordPolicy(browser, policyName);
+		PasswordPolicyTasks.delete_Policy(browser, policyName);
 		Assert.assertFalse(browser.link(policyName).exists(), "policy ["+ policyName  + "] does not exist after test");		
-	}//test_delete_PasswordPolicy
+	}
 	
-	/*
-	 * Modify password policy details, positive test cases
-	 */
 	@Test (groups={"modifyPolicy"}, dataProvider="positivePolicyData", dependsOnGroups="addPolicy")	
 	public void modifyPolicy_PositiveTest(String testName, String policyName, String fieldName, String fieldValue) throws Exception {
 		// get into password policy detail page
 		browser.link(policyName).click();
-		// performing test here
-		PasswordPolicyTasks.modify_PasswordPolicy_Positive(browser, testName, policyName, fieldName, fieldValue);  
+		
+		String originalValue = browser.textbox(fieldName).getText();
+		PasswordPolicyTasks.modifyPolicy_undo(browser, fieldName, fieldValue);
+		Assert.assertTrue(originalValue.equals(browser.textbox(fieldName).getText()), "after 'undo', the original value being restored" );
+		
+		PasswordPolicyTasks.modifyPolicy_reset(browser, fieldName, fieldValue);
+		Assert.assertTrue(originalValue.equals(browser.textbox(fieldName).getText()),"after 'Reset', the original value being restored"); 
+
+		PasswordPolicyTasks.modifyPolicy_update(browser,fieldName, fieldValue);
+		String after = browser.textbox(fieldName).getText();
+		Assert.assertTrue(after.equals(fieldValue),"after 'update', the field value not changed, report failure"); 
+
 		//go back to password policy list
 		browser.link("Password Policies").in(browser.div("content")).click();
-	}//test_modify_PasswordPolicy
-	
-	/*
-	 * Modify password policy details, negative test cases
-	 */
+	}
+
 	@Test (groups={"modifyPolicy"}, dataProvider="negativePolicyData", dependsOnGroups="addPolicy")	
 	public void modifyPolicy_NegativeTest(String testName, String policyName, String fieldName, 
 											 String fieldNegValue, String expectedErrorMsg) throws Exception {
 		// get into password policy detail page
 		browser.link(policyName).click();
-		// performing test here 
-		PasswordPolicyTasks.modify_PasswordPolicy_Negative(browser, testName, policyName, fieldName, fieldNegValue, expectedErrorMsg);
-		
+		PasswordPolicyTasks.modifyPolicy_Negative(browser, testName, policyName, fieldName, fieldNegValue, expectedErrorMsg);
 	}//test_modify_PasswordPolicy_Negative
 	
 	
@@ -177,7 +163,7 @@ public class PasswordPolicyTests extends SahiTestScript{
 	 
 	@DataProvider(name="positivePolicyData")
 	public Object[][] getPositivePolicyData() {
-		String policy = PasswordPolicyTests.testGroups[0];
+		String policy = PasswordPolicyTests.testUserGroups[0];
 		String testData[][]=
 			{
 				{"test field: krbmaxpwdlife", policy,"krbmaxpwdlife","50"} ,
@@ -192,7 +178,7 @@ public class PasswordPolicyTests extends SahiTestScript{
 	@DataProvider(name="negativePolicyData")
 	public Object[][] getNegativePolicyData() {
 		
-		String policy = PasswordPolicyTests.testGroups[0]; 
+		String policy = PasswordPolicyTests.testUserGroups[0]; 
 								// testName, policy name, fieldName, fieldValue(negative), expected error msg
 		String testData[][] = 
 			{	
@@ -223,42 +209,38 @@ public class PasswordPolicyTests extends SahiTestScript{
 	public Object[][] getBasicPasswordPolicy() {
 		String testData[][] ={{"password policy base test", "editors","15"}}; 
 		return testData;	
-	}//Data provider: createPasswordPolicy 
+	} 
 	
 	@DataProvider(name="1stPolicy")
 	public Object[][] get_1stPolicy() {
-		String[][] policy =  { {"1st password policy", PasswordPolicyTests.testGroups[0],"0"} };
+		String[][] policy =  { {"1st password policy", PasswordPolicyTests.testUserGroups[0],"0"} };
 		return policy; 
-	}//singlePolicy;
+	}
 	
 	@DataProvider(name="2nd_5thPolicy")
 	public Object[][] get_2nd_5thPolicy() {
-		String[][] policy = { {"2nd and 3rd password policy", PasswordPolicyTests.testGroups[1],"1", PasswordPolicyTests.testGroups[2],"2"},
-							  {"4th and 5th password policy", PasswordPolicyTests.testGroups[3],"3", PasswordPolicyTests.testGroups[4],"4"},
+		String[][] policies = { {"2nd and 3rd password policy", PasswordPolicyTests.testUserGroups[1],"1", PasswordPolicyTests.testUserGroups[2],"2"},
+							  {"4th and 5th password policy", PasswordPolicyTests.testUserGroups[3],"3", PasswordPolicyTests.testUserGroups[4],"4"},
 							};
-		return policy; 
-	}//singlePolicy;
+		return policies; 
+	}
 	
 	@DataProvider(name="6thPolicy")
 	public Object[][] get_6thPolicy() {
-		String[][] policy = { {"6th password policy", PasswordPolicyTests.testGroups[5],"5"}};
+		String[][] policy = { {"6th password policy", PasswordPolicyTests.testUserGroups[5],"5"}};
 		return policy; 
-	}//get_6thPolicy;
+	}
 	
 	@DataProvider(name="editorPolicy")
-	public Object[][] get_7thPolicy() {
+	public Object[][] get_editorPolicy() {
 		String[][] policy = { {"password policy for group 'editors'", "editors","6"}};
 		return policy; 
-	}//get_7thPolicy;
-	
+	}
+
 	@DataProvider (name="allTestPolicies")
 	public Object[][] getAllTestPolicies(){
 		String[][] policies = { {"passwordpolicygrp000"},{"passwordpolicygrp001"},{"passwordpolicygrp002"},
 								{"passwordpolicygrp003"},{"passwordpolicygrp004"},{"passwordpolicygrp005"}};
-//		String[][] policies = new String[PasswordPolicyTests.testGroups.length][1];
-//		for (int i=0;i<PasswordPolicyTests.testGroups.length; i++){
-//			policies[i][0]= PasswordPolicyTests.testGroups[i];
-//		}
 		return policies;
 	}
-}//class DNSTest
+}//class PasswordPolicyTests
