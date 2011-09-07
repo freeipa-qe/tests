@@ -193,7 +193,7 @@ rlJournalStart
 
                 if [ $rc -eq 0 ] ; then
                         rhts-sync-block -s READY $MASTER
-                        if [ $SLAVE != "" ] ; then
+                        if [ $SLAVE -ne "" ] ; then
                                 rhts-sync-block -s READY $SLAVE
                         fi
                         installClient
