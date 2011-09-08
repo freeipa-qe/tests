@@ -138,7 +138,14 @@ rlPhaseStartTest "Setup for sudo functional tests"
 #        rlRun "ipa-nis-manage -y $TmpDir/passwd.txt enable"
 #        rlRun "ipactl restart"
 
-cat > /etc/nss_ldap.conf << EOF
+	# The following changes are because of changes in sudo package which now
+	# searches for /etc/nslcd.conf for sudo maps. 
+	# https://bugzilla.redhat.com/show_bug.cgi?id=709235
+
+	rlRun "yum install nss-pam-ldapd -y"
+
+#cat > /etc/nss_ldap.conf << EOF
+cat > /etc/nscld.conf << EOF
 bind_policy soft
 sudoers_base ou=SUDOers,$basedn
 binddn uid=sudo,cn=sysaccounts,cn=etc,$basedn
@@ -155,7 +162,7 @@ TLS_CACERTDIR /etc/ipa
 uri ldap://$MASTER
 EOF
 
-	rlRun "cat /etc/nss_ldap.conf"
+	rlRun "cat /etc/nslcd.conf"
 	rlRun "LDAPTLS_CACERT=/etc/ipa/ca.crt"
 	rlRun "export LDAPTLS_CACERT"
 
