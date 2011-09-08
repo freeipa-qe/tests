@@ -1,0 +1,14 @@
+Owner:           Michael Gregg <mgregg@redhat.com>
+Name:            /CoreOS/ipa-server/acceptance/ds-migration
+TestVersion:     1.0
+Path:            /mnt/tests/CoreOS/ipa-server/acceptance/ds-migration
+Description:     Test of migrating DS instances to IPA
+Type:            Regression
+TestTime:        30m
+RunFor:          ipa-server
+Requires:        ipa-admintools
+Requires:        expect
+Priority:        Normal
+License:         GPLv2
+Confidential:    no
+Destructive:     no
