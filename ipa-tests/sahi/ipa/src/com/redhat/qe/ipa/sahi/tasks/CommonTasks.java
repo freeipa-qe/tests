@@ -311,7 +311,8 @@ public class CommonTasks {
 		if (memberOfType == "Sudo Rules"){
 			sahiTasks.link("memberof_sudorule").click();
 		}
-	
+			
+		
 		sahiTasks.radio(type).click();
 		
 		if (isMember){

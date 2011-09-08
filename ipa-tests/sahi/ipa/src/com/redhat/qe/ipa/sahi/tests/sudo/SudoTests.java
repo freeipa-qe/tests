@@ -59,8 +59,18 @@ public class SudoTests extends SahiTestScript{
 	private String[] names = {fqdn};
 	
 	//Sudo Command used in this testsuite
-	private String commandName = "/bin/ls";
-	private String commandDescription = "testing ls command for Sudo";
+	private String lsCommandName = "/bin/ls";
+	private String lsCommandDescription = "testing ls command for Sudo";
+	private String vimCommandName = "/usr/bin/vim";
+	private String vimCommandDescription = "testing vim command for Sudo";
+	
+	//Sudo Command Groups used in this testsuite
+	private String allowCommandGroupName = "allowgroup";
+	private String allowCommandGroupDescription = "allow group for Sudo commands";
+	private String denyCommandGroupName = "denygroup";
+	private String denyCommandGroupDescription = "deny group for Sudo commands";
+	
+	
 	
 	private String currentPage = "";
 	private String alternateCurrentPage = "";
@@ -91,15 +101,23 @@ public class SudoTests extends SahiTestScript{
 		
 		System.out.println("Check CurrentPage: " + commonTasks.hostgroupPage);
 		sahiTasks.navigateTo(commonTasks.hostgroupPage, true);
-		if (!sahiTasks.link(hostgroupName).exists()) {
+		if (!sahiTasks.link(hostgroupName).exists()) 
 			HostgroupTasks.addHostGroup(sahiTasks, hostgroupName, description, "Add");
-		}
 		
-		System.out.println("Check CurrentPage: " + commonTasks.hostgroupPage);
+		
+		System.out.println("Check CurrentPage: " + commonTasks.sudoCommandPage);
 		sahiTasks.navigateTo(commonTasks.sudoCommandPage, true);
-		if (!sahiTasks.link(commandName).exists()) {
-			SudoTasks.createSudoruleCommandAdd(sahiTasks, commandName, commandDescription);
-		}
+		if (!sahiTasks.link(lsCommandName).exists()) 
+			SudoTasks.createSudoruleCommandAdd(sahiTasks, lsCommandName, lsCommandDescription);
+		if (!sahiTasks.link(vimCommandName).exists()) 
+			SudoTasks.createSudoruleCommandAdd(sahiTasks, vimCommandName, vimCommandDescription);
+		
+		System.out.println("Check CurrentPage: " + commonTasks.sudoCommandGroupPage);
+		sahiTasks.navigateTo(commonTasks.sudoCommandGroupPage, true);
+		if (!sahiTasks.link(allowCommandGroupName).exists()) 
+			SudoTasks.createSudoruleCommandGroupAdd(sahiTasks, allowCommandGroupName, allowCommandGroupDescription);
+		if (!sahiTasks.link(denyCommandGroupName).exists()) 
+			SudoTasks.createSudoruleCommandGroupAdd(sahiTasks, denyCommandGroupName, denyCommandGroupDescription);		
 			
 		
 		sahiTasks.navigateTo(commonTasks.sudoRulePage, true);
@@ -160,10 +178,10 @@ public class SudoTests extends SahiTestScript{
 		
 		
 		//new test rule can be added now
-		SudoTasks.addAndEditSudoRule(sahiTasks, cn, uid, hostgroupName, commandName, runAsGroupName);				
+		SudoTasks.addAndEditSudoRule(sahiTasks, cn, uid, hostgroupName, lsCommandName, denyCommandGroupName, runAsGroupName);				
 		
 		//verify changes	
-		SudoTasks.verifySudoRuleUpdates(sahiTasks, cn, uid, hostgroupName, commandName, runAsGroupName);
+		SudoTasks.verifySudoRuleUpdates(sahiTasks, cn, uid, hostgroupName, lsCommandName, denyCommandGroupName, runAsGroupName);
 	}
 	
 	/*
@@ -226,7 +244,7 @@ public class SudoTests extends SahiTestScript{
 	 * Delete a Sudo Rule
 	 */
 	@Test (groups={"sudoRuleDeleteTests"}, description="Delete Rules one at a time", dataProvider="getSudoRuleDeleteTestObjects", 
-			dependsOnGroups={"sudoRuleAddTests", "sudoRuleSearchTests" })	
+			dependsOnGroups={"sudoRuleAddTests", "sudoRuleSearchTests", "invalidSudoRuleAddTests" })	
 	public void testSudoRuleDelete(String testName, String cn) throws Exception {
 		//verify rule to be deleted exists
 		Assert.assertTrue(sahiTasks.link(cn).exists(), "Verify Sudo Rule " + cn + "  to be deleted exists");
@@ -280,6 +298,10 @@ public class SudoTests extends SahiTestScript{
 		
 		//verify changes	
 		SudoTasks.verifySudoRuleGeneralSection(sahiTasks, cn, description);
+		
+		SudoTasks.undoResetUpdateSudoRuleSections(sahiTasks, cn, "ipaenabledflag", "undo");
+		SudoTasks.undoResetUpdateSudoRuleSections(sahiTasks, cn, "ipaenabledflag", "Reset");
+		SudoTasks.undoResetUpdateSudoRuleSections(sahiTasks, cn, "ipaenabledflag", "Update");
 	}
 	
 	
@@ -307,26 +329,26 @@ public class SudoTests extends SahiTestScript{
 	 * verify the user is not a member, and groups is a member of this sudo rule
 	 * add the user to the group
 	 * verify the user is an indirect member of the group
+	 * verify undo/reset/update for this section when working with the radiobutton
 	 */
-	//@Test (groups={"sudoRuleWhoSettingsTests"}, dataProvider="getEditSudoRuleTestObjects", dependsOnGroups={"sudoRuleAddAndEditTests", "sudoRuleMemberListTests"})
-	@Test (groups={"sudoRuleWhoSettingsTests"}, dataProvider="getEditSudoRuleTestObjects")
-	public void testSudoRuleWhoSettings(String testName, String cn) throws Exception {		
+	@Test (groups={"sudoRuleUserCategorySettingsTests"}, dataProvider="getEditSudoRuleTestObjects", dependsOnGroups={"sudoRuleAddAndEditTests"})
+	public void testSudoRuleUserCategorySettings(String testName, String cn) throws Exception {		
 		//verify rule to be edited exists
 		Assert.assertTrue(sahiTasks.link(cn).exists(), "Verify Rule " + cn + " to be edited exists");
 		
 		//verify by clicking on user - it is a member of this Sudo rule
-		SudoTasks.verifySudoRuleForEnrollmentInWhoSection(sahiTasks, commonTasks, cn, uid, "Users", "direct", true);
+		SudoTasks.verifySudoRuleForEnrollment(sahiTasks, commonTasks, cn, uid, "Users", "direct", true);
 		sahiTasks.navigateTo(commonTasks.sudoRulePage, true);
 		
 		//modify this rule
-		SudoTasks.modifySudoRuleWhoSection(sahiTasks, cn, uid, groupName);
+		SudoTasks.modifySudoRuleUserCategorySection(sahiTasks, cn, uid, groupName);
 		//verify by clicking on usergroup - it is a member of this Sudo rule
-		SudoTasks.verifySudoRuleForEnrollmentInWhoSection(sahiTasks, commonTasks, cn, groupName, "User Groups", "direct", true);
+		SudoTasks.verifySudoRuleForEnrollment(sahiTasks, commonTasks, cn, groupName, "User Groups", "direct", true);
 		sahiTasks.navigateTo(commonTasks.sudoRulePage, true);
 		
 		
 		//verify by clicking on user - it is a member of this Sudo rule
-		SudoTasks.verifySudoRuleForEnrollmentInWhoSection(sahiTasks,commonTasks,cn, uid, "Users", "direct", false);
+		SudoTasks.verifySudoRuleForEnrollment(sahiTasks,commonTasks,cn, uid, "Users", "direct", false);
 		sahiTasks.navigateTo(commonTasks.sudoRulePage, true);
 		
 		//add user to usergroup
@@ -335,9 +357,95 @@ public class SudoTests extends SahiTestScript{
 		sahiTasks.navigateTo(commonTasks.sudoRulePage, true);
 		
 		//now verify it is indirect member of this Sudo rule
-		SudoTasks.verifySudoRuleForEnrollmentInWhoSection(sahiTasks, commonTasks, cn, uid, "Users", "indirect", true);
+		SudoTasks.verifySudoRuleForEnrollment(sahiTasks, commonTasks, cn, uid, "Users", "indirect", true);
 		sahiTasks.navigateTo(commonTasks.sudoRulePage, true);
+		
+		SudoTasks.undoResetUpdateSudoRuleSections(sahiTasks, cn, "usercategory", "undo");
+		SudoTasks.undoResetUpdateSudoRuleSections(sahiTasks, cn, "usercategory", "Reset");
+		SudoTasks.undoResetUpdateSudoRuleSections(sahiTasks, cn, "usercategory", "Update");
 	}
+	
+	
+	/*
+	 * Edit the "Access this Host" Section for the Sudo Rule
+	 * Testing:
+	 * Verify hostgroup added as part of sudoRuleAddAndEditTests is a member of this sudo rule
+	 * add the host to the hostgroup
+	 * verify the host is an indirect member of the group
+	 * delete this hostgroup, add a host in this section
+	 * verify the hostgroup is not a member, and host is a member of this sudo rule
+	 * 
+	 * verify undo/reset/update for this section when working with the radiobutton
+	 */
+	@Test (groups={"sudoRuleHostCategorySettingsTests"}, dataProvider="getEditSudoRuleTestObjects", dependsOnGroups={"sudoRuleAddAndEditTests"})
+	public void testSudoRuleHostCategorySettings(String testName, String cn) throws Exception {		
+		//verify rule to be edited exists
+		Assert.assertTrue(sahiTasks.link(cn).exists(), "Verify Rule " + cn + " to be edited exists");
+		
+		//verify by clicking on hostgroup - it is a member of this Sudo rule
+		SudoTasks.verifySudoRuleForEnrollment(sahiTasks, commonTasks, cn, hostgroupName, "Host Groups", "direct", true);
+		sahiTasks.navigateTo(commonTasks.sudoRulePage, true);
+		
+		//add host to hostgroup
+		sahiTasks.navigateTo(commonTasks.hostgroupPage, true);
+		HostgroupTasks.addMembers(sahiTasks, hostgroupName, "host", fqdn, "Enroll");
+		sahiTasks.navigateTo(commonTasks.sudoRulePage, true);
+		
+		//now verify it is indirect member of this Sudo rule
+		SudoTasks.verifySudoRuleForEnrollment(sahiTasks, commonTasks, cn, fqdn, "Hosts", "indirect", true);
+		sahiTasks.navigateTo(commonTasks.sudoRulePage, true);
+		
+		//modify this rule
+		SudoTasks.modifySudoRuleHostCategorySection(sahiTasks, cn, fqdn, hostgroupName);
+		//verify by clicking on usergroup - it is a member of this Sudo rule
+		SudoTasks.verifySudoRuleForEnrollment(sahiTasks, commonTasks, cn, hostgroupName, "Host Groups", "direct", false);
+		sahiTasks.navigateTo(commonTasks.sudoRulePage, true);
+		
+		
+		//verify by clicking on user - it is a member of this Sudo rule
+		SudoTasks.verifySudoRuleForEnrollment(sahiTasks,commonTasks,cn, fqdn, "Hosts", "direct", true);
+		sahiTasks.navigateTo(commonTasks.sudoRulePage, true);
+				
+		
+		SudoTasks.undoResetUpdateSudoRuleSections(sahiTasks, cn, "hostcategory", "undo");
+		SudoTasks.undoResetUpdateSudoRuleSections(sahiTasks, cn, "hostcategory", "Reset");
+		SudoTasks.undoResetUpdateSudoRuleSections(sahiTasks, cn, "hostcategory", "Update");
+	}
+	
+	
+	/*
+	 * Edit the Who Section for the Sudo Rule
+	 * Testing:
+	 * Verify user added as part of sudoRuleAddAndEditTests is a member of this sudo rule
+	 * delete this user, add a user group in this section
+	 * verify the user is not a member, and groups is a member of this sudo rule
+	 * add the user to the group
+	 * verify the user is an indirect member of the group
+	 * verify undo/reset/update for this section when working with the radiobutton
+	 */
+	@Test (groups={"sudoRuleCommandCategorySettingsTests"}, dataProvider="getEditSudoRuleTestObjects", dependsOnGroups={"sudoRuleAddAndEditTests"})
+	//@Test (groups={"sudoRuleCommandCategorySettingsTests"}, dataProvider="getEditSudoRuleTestObjects")
+	public void testSudoRuleCommandCategorySettings(String testName, String cn) throws Exception {		
+		//verify rule to be edited exists
+		Assert.assertTrue(sahiTasks.link(cn).exists(), "Verify Rule " + cn + " to be edited exists");
+		
+		
+		//modify this rule
+		SudoTasks.modifySudoRuleCommandCategorySection(sahiTasks, cn, lsCommandName, allowCommandGroupName, vimCommandName, denyCommandGroupName);
+	    SudoTasks.verifySudoRuleCommandCategorySection(sahiTasks, cn, lsCommandName, allowCommandGroupName, vimCommandName, denyCommandGroupName);
+	    
+		//add command to commandgroup
+		sahiTasks.navigateTo(commonTasks.sudoCommandGroupPage, true);
+		SudoTasks.addMembers(sahiTasks, allowCommandGroupName, lsCommandName, "Enroll");
+		sahiTasks.navigateTo(commonTasks.sudoRulePage, true);
+		
+		
+		SudoTasks.undoResetUpdateSudoRuleSections(sahiTasks, cn, "cmdcategory", "undo");
+		SudoTasks.undoResetUpdateSudoRuleSections(sahiTasks, cn, "cmdcategory", "Reset");
+		SudoTasks.undoResetUpdateSudoRuleSections(sahiTasks, cn, "cmdcategory", "Update");
+	}
+	
+	
 	
 	/*
 	 * Verify member list for the Sudo Rule
@@ -370,7 +478,7 @@ public class SudoTests extends SahiTestScript{
 		//delete user, user group, host, host group added for this suite
 		sahiTasks.navigateTo(commonTasks.userPage, true);
 		//Since memberships were checked previously, may not be in the front page for User
-/*		if (sahiTasks.link("Users").in(sahiTasks.div("content")).exists())
+		if (sahiTasks.link("Users").in(sahiTasks.div("content")).exists())
 			sahiTasks.link("Users").in(sahiTasks.div("content")).click();
 		if (sahiTasks.link(uid).exists())
 			UserTasks.deleteUser(sahiTasks, uid);
@@ -401,11 +509,13 @@ public class SudoTests extends SahiTestScript{
 		if (sahiTasks.link(hostgroupName).exists())
 			HostgroupTasks.deleteHostgroup(sahiTasks, hostgroupName, "Delete");
 		
-		
+/*		
 		sahiTasks.navigateTo(commonTasks.sudoCommandPage, true);
-		if (sahiTasks.link(commandName).exists()) {
-			//SudoTasks.deleteSudoruleCommand(sahiTasks, commandName, commandDescription);
+		if (sahiTasks.link(lsCommandName).exists()) {
+			//SudoTasks.deleteSudoruleCommand(sahiTasks, lsCommandName, lsCommandDescription);
 		}		
+		
+		clean up sudo command groups*/
 		
 		sahiTasks.navigateTo(commonTasks.sudoRulePage, true);
 		
@@ -424,7 +534,7 @@ public class SudoTests extends SahiTestScript{
 				log.fine("Cleaning Sudo Rule: " + sudoRuleTestObject);
 				SudoTasks.deleteSudo(sahiTasks, sudoRuleTestObject, "Delete");
 			}			
-		}*/
+		}
 	}
 	
 	/*******************************************************

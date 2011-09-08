@@ -8,12 +8,14 @@
 			<run>
 			    <include name="setup" />
 			    <include name="sudoRuleAddTests" />	
-			    <include name="sudoRuleCancelAddTests" />
 			    <include name="sudoRuleAddAndAddAnotherTests" />
+			    <include name="sudoRuleCancelAddTests" />
 			    <include name="sudoRuleAddAndEditTests" />
 			    <include name="sudoRuleGeneralSettingsTests" />		    
 			    <include name="sudoRuleOptionsSettingsTests" />
-			    <include name="sudoRuleWhoSettingsTests" />
+			    <include name="sudoRuleUserCategorySettingsTests" />
+			    <include name="sudoRuleHostCategorySettingsTests" />
+			    <include name="sudoRuleCommandCategorySettingsTests" />
 			    <include name="invalidSudoRuleAddTests" />
 			    <include name="sudoRuleRequiredFieldAddTests" />
 			    <include name="sudoRuleExpandCollapseTests" />

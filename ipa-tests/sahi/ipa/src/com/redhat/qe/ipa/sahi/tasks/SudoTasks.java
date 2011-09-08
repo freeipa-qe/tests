@@ -61,7 +61,7 @@ public class SudoTasks {
 	 * @param cn - new Sudo Rule name
 	 * @param buttonToClick - Possible values - "Add" or "Cancel"
 	 */
-	public static void addAndEditSudoRule(SahiTasks sahiTasks, String cn, String uid, String hostgroupName, String commandName, String runAsGroupName) {
+	public static void addAndEditSudoRule(SahiTasks sahiTasks, String cn, String uid, String hostgroupName, String commandName, String commandGroupName, String runAsGroupName) {
 		sahiTasks.span("Add").click();
 		sahiTasks.textbox("cn").setValue(cn);
 		sahiTasks.button("Add and Edit").click();
@@ -96,6 +96,12 @@ public class SudoTasks {
 		sahiTasks.span(">>").click();
 		sahiTasks.button("Enroll").click();
 		
+		//Click to add Sudo Command Group From from "Deny" Section
+		sahiTasks.span("Add").under(sahiTasks.heading2(("Run Commands"))).under(sahiTasks.heading3("Deny")).near(sahiTasks.span("Sudo Command Groups")).click();
+		sahiTasks.checkbox(commandGroupName).click();
+		sahiTasks.span(">>").click();
+		sahiTasks.button("Enroll").click();
+		
 		//Click to add RunAs User from "As whom" Section
 		sahiTasks.span("Add").under(sahiTasks.heading2(("As Whom"))).near(sahiTasks.span("User Groups[1]")).click();
 		sahiTasks.checkbox(runAsGroupName).click();
@@ -110,12 +116,13 @@ public class SudoTasks {
 
 
 	
-	public static void verifySudoRuleUpdates(SahiTasks sahiTasks, String cn, String uid, String hostgroupName, String commandName, String runAsGroupName) {
+	public static void verifySudoRuleUpdates(SahiTasks sahiTasks, String cn, String uid, String hostgroupName, String commandName, String commandGroupName, String runAsGroupName) {
 		//click on rule to edit
 		sahiTasks.link(cn).click();
 		Assert.assertTrue(sahiTasks.checkbox(uid).exists(), "Verified user " + uid + " added for Rule " + cn);
 		Assert.assertTrue(sahiTasks.checkbox(hostgroupName).exists(), "Verified Host Group " + hostgroupName + " added for Rule " + cn);
 		Assert.assertTrue(sahiTasks.checkbox(commandName).exists(), "Verified Command " + commandName + " added for Rule " + cn);
+		Assert.assertTrue(sahiTasks.checkbox(commandGroupName).exists(), "Verified Command Group" + commandGroupName + " added for Rule " + cn);
 		Assert.assertTrue(sahiTasks.checkbox(runAsGroupName).exists(), "Verified From: Host " + runAsGroupName + " added for Rule " + cn);
 		
 		//Also verify from other pages
@@ -188,6 +195,11 @@ public class SudoTasks {
 		
 		sahiTasks.span("Add").click();
 		sahiTasks.textbox("ipasudoopt").setValue(option2);
+		sahiTasks.button("Cancel").click();
+		Assert.assertFalse(sahiTasks.span(option2).exists(), "Verified option was cancelled when adding");
+		
+		sahiTasks.span("Add").click();
+		sahiTasks.textbox("ipasudoopt").setValue(option2);
 		sahiTasks.button("Add").click();
 		
 		sahiTasks.span("Update").click();
@@ -213,42 +225,152 @@ public class SudoTasks {
 	 * @param sahiTasks
 	 * @param cn - the rule to modify for
 	 */
-	public static void modifySudoRuleWhoSection(SahiTasks sahiTasks, String cn, String user, String usergroup ) {
+	public static void modifySudoRuleUserCategorySection(SahiTasks sahiTasks, String cn, String user, String usergroup ) {
 		sahiTasks.link(cn).click();
-		
-		sahiTasks.checkbox(user).click();	
+		deleteFromSudoRule(sahiTasks, cn,  "Who", "Users", user, "Delete");
+		/*sahiTasks.checkbox(user).click();	
 		sahiTasks.span("Delete").under(sahiTasks.heading2(("Who"))).near(sahiTasks.span("Users")).click();
-		sahiTasks.button("Delete").click();
-		sahiTasks.span("Add").under(sahiTasks.heading2(("Who"))).near(sahiTasks.span("User Groups")).click();
+		sahiTasks.button("Delete").click();*/
+		
+		addToSudoRule(sahiTasks, cn, "Who", "User Groups", usergroup, "Enroll");		
+		/*sahiTasks.span("Add").under(sahiTasks.heading2(("Who"))).near(sahiTasks.span("User Groups")).click();
 		sahiTasks.checkbox(usergroup).click();
 		sahiTasks.span(">>").click();
-		sahiTasks.button("Enroll").click();
+		sahiTasks.button("Enroll").click();*/
 		
 		sahiTasks.span("Update").click();
 		sahiTasks.link("Sudo Rules").in(sahiTasks.div("content")).click();			
 	}
 	
-		
 	
 	
 	
-	public static void verifySudoRuleForEnrollmentInWhoSection(SahiTasks sahiTasks, CommonTasks commonTasks, String cn, String member, 
+	public static void verifySudoRuleForEnrollment(SahiTasks sahiTasks, CommonTasks commonTasks, String cn, String member, 
 			String memberType, String type, boolean isMember) {
 		sahiTasks.link(cn).click();
 		
 		if (sahiTasks.link(member).exists()) {
-			sahiTasks.link(member).click();
+			sahiTasks.link(member).click();	
 			CommonTasks.verifyMemberOf(sahiTasks, member, memberType, "Sudo Rules", cn, type, isMember);			
 		}
 		else {
 			if (memberType.equals("Users"))
 				sahiTasks.navigateTo(commonTasks.userPage);
-			else
+			if (memberType.equals("User Groups"))
 				sahiTasks.navigateTo(commonTasks.groupPage);
+			if (memberType.equals("Hosts"))
+				sahiTasks.navigateTo(commonTasks.hostPage);
+			if (memberType.equals("Host Groups"))
+				sahiTasks.navigateTo(commonTasks.hostgroupPage);
 			sahiTasks.link(member).click();
 			CommonTasks.verifyMemberOf(sahiTasks, member, memberType, "Sudo Rules", cn, type, isMember);
 		}
 	}
+	
+	/**
+	 * Modify Who Section for an HBAC Rule
+	 * @param sahiTasks
+	 * @param cn - the rule to modify for
+	 */
+	public static void modifySudoRuleHostCategorySection(SahiTasks sahiTasks, String cn, String hostName, String hostgroupName ) {
+		sahiTasks.link(cn).click();
+		deleteFromSudoRule(sahiTasks, cn,  "Access this host", "Host Groups", hostgroupName, "Delete");
+		/*sahiTasks.checkbox(hostgroupName).click();	
+		sahiTasks.span("Delete").under(sahiTasks.heading2(("Access this host"))).near(sahiTasks.span("Host Groups")).click();
+		sahiTasks.button("Delete").click();*/
+		
+		addToSudoRule(sahiTasks, cn, "Access this host", "Hosts", hostName, "Enroll");
+		/*sahiTasks.span("Add").under(sahiTasks.heading2(("Access this host"))).near(sahiTasks.span("Hosts")).click();
+		sahiTasks.checkbox(hostName).click();
+		sahiTasks.span(">>").click();
+		sahiTasks.button("Enroll").click();*/
+		
+		sahiTasks.span("Update").click();
+		sahiTasks.link("Sudo Rules").in(sahiTasks.div("content")).click();			
+	}
+
+	
+	
+	/**
+	 * Modify Who Section for an HBAC Rule
+	 * @param sahiTasks
+	 * @param cn - the rule to modify for
+	 */
+	public static void modifySudoRuleCommandCategorySection(SahiTasks sahiTasks, String cn, String lsCommandName, String allowCommandGroupName, 
+			String vimCommandName, String denyCommandGroupName ) {
+		sahiTasks.link(cn).click();
+		
+		deleteFromSudoRule(sahiTasks, cn, "Run Commands", "Allow", "Sudo Commands", lsCommandName, "Delete");		
+		addToSudoRule(sahiTasks, cn, "Run Commands", "Allow", "Sudo Command Groups", allowCommandGroupName, "Enroll");		
+		addToSudoRule(sahiTasks, cn, "Run Commands", "Deny", "Sudo Commands", vimCommandName, "Enroll");		
+		deleteFromSudoRule(sahiTasks, cn, "Run Commands", "Deny", "Sudo Command Groups", denyCommandGroupName, "Delete");	
+		
+		sahiTasks.span("Update").click();
+		sahiTasks.link("Sudo Rules").in(sahiTasks.div("content")).click();			
+	}
+	
+	public static void addToSudoRule(SahiTasks sahiTasks, String cn, String heading2, String type, String member, String buttonToClick ) {
+		addToSudoRule(sahiTasks, cn, heading2, "", type, member, buttonToClick);				
+	}
+	
+	public static void addToSudoRule(SahiTasks sahiTasks, String cn, String heading2, String heading3, String type, String member, String buttonToClick ) {
+		if (heading3.equals(""))
+			sahiTasks.span("Add").under(sahiTasks.heading2((heading2))).near(sahiTasks.span(type)).click();
+		else
+			sahiTasks.span("Add").under(sahiTasks.heading2((heading2))).under(sahiTasks.heading3(heading3)).near(sahiTasks.span(type)).click();
+		
+		sahiTasks.checkbox(member).click();
+		sahiTasks.span(">>").click();
+		sahiTasks.button(buttonToClick).click();
+	}
+	
+	
+	public static void deleteFromSudoRule(SahiTasks sahiTasks, String cn, String heading2, String type, String member, String buttonToClick ) {
+		deleteFromSudoRule(sahiTasks, cn, heading2, "", type, member, buttonToClick);				
+	}
+	
+	public static void deleteFromSudoRule(SahiTasks sahiTasks, String cn, String heading2, String heading3, String type, String member, String buttonToClick ) {
+		sahiTasks.checkbox(member).click();
+		if (heading3.equals(""))
+			sahiTasks.span("Delete").under(sahiTasks.heading2((heading2))).near(sahiTasks.span(type)).click();
+		else
+			sahiTasks.span("Delete").under(sahiTasks.heading2((heading2))).under(sahiTasks.heading3(heading3)).near(sahiTasks.span(type)).click();
+		
+		sahiTasks.button(buttonToClick).click();
+	}
+		
+	public static void verifySudoRuleCommandCategorySection(SahiTasks sahiTasks, String cn, String lsCommandName, String allowCommandGroupName, 
+			String vimCommandName, String denyCommandGroupName) {
+		//click on rule to edit
+		sahiTasks.link(cn).click();
+		Assert.assertFalse(sahiTasks.checkbox(lsCommandName).exists(), "Verified command " + lsCommandName + " is deleted from Allow section of " + cn);
+		Assert.assertTrue(sahiTasks.checkbox(allowCommandGroupName).exists(), "Verified Sudo Command Group " + allowCommandGroupName + " is added to Allow Section of " + cn);
+		Assert.assertTrue(sahiTasks.checkbox(vimCommandName).exists(), "Verified Command " + vimCommandName + " is added to Deny section of " + cn);
+		Assert.assertFalse(sahiTasks.checkbox(denyCommandGroupName).exists(), "Verified Sudo Command Group" + denyCommandGroupName + " is deleted from Deny section of  " + cn);
+		
+		sahiTasks.link("Sudo Rules").in(sahiTasks.div("content")).click();			
+	}
+	
+	
+	/**
+	 * @param sahiTasks
+	 * @param cn
+	 * @param category - usercategory/hostcategory/cmdcategory/ipasudorunasusercategory/ipasudorunasgroupcategory
+	 * @param action - undo/Reset/Update
+	 */
+	public static void undoResetUpdateSudoRuleSections(SahiTasks sahiTasks, String cn, String category, String action) {
+		sahiTasks.link(cn).click();
+		
+		sahiTasks.radio(category).click();
+		sahiTasks.span(action).click();
+		if ( (action.equals("undo")) || (action.equals("Reset")) )
+			Assert.assertTrue(sahiTasks.radio(category+"[1]").checked(), "Verified " + category + " set after choosing to " + action);		
+		else
+			Assert.assertTrue(sahiTasks.radio(category).checked(), "Verified " + category + " set after choosing to " + action);
+		sahiTasks.link("Sudo Rules").in(sahiTasks.div("content")).click();			
+	}	
+	
+	
 	
 	/*
 	 * Choose multiple rules. 
@@ -321,12 +443,33 @@ public class SudoTasks {
 	public static void createSudoruleCommandGroupAdd(SahiTasks sahiTasks, String cn, String description) {
 
 		sahiTasks.link("Sudo Command Groups").click();
-		sahiTasks.span("Add[2]").click();
+		sahiTasks.span("Add").click();
 		sahiTasks.textbox("cn").setValue(cn);
 		sahiTasks.textbox("description").setValue(description);
 		sahiTasks.button("Add").click();
 				
 	}
+	
+	
+	/*
+	 * Add Sudo Commands to Sudo Command Groups
+	 * @param sahiTasks
+	 * @param commandGroupName - name of sudo command group
+	 * @param membertype - sudo command/sudo command group
+	 * @param name - name to add as member
+	 * @param button - Enroll or Cancel
+	 */
+	public static void addMembers(SahiTasks sahiTasks, String commandGroupName, String commandName, String button) {
+		sahiTasks.link(commandGroupName).click();
+
+		sahiTasks.span("Enroll").click();
+		sahiTasks.checkbox(commandName).click();
+		sahiTasks.span(">>").click();
+		sahiTasks.button(button).click();
+		sahiTasks.link("Sudo Command Groups").in(sahiTasks.div("content")).click();
+	}
+	
+	
 	
 	public static void deleteSudoruleCommandGroupDel(SahiTasks sahiTasks, String cn, String description) {
 		
