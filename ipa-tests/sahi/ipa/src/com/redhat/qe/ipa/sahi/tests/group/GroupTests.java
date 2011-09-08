@@ -1,74 +1,86 @@
 package com.redhat.qe.ipa.sahi.tests.group;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.util.logging.Logger;
-
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
+import org.testng.annotations.*; 
 
 import com.redhat.qe.auto.testng.TestNGUtils;
 import com.redhat.qe.ipa.sahi.base.SahiTestScript;
-import com.redhat.qe.ipa.sahi.tasks.CommonTasks;
-import com.redhat.qe.ipa.sahi.tasks.SahiTasks;
-import com.redhat.qe.ipa.sahi.tasks.GroupTasks;
+import com.redhat.qe.ipa.sahi.tasks.*;
+import com.redhat.qe.auto.testng.*;
 
 public class GroupTests extends SahiTestScript{
 	
 	private static Logger log = Logger.getLogger(GroupTests.class.getName());
-	public static String groupPage = ""; 
-	
+	private static SahiTasks browser=null;
 	
 	@BeforeClass (groups={"init"}, description="Initialize app for this test suite run", alwaysRun=true, dependsOnGroups="setup")
-	public void initialize() throws CloneNotSupportedException {			
-		sahiTasks.navigateTo(commonTasks.groupPage, true);
-		sahiTasks.setStrictVisibilityCheck(true);
-		
-		groupPage = commonTasks.groupPage; 
+	public void initialize() throws CloneNotSupportedException {
+		browser=sahiTasks;
+		browser.navigateTo(commonTasks.groupPage, true);
+		browser.setStrictVisibilityCheck(true);
+	}
+	 
+	@BeforeMethod (alwaysRun=true)
+	public void checkURL(){
+		String currentURL = browser.fetch("top.location.href");
+		if (!currentURL.equals(commonTasks.groupPage)){
+			log.info("current url=("+currentURL + "), is not a starting position, move to url=("+commonTasks.groupPage +")");
+			browser.navigateTo(commonTasks.groupPage, true);
+		}
 	}
 	
-	//TODO: yi: BeforeMethod
+	@Test (groups={"addGroup"}, description="add group test", dataProvider="positiveData")
+	public void addGroup_add(String testScenario, String groupName, String groupDescription, String isPosix){
+		Assert.assertFalse(browser.link(groupName).exists(),"before 'Add', group does NOT exists");
+		GroupTasks.add_UserGroup(browser, groupName, groupDescription, isPosix);
+		Assert.assertTrue(browser.link(groupName).exists(),"after 'Add', group exists");
+	}
 	
-	/*
-	 * Add groups - positive tests
-	 */
-	@Test (groups={"acceptanceTest"}, dataProvider="getGroupObjects")	
-	public void groupAcceptanceTest(String testName, String groupName, String groupDescription) throws Exception {
-		GroupTasks.simpleAddGroup(sahiTasks, groupName, groupDescription);
-		GroupTasks.addAndAddAnotherGroup(sahiTasks, groupName, groupDescription);
-		GroupTasks.addAndEditGroup(sahiTasks, groupName, groupDescription);
-		GroupTasks.editGroup(sahiTasks, groupName, groupDescription);
-		GroupTasks.membershipGroup(sahiTasks, groupName, groupDescription);
-		
-		// Notes: Yi Zhang 7.28.2011
-		// 1. what is missed: search box inside "enroll dialogbox" and pagenation are missing
-		// 2. how to extend current test
-		// 	(1) currently, test use only fixed data, to extend, we sholuld apply data driven mechanism
-		// 	(2) no negative test here
-		// 	(3) no i18n test here
-		//
-	}//groupAcceptanceTest
+	@Test (groups={"deleteGroup"}, description="delete group test", dataProvider="singleGroupData", dependsOnGroups="addGroup")
+	public void deleteGroup_single(String testScenario, String groupName){
+		Assert.assertTrue(browser.link(groupName).exists(),"before 'Delete', group should exists");
+		GroupTasks.deleteGroup(browser, groupName);
+		Assert.assertFalse(browser.link(groupName).exists(),"after 'Delete', group should disappear");
+	}
 	
-	/*
-	 * Add groups - positive tests
-	 */
-	@Test (groups={"smokeTest"}, dataProvider="getGroupObjects")	
-	public void groupSmokeTest(String testName, String groupName, String groupDescription) throws Exception {
-
-		GroupTasks.smokeTest(sahiTasks);
-		 
-	}//groupSmokeTest
+	@Test (groups={"deleteGroup"}, description="delete group test", dataProvider="multipluGroupsData", dependsOnGroups="addGroup")
+	public void deleteGroup_multiple(String testScenario, String groupNames){
+		String[] groups = groupNames.split(" ");
+		for (String groupName:groups){
+			Assert.assertTrue(browser.link(groupName).exists(),"before 'Delete', group should exists");
+		}
+		GroupTasks.deleteGroup(browser, groups);
+		for (String groupName:groups){			
+			Assert.assertFalse(browser.link(groupName).exists(),"after 'Delete', group should disappear");
+		}
+	}
 	
 	/*******************************************************
-	 ************      DATA PROVIDERS     ***********
+	 *                DATA PROVIDERS                       *
 	 *******************************************************/
-
-	/*
-	 * Data to be used when adding hosts - for positive cases
-	 */
+	@DataProvider (name="positiveData")
+	public Object[][] getUserGroup (){
+		String[][] groups={  //scenario, user group name, description, posix or not info
+							{"posix group",		"usergrp001_posix",		"test user group, #001, posix group",		"isPosix"},
+							{"non posix group",	"usergrp002_nonposix",	"test user group, #002, non posix group",	"nonPosix"},
+							{"default group",	"usergrp003_nonposix",	"test user group, #003, non posix group",	"default"}
+						  };
+		return groups;
+	}
+	
+	@DataProvider (name="singleGroupData")
+	public Object[][] getSingleGroup(){
+		String[][] singleGroup = {{"single group", "usergrp001_posix"}};
+		return singleGroup;
+	}
+	
+	@DataProvider (name="multipluGroupsData")
+	public Object[][] getMultipulGroups(){
+		String[][] multipulGroups = {{"multipul groups", "usergrp002_nonposix usergrp003_nonposix"}};
+		return multipulGroups;
+	}
+	
 	@DataProvider(name="getGroupObjects")
 	public Object[][] getGroupObjects() {
 		return TestNGUtils.convertListOfListsTo2dArray(createGroupObjects());

@@ -8,7 +8,8 @@
 	    <run>
 	        <include name="setup" />
 	        <include name="init" /> 
-	        <include name="acceptanceTest" /> 				
+	        <include name="addGroup" /> 
+	        <include name="deleteGroup" />
 	    </run>
 	</groups>
 	<classes>
