@@ -63,7 +63,7 @@ hbacsvc_master_001() {
 		rlRun "ipa hbactest --user=$user1 --srchost=$CLIENT --host=$CLIENT2 --service=sshd | grep -i \"Access granted: False\"" 
 
 		rlRun "ipa hbactest --user=$user1 --srchost=$CLIENT --host=$CLIENT --service=sshd --rule=rule1 | grep -E '(Access granted: True|matched: rule1)'"
-		rlRun "ipa hbactest --user=$user1 --srchost=$CLIENT --host=$CLIENT --service=sshd --rule=rule2 | grep -E '(Access granted: False|notmatched: rule2)'" 
+		rlRun "ipa hbactest --user=$user1 --srchost=$CLIENT --host=$CLIENT --service=sshd --rule=rule2 | grep -E '(Unresolved rules in --rules|error: rule2)'" 
 		rlRun "ipa hbactest --user=$user2 --srchost=$CLIENT --host=$CLIENT --service=sshd --rule=rule1 | grep -E '(Access granted: False|notmatched: rule1)'"
 		rlRun "ipa hbactest --srchost=$CLIENT --host=$CLIENT --service=sshd  --user=$user1 --rule=rule1 --nodetail | grep -i \"Access granted: True\""
 		rlRun "ipa hbactest --srchost=$CLIENT --host=$CLIENT --service=sshd  --user=$user1 --rule=rule1 --nodetail | grep -i \"matched: rule1\"" 1
@@ -2074,6 +2074,61 @@ hbacsvc_client2_030() {
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 rlRun "getent -s sss passwd $user30"
                 rlRun "ssh_auth_success $user30 testpw123@ipa.com $CLIENT"
+
+        rlPhaseEnd
+
+}
+
+hbacsvc_master_bug736314() {
+
+        rlPhaseStartTest "ipa-hbacsvc-bug736314: user736314 part of rule736314 is allowed to access $MASTER from $CLIENT"
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                rlRun "ipa hbacrule-disable allow_all"
+
+                rlRun "ipa hbacrule-add rule736314"
+                rlRun "ipa hbacrule-add-user rule736314 --users=$user736314"
+                rlRun "ipa hbacrule-add-host rule736314 --hosts=$MASTER"
+                rlRun "ipa hbacrule-add-sourcehost rule736314 --hosts=$CLIENT,externalhost.randomhost.com,externalhost2.randomhost.com"
+                rlRun "ipa hbacrule-add-service rule736314 --hbacsvcs=sshd"
+                rlRun "ipa hbacrule-show rule736314 --all"
+
+        # ipa hbactest:
+
+                rlRun "ipa hbactest --user=$user736314 --srchost=externalhost.randomhost.com --host=$MASTER --service=sshd | grep -E '(Access granted: True|matched: rule736314)'"
+                rlRun "ipa hbactest --user=$user736314 --srchost=externalhost2.randomhost.com --host=$MASTER --service=sshd | grep -E '(Access granted: True|matched: rule736314)'"
+                rlRun "ipa hbactest --user=$user2 --srchost=externalhost.randomhost.com --host=$MASTER --service=sshd | grep -i \"Access granted: False\""
+                rlRun "ipa hbactest --user=$user736314 --srchost=externalhost.randomhost.com --host=externalhost2.randomhost.com --service=sshd | grep -i \"Access granted: False\""
+                rlRun "ipa hbactest --user=$user736314 --srchost=$CLIENT --host=externalhost.randomhost.com --service=sshd | grep -i \"Access granted: False\""
+
+                rlRun "ipa hbactest --user=$user736314 --srchost=externalhost.randomhost.com --host=$MASTER --service=sshd --rule=rule736314 | grep -E '(Access granted: True|matched: rule736314)'"
+                rlRun "ipa hbactest --user=$user736314 --srchost=externalhost2.randomhost.com --host=$MASTER --service=sshd --rule=rule736314 | grep -E '(Access granted: False|notmatched: rule736314)'"
+                rlRun "ipa hbactest --user=$user2 --srchost=externalhost.randomhost.com --host=externalhost.randomhost.com --service=sshd --rule=rule736314 | grep -E '(Access granted: False|notmatched: rule736314)'"
+                rlRun "ipa hbactest --user=$user736314 --srchost=externalhost.randomhost.com --host=$MASTER --service=sshd --rule=rule736314 --nodetail | grep -i \"Access granted: True\""
+                rlRun "ipa hbactest --user=$user736314 --srchost=externalhost2.randomhost.com --host=$MASTER --service=sshd --rule=rule736314 --nodetail | grep -i \"Access granted: True\""
+                rlRun "ipa hbactest --user=$user736314 --srchost=$CLIENT --host=$MASTER --service=sshd --rule=rule736314 --nodetail | grep -i \"Access granted: True\""
+                rlRun "ipa hbactest --user=$user736314 --srchost=externalhost.randomhost.com --host=$MASTER --service=sshd --rule=rule736314 --nodetail | grep -i \"matched: rule736314\"" 1
+
+        rlPhaseEnd
+}
+
+hbacsvc_client_bug736314() {
+
+        rlPhaseStartTest "ipa-hbacsvc-client1-bug736314: user736314 part of rule736314 is allowed to access $MASTER from $CLIENT"
+
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                rlRun "getent -s sss passwd $user736314"
+                rlRun "ssh_auth_success $user736314 testpw123@ipa.com $MASTER"
+
+        rlPhaseEnd
+}
+
+hbacsvc_client2_bug736314() {
+
+        rlPhaseStartTest "ipa-hbacsvc-client2-bug736314: user736314 part of rule736314 is allowed to access $MASTER from $CLIENT"
+
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                rlRun "getent -s sss passwd $user736314"
+                rlRun "ssh_auth_failure $user736314 testpw123@ipa.com $MASTER"
 
         rlPhaseEnd
 
