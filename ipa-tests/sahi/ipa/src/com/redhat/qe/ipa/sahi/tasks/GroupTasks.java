@@ -181,6 +181,33 @@ public class GroupTasks {
 			sahiTasks.link("User Groups").in(sahiTasks.div("content")).click();
 		
 	}
+	
+	/*
+	 * Add group members
+	 * @param sahiTasks
+	 * @param groupname - name of user group
+	 * @param membertype - user or usergroup
+	 * @param name - name to add as member
+	 * @param button - Enroll or Cancel
+	 */
+	public static void addMembers(SahiTasks sahiTasks, String groupName, String membertype, String name, String button) {
+		sahiTasks.link(groupName).click();
+		if (membertype == "user"){
+			sahiTasks.link("member_user").click();
+		}
+		if (membertype == "usergroup"){
+			sahiTasks.link("memberof_group").click();
+		}
+		
+		sahiTasks.radio("direct").click();
+		sahiTasks.link("Enroll").click();
+		
+		sahiTasks.checkbox(name).click();
+		
+		sahiTasks.span(">>").click();
+		sahiTasks.button(button).click();
+		sahiTasks.link("User Groups").in(sahiTasks.div("content")).click();
+	}
     
     /*
      * Create a Group, the purpose of this is to provide a public interface to other test suite to create a new group.

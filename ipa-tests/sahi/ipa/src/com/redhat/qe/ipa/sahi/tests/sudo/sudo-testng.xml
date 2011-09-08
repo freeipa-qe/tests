@@ -9,8 +9,11 @@
 			    <include name="setup" />
 			    <include name="sudoRuleAddTests" />	
 			    <include name="sudoRuleCancelAddTests" />
-			    <include name="sudoRuleAddAndAddAnotherTests" />			    
+			    <include name="sudoRuleAddAndAddAnotherTests" />
 			    <include name="sudoRuleAddAndEditTests" />
+			    <include name="sudoRuleGeneralSettingsTests" />		    
+			    <include name="sudoRuleOptionsSettingsTests" />
+			    <include name="sudoRuleWhoSettingsTests" />
 			    <include name="invalidSudoRuleAddTests" />
 			    <include name="sudoRuleRequiredFieldAddTests" />
 			    <include name="sudoRuleExpandCollapseTests" />

@@ -159,86 +159,96 @@ public class SudoTasks {
 	}
 	
 	
-	public static void modifySudorule(SahiTasks sahiTasks, String cn, String description, String ipasudoopt) {
-		
-		sahiTasks.link("Sudo Rules").click();
-		sahiTasks.cell(cn).click();
+	public static void modifySudoRuleGeneralSection(SahiTasks sahiTasks, String cn, String description) {
 		sahiTasks.link(cn).click();
+		
 		sahiTasks.textarea("description").setValue(description);
-		
-		//Update and go back to sudo rules list 
-		sahiTasks.span("Update").click();
-		sahiTasks.link("Sudo Rules").in(sahiTasks.div("content")).click();
-		
-		// Disable Sudo rule
-		sahiTasks.link("Sudo Rules").click();
-		sahiTasks.link(cn).click();
 		sahiTasks.radio("ipaenabledflag[1]").click();
+		
 		sahiTasks.span("Update").click();
-		sahiTasks.link("Sudo Rules[1]").click();
-		sahiTasks.link(cn).click();
+		sahiTasks.link("Sudo Rules").in(sahiTasks.div("content")).click();	
 		
-		//Re-enable sudo rule
-		sahiTasks.link("Sudo Rules").click();
-		sahiTasks.link(cn).click();
-		sahiTasks.radio("ipaenabledflag").click();
-		sahiTasks.span("Update").click();
-		sahiTasks.link("Sudo Rules[1]").click();
-		sahiTasks.link(cn).click();
-		
-		//Add sudo command to this rule
-		sahiTasks.link("Sudo Rules").click();
-		sahiTasks.link(cn).click();
-		sahiTasks.heading3("Allow").click();
-		sahiTasks.span("Add[6]").click();
-		sahiTasks.checkbox("select[21]").click();
-		sahiTasks.span(">>").click();
-		sahiTasks.button("Enroll").click();
-		sahiTasks.link(cn).click();
-		
-		//Del sudo command from this rule
-		sahiTasks.link("Sudo Rules[1]").click();
-		sahiTasks.link(cn).click();
-		sahiTasks.checkbox("select[10]").click();
-		sahiTasks.span("Delete[6]").click();
-		sahiTasks.button("Delete").click();
-		sahiTasks.link("Sudo Rules[1]").click();
-		
-		//Add sudooption to an existing sudorule and go back to sudo rules list
-		sahiTasks.link(cn).click();
-		sahiTasks.span("Add[1]").click();
-		sahiTasks.textbox("ipasudoopt").setValue(ipasudoopt);
-		sahiTasks.button("Add").click();
-		sahiTasks.link("Sudo Rules").in(sahiTasks.div("content")).click();
-		
-		//Del sudooption from an existing sudorule and go back to sudo rules list
-		sahiTasks.link(cn).click();
-		sahiTasks.checkbox(ipasudoopt).click();
-		sahiTasks.span("Delete[1]").click();
-		sahiTasks.button("Delete").click();
-		sahiTasks.link("Sudo Rules").in(sahiTasks.div("content")).click();
-		
-		//
 	}
-
-	public static void verifySudoruledescUpdates(SahiTasks sahiTasks, String cn, String description, String ipasudoopt) {
-		//click on sudo rule to edit
-		sahiTasks.link(cn).click();
+	
+	public static void verifySudoRuleGeneralSection(SahiTasks sahiTasks, String cn, String description) {
+        sahiTasks.link(cn).click();
 		
-		//verify sudorule's description
-		com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textarea("description").value(), description, "Verified updated description for sudorule " + cn);
-				
-		sahiTasks.link("Sudo Rules").in(sahiTasks.div("content")).click();
+		Assert.assertTrue(sahiTasks.textarea("description").containsText(description), "Verified description is set correctly");
+		Assert.assertTrue(sahiTasks.radio("ipaenabledflag[1]").checked(), "Verified rule is disabled");		
+		
+		sahiTasks.link("Sudo Rules").in(sahiTasks.div("content")).click();			
 	}
-	/* shanks
-	public static void deleteSudorule(SahiTasks sahiTasks, String cn) {
-		
-		sahiTasks.link("Sudo Rules").click();
-		sahiTasks.checkbox(cn).click();
+	
+	public static void modifySudoRuleOptionsSection(SahiTasks sahiTasks, String cn, String option1, String option2) {
+		sahiTasks.link(cn).click();
+		Assert.assertTrue(sahiTasks.span(option1).exists(), "Verified option to be deleted exists");
+		sahiTasks.checkbox(option1).click();
 		sahiTasks.span("Delete").click();
 		sahiTasks.button("Delete").click();
 		
-	}*/
+		sahiTasks.span("Add").click();
+		sahiTasks.textbox("ipasudoopt").setValue(option2);
+		sahiTasks.button("Add").click();
+		
+		sahiTasks.span("Update").click();
+		sahiTasks.link("Sudo Rules").in(sahiTasks.div("content")).click();	
+		
+	}
+	
+	public static void verifySudoRuleOptionsSection(SahiTasks sahiTasks, String cn, String option1, String option2) {
+        sahiTasks.link(cn).click();
+		
+        
+        Assert.assertFalse(sahiTasks.span(option1).exists(), "Verified option was deleted successfuly");
+        Assert.assertTrue(sahiTasks.span(option2).exists(), "Verified option was added successfuly");
+        
+        
+		sahiTasks.link("Sudo Rules").in(sahiTasks.div("content")).click();			
+	}
+
+	
+
+	/**
+	 * Modify Who Section for an HBAC Rule
+	 * @param sahiTasks
+	 * @param cn - the rule to modify for
+	 */
+	public static void modifySudoRuleWhoSection(SahiTasks sahiTasks, String cn, String user, String usergroup ) {
+		sahiTasks.link(cn).click();
+		
+		sahiTasks.checkbox(user).click();	
+		sahiTasks.span("Delete").under(sahiTasks.heading2(("Who"))).near(sahiTasks.span("Users")).click();
+		sahiTasks.button("Delete").click();
+		sahiTasks.span("Add").under(sahiTasks.heading2(("Who"))).near(sahiTasks.span("User Groups")).click();
+		sahiTasks.checkbox(usergroup).click();
+		sahiTasks.span(">>").click();
+		sahiTasks.button("Enroll").click();
+		
+		sahiTasks.span("Update").click();
+		sahiTasks.link("Sudo Rules").in(sahiTasks.div("content")).click();			
+	}
+	
+		
+	
+	
+	
+	public static void verifySudoRuleForEnrollmentInWhoSection(SahiTasks sahiTasks, CommonTasks commonTasks, String cn, String member, 
+			String memberType, String type, boolean isMember) {
+		sahiTasks.link(cn).click();
+		
+		if (sahiTasks.link(member).exists()) {
+			sahiTasks.link(member).click();
+			CommonTasks.verifyMemberOf(sahiTasks, member, memberType, "Sudo Rules", cn, type, isMember);			
+		}
+		else {
+			if (memberType.equals("Users"))
+				sahiTasks.navigateTo(commonTasks.userPage);
+			else
+				sahiTasks.navigateTo(commonTasks.groupPage);
+			sahiTasks.link(member).click();
+			CommonTasks.verifyMemberOf(sahiTasks, member, memberType, "Sudo Rules", cn, type, isMember);
+		}
+	}
 	
 	/*
 	 * Choose multiple rules. 

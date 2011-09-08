@@ -18,6 +18,45 @@ import com.redhat.qe.ipa.sahi.tasks.CommonTasks;
 import com.redhat.qe.ipa.sahi.tasks.SahiTasks;
 import com.redhat.qe.ipa.sahi.tasks.UserTasks;
 
+/*
+ * TODO: nkrishnan:
+ * Review comments:
+ * 1. In UserTests we can include positive tests for valid non-alphanumeric
+chars such as _, -, . and $ in various position within uid.
+
+2. In UserTests.userEditTests we could test emptying a text field and
+deleting values from multivalued fields as well.
+
+3. In UserTests.userAddDeleteUndoResetTests we can verify that the
+undo/reset does revert the fields before leaving the page.
+
+4. In UserTests' userEditIdentitySettingsTests,
+testUserEditMailingAddress, and testUserEditEmpMiscInfo we can verify
+that required fields are checked on update (i.e. missing required fields
+will generate a validation error from the UI instead of error message
+from the server).
+
+5. In UserTests.userSetPasswordTests we could test empty, invalid, or
+mismatching passwords. We might also want to verify that the user will
+see the self-service UI instead of the full admin UI.
+
+6. We could also test adding a user that has actually been added via
+CLI. It should fail, but then automatically refresh the page to show the
+user. Same thing for deleting a user.
+
+7. Similar to #6 but involving multiple users. The error dialog should
+show the users that failed to be added/deleted.
+
+8. We might want to test the Select/Unselect All checkbox in various tables.
+
+9. In UserTests.userSearchTests we can test different filters, e.g.
+searching using partial uid or last name.
+
+10. We can test adding/removing a user to/from another entity (i.e.
+groups, netgroups, roles, hbac rules, and sudo rules) using the user's
+member-of tabs.
+ */
+
 public class UserTests extends SahiTestScript{
 	private static Logger log = Logger.getLogger(UserTests.class.getName());
 	

@@ -21,7 +21,8 @@ public class CommonTasks {
 	public static String serverUrl = System.getProperty("ipa.server.url");
 	
 	public String userPage = serverUrl + "/ipa/ui/#identity=user&navigation=identity";	
-	public String groupPage = serverUrl +  "/ipa/ui/#nagivation=identity&identity=group";
+//	public String groupPage = serverUrl +  "/ipa/ui/#nagivation=identity&identity=group";
+	public String groupPage = serverUrl + "/ipa/ui/#identity=group&navigation=identity";
 	public String hostPage =  serverUrl + "/ipa/ui/#identity=host&navigation=identity";
 	public String hostgroupPage =  serverUrl + "/ipa/ui/#identity=hostgroup&navigation=identity";
 	public String netgroupPage =  serverUrl + "/ipa/ui/#identity=netgroup&navigation=identity";
@@ -277,5 +278,55 @@ public class CommonTasks {
 		return false;
 	}
 	
+	
+	
+	
+	/**
+	 * Verify Membership
+	 * Note: navigation to and from should be controlled by caller
+	 * 
+	 * @param sahiTasks
+	 * @param member - the member being verify for - the username/groupname
+	 * @param membertype - the type of member being verified - Users/User Groups
+	 * @param memberOfType - the memberOf type to which the member belongs - User Groups/Netgroups/Roles/HBAC Rules/Sudo Rules
+	 * @param memberOfName - the memberOf name to which the member belongs - the groupname/sudorulename
+	 * @param type - is the member a direct/indirect memberof
+	 * @param isMember - is the member expected to be exist - true/false
+	 */
+	public static void verifyMemberOf(SahiTasks sahiTasks, String member, String membertype, String memberOfType, String memberOfName,
+			String type, boolean isMember) {		
+		
+		if (memberOfType == "User Groups"){
+			sahiTasks.link("memberof_group").click();
+		}
+		if (memberOfType == "Netgroups"){
+			sahiTasks.link("memberof_netgroup").click();
+		}
+		if (memberOfType =="Roles"){
+			sahiTasks.link("memberof_role").click();
+		}
+		if (memberOfType == "HBAC Rules"){
+			sahiTasks.link("memberof_hbacrule").click();
+		}
+		if (memberOfType == "Sudo Rules"){
+			sahiTasks.link("memberof_sudorule").click();
+		}
+	
+		sahiTasks.radio(type).click();
+		
+		if (isMember){
+			Assert.assertTrue(sahiTasks.link(memberOfName).exists(), membertype + " " +  member + " is a " + type + 
+					" member of " + memberOfType + " " + memberOfName);
+		}
+		else {
+			Assert.assertFalse(sahiTasks.link(memberOfName).exists(), membertype + " " + member + " is NOT a " + type + 
+					" member of " + memberOfType + " "+ memberOfName);
+		}
+		
+
+		if (sahiTasks.link(membertype).in(sahiTasks.div("content")).exists())
+			sahiTasks.link(membertype).in(sahiTasks.div("content")).click();
+		
+	}
 
 }

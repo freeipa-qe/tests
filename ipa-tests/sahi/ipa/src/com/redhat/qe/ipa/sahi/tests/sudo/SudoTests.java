@@ -265,6 +265,80 @@ public class SudoTests extends SahiTestScript{
 		CommonTasks.clearSearch(sahiTasks);
 	}
 	
+	
+
+	/*
+	 * Edit the General Section for the Sudo Rule
+	 */
+	@Test (groups={"sudoRuleGeneralSettingsTests"}, dataProvider="getSudoRuleGeneralSettingsTestObjects", dependsOnGroups={"sudoRuleAddAndEditTests"})
+	public void testSudoRuleGeneralSettings(String testName, String cn, String description) throws Exception {		
+		//verify rule to be edited exists
+		Assert.assertTrue(sahiTasks.link(cn).exists(), "Verify Rule " + cn + " to be edited exists");
+		
+		//modify this rule
+		SudoTasks.modifySudoRuleGeneralSection(sahiTasks, cn, description);
+		
+		//verify changes	
+		SudoTasks.verifySudoRuleGeneralSection(sahiTasks, cn, description);
+	}
+	
+	
+	/*
+	 * Edit the Options Section for the Sudo Rule
+	 */
+	@Test (groups={"sudoRuleOptionsSettingsTests"}, dataProvider="getSudoRuleOptionsSettingsTestObjects", dependsOnGroups={"sudoRuleAddAndEditTests"})
+	public void testSudoRuleOptionsSettings(String testName, String cn, String option1, String option2) throws Exception {		
+		//verify rule to be edited exists
+		Assert.assertTrue(sahiTasks.link(cn).exists(), "Verify Rule " + cn + " to be edited exists");
+		
+		//modify this rule
+		SudoTasks.modifySudoRuleOptionsSection(sahiTasks, cn, option1, option2);
+		
+		//verify changes	
+		SudoTasks.verifySudoRuleOptionsSection(sahiTasks, cn, option1, option2);
+	}
+	
+
+	/*
+	 * Edit the Who Section for the Sudo Rule
+	 * Testing:
+	 * Verify user added as part of sudoRuleAddAndEditTests is a member of this sudo rule
+	 * delete this user, add a user group in this section
+	 * verify the user is not a member, and groups is a member of this sudo rule
+	 * add the user to the group
+	 * verify the user is an indirect member of the group
+	 */
+	//@Test (groups={"sudoRuleWhoSettingsTests"}, dataProvider="getEditSudoRuleTestObjects", dependsOnGroups={"sudoRuleAddAndEditTests", "sudoRuleMemberListTests"})
+	@Test (groups={"sudoRuleWhoSettingsTests"}, dataProvider="getEditSudoRuleTestObjects")
+	public void testSudoRuleWhoSettings(String testName, String cn) throws Exception {		
+		//verify rule to be edited exists
+		Assert.assertTrue(sahiTasks.link(cn).exists(), "Verify Rule " + cn + " to be edited exists");
+		
+		//verify by clicking on user - it is a member of this Sudo rule
+		SudoTasks.verifySudoRuleForEnrollmentInWhoSection(sahiTasks, commonTasks, cn, uid, "Users", "direct", true);
+		sahiTasks.navigateTo(commonTasks.sudoRulePage, true);
+		
+		//modify this rule
+		SudoTasks.modifySudoRuleWhoSection(sahiTasks, cn, uid, groupName);
+		//verify by clicking on usergroup - it is a member of this Sudo rule
+		SudoTasks.verifySudoRuleForEnrollmentInWhoSection(sahiTasks, commonTasks, cn, groupName, "User Groups", "direct", true);
+		sahiTasks.navigateTo(commonTasks.sudoRulePage, true);
+		
+		
+		//verify by clicking on user - it is a member of this Sudo rule
+		SudoTasks.verifySudoRuleForEnrollmentInWhoSection(sahiTasks,commonTasks,cn, uid, "Users", "direct", false);
+		sahiTasks.navigateTo(commonTasks.sudoRulePage, true);
+		
+		//add user to usergroup
+		sahiTasks.navigateTo(commonTasks.groupPage, true);
+		GroupTasks.addMembers(sahiTasks, groupName, "user", uid, "Enroll");
+		sahiTasks.navigateTo(commonTasks.sudoRulePage, true);
+		
+		//now verify it is indirect member of this Sudo rule
+		SudoTasks.verifySudoRuleForEnrollmentInWhoSection(sahiTasks, commonTasks, cn, uid, "Users", "indirect", true);
+		sahiTasks.navigateTo(commonTasks.sudoRulePage, true);
+	}
+	
 	/*
 	 * Verify member list for the Sudo Rule
 	 * uid is added as member of groupName
@@ -296,7 +370,7 @@ public class SudoTests extends SahiTestScript{
 		//delete user, user group, host, host group added for this suite
 		sahiTasks.navigateTo(commonTasks.userPage, true);
 		//Since memberships were checked previously, may not be in the front page for User
-		if (sahiTasks.link("Users").in(sahiTasks.div("content")).exists())
+/*		if (sahiTasks.link("Users").in(sahiTasks.div("content")).exists())
 			sahiTasks.link("Users").in(sahiTasks.div("content")).click();
 		if (sahiTasks.link(uid).exists())
 			UserTasks.deleteUser(sahiTasks, uid);
@@ -350,7 +424,7 @@ public class SudoTests extends SahiTestScript{
 				log.fine("Cleaning Sudo Rule: " + sudoRuleTestObject);
 				SudoTasks.deleteSudo(sahiTasks, sudoRuleTestObject, "Delete");
 			}			
-		}
+		}*/
 	}
 	
 	/*******************************************************
@@ -511,5 +585,37 @@ public class SudoTests extends SahiTestScript{
 	}
 	
 	
+	/*
+	 * Data to be used when modifying General Section 
+	 */
+	@DataProvider(name="getSudoRuleGeneralSettingsTestObjects")
+	public Object[][] getSudoRuleGeneralSettingsTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(editSudoRuleGeneralSettingsTestObject());
+	}
+	protected List<List<Object>> editSudoRuleGeneralSettingsTestObject() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname					cn   				description
+		ll.add(Arrays.asList(new Object[]{ "edit_general_sudorule",			"SudoRule4",		"This rule is for eng"      } ));
+		
+		return ll;	
+	}
+	
+
+	/*
+	 * Data to be used when modifying General Section 
+	 */
+	@DataProvider(name="getSudoRuleOptionsSettingsTestObjects")
+	public Object[][] getSudoRuleOptionsSettingsTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(editSudoRuleOptionsSettingsTestObject());
+	}
+	protected List<List<Object>> editSudoRuleOptionsSettingsTestObject() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname					cn   				option1							option2
+		ll.add(Arrays.asList(new Object[]{ "edit_general_sudorule",			"SudoRule4",		"logfile=/var/log/sudolog",		"env_delete+=\"JAVA_HOME\""      } ));
+		
+		return ll;	
+	}
 	
 }
