@@ -8,12 +8,6 @@ import com.redhat.qe.ipa.sahi.tests.group.GroupTests;
 public class GroupTasks {
     private static Logger log = Logger.getLogger(GroupTasks.class.getName());
      
-    /*
-     * Add a Group
-     * @param sahiTasks 
-     * @param groupName - user group name
-     * @param groupDescription - group description
-     */
     public static void addGroup(SahiTasks sahiTasks, String groupName, String groupDescription) {
         sahiTasks.span("Add").click();
         sahiTasks.textbox("cn").setValue(groupName);
@@ -21,22 +15,12 @@ public class GroupTasks {
         sahiTasks.button("Add").click();
     }
     
-    /*
-     * Delete a Group
-     * @param sahiTasks 
-     * @param groupname - name of group to delete
-     */
     public static void deleteGroup(SahiTasks sahiTasks, String groupName) {
     	sahiTasks.checkbox(groupName).click();
         sahiTasks.link("Delete").click();
         sahiTasks.button("Delete").click();
     }
-    
-    /*
-     * Delete a Group
-     * @param sahiTasks 
-     * @param groupnames - array of group names to delete
-     */
+
     public static void deleteGroup(SahiTasks sahiTasks, String [] groupnames) {
     	for (String groupname : groupnames) {
     		sahiTasks.checkbox(groupname).click();
@@ -44,6 +28,26 @@ public class GroupTasks {
         sahiTasks.link("Delete").click();
         sahiTasks.button("Delete").click();
     }
+    
+    /*
+     * Create a Group, the purpose of this is to provide a public interface to other test suite to create a new group.
+     * @param sahiTasks 
+     * @param groupName - user group name
+     * @param groupDescription - group description
+     */
+    public static void createGroupService(SahiTasks sahiTasks, String groupName, String groupDescription, String originalURL) {
+	// negative to group creation page, but there might be a bug here	
+    	//TODO: yi: navigate in tests before starting task
+    	//sahiTasks.navigateTo(GroupTests.groupPage, true);
+        sahiTasks.span("Add").click();
+        sahiTasks.textbox("cn").setValue(groupName);
+        sahiTasks.textbox("description").setValue(groupDescription);
+        sahiTasks.button("Add").click();
+
+	// go back to caller url
+    	sahiTasks.navigateTo(originalURL, true);
+
+    }//createGroupService
     
     /*
 	 * verify members
@@ -181,143 +185,71 @@ public class GroupTasks {
 			sahiTasks.link("User Groups").in(sahiTasks.div("content")).click();
 		
 	}
-	
-	/*
-	 * Add group members
-	 * @param sahiTasks
-	 * @param groupname - name of user group
-	 * @param membertype - user or usergroup
-	 * @param name - name to add as member
-	 * @param button - Enroll or Cancel
-	 */
-	public static void addMembers(SahiTasks sahiTasks, String groupName, String membertype, String name, String button) {
-		sahiTasks.link(groupName).click();
-		if (membertype == "user"){
-			sahiTasks.link("member_user").click();
-		}
-		if (membertype == "usergroup"){
-			sahiTasks.link("memberof_group").click();
-		}
-		
-		sahiTasks.radio("direct").click();
-		sahiTasks.link("Enroll").click();
-		
-		sahiTasks.checkbox(name).click();
-		
-		sahiTasks.span(">>").click();
-		sahiTasks.button(button).click();
-		sahiTasks.link("User Groups").in(sahiTasks.div("content")).click();
+
+	public static void add_UserGroup(SahiTasks browser, String groupName, String groupDescription, String isPosix){
+        browser.link("Add").click();
+        browser.textbox("cn").setValue(groupName);
+        browser.textbox("description").setValue(groupDescription);
+        if (isPosix.equals("isPosix")){
+        	browser.checkbox("posix").click();
+        }
+        browser.button("Add").click();
 	}
-    
-    /*
-     * Create a Group, the purpose of this is to provide a public interface to other test suite to create a new group.
-     * @param sahiTasks 
-     * @param groupName - user group name
-     * @param groupDescription - group description
-     */
-    public static void createGroupService(SahiTasks sahiTasks, String groupName, String groupDescription, String originalURL) {
-	// negative to group creation page, but there might be a bug here	
-    	//TODO: yi: navigate in tests before starting task
-    	//sahiTasks.navigateTo(GroupTests.groupPage, true);
-        sahiTasks.span("Add").click();
-        sahiTasks.textbox("cn").setValue(groupName);
-        sahiTasks.textbox("description").setValue(groupDescription);
-        sahiTasks.button("Add").click();
-
-	// go back to caller url
-    	sahiTasks.navigateTo(originalURL, true);
-
-    }//createGroupService
-
-
-    /*
-     * Test for: Simple add Group
-     * @param sahiTasks 
-     * @param groupName - user group name
-     * @param groupDescription - group description
-     */
-    public static void simpleAddGroup(SahiTasks sahiTasks, String groupName, String groupDescription) {
-
-        //sahiTasks.link("User Groups").click();
-        sahiTasks.span("Add").click();
-        sahiTasks.textbox("cn").setValue("auto_sahi_java_001");
-        sahiTasks.textbox("description").setValue("auto sahi 001 in java");
-        sahiTasks.button("Add").click();
-        sahiTasks.checkbox("auto_sahi_java_001").click();
-        sahiTasks.link("Delete").click();
-        sahiTasks.button("Delete").click();
+	
+	public static void add_and_add_another_UserGroup(SahiTasks browser, 
+													String firstGroupName, String firstGroupDescription, String first_isPosix,
+													String secondGroupName, String secondGroupDescription, String second_isPosix){
         
-    }// simpleAddGroup
-
-
-    /*
-     * Test for: add and add another Group
-     * @param sahiTasks 
-     * @param groupName - user group name
-     * @param groupDescription - group description
-     */
-    public static void addAndAddAnotherGroup(SahiTasks sahiTasks, String groupName, String groupDescription) {
-            // over all, this test case will covering the following scenario:
-            // 1. ensure "add and add another group" works
-            // 2. ensure "add and add another group" can be canceled 
-            // 3. ensure deletion of one group works
-            // 4. ensure deletion can be canceled
-            // 5. ensure deletion of multiple groups works
-            // the reasons to contain "deletion" test step are: 
-            //        (1) ensure the clean data exit, make sure no left over data that cause other test suite to fail or fake success 
-            //        (2) ensure the success of  adding groups
+        browser.link("Add").click();
+        browser.textbox("cn").setValue(firstGroupName);
+        browser.textbox("description").setValue(firstGroupDescription);
+        if (first_isPosix.equals("isPosix")){
+        	browser.checkbox("posix").click();
+        }
         
-            // this test contains the following logic/page flow path:
-            // add user group -> fill the form to create a new user group -> click "add and add another" to retain the same dialog and continue add 
-            // --> after add total 3 new user groups, click "cancel" to go back to main user group page
-            // --> then start to delete the newly created user groups: click the first one and delete it : sahi_auto_addandaddanother_001
-            // --> select the second one, but click "cancel" to NOT delete it, in UI, the second one is still in "selected" status (sahi_auto_addandaddanother_002)
-            // --> then select the third one, at this point, there will be total 2 newly created user groups being selected"
-            // --> click "delete" to delete the remaining two newly created user groups (sahi_auto_addandaddanother_002, sahi_auto_addandaddanother_003)
+        // click Add and Add Another to create a new group without leave the current dialog , this the main purpose of this test case
+        browser.button("Add and Add Another").click();    
+        browser.textbox("cn").setValue(secondGroupName);
+        browser.textbox("description").setValue(secondGroupDescription);
+        if (second_isPosix.equals("isPosix")){
+        	browser.checkbox("posix").click();
+        }
         
-            // get into add user group page
-            //sahiTasks.link("User Groups").click();
-            
-            // enter simple add group dialog, and add the first user group: sahi_auto_addandaddanother_001
-            sahiTasks.link("Add").click();
-            sahiTasks.textbox("cn").setValue("sahi_auto_addandaddanother_001");
-            sahiTasks.textbox("description").setValue("sahi auto, add and add another 001");
-            
-            // click Add and Add Another to create a new group without leave the current dialog , this the main purpose of this test case
-            sahiTasks.button("Add and Add Another").click();    
-            sahiTasks.textbox("cn").setValue("sahi_auto_addandaddanother_002");
-            sahiTasks.textbox("description").setValue("sahi auto, add and add another 002");
-            sahiTasks.checkbox("posix").click();
-            
-            // add another user group
-            sahiTasks.button("Add and Add Another").click();
-            sahiTasks.textbox("cn").setValue("sahi_auto_addandaddanother_003");
-            sahiTasks.textbox("description").setValue("sahi auto, add and add another 003");
-            sahiTasks.checkbox("posix").click();
-            
-            // finally cancel to go back to main user group page
-            sahiTasks.button("Add and Add Another").click();
-            sahiTasks.button("Cancel").click();
-                
-            // deletion test starts here: 
-            //                    test 1: single deletion test
-            sahiTasks.checkbox("sahi_auto_addandaddanother_001").click();
-            sahiTasks.link("Delete").near(sahiTasks.link("Add")).click();
-            sahiTasks.button("Delete").click();
-            
-            //                    test 2: single deletion canceling test    
-            sahiTasks.checkbox("sahi_auto_addandaddanother_002").click();
-            sahiTasks.link("Delete").click();
-            sahiTasks.button("Cancel").click();
+        // finally cancel to go back to main user group page
+        browser.button("Add and Add Another").click();
+        browser.button("Cancel").click();
+	}
+	
+	public static void add_and_edit_UserGroup(SahiTasks browser, String groupName, String groupDescription, String isPosix){
+        browser.link("Add").click();
 
-            //                    test 3: multiple  deletion test
-            sahiTasks.checkbox("sahi_auto_addandaddanother_003").click();
-            sahiTasks.link("Delete").click();
-            sahiTasks.button("Delete").click(); 
+        browser.textbox("cn").near(browser.label("Group name:")).setValue(groupName);
+        browser.textbox("description").near(browser.label("Description:")).setValue(groupDescription);
+        if (isPosix.equals("isPosix")){
+        	browser.checkbox("posix").click();
+        } 
+        browser.button("Add and Edit").click();
+        
+        // do some minimum editing to ensure page navigation is what we are intend to do
+        browser.link("Settings").click();
+        browser.textbox("description").setValue("verify get into edit mode: " + groupDescription);
+        browser.link("Update").click();
+        
+        // go back to use group list page
+        //browser.link("User Groups").in(browser.div("content")).click();
+	}
+	
+	public static void add_then_cancel_UserGroup(SahiTasks browser, String groupName, String groupDescription, String isPosix){
+        browser.link("Add").click();
 
-    }// addAndAddAnotherGroup
-
-
+        browser.textbox("cn").near(browser.label("Group name:")).setValue(groupName);
+        browser.textbox("description").near(browser.label("Description:")).setValue(groupDescription);
+        if (isPosix.equals("isPosix")){
+        	browser.checkbox("posix").click();
+        } 
+        browser.button("Cancel").click();
+	}
+	
     /*
      * Test for: add and edit Group
      * @param sahiTasks 
@@ -541,7 +473,7 @@ public class GroupTasks {
     	sahiTasks.button("Add").click();
     	
     	// go to group page to create new 2 user groups
-    	sahiTasks.navigateTo(System.getProperty("ipa.server.url")+GroupTests.groupPage, true);
+    	//sahiTasks.navigateTo(System.getProperty("ipa.server.url")+GroupTests.groupPage, true);
     	sahiTasks.link("User Groups").click();
     	sahiTasks.link("Add").click();
     	sahiTasks.textbox("cn").setValue("sahigrp_0100");
