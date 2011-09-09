@@ -145,7 +145,7 @@ rlPhaseStartTest "Setup for sudo functional tests"
 	rlRun "yum install nss-pam-ldapd -y"
 
 #cat > /etc/nss_ldap.conf << EOF
-cat > /etc/nscld.conf << EOF
+cat > /etc/nslcd.conf << EOF
 bind_policy soft
 sudoers_base ou=SUDOers,$basedn
 binddn uid=sudo,cn=sysaccounts,cn=etc,$basedn
