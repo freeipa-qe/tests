@@ -186,32 +186,41 @@ public class GroupTasks {
 		
 	}
 
-	public static void add_UserGroup(SahiTasks browser, String groupName, String groupDescription, String isPosix){
+	public static void add_UserGroup(SahiTasks browser, String groupName, String groupDescription, String gid, String isPosix){
         browser.link("Add").click();
         browser.textbox("cn").setValue(groupName);
         browser.textbox("description").setValue(groupDescription);
-        if (isPosix.equals("isPosix")){
+        if (! gid.equals(""))
+        	browser.textbox("gidnumber").setValue(gid);
+        
+        if (isPosix.equals("nonPosix")){
         	browser.checkbox("posix").click();
         }
         browser.button("Add").click();
 	}
 	
-	public static void add_and_add_another_UserGroup(SahiTasks browser, 
-													String firstGroupName, String firstGroupDescription, String first_isPosix,
-													String secondGroupName, String secondGroupDescription, String second_isPosix){
+	public static void add_and_add_another_UserGroup(
+							SahiTasks browser, 
+							String firstGroupName, String firstGroupDescription, String firstGid, String first_isPosix,
+							String secondGroupName, String secondGroupDescription, String secondGid, String second_isPosix){
         
         browser.link("Add").click();
         browser.textbox("cn").setValue(firstGroupName);
         browser.textbox("description").setValue(firstGroupDescription);
-        if (first_isPosix.equals("isPosix")){
+        if (! firstGid.equals(""))
+        	browser.textbox("gidnumber").setValue(firstGid);
+        if (first_isPosix.equals("nonPosix")){
         	browser.checkbox("posix").click();
         }
         
-        // click Add and Add Another to create a new group without leave the current dialog , this the main purpose of this test case
+        // click Add and Add Another to create a new group without leave the current dialog, 
+        // this the main purpose of this test case
         browser.button("Add and Add Another").click();    
         browser.textbox("cn").setValue(secondGroupName);
         browser.textbox("description").setValue(secondGroupDescription);
-        if (second_isPosix.equals("isPosix")){
+        if (! secondGid.equals(""))
+        	browser.textbox("gidnumber").setValue(secondGid);
+        if (second_isPosix.equals("nonPosix")){
         	browser.checkbox("posix").click();
         }
         
@@ -220,12 +229,13 @@ public class GroupTasks {
         browser.button("Cancel").click();
 	}
 	
-	public static void add_and_edit_UserGroup(SahiTasks browser, String groupName, String groupDescription, String isPosix){
+	public static void add_and_edit_UserGroup(SahiTasks browser, String groupName, String groupDescription, String gid, String isPosix){
         browser.link("Add").click();
 
-        browser.textbox("cn").near(browser.label("Group name:")).setValue(groupName);
-        browser.textbox("description").near(browser.label("Description:")).setValue(groupDescription);
-        if (isPosix.equals("isPosix")){
+        browser.textbox("cn").setValue(groupName);
+        browser.textbox("description").setValue(groupDescription);
+        browser.textbox("gidnumber").setValue(gid);
+        if (isPosix.equals("nonPosix")){
         	browser.checkbox("posix").click();
         } 
         browser.button("Add and Edit").click();
@@ -239,11 +249,12 @@ public class GroupTasks {
         //browser.link("User Groups").in(browser.div("content")).click();
 	}
 	
-	public static void add_then_cancel_UserGroup(SahiTasks browser, String groupName, String groupDescription, String isPosix){
+	public static void add_then_cancel_UserGroup(SahiTasks browser, String groupName, String groupDescription, String gid, String isPosix){
         browser.link("Add").click();
 
-        browser.textbox("cn").near(browser.label("Group name:")).setValue(groupName);
-        browser.textbox("description").near(browser.label("Description:")).setValue(groupDescription);
+        browser.textbox("cn").setValue(groupName);
+        browser.textbox("description").setValue(groupDescription);
+        browser.textbox("gidnumber").setValue(gid);
         if (isPosix.equals("isPosix")){
         	browser.checkbox("posix").click();
         } 
