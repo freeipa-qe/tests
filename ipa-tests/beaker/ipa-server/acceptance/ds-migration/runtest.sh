@@ -49,6 +49,8 @@ satrtEpoch=`date "+%s"`
 ##########################################
 #   test main 
 #########################################
+# ldapsearch -D "cn=Directory Manager" -hipaqa64vmc.idm.lab.bos.redhat.com -p2389 -wSecret123 -x -b ou=People,dc=bos,dc=redhat,dc=com objectclass=*
+# ipa migrate-ds ldap://ipaqa64vmc.idm.lab.bos.redhat.com:2389
 
 rlJournalStart
     rlPhaseStartSetup "ds-migration startup: Check for ipa-server package"
@@ -58,7 +60,13 @@ rlJournalStart
     rlPhaseEnd
 
     # r2d2_test_starts
-    ds-migration
+	if [ -x $CLIENT ]; then
+		echo "ERROR - there is not client. Please specify a client in the ipa-server install section."
+		echo "ERROR -  See the sample xml file"
+		rlFail "Client not found to migrate from"
+	else
+		ds-migration
+	fi
     # r2d2_test_ends
 
     rlPhaseStartCleanup "ds-migration cleanup"
