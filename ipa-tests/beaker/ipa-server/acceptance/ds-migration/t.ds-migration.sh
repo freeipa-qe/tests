@@ -49,6 +49,7 @@ ds-migration()
 {
 	rlPhaseStartTest "Migrating from $CLIENT"
 		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+		rlRun "ipa config-mod --enable-migration=TRUE" 0 "enabling migration"
 		rlRun "ipa migrate-ds ldap://$CLIENT:2389" 0 "running migration from DS instance on CLIENT"
 	rlPhaseEnd
 	
@@ -59,5 +60,8 @@ ds-migration()
 	# Checking user 2009
 	check_user user2009
 
+	rlPhaseStartTest "Migrating from $CLIENT"
+		rlRun "ipa config-mod --enable-migration=FALSE" 0 "disabling migration"
+	rlPhaseEnd
 } # ipasample
 
