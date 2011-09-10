@@ -4,10 +4,10 @@
 # Be sure to load the user into $1
 check_user()
 {
-	uid=$(ldapsearch -D \"cn=Directory Manager\" -h$CLIENT -p2389 -wSecret123 -x -b uid=$1,ou=People,dc=bos,dc=redhat,dc=com objectclass=* | grep uidNumber | cut -d\  -f2 )
-	gid=$(ldapsearch -D \"cn=Directory Manager\" -h$CLIENT -p2389 -wSecret123 -x -b uid=$1,ou=People,dc=bos,dc=redhat,dc=com objectclass=* | grep gidNumber | cut -d\  -f2 )
-	shell=$(ldapsearch -D \"cn=Directory Manager\" -h$CLIENT -p2389 -wSecret123 -x -b uid=$1,ou=People,dc=bos,dc=redhat,dc=com objectclass=* | grep loginShell | cut -d\  -f2 )
-	home=$(ldapsearch -D \"cn=Directory Manager\" -h$CLIENT -p2389 -wSecret123 -x -b uid=$1,ou=People,dc=bos,dc=redhat,dc=com objectclass=* | grep homeDirectory | cut -d\  -f2 )
+	uid=$(ldapsearch -D 'cn=Directory Manager' -h$CLIENT -p2389 -wSecret123 -x -b uid=$1,ou=People,dc=bos,dc=redhat,dc=com objectclass=* | grep uidNumber | cut -d\  -f2 )
+	gid=$(ldapsearch -D 'cn=Directory Manager' -h$CLIENT -p2389 -wSecret123 -x -b uid=$1,ou=People,dc=bos,dc=redhat,dc=com objectclass=* | grep gidNumber | cut -d\  -f2 )
+	shell=$(ldapsearch -D 'cn=Directory Manager' -h$CLIENT -p2389 -wSecret123 -x -b uid=$1,ou=People,dc=bos,dc=redhat,dc=com objectclass=* | grep loginShell | cut -d\  -f2 )
+	home=$(ldapsearch -D 'cn=Directory Manager' -h$CLIENT -p2389 -wSecret123 -x -b uid=$1,ou=People,dc=bos,dc=redhat,dc=com objectclass=* | grep homeDirectory | cut -d\  -f2 )
 
 	rlPhaseStartTest "checking uid for user $1"
 		rlRun "ipa user-show $1 | grep UID | grep $uid" 0 "checking to ensure the UID for user $1 is $uid"
