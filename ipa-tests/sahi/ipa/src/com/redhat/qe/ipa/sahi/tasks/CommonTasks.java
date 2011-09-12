@@ -330,4 +330,19 @@ public class CommonTasks {
 		
 	}
 
+	
+	/*
+	 * 
+	 */
+	public static void modifyToInvalidSetting(SahiTasks sahiTasks, String cn, String description, String expectedError) {		
+		sahiTasks.link(cn).click();
+		sahiTasks.link("Settings").click();
+		sahiTasks.textbox("description").setValue(" ");
+		sahiTasks.textbox("description").setValue(description);
+		sahiTasks.span("Update").click();
+		Assert.assertTrue(sahiTasks.div(expectedError).exists(), "Verified expected error when adding modifying host group :: " + expectedError);
+		sahiTasks.button("OK").click();
+		sahiTasks.span("undo").click();
+		//in calling test, make sure to navigate back to page with cn
+	}
 }
