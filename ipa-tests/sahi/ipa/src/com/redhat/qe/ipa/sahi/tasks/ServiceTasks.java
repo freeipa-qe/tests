@@ -54,6 +54,11 @@ public class ServiceTasks {
 		sahiTasks.checkbox(serviceprinc).click();
 		sahiTasks.link("Delete").click();
 		sahiTasks.button(button).click();
+		
+		if(button == "Cancel"){
+			// uncheck if the action was to cancel
+			sahiTasks.checkbox(serviceprinc).click();
+		}
 	}
 	
 	/*
@@ -67,5 +72,52 @@ public class ServiceTasks {
 		}
 		sahiTasks.link("Delete").click();
 		sahiTasks.button("Delete").click();
+	}
+	
+	/*
+	 * Add a certificate
+	 * @param sahiTasks
+	 * @param servicename - service to add certificate for
+	 * @param csr - certificate request
+	 * @param button - "Issue" or "Cancel"
+	 */
+	public static void addServiceCertificate(SahiTasks sahiTasks, String servicename, String csr, String button) {
+		sahiTasks.link(servicename).click();
+		sahiTasks.span("New Certificate").click();
+		sahiTasks.textarea(0).setValue(csr);
+		sahiTasks.button(button).click();
+		sahiTasks.link("Services").in(sahiTasks.div("content")).click();
+	}
+	
+	/*
+	 * Verify Valid Certificate Status
+	 * @param sahiTasks
+	 * @param servicename - servicename
+	 * @param certexists - boolean - should one exist?
+	 */
+	public static void verifyServiceCertificate(SahiTasks sahiTasks, String servicename, boolean certexists) {
+		sahiTasks.link(servicename).click();
+		if (certexists == false){
+			Assert.assertFalse(sahiTasks.span("Get").exists(), "Service certificate verify Get button doesn't exist");
+			Assert.assertFalse(sahiTasks.span("View").exists(), "Service certificate verify View button  doesn't exist");
+			Assert.assertFalse(sahiTasks.span("Revoke").exists(), "Service certificate verify Revoke button  doesn't exist");
+			Assert.assertTrue(sahiTasks.span("New Certificate").exists(), "Service certificate verify New Certificate button exists");
+		}
+		else {
+			sahiTasks.span("Get").isVisible();
+			Assert.assertTrue(sahiTasks.span("Get").exists(), "Service certificate verify Get button");
+			Assert.assertTrue(sahiTasks.span("View").exists(), "Service certificate verify View button");
+			Assert.assertTrue(sahiTasks.span("Revoke").exists(), "Service certificate verify Revoke button");
+		
+			//view certificate
+			sahiTasks.span("View").click();
+			sahiTasks.button("Close").click();
+		
+			//get certificate
+			sahiTasks.span("Get").click();
+			sahiTasks.button("Close").click();
+		}
+		
+		sahiTasks.link("Services").in(sahiTasks.div("content")).click();
 	}
 }
