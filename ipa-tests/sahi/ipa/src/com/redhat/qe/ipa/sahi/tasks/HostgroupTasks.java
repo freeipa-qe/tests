@@ -434,6 +434,7 @@ public class HostgroupTasks {
 		
 		sahiTasks.link(groupname).click();
 		sahiTasks.link("Settings").click();
+		sahiTasks.textbox("description").setValue(" ");
 		sahiTasks.textbox("description").setValue(description);
 		sahiTasks.span("Update").click();
 
