@@ -465,11 +465,14 @@ public class HostTests extends SahiTestScript{
 		
         //										testname					hostname     hostdomain    	ipadr   			expectedError
 		ll.add(Arrays.asList(new Object[]{ "missing_hostname",				"", 	 	 domain,		"",					"'fqdn' is required"} ));
+		ll.add(Arrays.asList(new Object[]{ "missing_domainname",			"mytest.", 	 "",			"",					"'fqdn' is required"} ));
 		ll.add(Arrays.asList(new Object[]{ "invalidipadr_alpha_chars",		"test",		 domain, 		"null",				"invalid 'ip_address': invalid IP address"	} ));
 		ll.add(Arrays.asList(new Object[]{ "invalidipadr_too_many_octets",	"test",		 domain, 		"10.10.10.10.10",	"invalid 'ip_address': invalid IP address"	} ));	
 		ll.add(Arrays.asList(new Object[]{ "invalidipadr_bad_octects",		"test",		 domain, 		"999.999.999.999",	"invalid 'ip_address': invalid IP address"	} ));
 		ll.add(Arrays.asList(new Object[]{ "invalidipadr_special_chars",	"test",		 domain, 		"~.&.#.^",			"invalid 'ip_address': invalid IP address"	} ));
 		ll.add(Arrays.asList(new Object[]{ "duplicate_hostname",			testhost,	 domain, 		"",					"host with name \""+ testhost + "." + domain + "\" already exists"	} ));
+		ll.add(Arrays.asList(new Object[]{ "begining_space_hostname",		" " + "testing",  domain,		"",				"invalid 'hostname': Leading and trailing spaces are not allowed"} ));
+		ll.add(Arrays.asList(new Object[]{ "ending_space_hostname",			"testing" + " ",  domain,		"",				"invalid 'hostname': Leading and trailing spaces are not allowed"} ));
 		return ll;	
 	}
 	
