@@ -88,12 +88,7 @@ public class SudoCommandGroupTests extends SahiTestScript{
         //										testname					cn   			description
 		ll.add(Arrays.asList(new Object[]{ "create_sudo_commandgroup",		"sudo group1",		"group1 with basic commands"	} ));
 		ll.add(Arrays.asList(new Object[]{ "create_sudo_commandgroup",		"sudo group2",		"group2 with basic commands"	} ));
-		/*
-		ll.add(Arrays.asList(new Object[]{ "create_sudo_commandgroup",		"sudo group3",		"group3 with basic commands"	} ));
-		ll.add(Arrays.asList(new Object[]{ "create_sudo_commandgroup",		"sudo group4",		"group4 with basic commands"	} ));
-		ll.add(Arrays.asList(new Object[]{ "create_sudo_commandgroup",		"sudo group5",		"group5 with basic commands"	} ));
-		*/
-				        
+		
 		return ll;	
 	}
 
@@ -110,12 +105,7 @@ public class SudoCommandGroupTests extends SahiTestScript{
         //										testname					cn   			description
 		ll.add(Arrays.asList(new Object[]{ "delete_sudo_commandgroup",		"sudo group1",		"group1 with basic commands"	} ));
 		ll.add(Arrays.asList(new Object[]{ "delete_sudo_commandgroup",		"sudo group2",		"group2 with basic commands"	} ));
-		/*
-		ll.add(Arrays.asList(new Object[]{ "delete_sudo_commandgroup",		"sudo group3",		"group3 with basic commands"	} ));
-		ll.add(Arrays.asList(new Object[]{ "delete_sudo_commandgroup",		"sudo group4",		"group4 with basic commands"	} ));
-		ll.add(Arrays.asList(new Object[]{ "delete_sudo_commandgroup",		"sudo group5",		"group5 with basic commands"	} ));
-		*/
-				        
+					        
 		return ll;	
 	}
 

@@ -16,6 +16,8 @@
 			    <include name="sudoRuleUserCategorySettingsTests" />
 			    <include name="sudoRuleHostCategorySettingsTests" />
 			    <include name="sudoRuleCommandCategorySettingsTests" />
+			    <include name="sudoRuleRunAsUserCategorySettingsTests" />
+			    <include name="sudoRuleRunAsGroupCategorySettingsTests" />
 			    <include name="invalidSudoRuleAddTests" />
 			    <include name="sudoRuleRequiredFieldAddTests" />
 			    <include name="sudoRuleExpandCollapseTests" />

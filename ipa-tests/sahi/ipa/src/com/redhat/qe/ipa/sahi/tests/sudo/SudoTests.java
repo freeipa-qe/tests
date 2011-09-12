@@ -41,8 +41,11 @@ public class SudoTests extends SahiTestScript{
 	//Group used in this testsuite
 	private String groupName = "sudogrp";
 	private String groupDescription = "Group1 to be used for Sudo tests";
+	private String runAsUserGroupName = "runassudousrgrp";
+	private String runAsUserGroupDescription = "Group2 to be used for Sudo tests";
 	private String runAsGroupName = "runassudogrp";
-	private String runAsGroupDescription = "Group2 to be used for Sudo tests";
+	private String runAsGroupDescription = "Group3 to be used for Sudo tests";
+
 	
 	//Host  used in this testsuite
 	private String domain = System.getProperty("ipa.server.domain");
@@ -91,8 +94,11 @@ public class SudoTests extends SahiTestScript{
 		sahiTasks.navigateTo(commonTasks.groupPage, true);
 		if (!sahiTasks.link(groupName).exists())
 			GroupTasks.createGroupService(sahiTasks, groupName, groupDescription, commonTasks.groupPage);
+		if (!sahiTasks.link(runAsUserGroupName).exists())
+			GroupTasks.createGroupService(sahiTasks, runAsUserGroupName, runAsUserGroupDescription, commonTasks.groupPage);
 		if (!sahiTasks.link(runAsGroupName).exists())
 			GroupTasks.createGroupService(sahiTasks, runAsGroupName, runAsGroupDescription, commonTasks.groupPage);
+		
 		
 		System.out.println("Check CurrentPage: " + commonTasks.hostPage);
 		sahiTasks.navigateTo(commonTasks.hostPage, true);
@@ -445,7 +451,92 @@ public class SudoTests extends SahiTestScript{
 		SudoTasks.undoResetUpdateSudoRuleSections(sahiTasks, cn, "cmdcategory", "Update");
 	}
 	
+	/*
+	 * Edit the As Whom Section for the Sudo Rule
+	 * Testing:
+	 * Add user, and user group to runAs User Category
+	 * verify these were added
+	 * Add user again - verify expected error
+	 * Verify user added as part of sudoRuleAddAndEditTests is a member of this sudo rule //bug
+	 * delete this user
+	 * verify the user is not a member, and groups is a member of this sudo rule //bug
+	 * add the user to the group
+	 * verify the user is an indirect member of the group //bug
+	 * 
+	 * delete the user and usergrop from runAs UserCategory
+	 * verify these were deleted
+	 * verify undo/reset/update for this section when working with the radiobutton
+	 */
+	@Test (groups={"sudoRuleRunAsUserCategorySettingsTests"}, dataProvider="getEditSudoRuleTestObjects", dependsOnGroups={"sudoRuleAddAndEditTests"})
+	public void testSudoRuleRunAsUserCategorySettings(String testName, String cn) throws Exception {		
+		//verify rule to be edited exists
+		Assert.assertTrue(sahiTasks.link(cn).exists(), "Verify Rule " + cn + " to be edited exists");
+		
+		
+		//modify this rule to add 
+		SudoTasks.modifySudoRuleRunAsUserCategorySection(sahiTasks, cn, runAsUID, runAsUserGroupName, true);
+		
+		SudoTasks.verifySudoRuleForRunAsUserCategorySection(sahiTasks, commonTasks, cn, runAsUID, runAsUserGroupName, true);
+		
+		// FIXME: nkrishnan: Bug 735185 - MemberOf not listed for HBAC Rules (Source host/hostgroup) and Sudo Rules (RunAs user/usergroups)
+		//verify by clicking on user - it is a member of this Sudo rule
+		//SudoTasks.verifySudoRuleForEnrollment(sahiTasks, commonTasks, cn, runAsUID, "Users", "direct", true);
+		//sahiTasks.navigateTo(commonTasks.sudoRulePage, true);
+		//verify by clicking on usergroup - it is a member of this Sudo rule
+		//SudoTasks.verifySudoRuleForEnrollment(sahiTasks, commonTasks, cn, runAsUserGroupName, "User Groups", "direct", true);
+		//sahiTasks.navigateTo(commonTasks.sudoRulePage, true);
+		
+		//enroll user twice
+		SudoTasks.enrollAgain(sahiTasks, cn, runAsUID, "As Whom", "Users");
 	
+		
+		/* FIXME: Bug 736455 - [ipa webui] Sudo Rule includes indirect hosts and users members in its list to add 
+		 * and related to above Bug 735185 
+		//add user to usergroup
+		sahiTasks.navigateTo(commonTasks.groupPage, true);
+		GroupTasks.addMembers(sahiTasks, groupName, "user", uid, "Enroll");
+		sahiTasks.navigateTo(commonTasks.sudoRulePage, true);
+		
+		//now verify it is indirect member of this Sudo rule
+		SudoTasks.verifySudoRuleForEnrollment(sahiTasks, commonTasks, cn, uid, "Users", "indirect", true);
+		sahiTasks.navigateTo(commonTasks.sudoRulePage, true);*/
+		
+		//modify this rule to delete
+		SudoTasks.modifySudoRuleRunAsUserCategorySection(sahiTasks, cn, runAsUID, runAsUserGroupName, false);
+		SudoTasks.verifySudoRuleForRunAsUserCategorySection(sahiTasks, commonTasks, cn, runAsUID, runAsUserGroupName, false);
+		
+		
+		SudoTasks.undoResetUpdateSudoRuleSections(sahiTasks, cn, "ipasudorunasusercategory", "undo");
+		SudoTasks.undoResetUpdateSudoRuleSections(sahiTasks, cn, "ipasudorunasusercategory", "Reset");
+		SudoTasks.undoResetUpdateSudoRuleSections(sahiTasks, cn, "ipasudorunasusercategory", "Update");
+	}
+	
+	/*
+	 * Testing:
+	 * Verify the group that was added as part of AddAndEdit Test is listed
+	 * Delete this group
+	 * verify the group was deleted
+	 * verify undo/reset/update for this section when working with the radiobutton
+	 */
+	@Test (groups={"sudoRuleRunAsGroupCategorySettingsTests"}, dataProvider="getEditSudoRuleTestObjects", dependsOnGroups={"sudoRuleAddAndEditTests"})
+	public void testSudoRuleRunAsGroupCategorySettings(String testName, String cn) throws Exception {		
+		//verify rule to be edited exists
+		Assert.assertTrue(sahiTasks.link(cn).exists(), "Verify Rule " + cn + " to be edited exists");
+		
+		SudoTasks.verifySudoRuleForRunAsGroupCategorySection(sahiTasks, commonTasks, cn, runAsGroupName, true);
+		
+		//enroll user twice
+		SudoTasks.enrollAgain(sahiTasks, cn, runAsGroupName, "As Whom", "User Groups[1]");
+		
+		//modify this rule to delete
+		SudoTasks.modifySudoRuleRunAsGroupCategorySection(sahiTasks, cn, runAsGroupName, false);
+		SudoTasks.verifySudoRuleForRunAsGroupCategorySection(sahiTasks, commonTasks, cn, runAsGroupName, false);
+		
+		
+		SudoTasks.undoResetUpdateSudoRuleSections(sahiTasks, cn, "ipasudorunasgroupcategory", "undo");
+		SudoTasks.undoResetUpdateSudoRuleSections(sahiTasks, cn, "ipasudorunasgroupcategory", "Reset");
+		SudoTasks.undoResetUpdateSudoRuleSections(sahiTasks, cn, "ipasudorunasgroupcategory", "Update");		
+	}
 	
 	/*
 	 * Verify member list for the Sudo Rule
@@ -478,7 +569,7 @@ public class SudoTests extends SahiTestScript{
 		//delete user, user group, host, host group added for this suite
 		sahiTasks.navigateTo(commonTasks.userPage, true);
 		//Since memberships were checked previously, may not be in the front page for User
-		if (sahiTasks.link("Users").in(sahiTasks.div("content")).exists())
+/*		if (sahiTasks.link("Users").in(sahiTasks.div("content")).exists())
 			sahiTasks.link("Users").in(sahiTasks.div("content")).click();
 		if (sahiTasks.link(uid).exists())
 			UserTasks.deleteUser(sahiTasks, uid);
@@ -492,8 +583,12 @@ public class SudoTests extends SahiTestScript{
 			sahiTasks.link("User Groups").in(sahiTasks.div("content")).click();
 		if (sahiTasks.link(groupName).exists())
 			GroupTasks.deleteGroup(sahiTasks, groupName);
+		if (sahiTasks.link(runAsUserGroupName).exists())
+			GroupTasks.deleteGroup(sahiTasks, runAsUserGroupName);
 		if (sahiTasks.link(runAsGroupName).exists())
 			GroupTasks.deleteGroup(sahiTasks, runAsGroupName);
+			
+			
 		
 		sahiTasks.navigateTo(commonTasks.hostPage, true);
 		//Since memberships were checked previously, may not be in the front page for Hosts
@@ -508,6 +603,8 @@ public class SudoTests extends SahiTestScript{
 			sahiTasks.link("Host Groups").in(sahiTasks.div("content")).click();
 		if (sahiTasks.link(hostgroupName).exists())
 			HostgroupTasks.deleteHostgroup(sahiTasks, hostgroupName, "Delete");
+			
+			
 		
 /*		
 		sahiTasks.navigateTo(commonTasks.sudoCommandPage, true);
@@ -515,7 +612,7 @@ public class SudoTests extends SahiTestScript{
 			//SudoTasks.deleteSudoruleCommand(sahiTasks, lsCommandName, lsCommandDescription);
 		}		
 		
-		clean up sudo command groups*/
+		clean up sudo command groups
 		
 		sahiTasks.navigateTo(commonTasks.sudoRulePage, true);
 		
@@ -534,7 +631,7 @@ public class SudoTests extends SahiTestScript{
 				log.fine("Cleaning Sudo Rule: " + sudoRuleTestObject);
 				SudoTasks.deleteSudo(sahiTasks, sudoRuleTestObject, "Delete");
 			}			
-		}
+		} */
 	}
 	
 	/*******************************************************
