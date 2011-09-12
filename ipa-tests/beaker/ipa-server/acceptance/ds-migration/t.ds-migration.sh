@@ -2,6 +2,7 @@
 ######################
 # Check user  
 # Be sure to load the user into $1
+######################
 check_user()
 {
 	uid=$(ldapsearch -D 'cn=Directory Manager' -h$CLIENT -p2389 -wSecret123 -x -b uid=$1,ou=People,dc=bos,dc=redhat,dc=com objectclass=* | grep uidNumber | cut -d\  -f2 )
@@ -40,6 +41,21 @@ check_user()
 }
 
 ######################
+# Check group 
+# Be sure to load the group into $1
+######################
+check_group()
+{
+	gid=$(ldapsearch -D 'cn=Directory Manager' -h$CLIENT -p2389 -wSecret123 -x -bi cn=$1,ou=Groups,dc=bos,dc=redhat,dc=com objectclass=* | grep gidNumber | cut -d\  -f2 )
+
+	rlPhaseStartTest "checking gid for group $1"
+		rlRun "ipa user-show $1 | grep GID | grep $gid" 0 "checking to ensure the UID for user $1 is $gid"
+	rlPhaseEnd
+
+}
+
+
+######################
 # test suite         #
 ######################
 # ldapsearch -D "cn=Directory Manager" -hipaqa64vmc.idm.lab.bos.redhat.com -p2389 -wSecret123 -x -b ou=People,dc=bos,dc=redhat,dc=com objectclass=*
@@ -59,6 +75,13 @@ ds-migration()
 	check_user user2000
 	# Checking user 2009
 	check_user user2009
+
+	# checking group 1000
+	check_group group1000
+	# checking group 2000
+	check_group group2000
+	# checking group Duplicate
+	check_group Duplicate
 
 	rlPhaseStartTest "Migrating from $CLIENT"
 		rlRun "ipa config-mod --enable-migration=FALSE" 0 "disabling migration"
