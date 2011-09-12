@@ -25,6 +25,7 @@
 			    <include name="invalidHostGroupModifyTests" />
 			    <include name="cleanup" />
 			    <!-- 
+			    <include name="invalidHostGroupModifyUndoTests" />
 				<include name="teardown"/>
 				-->
 			</run>

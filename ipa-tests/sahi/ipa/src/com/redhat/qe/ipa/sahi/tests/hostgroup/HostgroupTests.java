@@ -67,10 +67,10 @@ public class HostgroupTests extends SahiTestScript{
 		}
 		
 		//add hosts for host group members
-		sahiTasks.navigateTo(commonTasks.hostPage, true);
-		for (String hostname : hostnames_short) {
-			HostTasks.addHost(sahiTasks, hostname, commonTasks.getIpadomain(), "");
-		}
+		//sahiTasks.navigateTo(commonTasks.hostPage, true);
+		//for (String hostname : hostnames_short) {
+		//	HostTasks.addHost(sahiTasks, hostname, commonTasks.getIpadomain(), "");
+		//}
 		
 		sahiTasks.navigateTo(commonTasks.hostgroupPage, true);
 	}
@@ -78,8 +78,8 @@ public class HostgroupTests extends SahiTestScript{
 	@AfterClass (groups={"cleanup"}, description="Delete objects added for the tests", alwaysRun=true)
 	public void cleanup() throws Exception {	
 		// delete the hosts added for testing
-		sahiTasks.navigateTo(commonTasks.hostPage, true);
-		HostTasks.deleteHost(sahiTasks, hostnames);
+		//sahiTasks.navigateTo(commonTasks.hostPage, true);
+		//HostTasks.deleteHost(sahiTasks, hostnames);
 		
 		//delete the host groups added for testing
 		sahiTasks.navigateTo(commonTasks.hostgroupPage, true);
@@ -321,9 +321,18 @@ public class HostgroupTests extends SahiTestScript{
 	 * negative modify host group characters tests
 	 */
 	@Test (groups={"invalidHostGroupModifyTests"}, dataProvider="getModifyInvalidHostGroupTestObjects")	
-	public void testInvalidHostModify(String testName, String groupname, String description, String expectedError) throws Exception {
+	public void testInvalidHostGroupModify(String testName, String groupname, String description, String expectedError) throws Exception {
 		
 		HostgroupTasks.modifyInvalidDirtyHostGroup(sahiTasks, groupname, description, expectedError);
+	}
+	
+	/*
+	 * negative modify host group undo tests
+	 */
+	@Test (groups={"invalidHostGroupModifyUndoTests"}, dataProvider="getModifyInvalidHostGroupUndoTestObjects")	
+	public void testInvalidHostGroupUndoModify(String testName, String groupname, String description, String expectedError) throws Exception {
+		
+		HostgroupTasks.modifyInvalidUndoHostGroup(sahiTasks, groupname, description, expectedError);
 	}
 		
 
@@ -557,9 +566,23 @@ public class HostgroupTests extends SahiTestScript{
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 	
 		//										testname										groupanme			description			expectedError
-		ll.add(Arrays.asList(new Object[]{ 		"modify_invalid_description_empty",				myhostgroup,		"",	 				 "no modifications to be performed" } ));
 		ll.add(Arrays.asList(new Object[]{ 		"modify_invalid_description_leadingspace",		myhostgroup,		" my description",	 "invalid 'desc': Leading and trailing spaces are not allowed" } ));
 		ll.add(Arrays.asList(new Object[]{ 		"modify_invalid_description_trailingspace",		myhostgroup,		"my description ",	 "invalid 'desc': Leading and trailing spaces are not allowed" } ));
+		return ll;	
+	}
+	
+	/*
+	 * Data to be used when modify host groups undo - negative 
+	 */
+	@DataProvider(name="getModifyInvalidHostGroupUndoTestObjects")
+	public Object[][] getInvalidHostGroupUndoModifyTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createInvalidHostGroupUndoModifyTestObjects());
+	}
+	protected List<List<Object>> createInvalidHostGroupUndoModifyTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+	
+		//										testname										groupanme			description			expectedError
+		ll.add(Arrays.asList(new Object[]{ 		"modify_invalid_description_empty",				myhostgroup,		" ",	 				 "Input form contains invalid or missing values." } ));
 		return ll;	
 	}
 }
