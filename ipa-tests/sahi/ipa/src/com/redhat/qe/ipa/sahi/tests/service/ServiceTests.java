@@ -33,27 +33,32 @@ public class ServiceTests extends SahiTestScript {
 	private String mytesthost = "";
 	private String realm = "";
 	
+	private String testservice = "";
+	
 	@BeforeClass (groups={"init"}, description="Initialize app for this test suite run", alwaysRun=true, dependsOnGroups="setup")
 	public void initialize() throws CloneNotSupportedException {
+		sahiTasks.navigateTo(commonTasks.servicePage, true);
+		currentPage = sahiTasks.fetch("top.location.href");
+		alternateCurrentPage = sahiTasks.fetch("top.location.href") + "&service-facet=search" ;
+		sahiTasks.setStrictVisibilityCheck(true);
+		
 		domain = commonTasks.getIpadomain();
 		reversezone = commonTasks.getReversezone();
 		realm = domain.toUpperCase();
 		
-		mytesthost = "servicehost" + "." + domain;
-		sahiTasks.setStrictVisibilityCheck(true);
-		
-		currentPage = sahiTasks.fetch("top.location.href");
-		alternateCurrentPage = sahiTasks.fetch("top.location.href") + "&service-facet=search" ;
-		
-		//add host for testing services;
+		//add host and service
 		String [] dcs = reversezone.split("\\.");
 		String ipprefix = dcs[2] + "." + dcs[1] + "." + dcs[0] + ".";
 		String ipaddr = ipprefix + "199";
+		
+		testservice = "SRVC" + "/" + mytesthost + "@" + realm;
+		mytesthost = "servicehost" + "." + domain;
 		
 		sahiTasks.navigateTo(commonTasks.hostPage, true);
 		HostTasks.addHost(sahiTasks, "servicehost", domain, ipaddr);
 		
 		sahiTasks.navigateTo(commonTasks.servicePage, true);
+		ServiceTasks.addCustomService(sahiTasks, "SRVC", mytesthost, false);
 	}
 	
 	@AfterClass (groups={"cleanup"}, description="Delete objects added for the tests", alwaysRun=true)
@@ -131,7 +136,7 @@ public class ServiceTests extends SahiTestScript {
 	}
 	
 	/*
-	 * delete multple service s
+	 * delete multple service
 	 */
 	@Test (groups={"deleteMultipleServiceTests"}, dataProvider="getDeleteMultipleServiceTestObjects",  dependsOnGroups="serviceAddTests")	
 	public void testDeleteMultipleService(String testName) throws Exception {
@@ -149,6 +154,23 @@ public class ServiceTests extends SahiTestScript {
 		for (String servicename : defaultservices){
 			Assert.assertFalse(sahiTasks.link(servicename).exists(), "Verify service " + servicename + " does not exist.");
 		}
+	}
+	
+	/*
+	 * Add Service Certificate Tests
+	 */
+	@Test (groups={"serviceAddCertificateTests"}, dataProvider="getServiceAddCertificateTestObjects")	
+	public void testserviceAddCertificate(String testName, String button, boolean certexists) throws Exception {
+		
+		//Get CSR for host hosting service
+		String csr = CommonTasks.generateCSR(mytesthost);
+		
+		// add request certificate
+		ServiceTasks.addServiceCertificate(sahiTasks, testservice, csr, button);
+		
+		// verify cancel adding certificate
+		ServiceTasks.verifyServiceCertificate(sahiTasks, testservice, certexists);
+
 	}
 	
 	/*******************************************************
@@ -210,6 +232,23 @@ public class ServiceTests extends SahiTestScript {
         //									testname					servicename		button
 		ll.add(Arrays.asList(new Object[]{ 	"cancel_delete_service",	"CUSTOM",		"Cancel" } ));
 		ll.add(Arrays.asList(new Object[]{ 	"delete_single_service",	"CUSTOM",		"Delete" } ));
+		
+		return ll;	
+	}
+	
+	/*
+	 * Data to be used when deleting multiple services
+	 */
+	@DataProvider(name="getServiceAddCertificateTestObjects")
+	public Object[][] getServiceAddCertificateTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createServiceAddCertificateTestObjects());
+	}
+	protected List<List<Object>> createServiceAddCertificateTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //									testname							  button		certexists
+		ll.add(Arrays.asList(new Object[]{ 	"cancel_new_certificate_request",	  "Cancel",		false } ));
+		ll.add(Arrays.asList(new Object[]{ 	"new_valid_certificate_request",	  "Issue",		true } ));
 		
 		return ll;	
 	}
