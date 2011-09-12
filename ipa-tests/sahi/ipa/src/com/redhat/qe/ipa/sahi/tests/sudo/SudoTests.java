@@ -121,9 +121,9 @@ public class SudoTests extends SahiTestScript{
 		System.out.println("Check CurrentPage: " + commonTasks.sudoCommandGroupPage);
 		sahiTasks.navigateTo(commonTasks.sudoCommandGroupPage, true);
 		if (!sahiTasks.link(allowCommandGroupName).exists()) 
-			SudoTasks.createSudoruleCommandGroupAdd(sahiTasks, allowCommandGroupName, allowCommandGroupDescription);
+			SudoTasks.createSudoruleCommandGroupAdd(sahiTasks, allowCommandGroupName, allowCommandGroupDescription, "Add");
 		if (!sahiTasks.link(denyCommandGroupName).exists()) 
-			SudoTasks.createSudoruleCommandGroupAdd(sahiTasks, denyCommandGroupName, denyCommandGroupDescription);		
+			SudoTasks.createSudoruleCommandGroupAdd(sahiTasks, denyCommandGroupName, denyCommandGroupDescription, "Add");		
 			
 		
 		sahiTasks.navigateTo(commonTasks.sudoRulePage, true);
@@ -569,7 +569,7 @@ public class SudoTests extends SahiTestScript{
 		//delete user, user group, host, host group added for this suite
 		sahiTasks.navigateTo(commonTasks.userPage, true);
 		//Since memberships were checked previously, may not be in the front page for User
-/*		if (sahiTasks.link("Users").in(sahiTasks.div("content")).exists())
+		if (sahiTasks.link("Users").in(sahiTasks.div("content")).exists())
 			sahiTasks.link("Users").in(sahiTasks.div("content")).click();
 		if (sahiTasks.link(uid).exists())
 			UserTasks.deleteUser(sahiTasks, uid);
@@ -612,7 +612,7 @@ public class SudoTests extends SahiTestScript{
 			//SudoTasks.deleteSudoruleCommand(sahiTasks, lsCommandName, lsCommandDescription);
 		}		
 		
-		clean up sudo command groups
+		clean up sudo command groups*/
 		
 		sahiTasks.navigateTo(commonTasks.sudoRulePage, true);
 		
@@ -631,7 +631,7 @@ public class SudoTests extends SahiTestScript{
 				log.fine("Cleaning Sudo Rule: " + sudoRuleTestObject);
 				SudoTasks.deleteSudo(sahiTasks, sudoRuleTestObject, "Delete");
 			}			
-		} */
+		} 
 	}
 	
 	/*******************************************************
@@ -650,8 +650,8 @@ public class SudoTests extends SahiTestScript{
 		
         //										testname					cn   			
 		ll.add(Arrays.asList(new Object[]{ "create_sudorule",				"SudoRule1"} ));
-		ll.add(Arrays.asList(new Object[]{ "sudorule_long",					"abcdefghijklmnopqrstuvwxyz123456789ANDAGAINabcdefghijklmnopqrstuvwxyz123456789ANDAGAINabcdefghijklmnopqrstuvwxyz123456789"      } ));
-		ll.add(Arrays.asList(new Object[]{ "sudorule_specialchar",			"S@ud*o#Ru?le"      } ));
+	//	ll.add(Arrays.asList(new Object[]{ "sudorule_long",					"abcdefghijklmnopqrstuvwxyz123456789ANDAGAINabcdefghijklmnopqrstuvwxyz123456789ANDAGAINabcdefghijklmnopqrstuvwxyz123456789"      } ));
+	//	ll.add(Arrays.asList(new Object[]{ "sudorule_specialchar",			"S@ud*o#Ru?le"      } ));
 		
 		
 		return ll;	

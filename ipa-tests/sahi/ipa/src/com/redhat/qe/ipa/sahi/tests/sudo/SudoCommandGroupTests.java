@@ -13,6 +13,7 @@ import org.testng.annotations.Test;
 import com.redhat.qe.auto.testng.TestNGUtils;
 import com.redhat.qe.ipa.sahi.base.SahiTestScript;
 import com.redhat.qe.ipa.sahi.tasks.CommonTasks;
+import com.redhat.qe.ipa.sahi.tasks.HostgroupTasks;
 import com.redhat.qe.ipa.sahi.tasks.SudoTasks;
 
 public class SudoCommandGroupTests extends SahiTestScript{
@@ -43,24 +44,22 @@ public class SudoCommandGroupTests extends SahiTestScript{
 	/*
 	 * Add Sudo Command Groups - positive tests
 	 */
-	@Test (groups={"sudoruleCommandGroupAddTests"}, dataProvider="getSudoruleCommandGroupAddTestObjects", 
-			dependsOnGroups={"sudoruleAddTests"})	
+	@Test (groups={"sudoruleCommandGroupAddTests"}, dataProvider="getSudoruleCommandGroupAddTestObjects")	
 			public void testSudoruleCommandGroupAdd(String testName, String cn, String description) throws Exception {
 				//verify command group to be added doesn't exist
 				com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(cn).exists(), "Verify sudocommand group " + cn + "  doesn't already exist");
 				
 				//new sudo rule command can be added now
-				SudoTasks.createSudoruleCommandGroupAdd(sahiTasks, cn, description);
+				SudoTasks.createSudoruleCommandGroupAdd(sahiTasks, cn, description, "Add");
 				
 				//verify sudo command group was added successfully
-				com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(cn).exists(), "Added Sudo Command Group" + cn + "  successfully");
+				com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(cn.toLowerCase()).exists(), "Added Sudo Command Group" + cn + "  successfully");
 	} 
 	
 	/*
 	 * Del Sudo Command Group - positive tests
 	 */
-	@Test (groups={"sudoruleCommandGroupDelTests"}, dataProvider="getSudoruleCommandGroupDelTestObjects", 
-			dependsOnGroups={"sudoruleCommandGroupAddTests"})	
+	@Test (groups={"sudoruleCommandGroupDelTests"}, dataProvider="getSudoruleCommandGroupDelTestObjects")	
 			public void testSudoruleCommandGroupDel(String testName, String cn, String description) throws Exception {
 				//verify command group to be deleted exists
 				com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(cn).exists(), "Verify sudocommand group" + cn + "  to be deleted exists");
@@ -71,6 +70,34 @@ public class SudoCommandGroupTests extends SahiTestScript{
 				//verify sudo rule command group was added successfully
 				com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(cn).exists(), "Sudorule Command Group" + cn + "  deleted successfully");
 	} 
+	
+	/*
+	 * negative modify command group characters tests
+	 */
+	@Test (groups={"invalidSudoCommanGroupModifyTests"}, dataProvider="getSudoruleCommandGroupInvalidModifyTestObjects",  dependsOnGroups={"sudoruleCommandGroupAddTests"})	
+	public void testInvalidSudoCommandModify(String testName, String cn, String description, String expectedError) throws Exception {
+		
+		SudoTasks.modifySudoruleCommandGroupWithInvalidSetting(sahiTasks, cn, description, expectedError);
+	}
+	
+	
+	
+	@Test (groups={"invalidSudoCommanGroupAddTests"}, dataProvider="getSudoruleCommandGroupInvalidAddTestObjects")
+	public void testInvalidSudoCommandAdd(String testName, String cn, String description, String expectedError) throws Exception {
+		
+		SudoTasks.createInvalidSudoCommandGroup(sahiTasks, cn, description, expectedError);
+	}
+	
+	
+		
+	@Test (groups={"invalidSudoCommanGroupAddRequiredFieldTests"}, dataProvider="getSudoRuleCommandGroupRequiredFieldTestObjects")
+	public void testInvalidSudoCommandAddRequiredFieldTest(String testName, String cn,String expectedError) throws Exception {
+		
+		SudoTasks.createSudoCommandGroupWithRequiredField(sahiTasks, cn, "", expectedError);
+	}
+	
+	
+	
 	
 	/*******************************************************
 	 ************      DATA PROVIDERS     ******************
@@ -85,9 +112,10 @@ public class SudoCommandGroupTests extends SahiTestScript{
 	protected List<List<Object>> createSudoruleCommandGroupAddTestObjects() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-        //										testname					cn   			description
-		ll.add(Arrays.asList(new Object[]{ "create_sudo_commandgroup",		"sudo group1",		"group1 with basic commands"	} ));
-		ll.add(Arrays.asList(new Object[]{ "create_sudo_commandgroup",		"sudo group2",		"group2 with basic commands"	} ));
+        //										testname					cn   						description
+		ll.add(Arrays.asList(new Object[]{ "sudo_commandgroup",				"sudo group1",				"group1 with basic commands"	} ));
+		ll.add(Arrays.asList(new Object[]{ "sudo_commandgroup_long",		"abcdefghijklmnopqrstuvwxyz123456789ANDAGAINabcdefghijklmnopqrstuvwxyz123456789ANDAGAINabcdefghijklmnopqrstuvwxyz123456789",	"long group name"      } ));
+		ll.add(Arrays.asList(new Object[]{ "sudo_commandgroup_specialchar",	"S@ud*o#Ru?le", 			"group with special char - in De$c"      } ));
 		
 		return ll;	
 	}
@@ -104,9 +132,59 @@ public class SudoCommandGroupTests extends SahiTestScript{
 		
         //										testname					cn   			description
 		ll.add(Arrays.asList(new Object[]{ "delete_sudo_commandgroup",		"sudo group1",		"group1 with basic commands"	} ));
-		ll.add(Arrays.asList(new Object[]{ "delete_sudo_commandgroup",		"sudo group2",		"group2 with basic commands"	} ));
 					        
 		return ll;	
 	}
+	
+	
+	/*
+	 * Data to be used when adding sudo command groups - for positive cases
+	 */
+	@DataProvider(name="getSudoruleCommandGroupInvalidModifyTestObjects")
+	public Object[][] getSudoruleCommandGroupInvalidModifyTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createSudoruleCommandGroupInvalidModifyTestObjects());
+	}
+	protected List<List<Object>> createSudoruleCommandGroupInvalidModifyTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname			cn   				description		expected error
+		ll.add(Arrays.asList(new Object[]{ "sudo_commandgroup",		"sudo group1",		"", 			"Input form contains invalid or missing values."	} ));
+		
+		return ll;	
+	}
+	
+	
+	@DataProvider(name="getSudoruleCommandGroupInvalidAddTestObjects")
+	public Object[][] getSudoruleCommandGroupInvalidAddTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createSudoruleCommandGroupInvalidAddTestObjects());
+	}
+	protected List<List<Object>> createSudoruleCommandGroupInvalidAddTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname												cn   						description
+		ll.add(Arrays.asList(new Object[]{ "sudo_commandgroup_with trailing_space_in_desc",				"sudo group2",				"Description with trailing space ",		"invalid 'desc': Leading and trailing spaces are not allowed"	} ));
+		ll.add(Arrays.asList(new Object[]{ "sudo_commandgroup_with leading_space_in_desc",				"sudo group2",				" Description with leading space",		"invalid 'desc': Leading and trailing spaces are not allowed"      } ));
+		
+		return ll;	
+	}
+	
+	
+	/*
+	 * Data to be used when adding rules with required fields 
+	 */
+	@DataProvider(name="getSudoRuleCommandGroupRequiredFieldTestObjects")
+	public Object[][] getSudoRuleCommandGroupRequiredFieldTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createSudoRuleCommandGroupRequiredFieldTestObject());
+	}
+	protected List<List<Object>> createSudoRuleCommandGroupRequiredFieldTestObject() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname							cn					expected_Error   
+		ll.add(Arrays.asList(new Object[]{ "create_blank_sudocommandgroup",			"",					"Required field"      } ));
+		
+		return ll;	
+	}
+	
+	
 
 }

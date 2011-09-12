@@ -27,37 +27,37 @@
 			</run>
 		</groups>
 	</test>
-	
+
 <!--		
 	<test name="Sudo Command Tests">
 		<groups>
-			<run>
-			    Sudo Commands 		   
+			<run>		   
 			    <include name="sudoruleCommandAddTests" />
 				<include name="sudoruleCommandDelTests" />
 			</run>
 		</groups>
-		<classes>
-		    <class name="com.redhat.qe.ipa.sahi.tests.sudo.SudoCommandTests" />
-		</classes>
 	</test>
+	
+-->
+	
 	
 		
 	<test name="Sudo Command Group Tests">
+	   <packages>
+		     <package name="com.redhat.qe.ipa.sahi.*" />
+		</packages>
 		<groups>
-			<run>
-			    Sudo Command Groups 
-			   
+			<run>	
+			    <include name="setup" />
 				<include name="sudoruleCommandGroupAddTests" />
-				<include name="sudoruleCommandGroupDelTests" />
-				
+				<include name="invalidSudoCommanGroupAddTests" />
+				<include name="invalidSudoCommanGroupAddRequiredFieldTests" />
+				<include name="invalidSudoCommanGroupModifyTests" />
+				 <include name="sudoruleCommandGroupDelTests" />
 			</run>
 		</groups>
-		<classes>
-		    <class name="com.redhat.qe.ipa.sahi.tests.sudo.SudoCommandTests" />
-		</classes>
 	</test>
--->	
+
 	<listeners>        
   		<listener class-name="com.redhat.qe.auto.testng.TestNGListener" />	
 	</listeners>

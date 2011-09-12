@@ -530,13 +530,11 @@ public class SudoTasks {
 	 *********************** 		Tasks for Sudo Command Groups		********************** 
 	 *****************************************************************************************/
 
-	public static void createSudoruleCommandGroupAdd(SahiTasks sahiTasks, String cn, String description) {
-
-		sahiTasks.link("Sudo Command Groups").click();
+	public static void createSudoruleCommandGroupAdd(SahiTasks sahiTasks, String cn, String description, String buttonToClick) {
 		sahiTasks.span("Add").click();
 		sahiTasks.textbox("cn").setValue(cn);
 		sahiTasks.textbox("description").setValue(description);
-		sahiTasks.button("Add").click();
+		sahiTasks.button(buttonToClick).click();
 				
 	}
 	
@@ -565,8 +563,32 @@ public class SudoTasks {
 		
 		sahiTasks.link("Sudo Command Groups").click();
 		sahiTasks.checkbox(cn).click();
-		sahiTasks.span("Delete[2]").click();
+		sahiTasks.span("Delete").click();
 		sahiTasks.button("Delete").click();
 		
+	}
+	
+	public static void modifySudoruleCommandGroupWithInvalidSetting(SahiTasks sahiTasks, String cn, String description, String expectedError) {
+		CommonTasks.modifyToInvalidSetting(sahiTasks, cn, description, expectedError);
+		sahiTasks.link("Sudo Command Groups").in(sahiTasks.div("content")).click();
+	}
+	
+	public static void createInvalidSudoCommandGroup(SahiTasks sahiTasks,	String cn, String description, String expectedError) {		
+		sahiTasks.span("Add").click();
+		sahiTasks.textbox("cn").setValue(cn);
+		sahiTasks.textbox("description").setValue(description);
+		sahiTasks.button("Add").click();
+		Assert.assertTrue(sahiTasks.div(expectedError).exists(), "Verified Expected Error Message when creating invalid sudo command group");
+		sahiTasks.button("Cancel").near(sahiTasks.button("Retry")).click();
+		sahiTasks.button("Cancel").near(sahiTasks.button("Add and Edit")).click();
+	}
+	
+	public static void createSudoCommandGroupWithRequiredField(SahiTasks sahiTasks,	String cn, String description, String expectedError) {		
+		sahiTasks.span("Add").click();
+		sahiTasks.textbox("cn").setValue(cn);
+		sahiTasks.textbox("description").setValue(description);
+		sahiTasks.button("Add").click();
+		Assert.assertTrue(sahiTasks.span(expectedError).exists(), "Verified expected error when adding invalid rule " + cn);
+		sahiTasks.button("Cancel").near(sahiTasks.button("Add and Edit")).click();
 	}
 }
