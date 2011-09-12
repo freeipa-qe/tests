@@ -131,7 +131,7 @@ public class HostTasks {
 	public static void addInvalidHost(SahiTasks sahiTasks, String hostname, String hostdomain, String ipadr, String expectedError) {
 		sahiTasks.span("Add").click();
 		sahiTasks.textbox("hostname").setValue(hostname);
-		sahiTasks.textbox("dnszone").setValue(CommonTasks.ipadomain);
+		sahiTasks.textbox("dnszone").setValue(hostdomain);
 		if(ipadr == ""){ 
 			sahiTasks.checkbox("force").click();
 		}
