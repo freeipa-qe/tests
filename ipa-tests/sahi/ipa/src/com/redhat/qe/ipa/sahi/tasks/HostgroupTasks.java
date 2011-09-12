@@ -430,6 +430,33 @@ public class HostgroupTasks {
 	 * @param description - description for host group
 	 * @param expectedError - the error thrown when an invalid host group is being attempted to be added
 	 */
+	public static void modifyInvalidUndoHostGroup(SahiTasks sahiTasks, String groupname, String description, String expectedError) {
+		
+		sahiTasks.link(groupname).click();
+		sahiTasks.link("Settings").click();
+		sahiTasks.textbox("description").setValue(description);
+		sahiTasks.span("Update").click();
+
+		//Check for expected error
+		log.fine("error check");
+		Assert.assertTrue(sahiTasks.div(expectedError).exists(), "Verified expected error when adding modifying host group :: " + expectedError);
+	
+		sahiTasks.button("OK").click();
+		sahiTasks.span("undo").click();
+		
+		sahiTasks.link("Host Groups").in(sahiTasks.div("content")).click();
+		if (sahiTasks.button("Reset").exists()) {
+			sahiTasks.button("Reset").click();
+		}
+	}
+	
+	/*
+	 * modify host group - invalid description - dirty page
+	 * @param sahiTasks 
+	 * @param groupname - group name
+	 * @param description - description for host group
+	 * @param expectedError - the error thrown when an invalid host group is being attempted to be added
+	 */
 	public static void modifyInvalidDirtyHostGroup(SahiTasks sahiTasks, String groupname, String description, String expectedError) {
 		
 		sahiTasks.link(groupname).click();
