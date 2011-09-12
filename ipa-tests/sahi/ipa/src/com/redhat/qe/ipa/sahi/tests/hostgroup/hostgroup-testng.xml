@@ -23,9 +23,9 @@
 			    <include name="invalidCharHostGroupAddTests" />
 			    <include name="invalidHostGroupAddTests" />
 			    <include name="invalidHostGroupModifyTests" />
+			    <include name="invalidHostGroupModifyUndoTests" />
 			    <include name="cleanup" />
 			    <!-- 
-			    <include name="invalidHostGroupModifyUndoTests" />
 				<include name="teardown"/>
 				-->
 			</run>

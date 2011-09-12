@@ -67,10 +67,10 @@ public class HostgroupTests extends SahiTestScript{
 		}
 		
 		//add hosts for host group members
-		//sahiTasks.navigateTo(commonTasks.hostPage, true);
-		//for (String hostname : hostnames_short) {
-		//	HostTasks.addHost(sahiTasks, hostname, commonTasks.getIpadomain(), "");
-		//}
+		sahiTasks.navigateTo(commonTasks.hostPage, true);
+		for (String hostname : hostnames_short) {
+			HostTasks.addHost(sahiTasks, hostname, commonTasks.getIpadomain(), "");
+		}
 		
 		sahiTasks.navigateTo(commonTasks.hostgroupPage, true);
 	}
@@ -78,8 +78,8 @@ public class HostgroupTests extends SahiTestScript{
 	@AfterClass (groups={"cleanup"}, description="Delete objects added for the tests", alwaysRun=true)
 	public void cleanup() throws Exception {	
 		// delete the hosts added for testing
-		//sahiTasks.navigateTo(commonTasks.hostPage, true);
-		//HostTasks.deleteHost(sahiTasks, hostnames);
+		sahiTasks.navigateTo(commonTasks.hostPage, true);
+		HostTasks.deleteHost(sahiTasks, hostnames);
 		
 		//delete the host groups added for testing
 		sahiTasks.navigateTo(commonTasks.hostgroupPage, true);
@@ -582,7 +582,7 @@ public class HostgroupTests extends SahiTestScript{
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 	
 		//										testname										groupanme			description			expectedError
-		ll.add(Arrays.asList(new Object[]{ 		"modify_invalid_description_empty",				myhostgroup,		" ",	 				 "Input form contains invalid or missing values." } ));
+		ll.add(Arrays.asList(new Object[]{ 		"modify_invalid_description_empty",				myhostgroup,		"",	 				 "Input form contains invalid or missing values." } ));
 		return ll;	
 	}
 }
