@@ -471,6 +471,33 @@ public class GroupTasks {
 		sahiTasks.link("User Groups").in(sahiTasks.div("content")).click();
  	}
     
+	
+	/*
+	 * Remove user members
+	 * @param sahiTasks
+	 * @param groupname - name of group
+	 * @param name - names to remove as member
+	 * @param button - Delete or Cancel
+	 */
+	public static void removeMembers(SahiTasks sahiTasks, String groupName, String membertype, String name, String button) {
+		sahiTasks.link(groupName).click();
+		if (membertype == "user"){
+			sahiTasks.link("member_user").click();
+		}
+		if (membertype == "usergroup"){
+			sahiTasks.link("member_group").click();
+		}
+		
+		sahiTasks.radio("direct").click();
+		sahiTasks.checkbox(name).click();
+
+		sahiTasks.span("Delete").click();
+		sahiTasks.button(button).click();
+		sahiTasks.link("User Groups").in(sahiTasks.div("content")).click();
+	}
+	
+	
+	
     /*
      * Test for: add and edit Group
      * @param sahiTasks 

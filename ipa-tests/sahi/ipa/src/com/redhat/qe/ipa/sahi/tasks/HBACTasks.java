@@ -176,6 +176,23 @@ public class HBACTasks {
 	}
 	
 	/**
+	 * Modify General Section for an HBAC Rule
+	 * @param sahiTasks
+	 * @param cn - the rule to modify for
+	 */
+	public static void modifyHBACRuleInvalidGeneralSection(SahiTasks sahiTasks, String cn, String description, String expectedError) {
+		sahiTasks.link(cn).click();
+		
+		sahiTasks.textarea("description").setValue(description);		
+		sahiTasks.span("Update").click();
+		
+		CommonTasks.checkOperationsError(sahiTasks, expectedError);
+		
+		sahiTasks.link("HBAC Rules").in(sahiTasks.div("content")).click();	
+		
+	}
+	
+	/**
 	 * Verify General Section for an HBAC Rule
 	 * @param sahiTasks
 	 * @param cn - the rule to verify
@@ -205,7 +222,6 @@ public class HBACTasks {
 		sahiTasks.span(">>").click();
 		sahiTasks.button("Enroll").click();
 		
-		sahiTasks.span("Update").click();
 		sahiTasks.link("HBAC Rules").in(sahiTasks.div("content")).click();			
 	}
 	
@@ -245,8 +261,6 @@ public class HBACTasks {
 		sahiTasks.span("Delete").under(sahiTasks.heading2(("Accessing"))).near(sahiTasks.span("Host Groups")).click();
 		sahiTasks.button("Delete").click();
 		
-		
-		sahiTasks.span("Update").click();
 		sahiTasks.link("HBAC Rules").in(sahiTasks.div("content")).click();			
 		
 	}
@@ -271,11 +285,80 @@ public class HBACTasks {
 				"listed, since it is memberof and is already included in hostgroup");		
 		sahiTasks.button("Cancel").click();
 		
-		sahiTasks.span("Update").click();
 		sahiTasks.link("HBAC Rules").in(sahiTasks.div("content")).click();			
 		
 	}
 	
+	
+	/**
+	 * Modify Accessing Section for an HBAC Rule
+	 * @param sahiTasks
+	 * @param cn - the rule to modify for
+	 */
+	public static void modifyHBACRuleWhoSectionMemberList(SahiTasks sahiTasks, String cn, String uid, String groupname ) {
+		sahiTasks.link(cn).click();
+		
+		//Click to add Host groups from "Accessing" section
+		sahiTasks.span("Add").under(sahiTasks.heading2(("Who"))).near(sahiTasks.span("User Groups")).click();
+		sahiTasks.checkbox(groupname).under(sahiTasks.div("Available")).click();
+		sahiTasks.span(">>").click();
+		sahiTasks.button("Enroll").click();
+
+		sahiTasks.span("Add").under(sahiTasks.heading2(("Who"))).near(sahiTasks.span("Users")).click();		
+		Assert.assertFalse(sahiTasks.checkbox(uid).under(sahiTasks.div("Available")).exists(), "Verified user is not " +
+				"listed, since it is memberof and is already included in usergroup");		
+		sahiTasks.button("Cancel").click();
+		
+		sahiTasks.link("HBAC Rules").in(sahiTasks.div("content")).click();			
+		
+	}
+	
+	/**
+	 * This method not used yet in any tests...brought in from sudo tests
+	 * @param sahiTasks
+	 * @param cn
+	 * @param category - usercategory/hostcategory/servicecategory/sourcehostcategory
+	 * @param action - undo/Reset/Update
+	 */
+	public static void undoResetUpdateHBACRuleSections(SahiTasks sahiTasks, String cn, String category, String action) {
+		sahiTasks.link(cn).click();
+		
+		sahiTasks.radio(category).click();
+		sahiTasks.span(action).click();
+		if ( (action.equals("undo")) || (action.equals("Reset")) )
+			Assert.assertTrue(sahiTasks.radio(category+"[1]").checked(), "Verified " + category + " set after choosing to " + action);		
+		else
+			Assert.assertTrue(sahiTasks.radio(category).checked(), "Verified " + category + " set after choosing to " + action);
+		sahiTasks.link("HBAC Rules").in(sahiTasks.div("content")).click();			
+	}	
+	
+	
+	public static void updateCategory(SahiTasks sahiTasks, String cn, String hostgroupName, String expectedError, boolean memberExists) {
+		sahiTasks.link(cn).click();
+		
+		sahiTasks.radio("sourcehostcategory").click();
+		sahiTasks.span("Update").click();
+		
+		// a hostgroup is added...so error is expected
+		Assert.assertTrue(sahiTasks.span("Operations Error").exists(), "Verified Expected Error Message Header");
+		Assert.assertTrue(sahiTasks.div("Some operations failed.Show detailsHide details" + expectedError).exists(), "Verified Expected Error Message");
+		sahiTasks.link("Show details").click();
+		Assert.assertTrue(sahiTasks.listItem(expectedError).exists(), "Verified Expected Error Details when updating " +
+				"category without deleting members");
+		sahiTasks.button("OK").click();
+		
+		//delete the hostgroup
+		sahiTasks.checkbox(hostgroupName).under(sahiTasks.heading2(("From"))).near(sahiTasks.span("Host Groups")).click();
+		sahiTasks.span("Delete").under(sahiTasks.heading2(("From"))).near(sahiTasks.span("Host Groups")).click();
+		sahiTasks.button("Delete").click();
+		
+		//try again
+		sahiTasks.radio("sourcehostcategory").click();
+		sahiTasks.span("Update").click();
+		
+		//go back to hbac page - since no errors expected now
+		sahiTasks.link("HBAC Rules").in(sahiTasks.div("content")).click();					
+	}
 	
 	
 	/**
@@ -318,7 +401,6 @@ public class HBACTasks {
 		sahiTasks.span("Delete").under(sahiTasks.heading2(("From"))).near(sahiTasks.span("Hosts")).click();
 		sahiTasks.button("Delete").click();
 	
-		sahiTasks.span("Update").click();
 		sahiTasks.link("HBAC Rules").in(sahiTasks.div("content")).click();			
 		
 	}
@@ -363,7 +445,6 @@ public class HBACTasks {
 		sahiTasks.link(">>").click();
 		sahiTasks.button("Enroll").click();
 		
-		sahiTasks.span("Update").click();
 		sahiTasks.link("HBAC Rules").in(sahiTasks.div("content")).click();				
 	}
 	

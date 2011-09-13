@@ -21,6 +21,32 @@ import com.redhat.qe.ipa.sahi.tasks.HostTasks;
 import com.redhat.qe.ipa.sahi.tasks.HostgroupTasks;
 import com.redhat.qe.ipa.sahi.tasks.UserTasks;
 
+
+/* 
+ * Review comments
+ * 40. In HBACTasks adding/deleting entries (e.g. users, hosts) into/from a
+rule is saved immediately, so no need to click Update because the button
+will be disabled anyway. //done 
+
+41. In HBACTests.hbacRuleMemberListTests it tests hosts. It should test
+users too. It should also test if the host/user is already added
+directly it should not appear again in the available list. //done 
+
+42. Ideally all tests that change the data should be validated via CLI
+too, but this is probably low priority. // TODO: nkrishnan
+
+43. In HBACTests we could verify that when a category is set to 'all'
+the entries in that category are deleted. //done 
+
+  I think there is additional negative testing we can do //added some..but there could be more
+  
+  One thing that I think we should log a bug on that should not affect our automation at all is the main page for HBAC rules ... 
+  There is only "all" category for object type that can be associated with a rule and it is not editable.  I do not think they 
+  should be displayed on the main page at all.  I think just the rule name (link), description and whether the rule is enabled or disabled.
+  // logged bug 738038
+
+ */
+
 public class HBACTests extends SahiTestScript {
 	
 	private static Logger log = Logger.getLogger(HBACTests.class.getName());
@@ -172,7 +198,8 @@ public class HBACTests extends SahiTestScript {
 	/*
 	 * Add Rules - for negative tests
 	 */
-	@Test (groups={"invalidhbacRuleAddTests"}, dataProvider="getInvalidHBACRuleTestObjects", dependsOnGroups="hbacRuleAddTests")	
+	//@Test (groups={"invalidhbacRuleAddTests"}, dataProvider="getInvalidHBACRuleTestObjects", dependsOnGroups="hbacRuleAddTests")	
+	@Test (groups={"invalidhbacRuleAddTests"}, dataProvider="getInvalidHBACRuleTestObjects")	
 	public void testInvalidHBACRuleadd(String testName, String cn, String expectedError) throws Exception {
 		//new test user can be added now
 		HBACTasks.createInvalidRule(sahiTasks, cn, expectedError);		
@@ -250,7 +277,21 @@ public class HBACTests extends SahiTestScript {
 		
 	}
 	
-	
+	/*
+	 * Edit the General Section for the HBACRule
+	 */
+	//@Test (groups={"hbacRuleInvalidGeneralSettingsTests"}, dataProvider="getHBACRuleInvalidGeneralSettingsTestObjects", dependsOnGroups={"hbacRuleAddAndEditTests"})	
+	@Test (groups={"hbacRuleInvalidGeneralSettingsTests"}, dataProvider="getHBACRuleInvalidGeneralSettingsTestObjects")
+	public void testHBACRuleInvalidGeneralSettings(String testName, String cn, String description) throws Exception {		
+		//verify rule to be edited exists
+		Assert.assertTrue(sahiTasks.link(cn).exists(), "Verify Rule " + cn + " to be edited exists");
+		
+		String expectedError = "invalid 'desc': Gettext('Leading and trailing spaces are not allowed', domain='ipa', localedir=None)";
+		
+		//modify this rule
+		HBACTasks.modifyHBACRuleInvalidGeneralSection(sahiTasks, cn, description, expectedError);
+		
+	}
 	
 	/*
 	 * Edit the General Section for the HBACRule
@@ -341,7 +382,8 @@ public class HBACTests extends SahiTestScript {
 	 * is not listed since it already is in the list for this Rule, because
 	 * the it is memberof hostgroupName
 	 */
-	@Test (groups={"hbacRuleMemberListTests"}, dataProvider="getHBACRuleMemberListTestObjects", dependsOnGroups={"hbacRuleAddTests"})	
+	//@Test (groups={"hbacRuleMemberListTests"}, dataProvider="getHBACRuleMemberListTestObjects", dependsOnGroups={"hbacRuleAddTests"})
+	@Test (groups={"hbacRuleMemberListTests"}, dataProvider="getHBACRuleMemberListTestObjects")	
 	public void testHBACRuleMemberList(String testName, String cn) throws Exception {		
 		//verify rule to be edited exists
 		Assert.assertTrue(sahiTasks.link(cn).exists(), "Verify Rule " + cn + " to be edited exists");
@@ -357,6 +399,55 @@ public class HBACTests extends SahiTestScript {
 		sahiTasks.navigateTo(commonTasks.hbacPage, true);
 		
 	}
+	
+	
+	
+	/*
+	 * Verify member list for the HBACRule
+	 * uid is added as member of groupName
+	 * groupName is added to Who list for Rule
+	 * When choosing to add Users to Who list for Rule, verify that uid 
+	 * is not listed since it already is in the list for this Rule, because
+	 * the it is memberof groupName
+	 */
+	//@Test (groups={"hbacRuleUserMemberListTests"}, dataProvider="getHBACRuleMemberListTestObjects", dependsOnGroups={"hbacRuleAddTests"})	
+	@Test (groups={"hbacRuleUserMemberListTests"}, dataProvider="getHBACRuleMemberListTestObjects")
+	public void testHBACRuleUserMemberList(String testName, String cn) throws Exception {		
+		//verify rule to be edited exists
+		Assert.assertTrue(sahiTasks.link(cn).exists(), "Verify Rule " + cn + " to be edited exists");
+		
+		sahiTasks.navigateTo(commonTasks.groupPage, true);
+		GroupTasks.addMembers(sahiTasks, groupName, membertype, uid, "Enroll");
+		sahiTasks.navigateTo(commonTasks.hbacPage, true);
+		//modify this rule
+		HBACTasks.modifyHBACRuleWhoSectionMemberList(sahiTasks, cn, uid, groupName);
+		
+		sahiTasks.navigateTo(commonTasks.groupPage, true);
+		GroupTasks.removeMembers(sahiTasks, groupName, "user", uid, "Delete");
+		sahiTasks.navigateTo(commonTasks.hbacPage, true);
+		
+	}
+	
+	/*
+	 * In HBACTests we could verify that when a category is set to 'all' the entries in that category are deleted.
+	 * Add a source host (Done in hbacRuleFromSettingsTests)
+	 * Set the sourcehostcategory to 'all'
+	 * Update this
+	 * Verify error
+	 * Delete source host 
+	 * Set the sourcehostcategory to 'all'
+	 * Update this
+	 * Should be successful
+	 */
+	@Test (groups={"hbacRuleUpdateCategoryTests"}, dataProvider="getSingleHBACRuleTestObjects", dependsOnGroups={"hbacRuleAddAndEditTests", "hbacRuleFromSettingsTests"})	
+	public void testHBACRuleUpdateCategory(String testName, String cn) throws Exception {		
+		//verify rule to be edited exists
+		Assert.assertTrue(sahiTasks.link(cn).exists(), "Verify Rule " + cn + " to be edited exists");
+		String expectedError = "sourcehost category cannot be set to 'all' while there are allowed source hosts";
+		HBACTasks.updateCategory(sahiTasks, cn, hostgroupName, expectedError, true);		
+	}
+	
+	
 	
 	/*
 	 * Expand/Collapse details of an HBACRule
@@ -487,7 +578,7 @@ public class HBACTests extends SahiTestScript {
 		
 		return ll;	
 	}
-	
+
 	/*
 	 * Data to be used when adding rules 
 	 */
@@ -498,8 +589,10 @@ public class HBACTests extends SahiTestScript {
 	protected List<List<Object>> createInvalidHBACRuleTestObject() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-        //										testname					cn					expected_Error   
-		ll.add(Arrays.asList(new Object[]{ "create_duplicate_hbacrule",		"dev_hbacRule",		"HBAC rule with name \"dev_hbacRule\" already exists"      } ));
+        //										testname							cn					expected_Error   
+		ll.add(Arrays.asList(new Object[]{ "create_duplicate_hbacrule",				"dev_hbacRule",		"HBAC rule with name \"dev_hbacRule\" already exists"      } ));
+		ll.add(Arrays.asList(new Object[]{ "hbacrule_with trailing_space_in_name",	"hbacRule ",		"invalid 'name': Leading and trailing spaces are not allowed"	} ));
+		ll.add(Arrays.asList(new Object[]{ "hbacrule_with leading_space_in_name",	" hbacRule",		"invalid 'name': Leading and trailing spaces are not allowed"	} ));
 		
 		return ll;	
 	}
@@ -535,6 +628,24 @@ public class HBACTests extends SahiTestScript {
 		
 		return ll;	
 	}
+	
+	/*
+	 * Data to be used when adding rules 
+	 */
+	@DataProvider(name="getHBACRuleInvalidGeneralSettingsTestObjects")
+	public Object[][] getHBACRuleInvalidGeneralSettingsTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(editHBACRuleInvalidGeneralSettingsTestObject());
+	}
+	protected List<List<Object>> editHBACRuleInvalidGeneralSettingsTestObject() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname										cn   				description
+		ll.add(Arrays.asList(new Object[]{ "edit_general_hbacrule_trailingspace_in_desc",		"eng_hbacRule",		"This rule is for eng "      } ));
+		ll.add(Arrays.asList(new Object[]{ "edit_general_hbacrule_leadingspace_in_desc",		"eng_hbacRule",		" This rule is for eng"      } ));
+		
+		return ll;	
+	}
+	
 	
 	/*
 	 * Data to be used when deleting rules 

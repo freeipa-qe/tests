@@ -54,7 +54,7 @@ public class HBACServiceTests  extends SahiTestScript{
 		HBACTasks.addHBACService(sahiTasks, cn, description, "Add");
 		
 		//verify rule were added
-		Assert.assertTrue(sahiTasks.link(cn).exists(), "Added HBAC Service " + cn + "  successfully");
+		Assert.assertTrue(sahiTasks.link(cn.toLowerCase()).exists(), "Added HBAC Service " + cn + "  successfully");
 	}
 	
 	/*
@@ -224,6 +224,8 @@ public class HBACServiceTests  extends SahiTestScript{
         //										testname					cn			description
 		ll.add(Arrays.asList(new Object[]{ "good_hbacservice",				"http",		"testing http service for HBAC"      } ));
 		ll.add(Arrays.asList(new Object[]{ "good_hbacservice",				"https",	"testing https service for HBAC"      } ));
+		ll.add(Arrays.asList(new Object[]{ "hbacservice_long",				"abcdefghijklmnopqrstuvwxyz123456789ANDAGAINabcdefghijklmnopqrstuvwxyz123456789ANDAGAINabcdefghijklmnopqrstuvwxyz123456789", "long svc name"      } ));
+		ll.add(Arrays.asList(new Object[]{ "hbacservice_specialchar",	    "h@ba*c#Se?r!v<i~c`e",			"svc name with special char"      } ));
 		
 		return ll;	
 	}
@@ -271,8 +273,12 @@ public class HBACServiceTests  extends SahiTestScript{
 	protected List<List<Object>> createInvalidHBACServiceTestObject() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-        //										testname					cn			description				expected_Error   
-		ll.add(Arrays.asList(new Object[]{ "create_duplicate_hbacservice",	"http",		"duplicate service",	"HBAC service with name \"http\" already exists"      } ));
+        //										testname								cn				description									expected_Error   
+		ll.add(Arrays.asList(new Object[]{ "create_duplicate_hbacservice",				"http",			"duplicate service",						"HBAC service with name \"http\" already exists"      } ));
+		ll.add(Arrays.asList(new Object[]{ "hbacservice_with trailing_space_in_name",	"hbacSvc ",		"service with trailing space in name",		"invalid 'service': Leading and trailing spaces are not allowed"	} ));
+		ll.add(Arrays.asList(new Object[]{ "hbacservice_with leading_space_in_name",	" hbacSvc",		"service with leading space in name",		"invalid 'service': Leading and trailing spaces are not allowed"	} ));
+		ll.add(Arrays.asList(new Object[]{ "hbacservice_with trailing_space_in_desc",	"hbacSvc",		"service with trailing space in desc ",		"invalid 'service': Leading and trailing spaces are not allowed"	} ));
+		ll.add(Arrays.asList(new Object[]{ "hbacservice_with leading_space_in_desc",	"hbacSvc",		" service with leading space in desc",		"invalid 'service': Leading and trailing spaces are not allowed"	} ));
 		
 		return ll;	
 	}
