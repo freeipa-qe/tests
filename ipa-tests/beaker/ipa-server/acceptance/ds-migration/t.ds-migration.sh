@@ -54,6 +54,69 @@ check_group()
 
 }
 
+######################
+# Add some more users
+# Adding some more users to one group
+######################
+add_more_users()
+{
+	file="/dev/shm/new-users-for-group.ldif"
+	echo '# usera000, People, bos.redhat.com
+dn: uid=usera000,ou=People,dc=bos,dc=redhat,dc=com
+givenName: User
+sn: 1009
+loginShell: /bin/bash
+uidNumber: 1009
+gidNumber: 1000
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetorgperson
+objectClass: posixAccount
+uid: usera000
+gecos: User a000
+cn: User a000
+homeDirectory: /home/usera000
+
+dn: uid=userb000,ou=People,dc=bos,dc=redhat,dc=com
+givenName: User
+sn: 1009
+loginShell: /bin/bash
+uidNumber: 1009
+gidNumber: 1000
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetorgperson
+objectClass: posixAccount
+uid: userb000
+gecos: User a000
+cn: User a000
+homeDirectory: /home/userb000' >> $file
+
+	rlPhaseStartTest "adding some more users to gid 1000"
+		rlRun "ldapmodify -a -x -h$CLIENT -p 2389 -D \"cn=Directory Manager\" -wSecret123 -c -f $file" 0 "adding more users to gid 1000"
+	rlPhaseEnd
+
+}
+
+#####################
+# cleanup
+#####################
+cleanup()
+{
+	file=/dev/shm/ds-ipa-migration-test-cleanup.ldif
+	echo 'dn: uid=usera000,ou=People,dc=bos,dc=redhat,dc=com
+changetype: delete
+
+dn: uid=userb000,ou=People,dc=bos,dc=redhat,dc=com
+changetype: delete' > $file
+
+	rlPhaseStartTest "runnign cleanup of added users"
+		rlRun "ldapmodify -x -h$CLIENT -p 2389 -D \"cn=Directory Manager\" -wSecret123 -c -f $file" 0 "cleaning up added users"
+	rlPhaseEnd
+
+}
 
 ######################
 # test suite         #
@@ -68,13 +131,19 @@ ds-migration()
 		rlRun "ipa config-mod --enable-migration=TRUE" 0 "enabling migration"
 		rlRun "ipa migrate-ds ldap://$CLIENT:2389" 0 "running migration from DS instance on CLIENT"
 	rlPhaseEnd
+
+	add_more_users
 	
-	# Checking user 1000
+	# Checking user user1000
 	check_user user1000
-	# Checking user 2000
+	# Checking user user2000
 	check_user user2000
-	# Checking user 2009
+	# Checking user user2009
 	check_user user2009
+	# Checking user usera000
+	check_user usera000
+	# Checking user userb000
+	check_user userb000
 
 	# checking group 1000
 	check_group group1000
@@ -86,5 +155,8 @@ ds-migration()
 	rlPhaseStartTest "Migrating from $CLIENT"
 		rlRun "ipa config-mod --enable-migration=FALSE" 0 "disabling migration"
 	rlPhaseEnd
+
+	# Cleaning up added users
+	cleanup
 } # ipasample
 
