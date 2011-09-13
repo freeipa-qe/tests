@@ -116,6 +116,10 @@ changetype: delete' > $file
 		rlRun "ldapmodify -x -h$CLIENT -p 2389 -D \"cn=Directory Manager\" -w$ADMINPW -c -f $file" 0 "cleaning up added users"
 	rlPhaseEnd
 
+
+	rlPhaseStartTest "returning ipa server to normal operation"
+		rlRun "ipa config-mod --enable-migration=FALSE" 0 "enabling migration"
+	rlPhaseEnd
 }
 
 ######################
@@ -126,13 +130,17 @@ changetype: delete' > $file
 
 ds-migration()
 {
+
+	add_more_users
+
 	rlPhaseStartTest "Migrating from $CLIENT"
 		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 		rlRun "ipa config-mod --enable-migration=TRUE" 0 "enabling migration"
-		rlRun "echo $ADMINPW | ipa migrate-ds ldap://$CLIENT:2389" 0 "running migration from DS instance on CLIENT"
+		echo $ADMINPW | ipa migrate-ds ldap://$CLIENT:2389
+		if [ $? -ne 0 ]; then
+			rlFail "ERROR - Migration form DS failed"
+		fi
 	rlPhaseEnd
-
-	add_more_users
 	
 	# Checking user user1000
 	check_user user1000
