@@ -198,8 +198,7 @@ public class HBACTests extends SahiTestScript {
 	/*
 	 * Add Rules - for negative tests
 	 */
-	//@Test (groups={"invalidhbacRuleAddTests"}, dataProvider="getInvalidHBACRuleTestObjects", dependsOnGroups="hbacRuleAddTests")	
-	@Test (groups={"invalidhbacRuleAddTests"}, dataProvider="getInvalidHBACRuleTestObjects")	
+	@Test (groups={"invalidhbacRuleAddTests"}, dataProvider="getInvalidHBACRuleTestObjects", dependsOnGroups="hbacRuleAddTests")	
 	public void testInvalidHBACRuleadd(String testName, String cn, String expectedError) throws Exception {
 		//new test user can be added now
 		HBACTasks.createInvalidRule(sahiTasks, cn, expectedError);		
@@ -280,8 +279,7 @@ public class HBACTests extends SahiTestScript {
 	/*
 	 * Edit the General Section for the HBACRule
 	 */
-	//@Test (groups={"hbacRuleInvalidGeneralSettingsTests"}, dataProvider="getHBACRuleInvalidGeneralSettingsTestObjects", dependsOnGroups={"hbacRuleAddAndEditTests"})	
-	@Test (groups={"hbacRuleInvalidGeneralSettingsTests"}, dataProvider="getHBACRuleInvalidGeneralSettingsTestObjects")
+	@Test (groups={"hbacRuleInvalidGeneralSettingsTests"}, dataProvider="getHBACRuleInvalidGeneralSettingsTestObjects", dependsOnGroups={"hbacRuleAddAndEditTests"})	
 	public void testHBACRuleInvalidGeneralSettings(String testName, String cn, String description) throws Exception {		
 		//verify rule to be edited exists
 		Assert.assertTrue(sahiTasks.link(cn).exists(), "Verify Rule " + cn + " to be edited exists");
@@ -382,8 +380,7 @@ public class HBACTests extends SahiTestScript {
 	 * is not listed since it already is in the list for this Rule, because
 	 * the it is memberof hostgroupName
 	 */
-	//@Test (groups={"hbacRuleMemberListTests"}, dataProvider="getHBACRuleMemberListTestObjects", dependsOnGroups={"hbacRuleAddTests"})
-	@Test (groups={"hbacRuleMemberListTests"}, dataProvider="getHBACRuleMemberListTestObjects")	
+	@Test (groups={"hbacRuleMemberListTests"}, dataProvider="getHBACRuleMemberListTestObjects", dependsOnGroups={"hbacRuleAddTests"})	
 	public void testHBACRuleMemberList(String testName, String cn) throws Exception {		
 		//verify rule to be edited exists
 		Assert.assertTrue(sahiTasks.link(cn).exists(), "Verify Rule " + cn + " to be edited exists");
@@ -410,8 +407,7 @@ public class HBACTests extends SahiTestScript {
 	 * is not listed since it already is in the list for this Rule, because
 	 * the it is memberof groupName
 	 */
-	//@Test (groups={"hbacRuleUserMemberListTests"}, dataProvider="getHBACRuleMemberListTestObjects", dependsOnGroups={"hbacRuleAddTests"})	
-	@Test (groups={"hbacRuleUserMemberListTests"}, dataProvider="getHBACRuleMemberListTestObjects")
+	@Test (groups={"hbacRuleUserMemberListTests"}, dataProvider="getHBACRuleMemberListTestObjects", dependsOnGroups={"hbacRuleAddTests"})	
 	public void testHBACRuleUserMemberList(String testName, String cn) throws Exception {		
 		//verify rule to be edited exists
 		Assert.assertTrue(sahiTasks.link(cn).exists(), "Verify Rule " + cn + " to be edited exists");
