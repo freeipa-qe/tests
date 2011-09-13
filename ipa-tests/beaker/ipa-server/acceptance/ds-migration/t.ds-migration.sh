@@ -11,19 +11,19 @@ check_user()
 	home=$(ldapsearch -D 'cn=Directory Manager' -h$BEAKERCLIENT -p2389 -w$ADMINPW -x -b uid=$1,ou=People,dc=bos,dc=redhat,dc=com objectclass=* | grep homeDirectory | cut -d\  -f2 )
 
 	rlPhaseStartTest "checking uid for user $1"
-		rlRun "ipa user-show $1 | grep UID | grep $uid" 0 "checking to ensure the UID for user $1 is $uid"
+		rlRun "ipa user-show --all $1 | grep UID | grep $uid" 0 "checking to ensure the UID for user $1 is $uid"
 	rlPhaseEnd
 
 	rlPhaseStartTest "checking gid for user $1"
-		rlRun "ipa user-show $1 | grep GID | grep $gid" 0 "checking to ensure the UID for user $1 is $gid"
+		rlRun "ipa user-show --all $1 | grep GID | grep $gid" 0 "checking to ensure the UID for user $1 is $gid"
 	rlPhaseEnd
 
 	rlPhaseStartTest "checking shell for user $1"
-		rlRun "ipa user-show $1 | grep Login\ shell | grep $shell" 0 "checking to ensure the UID for user $1 is $shell"
+		rlRun "ipa user-show --all $1 | grep Login\ shell | grep $shell" 0 "checking to ensure the UID for user $1 is $shell"
 	rlPhaseEnd
 
 	rlPhaseStartTest "checking home dir for user $1"
-		rlRun "ipa user-show $1 | grep Home\ directory | grep $home" 0 "checking to ensure the UID for user $1 is $home"
+		rlRun "ipa user-show --all $1 | grep Home\ directory | grep $home" 0 "checking to ensure the UID for user $1 is $home"
 	rlPhaseEnd
 
 	# setting password and kiniting
@@ -33,7 +33,7 @@ check_user()
 
 	# Ensuring that kinit for user $1 works.
 	rlPhaseStartTest "kiniting as user $1"
-		rlRun "kinitAs $1 blarg1" 0 "Kinit as user $1"
+		rlRun "FirstKinitAs $1 blarg1 blarg26VLKOPWTF" 0 "Kinit as user $1"
 	rlPhaseEnd
 
 	# Resetting kinit to admin
@@ -92,9 +92,10 @@ objectClass: posixAccount
 uid: userb000
 gecos: User a000
 cn: User a000
-homeDirectory: /home/userb000' >> $file
+homeDirectory: /home/userb000' > $file
 
 	rlPhaseStartTest "adding some more users to gid 1000"
+		echo "running: ldapmodify -a -x -h$BEAKERCLIENT -p 2389 -D \"cn=Directory Manager\" -w$ADMINPW -c -f $file"
 		rlRun "ldapmodify -a -x -h$BEAKERCLIENT -p 2389 -D \"cn=Directory Manager\" -w$ADMINPW -c -f $file" 0 "adding more users to gid 1000"
 	rlPhaseEnd
 
