@@ -5,10 +5,10 @@
 ######################
 check_user()
 {
-	uid=$(ldapsearch -D 'cn=Directory Manager' -h$CLIENT -p2389 -wSecret123 -x -b uid=$1,ou=People,dc=bos,dc=redhat,dc=com objectclass=* | grep uidNumber | cut -d\  -f2 )
-	gid=$(ldapsearch -D 'cn=Directory Manager' -h$CLIENT -p2389 -wSecret123 -x -b uid=$1,ou=People,dc=bos,dc=redhat,dc=com objectclass=* | grep gidNumber | cut -d\  -f2 )
-	shell=$(ldapsearch -D 'cn=Directory Manager' -h$CLIENT -p2389 -wSecret123 -x -b uid=$1,ou=People,dc=bos,dc=redhat,dc=com objectclass=* | grep loginShell | cut -d\  -f2 )
-	home=$(ldapsearch -D 'cn=Directory Manager' -h$CLIENT -p2389 -wSecret123 -x -b uid=$1,ou=People,dc=bos,dc=redhat,dc=com objectclass=* | grep homeDirectory | cut -d\  -f2 )
+	uid=$(ldapsearch -D 'cn=Directory Manager' -h$CLIENT -p2389 -w$ADMINPW -x -b uid=$1,ou=People,dc=bos,dc=redhat,dc=com objectclass=* | grep uidNumber | cut -d\  -f2 )
+	gid=$(ldapsearch -D 'cn=Directory Manager' -h$CLIENT -p2389 -w$ADMINPW -x -b uid=$1,ou=People,dc=bos,dc=redhat,dc=com objectclass=* | grep gidNumber | cut -d\  -f2 )
+	shell=$(ldapsearch -D 'cn=Directory Manager' -h$CLIENT -p2389 -w$ADMINPW -x -b uid=$1,ou=People,dc=bos,dc=redhat,dc=com objectclass=* | grep loginShell | cut -d\  -f2 )
+	home=$(ldapsearch -D 'cn=Directory Manager' -h$CLIENT -p2389 -w$ADMINPW -x -b uid=$1,ou=People,dc=bos,dc=redhat,dc=com objectclass=* | grep homeDirectory | cut -d\  -f2 )
 
 	rlPhaseStartTest "checking uid for user $1"
 		rlRun "ipa user-show $1 | grep UID | grep $uid" 0 "checking to ensure the UID for user $1 is $uid"
@@ -46,7 +46,7 @@ check_user()
 ######################
 check_group()
 {
-	gid=$(ldapsearch -D 'cn=Directory Manager' -h$CLIENT -p2389 -wSecret123 -x -bi cn=$1,ou=Groups,dc=bos,dc=redhat,dc=com objectclass=* | grep gidNumber | cut -d\  -f2 )
+	gid=$(ldapsearch -D 'cn=Directory Manager' -h$CLIENT -p2389 -w$ADMINPW -x -bi cn=$1,ou=Groups,dc=bos,dc=redhat,dc=com objectclass=* | grep gidNumber | cut -d\  -f2 )
 
 	rlPhaseStartTest "checking gid for group $1"
 		rlRun "ipa user-show $1 | grep GID | grep $gid" 0 "checking to ensure the UID for user $1 is $gid"
@@ -95,7 +95,7 @@ cn: User a000
 homeDirectory: /home/userb000' >> $file
 
 	rlPhaseStartTest "adding some more users to gid 1000"
-		rlRun "ldapmodify -a -x -h$CLIENT -p 2389 -D \"cn=Directory Manager\" -wSecret123 -c -f $file" 0 "adding more users to gid 1000"
+		rlRun "ldapmodify -a -x -h$CLIENT -p 2389 -D \"cn=Directory Manager\" -w$ADMINPW -c -f $file" 0 "adding more users to gid 1000"
 	rlPhaseEnd
 
 }
@@ -113,7 +113,7 @@ dn: uid=userb000,ou=People,dc=bos,dc=redhat,dc=com
 changetype: delete' > $file
 
 	rlPhaseStartTest "runnign cleanup of added users"
-		rlRun "ldapmodify -x -h$CLIENT -p 2389 -D \"cn=Directory Manager\" -wSecret123 -c -f $file" 0 "cleaning up added users"
+		rlRun "ldapmodify -x -h$CLIENT -p 2389 -D \"cn=Directory Manager\" -w$ADMINPW -c -f $file" 0 "cleaning up added users"
 	rlPhaseEnd
 
 }
@@ -121,7 +121,7 @@ changetype: delete' > $file
 ######################
 # test suite         #
 ######################
-# ldapsearch -D "cn=Directory Manager" -hipaqa64vmc.idm.lab.bos.redhat.com -p2389 -wSecret123 -x -b ou=People,dc=bos,dc=redhat,dc=com objectclass=*
+# ldapsearch -D "cn=Directory Manager" -hipaqa64vmc.idm.lab.bos.redhat.com -p2389 -w$ADMINPW -x -b ou=People,dc=bos,dc=redhat,dc=com objectclass=*
 # ipa migrate-ds ldap://ipaqa64vmc.idm.lab.bos.redhat.com:2389
 
 ds-migration()
@@ -129,7 +129,7 @@ ds-migration()
 	rlPhaseStartTest "Migrating from $CLIENT"
 		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 		rlRun "ipa config-mod --enable-migration=TRUE" 0 "enabling migration"
-		rlRun "ipa migrate-ds ldap://$CLIENT:2389" 0 "running migration from DS instance on CLIENT"
+		rlRun "echo $ADMINPW | ipa migrate-ds ldap://$CLIENT:2389" 0 "running migration from DS instance on CLIENT"
 	rlPhaseEnd
 
 	add_more_users
