@@ -90,7 +90,35 @@ public class ServiceTasks {
 	}
 	
 	/*
-	 * Verify Valid Certificate Status
+	 * Revoke a certificate
+	 * @param sahiTasks
+	 * @param serviceprinc - service to add certificate for
+	 * @param reason - reason for revocation - match exact string to reason in drop down menu
+	 * @param button - Revoke or Cancel
+	 */
+	public static void revokeServiceCertificate(SahiTasks sahiTasks, String serviceprinc, String reason, String button) {
+		sahiTasks.link(serviceprinc).click();
+		sahiTasks.span("Revoke").click();
+		sahiTasks.select(0).choose(reason);
+		sahiTasks.button(button).click();
+		sahiTasks.link("Services").in(sahiTasks.div("content")).click();
+	}
+	
+	/*
+	 * Restore a certificate
+	 * @param sahiTasks
+	 * @param serviceprinc - service to restore certificate for
+	 * @param button - Restore or Cancel
+	 */
+	public static void restoreServiceCertificate(SahiTasks sahiTasks, String serviceprinc, String button) {
+		sahiTasks.link(serviceprinc).click();
+		sahiTasks.span("Restore").click();
+		sahiTasks.button(button).click();
+		sahiTasks.link("Services").in(sahiTasks.div("content")).click();
+	}
+	
+	/*
+	 * Verify Valid Certificate
 	 * @param sahiTasks
 	 * @param servicename - servicename
 	 * @param certexists - boolean - should one exist?
@@ -116,6 +144,27 @@ public class ServiceTasks {
 			//get certificate
 			sahiTasks.span("Get").click();
 			sahiTasks.button("Close").click();
+		}
+		
+		sahiTasks.link("Services").in(sahiTasks.div("content")).click();
+	}
+	
+	/*
+	 * Verify Revoked Certificate Status
+	 * @param sahiTasks
+	 * @param hostname - serviceprinc
+	 * @param status - Revoked or Hold
+	 * @param reason - If revoked or held, reason string to look for
+	 */
+	public static void verifyServiceCertificateStatus(SahiTasks sahiTasks, String serviceprinc, String status, String reason) {
+		sahiTasks.link(serviceprinc).click();
+		if (status == "Hold"){
+			com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.span("Restore").exists(), "Host certificate on hold, verify Restore button");
+			com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.span("Certificate Hold").exists(), "Verifying Certificate Hold status.");
+		}
+		if (status == "Revoked"){
+			com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.span("New Certificate").exists(), "Host certificate revoked, verify New Certificate button");
+			com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.span(reason).exists(), "Verifying Certificate Revoked status: " + reason);
 		}
 		
 		sahiTasks.link("Services").in(sahiTasks.div("content")).click();
