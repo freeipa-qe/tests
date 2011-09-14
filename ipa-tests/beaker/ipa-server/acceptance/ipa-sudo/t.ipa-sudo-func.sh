@@ -521,14 +521,15 @@ rlPhaseStartTest "sudorule-add-hostgrp_func001: Adding hostgroup and verifying f
 	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 	domain=`hostname -d`
 	rlRun "domainname $domain"
+	rlRun "rm -fr /var/lib/sss/db/cache_*"
+	rlRun "service sssd restart"
+	sleep 5
+
 	rlRun "ipa hostgroup-add hostgrp1 --desc=test_hostgrp"
 	rlRun "ipa sudorule-remove-host sudorule1 --hosts=$MASTER"
 	rlRun "ipa hostgroup-add-member hostgrp1 --hosts=$MASTER"
 
 	rlRun "ipa sudorule-add-host sudorule1 --hostgroup=hostgrp1"
-	rlRun "rm -fr /var/lib/sss/db/cache_*"
-	rlRun "service sssd restart"
-	sleep 5
 	rlRun "getent netgroup hostgrp1"
 
 	rlRun "sudo_list user1"
