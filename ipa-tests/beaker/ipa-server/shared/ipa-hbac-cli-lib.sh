@@ -19,6 +19,7 @@
 #	modifyHBACService
 #	findHBACService
 #	verifyHBACService
+#	verifyHBACServiceRAW
 #	deleteHBACService
 #	addHBACServiceGroup
 #	modifyHBACServiceGroup
@@ -449,13 +450,45 @@ findHBACServiceByOption()
    return $rc
 }
 
-
 #############################################################################
 # verifyHBACService Usage
 #   verifyHBACService <servicename> <attr> <value>
 ##############################################################################
 
 verifyHBACService()
+{
+  servicename=$1
+  attr=$2
+  value=$3
+  rc=0
+
+  tmpfile=/tmp/hbacsvcshow.out
+
+  ipa hbacsvc-show --all $servicename > $tmpfile
+  rc=$?
+  if [ $rc -eq 0 ] ; then
+     attrs=`cat $tmpfile | grep "$attr" | cut -d ":" -f 2`
+     echo $attrs | grep "$value"
+     if [ $? -eq 0 ] ; then
+        rlLog "$attr \"$value\" is associated with service $servicename"
+     else
+        rlLog "WARNING: $attr \"$value\" is NOT associated with service $servicename"
+        rc=1
+     fi
+ else
+     rlLog "ERROR: ipa hbacsvc-show command failed"
+ fi
+
+ return $rc
+}
+
+
+#############################################################################
+# verifyHBACServiceRAW Usage
+#   verifyHBACServiceRAW <servicename> <attr> <value>
+##############################################################################
+
+verifyHBACServiceRAW()
 {
   servicename=$1
   attr=$2
@@ -589,7 +622,9 @@ verifyHBACServiceGroup()
   rc=0
 
   tmpfile=/tmp/hbacsvcgrpshow.out
-  ipa hbacsvcgroup-show --all "$groupname" > $tmpfile
+  # ipa hbacsvcgroup-show --all "$groupname" > $tmpfile
+  # The following change is because --all does not display the attribute name
+  ipa hbacsvcgroup-show --all --raw "$groupname" > $tmpfile
   rc=$?
   if [ $rc -eq 0 ] ; then
      attrs=`cat $tmpfile | grep "$attr" | cut -d ":" -f 2`
