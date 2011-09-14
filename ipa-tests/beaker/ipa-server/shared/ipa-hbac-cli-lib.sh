@@ -731,7 +731,7 @@ verifyHBACGroupMember()
   fi
 
   # verify show all for member
-  verifyHBACService $member memberof $groupDN
+  verifyHBACServiceRAW $member memberof $groupDN
   rc=$?
   if [ $rc -eq 0 ] ; then
 	rlLog "show --all for service: $member is memberof $mygroup."
