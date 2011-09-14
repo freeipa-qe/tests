@@ -185,7 +185,7 @@ public class CommonTasks {
 			process = Runtime.getRuntime().exec(System.getProperty("user.dir") + "/scripts/generateCSR.sh " + hostname);
 			try
 			{
-			Thread.sleep(10000); // do nothing for 5000 miliseconds (5 second)
+			Thread.sleep(15000); // do nothing for 15000 miliseconds (15 second)
 			}
 			catch(InterruptedException e)
 			{
