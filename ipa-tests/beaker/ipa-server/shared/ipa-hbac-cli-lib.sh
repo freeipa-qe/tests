@@ -622,9 +622,7 @@ verifyHBACServiceGroup()
   rc=0
 
   tmpfile=/tmp/hbacsvcgrpshow.out
-  # ipa hbacsvcgroup-show --all "$groupname" > $tmpfile
-  # The following change is because --all does not display the attribute name
-  ipa hbacsvcgroup-show --all --raw "$groupname" > $tmpfile
+  ipa hbacsvcgroup-show --all "$groupname" > $tmpfile
   rc=$?
   if [ $rc -eq 0 ] ; then
      attrs=`cat $tmpfile | grep "$attr" | cut -d ":" -f 2`
@@ -734,14 +732,14 @@ verifyHBACGroupMember()
   verifyHBACServiceRAW $member memberof $groupDN
   rc=$?
   if [ $rc -eq 0 ] ; then
-	rlLog "show --all for service: $member is memberof $mygroup."
+	rlLog "show --all --raw for service: $member is memberof $mygroup."
   else
-	rlLog "WARNING: show --all for service: $member is NOT a member of $mygroup."
+	rlLog "WARNING: show --all --raw for service: $member is NOT a member of $mygroup."
 	let i=$i+1
   fi
 
   # verify show all for group
-  verifyHBACServiceGroup $mygroup member_hbacsvc $member
+  verifyHBACServiceGroup $mygroup "Member HBAC service" $member
   rc=$?
   if [ $rc -eq 0 ] ; then
         rlLog "show --all for service group: $mygroup has member $member."
