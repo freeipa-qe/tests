@@ -464,7 +464,9 @@ verifyHBACService()
 
   tmpfile=/tmp/hbacsvcshow.out
 
-  ipa hbacsvc-show --all $servicename > $tmpfile
+  # ipa hbacsvc-show --all $servicename > $tmpfile
+  # The following change is because --all does not display the attribute name
+  ipa hbacsvc-show --all --raw $servicename > $tmpfile
   rc=$?
   if [ $rc -eq 0 ] ; then
      attrs=`cat $tmpfile | grep "$attr" | cut -d ":" -f 2`
