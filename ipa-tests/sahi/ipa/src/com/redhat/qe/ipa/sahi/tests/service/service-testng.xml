@@ -7,11 +7,15 @@
 		<groups>
 			<run>
 			    <include name="setup" />
-			    <include name="init" />	
+			    <include name="init" />	 
 			    <include name="serviceAddTests" /> 
 			    <include name="deleteMultipleServiceTests" />
 				<include name="customServiceAddTests" />
 				<include name="deleteSingleServiceTests" />
+			    <include name="serviceAddCertificateTests" />
+			    <include name="serviceHoldCertificateTests" />
+			    <include name="serviceRestoreCertificateTests" />
+			    <include name="serviceRevokeCertificateTests" />
 				<include name="cleanup" />
 				<!--
 				<include name="teardown" />

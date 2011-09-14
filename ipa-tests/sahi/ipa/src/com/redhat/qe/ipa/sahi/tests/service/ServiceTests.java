@@ -32,8 +32,9 @@ public class ServiceTests extends SahiTestScript {
 	
 	private String mytesthost = "";
 	private String realm = "";
-	
 	private String testservice = "";
+	private String testprincipal ="";
+	private String csr ="";
 	
 	@BeforeClass (groups={"init"}, description="Initialize app for this test suite run", alwaysRun=true, dependsOnGroups="setup")
 	public void initialize() throws CloneNotSupportedException {
@@ -51,14 +52,18 @@ public class ServiceTests extends SahiTestScript {
 		String ipprefix = dcs[2] + "." + dcs[1] + "." + dcs[0] + ".";
 		String ipaddr = ipprefix + "199";
 		
-		testservice = "SRVC" + "/" + mytesthost + "@" + realm;
+		testservice = "SRVC";
 		mytesthost = "servicehost" + "." + domain;
+		testprincipal = testservice + "/" + mytesthost + "@" + realm;
 		
 		sahiTasks.navigateTo(commonTasks.hostPage, true);
 		HostTasks.addHost(sahiTasks, "servicehost", domain, ipaddr);
 		
 		sahiTasks.navigateTo(commonTasks.servicePage, true);
 		ServiceTasks.addCustomService(sahiTasks, "SRVC", mytesthost, false);
+		
+		//Get CSR for host hosting service
+		csr = CommonTasks.generateCSR(mytesthost);
 	}
 	
 	@AfterClass (groups={"cleanup"}, description="Delete objects added for the tests", alwaysRun=true)
@@ -162,14 +167,70 @@ public class ServiceTests extends SahiTestScript {
 	@Test (groups={"serviceAddCertificateTests"}, dataProvider="getServiceAddCertificateTestObjects")	
 	public void testserviceAddCertificate(String testName, String button, boolean certexists) throws Exception {
 		
-		//Get CSR for host hosting service
-		String csr = CommonTasks.generateCSR(mytesthost);
-		
 		// add request certificate
-		ServiceTasks.addServiceCertificate(sahiTasks, testservice, csr, button);
+		ServiceTasks.addServiceCertificate(sahiTasks, testprincipal, csr, button);
 		
 		// verify cancel adding certificate
-		ServiceTasks.verifyServiceCertificate(sahiTasks, testservice, certexists);
+		ServiceTasks.verifyServiceCertificate(sahiTasks, testprincipal, certexists);
+
+	}
+	
+	/*
+	 * Add Service Certificate Tests
+	 */
+	@Test (groups={"serviceHoldCertificateTests"}, dataProvider="getServiceHoldCertificateTestObjects",  dependsOnGroups="serviceAddCertificateTests")	
+	public void testserviceHoldCertificate(String testName, String button ) throws Exception {
+		
+		//  request certificate
+		ServiceTasks.revokeServiceCertificate(sahiTasks, testprincipal, "Certificate Hold", button);
+		
+		// verify certificate status
+		if (button == "Cancel"){
+			ServiceTasks.verifyServiceCertificate(sahiTasks, testprincipal, true);
+		}
+		else {
+			ServiceTasks.verifyServiceCertificateStatus(sahiTasks, testprincipal, "Hold", "Certificate Hold");
+		}
+
+	}
+	
+	/*
+	 * Restore Service Certificate Tests
+	 */
+	@Test (groups={"serviceRestoreCertificateTests"}, dataProvider="getServiceRestoreCertificateTestObjects",  dependsOnGroups="serviceHoldCertificateTests")	
+	public void testserviceRestoreCertificate(String testName, String button ) throws Exception {
+		
+		//  request certificate
+		ServiceTasks.restoreServiceCertificate(sahiTasks, testprincipal, button);
+		
+		// verify certificate status
+		if (button == "Cancel"){
+			ServiceTasks.verifyServiceCertificateStatus(sahiTasks, testprincipal, "Hold", "Certificate Hold");
+		}
+		else {
+			ServiceTasks.verifyServiceCertificate(sahiTasks, testprincipal, true);
+		}
+
+	}
+	
+	/*
+	 * Revoke Service Certificate Tests
+	 */
+	@Test (groups={"serviceRevokeCertificateTests"}, dataProvider="getServiceRevokeCertificateTestObjects",  dependsOnGroups="serviceRestoreCertificateTests")	
+	public void testserviceRevokeCertificate(String testName, String button ) throws Exception {
+		String reason = "Privilege Withdrawn";
+		
+		//  request certificate
+		ServiceTasks.revokeServiceCertificate(sahiTasks, testprincipal, reason, button);
+		
+		// verify certificate status
+		if (button == "Cancel"){
+			ServiceTasks.verifyServiceCertificate(sahiTasks, testprincipal, true);
+		}
+		else {
+			ServiceTasks.verifyServiceCertificateStatus(sahiTasks, testprincipal, "Revoked", reason);
+			
+		}
 
 	}
 	
@@ -237,7 +298,7 @@ public class ServiceTests extends SahiTestScript {
 	}
 	
 	/*
-	 * Data to be used when deleting multiple services
+	 * Data to be used when adding service certificate
 	 */
 	@DataProvider(name="getServiceAddCertificateTestObjects")
 	public Object[][] getServiceAddCertificateTestObjects() {
@@ -265,6 +326,57 @@ public class ServiceTests extends SahiTestScript {
 		
         //									testname				
 		ll.add(Arrays.asList(new Object[]{ 	"delete_multiple_service" } ));
+		
+		return ll;	
+	}
+	
+	/*
+	 * Data to be used holding certificate
+	 */
+	@DataProvider(name="getServiceHoldCertificateTestObjects")
+	public Object[][] getServiceHoldCertificateTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createServiceHoldCertificateTestObjects());
+	}
+	protected List<List<Object>> createServiceHoldCertificateTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //									testname							  button	
+		ll.add(Arrays.asList(new Object[]{ 	"cancel_hold_certificate",	  		 "Cancel" } ));
+		ll.add(Arrays.asList(new Object[]{ 	"hold_certificate",	  				 "Revoke"   } ));
+		
+		return ll;	
+	}
+	
+	/*
+	 * Data to be used restoring certificate
+	 */
+	@DataProvider(name="getServiceRestoreCertificateTestObjects")
+	public Object[][] getServiceRestoreCertificateTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createServiceRestoreCertificateTestObjects());
+	}
+	protected List<List<Object>> createServiceRestoreCertificateTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //									testname							  button	
+		ll.add(Arrays.asList(new Object[]{ 	"cancel_restore_certificate",	  	  "Cancel" } ));
+		ll.add(Arrays.asList(new Object[]{ 	"restore_certificate",	  			  "Restore"   } ));
+		
+		return ll;	
+	}
+	
+	/*
+	 * Data to be used revoking certificate
+	 */
+	@DataProvider(name="getServiceRevokeCertificateTestObjects")
+	public Object[][] getServiceRevokeCertificateTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createServiceRevokeCertificateTestObjects());
+	}
+	protected List<List<Object>> createServiceRevokeCertificateTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //									testname							  button	
+		ll.add(Arrays.asList(new Object[]{ 	"cancel_revoke_certificate",	  	  "Cancel" } ));
+		ll.add(Arrays.asList(new Object[]{ 	"revoke_certificate",	  			  "Revoke"   } ));
 		
 		return ll;	
 	}
