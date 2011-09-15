@@ -76,7 +76,7 @@ ipakrblockout_maxfail_negative()
     rlPhaseEnd
 
     rlPhaseStartTest "Max Failures Negative Test - Invalid Characters"
-	# https://bugzilla.redhat.com/show_bug.cgi?id=718015
+	rlLog "https://bugzilla.redhat.com/show_bug.cgi?id=718015"
 	expmsg="ipa: ERROR: invalid '$maxflag': must be an integer"       
         for value in jwy t _
         do
@@ -134,7 +134,7 @@ ipakrblockout_failinterval_negative()
     rlPhaseEnd
 
     rlPhaseStartTest "Failure Interval Negative Test - Invalid Characters"
-	# https://bugzilla.redhat.com/show_bug.cgi?id=718015
+	rlLog "https://bugzilla.redhat.com/show_bug.cgi?id=718015"
         expmsg="ipa: ERROR: invalid '$intervalflag': must be an integer"
         for value in 1avc jsdljo97 B
         do
@@ -191,7 +191,7 @@ ipakrblockout_lockouttime_negative()
     rlPhaseEnd
 
     rlPhaseStartTest "Lock Out Time Negative Test - Invalid Characters"
-	# https://bugzilla.redhat.com/show_bug.cgi?id=718015
+	rlLog "https://bugzilla.redhat.com/show_bug.cgi?id=718015"
         expmsg="ipa: ERROR: invalid '$locktimeflag': must be an integer"
         for value in T pdsw oiwiouuiy9869
         do
