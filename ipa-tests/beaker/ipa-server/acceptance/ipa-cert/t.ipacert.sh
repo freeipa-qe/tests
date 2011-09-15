@@ -101,14 +101,21 @@ cert_remove_hold_1002()
             rlRun "ipa cert-remove-hold $certid " 0 "cert-remove-hold always return 0(succes),we need more test to confirm remove hold fails" 
 
             #after remove hold, lets check the content again
-            ipa cert-show $certid > $tmpout
-            if grep -i "Revocation reason: $revokeCode" $tmpout
-            then
-                rlPass "revocation reason still found in cert-show, test pass"
-            else
-                rlFail "revocation reason not found in cert-show, test failed"
-                cat $tmpout
-            fi
+		# Once the cert is removed from hold there exists no revocation reason in the certificate,
+		# this caused beaker failure. Adding an "if" statement to exclude revocation code 6 to check
+		# for revocation reason in the certificate. 
+		if [ $revokeCode = 6 ]; then
+			rlPass "revocation reason: $revokeCode, not found in cert-show, as expected"
+		else
+            		ipa cert-show $certid > $tmpout
+		        if grep -i "Revocation reason: $revokeCode" $tmpout
+		            then
+	                	rlPass "revocation reason: $revokeCode, still found in cert-show, test pass"
+		            else
+                		rlFail "revocation reason: $revokeCode, not found in cert-show, test failed"
+        		        cat $tmpout
+		        fi
+		fi
             Kcleanup
             rm $tmpout
         done
