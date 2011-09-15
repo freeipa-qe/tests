@@ -480,7 +480,7 @@ fi
 	/etc/init.d/named restart
 
 	rlPhaseStartTest "ipa-dns-77: make sure that IPA saved record type MX"
-		rlRun "ipa dnsrecord-find $zone @ | grep $mx" 0 "make sure ipa recieved record type MX"
+		rlRun "ipa dnsrecord-find $zone | grep $mx" 0 "make sure ipa recieved record type MX"
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-78: make sure that dig can find the record type MX"
@@ -611,6 +611,7 @@ fi
 
 	# Type NAPTR
 	rlPhaseStartTest "ipa-dns-107: add record of type NAPTR"
+		echo "running ipa dnsrecord-add $zone naptr --naptr-rec '$naptr'"
 		rlRun "ipa dnsrecord-add $zone naptr --naptr-rec '$naptr'" 0 "add record type NAPTR"
 	rlPhaseEnd
 
@@ -721,7 +722,7 @@ fi
 
 	# Type kx
 	rlPhaseStartTest "ipa-dns-131: add record of type kx"
-		rlRun "ipa dnsrecord-add $zone @ --kx-rec '$kxpref1 $zone'" 0 "add record type kx"
+		rlRun "ipa dnsrecord-add $zone @ --kx-rec '$kxpref1 $a'" 0 "add record type kx"
 	rlPhaseEnd
 
 	/etc/init.d/named restart
@@ -735,7 +736,7 @@ fi
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-134: delete record of type kx"
-		rlRun "ipa dnsrecord-del $zone @ --kx-rec '$kxpref1 $zone'" 0 "delete record type kx"
+		rlRun "ipa dnsrecord-del $zone @ --kx-rec '$kxpref1 $a'" 0 "delete record type kx"
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-135: make sure that IPA deleted record type kx"
@@ -750,7 +751,7 @@ fi
 	# Negitive kx tests
 
 	rlPhaseStartTest "ipa-dns-137: add record of type bad kx"
-		rlRun "ipa dnsrecord-add $zone @ --kx-rec '$kxbadpref1 $zone'" 1 "add record type bad kx"
+		rlRun "ipa dnsrecord-add $zone @ --kx-rec '$kxbadpref1 $a'" 1 "add record type bad kx"
 	rlPhaseEnd
 
 	/etc/init.d/named restart
