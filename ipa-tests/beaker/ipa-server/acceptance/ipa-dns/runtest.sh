@@ -126,6 +126,7 @@ fi
 	loclong="59"
 	loc="37 23 30.900 N $loclat $loclong 19.000 W 7.00m 100.00m 100.00m 2.00m"
 	naptr='100 10 U E2U+msg !^.*$!mailto:info@example.com! .'
+	naprfind="info@example.com"
 	
 	rlPhaseStartTest "ipa-dns-07: create a new zone"
 		rlRun "ipa dnszone-add --name-server=$ipaddr --admin-email=$email --serial=$serial --refresh=$refresh --retry=$retry --expire=$expire --minimum=$minimum --ttl=$ttl $zone" 0 "Checking to ensure that ipa thinks that it can create a zone"
@@ -619,7 +620,7 @@ fi
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-109: make sure that dig can find the record type NAPTR"
-		rlRun "dig naptr.$zone | grep $naptr" 0 "make sure dig can find the NAPTR record"
+		rlRun "dig naptr.$zone | grep $naptrfind" 0 "make sure dig can find the NAPTR record"
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-110: delete record of type NAPTR"
