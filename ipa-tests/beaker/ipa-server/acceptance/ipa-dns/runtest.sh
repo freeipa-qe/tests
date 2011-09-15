@@ -241,7 +241,6 @@ fi
 	ptrvalue="in.awesome.domain."
 	srva="0 100 389"
 	srv="why.go.here.com."
-	naptr='E2U+msg" "!^.*$!mailto:info@example.com!'
 	kxpref1="12345678"
 	kxbadpref1="-1"
 	kxbadpref2="1233456789012345"
