@@ -16,6 +16,8 @@
 			    <include name="serviceHoldCertificateTests" />
 			    <include name="serviceRestoreCertificateTests" />
 			    <include name="serviceRevokeCertificateTests" />
+			    <include name="serviceAddManagedByHostTests" />
+			    <include name="serviceRemoveManagedByHostTests" />
 				<include name="cleanup" />
 				<!--
 				<include name="teardown" />

@@ -31,6 +31,7 @@ public class ServiceTests extends SahiTestScript {
 	private String domain = "";
 	
 	private String mytesthost = "";
+	private String mytesthost2 = "";
 	private String realm = "";
 	private String testservice = "";
 	private String testprincipal ="";
@@ -50,14 +51,17 @@ public class ServiceTests extends SahiTestScript {
 		//add host and service
 		String [] dcs = reversezone.split("\\.");
 		String ipprefix = dcs[2] + "." + dcs[1] + "." + dcs[0] + ".";
-		String ipaddr = ipprefix + "199";
+		String ipaddr1 = ipprefix + "199";
+		String ipaddr2 = ipprefix + "200";
 		
 		testservice = "SRVC";
-		mytesthost = "servicehost" + "." + domain;
+		mytesthost = "servicehost1" + "." + domain;
+		mytesthost2 = "servicehost2" + "." + domain;
 		testprincipal = testservice + "/" + mytesthost + "@" + realm;
 		
 		sahiTasks.navigateTo(commonTasks.hostPage, true);
-		HostTasks.addHost(sahiTasks, "servicehost", domain, ipaddr);
+		HostTasks.addHost(sahiTasks, "servicehost1", domain, ipaddr1);
+		HostTasks.addHost(sahiTasks, "servicehost2", domain, ipaddr2);
 		
 		sahiTasks.navigateTo(commonTasks.servicePage, true);
 		ServiceTasks.addCustomService(sahiTasks, "SRVC", mytesthost, false);
@@ -70,6 +74,7 @@ public class ServiceTests extends SahiTestScript {
 	public void cleanup() throws Exception {	
 		sahiTasks.navigateTo(commonTasks.hostPage, true);
 		HostTasks.deleteHost(sahiTasks, mytesthost, "YES");
+		HostTasks.deleteHost(sahiTasks, mytesthost2, "YES");
 		
 	}
 	
@@ -231,8 +236,34 @@ public class ServiceTests extends SahiTestScript {
 			ServiceTasks.verifyServiceCertificateStatus(sahiTasks, testprincipal, "Revoked", reason);
 			
 		}
-
 	}
+
+		/*
+		 * Add managed by host
+		 */
+		@Test (groups={"serviceAddManagedByHostTests"}, dataProvider="getServiceAddManagedByHostTestObjects")	
+		public void testserviceAddManagedByHost(String testName, String button, boolean exists ) throws Exception {
+			
+			// Add managed by host
+			ServiceTasks.addManagedByHost(sahiTasks, testprincipal, mytesthost2, button);
+			
+			// verify managed by host
+			ServiceTasks.verifyManagedByHost(sahiTasks, testprincipal, mytesthost2, exists);
+
+		}
+		
+		/*
+		 * Remove managed by host
+		 */
+		@Test (groups={"serviceRemoveManagedByHostTests"}, dataProvider="getServiceRemoveManagedByHostTestObjects",  dependsOnGroups="serviceAddManagedByHostTests")	
+		public void testserviceRemoveManagedByHost(String testName, String button, boolean exists ) throws Exception {
+			
+			//  remove managed by host
+			ServiceTasks.removeManagedByHost(sahiTasks, testprincipal, mytesthost2, button);
+			
+			// verify managed by host
+			ServiceTasks.verifyManagedByHost(sahiTasks, testprincipal, mytesthost2, exists);
+		}
 	
 	/*******************************************************
 	 ************      DATA PROVIDERS     ******************
@@ -377,6 +408,40 @@ public class ServiceTests extends SahiTestScript {
         //									testname							  button	
 		ll.add(Arrays.asList(new Object[]{ 	"cancel_revoke_certificate",	  	  "Cancel" } ));
 		ll.add(Arrays.asList(new Object[]{ 	"revoke_certificate",	  			  "Revoke"   } ));
+		
+		return ll;	
+	}
+	
+	/*
+	 * Data to be used adding manaaged by host
+	 */
+	@DataProvider(name="getServiceAddManagedByHostTestObjects")
+	public Object[][] getServiceAddManagedByHostTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createServiceAddManagedByHostTestObjects());
+	}
+	protected List<List<Object>> createServiceAddManagedByHostTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //									testname							  button		exists
+		ll.add(Arrays.asList(new Object[]{ 	"cancel_adding_managedby_host",	  	  "Cancel",		 false	} ));
+		ll.add(Arrays.asList(new Object[]{ 	"add_managedby_host",	  			  "Enroll",		 true   } ));
+		
+		return ll;	
+	}
+	
+	/*
+	 * Data to be used removing manaaged by host
+	 */
+	@DataProvider(name="getServiceRemoveManagedByHostTestObjects")
+	public Object[][] getServiceRemoveManagedByHostTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createServiceRemoveManagedByHostTestObjects());
+	}
+	protected List<List<Object>> createServiceRemoveManagedByHostTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //									testname							  button		exists
+		ll.add(Arrays.asList(new Object[]{ 	"cancel_removing_managedby_host",	  "Cancel",		 true	} ));
+		ll.add(Arrays.asList(new Object[]{ 	"remove_managedby_host",	  		  "Delete",		 false   } ));
 		
 		return ll;	
 	}
