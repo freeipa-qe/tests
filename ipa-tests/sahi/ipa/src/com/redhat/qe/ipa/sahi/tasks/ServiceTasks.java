@@ -169,4 +169,55 @@ public class ServiceTasks {
 		
 		sahiTasks.link("Services").in(sahiTasks.div("content")).click();
 	}
+	
+	/*
+	 * Add managedby host
+	 * @param sahiTasks
+	 * @param serviceprinc - service principal to add managed host to
+	 * @param hostname - host name
+	 * @param button - Revoke or Cancel
+	 */
+	public static void addManagedByHost(SahiTasks sahiTasks, String serviceprinc, String hostname, String button) {
+		sahiTasks.link(serviceprinc).click();
+		sahiTasks.link("managedby_host").click();
+		sahiTasks.link("Enroll").click();
+		sahiTasks.checkbox(hostname).click();
+		sahiTasks.span(">>").click();
+		sahiTasks.button(button).click();
+		sahiTasks.link("Services").in(sahiTasks.div("content")).click();
+	}
+	
+	/*
+	 * Remove managed host
+	 * @param sahiTasks
+	 * @param serviceprinc - service principal to add managed host to
+	 * @param button - Revoke or Cancel
+	 */
+	public static void removeManagedByHost(SahiTasks sahiTasks, String serviceprinc, String hostname, String button) {
+		sahiTasks.link(serviceprinc).click();
+		sahiTasks.link("managedby_host").click();
+		sahiTasks.checkbox(hostname).click();
+		sahiTasks.span("Delete").click();
+		sahiTasks.button(button).click();
+		sahiTasks.link("Services").in(sahiTasks.div("content")).click();
+	}
+	
+	/*
+	 * Verify managedby host
+	 * @param sahiTasks
+	 * @param serviceprinc - service principal
+	 * @param hostname - managedby host
+	 */
+	public static void verifyManagedByHost(SahiTasks sahiTasks, String managed, String managedby, boolean exists ) {
+		sahiTasks.link(managed).click();
+		sahiTasks.link("managedby_host").click();
+		if (exists == true){
+			com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(managedby).exists(), "Service " + managed + " is managed by " + managedby);
+		}
+		if (exists == false){
+			com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(managedby).exists(), "Service " + managed + " is NOT managed by " + managedby);
+		}	
+		
+		sahiTasks.link("Services").in(sahiTasks.div("content")).click();
+	}
 }
