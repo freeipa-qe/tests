@@ -2,6 +2,7 @@ package com.redhat.qe.ipa.sahi.tasks;
 
 import java.io.BufferedReader;
 import java.io.DataInputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -18,6 +19,7 @@ import com.redhat.qe.auto.testng.Assert;
 public class CommonTasks {
 	private static Logger log = Logger.getLogger(CommonTasks.class.getName());
 	
+	//public static String serverUrl = System.getProperty("ipa.server.url");
 	public static String serverUrl = System.getProperty("ipa.server.url");
 	
 	public String userPage = serverUrl + "/ipa/ui/#identity=user&navigation=identity";	
@@ -54,8 +56,6 @@ public class CommonTasks {
 		setReversezone(System.getProperty("ipa.server.reversezone"));
 	}
 	
-	
-
 	// to check if unexpected error was thrown in a test
 	public static boolean errorFlag = false;
 	
@@ -66,8 +66,6 @@ public class CommonTasks {
 	public static void setErrorFlag(boolean errorFlag) {
 		CommonTasks.errorFlag = errorFlag;
 	}
-	
-	
 
 	public String getIpadomain() {
 		return ipadomain;
@@ -88,7 +86,7 @@ public class CommonTasks {
 	public String getReversezone() {
 		return reversezone;
 	}
-
+	
 	public static void setReversezone(String reversezone) {
 		CommonTasks.reversezone = reversezone;
 	}
@@ -359,6 +357,62 @@ public class CommonTasks {
 		sahiTasks.button("OK").click();		
 	}
 	
-	
-	
+	/* Execute an IPA CLI command
+	 * @param command - command to execute
+     */
+    public static boolean executeIPACommand(String command) {
+    	try {
+    		Process process = Runtime.getRuntime().exec(command);
+    		
+    		OutputStream stdin = process.getOutputStream ();    	    
+    	    String line = command + "\n";   
+    	    stdin.write(line.getBytes() );
+	        System.out.println("Executing Command: " + line);
+    	    stdin.flush();
+    	    
+    		BufferedReader input =
+    	        new BufferedReader
+    	          (new InputStreamReader(process.getInputStream()));
+    		while ((line = input.readLine()) != null) {
+    			System.out.println("Command Returned: " + line);
+    	        log.finer(line);
+    	      }
+    		
+    		BufferedReader error =
+    	        new BufferedReader
+    	          (new InputStreamReader(process.getErrorStream()));
+    		while ((line = error.readLine()) != null) {
+    	        log.finer(line);
+    	        return false;
+    	      }
+    		
+    		stdin.close();    	
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return true;		
+	}
+    
+    /* Generate a keytab for an IPA principal
+     * @param principal - principal to generate keytab for
+     * @param keytabFile - ful path for keytab file
+     */
+
+    public static boolean getPrincipalKeytab (String principal, String keytabFile) {
+    	String command = "ipa-getkeytab -s " + CommonTasks.ipafqdn + " -p " + principal + " -k " + keytabFile;
+    	boolean exists = (new File(keytabFile)).exists();
+    	if (exists) {
+    		boolean success = (new File (keytabFile)).delete();
+    		if (!success) {
+    			log.finer("Failed to delete " + keytabFile);
+    		}	
+    	} 
+
+    	boolean commandsuccess = CommonTasks.executeIPACommand(command);
+    	if (!commandsuccess) {
+    		log.finer("Error executing ipa ipa getkeytab command: " + command);
+    		return false;
+    	}
+    	return true;
+    }	
 }
