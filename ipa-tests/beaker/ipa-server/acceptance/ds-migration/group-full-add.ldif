@@ -1,0 +1,20 @@
+dn: cn=Group1000,ou=Groups,dc=bos,dc=redhat,dc=com
+objectClass: top
+objectClass: groupOfUniqueNames
+cn: PD Managers
+ou: groups
+description: People who can manage engineer entries
+uniqueMember: cn=Directory Manager
+uniqueMember: uid=user1000
+
+dn: cn=group2000,ou=Groups,dc=bos,dc=redhat,dc=com
+objectClass: top
+objectClass: groupOfUniqueNames
+cn: PD Managers
+ou: groups
+description: People who can manage engineer entries
+uniqueMember: cn=Directory Manager
+uniqueMember: uid=user2009
+uniqueMember: uid=user2000
+uniqueMember: uid=user1000
+

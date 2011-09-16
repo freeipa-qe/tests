@@ -52,6 +52,14 @@ check_group()
 		rlRun "ipa user-show $1 | grep GID | grep $gid" 0 "checking to ensure the UID for user $1 is $gid"
 	rlPhaseEnd
 
+	# Now to ensure that all of the group members got copied over
+	ldapsearch -D 'cn=Directory Manager' -h$BEAKERCLIENT -p2389 -w$ADMINPW -x -bi cn=$1,ou=Groups,dc=bos,dc=redhat,dc=com objectclass=* | grep uniqueMember: | cut -d\  -f2 | grep uid | cut -d= -f2 | while read u; do 
+		echo "checking to ensure that user $u is in the ipa group $1"
+		
+		rlPhaseStartTest "checking for user $u in group $1"
+			rlRun "ipa user-show $1 | grep GID | grep $gid" 0 "checking to ensure that user $u is in group $1"
+		rlPhaseEnd
+done
 }
 
 ######################
@@ -123,6 +131,58 @@ changetype: delete' > $file
 	rlPhaseEnd
 }
 
+#####################
+# Remove groups for reinsertion later
+######################
+remove_groups()
+{
+	file=/dev/shm/ds-ipa-migration-remove-groups.ldif
+	echo 'dn: cn=Group1000,ou=Groups,dc=bos,dc=redhat,dc=com
+changetype: delete
+
+dn: cn=group2000,ou=Groups,dc=bos,dc=redhat,dc=com
+changetype: delete' > $file
+
+	rlPhaseStartTest "removing the groups that we will be rewriting later"
+		echo "running: ldapmodify -a -x -h$BEAKERCLIENT -p 2389 -D \"cn=Directory Manager\" -w$ADMINPW -c -f $file"
+		rlRun "ldapmodify -a -x -h$BEAKERCLIENT -p 2389 -D \"cn=Directory Manager\" -w$ADMINPW -c -f $file" 0 "adding more users to gid 1000"
+	rlPhaseEnd
+
+}
+
+#####################
+# Re-add the groups for testing later
+######################
+remove_groups()
+{
+	file=/dev/shm/ds-ipa-migration-re-add-groups.ldif
+	echo 'dn: cn=Group1000,ou=Groups,dc=bos,dc=redhat,dc=com
+objectClass: top
+objectClass: groupOfUniqueNames
+cn: PD Managers
+ou: groups
+description: People that are in Group1000
+uniqueMember: cn=Directory Manager
+uniqueMember: uid=user1000
+
+dn: cn=group2000,ou=Groups,dc=bos,dc=redhat,dc=com
+objectClass: top
+objectClass: groupOfUniqueNames
+cn: PD Managers
+ou: groups
+description: People that are in group2000
+uniqueMember: cn=Directory Manager
+uniqueMember: uid=user2009
+uniqueMember: uid=user2000' > $file
+
+	rlPhaseStartTest "re-inserting the groups that we will be testing with later"
+		echo "running: ldapmodify -a -x -h$BEAKERCLIENT -p 2389 -D \"cn=Directory Manager\" -w$ADMINPW -c -f $file"
+		rlRun "ldapmodify -a -x -h$BEAKERCLIENT -p 2389 -D \"cn=Directory Manager\" -w$ADMINPW -c -f $file" 0 "adding more users to gid 1000"
+	rlPhaseEnd
+
+}
+
+
 ######################
 # test suite         #
 ######################
@@ -133,6 +193,8 @@ ds-migration()
 {
 
 	add_more_users
+	remove_groups
+	re_add_groups
 
 	rlPhaseStartTest "Migrating from $BEAKERCLIENT"
 		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"

@@ -1,0 +1,5 @@
+dn: cn=Group1000,ou=Groups,dc=bos,dc=redhat,dc=com
+changetype: delete
+
+dn: cn=group2000,ou=Groups,dc=bos,dc=redhat,dc=com
+changetype: delete

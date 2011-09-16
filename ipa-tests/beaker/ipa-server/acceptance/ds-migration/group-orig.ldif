@@ -1,0 +1,5 @@
+dn: cn=Group1000,ou=Groups,dc=bos,dc=redhat,dc=com
+gidNumber: 1000
+objectClass: top
+objectClass: posixgroup
+cn: Group1000
