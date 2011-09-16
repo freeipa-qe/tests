@@ -22,6 +22,8 @@
 				<include name="hostCertificateTests" />
 				<include name="hostInvalidCSRTests" />
 				<include name="hostAddDNSTests" />
+			    <include name="hostGetKeytabTests" />
+			    <include name="hostRemoveKeytabTests" />
 				<include name="cleanup" />
 				<!--
 				<include name="teardown" />

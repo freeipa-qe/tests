@@ -16,6 +16,7 @@ import com.redhat.qe.ipa.sahi.tasks.CommonTasks;
 import com.redhat.qe.ipa.sahi.tasks.DNSTasks;
 import com.redhat.qe.ipa.sahi.tasks.SahiTasks;
 import com.redhat.qe.ipa.sahi.tasks.HostTasks;
+import com.redhat.qe.ipa.sahi.tasks.ServiceTasks;
 
 
 public class HostTests extends SahiTestScript{
@@ -38,7 +39,9 @@ public class HostTests extends SahiTestScript{
 	private String oldos = "Fedora 15";
 	private String managed = "managed";
 	private String managedby = "managedby";
-	
+	private String testprincipal = "";
+	private String realm = "";
+;	
 	@BeforeClass (groups={"init"}, description="Initialize app for this test suite run", alwaysRun=true, dependsOnGroups="setup")
 	public void initialize() throws CloneNotSupportedException {	
 		
@@ -50,6 +53,9 @@ public class HostTests extends SahiTestScript{
 		
 		currentPage = sahiTasks.fetch("top.location.href");
 		alternateCurrentPage = sahiTasks.fetch("top.location.href") + "&host-facet=search" ;
+		
+		realm = domain.toUpperCase();
+		testprincipal = "host" + "/" + testhost + "." + domain + "@" + realm;
 		
 		
 		//add the test hosts
@@ -360,6 +366,35 @@ public class HostTests extends SahiTestScript{
 		sahiTasks.navigateTo(commonTasks.hostPage, true);
 	}
 	
+	/*
+	 * host get keytab tests
+	 */
+	@Test (groups={"hostGetKeytabTests"}, dataProvider="getHostGetKeytabTestObjects")	
+	public void testgetHostKeytab(String testName ) throws Exception {
+		String fqdn = testhost + "." + domain;
+		String keytabfile = "/tmp/" + testhost + ".keytab";
+		// verify host does not have a keytab
+		HostTasks.verifyHostKeytab(sahiTasks, fqdn, false);
+		
+		//  provision a keytab for the service
+		CommonTasks.getPrincipalKeytab(testprincipal, keytabfile);
+		
+		// verify service has a keytab
+		HostTasks.verifyHostKeytab(sahiTasks, fqdn, true);
+	}
+	
+	/*
+	 * host remove keytab tests
+	 */
+	@Test (groups={"hostRemoveKeytabTests"}, dataProvider="getHostRemoveKeytabTestObjects", dependsOnGroups="hostGetKeytabTests" )	
+	public void testremoveHostKeytab(String testName ) throws Exception {
+		String fqdn = testhost + "." + domain;
+		//  unprovision keytab
+		HostTasks.deleteHostKeytab(sahiTasks, fqdn, "Unprovision");
+		// verify service has a keytab
+		HostTasks.verifyHostKeytab(sahiTasks, fqdn, false);
+	}
+	
 	
 	/*******************************************************
 	 ************      DATA PROVIDERS     ******************
@@ -613,6 +648,38 @@ public class HostTests extends SahiTestScript{
 		ll.add(Arrays.asList(new Object[]{ "host_add_del_updatedns",			"dnshost",  		"99",			 	"YES" } ));
 		ll.add(Arrays.asList(new Object[]{ "host_add_del_noupdatedns",			"dnshost",  		"99",				"NO" } ));
 		        
+		return ll;	
+	}
+	
+	/*
+	 * Data to be used provisioning keytab for host
+	 */
+	@DataProvider(name="getHostGetKeytabTestObjects")
+	public Object[][] getHostGetKeytabTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createHostGetKeytabTestObjects());
+	}
+	protected List<List<Object>> createHostGetKeytabTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //									testname					
+		ll.add(Arrays.asList(new Object[]{ 	"provision_host_keytab" } ));
+		
+		return ll;	
+	}
+	
+	/*
+	 * Data to be used deleting keytab for service
+	 */
+	@DataProvider(name="getHostRemoveKeytabTestObjects")
+	public Object[][] getHostRemoveKeytabTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createHostRemoveKeytabTestObjects());
+	}
+	protected List<List<Object>> createHostRemoveKeytabTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //									testname					
+		ll.add(Arrays.asList(new Object[]{ 	"unprovision_host_keytab" } ));
+		
 		return ll;	
 	}
 	
