@@ -49,14 +49,14 @@ public class HBACTasks {
 	 * @param buttonToClick - Possible values - "Delete" or "Cancel"
 	 */
 	public static void deleteHBAC(SahiTasks sahiTasks, String cn, String buttonToClick) {
-		sahiTasks.checkbox(cn.toLowerCase()).click();
+		sahiTasks.checkbox(cn).click();
 		sahiTasks.link("Delete").click();
 		sahiTasks.button(buttonToClick).click();
 		
 		
 		if (buttonToClick.equals("Cancel")) {
 			//Uncheck the box for this Rule
-			sahiTasks.checkbox(cn.toLowerCase()).click();
+			sahiTasks.checkbox(cn).click();
 		}
 	}
 
@@ -779,5 +779,28 @@ public class HBACTasks {
 		
 	}
 	
+	public static void modifyHBACServiceGroupWithInvalidSetting(SahiTasks sahiTasks, String cn, String description, String expectedError) {
+		CommonTasks.modifyToInvalidSetting(sahiTasks, cn, description, expectedError);
+		sahiTasks.link("HBAC Service Groups").in(sahiTasks.div("content")).click();
+	}
+	/*
+	
+	public static void createInvalidHBACServiceGroup(SahiTasks sahiTasks,	String cn, String description, String expectedError) {		
+		sahiTasks.span("Add").click();
+		sahiTasks.textbox("cn").setValue(cn);
+		sahiTasks.textbox("description").setValue(cn);
+		sahiTasks.button("Add and Edit").click();
+		
+		sahiTasks.link("Settings").click();
+		sahiTasks.textbox("description").setValue(description);
+		
+		sahiTasks.span("Update").click();	
+		
+		Assert.assertTrue(sahiTasks.div(expectedError).exists(), "Verified Expected Error Message when updating HBAC Service group with invalid desc");
+		sahiTasks.button("Cancel").near(sahiTasks.button("Retry")).click();
+		
+		sahiTasks.span("Reset").click();
+		sahiTasks.link("HBAC Service Groups").in(sahiTasks.div("content")).click();
+	}*/
 	
 }

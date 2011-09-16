@@ -256,7 +256,7 @@ public class HBACTests extends SahiTestScript {
 		//verify rule to be deleted exists
 		Assert.assertTrue(sahiTasks.link(cn).exists(), "Verify HBAC Rule " + cn + "  to be deleted exists");
 		
-		//modify this user
+		//cancel deleting this rule
 		HBACTasks.deleteHBAC(sahiTasks, cn, "Cancel");
 		
 		//verify user is deleted

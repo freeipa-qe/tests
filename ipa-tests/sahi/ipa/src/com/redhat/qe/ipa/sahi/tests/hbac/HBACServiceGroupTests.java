@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
 
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
@@ -15,6 +16,7 @@ import com.redhat.qe.auto.testng.TestNGUtils;
 import com.redhat.qe.ipa.sahi.base.SahiTestScript;
 import com.redhat.qe.ipa.sahi.tasks.CommonTasks;
 import com.redhat.qe.ipa.sahi.tasks.HBACTasks;
+import com.redhat.qe.ipa.sahi.tasks.SudoTasks;
 import com.redhat.qe.ipa.sahi.tests.user.UserTests;
 
 public class HBACServiceGroupTests extends SahiTestScript{
@@ -275,7 +277,7 @@ private static Logger log = Logger.getLogger(UserTests.class.getName());
 	 * Delete multiple HBAC Service Groups
 	 */
 	@Test (groups={"hbacServiceGroupMultipleDeleteTests"}, dataProvider="getMultipleHBACServiceGroupTestObjects", dependsOnGroups={"hbacServiceGroupAddTests", "hbacServiceGroupAddAndEditTests", "invalidhbacServiceGroupAddTests", 
-			"hbacServiceGroupSearchTests", "hbacServiceGroupEditTests", "hbacServiceGroupCancelDeleteServiceTests", "hbacServiceGroupDeleteServiceTests" })
+			"hbacServiceGroupSearchTests", "hbacServiceGroupEditTests", "hbacServiceGroupCancelDeleteServiceTests", "hbacServiceGroupDeleteServiceTests", "invalidhbacServiceGroupModTests" })
 	public void testMultipleHBACServiceGroupDelete(String testName, String cn1, String cn2, String cn3) throws Exception {	
 		String cns[] = {cn1, cn2, cn3};
 		
@@ -288,6 +290,31 @@ private static Logger log = Logger.getLogger(UserTests.class.getName());
 		HBACTasks.chooseMultiple(sahiTasks, cns);		
 		HBACTasks.deleteMultiple(sahiTasks);
 	}
+	
+	
+	@Test (groups={"invalidhbacServiceGroupModTests"}, dataProvider="getHBACServiceGroupInvalidAddTestObjects", dependsOnGroups={"hbacServiceGroupAddTests"} )
+	public void testInvalidHBACServiceGroupMod(String testName, String cn, String description, String expectedError) throws Exception {
+		HBACTasks.modifyHBACServiceGroupWithInvalidSetting(sahiTasks, cn, description, expectedError);
+	}
+	
+	
+	@AfterClass (groups={"cleanup"}, description="Delete objects created for this test suite", alwaysRun=true, dependsOnGroups="init")
+	public void cleanup() throws CloneNotSupportedException {
+		String[] hbacServiceGroupTestObjects = {"hbac group1",
+												"hbac group2"
+												} ; 
+		
+		//verify rules were found
+		for (String hbacServiceGroupTestObject : hbacServiceGroupTestObjects) {
+			if (sahiTasks.link(hbacServiceGroupTestObject.toLowerCase()).exists()){
+				log.fine("Cleaning HBAC Service Group: " + hbacServiceGroupTestObject);
+				HBACTasks.deleteHBAC(sahiTasks, hbacServiceGroupTestObject.toLowerCase(), "Delete");
+			}			
+		} 
+		
+	}
+	
+	
 	
 	
 	/*******************************************************
@@ -353,8 +380,12 @@ private static Logger log = Logger.getLogger(UserTests.class.getName());
 	protected List<List<Object>> createInvalidHBACServiceGroupTestObject() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-        //										testname						cn			description 					expected_Error   
-		ll.add(Arrays.asList(new Object[]{ "create_duplicate_hbacservicegroup",	"ftp",		"duplicate service group", 		"HBAC service group with name \"ftp\" already exists"      } ));
+        //										testname									cn								description 					expected_Error   
+		ll.add(Arrays.asList(new Object[]{ "create_duplicate_hbacservicegroup",				"ftp",							"duplicate service group", 		"HBAC service group with name \"ftp\" already exists"      } ));
+		ll.add(Arrays.asList(new Object[]{ "hbacservicegroup_with trailing_space_in_name",	"hbacServiceGroup ",			"name with trailing space", 	"invalid 'name': Leading and trailing spaces are not allowed"	} ));
+		ll.add(Arrays.asList(new Object[]{ "hbacservicegroup_with leading_space_in_name",	" hbacServiceGroup",			"name with leading space",		"invalid 'name': Leading and trailing spaces are not allowed"	} ));
+		ll.add(Arrays.asList(new Object[]{ "hbacservicegroup_with trailing_space_in_desc",	"hbacServiceGroup",				"desc with trailing space ",	"invalid 'desc': Leading and trailing spaces are not allowed"	} ));
+		ll.add(Arrays.asList(new Object[]{ "hbacservicegroup_with leading_space_in_desc",	"hbacServiceGroup",				" desc with leading space",		"invalid 'desc': Leading and trailing spaces are not allowed"	} ));
 		
 		return ll;	
 	}
@@ -442,4 +473,22 @@ private static Logger log = Logger.getLogger(UserTests.class.getName());
 		
 		return ll;	
 	}
+	
+	@DataProvider(name="getHBACServiceGroupInvalidAddTestObjects")
+	public Object[][] getHBACServiceGroupInvalidAddTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createHBACServiceGroupInvalidAddTestObjects());
+	}
+	protected List<List<Object>> createHBACServiceGroupInvalidAddTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname												cn   						description
+		ll.add(Arrays.asList(new Object[]{ "hbac_servicegroup_with trailing_space_in_desc",				"web",				"Description with trailing space ",		"invalid 'desc': Leading and trailing spaces are not allowed"	} ));
+		ll.add(Arrays.asList(new Object[]{ "hbac_servicegroup_with leading_space_in_desc",				"web",				" Description with leading space",		"invalid 'desc': Leading and trailing spaces are not allowed"      } ));
+		
+		return ll;	
+	}
+	
+	
+	
+	
 }

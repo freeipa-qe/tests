@@ -211,7 +211,6 @@ public class HBACServiceTests  extends SahiTestScript{
 	
 	@AfterClass (groups={"cleanup"}, description="Delete objects created for this test suite", alwaysRun=true, dependsOnGroups="init")
 	public void cleanup() throws CloneNotSupportedException {
-		System.out.println("NAMITA: Clean up");
 		String[] hbacRuleTestObjects = {"abcdefghijklmnopqrstuvwxyz123456789ANDAGAINabcdefghijklmnopqrstuvwxyz123456789ANDAGAINabcdefghijklmnopqrstuvwxyz123456789",
 										//"h@ba*c#Se?r!v<i~c`e"
 										} ; 
@@ -220,7 +219,7 @@ public class HBACServiceTests  extends SahiTestScript{
 		for (String hbacRuleTestObject : hbacRuleTestObjects) {
 			if (sahiTasks.link(hbacRuleTestObject.toLowerCase()).exists()){
 				log.fine("Cleaning Sudo Rule: " + hbacRuleTestObject);
-				HBACTasks.deleteHBAC(sahiTasks, hbacRuleTestObject, "Delete");
+				HBACTasks.deleteHBAC(sahiTasks, hbacRuleTestObject.toLowerCase(), "Delete");
 			}			
 		} 
 		

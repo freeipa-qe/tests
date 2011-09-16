@@ -263,15 +263,13 @@ public class CommonTasks {
 	 * start from expected page
 	 */
 	public static boolean checkError(SahiTasks sahiTasks) {
-		if (sahiTasks.div("/IPA Error */").exists()){
+		if ( (sahiTasks.div("/IPA Error */").exists()) || (sahiTasks.span("Required field").exists()) ){
 			log.fine("IPA error dialog appears, usually this is data format error");
-			// there will be two cancel button here
-			if (sahiTasks.button("Cancel").exists()) {
+			// there will be multiple cancel button here
+			while (sahiTasks.button("Cancel").exists()) {
 				sahiTasks.button("Cancel").click();
 			}
-			if (sahiTasks.button("Cancel").exists()) {
-				sahiTasks.button("Cancel").click();
-			}
+			
 			setErrorFlag(true);
 			return true;
 		}	
@@ -341,7 +339,7 @@ public class CommonTasks {
 		sahiTasks.textbox("description").setValue(description);
 		sahiTasks.span("Update").click();
 		Assert.assertTrue(sahiTasks.div(expectedError).exists(), "Verified expected error when adding modifying host group :: " + expectedError);
-		sahiTasks.button("OK").click();
+		sahiTasks.button("Cancel").click();
 		sahiTasks.span("undo").click();
 		//in calling test, make sure to navigate back to page with cn
 	}
