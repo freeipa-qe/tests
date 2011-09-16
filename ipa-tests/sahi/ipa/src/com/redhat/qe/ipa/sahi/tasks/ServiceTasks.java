@@ -220,4 +220,34 @@ public class ServiceTasks {
 		
 		sahiTasks.link("Services").in(sahiTasks.div("content")).click();
 	}
+	
+	/*
+	 * Verify keytab provisioning
+	 * @param sahiTasks
+	 * @param serviceprinc - service principal
+	 * @param provisioned - boolean provisioned or not
+	 */
+	public static void verifyServiceKeytab(SahiTasks sahiTasks, String serviceprinc, boolean provisioned ) {
+		sahiTasks.link(serviceprinc).click();
+		if (provisioned == false){
+			com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.bold("Kerberos Key Not Present").exists(), "Service " + serviceprinc + " does not have a keytab provisioned");
+		}
+		if (provisioned == true){
+			com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.bold("Kerberos Key Present, Service Provisioned:").exists(), "Service " + serviceprinc + " has a keytab provisioned");
+		}	
+		sahiTasks.link("Services").in(sahiTasks.div("content")).click();
+	}
+	
+	/*
+	 * Unprovision keytab
+	 * @param sahiTasks
+	 * @param serviceprinc - service principal
+	 * @param button - boolean provisioned or not
+	 */
+	public static void deleteServiceKeytab(SahiTasks sahiTasks, String serviceprinc, String button ) {
+		sahiTasks.link(serviceprinc).click();
+		sahiTasks.span("Delete Key, Unprovision").click();
+		sahiTasks.button(button).click();
+		sahiTasks.link("Services").in(sahiTasks.div("content")).click();
+	}
 }
