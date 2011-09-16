@@ -18,6 +18,8 @@
 			    <include name="serviceRevokeCertificateTests" />
 			    <include name="serviceAddManagedByHostTests" />
 			    <include name="serviceRemoveManagedByHostTests" />
+				<include name="serviceGetKeytabTests" />
+				<include name="serviceRemoveKeytabTests" />
 				<include name="cleanup" />
 				<!--
 				<include name="teardown" />

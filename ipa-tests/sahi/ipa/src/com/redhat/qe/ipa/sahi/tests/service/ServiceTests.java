@@ -264,6 +264,34 @@ public class ServiceTests extends SahiTestScript {
 			// verify managed by host
 			ServiceTasks.verifyManagedByHost(sahiTasks, testprincipal, mytesthost2, exists);
 		}
+		
+		/*
+		 * Service get keytab tests
+		 */
+		@Test (groups={"serviceGetKeytabTests"}, dataProvider="getServiceGetKeytabTestObjects")	
+		public void testgetServiceKeytab(String testName ) throws Exception {
+			String keytabfile = "/tmp/" + mytesthost + ".keytab";
+			// verify service does not have a keytab
+			ServiceTasks.verifyServiceKeytab(sahiTasks, testprincipal, false);
+			
+			//  provision a keytab for the service
+			CommonTasks.getPrincipalKeytab(testprincipal, keytabfile);
+			
+			// verify service has a keytab
+			ServiceTasks.verifyServiceKeytab(sahiTasks, testprincipal, true);
+		}
+		
+		/*
+		 * Service remove keytab tests
+		 */
+		@Test (groups={"serviceRemoveKeytabTests"}, dataProvider="getServiceRemoveKeytabTestObjects", dependsOnGroups="serviceGetKeytabTests" )	
+		public void testremoveServiceKeytab(String testName ) throws Exception {
+			
+			//  unprovision keytab
+			ServiceTasks.deleteServiceKeytab(sahiTasks, testprincipal, "Unprovision");
+			// verify service has a keytab
+			ServiceTasks.verifyServiceKeytab(sahiTasks, testprincipal, false);
+		}
 	
 	/*******************************************************
 	 ************      DATA PROVIDERS     ******************
@@ -442,6 +470,38 @@ public class ServiceTests extends SahiTestScript {
         //									testname							  button		exists
 		ll.add(Arrays.asList(new Object[]{ 	"cancel_removing_managedby_host",	  "Cancel",		 true	} ));
 		ll.add(Arrays.asList(new Object[]{ 	"remove_managedby_host",	  		  "Delete",		 false   } ));
+		
+		return ll;	
+	}
+	
+	/*
+	 * Data to be used provisioning keytab for service
+	 */
+	@DataProvider(name="getServiceGetKeytabTestObjects")
+	public Object[][] getServiceGetKeytabTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createServiceGetKeytabTestObjects());
+	}
+	protected List<List<Object>> createServiceGetKeytabTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //									testname					
+		ll.add(Arrays.asList(new Object[]{ 	"provision_service_keytab" } ));
+		
+		return ll;	
+	}
+	
+	/*
+	 * Data to be used deleting keytab for service
+	 */
+	@DataProvider(name="getServiceRemoveKeytabTestObjects")
+	public Object[][] getServiceRemoveKeytabTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createServiceRemoveKeytabTestObjects());
+	}
+	protected List<List<Object>> createServiceRemoveKeytabTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //									testname					
+		ll.add(Arrays.asList(new Object[]{ 	"unprovision_service_keytab" } ));
 		
 		return ll;	
 	}
