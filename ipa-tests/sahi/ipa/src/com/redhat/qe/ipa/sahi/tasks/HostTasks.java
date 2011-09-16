@@ -585,5 +585,35 @@ public class HostTasks {
 		}
 		sahiTasks.link("Hosts").in(sahiTasks.div("content")).click();
 	}
+	
+	/*
+	 * Verify keytab provisioning
+	 * @param sahiTasks
+	 * @param hostname - host name
+	 * @param provisioned - Unprovision or cancel
+	 */
+	public static void verifyHostKeytab(SahiTasks sahiTasks, String hostname, boolean provisioned ) {
+		sahiTasks.link(hostname).click();
+		if (provisioned == false){
+			com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.span("Kerberos Key Not Present").exists(), "Host " + hostname + " does not have a keytab provisioned");
+		}
+		if (provisioned == true){
+			com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.span("Kerberos Key Present, Host Provisioned: Delete Key, Unprovision").exists(), "Host " + hostname + " has a keytab provisioned");
+		}	
+		sahiTasks.link("Hosts").in(sahiTasks.div("content")).click();
+	}
+	
+	/*
+	 * Unprovision keytab
+	 * @param sahiTasks
+	 * @param hostname - host name
+	 * @param button - Unprovision or cancel
+	 */
+	public static void deleteHostKeytab(SahiTasks sahiTasks, String hostname, String button ) {
+		sahiTasks.link(hostname).click();
+		sahiTasks.span("Delete Key, Unprovision").click();
+		sahiTasks.button(button).click();
+		sahiTasks.link("Hosts").in(sahiTasks.div("content")).click();
+	}
 }
 
