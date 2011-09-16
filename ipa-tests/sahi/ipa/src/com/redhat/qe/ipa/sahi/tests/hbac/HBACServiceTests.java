@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
 
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
@@ -16,6 +17,7 @@ import com.redhat.qe.ipa.sahi.base.SahiTestScript;
 import com.redhat.qe.ipa.sahi.tasks.CommonTasks;
 import com.redhat.qe.ipa.sahi.tasks.HBACTasks;
 import com.redhat.qe.ipa.sahi.tasks.SahiTasks;
+import com.redhat.qe.ipa.sahi.tasks.SudoTasks;
 import com.redhat.qe.ipa.sahi.tests.user.UserTests;
 
 public class HBACServiceTests  extends SahiTestScript{
@@ -36,8 +38,9 @@ public class HBACServiceTests  extends SahiTestScript{
 	public void checkCurrentPage() {
 	    String currentPageNow = sahiTasks.fetch("top.location.href");
 	    System.out.println("CurrentPageNow: " + currentPageNow);
+	    CommonTasks.checkError(sahiTasks);
 		if (!currentPageNow.equals(currentPage) && !currentPageNow.equals(alternateCurrentPage)) {
-			CommonTasks.checkError(sahiTasks);
+			//CommonTasks.checkError(sahiTasks);
 			System.out.println("Not on expected Page....navigating back from : " + currentPageNow);
 			sahiTasks.navigateTo(commonTasks.hbacServicePage, true);
 		}		
@@ -70,6 +73,7 @@ public class HBACServiceTests  extends SahiTestScript{
 		
 		//verify user, user group, host, host group were added
 		Assert.assertTrue(sahiTasks.link(cn1).exists(), "Added HBAC Service " + cn1 + "  successfully");
+				
 		Assert.assertTrue(sahiTasks.link(cn2).exists(), "Added HBAC Service " + cn2 + "  successfully");
 	}
 	
@@ -205,7 +209,22 @@ public class HBACServiceTests  extends SahiTestScript{
 		Assert.assertTrue(sahiTasks.link(cn).exists(), "HBAC Rule " + cn + "  was not deleted");
 	}
 	
-	
+	@AfterClass (groups={"cleanup"}, description="Delete objects created for this test suite", alwaysRun=true, dependsOnGroups="init")
+	public void cleanup() throws CloneNotSupportedException {
+		System.out.println("NAMITA: Clean up");
+		String[] hbacRuleTestObjects = {"abcdefghijklmnopqrstuvwxyz123456789ANDAGAINabcdefghijklmnopqrstuvwxyz123456789ANDAGAINabcdefghijklmnopqrstuvwxyz123456789",
+										//"h@ba*c#Se?r!v<i~c`e"
+										} ; 
+		
+		//verify rules were found
+		for (String hbacRuleTestObject : hbacRuleTestObjects) {
+			if (sahiTasks.link(hbacRuleTestObject.toLowerCase()).exists()){
+				log.fine("Cleaning Sudo Rule: " + hbacRuleTestObject);
+				HBACTasks.deleteHBAC(sahiTasks, hbacRuleTestObject, "Delete");
+			}			
+		} 
+		
+	}
 	
 	/*******************************************************
 	 ************      DATA PROVIDERS     ******************
@@ -225,7 +244,8 @@ public class HBACServiceTests  extends SahiTestScript{
 		ll.add(Arrays.asList(new Object[]{ "good_hbacservice",				"http",		"testing http service for HBAC"      } ));
 		ll.add(Arrays.asList(new Object[]{ "good_hbacservice",				"https",	"testing https service for HBAC"      } ));
 		ll.add(Arrays.asList(new Object[]{ "hbacservice_long",				"abcdefghijklmnopqrstuvwxyz123456789ANDAGAINabcdefghijklmnopqrstuvwxyz123456789ANDAGAINabcdefghijklmnopqrstuvwxyz123456789", "long svc name"      } ));
-		ll.add(Arrays.asList(new Object[]{ "hbacservice_specialchar",	    "h@ba*c#Se?r!v<i~c`e",			"svc name with special char"      } ));
+		// FIXME: nkrishnan - Bug 738339 - [ipa webui] Encode special chars in values when displaying 
+		// ll.add(Arrays.asList(new Object[]{ "hbacservice_specialchar",	    "h@ba*c#Se?r!v<i~c`e",			"svc name with special char"      } ));
 		
 		return ll;	
 	}
@@ -277,8 +297,8 @@ public class HBACServiceTests  extends SahiTestScript{
 		ll.add(Arrays.asList(new Object[]{ "create_duplicate_hbacservice",				"http",			"duplicate service",						"HBAC service with name \"http\" already exists"      } ));
 		ll.add(Arrays.asList(new Object[]{ "hbacservice_with trailing_space_in_name",	"hbacSvc ",		"service with trailing space in name",		"invalid 'service': Leading and trailing spaces are not allowed"	} ));
 		ll.add(Arrays.asList(new Object[]{ "hbacservice_with leading_space_in_name",	" hbacSvc",		"service with leading space in name",		"invalid 'service': Leading and trailing spaces are not allowed"	} ));
-		ll.add(Arrays.asList(new Object[]{ "hbacservice_with trailing_space_in_desc",	"hbacSvc",		"service with trailing space in desc ",		"invalid 'service': Leading and trailing spaces are not allowed"	} ));
-		ll.add(Arrays.asList(new Object[]{ "hbacservice_with leading_space_in_desc",	"hbacSvc",		" service with leading space in desc",		"invalid 'service': Leading and trailing spaces are not allowed"	} ));
+		ll.add(Arrays.asList(new Object[]{ "hbacservice_with trailing_space_in_desc",	"hbacSvc",		"service with trailing space in desc ",		"invalid 'desc': Leading and trailing spaces are not allowed"	} ));
+		ll.add(Arrays.asList(new Object[]{ "hbacservice_with leading_space_in_desc",	"hbacSvc",		" service with leading space in desc",		"invalid 'desc': Leading and trailing spaces are not allowed"	} ));
 		
 		return ll;	
 	}

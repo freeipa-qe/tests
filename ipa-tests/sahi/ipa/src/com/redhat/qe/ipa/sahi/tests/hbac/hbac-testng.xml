@@ -8,8 +8,6 @@
 		<groups>
 			<run>
 			    <include name="setup" />
-			    
-			     <!-- HBAC Rules --> 
 			    <include name="hbacRuleAddTests" />
 			    <include name="invalidhbacRuleAddTests" />
 			    <include name="hbacRuleRequiredFieldAddTests" />
@@ -30,7 +28,7 @@
 			    <include name="hbacRuleExpandCollapseTests"/>
 			    <include name="hbacRuleSearchTests" />
 			    <include name="hbacRuleDeleteTests" />			   
-			    <include name="hbacRuleMultipleDeleteTests" />	
+			    <include name="hbacRuleMultipleDeleteTests" />
 			</run>
 		</groups>		
 		<classes>
@@ -42,7 +40,6 @@
 	<test name="HBAC Services Tests">
 		<groups>
 			<run>
-			   <!-- HBAC Service --> 
 			    <include name="hbacServiceAddTests" />
 			    <include name="hbacServiceAddAndAddAnotherTests" />
 			    <include name="hbacServiceAddAndEditTests" />
@@ -61,11 +58,10 @@
 		</classes>
 	</test>
 
-
 	<test name="HBAC Service Groups Tests">
 		<groups>
 			<run>
-			   <!-- HBAC Service Groups -->
+			    
 			    <include name="hbacServiceGroupAddTests" />
 			    <include name="hbacServiceGroupAddAndAddAnotherTests" />
 			    <include name="hbacServiceGroupAddAndEditTests" />
@@ -82,13 +78,13 @@
 			    <include name="hbacServiceGroupCancelDeleteTests" />
 			    <include name="hbacServiceGroupDeleteTests" />
 			    <include name="hbacServiceGroupMultipleDeleteTests" />	
+			    
 			</run>
 		</groups>
 		<classes>
 		    <class name="com.redhat.qe.ipa.sahi.tests.hbac.HBACServiceGroupTests" />
 		</classes>
 	</test>
-
 		
 	
 	<listeners>        

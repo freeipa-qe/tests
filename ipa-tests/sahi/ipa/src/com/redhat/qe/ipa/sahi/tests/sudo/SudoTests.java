@@ -650,8 +650,8 @@ public class SudoTests extends SahiTestScript{
 		
         //										testname					cn   			
 		ll.add(Arrays.asList(new Object[]{ "create_sudorule",				"SudoRule1"} ));
-	//	ll.add(Arrays.asList(new Object[]{ "sudorule_long",					"abcdefghijklmnopqrstuvwxyz123456789ANDAGAINabcdefghijklmnopqrstuvwxyz123456789ANDAGAINabcdefghijklmnopqrstuvwxyz123456789"      } ));
-	//	ll.add(Arrays.asList(new Object[]{ "sudorule_specialchar",			"S@ud*o#Ru?le"      } ));
+		ll.add(Arrays.asList(new Object[]{ "sudorule_long",					"abcdefghijklmnopqrstuvwxyz123456789ANDAGAINabcdefghijklmnopqrstuvwxyz123456789ANDAGAINabcdefghijklmnopqrstuvwxyz123456789"      } ));
+		ll.add(Arrays.asList(new Object[]{ "sudorule_specialchar",			"S@ud*o#Ru?le"      } ));
 		
 		
 		return ll;	

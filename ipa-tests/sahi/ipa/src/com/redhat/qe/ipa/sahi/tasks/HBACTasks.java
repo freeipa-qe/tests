@@ -49,14 +49,14 @@ public class HBACTasks {
 	 * @param buttonToClick - Possible values - "Delete" or "Cancel"
 	 */
 	public static void deleteHBAC(SahiTasks sahiTasks, String cn, String buttonToClick) {
-		sahiTasks.checkbox(cn).click();
+		sahiTasks.checkbox(cn.toLowerCase()).click();
 		sahiTasks.link("Delete").click();
 		sahiTasks.button(buttonToClick).click();
 		
 		
 		if (buttonToClick.equals("Cancel")) {
 			//Uncheck the box for this Rule
-			sahiTasks.checkbox(cn).click();
+			sahiTasks.checkbox(cn.toLowerCase()).click();
 		}
 	}
 
