@@ -5,11 +5,13 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
 
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
+import com.redhat.qe.auto.testng.Assert;
 import com.redhat.qe.auto.testng.TestNGUtils;
 import com.redhat.qe.ipa.sahi.base.SahiTestScript;
 import com.redhat.qe.ipa.sahi.tasks.CommonTasks;
@@ -47,7 +49,7 @@ public class SudoCommandGroupTests extends SahiTestScript{
 	@Test (groups={"sudoruleCommandGroupAddTests"}, dataProvider="getSudoruleCommandGroupAddTestObjects")	
 			public void testSudoruleCommandGroupAdd(String testName, String cn, String description) throws Exception {
 				//verify command group to be added doesn't exist
-				com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(cn).exists(), "Verify sudocommand group " + cn + "  doesn't already exist");
+				com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(cn.toCharArray()).exists(), "Verify sudocommand group " + cn + "  doesn't already exist");
 				
 				//new sudo rule command can be added now
 				SudoTasks.createSudoruleCommandGroupAdd(sahiTasks, cn, description, "Add");
@@ -57,18 +59,48 @@ public class SudoCommandGroupTests extends SahiTestScript{
 	} 
 	
 	/*
-	 * Del Sudo Command Group - positive tests
+	 * Add, but Cancel adding SudoRule
 	 */
-	@Test (groups={"sudoruleCommandGroupDelTests"}, dataProvider="getSudoruleCommandGroupDelTestObjects")	
-			public void testSudoruleCommandGroupDel(String testName, String cn, String description) throws Exception {
+	@Test (groups={"sudoCommandGroupCancelAddTests"}, description="Add but Cancel Adding Sudo Rule", dataProvider="getSudoCommandGroupCancelAddTestObjects")	
+	public void testSudoCommandGroupCancelAdd(String testName, String cn, String description) throws Exception {
+		//verify rule doesn't exist
+		Assert.assertFalse(sahiTasks.link(cn.toLowerCase()).exists(), "Verify Sudo Command Group " + cn + " doesn't already exist");
+		
+		//new test rule can be added now
+		SudoTasks.createSudoruleCommandGroupAdd(sahiTasks, cn, description,  "Cancel");
+		
+		//verify rule was not added
+		Assert.assertFalse(sahiTasks.link(cn.toLowerCase()).exists(), "Verify Sudo Command Group " + cn + "  was not added");
+	}
+	
+	/*
+	 * Cancel Del Sudo Command Group - positive tests
+	 */
+	@Test (groups={"sudoruleCommandGroupCancelDelTests"}, dataProvider="getSudoruleCommandGroupDelTestObjects",  dependsOnGroups={"sudoruleCommandGroupAddTests"})	
+			public void testSudoruleCommandGroupCancelDel(String testName, String cn, String description) throws Exception {
 				//verify command group to be deleted exists
-				com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(cn).exists(), "Verify sudocommand group" + cn + "  to be deleted exists");
+				com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(cn.toLowerCase()).exists(), "Verify sudocommand group" + cn + "  to be deleted exists");
 				
 				//new sudo command group can be deleted now
-				SudoTasks.deleteSudoruleCommandGroupDel(sahiTasks, cn, description);
+				SudoTasks.deleteSudoruleCommandGroupDel(sahiTasks, cn, description, "Cancel");
+				
+				//verify sudo rule command group was not deleted
+				com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(cn.toLowerCase()).exists(), "Sudorule Command Group" + cn + "  was not deleted");
+	} 
+	
+	/*
+	 * Del Sudo Command Group - positive tests
+	 */
+	@Test (groups={"sudoruleCommandGroupDelTests"}, dataProvider="getSudoruleCommandGroupDelTestObjects", dependsOnGroups={"sudoruleCommandGroupAddTests", "sudoruleCommandGroupCancelDelTests"})	
+			public void testSudoruleCommandGroupDel(String testName, String cn, String description) throws Exception {
+				//verify command group to be deleted exists
+				com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(cn.toLowerCase()).exists(), "Verify sudocommand group" + cn + "  to be deleted exists");
+				
+				//new sudo command group can be deleted now
+				SudoTasks.deleteSudoruleCommandGroupDel(sahiTasks, cn, description, "Delete");
 				
 				//verify sudo rule command group was added successfully
-				com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(cn).exists(), "Sudorule Command Group" + cn + "  deleted successfully");
+				com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(cn.toLowerCase()).exists(), "Sudorule Command Group" + cn + "  deleted successfully");
 	} 
 	
 	/*
@@ -96,8 +128,58 @@ public class SudoCommandGroupTests extends SahiTestScript{
 		SudoTasks.createSudoCommandGroupWithRequiredField(sahiTasks, cn, "", expectedError);
 	}
 	
+	/*
+	 * Add, and then add another Sudo Rule
+	 */
+	@Test (groups={"sudoCommandGroupAddAndAddAnotherTests"}, description="Add and Add Another Sudo Command Group", dataProvider="getSudoCommandGroupAddAndAddAnotherTestObjects")	
+	public void testSudoCommandGroupAddAndAddAnother(String testName, String cn1, String cn2, String desc) throws Exception {		
+		Assert.assertFalse(sahiTasks.link(cn1.toLowerCase()).exists(), "Verify Sudo Command Group " + cn1 + " doesn't already exist");
+		Assert.assertFalse(sahiTasks.link(cn2.toLowerCase()).exists(), "Verify Sudo Command Group " + cn2 + " doesn't already exist");
+		
+		SudoTasks.addSudoCommandGroupThenAddAnother(sahiTasks, cn1, cn2, desc);
+		
+		Assert.assertTrue(sahiTasks.link(cn1.toLowerCase()).exists(), "Added Sudo Command Group " + cn1 + "  successfully");
+		Assert.assertTrue(sahiTasks.link(cn2.toLowerCase()).exists(), "Added Sudo Command Group " + cn2 + "  successfully");
+	}
 	
 	
+	/*
+	 * Delete multiple Sudo Rules
+	 */
+	@Test (groups={"sudoCommandGroupMultipleDeleteTests"}, description="Delete Multiple Rules", dataProvider="getMultipleSudoCommandGroupTestObjects", 
+			dependsOnGroups={"sudoCommandGroupAddAndAddAnotherTests"})		
+	public void testMultipleSudoRuleDelete(String testName, String cn1, String cn2) throws Exception {	
+		String cns[] = {cn1.toLowerCase(), cn2.toLowerCase()};
+		
+		
+		//verify rule to be deleted exists
+		for (String cn : cns) {
+			Assert.assertTrue(sahiTasks.link(cn).exists(), "Verify Sudo Rule " + cn + "  to be deleted exists");
+		}			
+		//mark this rule for deletion
+		SudoTasks.chooseMultiple(sahiTasks, cns);		
+		SudoTasks.deleteMultiple(sahiTasks);
+	}
+	
+	
+
+	@AfterClass (groups={"cleanup"}, description="Delete objects created for this test suite", alwaysRun=true)
+	public void cleanup() throws CloneNotSupportedException {
+		String[] sudoCommandGroupTestObjects = {"S@ud*o#Ru?le",		
+				"abcdefghijklmnopqrstuvwxyz123456789ANDAGAINabcdefghijklmnopqrstuvwxyz123456789ANDAGAINabcdefghijklmnopqrstuvwxyz123456789",
+				"sudo group1",
+				"Sudo Group 2",
+				"Sudo Group 3"
+				} ;
+
+		//verify rules were found
+		for (String sudoCommandGroupTestObject : sudoCommandGroupTestObjects) {
+			if (sahiTasks.link(sudoCommandGroupTestObject.toLowerCase()).exists()){
+				log.fine("Cleaning Sudo Rule: " + sudoCommandGroupTestObject);
+				SudoTasks.deleteSudo(sahiTasks, sudoCommandGroupTestObject.toLowerCase(), "Delete");
+			}			
+		} 
+	}
 	
 	/*******************************************************
 	 ************      DATA PROVIDERS     ******************
@@ -116,6 +198,23 @@ public class SudoCommandGroupTests extends SahiTestScript{
 		ll.add(Arrays.asList(new Object[]{ "sudo_commandgroup",				"sudo group1",				"group1 with basic commands"	} ));
 		ll.add(Arrays.asList(new Object[]{ "sudo_commandgroup_long",		"abcdefghijklmnopqrstuvwxyz123456789ANDAGAINabcdefghijklmnopqrstuvwxyz123456789ANDAGAINabcdefghijklmnopqrstuvwxyz123456789",	"long group name"      } ));
 		ll.add(Arrays.asList(new Object[]{ "sudo_commandgroup_specialchar",	"S@ud*o#Ru?le", 			"group with special char - in De$c"      } ));
+		
+		return ll;	
+	}
+	
+	
+	/*
+	 * Data to be used when cancelling adding sudo command groups - for positive cases
+	 */
+	@DataProvider(name="getSudoCommandGroupCancelAddTestObjects")
+	public Object[][] getSudoCommandGroupCancelAddTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createSudoCommandGroupCancelAddTestObjects());
+	}
+	protected List<List<Object>> createSudoCommandGroupCancelAddTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname					cn   						description
+		ll.add(Arrays.asList(new Object[]{ "sudo_commandgroup",				"Sudo Group 2",				"cancel adding this group"	} ));
 		
 		return ll;	
 	}
@@ -164,6 +263,9 @@ public class SudoCommandGroupTests extends SahiTestScript{
         //										testname												cn   						description
 		ll.add(Arrays.asList(new Object[]{ "sudo_commandgroup_with trailing_space_in_desc",				"sudo group2",				"Description with trailing space ",		"invalid 'desc': Leading and trailing spaces are not allowed"	} ));
 		ll.add(Arrays.asList(new Object[]{ "sudo_commandgroup_with leading_space_in_desc",				"sudo group2",				" Description with leading space",		"invalid 'desc': Leading and trailing spaces are not allowed"      } ));
+		ll.add(Arrays.asList(new Object[]{ "sudo_commandgroup_with leading_space_in_name",				" sudo group2",				"Name with leading space",				"invalid 'sudocmdgroup_name': Leading and trailing spaces are not allowed"      } ));
+		ll.add(Arrays.asList(new Object[]{ "sudo_commandgroup_with trailing_space_in_name",				"sudo group2 ",				"Name with trailing space",				"invalid 'sudocmdgroup_name': Leading and trailing spaces are not allowed"      } ));
+		
 		
 		return ll;	
 	}
@@ -185,6 +287,39 @@ public class SudoCommandGroupTests extends SahiTestScript{
 		return ll;	
 	}
 	
+
+	/*
+	 * Data to be used when adding rules 
+	 */
+	@DataProvider(name="getSudoCommandGroupAddAndAddAnotherTestObjects")
+	public Object[][] getSudoCommandGroupAddAndAddAnotherTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createSudoCommandGroupAndAddAnotherTestObject());
+	}
+	protected List<List<Object>> createSudoCommandGroupAndAddAnotherTestObject() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname							cn1					cn2					desc   
+		ll.add(Arrays.asList(new Object[]{ "create_two_good_sudocommandgroups",		"Sudo Group 2",		"Sudo Group 3", 	"testing sudo groups"  } ));
+		
+		return ll;	
+	}
 	
+	
+	
+	/*
+	 * Data to be used when deleting multiple rules 
+	 */
+	@DataProvider(name="getMultipleSudoCommandGroupTestObjects")
+	public Object[][] getMultipleSudoCommandGroupTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(deleteMultipleSudoCommandGroupTestObject());
+	}
+	protected List<List<Object>> deleteMultipleSudoCommandGroupTestObject() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname							cn1					cn2					   
+		ll.add(Arrays.asList(new Object[]{ "create_two_good_sudocommandgroups",		"Sudo Group 2",		"Sudo Group 3" } ));
+		
+		return ll;	
+	}
 
 }
