@@ -32,6 +32,40 @@ fixHostFile()
 }
 
 ######################################
+#	fix /etc/hosts ipv6	     #
+######################################
+fixHostFileIPv6()
+{
+    HOSTSFILE="/etc/hosts"
+    rm -f $HOSTSFILE.ipabackup
+    cp -af $HOSTSFILE $HOSTSFILE.ipaipv6backup
+
+    # figure out what my active eth is from the machine's route
+    currenteth=$(/sbin/ip -6 route show | grep ^default | awk '{print $5}' | head -1)
+
+    # get the ip address of that interface
+    ipv6addr=$(ifconfig $currenteth | grep "inet6 " | grep Scope:Global | awk '{print $3}' | awk -F / '{print $1}')
+    rlLog "IPv6 address is $ipv6addr"
+
+    # Now, fix the hosts file to work with IPA.
+    hostname=$(hostname)
+    hostname_s=$(hostname -s)
+    #cat /etc/hosts | grep -v ^$ipv6addr > /dev/shm/hosts
+
+    # Remove any existing hostname entries from the hosts file
+    sed -i s/$hostname//g /dev/shm/hosts
+    sed -i s/$hostname_s//g /dev/shm/hosts
+    echo "$ipv6addr $hostname_s.$DOMAIN $hostname_s" >> /dev/shm/hosts
+    cat /dev/shm/hosts > /etc/hosts
+    rlLog "Hosts file contains:"
+    output=`cat /etc/hosts`
+    rlLog "$output"
+
+    return
+}
+
+
+######################################
 #       fix hostname                 #
 ######################################
 fixhostname()
@@ -79,6 +113,36 @@ fixResolv()
    return
 }
 
+
+#####################################
+#       fix resolv.conf ipv6        #
+#####################################
+fixResolvIPv6()
+{
+   rlLog "Fixing resolv.conf to point to master for IPv6"
+
+   # get the Master's IP address
+   ipv6addr=$(nslookup -type=AAAA $MASTER | grep "has AAAA" | awk '{print $5}')
+   rlLog "MASTER IP address is $ipv6addr"
+   sed -i s/^nameserver/#nameserver/g /etc/resolv.conf
+   echo "nameserver $ipv6addr" >> /etc/resolv.conf
+
+   # get the Slave's IP address
+   if [ "$SLAVE" != "" ]; then
+      slaveipv6addr=$(nslookup -type=AAAA $SLAVE | grep "has AAAA" | awk '{print $5}')
+      rlLog "SLAVE IPv6 address is $slaveipv6addr"
+      echo "nameserver $slaveipv6addr" >> /etc/resolv.conf
+   fi
+
+   rlLog "/etc/resolv.conf contains:"
+   output=`cat /etc/resolv.conf`
+   rlLog "$output"
+
+   return
+}
+
+
+
 ######################################
 #       Append env.sh                #
 ######################################
@@ -114,6 +178,77 @@ appendEnv()
   output=`cat /dev/shm/env.sh`
   rlLog "$output"
 }
+
+######################################
+#       Append env.sh for ipv6       #
+######################################
+appendEnvIPv6()
+{
+  ipv6addr=$(nslookup -type=AAAA $MASTER | grep "has AAAA" | awk '{print $5}')
+  # Adding MASTER and SLAVE bits to env.sh
+  master_short=`echo $MASTER | cut -d "." -f1`
+  MASTER=$master_short.$DOMAIN
+  echo "export MASTER=$MASTER" >> /dev/shm/env.sh
+  echo "export MASTERIP=$ipv6addr" >> /dev/shm/env.sh
+  if [ "$SLAVE" != "" ]; then
+        slave_short=`echo $SLAVE | cut -d "." -f1`
+        SLAVE=$slave_short.$DOMAIN
+        slaveipv6addr=$(nslookup -type=AAAA $SLAVE | grep "has AAAA" | awk '{print $5}')
+        echo "export SLAVE=$SLAVE" >> /dev/shm/env.sh
+        echo "export SLAVEIP=$slaveipv6addr" >> /dev/shm/env.sh
+  fi
+  if [ "$CLIENT" != "" ]; then
+        client_short=`echo $CLIENT | cut -d "." -f1`
+        CLIENT=$client_short.$DOMAIN
+        echo "export CLIENT=$CLIENT" >> /dev/shm/env.sh
+  fi
+
+  if [ "$CLIENT2" != "" ]; then
+        client2_short=`echo $CLIENT2 | cut -d "." -f1`
+        CLIENT2=$client2_short.$DOMAIN
+        echo "export CLIENT2=$CLIENT2" >> /dev/shm/env.sh
+  fi
+
+  rlLog "Contents of env.sh are"
+  output=`cat /dev/shm/env.sh`
+  rlLog "$output"
+}
+
+######################################
+#       Append env.sh for ipv6       #
+######################################
+appendEnvIPv6()
+{
+  ipv6addr=$(nslookup -type=AAAA $MASTER | grep "has AAAA" | awk '{print $5}')
+  # Adding MASTER and SLAVE bits to env.sh
+  master_short=`echo $MASTER | cut -d "." -f1`
+  MASTER=$master_short.$DOMAIN
+  echo "export MASTER=$MASTER" >> /dev/shm/env.sh
+  echo "export MASTERIP=$ipv6addr" >> /dev/shm/env.sh
+  if [ "$SLAVE" != "" ]; then
+        slave_short=`echo $SLAVE | cut -d "." -f1`
+        SLAVE=$slave_short.$DOMAIN
+        slaveipv6addr=$(nslookup -type=AAAA $SLAVE | grep "has AAAA" | awk '{print $5}')
+        echo "export SLAVE=$SLAVE" >> /dev/shm/env.sh
+        echo "export SLAVEIP=$slaveipv6addr" >> /dev/shm/env.sh
+  fi
+  if [ "$CLIENT" != "" ]; then
+        client_short=`echo $CLIENT | cut -d "." -f1`
+        CLIENT=$client_short.$DOMAIN
+        echo "export CLIENT=$CLIENT" >> /dev/shm/env.sh
+  fi
+
+  if [ "$CLIENT2" != "" ]; then
+        client2_short=`echo $CLIENT2 | cut -d "." -f1`
+        CLIENT2=$client2_short.$DOMAIN
+        echo "export CLIENT2=$CLIENT2" >> /dev/shm/env.sh
+  fi
+
+  rlLog "Contents of env.sh are"
+  output=`cat /dev/shm/env.sh`
+  rlLog "$output"
+}
+
 
 #################################################################
 #  SetUpAuthKeys ... all hosts will have the same public and    #

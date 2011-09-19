@@ -86,7 +86,7 @@ rlJournalStart
 			installMaster
 			rhts-sync-set -s READY
 			rlLog "Setting up Authorized keys"
-        		SetUpAuthKeys
+	        	SetUpAuthKeys
         		rlLog "Setting up known hosts file"
         		SetUpKnownHosts
 		fi
