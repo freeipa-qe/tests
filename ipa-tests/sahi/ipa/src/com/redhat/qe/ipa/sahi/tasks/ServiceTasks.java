@@ -250,4 +250,27 @@ public class ServiceTasks {
 		sahiTasks.button(button).click();
 		sahiTasks.link("Services").in(sahiTasks.div("content")).click();
 	}
+	
+	/*
+	 * Add invalid service.
+	 * @param sahiTasks 
+	 * @param hostname - hostname
+	 * @param service name - name for the service
+	 * @param expectedError - the error thrown when an invalid host is being attempted to be added
+	 */
+	public static void addInvalidService(SahiTasks sahiTasks, String hostname, String servicename, String expectedError) {
+		sahiTasks.link("Add").click();
+		sahiTasks.textbox("service").setValue(servicename);
+		sahiTasks.span("icon combobox-icon").click();
+		sahiTasks.select("list").choose(hostname);
+		sahiTasks.button("Add").click();
+		//Check for expected error
+		log.fine("error check");
+		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.div(expectedError).exists(), "Verified expected error when adding invalid service");
+	
+		log.fine("cancel(near retry)");
+		sahiTasks.button("Cancel").near(sahiTasks.button("Retry")).click();
+		log.fine("cancel");
+		sahiTasks.button("Cancel").near(sahiTasks.button("Add and Edit")).click();
+	}
 }
