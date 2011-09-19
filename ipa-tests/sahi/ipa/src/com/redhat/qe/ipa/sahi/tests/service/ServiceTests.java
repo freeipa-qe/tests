@@ -32,6 +32,7 @@ public class ServiceTests extends SahiTestScript {
 	
 	private String mytesthost = "";
 	private String mytesthost2 = "";
+	private String nodnshost = "";
 	private String realm = "";
 	private String testservice = "";
 	private String testprincipal ="";
@@ -57,11 +58,13 @@ public class ServiceTests extends SahiTestScript {
 		testservice = "SRVC";
 		mytesthost = "servicehost1" + "." + domain;
 		mytesthost2 = "servicehost2" + "." + domain;
+		nodnshost = "nodns" + "." + domain;
 		testprincipal = testservice + "/" + mytesthost + "@" + realm;
 		
 		sahiTasks.navigateTo(commonTasks.hostPage, true);
 		HostTasks.addHost(sahiTasks, "servicehost1", domain, ipaddr1);
 		HostTasks.addHost(sahiTasks, "servicehost2", domain, ipaddr2);
+		HostTasks.addHost(sahiTasks, "nodns", domain, "");
 		
 		sahiTasks.navigateTo(commonTasks.servicePage, true);
 		ServiceTasks.addCustomService(sahiTasks, "SRVC", mytesthost, false);
@@ -75,6 +78,7 @@ public class ServiceTests extends SahiTestScript {
 		sahiTasks.navigateTo(commonTasks.hostPage, true);
 		HostTasks.deleteHost(sahiTasks, mytesthost, "YES");
 		HostTasks.deleteHost(sahiTasks, mytesthost2, "YES");
+		HostTasks.deleteHost(sahiTasks, nodnshost, "NO");
 		
 	}
 	
@@ -125,6 +129,22 @@ public class ServiceTests extends SahiTestScript {
 		Assert.assertTrue(sahiTasks.link(servicename).exists(), "Verify service " + servicename + " exists.");
 	}
 	
+	/*
+	 * Add custom service 
+	 */
+	@Test (groups={"forceServiceAddTests"}, dataProvider="getForceServiceAddTestObjects")	
+	public void testForceServiceAdd(String testName) throws Exception {
+		String servicename = "HTTP/" + nodnshost + "@" + realm;
+		
+		// add service - force
+		ServiceTasks.addCustomService(sahiTasks, "HTTP", nodnshost, true );
+		
+		//verify service add
+		Assert.assertTrue(sahiTasks.link(servicename).exists(), "Verify service " + servicename + " exists.");
+		
+		// delete the service added
+		ServiceTasks.deleteService(sahiTasks, servicename, "Delete");
+	}
 	/*
 	 * delete single service 
 	 */
@@ -292,6 +312,16 @@ public class ServiceTests extends SahiTestScript {
 			// verify service has a keytab
 			ServiceTasks.verifyServiceKeytab(sahiTasks, testprincipal, false);
 		}
+		
+		/*
+		 * Add invalid service tests
+		 */
+		@Test (groups={"invalidserviceAddTests"}, dataProvider="getInvalidServiceTestObjects")	
+		public void testInvalidServiceadd(String testName, String hostname, String servicename, String expectedError) throws Exception {
+			
+			ServiceTasks.addInvalidService(sahiTasks, hostname, servicename, expectedError);
+
+		}
 	
 	/*******************************************************
 	 ************      DATA PROVIDERS     ******************
@@ -335,6 +365,22 @@ public class ServiceTests extends SahiTestScript {
 		
         //									testname				customservice
 		ll.add(Arrays.asList(new Object[]{ 	"add_custom_service",	"CUSTOM" } ));
+		
+		return ll;	
+	}
+	
+	/*
+	 * Data to be used when force adding a service
+	 */
+	@DataProvider(name="getForceServiceAddTestObjects")
+	public Object[][] getForceServiceAddTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createForceServiceAddTestObjects());
+	}
+	protected List<List<Object>> createForceServiceAddTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //									testname		
+		ll.add(Arrays.asList(new Object[]{ 	"force_add_service" } ));
 		
 		return ll;	
 	}
@@ -503,6 +549,25 @@ public class ServiceTests extends SahiTestScript {
         //									testname					
 		ll.add(Arrays.asList(new Object[]{ 	"unprovision_service_keytab" } ));
 		
+		return ll;	
+	}
+	
+	/*
+	 * Data to be used when adding services - for negative cases
+	 */
+	@DataProvider(name="getInvalidServiceTestObjects")
+	public Object[][] getInvalidServiceTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createInvalidServiceTestObjects());
+	}
+	protected List<List<Object>> createInvalidServiceTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname					hostname     	servicename    expectedError
+		ll.add(Arrays.asList(new Object[]{ "add_service_missing_hostname",	"", 	 		 "HTTP",			"The host 'undefined' does not exist to add a service to."} ));
+		ll.add(Arrays.asList(new Object[]{ "add_service_no_DNS_for host",	nodnshost, 		 "JUNK",			"Host does not have corresponding DNS A record"} ));
+		//TODO :: enable this test and set the right error message - https://bugzilla.redhat.com/show_bug.cgi?id=739640
+		//ll.add(Arrays.asList(new Object[]{ "add_service_no_service_name",	mytesthost,		 		"",				"Don't know yet"	} ));
+
 		return ll;	
 	}
 

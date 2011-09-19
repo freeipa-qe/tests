@@ -7,11 +7,12 @@
 		<groups>
 			<run>
 			    <include name="setup" />
-			    <include name="init" />	 
+			    <include name="init" />	
 			    <include name="serviceAddTests" /> 
 			    <include name="deleteMultipleServiceTests" />
 				<include name="customServiceAddTests" />
 				<include name="deleteSingleServiceTests" />
+				<include name="forceServiceAddTests" />
 			    <include name="serviceAddCertificateTests" />
 			    <include name="serviceHoldCertificateTests" />
 			    <include name="serviceRestoreCertificateTests" />
@@ -20,6 +21,7 @@
 			    <include name="serviceRemoveManagedByHostTests" />
 				<include name="serviceGetKeytabTests" />
 				<include name="serviceRemoveKeytabTests" />
+				<include name="invalidserviceAddTests" />
 				<include name="cleanup" />
 				<!--
 				<include name="teardown" />
