@@ -28,19 +28,21 @@
 		</groups>
 	</test>
 
-<!--		
+		
 	<test name="Sudo Command Tests">
 		<groups>
 			<run>		   
-			    <include name="sudoruleCommandAddTests" />
-				<include name="sudoruleCommandDelTests" />
+			    <include name="sudoCommandAddTests" />
+			    <include name="sudoCommandCancelAddTests" />
+				<include name="sudoCommandDelTests" />
+				<include name="sudoCommandCancelDelTests" />
 			</run>
 		</groups>
+		<classes>
+		    <class name="com.redhat.qe.ipa.sahi.tests.sudo.SudoCommandTests" />
+		</classes>
 	</test>
-	
--->
-	
-	
+
 		
 	<test name="Sudo Command Group Tests">
 	   <packages>
@@ -50,12 +52,19 @@
 			<run>	
 			    <include name="setup" />
 				<include name="sudoruleCommandGroupAddTests" />
+				<include name="sudoCommandGroupCancelAddTests" />
 				<include name="invalidSudoCommanGroupAddTests" />
+				<include name="sudoCommandGroupAddAndAddAnotherTests" />
+				<include name="sudoCommandGroupMultipleDeleteTests" />
 				<include name="invalidSudoCommanGroupAddRequiredFieldTests" />
 				<include name="invalidSudoCommanGroupModifyTests" />
-				 <include name="sudoruleCommandGroupDelTests" />
+				<include name="sudoruleCommandGroupCancelDelTests" />
+				<include name="sudoruleCommandGroupDelTests" />
 			</run>
 		</groups>
+		<classes>
+		    <class name="com.redhat.qe.ipa.sahi.tests.sudo.SudoCommandGroupTests" />
+		</classes>
 	</test>
 
 	<listeners>        

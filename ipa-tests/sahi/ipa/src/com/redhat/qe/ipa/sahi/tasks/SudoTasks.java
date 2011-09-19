@@ -13,7 +13,7 @@ public class SudoTasks {
 	 * @param sahiTasks 
 	 * @param cn - sudorule name
 	 */
-	public static void createSudorule(SahiTasks sahiTasks, String cn, String buttonToClick) {
+	public static void createSudoRule(SahiTasks sahiTasks, String cn, String buttonToClick) {
 
 		sahiTasks.span("Add").click();
 		sahiTasks.textbox("cn").setValue(cn);
@@ -46,7 +46,7 @@ public class SudoTasks {
 	 * @param cn1 - Rule to be added
 	 * @param cn2 - Next Rule to be added
 	 */
-	public static void addSudoRuleThenAddAnother(SahiTasks sahiTasks, String cn1, String cn2) {
+	public static void addSudoThenAddAnother(SahiTasks sahiTasks, String cn1, String cn2) {
 		sahiTasks.span("Add").click();
 		sahiTasks.textbox("cn").setValue(cn1);
 		sahiTasks.button("Add and Add Another").click();
@@ -508,12 +508,12 @@ public class SudoTasks {
 	/*****************************************************************************************
 	 *********************** 		Tasks for Sudo Commands		********************** 
 	 *****************************************************************************************/
-	public static void createSudoruleCommandAdd(SahiTasks sahiTasks, String cn, String description) {
+	public static void createSudoruleCommandAdd(SahiTasks sahiTasks, String cn, String description, String buttonToClick) {
 		
 		sahiTasks.link("Sudo Commands").click();
 		sahiTasks.span("Add").click();
 		sahiTasks.textbox("sudocmd").setValue(cn);
-		sahiTasks.button("Add").click();
+		sahiTasks.button(buttonToClick).click();
 	}
 	
 	public static void deleteSudoruleCommandDel(SahiTasks sahiTasks, String cn, String description) {
@@ -559,12 +559,17 @@ public class SudoTasks {
 	
 	
 	
-	public static void deleteSudoruleCommandGroupDel(SahiTasks sahiTasks, String cn, String description) {
+	public static void deleteSudoruleCommandGroupDel(SahiTasks sahiTasks, String cn, String description, String buttonToClick) {
 		
 		sahiTasks.link("Sudo Command Groups").click();
 		sahiTasks.checkbox(cn).click();
 		sahiTasks.span("Delete").click();
-		sahiTasks.button("Delete").click();
+		sahiTasks.button(buttonToClick).click();
+		
+		if (buttonToClick.equals("Cancel")) {
+			//Uncheck the box for this Rule
+			sahiTasks.checkbox(cn).click();
+		}
 		
 	}
 	
@@ -590,5 +595,21 @@ public class SudoTasks {
 		sahiTasks.button("Add").click();
 		Assert.assertTrue(sahiTasks.span(expectedError).exists(), "Verified expected error when adding invalid rule " + cn);
 		sahiTasks.button("Cancel").near(sahiTasks.button("Add and Edit")).click();
+	}
+	
+	/**
+	 * Add Sudo cmd grp, and Add Another
+	 * @param sahiTasks
+	 * @param cn1 - Rule to be added
+	 * @param cn2 - Next Rule to be added
+	 */
+	public static void addSudoCommandGroupThenAddAnother(SahiTasks sahiTasks, String cn1, String cn2, String description) {
+		sahiTasks.span("Add").click();
+		sahiTasks.textbox("cn").setValue(cn1);
+		sahiTasks.textbox("description").setValue(description);
+		sahiTasks.button("Add and Add Another").click();
+		sahiTasks.textbox("cn").setValue(cn2);
+		sahiTasks.textbox("description").setValue(description);
+		sahiTasks.button("Add").click();
 	}
 }

@@ -114,9 +114,9 @@ public class SudoTests extends SahiTestScript{
 		System.out.println("Check CurrentPage: " + commonTasks.sudoCommandPage);
 		sahiTasks.navigateTo(commonTasks.sudoCommandPage, true);
 		if (!sahiTasks.link(lsCommandName).exists()) 
-			SudoTasks.createSudoruleCommandAdd(sahiTasks, lsCommandName, lsCommandDescription);
+			SudoTasks.createSudoruleCommandAdd(sahiTasks, lsCommandName, lsCommandDescription, "Add");
 		if (!sahiTasks.link(vimCommandName).exists()) 
-			SudoTasks.createSudoruleCommandAdd(sahiTasks, vimCommandName, vimCommandDescription);
+			SudoTasks.createSudoruleCommandAdd(sahiTasks, vimCommandName, vimCommandDescription, "Add");
 		
 		System.out.println("Check CurrentPage: " + commonTasks.sudoCommandGroupPage);
 		sahiTasks.navigateTo(commonTasks.sudoCommandGroupPage, true);
@@ -153,7 +153,7 @@ public class SudoTests extends SahiTestScript{
 		com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(cn).exists(), "Verify sudorule " + cn + " doesn't already exist");
 		
 		//new sudo rule can be added now
-		SudoTasks.createSudorule(sahiTasks, cn, "Add");		
+		SudoTasks.createSudoRule(sahiTasks, cn, "Add");		
 		
 		//verify sudo rule was added successfully
 		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(cn).exists(), "Added sudorule " + cn + "  successfully");
@@ -167,7 +167,7 @@ public class SudoTests extends SahiTestScript{
 		Assert.assertFalse(sahiTasks.link(cn1).exists(), "Verify Sudo Rule " + cn1 + " doesn't already exist");
 		Assert.assertFalse(sahiTasks.link(cn2).exists(), "Verify Sudo Rule " + cn2 + " doesn't already exist");
 		
-		SudoTasks.addSudoRuleThenAddAnother(sahiTasks, cn1, cn2);
+		SudoTasks.addSudoThenAddAnother(sahiTasks, cn1, cn2);
 		
 		Assert.assertTrue(sahiTasks.link(cn1).exists(), "Added Sudo Rule " + cn1 + "  successfully");
 		Assert.assertTrue(sahiTasks.link(cn2).exists(), "Added Sudo Rule " + cn2 + "  successfully");
@@ -199,7 +199,7 @@ public class SudoTests extends SahiTestScript{
 		Assert.assertFalse(sahiTasks.link(cn).exists(), "Verify Sudo Rule " + cn + " doesn't already exist");
 		
 		//new test rule can be added now
-		SudoTasks.createSudorule(sahiTasks, cn, "Cancel");
+		SudoTasks.createSudoRule(sahiTasks, cn, "Cancel");
 		
 		//verify rule was added successfully
 		Assert.assertFalse(sahiTasks.link(cn).exists(), "Verify Sudo Rule " + cn + "  was not added");
