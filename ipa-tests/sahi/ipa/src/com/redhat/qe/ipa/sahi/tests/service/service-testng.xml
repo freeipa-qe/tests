@@ -22,6 +22,7 @@
 				<include name="serviceGetKeytabTests" />
 				<include name="serviceRemoveKeytabTests" />
 				<include name="invalidserviceAddTests" />
+				<include name="serviceSearchTests" />
 				<include name="cleanup" />
 				<!--
 				<include name="teardown" />

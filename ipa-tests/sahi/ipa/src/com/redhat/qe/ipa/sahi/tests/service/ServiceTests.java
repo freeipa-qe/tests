@@ -322,6 +322,53 @@ public class ServiceTests extends SahiTestScript {
 			ServiceTasks.addInvalidService(sahiTasks, hostname, servicename, expectedError);
 
 		}
+		
+		/*
+		 *Service Search Tests
+		 */
+		@Test (groups={"serviceSearchTests"}, dataProvider="getServiceSearchTestObjects")	
+		public void testServiceSearch(String testName, String searchString) throws Exception {
+			String [] myservices = {"smtp1", "smtp15", "smtp5", "smtp57"};
+			String smtp1princ = "smtp1" + "/" + mytesthost + "@" + realm;
+			String smtp15princ = "smtp15" + "/" + mytesthost + "@" + realm;
+			String smtp5princ = "smtp5" + "/" + mytesthost + "@" + realm;
+			String smtp57princ = "smtp57" + "/" + mytesthost + "@" + realm;
+			String [] myserviceprincs = {smtp1princ, smtp15princ, smtp5princ, smtp57princ};
+			
+			if ( searchString == "smtp"){
+				for (String myservice : myservices){
+					ServiceTasks.addCustomService(sahiTasks, myservice, mytesthost, false);
+				}
+			}
+			
+			CommonTasks.search(sahiTasks, searchString);
+				
+			if (searchString == "smtp"){
+				for (String myservprinc : myserviceprincs){
+					Assert.assertTrue(sahiTasks.link(myservprinc).exists(), "Searched and found service " + myservprinc + "  successfully.");
+				}
+			}
+			
+			if (searchString == "smtp1"){
+				Assert.assertTrue(sahiTasks.link(smtp1princ).exists(), "Searched and found service " + smtp1princ + "  successfully.");
+				Assert.assertTrue(sahiTasks.link(smtp15princ).exists(), "Searched and found service " + smtp15princ + "  successfully.");
+				Assert.assertFalse(sahiTasks.link(smtp5princ).exists(), "Search did not find service " + smtp5princ + ".");
+				Assert.assertFalse(sahiTasks.link(smtp57princ).exists(), "Search did not find service " + smtp57princ + ".");
+			}
+			
+			if (searchString == "smtp5"){
+				Assert.assertTrue(sahiTasks.link(smtp5princ).exists(), "Searched and found service " + smtp5princ + "  successfully");
+				Assert.assertTrue(sahiTasks.link(smtp57princ).exists(), "Searched and found service " + smtp57princ + "  successfully");
+				Assert.assertFalse(sahiTasks.link(smtp1princ).exists(), "Search did not find service " + smtp1princ + ".");
+				Assert.assertFalse(sahiTasks.link(smtp15princ).exists(), "Search did not find service " + smtp15princ + ".");
+			}
+			
+			CommonTasks.clearSearch(sahiTasks);
+			
+			if (searchString == "smtp5"){
+				ServiceTasks.deleteService(sahiTasks, myserviceprincs);
+			}
+		}
 	
 	/*******************************************************
 	 ************      DATA PROVIDERS     ******************
@@ -567,6 +614,24 @@ public class ServiceTests extends SahiTestScript {
 		ll.add(Arrays.asList(new Object[]{ "add_service_no_DNS_for host",	nodnshost, 		 "JUNK",			"Host does not have corresponding DNS A record"} ));
 		//TODO :: enable this test and set the right error message - https://bugzilla.redhat.com/show_bug.cgi?id=739640
 		//ll.add(Arrays.asList(new Object[]{ "add_service_no_service_name",	mytesthost,		 		"",				"Don't know yet"	} ));
+
+		return ll;	
+	}
+	
+	/*
+	 * Data to be used when searching for services
+	 */
+	@DataProvider(name="getServiceSearchTestObjects")
+	public Object[][] getServiceSearchTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createServiceSearchTestObjects());
+	}
+	protected List<List<Object>> createServiceSearchTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname			searchString
+		ll.add(Arrays.asList(new Object[]{ "search_service_test1",	"smtp" } ));
+		ll.add(Arrays.asList(new Object[]{ "search_service_test2",	"smtp1" } ));
+		ll.add(Arrays.asList(new Object[]{ "search_service_test1",	"smtp5" } ));
 
 		return ll;	
 	}
