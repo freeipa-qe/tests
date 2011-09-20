@@ -385,7 +385,7 @@ public class ServiceTests extends SahiTestScript {
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
         //									testname				srvtype    	button   
-		ll.add(Arrays.asList(new Object[]{ 	"add_service_canel",	"cifs", 	"Cancel"  } ));
+		ll.add(Arrays.asList(new Object[]{ 	"add_service_cancel",	"cifs", 	"Cancel"  } ));
 		ll.add(Arrays.asList(new Object[]{ 	"add_cifs_service",		"cifs", 	"Add"  } ));
 		ll.add(Arrays.asList(new Object[]{ 	"add_DNS_service",		"DNS", 		"Add"  } ));
 		ll.add(Arrays.asList(new Object[]{ 	"add_ftp_service",		"ftp", 		"Add"  } ));
@@ -394,7 +394,7 @@ public class ServiceTests extends SahiTestScript {
 		ll.add(Arrays.asList(new Object[]{ 	"add_ldap_service",		"ldap", 	"Add"  } ));
 		ll.add(Arrays.asList(new Object[]{ 	"add_libvirt_service",	"libvirt", 	"Add"  } ));
 		ll.add(Arrays.asList(new Object[]{ 	"add_nfs_service",		"nfs", 		"Add"  } ));
-		ll.add(Arrays.asList(new Object[]{ 	"add_apidd_service",	"qpidd", 	"Add"  } ));
+		ll.add(Arrays.asList(new Object[]{ 	"add_qpidd_service",	"qpidd", 	"Add"  } ));
 		ll.add(Arrays.asList(new Object[]{ 	"add_smtp_service",		"smtp", 	"Add"  } ));
 		
 		return ll;	
@@ -579,6 +579,8 @@ public class ServiceTests extends SahiTestScript {
 		
         //									testname					
 		ll.add(Arrays.asList(new Object[]{ 	"provision_service_keytab" } ));
+		//TODO :: Add when bug is fixed
+		//ll.add(Arrays.asList(new Object[]{ 	"cancel_provision_service_keytab" } ));
 		
 		return ll;	
 	}
@@ -595,7 +597,8 @@ public class ServiceTests extends SahiTestScript {
 		
         //									testname					
 		ll.add(Arrays.asList(new Object[]{ 	"unprovision_service_keytab" } ));
-		
+		//TODO :: Add when bug is fixed
+		//ll.add(Arrays.asList(new Object[]{ 	"cancel_unprovision_service_keytab" } ));
 		return ll;	
 	}
 	
