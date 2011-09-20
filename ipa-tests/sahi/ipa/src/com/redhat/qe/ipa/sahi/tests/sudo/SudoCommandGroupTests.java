@@ -47,12 +47,12 @@ public class SudoCommandGroupTests extends SahiTestScript{
 	 * Add Sudo Command Groups - positive tests
 	 */
 	@Test (groups={"sudoruleCommandGroupAddTests"}, dataProvider="getSudoruleCommandGroupAddTestObjects")	
-			public void testSudoruleCommandGroupAdd(String testName, String cn, String description) throws Exception {
+			public void testSudoCommandGroupAdd(String testName, String cn, String description) throws Exception {
 				//verify command group to be added doesn't exist
 				com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(cn.toCharArray()).exists(), "Verify sudocommand group " + cn + "  doesn't already exist");
 				
 				//new sudo rule command can be added now
-				SudoTasks.createSudoruleCommandGroupAdd(sahiTasks, cn, description, "Add");
+				SudoTasks.createSudoCommandGroupAdd(sahiTasks, cn, description, "Add");
 				
 				//verify sudo command group was added successfully
 				com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(cn.toLowerCase()).exists(), "Added Sudo Command Group" + cn + "  successfully");
@@ -67,7 +67,7 @@ public class SudoCommandGroupTests extends SahiTestScript{
 		Assert.assertFalse(sahiTasks.link(cn.toLowerCase()).exists(), "Verify Sudo Command Group " + cn + " doesn't already exist");
 		
 		//new test rule can be added now
-		SudoTasks.createSudoruleCommandGroupAdd(sahiTasks, cn, description,  "Cancel");
+		SudoTasks.createSudoCommandGroupAdd(sahiTasks, cn, description,  "Cancel");
 		
 		//verify rule was not added
 		Assert.assertFalse(sahiTasks.link(cn.toLowerCase()).exists(), "Verify Sudo Command Group " + cn + "  was not added");
@@ -76,13 +76,13 @@ public class SudoCommandGroupTests extends SahiTestScript{
 	/*
 	 * Cancel Del Sudo Command Group - positive tests
 	 */
-	@Test (groups={"sudoruleCommandGroupCancelDelTests"}, dataProvider="getSudoruleCommandGroupDelTestObjects",  dependsOnGroups={"sudoruleCommandGroupAddTests"})	
-			public void testSudoruleCommandGroupCancelDel(String testName, String cn, String description) throws Exception {
+	@Test (groups={"sudoCommandGroupCancelDelTests"}, dataProvider="getSudoruleCommandGroupDelTestObjects",  dependsOnGroups={"sudoruleCommandGroupAddTests"})	
+			public void testSudoCommandGroupCancelDel(String testName, String cn, String description) throws Exception {
 				//verify command group to be deleted exists
 				com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(cn.toLowerCase()).exists(), "Verify sudocommand group" + cn + "  to be deleted exists");
 				
 				//new sudo command group can be deleted now
-				SudoTasks.deleteSudoruleCommandGroupDel(sahiTasks, cn, description, "Cancel");
+				SudoTasks.deleteSudoCommandGroupDel(sahiTasks, cn, description, "Cancel");
 				
 				//verify sudo rule command group was not deleted
 				com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(cn.toLowerCase()).exists(), "Sudorule Command Group" + cn + "  was not deleted");
@@ -91,17 +91,57 @@ public class SudoCommandGroupTests extends SahiTestScript{
 	/*
 	 * Del Sudo Command Group - positive tests
 	 */
-	@Test (groups={"sudoruleCommandGroupDelTests"}, dataProvider="getSudoruleCommandGroupDelTestObjects", dependsOnGroups={"sudoruleCommandGroupAddTests", "sudoruleCommandGroupCancelDelTests"})	
-			public void testSudoruleCommandGroupDel(String testName, String cn, String description) throws Exception {
+	@Test (groups={"sudoCommandGroupDelTests"}, dataProvider="getSudoruleCommandGroupDelTestObjects", dependsOnGroups={"sudoruleCommandGroupAddTests", "sudoruleCommandGroupCancelDelTests"})	
+			public void testSudoCommandGroupDel(String testName, String cn, String description) throws Exception {
 				//verify command group to be deleted exists
 				com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(cn.toLowerCase()).exists(), "Verify sudocommand group" + cn + "  to be deleted exists");
 				
 				//new sudo command group can be deleted now
-				SudoTasks.deleteSudoruleCommandGroupDel(sahiTasks, cn, description, "Delete");
+				SudoTasks.deleteSudoCommandGroupDel(sahiTasks, cn, description, "Delete");
 				
 				//verify sudo rule command group was added successfully
 				com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(cn.toLowerCase()).exists(), "Sudorule Command Group" + cn + "  deleted successfully");
 	} 
+	
+
+	/*
+	 * Add, and then add another Sudo Rule
+	 */
+	@Test (groups={"sudoCommandGroupAddAndAddAnotherTests"}, description="Add and Add Another Sudo Command Group", dataProvider="getSudoCommandGroupAddAndAddAnotherTestObjects")	
+	public void testSudoCommandGroupAddAndAddAnother(String testName, String cn1, String cn2, String desc) throws Exception {		
+		Assert.assertFalse(sahiTasks.link(cn1.toLowerCase()).exists(), "Verify Sudo Command Group " + cn1 + " doesn't already exist");
+		Assert.assertFalse(sahiTasks.link(cn2.toLowerCase()).exists(), "Verify Sudo Command Group " + cn2 + " doesn't already exist");
+		
+		SudoTasks.addSudoCommandGroupThenAddAnother(sahiTasks, cn1, cn2, desc);
+		
+		Assert.assertTrue(sahiTasks.link(cn1.toLowerCase()).exists(), "Added Sudo Command Group " + cn1 + "  successfully");
+		Assert.assertTrue(sahiTasks.link(cn2.toLowerCase()).exists(), "Added Sudo Command Group " + cn2 + "  successfully");
+	}
+	
+	// Add and edit
+	
+	// Cancel adding a member
+	
+	// Add 3 members
+	
+	// Add a member again
+	
+	// Cancel removing a member
+	
+	// Remove a member
+	
+	// Add a member in 2 groups
+	
+	// Edit group and navigate back and forth
+	
+	// Remove member from one group, then another
+		
+	// Edit - undo/reset/update
+	
+	// Search
+	// expand-Collapse
+	
+	
 	
 	/*
 	 * negative modify command group characters tests
@@ -128,19 +168,6 @@ public class SudoCommandGroupTests extends SahiTestScript{
 		SudoTasks.createSudoCommandGroupWithRequiredField(sahiTasks, cn, "", expectedError);
 	}
 	
-	/*
-	 * Add, and then add another Sudo Rule
-	 */
-	@Test (groups={"sudoCommandGroupAddAndAddAnotherTests"}, description="Add and Add Another Sudo Command Group", dataProvider="getSudoCommandGroupAddAndAddAnotherTestObjects")	
-	public void testSudoCommandGroupAddAndAddAnother(String testName, String cn1, String cn2, String desc) throws Exception {		
-		Assert.assertFalse(sahiTasks.link(cn1.toLowerCase()).exists(), "Verify Sudo Command Group " + cn1 + " doesn't already exist");
-		Assert.assertFalse(sahiTasks.link(cn2.toLowerCase()).exists(), "Verify Sudo Command Group " + cn2 + " doesn't already exist");
-		
-		SudoTasks.addSudoCommandGroupThenAddAnother(sahiTasks, cn1, cn2, desc);
-		
-		Assert.assertTrue(sahiTasks.link(cn1.toLowerCase()).exists(), "Added Sudo Command Group " + cn1 + "  successfully");
-		Assert.assertTrue(sahiTasks.link(cn2.toLowerCase()).exists(), "Added Sudo Command Group " + cn2 + "  successfully");
-	}
 	
 	
 	/*
@@ -148,7 +175,7 @@ public class SudoCommandGroupTests extends SahiTestScript{
 	 */
 	@Test (groups={"sudoCommandGroupMultipleDeleteTests"}, description="Delete Multiple Rules", dataProvider="getMultipleSudoCommandGroupTestObjects", 
 			dependsOnGroups={"sudoCommandGroupAddAndAddAnotherTests"})		
-	public void testMultipleSudoRuleDelete(String testName, String cn1, String cn2) throws Exception {	
+	public void testMultipleSudoCommandGroupDelete(String testName, String cn1, String cn2) throws Exception {	
 		String cns[] = {cn1.toLowerCase(), cn2.toLowerCase()};
 		
 		

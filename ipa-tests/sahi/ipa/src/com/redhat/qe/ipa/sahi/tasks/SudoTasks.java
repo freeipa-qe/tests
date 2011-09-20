@@ -134,6 +134,7 @@ public class SudoTasks {
 		sahiTasks.link(cn).click();
 		
 		// FIXME: nkrishnan: Bug 735185 - MemberOf not listed for HBAC Rules (Source host/hostgroup) and Sudo Rules (RunAs user/usergroups)		
+		// not uncommenting, since flow depends on this test passing
 		//sahiTasks.link(runAsGroupName).click();
 		//GroupTasks.verifyMemberOf(sahiTasks, runAsGroupName, "sudorules", cn, "direct", "YES", true);		
 		//sahiTasks.link(cn).click();
@@ -484,7 +485,6 @@ public class SudoTasks {
 	
 	
 	
-	
 	/**
 	 * Delete an Sudo Rule
 	 * @param sahiTasks
@@ -508,12 +508,105 @@ public class SudoTasks {
 	/*****************************************************************************************
 	 *********************** 		Tasks for Sudo Commands		********************** 
 	 *****************************************************************************************/
-	public static void createSudoruleCommandAdd(SahiTasks sahiTasks, String cn, String description, String buttonToClick) {
+	public static void createSudoCommandAdd(SahiTasks sahiTasks, String cn, String description, String buttonToClick) {
 		
 		sahiTasks.link("Sudo Commands").click();
 		sahiTasks.span("Add").click();
 		sahiTasks.textbox("sudocmd").setValue(cn);
 		sahiTasks.button(buttonToClick).click();
+	}
+	
+
+	public static void addSudoCommandThenAddAnother(SahiTasks sahiTasks, String cn1, String cn2) {
+		sahiTasks.span("Add").click();
+		sahiTasks.textbox("sudocmd").setValue(cn1);
+		sahiTasks.button("Add and Add Another").click();
+		sahiTasks.textbox("sudocmd").setValue(cn2);
+		sahiTasks.button("Add").click();
+	}
+
+	
+	public static void addAndEditSudoCommand(SahiTasks sahiTasks, String cn, String description) {
+
+		sahiTasks.span("Add").click();
+		sahiTasks.textbox("sudocmd").setValue(cn);
+		sahiTasks.button("Add and Edit").click();
+		sahiTasks.textbox("description").setValue(description);
+		
+		sahiTasks.span("Update").click();
+		sahiTasks.link("Sudo Commands").in(sahiTasks.div("content")).click();
+	}
+	
+
+	public static void verifySudoCommandUpdates(SahiTasks sahiTasks, String cn,	String newdescription) {
+		sahiTasks.link(cn).click();
+		
+		//verify comamnd description
+		Assert.assertEquals(sahiTasks.textbox("description").value(), newdescription, "Verified description for command " + cn);
+
+		sahiTasks.link("Sudo Commands").in(sahiTasks.div("content")).click();
+	}
+	
+
+	public static void enrollCommandInCommandGroup (SahiTasks sahiTasks, String command, String commandGroup, String buttonToClick) {
+
+		sahiTasks.link(command).click(); 
+		sahiTasks.link("memberof_sudocmdgroup").click();
+		sahiTasks.span("Enroll").click();
+		sahiTasks.checkbox(commandGroup).under(sahiTasks.div("Available")).click();
+		sahiTasks.link(">>").click();
+		sahiTasks.button(buttonToClick).click();
+		sahiTasks.link("Sudo Commands").in(sahiTasks.div("content")).click();
+	}
+	
+	public static void deleteCommandFromCommandGroup (SahiTasks sahiTasks, String command, String commandGroup, String buttonToClick) {
+
+		sahiTasks.link(command).click(); 
+		sahiTasks.link("memberof_sudocmdgroup").click();
+		sahiTasks.checkbox(commandGroup).click();
+		sahiTasks.span("Delete").click();
+		sahiTasks.button(buttonToClick).click();
+		
+		if (buttonToClick.equals("Cancel")) {
+			//Uncheck the box for this Rule
+			sahiTasks.checkbox(commandGroup).click();
+		}
+		
+		sahiTasks.link("Sudo Commands").in(sahiTasks.div("content")).click();
+	}
+	
+	
+
+	public static void verifySudoCommandMembership (SahiTasks sahiTasks, String command, String commandGroup, boolean isMember) {
+
+		sahiTasks.link(command).click(); 
+
+		sahiTasks.link("memberof_sudocmdgroup").click();
+		if (isMember)
+			Assert.assertTrue(sahiTasks.link(commandGroup).exists(), "Verified command " + command + " is member of " + commandGroup);
+		else
+			Assert.assertFalse(sahiTasks.link(commandGroup).exists(), "Verified command " + command + " is not member of " + commandGroup);
+
+		sahiTasks.link("Sudo Commands").in(sahiTasks.div("content")).click();
+	}
+	
+	public static void createInvalidSudoCommand(SahiTasks sahiTasks,	String cn, String description, String expectedError) {		
+		sahiTasks.span("Add").click();
+		sahiTasks.textbox("sudocmd").setValue(cn);
+		sahiTasks.textbox("description").setValue(description);
+		sahiTasks.button("Add").click();
+		Assert.assertTrue(sahiTasks.div(expectedError).exists(), "Verified Expected Error Message when creating invalid sudo command group");
+		sahiTasks.button("Cancel").near(sahiTasks.button("Retry")).click();
+		sahiTasks.button("Cancel").near(sahiTasks.button("Add and Edit")).click();
+	}
+	
+	public static void modifySudoCommandSettings(SahiTasks sahiTasks, String cn, String description) {
+		sahiTasks.link(cn).click();
+		sahiTasks.link("Settings").click();
+		sahiTasks.textbox("description").setValue(" ");
+		sahiTasks.textbox("description").setValue(description);
+		sahiTasks.span("Update").click();
+		sahiTasks.link("Sudo Commands").in(sahiTasks.div("content")).click();
 	}
 	
 	public static void deleteSudoruleCommandDel(SahiTasks sahiTasks, String cn, String description) {
@@ -530,7 +623,7 @@ public class SudoTasks {
 	 *********************** 		Tasks for Sudo Command Groups		********************** 
 	 *****************************************************************************************/
 
-	public static void createSudoruleCommandGroupAdd(SahiTasks sahiTasks, String cn, String description, String buttonToClick) {
+	public static void createSudoCommandGroupAdd(SahiTasks sahiTasks, String cn, String description, String buttonToClick) {
 		sahiTasks.span("Add").click();
 		sahiTasks.textbox("cn").setValue(cn);
 		sahiTasks.textbox("description").setValue(description);
@@ -559,7 +652,7 @@ public class SudoTasks {
 	
 	
 	
-	public static void deleteSudoruleCommandGroupDel(SahiTasks sahiTasks, String cn, String description, String buttonToClick) {
+	public static void deleteSudoCommandGroupDel(SahiTasks sahiTasks, String cn, String description, String buttonToClick) {
 		
 		sahiTasks.link("Sudo Command Groups").click();
 		sahiTasks.checkbox(cn).click();

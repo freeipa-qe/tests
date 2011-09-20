@@ -1,6 +1,6 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
 <suite name="IPASudoTestSuite">	
-	<test name="Sudo Tests">
+	<test name="Sudo Rule Tests">
 		<packages>
 		     <package name="com.redhat.qe.ipa.sahi.*" />
 		</packages>
@@ -31,9 +31,18 @@
 		
 	<test name="Sudo Command Tests">
 		<groups>
-			<run>		   
+			<run>		
 			    <include name="sudoCommandAddTests" />
+			    <include name="sudoCommandModifySettingsTests" />
+			    <include name="invalidSudoCommandAddTests" />
 			    <include name="sudoCommandCancelAddTests" />
+			    <include name="sudoCommandAddAndAddAnotherTests" />
+			    <include name="sudoCommandMultipleDeleteTests" />
+			    <include name="sudoCommandAddAndEditTests" />
+			    <include name="sudoCommandCancelEnrollTests" />
+			    <include name="sudoCommandEnrollTests"/>
+			    <include name="sudoCommandCancelDeleteEnrolledTests" />
+			    <include name="sudoCommandDeleteEnrolledTests" />
 				<include name="sudoCommandDelTests" />
 				<include name="sudoCommandCancelDelTests" />
 			</run>
@@ -43,7 +52,7 @@
 		</classes>
 	</test>
 
-		
+	
 	<test name="Sudo Command Group Tests">
 	   <packages>
 		     <package name="com.redhat.qe.ipa.sahi.*" />
@@ -51,15 +60,15 @@
 		<groups>
 			<run>	
 			    <include name="setup" />
-				<include name="sudoruleCommandGroupAddTests" />
+				<include name="sudoCommandGroupAddTests" />
 				<include name="sudoCommandGroupCancelAddTests" />
 				<include name="invalidSudoCommanGroupAddTests" />
 				<include name="sudoCommandGroupAddAndAddAnotherTests" />
 				<include name="sudoCommandGroupMultipleDeleteTests" />
 				<include name="invalidSudoCommanGroupAddRequiredFieldTests" />
 				<include name="invalidSudoCommanGroupModifyTests" />
-				<include name="sudoruleCommandGroupCancelDelTests" />
-				<include name="sudoruleCommandGroupDelTests" />
+				<include name="sudoCommandGroupCancelDelTests" />
+				<include name="sudoCommandGroupDelTests" />
 			</run>
 		</groups>
 		<classes>

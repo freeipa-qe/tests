@@ -179,7 +179,7 @@ public class HBACTests extends SahiTestScript {
 	/*
 	 * Add, and edit HBACRule
 	 */	
-	@Test (groups={"hbacRuleAddAndEditTests"}, dataProvider="getSingleHBACRuleTestObjects", dependsOnGroups="hbacRuleCancelAddTests")	
+	@Test (groups={"hbacRuleAddAndEditTests"}, description="commented test for Bug 735185", dataProvider="getSingleHBACRuleTestObjects", dependsOnGroups="hbacRuleCancelAddTests")	
 	public void testHBACRuleAddAndEdit(String testName, String cn) throws Exception {
 		
 		//verify rule doesn't exist

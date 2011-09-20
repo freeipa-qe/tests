@@ -49,7 +49,7 @@ public class HBACServiceTests  extends SahiTestScript{
 	/*
 	 * Add a HBACService
 	 */
-	@Test (groups={"hbacServiceAddTests"}, dataProvider="getHBACServiceTestObjects")	
+	@Test (groups={"hbacServiceAddTests"}, description="Commented test for Bug 738339", dataProvider="getHBACServiceTestObjects")	
 	public void testHBACServiceAdd(String testName, String cn, String description) throws Exception {
 		//verify rule doesn't exist
 		Assert.assertFalse(sahiTasks.link(cn).exists(), "Verify HBAC Service " + cn + " doesn't already exist");
@@ -244,7 +244,8 @@ public class HBACServiceTests  extends SahiTestScript{
 		ll.add(Arrays.asList(new Object[]{ "good_hbacservice",				"https",	"testing https service for HBAC"      } ));
 		ll.add(Arrays.asList(new Object[]{ "hbacservice_long",				"abcdefghijklmnopqrstuvwxyz123456789ANDAGAINabcdefghijklmnopqrstuvwxyz123456789ANDAGAINabcdefghijklmnopqrstuvwxyz123456789", "long svc name"      } ));
 		// FIXME: nkrishnan - Bug 738339 - [ipa webui] Encode special chars in values when displaying 
-		// ll.add(Arrays.asList(new Object[]{ "hbacservice_specialchar",	    "h@ba*c#Se?r!v<i~c`e",			"svc name with special char"      } ));
+		// not uncommenting, since flow depends on this test passing
+	   // ll.add(Arrays.asList(new Object[]{ "hbacservice_specialchar",	    "h@ba*c#Se?r!v<i~c`e",			"svc name with special char"      } ));
 		
 		return ll;	
 	}

@@ -149,6 +149,7 @@ public class HBACTasks {
 		HostgroupTasks.verifyMemberOf(sahiTasks, hostgroupName, "hbacrule", cn, "direct", "YES", true);
 		sahiTasks.link(cn).click();
 		// FIXME: nkrishnan: Bug 735185 - MemberOf not listed for HBAC Rules (Source host/hostgroup) and Sudo Rules (RunAs user/usergroups)
+		// not uncommenting, since flow depends on this test passing
 		//sahiTasks.link(fqdn).click();
 		//HostTasks.verifyHostMemberOf(sahiTasks, fqdn, "HBAC Rules", cn, "indirect", "YES", true);		
 		//sahiTasks.link(cn).click();

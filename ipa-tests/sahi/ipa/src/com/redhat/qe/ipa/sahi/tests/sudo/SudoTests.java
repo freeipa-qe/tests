@@ -114,16 +114,16 @@ public class SudoTests extends SahiTestScript{
 		System.out.println("Check CurrentPage: " + commonTasks.sudoCommandPage);
 		sahiTasks.navigateTo(commonTasks.sudoCommandPage, true);
 		if (!sahiTasks.link(lsCommandName).exists()) 
-			SudoTasks.createSudoruleCommandAdd(sahiTasks, lsCommandName, lsCommandDescription, "Add");
+			SudoTasks.createSudoCommandAdd(sahiTasks, lsCommandName, lsCommandDescription, "Add");
 		if (!sahiTasks.link(vimCommandName).exists()) 
-			SudoTasks.createSudoruleCommandAdd(sahiTasks, vimCommandName, vimCommandDescription, "Add");
+			SudoTasks.createSudoCommandAdd(sahiTasks, vimCommandName, vimCommandDescription, "Add");
 		
 		System.out.println("Check CurrentPage: " + commonTasks.sudoCommandGroupPage);
 		sahiTasks.navigateTo(commonTasks.sudoCommandGroupPage, true);
 		if (!sahiTasks.link(allowCommandGroupName).exists()) 
-			SudoTasks.createSudoruleCommandGroupAdd(sahiTasks, allowCommandGroupName, allowCommandGroupDescription, "Add");
+			SudoTasks.createSudoCommandGroupAdd(sahiTasks, allowCommandGroupName, allowCommandGroupDescription, "Add");
 		if (!sahiTasks.link(denyCommandGroupName).exists()) 
-			SudoTasks.createSudoruleCommandGroupAdd(sahiTasks, denyCommandGroupName, denyCommandGroupDescription, "Add");		
+			SudoTasks.createSudoCommandGroupAdd(sahiTasks, denyCommandGroupName, denyCommandGroupDescription, "Add");		
 			
 		
 		sahiTasks.navigateTo(commonTasks.sudoRulePage, true);
@@ -176,7 +176,8 @@ public class SudoTests extends SahiTestScript{
 	/*
 	 * Add, and edit Sudo Rule
 	 */	
-	@Test (groups={"sudoRuleAddAndEditTests"}, description="Add and Edit Sudo Rule", dataProvider="getEditSudoRuleTestObjects")		
+	@Test (groups={"sudoRuleAddAndEditTests"}, description="Add and Edit Sudo Rule; commented test for Bug 735185", 
+			dataProvider="getEditSudoRuleTestObjects")		
 	public void testSudoRuleAddAndEdit(String testName, String cn) throws Exception {
 		
 		//verify rule doesn't exist
@@ -467,7 +468,8 @@ public class SudoTests extends SahiTestScript{
 	 * verify these were deleted
 	 * verify undo/reset/update for this section when working with the radiobutton
 	 */
-	@Test (groups={"sudoRuleRunAsUserCategorySettingsTests"}, dataProvider="getEditSudoRuleTestObjects", dependsOnGroups={"sudoRuleAddAndEditTests"})
+	@Test (groups={"sudoRuleRunAsUserCategorySettingsTests"}, description="Failures caused by bug 735185 & 736455 ",  
+			dataProvider="getEditSudoRuleTestObjects", dependsOnGroups={"sudoRuleAddAndEditTests"})
 	public void testSudoRuleRunAsUserCategorySettings(String testName, String cn) throws Exception {		
 		//verify rule to be edited exists
 		Assert.assertTrue(sahiTasks.link(cn).exists(), "Verify Rule " + cn + " to be edited exists");
@@ -480,18 +482,19 @@ public class SudoTests extends SahiTestScript{
 		
 		// FIXME: nkrishnan: Bug 735185 - MemberOf not listed for HBAC Rules (Source host/hostgroup) and Sudo Rules (RunAs user/usergroups)
 		//verify by clicking on user - it is a member of this Sudo rule
-		//SudoTasks.verifySudoRuleForEnrollment(sahiTasks, commonTasks, cn, runAsUID, "Users", "direct", true);
-		//sahiTasks.navigateTo(commonTasks.sudoRulePage, true);
+		SudoTasks.verifySudoRuleForEnrollment(sahiTasks, commonTasks, cn, runAsUID, "Users", "direct", true);
+		sahiTasks.navigateTo(commonTasks.sudoRulePage, true);
 		//verify by clicking on usergroup - it is a member of this Sudo rule
-		//SudoTasks.verifySudoRuleForEnrollment(sahiTasks, commonTasks, cn, runAsUserGroupName, "User Groups", "direct", true);
-		//sahiTasks.navigateTo(commonTasks.sudoRulePage, true);
+		SudoTasks.verifySudoRuleForEnrollment(sahiTasks, commonTasks, cn, runAsUserGroupName, "User Groups", "direct", true);
+		sahiTasks.navigateTo(commonTasks.sudoRulePage, true);
+		//end of bug test
 		
 		//enroll user twice
 		SudoTasks.enrollAgain(sahiTasks, cn, runAsUID, "As Whom", "Users");
 	
 		
-		/* FIXME: Bug 736455 - [ipa webui] Sudo Rule includes indirect hosts and users members in its list to add 
-		 * and related to above Bug 735185 
+		// FIXME: Bug 736455 - [ipa webui] Sudo Rule includes indirect hosts and users members in its list to add 
+		// and related to above Bug 735185 
 		//add user to usergroup
 		sahiTasks.navigateTo(commonTasks.groupPage, true);
 		GroupTasks.addMembers(sahiTasks, groupName, "user", uid, "Enroll");
@@ -499,7 +502,8 @@ public class SudoTests extends SahiTestScript{
 		
 		//now verify it is indirect member of this Sudo rule
 		SudoTasks.verifySudoRuleForEnrollment(sahiTasks, commonTasks, cn, uid, "Users", "indirect", true);
-		sahiTasks.navigateTo(commonTasks.sudoRulePage, true);*/
+		sahiTasks.navigateTo(commonTasks.sudoRulePage, true);
+		//end of bug test
 		
 		//modify this rule to delete
 		SudoTasks.modifySudoRuleRunAsUserCategorySection(sahiTasks, cn, runAsUID, runAsUserGroupName, false);
@@ -518,7 +522,8 @@ public class SudoTests extends SahiTestScript{
 	 * verify the group was deleted
 	 * verify undo/reset/update for this section when working with the radiobutton
 	 */
-	@Test (groups={"sudoRuleRunAsGroupCategorySettingsTests"}, dataProvider="getEditSudoRuleTestObjects", dependsOnGroups={"sudoRuleAddAndEditTests"})
+	@Test (groups={"sudoRuleRunAsGroupCategorySettingsTests"}, dataProvider="getEditSudoRuleTestObjects", 
+			dependsOnGroups={"sudoRuleAddAndEditTests"})
 	public void testSudoRuleRunAsGroupCategorySettings(String testName, String cn) throws Exception {		
 		//verify rule to be edited exists
 		Assert.assertTrue(sahiTasks.link(cn).exists(), "Verify Rule " + cn + " to be edited exists");
