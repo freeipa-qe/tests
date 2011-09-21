@@ -44,7 +44,7 @@ fixHostFileIPv6()
     currenteth=$(/sbin/ip -6 route show | grep ^default | awk '{print $5}' | head -1)
 
     # get the ip address of that interface
-    ipv6addr=$(ifconfig $currenteth | grep "inet6 " | grep Scope:Global | awk '{print $3}' | awk -F / '{print $1}')
+    ipv6addr=$(ifconfig $currenteth | grep "inet6 " | grep -E 'Scope:Site|Scope:Global' | awk '{print $3}' | awk -F / '{print $1}' | head -1)
     rlLog "IPv6 address is $ipv6addr"
 
     # Now, fix the hosts file to work with IPA.
