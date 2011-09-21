@@ -1,4 +1,6 @@
 
+export userpassword=redhat
+
 ######################
 # Check user  
 # Be sure to load the user into $1
@@ -24,6 +26,11 @@ check_user()
 
 	rlPhaseStartTest "checking home dir for user $1"
 		rlRun "ipa user-show --all $1 | grep Home\ directory | grep $home" 0 "checking to ensure the UID for user $1 is $home"
+	rlPhaseEnd
+
+	# Making sure that the password migrated properly with a ldapbind
+	rlPhaseStartTest " Making sure that the password for user $1 migrated properly with a ldapbind"
+		rlRun "ldapsearch -x -h127.0.0.1 -p389 -D'uid=$1,cn=users,cn=accounts,dc=$DOMAIN' -w$userpassword -b uid=$1,cn=users,cn=accounts,dc=$DOMAIN objectclass=*" 0 "ldapsearch as user $1 with password $userpassword"
 	rlPhaseEnd
 
 	# setting password and kiniting
@@ -84,6 +91,7 @@ objectClass: posixAccount
 uid: usera000
 gecos: User a000
 cn: User a000
+userPassword: redhat
 homeDirectory: /home/usera000
 
 dn: uid=userb000,ou=People,dc=bos,dc=redhat,dc=com
@@ -100,6 +108,7 @@ objectClass: posixAccount
 uid: userb000
 gecos: User a000
 cn: User a000
+userPassword: redhat
 homeDirectory: /home/userb000' > $file
 
 	rlPhaseStartTest "adding some more users to gid 1000"
@@ -107,28 +116,6 @@ homeDirectory: /home/userb000' > $file
 		rlRun "ldapmodify -a -x -h$BEAKERCLIENT -p 2389 -D \"cn=Directory Manager\" -w$ADMINPW -c -f $file" 0 "adding more users to gid 1000"
 	rlPhaseEnd
 
-}
-
-#####################
-# cleanup
-#####################
-cleanup()
-{
-	file=/dev/shm/ds-ipa-migration-test-cleanup.ldif
-	echo 'dn: uid=usera000,ou=People,dc=bos,dc=redhat,dc=com
-changetype: delete
-
-dn: uid=userb000,ou=People,dc=bos,dc=redhat,dc=com
-changetype: delete' > $file
-
-	rlPhaseStartTest "runnign cleanup of added users"
-		rlRun "ldapmodify -x -h$BEAKERCLIENT -p 2389 -D \"cn=Directory Manager\" -w$ADMINPW -c -f $file" 0 "cleaning up added users"
-	rlPhaseEnd
-
-
-	rlPhaseStartTest "returning ipa server to normal operation"
-		rlRun "ipa config-mod --enable-migration=FALSE" 0 "enabling migration"
-	rlPhaseEnd
 }
 
 #####################
@@ -145,7 +132,58 @@ changetype: delete' > $file
 
 	rlPhaseStartTest "removing the groups that we will be rewriting later"
 		echo "running: ldapmodify -a -x -h$BEAKERCLIENT -p 2389 -D \"cn=Directory Manager\" -w$ADMINPW -c -f $file"
-		rlRun "ldapmodify -a -x -h$BEAKERCLIENT -p 2389 -D \"cn=Directory Manager\" -w$ADMINPW -c -f $file" 0 "adding more users to gid 1000"
+		rlRun "ldapmodify -a -x -h$BEAKERCLIENT -p 2389 -D \"cn=Directory Manager\" -w$ADMINPW -c -f $file" 0 "removign groups"
+	rlPhaseEnd
+
+}
+
+#####################
+# cleanup
+#####################
+cleanup()
+{
+	file=/dev/shm/ds-ipa-migration-test-cleanup.ldif
+	echo 'dn: uid=usera000,ou=People,dc=bos,dc=redhat,dc=com
+changetype: delete
+
+dn: uid=userb000,ou=People,dc=bos,dc=redhat,dc=com
+changetype: delete' > $file
+
+	rlPhaseStartTest "running cleanup of added users"
+		rlRun "ldapmodify -x -h$BEAKERCLIENT -p 2389 -D \"cn=Directory Manager\" -w$ADMINPW -c -f $file" 0 "cleaning up added users"
+	rlPhaseEnd
+
+	remove_groups
+	
+	rlPhaseStartTest "removing ipa object from ipa server"
+		rlRun "ipa user-del user1000" 0 "Removing ipa user for cleanup"
+		rlRun "ipa user-del user2000" 0 "Removing ipa user for cleanup"
+		rlRun "ipa user-del user2009" 0 "Removing ipa user for cleanup"
+		rlRun "ipa user-del usera000" 0 "Removing ipa user for cleanup"
+		rlRun "ipa user-del userb000" 0 "Removing ipa user for cleanup"
+		rlRun "ipa group-del group1000" 0 "Removing ipa group for cleanup"
+		rlRun "ipa group-del group2000" 0 "Removing ipa group for cleanup"
+		rlRun "ipa group-del group2000" 0 "Removing ipa group for cleanup"
+	rlPhaseEnd
+	
+	rlPhaseStartTest "returning ipa server to normal operation"
+		rlRun "ipa config-mod --enable-migration=FALSE" 0 "enabling migration"
+	rlPhaseEnd
+}
+
+#####################
+# Set the password of a user in the initial DS server
+######################
+set_user_ldap_password()
+{
+	file=/dev/shm/ds-alter-user-password.ldif
+	echo "dn: uid=$1,ou=People,dc=bos,dc=redhat,dc=com
+changetype: modify
+replace: userPassword
+userPassword: $userpassword" > $file
+
+	rlPhaseStartTest "chaging thew password for user $1 in the DS server"
+		rlRun "ldapmodify -a -x -h$BEAKERCLIENT -p 2389 -D \"cn=Directory Manager\" -w$ADMINPW -c -f $file" 0 "changing the password for user $1"
 	rlPhaseEnd
 
 }
@@ -153,7 +191,7 @@ changetype: delete' > $file
 #####################
 # Re-add the groups for testing later
 ######################
-remove_groups()
+re_add_groups()
 {
 	file=/dev/shm/ds-ipa-migration-re-add-groups.ldif
 	echo 'dn: cn=Group1000,ou=Groups,dc=bos,dc=redhat,dc=com
@@ -163,7 +201,6 @@ cn: PD Managers
 ou: groups
 description: People that are in Group1000
 uniqueMember: cn=Directory Manager
-uniqueMember: uid=user1000
 
 dn: cn=group2000,ou=Groups,dc=bos,dc=redhat,dc=com
 objectClass: top
@@ -172,8 +209,8 @@ cn: PD Managers
 ou: groups
 description: People that are in group2000
 uniqueMember: cn=Directory Manager
-uniqueMember: uid=user2009
-uniqueMember: uid=user2000' > $file
+uniqueMember: uid=user2009,ou=People,dc=bos,dc=redhat,dc=com
+uniqueMember: uid=user2000,ou=People,dc=bos,dc=redhat,dc=com' > $file
 
 	rlPhaseStartTest "re-inserting the groups that we will be testing with later"
 		echo "running: ldapmodify -a -x -h$BEAKERCLIENT -p 2389 -D \"cn=Directory Manager\" -w$ADMINPW -c -f $file"
@@ -193,6 +230,11 @@ ds-migration()
 {
 
 	add_more_users
+	set_user_ldap_password user1000
+	set_user_ldap_password user2000
+	set_user_ldap_password user2009
+	set_user_ldap_password usera000
+	set_user_ldap_password userb000
 	remove_groups
 	re_add_groups
 

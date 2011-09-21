@@ -65,6 +65,7 @@ rlJournalStart
 		echo "ERROR -  See the sample xml file"
 		rlFail "Client not found to migrate from"
 	else
+		kinitAs $ADMINID $ADMINPW
 		ds-migration
 	fi
     # r2d2_test_ends
