@@ -15,7 +15,6 @@ import com.redhat.qe.auto.testng.Assert;
 import com.redhat.qe.auto.testng.TestNGUtils;
 import com.redhat.qe.ipa.sahi.base.SahiTestScript;
 import com.redhat.qe.ipa.sahi.tasks.CommonTasks;
-import com.redhat.qe.ipa.sahi.tasks.HBACTasks;
 import com.redhat.qe.ipa.sahi.tasks.SudoTasks;
 
 public class SudoCommandTests extends SahiTestScript {
@@ -62,7 +61,8 @@ public class SudoCommandTests extends SahiTestScript {
 	/*
 	 * Add Sudo Commands - positive tests
 	 */
-	@Test (groups={"sudoCommandAddTests"}, dataProvider="getSudoCommandAddTestObjects")	
+	@Test (groups={"sudoCommandAddTests"}, description="Add a Sudo Command",  
+			dataProvider="getSudoCommandAddTestObjects")	
 	public void testSudoCommandAdd(String testName, String cn, String description) throws Exception {
 				//verify command to be added doesn't exist
 				com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(cn).exists(), "Verify sudocommand " + cn + "  doesn't already exist");
@@ -77,7 +77,8 @@ public class SudoCommandTests extends SahiTestScript {
 	/*
 	 * Cancel Add Sudo Commands - positive tests
 	 */
-	@Test (groups={"sudoCommandCancelAddTests"}, dataProvider="getSudoCommandCancelAddTestObjects")	
+	@Test (groups={"sudoCommandCancelAddTests"}, description="Cancel adding a Sudo Command", 
+			dataProvider="getSudoCommandCancelAddTestObjects")	
 	public void testSudoCommandCancelAdd(String testName, String cn, String description) throws Exception {
 				//verify command to be added doesn't exist
 				com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(cn).exists(), "Verify sudocommand " + cn + "  doesn't already exist");
@@ -92,9 +93,10 @@ public class SudoCommandTests extends SahiTestScript {
 	/*
 	 * Cancel Del Sudo Commands - positive tests
 	 */
-	@Test (groups={"sudoCommandCancelDelTests"}, dataProvider="getSudoruleCommandDelTestObjects", 
+	@Test (groups={"sudoCommandCancelDelTests"}, description="Cancel deleting a Sudo command",  
+			dataProvider="getSudoruleCommandCancelDelTestObjects", 
 			dependsOnGroups={"sudoCommandAddTests"})	
-	public void testSudoCommandCancelDel(String testName, String cn, String description) throws Exception {
+	public void testSudoCommandCancelDel(String testName, String cn) throws Exception {
 				//verify command to be deleted exists
 				com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(cn).exists(), "Verify sudocommand " + cn + "  to be deleted exists");
 				
@@ -108,9 +110,10 @@ public class SudoCommandTests extends SahiTestScript {
 	/*
 	 * Del Sudo Commands - positive tests
 	 */
-	@Test (groups={"sudoCommandDelTests"}, dataProvider="getSudoruleCommandDelTestObjects", 
-			dependsOnGroups={"sudoCommandAddTests", "sudoCommandCancelDelTests", "invalidSudoCommandAddTests", "invalidSudoCommandModifyTests"})	
-	public void testSudoCommandDel(String testName, String cn, String description) throws Exception {
+	@Test (groups={"sudoCommandDelTests"},  description="Delete a Sudo command", 
+			dataProvider="getSudoruleCommandDelTestObjects", 
+			dependsOnGroups={"sudoCommandAddTests", "sudoCommandCancelDelTests", "invalidSudoCommandAddTests"})	
+	public void testSudoCommandDel(String testName, String cn) throws Exception {
 				//verify command to be deleted exists
 				com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(cn).exists(), "Verify sudocommand " + cn + "  to be deleted exists");
 				
@@ -126,7 +129,8 @@ public class SudoCommandTests extends SahiTestScript {
 	/*
 	 * Add, and then add another Sudo Command
 	 */
-	@Test (groups={"sudoCommandAddAndAddAnotherTests"}, description="Add and Add Another Sudo Command", dataProvider="getMultipleSudoCommandGroupTestObjects")	
+	@Test (groups={"sudoCommandAddAndAddAnotherTests"},  description="Add and Add another Sudo command",  
+			dataProvider="getAddAndAddAnotherSudoCommandGroupTestObjects")	
 	public void testSudoCommandAddAndAddAnother(String testName, String cn1, String cn2) throws Exception {		
 		Assert.assertFalse(sahiTasks.link(cn1).exists(), "Verify Sudo Command  " + cn1 + " doesn't already exist");
 		Assert.assertFalse(sahiTasks.link(cn2).exists(), "Verify Sudo Command  " + cn2 + " doesn't already exist");
@@ -140,7 +144,8 @@ public class SudoCommandTests extends SahiTestScript {
 	/*
 	 * Add, and edit Sudo command
 	 */	
-	@Test (groups={"sudoCommandAddAndEditTests"}, dataProvider="getSingleSudoCommandTestObjects")	
+	@Test (groups={"sudoCommandAddAndEditTests"}, description="Add and Edit a Sudo command",  
+			dataProvider="getAddAndEditSudoCommandTestObjects")	
 	public void testSudoCommandAddAndEdit(String testName, String cn, String description) throws Exception {
 		
 		//verify rule doesn't exist
@@ -158,14 +163,15 @@ public class SudoCommandTests extends SahiTestScript {
 	 * Cancel enrolling a Sudo command to a sudo command group
 	 * 
 	 */
-	@Test (groups={"sudoCommandCancelEnrollTests"}, dataProvider="getSingleSudoCommandTestObjects", 
+	@Test (groups={"sudoCommandCancelEnrollTests"},  description="Cancel enrolling a Command into a Command Group", 
+			dataProvider="getCancelEnrollSudoCommandTestObjects", 
 			dependsOnGroups={"sudoCommandAddAndEditTests"})	
-	public void testSudoCommandCancelEnroll(String testName, String command, String desc) throws Exception {
+	public void testSudoCommandCancelEnroll(String testName, String command) throws Exception {
 		
 		//verify command exists
 		Assert.assertTrue(sahiTasks.link(command).exists(), "Verify Command " + command + " exists");
 		
-		// Enroll command
+		// Enroll command, but cancel
 		SudoTasks.enrollCommandInCommandGroup(sahiTasks, command, commandGroup, "Cancel");
 		
 		// Verify membership
@@ -178,9 +184,10 @@ public class SudoCommandTests extends SahiTestScript {
 	 * Enroll a Sudo command to a sudo command group
 	 * 
 	 */
-	@Test (groups={"sudoCommandEnrollTests"}, dataProvider="getSingleSudoCommandTestObjects", 
+	@Test (groups={"sudoCommandEnrollTests"},  description="Enroll a Command into a Command Group", 
+			dataProvider="getEnrollSudoCommandTestObjects", 
 			dependsOnGroups={"sudoCommandAddAndEditTests", "sudoCommandCancelEnrollTests"})	
-	public void testSudoCommandEnroll(String testName, String command, String desc) throws Exception {
+	public void testSudoCommandEnroll(String testName, String command) throws Exception {
 		
 		//verify command exists
 		Assert.assertTrue(sahiTasks.link(command).exists(), "Verify Command " + command + " exists");
@@ -199,9 +206,10 @@ public class SudoCommandTests extends SahiTestScript {
 	 * Cancel deleting a Sudo command from a sudo command group
 	 * 
 	 */
-	@Test (groups={"sudoCommandCancelDeleteEnrolledTests"}, dataProvider="getSingleSudoCommandTestObjects",
+	@Test (groups={"sudoCommandCancelDeleteEnrolledTests"},  description="Cancel deleting an enrolled command from its group",
+			dataProvider="getCancelDelEnrolledSudoCommandTestObjects",
 			dependsOnGroups={"sudoCommandAddAndEditTests", "sudoCommandEnrollTests"})	
-	public void testSudoCommandCancelDeleteEnrolled(String testName, String command,  String desc) throws Exception {
+	public void testSudoCommandCancelDeleteEnrolled(String testName, String command) throws Exception {
 		
 		//verify command exists
 		Assert.assertTrue(sahiTasks.link(command).exists(), "Verify Command " + command + " exists");
@@ -219,9 +227,10 @@ public class SudoCommandTests extends SahiTestScript {
 	 * Delete a Sudo command from a sudo command group
 	 * 
 	 */
-	@Test (groups={"sudoCommandDeleteEnrolledTests"}, dataProvider="getSingleSudoCommandTestObjects",
-			dependsOnGroups={"sudoCommandAddAndEditTests", "sudoCommandEnrollTests"})	
-	public void testSudoCommandDeleteEnrolled(String testName, String command, String desc) throws Exception {
+	@Test (groups={"sudoCommandDeleteEnrolledTests"},  description="Delete an enrolled command from its group", 
+			dataProvider="getDeleteEnrolledSudoCommandTestObjects",
+			dependsOnGroups={"sudoCommandAddAndEditTests", "sudoCommandEnrollTests", "sudoCommandCancelDeleteEnrolledTests"})	
+	public void testSudoCommandDeleteEnrolled(String testName, String command) throws Exception {
 		
 		//verify command exists
 		Assert.assertTrue(sahiTasks.link(command).exists(), "Verify Command " + command + " exists");
@@ -238,7 +247,8 @@ public class SudoCommandTests extends SahiTestScript {
 	/*
 	 *  modify command   description to blank - positive
 	 */
-	@Test (groups={"sudoCommandModifySettingsTests"}, dataProvider="getSudoCommandModifyTestObjects", 
+	@Test (groups={"sudoCommandModifySettingsTests"},  description="Edit a Sudo Command, and update its description to be blank", 
+			dataProvider="getSudoCommandModifyTestObjects", 
 			dependsOnGroups={"sudoCommandAddAndEditTests"})	
 	public void testSudoCommandModifySettings(String testName, String cn, String description) throws Exception {
 		
@@ -251,12 +261,26 @@ public class SudoCommandTests extends SahiTestScript {
 	/*
 	 * invalid add
 	 */
-	@Test (groups={"invalidSudoCommandAddTests"}, dataProvider="getSudoCommandInvalidAddTestObjects", 
+	@Test (groups={"invalidSudoCommandAddTests"},  description="Verify error when adding invalid Sudo Command",
+			dataProvider="getSudoCommandInvalidAddTestObjects", 
 			dependsOnGroups={"sudoCommandAddTests"})
 	public void testInvalidSudoCommandAdd(String testName, String cn, String description, String expectedError) throws Exception {
 		
 		SudoTasks.createInvalidSudoCommand(sahiTasks, cn, description, expectedError);
 	}
+	
+	
+	/*
+	 * Add Commands - check required fields - for negative tests
+	 */
+	@Test (groups={"sudoCommandRequiredFieldAddTests"}, description="Add blank Command", 
+			dataProvider="getSudoCommandRequiredFieldTestObjects")	
+	public void testSudoCommandRequiredFieldAdd(String testName, String cn, String expectedError) throws Exception {
+		//new test user can be added now
+		SudoTasks.createWithRequiredFieldMissing(sahiTasks, cn, "sudocmd", expectedError);		
+	}
+	
+	
 	
 	/*
 	 * search
@@ -269,7 +293,7 @@ public class SudoCommandTests extends SahiTestScript {
 	/*
 	 * Delete multiple Sudo Rules
 	 */
-	@Test (groups={"sudoCommandMultipleDeleteTests"}, description="Delete Multiple Rules", dataProvider="getMultipleSudoCommandGroupTestObjects", 
+	@Test (groups={"sudoCommandMultipleDeleteTests"}, description="Delete Multiple Sudo Commands", dataProvider="getMultipleDelSudoCommandGroupTestObjects", 
 			dependsOnGroups={"sudoCommandAddAndAddAnotherTests"})		
 	public void testMultipleSudoCommandDelete(String testName, String cn1, String cn2) throws Exception {	
 		String cns[] = {cn1, cn2};
@@ -288,7 +312,7 @@ public class SudoCommandTests extends SahiTestScript {
 	
 	@AfterClass (groups={"cleanup"}, description="Delete objects created for this test suite", alwaysRun=true)
 	public void cleanup() throws CloneNotSupportedException {
-		String[] sudoCommandTestObjects = {"/bin/date",
+		String[] sudoCommandTestObjects = {//"/bin/date",
  										//	"/bin/cat",
 										"/bin/find",
 										"/bin/more",
@@ -318,8 +342,11 @@ public class SudoCommandTests extends SahiTestScript {
 	protected List<List<Object>> createSudoCommandAddTestObjects() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-        //										testname					cn   			desc	
-		ll.add(Arrays.asList(new Object[]{ "create_sudorule_command",		"/bin/date", 	"testing date command"	} ));
+        //										testname							cn   					desc	
+		ll.add(Arrays.asList(new Object[]{ "Add a Sudo Command - good",				"/bin/date", 			"testing date command"	} ));
+	//	ll.add(Arrays.asList(new Object[]{ "Add a Sudo Command - long",				"/home/abcdefghijklmnopqrstuvwxyz123456789ANDAGAINabcdefghijklmnopqrstuvwxyz123456789ANDAGAINabcdefghijklmnopqrstuvwxyz123456789/bin/date", 	"testing long date command"	} ));
+	//	ll.add(Arrays.asList(new Object[]{ "Add a Sudo Command - Special Char",		"/b@i&n?/~d:a?t+e-", 	"testing date command with special char"	} ));
+		
 	//	ll.add(Arrays.asList(new Object[]{ "create_sudorule_command",		"/bin/cat", 	"testing cat command"	} ));
 		/*
 		
@@ -341,29 +368,28 @@ public class SudoCommandTests extends SahiTestScript {
 	protected List<List<Object>> createSudoCommandCancelAddTestObjects() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-        //										testname					cn   			desc
-		ll.add(Arrays.asList(new Object[]{ "create_sudorule_command",		"/bin/find",	"testing find command"	} ));
+        //										testname							cn   			desc
+		ll.add(Arrays.asList(new Object[]{ "Cancel adding a Sudo Command",		"/bin/find",	"testing find command"	} ));
 								   
 		return ll;	
 	}
 	
+
 	/*
-	 * Data to be used when adding sudo rule commands - for positive cases
+	 * Data to be used when cancelling deleting sudo commands 
 	 */
-	@DataProvider(name="getSudoCommandCancelDeleteTestObjects")
-	public Object[][] getSudoCommandCancelDeleteTestObjects() {
-		return TestNGUtils.convertListOfListsTo2dArray(createSudoCommandCancelDeleteTestObjects());
+	@DataProvider(name="getSudoruleCommandCancelDelTestObjects")
+	public Object[][] getSudoruleCommandCancelDelTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createSudoruleCommandCancelDelTestObjects());
 	}
-	protected List<List<Object>> createSudoCommandCancelDeleteTestObjects() {		
+	protected List<List<Object>> createSudoruleCommandCancelDelTestObjects() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-        //										testname					cn   			
-		ll.add(Arrays.asList(new Object[]{ "create_sudorule_command",		"/bin/date"	} ));
-								   
+        //										testname							cn   				
+		ll.add(Arrays.asList(new Object[]{ "Cancel deleting a Sudo command",		"/bin/date"	} ));
+		
 		return ll;	
 	}
-	
-	
 	
 	/*
 	 * Data to be used when deleting sudo rule commands - for positive cases
@@ -375,9 +401,8 @@ public class SudoCommandTests extends SahiTestScript {
 	protected List<List<Object>> createSudoruleCommandDelTestObjects() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-        //										testname					cn   			description
-		ll.add(Arrays.asList(new Object[]{ "delete_sudorule_command",		"/bin/date",		"date command"	} ));
-	//	ll.add(Arrays.asList(new Object[]{ "delete_sudorule_command",		"/bin/cat",			"cat command"	} ));
+        //										testname					cn   				
+		ll.add(Arrays.asList(new Object[]{ "Delete a Sudo command",		"/bin/date"	} ));
 		
 		return ll;	
 	}
@@ -386,34 +411,121 @@ public class SudoCommandTests extends SahiTestScript {
 	/*
 	 * Data to be used when testing with multiple sudo commands - for positive cases
 	 */
-	@DataProvider(name="getMultipleSudoCommandGroupTestObjects")
-	public Object[][] getMultipleSudoCommandGroupTestObjects() {
-		return TestNGUtils.convertListOfListsTo2dArray(createMultipleSudoCommandTestObjects());
+	@DataProvider(name="getAddAndAddAnotherSudoCommandGroupTestObjects")
+	public Object[][] getAddAndAddAnotherSudoCommandGroupTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createAddAndAddAnotherSudoCommandTestObjects());
 	}
-	protected List<List<Object>> createMultipleSudoCommandTestObjects() {		
+	protected List<List<Object>> createAddAndAddAnotherSudoCommandTestObjects() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
         //										testname					cn1					cn2   			
-		ll.add(Arrays.asList(new Object[]{ "multiple_sudo_command",		"/bin/more",		"/usr/bin/less"	} ));
+		ll.add(Arrays.asList(new Object[]{ "Add and Add another Sudo command",		"/bin/more",		"/usr/bin/less"	} ));
 		
 		return ll;	
 	}
 	
 	/*
-	 * Data to be used when testing with single sudo command - for positive cases
+	 * Data to be used when testing with multiple sudo commands - for positive cases
 	 */
-	@DataProvider(name="getSingleSudoCommandTestObjects")
-	public Object[][] getSingleSudoCommandTestObjects() {
-		return TestNGUtils.convertListOfListsTo2dArray(createSingleSudoCommandTestObjects());
+	@DataProvider(name="getMultipleDelSudoCommandGroupTestObjects")
+	public Object[][] getMultipleDelSudoCommandGroupTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createMultipleDelSudoCommandTestObjects());
 	}
-	protected List<List<Object>> createSingleSudoCommandTestObjects() {		
+	protected List<List<Object>> createMultipleDelSudoCommandTestObjects() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-        //										testname					cn				desc  			
-		ll.add(Arrays.asList(new Object[]{ "single_sudo_command",		"/bin/ln",			"symlink command"	} ));
+        //										testname					cn1					cn2   			
+		ll.add(Arrays.asList(new Object[]{ "Delete multiple Sudo commands",		"/bin/more",		"/usr/bin/less"	} ));
 		
 		return ll;	
 	}
+	
+	
+	/*
+	 * Data to be used when adding and editing a sudo command 
+	 */
+	@DataProvider(name="getAddAndEditSudoCommandTestObjects")
+	public Object[][] getAddAndEditSudoCommandTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createAddAndEditSudoCommandTestObjects());
+	}
+	protected List<List<Object>> createAddAndEditSudoCommandTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname						cn					desc  			
+		ll.add(Arrays.asList(new Object[]{ "Add and Edit a Sudo command",		"/bin/ln",			"symlink command"	} ));
+		
+		return ll;	
+	}
+	
+	/*
+	 * Data to be used when cancelling enrolling a command
+	 */
+	@DataProvider(name="getCancelEnrollSudoCommandTestObjects")
+	public Object[][] getCancelEnrollSudoCommandTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createCancelEnrollSudoCommandTestObjects());
+	}
+	protected List<List<Object>> createCancelEnrollSudoCommandTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname											cn				 			
+		ll.add(Arrays.asList(new Object[]{ "Cancel enrolling a Command into a Command Group",		"/bin/ln"	} ));
+		
+		return ll;	
+	}
+	
+	
+	/*
+	 * Data to be used when  enrolling a command
+	 */
+	@DataProvider(name="getEnrollSudoCommandTestObjects")
+	public Object[][] getEnrollSudoCommandTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createEnrollSudoCommandTestObjects());
+	}
+	protected List<List<Object>> createEnrollSudoCommandTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname								cn				 			
+		ll.add(Arrays.asList(new Object[]{ "Enroll a Command into a Command Group",		"/bin/ln"	} ));
+		
+		return ll;	
+	}
+	
+	
+
+	/*
+	 * Data to be used when  cancelling deleting an enrolled command
+	 */
+	@DataProvider(name="getCancelDelEnrolledSudoCommandTestObjects")
+	public Object[][] getCancelDelEnrolledSudoCommandTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createCancelDelEnrolledSudoCommandTestObjects());
+	}
+	protected List<List<Object>> createCancelDelEnrolledSudoCommandTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname												cn				 			
+		ll.add(Arrays.asList(new Object[]{ "Cancel deleting an enrolled command from its group",		"/bin/ln"	} ));
+		
+		return ll;	
+	}
+	
+	
+	/*
+	 * Data to be used when deleting an enrolled command
+	 */
+	@DataProvider(name="getDeleteEnrolledSudoCommandTestObjects")
+	public Object[][] getDeleteEnrolledSudoCommandTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createDeleteEnrolledSudoCommandTestObjects());
+	}
+	protected List<List<Object>> createDeleteEnrolledSudoCommandTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname									cn				 			
+		ll.add(Arrays.asList(new Object[]{ "Delete an enrolled command from its group",		"/bin/ln"	} ));
+		
+		return ll;	
+	}
+	
+	
 	
 	
 	@DataProvider(name="getSudoCommandInvalidAddTestObjects")
@@ -423,18 +535,36 @@ public class SudoCommandTests extends SahiTestScript {
 	protected List<List<Object>> createSudoCommandInvalidAddTestObjects() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-        //										testname												cn   						description
-		ll.add(Arrays.asList(new Object[]{ "duplicate_sudo_command",								"/bin/date",				"Duplicate command",					"sudo command with name \"/bin/date\" already exists"	} ));
-		ll.add(Arrays.asList(new Object[]{ "sudo_command_with trailing_space_in_desc",				"/bin/find",				"Description with trailing space ",		"invalid 'desc': Leading and trailing spaces are not allowed"	} ));
-		ll.add(Arrays.asList(new Object[]{ "sudo_command_with leading_space_in_desc",				"/bin/find",				" Description with leading space",		"invalid 'desc': Leading and trailing spaces are not allowed"      } ));
-		ll.add(Arrays.asList(new Object[]{ "sudo_command_with leading_space_in_name",				" /bin/find",				"Name with leading space",				"invalid 'command': Leading and trailing spaces are not allowed"      } ));
-		ll.add(Arrays.asList(new Object[]{ "sudo_command_with trailing_space_in_name",				"/bin/find ",				"Name with trailing space",				"invalid 'command': Leading and trailing spaces are not allowed"      } ));
+        //										testname														cn   						description
+		ll.add(Arrays.asList(new Object[]{ "Verify error when adding duplicate Commands",						"/bin/date",				"Duplicate command",					"sudo command with name \"/bin/date\" already exists"	} ));
+		ll.add(Arrays.asList(new Object[]{ "Verify error when adding Command with trailing space in desc",		"/bin/find",				"Description with trailing space ",		"invalid 'desc': Leading and trailing spaces are not allowed"	} ));
+		ll.add(Arrays.asList(new Object[]{ "Verify error when adding Command with leading space in desc",		"/bin/find",				" Description with leading space",		"invalid 'desc': Leading and trailing spaces are not allowed"      } ));
+		ll.add(Arrays.asList(new Object[]{ "Verify error when adding Command with leading space in name",		" /bin/find",				"Name with leading space",				"invalid 'command': Leading and trailing spaces are not allowed"      } ));
+		ll.add(Arrays.asList(new Object[]{ "Verify error when adding Command with trailing space in name",		"/bin/find ",				"Name with trailing space",				"invalid 'command': Leading and trailing spaces are not allowed"      } ));
 		
 		
 		return ll;	
 	}
 	
 
+	/*
+	 * Data to be used when adding commands with required fields 
+	 */
+	@DataProvider(name="getSudoCommandRequiredFieldTestObjects")
+	public Object[][] getSudoCommandRequiredFieldTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createSudoCommandRequiredFieldTestObject());
+	}
+	protected List<List<Object>> createSudoCommandRequiredFieldTestObject() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname				cn					expected_Error   
+		ll.add(Arrays.asList(new Object[]{ "Add blank Command",			"",					"Required field"      } ));
+		
+		return ll;	
+	}
+	
+	
+	
 	/*
 	 * Data to be used when adding sudo command groups - for positive cases
 	 */
@@ -445,8 +575,8 @@ public class SudoCommandTests extends SahiTestScript {
 	protected List<List<Object>> createSudoCommandInvalidModifyTestObjects() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-        //										testname			cn   		description		
-		ll.add(Arrays.asList(new Object[]{ "sudo_command",		"/bin/ln",		""      	} ));
+        //										testname														cn   		description		
+		ll.add(Arrays.asList(new Object[]{ "Edit a Sudo Command, and update its description to be blank",		"/bin/ln",		""      	} ));
 		
 		return ll;	
 	}

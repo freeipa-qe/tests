@@ -16,7 +16,6 @@ import com.redhat.qe.auto.testng.TestNGUtils;
 import com.redhat.qe.ipa.sahi.base.SahiTestScript;
 import com.redhat.qe.ipa.sahi.tasks.CommonTasks;
 import com.redhat.qe.ipa.sahi.tasks.GroupTasks;
-import com.redhat.qe.ipa.sahi.tasks.HBACTasks;
 import com.redhat.qe.ipa.sahi.tasks.HostTasks;
 import com.redhat.qe.ipa.sahi.tasks.HostgroupTasks;
 import com.redhat.qe.ipa.sahi.tasks.SudoTasks;
@@ -147,7 +146,8 @@ public class SudoTests extends SahiTestScript{
 	/*
 	 * Add sudorule - for positive tests
 	 */
-	@Test (groups={"sudoRuleAddTests"}, description="Add Sudo Rules", dataProvider="getSudoruleTestObjects")	
+	@Test (groups={"sudoRuleAddTests"}, description="Add Sudo Rules", 
+			dataProvider="getSudoruleTestObjects")	
 	public void testSudoruleadd(String testName, String cn) throws Exception {		
 		//verify sudo rule doesn't exist
 		com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(cn).exists(), "Verify sudorule " + cn + " doesn't already exist");
@@ -162,7 +162,8 @@ public class SudoTests extends SahiTestScript{
 	/*
 	 * Add, and then add another Sudo Rule
 	 */
-	@Test (groups={"sudoRuleAddAndAddAnotherTests"}, description="Add and Add Another Sudo Rule", dataProvider="getSudoRuleAddAndAddAnotherTestObjects")	
+	@Test (groups={"sudoRuleAddAndAddAnotherTests"}, description="Add and Add Another Sudo Rule", 
+			dataProvider="getSudoRuleAddAndAddAnotherTestObjects")	
 	public void testSudoRuleAddAndAddAnother(String testName, String cn1, String cn2) throws Exception {		
 		Assert.assertFalse(sahiTasks.link(cn1).exists(), "Verify Sudo Rule " + cn1 + " doesn't already exist");
 		Assert.assertFalse(sahiTasks.link(cn2).exists(), "Verify Sudo Rule " + cn2 + " doesn't already exist");
@@ -177,7 +178,7 @@ public class SudoTests extends SahiTestScript{
 	 * Add, and edit Sudo Rule
 	 */	
 	@Test (groups={"sudoRuleAddAndEditTests"}, description="Add and Edit Sudo Rule; commented test for Bug 735185", 
-			dataProvider="getEditSudoRuleTestObjects")		
+			dataProvider="getAddAndEditSudoRuleTestObjects")		
 	public void testSudoRuleAddAndEdit(String testName, String cn) throws Exception {
 		
 		//verify rule doesn't exist
@@ -194,7 +195,8 @@ public class SudoTests extends SahiTestScript{
 	/*
 	 * Add, but Cancel adding SudoRule
 	 */
-	@Test (groups={"sudoRuleCancelAddTests"}, description="Add but Cancel Adding Sudo Rule", dataProvider="getSingleSudoRuleTestObjects")	
+	@Test (groups={"sudoRuleCancelAddTests"}, description="Add but Cancel Adding Sudo Rule", 
+			dataProvider="getCancelAddSudoRuleTestObjects")	
 	public void testSudoRuleCancelAdd(String testName, String cn) throws Exception {
 		//verify rule doesn't exist
 		Assert.assertFalse(sahiTasks.link(cn).exists(), "Verify Sudo Rule " + cn + " doesn't already exist");
@@ -210,7 +212,9 @@ public class SudoTests extends SahiTestScript{
 	/*
 	 * Add Rules - for negative tests
 	 */
-	@Test (groups={"invalidSudoRuleAddTests"}, description="Add duplicate Rule", dataProvider="getInvalidSudoRuleTestObjects", dependsOnGroups="sudoRuleAddTests")	
+	@Test (groups={"invalidSudoRuleAddTests"}, description="Verify errors when adding invalid rules", 
+			dataProvider="getInvalidSudoRuleTestObjects", 
+			dependsOnGroups="sudoRuleAddTests")	
 	public void testInvalidSudoRuleadd(String testName, String cn, String expectedError) throws Exception {
 		//new test user can be added now
 		SudoTasks.createInvalidRule(sahiTasks, cn, expectedError);		
@@ -220,10 +224,11 @@ public class SudoTests extends SahiTestScript{
 	/*
 	 * Add Rules - check required fields - for negative tests
 	 */
-	@Test (groups={"sudoRuleRequiredFieldAddTests"}, description="Add blank Rule", dataProvider="getSudoRuleRequiredFieldTestObjects")	
+	@Test (groups={"sudoRuleRequiredFieldAddTests"}, description="Add blank Rule", 
+			dataProvider="getSudoRuleRequiredFieldTestObjects")	
 	public void testSudoRuleRequiredFieldAdd(String testName, String cn, String expectedError) throws Exception {
 		//new test user can be added now
-		SudoTasks.createRuleWithRequiredField(sahiTasks, cn, expectedError);		
+		SudoTasks.createWithRequiredFieldMissing(sahiTasks, cn, "cn", expectedError);		
 	}
 	
 
@@ -232,7 +237,8 @@ public class SudoTests extends SahiTestScript{
 	/*
 	 * Delete multiple Sudo Rules
 	 */
-	@Test (groups={"sudoRuleMultipleDeleteTests"}, description="Delete Multiple Rules", dataProvider="getMultipleSudoRuleTestObjects", 
+	@Test (groups={"sudoRuleMultipleDeleteTests"}, description="Delete Multiple Rules", 
+			dataProvider="getMultipleSudoRuleTestObjects", 
 			dependsOnGroups={"sudoRuleAddTests", "sudoRuleSearchTests" })		
 	public void testMultipleSudoRuleDelete(String testName, String cn1, String cn2) throws Exception {	
 		String cns[] = {cn1, cn2};
@@ -250,7 +256,8 @@ public class SudoTests extends SahiTestScript{
 	/*
 	 * Delete a Sudo Rule
 	 */
-	@Test (groups={"sudoRuleDeleteTests"}, description="Delete Rules one at a time", dataProvider="getSudoRuleDeleteTestObjects", 
+	@Test (groups={"sudoRuleDeleteTests"}, description="Delete single Rule", 
+			dataProvider="getSudoRuleDeleteTestObjects", 
 			dependsOnGroups={"sudoRuleAddTests", "sudoRuleSearchTests", "invalidSudoRuleAddTests" })	
 	public void testSudoRuleDelete(String testName, String cn) throws Exception {
 		//verify rule to be deleted exists
@@ -266,7 +273,8 @@ public class SudoTests extends SahiTestScript{
 	/*
 	 * Expand/Collapse details of a Sudo Rule
 	 */
-	@Test (groups={"sudoRuleExpandCollapseTests"}, description="Expand and Collapse details of a Rule", dataProvider="getEditSudoRuleTestObjects",  
+	@Test (groups={"sudoRuleExpandCollapseTests"}, description="Expand and Collapse details of a Rule", 
+			dataProvider="getExpandCollapseSudoRuleTestObjects",  
 			dependsOnGroups="sudoRuleAddAndEditTests")
 	public void testSudoRuleExpandCollapse(String testName, String cn) throws Exception {
 		
@@ -653,10 +661,10 @@ public class SudoTests extends SahiTestScript{
 	protected List<List<Object>> createSudoruleTestObjects() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-        //										testname					cn   			
-		ll.add(Arrays.asList(new Object[]{ "create_sudorule",				"SudoRule1"} ));
-		ll.add(Arrays.asList(new Object[]{ "sudorule_long",					"abcdefghijklmnopqrstuvwxyz123456789ANDAGAINabcdefghijklmnopqrstuvwxyz123456789ANDAGAINabcdefghijklmnopqrstuvwxyz123456789"      } ));
-		ll.add(Arrays.asList(new Object[]{ "sudorule_specialchar",			"S@ud*o#Ru?le"      } ));
+        //										testname						cn   			
+		ll.add(Arrays.asList(new Object[]{ "Add a Sudo Rule - good",			"SudoRule1"} ));
+		ll.add(Arrays.asList(new Object[]{ "Add a Sudo Rule - long",			"abcdefghijklmnopqrstuvwxyz123456789ANDAGAINabcdefghijklmnopqrstuvwxyz123456789ANDAGAINabcdefghijklmnopqrstuvwxyz123456789"      } ));
+		ll.add(Arrays.asList(new Object[]{ "Add a Sudo Rule - Special Char",	"S@ud*o#Ru?le"      } ));
 		
 		
 		return ll;	
@@ -674,13 +682,46 @@ public class SudoTests extends SahiTestScript{
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
         //										testname						cn1					cn2   
-		ll.add(Arrays.asList(new Object[]{ "create_two_good_sudorule",			"SudoRule2",		"SudoRule3"  } ));
+		ll.add(Arrays.asList(new Object[]{ "Add and Add Another Sudo Rule",		"SudoRule2",		"SudoRule3"  } ));
 		
 		return ll;	
 	}
 	
 	
 
+	/*
+	 * Data to be used when adding rules 
+	 */
+	@DataProvider(name="getAddAndEditSudoRuleTestObjects")
+	public Object[][] getAddAndEditSudoRuleTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createAddAndEditSudoRuleTestObject());
+	}
+	protected List<List<Object>> createAddAndEditSudoRuleTestObject() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname					cn   			
+		ll.add(Arrays.asList(new Object[]{ "Add and Edit Sudo Rule",			"SudoRule4"      } ));
+		
+		return ll;	
+	}
+	
+
+	/*
+	 * Data to be used when adding rules 
+	 */
+	@DataProvider(name="getExpandCollapseSudoRuleTestObjects")
+	public Object[][] getExpandCollapseSudoRuleTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createExpandCollapseSudoRuleTestObject());
+	}
+	protected List<List<Object>> createExpandCollapseSudoRuleTestObject() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname								cn   			
+		ll.add(Arrays.asList(new Object[]{ "Expand and Collapse details of a Rule",		"SudoRule4"      } ));
+		
+		return ll;	
+	}
+	
 	/*
 	 * Data to be used when adding rules 
 	 */
@@ -700,15 +741,15 @@ public class SudoTests extends SahiTestScript{
 	/*
 	 * Data to be used when adding rules 
 	 */
-	@DataProvider(name="getSingleSudoRuleTestObjects")
-	public Object[][] getSingleSudoRuleTestObjects() {
-		return TestNGUtils.convertListOfListsTo2dArray(createSingleSudoRuleTestObject());
+	@DataProvider(name="getCancelAddSudoRuleTestObjects")
+	public Object[][] getCancelAddSudoRuleTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createCancelAddSudoRuleTestObject());
 	}
-	protected List<List<Object>> createSingleSudoRuleTestObject() {		
+	protected List<List<Object>> createCancelAddSudoRuleTestObject() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-        //										testname					cn   			
-		ll.add(Arrays.asList(new Object[]{ "create_good_sudorule",			"SudoRule5"      } ));
+        //										testname						cn   			
+		ll.add(Arrays.asList(new Object[]{ "Add but Cancel Adding Sudo Rule",	"SudoRule5"      } ));
 		
 		return ll;	
 	}
@@ -723,8 +764,10 @@ public class SudoTests extends SahiTestScript{
 	protected List<List<Object>> createInvalidSudoRuleTestObject() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-        //										testname					cn					expected_Error   
-		ll.add(Arrays.asList(new Object[]{ "create_duplicate_sudorule",		"sudorule1",		"sudo rule with name \"sudorule1\" already exists"      } ));
+        //										testname												cn					expected_Error   
+		ll.add(Arrays.asList(new Object[]{ "Verify error when adding duplicate Rule",					"sudorule1",		"sudo rule with name \"sudorule1\" already exists"      } ));
+		ll.add(Arrays.asList(new Object[]{ "Verify error when adding Rule with leading space in name",	" sudorule10",		"invalid 'sudorule_name': Leading and trailing spaces are not allowed"      } ));
+		ll.add(Arrays.asList(new Object[]{ "Verify error when adding Rule with trailing space in name",	"sudorule10 ",		"invalid 'sudorule_name': Leading and trailing spaces are not allowed"      } ));
 		
 		return ll;	
 	}
@@ -740,8 +783,8 @@ public class SudoTests extends SahiTestScript{
 	protected List<List<Object>> createSudoRuleRequiredFieldTestObject() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-        //										testname					cn					expected_Error   
-		ll.add(Arrays.asList(new Object[]{ "create_blank_sudorule",			"",					"Required field"      } ));
+        //										testname				cn					expected_Error   
+		ll.add(Arrays.asList(new Object[]{ "Add blank Rule",			"",					"Required field"      } ));
 		
 		return ll;	
 	}
@@ -774,7 +817,7 @@ public class SudoTests extends SahiTestScript{
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
         //										testname					cn1					cn2																																			
-		ll.add(Arrays.asList(new Object[]{ "delete_multiple_sudorule",		"S@ud*o#Ru?le",		"abcdefghijklmnopqrstuvwxyz123456789ANDAGAINabcdefghijklmnopqrstuvwxyz123456789ANDAGAINabcdefghijklmnopqrstuvwxyz123456789"      } ));
+		ll.add(Arrays.asList(new Object[]{ "Delete Multiple Rules",		"S@ud*o#Ru?le",		"abcdefghijklmnopqrstuvwxyz123456789ANDAGAINabcdefghijklmnopqrstuvwxyz123456789ANDAGAINabcdefghijklmnopqrstuvwxyz123456789"      } ));
 		
 		return ll;	
 	}
@@ -791,7 +834,7 @@ public class SudoTests extends SahiTestScript{
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
         //										testname					cn   
-		ll.add(Arrays.asList(new Object[]{ "delete_sudorule",			"SudoRule1"      } ));
+		ll.add(Arrays.asList(new Object[]{ "Delete single Rule",			"SudoRule1"      } ));
 		
 		return ll;	
 	}
