@@ -39,6 +39,8 @@
 
 rlJournalStart
     rlPhaseStartSetup "list files in /dev/shm"
+	/sbin/restorecon -v /root/.ssh/authorized_keys
+        /sbin/restorecon -v /root/.ssh/authorized_keys2
 	rlRun "ls /dev/shm" 0 "Listing files in /dev/shm"
     rlPhaseEnd
 
