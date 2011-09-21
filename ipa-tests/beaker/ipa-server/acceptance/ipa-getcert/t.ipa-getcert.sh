@@ -132,9 +132,9 @@ request_1001()  #ipa-getcert request -d [NSSDBDIR negative] -n [CertNickName pos
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
         local expectedErrCode="1" 
-        local expectedErrMsg="The location \"$NSSDBDIR_negative\" must be a directory\|No request found that matched arguments" 
+        local expectedErrMsg="The location \"$NSSDBDIR_negative\" must be a directory\|No request found that matched arguments\|Path \"$NSSDBDIR_negative\" is not a directory."
         local comment="scenario: [ipa-getcert request -d -n]	data: [NSSDBDIR negative]" 
-        # verifyString not defined, it will be ignore 
+	local verifyString="Path \"$NSSDBDIR_negative\" is not a directory."
 
         # test starts here  
         certRun "ipa-getcert request -d $NSSDBDIR_negative -n $CertNickName_positive" "$tmpout" $expectedErrCode "$expectedErrMsg" "$comment"  "$verifyString"
@@ -171,9 +171,9 @@ request_1002()  #ipa-getcert request -d [NSSDBDIR negative] -n [CertNickName pos
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
         local expectedErrCode="1" 
-        local expectedErrMsg="The location \"$NSSDBDIR_negative\" must be a directory\|No request found that matched arguments" 
+        local expectedErrMsg="The location \"$NSSDBDIR_negative\" must be a directory\|No request found that matched arguments\|Path \"$NSSDBDIR_negative\" is not a directory." 
         local comment="scenario: [ipa-getcert request -d -n  -t -I -R -N -K -U -D -E]	data: [NSSDBDIR negative]" 
-        # verifyString not defined, it will be ignore 
+        local verifyString="Path \"$NSSDBDIR_negative\" is not a directory."
 
         # test starts here  
         certRun "ipa-getcert request -d $NSSDBDIR_negative -n $CertNickName_positive -t $CertTokenName_positive -I $CertRequestNickName_positive -R -N $CertSubjectName_positive -K $CertPrincipalName_positive -U $EXTUSAGE_positive -D $DNSName_positive -E $EMAIL_positive" "$tmpout" $expectedErrCode "$expectedErrMsg" "$comment"  "$verifyString"
@@ -210,9 +210,9 @@ request_1003()  #ipa-getcert request -d [NSSDBDIR negative] -n [CertNickName pos
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
         local expectedErrCode="1" 
-        local expectedErrMsg="The location \"$NSSDBDIR_negative\" must be a directory\|No request found that matched arguments" 
+        local expectedErrMsg="The location \"$NSSDBDIR_negative\" must be a directory\|No request found that matched arguments\|Path \"$NSSDBDIR_negative\" is not a directory." 
         local comment="scenario: [ipa-getcert request -d -n  -t -I -r -N -K -U -D -E]	data: [NSSDBDIR negative]" 
-        # verifyString not defined, it will be ignore 
+        local verifyString="Path \"$NSSDBDIR_negative\" is not a directory."
 
         # test starts here  
         certRun "ipa-getcert request -d $NSSDBDIR_negative -n $CertNickName_positive -t $CertTokenName_positive -I $CertRequestNickName_positive -r -N $CertSubjectName_positive -K $CertPrincipalName_positive -U $EXTUSAGE_positive -D $DNSName_positive -E $EMAIL_positive" "$tmpout" $expectedErrCode "$expectedErrMsg" "$comment"  "$verifyString"
@@ -249,9 +249,9 @@ request_1004()  #ipa-getcert request -d [NSSDBDIR negative] -n [CertNickName pos
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
         local expectedErrCode="1" 
-        local expectedErrMsg="The location \"$NSSDBDIR_negative\" must be a directory\|No request found that matched arguments" 
+        local expectedErrMsg="The location \"$NSSDBDIR_negative\" must be a directory\|No request found that matched arguments\|Path \"$NSSDBDIR_negative\" is not a directory." 
         local comment="scenario: [ipa-getcert request -d -n  -t -g -R -N -K -U -D -E]	data: [NSSDBDIR negative]" 
-        # verifyString not defined, it will be ignore 
+        local verifyString="Path \"$NSSDBDIR_negative\" is not a directory."
 
         # test starts here  
         certRun "ipa-getcert request -d $NSSDBDIR_negative -n $CertNickName_positive -t $CertTokenName_positive -g $CertKeySize_positive -R -N $CertSubjectName_positive -K $CertPrincipalName_positive -U $EXTUSAGE_positive -D $DNSName_positive -E $EMAIL_positive" "$tmpout" $expectedErrCode "$expectedErrMsg" "$comment"  "$verifyString"
@@ -288,9 +288,9 @@ request_1005()  #ipa-getcert request -d [NSSDBDIR negative] -n [CertNickName pos
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
         local expectedErrCode="1" 
-        local expectedErrMsg="The location \"$NSSDBDIR_negative\" must be a directory\|No request found that matched arguments" 
+        local expectedErrMsg="The location \"$NSSDBDIR_negative\" must be a directory\|No request found that matched arguments\|Path \"$NSSDBDIR_negative\" is not a directory." 
         local comment="scenario: [ipa-getcert request -d -n  -t -g -r -N -K -U -D -E]	data: [NSSDBDIR negative]" 
-        # verifyString not defined, it will be ignore 
+        local verifyString="Path \"$NSSDBDIR_negative\" is not a directory."
 
         # test starts here  
         certRun "ipa-getcert request -d $NSSDBDIR_negative -n $CertNickName_positive -t $CertTokenName_positive -g $CertKeySize_positive -r -N $CertSubjectName_positive -K $CertPrincipalName_positive -U $EXTUSAGE_positive -D $DNSName_positive -E $EMAIL_positive" "$tmpout" $expectedErrCode "$expectedErrMsg" "$comment"  "$verifyString"
@@ -515,7 +515,7 @@ request_1011()  #ipa-getcert request -d [NSSDBDIR positive] -n [CertNickName pos
         # verifyString not defined, it will be ignore 
 
         # test starts here  
-        certRun "ipa-getcert request -d $NSSDBDIR_positive -n $CertNickName_positive -t $CertTokenName_positive -I $CertRequestNickName_negative -R -N $CertSubjectName_positive -K $CertPrincipalName_positive -U $EXTUSAGE_positive -D $DNSName_positive -E $EMAIL_positive" "$tmpout" $expectedErrCode "$expectedErrMsg" "$comment"  "$verifyString"
+        certRun "ipa-getcert request -d $NSSDBDIR_positive -n $CertNickName_positive -t \"$CertTokenName_positive\" -I $CertRequestNickName_negative -R -N $CertSubjectName_positive -K $CertPrincipalName_positive -U $EXTUSAGE_positive -D $DNSName_positive -E $EMAIL_positive" "$tmpout" $expectedErrCode "$expectedErrMsg" "$comment"  "$verifyString"
 
         # test evn cleanup 
         #no data cleanup defined 
@@ -554,7 +554,7 @@ request_1012()  #ipa-getcert request -d [NSSDBDIR positive] -n [CertNickName pos
         # verifyString not defined, it will be ignore 
 
         # test starts here  
-        certRun "ipa-getcert request -d $NSSDBDIR_positive -n $CertNickName_positive -t $CertTokenName_positive -I $CertRequestNickName_negative -r -N $CertSubjectName_positive -K $CertPrincipalName_positive -U $EXTUSAGE_positive -D $DNSName_positive -E $EMAIL_positive" "$tmpout" $expectedErrCode "$expectedErrMsg" "$comment"  "$verifyString"
+        certRun "ipa-getcert request -d $NSSDBDIR_positive -n $CertNickName_positive -t \"$CertTokenName_positive\" -I $CertRequestNickName_negative -r -N $CertSubjectName_positive -K $CertPrincipalName_positive -U $EXTUSAGE_positive -D $DNSName_positive -E $EMAIL_positive" "$tmpout" $expectedErrCode "$expectedErrMsg" "$comment"  "$verifyString"
 
         # test evn cleanup 
         #no data cleanup defined 
@@ -593,7 +593,7 @@ request_1013()  #ipa-getcert request -d [NSSDBDIR positive] -n [CertNickName pos
         local verifyString="status: NEED_KEY_PAIR\|status: CA_UNREACHABLE\|status: CA_UNCONFIGURED"
 
         # test starts here  
-        certRun "ipa-getcert request -d $NSSDBDIR_positive -n $CertNickName_positive -t $CertTokenName_positive -I $CertRequestNickName_positive -R -N $CertSubjectName_positive -K $CertPrincipalName_negative -U $EXTUSAGE_positive -D $DNSName_positive -E $EMAIL_positive" "$tmpout" $expectedErrCode "$expectedErrMsg" "$comment"  "$verifyString"
+        certRun "ipa-getcert request -d $NSSDBDIR_positive -n $CertNickName_positive -t \"$CertTokenName_positive\" -I $CertRequestNickName_positive -R -N $CertSubjectName_positive -K $CertPrincipalName_negative -U $EXTUSAGE_positive -D $DNSName_positive -E $EMAIL_positive" "$tmpout" $expectedErrCode "$expectedErrMsg" "$comment"  "$verifyString"
 
         # test evn cleanup 
         #no data cleanup defined 
@@ -665,7 +665,7 @@ request_1015()   #ipa-getcert request -d [NSSDBDIR positive] -n [CertNickName po
         #no data prepare defined 
 
         # test starts here  
-        rlRun "ipa-getcert request -d $NSSDBDIR_positive -n $CertNickName_positive -t $CertTokenName_positive -I $CertRequestNickName_positive -R -N $CertSubjectName_positive -K $CertPrincipalName_positive -U $EXTUSAGE_positive -D $DNSName_positive -E $EMAIL_positive" 0 "scenario: [ipa-getcert request -d -n  -t -I -R -N -K -U -D -E]	data: all positive"  
+        rlRun "ipa-getcert request -d $NSSDBDIR_positive -n $CertNickName_positive -t \"$CertTokenName_positive\" -I $CertRequestNickName_positive -R -N $CertSubjectName_positive -K $CertPrincipalName_positive -U $EXTUSAGE_positive -D $DNSName_positive -E $EMAIL_positive" 0 "scenario: [ipa-getcert request -d -n  -t -I -R -N -K -U -D -E]	data: all positive"  
         # test ends here 
 
         # test env cleanup 
@@ -705,7 +705,7 @@ request_1016()  #ipa-getcert request -d [NSSDBDIR positive] -n [CertNickName pos
         local verifyString="status: NEED_KEY_PAIR\|status: CA_UNREACHABLE\|status: CA_UNCONFIGURED"
 
         # test starts here  
-        certRun "ipa-getcert request -d $NSSDBDIR_positive -n $CertNickName_positive -t $CertTokenName_positive -I $CertRequestNickName_positive -r -N $CertSubjectName_positive -K $CertPrincipalName_negative -U $EXTUSAGE_positive -D $DNSName_positive -E $EMAIL_positive" "$tmpout" $expectedErrCode "$expectedErrMsg" "$comment"  "$verifyString"
+        certRun "ipa-getcert request -d $NSSDBDIR_positive -n $CertNickName_positive -t \"$CertTokenName_positive\" -I $CertRequestNickName_positive -r -N $CertSubjectName_positive -K $CertPrincipalName_negative -U $EXTUSAGE_positive -D $DNSName_positive -E $EMAIL_positive" "$tmpout" $expectedErrCode "$expectedErrMsg" "$comment"  "$verifyString"
 
         # test evn cleanup 
         #no data cleanup defined 
@@ -777,7 +777,7 @@ request_1018()   #ipa-getcert request -d [NSSDBDIR positive] -n [CertNickName po
         #no data prepare defined 
 
         # test starts here  
-        rlRun "ipa-getcert request -d $NSSDBDIR_positive -n $CertNickName_positive -t $CertTokenName_positive -I $CertRequestNickName_positive -r -N $CertSubjectName_positive -K $CertPrincipalName_positive -U $EXTUSAGE_positive -D $DNSName_positive -E $EMAIL_positive" 0 "scenario: [ipa-getcert request -d -n  -t -I -r -N -K -U -D -E]	data: all positive"  
+        rlRun "ipa-getcert request -d $NSSDBDIR_positive -n $CertNickName_positive -t \"$CertTokenName_positive\" -I $CertRequestNickName_positive -r -N $CertSubjectName_positive -K $CertPrincipalName_positive -U $EXTUSAGE_positive -D $DNSName_positive -E $EMAIL_positive" 0 "scenario: [ipa-getcert request -d -n  -t -I -r -N -K -U -D -E]	data: all positive"  
         # test ends here 
 
         # test env cleanup 
@@ -817,7 +817,7 @@ request_1019()  #ipa-getcert request -d [NSSDBDIR positive] -n [CertNickName pos
         local verifyString="status: NEED_KEY_PAIR\|status: CA_UNREACHABLE"
 
         # test starts here  
-        certRun "ipa-getcert request -d $NSSDBDIR_positive -n $CertNickName_positive -t $CertTokenName_positive -g $CertKeySize_negative -R -N $CertSubjectName_positive -K $CertPrincipalName_positive -U $EXTUSAGE_positive -D $DNSName_positive -E $EMAIL_positive" "$tmpout" $expectedErrCode "$expectedErrMsg" "$comment"  "$verifyString"
+        certRun "ipa-getcert request -d $NSSDBDIR_positive -n $CertNickName_positive -t \"$CertTokenName_positive\" -g $CertKeySize_negative -R -N $CertSubjectName_positive -K $CertPrincipalName_positive -U $EXTUSAGE_positive -D $DNSName_positive -E $EMAIL_positive" "$tmpout" $expectedErrCode "$expectedErrMsg" "$comment"  "$verifyString"
 
         # test evn cleanup 
         #no data cleanup defined 
@@ -856,7 +856,7 @@ request_1020()  #ipa-getcert request -d [NSSDBDIR positive] -n [CertNickName pos
         local verifyString="status: NEED_KEY_PAIR\|status: CA_UNREACHABLE"
 
         # test starts here  
-        certRun "ipa-getcert request -d $NSSDBDIR_positive -n $CertNickName_positive -t $CertTokenName_positive -g $CertKeySize_negative -r -N $CertSubjectName_positive -K $CertPrincipalName_positive -U $EXTUSAGE_positive -D $DNSName_positive -E $EMAIL_positive" "$tmpout" $expectedErrCode "$expectedErrMsg" "$comment"  "$verifyString"
+        certRun "ipa-getcert request -d $NSSDBDIR_positive -n $CertNickName_positive -t \"$CertTokenName_positive\" -g $CertKeySize_negative -r -N $CertSubjectName_positive -K $CertPrincipalName_positive -U $EXTUSAGE_positive -D $DNSName_positive -E $EMAIL_positive" "$tmpout" $expectedErrCode "$expectedErrMsg" "$comment"  "$verifyString"
 
         # test evn cleanup 
         #no data cleanup defined 
@@ -895,7 +895,7 @@ request_1021()  #ipa-getcert request -d [NSSDBDIR positive] -n [CertNickName pos
         local verifyString="status: NEED_KEY_PAIR\|status: CA_UNREACHABLE\|status: CA_UNCONFIGURED"
 
         # test starts here  
-        certRun "ipa-getcert request -d $NSSDBDIR_positive -n $CertNickName_positive -t $CertTokenName_positive -g $CertKeySize_positive -R -N $CertSubjectName_positive -K $CertPrincipalName_negative -U $EXTUSAGE_positive -D $DNSName_positive -E $EMAIL_positive" "$tmpout" $expectedErrCode "$expectedErrMsg" "$comment"  "$verifyString"
+        certRun "ipa-getcert request -d $NSSDBDIR_positive -n $CertNickName_positive -t \"$CertTokenName_positive\" -g $CertKeySize_positive -R -N $CertSubjectName_positive -K $CertPrincipalName_negative -U $EXTUSAGE_positive -D $DNSName_positive -E $EMAIL_positive" "$tmpout" $expectedErrCode "$expectedErrMsg" "$comment"  "$verifyString"
 
         # test evn cleanup 
         #no data cleanup defined 
@@ -934,7 +934,7 @@ request_1022()  #ipa-getcert request -d [NSSDBDIR positive] -n [CertNickName pos
         # verifyString not defined, it will be ignore 
 
         # test starts here  
-        certRun "ipa-getcert request -d $NSSDBDIR_positive -n $CertNickName_positive -t $CertTokenName_positive -g $CertKeySize_positive -R -N $CertSubjectName_positive -K $CertPrincipalName_positive -U $EXTUSAGE_negative -D $DNSName_positive -E $EMAIL_positive" "$tmpout" $expectedErrCode "$expectedErrMsg" "$comment"  "$verifyString"
+        certRun "ipa-getcert request -d $NSSDBDIR_positive -n $CertNickName_positive -t \"$CertTokenName_positive\" -g $CertKeySize_positive -R -N $CertSubjectName_positive -K $CertPrincipalName_positive -U $EXTUSAGE_negative -D $DNSName_positive -E $EMAIL_positive" "$tmpout" $expectedErrCode "$expectedErrMsg" "$comment"  "$verifyString"
 
         # test evn cleanup 
         #no data cleanup defined 
@@ -967,7 +967,7 @@ request_1023()   #ipa-getcert request -d [NSSDBDIR positive] -n [CertNickName po
         #no data prepare defined 
 
         # test starts here  
-        rlRun "ipa-getcert request -d $NSSDBDIR_positive -n $CertNickName_positive -t $CertTokenName_positive -g $CertKeySize_positive -R -N $CertSubjectName_positive -K $CertPrincipalName_positive -U $EXTUSAGE_positive -D $DNSName_positive -E $EMAIL_positive" 0 "scenario: [ipa-getcert request -d -n  -t -g -R -N -K -U -D -E]	data: all positive"  
+        rlRun "ipa-getcert request -d $NSSDBDIR_positive -n $CertNickName_positive -t \"$CertTokenName_positive\" -g $CertKeySize_positive -R -N $CertSubjectName_positive -K $CertPrincipalName_positive -U $EXTUSAGE_positive -D $DNSName_positive -E $EMAIL_positive" 0 "scenario: [ipa-getcert request -d -n  -t -g -R -N -K -U -D -E]	data: all positive"  
         # test ends here 
 
         # test env cleanup 
@@ -1007,7 +1007,7 @@ request_1024()  #ipa-getcert request -d [NSSDBDIR positive] -n [CertNickName pos
         local verifyString="status: NEED_KEY_PAIR\|status: CA_UNREACHABLE\|status: CA_UNCONFIGURED"
 
         # test starts here  
-        certRun "ipa-getcert request -d $NSSDBDIR_positive -n $CertNickName_positive -t $CertTokenName_positive -g $CertKeySize_positive -r -N $CertSubjectName_positive -K $CertPrincipalName_negative -U $EXTUSAGE_positive -D $DNSName_positive -E $EMAIL_positive" "$tmpout" $expectedErrCode "$expectedErrMsg" "$comment"  "$verifyString"
+        certRun "ipa-getcert request -d $NSSDBDIR_positive -n $CertNickName_positive -t \"$CertTokenName_positive\" -g $CertKeySize_positive -r -N $CertSubjectName_positive -K $CertPrincipalName_negative -U $EXTUSAGE_positive -D $DNSName_positive -E $EMAIL_positive" "$tmpout" $expectedErrCode "$expectedErrMsg" "$comment"  "$verifyString"
 
         # test evn cleanup 
         #no data cleanup defined 
@@ -1046,7 +1046,7 @@ request_1025()  #ipa-getcert request -d [NSSDBDIR positive] -n [CertNickName pos
         # verifyString not defined, it will be ignore 
 
         # test starts here  
-        certRun "ipa-getcert request -d $NSSDBDIR_positive -n $CertNickName_positive -t $CertTokenName_positive -g $CertKeySize_positive -r -N $CertSubjectName_positive -K $CertPrincipalName_positive -U $EXTUSAGE_negative -D $DNSName_positive -E $EMAIL_positive" "$tmpout" $expectedErrCode "$expectedErrMsg" "$comment"  "$verifyString"
+        certRun "ipa-getcert request -d $NSSDBDIR_positive -n $CertNickName_positive -t \"$CertTokenName_positive\" -g $CertKeySize_positive -r -N $CertSubjectName_positive -K $CertPrincipalName_positive -U $EXTUSAGE_negative -D $DNSName_positive -E $EMAIL_positive" "$tmpout" $expectedErrCode "$expectedErrMsg" "$comment"  "$verifyString"
 
         # test evn cleanup 
         #no data cleanup defined 
@@ -1079,7 +1079,7 @@ request_1026()   #ipa-getcert request -d [NSSDBDIR positive] -n [CertNickName po
         #no data prepare defined 
 
         # test starts here  
-        rlRun "ipa-getcert request -d $NSSDBDIR_positive -n $CertNickName_positive -t $CertTokenName_positive -g $CertKeySize_positive -r -N $CertSubjectName_positive -K $CertPrincipalName_positive -U $EXTUSAGE_positive -D $DNSName_positive -E $EMAIL_positive" 0 "scenario: [ipa-getcert request -d -n  -t -g -r -N -K -U -D -E]	data: all positive"  
+        rlRun "ipa-getcert request -d $NSSDBDIR_positive -n $CertNickName_positive -t \"$CertTokenName_positive\" -g $CertKeySize_positive -r -N $CertSubjectName_positive -K $CertPrincipalName_positive -U $EXTUSAGE_positive -D $DNSName_positive -E $EMAIL_positive" 0 "scenario: [ipa-getcert request -d -n  -t -g -r -N -K -U -D -E]	data: all positive"  
         # test ends here 
 
         # test env cleanup 
@@ -1107,7 +1107,7 @@ request_1027()  #ipa-getcert request -k [PemKeyFile negative] -f [PemCertFile po
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
         local expectedErrCode="1" 
-        local expectedErrMsg="The parent of location \"$PemKeyFile_negative\" must be a valid directory\|No request found that matched arguments" 
+        local expectedErrMsg="The parent of location \"$PemKeyFile_negative\" must be a valid directory\|No request found that matched arguments\|Path \"/root/${testID}\" is not a directory.\|\"/root/${testID}\": No such file or directory." 
         local comment="scenario: [ipa-getcert request -k -f]	data: [PemKeyFile negative]" 
         # verifyString not defined, it will be ignore 
 
@@ -3515,7 +3515,9 @@ start_tracking_1004()  #ipa-getcert start-tracking -d [NSSDBDIR positive] -n [Ce
         local expectedErrCode="0" 
         local expectedErrMsg="No_errmsg_defined_Ignore_Me" 
         local comment="scenario: [ipa-getcert start-tracking -d -n -t]	data: [CertTokenName negative]" 
-        local verifyString="status: NEED_KEY_PAIR"
+	# Updating the verifyString after confirming with Nalin.
+        # local verifyString="status: NEED_KEY_PAIR"
+        local verifyString="status: NEWLY_ADDED_NEED_KEYINFO_READ_TOKEN"
 
         # test starts here  
         certRun "ipa-getcert start-tracking -d $NSSDBDIR_positive -n $CertNickName_positive -t $CertTokenName_negative" "$tmpout" $expectedErrCode "$expectedErrMsg" "$comment"  "$verifyString"
@@ -3553,7 +3555,10 @@ start_tracking_1005()  #ipa-getcert start-tracking -d [NSSDBDIR positive] -n [Ce
         local expectedErrCode="0" 
         local expectedErrMsg="No_errmsg_defined_Ignore_Me" 
         local comment="scenario: [ipa-getcert start-tracking -d -n -t -I -U -K -D -E -R]	data: [CertTokenName negative]" 
-        local verifyString="status: NEED_KEY_PAIR"
+        # Updating the verifyString after confirming with Nalin.
+        # local verifyString="status: NEED_KEY_PAIR"
+        local verifyString="status: NEWLY_ADDED_NEED_KEYINFO_READ_TOKEN"
+
 
         # test starts here  
         certRun "ipa-getcert start-tracking -d $NSSDBDIR_positive -n $CertNickName_positive -t $CertTokenName_negative -I $TrackingRequestNickName_positive -U $EXTUSAGE_positive -K $CertPrincipalName_positive -D $DNSName_positive -E $EMAIL_positive -R" "$tmpout" $expectedErrCode "$expectedErrMsg" "$comment"  "$verifyString"
@@ -3591,7 +3596,9 @@ start_tracking_1006()  #ipa-getcert start-tracking -d [NSSDBDIR positive] -n [Ce
         local expectedErrCode="0" 
         local expectedErrMsg="No_errmsg_defined_Ignore_Me" 
         local comment="scenario: [ipa-getcert start-tracking -d -n -t -I -U -K -D -E -r]	data: [CertTokenName negative]" 
-        local verifyString="status: NEED_KEY_PAIR"
+        # Updating the verifyString after confirming with Nalin.
+        # local verifyString="status: NEED_KEY_PAIR"
+        local verifyString="status: NEWLY_ADDED_NEED_KEYINFO_READ_TOKEN"
 
         # test starts here  
         certRun "ipa-getcert start-tracking -d $NSSDBDIR_positive -n $CertNickName_positive -t $CertTokenName_negative -I $TrackingRequestNickName_positive -U $EXTUSAGE_positive -K $CertPrincipalName_positive -D $DNSName_positive -E $EMAIL_positive -r" "$tmpout" $expectedErrCode "$expectedErrMsg" "$comment"  "$verifyString"
@@ -3621,7 +3628,7 @@ start_tracking_1007()   #ipa-getcert start-tracking -d [NSSDBDIR positive] -n [C
         #no data prepare defined 
 
         # test starts here  
-        rlRun "ipa-getcert start-tracking -d $NSSDBDIR_positive -n $CertNickName_positive -t $CertTokenName_positive" 0 "scenario: [ipa-getcert start-tracking -d -n -t]	data: all positive"  
+        rlRun "ipa-getcert start-tracking -d $NSSDBDIR_positive -n $CertNickName_positive -t \"$CertTokenName_positive\"" 0 "scenario: [ipa-getcert start-tracking -d -n -t]	data: all positive"  
         # test ends here 
 
         # test env cleanup 
@@ -3660,7 +3667,7 @@ start_tracking_1008()  #ipa-getcert start-tracking -d [NSSDBDIR positive] -n [Ce
         # verifyString not defined, it will be ignore 
 
         # test starts here  
-        certRun "ipa-getcert start-tracking -d $NSSDBDIR_positive -n $CertNickName_positive -t $CertTokenName_positive -I $TrackingRequestNickName_negative -U $EXTUSAGE_positive -K $CertPrincipalName_positive -D $DNSName_positive -E $EMAIL_positive -R" "$tmpout" $expectedErrCode "$expectedErrMsg" "$comment"  "$verifyString"
+        certRun "ipa-getcert start-tracking -d $NSSDBDIR_positive -n $CertNickName_positive -t \"$CertTokenName_positive\" -I $TrackingRequestNickName_negative -U $EXTUSAGE_positive -K $CertPrincipalName_positive -D $DNSName_positive -E $EMAIL_positive -R" "$tmpout" $expectedErrCode "$expectedErrMsg" "$comment"  "$verifyString"
 
         # test evn cleanup 
         #no data cleanup defined 
@@ -3698,7 +3705,7 @@ start_tracking_1009()  #ipa-getcert start-tracking -d [NSSDBDIR positive] -n [Ce
         # verifyString not defined, it will be ignore 
 
         # test starts here  
-        certRun "ipa-getcert start-tracking -d $NSSDBDIR_positive -n $CertNickName_positive -t $CertTokenName_positive -I $TrackingRequestNickName_negative -U $EXTUSAGE_positive -K $CertPrincipalName_positive -D $DNSName_positive -E $EMAIL_positive -r" "$tmpout" $expectedErrCode "$expectedErrMsg" "$comment"  "$verifyString"
+        certRun "ipa-getcert start-tracking -d $NSSDBDIR_positive -n $CertNickName_positive -t \"$CertTokenName_positive\" -I $TrackingRequestNickName_negative -U $EXTUSAGE_positive -K $CertPrincipalName_positive -D $DNSName_positive -E $EMAIL_positive -r" "$tmpout" $expectedErrCode "$expectedErrMsg" "$comment"  "$verifyString"
 
         # test evn cleanup 
         #no data cleanup defined 
@@ -3812,7 +3819,7 @@ start_tracking_1012()  #ipa-getcert start-tracking -d [NSSDBDIR positive] -n [Ce
         local verifyString="status: NEED_KEY_PAIR\|status: CA_UNREACHABLE\|status: CA_UNCONFIGURED"
 
         # test starts here  
-        certRun "ipa-getcert start-tracking -d $NSSDBDIR_positive -n $CertNickName_positive -t $CertTokenName_positive -I $TrackingRequestNickName_positive -U $EXTUSAGE_positive -K $CertPrincipalName_negative -D $DNSName_positive -E $EMAIL_positive -R" "$tmpout" $expectedErrCode "$expectedErrMsg" "$comment"  "$verifyString"
+        certRun "ipa-getcert start-tracking -d $NSSDBDIR_positive -n $CertNickName_positive -t \"$CertTokenName_positive\" -I $TrackingRequestNickName_positive -U $EXTUSAGE_positive -K $CertPrincipalName_negative -D $DNSName_positive -E $EMAIL_positive -R" "$tmpout" $expectedErrCode "$expectedErrMsg" "$comment"  "$verifyString"
 
         # test evn cleanup 
         #no data cleanup defined 
@@ -3850,7 +3857,7 @@ start_tracking_1013()  #ipa-getcert start-tracking -d [NSSDBDIR positive] -n [Ce
         local verifyString="status: NEED_KEY_PAIR\|status: CA_UNREACHABLE\|status: CA_UNCONFIGURED"
 
         # test starts here  
-        certRun "ipa-getcert start-tracking -d $NSSDBDIR_positive -n $CertNickName_positive -t $CertTokenName_positive -I $TrackingRequestNickName_positive -U $EXTUSAGE_positive -K $CertPrincipalName_negative -D $DNSName_positive -E $EMAIL_positive -r" "$tmpout" $expectedErrCode "$expectedErrMsg" "$comment"  "$verifyString"
+        certRun "ipa-getcert start-tracking -d $NSSDBDIR_positive -n $CertNickName_positive -t \"$CertTokenName_positive\" -I $TrackingRequestNickName_positive -U $EXTUSAGE_positive -K $CertPrincipalName_negative -D $DNSName_positive -E $EMAIL_positive -r" "$tmpout" $expectedErrCode "$expectedErrMsg" "$comment"  "$verifyString"
 
         # test evn cleanup 
         #no data cleanup defined 
@@ -3882,7 +3889,7 @@ start_tracking_1014()   #ipa-getcert start-tracking -d [NSSDBDIR positive] -n [C
         #no data prepare defined 
 
         # test starts here  
-        rlRun "ipa-getcert start-tracking -d $NSSDBDIR_positive -n $CertNickName_positive -t $CertTokenName_positive -I $TrackingRequestNickName_positive -U $EXTUSAGE_positive -K $CertPrincipalName_positive -D $DNSName_positive -E $EMAIL_positive -R" 0 "scenario: [ipa-getcert start-tracking -d -n -t -I -U -K -D -E -R]	data: all positive"  
+        rlRun "ipa-getcert start-tracking -d $NSSDBDIR_positive -n $CertNickName_positive -t \"$CertTokenName_positive\" -I $TrackingRequestNickName_positive -U $EXTUSAGE_positive -K $CertPrincipalName_positive -D $DNSName_positive -E $EMAIL_positive -R" 0 "scenario: [ipa-getcert start-tracking -d -n -t -I -U -K -D -E -R]	data: all positive"  
         # test ends here 
 
         # test env cleanup 
@@ -3915,7 +3922,7 @@ start_tracking_1015()   #ipa-getcert start-tracking -d [NSSDBDIR positive] -n [C
         #no data prepare defined 
 
         # test starts here  
-        rlRun "ipa-getcert start-tracking -d $NSSDBDIR_positive -n $CertNickName_positive -t $CertTokenName_positive -I $TrackingRequestNickName_positive -U $EXTUSAGE_positive -K $CertPrincipalName_positive -D $DNSName_positive -E $EMAIL_positive -r" 0 "scenario: [ipa-getcert start-tracking -d -n -t -I -U -K -D -E -r]	data: all positive"  
+        rlRun "ipa-getcert start-tracking -d $NSSDBDIR_positive -n $CertNickName_positive -t \"$CertTokenName_positive\" -I $TrackingRequestNickName_positive -U $EXTUSAGE_positive -K $CertPrincipalName_positive -D $DNSName_positive -E $EMAIL_positive -r" 0 "scenario: [ipa-getcert start-tracking -d -n -t -I -U -K -D -E -r]	data: all positive"  
         # test ends here 
 
         # test env cleanup 
@@ -5540,7 +5547,9 @@ start_tracking_1060()  #ipa-getcert start-tracking -k [PemKeyFile positive] -f [
         local expectedErrCode="0" 
         local expectedErrMsg="No_errmsg_defined_Ignore_Me" 
         local comment="scenario: [ipa-getcert start-tracking -k -f -P -I -U -K -D -E -R]	data: [CertPrincipalName negative]" 
-        local verifyString="status: NEED_KEY_PAIR\|status: CA_UNREACHABLE\|status: CA_UNCONFIGURED"
+        # Updating the verifyString after confirming with Nalin.
+        # local verifyString="status: NEED_KEY_PAIR\|status: CA_UNREACHABLE\|status: CA_UNCONFIGURED"
+        local verifyString="status: NEED_KEY_PAIR\|status: CA_UNREACHABLE\|status: CA_UNCONFIGURED\|status: NEWLY_ADDED_NEED_KEYINFO_READ_TOKEN"
 
         # test starts here  
         certRun "ipa-getcert start-tracking -k $PemKeyFile_positive -f $PemCertFile_positive -P $CertPIN_positive -I $TrackingRequestNickName_positive -U $EXTUSAGE_positive -K $CertPrincipalName_negative -D $DNSName_positive -E $EMAIL_positive -R" "$tmpout" $expectedErrCode "$expectedErrMsg" "$comment"  "$verifyString"
@@ -5580,7 +5589,9 @@ start_tracking_1061()  #ipa-getcert start-tracking -k [PemKeyFile positive] -f [
         local expectedErrCode="0" 
         local expectedErrMsg="No_errmsg_defined_Ignore_Me" 
         local comment="scenario: [ipa-getcert start-tracking -k -f -P -I -U -K -D -E -r]	data: [CertPrincipalName negative]" 
-        local verifyString="status: NEED_KEY_PAIR\|status: CA_UNREACHABLE\|status: CA_UNCONFIGURED"
+        # Updating the verifyString after confirming with Nalin.
+	# local verifyString="status: NEED_KEY_PAIR\|status: CA_UNREACHABLE\|status: CA_UNCONFIGURED"
+	local verifyString="status: NEED_KEY_PAIR\|status: CA_UNREACHABLE\|status: CA_UNCONFIGURED\|status: NEWLY_ADDED_NEED_KEYINFO_READ_PIN"
 
         # test starts here  
         certRun "ipa-getcert start-tracking -k $PemKeyFile_positive -f $PemCertFile_positive -P $CertPIN_positive -I $TrackingRequestNickName_positive -U $EXTUSAGE_positive -K $CertPrincipalName_negative -D $DNSName_positive -E $EMAIL_positive -r" "$tmpout" $expectedErrCode "$expectedErrMsg" "$comment"  "$verifyString"
@@ -6006,7 +6017,9 @@ start_tracking_1072()  #ipa-getcert start-tracking -k [PemKeyFile positive] -f [
         local expectedErrCode="0" 
         local expectedErrMsg="No_errmsg_defined_Ignore_Me" 
         local comment="scenario: [ipa-getcert start-tracking -k -f -p -I -U -K -D -E -R]	data: [CertPrincipalName negative]" 
-        local verifyString="status: NEED_KEY_PAIR\|status: CA_UNREACHABLE\|status: CA_UNCONFIGURED"
+	# Updating verifyString after confirming with Nalin
+	# local verifyString="status: NEED_KEY_PAIR\|status: CA_UNREACHABLE\|status: CA_UNCONFIGURED"
+        local verifyString="status: NEED_KEY_PAIR\|status: CA_UNREACHABLE\|status: CA_UNCONFIGURED\|status: NEWLY_ADDED_NEED_KEYINFO_READ_PIN"
 
         # test starts here  
         certRun "ipa-getcert start-tracking -k $PemKeyFile_positive -f $PemCertFile_positive -p $PINFILE_positive -I $TrackingRequestNickName_positive -U $EXTUSAGE_positive -K $CertPrincipalName_negative -D $DNSName_positive -E $EMAIL_positive -R" "$tmpout" $expectedErrCode "$expectedErrMsg" "$comment"  "$verifyString"
@@ -6048,7 +6061,9 @@ start_tracking_1073()  #ipa-getcert start-tracking -k [PemKeyFile positive] -f [
         local expectedErrCode="0" 
         local expectedErrMsg="No_errmsg_defined_Ignore_Me" 
         local comment="scenario: [ipa-getcert start-tracking -k -f -p -I -U -K -D -E -r]	data: [CertPrincipalName negative]" 
-        local verifyString="status: NEED_KEY_PAIR\|status: CA_UNREACHABLE\|status: CA_UNCONFIGURED"
+        # Updating verifyString after confirming with Nalin
+        # local verifyString="status: NEED_KEY_PAIR\|status: CA_UNREACHABLE\|status: CA_UNCONFIGURED"
+        local verifyString="status: NEED_KEY_PAIR\|status: CA_UNREACHABLE\|status: CA_UNCONFIGURED\|status: NEWLY_ADDED_NEED_KEYINFO_READ_PIN"
 
         # test starts here  
         certRun "ipa-getcert start-tracking -k $PemKeyFile_positive -f $PemCertFile_positive -p $PINFILE_positive -I $TrackingRequestNickName_positive -U $EXTUSAGE_positive -K $CertPrincipalName_negative -D $DNSName_positive -E $EMAIL_positive -r" "$tmpout" $expectedErrCode "$expectedErrMsg" "$comment"  "$verifyString"
