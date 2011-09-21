@@ -169,7 +169,7 @@ http_tests()
 		rlAssertGrep "Disabled service \"$HTTPPRINC@$RELM\"" "/tmp/disable_service.out"
 		# verify service is disabled and certificate removed
 		rlRun "ipa service-show --all $HTTPPRINC > /tmp/disable_http.out"
-		rlAssertGrep "has_keytab: False" "/tmp/disable_http.out"
+		rlAssertGrep "Keytab: False" "/tmp/disable_http.out"
 		rlAssertNotGrep "Certificate" "/tmp/disable_http.out"
 		rlRun "kinitAs httpuser1 Secret123" 0 "kinit as user to get valid credentials"
                 rlLog "Executing: curl -kv --negotiate -u: http://$HOSTNAME/ipatest/"
