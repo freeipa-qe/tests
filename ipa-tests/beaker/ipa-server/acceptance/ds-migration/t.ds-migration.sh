@@ -38,7 +38,7 @@ check_user()
 		file=ssh-test-file-6148864.txt
 		touch /dev/shm/$file
 		rm -f /dev/shm/ssh-test-output.txt
-		echo $userpassword | ssh $1@$MASTER 'ls /dev/shm' > /dev/shm/ssh-test-output.txt
+		echo $userpassword | ssh $1@$MASTER 'ls /dev/shm' > /dev/shm/ssh-test-output.txt &
 		sleep 20
 		rlRun "grep $file /dev/shm/ssh-test-output.txt" 0 "check to see if the ssh as the user was sucessful"
 	rlPhaseEnd
