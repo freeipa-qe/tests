@@ -18,6 +18,8 @@
 #       fixResolv
 # 	ssh_auth_success
 # 	ssh_auth_failure
+#	ftp_auth_success
+#	ftp_auth_failure
 ######################################################################
 KINITEXEC=/usr/bin/kinit
 #######################################################################
@@ -616,3 +618,53 @@ fi
 
 
 ####################################################################
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# ftp_auth_success
+# Usage: ftp_auth_success user password host
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+ftp_auth_success()
+   {
+        {
+
+           ftp -inv $3 > /tmp/ftplog << EOF
+           user $1 $2
+           quit
+EOF
+
+           grep "Login successful." /tmp/ftplog
+           if [ $? = 0 ]; then
+                echo "Authentication successful, as expected"
+           else
+                echo "ERROR: Authentication failed."
+           fi
+        }
+   }
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# ftp_auth_failure
+# Usage: ftp_auth_failure user password host
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+ftp_auth_failure()
+   {
+        {
+
+           ftp -inv $3 > /tmp/ftplog << EOF
+           user $1 $2
+           quit
+EOF
+
+           grep "Login successful." /tmp/ftplog
+           if [ $? = 0 ]; then
+                echo "ERROR: Authentication failed."
+           else
+                echo "Authentication failed, as expected"
+           fi
+        }
+   }
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
