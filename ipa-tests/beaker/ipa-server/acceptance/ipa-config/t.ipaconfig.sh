@@ -225,7 +225,7 @@ ipaconfig_mod_maxusername_default()
         local spot=`getrandomint 3 31`
         #for len in 1 $spot $config_username_maxlength
         #for len in 1 $spot 
-	for len in 1 12 54 47 ; do
+	for len in 1 12 52 47 ; do
             #set the maxusername via ipa config-mod
             KinitAsAdmin
             rlRun "ipa config-mod --maxusername=$len" 0 "set maxusername to [$len]"
