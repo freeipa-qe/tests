@@ -530,6 +530,7 @@ rlPhaseStartTest "sudorule-add-hostgrp_func001: Adding hostgroup and verifying f
 	rlRun "ipa hostgroup-add-member hostgrp1 --hosts=$MASTER"
 
 	rlRun "ipa sudorule-add-host sudorule1 --hostgroup=hostgrp1"
+	sleep 5
 	# Commenting the following test as it is generating false failures and 
 	# the related functional test "grep for +hostgrp1" passess. 
 	# rlRun "getent netgroup hostgrp1"
