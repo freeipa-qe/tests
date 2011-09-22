@@ -33,6 +33,16 @@ check_user()
 		rlRun "ldapsearch -x -h127.0.0.1 -p389 -D'uid=$1,cn=users,cn=accounts,dc=$DOMAIN' -w$userpassword -b uid=$1,cn=users,cn=accounts,dc=$DOMAIN objectclass=*" 0 "ldapsearch as user $1 with password $userpassword"
 	rlPhaseEnd
 
+	# Making sure that the password migrated properly with ssh
+	rlPhaseStartTest " Making sure that the password for user $1 migrated properly with ssh"
+		file=ssh-test-file-6148864.txt
+		touch /dev/shm/$file
+		rm -f /dev/shm/ssh-test-output.txt
+		echo $userpassword | ssh $1@$MASTER 'ls /dev/shm' > /dev/shm/ssh-test-output.txt
+		sleep 20
+		rlRun "grep $file /dev/shm/ssh-test-output.txt" 0 "check to see if the ssh as the user was sucessful"
+	rlPhaseEnd
+
 	# setting password and kiniting
 	rlPhaseStartTest "Setting password for user $1"
 		rlRun "echo blarg1 | ipa passwd $1" 0 "Setting password on user $1"
@@ -130,10 +140,8 @@ changetype: delete
 dn: cn=group2000,ou=Groups,dc=bos,dc=redhat,dc=com
 changetype: delete' > $file
 
-	rlPhaseStartTest "removing the groups that we will be rewriting later"
-		echo "running: ldapmodify -a -x -h$BEAKERCLIENT -p 2389 -D \"cn=Directory Manager\" -w$ADMINPW -c -f $file"
-		rlRun "ldapmodify -a -x -h$BEAKERCLIENT -p 2389 -D \"cn=Directory Manager\" -w$ADMINPW -c -f $file" 0 "removign groups"
-	rlPhaseEnd
+	echo "running: ldapmodify -a -x -h$BEAKERCLIENT -p 2389 -D \"cn=Directory Manager\" -w$ADMINPW -c -f $file"
+	rlRun "ldapmodify -a -x -h$BEAKERCLIENT -p 2389 -D \"cn=Directory Manager\" -w$ADMINPW -c -f $file" 0 "removign groups"
 
 }
 
