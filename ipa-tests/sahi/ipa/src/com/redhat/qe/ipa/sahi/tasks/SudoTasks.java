@@ -533,7 +533,7 @@ public class SudoTasks {
 		sahiTasks.button("Add and Edit").click();
 		sahiTasks.textbox("description").setValue(description);
 		
-		//sahiTasks.span("Update").click();
+		sahiTasks.span("Update").click();
 		sahiTasks.link("Sudo Commands").in(sahiTasks.div("content")).click();
 	}
 	
@@ -738,7 +738,20 @@ public class SudoTasks {
 		sahiTasks.checkbox(commandGroup).under(sahiTasks.div("Available")).click();
 		sahiTasks.link(">>").click();
 		sahiTasks.button(buttonToClick).click();
-		sahiTasks.link("Sudo Commands").in(sahiTasks.div("content")).click();
+		sahiTasks.link("Sudo Command Groups").in(sahiTasks.div("content")).click();
+	}
+	
+	public static void verifySudoCommandGroupMembership (SahiTasks sahiTasks, String command, String commandGroup, boolean isMember) {
+
+		sahiTasks.link(commandGroup).click(); 
+
+		sahiTasks.link("member_sudocmdgroup").click();
+		if (isMember)
+			Assert.assertTrue(sahiTasks.link(command).exists(), "Verified command " + command + " is member of " + commandGroup);
+		else
+			Assert.assertFalse(sahiTasks.link(command).exists(), "Verified command " + command + " is not member of " + commandGroup);
+
+		sahiTasks.link("Sudo Command Groups").in(sahiTasks.div("content")).click();
 	}
 	
 	public static void deleteFromCommandGroup (SahiTasks sahiTasks, String command, String commandGroup, String buttonToClick) {

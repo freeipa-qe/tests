@@ -67,7 +67,7 @@ public class SudoCommandGroupTests extends SahiTestScript{
 			dataProvider="getSudoruleCommandGroupAddTestObjects")	
 			public void testSudoCommandGroupAdd(String testName, String cn, String description) throws Exception {
 				//verify command group to be added doesn't exist
-				com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(cn.toCharArray()).exists(), "Verify sudocommand group " + cn + "  doesn't already exist");
+				com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(cn.toLowerCase()).exists(), "Verify sudocommand group " + cn + "  doesn't already exist");
 				
 				//new sudo rule command can be added now
 				SudoTasks.createSudoCommandGroupAdd(sahiTasks, cn, description, "Add");
@@ -164,6 +164,7 @@ public class SudoCommandGroupTests extends SahiTestScript{
 	
 	// Cancel adding a member
 	
+	
 	// Add 3 members
 	
 	/*
@@ -172,17 +173,17 @@ public class SudoCommandGroupTests extends SahiTestScript{
 	 */
 	@Test (groups={"sudoCommandGroupEnrollTests"},  description="Enroll a Command into a Command Group", 
 			dataProvider="getEnrollIntoSudoCommandGroupTestObjects", 
-			dependsOnGroups={"sudoCommandGroupAddAndEditTests", "sudoCommandGroupCancelEnrollTests"})	
-	public void testSudoCommandGroupEnroll(String testName, String command) throws Exception {
+			dependsOnGroups={"sudoCommandGroupAddAndEditTests"})	
+	public void testSudoCommandGroupEnroll(String testName, String commandGroup) throws Exception {
 		
 		//verify command exists
-		Assert.assertTrue(sahiTasks.link(command).exists(), "Verify Command " + command + " exists");
+		Assert.assertTrue(sahiTasks.link(commandGroup).exists(), "Verify Command Group " + commandGroup + " exists");
 		
 		// Enroll command
-		//SudoTasks.enrollCommandInCommandGroup(sahiTasks, command, commandGroup, "Enroll");
+		SudoTasks.enrollIntoCommandGroup(sahiTasks, vimCommandName, commandGroup, "Enroll");
 		
 		// Verify membership
-		//SudoTasks.verifySudoCommandMembership(sahiTasks, command, commandGroup, true);
+		SudoTasks.verifySudoCommandMembership(sahiTasks, vimCommandName, commandGroup, true);
 		
 	}
 	
@@ -294,8 +295,8 @@ public class SudoCommandGroupTests extends SahiTestScript{
 		
         //										testname					cn   						description
 		ll.add(Arrays.asList(new Object[]{ "Add Sudo Command Group - good",				"sudo group1",				"group1 with basic commands"	} ));
-		ll.add(Arrays.asList(new Object[]{ "Add Sudo Command Group - long",				"abcdefghijklmnopqrstuvwxyz123456789ANDAGAINabcdefghijklmnopqrstuvwxyz123456789ANDAGAINabcdefghijklmnopqrstuvwxyz123456789",	"long group name"      } ));
-		ll.add(Arrays.asList(new Object[]{ "Add Sudo Command Group - Special Char",		"S@ud*o#Ru?le", 			"group with special char - in De$c"      } ));
+	//	ll.add(Arrays.asList(new Object[]{ "Add Sudo Command Group - long",				"abcdefghijklmnopqrstuvwxyz123456789ANDAGAINabcdefghijklmnopqrstuvwxyz123456789ANDAGAINabcdefghijklmnopqrstuvwxyz123456789",	"long group name"      } ));
+	//	ll.add(Arrays.asList(new Object[]{ "Add Sudo Command Group - Special Char",		"S@ud*o#Ru?le", 			"group with special char - in De$c"      } ));
 		
 		return ll;	
 	}

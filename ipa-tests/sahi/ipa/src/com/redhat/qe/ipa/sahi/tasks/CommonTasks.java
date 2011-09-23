@@ -337,7 +337,7 @@ public class CommonTasks {
 		sahiTasks.textbox("description").setValue(description);
 		sahiTasks.span("Update").click();
 		Assert.assertTrue(sahiTasks.div(expectedError).exists(), "Verified expected error when adding modifying host group :: " + expectedError);
-		sahiTasks.button("Cancel").click();
+		sahiTasks.button("OK").click();
 		sahiTasks.span("undo").click();
 		//in calling test, make sure to navigate back to page with cn
 	}
