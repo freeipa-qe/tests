@@ -160,12 +160,27 @@ public class SudoCommandGroupTests extends SahiTestScript{
 		SudoTasks.verifySudoCommandGroupUpdates(sahiTasks, cn, description, lsCommandName);
 	}
 
+
+	/*
+	 * Enroll a Sudo command to a sudo command group
+	 * 
+	 */
+	@Test (groups={"sudoCommandGroupCancelEnrollTests"},  description="Cancel enrolling a Command into a Command Group", 
+			dataProvider="getCancelEnrollIntoSudoCommandGroupTestObjects", 
+			dependsOnGroups={"sudoCommandGroupAddAndEditTests"})	
+	public void testSudoCommandGroupCancelEnroll(String testName, String commandGroup) throws Exception {
+		
+		//verify command exists
+		Assert.assertTrue(sahiTasks.link(commandGroup).exists(), "Verify Command Group " + commandGroup + " exists");
+		
+		// Enroll command
+		SudoTasks.enrollIntoCommandGroup(sahiTasks, vimCommandName, commandGroup, "Cancel");
+		
+		// Verify membership
+		SudoTasks.verifySudoCommandGroupMembership(sahiTasks, vimCommandName, commandGroup, false);
+		
+	}
 	
-	
-	// Cancel adding a member
-	
-	
-	// Add 3 members
 	
 	/*
 	 * Enroll a Sudo command to a sudo command group
@@ -173,7 +188,7 @@ public class SudoCommandGroupTests extends SahiTestScript{
 	 */
 	@Test (groups={"sudoCommandGroupEnrollTests"},  description="Enroll a Command into a Command Group", 
 			dataProvider="getEnrollIntoSudoCommandGroupTestObjects", 
-			dependsOnGroups={"sudoCommandGroupAddAndEditTests"})	
+			dependsOnGroups={"sudoCommandGroupAddAndEditTests", "sudoCommandGroupCancelEnrollTests"})	
 	public void testSudoCommandGroupEnroll(String testName, String commandGroup) throws Exception {
 		
 		//verify command exists
@@ -183,20 +198,82 @@ public class SudoCommandGroupTests extends SahiTestScript{
 		SudoTasks.enrollIntoCommandGroup(sahiTasks, vimCommandName, commandGroup, "Enroll");
 		
 		// Verify membership
-		SudoTasks.verifySudoCommandMembership(sahiTasks, vimCommandName, commandGroup, true);
+		SudoTasks.verifySudoCommandGroupMembership(sahiTasks, vimCommandName, commandGroup, true);
 		
 	}
 	
-
-	
-	
-	// Add a member again
+	/*
+	 * Enroll a Sudo command to a sudo command group - again
+	 * 
+	 */
+	@Test (groups={"sudoCommandGroupEnrollAgainTests"},  description="Enroll a Command into a Command Group Again", 
+			dataProvider="getEnrollAgainIntoSudoCommandGroupTestObjects", 
+			dependsOnGroups={"sudoCommandGroupAddAndEditTests", "sudoCommandGroupEnrollTests"})	
+	public void testSudoCommandGroupEnrollAgain(String testName, String commandGroup, String expectedError) throws Exception {
+		
+		//verify command exists
+		Assert.assertTrue(sahiTasks.link(commandGroup).exists(), "Verify Command Group " + commandGroup + " exists");
+		
+		// Enroll command
+		SudoTasks.enrollAgainIntoCommandGroup(sahiTasks, vimCommandName, commandGroup, expectedError);
+		
+		// Verify membership
+		SudoTasks.verifySudoCommandGroupMembership(sahiTasks, vimCommandName, commandGroup, true);
+		
+	}
 	
 	// Cancel removing a member
+	// Remove a member
+	@Test (groups={"sudoCancelDeleteFromCommandGroupTests"},  description="Cancel deleting a Command from a Command Group", 
+			dataProvider="getCancelDeleteFromSudoCommandGroupTestObjects", 
+			dependsOnGroups={"sudoCommandGroupAddAndEditTests"})	
+	public void testSudoCommandGroupCancelDeleteCommand(String testName, String commandGroup) throws Exception {
+		
+		//verify command exists
+		Assert.assertTrue(sahiTasks.link(commandGroup).exists(), "Verify Command Group " + commandGroup + " exists");
+		//Remove a command
+		SudoTasks.deleteFromCommandGroup(sahiTasks, lsCommandName, commandGroup, "Cancel");
+		
+		//Verify the command was deleted
+		SudoTasks.verifySudoCommandGroupMembership(sahiTasks, lsCommandName, commandGroup, false);
+	}
 	
 	// Remove a member
+	@Test (groups={"sudoDeleteFromCommandGroupTests"},  description="Delete a Command from a Command Group", 
+			dataProvider="getDeleteFromSudoCommandGroupTestObjects", 
+			dependsOnGroups={"sudoCommandGroupAddAndEditTests"})	
+	public void testSudoCommandGroupDeleteCommand(String testName, String commandGroup) throws Exception {
+		
+		//verify command exists
+		Assert.assertTrue(sahiTasks.link(commandGroup).exists(), "Verify Command Group " + commandGroup + " exists");
+		//Remove a command
+		SudoTasks.deleteFromCommandGroup(sahiTasks, lsCommandName, commandGroup, "Delete");
+		
+		//Verify the command was deleted
+		SudoTasks.verifySudoCommandGroupMembership(sahiTasks, lsCommandName, commandGroup, false);
+	}
 	
 	// Add a member in 2 groups
+	@Test (groups={"sudoTwoCommandGroupEnrollTests"},  description="Enroll a Command into two Command Groups", 
+			dataProvider="getEnrollIntoTwoSudoCommandGroupTestObjects", 
+			dependsOnGroups={"sudoCommandGroupAddAndEditTests", "sudoCommandGroupEnrollTests"})	
+	public void testTwoSudoCommandGroupEnroll(String testName, String commandGroup1, String commandGroup2, String description2) throws Exception {
+		
+		//verify command exists
+		Assert.assertTrue(sahiTasks.link(commandGroup1).exists(), "Verify Command Group " + commandGroup1 + " exists");
+		
+		// Verify membership of 2 commands in first command group
+		SudoTasks.verifySudoCommandGroupMembership(sahiTasks, vimCommandName, commandGroup1, true);
+		SudoTasks.verifySudoCommandGroupMembership(sahiTasks, lsCommandName, commandGroup1, true);
+		
+		//Add the second command group
+		SudoTasks.createSudoCommandGroupAdd(sahiTasks, commandGroup2, description2, "Add");
+		//Add a command into this command group
+		SudoTasks.enrollIntoCommandGroup(sahiTasks, vimCommandName, commandGroup2, "Enroll");
+		
+		//TODO : nkrishnan -  Finish the test
+	}
+	
 	
 	// Edit group and navigate back and forth
 	
@@ -295,8 +372,8 @@ public class SudoCommandGroupTests extends SahiTestScript{
 		
         //										testname					cn   						description
 		ll.add(Arrays.asList(new Object[]{ "Add Sudo Command Group - good",				"sudo group1",				"group1 with basic commands"	} ));
-	//	ll.add(Arrays.asList(new Object[]{ "Add Sudo Command Group - long",				"abcdefghijklmnopqrstuvwxyz123456789ANDAGAINabcdefghijklmnopqrstuvwxyz123456789ANDAGAINabcdefghijklmnopqrstuvwxyz123456789",	"long group name"      } ));
-	//	ll.add(Arrays.asList(new Object[]{ "Add Sudo Command Group - Special Char",		"S@ud*o#Ru?le", 			"group with special char - in De$c"      } ));
+		ll.add(Arrays.asList(new Object[]{ "Add Sudo Command Group - long",				"abcdefghijklmnopqrstuvwxyz123456789ANDAGAINabcdefghijklmnopqrstuvwxyz123456789ANDAGAINabcdefghijklmnopqrstuvwxyz123456789",	"long group name"      } ));
+		ll.add(Arrays.asList(new Object[]{ "Add Sudo Command Group - Special Char",		"S@ud*o#Ru?le", 			"group with special char - in De$c"      } ));
 		
 		return ll;	
 	}
@@ -466,11 +543,74 @@ public class SudoCommandGroupTests extends SahiTestScript{
 	protected List<List<Object>> createEnrollIntoSudoCommandGroupTestObjects() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-        //										testname								cn				 			
-		ll.add(Arrays.asList(new Object[]{ "Enroll a Command into a Command Group",		"/bin/ln"	} ));
+        //										testname								commandGroup				 			
+		ll.add(Arrays.asList(new Object[]{ "Enroll a Command into a Command Group",		"dev sudo group"	} ));
 		
 		return ll;	
 	}
 	
+	/*
+	 * Data to be used when cancelling enrolling a command
+	 */
+	@DataProvider(name="getCancelEnrollIntoSudoCommandGroupTestObjects")
+	public Object[][] getCancelEnrollIntoSudoCommandGroupTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createCancelEnrollIntoSudoCommandGroupTestObjects());
+	}
+	protected List<List<Object>> createCancelEnrollIntoSudoCommandGroupTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname											commandGroup				 			
+		ll.add(Arrays.asList(new Object[]{ "Cancel enrolling a Command into a Command Group",		"dev sudo group"	} ));
+		
+		return ll;	
+	}
+	
+	/*
+	 * Data to be used when  deleting  a command from a command group
+	 */
+	@DataProvider(name="getDeleteFromSudoCommandGroupTestObjects")
+	public Object[][] getDeleteFromSudoCommandGroupTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createDeleteFromSudoCommandGroupTestObjects());
+	}
+	protected List<List<Object>> createDeleteFromSudoCommandGroupTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname								commandGroup				 			
+		ll.add(Arrays.asList(new Object[]{ "Delete a Command from a Command Group",		"dev sudo group"	} ));
+		
+		return ll;	
+	}
+	
+	/*
+	 * Data to be used when cancelling deleting a command from a command group
+	 */
+	@DataProvider(name="getCancelDeleteFromSudoCommandGroupTestObjects")
+	public Object[][] getCancelDeleteFromSudoCommandGroupTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createCancelDeleteFromSudoCommandGroupTestObjects());
+	}
+	protected List<List<Object>> createCancelDeleteFromSudoCommandGroupTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname										commandGroup				 			
+		ll.add(Arrays.asList(new Object[]{ "Cancel deleting a Command from a Command Group",	"dev sudo group"	} ));
+		
+		return ll;	
+	}
+	
+	/*
+	 * Data to be used when cancelling enrolling a command
+	 */
+	@DataProvider(name="getEnrollAgainIntoSudoCommandGroupTestObjects")
+	public Object[][] getEnrollAgainIntoSudoCommandGroupTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createEnrollAgainIntoSudoCommandGroupTestObjects());
+	}
+	protected List<List<Object>> createEnrollAgainIntoSudoCommandGroupTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname										commandGroup		expectedError			 			
+		ll.add(Arrays.asList(new Object[]{ "Enroll a Command into a Command Group Again",		"dev sudo group",	"/usr/bin/vim: This entry is already a member"	} ));
+		
+		return ll;	
+	}
 	
 }

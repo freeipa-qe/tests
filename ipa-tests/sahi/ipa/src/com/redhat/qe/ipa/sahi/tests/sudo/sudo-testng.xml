@@ -52,7 +52,6 @@
 		    <class name="com.redhat.qe.ipa.sahi.tests.sudo.SudoCommandTests" />
 		</classes>
 	</test>
-	
 
 	<test name="Sudo Command Group Tests">
 	   <packages>
@@ -68,6 +67,10 @@
 				<include name="sudoCommandGroupAddAndEditTests" />
 				<include name="sudoCommandGroupCancelEnrollTests" />
 				<include name="sudoCommandGroupEnrollTests" />
+				<include name="sudoCommandGroupEnrollAgainTests" />
+				<include name="sudoCancelDeleteFromCommandGroupTests" />
+				<include name="sudoDeleteFromCommandGroupTests" />
+				<include name="sudoTwoCommandGroupEnrollTests"/>
 				<include name="sudoCommandGroupMultipleDeleteTests" />
 				<include name="invalidSudoCommanGroupAddRequiredFieldTests" />
 				<include name="invalidSudoCommanGroupModifyTests" />

@@ -732,12 +732,25 @@ public class SudoTasks {
 	
 	public static void enrollIntoCommandGroup (SahiTasks sahiTasks, String command, String commandGroup, String buttonToClick) {
 
-		sahiTasks.link(command).click(); 
+		sahiTasks.link(commandGroup).click(); 
 		sahiTasks.link("member_sudocmd").click();
 		sahiTasks.span("Enroll").click();
-		sahiTasks.checkbox(commandGroup).under(sahiTasks.div("Available")).click();
+		sahiTasks.checkbox(command).under(sahiTasks.div("Available")).click();
 		sahiTasks.link(">>").click();
 		sahiTasks.button(buttonToClick).click();
+		sahiTasks.link("Sudo Command Groups").in(sahiTasks.div("content")).click();
+	}
+	
+	public static void enrollAgainIntoCommandGroup (SahiTasks sahiTasks, String command, String commandGroup, String expectedError) {
+
+		sahiTasks.link(commandGroup).click(); 
+		sahiTasks.link("member_sudocmd").click();
+		sahiTasks.span("Enroll").click();
+		sahiTasks.checkbox(command).under(sahiTasks.div("Available")).click();
+		sahiTasks.link(">>").click();
+		sahiTasks.button("Enroll").click();
+		
+		CommonTasks.checkOperationsError(sahiTasks, expectedError);
 		sahiTasks.link("Sudo Command Groups").in(sahiTasks.div("content")).click();
 	}
 	
@@ -745,7 +758,7 @@ public class SudoTasks {
 
 		sahiTasks.link(commandGroup).click(); 
 
-		sahiTasks.link("member_sudocmdgroup").click();
+		sahiTasks.link("member_sudocmd").click();
 		if (isMember)
 			Assert.assertTrue(sahiTasks.link(command).exists(), "Verified command " + command + " is member of " + commandGroup);
 		else
