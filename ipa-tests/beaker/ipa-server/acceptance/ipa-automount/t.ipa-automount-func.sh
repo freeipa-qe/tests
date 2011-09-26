@@ -347,7 +347,7 @@ rlPhaseStartTest "indirect_mount_functionality_001: functionality testing indire
 	rlRun "touch /tmp/shanks.txt"
 	rlRun "ipa user-mod $user1 --homedir=/ipashare/$user1"
 
-	rlRun "touch $Tmpdir/sudo_list.exp"
+	rlRun "touch $TmpDir/sudo_list.exp"
 
 testout=/tmp/testout.txt
 cat > $TmpDir/test_list.exp << EOF
