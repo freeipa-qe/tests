@@ -641,13 +641,18 @@ public class SudoTests extends SahiTestScript{
 			
 			
 		
-/*		
+		
 		sahiTasks.navigateTo(commonTasks.sudoCommandPage, true);
 		if (sahiTasks.link(lsCommandName).exists()) {
 			//SudoTasks.deleteSudoruleCommand(sahiTasks, lsCommandName, lsCommandDescription);
-		}		
+		}	
 		
-		clean up sudo command groups*/
+		sahiTasks.navigateTo(commonTasks.sudoCommandGroupPage, true);
+		if (sahiTasks.link(allowCommandGroupName).exists()) 
+			SudoTasks.deleteSudoCommandGroupDel(sahiTasks, allowCommandGroupName, "Delete");
+		if (sahiTasks.link(denyCommandGroupName).exists()) 
+			SudoTasks.deleteSudoCommandGroupDel(sahiTasks, denyCommandGroupName, "Delete");
+		
 		
 		sahiTasks.navigateTo(commonTasks.sudoRulePage, true);
 		

@@ -15,6 +15,7 @@ import com.redhat.qe.auto.testng.Assert;
 import com.redhat.qe.auto.testng.TestNGUtils;
 import com.redhat.qe.ipa.sahi.base.SahiTestScript;
 import com.redhat.qe.ipa.sahi.tasks.CommonTasks;
+import com.redhat.qe.ipa.sahi.tasks.GroupTasks;
 import com.redhat.qe.ipa.sahi.tasks.SudoTasks;
 
 /*
@@ -318,7 +319,7 @@ public class SudoCommandTests extends SahiTestScript {
 	
 	@AfterClass (groups={"cleanup"}, description="Delete objects created for this test suite", alwaysRun=true)
 	public void cleanup() throws CloneNotSupportedException {
-		String[] sudoCommandTestObjects = {//"/bin/date",
+		String[] sudoCommandTestObjects = {"/bin/date",
  										//	"/bin/cat",
 										"/bin/find",
 										"/bin/more",
@@ -333,6 +334,10 @@ public class SudoCommandTests extends SahiTestScript {
 				SudoTasks.deleteSudo(sahiTasks, sudoCommandTestObject.toLowerCase(), "Delete");
 			}			
 		} 
+		
+		sahiTasks.navigateTo(commonTasks.sudoCommandGroupPage, true);
+		if (sahiTasks.link(commandGroup).exists())
+			SudoTasks.deleteSudoCommandGroupDel(sahiTasks, commandGroup, "Delete");
 	}
 	
 	/*******************************************************
@@ -350,8 +355,8 @@ public class SudoCommandTests extends SahiTestScript {
 		
         //										testname							cn   					desc	
 		ll.add(Arrays.asList(new Object[]{ "Add a Sudo Command - good",				"/bin/date", 			"testing date command"	} ));
-	//	ll.add(Arrays.asList(new Object[]{ "Add a Sudo Command - long",				"/home/abcdefghijklmnopqrstuvwxyz123456789ANDAGAINabcdefghijklmnopqrstuvwxyz123456789ANDAGAINabcdefghijklmnopqrstuvwxyz123456789/bin/date", 	"testing long date command"	} ));
-	//	ll.add(Arrays.asList(new Object[]{ "Add a Sudo Command - Special Char",		"/b@i&n?/~d:a?t+e-", 	"testing date command with special char"	} ));
+		ll.add(Arrays.asList(new Object[]{ "Add a Sudo Command - long",				"/home/abcdefghijklmnopqrstuvwxyz123456789ANDAGAINabcdefghijklmnopqrstuvwxyz123456789ANDAGAINabcdefghijklmnopqrstuvwxyz123456789/bin/date", 	"testing long date command"	} ));
+		ll.add(Arrays.asList(new Object[]{ "Add a Sudo Command - Special Char",		"/b@i&n?/~d:a?t+e-", 	"testing date command with special char"	} ));
 		
 	//	ll.add(Arrays.asList(new Object[]{ "create_sudorule_command",		"/bin/cat", 	"testing cat command"	} ));
 		/*

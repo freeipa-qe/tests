@@ -311,7 +311,10 @@ private static Logger log = Logger.getLogger(UserTests.class.getName());
 	@AfterClass (groups={"cleanup"}, description="Delete objects created for this test suite", alwaysRun=true, dependsOnGroups="init")
 	public void cleanup() throws CloneNotSupportedException {
 		String[] hbacServiceGroupTestObjects = {"hbac group1",
-												"hbac group2"
+												"hbac group2",
+												"su-test",
+												"web",
+												"abcdefghijklmnopqrstuvwxyz123456789@ANDAGAIN#abcdefghijklmnopqrstuvwxyz123456789*ANDAGAINabcdefghijklmnopqrstuvwxyz123456789?".toLowerCase()
 												} ; 
 		
 		//verify rules were found

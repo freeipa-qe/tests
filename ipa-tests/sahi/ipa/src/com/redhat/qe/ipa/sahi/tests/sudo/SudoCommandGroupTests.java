@@ -16,6 +16,7 @@ import com.redhat.qe.auto.testng.TestNGUtils;
 import com.redhat.qe.ipa.sahi.base.SahiTestScript;
 import com.redhat.qe.ipa.sahi.tasks.CommonTasks;
 import com.redhat.qe.ipa.sahi.tasks.SudoTasks;
+import com.redhat.qe.ipa.sahi.tasks.UserTasks;
 
 
 /*
@@ -355,13 +356,18 @@ public class SudoCommandGroupTests extends SahiTestScript{
 				"Dev Sudo Group"
 				} ;
 
-		//verify rules were found
 		for (String sudoCommandGroupTestObject : sudoCommandGroupTestObjects) {
 			if (sahiTasks.link(sudoCommandGroupTestObject.toLowerCase()).exists()){
 				log.fine("Cleaning Sudo Rule: " + sudoCommandGroupTestObject);
 				SudoTasks.deleteSudo(sahiTasks, sudoCommandGroupTestObject.toLowerCase(), "Delete");
 			}			
-		} 
+		}
+		
+		sahiTasks.navigateTo(commonTasks.sudoCommandPage, true);
+		if (sahiTasks.link(lsCommandName).exists())
+			SudoTasks.deleteSudo(sahiTasks, lsCommandName, "Delete");
+		if (sahiTasks.link(vimCommandName).exists())
+			SudoTasks.deleteSudo(sahiTasks, vimCommandName, "Delete");
 	}
 	
 	/*******************************************************
