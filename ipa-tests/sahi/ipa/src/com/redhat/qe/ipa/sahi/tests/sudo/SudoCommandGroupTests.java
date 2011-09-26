@@ -17,6 +17,13 @@ import com.redhat.qe.ipa.sahi.base.SahiTestScript;
 import com.redhat.qe.ipa.sahi.tasks.CommonTasks;
 import com.redhat.qe.ipa.sahi.tasks.SudoTasks;
 
+
+/*
+ * Comments from review:
+ * 54. SudoCommandGroupTests.testMultipleSudoCommandGroupDelete should
+verify the deletion.
+ * 
+ */
 public class SudoCommandGroupTests extends SahiTestScript{
 	private static Logger log = Logger.getLogger(SudoCommandGroupTests.class.getName());
 	
@@ -438,8 +445,10 @@ public class SudoCommandGroupTests extends SahiTestScript{
 	protected List<List<Object>> createSudoCommandGroupInvalidModifyTestObjects() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-        //										testname													cn   				description		expected error
-		ll.add(Arrays.asList(new Object[]{ "Verify error when editing a Command Group to have blank desc",	"sudo group1",		"", 			"Input form contains invalid or missing values."	} ));
+        //										testname																	cn   				description		expected error
+		// ll.add(Arrays.asList(new Object[]{ "Verify error when editing a Command Group to have blank desc",	"sudo group1",		"", 			"Input form contains invalid or missing values."	} ));
+		ll.add(Arrays.asList(new Object[]{ "Verify error when editing a Command Group to have trailing space in desc",		"sudo group1",				"Description with trailing space ",		"invalid 'desc': Leading and trailing spaces are not allowed"	} ));
+		ll.add(Arrays.asList(new Object[]{ "Verify error when editing a Command Group to have leading space in desc",		"sudo group1",				" Description with leading space",		"invalid 'desc': Leading and trailing spaces are not allowed"      } ));
 		
 		return ll;	
 	}

@@ -20,6 +20,15 @@ import com.redhat.qe.ipa.sahi.tasks.SahiTasks;
 import com.redhat.qe.ipa.sahi.tasks.SudoTasks;
 import com.redhat.qe.ipa.sahi.tests.user.UserTests;
 
+/*
+ * Feedback from review:
+ * 44. HBACServiceTests.testMultipleHBACServiceDelete should verify the
+deletion.
+
+45. In HBACServiceTests we could try adding/removing a HBAC service
+into/from HBAC service group from the HBAC service association page.
+ */
+
 public class HBACServiceTests  extends SahiTestScript{
 	private static Logger log = Logger.getLogger(UserTests.class.getName());
 	

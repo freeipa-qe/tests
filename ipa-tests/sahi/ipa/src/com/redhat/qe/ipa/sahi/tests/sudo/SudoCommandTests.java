@@ -17,6 +17,12 @@ import com.redhat.qe.ipa.sahi.base.SahiTestScript;
 import com.redhat.qe.ipa.sahi.tasks.CommonTasks;
 import com.redhat.qe.ipa.sahi.tasks.SudoTasks;
 
+/*
+ * Comments from review: 
+ * 53. SudoCommandTests.testMultipleSudoCommandDelete should verify the
+deletion.
+ */
+
 public class SudoCommandTests extends SahiTestScript {
 	private static Logger log = Logger.getLogger(SudoCommandTests.class.getName());
 	

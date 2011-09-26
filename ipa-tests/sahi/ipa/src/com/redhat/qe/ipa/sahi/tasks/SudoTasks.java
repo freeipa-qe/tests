@@ -769,15 +769,15 @@ public class SudoTasks {
 	
 	public static void deleteFromCommandGroup (SahiTasks sahiTasks, String command, String commandGroup, String buttonToClick) {
 
-		sahiTasks.link(command).click(); 
+		sahiTasks.link(commandGroup).click(); 
 		sahiTasks.link("member_sudocmd").click();
-		sahiTasks.checkbox(commandGroup).click();
+		sahiTasks.checkbox(command).click();
 		sahiTasks.span("Delete").click();
 		sahiTasks.button(buttonToClick).click();
 		
 		if (buttonToClick.equals("Cancel")) {
 			//Uncheck the box for this Rule
-			sahiTasks.checkbox(commandGroup).click();
+			sahiTasks.checkbox(command).click();
 		}
 		
 		sahiTasks.link("Sudo Commands").in(sahiTasks.div("content")).click();

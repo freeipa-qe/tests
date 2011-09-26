@@ -22,6 +22,28 @@ import com.redhat.qe.ipa.sahi.tasks.SudoTasks;
 import com.redhat.qe.ipa.sahi.tasks.UserTasks;
 import com.redhat.qe.ipa.sahi.tests.sudo.SudoTests;
 
+
+/*
+ * 
+ * Comments from review: 
+ * 50. The SudoTests.testMultipleSudoRuleDelete should verify the deletion.
+
+51. In SudoTests we can verify that the 'Who' list is independent from
+the 'As Whom' list. We should be able to add/delete a user/group to/from
+either/both lists.
+
+52. We could also verify that the user's Sudo Rules tab corresponds to
+the Sudo rule's 'Who' list but not the 'As Whom' list.
+
+51. In SudoTests we can verify that the 'Groups of RunAs Users' list is
+independent from the 'RunAs Groups' list. We should be able to
+add/delete a group to/from either/both lists.
+
+52. In SudoTests we can test adding external users under 'Who' and
+external hosts under 'Access This Host'.
+
+ */
+
 public class SudoTests extends SahiTestScript{
 	private static Logger log = Logger.getLogger(SudoTests.class.getName());
 	

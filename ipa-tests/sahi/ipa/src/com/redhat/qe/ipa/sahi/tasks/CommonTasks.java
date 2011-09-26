@@ -328,7 +328,8 @@ public class CommonTasks {
 
 	
 	/*
-	 * 
+	 * When modifying an object, and updating its desc to have trailing/leading space, it throws an error. 
+	 * This method can be used to edit the desc, and then check for this error
 	 */
 	public static void modifyToInvalidSetting(SahiTasks sahiTasks, String cn, String description, String expectedError) {		
 		sahiTasks.link(cn).click();
@@ -337,7 +338,7 @@ public class CommonTasks {
 		sahiTasks.textbox("description").setValue(description);
 		sahiTasks.span("Update").click();
 		Assert.assertTrue(sahiTasks.div(expectedError).exists(), "Verified expected error when adding modifying host group :: " + expectedError);
-		sahiTasks.button("OK").click();
+		sahiTasks.button("Cancel").click();
 		sahiTasks.span("undo").click();
 		//in calling test, make sure to navigate back to page with cn
 	}

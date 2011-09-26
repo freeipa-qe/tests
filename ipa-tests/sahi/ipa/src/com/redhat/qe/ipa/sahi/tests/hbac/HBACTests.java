@@ -44,6 +44,16 @@ the entries in that category are deleted. //done
   There is only "all" category for object type that can be associated with a rule and it is not editable.  I do not think they 
   should be displayed on the main page at all.  I think just the rule name (link), description and whether the rule is enabled or disabled.
   // logged bug 738038
+   * 
+   * 
+   *  more comments:
+   * 48. In HBACTests we could verify that the 'Accessing' list is
+independent from the 'From' list. We should be able to add/delete a
+host/hostgroup to/from either/both lists.
+
+49. We could also verify that the host's HBAC Rules tab corresponds to
+the HBAC rule's 'Accessing' list but not the 'From' list.
+
 
  */
 

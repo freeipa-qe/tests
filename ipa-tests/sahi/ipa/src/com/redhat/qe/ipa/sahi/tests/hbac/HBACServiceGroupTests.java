@@ -19,6 +19,16 @@ import com.redhat.qe.ipa.sahi.tasks.HBACTasks;
 import com.redhat.qe.ipa.sahi.tasks.SudoTasks;
 import com.redhat.qe.ipa.sahi.tests.user.UserTests;
 
+
+/*
+ * Comments from review
+ * 46. In HBACServiceGroupTests we can verify that removing a service group
+will remove the group from the member service's memberof list.
+
+47. HBACServiceGroupTests.testMultipleHBACServiceGroupDelete should
+verify the deletion.
+ */
+
 public class HBACServiceGroupTests extends SahiTestScript{
 private static Logger log = Logger.getLogger(UserTests.class.getName());
 	
