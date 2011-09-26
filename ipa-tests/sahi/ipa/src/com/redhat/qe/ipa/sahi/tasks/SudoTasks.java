@@ -261,6 +261,37 @@ public class SudoTasks {
 		}
 	}
 	
+	/*
+	 * modify to add external user and host
+	 */
+	public static void modifySudoRuleExternalUserHostSetting(SahiTasks sahiTasks, String cn, String externalUser, String externalHost ) {
+		sahiTasks.link(cn).click();
+		
+		sahiTasks.span("Add").under(sahiTasks.heading2(("Who"))).near(sahiTasks.span("Users")).click();
+		sahiTasks.textbox("external").setValue(externalUser);
+		sahiTasks.span(">>").click();
+		sahiTasks.button("Enroll").click();
+		
+		sahiTasks.span("Add").under(sahiTasks.heading2(("Access this host"))).near(sahiTasks.span("Hosts")).click();
+		sahiTasks.textbox("external").setValue(externalHost);
+		sahiTasks.link(">>").click();
+		sahiTasks.button("Enroll").click();
+		
+		sahiTasks.link("Sudo Rules").in(sahiTasks.div("content")).click();			
+	}
+	
+	/*
+	 * verify adding external user and host
+	 */
+	public static void verifySudoRuleExternalUserHostSetting(SahiTasks sahiTasks, String cn, String externalUser, String externalHost ) {
+		sahiTasks.link(cn).click();
+		
+		Assert.assertTrue(sahiTasks.checkbox(externalUser).under(sahiTasks.heading2(("Who"))).exists(), "Verified user " + externalUser + " added for Rule " + cn);
+		Assert.assertTrue(sahiTasks.checkbox(externalHost).under(sahiTasks.heading2(("Access this host"))).exists(), "Verified Host Group " + externalHost + " added for Rule " + cn);
+		
+	   sahiTasks.link("Sudo Rules").in(sahiTasks.div("content")).click();			
+	}
+	
 	/**
 	 * Modify Who Section for an HBAC Rule
 	 * @param sahiTasks
@@ -780,7 +811,64 @@ public class SudoTasks {
 			sahiTasks.checkbox(command).click();
 		}
 		
-		sahiTasks.link("Sudo Commands").in(sahiTasks.div("content")).click();
+		sahiTasks.link("Sudo Command Groups").in(sahiTasks.div("content")).click();
 	}
 	
+	
+	public static void editSudoCommandGroup(SahiTasks sahiTasks, String cn,	String description, String buttonToClick, boolean isCommandGroup) {
+		
+        String newDescription = "New testing description";
+		sahiTasks.link(cn).click();
+		if (isCommandGroup) {
+			sahiTasks.link("Settings").click();
+		}
+		sahiTasks.textbox("description").setValue(newDescription);
+		
+		if (isCommandGroup) 
+			sahiTasks.link("Sudo Command Groups").in(sahiTasks.div("content")).click();
+		else
+			sahiTasks.link("Sudo Commands").in(sahiTasks.div("content")).click();
+		
+		Assert.assertTrue(sahiTasks.span("Unsaved Changes").exists(), "Verified Error message title");
+		Assert.assertTrue(sahiTasks.div("This page has unsaved changes. Please save or revert.").exists(), "Verified expected error");
+		
+		sahiTasks.button(buttonToClick).click();
+		
+
+		if (buttonToClick.equals("Cancel")){
+			sahiTasks.textbox("description").getValue().equals(newDescription);
+			Assert.assertEquals(sahiTasks.textbox("description").value(), newDescription, "Verified description for service " + cn + " after Cancel");
+			
+			if (isCommandGroup) {
+				sahiTasks.link("Sudo Command Groups").in(sahiTasks.div("content")).click();
+				sahiTasks.button("Reset").click();
+			}
+			else {
+				sahiTasks.link("Sudo Commands").in(sahiTasks.div("content")).click();
+			    sahiTasks.button("Reset").click();
+			}
+		}
+		else if (buttonToClick.equals("Reset")) {
+			sahiTasks.link(cn).click();
+			if (isCommandGroup) {
+				sahiTasks.link("Settings").click();
+			}
+			Assert.assertEquals(sahiTasks.textbox("description").value(), description, "Verified description for service " + cn + " after Reset");
+			if (isCommandGroup) 
+				sahiTasks.link("Sudo Command Groups").in(sahiTasks.div("content")).click();
+			else
+				sahiTasks.link("Sudo Commands").in(sahiTasks.div("content")).click();
+		}
+		else {
+			sahiTasks.link(cn).click();
+			if (isCommandGroup) {
+				sahiTasks.link("Settings").click();
+			}
+			Assert.assertEquals(sahiTasks.textbox("description").value(), newDescription, "Verified description for service " + cn + " after Reset");
+			if (isCommandGroup) 
+				sahiTasks.link("Sudo Command Groups").in(sahiTasks.div("content")).click();
+			else
+				sahiTasks.link("Sudo Commands").in(sahiTasks.div("content")).click();
+		}
+	}
 }

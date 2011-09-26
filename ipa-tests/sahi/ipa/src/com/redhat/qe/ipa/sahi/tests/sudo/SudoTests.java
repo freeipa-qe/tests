@@ -26,7 +26,7 @@ import com.redhat.qe.ipa.sahi.tests.sudo.SudoTests;
 /*
  * 
  * Comments from review: 
- * 50. The SudoTests.testMultipleSudoRuleDelete should verify the deletion.
+ * 50. The SudoTests.testMultipleSudoRuleDelete should verify the deletion. //done
 
 51. In SudoTests we can verify that the 'Who' list is independent from
 the 'As Whom' list. We should be able to add/delete a user/group to/from
@@ -57,7 +57,6 @@ public class SudoTests extends SahiTestScript{
 	private String runAsUID = "runassudousr";
 	private String runAsGivenName = "Sudo";
 	private String runAsSN = "Test2";
-	
 	
 	//Group used in this testsuite
 	private String groupName = "sudogrp";
@@ -273,6 +272,11 @@ public class SudoTests extends SahiTestScript{
 		//mark this rule for deletion
 		SudoTasks.chooseMultiple(sahiTasks, cns);		
 		SudoTasks.deleteMultiple(sahiTasks);
+		
+		//verify rules were deleted 
+		for (String cn : cns) {
+			Assert.assertFalse(sahiTasks.link(cn).exists(), "Verify Sudo Rule " + cn + "  was deleted successfully");
+		}
 	}
 	
 	/*
@@ -400,6 +404,20 @@ public class SudoTests extends SahiTestScript{
 		SudoTasks.undoResetUpdateSudoRuleSections(sahiTasks, cn, "usercategory", "undo");
 		SudoTasks.undoResetUpdateSudoRuleSections(sahiTasks, cn, "usercategory", "Reset");
 		SudoTasks.undoResetUpdateSudoRuleSections(sahiTasks, cn, "usercategory", "Update");
+	}
+	
+	/*
+	 * Add an external user, and an external Host
+	 */
+	@Test (groups={"sudoRuleExternalUserHostSettingsTests"}, description="Verify External User and Host can be added to the rule",
+			dataProvider="getEditSudoRuleExternalUserHostTestObjects", 
+			dependsOnGroups={"sudoRuleAddAndEditTests"})
+	public void testSudoRuleExternalUserHostSettings(String testName, String cn, String externalUser, String externalHost) throws Exception {		
+		//verify rule to be edited exists
+		Assert.assertTrue(sahiTasks.link(cn).exists(), "Verify Rule " + cn + " to be edited exists");
+	
+		SudoTasks.modifySudoRuleExternalUserHostSetting(sahiTasks, cn, externalUser, externalHost);
+		SudoTasks.verifySudoRuleExternalUserHostSetting(sahiTasks, cn, externalUser, externalHost);
 	}
 	
 	
@@ -761,6 +779,23 @@ public class SudoTests extends SahiTestScript{
 		
         //										testname					cn   			
 		ll.add(Arrays.asList(new Object[]{ "create_good_sudorule",			"SudoRule4"      } ));
+		
+		return ll;	
+	}
+	
+	
+	/*
+	 * Data to be used when adding rules 
+	 */
+	@DataProvider(name="getEditSudoRuleExternalUserHostTestObjects")
+	public Object[][] getEditSudoRuleExternalUserHostTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createEditSudoRuleExternalUserHostTestObject());
+	}
+	protected List<List<Object>> createEditSudoRuleExternalUserHostTestObject() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname											cn   			externalUser		externalHost		
+		ll.add(Arrays.asList(new Object[]{ "Verify adding External User and Host to the Rule",		"SudoRule4",	"externaluser",		"external.host.com"      } ));
 		
 		return ll;	
 	}

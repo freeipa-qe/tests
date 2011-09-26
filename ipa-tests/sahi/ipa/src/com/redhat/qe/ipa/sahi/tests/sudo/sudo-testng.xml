@@ -11,6 +11,7 @@
 			    <include name="sudoRuleAddAndAddAnotherTests" />
 			    <include name="sudoRuleCancelAddTests" />
 			    <include name="sudoRuleAddAndEditTests" />
+			    <include name="sudoRuleExternalUserHostSettingsTests"/>
 			    <include name="sudoRuleGeneralSettingsTests" />		    
 			    <include name="sudoRuleOptionsSettingsTests" />
 			    <include name="sudoRuleUserCategorySettingsTests" />
@@ -53,6 +54,7 @@
 		</classes>
 	</test>
 
+
 	<test name="Sudo Command Group Tests">
 	   <packages>
 		     <package name="com.redhat.qe.ipa.sahi.*" />
@@ -71,6 +73,7 @@
 				<include name="sudoCancelDeleteFromCommandGroupTests" />
 				<include name="sudoDeleteFromCommandGroupTests" />
 				<include name="sudoTwoCommandGroupEnrollTests"/>
+				<include name="sudoCommandGroupEditTests"/>
 				<include name="sudoCommandGroupMultipleDeleteTests" />
 				<include name="invalidSudoCommanGroupAddRequiredFieldTests" />
 				<include name="invalidSudoCommanGroupModifyTests" />

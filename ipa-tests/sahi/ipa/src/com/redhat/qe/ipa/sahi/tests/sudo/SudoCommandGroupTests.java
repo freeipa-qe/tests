@@ -15,6 +15,7 @@ import com.redhat.qe.auto.testng.Assert;
 import com.redhat.qe.auto.testng.TestNGUtils;
 import com.redhat.qe.ipa.sahi.base.SahiTestScript;
 import com.redhat.qe.ipa.sahi.tasks.CommonTasks;
+import com.redhat.qe.ipa.sahi.tasks.HBACTasks;
 import com.redhat.qe.ipa.sahi.tasks.SudoTasks;
 import com.redhat.qe.ipa.sahi.tasks.UserTasks;
 
@@ -22,7 +23,7 @@ import com.redhat.qe.ipa.sahi.tasks.UserTasks;
 /*
  * Comments from review:
  * 54. SudoCommandGroupTests.testMultipleSudoCommandGroupDelete should
-verify the deletion.
+verify the deletion. //done
  * 
  */
 public class SudoCommandGroupTests extends SahiTestScript{
@@ -242,8 +243,8 @@ public class SudoCommandGroupTests extends SahiTestScript{
 		//Remove a command
 		SudoTasks.deleteFromCommandGroup(sahiTasks, lsCommandName, commandGroup, "Cancel");
 		
-		//Verify the command was deleted
-		SudoTasks.verifySudoCommandGroupMembership(sahiTasks, lsCommandName, commandGroup, false);
+		//Verify the command was not deleted
+		SudoTasks.verifySudoCommandGroupMembership(sahiTasks, lsCommandName, commandGroup, true);
 	}
 	
 	// Remove a member
@@ -261,7 +262,10 @@ public class SudoCommandGroupTests extends SahiTestScript{
 		SudoTasks.verifySudoCommandGroupMembership(sahiTasks, lsCommandName, commandGroup, false);
 	}
 	
-	// Add a member in 2 groups
+	/*
+	 *  Add a member in 2 groups
+	 *  then delete from each, one by one
+	 */
 	@Test (groups={"sudoTwoCommandGroupEnrollTests"},  description="Enroll a Command into two Command Groups", 
 			dataProvider="getEnrollIntoTwoSudoCommandGroupTestObjects", 
 			dependsOnGroups={"sudoCommandGroupAddAndEditTests", "sudoCommandGroupEnrollTests"})	
@@ -279,15 +283,41 @@ public class SudoCommandGroupTests extends SahiTestScript{
 		//Add a command into this command group
 		SudoTasks.enrollIntoCommandGroup(sahiTasks, vimCommandName, commandGroup2, "Enroll");
 		
-		//TODO : nkrishnan -  Finish the test
+		//verify from sudo command side - that it is member of 2 groups
+		sahiTasks.navigateTo(commonTasks.sudoCommandPage, true);
+		SudoTasks.verifySudoCommandMembership(sahiTasks, vimCommandName, commandGroup1, true);
+		SudoTasks.verifySudoCommandMembership(sahiTasks, vimCommandName, commandGroup2, true);
+		sahiTasks.navigateTo(commonTasks.sudoCommandGroupPage, true);
+		
+		//Remove command from one group
+		SudoTasks.deleteFromCommandGroup(sahiTasks, vimCommandName, commandGroup1, "Delete");
+		
+		//Verify the command was deleted
+		SudoTasks.verifySudoCommandGroupMembership(sahiTasks, vimCommandName, commandGroup1, false);
+		
+		//remove it from the next group
+		SudoTasks.deleteFromCommandGroup(sahiTasks, vimCommandName, commandGroup2, "Delete");
+		
+		//Verify the command was deleted
+		SudoTasks.verifySudoCommandGroupMembership(sahiTasks, vimCommandName, commandGroup2, false);
 	}
 	
-	
-	// Edit group and navigate back and forth
-	
-	// Remove member from one group, then another
+	/*
+	 * Edit an Sudo Command Group to verify
+	 * Cancel/Reset/Update buttons
+	 */
+	@Test (groups={"sudoCommandGroupEditTests"}, description="Verify Cancel/Update/Reset when editing a Command Group",
+			dataProvider="getSudoCommandGroupEditTestObjects", 
+			dependsOnGroups={"sudoCommandGroupAddAndEditTests" })			
+	public void testSudoCommandGroupEdit(String testName, String cn, String description) throws Exception {
+		//verify Sudo Command group to be edited exists
+		Assert.assertTrue(sahiTasks.link(cn).exists(), "Verify Sudo Command Group " + cn + "  to be edited exists");
 		
-	// Edit - undo/reset/update
+		//modify this HBAC Service
+		SudoTasks.editSudoCommandGroup(sahiTasks, cn, description, "Cancel", true);
+		SudoTasks.editSudoCommandGroup(sahiTasks, cn, description, "Reset", true);
+		SudoTasks.editSudoCommandGroup(sahiTasks, cn, description, "Update", true);		
+	}
 	
 	// Search
 	// expand-Collapse
@@ -342,6 +372,11 @@ public class SudoCommandGroupTests extends SahiTestScript{
 		//mark this rule for deletion
 		SudoTasks.chooseMultiple(sahiTasks, cns);		
 		SudoTasks.deleteMultiple(sahiTasks);
+		
+		//verify groups were deleted
+		for (String cn : cns) {
+			Assert.assertFalse(sahiTasks.link(cn).exists(), "Verify Sudo Rule " + cn + "  was deleted successfully");
+		}	
 	}
 	
 	
@@ -628,4 +663,36 @@ public class SudoCommandGroupTests extends SahiTestScript{
 		return ll;	
 	}
 	
+	/*
+	 * Data to be used when cancelling enrolling a command
+	 */
+	@DataProvider(name="getEnrollIntoTwoSudoCommandGroupTestObjects")
+	public Object[][] getEnrollIntoTwoSudoCommandGroupTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createEnrollIntoTwoSudoCommandGroupTestObjects());
+	}
+	protected List<List<Object>> createEnrollIntoTwoSudoCommandGroupTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname								commandGroup1			commandGroup2		desc			 			
+		ll.add(Arrays.asList(new Object[]{ "Enroll a Command into two Command Group",	"dev sudo group",		"qe sudo group",	"adding a command group - testing a command in two groups"	} ));
+		
+		return ll;	
+	}
+	
+	
+	/*
+	 * Data to be used when cancelling deleting a command from a command group
+	 */
+	@DataProvider(name="getSudoCommandGroupEditTestObjects")
+	public Object[][] getSudoCommandGroupEditTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createSudoCommandGroupEditTestObjects());
+	}
+	protected List<List<Object>> createSudoCommandGroupEditTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname																commandGroup		description				 			
+		ll.add(Arrays.asList(new Object[]{ "Verify Cancel/Reset/Update when editing description for Command Group",		"dev sudo group",	"sudo command group for dev"	} ));
+		
+		return ll;	
+	}
 }
