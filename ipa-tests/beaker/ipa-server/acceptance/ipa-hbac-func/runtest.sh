@@ -295,7 +295,7 @@ rlJournalStart
 
         # hbacsvc_client2_002
                 rlRun "rhts-sync-block -s DONE_hbacsvc_master_002 $BEAKERMASTER"
-                hbacsvc_client2_001
+                hbacsvc_client2_002
                 rlRun "rhts-sync-set -s DONE_hbacsvc_client2_002 -m $BEAKERCLIENT2"
 
 	# hbacsvc_client2_002_1
@@ -493,6 +493,7 @@ rlJournalStart
 	        rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 	        rlRun "create_ipauser user$i user$i user$i $userpw"
 	        sleep 5
+		rlRun "export user$i=user$i"
 	done
 	rlPhaseEnd
 
