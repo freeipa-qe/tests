@@ -53,8 +53,8 @@ fixHostFileIPv6()
     #cat /etc/hosts | grep -v ^$ipv6addr > /dev/shm/hosts
 
     # Remove any existing hostname entries from the hosts file
-    sed -i s/$hostname//g /dev/shm/hosts
-    sed -i s/$hostname_s//g /dev/shm/hosts
+    # sed -i s/$hostname//g /dev/shm/hosts
+    # sed -i s/$hostname_s//g /dev/shm/hosts
     echo "$ipv6addr $hostname_s.$DOMAIN $hostname_s" >> /dev/shm/hosts
     cat /dev/shm/hosts > /etc/hosts
     rlLog "Hosts file contains:"
@@ -85,6 +85,7 @@ fixhostname()
 
     return
 }
+
 
 #####################################
 #  	fix resolv.conf             #
@@ -213,42 +214,6 @@ appendEnvIPv6()
   output=`cat /dev/shm/env.sh`
   rlLog "$output"
 }
-
-######################################
-#       Append env.sh for ipv6       #
-######################################
-appendEnvIPv6()
-{
-  ipv6addr=$(nslookup -type=AAAA $MASTER | grep "has AAAA" | awk '{print $5}')
-  # Adding MASTER and SLAVE bits to env.sh
-  master_short=`echo $MASTER | cut -d "." -f1`
-  MASTER=$master_short.$DOMAIN
-  echo "export MASTER=$MASTER" >> /dev/shm/env.sh
-  echo "export MASTERIP=$ipv6addr" >> /dev/shm/env.sh
-  if [ "$SLAVE" != "" ]; then
-        slave_short=`echo $SLAVE | cut -d "." -f1`
-        SLAVE=$slave_short.$DOMAIN
-        slaveipv6addr=$(nslookup -type=AAAA $SLAVE | grep "has AAAA" | awk '{print $5}')
-        echo "export SLAVE=$SLAVE" >> /dev/shm/env.sh
-        echo "export SLAVEIP=$slaveipv6addr" >> /dev/shm/env.sh
-  fi
-  if [ "$CLIENT" != "" ]; then
-        client_short=`echo $CLIENT | cut -d "." -f1`
-        CLIENT=$client_short.$DOMAIN
-        echo "export CLIENT=$CLIENT" >> /dev/shm/env.sh
-  fi
-
-  if [ "$CLIENT2" != "" ]; then
-        client2_short=`echo $CLIENT2 | cut -d "." -f1`
-        CLIENT2=$client2_short.$DOMAIN
-        echo "export CLIENT2=$CLIENT2" >> /dev/shm/env.sh
-  fi
-
-  rlLog "Contents of env.sh are"
-  output=`cat /dev/shm/env.sh`
-  rlLog "$output"
-}
-
 
 #################################################################
 #  SetUpAuthKeys ... all hosts will have the same public and    #

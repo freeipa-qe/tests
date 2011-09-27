@@ -10,20 +10,41 @@ installMaster()
 	if [[ "$IPv6SETUP" != "TRUE" ]] ; then
 		rlRun "fixHostFile" 0 "Set up /etc/hosts"
 		rlRun "fixhostname" 0 "Fix hostname"
+
+	        if [[ "$SKIPINSTALL" != "TRUE" ]] ; then
+        	        echo "ipa-server-install --setup-dns --forwarder=$DNSFORWARD --hostname=$hostname_s.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U" > /dev/shm/installipa.bash
+                	rlLog "EXECUTING: ipa-server-install --setup-dns --forwarder=$DNSFORWARD --hostname=$hostname_s.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U"
+	                setenforce 1
+        	        chmod 755 /dev/shm/installipa.bash
+                	rlRun "/bin/bash /dev/shm/installipa.bash" 0 "Installing IPA Server"
+	                # test kinit
+        	        rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
+	        fi
+
 	else
 		rlRun "fixHostFileIPv6" 0 "Set up /etc/hosts"
                 rlRun "fixhostname" 0 "Fix hostname"
+
+	        if [[ "$SKIPINSTALL" != "TRUE" ]] ; then
+        	        echo "ipa-server-install --setup-dns --hostname=$hostname_s.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U" > /dev/shm/installipa.bash
+                	rlLog "EXECUTING: ipa-server-install --setup-dns --hostname=$hostname_s.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U"
+	                setenforce 1
+        	        chmod 755 /dev/shm/installipa.bash
+                	rlRun "/bin/bash /dev/shm/installipa.bash" 0 "Installing IPA Server"
+	                # test kinit
+        	        rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
+	        fi
 	fi
 
-	if [[ "$SKIPINSTALL" != "TRUE" ]] ; then
-		echo "ipa-server-install --setup-dns --forwarder=$DNSFORWARD --hostname=$hostname_s.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U" > /dev/shm/installipa.bash
-		rlLog "EXECUTING: ipa-server-install --setup-dns --forwarder=$DNSFORWARD --hostname=$hostname_s.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U"
-        	setenforce 1
-		chmod 755 /dev/shm/installipa.bash
-        	rlRun "/bin/bash /dev/shm/installipa.bash" 0 "Installing IPA Server"
-		# test kinit
-		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
-	fi
+#	if [[ "$SKIPINSTALL" != "TRUE" ]] ; then
+#		echo "ipa-server-install --setup-dns --forwarder=$DNSFORWARD --hostname=$hostname_s.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U" > /dev/shm/installipa.bash
+#		rlLog "EXECUTING: ipa-server-install --setup-dns --forwarder=$DNSFORWARD --hostname=$hostname_s.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U"
+#        	setenforce 1
+#		chmod 755 /dev/shm/installipa.bash
+#        	rlRun "/bin/bash /dev/shm/installipa.bash" 0 "Installing IPA Server"
+#		# test kinit
+#		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
+#	fi
 
 	if [ -f /var/log/ipaserver-install.log ]; then
         	rhts-submit-log -l /var/log/ipaserver-install.log
