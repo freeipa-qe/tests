@@ -477,7 +477,7 @@ public class SudoCommandGroupTests extends SahiTestScript{
 	
 	
 	/*
-	 * Data to be used when adding sudo command groups - for positive cases
+	 * Data to be used when adding sudo command groups 
 	 */
 	@DataProvider(name="getSudoCommandGroupInvalidModifyTestObjects")
 	public Object[][] getSudoCommandGroupInvalidModifyTestObjects() {

@@ -698,7 +698,7 @@ public class SudoTasks {
 	}
 	
 	public static void modifySudoruleCommandGroupWithInvalidSetting(SahiTasks sahiTasks, String cn, String description, String expectedError) {
-		CommonTasks.modifyToInvalidSetting(sahiTasks, cn, description, expectedError);
+		CommonTasks.modifyToInvalidSetting(sahiTasks, cn, "description", description, expectedError, "Cancel");
 		sahiTasks.link("Sudo Command Groups").in(sahiTasks.div("content")).click();
 	}
 	

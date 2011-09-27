@@ -33,7 +33,7 @@ users too. It should also test if the host/user is already added
 directly it should not appear again in the available list. //done 
 
 42. Ideally all tests that change the data should be validated via CLI
-too, but this is probably low priority. // TODO: nkrishnan
+too, but this is probably low priority. // TODO: nkrishnan - add a test
 
 43. In HBACTests we could verify that when a category is set to 'all'
 the entries in that category are deleted. //done 
@@ -49,10 +49,10 @@ the entries in that category are deleted. //done
    *  more comments:
    * 48. In HBACTests we could verify that the 'Accessing' list is
 independent from the 'From' list. We should be able to add/delete a
-host/hostgroup to/from either/both lists.
+host/hostgroup to/from either/both lists.// TODO: nkrishnan - add a test
 
 49. We could also verify that the host's HBAC Rules tab corresponds to
-the HBAC rule's 'Accessing' list but not the 'From' list.
+the HBAC rule's 'Accessing' list but not the 'From' list.// TODO: nkrishnan - add a test
 
 
  */

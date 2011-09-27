@@ -19,42 +19,42 @@ import com.redhat.qe.ipa.sahi.tasks.SahiTasks;
 import com.redhat.qe.ipa.sahi.tasks.UserTasks;
 
 /*
- * TODO: nkrishnan:
+ * 
  * Review comments:
  * 1. In UserTests we can include positive tests for valid non-alphanumeric
-chars such as _, -, . and $ in various position within uid.
+chars such as _, -, . and $ in various position within uid. // done
 
 2. In UserTests.userEditTests we could test emptying a text field and
-deleting values from multivalued fields as well.
+deleting values from multivalued fields as well.// TODO: nkrishnan - add a test
 
 3. In UserTests.userAddDeleteUndoResetTests we can verify that the
-undo/reset does revert the fields before leaving the page.
+undo/reset does revert the fields before leaving the page.// TODO: nkrishnan - add a test
 
 4. In UserTests' userEditIdentitySettingsTests,
 testUserEditMailingAddress, and testUserEditEmpMiscInfo we can verify
 that required fields are checked on update (i.e. missing required fields
 will generate a validation error from the UI instead of error message
-from the server).
+from the server).// TODO: nkrishnan - add a test
 
 5. In UserTests.userSetPasswordTests we could test empty, invalid, or
 mismatching passwords. We might also want to verify that the user will
-see the self-service UI instead of the full admin UI.
+see the self-service UI instead of the full admin UI.// TODO: nkrishnan - add a test
 
 6. We could also test adding a user that has actually been added via
 CLI. It should fail, but then automatically refresh the page to show the
-user. Same thing for deleting a user.
+user. Same thing for deleting a user.// TODO: nkrishnan - add a test
 
 7. Similar to #6 but involving multiple users. The error dialog should
-show the users that failed to be added/deleted.
+show the users that failed to be added/deleted.// TODO: nkrishnan - add a test
 
-8. We might want to test the Select/Unselect All checkbox in various tables.
+8. We might want to test the Select/Unselect All checkbox in various tables.// TODO: nkrishnan - add a test
 
 9. In UserTests.userSearchTests we can test different filters, e.g.
-searching using partial uid or last name.
+searching using partial uid or last name.// TODO: nkrishnan - add a test
 
 10. We can test adding/removing a user to/from another entity (i.e.
 groups, netgroups, roles, hbac rules, and sudo rules) using the user's
-member-of tabs.
+member-of tabs.// TODO: nkrishnan - add a test
  */
 
 public class UserTests extends SahiTestScript{
@@ -171,7 +171,9 @@ public class UserTests extends SahiTestScript{
 		UserTasks.verifyUserContactData(sahiTasks, uid, mail3, mail2, mail1, phone1, phone2, pager1, pager2, mobile1, mobile2, fax1, fax2);
 	}
 	
-	@Test (groups={"userAddDeleteUndoResetTests"}, dataProvider="getUserMultipleDataTestObjects", dependsOnGroups={"userAddTests", "userEditTests", "userMultipleDataTests"})	
+	@Test (groups={"userAddDeleteUndoResetTests"}, description="",
+			dataProvider="getUserMultipleDataTestObjects", 
+			dependsOnGroups={"userAddTests", "userEditTests", "userMultipleDataTests"})	
 	public void testUserAddDeleteUndoReset(String testName, String uid, String mail1, String mail2, String	mail3, 
 			String phone1, String phone2, String pager1, String pager2, String mobile1, String mobile2, 
 			String fax1, String fax2) throws Exception {		
@@ -200,6 +202,19 @@ public class UserTests extends SahiTestScript{
 		UserTasks.verifyUserIdentitySettings(sahiTasks, uid, givenname, sn, fullname, displayName, initials);
 	}
 	
+	/*
+	 * Update Identity Settings with invalid data
+	 */
+	@Test (groups={"userEditIdentitySettingsNegativeTests"}, description="Verify Error when editing Identity Settings using invalid data", 
+			dataProvider="getUserEditIdentitySettingsNegativeTestObjects", 
+			dependsOnGroups={"userAddTests"})	
+	public void testUserEditIdentityNegativeSettings(String testName, String uid, String fieldName, String fieldValue, String expectedError, String buttonToClick ) throws Exception {		
+		//verify user to be edited exists
+		Assert.assertTrue(sahiTasks.link(uid).exists(), "Verify user " + uid + " to be edited exists");
+		
+		//modify this user
+		UserTasks.modifyUserIdentitySettingsNegative(sahiTasks, uid, fieldName, fieldValue, expectedError, buttonToClick);
+	}
 	
 	/*
 	 * Update Account Settings
@@ -501,10 +516,11 @@ public class UserTests extends SahiTestScript{
 	protected List<List<Object>> createUserTestObjects() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-        //										testname					uid              		givenname	sn   
-		ll.add(Arrays.asList(new Object[]{ "create_good_user1",				"testuser", 			"Test",		"User"      } ));
-		ll.add(Arrays.asList(new Object[]{ "create_user_with_optional_login","", 					"Test",		"User"      } ));
-		ll.add(Arrays.asList(new Object[]{ "create_good_user2",				    "user2", 			    "Test2",	"User2"     } ));
+        //										testname					uid              			givenname			sn   
+		//ll.add(Arrays.asList(new Object[]{ "Add a user - good",				"testuser", 				"Test",				"User"      } ));
+		//ll.add(Arrays.asList(new Object[]{ "Add a user - optional login",	"", 						"Test",				"User"      } ));
+		ll.add(Arrays.asList(new Object[]{ "Add a user - testuser",			"user2", 			    	"Test2",			"User2"     } ));
+	//	ll.add(Arrays.asList(new Object[]{ "Add a user - special char",		"1spe.cial_us-er$", 		"S$p|e>c--i_a%l_",	"%U&s?e+r(" } ));
 		      
 		return ll;	
 	}
@@ -738,6 +754,24 @@ public class UserTests extends SahiTestScript{
 		return ll;	
 	}
 	
+	/*
+	 * Invalid data to be used when updating Identity Settings for users
+	 */
+	@DataProvider(name="getUserEditIdentitySettingsNegativeTestObjects")
+	public Object[][] getUserEditIdentitySettingsNegativeTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createUserEditIdentitySettingsNegativeTestObjects());
+	}
+	protected List<List<Object>> createUserEditIdentitySettingsNegativeTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname															cn   		fieldName		fieldValue		expected error													 cancel/ok button
+		ll.add(Arrays.asList(new Object[]{ "Verify error: In Identity Settings - firstname has trailing space",		"user2",	"givenname",	"XXX ",			"invalid 'first': Leading and trailing spaces are not allowed",		"Cancel"	} ));
+		ll.add(Arrays.asList(new Object[]{ "Verify error: In Identity Settings - firstname has leading space",		"user2",	"givenname",	" XXX",			"invalid 'first': Leading and trailing spaces are not allowed", 	"Cancel"	} ));
+		ll.add(Arrays.asList(new Object[]{ "Verify error: In Identity Settings - firstname is blank",				"user2",	"givenname",	"",			"Input form contains invalid or missing values.", 					"OK"	} ));
+		
+		
+		return ll;	
+	}
 	
 	/*
 	 * Data to be used when updating Account Settings for users

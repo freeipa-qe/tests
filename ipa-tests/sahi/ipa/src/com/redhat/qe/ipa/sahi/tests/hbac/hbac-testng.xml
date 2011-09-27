@@ -43,6 +43,10 @@
 			    <include name="hbacServiceAddTests" />
 			    <include name="hbacServiceAddAndAddAnotherTests" />
 			    <include name="hbacServiceAddAndEditTests" />
+			    <include name="hbacServiceCancelEnrollTests" />
+			    <include name="hbacServiceEnrollTests" />
+			    <include name="hbacServiceCancelDeleteEnrolledTests" />
+			    <include name="hbacServiceDeleteEnrolledTests" />
 			    <include name="hbacServiceEditTests" />
 			    <include name="hbacServiceCancelAddTests" />
 			    <include name="invalidhbacServiceAddTests" />
@@ -57,7 +61,8 @@
 		    <class name="com.redhat.qe.ipa.sahi.tests.hbac.HBACServiceTests" />
 		</classes>
 	</test>
-	
+
+
 	<test name="HBAC Service Groups Tests">
 		<groups>
 			<run>
@@ -67,6 +72,7 @@
 			    <include name="hbacServiceGroupCancelAddTests" />
 			    <include name="hbacServiceGroupNavigateTests" />
 			    <include name="hbacServiceGroupOneServiceTwoGroupsTests" />
+			    <include name="hbacServiceGroupEnrollServiceDeleteGroupTests"/>
 			    <include name="invalidhbacServiceGroupAddTests" />
 			    <include name="invalidhbacServiceGroupModTests" />
 			    <include name="hbacServiceGroupSearchTests" />

@@ -21,7 +21,7 @@ import com.redhat.qe.ipa.sahi.tasks.SudoTasks;
 /*
  * Comments from review: 
  * 53. SudoCommandTests.testMultipleSudoCommandDelete should verify the
-deletion.
+deletion. //done
  */
 
 public class SudoCommandTests extends SahiTestScript {
@@ -306,13 +306,19 @@ public class SudoCommandTests extends SahiTestScript {
 		String cns[] = {cn1, cn2};
 		
 		
-		//verify rule to be deleted exists
+		//verify command to be deleted exists
 		for (String cn : cns) {
 			Assert.assertTrue(sahiTasks.link(cn).exists(), "Verify Sudo Rule " + cn + "  to be deleted exists");
 		}			
 		//mark this rule for deletion
 		SudoTasks.chooseMultiple(sahiTasks, cns);		
 		SudoTasks.deleteMultiple(sahiTasks);
+		
+		//verify comamnds were deleted
+		for (String cn : cns) {
+			Assert.assertFalse(sahiTasks.link(cn).exists(), "Verify Sudo Rule " + cn + "  was deleted successfully");
+		}
+		
 	}
 	// Add a command to a command group
 	

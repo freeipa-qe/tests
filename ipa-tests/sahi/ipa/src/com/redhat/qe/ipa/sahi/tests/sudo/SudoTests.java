@@ -30,17 +30,17 @@ import com.redhat.qe.ipa.sahi.tests.sudo.SudoTests;
 
 51. In SudoTests we can verify that the 'Who' list is independent from
 the 'As Whom' list. We should be able to add/delete a user/group to/from
-either/both lists.
+either/both lists. // TODO: nkrishnan - add a test
 
 52. We could also verify that the user's Sudo Rules tab corresponds to
-the Sudo rule's 'Who' list but not the 'As Whom' list.
+the Sudo rule's 'Who' list but not the 'As Whom' list. // TODO: nkrishnan - add a test
 
 51. In SudoTests we can verify that the 'Groups of RunAs Users' list is
 independent from the 'RunAs Groups' list. We should be able to
-add/delete a group to/from either/both lists.
+add/delete a group to/from either/both lists. // TODO: nkrishnan - add a test
 
 52. In SudoTests we can test adding external users under 'Who' and
-external hosts under 'Access This Host'.
+external hosts under 'Access This Host'. //done
 
  */
 

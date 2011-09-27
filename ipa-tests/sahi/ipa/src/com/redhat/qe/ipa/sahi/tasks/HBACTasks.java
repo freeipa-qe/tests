@@ -677,8 +677,44 @@ public class HBACTasks {
 				sahiTasks.link("HBAC Services").in(sahiTasks.div("content")).click();
 		}
 	}
-
 	
+	public static void enrollServiceInServiceGroup (SahiTasks sahiTasks, String service, String serviceGroup, String buttonToClick) {
+
+		sahiTasks.link(service).click(); 
+		sahiTasks.link("memberof_hbacsvcgroup").click();
+		sahiTasks.span("Enroll").click();
+		sahiTasks.checkbox(serviceGroup).under(sahiTasks.div("Available")).click();
+		sahiTasks.link(">>").click();
+		sahiTasks.button(buttonToClick).click();
+		sahiTasks.link("HBAC Services").in(sahiTasks.div("content")).click();
+	}
+	
+	
+	public static void deleteServiceFromServiceGroup(SahiTasks sahiTasks, String service, String serviceGroup, String buttonToClick) {
+		sahiTasks.link(service).click();
+		sahiTasks.link("memberof_hbacsvcgroup").click();
+		sahiTasks.checkbox(serviceGroup).click();
+		sahiTasks.span("Delete").near(sahiTasks.span("Enroll")).click();
+		sahiTasks.button(buttonToClick).click();
+		
+		if (buttonToClick.equals("Cancel")) {
+			//Uncheck the box for this Rule
+			sahiTasks.checkbox(serviceGroup).click();
+		}
+		
+		sahiTasks.link("HBAC Services").in(sahiTasks.div("content")).click();
+	}
+
+	public static void verifyHBACServiceMembership(SahiTasks sahiTasks, String service, String serviceGroup, boolean isMember) {
+		sahiTasks.link(service).click();
+		sahiTasks.link("memberof_hbacsvcgroup").click();
+		if (isMember)
+			Assert.assertTrue(sahiTasks.link(serviceGroup).exists(), "Verified " + serviceGroup + " is listed in memberof for service " + service);
+		else
+			Assert.assertFalse(sahiTasks.link(serviceGroup).exists(), "Verified " + serviceGroup + " is not listed in memberof for service " + service);
+		
+		sahiTasks.link("HBAC Services").in(sahiTasks.div("content")).click();
+	}
 	
 	/*****************************************************************************************
 	 *********************** 		Tasks for HBAC Service Groups		********************** 
@@ -752,8 +788,8 @@ public class HBACTasks {
 		
 	}
 
-	public static void deleteServiceFromServiceGroup(SahiTasks sahiTasks, String service, String svcgrp, String buttonToClick) {
-		sahiTasks.link(svcgrp).click();
+	public static void deleteFromServiceGroup(SahiTasks sahiTasks, String service, String serviceGroup, String buttonToClick) {
+		sahiTasks.link(serviceGroup).click();
 		sahiTasks.checkbox(service).click();
 		sahiTasks.span("Delete").near(sahiTasks.span("Enroll")).click();
 		sahiTasks.button(buttonToClick).click();
@@ -781,9 +817,11 @@ public class HBACTasks {
 	}
 	
 	public static void modifyHBACServiceGroupWithInvalidSetting(SahiTasks sahiTasks, String cn, String description, String expectedError) {
-		CommonTasks.modifyToInvalidSetting(sahiTasks, cn, description, expectedError);
+		CommonTasks.modifyToInvalidSetting(sahiTasks, cn, "description", description, expectedError, "Cancel");
 		sahiTasks.link("HBAC Service Groups").in(sahiTasks.div("content")).click();
 	}
+	
+	
 	/*
 	
 	public static void createInvalidHBACServiceGroup(SahiTasks sahiTasks,	String cn, String description, String expectedError) {		

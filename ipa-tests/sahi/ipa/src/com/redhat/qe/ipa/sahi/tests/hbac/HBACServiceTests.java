@@ -16,27 +16,39 @@ import com.redhat.qe.auto.testng.TestNGUtils;
 import com.redhat.qe.ipa.sahi.base.SahiTestScript;
 import com.redhat.qe.ipa.sahi.tasks.CommonTasks;
 import com.redhat.qe.ipa.sahi.tasks.HBACTasks;
-import com.redhat.qe.ipa.sahi.tasks.SahiTasks;
-import com.redhat.qe.ipa.sahi.tasks.SudoTasks;
 import com.redhat.qe.ipa.sahi.tests.user.UserTests;
 
 /*
  * Feedback from review:
  * 44. HBACServiceTests.testMultipleHBACServiceDelete should verify the
-deletion.
+deletion. //done
 
 45. In HBACServiceTests we could try adding/removing a HBAC service
-into/from HBAC service group from the HBAC service association page.
+into/from HBAC service group from the HBAC service association page. //done - 
+added tests: hbacServiceCancelEnrollTests, hbacServiceEnrollTests, hbacServiceCancelDeleteEnrolledTests, hbacServiceDeleteEnrolledTests
  */
 
 public class HBACServiceTests  extends SahiTestScript{
 	private static Logger log = Logger.getLogger(UserTests.class.getName());
+	/*
+	 * PreRequisite - 
+	 */
+	// HBAC Service group used in this testsuite
+	private String serviceGroup = "svc-grp-1";
+	private String description = "set up service group";
 	
 	private String currentPage = "";
 	private String alternateCurrentPage = "";
 	
 	@BeforeClass (groups={"init"}, description="Initialize app for this test suite run", alwaysRun=true, dependsOnGroups="setup")
 	public void initialize() throws CloneNotSupportedException {	
+		
+		//Add the HBAC Service Group, if not available
+		sahiTasks.navigateTo(commonTasks.hbacServiceGroupPage, true);
+		if (!sahiTasks.link(serviceGroup).exists()) {
+			HBACTasks.addHBACService(sahiTasks, serviceGroup, description, "Add");;
+		}
+		
 		sahiTasks.navigateTo(commonTasks.hbacServicePage, true);
 		sahiTasks.setStrictVisibilityCheck(true);
 		currentPage = sahiTasks.fetch("top.location.href");
@@ -49,7 +61,7 @@ public class HBACServiceTests  extends SahiTestScript{
 	    System.out.println("CurrentPageNow: " + currentPageNow);
 	    CommonTasks.checkError(sahiTasks);
 		if (!currentPageNow.equals(currentPage) && !currentPageNow.equals(alternateCurrentPage)) {
-			//CommonTasks.checkError(sahiTasks);
+			//CommonTasks.checkError(sahiTasks);testMultipleHBACServiceDelete
 			System.out.println("Not on expected Page....navigating back from : " + currentPageNow);
 			sahiTasks.navigateTo(commonTasks.hbacServicePage, true);
 		}		
@@ -127,6 +139,93 @@ public class HBACServiceTests  extends SahiTestScript{
 		HBACTasks.createInvalidService(sahiTasks, cn, description, expectedError);		
 	}
 	
+	
+	
+	/*
+	 * Cancel enrolling a HBAC Service to a HBAC Service Group
+	 * 
+	 */
+	@Test (groups={"hbacServiceCancelEnrollTests"},  description="Cancel enrolling a Service into a Service Group", 
+			dataProvider="getCancelEnrollHBACServiceTestObjects", 
+			dependsOnGroups={"hbacServiceAddAndEditTests"})	
+	public void testHBACServiceCancelEnroll(String testName, String service) throws Exception {
+		
+		//verify command exists
+		Assert.assertTrue(sahiTasks.link(service).exists(), "Verify Service " + service + " exists");
+		
+		// Enroll service, but cancel
+		HBACTasks.enrollServiceInServiceGroup(sahiTasks, service, serviceGroup, "Cancel");
+		
+		// Verify membership
+		HBACTasks.verifyHBACServiceMembership(sahiTasks, service, serviceGroup, false);
+		
+	}
+		
+	
+	/*
+	 * Enroll a HBAC Service to a HBAC Service Group
+	 * 
+	 */
+	@Test (groups={"hbacServiceEnrollTests"},  description="Enroll a Service into a Service Group", 
+			dataProvider="getEnrollHBACServiceTestObjects", 
+			dependsOnGroups={"hbacServiceAddAndEditTests", "hbacServiceCancelEnrollTests"})	
+	public void testHBACServiceEnroll(String testName, String service) throws Exception {
+		
+		//verify service exists
+		Assert.assertTrue(sahiTasks.link(service).exists(), "Verify Service " + service + " exists");
+		
+		// Enroll service
+		HBACTasks.enrollServiceInServiceGroup(sahiTasks, service, serviceGroup, "Enroll");
+		
+		// Verify membership
+		HBACTasks.verifyHBACServiceMembership(sahiTasks, service, serviceGroup, true);
+		
+	}
+	
+
+	
+	/*
+	 * Cancel deleting a HBAC Service from a HBAC Service Group
+	 * 
+	 */
+	@Test (groups={"hbacServiceCancelDeleteEnrolledTests"},  description="Cancel deleting an enrolled service from its group",
+			dataProvider="getCancelDelEnrolledHBACServiceTestObjects",
+			dependsOnGroups={"hbacServiceAddAndEditTests", "hbacServiceEnrollTests"})	
+	public void testHBACServiceCancelDeleteEnrolled(String testName, String service) throws Exception {
+		
+		//verify service exists
+		Assert.assertTrue(sahiTasks.link(service).exists(), "Verify Command " + service + " exists");
+		
+		// Enroll service
+		HBACTasks.deleteServiceFromServiceGroup(sahiTasks, service, serviceGroup,  "Cancel");
+		
+		// Verify membership
+		HBACTasks.verifyHBACServiceMembership(sahiTasks, service, serviceGroup, true);
+		
+	}
+	
+
+	/*
+	 * Delete a HBAC Service from a HBAC Service Group
+	 * 
+	 */
+	@Test (groups={"hbacServiceDeleteEnrolledTests"},  description="Delete an enrolled service from its group", 
+			dataProvider="getDeleteEnrolledHBACServiceTestObjects",
+			dependsOnGroups={"hbacServiceAddAndEditTests", "hbacServiceEnrollTests", "hbacServiceCancelDeleteEnrolledTests"})	
+	public void testHBACServiceDeleteEnrolled(String testName, String service) throws Exception {
+		
+		//verify service exists
+		Assert.assertTrue(sahiTasks.link(service).exists(), "Verify Service " + service + " exists");
+		
+		// Enroll service
+		HBACTasks.deleteServiceFromServiceGroup(sahiTasks, service, serviceGroup, "Delete");
+		
+		// Verify membership
+		HBACTasks.verifyHBACServiceMembership(sahiTasks, service, serviceGroup, false);
+		
+	}
+	
+	
 	/*
 	 * Delete multiple HBAC Services
 	 */
@@ -135,13 +234,18 @@ public class HBACServiceTests  extends SahiTestScript{
 		String cns[] = {cn1, cn2, cn3};
 		
 		
-		//verify rule to be deleted exists
+		//verify services to be deleted exist
 		for (String cn : cns) {
 			Assert.assertTrue(sahiTasks.link(cn).exists(), "Verify HBAC Service " + cn + "  to be deleted exists");
 		}			
 		//mark this rule for deletion
 		HBACTasks.chooseMultiple(sahiTasks, cns);		
 		HBACTasks.deleteMultiple(sahiTasks);
+		
+		//verify services were deleted 
+		for (String cn : cns) {
+			Assert.assertTrue(sahiTasks.link(cn).exists(), "Verify HBAC Service " + cn + "  was deleted successfully");
+		}	
 	}
 	
 	
@@ -227,10 +331,15 @@ public class HBACServiceTests  extends SahiTestScript{
 		//verify rules were found
 		for (String hbacRuleTestObject : hbacRuleTestObjects) {
 			if (sahiTasks.link(hbacRuleTestObject.toLowerCase()).exists()){
-				log.fine("Cleaning Sudo Rule: " + hbacRuleTestObject);
+				log.fine("Cleaning HBAC Rule: " + hbacRuleTestObject);
 				HBACTasks.deleteHBAC(sahiTasks, hbacRuleTestObject.toLowerCase(), "Delete");
 			}			
 		} 
+		
+		sahiTasks.navigateTo(commonTasks.hbacServiceGroupPage, true);
+		if (sahiTasks.link(serviceGroup).exists()){
+			HBACTasks.deleteHBAC(sahiTasks, serviceGroup, "Delete");
+		}
 		
 	}
 	
@@ -364,4 +473,68 @@ public class HBACServiceTests  extends SahiTestScript{
 	}
 	
 	
+	/*
+	 * Data to be used when cancelling enrolling a service 
+	 */
+	@DataProvider(name="getCancelEnrollHBACServiceTestObjects")
+	public Object[][] getCancelEnrollHBACServiceTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createCancelEnrollHBACServiceTestObject());
+	}
+	protected List<List<Object>> createCancelEnrollHBACServiceTestObject() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname											cn				   
+		ll.add(Arrays.asList(new Object[]{ "Cancel enrolling a Service into a Service Group",		"ntpd"      } ));
+		
+		return ll;	
+	}
+	
+	
+	/*
+	 * Data to be used when enrolling a service 
+	 */
+	@DataProvider(name="getEnrollHBACServiceTestObjects")
+	public Object[][] getEnrollHBACServiceTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createEnrollHBACServiceTestObject());
+	}
+	protected List<List<Object>> createEnrollHBACServiceTestObject() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname											cn				   
+		ll.add(Arrays.asList(new Object[]{ "Enroll a Service into a Service Group",		"ntpd"      } ));
+		
+		return ll;	
+	}
+	
+	/*
+	 * Data to be used when cancelling deleting a service from its group 
+	 */
+	@DataProvider(name="getCancelDelEnrolledHBACServiceTestObjects")
+	public Object[][] getCancelDelEnrolledHBACServiceTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createCancelDelEnrolledHBACServiceTestObject());
+	}
+	protected List<List<Object>> createCancelDelEnrolledHBACServiceTestObject() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname											cn				   
+		ll.add(Arrays.asList(new Object[]{ "Cancel deleting an enrolled service from its group",	"ntpd"      } ));
+		
+		return ll;	
+	}
+	
+	/*
+	 * Data to be used when deleting a service from its group 
+	 */
+	@DataProvider(name="getDeleteEnrolledHBACServiceTestObjects")
+	public Object[][] getDeleteEnrolledHBACServiceTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createDeleteEnrolledHBACServiceTestObject());
+	}
+	protected List<List<Object>> createDeleteEnrolledHBACServiceTestObject() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname									cn				   
+		ll.add(Arrays.asList(new Object[]{ "Delete an enrolled service from its group",		"ntpd"      } ));
+		
+		return ll;	
+	}
 }

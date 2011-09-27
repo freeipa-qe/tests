@@ -331,14 +331,14 @@ public class CommonTasks {
 	 * When modifying an object, and updating its desc to have trailing/leading space, it throws an error. 
 	 * This method can be used to edit the desc, and then check for this error
 	 */
-	public static void modifyToInvalidSetting(SahiTasks sahiTasks, String cn, String description, String expectedError) {		
+	public static void modifyToInvalidSetting(SahiTasks sahiTasks, String cn, String fieldNameToUpdate, String description, String expectedError, String buttonToClick) {		
 		sahiTasks.link(cn).click();
 		sahiTasks.link("Settings").click();
-		sahiTasks.textbox("description").setValue(" ");
-		sahiTasks.textbox("description").setValue(description);
+		sahiTasks.textbox(fieldNameToUpdate).setValue(" ");
+		sahiTasks.textbox(fieldNameToUpdate).setValue(description);
 		sahiTasks.span("Update").click();
-		Assert.assertTrue(sahiTasks.div(expectedError).exists(), "Verified expected error when adding modifying host group :: " + expectedError);
-		sahiTasks.button("Cancel").click();
+		Assert.assertTrue(sahiTasks.div(expectedError).exists(), "Verified expected error  :: " + expectedError);
+		sahiTasks.button(buttonToClick).click();
 		sahiTasks.span("undo").click();
 		//in calling test, make sure to navigate back to page with cn
 	}

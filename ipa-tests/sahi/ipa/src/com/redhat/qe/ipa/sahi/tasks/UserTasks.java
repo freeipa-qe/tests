@@ -111,6 +111,12 @@ public class UserTasks {
 		sahiTasks.link("Users").in(sahiTasks.div("content")).click();
 	}
 	
+	public static void modifyUserIdentitySettingsNegative(SahiTasks sahiTasks, String uid, String fieldName, String fieldValue, String expectedError, String buttonToClick ) {
+		CommonTasks.modifyToInvalidSetting(sahiTasks, uid, fieldName, fieldValue, expectedError, buttonToClick);
+		
+		sahiTasks.link("Users").in(sahiTasks.div("content")).click();
+	}
+	
 	public static void modifyUserAccountSettings(SahiTasks sahiTasks, String uid, String uidnumber, String gidnumber, String loginshell, String homedirectory) {
 		//click on user to edit
 		sahiTasks.link(uid).click();
@@ -265,6 +271,7 @@ public class UserTasks {
 		//Edit - then undo
 		sahiTasks.textbox("telephonenumber").setValue(phone+phone);
 		sahiTasks.span("undo").click();
+		
 		
 		sahiTasks.link("Users").in(sahiTasks.div("content")).click();
 	}

@@ -23,10 +23,10 @@ import com.redhat.qe.ipa.sahi.tests.user.UserTests;
 /*
  * Comments from review
  * 46. In HBACServiceGroupTests we can verify that removing a service group
-will remove the group from the member service's memberof list.
+will remove the group from the member service's memberof list. //done - testHBACServiceGroupEnrollServiceDeleteGroup()
 
 47. HBACServiceGroupTests.testMultipleHBACServiceGroupDelete should
-verify the deletion.
+verify the deletion. //done
  */
 
 public class HBACServiceGroupTests extends SahiTestScript{
@@ -60,7 +60,7 @@ private static Logger log = Logger.getLogger(UserTests.class.getName());
 	@Test (groups={"hbacServiceGroupAddTests"}, dataProvider="getHBACServiceGroupTestObjects")	
 	public void testHBACServiceGroupAdd(String testName, String cn, String description) throws Exception {
 		//verify rule doesn't exist
-		Assert.assertFalse(sahiTasks.link(cn.toLowerCase()).exists(), "Verify HBAC Service " + cn + " doesn't already exist");
+		Assert.assertFalse(sahiTasks.link(cn.toLowerCase()).exists(), "Verify HBAC Service Group" + cn + " doesn't already exist");
 		
 		HBACTasks.addHBACService(sahiTasks, cn, description, "Add");
 		
@@ -170,7 +170,9 @@ private static Logger log = Logger.getLogger(UserTests.class.getName());
 	 * Enroll same service in 2 different groups, then delete from one group, then delete 
 	 * the service (thus deleting from the other group)
 	 */
-	@Test (groups={"hbacServiceGroupOneServiceTwoGroupsTests"}, dataProvider="getHBACServiceGroupOneServiceTwoGroupsTestObjects", dependsOnGroups={"hbacServiceGroupAddAndAddAnotherTests" })	
+	@Test (groups={"hbacServiceGroupOneServiceTwoGroupsTests"}, description="Enroll svc in 2 grps, del from one, then another, verify memberships",
+			dataProvider="getHBACServiceGroupOneServiceTwoGroupsTestObjects", 
+			dependsOnGroups={"hbacServiceGroupAddAndAddAnotherTests" })	
 	public void testHBACServiceGroupOneServiceTwoGroups(String testName, String service, String svcgrp1, String svcgrp2, String svcDescription) throws Exception {
 		//add a service - rlogin
 		sahiTasks.navigateTo(commonTasks.hbacServicePage, true);
@@ -184,15 +186,42 @@ private static Logger log = Logger.getLogger(UserTests.class.getName());
 		HBACTasks.verifyServicesInServiceGroup(sahiTasks, service, svcgrp1, true);
 		HBACTasks.verifyServicesInServiceGroup(sahiTasks, service, svcgrp2, true);
 		
-		HBACTasks.deleteServiceFromServiceGroup(sahiTasks, service, svcgrp1, "Delete");
+		HBACTasks.deleteFromServiceGroup(sahiTasks, service, svcgrp1, "Delete");
 		HBACTasks.verifyServicesInServiceGroup(sahiTasks, service, svcgrp1, false);
 		HBACTasks.verifyServicesInServiceGroup(sahiTasks, service, svcgrp2, true);
 		
 		sahiTasks.navigateTo(commonTasks.hbacServicePage, true);
 		HBACTasks.deleteHBAC(sahiTasks, service, "Delete");
 		sahiTasks.navigateTo(commonTasks.hbacServiceGroupPage, true);
-		HBACTasks.verifyServicesInServiceGroup(sahiTasks, service, svcgrp2, false);
+		HBACTasks.verifyServicesInServiceGroup(sahiTasks, service, svcgrp2, false);		
 	}
+	
+	/*
+	 * Enroll service in a group. Verify memberships. Now delete the service group, and 
+	 * verify membership for the service
+	 */
+	@Test (groups={"hbacServiceGroupEnrollServiceDeleteGroupTests"}, description="Enroll service, delete group, verify membership of service",
+			dataProvider="getHBACServiceGroupEnrollServiceDeleteGroupTestObjects")	
+	public void testHBACServiceGroupEnrollServiceDeleteGroup(String testName, String service, String svcgrp, String description) throws Exception {
+		Assert.assertFalse(sahiTasks.link(svcgrp).exists(), "Verify HBAC Service Group " + svcgrp + "  to be added does not exist");
+		
+		//add the service group
+		HBACTasks.addHBACService(sahiTasks, svcgrp, description, "Add");
+		//enroll service
+		HBACTasks.enrollServiceinServiceGroup(sahiTasks, svcgrp, service);
+		//verify membership
+		sahiTasks.navigateTo(commonTasks.hbacServicePage, true);
+		HBACTasks.verifyHBACServiceMembership(sahiTasks, service, svcgrp, true);
+		sahiTasks.navigateTo(commonTasks.hbacServiceGroupPage, true);
+		//delete service group
+		HBACTasks.deleteHBAC(sahiTasks, svcgrp, "Delete");
+		//verify membership
+		sahiTasks.navigateTo(commonTasks.hbacServicePage, true);
+		HBACTasks.verifyHBACServiceMembership(sahiTasks, service, svcgrp, false);
+		sahiTasks.navigateTo(commonTasks.hbacServiceGroupPage, true);
+		
+	}
+	
 	
 	
 	/*
@@ -216,7 +245,7 @@ private static Logger log = Logger.getLogger(UserTests.class.getName());
 		Assert.assertTrue(sahiTasks.link(svcgrp).exists(), "Verify HBAC Service Group " + svcgrp + "  to be edited exists");
 		HBACTasks.verifyServicesInServiceGroup(sahiTasks, service, svcgrp, true);
 		
-		HBACTasks.deleteServiceFromServiceGroup(sahiTasks, service, svcgrp, "Delete");
+		HBACTasks.deleteFromServiceGroup(sahiTasks, service, svcgrp, "Delete");
 		HBACTasks.verifyServicesInServiceGroup(sahiTasks, service, svcgrp, false);
 	}
 	
@@ -230,7 +259,7 @@ private static Logger log = Logger.getLogger(UserTests.class.getName());
 		Assert.assertTrue(sahiTasks.link(svcgrp).exists(), "Verify HBAC Service Group " + svcgrp + "  to be edited exists");
 		HBACTasks.verifyServicesInServiceGroup(sahiTasks, service, svcgrp, true);
 		
-		HBACTasks.deleteServiceFromServiceGroup(sahiTasks, service, svcgrp, "Cancel");
+		HBACTasks.deleteFromServiceGroup(sahiTasks, service, svcgrp, "Cancel");
 		HBACTasks.verifyServicesInServiceGroup(sahiTasks, service, svcgrp, true);
 	}
 	
@@ -292,13 +321,18 @@ private static Logger log = Logger.getLogger(UserTests.class.getName());
 		String cns[] = {cn1, cn2, cn3};
 		
 		
-		//verify rule to be deleted exists
+		//verify service groups to be deleted exist
 		for (String cn : cns) {
 			Assert.assertTrue(sahiTasks.link(cn).exists(), "Verify HBAC Service Groups " + cn + "  to be deleted exists");
 		}			
 		//mark this rule for deletion
 		HBACTasks.chooseMultiple(sahiTasks, cns);		
 		HBACTasks.deleteMultiple(sahiTasks);
+		
+		//verify service groups were deleted
+		for (String cn : cns) {
+			Assert.assertFalse(sahiTasks.link(cn).exists(), "Verify HBAC Service Groups " + cn + "  was deleted successfully");
+		}
 	}
 	
 	
@@ -465,11 +499,28 @@ private static Logger log = Logger.getLogger(UserTests.class.getName());
 	protected List<List<Object>> createHBACServiceGroupOneServiceTwoGroupsTestObjects() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-        //										testname							service			svcgrp1			svcgrp2			description	   
-		ll.add(Arrays.asList(new Object[]{ "one_hbacservice_two_hbacservicegroups",	"rlogin",		"login1",		"login2",		"testing rlogin service"      } ));
+        //										testname															service			svcgrp1			svcgrp2			description	   
+		ll.add(Arrays.asList(new Object[]{ "Enroll svc in 2 grps, del from one, then another, verify memberships",	"rlogin",		"login1",		"login2",		"testing rlogin service"      } ));
 		
 		return ll;	
 	}
+	
+	/*
+	 * Data to be used when enrolling/deleting service from service group 
+	 */
+	@DataProvider(name="getHBACServiceGroupEnrollServiceDeleteGroupTestObjects")
+	public Object[][] getHBACServiceGroupEnrollServiceDeleteGroupTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createHBACServiceGroupEnrollServiceDeleteGroupTestObjects());
+	}
+	protected List<List<Object>> createHBACServiceGroupEnrollServiceDeleteGroupTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname						service				svcgrp   		description
+		ll.add(Arrays.asList(new Object[]{ "hbacservice_in_hbacservicegroup",	"gdm-password",		"hbac group3", 	"this group will be deleted"		      } ));
+		
+		return ll;	
+	}
+	
 	
 	/*
 	 * Data to be used when enrolling/deleting service from service group 
@@ -481,8 +532,8 @@ private static Logger log = Logger.getLogger(UserTests.class.getName());
 	protected List<List<Object>> useServiceInHBACServiceGroupTestObjects() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-        //										testname						service		svcgrp   
-		ll.add(Arrays.asList(new Object[]{ "hbacservice_in_hbacservicegroup",	"gdm",		"web"		      } ));
+        //										testname													service		svcgrp   
+		ll.add(Arrays.asList(new Object[]{ "Enroll service, delete group, verify membership of service",	"gdm",		"web"		      } ));
 		
 		return ll;	
 	}
