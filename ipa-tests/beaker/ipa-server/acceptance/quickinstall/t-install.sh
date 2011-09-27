@@ -25,6 +25,7 @@ installMaster()
 		rlRun "fixHostFileIPv6" 0 "Set up /etc/hosts"
                 rlRun "fixhostname" 0 "Fix hostname"
 		rlRun "cat /etc/krb5.conf"
+		rlRun "fixForwarderIPv6" 0 "Fix DNSFORWARD"
 
 	        if [[ "$SKIPINSTALL" != "TRUE" ]] ; then
         	        echo "ipa-server-install --setup-dns --no-forwarders --hostname=$hostname_s.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U" > /dev/shm/installipa.bash
