@@ -19,7 +19,7 @@
 				<and>
 					<distro_variant op="=" value="Server"/>
 					<distro_arch op="=" value="x86_64"/>
-					<distro_tag op="=" value="RELEASED"/>
+					<distro_tag op="=" value="STABLE"/>
 					<distro_family op="=" value="RedHatEnterpriseLinux6"/>
 					<distro_method op="=" value="nfs"/>
 				</and>
@@ -52,12 +52,13 @@
 			<ks_appends/>
 			<repos>
 				<repo name="ipa" url="http://mickey.dsdev.sjc.redhat.com/repos/pki/ipa/devel/rhel6/devel_x86_64/x86_64"/>
+				<repo name="ipa-noarch" url="http://mickey.dsdev.sjc.redhat.com/repos/pki/ipa/devel/rhel6/devel_x86_64/noarch"/>
 			</repos>
 			<distroRequires>
 				<and>
 					<distro_variant op="=" value="Server"/>
 					<distro_arch op="=" value="x86_64"/>
-					<distro_tag op="=" value="RELEASED"/>
+					<distro_tag op="=" value="STABLE"/>
 					<distro_family op="=" value="RedHatEnterpriseLinux6"/>
 					<distro_method op="=" value="nfs"/>
 				</and>
@@ -91,12 +92,13 @@
 			<ks_appends/>
 			<repos>
 				<repo name="ipa" url="http://mickey.dsdev.sjc.redhat.com/repos/pki/ipa/devel/rhel6/devel_x86_64/x86_64"/>
+				<repo name="ipa-noarch" url="http://mickey.dsdev.sjc.redhat.com/repos/pki/ipa/devel/rhel6/devel_x86_64/noarch"/>
 			</repos>
 			<distroRequires>
 				<and>
 					<distro_variant op="=" value="Server"/>
 					<distro_arch op="=" value="x86_64"/>
-					<distro_tag op="=" value="RELEASED"/>
+					<distro_tag op="=" value="STABLE"/>
 					<distro_family op="=" value="RedHatEnterpriseLinux6"/>
 					<distro_method op="=" value="nfs"/>
 				</and>
