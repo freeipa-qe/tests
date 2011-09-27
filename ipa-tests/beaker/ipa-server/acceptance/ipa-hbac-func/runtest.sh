@@ -94,6 +94,9 @@ rlJournalStart
 
                 rlRun "rhts-sync-block -s DONE_master_setup $BEAKERMASTER"
                 rlRun "rhts-sync-set -s DONE_client1_setup -m $BEAKERCLIENT"
+	rlPhaseEnd
+
+        rlPhaseStartTest "CLIENT1 tests start"
 
 	# hbacsvc_client_001
                 rlRun "rhts-sync-block -s DONE_hbacsvc_master_001 $BEAKERMASTER"
@@ -293,6 +296,9 @@ rlJournalStart
 
 		rlRun "rhts-sync-block -s DONE_master_setup $BEAKERMASTER"
 		rlRun "rhts-sync-set -s DONE_client2_setup -m $BEAKERCLIENT2"
+	rlPhaseEnd
+
+        rlPhaseStartTest "CLIENT2 tests start"
 
 	# hbacsvc_client2_001
 		rlRun "rhts-sync-block -s DONE_hbacsvc_master_001 $BEAKERMASTER"
