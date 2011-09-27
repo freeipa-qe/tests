@@ -92,6 +92,9 @@ rlJournalStart
                 rlRun "service iptables stop" 0 "Stop the firewall on the client"
 		rlRun "cat /etc/krb5.conf"
 
+                rlRun "rhts-sync-block -s DONE_master_setup $BEAKERMASTER"
+                rlRun "rhts-sync-set -s DONE_client1_setup -m $BEAKERCLIENT"
+
 	# hbacsvc_client_001
                 rlRun "rhts-sync-block -s DONE_hbacsvc_master_001 $BEAKERMASTER"
                 hbacsvc_client_001
@@ -287,6 +290,9 @@ rlJournalStart
                 rlLog "Machine in recipe is CLIENT2"
                 rlRun "service iptables stop" 0 "Stop the firewall on the client"
 		rlRun "cat /etc/krb5.conf"
+
+		rlRun "rhts-sync-block -s DONE_master_setup $BEAKERMASTER"
+		rlRun "rhts-sync-set -s DONE_client2_setup -m $BEAKERCLIENT2"
 
 	# hbacsvc_client2_001
 		rlRun "rhts-sync-block -s DONE_hbacsvc_master_001 $BEAKERMASTER"
@@ -495,6 +501,10 @@ rlJournalStart
 	        sleep 5
 		rlRun "export user$i=user$i"
 	done
+		# adding additional sync-set and sync-block so that tests are not
+		# executed before the clients are ready
+		rlRun "rhts-sync-set -s DONE_master_setup -m $BEAKERMASTER"
+		rlRun "rhts-sync-block -s DONE_client1_setup -s DONE_client2_setup $BEAKERCLIENT $BEAKERCLIENT2"
 	rlPhaseEnd
 
 	rlPhaseStartTest "MASTER tests start"
