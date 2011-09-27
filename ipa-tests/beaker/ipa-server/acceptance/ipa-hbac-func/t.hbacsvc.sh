@@ -163,13 +163,13 @@ hbacsvc_master_002_1() {
 
         # ipa hbactest:
 
-                rlRun "ipa hbactest --user=$user1 --srchost=$CLIENT2 --host=$MASTER --service=vsftpd | grep -Ex '(Access granted: True|  matched: rule2)'" 1
+                rlRun "ipa hbactest --user=$user1 --srchost=$CLIENT2 --host=$MASTER --service=vsftpd | grep -Ex '(Access granted: True|  matched: rule2)'" 
                 rlRun "ipa hbactest --user=$user2 --srchost=$CLIENT2 --host=$MASTER --service=vsftpd | grep -i \"Access granted: False\""
                 rlRun "ipa hbactest --user=$user1 --srchost=$CLIENT --host=$MASTER --service=vsftpd | grep -i \"Access granted: False\""
                 rlRun "ipa hbactest --user=$user1 --srchost=$CLIENT2 --host=$CLIENT --service=vsftpd | grep -i \"Access granted: False\""
                 rlRun "ipa hbactest --user=$user1 --srchost=$CLIENT --host=$CLIENT2 --service=vsftpd | grep -i \"Access granted: False\""
 
-                rlRun "ipa hbactest --user=$user1 --srchost=$CLIENT2 --host=$MASTER --service=vsftpd --rule=rule2 | grep -Ex '(Access granted: True|  matched: rule2)'" 1
+                rlRun "ipa hbactest --user=$user1 --srchost=$CLIENT2 --host=$MASTER --service=vsftpd --rule=rule2 | grep -Ex '(Access granted: True|  matched: rule2)'" 
                 rlRun "ipa hbactest --user=$user1 --srchost=$CLIENT --host=$MASTER --service=vsftpd --rule=rule1 | grep -Ex '(Access granted: False|  notmatched: rule1)'"
                 rlRun "ipa hbactest --user=$user2 --srchost=$CLIENT2 --host=$MASTER --service=vsftpd --rule=rule1 | grep -Ex '(Access granted: False|  notmatched: rule1)'"
                 rlRun "ipa hbactest --srchost=$CLIENT2 --host=$MASTER --service=vsftpd  --user=$user1 --rule=rule1 --nodetail | grep -i \"Access granted: True\"" 1
@@ -299,22 +299,22 @@ hbacsvc_master_004() {
 
 hbacsvc_client_004() {
 
-        rlPhaseStartTest "ipa-hbacsvc-client1-004: $user4 accessing hostgroup from $CLIENT2"
+        rlPhaseStartTest "ipa-hbacsvc-client1-004: user4 accessing hostgroup from $CLIENT2"
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-                rlRun "getent -s sss passwd $user4"
-                rlRun "ssh_auth_success $user4 testpw123@ipa.com $CLIENT2"
+                rlRun "getent -s sss passwd user4"
+                rlRun "ssh_auth_success user4 testpw123@ipa.com $CLIENT2"
 
         rlPhaseEnd
 }
 
 hbacsvc_client2_004() {
 
-        rlPhaseStartTest "ipa-hbacsvc-client2-004: $user4 accessing hostgroup from $CLIENT"
+        rlPhaseStartTest "ipa-hbacsvc-client2-004: user4 accessing hostgroup from $CLIENT"
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 rlRun "getent -s sss passwd $user4"
-                rlRun "ssh_auth_failure $user4 testpw123@ipa.com $CLIENT2"
+                rlRun "ssh_auth_failure user4 testpw123@ipa.com $CLIENT2"
 
         rlPhaseEnd
 
@@ -355,22 +355,22 @@ hbacsvc_master_005() {
 
 hbacsvc_client_005() {
 
-        rlPhaseStartTest "ipa-hbacsvc-client1-005: $user5 accessing $CLIENT from hostgroup"
+        rlPhaseStartTest "ipa-hbacsvc-client1-005: user5 accessing $CLIENT from hostgroup"
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-                rlRun "getent -s sss passwd $user5"
-                rlRun "ssh_auth_success $user5 testpw123@ipa.com $CLIENT"
+                rlRun "getent -s sss passwd user5"
+                rlRun "ssh_auth_success user5 testpw123@ipa.com $CLIENT"
 
         rlPhaseEnd
 }
 
 hbacsvc_client2_005() {
 
-        rlPhaseStartTest "ipa-hbacsvc-client2-005: $user5 accessing $CLIENT from hostgroup"
+        rlPhaseStartTest "ipa-hbacsvc-client2-005: user5 accessing $CLIENT from hostgroup"
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-                rlRun "getent -s sss passwd $user5"
-                rlRun "ssh_auth_failure $user5 testpw123@ipa.com $CLIENT"
+                rlRun "getent -s sss passwd user5"
+                rlRun "ssh_auth_failure user5 testpw123@ipa.com $CLIENT"
 
         rlPhaseEnd
 }
@@ -403,22 +403,22 @@ hbacsvc_master_005_1() {
 
 hbacsvc_client_005_1() {
 
-        rlPhaseStartTest "ipa-hbacsvc-client1-005_1: $user5 is removed from rule5"
+        rlPhaseStartTest "ipa-hbacsvc-client1-005_1: user5 is removed from rule5"
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-                rlRun "getent -s sss passwd $user5"
-                rlRun "ssh_auth_failure $user5 testpw123@ipa.com $CLIENT"
+                rlRun "getent -s sss passwd user5"
+                rlRun "ssh_auth_failure user5 testpw123@ipa.com $CLIENT"
 
         rlPhaseEnd
 }
 
 hbacsvc_client2_005_1() {
 
-        rlPhaseStartTest "ipa-hbacsvc-client2-005_1: $user5 is removed from rule5"
+        rlPhaseStartTest "ipa-hbacsvc-client2-005_1: user5 is removed from rule5"
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-                rlRun "getent -s sss passwd $user5"
-                rlRun "ssh_auth_failure $user5 testpw123@ipa.com $CLIENT"
+                rlRun "getent -s sss passwd user5"
+                rlRun "ssh_auth_failure user5 testpw123@ipa.com $CLIENT"
 
         rlPhaseEnd
 }
@@ -461,22 +461,22 @@ hbacsvc_master_006() {
 
 hbacsvc_client_006() {
 
-        rlPhaseStartTest "ipa-hbacsvc-client1-006: $user6 accessing hostgroup2 from hostgroup"
+        rlPhaseStartTest "ipa-hbacsvc-client1-006: user6 accessing hostgroup2 from hostgroup"
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-                rlRun "getent -s sss passwd $user6"
-                rlRun "ssh_auth_failure $user6 testpw123@ipa.com $CLIENT2"
+                rlRun "getent -s sss passwd user6"
+                rlRun "ssh_auth_failure user6 testpw123@ipa.com $CLIENT2"
 
         rlPhaseEnd
 }
 
 hbacsvc_client2_006() {
 
-        rlPhaseStartTest "ipa-hbacsvc-client2-006: $user6 accessing hostgroup2 from hostgroup"
+        rlPhaseStartTest "ipa-hbacsvc-client2-006: user6 accessing hostgroup2 from hostgroup"
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-                rlRun "getent -s sss passwd $user6"
-                rlRun "ssh_auth_success $user6 testpw123@ipa.com $CLIENT"
+                rlRun "getent -s sss passwd user6"
+                rlRun "ssh_auth_success user6 testpw123@ipa.com $CLIENT"
 
         rlPhaseEnd
 
@@ -498,7 +498,7 @@ hbacsvc_master_007() {
                 rlRun "ipa hbacrule-add-user rule7 --users=$user7"
                 rlRun "ipa hbacrule-add-host rule7 --hostgroups=hostgrp7"
                 rlRun "ipa hbacrule-add-sourcehost rule7 --hostgroups=hostgrp7-2"
-		rlRun "ipa hbacrule-add-service rule7 --hbacsvcgroups=sshd"
+		rlRun "ipa hbacrule-add-service rule7 --hbacsvcs=sshd"
                 rlRun "ipa hbacrule-show rule7 --all"
 
         # ipa hbactest:
@@ -519,22 +519,22 @@ hbacsvc_master_007() {
 
 hbacsvc_client_007() {
 
-        rlPhaseStartTest "ipa-hbacsvc-client1-007: $user7 accessing hostgroup2 from hostgroup - hbacsvcgrp"
+        rlPhaseStartTest "ipa-hbacsvc-client1-007: user7 accessing hostgroup2 from hostgroup - hbacsvcgrp"
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-                rlRun "getent -s sss passwd $user7"
-                rlRun "ssh_auth_failure $user7 testpw123@ipa.com $CLIENT"
+                rlRun "getent -s sss passwd user7"
+                rlRun "ssh_auth_failure user7 testpw123@ipa.com $CLIENT"
 
         rlPhaseEnd
 }
 
 hbacsvc_client2_007() {
 
-        rlPhaseStartTest "ipa-hbacsvc-client2-007: $user7 accessing hostgroup2 from hostgroup - hbacsvcgrp"
+        rlPhaseStartTest "ipa-hbacsvc-client2-007: user7 accessing hostgroup2 from hostgroup - hbacsvcgrp"
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-                rlRun "getent -s sss passwd $user7"
-                rlRun "ssh_auth_success $user7 testpw123@ipa.com $CLIENT"
+                rlRun "getent -s sss passwd user7"
+                rlRun "ssh_auth_success user7 testpw123@ipa.com $CLIENT"
 
         rlPhaseEnd
 
@@ -569,29 +569,29 @@ hbacsvc_master_007_1() {
 
 hbacsvc_client_007_1() {
 
-        rlPhaseStartTest "ipa-hbacsvc-client1-007_1: $user7 accessing hostgroup2 from hostgroup - hbacsvcgrp"
+        rlPhaseStartTest "ipa-hbacsvc-client1-007_1: user7 accessing hostgroup2 from hostgroup - hbacsvcgrp"
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-                rlRun "getent -s sss passwd $user7"
-                rlRun "ssh_auth_failure $user7 testpw123@ipa.com $CLIENT"
+                rlRun "getent -s sss passwd user7"
+                rlRun "ssh_auth_failure user7 testpw123@ipa.com $CLIENT"
 
         rlPhaseEnd
 }
 
 hbacsvc_client2_007_1() {
 
-        rlPhaseStartTest "ipa-hbacsvc-client2-007_1: $user7 accessing hostgroup2 from hostgroup - hbacsvcgrp"
+        rlPhaseStartTest "ipa-hbacsvc-client2-007_1: user7 accessing hostgroup2 from hostgroup - hbacsvcgrp"
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-                rlRun "getent -s sss passwd $user7"
-                rlRun "ssh_auth_failure $user7 testpw123@ipa.com $CLIENT"
+                rlRun "getent -s sss passwd user7"
+                rlRun "ssh_auth_failure user7 testpw123@ipa.com $CLIENT"
 
         rlPhaseEnd
 
 }
 
 hbacsvc_master_008() {
-        rlPhaseStartTest "ipa-hbacsvc-008: $user8 from grp8 part of rule8 is allowed to access $CLIENT2 from $CLIENT"
+        rlPhaseStartTest "ipa-hbacsvc-008: user8 from grp8 part of rule8 is allowed to access $CLIENT2 from $CLIENT"
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 rlRun "ipa hbacrule-disable allow_all"
@@ -625,22 +625,22 @@ hbacsvc_master_008() {
 
 hbacsvc_client_008() {
 
-        rlPhaseStartTest "ipa-hbacsvc-client1-008: $user8 from grp8 part of rule8 is allowed to access $CLIENT2 from $CLIENT"
+        rlPhaseStartTest "ipa-hbacsvc-client1-008: user8 from grp8 part of rule8 is allowed to access $CLIENT2 from $CLIENT"
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-                rlRun "getent -s sss passwd $user8"
-                rlRun "ssh_auth_success $user8 testpw123@ipa.com $CLIENT2"
+                rlRun "getent -s sss passwd user8"
+                rlRun "ssh_auth_success user8 testpw123@ipa.com $CLIENT2"
 
         rlPhaseEnd
 }
 
 hbacsvc_client2_008() {
 
-        rlPhaseStartTest "ipa-hbacsvc-client2-008: $user8 from grp8 part of rule8 is allowed to access $CLIENT2 from $CLIENT"
+        rlPhaseStartTest "ipa-hbacsvc-client2-008: user8 from grp8 part of rule8 is allowed to access $CLIENT2 from $CLIENT"
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-                rlRun "getent -s sss passwd $user8"
-                rlRun "ssh_auth_failure $user8 testpw123@ipa.com $CLIENT2"
+                rlRun "getent -s sss passwd user8"
+                rlRun "ssh_auth_failure user8 testpw123@ipa.com $CLIENT2"
 
         rlPhaseEnd
 
@@ -675,21 +675,21 @@ hbacsvc_master_008_1() {
 
 hbacsvc_client_008_1() {
 
-        rlPhaseStartTest "ipa-hbacsvc-client1-008_1: $user8 from grp8 part of rule8 is allowed to access $CLIENT2 from $CLIENT"
+        rlPhaseStartTest "ipa-hbacsvc-client1-008_1: user8 from grp8 part of rule8 is allowed to access $CLIENT2 from $CLIENT"
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-                rlRun "getent -s sss passwd $user8"
-                rlRun "ssh_auth_failure $user8 testpw123@ipa.com $CLIENT2"
+                rlRun "getent -s sss passwd user8"
+                rlRun "ssh_auth_failure user8 testpw123@ipa.com $CLIENT2"
 
         rlPhaseEnd
 }
 
 hbacsvc_client2_008_1() {
 
-        rlPhaseStartTest "ipa-hbacsvc-client2-008_1: $user8 from grp8 part of rule8 is allowed to access $CLIENT2 from $CLIENT"
+        rlPhaseStartTest "ipa-hbacsvc-client2-008_1: user8 from grp8 part of rule8 is allowed to access $CLIENT2 from $CLIENT"
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-                rlRun "getent -s sss passwd $user8"
+                rlRun "getent -s sss passwd user8"
                 rlRun "ssh_auth_failure $user8 testpw123@ipa.com $CLIENT2"
 
         rlPhaseEnd
@@ -711,7 +711,7 @@ hbacsvc_master_009() {
                 rlRun "ipa hbacrule-add-user rule9 --groups=group9"
                 rlRun "ipa hbacrule-add-host rule9 --hosts=$CLIENT2"
                 rlRun "ipa hbacrule-add-sourcehost rule9 --hosts=$CLIENT"
-		rlRun "ipa hbacrule-add-service rule9 --hbacsvcgroup=sshd"
+		rlRun "ipa hbacrule-add-service rule9 --hbacsvcs=sshd"
                 rlRun "ipa hbacrule-show rule9 --all"
 
         # ipa hbactest:
@@ -733,22 +733,22 @@ hbacsvc_master_009() {
 
 hbacsvc_client_009() {
 
-        rlPhaseStartTest "ipa-hbacsvc-client1-009: $user9 from grp9 part of rule9 is allowed to access $CLIENT2 from $CLIENT"
+        rlPhaseStartTest "ipa-hbacsvc-client1-009: user9 from grp9 part of rule9 is allowed to access $CLIENT2 from $CLIENT"
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-                rlRun "getent -s sss passwd $user9"
-                rlRun "ssh_auth_success $user9 testpw123@ipa.com $CLIENT2"
+                rlRun "getent -s sss passwd user9"
+                rlRun "ssh_auth_success user9 testpw123@ipa.com $CLIENT2"
 
         rlPhaseEnd
 }
 
 hbacsvc_client2_009() {
 
-        rlPhaseStartTest "ipa-hbacsvc-client2-009: $user9 from grp9 part of rule9 is allowed to access $CLIENT2 from $CLIENT"
+        rlPhaseStartTest "ipa-hbacsvc-client2-009: user9 from grp9 part of rule9 is allowed to access $CLIENT2 from $CLIENT"
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-                rlRun "getent -s sss passwd $user9"
-                rlRun "ssh_auth_failure $user9 testpw123@ipa.com $CLIENT2"
+                rlRun "getent -s sss passwd user9"
+                rlRun "ssh_auth_failure user9 testpw123@ipa.com $CLIENT2"
 
         rlPhaseEnd
 
@@ -760,7 +760,8 @@ hbacsvc_master_009_1() {
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 rlRun "ipa hbacrule-disable allow_all"
 
-                rlRun "ipa hbacrule-add-user rule9 --groups=group9"
+		# Already this has been added as member in hbacsvc_master_009
+                # rlRun "ipa hbacrule-add-user rule9 --groups=group9"
                 rlRun "ipa hbacrule-show rule9 --all"
 
         # ipa hbactest:
@@ -785,8 +786,8 @@ hbacsvc_client_009_1() {
         rlPhaseStartTest "ipa-hbacsvc-client1-009_1: grp9 removed from rule9 which was allowed to access $CLIENT2 from $CLIENT"
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-                rlRun "getent -s sss passwd $user9"
-                rlRun "ssh_auth_failure $user9 testpw123@ipa.com $CLIENT2"
+                rlRun "getent -s sss passwd user9"
+                rlRun "ssh_auth_failure user9 testpw123@ipa.com $CLIENT2"
 
         rlPhaseEnd
 }
@@ -796,8 +797,8 @@ hbacsvc_client2_009_1() {
         rlPhaseStartTest "ipa-hbacsvc-client2-009_1: grp9 removed from rule9 which was allowed to access $CLIENT2 from $CLIENT"
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-                rlRun "getent -s sss passwd $user9"
-                rlRun "ssh_auth_failure $user9 testpw123@ipa.com $CLIENT2"
+                rlRun "getent -s sss passwd user9"
+                rlRun "ssh_auth_failure user9 testpw123@ipa.com $CLIENT2"
 
         rlPhaseEnd
 
@@ -817,7 +818,7 @@ hbacsvc_master_010() {
 
                 rlRun "ipa hbacrule-add rule10"
                 rlRun "ipa hbacrule-add-user rule10 --groups=group10"
-                rlRun "ipa hbacrule-add-host rule10 --hosts=hostgroup10"
+                rlRun "ipa hbacrule-add-host rule10 --hostgroups=hostgroup10"
                 rlRun "ipa hbacrule-add-sourcehost rule10 --hosts=$CLIENT"
 		rlRun "ipa hbacrule-add-service rule10 --hbacsvcs=sshd"
                 rlRun "ipa hbacrule-show rule10 --all"
@@ -841,22 +842,22 @@ hbacsvc_master_010() {
 
 hbacsvc_client_010() {
 
-        rlPhaseStartTest "ipa-hbacsvc-client1-010: $user10 from grp10 part of rule10 is allowed to access hostgrp from $CLIENT"
+        rlPhaseStartTest "ipa-hbacsvc-client1-010: user10 from grp10 part of rule10 is allowed to access hostgrp from $CLIENT"
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-                rlRun "getent -s sss passwd $user10"
-                rlRun "ssh_auth_success $user10 testpw123@ipa.com $CLIENT2"
+                rlRun "getent -s sss passwd user10"
+                rlRun "ssh_auth_success user10 testpw123@ipa.com $CLIENT2"
 
         rlPhaseEnd
 }
 
 hbacsvc_client2_010() {
 
-        rlPhaseStartTest "ipa-hbacsvc-client2-010: $user10 from grp10 part of rule10 is allowed to access hostgrp from $CLIENT"
+        rlPhaseStartTest "ipa-hbacsvc-client2-010: user10 from grp10 part of rule10 is allowed to access hostgrp from $CLIENT"
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-                rlRun "getent -s sss passwd $user10"
-                rlRun "ssh_auth_failure $user10 testpw123@ipa.com $CLIENT2"
+                rlRun "getent -s sss passwd user10"
+                rlRun "ssh_auth_failure user10 testpw123@ipa.com $CLIENT2"
 
         rlPhaseEnd
 
@@ -877,7 +878,7 @@ hbacsvc_master_011() {
                 rlRun "ipa hbacrule-add-user rule11 --groups=group11"
                 rlRun "ipa hbacrule-add-host rule11 --hosts=$CLIENT2"
                 rlRun "ipa hbacrule-add-sourcehost rule11 --hosts=hostgroup11"
-		rlRun "ipa hbacrule-add-service rule11 --hbacsvcgroup=sshd"
+		rlRun "ipa hbacrule-add-service rule11 --hbacsvcs=sshd"
                 rlRun "ipa hbacrule-show rule11 --all"
 
         # ipa hbactest:
@@ -899,22 +900,22 @@ hbacsvc_master_011() {
 
 hbacsvc_client_011() {
 
-        rlPhaseStartTest "ipa-hbacsvc-client1-011: $user11 from grp11 part of rule11 is allowed to access $CLIENT2 from hostgrp - hbacsvcgrp"
+        rlPhaseStartTest "ipa-hbacsvc-client1-011: user11 from grp11 part of rule11 is allowed to access $CLIENT2 from hostgrp - hbacsvcgrp"
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-                rlRun "getent -s sss passwd $user11"
-                rlRun "ssh_auth_success $user11 testpw123@ipa.com $CLIENT2"
+                rlRun "getent -s sss passwd user11"
+                rlRun "ssh_auth_success user11 testpw123@ipa.com $CLIENT2"
 
         rlPhaseEnd
 }
 
 hbacsvc_client2_011() {
 
-        rlPhaseStartTest "ipa-hbacsvc-client2-011: $user11 from grp11 part of rule11 is allowed to access hostgrp from $CLIENT"
+        rlPhaseStartTest "ipa-hbacsvc-client2-011: user11 from grp11 part of rule11 is allowed to access hostgrp from $CLIENT"
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-                rlRun "getent -s sss passwd $user11"
-                rlRun "ssh_auth_failure $user11 testpw123@ipa.com $CLIENT2"
+                rlRun "getent -s sss passwd user11"
+                rlRun "ssh_auth_failure user11 testpw123@ipa.com $CLIENT2"
 
         rlPhaseEnd
 
@@ -927,7 +928,7 @@ hbacsvc_master_011_1() {
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 rlRun "ipa hbacrule-disable allow_all"
 
-                rlRun "ipa hbacrule-remove-service rule11 --hbacsvcgroup=sshd"
+                rlRun "ipa hbacrule-remove-service rule11 --hbacsvcs=sshd"
                 rlRun "ipa hbacrule-show rule11 --all"
 
         # ipa hbactest:
@@ -952,8 +953,8 @@ hbacsvc_client_011_1() {
         rlPhaseStartTest "ipa-hbacsvc-client1-011_1: sshd service group removed from rule11 which was allowed to access $CLIENT2 from hostgrp - hbacsvcgrp"
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-                rlRun "getent -s sss passwd $user11"
-                rlRun "ssh_auth_failure $user11 testpw123@ipa.com $CLIENT2"
+                rlRun "getent -s sss passwd user11"
+                rlRun "ssh_auth_failure user11 testpw123@ipa.com $CLIENT2"
 
         rlPhaseEnd
 }
@@ -963,8 +964,8 @@ hbacsvc_client2_011_1() {
         rlPhaseStartTest "ipa-hbacsvc-client2-011_1: sshd service group removed from rule11 which was allowed to access $CLIENT2 from hostgrp - hbacsvcgrp"
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-                rlRun "getent -s sss passwd $user11"
-                rlRun "ssh_auth_failure $user11 testpw123@ipa.com $CLIENT2"
+                rlRun "getent -s sss passwd user11"
+                rlRun "ssh_auth_failure user11 testpw123@ipa.com $CLIENT2"
 
         rlPhaseEnd
 
@@ -986,7 +987,7 @@ hbacsvc_master_012() {
                 rlRun "ipa hbacrule-add-user rule12 --groups=group12"
                 rlRun "ipa hbacrule-add-host rule12 --hosts=$CLIENT2"
                 rlRun "ipa hbacrule-add-sourcehost rule12 --hosts=hostgroup12"
-		rlRun "ipa hbacrule-add-service rule12 --hbacsvcgroup=sshd"
+		rlRun "ipa hbacrule-add-service rule12 --hbacsvcgroups=sshd"
                 rlRun "ipa hbacrule-show rule12 --all"
 
         # ipa hbactest:
@@ -1008,22 +1009,22 @@ hbacsvc_master_012() {
 
 hbacsvc_client_012() {
 
-        rlPhaseStartTest "ipa-hbacsvc-client1-012: $user12 from grp12 part of rule12 is allowed to access $CLIENT2 from hostgrp - hbacsvcgrp"
+        rlPhaseStartTest "ipa-hbacsvc-client1-012: user12 from grp12 part of rule12 is allowed to access $CLIENT2 from hostgrp - hbacsvcgrp"
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-                rlRun "getent -s sss passwd $user12"
-                rlRun "ssh_auth_failure $user12 testpw123@ipa.com $CLIENT"
+                rlRun "getent -s sss passwd user12"
+                rlRun "ssh_auth_failure user12 testpw123@ipa.com $CLIENT"
 
         rlPhaseEnd
 }
 
 hbacsvc_client2_012() {
 
-        rlPhaseStartTest "ipa-hbacsvc-client2-012: $user12 from grp12 part of rule12 is allowed to access hostgrp from $CLIENT"
+        rlPhaseStartTest "ipa-hbacsvc-client2-012: user12 from grp12 part of rule12 is allowed to access hostgrp from $CLIENT"
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-                rlRun "getent -s sss passwd $user12"
-                rlRun "ssh_auth_success $user12 testpw123@ipa.com $CLIENT"
+                rlRun "getent -s sss passwd user12"
+                rlRun "ssh_auth_success user12 testpw123@ipa.com $CLIENT"
 
         rlPhaseEnd
 
@@ -1069,22 +1070,22 @@ hbacsvc_master_013() {
 
 hbacsvc_client_013() {
 
-        rlPhaseStartTest "ipa-hbacsvc-client1-013: $user13 from grp13 part of rule13 is allowed to access hostgrp from hostgrp2"
+        rlPhaseStartTest "ipa-hbacsvc-client1-013: user13 from grp13 part of rule13 is allowed to access hostgrp from hostgrp2"
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-                rlRun "getent -s sss passwd $user13"
-                rlRun "ssh_auth_success $user13 testpw133@ipa.com $CLIENT2"
+                rlRun "getent -s sss passwd user13"
+                rlRun "ssh_auth_success user13 testpw133@ipa.com $CLIENT2"
 
         rlPhaseEnd
 }
 
 hbacsvc_client2_013() {
 
-        rlPhaseStartTest "ipa-hbacsvc-client2-013: $user13 from grp13 part of rule13 is allowed to access hostgrp from hostgrp2"
+        rlPhaseStartTest "ipa-hbacsvc-client2-013: user13 from grp13 part of rule13 is allowed to access hostgrp from hostgrp2"
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-                rlRun "getent -s sss passwd $user13"
-                rlRun "ssh_auth_failure $user13 testpw133@ipa.com $CLIENT2"
+                rlRun "getent -s sss passwd user13"
+                rlRun "ssh_auth_failure user13 testpw133@ipa.com $CLIENT2"
 
         rlPhaseEnd
 
@@ -1109,7 +1110,7 @@ hbacsvc_master_014() {
                 rlRun "ipa hbacrule-add-user rule14 --groups=group14"
                 rlRun "ipa hbacrule-add-host rule14 --hosts=hostgroup14"
                 rlRun "ipa hbacrule-add-sourcehost rule14 --hosts=hostgroup14-2"
-		rlRun "ipa hbacrule-add-service rule14 --hbacsvcgroup=sshd"
+		rlRun "ipa hbacrule-add-service rule14 --hbacsvcs=sshd"
                 rlRun "ipa hbacrule-show rule14 --all"
 
         # ipa hbactest:
@@ -1131,22 +1132,22 @@ hbacsvc_master_014() {
 
 hbacsvc_client_014() {
 
-        rlPhaseStartTest "ipa-hbacsvc-client1-014: $user14 from grp14 part of rule14 is allowed to access hostgrp from hostgrp2"
+        rlPhaseStartTest "ipa-hbacsvc-client1-014: user14 from grp14 part of rule14 is allowed to access hostgrp from hostgrp2"
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-                rlRun "getent -s sss passwd $user14"
-                rlRun "ssh_auth_success $user14 testpw143@ipa.com $CLIENT2"
+                rlRun "getent -s sss passwd user14"
+                rlRun "ssh_auth_success user14 testpw143@ipa.com $CLIENT2"
 
         rlPhaseEnd
 }
 
 hbacsvc_client2_014() {
 
-        rlPhaseStartTest "ipa-hbacsvc-client2-014: $user14 from grp14 part of rule14 is allowed to access hostgrp from hostgrp2"
+        rlPhaseStartTest "ipa-hbacsvc-client2-014: user14 from grp14 part of rule14 is allowed to access hostgrp from hostgrp2"
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-                rlRun "getent -s sss passwd $user14"
-                rlRun "ssh_auth_failure $user14 testpw143@ipa.com $CLIENT2"
+                rlRun "getent -s sss passwd user14"
+                rlRun "ssh_auth_failure user14 testpw143@ipa.com $CLIENT2"
 
         rlPhaseEnd
 
@@ -1189,22 +1190,22 @@ hbacsvc_master_015() {
 
 hbacsvc_client_015() {
 
-        rlPhaseStartTest "ipa-hbacsvc-client1-015: $user15 from grp15 part of rule15 is allowed to access hostgrp from hostgrp2"
+        rlPhaseStartTest "ipa-hbacsvc-client1-015: user15 from grp15 part of rule15 is allowed to access hostgrp from hostgrp2"
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-                rlRun "getent -s sss passwd $user15"
-                rlRun "ssh_auth_failure $user15 testpw153@ipa.com $CLIENT"
+                rlRun "getent -s sss passwd user15"
+                rlRun "ssh_auth_failure user15 testpw153@ipa.com $CLIENT"
 
         rlPhaseEnd
 }
 
 hbacsvc_client2_015() {
 
-        rlPhaseStartTest "ipa-hbacsvc-client2-015: $user15 from grp15 part of rule15 is allowed to access hostgrp from hostgrp2"
+        rlPhaseStartTest "ipa-hbacsvc-client2-015: user15 from grp15 part of rule15 is allowed to access hostgrp from hostgrp2"
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-                rlRun "getent -s sss passwd $user15"
-                rlRun "ssh_auth_success $user15 testpw153@ipa.com $CLIENT"
+                rlRun "getent -s sss passwd user15"
+                rlRun "ssh_auth_success user15 testpw153@ipa.com $CLIENT"
 
         rlPhaseEnd
 
@@ -1238,22 +1239,22 @@ hbacsvc_master_015_1() {
 
 hbacsvc_client_015_1() {
 
-        rlPhaseStartTest "ipa-hbacsvc-client1-015_1: $user15 removed from rule15 which was allowed to access $CLIENT from $CLIENT2"
+        rlPhaseStartTest "ipa-hbacsvc-client1-015_1: user15 removed from rule15 which was allowed to access $CLIENT from $CLIENT2"
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-                rlRun "getent -s sss passwd $user15"
-                rlRun "ssh_auth_failure $user15 testpw153@ipa.com $CLIENT"
+                rlRun "getent -s sss passwd user15"
+                rlRun "ssh_auth_failure user15 testpw153@ipa.com $CLIENT"
 
         rlPhaseEnd
 }
 
 hbacsvc_client2_015_1() {
 
-        rlPhaseStartTest "ipa-hbacsvc-client2-015_1: $user15 removed from rule15 which was allowed to access $CLIENT from $CLIENT2"
+        rlPhaseStartTest "ipa-hbacsvc-client2-015_1: user15 removed from rule15 which was allowed to access $CLIENT from $CLIENT2"
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-                rlRun "getent -s sss passwd $user15"
-                rlRun "ssh_auth_failure $user15 testpw153@ipa.com $CLIENT"
+                rlRun "getent -s sss passwd user15"
+                rlRun "ssh_auth_failure user15 testpw153@ipa.com $CLIENT"
 
         rlPhaseEnd
 
@@ -1276,7 +1277,7 @@ hbacsvc_master_016() {
                 rlRun "ipa hbacrule-add-user rule16 --groups=group16"
                 rlRun "ipa hbacrule-add-host rule16 --hosts=$CLIENT"
                 rlRun "ipa hbacrule-add-sourcehost rule16 --hosts=$CLIENT2"
-		rlRun "ipa hbacrule-add-service rule16 --hbacsvcgroup=sshd"
+		rlRun "ipa hbacrule-add-service rule16 --hbacsvcs=sshd"
                 rlRun "ipa hbacrule-show rule16 --all"
 
         # ipa hbactest:
@@ -1297,22 +1298,22 @@ hbacsvc_master_016() {
 
 hbacsvc_client_016() {
 
-        rlPhaseStartTest "ipa-hbacsvc-client1-016: $user16 from grp16 part of rule16 is allowed to access hostgrp from hostgrp2 - hbacsvcgrp"
+        rlPhaseStartTest "ipa-hbacsvc-client1-016: user16 from grp16 part of rule16 is allowed to access hostgrp from hostgrp2 - hbacsvcgrp"
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-                rlRun "getent -s sss passwd $user16"
-                rlRun "ssh_auth_failure $user16 testpw163@ipa.com $CLIENT"
+                rlRun "getent -s sss passwd user16"
+                rlRun "ssh_auth_failure user16 testpw163@ipa.com $CLIENT"
 
         rlPhaseEnd
 }
 
 hbacsvc_client2_016() {
 
-        rlPhaseStartTest "ipa-hbacsvc-client2-016: $user16 from grp16 part of rule16 is allowed to access hostgrp from hostgrp2 - hbacsvcgrp"
+        rlPhaseStartTest "ipa-hbacsvc-client2-016: user16 from grp16 part of rule16 is allowed to access hostgrp from hostgrp2 - hbacsvcgrp"
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-                rlRun "getent -s sss passwd $user16"
-                rlRun "ssh_auth_success $user16 testpw163@ipa.com $CLIENT"
+                rlRun "getent -s sss passwd user16"
+                rlRun "ssh_auth_success user16 testpw163@ipa.com $CLIENT"
 
         rlPhaseEnd
 
@@ -1346,22 +1347,22 @@ hbacsvc_master_016_1() {
 
 hbacsvc_client_016_1() {
 
-        rlPhaseStartTest "ipa-hbacsvc-client1-016_1: $user16 removed from rule16 which was allowed to access $CLIENT from $CLIENT2 - hbacsvcgroup"
+        rlPhaseStartTest "ipa-hbacsvc-client1-016_1: user16 removed from rule16 which was allowed to access $CLIENT from $CLIENT2 - hbacsvcgroup"
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-                rlRun "getent -s sss passwd $user16"
-                rlRun "ssh_auth_failure $user16 testpw163@ipa.com $CLIENT"
+                rlRun "getent -s sss passwd user16"
+                rlRun "ssh_auth_failure user16 testpw163@ipa.com $CLIENT"
 
         rlPhaseEnd
 }
 
 hbacsvc_client2_016_1() {
 
-        rlPhaseStartTest "ipa-hbacsvc-client2-016_1: $user16 removed from rule16 which was allowed to access $CLIENT from $CLIENT2 - hbacsvcgroup"
+        rlPhaseStartTest "ipa-hbacsvc-client2-016_1: user16 removed from rule16 which was allowed to access $CLIENT from $CLIENT2 - hbacsvcgroup"
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-                rlRun "getent -s sss passwd $user16"
-                rlRun "ssh_auth_failure $user16 testpw163@ipa.com $CLIENT"
+                rlRun "getent -s sss passwd user16"
+                rlRun "ssh_auth_failure user16 testpw163@ipa.com $CLIENT"
 
         rlPhaseEnd
 
@@ -1407,22 +1408,22 @@ hbacsvc_master_017() {
 
 hbacsvc_client_017() {
 
-        rlPhaseStartTest "ipa-hbacsvc-client1-017: $user17 from grp17 part of rule17 is allowed to access hostgrp from hostgrp2"
+        rlPhaseStartTest "ipa-hbacsvc-client1-017: user17 from grp17 part of rule17 is allowed to access hostgrp from hostgrp2"
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-                rlRun "getent -s sss passwd $user17"
-                rlRun "ssh_auth_success $user17 testpw173@ipa.com $CLIENT2"
+                rlRun "getent -s sss passwd user17"
+                rlRun "ssh_auth_success user17 testpw173@ipa.com $CLIENT2"
 
         rlPhaseEnd
 }
 
 hbacsvc_client2_017() {
 
-        rlPhaseStartTest "ipa-hbacsvc-client2-017: $user17 from grp17 part of rule17 is allowed to access hostgrp from hostgrp2"
+        rlPhaseStartTest "ipa-hbacsvc-client2-017: user17 from grp17 part of rule17 is allowed to access hostgrp from hostgrp2"
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-                rlRun "getent -s sss passwd $user17"
-                rlRun "ssh_auth_failure $user17 testpw173@ipa.com $CLIENT2"
+                rlRun "getent -s sss passwd user17"
+                rlRun "ssh_auth_failure user17 testpw173@ipa.com $CLIENT2"
 
         rlPhaseEnd
 
@@ -1447,7 +1448,7 @@ hbacsvc_master_018() {
                 rlRun "ipa hbacrule-add-user rule18 --groups=group18"
                 rlRun "ipa hbacrule-add-host rule18 --hosts=$CLIENT"
                 rlRun "ipa hbacrule-add-sourcehost rule18 --hosts=hostgroup18"
-		rlRun "ipa hbacrule-add-service rule18 --hbacsvcgroup=sshd"
+		rlRun "ipa hbacrule-add-service rule18 --hbacsvcs=sshd"
                 rlRun "ipa hbacrule-show rule18 --all"
 
         # ipa hbactest:
@@ -1468,22 +1469,22 @@ hbacsvc_master_018() {
 
 hbacsvc_client_018() {
 
-        rlPhaseStartTest "ipa-hbacsvc-client1-018: $user18 from grp18 part of rule18 is allowed to access hostgrp from hostgrp2 - hbacsvcgrp"
+        rlPhaseStartTest "ipa-hbacsvc-client1-018: user18 from grp18 part of rule18 is allowed to access hostgrp from hostgrp2 - hbacsvcgrp"
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-                rlRun "getent -s sss passwd $user18"
-                rlRun "ssh_auth_success $user18 testpw183@ipa.com $CLIENT2"
+                rlRun "getent -s sss passwd user18"
+                rlRun "ssh_auth_success user18 testpw183@ipa.com $CLIENT2"
 
         rlPhaseEnd
 }
 
 hbacsvc_client2_018() {
 
-        rlPhaseStartTest "ipa-hbacsvc-client2-018: $user18 from grp18 part of rule18 is allowed to access hostgrp from hostgrp2 - hbacsvcgrp"
+        rlPhaseStartTest "ipa-hbacsvc-client2-018: user18 from grp18 part of rule18 is allowed to access hostgrp from hostgrp2 - hbacsvcgrp"
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-                rlRun "getent -s sss passwd $user18"
-                rlRun "ssh_auth_failure $user18 testpw183@ipa.com $CLIENT2"
+                rlRun "getent -s sss passwd user18"
+                rlRun "ssh_auth_failure user18 testpw183@ipa.com $CLIENT2"
 
         rlPhaseEnd
 
@@ -1532,22 +1533,22 @@ hbacsvc_master_019() {
 
 hbacsvc_client_019() {
 
-        rlPhaseStartTest "ipa-hbacsvc-client1-019: $user19 from grp19 part of rule19 is allowed to access hostgrp from hostgrp2"
+        rlPhaseStartTest "ipa-hbacsvc-client1-019: user19 from grp19 part of rule19 is allowed to access hostgrp from hostgrp2"
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-                rlRun "getent -s sss passwd $user19"
-                rlRun "ssh_auth_success $user19 testpw193@ipa.com $CLIENT2"
+                rlRun "getent -s sss passwd user19"
+                rlRun "ssh_auth_success user19 testpw193@ipa.com $CLIENT2"
 
         rlPhaseEnd
 }
 
 hbacsvc_client2_019() {
 
-        rlPhaseStartTest "ipa-hbacsvc-client2-019: $user19 from grp19 part of rule19 is allowed to access hostgrp from hostgrp2"
+        rlPhaseStartTest "ipa-hbacsvc-client2-019: user19 from grp19 part of rule19 is allowed to access hostgrp from hostgrp2"
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-                rlRun "getent -s sss passwd $user19"
-                rlRun "ssh_auth_failure $user19 testpw193@ipa.com $CLIENT2"
+                rlRun "getent -s sss passwd user19"
+                rlRun "ssh_auth_failure user19 testpw193@ipa.com $CLIENT2"
 
         rlPhaseEnd
 
@@ -1575,7 +1576,7 @@ hbacsvc_master_020() {
                 rlRun "ipa hbacrule-add-user rule20 --groups=group20-2"
                 rlRun "ipa hbacrule-add-host rule20 --hosts=hostgroup20"
                 rlRun "ipa hbacrule-add-sourcehost rule20 --hosts=hostgroup20-2"
-		rlRun "ipa hbacrule-add-service rule20 --hbacsvcgroup=sshd"
+		rlRun "ipa hbacrule-add-service rule20 --hbacsvcs=sshd"
                 rlRun "ipa hbacrule-show rule20 --all"
 
         # ipa hbactest:
@@ -1597,22 +1598,22 @@ hbacsvc_master_020() {
 
 hbacsvc_client_020() {
 
-        rlPhaseStartTest "ipa-hbacsvc-client1-020: $user20 from grp20 part of rule20 is allowed to access hostgrp from hostgrp2 - hbacsvcgrp"
+        rlPhaseStartTest "ipa-hbacsvc-client1-020: user20 from grp20 part of rule20 is allowed to access hostgrp from hostgrp2 - hbacsvcgrp"
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-                rlRun "getent -s sss passwd $user20"
-                rlRun "ssh_auth_success $user20 testpw203@ipa.com $CLIENT2"
+                rlRun "getent -s sss passwd user20"
+                rlRun "ssh_auth_success user20 testpw203@ipa.com $CLIENT2"
 
         rlPhaseEnd
 }
 
 hbacsvc_client2_020() {
 
-        rlPhaseStartTest "ipa-hbacsvc-client2-020: $user20 from grp20 part of rule20 is allowed to access hostgrp from hostgrp2 - hbacsvcgrp"
+        rlPhaseStartTest "ipa-hbacsvc-client2-020: user20 from grp20 part of rule20 is allowed to access hostgrp from hostgrp2 - hbacsvcgrp"
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-                rlRun "getent -s sss passwd $user20"
-                rlRun "ssh_auth_failure $user20 testpw203@ipa.com $CLIENT2"
+                rlRun "getent -s sss passwd user20"
+                rlRun "ssh_auth_failure user20 testpw203@ipa.com $CLIENT2"
 
         rlPhaseEnd
 
@@ -1642,8 +1643,8 @@ hbacsvc_client_020_1() {
         rlPhaseStartTest "ipa-hbacsvc-client1-020_1: hbac rule20 is removed."
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-                rlRun "getent -s sss passwd $user20"
-                rlRun "ssh_auth_failure $user20 testpw203@ipa.com $CLIENT2"
+                rlRun "getent -s sss passwd user20"
+                rlRun "ssh_auth_failure user20 testpw203@ipa.com $CLIENT2"
 
         rlPhaseEnd
 }
@@ -1653,14 +1654,12 @@ hbacsvc_client2_020_1() {
         rlPhaseStartTest "ipa-hbacsvc-client2-020_1: hbac rule20 is removed."
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-                rlRun "getent -s sss passwd $user20"
-                rlRun "ssh_auth_failure $user20 testpw203@ipa.com $CLIENT2"
+                rlRun "getent -s sss passwd user20"
+                rlRun "ssh_auth_failure user20 testpw203@ipa.com $CLIENT2"
 
         rlPhaseEnd
 
 }
-
-
 
 hbacsvc_master_021() {
 
@@ -1701,7 +1700,7 @@ hbacsvc_master_022() {
                 rlRun "ipa hbacrule-add-user rule22 --users=$user22"
                 rlRun "ipa hbacrule-add-host rule22 --hosts=externalhost.randomhost.com"
                 rlRun "ipa hbacrule-add-sourcehost rule22 --hosts=externalhost2.randomhost.com"
-		rlRun "ipa hbacrule-add-service rule22 --hbacsvcgroup=sshd"
+		rlRun "ipa hbacrule-add-service rule22 --hbacsvcs=sshd"
                 rlRun "ipa hbacrule-show rule22 --all"
 
         # ipa hbactest:
@@ -1767,7 +1766,7 @@ hbacsvc_master_024() {
                 rlRun "ipa hbacrule-add-user rule24 --users=$user24"
                 rlRun "ipa hbacrule-add-host rule24 --hosts=externalhost.randomhost.com"
                 rlRun "ipa hbacrule-add-sourcehost rule24 --hosts=externalhost2.randomhost.com"
-		rlRun "ipa hbacrule-add-service rule24 --hbacsvcgroup=sshd"
+		rlRun "ipa hbacrule-add-service rule24 --hbacsvcs=sshd"
                 rlRun "ipa hbacrule-show rule24 --all"
 
         # ipa hbactest:
@@ -1837,7 +1836,7 @@ hbacsvc_master_026() {
                 rlRun "ipa hbacrule-add-user rule26 --users=$user26"
                 rlRun "ipa hbacrule-add-host rule26 --hosts=externalhost.randomhost.com"
                 rlRun "ipa hbacrule-add-sourcehost rule26 --hosts=externalhost2.randomhost.com"
-		rlRun "ipa hbacrule-add-service rule26 --hbacsvcgroup=sshd"
+		rlRun "ipa hbacrule-add-service rule26 --hbacsvcs=sshd"
                 rlRun "ipa hbacrule-show rule26 --all"
 
         # ipa hbactest:
@@ -1890,22 +1889,22 @@ hbacsvc_master_027() {
 
 hbacsvc_client_027() {
 
-        rlPhaseStartTest "ipa-hbacsvc-client1-027: $user27 accessing hostgroup2 from hostgroup - hbacsvcgrp"
+        rlPhaseStartTest "ipa-hbacsvc-client1-027: user27 accessing hostgroup2 from hostgroup - hbacsvcgrp"
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-                rlRun "getent -s sss passwd $user27"
-                rlRun "ssh_auth_failure $user27 testpw123@ipa.com $CLIENT"
+                rlRun "getent -s sss passwd user27"
+                rlRun "ssh_auth_failure user27 testpw123@ipa.com $CLIENT"
 
         rlPhaseEnd
 }
 
 hbacsvc_client2_027() {
 
-        rlPhaseStartTest "ipa-hbacsvc-client2-027: $user27 accessing hostgroup2 from hostgroup - hbacsvcgrp"
+        rlPhaseStartTest "ipa-hbacsvc-client2-027: user27 accessing hostgroup2 from hostgroup - hbacsvcgrp"
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-                rlRun "getent -s sss passwd $user27"
-                rlRun "ssh_auth_success $user27 testpw123@ipa.com $CLIENT"
+                rlRun "getent -s sss passwd user27"
+                rlRun "ssh_auth_success user27 testpw123@ipa.com $CLIENT"
 
         rlPhaseEnd
 
@@ -1944,22 +1943,22 @@ hbacsvc_master_028() {
 
 hbacsvc_client_028() {
 
-        rlPhaseStartTest "ipa-hbacsvc-client1-028: $user28 part of rule28 is allowed to access $CLIENT from $CLIENT2 with incorrect hbacsvc"
+        rlPhaseStartTest "ipa-hbacsvc-client1-028: user28 part of rule28 is allowed to access $CLIENT from $CLIENT2 with incorrect hbacsvc"
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-                rlRun "getent -s sss passwd $user28"
-                rlRun "ssh_auth_failure $user28 testpw123@ipa.com $CLIENT"
+                rlRun "getent -s sss passwd user28"
+                rlRun "ssh_auth_failure user28 testpw123@ipa.com $CLIENT"
 
         rlPhaseEnd
 }
 
 hbacsvc_client2_028() {
 
-        rlPhaseStartTest "ipa-hbacsvc-client2-028: $user28 part of rule28 is allowed to access $CLIENT from $CLIENT2 with incorrect hbacsvc"
+        rlPhaseStartTest "ipa-hbacsvc-client2-028: user28 part of rule28 is allowed to access $CLIENT from $CLIENT2 with incorrect hbacsvc"
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-                rlRun "getent -s sss passwd $user28"
-                rlRun "ssh_auth_success $user28 testpw123@ipa.com $CLIENT"
+                rlRun "getent -s sss passwd user28"
+                rlRun "ssh_auth_success user28 testpw123@ipa.com $CLIENT"
 
         rlPhaseEnd
 
@@ -2001,22 +2000,22 @@ hbacsvc_master_029() {
 
 hbacsvc_client_029() {
 
-        rlPhaseStartTest "ipa-hbacsvc-client1-029: $user29 part of rule29 is allowed to access $CLIENT from $CLIENT2 with empty group"
+        rlPhaseStartTest "ipa-hbacsvc-client1-029: user29 part of rule29 is allowed to access $CLIENT from $CLIENT2 with empty group"
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-                rlRun "getent -s sss passwd $user29"
-                rlRun "ssh_auth_failure $user29 testpw123@ipa.com $CLIENT"
+                rlRun "getent -s sss passwd user29"
+                rlRun "ssh_auth_failure user29 testpw123@ipa.com $CLIENT"
 
         rlPhaseEnd
 }
 
 hbacsvc_client2_029() {
 
-        rlPhaseStartTest "ipa-hbacsvc-client2-029: $user29 part of rule29 is allowed to access $CLIENT from $CLIENT2 with empty group"
+        rlPhaseStartTest "ipa-hbacsvc-client2-029: user29 part of rule29 is allowed to access $CLIENT from $CLIENT2 with empty group"
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-                rlRun "getent -s sss passwd $user29"
-                rlRun "ssh_auth_success $user29 testpw123@ipa.com $CLIENT"
+                rlRun "getent -s sss passwd user29"
+                rlRun "ssh_auth_success user29 testpw123@ipa.com $CLIENT"
 
         rlPhaseEnd
 
@@ -2059,22 +2058,22 @@ hbacsvc_master_030() {
 
 hbacsvc_client_030() {
 
-        rlPhaseStartTest "ipa-hbacsvc-client1-030: $user30 part of rule30 is allowed to access $CLIENT from $CLIENT2 with empty netgroup"
+        rlPhaseStartTest "ipa-hbacsvc-client1-030: user30 part of rule30 is allowed to access $CLIENT from $CLIENT2 with empty netgroup"
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-                rlRun "getent -s sss passwd $user30"
-                rlRun "ssh_auth_failure $user30 testpw123@ipa.com $CLIENT"
+                rlRun "getent -s sss passwd user30"
+                rlRun "ssh_auth_failure user30 testpw123@ipa.com $CLIENT"
 
         rlPhaseEnd
 }
 
 hbacsvc_client2_030() {
 
-        rlPhaseStartTest "ipa-hbacsvc-client2-030: $user30 part of rule30 is allowed to access $CLIENT from $CLIENT2 with empty netgroup"
+        rlPhaseStartTest "ipa-hbacsvc-client2-030: user30 part of rule30 is allowed to access $CLIENT from $CLIENT2 with empty netgroup"
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-                rlRun "getent -s sss passwd $user30"
-                rlRun "ssh_auth_success $user30 testpw123@ipa.com $CLIENT"
+                rlRun "getent -s sss passwd user30"
+                rlRun "ssh_auth_success user30 testpw123@ipa.com $CLIENT"
 
         rlPhaseEnd
 
@@ -2117,8 +2116,8 @@ hbacsvc_client_bug736314() {
         rlPhaseStartTest "ipa-hbacsvc-client1-bug736314: user736314 part of rule736314 is allowed to access $MASTER from $CLIENT"
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-                rlRun "getent -s sss passwd $user736314"
-                rlRun "ssh_auth_success $user736314 testpw123@ipa.com $MASTER"
+                rlRun "getent -s sss passwd user736314"
+                rlRun "ssh_auth_success user736314 testpw123@ipa.com $MASTER"
 
         rlPhaseEnd
 }
@@ -2128,8 +2127,8 @@ hbacsvc_client2_bug736314() {
         rlPhaseStartTest "ipa-hbacsvc-client2-bug736314: user736314 part of rule736314 is allowed to access $MASTER from $CLIENT"
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-                rlRun "getent -s sss passwd $user736314"
-                rlRun "ssh_auth_failure $user736314 testpw123@ipa.com $MASTER"
+                rlRun "getent -s sss passwd user736314"
+                rlRun "ssh_auth_failure user736314 testpw123@ipa.com $MASTER"
 
         rlPhaseEnd
 
