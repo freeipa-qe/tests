@@ -14,7 +14,6 @@ installMaster()
 	else
 		rlRun "fixHostFileIPv6" 0 "Set up /etc/hosts"
                 rlRun "fixhostname" 0 "Fix hostname"
-		rlRun "cat /etc/krb5.conf"
 		rlRun "fixForwarderIPv6" 0 "Fix DNSFORWARD"
 	fi
 
