@@ -222,6 +222,7 @@ fixForwarderIPv6()
 {
   ipv6addr=$(nslookup -type=AAAA $MASTER | grep "has AAAA" | awk '{print $5}')
   sed -i "s/DNSFORWARD=10.14.63.12/DNSFORWARD=$ipv6addr/g" /dev/shm/env.sh
+  . /dev/shm/env.sh
   rlLog "cat /dev/shm/env.sh" "fixing DNSFORWARD in env.sh"
 }
 
