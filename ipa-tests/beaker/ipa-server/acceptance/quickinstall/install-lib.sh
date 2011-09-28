@@ -220,10 +220,11 @@ appendEnvIPv6()
 ######################################
 fixForwarderIPv6()
 {
-  ipv6addr=$(nslookup -type=AAAA $MASTER | grep "has AAAA" | awk '{print $5}')
-  sed -i "s/DNSFORWARD=10.14.63.12/DNSFORWARD=$ipv6addr/g" /dev/shm/env.sh
+  ipv6addr=$(ifconfig $currenteth | grep "inet6 " | grep -E 'Scope:Site|Scope:Global' | awk '{print $3}' | awk -F / '{print $1}' | head -1)
+  sed -i "s/10.14.63.12/$ipv6addr/g" /dev/shm/env.sh
   . /dev/shm/env.sh
-  rlLog "cat /dev/shm/env.sh" "fixing DNSFORWARD in env.sh"
+  rlRun "cat /dev/shm/env.sh"
+  rlLog "fixing DNSFORWARD in env.sh"
 }
 
 #################################################################

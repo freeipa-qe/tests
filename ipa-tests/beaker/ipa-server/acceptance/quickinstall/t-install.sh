@@ -14,12 +14,17 @@ installMaster()
 	else
 		rlRun "fixHostFileIPv6" 0 "Set up /etc/hosts"
                 rlRun "fixhostname" 0 "Fix hostname"
-		rlRun "fixForwarderIPv6" 0 "Fix DNSFORWARD"
 	fi
 
 	if [[ "$SKIPINSTALL" != "TRUE" ]] ; then
+
+	  if [[ "$IPv6SETUP" != "TRUE" ]] ; then
 		echo "ipa-server-install --setup-dns --forwarder=$DNSFORWARD --hostname=$hostname_s.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U" > /dev/shm/installipa.bash
 		rlLog "EXECUTING: ipa-server-install --setup-dns --forwarder=$DNSFORWARD --hostname=$hostname_s.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U"
+	  else
+		echo "ipa-server-install --setup-dns --no-forwarders --hostname=$hostname_s.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U" > /dev/shm/installipa.bash
+                rlLog "EXECUTING: ipa-server-install --setup-dns --no-forwarders --hostname=$hostname_s.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U"
+	  fi
         	setenforce 1
 		chmod 755 /dev/shm/installipa.bash
         	rlRun "/bin/bash /dev/shm/installipa.bash" 0 "Installing IPA Server"
