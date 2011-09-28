@@ -171,7 +171,10 @@ changetype: delete' > $file
 		rlRun "ipa user-del userb000" 0 "Removing ipa user for cleanup"
 		rlRun "ipa group-del group1000" 0 "Removing ipa group for cleanup"
 		rlRun "ipa group-del group2000" 0 "Removing ipa group for cleanup"
-		rlRun "ipa group-del group2000" 0 "Removing ipa group for cleanup"
+		rlRun "ipa group-del 'accounting managers'" 0 "Removing ipa group for cleanup"
+		rlRun "ipa group-del 'hr managers'" 0 "Removing ipa group for cleanup"
+		rlRun "ipa group-del 'pd managers'" 0 "Removing ipa group for cleanup"
+		rlRun "ipa group-del 'qa managers'" 0 "Removing ipa group for cleanup"
 	rlPhaseEnd
 	
 	rlPhaseStartTest "returning ipa server to normal operation"
