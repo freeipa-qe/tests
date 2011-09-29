@@ -75,8 +75,9 @@ public class HostTests extends SahiTestScript{
 	@BeforeMethod (alwaysRun=true)
 	public void checkCurrentPage() {
 	    String currentPageNow = sahiTasks.fetch("top.location.href");
+	    CommonTasks.checkError(sahiTasks);
 		if (!currentPageNow.equals(currentPage) && !currentPageNow.equals(alternateCurrentPage)) {
-			CommonTasks.checkError(sahiTasks);
+			//CommonTasks.checkError(sahiTasks);
 			System.out.println("Not on expected Page....navigating back from : " + currentPageNow);
 			sahiTasks.navigateTo(commonTasks.hostPage, true);
 		}		
