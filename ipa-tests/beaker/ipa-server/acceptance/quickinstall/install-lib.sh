@@ -227,6 +227,18 @@ fixForwarderIPv6()
   rlLog "fixing DNSFORWARD in env.sh"
 }
 
+######################################
+#	remove ipv4 addr	     #
+######################################
+rmIPv4addr()
+{
+  ipaddr=$(dig +noquestion $MASTER  | grep $MASTER | grep IN | awk '{print $5}')
+  ipv4gw=$(route -n | awk '{print $2}' | tail -n 1)
+  currenteth=$(route | grep ^default | awk '{print $8}')
+  /sbin/ip -4 addr del $ipaddr dev $currenteth
+  /sbin/route $ipaddr default gw $ipv4gw
+}
+
 #################################################################
 #  SetUpAuthKeys ... all hosts will have the same public and    #
 #    private key for the root user                              #

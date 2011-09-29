@@ -15,6 +15,7 @@ installMaster()
 		rlRun "fixHostFileIPv6" 0 "Set up /etc/hosts"
                 rlRun "fixhostname" 0 "Fix hostname"
 		rlRun "fixForwarderIPv6"
+		rlRun "rmIPv4addr"
 	fi
 
 	if [[ "$SKIPINSTALL" != "TRUE" ]] ; then
