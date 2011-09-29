@@ -91,13 +91,13 @@ public class SudoTasks {
 		sahiTasks.button("Enroll").click();
 		
 		//Click to add Sudo Command from "Allow" Section
-		sahiTasks.span("Add").under(sahiTasks.heading2(("Run Commands"))).under(sahiTasks.heading3("Allow")).near(sahiTasks.span("Sudo Commands")).click();
+		sahiTasks.span("Add").under(sahiTasks.heading2(("Run Commands"))).under(sahiTasks.heading3("Allow")).near(sahiTasks.span("Commands")).click();
 		sahiTasks.checkbox(commandName).click();
 		sahiTasks.span(">>").click();
 		sahiTasks.button("Enroll").click();
 		
 		//Click to add Sudo Command Group From from "Deny" Section
-		sahiTasks.span("Add").under(sahiTasks.heading2(("Run Commands"))).under(sahiTasks.heading3("Deny")).near(sahiTasks.span("Sudo Command Groups")).click();
+		sahiTasks.span("Add").under(sahiTasks.heading2(("Run Commands"))).under(sahiTasks.heading3("Deny")).near(sahiTasks.span("Command Groups")).click();
 		sahiTasks.checkbox(commandGroupName).click();
 		sahiTasks.span(">>").click();
 		sahiTasks.button("Enroll").click();
@@ -318,10 +318,10 @@ public class SudoTasks {
 			String vimCommandName, String denyCommandGroupName ) {
 		sahiTasks.link(cn).click();
 		
-		deleteFromSudoRule(sahiTasks, cn, "Run Commands", "Allow", "Sudo Commands", lsCommandName, "Delete");		
-		addToSudoRule(sahiTasks, cn, "Run Commands", "Allow", "Sudo Command Groups", allowCommandGroupName, "Enroll");		
-		addToSudoRule(sahiTasks, cn, "Run Commands", "Deny", "Sudo Commands", vimCommandName, "Enroll");		
-		deleteFromSudoRule(sahiTasks, cn, "Run Commands", "Deny", "Sudo Command Groups", denyCommandGroupName, "Delete");	
+		deleteFromSudoRule(sahiTasks, cn, "Run Commands", "Allow", "Commands", lsCommandName, "Delete");		
+		addToSudoRule(sahiTasks, cn, "Run Commands", "Allow", "Command Groups", allowCommandGroupName, "Enroll");		
+		addToSudoRule(sahiTasks, cn, "Run Commands", "Deny", "Commands", vimCommandName, "Enroll");		
+		deleteFromSudoRule(sahiTasks, cn, "Run Commands", "Deny", "Command Groups", denyCommandGroupName, "Delete");	
 		
 		sahiTasks.span("Update").click();
 		sahiTasks.link("Sudo Rules").in(sahiTasks.div("content")).click();			

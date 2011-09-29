@@ -91,7 +91,7 @@ public class HBACTasks {
 		sahiTasks.button("Enroll").click();
 		
 		//Click to add HBAC Service from "Via Service" Section
-		sahiTasks.span("Add").under(sahiTasks.heading2(("Via Service"))).near(sahiTasks.span("HBAC Services")).click();
+		sahiTasks.span("Add").under(sahiTasks.heading2(("Via Service"))).near(sahiTasks.span("Services")).click();
 		sahiTasks.checkbox(service).click();
 		sahiTasks.span(">>").click();
 		sahiTasks.button("Enroll").click();
@@ -430,7 +430,7 @@ public class HBACTasks {
 	public static void modifyHBACRuleViaServiceSection(SahiTasks sahiTasks, String cn, String searchString, String[] searchResult) {
 		sahiTasks.link(cn).click();
 		
-		sahiTasks.span("Add").under(sahiTasks.heading2(("Via Service"))).near(sahiTasks.span("HBAC Services")).click();
+		sahiTasks.span("Add").under(sahiTasks.heading2(("Via Service"))).near(sahiTasks.span("Services")).click();
 		sahiTasks.textbox("filter").setValue(searchString);
 		sahiTasks.link("Find").click();
 		
@@ -441,7 +441,7 @@ public class HBACTasks {
 		sahiTasks.span(">>").click();
 		sahiTasks.button("Enroll").click();
 		
-		sahiTasks.span("Add").under(sahiTasks.heading2(("Via Service"))).near(sahiTasks.span("HBAC Service Groups")).click();
+		sahiTasks.span("Add").under(sahiTasks.heading2(("Via Service"))).near(sahiTasks.span("Service Groups")).click();
 		sahiTasks.checkbox("Sudo").click();
 		sahiTasks.link(">>").click();
 		sahiTasks.button("Enroll").click();
