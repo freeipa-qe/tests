@@ -1,0 +1,24 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+<suite name="IPAConfigurationTestSuite">	
+	<test name="Configuration Tests">
+		<packages>
+		     <package name="com.redhat.qe.ipa.sahi.*" />
+		</packages>
+		<groups>
+			<run>
+			    <include name="setup" />
+			    <include name="configSearchOptionSizeLimitTests" />	
+			    <include name="configSearchOptionInvalidSizeLimitTests" />
+			    <include name="configSearchOptionTimeLimitTests" />	
+			    <include name="configSearchOptionInvalidTimeLimitTests" />
+			    <include name="configUserOptionSearchFieldTests" />
+			    <include name="configUserOptionInvalidSearchFieldTests" />
+			</run>
+		</groups>
+	</test>
+
+	<listeners>        
+  		<listener class-name="com.redhat.qe.auto.testng.TestNGListener" />	
+	</listeners>
+	
+</suite>

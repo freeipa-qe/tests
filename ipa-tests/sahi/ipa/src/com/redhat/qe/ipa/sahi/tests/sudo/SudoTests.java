@@ -834,7 +834,7 @@ public class SudoTests extends SahiTestScript{
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
         //										testname						cn   			
-		ll.add(Arrays.asList(new Object[]{ "edit_accessthishost_for_rule",		"SudoRule4"      } ));
+		ll.add(Arrays.asList(new Object[]{ "edit_commandcategory_for_rule",		"SudoRule4"      } ));
 		return ll;	
 	}
 	

@@ -517,10 +517,10 @@ public class UserTests extends SahiTestScript{
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
         //										testname					uid              			givenname			sn   
-		//ll.add(Arrays.asList(new Object[]{ "Add a user - good",				"testuser", 				"Test",				"User"      } ));
-		//ll.add(Arrays.asList(new Object[]{ "Add a user - optional login",	"", 						"Test",				"User"      } ));
+		ll.add(Arrays.asList(new Object[]{ "Add a user - good",				"testuser", 				"Test",				"User"      } ));
+		ll.add(Arrays.asList(new Object[]{ "Add a user - optional login",	"", 						"Test",				"User"      } ));
 		ll.add(Arrays.asList(new Object[]{ "Add a user - testuser",			"user2", 			    	"Test2",			"User2"     } ));
-	//	ll.add(Arrays.asList(new Object[]{ "Add a user - special char",		"1spe.cial_us-er$", 		"S$p|e>c--i_a%l_",	"%U&s?e+r(" } ));
+		ll.add(Arrays.asList(new Object[]{ "Add a user - special char",		"1spe.cial_us-er$", 		"S$p|e>c--i_a%l_",	"%U&s?e+r(" } ));
 		      
 		return ll;	
 	}

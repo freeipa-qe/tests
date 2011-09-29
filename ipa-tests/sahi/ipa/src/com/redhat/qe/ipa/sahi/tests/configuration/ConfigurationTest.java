@@ -1,0 +1,329 @@
+package com.redhat.qe.ipa.sahi.tests.configuration;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.logging.Logger;
+
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.DataProvider;
+import org.testng.annotations.Test;
+
+import com.redhat.qe.auto.testng.TestNGUtils;
+import com.redhat.qe.ipa.sahi.base.SahiTestScript;
+import com.redhat.qe.ipa.sahi.tasks.CommonTasks;
+import com.redhat.qe.ipa.sahi.tasks.ConfigurationTasks;
+import com.redhat.qe.ipa.sahi.tasks.HBACTasks;
+import com.redhat.qe.ipa.sahi.tasks.UserTasks;
+
+public class ConfigurationTest extends SahiTestScript{
+	private static Logger log = Logger.getLogger(ConfigurationTest.class.getName()); 
+	
+
+	private String currentPage = "";
+	//private String alternateCurrentPage = ""; //TODO : check what is it here?
+	
+	
+	@BeforeClass (groups={"init"}, description="Initialize app for this test suite run", 
+			alwaysRun=true, dependsOnGroups="setup")
+	public void initialize() throws CloneNotSupportedException {
+		sahiTasks.setStrictVisibilityCheck(true);
+		
+		//to set up search tests, adding objects in one category on identity and policy tabs 
+		//add users
+		sahiTasks.navigateTo(commonTasks.userPage, true);
+		String testUser="user";
+		for (int i=0; i<20; i++) {
+			if (!sahiTasks.link(testUser+i).exists())
+				UserTasks.createUser(sahiTasks, testUser+i, testUser+i, testUser+i, "Add");
+		}		
+		UserTasks.modifyUserMailingAddress(sahiTasks, "user0", "Westford Street", "Westford", "MA", "01234");
+		//add hbacrules
+		sahiTasks.navigateTo(commonTasks.hbacPage, true);
+	    String testHBACRule="rule";
+	    for (int i=0; i<20; i++) {
+			if (!sahiTasks.link(testHBACRule+i).exists())
+				HBACTasks.addHBACRule(sahiTasks, testHBACRule+i, "Add");
+	    }
+		
+		sahiTasks.navigateTo(commonTasks.configurationPage, true);
+		currentPage = sahiTasks.fetch("top.location.href");
+	}
+	
+	@BeforeMethod (alwaysRun=true)
+	public void checkCurrentPage() {
+	    String currentPageNow = sahiTasks.fetch("top.location.href");
+		if (!currentPageNow.equals(currentPage) ) {
+			CommonTasks.checkError(sahiTasks);
+			log.fine("Not on expected Page....navigating back from : " + currentPageNow);
+			sahiTasks.navigateTo(commonTasks.configurationPage, true);
+		}		
+	}		
+	
+	
+	/*
+	 * Test Search Options - size
+	 * if search limit is set to x, search for x objects in users and rules
+	 * Not testing a search limit on all objects:
+	 * users/groups/hosts/hostgroups/netgroups/hbacrules/hbacsvc/hbacsvgrp/sudoriles/sudocmd/sudocmdgrp 
+	 * 
+	 * Setting the time limit or size limit value to zero (0) or -1 means that there are no limits on searches. 
+	 */
+	@Test (groups={"configSearchOptionSizeLimitTests"}, description="Verify valid search size limit values", 
+			dataProvider="getConfigSearchOptionSizeLimitTestObjects")	
+	public void testConfigSearchOptionSizeLimitValue(String testName, String value, String expectedRows) throws Exception {
+			ConfigurationTasks.setConfigValue(sahiTasks, "ipasearchrecordslimit", value);
+			ConfigurationTasks.verifyConfigValue(sahiTasks, "ipasearchrecordslimit", value);
+			ConfigurationTasks.verifySearchSizeLimitFunctional(sahiTasks, commonTasks, value, expectedRows);
+			
+	} 
+	
+	/*
+	 * Test Search Options - size
+	 * Using invalid sizes
+	 */
+	@Test (groups={"configSearchOptionInvalidSizeLimitTests"}, description="Verify invalid search size limit values", 
+			dataProvider="getConfigSearchOptionInvalidSizeLimitTestObjects")	
+	public void testConfigSearchOptionInvalidSizeLimitValue(String testName, String value, String expectedError1, String expectedError2) throws Exception {
+			ConfigurationTasks.setInvalidConfigValue(sahiTasks, "ipasearchrecordslimit", value, expectedError1, expectedError2);
+	} 
+	
+	/*
+	 * Test Search Options - time
+	 * 
+	 * TODO: nkrishnan: Manual test to be added to make sure the search for a long list, 
+	 * times out within timelimit
+	 */
+	@Test (groups={"configSearchOptionTimeLimitTests"}, description="Verify valid search time limit values", 
+			dataProvider="getConfigSearchOptionTimeLimitTestObjects")	
+	public void testConfigSearchOptionTimeLimitValue(String testName, String value) throws Exception {
+			ConfigurationTasks.setConfigValue(sahiTasks, "ipasearchtimelimit", value);
+			ConfigurationTasks.verifyConfigValue(sahiTasks, "ipasearchtimelimit", value);			
+	} 
+	
+	/*
+	 * Test Search Options - time
+	 * Using invalid sizes
+	 * 
+	 * 
+	 */
+	@Test (groups={"configSearchOptionInvalidTimeLimitTests"}, description="Verify invalid search time limit values", 
+			dataProvider="getConfigSearchOptionInvalidTimeLimitTestObjects")	
+	public void testConfigSearchOptionInvalidTimeLimitValue(String testName, String value, String expectedError1, String expectedError2) throws Exception {
+			ConfigurationTasks.setInvalidConfigValue(sahiTasks, "ipasearchtimelimit", value, expectedError1, expectedError2);
+	} 
+	
+	
+	/*
+	 * Test Search Options 
+	 * undo/reset
+	 */
+	
+	/* 
+	 * Test User Options - uid,givenname,sn,telephonenumber,ou,title
+	 * search fields - add user and search for the field
+	 */
+	@Test (groups={"configUserOptionSearchFieldTests"}, description="Verify valid User Search Field values", 
+			dataProvider="getConfigUserOptionSearchFieldTestObjects")	
+	public void testConfigUserOptionSearchField(String testName, String searchField, String searchValue, String expectedUser) throws Exception {
+		ConfigurationTasks.setConfigValue(sahiTasks, "ipausersearchfields", searchField);
+		ConfigurationTasks.verifyConfigValue(sahiTasks, "ipausersearchfields", searchField);
+		ConfigurationTasks.verifyUserSearchFieldFunctional(sahiTasks, commonTasks, searchValue, expectedUser);
+	} 
+	
+	
+	/* 
+	 * Test User Options 
+	 * search field - invalid data
+	 * 
+	 */
+	@Test (groups={"configUserOptionInvalidSearchFieldTests"}, description="Verify invalid User Search Field values", 
+			dataProvider="getConfigUserOptionInvalidSearchFieldTestObjects")	
+	public void testConfigUserOptionInvalidSearchField(String testName, String value, String expectedError) throws Exception {
+		ConfigurationTasks.setInvalidConfigValue(sahiTasks, "ipausersearchfields", value, expectedError, "");		
+	}
+	
+	/*
+	 * Test User Options 
+	 * email - "testrelm " invalid 'emaildomain': Leading and trailing spaces are not allowed
+	 * blank is allowed, special char, numbers are allowed.
+	 */
+		
+	/*
+	 * Test User Options
+	 * home dir - "/home " - invalid 'homedirectory': Leading and trailing spaces are not allowed
+	 * blank is allowed
+	 */
+	
+	/*
+	 * Test User Options
+	 * max user length - "dfds" - Input form contains invalid or missing values./ must be an integer
+	 * 0 - min value is 1.
+	 * 
+	 * blank is allowed
+	 */
+	
+	
+	
+	/* 
+	 * Test User Options 
+	 * add user, and verify it picks up the defaults as set
+	 */
+	
+	/*
+	 * Default user objectclasses
+	 *  https://bugzilla.redhat.com/show_bug.cgi?id=741951 
+	 *  https://bugzilla.redhat.com/show_bug.cgi?id=741957
+	 * if posixaccount is deleted, when adding a user - error -
+	 * if ipaobject is deleted, when adding a user - error -
+	 * if krbticketpolicyaux is deleted, can add user. ipa user-show will not list this in its objectclass
+	 */
+	
+	
+	
+	
+	
+	@AfterClass (groups={"cleanup"}, description="Delete objects created for this test suite", alwaysRun=true)
+	public void cleanup() throws CloneNotSupportedException {
+		
+		//clean users and rules added
+		sahiTasks.navigateTo(commonTasks.userPage, true);
+		String testUser="user";
+		for (int i=0; i<20; i++) {
+			if (!sahiTasks.link(testUser+i).exists())
+				UserTasks.deleteUser(sahiTasks, testUser+i);
+		}		
+	
+		
+		sahiTasks.navigateTo(commonTasks.hbacPage, true);
+	    String testHBACRule="rule";
+	    for (int i=0; i<20; i++) {
+			if (!sahiTasks.link(testHBACRule+i).exists())
+				HBACTasks.deleteHBAC(sahiTasks, testHBACRule+i, "Delete");
+	    }
+	}
+	
+	/*******************************************************
+	 ************      DATA PROVIDERS     ******************
+	 *******************************************************/
+	
+	/*
+	 * Test size limits - valid
+	 */
+	@DataProvider(name="getConfigSearchOptionSizeLimitTestObjects")
+	public Object[][] getConfigSearchOptionSizeLimitTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createConfigSearchOptionSizeLimitTestObjects());
+	}
+	protected List<List<Object>> createConfigSearchOptionSizeLimitTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname			cn   		expectedRows				
+		ll.add(Arrays.asList(new Object[]{ "sizelimit_negative",	"-1",		"21"	} ));
+		ll.add(Arrays.asList(new Object[]{ "sizelimit_blank",		"",			"21"      } ));
+		ll.add(Arrays.asList(new Object[]{ "sizelimit_zero",		"0",		"21"      } ));
+		ll.add(Arrays.asList(new Object[]{ "sizelimit_ten",			"10",		"10"      } ));
+		
+		
+		return ll;	
+	}
+	
+	/*
+	 * Test size limits - invalid
+	 */
+	@DataProvider(name="getConfigSearchOptionInvalidSizeLimitTestObjects")
+	public Object[][] getConfigSearchOptionInvalidSizeLimitTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createConfigSearchOptionInvalidSizeLimitTestObjects());
+	}
+	protected List<List<Object>> createConfigSearchOptionInvalidSizeLimitTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname					cn   		expectedError1											expectedError2			
+		ll.add(Arrays.asList(new Object[]{ "sizelimit_letter",				"abc",		"Input form contains invalid or missing values.",		"Must be an integer"		} ));
+		ll.add(Arrays.asList(new Object[]{ "sizelimit_space",				" 10",      "Input form contains invalid or missing values.",		"Must be an integer"		} ));
+				
+		
+		return ll;	
+	}
+	
+	
+	/*
+	 * Test time limits - valid
+	 */
+	@DataProvider(name="getConfigSearchOptionTimeLimitTestObjects")
+	public Object[][] getConfigSearchOptionTimeLimitTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createConfigSearchOptionTimeLimitTestObjects());
+	}
+	protected List<List<Object>> createConfigSearchOptionTimeLimitTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname			cn   						
+		ll.add(Arrays.asList(new Object[]{ "timelimit_negative",	"-1"	} ));
+		ll.add(Arrays.asList(new Object[]{ "timelimit_blank",		""     	} ));
+		ll.add(Arrays.asList(new Object[]{ "timelimit_ten",			"10"   	} ));
+		
+		
+		return ll;	
+	}
+	
+	
+	
+	/*
+	 * Test time limits - invalid
+	 */
+	@DataProvider(name="getConfigSearchOptionInvalidTimeLimitTestObjects")
+	public Object[][] getConfigSearchOptionInvalidTimeLimitTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createConfigSearchOptionInvalidTimeLimitTestObjects());
+	}
+	protected List<List<Object>> createConfigSearchOptionInvalidTimeLimitTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname					cn   		expectedError1															expectedError2			
+		ll.add(Arrays.asList(new Object[]{ "timelimit_letter",				"abc",		"Input form contains invalid or missing values.",						"Must be an integer"		} ));
+		ll.add(Arrays.asList(new Object[]{ "timelimit_space",				" 10",      "Input form contains invalid or missing values.",						"Must be an integer"		} ));
+		ll.add(Arrays.asList(new Object[]{ "timelimit_zero",				"0",      	"invalid 'ipasearchtimelimit': searchtimelimit must be -1 or > 1.",		""		} ));
+				
+		
+		return ll;	
+	}
+	
+	/*
+	 * Test user options limits
+	 * User Search Fields
+	 * default list: uid,givenname,sn,telephonenumber,ou,title
+	 */
+	@DataProvider(name="getConfigUserOptionSearchFieldTestObjects")
+	public Object[][] getConfigUserOptionSearchFieldTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createConfigUserOptionSearchFieldTestObjects());
+	}
+	protected List<List<Object>> createConfigUserOptionSearchFieldTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname					cn   			searchValue		expectedUser				
+		ll.add(Arrays.asList(new Object[]{ "usersearchfield_existing",		"uid",			"user4",		"user4"			} ));
+		ll.add(Arrays.asList(new Object[]{ "usersearchfield_new",			"postalcode",	"01234",		"user0"			} ));				
+		
+		return ll;	
+	}
+	
+	/*
+	 * Test user options limits
+	 * User Search Fields
+	 */
+	@DataProvider(name="getConfigUserOptionInvalidSearchFieldTestObjects")
+	public Object[][] getConfigUserOptionInvalidSearchFieldTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createConfigUserOptionInvalidSearchFieldTestObjects());
+	}
+	protected List<List<Object>> createConfigUserOptionInvalidSearchFieldTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname						cn   		expectedError1				
+		ll.add(Arrays.asList(new Object[]{ "usersearchfield_blank",				"",			"an internal error has occurred"														} ));
+		ll.add(Arrays.asList(new Object[]{ "usersearchfield_trailing_space",	" uid",     "invalid 'usersearch': Leading and trailing spaces are not allowed"	} ));
+		ll.add(Arrays.asList(new Object[]{ "usersearchfield_leading_space",		"uid ",     "invalid 'usersearch': Leading and trailing spaces are not allowed"	} ));
+		ll.add(Arrays.asList(new Object[]{ "usersearchfield_notallowed",		"abc",     	"invalid 'ipausersearchfields': attribute \"abc\" not allowed"	} ));
+			
+		return ll;	
+	}
+}
