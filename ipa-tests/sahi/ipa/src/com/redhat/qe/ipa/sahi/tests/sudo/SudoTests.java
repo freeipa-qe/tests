@@ -311,7 +311,8 @@ public class SudoTests extends SahiTestScript{
 	/*
 	 * Search a Sudo Rule
 	 */
-	@Test (groups={"sudoRuleSearchTests"}, description="Search for Rules", dataProvider="getSudoRuleSearchTestObjects", 
+	@Test (groups={"sudoRuleSearchTests"}, description="Search for Rules", 
+			dataProvider="getSudoRuleSearchTestObjects", 
 			dependsOnGroups={"sudoRuleAddTests", "sudoRuleAddAndAddAnotherTests", "sudoRuleAddAndEditTests"})
 	public void testSudoRuleSearch(String testName, String searchString, String multipleResult1, String multipleResult2, String multipleResult3, String multipleResult4) throws Exception {		
 		String[] multipleResults = {multipleResult1, multipleResult2, multipleResult3, multipleResult4};
@@ -329,7 +330,9 @@ public class SudoTests extends SahiTestScript{
 	/*
 	 * Edit the General Section for the Sudo Rule
 	 */
-	@Test (groups={"sudoRuleGeneralSettingsTests"}, dataProvider="getSudoRuleGeneralSettingsTestObjects", dependsOnGroups={"sudoRuleAddAndEditTests"})
+	@Test (groups={"sudoRuleGeneralSettingsTests"}, description="Edit General Section for Sudo Rule",
+			dataProvider="getSudoRuleGeneralSettingsTestObjects", 
+			dependsOnGroups={"sudoRuleAddAndEditTests"})
 	public void testSudoRuleGeneralSettings(String testName, String cn, String description) throws Exception {		
 		//verify rule to be edited exists
 		Assert.assertTrue(sahiTasks.link(cn).exists(), "Verify Rule " + cn + " to be edited exists");
@@ -349,7 +352,9 @@ public class SudoTests extends SahiTestScript{
 	/*
 	 * Edit the Options Section for the Sudo Rule
 	 */
-	@Test (groups={"sudoRuleOptionsSettingsTests"}, dataProvider="getSudoRuleOptionsSettingsTestObjects", dependsOnGroups={"sudoRuleAddAndEditTests"})
+	@Test (groups={"sudoRuleOptionsSettingsTests"}, description="Edit Options Section for Sudo Rule",
+			dataProvider="getSudoRuleOptionsSettingsTestObjects", 
+			dependsOnGroups={"sudoRuleAddAndEditTests"})
 	public void testSudoRuleOptionsSettings(String testName, String cn, String option1, String option2) throws Exception {		
 		//verify rule to be edited exists
 		Assert.assertTrue(sahiTasks.link(cn).exists(), "Verify Rule " + cn + " to be edited exists");
@@ -372,7 +377,9 @@ public class SudoTests extends SahiTestScript{
 	 * verify the user is an indirect member of the group
 	 * verify undo/reset/update for this section when working with the radiobutton
 	 */
-	@Test (groups={"sudoRuleUserCategorySettingsTests"}, dataProvider="getEditSudoRuleTestObjects", dependsOnGroups={"sudoRuleAddAndEditTests"})
+	@Test (groups={"sudoRuleUserCategorySettingsTests"}, description="Edit Who Section for the Sudo Rule",
+			dataProvider="getEditWhoSectionSudoRuleTestObjects", 
+			dependsOnGroups={"sudoRuleAddAndEditTests"})
 	public void testSudoRuleUserCategorySettings(String testName, String cn) throws Exception {		
 		//verify rule to be edited exists
 		Assert.assertTrue(sahiTasks.link(cn).exists(), "Verify Rule " + cn + " to be edited exists");
@@ -432,7 +439,9 @@ public class SudoTests extends SahiTestScript{
 	 * 
 	 * verify undo/reset/update for this section when working with the radiobutton
 	 */
-	@Test (groups={"sudoRuleHostCategorySettingsTests"}, dataProvider="getEditSudoRuleTestObjects", dependsOnGroups={"sudoRuleAddAndEditTests"})
+	@Test (groups={"sudoRuleHostCategorySettingsTests"}, description="Edit the Access this Host Section for the Sudo Rule", 
+			dataProvider="getEditHostSudoRuleTestObjects", 
+			dependsOnGroups={"sudoRuleAddAndEditTests"})
 	public void testSudoRuleHostCategorySettings(String testName, String cn) throws Exception {		
 		//verify rule to be edited exists
 		Assert.assertTrue(sahiTasks.link(cn).exists(), "Verify Rule " + cn + " to be edited exists");
@@ -469,7 +478,7 @@ public class SudoTests extends SahiTestScript{
 	
 	
 	/*
-	 * Edit the Who Section for the Sudo Rule
+	 * Edit the Command Category for the Sudo Rule
 	 * Testing:
 	 * Verify user added as part of sudoRuleAddAndEditTests is a member of this sudo rule
 	 * delete this user, add a user group in this section
@@ -478,8 +487,9 @@ public class SudoTests extends SahiTestScript{
 	 * verify the user is an indirect member of the group
 	 * verify undo/reset/update for this section when working with the radiobutton
 	 */
-	@Test (groups={"sudoRuleCommandCategorySettingsTests"}, dataProvider="getEditSudoRuleTestObjects", dependsOnGroups={"sudoRuleAddAndEditTests"})
-	//@Test (groups={"sudoRuleCommandCategorySettingsTests"}, dataProvider="getEditSudoRuleTestObjects")
+	@Test (groups={"sudoRuleCommandCategorySettingsTests"}, description="Edit the Command Category for the Sudo Rule",
+			dataProvider="getEditCommandCategorySudoRuleTestObjects", 
+			dependsOnGroups={"sudoRuleAddAndEditTests"})
 	public void testSudoRuleCommandCategorySettings(String testName, String cn) throws Exception {		
 		//verify rule to be edited exists
 		Assert.assertTrue(sahiTasks.link(cn).exists(), "Verify Rule " + cn + " to be edited exists");
@@ -517,7 +527,7 @@ public class SudoTests extends SahiTestScript{
 	 * verify undo/reset/update for this section when working with the radiobutton
 	 */
 	@Test (groups={"sudoRuleRunAsUserCategorySettingsTests"}, description="Failures caused by bug 735185 & 736455 ",  
-			dataProvider="getEditSudoRuleTestObjects", dependsOnGroups={"sudoRuleAddAndEditTests"})
+			dataProvider="getEditAsWhomSudoRuleTestObjects", dependsOnGroups={"sudoRuleAddAndEditTests"})
 	public void testSudoRuleRunAsUserCategorySettings(String testName, String cn) throws Exception {		
 		//verify rule to be edited exists
 		Assert.assertTrue(sahiTasks.link(cn).exists(), "Verify Rule " + cn + " to be edited exists");
@@ -570,7 +580,8 @@ public class SudoTests extends SahiTestScript{
 	 * verify the group was deleted
 	 * verify undo/reset/update for this section when working with the radiobutton
 	 */
-	@Test (groups={"sudoRuleRunAsGroupCategorySettingsTests"}, dataProvider="getEditSudoRuleTestObjects", 
+	@Test (groups={"sudoRuleRunAsGroupCategorySettingsTests"}, description="Edit RunAs Section of Sudo Rule",
+			dataProvider="getEditRunAsSudoRuleTestObjects", 
 			dependsOnGroups={"sudoRuleAddAndEditTests"})
 	public void testSudoRuleRunAsGroupCategorySettings(String testName, String cn) throws Exception {		
 		//verify rule to be edited exists
@@ -706,10 +717,10 @@ public class SudoTests extends SahiTestScript{
 	protected List<List<Object>> createSudoruleTestObjects() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-        //										testname						cn   			
-		ll.add(Arrays.asList(new Object[]{ "Add a Sudo Rule - good",			"SudoRule1"} ));
-		ll.add(Arrays.asList(new Object[]{ "Add a Sudo Rule - long",			"abcdefghijklmnopqrstuvwxyz123456789ANDAGAINabcdefghijklmnopqrstuvwxyz123456789ANDAGAINabcdefghijklmnopqrstuvwxyz123456789"      } ));
-		ll.add(Arrays.asList(new Object[]{ "Add a Sudo Rule - Special Char",	"S@ud*o#Ru?le"      } ));
+        //										testname			cn   			
+		ll.add(Arrays.asList(new Object[]{ "add_rule_good",			"SudoRule1"} ));
+		ll.add(Arrays.asList(new Object[]{ "add_rule_long",			"abcdefghijklmnopqrstuvwxyz123456789ANDAGAINabcdefghijklmnopqrstuvwxyz123456789ANDAGAINabcdefghijklmnopqrstuvwxyz123456789"      } ));
+		ll.add(Arrays.asList(new Object[]{ "add_rule_special_char",	"S@ud*o#Ru?le"      } ));
 		
 		
 		return ll;	
@@ -726,8 +737,8 @@ public class SudoTests extends SahiTestScript{
 	protected List<List<Object>> createSudoRuleAndAddAnotherTestObject() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-        //										testname						cn1					cn2   
-		ll.add(Arrays.asList(new Object[]{ "Add and Add Another Sudo Rule",		"SudoRule2",		"SudoRule3"  } ));
+        //										testname					cn1					cn2   
+		ll.add(Arrays.asList(new Object[]{ "add_and_add_another_rule",		"SudoRule2",		"SudoRule3"  } ));
 		
 		return ll;	
 	}
@@ -745,7 +756,7 @@ public class SudoTests extends SahiTestScript{
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
         //										testname					cn   			
-		ll.add(Arrays.asList(new Object[]{ "Add and Edit Sudo Rule",			"SudoRule4"      } ));
+		ll.add(Arrays.asList(new Object[]{ "add_and_edit_rule",			"SudoRule4"      } ));
 		
 		return ll;	
 	}
@@ -762,40 +773,99 @@ public class SudoTests extends SahiTestScript{
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
         //										testname								cn   			
-		ll.add(Arrays.asList(new Object[]{ "Expand and Collapse details of a Rule",		"SudoRule4"      } ));
+		ll.add(Arrays.asList(new Object[]{ "expand_collapse_details_of_rule",		"SudoRule4"      } ));
 		
 		return ll;	
 	}
 	
 	/*
-	 * Data to be used when adding rules 
+	 * Data to be used when editing RunAs section for rules 
 	 */
-	@DataProvider(name="getEditSudoRuleTestObjects")
-	public Object[][] getEditSudoRuleTestObjects() {
-		return TestNGUtils.convertListOfListsTo2dArray(createEditSudoRuleTestObject());
+	@DataProvider(name="getEditRunAsSudoRuleTestObjects")
+	public Object[][] getEditRunAsSudoRuleTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createRunAsSudoRuleTestObject());
 	}
-	protected List<List<Object>> createEditSudoRuleTestObject() {		
+	protected List<List<Object>> createRunAsSudoRuleTestObject() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
         //										testname					cn   			
-		ll.add(Arrays.asList(new Object[]{ "create_good_sudorule",			"SudoRule4"      } ));
+		ll.add(Arrays.asList(new Object[]{ "edit_runas_for_rule",			"SudoRule4"      } ));
+		return ll;	
+	}
+	
+	/*
+	 * Data to be used when editing Who section for rules 
+	 */
+	@DataProvider(name="getEditWhoSectionSudoRuleTestObjects")
+	public Object[][] getEditWhoSectionSudoRuleTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createWhoSectionSudoRuleTestObject());
+	}
+	protected List<List<Object>> createWhoSectionSudoRuleTestObject() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
+        //										testname					cn   			
+		ll.add(Arrays.asList(new Object[]{ "edit_who_for_rule",			"SudoRule4"      } ));
+		return ll;	
+	}
+	
+	/*
+	 * Data to be used when editing 'Access this Host' section for rules 
+	 */
+	@DataProvider(name="getEditHostSudoRuleTestObjects")
+	public Object[][] getEditHostSudoRuleTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createHostSectionSudoRuleTestObject());
+	}
+	protected List<List<Object>> createHostSectionSudoRuleTestObject() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname						cn   			
+		ll.add(Arrays.asList(new Object[]{ "edit_accessthishost_for_rule",		"SudoRule4"      } ));
+		return ll;	
+	}
+	
+	/*
+	 * Data to be used when editing 'Access this Host' section for rules 
+	 */
+	@DataProvider(name="getEditCommandCategorySudoRuleTestObjects")
+	public Object[][] getEditCommandCategorySudoRuleTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createCommandCategorySudoRuleTestObject());
+	}
+	protected List<List<Object>> createCommandCategorySudoRuleTestObject() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname						cn   			
+		ll.add(Arrays.asList(new Object[]{ "edit_accessthishost_for_rule",		"SudoRule4"      } ));
+		return ll;	
+	}
+	
+	/*
+	 * Data to be used when editing 'Access this Host' section for rules 
+	 */
+	@DataProvider(name="getEditAsWhomSudoRuleTestObjects")
+	public Object[][] getEditAsWhomSudoRuleTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createAsWhomSudoRuleTestObject());
+	}
+	protected List<List<Object>> createAsWhomSudoRuleTestObject() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname				cn   			
+		ll.add(Arrays.asList(new Object[]{ "edit_aswhom_for_rule",		"SudoRule4"      } ));
 		return ll;	
 	}
 	
 	
 	/*
-	 * Data to be used when adding rules 
+	 * Data to be used when adding external user and host to rule 
 	 */
 	@DataProvider(name="getEditSudoRuleExternalUserHostTestObjects")
 	public Object[][] getEditSudoRuleExternalUserHostTestObjects() {
-		return TestNGUtils.convertListOfListsTo2dArray(createEditSudoRuleExternalUserHostTestObject());
+		return TestNGUtils.convertListOfListsTo2dArray(createSudoRuleExternalUserHostTestObject());
 	}
-	protected List<List<Object>> createEditSudoRuleExternalUserHostTestObject() {		
+	protected List<List<Object>> createSudoRuleExternalUserHostTestObject() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-        //										testname											cn   			externalUser		externalHost		
-		ll.add(Arrays.asList(new Object[]{ "Verify adding External User and Host to the Rule",		"SudoRule4",	"externaluser",		"external.host.com"      } ));
+        //										testname								cn   			externalUser		externalHost		
+		ll.add(Arrays.asList(new Object[]{ "add_external_user_and_host_to_rule",		"SudoRule4",	"externaluser",		"external.host.com"      } ));
 		
 		return ll;	
 	}
@@ -810,8 +880,8 @@ public class SudoTests extends SahiTestScript{
 	protected List<List<Object>> createCancelAddSudoRuleTestObject() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-        //										testname						cn   			
-		ll.add(Arrays.asList(new Object[]{ "Add but Cancel Adding Sudo Rule",	"SudoRule5"      } ));
+        //										testname			cn   			
+		ll.add(Arrays.asList(new Object[]{ "cancel_adding_rule",	"SudoRule5"      } ));
 		
 		return ll;	
 	}
@@ -826,10 +896,10 @@ public class SudoTests extends SahiTestScript{
 	protected List<List<Object>> createInvalidSudoRuleTestObject() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-        //										testname												cn					expected_Error   
-		ll.add(Arrays.asList(new Object[]{ "Verify error when adding duplicate Rule",					"sudorule1",		"sudo rule with name \"sudorule1\" already exists"      } ));
-		ll.add(Arrays.asList(new Object[]{ "Verify error when adding Rule with leading space in name",	" sudorule10",		"invalid 'sudorule_name': Leading and trailing spaces are not allowed"      } ));
-		ll.add(Arrays.asList(new Object[]{ "Verify error when adding Rule with trailing space in name",	"sudorule10 ",		"invalid 'sudorule_name': Leading and trailing spaces are not allowed"      } ));
+        //										testname							cn					expected_Error   
+		ll.add(Arrays.asList(new Object[]{ "add_duplicate_rule",					"sudorule1",		"sudo rule with name \"sudorule1\" already exists"      } ));
+		ll.add(Arrays.asList(new Object[]{ "add_rule_invalid_name_leading_space",	" sudorule10",		"invalid 'sudorule_name': Leading and trailing spaces are not allowed"      } ));
+		ll.add(Arrays.asList(new Object[]{ "add_rule_invalid_name_trailing_space",	"sudorule10 ",		"invalid 'sudorule_name': Leading and trailing spaces are not allowed"      } ));
 		
 		return ll;	
 	}
@@ -846,7 +916,7 @@ public class SudoTests extends SahiTestScript{
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
         //										testname				cn					expected_Error   
-		ll.add(Arrays.asList(new Object[]{ "Add blank Rule",			"",					"Required field"      } ));
+		ll.add(Arrays.asList(new Object[]{ "add_blank_rule",			"",					"Required field"      } ));
 		
 		return ll;	
 	}
@@ -878,8 +948,8 @@ public class SudoTests extends SahiTestScript{
 	protected List<List<Object>> deleteMultipleSudoRuleTestObjects() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-        //										testname					cn1					cn2																																			
-		ll.add(Arrays.asList(new Object[]{ "Delete Multiple Rules",		"S@ud*o#Ru?le",		"abcdefghijklmnopqrstuvwxyz123456789ANDAGAINabcdefghijklmnopqrstuvwxyz123456789ANDAGAINabcdefghijklmnopqrstuvwxyz123456789"      } ));
+        //										testname				cn1					cn2																																			
+		ll.add(Arrays.asList(new Object[]{ "delete_multiple_rules",		"S@ud*o#Ru?le",		"abcdefghijklmnopqrstuvwxyz123456789ANDAGAINabcdefghijklmnopqrstuvwxyz123456789ANDAGAINabcdefghijklmnopqrstuvwxyz123456789"      } ));
 		
 		return ll;	
 	}
@@ -896,7 +966,7 @@ public class SudoTests extends SahiTestScript{
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
         //										testname					cn   
-		ll.add(Arrays.asList(new Object[]{ "Delete single Rule",			"SudoRule1"      } ));
+		ll.add(Arrays.asList(new Object[]{ "delete_single_rule",			"SudoRule1"      } ));
 		
 		return ll;	
 	}
@@ -913,7 +983,7 @@ public class SudoTests extends SahiTestScript{
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
         //										testname					cn   				description
-		ll.add(Arrays.asList(new Object[]{ "edit_general_sudorule",			"SudoRule4",		"This rule is for eng"      } ));
+		ll.add(Arrays.asList(new Object[]{ "edit_general_rule",			"SudoRule4",		"This rule is for eng"      } ));
 		
 		return ll;	
 	}
@@ -930,7 +1000,7 @@ public class SudoTests extends SahiTestScript{
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
         //										testname					cn   				option1							option2
-		ll.add(Arrays.asList(new Object[]{ "edit_general_sudorule",			"SudoRule4",		"logfile=/var/log/sudolog",		"env_delete+=\"JAVA_HOME\""      } ));
+		ll.add(Arrays.asList(new Object[]{ "edit_options_sudorule",			"SudoRule4",		"logfile=/var/log/sudolog",		"env_delete+=\"JAVA_HOME\""      } ));
 		
 		return ll;	
 	}

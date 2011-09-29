@@ -359,10 +359,10 @@ public class SudoCommandTests extends SahiTestScript {
 	protected List<List<Object>> createSudoCommandAddTestObjects() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-        //										testname							cn   					desc	
-		ll.add(Arrays.asList(new Object[]{ "Add a Sudo Command - good",				"/bin/date", 			"testing date command"	} ));
-		ll.add(Arrays.asList(new Object[]{ "Add a Sudo Command - long",				"/home/abcdefghijklmnopqrstuvwxyz123456789ANDAGAINabcdefghijklmnopqrstuvwxyz123456789ANDAGAINabcdefghijklmnopqrstuvwxyz123456789/bin/date", 	"testing long date command"	} ));
-		ll.add(Arrays.asList(new Object[]{ "Add a Sudo Command - Special Char",		"/b@i&n?/~d:a?t+e-", 	"testing date command with special char"	} ));
+        //										testname			cn   					desc	
+		ll.add(Arrays.asList(new Object[]{ "add_command_good",				"/bin/date", 			"testing date command"	} ));
+		ll.add(Arrays.asList(new Object[]{ "add_command_long",				"/home/abcdefghijklmnopqrstuvwxyz123456789ANDAGAINabcdefghijklmnopqrstuvwxyz123456789ANDAGAINabcdefghijklmnopqrstuvwxyz123456789/bin/date", 	"testing long date command"	} ));
+		ll.add(Arrays.asList(new Object[]{ "add_command_special_char",		"/b@i&n?/~d:a?t+e-", 	"testing date command with special char"	} ));
 		
 	//	ll.add(Arrays.asList(new Object[]{ "create_sudorule_command",		"/bin/cat", 	"testing cat command"	} ));
 		/*
@@ -385,8 +385,8 @@ public class SudoCommandTests extends SahiTestScript {
 	protected List<List<Object>> createSudoCommandCancelAddTestObjects() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-        //										testname							cn   			desc
-		ll.add(Arrays.asList(new Object[]{ "Cancel adding a Sudo Command",		"/bin/find",	"testing find command"	} ));
+        //										testname			cn   			desc
+		ll.add(Arrays.asList(new Object[]{ "cancel_add_command",	"/bin/find",	"testing find command"	} ));
 								   
 		return ll;	
 	}
@@ -402,8 +402,8 @@ public class SudoCommandTests extends SahiTestScript {
 	protected List<List<Object>> createSudoruleCommandCancelDelTestObjects() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-        //										testname							cn   				
-		ll.add(Arrays.asList(new Object[]{ "Cancel deleting a Sudo command",		"/bin/date"	} ));
+        //										testname		cn   				
+		ll.add(Arrays.asList(new Object[]{ "cancel_delete_command",		"/bin/date"	} ));
 		
 		return ll;	
 	}
@@ -418,8 +418,8 @@ public class SudoCommandTests extends SahiTestScript {
 	protected List<List<Object>> createSudoruleCommandDelTestObjects() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-        //										testname					cn   				
-		ll.add(Arrays.asList(new Object[]{ "Delete a Sudo command",		"/bin/date"	} ));
+        //										testname			cn   				
+		ll.add(Arrays.asList(new Object[]{ "delete_single_command",		"/bin/date"	} ));
 		
 		return ll;	
 	}
@@ -436,7 +436,7 @@ public class SudoCommandTests extends SahiTestScript {
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
         //										testname					cn1					cn2   			
-		ll.add(Arrays.asList(new Object[]{ "Add and Add another Sudo command",		"/bin/more",		"/usr/bin/less"	} ));
+		ll.add(Arrays.asList(new Object[]{ "add_and_add_another_command",		"/bin/more",		"/usr/bin/less"	} ));
 		
 		return ll;	
 	}
@@ -452,7 +452,7 @@ public class SudoCommandTests extends SahiTestScript {
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
         //										testname					cn1					cn2   			
-		ll.add(Arrays.asList(new Object[]{ "Delete multiple Sudo commands",		"/bin/more",		"/usr/bin/less"	} ));
+		ll.add(Arrays.asList(new Object[]{ "delete_multiple_commands",		"/bin/more",		"/usr/bin/less"	} ));
 		
 		return ll;	
 	}
@@ -468,8 +468,8 @@ public class SudoCommandTests extends SahiTestScript {
 	protected List<List<Object>> createAddAndEditSudoCommandTestObjects() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-        //										testname						cn					desc  			
-		ll.add(Arrays.asList(new Object[]{ "Add and Edit a Sudo command",		"/bin/ln",			"symlink command"	} ));
+        //										testname				cn					desc  			
+		ll.add(Arrays.asList(new Object[]{ "add_and_edit_command",		"/bin/ln",			"symlink command"	} ));
 		
 		return ll;	
 	}
@@ -484,8 +484,8 @@ public class SudoCommandTests extends SahiTestScript {
 	protected List<List<Object>> createCancelEnrollSudoCommandTestObjects() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-        //										testname											cn				 			
-		ll.add(Arrays.asList(new Object[]{ "Cancel enrolling a Command into a Command Group",		"/bin/ln"	} ));
+        //										testname										cn				 			
+		ll.add(Arrays.asList(new Object[]{ "cancel_enrolling_command_into_commandgroup",		"/bin/ln"	} ));
 		
 		return ll;	
 	}
@@ -501,8 +501,8 @@ public class SudoCommandTests extends SahiTestScript {
 	protected List<List<Object>> createEnrollSudoCommandTestObjects() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-        //										testname								cn				 			
-		ll.add(Arrays.asList(new Object[]{ "Enroll a Command into a Command Group",		"/bin/ln"	} ));
+        //										testname							cn				 			
+		ll.add(Arrays.asList(new Object[]{ "enroll_command_into_commandgroup",		"/bin/ln"	} ));
 		
 		return ll;	
 	}
@@ -519,8 +519,8 @@ public class SudoCommandTests extends SahiTestScript {
 	protected List<List<Object>> createCancelDelEnrolledSudoCommandTestObjects() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-        //										testname												cn				 			
-		ll.add(Arrays.asList(new Object[]{ "Cancel deleting an enrolled command from its group",		"/bin/ln"	} ));
+        //										testname										cn				 			
+		ll.add(Arrays.asList(new Object[]{ "cancel_deleting_enrolled_command_from_group",		"/bin/ln"	} ));
 		
 		return ll;	
 	}
@@ -536,8 +536,8 @@ public class SudoCommandTests extends SahiTestScript {
 	protected List<List<Object>> createDeleteEnrolledSudoCommandTestObjects() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-        //										testname									cn				 			
-		ll.add(Arrays.asList(new Object[]{ "Delete an enrolled command from its group",		"/bin/ln"	} ));
+        //										testname								cn				 			
+		ll.add(Arrays.asList(new Object[]{ "delete_enrolled_command_from_group",		"/bin/ln"	} ));
 		
 		return ll;	
 	}
@@ -552,12 +552,12 @@ public class SudoCommandTests extends SahiTestScript {
 	protected List<List<Object>> createSudoCommandInvalidAddTestObjects() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-        //										testname														cn   						description
-		ll.add(Arrays.asList(new Object[]{ "Verify error when adding duplicate Commands",						"/bin/date",				"Duplicate command",					"sudo command with name \"/bin/date\" already exists"	} ));
-		ll.add(Arrays.asList(new Object[]{ "Verify error when adding Command with trailing space in desc",		"/bin/find",				"Description with trailing space ",		"invalid 'desc': Leading and trailing spaces are not allowed"	} ));
-		ll.add(Arrays.asList(new Object[]{ "Verify error when adding Command with leading space in desc",		"/bin/find",				" Description with leading space",		"invalid 'desc': Leading and trailing spaces are not allowed"      } ));
-		ll.add(Arrays.asList(new Object[]{ "Verify error when adding Command with leading space in name",		" /bin/find",				"Name with leading space",				"invalid 'command': Leading and trailing spaces are not allowed"      } ));
-		ll.add(Arrays.asList(new Object[]{ "Verify error when adding Command with trailing space in name",		"/bin/find ",				"Name with trailing space",				"invalid 'command': Leading and trailing spaces are not allowed"      } ));
+        //										testname									cn   						description
+		ll.add(Arrays.asList(new Object[]{ "add_duplicate_command",							"/bin/date",				"Duplicate command",					"sudo command with name \"/bin/date\" already exists"	} ));
+		ll.add(Arrays.asList(new Object[]{ "add_command_invalid_desc_trailing_space",		"/bin/find",				"Description with trailing space ",		"invalid 'desc': Leading and trailing spaces are not allowed"	} ));
+		ll.add(Arrays.asList(new Object[]{ "add_command_invalid_desc_leading_space",		"/bin/find",				" Description with leading space",		"invalid 'desc': Leading and trailing spaces are not allowed"      } ));
+		ll.add(Arrays.asList(new Object[]{ "add_command_invalid_name_leading_space",		" /bin/find",				"Name with leading space",				"invalid 'command': Leading and trailing spaces are not allowed"      } ));
+		ll.add(Arrays.asList(new Object[]{ "add_command_invalid_name_trailing_space",		"/bin/find ",				"Name with trailing space",				"invalid 'command': Leading and trailing spaces are not allowed"      } ));
 		
 		
 		return ll;	
@@ -575,7 +575,7 @@ public class SudoCommandTests extends SahiTestScript {
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
         //										testname				cn					expected_Error   
-		ll.add(Arrays.asList(new Object[]{ "Add blank Command",			"",					"Required field"      } ));
+		ll.add(Arrays.asList(new Object[]{ "add_blank_command",			"",					"Required field"      } ));
 		
 		return ll;	
 	}
@@ -592,8 +592,8 @@ public class SudoCommandTests extends SahiTestScript {
 	protected List<List<Object>> createSudoCommandInvalidModifyTestObjects() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-        //										testname														cn   		description		
-		ll.add(Arrays.asList(new Object[]{ "Edit a Sudo Command, and update its description to be blank",		"/bin/ln",		""      	} ));
+        //										testname								cn   		description		
+		ll.add(Arrays.asList(new Object[]{ "edit_command_update_with_blank_desc",		"/bin/ln",		""      	} ));
 		
 		return ll;	
 	}

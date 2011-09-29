@@ -41,7 +41,7 @@ public class CommonTasks {
 	public String sudoCommandPage =  serverUrl + "/ipa/ui/#sudo=sudocmd&policy=sudo&navigation=policy";
 	public String sudoCommandGroupPage =  serverUrl + "/ipa/ui/#sudo=sudocmdgroup&policy=sudo&navigation=policy";
 
-	
+	public String configurationPage = serverUrl + "/ipa/ui/#ipaserver=config&navigation=ipaserver"; 
 	
 	public static String ipadomain = "";
 	public static String ipafqdn= "";

@@ -418,10 +418,10 @@ public class SudoCommandGroupTests extends SahiTestScript{
 	protected List<List<Object>> createSudoruleCommandGroupAddTestObjects() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-        //										testname					cn   						description
-		ll.add(Arrays.asList(new Object[]{ "Add Sudo Command Group - good",				"sudo group1",				"group1 with basic commands"	} ));
-		ll.add(Arrays.asList(new Object[]{ "Add Sudo Command Group - long",				"abcdefghijklmnopqrstuvwxyz123456789ANDAGAINabcdefghijklmnopqrstuvwxyz123456789ANDAGAINabcdefghijklmnopqrstuvwxyz123456789",	"long group name"      } ));
-		ll.add(Arrays.asList(new Object[]{ "Add Sudo Command Group - Special Char",		"S@ud*o#Ru?le", 			"group with special char - in De$c"      } ));
+        //										testname			cn   						description
+		ll.add(Arrays.asList(new Object[]{ "add_commandgroup_good",				"sudo group1",				"group1 with basic commands"	} ));
+		ll.add(Arrays.asList(new Object[]{ "add_commandgroup_long",				"abcdefghijklmnopqrstuvwxyz123456789ANDAGAINabcdefghijklmnopqrstuvwxyz123456789ANDAGAINabcdefghijklmnopqrstuvwxyz123456789",	"long group name"      } ));
+		ll.add(Arrays.asList(new Object[]{ "add_commandgroup_special_char",		"S@ud*o#Ru?le", 			"group with special char - in De$c"      } ));
 		
 		return ll;	
 	}
@@ -437,8 +437,8 @@ public class SudoCommandGroupTests extends SahiTestScript{
 	protected List<List<Object>> createSudoCommandGroupCancelAddTestObjects() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-        //										testname					cn   						description
-		ll.add(Arrays.asList(new Object[]{ "Add but Cancel Adding Sudo Command Group",				"Sudo Group 2",				"cancel adding this group"	} ));
+        //										testname				cn   						description
+		ll.add(Arrays.asList(new Object[]{ "cancel_adding_commandgroup",				"Sudo Group 2",				"cancel adding this group"	} ));
 		
 		return ll;	
 	}
@@ -453,8 +453,8 @@ public class SudoCommandGroupTests extends SahiTestScript{
 	protected List<List<Object>> deleteSudoruleCommandGroupCancelDelTestObjects() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-        //										testname								cn   			
-		ll.add(Arrays.asList(new Object[]{ "Cancel deleting a Sudo Command Group",		"sudo group1"	} ));
+        //										testname			cn   			
+		ll.add(Arrays.asList(new Object[]{ "cancel_deleting_commandgroup",		"sudo group1"	} ));
 					        
 		return ll;	
 	}
@@ -469,8 +469,8 @@ public class SudoCommandGroupTests extends SahiTestScript{
 	protected List<List<Object>> deleteSudoruleCommandGroupDelTestObjects() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-        //										testname					cn   			
-		ll.add(Arrays.asList(new Object[]{ "Delete a Sudo Command Group",	"sudo group1"	} ));
+        //									testname			cn   			
+		ll.add(Arrays.asList(new Object[]{ "delete_single_commandgroup",		"sudo group1"	} ));
 					        
 		return ll;	
 	}
@@ -486,10 +486,10 @@ public class SudoCommandGroupTests extends SahiTestScript{
 	protected List<List<Object>> createSudoCommandGroupInvalidModifyTestObjects() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-        //										testname																	cn   				description		expected error
+        //										testname											cn   				description		expected error
 		// ll.add(Arrays.asList(new Object[]{ "Verify error when editing a Command Group to have blank desc",	"sudo group1",		"", 			"Input form contains invalid or missing values."	} ));
-		ll.add(Arrays.asList(new Object[]{ "Verify error when editing a Command Group to have trailing space in desc",		"sudo group1",				"Description with trailing space ",		"invalid 'desc': Leading and trailing spaces are not allowed"	} ));
-		ll.add(Arrays.asList(new Object[]{ "Verify error when editing a Command Group to have leading space in desc",		"sudo group1",				" Description with leading space",		"invalid 'desc': Leading and trailing spaces are not allowed"      } ));
+		ll.add(Arrays.asList(new Object[]{ "edit__commandgroup_invalid_desc_trailing_space",		"sudo group1",				"Description with trailing space ",		"invalid 'desc': Leading and trailing spaces are not allowed"	} ));
+		ll.add(Arrays.asList(new Object[]{ "edit__commandgroup_invalid_desc_leading_space",			"sudo group1",				" Description with leading space",		"invalid 'desc': Leading and trailing spaces are not allowed"      } ));
 		
 		return ll;	
 	}
@@ -502,12 +502,12 @@ public class SudoCommandGroupTests extends SahiTestScript{
 	protected List<List<Object>> createSudoruleCommandGroupInvalidAddTestObjects() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-        //										testname																cn   						description
+        //										testname										cn   						description								expectederror
 		//TODO : duplicate group
-		ll.add(Arrays.asList(new Object[]{ "Verify error when adding Command Group with trailing space in desc",		"sudo group2",				"Description with trailing space ",		"invalid 'desc': Leading and trailing spaces are not allowed"	} ));
-		ll.add(Arrays.asList(new Object[]{ "Verify error when adding Command Group with leading space in desc",			"sudo group2",				" Description with leading space",		"invalid 'desc': Leading and trailing spaces are not allowed"      } ));
-		ll.add(Arrays.asList(new Object[]{ "Verify error when adding Command Group with leading space in name",			" sudo group2",				"Name with leading space",				"invalid 'sudocmdgroup_name': Leading and trailing spaces are not allowed"      } ));
-		ll.add(Arrays.asList(new Object[]{ "Verify error when adding Command Group with trailing space in name",		"sudo group2 ",				"Name with trailing space",				"invalid 'sudocmdgroup_name': Leading and trailing spaces are not allowed"      } ));
+		ll.add(Arrays.asList(new Object[]{ "add_commandgroup_invalid_desc_trailing_space",		"sudo group2",				"Description with trailing space ",		"invalid 'desc': Leading and trailing spaces are not allowed"	} ));
+		ll.add(Arrays.asList(new Object[]{ "add_commandgroup_invalid_desc_leading_space",		"sudo group2",				" Description with leading space",		"invalid 'desc': Leading and trailing spaces are not allowed"      } ));
+		ll.add(Arrays.asList(new Object[]{ "add_commandgroup_invalid_name_leading_space",		" sudo group2",				"Name with leading space",				"invalid 'sudocmdgroup_name': Leading and trailing spaces are not allowed"      } ));
+		ll.add(Arrays.asList(new Object[]{ "add_commandgroup_invalid_name_trailing_space",		"sudo group2 ",				"Name with trailing space",				"invalid 'sudocmdgroup_name': Leading and trailing spaces are not allowed"      } ));
 		
 		
 		return ll;	
@@ -524,8 +524,8 @@ public class SudoCommandGroupTests extends SahiTestScript{
 	protected List<List<Object>> createSudoRuleCommandGroupRequiredFieldTestObject() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-        //										testname											cn					expected_Error   
-		ll.add(Arrays.asList(new Object[]{ "Verify error when adding blank Sudo Command group",		"",					"Required field"      } ));
+        //										testname								cn					expected_Error   
+		ll.add(Arrays.asList(new Object[]{ "add_commandgroup_invalid_blank_name",		"",					"Required field"      } ));
 		
 		return ll;	
 	}
@@ -541,8 +541,8 @@ public class SudoCommandGroupTests extends SahiTestScript{
 	protected List<List<Object>> createSudoCommandGroupAndAddAnotherTestObject() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-        //										testname								cn1					cn2					desc   
-		ll.add(Arrays.asList(new Object[]{ "Add and Add Another Sudo Command Group",	"Sudo Group 2",		"Sudo Group 3", 	"testing sudo groups"  } ));
+        //										testname						cn1					cn2					desc   
+		ll.add(Arrays.asList(new Object[]{ "add_and_add_another_commandgroup",	"Sudo Group 2",		"Sudo Group 3", 	"testing sudo groups"  } ));
 		
 		return ll;	
 	}
@@ -559,8 +559,8 @@ public class SudoCommandGroupTests extends SahiTestScript{
 	protected List<List<Object>> deleteMultipleSudoCommandGroupTestObject() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-        //										testname				cn1					cn2					   
-		ll.add(Arrays.asList(new Object[]{ "Delete Multiple Rules",		"Sudo Group 2",		"Sudo Group 3" } ));
+        //										testname						cn1					cn2					   
+		ll.add(Arrays.asList(new Object[]{ "delete_multiple_commandgroups",		"Sudo Group 2",		"Sudo Group 3" } ));
 		
 		return ll;	
 	}
@@ -576,8 +576,8 @@ public class SudoCommandGroupTests extends SahiTestScript{
 	protected List<List<Object>> createAddAndEditSudoCommandGroupTestObjects() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-        //										testname							cn					desc  			
-		ll.add(Arrays.asList(new Object[]{ "Add and Edit a Sudo Command Group",		"Dev Sudo Group",	"sudo command group for dev"	} ));
+        //										testname					cn					desc  			
+		ll.add(Arrays.asList(new Object[]{ "add_and_edit_commandgroup",		"Dev Sudo Group",	"sudo command group for dev"	} ));
 		
 		return ll;	
 	}
@@ -593,8 +593,8 @@ public class SudoCommandGroupTests extends SahiTestScript{
 	protected List<List<Object>> createEnrollIntoSudoCommandGroupTestObjects() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-        //										testname								commandGroup				 			
-		ll.add(Arrays.asList(new Object[]{ "Enroll a Command into a Command Group",		"dev sudo group"	} ));
+        //										testname							commandGroup				 			
+		ll.add(Arrays.asList(new Object[]{ "enroll_command_into_commandgroup",		"dev sudo group"	} ));
 		
 		return ll;	
 	}
@@ -609,8 +609,8 @@ public class SudoCommandGroupTests extends SahiTestScript{
 	protected List<List<Object>> createCancelEnrollIntoSudoCommandGroupTestObjects() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-        //										testname											commandGroup				 			
-		ll.add(Arrays.asList(new Object[]{ "Cancel enrolling a Command into a Command Group",		"dev sudo group"	} ));
+        //										testname										commandGroup				 			
+		ll.add(Arrays.asList(new Object[]{ "cancel_enrolling_command_into_commandgroup",		"dev sudo group"	} ));
 		
 		return ll;	
 	}
@@ -626,7 +626,7 @@ public class SudoCommandGroupTests extends SahiTestScript{
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
         //										testname								commandGroup				 			
-		ll.add(Arrays.asList(new Object[]{ "Delete a Command from a Command Group",		"dev sudo group"	} ));
+		ll.add(Arrays.asList(new Object[]{ "delete_command_from_commandgroup",		"dev sudo group"	} ));
 		
 		return ll;	
 	}
@@ -641,8 +641,8 @@ public class SudoCommandGroupTests extends SahiTestScript{
 	protected List<List<Object>> createCancelDeleteFromSudoCommandGroupTestObjects() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-        //										testname										commandGroup				 			
-		ll.add(Arrays.asList(new Object[]{ "Cancel deleting a Command from a Command Group",	"dev sudo group"	} ));
+        //										testname									commandGroup				 			
+		ll.add(Arrays.asList(new Object[]{ "cancel_deleting_command_from_commandgroup",		"dev sudo group"	} ));
 		
 		return ll;	
 	}
@@ -657,8 +657,8 @@ public class SudoCommandGroupTests extends SahiTestScript{
 	protected List<List<Object>> createEnrollAgainIntoSudoCommandGroupTestObjects() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-        //										testname										commandGroup		expectedError			 			
-		ll.add(Arrays.asList(new Object[]{ "Enroll a Command into a Command Group Again",		"dev sudo group",	"/usr/bin/vim: This entry is already a member"	} ));
+        //										testname									commandGroup		expectedError			 			
+		ll.add(Arrays.asList(new Object[]{ "enroll_command_into_commandgroup_again",		"dev sudo group",	"/usr/bin/vim: This entry is already a member"	} ));
 		
 		return ll;	
 	}
@@ -674,7 +674,7 @@ public class SudoCommandGroupTests extends SahiTestScript{
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
         //										testname								commandGroup1			commandGroup2		desc			 			
-		ll.add(Arrays.asList(new Object[]{ "Enroll a Command into two Command Group",	"dev sudo group",		"qe sudo group",	"adding a command group - testing a command in two groups"	} ));
+		ll.add(Arrays.asList(new Object[]{ "enroll_command_into_two_commandgroup",		"dev sudo group",		"qe sudo group",	"adding a command group - testing a command in two groups"	} ));
 		
 		return ll;	
 	}
@@ -690,8 +690,8 @@ public class SudoCommandGroupTests extends SahiTestScript{
 	protected List<List<Object>> createSudoCommandGroupEditTestObjects() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-        //										testname																commandGroup		description				 			
-		ll.add(Arrays.asList(new Object[]{ "Verify Cancel/Reset/Update when editing description for Command Group",		"dev sudo group",	"sudo command group for dev"	} ));
+        //										testname											commandGroup		description				 			
+		ll.add(Arrays.asList(new Object[]{ "cancel_reset_update_when_editing_desc_commandgroup",	"dev sudo group",	"sudo command group for dev"	} ));
 		
 		return ll;	
 	}
