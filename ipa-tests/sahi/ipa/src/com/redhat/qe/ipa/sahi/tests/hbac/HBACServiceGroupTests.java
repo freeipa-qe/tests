@@ -225,22 +225,22 @@ private static Logger log = Logger.getLogger(UserTests.class.getName());
 	
 	
 	/*
-	 * Enroll same service twice - negative
+	 * Enroll service 
 	 */
-	@Test (groups={"hbacServiceGroupEnrollServiceTwiceTests"}, dataProvider="getHBACServiceInServiceGroupTestObjects", dependsOnGroups={"hbacServiceGroupAddTests" })	
-	public void testHBACServiceGroupEnrollServiceTwice(String testName, String service, String svcgrp) throws Exception {
+	@Test (groups={"hbacServiceGroupEnrollServiceTests"}, dataProvider="getHBACServiceInServiceGroupTestObjects", dependsOnGroups={"hbacServiceGroupAddTests" })	
+	public void testHBACServiceGroupEnrollService(String testName, String service, String svcgrp) throws Exception {
 		Assert.assertTrue(sahiTasks.link(svcgrp).exists(), "Verify HBAC Service Group " + svcgrp + "  to be edited exists");
 		
 		HBACTasks.enrollServiceinServiceGroup(sahiTasks, svcgrp, service);
 		HBACTasks.verifyServicesInServiceGroup(sahiTasks, service, svcgrp, true);
-		HBACTasks.enrollServiceAgainInServiceGroup(sahiTasks, svcgrp, service);
+		//HBACTasks.enrollServiceAgainInServiceGroup(sahiTasks, svcgrp, service);
 	}
 	
 	
 	/*
 	 * Edit an HBAC Service Group to delete a service
 	 */
-	@Test (groups={"hbacServiceGroupDeleteServiceTests"}, dataProvider="getHBACServiceInServiceGroupTestObjects", dependsOnGroups={"hbacServiceGroupAddTests", "hbacServiceGroupEnrollServiceTwiceTests", "hbacServiceGroupCancelDeleteServiceTests" })	
+	@Test (groups={"hbacServiceGroupDeleteServiceTests"}, dataProvider="getHBACServiceInServiceGroupTestObjects", dependsOnGroups={"hbacServiceGroupAddTests", "hbacServiceGroupEnrollServiceTests", "hbacServiceGroupCancelDeleteServiceTests" })	
 	public void testHBACServiceGroupDeleteService(String testName, String service, String svcgrp) throws Exception {
 		Assert.assertTrue(sahiTasks.link(svcgrp).exists(), "Verify HBAC Service Group " + svcgrp + "  to be edited exists");
 		HBACTasks.verifyServicesInServiceGroup(sahiTasks, service, svcgrp, true);
@@ -254,7 +254,7 @@ private static Logger log = Logger.getLogger(UserTests.class.getName());
 	/*
 	 * Edit an HBAC Service Group to cancel deleting a service
 	 */
-	@Test (groups={"hbacServiceGroupCancelDeleteServiceTests"}, dataProvider="getHBACServiceInServiceGroupTestObjects", dependsOnGroups={"hbacServiceGroupAddTests", "hbacServiceGroupEnrollServiceTwiceTests" })	
+	@Test (groups={"hbacServiceGroupCancelDeleteServiceTests"}, dataProvider="getHBACServiceInServiceGroupTestObjects", dependsOnGroups={"hbacServiceGroupAddTests", "hbacServiceGroupEnrollServiceTests" })	
 	public void testHBACServiceGroupCancelDeleteService(String testName, String service, String svcgrp) throws Exception {
 		Assert.assertTrue(sahiTasks.link(svcgrp).exists(), "Verify HBAC Service Group " + svcgrp + "  to be edited exists");
 		HBACTasks.verifyServicesInServiceGroup(sahiTasks, service, svcgrp, true);

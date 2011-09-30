@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
 
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
@@ -16,6 +17,7 @@ import com.redhat.qe.auto.testng.TestNGUtils;
 import com.redhat.qe.ipa.sahi.base.SahiTestScript;
 import com.redhat.qe.ipa.sahi.tasks.CommonTasks;
 import com.redhat.qe.ipa.sahi.tasks.SahiTasks;
+import com.redhat.qe.ipa.sahi.tasks.SudoTasks;
 import com.redhat.qe.ipa.sahi.tasks.UserTasks;
 
 /*
@@ -84,7 +86,8 @@ public class UserTests extends SahiTestScript{
 	/*
 	 * Add users - for positive tests
 	 */
-	@Test (groups={"userAddTests"}, dataProvider="getUserTestObjects")	
+	@Test (groups={"userAddTests"}, description="Add valid users",
+			dataProvider="getUserTestObjects")	
 	public void testUseradd(String testName, String uid, String givenname, String sn) throws Exception {
 		String expectedUID=uid;
 		if (uid.length() == 0) {
@@ -105,7 +108,8 @@ public class UserTests extends SahiTestScript{
 	/*
 	 * Add users - for positive tests
 	 */
-	@Test (groups={"userCancelAddTests"}, dataProvider="getSingleUserTestObjects")	
+	@Test (groups={"userCancelAddTests"}, description="Cancel adding a user",
+			dataProvider="getCancelAddUserTestObjects")	
 	public void testUserCancelAdd(String testName, String uid, String givenname, String sn) throws Exception {
 		//verify user doesn't exist
 		Assert.assertFalse(sahiTasks.link(uid).exists(), "Verify user " + uid + " doesn't already exist");
@@ -120,7 +124,8 @@ public class UserTests extends SahiTestScript{
 	/*
 	 * Add users - for negative tests
 	 */
-	@Test (groups={"invalidUserAddTests"}, dataProvider="getInvalidUserTestObjects",  dependsOnGroups="userAddTests")	
+	@Test (groups={"invalidUserAddTests"}, description="Add user - invalid",
+			dataProvider="getInvalidUserTestObjects",  dependsOnGroups="userAddTests")	
 	public void testInvalidUseradd(String testName, String uid, String givenname, String sn, String expectedError) throws Exception {
 		//new test user can be added now
 		UserTasks.createInvalidUser(sahiTasks, uid, givenname, sn, expectedError);		
@@ -171,8 +176,8 @@ public class UserTests extends SahiTestScript{
 		UserTasks.verifyUserContactData(sahiTasks, uid, mail3, mail2, mail1, phone1, phone2, pager1, pager2, mobile1, mobile2, fax1, fax2);
 	}
 	
-	@Test (groups={"userAddDeleteUndoResetTests"}, description="",
-			dataProvider="getUserMultipleDataTestObjects", 
+	@Test (groups={"userAddDeleteUndoResetTests"}, description="Add/Delete/Undo/Reset contact data",
+			dataProvider="getUserAddDeleteUndoResetTestObjects", 
 			dependsOnGroups={"userAddTests", "userEditTests", "userMultipleDataTests"})	
 	public void testUserAddDeleteUndoReset(String testName, String uid, String mail1, String mail2, String	mail3, 
 			String phone1, String phone2, String pager1, String pager2, String mobile1, String mobile2, 
@@ -288,7 +293,7 @@ public class UserTests extends SahiTestScript{
 	/*
 	 * Cancel when deactivating users - for positive tests
 	 */
-	@Test (groups={"userCancelDeactivateTests"}, dataProvider="getUserStatusTestObjects", dependsOnGroups={"userAddTests",
+	@Test (groups={"userCancelDeactivateTests"}, dataProvider="getUserCancelDeactivateStatusTestObjects", dependsOnGroups={"userAddTests",
 			"userSetPasswordTests"})	
 	public void testUserCancelDeactivate(String testName, String uid, String password) throws Exception {		
 		//verify user to be edited exists
@@ -313,7 +318,7 @@ public class UserTests extends SahiTestScript{
 	/*
 	 * Deactivate users - for positive tests
 	 */
-	@Test (groups={"userDeactivateTests"}, dataProvider="getUserStatusTestObjects", dependsOnGroups={"userAddTests", "userCancelDeactivateTests", 
+	@Test (groups={"userDeactivateTests"}, dataProvider="getUserDeactivateStatusTestObjects", dependsOnGroups={"userAddTests", "userCancelDeactivateTests", 
 			"userSetPasswordTests"})	
 	public void testUserDeactivate(String testName, String uid, String password) throws Exception {		
 		//verify user to be edited exists
@@ -336,7 +341,7 @@ public class UserTests extends SahiTestScript{
 	/*
 	 * Cancel when reactivating users - for positive tests
 	 */
-	@Test (groups={"userCancelReactivateTests"}, dataProvider="getUserStatusTestObjects", dependsOnGroups={"userAddTests", "userDeactivateTests", "userSetPasswordTests"})	
+	@Test (groups={"userCancelReactivateTests"}, dataProvider="getUserCancelReactivateStatusTestObjects", dependsOnGroups={"userAddTests", "userDeactivateTests", "userSetPasswordTests"})	
 	public void testUserCancelReactivate(String testName, String uid, String password) throws Exception {		
 		//verify user to be edited exists
 		Assert.assertTrue(sahiTasks.link(uid).exists(), "Verify user " + uid + " to be reactivated exists");
@@ -358,7 +363,7 @@ public class UserTests extends SahiTestScript{
 	/*
 	 * Reactivate users - for positive tests
 	 */
-	@Test (groups={"userReactivateTests"}, dataProvider="getUserStatusTestObjects", dependsOnGroups={"userAddTests", "userDeactivateTests", "userSetPasswordTests", "userCancelReactivateTests"})	
+	@Test (groups={"userReactivateTests"}, dataProvider="getUserReactivateStatusTestObjects", dependsOnGroups={"userAddTests", "userDeactivateTests", "userSetPasswordTests", "userCancelReactivateTests"})	
 	public void testUserReactivate(String testName, String uid, String password) throws Exception {		
 		//verify user to be edited exists
 		Assert.assertTrue(sahiTasks.link(uid).exists(), "Verify user " + uid + " to be reactivated exists");
@@ -488,6 +493,29 @@ public class UserTests extends SahiTestScript{
 		
 	}
 	
+	@AfterClass (groups={"cleanup"}, description="Delete objects created for this test suite", alwaysRun=true)
+	public void cleanup() throws CloneNotSupportedException {
+		sahiTasks.navigateTo(commonTasks.userPage, true);
+		
+		String[] uids = {"user1",		
+				"user2",
+				"testuser",	
+				"tuser",	
+				"1spe.cial_us-er$",	
+				"user9",
+				"tuser7",
+				"tuser8"
+				} ;
+
+		//verify users were found
+		for (String uid : uids) {
+			if (sahiTasks.link(uid).exists()){
+				log.fine("Cleaning User: " + uid);
+				UserTasks.deleteUser(sahiTasks, uid);
+			}			
+		} 
+	}
+	
 	
 	/*******************************************************
 	 ************      DATA PROVIDERS     ******************
@@ -496,15 +524,15 @@ public class UserTests extends SahiTestScript{
 	/*
 	 * Data to be used when adding users - for positive cases
 	 */
-	@DataProvider(name="getSingleUserTestObjects")
-	public Object[][] getSingleUserTestObjects() {
-		return TestNGUtils.convertListOfListsTo2dArray(createSingleUserTestObjects());
+	@DataProvider(name="getCancelAddUserTestObjects")
+	public Object[][] getCancelAddUserTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createCancelAddUserTestObjects());
 	}
-	protected List<List<Object>> createSingleUserTestObjects() {		
+	protected List<List<Object>> createCancelAddUserTestObjects() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-        //										testname					uid              	givenname		sn   
-		ll.add(Arrays.asList(new Object[]{ "create_single_user",				"user1", 			"Test1",		"User1"      } ));
+        //									testname				uid              	givenname		sn   
+		ll.add(Arrays.asList(new Object[]{ "cancel_add",			"user1", 			"Test1",		"User1"      } ));
 		
 		return ll;	
 	}
@@ -516,11 +544,11 @@ public class UserTests extends SahiTestScript{
 	protected List<List<Object>> createUserTestObjects() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-        //										testname					uid              			givenname			sn   
-		ll.add(Arrays.asList(new Object[]{ "Add a user - good",				"testuser", 				"Test",				"User"      } ));
-		ll.add(Arrays.asList(new Object[]{ "Add a user - optional login",	"", 						"Test",				"User"      } ));
-		ll.add(Arrays.asList(new Object[]{ "Add a user - testuser",			"user2", 			    	"Test2",			"User2"     } ));
-		ll.add(Arrays.asList(new Object[]{ "Add a user - special char",		"1spe.cial_us-er$", 		"S$p|e>c--i_a%l_",	"%U&s?e+r(" } ));
+        //										testname			uid              			givenname			sn   
+		ll.add(Arrays.asList(new Object[]{ "add_good",				"testuser", 				"Test",				"User"      } ));
+		ll.add(Arrays.asList(new Object[]{ "add_optional_login",	"", 						"Test",				"User"      } ));
+		ll.add(Arrays.asList(new Object[]{ "add_testuser",			"user2", 			    	"Test2",			"User2"     } ));
+		ll.add(Arrays.asList(new Object[]{ "add_special_char",		"1spe.cial_us-er$", 		"S$p|e>c--i_a%l_",	"%U&s?e+r(" } ));
 		      
 		return ll;	
 	}
@@ -576,15 +604,15 @@ public class UserTests extends SahiTestScript{
 	protected List<List<Object>> editUserTestObjects() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-        //										testname					uid              		title					mail   
-		ll.add(Arrays.asList(new Object[]{ "edit_good_user",				"testuser", 			"Software Engineer",	"testuser@example.com"     } ));
+        //										testname			uid              		title					mail   
+		ll.add(Arrays.asList(new Object[]{ "edit_user",				"testuser", 			"Software Engineer",	"testuser@example.com"     } ));
 		        
 		return ll;	
 	}
 	
 	
 	/*
-	 * Data to be used when adding multiple Contact infor for users
+	 * Data to be used when adding multiple Contact info for users
 	 */
 	@DataProvider(name="getUserMultipleDataTestObjects")
 	public Object[][] getUserMultipleDataTestObjects() {
@@ -595,6 +623,23 @@ public class UserTests extends SahiTestScript{
 		
         //										testname					uid              		mail1			mail2			mail3 				phone1		phone2  		pager1		pager2			mobile1		mobile2			fax1		fax2
 		ll.add(Arrays.asList(new Object[]{ "add_multiple_contactdata",		"testuser", 			"one@testrelm",	"two@testrelm", "three@testrelm",   "1234567", 	"7654321",		"9876543",	"3456789",		"135790",	"097531", 		"1122334", 	"4332211"	 } ));
+		        
+		return ll;	
+	}
+	
+	
+	/*
+	 * Data to be used when adding multiple Contact info for users
+	 */
+	@DataProvider(name="getUserAddDeleteUndoResetTestObjects")
+	public Object[][] getUserAddDeleteUndoResetTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createUserAddDeleteUndoResetTestObjects());
+	}
+	protected List<List<Object>> createUserAddDeleteUndoResetTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname					uid              	mail1			mail2			mail3 				phone1		phone2  		pager1		pager2			mobile1		mobile2			fax1		fax2
+		ll.add(Arrays.asList(new Object[]{ "add_delete_undo_reset",			"testuser", 		"one@testrelm",	"two@testrelm", "three@testrelm",   "1234567", 	"7654321",		"9876543",	"3456789",		"135790",	"097531", 		"1122334", 	"4332211"	 } ));
 		        
 		return ll;	
 	}
@@ -615,20 +660,66 @@ public class UserTests extends SahiTestScript{
 		return ll;	
 	}
 	
-	
+	/*
+	 * Data to be used when cancelling deactivating user
+	 */
+	@DataProvider(name="getUserCancelDeactivateStatusTestObjects")
+	public Object[][] getUserCancelDeactivateStatusTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createUserCancelDeactivateStatusTestObjects());
+	}
+	protected List<List<Object>> createUserCancelDeactivateStatusTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname				  uid			password              		
+		ll.add(Arrays.asList(new Object[]{ "cancel_deactivate",			"testuser",		"Secret123"     } ));
+		        
+		return ll;	
+	}
 	
 	/*
 	 * Data to be used when deactivating user
 	 */
-	@DataProvider(name="getUserStatusTestObjects")
-	public Object[][] getUserStatusTestObjects() {
-		return TestNGUtils.convertListOfListsTo2dArray(editStatusUserTestObjects());
+	@DataProvider(name="getUserDeactivateStatusTestObjects")
+	public Object[][] getUserDeactivateStatusTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createUserDeactivateStatusTestObjects());
 	}
-	protected List<List<Object>> editStatusUserTestObjects() {		
+	protected List<List<Object>> createUserDeactivateStatusTestObjects() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-        //										testname					     uid			password              		
-		ll.add(Arrays.asList(new Object[]{ "deactivate_test_user",				"testuser",		"Secret123"     } ));
+        //										testname			  uid			password              		
+		ll.add(Arrays.asList(new Object[]{ "deactivate",			"testuser",		"Secret123"     } ));
+		        
+		return ll;	
+	}
+
+	/*
+	 * Data to be used when cancelling reactivating user
+	 */
+	@DataProvider(name="getUserCancelReactivateStatusTestObjects")
+	public Object[][] getUserCancelReactivateStatusTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createUserCancelReactivateStatusTestObjects());
+	}
+	protected List<List<Object>> createUserCancelReactivateStatusTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname				  uid			password              		
+		ll.add(Arrays.asList(new Object[]{ "cancel_reactivate",			"testuser",		"Secret123"     } ));
+		        
+		return ll;	
+	}
+	
+	/*
+	 * Data to be used when reactivating user
+	 */
+	@DataProvider(name="getUserReactivateStatusTestObjects")
+	public Object[][] getUserReactivateStatusTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createUserReactivateStatusTestObjects());
+	}
+	protected List<List<Object>> createUserReactivateStatusTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname			  uid			password              		
+		ll.add(Arrays.asList(new Object[]{ "reactivate",			"testuser",		"Secret123"     } ));
 		        
 		return ll;	
 	}
@@ -646,8 +737,8 @@ public class UserTests extends SahiTestScript{
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
         //										testname					uid              		
-		ll.add(Arrays.asList(new Object[]{ "delete_good_user1",				"testuser"     } ));
-		ll.add(Arrays.asList(new Object[]{ "delete_good_user2",				"user2"     } ));
+		ll.add(Arrays.asList(new Object[]{ "delete_single_user1",			"testuser"     } ));
+		ll.add(Arrays.asList(new Object[]{ "delete_single_user2",			"user2"     } ));
 		        
 		return ll;	
 	}
@@ -679,8 +770,8 @@ public class UserTests extends SahiTestScript{
 	protected List<List<Object>> createUserAndAddAnotherTestObjects() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-        //										testname					givenname1		sn1			givenname2		sn2   
-		ll.add(Arrays.asList(new Object[]{ "add_two_users",					"Test",			"User7",	"Test",			"User8"     } ));
+        //										testname				givenname1		sn1			givenname2		sn2   
+		ll.add(Arrays.asList(new Object[]{ "add_and_add_another",		"Test",			"User7",	"Test",			"User8"     } ));
 		        
 		return ll;	
 	}
@@ -696,8 +787,8 @@ public class UserTests extends SahiTestScript{
 	protected List<List<Object>> addAndEditUserTestObjects() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-        //										testname			uid				givenname		sn			title					mail   
-		ll.add(Arrays.asList(new Object[]{ "add_and_edit_user",		"user9",		"Test",			"User",		"Software Engineer",	"testuser@example.com"     } ));
+        //										testname		uid				givenname		sn			title					mail   
+		ll.add(Arrays.asList(new Object[]{ "add_and_edit",		"user9",		"Test",			"User",		"Software Engineer",	"testuser@example.com"     } ));
 		        
 		return ll;	
 	}
@@ -713,10 +804,10 @@ public class UserTests extends SahiTestScript{
 	protected List<List<Object>> searchUserTestObjects() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-        //										testname					uid       		multiple_result1	       		
-		ll.add(Arrays.asList(new Object[]{ "search_good_user1",				"testuser",		""    				} ));
-		ll.add(Arrays.asList(new Object[]{ "search_good_user2",				"user2",		""	     			} ));
-		ll.add(Arrays.asList(new Object[]{ "search_good_tuser_multipleresult",				"tuser",		"testuser"     		} ));
+        //										testname				uid       		multiple_result1	       		
+		ll.add(Arrays.asList(new Object[]{ "search_user1",				"testuser",		""    				} ));
+		ll.add(Arrays.asList(new Object[]{ "search_user2",				"user2",		""	     			} ));
+		ll.add(Arrays.asList(new Object[]{ "search_multipleresult",		"tuser",		"testuser"     		} ));
 		        
 		return ll;	
 	}
@@ -732,7 +823,7 @@ public class UserTests extends SahiTestScript{
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
         //										testname					uid       			       		
-		ll.add(Arrays.asList(new Object[]{ "expand_collapse_user",			"testuser"    				} ));
+		ll.add(Arrays.asList(new Object[]{ "expand_collapse",			"testuser"    				} ));
 		  
 		return ll;	
 	}
@@ -748,8 +839,8 @@ public class UserTests extends SahiTestScript{
 	protected List<List<Object>> editIdentitySettingsTestObjects() {			
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-        //										testname						uid    		givenname		sn				fullname			displayName		initials   			       		
-		ll.add(Arrays.asList(new Object[]{ "identity_settings_user",			"tuser",	"Mickey",		"Mouse",		"Mickey Mouse",		"Mickey M.",	"MM"	  				} ));
+        //										testname				uid    		givenname		sn				fullname			displayName		initials   			       		
+		ll.add(Arrays.asList(new Object[]{ "identity_settings",			"tuser",	"Mickey",		"Mouse",		"Mickey Mouse",		"Mickey M.",	"MM"	  				} ));
 		  
 		return ll;	
 	}
@@ -764,10 +855,10 @@ public class UserTests extends SahiTestScript{
 	protected List<List<Object>> createUserEditIdentitySettingsNegativeTestObjects() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-        //										testname															cn   		fieldName		fieldValue		expected error													 cancel/ok button
-		ll.add(Arrays.asList(new Object[]{ "Verify error: In Identity Settings - firstname has trailing space",		"user2",	"givenname",	"XXX ",			"invalid 'first': Leading and trailing spaces are not allowed",		"Cancel"	} ));
-		ll.add(Arrays.asList(new Object[]{ "Verify error: In Identity Settings - firstname has leading space",		"user2",	"givenname",	" XXX",			"invalid 'first': Leading and trailing spaces are not allowed", 	"Cancel"	} ));
-		ll.add(Arrays.asList(new Object[]{ "Verify error: In Identity Settings - firstname is blank",				"user2",	"givenname",	"",			"Input form contains invalid or missing values.", 					"OK"	} ));
+        //										testname										cn   		fieldName		fieldValue		expected error													 cancel/ok button
+		ll.add(Arrays.asList(new Object[]{ "identity_settings_firstname_trailing_space",		"user2",	"givenname",	"XXX ",			"invalid 'first': Leading and trailing spaces are not allowed",		"Cancel"	} ));
+		ll.add(Arrays.asList(new Object[]{ "identity_settings_firstname_leading_space",			"user2",	"givenname",	" XXX",			"invalid 'first': Leading and trailing spaces are not allowed", 	"Cancel"	} ));
+		ll.add(Arrays.asList(new Object[]{ "identity_settings_firstname_blank",					"user2",	"givenname",	"",			"Input form contains invalid or missing values.", 					"OK"	} ));
 		
 		
 		return ll;	
@@ -783,8 +874,8 @@ public class UserTests extends SahiTestScript{
 	protected List<List<Object>> editAccountSettingsTestObjects() {			
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-        //										testname						uid    		uidnumber		gidnumber		loginshell		homedirectory   			       		
-		ll.add(Arrays.asList(new Object[]{ "account_settings_user",				"tuser",	"123456789",	"987654321",	"/bin/csh",		"/home/newtuser"		} ));
+        //										testname					uid    		uidnumber		gidnumber		loginshell		homedirectory   			       		
+		ll.add(Arrays.asList(new Object[]{ "account_settings",				"tuser",	"123456789",	"987654321",	"/bin/csh",		"/home/newtuser"		} ));
 		  
 		return ll;	
 	}
@@ -800,7 +891,7 @@ public class UserTests extends SahiTestScript{
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
         //										testname						uid    		street					city			state		zip   			       		
-		ll.add(Arrays.asList(new Object[]{ "MailingAddress_settings_user",				"tuser",	"200 Broadway Ave",		"Bedford",		"MA",		"01730"		} ));
+		ll.add(Arrays.asList(new Object[]{ "mailingAddress_settings",			"tuser",	"200 Broadway Ave",		"Bedford",		"MA",		"01730"		} ));
 		  
 		return ll;	
 	}
@@ -816,8 +907,8 @@ public class UserTests extends SahiTestScript{
 	protected List<List<Object>> editEmpMiscInfoTestObjects() {			
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-        //										testname				uid    		org			manager			car  			       		
-		ll.add(Arrays.asList(new Object[]{ "emp_misc_user",				"tuser",	"QE",		"testuser",		"012 ABC"		} ));
+        //										testname		uid    		org			manager			car  			       		
+		ll.add(Arrays.asList(new Object[]{ "emp_misc",			"tuser",	"QE",		"testuser",		"012 ABC"		} ));
 		  
 		return ll;	
 	}

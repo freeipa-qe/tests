@@ -449,8 +449,7 @@ public class HBACTests extends SahiTestScript {
 	public void testHBACRuleUpdateCategory(String testName, String cn) throws Exception {		
 		//verify rule to be edited exists
 		Assert.assertTrue(sahiTasks.link(cn).exists(), "Verify Rule " + cn + " to be edited exists");
-		String expectedError = "sourcehost category cannot be set to 'all' while there are allowed source hosts";
-		HBACTasks.updateCategory(sahiTasks, cn, hostgroupName, expectedError, true);		
+		HBACTasks.updateCategory(sahiTasks, cn, hostgroupName, true);		
 	}
 	
 	

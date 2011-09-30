@@ -69,7 +69,7 @@
 				<include name="sudoCommandGroupAddAndEditTests" />
 				<include name="sudoCommandGroupCancelEnrollTests" />
 				<include name="sudoCommandGroupEnrollTests" />
-				<include name="sudoCommandGroupEnrollAgainTests" />
+				<!-- not a valid test anymore <include name="sudoCommandGroupEnrollAgainTests" /> -->
 				<include name="sudoCancelDeleteFromCommandGroupTests" />
 				<include name="sudoDeleteFromCommandGroupTests" />
 				<include name="sudoTwoCommandGroupEnrollTests"/>

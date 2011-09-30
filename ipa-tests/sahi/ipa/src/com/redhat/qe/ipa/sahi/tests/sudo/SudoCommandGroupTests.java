@@ -386,9 +386,10 @@ public class SudoCommandGroupTests extends SahiTestScript{
 		String[] sudoCommandGroupTestObjects = {"S@ud*o#Ru?le",		
 				"abcdefghijklmnopqrstuvwxyz123456789ANDAGAINabcdefghijklmnopqrstuvwxyz123456789ANDAGAINabcdefghijklmnopqrstuvwxyz123456789",
 				"sudo group1",
-				"Sudo Group 2",
-				"Sudo Group 3",
-				"Dev Sudo Group"
+				"sudo group 2",
+				"sudo group 3",
+				"dev sudo group",
+				"qe sudo group"
 				} ;
 
 		for (String sudoCommandGroupTestObject : sudoCommandGroupTestObjects) {

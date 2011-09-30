@@ -30,9 +30,6 @@
 				<include name="userAddAndEditTests" />
 				<include name="userDeleteTests" />
 				<include name="userMultipleDeleteTests" />
-				<!--
-				<include name="teardown"/>
-				-->
 			</run>
 		</groups>
 		<classes>

@@ -229,7 +229,9 @@ public class HBACServiceTests  extends SahiTestScript{
 	/*
 	 * Delete multiple HBAC Services
 	 */
-	@Test (groups={"hbacServiceMultipleDeleteTests"}, dataProvider="getMultipleHBACServiceTestObjects", dependsOnGroups={"hbacServiceAddTests", "hbacServiceAddAndEditTests", "invalidhbacServiceAddTests", "hbacServiceSearchTests", "hbacServiceEditTests" })
+	@Test (groups={"hbacServiceMultipleDeleteTests"}, dataProvider="getMultipleHBACServiceTestObjects", 
+			dependsOnGroups={"hbacServiceAddTests", "hbacServiceAddAndEditTests", "invalidhbacServiceAddTests", 
+			"hbacServiceSearchTests", "hbacServiceEditTests", "hbacServiceCancelEnrollTests" })
 	public void testMultipleHBACServiceDelete(String testName, String cn1, String cn2, String cn3) throws Exception {	
 		String cns[] = {cn1, cn2, cn3};
 		
@@ -244,7 +246,7 @@ public class HBACServiceTests  extends SahiTestScript{
 		
 		//verify services were deleted 
 		for (String cn : cns) {
-			Assert.assertTrue(sahiTasks.link(cn).exists(), "Verify HBAC Service " + cn + "  was deleted successfully");
+			Assert.assertFalse(sahiTasks.link(cn).exists(), "Verify HBAC Service " + cn + "  was deleted successfully");
 		}	
 	}
 	

@@ -78,7 +78,7 @@
 			    <include name="hbacServiceGroupSearchTests" />
 			    <include name="hbacServiceGroupExpandCollapseTests" />
 			    <include name="hbacServiceGroupEditTests" />
-			    <include name="hbacServiceGroupEnrollServiceTwiceTests" />
+			    <include name="hbacServiceGroupEnrollServiceTests" /> 
 			    <include name="hbacServiceGroupDeleteServiceTests" />
 			    <include name="hbacServiceGroupCancelDeleteServiceTests"/>
 			    <include name="hbacServiceGroupCancelDeleteTests" />

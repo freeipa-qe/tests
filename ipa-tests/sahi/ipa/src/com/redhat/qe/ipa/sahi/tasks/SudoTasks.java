@@ -91,19 +91,19 @@ public class SudoTasks {
 		sahiTasks.button("Enroll").click();
 		
 		//Click to add Sudo Command from "Allow" Section
-		sahiTasks.span("Add").under(sahiTasks.heading2(("Run Commands"))).under(sahiTasks.heading3("Allow")).near(sahiTasks.span("Commands")).click();
+		sahiTasks.span("Add").under(sahiTasks.heading2(("Run Commands"))).under(sahiTasks.heading3("Allow")).near(sahiTasks.span("Sudo Allow Commands")).click();
 		sahiTasks.checkbox(commandName).click();
 		sahiTasks.span(">>").click();
 		sahiTasks.button("Enroll").click();
 		
 		//Click to add Sudo Command Group From from "Deny" Section
-		sahiTasks.span("Add").under(sahiTasks.heading2(("Run Commands"))).under(sahiTasks.heading3("Deny")).near(sahiTasks.span("Command Groups")).click();
+		sahiTasks.span("Add").under(sahiTasks.heading2(("Run Commands"))).under(sahiTasks.heading3("Deny")).near(sahiTasks.span("Sudo Deny Command Groups")).click();
 		sahiTasks.checkbox(commandGroupName).click();
 		sahiTasks.span(">>").click();
 		sahiTasks.button("Enroll").click();
 		
 		//Click to add RunAs User from "As whom" Section
-		sahiTasks.span("Add").under(sahiTasks.heading2(("As Whom"))).near(sahiTasks.span("User Groups[1]")).click();
+		sahiTasks.span("Add").under(sahiTasks.heading2(("As Whom"))).near(sahiTasks.span("RunAs Groups")).click();
 		sahiTasks.checkbox(runAsGroupName).click();
 		sahiTasks.span(">>").click();
 		sahiTasks.button("Enroll").click();
@@ -318,10 +318,10 @@ public class SudoTasks {
 			String vimCommandName, String denyCommandGroupName ) {
 		sahiTasks.link(cn).click();
 		
-		deleteFromSudoRule(sahiTasks, cn, "Run Commands", "Allow", "Commands", lsCommandName, "Delete");		
-		addToSudoRule(sahiTasks, cn, "Run Commands", "Allow", "Command Groups", allowCommandGroupName, "Enroll");		
-		addToSudoRule(sahiTasks, cn, "Run Commands", "Deny", "Commands", vimCommandName, "Enroll");		
-		deleteFromSudoRule(sahiTasks, cn, "Run Commands", "Deny", "Command Groups", denyCommandGroupName, "Delete");	
+		deleteFromSudoRule(sahiTasks, cn, "Run Commands", "Allow", "Sudo Allow Commands", lsCommandName, "Delete");		
+		addToSudoRule(sahiTasks, cn, "Run Commands", "Allow", "Sudo Allow Command Groups", allowCommandGroupName, "Enroll");		
+		addToSudoRule(sahiTasks, cn, "Run Commands", "Deny", "Sudo Deny Commands", vimCommandName, "Enroll");		
+		deleteFromSudoRule(sahiTasks, cn, "Run Commands", "Deny", "Sudo Deny Command Groups", denyCommandGroupName, "Delete");	
 		
 		sahiTasks.span("Update").click();
 		sahiTasks.link("Sudo Rules").in(sahiTasks.div("content")).click();			
@@ -336,11 +336,11 @@ public class SudoTasks {
 	public static void modifySudoRuleRunAsUserCategorySection(SahiTasks sahiTasks, String cn, String runasUser, String runasUsergroup, boolean isAdd ) {
 		sahiTasks.link(cn).click();
 		if (isAdd) {
-			addToSudoRule(sahiTasks, cn, "As Whom", "Users", runasUser, "Enroll");	
-			addToSudoRule(sahiTasks, cn, "As Whom", "User Groups", runasUsergroup, "Enroll");
+			addToSudoRule(sahiTasks, cn, "As Whom", "RunAs Users", runasUser, "Enroll");	
+			addToSudoRule(sahiTasks, cn, "As Whom", "Groups of RunAs Users", runasUsergroup, "Enroll");
 		} else {
-			deleteFromSudoRule(sahiTasks, cn,  "As Whom", "Users", runasUser, "Delete");
-			deleteFromSudoRule(sahiTasks, cn,  "As Whom", "User Groups", runasUsergroup, "Delete");
+			deleteFromSudoRule(sahiTasks, cn,  "As Whom", "RunAs Users", runasUser, "Delete");
+			deleteFromSudoRule(sahiTasks, cn,  "As Whom", "Groups of RunAs Users", runasUsergroup, "Delete");
 		}
 		
 		
@@ -384,9 +384,9 @@ public class SudoTasks {
 	public static void modifySudoRuleRunAsGroupCategorySection(SahiTasks sahiTasks, String cn, String runasGroup, boolean isAdd ) {
 		sahiTasks.link(cn).click();
 		if (isAdd) {
-			addToSudoRule(sahiTasks, cn, "As Whom", "User Groups[1]", runasGroup, "Enroll");
+			addToSudoRule(sahiTasks, cn, "As Whom", "RunAs Groups", runasGroup, "Enroll");
 		} else {
-			deleteFromSudoRule(sahiTasks, cn,  "As Whom", "User Groups[1]", runasGroup, "Delete");
+			deleteFromSudoRule(sahiTasks, cn,  "As Whom", "RunAs Groups", runasGroup, "Delete");
 		}		
 		sahiTasks.span("Update").click();
 		sahiTasks.link("Sudo Rules").in(sahiTasks.div("content")).click();			

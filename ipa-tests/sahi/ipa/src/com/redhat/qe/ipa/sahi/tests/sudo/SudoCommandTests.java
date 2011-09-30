@@ -330,7 +330,9 @@ public class SudoCommandTests extends SahiTestScript {
 										"/bin/find",
 										"/bin/more",
 										"/usr/bin/less",
-										"/bin/ln"
+										"/bin/ln",
+										"/b@i&n?/~d:a?t+e-",
+										"/home/abcdefghijklmnopqrstuvwxyz123456789ANDAGAINabcdefghijklmnopqrstuvwxyz123456789ANDAGAINabcdefghijklmnopqrstuvwxyz123456789/bin/date"
 												} ;
 
 		//verify rules were found
