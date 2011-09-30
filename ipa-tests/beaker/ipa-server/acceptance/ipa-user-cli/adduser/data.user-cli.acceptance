@@ -11,7 +11,7 @@ adminpassword="redhat123"
 
 superuser="sup34"
 superuseremail="$superuser@really.cool.domain.co.uk.us.fi.com"
-superuserprinc="$superuser@$RELM"
+superuserprinc="$superuser@"
 superuserhome="/home2/$superuser"
 superusergecos="whatsgecos?"
 superuserfirst="Superuser"

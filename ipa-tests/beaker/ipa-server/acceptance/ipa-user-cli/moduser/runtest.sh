@@ -72,7 +72,7 @@ rlJournalStart
                             --last=$superuserlast \
                             --gecos=$superusergecos \
                             --home=$superuserhome \
-                            --principal=$superuserprinc \
+                            --principal=$superuserprinc$RELM \
                             --email=$superuseremail \
 			    --phone="$mphone" \
 			    --mobile="$mmobile" \

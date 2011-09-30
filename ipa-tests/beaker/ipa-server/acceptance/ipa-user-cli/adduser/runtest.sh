@@ -68,7 +68,7 @@ rlJournalStart
                             --last=$superuserlast \
                             --gecos=$superusergecos \
                             --home=$superuserhome \
-                            --principal=$superuserprinc \
+                            --principal=$superuserprinc$RELM \
                             --email=$superuseremail \
 			    --phone="$mphone" \
 			    --mobile="$mmobile" \
@@ -413,6 +413,12 @@ rlJournalStart
         command="ipa user-show $myuser"
 	rlRun "$command" 2 "Check that return code is 2"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message - show user that doesn't exist."
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-user-cli-add-035: Add user with principal not in the IPA realm"
+        expmsg="ipa: ERROR: The realm for the principal does not match the realm for this IPA server"
+        command="ipa user-add --first=princ --last=user --principal=puser@WRONG puser"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message - principal not in IPA server realm."
     rlPhaseEnd
 
     rlPhaseStartCleanup "ipa-user-cli-add-cleanup"
