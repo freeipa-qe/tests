@@ -56,12 +56,8 @@
 
 
 	<test name="Sudo Command Group Tests">
-	   <packages>
-		     <package name="com.redhat.qe.ipa.sahi.*" />
-		</packages>
 		<groups>
 			<run>	
-			    <include name="setup" />
 				<include name="sudoCommandGroupAddTests" />
 				<include name="sudoCommandGroupCancelAddTests" />
 				<include name="invalidSudoCommanGroupAddTests" />
@@ -69,7 +65,7 @@
 				<include name="sudoCommandGroupAddAndEditTests" />
 				<include name="sudoCommandGroupCancelEnrollTests" />
 				<include name="sudoCommandGroupEnrollTests" />
-				<!-- not a valid test anymore <include name="sudoCommandGroupEnrollAgainTests" /> -->
+				<!-- not a valid test anymore <include name="sudoCommandGroupEnrollAgainTests" /> --> 
 				<include name="sudoCancelDeleteFromCommandGroupTests" />
 				<include name="sudoDeleteFromCommandGroupTests" />
 				<include name="sudoTwoCommandGroupEnrollTests"/>

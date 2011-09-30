@@ -250,7 +250,7 @@ public class SudoCommandGroupTests extends SahiTestScript{
 	// Remove a member
 	@Test (groups={"sudoDeleteFromCommandGroupTests"},  description="Delete a Command from a Command Group", 
 			dataProvider="getDeleteFromSudoCommandGroupTestObjects", 
-			dependsOnGroups={"sudoCommandGroupAddAndEditTests"})	
+			dependsOnGroups={"sudoCommandGroupAddAndEditTests", "sudoTwoCommandGroupEnrollTests"})	
 	public void testSudoCommandGroupDeleteCommand(String testName, String commandGroup) throws Exception {
 		
 		//verify command exists
@@ -339,7 +339,7 @@ public class SudoCommandGroupTests extends SahiTestScript{
 	
 	@Test (groups={"invalidSudoCommanGroupAddTests"}, description="Verify error when adding invalid Sudo Command Group", 
 			dataProvider="getSudoruleCommandGroupInvalidAddTestObjects")
-	public void testInvalidSudoCommandAdd(String testName, String cn, String description, String expectedError) throws Exception {
+	public void testInvalidSudoCommandGroupAdd(String testName, String cn, String description, String expectedError) throws Exception {
 		
 		SudoTasks.createInvalidSudoCommandGroup(sahiTasks, cn, description, expectedError);
 	}
@@ -383,6 +383,7 @@ public class SudoCommandGroupTests extends SahiTestScript{
 
 	@AfterClass (groups={"cleanup"}, description="Delete objects created for this test suite", alwaysRun=true)
 	public void cleanup() throws CloneNotSupportedException {
+		
 		String[] sudoCommandGroupTestObjects = {"S@ud*o#Ru?le",		
 				"abcdefghijklmnopqrstuvwxyz123456789ANDAGAINabcdefghijklmnopqrstuvwxyz123456789ANDAGAINabcdefghijklmnopqrstuvwxyz123456789",
 				"sudo group1",
@@ -395,6 +396,7 @@ public class SudoCommandGroupTests extends SahiTestScript{
 		for (String sudoCommandGroupTestObject : sudoCommandGroupTestObjects) {
 			if (sahiTasks.link(sudoCommandGroupTestObject.toLowerCase()).exists()){
 				log.fine("Cleaning Sudo Rule: " + sudoCommandGroupTestObject);
+				System.out.println("Cleaning Sudo Rule: " + sudoCommandGroupTestObject);
 				SudoTasks.deleteSudo(sahiTasks, sudoCommandGroupTestObject.toLowerCase(), "Delete");
 			}			
 		}
