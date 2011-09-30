@@ -9,10 +9,9 @@
 admin="admin"
 adminpassword="redhat123"
 
-realm="SJC.REDHAT.COM"
 superuser="sup34"
 superuseremail="$superuser@really.cool.domain.co.uk.us.fi.com"
-superuserprinc="$superuser@$realm"
+superuserprinc="$superuser@$RELM"
 superuserhome="/home2/$superuser"
 superusergecos="whatsgecos?"
 superuserfirst="Superuser"
