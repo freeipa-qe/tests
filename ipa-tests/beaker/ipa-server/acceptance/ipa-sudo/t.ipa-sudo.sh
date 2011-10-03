@@ -791,7 +791,7 @@ rlPhaseStartTest "sudorule-add-allow-command_001: ipa sudorule-add-allow-command
 	rlAssertGrep "Rule name: sudorule1" "$TmpDir/sudorule-add-allow-command_001.txt"
 	rlAssertGrep "Enabled: TRUE" "$TmpDir/sudorule-add-allow-command_001.txt"
 	rlAssertGrep "Sudo Allow Commands: /bin/ls" "$TmpDir/sudorule-add-allow-command_001.txt"
-	rlAssertGrep "Sudo Command Groups: sudogrp1" "$TmpDir/sudorule-add-allow-command_001.txt"
+	rlAssertGrep "Sudo Allow Command Groups: sudogrp1" "$TmpDir/sudorule-add-allow-command_001.txt"
 	rlAssertGrep "Number of members added 2" "$TmpDir/sudorule-add-allow-command_001.txt"
 	rlRun "cat $TmpDir/sudorule-add-allow-command_001.txt"
 
@@ -820,7 +820,7 @@ rlPhaseStartTest "sudorule-add-allow-command_002: ipa sudorule-add-allow-command
         rlAssertGrep "Rule name: sudorule1" "$TmpDir/sudorule-add-allow-command_002.txt"
         rlAssertGrep "Enabled: TRUE" "$TmpDir/sudorule-add-allow-command_002.txt"
         rlAssertGrep "Sudo Allow Commands: /bin/ls, /bin/df" "$TmpDir/sudorule-add-allow-command_002.txt"
-	rlAssertGrep "Sudo Command Groups: sudogrp1, sudogrp2" "$TmpDir/sudorule-add-allow-command_002.txt"
+	rlAssertGrep "Sudo Allow Command Groups: sudogrp1, sudogrp2" "$TmpDir/sudorule-add-allow-command_002.txt"
         rlAssertGrep "Number of members added 4" "$TmpDir/sudorule-add-allow-command_002.txt"
         rlRun "cat $TmpDir/sudorule-add-allow-command_002.txt"
 
@@ -1432,7 +1432,7 @@ rlPhaseStartTest "sudorule-add-runasuser_002: ipa sudorule-add-runasuser --users
 
 	rlRun "ipa sudorule-add-runasuser rule1 --users=sudouser1,sudouser2 > $TmpDir/sudorule-add-runasuser_002.txt 2>&1"
 	rlAssertGrep "Rule name: rule1" "$TmpDir/sudorule-add-runasuser_002.txt"
-	rlAssertGrep "RunAs User: sudouser1, sudouser2" "$TmpDir/sudorule-add-runasuser_002.txt"
+	rlAssertGrep "RunAs Users: sudouser1, sudouser2" "$TmpDir/sudorule-add-runasuser_002.txt"
 	rlAssertGrep "Number of members added 2" "$TmpDir/sudorule-add-runasuser_002.txt"
 	rlRun "cat $TmpDir/sudorule-add-runasuser_002.txt"
 
@@ -1455,13 +1455,13 @@ rlPhaseStartTest "sudorule-add-runasuser_003: ipa sudorule-add-runasuser --group
 	rlRun "ipa sudorule-add-runasuser rule1 --groups=sudogrp1,sudogrp2 > $TmpDir/sudorule-add-runasuser_003.txt 2>&1"
         rlAssertGrep "Rule name: rule1" "$TmpDir/sudorule-add-runasuser_003.txt"
 	rlLog "Verifying bug https://bugzilla.redhat.com/show_bug.cgi?id=710253"
-        rlAssertGrep "RunAs Group: sudogrp1, sudogrp2" "$TmpDir/sudorule-add-runasuser_003.txt"
+        rlAssertGrep "Groups of RunAs Users: sudogrp1, sudogrp2" "$TmpDir/sudorule-add-runasuser_003.txt"
 	rlAssertGrep "Number of members added 2" "$TmpDir/sudorule-add-runasuser_003.txt"
 	rlRun "cat $TmpDir/sudorule-add-runasuser_003.txt"
 
 	rlLog "Verifying bug https://bugzilla.redhat.com/show_bug.cgi?id=713385"
 	rlRun "ipa sudorule-find rule1 --all > $TmpDir/sudorule-add-runasuser_003.txt 2>&1"
-	rlAssertGrep "RunAs Group: sudogrp1, sudogrp2" "$TmpDir/sudorule-add-runasuser_003.txt"
+	rlAssertGrep "Groups of RunAs Users: sudogrp1, sudogrp2" "$TmpDir/sudorule-add-runasuser_003.txt"
 	rlRun "cat $TmpDir/sudorule-add-runasuser_003.txt"
 
         rlRun "ipa sudorule-del rule1"
@@ -1549,7 +1549,7 @@ rlPhaseStartTest "sudorule-remove-runasuser_004: ipa sudorule-remove-runasuser -
 	rlLog "Verifying bug https://bugzilla.redhat.com/show_bug.cgi?id=713380"
         rlRun "ipa sudorule-remove-runasuser rule1 --groups=sudogrp1 > $TmpDir/sudorule-remove-runasuser_004.txt 2>&1"
         rlAssertGrep "Rule name: rule1" "$TmpDir/sudorule-remove-runasuser_004.txt"
-	rlAssertGrep "RunAs Group: sudogrp2" "$TmpDir/sudorule-remove-runasuser_004.txt"
+	rlAssertGrep "Groups of RunAs Users: sudogrp2" "$TmpDir/sudorule-remove-runasuser_004.txt"
         rlAssertGrep "Number of members removed 1" "$TmpDir/sudorule-remove-runasuser_004.txt"
         rlRun "cat $TmpDir/sudorule-remove-runasuser_004.txt"
 
@@ -1573,12 +1573,12 @@ rlPhaseStartTest "sudorule-remove-runasuser_005: ipa sudorule-remove-runasuser -
 
         rlRun "ipa sudorule-remove-runasuser rule1 --users=sudouser1 > $TmpDir/sudorule-remove-runasuser_005.txt 2>&1"
         rlAssertGrep "Rule name: rule1" "$TmpDir/sudorule-remove-runasuser_005.txt"
-	rlAssertGrep "RunAs User: sudouser2" "$TmpDir/sudorule-remove-runasuser_005.txt"
+	rlAssertGrep "RunAs Users: sudouser2" "$TmpDir/sudorule-remove-runasuser_005.txt"
         rlAssertGrep "Number of members removed 1" "$TmpDir/sudorule-remove-runasuser_005.txt"
         rlRun "cat $TmpDir/sudorule-remove-runasuser_005.txt"
 
 	rlRun "ipa sudorule-find rule1 --all > $TmpDir/sudorule-remove-runasuser_005.txt 2>&1"
-	rlAssertGrep "RunAs User: sudouser2" "$TmpDir/sudorule-remove-runasuser_005.txt"
+	rlAssertGrep "RunAs Users: sudouser2" "$TmpDir/sudorule-remove-runasuser_005.txt"
         rlRun "cat $TmpDir/sudorule-remove-runasuser_005.txt"
 
         rlRun "ipa user-del sudouser1"
@@ -1637,14 +1637,14 @@ rlPhaseStartTest "sudorule-add-runasgroup_002: ipa sudorule-add-runasgroup rule1
 
         rlRun "ipa sudorule-add-runasgroup rule1 --groups=sudogrp1 > $TmpDir/sudorule-add-runasgroup_002.txt 2>&1"
         rlAssertGrep "Rule name: rule1" "$TmpDir/sudorule-add-runasgroup_002.txt"
-        rlAssertGrep "RunAsGroup Group: sudogrp1" "$TmpDir/sudorule-add-runasgroup_002.txt"
+        rlAssertGrep "RunAs Groups: sudogrp1" "$TmpDir/sudorule-add-runasgroup_002.txt"
         rlAssertGrep "Number of members added 1" "$TmpDir/sudorule-add-runasgroup_002.txt"
         rlRun "cat $TmpDir/sudorule-add-runasgroup_002.txt"
 
         rlRun "ipa sudorule-add-runasgroup rule1 --groups=sudogrp2 --all > $TmpDir/sudorule-add-runasgroup_002.txt 2>&1"
         rlAssertGrep "Rule name: rule1" "$TmpDir/sudorule-add-runasgroup_002.txt"
 	rlLog "Verified regression bug https://bugzilla.redhat.com/show_bug.cgi?id=728118"
-        rlAssertGrep "RunAsGroup Group: sudogrp1, sudogrp2" "$TmpDir/sudorule-add-runasgroup_002.txt"
+        rlAssertGrep "RunAs Groups: sudogrp1, sudogrp2" "$TmpDir/sudorule-add-runasgroup_002.txt"
         rlRun "cat $TmpDir/sudorule-add-runasgroup_002.txt"
 
         rlRun "ipa sudorule-add-runasgroup rule1 --groups=sudogrp3 --all --raw > $TmpDir/sudorule-add-runasgroup_002.txt 2>&1"
@@ -1662,7 +1662,7 @@ rlPhaseStartTest "sudorule-add-runasgroup_002: ipa sudorule-add-runasgroup rule1
 
         rlRun "ipa sudorule-add-runasgroup rule1 --groups=sudogrp4,sudogrp5,sudogrp6 > $TmpDir/sudorule-add-runasgroup_002.txt 2>&1"
         rlAssertGrep "Rule name: rule1" "$TmpDir/sudorule-add-runasgroup_002.txt"
-        rlAssertGrep "RunAsGroup Group: sudogrp1, sudogrp2, sudogrp3, sudogrp4, sudogrp5, sudogrp6" "$TmpDir/sudorule-add-runasgroup_002.txt"
+        rlAssertGrep "RunAs Groups: sudogrp1, sudogrp2, sudogrp3, sudogrp4, sudogrp5, sudogrp6" "$TmpDir/sudorule-add-runasgroup_002.txt"
         rlAssertGrep "Number of members added 3" "$TmpDir/sudorule-add-runasgroup_002.txt"
         rlRun "cat $TmpDir/sudorule-add-runasgroup_002.txt"
 
@@ -1716,7 +1716,7 @@ rlPhaseStartTest "sudorule-remove-runasgroup_002: ipa sudorule-remove-runasgroup
 
         rlRun "ipa sudorule-remove-runasgroup rule1 --groups=sudogrp2 --all > $TmpDir/sudorule-remove-runasgroup_002.txt 2>&1"
         rlAssertGrep "Rule name: rule1" "$TmpDir/sudorule-remove-runasgroup_002.txt"
-        rlAssertGrep "RunAsGroup Group: sudogrp3, sudogrp4, sudogrp5, sudogrp6" "$TmpDir/sudorule-remove-runasgroup_002.txt"
+        rlAssertGrep "RunAs Groups: sudogrp3, sudogrp4, sudogrp5, sudogrp6" "$TmpDir/sudorule-remove-runasgroup_002.txt"
         rlRun "cat $TmpDir/sudorule-remove-runasgroup_002.txt"
 
         rlRun "ipa sudorule-remove-runasgroup rule1 --groups=sudogrp3 --all --raw > $TmpDir/sudorule-remove-runasgroup_002.txt 2>&1"
@@ -2428,7 +2428,7 @@ rlPhaseStartTest "Clean up for sudo sanity tests"
 	#rlRun "ipa-nis-manage -y $TmpDir/passwd.txt disable"
 	#rlRun "ipactl restart"
 
-        rlRun "popd"
-        rlRun "rm -r $TmpDir" 0 "Removing tmp directory"
+        #rlRun "popd"
+        #rlRun "rm -r $TmpDir" 0 "Removing tmp directory"
 rlPhaseEnd
 }
