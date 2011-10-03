@@ -64,7 +64,7 @@
 REALM=`os_getdomainname | tr "[a-z]" "[A-Z]"`
 DOMAIN=`os_getdomainname`
 
-host1="dev_host."$DOMAIN
+host1="devhost."$DOMAIN
 
 user1="dev"
 
