@@ -2,7 +2,6 @@ package com.redhat.qe.ipa.sahi.tests.service;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -17,7 +16,6 @@ import com.redhat.qe.auto.testng.TestNGUtils;
 import com.redhat.qe.ipa.sahi.base.SahiTestScript;
 import com.redhat.qe.ipa.sahi.tasks.CommonTasks;
 import com.redhat.qe.ipa.sahi.tasks.HostTasks;
-import com.redhat.qe.ipa.sahi.tasks.SahiTasks;
 import com.redhat.qe.ipa.sahi.tasks.ServiceTasks;
 
 
@@ -319,8 +317,10 @@ public class ServiceTests extends SahiTestScript {
 		 */
 		@Test (groups={"invalidserviceAddTests"}, dataProvider="getInvalidServiceTestObjects")	
 		public void testInvalidServiceadd(String testName, String hostname, String servicename, String expectedError) throws Exception {
-			
-			ServiceTasks.addInvalidService(sahiTasks, hostname, servicename, expectedError);
+			boolean requiredFieldTest=false;
+			if (testName.contains("missing"))
+					requiredFieldTest=true;
+			ServiceTasks.addInvalidService(sahiTasks, hostname, servicename, expectedError, requiredFieldTest);
 
 		}
 		
@@ -614,7 +614,7 @@ public class ServiceTests extends SahiTestScript {
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
         //										testname					hostname     	servicename    expectedError
-		ll.add(Arrays.asList(new Object[]{ "add_service_missing_hostname",	"", 	 		 "HTTP",			"The host 'undefined' does not exist to add a service to."} ));
+		ll.add(Arrays.asList(new Object[]{ "add_service_missing_hostname",	"", 	 		 "HTTP",			"Required field"} ));
 		ll.add(Arrays.asList(new Object[]{ "add_service_no_DNS_for host",	nodnshost, 		 "JUNK",			"Host does not have corresponding DNS A record"} ));
 		//TODO :: enable this test and set the right error message - https://bugzilla.redhat.com/show_bug.cgi?id=739640
 		//ll.add(Arrays.asList(new Object[]{ "add_service_no_service_name",	mytesthost,		 		"",				"Don't know yet"	} ));

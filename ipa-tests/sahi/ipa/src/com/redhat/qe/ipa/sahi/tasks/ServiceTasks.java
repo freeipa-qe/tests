@@ -159,12 +159,12 @@ public class ServiceTasks {
 	public static void verifyServiceCertificateStatus(SahiTasks sahiTasks, String serviceprinc, String status, String reason) {
 		sahiTasks.link(serviceprinc).click();
 		if (status == "Hold"){
-			com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.span("Restore").exists(), "Host certificate on hold, verify Restore button");
-			com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.span("Certificate Hold").exists(), "Verifying Certificate Hold status.");
+			Assert.assertTrue(sahiTasks.span("Restore").exists(), "Host certificate on hold, verify Restore button");
+			Assert.assertTrue(sahiTasks.span("Certificate Hold").exists(), "Verifying Certificate Hold status.");
 		}
 		if (status == "Revoked"){
-			com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.span("New Certificate").exists(), "Host certificate revoked, verify New Certificate button");
-			com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.span(reason).exists(), "Verifying Certificate Revoked status: " + reason);
+			Assert.assertTrue(sahiTasks.span("New Certificate").exists(), "Host certificate revoked, verify New Certificate button");
+			Assert.assertTrue(sahiTasks.span(reason).exists(), "Verifying Certificate Revoked status: " + reason);
 		}
 		
 		sahiTasks.link("Services").in(sahiTasks.div("content")).click();
@@ -212,10 +212,10 @@ public class ServiceTasks {
 		sahiTasks.link(managed).click();
 		sahiTasks.link("managedby_host").click();
 		if (exists == true){
-			com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(managedby).exists(), "Service " + managed + " is managed by " + managedby);
+			Assert.assertTrue(sahiTasks.link(managedby).exists(), "Service " + managed + " is managed by " + managedby);
 		}
 		if (exists == false){
-			com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(managedby).exists(), "Service " + managed + " is NOT managed by " + managedby);
+			Assert.assertFalse(sahiTasks.link(managedby).exists(), "Service " + managed + " is NOT managed by " + managedby);
 		}	
 		
 		sahiTasks.link("Services").in(sahiTasks.div("content")).click();
@@ -230,10 +230,10 @@ public class ServiceTasks {
 	public static void verifyServiceKeytab(SahiTasks sahiTasks, String serviceprinc, boolean provisioned ) {
 		sahiTasks.link(serviceprinc).click();
 		if (provisioned == false){
-			com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.bold("Kerberos Key Not Present").exists(), "Service " + serviceprinc + " does not have a keytab provisioned");
+			Assert.assertTrue(sahiTasks.bold("Kerberos Key Not Present").exists(), "Service " + serviceprinc + " does not have a keytab provisioned");
 		}
 		if (provisioned == true){
-			com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.bold("Kerberos Key Present, Service Provisioned:").exists(), "Service " + serviceprinc + " has a keytab provisioned");
+			Assert.assertTrue(sahiTasks.bold("Kerberos Key Present, Service Provisioned:").exists(), "Service " + serviceprinc + " has a keytab provisioned");
 		}	
 		sahiTasks.link("Services").in(sahiTasks.div("content")).click();
 	}
@@ -258,7 +258,7 @@ public class ServiceTasks {
 	 * @param service name - name for the service
 	 * @param expectedError - the error thrown when an invalid host is being attempted to be added
 	 */
-	public static void addInvalidService(SahiTasks sahiTasks, String hostname, String servicename, String expectedError) {
+	public static void addInvalidService(SahiTasks sahiTasks, String hostname, String servicename, String expectedError, boolean requiredFieldTest) {
 		sahiTasks.link("Add").click();
 		sahiTasks.textbox("service").setValue(servicename);
 		sahiTasks.span("icon combobox-icon").click();
@@ -266,10 +266,15 @@ public class ServiceTasks {
 		sahiTasks.button("Add").click();
 		//Check for expected error
 		log.fine("error check");
-		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.div(expectedError).exists(), "Verified expected error when adding invalid service");
-	
-		log.fine("cancel(near retry)");
-		sahiTasks.button("Cancel").near(sahiTasks.button("Retry")).click();
+		if (requiredFieldTest)
+			Assert.assertTrue(sahiTasks.span(expectedError).exists(), "Verified expected error when adding invalid service");
+		else {
+			Assert.assertTrue(sahiTasks.div(expectedError).exists(), "Verified expected error when adding invalid service");
+			
+			log.fine("cancel(near retry)");
+			sahiTasks.button("Cancel").near(sahiTasks.button("Retry")).click();
+		}
+		
 		log.fine("cancel");
 		sahiTasks.button("Cancel").near(sahiTasks.button("Add and Edit")).click();
 	}
