@@ -57,9 +57,10 @@ public class ConfigurationTasks {
 	public static void verifySearchSizeLimitFunctional(SahiTasks sahiTasks, CommonTasks commonTasks, String value, String expectedRows) {
 		sahiTasks.navigateTo(commonTasks.userPage, true);
 		if (value.equals(expectedRows))
-			Assert.assertTrue(sahiTasks.span("Query returned more results than the configured size limit. Displaying the first " + value + " results.").exists(), "");
+			Assert.assertTrue(sahiTasks.span("Query returned more results than the configured size limit. Displaying the first " + value + 
+					" results.").exists(), "Verified number of users returned is " + value);
 		else
-			Assert.assertTrue(sahiTasks.span(expectedRows + " users matched").exists(), "");
+			Assert.assertTrue(sahiTasks.span(expectedRows + " users matched").exists(), "Verified number of users returned is " + expectedRows);
 		
 		sahiTasks.navigateTo(commonTasks.hbacPage);
 		if (value.equals(expectedRows))
