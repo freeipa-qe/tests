@@ -7,7 +7,6 @@
 		<groups>
 			<run>
 			    <include name="setup" />
-			    <include name="init" />	
 			    <include name="addNetGroupTests" />
 			    <include name="deleteNetGroupTests" />
 			    <include name="addAndAddAnotherNetGroupTests" />
@@ -17,15 +16,8 @@
 			    <include name="netGroupHostGroupMembersTests" />
 			    <include name="netGroupUserGroupMembersTests" />
 			    <include name="netGroupUserMembersTests" />
-			    <include name="cleanup" />
-			    <!--
-				<include name="teardown"/>
-				-->
 			</run>
 		</groups>
-		<classes>
-		    <class name="com.redhat.qe.ipa.sahi.tests.netgroup.NetgroupTests" />
-		</classes>
 	</test>
 	
 	<listeners>        

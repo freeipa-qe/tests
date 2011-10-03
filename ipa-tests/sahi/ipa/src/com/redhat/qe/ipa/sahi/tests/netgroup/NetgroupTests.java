@@ -10,6 +10,7 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
+import com.redhat.qe.auto.testng.Assert;
 import com.redhat.qe.auto.testng.TestNGUtils;
 import com.redhat.qe.ipa.sahi.base.SahiTestScript;
 import com.redhat.qe.ipa.sahi.tasks.CommonTasks;
@@ -17,7 +18,6 @@ import com.redhat.qe.ipa.sahi.tasks.GroupTasks;
 import com.redhat.qe.ipa.sahi.tasks.HostTasks;
 import com.redhat.qe.ipa.sahi.tasks.HostgroupTasks;
 import com.redhat.qe.ipa.sahi.tasks.NetgroupTasks;
-import com.redhat.qe.ipa.sahi.tasks.SahiTasks;
 import com.redhat.qe.ipa.sahi.tasks.UserTasks;
 
 public class NetgroupTests extends SahiTestScript{
@@ -26,11 +26,11 @@ public class NetgroupTests extends SahiTestScript{
 	private String currentPage = "";
 	private String alternateCurrentPage = "";
 	
-	private String devwebserver = "webserver_dev";
-	private String qewebserver = "webserver_qe";
-	private String devhost = "laptop_dev";
-	private String qehost = "laptop_qa";
-	private String engwebserver = "webserver_eng";
+	private String devwebserver = "webserver-dev";
+	private String qewebserver = "webserver-qe";
+	private String devhost = "laptop-dev";
+	private String qehost = "laptop-qa";
+	private String engwebserver = "webserver-eng";
 	
 	private String [] hostnames = {devwebserver, qewebserver, devhost, qehost, engwebserver};
 	
@@ -156,7 +156,7 @@ public class NetgroupTests extends SahiTestScript{
 	@Test (groups={"addNetGroupTests"}, dataProvider="getAddNetGroupTestObjects")	
 	public void testNetGroupAdd(String testName, String groupName, String description, String button) throws Exception {
 		//verify host group doesn't exist
-		com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(groupName).exists(), "Verify net group " + groupName + " doesn't already exist");
+		Assert.assertFalse(sahiTasks.link(groupName).exists(), "Verify net group " + groupName + " doesn't already exist");
 		
 		//add new host group
 		NetgroupTasks.addNetGroup(sahiTasks, groupName, description, button);
@@ -165,10 +165,10 @@ public class NetgroupTests extends SahiTestScript{
 
 		if (button == "Cancel"){
 			//verify net group was not added
-			com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(lowercase).exists(), "Verify net group " + groupName + " was not added");
+			Assert.assertFalse(sahiTasks.link(lowercase).exists(), "Verify net group " + groupName + " was not added");
 		}
 		else {
-			com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(lowercase).exists(), "Verify net group " + groupName + " was added successfully");
+			Assert.assertTrue(sahiTasks.link(lowercase).exists(), "Verify net group " + groupName + " was added successfully");
 		}
 	}
 	
@@ -179,16 +179,16 @@ public class NetgroupTests extends SahiTestScript{
 	public void testNetGroupDelete(String testName, String groupName, String button) throws Exception {
 		// verify host group exists
 		String lowercase = groupName.toLowerCase();
-		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(lowercase).exists(), "Verify net group " + groupName + " exists");
+		Assert.assertTrue(sahiTasks.link(lowercase).exists(), "Verify net group " + groupName + " exists");
 		
 		//delete net group
 		NetgroupTasks.deleteNetgroup(sahiTasks, lowercase, button);
 		
 		if (button == "Cancel"){
-			com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(lowercase).exists(), "Verify net group " + groupName + " still exists");
+			Assert.assertTrue(sahiTasks.link(lowercase).exists(), "Verify net group " + groupName + " still exists");
 		}
 		else {
-			com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(lowercase).exists(), "Verify net group " + groupName + " was deleted successfully");
+			Assert.assertFalse(sahiTasks.link(lowercase).exists(), "Verify net group " + groupName + " was deleted successfully");
 		}
 	}
 	
@@ -199,17 +199,17 @@ public class NetgroupTests extends SahiTestScript{
 	public void testNetGroupAddAndAddAnother(String testName, String groupName1, String groupName2, String groupName3) throws Exception {
 		
 		//verify host group doesn't exist
-		com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(groupName1).exists(), "Verify net group " + groupName1 + " doesn't already exist");
-		com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(groupName2).exists(), "Verify net group " + groupName2 + " doesn't already exist");
-		com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(groupName3).exists(), "Verify net group " + groupName3 + " doesn't already exist");
+		Assert.assertFalse(sahiTasks.link(groupName1).exists(), "Verify net group " + groupName1 + " doesn't already exist");
+		Assert.assertFalse(sahiTasks.link(groupName2).exists(), "Verify net group " + groupName2 + " doesn't already exist");
+		Assert.assertFalse(sahiTasks.link(groupName3).exists(), "Verify net group " + groupName3 + " doesn't already exist");
 		
 		//add new host group
 		HostgroupTasks.addAndAddAnotherHostGroup(sahiTasks, groupName1, groupName2, groupName3);
 	
 		//verify host group exists
-		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(groupName1).exists(), "Verify net group " + groupName1 + " exists");
-		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(groupName2).exists(), "Verify net group " + groupName2 + " exists");
-		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(groupName3).exists(), "Verify net group " + groupName3 + " exists");
+		Assert.assertTrue(sahiTasks.link(groupName1).exists(), "Verify net group " + groupName1 + " exists");
+		Assert.assertTrue(sahiTasks.link(groupName2).exists(), "Verify net group " + groupName2 + " exists");
+		Assert.assertTrue(sahiTasks.link(groupName3).exists(), "Verify net group " + groupName3 + " exists");
 	
 	}
 	
@@ -219,18 +219,18 @@ public class NetgroupTests extends SahiTestScript{
 	@Test (groups={"deleteMultipleNetGroupTests"}, dataProvider="getAddAndAddAnotherNetGroupTestObjects",  dependsOnGroups="addAndAddAnotherNetGroupTests")	
 	public void testNetGroupDeleteMultiple(String testName, String groupName1, String groupName2, String groupName3) throws Exception {
 		//verify host group exists
-		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(groupName1).exists(), "Verify net group " + groupName1 + " exists");
-		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(groupName2).exists(), "Verify net group " + groupName2 + " exists");
-		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(groupName3).exists(), "Verify net group " + groupName3 + " exists");
+		Assert.assertTrue(sahiTasks.link(groupName1).exists(), "Verify net group " + groupName1 + " exists");
+		Assert.assertTrue(sahiTasks.link(groupName2).exists(), "Verify net group " + groupName2 + " exists");
+		Assert.assertTrue(sahiTasks.link(groupName3).exists(), "Verify net group " + groupName3 + " exists");
 		
 		String [] groupnames = {groupName1, groupName2, groupName3};
 		//delete net group
 		NetgroupTasks.deleteNetgroup(sahiTasks, groupnames);
 
 		//verify net group doesn't exist
-		com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(groupName1).exists(), "Verify net group " + groupName1 + " was deleted successfully");
-		com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(groupName2).exists(), "Verify net group " + groupName2 + " was deleted successfully");
-		com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(groupName3).exists(), "Verify net group " + groupName3 + " was deleted successfully");
+		Assert.assertFalse(sahiTasks.link(groupName1).exists(), "Verify net group " + groupName1 + " was deleted successfully");
+		Assert.assertFalse(sahiTasks.link(groupName2).exists(), "Verify net group " + groupName2 + " was deleted successfully");
+		Assert.assertFalse(sahiTasks.link(groupName3).exists(), "Verify net group " + groupName3 + " was deleted successfully");
 		
 	}
 	
@@ -240,13 +240,13 @@ public class NetgroupTests extends SahiTestScript{
 	@Test (groups={"addAndEditNetGroupSettingsTest"}, dataProvider="getAddAndEditNetGroupTestObjects")	
 	public void testnetGroupAddAndEdit(String testName, String groupName, String description1, String description2, String nisdomain) throws Exception {
 		//verify net group doesn't exist
-		com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(groupName).exists(), "Verify net group " + groupName + " doesn't already exist");
+		Assert.assertFalse(sahiTasks.link(groupName).exists(), "Verify net group " + groupName + " doesn't already exist");
 		
 		//add new net group
 		NetgroupTasks.addAndEditNetGroup(sahiTasks, groupName, description1, description2, nisdomain);
 		
 		//verify the net group exists
-		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(groupName).exists(), "Verify net group " + groupName + " exists");
+		Assert.assertTrue(sahiTasks.link(groupName).exists(), "Verify net group " + groupName + " exists");
 		
 		//verify the net group setting
 		NetgroupTasks.verifyNetGroupSettings(sahiTasks, groupName, description2, nisdomain);
