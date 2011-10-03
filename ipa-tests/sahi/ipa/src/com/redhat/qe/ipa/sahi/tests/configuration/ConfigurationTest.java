@@ -15,6 +15,7 @@ import com.redhat.qe.auto.testng.TestNGUtils;
 import com.redhat.qe.ipa.sahi.base.SahiTestScript;
 import com.redhat.qe.ipa.sahi.tasks.CommonTasks;
 import com.redhat.qe.ipa.sahi.tasks.ConfigurationTasks;
+import com.redhat.qe.ipa.sahi.tasks.GroupTasks;
 import com.redhat.qe.ipa.sahi.tasks.HBACTasks;
 import com.redhat.qe.ipa.sahi.tasks.UserTasks;
 
@@ -146,11 +147,43 @@ public class ConfigurationTest extends SahiTestScript{
 	}
 	
 	/*
-	 * Test User Options 
-	 * email - "testrelm " invalid 'emaildomain': Leading and trailing spaces are not allowed
-	 * blank is allowed, special char, numbers are allowed.
+	 * Test User Options - email 
+	 * 
 	 */
+	@Test (groups={"configUserOptionEmailTests"}, description="Verify valid User Default Email values", 
+			dataProvider="getConfigUserOptionEmailTestObjects")	
+	public void testConfigUserOptionEmail(String testName, String email) throws Exception {
+		ConfigurationTasks.setConfigValue(sahiTasks, "ipadefaultemaildomain", email);
+		ConfigurationTasks.verifyConfigValue(sahiTasks, "ipadefaultemaildomain", email);
+		String user = "user1";
+		ConfigurationTasks.verifyUserEmailFunctional(sahiTasks, commonTasks, email, user);
+	} 
+	
+	
+	/*
+	 * Test User Options - email - invalid
+	 * 
+	 */
+	
+	@Test (groups={"configUserOptionInvalidEmailTests"}, description="Verify invalid User Default Email values", 
+			dataProvider="getConfigUserOptionInvalidEmailTestObjects")	
+	public void testConfigUserOptionInvalidEmail(String testName, String email, String expectedError) throws Exception {
+		ConfigurationTasks.setInvalidConfigValue(sahiTasks, "ipadefaultemaildomain", email, expectedError, "");		
+	}
 		
+	/*
+	 * Test User Options - group 
+	 * 
+	 */
+	@Test (groups={"configUserOptionGroupTests"}, description="Verify valid User Default User Group values", 
+			dataProvider="getConfigUserOptionGroupTestObjects")	
+	public void testConfigUserOptionGroup(String testName, String group) throws Exception {
+		ConfigurationTasks.setGroupConfigValue(sahiTasks, commonTasks, group);
+		ConfigurationTasks.verifyConfigValue(sahiTasks, "ipadefaultprimarygroup", group);
+		
+		//ConfigurationTasks.verifyUserEmailFunctional(sahiTasks, commonTasks, email, user);
+	} 
+	
 	/*
 	 * Test User Options
 	 * home dir - "/home " - invalid 'homedirectory': Leading and trailing spaces are not allowed
@@ -192,7 +225,7 @@ public class ConfigurationTest extends SahiTestScript{
 		sahiTasks.navigateTo(commonTasks.userPage, true);
 		String testUser="user";
 		for (int i=0; i<20; i++) {
-			if (!sahiTasks.link(testUser+i).exists())
+			if (sahiTasks.link(testUser+i).exists())
 				UserTasks.deleteUser(sahiTasks, testUser+i);
 		}		
 	
@@ -200,9 +233,20 @@ public class ConfigurationTest extends SahiTestScript{
 		sahiTasks.navigateTo(commonTasks.hbacPage, true);
 	    String testHBACRule="rule";
 	    for (int i=0; i<20; i++) {
-			if (!sahiTasks.link(testHBACRule+i).exists())
+			if (sahiTasks.link(testHBACRule+i).exists())
 				HBACTasks.deleteHBAC(sahiTasks, testHBACRule+i, "Delete");
 	    }
+	    
+	    sahiTasks.navigateTo(commonTasks.groupPage, true);
+		if (!sahiTasks.link("configgroup").exists())
+			GroupTasks.deleteGroup(sahiTasks, "configgroup");
+	    
+	  //restore defaults
+	    sahiTasks.navigateTo(commonTasks.configurationPage, true);
+	    ConfigurationTasks.setConfigValue(sahiTasks, "ipasearchrecordslimit", "100");
+	    ConfigurationTasks.setConfigValue(sahiTasks, "ipasearchtimelimit", "2");
+	    ConfigurationTasks.setConfigValue(sahiTasks, "ipausersearchfields", "uid,givenname,sn,telephonenumber,ou,title");
+	    ConfigurationTasks.setConfigValue(sahiTasks, "ipadefaultemaildomain", "testrelm");
 	}
 	
 	/*******************************************************
@@ -320,10 +364,67 @@ public class ConfigurationTest extends SahiTestScript{
 		
         //										testname						cn   		expectedError1				
 		ll.add(Arrays.asList(new Object[]{ "usersearchfield_blank",				"",			"an internal error has occurred"														} ));
-		ll.add(Arrays.asList(new Object[]{ "usersearchfield_trailing_space",	" uid",     "invalid 'usersearch': Leading and trailing spaces are not allowed"	} ));
-		ll.add(Arrays.asList(new Object[]{ "usersearchfield_leading_space",		"uid ",     "invalid 'usersearch': Leading and trailing spaces are not allowed"	} ));
+		ll.add(Arrays.asList(new Object[]{ "usersearchfield_trailing_space",	"uid ",     "invalid 'usersearch': Leading and trailing spaces are not allowed"	} ));
+		ll.add(Arrays.asList(new Object[]{ "usersearchfield_leading_space",		" uid",     "invalid 'usersearch': Leading and trailing spaces are not allowed"	} ));
 		ll.add(Arrays.asList(new Object[]{ "usersearchfield_notallowed",		"abc",     	"invalid 'ipausersearchfields': attribute \"abc\" not allowed"	} ));
 			
+		return ll;	
+	}
+	
+	/*
+	 * Test user options limits
+	 * Default e-mail domain for new users
+	 */
+	@DataProvider(name="getConfigUserOptionEmailTestObjects")
+	public Object[][] getConfigUserOptionEmailTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createConfigUserOptionEmailTestObjects());
+	}
+	protected List<List<Object>> createConfigUserOptionEmailTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname				email						uid			
+		ll.add(Arrays.asList(new Object[]{ "useremail_new",				"idmqe.redhat.com"			} ));
+		ll.add(Arrays.asList(new Object[]{ "useremail_specialchar",			"$idm-qe_redh@+.c^om~"		} ));		
+		ll.add(Arrays.asList(new Object[]{ "useremail_blank",			""							} ));
+		ll.add(Arrays.asList(new Object[]{ "useremail_numbers",			"12idm34qe"					} ));
+		ll.add(Arrays.asList(new Object[]{ "useremail_space_inbetween",	"12 34"						} ));
+		
+		
+		return ll;	
+	}
+	
+	/*
+	 * Test user options limits - invalid
+	 * Default e-mail domain for new users
+	 */
+	@DataProvider(name="getConfigUserOptionInvalidEmailTestObjects")
+	public Object[][] getConfigUserOptionInvalidEmailTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createConfigUserOptionInvalidEmailTestObjects());
+	}
+	protected List<List<Object>> createConfigUserOptionInvalidEmailTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname						email   			expectedError																} ));
+		ll.add(Arrays.asList(new Object[]{ "useremail_trailing_space",			"testrelm ",     "invalid 'emaildomain': Leading and trailing spaces are not allowed"	} ));
+		ll.add(Arrays.asList(new Object[]{ "useremail_leading_space",			" testrelm",     "invalid 'emaildomain': Leading and trailing spaces are not allowed"	} ));
+			
+		return ll;	
+	}
+	
+	/*
+	 * Test user options limits
+	 * Default e-mail domain for new users
+	 */
+	@DataProvider(name="getConfigUserOptionGroupTestObjects")
+	public Object[][] getConfigUserOptionGroupTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createConfigUserOptionGroupTestObjects());
+	}
+	protected List<List<Object>> createConfigUserOptionGroupTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname				group			
+		ll.add(Arrays.asList(new Object[]{ "usergroup_new",				"configgroup"			} ));
+		
 		return ll;	
 	}
 }

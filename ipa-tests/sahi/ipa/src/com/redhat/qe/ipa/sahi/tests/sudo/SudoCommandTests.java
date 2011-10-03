@@ -487,7 +487,7 @@ public class SudoCommandTests extends SahiTestScript {
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
         //										testname										cn				 			
-		ll.add(Arrays.asList(new Object[]{ "cancel_enrolling_command_into_commandgroup",		"/bin/ln"	} ));
+		ll.add(Arrays.asList(new Object[]{ "cancel_enrolling_command_into_group",		"/bin/ln"	} ));
 		
 		return ll;	
 	}
@@ -504,7 +504,7 @@ public class SudoCommandTests extends SahiTestScript {
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
         //										testname							cn				 			
-		ll.add(Arrays.asList(new Object[]{ "enroll_command_into_commandgroup",		"/bin/ln"	} ));
+		ll.add(Arrays.asList(new Object[]{ "enroll_command_into_group",		"/bin/ln"	} ));
 		
 		return ll;	
 	}

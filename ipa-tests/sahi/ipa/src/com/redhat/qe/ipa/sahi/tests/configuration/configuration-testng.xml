@@ -13,6 +13,9 @@
 			    <include name="configSearchOptionInvalidTimeLimitTests" />
 			    <include name="configUserOptionSearchFieldTests" />
 			    <include name="configUserOptionInvalidSearchFieldTests" />
+			    <include name="configUserOptionEmailTests" />
+			    <include name="configUserOptionInvalidEmailTests" />
+			    <include name="configUserOptionGroupTests" />
 			</run>
 		</groups>
 	</test>

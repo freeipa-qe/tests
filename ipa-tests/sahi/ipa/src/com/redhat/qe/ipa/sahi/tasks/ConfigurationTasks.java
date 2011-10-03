@@ -10,6 +10,8 @@ public class ConfigurationTasks {
 	
 	
 	public static void setConfigValue(SahiTasks sahiTasks, String field, String value) {
+		if (value.isEmpty())
+			sahiTasks.textbox(field).setValue(" ");
 		sahiTasks.textbox(field).setValue(value);
 		sahiTasks.span("Update").click();
 	}
@@ -35,11 +37,25 @@ public class ConfigurationTasks {
 		sahiTasks.span("undo").click();
 	}
 	
+	public static void setGroupConfigValue(SahiTasks sahiTasks, CommonTasks commonTasks, String group) {
+		sahiTasks.navigateTo(commonTasks.groupPage, true);
+		if (!sahiTasks.link(group).exists())
+			GroupTasks.addGroup(sahiTasks, group, group);
+		sahiTasks.navigateTo(commonTasks.configurationPage, true);
+		
+		
+		sahiTasks.span("icon combobox-icon").click();
+		sahiTasks.select("list").choose(group);
+		
+		//sahiTasks.textbox("ipadefaultprimarygroup").setValue(group);
+		sahiTasks.span("Update").click();
+	}
+	
 	/*
 	 * Verify the search size limit brings back the expected number of entries
 	 */
 	public static void verifySearchSizeLimitFunctional(SahiTasks sahiTasks, CommonTasks commonTasks, String value, String expectedRows) {
-		sahiTasks.navigateTo(commonTasks.userPage);
+		sahiTasks.navigateTo(commonTasks.userPage, true);
 		if (value.equals(expectedRows))
 			Assert.assertTrue(sahiTasks.span("Query returned more results than the configured size limit. Displaying the first " + value + " results.").exists(), "");
 		else
@@ -68,5 +84,34 @@ public class ConfigurationTasks {
 		sahiTasks.navigateTo(commonTasks.configurationPage);
 	}
 	
+	
+	/*
+	 * Verify default domain for user's email is as set in default email domain field
+	 *
+	 */
+	
+	public static void verifyUserEmailFunctional(SahiTasks sahiTasks, CommonTasks commonTasks, String email, String user) {
+		sahiTasks.navigateTo(commonTasks.userPage);
+		//add an email for this user
+		sahiTasks.link(user).click();
+		sahiTasks.link("Add").click();
+		//do not specify domain
+		sahiTasks.textbox("mail").setValue(user);
+		sahiTasks.link("Update").click();
+		
+		//verify default domain is picked
+		if (email.isEmpty())
+			Assert.assertEquals(sahiTasks.textbox("mail").value(), user, "Verified mail for user " + user + ": " + user);
+		else
+			Assert.assertEquals(sahiTasks.textbox("mail").value(), user + "@" + email, "Verified mail for user " + user + ": " + user + "@" + email);
+		
+		//delete this email for next test
+		sahiTasks.link("Delete").click();
+		sahiTasks.link("Update").click();
+		
+		sahiTasks.link("Users").in(sahiTasks.div("content")).click();
+		
+		sahiTasks.navigateTo(commonTasks.configurationPage);
+	}
 	
 }

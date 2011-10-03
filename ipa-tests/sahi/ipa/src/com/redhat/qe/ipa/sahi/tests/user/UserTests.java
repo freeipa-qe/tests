@@ -563,11 +563,11 @@ public class UserTests extends SahiTestScript{
 	protected List<List<Object>> createInvalidUserTestObjects() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-        //										testname						uid										givenname	sn   		 ExpectedError
+        //										testname							uid										givenname	sn   		 ExpectedError
 		
-		ll.add(Arrays.asList(new Object[]{ "create_long_user",					"abcdefghijklmnopqrstuvwxyx12345678", 	"Long",		"User",      "invalid 'login': can be at most 32 characters"	} ));
-		ll.add(Arrays.asList(new Object[]{ "recreate_user",						"testuser", 							"Test",		"User",		 "user with name \"testuser\" already exists"	} ));
-		ll.add(Arrays.asList(new Object[]{ "create_user_with_optional_login",	"", 									"Testing",	"User",		 "user with name \"tuser\" already exists"	} ));
+		ll.add(Arrays.asList(new Object[]{ "create_long_user",						"abcdefghijklmnopqrstuvwxyx12345678", 	"Long",		"User",      "invalid 'login': can be at most 32 characters"	} ));
+		ll.add(Arrays.asList(new Object[]{ "recreate_user",							"testuser", 							"Test",		"User",		 "user with name \"testuser\" already exists"	} ));
+		ll.add(Arrays.asList(new Object[]{ "create_user_with_optional_login_again",	"", 									"Testing",	"User",		 "user with name \"tuser\" already exists"	} ));
 		
 		return ll;	
 	}
