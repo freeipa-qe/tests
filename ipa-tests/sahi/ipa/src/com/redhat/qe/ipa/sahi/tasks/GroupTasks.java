@@ -194,7 +194,7 @@ public class GroupTasks {
         	browser.textbox("gidnumber").setValue(gid);
         
         if (isPosix.equals("nonPosix")){
-        	browser.checkbox("posix").click();
+        	browser.checkbox("nonposix").click();
         }
         browser.button("Add").click();
 	}
@@ -210,7 +210,7 @@ public class GroupTasks {
         if (! firstGid.equals(""))
         	browser.textbox("gidnumber").setValue(firstGid);
         if (first_isPosix.equals("nonPosix")){
-        	browser.checkbox("posix").click();
+        	browser.checkbox("nonposix").click();
         }
         
         // click Add and Add Another to create a new group without leave the current dialog, 
@@ -221,7 +221,7 @@ public class GroupTasks {
         if (! secondGid.equals(""))
         	browser.textbox("gidnumber").setValue(secondGid);
         if (second_isPosix.equals("nonPosix")){
-        	browser.checkbox("posix").click();
+        	browser.checkbox("nonposix").click();
         }
         
         // finally cancel to go back to main user group page
@@ -236,7 +236,7 @@ public class GroupTasks {
         browser.textbox("description").setValue(groupDescription);
         browser.textbox("gidnumber").setValue(gid);
         if (isPosix.equals("nonPosix")){
-        	browser.checkbox("posix").click();
+        	browser.checkbox("nonposix").click();
         } 
         browser.button("Add and Edit").click();
         
@@ -256,7 +256,7 @@ public class GroupTasks {
         browser.textbox("description").setValue(groupDescription);
         browser.textbox("gidnumber").setValue(gid);
         if (isPosix.equals("isPosix")){
-        	browser.checkbox("posix").click();
+        	browser.checkbox("nonposix").click();
         } 
         browser.button("Cancel").click();
 	}

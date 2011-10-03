@@ -101,7 +101,7 @@ public class GroupTests extends SahiTestScript{
 						{"posix group",	
 								GroupTests.testUserGroups[0],"posix group, with given gid","1500000001","isPosix"},
 						{"non posix group",	
-								GroupTests.testUserGroups[1],"non posix group, with given gid","1500000002","nonPosix"},
+								GroupTests.testUserGroups[1],"non posix group","","nonPosix"},
 						{"default group: non-posix, assigned gid",
 								GroupTests.testUserGroups[2],	"default group","","default"}
 					  };
@@ -115,10 +115,10 @@ public class GroupTests extends SahiTestScript{
 								GroupTests.testUserGroups[3], "posix, given gid","1500000003","isPosix",
 								GroupTests.testUserGroups[4], "posix, given gid","1500000004","isPosix"},
 						{"2 non posix group",	
-								GroupTests.testUserGroups[5], "non posix, given gid","1500000005","nonPosix",
-								GroupTests.testUserGroups[6], "non posix, given gid","1500000006","nonPosix"},
+								GroupTests.testUserGroups[5], "non posix","","nonPosix",
+								GroupTests.testUserGroups[6], "non posix","","nonPosix"},
 						{"mixed groups: posix and non posix",
-								GroupTests.testUserGroups[7], "non posix, given gid","1500000007","default",
+								GroupTests.testUserGroups[7], "non posix","","default",
 								GroupTests.testUserGroups[8], "posix, assigned gid", "","isPosix"}
 					  };
 		return groups;
@@ -131,7 +131,7 @@ public class GroupTests extends SahiTestScript{
 						{"posix group",	
 								GroupTests.testUserGroups[9],"posix group, with given gid","1500000009","isPosix"},
 						{"non posix group",	
-								GroupTests.testUserGroups[10],"non posix group, with given gid","1500000010","nonPosix"},
+								GroupTests.testUserGroups[10],"non posix group","","nonPosix"},
 						{"default group: non-posix, assigned gid",
 								GroupTests.testUserGroups[11],	"default group","","default"}
 					  };
