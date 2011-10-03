@@ -553,6 +553,24 @@ rlPhaseStartTest "ipa-host-cli-38: find more hosts than exist"
 	rlRun "ipa host-del $myhost" 0 "Deleting host with hostname ending in ."
     rlPhaseEnd
 
+    rlPhaseStartTest "ipa-host-cli-53: Negative - add host with _"
+        command="ipa host-add host_underscore.$RELM --force"
+        expmsg="ipa: ERROR: invalid 'hostname': may only include letters, numbers, and -"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-host-cli-54: Negative - add host with ~"
+        command="ipa host-add host~tilda.$RELM --force"
+        expmsg="ipa: ERROR: invalid 'hostname': may only include letters, numbers, and -"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-host-cli-55: Negative - add host with +"
+        command="ipa host-add host+plus.$RELM --force"
+        expmsg="ipa: ERROR: invalid 'hostname': may only include letters, numbers, and -"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
+    rlPhaseEnd
+
     rlPhaseStartCleanup "ipa-host-cli-cleanup: Destroying admin credentials."
 	rlRun "ipa config-mod --searchrecordslimit=100" 0 "set search records limit back to default"
         i=1
