@@ -231,7 +231,8 @@ public class HBACServiceTests  extends SahiTestScript{
 	 */
 	@Test (groups={"hbacServiceMultipleDeleteTests"}, dataProvider="getMultipleHBACServiceTestObjects", 
 			dependsOnGroups={"hbacServiceAddTests", "hbacServiceAddAndEditTests", "invalidhbacServiceAddTests", 
-			"hbacServiceSearchTests", "hbacServiceEditTests", "hbacServiceCancelEnrollTests" })
+			"hbacServiceSearchTests", "hbacServiceEditTests", "hbacServiceEnrollTests", "hbacServiceCancelEnrollTests",
+			"hbacServiceCancelDeleteEnrolledTests", "hbacServiceDeleteEnrolledTests"})
 	public void testMultipleHBACServiceDelete(String testName, String cn1, String cn2, String cn3) throws Exception {	
 		String cns[] = {cn1, cn2, cn3};
 		
