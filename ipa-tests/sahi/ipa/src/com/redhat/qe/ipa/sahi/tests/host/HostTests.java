@@ -10,6 +10,7 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 import org.testng.annotations.AfterClass;
 
+import com.redhat.qe.auto.testng.Assert;
 import com.redhat.qe.auto.testng.TestNGUtils;
 import com.redhat.qe.ipa.sahi.base.SahiTestScript;
 import com.redhat.qe.ipa.sahi.tasks.CommonTasks;
@@ -92,13 +93,13 @@ public class HostTests extends SahiTestScript{
 		String lowerdn = fqdn.toLowerCase();
 		
 		//verify host doesn't exist
-		com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(lowerdn).exists(), "Verify host " + fqdn + " doesn't already exist");
+		Assert.assertFalse(sahiTasks.link(lowerdn).exists(), "Verify host " + fqdn + " doesn't already exist");
 		
 		//add new host
 		HostTasks.addHost(sahiTasks, hostname, domain, ipadr);
 
 		//verify host was added
-		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(lowerdn).exists(), "Added host " + fqdn + "  successfully");
+		Assert.assertTrue(sahiTasks.link(lowerdn).exists(), "Added host " + fqdn + "  successfully");
 	}
 	
 	/*
@@ -107,13 +108,13 @@ public class HostTests extends SahiTestScript{
 	@Test (groups={"deleteHostTests"}, dataProvider="getHostDeleteTestObjects",  dependsOnGroups="addHostTests")	
 	public void testHostDelete(String testName, String fqdn) throws Exception {
 		//verify host exists
-		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(fqdn).exists(), "Verify host " + fqdn + " already exist");
+		Assert.assertTrue(sahiTasks.link(fqdn).exists(), "Verify host " + fqdn + " already exist");
 		
 		//delete new host
 		HostTasks.deleteHost(sahiTasks, fqdn);
 		
 		//verify host was deleted
-		com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(fqdn).exists(), "Added host " + fqdn + "  successfully");
+		Assert.assertFalse(sahiTasks.link(fqdn).exists(), "Added host " + fqdn + "  successfully");
 	}
 	
 	/*
@@ -123,7 +124,7 @@ public class HostTests extends SahiTestScript{
 	public void testHostForceAdd(String testName, String hostname1, String hostname2, String hostname3) throws Exception {
 		String [] hostnames = {hostname1, hostname2, hostname3};
 		for (String hostname : hostnames){
-			com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(hostname + "." + domain).exists(), "Verify host " + hostname + " doesn't already exist");
+			Assert.assertFalse(sahiTasks.link(hostname + "." + domain).exists(), "Verify host " + hostname + " doesn't already exist");
 		}
 
 		//add new hosts
@@ -131,7 +132,7 @@ public class HostTests extends SahiTestScript{
 		
 		for (String hostname : hostnames){
 			//verify host was added
-			com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(hostname+"."+domain).exists(), "Added host " + hostname + "  successfully");
+			Assert.assertTrue(sahiTasks.link(hostname+"."+domain).exists(), "Added host " + hostname + "  successfully");
 		}
 	}
 	
@@ -143,14 +144,14 @@ public class HostTests extends SahiTestScript{
 		String [] hostnames = {hostname1, hostname2, hostname3};
 		for (String hostname : hostnames) {
 			//verify host exists
-			com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(hostname).exists(), "Verify host " + hostname + " already exist");
+			Assert.assertTrue(sahiTasks.link(hostname).exists(), "Verify host " + hostname + " already exist");
 		}
 		//delete the hosts
 		HostTasks.deleteHost(sahiTasks, hostnames);
 		
 		for (String hostname : hostnames) {
 			//verify host was deleted
-			com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(hostname).exists(), "Deleted host " + hostname + "  successfully");
+			Assert.assertFalse(sahiTasks.link(hostname).exists(), "Deleted host " + hostname + "  successfully");
 		}
 	}
 	
@@ -163,13 +164,13 @@ public class HostTests extends SahiTestScript{
 		String lowerdn = fqdn.toLowerCase();
 		
 		//verify host doesn't exist
-		com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(lowerdn).exists(), "Verify host " + hostname + " doesn't already exist");
+		Assert.assertFalse(sahiTasks.link(lowerdn).exists(), "Verify host " + hostname + " doesn't already exist");
 		
 		//add and edit new host
 		HostTasks.addHostAndEdit(sahiTasks, domain, hostname, ipadr, description, local, location, platform, os);
 		
 		//verify host was added
-		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(lowerdn).exists(), "Added host " + hostname + "  successfully");
+		Assert.assertTrue(sahiTasks.link(lowerdn).exists(), "Added host " + hostname + "  successfully");
 		
 		//verify all host fields
 		HostTasks.verifyHostSettings(sahiTasks, lowerdn, description, local, location, platform, os);
@@ -183,7 +184,7 @@ public class HostTests extends SahiTestScript{
 	@Test (groups={"modifyHostTests"}, dataProvider="getModifyHostTestObjects")	
 	public void testModifyHost(String testName, String field, String value) throws Exception {
 		String fqdn = testhost + "." + domain;
-		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(fqdn).exists(), "Host " + testhost + "  exists");
+		Assert.assertTrue(sahiTasks.link(fqdn).exists(), "Host " + testhost + "  exists");
 		
 		//modify the host
 		HostTasks.modifyHost(sahiTasks, fqdn, field, value);
@@ -199,7 +200,7 @@ public class HostTests extends SahiTestScript{
 	@Test (groups={"otpHostTests"}, dataProvider="getOTPHostTestObjects")	
 	public void testHostOTP(String testName, String otp, boolean set, boolean verifyset, String button) throws Exception {
 		String fqdn = testhost + "." + domain;
-		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(fqdn).exists(), "Host " + fqdn + "  exists");
+		Assert.assertTrue(sahiTasks.link(fqdn).exists(), "Host " + fqdn + "  exists");
 		
 		//modify the host
 		HostTasks.modifyHostOTP(sahiTasks, fqdn, otp, set, button);
@@ -215,7 +216,7 @@ public class HostTests extends SahiTestScript{
 	@Test (groups={"undoModifyHostTests"}, dataProvider="getUndoModifyHostTestObjects")	
 	public void tesUndoModifyHost(String testName, String newdesc, String newlocal, String newlocation, String newplatform, String newos ) throws Exception {
 		String fqdn = undotesthost + "." + domain;
-		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(fqdn).exists(),  fqdn + "  exists");
+		Assert.assertTrue(sahiTasks.link(fqdn).exists(),  fqdn + "  exists");
 		
 		//modify the host
 		HostTasks.undoModifyHost(sahiTasks, fqdn, newdesc, newlocal, newlocation, newplatform, newos);
@@ -320,10 +321,14 @@ public class HostTests extends SahiTestScript{
 	 */
 	@Test (groups={"invalidhostAddTests"}, dataProvider="getInvalidHostTestObjects")	
 	public void testInvalidHostadd(String testName, String hostname, String hostdomain, String ipadr, String expectedError) throws Exception {
-		
-		HostTasks.addInvalidHost(sahiTasks, hostname, hostdomain, ipadr, expectedError);
+		boolean requiredFieldTest=false;
+		if (testName.startsWith("missing")) 
+			requiredFieldTest=true;
+		HostTasks.addInvalidHost(sahiTasks, hostname, hostdomain, ipadr, expectedError, requiredFieldTest);
 
 	}
+	
+	
 	
 	/*
 	 * Host Add DNS tests
@@ -339,7 +344,7 @@ public class HostTests extends SahiTestScript{
 		HostTasks.addHost(sahiTasks, hostname, domain, ipaddr);
 		
 		// verify host was added
-		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(fqdn).exists(), "Added host " + fqdn + "  successfully");
+		Assert.assertTrue(sahiTasks.link(fqdn).exists(), "Added host " + fqdn + "  successfully");
 		
 		// verify host link to dns and dns records
 		HostTasks.verifyHostDNSLink(sahiTasks, fqdn, "YES");
@@ -414,8 +419,7 @@ public class HostTests extends SahiTestScript{
         //										testname				hostname		ipadr
 		ll.add(Arrays.asList(new Object[]{ "add_host_lowercase",		"myhost1",		"" } ));
 		ll.add(Arrays.asList(new Object[]{ "add_host_uppercase",		"MYHOST2",		"" } ));
-		ll.add(Arrays.asList(new Object[]{ "add_host_mixedcase",		"MyHost3", 		"" } ));
-		ll.add(Arrays.asList(new Object[]{ "add_host_tilde",			"test~", 		"" } ));
+		ll.add(Arrays.asList(new Object[]{ "add_host_mixedcase",		"MyHost3", 		"" } ));		
 		ll.add(Arrays.asList(new Object[]{ "add_host_dash",				"test-", 		"" } ));
 		        
 		return ll;	
@@ -435,7 +439,6 @@ public class HostTests extends SahiTestScript{
 		ll.add(Arrays.asList(new Object[]{ "delete_host_lowercase",		"myhost1."+domain 	} ));
 		ll.add(Arrays.asList(new Object[]{ "delete_host_uppercase",		"myhost2."+domain 	} ));
 		ll.add(Arrays.asList(new Object[]{ "delete_host_mixedcase",		"myhost3."+domain 	} ));
-		ll.add(Arrays.asList(new Object[]{ "delete_host_tilde",			"test~."+domain     	} ));
 		ll.add(Arrays.asList(new Object[]{ "delete_host_dash",			"test-."+domain		} ));
 		        
 		return ll;	
@@ -500,18 +503,20 @@ public class HostTests extends SahiTestScript{
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
         //										testname					hostname     hostdomain    	ipadr   			expectedError
-		ll.add(Arrays.asList(new Object[]{ "missing_hostname",				"", 	 	 domain,		"",					"'fqdn' is required"} ));
-		ll.add(Arrays.asList(new Object[]{ "missing_domainname",			"mytest.", 	 "",			"",					"'fqdn' is required"} ));
+		ll.add(Arrays.asList(new Object[]{ "missing_hostname",				"", 	 	 domain,		"",					"Required field"} ));
+	    ll.add(Arrays.asList(new Object[]{ "missing_domainname",			"mytest.", 	 "",			"",					"Required field"} ));
 		ll.add(Arrays.asList(new Object[]{ "invalidipadr_alpha_chars",		"test",		 domain, 		"null",				"invalid 'ip_address': invalid IP address"	} ));
 		ll.add(Arrays.asList(new Object[]{ "invalidipadr_too_many_octets",	"test",		 domain, 		"10.10.10.10.10",	"invalid 'ip_address': invalid IP address"	} ));	
 		ll.add(Arrays.asList(new Object[]{ "invalidipadr_bad_octects",		"test",		 domain, 		"999.999.999.999",	"invalid 'ip_address': invalid IP address"	} ));
 		ll.add(Arrays.asList(new Object[]{ "invalidipadr_special_chars",	"test",		 domain, 		"~.&.#.^",			"invalid 'ip_address': invalid IP address"	} ));
 		ll.add(Arrays.asList(new Object[]{ "duplicate_hostname",			testhost,	 domain, 		"",					"host with name \""+ testhost + "." + domain + "\" already exists"	} ));
-		ll.add(Arrays.asList(new Object[]{ "begining_space_hostname",		" " + "testing",  domain,		"",				"invalid 'hostname': Leading and trailing spaces are not allowed"} ));
-		ll.add(Arrays.asList(new Object[]{ "ending_space_hostname",			"testing" + " ",  domain,		"",				"invalid 'hostname': Leading and trailing spaces are not allowed"} ));
+		ll.add(Arrays.asList(new Object[]{ "begining_space_hostname",		" " + "testing",  domain,		"",				"invalid 'hostname': may only include letters, numbers, and -"} ));
+		ll.add(Arrays.asList(new Object[]{ "ending_space_hostname",			"testing" + " ",  domain,		"",				"invalid 'hostname': may only include letters, numbers, and -"} ));
+		ll.add(Arrays.asList(new Object[]{ "invalid_host_tilde",			"test~", 	 domain,		"",					"invalid 'hostname': may only include letters, numbers, and -"		 } ));
 		return ll;	
 	}
 	
+		
 	/*
 	 * Data to be used when modifying hosts - for positive tests
 	 */

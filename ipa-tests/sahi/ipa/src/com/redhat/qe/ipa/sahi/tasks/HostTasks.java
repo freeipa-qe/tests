@@ -114,10 +114,10 @@ public class HostTasks {
 	 */
 	public static void verifyHostSettings(SahiTasks sahiTasks, String hostname, String description, String local, String location, String platform, String os) {
 		sahiTasks.link(hostname).click(); 
-		com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("description").value(), description, "Verified description for host: " + description);
-		com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("l").value(), local, "Verified local for host: " + local);
-		com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("nshostlocation").value(), location, "Verified location for host: " + location);
-		com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("nshardwareplatform").value(), platform, "Verified platform for host: " + platform);
+		Assert.assertEquals(sahiTasks.textbox("description").value(), description, "Verified description for host: " + description);
+		Assert.assertEquals(sahiTasks.textbox("l").value(), local, "Verified local for host: " + local);
+		Assert.assertEquals(sahiTasks.textbox("nshostlocation").value(), location, "Verified location for host: " + location);
+		Assert.assertEquals(sahiTasks.textbox("nshardwareplatform").value(), platform, "Verified platform for host: " + platform);
 		sahiTasks.link("Hosts").in(sahiTasks.div("content")).click();
 	}
 	
@@ -128,7 +128,7 @@ public class HostTasks {
 	 * @param ipadr - ip address for the host
 	 * @param expectedError - the error thrown when an invalid host is being attempted to be added
 	 */
-	public static void addInvalidHost(SahiTasks sahiTasks, String hostname, String hostdomain, String ipadr, String expectedError) {
+	public static void addInvalidHost(SahiTasks sahiTasks, String hostname, String hostdomain, String ipadr, String expectedError, boolean requiredFieldTest) {
 		sahiTasks.span("Add").click();
 		sahiTasks.textbox("hostname").setValue(hostname);
 		sahiTasks.textbox("dnszone").setValue(hostdomain);
@@ -141,13 +141,19 @@ public class HostTasks {
 		sahiTasks.button("Add").click();
 		//Check for expected error
 		log.fine("error check");
-		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.div(expectedError).exists(), "Verified expected error when adding invalid host");
-	
-		log.fine("cancel(near retry)");
-		sahiTasks.button("Cancel").near(sahiTasks.button("Retry")).click();
+		if (requiredFieldTest)
+			Assert.assertTrue(sahiTasks.span(expectedError).exists(), "Verified expected error when adding invalid host " );
+		else {
+			Assert.assertTrue(sahiTasks.div(expectedError).exists(), "Verified expected error when adding invalid host");
+			log.fine("cancel(near retry)");
+			sahiTasks.button("Cancel").near(sahiTasks.button("Retry")).click();
+		}		
 		log.fine("cancel");
 		sahiTasks.button("Cancel").near(sahiTasks.button("Add and Edit")).click();
 	}
+	
+
+
 	
 	/*
 	 * Modify a host
@@ -253,22 +259,22 @@ public class HostTasks {
 	public static void verifyHostField(SahiTasks sahiTasks, String hostname, String field, String value) {
 		sahiTasks.link(hostname).click();
 		if (field == "description"){
-			com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("description").value(), value, "Verified description for host: " + value);
+			Assert.assertEquals(sahiTasks.textbox("description").value(), value, "Verified description for host: " + value);
 		}
 		if (field == "local"){
-			com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("l").value(), value, "Verified local for host: " + value);
+			Assert.assertEquals(sahiTasks.textbox("l").value(), value, "Verified local for host: " + value);
 		}
 		if (field == "location"){
-			com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("nshostlocation").value(), value, "Verified location for host: " + value);
+			Assert.assertEquals(sahiTasks.textbox("nshostlocation").value(), value, "Verified location for host: " + value);
 		}
 		if (field == "platform"){
-			com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("nshardwareplatform").value(), value, "Verified hardware platform for host: " + value);
+			Assert.assertEquals(sahiTasks.textbox("nshardwareplatform").value(), value, "Verified hardware platform for host: " + value);
 		}
 		if (field == "os"){
-			com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("nsosversion").value(), value, "Verified operating system for host: " + value);
+			Assert.assertEquals(sahiTasks.textbox("nsosversion").value(), value, "Verified operating system for host: " + value);
 		}
 		if (field == "otp"){
-			com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("otp").value(), value, "Verified One Time Password for host: " + value);
+			Assert.assertEquals(sahiTasks.textbox("otp").value(), value, "Verified One Time Password for host: " + value);
 		}
 
 		sahiTasks.link("Hosts").in(sahiTasks.div("content")).click();
@@ -320,10 +326,10 @@ public class HostTasks {
 		sahiTasks.link(managed).click();
 		sahiTasks.link("managedby_host").click();
 		if (exists == "YES"){
-			com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(managedby).exists(), "Host " + managed + " is managed by " + managedby);
+			Assert.assertTrue(sahiTasks.link(managedby).exists(), "Host " + managed + " is managed by " + managedby);
 		}
 		if (exists == "NO"){
-			com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(managedby).exists(), "Host " + managed + " is NOT managed by " + managedby);
+			Assert.assertFalse(sahiTasks.link(managedby).exists(), "Host " + managed + " is NOT managed by " + managedby);
 		}	
 		
 		sahiTasks.link("Hosts").in(sahiTasks.div("content")).click();
@@ -379,10 +385,10 @@ public class HostTasks {
 	public static void verifyHostDNSLink(SahiTasks sahiTasks, String hostname, String exists) {
 		sahiTasks.link(hostname).click();
 		if (exists == "YES"){
-			com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(hostname).exists(), "Host " + hostname + " link to DNS exists");
+			Assert.assertTrue(sahiTasks.link(hostname).exists(), "Host " + hostname + " link to DNS exists");
 		}
 		else {
-			com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(hostname).exists(), "Host " + hostname + " link to DNS does NOT exists");
+			Assert.assertFalse(sahiTasks.link(hostname).exists(), "Host " + hostname + " link to DNS does NOT exists");
 		}
 		sahiTasks.link("Hosts").in(sahiTasks.div("content")).click();
 	}
@@ -409,9 +415,9 @@ public class HostTasks {
 	public static void verifyHostCertificate(SahiTasks sahiTasks, String hostname) {
 		sahiTasks.link(hostname).click();
 		sahiTasks.span("Get").isVisible();
-		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.span("Get").exists(), "Host certificate verify Get button");
-		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.span("View").exists(), "Host certificate verify View button");
-		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.span("Revoke").exists(), "Host certificate verify Revoke button");
+		Assert.assertTrue(sahiTasks.span("Get").exists(), "Host certificate verify Get button");
+		Assert.assertTrue(sahiTasks.span("View").exists(), "Host certificate verify View button");
+		Assert.assertTrue(sahiTasks.span("Revoke").exists(), "Host certificate verify Revoke button");
 		
 		//view certificate
 		sahiTasks.span("View").click();
@@ -450,12 +456,12 @@ public class HostTasks {
 	public static void verifyHostCertificate(SahiTasks sahiTasks, String hostname, String status, String reason) {
 		sahiTasks.link(hostname).click();
 		if (status == "Hold"){
-			com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.span("Restore").exists(), "Host certificate on hold, verify Restore button");
-			com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.span("Certificate Hold").exists(), "Verifying Certificate Hold status.");
+			Assert.assertTrue(sahiTasks.span("Restore").exists(), "Host certificate on hold, verify Restore button");
+			Assert.assertTrue(sahiTasks.span("Certificate Hold").exists(), "Verifying Certificate Hold status.");
 		}
 		if (status == "Revoked"){
-			com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.span("New Certificate").exists(), "Host certificate revoked, verify New Certificate button");
-			com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.span(reason).exists(), "Verifying Certificate Revoked status: " + reason);
+			Assert.assertTrue(sahiTasks.span("New Certificate").exists(), "Host certificate revoked, verify New Certificate button");
+			Assert.assertTrue(sahiTasks.span(reason).exists(), "Verifying Certificate Revoked status: " + reason);
 		}
 		
 		sahiTasks.link("Hosts").in(sahiTasks.div("content")).click();
@@ -498,7 +504,7 @@ public class HostTasks {
 		sahiTasks.textarea(0).setValue(csr);
 		sahiTasks.button("Issue").click();
 		
-		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.div(expectedError).exists(), "Verified expected error with invalid csr.");
+		Assert.assertTrue(sahiTasks.div(expectedError).exists(), "Verified expected error with invalid csr.");
 		sahiTasks.button("Cancel").click();
 		sahiTasks.link("Hosts").in(sahiTasks.div("content")).click();
 	}
@@ -536,10 +542,10 @@ public class HostTasks {
 
 
 		if (exists == "YES"){
-			com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(grprulename).exists(), "Host " + hostname + " is a member of " + membertype + " " + grprulename);
+			Assert.assertTrue(sahiTasks.link(grprulename).exists(), "Host " + hostname + " is a member of " + membertype + " " + grprulename);
 		}
 		else {
-			com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(grprulename).exists(), "Host " + hostname + " is NOT member of " + membertype + " "+ grprulename);
+			Assert.assertFalse(sahiTasks.link(grprulename).exists(), "Host " + hostname + " is NOT member of " + membertype + " "+ grprulename);
 		}
 		if (!onPage) 
 			sahiTasks.link("Hosts").in(sahiTasks.div("content")).click();
@@ -577,10 +583,10 @@ public class HostTasks {
 		
 		for (String grprulename : grprulenames){
 			if (exists == "YES"){
-			com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(grprulename).exists(), "Host " + hostname + " is a member of " + membertype + " " + grprulename);
+			Assert.assertTrue(sahiTasks.link(grprulename).exists(), "Host " + hostname + " is a member of " + membertype + " " + grprulename);
 			}
 			else {
-				com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(grprulename).exists(), "Host " + hostname + " is NOT member of " + membertype + " "+ grprulename);
+				Assert.assertFalse(sahiTasks.link(grprulename).exists(), "Host " + hostname + " is NOT member of " + membertype + " "+ grprulename);
 			}
 		}
 		sahiTasks.link("Hosts").in(sahiTasks.div("content")).click();
@@ -595,10 +601,10 @@ public class HostTasks {
 	public static void verifyHostKeytab(SahiTasks sahiTasks, String hostname, boolean provisioned ) {
 		sahiTasks.link(hostname).click();
 		if (provisioned == false){
-			com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.span("Kerberos Key Not Present").exists(), "Host " + hostname + " does not have a keytab provisioned");
+			Assert.assertTrue(sahiTasks.span("Kerberos Key Not Present").exists(), "Host " + hostname + " does not have a keytab provisioned");
 		}
 		if (provisioned == true){
-			com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.span("Kerberos Key Present, Host Provisioned: Delete Key, Unprovision").exists(), "Host " + hostname + " has a keytab provisioned");
+			Assert.assertTrue(sahiTasks.span("Kerberos Key Present, Host Provisioned: Delete Key, Unprovision").exists(), "Host " + hostname + " has a keytab provisioned");
 		}	
 		sahiTasks.link("Hosts").in(sahiTasks.div("content")).click();
 	}
