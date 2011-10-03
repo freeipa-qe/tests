@@ -76,7 +76,7 @@ public class HostgroupTasks {
 	public static void verifyHostGroupSettings(SahiTasks sahiTasks, String groupName, String description) {
 		sahiTasks.link(groupName).click();
 		sahiTasks.link("Settings").click();
-		com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox("description").value(), description, "Verified existing description for host group: " + groupName);
+		Assert.assertEquals(sahiTasks.textbox("description").value(), description, "Verified existing description for host group: " + groupName);
 		sahiTasks.link("Host Groups").in(sahiTasks.div("content")).click();
 		
 	}
@@ -187,13 +187,13 @@ public class HostgroupTasks {
 			sahiTasks.checkbox("hidememb").check();
 			sahiTasks.textbox("filter").setValue(searchstr);
 			sahiTasks.span("Find").click();
-			com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.span(enrolled+"[1]").exists(), "enrolled " + membertype + " " + enrolled + " is hidden");
+			Assert.assertFalse(sahiTasks.span(enrolled+"[1]").exists(), "enrolled " + membertype + " " + enrolled + " is hidden");
 		}
 		if ( hide == "NO") {
 			sahiTasks.checkbox("hidememb").uncheck();
 			sahiTasks.textbox("filter").setValue(searchstr);
 			sahiTasks.span("Find").click();
-			com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.span(enrolled+"[1]").exists(), "enrolled " + membertype + " " + enrolled + " is NOT hidden");
+			Assert.assertTrue(sahiTasks.span(enrolled+"[1]").exists(), "enrolled " + membertype + " " + enrolled + " is NOT hidden");
 		}
 		
 		sahiTasks.button("Cancel").click();
@@ -221,10 +221,10 @@ public class HostgroupTasks {
 		sahiTasks.radio(type).click();
 		
 		if (exists == "YES"){
-			com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(name).exists(), membertype + " " + name + " is a member of host group " + groupName);
+			Assert.assertTrue(sahiTasks.link(name).exists(), membertype + " " + name + " is a member of host group " + groupName);
 		}
 		else {
-			com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(name).exists(), membertype + " " + name + " is NOT member of host group " + groupName);
+			Assert.assertFalse(sahiTasks.link(name).exists(), membertype + " " + name + " is NOT member of host group " + groupName);
 		}
 		sahiTasks.link("Host Groups").in(sahiTasks.div("content")).click();
 	}
@@ -251,10 +251,10 @@ public class HostgroupTasks {
 		
 		for (String name : names) {
 			if (exists == "YES"){
-				com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(name).exists(), membertype + " " + name + " is a member of host group " + groupName);
+				Assert.assertTrue(sahiTasks.link(name).exists(), membertype + " " + name + " is a member of host group " + groupName);
 			}
 			else {
-				com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(name).exists(), membertype + " " + name + " is NOT member of host group " + groupName);
+				Assert.assertFalse(sahiTasks.link(name).exists(), membertype + " " + name + " is NOT member of host group " + groupName);
 			}
 		}
 		sahiTasks.link("Host Groups").in(sahiTasks.div("content")).click();
@@ -284,10 +284,10 @@ public class HostgroupTasks {
 		sahiTasks.radio(type).click();
 		
 		if (exists == "YES"){
-			com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(grprulename).exists(), "Host group " + groupName + " is a memberof host group " + memberoftype + ": " + grprulename);
+			Assert.assertTrue(sahiTasks.link(grprulename).exists(), "Host group " + groupName + " is a memberof host group " + memberoftype + ": " + grprulename);
 		}
 		else {
-			com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(grprulename).exists(), "Host group " + groupName + " is NOT a memberof host group " + memberoftype + ": " + grprulename);
+			Assert.assertFalse(sahiTasks.link(grprulename).exists(), "Host group " + groupName + " is NOT a memberof host group " + memberoftype + ": " + grprulename);
 		}
 
 		if (!onPage) 
@@ -320,10 +320,10 @@ public class HostgroupTasks {
 		
 		for (String grprulename : grprulenames) {
 			if (exists == "YES"){
-				com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(grprulename).exists(), "Host group " + groupName + " is a memberof " + memberoftype + ": " + grprulename);
+				Assert.assertTrue(sahiTasks.link(grprulename).exists(), "Host group " + groupName + " is a memberof " + memberoftype + ": " + grprulename);
 			}
 			else {
-				com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(grprulename).exists(), "Host group " + groupName + " is NOT a memberof " + memberoftype + ": " + grprulename);
+				Assert.assertFalse(sahiTasks.link(grprulename).exists(), "Host group " + groupName + " is NOT a memberof " + memberoftype + ": " + grprulename);
 			}
 		}
 		sahiTasks.link("Host Groups").in(sahiTasks.div("content")).click();
@@ -393,7 +393,7 @@ public class HostgroupTasks {
 		sahiTasks.button("Add").click();
 		//Check for expected error
 		log.fine("error check");
-		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.div(expectedError).exists(), "Verified expected error when adding invalid host group :: " + expectedError);
+		Assert.assertTrue(sahiTasks.div(expectedError).exists(), "Verified expected error when adding invalid host group :: " + expectedError);
 	
 		log.fine("cancel(near retry)");
 		sahiTasks.button("Cancel").near(sahiTasks.button("Retry")).click();

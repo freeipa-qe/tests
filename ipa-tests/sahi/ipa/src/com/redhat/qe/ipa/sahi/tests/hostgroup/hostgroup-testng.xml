@@ -7,13 +7,12 @@
 		<groups>
 			<run>
 			    <include name="setup" />
-			    <include name="init" />	   
 			    <include name="addHostGroupTests" />	
 				<include name="deleteHostGroupTests" />
 				<include name="addAndAddAnotherHostGroupTests" />
 			    <include name="deleteMultipleHostGroupTests" />
 			    <include name="addAndEditHostGroupSettingsTest" />
-			    <include name="AddHostMembersTests" />	
+			    <include name="AddHostMembersTests" />
 			    <include name="hostGroupMemberofTest" />
 			    <include name="hostMemberofTest" />
 			    <include name="cancelAddMembersTest" />
@@ -24,10 +23,6 @@
 			    <include name="invalidHostGroupAddTests" />
 			    <include name="invalidHostGroupModifyTests" />
 			    <include name="invalidHostGroupModifyUndoTests" />
-			    <include name="cleanup" />
-			    <!-- 
-				<include name="teardown"/>
-				-->
 			</run>
 		</groups>
 		<classes>

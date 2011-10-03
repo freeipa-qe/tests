@@ -10,12 +10,12 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
+import com.redhat.qe.auto.testng.Assert;
 import com.redhat.qe.auto.testng.TestNGUtils;
 import com.redhat.qe.ipa.sahi.base.SahiTestScript;
 import com.redhat.qe.ipa.sahi.tasks.CommonTasks;
 import com.redhat.qe.ipa.sahi.tasks.HostTasks;
 import com.redhat.qe.ipa.sahi.tasks.HostgroupTasks;
-import com.redhat.qe.ipa.sahi.tasks.SahiTasks;
 
 public class HostgroupTests extends SahiTestScript{
 	private String currentPage = "";
@@ -23,18 +23,18 @@ public class HostgroupTests extends SahiTestScript{
 	
 	// hosts and host arrays
 	private String myhost_short = "testhost";
-	private String devwebserver_short = "webserver_dev";
-	private String qewebserver_short = "webserver_qe";
-	private String devhost_short = "laptop_dev";
-	private String qehost_short = "laptop_qa";
-	private String engwebserver_short = "webserver_eng";
+	private String devwebserver_short = "webserver-dev";
+	private String qewebserver_short = "webserver-qe";
+	private String devhost_short = "laptop-dev";
+	private String qehost_short = "laptop-qa";
+	private String engwebserver_short = "webserver-eng";
 	
 	private String myhost = "testhost." + CommonTasks.ipadomain;
-	private String devwebserver = "webserver_dev." + CommonTasks.ipadomain;
-	private String qewebserver = "webserver_qe." + CommonTasks.ipadomain;
-	private String devhost = "laptop_dev." + CommonTasks.ipadomain;
-	private String qehost = "laptop_qa." + CommonTasks.ipadomain;
-	private String engwebserver = "webserver_eng." + CommonTasks.ipadomain;
+	private String devwebserver = "webserver-dev." + CommonTasks.ipadomain;
+	private String qewebserver = "webserver-qe." + CommonTasks.ipadomain;
+	private String devhost = "laptop-dev." + CommonTasks.ipadomain;
+	private String qehost = "laptop-qa." + CommonTasks.ipadomain;
+	private String engwebserver = "webserver-eng." + CommonTasks.ipadomain;
 	
 	private String [] devhosts = {devwebserver, devhost};
 	private String [] qehosts = {qewebserver, qehost};
@@ -102,7 +102,7 @@ public class HostgroupTests extends SahiTestScript{
 	@Test (groups={"addHostGroupTests"}, dataProvider="getAddHostGroupTestObjects")	
 	public void testHostGroupAdd(String testName, String groupName, String description, String button) throws Exception {
 		//verify host group doesn't exist
-		com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(groupName).exists(), "Verify host group " + groupName + " doesn't already exist");
+		Assert.assertFalse(sahiTasks.link(groupName).exists(), "Verify host group " + groupName + " doesn't already exist");
 		
 		//add new host group
 		HostgroupTasks.addHostGroup(sahiTasks, groupName, description, button);
@@ -111,10 +111,10 @@ public class HostgroupTests extends SahiTestScript{
 
 		if (button == "Cancel"){
 			//verify host group was not added
-			com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(lowercase).exists(), "Verify host group " + groupName + " was not added");
+			Assert.assertFalse(sahiTasks.link(lowercase).exists(), "Verify host group " + groupName + " was not added");
 		}
 		else {
-			com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(lowercase).exists(), "Verify host group " + groupName + " was added successfully");
+			Assert.assertTrue(sahiTasks.link(lowercase).exists(), "Verify host group " + groupName + " was added successfully");
 		}
 	}
 	
@@ -125,16 +125,16 @@ public class HostgroupTests extends SahiTestScript{
 	public void testHostGroupDelete(String testName, String groupName, String button) throws Exception {
 		// verify host group exists
 		String lowercase = groupName.toLowerCase();
-		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(lowercase).exists(), "Verify host group " + groupName + " exists");
+		Assert.assertTrue(sahiTasks.link(lowercase).exists(), "Verify host group " + groupName + " exists");
 		
 		//delete host group
 		HostgroupTasks.deleteHostgroup(sahiTasks, lowercase, button);
 		
 		if (button == "Cancel"){
-			com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(lowercase).exists(), "Verify host group " + groupName + " still exists");
+			Assert.assertTrue(sahiTasks.link(lowercase).exists(), "Verify host group " + groupName + " still exists");
 		}
 		else {
-			com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(lowercase).exists(), "Verify host group " + groupName + " was deleted successfully");
+			Assert.assertFalse(sahiTasks.link(lowercase).exists(), "Verify host group " + groupName + " was deleted successfully");
 		}
 	}
 	
@@ -145,17 +145,17 @@ public class HostgroupTests extends SahiTestScript{
 	public void testHostGroupAddAndAddAnother(String testName, String groupName1, String groupName2, String groupName3) throws Exception {
 		
 		//verify host group doesn't exist
-		com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(groupName1).exists(), "Verify host group " + groupName1 + " doesn't already exist");
-		com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(groupName2).exists(), "Verify host group " + groupName2 + " doesn't already exist");
-		com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(groupName3).exists(), "Verify host group " + groupName3 + " doesn't already exist");
+		Assert.assertFalse(sahiTasks.link(groupName1).exists(), "Verify host group " + groupName1 + " doesn't already exist");
+		Assert.assertFalse(sahiTasks.link(groupName2).exists(), "Verify host group " + groupName2 + " doesn't already exist");
+		Assert.assertFalse(sahiTasks.link(groupName3).exists(), "Verify host group " + groupName3 + " doesn't already exist");
 		
 		//add new host group
 		HostgroupTasks.addAndAddAnotherHostGroup(sahiTasks, groupName1, groupName2, groupName3);
 	
 		//verify host group exists
-		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(groupName1).exists(), "Verify host group " + groupName1 + " exists");
-		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(groupName2).exists(), "Verify host group " + groupName2 + " exists");
-		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(groupName3).exists(), "Verify host group " + groupName3 + " exists");
+		Assert.assertTrue(sahiTasks.link(groupName1).exists(), "Verify host group " + groupName1 + " exists");
+		Assert.assertTrue(sahiTasks.link(groupName2).exists(), "Verify host group " + groupName2 + " exists");
+		Assert.assertTrue(sahiTasks.link(groupName3).exists(), "Verify host group " + groupName3 + " exists");
 	
 	}
 	
@@ -165,18 +165,18 @@ public class HostgroupTests extends SahiTestScript{
 	@Test (groups={"deleteMultipleHostGroupTests"}, dataProvider="getAddAndAddAnotherHostGroupTestObjects",  dependsOnGroups="addAndAddAnotherHostGroupTests")	
 	public void testHostGroupDeleteMultiple(String testName, String groupName1, String groupName2, String groupName3) throws Exception {
 		//verify host group exists
-		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(groupName1).exists(), "Verify host group " + groupName1 + " exists");
-		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(groupName2).exists(), "Verify host group " + groupName2 + " exists");
-		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(groupName3).exists(), "Verify host group " + groupName3 + " exists");
+		Assert.assertTrue(sahiTasks.link(groupName1).exists(), "Verify host group " + groupName1 + " exists");
+		Assert.assertTrue(sahiTasks.link(groupName2).exists(), "Verify host group " + groupName2 + " exists");
+		Assert.assertTrue(sahiTasks.link(groupName3).exists(), "Verify host group " + groupName3 + " exists");
 		
 		String [] groupnames = {groupName1, groupName2, groupName3};
 		//delete host group
 		HostgroupTasks.deleteHostgroup(sahiTasks, groupnames);
 
 		//verify host group doesn't exist
-		com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(groupName1).exists(), "Verify host group " + groupName1 + " was deleted successfully");
-		com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(groupName2).exists(), "Verify host group " + groupName2 + " was deleted successfully");
-		com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(groupName3).exists(), "Verify host group " + groupName3 + " was deleted successfully");
+		Assert.assertFalse(sahiTasks.link(groupName1).exists(), "Verify host group " + groupName1 + " was deleted successfully");
+		Assert.assertFalse(sahiTasks.link(groupName2).exists(), "Verify host group " + groupName2 + " was deleted successfully");
+		Assert.assertFalse(sahiTasks.link(groupName3).exists(), "Verify host group " + groupName3 + " was deleted successfully");
 		
 	}
 	
@@ -186,13 +186,13 @@ public class HostgroupTests extends SahiTestScript{
 	@Test (groups={"addAndEditHostGroupSettingsTest"}, dataProvider="getAddAndEditHostGroupTestObjects")	
 	public void testHostGroupAddAndEdit(String testName, String groupName, String description1, String description2) throws Exception {
 		//verify host group doesn't exist
-		com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(groupName).exists(), "Verify host group " + groupName + " doesn't already exist");
+		Assert.assertFalse(sahiTasks.link(groupName).exists(), "Verify host group " + groupName + " doesn't already exist");
 		
 		//add new host group
 		HostgroupTasks.addAndEditHostGroup(sahiTasks, groupName, description1, description2);
 		
 		//verify the host group exists
-		com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(groupName).exists(), "Verify host group " + groupName + " exists");
+		Assert.assertTrue(sahiTasks.link(groupName).exists(), "Verify host group " + groupName + " exists");
 		
 		//verify the description setting
 		HostgroupTasks.verifyHostGroupSettings(sahiTasks, groupName, description2);
