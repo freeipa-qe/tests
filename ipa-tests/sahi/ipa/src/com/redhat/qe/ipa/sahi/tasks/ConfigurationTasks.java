@@ -115,4 +115,67 @@ public class ConfigurationTasks {
 		sahiTasks.navigateTo(commonTasks.configurationPage);
 	}
 	
+	
+	/*
+	 * Verify default group for user is as set in config
+	 *
+	 */
+	
+	public static void verifyUserGroupFunctional(SahiTasks sahiTasks, CommonTasks commonTasks, String group, String user) {
+		sahiTasks.navigateTo(commonTasks.userPage);
+		UserTasks.createUser(sahiTasks, user, user, user, "Add");
+		//add an email for this user
+		sahiTasks.link(user).click();		
+		CommonTasks.verifyMemberOf(sahiTasks, user, "User", "User Groups", group, "direct", true);	
+		sahiTasks.link("Users").in(sahiTasks.div("content")).click();
+		UserTasks.deleteUser(sahiTasks, user);
+		
+		sahiTasks.navigateTo(commonTasks.configurationPage);
+	}
+	
+	/*
+	 * Verify home dir for user is as set in config
+	 *
+	 */
+	
+	public static void verifyUserHomeDirFunctional(SahiTasks sahiTasks, CommonTasks commonTasks, String homedir, String user) {
+		sahiTasks.navigateTo(commonTasks.userPage);
+		UserTasks.createUser(sahiTasks, user, user, user, "Add");
+		//add an email for this user
+		sahiTasks.link(user).click();	
+		Assert.assertEquals(sahiTasks.textbox("homedirectory").value(), homedir + "/" + user, "Verified  Home directory for user " + user + ": " + homedir);
+		sahiTasks.link("Users").in(sahiTasks.div("content")).click();
+		UserTasks.deleteUser(sahiTasks, user);
+		
+		sahiTasks.navigateTo(commonTasks.configurationPage);
+	}
+	
+	/*
+	 * Verify max name length for user is as set in config
+	 *
+	 */
+	
+	public static void verifyUserNameLengthFunctional(SahiTasks sahiTasks, CommonTasks commonTasks, String nameLength, String userGood, String userBad) {
+		sahiTasks.navigateTo(commonTasks.userPage);
+		UserTasks.createUser(sahiTasks, userGood, userGood, userGood, "Add");
+		//add an email for this user
+		Assert.assertTrue(sahiTasks.link(userGood).exists(), "Verified " + userGood + " was added successfully");
+		
+		//TODO: nkrishnan: what is the max length, if set to blank? 
+		if (!nameLength.isEmpty()) {
+			UserTasks.createUser(sahiTasks, userBad, userBad, userBad, "Add");
+			
+			String expectedError = "invalid 'login': can be at most " + nameLength + " characters";
+			Assert.assertTrue(sahiTasks.div(expectedError).exists(), "Verified expected error when adding invalid user " + userBad);
+			sahiTasks.button("Cancel").near(sahiTasks.button("Retry")).click();
+			log.fine("cancel");
+			sahiTasks.button("Cancel").near(sahiTasks.button("Add and Edit")).click();
+		}
+		
+		
+		UserTasks.deleteUser(sahiTasks, userGood);
+		
+		sahiTasks.navigateTo(commonTasks.configurationPage);
+	}
+	
 }

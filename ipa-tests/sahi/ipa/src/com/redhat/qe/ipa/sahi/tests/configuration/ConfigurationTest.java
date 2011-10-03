@@ -34,7 +34,7 @@ public class ConfigurationTest extends SahiTestScript{
 		
 		//to set up search tests, adding objects in one category on identity and policy tabs 
 		//add users
-		sahiTasks.navigateTo(commonTasks.userPage, true);
+	/*	sahiTasks.navigateTo(commonTasks.userPage, true);
 		String testUser="user";
 		for (int i=0; i<20; i++) {
 			if (!sahiTasks.link(testUser+i).exists())
@@ -47,7 +47,7 @@ public class ConfigurationTest extends SahiTestScript{
 	    for (int i=0; i<20; i++) {
 			if (!sahiTasks.link(testHBACRule+i).exists())
 				HBACTasks.addHBACRule(sahiTasks, testHBACRule+i, "Add");
-	    }
+	    }*/
 		
 		sahiTasks.navigateTo(commonTasks.configurationPage, true);
 		currentPage = sahiTasks.fetch("top.location.href");
@@ -179,16 +179,38 @@ public class ConfigurationTest extends SahiTestScript{
 			dataProvider="getConfigUserOptionGroupTestObjects")	
 	public void testConfigUserOptionGroup(String testName, String group) throws Exception {
 		ConfigurationTasks.setGroupConfigValue(sahiTasks, commonTasks, group);
-		ConfigurationTasks.verifyConfigValue(sahiTasks, "ipadefaultprimarygroup", group);
-		
-		//ConfigurationTasks.verifyUserEmailFunctional(sahiTasks, commonTasks, email, user);
+		ConfigurationTasks.verifyConfigValue(sahiTasks, "ipadefaultprimarygroup", group);		
+		String user = "configuser";
+		ConfigurationTasks.verifyUserGroupFunctional(sahiTasks, commonTasks, group, user);
 	} 
 	
+	
 	/*
-	 * Test User Options
-	 * home dir - "/home " - invalid 'homedirectory': Leading and trailing spaces are not allowed
-	 * blank is allowed
+	 * Test User Options - home dir 
+	 * 
 	 */
+	@Test (groups={"configUserOptionHomeDirTests"}, description="Verify valid User Home Directory values", 
+			dataProvider="getConfigUserOptionHomeDirTestObjects")	
+	public void testConfigUserOptionHomeDir(String testName, String homedir) throws Exception {
+		ConfigurationTasks.setConfigValue(sahiTasks, "ipahomesrootdir", homedir);
+		ConfigurationTasks.verifyConfigValue(sahiTasks, "ipahomesrootdir", homedir);
+		String user = "configuser";
+		ConfigurationTasks.verifyUserHomeDirFunctional(sahiTasks, commonTasks, homedir, user);
+	} 
+	
+	
+	/*
+	 * Test User Options - home dir - invalid
+	 * 
+	 */
+	
+	@Test (groups={"configUserOptionInvalidHomeDirTests"}, description="Verify invalid User Home Directory values", 
+			dataProvider="getConfigUserOptionInvalidHomeDirTestObjects")	
+	public void testConfigUserOptionInvalidHomeDir(String testName, String homedir, String expectedError) throws Exception {
+		ConfigurationTasks.setInvalidConfigValue(sahiTasks, "ipahomesrootdir", homedir, expectedError, "");		
+	}
+		
+	
 	
 	/*
 	 * Test User Options
@@ -197,6 +219,26 @@ public class ConfigurationTest extends SahiTestScript{
 	 * 
 	 * blank is allowed
 	 */
+	@Test (groups={"configUserOptionNameLengthTests"}, description="Verify valid User Name Length values", 
+			dataProvider="getConfigUserOptionNameLengthTestObjects")	
+	public void testConfigUserOptionNameLength(String testName, String nameLength, String userGood, String userBad) throws Exception {
+		ConfigurationTasks.setConfigValue(sahiTasks, "ipamaxusernamelength", nameLength);
+		ConfigurationTasks.verifyConfigValue(sahiTasks, "ipamaxusernamelength", nameLength);
+		
+		ConfigurationTasks.verifyUserNameLengthFunctional(sahiTasks, commonTasks, nameLength, userGood, userBad);
+	} 
+	
+	
+	/*
+	 * Test User Options - home dir - invalid
+	 * 
+	 */	
+	@Test (groups={"configUserOptionInvalidNameLengthTests"}, description="Verify invalid User Name Length values", 
+			dataProvider="getConfigUserOptionInvalidNameLengthTestObjects")	
+	public void testConfigUserOptionInvalidNameLength(String testName, String nameLength, String expectedError1, String expectedError2) throws Exception {
+		ConfigurationTasks.setInvalidConfigValue(sahiTasks, "ipamaxusernamelength", nameLength, expectedError1, expectedError2);		
+	}
+	
 	
 	
 	
@@ -221,13 +263,15 @@ public class ConfigurationTest extends SahiTestScript{
 	@AfterClass (groups={"cleanup"}, description="Delete objects created for this test suite", alwaysRun=true)
 	public void cleanup() throws CloneNotSupportedException {
 		
-		//clean users and rules added
+	/*	//clean users and rules added
 		sahiTasks.navigateTo(commonTasks.userPage, true);
 		String testUser="user";
 		for (int i=0; i<20; i++) {
 			if (sahiTasks.link(testUser+i).exists())
 				UserTasks.deleteUser(sahiTasks, testUser+i);
-		}		
+		}	
+		if (sahiTasks.link("configuser").exists())
+				UserTasks.deleteUser(sahiTasks, "configuser");	
 	
 		
 		sahiTasks.navigateTo(commonTasks.hbacPage, true);
@@ -237,9 +281,7 @@ public class ConfigurationTest extends SahiTestScript{
 				HBACTasks.deleteHBAC(sahiTasks, testHBACRule+i, "Delete");
 	    }
 	    
-	    sahiTasks.navigateTo(commonTasks.groupPage, true);
-		if (!sahiTasks.link("configgroup").exists())
-			GroupTasks.deleteGroup(sahiTasks, "configgroup");
+	*/
 	    
 	  //restore defaults
 	    sahiTasks.navigateTo(commonTasks.configurationPage, true);
@@ -247,6 +289,15 @@ public class ConfigurationTest extends SahiTestScript{
 	    ConfigurationTasks.setConfigValue(sahiTasks, "ipasearchtimelimit", "2");
 	    ConfigurationTasks.setConfigValue(sahiTasks, "ipausersearchfields", "uid,givenname,sn,telephonenumber,ou,title");
 	    ConfigurationTasks.setConfigValue(sahiTasks, "ipadefaultemaildomain", "testrelm");
+	    ConfigurationTasks.setGroupConfigValue(sahiTasks, commonTasks, "ipausers");
+	    ConfigurationTasks.setConfigValue(sahiTasks, "ipahomesrootdir", "/home");
+	    ConfigurationTasks.setConfigValue(sahiTasks, "ipamaxusernamelength", "32");
+	    
+	    
+	    sahiTasks.navigateTo(commonTasks.groupPage, true);
+		if (!sahiTasks.link("configgroup").exists())
+			GroupTasks.deleteGroup(sahiTasks, "configgroup");
+		
 	}
 	
 	/*******************************************************
@@ -372,7 +423,7 @@ public class ConfigurationTest extends SahiTestScript{
 	}
 	
 	/*
-	 * Test user options limits
+	 * Test user options 
 	 * Default e-mail domain for new users
 	 */
 	@DataProvider(name="getConfigUserOptionEmailTestObjects")
@@ -412,8 +463,8 @@ public class ConfigurationTest extends SahiTestScript{
 	}
 	
 	/*
-	 * Test user options limits
-	 * Default e-mail domain for new users
+	 * Test user options 
+	 * Default group for new users
 	 */
 	@DataProvider(name="getConfigUserOptionGroupTestObjects")
 	public Object[][] getConfigUserOptionGroupTestObjects() {
@@ -427,4 +478,90 @@ public class ConfigurationTest extends SahiTestScript{
 		
 		return ll;	
 	}
+	
+	
+	/*
+	 * Test user options 
+	 * Home dir
+	 */
+	@DataProvider(name="getConfigUserOptionHomeDirTestObjects")
+	public Object[][] getConfigUserOptionHomeDirTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createConfigUserOptionHomeDirTestObjects());
+	}
+	protected List<List<Object>> createConfigUserOptionHomeDirTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname					homedir						uid			
+		ll.add(Arrays.asList(new Object[]{ "userhomedir_new",				"/home/users"					} ));
+		ll.add(Arrays.asList(new Object[]{ "userhomedir_specialchar",		"^&/*)(h*o@m%e/!u^s:e~r`s"		} ));		
+		ll.add(Arrays.asList(new Object[]{ "userhomedir_blank",				""							} ));
+		ll.add(Arrays.asList(new Object[]{ "userhomedir_numbers",			"1/home2/3users4"					} ));
+		ll.add(Arrays.asList(new Object[]{ "userhomedir_space_inbetween",	"12 34"						} ));
+		
+		
+		return ll;	
+	}
+	
+	
+	/*
+	 * Test user options home dir - invalid
+	 * Home dir 
+	 */
+	@DataProvider(name="getConfigUserOptionInvalidHomeDirTestObjects")
+	public Object[][] getConfigUserOptionInvalidHomeDirTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createConfigUserOptionInvalidHomeDirTestObjects());
+	}
+	protected List<List<Object>> createConfigUserOptionInvalidHomeDirTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname						homedir   			expectedError																} ));
+		ll.add(Arrays.asList(new Object[]{ "userhomedir_trailing_space",		"/home ",     "invalid 'homedirectory': Leading and trailing spaces are not allowed"	} ));
+		ll.add(Arrays.asList(new Object[]{ "userhomedir_leading_space",			" /home",     "invalid 'homedirectory': Leading and trailing spaces are not allowed"	} ));
+			
+		return ll;	
+	}
+	
+	/*
+	 * Test user options 
+	 * Username length
+	 */
+	@DataProvider(name="getConfigUserOptionNameLengthTestObjects")
+	public Object[][] getConfigUserOptionNameLengthTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createConfigUserOptionNameLengthTestObjects());
+	}
+	protected List<List<Object>> createConfigUserOptionNameLengthTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname						usernameLength			uidShort		uidLong			
+		ll.add(Arrays.asList(new Object[]{ "usernamelength_new",				"5",					"abcde",		"abcdef"					} ));	
+		//TODO: nkrishnan: Check the expected length, is set to blank
+		// doc at http://docs.redhat.com/docs/en-US/Red_Hat_Enterprise_Linux/6/html/Enterprise_Identity_Management_Guide/chap-Enterprise_Identity_Management_Guide-Configuring_IPA_Users_and_Groups.html#sect-Enterprise_Identity_Management_Guide-Configuring_IPA_Users-Specifying_Default_User_Settings
+		// indicates default is 8.
+		ll.add(Arrays.asList(new Object[]{ "usernamelength_blank",				"",						"abcdefgh",		"abcdefghi"					} ));
+		
+		
+		return ll;	
+	}
+	
+
+	/*
+	 * Test user options 
+	 * Username length
+	 */
+	@DataProvider(name="getConfigUserOptionInvalidNameLengthTestObjects")
+	public Object[][] getConfigUserOptionInvalidNameLengthTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createConfigUserOptionInvalidNameLengthTestObjects());
+	}
+	protected List<List<Object>> createConfigUserOptionInvalidNameLengthTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname						usernameLength		expectedError1										expectedError2			
+		ll.add(Arrays.asList(new Object[]{ "usernamelength_specialchar",		"*", 				"Input form contains invalid or missing values.", 	"Must be an integer"		} ));		
+		ll.add(Arrays.asList(new Object[]{ "usernamelength_letters",			"abc", 				"Input form contains invalid or missing values.", 	"Must be an integer"			} ));
+		ll.add(Arrays.asList(new Object[]{ "usernamelength_space_inbetween",	"1 2", 				"Input form contains invalid or missing values.", 	"Must be an integer"			} ));
+		
+		
+		return ll;	
+	}
+	
 }

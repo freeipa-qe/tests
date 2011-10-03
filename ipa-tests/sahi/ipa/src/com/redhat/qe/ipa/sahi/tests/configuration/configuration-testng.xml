@@ -16,6 +16,10 @@
 			    <include name="configUserOptionEmailTests" />
 			    <include name="configUserOptionInvalidEmailTests" />
 			    <include name="configUserOptionGroupTests" />
+			    <include name="configUserOptionHomeDirTests" />
+			    <include name="configUserOptionInvalidHomeDirTests" />
+			    <include name="configUserOptionNameLengthTests" />
+			    <include name="configUserOptionInvalidNameLengthTests" />
 			</run>
 		</groups>
 	</test>
