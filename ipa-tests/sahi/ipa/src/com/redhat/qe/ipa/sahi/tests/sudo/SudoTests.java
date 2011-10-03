@@ -590,7 +590,7 @@ public class SudoTests extends SahiTestScript{
 		SudoTasks.verifySudoRuleForRunAsGroupCategorySection(sahiTasks, commonTasks, cn, runAsGroupName, true);
 		
 		//enroll user twice
-		SudoTasks.enrollAgain(sahiTasks, cn, runAsGroupName, "As Whom", "User Groups[1]");
+		SudoTasks.enrollAgain(sahiTasks, cn, runAsGroupName, "As Whom", "RunAs Groups");
 		
 		//modify this rule to delete
 		SudoTasks.modifySudoRuleRunAsGroupCategorySection(sahiTasks, cn, runAsGroupName, false);
