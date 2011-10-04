@@ -20,6 +20,12 @@
 			    <include name="configUserOptionInvalidHomeDirTests" />
 			    <include name="configUserOptionNameLengthTests" />
 			    <include name="configUserOptionInvalidNameLengthTests" />
+			    <include name="configUserOptionPwdExpNotifyTests" />
+			    <include name="configUserOptionInvalidPwdExpNotifyTests" />
+			    <include name="configUserOptionEnableMigrationModeTests" />
+			    <include name="configGroupOptionSearchFieldTests" />
+			    <include name="configGroupOptionInvalidSearchFieldTests" />
+			    <include name="configUndoResetTests" />
 			</run>
 		</groups>
 	</test>

@@ -49,6 +49,13 @@ public class ConfigurationTest extends SahiTestScript{
 				HBACTasks.addHBACRule(sahiTasks, testHBACRule+i, "Add");
 	    }
 		
+		sahiTasks.navigateTo(commonTasks.groupPage, true);
+	    String testGroup="group";
+	    for (int i=0; i<5; i++) {
+			if (!sahiTasks.link(testGroup+i).exists())
+				GroupTasks.addGroup(sahiTasks, testGroup+i, "testing for config");
+	    }
+		
 		sahiTasks.navigateTo(commonTasks.configurationPage, true);
 		currentPage = sahiTasks.fetch("top.location.href");
 	}
@@ -116,11 +123,6 @@ public class ConfigurationTest extends SahiTestScript{
 			ConfigurationTasks.setInvalidConfigValue(sahiTasks, "ipasearchtimelimit", value, expectedError1, expectedError2);
 	} 
 	
-	
-	/*
-	 * Test Search Options 
-	 * undo/reset
-	 */
 	
 	/* 
 	 * Test User Options - uid,givenname,sn,telephonenumber,ou,title
@@ -214,10 +216,7 @@ public class ConfigurationTest extends SahiTestScript{
 	
 	/*
 	 * Test User Options
-	 * max user length - "dfds" - Input form contains invalid or missing values./ must be an integer
-	 * 0 - min value is 1.
-	 * 
-	 * blank is allowed
+	 * Name length
 	 */
 	@Test (groups={"configUserOptionNameLengthTests"}, description="Verify valid User Name Length values", 
 			dataProvider="getConfigUserOptionNameLengthTestObjects")	
@@ -230,7 +229,7 @@ public class ConfigurationTest extends SahiTestScript{
 	
 	
 	/*
-	 * Test User Options - home dir - invalid
+	 * Test User Options - Name length - invalid
 	 * 
 	 */	
 	@Test (groups={"configUserOptionInvalidNameLengthTests"}, description="Verify invalid User Name Length values", 
@@ -240,13 +239,68 @@ public class ConfigurationTest extends SahiTestScript{
 	}
 	
 	
+	/*
+	 * Test User Options
+	 * Password Expiration Notification
+	 * TODO: nkrishnan - add manual tasks to verify values
+	 */
+	@Test (groups={"configUserOptionPwdExpNotifyTests"}, description="Verify valid Password Expiration Notification values", 
+			dataProvider="getConfigUserOptionPwdExpNotifyTestObjects")	
+	public void testConfigUserOptionPwdExpNotify(String testName, String pwdExpNotify) throws Exception {
+		ConfigurationTasks.setConfigValue(sahiTasks, "ipapwdexpadvnotify", pwdExpNotify);
+		ConfigurationTasks.verifyConfigValue(sahiTasks, "ipapwdexpadvnotify", pwdExpNotify);
+	} 
+	
+	
+	/*
+	 * Test User Options - Password Expiration Notification - invalid
+	 * 
+	 */	
+	@Test (groups={"configUserOptionInvalidPwdExpNotifyTests"}, description="Verify invalid Password Expiration Notification values", 
+			dataProvider="getConfigUserOptionInvalidPwdExpNotifyTestObjects")	
+	public void testConfigUserOptionInvalidPwdExpNotify(String testName, String pwdExpNotify, String expectedError1, String expectedError2) throws Exception {
+		ConfigurationTasks.setInvalidConfigValue(sahiTasks, "ipapwdexpadvnotify", pwdExpNotify, expectedError1, expectedError2);		
+	}
+	
+	/*
+	 * Test User Options
+	 * Enable Migration mode
+	 * TODO: nkrishnan - add manual tasks to verify values
+	 */
+	@Test (groups={"configUserOptionEnableMigrationModeTests"}, description="Verify Enable Migration mode", 
+			dataProvider="getConfigUserOptionEnableMigrationModeTestObjects")	
+	public void testConfigUserOptionEnableMigrationMode(String testName, String mode) throws Exception {
+		ConfigurationTasks.setMigrationModeConfigValue(sahiTasks, mode);
+		ConfigurationTasks.verifyMigrationModeConfigValue(sahiTasks, mode);
+	} 
 	
 	
 	/* 
-	 * Test User Options 
-	 * add user, and verify it picks up the defaults as set
+	 * Test Group Options - 
+	 * search fields - search for group
 	 */
+	@Test (groups={"configGroupOptionSearchFieldTests"}, description="Verify valid Group Search Field values", 
+			dataProvider="getConfigGroupOptionSearchFieldTestObjects")	
+	public void testConfigGroupOptionSearchField(String testName, String searchField, String searchValue, String expectedGroup) throws Exception {
+		ConfigurationTasks.setConfigValue(sahiTasks, "ipagroupsearchfields", searchField);
+		ConfigurationTasks.verifyConfigValue(sahiTasks, "ipagroupsearchfields", searchField);
+		ConfigurationTasks.verifyGroupSearchFieldFunctional(sahiTasks, commonTasks, searchValue, expectedGroup);
+	} 
 	
+	
+	/* 
+	 * Test Group Options 
+	 * search field - invalid data
+	 * 
+	 */
+	@Test (groups={"configGroupOptionInvalidSearchFieldTests"}, description="Verify invalid Group Search Field values", 
+			dataProvider="getConfigGroupOptionInvalidSearchFieldTestObjects")	
+	public void testConfigGroupOptionInvalidSearchField(String testName, String value, String expectedError) throws Exception {
+		ConfigurationTasks.setInvalidConfigValue(sahiTasks, "ipagroupsearchfields", value, expectedError, "");		
+	}
+	
+	
+
 	/*
 	 * Default user objectclasses
 	 *  https://bugzilla.redhat.com/show_bug.cgi?id=741951 
@@ -254,10 +308,19 @@ public class ConfigurationTest extends SahiTestScript{
 	 * if posixaccount is deleted, when adding a user - error -
 	 * if ipaobject is deleted, when adding a user - error -
 	 * if krbticketpolicyaux is deleted, can add user. ipa user-show will not list this in its objectclass
+	 * 
+	 * TODO: nkrishnan: Add tests after bugs are addressed
 	 */
 	
 	
-	
+	/*
+	 * Undo/Reset 
+	 */
+	@Test (groups={"configUndoResetTests"}, description="Verify Undo/Reset", 
+			dataProvider="getConfigUndoResetTestObjects")	
+	public void testConfigUndoReset(String testName, String field, String value, String buttonToClick) throws Exception {
+		ConfigurationTasks.modifyAndVerifyConfigValues(sahiTasks, field, value, buttonToClick);		
+	}
 	
 	
 	@AfterClass (groups={"cleanup"}, description="Delete objects created for this test suite", alwaysRun=true)
@@ -280,18 +343,20 @@ public class ConfigurationTest extends SahiTestScript{
 			if (sahiTasks.link(testHBACRule+i).exists())
 				HBACTasks.deleteHBAC(sahiTasks, testHBACRule+i, "Delete");
 	    }
+		
+		sahiTasks.navigateTo(commonTasks.groupPage, true);
+	    String testGroup="group";
+	    for (int i=0; i<5; i++) {
+			if (sahiTasks.link(testGroup+i).exists())
+				GroupTasks.deleteGroup(sahiTasks, testGroup+i);
+	    } 
 	    
 	
 	    
 	  //restore defaults
 	    sahiTasks.navigateTo(commonTasks.configurationPage, true);
-	    ConfigurationTasks.setConfigValue(sahiTasks, "ipasearchrecordslimit", "100");
-	    ConfigurationTasks.setConfigValue(sahiTasks, "ipasearchtimelimit", "2");
-	    ConfigurationTasks.setConfigValue(sahiTasks, "ipausersearchfields", "uid,givenname,sn,telephonenumber,ou,title");
-	    ConfigurationTasks.setConfigValue(sahiTasks, "ipadefaultemaildomain", "testrelm");
-	    ConfigurationTasks.setGroupConfigValue(sahiTasks, commonTasks, "ipausers");
-	    ConfigurationTasks.setConfigValue(sahiTasks, "ipahomesrootdir", "/home");
-	    ConfigurationTasks.setConfigValue(sahiTasks, "ipamaxusernamelength", "32");
+	    ConfigurationTasks.restoreDefaults(sahiTasks, commonTasks);
+	    
 	    
 	    
 	    sahiTasks.navigateTo(commonTasks.groupPage, true);
@@ -559,6 +624,128 @@ public class ConfigurationTest extends SahiTestScript{
 		ll.add(Arrays.asList(new Object[]{ "usernamelength_specialchar",		"*", 				"Input form contains invalid or missing values.", 	"Must be an integer"		} ));		
 		ll.add(Arrays.asList(new Object[]{ "usernamelength_letters",			"abc", 				"Input form contains invalid or missing values.", 	"Must be an integer"			} ));
 		ll.add(Arrays.asList(new Object[]{ "usernamelength_space_inbetween",	"1 2", 				"Input form contains invalid or missing values.", 	"Must be an integer"			} ));
+		ll.add(Arrays.asList(new Object[]{ "usernamelength_max",				"2147483648", 		"Input form contains invalid or missing values.", 	"Maximum value is 2147483647"			} ));
+		
+		
+		return ll;	
+	}
+	
+	
+	/*
+	 * Test user options 
+	 * Password Expiration notification
+	 */
+	@DataProvider(name="getConfigUserOptionPwdExpNotifyTestObjects")
+	public Object[][] getConfigUserOptionPwdExpNotifyTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createConfigUserOptionPwdExpNotifyTestObjects());
+	}
+	protected List<List<Object>> createConfigUserOptionPwdExpNotifyTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname					pwd exp			
+		ll.add(Arrays.asList(new Object[]{ "userpwdexpnotify_new",			"5"		} ));	
+		ll.add(Arrays.asList(new Object[]{ "userpwdexpnotify_blank",		""		} ));
+		
+		
+		return ll;	
+	}
+	
+	
+	
+	/*
+	 * Test user options 
+	 * Password Expiration notification
+	 */
+	@DataProvider(name="getConfigUserOptionInvalidPwdExpNotifyTestObjects")
+	public Object[][] getConfigUserOptionInvalidPwdExpNotifyTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createConfigUserOptionInvalidPwdExpNotifyTestObjects());
+	}
+	protected List<List<Object>> createConfigUserOptionInvalidPwdExpNotifyTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname						pwd exp				expectedError1										expectedError2			
+		ll.add(Arrays.asList(new Object[]{ "userpwdexpnotify_specialchar",		"*", 				"Input form contains invalid or missing values.", 	"Must be an integer"		} ));		
+		ll.add(Arrays.asList(new Object[]{ "userpwdexpnotify_letters",			"abc", 				"Input form contains invalid or missing values.", 	"Must be an integer"			} ));
+		ll.add(Arrays.asList(new Object[]{ "userpwdexpnotify_space_inbetween",	"1 2", 				"Input form contains invalid or missing values.", 	"Must be an integer"			} ));
+		ll.add(Arrays.asList(new Object[]{ "userpwdexpnotify_max",				"2147483648", 		"Input form contains invalid or missing values.", 	"Maximum value is 2147483647"			} ));
+		
+		
+		return ll;	
+	}
+	
+	/*
+	 * Test user options 
+	 * Enable Migration Mode
+	 */
+	@DataProvider(name="getConfigUserOptionEnableMigrationModeTestObjects")
+	public Object[][] getConfigUserOptionEnableMigrationModeTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createConfigUserOptionEnableMigrationModeTestObjects());
+	}
+	protected List<List<Object>> createConfigUserOptionEnableMigrationModeTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname					mode				
+		ll.add(Arrays.asList(new Object[]{ "usermigrationmode_enable",		"enable"		} ));	
+		ll.add(Arrays.asList(new Object[]{ "usermigrationmode_disable",		"disable"		} ));	
+		
+		
+		return ll;	
+	}
+	
+	
+	/*
+	 * Test Group options limits
+	 * Group Search Fields
+	 * default list:cn,description
+	 */
+	@DataProvider(name="getConfigGroupOptionSearchFieldTestObjects")
+	public Object[][] getConfigGroupOptionSearchFieldTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createConfigGroupOptionSearchFieldTestObjects());
+	}
+	protected List<List<Object>> createConfigGroupOptionSearchFieldTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname					cn   			searchValue		expectedGroup				
+		ll.add(Arrays.asList(new Object[]{ "groupsearchfield_existing",		"cn",			"group1",		"group1"			} ));
+		//TODO: nkrishnan: what is another group attribute to use for searching??
+		//ll.add(Arrays.asList(new Object[]{ "groupsearchfield_new",			"postalcode",	"01234",		"user0"			} ));				
+		
+		return ll;	
+	}
+	
+	/*
+	 * Test Group options limits
+	 * Group Search Fields
+	 */
+	@DataProvider(name="getConfigGroupOptionInvalidSearchFieldTestObjects")
+	public Object[][] getConfigGroupOptionInvalidSearchFieldTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createConfigGroupOptionInvalidSearchFieldTestObjects());
+	}
+	protected List<List<Object>> createConfigGroupOptionInvalidSearchFieldTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname						cn   		expectedError1				
+		ll.add(Arrays.asList(new Object[]{ "groupsearchfield_blank",			"",			"an internal error has occurred"														} ));
+		ll.add(Arrays.asList(new Object[]{ "groupsearchfield_trailing_space",	"uid ",     "invalid 'groupsearch': Leading and trailing spaces are not allowed"	} ));
+		ll.add(Arrays.asList(new Object[]{ "groupsearchfield_leading_space",	" uid",     "invalid 'groupsearch': Leading and trailing spaces are not allowed"	} ));
+		ll.add(Arrays.asList(new Object[]{ "groupsearchfield_notallowed",		"abc",     	"invalid 'ipagroupsearchfields': attribute \"abc\" not allowed"	} ));
+			
+		return ll;	
+	}
+	
+	/*
+	 * Undo/Reset Tests
+	 */
+	@DataProvider(name="getConfigUndoResetTestObjects")
+	public Object[][] getConfigUndoResetTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createConfigUndoResetTestObjects());
+	}
+	protected List<List<Object>> createConfigUndoResetTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname					field							value			buttonToClick				
+		ll.add(Arrays.asList(new Object[]{ "config_email_undo",				"ipadefaultemaildomain",		"test",			"undo"		} ));	
+		ll.add(Arrays.asList(new Object[]{ "config_groupsearch_reset",		"ipagroupsearchfields",			"gidNumber",	"Reset"		} ));	
 		
 		
 		return ll;	

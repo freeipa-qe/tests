@@ -17,7 +17,7 @@ public class ConfigurationTasks {
 	}
 	
 	public static void verifyConfigValue(SahiTasks sahiTasks, String field, String value) {
-		Assert.assertEquals(sahiTasks.textbox(field).value(), value, "Verified config value for " + field + "  is " + value);
+		Assert.assertEquals(sahiTasks.textbox(field).value(), value, "Verified config value for " + field + "  is " + value);		
 	}
 	
 	public static void setInvalidConfigValue(SahiTasks sahiTasks, String field, String value, String expectedError1, String expectedError2) {
@@ -49,6 +49,22 @@ public class ConfigurationTasks {
 		
 		//sahiTasks.textbox("ipadefaultprimarygroup").setValue(group);
 		sahiTasks.span("Update").click();
+	}
+	
+	public static void setMigrationModeConfigValue(SahiTasks sahiTasks, String mode) {
+		if (mode.equals("enable") && (!sahiTasks.checkbox("ipamigrationenabled").checked()) )
+			sahiTasks.checkbox("ipamigrationenabled").click();
+		if (mode.equals("disable") && (sahiTasks.checkbox("ipamigrationenabled").checked()) )
+			sahiTasks.checkbox("ipamigrationenabled").click();
+		sahiTasks.span("Update").click();
+		
+	}
+	
+	public static void verifyMigrationModeConfigValue(SahiTasks sahiTasks, String mode) {
+		if (mode.equals("enable"))
+			Assert.assertTrue(sahiTasks.checkbox("ipamigrationenabled").checked(), "Verified Migration mode is enabled");
+		else
+			Assert.assertFalse(sahiTasks.checkbox("ipamigrationenabled").checked(), "Verified Migration mode is disabled");
 	}
 	
 	/*
@@ -85,6 +101,20 @@ public class ConfigurationTasks {
 		sahiTasks.navigateTo(commonTasks.configurationPage);
 	}
 	
+	
+	/*
+	 * Verify search brings back groups based on set search field
+	 *
+	 */
+	
+	public static void verifyGroupSearchFieldFunctional(SahiTasks sahiTasks, CommonTasks commonTasks, String searchValue, String expectedGroup) {
+		sahiTasks.navigateTo(commonTasks.groupPage);
+		CommonTasks.search(sahiTasks, searchValue);				
+		Assert.assertTrue(sahiTasks.checkbox(expectedGroup).exists(), "Searched successfully for " + expectedGroup);
+		
+		CommonTasks.clearSearch(sahiTasks);
+		sahiTasks.navigateTo(commonTasks.configurationPage);
+	}
 	
 	/*
 	 * Verify default domain for user's email is as set in default email domain field
@@ -177,5 +207,28 @@ public class ConfigurationTasks {
 		
 		sahiTasks.navigateTo(commonTasks.configurationPage);
 	}
+	
+	public static void modifyAndVerifyConfigValues(SahiTasks sahiTasks, String field, String value, String buttonToClick) {
+		String originalValue = sahiTasks.textbox(field).getValue();
+		sahiTasks.textbox(field).setValue(value);
+		sahiTasks.span(buttonToClick).click();
+		//buttonToClick is either Undo or Reset...so verify value is reverted
+		Assert.assertEquals(sahiTasks.textbox(field).value(), originalValue, "Verified config value for " + field + "  is " + originalValue);
+	}
+	
+	
+	public static void restoreDefaults(SahiTasks sahiTasks, CommonTasks commonTasks) {
+	    ConfigurationTasks.setConfigValue(sahiTasks, "ipasearchrecordslimit", "100");
+	    ConfigurationTasks.setConfigValue(sahiTasks, "ipasearchtimelimit", "2");
+	    ConfigurationTasks.setConfigValue(sahiTasks, "ipausersearchfields", "uid,givenname,sn,telephonenumber,ou,title");
+	    ConfigurationTasks.setConfigValue(sahiTasks, "ipadefaultemaildomain", "testrelm");
+	    ConfigurationTasks.setGroupConfigValue(sahiTasks, commonTasks, "ipausers");
+	    ConfigurationTasks.setConfigValue(sahiTasks, "ipahomesrootdir", "/home");
+	    ConfigurationTasks.setConfigValue(sahiTasks, "ipamaxusernamelength", "32");
+	    ConfigurationTasks.setConfigValue(sahiTasks, "ipapwdexpadvnotify", "4");
+	    ConfigurationTasks.setConfigValue(sahiTasks, "ipagroupsearchfields", "cn,description");
+	}
+		
+
 	
 }
