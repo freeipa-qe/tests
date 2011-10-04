@@ -17,21 +17,21 @@ set_systime()
     local now
     local desiredtime
     local after
-    rlLog "before set systime [$before]"
-    rlLog "offset [$offset] seconds"
     now=`date "+%s"`
     desiredtime=`echo "$now $offset" | bc`
     date "+%a %b %e %H:%M:%S %Y" -s "`perl -le "print scalar localtime $desiredtime"`"
     after=`date`
-    rlLog "after set systime [$after]"
+    echo "[set system time] before set systime [$before]"
+    echo "[set system time] after  set systime [$after]"
+    echo "[set system time] offset [$offset] seconds"
 } # set_systime
 
 restore_systime()
 {
 #restore system time by sync with ntp server
-    rlRun "service ntpd stop" 0 "Stopping local ntpd service to sync with external source"
+#    rlRun "service ntpd stop" 0 "Stopping local ntpd service to sync with external source"
     rlRun "ntpdate $NTPSERVER" 0 "restore system by sync with ntp server"
-    rlRun "service ntpd start" 0 "Starting local ntpd service again"
+#    rlRun "service ntpd start" 0 "Starting local ntpd service again"
 } # restore_systime
 
 restart_ipa_passwd()
@@ -60,7 +60,7 @@ read_pwpolicy()
     else
         keyword="$attr"
     fi
-    KinitAsAdmin 2>&1 >/dev/null
+    Local_KinitAsAdmin 2>&1 >/dev/null
     ipa pwpolicy-show $pwpolicy > $out
     result=`grep -i "$keyword" $out | cut -d":" -f2 | xargs echo`
     rm $out
@@ -70,7 +70,7 @@ read_pwpolicy()
 
 read_default_policy_setting()
 {
-    KinitAsAdmin
+    Local_KinitAsAdmin
     local out=$TmpDir/defaultvalues.$RANDOM.txt
     rlRun "ipa pwpolicy-show > $out" 0 "read global password policy"
     globalpw_maxlife=`grep "Max lifetime" $out | cut -d":" -f2` # unit is in day
@@ -87,31 +87,31 @@ read_default_policy_setting()
 
 reset_global_pwpolicy()
 {
-    rlLog "reset password policy"
-    rlLog "maxlife [$globalpw_maxlife] days , minlife [$globalpw_minlife] hours"
-    rlLog "history [$globalpw_history], classes [$globalpw_classes], length [$globalpw_length]"
-    KinitAsAdmin 
-    rlLog "set global password policy back to default"
+    echo "reset password policy"
+    echo "maxlife [$globalpw_maxlife] days , minlife [$globalpw_minlife] hours"
+    echo "history [$globalpw_history], classes [$globalpw_classes], length [$globalpw_length]"
+    Local_KinitAsAdmin 
+    echo "set global password policy back to default"
     ipa pwpolicy-mod --maxlife=$globalpw_maxlife \
                      --minlife=$globalpw_minlife \
                      --history=$globalpw_history \
                      --minclasses=$globalpw_classes \
                      --minlength=$globalpw_length 
-    rlLog "reset finished"
+    echo "reset finished"
     rlRun "$kdestroy"
 } #reset_pwpolicy_to_default
 
 reset_group_pwpolicy()
 {
     local out=$TmpDir/setgrouppwpolicy.$RANDOM.out
-    rlLog "set group password policy"
-    rlLog "maxlife [$grouppw_maxlife] days, minlife [$grouppw_minlife] hours history [$grouppw_history]" 
-    rlLog "classes [$grouppw_classes], length [$grouppw_length] priority [$grouppw_priority]"
+    echo "set group password policy"
+    echo "maxlife [$grouppw_maxlife] days, minlife [$grouppw_minlife] hours history [$grouppw_history]" 
+    echo "classes [$grouppw_classes], length [$grouppw_length] priority [$grouppw_priority]"
     grppw_exist $testgrp
     if [ $? = 0 ];then
         del_grppw $testgrp
     fi
-    KinitAsAdmin 
+    Local_KinitAsAdmin 
     ipa pwpolicy-add $testgrp \
                      --maxlife=$grouppw_maxlife\
                      --minlife=$grouppw_minlife \
@@ -143,14 +143,14 @@ reset_group_pwpolicy()
 reset_nestedgroup_pwpolicy()
 {
     local out=$TmpDir/setgrouppwpolicy.$RANDOM.out
-    rlLog "set group password policy"
-    rlLog "maxlife [$nestedpw_maxlife] days, minlife [$nestedpw_minlife] hours history [$nestedpw_history]" 
-    rlLog "classes [$nestedpw_classes], length [$nestedpw_length] priority [$nestedpw_priority]"
+    echo "set group password policy"
+    echo "maxlife [$nestedpw_maxlife] days, minlife [$nestedpw_minlife] hours history [$nestedpw_history]" 
+    echo "classes [$nestedpw_classes], length [$nestedpw_length] priority [$nestedpw_priority]"
     grppw_exist $nestedgrp
     if [ $? = 0 ];then
         del_grppw $nestedgrp 
     fi
-    KinitAsAdmin 
+    Local_KinitAsAdmin 
     ipa pwpolicy-add $nestedgrp\
                      --maxlife=$nestedpw_maxlife\
                      --minlife=$nestedpw_minlife \
@@ -192,7 +192,7 @@ util_pwpolicy_createnew()
         thisarg="--${arg}"
         argstring="$argstring $thisarg"
     done
-    KinitAsAdmin
+    Local_KinitAsAdmin
     rlRun "ipa pwpolicy-add $policyname $argstring" \
           0 "create password policy: [$policyname]"
     rm $out
@@ -202,12 +202,12 @@ del_grppw()
 {
     local grp=$1
     local out=$TmpDir/grpwpexist.$RANDOM.out
-    KinitAsAdmin
+    Local_KinitAsAdmin
     if ipa pwpolicy-find | grep -i $grp  2>&1 >/dev/null
     then
         rlRun "ipa pwpolicy-del $grp " 0 "delete pwpolicy [$grp]"
     else
-        rlLog "not found group password policy: [$grppw], do nothing"
+        echo "not found group password policy: [$grppw], do nothing"
     fi
     rlRun "$kdestroy"
     rm $out
@@ -219,14 +219,14 @@ grppw_exist()
 # return 1 if group pw policy NOT exist
     local grp=$1
     local out=$TmpDir/grpwpexist.$RANDOM.out
-    KinitAsAdmin
+    Local_KinitAsAdmin
     if ipa pwpolicy-find | grep -i $grp  2>&1 >/dev/null
     then
-        rlLog "found group password policy: [$grp]"
+        echo "found group password policy: [$grp]"
         rlRun "$kdestroy"
         return 0
     else
-        rlLog "not found group password policy: [$grp]"
+        echo "not found group password policy: [$grp]"
         rlRun "$kdestroy"
         return 1
     fi
@@ -241,8 +241,8 @@ add_test_ac()
         del_test_ac 
     fi
     rlRun "$kdestroy"
-    KinitAsAdmin
-    rlLog "set up ac with inital pw: [$initialpw]"
+    Local_KinitAsAdmin
+    echo "set up ac with inital pw: [$initialpw]"
     echo $initialpw |\
            ipa user-add $testac\
                         --first $testacFirst\
@@ -250,7 +250,7 @@ add_test_ac()
                         --password 
     rc=$?    
     # set test account password 
-    rlLog "change initialpw to [$testacPW]"
+    echo "change initialpw to [$testacPW]"
     FirstKinitAs $testac $initialpw $testacPW
     rlRun "$kdestroy"
 
@@ -260,19 +260,19 @@ add_test_ac()
 
 del_test_ac()
 {
-    user_exist $testac
-    if [ $? = 0 ]
-    then
-        rlLog "test account found, now delete it"
-        KinitAsAdmin
+#    user_exist $testac
+#    if [ $? = 0 ]
+#    then
+#        echo "test account found, now delete it"
+        Local_KinitAsAdmin
         ipa user-del $testac
-	rc=$?
-        rlRun "$kdestroy"
-    else
-        rlLog "test account does not exist, do nothing"
-    fi
-
-    return $rc
+#	rc=$?
+#        rlRun "$kdestroy"
+#    else
+#        echo "test account does not exist, do nothing"
+#    fi
+#
+#    return $rc
 
 } # del_test_ac
 
@@ -284,16 +284,16 @@ user_exist()
     local out=$TmpDir/userexist.$RANDOM.out
     if [ ! -z "$userlogin" ]
     then
-        KinitAsAdmin
+        Local_KinitAsAdmin
         ipa user-find $userlogin > $out
         rlRun "$kdestroy"
         if grep -i "User login: $userlogin$" $out 2>&1 >/dev/null
         then
-            rlLog "find [$userlogin] in ipa server"
+            echo "find [$userlogin] in ipa server"
             rm $out
             return 0
         else
-            rlLog "didn't find [$userlogin]"
+            echo "didn't find [$userlogin]"
             rm $out
             return 1
         fi
@@ -318,10 +318,10 @@ del_test_grp()
     grp_exist $testgrp
     if [ $? = 0 ]
     then
-        rlLog "test group [$testgrp] exist, now delete it"
+        echo "test group [$testgrp] exist, now delete it"
         del_grp "$testgrp"
     else
-        rlLog "test group [$testgrp] does not exist, do nothing"
+        echo "test group [$testgrp] does not exist, do nothing"
     fi
 } #del_test_grp
 
@@ -339,7 +339,7 @@ add_grp(){
     local grpname=$1
     local desc=$2
     if [ ! -z "$grpname" ];then
-        KinitAsAdmin
+        Local_KinitAsAdmin
         rlRun "ipa group-add $grpname --desc \"$desc\"" 0 "create group [$grpname]"
         rlRun "$kdestroy"
     else
@@ -350,7 +350,7 @@ add_grp(){
 del_grp(){
     local grpname=$1
     if [ ! -z "$grpname" ];then
-        KinitAsAdmin
+        Local_KinitAsAdmin
         rlRun "ipa group-del $grpname" 0 "delete group: [$grpname]"
         rlRun "$kdestroy"
     else
@@ -364,16 +364,16 @@ grp_exist()
     local out=$TmpDir/grpexist.$RANDOM.out
     if [ ! -z "$grp" ]
     then
-        KinitAsAdmin
+        Local_KinitAsAdmin
         ipa group-find $grp > $out
         rlRun "$kdestroy"
         if grep -i "Group name: $grp$" $out 2>&1 >/dev/null
         then
-            rlLog "group [$grp] found"
+            echo "group [$grp] found"
             rm $out
             return 0
         else
-            rlLog "group [$grp] not found"
+            echo "group [$grp] not found"
             rm $out
             return 1
         fi
@@ -385,7 +385,7 @@ grp_exist()
 append_test_member()
 {
     local out=$TmpDir/appendtestmember.$RANDOM.out
-    KinitAsAdmin
+    Local_KinitAsAdmin
     ipa group-show $testgrp > $out
     if grep "Member users" $out | grep -i "$testac" $out 2>&1 > /dev/null
     then
@@ -400,7 +400,7 @@ append_test_member()
 append_test_grp()
 {
     local out=$TmpDir/appendgrouptogroup.$RANDOM.out
-    KinitAsAdmin
+    Local_KinitAsAdmin
     ipa group-show $testgrp > $out
     if grep "Member groups" $out | grep -i $nestedgrp 2>&1 > /dev/null
     then
@@ -416,7 +416,7 @@ append_test_grp()
 append_test_nested_ac()
 {
     local out=$TmpDir/appendnestedac.$RANDOM.out
-    KinitAsAdmin
+    Local_KinitAsAdmin
 
     # test account should not be member of top group
     ipa group-show $testgrp > $out
@@ -444,7 +444,7 @@ append_test_nested_ac()
 remove_test_member()
 {
     local out=$TmpDir/removetestmember.$RANDOM.out
-    KinitAsAdmin
+    Local_KinitAsAdmin
     ipa group-show $testgrp > $out
     if grep "Member users" $out | grep -i "$testac" $out 2>&1 > /dev/null
     then
@@ -495,13 +495,18 @@ Local_KinitAsAdmin()
     local out=$TmpDir/kinitasadmin.$RANDOM.txt
     local exp
     local temppw
-    echo $pw | kinit $ADMINID > $out
+    echo "[Local_KinitAsAdmin] try old password: [$pw]"
+    echo $pw | kinit $ADMINID 2>&1 > $out
     if [ $? = 0 ];then
-        rlPass "kinit as admin with $pw success"
+        rlPass "[Local_KinitAsAdmin] kinit as admin with $pw success"
     elif [ $? = 1 ];then
+        echo "[Local_KinitAsAdmin] password [$pw] failed, check whether it is because password expired"
+        echo "============ output of [echo $pw | kinit $ADMIN] ============="
+        cat $out
+        echo "============================================================"
         if grep "Password expired" $out 2>&1 >/dev/null
         then
-            rlLog "admin password exipred, do reset process"
+            echo "admin password exipred, do reset process"
             exp=$TmpDir/resetadminpassword.$RANDOM.exp
             temppw="New_$pw"
             kinit_aftermaxlife "$ADMINID" "$ADMINPW" $temppw
@@ -541,7 +546,7 @@ Local_KinitAsAdmin()
         then
             rlFail "admin password wrong? [$pw]"
         else
-            rlLog "unhandled error"
+            echo "[Local_KinitAsAdmin] unhandled error"
         fi
     else
         rlFail "unknow error, return code [$?] not recoginzed"
@@ -559,12 +564,12 @@ change_password()
     local out=$TmpDir/changepassword.$RANDOM.out
     local exp=$TmpDir/changepassword.$RANDOM.exp
     local ret
-    rlLog "change password for [$userlogin] from [$currentpw] to [$newpw]"
+    echo "[change_password] change password for [$userlogin] from [$currentpw] to [$newpw]"
     #rlRun "echo \"$currentpw\" | kinit $userlogin" \
     #      0 "current pw [$currentpw] has to work before we continue"
     if klist | grep -i "Default principal: $userlogin" 2>&1 >/dev/null
     then
-        rlLog "found kerberos for user [$userlogin], test continue"
+        echo "found kerberos for user [$userlogin], test continue"
     else
         rlFail "no kerberos found for [$userlogin], test can not continue"
         return 1
@@ -585,12 +590,15 @@ change_password()
     if grep "Constraint violation:Password Fails to meet minimum strength criteria" $out  2>&1 >/dev/null|| grep "ipa: ERROR" $out 2>&1 >/dev/null
     then
         ret=1
-        echo "===============output of change_password==============="
-        cat $out
-        echo "======================================================="
     else
         ret=0
     fi
+    echo "===============output of change_password==============="
+    cat $exp
+    echo "------------- [Above: exp ] [ below: output ] --------"
+    cat $out
+    echo "======================================================="
+
     rm $out
     rm $exp
     return $ret
@@ -598,7 +606,7 @@ change_password()
 
 random_password()
 {
-    local classes=4
+    local classes=5
     local length=8
     local outfile=$TmpDir/ramdompassword.$RANDOM.out
     generate_password $classes $length $outfile
@@ -612,7 +620,7 @@ generate_password()
     local length=$2
     local pwoutfile=$TmpDir/generatepassword.$RANDOM.out
     local randompw=""
-    local allclasses="lowerl upperl digit special"
+    local allclasses="lowerl upperl digit special eightbits"
     local selectedclasses=""
     local i=0
 
@@ -620,23 +628,35 @@ generate_password()
     if [ $classes = 0 ];then
         classes=1 # there is no such password that has no class at all
     fi
-    while [ $i -lt $classes ]
-    do
-        number=$RANDOM
-        let "number %= 4"
-        number=$((number+1)) #get random number in [1,2,3,4]
-        field=`echo $allclasses | cut -d" " -f$number`
-        #rlLog "num[$number],field=[$field]"
-        if  echo $selectedclasses| grep $field 2>&1 >/dev/null
-        then
-            continue
-        else
-            selectedclasses="$selectedclasses $field"
-            i=$((i+1))
-        fi
-    done
+    if [ $classes = 1 ];then
+        selectedclasses="lowerl"
+    elif [ $classes = 2 ];then
+        selectedclasses="lowerl upperl"
+    elif [ $classes = 3 ];then
+        selectedclasses="lowerl upperl digit"
+    elif [ $classes = 4 ];then
+        selectedclasses="lowerl upperl digit special"
+    else 
+        selectedclasses="lowerl upperl digit special eightbits"
+    fi
+        
+#    while [ $i -lt $classes ]
+#    do
+#        number=$RANDOM
+#        let "number %= 5"
+#        number=$((number+1)) #get random number in [1,2,3,4,5]
+#        field=`echo $allclasses | cut -d" " -f$number`
+#        #echo "num[$number],field=[$field]"
+#        if  echo $selectedclasses| grep $field 2>&1 >/dev/null
+#        then
+#            continue
+#        else
+#            selectedclasses="$selectedclasses $field"
+#            i=$((i+1))
+#        fi
+#    done
     # up to here, we might have: selectedclasses= lowerl upperl special
-    #i=$classes
+    i=$classes
     field="" #this is just a symble reuse, it has no relation with previous value
     while [ $i -lt $length ]
     do
@@ -647,7 +667,7 @@ generate_password()
         i=$((i+1))
     done
     # up to here, we might have: selectedclasses= lowerl upperl special lowerl upperl
-    #rlLog "selectedclasses=[$selectedclasses]"
+    #echo "selectedclasses=[$selectedclasses]"
     # it is possible length<class, in this case we have to fulfill length requirement
     i=0
     for class in $selectedclasses
@@ -661,7 +681,7 @@ generate_password()
     finalpw=`cat $pwoutfile`
     rm $pwoutfile
     echo $finalpw
-    #rlLog "generated password : [$randompw] classes=[$classes] length=[$length]"
+    #echo "generated password : [$randompw] classes=[$classes] length=[$length]"
 } #generate_password
 
 get_random()
@@ -671,7 +691,8 @@ get_random()
     local lowerl="a b c d e f g h i j k l m n o p q r s t u v w x y z"
     local upperl="A B C D E F G H I J K L M N O P Q R S T U V W X Y Z"
     local digit="0 1 2 3 4 5 6 7 8 9"
-    local special="= + . , ? ! / ~ @ # % ^"
+    local special="= + . , / ~ @ # % ^"
+    local eightbits="ò ð đ đ № π נ ğ ð ๐ š ŵ ð đ è č è č ш و"
     #local special=". , ? < > / ( ) ~ ! @ # $ % ^ & * - + = _ { } [ ] ;"
     # FIXME: the special char: $ ( ) { } [ ] _ + - & * ; has special meaning in shell
     # this is due to 3 cause: 1. shell treats $? $! $@ differently
@@ -695,36 +716,25 @@ get_random()
     fi
     if [ $class = "special" ];then
         str="$special"
-        len=12 #full length should be 27
+        len=10 #full length should be 27
     fi
+    if [ $class = "eightbits" ];then
+        str="$eightbits"
+        len=20 #full length should be 27
+    fi
+
+
     index=$RANDOM
     let "index %= $len"
     index=$((index+1))
     l=`echo $str | cut -d" " -f$index`
-    #rlLog "this letter: [${l}], index=[$index]"
+    #echo "this letter: [${l}], index=[$index]"
     echo -n "${l}" >> $outf 
 } #get_random
 
 #####################################################################
 #####################################################################
 #####################################################################
-
-maxlife_default()
-{
-    local maxlife=$1
-    local minlife=$2
-    local midpoint=`echo "($minlife + $maxlife)/2" |bc` 
-    rlLog "mid point: [$midpoint]"
-    set_systime "+ $midpoint"
-#    rlRun "$kdestroy"
-    rlRun "echo $testacPW | kinit $testac" 0 "kinit use same password between minlife and max life should success"
-    rlRun "$kdestroy"
-
-    # when system time > maxlife, ipa server should prompt for password change
-    set_systime "+ $midpoint + 60"  # set system time after the max life
-    kinit_aftermaxlife $testac $testacPW $testacNEWPW
-} #maxlife_default
-
 minlife_default()
 {
     local maxlife=$1
@@ -735,26 +745,26 @@ minlife_default()
     local length
     local classes
     local out=$TmpDir/minlifedefault.$RANDOM.out
-    KinitAsAdmin
-    rlLog "check global pw policy"
+    Local_KinitAsAdmin
+    echo "check global pw policy"
     echo "------------------------------------------"
     ipa pwpolicy-show
     echo "------------------------------------------"
-    rlLog "set all other password constrains to 0"
+    echo "set all other password constrains to 0"
     ipa pwpolicy-mod $grp --maxlife=$grouppw_maxlife --history=0 --minlength=0 --minclasses=1 
     ipa pwpolicy-show  $grp > $out
     history=`grep "History size:" $out | cut -d":" -f2|xargs echo`
     length=`grep "length:" $out | cut -d":" -f2|xargs echo`
     classes=`grep "classes:" $out | cut -d":" -f2|xargs echo`
-    rlLog "set precondition: history=[$history] minlength=[$length] classes=[$classes]"
+    echo "set precondition: history=[$history] minlength=[$length] classes=[$classes]"
     if [ $history = 0 ] && [ $length = 0 ] && [ $classes = 1 ]
     then
         life=2 #set minlife to 2 hours
 
         ipa pwpolicy-mod $grp --minlife=$life
         life=`ipa pwpolicy-show | grep "Min lifetime" | cut -d":" -f2 |xargs echo` # confirm the minlife setting
-        rlLog "minlife has been setting to [$life] hours"
-        rlLog "set system time 2 minute before minlife"
+        echo "minlife has been setting to [$life] hours"
+        echo "set system time 2 minute before minlife"
         set_systime "+ 2*60*60 - 2*60"
         # before minlife, change password should fail
         rlRun "echo $testacPW | kinit $testac" 0 "make sure currentPW work [$testacPW]"
@@ -790,20 +800,20 @@ minlife_lowerbound()
         local grp=$1
         local lowbound=0
         local out=$TmpDir/minlifelowbound.$RANDOM.out
-        rlLog "The lower bound of minlife time is [$lowbound] for group pw [$grp]"
-        KinitAsAdmin
-        rlLog "set all other password constrains to 0"
+        echo "The lower bound of minlife time is [$lowbound] for group pw [$grp]"
+        Local_KinitAsAdmin
+        echo "set all other password constrains to 0"
         ipa pwpolicy-mod $grp --maxlife=$globalpw_maxlife --history=0 --minlength=0 --minclasses=1 
         ipa pwpolicy-show  $grp > $out
         history=`grep "History size:" $out | cut -d":" -f2|xargs echo`
         length=`grep "length:" $out | cut -d":" -f2|xargs echo`
         classes=`grep "classes:" $out | cut -d":" -f2|xargs echo`
-        rlLog "set precondition: history=[$history] minlength=[$length] classes=[$classes]"
+        echo "set precondition: history=[$history] minlength=[$length] classes=[$classes]"
         if [ $history = 0 ] && [ $length = 0 ] && [ $classes = 1 ]
         then
             rlRun "ipa pwpolicy-mod $grp --minlife=$lowbound" 0 "set to lowbound should success"
-            rlLog "minlife has been setting to [$lowbound] hours"
-            rlLog "after set minlife to 0, we should be able to change password anytime we wont"
+            echo "minlife has been setting to [$lowbound] hours"
+            echo "after set minlife to 0, we should be able to change password anytime we wont"
             oldpw=$testacPW
             newpw="dummy123"
             #FIXME: I should have more test data right here
@@ -863,7 +873,7 @@ util_pwpolicy_removeall()
     local out=$TmpDir/uitl.pwpolicy.removeall.out
     local i=0
     local list
-    KinitAsAdmin
+    Local_KinitAsAdmin
     ipa pwpolicy-find | grep -i "group" | grep -v -i "GLOBAL" > $out
     for line in `cat $out`; do
         pwpolicy=`echo $line | cut -d":" -f2 | xargs echo`
