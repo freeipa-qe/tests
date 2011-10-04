@@ -34,7 +34,7 @@ public class ConfigurationTest extends SahiTestScript{
 		
 		//to set up search tests, adding objects in one category on identity and policy tabs 
 		//add users
-	/*	sahiTasks.navigateTo(commonTasks.userPage, true);
+		sahiTasks.navigateTo(commonTasks.userPage, true);
 		String testUser="user";
 		for (int i=0; i<20; i++) {
 			if (!sahiTasks.link(testUser+i).exists())
@@ -47,7 +47,7 @@ public class ConfigurationTest extends SahiTestScript{
 	    for (int i=0; i<20; i++) {
 			if (!sahiTasks.link(testHBACRule+i).exists())
 				HBACTasks.addHBACRule(sahiTasks, testHBACRule+i, "Add");
-	    }*/
+	    }
 		
 		sahiTasks.navigateTo(commonTasks.configurationPage, true);
 		currentPage = sahiTasks.fetch("top.location.href");
@@ -263,7 +263,7 @@ public class ConfigurationTest extends SahiTestScript{
 	@AfterClass (groups={"cleanup"}, description="Delete objects created for this test suite", alwaysRun=true)
 	public void cleanup() throws CloneNotSupportedException {
 		
-	/*	//clean users and rules added
+		//clean users and rules added
 		sahiTasks.navigateTo(commonTasks.userPage, true);
 		String testUser="user";
 		for (int i=0; i<20; i++) {
@@ -281,7 +281,7 @@ public class ConfigurationTest extends SahiTestScript{
 				HBACTasks.deleteHBAC(sahiTasks, testHBACRule+i, "Delete");
 	    }
 	    
-	*/
+	
 	    
 	  //restore defaults
 	    sahiTasks.navigateTo(commonTasks.configurationPage, true);
