@@ -634,9 +634,9 @@ EOF
 
            grep "Login successful." /tmp/ftplog
            if [ $? = 0 ]; then
-                echo "Authentication successful, as expected"
+                rlPass "Authentication successful, as expected"
            else
-                echo "ERROR: Authentication failed."
+                rlFail "ERROR: Authentication failed."
            fi
         }
    }
@@ -659,9 +659,9 @@ EOF
 
            grep "Login successful." /tmp/ftplog
            if [ $? = 0 ]; then
-                echo "ERROR: Authentication failed."
+                rlFail "ERROR: Authentication success."
            else
-                echo "Authentication failed, as expected"
+                rlPass "Authentication failed, as expected"
            fi
         }
    }
