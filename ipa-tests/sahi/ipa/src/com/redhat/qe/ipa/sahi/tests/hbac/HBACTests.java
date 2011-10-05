@@ -722,7 +722,7 @@ public class HBACTests extends SahiTestScript {
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
         //										testname					cn   
-		ll.add(Arrays.asList(new Object[]{ "create_good_hbacrule",			"eng_hbacRule"      } ));
+		ll.add(Arrays.asList(new Object[]{ "create_good_rule",			"eng_hbacRule"      } ));
 		
 		return ll;	
 	}
@@ -807,7 +807,7 @@ public class HBACTests extends SahiTestScript {
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
         //										testname							cn					expected_Error   
-		ll.add(Arrays.asList(new Object[]{ "create_duplicate_hbacrule",				"dev_hbacRule",		"HBAC rule with name \"dev_hbacRule\" already exists"      } ));
+		ll.add(Arrays.asList(new Object[]{ "create_duplicate_rule",					"dev_hbacRule",		"HBAC rule with name \"dev_hbacRule\" already exists"      } ));
 		ll.add(Arrays.asList(new Object[]{ "rule_with trailing_space_in_name",		"hbacRule ",		"invalid 'name': Leading and trailing spaces are not allowed"	} ));
 		ll.add(Arrays.asList(new Object[]{ "rule_with leading_space_in_name",		" hbacRule",		"invalid 'name': Leading and trailing spaces are not allowed"	} ));
 		
@@ -875,7 +875,7 @@ public class HBACTests extends SahiTestScript {
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
         //										testname					cn   
-		ll.add(Arrays.asList(new Object[]{ "delete_rule1",			"eng_hbacRule"      } ));
+		ll.add(Arrays.asList(new Object[]{ "delete_rule",			"eng_hbacRule"      } ));
 		
 		return ll;	
 	}

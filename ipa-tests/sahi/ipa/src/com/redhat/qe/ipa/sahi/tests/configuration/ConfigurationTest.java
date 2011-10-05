@@ -359,7 +359,7 @@ public class ConfigurationTest extends SahiTestScript{
 	    
 	    
 	    sahiTasks.navigateTo(commonTasks.groupPage, true);
-		if (!sahiTasks.link("configgroup").exists())
+		if (sahiTasks.link("configgroup").exists())
 			GroupTasks.deleteGroup(sahiTasks, "configgroup");
 		
 	}

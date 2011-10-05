@@ -337,9 +337,9 @@ public class SudoCommandTests extends SahiTestScript {
 
 		//verify rules were found
 		for (String sudoCommandTestObject : sudoCommandTestObjects) {
-			if (sahiTasks.link(sudoCommandTestObject.toLowerCase()).exists()){
+			if (sahiTasks.link(sudoCommandTestObject).exists()){
 				log.fine("Cleaning Sudo Rule: " + sudoCommandTestObject);
-				SudoTasks.deleteSudo(sahiTasks, sudoCommandTestObject.toLowerCase(), "Delete");
+				SudoTasks.deleteSudo(sahiTasks, sudoCommandTestObject, "Delete");
 			}			
 		} 
 		
