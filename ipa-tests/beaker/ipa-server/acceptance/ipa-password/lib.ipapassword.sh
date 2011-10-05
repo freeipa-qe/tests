@@ -242,7 +242,7 @@ add_test_ac()
     fi
     rlRun "$kdestroy"
     Local_KinitAsAdmin
-    echo "set up ac with inital pw: [$initialpw]"
+    echo "[add_test_ac] set up test account with inital pw: [$initialpw]"
     echo $initialpw |\
            ipa user-add $testac\
                         --first $testacFirst\
@@ -250,12 +250,10 @@ add_test_ac()
                         --password 
     rc=$?    
     # set test account password 
-    echo "change initialpw to [$testacPW]"
+    echo "[add_test_ac] change initialpw to [$testacPW], by calling FirstKinitAs"
     FirstKinitAs $testac $initialpw $testacPW
     rlRun "$kdestroy"
-
     return $rc
-
 } # add_test_ac
 
 del_test_ac()
@@ -481,9 +479,20 @@ kinit_aftermaxlife()
     echo 'send -s -- "\r"' >> $exp
     echo 'expect eof ' >> $exp
     rlRun "$kdestroy"
-    rlRun "/usr/bin/expect $exp " 0 "ipa server should prompt for password change when system is after maxlife"
+
+    echo "====== [kinit_aftermaxlife] exp file ========="
+    cat $exp
+    echo "----------- ipactl status -------------------"
+    ipactl status
+    echo "=============================================="
+    rlRun "/usr/bin/expect $exp " 0 "[kinit_aftermaxlife] ipa server should prompt for password change when system is after maxlife"
     rlRun "$kdestroy"
-    rlRun "echo $newpw | kinit $username" 0 "after password change prompt, try with the new password [$newpw]"
+
+    echo "====== [kinit_aftermaxlife] ipactl status after run exp file ========="
+    ipactl status
+    echo "=============================================="
+
+    rlRun "echo $newpw | kinit $username" 0 "[kinit_aftermaxlife] after password change prompt, try with the new password [$newpw]"
     # clean up
     rm $exp
 } #kinit_aftermaxlife
@@ -498,8 +507,11 @@ Local_KinitAsAdmin()
     echo "[Local_KinitAsAdmin] try old password: [$pw]"
     echo $pw | kinit $ADMINID 2>&1 > $out
     if [ $? = 0 ];then
-        rlPass "[Local_KinitAsAdmin] kinit as admin with $pw success"
+        rlPass "[Local_KinitAsAdmin] kinit as admin with [$pw] success"
     elif [ $? = 1 ];then
+        echo "[Local_KinitAsAdmin] check ipactl status"
+        ipactl status
+        echo "========================================="
         echo "[Local_KinitAsAdmin] password [$pw] failed, check whether it is because password expired"
         echo "============ output of [echo $pw | kinit $ADMIN] ============="
         cat $out
@@ -517,7 +529,7 @@ Local_KinitAsAdmin()
             history=`echo $history`
             classses=`ipa pwpolicy-show | grep "classes" | cut -d":" -f2`
             classes=`echo $classes`
-            ipa pwpolicy-mod --minlife=0 --history=0 --minclasses=0
+            ipa pwpolicy-mod --maxfail=0 --failinterval=0 --lockouttime=0 --minlife=0 --history=0 --minclasses=0
             # now set admin password back to original password
             echo "set timeout 30" > $exp
             echo "set force_conservative 0" >> $exp
@@ -538,18 +550,18 @@ Local_KinitAsAdmin()
             $kdestroy
             echo $pw | kinit $ADMINID
             if [ $? = 1 ];then
-                rlFail "reset password back to original [$pw] failed"
+                rlFail "[Local_KinitAsAdmin] reset password back to original [$pw] failed"
             fi
-            ipa pwpolicy-mod --minlife=$min --history=$history --minclasses=$classes           
-            rlPass "set admin password back to [$pw] success -- after set to temp"
+            ipa pwpolicy-mod --maxfail=0 --failinterval=0 --lockouttime=0 --minlife=$min --history=$history --minclasses=$classes           
+            rlPass "[Local_KinitAsAdmin] set admin password back to [$pw] success -- after set to temp"
         elif grep "Password incorrect while getting initial credentials" $out 2>&1 >/dev/null
         then
-            rlFail "admin password wrong? [$pw]"
+            rlFail "[Local_KinitAsAdmin] admin password wrong? [$pw]"
         else
             echo "[Local_KinitAsAdmin] unhandled error"
         fi
     else
-        rlFail "unknow error, return code [$?] not recoginzed"
+        rlFail "[Local_KinitAsAdmin] unknow error, return code [$?] not recoginzed"
     fi
     rm $out
 } #KinitAsAdmin
@@ -587,11 +599,17 @@ change_password()
     echo 'send -s -- "\r"' >> $exp
     echo 'expect eof ' >> $exp
     /usr/bin/expect $exp  > $out
-    if grep "Constraint violation:Password Fails to meet minimum strength criteria" $out  2>&1 >/dev/null|| grep "ipa: ERROR" $out 2>&1 >/dev/null
+#    if grep "Constraint violation:Password Fails to meet minimum strength criteria" $out  2>&1 >/dev/null|| grep "ipa: ERROR" $out 2>&1 >/dev/null
+#    then
+#        ret=1
+#    else
+#        ret=0
+#    fi
+    if grep "Changed password "  $out  2>&1 >/dev/null
     then
-        ret=1
-    else
         ret=0
+    else
+        ret=1
     fi
     echo "===============output of change_password==============="
     cat $exp
@@ -691,7 +709,7 @@ get_random()
     local lowerl="a b c d e f g h i j k l m n o p q r s t u v w x y z"
     local upperl="A B C D E F G H I J K L M N O P Q R S T U V W X Y Z"
     local digit="0 1 2 3 4 5 6 7 8 9"
-    local special="= + . , / ~ @ # % ^"
+    local special="= + . , / ~ # % ^"
     local eightbits="ò ð đ đ № π נ ğ ð ๐ š ŵ ð đ è č è č ш و"
     #local special=". , ? < > / ( ) ~ ! @ # $ % ^ & * - + = _ { } [ ] ;"
     # FIXME: the special char: $ ( ) { } [ ] _ + - & * ; has special meaning in shell
@@ -716,13 +734,12 @@ get_random()
     fi
     if [ $class = "special" ];then
         str="$special"
-        len=10 #full length should be 27
+        len=9 #full length should be 27
     fi
     if [ $class = "eightbits" ];then
         str="$eightbits"
         len=20 #full length should be 27
     fi
-
 
     index=$RANDOM
     let "index %= $len"

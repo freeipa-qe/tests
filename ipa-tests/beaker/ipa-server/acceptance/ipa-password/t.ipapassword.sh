@@ -8,7 +8,7 @@ ipapassword()
     ipapassword_globalpolicy
     ipapassword_grouppolicy
     ipapassword_nestedgroup
-    ipapassword_attr
+#    ipapassword_attr
     ipapassword_envcleanup
 } # ipapassword
 
@@ -19,63 +19,63 @@ ipapassword_globalpolicy()
 {
     ipapassword_globalpolicy_envsetup
     ipapassword_globalpolicy_maxlifetime_default
-    ipapassword_globalpolicy_maxlifetime_lowerbound
-    ipapassword_globalpolicy_maxlifetime_upperbound
-    ipapassword_globalpolicy_maxlifetime_negative
-    ipapassword_globalpolicy_minlifetime_default
-    ipapassword_globalpolicy_minlifetime_lowerbound
-    ipapassword_globalpolicy_minlifetime_upperbound
-    ipapassword_globalpolicy_minlifetime_negative
-    ipapassword_globalpolicy_minlifetime_greater_maxlife_negative
-    ipapassword_globalpolicy_history_default
-    ipapassword_globalpolicy_history_lowerbound
-    ipapassword_globalpolicy_history_upperbound
-    ipapassword_globalpolicy_history_negative
-    ipapassword_globalpolicy_classes_default
-    ipapassword_globalpolicy_classes_lowerbound
-    ipapassword_globalpolicy_classes_upperbound
-    ipapassword_globalpolicy_classes_negative
-    ipapassword_globalpolicy_length_default
-    ipapassword_globalpolicy_length_lowerbound
-    ipapassword_globalpolicy_length_upperbound
-    ipapassword_globalpolicy_length_negative
+#    ipapassword_globalpolicy_maxlifetime_lowerbound
+#    ipapassword_globalpolicy_maxlifetime_upperbound
+#    ipapassword_globalpolicy_maxlifetime_negative
+#    ipapassword_globalpolicy_minlifetime_default
+#    ipapassword_globalpolicy_minlifetime_lowerbound
+#    ipapassword_globalpolicy_minlifetime_upperbound
+#    ipapassword_globalpolicy_minlifetime_negative
+#    ipapassword_globalpolicy_minlifetime_greater_maxlife_negative
+#    ipapassword_globalpolicy_history_default
+#    ipapassword_globalpolicy_history_lowerbound
+#    ipapassword_globalpolicy_history_upperbound
+#    ipapassword_globalpolicy_history_negative
+#    ipapassword_globalpolicy_classes_default
+#    ipapassword_globalpolicy_classes_lowerbound
+#    ipapassword_globalpolicy_classes_upperbound
+#    ipapassword_globalpolicy_classes_negative
+#    ipapassword_globalpolicy_length_default
+#    ipapassword_globalpolicy_length_lowerbound
+#    ipapassword_globalpolicy_length_upperbound
+#    ipapassword_globalpolicy_length_negative
     ipapassword_globalpolicy_envcleanup
 } #ipapassword_globalpolicy
 
 ipapassword_grouppolicy()
 {
     ipapassword_grouppolicy_envsetup
-    ipapassword_grouppolicy_maxlifetime_default
-    ipapassword_grouppolicy_maxlifetime_lowerbound
-    ipapassword_grouppolicy_maxlifetime_upperbound
-    ipapassword_grouppolicy_maxlifetime_negative
-    ipapassword_grouppolicy_minlifetime_default
-    ipapassword_grouppolicy_minlifetime_lowerbound
-    ipapassword_grouppolicy_minlifetime_upperbound
-    ipapassword_grouppolicy_minlifetime_negative
-    ipapassword_grouppolicy_history_default
-    ipapassword_grouppolicy_history_lowerbound
-    ipapassword_grouppolicy_history_upperbound
-    ipapassword_grouppolicy_history_negative
-    ipapassword_grouppolicy_classes_default
-    ipapassword_grouppolicy_classes_lowerbound
-    ipapassword_grouppolicy_classes_upperbound
-    ipapassword_grouppolicy_classes_negative
-    ipapassword_grouppolicy_length_default
-    ipapassword_grouppolicy_length_lowerbound
-    ipapassword_grouppolicy_length_upperbound
-    ipapassword_grouppolicy_length_negative
+    ipapassword_grouppolicy_maxlifetime_default # this one always failed, i couldn't figure it out why
+#    ipapassword_grouppolicy_maxlifetime_lowerbound
+#    ipapassword_grouppolicy_maxlifetime_upperbound
+#    ipapassword_grouppolicy_maxlifetime_negative
+#    ipapassword_grouppolicy_minlifetime_default
+#    ipapassword_grouppolicy_minlifetime_lowerbound
+#    ipapassword_grouppolicy_minlifetime_upperbound
+#    ipapassword_grouppolicy_minlifetime_negative
+#    ipapassword_grouppolicy_history_default
+#    ipapassword_grouppolicy_history_lowerbound
+#    ipapassword_grouppolicy_history_upperbound
+#    ipapassword_grouppolicy_history_negative
+#    ipapassword_grouppolicy_classes_default
+#    ipapassword_grouppolicy_classes_lowerbound
+#    ipapassword_grouppolicy_classes_upperbound
+#    ipapassword_grouppolicy_classes_negative
+#    ipapassword_grouppolicy_length_default
+#    ipapassword_grouppolicy_length_lowerbound
+#    ipapassword_grouppolicy_length_upperbound
+#    ipapassword_grouppolicy_length_negative
     ipapassword_grouppolicy_envcleanup
 } #ipapassword_grouppolicy
 
 ipapassword_nestedgroup()
 {
     ipapassword_nestedgroup_envsetup
-    ipapassword_nestedgrouppw_maxlife_conflict
+#    ipapassword_nestedgrouppw_maxlife_conflict
     ipapassword_nestedgrouppw_minlife_conflict
     ipapassword_nestedgrouppw_history_conflict
-    ipapassword_nestedgrouppw_classes_conflict
-    ipapassword_nestedgrouppw_length_conflict
+#    ipapassword_nestedgrouppw_classes_conflict
+#    ipapassword_nestedgrouppw_length_conflict
     ipapassword_nestedgroup_envcleanup
 } #ipapassword_nestedgroup
 
@@ -157,7 +157,13 @@ ipapassword_globalpolicy_maxlifetime_default_logic()
         rlLog "mid point: [$midpoint]"
         set_systime "+ $midpoint"
         rlRun "$kdestroy"
+        echo "---- ipactl report before [kinit $testac]---"
+        ipactl status
+        echo "----------------------"
         rlRun "echo $testacPW | kinit $testac 2>&1 >/dev/null" 0 "kinit as same password between minlife and max life should success"
+        echo "---- ipactl report after [kinit $testac]---"
+        ipactl status
+        echo "----------------------"
 
         echo "[papassword_globalpolicy_maxlifetime_default] scenario 2: when system time > maxlife, ipa server should prompt for password change"
         set_systime "+ $midpoint + 60"  # set system time after the max life
@@ -258,7 +264,7 @@ ipapassword_globalpolicy_minlifetime_default_logic()
         local out=$TmpDir/globalminlifedefault.$RANDOM.txt
         Local_KinitAsAdmin
         rlLog "disable other password policy constrains"
-        ipa pwpolicy-mod --maxlife=$globalpw_maxlife --history=0 --minlength=0 --minclasses=1 
+        ipa pwpolicy-mod --maxfail=0 --failinterval=0 --lockouttime=0 --maxlife=$globalpw_maxlife --history=0 --minlength=0 --minclasses=1 
         ipa pwpolicy-show > $out
         history=`grep "History size:" $out | cut -d":" -f2|xargs echo`
         length=`grep "length:" $out | cut -d":" -f2|xargs echo`
@@ -317,7 +323,7 @@ ipapassword_globalpolicy_minlifetime_lowerbound_logic()
         rlLog "The lower bound of minlife time is [$lowbound]"
         Local_KinitAsAdmin
         rlLog "disable other password policy constrains"
-        ipa pwpolicy-mod --maxlife=$globalpw_maxlife --history=0 --minlength=0 --minclasses=1 
+        ipa pwpolicy-mod --maxfail=0 --failinterval=0 --lockouttime=0 --maxlife=$globalpw_maxlife --history=0 --minlength=0 --minclasses=1 
         ipa pwpolicy-show > $out
         history=`grep "History size:" $out | cut -d":" -f2|xargs echo`
         length=`grep "length:" $out | cut -d":" -f2|xargs echo`
@@ -451,7 +457,7 @@ ipapassword_globalpolicy_history_default()
         rlLog "default behave of history setting test"
         Local_KinitAsAdmin
         rlLog "disable other password policy constrains"
-        ipa pwpolicy-mod --maxlife=$globalpw_maxlife --minlife=0 --minlength=0 --minclasses=1 
+        ipa pwpolicy-mod --maxfail=0 --failinterval=0 --lockouttime=0 --maxlife=$globalpw_maxlife --minlife=0 --minlength=0 --minclasses=1 
         ipa pwpolicy-show > $out
         minlife=`grep "Min lifetime" $out | cut -d":" -f2|xargs echo`
         length=`grep "length:" $out | cut -d":" -f2|xargs echo`
@@ -537,7 +543,7 @@ ipapassword_globalpolicy_history_lowerbound()
         rlLog "lowerbound of password history is $lowbound"
         Local_KinitAsAdmin
         rlLog "disable other password policy constrains"
-        ipa pwpolicy-mod --maxlife=$globalpw_maxlife --minlife=0 --minlength=0 --minclasses=1 --history=$lowbound
+        ipa pwpolicy-mod --maxfail=0 --failinterval=0 --lockouttime=0 --maxlife=$globalpw_maxlife --minlife=0 --minlength=0 --minclasses=1 --history=$lowbound
         ipa pwpolicy-show > $out
         minlife=`grep "Min lifetime" $out | cut -d":" -f2|xargs echo`
         length=`grep "length:" $out | cut -d":" -f2|xargs echo`
@@ -657,7 +663,7 @@ ipapassword_globalpolicy_classes_default()
         rlLog "check minimum classes default behave: when classes between [2-4]"
         Local_KinitAsAdmin
         rlLog "disable other password policy constrains"
-        ipa pwpolicy-mod --maxlife=$globalpw_maxlife --minlife=0 --minlength=0 --history=0 
+        ipa pwpolicy-mod --maxfail=0 --failinterval=0 --lockouttime=0 --maxlife=$globalpw_maxlife --minlife=0 --minlength=0 --history=0 
         ipa pwpolicy-show > $out
         minlife=`grep "Min lifetime" $out | cut -d":" -f2|xargs echo`
         length=`grep "length:" $out | cut -d":" -f2|xargs echo`
@@ -816,7 +822,7 @@ ipapassword_globalpolicy_classes_upperbound()
         rlLog "check minimum classes upperbound: >4, it should behave same as 4"
         Local_KinitAsAdmin
         rlLog "disable other password policy constrains"
-        ipa pwpolicy-mod --maxlife=$globalpw_maxlife --minlife=0 --minlength=0 --history=0 
+        ipa pwpolicy-mod --maxfail=0 --failinterval=0 --lockouttime=0 --maxlife=$globalpw_maxlife --minlife=0 --minlength=0 --history=0 
         ipa pwpolicy-show > $out
         minlife=`grep "Min lifetime" $out | cut -d":" -f2|xargs echo`
         length=`grep "length:" $out | cut -d":" -f2|xargs echo`
@@ -932,7 +938,7 @@ ipapassword_globalpolicy_length_default()
         reset_global_pwpolicy
         rlLog "disable other password policy constrains"
         Local_KinitAsAdmin
-        ipa pwpolicy-mod --maxlife=$globalpw_maxlife --minlife=0 --minclasses=0 --history=0 
+        ipa pwpolicy-mod --maxfail=0 --failinterval=0 --lockouttime=0 --maxlife=$globalpw_maxlife --minlife=0 --minclasses=0 --history=0 
         ipa pwpolicy-show > $out
         minlife=`grep "Min lifetime" $out | cut -d":" -f2|xargs echo`
         classes=`grep "classes:" $out | cut -d":" -f2|xargs echo`
@@ -1015,7 +1021,7 @@ ipapassword_globalpolicy_length_lowerbound()
         reset_global_pwpolicy
         rlLog "disable other password policy constrains"
         Local_KinitAsAdmin
-        ipa pwpolicy-mod --maxlife=$globalpw_maxlife --minlife=0 --minclasses=0 --history=0 --minlength=0
+        ipa pwpolicy-mod --maxfail=0 --failinterval=0 --lockouttime=0 --maxlife=$globalpw_maxlife --minlife=0 --minclasses=0 --history=0 --minlength=0
         ipa pwpolicy-show > $out
         minlife=`grep "Min lifetime" $out | cut -d":" -f2|xargs echo`
         classes=`grep "classes:" $out | cut -d":" -f2|xargs echo`
@@ -1062,7 +1068,7 @@ ipapassword_globalpolicy_length_upperbound()
         reset_global_pwpolicy
         rlLog "disable other password policy constrains"
         Local_KinitAsAdmin
-        ipa pwpolicy-mod --maxlife=$globalpw_maxlife --minlife=0 --minclasses=0 --history=0 
+        ipa pwpolicy-mod --maxfail=0 --failinterval=0 --lockouttime=0 --maxlife=$globalpw_maxlife --minlife=0 --minclasses=0 --history=0 
         ipa pwpolicy-show > $out
         minlife=`grep "Min lifetime" $out | cut -d":" -f2|xargs echo`
         classes=`grep "classes:" $out | cut -d":" -f2|xargs echo`
@@ -1230,14 +1236,14 @@ ipapassword_grouppolicy_maxlifetime_default_logic()
         local maxlife=`echo "$grouppw_maxlife * 24 * 60 * 60 " |bc `
         local minlife=`echo "$grouppw_minlife * 60 * 60 " |bc`
         local midpoint=`echo "($minlife + $maxlife)/2" |bc` 
-        echo "mid point: [$midpoint]"
+        echo "maxlife [$grouppw_maxlife], minlife [$grouppw_minlife] mid point: [$midpoint]"
         set_systime "+ $midpoint"
         rlRun "$kdestroy"
         rlRun "echo $testacPW | kinit $testac" 0 "kinit use same password between minlife and max life should success"
         rlRun "$kdestroy"
 
         rlLog "when system time > maxlife, ipa server should prompt for password change"
-        set_systime "+ $midpoint + $midpoint + $midpoint"  # set system time after the max life
+        set_systime "+ $midpoint + 60"  # set system time after the max life
         kinit_aftermaxlife $testac $testacPW $testacNEWPW
 
     # test logic ends
@@ -1438,7 +1444,7 @@ ipapassword_grouppolicy_history_default()
         reset_group_pwpolicy
         Local_KinitAsAdmin
         rlLog "disable other password policy constrains"
-        ipa pwpolicy-mod $testgrp --maxlife=$grouppw_maxlife --minlife=0 --minlength=0 --minclasses=1 
+        ipa pwpolicy-mod $testgrp --maxfail=0 --failinterval=0 --lockouttime=0 --maxlife=$grouppw_maxlife --minlife=0 --minlength=0 --minclasses=1 
         ipa pwpolicy-show $testgrp > $out
         minlife=`grep "Min lifetime" $out | cut -d":" -f2|xargs echo`
         length=`grep "length:" $out | cut -d":" -f2|xargs echo`
@@ -1525,7 +1531,7 @@ ipapassword_grouppolicy_history_lowerbound()
         rlLog "lowerbound of password history is $lowbound"
         Local_KinitAsAdmin
         rlLog "disable other password policy constrains"
-        ipa pwpolicy-mod $testgrp --maxlife=$grouppw_maxlife --minlife=0 --minlength=0 --minclasses=1 --history=$lowbound
+        ipa pwpolicy-mod $testgrp --maxfail=0 --failinterval=0 --lockouttime=0 --maxlife=$grouppw_maxlife --minlife=0 --minlength=0 --minclasses=1 --history=$lowbound
         ipa pwpolicy-show $testgrp > $out
         minlife=`grep "Min lifetime" $out | cut -d":" -f2|xargs echo`
         length=`grep "length:" $out | cut -d":" -f2|xargs echo`
@@ -1649,7 +1655,7 @@ ipapassword_grouppolicy_classes_default()
         reset_group_pwpolicy
         Local_KinitAsAdmin
         rlLog "disable other password policy constrains"
-        ipa pwpolicy-mod $testgrp --maxlife=$grouppw_maxlife --minlife=0 --minlength=0 --history=0 
+        ipa pwpolicy-mod $testgrp --maxfail=0 --failinterval=0 --lockouttime=0 --maxlife=$grouppw_maxlife --minlife=0 --minlength=0 --history=0 
         ipa pwpolicy-show $testgrp > $out
         minlife=`grep "Min lifetime" $out | cut -d":" -f2|xargs echo`
         length=`grep "length:" $out | cut -d":" -f2|xargs echo`
@@ -1814,7 +1820,7 @@ ipapassword_grouppolicy_classes_upperbound()
         add_test_grp
         reset_group_pwpolicy
         Local_KinitAsAdmin
-        ipa pwpolicy-mod $testgrp --maxlife=$globalpw_maxlife --minlife=0 --minlength=0 --history=0 
+        ipa pwpolicy-mod $testgrp --maxfail=0 --failinterval=0 --lockouttime=0 --maxlife=$globalpw_maxlife --minlife=0 --minlength=0 --history=0 
         ipa pwpolicy-show $testgrp > $out
         minlife=`grep "Min lifetime" $out | cut -d":" -f2|xargs echo`
         length=`grep "length:" $out | cut -d":" -f2|xargs echo`
@@ -1932,7 +1938,7 @@ ipapassword_grouppolicy_length_default()
         reset_group_pwpolicy
         rlLog "disable other password policy constrains"
         Local_KinitAsAdmin
-        ipa pwpolicy-mod $testgrp --maxlife=$globalpw_maxlife --minlife=0 --minclasses=0 --history=0 
+        ipa pwpolicy-mod $testgrp --maxfail=0 --failinterval=0 --lockouttime=0 --maxlife=$globalpw_maxlife --minlife=0 --minclasses=0 --history=0 
         ipa pwpolicy-show $testgrp > $out
         minlife=`grep "Min lifetime" $out | cut -d":" -f2|xargs echo`
         classes=`grep "classes:" $out | cut -d":" -f2|xargs echo`
@@ -2021,7 +2027,7 @@ ipapassword_grouppolicy_length_lowerbound()
         reset_group_pwpolicy
         rlLog "disable other password policy constrains"
         Local_KinitAsAdmin
-        ipa pwpolicy-mod $testgrp --maxlife=$grouppw_maxlife --minlife=0 --minclasses=0 --history=0 --minlength=0
+        ipa pwpolicy-mod $testgrp --maxfail=0 --failinterval=0 --lockouttime=0 --maxlife=$grouppw_maxlife --minlife=0 --minclasses=0 --history=0 --minlength=0
         ipa pwpolicy-show $testgrp > $out
         minlife=`grep "Min lifetime" $out | cut -d":" -f2|xargs echo`
         classes=`grep "classes:" $out | cut -d":" -f2|xargs echo`
@@ -2067,7 +2073,7 @@ ipapassword_grouppolicy_length_upperbound()
         reset_group_pwpolicy
         rlLog "disable other password policy constrains"
         Local_KinitAsAdmin
-        ipa pwpolicy-mod $testgrp --maxlife=$grouppw_maxlife --minlife=0 --minclasses=0 --history=0 
+        ipa pwpolicy-mod $testgrp --maxfail=0 --failinterval=0 --lockouttime=0 --maxlife=$grouppw_maxlife --minlife=0 --minclasses=0 --history=0 
         ipa pwpolicy-show $testgrp > $out
         minlife=`grep "Min lifetime" $out | cut -d":" -f2|xargs echo`
         classes=`grep "classes:" $out | cut -d":" -f2|xargs echo`
