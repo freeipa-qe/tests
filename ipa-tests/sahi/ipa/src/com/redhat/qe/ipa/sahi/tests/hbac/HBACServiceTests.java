@@ -70,7 +70,8 @@ public class HBACServiceTests  extends SahiTestScript{
 	/*
 	 * Add a HBACService
 	 */
-	@Test (groups={"hbacServiceAddTests"}, description="Commented test for Bug 738339", dataProvider="getHBACServiceTestObjects")	
+	@Test (groups={"hbacServiceAddTests"}, description="Add a HBACService; Commented test for Bug 738339", 
+			dataProvider="getHBACServiceTestObjects")	
 	public void testHBACServiceAdd(String testName, String cn, String description) throws Exception {
 		//verify rule doesn't exist
 		Assert.assertFalse(sahiTasks.link(cn).exists(), "Verify HBAC Service " + cn + " doesn't already exist");
@@ -84,7 +85,8 @@ public class HBACServiceTests  extends SahiTestScript{
 	/*
 	 * Add, and then add another HBACService
 	 */
-	@Test (groups={"hbacServiceAddAndAddAnotherTests"}, dataProvider="getHBACServiceAddAndAddAnotherTestObjects")	
+	@Test (groups={"hbacServiceAddAndAddAnotherTests"}, description="Add, and then add another HBACService",
+			dataProvider="getHBACServiceAddAndAddAnotherTestObjects")	
 	public void testHBACServiceAddAndAddAnother(String testName, String cn1, String cn2, String description) throws Exception {
 		//verify user, user group, host, host group doesn't exist
 		Assert.assertFalse(sahiTasks.link(cn1).exists(), "Verify HBAC Service " + cn1 + " doesn't already exist");
@@ -101,7 +103,8 @@ public class HBACServiceTests  extends SahiTestScript{
 	/*
 	 * Add, and edit HBAC Service
 	 */	
-	@Test (groups={"hbacServiceAddAndEditTests"}, dataProvider="getSingleHBACServiceTestObjects", dependsOnGroups="hbacServiceCancelAddTests")	
+	@Test (groups={"hbacServiceAddAndEditTests"}, description="Add, and edit HBAC Service",
+			dataProvider="getHBACServiceAddAndEditTestObjects", dependsOnGroups="hbacServiceCancelAddTests")	
 	public void testHBACServiceAddAndEdit(String testName, String cn, String description) throws Exception {
 		
 		//verify rule doesn't exist
@@ -117,7 +120,8 @@ public class HBACServiceTests  extends SahiTestScript{
 	/*
 	 * Add, but Cancel adding HBAC Service
 	 */
-	@Test (groups={"hbacServiceCancelAddTests"}, dataProvider="getSingleHBACServiceTestObjects")	
+	@Test (groups={"hbacServiceCancelAddTests"}, description="Add, but Cancel adding HBAC Service",
+			dataProvider="getHBACServiceCancelAddTestObjects")	
 	public void testHBACServiceCancelAdd(String testName, String cn, String description) throws Exception {
 		//verify rule doesn't exist
 		Assert.assertFalse(sahiTasks.link(cn).exists(), "Verify HBAC Service " + cn + " doesn't already exist");
@@ -133,7 +137,8 @@ public class HBACServiceTests  extends SahiTestScript{
 	/*
 	 * Add Service - for negative tests
 	 */
-	@Test (groups={"invalidhbacServiceAddTests"}, dataProvider="getInvalidHBACServiceTestObjects", dependsOnGroups="hbacServiceAddTests")	
+	@Test (groups={"invalidhbacServiceAddTests"}, description="Add Service - for negative tests",
+			dataProvider="getInvalidHBACServiceTestObjects", dependsOnGroups="hbacServiceAddTests")	
 	public void testInvalidHBACServiceadd(String testName, String cn, String description, String expectedError) throws Exception {
 		//new test user can be added now
 		HBACTasks.createInvalidService(sahiTasks, cn, description, expectedError);		
@@ -229,7 +234,8 @@ public class HBACServiceTests  extends SahiTestScript{
 	/*
 	 * Delete multiple HBAC Services
 	 */
-	@Test (groups={"hbacServiceMultipleDeleteTests"}, dataProvider="getMultipleHBACServiceTestObjects", 
+	@Test (groups={"hbacServiceMultipleDeleteTests"}, description="Delete multiple HBAC Services",
+			dataProvider="getMultipleHBACServiceTestObjects", 
 			dependsOnGroups={"hbacServiceAddTests", "hbacServiceAddAndEditTests", "invalidhbacServiceAddTests", 
 			"hbacServiceSearchTests", "hbacServiceEditTests", "hbacServiceEnrollTests", "hbacServiceCancelEnrollTests",
 			"hbacServiceCancelDeleteEnrolledTests", "hbacServiceDeleteEnrolledTests"})
@@ -255,7 +261,8 @@ public class HBACServiceTests  extends SahiTestScript{
 	/*
 	 * Search an HBAC Service
 	 */
-	@Test (groups={"hbacServiceSearchTests"}, dataProvider="getHBACServiceSearchTestObjects",  dependsOnGroups={"hbacServiceAddTests", "hbacServiceAddAndEditTests", "hbacServiceAddAndAddAnotherTests"})
+	@Test (groups={"hbacServiceSearchTests"}, description="Search an HBAC Service",
+			dataProvider="getHBACServiceSearchTestObjects",  dependsOnGroups={"hbacServiceAddTests", "hbacServiceAddAndEditTests", "hbacServiceAddAndAddAnotherTests"})
 	public void testHBACServiceSearch(String testName, String searchString, String multipleResult1, String multipleResult2, String multipleResult3, String multipleResult4, String multipleResult5) throws Exception {		
 		String[] multipleResults = {multipleResult1, multipleResult2, multipleResult3, multipleResult4, multipleResult5}; 
 		CommonTasks.search(sahiTasks, searchString);
@@ -272,7 +279,8 @@ public class HBACServiceTests  extends SahiTestScript{
 	/*
 	 * Expand/Collapse details of an HBAC Service
 	 */
-	@Test (groups={"hbacServiceExpandCollapseTests"}, dataProvider="getSingleHBACServiceTestObjects",  dependsOnGroups="hbacServiceAddAndEditTests")	
+	@Test (groups={"hbacServiceExpandCollapseTests"}, description="Expand/Collapse details of an HBAC Service",
+			dataProvider="getHBACServiceExpandCollapseTestObjects",  dependsOnGroups="hbacServiceAddAndEditTests")	
 	public void testHBACServiceExpandCollapse(String testName, String cn, String description) throws Exception {
 		
 		HBACTasks.expandCollapseService(sahiTasks, cn, false);		
@@ -282,7 +290,8 @@ public class HBACServiceTests  extends SahiTestScript{
 	/*
 	 * Delete an HBAC Service
 	 */
-	@Test (groups={"hbacServiceDeleteTests"}, dataProvider="getHBACServiceDeleteTestObjects", dependsOnGroups={"hbacServiceAddAndAddAnotherTests", "hbacServiceSearchTests", "hbacServiceCancelDeleteTests" })	
+	@Test (groups={"hbacServiceDeleteTests"}, description="Delete an HBAC Service",
+			dataProvider="getHBACServiceDeleteTestObjects", dependsOnGroups={"hbacServiceAddAndAddAnotherTests", "hbacServiceSearchTests", "hbacServiceCancelDeleteTests" })	
 	public void testHBACServiceDelete(String testName, String cn) throws Exception {
 		//verify rule to be deleted exists
 		Assert.assertTrue(sahiTasks.link(cn).exists(), "Verify HBAC Service " + cn + "  to be deleted exists");
@@ -297,7 +306,8 @@ public class HBACServiceTests  extends SahiTestScript{
 	/*
 	 * Edit an HBAC Service
 	 */
-	@Test (groups={"hbacServiceEditTests"}, dataProvider="getSingleHBACServiceTestObjects", dependsOnGroups={"hbacServiceAddAndEditTests" })	
+	@Test (groups={"hbacServiceEditTests"}, description="Edit an HBAC Service",
+			dataProvider="getHBACServiceEditTestObjects", dependsOnGroups={"hbacServiceAddAndEditTests" })	
 	public void testHBACServiceEdit(String testName, String cn, String description) throws Exception {
 		//verify HBAC Service to be edited exists
 		Assert.assertTrue(sahiTasks.link(cn).exists(), "Verify HBAC Rule " + cn + "  to be edited exists");
@@ -313,7 +323,8 @@ public class HBACServiceTests  extends SahiTestScript{
 	/*
 	 * Delete, but Cancel deleting an HBACRule
 	 */
-	@Test (groups={"hbacServiceCancelDeleteTests"}, dataProvider="getHBACServiceDeleteTestObjects", dependsOnGroups={"hbacServiceAddAndAddAnotherTests" })	
+	@Test (groups={"hbacServiceCancelDeleteTests"}, description="Delete, but Cancel deleting an HBACRule",
+			dataProvider="getHBACServiceCancelDeleteTestObjects", dependsOnGroups={"hbacServiceAddAndAddAnotherTests" })	
 	public void testHBACServiceCancelDelete(String testName, String cn) throws Exception {
 		//verify rule to be deleted exists
 		Assert.assertTrue(sahiTasks.link(cn).exists(), "Verify HBAC Rule " + cn + "  to be deleted exists");
@@ -328,7 +339,8 @@ public class HBACServiceTests  extends SahiTestScript{
 	@AfterClass (groups={"cleanup"}, description="Delete objects created for this test suite", alwaysRun=true, dependsOnGroups="init")
 	public void cleanup() throws CloneNotSupportedException {
 		String[] hbacRuleTestObjects = {"abcdefghijklmnopqrstuvwxyz123456789ANDAGAINabcdefghijklmnopqrstuvwxyz123456789ANDAGAINabcdefghijklmnopqrstuvwxyz123456789",
-										//"h@ba*c#Se?r!v<i~c`e"
+										//"h@ba*c#Se?r!v<i~c`e",
+										"rlogin"
 										} ; 
 		
 		//verify rules were found
@@ -361,9 +373,9 @@ public class HBACServiceTests  extends SahiTestScript{
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
         //										testname					cn			description
-		ll.add(Arrays.asList(new Object[]{ "good_hbacservice",				"http",		"testing http service for HBAC"      } ));
-		ll.add(Arrays.asList(new Object[]{ "good_hbacservice",				"https",	"testing https service for HBAC"      } ));
-		ll.add(Arrays.asList(new Object[]{ "hbacservice_long",				"abcdefghijklmnopqrstuvwxyz123456789ANDAGAINabcdefghijklmnopqrstuvwxyz123456789ANDAGAINabcdefghijklmnopqrstuvwxyz123456789", "long svc name"      } ));
+		ll.add(Arrays.asList(new Object[]{ "good_service",				"http",		"testing http service for HBAC"      } ));
+		ll.add(Arrays.asList(new Object[]{ "test_service",				"https",	"testing https service for HBAC"      } ));
+		ll.add(Arrays.asList(new Object[]{ "long_service",				"abcdefghijklmnopqrstuvwxyz123456789ANDAGAINabcdefghijklmnopqrstuvwxyz123456789ANDAGAINabcdefghijklmnopqrstuvwxyz123456789", "long svc name"      } ));
 		// FIXME: nkrishnan - Bug 738339 - [ipa webui] Encode special chars in values when displaying 
 		// not uncommenting, since flow depends on this test passing
 	   // ll.add(Arrays.asList(new Object[]{ "hbacservice_specialchar",	    "h@ba*c#Se?r!v<i~c`e",			"svc name with special char"      } ));
@@ -382,7 +394,58 @@ public class HBACServiceTests  extends SahiTestScript{
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
         //										testname						cn1			cn2 		description  
-		ll.add(Arrays.asList(new Object[]{ "create_two_good_hbacservice",		"rlogin",	"portmap",	"testing svc for HBAC"			  } ));
+		ll.add(Arrays.asList(new Object[]{ "add_and_add_another_service",		"rlogin",	"portmap",	"testing svc for HBAC"			  } ));
+		
+		return ll;	
+	}
+	
+	
+	/*
+	 * Data to be used when adding service 
+	 */
+	@DataProvider(name="getHBACServiceAddAndEditTestObjects")
+	public Object[][] getHBACServiceAddAndEditTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createHBACServiceAddAndEditTestObject());
+	}
+	protected List<List<Object>> createHBACServiceAddAndEditTestObject() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname				cn			description	   
+		ll.add(Arrays.asList(new Object[]{ "add_and_edit_service",		"ntpd",		"testing ntpd service for HBAC"      } ));
+		
+		return ll;	
+	}
+	
+	
+	/*
+	 * Data to be used when adding service 
+	 */
+	@DataProvider(name="getHBACServiceCancelAddTestObjects")
+	public Object[][] getHBACServiceCancelAddTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createHBACServiceCancelAddTestObject());
+	}
+	protected List<List<Object>> createHBACServiceCancelAddTestObject() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname				cn			description	   
+		ll.add(Arrays.asList(new Object[]{ "cancel_add_service",		"ntpd",		"testing ntpd service for HBAC"      } ));
+		
+		return ll;	
+	}
+	
+	
+	/*
+	 * Data to be used when adding service 
+	 */
+	@DataProvider(name="getHBACServiceExpandCollapseTestObjects")
+	public Object[][] getHBACServiceExpandCollapseTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createHBACServiceExpandCollapseTestObject());
+	}
+	protected List<List<Object>> createHBACServiceExpandCollapseTestObject() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname					cn			description	   
+		ll.add(Arrays.asList(new Object[]{ "expandcollapse_service",		"ntpd",		"testing ntpd service for HBAC"      } ));
 		
 		return ll;	
 	}
@@ -390,15 +453,15 @@ public class HBACServiceTests  extends SahiTestScript{
 	/*
 	 * Data to be used when adding service 
 	 */
-	@DataProvider(name="getSingleHBACServiceTestObjects")
-	public Object[][] getSingleHBACServiceTestObjects() {
-		return TestNGUtils.convertListOfListsTo2dArray(createSingleHBACServiceTestObject());
+	@DataProvider(name="getHBACServiceEditTestObjects")
+	public Object[][] getSingleHBACServiceEditTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createHBACServiceEditTestObject());
 	}
-	protected List<List<Object>> createSingleHBACServiceTestObject() {		
+	protected List<List<Object>> createHBACServiceEditTestObject() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-        //										testname					cn			description	   
-		ll.add(Arrays.asList(new Object[]{ "create_good_hbacservice",		"ntpd",		"testing ntpd service for HBAC"      } ));
+        //										testname		cn			description	   
+		ll.add(Arrays.asList(new Object[]{ "edit_service",		"ntpd",		"testing ntpd service for HBAC"      } ));
 		
 		return ll;	
 	}
@@ -415,11 +478,11 @@ public class HBACServiceTests  extends SahiTestScript{
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
         //										testname								cn				description									expected_Error   
-		ll.add(Arrays.asList(new Object[]{ "create_duplicate_hbacservice",				"http",			"duplicate service",						"HBAC service with name \"http\" already exists"      } ));
-		ll.add(Arrays.asList(new Object[]{ "hbacservice_with trailing_space_in_name",	"hbacSvc ",		"service with trailing space in name",		"invalid 'service': Leading and trailing spaces are not allowed"	} ));
-		ll.add(Arrays.asList(new Object[]{ "hbacservice_with leading_space_in_name",	" hbacSvc",		"service with leading space in name",		"invalid 'service': Leading and trailing spaces are not allowed"	} ));
-		ll.add(Arrays.asList(new Object[]{ "hbacservice_with trailing_space_in_desc",	"hbacSvc",		"service with trailing space in desc ",		"invalid 'desc': Leading and trailing spaces are not allowed"	} ));
-		ll.add(Arrays.asList(new Object[]{ "hbacservice_with leading_space_in_desc",	"hbacSvc",		" service with leading space in desc",		"invalid 'desc': Leading and trailing spaces are not allowed"	} ));
+		ll.add(Arrays.asList(new Object[]{ "create_duplicate_service",					"http",			"duplicate service",						"HBAC service with name \"http\" already exists"      } ));
+		ll.add(Arrays.asList(new Object[]{ "service_with trailing_space_in_name",		"hbacSvc ",		"service with trailing space in name",		"invalid 'service': Leading and trailing spaces are not allowed"	} ));
+		ll.add(Arrays.asList(new Object[]{ "service_with leading_space_in_name",		" hbacSvc",		"service with leading space in name",		"invalid 'service': Leading and trailing spaces are not allowed"	} ));
+		ll.add(Arrays.asList(new Object[]{ "service_with trailing_space_in_desc",		"hbacSvc",		"service with trailing space in desc ",		"invalid 'desc': Leading and trailing spaces are not allowed"	} ));
+		ll.add(Arrays.asList(new Object[]{ "service_with leading_space_in_desc",		"hbacSvc",		" service with leading space in desc",		"invalid 'desc': Leading and trailing spaces are not allowed"	} ));
 		
 		return ll;	
 	}
@@ -435,7 +498,7 @@ public class HBACServiceTests  extends SahiTestScript{
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
         //										testname					cn1			cn2				cn3																																	cn4   
-		ll.add(Arrays.asList(new Object[]{ "delete_multiple_hbacservice",	"http",		"https",		"ntpd"      } ));
+		ll.add(Arrays.asList(new Object[]{ "delete_multiple_service",		"http",		"https",		"ntpd"      } ));
 		
 		return ll;	
 	}
@@ -469,11 +532,28 @@ public class HBACServiceTests  extends SahiTestScript{
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
         //										testname					cn				   
-		ll.add(Arrays.asList(new Object[]{ "delete_hbacservice1",		"portmap"	 } ));
-		ll.add(Arrays.asList(new Object[]{ "delete_hbacservice2",		"rlogin"	 } ));
+		ll.add(Arrays.asList(new Object[]{ "delete_hbacservice",		"portmap"	 } ));
 		
 		return ll;	
 	}
+	
+	
+	/*
+	 * Data to be used when deleting service 
+	 */
+	@DataProvider(name="getHBACServiceCancelDeleteTestObjects")
+	public Object[][] getHBACServiceCancelDeleteTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(cancelDeleteHBACServiceTestObject());
+	}
+	protected List<List<Object>> cancelDeleteHBACServiceTestObject() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname					cn				   
+		ll.add(Arrays.asList(new Object[]{ "cancel_delete_hbacservice",		"portmap"	 } ));
+		
+		return ll;	
+	}
+	
 	
 	
 	/*
@@ -486,8 +566,8 @@ public class HBACServiceTests  extends SahiTestScript{
 	protected List<List<Object>> createCancelEnrollHBACServiceTestObject() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-        //										testname											cn				   
-		ll.add(Arrays.asList(new Object[]{ "Cancel enrolling a Service into a Service Group",		"ntpd"      } ));
+        //										testname									cn				   
+		ll.add(Arrays.asList(new Object[]{ "cancel_enroll_service_into_servicegroup",		"ntpd"      } ));
 		
 		return ll;	
 	}
@@ -503,8 +583,8 @@ public class HBACServiceTests  extends SahiTestScript{
 	protected List<List<Object>> createEnrollHBACServiceTestObject() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-        //										testname											cn				   
-		ll.add(Arrays.asList(new Object[]{ "Enroll a Service into a Service Group",		"ntpd"      } ));
+        //										testname						cn				   
+		ll.add(Arrays.asList(new Object[]{ "enroll_service_into_group",			"ntpd"      } ));
 		
 		return ll;	
 	}
@@ -519,8 +599,8 @@ public class HBACServiceTests  extends SahiTestScript{
 	protected List<List<Object>> createCancelDelEnrolledHBACServiceTestObject() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-        //										testname											cn				   
-		ll.add(Arrays.asList(new Object[]{ "Cancel deleting an enrolled service from its group",	"ntpd"      } ));
+        //										testname							cn				   
+		ll.add(Arrays.asList(new Object[]{ "cancel_deleting_service_from_group",	"ntpd"      } ));
 		
 		return ll;	
 	}
@@ -535,8 +615,8 @@ public class HBACServiceTests  extends SahiTestScript{
 	protected List<List<Object>> createDeleteEnrolledHBACServiceTestObject() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-        //										testname									cn				   
-		ll.add(Arrays.asList(new Object[]{ "Delete an enrolled service from its group",		"ntpd"      } ));
+        //										testname					cn				   
+		ll.add(Arrays.asList(new Object[]{ "delete_service_from_group",		"ntpd"      } ));
 		
 		return ll;	
 	}

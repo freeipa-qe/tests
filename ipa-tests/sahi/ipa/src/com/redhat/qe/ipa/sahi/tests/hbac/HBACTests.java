@@ -144,7 +144,8 @@ public class HBACTests extends SahiTestScript {
 	/*
 	 * Add HBACRule
 	 */
-	@Test (groups={"hbacRuleAddTests"}, dataProvider="getHBACRuleTestObjects")	
+	@Test (groups={"hbacRuleAddTests"}, description="Add HBAC Rules",
+			dataProvider="getHBACRuleTestObjects")	
 	public void testHBACRuleAdd(String testName, String cn) throws Exception {
 		//verify rule doesn't exist
 		Assert.assertFalse(sahiTasks.link(cn).exists(), "Verify HBAC Rule " + cn + " doesn't already exist");
@@ -158,7 +159,8 @@ public class HBACTests extends SahiTestScript {
 	/*
 	 * Add, and then add another HBACRule
 	 */
-	@Test (groups={"hbacRuleAddAndAddAnotherTests"}, dataProvider="getHBACRuleAddAndAddAnotherTestObjects")	
+	@Test (groups={"hbacRuleAddAndAddAnotherTests"}, description="Add and Add Another HBAC Rule",
+			dataProvider="getHBACRuleAddAndAddAnotherTestObjects")	
 	public void testHBACRuleAddAndAddAnother(String testName, String cn1, String cn2) throws Exception {
 		//verify user, user group, host, host group doesn't exist
 		Assert.assertFalse(sahiTasks.link(cn1).exists(), "Verify HBAC Rule " + cn1 + " doesn't already exist");
@@ -174,7 +176,8 @@ public class HBACTests extends SahiTestScript {
 	/*
 	 * Add, but Cancel adding HBACRule
 	 */
-	@Test (groups={"hbacRuleCancelAddTests"}, dataProvider="getSingleHBACRuleTestObjects")	
+	@Test (groups={"hbacRuleCancelAddTests"}, description="Cancel Add an HBAC Rule",
+			dataProvider="getCancelAddHBACRuleTestObjects")	
 	public void testHBACRuleCancelAdd(String testName, String cn) throws Exception {
 		//verify rule doesn't exist
 		Assert.assertFalse(sahiTasks.link(cn).exists(), "Verify HBAC Rule " + cn + " doesn't already exist");
@@ -189,7 +192,8 @@ public class HBACTests extends SahiTestScript {
 	/*
 	 * Add, and edit HBACRule
 	 */	
-	@Test (groups={"hbacRuleAddAndEditTests"}, description="commented test for Bug 735185", dataProvider="getSingleHBACRuleTestObjects", dependsOnGroups="hbacRuleCancelAddTests")	
+	@Test (groups={"hbacRuleAddAndEditTests"}, description="Add and Edit an HBAC rule; commented test for Bug 735185", 
+			dataProvider="getAddAndEditHBACRuleTestObjects", dependsOnGroups="hbacRuleCancelAddTests")	
 	public void testHBACRuleAddAndEdit(String testName, String cn) throws Exception {
 		
 		//verify rule doesn't exist
@@ -208,7 +212,8 @@ public class HBACTests extends SahiTestScript {
 	/*
 	 * Add Rules - for negative tests
 	 */
-	@Test (groups={"invalidhbacRuleAddTests"}, dataProvider="getInvalidHBACRuleTestObjects", dependsOnGroups="hbacRuleAddTests")	
+	@Test (groups={"invalidhbacRuleAddTests"}, description="Add HBAC Rules - invalid",
+			dataProvider="getInvalidHBACRuleTestObjects", dependsOnGroups="hbacRuleAddTests")	
 	public void testInvalidHBACRuleadd(String testName, String cn, String expectedError) throws Exception {
 		//new test user can be added now
 		HBACTasks.createInvalidRule(sahiTasks, cn, expectedError);		
@@ -217,7 +222,8 @@ public class HBACTests extends SahiTestScript {
 	/*
 	 * Add Rules - check required fields - for negative tests
 	 */
-	@Test (groups={"hbacRuleRequiredFieldAddTests"}, dataProvider="getHBACRuleRequiredFieldTestObjects")	
+	@Test (groups={"hbacRuleRequiredFieldAddTests"}, description="Add HBAC Rules - missing required field",
+			dataProvider="getHBACRuleRequiredFieldTestObjects")	
 	public void testHBACRuleRequiredFieldAdd(String testName, String cn, String expectedError) throws Exception {
 		//new test user can be added now
 		HBACTasks.createRuleWithRequiredField(sahiTasks, cn, expectedError);		
@@ -226,9 +232,10 @@ public class HBACTests extends SahiTestScript {
 	/*
 	 * Delete an HBACRule
 	 */
-	@Test (groups={"hbacRuleDeleteTests"}, dataProvider="getHBACRuleDeleteTestObjects", dependsOnGroups={"hbacRuleAddAndEditTests",
-			"hbacRuleAddAndAddAnotherTests", "hbacRuleSearchTests", "hbacRuleViaServiceSettingsTests", "hbacRuleWhoSettingsTests", 
-			"hbacRuleGeneralSettingsTests", "hbacRuleFromSettingsTests" })	
+	@Test (groups={"hbacRuleDeleteTests"}, description="Delete an HBAC Rule",
+			dataProvider="getHBACRuleDeleteTestObjects", 
+			dependsOnGroups={"hbacRuleAddAndEditTests",	"hbacRuleAddAndAddAnotherTests", "hbacRuleSearchTests", 
+			"hbacRuleViaServiceSettingsTests", "hbacRuleWhoSettingsTests", 	"hbacRuleGeneralSettingsTests", "hbacRuleFromSettingsTests" })	
 	public void testHBACRuleDelete(String testName, String cn) throws Exception {
 		//verify rule to be deleted exists
 		Assert.assertTrue(sahiTasks.link(cn).exists(), "Verify HBAC Rule " + cn + "  to be deleted exists");
@@ -243,7 +250,9 @@ public class HBACTests extends SahiTestScript {
 	/*
 	 * Delete multiple HBACRule
 	 */
-	@Test (groups={"hbacRuleMultipleDeleteTests"}, dataProvider="getMultipleHBACRuleTestObjects", dependsOnGroups={"hbacRuleAddTests", "hbacRuleSearchTests", "invalidhbacRuleAddTests", "hbacRuleMemberListTests" })
+	@Test (groups={"hbacRuleMultipleDeleteTests"}, description="Delete multiple HBAC Rules",
+			dataProvider="getMultipleHBACRuleTestObjects", 
+			dependsOnGroups={"hbacRuleAddTests", "hbacRuleSearchTests", "invalidhbacRuleAddTests", "hbacRuleMemberListTests" })
 	public void testMultipleHBACRuleDelete(String testName, String cn1, String cn2, String cn3) throws Exception {	
 		String cns[] = {cn1, cn2, cn3};
 		
@@ -261,7 +270,8 @@ public class HBACTests extends SahiTestScript {
 	/*
 	 * Delete, but Cancel deleting an HBACRule
 	 */
-	@Test (groups={"hbacRuleCancelDeleteTests"}, dataProvider="getSingleHBACRuleTestObjects", dependsOnGroups={"hbacRuleAddAndEditTests" })	
+	@Test (groups={"hbacRuleCancelDeleteTests"}, description="Cancel Delete an HBAC Rule",
+			dataProvider="getCancelDeleteHBACRuleTestObjects", dependsOnGroups={"hbacRuleAddAndEditTests" })	
 	public void testHBACRuleCancelDelete(String testName, String cn) throws Exception {
 		//verify rule to be deleted exists
 		Assert.assertTrue(sahiTasks.link(cn).exists(), "Verify HBAC Rule " + cn + "  to be deleted exists");
@@ -276,7 +286,8 @@ public class HBACTests extends SahiTestScript {
 	/*
 	 * Edit, but Reset/Undo an HBACRule
 	 */
-	@Test (groups={"hbacRuleResetUndoSettingsTests"}, dataProvider="getSingleHBACRuleTestObjects", dependsOnGroups={"hbacRuleAddAndEditTests"})	
+	@Test (groups={"hbacRuleResetUndoSettingsTests"}, description="Edit, but Reset/Undo an HBACRule",
+			dataProvider="getResetUndoHBACRuleTestObjects", dependsOnGroups={"hbacRuleAddAndEditTests"})	
 	public void testHBACRuleResetSettings(String testName, String cn) throws Exception {		
 		//verify rule to be edited exists
 		Assert.assertTrue(sahiTasks.link(cn).exists(), "Verify Rule " + cn + " to be edited exists");
@@ -289,7 +300,8 @@ public class HBACTests extends SahiTestScript {
 	/*
 	 * Edit the General Section for the HBACRule
 	 */
-	@Test (groups={"hbacRuleInvalidGeneralSettingsTests"}, dataProvider="getHBACRuleInvalidGeneralSettingsTestObjects", dependsOnGroups={"hbacRuleAddAndEditTests"})	
+	@Test (groups={"hbacRuleInvalidGeneralSettingsTests"}, description="Edit the General Section for the HBACRule - invalid",
+			dataProvider="getHBACRuleInvalidGeneralSettingsTestObjects", dependsOnGroups={"hbacRuleAddAndEditTests"})	
 	public void testHBACRuleInvalidGeneralSettings(String testName, String cn, String description) throws Exception {		
 		//verify rule to be edited exists
 		Assert.assertTrue(sahiTasks.link(cn).exists(), "Verify Rule " + cn + " to be edited exists");
@@ -304,7 +316,8 @@ public class HBACTests extends SahiTestScript {
 	/*
 	 * Edit the General Section for the HBACRule
 	 */
-	@Test (groups={"hbacRuleGeneralSettingsTests"}, dataProvider="getHBACRuleGeneralSettingsTestObjects", dependsOnGroups={"hbacRuleAddAndEditTests"})	
+	@Test (groups={"hbacRuleGeneralSettingsTests"}, description="Edit the General Section for the HBACRule",
+			dataProvider="getHBACRuleGeneralSettingsTestObjects", dependsOnGroups={"hbacRuleAddAndEditTests"})	
 	public void testHBACRuleGeneralSettings(String testName, String cn, String description) throws Exception {		
 		//verify rule to be edited exists
 		Assert.assertTrue(sahiTasks.link(cn).exists(), "Verify Rule " + cn + " to be edited exists");
@@ -320,7 +333,8 @@ public class HBACTests extends SahiTestScript {
 	/*
 	 * Edit the Who Section for the HBACRule
 	 */
-	@Test (groups={"hbacRuleWhoSettingsTests"}, dataProvider="getSingleHBACRuleTestObjects", dependsOnGroups={"hbacRuleAddAndEditTests", "hbacRuleMemberListTests"})	
+	@Test (groups={"hbacRuleWhoSettingsTests"}, description="Edit the Who Section for the HBACRule",
+			dataProvider="getHBACRuleWhoSettingsTestObjects", dependsOnGroups={"hbacRuleAddAndEditTests", "hbacRuleMemberListTests"})	
 	public void testHBACRuleWhoSettings(String testName, String cn) throws Exception {		
 		//verify rule to be edited exists
 		Assert.assertTrue(sahiTasks.link(cn).exists(), "Verify Rule " + cn + " to be edited exists");
@@ -336,7 +350,9 @@ public class HBACTests extends SahiTestScript {
 	/*
 	 * Edit the Accessing Section for the HBACRule
 	 */
-	@Test (groups={"hbacRuleAccessingSettingsTests"}, dataProvider="getSingleHBACRuleTestObjects", dependsOnGroups={"hbacRuleAddAndEditTests", "hbacRuleMemberListTests"})	
+	@Test (groups={"hbacRuleAccessingSettingsTests"}, description="Edit the Accessing Section for the HBACRule",
+			dataProvider="getHBACRuleAccessingSectionTestObjects", 
+			dependsOnGroups={"hbacRuleAddAndEditTests", "hbacRuleMemberListTests"})	
 	public void testHBACRuleAccessingSettings(String testName, String cn) throws Exception {		
 		//verify rule to be edited exists
 		Assert.assertTrue(sahiTasks.link(cn).exists(), "Verify Rule " + cn + " to be edited exists");
@@ -352,7 +368,9 @@ public class HBACTests extends SahiTestScript {
 	/*
 	 * Edit the From Section for the HBACRule
 	 */
-	@Test (groups={"hbacRuleFromSettingsTests"}, dataProvider="getSingleHBACRuleTestObjects", dependsOnGroups={"hbacRuleAddAndEditTests", "hbacRuleMemberListTests"})	
+	@Test (groups={"hbacRuleFromSettingsTests"}, description="Edit the From Section for the HBACRule",
+			dataProvider="getHBACRuleFromSectionTestObjects", 
+			dependsOnGroups={"hbacRuleAddAndEditTests", "hbacRuleMemberListTests"})	
 	public void testHBACRuleFromSettings(String testName, String cn) throws Exception {		
 		//verify rule to be edited exists
 		Assert.assertTrue(sahiTasks.link(cn).exists(), "Verify Rule " + cn + " to be edited exists");
@@ -367,7 +385,9 @@ public class HBACTests extends SahiTestScript {
 	/*
 	 * Edit the Via Service Section for the HBACRule
 	 */
-	@Test (groups={"hbacRuleViaServiceSettingsTests"}, dataProvider="getSingleHBACRuleTestObjects", dependsOnGroups={"hbacRuleAddAndEditTests"})	
+	@Test (groups={"hbacRuleViaServiceSettingsTests"}, description="Edit the Via Service Section for the HBACRule",
+			dataProvider="getHBACRuleViaServiceSectionTestObjects", 
+			dependsOnGroups={"hbacRuleAddAndEditTests"})	
 	public void testHBACRuleViaServiceSettings(String testName, String cn) throws Exception {		
 		//verify rule to be edited exists
 		Assert.assertTrue(sahiTasks.link(cn).exists(), "Verify Rule " + cn + " to be edited exists");
@@ -390,7 +410,8 @@ public class HBACTests extends SahiTestScript {
 	 * is not listed since it already is in the list for this Rule, because
 	 * the it is memberof hostgroupName
 	 */
-	@Test (groups={"hbacRuleMemberListTests"}, dataProvider="getHBACRuleMemberListTestObjects", dependsOnGroups={"hbacRuleAddTests"})	
+	@Test (groups={"hbacRuleMemberListTests"}, description="Verify host member list for the HBACRule", 
+			dataProvider="getHBACRuleHostMemberListTestObjects", dependsOnGroups={"hbacRuleAddTests"})	
 	public void testHBACRuleMemberList(String testName, String cn) throws Exception {		
 		//verify rule to be edited exists
 		Assert.assertTrue(sahiTasks.link(cn).exists(), "Verify Rule " + cn + " to be edited exists");
@@ -417,7 +438,8 @@ public class HBACTests extends SahiTestScript {
 	 * is not listed since it already is in the list for this Rule, because
 	 * the it is memberof groupName
 	 */
-	@Test (groups={"hbacRuleUserMemberListTests"}, dataProvider="getHBACRuleMemberListTestObjects", dependsOnGroups={"hbacRuleAddTests"})	
+	@Test (groups={"hbacRuleUserMemberListTests"}, description="Verify user member list for the HBACRule",
+			dataProvider="getHBACRuleUserMemberListTestObjects", dependsOnGroups={"hbacRuleAddTests"})	
 	public void testHBACRuleUserMemberList(String testName, String cn) throws Exception {		
 		//verify rule to be edited exists
 		Assert.assertTrue(sahiTasks.link(cn).exists(), "Verify Rule " + cn + " to be edited exists");
@@ -445,7 +467,9 @@ public class HBACTests extends SahiTestScript {
 	 * Update this
 	 * Should be successful
 	 */
-	@Test (groups={"hbacRuleUpdateCategoryTests"}, dataProvider="getSingleHBACRuleTestObjects", dependsOnGroups={"hbacRuleAddAndEditTests", "hbacRuleFromSettingsTests"})	
+	@Test (groups={"hbacRuleUpdateCategoryTests"}, description="Update category -> delete entries",
+			dataProvider="getHBACRuleUpdateCategoryTestObjects", 
+			dependsOnGroups={"hbacRuleAddAndEditTests", "hbacRuleFromSettingsTests"})	
 	public void testHBACRuleUpdateCategory(String testName, String cn) throws Exception {		
 		//verify rule to be edited exists
 		Assert.assertTrue(sahiTasks.link(cn).exists(), "Verify Rule " + cn + " to be edited exists");
@@ -457,7 +481,8 @@ public class HBACTests extends SahiTestScript {
 	/*
 	 * Expand/Collapse details of an HBACRule
 	 */
-	@Test (groups={"hbacRuleExpandCollapseTests"}, dataProvider="getSingleHBACRuleTestObjects",  dependsOnGroups="hbacRuleAddAndEditTests")
+	@Test (groups={"hbacRuleExpandCollapseTests"}, description="Expand/Collapse details of an HBACRule",
+			dataProvider="getHBACRuleExpandCollapseTestObjects",  dependsOnGroups="hbacRuleAddAndEditTests")
 	public void testHBACRuleExpandCollapse(String testName, String cn) throws Exception {
 		
 		HBACTasks.expandCollapseRule(sahiTasks, cn);		
@@ -467,7 +492,9 @@ public class HBACTests extends SahiTestScript {
 	/*
 	 * Search an HBACRule
 	 */
-	@Test (groups={"hbacRuleSearchTests"}, dataProvider="getHBACRuleSearchTestObjects",  dependsOnGroups={"hbacRuleAddTests", "hbacRuleAddAndEditTests", "hbacRuleAddAndAddAnotherTests"})
+	@Test (groups={"hbacRuleSearchTests"}, description="Search an HBACRule",
+			dataProvider="getHBACRuleSearchTestObjects",  
+			dependsOnGroups={"hbacRuleAddTests", "hbacRuleAddAndEditTests", "hbacRuleAddAndAddAnotherTests"})
 	public void testHBACRuleSearch(String testName, String cn, String multipleResult) throws Exception {		
 		CommonTasks.search(sahiTasks, cn);
 		
@@ -512,6 +539,19 @@ public class HBACTests extends SahiTestScript {
 		
 		
 		sahiTasks.navigateTo(commonTasks.hbacPage, true);
+		String[] hbacRuleTestObjects = {"doc_hbacRule", 
+										"doc_hbacRule1"
+										} ; 
+
+		//delete any leftover rules created for this test suite
+		for (String hbacRuleTestObject : hbacRuleTestObjects) {
+			if (sahiTasks.link(hbacRuleTestObject.toLowerCase()).exists()){
+				log.fine("Cleaning HBAC Service Group: " + hbacRuleTestObject);
+				HBACTasks.deleteHBAC(sahiTasks, hbacRuleTestObject.toLowerCase(), "Delete");
+			}			
+		} 
+
+		
 	}
 	
 	
@@ -531,9 +571,9 @@ public class HBACTests extends SahiTestScript {
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
         //										testname					cn   
-		ll.add(Arrays.asList(new Object[]{ "good_hbacrule",					"dev_hbacRule"      } ));
-		ll.add(Arrays.asList(new Object[]{ "hbacrule_long",					"abcdefghijklmnopqrstuvwxyz123456789ANDAGAINabcdefghijklmnopqrstuvwxyz123456789ANDAGAINabcdefghijklmnopqrstuvwxyz123456789"      } ));
-		ll.add(Arrays.asList(new Object[]{ "hbacrule_specialchar",			"h@ba*c#Ru?le"      } ));
+		ll.add(Arrays.asList(new Object[]{ "add_good_rule",					"dev_hbacRule"      } ));
+		ll.add(Arrays.asList(new Object[]{ "add_long_rule",					"abcdefghijklmnopqrstuvwxyz123456789ANDAGAINabcdefghijklmnopqrstuvwxyz123456789ANDAGAINabcdefghijklmnopqrstuvwxyz123456789"      } ));
+		ll.add(Arrays.asList(new Object[]{ "add_specialchar_rule",			"h@ba*c#Ru?le"      } ));
 		
 		return ll;	
 	}
@@ -545,8 +585,8 @@ public class HBACTests extends SahiTestScript {
 	protected List<List<Object>> deleteMultipleHBACRuleTestObjects() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-        //										testname					cn1					cn2																																	cn3   
-		ll.add(Arrays.asList(new Object[]{ "delete_multiple_hbacrule",		"dev_hbacRule",		"abcdefghijklmnopqrstuvwxyz123456789ANDAGAINabcdefghijklmnopqrstuvwxyz123456789ANDAGAINabcdefghijklmnopqrstuvwxyz123456789",		"h@ba*c#Ru?le"      } ));
+        //										testname				cn1					cn2																																	cn3   
+		ll.add(Arrays.asList(new Object[]{ "delete_multiple_rule",		"dev_hbacRule",		"abcdefghijklmnopqrstuvwxyz123456789ANDAGAINabcdefghijklmnopqrstuvwxyz123456789ANDAGAINabcdefghijklmnopqrstuvwxyz123456789",		"h@ba*c#Ru?le"      } ));
 		
 		return ll;	
 	}
@@ -555,11 +595,130 @@ public class HBACTests extends SahiTestScript {
 	/*
 	 * Data to be used when adding rules 
 	 */
-	@DataProvider(name="getSingleHBACRuleTestObjects")
-	public Object[][] getSingleHBACRuleTestObjects() {
-		return TestNGUtils.convertListOfListsTo2dArray(createSingleHBACRuleTestObject());
+	@DataProvider(name="getCancelAddHBACRuleTestObjects")
+	public Object[][] getCancelAddHBACRuleTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createCancelAddHBACRuleTestObject());
 	}
-	protected List<List<Object>> createSingleHBACRuleTestObject() {		
+	protected List<List<Object>> createCancelAddHBACRuleTestObject() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname				cn   
+		ll.add(Arrays.asList(new Object[]{ "cancel_add_rule",			"eng_hbacRule"      } ));
+		
+		return ll;	
+	}
+	
+	
+	/*
+	 * Data to be used when adding rules 
+	 */
+	@DataProvider(name="getAddAndEditHBACRuleTestObjects")
+	public Object[][] getAddAndEditHBACRuleTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createAddAndEditHBACRuleTestObject());
+	}
+	protected List<List<Object>> createAddAndEditHBACRuleTestObject() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname				cn   
+		ll.add(Arrays.asList(new Object[]{ "add_and_edit_rule",			"eng_hbacRule"      } ));
+		
+		return ll;	
+	}
+	
+	/*
+	 * Data to be used when adding rules 
+	 */
+	@DataProvider(name="getCancelDeleteHBACRuleTestObjects")
+	public Object[][] getCancelDeleteHBACRuleTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createCancelDeleteHBACRuleTestObject());
+	}
+	protected List<List<Object>> createCancelDeleteHBACRuleTestObject() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname					cn   
+		ll.add(Arrays.asList(new Object[]{ "cancel_delete_rule",			"eng_hbacRule"      } ));
+		
+		return ll;	
+	}
+	
+	
+	/*
+	 * Data to be used when adding rules 
+	 */
+	@DataProvider(name="getResetUndoHBACRuleTestObjects")
+	public Object[][] getResetUndoHBACRuleTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createResetUndoHBACRuleTestObject());
+	}
+	protected List<List<Object>> createResetUndoHBACRuleTestObject() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname				cn   
+		ll.add(Arrays.asList(new Object[]{ "reset_undo_rule",			"eng_hbacRule"      } ));
+		
+		return ll;	
+	}
+	
+	
+	/*
+	 * Data to be used when adding rules 
+	 */
+	@DataProvider(name="getHBACRuleWhoSettingsTestObjects")
+	public Object[][] getHBACRuleWhoSettingsTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createHBACRuleWhoSettingsTestObject());
+	}
+	protected List<List<Object>> createHBACRuleWhoSettingsTestObject() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname			cn   
+		ll.add(Arrays.asList(new Object[]{ "edit_who_rule",			"eng_hbacRule"      } ));
+		
+		return ll;	
+	}
+	
+	
+	/*
+	 * Data to be used when adding rules 
+	 */
+	@DataProvider(name="getHBACRuleAccessingSectionTestObjects")
+	public Object[][] getHBACRuleAccessingSectionTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createHBACRuleAccessingSectionTestObject());
+	}
+	protected List<List<Object>> createHBACRuleAccessingSectionTestObject() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname					cn   
+		ll.add(Arrays.asList(new Object[]{ "edit_accessing_rule",			"eng_hbacRule"      } ));
+		
+		return ll;	
+	}
+	
+	
+	
+	/*
+	 * Data to be used when adding rules 
+	 */
+	@DataProvider(name="getHBACRuleFromSectionTestObjects")
+	public Object[][] getHBACRuleFromSectionTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createHBACRuleFromSectionTestObject());
+	}
+	protected List<List<Object>> createHBACRuleFromSectionTestObject() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname					cn   
+		ll.add(Arrays.asList(new Object[]{ "edit_from_rule",			"eng_hbacRule"      } ));
+		
+		return ll;	
+	}
+	
+	
+	/*
+	 * Data to be used when adding rules 
+	 */
+	@DataProvider(name="getHBACRuleViaServiceSectionTestObjects")
+	public Object[][] getHBACRuleViaServiceSectionTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createHBACRuleViaServiceSectionTestObject());
+	}
+	protected List<List<Object>> createHBACRuleViaServiceSectionTestObject() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
         //										testname					cn   
@@ -568,22 +727,75 @@ public class HBACTests extends SahiTestScript {
 		return ll;	
 	}
 	
+	
+	
 	/*
 	 * Data to be used when adding rules 
 	 */
-	@DataProvider(name="getHBACRuleMemberListTestObjects")
-	public Object[][] getHBACRuleMemberListTestObjects() {
-		return TestNGUtils.convertListOfListsTo2dArray(createHBACRuleMemberListTestObject());
+	@DataProvider(name="getHBACRuleUpdateCategoryTestObjects")
+	public Object[][] getHBACRuleUpdateCategoryTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createHBACRuleUpdateCategoryTestObject());
 	}
-	protected List<List<Object>> createHBACRuleMemberListTestObject() {		
+	protected List<List<Object>> createHBACRuleUpdateCategoryTestObject() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
         //										testname					cn   
-		ll.add(Arrays.asList(new Object[]{ "create_good_hbacrule",			"dev_hbacRule"      } ));
+		ll.add(Arrays.asList(new Object[]{ "update_category_rule",			"eng_hbacRule"      } ));
+		
+		return ll;	
+	}
+	
+	
+	/*
+	 * Data to be used when adding rules 
+	 */
+	@DataProvider(name="getHBACRuleExpandCollapseTestObjects")
+	public Object[][] getHBACRuleExpandCollapseTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createHBACRuleExpandCollapseTestObject());
+	}
+	protected List<List<Object>> createHBACRuleExpandCollapseTestObject() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname					cn   
+		ll.add(Arrays.asList(new Object[]{ "expand_collapse_rule",			"eng_hbacRule"      } ));
+		
+		return ll;	
+	}
+	
+
+	
+	/*
+	 * Data to be used when adding rules 
+	 */
+	@DataProvider(name="getHBACRuleHostMemberListTestObjects")
+	public Object[][] getHBACRuleHostMemberListTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createHBACRuleHostMemberListTestObject());
+	}
+	protected List<List<Object>> createHBACRuleHostMemberListTestObject() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname					cn   
+		ll.add(Arrays.asList(new Object[]{ "hostmembership_rule",			"dev_hbacRule"      } ));
 		
 		return ll;	
 	}
 
+	/*
+	 * Data to be used when adding rules 
+	 */
+	@DataProvider(name="getHBACRuleUserMemberListTestObjects")
+	public Object[][] getHBACRuleUserMemberListTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createHBACRuleUserMemberListTestObject());
+	}
+	protected List<List<Object>> createHBACRuleUserMemberListTestObject() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname					cn   
+		ll.add(Arrays.asList(new Object[]{ "usermembership_rule",			"dev_hbacRule"      } ));
+		
+		return ll;	
+	}
+	
 	/*
 	 * Data to be used when adding rules 
 	 */
@@ -596,8 +808,8 @@ public class HBACTests extends SahiTestScript {
 		
         //										testname							cn					expected_Error   
 		ll.add(Arrays.asList(new Object[]{ "create_duplicate_hbacrule",				"dev_hbacRule",		"HBAC rule with name \"dev_hbacRule\" already exists"      } ));
-		ll.add(Arrays.asList(new Object[]{ "hbacrule_with trailing_space_in_name",	"hbacRule ",		"invalid 'name': Leading and trailing spaces are not allowed"	} ));
-		ll.add(Arrays.asList(new Object[]{ "hbacrule_with leading_space_in_name",	" hbacRule",		"invalid 'name': Leading and trailing spaces are not allowed"	} ));
+		ll.add(Arrays.asList(new Object[]{ "rule_with trailing_space_in_name",		"hbacRule ",		"invalid 'name': Leading and trailing spaces are not allowed"	} ));
+		ll.add(Arrays.asList(new Object[]{ "rule_with leading_space_in_name",		" hbacRule",		"invalid 'name': Leading and trailing spaces are not allowed"	} ));
 		
 		return ll;	
 	}
@@ -612,8 +824,8 @@ public class HBACTests extends SahiTestScript {
 	protected List<List<Object>> createHBACRuleRequiredFieldTestObject() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-        //										testname					cn					expected_Error   
-		ll.add(Arrays.asList(new Object[]{ "create_blank_hbacrule",			"",					"Required field"      } ));
+        //										testname				cn					expected_Error   
+		ll.add(Arrays.asList(new Object[]{ "create_blank_rule",			"",					"Required field"      } ));
 		
 		return ll;	
 	}
@@ -628,8 +840,8 @@ public class HBACTests extends SahiTestScript {
 	protected List<List<Object>> editHBACRuleGeneralSettingsTestObject() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-        //										testname					cn   				description
-		ll.add(Arrays.asList(new Object[]{ "edit_general_hbacrule",			"eng_hbacRule",		"This rule is for eng"      } ));
+        //										testname				cn   				description
+		ll.add(Arrays.asList(new Object[]{ "edit_general_rule",			"eng_hbacRule",		"This rule is for eng"      } ));
 		
 		return ll;	
 	}
@@ -644,9 +856,9 @@ public class HBACTests extends SahiTestScript {
 	protected List<List<Object>> editHBACRuleInvalidGeneralSettingsTestObject() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-        //										testname										cn   				description
-		ll.add(Arrays.asList(new Object[]{ "edit_general_hbacrule_trailingspace_in_desc",		"eng_hbacRule",		"This rule is for eng "      } ));
-		ll.add(Arrays.asList(new Object[]{ "edit_general_hbacrule_leadingspace_in_desc",		"eng_hbacRule",		" This rule is for eng"      } ));
+        //										testname									cn   				description
+		ll.add(Arrays.asList(new Object[]{ "edit_general_rule_trailingspace_in_desc",		"eng_hbacRule",		"This rule is for eng "      } ));
+		ll.add(Arrays.asList(new Object[]{ "edit_general_rule_leadingspace_in_desc",		"eng_hbacRule",		" This rule is for eng"      } ));
 		
 		return ll;	
 	}
@@ -663,9 +875,7 @@ public class HBACTests extends SahiTestScript {
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
         //										testname					cn   
-		ll.add(Arrays.asList(new Object[]{ "delete_hbacrule1",			"eng_hbacRule"      } ));
-		ll.add(Arrays.asList(new Object[]{ "delete_hbacrule2",			"doc_hbacRule"      } ));
-		ll.add(Arrays.asList(new Object[]{ "delete_hbacrule3",			"doc_hbacRule1"      } ));
+		ll.add(Arrays.asList(new Object[]{ "delete_rule1",			"eng_hbacRule"      } ));
 		
 		return ll;	
 	}
@@ -681,8 +891,8 @@ public class HBACTests extends SahiTestScript {
 	protected List<List<Object>> createHBACRuleAndAddAnotherTestObject() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-        //										testname						cn1						cn2   
-		ll.add(Arrays.asList(new Object[]{ "create_two_good_hbacrule",			"doc_hbacRule",		"doc_hbacRule1"  } ));
+        //										testname						cn1					cn2   
+		ll.add(Arrays.asList(new Object[]{ "add_and_add_another_rule",			"doc_hbacRule",		"doc_hbacRule1"  } ));
 		
 		return ll;	
 	}
@@ -699,9 +909,9 @@ public class HBACTests extends SahiTestScript {
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
         //										testname					cn       				multiple_result1  
-		ll.add(Arrays.asList(new Object[]{ "search_good_hbacrule",			"eng_hbacRule",			""  } ));		
-		ll.add(Arrays.asList(new Object[]{ "search_specialchar_hbacrule",	"h@ba*c#Ru?le",			""  } ));
-		ll.add(Arrays.asList(new Object[]{ "search_multiple_hbacrule",			"doc_hbacRule",			"doc_hbacRule1"  } ));
+		ll.add(Arrays.asList(new Object[]{ "search_good_rule",			"eng_hbacRule",			""  } ));		
+		ll.add(Arrays.asList(new Object[]{ "search_specialchar_rule",	"h@ba*c#Ru?le",			""  } ));
+		ll.add(Arrays.asList(new Object[]{ "search_multiple_rule",			"doc_hbacRule",			"doc_hbacRule1"  } ));
 		
 		return ll;	
 	}

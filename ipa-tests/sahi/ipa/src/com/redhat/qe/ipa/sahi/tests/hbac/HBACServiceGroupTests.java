@@ -16,7 +16,6 @@ import com.redhat.qe.auto.testng.TestNGUtils;
 import com.redhat.qe.ipa.sahi.base.SahiTestScript;
 import com.redhat.qe.ipa.sahi.tasks.CommonTasks;
 import com.redhat.qe.ipa.sahi.tasks.HBACTasks;
-import com.redhat.qe.ipa.sahi.tasks.SudoTasks;
 import com.redhat.qe.ipa.sahi.tests.user.UserTests;
 
 
@@ -55,9 +54,10 @@ private static Logger log = Logger.getLogger(UserTests.class.getName());
 	}
 	
 	/*
-	 * Add a HBACService
+	 * Add a HBACService Group
 	 */
-	@Test (groups={"hbacServiceGroupAddTests"}, dataProvider="getHBACServiceGroupTestObjects")	
+	@Test (groups={"hbacServiceGroupAddTests"}, description="Add a HBAC Service Group",
+			dataProvider="getHBACServiceGroupTestObjects")	
 	public void testHBACServiceGroupAdd(String testName, String cn, String description) throws Exception {
 		//verify rule doesn't exist
 		Assert.assertFalse(sahiTasks.link(cn.toLowerCase()).exists(), "Verify HBAC Service Group" + cn + " doesn't already exist");
@@ -69,9 +69,10 @@ private static Logger log = Logger.getLogger(UserTests.class.getName());
 	}
 	
 	/*
-	 * Add, and then add another HBACService
+	 * Add, and then add another HBAC Service Group
 	 */
-	@Test (groups={"hbacServiceGroupAddAndAddAnotherTests"}, dataProvider="getHBACServiceGroupAddAndAddAnotherTestObjects")	
+	@Test (groups={"hbacServiceGroupAddAndAddAnotherTests"}, description="Add, and then add another HBAC Service Group",
+			dataProvider="getHBACServiceGroupAddAndAddAnotherTestObjects")	
 	public void testHBACServiceGroupAddAndAddAnother(String testName, String cn1, String cn2, String description) throws Exception {
 		//verify user, user group, host, host group doesn't exist
 		Assert.assertFalse(sahiTasks.link(cn1).exists(), "Verify HBAC Service Group " + cn1 + " doesn't already exist");
@@ -85,9 +86,10 @@ private static Logger log = Logger.getLogger(UserTests.class.getName());
 	}
 	
 	/*
-	 * Add, and edit HBAC Service
+	 * Add, and edit HBAC Service group
 	 */	
-	@Test (groups={"hbacServiceGroupAddAndEditTests"}, dataProvider="getSingleHBACServiceGroupTestObjects", dependsOnGroups="hbacServiceGroupCancelAddTests")	
+	@Test (groups={"hbacServiceGroupAddAndEditTests"}, description="Add, and edit HBAC Service group",
+			dataProvider="getHBACServiceGroupAddAndEditTestObjects", dependsOnGroups="hbacServiceGroupCancelAddTests")	
 	public void testHBACServiceGroupAddAndEdit(String testName, String cn, String description) throws Exception {
 		
 		//verify rule doesn't exist
@@ -102,9 +104,10 @@ private static Logger log = Logger.getLogger(UserTests.class.getName());
 	}
 	
 	/*
-	 * Add, but Cancel adding HBAC Service
+	 * Add, but Cancel adding HBAC Service Group
 	 */
-	@Test (groups={"hbacServiceGroupCancelAddTests"}, dataProvider="getSingleHBACServiceGroupTestObjects")	
+	@Test (groups={"hbacServiceGroupCancelAddTests"}, description="Add, but Cancel adding HBAC Service Group",
+			dataProvider="getHBACServiceGroupCancelAddTestObjects")	
 	public void testHBACServiceGroupCancelAdd(String testName, String cn, String description) throws Exception {
 		//verify rule doesn't exist
 		Assert.assertFalse(sahiTasks.link(cn).exists(), "Verify HBAC Service Group " + cn + " doesn't already exist");
@@ -120,7 +123,8 @@ private static Logger log = Logger.getLogger(UserTests.class.getName());
 	/*
 	 * Add Service Group- for negative tests
 	 */
-	@Test (groups={"invalidhbacServiceGroupAddTests"}, dataProvider="getInvalidHBACServiceGroupTestObjects")	
+	@Test (groups={"invalidhbacServiceGroupAddTests"}, description="Add Service Group- for negative tests",
+			dataProvider="getInvalidHBACServiceGroupTestObjects")	
 	public void testInvalidHBACServiceGroupadd(String testName, String cn, String description, String expectedError) throws Exception {
 		//new test user can be added now
 		HBACTasks.createInvalidService(sahiTasks, cn, description, expectedError);		
@@ -130,7 +134,9 @@ private static Logger log = Logger.getLogger(UserTests.class.getName());
 	/*
 	 * Search an HBAC Service Group
 	 */
-	@Test (groups={"hbacServiceGroupSearchTests"}, dataProvider="getHBACServiceGroupSearchTestObjects",  dependsOnGroups={"hbacServiceGroupAddTests", "hbacServiceGroupAddAndEditTests", "hbacServiceGroupAddAndAddAnotherTests"})
+	@Test (groups={"hbacServiceGroupSearchTests"}, description="Search an HBAC Service Group",
+			dataProvider="getHBACServiceGroupSearchTestObjects",  
+			dependsOnGroups={"hbacServiceGroupAddTests", "hbacServiceGroupAddAndEditTests", "hbacServiceGroupAddAndAddAnotherTests"})
 	public void testHBACServiceGroupSearch(String testName, String searchString, String multipleResult1, String multipleResult2, String multipleResult3, String multipleResult4) throws Exception {		
 		String[] multipleResults = {multipleResult1, multipleResult2, multipleResult3, multipleResult4}; 
 		CommonTasks.search(sahiTasks, searchString);
@@ -147,7 +153,8 @@ private static Logger log = Logger.getLogger(UserTests.class.getName());
 	/*
 	 * Expand/Collapse details of an HBAC Service Group
 	 */
-	@Test (groups={"hbacServiceGroupExpandCollapseTests"}, dataProvider="getSingleHBACServiceGroupTestObjects",  dependsOnGroups="hbacServiceGroupAddAndEditTests")	
+	@Test (groups={"hbacServiceGroupExpandCollapseTests"}, description="Expand/Collapse details of an HBAC Service Group",
+			dataProvider="getHBACServiceGroupExpandCollapseTestObjects",  dependsOnGroups="hbacServiceGroupAddAndEditTests")	
 	public void testHBACServiceGroupExpandCollapse(String testName, String cn, String description) throws Exception {
 		
 		HBACTasks.expandCollapseService(sahiTasks, cn, true);		
@@ -159,7 +166,8 @@ private static Logger log = Logger.getLogger(UserTests.class.getName());
 	/*
 	 * Edit an HBAC service group, and navigate back and forth between the group, and its service member
 	 */
-	@Test (groups={"hbacServiceGroupNavigateTests"}, dataProvider="getSingleHBACServiceGroupTestObjects", dependsOnGroups={"hbacServiceGroupAddAndEditTests" })	
+	@Test (groups={"hbacServiceGroupNavigateTests"}, description="Edit an HBAC service group, and navigate back and forth between the group, and its service member",
+			dataProvider="getHBACServiceGroupNavigateTestObjects", dependsOnGroups={"hbacServiceGroupAddAndEditTests" })	
 	public void testHBACServiceGroupNavigate(String testName, String cn, String description) throws Exception {
 		// the group added in a previous test - su-test - has 2 services enrolled - su and su-l
 			
@@ -227,7 +235,8 @@ private static Logger log = Logger.getLogger(UserTests.class.getName());
 	/*
 	 * Enroll service 
 	 */
-	@Test (groups={"hbacServiceGroupEnrollServiceTests"}, dataProvider="getHBACServiceInServiceGroupTestObjects", dependsOnGroups={"hbacServiceGroupAddTests" })	
+	@Test (groups={"hbacServiceGroupEnrollServiceTests"}, description="Enroll service",
+			dataProvider="getEnrollHBACServiceInServiceGroupTestObjects", dependsOnGroups={"hbacServiceGroupAddTests" })	
 	public void testHBACServiceGroupEnrollService(String testName, String service, String svcgrp) throws Exception {
 		Assert.assertTrue(sahiTasks.link(svcgrp).exists(), "Verify HBAC Service Group " + svcgrp + "  to be edited exists");
 		
@@ -240,7 +249,8 @@ private static Logger log = Logger.getLogger(UserTests.class.getName());
 	/*
 	 * Edit an HBAC Service Group to delete a service
 	 */
-	@Test (groups={"hbacServiceGroupDeleteServiceTests"}, dataProvider="getHBACServiceInServiceGroupTestObjects", dependsOnGroups={"hbacServiceGroupAddTests", "hbacServiceGroupEnrollServiceTests", "hbacServiceGroupCancelDeleteServiceTests" })	
+	@Test (groups={"hbacServiceGroupDeleteServiceTests"}, description="Edit an HBAC Service Group to delete a service",
+			dataProvider="getHBACServiceGroupDeleteServiceTestObjects", dependsOnGroups={"hbacServiceGroupAddTests", "hbacServiceGroupEnrollServiceTests", "hbacServiceGroupCancelDeleteServiceTests" })	
 	public void testHBACServiceGroupDeleteService(String testName, String service, String svcgrp) throws Exception {
 		Assert.assertTrue(sahiTasks.link(svcgrp).exists(), "Verify HBAC Service Group " + svcgrp + "  to be edited exists");
 		HBACTasks.verifyServicesInServiceGroup(sahiTasks, service, svcgrp, true);
@@ -254,7 +264,9 @@ private static Logger log = Logger.getLogger(UserTests.class.getName());
 	/*
 	 * Edit an HBAC Service Group to cancel deleting a service
 	 */
-	@Test (groups={"hbacServiceGroupCancelDeleteServiceTests"}, dataProvider="getHBACServiceInServiceGroupTestObjects", dependsOnGroups={"hbacServiceGroupAddTests", "hbacServiceGroupEnrollServiceTests" })	
+	@Test (groups={"hbacServiceGroupCancelDeleteServiceTests"}, description="Edit an HBAC Service Group to cancel deleting a service", 
+			dataProvider="getHBACServiceCancelDeleteServiceTestObjects", 
+			dependsOnGroups={"hbacServiceGroupAddTests", "hbacServiceGroupEnrollServiceTests" })	
 	public void testHBACServiceGroupCancelDeleteService(String testName, String service, String svcgrp) throws Exception {
 		Assert.assertTrue(sahiTasks.link(svcgrp).exists(), "Verify HBAC Service Group " + svcgrp + "  to be edited exists");
 		HBACTasks.verifyServicesInServiceGroup(sahiTasks, service, svcgrp, true);
@@ -269,7 +281,9 @@ private static Logger log = Logger.getLogger(UserTests.class.getName());
 	/*
 	 * Edit an HBAC Service Group
 	 */
-	@Test (groups={"hbacServiceGroupEditTests"}, dataProvider="getSingleHBACServiceGroupTestObjects", dependsOnGroups={"hbacServiceGroupAddAndEditTests" })	
+	@Test (groups={"hbacServiceGroupEditTests"}, description="Edit an HBAC Service Group",
+			dataProvider="getHBACServiceGroupEditTestObjects", 
+			dependsOnGroups={"hbacServiceGroupAddAndEditTests" })	
 	public void testHBACServiceGroupEdit(String testName, String cn, String description) throws Exception {
 		//verify HBAC Service to be edited exists
 		Assert.assertTrue(sahiTasks.link(cn).exists(), "Verify HBAC Service Group " + cn + "  to be edited exists");
@@ -285,7 +299,9 @@ private static Logger log = Logger.getLogger(UserTests.class.getName());
 	/*
 	 * Delete, but Cancel deleting an HBAC Service Group
 	 */
-	@Test (groups={"hbacServiceGroupCancelDeleteTests"}, dataProvider="getHBACServiceGroupDeleteTestObjects", dependsOnGroups={"hbacServiceGroupAddAndAddAnotherTests" })	
+	@Test (groups={"hbacServiceGroupCancelDeleteTests"}, description="Cancel deleting a HBAC Service Group",
+			dataProvider="getHBACServiceGroupCancelDeleteTestObjects", 
+			dependsOnGroups={"hbacServiceGroupAddAndAddAnotherTests" })	
 	public void testHBACServiceGroupCancelDelete(String testName, String cn) throws Exception {
 		//verify rule to be deleted exists
 		Assert.assertTrue(sahiTasks.link(cn).exists(), "Verify HBAC Service Group " + cn + "  to be deleted exists");
@@ -300,7 +316,8 @@ private static Logger log = Logger.getLogger(UserTests.class.getName());
 	/*
 	 * Delete an HBAC Service Group
 	 */
-	@Test (groups={"hbacServiceGroupDeleteTests"}, dataProvider="getHBACServiceGroupDeleteTestObjects", dependsOnGroups={"hbacServiceGroupAddAndAddAnotherTests", "hbacServiceGroupSearchTests", "hbacServiceGroupCancelDeleteTests" })	
+	@Test (groups={"hbacServiceGroupDeleteTests"}, description="Delete an HBAC Service Group",
+			dataProvider="getHBACServiceGroupDeleteTestObjects", dependsOnGroups={"hbacServiceGroupAddAndAddAnotherTests", "hbacServiceGroupSearchTests", "hbacServiceGroupCancelDeleteTests" })	
 	public void testHBACServiceGroupDelete(String testName, String cn) throws Exception {
 		//verify rule to be deleted exists
 		Assert.assertTrue(sahiTasks.link(cn).exists(), "Verify HBAC Service Group " + cn + "  to be deleted exists");
@@ -315,7 +332,8 @@ private static Logger log = Logger.getLogger(UserTests.class.getName());
 	/*
 	 * Delete multiple HBAC Service Groups
 	 */
-	@Test (groups={"hbacServiceGroupMultipleDeleteTests"}, dataProvider="getMultipleHBACServiceGroupTestObjects", dependsOnGroups={"hbacServiceGroupAddTests", "hbacServiceGroupAddAndEditTests", "invalidhbacServiceGroupAddTests", 
+	@Test (groups={"hbacServiceGroupMultipleDeleteTests"}, description="Delete multiple HBAC Service Groups",
+			dataProvider="getMultipleHBACServiceGroupTestObjects", dependsOnGroups={"hbacServiceGroupAddTests", "hbacServiceGroupAddAndEditTests", "invalidhbacServiceGroupAddTests", 
 			"hbacServiceGroupSearchTests", "hbacServiceGroupEditTests", "hbacServiceGroupCancelDeleteServiceTests", "hbacServiceGroupDeleteServiceTests", "invalidhbacServiceGroupModTests" })
 	public void testMultipleHBACServiceGroupDelete(String testName, String cn1, String cn2, String cn3) throws Exception {	
 		String cns[] = {cn1, cn2, cn3};
@@ -336,7 +354,8 @@ private static Logger log = Logger.getLogger(UserTests.class.getName());
 	}
 	
 	
-	@Test (groups={"invalidhbacServiceGroupModTests"}, dataProvider="getHBACServiceGroupInvalidAddTestObjects", dependsOnGroups={"hbacServiceGroupAddTests"} )
+	@Test (groups={"invalidhbacServiceGroupModTests"}, description="Modify HBAC Service Group With Invalid Setting",
+			dataProvider="getHBACServiceGroupInvalidAddTestObjects", dependsOnGroups={"hbacServiceGroupAddTests"} )
 	public void testInvalidHBACServiceGroupMod(String testName, String cn, String description, String expectedError) throws Exception {
 		HBACTasks.modifyHBACServiceGroupWithInvalidSetting(sahiTasks, cn, description, expectedError);
 	}
@@ -348,7 +367,8 @@ private static Logger log = Logger.getLogger(UserTests.class.getName());
 												"hbac group2",
 												"su-test",
 												"web",
-												"abcdefghijklmnopqrstuvwxyz123456789@ANDAGAIN#abcdefghijklmnopqrstuvwxyz123456789*ANDAGAINabcdefghijklmnopqrstuvwxyz123456789?".toLowerCase()
+												"abcdefghijklmnopqrstuvwxyz123456789@ANDAGAIN#abcdefghijklmnopqrstuvwxyz123456789*ANDAGAINabcdefghijklmnopqrstuvwxyz123456789?".toLowerCase(),
+												"login2"
 												} ; 
 		
 		//verify rules were found
@@ -379,8 +399,8 @@ private static Logger log = Logger.getLogger(UserTests.class.getName());
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
         //										testname					cn			description
-		ll.add(Arrays.asList(new Object[]{ "good_hbacservicegroup",			"web",		"testing http service group for HBAC"      } ));
-		ll.add(Arrays.asList(new Object[]{ "long_hbacservicegroup",			"abcdefghijklmnopqrstuvwxyz123456789@ANDAGAIN#abcdefghijklmnopqrstuvwxyz123456789*ANDAGAINabcdefghijklmnopqrstuvwxyz123456789?",		"testing https service group for HBAC"      } ));
+		ll.add(Arrays.asList(new Object[]{ "add_good_servicegroup",			"web",		"testing http service group for HBAC"      } ));
+		ll.add(Arrays.asList(new Object[]{ "add_long_servicegroup",			"abcdefghijklmnopqrstuvwxyz123456789@ANDAGAIN#abcdefghijklmnopqrstuvwxyz123456789*ANDAGAINabcdefghijklmnopqrstuvwxyz123456789?",		"testing https service group for HBAC"      } ));
 		
 		return ll;	
 	}
@@ -396,23 +416,93 @@ private static Logger log = Logger.getLogger(UserTests.class.getName());
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
         //										testname							cn1			cn2 		description  
-		ll.add(Arrays.asList(new Object[]{ "create_two_good_hbacservicegroups",		"login1",	"login2",	"testing svc groups for HBAC"			  } ));
+		ll.add(Arrays.asList(new Object[]{ "add_and_add_another_servicegroup",		"login1",	"login2",	"testing svc groups for HBAC"			  } ));
 		
 		return ll;	
 	}
 	
+	
 	/*
 	 * Data to be used when adding service group
 	 */
-	@DataProvider(name="getSingleHBACServiceGroupTestObjects")
-	public Object[][] getSingleHBACServiceGroupTestObjects() {
-		return TestNGUtils.convertListOfListsTo2dArray(createSingleHBACServiceGroupTestObject());
+	@DataProvider(name="getHBACServiceGroupAddAndEditTestObjects")
+	public Object[][] getHBACServiceGroupAddAndEditTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createHBACServiceGroupAddAndEditTestObject());
 	}
-	protected List<List<Object>> createSingleHBACServiceGroupTestObject() {		
+	protected List<List<Object>> createHBACServiceGroupAddAndEditTestObject() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
         //										testname						cn				description	   								
-		ll.add(Arrays.asList(new Object[]{ "create_good_hbacservicegroup",		"su-test",		"testing su-test service group for HBAC"    } ));
+		ll.add(Arrays.asList(new Object[]{ "add_and_edit_servicegroup",		"su-test",		"testing su-test service group for HBAC"    } ));
+		
+		return ll;	
+	}
+	
+	
+	/*
+	 * Data to be used when adding service group
+	 */
+	@DataProvider(name="getHBACServiceGroupCancelAddTestObjects")
+	public Object[][] getHBACServiceGroupCancelAddTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createHBACServiceGroupCancelAddTestObject());
+	}
+	protected List<List<Object>> createHBACServiceGroupCancelAddTestObject() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname						cn				description	   								
+		ll.add(Arrays.asList(new Object[]{ "cancel_add_servicegroup",		"su-test",		"testing su-test service group for HBAC"    } ));
+		
+		return ll;	
+	}
+	
+	
+	/*
+	 * Data to be used when adding service group
+	 */
+	@DataProvider(name="getHBACServiceGroupExpandCollapseTestObjects")
+	public Object[][] getHBACServiceGroupExpandCollapseTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createHBACServiceGroupExpandCollapseTestObject());
+	}
+	protected List<List<Object>> createHBACServiceGroupExpandCollapseTestObject() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname						cn				description	   								
+		ll.add(Arrays.asList(new Object[]{ "expand_collapse_servicegroup",		"su-test",		"testing su-test service group for HBAC"    } ));
+		
+		return ll;	
+	}
+	
+	
+	
+	/*
+	 * Data to be used when adding service group
+	 */
+	@DataProvider(name="getHBACServiceGroupNavigateTestObjects")
+	public Object[][] getHBACServiceGroupNavigateTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createHBACServiceGroupNavigateTestObject());
+	}
+	protected List<List<Object>> createHBACServiceGroupNavigateTestObject() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname				cn				description	   								
+		ll.add(Arrays.asList(new Object[]{ "navigate_servicegroup",		"su-test",		"testing su-test service group for HBAC"    } ));
+		
+		return ll;	
+	}
+	
+	
+	/*
+	 * Data to be used when adding service group
+	 */
+	@DataProvider(name="getHBACServiceGroupEditTestObjects")
+	public Object[][] getHBACServiceGroupEditTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createHBACServiceGroupEditTestObject());
+	}
+	protected List<List<Object>> createHBACServiceGroupEditTestObject() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname			cn				description	   								
+		ll.add(Arrays.asList(new Object[]{ "edit_servicegroup",		"su-test",		"testing su-test service group for HBAC"    } ));
 		
 		return ll;	
 	}
@@ -428,11 +518,11 @@ private static Logger log = Logger.getLogger(UserTests.class.getName());
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
         //										testname									cn								description 					expected_Error   
-		ll.add(Arrays.asList(new Object[]{ "create_duplicate_hbacservicegroup",				"ftp",							"duplicate service group", 		"HBAC service group with name \"ftp\" already exists"      } ));
-		ll.add(Arrays.asList(new Object[]{ "hbacservicegroup_with trailing_space_in_name",	"hbacServiceGroup ",			"name with trailing space", 	"invalid 'name': Leading and trailing spaces are not allowed"	} ));
-		ll.add(Arrays.asList(new Object[]{ "hbacservicegroup_with leading_space_in_name",	" hbacServiceGroup",			"name with leading space",		"invalid 'name': Leading and trailing spaces are not allowed"	} ));
-		ll.add(Arrays.asList(new Object[]{ "hbacservicegroup_with trailing_space_in_desc",	"hbacServiceGroup",				"desc with trailing space ",	"invalid 'desc': Leading and trailing spaces are not allowed"	} ));
-		ll.add(Arrays.asList(new Object[]{ "hbacservicegroup_with leading_space_in_desc",	"hbacServiceGroup",				" desc with leading space",		"invalid 'desc': Leading and trailing spaces are not allowed"	} ));
+		ll.add(Arrays.asList(new Object[]{ "create_duplicate_servicegroup",				"ftp",							"duplicate service group", 		"HBAC service group with name \"ftp\" already exists"      } ));
+		ll.add(Arrays.asList(new Object[]{ "servicegroup_with trailing_space_in_name",	"hbacServiceGroup ",			"name with trailing space", 	"invalid 'name': Leading and trailing spaces are not allowed"	} ));
+		ll.add(Arrays.asList(new Object[]{ "servicegroup_with leading_space_in_name",	" hbacServiceGroup",			"name with leading space",		"invalid 'name': Leading and trailing spaces are not allowed"	} ));
+		ll.add(Arrays.asList(new Object[]{ "servicegroup_with trailing_space_in_desc",	"hbacServiceGroup",				"desc with trailing space ",	"invalid 'desc': Leading and trailing spaces are not allowed"	} ));
+		ll.add(Arrays.asList(new Object[]{ "servicegroup_with leading_space_in_desc",	"hbacServiceGroup",				" desc with leading space",		"invalid 'desc': Leading and trailing spaces are not allowed"	} ));
 		
 		return ll;	
 	}
@@ -449,7 +539,7 @@ private static Logger log = Logger.getLogger(UserTests.class.getName());
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
         //										testname				searchstring	cn1			cn2			cn3			cn4																																		cn4   
-		ll.add(Arrays.asList(new Object[]{ "search_hbacservicegroup",	"testing",		"login1",	"login2",	"su-test",		"web"      } ));
+		ll.add(Arrays.asList(new Object[]{ "search_servicegroup",	"testing",		"login1",	"login2",	"su-test",		"web"      } ));
 		
 		return ll;	
 	}
@@ -464,9 +554,24 @@ private static Logger log = Logger.getLogger(UserTests.class.getName());
 	protected List<List<Object>> deleteHBACServiceGroupTestObject() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-        //										testname					cn				   
-		ll.add(Arrays.asList(new Object[]{ "delete_hbacservicegroup1",		"login1"	 } ));
-		ll.add(Arrays.asList(new Object[]{ "delete_hbacservicegroup2",		"login2"	 } ));
+        //										testname				cn				   
+		ll.add(Arrays.asList(new Object[]{ "delete_servicegroup",		"login1"	 } ));
+		
+		return ll;	
+	}
+	
+	/*
+	 * Data to be used when cancelling deleting service groups
+	 */
+	@DataProvider(name="getHBACServiceGroupCancelDeleteTestObjects")
+	public Object[][] getHBACServiceGroupCancelDeleteTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(cancelDeleteHBACServiceGroupTestObject());
+	}
+	protected List<List<Object>> cancelDeleteHBACServiceGroupTestObject() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname						cn				   
+		ll.add(Arrays.asList(new Object[]{ "cancel_delete_servicegroup",		"login1"	 } ));
 		
 		return ll;	
 	}
@@ -483,7 +588,7 @@ private static Logger log = Logger.getLogger(UserTests.class.getName());
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
         //										testname						cn1			cn2			cn3																																	cn4   
-		ll.add(Arrays.asList(new Object[]{ "delete_multiple_hbacservicegroups",	"su-test",		"web",		"abcdefghijklmnopqrstuvwxyz123456789@andagain#abcdefghijklmnopqrstuvwxyz123456789*andagainabcdefghijklmnopqrstuvwxyz123456789?"      } ));
+		ll.add(Arrays.asList(new Object[]{ "delete_multiple_servicegroups",		"su-test",		"web",		"abcdefghijklmnopqrstuvwxyz123456789@andagain#abcdefghijklmnopqrstuvwxyz123456789*andagainabcdefghijklmnopqrstuvwxyz123456789?"      } ));
 		
 		return ll;	
 	}
@@ -499,8 +604,8 @@ private static Logger log = Logger.getLogger(UserTests.class.getName());
 	protected List<List<Object>> createHBACServiceGroupOneServiceTwoGroupsTestObjects() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-        //										testname															service			svcgrp1			svcgrp2			description	   
-		ll.add(Arrays.asList(new Object[]{ "Enroll svc in 2 grps, del from one, then another, verify memberships",	"rlogin",		"login1",		"login2",		"testing rlogin service"      } ));
+        //										testname				service			svcgrp1			svcgrp2			description	   
+		ll.add(Arrays.asList(new Object[]{ "one_service_two_groups",	"rlogin",		"login1",		"login2",		"testing rlogin service"      } ));
 		
 		return ll;	
 	}
@@ -516,7 +621,23 @@ private static Logger log = Logger.getLogger(UserTests.class.getName());
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
         //										testname						service				svcgrp   		description
-		ll.add(Arrays.asList(new Object[]{ "hbacservice_in_hbacservicegroup",	"gdm-password",		"hbac group3", 	"this group will be deleted"		      } ));
+		ll.add(Arrays.asList(new Object[]{ "enroll_service_delete_servicegroup",	"gdm-password",		"hbac group3", 	"this group will be deleted"		      } ));
+		
+		return ll;	
+	}
+	
+	/*
+	 * Data to be used when enrolling service in service group 
+	 */
+	@DataProvider(name="getEnrollHBACServiceInServiceGroupTestObjects")
+	public Object[][] getEnrollHBACServiceInServiceGroupTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(enrollServiceInHBACServiceGroupTestObjects());
+	}
+	protected List<List<Object>> enrollServiceInHBACServiceGroupTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname						service		svcgrp   
+		ll.add(Arrays.asList(new Object[]{ "enroll_service_in_servicegroup",	"gdm",		"web"		      } ));
 		
 		return ll;	
 	}
@@ -525,15 +646,31 @@ private static Logger log = Logger.getLogger(UserTests.class.getName());
 	/*
 	 * Data to be used when enrolling/deleting service from service group 
 	 */
-	@DataProvider(name="getHBACServiceInServiceGroupTestObjects")
-	public Object[][] getHBACServiceInServiceGroupTestObjects() {
-		return TestNGUtils.convertListOfListsTo2dArray(useServiceInHBACServiceGroupTestObjects());
+	@DataProvider(name="getHBACServiceGroupDeleteServiceTestObjects")
+	public Object[][] getHBACServiceGroupDeleteServiceTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createHBACServiceGroupDeleteServiceTestObjects());
 	}
-	protected List<List<Object>> useServiceInHBACServiceGroupTestObjects() {		
+	protected List<List<Object>> createHBACServiceGroupDeleteServiceTestObjects() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-        //										testname													service		svcgrp   
-		ll.add(Arrays.asList(new Object[]{ "Enroll service, delete group, verify membership of service",	"gdm",		"web"		      } ));
+        //										testname						service		svcgrp   
+		ll.add(Arrays.asList(new Object[]{ "delete_service_from_servicegroup",	"gdm",		"web"		      } ));
+		
+		return ll;	
+	}
+	
+	/*
+	 * Data to be used when enrolling/deleting service from service group 
+	 */
+	@DataProvider(name="getHBACServiceCancelDeleteServiceTestObjects")
+	public Object[][] getHBACServiceCancelDeleteServiceTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createHBACServiceCancelDeleteServiceTestObjects());
+	}
+	protected List<List<Object>> createHBACServiceCancelDeleteServiceTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname								service		svcgrp   
+		ll.add(Arrays.asList(new Object[]{ "cancel_delete_service_from_servicegroup",	"gdm",		"web"		      } ));
 		
 		return ll;	
 	}
@@ -545,9 +682,9 @@ private static Logger log = Logger.getLogger(UserTests.class.getName());
 	protected List<List<Object>> createHBACServiceGroupInvalidAddTestObjects() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-        //										testname												cn   						description
-		ll.add(Arrays.asList(new Object[]{ "hbac_servicegroup_with trailing_space_in_desc",				"web",				"Description with trailing space ",		"invalid 'desc': Leading and trailing spaces are not allowed"	} ));
-		ll.add(Arrays.asList(new Object[]{ "hbac_servicegroup_with leading_space_in_desc",				"web",				" Description with leading space",		"invalid 'desc': Leading and trailing spaces are not allowed"      } ));
+        //										testname											cn   						description
+		ll.add(Arrays.asList(new Object[]{ "servicegroup_with trailing_space_in_desc",				"web",				"Description with trailing space ",		"invalid 'desc': Leading and trailing spaces are not allowed"	} ));
+		ll.add(Arrays.asList(new Object[]{ "servicegroup_with leading_space_in_desc",				"web",				" Description with leading space",		"invalid 'desc': Leading and trailing spaces are not allowed"      } ));
 		
 		return ll;	
 	}

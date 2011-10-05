@@ -24,7 +24,6 @@ public class ConfigurationTest extends SahiTestScript{
 	
 
 	private String currentPage = "";
-	//private String alternateCurrentPage = ""; //TODO : check what is it here?
 	
 	
 	@BeforeClass (groups={"init"}, description="Initialize app for this test suite run", 
