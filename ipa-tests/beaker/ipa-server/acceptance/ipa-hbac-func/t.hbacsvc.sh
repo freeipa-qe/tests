@@ -218,6 +218,9 @@ hbacsvc_master_003() {
 
                 rlRun "ipa hbacrule-add rule3"
 
+		rlRun "ipa hbacsvc-add vsftpd"
+		rlRun "ipa hbacsvcgroup-add-member ftp --hbacsvcs=vsftpd"
+
                 rlRun "ipa hbacrule-add-service rule3 --hbacsvcs=ftp"
                 rlRun "ipa hbacrule-add-user rule3 --users=$user3"
                 rlRun "ipa hbacrule-add-host rule3 --hosts=$MASTER"
@@ -313,7 +316,7 @@ hbacsvc_client2_004() {
         rlPhaseStartTest "ipa-hbacsvc-client2-004: user4 accessing hostgroup from $CLIENT"
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-                rlRun "getent -s sss passwd $user4"
+                rlRun "getent -s sss passwd user4"
                 rlRun "ssh_auth_failure user4 testpw123@ipa.com $CLIENT2"
 
         rlPhaseEnd
@@ -359,7 +362,7 @@ hbacsvc_client_005() {
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 rlRun "getent -s sss passwd user5"
-                rlRun "ssh_auth_success user5 testpw123@ipa.com $CLIENT"
+                rlRun "ssh_auth_success user5 testpw123@ipa.com $CLIENT2"
 
         rlPhaseEnd
 }
@@ -877,7 +880,7 @@ hbacsvc_master_011() {
                 rlRun "ipa hbacrule-add rule11"
                 rlRun "ipa hbacrule-add-user rule11 --groups=group11"
                 rlRun "ipa hbacrule-add-host rule11 --hosts=$CLIENT2"
-                rlRun "ipa hbacrule-add-sourcehost rule11 --hosts=hostgroup11"
+                rlRun "ipa hbacrule-add-sourcehost rule11 --hostgroups=hostgroup11"
 		rlRun "ipa hbacrule-add-service rule11 --hbacsvcs=sshd"
                 rlRun "ipa hbacrule-show rule11 --all"
 
@@ -986,8 +989,8 @@ hbacsvc_master_012() {
                 rlRun "ipa hbacrule-add rule12"
                 rlRun "ipa hbacrule-add-user rule12 --groups=group12"
                 rlRun "ipa hbacrule-add-host rule12 --hosts=$CLIENT2"
-                rlRun "ipa hbacrule-add-sourcehost rule12 --hosts=hostgroup12"
-		rlRun "ipa hbacrule-add-service rule12 --hbacsvcgroups=sshd"
+                rlRun "ipa hbacrule-add-sourcehost rule12 --hostgroups=hostgroup12"
+		rlRun "ipa hbacrule-add-service rule12 --hbacsvcgroup=sshd"
                 rlRun "ipa hbacrule-show rule12 --all"
 
         # ipa hbactest:
@@ -1046,8 +1049,8 @@ hbacsvc_master_013() {
 
                 rlRun "ipa hbacrule-add rule13"
                 rlRun "ipa hbacrule-add-user rule13 --groups=group13"
-                rlRun "ipa hbacrule-add-host rule13 --hosts=hostgroup13"
-                rlRun "ipa hbacrule-add-sourcehost rule13 --hosts=hostgroup13-2"
+                rlRun "ipa hbacrule-add-host rule13 --hostgroups=hostgroup13"
+                rlRun "ipa hbacrule-add-sourcehost rule13 --hostgroups=hostgroup13-2"
 		rlRun "ipa hbacrule-add-service rule13 --hbacsvcs=sshd"
                 rlRun "ipa hbacrule-show rule13 --all"
 
@@ -1108,8 +1111,8 @@ hbacsvc_master_014() {
 
                 rlRun "ipa hbacrule-add rule14"
                 rlRun "ipa hbacrule-add-user rule14 --groups=group14"
-                rlRun "ipa hbacrule-add-host rule14 --hosts=hostgroup14"
-                rlRun "ipa hbacrule-add-sourcehost rule14 --hosts=hostgroup14-2"
+                rlRun "ipa hbacrule-add-host rule14 --hostgroups=hostgroup14"
+                rlRun "ipa hbacrule-add-sourcehost rule14 --hostgroups=hostgroup14-2"
 		rlRun "ipa hbacrule-add-service rule14 --hbacsvcs=sshd"
                 rlRun "ipa hbacrule-show rule14 --all"
 
@@ -1386,7 +1389,7 @@ hbacsvc_master_017() {
                 rlRun "ipa hbacrule-add rule17"
                 rlRun "ipa hbacrule-add-user rule17 --groups=group17"
                 rlRun "ipa hbacrule-add-host rule17 --hosts=$CLIENT"
-                rlRun "ipa hbacrule-add-sourcehost rule17 --hosts=hostgroup17"
+                rlRun "ipa hbacrule-add-sourcehost rule17 --hostgroups=hostgroup17"
 		rlRun "ipa hbacrule-add-service rule17 --hbacsvcs=sshd"
                 rlRun "ipa hbacrule-show rule17 --all"
 
@@ -1447,7 +1450,7 @@ hbacsvc_master_018() {
                 rlRun "ipa hbacrule-add rule18"
                 rlRun "ipa hbacrule-add-user rule18 --groups=group18"
                 rlRun "ipa hbacrule-add-host rule18 --hosts=$CLIENT"
-                rlRun "ipa hbacrule-add-sourcehost rule18 --hosts=hostgroup18"
+                rlRun "ipa hbacrule-add-sourcehost rule18 --hostgroups=hostgroup18"
 		rlRun "ipa hbacrule-add-service rule18 --hbacsvcs=sshd"
                 rlRun "ipa hbacrule-show rule18 --all"
 
@@ -1509,8 +1512,8 @@ hbacsvc_master_019() {
 
                 rlRun "ipa hbacrule-add rule19"
                 rlRun "ipa hbacrule-add-user rule19 --groups=group19-2"
-                rlRun "ipa hbacrule-add-host rule19 --hosts=hostgroup19"
-                rlRun "ipa hbacrule-add-sourcehost rule19 --hosts=hostgroup19-2"
+                rlRun "ipa hbacrule-add-host rule19 --hostgroups=hostgroup19"
+                rlRun "ipa hbacrule-add-sourcehost rule19 --hostgroups=hostgroup19-2"
 		rlRun "ipa hbacrule-add-service rule19 --hbacsvcs=sshd"
                 rlRun "ipa hbacrule-show rule19 --all"
 
@@ -1574,8 +1577,8 @@ hbacsvc_master_020() {
 
                 rlRun "ipa hbacrule-add rule20"
                 rlRun "ipa hbacrule-add-user rule20 --groups=group20-2"
-                rlRun "ipa hbacrule-add-host rule20 --hosts=hostgroup20"
-                rlRun "ipa hbacrule-add-sourcehost rule20 --hosts=hostgroup20-2"
+                rlRun "ipa hbacrule-add-host rule20 --hostgroups=hostgroup20"
+                rlRun "ipa hbacrule-add-sourcehost rule20 --hostgroups=hostgroup20-2"
 		rlRun "ipa hbacrule-add-service rule20 --hbacsvcs=sshd"
                 rlRun "ipa hbacrule-show rule20 --all"
 
@@ -1868,7 +1871,7 @@ hbacsvc_master_027() {
                 rlRun "ipa hbacrule-add-host rule27 --hosts=$CLIENT"
                 rlRun "ipa hbacrule-add-sourcehost rule27 --hosts=$CLIENT2"
                 rlRun "ipa hbacrule-add-service rule27 --hbacsvcs=sshd"
-                rlRun "ipa hbacrule-add-service rule27 --hbacsvcgroups=empty"
+                rlRun "ipa hbacrule-add-service rule27 --hbacsvcgroup=empty"
                 rlRun "ipa hbacrule-show rule27 --all"
 
         # ipa hbactest:
@@ -1922,7 +1925,7 @@ hbacsvc_master_028() {
                 rlRun "ipa hbacrule-add-host rule28 --hosts=$CLIENT"
                 rlRun "ipa hbacrule-add-sourcehost rule28 --hosts=$CLIENT2"
                 rlRun "ipa hbacrule-add-service rule28 --hbacsvcs=sshdtest"
-                rlRun "ipa hbacrule-add-service rule28 --hbacsvcgroups=sshd"
+                rlRun "ipa hbacrule-add-service rule28 --hbacsvcgroup=sshd"
                 rlRun "ipa hbacrule-show rule28 --all"
 
         # ipa hbactest:
@@ -1979,7 +1982,7 @@ hbacsvc_master_029() {
                 rlRun "ipa hbacrule-add-host rule29 --hosts=$CLIENT"
                 rlRun "ipa hbacrule-add-sourcehost rule29 --hosts=$CLIENT2"
                 rlRun "ipa hbacrule-add-service rule29 --hbacsvcs=sshd"
-                rlRun "ipa hbacrule-add-service rule29 --hbacsvcgroups=empty"
+                rlRun "ipa hbacrule-add-service rule29 --hbacsvcgroup=empty"
                 rlRun "ipa hbacrule-show rule29 --all"
 
         # ipa hbactest:
@@ -2037,7 +2040,7 @@ hbacsvc_master_030() {
                 rlRun "ipa hbacrule-add-host rule30 --hostgroups=emptyhostgroup"
                 rlRun "ipa hbacrule-add-sourcehost rule30 --hosts=$CLIENT2"
                 rlRun "ipa hbacrule-add-service rule30 --hbacsvcs=sshd"
-                rlRun "ipa hbacrule-add-service rule30 --hbacsvcgroups=empty"
+                rlRun "ipa hbacrule-add-service rule30 --hbacsvcgroup=empty"
                 rlRun "ipa hbacrule-show rule30 --all"
 
         # ipa hbactest:

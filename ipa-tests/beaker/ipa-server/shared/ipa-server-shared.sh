@@ -572,20 +572,23 @@ qaRun()
 ssh_auth_success()
    {
         {
+user=$1
+passwd=$2
+host=$3
 	expect -f - <<-EOF | grep -C 77 '^login successful'
-        	spawn ssh -q -o StrictHostKeyChecking=no -l "$1" $3 echo 'login successful'
+        	spawn ssh -q -o StrictHostKeyChecking=no -l "$user" $host echo 'login successful'
                 expect {
                 	"*assword: " {
-                        send -- "$2\r"
+                        send -- "$passwd\r"
                         	}
                        }
                 expect eof
 EOF
 
 if [ $? = 0 ]; then
-	rlPass "Authentication successful for $i, as expected"
+	echo "Authentication successful for $user, as expected"
 	else   
-        rlFail "ERROR: Authentication failed for $1, expected success."
+        echo "ERROR: Authentication failed for $user, expected success."
 fi
         }
    }
@@ -598,20 +601,23 @@ fi
 ssh_auth_failure()
    {
         {
+user=$1
+passwd=$2
+host=$3
         expect -f - <<-EOF | grep -C 77 '^login successful'
-                spawn ssh -q -l "$1" $CLIENT1 echo 'login successful'
+                spawn ssh -q -o StrictHostKeyChecking=no -l "$user" $host echo 'login successful'
                 expect {
  	                "*assword: " {
-                        send -- "$2\r"
+                        send -- "$passwd\r"
                                 }
                        }
                 expect eof
 EOF
 
 if [ $? = 0 ]; then
-	rlFail "ERROR: Authentication success for $1, expected failure."
+	echo "ERROR: Authentication success for $user, expected failure."
         else
-        rlPass "Authentication failed for $1, as expected"
+        echo "Authentication failed for $user, as expected"
 fi
         }
    }
