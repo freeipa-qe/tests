@@ -193,8 +193,8 @@ public class GroupTasks {
         if (! gid.equals(""))
         	browser.textbox("gidnumber").setValue(gid);
         
-        if (isPosix.equals("nonPosix")){
-        	browser.checkbox("nonposix").click();
+        if (isPosix.equals("isPosix")){
+        	browser.checkbox("posix").click();
         }
         browser.button("Add").click();
 	}
@@ -209,8 +209,8 @@ public class GroupTasks {
         browser.textbox("description").setValue(firstGroupDescription);
         if (! firstGid.equals(""))
         	browser.textbox("gidnumber").setValue(firstGid);
-        if (first_isPosix.equals("nonPosix")){
-        	browser.checkbox("nonposix").click();
+        if (first_isPosix.equals("isPosix")){
+        	browser.checkbox("posix").click();
         }
         
         // click Add and Add Another to create a new group without leave the current dialog, 
@@ -220,8 +220,8 @@ public class GroupTasks {
         browser.textbox("description").setValue(secondGroupDescription);
         if (! secondGid.equals(""))
         	browser.textbox("gidnumber").setValue(secondGid);
-        if (second_isPosix.equals("nonPosix")){
-        	browser.checkbox("nonposix").click();
+        if (second_isPosix.equals("isPosix")){
+        	browser.checkbox("posix").click();
         }
         
         // finally cancel to go back to main user group page
@@ -235,8 +235,8 @@ public class GroupTasks {
         browser.textbox("cn").setValue(groupName);
         browser.textbox("description").setValue(groupDescription);
         browser.textbox("gidnumber").setValue(gid);
-        if (isPosix.equals("nonPosix")){
-        	browser.checkbox("nonposix").click();
+        if (isPosix.equals("isPosix")){
+        	browser.checkbox("posix").click();
         } 
         browser.button("Add and Edit").click();
         
@@ -256,7 +256,7 @@ public class GroupTasks {
         browser.textbox("description").setValue(groupDescription);
         browser.textbox("gidnumber").setValue(gid);
         if (isPosix.equals("isPosix")){
-        	browser.checkbox("nonposix").click();
+        	browser.checkbox("posix").click();
         } 
         browser.button("Cancel").click();
 	}
