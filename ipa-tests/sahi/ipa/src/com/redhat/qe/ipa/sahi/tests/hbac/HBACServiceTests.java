@@ -373,9 +373,9 @@ public class HBACServiceTests  extends SahiTestScript{
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
         //										testname					cn			description
-		ll.add(Arrays.asList(new Object[]{ "good_service",				"http",		"testing http service for HBAC"      } ));
-		ll.add(Arrays.asList(new Object[]{ "test_service",				"https",	"testing https service for HBAC"      } ));
-		ll.add(Arrays.asList(new Object[]{ "long_service",				"abcdefghijklmnopqrstuvwxyz123456789ANDAGAINabcdefghijklmnopqrstuvwxyz123456789ANDAGAINabcdefghijklmnopqrstuvwxyz123456789", "long svc name"      } ));
+		ll.add(Arrays.asList(new Object[]{ "add_good_service",				"http",		"testing http service for HBAC"      } ));
+		ll.add(Arrays.asList(new Object[]{ "add_test_service",				"https",	"testing https service for HBAC"      } ));
+		ll.add(Arrays.asList(new Object[]{ "add_long_service",				"abcdefghijklmnopqrstuvwxyz123456789ANDAGAINabcdefghijklmnopqrstuvwxyz123456789ANDAGAINabcdefghijklmnopqrstuvwxyz123456789", "long svc name"      } ));
 		// FIXME: nkrishnan - Bug 738339 - [ipa webui] Encode special chars in values when displaying 
 		// not uncommenting, since flow depends on this test passing
 	   // ll.add(Arrays.asList(new Object[]{ "hbacservice_specialchar",	    "h@ba*c#Se?r!v<i~c`e",			"svc name with special char"      } ));
@@ -515,7 +515,7 @@ public class HBACServiceTests  extends SahiTestScript{
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
         //										testname			searchstring	cn1			cn2			cn3			cn4			cn5																																	cn4   
-		ll.add(Arrays.asList(new Object[]{ "search_hbacservice",	"testing",		"http",		"https",	"ntpd",		"rlogin",	"portmap"      } ));
+		ll.add(Arrays.asList(new Object[]{ "search_service",	"testing",		"http",		"https",	"ntpd",		"rlogin",	"portmap"      } ));
 		
 		return ll;	
 	}
@@ -532,7 +532,7 @@ public class HBACServiceTests  extends SahiTestScript{
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
         //										testname					cn				   
-		ll.add(Arrays.asList(new Object[]{ "delete_hbacservice",		"portmap"	 } ));
+		ll.add(Arrays.asList(new Object[]{ "delete_service",		"portmap"	 } ));
 		
 		return ll;	
 	}
@@ -549,7 +549,7 @@ public class HBACServiceTests  extends SahiTestScript{
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
         //										testname					cn				   
-		ll.add(Arrays.asList(new Object[]{ "cancel_delete_hbacservice",		"portmap"	 } ));
+		ll.add(Arrays.asList(new Object[]{ "cancel_delete_service",		"portmap"	 } ));
 		
 		return ll;	
 	}
@@ -567,7 +567,7 @@ public class HBACServiceTests  extends SahiTestScript{
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
         //										testname									cn				   
-		ll.add(Arrays.asList(new Object[]{ "cancel_enroll_service_into_servicegroup",		"ntpd"      } ));
+		ll.add(Arrays.asList(new Object[]{ "cancel_enroll_service_into_group",		"ntpd"      } ));
 		
 		return ll;	
 	}
