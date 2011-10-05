@@ -30,7 +30,7 @@ restore_systime()
 {
 #restore system time by sync with ntp server
 #    rlRun "service ntpd stop" 0 "Stopping local ntpd service to sync with external source"
-    rlRun "ntpdate $NTPSERVER" 0 "restore system by sync with ntp server"
+    ntpdate $NTPSERVER
 #    rlRun "service ntpd start" 0 "Starting local ntpd service again"
 } # restore_systime
 
@@ -462,7 +462,7 @@ kinit_aftermaxlife()
     local exp=$TmpDir/kinitaftermaxlife.$RANDOM.exp
     echo "set timeout 30" > $exp
     echo "set force_conservative 0" >> $exp
-    echo "set send_slow {1 .1}" >> $exp
+    echo "set send_slow {2 .5}" >> $exp
     echo "spawn kinit -V $username" >> $exp
     echo 'match_max 100000' >> $exp
     echo 'expect "*: "' >> $exp
@@ -533,7 +533,7 @@ Local_KinitAsAdmin()
             # now set admin password back to original password
             echo "set timeout 30" > $exp
             echo "set force_conservative 0" >> $exp
-            echo "set send_slow {1 .1}" >> $exp
+            echo "set send_slow {2 .5}" >> $exp
             echo "spawn ipa passwd admin" >> $exp
             echo 'match_max 100000' >> $exp
             echo 'expect "*: "' >> $exp
@@ -588,7 +588,7 @@ change_password()
     fi
     echo "set timeout 5" > $exp
     echo "set force_conservative 0" >> $exp
-    echo "set send_slow {1 .1}" >> $exp
+    echo "set send_slow {2 .5}" >> $exp
     echo "spawn ipa passwd $userlogin" >> $exp
     echo 'match_max 100000' >> $exp
     echo 'expect "*: "' >> $exp
