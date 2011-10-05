@@ -504,11 +504,12 @@ Local_KinitAsAdmin()
     local out=$TmpDir/kinitasadmin.$RANDOM.txt
     local exp
     local temppw
-    echo "[Local_KinitAsAdmin] try old password: [$pw]"
+    echo "[Local_KinitAsAdmin] kinit with password: [$pw]"
     echo $pw | kinit $ADMINID 2>&1 > $out
     if [ $? = 0 ];then
         rlPass "[Local_KinitAsAdmin] kinit as admin with [$pw] success"
     elif [ $? = 1 ];then
+        echo "[Local_KinitAsAdmin] kinit as admin with [$pw] failed"
         echo "[Local_KinitAsAdmin] check ipactl status"
         ipactl status
         echo "========================================="
