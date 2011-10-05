@@ -64,8 +64,7 @@
 				<include name="sudoCommandGroupAddAndAddAnotherTests" />
 				<include name="sudoCommandGroupAddAndEditTests" />
 				<include name="sudoCommandGroupCancelEnrollTests" />
-				<include name="sudoCommandGroupEnrollTests" />
-				<!-- not a valid test anymore <include name="sudoCommandGroupEnrollAgainTests" /> --> 
+				<include name="sudoCommandGroupEnrollTests" /> 
 				<include name="sudoCancelDeleteFromCommandGroupTests" />
 				<include name="sudoDeleteFromCommandGroupTests" />
 				<include name="sudoTwoCommandGroupEnrollTests"/>
@@ -81,6 +80,7 @@
 		    <class name="com.redhat.qe.ipa.sahi.tests.sudo.SudoCommandGroupTests" />
 		</classes>
 	</test>
+	
 
 	<listeners>        
   		<listener class-name="com.redhat.qe.auto.testng.TestNGListener" />	
