@@ -90,6 +90,7 @@ rlJournalStart
 	rlPhaseStartSetup "ipa-hbacsvc-func: Checking client"
                 rlLog "Machine in recipe is CLIENT"
                 rlRun "service iptables stop" 0 "Stop the firewall on the client"
+		rlRun "yum install -y ftp"
 		rlRun "cat /etc/krb5.conf"
 
                 rlRun "rhts-sync-block -s DONE_master_setup $BEAKERMASTER"
@@ -292,6 +293,7 @@ rlJournalStart
 	rlPhaseStartSetup "ipa-hbacsvc-func: Checking client"
                 rlLog "Machine in recipe is CLIENT2"
                 rlRun "service iptables stop" 0 "Stop the firewall on the client"
+		rlRun "yum install -y ftp"
 		rlRun "cat /etc/krb5.conf"
 
 		rlRun "rhts-sync-block -s DONE_master_setup $BEAKERMASTER"
