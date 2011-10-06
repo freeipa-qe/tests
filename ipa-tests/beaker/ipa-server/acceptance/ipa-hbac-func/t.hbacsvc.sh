@@ -1975,7 +1975,7 @@ hbacsvc_master_029() {
                 rlRun "ipa hbacrule-disable allow_all"
 
 		rlRun "ipa group-add emptygroup --desc=emptygroup"
-		rlRun "ipa hbacsvcgroup-add empty"
+		rlRun "ipa hbacsvcgroup-add empty --desc=emptygroup"
                 rlRun "ipa hbacrule-add rule29"
                 rlRun "ipa hbacrule-add-user rule29 --users=$user29"
                 rlRun "ipa hbacrule-add-user rule29 --groups=emptygroup"
@@ -2032,7 +2032,7 @@ hbacsvc_master_030() {
 
 		rlRun "ipa hostgroup-add emptyhostgroup --desc=emptyhostgroup"
 		rlRun "ipa group-add emptygroup --desc=emptygroup"
-		rlRun "ipa hbacsvcgroup-add empty"
+		rlRun "ipa hbacsvcgroup-add empty --desc=emptygroup"
                 rlRun "ipa hbacrule-add rule30"
                 rlRun "ipa hbacrule-add-user rule30 --users=$user30"
                 rlRun "ipa hbacrule-add-user rule30 --groups=emptygroup"
