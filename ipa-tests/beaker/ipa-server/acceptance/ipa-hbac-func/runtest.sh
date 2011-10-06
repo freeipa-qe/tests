@@ -678,7 +678,8 @@ rlJournalStart
                 hbacsvc_master_025
 
 	# hbacsvc_master_026
-                hbacsvc_master_026
+	# Target host cannot be an external host. Hence commenting the following test.
+        #       hbacsvc_master_026
 
 	# hbacsvc_master_027
 		hbacsvc_master_027

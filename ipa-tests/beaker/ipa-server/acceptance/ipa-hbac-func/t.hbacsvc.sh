@@ -990,6 +990,8 @@ hbacsvc_master_012() {
                 rlRun "ipa hbacrule-add-user rule12 --groups=group12"
                 rlRun "ipa hbacrule-add-host rule12 --hosts=$CLIENT2"
                 rlRun "ipa hbacrule-add-sourcehost rule12 --hostgroups=hostgroup12"
+		rlRun "ipa hbacsvcgroup-add sshd --desc=sshdgrp"
+		rlRun "ipa hbacsvcgroup-add-member sshd --hbacsvc=sshd"
 		rlRun "ipa hbacrule-add-service rule12 --hbacsvcgroup=sshd"
                 rlRun "ipa hbacrule-show rule12 --all"
 
@@ -1630,7 +1632,7 @@ hbacsvc_master_020_1() {
                 rlRun "ipa hbacrule-disable allow_all"
 
                 rlRun "ipa hbacrule-del rule20"
-                rlRun "ipa hbacrule-show rule20 --all" 1
+                rlRun "ipa hbacrule-show rule20 --all" 2
 
         # ipa hbactest:
 
@@ -1797,11 +1799,11 @@ hbacsvc_master_025() {
 
                 rlRun "ipa group-add group25 --desc=group25"
                 rlRun "ipa group-add group25-2 --desc=group25-2"
-                rlRun "ipa group-add-member group25 --users=$group25-2"
-                rlRun "ipa group-add-member group25-2 --users=$user25"
+                rlRun "ipa group-add-member group25 --users=user25"
+                rlRun "ipa group-add-member group25-2 --groups=group25"
 
                 rlRun "ipa hbacrule-add rule25"
-                rlRun "ipa hbacrule-add-user rule25 --users=$user25"
+                rlRun "ipa hbacrule-add-user rule25 --users=user25"
                 rlRun "ipa hbacrule-add-host rule25 --hosts=$CLIENT"
                 rlRun "ipa hbacrule-add-sourcehost rule25 --hosts=externalhost2.randomhost.com"
 		rlRun "ipa hbacrule-add-service rule25 --hbacsvcs=sshd"
@@ -1832,8 +1834,8 @@ hbacsvc_master_026() {
 
                 rlRun "ipa group-add group26 --desc=group26"
                 rlRun "ipa group-add group26-2 --desc=group26-2"
-                rlRun "ipa group-add-member group26 --users=$group26-2"
-                rlRun "ipa group-add-member group26-2 --users=$user26"
+                rlRun "ipa group-add-member group26 --user=user26"
+                rlRun "ipa group-add-member group26-2 --groups=group26"
 
                 rlRun "ipa hbacrule-add rule26"
                 rlRun "ipa hbacrule-add-user rule26 --users=$user26"
@@ -1884,7 +1886,7 @@ hbacsvc_master_027() {
                 rlRun "ipa hbactest --user=$user27 --srchost=$CLIENT2 --host=$CLIENT --service=sshd --rule=rule27 | grep -Ex '(Access granted: True|  matched: rule27)'"
                 rlRun "ipa hbactest --user=$user27 --srchost=$CLIENT2 --host=$MASTER --service=sshd --rule=rule27 | grep -Ex '(Access granted: False|  notmatched: rule27)'"
                 rlRun "ipa hbactest --user=$user2 --srchost=$CLIENT2 --host=$CLIENT --service=sshd --rule=rule27 | grep -Ex '(Access granted: False|  notmatched: rule27)'"
-                rlRun "ipa hbactest --srchost=$CLIENT2 --host=$CLIENT2 --service=sshd  --user=$user27 --rule=rule27 --nodetail | grep -i \"Access granted: True\""
+                rlRun "ipa hbactest --srchost=$CLIENT2 --host=$CLIENT2 --service=sshd  --user=$user27 --rule=rule27 --nodetail | grep -i \"Access granted: False\""
                 rlRun "ipa hbactest --srchost=$CLIENT2 --host=$CLIENT2 --service=sshd  --user=$user27 --rule=rule27 --nodetail | grep -i \"matched: rule27\"" 1
 
         rlPhaseEnd
@@ -1925,7 +1927,7 @@ hbacsvc_master_028() {
                 rlRun "ipa hbacrule-add-host rule28 --hosts=$CLIENT"
                 rlRun "ipa hbacrule-add-sourcehost rule28 --hosts=$CLIENT2"
                 rlRun "ipa hbacrule-add-service rule28 --hbacsvcs=sshdtest"
-                rlRun "ipa hbacrule-add-service rule28 --hbacsvcgroup=sshd"
+                rlRun "ipa hbacrule-add-service rule28 --hbacsvcs=sshd"
                 rlRun "ipa hbacrule-show rule28 --all"
 
         # ipa hbactest:
