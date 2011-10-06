@@ -1,7 +1,8 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
 #   Makefile of /CoreOS/ipa-server/acceptance/managedby
-#   Description: IPA managedby tests
+#   
+#   Description: IPA managed by tests
 #   Author: Michael Gregg <mgregg@redhat.com>
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -24,12 +25,12 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-export TEST=/CoreOS/ipa-server/acceptance/managedby
+export TEST=/CoreOS/ipa-server/acceptance/ipa-functional-services
 export TESTVERSION=1.0
 
 BUILT_FILES=
 
-FILES=$(METADATA) runtest.sh Makefile PURPOSE t.replicationonmasterslave.sh data.replication.master data.replication.slave data.replication lib.replication.sh
+FILES=$(METADATA) runtest.sh Makefile PURPOSE t.ipafunctionalservices_http.sh
 
 .PHONY: all install download clean
 
@@ -50,12 +51,16 @@ $(METADATA): Makefile
 	@echo "Name:            $(TEST)" >> $(METADATA)
 	@echo "TestVersion:     $(TESTVERSION)" >> $(METADATA)
 	@echo "Path:            $(TEST_DIR)" >> $(METADATA)
-	@echo "Description:     IPA replication acceptance tests" >> $(METADATA)
+	@echo "Description:     IPA Services Functional tests" >> $(METADATA)
 	@echo "Type:            Regression" >> $(METADATA)
-	@echo "TestTime:        60m" >> $(METADATA)
-	@echo "RunFor:          ipa-server" >> $(METADATA)
+	@echo "TestTime:        90m" >> $(METADATA)
+	@echo "RunFor:          ipa-client" >> $(METADATA)
 	@echo "Requires:        ipa-admintools" >> $(METADATA)
 	@echo "Requires:        expect" >> $(METADATA)
+	@echo "Requires:        mod_nss" >> $(METADATA)
+	@echo "Requires:        httpd" >> $(METADATA)
+	@echo "Requires:        mod_auth_kerb" >> $(METADATA)
+	@echo "Requires:        389-ds-base" >> $(METADATA)
 	@echo "Priority:        Normal" >> $(METADATA)
 	@echo "License:         GPLv2" >> $(METADATA)
 	@echo "Confidential:    no" >> $(METADATA)
