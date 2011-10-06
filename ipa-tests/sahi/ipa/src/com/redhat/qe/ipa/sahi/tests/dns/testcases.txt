@@ -1,0 +1,23 @@
+# Yi Zhang : Oct. 6, 2011
+# to submit to tcms use following command:
+# tcms-submit  --phase --description --nobugzilla --runtest ./testcases.txt --plan 4493
+#
+# test case file for tcms-submit
+
+    rlPhaseStartTest "add dns zone"
+    rlPhaseStartTest "delete dns zone"
+
+    rlPhaseStartTest "add dns record: add one record"
+    rlPhaseStartTest "add dns record: add and add another record"
+    rlPhaseStartTest "add dns record: add one record then switch to edit mode"
+    rlPhaseStartTest "add dns record: add then cancel the action, expect no record being created"
+
+    rlPhaseStartTest "modify dns record:"
+
+
+    rlPhaseStartTest "delete single-valued dns record:"
+    rlPhaseStartTest "delete multi-valued dns record:"
+    
+    rlPhaseStartTest "add dns reverse zone"
+    rlPhaseStartTest "delete reverse dns zone"
+
