@@ -512,6 +512,18 @@ Local_KinitAsAdmin()
         echo "[Local_KinitAsAdmin] kinit as admin with [$pw] failed"
         echo "[Local_KinitAsAdmin] check ipactl status"
         ipactl status
+        if echo $pw | kinit $ADMINID | grep -i "kinit: Generic error (see e-text) while getting initial credentials"
+        then
+            echo "[Local_KinitAsAdmin] got kinit: Generic error, restart ipa and try same password again"
+            ipactl restart
+            rlRun "$kdestroy"
+            echo $pw | kinit $ADMINID 2>&1 > $out
+            if [ $? = 0 ];then
+                rlPass "[Local_KinitAsAdmin] kinit as admin with [$pw] success at second attemp -- after restart ipa"
+                return
+            fi
+        fi        
+            
         echo "========================================="
         echo "[Local_KinitAsAdmin] password [$pw] failed, check whether it is because password expired"
         echo "============ output of [echo $pw | kinit $ADMIN] ============="
