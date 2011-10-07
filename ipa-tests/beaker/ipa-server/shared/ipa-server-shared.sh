@@ -586,9 +586,9 @@ host=$3
 EOF
 
 if [ $? = 0 ]; then
-	echo "Authentication successful for $user, as expected"
+	rlPass "Authentication successful for $user, as expected"
 	else   
-        echo "ERROR: Authentication failed for $user, expected success."
+        rlFail "ERROR: Authentication failed for $user, expected success."
 fi
         }
    }
@@ -615,9 +615,9 @@ host=$3
 EOF
 
 if [ $? = 0 ]; then
-	echo "ERROR: Authentication success for $user, expected failure."
+	rlFail "ERROR: Authentication success for $user, expected failure."
         else
-        echo "Authentication failed for $user, as expected"
+        rlPass "Authentication failed for $user, as expected"
 fi
         }
    }
