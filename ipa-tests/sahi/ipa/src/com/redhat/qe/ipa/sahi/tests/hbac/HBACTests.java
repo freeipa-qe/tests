@@ -545,9 +545,9 @@ public class HBACTests extends SahiTestScript {
 
 		//delete any leftover rules created for this test suite
 		for (String hbacRuleTestObject : hbacRuleTestObjects) {
-			if (sahiTasks.link(hbacRuleTestObject.toLowerCase()).exists()){
+			if (sahiTasks.link(hbacRuleTestObject).exists()){
 				log.fine("Cleaning HBAC Service Group: " + hbacRuleTestObject);
-				HBACTasks.deleteHBAC(sahiTasks, hbacRuleTestObject.toLowerCase(), "Delete");
+				HBACTasks.deleteHBAC(sahiTasks, hbacRuleTestObject, "Delete");
 			}			
 		} 
 
