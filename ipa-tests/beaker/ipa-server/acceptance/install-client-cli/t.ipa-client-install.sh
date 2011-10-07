@@ -487,7 +487,7 @@ ipaclientinstall_force()
       rlRun "ipa-client-install --domain=$DOMAIN --realm=$RELM --ntp-server=$NTPSERVER -p $ADMINID -w $ADMINPW -U --server=$MASTER -f" 0 "Installing ipa client and configuring - second time - force it"
       verify_install true force
     rlPhaseEnd
-    rlPhaseStartTest "ipa-client-install-28- [Positive] Uninstall IPA Client after installing with -f [Bug 690185]" 
+    rlPhaseStartTest "ipa-client-install-28- [Positive] Uninstall IPA Client after installing with -f" 
        rlLog "EXECUTING: ipa-client-install --uninstall -U"
        command="ipa-client-install --uninstall -U"
        rlRun "$command" 0 "Uninstalling ipa client - after a force install"
@@ -500,7 +500,7 @@ ipaclientinstall_force()
        rlLog "EXECUTING: ipa-client-install --uninstall -U"
        qaExpectedRun "$command" "$tmpout" 2 "Verify expected error message for non-existent IPA Install" "$expmsg"
     rlPhaseEnd
-    rlPhaseStartTest "ipa-client-install-30- [Positive] Uninstall non-existent IPA Client with force [Bug 690185]" 
+    rlPhaseStartTest "ipa-client-install-30- [Positive] Uninstall non-existent IPA Client with force" 
       # But now force it to install even though it has been previously uninstalled here.
       rlLog "EXECUTING: ipa-client-install --uninstall -U -f"
       rlRun "ipa-client-install --uninstall -U --force" 0 "Uninstalling ipa client - second time - force it"

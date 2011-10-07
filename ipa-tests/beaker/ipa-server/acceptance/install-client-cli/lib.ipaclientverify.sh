@@ -129,11 +129,11 @@ verify_sssd()
        rlLog "Verify sssd.conf - with sssd"
        if [ "$2" == "force" ] ; then
           testcachecredentials=`grep "^cache_credentials"  $SSSD | cut -d "=" -f2 | xargs echo`
-          ipacompare_forinstalluninstall "cache_credentials " "$cache_credentials_force" "$testcachecredentials" "$1" 
+          ipacompare_forinstalluninstall "cache_credentials " "$cache_credentials" "$testcachecredentials" "$1" 
           testauthprovider=`grep "^auth_provider" $SSSD | cut -d "=" -f2 | xargs echo`
-          ipacompare_forinstalluninstall "auth_provider " "$auth_provider_force" "$testauthprovider" "$1" 
+          ipacompare_forinstalluninstall "auth_provider " "$auth_provider" "$testauthprovider" "$1" 
           testchpassprovider=`grep "^chpass_provider" $SSSD | cut -d "=" -f2 | xargs echo`
-          ipacompare_forinstalluninstall "chpass_provider " "$chpass_provider_force" "$testchpassprovider" "$1" 
+          ipacompare_forinstalluninstall "chpass_provider " "$chpass_provider" "$testchpassprovider" "$1" 
        fi
        testidprovider=`grep "^id_provider" $SSSD | cut -d "=" -f2 | xargs echo`
        ipacompare_forinstalluninstall "id_provider " "$id_provider" "$testidprovider" "$1" 
@@ -167,16 +167,16 @@ verify_krb5()
     ipacompare_forinstalluninstall "default_realm " "$default_realm" "$testdefaultrealm" "$1" 
     testrdns=`grep "rdns" $KRB5 | cut -d "=" -f2 | xargs echo` 
     ipacompare_forinstalluninstall "rdns " "$rdns" "$testrdns" "$1" 
-    testticketlifetime=`grep "ticket_lifetime" $KRB5 | cut -d "=" -f2 | xargs echo` 
-    ipacompare_forinstalluninstall "ticket_lifetime " "$ticket_lifetime" "$testticketlifetime" "$1" 
+    #testticketlifetime=`grep "ticket_lifetime" $KRB5 | cut -d "=" -f2 | xargs echo` 
+    #ipacompare_forinstalluninstall "ticket_lifetime " "$ticket_lifetime" "$testticketlifetime" "$1" 
     testforwardable=`grep "forwardable" $KRB5 | cut -d "=" -f2 | xargs echo` 
     ipacompare_forinstalluninstall "forwardable " "$forwardable" "$testforwardable" "$1" 
     testpkinitanchors=`grep "pkinit_anchors" $KRB5 | cut -d "=" -f2 | xargs echo` 
     ipacompare_forinstalluninstall "pkinit_anchors " "$pkinit_anchors" "$testpkinitanchors" "$1" 
     testdebug=`grep "debug" $KRB5 | cut -d "=" -f2 | xargs echo` 
     ipacompare_forinstalluninstall "debug " "$debug_krb5" "$testdebug" "$1" 
-    testrenewlifetime=`grep "renew_lifetime" $KRB5 | cut -d "=" -f2 | xargs echo` 
-    ipacompare_forinstalluninstall "renew_lifetime " "$renew_lifetime" "$testrenewlifetime" "$1" 
+    #testrenewlifetime=`grep "renew_lifetime" $KRB5 | cut -d "=" -f2 | xargs echo` 
+    #ipacompare_forinstalluninstall "renew_lifetime " "$renew_lifetime" "$testrenewlifetime" "$1" 
     testkrb4convert=`grep "krb4_convert" $KRB5 | cut -d "=" -f2 | xargs echo` 
     ipacompare_forinstalluninstall "krb4_convert " "$krb4_convert" "$testkrb4convert" "$1" 
     if [ "$2" == "force" ] ; then
