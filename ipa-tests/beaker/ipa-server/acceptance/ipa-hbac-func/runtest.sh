@@ -693,7 +693,7 @@ rlJournalStart
 
 	# hbacsvc_master_029
 		hbacsvc_master_029
-                rlRun "rhts-sync-set -s DONE_hbacsvc_master_029-m $BEAKERMASTER"
+                rlRun "rhts-sync-set -s DONE_hbacsvc_master_029 -m $BEAKERMASTER"
                 rlRun "rhts-sync-block -s DONE_hbacsvc_client_029 -s DONE_hbacsvc_client2_029 $BEAKERCLIENT $BEAKERCLIENT2"
 
 	# hbacsvc_master_030

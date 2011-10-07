@@ -144,6 +144,7 @@ hbacsvc_client2_002() {
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 rlRun "getent -s sss passwd $user1"
+                rlRun "getent -s sss passwd $user2"
                 rlRun "ftp_auth_success $user1 testpw123@ipa.com $MASTER"
 		rlRun "ftp_auth_failure $user2 testpw123@ipa.com $MASTER"
 
