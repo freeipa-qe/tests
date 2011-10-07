@@ -100,8 +100,8 @@ hbacsvc_master_002() {
                 rlRun "ipa hbacrule-disable allow_all"
 
 		rlRun "yum install ftp vsftpd -y"
-		rlRun "setsebool -P ftp_home_dir on"
 		rlRun "service vsftpd start"
+		rlRun "setsebool -P ftp_home_dir on"
 
 		rlRun "ipa hbacrule-add rule2"
 		rlRun "ipa hbacrule-add-user rule2 --users=$user1"
@@ -2089,6 +2089,10 @@ hbacsvc_master_bug736314() {
 
         rlPhaseStartTest "ipa-hbacsvc-bug736314: user736314 part of rule736314 is allowed to access $MASTER from $CLIENT"
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+		user736314="user736314"
+		rlRun "create_ipauser $user736314 $user736314 $user736314 $userpw"
+                sleep 5
+
                 rlRun "ipa hbacrule-disable allow_all"
 
                 rlRun "ipa hbacrule-add rule736314"
