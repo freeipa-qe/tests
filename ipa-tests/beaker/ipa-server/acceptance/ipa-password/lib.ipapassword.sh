@@ -460,9 +460,9 @@ kinit_aftermaxlife()
     local pw=$2
     local newpw=$3
     local exp=$TmpDir/kinitaftermaxlife.$RANDOM.exp
-    echo "set timeout 30" > $exp
+    echo "set timeout 10" > $exp
     echo "set force_conservative 0" >> $exp
-    echo "set send_slow {2 .5}" >> $exp
+    echo "set send_slow {1 .01}" >> $exp
     echo "spawn kinit -V $username" >> $exp
     echo 'match_max 100000' >> $exp
     echo 'expect "*: "' >> $exp
@@ -544,9 +544,9 @@ Local_KinitAsAdmin()
             classes=`echo $classes`
             ipa pwpolicy-mod --maxfail=0 --failinterval=0 --lockouttime=0 --minlife=0 --history=0 --minclasses=0
             # now set admin password back to original password
-            echo "set timeout 30" > $exp
+            echo "set timeout 10" > $exp
             echo "set force_conservative 0" >> $exp
-            echo "set send_slow {2 .5}" >> $exp
+            echo "set send_slow {1 .01}" >> $exp
             echo "spawn ipa passwd admin" >> $exp
             echo 'match_max 100000' >> $exp
             echo 'expect "*: "' >> $exp
@@ -599,9 +599,9 @@ change_password()
         rlFail "no kerberos found for [$userlogin], test can not continue"
         return 1
     fi
-    echo "set timeout 5" > $exp
+    echo "set timeout 10" > $exp
     echo "set force_conservative 0" >> $exp
-    echo "set send_slow {2 .5}" >> $exp
+    echo "set send_slow {1 .01}" >> $exp
     echo "spawn ipa passwd $userlogin" >> $exp
     echo 'match_max 100000' >> $exp
     echo 'expect "*: "' >> $exp
