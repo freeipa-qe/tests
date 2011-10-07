@@ -1941,7 +1941,7 @@ hbacsvc_master_028() {
                 rlRun "ipa hbactest --user=$user28 --srchost=$CLIENT2 --host=$CLIENT --service=sshd --rule=rule28 | grep -Ex '(Access granted: True|  matched: rule28)'"
                 rlRun "ipa hbactest --user=$user28 --srchost=$CLIENT2 --host=$MASTER --service=sshd --rule=rule28 | grep -Ex '(Access granted: False|  notmatched: rule28)'"
                 rlRun "ipa hbactest --user=$user2 --srchost=$CLIENT2 --host=$CLIENT --service=sshd --rule=rule28 | grep -Ex '(Access granted: False|  notmatched: rule28)'"
-                rlRun "ipa hbactest --srchost=$CLIENT2 --host=$CLIENT2 --service=sshd  --user=$user28 --rule=rule28 --nodetail | grep -i \"Access granted: True\""
+                rlRun "ipa hbactest --srchost=$CLIENT2 --host=$CLIENT2 --service=sshd  --user=$user28 --rule=rule28 --nodetail | grep -i \"Access granted: False\""
                 rlRun "ipa hbactest --srchost=$CLIENT2 --host=$CLIENT2 --service=sshd  --user=$user28 --rule=rule28 --nodetail | grep -i \"matched: rule28\"" 1
 
         rlPhaseEnd
@@ -1977,6 +1977,10 @@ hbacsvc_master_029() {
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 rlRun "ipa hbacrule-disable allow_all"
 
+		ipa hbacsvcgroup-show empty
+		if [ $? -ne 0 ] ; then
+			rlRun "ipa hbacsvcgroup-del empty"
+		fi
 		rlRun "ipa group-add emptygroup --desc=emptygroup"
 		rlRun "ipa hbacsvcgroup-add empty --desc=emptygroup"
                 rlRun "ipa hbacrule-add rule29"
@@ -1998,7 +2002,7 @@ hbacsvc_master_029() {
                 rlRun "ipa hbactest --user=$user29 --srchost=$CLIENT2 --host=$CLIENT --service=sshd --rule=rule29 | grep -Ex '(Access granted: True|  matched: rule29)'"
                 rlRun "ipa hbactest --user=$user29 --srchost=$CLIENT2 --host=$MASTER --service=sshd --rule=rule29 | grep -Ex '(Access granted: False|  notmatched: rule29)'"
                 rlRun "ipa hbactest --user=$user2 --srchost=$CLIENT2 --host=$CLIENT --service=sshd --rule=rule29 | grep -Ex '(Access granted: False|  notmatched: rule29)'"
-                rlRun "ipa hbactest --srchost=$CLIENT2 --host=$CLIENT2 --service=sshd  --user=$user29 --rule=rule29 --nodetail | grep -i \"Access granted: True\""
+                rlRun "ipa hbactest --srchost=$CLIENT2 --host=$CLIENT2 --service=sshd  --user=$user29 --rule=rule29 --nodetail | grep -i \"Access granted: False\""
                 rlRun "ipa hbactest --srchost=$CLIENT2 --host=$CLIENT2 --service=sshd  --user=$user29 --rule=rule29 --nodetail | grep -i \"matched: rule29\"" 1
 
         rlPhaseEnd
@@ -2034,7 +2038,15 @@ hbacsvc_master_030() {
                 rlRun "ipa hbacrule-disable allow_all"
 
 		rlRun "ipa hostgroup-add emptyhostgroup --desc=emptyhostgroup"
+		ipa group-show emptygroup
+		if [ $? -ne 0 ] ; then
+			rlRun "ipa group-del emptygroup"
+		fi
 		rlRun "ipa group-add emptygroup --desc=emptygroup"
+		ipa hbacsvcgroup-show empty
+		if [ $? -ne 0 ] ; then
+			rlRun "ipa hbacsvcgroup-del empty"
+		fi
 		rlRun "ipa hbacsvcgroup-add empty --desc=emptygroup"
                 rlRun "ipa hbacrule-add rule30"
                 rlRun "ipa hbacrule-add-user rule30 --users=$user30"
@@ -2056,8 +2068,8 @@ hbacsvc_master_030() {
                 rlRun "ipa hbactest --user=$user30 --srchost=$CLIENT2 --host=$CLIENT --service=sshd --rule=rule30 | grep -Ex '(Access granted: True|  matched: rule30)'"
                 rlRun "ipa hbactest --user=$user30 --srchost=$CLIENT2 --host=$MASTER --service=sshd --rule=rule30 | grep -Ex '(Access granted: False|  notmatched: rule30)'"
                 rlRun "ipa hbactest --user=$user2 --srchost=$CLIENT2 --host=$CLIENT --service=sshd --rule=rule30 | grep -Ex '(Access granted: False|  notmatched: rule30)'"
-                rlRun "ipa hbactest --srchost=$CLIENT2 --host=$CLIENT2 --service=sshd  --user=$user30 --rule=rule30 --nodetail | grep -i \"Access granted: True\""
-                rlRun "ipa hbactest --srchost=$CLIENT2 --host=$CLIENT2 --service=sshd  --user=$user30 --rule=rule30 --nodetail | grep -i \"matched: rule30\"" 1
+                rlRun "ipa hbactest --srchost=$CLIENT2 --host=$CLIENT2 --service=sshd  --user=$user30 --rule=rule30 --nodetail | grep -i \"Access granted: False\""
+                rlRun "ipa hbactest --srchost=$CLIENT2 --host=$CLIENT2 --service=sshd  --user=$user30 --rule=rule30 --nodetail | grep -i \"notmatched: rule30\"" 1
 
         rlPhaseEnd
 }

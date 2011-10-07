@@ -666,19 +666,21 @@ rlJournalStart
                 hbacsvc_master_021
 
 	# hbacsvc_master_022
-                hbacsvc_master_022
+	# As per design target host cannot be an external host. Hence commenting the following test.
+        #       hbacsvc_master_022
 
 	# hbacsvc_master_023
                 hbacsvc_master_023
 
 	# hbacsvc_master_024
-                hbacsvc_master_024
+	# As per design target host cannot be an external host. Hence commenting the following test.
+        #       hbacsvc_master_024
 
 	# hbacsvc_master_025
                 hbacsvc_master_025
 
 	# hbacsvc_master_026
-	# Target host cannot be an external host. Hence commenting the following test.
+	# As per design target host cannot be an external host. Hence commenting the following test.
         #       hbacsvc_master_026
 
 	# hbacsvc_master_027
