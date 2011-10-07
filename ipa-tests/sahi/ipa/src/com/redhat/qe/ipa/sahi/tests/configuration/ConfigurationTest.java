@@ -19,6 +19,21 @@ import com.redhat.qe.ipa.sahi.tasks.GroupTasks;
 import com.redhat.qe.ipa.sahi.tasks.HBACTasks;
 import com.redhat.qe.ipa.sahi.tasks.UserTasks;
 
+
+/*
+ * Comments from review:
+ * 1)  Scenario ... you could try to delete the configgroup while it is set to the default.  You shouldn't be able to delete it. //done
+
+2) I am not sure that spaces should be allowed in the default email domain.
+
+So ... 2 questions for Rob ... //done
+1) should spaces be allowed in default email domain?
+2) what is the max user length if the value is set to blank or should blank not be allowed?
+
+I also tried running the tests from eclipse and I think there is an order issue, or you need to set the search size limit to 
+over 21 as the last value in that test.  The config user that gets added and then deleted, doesn't get deleted because it is 
+displayed on the screen and then subsequently adding the user again - duplicate user error. //done
+ */
 public class ConfigurationTest extends SahiTestScript{
 	private static Logger log = Logger.getLogger(ConfigurationTest.class.getName()); 
 	
@@ -84,7 +99,8 @@ public class ConfigurationTest extends SahiTestScript{
 			ConfigurationTasks.setConfigValue(sahiTasks, "ipasearchrecordslimit", value);
 			ConfigurationTasks.verifyConfigValue(sahiTasks, "ipasearchrecordslimit", value);
 			ConfigurationTasks.verifySearchSizeLimitFunctional(sahiTasks, commonTasks, value, expectedRows);
-			
+			//set search size limit back to its default
+			ConfigurationTasks.setConfigValue(sahiTasks, "ipasearchrecordslimit", "100");
 	} 
 	
 	/*
@@ -183,6 +199,7 @@ public class ConfigurationTest extends SahiTestScript{
 		ConfigurationTasks.verifyConfigValue(sahiTasks, "ipadefaultprimarygroup", group);		
 		String user = "configuser";
 		ConfigurationTasks.verifyUserGroupFunctional(sahiTasks, commonTasks, group, user);
+		ConfigurationTasks.verifyDeleteDefaultUserGroup(sahiTasks, commonTasks, group);
 	} 
 	
 	

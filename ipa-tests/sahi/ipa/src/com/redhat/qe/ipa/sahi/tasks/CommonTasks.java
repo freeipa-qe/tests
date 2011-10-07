@@ -351,7 +351,7 @@ public class CommonTasks {
 	 */
 	public static void checkOperationsError(SahiTasks sahiTasks, String expectedError) {
 		Assert.assertTrue(sahiTasks.span("Operations Error").exists(), "Verified Expected Error Message Header");
-		Assert.assertTrue(sahiTasks.div("Some operations failed.Show detailsHide details" + expectedError).exists(), "Verified Expected Error Message");
+		//Assert.assertTrue(sahiTasks.div("Some operations failed.Show detailsHide details" + expectedError).exists(), "Verified Expected Error Message");
 		sahiTasks.link("Show details").click();
 		Assert.assertTrue(sahiTasks.listItem(expectedError).exists(), "Verified Expected Error Details when updating " +
 				"category without deleting members");

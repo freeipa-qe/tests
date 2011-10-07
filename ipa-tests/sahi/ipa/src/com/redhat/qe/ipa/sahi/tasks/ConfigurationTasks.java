@@ -163,6 +163,22 @@ public class ConfigurationTasks {
 		sahiTasks.navigateTo(commonTasks.configurationPage);
 	}
 	
+	
+
+	/*
+	 * Verify default group for user cannot be deleted
+	 *
+	 */
+	
+	public static void verifyDeleteDefaultUserGroup(SahiTasks sahiTasks, CommonTasks commonTasks, String group) {
+		sahiTasks.navigateTo(commonTasks.groupPage);
+		GroupTasks.deleteGroup(sahiTasks, group);
+		String expectedError = "The default users group cannot be removed";
+		CommonTasks.checkOperationsError(sahiTasks, expectedError);
+		sahiTasks.navigateTo(commonTasks.configurationPage);
+	}
+	
+	
 	/*
 	 * Verify home dir for user is as set in config
 	 *
