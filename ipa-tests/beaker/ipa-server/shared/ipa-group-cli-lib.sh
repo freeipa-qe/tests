@@ -416,6 +416,15 @@ verifyUPG()
 	rlLog "User and Group member unique IDs match."
   fi
 
+  # verify bugzilla 745552
+  PRIMARYGROUPID=`cat /tmp/showuser.out | grep GID | cut -d ":" -f 2`
+  if [ $USERIDNUM -ne $PRIMARYGROUPID ] ; then
+	rc=1
+	rlLog "Verify bugzilla 74552 failed.  UID: $USERIDNUM does not match primary group GID: $PRIMARYGROUPID"
+  else
+	rlLog "UID: $USERIDNUM matches primary group GID: $PRIMARYGROUPID"
+  fi
+
   return $rc
 }
 
