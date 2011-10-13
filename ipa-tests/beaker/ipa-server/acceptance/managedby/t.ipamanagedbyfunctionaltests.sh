@@ -32,9 +32,14 @@ ipa-managedbyfunctionaltests()
 
 ipa-managedbyfunctionaltestssetup()
 {
+	kdestroy
+	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials"
+
 	# create a host to be used by the client. 
+	running"ipa dnsrecord-add 98.16.10.in-addr.arpa. 239 --ptr-rec $FAKEHOSTNAME."
 	ipa dnsrecord-add 98.16.10.in-addr.arpa. 239 --ptr-rec $FAKEHOSTNAME.	
-	ipa host-add --ip-address=$FAKEHOSTNAMEIP $FAKEHOST
+	running "ipa host-add --ip-address=$FAKEHOSTNAMEIP $FAKEHOSTNAME"
+	ipa host-add --ip-address=$FAKEHOSTNAMEIP $FAKEHOSTNAME
 	
 }
 
