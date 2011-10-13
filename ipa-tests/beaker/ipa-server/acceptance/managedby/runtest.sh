@@ -40,8 +40,7 @@
 . /dev/shm/env.sh
 
 # Include test case file
-. ./t.ipafunctionalservices_http.sh
-#. ./t.ipafunctionalservices_ldap.sh
+. ./t.ipamanagedbyfunctionaltests.sh
 
 PACKAGELIST="ipa-admintools ipa-client httpd mod_nss mod_auth_kerb 389-ds-base expect"
 
@@ -51,6 +50,20 @@ PACKAGELIST="ipa-admintools ipa-client httpd mod_nss mod_auth_kerb 389-ds-base e
 #########################################
 rlJournalStart
   rlPhaseStartTest "Machine environment check"
+
+	#####################################################################
+	# 		IS THIS MACHINE A MASTER?                           #
+	#####################################################################
+	rc=0
+	echo $MASTER | grep $HOSTNAME
+	if [ $? -eq 0 ] ; then
+		ipa-managedbyfunctionaltestssetup
+		ipa-managedbyfunctionaltests
+			rhts-sync-set -s DONE
+		rlPass
+	else
+		rlLog "Machine in recipe in not a MASTER"
+	fi
 
         #####################################################################
         #               IS THIS MACHINE A CLIENT?                           #
@@ -68,37 +81,11 @@ rlJournalStart
                         	fi
                 	done
                 	rlRun "service iptables stop" 0 "Stop the firewall on the client"
-                	ipafunctionalservices_http
-#                	ipafunctionalservices_ldap
-			rhts-sync-set -s DONE
+			rhts-sync-block -s DONE $BEAKERSERVER
+			ipa-managedbyfunctionaltests
                 fi
         else
                 rlLog "Machine in recipe in not a CLIENT"
-        fi
-
-
-	#####################################################################
-	# 		IS THIS MACHINE A MASTER?                           #
-	#####################################################################
-	rc=0
-	echo $MASTER | grep $HOSTNAME
-	if [ $? -eq 0 ] ; then
-		rhts-sync-block -s DONE $BEAKERCLIENT
-		rlPass
-	else
-		rlLog "Machine in recipe in not a MASTER"
-	fi
-
-	#####################################################################
-	# 		IS THIS MACHINE A SLAVE?                            #
-	#####################################################################
-	rc=0
-        echo $SLAVE | grep $HOSTNAME
-        if [ $? -eq 0 ] ; then
-		rhts-sync-block -s DONE $BEAKERCLIENT
-		rlPass
-        else
-                rlLog "Machine in recipe in not a SLAVE"
         fi
 
    rlPhaseEnd
