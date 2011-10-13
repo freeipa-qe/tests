@@ -23,7 +23,7 @@ echo " HTTP keytab: $HTTPKEYTAB"
 ipa-managedbyfunctionaltests()
 {
     managedby_server_tests
-#    cleanup_managedby
+    cleanup_managedby
 } 
 
 ######################
@@ -36,9 +36,9 @@ ipa-managedbyfunctionaltestssetup()
 	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials"
 
 	# create a host to be used by the client. 
-	running"ipa dnsrecord-add 98.16.10.in-addr.arpa. 239 --ptr-rec $FAKEHOSTNAME."
-	ipa dnsrecord-add 98.16.10.in-addr.arpa. 239 --ptr-rec $FAKEHOSTNAME.	
-	running "ipa host-add --ip-address=$FAKEHOSTNAMEIP $FAKEHOSTNAME"
+#	echo "running: ipa dnsrecord-add 98.16.10.in-addr.arpa. 239 --ptr-rec $FAKEHOSTNAME."
+#	ipa dnsrecord-add 98.16.10.in-addr.arpa. 239 --ptr-rec $FAKEHOSTNAME.	
+	echo "running: ipa host-add --ip-address=$FAKEHOSTNAMEIP $FAKEHOSTNAME"
 	ipa host-add --ip-address=$FAKEHOSTNAMEIP $FAKEHOSTNAME
 	
 }
@@ -62,8 +62,8 @@ managedby_server_tests()
 	rlPhaseEnd
 
 	rlPhaseStartTest "Create a services to FAKEHOST to test with later"
-		rlRun "ipa service-add test/$FAKEHOST" 0 "Added a test service to the FAKEHOST"
-		rlRun "ipa service-find test/$FAKEHOST" 0 "Ensure that the service got added properly"
+		rlRun "ipa service-add test/$FAKEHOSTNAME" 0 "Added a test service to the FAKEHOST"
+		rlRun "ipa service-find test/$FAKEHOSTNAME" 0 "Ensure that the service got added properly"
 	rlPhaseEnd
 
 	rlPhaseStartTest "Negitive test case to try binding as the CLIENTs principal"
@@ -80,12 +80,12 @@ managedby_server_tests()
 	
 	rlPhaseStartTest "try to create a keytab for a service that we should not be able to"
 		file="/dev/shm/fakehostprincipal.keytab"
-		rlRun "ipa-getkeytab -s $MASTER -k $file -p test/$FAKEHOST" 1 "Try to create a keytab for a service that we shouldn't have access to"
+		rlRun "ipa-getkeytab -s $MASTER -k $file -p test/$FAKEHOSTNAME" 1 "Try to create a keytab for a service that we shouldn't have access to. running ipa-getkeytab -s $MASTER -k $file -p test/$FAKEHOSTNAME"
 	rlPhaseEnd
 
 	file="/dev/shm/clientprincipal.keytab"
 	rlPhaseStartTest "try to create a keytab for a service that we should be able to"
-		rlRun "ipa-getkeytab -s $MASTER -k $file -p test/$CLIENT" 0 "Try to create a keytab for a service that we should have access to"
+		rlRun "ipa-getkeytab -s $MASTER -k $file -p test/$CLIENT" 0 "Try to create a keytab for a service that we should have access to by running ipa-getkeytab -s $MASTER -k $file -p test/$CLIENT"
 		rlRun "grep $CLIENT $file" 0 "Make sure that the CLIENT hostname appears to be in the new keytab"
 	rlPhaseEnd
 
@@ -94,6 +94,20 @@ managedby_server_tests()
 certutil -R -s 'cn=ipaqavma.testrelm, o=testrelm' -d db -a > /tmp/puma.csr
 ipa cert-request --principal=host/ipaqavma.testrelm /tmp/puma.csr
 
+}
+
+cleanup_managedby()
+{
+
+	file="/dev/shm/fakehostprincipal.keytab"
+	rm -f $file
+	file="/dev/shm/clientprincipal.keytab"
+	rm -f $file
+	ipa service-del test/$FAKEHOSTNAME
+	ipa service-del test/$CLIENT
+	ipa host-del-managedby --hosts=$CLIENT $FAKEHOSTNAME
+	ipa host-del $FAKEHOSTNAME
+	echo Y | ipa dnsrecord-del 98.16.10.in-addr.arpa. 239
 }
 
 cleanup_http()
