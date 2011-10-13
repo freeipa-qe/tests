@@ -3,8 +3,8 @@
 
 delegation() {
     permission
-#    privilege
-#    role
+    privilege
+    role
 }
 
 permission()
