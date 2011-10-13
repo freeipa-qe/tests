@@ -80,7 +80,7 @@ managedby_server_tests()
 	
 	rlPhaseStartTest "try to create a keytab for a service that we should not be able to"
 		file="/dev/shm/fakehostprincipal.keytab"
-		rlRun "ipa-getkeytab -s $MASTER -k $file -p test/$FAKEHOSTNAME" 1 "Try to create a keytab for a service that we shouldn't have access to. running ipa-getkeytab -s $MASTER -k $file -p test/$FAKEHOSTNAME"
+		rlRun "ipa-getkeytab -s $MASTER -k $file -p test/$FAKEHOSTNAME" 9 "Try to create a keytab for a service that we shouldn't have access to. running ipa-getkeytab -s $MASTER -k $file -p test/$FAKEHOSTNAME"
 	rlPhaseEnd
 
 	file="/dev/shm/clientprincipal.keytab"
@@ -99,13 +99,15 @@ ipa cert-request --principal=host/ipaqavma.testrelm /tmp/puma.csr
 cleanup_managedby()
 {
 
+	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials"
 	file="/dev/shm/fakehostprincipal.keytab"
 	rm -f $file
 	file="/dev/shm/clientprincipal.keytab"
 	rm -f $file
 	ipa service-del test/$FAKEHOSTNAME
 	ipa service-del test/$CLIENT
-	ipa host-del-managedby --hosts=$CLIENT $FAKEHOSTNAME
+	ipa host-remove-managedby --hosts=$MASTER $CLIENT
+	ipa host-remove-managedby --hosts=$CLIENT $FAKEHOSTNAME
 	ipa host-del $FAKEHOSTNAME
 	echo Y | ipa dnsrecord-del 98.16.10.in-addr.arpa. 239
 }
