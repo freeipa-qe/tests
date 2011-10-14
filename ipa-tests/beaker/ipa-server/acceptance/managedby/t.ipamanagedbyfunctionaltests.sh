@@ -41,10 +41,6 @@ ipa-managedbyfunctionaltestssetup()
 	echo "running: ipa host-add --ip-address=$FAKEHOSTNAMEIP $FAKEHOSTNAME"
 	ipa host-add --ip-address=$FAKEHOSTNAMEIP $FAKEHOSTNAME
 	
-}
-
-managedby_server_tests()
-{
 	rlPhaseStartTest "Add managedby agreement for this host"
 		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials"
 		rlRun "ipa host-add-managedby --hosts=$MASTER $CLIENT" 0 "Adding a managedby agreement for the MASTER of the client"
@@ -66,13 +62,22 @@ managedby_server_tests()
 		rlRun "ipa service-find test/$FAKEHOSTNAME" 0 "Ensure that the service got added properly"
 	rlPhaseEnd
 
+	rlPhaseStart "add a managedby service agreement for the master to the test/client serivce"
+		rlRun "ipa service-add-host --hosts=$MASTER test/$CLIENT" 0 "Adding $MASTER to the clients service"
+		rlRun "ipa service-add-host --hosts=$MASTER test/$CLIENT | grep 'member host' | grep $MASTER" 0 "Verify that the master seems to be in the list for the client service"
+	rlPhaseEnd
+
+}
+
+managedby_server_tests()
+{
 	rlPhaseStartTest "Negitive test case to try binding as the CLIENTs principal"
 		kdestroy
 		rlRun "kinit -kt /etc/krb5.keytab host/$CLIENT" 1 "Bind as the host principal for CLIENT, this should return 1"
 		rlRun "klist | grep host/$CLIENT" 1 "make sure we are not bound as the CLIENT host principal"
 	rlPhaseEnd
 
-	rlPhaseStartTest "bind as the MASTER's principal"
+	rlPhaseStartTest "bind as the MASTERs principal"
 		kdestroy
 		rlRun "kinit -kt /etc/krb5.keytab host/$MASTER" 0 "Bind as the host principal for this host"
 		rlRun "klist | grep host/$MASTER" 0 "make sure we seem to be bound as the MASTER principal"
@@ -84,11 +89,18 @@ managedby_server_tests()
 	rlPhaseEnd
 
 	file="/dev/shm/clientprincipal.keytab"
+	hostfile="/dev/shm/clienthostprincipal.keytab"
 	rlPhaseStartTest "try to create a keytab for a service that we should be able to"
 		rlRun "ipa-getkeytab -s $MASTER -k $file -p test/$CLIENT" 0 "Try to create a keytab for a service that we should have access to by running ipa-getkeytab -s $MASTER -k $file -p test/$CLIENT"
+		rlRun "ipa-getkeytab -s $MASTER -k $hostfile -p host/$CLIENT" 0 "Try to create a keytab for a service that we should have access to by running ipa-getkeytab -s $MASTER -k $file -p test/$CLIENT"
 		rlRun "grep $CLIENT $file" 0 "Make sure that the CLIENT hostname appears to be in the new keytab"
 	rlPhaseEnd
 
+	rlPhaseStart "ensure that we can kinit as the gotten keytabs"
+		rlRun "kinit -kt $hostfile host/$CLIENT" 0 "Make sure we can kinit as the keytab that we got from the client"
+		kdestroy
+		kinit -kt /etc/krb5.keytab host/$MASTER
+	rlPhaseEnd
 
 # Next, I should be replicating these steps
 certutil -R -s 'cn=ipaqavma.testrelm, o=testrelm' -d db -a > /tmp/puma.csr
