@@ -85,6 +85,8 @@ fi
 	ipoc4=$(echo $ipaddr | cut -d\. -f4) 
 	echo "IP is $ipoc1 . $ipoc2 . $ipoc3 . $ipoc4"
 
+	# Get the default routers ip, use that for the new ip for the fakehost
+#	newfakehostip=`route -n | grep ^0 | awk '{print $2'}`
 	rlPhaseStartTest "ipa-dns-01: create a new fake host to test dns add during replica prepare"
 		let newip=$ipoc4+1
 		ipa-replica-prepare -p $ADMINPW --ip-address=$ipoc1.$ipoc2.$ipoc3.$newip newfakehost$newip.$DOMAIN
@@ -126,7 +128,7 @@ fi
 	loclong="59"
 	loc="37 23 30.900 N $loclat $loclong 19.000 W 7.00m 100.00m 100.00m 2.00m"
 	naptr='100 10 U E2U+msg !^.*$!mailto:info@example.com! .'
-	naprfind="info@example.com"
+	naptrfind="info@example.com"
 	
 	rlPhaseStartTest "ipa-dns-07: create a new zone"
 		rlRun "ipa dnszone-add --name-server=$ipaddr --admin-email=$email --serial=$serial --refresh=$refresh --retry=$retry --expire=$expire --minimum=$minimum --ttl=$ttl $zone" 0 "Checking to ensure that ipa thinks that it can create a zone"
@@ -232,7 +234,7 @@ fi
 	aaaabad2="aaaa:bbbb:cccc:dddd:eeee:fffff"
 	afsdb="green.femto.edu."
 	certa="PGP 0 0"
-	cert="HC1AAH5t0b9xzRojScUBtVOUObTkFdb/tN81G2MmDL8AXr+tFlJ4J76cckH45wgSRVpIIiH6xdG8pifxp5+D2g=="
+	cert="F835EDA21E94B565716F"
 	cname="m.l.k."
 	dname="bar.$zone."
 	txt="none=1.2.3.4"
@@ -620,7 +622,7 @@ fi
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-109: make sure that dig can find the record type NAPTR"
-		rlRun "dig naptr.$zone | grep $naptrfind" 0 "make sure dig can find the NAPTR record"
+		rlRun "dig naptr.$zone NAPTR | grep '$naptrfind'" 0 "make sure dig can find the NAPTR record"
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-110: delete record of type NAPTR"
@@ -634,7 +636,7 @@ fi
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-112: make sure that dig can not find the record type NAPTR"
-		rlRun "dig naptr.$zone NAPTR | grep '$naptr'" 1 "make sure dig can not find the NAPTR record"
+		rlRun "dig naptr.$zone NAPTR | grep '$naptrfind'" 1 "make sure dig can not find the NAPTR record"
 	rlPhaseEnd
 
 
@@ -780,6 +782,7 @@ fi
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-143: make sure that dig can find the record type loc"
+dig $zone loc
 		rlRun "dig $zone loc | grep '$loclong'" 0 "make sure dig can find the loc record looking for long"
 		rlRun "dig $zone loc | grep '$loclat'" 0 "make sure dig can find the loc record looking for lat"
 	rlPhaseEnd
