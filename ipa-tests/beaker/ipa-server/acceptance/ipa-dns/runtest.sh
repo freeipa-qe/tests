@@ -83,13 +83,13 @@ fi
 	ipoc2=$(echo $ipaddr | cut -d\. -f2) 
 	ipoc3=$(echo $ipaddr | cut -d\. -f3) 
 	ipoc4=$(echo $ipaddr | cut -d\. -f4) 
+	# Get the default routers ip, use that for the new ip for the fakehost
+	newfakehostip=`route -n | grep ^0 | awk '{print $2'}`
 	echo "IP is $ipoc1 . $ipoc2 . $ipoc3 . $ipoc4"
 
-	# Get the default routers ip, use that for the new ip for the fakehost
-#	newfakehostip=`route -n | grep ^0 | awk '{print $2'}`
 	rlPhaseStartTest "ipa-dns-01: create a new fake host to test dns add during replica prepare"
 		let newip=$ipoc4+1
-		ipa-replica-prepare -p $ADMINPW --ip-address=$ipoc1.$ipoc2.$ipoc3.$newip newfakehost$newip.$DOMAIN
+		ipa-replica-prepare -p $ADMINPW --ip-address=$newfakehostip newfakehost$newip.$DOMAIN
 	rlPhaseEnd
 
 
@@ -98,11 +98,11 @@ fi
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-03: ensure that the forward ip of the new fakehost was created in dns correctly with dig"
-		rlRun "dig newfakehost$newip.$DOMAIN | grep $ipoc1.$ipoc2.$ipoc3.$newip" 0 "Checking to ensure that dig returns the correct ip address"
+		rlRun "dig newfakehost$newip.$DOMAIN | grep $newfakehostip" 0 "Checking to ensure that dig returns the correct ip address"
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-04: ensure that the reverse entry of the new fakehost was created in dns correctly with dig"
-		rlRun "dig -x $ipoc1.$ipoc2.$ipoc3.$newip | grep newfakehost$newip.$DOMAIN" 0 "Checking to ensure that reverse of newfakehost$newip.$DOMAIN is set up correctly"
+		rlRun "dig -x $newfakehostip | grep newfakehost$newip.$DOMAIN" 0 "Checking to ensure that reverse of newfakehost$newip.$DOMAIN is set up correctly"
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-05: ensure that the forward ip of the new fakehost is resolvable by dnsrecord-show"
@@ -784,7 +784,8 @@ fi
 	rlPhaseStartTest "ipa-dns-143: make sure that dig can find the record type loc"
 dig $zone loc
 		rlRun "dig $zone loc | grep '$loclong'" 0 "make sure dig can find the loc record looking for long"
-		rlRun "dig $zone loc | grep '$loclat'" 0 "make sure dig can find the loc record looking for lat"
+dig $zone loc
+	#	rlRun "dig $zone loc | grep '$loclat'" 0 "make sure dig can find the loc record looking for lat"
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-144: delete record of type loc"
