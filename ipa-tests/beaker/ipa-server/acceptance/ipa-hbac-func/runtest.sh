@@ -92,6 +92,7 @@ rlJournalStart
                 rlRun "service iptables stop" 0 "Stop the firewall on the client"
 		rlRun "yum install -y ftp"
 		rlRun "cat /etc/krb5.conf"
+		rlRun "authconfig --enablemkhomedir --updateall"
 
                 rlRun "rhts-sync-block -s DONE_master_setup $BEAKERMASTER"
                 rlRun "rhts-sync-set -s DONE_client1_setup -m $BEAKERCLIENT"
@@ -295,6 +296,7 @@ rlJournalStart
                 rlRun "service iptables stop" 0 "Stop the firewall on the client"
 		rlRun "yum install -y ftp"
 		rlRun "cat /etc/krb5.conf"
+		rlRun "authconfig --enablemkhomedir --updateall"
 
 		rlRun "rhts-sync-block -s DONE_master_setup $BEAKERMASTER"
 		rlRun "rhts-sync-set -s DONE_client2_setup -m $BEAKERCLIENT2"
@@ -497,6 +499,7 @@ rlJournalStart
 	rlPhaseStartSetup "ipa-hbacsvc-func: Setup of users"
 
                 rlRun "service iptables stop" 0 "Stop the firewall on the client"
+		rlRun "authconfig --enablemkhomedir --updateall"
         	rlRun "cat /dev/shm/env.sh"
 	        rlRun "TmpDir=\`mktemp -d\`" 0 "Creating tmp directory"
         	rlRun "pushd $TmpDir"
