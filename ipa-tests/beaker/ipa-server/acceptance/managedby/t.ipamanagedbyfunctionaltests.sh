@@ -121,8 +121,8 @@ managedby_server_tests()
 		rm -Rf $certdir
 		mkdir $certdir
 		cd $certdir
-		echo "running certutil -R -s 'CN=$CLIENT,O=$RELM -a -d . -z $RANDOM -f $PWDFILE >> $CLIENT.csr"
-		rlRun "certutil -R -s 'CN=$CLIENT,O=$RELM -a -d . -z $RANDOM -f $PWDFILE >> $CLIENT.csr" 0 "Create a csr for the client"
+		echo "running certutil -R -s 'CN=$CLIENT,O=$RELM' -a -d . -z $RANDOM -f $PWDFILE >> $CLIENT.csr"
+		rlRun "certutil -R -s 'CN=$CLIENT,O=$RELM' -a -d . -z $RANDOM -f $PWDFILE >> $CLIENT.csr" 0 "Create a csr for the client"
 		rlRun "ipa cert-request --principal=host/$MASTER@$RELM $CLIENT.csr" 0 "Sign the client CSR"
 	rlPhaseEnd
 
@@ -131,7 +131,7 @@ managedby_server_tests()
 		rm -Rf $certdir
 		mkdir $certdir
 		cd $certdir
-		rlRun "certutil -R -s 'CN=$FAKEHOSTNAME,O=$RELM -a -d . -z $RANDOM -f $PWDFILE >> $FAKEHOSTNAME.csr" 0 "Create a csr for the fakehost"
+		rlRun "certutil -R -s 'CN=$FAKEHOSTNAME,O=$RELM' -a -d . -z $RANDOM -f $PWDFILE >> $FAKEHOSTNAME.csr" 0 "Create a csr for the fakehost"
 		rlRun "ipa cert-request --principal=host/$MASTER@$RELM $FAKEHOSTNAME.csr" 1 "Make sure that we could not sigh the csr"
 	rlPhaseEnd
 
