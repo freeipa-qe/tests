@@ -10,6 +10,8 @@ HTTPKRBCFG="/etc/httpd/conf.d/krb.conf"
 FAKEHOSTNAME="managedby-fakehost.testrelm"
 FAKEHOSTREALNAME="managedby-fakehost.idm.lab.bos.redhat.com"
 FAKEHOSTNAMEIP="10.16.98.239"
+FAKEHOSTKEYTABFILE="/dev/shm/$FAKEHOSTNAME.host.keytab"
+CLIENTKEYTABFILE="/dev/shm/$CLIENT.host.keytab"
 
 echo " HTTP configuration directory:  $HTTPCFGDIR"
 echo " HTTP certificate directory:  $HTTPCERTDIR"
@@ -67,6 +69,13 @@ ipa-managedbyfunctionaltestssetup()
 		rlRun "ipa service-add-host --hosts=$MASTER test/$CLIENT | grep 'member host' | grep $MASTER" 0 "Verify that the master seems to be in the list for the client service"
 	rlPhaseEnd
 
+	rlPhaseStart "Make some keytabs for later testing"
+		rm -f $FAKEHOSTKEYTABFILE
+		rm -f $CLIENTKEYTABFILE
+		rlRun "ipa-getkeytab -s $MASTER -k $FAKEHOSTKEYTABFILE -p host/$FAKEHOSTNAME" 0 "get the host keytab for the fake host"
+		rlRun "ipa-getkeytab -s $MASTER -k $CLIENTKEYTABFIL -p host/$CLIENT" 0 "get the host keytab for the client"
+	rlPhaseEnd
+
 }
 
 managedby_server_tests()
@@ -90,6 +99,7 @@ managedby_server_tests()
 
 	file="/dev/shm/clientprincipal.keytab"
 	hostfile="/dev/shm/clienthostprincipal.keytab"
+
 	rlPhaseStartTest "try to create a keytab for a service that we should be able to"
 		rlRun "ipa-getkeytab -s $MASTER -k $file -p test/$CLIENT" 0 "Try to create a keytab for a service that we should have access to by running ipa-getkeytab -s $MASTER -k $file -p test/$CLIENT"
 		rlRun "ipa-getkeytab -s $MASTER -k $hostfile -p host/$CLIENT" 0 "Try to create a keytab for a service that we should have access to by running ipa-getkeytab -s $MASTER -k $file -p test/$CLIENT"
@@ -102,9 +112,27 @@ managedby_server_tests()
 		kinit -kt /etc/krb5.keytab host/$MASTER
 	rlPhaseEnd
 
-# Next, I should be replicating these steps
-certutil -R -s 'cn=ipaqavma.testrelm, o=testrelm' -d db -a > /tmp/puma.csr
-ipa cert-request --principal=host/ipaqavma.testrelm /tmp/puma.csr
+	RANDOM=/dev/shm/random.txt
+	echo 'asjkf;avi byrwebh8959aevut890artyariutainawer8turtvuntiohufyav89ra7e4597346g7q35gqhv790qw47tbawvranofiau db8fgaeru sdbo;adfuaidfgy apvudfuas!bio fu' > $RANDOM
+	PWDFILE=/dev/shm/pwfile.txt
+	echo "Secret123" > $PWDFILE
+	rlPhaseStart "create a csrt for the client and sign it using the managed by agreement"
+		certdir=/dev/shm/clientdb
+		rm -Rf $certdir
+		mkdir $certdir
+		cd $certdir
+		rlRun "certutil -R -s 'CN=$CLIENT,O=$RELM -a -d . -z $RANDOM -f $PWDFILE >> $CLIENT.csr" 0 "Create a csr for the client"
+		rlRun "ipa cert-request --principal=host/$MASTER@$RELM $CLIENT.csr" 0 "Sign the client CSR"
+	rlPhaseEnd
+
+	rlPhaseStart "Negitive test case to ensur"
+		certdir=/dev/shm/fakehostdb
+		rm -Rf $certdir
+		mkdir $certdir
+		cd $certdir
+		rlRun "certutil -R -s 'CN=$FAKEHOSTNAME,O=$RELM -a -d . -z $RANDOM -f $PWDFILE >> $FAKEHOSTNAME.csr" 0 "Create a csr for the fakehost"
+		rlRun "ipa cert-request --principal=host/$MASTER@$RELM $FAKEHOSTNAME.csr" 1 "Make sure that we could not sigh the csr"
+	rlPhaseEnd
 
 }
 
