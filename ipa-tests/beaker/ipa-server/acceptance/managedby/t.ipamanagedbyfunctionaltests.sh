@@ -64,12 +64,12 @@ ipa-managedbyfunctionaltestssetup()
 		rlRun "ipa service-find test/$FAKEHOSTNAME" 0 "Ensure that the service got added properly"
 	rlPhaseEnd
 
-	rlPhaseStart "add a managedby service agreement for the master to the test/client serivce"
+	rlPhaseStartTest "add a managedby service agreement for the master to the test/client serivce"
 		rlRun "ipa service-add-host --hosts=$MASTER test/$CLIENT" 0 "Adding $MASTER to the clients service"
 		rlRun "ipa service-add-host --hosts=$MASTER test/$CLIENT | grep 'member host' | grep $MASTER" 0 "Verify that the master seems to be in the list for the client service"
 	rlPhaseEnd
 
-	rlPhaseStart "Make some keytabs for later testing"
+	rlPhaseStartTest "Make some keytabs for later testing"
 		rm -f $FAKEHOSTKEYTABFILE
 		rm -f $CLIENTKEYTABFILE
 		rlRun "ipa-getkeytab -s $MASTER -k $FAKEHOSTKEYTABFILE -p host/$FAKEHOSTNAME" 0 "get the host keytab for the fake host"
@@ -106,7 +106,7 @@ managedby_server_tests()
 		rlRun "grep $CLIENT $file" 0 "Make sure that the CLIENT hostname appears to be in the new keytab"
 	rlPhaseEnd
 
-	rlPhaseStart "ensure that we can kinit as the gotten keytabs"
+	rlPhaseStartTest "ensure that we can kinit as the gotten keytabs"
 		rlRun "kinit -kt $hostfile host/$CLIENT" 0 "Make sure we can kinit as the keytab that we got from the client"
 		kdestroy
 		kinit -kt /etc/krb5.keytab host/$MASTER
@@ -116,7 +116,7 @@ managedby_server_tests()
 	echo 'asjkf;avi byrwebh8959aevut890artyariutainawer8turtvuntiohufyav89ra7e4597346g7q35gqhv790qw47tbawvranofiau db8fgaeru sdbo;adfuaidfgy apvudfuas!bio fu' > $RANDOM
 	PWDFILE=/dev/shm/pwfile.txt
 	echo "Secret123" > $PWDFILE
-	rlPhaseStart "create a csrt for the client and sign it using the managed by agreement"
+	rlPhaseStartTest "create a csrt for the client and sign it using the managed by agreement"
 		certdir=/dev/shm/clientdb
 		rm -Rf $certdir
 		mkdir $certdir
@@ -125,7 +125,7 @@ managedby_server_tests()
 		rlRun "ipa cert-request --principal=host/$MASTER@$RELM $CLIENT.csr" 0 "Sign the client CSR"
 	rlPhaseEnd
 
-	rlPhaseStart "Negitive test case to ensur"
+	rlPhaseStartTest "Negitive test case to ensur"
 		certdir=/dev/shm/fakehostdb
 		rm -Rf $certdir
 		mkdir $certdir
