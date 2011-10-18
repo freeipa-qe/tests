@@ -73,7 +73,7 @@ ipa-managedbyfunctionaltestssetup()
 		rm -f $FAKEHOSTKEYTABFILE
 		rm -f $CLIENTKEYTABFILE
 		rlRun "ipa-getkeytab -s $MASTER -k $FAKEHOSTKEYTABFILE -p host/$FAKEHOSTNAME" 0 "get the host keytab for the fake host"
-		rlRun "ipa-getkeytab -s $MASTER -k $CLIENTKEYTABFIL -p host/$CLIENT" 0 "get the host keytab for the client"
+		rlRun "ipa-getkeytab -s $MASTER -k $CLIENTKEYTABFILE -p host/$CLIENT" 0 "get the host keytab for the client"
 	rlPhaseEnd
 
 }
@@ -113,14 +113,15 @@ managedby_server_tests()
 	rlPhaseEnd
 
 	RANDOM=/dev/shm/random.txt
-	echo 'asjkf;avi byrwebh8959aevut890artyariutainawer8turtvuntiohufyav89ra7e4597346g7q35gqhv790qw47tbawvranofiau db8fgaeru sdbo;adfuaidfgy apvudfuas!bio fu' > $RANDOM
+	echo 'asjkfavi byrwebh8959aevut890artyariutainawer8turtvuntiohufyav89ra7e4597346g7q35gqhv79976856f0qw47tbawvranofiau db8fgaeru sdboadfuaidfgy apvudfuas!bio fu' > $RANDOM
 	PWDFILE=/dev/shm/pwfile.txt
 	echo "Secret123" > $PWDFILE
-	rlPhaseStartTest "create a csrt for the client and sign it using the managed by agreement"
+	rlPhaseStartTest "create a csr for the client and sign it using the managed by agreement"
 		certdir=/dev/shm/clientdb
 		rm -Rf $certdir
 		mkdir $certdir
 		cd $certdir
+		echo "running certutil -R -s 'CN=$CLIENT,O=$RELM -a -d . -z $RANDOM -f $PWDFILE >> $CLIENT.csr"
 		rlRun "certutil -R -s 'CN=$CLIENT,O=$RELM -a -d . -z $RANDOM -f $PWDFILE >> $CLIENT.csr" 0 "Create a csr for the client"
 		rlRun "ipa cert-request --principal=host/$MASTER@$RELM $CLIENT.csr" 0 "Sign the client CSR"
 	rlPhaseEnd
