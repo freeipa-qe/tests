@@ -782,10 +782,12 @@ fi
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-143: make sure that dig can find the record type loc"
-dig $zone loc
-		rlRun "dig $zone loc | grep '$loclong'" 0 "make sure dig can find the loc record looking for long"
-dig $zone loc
-	#	rlRun "dig $zone loc | grep '$loclat'" 0 "make sure dig can find the loc record looking for lat"
+		dig $zone loc
+		file="/dev/shm/dig-loc-result.txt"
+		dig $zone LOC > $file
+		cat $file
+		rlRun "grep '$loclong' $file" 0 "make sure dig can find the loc record looking for long"
+		rlRun "grep '$loclat' $file" 0 "make sure dig can find the loc record looking for lat"
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-144: delete record of type loc"
