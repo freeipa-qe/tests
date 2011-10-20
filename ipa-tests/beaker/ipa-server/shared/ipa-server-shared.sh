@@ -539,7 +539,7 @@ qaRun()
     rlLog "expect [$expectCode], out=[$out]"
     rlLog "$comment"
     
-    $1 2>$out
+    $1 >& $out
     actualCode=$?
     if [ "$actualCode" = "$expectCode" ];then
         rlLog "return code matches, now check the message"
