@@ -272,6 +272,11 @@ rlJournalStart
 
 	rlPhaseEnd
 
+        rlPhaseStartCleanup "ipa-hbacrule-func-cleanup: Destroying admin credentials."
+                rlRun "kdestroy" 0 "Destroying admin credentials."
+                rlRun "cat /var/log/secure | grep \"pam_sss(sshd:auth)\""
+        rlPhaseEnd
+
         else
 
                 rlLog "Machine in recipe in not a CLIENT"
@@ -475,6 +480,11 @@ rlJournalStart
                 rlRun "rhts-sync-set -s DONE_hbacsvc_client2_bug736314 -m $BEAKERCLIENT2"
 
 	rlPhaseEnd
+
+        rlPhaseStartCleanup "ipa-hbacrule-func-cleanup: Destroying admin credentials."
+                rlRun "kdestroy" 0 "Destroying admin credentials."
+                rlRun "cat /var/log/secure | grep \"pam_sss(sshd:auth)\""
+        rlPhaseEnd
 
         else
 
@@ -718,6 +728,7 @@ rlJournalStart
 	        rlRun "ipa hbacrule-del rule1" 0 "CLEANUP: Deleting rule rule1"
 
 	        rlRun "kdestroy" 0 "Destroying admin credentials."
+		rlRun "cat /var/log/secure | grep \"pam_sss(sshd:auth)\""
 	rlPhaseEnd
 
 
