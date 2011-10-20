@@ -139,10 +139,6 @@ verify_sssd()
        ipacompare_forinstalluninstall "id_provider " "$id_provider" "$testidprovider" "$1" 
        testipadomain=`grep "^ipa_domain" $SSSD | cut -d "=" -f2 | xargs echo`
        ipacompare_forinstalluninstall "ipa_domain " "$ipa_domain" "$testipadomain" "$1" 
-       if [  $installcheck  -a  "$2" != "force" ] ; then
-          testkrb5realm=`grep "^krb5_realm" $SSSD | cut -d "=" -f2 | xargs echo`
-          ipacompare_forinstalluninstall "krb5_realm " "$krb5_realm" "$testkrb5realm" "$1" 
-       fi
        testipaserver=`grep "^ipa_server" $SSSD | cut -d "=" -f2 | xargs echo`
        ipacompare_forinstalluninstall_withmasterslave "ipa_server " "$ipa_server_master" "$ipa_server_slave" "$testipaserver" "$1"
        if [ "$2" == "enablednsupdates" ] ; then
@@ -173,12 +169,8 @@ verify_krb5()
     ipacompare_forinstalluninstall "forwardable " "$forwardable" "$testforwardable" "$1" 
     testpkinitanchors=`grep "pkinit_anchors" $KRB5 | cut -d "=" -f2 | xargs echo` 
     ipacompare_forinstalluninstall "pkinit_anchors " "$pkinit_anchors" "$testpkinitanchors" "$1" 
-    testdebug=`grep "debug" $KRB5 | cut -d "=" -f2 | xargs echo` 
-    ipacompare_forinstalluninstall "debug " "$debug_krb5" "$testdebug" "$1" 
     #testrenewlifetime=`grep "renew_lifetime" $KRB5 | cut -d "=" -f2 | xargs echo` 
     #ipacompare_forinstalluninstall "renew_lifetime " "$renew_lifetime" "$testrenewlifetime" "$1" 
-    testkrb4convert=`grep "krb4_convert" $KRB5 | cut -d "=" -f2 | xargs echo` 
-    ipacompare_forinstalluninstall "krb4_convert " "$krb4_convert" "$testkrb4convert" "$1" 
     if [ "$2" == "force" ] ; then
        testdnslookupkdc=`grep "dns_lookup_kdc" $KRB5 | cut -d "=" -f2 | xargs echo` 
        ipacompare_forinstalluninstall "dns_lookup_kdc " "$dns_lookup_kdc_force" "$testdnslookupkdc" "$1" 
@@ -263,8 +255,10 @@ verify_authconfig()
       rlLog "Verify authconfig -with sssd"
       testusesssdauth=`grep "USESSSDAUTH"  $AUTHCONFIG | cut -d "=" -f2 | xargs echo`
       ipacompare_forinstalluninstall "USESSSDAUTH: " "$USESSSDAUTH" "$testusesssdauth" "$1" 
-      testusekerberos=`grep "USEKERBEROS"  $AUTHCONFIG | cut -d "=" -f2 | xargs echo`
-      ipacompare_forinstalluninstall "USEKERBEROS: " "$USEKERBEROS" "$testusekerberos" "$1" 
+      if $1 ; then
+      	testusekerberos=`grep "USEKERBEROS"  $AUTHCONFIG | cut -d "=" -f2 | xargs echo`
+      	ipacompare_forinstalluninstall "USEKERBEROS: " "$USEKERBEROS" "$testusekerberos" "$1" 
+      fi
       testusesssd=`grep -w "USESSSD"  $AUTHCONFIG | cut -d "=" -f2 | xargs echo`
       ipacompare_forinstalluninstall "USESSSD: " "$USESSSD" "$testusesssd" "$1" 
       if [ "$2" == "mkhomedir" ] ; then
@@ -309,7 +303,7 @@ qaExpectedRun()
     rlLog "$comment"
    
 
-    $cmd >$out
+    $cmd >& $out
     actualCode=$?
     if [ "$actualCode" = "$expectCode" ];then
         rlLog "return code matches, now check the message"

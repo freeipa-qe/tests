@@ -83,14 +83,14 @@ setup()
 {
     rlPhaseStartSetup "ipa-client-install-Setup "
         # edit hosts file and resolv file before starting tests
-        rlRun "fixHostFile" 0 "Set up /etc/hosts"
-        rlRun "fixhostname" 0 "Fix hostname"
-        rlRun "fixResolv" 0 "fixing the resolv.conf to contain the correct nameserver lines"
-        rlRun "appendEnv" 0 "Append the machine information to the env.sh with the information for the machines in the recipe set"
-        rlLog "Setting up Authorized keys"
-        SetUpAuthKeys
-        rlLog "Setting up known hosts file"
-        SetUpKnownHosts
+#        rlRun "fixHostFile" 0 "Set up /etc/hosts"
+#        rlRun "fixhostname" 0 "Fix hostname"
+#        rlRun "fixResolv" 0 "fixing the resolv.conf to contain the correct nameserver lines"
+#        rlRun "appendEnv" 0 "Append the machine information to the env.sh with the information for the machines in the recipe set"
+#        rlLog "Setting up Authorized keys"
+#        SetUpAuthKeys
+#        rlLog "Setting up known hosts file"
+#        SetUpKnownHosts
 
     
         ## Lines to expect to be changed during the isnatllation process
@@ -156,8 +156,11 @@ ipaclientinstall_noparam()
         uninstall_fornexttest
         rlLog "EXECUTING: ipa-client-install -U "
         command="ipa-client-install -U"
-        expmsg="One of password and principal are required."
-        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for IPA Install with no param"
+        expmsg="One of password and principal are required.
+Installation failed. Rolling back changes.
+IPA client is not configured on this system."
+       local tmpout=$TmpDir/ipaclientinstall_noparam.out
+       qaRun "$command" "$tmpout" 1 $expmsg "Verify expected error message for IPA Install with no param" debug 
     rlPhaseEnd
 }
 
@@ -193,8 +196,11 @@ ipaclientinstall_invaliddomain()
        uninstall_fornexttest
        rlLog "EXECUTING: ipa-client-install --domain=xxx -p $ADMINID -w $ADMINPW -U"
        command="ipa-client-install --domain=xxx -p $ADMINID -w $ADMINPW -U"
-       expmsg="Unable to find IPA Server to join"
-       rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for IPA Install with invalid domain"
+       expmsg="Unable to find IPA Server to join
+Installation failed. Rolling back changes.
+IPA client is not configured on this system."
+       local tmpout=$TmpDir/ipaclientinstall_invaliddomain.out
+       qaRun "$command" "$tmpout" 1 $expmsg "Verify expected error message for IPA Install with invalid domain" 
     rlPhaseEnd
 }
 
@@ -211,7 +217,9 @@ ipaclientinstall_server_nodomain()
        expmsg="Usage: ipa-client-install [options]
 
 ipa-client-install: error: --server cannot be used without providing --domain"
-       rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for IPA Install with no domain"
+       local tmpout=$TmpDir/ipaclientinstall_server_nodomain.out
+       qaRun "$command" "$tmpout" 2 $expmsg "Verify expected error message for IPA Install with no domain" 
+#       rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for IPA Install with no domain"
     rlPhaseEnd
 }
 
@@ -221,8 +229,10 @@ ipaclientinstall_server_invalidserver()
        uninstall_fornexttest
        rlLog "EXECUTING: ipa-client-install --server=xxx --domain=xxx "
        command="ipa-client-install --server=xxx --domain=xxx"
-       expmsg="Retrieving CA from xxx failed."
-       local tmpout=$TmpDir/ipaclientinstall_server_invalidresolvconf1.out
+       expmsg="xxx is not an IPA v2 Server.
+Installation failed. Rolling back changes.
+IPA client is not configured on this system."
+       local tmpout=$TmpDir/ipaclientinstall_server_invalidserver.out
        qaRun "$command" "$tmpout" 1 $expmsg "Verify expected error message for IPA Install with invalid server" 
     rlPhaseEnd
 }
@@ -240,7 +250,8 @@ ipaclientinstall_realm_casesensitive()
        rlLog "EXECUTING: ipa-client-install --realm=$relminlowercase"
        command="ipa-client-install --realm=$relminlowercase"
        expmsg="ERROR: The provided realm name: [$relminlowercase] does not match with the discovered one: [$RELM]"
-       rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for IPA Install with incorrect case realmname"
+       local tmpout=$TmpDir/ipaclientinstall_realm_casesensitive.out
+       qaRun "$command" "$tmpout" 1 $expmsg "Verify expected error message for IPA Install with incorrect case realmname" 
 
     rlPhaseEnd
 }
@@ -252,7 +263,8 @@ ipaclientinstall_invalidrealm()
        rlLog "EXECUTING: ipa-client-install --realm=xxx"
        command="ipa-client-install --realm=xxx"
        expmsg="ERROR: The provided realm name: [xxx] does not match with the discovered one: [$RELM]"
-       rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for IPA Install with invalid realmname"
+       local tmpout=$TmpDir/ipaclientinstall_invalidrealm.out
+       qaRun "$command" "$tmpout" 1 $expmsg "Verify expected error message for IPA Install with invalid realmname" 
     rlPhaseEnd
 }
 
@@ -266,11 +278,12 @@ ipaclientinstall_hostname()
 {
     rlPhaseStartTest "ipa-client-install-12- [Positive-Negative] IPA Install with invalid hostname"
        uninstall_fornexttest
-       rlLog "EXECUTING: ipa-client-install --hostname=$CLIENT"
+       #rlLog "EXECUTING: ipa-client-install --hostname=$CLIENT"
        local tmpout=$TmpDir/ipaclientinstall_hostname.$RANDOM.out
        command="ipa-client-install --hostname=$CLIENT.nonexistent --server=$MASTER --domain=$DOMAIN -p $ADMINID -w $ADMINPW --ntp-server=$NTPSERVER -U"
+       rlLog "EXECUTING: $command" 
        expmsg1="Warning: Hostname ($CLIENT.nonexistent) not found in DNS"
-       expmsg2="DNS server record set to: $CLIENT.nonexistent -> "
+       expmsg2="Failed to update DNS A record."
        qaExpectedRun "$command" "$tmpout" 0 "Verify expected error message for IPA Install with invalid hostname" "$expmsg1" "$expmsg2" 
 
        verify_install
@@ -278,7 +291,7 @@ ipaclientinstall_hostname()
        # now uninstall
        rlRun "ipa-client-install --uninstall -U " 0 "Uninstalling ipa client"
 
-       # after uninstall of this - verify keytab for this client is set false on server - bug 681338 
+       # after uninstall of this - verify keytab for this client is set false on server 
        rlRun "ipa-client-install --domain=$DOMAIN --realm=$RELM --ntp-server=$NTPSERVER -p $ADMINID -w $ADMINPW -U --server=$MASTER" 0 "Installing ipa client and configuring - with all params"
         rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials after installing"
        local tmpout=$TmpDir/verify_keytab_afteruninstall.$RANDOM.out
@@ -302,9 +315,10 @@ ipaclientinstall_password()
        uninstall_fornexttest
        rlLog "EXECUTING: ipa-client-install --password=$ADMINPW"
        command="ipa-client-install --password $ADMINPW -U"
-       expmsg="Joining realm failed: Host is already joined.
-Certificate subject base is: O=$RELM"
-       rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for IPA Install with password, but missing principal"
+       expmsg="Joining realm failed: Incorrect password.
+Installation failed. Rolling back changes."
+       local tmpout=$TmpDir/ipaclientinstall_password
+       qaRun "$command" "$tmpout" 1 $expmsg "Verify expected error message for IPA Install with password, but missing principal" 
     rlPhaseEnd
 }
 
@@ -328,7 +342,9 @@ ipaclientinstall_nonexistentprincipal()
         uninstall_fornexttest
         command="ipa-client-install --ntp-server=$NTPSERVER -p $testuser -w $testpwd -U" 
         expmsg="kinit: Client '$testuser@$RELM' not found in Kerberos database while getting initial credentials"
-        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for IPA Install with non-existent principal"
+        local tmpout=$TmpDir/ipaclientinstall_password
+        qaRun "$command" "$tmpout" 1 $expmsg "Verify expected error message for IPA Install with non-existent principal"
+       # rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for IPA Install with non-existent principal"
     rlPhaseEnd
 }
 
@@ -342,8 +358,7 @@ ipaclientinstall_nonadminprincipal()
        uninstall_fornexttest
        rlLog "EXECUTING: ipa-client-install --ntp-server=$NTPSERVER --principal $testuser -w $testpwd -U"
        command="ipa-client-install --ntp-server=$NTPSERVER --principal $testuser -w $testpwd -U" 
-       expmsg="Joining realm failed because of failing XML-RPC request.
-  This error may be caused by incompatible server/client major versions."
+       expmsg="Joining realm failed: No permission to join this host to the IPA domain."
        tmpout=$TmpDir/ipaclientinstall_nonadminprincipal.out
        qaExpectedRun "$command" "$tmpout" 1 "Verify expected error message for IPA Install with non-admin principal" "$expmsg"
 
@@ -361,7 +376,7 @@ ipaclientinstall_principalwithinvalidpassword()
        command="ipa-client-install --ntp-server=$NTPSERVER -p $ADMINID -w $testpwd -U" 
        expmsg="kinit: Password incorrect while getting initial credentials"
        tmpout=$TmpDir/ipaclientinstall_principalwithinvalidpassword.out
-       rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for IPA Install with principal with invalid password"
+       qaRun "$command" "$tmpout" 1 $expmsg "Verify expected error message for IPA Install with principal with invalid password" 
     rlPhaseEnd
 }
 
@@ -479,15 +494,20 @@ ipaclientinstall_force()
       # A second install will indicate it is already installed.
       command="ipa-client-install --domain=$DOMAIN --realm=$RELM --ntp-server=$NTPSERVER -p $ADMINID -w $ADMINPW -U --server=$MASTER"
       expmsg="IPA client is already configured on this system."
-      rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for reinstall of IPA Install"
+       local tmpout=$TmpDir/ipaclientinstall_force1.out
+       qaRun "$command" "$tmpout" 3 $expmsg "Verify expected error message for reinstall of IPA Install"
+#      rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for reinstall of IPA Install"
     rlPhaseEnd
     rlPhaseStartTest "ipa-client-install-27- [Positive] Reinstall Client with force" 
       # But now force it to install even though it has been previously installed here.
+      # Now it behaves same as if a second install is beign attempted.
       rlLog "EXECUTING: ipa-client-install --domain=$DOMAIN --realm=$RELM --ntp-server=$NTPSERVER -p $ADMINID -w $ADMINPW -U --server=$MASTER -f"
-      rlRun "ipa-client-install --domain=$DOMAIN --realm=$RELM --ntp-server=$NTPSERVER -p $ADMINID -w $ADMINPW -U --server=$MASTER -f" 0 "Installing ipa client and configuring - second time - force it"
-      verify_install true force
+      command="ipa-client-install --domain=$DOMAIN --realm=$RELM --ntp-server=$NTPSERVER -p $ADMINID -w $ADMINPW -U --server=$MASTER -f"
+      expmsg="IPA client is already configured on this system."
+       local tmpout=$TmpDir/ipaclientinstall_force1.out
+       qaRun "$command" "$tmpout" 3 $expmsg "Verify expected error message for reinstall of IPA Install"
     rlPhaseEnd
-    rlPhaseStartTest "ipa-client-install-28- [Positive] Uninstall IPA Client after installing with -f" 
+    rlPhaseStartTest "ipa-client-install-28- [Positive] Uninstall IPA Client after atemmpting to install with -f" 
        rlLog "EXECUTING: ipa-client-install --uninstall -U"
        command="ipa-client-install --uninstall -U"
        rlRun "$command" 0 "Uninstalling ipa client - after a force install"
@@ -503,7 +523,10 @@ ipaclientinstall_force()
     rlPhaseStartTest "ipa-client-install-30- [Positive] Uninstall non-existent IPA Client with force" 
       # But now force it to install even though it has been previously uninstalled here.
       rlLog "EXECUTING: ipa-client-install --uninstall -U -f"
-      rlRun "ipa-client-install --uninstall -U --force" 0 "Uninstalling ipa client - second time - force it"
+       command="ipa-client-install --uninstall -U --force"
+       expmsg="IPA client is not configured on this system."
+       local tmpout=$TmpDir/ipaclientinstall_force.$RANDOM.out
+       qaExpectedRun "$command" "$tmpout" 2 "Verify expected error message for non-existent IPA Install" "$expmsg"
       verify_install false
     rlPhaseEnd
 }

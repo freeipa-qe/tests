@@ -50,8 +50,6 @@ ticket_lifetime="24h"
 forwardable="yes"
 pkinit_anchors="FILE:/etc/ipa/ca.crt"
 domain_realm="$RELM $RELM"
-debug_krb5="false"
-krb4_convert="false"
 dns_lookup_kdc_force="false"
 dns_lookup_realm_force="false"
 
@@ -62,7 +60,7 @@ ntplocalserver="server	127.127.1.0	# local clock"
 
 #authconfig updates
 USESSSDAUTH="yes"
-USEKERBEROS="yes"
+USEKERBEROS="no"
 USESSSD="yes"
 USESSSDAUTH_nosssd="no"
 USEKERBEROS_nosssd="yes"
@@ -71,5 +69,6 @@ USEMKHOMEDIR="yes"
 
 
 # User used in these tests
-testuser="TestUser"
+#testuser="TestUser"
+testuser="testuser"
 testpwd="TestPassword"
