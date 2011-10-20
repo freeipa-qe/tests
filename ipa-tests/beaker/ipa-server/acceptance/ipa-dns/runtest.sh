@@ -721,6 +721,40 @@ fi
 		rlRun "dig cert.$zone CERT | grep $cert" 1 "make sure dig can not find the cert record"
 	rlPhaseEnd
 
+	# Type loc
+	rlPhaseStartTest "ipa-dns-pre141: add record of type loc"
+		rlRun "ipa dnsrecord-add $zone @ --loc-rec '$loc'" 0 "add record type loc"
+	rlPhaseEnd
+
+	/etc/init.d/named restart
+
+	rlPhaseStartTest "ipa-dns-pre142: make sure that IPA saved record type loc"
+		rlRun "ipa dnsrecord-find $zone | grep '$loclong'" 0 "make sure ipa recieved record type loc"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-pre143: make sure that dig can find the record type loc"
+		file="/dev/shm/dig-loc-result.txt"
+		dig $zone LOC > $file
+		cat $file
+		rlRun "grep '$loclong' $file" 0 "make sure dig can find the loc record looking for long"
+		rlRun "grep '$loclat' $file" 0 "make sure dig can find the loc record looking for lat"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-pre144: delete record of type loc"
+		rlRun "ipa dnsrecord-del $zone @ --loc-rec '$loc'" 0 "delete record type loc"
+	rlPhaseEnd
+
+	/etc/init.d/named restart
+
+	rlPhaseStartTest "ipa-dns-pre145: make sure that IPA deleted record type loc"
+		rlRun "ipa dnsrecord-find $zone loc" 1 "make sure ipa deleted record type loc"
+	rlPhaseEnd
+
+	sleep 5
+	rlPhaseStartTest "ipa-dns-pre146: make sure that dig can not find the record type loc"
+		rlRun "dig $zone loc | grep $loclong" 1 "make sure dig can not find the loc record"
+	rlPhaseEnd
+
 
 	# Type kx
 	rlPhaseStartTest "ipa-dns-131: add record of type kx"
@@ -782,7 +816,6 @@ fi
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-143: make sure that dig can find the record type loc"
-		dig $zone loc
 		file="/dev/shm/dig-loc-result.txt"
 		dig $zone LOC > $file
 		cat $file
