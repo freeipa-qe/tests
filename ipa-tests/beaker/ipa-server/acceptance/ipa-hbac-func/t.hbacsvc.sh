@@ -512,7 +512,7 @@ hbacsvc_master_007() {
 
                 rlRun "ipa hbactest --user=$user7 --srchost=$CLIENT2 --host=$CLIENT --service=sshd | grep -Ex '(Access granted: True|  matched: rule7)'"
                 rlRun "ipa hbactest --user=$user2 --srchost=$CLIENT2 --host=$CLIENT --service=sshd | grep -i \"Access granted: False\""
-                rlRun "ipa hbactest --user=$user7 --srchost=$CLEINT --host=$CLIENT --service=sshd | grep -i \"Access granted: False\""
+                rlRun "ipa hbactest --user=$user7 --srchost=$CLIENT --host=$CLIENT --service=sshd | grep -i \"Access granted: False\""
                 rlRun "ipa hbactest --user=$user7 --srchost=$CLIENT --host=$CLIENT2 --service=sshd | grep -i \"Access granted: False\""
 
                 rlRun "ipa hbactest --user=$user7 --srchost=$CLIENT2 --host=$CLIENT --service=sshd --rule=rule7 | grep -Ex '(Access granted: True|  matched: rule7)'"
@@ -899,8 +899,8 @@ hbacsvc_master_011() {
                 rlRun "ipa hbactest --user=$user11 --srchost=$CLIENT --host=$CLIENT2 --service=sshd --rule=rule11 | grep -Ex '(Access granted: True|  matched: rule11)'"
                 rlRun "ipa hbactest --user=$user11 --srchost=$CLIENT --host=$MASTER --service=sshd --rule=rule11 | grep -Ex '(Access granted: False|  notmatched: rule11)'"
                 rlRun "ipa hbactest --user=$user2 --srchost=$CLIENT --host=$CLIENT2 --service=sshd --rule=rule11 | grep -Ex '(Access granted: False|  notmatched: rule11)'"
-                rlRun "ipa hbactest --user=$user11 --srchost=$CLIENT --host=$CLIENT --service=sshd --rule=rule11 --nodetail | grep -i \"Access granted: True\""
-                rlRun "ipa hbactest --user=$user11 --srchost=$CLIENT --host=$CLIENT --service=sshd --rule=rule11 --nodetail | grep -i \"matched: rule11\"" 1 "hbactest fails with error code 1"
+                rlRun "ipa hbactest --user=$user11 --srchost=$CLIENT --host=$CLIENT2 --service=sshd --rule=rule11 --nodetail | grep -i \"Access granted: True\""
+                rlRun "ipa hbactest --user=$user11 --srchost=$CLIENT --host=$CLIENT2 --service=sshd --rule=rule11 --nodetail | grep -i \"matched: rule11\"" 1 "hbactest fails with error code 1"
 
         rlPhaseEnd
 }
@@ -1010,8 +1010,8 @@ hbacsvc_master_012() {
                 rlRun "ipa hbactest --user=$user12 --srchost=$CLIENT --host=$CLIENT2 --service=sshd --rule=rule12 | grep -Ex '(Access granted: True|  matched: rule12)'"
                 rlRun "ipa hbactest --user=$user12 --srchost=$CLIENT --host=$MASTER --service=sshd --rule=rule12 | grep -Ex '(Access granted: False|  notmatched: rule12)'"
                 rlRun "ipa hbactest --user=$user2 --srchost=$CLIENT --host=$CLIENT2 --service=sshd --rule=rule12 | grep -Ex '(Access granted: False|  notmatched: rule12)'"
-                rlRun "ipa hbactest --user=$user12 --srchost=$CLIENT --host=$CLIENT --service=sshd --rule=rule12 --nodetail | grep -i \"Access granted: True\""
-                rlRun "ipa hbactest --user=$user12 --srchost=$CLIENT --host=$CLIENT --service=sshd --rule=rule12 --nodetail | grep -i \"matched: rule12\"" 1 "hbactest fails with error code 1"
+                rlRun "ipa hbactest --user=$user12 --srchost=$CLIENT --host=$CLIENT2 --service=sshd --rule=rule12 --nodetail | grep -i \"Access granted: True\""
+                rlRun "ipa hbactest --user=$user12 --srchost=$CLIENT --host=$CLIENT2 --service=sshd --rule=rule12 --nodetail | grep -i \"matched: rule12\"" 1 "hbactest fails with error code 1"
 
         rlPhaseEnd
 }
@@ -1135,7 +1135,7 @@ hbacsvc_master_014() {
                 rlRun "ipa hbactest --user=$user14 --srchost=$CLIENT2 --host=$CLIENT --service=sshd --rule=rule14 | grep -Ex '(Access granted: True|  matched: rule14)'"
                 rlRun "ipa hbactest --user=$user14 --srchost=$CLIENT --host=$MASTER --service=sshd --rule=rule14 | grep -Ex '(Access granted: False|  notmatched: rule14)'"
                 rlRun "ipa hbactest --user=$user2 --srchost=$CLIENT2 --host=$CLIENT --service=sshd --rule=rule14 | grep -Ex '(Access granted: False|  notmatched: rule14)'"
-                rlRun "ipa hbactest --user=$user14 --srchost=$CLEINT2 --host=$CLIENT --service=sshd --rule=rule14 --nodetail | grep -i \"Access granted: True\""
+                rlRun "ipa hbactest --user=$user14 --srchost=$CLIENT2 --host=$CLIENT --service=sshd --rule=rule14 --nodetail | grep -i \"Access granted: True\""
                 rlRun "ipa hbactest --user=$user14 --srchost=$CLIENT2 --host=$CLIENT --service=sshd --rule=rule14 --nodetail | grep -i \"matched: rule14\"" 1 "hbactest fails with error code 1"
 
         rlPhaseEnd
@@ -1987,7 +1987,7 @@ hbacsvc_master_029() {
                 rlRun "ipa hbacrule-disable allow_all"
 
 		ipa hbacsvcgroup-show empty
-		if [ $? -ne 0 ] ; then
+		if [ $? -eq 0 ] ; then
 			rlRun "ipa hbacsvcgroup-del empty"
 		fi
 		rlRun "ipa group-add emptygroup --desc=emptygroup"
