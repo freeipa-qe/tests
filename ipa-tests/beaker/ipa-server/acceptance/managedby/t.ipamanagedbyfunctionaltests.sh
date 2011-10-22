@@ -137,6 +137,74 @@ managedby_server_tests()
 
 }
 
+managedby_client_tests()
+{
+	rlPhaseStartTest "Negitive test case to try binding as the MASTERs principal"
+		kdestroy
+		rlRun "kinit -kt /etc/krb5.keytab host/$MASTER" 1 "Bind as the host principal for MASTER, this should return 1"
+		rlRun "klist | grep host/$MASTER" 1 "make sure we are not bound as the MASTER host principal"
+	rlPhaseEnd
+
+	rlPhaseStartTest "bind as the CLIENTs principal"
+		kdestroy
+		rlRun "kinit -kt /etc/krb5.keytab host/$CLIENT" 0 "Bind as the host principal for this host"
+		rlRun "klist | grep host/$CLIENT" 0 "make sure we seem to be bound as the CLIENT principal"
+	rlPhaseEnd
+	
+	rlPhaseStartTest "try to create a keytab for a service that we should be able to"
+		file="/dev/shm/fakehostprincipal.keytab"
+		rlRun "ipa-getkeytab -s $CLIENT -k $file -p test/$FAKEHOSTNAME" 0 "Try to create a keytab for a service that we should have access to. running ipa-getkeytab -s $CLIENT -k $file -p test/$FAKEHOSTNAME"
+	rlPhaseEnd
+
+	file="/dev/shm/masterprincipal.keytab"
+
+	rlPhaseStartTest "try to create a keytab for a service that we should not be able to"
+		rlRun "ipa-getkeytab -s $CLIENT -k $file -p test2/$MASTER" 9 "Try to create a keytab for a service that we should inot have access to by running ipa-getkeytab -s $MASTER -k $file -p test/$MASTER"
+		rlRun "grep $MASTER $file" r10 "Make sure that the CLIENT hostname appears to be in the new keytab"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ensure that we can not kinit as the gotten keytabs"
+		rlRun "kinit -kt $file test2/$master" 1 "Make sure we can not kinit as the keytab that we got from the client"
+		kdestroy
+		kinit -kt /etc/krb5.keytab host/$CLIENT
+	rlPhaseEnd
+
+	RANDOM=/dev/shm/random.txt
+	echo 'asjkfavi byrwebh8959aevut890artyariutainawer8turtvuntiohufyav89ra7e4597346g7q35gqhv79976856f0qw47tbawvranofiau db8fgaeru sdboadfuaidfgy apvudfuas!bio fu' > $RANDOM
+	PWDFILE=/dev/shm/pwfile.txt
+	echo "Secret123" > $PWDFILE
+	rlPhaseStartTest "create a csr for the client and sign it using the managed by agreement"
+		certdir=/dev/shm/clientdb
+		rm -Rf $certdir
+		mkdir $certdir
+		cd $certdir
+		echo "running certutil -R -s 'CN=$CLIENT,O=$RELM' -a -d . -z $RANDOM -f $PWDFILE >> $certdir/$CLIENT.csr"
+		rlRun "certutil -R -s 'CN=$CLIENT,O=$RELM' -a -d . -z $RANDOM -f $PWDFILE >> $certdir/$CLIENT.csr" 0 "Create a csr for the client"
+		rlRun "ipa cert-request --principal=host/$CLIENT@$RELM $certdir$CLIENT.csr" 0 "Sign the client CSR"
+	rlPhaseEnd
+
+	rlPhaseStartTest "create a csr for the client and sign it using the managed by agreement"
+		certdir=/dev/shm/fakehostdb
+		rm -Rf $certdir
+		mkdir $certdir
+		cd $certdir
+		echo "running certutil -R -s 'CN=$FAKEHOSTNAME,O=$RELM' -a -d . -z $RANDOM -f $PWDFILE >> $certdir/$FAKEHOSTNAME.csr"
+		rlRun "certutil -R -s 'CN=$FAKEHOSTNAME,O=$RELM' -a -d . -z $RANDOM -f $PWDFILE >> $certdir/$FAKEHOSTNAME.csr" 0 "Create a csr for the client"
+		rlRun "ipa cert-request --principal=host/$FAKEHOSTNAME@$RELM $certdir/$FAKEHOSTNAME.csr" 0 "Sign the client CSR"
+	rlPhaseEnd
+
+	rlPhaseStartTest "Negitive test case to ensur"
+		certdir=/dev/shm/fakehostdb
+		rm -Rf $certdir
+		mkdir $certdir
+		cd $certdir
+		rlRun "certutil -R -s 'CN=$FAKEHOSTNAME,O=$RELM' -a -d . -z $RANDOM -f $PWDFILE >> $FAKEHOSTNAME.csr" 0 "Create a csr for the fakehost"
+		rlRun "ipa cert-request --principal=host/$MASTER@$RELM $FAKEHOSTNAME.csr" 1 "Make sure that we could not sigh the csr"
+	rlPhaseEnd
+
+}
+
+
 cleanup_managedby()
 {
 
@@ -146,6 +214,7 @@ cleanup_managedby()
 	file="/dev/shm/clientprincipal.keytab"
 	rm -f $file
 	ipa service-del test/$FAKEHOSTNAME
+	ipa service-del test2/$FAKEHOSTNAME
 	ipa service-del test/$CLIENT
 	ipa host-remove-managedby --hosts=$MASTER $CLIENT
 	ipa host-remove-managedby --hosts=$CLIENT $FAKEHOSTNAME
