@@ -29,7 +29,7 @@ export TESTVERSION=1.0
 
 BUILT_FILES=
 
-FILES=$(METADATA) runtest.sh Makefile PURPOSE t.ipamanagedservices_http.sh
+FILES=$(METADATA) runtest.sh Makefile PURPOSE t.ipamanagedby_http.sh
 
 .PHONY: all install download clean
 

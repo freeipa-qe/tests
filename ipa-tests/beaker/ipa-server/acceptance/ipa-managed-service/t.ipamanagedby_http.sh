@@ -8,7 +8,7 @@ HTTPKEYTAB="$HTTPCFGDIR/$HOSTNAME.keytab"
 HTTPKRBCFG="/etc/httpd/conf.d/krb.conf"
 MANAGINGHOST="managedby.$DOMAIN"
 MANAGINGKEYTAB="/tmp/$MANAGINGHOST.keytab"
-MANAGINGPRINC="host/$MANAGINGHOST@$RELM"
+MANAGINGPRINC="host/$MANAGINGHOST"
 INVALIDHOST="notme.$DOMAIN"
 
 echo " HTTP configuration directory:  $HTTPCFGDIR"
@@ -20,13 +20,13 @@ echo " HTTP keytab: $HTTPKEYTAB"
 ######################
 # test suite         #
 ######################
-ipamanagedservices_http()
+ipamangedservices_http()
 {
     setup_ipa_http
     setup_http
-    http_tests
-    cleanup_http
-    cleanup_ipa_http
+    #http_tests
+    #cleanup_http
+    #cleanup_ipa_http
 } 
 
 ######################
@@ -101,11 +101,13 @@ setup_http()
         	cat $HOSTNAME.csr
 
 		# kinit with the managing host's keytab
+		rlLog "EXECUTING: kinit -kt $MANAGINGKEYTAB $MANAGINGPRINC"
 		rlRun "kinit -kt $MANAGINGKEYTAB $MANAGINGPRINC" 0 "kinit with managing host's keytab"
 		klist
 
         	# submit the certificate request
-        	rlRun "ipa cert-request --principal=$HTTPPRINC $HOSTNAME.csr" 0 "Submitting certificate request for HTTP server"
+		rlLog "EXECUTING: ipa cert-request --principal=$MANAGINGPRINC $HOSTNAME.csr"
+        	rlRun "ipa cert-request --principal=$MANAGINGPRINC $HOSTNAME.csr" 0 "Submitting certificate request for HTTP server"
 
 		# kinit as admin again 
 		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials"
@@ -213,6 +215,7 @@ cleanup_ipa_http()
 		# delete keytab file
                 rlRun "rm -rf $HTTPKEYTAB" 0 "Delete the HTTP keytab file"
 		rlRun "ipa service-del $HTTPPRINC" 0 "Remove the HTTP service for this client host"
+		rlRun "ipa host-remove-managedby --hosts=$MANAGINGHOST $CLIENT"
 		rlRun "ipa host-del $MANAGINGHOST" 0 "Deleting the managing host"
 	rlPhaseEnd
 }
