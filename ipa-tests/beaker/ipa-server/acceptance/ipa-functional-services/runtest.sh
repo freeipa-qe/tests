@@ -40,8 +40,7 @@
 . /dev/shm/env.sh
 
 # Include test case file
-. ./t.ipafunctionalservices_http.sh
-. ./t.ipafunctionalservices_ldap.sh
+. ./t.ipamanagedby_http.sh
 
 PACKAGELIST="ipa-admintools ipa-client httpd mod_nss mod_auth_kerb 389-ds-base expect"
 
@@ -68,8 +67,7 @@ rlJournalStart
                         	fi
                 	done
                 	rlRun "service iptables stop" 0 "Stop the firewall on the client"
-                	ipafunctionalservices_http
-                	ipafunctionalservices_ldap
+                	ipamangedservices_http
 			rhts-sync-set -s DONE
                 fi
         else
