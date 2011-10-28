@@ -98,13 +98,9 @@ rlJournalStart
         echo $CLIENT | grep $HOSTNAME
         rc=$?
         if [ $rc -eq 0 ] ; then
-                rhts-sync-block -s READY $SLAVE
-                setup
-                runtests
 		setup-nis-server
         	/etc/init.d/rpcbind restart
-        	/etc/init.d/dirsrv restart
-                cleanup
+		/etc/init.d/ypbind restart
         fi
 
    rlJournalPrintText

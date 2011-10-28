@@ -3,7 +3,7 @@
 		ipa-server RHEL6 multihost(master, slave) NIS tests
 	</whiteboard>
 	<recipeSet>
-		<recipe kernel_options="" kernel_options_post="" ks_meta="" role="SLAVE" whiteboard="IPA MASTER">
+		<recipe kernel_options="" kernel_options_post="" ks_meta="" role="MASTER" whiteboard="IPA MASTER">
 			<autopick random="false"/>
 			<watchdog panic="None"/>
 			<packages/>
@@ -46,7 +46,7 @@
 			</task>
 
 		</recipe>
-		<recipe kernel_options="" kernel_options_post="" ks_meta="" role="MASTER" whiteboard="IPA REPLICA">
+		<recipe kernel_options="" kernel_options_post="" ks_meta="" role="SLAVE" whiteboard="IPA REPLICA">
 			<autopick random="false"/>
 			<watchdog panic="None"/>
 			<packages/>

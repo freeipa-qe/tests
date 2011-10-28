@@ -1,7 +1,9 @@
 
 # A env set for setup and usage of nis is IPA. 
 
-NISHOST1="$MASTER"
+
+MYHOSTNAME=$(hostname -s)
+NISHOST1="$MYHOSTNAME"
 NISUSER1="joe1"
 NISUSER2="joe2"
 NISUSER3="jaKob"
@@ -28,14 +30,13 @@ setup-nis-server()
 	setenforce 0 # This seems to mak ehe installs work faster
 	/bin/domainname $NISDOMAIN 
 	/bin/ypdomainname $NISDOMAIN 
-	echo "$MASTER" | $LIBDIR/yp/ypinit -m	
-	echo "domain $NISDOMAIN server $MASTER"
+	echo "$MYHOSTNAME" | $LIBDIR/yp/ypinit -m	
+	echo "domain $NISDOMAIN server $MYHOSTNAME"
 	service ypserv restart
-	/etc/init.d/ypbind restart
 	sed -i s/^NISDOMAIN/#NISDOMAIN/g /etc/sysconfig/network
 	echo "NISDOMAIN=\"$NISDOMAIN\"" >>  /etc/sysconfig/network
 	sed -i s/^domain/#domain/g /etc/yp.conf
-	echo "domain $NISDOMAIN server $MASTER" >> /etc/yp.conf
+	echo "domain $NISDOMAIN server $MYHOSTNAME" >> /etc/yp.conf
 	# Create securenets file
 	echo '255.0.0.0       127.0.0.0
 # This line gives access to everybody. 
@@ -44,7 +45,7 @@ setup-nis-server()
 	adduser --password $NISUSER2PASSWD $NISUSER2
 	adduser --password $NISUSER3PASSWD $NISUSER3
 	adduser --password $NISUSER4PASSWD $NISUSER4
-	echo "$MASTER" | $LIBDIR/yp/ypinit -m	
+	echo "$MYHOSTNAME" | $LIBDIR/yp/ypinit -m	
 	service yppasswdd start
 	service ypxfrd start
 	chkconfig ypserv on
@@ -55,7 +56,6 @@ setup-nis-server()
 	service ypbind restart
 	service ypserv restart
 	service ypbind restart
-	ypcat passwd
 
 	# configuring netgroups
 	echo "convertpeople (-,$NISUSER1,$NISDOMAIN) (-,$NISUSER2,$NISDOMAIN) (-,$NISUSER3,$NISDOMAIN) (-,$NISUSER4,$NISDOMAIN)" > /etc/netgroup
@@ -65,19 +65,21 @@ setup-nis-server()
 	cat /var/yp/Makefile > /var/yp/backup-Makefile
 	sed -i s/"$sedin"/"$sedout"/g /var/yp/Makefile
 
-	echo "$MASTER" | $LIBDIR/yp/ypinit -m 
+	echo "$MYHOSTNAME" | $LIBDIR/yp/ypinit -m 
 	service ypserv restart
 	service ypbind restart
 	
 	# Checking to ensure that it worked
-	rlRun "/usr/bin/ypcat passwd | grep $NISUSER1" 0 "Checking to ensure that nis user 1 was added to the passwd map" 
-	rlRun "/usr/bin/ypcat passwd | grep $NISUSER2" 0 "Checking to ensure that nis user 2 was added to the passwd map" 
-	rlRun "/usr/bin/ypcat passwd | grep $NISUSER3" 0 "Checking to ensure that nis user 3 was added to the passwd map" 
-	rlRun "/usr/bin/ypcat passwd | grep $NISUSER4" 0 "Checking to ensure that nis user 4 was added to the passwd map" 
-	rlRun "/usr/bin/ypcat netgroup | grep $NISUSER1" 0 "Checking to ensure that nis user 1 was added to the netgroup" 
-	rlRun "/usr/bin/ypcat netgroup | grep $NISUSER2" 0 "Checking to ensure that nis user 2 was added to the netgroup" 
-	rlRun "/usr/bin/ypcat netgroup | grep $NISUSER3" 0 "Checking to ensure that nis user 3 was added to the netgroup" 
-	rlRun "/usr/bin/ypcat netgroup | grep $NISUSER4" 0 "Checking to ensure that nis user 4 was added to the netgroup" 
+	rlRun "/usr/bin/ypcat -d $NISDOMAIN -h $MYHOSTNAME passwd | grep $NISUSER1" 0 "Checking to ensure that nis user 1 was added to the passwd map" 
+	rlRun "/usr/bin/ypcat -d $NISDOMAIN -h $MYHOSTNAME passwd | grep $NISUSER2" 0 "Checking to ensure that nis user 2 was added to the passwd map" 
+	rlRun "/usr/bin/ypcat -d $NISDOMAIN -h $MYHOSTNAME passwd | grep $NISUSER3" 0 "Checking to ensure that nis user 3 was added to the passwd map" 
+	rlRun "/usr/bin/ypcat -d $NISDOMAIN -h $MYHOSTNAME passwd | grep $NISUSER4" 0 "Checking to ensure that nis user 4 was added to the passwd map" 
+	rlRun "/usr/bin/ypcat -d $NISDOMAIN -h $MYHOSTNAME netgroup | grep $NISUSER1" 0 "Checking to ensure that nis user 1 was added to the netgroup" 
+	rlRun "/usr/bin/ypcat -d $NISDOMAIN -h $MYHOSTNAME netgroup | grep $NISUSER2" 0 "Checking to ensure that nis user 2 was added to the netgroup" 
+	rlRun "/usr/bin/ypcat -d $NISDOMAIN -h $MYHOSTNAME netgroup | grep $NISUSER3" 0 "Checking to ensure that nis user 3 was added to the netgroup" 
+	rlRun "/usr/bin/ypcat -d $NISDOMAIN -h $MYHOSTNAME netgroup | grep $NISUSER4" 0 "Checking to ensure that nis user 4 was added to the netgroup" 
 	setenforce 1
+	service ypserv restart
+	service ypbind restart
 
 }

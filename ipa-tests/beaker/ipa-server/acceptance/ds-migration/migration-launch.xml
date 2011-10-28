@@ -2,7 +2,7 @@
 	<whiteboard>
 		DS to IPA migration test
 	</whiteboard>
-	<recipeSet priority="Normal">
+	<recipeSet>
 		<recipe kernel_options="" kernel_options_post="" ks_meta="" role="None" whiteboard="redhat-ds-base for LDAP-ID-and-LDAP-AUTH">
 			<autopick random="false"/>
 			<watchdog panic="None"/>
