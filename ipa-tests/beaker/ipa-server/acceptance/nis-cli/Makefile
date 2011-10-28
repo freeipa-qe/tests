@@ -29,7 +29,7 @@ export TESTVERSION=1.0
 
 BUILT_FILES=
 
-FILES=$(METADATA) runtest.sh t.nistests.sh Makefile PURPOSE bkr-replication.xml 
+FILES=$(METADATA) runtest.sh t.nistests.sh Makefile PURPOSE bkr-nis-cli-only.xml bkr-nis-tests-also-creates-nis-master.xml
 
 .PHONY: all install download clean
 

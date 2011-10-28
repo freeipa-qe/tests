@@ -64,10 +64,10 @@ rlJournalStart
 		yum -y install yptools rpcbind ypbind ypserv yp-tools
         	ipa-compat-manage -y $pwdfile enable
         	rlRun "ipa-nis-manage -y $pwdfile enable" 0 "Enable the NIS plugin"
-	#	Removing nis server setup
-	#	setup-nis-server
-        #	/etc/init.d/rpcbind restart
-        #	/etc/init.d/dirsrv restart
+	#	NIS server setup moved to Client
+		setup-nis-server
+        	/etc/init.d/rpcbind restart
+        	/etc/init.d/dirsrv restart
 		setup
         	runtests
         	cleanup
@@ -101,6 +101,9 @@ rlJournalStart
                 rhts-sync-block -s READY $SLAVE
                 setup
                 runtests
+		setup-nis-server
+        	/etc/init.d/rpcbind restart
+        	/etc/init.d/dirsrv restart
                 cleanup
         fi
 
