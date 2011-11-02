@@ -1923,7 +1923,8 @@ rlPhaseStartTest "sudorule-mod_009: ipa sudorule-mod --runasexternaluser"
 	rlRun "ipa sudorule-find rule1 --all --raw | grep \"ipasudorunasextuser: extuser2\""
 	rlRun "ipa sudorule-find rule1 --all --raw | grep \"ipasudorunasextuser: extuser3\""
 
-#	rlRun "ipa sudorule-mod rule1 --runasexternaluser=extuser2,extuser3,extuser4"
+	rlRun "ipa sudorule-mod rule1 --runasexternaluser=extuser2,extuser3,extuser4 > $TmpDir/sudorule-mod_009.txt 2>&1" 1
+	rlAssertGrep "ipa: ERROR: invalid 'runasexternaluser': this option has been deprecated." "$TmpDir/sudorule-mod_009.txt"
 	
 	rlLog "Verifying bug https://bugzilla.redhat.com/show_bug.cgi?id=711667"
 #	 rlRun "ipa sudorule-find rule1 --all --raw | grep \"ipasudorunasextuser: extuser2\""
@@ -1954,7 +1955,8 @@ rlPhaseStartTest "sudorule-mod_010: ipa sudorule-mod --runasexternalgroup"
         rlRun "ipa sudorule-find rule1 --all --raw | grep \"ipasudorunasextgroup: extgrp3\""
         rlRun "ipa sudorule-find rule1 --all --raw"
 
-#        rlRun "ipa sudorule-mod rule1 --runasexternaluser=extgrp2,extgrp3,extgrp4"
+        rlRun "ipa sudorule-mod rule1 --runasexternalgroup=extgrp2,extgrp3,extgrp4 > $TmpDir/sudorule-mod_010.txt 2>&1" 1
+	rlAssertGrep "ipa: ERROR: invalid 'runasexternalgroup': this option has been deprecated." "$TmpDir/sudorule-mod_010.txt"
 
 	rlLog "Verifying bug https://bugzilla.redhat.com/show_bug.cgi?id=711671"
 #        rlRun "ipa sudorule-find rule1 --all --raw | grep \"ipasudorunasextgroup: extgrp2\""
