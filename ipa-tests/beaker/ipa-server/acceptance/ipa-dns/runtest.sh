@@ -244,9 +244,9 @@ fi
 	ptrvalue="in.awesome.domain."
 	srva="0 100 389"
 	srv="why.go.here.com."
-	kxpref1="12345678"
+	kxpref1="1234"
 	kxbadpref1="-1"
-	kxbadpref2="1233456789012345"
+	kxbadpref2="123345678"
 	
 	# These values are all for creating the ptr zone
 	ptrzone="$ptroctet.in-addr.arpa."
@@ -259,7 +259,7 @@ fi
 	pexpire=1292
 	pminimum=39
 	pttl=59
-	pbadnum=123456789012399
+	pbadnum=12345678901234
 
 	# record additions and delettion test
 	# Type A
