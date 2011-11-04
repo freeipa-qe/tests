@@ -45,6 +45,7 @@
 . ./t.nistests.sh
 
 rlJournalStart
+	HOSTNAME=$(hostname -s)
         myhostname=`hostname`
         rlLog "hostname command: $myhostname"
         rlLog "HOSTNAME: $HOSTNAME"
@@ -85,9 +86,10 @@ rlJournalStart
         rc=$?
         if [ $rc -eq 0 ] ; then
 		rhts-sync-block -s READY $MASTER
-		setup
-		runtests
-		cleanup
+	        rlPhaseStartTest "ipa-nis-cli-slave-bogus-01: A no op test to make sure things are working"
+        	        rlRun "/dev/shm/nis.sh" 0 "Check to see that the nis lib is there"
+	        rlPhaseEnd
+
 		rhts-sync-set -s READY
 	fi
 

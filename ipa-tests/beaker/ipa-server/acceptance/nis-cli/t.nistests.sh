@@ -25,8 +25,10 @@ setup()
 	rlPhaseEnd
 	
 	rlPhaseStartTest "ipa-nis-cli-01: enable nis listening."
-		rlRun "echo $ADMINPW | ipa-compat-manage enable" 0 "Enabling ipa compatibility"
-		rlRun "echo $ADMINPW | ipa-nis-manage enable" 0 "Enabling nis listening"
+		# Enabling ipa compatibility	
+		echo $ADMINPW | ipa-compat-manage enable
+		# Enabling nis listening
+		echo $ADMINPW | ipa-nis-manage enable  
 		rlRun "/etc/init.d/rpcbind restart" 0 "restarting rcpbind"
 		rlRun "/etc/init.d/ipa restart" 0 "restarting IPA"
 	rlPhaseEnd
