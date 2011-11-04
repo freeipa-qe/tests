@@ -24,7 +24,7 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 export TEST=/CoreOS/ipa-server/shared
-export TESTVERSION=1.0
+export TESTVERSION=1.0.1
 
 BUILT_FILES=
 
