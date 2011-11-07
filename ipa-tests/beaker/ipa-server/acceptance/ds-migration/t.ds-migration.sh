@@ -290,8 +290,8 @@ client_ds_setup()
 	hostnames=$(hostname -s)
 	hostnamef=$(hostname)
 	# ds-setup.inf should be in /dev/shm
-	sed s/--shorthostname--/$hostnames/g /dev/shm/ds-setup.inf
-	sed s/--fullhostname--/$hostnamef/g /dev/shm/ds-setup.inf
+	sed -i s/--shorthostname--/$hostnames/g /dev/shm/ds-setup.inf
+	sed -i s/--fullhostname--/$hostnamef/g /dev/shm/ds-setup.inf
 	/usr/sbin/useradd -G root dirsrv
 	/usr/sbin/setup-ds.pl --silent --file=/tmp/setupsPTTgM.inf
 	rlPhaseStartTest "Testing to ensure that the ds instance on $hostnamef got set properly"
