@@ -66,7 +66,15 @@ rlJournalStart
 		rlFail "Client not found to migrate from"
 	else
 		kinitAs $ADMINID $ADMINPW
-		ds-migration
+		hostnames=$(hostname -s)
+		echo $MASTER | grep $hostnames
+		if [ $? -eq 0 ]; then # This is a master, run the master tests now
+			ds-migration
+		fi
+		echo $CLIENT | grep $hostnames
+		if [ $? -eq 0 ]; then # This is a client, setup DS on this machine now
+			client_ds_setup
+		fi
 	fi
     # r2d2_test_ends
 

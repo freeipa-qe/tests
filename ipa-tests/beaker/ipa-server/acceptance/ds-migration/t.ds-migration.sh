@@ -284,3 +284,17 @@ ds-migration()
 	cleanup
 } # ipasample
 
+# This bit sets up and configures the ds instance on the client
+client_ds_setup()
+{
+	hostnames=$(hostname -s)
+	hostnamef=$(hostname)
+	# ds-setup.inf should be in /dev/shm
+	sed s/--shorthostname--/$hostnames/g /dev/shm/ds-setup.inf
+	sed s/--fullhostname--/$hostnamef/g /dev/shm/ds-setup.inf
+	/usr/sbin/useradd -G root dirsrv
+	/usr/sbin/setup-ds.pl --silent --file=/tmp/setupsPTTgM.inf
+	rlPhaseStartTest "Testing to ensure that the ds instance on $hostnamef got set properly"
+		rlRun "ldapsearch -D \"cn=Directory Manager\" -h$hostnamef -p389 -w$ADMINPW -x -b dc=bos,dc=redhat,dc=com objectclass=*" 0 "Checking to ensure that we can ldapsearch against the new DS instance"
+	rlPhaseEnd
+}
