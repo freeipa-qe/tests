@@ -130,9 +130,10 @@ public class HBACTests extends SahiTestScript {
 	public void checkCurrentPage() {
 	    String currentPageNow = sahiTasks.fetch("top.location.href");
 	    System.out.println("CurrentPageNow: " + currentPageNow);
+	    CommonTasks.checkError(sahiTasks);
 		if (!currentPageNow.equals(currentPage) && !currentPageNow.equals(alternateCurrentPage1)
 				&& !currentPageNow.equals(alternateCurrentPage2) && !currentPageNow.equals(alternateCurrentPage3)) {
-			CommonTasks.checkError(sahiTasks);
+			//CommonTasks.checkError(sahiTasks);
 			System.out.println("Not on expected Page....navigating back from : " + currentPageNow);
 			sahiTasks.navigateTo(commonTasks.hbacPage, true);
 		}		

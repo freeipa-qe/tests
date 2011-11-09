@@ -24,6 +24,7 @@ public class GroupTests extends SahiTestScript{
 	@BeforeMethod (alwaysRun=true)
 	public void checkURL(){
 		String currentURL = browser.fetch("top.location.href");
+		CommonTasks.checkError(sahiTasks);
 		if (!currentURL.equals(commonTasks.groupPage)){
 			log.info("current url=("+currentURL + "), is not a starting position, move to url=("+commonTasks.groupPage +")");
 			browser.navigateTo(commonTasks.groupPage, true);

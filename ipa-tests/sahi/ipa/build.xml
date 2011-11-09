@@ -53,18 +53,20 @@
 
 	<target name="run" description="run RHQ sahi java test" depends="compile">
 		<testng haltonfailure="false" classpathref="tests.cp" reporter="org.testng.reporters.JUnitXMLReporter" outputdir="${test.output.dir}" listeners="com.redhat.qe.auto.testng.TestNGListener">
-			<xmlfileset dir="src/com/redhat/qe/ipa/sahi/tests/hbac" includes="hbac-testng.xml"/>
 			<!-- <xmlfileset dir="src/com/redhat/qe/ipa/sahi/tests/user" includes="user-testng.xml"/>
-			<xmlfileset dir="src/com/redhat/qe/ipa/sahi/tests/host" includes="host-testng.xml"/>
-			<xmlfileset dir="src/com/redhat/qe/ipa/sahi/tests/hostgroup" includes="hostgroup-testng.xml"/>
-			<xmlfileset dir="src/com/redhat/qe/ipa/sahi/tests/dns" includes="dns-testng.xml"/>
+            <xmlfileset dir="src/com/redhat/qe/ipa/sahi/tests/group" includes="group-testng.xml"/>
+            <xmlfileset dir="src/com/redhat/qe/ipa/sahi/tests/host" includes="host-testng.xml"/> -->
+            <xmlfileset dir="src/com/redhat/qe/ipa/sahi/tests/hostgroup" includes="hostgroup-testng.xml"/>
+            <!-- <xmlfileset dir="src/com/redhat/qe/ipa/sahi/tests/netgroup" includes="netgroup-testng.xml"/>
+			<xmlfileset dir="src/com/redhat/qe/ipa/sahi/tests/service" includes="service-testng.xml"/> -->
+			<!-- 
+			<xmlfileset dir="src/com/redhat/qe/ipa/sahi/tests/dns" includes="dns-testng.xml"/> 
+			-->
+			<!-- <xmlfileset dir="src/com/redhat/qe/ipa/sahi/tests/hbac" includes="hbac-testng.xml"/>
 			<xmlfileset dir="src/com/redhat/qe/ipa/sahi/tests/sudo" includes="sudo-testng.xml"/>
-			<xmlfileset dir="src/com/redhat/qe/ipa/sahi/tests/host" includes="host-testng.xml"/>					 
-			<xmlfileset dir="src/com/redhat/qe/ipa/sahi/tests/group" includes="group-testng.xml"/>
-			<xmlfileset dir="src/com/redhat/qe/ipa/sahi/tests/kerberosticketpolicy" includes="kerberosticketpolicy-testng.xml"/> 
-			<xmlfileset dir="src/com/redhat/qe/ipa/sahi/tests/netgroup" includes="netgroup-testng.xml"/>
 			<xmlfileset dir="src/com/redhat/qe/ipa/sahi/tests/passwordpolicy" includes="passwordpolicy-testng.xml"/>
-			 -->
+			<xmlfileset dir="src/com/redhat/qe/ipa/sahi/tests/kerberosticketpolicy" includes="kerberosticketpolicy-testng.xml"/>
+			<xmlfileset dir="src/com/redhat/qe/ipa/sahi/tests/configuration" includes="configuration-testng.xml"/> -->
 		</testng>
 	</target>
 

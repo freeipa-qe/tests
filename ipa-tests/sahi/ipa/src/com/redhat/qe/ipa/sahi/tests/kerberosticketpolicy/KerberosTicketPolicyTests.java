@@ -9,6 +9,7 @@ import org.testng.annotations.*;
 
 import com.redhat.qe.auto.testng.TestNGUtils;
 import com.redhat.qe.ipa.sahi.base.SahiTestScript;
+import com.redhat.qe.ipa.sahi.tasks.CommonTasks;
 import com.redhat.qe.ipa.sahi.tasks.KerberosTicketPolicyTasks;
 import com.redhat.qe.ipa.sahi.tasks.SahiTasks;
 
@@ -56,6 +57,7 @@ public class KerberosTicketPolicyTests extends SahiTestScript{
 	public void checkURL(){
 		// ensure the starting page for each test case is the kerberos ticket policy page
 		String currentURL = browser.fetch("top.location.href"); 
+		CommonTasks.checkError(sahiTasks);
 		if (!currentURL.equals(commonTasks.kerberosTicketPolicyPage)){
 			log.info("current url=("+currentURL + "), is not a starting position, move to url=("+commonTasks.kerberosTicketPolicyPage +")");
 			browser.navigateTo(commonTasks.kerberosTicketPolicyPage, true);

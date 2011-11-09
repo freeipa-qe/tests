@@ -77,8 +77,9 @@ public class ConfigurationTest extends SahiTestScript{
 	@BeforeMethod (alwaysRun=true)
 	public void checkCurrentPage() {
 	    String currentPageNow = sahiTasks.fetch("top.location.href");
+	    CommonTasks.checkError(sahiTasks);
 		if (!currentPageNow.equals(currentPage) ) {
-			CommonTasks.checkError(sahiTasks);
+			//CommonTasks.checkError(sahiTasks);
 			log.fine("Not on expected Page....navigating back from : " + currentPageNow);
 			sahiTasks.navigateTo(commonTasks.configurationPage, true);
 		}		

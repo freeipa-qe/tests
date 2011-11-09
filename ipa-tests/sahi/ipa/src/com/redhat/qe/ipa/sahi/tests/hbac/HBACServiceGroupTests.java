@@ -46,8 +46,9 @@ private static Logger log = Logger.getLogger(UserTests.class.getName());
 	public void checkCurrentPage() {
 	    String currentPageNow = sahiTasks.fetch("top.location.href");
 	    System.out.println("CurrentPageNow: " + currentPageNow);
+	    CommonTasks.checkError(sahiTasks);
 		if (!currentPageNow.equals(currentPage) && !currentPageNow.equals(alternateCurrentPage)) {
-			CommonTasks.checkError(sahiTasks);
+			//CommonTasks.checkError(sahiTasks);
 			System.out.println("Not on expected Page....navigating back from : " + currentPageNow);
 			sahiTasks.navigateTo(commonTasks.hbacServiceGroupPage, true);
 		}		

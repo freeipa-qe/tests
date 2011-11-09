@@ -44,6 +44,7 @@ public class DNSTests extends SahiTestScript{
 	public void checkURL(){
 		String currentURL = sahiTasks.fetch("top.location.href");
 		//TODO: yi: check for the alternateDNSpage url as well
+		CommonTasks.checkError(sahiTasks);
 		if (!currentURL.equals(commonTasks.dnsPage)){
 			log.info("current url=("+currentURL + "), is not a starting position, move to url=("+ commonTasks.dnsPage +")");
 			sahiTasks.navigateTo(commonTasks.dnsPage, true);
