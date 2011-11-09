@@ -342,10 +342,11 @@ client_ds_setup()
 	hostnames=$(hostname -s)
 	hostnamef=$(hostname)
 	# ds-setup.inf should be in /dev/shm
-	sed -i s/--shorthostname--/$hostnames/g /dev/shm/ds-setup.inf
-	sed -i s/--fullhostname--/$hostnamef/g /dev/shm/ds-setup.inf
+	cat /dev/shm/ds-setup.inf > /tmp/ds-setup.inf
+	sed -i s/--shorthostname--/$hostnames/g /tmp/ds-setup.inf
+	sed -i s/--fullhostname--/$hostnamef/g /tmp/ds-setup.inf
 	/usr/sbin/useradd -G root dirsrv
-	/usr/sbin/setup-ds.pl --silent --file=/tmp/setupsPTTgM.inf
+	/usr/sbin/setup-ds.pl --silent --file=/tmp/ds-setup.inf
 	rlPhaseStartTest "Testing to ensure that the ds instance on $hostnamef got set properly"
 		rlRun "ldapsearch -D \"cn=Directory Manager\" -h$hostnamef -p389 -w$ADMINPW -x -b dc=bos,dc=redhat,dc=com objectclass=*" 0 "Checking to ensure that we can ldapsearch against the new DS instance"
 	rlPhaseEnd
