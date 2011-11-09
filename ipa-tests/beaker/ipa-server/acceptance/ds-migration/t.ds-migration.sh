@@ -119,7 +119,59 @@ uid: userb000
 gecos: User a000
 cn: User a000
 userPassword: redhat
-homeDirectory: /home/userb000' > $file
+homeDirectory: /home/userb000
+
+# user1000, People, bos.redhat.com
+dn: uid=user1000,ou=People,dc=bos,dc=redhat,dc=com
+givenName: User
+sn: 1000
+loginShell: /bin/bash
+uidNumber: 1000
+gidNumber: 1000
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetorgperson
+objectClass: posixAccount
+uid: user1000
+gecos: User 1000
+cn: User 1000
+userPassword: redhat
+homeDirectory: /home/user1000
+
+dn: uid=user2000,ou=People,dc=bos,dc=redhat,dc=com
+givenName: User
+sn: 2000
+loginShell: /bin/bash
+uidNumber: 2000
+gidNumber: 2000
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetorgperson
+objectClass: posixAccount
+uid: user2000
+gecos: User 2000
+cn: User 2000
+userPassword: redhat
+homeDirectory: /home/user2000
+
+dn: uid=user2009,ou=People,dc=bos,dc=redhat,dc=com
+givenName: User
+sn: 2000
+loginShell: /bin/bash
+uidNumber: 2009
+gidNumber: 2009
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetorgperson
+objectClass: posixAccount
+uid: user2009
+gecos: User 2009
+cn: User 2009
+userPassword: redhat
+homeDirectory: /home/user2009' > $file
 
 	rlPhaseStartTest "adding some more users to gid 1000"
 		echo "running: ldapmodify -a -x -h$BEAKERCLIENT -p 389 -D \"cn=Directory Manager\" -w$ADMINPW -c -f $file"
