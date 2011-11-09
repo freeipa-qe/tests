@@ -181,19 +181,33 @@ homeDirectory: /home/user2009' > $file
 }
 
 #####################
-# Remove groups for reinsertion later
+# Remove group for reinsertion later
 ######################
-remove_groups()
+remove_group()
 {
+	# Remove group in $1
 	file=/dev/shm/ds-ipa-migration-remove-groups.ldif
-	echo 'dn: cn=Group1000,ou=Groups,dc=bos,dc=redhat,dc=com
-changetype: delete
-
-dn: cn=group2000,ou=Groups,dc=bos,dc=redhat,dc=com
+	echo 'dn: cn=$1,ou=Groups,dc=bos,dc=redhat,dc=com
 changetype: delete' > $file
 
 	echo "running: ldapmodify -a -x -h$BEAKERCLIENT -p 389 -D \"cn=Directory Manager\" -w$ADMINPW -c -f $file"
 	rlRun "ldapmodify -a -x -h$BEAKERCLIENT -p 389 -D \"cn=Directory Manager\" -w$ADMINPW -c -f $file" 0 "removign groups"
+
+}
+
+#####################
+# Remove user
+#####################
+remove_user()
+{
+	# Remove the user specified in $1
+	file=/dev/shm/ds-ipa-migration-test-cleanup.ldif
+	echo 'dn: uid=$1,ou=People,dc=bos,dc=redhat,dc=com
+changetype: delete' > $file
+
+	rlPhaseStartTest "running cleanup of user $1"
+		rlRun "ldapmodify -x -h$BEAKERCLIENT -p 389 -D \"cn=Directory Manager\" -w$ADMINPW -c -f $file" 0 "cleaning up added user $1"
+	rlPhaseEnd
 
 }
 
@@ -213,7 +227,14 @@ changetype: delete' > $file
 		rlRun "ldapmodify -x -h$BEAKERCLIENT -p 389 -D \"cn=Directory Manager\" -w$ADMINPW -c -f $file" 0 "cleaning up added users"
 	rlPhaseEnd
 
-	remove_groups
+	remove_user user1000	
+	remove_user user2000	
+	remove_user user2009	
+	remove_user usera000	
+	remove_user userb000	
+
+	remove_group group1000
+	remove_group group2000
 	
 	rlPhaseStartTest "removing ipa object from ipa server"
 		rlRun "ipa user-del user1000" 0 "Removing ipa user for cleanup"
