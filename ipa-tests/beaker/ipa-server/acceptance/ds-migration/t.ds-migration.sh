@@ -187,8 +187,8 @@ remove_group()
 {
 	# Remove group in $1
 	file=/dev/shm/ds-ipa-migration-remove-groups.ldif
-	echo 'dn: cn=$1,ou=Groups,dc=bos,dc=redhat,dc=com
-changetype: delete' > $file
+	echo "dn: cn=$1,ou=Groups,dc=bos,dc=redhat,dc=com" > $file
+	echo 'changetype: delete' > $file
 
 	echo "running: ldapmodify -a -x -h$BEAKERCLIENT -p 389 -D \"cn=Directory Manager\" -w$ADMINPW -c -f $file"
 	rlRun "ldapmodify -a -x -h$BEAKERCLIENT -p 389 -D \"cn=Directory Manager\" -w$ADMINPW -c -f $file" 0 "removign groups"
@@ -202,8 +202,8 @@ remove_user()
 {
 	# Remove the user specified in $1
 	file=/dev/shm/ds-ipa-migration-test-cleanup.ldif
-	echo 'dn: uid=$1,ou=People,dc=bos,dc=redhat,dc=com
-changetype: delete' > $file
+	echo "dn: uid=$1,ou=People,dc=bos,dc=redhat,dc=com" > $file
+	echo 'changetype: delete' >> $file
 
 	rlPhaseStartTest "running cleanup of user $1"
 		rlRun "ldapmodify -x -h$BEAKERCLIENT -p 389 -D \"cn=Directory Manager\" -w$ADMINPW -c -f $file" 0 "cleaning up added user $1"
@@ -319,7 +319,6 @@ ds-migration()
 	set_user_ldap_password user2009
 	set_user_ldap_password usera000
 	set_user_ldap_password userb000
-	remove_groups
 	re_add_groups
 
 	rlPhaseStartTest "Migrating from $BEAKERCLIENT"
