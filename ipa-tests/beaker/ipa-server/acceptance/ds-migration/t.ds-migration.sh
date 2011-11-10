@@ -68,7 +68,6 @@ check_group()
 	rlPhaseStartTest "checking gid for group $1"
 		rlRun "ipa group-find --all $1 | grep GID | grep $gid" 0 "checking to ensure the UID for user $1 is $gid"
 	rlPhaseEnd
-done
 }
 
 ######################
@@ -230,9 +229,10 @@ cleanup()
 		rlRun "ipa group-del 'qa managers'" 0 "Removing ipa group for cleanup"
 	rlPhaseEnd
 	
-	rlPhaseStartTest "returning ipa server to normal operation"
-		rlRun "ipa config-mod --enable-migration=FALSE" 0 "enabling migration"
-	rlPhaseEnd
+#	rlPhaseStartTest "returning ipa server to normal operation"
+#		rlRun "ipa config-mod --enable-migration=FALSE" 0 "disabling migration"
+#	rlPhaseEnd
+	ipa config-mod --enable-migration=FALSE
 }
 
 #####################
@@ -329,8 +329,6 @@ ds-migration()
 	check_group group1000
 	# checking group 2000
 	check_group group2000
-	# checking group Duplicate
-	check_group Duplicate
 
 	rlPhaseStartTest "Migrating from $BEAKERCLIENT"
 		rlRun "ipa config-mod --enable-migration=FALSE" 0 "disabling migration"
