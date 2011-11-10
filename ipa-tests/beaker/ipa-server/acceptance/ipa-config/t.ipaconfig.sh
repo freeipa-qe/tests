@@ -464,6 +464,7 @@ ipaconfig_mod_defaultgroup_negative()
 # non-loop data : 
     rlPhaseStartTest "ipaconfig_mod_defaultgroup_negative"
         rlLog "negative test case for defaultgroup"
+	rlLog "https://bugzilla.redhat.com/show_bug.cgi?id=752686"
         ipaconfig_mod_defaultgroup_negative_logic
     rlPhaseEnd
 } #ipaconfig_mod_defaultgroup_negative
