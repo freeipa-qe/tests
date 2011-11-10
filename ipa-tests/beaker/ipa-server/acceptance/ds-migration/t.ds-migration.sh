@@ -63,19 +63,11 @@ check_user()
 ######################
 check_group()
 {
-	gid=$(ldapsearch -D 'cn=Directory Manager' -h$BEAKERCLIENT -p389 -w$ADMINPW -x -bi cn=$1,ou=Groups,dc=bos,dc=redhat,dc=com objectclass=* | grep gidNumber | cut -d\  -f2 )
+	gid=$(ldapsearch -D 'cn=Directory Manager' -h$BEAKERCLIENT -p389 -w$ADMINPW -x -b cn=$1,ou=Groups,dc=bos,dc=redhat,dc=com objectclass=* | grep gidNumber | cut -d\  -f2 )
 
 	rlPhaseStartTest "checking gid for group $1"
-		rlRun "ipa user-show $1 | grep GID | grep $gid" 0 "checking to ensure the UID for user $1 is $gid"
+		rlRun "ipa group-find --all $1 | grep GID | grep $gid" 0 "checking to ensure the UID for user $1 is $gid"
 	rlPhaseEnd
-
-	# Now to ensure that all of the group members got copied over
-	ldapsearch -D 'cn=Directory Manager' -h$BEAKERCLIENT -p389 -w$ADMINPW -x -bi cn=$1,ou=Groups,dc=bos,dc=redhat,dc=com objectclass=* | grep uniqueMember: | cut -d\  -f2 | grep uid | cut -d= -f2 | while read u; do 
-		echo "checking to ensure that user $u is in the ipa group $1"
-		
-		rlPhaseStartTest "checking for user $u in group $1"
-			rlRun "ipa user-show $1 | grep GID | grep $gid" 0 "checking to ensure that user $u is in group $1"
-		rlPhaseEnd
 done
 }
 
@@ -188,11 +180,11 @@ remove_group()
 	# Remove group in $1
 	file=/dev/shm/ds-ipa-migration-remove-groups.ldif
 	echo "dn: cn=$1,ou=Groups,dc=bos,dc=redhat,dc=com" > $file
-	echo 'changetype: delete' > $file
+	echo 'changetype: delete' >> $file
 
-	echo "running: ldapmodify -a -x -h$BEAKERCLIENT -p 389 -D \"cn=Directory Manager\" -w$ADMINPW -c -f $file"
-	rlRun "ldapmodify -a -x -h$BEAKERCLIENT -p 389 -D \"cn=Directory Manager\" -w$ADMINPW -c -f $file" 0 "removign groups"
-
+	rlPhaseStartTest "running cleanup of group $1"
+		rlRun "ldapmodify -a -x -h$BEAKERCLIENT -p 389 -D \"cn=Directory Manager\" -w$ADMINPW -c -f $file" 0 "removing group $1"
+	rlPhaseEnd
 }
 
 #####################
@@ -208,7 +200,6 @@ remove_user()
 	rlPhaseStartTest "running cleanup of user $1"
 		rlRun "ldapmodify -x -h$BEAKERCLIENT -p 389 -D \"cn=Directory Manager\" -w$ADMINPW -c -f $file" 0 "cleaning up added user $1"
 	rlPhaseEnd
-
 }
 
 #####################
@@ -216,24 +207,13 @@ remove_user()
 #####################
 cleanup()
 {
-	file=/dev/shm/ds-ipa-migration-test-cleanup.ldif
-	echo 'dn: uid=usera000,ou=People,dc=bos,dc=redhat,dc=com
-changetype: delete
-
-dn: uid=userb000,ou=People,dc=bos,dc=redhat,dc=com
-changetype: delete' > $file
-
-	rlPhaseStartTest "running cleanup of added users"
-		rlRun "ldapmodify -x -h$BEAKERCLIENT -p 389 -D \"cn=Directory Manager\" -w$ADMINPW -c -f $file" 0 "cleaning up added users"
-	rlPhaseEnd
-
 	remove_user user1000	
 	remove_user user2000	
 	remove_user user2009	
 	remove_user usera000	
 	remove_user userb000	
 
-	remove_group group1000
+	remove_group Group1000
 	remove_group group2000
 	
 	rlPhaseStartTest "removing ipa object from ipa server"
@@ -266,7 +246,7 @@ changetype: modify
 replace: userPassword
 userPassword: $userpassword" > $file
 
-	rlPhaseStartTest "chaging thew password for user $1 in the DS server"
+	rlPhaseStartTest "changing the password for user $1 in the DS server"
 		rlRun "ldapmodify -a -x -h$BEAKERCLIENT -p 389 -D \"cn=Directory Manager\" -w$ADMINPW -c -f $file" 0 "changing the password for user $1"
 	rlPhaseEnd
 
@@ -281,16 +261,20 @@ re_add_groups()
 	echo 'dn: cn=Group1000,ou=Groups,dc=bos,dc=redhat,dc=com
 objectClass: top
 objectClass: groupOfUniqueNames
+objectClass: posixGroup
 cn: PD Managers
 ou: groups
+gidNumber: 330
 description: People that are in Group1000
 uniqueMember: cn=Directory Manager
 
 dn: cn=group2000,ou=Groups,dc=bos,dc=redhat,dc=com
 objectClass: top
 objectClass: groupOfUniqueNames
+objectClass: posixGroup
 cn: PD Managers
 ou: groups
+gidNumber: 335
 description: People that are in group2000
 uniqueMember: cn=Directory Manager
 uniqueMember: uid=user2009,ou=People,dc=bos,dc=redhat,dc=com
