@@ -357,7 +357,7 @@ request_1007()  #ipa-getcert request -d [NSSDBDIR positive] -n [CertNickName pos
         local expectedErrMsg="No_errmsg_defined_Ignore_Me" 
         local comment="scenario: [ipa-getcert request -d -n  -t -I -R -N -K -U -D -E]	data: [CertTokenName negative]" 
 	# Updating verifyString after confirming with Nalin.
-        local verifyString="status: NEED_KEY_PAIR"
+        local verifyString="status: NEED_KEY_PAIR\|status: NEWLY_ADDED_NEED_KEYINFO_READ_TOKEN"
         #local verifyString="status: NEWLY_ADDED_NEED_KEYINFO_READ_TOKEN"
 
         # test starts here  
@@ -398,7 +398,7 @@ request_1008()  #ipa-getcert request -d [NSSDBDIR positive] -n [CertNickName pos
         local expectedErrMsg="No_errmsg_defined_Ignore_Me" 
         local comment="scenario: [ipa-getcert request -d -n  -t -I -r -N -K -U -D -E]	data: [CertTokenName negative]" 
 	# Updateing verifyString after confirming with Nalin.
-        local verifyString="status: NEED_KEY_PAIR"
+        local verifyString="status: NEED_KEY_PAIR\|status: NEWLY_ADDED_NEED_KEYINFO_READ_TOKEN"
         #local verifyString="status: NEWLY_ADDED_NEED_KEYINFO_READ_TOKEN"
 
         # test starts here  
@@ -439,7 +439,7 @@ request_1009()  #ipa-getcert request -d [NSSDBDIR positive] -n [CertNickName pos
         local expectedErrMsg="No_errmsg_defined_Ignore_Me" 
         local comment="scenario: [ipa-getcert request -d -n  -t -g -R -N -K -U -D -E]	data: [CertTokenName negative]" 
 	# updating verifyString after confirming with Nalin
-        local verifyString="status: NEED_KEY_PAIR"
+        local verifyString="status: NEED_KEY_PAIR\|status: NEWLY_ADDED_NEED_KEYINFO_READ_TOKEN"
 	    #local verifyString="status: NEWLY_ADDED_NEED_KEYINFO_READ_TOKEN"
 
         # test starts here  
@@ -480,7 +480,7 @@ request_1010()  #ipa-getcert request -d [NSSDBDIR positive] -n [CertNickName pos
         local expectedErrMsg="No_errmsg_defined_Ignore_Me" 
         local comment="scenario: [ipa-getcert request -d -n  -t -g -r -N -K -U -D -E]	data: [CertTokenName negative]" 
 	# updating verifyString after confirming with Nalin
-        local verifyString="status: NEED_KEY_PAIR"
+        local verifyString="status: NEED_KEY_PAIR\|status: NEWLY_ADDED_NEED_KEYINFO_READ_TOKEN"
 	    #local verifyString="status: NEWLY_ADDED_NEED_KEYINFO_READ_TOKEN"
 
         # test starts here  
@@ -3524,7 +3524,7 @@ start_tracking_1004()  #ipa-getcert start-tracking -d [NSSDBDIR positive] -n [Ce
         local expectedErrMsg="No_errmsg_defined_Ignore_Me" 
         local comment="scenario: [ipa-getcert start-tracking -d -n -t]	data: [CertTokenName negative]" 
 	    # Updating the verifyString after confirming with Nalin.
-        local verifyString="status: NEED_KEY_PAIR"
+        local verifyString="status: NEED_KEY_PAIR\|status: NEWLY_ADDED_NEED_KEYINFO_READ_TOKEN"
         #local verifyString="status: NEWLY_ADDED_NEED_KEYINFO_READ_TOKEN"
 
         # test starts here  
@@ -3564,7 +3564,7 @@ start_tracking_1005()  #ipa-getcert start-tracking -d [NSSDBDIR positive] -n [Ce
         local expectedErrMsg="No_errmsg_defined_Ignore_Me" 
         local comment="scenario: [ipa-getcert start-tracking -d -n -t -I -U -K -D -E -R]	data: [CertTokenName negative]" 
         # Updating the verifyString after confirming with Nalin.
-        local verifyString="status: NEED_KEY_PAIR"
+        local verifyString="status: NEED_KEY_PAIR\|status: NEWLY_ADDED_NEED_KEYINFO_READ_TOKEN"
         #local verifyString="status: NEWLY_ADDED_NEED_KEYINFO_READ_TOKEN"
 
 
@@ -3605,7 +3605,7 @@ start_tracking_1006()  #ipa-getcert start-tracking -d [NSSDBDIR positive] -n [Ce
         local expectedErrMsg="No_errmsg_defined_Ignore_Me" 
         local comment="scenario: [ipa-getcert start-tracking -d -n -t -I -U -K -D -E -r]	data: [CertTokenName negative]" 
         # Updating the verifyString after confirming with Nalin.
-        local verifyString="status: NEED_KEY_PAIR"
+        local verifyString="status: NEED_KEY_PAIR\|status: NEWLY_ADDED_NEED_KEYINFO_READ_TOKEN"
         #local verifyString="status: NEWLY_ADDED_NEED_KEYINFO_READ_TOKEN"
 
         # test starts here  
