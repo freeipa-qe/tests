@@ -466,15 +466,16 @@ kinit_aftermaxlife()
     echo "spawn kinit -V $username" >> $exp
     echo 'match_max 100000' >> $exp
     echo 'expect "*: "' >> $exp
-    echo 'sleep .5' >> $exp
+    #echo 'sleep .5' >> $exp
     echo "send -s -- \"$pw\"" >> $exp
     echo 'send -s -- "\r"' >> $exp
-    echo 'sleep .5' >> $exp
-    echo 'expect "Password expired*"' >> $exp
+    #echo 'sleep .5' >> $exp
+    echo 'expect "Password expired. You must change it now."' >> $exp
+    echo 'expect "Enter new password: "' >> $exp
     echo "send -s -- \"$newpw\"" >> $exp
     echo 'send -s -- "\r"' >> $exp
-    echo 'sleep .5' >> $exp
-    echo 'expect "*: "' >> $exp
+    #echo 'sleep .5' >> $exp
+    echo 'expect "Enter it again: "' >> $exp
     echo "send -s -- \"$newpw\"" >> $exp
     echo 'send -s -- "\r"' >> $exp
     echo 'expect eof ' >> $exp
@@ -549,15 +550,18 @@ Local_KinitAsAdmin()
             echo "set send_slow {1 .01}" >> $exp
             echo "spawn ipa passwd admin" >> $exp
             echo 'match_max 100000' >> $exp
-            echo 'expect "*: "' >> $exp
+            echo 'expect "Current Password: "' >> $exp
+            echo "send -s -- \"$temppw\"" >> $exp
+            echo 'send -s -- "\r"' >> $exp
+            echo 'expect "New Password: "' >> $exp
             echo "send -s -- \"$pw\"" >> $exp
             echo 'send -s -- "\r"' >> $exp
-            echo 'expect "*: "' >> $exp
+            echo 'expect "Enter New Password again to verify: "' >> $exp
             echo "send -s -- \"$pw\"" >> $exp
             echo 'send -s -- "\r"' >> $exp
             echo 'expect eof ' >> $exp
             /usr/bin/expect $exp 
-            #cat $exp
+            cat $exp
             rm $exp
             # after reset password, test the new password
             $kdestroy
@@ -604,10 +608,13 @@ change_password()
     echo "set send_slow {1 .01}" >> $exp
     echo "spawn ipa passwd $userlogin" >> $exp
     echo 'match_max 100000' >> $exp
-    echo 'expect "*: "' >> $exp
+    echo 'expect "Current Password: "' >> $exp
+    echo "send -s -- \"$currentpw\"" >> $exp
+    echo 'send -s -- "\r"' >> $exp
+    echo 'expect "New Password: "' >> $exp
     echo "send -s -- \"$newpw\"" >> $exp
     echo 'send -s -- "\r"' >> $exp
-    echo 'expect "*: "' >> $exp
+    echo 'expect "Enter New Password again to verify: "' >> $exp
     echo "send -s -- \"$newpw\"" >> $exp
     echo 'send -s -- "\r"' >> $exp
     echo 'expect eof ' >> $exp
