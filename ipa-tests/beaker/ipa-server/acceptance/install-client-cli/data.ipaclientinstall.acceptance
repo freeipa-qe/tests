@@ -50,6 +50,7 @@ ticket_lifetime="24h"
 forwardable="yes"
 pkinit_anchors="FILE:/etc/ipa/ca.crt"
 domain_realm="$RELM $RELM"
+domain_realm_nonexistent="$RELM $RELM $RELM $RELM"
 dns_lookup_kdc_force="false"
 dns_lookup_realm_force="false"
 
