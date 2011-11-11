@@ -1,19 +1,17 @@
 <job>
 	<whiteboard>
-		ipa-server ipa-getcert RHEL6.1 multihost(master, client) on pool machines
+		ipa-server ipa-getcert RHEL6.2 
 	</whiteboard>
 	<recipeSet>
 		<recipe kernel_options="" kernel_options_post="" ks_meta="" role="MASTER" whiteboard="">
 			<watchdog/>
 			<packages/>
 			<ks_appends/>
-            <repos>
+            <repos/>
                 <!-- <repo name="ipa" url="http://mickey.dsdev.sjc.redhat.com/repos/pki/ipa/devel/rhel6/devel_x86_64/x86_64/"/>
                 <repo name="ipa_noarch" url="http://mickey.dsdev.sjc.redhat.com/repos/pki/ipa/devel/rhel6/devel_x86_64/noarch/"/>
                 <repo name="rhel_nightly" url="http://download.devel.redhat.com/nightly/latest-RHEL6.1/6.1/Server/x86_64/os/"/>
                 -->
-            </repos>
-
 			<distroRequires>
 				<and>
 					<distro_family op="=" value="RedHatEnterpriseLinux6"/>
@@ -26,7 +24,7 @@
 			</distroRequires>
 			<hostRequires>
                 <and>
-                    <hostname op="=" value="mv32a-vm.idm.lab.bos.redhat.com" />
+                    <hostname op="=" value="mv32b-vm.idm.lab.bos.redhat.com" />
                 </and>
 			</hostRequires>
 
