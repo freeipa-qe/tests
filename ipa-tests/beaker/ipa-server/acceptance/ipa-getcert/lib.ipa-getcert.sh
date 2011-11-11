@@ -1,12 +1,22 @@
 ######################################
 # lib.ipa-getcert.sh                 #
 ######################################
-
-cert_subject=`echo $ADMINPW | kinit $ADMINID 2>&1 >/dev/null; ipa config-show | grep "Certificate Subject base" | cut -d":" -f2 | xargs echo;kdestroy 2>&1 >/dev/null`
+get_certsubject(){
+    echo $ADMINPW | kinit $ADMINID 2>&1 >/dev/null
+    cert=`ipa config-show | grep "Certificate Subject base" | cut -d":" -f2 | xargs echo`
+    echo $cert
+}
+    
+#cert_subject=`echo $ADMINPW | kinit $ADMINID 2>&1 >/dev/null; ipa config-show | grep "Certificate Subject base" | cut -d":" -f2 | xargs echo;kdestroy 2>&1 >/dev/null`
+cert_subject=`get_certsubject`
 fqdn=`hostname --fqdn`
 pem_dir="/tmp/getcert$RANDOM"
 #REALM="SJC.REDHAT.COM"
 
+echo "------ before we start, here are list of test data ------------------"
+echo "  cert_subject: [$cert_subject]"
+echo "          fqdn: [$fqdn]"
+echo "---------------------------------------------------------------------"
 prepare_certrequest(){
     local id=$1
     local TrackingNickName=$id
