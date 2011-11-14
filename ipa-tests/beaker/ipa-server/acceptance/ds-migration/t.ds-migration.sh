@@ -2,7 +2,7 @@
 export userpassword=redhat
 export hostnames=$(hostname -s)
 export hostnamef=$(hostname)
-export clientport=7389
+export clientport=9389
 
 ######################
 # Check user  
