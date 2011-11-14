@@ -350,3 +350,9 @@ ds_setup()
 		rlRun "ldapsearch -D \"cn=Directory Manager\" -h$hostnamef -p$clientport -w$ADMINPW -x -b dc=bos,dc=redhat,dc=com objectclass=*" 0 "Checking to ensure that we can ldapsearch against the new DS instance"
 	rlPhaseEnd
 }
+
+# Removes the instance created by ds_setup
+ds_cleanup()
+{
+	/usr/sbin/remove-ds slapd-$hostnames
+}

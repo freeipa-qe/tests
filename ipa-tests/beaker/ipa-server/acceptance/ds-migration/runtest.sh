@@ -66,10 +66,10 @@ rlJournalStart
 		ds_setup
 		sleep 120	
 		ds_migration
-		client_ds_setup
     # r2d2_test_ends
 
     rlPhaseStartCleanup "ds-migration cleanup"
+	ds_cleanup
         rlRun "popd"
         rlRun "rm -r $TmpDir" 0 "Removing tmp directory"
     rlPhaseEnd
