@@ -33,7 +33,7 @@ check_user()
 
 	# Making sure that the password migrated properly with a ldapbind
 	rlPhaseStartTest " Making sure that the password for user $1 migrated properly with a ldapbind"
-		rlRun "ldapsearch -x -h$hostnamef -p$clientport -D'uid=$1,cn=users,cn=accounts,dc=$DOMAIN' -w$userpassword -b uid=$1,ou=People,dc=bos,dc=redhat,dc=com objectclass=*" 0 "ldapsearch as user $1 with password $userpassword"
+		rlRun "ldapsearch -x -h$hostnamef -p$clientport -D'uid=$1,ou=People,dc=bos,dc=redhat,dc=com' -w$userpassword -b uid=$1,ou=People,dc=bos,dc=redhat,dc=com objectclass=*" 0 "ldapsearch as user $1 with password $userpassword"
 	rlPhaseEnd
 
 	# Ensuring that kinit for user $1 works.
