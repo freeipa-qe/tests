@@ -290,9 +290,9 @@ ipaclientinstall_hostname()
     
        # now uninstall
        rlRun "ipa-client-install --uninstall -U " 0 "Uninstalling ipa client"
-
+    
        # after uninstall of this - verify keytab for this client is set false on server 
-       rlRun "ipa-client-install --hostname=$CLIENT --domain=$DOMAIN --realm=$RELM --ntp-server=$NTPSERVER -p $ADMINID -w $ADMINPW -U --server=$MASTER" 0 "Installing ipa client and configuring - with all params"
+       rlRun "ipa-client-install --domain=$DOMAIN --realm=$RELM --ntp-server=$NTPSERVER -p $ADMINID -w $ADMINPW -U --server=$MASTER" 0 "Installing ipa client and configuring - with all params"
         rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials after installing"
        local tmpout=$TmpDir/verify_keytab_afteruninstall.$RANDOM.out
        verify_keytab_afteruninstall $CLIENT.nonexistent $tmpout
