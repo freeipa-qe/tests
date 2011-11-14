@@ -64,7 +64,7 @@ rlJournalStart
 		hostnames=$(hostname -s)
 		echo "hostname is $hostnames"
 		ds_setup
-		sleep 120	
+		sleep 30	
 		ds_migration
     # r2d2_test_ends
 

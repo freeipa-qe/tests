@@ -10,10 +10,10 @@ export clientport=9389
 ######################
 check_user()
 {
-	uid=$(ldapsearch -D 'cn=Directory Manager' -h$hostnamel -p$clientport -w$ADMINPW -x -b uid=$1,ou=People,dc=bos,dc=redhat,dc=com objectclass=* | grep uidNumber | cut -d\  -f2 )
-	gid=$(ldapsearch -D 'cn=Directory Manager' -h$hostnamel -p$clientport -w$ADMINPW -x -b uid=$1,ou=People,dc=bos,dc=redhat,dc=com objectclass=* | grep gidNumber | cut -d\  -f2 )
-	shell=$(ldapsearch -D 'cn=Directory Manager' -h$hostnamel -p$clientport -w$ADMINPW -x -b uid=$1,ou=People,dc=bos,dc=redhat,dc=com objectclass=* | grep loginShell | cut -d\  -f2 )
-	home=$(ldapsearch -D 'cn=Directory Manager' -h$hostnamel -p$clientport -w$ADMINPW -x -b uid=$1,ou=People,dc=bos,dc=redhat,dc=com objectclass=* | grep homeDirectory | cut -d\  -f2 )
+	uid=$(ldapsearch -D 'cn=Directory Manager' -h$hostnamef -p$clientport -w$ADMINPW -x -b uid=$1,ou=People,dc=bos,dc=redhat,dc=com objectclass=* | grep uidNumber | cut -d\  -f2 )
+	gid=$(ldapsearch -D 'cn=Directory Manager' -h$hostnamef -p$clientport -w$ADMINPW -x -b uid=$1,ou=People,dc=bos,dc=redhat,dc=com objectclass=* | grep gidNumber | cut -d\  -f2 )
+	shell=$(ldapsearch -D 'cn=Directory Manager' -h$hostnamef -p$clientport -w$ADMINPW -x -b uid=$1,ou=People,dc=bos,dc=redhat,dc=com objectclass=* | grep loginShell | cut -d\  -f2 )
+	home=$(ldapsearch -D 'cn=Directory Manager' -h$hostnamef -p$clientport -w$ADMINPW -x -b uid=$1,ou=People,dc=bos,dc=redhat,dc=com objectclass=* | grep homeDirectory | cut -d\  -f2 )
 
 	rlPhaseStartTest "checking uid for user $1"
 		rlRun "ipa user-show --all $1 | grep UID | grep $uid" 0 "checking to ensure the UID for user $1 is $uid"
@@ -66,7 +66,7 @@ check_user()
 ######################
 check_group()
 {
-	gid=$(ldapsearch -D 'cn=Directory Manager' -h$hostnamel -p$clientport -w$ADMINPW -x -b cn=$1,ou=Groups,dc=bos,dc=redhat,dc=com objectclass=* | grep gidNumber | cut -d\  -f2 )
+	gid=$(ldapsearch -D 'cn=Directory Manager' -h$hostnamef -p$clientport -w$ADMINPW -x -b cn=$1,ou=Groups,dc=bos,dc=redhat,dc=com objectclass=* | grep gidNumber | cut -d\  -f2 )
 
 	rlPhaseStartTest "checking gid for group $1"
 		rlRun "ipa group-find --all $1 | grep GID | grep $gid" 0 "checking to ensure the UID for user $1 is $gid"
@@ -168,8 +168,8 @@ userPassword: redhat
 homeDirectory: /home/user2009' > $file
 
 	rlPhaseStartTest "adding some more users to gid 1000"
-		echo "running: ldapmodify -a -x -h$hostnamel -p $clientport -D \"cn=Directory Manager\" -w$ADMINPW -c -f $file"
-		rlRun "ldapmodify -a -x -h$hostnamel -p $clientport -D \"cn=Directory Manager\" -w$ADMINPW -c -f $file" 0 "adding more users to gid 1000"
+		echo "running: ldapmodify -a -x -h$hostnamef -p $clientport -D \"cn=Directory Manager\" -w$ADMINPW -c -f $file"
+		rlRun "ldapmodify -a -x -h$hostnamef -p $clientport -D \"cn=Directory Manager\" -w$ADMINPW -c -f $file" 0 "adding more users to gid 1000"
 	rlPhaseEnd
 
 }
@@ -185,7 +185,7 @@ remove_group()
 	echo 'changetype: delete' >> $file
 
 	rlPhaseStartTest "running cleanup of group $1"
-		rlRun "ldapmodify -a -x -h$hostnamel -p $clientport -D \"cn=Directory Manager\" -w$ADMINPW -c -f $file" 0 "removing group $1"
+		rlRun "ldapmodify -a -x -h$hostnamef -p $clientport -D \"cn=Directory Manager\" -w$ADMINPW -c -f $file" 0 "removing group $1"
 	rlPhaseEnd
 }
 
@@ -200,7 +200,7 @@ remove_user()
 	echo 'changetype: delete' >> $file
 
 	rlPhaseStartTest "running cleanup of user $1"
-		rlRun "ldapmodify -x -h$hostnamel -p $clientport -D \"cn=Directory Manager\" -w$ADMINPW -c -f $file" 0 "cleaning up added user $1"
+		rlRun "ldapmodify -x -h$hostnamef -p $clientport -D \"cn=Directory Manager\" -w$ADMINPW -c -f $file" 0 "cleaning up added user $1"
 	rlPhaseEnd
 }
 
@@ -246,7 +246,7 @@ replace: userPassword
 userPassword: $userpassword" > $file
 
 	rlPhaseStartTest "changing the password for user $1 in the DS server"
-		rlRun "ldapmodify -a -x -h$hostnamel -p $clientport -D \"cn=Directory Manager\" -w$ADMINPW -c -f $file" 0 "changing the password for user $1"
+		rlRun "ldapmodify -a -x -h$hostnamef -p $clientport -D \"cn=Directory Manager\" -w$ADMINPW -c -f $file" 0 "changing the password for user $1"
 	rlPhaseEnd
 
 }
@@ -280,8 +280,8 @@ uniqueMember: uid=user2009,ou=People,dc=bos,dc=redhat,dc=com
 uniqueMember: uid=user2000,ou=People,dc=bos,dc=redhat,dc=com' > $file
 
 	rlPhaseStartTest "re-inserting the groups that we will be testing with later"
-		echo "running: ldapmodify -a -x -h$hostnamel -p $clientport -D \"cn=Directory Manager\" -w$ADMINPW -c -f $file"
-		rlRun "ldapmodify -a -x -h$hostnamel -p $clientport -D \"cn=Directory Manager\" -w$ADMINPW -c -f $file" 0 "adding more users to gid 1000"
+		echo "running: ldapmodify -a -x -h$hostnamef -p $clientport -D \"cn=Directory Manager\" -w$ADMINPW -c -f $file"
+		rlRun "ldapmodify -a -x -h$hostnamef -p $clientport -D \"cn=Directory Manager\" -w$ADMINPW -c -f $file" 0 "adding more users to gid 1000"
 	rlPhaseEnd
 
 }
@@ -304,10 +304,10 @@ ds_migration()
 	set_user_ldap_password userb000
 	re_add_groups
 
-	rlPhaseStartTest "Migrating from $hostnamel:$clientport"
+	rlPhaseStartTest "Migrating from $hostnamef:$clientport"
 		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 		rlRun "ipa config-mod --enable-migration=TRUE" 0 "enabling migration"
-		echo $ADMINPW | ipa migrate-ds ldap://$hostnamel:$clientport
+		echo $ADMINPW | ipa migrate-ds ldap://$hostnamef:$clientport
 		if [ $? -ne 0 ]; then
 			rlFail "ERROR - Migration form DS failed"
 		fi
@@ -354,5 +354,5 @@ ds_setup()
 # Removes the instance created by ds_setup
 ds_cleanup()
 {
-	/usr/sbin/remove-ds slapd-$hostnames
+	/usr/sbin/remove-ds -i slapd-$hostnames
 }
