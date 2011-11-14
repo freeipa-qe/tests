@@ -60,23 +60,13 @@ rlJournalStart
     rlPhaseEnd
 
     # r2d2_test_starts
-	if [ -x $CLIENT ]; then
-		echo "ERROR - there is no client. Please specify a client in the ipa-server install section."
-		echo "ERROR -  See the sample xml file"
-		rlFail "Client not found to migrate from"
-	else
 		kinitAs $ADMINID $ADMINPW
 		hostnames=$(hostname -s)
 		echo "hostname is $hostnames"
-		echo $MASTER | grep $hostnames
-		if [ $? -eq 0 ]; then # This is a master, run the master tests now
-			ds-migration
-		fi
-		echo $CLIENT | grep $hostnames
-		if [ $? -eq 0 ]; then # This is a client, setup DS on this machine now
-			client_ds_setup
-		fi
-	fi
+		ds_setup
+		sleep 120	
+		ds_migration
+		client_ds_setup
     # r2d2_test_ends
 
     rlPhaseStartCleanup "ds-migration cleanup"

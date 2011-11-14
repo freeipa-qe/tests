@@ -1,5 +1,8 @@
 
 export userpassword=redhat
+export hostnames=$(hostname -s)
+export hostnamef=$(hostname)
+export clientport=7389
 
 ######################
 # Check user  
@@ -7,10 +10,10 @@ export userpassword=redhat
 ######################
 check_user()
 {
-	uid=$(ldapsearch -D 'cn=Directory Manager' -h$BEAKERCLIENT -p389 -w$ADMINPW -x -b uid=$1,ou=People,dc=bos,dc=redhat,dc=com objectclass=* | grep uidNumber | cut -d\  -f2 )
-	gid=$(ldapsearch -D 'cn=Directory Manager' -h$BEAKERCLIENT -p389 -w$ADMINPW -x -b uid=$1,ou=People,dc=bos,dc=redhat,dc=com objectclass=* | grep gidNumber | cut -d\  -f2 )
-	shell=$(ldapsearch -D 'cn=Directory Manager' -h$BEAKERCLIENT -p389 -w$ADMINPW -x -b uid=$1,ou=People,dc=bos,dc=redhat,dc=com objectclass=* | grep loginShell | cut -d\  -f2 )
-	home=$(ldapsearch -D 'cn=Directory Manager' -h$BEAKERCLIENT -p389 -w$ADMINPW -x -b uid=$1,ou=People,dc=bos,dc=redhat,dc=com objectclass=* | grep homeDirectory | cut -d\  -f2 )
+	uid=$(ldapsearch -D 'cn=Directory Manager' -h$hostnamel -p$clientport -w$ADMINPW -x -b uid=$1,ou=People,dc=bos,dc=redhat,dc=com objectclass=* | grep uidNumber | cut -d\  -f2 )
+	gid=$(ldapsearch -D 'cn=Directory Manager' -h$hostnamel -p$clientport -w$ADMINPW -x -b uid=$1,ou=People,dc=bos,dc=redhat,dc=com objectclass=* | grep gidNumber | cut -d\  -f2 )
+	shell=$(ldapsearch -D 'cn=Directory Manager' -h$hostnamel -p$clientport -w$ADMINPW -x -b uid=$1,ou=People,dc=bos,dc=redhat,dc=com objectclass=* | grep loginShell | cut -d\  -f2 )
+	home=$(ldapsearch -D 'cn=Directory Manager' -h$hostnamel -p$clientport -w$ADMINPW -x -b uid=$1,ou=People,dc=bos,dc=redhat,dc=com objectclass=* | grep homeDirectory | cut -d\  -f2 )
 
 	rlPhaseStartTest "checking uid for user $1"
 		rlRun "ipa user-show --all $1 | grep UID | grep $uid" 0 "checking to ensure the UID for user $1 is $uid"
@@ -30,7 +33,7 @@ check_user()
 
 	# Making sure that the password migrated properly with a ldapbind
 	rlPhaseStartTest " Making sure that the password for user $1 migrated properly with a ldapbind"
-		rlRun "ldapsearch -x -h127.0.0.1 -p389 -D'uid=$1,cn=users,cn=accounts,dc=$DOMAIN' -w$userpassword -b uid=$1,cn=users,cn=accounts,dc=$DOMAIN objectclass=*" 0 "ldapsearch as user $1 with password $userpassword"
+		rlRun "ldapsearch -x -h127.0.0.1 -p$clientport -D'uid=$1,cn=users,cn=accounts,dc=$DOMAIN' -w$userpassword -b uid=$1,cn=users,cn=accounts,dc=$DOMAIN objectclass=*" 0 "ldapsearch as user $1 with password $userpassword"
 	rlPhaseEnd
 
 	# Making sure that the password migrated properly with ssh
@@ -63,7 +66,7 @@ check_user()
 ######################
 check_group()
 {
-	gid=$(ldapsearch -D 'cn=Directory Manager' -h$BEAKERCLIENT -p389 -w$ADMINPW -x -b cn=$1,ou=Groups,dc=bos,dc=redhat,dc=com objectclass=* | grep gidNumber | cut -d\  -f2 )
+	gid=$(ldapsearch -D 'cn=Directory Manager' -h$hostnamel -p$clientport -w$ADMINPW -x -b cn=$1,ou=Groups,dc=bos,dc=redhat,dc=com objectclass=* | grep gidNumber | cut -d\  -f2 )
 
 	rlPhaseStartTest "checking gid for group $1"
 		rlRun "ipa group-find --all $1 | grep GID | grep $gid" 0 "checking to ensure the UID for user $1 is $gid"
@@ -165,8 +168,8 @@ userPassword: redhat
 homeDirectory: /home/user2009' > $file
 
 	rlPhaseStartTest "adding some more users to gid 1000"
-		echo "running: ldapmodify -a -x -h$BEAKERCLIENT -p 389 -D \"cn=Directory Manager\" -w$ADMINPW -c -f $file"
-		rlRun "ldapmodify -a -x -h$BEAKERCLIENT -p 389 -D \"cn=Directory Manager\" -w$ADMINPW -c -f $file" 0 "adding more users to gid 1000"
+		echo "running: ldapmodify -a -x -h$hostnamel -p $clientport -D \"cn=Directory Manager\" -w$ADMINPW -c -f $file"
+		rlRun "ldapmodify -a -x -h$hostnamel -p $clientport -D \"cn=Directory Manager\" -w$ADMINPW -c -f $file" 0 "adding more users to gid 1000"
 	rlPhaseEnd
 
 }
@@ -182,7 +185,7 @@ remove_group()
 	echo 'changetype: delete' >> $file
 
 	rlPhaseStartTest "running cleanup of group $1"
-		rlRun "ldapmodify -a -x -h$BEAKERCLIENT -p 389 -D \"cn=Directory Manager\" -w$ADMINPW -c -f $file" 0 "removing group $1"
+		rlRun "ldapmodify -a -x -h$hostnamel -p $clientport -D \"cn=Directory Manager\" -w$ADMINPW -c -f $file" 0 "removing group $1"
 	rlPhaseEnd
 }
 
@@ -197,7 +200,7 @@ remove_user()
 	echo 'changetype: delete' >> $file
 
 	rlPhaseStartTest "running cleanup of user $1"
-		rlRun "ldapmodify -x -h$BEAKERCLIENT -p 389 -D \"cn=Directory Manager\" -w$ADMINPW -c -f $file" 0 "cleaning up added user $1"
+		rlRun "ldapmodify -x -h$hostnamel -p $clientport -D \"cn=Directory Manager\" -w$ADMINPW -c -f $file" 0 "cleaning up added user $1"
 	rlPhaseEnd
 }
 
@@ -229,10 +232,6 @@ cleanup()
 		rlRun "ipa group-del 'qa managers'" 0 "Removing ipa group for cleanup"
 	rlPhaseEnd
 	
-#	rlPhaseStartTest "returning ipa server to normal operation"
-#		rlRun "ipa config-mod --enable-migration=FALSE" 0 "disabling migration"
-#	rlPhaseEnd
-	ipa config-mod --enable-migration=FALSE
 }
 
 #####################
@@ -247,7 +246,7 @@ replace: userPassword
 userPassword: $userpassword" > $file
 
 	rlPhaseStartTest "changing the password for user $1 in the DS server"
-		rlRun "ldapmodify -a -x -h$BEAKERCLIENT -p 389 -D \"cn=Directory Manager\" -w$ADMINPW -c -f $file" 0 "changing the password for user $1"
+		rlRun "ldapmodify -a -x -h$hostnamel -p $clientport -D \"cn=Directory Manager\" -w$ADMINPW -c -f $file" 0 "changing the password for user $1"
 	rlPhaseEnd
 
 }
@@ -281,8 +280,8 @@ uniqueMember: uid=user2009,ou=People,dc=bos,dc=redhat,dc=com
 uniqueMember: uid=user2000,ou=People,dc=bos,dc=redhat,dc=com' > $file
 
 	rlPhaseStartTest "re-inserting the groups that we will be testing with later"
-		echo "running: ldapmodify -a -x -h$BEAKERCLIENT -p 389 -D \"cn=Directory Manager\" -w$ADMINPW -c -f $file"
-		rlRun "ldapmodify -a -x -h$BEAKERCLIENT -p 389 -D \"cn=Directory Manager\" -w$ADMINPW -c -f $file" 0 "adding more users to gid 1000"
+		echo "running: ldapmodify -a -x -h$hostnamel -p $clientport -D \"cn=Directory Manager\" -w$ADMINPW -c -f $file"
+		rlRun "ldapmodify -a -x -h$hostnamel -p $clientport -D \"cn=Directory Manager\" -w$ADMINPW -c -f $file" 0 "adding more users to gid 1000"
 	rlPhaseEnd
 
 }
@@ -291,10 +290,10 @@ uniqueMember: uid=user2000,ou=People,dc=bos,dc=redhat,dc=com' > $file
 ######################
 # test suite         #
 ######################
-# ldapsearch -D "cn=Directory Manager" -hipaqa64vmc.idm.lab.bos.redhat.com -p389 -w$ADMINPW -x -b ou=People,dc=bos,dc=redhat,dc=com objectclass=*
-# ipa migrate-ds ldap://ipaqa64vmc.idm.lab.bos.redhat.com:389
+# ldapsearch -D "cn=Directory Manager" -hipaqa64vmc.idm.lab.bos.redhat.com -p$clientport -w$ADMINPW -x -b ou=People,dc=bos,dc=redhat,dc=com objectclass=*
+# ipa migrate-ds ldap://ipaqa64vmc.idm.lab.bos.redhat.com:$clientport
 
-ds-migration()
+ds_migration()
 {
 
 	add_more_users
@@ -305,10 +304,10 @@ ds-migration()
 	set_user_ldap_password userb000
 	re_add_groups
 
-	rlPhaseStartTest "Migrating from $BEAKERCLIENT"
+	rlPhaseStartTest "Migrating from $hostnamel:$clientport"
 		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 		rlRun "ipa config-mod --enable-migration=TRUE" 0 "enabling migration"
-		echo $ADMINPW | ipa migrate-ds ldap://$BEAKERCLIENT:389
+		echo $ADMINPW | ipa migrate-ds ldap://$hostnamel:$clientport
 		if [ $? -ne 0 ]; then
 			rlFail "ERROR - Migration form DS failed"
 		fi
@@ -330,7 +329,7 @@ ds-migration()
 	# checking group 2000
 	check_group group2000
 
-	rlPhaseStartTest "Migrating from $BEAKERCLIENT"
+	rlPhaseStartTest "disabling migration"
 		rlRun "ipa config-mod --enable-migration=FALSE" 0 "disabling migration"
 	rlPhaseEnd
 
@@ -339,10 +338,8 @@ ds-migration()
 } # ipasample
 
 # This bit sets up and configures the ds instance on the client
-client_ds_setup()
+ds_setup()
 {
-	hostnames=$(hostname -s)
-	hostnamef=$(hostname)
 	# ds-setup.inf should be in /dev/shm
 	cat /dev/shm/ds-setup.inf > /tmp/ds-setup.inf
 	sed -i s/--shorthostname--/$hostnames/g /tmp/ds-setup.inf
@@ -350,6 +347,6 @@ client_ds_setup()
 	/usr/sbin/useradd -G root dirsrv
 	/usr/sbin/setup-ds.pl --silent --file=/tmp/ds-setup.inf
 	rlPhaseStartTest "Testing to ensure that the ds instance on $hostnamef got set properly"
-		rlRun "ldapsearch -D \"cn=Directory Manager\" -h$hostnamef -p389 -w$ADMINPW -x -b dc=bos,dc=redhat,dc=com objectclass=*" 0 "Checking to ensure that we can ldapsearch against the new DS instance"
+		rlRun "ldapsearch -D \"cn=Directory Manager\" -h$hostnamef -p$clientport -w$ADMINPW -x -b dc=bos,dc=redhat,dc=com objectclass=*" 0 "Checking to ensure that we can ldapsearch against the new DS instance"
 	rlPhaseEnd
 }

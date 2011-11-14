@@ -15,7 +15,7 @@ InstallLdifFile = suggest
 RootDN = cn=Directory Manager
 RootDNPwd = Secret123
 ServerIdentifier = --shorthostname--
-ServerPort = 389
+ServerPort = 7389
 Suffix = dc=bos,dc=redhat,dc=com
 bak_dir = /var/lib/dirsrv/slapd---shorthostname--/bak
 bindir = /usr/bin
