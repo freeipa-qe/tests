@@ -59,6 +59,7 @@ rlJournalStart
     rlPhaseEnd
 
     # r2d2_test_starts
+echo "yidebug: start"
     ipagetcert
     # r2d2_test_ends
 
