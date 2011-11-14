@@ -33,7 +33,12 @@ check_user()
 
 	# Making sure that the password migrated properly with a ldapbind
 	rlPhaseStartTest " Making sure that the password for user $1 migrated properly with a ldapbind"
-		rlRun "ldapsearch -x -h127.0.0.1 -p$clientport -D'uid=$1,cn=users,cn=accounts,dc=$DOMAIN' -w$userpassword -b uid=$1,cn=users,cn=accounts,dc=$DOMAIN objectclass=*" 0 "ldapsearch as user $1 with password $userpassword"
+		rlRun "ldapsearch -x -h$hostnamef -p$clientport -D'uid=$1,cn=users,cn=accounts,dc=$DOMAIN' -w$userpassword -b uid=$1,ou=People,dc=bos,dc=redhat,dc=com objectclass=*" 0 "ldapsearch as user $1 with password $userpassword"
+	rlPhaseEnd
+
+	# Ensuring that kinit for user $1 works.
+	rlPhaseStartTest "kiniting as user $1"
+		rlRun "FirstKinitAs $1 $userpassword blarg4r5" 0 "Kinit as user $1"
 	rlPhaseEnd
 
 	# Making sure that the password migrated properly with ssh
@@ -41,7 +46,7 @@ check_user()
 		file=ssh-test-file-6148864.txt
 		touch /dev/shm/$file
 		rm -f /dev/shm/ssh-test-output.txt
-		echo $userpassword | ssh $1@$MASTER 'ls /dev/shm' > /dev/shm/ssh-test-output.txt &
+		echo blarg4r5 | ssh $1@$MASTER 'ls /dev/shm' > /dev/shm/ssh-test-output.txt &
 		sleep 20
 		rlRun "grep $file /dev/shm/ssh-test-output.txt" 0 "check to see if the ssh as the user was sucessful"
 	rlPhaseEnd
