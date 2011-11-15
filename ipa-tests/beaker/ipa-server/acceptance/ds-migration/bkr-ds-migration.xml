@@ -8,7 +8,9 @@
 			<watchdog panic="None"/>
 			<packages/>
 			<ks_appends/>
-			<repos/>
+			<repos>
+				<repo name="ipa-noarch" url="http://epsilon.dsdev.sjc.redhat.com/tet/up.repo"/>
+			</repos>
 			<distroRequires>
 				<and>
 					<distro_variant op="=" value="Server"/>

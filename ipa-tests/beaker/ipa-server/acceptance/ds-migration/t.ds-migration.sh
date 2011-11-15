@@ -42,7 +42,7 @@ check_user()
 	rlPhaseEnd
 
 	# Making sure that the password migrated properly with ssh
-	rlPhaseStartTest " Making sure that the password for user $1 migrated properly with ssh"
+	rlPhaseStartTest " Making sure that the password for user $1 migrated properly with ssh, this often fails. bug report pending."
 		file=ssh-test-file-6148864.txt
 		touch /dev/shm/$file
 		rm -f /dev/shm/ssh-test-output.txt
@@ -231,10 +231,10 @@ cleanup()
 		rlRun "ipa user-del userb000" 0 "Removing ipa user for cleanup"
 		rlRun "ipa group-del group1000" 0 "Removing ipa group for cleanup"
 		rlRun "ipa group-del group2000" 0 "Removing ipa group for cleanup"
-		rlRun "ipa group-del 'accounting managers'" 0 "Removing ipa group for cleanup"
-		rlRun "ipa group-del 'hr managers'" 0 "Removing ipa group for cleanup"
-		rlRun "ipa group-del 'pd managers'" 0 "Removing ipa group for cleanup"
-		rlRun "ipa group-del 'qa managers'" 0 "Removing ipa group for cleanup"
+		rlRun "ipa group-del 'accounting managers'" 0 "Removing ipa group for cleanup, often fails due to https://bugzilla.redhat.com/show_bug.cgi?id=753966"
+		rlRun "ipa group-del 'hr managers'" 0 "Removing ipa group for cleanup, often fails due to https://bugzilla.redhat.com/show_bug.cgi?id=753966"
+		rlRun "ipa group-del 'pd managers'" 0 "Removing ipa group for cleanup, often fails due to https://bugzilla.redhat.com/show_bug.cgi?id=753966"
+		rlRun "ipa group-del 'qa managers'" 0 "Removing ipa group for cleanup, often fails due to https://bugzilla.redhat.com/show_bug.cgi?id=753966"
 	rlPhaseEnd
 	
 }
