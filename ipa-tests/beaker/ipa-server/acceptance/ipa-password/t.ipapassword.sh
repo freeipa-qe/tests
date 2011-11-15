@@ -6,9 +6,9 @@ ipapassword()
 {
     ipapassword_envsetup
     ipapassword_globalpolicy
-    ipapassword_grouppolicy
-    ipapassword_nestedgroup
-    ipapassword_attr
+#    ipapassword_grouppolicy
+#    ipapassword_nestedgroup
+#    ipapassword_attr
     ipapassword_envcleanup
 } # ipapassword
 
@@ -18,27 +18,34 @@ ipapassword()
 ipapassword_globalpolicy()
 {
     ipapassword_globalpolicy_envsetup
-    ipapassword_globalpolicy_maxlifetime_default
-    ipapassword_globalpolicy_maxlifetime_lowerbound
-    ipapassword_globalpolicy_maxlifetime_upperbound
-    ipapassword_globalpolicy_maxlifetime_negative
-    ipapassword_globalpolicy_minlifetime_default
-    ipapassword_globalpolicy_minlifetime_lowerbound
-    ipapassword_globalpolicy_minlifetime_upperbound
-    ipapassword_globalpolicy_minlifetime_negative
-    ipapassword_globalpolicy_minlifetime_greater_maxlife_negative
-    ipapassword_globalpolicy_history_default
-    ipapassword_globalpolicy_history_lowerbound
-    ipapassword_globalpolicy_history_upperbound
-    ipapassword_globalpolicy_history_negative
-    ipapassword_globalpolicy_classes_default
-    ipapassword_globalpolicy_classes_lowerbound
-    ipapassword_globalpolicy_classes_upperbound
-    ipapassword_globalpolicy_classes_negative
-    ipapassword_globalpolicy_length_default
-    ipapassword_globalpolicy_length_lowerbound
-    ipapassword_globalpolicy_length_upperbound
-    ipapassword_globalpolicy_length_negative
+#    ipapassword_globalpolicy_maxlifetime_default
+#    ipapassword_globalpolicy_maxlifetime_lowerbound
+#    ipapassword_globalpolicy_maxlifetime_upperbound
+#    ipapassword_globalpolicy_maxlifetime_negative
+#    ipapassword_globalpolicy_minlifetime_default
+#    ipapassword_globalpolicy_minlifetime_lowerbound
+#    ipapassword_globalpolicy_minlifetime_upperbound
+#    ipapassword_globalpolicy_minlifetime_negative
+#    ipapassword_globalpolicy_minlifetime_greater_maxlife_negative
+#    ipapassword_globalpolicy_history_default
+#    ipapassword_globalpolicy_history_lowerbound
+#    ipapassword_globalpolicy_history_upperbound
+#    ipapassword_globalpolicy_history_negative
+    local thisisacounter=0
+    while [ $thisisacounter -lt 100 ]
+    do
+        echo "################################################ run counter: [$thisisacounter] ############## "
+
+        ipapassword_globalpolicy_classes_default
+        ipapassword_globalpolicy_classes_lowerbound
+        thisisacounter=$((thisisacounter+1))
+    done
+#    ipapassword_globalpolicy_classes_upperbound
+#    ipapassword_globalpolicy_classes_negative
+#    ipapassword_globalpolicy_length_default
+#    ipapassword_globalpolicy_length_lowerbound
+#    ipapassword_globalpolicy_length_upperbound
+#    ipapassword_globalpolicy_length_negative
     ipapassword_globalpolicy_envcleanup
 } #ipapassword_globalpolicy
 
