@@ -83,7 +83,8 @@ setup()
        ## Lines to expect to be changed during the isnatllation process
        ## which reference the MASTER. 
        ## Moved them here from data.ipaclientinstall.acceptance since MASTER is not set there.
-       ipa_server="_srv_, $MASTER" # sssd.conf updates
+       # 2.0 ipa_server="_srv_, $MASTER" # sssd.conf updates
+       ipa_server="$MASTER" # sssd.conf updates
     rlPhaseEnd
 }
 
@@ -155,7 +156,8 @@ ipaserverinstall_hostname()
          rlLog "EXECUTING: ipa-server-install --setup-dns --forwarder=$DNSFORWARD --hostname=$MYHOSTNAME -r $RELM --p $ADMINPW -P $ADMINPW -a $ADMINPW -U"
         command="ipa-server-install --setup-dns --forwarder=$DNSFORWARD --hostname=$MYHOSTNAME -r $RELM -p $ADMINPW -P $ADMINPW -a $ADMINPW -U"
         local tmpout=$TmpDir/ipaserverinstall_hostname.out
-        expmsg="Unable to resolve host name, check /etc/hosts or DNS name resolution"
+        #expmsg="Unable to resolve host name, check /etc/hosts or DNS name resolution"
+        expmsg="Unable to resolve IP address for host name"
         qaRun "$command" "$tmpout" 1 "$expmsg" "Verify expected error message when installing with incorrect hostname"
     rlPhaseEnd
 }
@@ -226,11 +228,14 @@ ipa-server-install: error: You must specify at least one --forwarder option or -
 #######################################################
 ipaserverinstall_ipaddress()
 {
-    rlPhaseStartTest "ipa-server-install - 10 - [Positive] Install with diff ip address [Bug 696268]"
+    rlPhaseStartTest "ipa-server-install - 10 - [Negative] Install with diff ip address"
         uninstall_fornexttest
         rlLog "EXECUTING: ipa-server-install --setup-dns --forwarder=$DNSFORWARD --ip-address=$NEWIPADDRESS -r $RELM -p $ADMINPW -P $ADMINPW -a $ADMINPW -U"
-        rlRun "ipa-server-install --setup-dns --forwarder=$DNSFORWARD --ip-address=$NEWIPADDRESS -r $RELM -p $ADMINPW -P $ADMINPW -a $ADMINPW -U" 0 "Installing ipa server with diff ip address"
-        verify_install true newip
+        command="ipa-server-install --setup-dns --forwarder=$DNSFORWARD --ip-address=$NEWIPADDRESS -r $RELM -p $ADMINPW -P $ADMINPW -a $ADMINPW -U"
+        expmsg="Usage: ipa-server-install [options]
+
+ipa-server-install: error: option --ip-address: invalid IP address $NEWIPADDRESS: No network interface matches the provided IP address and netmask"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for IPA Install with different ip address" 
     rlPhaseEnd
 }
 

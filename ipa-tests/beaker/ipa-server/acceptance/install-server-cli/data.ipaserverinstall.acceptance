@@ -6,7 +6,7 @@ DEFAULT="/etc/ipa/default.conf"
 AUTHCONFIG="/etc/sysconfig/authconfig"
 SLAPD_PKI="/etc/dirsrv/slapd-PKI-IPA"
 NTP="/etc/ntp.conf"
-VERSION="2.0.0"
+VERSION="2.1.3"
 
 #Realm used in these tests
 MYREALM="RALEIGHREALM"
@@ -24,14 +24,18 @@ group="files sss"
 netgroup="files sss"
 
 # sssd.conf updates
-krb5_realm_myrealm="$MYREALM $MYREALM"
-cache_credentials="True True"
+#krb5_realm_myrealm="$MYREALM $MYREALM"
+krb5_realm_myrealm="$MYREALM"
+#cache_credentials="True True"
+cache_credentials="True"
 ipa_domain=$DOMAIN
 id_provider="ipa"
-auth_provider="ipa krb5"
+#auth_provider="ipa krb5"
+auth_provider="ipa"
 access_provider="ipa"
-chpass_provider="ipa krb5"
-krb5_realm=$RELM
+#chpass_provider="ipa krb5"
+chpass_provider="ipa"
+#krb5_realm=$RELM
 
 
 # krb5.conf updates
@@ -39,17 +43,19 @@ dns_lookup_kdc="true"
 default_realm=$RELM
 dns_lookup_realm="true"
 rdns="false"
-ticket_lifetime="24h 36000"
-forwardable="yes true"
+#ticket_lifetime="24h 36000"
+ticket_lifetime="24h"
+#forwardable="yes true"
+forwardable="yes"
 pkinit_anchors="FILE:/etc/ipa/ca.crt"
-debug_krb5="false"
-renew_lifetime="36000"
-krb4_convert="false"
+#debug_krb5="false"
+#renew_lifetime="36000"
+#krb4_convert="false"
 default_myrealm=$MYREALM
 
 #authconfig updates
 USESSSDAUTH="yes"
-USEKERBEROS="yes"
+#USEKERBEROS="yes"
 USESSSD="yes"
 
 #default.conf contents

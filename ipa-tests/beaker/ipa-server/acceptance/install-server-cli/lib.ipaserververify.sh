@@ -95,12 +95,15 @@ verify_sssd()
 
      testcachecredentials=`grep "^cache_credentials"  $SSSD | cut -d "=" -f2 | xargs echo`
      ipacompare_forinstalluninstall "cache_credentials " "$cache_credentials" "$testcachecredentials" "$1" 
-     if [ "$2" == "realm" ] ; then
-        testkrb5realm=`grep "^krb5_realm" $SSSD | cut -d "=" -f2 | xargs echo`
-        ipacompare_forinstalluninstall "krb5_realm " "$krb5_realm_myrealm" "$testkrb5realm" "$1" 
-     else
-        testkrb5realm=`grep "^krb5_realm" $SSSD | cut -d "=" -f2 | xargs echo`
-        ipacompare_forinstalluninstall "krb5_realm " "$krb5_realm" "$testkrb5realm" "$1" 
+     local installcheck="$1"
+     if $installcheck ; then
+        if [ "$2" == "realm" ] ; then
+           testkrb5realm=`grep "^krb5_realm" $SSSD | cut -d "=" -f2 | xargs echo`
+           ipacompare_forinstalluninstall "krb5_realm " "$krb5_realm_myrealm" "$testkrb5realm" "$1" 
+        else
+           testkrb5realm=`grep "^krb5_realm" $SSSD | cut -d "=" -f2 | xargs echo`
+           ipacompare_forinstalluninstall "krb5_realm " "$krb5_realm" "$testkrb5realm" "$1" 
+        fi
      fi
      testipadomain=`grep "^ipa_domain" $SSSD | cut -d "=" -f2 | xargs echo`
      ipacompare_forinstalluninstall "ipa_domain " "$ipa_domain" "$testipadomain" "$1" 
@@ -129,18 +132,21 @@ verify_krb5()
     fi
     testrdns=`grep "rdns" $KRB5 | cut -d "=" -f2 | xargs echo` 
     ipacompare_forinstalluninstall "rdns " "$rdns" "$testrdns" "$1" 
-    testticketlifetime=`grep "ticket_lifetime" $KRB5 | cut -d "=" -f2 | xargs echo` 
-    ipacompare_forinstalluninstall "ticket_lifetime " "$ticket_lifetime" "$testticketlifetime" "$1" 
     testforwardable=`grep "forwardable" $KRB5 | cut -d "=" -f2 | xargs echo` 
     ipacompare_forinstalluninstall "forwardable " "$forwardable" "$testforwardable" "$1" 
     testpkinitanchors=`grep "pkinit_anchors" $KRB5 | cut -d "=" -f2 | xargs echo` 
     ipacompare_forinstalluninstall "pkinit_anchors " "$pkinit_anchors" "$testpkinitanchors" "$1" 
-    testdebug=`grep "debug" $KRB5 | cut -d "=" -f2 | xargs echo` 
-    ipacompare_forinstalluninstall "debug " "$debug_krb5" "$testdebug" "$1" 
     testrenewlifetime=`grep "renew_lifetime" $KRB5 | cut -d "=" -f2 | xargs echo` 
     ipacompare_forinstalluninstall "renew_lifetime " "$renew_lifetime" "$testrenewlifetime" "$1" 
-    testkrb4convert=`grep "krb4_convert" $KRB5 | cut -d "=" -f2 | xargs echo` 
-    ipacompare_forinstalluninstall "krb4_convert " "$krb4_convert" "$testkrb4convert" "$1" 
+    local installcheck="$1"
+    if $installcheck ; then
+       testticketlifetime=`grep "ticket_lifetime" $KRB5 | cut -d "=" -f2 | xargs echo` 
+       ipacompare_forinstalluninstall "ticket_lifetime " "$ticket_lifetime" "$testticketlifetime" "$1" 
+       testdebug=`grep "debug" $KRB5 | cut -d "=" -f2 | xargs echo` 
+       ipacompare_forinstalluninstall "debug " "$debug_krb5" "$testdebug" "$1" 
+       testkrb4convert=`grep "krb4_convert" $KRB5 | cut -d "=" -f2 | xargs echo` 
+       ipacompare_forinstalluninstall "krb4_convert " "$krb4_convert" "$testkrb4convert" "$1" 
+    fi
 }
 
 
@@ -166,8 +172,8 @@ verify_authconfig()
 
     testusesssdauth=`grep "USESSSDAUTH"  $AUTHCONFIG | cut -d "=" -f2 | xargs echo`
     ipacompare_forinstalluninstall "USESSSDAUTH: " "$USESSSDAUTH" "$testusesssdauth" "$1" 
-    testusekerberos=`grep "USEKERBEROS"  $AUTHCONFIG | cut -d "=" -f2 | xargs echo`
-    ipacompare_forinstalluninstall "USEKERBEROS: " "$USEKERBEROS" "$testusekerberos" "$1" 
+    #testusekerberos=`grep "USEKERBEROS"  $AUTHCONFIG | cut -d "=" -f2 | xargs echo`
+    #ipacompare_forinstalluninstall "USEKERBEROS: " "$USEKERBEROS" "$testusekerberos" "$1" 
     testusesssd=`grep -w "USESSSD"  $AUTHCONFIG | cut -d "=" -f2 | xargs echo`
     ipacompare_forinstalluninstall "USESSSD: " "$USESSSD" "$testusesssd" "$1" 
 }
@@ -324,7 +330,7 @@ verify_zonemgr()
    rlLog "Verify zonemgr addr"
 
    out=$2
-   command="ipa dnszone-find"
+   command="ipa dnszone-show $DOMAIN"
    $command > $out
    if [ "$3" == "zonemgr" ]; then
       testadminemail=`grep -m 1 "Administrator e-mail address" $out | cut -d ":" -f2 | xargs echo`
