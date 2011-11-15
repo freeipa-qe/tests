@@ -521,11 +521,18 @@ rlJournalStart
 		BEAKERCLIENT2_SH=`echo $BEAKERCLIENT2 | cut -d "." -f 1`
 		BEAKERCLIENT_PTR=`nslookup $BEAKERCLIENT | grep Address | grep -v "#" | awk '{print $2}' | cut -d "." -f 4`
 		BEAKERCLIENT2_PTR=`nslookup $BEAKERCLIENT2 | grep Address | grep -v "#" | awk '{print $2}' | cut -d "." -f 4`
-		REVERSE_ZONE=`ipa dnszone-find | grep -i "Zone name" | head -1 | awk '{print $4}'`
+
+		REVERSE_ZONE=`ipa dnszone-\find | grep -i "Zone name" | head -1 | awk '{print $4}'`
 		rlLog "REVERSE_ZONE is $REVERSE_ZONE"
+
 		ipa dnszone-find | grep -i "Zone name" | head -1 | awk '{print $4}' > /tmp/reverse_zone.out
 		REVERSE_ZONE=`cat /tmp/reverse_zone.out`
 		rlLog "REVERSE_ZONE now is $REVERSE_ZONE"
+
+		rlRun "ipa dnszone-find > /tmp/rev.out 2>&1"
+		REVERSE_ZONE=`cat /tmp/rev.out | grep -i "Zone name" | head -1 | awk '{print $4}'`
+		rlRun "cat /tmp/rev.out"
+		rlLog "REVERSE_ZONE now again is $REVERSE_ZONE"
 
 		# Adding forward and reverse record.
 		rlRun "ipa dnsrecord-add $DOMAIN $BEAKERCLIENT_SH --a-rec=$BEAKERCLIENT_IP"
