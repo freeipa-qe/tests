@@ -516,18 +516,29 @@ rlJournalStart
 	        rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 
 		BEAKERCLIENT_IP=`nslookup $BEAKERCLIENT | grep Address | grep -v "#" | awk '{print $2}'`
+		rlRun "BEAKERCLIENT_IP is $BEAKERCLIENT_IP"
 		BEAKERCLIENT2_IP=`nslookup $BEAKERCLIENT2 | grep Address | grep -v "#" | awk '{print $2}'`
+		rlRun "BEAKERCLIENT2_IP is $BEAKERCLIENT2_IP"
 		BEAKERCLIENT_SH=`echo $BEAKERCLIENT | cut -d "." -f 1`
+		rlRun "BEAKERCLIENT_SH is $BEAKERCLIENT_SH"
 		BEAKERCLIENT2_SH=`echo $BEAKERCLIENT2 | cut -d "." -f 1`
+		rlRun "BEAKERCLIENT2_SH is $BEAKERCLIENT2_SH"
 		BEAKERCLIENT_PTR=`nslookup $BEAKERCLIENT | grep Address | grep -v "#" | awk '{print $2}' | cut -d "." -f 4`
+		rlRun "BEAKERCLIENT_PTR is $BEAKERCLIENT_PTR"
 		BEAKERCLIENT2_PTR=`nslookup $BEAKERCLIENT2 | grep Address | grep -v "#" | awk '{print $2}' | cut -d "." -f 4`
+		rlRun "BEAKERCLIENT2_PTR is $BEAKERCLIENT2_PTR"
 		REVERSE_ZONE=`ipa dnszone-find | grep -i "Zone name" | head -1 | awk '{print $4}'`
+		rlRun "REVERSE_ZONE is $REVERSE_ZONE"
 
 		# Adding forward and reverse record.
+		echo "ipa dnsrecord-add $DOMAIN $BEAKERCLIENT_SH --a-rec=$BEAKERCLIENT_IP"
+		echo "ipa dnsrecord-add $REVERSE_ZONE $BEAKERCLIENT_PTR --ptr-rec=$CLIENT."
 		rlRun "ipa dnsrecord-add $DOMAIN $BEAKERCLIENT_SH --a-rec=$BEAKERCLIENT_IP"
 		rlRun "ipa dnsrecord-add $REVERSE_ZONE $BEAKERCLIENT_PTR --ptr-rec=$CLIENT."
 
 		# Adding forward and reverse record.
+		echo "ipa dnsrecord-add $DOMAIN $BEAKERCLIENT2_SH --a-rec=$BEAKERCLIENT2_IP"
+		echo "ipa dnsrecord-add $REVERSE_ZONE $BEAKERCLIENT2_PTR --ptr-rec=$CLIENT2."
 		rlRun "ipa dnsrecord-add $DOMAIN $BEAKERCLIENT2_SH --a-rec=$BEAKERCLIENT2_IP"
 		rlRun "ipa dnsrecord-add $REVERSE_ZONE $BEAKERCLIENT2_PTR --ptr-rec=$CLIENT2."
 
