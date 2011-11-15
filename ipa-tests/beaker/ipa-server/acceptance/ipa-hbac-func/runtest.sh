@@ -530,7 +530,7 @@ rlJournalStart
 		rlLog "REVERSE_ZONE now is $REVERSE_ZONE"
 
 		rlRun "ipa dnszone-find > /tmp/rev.out 2>&1"
-		REVERSE_ZONE=`cat /tmp/rev.out | grep -i "Zone name" | head -1 | awk '{print $4}'`
+		REVERSE_ZONE=`cat /tmp/rev.out | grep -i "Zone name" | head -1 | awk '{print $3}'`
 		rlRun "cat /tmp/rev.out"
 		rlLog "REVERSE_ZONE now again is $REVERSE_ZONE"
 
