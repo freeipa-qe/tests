@@ -1,21 +1,20 @@
-<job retention_tag="scratch">
+<job>
 	<whiteboard>
-		ipa-server RHEL6 multihost(master, slave) replication test
+		ipa-server RHEL6 multihost(master, slave) replication test i386
 	</whiteboard>
-	<recipeSet priority="Normal">
+	<recipeSet>
 		<recipe kernel_options="" kernel_options_post="" ks_meta="" role="MASTER" whiteboard="IPA MASTER">
 			<autopick random="false"/>
 			<watchdog panic="None"/>
 			<packages/>
 			<ks_appends/>
 			<repos>
-				<repo name="ipa" url="http://mickey.dsdev.sjc.redhat.com/repos/pki/ipa/devel/rhel6/devel_x86_64/x86_64/"/>
-				<repo name="ipa-noarch" url="http://mickey.dsdev.sjc.redhat.com/repos/pki/ipa/devel/rhel6/devel_x86_64/noarch"/>
+				<repo name="ipa-noarch" url="http://epsilon.dsdev.sjc.redhat.com/tet/up386.repo"/>
 			</repos>
 			<distroRequires>
 				<and>
 					<distro_variant op="=" value="Server"/>
-					<distro_arch op="=" value="x86_64"/>
+					<distro_arch op="=" value="i386"/>
 					<distro_tag op="=" value="RELEASED"/>
 					<distro_family op="=" value="RedHatEnterpriseLinux6"/>
 					<distro_method op="=" value="nfs"/>
@@ -45,13 +44,12 @@
 			<packages/>
 			<ks_appends/>
 			<repos>
-				<repo name="ipa" url="http://mickey.dsdev.sjc.redhat.com/repos/pki/ipa/devel/rhel6/devel_x86_64/x86_64/"/>
-				<repo name="ipa-noarch" url="http://mickey.dsdev.sjc.redhat.com/repos/pki/ipa/devel/rhel6/devel_x86_64/noarch"/>
+				<repo name="ipa-noarch" url="http://epsilon.dsdev.sjc.redhat.com/tet/up386.repo"/>
 			</repos>
 			<distroRequires>
 				<and>
 					<distro_variant op="=" value="Server"/>
-					<distro_arch op="=" value="x86_64"/>
+					<distro_arch op="=" value="i386"/>
 					<distro_tag op="=" value="RELEASED"/>
 					<distro_family op="=" value="RedHatEnterpriseLinux6"/>
 					<distro_method op="=" value="nfs"/>

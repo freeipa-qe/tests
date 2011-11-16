@@ -54,7 +54,7 @@ testReplicationOnMasterAndSlave()
             slaveIsInstalled=true
           fi
         done
-        rhts-sync-set -m $BEAKERSLAVE -s READY
+        rhts-sync-set -s READY
       fi
     rlPhaseEnd
 
@@ -75,7 +75,7 @@ testReplicationOnMasterAndSlave()
          rlRun "FirstKinitAs $login $password $ADMINPW" 0 "kinit and set new password for the new user"
       rlPhaseEnd
 
-      rhts-sync-set -m $BEAKERMASTER -s MASTERADDEDOBJS
+      rhts-sync-set -s MASTERADDEDOBJS
     fi
 
 
@@ -93,7 +93,7 @@ testReplicationOnMasterAndSlave()
          rlRun "FirstKinitAs $login $password $ADMINPW" 0 "kinit and set new password for the new user"
       rlPhaseEnd
 
-      rhts-sync-set -m $BEAKERSLAVE -s SLAVEADDEDOBJS
+      rhts-sync-set -s SLAVEADDEDOBJS
    fi
  
 ################################################
@@ -112,7 +112,7 @@ testReplicationOnMasterAndSlave()
          rlRun "kinitAs $login $ADMINPW" 0 "Kinit on slave as user added from master"
       rlPhaseEnd
       
-      rhts-sync-set -m $BEAKERSLAVE -s SLAVECHECKEDOBJS
+      rhts-sync-set -s SLAVECHECKEDOBJS
    fi
    
 
@@ -133,7 +133,7 @@ testReplicationOnMasterAndSlave()
          rlRun "kinitAs $login $ADMINPW" 0 "Kinit on master as user added from slave"
       rlPhaseEnd
 
-      rhts-sync-set -m $BEAKERMASTER -s MASTERCHECKEDOBJS
+      rhts-sync-set -s MASTERCHECKEDOBJS
     fi
 
 
@@ -155,7 +155,7 @@ testReplicationOnMasterAndSlave()
          rlRun "FirstKinitAs $login_updated $passwordChange $updatedPassword" 0 "kinit as user with updated password"
       rlPhaseEnd
 
-      rhts-sync-set -m $BEAKERMASTER -s MASTERUPDATEDOBJS
+      rhts-sync-set -s MASTERUPDATEDOBJS
     fi
 
 
@@ -175,7 +175,7 @@ testReplicationOnMasterAndSlave()
          rlRun "kinitAs $login_updated $updatedPassword" 0 "Kinit on slave as user updated from master"
       rlPhaseEnd
 
-      rhts-sync-set -m $BEAKERSLAVE -s SLAVECHECKEDUPDATEDOBJS
+      rhts-sync-set -s SLAVECHECKEDUPDATEDOBJS
    fi
 
 
@@ -197,7 +197,7 @@ testReplicationOnMasterAndSlave()
          rlRun "FirstKinitAs $login_updated $passwordChange $updatedPassword" 0 "kinit as user with updated password"
       rlPhaseEnd
 
-      rhts-sync-set -m $BEAKERSLAVE -s SLAVEUPDATEDOBJS
+      rhts-sync-set -s SLAVEUPDATEDOBJS
    fi
 
 
@@ -215,7 +215,7 @@ testReplicationOnMasterAndSlave()
       # kinit on master, as the user updated from slave
       rlPhaseStartTest "Kinit on master, as user updated from slave"
          rlRun "kinitAs $login_updated $updatedPassword" 0 "Kinit on master as user updated from slave"
-     rhts-sync-set -m $BEAKERMASTER -s MASTERCHECKEDUPDATEDOBJS
+     rhts-sync-set -s MASTERCHECKEDUPDATEDOBJS
     fi
 
 
@@ -231,7 +231,7 @@ testReplicationOnMasterAndSlave()
          delete_objects
       rlPhaseEnd
 
-      rhts-sync-set -m $BEAKERMASTER -s MASTERDELETEDOBJS
+      rhts-sync-set -s MASTERDELETEDOBJS
     fi
 
 
@@ -247,7 +247,7 @@ testReplicationOnMasterAndSlave()
          delete_slave_objects
       rlPhaseEnd
 
-      rhts-sync-set -m $BEAKERSLAVE -s SLAVEDELETEDOBJS
+      rhts-sync-set -s SLAVEDELETEDOBJS
     fi
 
 
@@ -263,7 +263,7 @@ testReplicationOnMasterAndSlave()
          check_deletedobjects
       rlPhaseEnd
 
-      rhts-sync-set -m $BEAKERSLAVE -s SLAVECHECKDELETEDOBJS
+      rhts-sync-set -s SLAVECHECKDELETEDOBJS
    fi
 
 

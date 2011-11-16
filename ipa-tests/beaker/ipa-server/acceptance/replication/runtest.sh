@@ -80,8 +80,8 @@ rlJournalStart
     rlPhaseEnd
 
 	if [ -z $SLAVE ]; then
-		echo "ERROR - This test suite must be run on a setup involving at lease one master, and one replica server"
-		rlFail "This test suite must be run on a setup involving at lease one master, and one replica server"
+		echo "ERROR - This test suite must be run on a setup involving at least one master, and one replica server"
+		rlFail "This test suite must be run on a setup involving at least one master, and one replica server"
 	else
 #		setupApache
 	        testReplicationOnMasterAndSlave
