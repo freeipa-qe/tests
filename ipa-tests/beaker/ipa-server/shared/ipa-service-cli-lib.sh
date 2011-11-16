@@ -1,6 +1,8 @@
 #!/bin/sh
 . /dev/shm/env.sh
 
+# Note - this file might not be used by any test.
+
 ########################################################################
 #  SERVICE CLI SHARED LIBRARY
 #######################################################################
