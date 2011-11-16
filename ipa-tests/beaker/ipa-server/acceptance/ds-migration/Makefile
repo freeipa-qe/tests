@@ -29,7 +29,7 @@ export TESTVERSION=1.0
 
 BUILT_FILES=
 
-FILES=$(METADATA) runtest.sh Makefile PURPOSE t.ds-migration.sh migration-launch.xml
+FILES=$(METADATA) runtest.sh Makefile PURPOSE t.ds-migration.sh migration-launch.xml ds-setup.inf
 
 .PHONY: all install download clean
 
