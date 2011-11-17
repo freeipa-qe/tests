@@ -96,6 +96,17 @@ rlJournalStart
 
                 rlRun "rhts-sync-block -s DONE_master_setup $BEAKERMASTER"
                 rlRun "rhts-sync-set -s DONE_client1_setup -m $BEAKERCLIENT"
+
+                MASTER_IP=`nslookup $MASTER | grep Address | grep -v "#" | awk '{print $2}'`
+                BEAKERCLIENT_IP=`nslookup $BEAKERCLIENT | grep Address | grep -v "#" | awk '{print $2}'`
+                BEAKERCLIENT2_IP=`nslookup $BEAKERCLIENT2 | grep Address | grep -v "#" | awk '{print $2}'`
+
+                echo "$MASTER_IP        $MASTER >> /etc/hosts"
+                echo "$BEAKERCLIENT2_IP  $CLIENT2 >> /etc/hosts"
+
+                rlRun "cat /etc/hosts"
+
+
 	rlPhaseEnd
 
         rlPhaseStartTest "CLIENT1 tests start"
@@ -305,6 +316,16 @@ rlJournalStart
 
 		rlRun "rhts-sync-block -s DONE_master_setup $BEAKERMASTER"
 		rlRun "rhts-sync-set -s DONE_client2_setup -m $BEAKERCLIENT2"
+
+		MASTER_IP=`nslookup $MASTER | grep Address | grep -v "#" | awk '{print $2}'`
+                BEAKERCLIENT_IP=`nslookup $BEAKERCLIENT | grep Address | grep -v "#" | awk '{print $2}'`
+                BEAKERCLIENT2_IP=`nslookup $BEAKERCLIENT2 | grep Address | grep -v "#" | awk '{print $2}'`
+
+		echo "$MASTER_IP	$MASTER >> /etc/hosts"
+		echo "$BEAKERCLIENT_IP	$CLIENT >> /etc/hosts"
+
+		rlRun "cat /etc/hosts"
+
 	rlPhaseEnd
 
         rlPhaseStartTest "CLIENT2 tests start"
@@ -521,6 +542,11 @@ rlJournalStart
 		BEAKERCLIENT2_SH=`echo $BEAKERCLIENT2 | cut -d "." -f 1`
 		BEAKERCLIENT_PTR=`nslookup $BEAKERCLIENT | grep Address | grep -v "#" | awk '{print $2}' | cut -d "." -f 4`
 		BEAKERCLIENT2_PTR=`nslookup $BEAKERCLIENT2 | grep Address | grep -v "#" | awk '{print $2}' | cut -d "." -f 4`
+
+		echo "$BEAKERCLIENT_IP	$CLIENT	>> /etc/hosts"
+		echo "$BEAKERCLIENT2_IP	$CLIENT2 >> /etc/hosts"
+
+		rlRun "cat /etc/hosts"
 
 		REVERSE_ZONE=`ipa dnszone-\find | grep -i "Zone name" | head -1 | awk '{print $4}'`
 		rlLog "REVERSE_ZONE is $REVERSE_ZONE"
