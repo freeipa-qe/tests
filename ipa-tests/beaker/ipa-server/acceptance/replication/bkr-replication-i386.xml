@@ -1,6 +1,6 @@
 <job>
 	<whiteboard>
-		ipa-server RHEL6 multihost(master, slave) replication test i386
+		ipa-server RHEL6 multihost(master, slave) replication test i386 
 	</whiteboard>
 	<recipeSet>
 		<recipe kernel_options="" kernel_options_post="" ks_meta="" role="MASTER" whiteboard="IPA MASTER">
@@ -9,7 +9,7 @@
 			<packages/>
 			<ks_appends/>
 			<repos>
-				<repo name="ipa-noarch" url="http://epsilon.dsdev.sjc.redhat.com/tet/up386.repo"/>
+				<repo name="ipa-noarch" url="http://download.lab.bos.redhat.com/rel-eng/RHEL6.2-Snapshot-5.0/6.2/Server/i386/os"/>
 			</repos>
 			<distroRequires>
 				<and>
@@ -27,6 +27,11 @@
 			<partitions/>
 			<task name="/distribution/install" role="STANDALONE">
 				<params/>
+			</task>
+			<task name="/distribution/pkginstall" role="STANDALONE">
+				<params>
+					<param name="PKGARGNAME" value="expect ipa-server ipa-client"/>
+				</params>
 			</task>
 			<task name="/CoreOS/ipa-server/shared" role="STANDALONE">
 				<params/>
@@ -37,6 +42,11 @@
 			<task name="/CoreOS/ipa-server/acceptance/replication" role="MASTER">
 				<params/>
 			</task>
+			<task name="/distribution/reservesys" role="STANDALONE">
+				<params>
+					<param name="RESERVETIME" value="86400"/>
+				</params>
+			</task>
 		</recipe>
 		<recipe kernel_options="" kernel_options_post="" ks_meta="" role="SLAVE" whiteboard="IPA REPLICA">
 			<autopick random="false"/>
@@ -44,7 +54,7 @@
 			<packages/>
 			<ks_appends/>
 			<repos>
-				<repo name="ipa-noarch" url="http://epsilon.dsdev.sjc.redhat.com/tet/up386.repo"/>
+				<repo name="ipa-noarch" url="http://download.lab.bos.redhat.com/rel-eng/RHEL6.2-Snapshot-5.0/6.2/Server/i386/os"/>
 			</repos>
 			<distroRequires>
 				<and>
@@ -63,6 +73,11 @@
 			<task name="/distribution/install" role="STANDALONE">
 				<params/>
 			</task>
+			<task name="/distribution/pkginstall" role="STANDALONE">
+				<params>
+					<param name="PKGARGNAME" value="expect ipa-server ipa-client"/>
+				</params>
+			</task>
 			<task name="/CoreOS/ipa-server/shared" role="STANDALONE">
 				<params/>
 			</task>
@@ -71,6 +86,11 @@
 			</task>
 			<task name="/CoreOS/ipa-server/acceptance/replication" role="SLAVE">
 				<params/>
+			</task>
+			<task name="/distribution/reservesys" role="STANDALONE">
+				<params>
+					<param name="RESERVETIME" value="86400"/>
+				</params>
 			</task>
 		</recipe>
 	</recipeSet>
