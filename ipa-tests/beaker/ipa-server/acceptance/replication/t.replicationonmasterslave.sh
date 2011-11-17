@@ -15,46 +15,46 @@
 testReplicationOnMasterAndSlave()
 {
 ################################################
-#	  setup	
+#	setup	
 ################################################
 
-	  rlPhaseStartSetup "Replication tests setup"
-		  rlLog "MASTER: $MASTER; MASTERIP: $MASTERIP"
-		  rlLog "BEAKERMASTER: $BEAKERMASTER"
-		  rlLog "SLAVE: $SLAVE; SLAVEIP: $SLAVEIP"
-		  rlLog "BEAKERSLAVE: $BEAKERSLAVE"
-		  masterDatafile="/mnt/tests/CoreOS/ipa-server/acceptance/replication/data.replication.master"
-		  slaveDatafile="/mnt/tests/CoreOS/ipa-server/acceptance/replication/data.replication.slave"
+	rlPhaseStartSetup "Replication tests setup"
+		rlLog "MASTER: $MASTER; MASTERIP: $MASTERIP"
+		rlLog "BEAKERMASTER: $BEAKERMASTER"
+		rlLog "SLAVE: $SLAVE; SLAVEIP: $SLAVEIP"
+		rlLog "BEAKERSLAVE: $BEAKERSLAVE"
+		masterDatafile="/mnt/tests/CoreOS/ipa-server/acceptance/replication/data.replication.master"
+		slaveDatafile="/mnt/tests/CoreOS/ipa-server/acceptance/replication/data.replication.slave"
 
-		  # Determine if this is a master
-		  hostname=`hostname -s`
-		  echo $MASTER | grep $hostname
-		  if [ $? -eq 0 ]; then
-			  echo "this is a MASTER"
-			  config="master"  
-		  else
-			  echo $SLAVE | grep $hostname
-			  if [ $? -eq 0 ]; then
-				  echo "This is a SLAVE"
-				  config="slave"
-			  else
-				  echo "This is a CLIENT"
-				  config="client"
-			  fi
-		  fi
+		# Determine if this is a master
+		hostname=`hostname -s`
+		echo $MASTER | grep $hostname
+		if [ $? -eq 0 ]; then
+			echo "this is a MASTER"
+			config="master"
+		else
+			echo $SLAVE | grep $hostname
+			if [ $? -eq 0 ]; then
+				echo "This is a SLAVE"
+				config="slave"
+			else
+				echo "This is a CLIENT"
+				config="client"
+			fi
+		fi
 
 	
 		if [ $config == "slave" ] ; then
-		  slaveIsInstalled=false
-		  while [ $slaveIsInstalled == "false" ] ; do  
+		slaveIsInstalled=false
+		while [ $slaveIsInstalled == "false" ] ; do
 			 kinitAs $ADMINID $ADMINPW
 			 if [ $? != 0 ] ; then
-			  sleep 500
+			sleep 500
 			 else 
 				slaveIsInstalled=true
 			 fi
-		  done
-		  rhts-sync-set -s READY
+		done
+		rhts-sync-set -s READY
 		fi
 	 rlPhaseEnd
 
@@ -103,7 +103,7 @@ testReplicationOnMasterAndSlave()
 
 	if [ $config == "slave" ] ; then
 		rhts-sync-block -s MASTERADDEDOBJS $BEAKERMASTER
-	  
+	
 		rlPhaseStartTest "Check objects (added from master) on slave"
 			source $masterDatafile
 			check_objects 
@@ -119,7 +119,7 @@ testReplicationOnMasterAndSlave()
 
 
 ################################################
-# 4  check objects on master
+# 4check objects on master
 ################################################
 
 	 if [ $config == "master" ] ; then 
@@ -161,7 +161,7 @@ testReplicationOnMasterAndSlave()
 
 
 ################################################
-# 6  check updated objects on replica
+# 6check updated objects on replica
 ################################################
 
 	if [ $config == "slave" ] ; then
@@ -181,7 +181,7 @@ testReplicationOnMasterAndSlave()
 
 
 ################################################
-# 7  modify objects on replica 
+# 7modify objects on replica 
 ################################################
 
 	if [ $config == "slave" ] ; then
@@ -216,12 +216,12 @@ testReplicationOnMasterAndSlave()
 		# kinit on master, as the user updated from slave
 		rlPhaseStartTest "Kinit on master, as user updated from slave"
 			rlRun "kinitAs $login_updated $updatedPassword" 0 "Kinit on master as user updated from slave"
-	  rhts-sync-set -s MASTERCHECKEDUPDATEDOBJS
+	rhts-sync-set -s MASTERCHECKEDUPDATEDOBJS
 	 fi
 
 
 ###########################################################################
-# 9  delete object (added from replica, modified from master) from master
+# 9delete object (added from replica, modified from master) from master
 ###########################################################################
 
 	 if [ $config == "master" ] ; then 
@@ -237,7 +237,7 @@ testReplicationOnMasterAndSlave()
 
 
 ###########################################################################
-# 10  delete object (added from master, modified from replica) from replica
+# 10delete object (added from master, modified from replica) from replica
 ###########################################################################
 
 	 if [ $config == "slave" ] ; then 
@@ -253,12 +253,12 @@ testReplicationOnMasterAndSlave()
 
 
 ###################################################
-# 11  check deleted objects not available on replica
+# 11check deleted objects not available on replica
 ###################################################
 
 	if [ $config == "slave" ] ; then
 		rhts-sync-block -s MASTERDELETEDOBJS $BEAKERMASTER
-	  
+	
 		rlPhaseStartTest "Check objects (deleted from master) on slave"
 			source $masterDatafile
 			check_deletedobjects
@@ -269,7 +269,7 @@ testReplicationOnMasterAndSlave()
 
 
 	if [ $config == "master" ] ; then
-	  
+	
 		rlPhaseStartTest "Check deleted objects on master"
 			source $masterDatafile
 			check_deletedobjects
@@ -280,21 +280,21 @@ testReplicationOnMasterAndSlave()
 
 ##
 ##	# kinit user from client to master
-##	  rhts-sync-block -s READYFORCLIENT {$MASTER, $SLAVE}
-##	  kinit_user
-##	  rhts-sync-set -s READY
+##	rhts-sync-block -s READYFORCLIENT {$MASTER, $SLAVE}
+##	kinit_user
+##	rhts-sync-set -s READY
 ##
 ##	# check login on replica
-##	  check_login
+##	check_login
 ##
 ##	# kinit user from client to replica
-##	  kinit_user
+##	kinit_user
 ##
 ##	# check login on master
-##	  check_login
+##	check_login
 ##
 ##	# user changes password from client to master
-##	  client_actions
+##	client_actions
 ##
 ##	# ....and so on
 
@@ -303,7 +303,7 @@ testReplicationOnMasterAndSlave()
 add_objects()
 {
 
-	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials  to add objects"
+	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentialsto add objects"
 	# perform actions to add objects
 	rlLog "Adding objects on $hostname"
 	# Add a user
@@ -389,7 +389,7 @@ slave_objects_add()
 check_objects()
 {
 
-	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials  to check objects"
+	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentialsto check objects"
 	check_newuser
 	check_newgroup
 	check_newhost
@@ -413,7 +413,7 @@ check_objects()
 
 update_objects()
 {
-	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials  to update objects"
+	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentialsto update objects"
 	modify_newuser $1
 	modify_newgroup $2
 	modify_newhost $3
@@ -434,7 +434,7 @@ update_objects()
 
 check_updated_objects()
 {
-	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials  to verify updated objects"
+	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentialsto verify updated objects"
 	check_modifieduser
 	check_modifiedgroup
 	check_modifiedhost $1
@@ -493,7 +493,7 @@ check_updated_slave_objects()
 
 delete_objects()
 {
-	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials  to delete objects"
+	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentialsto delete objects"
 	delete_user
 	delete_group
 	delete_host
@@ -538,7 +538,7 @@ delete_slave_objects()
 
 check_deletedobjects()
 {
-	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials  to verify deleted objects"
+	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentialsto verify deleted objects"
 	check_deleteduser
 	check_deletedgroup
 	check_deletedhost
