@@ -36,10 +36,10 @@ testReplicationOnMasterAndSlave()
 			echo $SLAVE | grep $hostname
 			if [ $? -eq 0 ]; then
 				echo "This is a SLAVE"
-				config="slave"
+				export config="slave"
 			else
 				echo "This is a CLIENT"
-				config="client"
+				export config="client"
 			fi
 		fi
 
@@ -54,11 +54,10 @@ testReplicationOnMasterAndSlave()
 				slaveIsInstalled=true
 			 fi
 		done
+		echo "setting state to READY"
 		rhts-sync-set -s READY
 		fi
 	 rlPhaseEnd
-
-
 
 ################################################
 # 1	add objects from master
@@ -67,25 +66,29 @@ testReplicationOnMasterAndSlave()
 	if [ $config == "master" ] ; then 
 		echo "starting master add objects section"
 
+		echo "Waiting for slave to be ready, waiting for state of $BEAKERSLAVE to be \"READY\""
 		rhts-sync-block -s READY $BEAKERSLAVE
+		echo "sync with client complete, read state from $BEAKERSLAVE as READY"
 
-	rlPhaseStartTest "Add objects from master"
+		rlPhaseStartTest "Add objects from master"
 		source $masterDatafile
 			add_objects 
 			rlRun "ipa passwd $login $password" 0 "Set initial password for the new user"
 			rlRun "FirstKinitAs $login $password $ADMINPW" 0 "kinit and set new password for the new user"
 		rlPhaseEnd
 
+		echo "setting state to MASTERADDEDOBJS"
 		rhts-sync-set -s MASTERADDEDOBJS
 	 fi
-
 
 ################################################
 # 2	add objects on replica
 ################################################
 
 	if [ $config == "slave" ] ; then
-		rhts-sync-block -s SLAVECHECKEDOBJS $BEAKERSLAVE
+		echo "Attempting to Sync with MASTER, trying to read state MASTERADDEDOBJS from $BEAKERMASTER"
+		rhts-sync-block -s MASTERADDEDOBJS $BEAKERMASTER
+		echo "Sync with MASTER complete, read state as MASTERADDEDOBJS from $BEAKERMASTER"
 
 		rlPhaseStartTest "Add objects from slave"
 			source $slaveDatafile
@@ -93,8 +96,6 @@ testReplicationOnMasterAndSlave()
 			rlRun "ipa passwd $login $password" 0 "Set initial password for the new user"
 			rlRun "FirstKinitAs $login $password $ADMINPW" 0 "kinit and set new password for the new user"
 		rlPhaseEnd
-
-		rhts-sync-set -s SLAVEADDEDOBJS
 	fi
  
 ################################################
@@ -102,8 +103,6 @@ testReplicationOnMasterAndSlave()
 ################################################
 
 	if [ $config == "slave" ] ; then
-		rhts-sync-block -s MASTERADDEDOBJS $BEAKERMASTER
-	
 		rlPhaseStartTest "Check objects (added from master) on slave"
 			source $masterDatafile
 			check_objects 
@@ -115,15 +114,14 @@ testReplicationOnMasterAndSlave()
 		
 		rhts-sync-set -s SLAVECHECKEDOBJS
 	fi
-	
-
 
 ################################################
-# 4check objects on master
+# 4	check objects on master
 ################################################
 
 	 if [ $config == "master" ] ; then 
-		rhts-sync-block -s SLAVEADDEDOBJS $BEAKERSLAVE
+		rhts-sync-block -s SLAVECHECKEDOBJS $BEAKERSLAVE
+		echo "Sync with slave complete, read state as SLAVECHECKEDOBJS from $BEAKERSLAVE"
 
 		rlPhaseStartTest "Check objects (added from slave) on master"
 			source $slaveDatafile
@@ -133,18 +131,13 @@ testReplicationOnMasterAndSlave()
 		rlPhaseStartTest "Kinit on master, as user added from slave"
 			rlRun "kinitAs $login $ADMINPW" 0 "Kinit on master as user added from slave"
 		rlPhaseEnd
-
-		rhts-sync-set -s MASTERCHECKEDOBJS
 	 fi
-
 
 ################################################
 # 5	update objects on master
 ################################################
 
 	 if [ $config == "master" ] ; then 
-		rhts-sync-block -s MASTERCHECKEDOBJS $BEAKERMASTER
-
 		rlPhaseStartTest "Modify objects (added from slave) on master"
 			# save away data to check before sourcing datafile
 			loginToUpdate=$login
@@ -156,16 +149,17 @@ testReplicationOnMasterAndSlave()
 			rlRun "FirstKinitAs $login_updated $passwordChange $updatedPassword" 0 "kinit as user with updated password"
 		rlPhaseEnd
 
+		echo "setting state to MASTERUPDATEDOBJS"
 		rhts-sync-set -s MASTERUPDATEDOBJS
 	 fi
 
-
 ################################################
-# 6check updated objects on replica
+# 6	check updated objects on replica
 ################################################
 
 	if [ $config == "slave" ] ; then
 		rhts-sync-block -s MASTERUPDATEDOBJS $BEAKERMASTER
+		echo "sync from master complete. Read state as MASTERUPDATEDOBJS $BEAKERMASTER"
 
 		rlPhaseStartTest "Check objects (modified from master) on slave"
 			source $masterDatafile
@@ -175,18 +169,13 @@ testReplicationOnMasterAndSlave()
 		rlPhaseStartTest "Kinit on slave, as user updated from master"
 			rlRun "kinitAs $login_updated $updatedPassword" 0 "Kinit on slave as user updated from master"
 		rlPhaseEnd
-
-		rhts-sync-set -s SLAVECHECKEDUPDATEDOBJS
 	fi
 
-
 ################################################
-# 7modify objects on replica 
+# 7	modify objects on replica 
 ################################################
 
 	if [ $config == "slave" ] ; then
-		rhts-sync-block -s SLAVECHECKEDUPDATEDOBJS $BEAKERSLAVE
-
 		rlPhaseStartTest "Modify objects (added from master) on slave"
 			# save away data to check before sourcing datafile
 			loginToUpdate=$login
@@ -198,9 +187,9 @@ testReplicationOnMasterAndSlave()
 			rlRun "FirstKinitAs $login_updated $passwordChange $updatedPassword" 0 "kinit as user with updated password"
 		rlPhaseEnd
 
+		echo "setting state to SLAVEUPDATEDOBJS"
 		rhts-sync-set -s SLAVEUPDATEDOBJS
 	fi
-
 
 ################################################
 # 8	check updated objects from master
@@ -208,6 +197,7 @@ testReplicationOnMasterAndSlave()
 
 	 if [ $config == "master" ] ; then 
 		rhts-sync-block -s SLAVEUPDATEDOBJS $BEAKERSLAVE
+		echo "sync with slave complete, read state as SLAVEUPDATEDOBJS from $BEAKERSLAVE"
 
 		rlPhaseStartTest "Check objects (modified from slave) on master"
 			source $slaveDatafile
@@ -216,55 +206,46 @@ testReplicationOnMasterAndSlave()
 		# kinit on master, as the user updated from slave
 		rlPhaseStartTest "Kinit on master, as user updated from slave"
 			rlRun "kinitAs $login_updated $updatedPassword" 0 "Kinit on master as user updated from slave"
-	rhts-sync-set -s MASTERCHECKEDUPDATEDOBJS
 	 fi
 
-
 ###########################################################################
-# 9delete object (added from replica, modified from master) from master
+# 9	delete object (added from replica, modified from master) from master
 ###########################################################################
 
 	 if [ $config == "master" ] ; then 
-		rhts-sync-block -s MASTERCHECKEDUPDATEDOBJS $BEAKERMASTER
-
 		rlPhaseStartTest "Delete objects (added from slave, modified from master) on master"
 			source $masterDatafile
 			delete_objects
 		rlPhaseEnd
 
+		echo "setting state to MASTERDELETEDOBJS"
 		rhts-sync-set -s MASTERDELETEDOBJS
 	 fi
-
+sleep 100
 
 ###########################################################################
-# 10delete object (added from master, modified from replica) from replica
+# 10	delete object (added from master, modified from replica) from replica
 ###########################################################################
 
 	 if [ $config == "slave" ] ; then 
-		rhts-sync-block -s SLAVECHECKDELETEDOBJS $BEAKERSLAVE
+		rhts-sync-block -s MASTERDELETEDOBJS $BEAKERMASTER
 
 		rlPhaseStartTest "Delete objects (added from master, modified from master) on master"
 			source $slaveDatafile
 			delete_slave_objects
 		rlPhaseEnd
-
-		rhts-sync-set -s SLAVEDELETEDOBJS
 	 fi
-
+sleep 100
 
 ###################################################
-# 11check deleted objects not available on replica
+# 11	check deleted objects not available on replica
 ###################################################
 
 	if [ $config == "slave" ] ; then
-		rhts-sync-block -s MASTERDELETEDOBJS $BEAKERMASTER
-	
 		rlPhaseStartTest "Check objects (deleted from master) on slave"
 			source $masterDatafile
 			check_deletedobjects
 		rlPhaseEnd
-
-		rhts-sync-set -s SLAVECHECKDELETEDOBJS
 	fi
 
 
@@ -274,7 +255,6 @@ testReplicationOnMasterAndSlave()
 			source $masterDatafile
 			check_deletedobjects
 		rlPhaseEnd
-
 	fi
 
 
@@ -303,7 +283,7 @@ testReplicationOnMasterAndSlave()
 add_objects()
 {
 
-	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentialsto add objects"
+	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials to add objects"
 	# perform actions to add objects
 	rlLog "Adding objects on $hostname"
 	# Add a user
@@ -389,7 +369,7 @@ slave_objects_add()
 check_objects()
 {
 
-	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentialsto check objects"
+	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials to check objects"
 	check_newuser
 	check_newgroup
 	check_newhost
@@ -413,7 +393,7 @@ check_objects()
 
 update_objects()
 {
-	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentialsto update objects"
+	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials to update objects"
 	modify_newuser $1
 	modify_newgroup $2
 	modify_newhost $3
@@ -434,7 +414,7 @@ update_objects()
 
 check_updated_objects()
 {
-	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentialsto verify updated objects"
+	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials to verify updated objects"
 	check_modifieduser
 	check_modifiedgroup
 	check_modifiedhost $1
@@ -493,7 +473,7 @@ check_updated_slave_objects()
 
 delete_objects()
 {
-	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentialsto delete objects"
+	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials to delete objects"
 	delete_user
 	delete_group
 	delete_host
@@ -538,7 +518,7 @@ delete_slave_objects()
 
 check_deletedobjects()
 {
-	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentialsto verify deleted objects"
+	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials to verify deleted objects"
 	check_deleteduser
 	check_deletedgroup
 	check_deletedhost

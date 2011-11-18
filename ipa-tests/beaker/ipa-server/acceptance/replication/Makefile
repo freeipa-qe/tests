@@ -23,6 +23,9 @@
 #   Boston, MA 02110-1301, USA.
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Changelog:
+# 11-17-2011 mgregg - changed all space groupings to tab stops. 
+# 11-18-2011 mgregg - changed all space groupings to tab stops. 
 
 export TEST=/CoreOS/ipa-server/acceptance/replication
 export TESTVERSION=1.0
