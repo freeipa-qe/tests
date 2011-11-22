@@ -101,8 +101,8 @@ rlJournalStart
                 BEAKERCLIENT_IP=`nslookup $BEAKERCLIENT | grep Address | grep -v "#" | awk '{print $2}'`
                 BEAKERCLIENT2_IP=`nslookup $BEAKERCLIENT2 | grep Address | grep -v "#" | awk '{print $2}'`
 
-                echo "$MASTER_IP        $MASTER >> /etc/hosts"
-                echo "$BEAKERCLIENT2_IP  $CLIENT2 >> /etc/hosts"
+                echo $MASTER_IP        $MASTER >> /etc/hosts
+                echo $BEAKERCLIENT2_IP  $CLIENT2 >> /etc/hosts
 
                 rlRun "cat /etc/hosts"
 
@@ -321,8 +321,8 @@ rlJournalStart
                 BEAKERCLIENT_IP=`nslookup $BEAKERCLIENT | grep Address | grep -v "#" | awk '{print $2}'`
                 BEAKERCLIENT2_IP=`nslookup $BEAKERCLIENT2 | grep Address | grep -v "#" | awk '{print $2}'`
 
-		echo "$MASTER_IP	$MASTER >> /etc/hosts"
-		echo "$BEAKERCLIENT_IP	$CLIENT >> /etc/hosts"
+		echo $MASTER_IP	$MASTER >> /etc/hosts
+		echo $BEAKERCLIENT_IP	$CLIENT >> /etc/hosts
 
 		rlRun "cat /etc/hosts"
 
@@ -543,8 +543,8 @@ rlJournalStart
 		BEAKERCLIENT_PTR=`nslookup $BEAKERCLIENT | grep Address | grep -v "#" | awk '{print $2}' | cut -d "." -f 4`
 		BEAKERCLIENT2_PTR=`nslookup $BEAKERCLIENT2 | grep Address | grep -v "#" | awk '{print $2}' | cut -d "." -f 4`
 
-		echo "$BEAKERCLIENT_IP	$CLIENT	>> /etc/hosts"
-		echo "$BEAKERCLIENT2_IP	$CLIENT2 >> /etc/hosts"
+		echo $BEAKERCLIENT_IP	$CLIENT	>> /etc/hosts
+		echo $BEAKERCLIENT2_IP	$CLIENT2 >> /etc/hosts
 
 		rlRun "cat /etc/hosts"
 
