@@ -572,12 +572,13 @@ rlJournalStart
 
 
         	# kinit as admin and creating users
-	for i in {1..40}; do
-	        rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-	        rlRun "create_ipauser user$i user$i user$i $userpw"
-	        sleep 5
-		rlRun "export user$i=user$i"
-	done
+# Creating users in their respective tests, hence commenting from here.
+#	for i in {1..40}; do
+#	        rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+#	        rlRun "create_ipauser user$i user$i user$i $userpw"
+#	        sleep 5
+#		rlRun "export user$i=user$i"
+#	done
 		# adding additional sync-set and sync-block so that tests are not
 		# executed before the clients are ready
 		rlRun "rhts-sync-set -s DONE_master_setup -m $BEAKERMASTER"

@@ -43,6 +43,15 @@ hbacsvc_master_001() {
 
 	rlPhaseStartTest "ipa-hbacsvc-001: $user1 part of rule1 is allowed to access $CLIENT from $CLIENT - SSHD Service"
 
+                # kinit as admin and creating users
+        for i in {1..3}; do
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                rlRun "create_ipauser user$i user$i user$i $userpw"
+                sleep 5
+                rlRun "export user$i=user$i"
+        done
+
+
         	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 		rlRun "ssh_auth_success $user1 testpw123@ipa.com $MASTER"
 		rlRun "ssh_auth_success $user3 testpw123@ipa.com $MASTER"
@@ -275,6 +284,14 @@ hbacsvc_client2_003() {
 hbacsvc_master_004() {
         rlPhaseStartTest "ipa-hbacsvc-004: $user4 part of rule4 is allowed to access hostgroup from $CLIENT"
 
+        for i in 4; do
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                rlRun "create_ipauser user$i user$i user$i $userpw"
+                sleep 5
+                rlRun "export user$i=user$i"
+        done
+
+
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 rlRun "ipa hbacrule-disable allow_all"
 		rlLog "Verifies bug https://bugzilla.redhat.com/show_bug.cgi?id=733663"
@@ -331,6 +348,14 @@ hbacsvc_client2_004() {
 
 hbacsvc_master_005() {
         rlPhaseStartTest "ipa-hbacsvc-005: $user5 part of rule5 is allowed to access $CLIENT from hostgroup"
+
+        for i in 5; do
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                rlRun "create_ipauser user$i user$i user$i $userpw"
+                sleep 5
+                rlRun "export user$i=user$i"
+        done
+
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 rlRun "ipa hbacrule-disable allow_all"
@@ -436,6 +461,13 @@ hbacsvc_client2_005_1() {
 hbacsvc_master_006() {
         rlPhaseStartTest "ipa-hbacsvc-006: $user6 part of rule6 is allowed to access hostgroup from hostgroup2"
 
+        for i in 6; do
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                rlRun "create_ipauser user$i user$i user$i $userpw"
+                sleep 5
+                rlRun "export user$i=user$i"
+        done
+
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 rlRun "ipa hbacrule-disable allow_all"
 
@@ -492,6 +524,13 @@ hbacsvc_client2_006() {
 
 hbacsvc_master_007() {
         rlPhaseStartTest "ipa-hbacsvc-007: $user7 part of rule7 is allowed to access hostgroup from hostgroup2 with hbacsvcgrp"
+
+        for i in 7; do
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                rlRun "create_ipauser user$i user$i user$i $userpw"
+                sleep 5
+                rlRun "export user$i=user$i"
+        done
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 rlRun "ipa hbacrule-disable allow_all"
@@ -601,6 +640,13 @@ hbacsvc_client2_007_1() {
 hbacsvc_master_008() {
         rlPhaseStartTest "ipa-hbacsvc-008: user8 from grp8 part of rule8 is allowed to access $CLIENT2 from $CLIENT"
 
+        for i in 8; do
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                rlRun "create_ipauser user$i user$i user$i $userpw"
+                sleep 5
+                rlRun "export user$i=user$i"
+        done
+
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 rlRun "ipa hbacrule-disable allow_all"
 
@@ -709,6 +755,13 @@ hbacsvc_client2_008_1() {
 hbacsvc_master_009() {
         rlPhaseStartTest "ipa-hbacsvc-009: $user9 from grp9 part of rule9 is allowed to access $CLIENT2 from $CLIENT - hbacsvcgrp"
 
+        for i in 9; do
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                rlRun "create_ipauser user$i user$i user$i $userpw"
+                sleep 5
+                rlRun "export user$i=user$i"
+        done
+
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 rlRun "ipa hbacrule-disable allow_all"
 
@@ -816,6 +869,13 @@ hbacsvc_client2_009_1() {
 hbacsvc_master_010() {
         rlPhaseStartTest "ipa-hbacsvc-010: $user10 from grp10 part of rule10 is allowed to access hostgrp from $CLIENT"
 
+        for i in 10; do
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                rlRun "create_ipauser user$i user$i user$i $userpw"
+                sleep 5
+                rlRun "export user$i=user$i"
+        done
+
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 rlRun "ipa hbacrule-disable allow_all"
 
@@ -873,6 +933,13 @@ hbacsvc_client2_010() {
 
 hbacsvc_master_011() {
         rlPhaseStartTest "ipa-hbacsvc-011: $user11 from grp11 part of rule11 is allowed to access $CLIENT2 from hostgrp - hbacsvcgrp"
+
+        for i in 11; do
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                rlRun "create_ipauser user$i user$i user$i $userpw"
+                sleep 5
+                rlRun "export user$i=user$i"
+        done
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 rlRun "ipa hbacrule-disable allow_all"
@@ -983,6 +1050,13 @@ hbacsvc_client2_011_1() {
 hbacsvc_master_012() {
         rlPhaseStartTest "ipa-hbacsvc-012: $user12 from grp12 part of rule12 is allowed to access $CLIENT2 from hostgrp - hbacsvcgrp"
 
+        for i in 12; do
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                rlRun "create_ipauser user$i user$i user$i $userpw"
+                sleep 5
+                rlRun "export user$i=user$i"
+        done
+
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 rlRun "ipa hbacrule-disable allow_all"
 
@@ -1044,6 +1118,13 @@ hbacsvc_client2_012() {
 
 hbacsvc_master_013() {
         rlPhaseStartTest "ipa-hbacsvc-013: $user13 from grp13 part of rule13 is allowed to access hostgrp from hostgrp2"
+
+        for i in 13; do
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                rlRun "create_ipauser user$i user$i user$i $userpw"
+                sleep 5
+                rlRun "export user$i=user$i"
+        done
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 rlRun "ipa hbacrule-disable allow_all"
@@ -1108,6 +1189,13 @@ hbacsvc_client2_013() {
 hbacsvc_master_014() {
         rlPhaseStartTest "ipa-hbacsvc-014: $user14 from grp14 part of rule14 is allowed to access hostgrp from hostgrp2 - hbacsvcgrp"
 
+        for i in 14; do
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                rlRun "create_ipauser user$i user$i user$i $userpw"
+                sleep 5
+                rlRun "export user$i=user$i"
+        done
+
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 rlRun "ipa hbacrule-disable allow_all"
 
@@ -1169,6 +1257,14 @@ hbacsvc_client2_014() {
 hbacsvc_master_015() {
 
 	rlPhaseStartTest "ipa-hbacsvc-015: $user15 from nestgrp15 part of rule15 is allowed to access $CLIENT from $CLIENT2"
+
+        for i in 15; do
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                rlRun "create_ipauser user$i user$i user$i $userpw"
+                sleep 5
+                rlRun "export user$i=user$i"
+        done
+
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 rlRun "ipa hbacrule-disable allow_all"
 
@@ -1277,6 +1373,14 @@ hbacsvc_client2_015_1() {
 hbacsvc_master_016() {
 
 	rlPhaseStartTest "ipa-hbacsvc-016: $user16 from nestgrp16 part of rule16 is allowed to access $CLIENT from $CLIENT2 - hbacsvcgroup"
+
+        for i in 16; do
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                rlRun "create_ipauser user$i user$i user$i $userpw"
+                sleep 5
+                rlRun "export user$i=user$i"
+        done
+
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 rlRun "ipa hbacrule-disable allow_all"
 
@@ -1384,6 +1488,14 @@ hbacsvc_client2_016_1() {
 hbacsvc_master_017() {
 
 	rlPhaseStartTest "ipa-hbacsvc-017: $user17 from nestgrp17 part of rule17 is allowed to access host from hostgrp2"
+
+        for i in 17; do
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                rlRun "create_ipauser user$i user$i user$i $userpw"
+                sleep 5
+                rlRun "export user$i=user$i"
+        done
+
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 rlRun "ipa hbacrule-disable allow_all"
 
@@ -1446,6 +1558,14 @@ hbacsvc_client2_017() {
 hbacsvc_master_018() {
 
 	rlPhaseStartTest "ipa-hbacsvc-018: $user18 from nestgrp18 part of rule18 is allowed to access host from hostgrp2 - hbacsvcgrp"
+
+        for i in 18; do
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                rlRun "create_ipauser user$i user$i user$i $userpw"
+                sleep 5
+                rlRun "export user$i=user$i"
+        done
+
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 rlRun "ipa hbacrule-disable allow_all"
 
@@ -1508,6 +1628,14 @@ hbacsvc_client2_018() {
 hbacsvc_master_019() {
 
 	rlPhaseStartTest "ipa-hbacsvc-019: $user19 from nestgrp19 part of rule19 is allowed to access hostgrp from hostgrp2"
+
+        for i in 19; do
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                rlRun "create_ipauser user$i user$i user$i $userpw"
+                sleep 5
+                rlRun "export user$i=user$i"
+        done
+
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 rlRun "ipa hbacrule-disable allow_all"
 
@@ -1574,6 +1702,14 @@ hbacsvc_client2_019() {
 hbacsvc_master_020() {
 
 	rlPhaseStartTest "ipa-hbacsvc-020: $user20 from nestgrp20 part of rule20 is allowed to access hostgrp from hostgrp2 - hbacsvcgrp"
+
+        for i in 20; do
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                rlRun "create_ipauser user$i user$i user$i $userpw"
+                sleep 5
+                rlRun "export user$i=user$i"
+        done
+
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 rlRun "ipa hbacrule-disable allow_all"
 
@@ -1680,6 +1816,14 @@ hbacsvc_client2_020_1() {
 hbacsvc_master_021() {
 
 	rlPhaseStartTest "ipa-hbacsvc-021: $user21 part of rule21 is allowed to access $CLIENT from EXT_HOST"
+
+        for i in 21; do
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                rlRun "create_ipauser user$i user$i user$i $userpw"
+                sleep 5
+                rlRun "export user$i=user$i"
+        done
+
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 rlRun "ipa hbacrule-disable allow_all"
 
@@ -1709,6 +1853,14 @@ hbacsvc_master_021() {
 hbacsvc_master_022() {
 
 	rlPhaseStartTest "ipa-hbacsvc-022: $user22 part of rule22 is allowed to access EXT_HOST from EXT_HOST2 - hbacsvcgroup"
+
+        for i in 22; do
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                rlRun "create_ipauser user$i user$i user$i $userpw"
+                sleep 5
+                rlRun "export user$i=user$i"
+        done
+
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 rlRun "ipa hbacrule-disable allow_all"
 
@@ -1739,6 +1891,14 @@ hbacsvc_master_022() {
 hbacsvc_master_023() {
 
 	rlPhaseStartTest "ipa-hbacsvc-023: $user23 part of group23 is allowed to access $CLIENT2 from EXT_HOST2"
+
+        for i in 23; do
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                rlRun "create_ipauser user$i user$i user$i $userpw"
+                sleep 5
+                rlRun "export user$i=user$i"
+        done
+
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 rlRun "ipa hbacrule-disable allow_all"
 
@@ -1772,6 +1932,14 @@ hbacsvc_master_023() {
 hbacsvc_master_024() {
 	
 	rlPhaseStartTest "ipa-hbacsvc-024: $user24 part of group24 is allowed to access EXT_HOST from EXT_HOST2 - hbacsvcgroup"
+
+        for i in 24; do
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                rlRun "create_ipauser user$i user$i user$i $userpw"
+                sleep 5
+                rlRun "export user$i=user$i"
+        done
+
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 rlRun "ipa hbacrule-disable allow_all"
 
@@ -1805,6 +1973,14 @@ hbacsvc_master_024() {
 hbacsvc_master_025() {
 
 	rlPhaseStartTest "ipa-hbacsvc-025: $user25 part of group25 is allowed to access $CLIENT from EXT_HOST2"
+
+        for i in 25; do
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                rlRun "create_ipauser user$i user$i user$i $userpw"
+                sleep 5
+                rlRun "export user$i=user$i"
+        done
+
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 rlRun "ipa hbacrule-disable allow_all"
 
@@ -1840,6 +2016,14 @@ hbacsvc_master_025() {
 hbacsvc_master_026() {
 
 	rlPhaseStartTest "ipa-hbacsvc-026: $user26 part of group26 is allowed to access EXT_HOST from EXT_HOST2 - hbacsvcgroup"
+
+        for i in 26; do
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                rlRun "create_ipauser user$i user$i user$i $userpw"
+                sleep 5
+                rlRun "export user$i=user$i"
+        done
+
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 rlRun "ipa hbacrule-disable allow_all"
 
@@ -1874,6 +2058,13 @@ hbacsvc_master_026() {
 
 hbacsvc_master_027() {
         rlPhaseStartTest "ipa-hbacsvc-027: $user27 part of rule27 is allowed to access $CLIENT from $CLIENT2 with empty hbacsvcgrp"
+
+        for i in 27; do
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                rlRun "create_ipauser user$i user$i user$i $userpw"
+                sleep 5
+                rlRun "export user$i=user$i"
+        done
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 rlRun "ipa hbacrule-disable allow_all"
@@ -1929,6 +2120,13 @@ hbacsvc_client2_027() {
 hbacsvc_master_028() {
         rlPhaseStartTest "ipa-hbacsvc-028: $user28 part of rule28 is allowed to access $CLIENT from $CLIENT2 with incorrect hbacsvc"
 
+        for i in 28; do
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                rlRun "create_ipauser user$i user$i user$i $userpw"
+                sleep 5
+                rlRun "export user$i=user$i"
+        done
+
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 rlRun "ipa hbacrule-disable allow_all"
 
@@ -1983,6 +2181,13 @@ hbacsvc_client2_028() {
 
 hbacsvc_master_029() {
         rlPhaseStartTest "ipa-hbacsvc-029: $user29 part of rule29 is allowed to access $CLIENT from $CLIENT2 with empty group"
+
+        for i in 29; do
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                rlRun "create_ipauser user$i user$i user$i $userpw"
+                sleep 5
+                rlRun "export user$i=user$i"
+        done
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 rlRun "ipa hbacrule-disable allow_all"
@@ -2043,6 +2248,13 @@ hbacsvc_client2_029() {
 
 hbacsvc_master_030() {
         rlPhaseStartTest "ipa-hbacsvc-030: $user30 part of rule30 is allowed to access $CLIENT from $CLIENT2 with empty netgroup"
+
+        for i in 30; do
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                rlRun "create_ipauser user$i user$i user$i $userpw"
+                sleep 5
+                rlRun "export user$i=user$i"
+        done
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 rlRun "ipa hbacrule-disable allow_all"
