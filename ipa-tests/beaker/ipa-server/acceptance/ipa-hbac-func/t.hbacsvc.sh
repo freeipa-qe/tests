@@ -330,8 +330,8 @@ hbacsvc_client_004() {
         rlPhaseStartTest "ipa-hbacsvc-client1-004: user4 accessing hostgroup from $CLIENT2"
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-                rlRun "getent -s sss passwd user4"
 		sleep 5
+                rlRun "getent -s sss passwd user4"
                 rlRun "ssh_auth_success user4 testpw123@ipa.com $CLIENT2"
 
         rlPhaseEnd
@@ -1638,7 +1638,7 @@ hbacsvc_client2_018() {
 		sleep 5
                 rlRun "getent -s sss passwd user18"
                 rlRun "ssh_auth_failure user18 testpw123@ipa.com $CLIENT2"
-                rlRun "ssh_auth_failure user18 testpw123@ipa.com $CLIENT"
+                rlRun "ssh_auth_success user18 testpw123@ipa.com $CLIENT"
 
         rlPhaseEnd
 
