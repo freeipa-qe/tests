@@ -342,7 +342,7 @@ add_objects()
 	add_config
 }
 
-slave_objects_add()
+slave_add_objects()
 {
 	add_slave_user
 	add_slave_group
