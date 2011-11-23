@@ -86,16 +86,15 @@ testReplicationOnMasterAndSlave()
 ################################################
 
 	if [ $config == "slave" ] ; then
-		echo "Attempting to Sync with MASTER, trying to read state MASTERADDEDOBJS from $BEAKERMASTER"
-		rhts-sync-block -s MASTERADDEDOBJS $BEAKERMASTER
-		echo "Sync with MASTER complete, read state as MASTERADDEDOBJS from $BEAKERMASTER"
-
 		rlPhaseStartTest "Add objects from slave"
 			source $slaveDatafile
 			slave_add_objects 
 			rlRun "ipa passwd $login $password" 0 "Set initial password for the new user"
 			rlRun "FirstKinitAs $login $password $ADMINPW" 0 "kinit and set new password for the new user"
 		rlPhaseEnd
+		echo "Attempting to Sync with MASTER, trying to read state MASTERADDEDOBJS from $BEAKERMASTER"
+		rhts-sync-block -s MASTERADDEDOBJS $BEAKERMASTER
+		echo "Sync with MASTER complete, read state as MASTERADDEDOBJS from $BEAKERMASTER"
 	fi
  
 ################################################
@@ -120,9 +119,6 @@ testReplicationOnMasterAndSlave()
 ################################################
 
 	 if [ $config == "master" ] ; then 
-		rhts-sync-block -s SLAVECHECKEDOBJS $BEAKERSLAVE
-		echo "Sync with slave complete, read state as SLAVECHECKEDOBJS from $BEAKERSLAVE"
-
 		rlPhaseStartTest "Check objects (added from slave) on master"
 			source $slaveDatafile
 			check_objects
@@ -138,6 +134,8 @@ testReplicationOnMasterAndSlave()
 ################################################
 
 	 if [ $config == "master" ] ; then 
+		rhts-sync-block -s SLAVECHECKEDOBJS $BEAKERSLAVE
+		echo "Sync with slave complete, read state as SLAVECHECKEDOBJS from $BEAKERSLAVE"
 		rlPhaseStartTest "Modify objects (added from slave) on master"
 			# save away data to check before sourcing datafile
 			loginToUpdate=$login
