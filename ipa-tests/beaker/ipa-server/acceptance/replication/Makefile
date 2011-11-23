@@ -28,7 +28,7 @@
 # 11-18-2011 mgregg - changed all space groupings to tab stops. 
 
 export TEST=/CoreOS/ipa-server/acceptance/replication
-export TESTVERSION=1.0
+export TESTVERSION=1.1
 
 BUILT_FILES=
 
