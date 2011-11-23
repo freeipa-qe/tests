@@ -1179,7 +1179,7 @@ hbacsvc_client_013() {
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 rlRun "getent -s sss passwd user13"
-                rlRun "ssh_auth_failure user13 testpw133@ipa.com $CLIENT2"
+                rlRun "ssh_auth_failure user13 testpw123@ipa.com $CLIENT2"
 
 
         rlPhaseEnd
@@ -1192,7 +1192,7 @@ hbacsvc_client2_013() {
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 		sleep 5
                 rlRun "getent -s sss passwd user13"
-                rlRun "ssh_auth_success user13 testpw133@ipa.com $CLIENT"
+                rlRun "ssh_auth_success user13 testpw123@ipa.com $CLIENT"
 
         rlPhaseEnd
 
@@ -1250,7 +1250,7 @@ hbacsvc_client_014() {
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 rlRun "getent -s sss passwd user14"
-                rlRun "ssh_auth_failure user14 testpw143@ipa.com $CLIENT2"
+                rlRun "ssh_auth_failure user14 testpw123@ipa.com $CLIENT2"
 
         rlPhaseEnd
 }
@@ -1262,7 +1262,7 @@ hbacsvc_client2_014() {
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 		sleep 5
                 rlRun "getent -s sss passwd user14"
-                rlRun "ssh_auth_success user14 testpw143@ipa.com $CLIENT"
+                rlRun "ssh_auth_success user14 testpw123@ipa.com $CLIENT"
 
         rlPhaseEnd
 
@@ -1317,7 +1317,7 @@ hbacsvc_client_015() {
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 rlRun "getent -s sss passwd user15"
-                rlRun "ssh_auth_failure user15 testpw153@ipa.com $CLIENT"
+                rlRun "ssh_auth_failure user15 testpw123@ipa.com $CLIENT"
 
         rlPhaseEnd
 }
@@ -1329,7 +1329,7 @@ hbacsvc_client2_015() {
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 		sleep 5
                 rlRun "getent -s sss passwd user15"
-                rlRun "ssh_auth_success user15 testpw153@ipa.com $CLIENT"
+                rlRun "ssh_auth_success user15 testpw123@ipa.com $CLIENT"
 
         rlPhaseEnd
 
@@ -1367,7 +1367,7 @@ hbacsvc_client_015_1() {
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 rlRun "getent -s sss passwd user15"
-                rlRun "ssh_auth_failure user15 testpw153@ipa.com $CLIENT"
+                rlRun "ssh_auth_failure user15 testpw123@ipa.com $CLIENT"
 
         rlPhaseEnd
 }
@@ -1378,7 +1378,7 @@ hbacsvc_client2_015_1() {
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 rlRun "getent -s sss passwd user15"
-                rlRun "ssh_auth_failure user15 testpw153@ipa.com $CLIENT"
+                rlRun "ssh_auth_failure user15 testpw123@ipa.com $CLIENT"
 
         rlPhaseEnd
 
@@ -1434,7 +1434,7 @@ hbacsvc_client_016() {
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 rlRun "getent -s sss passwd user16"
-                rlRun "ssh_auth_failure user16 testpw163@ipa.com $CLIENT"
+                rlRun "ssh_auth_failure user16 testpw123@ipa.com $CLIENT"
 
         rlPhaseEnd
 }
@@ -1446,7 +1446,7 @@ hbacsvc_client2_016() {
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 		sleep 5
                 rlRun "getent -s sss passwd user16"
-                rlRun "ssh_auth_success user16 testpw163@ipa.com $CLIENT"
+                rlRun "ssh_auth_success user16 testpw123@ipa.com $CLIENT"
 
         rlPhaseEnd
 
@@ -1484,7 +1484,7 @@ hbacsvc_client_016_1() {
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 rlRun "getent -s sss passwd user16"
-                rlRun "ssh_auth_failure user16 testpw163@ipa.com $CLIENT"
+                rlRun "ssh_auth_failure user16 testpw123@ipa.com $CLIENT"
 
         rlPhaseEnd
 }
@@ -1495,7 +1495,7 @@ hbacsvc_client2_016_1() {
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 rlRun "getent -s sss passwd user16"
-                rlRun "ssh_auth_failure user16 testpw163@ipa.com $CLIENT"
+                rlRun "ssh_auth_failure user16 testpw123@ipa.com $CLIENT"
 
         rlPhaseEnd
 
@@ -1553,7 +1553,7 @@ hbacsvc_client_017() {
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 rlRun "getent -s sss passwd user17"
-                rlRun "ssh_auth_failure user17 testpw173@ipa.com $CLIENT2"
+                rlRun "ssh_auth_failure user17 testpw123@ipa.com $CLIENT2"
 
         rlPhaseEnd
 }
@@ -1565,8 +1565,8 @@ hbacsvc_client2_017() {
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 		sleep 5
                 rlRun "getent -s sss passwd user17"
-                rlRun "ssh_auth_failure user17 testpw173@ipa.com $CLIENT2"
-                rlRun "ssh_auth_success user17 testpw173@ipa.com $CLIENT"
+                rlRun "ssh_auth_failure user17 testpw123@ipa.com $CLIENT2"
+                rlRun "ssh_auth_success user17 testpw123@ipa.com $CLIENT"
 
         rlPhaseEnd
 
@@ -1625,7 +1625,7 @@ hbacsvc_client_018() {
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 		sleep 5
                 rlRun "getent -s sss passwd user18"
-                rlRun "ssh_auth_failure user18 testpw183@ipa.com $CLIENT2"
+                rlRun "ssh_auth_failure user18 testpw123@ipa.com $CLIENT2"
 
         rlPhaseEnd
 }
@@ -1637,8 +1637,8 @@ hbacsvc_client2_018() {
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 		sleep 5
                 rlRun "getent -s sss passwd user18"
-                rlRun "ssh_auth_failure user18 testpw183@ipa.com $CLIENT2"
-                rlRun "ssh_auth_failure user18 testpw183@ipa.com $CLIENT"
+                rlRun "ssh_auth_failure user18 testpw123@ipa.com $CLIENT2"
+                rlRun "ssh_auth_failure user18 testpw123@ipa.com $CLIENT"
 
         rlPhaseEnd
 
@@ -1700,7 +1700,7 @@ hbacsvc_client_019() {
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 		sleep 5
                 rlRun "getent -s sss passwd user19"
-                rlRun "ssh_auth_failure user19 testpw193@ipa.com $CLIENT2"
+                rlRun "ssh_auth_failure user19 testpw123@ipa.com $CLIENT2"
 
         rlPhaseEnd
 }
@@ -1712,8 +1712,8 @@ hbacsvc_client2_019() {
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 		sleep 5
                 rlRun "getent -s sss passwd user19"
-                rlRun "ssh_auth_failure user19 testpw193@ipa.com $CLIENT2"
-                rlRun "ssh_auth_success user19 testpw193@ipa.com $CLIENT"
+                rlRun "ssh_auth_failure user19 testpw123@ipa.com $CLIENT2"
+                rlRun "ssh_auth_success user19 testpw123@ipa.com $CLIENT"
 
         rlPhaseEnd
 
@@ -1776,7 +1776,7 @@ hbacsvc_client_020() {
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 		sleep 5
                 rlRun "getent -s sss passwd user20"
-                rlRun "ssh_auth_failure user20 testpw203@ipa.com $CLIENT2"
+                rlRun "ssh_auth_failure user20 testpw123@ipa.com $CLIENT2"
 
         rlPhaseEnd
 }
@@ -1788,8 +1788,8 @@ hbacsvc_client2_020() {
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 		sleep 5
                 rlRun "getent -s sss passwd user20"
-                rlRun "ssh_auth_failure user20 testpw203@ipa.com $CLIENT2"
-                rlRun "ssh_auth_success user20 testpw203@ipa.com $CLIENT"
+                rlRun "ssh_auth_failure user20 testpw123@ipa.com $CLIENT2"
+                rlRun "ssh_auth_success user20 testpw123@ipa.com $CLIENT"
 
         rlPhaseEnd
 
@@ -1820,7 +1820,7 @@ hbacsvc_client_020_1() {
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 rlRun "getent -s sss passwd user20"
-                rlRun "ssh_auth_failure user20 testpw203@ipa.com $CLIENT2"
+                rlRun "ssh_auth_failure user20 testpw123@ipa.com $CLIENT2"
 
         rlPhaseEnd
 }
@@ -1831,7 +1831,7 @@ hbacsvc_client2_020_1() {
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 rlRun "getent -s sss passwd user20"
-                rlRun "ssh_auth_failure user20 testpw203@ipa.com $CLIENT2"
+                rlRun "ssh_auth_failure user20 testpw123@ipa.com $CLIENT2"
 
         rlPhaseEnd
 
