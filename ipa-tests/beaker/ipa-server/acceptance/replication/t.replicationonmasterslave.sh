@@ -86,15 +86,15 @@ testReplicationOnMasterAndSlave()
 ################################################
 
 	if [ $config == "slave" ] ; then
+		echo "Attempting to Sync with MASTER, trying to read state MASTERADDEDOBJS from $BEAKERMASTER"
+		rhts-sync-block -s MASTERADDEDOBJS $BEAKERMASTER
+		echo "Sync with MASTER complete, read state as MASTERADDEDOBJS from $BEAKERMASTER"
 		rlPhaseStartTest "Add objects from slave"
 			source $slaveDatafile
 			slave_add_objects 
 			rlRun "ipa passwd $login $password" 0 "Set initial password for the new user"
 			rlRun "FirstKinitAs $login $password $ADMINPW" 0 "kinit and set new password for the new user"
 		rlPhaseEnd
-		echo "Attempting to Sync with MASTER, trying to read state MASTERADDEDOBJS from $BEAKERMASTER"
-		rhts-sync-block -s MASTERADDEDOBJS $BEAKERMASTER
-		echo "Sync with MASTER complete, read state as MASTERADDEDOBJS from $BEAKERMASTER"
 	fi
  
 ################################################
