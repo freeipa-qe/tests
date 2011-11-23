@@ -43,6 +43,7 @@ add_slave_user()
 {
 	rlPhaseStartTest "add user on slave"
 		# add manager user
+		echo "ipa user-add --first=$first --last=$lastName --cn=$cn --displayname=$displayName  --initials=$initials  --homedir=$homedir --gecos=$gecos --shell=$shell --principal=$principal --email=$email --uid=$uid --gidnumber=$gidnumber --street=$street --city=$city --state=$state --postalcode=$postalcode --phone=$phone --mobile=$mobile --pager=$pager --fax=$fax --orgunit=$orgunit --title=$title --manager=$manager --carlicense=$carlicense  slogin"
 		rlRun "ipa user-add --first=$firstName \
 		                   --last=$lastName  \
 		                   --cn=$cn \
