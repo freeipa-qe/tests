@@ -736,6 +736,7 @@ delete_netgroup()
 {
 	rlPhaseStartTest "delete netgroup"
 		rlRun "ipa netgroup-del $netgroup_updated" 0 "Delete the netgroup" 
+		ipa netgroup-del netgroup_groupMember1
 	rlPhaseEnd
 }
 
@@ -974,17 +975,17 @@ check_deleteddns()
 REALM=`os_getdomainname | tr "[a-z]" "[A-Z]"`
 DOMAIN=`os_getdomainname`
 
-host1="dev_host_hbac."$DOMAIN
+host1="dev-host-hbac."$DOMAIN
 
-user1="dev_hbac"
+user1="dev-hbac"
 
-usergroup1="dev_ugrp_hbac"
+usergroup1="dev-ugrp-hbac"
 
-hostgroup1="dev_hosts_hbac"
+hostgroup1="dev-hosts-hbac"
 
-hostgroup2="dev_slave_hbac"
+hostgroup2="dev-slave-hbac"
 
-servicegroup="remote_access_hbac"
+servicegroup="remote-access-hbac"
 
 hbac_setup()
 {
