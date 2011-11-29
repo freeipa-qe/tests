@@ -24,9 +24,9 @@ ipamangedservices_http()
 {
     setup_ipa_http
     setup_http
-    #http_tests
-    #cleanup_http
-    #cleanup_ipa_http
+    http_tests
+    cleanup_http
+    cleanup_ipa_http
 } 
 
 ######################
@@ -44,7 +44,7 @@ setup_ipa_http()
 		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials"
 
 		# add HTTP service for this client host	
-		rlRun "ipa service-add $HTTPPRINC" 0 "Add HTTP service for this client host"
+		rlRun "ipa service-add $HTTPPRINC --force" 0 "Add HTTP service for this client host"
 
 		# get a keytab
 		cd $HTTPCFGDIR
@@ -53,7 +53,10 @@ setup_ipa_http()
 
 		rlRun "ipa host-add $MANAGINGHOST --force" 0 "Add host that will manage this client"
 		rlRun "ipa-getkeytab -s $MASTER -k $MANAGINGKEYTAB -p $MANAGINGPRINC" 0 "Get keytab for the managing host"
+		rlLog "EXECUTING: ipa host-add-managedby --hosts=$MANAGINGHOST $CLIENT"
 		rlRun "ipa host-add-managedby --hosts=$MANAGINGHOST $CLIENT" 0 "Allow managing host to manage this client"
+		rlLog "EXECUTING: ipa service-add-host --hosts=$MANAGINGHOST $CLIENT"
+		rlRun "ipa service-add-host --hosts=$MANAGINGHOST $HTTPPRINC@$RELM" 0 "Allow managing host to manage this client services"
 
 	rlPhaseEnd
 }
@@ -106,8 +109,8 @@ setup_http()
 		klist
 
         	# submit the certificate request
-		rlLog "EXECUTING: ipa cert-request --principal=$MANAGINGPRINC $HOSTNAME.csr"
-        	rlRun "ipa cert-request --principal=$MANAGINGPRINC $HOSTNAME.csr" 0 "Submitting certificate request for HTTP server"
+		rlLog "EXECUTING: ipa cert-request --principal=$HTTPPRINC@$RELM $HOSTNAME.csr"
+        	rlRun "ipa cert-request --principal=$HTTPPRINC@$RELM $HOSTNAME.csr" 0 "Submitting certificate request for HTTP server"
 
 		# kinit as admin again 
 		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials"
