@@ -161,15 +161,16 @@ verifyCert(){
 
 certRun()
 {
+#set -x
     local cmd=$1
     local out=$2
-    local errout="/tmp/qarun.err.out.$RANDOM.out"
+    local errout="/tmp/certrun.err.out.$RANDOM.out"
     local expectCode="$3"
     local expectMsg="$4"
     local comment="$5"
     local verifyString=$6
     rlLog "$cmd"
-    rlLog "expect [$expectCode], output [$out]"
+    rlLog "expect return code:[$expectCode], output [$out]"
     rlLog "comment [$comment]"
     
     $cmd 2>$errout 1>$out
@@ -182,6 +183,11 @@ certRun()
         rlFail "expect [$expectCode] actual [$actualCode]"
         debug="debug"
     fi
+
+    if [ "$expectMsg" = "" ]
+    then
+        rlLog "empty expect message defined, skip error message check"
+    else
         #check the error message
         if grep -i "$expectMsg" $out 2>&1 >/dev/null
         then 
@@ -219,15 +225,15 @@ certRun()
                 debug="debug"
             fi
         fi
-   # else
-   #     rlFail "expect [$expectCode] actual [$actualCode]"
-   #     debug="debug"
-   # fi
+    fi
+   
     # if debug is defined
     if [ "$debug" = "debug" ];then
         echo "========== expected message ==============="
         echo "expected msg : $expectMsg"
-        echo "verify string: $verifyString"
+        if [ "$verifyString" != "" ];then
+            echo "verify string: $verifyString"
+        fi
         echo "==========  actual  output  ==============="
         cat $out
         echo "------------- cmd -------------------------"
