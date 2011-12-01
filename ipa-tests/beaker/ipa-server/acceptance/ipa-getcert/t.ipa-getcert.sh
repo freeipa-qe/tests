@@ -8,12 +8,12 @@
 
 ipagetcert() #total test cases: 203
 {
-    request
-    start_tracking
+#    request
+#    start_tracking
     stop_tracking
-    resubmit
-    list
-    list_cas
+#    resubmit
+#    list
+#    list_cas
 } #ipagetcert
 
 request()
@@ -354,7 +354,7 @@ request_1007()  #ipa-getcert request -d [NSSDBDIR positive] -n [CertNickName pos
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
         local expectedErrCode="0" 
-        local expectedErrMsg="No_errmsg_defined_Ignore_Me" 
+        local expectedErrMsg="" 
         local comment="scenario: [ipa-getcert request -d -n  -t -I -R -N -K -U -D -E]	data: [CertTokenName negative]" 
 	# Updating verifyString after confirming with Nalin.
         local verifyString="status: NEED_KEY_PAIR\|status: NEWLY_ADDED_NEED_KEYINFO_READ_TOKEN"
@@ -395,7 +395,7 @@ request_1008()  #ipa-getcert request -d [NSSDBDIR positive] -n [CertNickName pos
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
         local expectedErrCode="0" 
-        local expectedErrMsg="No_errmsg_defined_Ignore_Me" 
+        local expectedErrMsg="" 
         local comment="scenario: [ipa-getcert request -d -n  -t -I -r -N -K -U -D -E]	data: [CertTokenName negative]" 
 	# Updateing verifyString after confirming with Nalin.
         local verifyString="status: NEED_KEY_PAIR\|status: NEWLY_ADDED_NEED_KEYINFO_READ_TOKEN"
@@ -436,7 +436,7 @@ request_1009()  #ipa-getcert request -d [NSSDBDIR positive] -n [CertNickName pos
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
         local expectedErrCode="0" 
-        local expectedErrMsg="No_errmsg_defined_Ignore_Me" 
+        local expectedErrMsg="" 
         local comment="scenario: [ipa-getcert request -d -n  -t -g -R -N -K -U -D -E]	data: [CertTokenName negative]" 
 	# updating verifyString after confirming with Nalin
         local verifyString="status: NEED_KEY_PAIR\|status: NEWLY_ADDED_NEED_KEYINFO_READ_TOKEN"
@@ -477,7 +477,7 @@ request_1010()  #ipa-getcert request -d [NSSDBDIR positive] -n [CertNickName pos
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
         local expectedErrCode="0" 
-        local expectedErrMsg="No_errmsg_defined_Ignore_Me" 
+        local expectedErrMsg="" 
         local comment="scenario: [ipa-getcert request -d -n  -t -g -r -N -K -U -D -E]	data: [CertTokenName negative]" 
 	# updating verifyString after confirming with Nalin
         local verifyString="status: NEED_KEY_PAIR\|status: NEWLY_ADDED_NEED_KEYINFO_READ_TOKEN"
@@ -598,7 +598,7 @@ request_1013()  #ipa-getcert request -d [NSSDBDIR positive] -n [CertNickName pos
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
         local expectedErrCode="0" 
-        local expectedErrMsg="No_errmsg_defined_Ignore_Me" 
+        local expectedErrMsg="" 
         local comment="scenario: [ipa-getcert request -d -n  -t -I -R -N -K -U -D -E]	data: [CertPrincipalName negative]" 
         local verifyString="status: NEED_KEY_PAIR\|status: CA_UNREACHABLE\|status: CA_UNCONFIGURED"
 
@@ -710,7 +710,7 @@ request_1016()  #ipa-getcert request -d [NSSDBDIR positive] -n [CertNickName pos
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
         local expectedErrCode="0" 
-        local expectedErrMsg="No_errmsg_defined_Ignore_Me" 
+        local expectedErrMsg="" 
         local comment="scenario: [ipa-getcert request -d -n  -t -I -r -N -K -U -D -E]	data: [CertPrincipalName negative]" 
         local verifyString="status: NEED_KEY_PAIR\|status: CA_UNREACHABLE\|status: CA_UNCONFIGURED"
 
@@ -822,7 +822,7 @@ request_1019()  #ipa-getcert request -d [NSSDBDIR positive] -n [CertNickName pos
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
         local expectedErrCode="0" 
-        local expectedErrMsg="No_errmsg_defined_Ignore_Me" 
+        local expectedErrMsg="" 
         local comment="scenario: [ipa-getcert request -d -n  -t -g -R -N -K -U -D -E]	data: [CertKeySize negative]" 
         local verifyString="status: NEED_KEY_PAIR\|status: CA_UNREACHABLE"
 
@@ -861,7 +861,7 @@ request_1020()  #ipa-getcert request -d [NSSDBDIR positive] -n [CertNickName pos
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
         local expectedErrCode="0" 
-        local expectedErrMsg="No_errmsg_defined_Ignore_Me" 
+        local expectedErrMsg="" 
         local comment="scenario: [ipa-getcert request -d -n  -t -g -r -N -K -U -D -E]	data: [CertKeySize negative]" 
         local verifyString="status: NEED_KEY_PAIR\|status: CA_UNREACHABLE"
 
@@ -900,7 +900,7 @@ request_1021()  #ipa-getcert request -d [NSSDBDIR positive] -n [CertNickName pos
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
         local expectedErrCode="0" 
-        local expectedErrMsg="No_errmsg_defined_Ignore_Me" 
+        local expectedErrMsg="" 
         local comment="scenario: [ipa-getcert request -d -n  -t -g -R -N -K -U -D -E]	data: [CertPrincipalName negative]" 
         local verifyString="status: NEED_KEY_PAIR\|status: CA_UNREACHABLE\|status: CA_UNCONFIGURED"
 
@@ -1012,7 +1012,7 @@ request_1024()  #ipa-getcert request -d [NSSDBDIR positive] -n [CertNickName pos
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
         local expectedErrCode="0" 
-        local expectedErrMsg="No_errmsg_defined_Ignore_Me" 
+        local expectedErrMsg="" 
         local comment="scenario: [ipa-getcert request -d -n  -t -g -r -N -K -U -D -E]	data: [CertPrincipalName negative]" 
         local verifyString="status: NEED_KEY_PAIR\|status: CA_UNREACHABLE\|status: CA_UNCONFIGURED"
 
@@ -1156,7 +1156,7 @@ request_1028()  #ipa-getcert request -k [PemKeyFile negative] -f [PemCertFile po
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
         local expectedErrCode="1" 
-        local expectedErrMsg="Path \"/root/${testID}\" is not a directory\|No request found that matched arguments" 
+        local expectedErrMsg="Path \"/root/${testID}\": No such file or directory.\|No request found that matched arguments" 
         local comment="scenario: [ipa-getcert request -k -f  -P -I -R -N -K -U -D -E]	data: [PemKeyFile negative]" 
         # verifyString not defined, it will be ignore 
 
@@ -1195,7 +1195,7 @@ request_1029()  #ipa-getcert request -k [PemKeyFile negative] -f [PemCertFile po
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
         local expectedErrCode="1" 
-        local expectedErrMsg="Path \"/root/${testID}\" is not a directory\|No request found that matched arguments" 
+        local expectedErrMsg="Path \"/root/${testID}\": No such file or directory.\|No request found that matched arguments" 
         local comment="scenario: [ipa-getcert request -k -f  -P -I -r -N -K -U -D -E]	data: [PemKeyFile negative]" 
         # verifyString not defined, it will be ignore 
 
@@ -1234,7 +1234,7 @@ request_1030()  #ipa-getcert request -k [PemKeyFile negative] -f [PemCertFile po
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
         local expectedErrCode="1" 
-        local expectedErrMsg="Path \"/root/${testID}\" is not a directory\|No request found that matched arguments" 
+        local expectedErrMsg="Path \"/root/${testID}\": No such file or directory.\|No request found that matched arguments" 
         local comment="scenario: [ipa-getcert request -k -f  -P -g -R -N -K -U -D -E]	data: [PemKeyFile negative]" 
         # verifyString not defined, it will be ignore 
 
@@ -1273,7 +1273,7 @@ request_1031()  #ipa-getcert request -k [PemKeyFile negative] -f [PemCertFile po
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
         local expectedErrCode="1" 
-        local expectedErrMsg="Path \"/root/${testID}\" is not a directory\|No request found that matched arguments" 
+        local expectedErrMsg="Path \"/root/${testID}\": No such file or directory.\|No request found that matched arguments" 
         local comment="scenario: [ipa-getcert request -k -f  -P -g -r -N -K -U -D -E]	data: [PemKeyFile negative]" 
         # verifyString not defined, it will be ignore 
 
@@ -1313,7 +1313,7 @@ request_1032()  #ipa-getcert request -k [PemKeyFile negative] -f [PemCertFile po
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
         local expectedErrCode="1" 
-        local expectedErrMsg="Path \"/root/${testID}\" is not a directory\|No request found that matched arguments" 
+        local expectedErrMsg="Path \"/root/${testID}\": No such file or directory.\|No request found that matched arguments" 
         local comment="scenario: [ipa-getcert request -k -f  -p -I -R -N -K -U -D -E]	data: [PemKeyFile negative]" 
         # verifyString not defined, it will be ignore 
 
@@ -1354,7 +1354,7 @@ request_1033()  #ipa-getcert request -k [PemKeyFile negative] -f [PemCertFile po
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
         local expectedErrCode="1" 
-        local expectedErrMsg="Path \"/root/${testID}\" is not a directory\|No request found that matched arguments" 
+        local expectedErrMsg="Path \"/root/${testID}\": No such file or directory.\|No request found that matched arguments" 
         local comment="scenario: [ipa-getcert request -k -f  -p -I -r -N -K -U -D -E]	data: [PemKeyFile negative]" 
         # verifyString not defined, it will be ignore 
 
@@ -1395,7 +1395,7 @@ request_1034()  #ipa-getcert request -k [PemKeyFile negative] -f [PemCertFile po
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
         local expectedErrCode="1" 
-        local expectedErrMsg="Path \"/root/${testID}\" is not a directory\|No request found that matched arguments" 
+        local expectedErrMsg="Path \"/root/${testID}\": No such file or directory.\|No request found that matched arguments" 
         local comment="scenario: [ipa-getcert request -k -f  -p -g -R -N -K -U -D -E]	data: [PemKeyFile negative]" 
         # verifyString not defined, it will be ignore 
 
@@ -1436,7 +1436,7 @@ request_1035()  #ipa-getcert request -k [PemKeyFile negative] -f [PemCertFile po
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
         local expectedErrCode="1" 
-        local expectedErrMsg="Path \"/root/${testID}\" is not a directory\|No request found that matched arguments" 
+        local expectedErrMsg="Path \"/root/${testID}\": No such file or directory.\|No request found that matched arguments" 
         local comment="scenario: [ipa-getcert request -k -f  -p -g -r -N -K -U -D -E]	data: [PemKeyFile negative]" 
         # verifyString not defined, it will be ignore 
 
@@ -1940,7 +1940,7 @@ request_1048()  #ipa-getcert request -k [PemKeyFile positive] -f [PemCertFile po
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
         local expectedErrCode="0" 
-        local expectedErrMsg="No_errmsg_defined_Ignore_Me" 
+        local expectedErrMsg="" 
         local comment="scenario: [ipa-getcert request -k -f  -P -I -R -N -K -U -D -E]	data: [CertPrincipalName negative]" 
         local verifyString="status: NEED_KEY_PAIR\|status: CA_UNREACHABLE\|status: CA_UNCONFIGURED\|status: NEWLY_ADDED_NEED_KEYINFO_READ_PIN"
 
@@ -2058,7 +2058,7 @@ request_1051()  #ipa-getcert request -k [PemKeyFile positive] -f [PemCertFile po
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
         local expectedErrCode="0" 
-        local expectedErrMsg="No_errmsg_defined_Ignore_Me" 
+        local expectedErrMsg="" 
         local comment="scenario: [ipa-getcert request -k -f  -P -I -r -N -K -U -D -E]	data: [CertPrincipalName negative]" 
         local verifyString="status: NEED_KEY_PAIR\|status: CA_UNREACHABLE\|status: CA_UNCONFIGURED\|status: NEWLY_ADDED_NEED_KEYINFO_READ_PIN"
 
@@ -2176,7 +2176,7 @@ request_1054()  #ipa-getcert request -k [PemKeyFile positive] -f [PemCertFile po
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
         local expectedErrCode="0" 
-        local expectedErrMsg="No_errmsg_defined_Ignore_Me" 
+        local expectedErrMsg="" 
         local comment="scenario: [ipa-getcert request -k -f  -P -g -R -N -K -U -D -E]	data: [CertKeySize negative]" 
         local verifyString="status: NEED_KEY_PAIR\|status: CA_UNREACHABLE\|status: NEWLY_ADDED_NEED_KEYINFO_READ_PIN"
 
@@ -2217,7 +2217,7 @@ request_1055()  #ipa-getcert request -k [PemKeyFile positive] -f [PemCertFile po
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
         local expectedErrCode="0" 
-        local expectedErrMsg="No_errmsg_defined_Ignore_Me" 
+        local expectedErrMsg="" 
         local comment="scenario: [ipa-getcert request -k -f  -P -g -r -N -K -U -D -E]	data: [CertKeySize negative]" 
         local verifyString="status: NEED_KEY_PAIR\|status: CA_UNREACHABLE\|status: NEWLY_ADDED_NEED_KEYINFO_READ_PIN"
 
@@ -2258,7 +2258,7 @@ request_1056()  #ipa-getcert request -k [PemKeyFile positive] -f [PemCertFile po
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
         local expectedErrCode="0" 
-        local expectedErrMsg="No_errmsg_defined_Ignore_Me" 
+        local expectedErrMsg="" 
         local comment="scenario: [ipa-getcert request -k -f  -P -g -R -N -K -U -D -E]	data: [CertPrincipalName negative]" 
         local verifyString="status: NEED_KEY_PAIR\|status: CA_UNREACHABLE\|status: CA_UNCONFIGURED\|status: NEWLY_ADDED_NEED_KEYINFO_READ_PIN"
 
@@ -2376,7 +2376,7 @@ request_1059()  #ipa-getcert request -k [PemKeyFile positive] -f [PemCertFile po
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
         local expectedErrCode="0" 
-        local expectedErrMsg="No_errmsg_defined_Ignore_Me" 
+        local expectedErrMsg="" 
         local comment="scenario: [ipa-getcert request -k -f  -P -g -r -N -K -U -D -E]	data: [CertPrincipalName negative]" 
         local verifyString="status: NEED_KEY_PAIR\|status: CA_UNREACHABLE\|status: CA_UNCONFIGURED\|status: NEWLY_ADDED_NEED_KEYINFO_READ_PIN"
 
@@ -2494,7 +2494,7 @@ request_1062()  #ipa-getcert request -k [PemKeyFile positive] -f [PemCertFile po
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
         local expectedErrCode="0" 
-        local expectedErrMsg="No_errmsg_defined_Ignore_Me" 
+        local expectedErrMsg="" 
         local comment="scenario: [ipa-getcert request -k -f  -p -I -R -N -K -U -D -E]	data: [PINFILE negative]" 
         local verifyString="status: NEWLY_ADDED_NEED_KEYINFO_READ_PIN"
 
@@ -2535,7 +2535,7 @@ request_1063()  #ipa-getcert request -k [PemKeyFile positive] -f [PemCertFile po
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
         local expectedErrCode="0" 
-        local expectedErrMsg="No_errmsg_defined_Ignore_Me" 
+        local expectedErrMsg="" 
         local comment="scenario: [ipa-getcert request -k -f  -p -I -r -N -K -U -D -E]	data: [PINFILE negative]" 
         local verifyString="status: NEWLY_ADDED_NEED_KEYINFO_READ_PIN"
 
@@ -2576,7 +2576,7 @@ request_1064()  #ipa-getcert request -k [PemKeyFile positive] -f [PemCertFile po
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
         local expectedErrCode="0" 
-        local expectedErrMsg="No_errmsg_defined_Ignore_Me" 
+        local expectedErrMsg="" 
         local comment="scenario: [ipa-getcert request -k -f  -p -g -R -N -K -U -D -E]	data: [PINFILE negative]" 
         local verifyString="status: NEWLY_ADDED_NEED_KEYINFO_READ_PIN"
 
@@ -2617,7 +2617,7 @@ request_1065()  #ipa-getcert request -k [PemKeyFile positive] -f [PemCertFile po
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
         local expectedErrCode="0" 
-        local expectedErrMsg="No_errmsg_defined_Ignore_Me" 
+        local expectedErrMsg="" 
         local comment="scenario: [ipa-getcert request -k -f  -p -g -r -N -K -U -D -E]	data: [PINFILE negative]" 
         local verifyString="status: NEWLY_ADDED_NEED_KEYINFO_READ_PIN"
 
@@ -2745,7 +2745,7 @@ request_1068()  #ipa-getcert request -k [PemKeyFile positive] -f [PemCertFile po
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
         local expectedErrCode="0" 
-        local expectedErrMsg="No_errmsg_defined_Ignore_Me" 
+        local expectedErrMsg="" 
         local comment="scenario: [ipa-getcert request -k -f  -p -I -R -N -K -U -D -E]	data: [CertPrincipalName negative]" 
         local verifyString="status: NEED_KEY_PAIR\|status: CA_UNREACHABLE\|status: CA_UNCONFIGURED\|status: NEWLY_ADDED_NEED_KEYINFO_READ_PIN"
 
@@ -2869,7 +2869,7 @@ request_1071()  #ipa-getcert request -k [PemKeyFile positive] -f [PemCertFile po
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
         local expectedErrCode="0" 
-        local expectedErrMsg="No_errmsg_defined_Ignore_Me" 
+        local expectedErrMsg="" 
         local comment="scenario: [ipa-getcert request -k -f  -p -I -r -N -K -U -D -E]	data: [CertPrincipalName negative]" 
         local verifyString="status: NEED_KEY_PAIR\|status: CA_UNREACHABLE\|status: CA_UNCONFIGURED\|status: NEWLY_ADDED_NEED_KEYINFO_READ_PIN"
 
@@ -2993,7 +2993,7 @@ request_1074()  #ipa-getcert request -k [PemKeyFile positive] -f [PemCertFile po
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
         local expectedErrCode="0" 
-        local expectedErrMsg="No_errmsg_defined_Ignore_Me" 
+        local expectedErrMsg="" 
         local comment="scenario: [ipa-getcert request -k -f  -p -g -R -N -K -U -D -E]	data: [CertKeySize negative]" 
         local verifyString="status: NEED_KEY_PAIR\|status: CA_UNREACHABLE\|status: NEWLY_ADDED_NEED_KEYINFO_READ_PIN"
 
@@ -3036,7 +3036,7 @@ request_1075()  #ipa-getcert request -k [PemKeyFile positive] -f [PemCertFile po
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
         local expectedErrCode="0" 
-        local expectedErrMsg="No_errmsg_defined_Ignore_Me" 
+        local expectedErrMsg="" 
         local comment="scenario: [ipa-getcert request -k -f  -p -g -r -N -K -U -D -E]	data: [CertKeySize negative]" 
         local verifyString="status: NEED_KEY_PAIR\|status: CA_UNREACHABLE\|status: NEWLY_ADDED_NEED_KEYINFO_READ_PIN"
 
@@ -3079,7 +3079,7 @@ request_1076()  #ipa-getcert request -k [PemKeyFile positive] -f [PemCertFile po
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
         local expectedErrCode="0" 
-        local expectedErrMsg="No_errmsg_defined_Ignore_Me" 
+        local expectedErrMsg="" 
         local comment="scenario: [ipa-getcert request -k -f  -p -g -R -N -K -U -D -E]	data: [CertPrincipalName negative]" 
         local verifyString="status: NEED_KEY_PAIR\|status: CA_UNREACHABLE\|status: CA_UNCONFIGURED\|status: NEWLY_ADDED_NEED_KEYINFO_READ_PIN"
 
@@ -3203,7 +3203,7 @@ request_1079()  #ipa-getcert request -k [PemKeyFile positive] -f [PemCertFile po
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
         local expectedErrCode="0" 
-        local expectedErrMsg="No_errmsg_defined_Ignore_Me" 
+        local expectedErrMsg="" 
         local comment="scenario: [ipa-getcert request -k -f  -p -g -r -N -K -U -D -E]	data: [CertPrincipalName negative]" 
         local verifyString="status: NEED_KEY_PAIR\|status: CA_UNREACHABLE\|status: CA_UNCONFIGURED\|status: NEWLY_ADDED_NEED_KEYINFO_READ_PIN"
 
@@ -3523,7 +3523,7 @@ start_tracking_1004()  #ipa-getcert start-tracking -d [NSSDBDIR positive] -n [Ce
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
         local expectedErrCode="0" 
-        local expectedErrMsg="No_errmsg_defined_Ignore_Me" 
+        local expectedErrMsg="" 
         local comment="scenario: [ipa-getcert start-tracking -d -n -t]	data: [CertTokenName negative]" 
 	    # Updating the verifyString after confirming with Nalin.
         local verifyString="status: NEED_KEY_PAIR\|status: NEWLY_ADDED_NEED_KEYINFO_READ_TOKEN"
@@ -3563,7 +3563,7 @@ start_tracking_1005()  #ipa-getcert start-tracking -d [NSSDBDIR positive] -n [Ce
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
         local expectedErrCode="0" 
-        local expectedErrMsg="No_errmsg_defined_Ignore_Me" 
+        local expectedErrMsg="" 
         local comment="scenario: [ipa-getcert start-tracking -d -n -t -I -U -K -D -E -R]	data: [CertTokenName negative]" 
         # Updating the verifyString after confirming with Nalin.
         local verifyString="status: NEED_KEY_PAIR\|status: NEWLY_ADDED_NEED_KEYINFO_READ_TOKEN"
@@ -3604,7 +3604,7 @@ start_tracking_1006()  #ipa-getcert start-tracking -d [NSSDBDIR positive] -n [Ce
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
         local expectedErrCode="0" 
-        local expectedErrMsg="No_errmsg_defined_Ignore_Me" 
+        local expectedErrMsg="" 
         local comment="scenario: [ipa-getcert start-tracking -d -n -t -I -U -K -D -E -r]	data: [CertTokenName negative]" 
         # Updating the verifyString after confirming with Nalin.
         local verifyString="status: NEED_KEY_PAIR\|status: NEWLY_ADDED_NEED_KEYINFO_READ_TOKEN"
@@ -3824,7 +3824,7 @@ start_tracking_1012()  #ipa-getcert start-tracking -d [NSSDBDIR positive] -n [Ce
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
         local expectedErrCode="0" 
-        local expectedErrMsg="No_errmsg_defined_Ignore_Me" 
+        local expectedErrMsg="" 
         local comment="scenario: [ipa-getcert start-tracking -d -n -t -I -U -K -D -E -R]	data: [CertPrincipalName negative]" 
         local verifyString="status: NEED_KEY_PAIR\|status: CA_UNREACHABLE\|status: CA_UNCONFIGURED"
 
@@ -3862,7 +3862,7 @@ start_tracking_1013()  #ipa-getcert start-tracking -d [NSSDBDIR positive] -n [Ce
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
         local expectedErrCode="0" 
-        local expectedErrMsg="No_errmsg_defined_Ignore_Me" 
+        local expectedErrMsg="" 
         local comment="scenario: [ipa-getcert start-tracking -d -n -t -I -U -K -D -E -r]	data: [CertPrincipalName negative]" 
         local verifyString="status: NEED_KEY_PAIR\|status: CA_UNREACHABLE\|status: CA_UNCONFIGURED"
 
@@ -4237,7 +4237,7 @@ start_tracking_1024()  #ipa-getcert start-tracking -i [ExistingTrackingRequestNi
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
         local expectedErrCode="0" 
-        local expectedErrMsg="No_errmsg_defined_Ignore_Me" 
+        local expectedErrMsg="" 
         local comment="scenario: [ipa-getcert start-tracking -i -I -U -K -D -E -R]	data: [CertPrincipalName negative]" 
         local verifyString="status: NEED_KEY_PAIR\|status: CA_UNREACHABLE\|status: CA_UNCONFIGURED"
 
@@ -4273,7 +4273,7 @@ start_tracking_1025()  #ipa-getcert start-tracking -i [ExistingTrackingRequestNi
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
         local expectedErrCode="0" 
-        local expectedErrMsg="No_errmsg_defined_Ignore_Me" 
+        local expectedErrMsg="" 
         local comment="scenario: [ipa-getcert start-tracking -i -I -U -K -D -E -r]	data: [CertPrincipalName negative]" 
         local verifyString="status: NEED_KEY_PAIR\|status: CA_UNREACHABLE\|status: CA_UNCONFIGURED"
 
@@ -4367,7 +4367,7 @@ start_tracking_1028()  #ipa-getcert start-tracking -k [PemKeyFile negative] -f [
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
         local expectedErrCode="1" 
-        local expectedErrMsg="Path \"/root/${testID}\" is not a directory\|No request found that matched arguments" 
+        local expectedErrMsg="Path \"/root/${testID}\": No such file or directory.\|No request found that matched arguments" 
         local comment="scenario: [ipa-getcert start-tracking -k -f]	data: [PemKeyFile negative]" 
         # verifyString not defined, it will be ignore 
 
@@ -4404,7 +4404,7 @@ start_tracking_1029()  #ipa-getcert start-tracking -k [PemKeyFile negative] -f [
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
         local expectedErrCode="1" 
-        local expectedErrMsg="Path \"/root/${testID}\" is not a directory\|No request found that matched arguments" 
+        local expectedErrMsg="Path \"/root/${testID}\": No such file or directory.\|No request found that matched arguments" 
         local comment="scenario: [ipa-getcert start-tracking -k -f -I -U -K -D -E -R]	data: [PemKeyFile negative]" 
         # verifyString not defined, it will be ignore 
 
@@ -4441,7 +4441,7 @@ start_tracking_1030()  #ipa-getcert start-tracking -k [PemKeyFile negative] -f [
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
         local expectedErrCode="1" 
-        local expectedErrMsg="Path \"/root/${testID}\" is not a directory\|No request found that matched arguments" 
+        local expectedErrMsg="Path \"/root/${testID}\": No such file or directory.\|No request found that matched arguments" 
         local comment="scenario: [ipa-getcert start-tracking -k -f -I -U -K -D -E -r]	data: [PemKeyFile negative]" 
         # verifyString not defined, it will be ignore 
 
@@ -4474,7 +4474,7 @@ start_tracking_1031()  #ipa-getcert start-tracking -k [PemKeyFile negative] -f [
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
         local expectedErrCode="1" 
-        local expectedErrMsg="Path \"/root/${testID}\" is not a directory\|No request found that matched arguments" 
+        local expectedErrMsg="Path \"/root/${testID}\": No such file or directory.\|No request found that matched arguments" 
         local comment="scenario: [ipa-getcert start-tracking -k -f -P]	data: [PemKeyFile negative]" 
         # verifyString not defined, it will be ignore 
 
@@ -4550,7 +4550,7 @@ start_tracking_1033()  #ipa-getcert start-tracking -k [PemKeyFile negative] -f [
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
         local expectedErrCode="1" 
-        local expectedErrMsg="Path \"/root/${testID}\" is not a directory\|No request found that matched arguments" 
+        local expectedErrMsg="Path \"/root/${testID}\": No such file or directory.\|No request found that matched arguments" 
         local comment="scenario: [ipa-getcert start-tracking -k -f -P -I -U -K -D -E -r]	data: [PemKeyFile negative]" 
         # verifyString not defined, it will be ignore 
 
@@ -4584,7 +4584,7 @@ start_tracking_1034()  #ipa-getcert start-tracking -k [PemKeyFile negative] -f [
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
         local expectedErrCode="1" 
-        local expectedErrMsg="Path \"/root/${testID}\" is not a directory\|No request found that matched arguments" 
+        local expectedErrMsg="Path \"/root/${testID}\": No such file or directory.\|No request found that matched arguments" 
         local comment="scenario: [ipa-getcert start-tracking -k -f -p]	data: [PemKeyFile negative]" 
         # verifyString not defined, it will be ignore 
 
@@ -4624,7 +4624,7 @@ start_tracking_1035()  #ipa-getcert start-tracking -k [PemKeyFile negative] -f [
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
         local expectedErrCode="1" 
-        local expectedErrMsg="Path \"/root/${testID}\" is not a directory\|No request found that matched arguments" 
+        local expectedErrMsg="Path \"/root/${testID}\": No such file or directory.\|No request found that matched arguments" 
         local comment="scenario: [ipa-getcert start-tracking -k -f -p -I -U -K -D -E -R]	data: [PemKeyFile negative]" 
         # verifyString not defined, it will be ignore 
 
@@ -4664,7 +4664,7 @@ start_tracking_1036()  #ipa-getcert start-tracking -k [PemKeyFile negative] -f [
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
         local expectedErrCode="1" 
-        local expectedErrMsg="Path \"/root/${testID}\" is not a directory\|No request found that matched arguments" 
+        local expectedErrMsg="Path \"/root/${testID}\": No such file or directory.\|No request found that matched arguments" 
         local comment="scenario: [ipa-getcert start-tracking -k -f -p -I -U -K -D -E -r]	data: [PemKeyFile negative]" 
         # verifyString not defined, it will be ignore 
 
@@ -5218,7 +5218,7 @@ start_tracking_1051()  #ipa-getcert start-tracking -k [PemKeyFile positive] -f [
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
         local expectedErrCode="0" 
-        local expectedErrMsg="No_errmsg_defined_Ignore_Me" 
+        local expectedErrMsg="" 
         local comment="scenario: [ipa-getcert start-tracking -k -f -I -U -K -D -E -R]	data: [CertPrincipalName negative]" 
         local verifyString="status: NEED_KEY_PAIR\|status: CA_UNREACHABLE\|status: CA_UNCONFIGURED"
 
@@ -5257,7 +5257,7 @@ start_tracking_1052()  #ipa-getcert start-tracking -k [PemKeyFile positive] -f [
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
         local expectedErrCode="0" 
-        local expectedErrMsg="No_errmsg_defined_Ignore_Me" 
+        local expectedErrMsg="" 
         local comment="scenario: [ipa-getcert start-tracking -k -f -I -U -K -D -E -r]	data: [CertPrincipalName negative]" 
         local verifyString="status: NEED_KEY_PAIR\|status: CA_UNREACHABLE\|status: CA_UNCONFIGURED"
 
@@ -5555,7 +5555,7 @@ start_tracking_1060()  #ipa-getcert start-tracking -k [PemKeyFile positive] -f [
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
         local expectedErrCode="0" 
-        local expectedErrMsg="No_errmsg_defined_Ignore_Me" 
+        local expectedErrMsg="" 
         local comment="scenario: [ipa-getcert start-tracking -k -f -P -I -U -K -D -E -R]	data: [CertPrincipalName negative]" 
         # Updating the verifyString after confirming with Nalin.
         # local verifyString="status: NEED_KEY_PAIR\|status: CA_UNREACHABLE\|status: CA_UNCONFIGURED"
@@ -5597,7 +5597,7 @@ start_tracking_1061()  #ipa-getcert start-tracking -k [PemKeyFile positive] -f [
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
         local expectedErrCode="0" 
-        local expectedErrMsg="No_errmsg_defined_Ignore_Me" 
+        local expectedErrMsg="" 
         local comment="scenario: [ipa-getcert start-tracking -k -f -P -I -U -K -D -E -r]	data: [CertPrincipalName negative]" 
         # Updating the verifyString after confirming with Nalin.
 	# local verifyString="status: NEED_KEY_PAIR\|status: CA_UNREACHABLE\|status: CA_UNCONFIGURED"
@@ -5704,7 +5704,7 @@ start_tracking_1064()  #ipa-getcert start-tracking -k [PemKeyFile positive] -f [
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
         local expectedErrCode="0" 
-        local expectedErrMsg="No_errmsg_defined_Ignore_Me" 
+        local expectedErrMsg="" 
         local comment="scenario: [ipa-getcert start-tracking -k -f -p]	data: [PINFILE negative]" 
         local verifyString="status: NEWLY_ADDED_NEED_KEYINFO_READ_PIN"
 
@@ -5744,7 +5744,7 @@ start_tracking_1065()  #ipa-getcert start-tracking -k [PemKeyFile positive] -f [
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
         local expectedErrCode="0" 
-        local expectedErrMsg="No_errmsg_defined_Ignore_Me" 
+        local expectedErrMsg="" 
         local comment="scenario: [ipa-getcert start-tracking -k -f -p -I -U -K -D -E -R]	data: [PINFILE negative]" 
         local verifyString="status: NEWLY_ADDED_NEED_KEYINFO_READ_PIN"
 
@@ -5784,7 +5784,7 @@ start_tracking_1066()  #ipa-getcert start-tracking -k [PemKeyFile positive] -f [
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
         local expectedErrCode="0" 
-        local expectedErrMsg="No_errmsg_defined_Ignore_Me" 
+        local expectedErrMsg="" 
         local comment="scenario: [ipa-getcert start-tracking -k -f -p -I -U -K -D -E -r]	data: [PINFILE negative]" 
         local verifyString="status: NEWLY_ADDED_NEED_KEYINFO_READ_PIN"
 
@@ -6025,7 +6025,7 @@ start_tracking_1072()  #ipa-getcert start-tracking -k [PemKeyFile positive] -f [
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
         local expectedErrCode="0" 
-        local expectedErrMsg="No_errmsg_defined_Ignore_Me" 
+        local expectedErrMsg="" 
         local comment="scenario: [ipa-getcert start-tracking -k -f -p -I -U -K -D -E -R]	data: [CertPrincipalName negative]" 
 	# Updating verifyString after confirming with Nalin
 	# local verifyString="status: NEED_KEY_PAIR\|status: CA_UNREACHABLE\|status: CA_UNCONFIGURED"
@@ -6069,7 +6069,7 @@ start_tracking_1073()  #ipa-getcert start-tracking -k [PemKeyFile positive] -f [
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
         local expectedErrCode="0" 
-        local expectedErrMsg="No_errmsg_defined_Ignore_Me" 
+        local expectedErrMsg="" 
         local comment="scenario: [ipa-getcert start-tracking -k -f -p -I -U -K -D -E -r]	data: [CertPrincipalName negative]" 
         # Updating verifyString after confirming with Nalin
         # local verifyString="status: NEED_KEY_PAIR\|status: CA_UNREACHABLE\|status: CA_UNCONFIGURED"
@@ -6169,13 +6169,13 @@ stop_tracking()
     stop_tracking_envsetup
     stop_tracking_1001	#scenario: [ipa-getcert stop-tracking -d -n -t]	data: [NSSDBDIR negative]
     stop_tracking_1002	#scenario: [ipa-getcert stop-tracking -d -n -t]	data: [ExistingCertNickName negative]
-    #stop_tracking_1003	#scenario: [ipa-getcert stop-tracking -d -n -t]	data: [StopTrackingCertTokenName negative]
-    #stop_tracking_1004	#scenario: [ipa-getcert stop-tracking -d -n -t]	data: all positive
+    stop_tracking_1003	#scenario: [ipa-getcert stop-tracking -d -n -t]	data: [StopTrackingCertTokenName negative]
+    stop_tracking_1004	#scenario: [ipa-getcert stop-tracking -d -n -t]	data: all positive
     stop_tracking_1005	#scenario: [ipa-getcert stop-tracking -i]	data: [ExistingTrackingRequestNickName negative]
     stop_tracking_1006	#scenario: [ipa-getcert stop-tracking -i]	data: all positive
     stop_tracking_1007	#scenario: [ipa-getcert stop-tracking -k -f]	data: [PemKeyFile negative]
     stop_tracking_1008	#scenario: [ipa-getcert stop-tracking -k -f]	data: [PemCertFile negative]
-    #stop_tracking_1009	#scenario: [ipa-getcert stop-tracking -k -f]	data: all positive
+    stop_tracking_1009	#scenario: [ipa-getcert stop-tracking -k -f]	data: all positive
     stop_tracking_envcleanup
 } #stop_tracking
 stop_tracking_envsetup()
@@ -6247,7 +6247,7 @@ stop_tracking_1002()  #ipa-getcert stop-tracking -d [NSSDBDIR positive] -n [Exis
         # verifyString not defined, it will be ignore 
 
         # test starts here  
-        certRun "ipa-getcert stop-tracking -d $NSSDBDIR_positive -n $ExistingCertNickName_negative -t $StopTrackingCertTokenName_positive" "$tmpout" $expectedErrCode "$expectedErrMsg" "$comment"  "$verifyString"
+        certRun "ipa-getcert stop-tracking -d $NSSDBDIR_positive -n $ExistingCertNickName_negative -t '$StopTrackingCertTokenName_positive' " "$tmpout" $expectedErrCode "$expectedErrMsg" "$comment"  "$verifyString"
 
         # test evn cleanup 
         #no data cleanup defined 
@@ -6392,7 +6392,7 @@ stop_tracking_1007()  #ipa-getcert stop-tracking -k [PemKeyFile negative] -f [Pe
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
         local expectedErrCode="1" 
-        local expectedErrMsg="Path \"/root/${testID}\" is not a directory\|No request found that matched arguments" 
+        local expectedErrMsg="Path \"/root/${testID}\": No such file or directory.\|No request found that matched arguments" 
         local comment="scenario: [ipa-getcert stop-tracking -k -f]	data: [PemKeyFile negative]" 
         # verifyString not defined, it will be ignore 
 
@@ -6475,38 +6475,38 @@ resubmit()
     resubmit_envsetup
     resubmit_1001	#scenario: [ipa-getcert resubmit -d -n -N -U -K -D -E]	data: [NSSDBDIR negative]
     resubmit_1002	#scenario: [ipa-getcert resubmit -d -n  -t -N -U -K -D -E -I]	data: [NSSDBDIR negative]
-    #resubmit_1003	#scenario: [ipa-getcert resubmit -d -n -N -U -K -D -E]	data: [CertSubjectName negative]
+    resubmit_1003	#scenario: [ipa-getcert resubmit -d -n -N -U -K -D -E]	data: [CertSubjectName negative]
     resubmit_1004	#scenario: [ipa-getcert resubmit -d -n -N -U -K -D -E]	data: [EXTUSAGE negative]
-    #resubmit_1005	#scenario: [ipa-getcert resubmit -d -n -N -U -K -D -E]	data: [CertPrincipalName negative]
+    resubmit_1005	#scenario: [ipa-getcert resubmit -d -n -N -U -K -D -E]	data: [CertPrincipalName negative]
     resubmit_1006	#scenario: [ipa-getcert resubmit -d -n -N -U -K -D -E]	data: all positive
-    #resubmit_1007	#scenario: [ipa-getcert resubmit -d -n  -t -N -U -K -D -E -I]	data: [CertTokenName negative]
-    #resubmit_1008	#scenario: [ipa-getcert resubmit -d -n  -t -N -U -K -D -E -I]	data: [CertSubjectName negative]
+    resubmit_1007	#scenario: [ipa-getcert resubmit -d -n  -t -N -U -K -D -E -I]	data: [CertTokenName negative]
+    resubmit_1008	#scenario: [ipa-getcert resubmit -d -n  -t -N -U -K -D -E -I]	data: [CertSubjectName negative]
     resubmit_1009	#scenario: [ipa-getcert resubmit -d -n  -t -N -U -K -D -E -I]	data: [EXTUSAGE negative]
-    #resubmit_1010	#scenario: [ipa-getcert resubmit -d -n  -t -N -U -K -D -E -I]	data: [CertPrincipalName negative]
+    resubmit_1010	#scenario: [ipa-getcert resubmit -d -n  -t -N -U -K -D -E -I]	data: [CertPrincipalName negative]
     resubmit_1011	#scenario: [ipa-getcert resubmit -d -n  -t -N -U -K -D -E -I]	data: [EXTUSAGE negative]
-    #resubmit_1012	#scenario: [ipa-getcert resubmit -d -n  -t -N -U -K -D -E -I]	data: all positive
+    resubmit_1012	#scenario: [ipa-getcert resubmit -d -n  -t -N -U -K -D -E -I]	data: all positive
     resubmit_1013	#scenario: [ipa-getcert resubmit -f -N -U -K -D -E]	data: [PemCertFile negative]
     resubmit_1014	#scenario: [ipa-getcert resubmit -f  -P -N -U -K -D -E -I]	data: [PemCertFile negative]
-    #resubmit_1015	#scenario: [ipa-getcert resubmit -f -N -U -K -D -E]	data: [CertSubjectName negative]
+    resubmit_1015	#scenario: [ipa-getcert resubmit -f -N -U -K -D -E]	data: [CertSubjectName negative]
     resubmit_1016	#scenario: [ipa-getcert resubmit -f -N -U -K -D -E]	data: [EXTUSAGE negative]
-    #resubmit_1017	#scenario: [ipa-getcert resubmit -f -N -U -K -D -E]	data: [CertPrincipalName negative]
-    #resubmit_1018	#scenario: [ipa-getcert resubmit -f -N -U -K -D -E]	data: all positive
-    #resubmit_1019	#scenario: [ipa-getcert resubmit -f  -P -N -U -K -D -E -I]	data: [CertSubjectName negative]
+    resubmit_1017	#scenario: [ipa-getcert resubmit -f -N -U -K -D -E]	data: [CertPrincipalName negative]
+    resubmit_1018	#scenario: [ipa-getcert resubmit -f -N -U -K -D -E]	data: all positive
+    resubmit_1019	#scenario: [ipa-getcert resubmit -f  -P -N -U -K -D -E -I]	data: [CertSubjectName negative]
     resubmit_1020	#scenario: [ipa-getcert resubmit -f  -P -N -U -K -D -E -I]	data: [EXTUSAGE negative]
-    #resubmit_1021	#scenario: [ipa-getcert resubmit -f  -P -N -U -K -D -E -I]	data: [CertPrincipalName negative]
+    resubmit_1021	#scenario: [ipa-getcert resubmit -f  -P -N -U -K -D -E -I]	data: [CertPrincipalName negative]
     resubmit_1022	#scenario: [ipa-getcert resubmit -f  -P -N -U -K -D -E -I]	data: [EXTUSAGE negative]
-    #resubmit_1023	#scenario: [ipa-getcert resubmit -f  -P -N -U -K -D -E -I]	data: all positive
-    #resubmit_1024	#scenario: [ipa-getcert resubmit -i -N -U -K -D -E]	data: [TrackingRequestNickName negative]
-    #resubmit_1025	#scenario: [ipa-getcert resubmit -i -N -U -K -D -E -I]	data: [TrackingRequestNickName negative]
-    #resubmit_1026	#scenario: [ipa-getcert resubmit -i -N -U -K -D -E]	data: [CertSubjectName negative]
-    #resubmit_1027	#scenario: [ipa-getcert resubmit -i -N -U -K -D -E -I]	data: [CertSubjectName negative]
+    resubmit_1023	#scenario: [ipa-getcert resubmit -f  -P -N -U -K -D -E -I]	data: all positive
+    resubmit_1024	#scenario: [ipa-getcert resubmit -i -N -U -K -D -E]	data: [TrackingRequestNickName negative]
+    resubmit_1025	#scenario: [ipa-getcert resubmit -i -N -U -K -D -E -I]	data: [TrackingRequestNickName negative]
+    resubmit_1026	#scenario: [ipa-getcert resubmit -i -N -U -K -D -E]	data: [CertSubjectName negative]
+    resubmit_1027	#scenario: [ipa-getcert resubmit -i -N -U -K -D -E -I]	data: [CertSubjectName negative]
     resubmit_1028	#scenario: [ipa-getcert resubmit -i -N -U -K -D -E]	data: [EXTUSAGE negative]
     resubmit_1029	#scenario: [ipa-getcert resubmit -i -N -U -K -D -E -I]	data: [EXTUSAGE negative]
-    #resubmit_1030	#scenario: [ipa-getcert resubmit -i -N -U -K -D -E]	data: [CertPrincipalName negative]
-    #resubmit_1031	#scenario: [ipa-getcert resubmit -i -N -U -K -D -E -I]	data: [CertPrincipalName negative]
-    #resubmit_1032	#scenario: [ipa-getcert resubmit -i -N -U -K -D -E]	data: all positive
+    resubmit_1030	#scenario: [ipa-getcert resubmit -i -N -U -K -D -E]	data: [CertPrincipalName negative]
+    resubmit_1031	#scenario: [ipa-getcert resubmit -i -N -U -K -D -E -I]	data: [CertPrincipalName negative]
+    resubmit_1032	#scenario: [ipa-getcert resubmit -i -N -U -K -D -E]	data: all positive
     resubmit_1033	#scenario: [ipa-getcert resubmit -i -N -U -K -D -E -I]	data: [EXTUSAGE negative]
-    #resubmit_1034	#scenario: [ipa-getcert resubmit -i -N -U -K -D -E -I]	data: all positive
+    resubmit_1034	#scenario: [ipa-getcert resubmit -i -N -U -K -D -E -I]	data: all positive
     resubmit_envcleanup
 } #resubmit
 resubmit_envsetup()
@@ -6619,7 +6619,7 @@ resubmit_1003()  #ipa-getcert resubmit -d [NSSDBDIR positive] -n [ExistingCertNi
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
         local expectedErrCode="0" 
-        local expectedErrMsg="__errmsg_NOT_FOUND_IN_DB__" 
+        local expectedErrMsg="" 
         local comment="scenario: [ipa-getcert resubmit -d -n -N -U -K -D -E]	data: [CertSubjectName negative]" 
         # verifyString not defined, it will be ignore 
 
@@ -6693,7 +6693,7 @@ resubmit_1005()  #ipa-getcert resubmit -d [NSSDBDIR positive] -n [ExistingCertNi
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
         local expectedErrCode="0" 
-        local expectedErrMsg="No_errmsg_defined_Ignore_Me" 
+        local expectedErrMsg="" 
         local comment="scenario: [ipa-getcert resubmit -d -n -N -U -K -D -E]	data: [CertPrincipalName negative]" 
         local verifyString="status: NEED_KEY_PAIR\|status: CA_UNREACHABLE\|status: CA_UNCONFIGURED"
 
@@ -6763,7 +6763,7 @@ resubmit_1007()  #ipa-getcert resubmit -d [NSSDBDIR positive] -n [ExistingCertNi
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
         local expectedErrCode="0" 
-        local expectedErrMsg="No_errmsg_defined_Ignore_Me" 
+        local expectedErrMsg="" 
         local comment="scenario: [ipa-getcert resubmit -d -n  -t -N -U -K -D -E -I]	data: [CertTokenName negative]" 
         local verifyString="status: NEED_KEY_PAIR"
 
@@ -6878,7 +6878,7 @@ resubmit_1010()  #ipa-getcert resubmit -d [NSSDBDIR positive] -n [ExistingCertNi
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
         local expectedErrCode="0" 
-        local expectedErrMsg="No_errmsg_defined_Ignore_Me" 
+        local expectedErrMsg="" 
         local comment="scenario: [ipa-getcert resubmit -d -n  -t -N -U -K -D -E -I]	data: [CertPrincipalName negative]" 
         local verifyString="status: NEED_KEY_PAIR\|status: CA_UNREACHABLE\|status: CA_UNCONFIGURED"
 
@@ -7131,7 +7131,7 @@ resubmit_1017()  #ipa-getcert resubmit -f [PemCertFile positive] -N [CertSubject
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
         local expectedErrCode="0" 
-        local expectedErrMsg="No_errmsg_defined_Ignore_Me" 
+        local expectedErrMsg="" 
         local comment="scenario: [ipa-getcert resubmit -f -N -U -K -D -E]	data: [CertPrincipalName negative]" 
         local verifyString="status: NEED_KEY_PAIR\|status: CA_UNREACHABLE\|status: CA_UNCONFIGURED"
 
@@ -7274,7 +7274,7 @@ resubmit_1021()  #ipa-getcert resubmit -f [PemCertFile positive] -P [CertPIN pos
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
         local expectedErrCode="0" 
-        local expectedErrMsg="No_errmsg_defined_Ignore_Me" 
+        local expectedErrMsg="" 
         local comment="scenario: [ipa-getcert resubmit -f  -P -N -U -K -D -E -I]	data: [CertPrincipalName negative]" 
         local verifyString="status: NEED_KEY_PAIR\|status: CA_UNREACHABLE\|status: CA_UNCONFIGURED"
 
@@ -7597,7 +7597,7 @@ resubmit_1030()  #ipa-getcert resubmit -i [TrackingRequestNickName positive] -N 
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
         local expectedErrCode="0" 
-        local expectedErrMsg="No_errmsg_defined_Ignore_Me" 
+        local expectedErrMsg="" 
         local comment="scenario: [ipa-getcert resubmit -i -N -U -K -D -E]	data: [CertPrincipalName negative]" 
         local verifyString="status: NEED_KEY_PAIR\|status: CA_UNREACHABLE\|status: CA_UNCONFIGURED"
 
@@ -7633,7 +7633,7 @@ resubmit_1031()  #ipa-getcert resubmit -i [TrackingRequestNickName positive] -N 
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
         local expectedErrCode="0" 
-        local expectedErrMsg="No_errmsg_defined_Ignore_Me" 
+        local expectedErrMsg="" 
         local comment="scenario: [ipa-getcert resubmit -i -N -U -K -D -E -I]	data: [CertPrincipalName negative]" 
         local verifyString="status: NEED_KEY_PAIR\|status: CA_UNREACHABLE\|status: CA_UNCONFIGURED"
 
