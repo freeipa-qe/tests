@@ -8,12 +8,12 @@
 
 ipagetcert() #total test cases: 203
 {
-#    request
-#    start_tracking
+    request
+    start_tracking
     stop_tracking
-#    resubmit
-#    list
-#    list_cas
+    resubmit
+    list
+    list_cas
 } #ipagetcert
 
 request()
