@@ -1,40 +1,38 @@
 <job>
 	<whiteboard>
-		ipa-server ipa-getcert RHEL6.2 build RC
+		ipa-server ipa-getcert RHEL6.2 build RC x86_64
 	</whiteboard>
 	<recipeSet>
-		<recipe whiteboard="ipa-getcert RHEL 6.2 RC">
+		<recipe whiteboard="ipa-getcert RHEL 6.2 RC x86_64">
+		    <autopick random="false"/>
+            <watchdog panic="None" />
+            <ks_appends/>
+            <packages/>
             <repos>
-                <repo name="ipa_rc" url="http://download.lab.bos.redhat.com/rel-eng/RHEL6.2-RC-1.0/6.2/Server/i386/os/"/>
-                <repo name="ipa_noarch_rc" url="http://download.lab.bos.redhat.com/rel-eng/RHEL6.2-RC-1.0/6.2/Server/optional/i386/os/"/>
+                <repo name="ipa_rc" url="http://download.lab.bos.redhat.com/rel-eng/RHEL6.2-RC-4.0/6.2/Server/x86_64/os/"/>
+                <repo name="ipa_noarch_rc" url="http://download.lab.bos.redhat.com/rel-eng/RHEL6.2-RC-4.0/6.2/Server/optional/x86_64/os/"/>
             </repos>
-
 			<distroRequires>
 				<and>
 					<distro_family op="=" value="RedHatEnterpriseLinux6"/>
 					<distro_variant op="=" value="Server"/>
-					<distro_method op="=" value="nfs"/>
 					<distro_tag op="=" value="STABLE"/>
 					<distro_arch op="=" value="x86_64"/>
 				</and>
 				<distro_virt op="=" value=""/>
 			</distroRequires>
+			<hostRequires/>
+			<!--
 			<hostRequires>
-                <and>
+			    <and>
                     <hostname op="=" value="mv32b-vm.idm.lab.bos.redhat.com" />
                 </and>
 			</hostRequires>
-
+            -->
 			<partitions/>
 
 			<task name="/distribution/install" role="STANDALONE">
 				<params/>
-			</task>
-
-     		<task name="/distribution/pkginstall" role="STANDALONE">
-				<params>
-				<param name="PKGARGNAME" value="expect"/>
-				</params>
 			</task>
 
 			<task name="/CoreOS/ipa-server/shared" role="STANDALONE">
@@ -44,6 +42,7 @@
 				<params/>
 			</task>
            	<task name="/CoreOS/ipa-server/acceptance/ipa-getcert" role="MASTER">
+				<params/>
 			</task>
 			<task name="/CoreOS/ipa-server/acceptance/uninstall" role="STANDALONE">
 				<params/>
