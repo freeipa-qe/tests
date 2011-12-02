@@ -193,6 +193,7 @@ certRun()
         then 
             rlPass "expected message matches"
         else
+            rlLog "expected message not found in output, check the verifyString"
             if [ ! "$verifyString" = "" ];then
                 rlLog "verify [$verifyString]"
                 if grep -i "New .* request .* added" $out 2>&1 >/dev/null
@@ -221,7 +222,7 @@ certRun()
                     debug="debug"
                 fi
             else
-                rlFail "error message does not match as expected";
+                rlFail "verifyString is empty, report error: message does not match as expected";
                 debug="debug"
             fi
         fi
@@ -230,9 +231,9 @@ certRun()
     # if debug is defined
     if [ "$debug" = "debug" ];then
         echo "========== expected message ==============="
-        echo "expected msg : $expectMsg"
+        echo "expected msg : [$expectMsg]"
         if [ "$verifyString" != "" ];then
-            echo "verify string: $verifyString"
+            echo "verifyString : [$verifyString]"
         fi
         echo "==========  actual  output  ==============="
         cat $out

@@ -132,9 +132,9 @@ request_1001()  #ipa-getcert request -d [NSSDBDIR negative] -n [CertNickName pos
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
         local expectedErrCode="1" 
-        local expectedErrMsg="The location \"$NSSDBDIR_negative\" is not a directory\|No request found that matched arguments\|Path \"$NSSDBDIR_negative\" is not a directory."
+        local expectedErrMsg="The location \"$NSSDBDIR_negative\" must be a directory\|No request found that matched arguments\|Path \"$NSSDBDIR_negative\" is not a directory."
         local comment="scenario: [ipa-getcert request -d -n]	data: [NSSDBDIR negative]" 
-	local verifyString="Path \"$NSSDBDIR_negative\" is not a directory."
+        local verifyString="Path \"$NSSDBDIR_negative\" is not a directory."
 
         # test starts here  
         certRun "ipa-getcert request -d $NSSDBDIR_negative -n $CertNickName_positive" "$tmpout" $expectedErrCode "$expectedErrMsg" "$comment"  "$verifyString"
@@ -171,7 +171,7 @@ request_1002()  #ipa-getcert request -d [NSSDBDIR negative] -n [CertNickName pos
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
         local expectedErrCode="1" 
-        local expectedErrMsg="The location \"$NSSDBDIR_negative\" is not a directory\|No request found that matched arguments\|Path \"$NSSDBDIR_negative\" is not a directory." 
+        local expectedErrMsg="The location \"$NSSDBDIR_negative\" must be a directory\|No request found that matched arguments\|Path \"$NSSDBDIR_negative\" is not a directory." 
         local comment="scenario: [ipa-getcert request -d -n  -t -I -R -N -K -U -D -E]	data: [NSSDBDIR negative]" 
         local verifyString="Path \"$NSSDBDIR_negative\" is not a directory."
 
@@ -210,7 +210,7 @@ request_1003()  #ipa-getcert request -d [NSSDBDIR negative] -n [CertNickName pos
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
         local expectedErrCode="1" 
-        local expectedErrMsg="The location \"$NSSDBDIR_negative\" is not a directory\|No request found that matched arguments\|Path \"$NSSDBDIR_negative\" is not a directory." 
+        local expectedErrMsg="The location \"$NSSDBDIR_negative\" must be a directory\|No request found that matched arguments\|Path \"$NSSDBDIR_negative\" is not a directory." 
         local comment="scenario: [ipa-getcert request -d -n  -t -I -r -N -K -U -D -E]	data: [NSSDBDIR negative]" 
         local verifyString="Path \"$NSSDBDIR_negative\" is not a directory."
 
@@ -249,7 +249,7 @@ request_1004()  #ipa-getcert request -d [NSSDBDIR negative] -n [CertNickName pos
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
         local expectedErrCode="1" 
-        local expectedErrMsg="The location \"$NSSDBDIR_negative\" is not a directory\|No request found that matched arguments\|Path \"$NSSDBDIR_negative\" is not a directory." 
+        local expectedErrMsg="The location \"$NSSDBDIR_negative\" must be a directory\|No request found that matched arguments\|Path \"$NSSDBDIR_negative\" is not a directory." 
         local comment="scenario: [ipa-getcert request -d -n  -t -g -R -N -K -U -D -E]	data: [NSSDBDIR negative]" 
         local verifyString="Path \"$NSSDBDIR_negative\" is not a directory."
 
@@ -288,7 +288,7 @@ request_1005()  #ipa-getcert request -d [NSSDBDIR negative] -n [CertNickName pos
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
         local expectedErrCode="1" 
-        local expectedErrMsg="The location \"$NSSDBDIR_negative\" is not a directory\|No request found that matched arguments\|Path \"$NSSDBDIR_negative\" is not a directory." 
+        local expectedErrMsg="The location \"$NSSDBDIR_negative\" must be a directory\|No request found that matched arguments\|Path \"$NSSDBDIR_negative\" is not a directory." 
         local comment="scenario: [ipa-getcert request -d -n  -t -g -r -N -K -U -D -E]	data: [NSSDBDIR negative]" 
         local verifyString="Path \"$NSSDBDIR_negative\" is not a directory."
 
@@ -523,7 +523,7 @@ request_1011()  #ipa-getcert request -d [NSSDBDIR positive] -n [CertNickName pos
         # verifyString not defined, it will be ignore 
 
         # test starts here  
-        local cmd="ipa-getcert request -d $NSSDBDIR_positive -n '$CertNickName_positive' -t '$CertTokenName_positive' -I '$CertRequestNickName_negative' -R -N '$CertSubjectName_positive' -K '$CertPrincipalName_positive' -U $EXTUSAGE_positive -D '$DNSName_positive' -E '$EMAIL_positive'"
+        local cmd="ipa-getcert request -d $NSSDBDIR_positive -n $CertNickName_positive -t \"$CertTokenName_positive\" -I $CertRequestNickName_negative -R -N $CertSubjectName_positive -K $CertPrincipalName_positive -U $EXTUSAGE_positive -D $DNSName_positive -E $EMAIL_positive"
         certRun "$cmd" "$tmpout" $expectedErrCode "$expectedErrMsg" "$comment"  "$verifyString"
         #certRun "ipa-getcert request -d $NSSDBDIR_positive -n $CertNickName_positive -t '$CertTokenName_positive' -I $CertRequestNickName_negative -R -N $CertSubjectName_positive -K $CertPrincipalName_positive -U $EXTUSAGE_positive -D $DNSName_positive -E $EMAIL_positive" "$tmpout" $expectedErrCode "$expectedErrMsg" "$comment"  "$verifyString"
 
@@ -1117,7 +1117,7 @@ request_1027()  #ipa-getcert request -k [PemKeyFile negative] -f [PemCertFile po
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
         local expectedErrCode="1" 
-        local expectedErrMsg="Path \"/root/${testID}\" is not a directory\|No request found that matched arguments\|Path \"/root/${testID}\" is not a directory.\|\"/root/${testID}\": No such file or directory." 
+        local expectedErrMsg="Path \"/root/${testID}\" is not a directory\|No request found that matched arguments\|Path \"/root/${testID}\" is not a directory.\|\"/root/${testID}\": No such file or directory.\|The parent of location \"$PemKeyFile_negative\" must be a valid directory" 
         local comment="scenario: [ipa-getcert request -k -f]	data: [PemKeyFile negative]" 
         # verifyString not defined, it will be ignore 
 
@@ -1156,7 +1156,7 @@ request_1028()  #ipa-getcert request -k [PemKeyFile negative] -f [PemCertFile po
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
         local expectedErrCode="1" 
-        local expectedErrMsg="Path \"/root/${testID}\": No such file or directory.\|No request found that matched arguments" 
+        local expectedErrMsg="Path \"/root/${testID}\" is not a directory\|No request found that matched arguments\|The parent of location \"$PemKeyFile_negative\" must be a valid directory" 
         local comment="scenario: [ipa-getcert request -k -f  -P -I -R -N -K -U -D -E]	data: [PemKeyFile negative]" 
         # verifyString not defined, it will be ignore 
 
@@ -1195,7 +1195,7 @@ request_1029()  #ipa-getcert request -k [PemKeyFile negative] -f [PemCertFile po
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
         local expectedErrCode="1" 
-        local expectedErrMsg="Path \"/root/${testID}\": No such file or directory.\|No request found that matched arguments" 
+        local expectedErrMsg="Path \"/root/${testID}\" is not a directory\|No request found that matched arguments\|The parent of location \"$PemKeyFile_negative\" must be a valid directory" 
         local comment="scenario: [ipa-getcert request -k -f  -P -I -r -N -K -U -D -E]	data: [PemKeyFile negative]" 
         # verifyString not defined, it will be ignore 
 
@@ -1234,7 +1234,7 @@ request_1030()  #ipa-getcert request -k [PemKeyFile negative] -f [PemCertFile po
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
         local expectedErrCode="1" 
-        local expectedErrMsg="Path \"/root/${testID}\": No such file or directory.\|No request found that matched arguments" 
+        local expectedErrMsg="Path \"/root/${testID}\" is not a directory\|No request found that matched arguments\|The parent of location \"$PemKeyFile_negative\" must be a valid directory" 
         local comment="scenario: [ipa-getcert request -k -f  -P -g -R -N -K -U -D -E]	data: [PemKeyFile negative]" 
         # verifyString not defined, it will be ignore 
 
@@ -1273,7 +1273,7 @@ request_1031()  #ipa-getcert request -k [PemKeyFile negative] -f [PemCertFile po
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
         local expectedErrCode="1" 
-        local expectedErrMsg="Path \"/root/${testID}\": No such file or directory.\|No request found that matched arguments" 
+        local expectedErrMsg="Path \"/root/${testID}\" is not a directory\|No request found that matched arguments\|The parent of location \"$PemKeyFile_negative\" must be a valid directory" 
         local comment="scenario: [ipa-getcert request -k -f  -P -g -r -N -K -U -D -E]	data: [PemKeyFile negative]" 
         # verifyString not defined, it will be ignore 
 
@@ -1313,7 +1313,7 @@ request_1032()  #ipa-getcert request -k [PemKeyFile negative] -f [PemCertFile po
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
         local expectedErrCode="1" 
-        local expectedErrMsg="Path \"/root/${testID}\": No such file or directory.\|No request found that matched arguments" 
+        local expectedErrMsg="Path \"/root/${testID}\" is not a directory\|No request found that matched arguments\|The parent of location \"$PemKeyFile_negative\" must be a valid directory" 
         local comment="scenario: [ipa-getcert request -k -f  -p -I -R -N -K -U -D -E]	data: [PemKeyFile negative]" 
         # verifyString not defined, it will be ignore 
 
@@ -1354,7 +1354,7 @@ request_1033()  #ipa-getcert request -k [PemKeyFile negative] -f [PemCertFile po
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
         local expectedErrCode="1" 
-        local expectedErrMsg="Path \"/root/${testID}\": No such file or directory.\|No request found that matched arguments" 
+        local expectedErrMsg="Path \"/root/${testID}\" is not a directory\|No request found that matched arguments\|The parent of location \"$PemKeyFile_negative\" must be a valid directory" 
         local comment="scenario: [ipa-getcert request -k -f  -p -I -r -N -K -U -D -E]	data: [PemKeyFile negative]" 
         # verifyString not defined, it will be ignore 
 
@@ -1395,7 +1395,7 @@ request_1034()  #ipa-getcert request -k [PemKeyFile negative] -f [PemCertFile po
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
         local expectedErrCode="1" 
-        local expectedErrMsg="Path \"/root/${testID}\": No such file or directory.\|No request found that matched arguments" 
+        local expectedErrMsg="Path \"/root/${testID}\" is not a directory\|No request found that matched arguments\|The parent of location \"$PemKeyFile_negative\" must be a valid directory" 
         local comment="scenario: [ipa-getcert request -k -f  -p -g -R -N -K -U -D -E]	data: [PemKeyFile negative]" 
         # verifyString not defined, it will be ignore 
 
@@ -1436,7 +1436,7 @@ request_1035()  #ipa-getcert request -k [PemKeyFile negative] -f [PemCertFile po
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
         local expectedErrCode="1" 
-        local expectedErrMsg="Path \"/root/${testID}\": No such file or directory.\|No request found that matched arguments" 
+        local expectedErrMsg="Path \"/root/${testID}\" is not a directory\|No request found that matched arguments\|The parent of location \"$PemKeyFile_negative\" must be a valid directory" 
         local comment="scenario: [ipa-getcert request -k -f  -p -g -r -N -K -U -D -E]	data: [PemKeyFile negative]" 
         # verifyString not defined, it will be ignore 
 
@@ -3414,7 +3414,7 @@ start_tracking_1001()  #ipa-getcert start-tracking -d [NSSDBDIR negative] -n [Ce
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
         local expectedErrCode="1" 
-        local expectedErrMsg="Path \"$NSSDBDIR_negative\" is not a directory\|No request found that matched arguments" 
+        local expectedErrMsg="Path \"$NSSDBDIR_negative\" is not a directory\|No request found that matched arguments\|The location \"$NSSDBDIR_negative\" must be a directory" 
         local comment="scenario: [ipa-getcert start-tracking -d -n -t]	data: [NSSDBDIR negative]" 
         # verifyString not defined, it will be ignore 
 
@@ -3452,7 +3452,7 @@ start_tracking_1002()  #ipa-getcert start-tracking -d [NSSDBDIR negative] -n [Ce
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
         local expectedErrCode="1" 
-        local expectedErrMsg="Path \"$NSSDBDIR_negative\" is not a directory\|No request found that matched arguments" 
+        local expectedErrMsg="Path \"$NSSDBDIR_negative\" is not a directory\|No request found that matched arguments\|The location \"$NSSDBDIR_negative\" must be a directory" 
         local comment="scenario: [ipa-getcert start-tracking -d -n -t -I -U -K -D -E -R]	data: [NSSDBDIR negative]" 
         # verifyString not defined, it will be ignore 
 
@@ -3490,7 +3490,7 @@ start_tracking_1003()  #ipa-getcert start-tracking -d [NSSDBDIR negative] -n [Ce
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
         local expectedErrCode="1" 
-        local expectedErrMsg="Path \"$NSSDBDIR_negative\" is not a directory\|No request found that matched arguments" 
+        local expectedErrMsg="Path \"$NSSDBDIR_negative\" is not a directory\|No request found that matched arguments\|The location \"$NSSDBDIR_negative\" must be a directory" 
         local comment="scenario: [ipa-getcert start-tracking -d -n -t -I -U -K -D -E -r]	data: [NSSDBDIR negative]" 
         # verifyString not defined, it will be ignore 
 
@@ -4367,7 +4367,7 @@ start_tracking_1028()  #ipa-getcert start-tracking -k [PemKeyFile negative] -f [
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
         local expectedErrCode="1" 
-        local expectedErrMsg="Path \"/root/${testID}\": No such file or directory.\|No request found that matched arguments" 
+        local expectedErrMsg="Path \"/root/${testID}\" is not a directory\|No request found that matched arguments\|The parent of location \"$PemKeyFile_negative\" must be a valid directory" 
         local comment="scenario: [ipa-getcert start-tracking -k -f]	data: [PemKeyFile negative]" 
         # verifyString not defined, it will be ignore 
 
@@ -4404,7 +4404,7 @@ start_tracking_1029()  #ipa-getcert start-tracking -k [PemKeyFile negative] -f [
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
         local expectedErrCode="1" 
-        local expectedErrMsg="Path \"/root/${testID}\": No such file or directory.\|No request found that matched arguments" 
+        local expectedErrMsg="Path \"/root/${testID}\" is not a directory\|No request found that matched arguments\|The parent of location \"$PemKeyFile_negative\" must be a valid directory" 
         local comment="scenario: [ipa-getcert start-tracking -k -f -I -U -K -D -E -R]	data: [PemKeyFile negative]" 
         # verifyString not defined, it will be ignore 
 
@@ -4441,7 +4441,7 @@ start_tracking_1030()  #ipa-getcert start-tracking -k [PemKeyFile negative] -f [
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
         local expectedErrCode="1" 
-        local expectedErrMsg="Path \"/root/${testID}\": No such file or directory.\|No request found that matched arguments" 
+        local expectedErrMsg="Path \"/root/${testID}\" is not a directory\|No request found that matched arguments\|The parent of location \"$PemKeyFile_negative\" must be a valid directory" 
         local comment="scenario: [ipa-getcert start-tracking -k -f -I -U -K -D -E -r]	data: [PemKeyFile negative]" 
         # verifyString not defined, it will be ignore 
 
@@ -4474,7 +4474,7 @@ start_tracking_1031()  #ipa-getcert start-tracking -k [PemKeyFile negative] -f [
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
         local expectedErrCode="1" 
-        local expectedErrMsg="Path \"/root/${testID}\": No such file or directory.\|No request found that matched arguments" 
+        local expectedErrMsg="Path \"/root/${testID}\" is not a directory\|No request found that matched arguments\|The parent of location \"$PemKeyFile_negative\" must be a valid directory" 
         local comment="scenario: [ipa-getcert start-tracking -k -f -P]	data: [PemKeyFile negative]" 
         # verifyString not defined, it will be ignore 
 
@@ -4512,7 +4512,7 @@ start_tracking_1032()  #ipa-getcert start-tracking -k [PemKeyFile negative] -f [
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
         local expectedErrCode="1" 
-        local expectedErrMsg="Path \"/root/${testID}\" is not a directory\|No request found that matched arguments" 
+        local expectedErrMsg="Path \"/root/${testID}\" is not a directory\|No request found that matched arguments\|The parent of location \"$PemKeyFile_negative\" must be a valid directory" 
         local comment="scenario: [ipa-getcert start-tracking -k -f -P -I -U -K -D -E -R]	data: [PemKeyFile negative]" 
         # verifyString not defined, it will be ignore 
 
@@ -4550,7 +4550,7 @@ start_tracking_1033()  #ipa-getcert start-tracking -k [PemKeyFile negative] -f [
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
         local expectedErrCode="1" 
-        local expectedErrMsg="Path \"/root/${testID}\": No such file or directory.\|No request found that matched arguments" 
+        local expectedErrMsg="Path \"/root/${testID}\" is not a directory\|No request found that matched arguments\|The parent of location \"$PemKeyFile_negative\" must be a valid directory" 
         local comment="scenario: [ipa-getcert start-tracking -k -f -P -I -U -K -D -E -r]	data: [PemKeyFile negative]" 
         # verifyString not defined, it will be ignore 
 
@@ -4584,7 +4584,7 @@ start_tracking_1034()  #ipa-getcert start-tracking -k [PemKeyFile negative] -f [
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
         local expectedErrCode="1" 
-        local expectedErrMsg="Path \"/root/${testID}\": No such file or directory.\|No request found that matched arguments" 
+        local expectedErrMsg="Path \"/root/${testID}\" is not a directory\|No request found that matched arguments\|The parent of location \"$PemKeyFile_negative\" must be a valid directory" 
         local comment="scenario: [ipa-getcert start-tracking -k -f -p]	data: [PemKeyFile negative]" 
         # verifyString not defined, it will be ignore 
 
@@ -4624,7 +4624,7 @@ start_tracking_1035()  #ipa-getcert start-tracking -k [PemKeyFile negative] -f [
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
         local expectedErrCode="1" 
-        local expectedErrMsg="Path \"/root/${testID}\": No such file or directory.\|No request found that matched arguments" 
+        local expectedErrMsg="Path \"/root/${testID}\" is not a directory\|No request found that matched arguments\|The parent of location \"$PemKeyFile_negative\" must be a valid directory" 
         local comment="scenario: [ipa-getcert start-tracking -k -f -p -I -U -K -D -E -R]	data: [PemKeyFile negative]" 
         # verifyString not defined, it will be ignore 
 
@@ -4664,7 +4664,7 @@ start_tracking_1036()  #ipa-getcert start-tracking -k [PemKeyFile negative] -f [
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
         local expectedErrCode="1" 
-        local expectedErrMsg="Path \"/root/${testID}\": No such file or directory.\|No request found that matched arguments" 
+        local expectedErrMsg="Path \"/root/${testID}\" is not a directory\|No request found that matched arguments\|The parent of location \"$PemKeyFile_negative\" must be a valid directory" 
         local comment="scenario: [ipa-getcert start-tracking -k -f -p -I -U -K -D -E -r]	data: [PemKeyFile negative]" 
         # verifyString not defined, it will be ignore 
 
@@ -6169,13 +6169,13 @@ stop_tracking()
     stop_tracking_envsetup
     stop_tracking_1001	#scenario: [ipa-getcert stop-tracking -d -n -t]	data: [NSSDBDIR negative]
     stop_tracking_1002	#scenario: [ipa-getcert stop-tracking -d -n -t]	data: [ExistingCertNickName negative]
-    stop_tracking_1003	#scenario: [ipa-getcert stop-tracking -d -n -t]	data: [StopTrackingCertTokenName negative]
-    stop_tracking_1004	#scenario: [ipa-getcert stop-tracking -d -n -t]	data: all positive
+    #stop_tracking_1003	#scenario: [ipa-getcert stop-tracking -d -n -t]	data: [StopTrackingCertTokenName negative]
+    #stop_tracking_1004	#scenario: [ipa-getcert stop-tracking -d -n -t]	data: all positive
     stop_tracking_1005	#scenario: [ipa-getcert stop-tracking -i]	data: [ExistingTrackingRequestNickName negative]
     stop_tracking_1006	#scenario: [ipa-getcert stop-tracking -i]	data: all positive
     stop_tracking_1007	#scenario: [ipa-getcert stop-tracking -k -f]	data: [PemKeyFile negative]
     stop_tracking_1008	#scenario: [ipa-getcert stop-tracking -k -f]	data: [PemCertFile negative]
-    stop_tracking_1009	#scenario: [ipa-getcert stop-tracking -k -f]	data: all positive
+    #stop_tracking_1009	#scenario: [ipa-getcert stop-tracking -k -f]	data: all positive
     stop_tracking_envcleanup
 } #stop_tracking
 stop_tracking_envsetup()
@@ -6247,7 +6247,7 @@ stop_tracking_1002()  #ipa-getcert stop-tracking -d [NSSDBDIR positive] -n [Exis
         # verifyString not defined, it will be ignore 
 
         # test starts here  
-        certRun "ipa-getcert stop-tracking -d $NSSDBDIR_positive -n $ExistingCertNickName_negative -t '$StopTrackingCertTokenName_positive' " "$tmpout" $expectedErrCode "$expectedErrMsg" "$comment"  "$verifyString"
+        certRun "ipa-getcert stop-tracking -d $NSSDBDIR_positive -n $ExistingCertNickName_negative -t $StopTrackingCertTokenName_positive" "$tmpout" $expectedErrCode "$expectedErrMsg" "$comment"  "$verifyString"
 
         # test evn cleanup 
         #no data cleanup defined 
@@ -6392,7 +6392,7 @@ stop_tracking_1007()  #ipa-getcert stop-tracking -k [PemKeyFile negative] -f [Pe
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
         local expectedErrCode="1" 
-        local expectedErrMsg="Path \"/root/${testID}\": No such file or directory.\|No request found that matched arguments" 
+        local expectedErrMsg="Path \"/root/${testID}\" is not a directory\|No request found that matched arguments" 
         local comment="scenario: [ipa-getcert stop-tracking -k -f]	data: [PemKeyFile negative]" 
         # verifyString not defined, it will be ignore 
 
@@ -6475,38 +6475,38 @@ resubmit()
     resubmit_envsetup
     resubmit_1001	#scenario: [ipa-getcert resubmit -d -n -N -U -K -D -E]	data: [NSSDBDIR negative]
     resubmit_1002	#scenario: [ipa-getcert resubmit -d -n  -t -N -U -K -D -E -I]	data: [NSSDBDIR negative]
-    resubmit_1003	#scenario: [ipa-getcert resubmit -d -n -N -U -K -D -E]	data: [CertSubjectName negative]
+    #resubmit_1003	#scenario: [ipa-getcert resubmit -d -n -N -U -K -D -E]	data: [CertSubjectName negative]
     resubmit_1004	#scenario: [ipa-getcert resubmit -d -n -N -U -K -D -E]	data: [EXTUSAGE negative]
-    resubmit_1005	#scenario: [ipa-getcert resubmit -d -n -N -U -K -D -E]	data: [CertPrincipalName negative]
+    #resubmit_1005	#scenario: [ipa-getcert resubmit -d -n -N -U -K -D -E]	data: [CertPrincipalName negative]
     resubmit_1006	#scenario: [ipa-getcert resubmit -d -n -N -U -K -D -E]	data: all positive
-    resubmit_1007	#scenario: [ipa-getcert resubmit -d -n  -t -N -U -K -D -E -I]	data: [CertTokenName negative]
-    resubmit_1008	#scenario: [ipa-getcert resubmit -d -n  -t -N -U -K -D -E -I]	data: [CertSubjectName negative]
+    #resubmit_1007	#scenario: [ipa-getcert resubmit -d -n  -t -N -U -K -D -E -I]	data: [CertTokenName negative]
+    #resubmit_1008	#scenario: [ipa-getcert resubmit -d -n  -t -N -U -K -D -E -I]	data: [CertSubjectName negative]
     resubmit_1009	#scenario: [ipa-getcert resubmit -d -n  -t -N -U -K -D -E -I]	data: [EXTUSAGE negative]
-    resubmit_1010	#scenario: [ipa-getcert resubmit -d -n  -t -N -U -K -D -E -I]	data: [CertPrincipalName negative]
+    #resubmit_1010	#scenario: [ipa-getcert resubmit -d -n  -t -N -U -K -D -E -I]	data: [CertPrincipalName negative]
     resubmit_1011	#scenario: [ipa-getcert resubmit -d -n  -t -N -U -K -D -E -I]	data: [EXTUSAGE negative]
-    resubmit_1012	#scenario: [ipa-getcert resubmit -d -n  -t -N -U -K -D -E -I]	data: all positive
+    #resubmit_1012	#scenario: [ipa-getcert resubmit -d -n  -t -N -U -K -D -E -I]	data: all positive
     resubmit_1013	#scenario: [ipa-getcert resubmit -f -N -U -K -D -E]	data: [PemCertFile negative]
     resubmit_1014	#scenario: [ipa-getcert resubmit -f  -P -N -U -K -D -E -I]	data: [PemCertFile negative]
-    resubmit_1015	#scenario: [ipa-getcert resubmit -f -N -U -K -D -E]	data: [CertSubjectName negative]
+    #resubmit_1015	#scenario: [ipa-getcert resubmit -f -N -U -K -D -E]	data: [CertSubjectName negative]
     resubmit_1016	#scenario: [ipa-getcert resubmit -f -N -U -K -D -E]	data: [EXTUSAGE negative]
-    resubmit_1017	#scenario: [ipa-getcert resubmit -f -N -U -K -D -E]	data: [CertPrincipalName negative]
-    resubmit_1018	#scenario: [ipa-getcert resubmit -f -N -U -K -D -E]	data: all positive
-    resubmit_1019	#scenario: [ipa-getcert resubmit -f  -P -N -U -K -D -E -I]	data: [CertSubjectName negative]
+    #resubmit_1017	#scenario: [ipa-getcert resubmit -f -N -U -K -D -E]	data: [CertPrincipalName negative]
+    #resubmit_1018	#scenario: [ipa-getcert resubmit -f -N -U -K -D -E]	data: all positive
+    #resubmit_1019	#scenario: [ipa-getcert resubmit -f  -P -N -U -K -D -E -I]	data: [CertSubjectName negative]
     resubmit_1020	#scenario: [ipa-getcert resubmit -f  -P -N -U -K -D -E -I]	data: [EXTUSAGE negative]
-    resubmit_1021	#scenario: [ipa-getcert resubmit -f  -P -N -U -K -D -E -I]	data: [CertPrincipalName negative]
+    #resubmit_1021	#scenario: [ipa-getcert resubmit -f  -P -N -U -K -D -E -I]	data: [CertPrincipalName negative]
     resubmit_1022	#scenario: [ipa-getcert resubmit -f  -P -N -U -K -D -E -I]	data: [EXTUSAGE negative]
-    resubmit_1023	#scenario: [ipa-getcert resubmit -f  -P -N -U -K -D -E -I]	data: all positive
-    resubmit_1024	#scenario: [ipa-getcert resubmit -i -N -U -K -D -E]	data: [TrackingRequestNickName negative]
-    resubmit_1025	#scenario: [ipa-getcert resubmit -i -N -U -K -D -E -I]	data: [TrackingRequestNickName negative]
-    resubmit_1026	#scenario: [ipa-getcert resubmit -i -N -U -K -D -E]	data: [CertSubjectName negative]
-    resubmit_1027	#scenario: [ipa-getcert resubmit -i -N -U -K -D -E -I]	data: [CertSubjectName negative]
+    #resubmit_1023	#scenario: [ipa-getcert resubmit -f  -P -N -U -K -D -E -I]	data: all positive
+    #resubmit_1024	#scenario: [ipa-getcert resubmit -i -N -U -K -D -E]	data: [TrackingRequestNickName negative]
+    #resubmit_1025	#scenario: [ipa-getcert resubmit -i -N -U -K -D -E -I]	data: [TrackingRequestNickName negative]
+    #resubmit_1026	#scenario: [ipa-getcert resubmit -i -N -U -K -D -E]	data: [CertSubjectName negative]
+    #resubmit_1027	#scenario: [ipa-getcert resubmit -i -N -U -K -D -E -I]	data: [CertSubjectName negative]
     resubmit_1028	#scenario: [ipa-getcert resubmit -i -N -U -K -D -E]	data: [EXTUSAGE negative]
     resubmit_1029	#scenario: [ipa-getcert resubmit -i -N -U -K -D -E -I]	data: [EXTUSAGE negative]
-    resubmit_1030	#scenario: [ipa-getcert resubmit -i -N -U -K -D -E]	data: [CertPrincipalName negative]
-    resubmit_1031	#scenario: [ipa-getcert resubmit -i -N -U -K -D -E -I]	data: [CertPrincipalName negative]
-    resubmit_1032	#scenario: [ipa-getcert resubmit -i -N -U -K -D -E]	data: all positive
+    #resubmit_1030	#scenario: [ipa-getcert resubmit -i -N -U -K -D -E]	data: [CertPrincipalName negative]
+    #resubmit_1031	#scenario: [ipa-getcert resubmit -i -N -U -K -D -E -I]	data: [CertPrincipalName negative]
+    #resubmit_1032	#scenario: [ipa-getcert resubmit -i -N -U -K -D -E]	data: all positive
     resubmit_1033	#scenario: [ipa-getcert resubmit -i -N -U -K -D -E -I]	data: [EXTUSAGE negative]
-    resubmit_1034	#scenario: [ipa-getcert resubmit -i -N -U -K -D -E -I]	data: all positive
+    #resubmit_1034	#scenario: [ipa-getcert resubmit -i -N -U -K -D -E -I]	data: all positive
     resubmit_envcleanup
 } #resubmit
 resubmit_envsetup()
@@ -6619,7 +6619,7 @@ resubmit_1003()  #ipa-getcert resubmit -d [NSSDBDIR positive] -n [ExistingCertNi
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
         local expectedErrCode="0" 
-        local expectedErrMsg="" 
+        local expectedErrMsg="__errmsg_NOT_FOUND_IN_DB__" 
         local comment="scenario: [ipa-getcert resubmit -d -n -N -U -K -D -E]	data: [CertSubjectName negative]" 
         # verifyString not defined, it will be ignore 
 
