@@ -1234,7 +1234,7 @@ request_1030()  #ipa-getcert request -k [PemKeyFile negative] -f [PemCertFile po
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
         local expectedErrCode="1" 
-        local expectedErrMsg="Path \"/root/${testID}\" is not a directory\|No request found that matched arguments\|The parent of location \"$PemKeyFile_negative\" must be a valid directory" 
+        local expectedErrMsg="Path \"/root/${testID}\" is not a directory\|No request found that matched arguments\|The parent of location \"$PemKeyFile_negative\" must be a valid directory\|Path \"/root/${testID}\": No such file or directory" 
         local comment="scenario: [ipa-getcert request -k -f  -P -g -R -N -K -U -D -E]	data: [PemKeyFile negative]" 
         # verifyString not defined, it will be ignore 
 
@@ -6392,7 +6392,7 @@ stop_tracking_1007()  #ipa-getcert stop-tracking -k [PemKeyFile negative] -f [Pe
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
         local expectedErrCode="1" 
-        local expectedErrMsg="Path \"/root/${testID}\" is not a directory\|No request found that matched arguments\|Path \"$/root/${testID}\": No such file or directory" 
+        local expectedErrMsg="Path \"/root/${testID}\" is not a directory\|No request found that matched arguments\|Path \"$/root/${testID}\": No such file or directory\|\"/root/${testID}\": No such file or directory" 
         local comment="scenario: [ipa-getcert stop-tracking -k -f]	data: [PemKeyFile negative]" 
         # verifyString not defined, it will be ignore 
 
