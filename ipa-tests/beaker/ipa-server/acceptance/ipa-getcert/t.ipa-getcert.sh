@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -x
 #testsuite : ipa-getcert
 #author    : Yi Zhang (yzhang@redhat.com)
 #testplan  : IPA client tool ipa-getcert Test Plan
@@ -106,6 +106,7 @@ request_envsetup()
 {
     rlPhaseStartSetup "request_envsetup"
         #environment setup starts here
+	clean_requests
         #environment setup ends   here
     rlPhaseEnd
 } #envsetup
@@ -113,6 +114,7 @@ request_envcleanup()
 {
     rlPhaseStartCleanup "request_envcleanup"
         #environment cleanup starts here
+	clean_requests
         #environment cleanup ends   here
     rlPhaseEnd
 } #envcleanup
@@ -142,6 +144,16 @@ request_1001()  #ipa-getcert request -d [NSSDBDIR negative] -n [CertNickName pos
         # test evn cleanup 
         #no data cleanup defined 
 
+        # check for request creation
+
+        # if there was a request ...
+        check=`check_request`
+        rlLog "check_request returned: $check"
+        if [ -n "$check" ] ; then
+                rlFail "Appears that a request was generated when an error was expected.  Requestid: $check"
+                clean_requests
+        fi
+
         # test cleanup 
         if [ -f $tmpout ];then 
             rm $tmpout 
@@ -158,7 +170,7 @@ request_1002()  #ipa-getcert request -d [NSSDBDIR negative] -n [CertNickName pos
         local tmpout=${TmpDir}/request_1002.${RANDOM}.out
         local NSSDBDIR_negative="/etc/pki/nssdb/cert8.db"
         local CertNickName_positive="GetcertTest-${testID}"
-        local CertTokenName_positive="NSS Certificate DB"
+        local CertTokenName_positive="NSSCertificateDB"
         local CertRequestNickName_positive="CertReq_${testID}_${RANDOM}"
         local CertSubjectName_positive="$cert_subject"
         local CertPrincipalName_positive="${testID}/${fqdn}@${RELM}"
@@ -181,6 +193,16 @@ request_1002()  #ipa-getcert request -d [NSSDBDIR negative] -n [CertNickName pos
         # test evn cleanup 
         #no data cleanup defined 
 
+        # check for request creation
+
+        # if there was a request ...
+        check=`check_request`
+        rlLog "check_request returned: $check"
+        if [ -n "$check" ] ; then
+                rlFail "Appears that a request was generated when an error was expected.  Requestid: $check"
+                clean_requests
+        fi
+
         # test cleanup 
         if [ -f $tmpout ];then 
             rm $tmpout 
@@ -197,7 +219,7 @@ request_1003()  #ipa-getcert request -d [NSSDBDIR negative] -n [CertNickName pos
         local tmpout=${TmpDir}/request_1003.${RANDOM}.out
         local NSSDBDIR_negative="/etc/pki/nssdb/cert8.db"
         local CertNickName_positive="GetcertTest-${testID}"
-        local CertTokenName_positive="NSS Certificate DB"
+        local CertTokenName_positive="NSSCertificateDB"
         local CertRequestNickName_positive="CertReq_${testID}_${RANDOM}"
         local CertSubjectName_positive="$cert_subject"
         local CertPrincipalName_positive="${testID}/${fqdn}@${RELM}"
@@ -220,6 +242,16 @@ request_1003()  #ipa-getcert request -d [NSSDBDIR negative] -n [CertNickName pos
         # test evn cleanup 
         #no data cleanup defined 
 
+        # check for request creation
+
+        # if there was a request ...
+        check=`check_request`
+        rlLog "check_request returned: $check"
+        if [ -n "$check" ] ; then
+                rlFail "Appears that a request was generated when an error was expected.  Requestid: $check"
+                clean_requests
+        fi
+
         # test cleanup 
         if [ -f $tmpout ];then 
             rm $tmpout 
@@ -236,7 +268,7 @@ request_1004()  #ipa-getcert request -d [NSSDBDIR negative] -n [CertNickName pos
         local tmpout=${TmpDir}/request_1004.${RANDOM}.out
         local NSSDBDIR_negative="/etc/pki/nssdb/cert8.db"
         local CertNickName_positive="GetcertTest-${testID}"
-        local CertTokenName_positive="NSS Certificate DB"
+        local CertTokenName_positive="NSSCertificateDB"
         local CertKeySize_positive="1024"
         local CertSubjectName_positive="$cert_subject"
         local CertPrincipalName_positive="${testID}/${fqdn}@${RELM}"
@@ -259,6 +291,16 @@ request_1004()  #ipa-getcert request -d [NSSDBDIR negative] -n [CertNickName pos
         # test evn cleanup 
         #no data cleanup defined 
 
+        # check for request creation
+
+        # if there was a request ...
+        check=`check_request`
+        rlLog "check_request returned: $check"
+        if [ -n "$check" ] ; then
+                rlFail "Appears that a request was generated when an error was expected.  Requestid: $check"
+                clean_requests
+        fi
+
         # test cleanup 
         if [ -f $tmpout ];then 
             rm $tmpout 
@@ -275,7 +317,7 @@ request_1005()  #ipa-getcert request -d [NSSDBDIR negative] -n [CertNickName pos
         local tmpout=${TmpDir}/request_1005.${RANDOM}.out
         local NSSDBDIR_negative="/etc/pki/nssdb/cert8.db"
         local CertNickName_positive="GetcertTest-${testID}"
-        local CertTokenName_positive="NSS Certificate DB"
+        local CertTokenName_positive="NSSCertificateDB"
         local CertKeySize_positive="1024"
         local CertSubjectName_positive="$cert_subject"
         local CertPrincipalName_positive="${testID}/${fqdn}@${RELM}"
@@ -297,6 +339,16 @@ request_1005()  #ipa-getcert request -d [NSSDBDIR negative] -n [CertNickName pos
 
         # test evn cleanup 
         #no data cleanup defined 
+
+        # check for request creation
+
+        # if there was a request ...
+        check=`check_request`
+        rlLog "check_request returned: $check"
+        if [ -n "$check" ] ; then
+                rlFail "Appears that a request was generated when an error was expected.  Requestid: $check"
+                clean_requests
+        fi
 
         # test cleanup 
         if [ -f $tmpout ];then 
@@ -324,6 +376,13 @@ request_1006()   #ipa-getcert request -d [NSSDBDIR positive] -n [CertNickName po
 
         # test env cleanup 
         #no data cleanup defined 
+        # stop tracking or certmonger will start taking up all system resources trying to generate keys!
+        check=`check_request`
+        rlLog "check_request returned: $check"
+        if [ -n "$check" ] ; then
+                rlLog "Request successful!  Requestid: $check"
+                clean_requests
+        fi
 
         # test clean up 
         if [ -f $tmpout ];then 
@@ -365,6 +424,13 @@ request_1007()  #ipa-getcert request -d [NSSDBDIR positive] -n [CertNickName pos
 
         # test evn cleanup 
         #no data cleanup defined 
+        # stop tracking or certmonger will start taking up all system resources trying to generate keys!
+        check=`check_request`
+        rlLog "check_request returned: $check"
+        if [ -n "$check" ] ; then
+                rlLog "Request successful!  Requestid: $check"
+                clean_requests
+        fi
 
         # test cleanup 
         if [ -f $tmpout ];then 
@@ -406,6 +472,13 @@ request_1008()  #ipa-getcert request -d [NSSDBDIR positive] -n [CertNickName pos
 
         # test evn cleanup 
         #no data cleanup defined 
+        # stop tracking or certmonger will start taking up all system resources trying to generate keys!
+        check=`check_request`
+        rlLog "check_request returned: $check"
+        if [ -n "$check" ] ; then
+                rlLog "Request successful!  Requestid: $check"
+                clean_requests
+        fi
 
         # test cleanup 
         if [ -f $tmpout ];then 
@@ -447,6 +520,13 @@ request_1009()  #ipa-getcert request -d [NSSDBDIR positive] -n [CertNickName pos
 
         # test evn cleanup 
         #no data cleanup defined 
+        # stop tracking or certmonger will start taking up all system resources trying to generate keys!
+        check=`check_request`
+        rlLog "check_request returned: $check"
+        if [ -n "$check" ] ; then
+                rlLog "Request successful!  Requestid: $check"
+                clean_requests
+        fi
 
         # test cleanup 
         if [ -f $tmpout ];then 
@@ -488,6 +568,13 @@ request_1010()  #ipa-getcert request -d [NSSDBDIR positive] -n [CertNickName pos
 
         # test evn cleanup 
         #no data cleanup defined 
+        # stop tracking or certmonger will start taking up all system resources trying to generate keys!
+        check=`check_request`
+        rlLog "check_request returned: $check"
+        if [ -n "$check" ] ; then
+                rlLog "Request successful!  Requestid: $check"
+                clean_requests
+        fi
 
         # test cleanup 
         if [ -f $tmpout ];then 
@@ -505,8 +592,8 @@ request_1011()  #ipa-getcert request -d [NSSDBDIR positive] -n [CertNickName pos
         local tmpout=${TmpDir}/request_1011.${RANDOM}.out
         local NSSDBDIR_positive="/etc/pki/nssdb"
         local CertNickName_positive="GetcertTest-${testID}"
-        local CertTokenName_positive="NSS Certificate DB"
-        local CertRequestNickName_negative="CertReq-$testID"
+        local CertTokenName_positive="NSSCertificateDB"
+        local CertRequestNickName_negative="CertReq-${testID}"
         local CertSubjectName_positive="$cert_subject"
         local CertPrincipalName_positive="${testID}/${fqdn}@${RELM}"
         local EXTUSAGE_positive="1.3.6.1.5.5.7.3.1"
@@ -528,7 +615,14 @@ request_1011()  #ipa-getcert request -d [NSSDBDIR positive] -n [CertNickName pos
         #certRun "ipa-getcert request -d $NSSDBDIR_positive -n $CertNickName_positive -t '$CertTokenName_positive' -I $CertRequestNickName_negative -R -N $CertSubjectName_positive -K $CertPrincipalName_positive -U $EXTUSAGE_positive -D $DNSName_positive -E $EMAIL_positive" "$tmpout" $expectedErrCode "$expectedErrMsg" "$comment"  "$verifyString"
 
         # test evn cleanup 
-        #no data cleanup defined 
+        # check for request creation
+        # if there was a request ...
+        check=`check_request`
+        rlLog "check_request returned: $check"
+        if [ -n "$check" ] ; then
+                rlFail "Appears that a request was generated when an error was expected.  Requestid: $check"
+                clean_requests
+        fi
 
         # test cleanup 
         if [ -f $tmpout ];then 
@@ -546,8 +640,8 @@ request_1012()  #ipa-getcert request -d [NSSDBDIR positive] -n [CertNickName pos
         local tmpout=${TmpDir}/request_1012.${RANDOM}.out
         local NSSDBDIR_positive="/etc/pki/nssdb"
         local CertNickName_positive="GetcertTest-${testID}"
-        local CertTokenName_positive="NSS Certificate DB"
-        local CertRequestNickName_negative="CertReq-$testID"
+        local CertTokenName_positive="NSSCertificateDB"
+        local CertRequestNickName_negative="CertReq-${testID}"
         local CertSubjectName_positive="$cert_subject"
         local CertPrincipalName_positive="${testID}/${fqdn}@${RELM}"
         local EXTUSAGE_positive="1.3.6.1.5.5.7.3.1"
@@ -569,6 +663,16 @@ request_1012()  #ipa-getcert request -d [NSSDBDIR positive] -n [CertNickName pos
         # test evn cleanup 
         #no data cleanup defined 
 
+        # check for request creation
+
+        # if there was a request ...
+        check=`check_request`
+        rlLog "check_request returned: $check"
+        if [ -n "$check" ] ; then
+                rlFail "Appears that a request was generated when an error was expected.  Requestid: $check"
+                clean_requests
+        fi
+
         # test cleanup 
         if [ -f $tmpout ];then 
             rm $tmpout 
@@ -585,7 +689,7 @@ request_1013()  #ipa-getcert request -d [NSSDBDIR positive] -n [CertNickName pos
         local tmpout=${TmpDir}/request_1013.${RANDOM}.out
         local NSSDBDIR_positive="/etc/pki/nssdb"
         local CertNickName_positive="GetcertTest-${testID}"
-        local CertTokenName_positive="NSS Certificate DB"
+        local CertTokenName_positive="NSSCertificateDB"
         local CertRequestNickName_positive="CertReq_${testID}_${RANDOM}"
         local CertSubjectName_positive="$cert_subject"
         local CertPrincipalName_negative="NoSuchPrincipal${testID}"
@@ -606,7 +710,13 @@ request_1013()  #ipa-getcert request -d [NSSDBDIR positive] -n [CertNickName pos
         certRun "ipa-getcert request -d $NSSDBDIR_positive -n $CertNickName_positive -t \"$CertTokenName_positive\" -I $CertRequestNickName_positive -R -N $CertSubjectName_positive -K $CertPrincipalName_negative -U $EXTUSAGE_positive -D $DNSName_positive -E $EMAIL_positive" "$tmpout" $expectedErrCode "$expectedErrMsg" "$comment"  "$verifyString"
 
         # test evn cleanup 
-        #no data cleanup defined 
+        # stop tracking or certmonger will start taking up all system resources trying to generate keys!
+        check=`check_request`
+        rlLog "check_request returned: $check"
+        if [ -n "$check" ] ; then
+                rlLog "Request successful!  Requestid: $check"
+                clean_requests
+        fi
 
         # test cleanup 
         if [ -f $tmpout ];then 
@@ -624,7 +734,7 @@ request_1014()  #ipa-getcert request -d [NSSDBDIR positive] -n [CertNickName pos
         local tmpout=${TmpDir}/request_1014.${RANDOM}.out
         local NSSDBDIR_positive="/etc/pki/nssdb"
         local CertNickName_positive="GetcertTest-${testID}"
-        local CertTokenName_positive="NSS Certificate DB"
+        local CertTokenName_positive="NSSCertificateDB"
         local CertRequestNickName_positive="CertReq_${testID}_${RANDOM}"
         local CertSubjectName_positive="$cert_subject"
         local CertPrincipalName_positive="${testID}/${fqdn}@${RELM}"
@@ -645,7 +755,15 @@ request_1014()  #ipa-getcert request -d [NSSDBDIR positive] -n [CertNickName pos
         certRun "ipa-getcert request -d $NSSDBDIR_positive -n $CertNickName_positive -t $CertTokenName_positive -I $CertRequestNickName_positive -R -N $CertSubjectName_positive -K $CertPrincipalName_positive -U $EXTUSAGE_negative -D $DNSName_positive -E $EMAIL_positive" "$tmpout" $expectedErrCode "$expectedErrMsg" "$comment"  "$verifyString"
 
         # test evn cleanup 
-        #no data cleanup defined 
+        # check for request creation
+
+        # if there was a request ...
+        check=`check_request`
+        rlLog "check_request returned: $check"
+        if [ -n "$check" ] ; then
+                rlFail "Appears that a request was generated when an error was expected.  Requestid: $check"
+                clean_requests
+        fi
 
         # test cleanup 
         if [ -f $tmpout ];then 
@@ -663,7 +781,7 @@ request_1015()   #ipa-getcert request -d [NSSDBDIR positive] -n [CertNickName po
         local tmpout=${TmpDir}/request_1015.${RANDOM}.out
         local NSSDBDIR_positive="/etc/pki/nssdb"
         local CertNickName_positive="GetcertTest-${testID}"
-        local CertTokenName_positive="NSS Certificate DB"
+        local CertTokenName_positive="NSSCertificateDB"
         local CertRequestNickName_positive="CertReq_${testID}_${RANDOM}"
         local CertSubjectName_positive="$cert_subject"
         local CertPrincipalName_positive="${testID}/${fqdn}@${RELM}"
@@ -679,7 +797,13 @@ request_1015()   #ipa-getcert request -d [NSSDBDIR positive] -n [CertNickName po
         # test ends here 
 
         # test env cleanup 
-        #no data cleanup defined 
+        # stop tracking or certmonger will start taking up all system resources trying to generate keys!
+        check=`check_request`
+        rlLog "check_request returned: $check"
+        if [ -n "$check" ] ; then
+                rlLog "Request successful!  Requestid: $check"
+                clean_requests
+        fi
 
         # test clean up 
         if [ -f $tmpout ];then 
@@ -697,7 +821,7 @@ request_1016()  #ipa-getcert request -d [NSSDBDIR positive] -n [CertNickName pos
         local tmpout=${TmpDir}/request_1016.${RANDOM}.out
         local NSSDBDIR_positive="/etc/pki/nssdb"
         local CertNickName_positive="GetcertTest-${testID}"
-        local CertTokenName_positive="NSS Certificate DB"
+        local CertTokenName_positive="NSSCertificateDB"
         local CertRequestNickName_positive="CertReq_${testID}_${RANDOM}"
         local CertSubjectName_positive="$cert_subject"
         local CertPrincipalName_negative="NoSuchPrincipal${testID}"
@@ -718,7 +842,13 @@ request_1016()  #ipa-getcert request -d [NSSDBDIR positive] -n [CertNickName pos
         certRun "ipa-getcert request -d $NSSDBDIR_positive -n $CertNickName_positive -t \"$CertTokenName_positive\" -I $CertRequestNickName_positive -r -N $CertSubjectName_positive -K $CertPrincipalName_negative -U $EXTUSAGE_positive -D $DNSName_positive -E $EMAIL_positive" "$tmpout" $expectedErrCode "$expectedErrMsg" "$comment"  "$verifyString"
 
         # test evn cleanup 
-        #no data cleanup defined 
+        # stop tracking or certmonger will start taking up all system resources trying to generate keys!
+        check=`check_request`
+        rlLog "check_request returned: $check"
+        if [ -n "$check" ] ; then
+                rlLog "Request successful!  Requestid: $check"
+                clean_requests
+        fi
 
         # test cleanup 
         if [ -f $tmpout ];then 
@@ -736,7 +866,7 @@ request_1017()  #ipa-getcert request -d [NSSDBDIR positive] -n [CertNickName pos
         local tmpout=${TmpDir}/request_1017.${RANDOM}.out
         local NSSDBDIR_positive="/etc/pki/nssdb"
         local CertNickName_positive="GetcertTest-${testID}"
-        local CertTokenName_positive="NSS Certificate DB"
+        local CertTokenName_positive="NSSCertificateDB"
         local CertRequestNickName_positive="CertReq_${testID}_${RANDOM}"
         local CertSubjectName_positive="$cert_subject"
         local CertPrincipalName_positive="${testID}/${fqdn}@${RELM}"
@@ -757,7 +887,15 @@ request_1017()  #ipa-getcert request -d [NSSDBDIR positive] -n [CertNickName pos
         certRun "ipa-getcert request -d $NSSDBDIR_positive -n $CertNickName_positive -t $CertTokenName_positive -I $CertRequestNickName_positive -r -N $CertSubjectName_positive -K $CertPrincipalName_positive -U $EXTUSAGE_negative -D $DNSName_positive -E $EMAIL_positive" "$tmpout" $expectedErrCode "$expectedErrMsg" "$comment"  "$verifyString"
 
         # test evn cleanup 
-        #no data cleanup defined 
+        # check for request creation
+
+        # if there was a request ...
+        check=`check_request`
+        rlLog "check_request returned: $check"
+        if [ -n "$check" ] ; then
+                rlFail "Appears that a request was generated when an error was expected.  Requestid: $check"
+                clean_requests
+        fi
 
         # test cleanup 
         if [ -f $tmpout ];then 
@@ -775,7 +913,7 @@ request_1018()   #ipa-getcert request -d [NSSDBDIR positive] -n [CertNickName po
         local tmpout=${TmpDir}/request_1018.${RANDOM}.out
         local NSSDBDIR_positive="/etc/pki/nssdb"
         local CertNickName_positive="GetcertTest-${testID}"
-        local CertTokenName_positive="NSS Certificate DB"
+        local CertTokenName_positive="NSSCertificateDB"
         local CertRequestNickName_positive="CertReq_${testID}_${RANDOM}"
         local CertSubjectName_positive="$cert_subject"
         local CertPrincipalName_positive="${testID}/${fqdn}@${RELM}"
@@ -791,7 +929,13 @@ request_1018()   #ipa-getcert request -d [NSSDBDIR positive] -n [CertNickName po
         # test ends here 
 
         # test env cleanup 
-        #no data cleanup defined 
+        # stop tracking or certmonger will start taking up all system resources trying to generate keys!
+        check=`check_request`
+        rlLog "check_request returned: $check"
+        if [ -n "$check" ] ; then
+                rlLog "Request successful!  Requestid: $check"
+                clean_requests
+        fi
 
         # test clean up 
         if [ -f $tmpout ];then 
@@ -809,7 +953,7 @@ request_1019()  #ipa-getcert request -d [NSSDBDIR positive] -n [CertNickName pos
         local tmpout=${TmpDir}/request_1019.${RANDOM}.out
         local NSSDBDIR_positive="/etc/pki/nssdb"
         local CertNickName_positive="GetcertTest-${testID}"
-        local CertTokenName_positive="NSS Certificate DB"
+        local CertTokenName_positive="NSSCertificateDB"
         local CertKeySize_negative="shouldBEnumber${testID}"
         local CertSubjectName_positive="$cert_subject"
         local CertPrincipalName_positive="${testID}/${fqdn}@${RELM}"
@@ -830,7 +974,13 @@ request_1019()  #ipa-getcert request -d [NSSDBDIR positive] -n [CertNickName pos
         certRun "ipa-getcert request -d $NSSDBDIR_positive -n $CertNickName_positive -t \"$CertTokenName_positive\" -g $CertKeySize_negative -R -N $CertSubjectName_positive -K $CertPrincipalName_positive -U $EXTUSAGE_positive -D $DNSName_positive -E $EMAIL_positive" "$tmpout" $expectedErrCode "$expectedErrMsg" "$comment"  "$verifyString"
 
         # test evn cleanup 
-        #no data cleanup defined 
+        # stop tracking or certmonger will start taking up all system resources trying to generate keys!
+        check=`check_request`
+        rlLog "check_request returned: $check"
+        if [ -n "$check" ] ; then
+                rlLog "Request successful!  Requestid: $check"
+                clean_requests
+        fi
 
         # test cleanup 
         if [ -f $tmpout ];then 
@@ -848,7 +998,7 @@ request_1020()  #ipa-getcert request -d [NSSDBDIR positive] -n [CertNickName pos
         local tmpout=${TmpDir}/request_1020.${RANDOM}.out
         local NSSDBDIR_positive="/etc/pki/nssdb"
         local CertNickName_positive="GetcertTest-${testID}"
-        local CertTokenName_positive="NSS Certificate DB"
+        local CertTokenName_positive="NSSCertificateDB"
         local CertKeySize_negative="shouldBEnumber${testID}"
         local CertSubjectName_positive="$cert_subject"
         local CertPrincipalName_positive="${testID}/${fqdn}@${RELM}"
@@ -869,7 +1019,13 @@ request_1020()  #ipa-getcert request -d [NSSDBDIR positive] -n [CertNickName pos
         certRun "ipa-getcert request -d $NSSDBDIR_positive -n $CertNickName_positive -t \"$CertTokenName_positive\" -g $CertKeySize_negative -r -N $CertSubjectName_positive -K $CertPrincipalName_positive -U $EXTUSAGE_positive -D $DNSName_positive -E $EMAIL_positive" "$tmpout" $expectedErrCode "$expectedErrMsg" "$comment"  "$verifyString"
 
         # test evn cleanup 
-        #no data cleanup defined 
+        # stop tracking or certmonger will start taking up all system resources trying to generate keys!
+        check=`check_request`
+        rlLog "check_request returned: $check"
+        if [ -n "$check" ] ; then
+                rlLog "Request successful!  Requestid: $check"
+                clean_requests
+        fi
 
         # test cleanup 
         if [ -f $tmpout ];then 
@@ -887,7 +1043,7 @@ request_1021()  #ipa-getcert request -d [NSSDBDIR positive] -n [CertNickName pos
         local tmpout=${TmpDir}/request_1021.${RANDOM}.out
         local NSSDBDIR_positive="/etc/pki/nssdb"
         local CertNickName_positive="GetcertTest-${testID}"
-        local CertTokenName_positive="NSS Certificate DB"
+        local CertTokenName_positive="NSSCertificateDB"
         local CertKeySize_positive="1024"
         local CertSubjectName_positive="$cert_subject"
         local CertPrincipalName_negative="NoSuchPrincipal${testID}"
@@ -908,7 +1064,13 @@ request_1021()  #ipa-getcert request -d [NSSDBDIR positive] -n [CertNickName pos
         certRun "ipa-getcert request -d $NSSDBDIR_positive -n $CertNickName_positive -t \"$CertTokenName_positive\" -g $CertKeySize_positive -R -N $CertSubjectName_positive -K $CertPrincipalName_negative -U $EXTUSAGE_positive -D $DNSName_positive -E $EMAIL_positive" "$tmpout" $expectedErrCode "$expectedErrMsg" "$comment"  "$verifyString"
 
         # test evn cleanup 
-        #no data cleanup defined 
+        # stop tracking or certmonger will start taking up all system resources trying to generate keys!
+        check=`check_request`
+        rlLog "check_request returned: $check"
+        if [ -n "$check" ] ; then
+                rlLog "Request successful!  Requestid: $check"
+                clean_requests
+        fi
 
         # test cleanup 
         if [ -f $tmpout ];then 
@@ -926,7 +1088,7 @@ request_1022()  #ipa-getcert request -d [NSSDBDIR positive] -n [CertNickName pos
         local tmpout=${TmpDir}/request_1022.${RANDOM}.out
         local NSSDBDIR_positive="/etc/pki/nssdb"
         local CertNickName_positive="GetcertTest-${testID}"
-        local CertTokenName_positive="NSS Certificate DB"
+        local CertTokenName_positive="NSSCertificateDB"
         local CertKeySize_positive="1024"
         local CertSubjectName_positive="$cert_subject"
         local CertPrincipalName_positive="${testID}/${fqdn}@${RELM}"
@@ -947,7 +1109,15 @@ request_1022()  #ipa-getcert request -d [NSSDBDIR positive] -n [CertNickName pos
         certRun "ipa-getcert request -d $NSSDBDIR_positive -n $CertNickName_positive -t \"$CertTokenName_positive\" -g $CertKeySize_positive -R -N $CertSubjectName_positive -K $CertPrincipalName_positive -U $EXTUSAGE_negative -D $DNSName_positive -E $EMAIL_positive" "$tmpout" $expectedErrCode "$expectedErrMsg" "$comment"  "$verifyString"
 
         # test evn cleanup 
-        #no data cleanup defined 
+        # check for request creation
+
+        # if there was a request ...
+        check=`check_request`
+        rlLog "check_request returned: $check"
+        if [ -n "$check" ] ; then
+                rlFail "Appears that a request was generated when an error was expected.  Requestid: $check"
+                clean_requests
+        fi
 
         # test cleanup 
         if [ -f $tmpout ];then 
@@ -965,7 +1135,7 @@ request_1023()   #ipa-getcert request -d [NSSDBDIR positive] -n [CertNickName po
         local tmpout=${TmpDir}/request_1023.${RANDOM}.out
         local NSSDBDIR_positive="/etc/pki/nssdb"
         local CertNickName_positive="GetcertTest-${testID}"
-        local CertTokenName_positive="NSS Certificate DB"
+        local CertTokenName_positive="NSSCertificateDB"
         local CertKeySize_positive="1024"
         local CertSubjectName_positive="$cert_subject"
         local CertPrincipalName_positive="${testID}/${fqdn}@${RELM}"
@@ -981,7 +1151,13 @@ request_1023()   #ipa-getcert request -d [NSSDBDIR positive] -n [CertNickName po
         # test ends here 
 
         # test env cleanup 
-        #no data cleanup defined 
+        # stop tracking or certmonger will start taking up all system resources trying to generate keys!
+        check=`check_request`
+        rlLog "check_request returned: $check"
+        if [ -n "$check" ] ; then
+                rlLog "Request successful!  Requestid: $check"
+                clean_requests
+        fi
 
         # test clean up 
         if [ -f $tmpout ];then 
@@ -999,7 +1175,7 @@ request_1024()  #ipa-getcert request -d [NSSDBDIR positive] -n [CertNickName pos
         local tmpout=${TmpDir}/request_1024.${RANDOM}.out
         local NSSDBDIR_positive="/etc/pki/nssdb"
         local CertNickName_positive="GetcertTest-${testID}"
-        local CertTokenName_positive="NSS Certificate DB"
+        local CertTokenName_positive="NSSCertificateDB"
         local CertKeySize_positive="1024"
         local CertSubjectName_positive="$cert_subject"
         local CertPrincipalName_negative="NoSuchPrincipal${testID}"
@@ -1020,7 +1196,13 @@ request_1024()  #ipa-getcert request -d [NSSDBDIR positive] -n [CertNickName pos
         certRun "ipa-getcert request -d $NSSDBDIR_positive -n $CertNickName_positive -t \"$CertTokenName_positive\" -g $CertKeySize_positive -r -N $CertSubjectName_positive -K $CertPrincipalName_negative -U $EXTUSAGE_positive -D $DNSName_positive -E $EMAIL_positive" "$tmpout" $expectedErrCode "$expectedErrMsg" "$comment"  "$verifyString"
 
         # test evn cleanup 
-        #no data cleanup defined 
+        # stop tracking or certmonger will start taking up all system resources trying to generate keys!
+        check=`check_request`
+        rlLog "check_request returned: $check"
+        if [ -n "$check" ] ; then
+                rlLog "Request successful!  Requestid: $check"
+                clean_requests
+        fi
 
         # test cleanup 
         if [ -f $tmpout ];then 
@@ -1038,7 +1220,7 @@ request_1025()  #ipa-getcert request -d [NSSDBDIR positive] -n [CertNickName pos
         local tmpout=${TmpDir}/request_1025.${RANDOM}.out
         local NSSDBDIR_positive="/etc/pki/nssdb"
         local CertNickName_positive="GetcertTest-${testID}"
-        local CertTokenName_positive="NSS Certificate DB"
+        local CertTokenName_positive="NSSCertificateDB"
         local CertKeySize_positive="1024"
         local CertSubjectName_positive="$cert_subject"
         local CertPrincipalName_positive="${testID}/${fqdn}@${RELM}"
@@ -1059,7 +1241,15 @@ request_1025()  #ipa-getcert request -d [NSSDBDIR positive] -n [CertNickName pos
         certRun "ipa-getcert request -d $NSSDBDIR_positive -n $CertNickName_positive -t \"$CertTokenName_positive\" -g $CertKeySize_positive -r -N $CertSubjectName_positive -K $CertPrincipalName_positive -U $EXTUSAGE_negative -D $DNSName_positive -E $EMAIL_positive" "$tmpout" $expectedErrCode "$expectedErrMsg" "$comment"  "$verifyString"
 
         # test evn cleanup 
-        #no data cleanup defined 
+        # check for request creation
+
+        # if there was a request ...
+        check=`check_request`
+        rlLog "check_request returned: $check"
+        if [ -n "$check" ] ; then
+                rlFail "Appears that a request was generated when an error was expected.  Requestid: $check"
+                clean_requests
+        fi
 
         # test cleanup 
         if [ -f $tmpout ];then 
@@ -1077,7 +1267,7 @@ request_1026()   #ipa-getcert request -d [NSSDBDIR positive] -n [CertNickName po
         local tmpout=${TmpDir}/request_1026.${RANDOM}.out
         local NSSDBDIR_positive="/etc/pki/nssdb"
         local CertNickName_positive="GetcertTest-${testID}"
-        local CertTokenName_positive="NSS Certificate DB"
+        local CertTokenName_positive="NSSCertificateDB"
         local CertKeySize_positive="1024"
         local CertSubjectName_positive="$cert_subject"
         local CertPrincipalName_positive="${testID}/${fqdn}@${RELM}"
@@ -1093,7 +1283,13 @@ request_1026()   #ipa-getcert request -d [NSSDBDIR positive] -n [CertNickName po
         # test ends here 
 
         # test env cleanup 
-        #no data cleanup defined 
+        # stop tracking or certmonger will start taking up all system resources trying to generate keys!
+        check=`check_request`
+        rlLog "check_request returned: $check"
+        if [ -n "$check" ] ; then
+                rlLog "Request successful!  Requestid: $check"
+                clean_requests
+        fi
 
         # test clean up 
         if [ -f $tmpout ];then 
@@ -1126,6 +1322,16 @@ request_1027()  #ipa-getcert request -k [PemKeyFile negative] -f [PemCertFile po
 
         # test evn cleanup 
         cleanup_pem_certfile $testID 
+
+        # check for request creation
+
+        # if there was a request ...
+        check=`check_request`
+        rlLog "check_request returned: $check"
+        if [ -n "$check" ] ; then
+                rlFail "Appears that a request was generated when an error was expected.  Requestid: $check"
+                clean_requests
+        fi
 
         # test cleanup 
         if [ -f $tmpout ];then 
@@ -1166,6 +1372,16 @@ request_1028()  #ipa-getcert request -k [PemKeyFile negative] -f [PemCertFile po
         # test evn cleanup 
         cleanup_pem_certfile $testID 
 
+        # check for request creation
+
+        # if there was a request ...
+        check=`check_request`
+        rlLog "check_request returned: $check"
+        if [ -n "$check" ] ; then
+                rlFail "Appears that a request was generated when an error was expected.  Requestid: $check"
+                clean_requests
+        fi
+
         # test cleanup 
         if [ -f $tmpout ];then 
             rm $tmpout 
@@ -1204,6 +1420,16 @@ request_1029()  #ipa-getcert request -k [PemKeyFile negative] -f [PemCertFile po
 
         # test evn cleanup 
         cleanup_pem_certfile $testID 
+
+        # check for request creation
+
+        # if there was a request ...
+        check=`check_request`
+        rlLog "check_request returned: $check"
+        if [ -n "$check" ] ; then
+                rlFail "Appears that a request was generated when an error was expected.  Requestid: $check"
+                clean_requests
+        fi
 
         # test cleanup 
         if [ -f $tmpout ];then 
@@ -1244,6 +1470,16 @@ request_1030()  #ipa-getcert request -k [PemKeyFile negative] -f [PemCertFile po
         # test evn cleanup 
         cleanup_pem_certfile $testID 
 
+        # check for request creation
+
+        # if there was a request ...
+        check=`check_request`
+        rlLog "check_request returned: $check"
+        if [ -n "$check" ] ; then
+                rlFail "Appears that a request was generated when an error was expected.  Requestid: $check"
+                clean_requests
+        fi
+
         # test cleanup 
         if [ -f $tmpout ];then 
             rm $tmpout 
@@ -1282,6 +1518,16 @@ request_1031()  #ipa-getcert request -k [PemKeyFile negative] -f [PemCertFile po
 
         # test evn cleanup 
         cleanup_pem_certfile $testID 
+
+        # check for request creation
+
+        # if there was a request ...
+        check=`check_request`
+        rlLog "check_request returned: $check"
+        if [ -n "$check" ] ; then
+                rlFail "Appears that a request was generated when an error was expected.  Requestid: $check"
+                clean_requests
+        fi
 
         # test cleanup 
         if [ -f $tmpout ];then 
@@ -1323,6 +1569,15 @@ request_1032()  #ipa-getcert request -k [PemKeyFile negative] -f [PemCertFile po
         # test evn cleanup 
         cleanup_pem_certfile $testID
         cleanup_pin $testID 
+        # check for request creation
+
+        # if there was a request ...
+        check=`check_request`
+        rlLog "check_request returned: $check"
+        if [ -n "$check" ] ; then
+                rlFail "Appears that a request was generated when an error was expected.  Requestid: $check"
+                clean_requests
+        fi
 
         # test cleanup 
         if [ -f $tmpout ];then 
@@ -1365,6 +1620,16 @@ request_1033()  #ipa-getcert request -k [PemKeyFile negative] -f [PemCertFile po
         cleanup_pem_certfile $testID
         cleanup_pin $testID 
 
+        # check for request creation
+
+        # if there was a request ...
+        check=`check_request`
+        rlLog "check_request returned: $check"
+        if [ -n "$check" ] ; then
+                rlFail "Appears that a request was generated when an error was expected.  Requestid: $check"
+                clean_requests
+        fi
+
         # test cleanup 
         if [ -f $tmpout ];then 
             rm $tmpout 
@@ -1405,6 +1670,16 @@ request_1034()  #ipa-getcert request -k [PemKeyFile negative] -f [PemCertFile po
         # test evn cleanup 
         cleanup_pem_certfile $testID
         cleanup_pin $testID 
+
+        # check for request creation
+
+        # if there was a request ...
+        check=`check_request`
+        rlLog "check_request returned: $check"
+        if [ -n "$check" ] ; then
+                rlFail "Appears that a request was generated when an error was expected.  Requestid: $check"
+                clean_requests
+        fi
 
         # test cleanup 
         if [ -f $tmpout ];then 
@@ -1447,6 +1722,16 @@ request_1035()  #ipa-getcert request -k [PemKeyFile negative] -f [PemCertFile po
         cleanup_pem_certfile $testID
         cleanup_pin $testID 
 
+        # check for request creation
+
+        # if there was a request ...
+        check=`check_request`
+        rlLog "check_request returned: $check"
+        if [ -n "$check" ] ; then
+                rlFail "Appears that a request was generated when an error was expected.  Requestid: $check"
+                clean_requests
+        fi
+
         # test cleanup 
         if [ -f $tmpout ];then 
             rm $tmpout 
@@ -1478,6 +1763,16 @@ request_1036()  #ipa-getcert request -k [PemKeyFile positive] -f [PemCertFile ne
 
         # test evn cleanup 
         cleanup_pem_keyfile $testID 
+
+        # check for request creation
+
+        # if there was a request ...
+        check=`check_request`
+        rlLog "check_request returned: $check"
+        if [ -n "$check" ] ; then
+                rlFail "Appears that a request was generated when an error was expected.  Requestid: $check"
+                clean_requests
+        fi
 
         # test cleanup 
         if [ -f $tmpout ];then 
@@ -1518,6 +1813,16 @@ request_1037()  #ipa-getcert request -k [PemKeyFile positive] -f [PemCertFile ne
         # test evn cleanup 
         cleanup_pem_keyfile $testID 
 
+        # check for request creation
+
+        # if there was a request ...
+        check=`check_request`
+        rlLog "check_request returned: $check"
+        if [ -n "$check" ] ; then
+                rlFail "Appears that a request was generated when an error was expected.  Requestid: $check"
+                clean_requests
+        fi
+
         # test cleanup 
         if [ -f $tmpout ];then 
             rm $tmpout 
@@ -1556,6 +1861,16 @@ request_1038()  #ipa-getcert request -k [PemKeyFile positive] -f [PemCertFile ne
 
         # test evn cleanup 
         cleanup_pem_keyfile $testID 
+
+        # check for request creation
+
+        # if there was a request ...
+        check=`check_request`
+        rlLog "check_request returned: $check"
+        if [ -n "$check" ] ; then
+                rlFail "Appears that a request was generated when an error was expected.  Requestid: $check"
+                clean_requests
+        fi
 
         # test cleanup 
         if [ -f $tmpout ];then 
@@ -1596,6 +1911,16 @@ request_1039()  #ipa-getcert request -k [PemKeyFile positive] -f [PemCertFile ne
         # test evn cleanup 
         cleanup_pem_keyfile $testID 
 
+        # check for request creation
+
+        # if there was a request ...
+        check=`check_request`
+        rlLog "check_request returned: $check"
+        if [ -n "$check" ] ; then
+                rlFail "Appears that a request was generated when an error was expected.  Requestid: $check"
+                clean_requests
+        fi
+
         # test cleanup 
         if [ -f $tmpout ];then 
             rm $tmpout 
@@ -1634,6 +1959,16 @@ request_1040()  #ipa-getcert request -k [PemKeyFile positive] -f [PemCertFile ne
 
         # test evn cleanup 
         cleanup_pem_keyfile $testID 
+
+        # check for request creation
+
+        # if there was a request ...
+        check=`check_request`
+        rlLog "check_request returned: $check"
+        if [ -n "$check" ] ; then
+                rlFail "Appears that a request was generated when an error was expected.  Requestid: $check"
+                clean_requests
+        fi
 
         # test cleanup 
         if [ -f $tmpout ];then 
@@ -1676,6 +2011,16 @@ request_1041()  #ipa-getcert request -k [PemKeyFile positive] -f [PemCertFile ne
         cleanup_pem_keyfile $testID
         cleanup_pin $testID 
 
+        # check for request creation
+
+        # if there was a request ...
+        check=`check_request`
+        rlLog "check_request returned: $check"
+        if [ -n "$check" ] ; then
+                rlFail "Appears that a request was generated when an error was expected.  Requestid: $check"
+                clean_requests
+        fi
+
         # test cleanup 
         if [ -f $tmpout ];then 
             rm $tmpout 
@@ -1716,6 +2061,16 @@ request_1042()  #ipa-getcert request -k [PemKeyFile positive] -f [PemCertFile ne
         # test evn cleanup 
         cleanup_pem_keyfile $testID
         cleanup_pin $testID 
+
+        # check for request creation
+
+        # if there was a request ...
+        check=`check_request`
+        rlLog "check_request returned: $check"
+        if [ -n "$check" ] ; then
+                rlFail "Appears that a request was generated when an error was expected.  Requestid: $check"
+                clean_requests
+        fi
 
         # test cleanup 
         if [ -f $tmpout ];then 
@@ -1758,6 +2113,16 @@ request_1043()  #ipa-getcert request -k [PemKeyFile positive] -f [PemCertFile ne
         cleanup_pem_keyfile $testID
         cleanup_pin $testID 
 
+        # check for request creation
+
+        # if there was a request ...
+        check=`check_request`
+        rlLog "check_request returned: $check"
+        if [ -n "$check" ] ; then
+                rlFail "Appears that a request was generated when an error was expected.  Requestid: $check"
+                clean_requests
+        fi
+
         # test cleanup 
         if [ -f $tmpout ];then 
             rm $tmpout 
@@ -1799,6 +2164,16 @@ request_1044()  #ipa-getcert request -k [PemKeyFile positive] -f [PemCertFile ne
         cleanup_pem_keyfile $testID
         cleanup_pin $testID 
 
+        # check for request creation
+
+        # if there was a request ...
+        check=`check_request`
+        rlLog "check_request returned: $check"
+        if [ -n "$check" ] ; then
+                rlFail "Appears that a request was generated when an error was expected.  Requestid: $check"
+                clean_requests
+        fi
+
         # test cleanup 
         if [ -f $tmpout ];then 
             rm $tmpout 
@@ -1827,6 +2202,13 @@ request_1045()   #ipa-getcert request -k [PemKeyFile positive] -f [PemCertFile p
         # test env cleanup 
         cleanup_pem_keyfile $testID
         cleanup_pem_certfile $testID 
+        # stop tracking or certmonger will start taking up all system resources trying to generate keys!
+        check=`check_request`
+        rlLog "check_request returned: $check"
+        if [ -n "$check" ] ; then
+                rlLog "Request successful!  Requestid: $check"
+                clean_requests
+        fi
 
         # test clean up 
         if [ -f $tmpout ];then 
@@ -1869,6 +2251,16 @@ request_1046()  #ipa-getcert request -k [PemKeyFile positive] -f [PemCertFile po
         cleanup_pem_keyfile $testID
         cleanup_pem_certfile $testID 
 
+        # check for request creation
+
+        # if there was a request ...
+        check=`check_request`
+        rlLog "check_request returned: $check"
+        if [ -n "$check" ] ; then
+                rlFail "Appears that a request was generated when an error was expected.  Requestid: $check"
+                clean_requests
+        fi
+
         # test cleanup 
         if [ -f $tmpout ];then 
             rm $tmpout 
@@ -1910,6 +2302,16 @@ request_1047()  #ipa-getcert request -k [PemKeyFile positive] -f [PemCertFile po
         cleanup_pem_keyfile $testID
         cleanup_pem_certfile $testID 
 
+        # check for request creation
+
+        # if there was a request ...
+        check=`check_request`
+        rlLog "check_request returned: $check"
+        if [ -n "$check" ] ; then
+                rlFail "Appears that a request was generated when an error was expected.  Requestid: $check"
+                clean_requests
+        fi
+
         # test cleanup 
         if [ -f $tmpout ];then 
             rm $tmpout 
@@ -1950,6 +2352,13 @@ request_1048()  #ipa-getcert request -k [PemKeyFile positive] -f [PemCertFile po
         # test evn cleanup 
         cleanup_pem_keyfile $testID
         cleanup_pem_certfile $testID 
+        # stop tracking or certmonger will start taking up all system resources trying to generate keys!
+        check=`check_request`
+        rlLog "check_request returned: $check"
+        if [ -n "$check" ] ; then
+                rlLog "Request successful!  Requestid: $check"
+                clean_requests
+        fi
 
         # test cleanup 
         if [ -f $tmpout ];then 
@@ -1992,6 +2401,16 @@ request_1049()  #ipa-getcert request -k [PemKeyFile positive] -f [PemCertFile po
         cleanup_pem_keyfile $testID
         cleanup_pem_certfile $testID 
 
+        # check for request creation
+
+        # if there was a request ...
+        check=`check_request`
+        rlLog "check_request returned: $check"
+        if [ -n "$check" ] ; then
+                rlFail "Appears that a request was generated when an error was expected.  Requestid: $check"
+                clean_requests
+        fi
+
         # test cleanup 
         if [ -f $tmpout ];then 
             rm $tmpout 
@@ -2027,6 +2446,13 @@ request_1050()   #ipa-getcert request -k [PemKeyFile positive] -f [PemCertFile p
         # test env cleanup 
         cleanup_pem_keyfile $testID
         cleanup_pem_certfile $testID 
+        # stop tracking or certmonger will start taking up all system resources trying to generate keys!
+        check=`check_request`
+        rlLog "check_request returned: $check"
+        if [ -n "$check" ] ; then
+                rlLog "Request successful!  Requestid: $check"
+                clean_requests
+        fi
 
         # test clean up 
         if [ -f $tmpout ];then 
@@ -2068,6 +2494,13 @@ request_1051()  #ipa-getcert request -k [PemKeyFile positive] -f [PemCertFile po
         # test evn cleanup 
         cleanup_pem_keyfile $testID
         cleanup_pem_certfile $testID 
+        # stop tracking or certmonger will start taking up all system resources trying to generate keys!
+        check=`check_request`
+        rlLog "check_request returned: $check"
+        if [ -n "$check" ] ; then
+                rlLog "Request successful!  Requestid: $check"
+                clean_requests
+        fi
 
         # test cleanup 
         if [ -f $tmpout ];then 
@@ -2109,6 +2542,16 @@ request_1052()  #ipa-getcert request -k [PemKeyFile positive] -f [PemCertFile po
         # test evn cleanup 
         cleanup_pem_keyfile $testID
         cleanup_pem_certfile $testID 
+
+        # check for request creation
+
+        # if there was a request ...
+        check=`check_request`
+        rlLog "check_request returned: $check"
+        if [ -n "$check" ] ; then
+                rlFail "Appears that a request was generated when an error was expected.  Requestid: $check"
+                clean_requests
+        fi
 
         # test cleanup 
         if [ -f $tmpout ];then 
@@ -2186,6 +2629,13 @@ request_1054()  #ipa-getcert request -k [PemKeyFile positive] -f [PemCertFile po
         # test evn cleanup 
         cleanup_pem_keyfile $testID
         cleanup_pem_certfile $testID 
+        # stop tracking or certmonger will start taking up all system resources trying to generate keys!
+        check=`check_request`
+        rlLog "check_request returned: $check"
+        if [ -n "$check" ] ; then
+                rlLog "Request successful!  Requestid: $check"
+                clean_requests
+        fi
 
         # test cleanup 
         if [ -f $tmpout ];then 
@@ -2227,6 +2677,13 @@ request_1055()  #ipa-getcert request -k [PemKeyFile positive] -f [PemCertFile po
         # test evn cleanup 
         cleanup_pem_keyfile $testID
         cleanup_pem_certfile $testID 
+        # stop tracking or certmonger will start taking up all system resources trying to generate keys!
+        check=`check_request`
+        rlLog "check_request returned: $check"
+        if [ -n "$check" ] ; then
+                rlLog "Request successful!  Requestid: $check"
+                clean_requests
+        fi
 
         # test cleanup 
         if [ -f $tmpout ];then 
@@ -2268,6 +2725,13 @@ request_1056()  #ipa-getcert request -k [PemKeyFile positive] -f [PemCertFile po
         # test evn cleanup 
         cleanup_pem_keyfile $testID
         cleanup_pem_certfile $testID 
+        # stop tracking or certmonger will start taking up all system resources trying to generate keys!
+        check=`check_request`
+        rlLog "check_request returned: $check"
+        if [ -n "$check" ] ; then
+                rlLog "Request successful!  Requestid: $check"
+                clean_requests
+        fi
 
         # test cleanup 
         if [ -f $tmpout ];then 
@@ -2310,6 +2774,16 @@ request_1057()  #ipa-getcert request -k [PemKeyFile positive] -f [PemCertFile po
         cleanup_pem_keyfile $testID
         cleanup_pem_certfile $testID 
 
+        # check for request creation
+
+        # if there was a request ...
+        check=`check_request`
+        rlLog "check_request returned: $check"
+        if [ -n "$check" ] ; then
+                rlFail "Appears that a request was generated when an error was expected.  Requestid: $check"
+                clean_requests
+        fi
+
         # test cleanup 
         if [ -f $tmpout ];then 
             rm $tmpout 
@@ -2345,6 +2819,13 @@ request_1058()   #ipa-getcert request -k [PemKeyFile positive] -f [PemCertFile p
         # test env cleanup 
         cleanup_pem_keyfile $testID
         cleanup_pem_certfile $testID 
+        # stop tracking or certmonger will start taking up all system resources trying to generate keys!
+        check=`check_request`
+        rlLog "check_request returned: $check"
+        if [ -n "$check" ] ; then
+                rlLog "Request successful!  Requestid: $check"
+                clean_requests
+        fi
 
         # test clean up 
         if [ -f $tmpout ];then 
@@ -2386,6 +2867,13 @@ request_1059()  #ipa-getcert request -k [PemKeyFile positive] -f [PemCertFile po
         # test evn cleanup 
         cleanup_pem_keyfile $testID
         cleanup_pem_certfile $testID 
+        # stop tracking or certmonger will start taking up all system resources trying to generate keys!
+        check=`check_request`
+        rlLog "check_request returned: $check"
+        if [ -n "$check" ] ; then
+                rlLog "Request successful!  Requestid: $check"
+                clean_requests
+        fi
 
         # test cleanup 
         if [ -f $tmpout ];then 
@@ -2428,6 +2916,16 @@ request_1060()  #ipa-getcert request -k [PemKeyFile positive] -f [PemCertFile po
         cleanup_pem_keyfile $testID
         cleanup_pem_certfile $testID 
 
+        # check for request creation
+
+        # if there was a request ...
+        check=`check_request`
+        rlLog "check_request returned: $check"
+        if [ -n "$check" ] ; then
+                rlFail "Appears that a request was generated when an error was expected.  Requestid: $check"
+                clean_requests
+        fi
+
         # test cleanup 
         if [ -f $tmpout ];then 
             rm $tmpout 
@@ -2463,6 +2961,13 @@ request_1061()   #ipa-getcert request -k [PemKeyFile positive] -f [PemCertFile p
         # test env cleanup 
         cleanup_pem_keyfile $testID
         cleanup_pem_certfile $testID 
+        # stop tracking or certmonger will start taking up all system resources trying to generate keys!
+        check=`check_request`
+        rlLog "check_request returned: $check"
+        if [ -n "$check" ] ; then
+                rlLog "Request successful!  Requestid: $check"
+                clean_requests
+        fi
 
         # test clean up 
         if [ -f $tmpout ];then 
@@ -2504,6 +3009,13 @@ request_1062()  #ipa-getcert request -k [PemKeyFile positive] -f [PemCertFile po
         # test evn cleanup 
         cleanup_pem_keyfile $testID
         cleanup_pem_certfile $testID 
+        # stop tracking or certmonger will start taking up all system resources trying to generate keys!
+        check=`check_request`
+        rlLog "check_request returned: $check"
+        if [ -n "$check" ] ; then
+                rlLog "Request successful!  Requestid: $check"
+                clean_requests
+        fi
 
         # test cleanup 
         if [ -f $tmpout ];then 
@@ -2545,6 +3057,13 @@ request_1063()  #ipa-getcert request -k [PemKeyFile positive] -f [PemCertFile po
         # test evn cleanup 
         cleanup_pem_keyfile $testID
         cleanup_pem_certfile $testID 
+        # stop tracking or certmonger will start taking up all system resources trying to generate keys!
+        check=`check_request`
+        rlLog "check_request returned: $check"
+        if [ -n "$check" ] ; then
+                rlLog "Request successful!  Requestid: $check"
+                clean_requests
+        fi
 
         # test cleanup 
         if [ -f $tmpout ];then 
@@ -2586,6 +3105,13 @@ request_1064()  #ipa-getcert request -k [PemKeyFile positive] -f [PemCertFile po
         # test evn cleanup 
         cleanup_pem_keyfile $testID
         cleanup_pem_certfile $testID 
+        # stop tracking or certmonger will start taking up all system resources trying to generate keys!
+        check=`check_request`
+        rlLog "check_request returned: $check"
+        if [ -n "$check" ] ; then
+                rlLog "Request successful!  Requestid: $check"
+                clean_requests
+        fi
 
         # test cleanup 
         if [ -f $tmpout ];then 
@@ -2627,6 +3153,13 @@ request_1065()  #ipa-getcert request -k [PemKeyFile positive] -f [PemCertFile po
         # test evn cleanup 
         cleanup_pem_keyfile $testID
         cleanup_pem_certfile $testID 
+        # stop tracking or certmonger will start taking up all system resources trying to generate keys!
+        check=`check_request`
+        rlLog "check_request returned: $check"
+        if [ -n "$check" ] ; then
+                rlLog "Request successful!  Requestid: $check"
+                clean_requests
+        fi
 
         # test cleanup 
         if [ -f $tmpout ];then 
@@ -2671,6 +3204,16 @@ request_1066()  #ipa-getcert request -k [PemKeyFile positive] -f [PemCertFile po
         cleanup_pem_certfile $testID
         cleanup_pin $testID 
 
+        # check for request creation
+
+        # if there was a request ...
+        check=`check_request`
+        rlLog "check_request returned: $check"
+        if [ -n "$check" ] ; then
+                rlFail "Appears that a request was generated when an error was expected.  Requestid: $check"
+                clean_requests
+        fi
+
         # test cleanup 
         if [ -f $tmpout ];then 
             rm $tmpout 
@@ -2714,6 +3257,16 @@ request_1067()  #ipa-getcert request -k [PemKeyFile positive] -f [PemCertFile po
         cleanup_pem_certfile $testID
         cleanup_pin $testID 
 
+        # check for request creation
+
+        # if there was a request ...
+        check=`check_request`
+        rlLog "check_request returned: $check"
+        if [ -n "$check" ] ; then
+                rlFail "Appears that a request was generated when an error was expected.  Requestid: $check"
+                clean_requests
+        fi
+
         # test cleanup 
         if [ -f $tmpout ];then 
             rm $tmpout 
@@ -2756,6 +3309,13 @@ request_1068()  #ipa-getcert request -k [PemKeyFile positive] -f [PemCertFile po
         cleanup_pem_keyfile $testID
         cleanup_pem_certfile $testID
         cleanup_pin $testID 
+        # stop tracking or certmonger will start taking up all system resources trying to generate keys!
+        check=`check_request`
+        rlLog "check_request returned: $check"
+        if [ -n "$check" ] ; then
+                rlLog "Request successful!  Requestid: $check"
+                clean_requests
+        fi
 
         # test cleanup 
         if [ -f $tmpout ];then 
@@ -2800,6 +3360,16 @@ request_1069()  #ipa-getcert request -k [PemKeyFile positive] -f [PemCertFile po
         cleanup_pem_certfile $testID
         cleanup_pin $testID 
 
+        # check for request creation
+
+        # if there was a request ...
+        check=`check_request`
+        rlLog "check_request returned: $check"
+        if [ -n "$check" ] ; then
+                rlFail "Appears that a request was generated when an error was expected.  Requestid: $check"
+                clean_requests
+        fi
+
         # test cleanup 
         if [ -f $tmpout ];then 
             rm $tmpout 
@@ -2837,6 +3407,13 @@ request_1070()   #ipa-getcert request -k [PemKeyFile positive] -f [PemCertFile p
         cleanup_pem_keyfile $testID
         cleanup_pem_certfile $testID
         cleanup_pin $testID 
+        # stop tracking or certmonger will start taking up all system resources trying to generate keys!
+        check=`check_request`
+        rlLog "check_request returned: $check"
+        if [ -n "$check" ] ; then
+                rlLog "Request successful!  Requestid: $check"
+                clean_requests
+        fi
 
         # test clean up 
         if [ -f $tmpout ];then 
@@ -2880,6 +3457,13 @@ request_1071()  #ipa-getcert request -k [PemKeyFile positive] -f [PemCertFile po
         cleanup_pem_keyfile $testID
         cleanup_pem_certfile $testID
         cleanup_pin $testID 
+        # stop tracking or certmonger will start taking up all system resources trying to generate keys!
+        check=`check_request`
+        rlLog "check_request returned: $check"
+        if [ -n "$check" ] ; then
+                rlLog "Request successful!  Requestid: $check"
+                clean_requests
+        fi
 
         # test cleanup 
         if [ -f $tmpout ];then 
@@ -2924,6 +3508,16 @@ request_1072()  #ipa-getcert request -k [PemKeyFile positive] -f [PemCertFile po
         cleanup_pem_certfile $testID
         cleanup_pin $testID 
 
+        # check for request creation
+
+        # if there was a request ...
+        check=`check_request`
+        rlLog "check_request returned: $check"
+        if [ -n "$check" ] ; then
+                rlFail "Appears that a request was generated when an error was expected.  Requestid: $check"
+                clean_requests
+        fi
+
         # test cleanup 
         if [ -f $tmpout ];then 
             rm $tmpout 
@@ -2961,6 +3555,13 @@ request_1073()   #ipa-getcert request -k [PemKeyFile positive] -f [PemCertFile p
         cleanup_pem_keyfile $testID
         cleanup_pem_certfile $testID
         cleanup_pin $testID 
+        # stop tracking or certmonger will start taking up all system resources trying to generate keys!
+        check=`check_request`
+        rlLog "check_request returned: $check"
+        if [ -n "$check" ] ; then
+                rlLog "Request successful!  Requestid: $check"
+                clean_requests
+        fi
 
         # test clean up 
         if [ -f $tmpout ];then 
@@ -3004,6 +3605,13 @@ request_1074()  #ipa-getcert request -k [PemKeyFile positive] -f [PemCertFile po
         cleanup_pem_keyfile $testID
         cleanup_pem_certfile $testID
         cleanup_pin $testID 
+        # stop tracking or certmonger will start taking up all system resources trying to generate keys!
+        check=`check_request`
+        rlLog "check_request returned: $check"
+        if [ -n "$check" ] ; then
+                rlLog "Request successful!  Requestid: $check"
+                clean_requests
+        fi
 
         # test cleanup 
         if [ -f $tmpout ];then 
@@ -3047,6 +3655,13 @@ request_1075()  #ipa-getcert request -k [PemKeyFile positive] -f [PemCertFile po
         cleanup_pem_keyfile $testID
         cleanup_pem_certfile $testID
         cleanup_pin $testID 
+        # stop tracking or certmonger will start taking up all system resources trying to generate keys!
+        check=`check_request`
+        rlLog "check_request returned: $check"
+        if [ -n "$check" ] ; then
+                rlLog "Request successful!  Requestid: $check"
+                clean_requests
+        fi
 
         # test cleanup 
         if [ -f $tmpout ];then 
@@ -3090,6 +3705,13 @@ request_1076()  #ipa-getcert request -k [PemKeyFile positive] -f [PemCertFile po
         cleanup_pem_keyfile $testID
         cleanup_pem_certfile $testID
         cleanup_pin $testID 
+        # stop tracking or certmonger will start taking up all system resources trying to generate keys!
+        check=`check_request`
+        rlLog "check_request returned: $check"
+        if [ -n "$check" ] ; then
+                rlLog "Request successful!  Requestid: $check"
+                clean_requests
+        fi
 
         # test cleanup 
         if [ -f $tmpout ];then 
@@ -3134,6 +3756,16 @@ request_1077()  #ipa-getcert request -k [PemKeyFile positive] -f [PemCertFile po
         cleanup_pem_certfile $testID
         cleanup_pin $testID 
 
+        # check for request creation
+
+        # if there was a request ...
+        check=`check_request`
+        rlLog "check_request returned: $check"
+        if [ -n "$check" ] ; then
+                rlFail "Appears that a request was generated when an error was expected.  Requestid: $check"
+                clean_requests
+        fi
+
         # test cleanup 
         if [ -f $tmpout ];then 
             rm $tmpout 
@@ -3171,6 +3803,13 @@ request_1078()   #ipa-getcert request -k [PemKeyFile positive] -f [PemCertFile p
         cleanup_pem_keyfile $testID
         cleanup_pem_certfile $testID
         cleanup_pin $testID 
+        # stop tracking or certmonger will start taking up all system resources trying to generate keys!
+        check=`check_request`
+        rlLog "check_request returned: $check"
+        if [ -n "$check" ] ; then
+                rlLog "Request successful!  Requestid: $check"
+                clean_requests
+        fi
 
         # test clean up 
         if [ -f $tmpout ];then 
@@ -3214,6 +3853,13 @@ request_1079()  #ipa-getcert request -k [PemKeyFile positive] -f [PemCertFile po
         cleanup_pem_keyfile $testID
         cleanup_pem_certfile $testID
         cleanup_pin $testID 
+        # stop tracking or certmonger will start taking up all system resources trying to generate keys!
+        check=`check_request`
+        rlLog "check_request returned: $check"
+        if [ -n "$check" ] ; then
+                rlLog "Request successful!  Requestid: $check"
+                clean_requests
+        fi
 
         # test cleanup 
         if [ -f $tmpout ];then 
@@ -3258,6 +3904,16 @@ request_1080()  #ipa-getcert request -k [PemKeyFile positive] -f [PemCertFile po
         cleanup_pem_certfile $testID
         cleanup_pin $testID 
 
+        # check for request creation
+
+        # if there was a request ...
+        check=`check_request`
+        rlLog "check_request returned: $check"
+        if [ -n "$check" ] ; then
+                rlFail "Appears that a request was generated when an error was expected.  Requestid: $check"
+                clean_requests
+        fi
+
         # test cleanup 
         if [ -f $tmpout ];then 
             rm $tmpout 
@@ -3295,6 +3951,13 @@ request_1081()   #ipa-getcert request -k [PemKeyFile positive] -f [PemCertFile p
         cleanup_pem_keyfile $testID
         cleanup_pem_certfile $testID
         cleanup_pin $testID 
+        # stop tracking or certmonger will start taking up all system resources trying to generate keys!
+        check=`check_request`
+        rlLog "check_request returned: $check"
+        if [ -n "$check" ] ; then
+                rlLog "Request successful!  Requestid: $check"
+                clean_requests
+        fi
 
         # test clean up 
         if [ -f $tmpout ];then 
@@ -3394,6 +4057,7 @@ start_tracking_envcleanup()
 {
     rlPhaseStartCleanup "start_tracking_envcleanup"
         #environment cleanup starts here
+	clean_requests
         #environment cleanup ends   here
     rlPhaseEnd
 } #envcleanup
@@ -3407,7 +4071,7 @@ start_tracking_1001()  #ipa-getcert start-tracking -d [NSSDBDIR negative] -n [Ce
         local tmpout=${TmpDir}/start_tracking_1001.${RANDOM}.out
         local NSSDBDIR_negative="/etc/pki/nssdb/cert8.db"
         local CertNickName_positive="GetcertTest-${testID}"
-        local CertTokenName_positive="NSS Certificate DB"
+        local CertTokenName_positive="NSSCertificateDB"
 
         # test env setup 
         #no data prepare defined 
@@ -3440,7 +4104,7 @@ start_tracking_1002()  #ipa-getcert start-tracking -d [NSSDBDIR negative] -n [Ce
         local tmpout=${TmpDir}/start_tracking_1002.${RANDOM}.out
         local NSSDBDIR_negative="/etc/pki/nssdb/cert8.db"
         local CertNickName_positive="GetcertTest-${testID}"
-        local CertTokenName_positive="NSS Certificate DB"
+        local CertTokenName_positive="NSSCertificateDB"
         local TrackingRequestNickName_positive="TracReq_${testID}"
         local EXTUSAGE_positive="1.3.6.1.5.5.7.3.1"
         local CertPrincipalName_positive="${testID}/${fqdn}@${RELM}"
@@ -3478,7 +4142,7 @@ start_tracking_1003()  #ipa-getcert start-tracking -d [NSSDBDIR negative] -n [Ce
         local tmpout=${TmpDir}/start_tracking_1003.${RANDOM}.out
         local NSSDBDIR_negative="/etc/pki/nssdb/cert8.db"
         local CertNickName_positive="GetcertTest-${testID}"
-        local CertTokenName_positive="NSS Certificate DB"
+        local CertTokenName_positive="NSSCertificateDB"
         local TrackingRequestNickName_positive="TracReq_${testID}"
         local EXTUSAGE_positive="1.3.6.1.5.5.7.3.1"
         local CertPrincipalName_positive="${testID}/${fqdn}@${RELM}"
@@ -3632,7 +4296,7 @@ start_tracking_1007()   #ipa-getcert start-tracking -d [NSSDBDIR positive] -n [C
         local tmpout=${TmpDir}/start_tracking_1007.${RANDOM}.out
         local NSSDBDIR_positive="/etc/pki/nssdb"
         local CertNickName_positive="GetcertTest-${testID}"
-        local CertTokenName_positive="NSS Certificate DB"
+        local CertTokenName_positive="NSSCertificateDB"
 
         # test env setup 
         #no data prepare defined 
@@ -3660,7 +4324,7 @@ start_tracking_1008()  #ipa-getcert start-tracking -d [NSSDBDIR positive] -n [Ce
         local tmpout=${TmpDir}/start_tracking_1008.${RANDOM}.out
         local NSSDBDIR_positive="/etc/pki/nssdb"
         local CertNickName_positive="GetcertTest-${testID}"
-        local CertTokenName_positive="NSS Certificate DB"
+        local CertTokenName_positive="NSSCertificateDB"
         local TrackingRequestNickName_negative="TracReq-${testID}"
         local EXTUSAGE_positive="1.3.6.1.5.5.7.3.1"
         local CertPrincipalName_positive="${testID}/${fqdn}@${RELM}"
@@ -3698,7 +4362,7 @@ start_tracking_1009()  #ipa-getcert start-tracking -d [NSSDBDIR positive] -n [Ce
         local tmpout=${TmpDir}/start_tracking_1009.${RANDOM}.out
         local NSSDBDIR_positive="/etc/pki/nssdb"
         local CertNickName_positive="GetcertTest-${testID}"
-        local CertTokenName_positive="NSS Certificate DB"
+        local CertTokenName_positive="NSSCertificateDB"
         local TrackingRequestNickName_negative="TracReq-${testID}"
         local EXTUSAGE_positive="1.3.6.1.5.5.7.3.1"
         local CertPrincipalName_positive="${testID}/${fqdn}@${RELM}"
@@ -3736,7 +4400,7 @@ start_tracking_1010()  #ipa-getcert start-tracking -d [NSSDBDIR positive] -n [Ce
         local tmpout=${TmpDir}/start_tracking_1010.${RANDOM}.out
         local NSSDBDIR_positive="/etc/pki/nssdb"
         local CertNickName_positive="GetcertTest-${testID}"
-        local CertTokenName_positive="NSS Certificate DB"
+        local CertTokenName_positive="NSSCertificateDB"
         local TrackingRequestNickName_positive="TracReq_${testID}"
         local EXTUSAGE_negative="in.valid.ext.usage.${testID}"
         local CertPrincipalName_positive="${testID}/${fqdn}@${RELM}"
@@ -3774,7 +4438,7 @@ start_tracking_1011()  #ipa-getcert start-tracking -d [NSSDBDIR positive] -n [Ce
         local tmpout=${TmpDir}/start_tracking_1011.${RANDOM}.out
         local NSSDBDIR_positive="/etc/pki/nssdb"
         local CertNickName_positive="GetcertTest-${testID}"
-        local CertTokenName_positive="NSS Certificate DB"
+        local CertTokenName_positive="NSSCertificateDB"
         local TrackingRequestNickName_positive="TracReq_${testID}"
         local EXTUSAGE_negative="in.valid.ext.usage.${testID}"
         local CertPrincipalName_positive="${testID}/${fqdn}@${RELM}"
@@ -3812,7 +4476,7 @@ start_tracking_1012()  #ipa-getcert start-tracking -d [NSSDBDIR positive] -n [Ce
         local tmpout=${TmpDir}/start_tracking_1012.${RANDOM}.out
         local NSSDBDIR_positive="/etc/pki/nssdb"
         local CertNickName_positive="GetcertTest-${testID}"
-        local CertTokenName_positive="NSS Certificate DB"
+        local CertTokenName_positive="NSSCertificateDB"
         local TrackingRequestNickName_positive="TracReq_${testID}"
         local EXTUSAGE_positive="1.3.6.1.5.5.7.3.1"
         local CertPrincipalName_negative="NoSuchPrincipal${testID}"
@@ -3850,7 +4514,7 @@ start_tracking_1013()  #ipa-getcert start-tracking -d [NSSDBDIR positive] -n [Ce
         local tmpout=${TmpDir}/start_tracking_1013.${RANDOM}.out
         local NSSDBDIR_positive="/etc/pki/nssdb"
         local CertNickName_positive="GetcertTest-${testID}"
-        local CertTokenName_positive="NSS Certificate DB"
+        local CertTokenName_positive="NSSCertificateDB"
         local TrackingRequestNickName_positive="TracReq_${testID}"
         local EXTUSAGE_positive="1.3.6.1.5.5.7.3.1"
         local CertPrincipalName_negative="NoSuchPrincipal${testID}"
@@ -3888,7 +4552,7 @@ start_tracking_1014()   #ipa-getcert start-tracking -d [NSSDBDIR positive] -n [C
         local tmpout=${TmpDir}/start_tracking_1014.${RANDOM}.out
         local NSSDBDIR_positive="/etc/pki/nssdb"
         local CertNickName_positive="GetcertTest-${testID}"
-        local CertTokenName_positive="NSS Certificate DB"
+        local CertTokenName_positive="NSSCertificateDB"
         local TrackingRequestNickName_positive="TracReq_${testID}"
         local EXTUSAGE_positive="1.3.6.1.5.5.7.3.1"
         local CertPrincipalName_positive="${testID}/${fqdn}@${RELM}"
@@ -3921,7 +4585,7 @@ start_tracking_1015()   #ipa-getcert start-tracking -d [NSSDBDIR positive] -n [C
         local tmpout=${TmpDir}/start_tracking_1015.${RANDOM}.out
         local NSSDBDIR_positive="/etc/pki/nssdb"
         local CertNickName_positive="GetcertTest-${testID}"
-        local CertTokenName_positive="NSS Certificate DB"
+        local CertTokenName_positive="NSSCertificateDB"
         local TrackingRequestNickName_positive="TracReq_${testID}"
         local EXTUSAGE_positive="1.3.6.1.5.5.7.3.1"
         local CertPrincipalName_positive="${testID}/${fqdn}@${RELM}"
@@ -3958,13 +4622,14 @@ start_tracking_1016()  #ipa-getcert start-tracking -i [ExistingTrackingRequestNi
         #no data prepare defined 
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
-        local expectedErrCode="1" 
-        local expectedErrMsg="None of database directory and nickname or certificate file specified\|No request found that matched arguments" 
+        local expectedErrCode="1"
+	local expectedErrMsg="No request found with specified nickname." 
+        #local expectedErrMsg="None of database directory and nickname or certificate file specified\|No request found that matched arguments" 
         local comment="scenario: [ipa-getcert start-tracking -i]	data: [ExistingTrackingRequestNickName negative]" 
         # verifyString not defined, it will be ignore 
 
         # test starts here  
-        certRun "ipa-getcert start-tracking -i $ExistingTrackingRequestNickName_negative" "$tmpout" $expectedErrCode "$expectedErrMsg" "$comment"  "$verifyString"
+        certRun "ipa-getcert start-tracking -i $ExistingTrackingRequestNickName_negative" "/tmp/1016.out" $expectedErrCode "$expectedErrMsg" "$comment"  "$verifyString"
 
         # test evn cleanup 
         #no data cleanup defined 
@@ -3995,12 +4660,13 @@ start_tracking_1017()  #ipa-getcert start-tracking -i [ExistingTrackingRequestNi
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
         local expectedErrCode="1" 
-        local expectedErrMsg="None of database directory and nickname or certificate file specified\|No request found that matched arguments" 
+	local expectedErrMsg="No request found with specified nickname."
+        #local expectedErrMsg="None of database directory and nickname or certificate file specified\|No request found that matched arguments" 
         local comment="scenario: [ipa-getcert start-tracking -i -I -U -K -D -E -R]	data: [ExistingTrackingRequestNickName negative]" 
         # verifyString not defined, it will be ignore 
 
         # test starts here  
-        certRun "ipa-getcert start-tracking -i $ExistingTrackingRequestNickName_negative -I $TrackingRequestNickName_positive -U $EXTUSAGE_positive -K $CertPrincipalName_positive -D $DNSName_positive -E $EMAIL_positive -R" "$tmpout" $expectedErrCode "$expectedErrMsg" "$comment"  "$verifyString"
+        certRun "ipa-getcert start-tracking -i $ExistingTrackingRequestNickName_negative -I $TrackingRequestNickName_positive -U $EXTUSAGE_positive -K $CertPrincipalName_positive -D $DNSName_positive -E $EMAIL_positive -R" "/tmp/1017.out" $expectedErrCode "$expectedErrMsg" "$comment"  "$verifyString"
 
         # test evn cleanup 
         #no data cleanup defined 
@@ -4031,12 +4697,13 @@ start_tracking_1018()  #ipa-getcert start-tracking -i [ExistingTrackingRequestNi
 
         # expectedErrCode expectedErrMsg will be saved in testvalues table 
         local expectedErrCode="1" 
-        local expectedErrMsg="None of database directory and nickname or certificate file specified\|No request found that matched arguments" 
+	local expectedErrMsg="No request found with specified nickname."
+        #local expectedErrMsg="None of database directory and nickname or certificate file specified\|No request found that matched arguments" 
         local comment="scenario: [ipa-getcert start-tracking -i -I -U -K -D -E -r]	data: [ExistingTrackingRequestNickName negative]" 
         # verifyString not defined, it will be ignore 
 
         # test starts here  
-        certRun "ipa-getcert start-tracking -i $ExistingTrackingRequestNickName_negative -I $TrackingRequestNickName_positive -U $EXTUSAGE_positive -K $CertPrincipalName_positive -D $DNSName_positive -E $EMAIL_positive -r" "$tmpout" $expectedErrCode "$expectedErrMsg" "$comment"  "$verifyString"
+        certRun "ipa-getcert start-tracking -i $ExistingTrackingRequestNickName_negative -I $TrackingRequestNickName_positive -U $EXTUSAGE_positive -K $CertPrincipalName_positive -D $DNSName_positive -E $EMAIL_positive -r" "/tmp/1018.out" $expectedErrCode "$expectedErrMsg" "$comment"  "$verifyString"
 
         # test evn cleanup 
         #no data cleanup defined 
@@ -6189,6 +6856,7 @@ stop_tracking_envcleanup()
 {
     rlPhaseStartCleanup "stop_tracking_envcleanup"
         #environment cleanup starts here
+	clean_requests
         #environment cleanup ends   here
     rlPhaseEnd
 } #envcleanup
@@ -6202,7 +6870,7 @@ stop_tracking_1001()  #ipa-getcert stop-tracking -d [NSSDBDIR negative] -n [Exis
         local tmpout=${TmpDir}/stop_tracking_1001.${RANDOM}.out
         local NSSDBDIR_negative="/etc/pki/nssdb/cert8.db"
         local ExistingCertNickName_positive="$testID"
-        local StopTrackingCertTokenName_positive="NSS Certificate DB"
+        local StopTrackingCertTokenName_positive="NSSCertificateDB"
 
         # test env setup 
         prepare_certrequest $testID 
@@ -6235,7 +6903,7 @@ stop_tracking_1002()  #ipa-getcert stop-tracking -d [NSSDBDIR positive] -n [Exis
         local tmpout=${TmpDir}/stop_tracking_1002.${RANDOM}.out
         local NSSDBDIR_positive="/etc/pki/nssdb"
         local ExistingCertNickName_negative="NoSuchCertExist${testID}"
-        local StopTrackingCertTokenName_positive="NSS Certificate DB"
+        local StopTrackingCertTokenName_positive="NSSCertificateDB"
 
         # test env setup 
         #no data prepare defined 
@@ -6301,7 +6969,7 @@ stop_tracking_1004()   #ipa-getcert stop-tracking -d [NSSDBDIR positive] -n [Exi
         local tmpout=${TmpDir}/stop_tracking_1004.${RANDOM}.out
         local NSSDBDIR_positive="/etc/pki/nssdb"
         local ExistingCertNickName_positive="$testID"
-        local StopTrackingCertTokenName_positive="NSS Certificate DB"
+        local StopTrackingCertTokenName_positive="NSSCertificateDB"
 
         # test env setup 
         prepare_certrequest $testID 
@@ -6520,6 +7188,7 @@ resubmit_envcleanup()
 {
     rlPhaseStartCleanup "resubmit_envcleanup"
         #environment cleanup starts here
+	clean_requests
         #environment cleanup ends   here
     rlPhaseEnd
 } #envcleanup
@@ -6570,7 +7239,7 @@ resubmit_1002()  #ipa-getcert resubmit -d [NSSDBDIR negative] -n [ExistingCertNi
         local tmpout=${TmpDir}/resubmit_1002.${RANDOM}.out
         local NSSDBDIR_negative="/etc/pki/nssdb/cert8.db"
         local ExistingCertNickName_positive="$testID"
-        local CertTokenName_positive="NSS Certificate DB"
+        local CertTokenName_positive="NSSCertificateDB"
         local CertSubjectName_positive="$cert_subject"
         local EXTUSAGE_positive="1.3.6.1.5.5.7.3.1"
         local CertPrincipalName_positive="${testID}/${fqdn}@${RELM}"
@@ -6789,7 +7458,7 @@ resubmit_1008()  #ipa-getcert resubmit -d [NSSDBDIR positive] -n [ExistingCertNi
         local tmpout=${TmpDir}/resubmit_1008.${RANDOM}.out
         local NSSDBDIR_positive="/etc/pki/nssdb"
         local ExistingCertNickName_positive="$testID"
-        local CertTokenName_positive="NSS Certificate DB"
+        local CertTokenName_positive="NSSCertificateDB"
         local CertSubjectName_negative="#"
         local EXTUSAGE_positive="1.3.6.1.5.5.7.3.1"
         local CertPrincipalName_positive="${testID}/${fqdn}@${RELM}"
@@ -6827,7 +7496,7 @@ resubmit_1009()  #ipa-getcert resubmit -d [NSSDBDIR positive] -n [ExistingCertNi
         local tmpout=${TmpDir}/resubmit_1009.${RANDOM}.out
         local NSSDBDIR_positive="/etc/pki/nssdb"
         local ExistingCertNickName_positive="$testID"
-        local CertTokenName_positive="NSS Certificate DB"
+        local CertTokenName_positive="NSSCertificateDB"
         local CertSubjectName_positive="$cert_subject"
         local EXTUSAGE_negative="in.valid.ext.usage.${testID}"
         local CertPrincipalName_positive="${testID}/${fqdn}@${RELM}"
@@ -6866,7 +7535,7 @@ resubmit_1010()  #ipa-getcert resubmit -d [NSSDBDIR positive] -n [ExistingCertNi
         local tmpout=${TmpDir}/resubmit_1010.${RANDOM}.out
         local NSSDBDIR_positive="/etc/pki/nssdb"
         local ExistingCertNickName_positive="$testID"
-        local CertTokenName_positive="NSS Certificate DB"
+        local CertTokenName_positive="NSSCertificateDB"
         local CertSubjectName_positive="$cert_subject"
         local EXTUSAGE_positive="1.3.6.1.5.5.7.3.1"
         local CertPrincipalName_negative="NoSuchPrincipal${testID}"
@@ -6904,7 +7573,7 @@ resubmit_1011()  #ipa-getcert resubmit -d [NSSDBDIR positive] -n [ExistingCertNi
         local tmpout=${TmpDir}/resubmit_1011.${RANDOM}.out
         local NSSDBDIR_positive="/etc/pki/nssdb"
         local ExistingCertNickName_positive="$testID"
-        local CertTokenName_positive="NSS Certificate DB"
+        local CertTokenName_positive="NSSCertificateDB"
         local CertSubjectName_positive="$cert_subject"
         local EXTUSAGE_positive="1.3.6.1.5.5.7.3.1"
         local CertPrincipalName_positive="${testID}/${fqdn}@${RELM}"
@@ -6943,7 +7612,7 @@ resubmit_1012()   #ipa-getcert resubmit -d [NSSDBDIR positive] -n [ExistingCertN
         local tmpout=${TmpDir}/resubmit_1012.${RANDOM}.out
         local NSSDBDIR_positive="/etc/pki/nssdb"
         local ExistingCertNickName_positive="$testID"
-        local CertTokenName_positive="NSS Certificate DB"
+        local CertTokenName_positive="NSSCertificateDB"
         local CertSubjectName_positive="$cert_subject"
         local EXTUSAGE_positive="1.3.6.1.5.5.7.3.1"
         local CertPrincipalName_positive="${testID}/${fqdn}@${RELM}"
@@ -7768,6 +8437,7 @@ list_envcleanup()
 {
     rlPhaseStartCleanup "list_envcleanup"
         #environment cleanup starts here
+	clean_requests
         #environment cleanup ends   here
     rlPhaseEnd
 } #envcleanup
@@ -7864,6 +8534,7 @@ list_cas_envcleanup()
 {
     rlPhaseStartCleanup "list_cas_envcleanup"
         #environment cleanup starts here
+	clean_requests
         #environment cleanup ends   here
     rlPhaseEnd
 } #envcleanup
