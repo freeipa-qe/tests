@@ -1,6 +1,8 @@
 ######################################
 # lib.ipa-getcert.sh                 #
 ######################################
+requestpath="/var/lib/certmonger/requests/"
+
 get_certsubject(){
     echo $ADMINPW | kinit $ADMINID 2>&1 >/dev/null
     cert=`ipa config-show | grep "Certificate Subject base" | cut -d":" -f2 | xargs echo`
@@ -255,4 +257,24 @@ check_certmonger_status(){
         tail -n 20 /var/log/message
         echo "---------------------------------------------------"
     fi
+}
+
+check_request(){
+   requestid=""
+
+   requestid=`ls $requestpath 2>&1`
+   rlLog "Request: $requestid"
+
+  if [ -n "$requestid" ] ; then
+        #wait for the request to finish
+        sleep 5
+  fi
+  echo $requestid
+}
+
+clean_requests(){
+
+        service certmonger stop
+        rm -rf $requestpath/*
+        service certmonger start
 }
