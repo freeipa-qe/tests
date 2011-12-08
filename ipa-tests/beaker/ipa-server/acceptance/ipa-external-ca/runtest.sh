@@ -94,8 +94,8 @@ rlJournalStart
 	rlPhaseEnd
 
 	rlPhaseStartCleanup "ipa-external-ca: ipa-server un-installation."
-        	# delete hbac service 
-		rlLog "ipa-server-install --uninstall -U"
+        	# dummy section
+		rlLog "dummy section"
 	rlPhaseEnd
 
 
