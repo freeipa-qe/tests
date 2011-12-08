@@ -25,6 +25,8 @@ testReplicationOnMasterAndSlave()
 		rlLog "BEAKERSLAVE: $BEAKERSLAVE"
 		masterDatafile="/mnt/tests/CoreOS/ipa-server/acceptance/replication/data.replication.master"
 		slaveDatafile="/mnt/tests/CoreOS/ipa-server/acceptance/replication/data.replication.slave"
+		# LOCAL masterDatafile="/home/test/beaker/ipa-server/acceptance/replication/data.replication.master"
+		# LOCAL slaveDatafile="/home/test/beaker/ipa-server/acceptance/replication/data.replication.slave"
 
 		# Determine if this is a master
 		hostname=`hostname -s`
@@ -119,6 +121,7 @@ testReplicationOnMasterAndSlave()
 ################################################
 
 	 if [ $config == "master" ] ; then 
+                rhts-sync-block -s SLAVECHECKEDOBJS $BEAKERSLAVE
 		rlPhaseStartTest "Check objects (added from slave) on master"
 			source $slaveDatafile
 			check_objects
@@ -134,8 +137,8 @@ testReplicationOnMasterAndSlave()
 ################################################
 
 	 if [ $config == "master" ] ; then 
-		rhts-sync-block -s SLAVECHECKEDOBJS $BEAKERSLAVE
-		echo "Sync with slave complete, read state as SLAVECHECKEDOBJS from $BEAKERSLAVE"
+	#	rhts-sync-block -s SLAVECHECKEDOBJS $BEAKERSLAVE
+		#echo "Sync with slave complete, read state as SLAVECHECKEDOBJS from $BEAKERSLAVE"
 		rlPhaseStartTest "Modify objects (added from slave) on master"
 			# save away data to check before sourcing datafile
 			loginToUpdate=$login
@@ -151,7 +154,7 @@ testReplicationOnMasterAndSlave()
 		rhts-sync-set -s MASTERUPDATEDOBJS
 	 fi
 
-################################################
+###############################################
 # 6	check updated objects on replica
 ################################################
 
@@ -199,16 +202,16 @@ testReplicationOnMasterAndSlave()
 
 		rlPhaseStartTest "Check objects (modified from slave) on master"
 			source $slaveDatafile
-			check_updated_objects_slave
+			check_updated_slave_objects
 		rlPhaseEnd
 		# kinit on master, as the user updated from slave
 		rlPhaseStartTest "Kinit on master, as user updated from slave"
 			rlRun "kinitAs $login_updated $updatedPassword" 0 "Kinit on master as user updated from slave"
 	 fi
 
-###########################################################################
-# 9	delete object (added from replica, modified from master) from master
-###########################################################################
+##########################################################################
+# 	delete object (added from replica, modified from master) from master
+##########################################################################
 
 	 if [ $config == "master" ] ; then 
 		rlPhaseStartTest "Delete objects (added from slave, modified from master) on master"
@@ -244,37 +247,40 @@ sleep 100
 			source $masterDatafile
 			check_deletedobjects
 		rlPhaseEnd
+		rhts-sync-set -s SLAVEDONE 
 	fi
 
 
 	if [ $config == "master" ] ; then
 	
+		rhts-sync-block -s SLAVEDONE $BEAKERMASTER
 		rlPhaseStartTest "Check deleted objects on master"
-			source $masterDatafile
+			source $slaveDatafile
 			check_deletedobjects
 		rlPhaseEnd
+		rhts-sync-set -s MASTERDONE 
 	fi
-
-
-##
-##	# kinit user from client to master
-##	rhts-sync-block -s READYFORCLIENT {$MASTER, $SLAVE}
-##	kinit_user
-##	rhts-sync-set -s READY
-##
-##	# check login on replica
-##	check_login
-##
-##	# kinit user from client to replica
-##	kinit_user
-##
-##	# check login on master
-##	check_login
-##
-##	# user changes password from client to master
-##	client_actions
-##
-##	# ....and so on
+#
+#
+###
+###	# kinit user from client to master
+###	rhts-sync-block -s READYFORCLIENT {$MASTER, $SLAVE}
+###	kinit_user
+###	rhts-sync-set -s READY
+###
+###	# check login on replica
+###	check_login
+###
+###	# kinit user from client to replica
+###	kinit_user
+###
+###	# check login on master
+###	check_login
+###
+###	# user changes password from client to master
+###	client_actions
+###
+###	# ....and so on
 
 }
 
@@ -303,7 +309,7 @@ add_objects()
 	add_newservice
 
 	# Add a delegation
-#	add_delegation
+	add_delegation
 
 	# Add a DNS record 
 	add_dns
@@ -344,6 +350,7 @@ add_objects()
 
 slave_add_objects()
 {
+	rlLog "Adding objects on $hostname"
 	add_slave_user
 	add_slave_group
 	add_slave_host
@@ -433,8 +440,9 @@ check_updated_objects()
 
 slave_update_objects()
 {
-	modify_slave_user
-	modify_slave_group
+	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials to verify updated objects"
+	modify_slave_user $1
+	modify_slave_group $2
 	modify_slave_host
 	modify_slave_hostgroup
 	modify_slave_netgroup
@@ -452,6 +460,7 @@ slave_update_objects()
 
 check_updated_slave_objects()
 {
+	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials to verify updated objects"
 	check_slave_modifieduser
 	check_slave_modifiedgroup
 	check_slave_modifiedhost
@@ -494,6 +503,7 @@ delete_objects()
 
 delete_slave_objects()
 {
+	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials to delete objects"
 	delete_slave_user
 	delete_slave_group
 	delete_slave_host
@@ -512,6 +522,7 @@ delete_slave_objects()
 	delete_slave_selfservice
 	delete_slave_privilege
 	delete_slave_role
+        delete_slave_permission
 }
 
 check_deletedobjects()
@@ -534,5 +545,5 @@ check_deletedobjects()
 	check_deletedsudorule
 	check_deletedsudocmdgroup
 	check_deletedsudocmd
-	check_deleteconfig
+	check_deletedconfig
 }

@@ -95,7 +95,7 @@ managedByHost="dreamworks.$DOMAIN"
 managedByHostIP="\"10.16.84.17\""
 
 ######### attributes for a new host modified from a master
-newHost_updated="row.$DOMAIN"
+host_updated="row.$DOMAIN"
 hostDesc_updated="\"For the Publisher team\"" 
 hostLocality_updated="Raleigh"
 hostLocation_updated="\"2nd Floor Lab\"" 
@@ -103,12 +103,12 @@ hostPlatform_updated="\"Lenovo T6\""
 hostOS_updated="\"RHEL 6.0\""
 #hostPassword_updated="Secret456"
 managedByHost_updated="penguin.$DOMAIN"
-hostPrincipal_updated="host/$newHost_updated@$RELM"
+hostPrincipal_updated="host/$host_updated@$RELM"
 
 
 ######### attributes for a new hostgroup added from master
 hostgroup="westford"
-hostgroup2="cambridge"
+hostgroup22="cambridge"
 hostgroup_desc="Westford hosts"
 hostgroup_groupMember1="bldg1"
 hostgroup_groupMember2="bldf1"
@@ -149,3 +149,8 @@ service2_updated=lsmtp/$MASTER@$RELM
 subject_updated="CN=rhel61-server3.testrelm,O=TESTRELM"
 service_managedby_attr="fqdn=$managedByHost_updated,cn=computers,cn=accounts,dc=testrelm"
 service_managedby_attr2="fqdn=$managedByHost,cn=computers,cn=accounts,dc=testrelm"
+
+
+hbacservice1=rlogin
+hbacservice2=qlogin
+

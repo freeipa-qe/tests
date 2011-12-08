@@ -59,7 +59,7 @@ login="aclark"
 
 # attributes for a new group modified from slave
 groupName_updated="evaluator"
-slave_groupName_updated="zoltar"
+#groupName_updated="zoltar"
 desc_updated="\"users in this group can evaluate contents of this book\""
 groupMember1_updated="eileen"
 groupMember2_updated="karen"
@@ -67,7 +67,7 @@ groupName_nonposix_updated="publisher"
 
 # attributes for a new group added from slave 
 groupName="subscriber"
-slaveGroupName="sgroup"
+#slaveGroupName="sgroup"
 dn="cn=$groupName,cn=groups,cn=accounts,dc=$DOMAIN"
 desc="\"users in this group can subscribe to get updates\""
 gid="5003"
@@ -94,7 +94,7 @@ managedByHost="penguin.$DOMAIN"
 managedByHostIP="\"10.16.84.18\""
 
 # attributes for a new host modified from a slave
-newHost_updated="harper.$DOMAIN"
+host_updated="harper.$DOMAIN"
 hostDesc_updated="\"For the Printer team\"" 
 hostLocality_updated="Raleigh"
 hostLocation_updated="\"4th Floor Lab\"" 
@@ -105,7 +105,7 @@ managedByHost_updated="dreamworks.$DOMAIN"
 
 ######### attributes for a new hostgroup added from slave
 hostgroup="raleigh"
-hostgroup2="cambridge"
+hostgroup22="cambridge"
 hostgroup_desc="Raleigh hosts"
 hostgroup_groupMember1="bldg2"
 hostgroup_groupMember2="bldf1"
@@ -143,3 +143,8 @@ service2_updated=lsmtp/$MASTER@$RELM
 subject_updated="CN=rhel61-server3.testrelm,O=TESTRELM"
 service_managedby_attr="fqdn=$managedByHost_updated,cn=computers,cn=accounts,dc=testrelm"
 service_managedby_attr2="fqdn=$managedByHost,cn=computers,cn=accounts,dc=testrelm"
+
+
+
+hbacservice1=rlogin
+hbacservice2=qlogin
