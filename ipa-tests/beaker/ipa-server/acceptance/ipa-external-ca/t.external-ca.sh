@@ -49,6 +49,7 @@ installMasterExtCA()
         rlRun "fixHostFile" 0 "Set up /etc/hosts"
 	rlRun "fixhostname" 0 "Fix hostname"
 
+	rlRun "yum install -y ipa-server bind-dyndb-ldap bind"
 	echo "ipa-server-install --external-ca --setup-dns --forwarder=$DNSFORWARD --hostname=$hostname_s.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U" > /dev/shm/installipa.bash
 
 	rlLog "EXECUTING: ipa-server-install --external-ca --setup-dns --forwarder=$DNSFORWARD --hostname=$hostname_s.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U"
