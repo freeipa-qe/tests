@@ -29,7 +29,7 @@ export TESTVERSION=1.0
 
 BUILT_FILES=
 
-FILES=$(METADATA) runtest.sh Makefile PURPOSE t.external-ca.sh
+FILES=$(METADATA) runtest.sh Makefile PURPOSE t.external-ca.sh signca.py makesub.sh install-lib.sh
 
 .PHONY: all install download clean
 
