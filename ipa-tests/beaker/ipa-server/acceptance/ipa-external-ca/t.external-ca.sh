@@ -63,7 +63,8 @@ installMasterExtCA()
 
 	rlAssertExists "/root/ipa.csr"
 	rlRun "mkdir /root/ipa-ca"
-	rlRun "cp /root/beaker/ipa-server/acceptance/ipa-external-ca/makesub.sh /root/beaker/ipa-server/acceptance/ipa-external-ca/signca.py /root/ipa-ca/"
+	rlRun "cp /mnt/tests/CoreOS/ipa-server/acceptance/ipa-external-ca/makesub.sh /root/ipa-ca/"
+	rlRun "cp /mnt/tests/CoreOS/ipa-server/acceptance/ipa-external-ca/signca.py /root/ipa-ca/"
 	pushd .
 	rlRun "cd /root/ipa-ca"
 
@@ -129,10 +130,13 @@ set send_slow {1 .1}' > $expfile
 	echo 'expect "*:"' >> $expfile
 	echo "send -s -- "$password"" >> $expfile
 	echo 'send -s -- "\r"' >> $expfile
+	echo 'wait' >> $expfile
 	echo 'expect eof ' >> $expfile
 
 	rlLog "Executing: /usr/sbin/ipa-server-install --external_cert_file=/root/ipa-ca/ipa.crt --external_ca_file=/root/ipa-ca/ipacacert.asc"
 	rlRun "/usr/bin/expect $expfile"
+
+	rlRun "service ipa status"
 
 }
 
