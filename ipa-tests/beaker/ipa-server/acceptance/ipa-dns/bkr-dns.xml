@@ -3,7 +3,7 @@
 		ipa-server dns tests
 	</whiteboard>
 	<recipeSet>
-		<recipe whiteboard="ipa dns tests - x86_64">
+		<recipe whiteboard="ipa dns tests - x86_64" ks_meta="selinux=disabled partitions=yes">
 			<distroRequires>
 				<and>
 					<distro_variant op="=" value="Server"/>
@@ -15,8 +15,7 @@
 			</distroRequires>
 			<hostRequires/>
 			<repos>
-				<repo name="ipa" url="http://mickey.dsdev.sjc.redhat.com/repos/pki/ipa/devel/rhel6/devel_x86_64/x86_64/"/>
-				<repo name="ipa_noarch" url="http://mickey.dsdev.sjc.redhat.com/repos/pki/ipa/devel/rhel6/devel_x86_64/noarch/"/>
+				<repo name="ipa-noarch" url="http://epsilon.dsdev.sjc.redhat.com/tet/up.repo"/>
 			</repos>
 			<task name="/distribution/install" role="STANDALONE">
 				<params/>
@@ -34,6 +33,11 @@
 			</task>
 			<task name="/CoreOS/ipa-server/acceptance/ipa-dns" role="MASTER">
 				<params/>
+			</task>
+			<task name="/distribution/reservesys" role="STANDALONE">
+				<params>
+					<param name="RESERVETIME" value="86400"/>
+				</params>
 			</task>
 		</recipe>
 	</recipeSet>
