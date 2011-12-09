@@ -137,8 +137,6 @@ testReplicationOnMasterAndSlave()
 ################################################
 
 	 if [ $config == "master" ] ; then 
-	#	rhts-sync-block -s SLAVECHECKEDOBJS $BEAKERSLAVE
-		#echo "Sync with slave complete, read state as SLAVECHECKEDOBJS from $BEAKERSLAVE"
 		rlPhaseStartTest "Modify objects (added from slave) on master"
 			# save away data to check before sourcing datafile
 			loginToUpdate=$login
@@ -210,7 +208,7 @@ testReplicationOnMasterAndSlave()
 	 fi
 
 ##########################################################################
-# 	delete object (added from replica, modified from master) from master
+# 9   delete object (added from replica, modified from master) from master
 ##########################################################################
 
 	 if [ $config == "master" ] ; then 
@@ -253,7 +251,7 @@ sleep 100
 
 	if [ $config == "master" ] ; then
 	
-		rhts-sync-block -s SLAVEDONE $BEAKERMASTER
+		rhts-sync-block -s SLAVEDONE $BEAKERSLAVE
 		rlPhaseStartTest "Check deleted objects on master"
 			source $slaveDatafile
 			check_deletedobjects
@@ -415,6 +413,7 @@ update_objects()
 	modify_sudorule
 	modify_sudocmdgroup
 	modify_sudocmd
+	modify_config
 }
 
 check_updated_objects()
@@ -436,6 +435,7 @@ check_updated_objects()
 	check_modifiedsudorule
 	check_modifiedsudocmdgroup
 	check_modifiedsudocmd
+	check_modifiedconfig
 }
 
 slave_update_objects()
@@ -448,7 +448,7 @@ slave_update_objects()
 	modify_slave_netgroup
 	modify_slave_newservice
 	modify_slave_hbacservice
-	modify_slave_service
+	#modify_slave_service
 	modify_slave_sudorule
 	modify_slave_sudocmd
 	modify_slave_sudocmdgroup
@@ -498,7 +498,6 @@ delete_objects()
 	delete_sudorule
 	delete_sudocmdgroup
 	delete_sudocmd
-	delete_config
 }
 
 delete_slave_objects()
@@ -513,11 +512,10 @@ delete_slave_objects()
 	delete_slave_dns
 	delete_slave_hbac
 	delete_slave_hbac_service
-	delete_slave_service
+	#delete_slave_service
 	delete_slave_sudorule
 	delete_slave_sudocmd
 	delete_slave_sudocmdgroup
-	delete_slave_config
 	delete_slave_pwpolicy
 	delete_slave_selfservice
 	delete_slave_privilege
@@ -545,5 +543,4 @@ check_deletedobjects()
 	check_deletedsudorule
 	check_deletedsudocmdgroup
 	check_deletedsudocmd
-	check_deletedconfig
 }

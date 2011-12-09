@@ -92,7 +92,11 @@ rlJournalStart
         rlRun "rm -r $TmpDir" 0 "Removing tmp directory"
     rlPhaseEnd
 
-    makereport
+    rlJournalPrintText
+	report=/tmp/rhts.report.$RANDOM.txt
+	makereport $report
+	rhts-submit-log -l $report
+    rlJournalEnd 
 rlJournalEnd
 
 
