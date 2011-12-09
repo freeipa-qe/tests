@@ -25,8 +25,6 @@ testReplicationOnMasterAndSlave()
 		rlLog "BEAKERSLAVE: $BEAKERSLAVE"
 		masterDatafile="/mnt/tests/CoreOS/ipa-server/acceptance/replication/data.replication.master"
 		slaveDatafile="/mnt/tests/CoreOS/ipa-server/acceptance/replication/data.replication.slave"
-		# LOCAL masterDatafile="/home/test/beaker/ipa-server/acceptance/replication/data.replication.master"
-		# LOCAL slaveDatafile="/home/test/beaker/ipa-server/acceptance/replication/data.replication.slave"
 
 		# Determine if this is a master
 		hostname=`hostname -s`
@@ -448,7 +446,6 @@ slave_update_objects()
 	modify_slave_netgroup
 	modify_slave_newservice
 	modify_slave_hbacservice
-	#modify_slave_service
 	modify_slave_sudorule
 	modify_slave_sudocmd
 	modify_slave_sudocmdgroup
@@ -512,7 +509,6 @@ delete_slave_objects()
 	delete_slave_dns
 	delete_slave_hbac
 	delete_slave_hbac_service
-	#delete_slave_service
 	delete_slave_sudorule
 	delete_slave_sudocmd
 	delete_slave_sudocmdgroup

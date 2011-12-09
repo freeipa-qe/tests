@@ -467,11 +467,6 @@ add_newnetgroup()
 add_slave_netgroup()
 {
     add_newnetgroup
-#	rlPhaseStartTest "add netgroup"
-#		rlRun "ipa netgroup-add --desc=$netgroup_groupMember1 $netgroup_groupMember1" 0 "Add netgroup to be added as a member"
-#		rlRun "ipa netgroup-add --desc=$netgroup_desc --nisdomain=$DOMAIN --usercat=all --hostcat=all $netgroup" 0 "Add new netgroup"
-#		rlRun "ipa netgroup-add-member --users=$groupMember1 --groups=$groupName_nonposix --hosts=$managedByHost --hostgroups=$hostgroup_groupMember1 --netgroups=$netgroup_groupMember1 $netgroup" 0 "Add members to netgroup"
-#	rlPhaseEnd
 }
 
 check_newnetgroup()
@@ -529,9 +524,6 @@ delete_netgroup()
 delete_slave_netgroup()
 {
     delete_netgroup
-#	rlPhaseStartTest "delete netgroup"
-#		rlRun "ipa netgroup-del $netgroup_updated" 0 "Delete the netgroup" 
-#	rlPhaseEnd
 }
 
 check_deletednetgroup()
@@ -649,7 +641,7 @@ add_delegation()
 			rlLog "ipa permission-add $testID  --attrs=$attrs_TestValue  --permissions=$permissions_TestValue  --targetgroup=$targetgroup_TestValue "
 			rlRun "ipa permission-add $testID  --attrs=$attrs_TestValue  --permissions=$permissions_TestValue  --targetgroup=$targetgroup_TestValue " 0 "test options:  [desc]=[$desc_TestValue] [attrs]=[$attrs_TestValue] [permissions]=[$permissions_TestValue] [targetgroup]=[$targetgroup_TestValue]"
 			# TODO: command not found: deletePermission $testID
-			# TODO: Keeping tmp file for now - NAMITA rm $tmpout 2>&1 >/dev/null
+			rm $tmpout 2>&1 >/dev/null
 		rlPhaseEnd
 	fi
 } #permission_add_1036
@@ -669,23 +661,9 @@ check_delegation()
 ################################
 # DNS section
 ################################
-#export zone=repnewzone
-#export arec="alpha2.$zone"
-#export slavearec="beta2.$zone"
-#export a="1.2.3.4"
-#export slavea="6.5.4.3"
 add_dns()
 {
-#	ipaddr=`hostname`	
-#	email="ipaqar.redhat.com"
-#	serial=2010010701
-#	refresh=303
-#	retry=101
-#	expire=1202
-#	minimum=33
-#	ttl=55
-	
-		    	KinitAsAdmin
+    	KinitAsAdmin
 	rlPhaseStartTest "create a new zone $zone to be used in a replication dns test. It could contain the $zrec record"
 		rlRun "ipa dnszone-add --name-server=$ipaddr --admin-email=$email --serial=$serial --refresh=$refresh --retry=$retry --expire=$expire --minimum=$minimum --ttl=$ttl $zone" 0 "Checking to ensure that ipa thinks that it can create a zone"
 		rlRun "/usr/sbin/ipactl restart" 0 "Restarting IPA server"
@@ -741,21 +719,6 @@ check_deleteddns()
 ################################
 # hbac section
 ################################
-#REALM=`os_getdomainname | tr "[a-z]" "[A-Z]"`
-#DOMAIN=`os_getdomainname`
-#
-#host1="dev-host-hbac."$DOMAIN
-#
-#user1="dev-hbac"
-#
-#usergroup1="dev-ugrp-hbac"
-#
-#hostgroup1="dev-hosts-hbac"
-#
-#hostgroup2="dev-slave-hbac"
-#
-#servicegroup="remote-access-hbac"
-
 hbac_setup()
 {
 	rlPhaseStartTest "hbac setup"
@@ -837,7 +800,6 @@ delete_hbac()
 		rlRun "deleteGroup $usergroup1" 0 "Deleting User Group associated with rule."
 		rlRun "deleteHost $host1" 0 "Deleting Host associated with rule."
 		rlRun "deleteHostGroup $hostgroup1" 0 "Deleting Host Group associated with rule."
-		#rlRun "deleteHBACRule Engineering" 0 "CLEANUP: Deleting Rule"
 	rlPhaseEnd
 }
 
@@ -845,6 +807,7 @@ delete_slave_hbac()
 {
 	rlPhaseStartTest "delete hba entries from hosts"
 		rlRun "deleteHostGroup $hostgroup2" 0 "Deleting Host Group associated with rule."
+		rlRun "deleteHBACRule Engineering" 0 "CLEANUP: Deleting Rule"
 	rlPhaseEnd
 }
 
@@ -860,8 +823,6 @@ check_deletedhbac()
 ################################
 # hbac service section
 ################################
-#hbacservice1="rlogin"
-#hbacservice2="qlogin"
 add_hbac_service()
 {
 	rlPhaseStartTest "add hbac service"
@@ -946,8 +907,6 @@ check_deletedhbacservice()
 ################################
 # permission section
 ################################
-#puser1="puser"
-#puser2="ruser"
 add_permission()
 {
 	rlPhaseStartTest "add a permission"
@@ -1014,8 +973,6 @@ check_deletedpermission()
 ################################
 # sudo rule
 ################################
-#rule1=sudorule1
-#rule2=sudorule2
 add_sudorule()
 {
 	rlPhaseStartTest "add a sudo rule"
@@ -1082,8 +1039,6 @@ check_deletedsudorule()
 ################################
 # sudo cmd
 ################################
-#cmdrule1="/use/local/bin/nonexist"
-#cmdrule2="/use/local/bin/alsononexist"
 add_sudocmd()
 {
 	rlPhaseStartTest "add a sudo cmd"
@@ -1150,8 +1105,6 @@ check_deletedsudocmd()
 ################################
 # sudo cmd group
 ################################
-#cmdgrp1=repadmins
-#cmdgrp2=loosingadmins
 add_sudocmdgroup()
 {
 	rlPhaseStartTest "add a sudo cmd group"
@@ -1259,8 +1212,6 @@ check_modifiedconfig()
 ################################
 # pwpolicy section
 ################################
-#tg="pwtestg"
-#ts="pwtests"
 add_pwpolicy()
 {
 	ipa group-add --desc=tg $tg
@@ -1330,8 +1281,6 @@ check_deletedpwpolicy()
 ################################
 # selfservice section
 ################################
-#ss="users-self-s"
-#sr="users-self-r"
 add_selfservice()
 {
 	rlPhaseStartTest "adding a selfservice section"
@@ -1396,8 +1345,6 @@ check_deletedselfservice()
 ################################
 # privilege section
 ################################
-#priv="rep-priv"
-#priv2="dem-priv"
 add_privilege()
 {
 	rlPhaseStartTest "Add a privilege"
@@ -1462,8 +1409,6 @@ check_deletedprivilege()
 ################################
 # role section
 ################################
-#role="rep-rtst"
-#role2="dem-rtst"
 add_role()
 {
 	rlPhaseStartTest "Add a role"
