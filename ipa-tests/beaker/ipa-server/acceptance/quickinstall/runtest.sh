@@ -72,45 +72,45 @@ rlJournalStart
 	rc=0
 	echo $MASTER | grep $HOSTNAME
 	if [ $? -eq 0 ] ; then
-	   yum clean all
-	   yum -y install $COMMON_SERVER_PACKAGES
+	   	yum clean all
+	   	yum -y install $COMMON_SERVER_PACKAGES
 
-	   if [ "$FLAVOR" == "Fedora" ] ; then
-		yum -y install $FREEIPA_SERVER_PACKAGES
-                yum -y update
+	   	if [ "$FLAVOR" == "Fedora" ] ; then
+			yum -y install $FREEIPA_SERVER_PACKAGES
+                	yum -y update
 
-	        for item in $FREEIPA_SERVER_PACKAGES ; do
-			rpm -qa | grep $item
-			if [ $? -eq 0 ] ; then
-				rlLog "$item package is installed"
-			else
-				rlLog "ERROR: $item package is NOT installed"
-				rc=1
-			fi
-	   	done
-	   else
-		yum -y install $RHELIPA_SERVER_PACKAGES
-                yum -y update
+	        	for item in $FREEIPA_SERVER_PACKAGES ; do
+				rpm -qa | grep $item
+				if [ $? -eq 0 ] ; then
+					rlLog "$item package is installed"
+				else
+					rlLog "ERROR: $item package is NOT installed"
+					rc=1
+				fi
+	   		done
+	   	else
+			yum -y install $RHELIPA_SERVER_PACKAGES
+                	yum -y update
 
-           	for item in $RHELIPA_SERVER_PACKAGES ; do
-                	rpm -qa | grep $item
-                	if [ $? -eq 0 ] ; then
-                        	rlLog "$item package is installed"
-                	else    
-                        	rlLog "ERROR: $item package is NOT installed"
-                        	rc=1    
-                	fi      
-           	done 
-	     if
+           		for item in $RHELIPA_SERVER_PACKAGES ; do
+                		rpm -qa | grep $item
+                		if [ $? -eq 0 ] ; then
+                        		rlLog "$item package is installed"
+                		else    
+                        		rlLog "ERROR: $item package is NOT installed"
+                        		rc=1    
+                		fi      
+           		done 
+	     	fi	
 
-	    if [ $rc -eq 0 ] ; then
-		installMaster
-		rhts-sync-set -s READY
-		rlLog "Setting up Authorized keys"
-	        SetUpAuthKeys
-        	rlLog "Setting up known hosts file"
-        	SetUpKnownHosts
-	    fi
+	    	if [ $rc -eq 0 ] ; then
+			installMaster
+			rhts-sync-set -s READY
+			rlLog "Setting up Authorized keys"
+	        	SetUpAuthKeys
+        		rlLog "Setting up known hosts file"
+        		SetUpKnownHosts
+	    	fi
 	else
 		rlLog "Machine in recipe in not a MASTER"
 	fi
@@ -121,36 +121,36 @@ rlJournalStart
 	rc=0
         echo $SLAVE | grep $HOSTNAME
         if [ $? -eq 0 ] ; then
-	   yum clean all
-           yum -y install $COMMON_SERVER_PACKAGES
+	   	yum clean all
+           	yum -y install $COMMON_SERVER_PACKAGES
 
-           if [ "$FLAVOR" == "Fedora" ] ; then
-                yum -y install $FREEIPA_SERVER_PACKAGES
-                yum -y update
+           	if [ "$FLAVOR" == "Fedora" ] ; then
+                	yum -y install $FREEIPA_SERVER_PACKAGES
+                	yum -y update
 
-                for item in $FREEIPA_SERVER_PACKAGES ; do
-                        rpm -qa | grep $item
-                        if [ $? -eq 0 ] ; then
-                                rlLog "$item package is installed"
-                        else
-                                rlLog "ERROR: $item package is NOT installed"
-                                rc=1
-                        fi
-                done
-           else
-                yum -y install $RHELIPA_SERVER_PACKAGES
-                yum -y update
+                	for item in $FREEIPA_SERVER_PACKAGES ; do
+                        	rpm -qa | grep $item
+                        	if [ $? -eq 0 ] ; then
+                                	rlLog "$item package is installed"
+                        	else
+                                	rlLog "ERROR: $item package is NOT installed"
+                                	rc=1
+                        	fi
+                	done
+           	else
+                	yum -y install $RHELIPA_SERVER_PACKAGES
+                	yum -y update
 
-                for item in $RHELIPA_SERVER_PACKAGES ; do
-                        rpm -qa | grep $item
-                        if [ $? -eq 0 ] ; then
-                                rlLog "$item package is installed"
-                        else
-                                rlLog "ERROR: $item package is NOT installed"
-                                rc=1
-                        fi
-                done
-             if
+                	for item in $RHELIPA_SERVER_PACKAGES ; do
+                        	rpm -qa | grep $item
+                        	if [ $? -eq 0 ] ; then
+                                	rlLog "$item package is installed"
+                        	else
+                                	rlLog "ERROR: $item package is NOT installed"
+                                	rc=1
+                        	fi
+                	done
+             	fi
 
 		if [ $rc -eq 0 ] ; then
 			rhts-sync-block -s READY $MASTER
@@ -171,36 +171,36 @@ rlJournalStart
 	rc=0
         echo $CLIENT | grep $HOSTNAME
         if [ $? -eq 0 ] ; then
-	   yum clean all
-           yum -y install $COMMON_CLIENT_PACKAGES
+	   	yum clean all
+           	yum -y install $COMMON_CLIENT_PACKAGES
 
-           if [ "$FLAVOR" == "Fedora" ] ; then
-                yum -y install $FREEIPA_CLIENT_PACKAGES
-                yum -y update
+           	if [ "$FLAVOR" == "Fedora" ] ; then
+                	yum -y install $FREEIPA_CLIENT_PACKAGES
+                	yum -y update
 
-                for item in $FREEIPA_CLIENT_PACKAGES ; do
-                        rpm -qa | grep $item
-                        if [ $? -eq 0 ] ; then
-                                rlLog "$item package is installed"
-                        else
-                                rlLog "ERROR: $item package is NOT installed"
-                                rc=1
-                        fi
-                done
-           else
-                yum -y install $RHELIPA_CLIENT_PACKAGES
-                yum -y update
+                	for item in $FREEIPA_CLIENT_PACKAGES ; do
+                        	rpm -qa | grep $item
+                        	if [ $? -eq 0 ] ; then
+                                	rlLog "$item package is installed"
+                        	else
+                                	rlLog "ERROR: $item package is NOT installed"
+                                	rc=1
+                        	fi
+                	done
+           	else
+                	yum -y install $RHELIPA_CLIENT_PACKAGES
+                	yum -y update
 
-                for item in $RHELIPA_CLIENT_PACKAGES ; do
-                        rpm -qa | grep $item
-                        if [ $? -eq 0 ] ; then
-                                rlLog "$item package is installed"
-                        else
-                                rlLog "ERROR: $item package is NOT installed"
-                                rc=1
-                        fi
-                done
-             if
+                	for item in $RHELIPA_CLIENT_PACKAGES ; do
+                        	rpm -qa | grep $item
+                        	if [ $? -eq 0 ] ; then
+                                	rlLog "$item package is installed"
+                        	else
+                                	rlLog "ERROR: $item package is NOT installed"
+                                	rc=1
+                        	fi
+                	done
+             	fi
 
 		if [ $rc -eq 0 ] ; then
                         rhts-sync-block -s READY $MASTER
@@ -219,36 +219,36 @@ rlJournalStart
         rc=0
         echo $CLIENT2 | grep $HOSTNAME
         if [ $? -eq 0 ] ; then
-	   yum clean all
-           yum -y install $COMMON_SERVER_PACKAGES
+	   	yum clean all
+           	yum -y install $COMMON_SERVER_PACKAGES
 
-           if [ "$FLAVOR" == "Fedora" ] ; then
-                yum -y install $FREEIPA_SERVER_PACKAGES
-                yum -y update
+           	if [ "$FLAVOR" == "Fedora" ] ; then
+                	yum -y install $FREEIPA_SERVER_PACKAGES
+                	yum -y update
 
-                for item in $FREEIPA_SERVER_PACKAGES ; do
-                        rpm -qa | grep $item
-                        if [ $? -eq 0 ] ; then
-                                rlLog "$item package is installed"
-                        else
-                                rlLog "ERROR: $item package is NOT installed"
-                                rc=1
-                        fi
-                done
-            else
-                yum -y install $RHELIPA_SERVER_PACKAGES
-                yum -y update
+                	for item in $FREEIPA_SERVER_PACKAGES ; do
+                        	rpm -qa | grep $item
+                        	if [ $? -eq 0 ] ; then
+                                	rlLog "$item package is installed"
+                        	else
+                                	rlLog "ERROR: $item package is NOT installed"
+                                	rc=1
+                        	fi
+                	done
+            	else
+                	yum -y install $RHELIPA_SERVER_PACKAGES
+                	yum -y update
 
-                for item in $RHELIPA_SERVER_PACKAGES ; do
-                        rpm -qa | grep $item
-                        if [ $? -eq 0 ] ; then
-                                rlLog "$item package is installed"
-                        else
-                                rlLog "ERROR: $item package is NOT installed"
-                                rc=1
-                        fi
-                done
-             if
+                	for item in $RHELIPA_SERVER_PACKAGES ; do
+                        	rpm -qa | grep $item
+                        	if [ $? -eq 0 ] ; then
+                                	rlLog "$item package is installed"
+                        	else
+                                	rlLog "ERROR: $item package is NOT installed"
+                                	rc=1
+                        	fi
+                	done
+             	fi
 
                 if [ $rc -eq 0 ] ; then
                         rhts-sync-block -s READY $MASTER
@@ -260,7 +260,6 @@ rlJournalStart
         else
                 rlLog "Machine in recipe in not a CLIENT2"
         fi
-
 
    rlJournalPrintText
    report=/tmp/rhts.report.$RANDOM.txt
