@@ -156,11 +156,11 @@ hbacservice2="qlogin"
 
 
 ########### dns ##################
-export zone=repnewzone
-export arec="alpha2.$zone"
-export slavearec="beta2.$zone"
-export a="1.2.3.4"
-export slavea="6.5.4.3"
+zone=repnewzone
+arec="alpha2.$zone"
+slavearec="beta2.$zone"
+a="1.2.3.4"
+slavea="6.5.4.3"
 ipaddr=`hostname`
 email="ipaqar.redhat.com"
 serial=2010010701
