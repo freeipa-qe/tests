@@ -51,11 +51,11 @@ run: $(FILES) build
 	rm -f /dev/shm/ipa-hbac-cli-lib.sh
 	cp ./ipa-hbac-cli-lib.sh /dev/shm/.
 	rm -f /dev/shm/lib.user-cli.sh
+	cp ./lib.user-cli.sh /dev/shm/.
+	rm -f /dev/shm/ipa-service-cli-lib.sh
 	cp ./ipa-service-cli-lib.sh /dev/shm/.
 	rm -f /dev/shm/nis.sh
 	cp ./nis.sh /dev/shm/.
-	rm -f /dev/shm/ipa-service-cli-lib.sh
-	cp ./lib.user-cli.sh /dev/shm/.
 	rm -f /dev/shm/set-root-pw.exp
 	cp ./set-root-pw.exp /dev/shm/.
 	rm -f /dev/shm/id_rsa*
