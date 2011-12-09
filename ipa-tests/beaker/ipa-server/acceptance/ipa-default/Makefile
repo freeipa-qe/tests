@@ -29,7 +29,7 @@ export TESTVERSION=1.0
 
 BUILT_FILES=
 
-FILES=$(METADATA) runtest.sh Makefile PURPOSE t.ipadefault.sh data.ipadefault.acceptance lib.ipdefault.sh
+FILES=$(METADATA) runtest.sh Makefile PURPOSE t.ipadefault.sh data.ipadefault.acceptance t.ipadefault.sh
 
 .PHONY: all install download clean
 
