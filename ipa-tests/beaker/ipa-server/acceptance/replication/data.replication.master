@@ -150,7 +150,79 @@ subject_updated="CN=rhel61-server3.testrelm,O=TESTRELM"
 service_managedby_attr="fqdn=$managedByHost_updated,cn=computers,cn=accounts,dc=testrelm"
 service_managedby_attr2="fqdn=$managedByHost,cn=computers,cn=accounts,dc=testrelm"
 
+############# hbac service ########################
+hbacservice1="rlogin"
+hbacservice2="qlogin"
 
-hbacservice1=rlogin
-hbacservice2=qlogin
+
+########### dns ##################
+export zone=repnewzone
+export arec="alpha2.$zone"
+export slavearec="beta2.$zone"
+export a="1.2.3.4"
+export slavea="6.5.4.3"
+ipaddr=`hostname`
+email="ipaqar.redhat.com"
+serial=2010010701
+refresh=303
+retry=101
+expire=1202
+minimum=33
+ttl=55
+
+
+########## hbac ################\
+REALM=`os_getdomainname | tr "[a-z]" "[A-Z]"`
+DOMAIN=`os_getdomainname`
+
+host1="dev-host-hbac."$DOMAIN
+
+user1="dev-hbac"
+
+usergroup1="dev-ugrp-hbac"
+
+hostgroup1="dev-hosts-hbac"
+
+hostgroup2="dev-slave-hbac"
+
+servicegroup="remote-access-hbac"
+
+################   permission ###############
+puser1="puser"
+puser2="ruser"
+
+
+############# sudo ################
+rule1=sudorule1
+rule2=sudorule2
+
+
+################  sudo cmd ##################
+cmdrule1="/use/local/bin/nonexist"
+cmdrule2="/use/local/bin/alsononexist"
+
+################ sudo cmd grp ###############
+cmdgrp1=repadmins
+cmdgrp2=loosingadmins
+
+
+############## pw policy ###########
+tg="pwtestg"
+ts="pwtests"
+
+
+################  self-service  ################
+ss="users-self-s"
+sr="users-self-r"
+
+
+############## priv ###############
+priv="rep-priv"
+priv2="dem-priv"
+
+
+################# role ###################
+role="rep-rtst"
+role2="dem-rtst"
+
 

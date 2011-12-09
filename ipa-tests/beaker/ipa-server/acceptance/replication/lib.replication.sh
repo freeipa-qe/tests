@@ -202,7 +202,6 @@ check_newgroup()
 	rlPhaseStartTest "check new group"
 		rlRun "verifyGroupAttr $groupName \"dn\" $dn" 0 "Verify group's dn"
 		rlRun "verifyGroupAttr $groupName \"Group name\" $groupName" 0 "Verify group's name"
-	#	rlRun "verifyGroupAttr $slaveGroupName \"Group name\" $slaveGroupName" 0 "Verify group's name"
 		rlRun "verifyGroupAttr $groupName \"Description\" $desc" 0 "Verify group's description"
 		if [ "$1" == "nonposix" ] ; then 
 		    # should not have a GID
@@ -211,7 +210,6 @@ check_newgroup()
 		   rlRun "verifyGroupAttr $groupName \"GID\" $gid" 0 "Verify group's gid"
 		fi
 		rlRun "verifyGroupAttr $groupName \"Member users\" \"$groupMember1, $groupMember2\"" 0 "Verify group's user members"
-	#	rlRun "verifyGroupAttr $slaveGroupName \"Member users\" \"$groupMember1, $groupMember2\"" 0 "Verify group's user members"
 		rlRun "verifyGroupAttr $groupName \"Member groups\" $groupName_nonposix" 0 "Verify group's group members"
 	rlPhaseEnd
 }
@@ -671,21 +669,21 @@ check_delegation()
 ################################
 # DNS section
 ################################
-export zone=repnewzone
-export arec="alpha2.$zone"
-export slavearec="beta2.$zone"
-export a="1.2.3.4"
-export slavea="6.5.4.3"
+#export zone=repnewzone
+#export arec="alpha2.$zone"
+#export slavearec="beta2.$zone"
+#export a="1.2.3.4"
+#export slavea="6.5.4.3"
 add_dns()
 {
-	ipaddr=`hostname`	
-	email="ipaqar.redhat.com"
-	serial=2010010701
-	refresh=303
-	retry=101
-	expire=1202
-	minimum=33
-	ttl=55
+#	ipaddr=`hostname`	
+#	email="ipaqar.redhat.com"
+#	serial=2010010701
+#	refresh=303
+#	retry=101
+#	expire=1202
+#	minimum=33
+#	ttl=55
 	
 		    	KinitAsAdmin
 	rlPhaseStartTest "create a new zone $zone to be used in a replication dns test. It could contain the $zrec record"
@@ -743,20 +741,20 @@ check_deleteddns()
 ################################
 # hbac section
 ################################
-REALM=`os_getdomainname | tr "[a-z]" "[A-Z]"`
-DOMAIN=`os_getdomainname`
-
-host1="dev-host-hbac."$DOMAIN
-
-user1="dev-hbac"
-
-usergroup1="dev-ugrp-hbac"
-
-hostgroup1="dev-hosts-hbac"
-
-hostgroup2="dev-slave-hbac"
-
-servicegroup="remote-access-hbac"
+#REALM=`os_getdomainname | tr "[a-z]" "[A-Z]"`
+#DOMAIN=`os_getdomainname`
+#
+#host1="dev-host-hbac."$DOMAIN
+#
+#user1="dev-hbac"
+#
+#usergroup1="dev-ugrp-hbac"
+#
+#hostgroup1="dev-hosts-hbac"
+#
+#hostgroup2="dev-slave-hbac"
+#
+#servicegroup="remote-access-hbac"
 
 hbac_setup()
 {
@@ -862,8 +860,8 @@ check_deletedhbac()
 ################################
 # hbac service section
 ################################
-hbacservice1="rlogin"
-hbacservice2="qlogin"
+#hbacservice1="rlogin"
+#hbacservice2="qlogin"
 add_hbac_service()
 {
 	rlPhaseStartTest "add hbac service"
@@ -893,8 +891,6 @@ check_hbac_service()
 
 }
 
-hbacservice1="rlogin"
-hbacservice2="qlogin"
 modify_hbac_service()
 {
 	rlPhaseStartTest "Modify hbac-service Description with --desc"
@@ -902,8 +898,6 @@ modify_hbac_service()
 	rlPhaseEnd
 }
 
-hbacservice1="rlogin"
-hbacservice2="qlogin"
 modify_slave_hbacservice()
 {
 	rlPhaseStartTest "Modify hbac-service Description with --desc"
@@ -952,8 +946,8 @@ check_deletedhbacservice()
 ################################
 # permission section
 ################################
-puser1="puser"
-puser2="ruser"
+#puser1="puser"
+#puser2="ruser"
 add_permission()
 {
 	rlPhaseStartTest "add a permission"
@@ -1020,8 +1014,8 @@ check_deletedpermission()
 ################################
 # sudo rule
 ################################
-rule1=sudorule1
-rule2=sudorule2
+#rule1=sudorule1
+#rule2=sudorule2
 add_sudorule()
 {
 	rlPhaseStartTest "add a sudo rule"
@@ -1088,8 +1082,8 @@ check_deletedsudorule()
 ################################
 # sudo cmd
 ################################
-cmdrule1="/use/local/bin/nonexist"
-cmdrule2="/use/local/bin/alsononexist"
+#cmdrule1="/use/local/bin/nonexist"
+#cmdrule2="/use/local/bin/alsononexist"
 add_sudocmd()
 {
 	rlPhaseStartTest "add a sudo cmd"
@@ -1156,8 +1150,8 @@ check_deletedsudocmd()
 ################################
 # sudo cmd group
 ################################
-cmdgrp1=repadmins
-cmdgrp2=loosingadmins
+#cmdgrp1=repadmins
+#cmdgrp2=loosingadmins
 add_sudocmdgroup()
 {
 	rlPhaseStartTest "add a sudo cmd group"
@@ -1265,8 +1259,8 @@ check_modifiedconfig()
 ################################
 # pwpolicy section
 ################################
-tg="pwtestg"
-ts="pwtests"
+#tg="pwtestg"
+#ts="pwtests"
 add_pwpolicy()
 {
 	ipa group-add --desc=tg $tg
@@ -1336,8 +1330,8 @@ check_deletedpwpolicy()
 ################################
 # selfservice section
 ################################
-ss="users-self-s"
-sr="users-self-r"
+#ss="users-self-s"
+#sr="users-self-r"
 add_selfservice()
 {
 	rlPhaseStartTest "adding a selfservice section"
@@ -1402,8 +1396,8 @@ check_deletedselfservice()
 ################################
 # privilege section
 ################################
-priv="rep-priv"
-priv2="dem-priv"
+#priv="rep-priv"
+#priv2="dem-priv"
 add_privilege()
 {
 	rlPhaseStartTest "Add a privilege"
@@ -1468,8 +1462,8 @@ check_deletedprivilege()
 ################################
 # role section
 ################################
-role="rep-rtst"
-role2="dem-rtst"
+#role="rep-rtst"
+#role2="dem-rtst"
 add_role()
 {
 	rlPhaseStartTest "Add a role"
