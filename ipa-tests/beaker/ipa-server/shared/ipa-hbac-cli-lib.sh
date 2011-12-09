@@ -371,7 +371,7 @@ addHBACService()
 modifyHBACService()
 {
 
-   servicenanme=$1
+   servicename=$1
    attribute=$2
    value=$3
    rc=0
@@ -406,7 +406,7 @@ findHBACService()
    if [ $rc -eq 0 ] ; then
 	rlLog "HBAC service $servicename found."
    else
-	rlLog "WARNING: HBAC service $service NOT found."
+	rlLog "WARNING: HBAC service $servicename NOT found."
 	rc=1
    fi
 
