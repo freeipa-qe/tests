@@ -43,7 +43,7 @@
 . ./data.ipadefault.acceptance
 . ./lib.ipadefault.sh
 
-PACKAGE="ipa-server"
+PACKAGE="ipa-admintools"
 
 ##########################################
 #   test main 
@@ -51,7 +51,12 @@ PACKAGE="ipa-server"
 
 rlJournalStart
     rlPhaseStartSetup "ipadefault startup: Check for ipa-server package"
-        rlAssertRpm $PACKAGE
+        rpm -qa | grep $PACKAGE
+        if [ $? -eq 0 ] ; then
+                rlPass "ipa-admintools package is installed"
+        else
+                rlFail "ipa-admintools package NOT found!"
+        fi
         rlRun "TmpDir=\`mktemp -d\`" 0 "Creating tmp directory"
         rlRun "pushd $TmpDir"
     rlPhaseEnd
