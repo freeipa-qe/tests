@@ -49,7 +49,7 @@
 # Test Suite Globals
 ########################################################################
 # ADMINID is now part of env.sh
-#ADMINID="admin"
+PACKAGE="ipa-admintools"
 ADMINPWD=$ADMINPW
 
 BASEDN="dc=$DOMAIN"
