@@ -57,7 +57,7 @@ rlJournalStart
 	echo "export BEAKERCLIENT=$CLIENT" >> /dev/shm/env.sh
 	echo "export BEAKERCLIENT2=$CLIENT2" >> /dev/shm/env.sh
 
-	cat /etc/redhat-release | grep "Fedorda"
+	cat /etc/redhat-release | grep "Fedora"
 	if [ $? -eq 0 ] ; then
 		FLAVOR="Fedora"
 		rlLog "Automation is running against Fedora"
