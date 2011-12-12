@@ -69,9 +69,9 @@ rlJournalStart
 
     rlPhaseEnd
 
-	rlPhaseStartTest "Installing rpcbind yptools"
-		yum -y install wget rpcbind
-	rlPhaseEnd
+#	rlPhaseStartTest "Installing rpcbind yptools"
+#		yum -y install wget rpcbind
+#	rlPhaseEnd
 
 if [ $master -eq 1 ]; then
 	setenforce 0
@@ -92,7 +92,7 @@ fi
 	echo "IP is $ipoc1 . $ipoc2 . $ipoc3 . $ipoc4"
 
 	rlPhaseStartTest "ipa-dns-01: create a new fake host to test dns add during replica prepare"
-		let newip=$ipoc4+1
+		let newip=99
 		ipa-replica-prepare -p $ADMINPW --ip-address=$newfakehostip newfakehost$newip.$DOMAIN
 	rlPhaseEnd
 
