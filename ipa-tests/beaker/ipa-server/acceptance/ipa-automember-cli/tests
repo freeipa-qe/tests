@@ -1,0 +1,168 @@
+######################################################################
+# Pre-Requisite actions
+######################################################################
+
+# include standard sources:
+
+
+. /root/ipa-automember-cli/ipa-automember-cli-lib.sh 
+. /root/beaker/ipa-server/shared/ipa-group-cli-lib.sh
+. /root/beaker/ipa-server/shared/ipa-hostgroup-cli-lib.sh
+. /root/beaker/ipa-server/shared/ipa-host-cli-lib.sh
+. /usr/bin/rhts-environment.sh
+. /usr/share/beakerlib/beakerlib.sh
+. /root/beaker/ipa-server/shared/ipa-server-shared.sh
+. /dev/shm/env.sh
+. /usr/share/beakerlib/beakerlib.sh
+
+# . /root/beaker/ipa-server/shared/ipa-group-cli-lib.sh
+   # addGroup <description> <groupname>
+   # verifyGroupMember <membername> <membertype> <groupname>
+   # deleteGroup <groupname>
+
+# . /root/beaker/ipa-server/shared/ipa-hostgroup-cli-lib.sh
+   # addHostGroup <description> <groupname>
+   # verifyHostGroupMember <membername> <membertype> <groupname>
+   # deleteHostGroup <groupname>
+
+# . /root/beaker/ipa-server/shared/ipa-host-cli-lib.sh
+   # addHost <hostname>
+   # deleteHost <hostname>
+
+# . /usr/bin/rhts-environment.sh
+# . /usr/share/beakerlib/beakerlib.sh
+# . /root/beaker/ipa-server/shared/ipa-server-shared.sh
+
+# set global variables:
+
+GROUP=devel
+HOSTGROUP=webservers
+DNEGROUP=eng
+DNEHOSTGROUP=engservers
+
+# create a group
+   addGroup "Developers" "devel"
+
+# create a hostgroup
+   addHostGroup "Web Servers" "webservers"
+
+# add match user mscott
+   ipa user-add --first=Manager --last=Scott mscott 
+
+# add non-match user mjohn 
+   ipa user-add --first=Manager --last=John mjohn
+
+######################################################################
+#  automember-add                   Add an automember rule.
+######################################################################
+
+# create rule for existing group
+   ipa automember-add --type=group devel
+
+# create rule for non-existent group
+   ipa automember-add --type=group eng
+
+# create rule for existing hostgroup
+   ipa automember-add --type=hostgroup webservers
+
+# create rule for non-existent hostgroup
+   ipa automember-add --type=hostgroup  engservers
+
+######################################################################
+#  automember-add-condition         Add conditions to an automember rule.
+######################################################################
+### need to see if I need to test separately for different keys?
+### ???
+
+# add inclusive condition for existing group rule
+   ipa automember-add-condition --type=group devel --key=manager --inclusive-regex=^uid=mscott
+  
+   # test match for inclusive condition for existing group rule
+      ipa user-add --first=Tim --last=User1 tuser1 --manager=mscott
+      ipa group-show devel|grep tuser1
+      verifyGroupMember tuser1 group devel
+
+   # test non-match for inclusive condition for existing group rule
+      ipa user-add --first=Tim --last=User2 tuser2 --manager=mjohn
+      ipa group-show devel|grep tuser2
+      verifyGroupMember tuser2 group devel
+
+# add exclusive condition for existing group rule
+   ipa automember-add-condition --key=manager --type=group --exclusive-regex=^uid=mjohn devel
+
+   # test match for exclusive condition for existing group rule
+      ipa user-add --first=Tim --last=User1 --password tuser1 --manager=mscott
+
+   # test non-match for exclusive condition for existing group rule
+      ipa user-add --first=Tim --last=User2 --password tuser2 --manager=mjohn
+
+
+# add inclusive condition for non-existing group rule
+   ipa automember-add-condition --key=manager --type=group --inclusive-regex=^uid=mjohn eng
+
+# add exclusive condition for non-existing group rule
+   ipa automember-add-condition --key=manager --type=group --exclusive-regex=^uid=mscott eng
+
+# add inclusive condition for existing hostgroup rule
+   ipa automember-add-condition --key=fqdn --type=hostgroup --inclusive-regex=^web[1-9]+\.example\.com webservers
+
+# add exclusive condition for existing hostgroup rule
+   ipa automember-add-condition --key=fqdn --type=hostgroup --exclusive-regex=^web5\.example\.com webservers
+
+# add inclusive condition for non-existing hostgroup rule
+   ipa automember-add-condition --key=fqdn --type=hostgroup --inclusive-regex=^eng[1-9]+\.example\.com engservers
+
+# add exclusive condition for non-existing hostgroup rule
+   ipa automember-add-condition --key=fqdn --type=hostgroup --exclusive-regex=^eng5\.example\.com engservers
+
+######################################################################
+#  automember-default-group-remove  Remove default group for all unmatched entries.
+######################################################################
+
+#       removeAutomemberDefaultGroup  <type>
+
+######################################################################
+#  automember-default-group-set     Set default group for all unmatched entries.
+######################################################################
+
+#       setAutomemberDefaultGroup  <type> <name>
+
+######################################################################
+#  automember-default-group-show    Display information about the default automember groups.
+######################################################################
+
+#       showAutomemberDefaultGroup  <type>
+
+######################################################################
+#  automember-del                   Delete an automember rule.
+######################################################################
+
+#       deleteAutomember           <type> <name>
+
+######################################################################
+#  automember-find                  Search for automember rules.
+######################################################################
+
+#       findAutomember             <type> <name>
+
+##################################################################### 
+#  automember-mod                   Modify an automember rule.
+######################################################################
+
+#       modifyAutomember           <type> <name> <attribute> <value>
+
+######################################################################
+#  automember-remove-condition      Remove conditions from an automember rule.
+######################################################################
+
+#       removeAutomemberCondition  <type> <name> <key> <regextype> <regex>
+
+######################################################################
+#  automember-show                  Display information about an automember rule.
+######################################################################
+
+#       VerifyAutomemberAttr       <type> <name> <attribute> <value>
+#       showAutomember             <type> <name>
+
+
+

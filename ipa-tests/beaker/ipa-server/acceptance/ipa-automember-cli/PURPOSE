@@ -1,0 +1,3 @@
+POSE of /CoreOS/tests/Regression/ipa-automember-cli
+Description: IPA automember CLI acceptance tests
+Author: Scott Poore <spoore@redhat.com>
