@@ -65,28 +65,73 @@
 . /dev/shm/ipa-server-shared.sh
 . /dev/shm/env.sh
 
-# Include test case file
-. ./t.ipaautomember.sh
 
+######################################################################
+# Test Suite Globals
+######################################################################
+# ADMINID is now part of env.sh
+BASEDN="dc=$DOMAIN"
+HOSTGRPDN="cn=hostgroups,cn=accounts,"
+HOSTGRPRDN="$HOSTGRPDN$BASEDN"
+HOSTDN="cn=computers,cn=accounts,"
+HOSTRDN="$HOSTDN$BASEDN"
+
+rlLog "HOSTDN is $HOSTRDN"
+rlLog "HOSTGRPDN is $HOSTGRPRDN"
+rlLog "Server is $MASTER"
+
+######################################################################
 
 PACKAGE="ipa-admintools"
-######################################################################
-# Test Main:
-######################################################################
 
 rlJournalStart
-	rlPhaseStartSetup "ipa-automember-cli-startup: Check for admintools package."
+	rlPhaseStartSetup "ipa-automember-cli-startup: Check for admintools package, kinit, groups, and hostgroups."
 		rpm -qa | grep $PACKAGE
 		if [ $? -eq 0 ]; then
 			rlPass "*ipa-admintools package is installed"
 		else
 			rlFail "*ipa-admintools package NOT found!."
 		fi
+		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as $ADMINID user"
+		rlRun "TmpDir=\`mktemp -d\`" 0 "Creating tmp directory"
+		rlRun "pushd $TmpDir"
+		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as $ADMINID user"
+		
+		rlRun "addGroup \"Developers\" \"devel\""
+		rlRun "addHostGroup \"Web Servers\" \"webservers\""
 	rlPhaseEnd
 
-	# run the tests
-	ipaautomember
+	rlPhaseStartTest "ipa-automember-cli-01: create rule for existing group"
+		rlRun "addAutomember group devel" 0 "Adding automember rule for group devel"
+	rlPhaseEnd
 
+	rlPhaseStartTest "ipa-automember-cli-02: create rule for existing hostgroup"
+		rlRun "addAutomember hostgroup webservers" 0 "Adding automember rule for hostgroup webservers"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-automember-cli-03: create rule for non-existent group"
+		rlRun "addAutomember group eng" 2 "Adding automember rule for non-existent group eng"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-automember-cli-04: create rule for non-existent hostgroup"
+		rlRun "addAutomember hostgroup engservers" 2 "Adding automember rule for non-existent hostgroup engservers"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-automember-cli-05: create rule for invalid type"
+		rlRun "addAutomember badtype devel" 1 "Adding automember rule for invalid type=badtype"
+		expmsg="ipa: ERROR: invalid 'type': must be one of (u'group', u'hostgroup')"
+		command="ipa automember-add --type=badtype devel"
+		rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error for invalid type"
+	rlPhaseEnd
+
+	rlPhaseStartCleanup "ipa-automember-cli-cleanup: Delete remaining automember ruls and Destroying admin credentials"
+		rlRun "deleteAutomember group devel" 0 "Deleting automember group rule for devel"
+		rlRun "deleteAutomember hostgroup webservers" 0 "Deleting automember hostgroup rule for webservers"
+		rlRun "deleteGroup devel" 0 "Deleting group devel"
+		rlRun "deleteHostGroup webservers" 0 "Deleting hostgroup webservers"
+		rlRun "kdestroy" 0 "Destroying admin credentials"
+	rlPhaseEnd
+	
 	rlJournalPrintText
 	report=$TmpDir/rhts.export.$RANDOM.txt
 	makereport $report
