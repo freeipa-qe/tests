@@ -807,7 +807,7 @@ delete_slave_hbac()
 {
 	rlPhaseStartTest "delete hba entries from hosts"
 		rlRun "deleteHostGroup $hostgroup2" 0 "Deleting Host Group associated with rule."
-		rlRun "deleteHBACRule Engineering" 0 "CLEANUP: Deleting Rule"
+		#rlRun "deleteHBACRule Engineering" 0 "CLEANUP: Deleting Rule"
 	rlPhaseEnd
 }
 
