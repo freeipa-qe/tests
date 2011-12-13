@@ -870,14 +870,14 @@ modify_slave_hbacservice()
 check_modifiedhbacservice()
 {
 	rlPhaseStartTest "Check modified hbac-service Description with --desc"
-		rlRun "verifyHBACService $hbacservice2 \"Description\" \"Newer Description\"" 0 "Verify New Service Description"
+		rlRun "verifyHBACService $hbacservice1 \"Description\" \"Newer Description\"" 0 "Verify New Service Description"
 	rlPhaseEnd
 }
 
 check_slave_modifiedhbacservice()
 {
 	rlPhaseStartTest "Check modified hbac-service Description with --desc"
-		rlRun "verifyHBACService $hbacservice1 \"Description\" \"Newer Description\"" 0 "Verify New Service Description"
+		rlRun "verifyHBACService $hbacservice2 \"Description\" \"Newer Description\"" 0 "Verify New Service Description"
 	rlPhaseEnd
 }
 
