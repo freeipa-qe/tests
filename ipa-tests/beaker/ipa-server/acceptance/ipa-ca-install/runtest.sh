@@ -90,7 +90,6 @@ rlJournalStart
 
 	rlPhaseStartTest "MASTER tests start"
 		installMaster
-		installCA
 
 	rlPhaseEnd
 
@@ -106,6 +105,28 @@ rlJournalStart
 
         #####################################################################
 
+
+        #####################################################################
+        #               IS THIS MACHINE A SLAVE?                            #
+        #####################################################################
+        rc=0
+        echo $SLAVE | grep $HOSTNAME
+        if [ $? -eq 0 ] ; then
+                yum clean all
+
+                if [ $rc -eq 0 ] ; then
+                        rhts-sync-block -s READY $MASTER
+                        installSlave
+			installCA
+                        rhts-sync-set -s READY
+                        rlLog "Setting up Authorized keys"
+                        SetUpAuthKeys
+                        rlLog "Setting up known hosts file"
+                        SetUpKnownHosts
+                fi
+        else
+                rlLog "Machine in recipe in not a SLAVE"
+	fi
 
 
 rlJournalPrintText

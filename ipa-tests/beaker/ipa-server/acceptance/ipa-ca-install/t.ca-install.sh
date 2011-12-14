@@ -100,7 +100,10 @@ installMaster()
 installSlave()
 {
    rlPhaseStartSetup "Install IPA REPLICA Server"
-        rlRun "/etc/init.d/ntpd stop" 0 "Stopping the ntp server"
+	
+	yum install -y ipa-server bind-dyndb-ldap bind
+        
+	rlRun "/etc/init.d/ntpd stop" 0 "Stopping the ntp server"
         # stop the firewall
         service iptables stop
         service ip6tables stop
@@ -124,7 +127,7 @@ installSlave()
                 echo "ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg" > /dev/shm/replica-install.bash
                 chmod 755 /dev/shm/replica-install.bash
                 rlLog "EXECUTING: ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg"
-                rlRun "bash /dev/shm/replica-install.bash" 0 "Replica installation"
+                rlRun "/bin/bash /dev/shm/replica-install.bash" 0 "Replica installation"
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
 
                 rlRun "appendEnv" 0 "Append the machine information to the env.sh with the information for the machines in the recipe set"
@@ -141,4 +144,19 @@ installSlave()
 }
 
 
+installCA()
+{
 
+   rlPhaseStartSetup "Installing CA Replica"
+
+	rlLog "Executing: ipa-ca-install -p $ADMINPW -w $ADMINPW --skip-conncheck --unattended /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg"
+	echo "ipa-ca-install -p $ADMINPW -w $ADMINPW --skip-conncheck --unattended /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg" > /dev/shm/replica-ca-install.bash
+	chmod 755 /dev/shm/replica-ca-install.bash
+	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
+	rlRun "/bin/bash /dev/shm/replica-ca-install.bash" 0 "CA Replica installation"
+
+	if [ -f /var/log/ipareplica-ca-install.log ]; then
+		rhts-submit-log -l /var/log/ipareplica-ca-install.log
+	fi
+
+}
