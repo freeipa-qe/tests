@@ -2,11 +2,12 @@
 #       addAutomember                 <type> <name>
 ######################################################################
 #### good
-	- ipa-automember-cli-01: create rule for existing group
-	- ipa-automember-cli-02: create rule for existing hostgroup
+	- ipa-automember-cli-01:  create rule for group
+	- ipa-automember-cli-02:  create rule for hostgroup
 #### badgroup
 	- ipa-automember-cli-03: create rule for non-existent group
 	- ipa-automember-cli-04: create rule for non-existent hostgroup
+
 #### badtype
 	- ipa-automember-cli-05: create rule for invalid type
 
@@ -14,34 +15,34 @@
 #       addAutomemberCondition        <type> <name> <key> <regextype> <regex>
 ######################################################################
 #### good
-	- ipa-automember-cli-##: add group inclusive condition to existing group rule
-	- ipa-automember-cli-##: add group exclusive condition to existing group rule
-	- ipa-automember-cli-##: add hostgroup inclusive condition to existing hostgroup rule
-	- ipa-automember-cli-##: add hostgroup exclusive condition to existing hostgroup rule
+	- ipa-automember-cli-06: add inclusive regex to group
+	- ipa-automembet-cli-07: add exclusive regex to group
+	- ipa-automembet-cli-08: add inclusive regex to hostgroup
+	- ipa-automember-cli-09: add exclusive regex to hostgroup
 #### badgroup
-	- ipa-automember-cli-##: add group inclusive condition to non-existent group rule
-	- ipa-automember-cli-##: add group exclusive condition to non-existent group rule
-	- ipa-automember-cli-##: add hostgroup inclusive condition to non-existent hostgroup rule
-	- ipa-automember-cli-##: add hostgroup exclusive condition to non-existent hostgroup rule
+	- ipa-automember-cli-10: add inclusive regex to non-existent group
+	- ipa-automember-cli-11: add exclusive regex to non-existent group
+	- ipa-automember-cli-12: add inclusive regex to non-existent hostgroup
+	- ipa-automember-cli-13: add exclusive regex to non-existent hostgroup
 #### badtype
-	- ipa-automember-cli-##: add badtype inclusive condition to existing group rule with invalid type
-	- ipa-automember-cli-##: add badtype exclusive condition to existing group rule with invalid type
-	- ipa-automember-cli-##: add badtype inclusive condition to existing hostgroup rule with invalid type
-	- ipa-automember-cli-##: add badtype exclusive condition to existing hostgroup rule with invalid type
+	- ipa-automember-cli-14: add inclusive regex to group with invalid type
+	- ipa-automember-cli-15: add exclusive regex to group with invalid type
+	- ipa-automember-cli-16: add inclusive regex to hostgroup with invalid type
+	- ipa-automember-cli-17: add exclusive regex to hostgroup with invalid type
 #### badkey
-	- ipa-automember-cli-##: add group inclusive condition to existing group rule with invalid key
-	- ipa-automember-cli-##: add group exclusive condition to existing group rule with invalid key
-	- ipa-automember-cli-##: add hostgroup inclusive condition to existing hostgroup rule with invalid key
-	- ipa-automember-cli-##: add hostgroup exclusive condition to existing hostgroup rule with invalid key
+	- ipa-automember-cli-18: add inclusive regex to group with invalid key
+	- ipa-automember-cli-19: add exclusive regex to group with invalid key
+	- ipa-automember-cli-20: add inclusive regex to hostgroup with invalid key
+	- ipa-automember-cli-21: add exclusive regex to hostgroup with invalid key
 #### badregextype
-	- ipa-automember-cli-##: add group badregextype condition to existing group rule with invalid regextype
-	- ipa-automember-cli-##: add hostgroup badregextype condition to existing hostgroup rule with invalid regextype
+	- ipa-automember-cli-22: add regex to group with invalid regextype
+	- ipa-automember-cli-23: add regex to hostgroup with invalid regextype
 #### badregex
 #### is this even possible?????
-	- ipa-automember-cli-##: add group inclusive condition to existing group rule with invalid regex
-	- ipa-automember-cli-##: add group exclusive condition to existing group rule with invalid regex
-	- ipa-automember-cli-##: add hostgroup inclusive condition to existing hostgroup rule with invalid regex
-	- ipa-automember-cli-##: add hostgroup exclusive condition to existing hostgroup rule with invalid regex
+	- ipa-automember-cli-##: add inclusive regex to group with invalid regex
+	- ipa-automember-cli-##: add exclusive regex to group with invalid regex
+	- ipa-automember-cli-##: add inclusive regex to hostgroup with invalid regex
+	- ipa-automember-cli-##: add exclusive regex to hostgroup with invalid regex
 
 ######################################################################
 #       findAutomember                <type> <name>
