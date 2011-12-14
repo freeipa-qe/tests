@@ -67,11 +67,16 @@ ipaautomember()
 	ipaautomember_setup
 	ipaautomember_addAutomember_positive
 	ipaautomember_addAutomember_negative
+	ipaautomember_addAutomemberCondition_positive
+	ipaautomember_addAutomemberCondition_negative_badgroup
+	ipaautomember_addAutomemberCondition_negative_badtype
+	ipaautomember_addAutomemberCondition_negative_badkey
+	ipaautomember_addAutomemberCondition_negative_badregextype
 	ipaautomember_cleanup
 }
 
 ######################################################################
-# variables
+# SETUP
 ######################################################################
 ipaautomember_setup()
 {
@@ -87,7 +92,7 @@ ipaautomember_setup()
 }
 
 ######################################################################
-# variables
+# addAutomember positive tests
 ######################################################################
 ipaautomember_addAutomember_positive()
 {
@@ -101,7 +106,7 @@ ipaautomember_addAutomember_positive()
 }
 
 ######################################################################
-# CLEANUP
+# addAutomember negative tests
 ######################################################################
 ipaautomember_addAutomember_negative()
 {
@@ -122,11 +127,128 @@ ipaautomember_addAutomember_negative()
 }
 
 ######################################################################
+# addAutomemberCondition positive tests
+######################################################################
+ipaautomember_addAutomemberCondition_positive()
+{
+	rlPhaseStartTest "ipa-automember-cli-06: add group inclusive condition to existing group rule"
+		rlRun "addAutomemberCondition group devel manager inclusive ^uid=mscott" 0 \
+			"add group inclusive condition to existing group rule"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-automembet-cli-07: add group exclusive condition to existing group rule"
+		rlRun "addAutomemberCondition group devel manager exclusive ^uid=mjohn" 0 \
+			"add group exclusive condition to existing group rule"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-automembet-cli-08: add hostgroup inclusive condition to existing hostgroup rule"
+		rlRun "addAutomemberCondition hostgroup webservers fqdn inclusive ^web[0-9]+\.example\.com" 0 \
+			"add hostgroup inclusive condition to existing hostgroup rule"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-automember-cli-09: add hostgroup exclusive condition to existing hostgroup rule"
+		rlRun "addAutomemberCondition hostgroup webservers fqdn exclusive ^eng[0-9]+\.example\.com" 0 \
+			"add hostgroup exclusive condition to existing hostgroup rule"
+	rlPhaseEnd
+}
+
+######################################################################
+# addAutomemberCondition negative tests for non-existent group
+######################################################################
+ipaautomember_addAutomemberCondition_negative_badgroup()
+{
+	rlPhaseStartTest "ipa-automember-cli-10: add group inclusive condition to non-existent group rule"
+		rlRun "addAutomemberCondition group eng manager inclusive ^uid=mjohn" 0 \
+			"add group inclusive condition to non-existent group rule"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-automember-cli-11: add group exclusive condition to non-existent group rule"
+		rlRun "addAutomemberCondition group eng manager exclusive ^uid=mjohn" 0 \
+			"add group exclusive condition to non-existent group rule"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-automember-cli-12: add hostgroup inclusive condition to non-existent hostgroup rule"
+		rlRun "addAutomemberCondition hostgroup engservers fqdn inclusive ^eng[0-9]+\.example\.com" 0 \
+			"add hostgroup inclusive condition to non-existent hostgroup rule"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-automember-cli-13: add hostgroup exclusive condition to non-existent hostgroup rule"
+		rlRun "addAutomemberCondition hostgroup engservers fqdn exclusive ^web[0-9]+\.example\.com" 0 \
+			"add hostgroup exclusive condition to non-existent hostgroup rule"
+	rlPhaseEnd
+
+}
+
+######################################################################
+# addAutomemberCondition negative tests for invalid type
+######################################################################
+ipaautomember_addAutomemberCondition_negative_badtype()
+{
+	rlPhaseStartTest "ipa-automember-cli-14: add badtype inclusive condition to existing group rule with invalid type"
+		rlRun "addAutomemberCondition badtype devel manager inclusive ^uid=mjohn" 0 \
+			"add badtype inclusive condition to existing group rule with invalid type"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-automember-cli-15: add badtype exclusive condition to existing group rule with invalid type"
+		rlRun "addAutomemberCondition badtype devel manager exclusive ^uid=mjohn" 0 \
+			"add badtype exclusive condition to existing group rule with invalid type"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-automember-cli-16: add badtype inclusive condition to existing hostgroup rule with invalid type"
+		rlRun "addAutomemberCondition badtype webservers fqdn inclusive ^web[0-9]+\.example\.com" 0 \
+			"add badtype inclusive condition to existing hostgroup rule with invalid type"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-automember-cli-17: add badtype exclusive condition to existing hostgroup rule with invalid type"
+		rlRun "addAutomemberCondition badtype webservers fqdn exclusive ^eng[0-9]+\.example\.com" 0 \
+			"add badtype exclusive condition to existing hostgroup rule with invalid type"
+	rlPhaseEnd
+
+}
+
+ipaautomember_addAutomemberCondition_negative_badkey()
+{
+	rlPhaseStartTest "ipa-automember-cli-18: add group inclusive condition to existing group rule with invalid key"
+		rlRun "addAutomemberCondition group devel badkey inclusive ^uid=mscott" 0 \
+			"add group inclusive condition to existing group rule with invalid key"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-automember-cli-19: add group exclusive condition to existing group rule with invalid key"
+		rlRun "addAutomemberCondition group devel badkey exclusive ^uid=mjohn" 0 \
+			"add group exclusive condition to existing group rule with invalid key"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-automember-cli-20: add hostgroup inclusive condition to existing hostgroup rule with invalid key"
+		rlRun "addAutomemberCondition hostgroup webservers badkey inclusive ^web[0-9]+\.example\.com" 0 \
+			"add hostgroup inclusive condition to existing hostgroup rule with invalid key"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-automember-cli-21: add hostgroup exclusive condition to existing hostgroup rule with invalid key"
+		rlRun "addAutomemberCondition hostgroup webservers badkey exclusive ^eng[0-9]+\.example\.com" 0 \
+			"add hostgroup exclusive condition to existing hostgroup rule with invalid key"
+	rlPhaseEnd
+}
+
+ipaautomember_addAutomemberCondition_negative_badregextype()
+{
+	rlPhaseStartTest "ipa-automember-cli-22: add group badregextype condition to existing group rule with invalid regextype"
+		rlRun "addAutomemberCondition group devel manager badregextype ^uid=mscott" 0 \
+			"add group badregextype condition to existing group rule with invalid regextype"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-automember-cli-23: add hostgroup badregextype condition to existing hostgroup rule with invalid regextype"
+		rlRun "addAutomemberCondition hostgroup webservers fqdn badregextype ^web[0-9]+\.example\.com" 0 \
+			"add hostgroup badregextype condition to existing hostgroup rule with invalid regextype"
+	rlPhaseEnd
+}
+
+
+######################################################################
 # CLEANUP
 ######################################################################
 ipaautomember_cleanup()
 {
-	rlPhaseStartCleanup "ipa-automember-cli-cleanup: Delete remaining automember ruls and Destroying admin credentials"
+	rlPhaseStartCleanup "ipa-automember-cli-cleanup: Delete remaining automember rules and Destroying admin credentials"
 		rlRun "deleteAutomember group devel" 0 "Deleting automember group rule for devel"
 		rlRun "deleteAutomember hostgroup webservers" 0 "Deleting automember hostgroup rule for webservers"
 		rlRun "deleteGroup devel" 0 "Deleting group devel"

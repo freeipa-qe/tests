@@ -1,0 +1,134 @@
+######################################################################
+#       addAutomember                 <type> <name>
+######################################################################
+#### good
+	- ipa-automember-cli-01: create rule for existing group
+	- ipa-automember-cli-02: create rule for existing hostgroup
+#### badgroup
+	- ipa-automember-cli-03: create rule for non-existent group
+	- ipa-automember-cli-04: create rule for non-existent hostgroup
+#### badtype
+	- ipa-automember-cli-05: create rule for invalid type
+
+######################################################################
+#       addAutomemberCondition        <type> <name> <key> <regextype> <regex>
+######################################################################
+#### good
+	- ipa-automember-cli-##: add group inclusive condition to existing group rule
+	- ipa-automember-cli-##: add group exclusive condition to existing group rule
+	- ipa-automember-cli-##: add hostgroup inclusive condition to existing hostgroup rule
+	- ipa-automember-cli-##: add hostgroup exclusive condition to existing hostgroup rule
+#### badgroup
+	- ipa-automember-cli-##: add group inclusive condition to non-existent group rule
+	- ipa-automember-cli-##: add group exclusive condition to non-existent group rule
+	- ipa-automember-cli-##: add hostgroup inclusive condition to non-existent hostgroup rule
+	- ipa-automember-cli-##: add hostgroup exclusive condition to non-existent hostgroup rule
+#### badtype
+	- ipa-automember-cli-##: add badtype inclusive condition to existing group rule with invalid type
+	- ipa-automember-cli-##: add badtype exclusive condition to existing group rule with invalid type
+	- ipa-automember-cli-##: add badtype inclusive condition to existing hostgroup rule with invalid type
+	- ipa-automember-cli-##: add badtype exclusive condition to existing hostgroup rule with invalid type
+#### badkey
+	- ipa-automember-cli-##: add group inclusive condition to existing group rule with invalid key
+	- ipa-automember-cli-##: add group exclusive condition to existing group rule with invalid key
+	- ipa-automember-cli-##: add hostgroup inclusive condition to existing hostgroup rule with invalid key
+	- ipa-automember-cli-##: add hostgroup exclusive condition to existing hostgroup rule with invalid key
+#### badregextype
+	- ipa-automember-cli-##: add group badregextype condition to existing group rule with invalid regextype
+	- ipa-automember-cli-##: add hostgroup badregextype condition to existing hostgroup rule with invalid regextype
+#### badregex
+#### is this even possible?????
+	- ipa-automember-cli-##: add group inclusive condition to existing group rule with invalid regex
+	- ipa-automember-cli-##: add group exclusive condition to existing group rule with invalid regex
+	- ipa-automember-cli-##: add hostgroup inclusive condition to existing hostgroup rule with invalid regex
+	- ipa-automember-cli-##: add hostgroup exclusive condition to existing hostgroup rule with invalid regex
+
+######################################################################
+#       findAutomember                <type> <name>
+######################################################################
+#### good
+	- ipa-automember-cli-##: find existing group rule
+	- ipa-automember-cli-##: find existing hostgroup rule
+#### badgroup
+	- ipa-automember-cli-##: find non-existent group rule
+	- ipa-automember-cli-##: find non-existent hostgroup rule
+#### badtype
+	- ipa-automember-cli-##: find existing group rule with invalid type
+	- ipa-automember-cli-##: find existing hostgroup rule with invalid type
+
+######################################################################
+#       showAutomember                <type> <name>
+######################################################################
+#### good
+	- ipa-automember-cli-##: show existing group rule
+	- ipa-automember-cli-##: show existing hostgroup rule
+#### badgroup
+	- ipa-automember-cli-##: show non-existent group rule
+	- ipa-automember-cli-##: show non-existent hostgroup rule
+#### badtype
+	- ipa-automember-cli-##: show existing group rule with invalid type
+	- ipa-automember-cli-##: show existing hostgroup rule with invalid type
+
+######################################################################
+#       modifyAutomember              <type> <name> <attribute> <value>
+#       Need to find out valid args/options here....--desc seems to be the
+#       only thing I can find that works...
+######################################################################
+#### good
+	- ipa-automember-cli-##: modify existing group rule
+	- ipa-automember-cli-##: modify existing hostgroup rule
+#### badgroup
+	- ipa-automember-cli-##: modify existing group rule with invalid type
+	- ipa-automember-cli-##: modify existing hostgroup rule with invalid type
+#### badtype
+	- ipa-automember-cli-##: modify existing group rule with invalid attribute
+	- ipa-automember-cli-##: modify existing hostgroup rule with invalid attribute
+
+######################################################################
+#       verifyAutomemberAttr          <type> <name> <attribute> <value>
+######################################################################
+#### good
+	- ipa-automember-cli-##: verify (using automember-show) existing group rule 
+	- ipa-automember-cli-##: verify (using automember-show) existing hostgroup rule 
+#### badtype
+	- ipa-automember-cli-##: verify (using automember-show) existing group rule with invalid type
+	- ipa-automember-cli-##: verify (using automember-show) existing hostgroup rule with invalid type
+#### badattr
+	- ipa-automember-cli-##: verify (using automember-show) existing group rule with incorrect attribute
+	- ipa-automember-cli-##: verify (using automember-show) existing hostgroup rule with incorrect attribute
+#### badval
+	- ipa-automember-cli-##: verify (using automember-show) existing group rule with incorrect value
+	- ipa-automember-cli-##: verify (using automember-show) existing hostgroup rule with incorrect value
+
+######################################################################
+#       removeAutomemberCondition     <type> <name> <key> <regextype> <regex>
+######################################################################
+	- ipa-automember-cli-##: 
+
+######################################################################
+#       setAutomemberDefaultGroup     <type> <name>
+######################################################################
+	- ipa-automember-cli-##: 
+
+######################################################################
+#       showAutomemberDefaultGroup    <type>
+######################################################################
+	- ipa-automember-cli-##: 
+
+######################################################################
+#       removeAutomemberDefaultGroup  <type>
+######################################################################
+	- ipa-automember-cli-##: 
+
+######################################################################
+#       deleteAutomember              <type> <name>
+######################################################################
+	- ipa-automember-cli-##: delete existing group rule
+	- ipa-automember-cli-##: delete existing hostgroup rule
+
+	- ipa-automember-cli-##: delete non-existent group rule
+	- ipa-automember-cli-##: delete non-existent hostgroup rule
+
+	- ipa-automember-cli-##: delete existing group rule with invalid type
+	- ipa-automember-cli-##: delete existing hostgroup rule with invalid type
+
