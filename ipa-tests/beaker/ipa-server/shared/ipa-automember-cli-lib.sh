@@ -298,7 +298,7 @@ showAutomemberDefaultGroup()
 	ipa automember-default-group-show --type=$type
 	rc=$?
 	if [ $rc -ne 0 ]; then
-		rlLog "WARNING: Removing Automember Default Group for type \"$type\" failed."
+		rlLog "WARNING: Showing Automember Default Group for type \"$type\" failed."
 	else
 		rlLog "Removing Default Group for type \"$type\" successful."
 	fi
