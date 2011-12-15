@@ -66,12 +66,23 @@ ipaautomember()
 {
 	ipaautomember_setup
 	ipaautomember_addAutomember_positive
-	ipaautomember_addAutomember_negative
-	ipaautomember_addAutomemberCondition_positive
-	ipaautomember_addAutomemberCondition_negative_badgroup
-	ipaautomember_addAutomemberCondition_negative_badtype
-	ipaautomember_addAutomemberCondition_negative_badkey
-	ipaautomember_addAutomemberCondition_negative_badregextype
+	#ipaautomember_addAutomember_negative
+	#ipaautomember_addAutomemberCondition_positive
+	#ipaautomember_addAutomemberCondition_negative_badgroup
+	#ipaautomember_addAutomemberCondition_negative_badtype
+	#ipaautomember_addAutomemberCondition_negative_badkey
+	#ipaautomember_addAutomemberCondition_negative_badregextype
+	#ipaautomember_findAutomember_positive
+	#ipaautomember_findAutomember_negative_badgroup
+	#ipaautomember_findAutomember_negative_badtype
+	#ipaautomember_showAutomember_positive
+	#ipaautomember_showAutomember_negative_badgroup
+	#ipaautomember_showAutomember_negative_badtype
+	ipaautomember_modifyAutomember_positive
+	ipaautomember_modifyAutomember_negative_sameval
+	ipaautomember_modifyAutomember_negative_badgroup
+	ipaautomember_modifyAutomember_negative_badtype
+	ipaautomember_modifyAutomember_negative_badattr
 	ipaautomember_cleanup
 }
 
@@ -255,6 +266,9 @@ ipaautomember_addAutomemberCondition_negative_badtype()
 
 }
 
+######################################################################
+# addAutomemberCondition negative tests for invalid key
+######################################################################
 ipaautomember_addAutomemberCondition_negative_badkey()
 {
 	desc="add inclusive regex to group with invalid key"
@@ -294,6 +308,9 @@ ipaautomember_addAutomemberCondition_negative_badkey()
 	rlPhaseEnd
 }
 
+######################################################################
+# addAutomemberCondition negative tests for invalid regex type
+######################################################################
 ipaautomember_addAutomemberCondition_negative_badregextype()
 {
 	desc="add regex to group with invalid regextype"
@@ -319,6 +336,243 @@ ipaautomember_addAutomemberCondition_negative_badregextype()
 	rlPhaseEnd
 }
 
+######################################################################
+# findAutomember positive tests
+######################################################################
+ipaautomember_findAutomember_positive()
+{
+	desc="find existing group rule"
+	rlPhaseStartTest "ipa-automember-cli-1701: $desc"
+		rlRun "findAutomember group devel" 0 "Verify return code for $desc"
+	rlPhaseEnd
+
+	desc="find existing hostgroup rule"
+	rlPhaseStartTest "ipa-automember-cli-1702: $desc"
+		rlRun "findAutomember hostgroup webservers" 0 "Verify return code for $desc"
+	rlPhaseEnd
+
+}
+
+######################################################################
+# findAutomember negative tests for non-existent group
+######################################################################
+ipaautomember_findAutomember_negative_badgroup()
+{
+	desc="find non-existent group rule"
+	rlPhaseStartTest "ipa-automember-cli-1801: $desc"
+		rlRun "findAutomember group eng" 1 "Verify error code for $desc"
+		command="ipa automember-find --type=group eng"
+		expmsg="0 rules matched"
+		#rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify error message for $desc"
+		rlRun "$command > /tmp/ipaam_badgroup 2>&1" 1 "Verify error message for $desc"
+		rlAssertGrep "$expmsg" "/tmp/ipaam_badgroup"
+	rlPhaseEnd
+
+	desc="find non-existent hostgroup rule"
+	rlPhaseStartTest "ipa-automember-cli-1802: $desc"
+		rlRun "findAutomember hostgroup engservers" 1 "Verify error code for $desc"
+		command="ipa automember-find --type=hostgroup engservers"
+		expmsg="0 rules matched"
+		#rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify error message for $desc"
+		rlRun "$command > /tmp/ipaam_badgroup 2>&1" 1 "Verify error message for $desc"
+		rlAssertGrep "$expmsg" "/tmp/ipaam_badgroup"
+	rlPhaseEnd
+}
+
+######################################################################
+# findAutomember negative tests for invalid type
+######################################################################
+ipaautomember_findAutomember_negative_badtype()
+{
+	desc="find existing group rule with invalid type"
+	rlPhaseStartTest "ipa-automember-cli-1901: $desc"
+		rlRun "findAutomember group eng" 1 "Verify error code for $desc"
+		command="ipa automember-find --type=badtype devel"
+		expmsg="ipa: ERROR: invalid 'type': must be one of (u'group', u'hostgroup')"
+		rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify error message for $desc"
+	rlPhaseEnd
+
+	desc="find existing hostgroup rule with invalid type"
+	rlPhaseStartTest "ipa-automember-cli-1902: $desc"
+		rlRun "findAutomember hostgroup engservers" 1 "Verify error code for $desc"
+		command="ipa automember-find --type=badtype engservers"
+		expmsg="ipa: ERROR: invalid 'type': must be one of (u'group', u'hostgroup')"
+		rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify error message for $desc"
+	rlPhaseEnd
+}
+
+######################################################################
+# showAutomember positive tests
+######################################################################
+ipaautomember_showAutomember_positive()
+{
+	desc="show existing group rule"
+	rlPhaseStartTest "ipa-automember-cli-2001: $desc"
+		rlRun "showAutomember group devel" 0 "Verify return code for $desc"
+	rlPhaseEnd
+	
+	desc="show existing hostgroup rule"
+	rlPhaseStartTest "ipa-automember-cli-2002: $desc"
+		rlRun "showAutomember hostgroup webservers" 0 "Verify return code for $desc"
+	rlPhaseEnd
+	
+}
+
+######################################################################
+# showAutomember negative tests for non-existent group
+######################################################################
+ipaautomember_showAutomember_negative_badgroup()
+{
+	desc="show non-existent group rule"
+	rlPhaseStartTest "ipa-automember-cli-2101: $desc"
+		rlRun "showAutomember group eng" 2 "Verify error code for $desc"
+		command="ipa automember-show --type=group eng"
+		expmsg="ipa: ERROR: : auto_member_rule not found"
+		rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify error message for $desc"
+	rlPhaseEnd
+
+	desc="show non-existent hostgroup rule"
+	rlPhaseStartTest "ipa-automember-cli-2102: $desc"
+		rlRun "showAutomember hostgroup engservers" 2 "Verify error code for $desc"
+		command="ipa automember-show --type=hostgroup engservers"
+		expmsg="ipa: ERROR: : auto_member_rule not found"
+		rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify error message for $desc"
+	rlPhaseEnd
+}
+
+######################################################################
+# showAutomember negative tests for invalid type
+######################################################################
+ipaautomember_showAutomember_negative_badtype()
+{
+	desc="show existing group rule with invalid type"
+	rlPhaseStartTest "ipa-automember-cli-2201: $desc"
+		rlRun "showAutomember badtype devel" 1 "Verify error code for $desc"
+		command="ipa automember-show --type=badtype devel"
+		expmsg="ipa: ERROR: invalid 'type': must be one of (u'group', u'hostgroup')"
+		rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify error message for $desc"
+	rlPhaseEnd
+
+	desc="show existing hostgroup rule with invalid type"
+	rlPhaseStartTest "ipa-automember-cli-2202: $desc"
+		rlRun "showAutomember badtype engservers" 1 "Verify error code for $desc"
+		command="ipa automember-show --type=badtype webservers"
+		expmsg="ipa: ERROR: invalid 'type': must be one of (u'group', u'hostgroup')"
+		rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify error message for $desc"
+	rlPhaseEnd
+}
+
+######################################################################
+# modifyAutomember positive tests
+######################################################################
+ipaautomember_modifyAutomember_positive()
+{
+	desc="modify existing group rule"
+	rlPhaseStartTest "ipa-automember-cli-2301: $desc"
+		rlRun "modifyAutomember group devel desc \"DEV_USERS\"" 0 "Verify return code for $desc"
+	rlPhaseEnd
+	
+	desc="modify existing hostgroup rule"
+	rlPhaseStartTest "ipa-automember-cli-2302: $desc"
+		rlRun "modifyAutomember hostgroup webservers desc \"WEB_SERVERS\"" 0 "Verify return code for $desc"
+	rlPhaseEnd
+}
+
+######################################################################
+# modifyAutomember negative tests for same value
+######################################################################
+ipaautomember_modifyAutomember_negative_sameval()
+{
+	desc="modify existing group rule with same value"
+	rlPhaseStartTest "ipa-automember-cli-2401: $desc"
+		rlRun "modifyAutomember group devel desc \"DEV_USERS\"" 1 "Verify return code for $desc"
+		command="ipa automember-mod --type=group devel --desc=\"DEV_USERS\""
+		expmsg="ipa: ERROR: no modifications to be performed"
+		rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify error message for $desc"
+	rlPhaseEnd
+
+	desc="modify existing hostgroup rule with same value"
+	rlPhaseStartTest "ipa-automember-cli-2402: $desc"
+		rlRun "modifyAutomember hostgroup webservers desc \"WEB_SERVERS\"" 1 "Verify return code for $desc"
+		command="ipa automember-mod --type=hostgroup webservers --desc=\"WEB_SERVERS\""
+		expmsg="ipa: ERROR: no modifications to be performed"
+		rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify error message for $desc"
+	rlPhaseEnd
+}
+
+######################################################################
+# modifyAutomember negative tests for non-existent group
+######################################################################
+ipaautomember_modifyAutomember_negative_badgroup()
+{
+	desc="modify existing group rule with non-existent group"
+	rlPhaseStartTest "ipa-automember-cli-2501: $desc"
+		rlRun "modifyAutomember group eng desc \"ENG_USERS\"" 1 "Verify error code for $desc"
+		command="ipa automember-mod --type=group eng --desc=\"ENG_USERS\""
+		expmsg="ipa: ERROR: : auto_member_rule not found"
+		#rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify error message for $desc"
+		rlRun "$command > /tmp/ipaam_badgroup 2>&1" 2 "Verify error message for $desc"
+		rlAssertGrep "$expmsg" "/tmp/ipaam_badgroup"
+	rlPhaseEnd
+
+	desc="modify existing hostgroup rule with non-existent group"
+	rlPhaseStartTest "ipa-automember-cli-2502: $desc"
+		rlRun "modifyAutomember hostgroup engservers desc \"ENG_SERVERS\"" 1 "Verify error code for $desc"
+		command="ipa automember-mod --type=hostgroup engservers --desc=\"ENG_SERVERS\""
+		expmsg="ipa: ERROR: : auto_member_rule not found"
+		#rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify error message for $desc"
+		rlRun "$command > /tmp/ipaam_badgroup 2>&1" 2 "Verify error message for $desc"
+		rlAssertGrep "$expmsg" "/tmp/ipaam_badgroup"
+	rlPhaseEnd
+}
+
+######################################################################
+# modifyAutomember negative tests for invalid type
+######################################################################
+ipaautomember_modifyAutomember_negative_badtype()
+{
+	desc="modify existing group rule with invalid type"
+	rlPhaseStartTest "ipa-automember-cli-2601: $desc"
+		rlRun "modifyAutomember badtype devel desc \"DEV_USERS\"" 1 "Verify error code for $desc"
+		command="ipa automember-mod --type=badtype devel --desc=\"DEV_USERS\""
+		expmsg="ipa: ERROR: invalid 'type': must be one of (u'group', u'hostgroup')"
+		rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify error message for $desc"
+	rlPhaseEnd
+
+	desc="modify existing hostgroup rule with invalid type"
+	rlPhaseStartTest "ipa-automember-cli-2602: $desc"
+		rlRun "modifyAutomember badtype webservers desc \"WEB_SERVERS\"" 1 "Verify error code for $desc"
+		command="ipa automember-mod --type=badtype webservers --desc=\"WEB_SERVERS\""
+		expmsg="ipa: ERROR: invalid 'type': must be one of (u'group', u'hostgroup')"
+		rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify error message for $desc"
+	rlPhaseEnd
+}
+
+######################################################################
+# modifyAutomember negative tests for invalid attribute
+######################################################################
+ipaautomember_modifyAutomember_negative_badattr()
+{
+	desc="modify existing group rule with invalid attribute"
+	rlPhaseStartTest "ipa-automember-cli-2701: $desc"
+		rlRun "modifyAutomember group devel name \"DEV_USERS\"" 1 "Verify error code for $desc"
+		command="ipa automember-show --type=group devel --name=\"DEV_USERS\""
+		expmsg="ipa: error: no such option: --name"
+		#rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify error message for $desc"
+		rlRun "$command > /tmp/ipaam_badattr 2>&1" 2 "Verify error message for $desc"
+		rlAssertGrep "$expmsg" "/tmp/ipaam_badattr"
+	rlPhaseEnd
+
+	desc="modify existing hostgroup rule with invalid attribute"
+	rlPhaseStartTest "ipa-automember-cli-2702: $desc"
+		rlRun "modifyAutomember hostgroup webservers name \"WEB_SERVERS\"" 1 "Verify error code for $desc"
+		command="ipa automember-show --type=hostgroup webservers --name=\"WEB_SERVERS\""
+		expmsg="ipa: error: no such option: --name"
+		#rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify error message for $desc"
+		rlRun "$command > /tmp/ipaam_badattr 2>&1" 2 "Verify error message for $desc"
+		rlAssertGrep "$expmsg" "/tmp/ipaam_badattr"
+	rlPhaseEnd
+}
 
 ######################################################################
 # CLEANUP
