@@ -300,7 +300,7 @@ showAutomemberDefaultGroup()
 	if [ $rc -ne 0 ]; then
 		rlLog "WARNING: Showing Automember Default Group for type \"$type\" failed."
 	else
-		rlLog "Removing Default Group for type \"$type\" successful."
+		rlLog "Showing Default Group for type \"$type\" successful."
 	fi
 
 	return $rc
