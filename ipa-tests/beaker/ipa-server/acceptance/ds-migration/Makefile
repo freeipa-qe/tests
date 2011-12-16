@@ -2,7 +2,7 @@
 #
 #   Makefile of /CoreOS/tests/Regression/ds-migration
 #   Description: Test of migrating DS instances to IPA
-#   Author: Michael Gregg <mgregg@redhat.com>
+#   Author: Jenny Galipeau <jgalipea@redhat.com>
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
@@ -25,11 +25,11 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 export TEST=/CoreOS/ipa-server/acceptance/ds-migration
-export TESTVERSION=1.0
+export TESTVERSION=2.0
 
 BUILT_FILES=
 
-FILES=$(METADATA) runtest.sh Makefile PURPOSE t.ds-migration.sh migration-launch.xml ds-setup.inf
+FILES=$(METADATA) runtest.sh Makefile PURPOSE t.ds-migration-acceptance.sh lib.ds-migration.sh installds.sh
 
 .PHONY: all install download clean
 
@@ -47,13 +47,13 @@ clean:
 include /usr/share/rhts/lib/rhts-make.include
 
 $(METADATA): Makefile
-	@echo "Owner:           Michael Gregg <mgregg@redhat.com>" > $(METADATA)
+	@echo "Owner:           Jenny Galipeau <jgalipea@redhat.com>" > $(METADATA)
 	@echo "Name:            $(TEST)" >> $(METADATA)
 	@echo "TestVersion:     $(TESTVERSION)" >> $(METADATA)
 	@echo "Path:            $(TEST_DIR)" >> $(METADATA)
 	@echo "Description:     IPA ds-migration acceptance tests" >> $(METADATA)
 	@echo "Type:            Regression" >> $(METADATA)
-	@echo "TestTime:        30m" >> $(METADATA)
+	@echo "TestTime:        60m" >> $(METADATA)
 	@echo "RunFor:          ipa-server" >> $(METADATA)
 	@echo "Requires:        ipa-admintools" >> $(METADATA)
 	@echo "Requires:        expect" >> $(METADATA)
