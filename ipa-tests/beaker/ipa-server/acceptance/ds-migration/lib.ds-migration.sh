@@ -1,12 +1,10 @@
-MIGRATIONCFGOPTION="enable-migration"
-MIGRATIONOUTPUT="Enable migration mode"
 
 SetMigrationConfig()
 {
    value=$1
    rc=0
 
-   ipa config-mod --$MIGRATIONCFGOPTION $value
+   ipa config-mod --enable-migration $value
    if [ $? -ne 0 ] ;then
 	rlLog "WARNING : Configuring migration mode failed: $?"
 	rc=1
@@ -24,9 +22,10 @@ VerifyMigrationConfig()
   rc=0
   tmpout="/tmp/config.out"
 
-  ipa-config-show > $tmpout
-  config=`cat $tmpout | grep \"$MIGRATIONOUTPUT\"`
-  value=`echo $config | cut -d \": \" -f 2`
+  value=`ipa config-show | grep "Enable migration mode" | cut -d ":" -f 2`
+  # trim whitespace
+  value=`echo $value`
+  rlLog "CONFIG SHOW VALUE: $value"
 
   if [ "$expectedvalue" != $value ] ; then
 	rlLog "ERROR : Migration mode configuration not as expected.  Expected: $expectedvalue  Got: $value"

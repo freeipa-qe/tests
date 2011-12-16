@@ -41,6 +41,9 @@
 
 # Include test case file
 . ./t.ds-migration-acceptance.sh
+. ./lib.ds-migration.sh
+. ./installds.sh
+
 
 PACKAGELIST="ipa-admintools ipa-client httpd mod_nss mod_auth_kerb 389-ds-base expect"
 
@@ -67,7 +70,7 @@ rlJournalStart
                         	fi
                 	done
                 	rlRun "service iptables stop" 0 "Stop the firewall on the client"
-                	installds.sh
+                	installds
 			rhts-sync-set -s DONE
                 fi
         else

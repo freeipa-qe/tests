@@ -34,8 +34,6 @@ FILES=$(METADATA) runtest.sh Makefile PURPOSE t.ds-migration-acceptance.sh lib.d
 .PHONY: all install download clean
 
 run: $(FILES) build
-	rm -f /dev/shm/ds-setup.inf
-	cp ./ds-setup.inf /dev/shm/.
 	./runtest.sh
 
 build: $(BUILT_FILES)
