@@ -18,7 +18,17 @@ echo "Instance configuration file: $INSTANCECFG"
 echo "Password scheme ldif file: $PWDSCHEME"
 echo "LDAP instance: $INSTANCE"
 
+installds(){
+
+####################################################
+# turn off firewall
+####################################################
+service iptables stop
+
+####################################################
 # set up directory server instance
+####################################################
+
 rlLog "Setting up Directory Server instance ............."
 echo "[General]" > $INSTANCECFG
 echo "FullMachineName= $HOSTNAME" >> $INSTANCECFG
@@ -43,8 +53,8 @@ echo "SysUser= nobody" >> $INSTANCECFG
 
 cat $INSTANCECFG
 
-rlRun "/usr/sbin/setup-ds.pl --silent --file=$INSTANCECFG" 0 "Silent instance creation"
-rlRun "/usr/bin/ldapsearch -x -h $HOSTNAME -p $LDAPPORT -D \"cn=Directory manager\" -w $ADMINPW -b \"$BASEDN\"" 0 "Verifying directory server instance"
+/usr/sbin/setup-ds.pl --silent --file=$INSTANCECFG
+/usr/bin/ldapsearch -x -h $HOSTNAME -p $LDAPPORT -D "cn=Directory manager" -w $ADMINPW -b "$BASEDN"
 
 # change password scheme
 echo "dn: cn=config" > $PWDSCHEME
@@ -54,7 +64,7 @@ echo "passwordstoragescheme: clear" >> $PWDSCHEME
 
 cat $PWDSCHEME
 
-rlRun "/usr/bin/ldapmodify -a -x -h $HOSTNAME -p $LDAPPORT -D \"cn=Directory Manager\" -w $ADMINPW -c -f $PWDSCHEME" 0 "Change password scheme for directory server"
+/usr/bin/ldapmodify -a -x -h $HOSTNAME -p $LDAPPORT -D "cn=Directory Manager" -w $ADMINPW -c -f $PWDSCHEME
 
 ##########################################################################
 # SSL Secure instance 
@@ -62,29 +72,26 @@ rlRun "/usr/bin/ldapmodify -a -x -h $HOSTNAME -p $LDAPPORT -D \"cn=Directory Man
 
 
 rlLog "Creating noise file ....................................................."
-rlRun "echo \"kjasero;uae8905t76V)e6v7q4wy58w4a5;7t90r798bv2[578rbvr7b90w7rbaw0 brwb7yfbz7rv6vawp9\" > /tmp/noise.txt" 0
+echo "kjasero;uae8905t76V)e6v7q4wy58w4a5;7t90r798bv2[578rbvr7b90w7rbaw0 brwb7yfbz7rv6vawp9" > /tmp/noise.txt
 rlLog "Creating password file...................................................."
-rlRun "echo Secret123 > /tmp/pwdfile.txt"
+echo "echo Secret123 > /tmp/pwdfile.txt"
 
 rlLog "Creating password for certificate databases .............................."
-rlRun "cd /etc/dirsrv/$INSTANCE" 0 
-rlRun "certutil -d . -N -f /tmp/pwdfile.txt" 0
+cd /etc/dirsrv/$INSTANCE 
+certutil -d . -N -f /tmp/pwdfile.txt
 
 rlLog "Creating CA certificate .................................................."
-rlRun "cd /etc/dirsrv/$INSTANCE" 0
-	rlRun "echo -e \"y\n\ny\n\" | certutil -S -n \"CA certificate\" -s \"cn=CA cert,dc=example,dc=com\" -2 -x -t \"CT,,\" -m 1000 -v 120 -d . -k rsa -f /tmp/pwdfile.txt -z /tmp/noise.txt" 0
+cd /etc/dirsrv/$INSTANCE
+echo -e "y\n\ny\n" | certutil -S -n "CA certificate" -s "cn=CA cert,dc=example,dc=com" -2 -x -t "CT,," -m 1000 -v 120 -d . -k rsa -f /tmp/pwdfile.txt -z /tmp/noise.txt
 
 rlLog "Creating Server certificate ................................................"
-rlRun "cd /etc/dirsrv/$INSTANCE" 0
-rlRun "certutil -S -n \"Server-Cert\" -s \"cn=$HOSTNAME, cn=Directory Server\" -c \"CA certificate\" -t \"u,u,u\" -m 1001 -v 120 -d . -k rsa -f /tmp/pwdfile.txt -z /tmp/noise.txt"
-
-rlLog "Creating cacert.asc file .................................................."
-rlRun "certutil -d . -L -n \"CA certificate\" -a > cacert.asc" 0
+cd /etc/dirsrv/$INSTANCE
+certutil -S -n "Server-Cert" -s "cn=$HOSTNAME, cn=Directory Server" -c "CA certificate" -t "u,u,u" -m 1001 -v 120 -d . -k rsa -f /tmp/pwdfile.txt -z /tmp/noise.txt
 
 ###########################################################################
 # Turn on ssl
 ###########################################################################
-
+rlLog "Turning on ssl ............................................."
 cat > ssl.ldif << ssl.ldif_EOF
 
 dn: cn=config
@@ -116,5 +123,94 @@ nssslpersonalityssl: Server-Cert
 nssslactivation: on
 ssl.ldif_EOF
 
-rlRun "/usr/bin/ldapmodify -x -h $SERVERS -p 389 -D \"$ROOTDN\" -w $ROOTDNPWD -c -f ssl.ldif" 0
-rlRun "service dirsrv restart" 0 "Restarting directory server for SSL configuration"
+/usr/bin/ldapmodify -x -h $HOSTNAME -p 389 -D "cn=Directory Manager" -w $ADMINPW -c -f ./ssl.ldif
+
+rlRun "echo \"Internal (Software) Token:Secret123\" > /etc/dirsrv/$INSTANCE/pin.txt" 0
+
+cat /etc/redhat-release | grep "Fedora"
+if [ $? -eq 0 ] ; then
+	FLAVOR="Fedora"
+else
+	FLAVOR="RHEL"
+fi
+
+# restart the directory server
+if [ "$FLAVOR" == "Fedora" ] ; then
+	rlRun "systemctl restart dirsrv.target" 0 "Restarting directory server for ssl changes"
+else
+	rlRun "service dirsrv restart" 0 "Restarting directory server for ssl changes"
+fi
+
+sleep 3
+
+###########################################################################
+#  add a couple users and a couple of groups
+###########################################################################
+	cat > instance1.ldif << instance1.ldif_EOF
+
+version: 1
+
+# entry-id: 10
+dn: uid=puser1,ou=People,dc=example,dc=com
+passwordGraceUserTime: 0
+modifiersName: cn=directory manager
+userPassword: Secret123
+uidNumber: 1001
+gidNumber: 1001
+objectClass: top
+objectClass: person
+objectClass: posixAccount
+uid: puser1
+cn: Posix User1
+sn: User1
+homeDirectory: /home/puser1
+loginshell: /bin/bash
+userPassword: fo0m4nchU
+creatorsName: uid=admin,ou=administrators,ou=topologymanagement,o=netscaperoot
+nsUniqueId: 42598c8a-1dd211b2-8f88fe1c-fcc30000
+
+# entry-id: 11
+dn: uid=puser2,ou=People,dc=example,dc=com
+passwordGraceUserTime: 0
+uidNumber: 1002
+gidNumber: 1002
+objectClass: top
+objectClass: person
+objectClass: posixAccount
+uid: puser2
+cn: Posix User2
+sn: User2
+homeDirectory: /home/puser2
+loginshell: /bin/bash
+userPassword: Secret123
+creatorsName: uid=admin,ou=administrators,ou=topologymanagement,o=netscaperoot
+modifiersName: uid=admin,ou=administrators,ou=topologymanagement,o=netscaperoot
+nsUniqueId: 42598c8b-1dd211b2-8f88fe1c-fcc30000
+
+# entry-id: 12
+dn: cn=Group1,ou=groups,dc=example,dc=com
+gidNumber: 1001
+objectClass: top
+objectClass: groupOfNames
+objectClass: posixGroup
+cn: Group1
+creatorsName: uid=admin,ou=administrators,ou=topologymanagement,o=netscaperoot
+modifiersName: uid=admin,ou=administrators,ou=topologymanagement,o=netscaperoot
+nsUniqueId: 42598c8c-1dd211b2-8f88fe1c-fcc30000
+
+# entry-id: 13
+dn: cn=Group2,ou=groups,dc=example,dc=com
+gidNumber: 1002
+objectClass: top
+objectClass: groupOfNames
+objectClass: posixGroup
+cn: Group2
+creatorsName: uid=admin,ou=administrators,ou=topologymanagement,o=netscaperoot
+modifiersName: uid=admin,ou=administrators,ou=topologymanagement,o=netscaperoot
+nsUniqueId: 42598c8d-1dd211b2-8f88fe1c-fcc30000
+instance1.ldif_EOF
+
+rlRun "/usr/bin/ldapmodify -a -x -h $HOSTNAME -p 389 -D \"cn=Directory Manager\" -w $ADMINPW -c -f instance1.ldif" 0
+
+
+}
