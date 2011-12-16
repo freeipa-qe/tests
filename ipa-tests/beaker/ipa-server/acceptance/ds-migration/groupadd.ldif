@@ -1,4 +1,0 @@
-dn: cn=Group1000,ou=Groups,dc=bos,dc=redhat,dc=com
-changetype: modify
-add: ou
-ou: groups

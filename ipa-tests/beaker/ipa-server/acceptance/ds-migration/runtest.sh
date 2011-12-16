@@ -2,15 +2,15 @@
 # vim: dict=/usr/share/beakerlib/dictionary.vim cpt=.,w,b,u,t,i,k
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-#   runtest.sh of /CoreOS/ipa-tests/acceptance/ds-migration
-#   Description: IPA ds-migration acceptance tests
+#   runtest.sh of /CoreOS/ipa-server/acceptance/ds-migraion
+#   Description: IPA DS Migration Acceptance Tests
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# The following ipa will be tested:
-#
+#   HTTP and HTTPS will be the services used to test the functionality
+#   of kerberizing a service and testing access
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-#   Author: Michael Gregg <mgregg@redhat.com>
-#   Date  : Sept 10, 2010
+#   Author: Jenny Galipeau <jgalipea@redhat.com>
+#   Date  : December 16, 2011
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
 #   Copyright (c) 2010 Red Hat, Inc. All rights reserved.
@@ -40,74 +40,69 @@
 . /dev/shm/env.sh
 
 # Include test case file
-. ./t.ds-migration.sh
+. ./t.ds-migration-acceptance.sh
 
-PACKAGE="ipa-server"
+PACKAGELIST="ipa-admintools ipa-client httpd mod_nss mod_auth_kerb 389-ds-base expect"
 
-startDate=`date "+%F %r"`
-satrtEpoch=`date "+%s"`
+
 ##########################################
 #   test main 
 #########################################
-# ldapsearch -D "cn=Directory Manager" -hipaqa64vmc.idm.lab.bos.redhat.com -p2389 -wSecret123 -x -b ou=People,dc=bos,dc=redhat,dc=com objectclass=*
-# ipa migrate-ds ldap://ipaqa64vmc.idm.lab.bos.redhat.com:2389
-
 rlJournalStart
-    rlPhaseStartSetup "ds-migration startup: Check for ipa-server package"
-        rlAssertRpm $PACKAGE
-        rlRun "TmpDir=\`mktemp -d\`" 0 "Creating tmp directory"
-        rlRun "pushd $TmpDir"
-    rlPhaseEnd
+  rlPhaseStartTest "Machine environment check"
 
-    # r2d2_test_starts
-		kinitAs $ADMINID $ADMINPW
-		hostnames=$(hostname -s)
-		echo "hostname is $hostnames"
-		ds_setup
-		sleep 30	
-		ds_migration
-    # r2d2_test_ends
+        #####################################################################
+        #               IS THIS MACHINE A CLIENT?                           #
+        #####################################################################
+        rc=0
+        echo $CLIENT | grep $HOSTNAME
+        if [ $? -eq 0 ] ; then
+                if [ $rc -eq 0 ] ; then
+               		for item in $PACKAGELIST ; do
+                        	rpm -qa | grep $item
+                        	if [ $? -eq 0 ] ; then
+                                	rlPass "$item package is installed"
+                        	else
+                                	rlFail "$item package NOT found!"
+                        	fi
+                	done
+                	rlRun "service iptables stop" 0 "Stop the firewall on the client"
+                	installds.sh
+			rhts-sync-set -s DONE
+                fi
+        else
+                rlLog "Machine in recipe in not a CLIENT"
+        fi
 
-    rlPhaseStartCleanup "ds-migration cleanup"
-	ds_cleanup
-        rlRun "popd"
-        rlRun "rm -r $TmpDir" 0 "Removing tmp directory"
-    rlPhaseEnd
 
-    makereport
+	#####################################################################
+	# 		IS THIS MACHINE A MASTER?                           #
+	#####################################################################
+	rc=0
+	echo $MASTER | grep $HOSTNAME
+	if [ $? -eq 0 ] ; then
+		rhts-sync-block -s DONE $BEAKERCLIENT
+		ds-migration-acceptance
+	else
+		rlLog "Machine in recipe in not a MASTER"
+	fi
+
+	#####################################################################
+	# 		IS THIS MACHINE A SLAVE?                            #
+	#####################################################################
+	rc=0
+        echo $SLAVE | grep $HOSTNAME
+        if [ $? -eq 0 ] ; then
+		rhts-sync-block -s DONE $BEAKERCLIENT
+		rlPass
+        else
+                rlLog "Machine in recipe in not a SLAVE"
+        fi
+
+   rlPhaseEnd
+    
+   rlJournalPrintText
+   report=/tmp/rhts.report.$RANDOM.txt
+   makereport $report
+   rhts-submit-log -l $report
 rlJournalEnd
-
-
- 
-# manifest:
-# teststuie   : ipasample
-    ## testset: _lifetime
-        ### testcase: minlife_nolimit 
-            #### comment : this is to test for minimum of password history
-            #### data-loop : minage
-            #### data-no-loop : pwusername pwinintial_password
-        ### testcase: _minlife_somelimit
-            #### comment: set password life time to 0
-            #### data-loop: 
-            #### data-no-loop : pwusername pwinitial_password
-        ### testcase: _minlife_negative
-            #### comment: negative test case for minimum password life
-            #### data-loop: minage
-            #### data-no-loop : pwusername pwinitial_password
-        ### testcase: _minlife_verify
-            #### comment: verify the changes
-            #### data-loop: minage
-            #### data-no-loop : pwusername pwinitial_password
-    ## testset: pwhistory
-        ### testcase: _defaultvalue
-            #### comment: verifyt the default value
-            #### data-loop: size day 
-            #### data-no-loop:  admin adminpassword
-        ### testcase: _lowbound
-            #### comment: check the lower bound of value range
-            #### data-loop:  size day expired
-            #### data-no-loop: 
-        ### testcase: password_history_negative
-            #### comment: do negative test on history of password
-            #### data-loop:  size day expired newpw
-            #### data-no-loop: admin adminpassword
