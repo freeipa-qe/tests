@@ -91,6 +91,9 @@ rlJournalStart
 	rlPhaseStartTest "MASTER tests start"
 		installMaster
 
+                rhts-sync-set -s READY $MASTER
+		rhts-sync-block -s DONE $SLAVE
+
 	rlPhaseEnd
 
 	rlPhaseStartCleanup "ipa-ca-install: ipa-server clean up."
@@ -118,7 +121,7 @@ rlJournalStart
                         rhts-sync-block -s READY $MASTER
                         installSlave
 			installCA
-                        rhts-sync-set -s READY
+                        rhts-sync-set -s DONE $SLAVE
                         rlLog "Setting up Authorized keys"
                         SetUpAuthKeys
                         rlLog "Setting up known hosts file"
