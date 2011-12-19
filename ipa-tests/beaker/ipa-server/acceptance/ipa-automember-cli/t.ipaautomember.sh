@@ -66,63 +66,63 @@ ipaautomember()
 {
 	ipaautomember_setup
 
-	#ipaautomember_addAutomember_positive
-	#ipaautomember_addAutomember_negative
+	ipaautomember_addAutomember_positive
+	ipaautomember_addAutomember_negative
 
-	#ipaautomember_addAutomemberCondition_positive
-	#ipaautomember_addAutomemberCondition_negative_badgroup
-	#ipaautomember_addAutomemberCondition_negative_badtype
-	#ipaautomember_addAutomemberCondition_negative_badkey
-	#ipaautomember_addAutomemberCondition_negative_badregextype
+	ipaautomember_addAutomemberCondition_positive
+	ipaautomember_addAutomemberCondition_negative_badgroup
+	ipaautomember_addAutomemberCondition_negative_badtype
+	ipaautomember_addAutomemberCondition_negative_badkey
+	ipaautomember_addAutomemberCondition_negative_badregextype
 
-	#ipaautomember_findAutomember_positive
-	#ipaautomember_findAutomember_negative_badgroup
-	#ipaautomember_findAutomember_negative_badtype
+	ipaautomember_findAutomember_positive
+	ipaautomember_findAutomember_negative_badgroup
+	ipaautomember_findAutomember_negative_badtype
 
-	#ipaautomember_showAutomember_positive
-	#ipaautomember_showAutomember_negative_badgroup
-	#ipaautomember_showAutomember_negative_badtype
+	ipaautomember_showAutomember_positive
+	ipaautomember_showAutomember_negative_badgroup
+	ipaautomember_showAutomember_negative_badtype
 
-	#ipaautomember_modifyAutomember_positive
-	#ipaautomember_modifyAutomember_negative_sameval
-	#ipaautomember_modifyAutomember_negative_badgroup
-	#ipaautomember_modifyAutomember_negative_badtype
-	#ipaautomember_modifyAutomember_negative_badattr
+	ipaautomember_modifyAutomember_positive
+	ipaautomember_modifyAutomember_negative_sameval
+	ipaautomember_modifyAutomember_negative_badgroup
+	ipaautomember_modifyAutomember_negative_badtype
+	ipaautomember_modifyAutomember_negative_badattr
 
-	#ipaautomember_verifyAutomemberAttr_positive
-	#ipaautomember_verifyAutomemberAttr_negative_badgroup
-	#ipaautomember_verifyAutomemberAttr_negative_badtype
-	#ipaautomember_verifyAutomemberAttr_negative_badattr
-	#ipaautomember_verifyAutomemberAttr_negative_badval
+	ipaautomember_verifyAutomemberAttr_positive
+	ipaautomember_verifyAutomemberAttr_negative_badgroup
+	ipaautomember_verifyAutomemberAttr_negative_badtype
+	ipaautomember_verifyAutomemberAttr_negative_badattr
+	ipaautomember_verifyAutomemberAttr_negative_badval
 
-	#ipaautomember_setAutomemberDefaultGroup_positive
-	#ipaautomember_setAutomemberDefaultGroup_negative_sameval
-	#ipaautomember_setAutomemberDefaultGroup_negative_badgroup
-	#ipaautomember_setAutomemberDefaultGroup_negative_badtype
+	ipaautomember_setAutomemberDefaultGroup_positive
+	ipaautomember_setAutomemberDefaultGroup_negative_sameval
+	ipaautomember_setAutomemberDefaultGroup_negative_badgroup
+	ipaautomember_setAutomemberDefaultGroup_negative_badtype
 
-	#ipaautomember_showAutomemberDefaultGroup_positive
-	#ipaautomember_showAutomemberDefaultGroup_negative_badtype
+	ipaautomember_showAutomemberDefaultGroup_positive
+	ipaautomember_showAutomemberDefaultGroup_negative_badtype
 
-	#ipaautomember_removeAutomemberDefaultGroup_positive
-	#ipaautomember_removeAutomemberDefaultGroup_negative_badtype
-	#ipaautomember_removeAutomemberDefaultGroup_negative_nodefault
+	ipaautomember_removeAutomemberDefaultGroup_positive
+	ipaautomember_removeAutomemberDefaultGroup_negative_badtype
+	ipaautomember_removeAutomemberDefaultGroup_negative_nodefault
 
-	#ipaautomember_showAutomemberDefaultGroup_negative_nodefault
+	ipaautomember_showAutomemberDefaultGroup_negative_nodefault
 
-	#ipaautomember_removeAutomemberCondition_negative_badregex
-	#ipaautomember_removeAutomemberCondition_positive
-	#ipaautomember_removeAutomemberCondition_negative_badgroup
-	#ipaautomember_removeAutomemberCondition_negative_badtype
-	#ipaautomember_removeAutomemberCondition_negative_badkey
-	#ipaautomember_removeAutomemberCondition_negative_badregextype
+	ipaautomember_removeAutomemberCondition_negative_badregex
+	ipaautomember_removeAutomemberCondition_positive
+	ipaautomember_removeAutomemberCondition_negative_badgroup
+	ipaautomember_removeAutomemberCondition_negative_badtype
+	ipaautomember_removeAutomemberCondition_negative_badkey
+	ipaautomember_removeAutomemberCondition_negative_badregextype
 
-	#ipaautomember_deleteAutomember_positive
-	#ipaautomember_deleteAutomember_negative_badgroup
-	#ipaautomember_deleteAutomember_negative_badtype
+	ipaautomember_deleteAutomember_positive
+	ipaautomember_deleteAutomember_negative_badgroup
+	ipaautomember_deleteAutomember_negative_badtype
 
-	#ipaautomember_usertest_setup
-	#ipaautomember_usertest_positive_inclusive
-	#ipaautomember_usertest_cleanup
+	ipaautomember_usertest_setup
+	ipaautomember_usertest_positive_inclusive
+	ipaautomember_usertest_cleanup
 
 	ipaautomember_hosttest_setup
 	ipaautomember_hosttest_positive_inclusive
@@ -143,7 +143,7 @@ ipaautomember_setup()
 		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as $ADMINID user"
 		
 		rlRun "addGroup \"Developers\" \"devel\""
-		rlRun "addHostGroup \"Web Servers\" \"webservers\""
+		rlRun "addHostGroup \"QA Servers\" \"qaservers\""
 		rlRun "addGroup \"Default Group\" \"defgroup\""
 		rlRun "addHostGroup \"Default HostGroup\" \"defhostgroup\""
 		
@@ -164,7 +164,7 @@ ipaautomember_addAutomember_positive()
 
 	desc="create rule for hostgroup"
 	rlPhaseStartTest "ipa-automember-cli-1002: $desc"
-		rlRun "addAutomember hostgroup webservers" 0 "Verifying error code for $desc"
+		rlRun "addAutomember hostgroup qaservers" 0 "Verifying error code for $desc"
 	rlPhaseEnd
 }
 
@@ -207,8 +207,8 @@ ipaautomember_addAutomember_negative()
 
 	desc="create rule for hostgroup that already exists"
 	rlPhaseStartTest "ipa-automember-cli-1105: $desc"
-		rlRun "addAutomember hostgroup webservers" 1 "Verifying error code for $desc"
-		command="ipa automember-add --type=hostgroup webservers"
+		rlRun "addAutomember hostgroup qaservers" 1 "Verifying error code for $desc"
+		command="ipa automember-add --type=hostgroup qaservers"
 		expmsg="ipa: ERROR: auto_member_rule with name \"\" already exists"
 		rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify error message for $desc"
 	rlPhaseEnd
@@ -232,14 +232,14 @@ ipaautomember_addAutomemberCondition_positive()
 	rlPhaseEnd
 
 	desc="add inclusive regex to hostgroup"
-	rlPhaseStartTest "ipa-automembet-cli-1203: $desc"
-		rlRun "addAutomemberCondition hostgroup webservers fqdn inclusive ^web[0-9]+\.example\.com" 0 \
+	rlPhaseStartTest "ipa-automember-cli-1203: $desc"
+		rlRun "addAutomemberCondition hostgroup qaservers fqdn inclusive ^qa[0-9]+\.example\.com" 0 \
 			"Verify return code for $desc"
 	rlPhaseEnd
 
 	desc="add exclusive regex to hostgroup"
 	rlPhaseStartTest "ipa-automember-cli-1204: $desc"
-		rlRun "addAutomemberCondition hostgroup webservers fqdn exclusive ^eng[0-9]+\.example\.com" 0 \
+		rlRun "addAutomemberCondition hostgroup qaservers fqdn exclusive ^eng[0-9]+\.example\.com" 0 \
 			"Verify return code for $desc"
 	rlPhaseEnd
 }
@@ -278,9 +278,9 @@ ipaautomember_addAutomemberCondition_negative_badgroup()
 
 	desc="add exclusive regex to non-existent hostgroup"
 	rlPhaseStartTest "ipa-automember-cli-1304: $desc"
-		rlRun "addAutomemberCondition hostgroup engservers fqdn exclusive ^web[0-9]+\.example\.com" 2 \
+		rlRun "addAutomemberCondition hostgroup engservers fqdn exclusive ^qa[0-9]+\.example\.com" 2 \
 			"Verify error code for $desc"
-		command="ipa automember-add-condition --type=hostgroup engservers --key=fqdn --exclusive-regex=^web[0-9]+.example.com"
+		command="ipa automember-add-condition --type=hostgroup engservers --key=fqdn --exclusive-regex=^qa[0-9]+.example.com"
 		expmsg="ipa: ERROR: Auto member rule: engservers not found!"
 		rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify error message for $desc"
 	rlPhaseEnd
@@ -312,18 +312,18 @@ ipaautomember_addAutomemberCondition_negative_badtype()
 
 	desc="add inclusive regex to hostgroup with invalid type"
 	rlPhaseStartTest "ipa-automember-cli-1403: $desc"
-		rlRun "addAutomemberCondition badtype webservers fqdn inclusive ^web[0-9]+\.example\.com" 1 \
+		rlRun "addAutomemberCondition badtype qaservers fqdn inclusive ^qa[0-9]+\.example\.com" 1 \
 			"Verify error code for $desc"
-		command="ipa automember-add-condition --type=badtype webservers --key=fqdn --inclusive-regex=^web[0-9]+.example.com"
+		command="ipa automember-add-condition --type=badtype qaservers --key=fqdn --inclusive-regex=^qa[0-9]+.example.com"
 		expmsg="ipa: ERROR: invalid 'type': must be one of (u'group', u'hostgroup')"
 		rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify error message for $desc"
 	rlPhaseEnd
 
 	desc="add exclusive regex to hostgroup with invalid type"
 	rlPhaseStartTest "ipa-automember-cli-1404: $desc"
-		rlRun "addAutomemberCondition badtype webservers fqdn exclusive ^eng[0-9]+\.example\.com" 1 \
+		rlRun "addAutomemberCondition badtype qaservers fqdn exclusive ^eng[0-9]+\.example\.com" 1 \
 			"Verify error code for $desc"
-		command="ipa automember-add-condition --type=badtype webservers --key=fqdn --exclusive-regex=^eng[0-9]+.example.com"
+		command="ipa automember-add-condition --type=badtype qaservers --key=fqdn --exclusive-regex=^eng[0-9]+.example.com"
 		expmsg="ipa: ERROR: invalid 'type': must be one of (u'group', u'hostgroup')"
 		rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify error message for $desc"
 	rlPhaseEnd
@@ -355,18 +355,18 @@ ipaautomember_addAutomemberCondition_negative_badkey()
 
 	desc="add inclusive regex to hostgroup with invalid key"
 	rlPhaseStartTest "ipa-automember-cli-1503: $desc"
-		rlRun "addAutomemberCondition hostgroup webservers badkey inclusive ^web[0-9]+\.example\.com" 2 \
+		rlRun "addAutomemberCondition hostgroup qaservers badkey inclusive ^qa[0-9]+\.example\.com" 2 \
 			"Verify error code for add inclusive regex to hostgroup with invalid key"
-		command="ipa automember-add-condition --type=hostgroup webservers --key=badkey --inclusive-regex=^web[0-9]+.example.com"
+		command="ipa automember-add-condition --type=hostgroup qaservers --key=badkey --inclusive-regex=^qa[0-9]+.example.com"
 		expmsg="ipa: ERROR: badkey is not a valid attribute."
 		rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify error message for $desc"
 	rlPhaseEnd
 
 	desc="add exclusive regex to hostgroup with invalid key"
 	rlPhaseStartTest "ipa-automember-cli-1504: $desc"
-		rlRun "addAutomemberCondition hostgroup webservers badkey exclusive ^eng[0-9]+\.example\.com" 2 \
+		rlRun "addAutomemberCondition hostgroup qaservers badkey exclusive ^eng[0-9]+\.example\.com" 2 \
 			"Verify error code for $desc"
-		command="ipa automember-add-condition --type=hostgroup webservers --key=badkey --exclusive-regex=^eng[0-9]+.example.com"
+		command="ipa automember-add-condition --type=hostgroup qaservers --key=badkey --exclusive-regex=^eng[0-9]+.example.com"
 		expmsg="ipa: ERROR: badkey is not a valid attribute."
 		rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify error message for $desc"
 	rlPhaseEnd
@@ -390,9 +390,9 @@ ipaautomember_addAutomemberCondition_negative_badregextype()
 
 	desc="add regex to hostgroup with invalid regextype"
 	rlPhaseStartTest "ipa-automember-cli-1602: $desc"
-		rlRun "addAutomemberCondition hostgroup webservers fqdn badregextype ^web[0-9]+\.example\.com" 2 \
+		rlRun "addAutomemberCondition hostgroup qaservers fqdn badregextype ^qa[0-9]+\.example\.com" 2 \
 			"Verify error code for $desc"
-		command="ipa automember-add-condition --type=hostgroup webservers --key=fqdn --badregextype-regex=^web[0-9]+.example.com"
+		command="ipa automember-add-condition --type=hostgroup qaservers --key=fqdn --badregextype-regex=^qa[0-9]+.example.com"
 		expmsg="ipa: error: no such option: --badregextype-regex"
 		#rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify error message for $desc"
 		rlRun "$command > /tmp/ipaam_badregextype 2>&1" 2 "Verify error message for $desc"
@@ -412,7 +412,7 @@ ipaautomember_findAutomember_positive()
 
 	desc="find existing hostgroup rule"
 	rlPhaseStartTest "ipa-automember-cli-1702: $desc"
-		rlRun "findAutomember hostgroup webservers" 0 "Verify return code for $desc"
+		rlRun "findAutomember hostgroup qaservers" 0 "Verify return code for $desc"
 	rlPhaseEnd
 
 }
@@ -477,7 +477,7 @@ ipaautomember_showAutomember_positive()
 	
 	desc="show existing hostgroup rule"
 	rlPhaseStartTest "ipa-automember-cli-2002: $desc"
-		rlRun "showAutomember hostgroup webservers" 0 "Verify return code for $desc"
+		rlRun "showAutomember hostgroup qaservers" 0 "Verify return code for $desc"
 	rlPhaseEnd
 	
 }
@@ -520,7 +520,7 @@ ipaautomember_showAutomember_negative_badtype()
 	desc="show existing hostgroup rule with invalid type"
 	rlPhaseStartTest "ipa-automember-cli-2202: $desc"
 		rlRun "showAutomember badtype engservers" 1 "Verify error code for $desc"
-		command="ipa automember-show --type=badtype webservers"
+		command="ipa automember-show --type=badtype qaservers"
 		expmsg="ipa: ERROR: invalid 'type': must be one of (u'group', u'hostgroup')"
 		rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify error message for $desc"
 	rlPhaseEnd
@@ -538,7 +538,7 @@ ipaautomember_modifyAutomember_positive()
 	
 	desc="modify existing hostgroup rule"
 	rlPhaseStartTest "ipa-automember-cli-2302: $desc"
-		rlRun "modifyAutomember hostgroup webservers desc \"WEB_SERVERS\"" 0 "Verify return code for $desc"
+		rlRun "modifyAutomember hostgroup qaservers desc \"WEB_SERVERS\"" 0 "Verify return code for $desc"
 	rlPhaseEnd
 }
 
@@ -557,8 +557,8 @@ ipaautomember_modifyAutomember_negative_sameval()
 
 	desc="modify existing hostgroup rule with same value"
 	rlPhaseStartTest "ipa-automember-cli-2402: $desc"
-		rlRun "modifyAutomember hostgroup webservers desc \"WEB_SERVERS\"" 1 "Verify return code for $desc"
-		command="ipa automember-mod --type=hostgroup webservers --desc=\"WEB_SERVERS\""
+		rlRun "modifyAutomember hostgroup qaservers desc \"WEB_SERVERS\"" 1 "Verify return code for $desc"
+		command="ipa automember-mod --type=hostgroup qaservers --desc=\"WEB_SERVERS\""
 		expmsg="ipa: ERROR: no modifications to be performed"
 		rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify error message for $desc"
 	rlPhaseEnd
@@ -605,8 +605,8 @@ ipaautomember_modifyAutomember_negative_badtype()
 
 	desc="modify existing hostgroup rule with invalid type"
 	rlPhaseStartTest "ipa-automember-cli-2602: $desc"
-		rlRun "modifyAutomember badtype webservers desc \"WEB_SERVERS\"" 1 "Verify error code for $desc"
-		command="ipa automember-mod --type=badtype webservers --desc=\"WEB_SERVERS\""
+		rlRun "modifyAutomember badtype qaservers desc \"WEB_SERVERS\"" 1 "Verify error code for $desc"
+		command="ipa automember-mod --type=badtype qaservers --desc=\"WEB_SERVERS\""
 		expmsg="ipa: ERROR: invalid 'type': must be one of (u'group', u'hostgroup')"
 		rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify error message for $desc"
 	rlPhaseEnd
@@ -629,8 +629,8 @@ ipaautomember_modifyAutomember_negative_badattr()
 
 	desc="modify existing hostgroup rule with invalid attribute"
 	rlPhaseStartTest "ipa-automember-cli-2702: $desc"
-		rlRun "modifyAutomember hostgroup webservers name \"WEB_SERVERS\"" 1 "Verify error code for $desc"
-		command="ipa automember-show --type=hostgroup webservers --name=\"WEB_SERVERS\""
+		rlRun "modifyAutomember hostgroup qaservers name \"WEB_SERVERS\"" 1 "Verify error code for $desc"
+		command="ipa automember-show --type=hostgroup qaservers --name=\"WEB_SERVERS\""
 		expmsg="ipa: error: no such option: --name"
 		#rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify error message for $desc"
 		rlRun "$command > /tmp/ipaam_badattr 2>&1" 2 "Verify error message for $desc"
@@ -650,7 +650,7 @@ ipaautomember_verifyAutomemberAttr_positive()
 	
 	desc="verify existing hostgroup rule"
 	rlPhaseStartTest "ipa-automember-cli-2802: $desc"
-		rlRun "verifyAutomemberAttr hostgroup webservers Description \"WEB_SERVERS\"" 0 "Verify return code for $desc"
+		rlRun "verifyAutomemberAttr hostgroup qaservers Description \"WEB_SERVERS\"" 0 "Verify return code for $desc"
 	rlPhaseEnd
 }
 
@@ -691,8 +691,8 @@ ipaautomember_verifyAutomemberAttr_negative_badtype()
 
 	desc="verify existing hostgroup rule with invalid type"
 	rlPhaseStartTest "ipa-automember-cli-3002: $desc"
-		rlRun "verifyAutomemberAttr badtype webservers desc WEB_SERVERS" 1 "Verify error code for $desc"
-		command="ipa automember-show --type=badtype webservers"
+		rlRun "verifyAutomemberAttr badtype qaservers desc WEB_SERVERS" 1 "Verify error code for $desc"
+		command="ipa automember-show --type=badtype qaservers"
 		expmsg="ipa: ERROR: invalid 'type': must be one of (u'group', u'hostgroup')"
 		rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify error message for $desc"
 	rlPhaseEnd
@@ -715,8 +715,8 @@ ipaautomember_verifyAutomemberAttr_negative_badattr()
 
 	desc="verify existing hostgroup rule with invalid attribute"
 	rlPhaseStartTest "ipa-automember-cli-3102: $desc"
-		rlRun "verifyAutomemberAttr hostgroup webservers badattr \"WEB_SERVERS\"" 1 "Verify error code for $desc"
-		command="ipa automember-show --all --type=hostgroup webservers" 
+		rlRun "verifyAutomemberAttr hostgroup qaservers badattr \"WEB_SERVERS\"" 1 "Verify error code for $desc"
+		command="ipa automember-show --all --type=hostgroup qaservers" 
 		expmsg="badattr"
 		#rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify error message for $desc"
 		rlRun "$command > /tmp/ipaam_badattr 2>&1" 0 "Verify error message for $desc"
@@ -741,8 +741,8 @@ ipaautomember_verifyAutomemberAttr_negative_badval()
 
 	desc="verify existing hostgroup rule with incorrect value"
 	rlPhaseStartTest "ipa-automember-cli-3202: $desc"
-		rlRun "verifyAutomemberAttr hostgroup webservers \"Automember Rule\" badval" 1 "Verify error code for $desc"
-		command="ipa automember-show --all --type=hostgroup webservers"
+		rlRun "verifyAutomemberAttr hostgroup qaservers \"Automember Rule\" badval" 1 "Verify error code for $desc"
+		command="ipa automember-show --all --type=hostgroup qaservers"
 		expmsg="Automember Rule: badval"
 		#rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify error message for $desc"
 		rlRun "$command > /tmp/ipaam_badval 2>&1" 0 "Verify error message for $desc"
@@ -958,14 +958,14 @@ ipaautomember_removeAutomemberCondition_positive()
 	rlPhaseEnd
 
 	desc="remove hostgroup inclusive regex"
-	rlPhaseStartTest "ipa-automembet-cli-4303: $desc"
-		rlRun "removeAutomemberCondition hostgroup webservers fqdn inclusive ^web[0-9]+\.example\.com" 0 \
+	rlPhaseStartTest "ipa-automember-cli-4303: $desc"
+		rlRun "removeAutomemberCondition hostgroup qaservers fqdn inclusive ^qa[0-9]+\.example\.com" 0 \
 			"Verify return code for $desc"
 	rlPhaseEnd
 
 	desc="remove hostgroup exclusive regex"
 	rlPhaseStartTest "ipa-automember-cli-4304: $desc"
-		rlRun "removeAutomemberCondition hostgroup webservers fqdn exclusive ^eng[0-9]+\.example\.com" 0 \
+		rlRun "removeAutomemberCondition hostgroup qaservers fqdn exclusive ^eng[0-9]+\.example\.com" 0 \
 			"Verify return code for $desc"
 	rlPhaseEnd
 }
@@ -1004,9 +1004,9 @@ ipaautomember_removeAutomemberCondition_negative_badgroup()
 
 	desc="remove exclusive regex for non-existent hostgroup"
 	rlPhaseStartTest "ipa-automember-cli-4404: $desc"
-		rlRun "removeAutomemberCondition hostgroup engservers fqdn exclusive ^web[0-9]+\.example\.com" 2 \
+		rlRun "removeAutomemberCondition hostgroup engservers fqdn exclusive ^qa[0-9]+\.example\.com" 2 \
 			"Verify error code for $desc"
-		command="ipa automember-remove-condition --type=hostgroup engservers --key=fqdn --exclusive-regex=^web[0-9]+.example.com"
+		command="ipa automember-remove-condition --type=hostgroup engservers --key=fqdn --exclusive-regex=^qa[0-9]+.example.com"
 		expmsg="ipa: ERROR: Auto member rule: engservers not found!"
 		rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify error message for $desc"
 	rlPhaseEnd
@@ -1038,18 +1038,18 @@ ipaautomember_removeAutomemberCondition_negative_badtype()
 
 	desc="remove inclusive regex from hostgroup with invalid type"
 	rlPhaseStartTest "ipa-automember-cli-4503: $desc"
-		rlRun "removeAutomemberCondition badtype webservers fqdn inclusive ^web[0-9]+\.example\.com" 1 \
+		rlRun "removeAutomemberCondition badtype qaservers fqdn inclusive ^qa[0-9]+\.example\.com" 1 \
 			"Verify error code for $desc"
-		command="ipa automember-remove-condition --type=badtype webservers --key=fqdn --inclusive-regex=^web[0-9]+.example.com"
+		command="ipa automember-remove-condition --type=badtype qaservers --key=fqdn --inclusive-regex=^qa[0-9]+.example.com"
 		expmsg="ipa: ERROR: invalid 'type': must be one of (u'group', u'hostgroup')"
 		rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify error message for $desc"
 	rlPhaseEnd
 
 	desc="remove exclusive regex from hostgroup with invalid type"
 	rlPhaseStartTest "ipa-automember-cli-4504: $desc"
-		rlRun "removeAutomemberCondition badtype webservers fqdn exclusive ^eng[0-9]+\.example\.com" 1 \
+		rlRun "removeAutomemberCondition badtype qaservers fqdn exclusive ^eng[0-9]+\.example\.com" 1 \
 			"Verify error code for $desc"
-		command="ipa automember-remove-condition --type=badtype webservers --key=fqdn --exclusive-regex=^eng[0-9]+.example.com"
+		command="ipa automember-remove-condition --type=badtype qaservers --key=fqdn --exclusive-regex=^eng[0-9]+.example.com"
 		expmsg="ipa: ERROR: invalid 'type': must be one of (u'group', u'hostgroup')"
 		rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify error message for $desc"
 	rlPhaseEnd
@@ -1085,9 +1085,9 @@ ipaautomember_removeAutomemberCondition_negative_badkey()
 
 	desc="remove inclusive regex from hostgroup with invalid key"
 	rlPhaseStartTest "ipa-automember-cli-4603: $desc"
-		rlRun "removeAutomemberCondition hostgroup webservers badkey inclusive ^web[0-9]+\.example\.com" 1 \
+		rlRun "removeAutomemberCondition hostgroup qaservers badkey inclusive ^qa[0-9]+\.example\.com" 1 \
 			"Verify error code for remove inclusive regex to hostgroup with invalid key"
-		command="ipa automember-remove-condition --type=hostgroup webservers --key=badkey --inclusive-regex=^web[0-9]+.example.com"
+		command="ipa automember-remove-condition --type=hostgroup qaservers --key=badkey --inclusive-regex=^qa[0-9]+.example.com"
 		expmsg="Number of conditions removed 0"
 		#rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify error message for $desc"
 		rlRun "$command > /tmp/ipaam_badkey 2>&1" 1 "Verify error message for $desc"
@@ -1096,9 +1096,9 @@ ipaautomember_removeAutomemberCondition_negative_badkey()
 
 	desc="remove exclusive regex from hostgroup with invalid key"
 	rlPhaseStartTest "ipa-automember-cli-4604: $desc"
-		rlRun "removeAutomemberCondition hostgroup webservers badkey exclusive ^eng[0-9]+\.example\.com" 1 \
+		rlRun "removeAutomemberCondition hostgroup qaservers badkey exclusive ^eng[0-9]+\.example\.com" 1 \
 			"Verify error code for $desc"
-		command="ipa automember-remove-condition --type=hostgroup webservers --key=badkey --exclusive-regex=^eng[0-9]+.example.com"
+		command="ipa automember-remove-condition --type=hostgroup qaservers --key=badkey --exclusive-regex=^eng[0-9]+.example.com"
 		expmsg="Number of conditions removed 0"
 		#rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify error message for $desc"
 		rlRun "$command > /tmp/ipaam_badkey 2>&1" 1 "Verify error message for $desc"
@@ -1124,9 +1124,9 @@ ipaautomember_removeAutomemberCondition_negative_badregextype()
 
 	desc="remove regex from hostgroup with invalid regextype"
 	rlPhaseStartTest "ipa-automember-cli-4702: $desc"
-		rlRun "removeAutomemberCondition hostgroup webservers fqdn badregextype ^web[0-9]+\.example\.com" 2 \
+		rlRun "removeAutomemberCondition hostgroup qaservers fqdn badregextype ^qa[0-9]+\.example\.com" 2 \
 			"Verify error code for $desc"
-		command="ipa automember-remove-condition --type=hostgroup webservers --key=fqdn --badregextype-regex=^web[0-9]+.example.com"
+		command="ipa automember-remove-condition --type=hostgroup qaservers --key=fqdn --badregextype-regex=^qa[0-9]+.example.com"
 		expmsg="ipa: error: no such option: --badregextype-regex"
 		#rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify error message for $desc"
 		rlRun "$command > /tmp/ipaam_badregextype 2>&1" 2 "Verify error message for $desc"
@@ -1163,9 +1163,9 @@ ipaautomember_removeAutomemberCondition_negative_badregex()
 
 	desc="remove hostgroup inclusive regex for non-existent regex"
 	rlPhaseStartTest "ipa-automember-cli-4803: $desc"
-		rlRun "removeAutomemberCondition hostgroup webservers fqdn inclusive ^badweb[0-9]+\.example\.com" 1 \
+		rlRun "removeAutomemberCondition hostgroup qaservers fqdn inclusive ^badqa[0-9]+\.example\.com" 1 \
 			"Verify error code for remove inclusive regex to hostgroup with invalid key"
-		command="ipa automember-remove-condition --type=hostgroup webservers --key=fqdn --inclusive-regex=^badweb[0-9]+.example.com"
+		command="ipa automember-remove-condition --type=hostgroup qaservers --key=fqdn --inclusive-regex=^badqa[0-9]+.example.com"
 		expmsg="Number of conditions removed 0"
 		#rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify error message for $desc"
 		rlRun "$command > /tmp/ipaam_badregex 2>&1" 1 "Verify error message for $desc"
@@ -1174,9 +1174,9 @@ ipaautomember_removeAutomemberCondition_negative_badregex()
 
 	desc="remove hostgroup exclusive regex for non-existent regex"
 	rlPhaseStartTest "ipa-automember-cli-4804: $desc"
-		rlRun "removeAutomemberCondition hostgroup webservers fqdn exclusive ^badeng[0-9]+\.example\.com" 1 \
+		rlRun "removeAutomemberCondition hostgroup qaservers fqdn exclusive ^badeng[0-9]+\.example\.com" 1 \
 			"Verify error code for $desc"
-		command="ipa automember-remove-condition --type=hostgroup webservers --key=fqdn --exclusive-regex=^badeng[0-9]+.example.com"
+		command="ipa automember-remove-condition --type=hostgroup qaservers --key=fqdn --exclusive-regex=^badeng[0-9]+.example.com"
 		expmsg="Number of conditions removed 0"
 		#rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify error message for $desc"
 		rlRun "$command > /tmp/ipaam_badregex 2>&1" 1 "Verify error message for $desc"
@@ -1196,7 +1196,7 @@ ipaautomember_deleteAutomember_positive()
 
 	desc="delete existing hostgroup rule"
 	rlPhaseStartTest "ipa-automember-cli-4902: $desc"
-		rlRun "deleteAutomember hostgroup webservers" 0 "Verify return code for $desc"
+		rlRun "deleteAutomember hostgroup qaservers" 0 "Verify return code for $desc"
 	rlPhaseEnd
 }
 
@@ -1214,14 +1214,14 @@ ipaautomember_deleteAutomember_negative_badgroup()
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-automember-cli-5002: $desc"
-		rlRun "deleteAutomember hostgroup webservers" 2 "Verify return code for $desc"
-		command="ipa automember-del --type=group devel"
+		rlRun "deleteAutomember hostgroup qaservers" 2 "Verify return code for $desc"
+		command="ipa automember-del --type=group qaservers"
 		expmsg="ipa: ERROR: : auto_member_rule not found"
 		rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify error message for $desc"
 	rlPhaseEnd
 
 }
-	
+
 ######################################################################
 # deleteAutomember negative tests for invalid type
 ######################################################################
@@ -1244,25 +1244,27 @@ ipaautomember_usertest_setup()
 {
 	desc="Setup users/groups/rules for user tests"
 	rlPhaseStartTest "ipa-automember-usertest-1000: $desc"
-		#rlRun "ipa group-add --desc=Developers devel"
+		rlRun "ipa group-add --desc=Developers dev"
 		rlRun "ipa group-add --desc=Engineers  eng"
 		rlRun "ipa group-add --desc=WebAdmins  web"
 		rlRun "ipa group-add --desc=DBAdmins   db"
 
-		rlRun "ipa user-add --first=Manager --last=Devel mdevel"
+		rlRun "ipa group-add --desc=CorpGroup  corpgroup"
+
+		rlRun "ipa user-add --first=Manager --last=Devel mdev"
 		rlRun "ipa user-add --first=Manager --last=Eng   meng"
 		rlRun "ipa user-add --first=Manager --last=Web   mweb"
 		rlRun "ipa user-add --first=Manager --last=DB    mdb"
 
-		rlRun "ipa automember-add --type=group --desc=Developers_AM_Rule devel"
+		rlRun "ipa automember-add --type=group --desc=Developers_AM_Rule dev"
 		rlRun "ipa automember-add --type=group --desc=Engineers_AM_Rule  eng"
 		rlRun "ipa automember-add --type=group --desc=WebAdmins_AM_Rule  web"
 		rlRun "ipa automember-add --type=group --desc=DBAdmins_AM_Rule   db"
 
-		rlRun "ipa automember-add-condition --type=group devel --key=manager --inclusive-regex=^uid=mdevel"
-		rlRun "ipa automember-add-condition --type=group devel --key=title --inclusive-regex=^tdevel"
-		rlRun "ipa automember-add-condition --type=group devel --key=manager --exclusive-regex=^uid=meng"
-		rlRun "ipa automember-add-condition --type=group devel --key=title --exclusive-regex=^teng"
+		rlRun "ipa automember-add-condition --type=group dev --key=manager --inclusive-regex=^uid=mdev"
+		rlRun "ipa automember-add-condition --type=group dev --key=title --inclusive-regex=^tdev"
+		rlRun "ipa automember-add-condition --type=group dev --key=manager --exclusive-regex=^uid=meng"
+		rlRun "ipa automember-add-condition --type=group dev --key=title --exclusive-regex=^teng"
 
 		rlRun "ipa automember-add-condition --type=group eng --key=manager --inclusive-regex=^uid=meng"
 		rlRun "ipa automember-add-condition --type=group eng --key=title --inclusive-regex=^teng"
@@ -1276,8 +1278,10 @@ ipaautomember_usertest_setup()
 
 		rlRun "ipa automember-add-condition --type=group db --key=manager --inclusive-regex=^uid=mdb"
 		rlRun "ipa automember-add-condition --type=group db --key=title --inclusive-regex=^tdb"
-		rlRun "ipa automember-add-condition --type=group db --key=manager --exclusive-regex=^uid=mdevel"
-		rlRun "ipa automember-add-condition --type=group db --key=title --exclusive-regex=^tdevel"
+		rlRun "ipa automember-add-condition --type=group db --key=manager --exclusive-regex=^uid=mdev"
+		rlRun "ipa automember-add-condition --type=group db --key=title --exclusive-regex=^tdev"
+
+		rlRun "ipa automember-default-group-set --type=group --default-group=corpgroup"
 	rlPhaseEnd
 }
 
@@ -1314,7 +1318,7 @@ ipaautomember_usertest_positive_inclusive()
 {
 	desc="add tests match manager"
 	rlPhaseStartTest "ipa-automember-usertest-1101: $desc"
-		userAddQuickTest user0001 mdevel notitle devel
+		userAddQuickTest user0001 mdev   notitle dev
 		userAddQuickTest user0002 meng   notitle eng
 		userAddQuickTest user0003 mweb   notitle web
 		userAddQuickTest user0004 mdb    notitle db
@@ -1322,7 +1326,7 @@ ipaautomember_usertest_positive_inclusive()
 
 	desc="user add tests match title"
 	rlPhaseStartTest "ipa-automember-usertest-1102: $desc"
-		userAddQuickTest user0005 nomanager tdevel devel
+		userAddQuickTest user0005 nomanager tdev   dev
 		userAddQuickTest user0006 nomanager teng   eng
 		userAddQuickTest user0007 nomanager tweb   web
 		userAddQuickTest user0008 nomanager tdb    db
@@ -1330,22 +1334,22 @@ ipaautomember_usertest_positive_inclusive()
 
  	desc="user add tests match manager and title"
 	rlPhaseStartTest "ipa-automember-usertest-1103: $desc"
-		userAddQuickTest user0009 mdevel tdevel devel
-		userAddQuickTest user0010 mdevel teng   eng
-		userAddQuickTest user0011 mdevel tweb   devel,web
-		userAddQuickTest user0012 mdevel tdb    devel
+		userAddQuickTest user0009 mdev   tdev   dev
+		userAddQuickTest user0010 mdev   teng   eng
+		userAddQuickTest user0011 mdev   tweb   dev,web
+		userAddQuickTest user0012 mdev   tdb    dev
 
-		userAddQuickTest user0013 meng   tdevel eng
+		userAddQuickTest user0013 meng   tdev   eng
 		userAddQuickTest user0014 meng   teng   eng
 		userAddQuickTest user0015 meng   tweb   web
 		userAddQuickTest user0016 meng   tdb    eng,db
 
-		userAddQuickTest user0017 mweb   tdevel web,devel
+		userAddQuickTest user0017 mweb   tdev   web,dev
 		userAddQuickTest user0018 mweb   teng   web
 		userAddQuickTest user0019 mweb   tweb   web
 		userAddQuickTest user0020 mweb   tdb    db
 
-		userAddQuickTest user0021 mdb    tdevel devel
+		userAddQuickTest user0021 mdb    tdev   dev
 		userAddQuickTest user0022 mdb    teng   db,eng
 		userAddQuickTest user0023 mdb    tweb   db
 		userAddQuickTest user0024 mdb    tdb    db
@@ -1357,23 +1361,25 @@ ipaautomember_usertest_positive_inclusive()
 ######################################################################
 ipaautomember_usertest_cleanup()
 {
-	rlPhaseStartTest "user test cleanup"
-                #rlRun "ipa group-del devel"
+	rlPhaseStartTest "ipa-automember-usertest-cleanup: delete groups, users, rules"
+                rlRun "ipa group-del dev"
                 rlRun "ipa group-del eng"
                 rlRun "ipa group-del web"
                 rlRun "ipa group-del db"
+
+		rlRun "ipa group-del corpgroup"
 
 		for i in $(seq 1 24); do
 			user=$(printf "user%.4d" $i)
 			rlRun "ipa user-del $user"
 		done
 
-                rlRun "ipa user-del mdevel"
+                rlRun "ipa user-del mdev"
                 rlRun "ipa user-del meng"
                 rlRun "ipa user-del mweb"
                 rlRun "ipa user-del mdb"
 
-                rlRun "ipa automember-del --type=group devel"
+                rlRun "ipa automember-del --type=group dev"
                 rlRun "ipa automember-del --type=group eng"
                 rlRun "ipa automember-del --type=group web"
                 rlRun "ipa automember-del --type=group db"
@@ -1389,12 +1395,14 @@ ipaautomember_hosttest_setup()
 	rlPhaseStartTest "ipa-automember-hosttest-1000: $desc"
 		rlRun "ipa hostgroup-add --desc=DevServers devservers"
 		rlRun "ipa hostgroup-add --desc=EngServers engservers"
-		#rlRun "ipa hostgroup-add --desc=WebServers webservers"
+		rlRun "ipa hostgroup-add --desc=WebServers webservers"
 		rlRun "ipa hostgroup-add --desc=DBAServers dbaservers"
+
+		rlRun "ipa hostgroup-add --desc=CorpHostGroup corphostgroup"
 
 		rlRun "ipa automember-add --type=hostgroup devservers"
 		rlRun "ipa automember-add --type=hostgroup engservers"
-		#rlRun "ipa automember-add --type=hostgroup webservers"
+		rlRun "ipa automember-add --type=hostgroup webservers"
 		rlRun "ipa automember-add --type=hostgroup dbaservers"
 
 		rlRun "ipa automember-add-condition --type=hostgroup devservers --key=description --inclusive-regex=dev"
@@ -1416,6 +1424,8 @@ ipaautomember_hosttest_setup()
 		rlRun "ipa automember-add-condition --type=hostgroup dbaservers --key=fqdn        --inclusive-regex=^dba[0-9]+.testrelm"
 		rlRun "ipa automember-add-condition --type=hostgroup dbaservers --key=description --exclusive-regex=dev"
 		rlRun "ipa automember-add-condition --type=hostgroup dbaservers --key=fqdn        --exclusive-regex=^dev[0-9]+.testrelm"
+
+		rlRun "ipa automember-default-group-set --type=hostgroup --default-group=corphostgroup"
 	rlPhaseEnd
 }
 
@@ -1491,7 +1501,7 @@ ipaautomember_hosttest_positive_inclusive()
 ######################################################################
 ipaautomember_hosttest_cleanup()
 {
-	rlPhaseStartTest "host test cleanup"
+	rlPhaseStartTest "ipa-automember-hostest-cleanup: delete hosts, hostgroups, rules"
 
 		for i in srv0001 srv0002 srv0003 srv0004; do
 			rlRun "ipa host-del $i.testrelm"
@@ -1505,13 +1515,15 @@ ipaautomember_hosttest_cleanup()
 
 		rlRun "ipa automember-del --type=hostgroup devservers"
 		rlRun "ipa automember-del --type=hostgroup engservers"
-		#rlRun "ipa automember-del --type=hostgroup webservers"
+		rlRun "ipa automember-del --type=hostgroup webservers"
 		rlRun "ipa automember-del --type=hostgroup dbaservers"
 
 		rlRun "ipa hostgroup-del devservers"
 		rlRun "ipa hostgroup-del engservers"
-		#rlRun "ipa hostgroup-del webservers"
+		rlRun "ipa hostgroup-del webservers"
 		rlRun "ipa hostgroup-del dbaservers"
+	
+		rlRun "ipa hostgroup-del corphostgroup"
 	
 	rlPhaseEnd
 }
@@ -1523,7 +1535,7 @@ ipaautomember_cleanup()
 {
 	rlPhaseStartCleanup "ipa-automember-cli-cleanup: Delete remaining automember rules and Destroying admin credentials"
 		rlRun "deleteGroup devel" 0 "Deleting group devel"
-		rlRun "deleteHostGroup webservers" 0 "Deleting hostgroup webservers"
+		rlRun "deleteHostGroup qaservers" 0 "Deleting hostgroup webservers"
 		rlRun "deleteGroup defgroup" 0 "Deleting group defgroup"
 		rlRun "deleteHostGroup defhostgroup" 0 "Deleting hostgroup defhostgroup"
 		rlRun "ipa user-del mscott"
