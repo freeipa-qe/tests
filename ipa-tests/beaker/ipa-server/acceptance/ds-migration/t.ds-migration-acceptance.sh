@@ -219,12 +219,6 @@ cleartxtpwdmigration()
 
                 rlRun "ssh_auth_success $USER1 $USER1PWD $HOSTNAME"
 		rlRun "ssh_auth_success $USER2 $USER2PWD $HOSTNAME"
-
-                #cleanup for next migration test
-                ipa user-del $USER1
-                ipa user-del $USER2
-                ipa group-del $GROUP1
-                ipa group-del $GROUP2
         rlPhaseEnd
 
 }
