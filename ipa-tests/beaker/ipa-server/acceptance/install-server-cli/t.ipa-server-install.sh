@@ -38,6 +38,8 @@ ipaserverinstall()
 
 #  --ip-address=IP_ADDRESS     Master Server IP Address
      ipaserverinstall_ipaddress
+#     Add test to verify: bug 696268: IPA server install with DNS setup, and with --ip-address cannot resolve hostnames
+     ipaserverinstall_invalidipaddress
 
 
 #  --no-forwarders       Do not add any DNS forwarders, use root servers
@@ -51,9 +53,13 @@ ipaserverinstall()
 
 #  --zonemgr=ZONEMGR     DNS zone manager e-mail address. Defaults to root
      ipaserverinstall_withzonemgr
+#     Add test to verify: bug 693771 : Preinstall check needed if zonemgr has special char
+     ipaserverinstall_withinvalidzonemgr
 
 #  --subject=SUBJECT     The certificate subject base (default O=<realm-name>)
      ipaserverinstall_subject
+#     Add test to verify: bug 696282 : Preinstall check needed if subject is not specified in required format
+     ipaserverinstall_invalidsubject
 
 #  --idstart=IDSTART     The starting value for the IDs range (default random)
 #  --idmax=IDMAX         The max value value for the IDs range (default: idstart+199999)
@@ -63,8 +69,35 @@ ipaserverinstall()
      ipaserverinstall_nohbacallow
 
 #  --no-host-dns         Do not use DNS for hostname lookup during installation
-      ipaserverinstall_nohostdns
+#    Add test to verify:  bug 707229 : ipa-server-install with --no-host-dns still checks DNS : Also look at bug 729377
+     ipaserverinstall_nohostdns
+     ipaserverinstall_nohostsentry
+     ipaserverinstall_nohostdns_nohostsentry
 
+#  --no-ui-redirect      Do not automatically redirect to the Web UI.
+     ipaserverinstall_nouiredirect
+
+#  --reverse-zone=REVERSE_ZONE  The reverse DNS zone to use
+
+#   --zone-refresh=ZONE_REFRESH Number of seconds between regular checks for new DNS zones.
+
+#     Add test to verify: bug 681978 : Uninstalling client if the server is installed should be prevented
+       ipaclient_uninstall
+
+
+
+
+#     Add test to verify: bug 729166 : ipa-server-install creates wrong reverse zone record in LDAP
+      ipaserverinstall_verifyreversezone
+
+#     Add test to verify: bug 740403 : invalid Directory Manager password causes ipaserver-install to fail with "Exception in CertSubjectPanel(): java.lang.IndexOutOfBoundsException"
+#     Install using DM password with backslash
+
+#     Add test to verify: bug 742875 : named fails to start after installing ipa server when short hostname preceeds fqdn in /etc/hosts. 
+      ipaserverinstall_shorthostname
+	
+
+ 
 #  --selfsign            Configure a self-signed CA instance rather than a dogtag CA
     ipaserverinstall_selfsign
 # This should be last test - then run IPA Functional tests against this server
@@ -239,6 +272,20 @@ ipa-server-install: error: option --ip-address: invalid IP address $NEWIPADDRESS
     rlPhaseEnd
 }
 
+ipaserverinstall_invalidipaddress()
+{
+    rlPhaseStartTest "ipa-server-install - 14 - [Negative] Install with invalid ipaddress" 
+        uninstall_fornexttest
+        local tmpout=$TmpDir/ipaserverinstall_invalidipaddress.out
+        command="ipa-server-install --setup-dns --forwarder=$DNSFORWARD --ip-address=$ANOTHERNEWIPADDRESS -r $RELM -p $ADMINPW -P $ADMINPW -a $ADMINPW -U"
+        expmsg="ipa-server-install: error: option --ip-address: invalid IP address $ANOTHERNEWIPADDRESS: failed to detect a valid IP address from '$ANOTHERNEWIPADDRESS'"
+        qaRun "$command" "$tmpout" 2 "$expmsg" "Verify expected error message for IPA Install with invalid ipaddress"  debug
+    rlPhaseEnd
+
+
+}
+
+
 ########################################################################
 #  --no-forwarders       Do not add any DNS forwarders, use root servers
 ########################################################################
@@ -296,6 +343,16 @@ ipaserverinstall_withzonemgr()
     rlPhaseEnd
 }
 
+ipaserverinstall_withinvalidzonemgr()
+{
+    rlPhaseStartTest "ipa-server-install - 14 - [Negative] Install with invalid zonemgr" 
+        uninstall_fornexttest
+        local tmpout=$TmpDir/ipaserverinstall_invalidzonemgr.out
+        command="ipa-server-install --setup-dns --forwarder=$DNSFORWARD  -r $RELM -p $ADMINPW -P $ADMINPW -a $ADMINPW --zonemgr=$special_char_in_admin_email -U"
+        expmsg="invalid 'zonemgr': The character"
+        qaRun "$command" "$tmpout" 1 "$expmsg" "Verify expected error message for IPA Install with invalid zonemgr"  debug
+    rlPhaseEnd
+}
 #####################################################
 #  --subject=SUBJECT     The certificate subject base 
 #                        (default O=<realm-name>)
@@ -310,6 +367,20 @@ ipaserverinstall_subject()
         verify_install true tmpout subject 
     rlPhaseEnd
 }
+
+ipaserverinstall_invalidsubject()
+{
+    rlPhaseStartTest "ipa-server-install - 14 - [Negative] Install with invalid subject" 
+        uninstall_fornexttest
+        local tmpout=$TmpDir/ipaserverinstall_invalidzonemgr.out
+        command="ipa-server-install --setup-dns --forwarder=$DNSFORWARD  -r $RELM -p $ADMINPW -P $ADMINPW -a $ADMINPW --subject=$invalid_cert_subject -U"
+        expmsg="ipa-server-install: error: Invalid subject base format: malformed RDN string = \"$invalid_cert_subject\""
+
+        qaRun "$command" "$tmpout" 2 "$expmsg" "Verify expected error message for IPA Install with invalid subject"  debug
+    rlPhaseEnd
+
+}
+
 
 ########################################################################################
 ##  --idstart=IDSTART     The starting value for the IDs range (default random)
@@ -358,6 +429,94 @@ ipaserverinstall_nohostdns()
 }
 
 
+ipaserverinstall_nohostsentry()
+{
+    rlPhaseStartTest "ipa-server-install - 18 - [Negative] Install with no /etc/hosts entry" 
+        uninstall_fornexttest
+        local tmpout=$TmpDir/ipaserverinstall_nohostdns.out
+        hostsFileUpdateForTest
+        command="ipa-server-install --hostname=$MASTER -r $RELM -p $ADMINPW -P $ADMINPW -a $ADMINPW -U"
+        expmsg="Unable to resolve host name, check /etc/hosts or DNS name resolution"
+        qaRun "$command" "$tmpout" 1 "$expmsg" "Verify expected error message for IPA Install with no /etc/hosts entry for server" debug 
+        restoreHostsFile
+    rlPhaseEnd
+}
+
+ipaserverinstall_nohostdns_nohostsentry()
+{
+    rlPhaseStartTest "ipa-server-install - 18 - [Positive] Install with --no-host-dns, and with no /etc/hosts entry" 
+        uninstall_fornexttest
+        local tmpout=$TmpDir/ipaserverinstall_nohostdns.out
+        hostsFileUpdateForTest
+        command="ipa-server-install --hostname=$MASTER -r $RELM -p $ADMINPW -P $ADMINPW -a $ADMINPW --no-host-dns -U"
+        expmsg="Warning: skipping DNS resolution of host ipa-server.testrelm"
+        qaRun "$command" "$tmpout" 1 "$expmsg" "Verify expected error message for IPA Install with no /etc/hosts entry for server" debug
+        restoreHostsFile
+    rlPhaseEnd
+}
+
+
+
+####################################################################################
+# 
+####################################################################################
+ipaserverinstall_nouiredirect()
+{
+    rlPhaseStartTest "ipa-server-install - 19 - [Positive] Install with --no-ui-redirect" 
+        uninstall_fornexttest
+        local tmpout=$TmpDir/ipaserverinstall_nouiredirect.out
+        rlRun "ipa-server-install --setup-dns --forwarder=$DNSFORWARD  -r $RELM -p $ADMINPW -P $ADMINPW -a $ADMINPW --no-ui-redirect -U" 0 "Install with no-host-dns"
+        verify_install true tmpout noredirect
+    rlPhaseEnd
+}
+
+
+####################################################################################
+#   bug 681978 : Uninstalling client if the server is installed should be prevented
+####################################################################################
+ipaclient_uninstall()
+{
+    rlPhaseStartTest "ipa-server-install - 19 - [Negative] Uninstall ipa-client on a sever machine "
+       install_fornexttest
+       local tmpout=$TmpDir/ipaclientuninstall.out
+       command="ipa-client-install --uninstall -U"
+       expmsg="IPA client is configured as a part of IPA server on this system."
+       qaRun "$command" "$tmpout" 2 "$expmsg" "Verify expected error message when uninstalling ipa-client on a server machine" debug
+    rlPhaseEnd
+}
+
+
+####################################################################################
+#    bug 742875 : named fails to start after installing ipa server when short 
+#    hostname preceeds fqdn in /etc/hosts. 
+####################################################################################
+ipaserverinstall_shorthostname()
+{
+    rlPhaseStartTest "ipa-server-install - 19 - [Negative] Install with short hostname first in /etc/hosts"
+       uninstall_fornexttest
+       hostsFileSwithHostForTest
+       local tmpout=$TmpDir/ipashorthostnameinstall.out
+       command="ipa-server-install --setup-dns --forwarder=$DNSFORWARD --hostname=$HOSTNAME -r $RELM -p $ADMINPW -P $ADMINPW -a $ADMINPW -U" 
+       expmsg="The host name $HOSTNAME does not match the primary host name $(hostname -s). Please check /etc/hosts or DNS name resolution"
+       qaRun "$command" "$tmpout" 1 "$expmsg" "Verify expected error message when installing with short hostnamefirst in /etc/hosts" debug
+       restoreHostsFile
+    rlPhaseEnd
+
+}
+
+
+####################################################################################
+#    bug 729166 : ipa-server-install creates wrong reverse zone record in LDAP
+####################################################################################
+ipaserverinstall_verifyreversezone()
+{
+    rlPhaseStartTest "ipa-server-install - 19 - [Negative] Install with short hostname first in /etc/hosts"
+       install_fornexttest
+       verify_reversezone
+    rlPhaseEnd
+}
+
+
 ####################################################################################
 #  --selfsign            Configure a self-signed CA instance rather than a dogtag CA
 ####################################################################################
@@ -379,30 +538,31 @@ ipaserverinstall_selfsign()
 # $1: true for install; false for uninstall
 # $2: the temp file used to write out ipactl status 
 # $3: can be one of selfsign, realm, nontp, zonemgr, noforwarders, 
-#     newip, subject, allow, password, noreverse, nohbac.
+#     newip, subject, allow, password, noreverse, nohbac, noredirect.
 ##############################################################
 verify_install()
 {
-   verify_kinit $1
-   verify_ipactl_status $1 $2 $3 
-   verify_sssd $1 $3
-   verify_default $1 $3
-   verify_ntp $1 $3
-   verify_zonemgr $1 $2 $3
-   verify_forwarder $1 $2 $3
-   verify_subject $1 $2 $3
-   verify_password $1 $2 $3
-   verify_kinit $1
-   verify_reverse $1 $2 $3
-   verify_krb5 $1 $3 
-   verify_nsswitch $1
-   verify_authconfig $1
-   verify_hbac $1 $3
+    verify_kinit $1
+    verify_ipactl_status $1 $2 $3 
+    verify_sssd $1 $3
+    verify_default $1 $3
+    verify_ntp $1 $3
+    verify_zonemgr $1 $2 $3
+    verify_forwarder $1 $2 $3
+    verify_subject $1 $2 $3
+    verify_password $1 $2 $3
+    verify_kinit $1
+    verify_reverse $1 $2 $3
+    verify_krb5 $1 $3 
+    verify_nsswitch $1
+    verify_authconfig $1
+    verify_hbac $1 $3
+    verify_noredirect $1 $3
 }
 
 
 
-### TODO: Later - when testing with external certs
+# Options below covered in External CA tests
 #  --external-ca         Generate a CSR to be signed by an external CA
 #  --external_cert_file=EXTERNAL_CERT_FILE
 #                        File containing PKCS#10 certificate

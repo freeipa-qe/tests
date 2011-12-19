@@ -538,4 +538,69 @@ verify_hbac()
 }
 
 
+verify_noredirect()
+{
+  rlLog "Verify ipa-rewrite to verify for redirect"
 
+  if [ "$1" == "false" ]; then
+    return
+  fi
+
+  testRewrite=`grep $rewriteLine $REWRITE`
+  if [ "$2" == "noredirect" ] ; then
+      if [ ${testRewrite:0:1} == "#" ] ; then
+         rlPass "Redirect line is commented"
+      else
+        rlFail "Redirect line is NOT commented"
+      fi
+  else
+      if [ ${testRewrite:0:1} == "#" ] ; then
+         rlFail "Redirect line is commented"
+      else
+        rlPass "Redirect line is not commented"
+      fi
+  fi
+  
+}
+
+
+hostsFileUpdateForTest()
+{
+    HOSTSFILE="/etc/hosts"
+    rm -f $HOSTSFILE.ipaservertestbackup
+    cp -af $HOSTSFILE $HOSTSFILE.ipaservertestbackup 
+    sed -i s/^$MASTERIP/#$MASTERIP/g $HOSTSFILE 
+}
+
+
+hostsFileSwithHostForTest()
+{
+    HOSTSFILE="/etc/hosts"
+    rm -f $HOSTSFILE.ipaservertestbackup
+    cp -af $HOSTSFILE $HOSTSFILE.ipaservertestbackup 
+    sed -i s/^$MASTERIP/#$MASTERIP/g /etc/hosts
+    hostname=$(hostname)
+    hostname_s=$(hostname -s)
+    echo "$MASTERIP $hostname_s $hostname_s.$DOMAIN" >> $HOSTSFILE
+}
+
+restoreHostsFile()
+{
+    HOSTSFILE="/etc/hosts"
+    mv $HOSTSFILE.ipaservertestbackup /etc/hosts
+ 
+}
+
+
+verify_reversezone()
+{
+
+   out=$2
+   reversezone=`host 10.16.185.57 | cut -d " " -f1`
+   command="ipa dnszone-find $reversezone --all" 
+   $command > $out
+   
+   testidnsUpdatePolicy=`grep -m 1 "BIND update policy" $out | cut -d ":" -f2 | xargs echo`
+   expectedidnsUpdatePolicy="grant $RELM krb5-subdomain $reversezone. PTR;"
+   ipacompare_forinstalluninstall "BIND update policy: " "$expectedidnsUpdatePolicy" "$testidnsUpdatePolicy" true 
+}
