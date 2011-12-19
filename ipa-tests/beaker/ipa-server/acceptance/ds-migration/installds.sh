@@ -154,7 +154,6 @@ version: 1
 dn: uid=puser1,ou=People,dc=example,dc=com
 passwordGraceUserTime: 0
 modifiersName: cn=directory manager
-userPassword: Secret123
 uidNumber: 1001
 gidNumber: 1001
 objectClass: top
