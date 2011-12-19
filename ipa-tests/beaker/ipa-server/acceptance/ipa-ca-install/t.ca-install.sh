@@ -101,6 +101,7 @@ installSlave()
 {
    rlPhaseStartSetup "Install IPA REPLICA Server"
 	
+	yum install -y openssh-clients
 	yum install -y ipa-server bind-dyndb-ldap bind
         
 	rlRun "/etc/init.d/ntpd stop" 0 "Stopping the ntp server"
@@ -112,6 +113,7 @@ installSlave()
         cd /dev/shm/
         hostname_s=$(hostname -s)
         rlRun "sftp root@$MASTER:/var/lib/ipa/replica-info-$hostname_s.$DOMAIN.gpg" 0 "Get replica package"
+        rlLog "sftp root@$MASTER:/var/lib/ipa/replica-info-$hostname_s.$DOMAIN.gpg"
         rlLog "Checking for existance of replica gpg file"
         ls /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg
         if [ $? -ne 0 ] ; then
