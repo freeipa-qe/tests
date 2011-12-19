@@ -52,6 +52,8 @@ run: $(FILES) build
 	cp ./ipa-hbac-cli-lib.sh /dev/shm/.
 	rm -f /dev/shm/ipa-automember-cli-lib.sh
 	cp ./ipa-automember-cli-lib.sh /dev/shm/.
+	rm -f /dev/shm/lib.ds-migration.sh
+	cp ./lib.ds-migration.sh /dev/shm/.
 	rm -f /dev/shm/lib.user-cli.sh
 	cp ./lib.user-cli.sh /dev/shm/.
 	rm -f /dev/shm/ipa-service-cli-lib.sh
