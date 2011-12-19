@@ -150,7 +150,7 @@ verifyAutomemberAttr()
 	if [ $rc -ne 0 ]; then
 		rlLog "ERROR: ipa automember $name verification failed:  Value of $attribute != $value."
 	else
-		rlLog "ipa automember $name Verification successfule: Value of $attribute = $value."
+		rlLog "ipa automember $name Verification successful: Value of $attribute = $value."
 	fi
 
 	return $rc
