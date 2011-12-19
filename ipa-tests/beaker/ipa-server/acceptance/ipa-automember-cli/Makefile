@@ -45,7 +45,6 @@ build: $(BUILT_FILES)
 clean:
 	rm -f *~ $(BUILT_FILES)
 
-
 include /usr/share/rhts/lib/rhts-make.include
 
 $(METADATA): Makefile
