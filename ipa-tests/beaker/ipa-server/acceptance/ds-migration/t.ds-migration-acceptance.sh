@@ -221,17 +221,24 @@ cleartxtpwdmigration()
 		rlRun "ssh_auth_success $USER2 $USER2PWD $HOSTNAME"
         rlPhaseEnd
 
+        rlPhaseStartTest "ds-migration-cleartxt-pwd-002 Cleanup migration"
+                SetMigrationConfig FALSE
+                ipa user-del $USER1
+                ipa user-del $USER2
+                ipa group-del $GROUP1
+                ipa group-del $GROUP2
+
+		rlRun "ipa user-show $USER1" 0 "Make sure $USER1 was deleted"
+		rlRun "ipa user-show $USER2" 0 "Make sure $USER2 was deleted"
+		rlRun "ipa group-show $GROUP1" 0 "Make sure $GROUP1 was deleted"
+		rlRun "ipa group-show $GROUP1" 0 "Make sure $GROUP1 was deleted"
+        rlPhaseEnd
 }
-
-
 
 cleanup()
 {
-	rlPhaseStartTest "CLEANUP: Set config to false and delete migrated objects"
-		SetMigrationConfig FALSE
-		ipa user-del $USER1
-		ipa user-del $USER2
-		ipa group-del $GROUP1
-		ipa group-del $GROUP2
-	rlPhaseEnd
+        rlPhaseStartTest "ds-migration-functional-cleanup Remove Directory Server Instance"
+                rlRun "/usr/sbin/remove-ds.pl -i $INSTANCE" 0 "Removing directory server instance"
+        rlPhaseEnd
 }
+
