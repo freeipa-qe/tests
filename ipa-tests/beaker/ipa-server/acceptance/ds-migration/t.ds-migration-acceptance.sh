@@ -28,7 +28,7 @@ ds-migration-acceptance()
 
 setup()
 {
-        rlPhaseStartTest "SETUP: Kinit As Administrator"
+        rlPhaseStartTest "SETUP MIGRATION ACCEPTANCE"
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials"
         rlPhaseEnd
 }
@@ -228,17 +228,18 @@ cleartxtpwdmigration()
                 ipa group-del $GROUP1
                 ipa group-del $GROUP2
 
-		rlRun "ipa user-show $USER1" 0 "Make sure $USER1 was deleted"
-		rlRun "ipa user-show $USER2" 0 "Make sure $USER2 was deleted"
-		rlRun "ipa group-show $GROUP1" 0 "Make sure $GROUP1 was deleted"
-		rlRun "ipa group-show $GROUP1" 0 "Make sure $GROUP1 was deleted"
+		rlRun "ipa user-show $USER1" 2 "Make sure $USER1 was deleted"
+		rlRun "ipa user-show $USER2" 2 "Make sure $USER2 was deleted"
+		rlRun "ipa group-show $GROUP1" 2 "Make sure $GROUP1 was deleted"
+		rlRun "ipa group-show $GROUP1" 2 "Make sure $GROUP1 was deleted"
         rlPhaseEnd
 }
 
 cleanup()
 {
-        rlPhaseStartTest "ds-migration-functional-cleanup Remove Directory Server Instance"
-                rlRun "/usr/sbin/remove-ds.pl -i $INSTANCE" 0 "Removing directory server instance"
+        rlPhaseStartTest "CLEANUP MIGRATION ACCEPTANCE"
+		SetMigrationConfig FALSE
+		rlRun "ssh root@$CLIENT /usr/sbin/remove-ds.pl -i $INSTANCE" 0 "Removing directory server instance"
         rlPhaseEnd
 }
 

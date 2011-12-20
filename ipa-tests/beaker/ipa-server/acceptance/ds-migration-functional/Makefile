@@ -1,7 +1,7 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-#   Makefile of /CoreOS/tests/Regression/ds-migration
-#   Description: Test of migrating DS instances to IPA
+#   Makefile of /CoreOS/tests/Regression/ds-migration-functional
+#   Description: Test of migrating DS instances to IPA - hashed passwords
 #   Author: Jenny Galipeau <jgalipea@redhat.com>
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -24,12 +24,12 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-export TEST=/CoreOS/ipa-server/acceptance/ds-migration
-export TESTVERSION=2.0
+export TEST=/CoreOS/ipa-server/acceptance/ds-migration-functional
+export TESTVERSION=1.0
 
 BUILT_FILES=
 
-FILES=$(METADATA) runtest.sh Makefile PURPOSE t.ds-migration-acceptance.sh installds.sh
+FILES=$(METADATA) runtest.sh Makefile PURPOSE t.ds-migration-functional.sh installds.sh
 
 .PHONY: all install download clean
 
@@ -49,7 +49,7 @@ $(METADATA): Makefile
 	@echo "Name:            $(TEST)" >> $(METADATA)
 	@echo "TestVersion:     $(TESTVERSION)" >> $(METADATA)
 	@echo "Path:            $(TEST_DIR)" >> $(METADATA)
-	@echo "Description:     IPA ds-migration acceptance tests" >> $(METADATA)
+	@echo "Description:     IPA ds-migration functional tests" >> $(METADATA)
 	@echo "Type:            Regression" >> $(METADATA)
 	@echo "TestTime:        60m" >> $(METADATA)
 	@echo "RunFor:          ipa-server" >> $(METADATA)
