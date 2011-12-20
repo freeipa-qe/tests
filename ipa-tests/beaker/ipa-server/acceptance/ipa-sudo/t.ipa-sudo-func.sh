@@ -142,10 +142,18 @@ rlPhaseStartTest "Setup for sudo functional tests"
 	# searches for /etc/nslcd.conf for sudo maps. 
 	# https://bugzilla.redhat.com/show_bug.cgi?id=709235
 
-	rlRun "yum install nss-pam-ldapd -y"
+	if [ $distro_variant = Fedora ]; then
+		rlLog "Distro variant detected is $distro_variant"
+		rlRun "yum install nss_ldapd -y"
+	else
+		rlLog "Distro variant detected is $distro_variant"
+		rlRun "yum install nss-pam-ldapd -y"
+	fi
 
-#cat > /etc/nss_ldap.conf << EOF
-cat > /etc/nslcd.conf << EOF
+
+SUDO_LDAP_CONF_PATH=`/usr/bin/sudo -V | grep 'ldap.conf path' | cut -d " " -f 3`
+
+cat > $SUDO_LDAP_CONF_PATH << EOF
 bind_policy soft
 sudoers_base ou=SUDOers,$basedn
 binddn uid=sudo,cn=sysaccounts,cn=etc,$basedn
