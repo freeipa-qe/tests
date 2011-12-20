@@ -8,6 +8,7 @@ SLAPD_PKI="/etc/dirsrv/slapd-PKI-IPA"
 NTP="/etc/ntp.conf"
 VERSION="2.1.3"
 REWRITE="/etc/httpd/conf.d/ipa-rewrite.conf"
+NAMED="/etc/named.conf"
 
 #Realm used in these tests
 MYREALM="RALEIGHREALM"
@@ -118,3 +119,11 @@ testpwd="TestPassword"
 # Rewrite line in ipa-rewrite
 rewriteLine="L,NC,R=301"
 
+
+reversezone=`echo $MASTERIP | cut -d "." -f2`.`echo $MASTERIP | cut -d "." -f1`.in-addr.arpa.
+
+
+# Zone Refresh in named.conf
+zone_refresh_value="90"
+zone_refresh_value_default="30"
+zoneRefreshLine="zone_refresh"

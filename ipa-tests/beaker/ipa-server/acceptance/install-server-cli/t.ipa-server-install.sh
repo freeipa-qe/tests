@@ -78,17 +78,15 @@ ipaserverinstall()
      ipaserverinstall_nouiredirect
 
 #  --reverse-zone=REVERSE_ZONE  The reverse DNS zone to use
+#     Add test to verify: bug 729166 : ipa-server-install creates wrong reverse zone record in LDAP
+      ipaserverinstall_reversezone
 
 #   --zone-refresh=ZONE_REFRESH Number of seconds between regular checks for new DNS zones.
+      ipaserverinstall_zonerefresh
 
 #     Add test to verify: bug 681978 : Uninstalling client if the server is installed should be prevented
        ipaclient_uninstall
 
-
-
-
-#     Add test to verify: bug 729166 : ipa-server-install creates wrong reverse zone record in LDAP
-      ipaserverinstall_verifyreversezone
 
 #     Add test to verify: bug 740403 : invalid Directory Manager password causes ipaserver-install to fail with "Exception in CertSubjectPanel(): java.lang.IndexOutOfBoundsException"
 #     Install using DM password with backslash
@@ -274,7 +272,7 @@ ipa-server-install: error: option --ip-address: invalid IP address $NEWIPADDRESS
 
 ipaserverinstall_invalidipaddress()
 {
-    rlPhaseStartTest "ipa-server-install - 14 - [Negative] Install with invalid ipaddress" 
+    rlPhaseStartTest "ipa-server-install - 11 - [Negative] Install with invalid ipaddress" 
         uninstall_fornexttest
         local tmpout=$TmpDir/ipaserverinstall_invalidipaddress.out
         command="ipa-server-install --setup-dns --forwarder=$DNSFORWARD --ip-address=$ANOTHERNEWIPADDRESS -r $RELM -p $ADMINPW -P $ADMINPW -a $ADMINPW -U"
@@ -291,7 +289,7 @@ ipaserverinstall_invalidipaddress()
 ########################################################################
 ipaserverinstall_noforwarders()
 {
-    rlPhaseStartTest "ipa-server-install - 11 - [Positive] Install with no forwarders"
+    rlPhaseStartTest "ipa-server-install - 12 - [Positive] Install with no forwarders"
         uninstall_fornexttest
         local tmpout=$TmpDir/ipaserverinstall_noforwarders.out
         rlLog "EXECUTING: ipa-server-install --setup-dns --no-forwarders  -r $RELM -p $ADMINPW -P $ADMINPW -a $ADMINPW -U"
@@ -305,7 +303,7 @@ ipaserverinstall_noforwarders()
 #######################################################
 ipaserverinstall_noreverse()
 {
-    rlPhaseStartTest "ipa-server-install - 12 - [Positive] Install with no reverse zone"
+    rlPhaseStartTest "ipa-server-install - 13 - [Positive] Install with no reverse zone"
         uninstall_fornexttest
         local tmpout=$TmpDir/ipaserverinstall_noreverse.out
         rlLog "EXECUTING: ipa-server-install --setup-dns --forwarder=$DNSFORWARD --no-reverse -r $RELM -p $ADMINPW -P $ADMINPW -a $ADMINPW -U"
@@ -319,7 +317,7 @@ ipaserverinstall_noreverse()
 ###############################################
 ipaserverinstall_nontp()
 {
-    rlPhaseStartTest "ipa-server-install - 13 - [Positive] Install with no ntp" 
+    rlPhaseStartTest "ipa-server-install - 14 - [Positive] Install with no ntp" 
         uninstall_fornexttest
         local tmpout=$TmpDir/ipaserverinstall_nontp.out
         rlLog "EXECUTING: ipa-server-install --setup-dns --forwarder=$DNSFORWARD  -r $RELM -p $ADMINPW -P $ADMINPW -a $ADMINPW --no-ntp -U"
@@ -334,7 +332,7 @@ ipaserverinstall_nontp()
 #########################################################################
 ipaserverinstall_withzonemgr()
 {
-    rlPhaseStartTest "ipa-server-install - 14 - [Positive] Install with zonemgr" 
+    rlPhaseStartTest "ipa-server-install - 15 - [Positive] Install with zonemgr" 
         uninstall_fornexttest
         local tmpout=$TmpDir/ipaserverinstall_zonemgr.out
         rlLog "EXECUTING: ipa-server-install --setup-dns --forwarder=$DNSFORWARD  -r $RELM -p $ADMINPW -P $ADMINPW -a $ADMINPW --zonemgr=$non_default_admin_email -U" 
@@ -345,7 +343,7 @@ ipaserverinstall_withzonemgr()
 
 ipaserverinstall_withinvalidzonemgr()
 {
-    rlPhaseStartTest "ipa-server-install - 14 - [Negative] Install with invalid zonemgr" 
+    rlPhaseStartTest "ipa-server-install - 16 - [Negative] Install with invalid zonemgr" 
         uninstall_fornexttest
         local tmpout=$TmpDir/ipaserverinstall_invalidzonemgr.out
         command="ipa-server-install --setup-dns --forwarder=$DNSFORWARD  -r $RELM -p $ADMINPW -P $ADMINPW -a $ADMINPW --zonemgr=$special_char_in_admin_email -U"
@@ -359,7 +357,7 @@ ipaserverinstall_withinvalidzonemgr()
 #####################################################
 ipaserverinstall_subject()
 {
-    rlPhaseStartTest "ipa-server-install - 15 - [Positive] Install with subject" 
+    rlPhaseStartTest "ipa-server-install - 17 - [Positive] Install with subject" 
         uninstall_fornexttest
         local tmpout=$TmpDir/ipaserverinstall_subject.out
         rlLog "EXECUTING: ipa-server-install --setup-dns --forwarder=$DNSFORWARD  -r $RELM -p $ADMINPW -P $ADMINPW -a $ADMINPW --subject=$cert_subject -U" 
@@ -370,7 +368,7 @@ ipaserverinstall_subject()
 
 ipaserverinstall_invalidsubject()
 {
-    rlPhaseStartTest "ipa-server-install - 14 - [Negative] Install with invalid subject" 
+    rlPhaseStartTest "ipa-server-install - 18 - [Negative] Install with invalid subject" 
         uninstall_fornexttest
         local tmpout=$TmpDir/ipaserverinstall_invalidzonemgr.out
         command="ipa-server-install --setup-dns --forwarder=$DNSFORWARD  -r $RELM -p $ADMINPW -P $ADMINPW -a $ADMINPW --subject=$invalid_cert_subject -U"
@@ -388,7 +386,7 @@ ipaserverinstall_invalidsubject()
 ########################################################################################
 ipaserverinstall_id()
 {
-    rlPhaseStartTest "ipa-server-install - 16 - [Positive] Install with id start and id max specified" 
+    rlPhaseStartTest "ipa-server-install - 19 - [Positive] Install with id start and id max specified" 
         uninstall_fornexttest
         local tmpout=$TmpDir/ipaserverinstall_id.out
         rlLog "EXECUTING: ipa-server-install --setup-dns --forwarder=$DNSFORWARD  -r $RELM -p $ADMINPW -P $ADMINPW -a $ADMINPW --idstart=$idstart --idmax=$idmax -U"
@@ -404,7 +402,7 @@ ipaserverinstall_id()
 ###########################################################
 ipaserverinstall_nohbacallow()
 {
-    rlPhaseStartTest "ipa-server-install - 17 - [Positive] Do not Install allow_all HBAC rule"
+    rlPhaseStartTest "ipa-server-install - 20 - [Positive] Do not Install allow_all HBAC rule"
         uninstall_fornexttest
         local tmpout=$TmpDir/ipaserverinstall_nohbacallow.out
         rlLog "EXECUTING: ipa-server-install --setup-dns --forwarder=$DNSFORWARD  -r $RELM -p $ADMINPW -P $ADMINPW -a $ADMINPW --no_hbac_allow -U"
@@ -419,7 +417,7 @@ ipaserverinstall_nohbacallow()
 ###############################################################################
 ipaserverinstall_nohostdns()
 {
-    rlPhaseStartTest "ipa-server-install - 18 - [Positive] Install with no host dns" 
+    rlPhaseStartTest "ipa-server-install - 21 - [Positive] Install with no host dns" 
         uninstall_fornexttest
         local tmpout=$TmpDir/ipaserverinstall_nohostdns.out
         rlLog "EXECUTING: ipa-server-install --setup-dns --forwarder=$DNSFORWARD  -r $RELM -p $ADMINPW -P $ADMINPW -a $ADMINPW --no-host-dns -U"
@@ -431,7 +429,7 @@ ipaserverinstall_nohostdns()
 
 ipaserverinstall_nohostsentry()
 {
-    rlPhaseStartTest "ipa-server-install - 18 - [Negative] Install with no /etc/hosts entry" 
+    rlPhaseStartTest "ipa-server-install - 22 - [Negative] Install with no /etc/hosts entry" 
         uninstall_fornexttest
         local tmpout=$TmpDir/ipaserverinstall_nohostdns.out
         hostsFileUpdateForTest
@@ -444,7 +442,7 @@ ipaserverinstall_nohostsentry()
 
 ipaserverinstall_nohostdns_nohostsentry()
 {
-    rlPhaseStartTest "ipa-server-install - 18 - [Positive] Install with --no-host-dns, and with no /etc/hosts entry" 
+    rlPhaseStartTest "ipa-server-install - 23 - [Positive] Install with --no-host-dns, and with no /etc/hosts entry" 
         uninstall_fornexttest
         local tmpout=$TmpDir/ipaserverinstall_nohostdns.out
         hostsFileUpdateForTest
@@ -456,16 +454,29 @@ ipaserverinstall_nohostdns_nohostsentry()
 }
 
 
+####################################################################################
+#   --zone-refresh=ZONE_REFRESH Number of seconds between regular checks for new DNS zones.
+####################################################################################
+ipaserverinstall_zonerefresh()
+{
+    rlPhaseStartTest "ipa-server-install - 24 - [Positive] Install with --zone-refresh" 
+        uninstall_fornexttest
+        local tmpout=$TmpDir/ipaserverinstall_zonerefresh.out
+        rlRun "ipa-server-install --setup-dns --forwarder=$DNSFORWARD  -r $RELM -p $ADMINPW -P $ADMINPW -a $ADMINPW --zone-refresh=90 -U" 0 "Install with zone-refresh"
+        verify_install true tmpout zonerefresh 
+    rlPhaseEnd
+}
+
 
 ####################################################################################
-# 
+#  --no-ui-redirect      Do not automatically redirect to the Web UI.
 ####################################################################################
 ipaserverinstall_nouiredirect()
 {
-    rlPhaseStartTest "ipa-server-install - 19 - [Positive] Install with --no-ui-redirect" 
+    rlPhaseStartTest "ipa-server-install - 25 - [Positive] Install with --no-ui-redirect" 
         uninstall_fornexttest
         local tmpout=$TmpDir/ipaserverinstall_nouiredirect.out
-        rlRun "ipa-server-install --setup-dns --forwarder=$DNSFORWARD  -r $RELM -p $ADMINPW -P $ADMINPW -a $ADMINPW --no-ui-redirect -U" 0 "Install with no-host-dns"
+        rlRun "ipa-server-install --setup-dns --forwarder=$DNSFORWARD  -r $RELM -p $ADMINPW -P $ADMINPW -a $ADMINPW --no-ui-redirect -U" 0 "Install with no-ui-redirect"
         verify_install true tmpout noredirect
     rlPhaseEnd
 }
@@ -476,7 +487,7 @@ ipaserverinstall_nouiredirect()
 ####################################################################################
 ipaclient_uninstall()
 {
-    rlPhaseStartTest "ipa-server-install - 19 - [Negative] Uninstall ipa-client on a sever machine "
+    rlPhaseStartTest "ipa-server-install - 26 - [Negative] Uninstall ipa-client on a sever machine "
        install_fornexttest
        local tmpout=$TmpDir/ipaclientuninstall.out
        command="ipa-client-install --uninstall -U"
@@ -492,7 +503,7 @@ ipaclient_uninstall()
 ####################################################################################
 ipaserverinstall_shorthostname()
 {
-    rlPhaseStartTest "ipa-server-install - 19 - [Negative] Install with short hostname first in /etc/hosts"
+    rlPhaseStartTest "ipa-server-install - 27 - [Negative] Install with short hostname first in /etc/hosts"
        uninstall_fornexttest
        hostsFileSwithHostForTest
        local tmpout=$TmpDir/ipashorthostnameinstall.out
@@ -506,13 +517,17 @@ ipaserverinstall_shorthostname()
 
 
 ####################################################################################
+#   --reverse-zone=REVERSE_ZONE  The reverse DNS zone to use
 #    bug 729166 : ipa-server-install creates wrong reverse zone record in LDAP
 ####################################################################################
-ipaserverinstall_verifyreversezone()
+ipaserverinstall_reversezone()
 {
-    rlPhaseStartTest "ipa-server-install - 19 - [Negative] Install with short hostname first in /etc/hosts"
-       install_fornexttest
-       verify_reversezone
+    rlPhaseStartTest "ipa-server-install - 28 - [Positive] Verify reverse zone and idnsUpdatePolicy after Install" 
+       uninstall_fornexttest
+       local tmpout=$TmpDir/ipaserverinstall_reversezone.out
+       rlRun "ipa-server-install --setup-dns --forwarder=$DNSFORWARD --reverse-zone=$reversezone -r $RELM -p $ADMINPW -P $ADMINPW -a $ADMINPW -U" 0 "Installing ipa server with selfsign " 
+       verify_kinit $1
+       verify_reversezone $tmpout
     rlPhaseEnd
 }
 
@@ -522,7 +537,7 @@ ipaserverinstall_verifyreversezone()
 ####################################################################################
 ipaserverinstall_selfsign()
 {
-    rlPhaseStartTest "ipa-server-install - 19 - [Positive] Install with selfsign "
+    rlPhaseStartTest "ipa-server-install - 29 - [Positive] Install with selfsign "
         uninstall_fornexttest
         local tmpout=$TmpDir/ipaserverinstall_selfsign.out
         rlLog "EXECUTING: ipa-server-install --setup-dns --forwarder=$DNSFORWARD --selfsign -r $RELM -p $ADMINPW -P $ADMINPW -a $ADMINPW -U"
@@ -538,7 +553,8 @@ ipaserverinstall_selfsign()
 # $1: true for install; false for uninstall
 # $2: the temp file used to write out ipactl status 
 # $3: can be one of selfsign, realm, nontp, zonemgr, noforwarders, 
-#     newip, subject, allow, password, noreverse, nohbac, noredirect.
+#     newip, subject, allow, password, noreverse, nohbac, noredirect,
+#     zonerefresh
 ##############################################################
 verify_install()
 {
@@ -558,6 +574,7 @@ verify_install()
     verify_authconfig $1
     verify_hbac $1 $3
     verify_noredirect $1 $3
+    verify_zonerefresh $1 $3
 }
 
 

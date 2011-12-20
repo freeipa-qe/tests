@@ -595,12 +595,38 @@ restoreHostsFile()
 verify_reversezone()
 {
 
-   out=$2
-   reversezone=`host 10.16.185.57 | cut -d " " -f1`
+   out=$1
    command="ipa dnszone-find $reversezone --all" 
    $command > $out
    
    testidnsUpdatePolicy=`grep -m 1 "BIND update policy" $out | cut -d ":" -f2 | xargs echo`
-   expectedidnsUpdatePolicy="grant $RELM krb5-subdomain $reversezone. PTR;"
+   expectedidnsUpdatePolicy="grant $RELM krb5-subdomain $reversezone PTR;"
    ipacompare_forinstalluninstall "BIND update policy: " "$expectedidnsUpdatePolicy" "$testidnsUpdatePolicy" true 
+}
+
+
+
+
+verify_zonerefresh()
+{
+  if [ "$1" == "false" ]; then
+    return
+  fi
+
+  testzonerefresh=`grep $zoneRefreshLine $NAMED | cut -d " " -f3 | cut -d "\"" -f1`
+
+  if [ "$2" == "zonerefresh" ] ; then
+      if [ "$testzonerefresh" == "$zone_refresh_value" ] ; then
+         rlPass "Zone Refresh is set correctly to $zone_refresh_value in $NAMED"
+      else
+         rlFail "Zone Refresh is NOT set correctly in $NAMED, and is $testzonerefresh"
+      fi
+  else
+      if [ "$testzonerefresh" == "$zone_refresh_value_default" ] ; then
+         rlPass "Zone Refresh is set correctly to $testzonerefresh in $NAMED"
+      else
+         rlFail "Zone Refresh is NOT set correctly in $NAMED, and is $testzonerefresh"
+      fi
+  fi
+
 }
