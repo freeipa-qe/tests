@@ -117,13 +117,6 @@ ssl.ldif_EOF
 
 rlRun "echo \"Internal (Software) Token:Secret123\" > /etc/dirsrv/$INSTANCE/pin.txt" 0
 
-cat /etc/redhat-release | grep "Fedora"
-if [ $? -eq 0 ] ; then
-	FLAVOR="Fedora"
-else
-	FLAVOR="RHEL"
-fi
-
 # restart the directory server
 if [ "$FLAVOR" == "Fedora" ] ; then
 	rlRun "systemctl restart dirsrv.target" 0 "Restarting directory server for ssl changes"

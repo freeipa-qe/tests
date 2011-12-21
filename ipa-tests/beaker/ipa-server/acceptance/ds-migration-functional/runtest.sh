@@ -45,7 +45,14 @@
 . ./t.ds-migration-functional.sh
 . ./installds.sh
 
-PACKAGELIST="ipa-admintools ipa-client 389-ds-base expect"
+PACKAGELIST="389-ds-base"
+
+cat /etc/redhat-release | grep "Fedora"
+if [ $? -eq 0 ] ; then
+        export FLAVOR="Fedora"
+else
+        export FLAVOR="RHEL"
+fi
 
 
 ##########################################
