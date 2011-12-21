@@ -42,11 +42,17 @@
 
 # Include test case file
 . ./t.ds-migration-acceptance.sh
-. ./lib.ds-migration.sh
 . ./installds.sh
 
 
-PACKAGELIST="ipa-admintools ipa-client httpd mod_nss mod_auth_kerb 389-ds-base expect"
+CLIENTPACKAGELIST="389-ds-base"
+
+cat /etc/redhat-release | grep "Fedora"
+if [ $? -eq 0 ] ; then
+        export FLAVOR="Fedora"
+else
+        export FLAVOR="RHEL"
+fi
 
 
 ##########################################
@@ -62,7 +68,7 @@ rlJournalStart
         echo $CLIENT | grep $HOSTNAME
         if [ $? -eq 0 ] ; then
                 if [ $rc -eq 0 ] ; then
-               		for item in $PACKAGELIST ; do
+               		for item in $CLIENTPACKAGELIST ; do
                         	rpm -qa | grep $item
                         	if [ $? -eq 0 ] ; then
                                 	rlPass "$item package is installed"

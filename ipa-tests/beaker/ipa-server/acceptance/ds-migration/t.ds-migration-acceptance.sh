@@ -209,6 +209,92 @@ migratecmd()
                 ipa group-del $GROUP1
                 ipa group-del $GROUP2
         rlPhaseEnd
+
+	rlPhaseStartTest "ds-migration-cmd-014 Ignore User Objectclass"
+                rlLog "EXECUTING: ipa migrate-ds --user-container=\"$USERCONTAINER\" --group-container=\"$GROUPCONTAINER\" --user-ignore-objectclass=posixAccount ldap://$CLIENT:389"
+                rlRun "echo $ADMINPW | ipa migrate-ds --user-container=\"$USERCONTAINER\" --group-container=\"$GROUPCONTAINER\" --user-ignore-objectclass=posixAccount ldap://$CLIENT:389" 0
+
+                rlRun "ipa user-show $USER1" 2 "Verifying $USER1 was NOT migrated"
+                rlRun "ipa user-show $USER2" 2 "Verifying user '$USER2' was NOT migrated"
+                rlRun "ipa group-show $GROUP1" 0 "Verifying group '$GROUP1' was migrated"
+                rlRun "ipa group-show $GROUP2" 0 "Verifying group '$GROUP2' was migrated"
+
+                #cleanup for next migration test
+                ipa user-del $USER1
+                ipa user-del $USER2
+                ipa group-del $GROUP1
+                ipa group-del $GROUP2
+        rlPhaseEnd
+
+        rlPhaseStartTest "ds-migration-cmd-015 Ignore Group Objectclass"
+                rlLog "EXECUTING: ipa migrate-ds --user-container=\"$USERCONTAINER\" --group-container=\"$GROUPCONTAINER\" --group-ignore-objectclass=posixGroup ldap://$CLIENT:389"
+                rlRun "echo $ADMINPW | ipa migrate-ds --user-container=\"$USERCONTAINER\" --group-container=\"$GROUPCONTAINER\" --group-ignore-objectclass=posixGroup ldap://$CLIENT:389" 0
+        
+                rlRun "ipa user-show $USER1" 0 "Verifying $USER1 was migrated"
+                rlRun "ipa user-show $USER2" 0 "Verifying user '$USER2' was migrated"
+                rlRun "ipa group-show $GROUP1" 2 "Verifying group '$GROUP1' was NOT migrated"
+                rlRun "ipa group-show $GROUP2" 2 "Verifying group '$GROUP2' was NOT migrated"
+                
+                #cleanup for next migration test
+                ipa user-del $USER1
+                ipa user-del $USER2
+                ipa group-del $GROUP1
+                ipa group-del $GROUP2
+        rlPhaseEnd
+
+	rlPhaseStartTest "ds-migration-cmd-016 Existing User is skipped"
+		rlRun "ipa user-add --first=posix --last=user $USER1" 0 "Add user that will be migrated"
+		# get the ipa user id
+		preipauserid=`ipa user-show $USER1 | grep UID | cut -d ":" -f 2`
+		#trim whitespace
+		preipauserid=`echo $preipauserid`
+		rlLog "IPA User ID for $USER1: $preipauserid"
+                rlLog "EXECUTING: ipa migrate-ds --user-container=\"$USERCONTAINER\" --group-container=\"$GROUPCONTAINER\" ldap://$CLIENT:389"
+                rlRun "echo $ADMINPW | ipa migrate-ds --user-container=\"$USERCONTAINER\" --group-container=\"$GROUPCONTAINER\" ldap://$CLIENT:389" 0
+
+                # get the userid of user1 and make sure it was not changed
+		postipauserid=`ipa user-show $USER1 | grep UID | cut -d ":" -f 2`
+		#trim whitespace
+                postipauserid=`echo $postipauserid`
+		if [ $preipauserid -ne $postipauserid ] ; then
+			rlFail "Existing user should have been skipped during migration.  UID before migration: $preipauserid  UID post migration: $postipauserid"
+		else
+			rlPass "Existing IPA user. UID before migration: $preipauserid  UID post migration: $postipauserid"
+		fi
+
+                #cleanup for next migration test
+                ipa user-del $USER1
+                ipa user-del $USER2
+                ipa group-del $GROUP1
+                ipa group-del $GROUP2
+        rlPhaseEnd
+
+	rlPhaseStartTest "ds-migration-cmd-017 Overwrite Group GID"
+                rlRun "ipa group-add --desc=test $GROUP1" 0 "Add group that will be migrated"
+                # get the ipa group id
+                preipagroupid=`ipa group-show $GROUP1 | grep GID | cut -d ":" -f 2`
+                #trim whitespace
+                preipagroupid=`echo $preipagroupid`
+                rlLog "IPA Group ID for $GROUP1: $preipagroupid"
+                rlLog "EXECUTING: ipa migrate-ds --user-container=\"$USERCONTAINER\" --group-container=\"$GROUPCONTAINER\" --group-overwrite-gid ldap://$CLIENT:389"
+                rlRun "echo $ADMINPW | ipa migrate-ds --user-container=\"$USERCONTAINER\" --group-container=\"$GROUPCONTAINER\" --group-overwrite-gid ldap://$CLIENT:389" 0
+
+                # get the gid of group1 and make sure it was overwritten
+                postipagroupid=`ipa group-show $GROUP1 | grep GID | cut -d ":" -f 2`
+                #trim whitespace
+                postipagroupid=`echo $postipagroupid`
+                if [ $preipagroupid -eq $postipagroupid ] ; then
+                        rlFail "Existing group's GID should have been overwritten  GID before migration: $preipagroupid  GID post migration: $postipagroupid"
+                else
+                        rlPass "Existing IPA Group. GID before migration: $preipagroupid  GID post migration: $postipagroupid"
+                fi
+
+                #cleanup for next migration test
+                ipa user-del $USER1
+                ipa user-del $USER2
+                ipa group-del $GROUP1
+                ipa group-del $GROUP2
+        rlPhaseEnd
 }
 
 cleartxtpwdmigration()
@@ -222,7 +308,6 @@ cleartxtpwdmigration()
         rlPhaseEnd
 
         rlPhaseStartTest "ds-migration-cleartxt-pwd-002 Cleanup migration"
-                SetMigrationConfig FALSE
                 ipa user-del $USER1
                 ipa user-del $USER2
                 ipa group-del $GROUP1
