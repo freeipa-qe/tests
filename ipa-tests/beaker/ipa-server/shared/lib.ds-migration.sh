@@ -5,7 +5,7 @@ SetMigrationConfig()
    rc=0
 
    ipa config-mod --enable-migration $value
-   if [ $? -ne 0 ] ;then
+   if [ $? -ne 0 ] ; then
 	rlLog "WARNING : Configuring migration mode failed: $?"
 	rc=1
    else
