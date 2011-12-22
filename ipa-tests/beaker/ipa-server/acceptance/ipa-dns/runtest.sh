@@ -39,7 +39,7 @@
 . /dev/shm/ipa-server-shared.sh
 . /dev/shm/env.sh
 
-PACKAGE="ipa-admintools"
+PACKAGE="ipa-server"
 
 # Init master var
 export master=0;
@@ -58,20 +58,16 @@ fi
 
 rlJournalStart
     rlPhaseStartSetup "nis-cli startup: Check for ipa-server package"
-        if [ $? -eq 0 ] ; then
-                rlPass "ipa-admintools package is installed"
-        else
-                rlFail "ipa-admintools package NOT found!"
-        fi
+        rlAssertRpm $PACKAGE
         rlRun "TmpDir=\`mktemp -d\`" 0 "Creating tmp directory"
         rlRun "pushd $TmpDir"
 	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 
     rlPhaseEnd
 
-#	rlPhaseStartTest "Installing rpcbind yptools"
-#		yum -y install wget rpcbind
-#	rlPhaseEnd
+	rlPhaseStartTest "Installing rpcbind yptools"
+		yum -y install wget rpcbind
+	rlPhaseEnd
 
 if [ $master -eq 1 ]; then
 	setenforce 0
@@ -92,7 +88,7 @@ fi
 	echo "IP is $ipoc1 . $ipoc2 . $ipoc3 . $ipoc4"
 
 	rlPhaseStartTest "ipa-dns-01: create a new fake host to test dns add during replica prepare"
-		let newip=99
+		let newip=$ipoc4+1
 		ipa-replica-prepare -p $ADMINPW --ip-address=$newfakehostip newfakehost$newip.$DOMAIN
 	rlPhaseEnd
 
@@ -857,6 +853,25 @@ fi
 	rlPhaseStartTest "ipa-dns-150: Make sure the ptr zone got deleted properly"
 		rlRun "ipa dnszone-find $ptrzone" 1 "Make sure the ptr zone delete happened properly"
 	rlPhaseEnd
+
+	# Tests for bug https://bugzilla.redhat.com/show_bug.cgi?id=750947
+	aaaa="fec0:0:a10:6000:11:16ff:fe98:122"
+	rlPhaseStartTest "ipa-dns-151: add record of type AAAA to test bug 750947"
+		rlRun "ipa dnsrecord-add $zone aaaa --aaaa-rec='$aaaa'" 0 "add record type AAAA"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-152: make sure that IPA saved record type AAAA"
+		rlRun "ipa dnsrecord-find $zone aaaa | grep $aaaa" 0 "make sure ipa recieved record type AAAA"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-153: make sure that dig can find the record type AAAA"
+		rlRun "dig aaaa.$zone AAAA | grep $aaaa" 0 "make sure dig can find the AAAA record"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-154: delete record of type AAAA"
+		rlRun "ipa dnsrecord-del $zone aaaa --aaaa-rec $aaaa" 0 "delete record type AAAA"
+	rlPhaseEnd
+
 
 	rlJournalPrintText
 	report=/tmp/rhts.report.$RANDOM.txt
