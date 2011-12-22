@@ -5,7 +5,7 @@
 installMaster()
 {
    rlPhaseStartTest "Install IPA MASTER Server"
-	rlRun "/etc/init.d/ntpd stop" 0 "Stopping the ntp server"
+	rlRun "service ntpd stop" 0 "Stopping the ntp server"
 	rlRun "ntpdate $NTPSERVER" 0 "Synchronzing clock with valid time server"
 	if [[ "$IPv6SETUP" != "TRUE" ]] ; then
 		rlRun "fixHostFile" 0 "Set up /etc/hosts"
@@ -74,7 +74,7 @@ fi
 installSlave()
 {
    rlPhaseStartSetup "Install IPA REPLICA Server"
-	rlRun "/etc/init.d/ntpd stop" 0 "Stopping the ntp server"
+	rlRun "service ntpd stop" 0 "Stopping the ntp server"
 	# stop the firewall
         service iptables stop
 	service ip6tables stop
@@ -88,7 +88,7 @@ installSlave()
         if [ $? -ne 0 ] ; then
                 rlFail "ERROR: Replica Package not found"
         else
-       		rlRun "/etc/init.d/ntpd stop" 0 "Stopping the ntp server"
+       		rlRun "service ntpd stop" 0 "Stopping the ntp server"
         	rlRun "ntpdate $NTPSERVER" 0 "Synchronzing clock with valid time server"
 		rlLog "SKIPINSTALL: $SKIPINSTALL"	
 		if [[ "$SKIPINSTALL" != "TRUE" ]] ; then
@@ -128,7 +128,7 @@ installSlave()
 installClient()
 {
    rlPhaseStartSetup "Install IPA Client"
-	rlRun "/etc/init.d/ntpd stop" 0 "Stopping the ntp server"
+	rlRun "service ntpd stop" 0 "Stopping the ntp server"
 	rlRun "ntpdate $NTPSERVER" 0 "Synchronzing clock with corp time server"
 	rlLog "SKIPINSTALL: $SKIPINSTALL"
 	if [[ "$SKIPINSTALL" != "TRUE" ]] ; then
