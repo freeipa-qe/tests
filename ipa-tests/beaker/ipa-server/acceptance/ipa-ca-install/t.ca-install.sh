@@ -69,7 +69,7 @@ installMaster()
         for s in $SLAVE; do
                 if [ "$s" != "" ]; then
                         # Determine the IP of the slave to be used when creating the replica file.
-                        ipofs=$(dig +noquestion $s  | grep $s | grep IN | awk '{print $5}')
+                        ipofs=$(dig +noquestion $s  | grep $s | grep IN | grep A | awk '{print $5}')
 
                         # put the short form of the hostname for server $s into s_short
                         hostname_s=$(echo $s | cut -d. -f1)
