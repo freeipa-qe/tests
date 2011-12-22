@@ -112,7 +112,7 @@ hashedpwdmigration_http()
 cleanup()
 {
 	rlPhaseStartTest "CLEANUP FUNCTIONAL TESTING"
-		rlRun "ssh root@$CLIENT /usr/sbin/remove-ds.pl -i $INSTANCE" 0 "Removing directory server instance"
+		rlRun "ssh -o StrictHostKeyChecking=no root@$CLIENT /usr/sbin/remove-ds.pl -i $INSTANCE" 0 "Removing directory server instance"
 		rlRun "SetMigrationConfig FALSE" 0 "Set migration mode to FALSE"
 	rlPhaseEnd
 }
