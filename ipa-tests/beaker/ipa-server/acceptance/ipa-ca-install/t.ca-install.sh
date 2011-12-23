@@ -49,6 +49,9 @@ installMaster()
         rlRun "fixHostFile" 0 "Set up /etc/hosts"
 	rlRun "fixhostname" 0 "Fix hostname"
 
+        # Determine the IP of the slave to be used when creating the replica file.
+        ipofs=$(dig +noquestion $s  | grep $s | grep IN | grep A | awk '{print $5}')
+
 	rlRun "yum install -y ipa-server bind-dyndb-ldap bind"
 	echo "ipa-server-install --setup-dns --forwarder=$DNSFORWARD --hostname=$hostname_s.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U" > /dev/shm/installipa.bash
 
@@ -68,16 +71,13 @@ installMaster()
    rlPhaseStartTest "Create Replica Package(s)"
         for s in $SLAVE; do
                 if [ "$s" != "" ]; then
-                        # Determine the IP of the slave to be used when creating the replica file.
-                        ipofs=$(dig +noquestion $s  | grep $s | grep IN | grep A | awk '{print $5}')
-			ipofs2=`cat /etc/hosts | grep $s | cut -f 1 -d " "`
 
                         # put the short form of the hostname for server $s into s_short
                         hostname_s=$(echo $s | cut -d. -f1)
 
-                        rlLog "IP of server $s is resolving as $ipofs2, using short hostname of $hostname_s"
+                        rlLog "IP of server $s is resolving as $ipofs, using short hostname of $hostname_s"
                         rlLog "Running: ipa-replica-prepare -p $ADMINPW --ip-address=$ipofs2 $hostname_s.$DOMAIN"
-                        rlRun "ipa-replica-prepare -p $ADMINPW --ip-address=$ipofs2 $hostname_s.$DOMAIN" 0 "Creating replica package"
+                        rlRun "ipa-replica-prepare -p $ADMINPW --ip-address=$ipofs $hostname_s.$DOMAIN" 0 "Creating replica package"
                         rlRun "service named restart" 0 "Restarting named as work around when adding new reverse zone"
 
                 else
