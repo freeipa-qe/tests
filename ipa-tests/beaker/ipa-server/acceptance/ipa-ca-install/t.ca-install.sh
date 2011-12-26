@@ -51,6 +51,7 @@ installMaster()
 
         # Determine the IP of the slave to be used when creating the replica file.
         ipofs=$(dig +noquestion $SLAVE  | grep $SLAVE | grep IN | grep A | awk '{print $5}')
+	rlLog "IP address of SLAVE: $SLAVE is $ipofs"
 
 	rlRun "yum install -y ipa-server bind-dyndb-ldap bind"
 	echo "ipa-server-install --setup-dns --forwarder=$DNSFORWARD --hostname=$hostname_s.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U" > /dev/shm/installipa.bash
