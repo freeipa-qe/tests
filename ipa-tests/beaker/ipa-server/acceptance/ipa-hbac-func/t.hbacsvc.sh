@@ -2414,6 +2414,69 @@ hbacsvc_client2_031() {
 }
 
 
+hbacsvc_master_032() {
+
+                # kinit as admin and creating users
+                kinitAs $ADMINID $ADMINPW
+                create_ipauser userÃŒ userÃŒ userÃŒ $userpw
+                sleep 5
+                export user32=userÃŒ
+
+        rlPhaseStartTest "ipa-hbacsvc-032: $user32 part of ÃŒÃŒ (UTF-8) is allowed to access $CLIENT from $CLIENT - SSHD Service"
+
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                rlRun "ssh_auth_success $user32 testpw123@ipa.com $MASTER"
+
+                rlRun "ipa hbacrule-disable allow_all"
+
+                rlRun "ipa hbacrule-add ÃŒÃŒ"
+                rlRun "ipa hbacrule-add-user ÃŒÃŒ --users=$user32"
+                rlRun "ipa hbacrule-add-host ÃŒÃŒ --hosts=$CLIENT"
+                rlRun "ipa hbacrule-add-sourcehost ÃŒÃŒ --hosts=$CLIENT"
+                rlRun "ipa hbacrule-add-service ÃŒÃŒ --hbacsvcs=sshd"
+                rlRun "ipa hbacrule-show ÃŒÃŒ --all"
+
+        # ipa hbactest:
+
+                rlRun "ipa hbactest --user=$user32 --srchost=$CLIENT --host=$CLIENT --service=sshd | grep -Ex '(Access granted: True|  matched: ÃŒÃŒ)'"
+                rlRun "ipa hbactest --user=$user2 --srchost=$CLIENT --host=$CLIENT --service=sshd | grep -i \"Access granted: False\""
+                rlRun "ipa hbactest --user=$user32 --srchost=$CLIENT2 --host=$CLIENT --service=sshd | grep -i \"Access granted: False\""
+                rlRun "ipa hbactest --user=$user32 --srchost=$CLIENT --host=$CLIENT2 --service=sshd | grep -i \"Access granted: False\""
+
+                rlRun "ipa hbactest --user=$user32 --srchost=$CLIENT --host=$CLIENT --service=sshd --rule=ÃŒÃŒ | grep -Ex '(Access granted: True|  matched: ÃŒÃŒ)'"
+                rlRun "ipa hbactest --user=$user32 --srchost=$CLIENT --host=$CLIENT --service=sshd --rule=rule2 | grep -Ex '(Unresolved rules in --rules|error: rule2)'"
+                rlRun "ipa hbactest --user=$user2 --srchost=$CLIENT --host=$CLIENT --service=sshd --rule=ÃŒÃŒ | grep -Ex '(Access granted: False|  notmatched: rule1)'"
+                rlRun "ipa hbactest --srchost=$CLIENT --host=$CLIENT --service=sshd  --user=$user32 --rule=ÃŒÃŒ --nodetail | grep -i \"Access granted: True\""
+                rlRun "ipa hbactest --srchost=$CLIENT --host=$CLIENT --service=sshd  --user=$user32 --rule=ÃŒÃŒ --nodetail | grep -i \"matched: ÃŒÃŒ\"" 1
+
+        rlPhaseEnd
+}
+
+
+hbacsvc_client_032() {
+
+        rlPhaseStartTest "ipa-hbacsvc-client1-032: $user32 accessing $CLIENT from $CLIENT using SSHD service."
+
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                rlRun "getent -s sss passwd $user32"
+                sleep 5
+                rlRun "ssh_auth_success $user32 testpw123@ipa.com $CLIENT"
+
+        rlPhaseEnd
+}
+
+hbacsvc_client2_032() {
+
+        rlPhaseStartTest "ipa-hbacsvc-client2-032: $user32 accessing $CLIENT from $CLIENT2 using SSHD service."
+
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                rlRun "getent -s sss passwd $user32"
+                rlRun "ssh_auth_failure $user32 testpw123@ipa.com $CLIENT2"
+
+        rlPhaseEnd
+}
+
+
 hbacsvc_master_bug736314() {
 
         rlPhaseStartTest "ipa-hbacsvc-bug736314: user736314 part of rule736314 is allowed to access $MASTER from $CLIENT"
