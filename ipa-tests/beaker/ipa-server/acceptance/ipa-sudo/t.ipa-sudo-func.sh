@@ -559,7 +559,10 @@ rlPhaseStartTest "sudorule-remove-hostgrp_func001: Removing hostgroup and verify
 	rlRun "ipa sudorule-remove-host sudorule1 --hostgroup=hostgrp1"
         rlRun "ipa hostgroup-del hostgrp1"
 
+	rlRun "rm -fr /var/lib/sss/db/cache_*"
         rlRun "service sssd restart"
+	sleep 5
+	rlRun "getent -s sss passwd user1"
 
         rlRun "sudo_list user1"
         rlAssertNotGrep "sudo: ldap sudoHost '+hostgrp1' ... MATCH" "$sudoout"
