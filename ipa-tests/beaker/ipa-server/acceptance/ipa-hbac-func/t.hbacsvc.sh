@@ -2361,6 +2361,8 @@ hbacsvc_master_031() {
 
         rlPhaseStartTest "ipa-hbacsvc-031: $user31 part of ÃŒ (UTF-8) is allowed to access $CLIENT from $CLIENT - SSHD Service"
 
+		rlRun "ipa hbacrule-enable allow_all"
+
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 rlRun "ssh_auth_success $user31 testpw123@ipa.com $MASTER"
 
@@ -2381,7 +2383,7 @@ hbacsvc_master_031() {
                 rlRun "ipa hbactest --user=$user31 --srchost=$CLIENT --host=$CLIENT2 --service=sshd | grep -i \"Access granted: False\""
 
                 rlRun "ipa hbactest --user=$user31 --srchost=$CLIENT --host=$CLIENT --service=sshd --rule=ÃŒ | grep -Ex '(Access granted: True|  matched: ÃŒ)'"
-                rlRun "ipa hbactest --user=$user31 --srchost=$CLIENT --host=$CLIENT --service=sshd --rule=rule2 | grep -Ex '(Unresolved rules in --rules|error: rule2)'"
+                rlRun "ipa hbactest --user=$user31 --srchost=$CLIENT --host=$CLIENT --service=sshd --rule=rule2 | grep -Ex '(Unresolved rules in --rules|error: rule2)'" 1
                 rlRun "ipa hbactest --user=$user2 --srchost=$CLIENT --host=$CLIENT --service=sshd --rule=ÃŒ | grep -Ex '(Access granted: False|  notmatched: rule1)'"
                 rlRun "ipa hbactest --srchost=$CLIENT --host=$CLIENT --service=sshd  --user=$user31 --rule=ÃŒ --nodetail | grep -i \"Access granted: True\""
                 rlRun "ipa hbactest --srchost=$CLIENT --host=$CLIENT --service=sshd  --user=$user31 --rule=ÃŒ --nodetail | grep -i \"matched: ÃŒ\"" 1
@@ -2415,6 +2417,13 @@ hbacsvc_client2_031() {
 
 
 hbacsvc_master_032() {
+
+# Unable to add UTF-8 user, hence commenting this test in runtest.sh
+#[root@bumblebee ~]# ipa user-add userÃŒ
+#First name: userÃŒ
+#Last name: userÃŒ
+#ipa: ERROR: invalid 'login': may only include letters, numbers, _, -, . and $
+
 
                 # kinit as admin and creating users
                 kinitAs $ADMINID $ADMINPW
