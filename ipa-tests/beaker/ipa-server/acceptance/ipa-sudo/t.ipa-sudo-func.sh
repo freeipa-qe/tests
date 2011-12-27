@@ -144,7 +144,7 @@ rlPhaseStartTest "Setup for sudo functional tests"
 
 	if [ $distro_variant = Fedora ]; then
 		rlLog "Distro variant detected is $distro_variant"
-		rlRun "yum install nss_ldapd -y"
+		rlRun "yum install nss_ldap -y"
 	else
 		rlLog "Distro variant detected is $distro_variant"
 		rlRun "yum install nss-pam-ldapd -y"
@@ -170,7 +170,7 @@ TLS_CACERTDIR /etc/ipa
 uri ldap://$MASTER
 EOF
 
-	rlRun "cat /etc/nslcd.conf"
+	rlRun "cat $SUDO_LDAP_CONF_PATH"
 	rlRun "LDAPTLS_CACERT=/etc/ipa/ca.crt"
 	rlRun "export LDAPTLS_CACERT"
 
