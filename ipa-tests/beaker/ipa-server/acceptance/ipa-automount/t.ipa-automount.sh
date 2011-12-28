@@ -1442,12 +1442,32 @@ rlPhaseStartTest "automountmap_del: ipa automountmap-del LOCATION MAP"
         rlAssertGrep "ipa: ERROR: auto.map1: automount map not found" "$TmpDir/automountmap_del.out"
         rlRun "cat $TmpDir/automountmap_del.out"
 
-        rlRun "ipa automountmap-del baltimore auto.map1 auto.map2 --continue> $TmpDir/automountmap_del.out 2>&1"
+        rlRun "ipa automountmap-del baltimore auto.map1 auto.map2 --continue > $TmpDir/automountmap_del.out 2>&1"
         rlAssertGrep "Deleted automount map \"auto.map2\"" "$TmpDir/automountmap_del.out"
 	rlAssertGrep "Failed to remove: auto.map1" "$TmpDir/automountmap_del.out"
 
 rlPhaseEnd
 }
+
+bz725433() {
+
+rlPhaseStartTest "bz725433: automountmap gets added even though the return code is 1"
+
+	rlLog "Verifying bug https://bugzilla.redhat.com/show_bug.cgi?id=725433"
+
+	rlRun "ipa automountlocation-add baltimore"
+        rlRun "ipa automountmap-add baltimore auto.share"
+	rlRun "ipa automountkey-add baltimore auto.master --key=/share --info=auto.share"
+	rlRun "ipa automountmap-add-indirect baltimore auto.share2 --mount=/usr/share/man"
+	rlRun "ipa automountmap-add-indirect baltimore auto.share3 --mount=/usr/share/man" 1
+
+	rlRun "/usr/bin/ldapsearch  -LLL -x -h localhost -D \"cn=Directory Manager\" -w Secret123 -b $basedn \"(&(objectclass=automountmap)(automountMapName=auto.share3))\" | grep auto.share3" 1
+
+	rlRun "ipa automountlocation-del baltimore"
+
+rlPhaseEnd
+}
+
 
 cleanup() {
 rlPhaseStartTest "Clean up for automount configuration tests"
