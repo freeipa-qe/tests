@@ -2395,9 +2395,9 @@ hbacsvc_client_031() {
         rlPhaseStartTest "ipa-hbacsvc-client1-031: $user31 accessing $CLIENT from $CLIENT using SSHD service."
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-                rlRun "getent -s sss passwd $user31"
+                rlRun "getent -s sss passwd user31"
                 sleep 5
-                rlRun "ssh_auth_success $user31 testpw123@ipa.com $CLIENT"
+                rlRun "ssh_auth_success user31 testpw123@ipa.com $CLIENT"
 
         rlPhaseEnd
 }
@@ -2407,8 +2407,8 @@ hbacsvc_client2_031() {
         rlPhaseStartTest "ipa-hbacsvc-client2-031: $user31 accessing $CLIENT from $CLIENT2 using SSHD service."
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-                rlRun "getent -s sss passwd $user31"
-                rlRun "ssh_auth_failure $user31 testpw123@ipa.com $CLIENT2"
+                rlRun "getent -s sss passwd user31"
+                rlRun "ssh_auth_failure user31 testpw123@ipa.com $CLIENT2"
 
         rlPhaseEnd
 }
