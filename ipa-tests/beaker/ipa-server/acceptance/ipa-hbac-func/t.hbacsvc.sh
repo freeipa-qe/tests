@@ -2361,11 +2361,9 @@ hbacsvc_master_031() {
 
         rlPhaseStartTest "ipa-hbacsvc-031: $user31 part of ÃŒ (UTF-8) is allowed to access $CLIENT from $CLIENT - SSHD Service"
 
-		rlRun "ipa hbacrule-enable allow_all"
-
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+		rlRun "ipa hbacrule-enable allow_all"
                 rlRun "ssh_auth_success $user31 testpw123@ipa.com $MASTER"
-
                 rlRun "ipa hbacrule-disable allow_all"
 
                 rlRun "ipa hbacrule-add ÃŒ"
