@@ -674,3 +674,44 @@ EOF
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# interactive
+# Usage: interactive ipa command option
+# 
+# This constructs a expect file which is then executed so as to cover
+# ipa commands interactive testing.
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+interactive() {
+
+count=2
+
+expfile=/tmp/interactive.exp
+expout=/tmp/interactive.out
+
+rm -rf $expfile $expout
+
+echo 'set timeout 30
+set send_slow {1 .1}' > $expfile
+echo "spawn $1 $2" >> $expfile
+echo 'match_max 100000' >> $expfile
+
+while [ $count -lt $# ]; do
+        let count=count+1
+	        echo 'expect "*: "' >> $expfile
+	        echo 'sleep .5' >> $expfile
+	        eval "echo \"send -s -- \"\$$count\"\"" >> $expfile
+	        echo 'send -s -- "\r"' >> $expfile
+done
+
+echo 'expect eof ' >> $expfile
+
+	echo "Constructed expect file is:"
+		/bin/cat $expfile
+	echo ""
+		/usr/bin/expect $expfile >> $expout 2>&1
+	echo ""
+	echo "Interactive command output:"
+		/bin/cat $expout
+}
+
