@@ -1468,6 +1468,51 @@ rlPhaseStartTest "bz725433: automountmap gets added even though the return code 
 rlPhaseEnd
 }
 
+bz726725() {
+
+rlPhaseStartTest "bz726725: Error message states 'automountmapautomountmapname' while add/mod/del automountkey with empty automountmap name."
+
+	rlLog "Verifying bug https://bugzilla.redhat.com/show_bug.cgi?id=726725"
+
+	rlRun "ipa automountlocation-add pune"
+
+	rlRun "interactive ipa automountkey-add pune"
+	rlAssertGrep "ipa: ERROR: 'automountmap' is required" "/tmp/interactive.out"
+
+	rlRun "interactive ipa automountkey-del pune"
+	rlAssertGrep "ipa: ERROR: 'automountmap' is required" "/tmp/interactive.out"
+
+	rlRun "interactive ipa automountkey-mod pune"
+	rlAssertGrep "ipa: ERROR: 'automountmap' is required" "/tmp/interactive.out"
+
+	rlRun "interactive ipa automountkey-find pune"
+	rlAssertGrep "ipa: ERROR: 'automountmap' is required" "/tmp/interactive.out"
+
+	rlRun "interactive ipa automountkey-show pune"
+	rlAssertGrep "ipa: ERROR: 'automountmap' is required" "/tmp/interactive.out"
+
+	rlRun "ipa automountlocation-del pune"
+}
+
+bz726722() {
+
+rlPhaseStartTest "bz726722: Error message states 'automountlocationcn' while add/mod/del automountmap or automountkey with empty location."
+
+	rlLog "Verifying bug https://bugzilla.redhat.com/show_bug.cgi?id=726722"
+
+	rlRun "interactive ipa automountmap-add"
+	rlAssertGrep "ipa: ERROR: 'automountlocation' is required" "/tmp/interactive.out"
+
+	rlRun "interactive ipa automountkey-add"
+	rlAssertGrep "ipa: ERROR: 'automountlocation' is required" "/tmp/interactive.out"
+
+	rlRun "interactive ipa automountmap-del"
+	rlAssertGrep "ipa: ERROR: 'automountlocation' is required" "/tmp/interactive.out"
+
+	rlRun "interactive ipa automountkey-del"
+	rlssertGrep "ipa: ERROR: 'automountlocation' is required" "/tmp/interactive.out"
+}
+
 
 cleanup() {
 rlPhaseStartTest "Clean up for automount configuration tests"
