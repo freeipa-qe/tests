@@ -703,6 +703,7 @@ while [ $count -lt $# ]; do
 	        eval "echo \"send -s -- \"\$$count\"\"" >> $expfile
 	        echo 'send -s -- "\r"' >> $expfile
 done
+	        echo 'send -s -- "\r"' >> $expfile
 
 echo 'expect eof ' >> $expfile
 
