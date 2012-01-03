@@ -447,7 +447,7 @@ ipaserverinstall_nohostdns_nohostsentry()
         local tmpout=$TmpDir/ipaserverinstall_nohostdns.out
         hostsFileUpdateForTest
         command="ipa-server-install --hostname=$MASTER -r $RELM -p $ADMINPW -P $ADMINPW -a $ADMINPW --no-host-dns -U"
-        expmsg="Warning: skipping DNS resolution of host ipa-server.testrelm"
+        expmsg="Warning: skipping DNS resolution of host $MASTER"
         qaRun "$command" "$tmpout" 1 "$expmsg" "Verify expected error message for IPA Install with no /etc/hosts entry for server" debug
         restoreHostsFile
     rlPhaseEnd
