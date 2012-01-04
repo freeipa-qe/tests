@@ -29,6 +29,7 @@ ipaclientinstall()
 #   --server=SERVER Set the IPA server to connect to
    ipaclientinstall_server_nodomain 
    ipaclientinstall_server_invalidserver
+   ipaclientinstall_server_unreachableserver
 
 
 #   --realm=REALM_NAME Set the IPA realm name to REALM_NAME 
@@ -37,6 +38,7 @@ ipaclientinstall()
 
 #   --hostname The hostname of this server (FQDN). By default of nodename from uname(2) is used. 
    ipaclientinstall_hostname 
+
 
 
 #  --on-master The client is being configured on an IPA server.
@@ -64,18 +66,26 @@ ipaclientinstall()
 #   --enable-dns-updates This option tells SSSD to automatically update DNS with the IP address of this client.
      ipaclientinstall_enablednsupdates
 
-
-#   Install client with master down #bug 696193
-#   ipaclientinstall_withmasterdown
-
 #   -S, --no-sssd  Do not configure the client to use SSSD for authentication, use nss_ldap instead.
    ipaclientinstall_nosssd
-
-
 
 #  --f, --force Force the settings even if errors occur
    ipaclientinstall_force 
 
+# Bug 714600 - ipa-client-install should configure sssd to store password if offline
+#  --no-krb5-offline-passwords Configure SSSD not to store user password when the server is offline
+      ipaclientinstall_nokrb5offlinepasswords
+
+#  --preserve-sssd     Preserve old SSSD configuration if possible
+      ipaclientinstall_preservesssd
+
+# Bug 736617 - ipa-client-install mishandles ntp service configuration
+       ipaclientinstall_ntpservice     
+
+#Bug 736684 - ipa-client-install should sync time before kinit 
+# TODO
+
+      ipaclientinstall_withmasterdown
 
 }
 
@@ -238,6 +248,28 @@ IPA client is not configured on this system."
 }
 
 
+# Bug 745392 - ipa-client-install hangs if the discovered server is unresponsive
+
+ipaclientinstall_server_unreachableserver()
+{
+    rlPhaseStartTest "ipa-client-install-09- [Negative] Install with unreachable server"
+       uninstall_fornexttest
+       # update /etc/resolv.conf so that the server is undiscoverable
+       updateResolv
+       rlLog "EXECUTING: ipa-client-install -U"
+       command="ipa-client-install -p $ADMINID -w $ADMINPW -U"
+       expmsg="Unable to discover domain, not provided on command line
+Installation failed. Rolling back changes.
+IPA client is not configured on this system."
+       local tmpout=$TmpDir/ipaclientinstall_server_unreachableserver.out
+       qaRun "$command" "$tmpout" 1 $expmsg "Verify expected error message for IPA Install with unreachable server" 
+
+       # restore /etc/resolv.conf for the rest of the tests
+       restoreResolv
+    rlPhaseEnd
+}
+
+
 #########################################################
 # --realm=REALM_NAME Set the IPA realm name to REALM_NAME 
 #########################################################
@@ -271,25 +303,30 @@ ipaclientinstall_invalidrealm()
 
 ###############################################################################################
 #  --hostname The hostname of this server (FQDN). By default of nodename from uname(2) is used. 
+#  Bug 690473 - Installing ipa-client indicates DNS is updated for this unknown hostname, but is not on server 
+#  Bug 714919 - ipa-client-install should configure hostname
+#  Bug 734013 - ipa-client-install breaks network configuration
 ###############################################################################################
 #negative tests for --hostname option
 ## in the case below - client is installed, but a DNS entry is not available on server for this client.
 ipaclientinstall_hostname()
 {
-    rlPhaseStartTest "ipa-client-install-12- [Positive-Negative] IPA Install with invalid hostname"
+    rlPhaseStartTest "ipa-client-install-12- [Positive-Negative] IPA Install with different hostname"
        uninstall_fornexttest
-       #rlLog "EXECUTING: ipa-client-install --hostname=$CLIENT"
        local tmpout=$TmpDir/ipaclientinstall_hostname.$RANDOM.out
        command="ipa-client-install --hostname=$CLIENT.nonexistent --server=$MASTER --domain=$DOMAIN -p $ADMINID -w $ADMINPW --ntp-server=$NTPSERVER -U"
        rlLog "EXECUTING: $command" 
        expmsg1="Warning: Hostname ($CLIENT.nonexistent) not found in DNS"
        expmsg2="Failed to update DNS A record."
-       qaExpectedRun "$command" "$tmpout" 0 "Verify expected error message for IPA Install with invalid hostname" "$expmsg1" "$expmsg2" 
+       qaExpectedRun "$command" "$tmpout" 0 "Verify expected message for IPA Install with different hostname" "$expmsg1" "$expmsg2" 
 
-        verify_install true nonexistent
+       verify_install true nonexistent
+       verify_hostname $CLIENT.nonexistent
     
        # now uninstall
        rlRun "ipa-client-install --uninstall -U " 0 "Uninstalling ipa client"
+       # verify hostname has been restored after uninstall
+       verify_hostname $CLIENT
     
        # after uninstall of this - verify keytab for this client is set false on server 
        rlRun "ipa-client-install --domain=$DOMAIN --realm=$RELM --ntp-server=$NTPSERVER -p $ADMINID -w $ADMINPW -U --server=$MASTER" 0 "Installing ipa client and configuring - with all params"
@@ -532,11 +569,61 @@ ipaclientinstall_force()
 }
 
 
+#######################################################
+#  --no-krb5-offline-passwords Configure SSSD not to store user password when the server is offline
+#  Bug 714600 - ipa-client-install should configure sssd to store password if offline
+#######################################################
+ipaclientinstall_nokrb5offlinepasswords()
+{
+   rlPhaseStartTest "ipa-client-install-24- [Positive] Install with no-krb5-offline-passwords"
+        uninstall_fornexttest
+        rlLog "EXECUTING: ipa-client-install --domain=$DOMAIN --realm=$RELM --ntp-server=$NTPSERVER -p $ADMINID -w $ADMINPW -U --server=$MASTER --no-krb5-offline-passwords"
+        rlRun "ipa-client-install --domain=$DOMAIN --realm=$RELM --ntp-server=$NTPSERVER -p $ADMINID -w $ADMINPW -U --server=$MASTER --no-krb5-offline-passwords" 0 "Installing ipa client and configuring - with no SSSD configured"
+        verify_install true nokrb5offlinepasswords 
+    rlPhaseEnd
+
+}
+
+
+#######################################################
+#  --preserve-sssd     Preserve old SSSD configuration if possible
+#######################################################
+ipaclientinstall_preservesssd()
+{
+   rlPhaseStartTest "ipa-client-install-24- [Positive] Install with preserve-sssd"
+        uninstall_fornexttest
+        rlLog "EXECUTING: ipa-client-install --domain=$DOMAIN --realm=$RELM --ntp-server=$NTPSERVER -p $ADMINID -w $ADMINPW -U --server=$MASTER --preserve-sssd"
+        rlRun "ipa-client-install --domain=$DOMAIN --realm=$RELM --ntp-server=$NTPSERVER -p $ADMINID -w $ADMINPW -U --server=$MASTER --preserve-sssd" 0 "Installing ipa client with preserve-sssd"
+        verify_sssd false
+    rlPhaseEnd
+}
+
+#######################################################
+# Bug 736617 - ipa-client-install mishandles ntp service configuration
+#######################################################
+ipaclientinstall_ntpservice()
+{
+   rlPhaseStartTest "ipa-client-install-24- [Positive] Verify ntp service with client install"
+        uninstall_fornexttest
+        rlLog "EXECUTING: ipa-client-install --domain=$DOMAIN --realm=$RELM --ntp-server=$NTPSERVER -p $ADMINID -w $ADMINPW -U --server=$MASTER"
+        rlRun "ipa-client-install --domain=$DOMAIN --realm=$RELM --ntp-server=$NTPSERVER -p $ADMINID -w $ADMINPW -U --server=$MASTER" 0 "Installing ipa client"
+        verify_ntpservice true
+   rlPhaseEnd
+
+
+   rlPhaseStartTest "ipa-client-install-24- [Positive] Verify ntp service with client uninstall"
+        uninstall_fornexttest
+        verify_ntpservice false 
+    rlPhaseEnd
+}
+
+     
 ##############################################################
 # Verify files updated during install and unistall
 # Also does kinit to verify the install
 # $1: true for install; false for uninstall
-# $2: can be one of nosssd, nontp, nontpspecified, mkhomedir, permit, force. 
+# $2: can be one of nosssd, nontp, nontpspecified, mkhomedir, 
+#     permit, force, nokrb5offlinepasswords
 ##############################################################
 verify_install()
 {

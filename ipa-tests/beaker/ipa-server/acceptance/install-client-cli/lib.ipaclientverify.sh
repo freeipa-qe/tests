@@ -152,6 +152,19 @@ verify_sssd()
           testaccessprovider=`grep "^access_provider" $SSSD | cut -d "=" -f2 | xargs echo`
           ipacompare_forinstalluninstall "access_provider " "$access_provider" "$testaccessprovider" "$1" 
        fi
+       if [ "$2" == "nokrb5offlinepasswords" ] ; then
+          grep "krb5_store_password_if_offline" $SSSD
+          if [ $? -eq 0 ]; then
+            rlFail "krb5_store_password_if_offline is set in sssd.conf"
+            rlLog `grep "krb5_store_password_if_offline" $SSSD`
+          else
+            rlPass "krb5_store_password_if_offline is not set in sssd.conf"
+          fi
+       else
+          testnokrb5offlinepasswords=`grep "krb5_store_password_if_offline" $SSSD | cut -d "=" -f2 | xargs echo`
+          ipacompare_forinstalluninstall "krb5_store_password_if_offline " "True" "$testnokrb5offlinepasswords" "$1" 
+       fi
+       
     fi
 }
 
@@ -243,6 +256,38 @@ verify_ntp()
    
 }
 
+verify_ntpservice()
+{
+
+    local installcheck="$1"
+    if $installcheck ; then
+     service ntpd status | grep running 
+      if [ $? -eq 0  ] ; then
+         rlPass "ntpd status is as expected: running"
+      else
+         rlFail "ntpd status is NOT as expected: running"
+      fi
+      cat $STEPTICKER | grep "Use IPA-provided NTP server"
+      if [ $? -eq 0  ] ; then
+        rlPass "$STEPTICKER is configured correctly"
+      else
+        rlFail "$STEPTICKER is NOT configured correctly"
+      fi
+    else
+     service ntpd status | grep stopped
+      if [ $? -eq 0  ] ; then
+         rlPass "ntpd status is as expected: stopped"
+      else
+         rlFail "ntpd status is NOT as expected: stopped"
+      fi
+      cat $STEPTICKER | grep "Use IPA-provided NTP server" 
+      if [ $? -eq 0  ] ; then
+        rlFail "$STEPTICKER is NOT configured correctly"
+      else
+        rlPass "$STEPTICKER is configured correctly"
+      fi
+   fi
+}
 
 verify_authconfig()
 {
@@ -387,4 +432,40 @@ rlLog "Out: $out"
     else
         rlFail "Keytab for uninstalled client is not reset";
     fi
+}
+
+
+verify_hostname()
+{
+  newHostname=$1
+  if [ `hostname` = $newHostname ] ; then
+      rlPass "Hostname is as expected: $newHostname"
+  else
+      rlFail "Hostname is different from expected. Expected: $newHostname; Got: `hostname`"
+  fi
+  
+  cat $NETWORK | grep $newHostname
+  if [ $? -eq 0 ]; then
+     rlPass "$NETWORK file is correctly updated with new hostname "
+     rlPass "`cat $NETWORK | grep $newHostname`"
+  else
+     rlFail "$NETWORK file is not updated with new hostname"
+     rlFail "`cat $NETWORK | grep HOSTNAME` "
+  fi
+
+}
+
+
+updateResolv()
+{
+        fakeip=99.99.99.999
+	rm -f /dev/shm/ipa-resolv.conf-backup-clienttest
+	cat /etc/resolv.conf > /dev/shm/ipa-resolv.conf-backup-clienttest
+	sed -i s/^nameserver/#nameserver/g /etc/resolv.conf
+	echo "nameserver $fakeip" >> /etc/resolv.conf
+}
+
+restoreResolv()
+{
+   mv /dev/shm/ipa-resolv.conf-backup-clienttest /etc/resolv.conf
 }

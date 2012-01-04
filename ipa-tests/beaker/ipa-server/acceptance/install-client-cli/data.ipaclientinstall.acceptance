@@ -5,6 +5,8 @@ KRB5="/etc/krb5.conf"
 DEFAULT="/etc/ipa/default.conf"
 NTP="/etc/ntp.conf"
 AUTHCONFIG="/etc/sysconfig/authconfig"
+NETWORK="/etc/sysconfig/network"
+STEPTICKER="/etc/ntp/step-tickers"
 
 # Lines to check after install
 
