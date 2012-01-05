@@ -1454,6 +1454,7 @@ bz725433() {
 rlPhaseStartTest "bz725433: automountmap gets added even though the return code is 1"
 
 	rlLog "Verifying bug https://bugzilla.redhat.com/show_bug.cgi?id=725433"
+	rlRun "ipa automountlocation-del baltimore"
 
 	rlRun "ipa automountlocation-add baltimore"
         rlRun "ipa automountmap-add baltimore auto.share"
