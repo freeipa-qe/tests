@@ -1,7 +1,7 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
 #   Makefile of /CoreOS/automation-and-system-test/shared
-#   Description: Basic install test for ipa-server
+#   Description: Basic install test for the System Test/Automation Initative project
 #   Author: Michael Gregg <mgregg@redhat.com>
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -28,7 +28,7 @@ export TESTVERSION=1.0
 
 BUILT_FILES=
 
-FILES=$(METADATA) runtest.sh ipa-hostgroup-cli-lib.sh ipa-service-cli-lib.sh Makefile PURPOSE set-root-pw.exp id_rsa.pub id_rsa id_dsa.pub id_dsa env.sh id_rsa_global.pub id_rsa_global
+FILES=$(METADATA) runtest.sh auto-sys-test-hostgroup-cli-lib.sh auto-sys-test-service-cli-lib.sh Makefile PURPOSE set-root-pw.exp id_rsa.pub id_rsa id_dsa.pub id_dsa auto-env.sh id_rsa_global.pub id_rsa_global
 
 .PHONY: all install download clean
 
@@ -36,12 +36,12 @@ run: $(FILES) build
 	#yum -y install expect
 	#expect ./set-root-pw.exp
 	#wget http://apoc.dsdev.sjc.redhat.com/tet/rhts-get.txt
-	rm -f /dev/shm/env.sh
-	cp ./env.sh /dev/shm/.
-	rm -f /dev/shm/ipa-hostgroup-cli-lib.sh
-	cp ./ipa-hostgroup-cli-lib.sh /dev/shm/.
-	rm -f /dev/shm/ipa-service-cli-lib.sh
-	cp ./ipa-service-cli-lib.sh /dev/shm/.
+	rm -f /dev/shm/auto-env.sh
+	cp ./auto-env.sh /dev/shm/.
+	rm -f /dev/shm/auto-sys-test-hostgroup-cli-lib.sh
+	cp ./auto-sys-test-hostgroup-cli-lib.sh /dev/shm/.
+	rm -f /dev/shm/auto-sys-test-service-cli-lib.sh
+	cp ./auto-sys-test-service-cli-lib.sh /dev/shm/.
 	rm -f /dev/shm/set-root-pw.exp
 	cp ./set-root-pw.exp /dev/shm/.
 	rm -f /dev/shm/id_rsa*
@@ -77,7 +77,7 @@ $(METADATA): Makefile
 	@echo "Name:            $(TEST)" >> $(METADATA)
 	@echo "TestVersion:     $(TESTVERSION)" >> $(METADATA)
 	@echo "Path:            $(TEST_DIR)" >> $(METADATA)
-	@echo "Description:     Package containing libraries for ipa-server beaker tests" >> $(METADATA)
+	@echo "Description:     Package containing libraries for System Test/Automation Initative project" >> $(METADATA)
 	@echo "Type:            Acceptance" >> $(METADATA)
 	@echo "TestTime:        2m" >> $(METADATA)
 	@echo "RunFor:          ipa-server" >> $(METADATA)
