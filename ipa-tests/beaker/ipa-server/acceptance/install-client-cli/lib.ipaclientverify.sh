@@ -480,5 +480,18 @@ verify_time()
    else
      rlFail "Client time does not match time on server"
      rlLog "Client Time: $clientTime; and Server Time: $serverTime"
+     date --set='-2 hours'
+     rlLog "Reset time on Client: `date`"
    fi
+}
+
+getRandomPassword()
+{
+     out="$1"
+     ssh root@$MASTER \"ipa host-add $CLIENT --random\" > $out
+
+#     $cmd > $out
+     randomPassword=`grep "Random password:" $out | cut -d ":" -f2`
+     return $randomPassword
+
 }
