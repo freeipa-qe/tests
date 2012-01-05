@@ -469,3 +469,16 @@ restoreResolv()
 {
    mv /dev/shm/ipa-resolv.conf-backup-clienttest /etc/resolv.conf
 }
+
+
+verify_time()
+{
+   clientTime=`date +%l:%M`
+   serverTime=`ssh root@$MASTER date +%l:%M`
+   if [ "$clientTime" =  "$serverTime" ] ; then
+     rlPass "Client time matches time on server"
+   else
+     rlFail "Client time does not match time on server"
+     rlLog "Client Time: $clientTime; and Server Time: $serverTime"
+   fi
+}

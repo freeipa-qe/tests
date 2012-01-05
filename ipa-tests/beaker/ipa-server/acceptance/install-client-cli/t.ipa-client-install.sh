@@ -83,7 +83,11 @@ ipaclientinstall()
        ipaclientinstall_ntpservice     
 
 #Bug 736684 - ipa-client-install should sync time before kinit 
-# TODO
+       ipaclientinstall_synctime
+
+# Bug 698219 - Uninstalling ipa-client fails, if it joined replica when being installed
+      ipaclientinstall_joinreplica
+
 
       ipaclientinstall_withmasterdown
 
@@ -93,14 +97,14 @@ setup()
 {
     rlPhaseStartSetup "ipa-client-install-Setup "
         # edit hosts file and resolv file before starting tests
-        rlRun "fixHostFile" 0 "Set up /etc/hosts"
-        rlRun "fixhostname" 0 "Fix hostname"
-        rlRun "fixResolv" 0 "fixing the resolv.conf to contain the correct nameserver lines"
-        rlRun "appendEnv" 0 "Append the machine information to the env.sh with the information for the machines in the recipe set"
-        rlLog "Setting up Authorized keys"
-        SetUpAuthKeys
-        rlLog "Setting up known hosts file"
-        SetUpKnownHosts
+#        rlRun "fixHostFile" 0 "Set up /etc/hosts"
+#        rlRun "fixhostname" 0 "Fix hostname"
+#        rlRun "fixResolv" 0 "fixing the resolv.conf to contain the correct nameserver lines"
+#        rlRun "appendEnv" 0 "Append the machine information to the env.sh with the information for the machines in the recipe set"
+#        rlLog "Setting up Authorized keys"
+#        SetUpAuthKeys
+#        rlLog "Setting up known hosts file"
+#        SetUpKnownHosts
 
     
         ## Lines to expect to be changed during the isnatllation process
@@ -499,6 +503,26 @@ ipaclientinstall_withmasterdown()
 }
 
 
+##########################################
+# Client Install joining replica server specifically, then uninstall 
+# Bug 698219 - Uninstalling ipa-client fails, if it joined replica when being installed
+##########################################
+ipaclientinstall_joinreplica()
+{
+    rlPhaseStartTest "ipa-client-install-23- [Positive] Install , and join REPLICA, then uninstall"
+        uninstall_fornexttest
+       
+        rlLog "EXECUTING: ipa-client-install --domain=$DOMAIN --realm=$RELM --server=$SLAVE --ntp-server=$NTPSERVER -p $ADMINID -w $ADMINPW --unattended "
+        rlRun "ipa-client-install --domain=$DOMAIN --realm=$RELM --server=$SLAVE --ntp-server=$NTPSERVER -p $ADMINID -w $ADMINPW --unattended " 0 "Installing ipa client and configuring - with all params"
+        verify_install true
+  
+        # Now uninstall
+        uninstall_fornexttest
+        verify_install false 
+
+    rlPhaseEnd
+}
+
 
 
 ####################################################################################################
@@ -618,6 +642,25 @@ ipaclientinstall_ntpservice()
 }
 
      
+##############################################################
+#Bug 736684 - ipa-client-install should sync time before kinit 
+##############################################################
+ipaclientinstall_synctime()
+{
+   rlPhaseStartTest "ipa-client-install-24- [Positive] Verify time is sync'd with client install"
+        uninstall_fornexttest
+        # set time on this system to be 2 hours ahead
+        date --set='+2 hours'
+        rlLog "Time on Client is: `date`"
+        rlLog "EXECUTING: ipa-client-install --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW -U --server=$MASTER"
+        rlRun "ipa-client-install --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW -U --server=$MASTER" 0 "Installing ipa client"
+        # time on this system should match the server time
+        verify_time
+   rlPhaseEnd
+}
+
+
+
 ##############################################################
 # Verify files updated during install and unistall
 # Also does kinit to verify the install
