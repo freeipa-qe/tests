@@ -173,6 +173,10 @@ automountkey_show
 automount_location_del
 automountkey_del
 automountmap_del
+
+bz725433
+bz726725
+bz726722
 	# sanity tests end.
 
     rlPhaseStartCleanup "ipa-automount-cleanup: Destroying admin credentials & and disabling nis."
