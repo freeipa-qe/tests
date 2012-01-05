@@ -1,14 +1,16 @@
-<job retention_tag="scratch">
+<job>
 	<whiteboard>
 		ipa-server RHEL6 managedby test
 	</whiteboard>
-	<recipeSet priority="Normal">
+	<recipeSet>
 		<recipe kernel_options="" kernel_options_post="" ks_meta="" role="MASTER" whiteboard="IPA MASTER">
 			<autopick random="false"/>
 			<watchdog panic="None"/>
 			<packages/>
 			<ks_appends/>
-			<repos/>
+			<repos>
+				<repo name="ipa" url="http://epsilon.dsdev.sjc.redhat.com/tet/up.repo"/>
+			</repos>
 			<distroRequires>
 				<and>
 					<distro_variant op="=" value="Server"/>
@@ -41,7 +43,9 @@
 			<watchdog panic="None"/>
 			<packages/>
 			<ks_appends/>
-			<repos/>
+			<repos>
+				<repo name="ipa" url="http://epsilon.dsdev.sjc.redhat.com/tet/up.repo"/>
+			</repos>
 			<distroRequires>
 				<and>
 					<distro_variant op="=" value="Server"/>

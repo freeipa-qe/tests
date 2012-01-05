@@ -1,0 +1,3 @@
+PURPOSE of /CoreOS/sssd/ipa-server/shared
+Description: Shared libs for IPA-server tests
+Author: Michael Gregg <mgregg@redhat.com>
