@@ -135,8 +135,10 @@ verify_sssd()
           testchpassprovider=`grep "^chpass_provider" $SSSD | cut -d "=" -f2 | xargs echo`
           ipacompare_forinstalluninstall "chpass_provider " "$chpass_provider" "$testchpassprovider" "$1" 
        fi
-       testidprovider=`grep "^id_provider" $SSSD | cut -d "=" -f2 | xargs echo`
-       ipacompare_forinstalluninstall "id_provider " "$id_provider" "$testidprovider" "$1" 
+       if [ "$2" != "preserve" ] ; then
+         testidprovider=`grep "^id_provider" $SSSD | cut -d "=" -f2 | xargs echo`
+         ipacompare_forinstalluninstall "id_provider " "$id_provider" "$testidprovider" "$1" 
+       fi
        testipadomain=`grep "^ipa_domain" $SSSD | cut -d "=" -f2 | xargs echo`
        ipacompare_forinstalluninstall "ipa_domain " "$ipa_domain" "$testipadomain" "$1" 
        testipaserver=`grep "^ipa_server" $SSSD | cut -d "=" -f2 | xargs echo`
@@ -164,7 +166,15 @@ verify_sssd()
           testnokrb5offlinepasswords=`grep "krb5_store_password_if_offline" $SSSD | cut -d "=" -f2 | xargs echo`
           ipacompare_forinstalluninstall "krb5_store_password_if_offline " "True" "$testnokrb5offlinepasswords" "$1" 
        fi
-       
+       if [ "$2" == "preserve" ] ; then
+          grep "LDAP-KRB5" $SSSD
+          if [ $? -eq 0 ]; then
+            rlPass "$SSSD was preserved during client install"
+          else
+            rlFail "$SSSD was NOT preserved during client install"
+          fi
+       fi
+
     fi
 }
 
@@ -473,13 +483,16 @@ restoreResolv()
 
 verify_time()
 {
-   clientTime=`date +%l:%M`
-   serverTime=`ssh root@$MASTER date +%l:%M`
-   if [ "$clientTime" =  "$serverTime" ] ; then
+   clientTime=`date +%s`
+   serverTime=`ssh root@$MASTER date +%s`
+   diffInTime=`expr $clientTime - $serverTime`
+
+   #Allow 2 min difference
+   if [ -120 -le $diffInTime -o $diffInTime -ge 120 ] ; then
      rlPass "Client time matches time on server"
    else
      rlFail "Client time does not match time on server"
-     rlLog "Client Time: $clientTime; and Server Time: $serverTime"
+     rlLog "Client Time: `date`; and Server Time: `ssh root@$MASTER date`"
      date --set='-2 hours'
      rlLog "Reset time on Client: `date`"
    fi
@@ -495,3 +508,32 @@ getRandomPassword()
      return $randomPassword
 
 }
+
+
+writesssdconf()
+{
+
+   rlRun "echo \"[sssd]\" > $SSSD"
+   rlRun "echo \"config_file_version = 2\" >> $SSSD"
+   rlRun "echo \"domains = LDAP-KRB5\" >> $SSSD"
+   rlRun "echo \"debug_level = 6\" >> $SSSD"
+   rlRun "echo \"reconnection_retries = 3\" >> $SSSD"
+   rlRun "echo \"services = nss, pam\" >> $SSSD"
+   rlRun "echo \"\" >> $SSSD"
+   rlRun "echo \"[nss]\" >> $SSSD"
+   rlRun "echo \"filter_groups = root\" >> $SSSD"
+   rlRun "echo \"filter_users = root\" >> $SSSD"
+   rlRun "echo \"\" >> $SSSD"
+   rlRun "echo \"[pam]\" >> $SSSD"
+   rlRun "echo \"\" >> $SSSD"
+   rlRun "echo \"[domain/LDAP-KRB5]\" >> $SSSD"
+   rlRun "echo \"id_provider = ldap\" >> $SSSD"
+   rlRun "echo \"auth_provider = krb5\" >> $SSSD"
+   rlRun "echo \"ldap_uri = ldap://$MASTER\" >> $SSSD"
+   rlRun "echo \"debug_level = 9\" >> $SSSD"
+   rlRun "echo \"krb5_server = $MASTER\" >> $SSSD"
+   rlRun "echo \"krb5_realm = $RELM\" >> $SSSD"
+
+}
+
+

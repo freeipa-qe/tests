@@ -105,9 +105,9 @@ setup()
 #        rlRun "fixResolv" 0 "fixing the resolv.conf to contain the correct nameserver lines"
 #        rlRun "appendEnv" 0 "Append the machine information to the env.sh with the information for the machines in the recipe set"
 #        rlLog "Setting up Authorized keys"
-#        SetUpAuthKeys
+        SetUpAuthKeys
 #        rlLog "Setting up known hosts file"
-#        SetUpKnownHosts
+        SetUpKnownHosts
 
     
         ## Lines to expect to be changed during the isnatllation process
@@ -595,10 +595,39 @@ ipaclientinstall_preservesssd()
 {
    rlPhaseStartTest "ipa-client-install-32- [Positive] Install with preserve-sssd"
         uninstall_fornexttest
-        rlLog "EXECUTING: ipa-client-install --domain=$DOMAIN --realm=$RELM --ntp-server=$NTPSERVER -p $ADMINID -w $ADMINPW -U --server=$MASTER --preserve-sssd"
-        rlRun "ipa-client-install --domain=$DOMAIN --realm=$RELM --ntp-server=$NTPSERVER -p $ADMINID -w $ADMINPW -U --server=$MASTER --preserve-sssd" 0 "Installing ipa client with preserve-sssd"
-        verify_sssd false
+        
+        # To set up an sssd.conf that can be preserved: 
+        # create a sssd.conf
+          writesssdconf
+        # update /etc/nsswitch.conf, and vim /etc/pam.d/system-auth to use sssd
+          rlRun "authconfig --enablesssd --enablesssdauth --updateall"
+        # restart sssd service
+          rlServiceStop "sssd"
+          rlServiceStart "sssd"
+        # edit /etc/krb5.conf
+          rlRun "perl -pi -e 's/EXAMPLE.COM/TESTRELM/g' $KRB5"
+          rlRun "perl -pi -e 's/kerberos.example.com/$MASTER/g' $KRB5"
+        # verify kinit
+          verify_kinit true 
+
+        #install ipa-client with --preserve-sssd
+       rlLog "EXECUTING: ipa-client-install --domain=$DOMAIN --realm=$RELM --ntp-server=$NTPSERVER -p $ADMINID -w $ADMINPW -U --server=$MASTER --preserve-sssd"
+       rlRun "ipa-client-install --domain=$DOMAIN --realm=$RELM --ntp-server=$NTPSERVER -p $ADMINID -w $ADMINPW -U --server=$MASTER --preserve-sssd" 0 "Installing ipa client with preserve-sssd"
+
+        # be able ot kinit
+          verify_kinit true 
+
+        # verify sssd contents were preserved
+        verify_sssd true preserve 
     rlPhaseEnd
+
+
+    #rlPhaseStartTest "ipa-client-install-32- [Negative] Install with preserve-sssd, using invalid sssd.conf"
+        # create a sssd.conf
+        # install with --preserve-sssd
+       # verify error
+       
+    #rlPhaseEnd
 }
 
 #######################################################
@@ -608,8 +637,8 @@ ipaclientinstall_ntpservice()
 {
    rlPhaseStartTest "ipa-client-install-33- [Positive] Verify ntp service with client install"
         uninstall_fornexttest
-        rlLog "EXECUTING: ipa-client-install --domain=$DOMAIN --realm=$RELM --ntp-server=$NTPSERVER -p $ADMINID -w $ADMINPW -U --server=$MASTER"
-        rlRun "ipa-client-install --domain=$DOMAIN --realm=$RELM --ntp-server=$NTPSERVER -p $ADMINID -w $ADMINPW -U --server=$MASTER" 0 "Installing ipa client"
+        rlLog "EXECUTING: ipa-client-install --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW -U --server=$MASTER"
+        rlRun "ipa-client-install --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW -U --server=$MASTER" 0 "Installing ipa client"
         verify_ntpservice true
    rlPhaseEnd
 
@@ -628,13 +657,21 @@ ipaclientinstall_synctime()
 {
    rlPhaseStartTest "ipa-client-install-35- [Positive] Verify time is sync'd with client install"
         uninstall_fornexttest
+
+        # uninstall should have stopped the ntpd service. But it didn't, and 
+        # for this test - have to make sure we start the test with the service not running.
+        rlRun "service ntpd stop" 0 "Stopping the ntp server"
+
         # set time on this system to be 2 hours ahead
         date --set='+2 hours'
         rlLog "Time on Client is: `date`"
+
         rlLog "EXECUTING: ipa-client-install --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW -U --server=$MASTER"
         rlRun "ipa-client-install --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW -U --server=$MASTER" 0 "Installing ipa client"
+
         # time on this system should match the server time
         verify_time
+
    rlPhaseEnd
 }
 
@@ -686,7 +723,7 @@ ipaclientinstall_withmasterdown()
 # Also does kinit to verify the install
 # $1: true for install; false for uninstall
 # $2: can be one of nosssd, nontp, nontpspecified, mkhomedir, 
-#     permit, force, nokrb5offlinepasswords
+#     permit, force, nokrb5offlinepasswords, preserve
 ##############################################################
 verify_install()
 {
