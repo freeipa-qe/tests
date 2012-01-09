@@ -16,16 +16,20 @@ selfservice()
 #############################################
 selfservice_add()
 {
-    selfservice_add_envsetup
-    selfservice_add_1001  #test_scenario (positive test): [--all]
+    selfservice_add_envsetup 
+### prompts for input...not a valid non-interactive test...requires --attrs=
+    ###selfservice_add_1001  #test_scenario (positive test): [--all]
     selfservice_add_1002  #test_scenario (negative test): [--all --attrs;negative;LIST --permissions;positive;LIST --raw]
     selfservice_add_1003  #test_scenario (negative test): [--all --attrs;positive;LIST --permissions;negative;LIST --raw]
     selfservice_add_1004  #test_scenario (positive test): [--all --attrs;positive;LIST --permissions;positive;LIST --raw]
     selfservice_add_1005  #test_scenario (negative test): [--attrs;negative;LIST]
     selfservice_add_1006  #test_scenario (positive test): [--attrs;positive;LIST]
-    selfservice_add_1007  #test_scenario (negative test): [--permissions;negative;LIST]
-    selfservice_add_1008  #test_scenario (positive test): [--permissions;positive;LIST]
-    selfservice_add_1009  #test_scenario (positive test): [--raw]
+### prompts for input...not a valid non-interactive test...requires --attrs=
+    #selfservice_add_1007  #test_scenario (negative test): [--permissions;negative;LIST]
+### prompts for input...not a valid non-interactive test...requires --attrs=
+    ###selfservice_add_1008  #test_scenario (positive test): [--permissions;positive;LIST]
+### prompts for input...not a valid non-interactive test...requires --attrs=
+    ###selfservice_add_1009  #test_scenario (positive test): [--raw]
     selfservice_add_envcleanup
 } #selfservice-add
 
@@ -45,7 +49,7 @@ selfservice_add_envcleanup()
     rlPhaseEnd
 } #envcleanup
 
-selfservice_add_1001()
+selfservice_add_1001() ### prompts for input...not a valid non-interactive test...requires --attrs=
 {
     rlPhaseStartTest "selfservice_add_1001 [positive test] --all"
         local testID="selfservice_add_1001"
@@ -89,7 +93,7 @@ selfservice_add_1003()
     rlPhaseEnd
 } #selfservice_add_1003
 
-selfservice_add_1004()
+selfservice_add_1004() #BZ 772106 -- ipa selfservice-add --raw returns "internal error" message
 {
     rlPhaseStartTest "selfservice_add_1004 [positive test] --all --attrs;positive;LIST --permissions;positive;LIST --raw"
         local testID="selfservice_add_1004"
@@ -131,7 +135,7 @@ selfservice_add_1006()
     rlPhaseEnd
 } #selfservice_add_1006
 
-selfservice_add_1007()
+selfservice_add_1007() ### prompts for input...not a valid non-interactive test...requires --attrs=
 {
     rlPhaseStartTest "selfservice_add_1007 [negative test] --permissions;negative;LIST"
         local testID="selfservice_add_1007"
@@ -140,13 +144,13 @@ selfservice_add_1007()
         local permissions_TestValue_Negative="badperm" #permissions;negative;LIST
         local expectedErrMsg=replace_me
         local expectedErrCode=1
-        qaRun "ipa selfservice-add $testID  --permissions=$permissions_TestValue_Negative " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [permissions]=[$permissions_TestValue_Negative]" 
+        qaRun "ipa selfservice-add $testID  --permissions=$permissions_TestValue_Negative" "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [permissions]=[$permissions_TestValue_Negative]" 
         Kcleanup
         rm $tmpout
     rlPhaseEnd
 } #selfservice_add_1007
 
-selfservice_add_1008()
+selfservice_add_1008() ### prompts for input...not a valid non-interactive test...requires --attrs=
 {
     rlPhaseStartTest "selfservice_add_1008 [positive test] --permissions;positive;LIST"
         local testID="selfservice_add_1008"
@@ -159,7 +163,7 @@ selfservice_add_1008()
     rlPhaseEnd
 } #selfservice_add_1008
 
-selfservice_add_1009()
+selfservice_add_1009() ### prompts for input...not a valid non-interactive test...requires --attrs=
 {
     rlPhaseStartTest "selfservice_add_1009 [positive test] --raw"
         local testID="selfservice_add_1009"
@@ -179,6 +183,8 @@ selfservice_add_1009()
 selfservice_del()
 {
     selfservice_del_envsetup
+    selfservice_del_1001
+    selfservice_del_1002
     selfservice_del_envcleanup
 } #selfservice-del
 
@@ -187,9 +193,9 @@ selfservice_del_envsetup()
     rlPhaseStartSetup "selfservice_del_envsetup"
         #environment setup starts here
         KinitAsAdmin
-	for i in $(seq 1001 1001); do   ### yes this should be 1001 1001 so it only creates one user.
-		rlRun "ipa selfservice-add --attrs=l --permissions=write selfservice_del_$i" 0 "selfservice-add selfservice_del_$i rule needed for test"
-	done
+		for i in $(seq 1001 1001); do   ### yes this should be 1001 1001 so it only creates one user.
+			rlRun "ipa selfservice-add --attrs=l --permissions=write selfservice_del_$i" 0 "selfservice-add selfservice_del_$i rule needed for test"
+		done
         Kcleanup
         #environment setup ends   here
     rlPhaseEnd
@@ -223,7 +229,7 @@ selfservice_del_1002()
         KinitAsAdmin
         local name_TestValue_Negative="badname" 
         local expectedErrMsg="ipa: ERROR: ACI with name \"badname\" not found"
-        local expectedErrCode=1
+        local expectedErrCode=2
         qaRun "ipa selfservice-del $name_TestValue_Negative" "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  (delete non-existent rule)"
         Kcleanup
         rm $tmpout
@@ -257,11 +263,11 @@ selfservice_find_envsetup()
 {
     rlPhaseStartSetup "selfservice_find_envsetup"
         #environment setup starts here
-	KinitAsAdmin
-	for i in $(seq 1001 1012); do
-		rlRun "ipa selfservice-add --attrs=l --permissions=write selfservice_find_$i" 0 "selfservice-add selfservice_find_$i rule needed for test"
-	done
-	Kcleanup
+		KinitAsAdmin
+		for i in $(seq 1001 1012); do
+			rlRun "ipa selfservice-add --attrs=l --permissions=write selfservice_find_$i" 0 "selfservice-add selfservice_find_$i rule needed for test"
+		done
+		Kcleanup
         #environment setup ends   here
     rlPhaseEnd
 } #envsetup
@@ -270,9 +276,11 @@ selfservice_find_envcleanup()
 {
     rlPhaseStartCleanup "selfservice_find_envcleanup"
         #environment cleanup starts here
-	for i in $(seq 1001 1012); do
-		rlRun "ipa selfservice-del selfservice_find_$i" 0 "selfservice-del selfservice_find_$i rule used for test"
-	done
+		KinitAsAdmin
+		for i in $(seq 1001 1012); do
+			rlRun "ipa selfservice-del selfservice_find_$i" 0 "selfservice-del selfservice_find_$i rule used for test"
+		done
+		Kcleanup
         #environment cleanup ends   here
     rlPhaseEnd
 } #envcleanup
@@ -326,7 +334,7 @@ selfservice_find_1003()
     rlPhaseEnd
 } #selfservice_find_1003
 
-selfservice_find_1004()
+selfservice_find_1004() # BZ 747693 -- ipa selfservice-find --raw returns "internal error" 
 {
     rlPhaseStartTest "selfservice_find_1004 [negative test] --all --attrs;positive;LIST --name;positive;STR --permissions;negative;LIST --raw"
         local testID="selfservice_find_1004"
@@ -343,7 +351,7 @@ selfservice_find_1004()
     rlPhaseEnd
 } #selfservice_find_1004
 
-selfservice_find_1005()
+selfservice_find_1005() # BZ 747693 -- ipa selfservice-find --raw returns "internal error" 
 {
     rlPhaseStartTest "selfservice_find_1005 [positive test] --all --attrs;positive;LIST --name;positive;STR --permissions;positive;LIST --raw"
         local testID="selfservice_find_1005"
@@ -449,7 +457,7 @@ selfservice_find_1011()
     rlPhaseEnd
 } #selfservice_find_1011
 
-selfservice_find_1012()
+selfservice_find_1012() # BZ 747693 -- ipa selfservice-find --raw returns "internal error"
 {
     rlPhaseStartTest "selfservice_find_1012 [positive test] --raw"
         local testID="selfservice_find_1012"
@@ -469,7 +477,8 @@ selfservice_find_1012()
 selfservice_mod()
 {
     selfservice_mod_envsetup
-    selfservice_mod_1001  #test_scenario (positive test): [--all]
+### prompts for input...not a valid non-interactive test...requires --attrs= or --permissions
+    ### selfservice_mod_1001  #test_scenario (positive test): [--all]
     selfservice_mod_1002  #test_scenario (negative test): [--all --attrs;negative;LIST --permissions;positive;LIST --raw]
     selfservice_mod_1003  #test_scenario (negative test): [--all --attrs;positive;LIST --permissions;negative;LIST --raw]
     selfservice_mod_1004  #test_scenario (positive test): [--all --attrs;positive;LIST --permissions;positive;LIST --raw]
@@ -477,7 +486,8 @@ selfservice_mod()
     selfservice_mod_1006  #test_scenario (positive test): [--attrs;positive;LIST]
     selfservice_mod_1007  #test_scenario (negative test): [--permissions;negative;LIST]
     selfservice_mod_1008  #test_scenario (positive test): [--permissions;positive;LIST]
-    selfservice_mod_1009  #test_scenario (positive test): [--raw]
+### prompts for input...not a valid non-interactive test...requires --attrs= or --permissions
+    ### selfservice_mod_1009  #test_scenario (positive test): [--raw]
     selfservice_mod_envcleanup
 } #selfservice-mod
 
@@ -485,11 +495,11 @@ selfservice_mod_envsetup()
 {
     rlPhaseStartSetup "selfservice_mod_envsetup"
         #environment setup starts here
-	KinitAsAdmin
-	for i in $(seq 1001 1009); do
-		rlRun "ipa selfservice-add --attrs=l --permissions=write selfservice_mod_$i" 0 "selfservice-add selfservice_mod_$i rule needed for test"
-	done
-	Kcleanup
+		KinitAsAdmin
+		for i in $(seq 1001 1009); do
+			rlRun "ipa selfservice-add --attrs=l --permissions=write selfservice_mod_$i" 0 "selfservice-add selfservice_mod_$i rule needed for test"
+		done
+		Kcleanup
         #environment setup ends   here
     rlPhaseEnd
 } #envsetup
@@ -498,14 +508,16 @@ selfservice_mod_envcleanup()
 {
     rlPhaseStartCleanup "selfservice_mod_envcleanup"
         #environment cleanup starts here
-	for i in $(seq 1001 1009); do
-		rlRun "ipa selfservice-del selfservice_mod_$i" 0 "selfservice-del selfservice_mod_$i rule used for test"
-	done
+		KinitAsAdmin
+		for i in $(seq 1001 1009); do
+			rlRun "ipa selfservice-del selfservice_mod_$i" 0 "selfservice-del selfservice_mod_$i rule used for test"
+		done
+		Kcleanup
         #environment cleanup ends   here
     rlPhaseEnd
 } #envcleanup
 
-selfservice_mod_1001()
+selfservice_mod_1001() ### prompts for input...not a valid non-interactive test...requires --attrs= or --permissions
 {
     rlPhaseStartTest "selfservice_mod_1001 [positive test] --all"
         local testID="selfservice_mod_1001"
@@ -555,7 +567,7 @@ selfservice_mod_1003()
     rlPhaseEnd
 } #selfservice_mod_1003
 
-selfservice_mod_1004()
+selfservice_mod_1004() # BZ 772675 -- ipa selfservice-mod --raw returns "internal error" message
 {
     rlPhaseStartTest "selfservice_mod_1004 [positive test] --all --attrs;positive;LIST --permissions;positive;LIST --raw"
         local testID="selfservice_mod_1004"
@@ -566,10 +578,13 @@ selfservice_mod_1004()
         rlRun "ipa selfservice-mod $testID --all  --attrs=$attrs_TestValue  --permissions=$permissions_TestValue --raw " 0 "test options:  (change attr, with --raw) [attrs]=[$attrs_TestValue] [permissions]=[$permissions_TestValue]" 
         local attrs_TestValue="st" #attrs;positive;LIST 
         rlRun "ipa selfservice-mod $testID --all  --attrs=$attrs_TestValue  --permissions=$permissions_TestValue " 0 "test options:  (change attr, without --raw) [attrs]=[$attrs_TestValue] [permissions]=[$permissions_TestValue]" 
+
         local attrs_TestValue="st,l" #attrs;positive;LIST 
         rlRun "ipa selfservice-mod $testID --all  --attrs=$attrs_TestValue  --permissions=$permissions_TestValue --raw " 0 "test options:  (add attr, with --raw) [attrs]=[$attrs_TestValue] [permissions]=[$permissions_TestValue]" 
+
         local attrs_TestValue="mobile,st,l" #attrs;positive;LIST 
         rlRun "ipa selfservice-mod $testID --all  --attrs=$attrs_TestValue  --permissions=$permissions_TestValue " 0 "test options:  (add attr, without --raw) [attrs]=[$attrs_TestValue] [permissions]=[$permissions_TestValue]" 
+
         local permissions_TestValue="read" #permissions;positive;LIST 
         rlRun "ipa selfservice-mod $testID --all  --attrs=$attrs_TestValue  --permissions=$permissions_TestValue --raw " 0 "test options:  (change perm, with --raw) [attrs]=[$attrs_TestValue] [permissions]=[$permissions_TestValue]" 
         local permissions_TestValue="read,write" #permissions;positive;LIST 
@@ -579,19 +594,22 @@ selfservice_mod_1004()
     rlPhaseEnd
 } #selfservice_mod_1004
 
-selfservice_mod_1005()
+selfservice_mod_1005() # BZ 747741 -- command: ipa selfservice-mod : provide wrong attr for --attrs delete a selfservice permission
 {
     rlPhaseStartTest "selfservice_mod_1005 [negative test] --attrs;negative;LIST"
         local testID="selfservice_mod_1005"
-        local tmpout=$TmpDir/selfservice_mod_1005.$RANDOM.out
+        local tmpout=$TmpDir/selfservice_mod_1005.$RANDOM.out.1
         KinitAsAdmin
         local attrs_TestValue_Negative="badattrs" #attrs;negative;LIST
         local expectedErrMsg="ipa: ERROR: targetattr \"badattrs\" does not exist in schema."
         local expectedErrCode=1
-        qaRun "ipa selfservice-mod $testID  --attrs=$attrs_TestValue_Negative " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  (with invalid attrs) [attrs]=[$attrs_TestValue_Negative]" 
+        qaRun "ipa selfservice-mod $testID  --attrs=$attrs_TestValue_Negative" "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  (with invalid attrs) [attrs]=[$attrs_TestValue_Negative]" 
+        rm $tmpout
+
+        local tmpout=$TmpDir/selfservice_mod_1005.$RANDOM.out.2
         local attrs_TestValue_Negative="l" #attrs;negative;LIST
         local expectedErrMsg="ipa: ERROR: no modifications to be performed"
-        qaRun "ipa selfservice-mod $testID  --attrs=$attrs_TestValue_Negative " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  (with same attrs) [attrs]=[$attrs_TestValue_Negative]" 
+        qaRun "ipa selfservice-mod $testID  --attrs=$attrs_TestValue_Negative" "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  (with same attrs) [attrs]=[$attrs_TestValue_Negative]" 
         Kcleanup
         rm $tmpout
     rlPhaseEnd
@@ -612,7 +630,7 @@ selfservice_mod_1006()
     rlPhaseEnd
 } #selfservice_mod_1006
 
-selfservice_mod_1007()
+selfservice_mod_1007() 
 {
     rlPhaseStartTest "selfservice_mod_1007 [negative test] --permissions;negative;LIST"
         local testID="selfservice_mod_1007"
@@ -630,7 +648,7 @@ selfservice_mod_1007()
     rlPhaseEnd
 } #selfservice_mod_1007
 
-selfservice_mod_1008()
+selfservice_mod_1008() 
 {
     rlPhaseStartTest "selfservice_mod_1008 [positive test] --permissions;positive;LIST"
         local testID="selfservice_mod_1008"
@@ -645,7 +663,7 @@ selfservice_mod_1008()
     rlPhaseEnd
 } #selfservice_mod_1008
 
-selfservice_mod_1009()
+selfservice_mod_1009() ### prompts for input...not a valid non-interactive test...requires --attrs= or --permissions
 {
     rlPhaseStartTest "selfservice_mod_1009 [positive test] --raw"
         local testID="selfservice_mod_1009"
@@ -675,11 +693,11 @@ selfservice_show_envsetup()
 {
     rlPhaseStartSetup "selfservice_show_envsetup"
         #environment setup starts here
-	KinitAsAdmin
-	for i in $(seq 1001 1003); do
-		rlRun "ipa selfservice-add --attrs=l --permissions=write selfservice_show_$i" 0 "selfservice-add selfservice_show_$i rule needed for test"
-	done
-	Kcleanup
+		KinitAsAdmin
+		for i in $(seq 1001 1003); do
+			rlRun "ipa selfservice-add --attrs=l --permissions=write selfservice_show_$i" 0 "selfservice-add selfservice_show_$i rule needed for test"
+		done
+		Kcleanup
         #environment setup ends   here
     rlPhaseEnd
 } #envsetup
@@ -688,9 +706,11 @@ selfservice_show_envcleanup()
 {
     rlPhaseStartCleanup "selfservice_show_envcleanup"
         #environment cleanup starts here
-	for i in $(seq 1001 1003); do
-		rlRun "ipa selfservice-del selfservice_show_$i" 0 "selfservice-del selfservice_show_$i rule used for test"
-	done
+		KinitAsAdmin
+		for i in $(seq 1001 1003); do
+			rlRun "ipa selfservice-del selfservice_show_$i" 0 "selfservice-del selfservice_show_$i rule used for test"
+		done
+		Kcleanup
         #environment cleanup ends   here
     rlPhaseEnd
 } #envcleanup
