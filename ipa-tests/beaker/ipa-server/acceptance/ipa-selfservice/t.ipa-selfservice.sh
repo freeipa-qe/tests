@@ -751,4 +751,93 @@ selfservice_show_1003()
     rlPhaseEnd
 } #selfservice_show_1003
 
+#############################################
+#  test suite: selfservice BZs
+#############################################
+
+selfservice_bz()
+{
+	selfservice_bz_envsetup
+	selfservice_bz_772106 # ipa selfservice-add --raw returns "internal error" message
+	selfservice_bz_772675 # ipa selfservice-mod --raw returns "internal error" message
+	selfservice_bz_747730 # ipa selfservice-mod "edit address" --permissions="" delete a selfservice permission
+	selfservice_bz_747741 # ipa selfservice-mod : provide wrong attr for --attrs delete a selfservice permission
+	selfservice_bz_747693 # ipa selfservice-find --raw returns "internal error"
+	selfservice_bz_747720 # ipa selfservice-find --permission="" returns internal error
+	selfservice_bz_747722 # ipa selfservice-find --attrs="" returns internal error
+	selfservice_bz_cleanup
+}
+
+selfservice_bz_envsetup()
+{
+	rlPhaseStartSetup "selfservice_bz_envsetup"
+		#environment setup starts here
+		#environment setup ends   here
+	rlPhaseEnd
+} #envsetup
+
+selfservice_bz_cleanup()
+{
+	rlPhaseStartCleanup "selfservice_bz_cleanup"
+		#environment cleanup starts here
+		#environment cleanup ends   here
+	rlPhaseEnd
+} #envcleanup
+
+selfservice_bz_772106() # ipa selfservice-add --raw returns "internal error" message
+{
+	rlPhaseStartTest "selfservice_bz_772106 ipa selfservice-add --raw returns internal error message"
+		KinitAsAdmin
+		Kcleanup
+	rlPhaseEnd
+} #selfservice_bz_772106
+
+selfservice_bz_772675() # ipa selfservice-mod --raw returns "internal error" message
+{
+	rlPhaseStartTest "selfservice_bz_772675 ipa selfservice-mod --raw returns internal error message"
+		KinitAsAdmin
+		Kcleanup
+	rlPhaseEnd
+} #selfservice_bz_772675
+
+selfservice_bz_747730() # ipa selfservice-mod "edit address" --permissions="" delete a selfservice permission
+{
+	rlPhaseStartTest "selfservice_bz_747730 ipa selfservice-mod edit address --permissions=\"\" delete a selfservice permission"
+		KinitAsAdmin
+		Kcleanup
+	rlPhaseEnd
+} #selfservice_bz_747730
+
+selfservice_bz_747741() # ipa selfservice-mod : provide wrong attr for --attrs delete a selfservice permission
+{
+	rlPhaseStartTest "selfservice_bz_747741 ipa selfservice-mod provide wrong attr for --attrs delete a selfservice permission"
+		KinitAsAdmin
+		Kcleanup
+	rlPhaseEnd
+} #selfservice_bz_747741
+
+selfservice_bz_747693() # ipa selfservice-find --raw returns "internal error"
+{
+	rlPhaseStartTest "selfservice_bz_747693 ipa selfservice-find --raw returns internal error"
+		KinitAsAdmin
+		Kcleanup
+	rlPhaseEnd
+} #selfservice_bz_747693
+
+selfservice_bz_747720() # ipa selfservice-find --permission="" returns internal error
+{
+	rlPhaseStartTest "selfservice_bz_747720 ipa selfservice-find --permission=\"\" returns internal error"
+		KinitAsAdmin
+		Kcleanup
+	rlPhaseEnd
+} #selfservice_bz_747720
+
+selfservice_bz_747722() # ipa selfservice-find --attrs="" returns internal error
+{
+	rlPhaseStartTest "selfservice_bz_747722 ipa selfservice-find --attrs=\"\" returns internal error"
+		KinitAsAdmin
+		Kcleanup
+	rlPhaseEnd
+} #selfservice_bz_747722
+
 #END OF TEST CASE for [selfservice-show]
