@@ -6,7 +6,7 @@
 #  test suite: selfservice BZs
 #############################################
 
-selfservice_bs()
+selfservice_bz()
 {
 	selfservice_bz_envsetup
 	selfservice_bz_772106 # ipa selfservice-add --raw returns "internal error" message
