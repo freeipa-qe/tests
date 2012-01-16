@@ -153,6 +153,27 @@ installCA()
 
    rlPhaseStartSetup "Installing CA Replica"
 
+	rlRun "mv /etc/hosts /var/tmp/"
+	echo "127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4" > /etc/hosts
+
+	rlRun "nslookup $MASTER"
+	rlRun "nslookup $SLAVE"
+	rlLog "Executing: ipa-ca-install -p $ADMINPW -w $ADMINPW --skip-conncheck --unattended --no-host-dns /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg"
+
+	rlLog "Verifying bug https://bugzilla.redhat.com/show_bug.cgi?id=757681"
+	echo "ipa-ca-install -p $ADMINPW -w $ADMINPW --skip-conncheck --unattended --no-host-dns /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg" > /dev/shm/replica-ca-install.bash
+        chmod 755 /dev/shm/replica-ca-install.bash
+        rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
+        rlRun "/bin/bash /dev/shm/replica-ca-install.bash" 0 "CA Replica installation with --no-host-dns"
+
+	sleep 5
+	rlRun "service ipa status"
+	rlRun "ipa-server-install --uninstall -U"
+	sleep 5
+
+	rlRun "mv /etc/hosts /tmp/"
+	rlRun "mv /var/tmp/hosts /etc/hosts" 0 " Restoring /etc/hosts"
+
 	rlLog "Executing: ipa-ca-install -p $ADMINPW -w $ADMINPW --skip-conncheck --unattended /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg"
 	echo "ipa-ca-install -p $ADMINPW -w $ADMINPW --skip-conncheck --unattended /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg" > /dev/shm/replica-ca-install.bash
 	chmod 755 /dev/shm/replica-ca-install.bash
