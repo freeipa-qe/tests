@@ -121,7 +121,7 @@ selfservice_usertest_1003()
 
 selfservice_usertest_1004()
 {
-	rlPhaseStartTest "selfservice-usertest-1004: create new rule and test allowed access"
+	rlPhaseStartTest "selfservice-usertest-1004: create new rule and test write access"
 		KinitAsAdmin
 		rlRun "ipa selfservice-add rule0001 --attrs=\"mobile, pager, facsimiletelephonenumber, telephonenumber\"" 
 
@@ -136,6 +136,7 @@ selfservice_usertest_1004()
 selfservice_usertest_1005()
 {
 	rlPhaseStartTest "selfservice-usertest-1005: check the user's attribute settings"
+		tmpout=$TmpDir/selfservice_usertest.out
 		KinitAsUser user0001 passw0rd1
 		rlRun "ipa user-find user0001  --first=Good"
 		rlRun "ipa user-find user0001  --last=User"
@@ -154,8 +155,13 @@ selfservice_usertest_1005()
 		rlRun "ipa user-find user0001  --fax=777-777-7777"
 		rlRun "ipa user-find user0001  --orgunit=good-org"
 		rlRun "ipa user-find user0001  --title=good_admin"
-		rlRun "ipa user-find user0001  --manager=good_manager"
+		rlRun "ipa user-find user0001  --manager=good_manager > $tmpout 2>&1"
+		if [ $(grep "Number of entries returned 0$" $tmpout|wc -l) -eq 1 ]; then
+			rlFail "BZ 781208 -- ipa user-find --manager does not find matches"
+			cat $tmpout
+		fi
 		rlRun "ipa user-find user0001  --carlicense=good-3333"
+		[ -f $tmpout ] && rm $tmpout
 	rlPhaseEnd	
 } #selfservice_usertest_1005
 		
