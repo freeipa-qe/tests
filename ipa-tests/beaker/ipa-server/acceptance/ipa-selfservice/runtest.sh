@@ -40,10 +40,9 @@
 . /dev/shm/env.sh
 
 # Include test case file
-#. ./t.ipa-selfservice.sh
-. ./tests.d/t.ipa-selfservice-cli.sh
-. ./tests.d/t.ipa-selfservice-bz.sh
-. ./tests.d/t.ipa-selfservice-users.sh
+. ./t.ipa-selfservice-cli.sh
+. ./t.ipa-selfservice-users.sh
+. ./t.ipa-selfservice-bz.sh
 
 PACKAGE="ipa-server"
 
@@ -61,9 +60,9 @@ rlJournalStart
     rlPhaseEnd
 
     # r2d2_test_starts
-    selfservice_cli
-	selfservice_bz
+	selfservice_cli
 	selfservice_usertest
+	selfservice_bz
     # r2d2_test_ends
 
     rlPhaseStartCleanup "ipa-selfservice cleanup"
