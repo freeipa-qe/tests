@@ -29,7 +29,7 @@ export TESTVERSION=1.0
 
 BUILT_FILES=
 
-FILES=$(METADATA) runtest.sh Makefile PURPOSE t.ipa-selfservice-cli.sh t.ipa-selfservice-users.sh t.ipa-selfservice-users.sh
+FILES=$(METADATA) runtest.sh Makefile PURPOSE t.ipa-selfservice-cli.sh t.ipa-selfservice-users.sh t.ipa-selfservice-bz.sh
 
 .PHONY: all install download clean
 
