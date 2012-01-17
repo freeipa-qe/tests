@@ -1,0 +1,13 @@
+BZ 766183 -- [RFE] Support auto membership functionality in IPA
+* https://bugzilla.redhat.com/show_bug.cgi?id=766183
+* https://fedorahosted.org/freeipa/ticket/1272
+* https://fedorahosted.org/freeipa/ticket/753
+
+BZ 746589 -- automember functionality not available for upgraded IPA server
+* https://bugzilla.redhat.com/show_bug.cgi?id=746589
+* https://fedorahosted.org/freeipa/ticket/1992
+
+BZ 772659 -- Typo in example description for automember-default-group-remove
+* https://bugzilla.redhat.com/show_bug.cgi?id=772659
+* https://fedorahosted.org/freeipa/ticket/2236
+

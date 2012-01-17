@@ -61,8 +61,8 @@ rlJournalStart
     rlPhaseEnd
 
     # r2d2_test_starts
-    #selfservice_cli
-	#selfservice_bz
+    selfservice_cli
+	selfservice_bz
 	selfservice_usertest
     # r2d2_test_ends
 
