@@ -43,8 +43,6 @@
 . /dev/shm/lib.user-cli.sh
 . /dev/shm/ipa-group-cli-lib.sh
 
-
-BASEDN="dc=$DOMAIN"
 GROUPRDN="cn=groups,cn=accounts,"
 GROUPDN="$GROUPRDN$BASEDN"
 echo "GROUPDN is $USERDN"
@@ -223,7 +221,7 @@ rlJournalStart
         group1="cn=bogus,$GROUPDN"
         group2="cn=bogus2,$GROUPDN"
         command="ipa user-mod --setattr $attr=\"$group1\" $superuser"
-        expmsg="ipa: ERROR: Insufficient access: Insufficient 'write' privilege to the 'memberOf' attribute of entry 'uid=$superuser,cn=users,cn=accounts,dc=$DOMAIN'."
+        expmsg="ipa: ERROR: Insufficient access: Insufficient 'write' privilege to the 'memberOf' attribute of entry 'uid=$superuser,cn=users,cn=accounts,$BASEDN'."
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
         command="ipa user-mod --addattr $attr=\"$group2\" $superuser"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
@@ -275,7 +273,7 @@ rlJournalStart
 
     rlPhaseStartTest "ipa-user-cli-mod-034: setattr and addattr krbPwdPolicyReference"
         command="ipa user-mod --setattr krbPwdPolicyReference=test $superuser"
-        expmsg="ipa: ERROR: Insufficient access: Insufficient 'write' privilege to the 'krbPwdPolicyReference' attribute of entry 'uid=$superuser,cn=users,cn=accounts,dc=$DOMAIN'."
+        expmsg="ipa: ERROR: Insufficient access: Insufficient 'write' privilege to the 'krbPwdPolicyReference' attribute of entry 'uid=$superuser,cn=users,cn=accounts,$BASEDN'."
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
         command="ipa user-mod --setattr krbPwdPolicyReference=test $superuser"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
@@ -283,7 +281,7 @@ rlJournalStart
 
     rlPhaseStartTest "ipa-user-cli-mod-035: setattr and addattr krbPrincipalName"
         command="ipa user-mod --setattr krbPrincipalName=test $superuser"
-        expmsg="ipa: ERROR: Insufficient access: Insufficient 'write' privilege to the 'krbPrincipalName' attribute of entry 'uid=$superuser,cn=users,cn=accounts,dc=$DOMAIN'."
+        expmsg="ipa: ERROR: Insufficient access: Insufficient 'write' privilege to the 'krbPrincipalName' attribute of entry 'uid=$superuser,cn=users,cn=accounts,$BASEDN'."
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
         command="ipa user-mod --setattr krbPrincipalName=test $superuser"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
