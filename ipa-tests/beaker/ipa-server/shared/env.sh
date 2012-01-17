@@ -5,6 +5,7 @@ ROOTDNPWD=Secret123
 DNSFORWARD=10.14.63.12
 RELM=TESTRELM.COM
 DOMAIN=testrelm.com
+BASEDN="dc=testrelm,dc=com"
 NISDOMAIN=ipatest
 NTPSERVER=clock.redhat.com
 
