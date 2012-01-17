@@ -3,8 +3,8 @@ ADMINPW=Secret123
 ROOTDN="cn=Directory Manager"
 ROOTDNPWD=Secret123
 DNSFORWARD=10.14.63.12
-RELM=TESTRELM
-DOMAIN=testrelm
+RELM=TESTRELM.COM
+DOMAIN=testrelm.com
 NISDOMAIN=ipatest
 NTPSERVER=clock.redhat.com
 
