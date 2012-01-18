@@ -256,12 +256,12 @@ verifyHostGroupMember()
 
   # construct groupDN
   mygroup="cn=$group"
-  groupDN="$mygroup,cn=hostgroups,cn=accounts,dc=$DOMAIN"
+  groupDN="$mygroup,cn=hostgroups,cn=accounts,$BASEDN"
 
   # construct memberDN and verify host group returned with find and show
   if [[ $membertype == "host" ]] ; then
         mymember="fqdn=$member"
-        memberDN="$mymember,cn=computers,cn=accounts,dc=$DOMAIN"
+        memberDN="$mymember,cn=computers,cn=accounts,$BASEDN"
 
         ipa hostgroup-find "$group" > /tmp/findhostgroup.out
         members=`cat /tmp/findhostgroup.out | grep "Member hosts:" | cut -d ":" -f2`
@@ -287,7 +287,7 @@ verifyHostGroupMember()
 
   elif [[ $membertype == "hostgroup" ]] ; then
         mymember="cn=$member"
-        memberDN="$mymember,cn=hostgroups,cn=accounts,dc=$DOMAIN"
+        memberDN="$mymember,cn=hostgroups,cn=accounts,$BASEDN"
 
 	ipa hostgroup-find "$member" > /tmp/findhostgroup.out
         members=`cat /tmp/findhostgroup.out | grep "Member of host-groups:" | cut -d ":" -f2`
@@ -317,9 +317,9 @@ verifyHostGroupMember()
   rlLog "Host Group DN: $groupDN"
   # verify member attribute for group
   /usr/bin/ldapsearch -x -h $MASTER -p 389 -D "$ROOTDN" -w $ROOTDNPWD -b "$groupDN" | grep "member:" > /tmp/member.out
-   cat /tmp/member.out | grep "$memberDN"
+   cat /tmp/member.out | grep "$member"
   if [ $? -ne 0 ] ; then
-  	rlLog "WARNING: member: $memberDN not found for group $mygroup"	
+  	rlLog "WARNING: member: $member not found for group $group"	
 	let rc=$rc+1
   else
         rlLog "member attributes for host group membership is as expected."
@@ -328,9 +328,9 @@ verifyHostGroupMember()
   # verify memberof attribute for the member
 
   /usr/bin/ldapsearch -x -h $MASTER -p 389 -D "$ROOTDN" -w $ROOTDNPWD -b "$memberDN" | grep "memberOf:" > /tmp/memberof.out
-  cat /tmp/memberof.out | grep "$groupDN"
+  cat /tmp/memberof.out | grep "$group"
   if [ $? -ne 0 ] ; then
-  	rlLog "WARNING: memberOf: $groupDN not found for member $member"
+  	rlLog "WARNING: memberOf: $group not found for member $member"
         let rc=$rc+1
   else
         rlLog "memberOf attributes for host group membership is as expected."
