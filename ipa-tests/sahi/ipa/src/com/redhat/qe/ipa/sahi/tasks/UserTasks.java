@@ -588,4 +588,17 @@ public class UserTasks {
 		sahiTasks.link("Users").in(sahiTasks.div("content")).click();
 	}
 	
+	public static  void addUserService(SahiTasks browser, String uid, String firstName, String lastName) {
+		browser.link("Add").click();
+		browser.link("Optional field: click to show").click();
+		browser.textbox("uid").setValue(uid);
+		browser.textbox("givenname").setValue(firstName);
+		browser.textbox("sn").setValue(lastName);
+		browser.button("Add").click();
+	}
+
+	public static void deleteUserService(SahiTasks browser, String uid) {
+		UserTasks.deleteUser(browser, uid);
+	}
+
 }

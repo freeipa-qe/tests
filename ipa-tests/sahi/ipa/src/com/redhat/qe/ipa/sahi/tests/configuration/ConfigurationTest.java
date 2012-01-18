@@ -44,7 +44,7 @@ public class ConfigurationTest extends SahiTestScript{
 	@BeforeClass (groups={"init"}, description="Initialize app for this test suite run", 
 			alwaysRun=true, dependsOnGroups="setup")
 	public void initialize() throws CloneNotSupportedException {
-		sahiTasks.setStrictVisibilityCheck(true);
+		//sahiTasks.setStrictVisibilityCheck(true);
 		
 		//to set up search tests, adding objects in one category on identity and policy tabs 
 		//add users

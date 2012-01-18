@@ -187,9 +187,10 @@ public class GroupTasks {
 	}
 
 	public static void add_UserGroup(SahiTasks browser, String groupName, String groupDescription, String gid, String isPosix){
-        browser.link("Add").click();
+        //browser.link("Add").click();
+		browser.span("Add").click();
         browser.textbox("cn").setValue(groupName);
-        browser.textbox("description").setValue(groupDescription);
+        browser.textarea("description").setValue(groupDescription); 
         if (! gid.equals(""))
         	browser.textbox("gidnumber").setValue(gid);
         
@@ -204,9 +205,10 @@ public class GroupTasks {
 							String firstGroupName, String firstGroupDescription, String firstGid, String first_isPosix,
 							String secondGroupName, String secondGroupDescription, String secondGid, String second_isPosix){
         
-        browser.link("Add").click();
+        //browser.link("Add").click();
+        browser.span("Add").click();
         browser.textbox("cn").setValue(firstGroupName);
-        browser.textbox("description").setValue(firstGroupDescription);
+        browser.textarea("description").setValue(firstGroupDescription);
         if (! firstGid.equals(""))
         	browser.textbox("gidnumber").setValue(firstGid);
         if (first_isPosix.equals("nonPosix")){
@@ -217,7 +219,7 @@ public class GroupTasks {
         // this the main purpose of this test case
         browser.button("Add and Add Another").click();    
         browser.textbox("cn").setValue(secondGroupName);
-        browser.textbox("description").setValue(secondGroupDescription);
+        browser.textarea("description").setValue(secondGroupDescription);
         if (! secondGid.equals(""))
         	browser.textbox("gidnumber").setValue(secondGid);
         if (second_isPosix.equals("nonPosix")){
@@ -233,7 +235,7 @@ public class GroupTasks {
         browser.link("Add").click();
 
         browser.textbox("cn").setValue(groupName);
-        browser.textbox("description").setValue(groupDescription);
+        browser.textarea("description").setValue(groupDescription);
         browser.textbox("gidnumber").setValue(gid);
         if (isPosix.equals("nonPosix")){
         	browser.checkbox("nonposix").click();
@@ -242,7 +244,7 @@ public class GroupTasks {
         
         // do some minimum editing to ensure page navigation is what we are intend to do
         browser.link("Settings").click();
-        browser.textbox("description").setValue("verify get into edit mode: " + groupDescription);
+        browser.textarea("description").setValue("verify get into edit mode: " + groupDescription);
         browser.link("Update").click();
         
         // go back to use group list page
@@ -253,7 +255,7 @@ public class GroupTasks {
         browser.link("Add").click();
 
         browser.textbox("cn").setValue(groupName);
-        browser.textbox("description").setValue(groupDescription);
+        browser.textarea("description").setValue(groupDescription);
         browser.textbox("gidnumber").setValue(gid);
         if (isPosix.equals("isPosix")){
         	browser.checkbox("nonposix").click();

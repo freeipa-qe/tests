@@ -18,9 +18,9 @@ public class GroupTests extends SahiTestScript{
 	public void initialize() throws CloneNotSupportedException {
 		browser=sahiTasks;
 		browser.navigateTo(commonTasks.groupPage, true);
-		browser.setStrictVisibilityCheck(true);
+		browser.setStrictVisibilityCheck(true); 
 	}
-	 
+
 	@BeforeMethod (alwaysRun=true)
 	public void checkURL(){
 		String currentURL = browser.fetch("top.location.href");
@@ -58,7 +58,7 @@ public class GroupTests extends SahiTestScript{
 		Assert.assertFalse(browser.link(groupName).exists(),"before 'Add', group does NOT exists");
 		GroupTasks.add_and_edit_UserGroup(browser, groupName, groupDescription, gid, isPosix);
 		browser.link("User Groups").in(browser.div("content")).click();
-		Assert.assertTrue(browser.link(groupName).exists(),"after 'Add', group exists");
+		Assert.assertTrue(browser.link(groupName).exists(),"after 'Add', group '" + groupName + "' should exists");
 	}
 	
 	@Test (groups={"addGroup"}, description="add group test", dataProvider="13th_UserGroupsData")
