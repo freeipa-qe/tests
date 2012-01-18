@@ -40,9 +40,9 @@
 . /dev/shm/env.sh
 
 # Include test case file
-. ./t.ipa-delegation-cli-cmd.sh
-. ./t.ipa-delegation-cli-user.sh
-. ./t.ipa-delegation-cli-bz.sh
+. ./tests.d/t.ipa-delegation-cli-cmd.sh
+. ./tests.d/t.ipa-delegation-cli-user.sh
+. ./tests.d/t.ipa-delegation-cli-bz.sh
 
 PACKAGE="ipa-server"
 
