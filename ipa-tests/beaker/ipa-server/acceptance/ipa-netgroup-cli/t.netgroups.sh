@@ -18,8 +18,8 @@ hgroup1=hg144335566
 hgroup2=hg2
 hgroup3=hg3afdsk
 
-BASEDN="dc=$DOMAIN"
-NETGRPDN="cn=ng,cn=alt,dc=$BASEDN"
+NETGRPDN="cn=ng,cn=alt,$BASEDN"
+ENTRY="NGP Definition"
 
 #########################################################################
 # TEST SECTIONS TO RUN
@@ -61,8 +61,8 @@ setup()
 	echo $CLIENT | grep $HOSTNAME
 	if [ $? -eq 0 ] ; then
 		rlLog "This is a CLIENT"
-		ssh root@$MASTER "echo $ADMINPW | ipa-host-net-manage disable" 
-		ssh root@$MASTER "echo $ADMINPW | ipa-host-net-manage status" > /tmp/plugin.out
+		ssh root@$MASTER "echo $ADMINPW | ipa-managed-entries --entry=\"$ENTRY\" disable" 
+		ssh root@$MASTER "echo $ADMINPW | ipa-managed-entries --entry=\"$ENTRY\" status" > /tmp/plugin.out
 		cat /tmp/plugin.out | grep "Plugin Disabled"
 		if [ $? -eq 0 ] ; then
 			rlPass "Host Net Manager Plugin is disabled"
@@ -72,8 +72,8 @@ setup()
 			
 	else
 		rlLog "This is an IPA server"
-		execNetgroupPlugin disable
-		status=`execNetgroupPlugin status`
+		execManageNGPPlugin disable
+		status=`execManageNGPPlugin status`
 		echo $status | grep "Plugin Disabled"
 		if [ $? -eq 0 ] ; then
 			rlPass "Host Net Manage Plugin is disabled"
@@ -140,8 +140,8 @@ cleanup()
 	echo $CLIENT | grep $HOSTNAME
         if [ $? -eq 0 ] ; then
                 rlLog "This is a CLIENT"
-                ssh root@$MASTER "echo $ADMINPW | ipa-host-net-manage disable" 
-                ssh root@$MASTER "echo $ADMINPW | ipa-host-net-manage status" > /tmp/plugin.out
+                ssh root@$MASTER "echo $ADMINPW | ipa-managed-entries --entry=\"${ENTRY}\" disable" 
+                ssh root@$MASTER "echo $ADMINPW | ipa-managed-entries --entry=\"${ENTRY}\" status" > /tmp/plugin.out
                 cat /tmp/plugin.out | grep "Plugin Disabled"
                 if [ $? -eq 0 ] ; then
                         rlPass "Host Net Manager Plugin is disabled"
@@ -151,8 +151,8 @@ cleanup()
                         
         else
                 rlLog "This is an IPA server"
-                execNetgroupPlugin disable
-                status=`execNetgroupPlugin status`
+                execManageNGPPlugin disable
+                status=`execManageNGPPlugin status`
                 echo $status | grep "Plugin Disabled"
                 if [ $? -eq 0 ] ; then
                         rlPass "Host Net Manage Plugin is disabled"
@@ -571,8 +571,8 @@ manage_netgroups_positive()
 		echo $CLIENT | grep $HOSTNAME
         	if [ $? -eq 0 ] ; then
                 	rlLog "This is a CLIENT"
-                	ssh root@$MASTER "echo $ADMINPW | ipa-host-net-manage enable" 
-                	ssh root@$MASTER "echo $ADMINPW | ipa-host-net-manage status" > /tmp/plugin.out
+                	ssh root@$MASTER "echo $ADMINPW | ipa-managed-entries \"${ENTR}Y\" enable" 
+                	ssh root@$MASTER "echo $ADMINPW | ipa-managed-entries \"${ENTRY}\" status" > /tmp/plugin.out
                 	cat /tmp/plugin.out | grep "Plugin Enabled"
                 	if [ $? -eq 0 ] ; then
                         	rlPass "Host Net Manager Plugin is enabled"
@@ -582,8 +582,8 @@ manage_netgroups_positive()
                         
         	else
                 	rlLog "This is an IPA server"
-                	execNetgroupPlugin enable
-                	status=`execNetgroupPlugin status`
+                	execManageNGPPlugin enable
+                	status=`execManageNGPPlugin status`
                 	echo $status | grep "Plugin Enabled"
                 	if [ $? -eq 0 ] ; then
                         	rlPass "Host Net Manage Plugin is enabled"
@@ -619,7 +619,7 @@ manage_netgroups_negative()
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-netgroup-049: manage netgroups: Incorrect directory manager password"
-		rlRun "ssh root@$MASTER \"echo badpassword | ipa-host-net-manage status\" > /tmp/pluginerr.out 2>&1" 1 "ipa manage net group status with incorrect directory manager password."
+		rlRun "ssh root@$MASTER \"echo badpassword | ipa-managed-entries status\" > /tmp/pluginerr.out 2>&1" 1 "ipa manage net group status with incorrect directory manager password."
 		cat /tmp/pluginerr.out | grep "Traceback"
 		if [ $? -eq 0 ] ; then
 			rlFail "ERROR: Traceback returned with bad directory manager password."
