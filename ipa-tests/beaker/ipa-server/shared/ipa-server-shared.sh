@@ -458,30 +458,23 @@ ipauser_exist()
 } #ipauser_exist
 
 #######################################################################
-# execNetgroupPlugin Usage:
-#       execNetgroupPlugin <enable | disable | status>
+# execManageNGPPlugin Usage:
+#       execManageNGPPlugin "NGP Definition" <enable | disable | status>
 # 
 #####################################################################
-execNetgroupPlugin()
+
+execManageNGPPlugin()
 {
+   local entry="NGP Definition"
    local option=$1
-   local password=$ADMINPW
-   local expfile=/tmp/netplugin.exp
-   local outfile=/tmp/netplugin.out
+   local outfile=/tmp/plugin.out
 
-   rm -rf $expfile
-   echo "spawn /usr/sbin/ipa-host-net-manage $option" > $expfile
-   echo 'expect "Directory Manager password: "' >> $expfile
-   echo "send $password" >> $expfile
-   echo 'send \r' >> $expfile
-   echo 'expect eof' >> $expfile
+   rlLog "Executing /usr/sbin/ipa-managed-entries --entry=\"$entry\" $option"
+   /usr/sbin/ipa-managed-entries --entry="$entry" $option
 
-   /usr/bin/expect $expfile > $outfile
-   rc=$?
-
+   /usr/sbin/ipa-managed-entries --entry="$entry" status 2>&1 > $outfile
    status=`cat $outfile`
-   echo $status
-   return $rc
+   rlLog "NPG Plugin Status: $status"
 }
 
 
