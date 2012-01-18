@@ -49,7 +49,6 @@
 # Test Suite Globals
 ########################################################################
 
-BASEDN="dc=$DOMAIN"
 HOSTGRPDN="cn=hostgroups,cn=accounts,"
 HOSTGRPRDN="$HOSTGRPDN$BASEDN"
 HOSTDN="cn=computers,cn=accounts,"
@@ -59,11 +58,11 @@ rlLog "HOSTDN is $HOSTRDN"
 rlLog "HOSTGRPDN is $HOSTGRPRDN"
 rlLog "Server is $MASTER"
 
-host1="nightcrawler."$DOMAIN
-host2="ivanova."$DOMAIN
-host3="samwise."$DOMAIN
-host4="shadowfall."$DOMAIN
-host5="qe-blade-23."$DOMAIN
+host1="nightcrawler.$DOMAIN"
+host2="ivanova.$DOMAIN"
+host3="samwise.$DOMAIN"
+host4="shadowfall.$DOMAIN"
+host5="qe-blade-23.$DOMAIN"
 
 group1="hostgrp1"
 group2="host group 2"
@@ -134,34 +133,34 @@ rlJournalStart
 
     rlPhaseStartTest "ipa-hostgroup-cli-05: Host group 1 memberships - one host" 
 	rlRun "addHostGroupMembers hosts $host1 \"$group1\"" 0 "Adding host $host1 to host group \"$group1\""
-	rlRun "verifyHostGroupMember $host1 host  \"$group1\"" 0 "Verify member"
+	rlRun "verifyHostGroupMember $host1 host \"$group1\"" 0 "Verify member"
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-hostgroup-cli-06: Hostgroup 2 memberships - two hosts"
 	rlRun "addHostGroupMembers hosts \"$host1,$host2\" \"$group2\"" 0 "Adding host $host1 and $host2 to host group \"$group2\""
-	rlRun "verifyHostGroupMember $host1 host  \"$group2\"" 0 "Verify member"
-	rlRun "verifyHostGroupMember $host2 host  \"$group2\"" 0 "Verify member"
+	rlRun "verifyHostGroupMember $host1 host \"$group2\"" 0 "Verify member"
+	rlRun "verifyHostGroupMember $host2 host \"$group2\"" 0 "Verify member"
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-hostgroup-cli-07: Host group 3 memberships - three hosts"
 	rlRun "addHostGroupMembers hosts \"$host2,$host3,$host4\" \"$group3\"" 0 "Adding host $host2, $host3 and $host4 to host group \"$group3\""
-	rlRun "verifyHostGroupMember $host2 host  \"$group3\"" 0 "Verify member"
-	rlRun "verifyHostGroupMember $host3 host  \"$group3\"" 0 "Verify member"
-	rlRun "verifyHostGroupMember $host4 host  \"$group3\"" 0 "Verify member"
+	rlRun "verifyHostGroupMember $host2 host \"$group3\"" 0 "Verify member"
+	rlRun "verifyHostGroupMember $host3 host \"$group3\"" 0 "Verify member"
+	rlRun "verifyHostGroupMember $host4 host \"$group3\"" 0 "Verify member"
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-hostgroup-cli-08: Host group 4 memberships - one host"
 	rlRun "addHostGroupMembers hosts $host5 \"$group4\"" 0 "Adding host $host5 to host group \"$group4\""
-	rlRun "verifyHostGroupMember $host5 host  \"$group4\"" 0 "Verify member"
+	rlRun "verifyHostGroupMember $host5 host \"$group4\"" 0 "Verify member"
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-hostgroup-cli-09: Host group 5 memberships - all hosts"
 	rlRun "addHostGroupMembers hosts \"$host1,$host2,$host3,$host4,$host5\" \"$group5\"" 0 "Adding host $host1, $host2, $host3, $host4 and $host5 to host group \"$group5\""
-	rlRun "verifyHostGroupMember $host1 host  \"$group5\"" 0 "Verify member"
-	rlRun "verifyHostGroupMember $host2 host  \"$group5\"" 0 "Verify member"
-	rlRun "verifyHostGroupMember $host3 host  \"$group5\"" 0 "Verify member"
-	rlRun "verifyHostGroupMember $host4 host  \"$group5\"" 0 "Verify member"
-	rlRun "verifyHostGroupMember $host5 host  \"$group5\"" 0 "Verify member"
+	rlRun "verifyHostGroupMember $host1 host \"$group5\"" 0 "Verify member"
+	rlRun "verifyHostGroupMember $host2 host \"$group5\"" 0 "Verify member"
+	rlRun "verifyHostGroupMember $host3 host \"$group5\"" 0 "Verify member"
+	rlRun "verifyHostGroupMember $host4 host \"$group5\"" 0 "Verify member"
+	rlRun "verifyHostGroupMember $host5 host \"$group5\"" 0 "Verify member"
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-hostgroup-cli-10: Nested Host Groups"
@@ -181,15 +180,15 @@ rlJournalStart
 
     rlPhaseStartTest "ipa-hostgroup-cli-13: Delete Host that is member of multiple host groups"
 	rlRun "deleteHost $host2" 0 "Deleting host $host2"
-	rlRun "verifyHostGroupMember \"$host2\" host  \"$group2\"" 4 "Verify member was removed"
-	rlRun "verifyHostGroupMember \"$host2\" host  \"$group3\"" 4 "Verify member was removed"
-	rlRun "verifyHostGroupMember \"$host2\" host  \"$group5\"" 4 "Verify member was removed"
+	rlRun "verifyHostGroupMember \"$host2\" host \"$group2\"" 4 "Verify member was removed"
+	rlRun "verifyHostGroupMember \"$host2\" host \"$group3\"" 4 "Verify member was removed"
+	rlRun "verifyHostGroupMember \"$host2\" host \"$group5\"" 4 "Verify member was removed"
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-hostgroup-cli-14: Delete Host Group that has multiple members"
         rlRun "deleteHostGroup \"$group3\"" 0 "Deleting host group \"$group3\""
-        rlRun "verifyHostGroupMember \"$host3\" host  \"$group3\"" 4 "Verify member was removed"
-        rlRun "verifyHostGroupMember \"$host4\" host  \"$group3\"" 4 "Verify member was removed"
+        rlRun "verifyHostGroupMember \"$host3\" host \"$group3\"" 4 "Verify member was removed"
+        rlRun "verifyHostGroupMember \"$host4\" host \"$group3\"" 4 "Verify member was removed"
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-hostgroup-cli-15: find hostgroup doesn't exist"
@@ -258,10 +257,10 @@ rlJournalStart
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-hostgroup-cli-25: Negative - setattr and addattr on cn"
-        command="ipa hostgroup-mod --setattr cn=\"cn=new,cn=groups,dc=$DOMAIN\" $group1"
+        command="ipa hostgroup-mod --setattr cn=\"cn=new,cn=groups,$BASEDN\" $group1"
         expmsg="ipa: ERROR: modifying primary key is not allowed"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
-        command="ipa hostgroup-mod --addattr cn=\"cn=new,cn=groups,dc=$DOMAIN\" $group1"
+        command="ipa hostgroup-mod --addattr cn=\"cn=new,cn=groups,$BASEDN\" $group1"
 	expmsg="ipa: ERROR: cn: Only one value allowed."
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
     rlPhaseEnd
@@ -278,18 +277,18 @@ rlJournalStart
 
     rlPhaseStartTest "ipa-hostgroup-cli-27: setattr and addattr on member"
         attr="member"
-	member1short="new.testrelm"
-	member2short="new2.testrelm"
+	member1short="new.$DOMAIN"
+	member2short="new2.$DOMAIN"
 	ipa host-add --force $member1short
 	ipa host-add --force $member2short
-        member1="fqdn=new.testrelm,$HOSTRDN"
-        member2="fqdn=new2.testrelm,$HOSTRDN"
+        member1="fqdn=new.$DOMAIN,$HOSTRDN"
+        member2="fqdn=new2.$DOMAIN,$HOSTRDN"
         rlRun "setAttribute hostgroup member \"$member1\" $group1" 0 "Setting member attribute"
 	rlRun "verifyHostGroupMember \"$member1short\" host \"$group1\"" 0 "Verify member was added"
 	rlRun "addAttribute hostgroup member \"$member2\" $group1" 0 "Adding additional member attribute"
 	rlRun "verifyHostGroupMember \"$member2short\" host \"$group1\"" 0 "Verify member was added"
-	ipa host-del new.testrelm
-	ipa host-del new2.testrelm
+	ipa host-del new.$DOMAIN
+	ipa host-del new2.$DOMAIN
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-hostgroup-cli-28: setattr and addattr on memberOf"
@@ -297,7 +296,7 @@ rlJournalStart
         member1="cn=bogus,$HOSTGRPRDN"
         member2="cn=bogus2,$HOSTGRPRDN"
         command="ipa hostgroup-mod --setattr $attr=\"$member1\" \"$group1\""
-        expmsg="ipa: ERROR: Insufficient access: Insufficient 'write' privilege to the 'memberOf' attribute of entry 'cn=hostgrp1,cn=hostgroups,cn=accounts,dc=testrelm'."
+        expmsg="ipa: ERROR: Insufficient access: Insufficient 'write' privilege to the 'memberOf' attribute of entry 'cn=hostgrp1,cn=hostgroups,cn=accounts,$BASEDN'."
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
         command="ipa hostgroup-mod --addattr $attr=\"$member2\" \"$group1\""
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
