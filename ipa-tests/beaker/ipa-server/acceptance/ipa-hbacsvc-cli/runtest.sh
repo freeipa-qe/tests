@@ -46,9 +46,6 @@
 # Test Suite Globals
 ########################################################################
 
-REALM=`os_getdomainname | tr "[a-z]" "[A-Z]"`
-DOMAIN=`os_getdomainname`
-
 service1="http"
 service2="https"
 service3="rlogin"
@@ -123,7 +120,7 @@ rlJournalStart
 
     rlPhaseStartTest "ipa-hbacsvc-cli-007: Negative - Service - setattr and addattr on memberOf"
         command="ipa hbacsvc-mod --setattr memberOf=SUDO $service1"
-	expmsg="ipa: ERROR: Insufficient access: Insufficient 'write' privilege to the 'memberOf' attribute of entry 'cn=$service1,cn=hbacservices,cn=hbac,dc=$DOMAIN'."
+	expmsg="ipa: ERROR: Insufficient access: Insufficient 'write' privilege to the 'memberOf' attribute of entry 'cn=$service1,cn=hbacservices,cn=hbac,$BASEDN'."
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message"
         command="ipa hbacsvc-mod --addattr memberOf=SUDO $service1"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message"
@@ -247,8 +244,8 @@ rlJournalStart
 
     rlPhaseStartTest "ipa-hbacscc-cli-023: Delete service group with service members."
 	rlRun "deleteHBACServiceGroup $servicegroup2" 0 "Deleting service group $servicegroup2"
-	rlRun "verifyHBACService http memberof \"cn=$servicegroup2,cn=hbacservicegroups,cn=accounts,dc=$DOMAIN\"" 1 "Verifying service exists but membership was removed."
-        rlRun "verifyHBACService https memberof \"cn=$servicegroup2,cn=hbacservicegroups,cn=accounts,dc=$DOMAIN\"" 1 "Verifying service exists but membership was removed."
+	rlRun "verifyHBACService http memberof \"cn=$servicegroup2,cn=hbacservicegroups,cn=accounts,$BASEDN\"" 1 "Verifying service exists but membership was removed."
+        rlRun "verifyHBACService https memberof \"cn=$servicegroup2,cn=hbacservicegroups,cn=accounts,$BASEDN\"" 1 "Verifying service exists but membership was removed."
     rlPhaseEnd
 
     rlPhaseStartCleanup "ipa-hbacsvc-cli-cleanup: Destroying admin credentials."
