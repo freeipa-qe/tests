@@ -52,7 +52,6 @@
 PACKAGE="ipa-admintools"
 ADMINPWD=$ADMINPW
 
-BASEDN="dc=$DOMAIN"
 USERRDN="cn=users,cn=accounts,"
 USERDN="$USERRDN$BASEDN"
 USERRDN="cn=users,cn=accounts,"
@@ -691,7 +690,7 @@ rlJournalStart
         member1="cn=bogus,$GROUPRDN"
         member2="cn=bogus2,$GROUPRDN"
         command="ipa group-mod --setattr $attr=\"$member1\" fish"
-        expmsg="ipa: ERROR: Insufficient access: Insufficient 'write' privilege to the 'memberOf' attribute of entry 'cn=fish,cn=groups,cn=accounts,dc=testrelm'."
+        expmsg="ipa: ERROR: Insufficient access: Insufficient 'write' privilege to the 'memberOf' attribute of entry 'cn=fish,cn=groups,cn=accounts,$BASEDN'."
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
         command="ipa group-mod --addattr $attr=\"$member2\" fish"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
