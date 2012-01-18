@@ -700,12 +700,12 @@ verifyHBACGroupMember()
 
   # construct memberDN
   memberCN="cn=$member"
-  memberDN="$memberCN,cn=hbacservices,cn=hbac,dc=$DOMAIN"
+  memberDN="$memberCN,cn=hbacservices,cn=hbac,$BASEDN"
   rlLog "Verifying Service: $memberDN"
 
   # construct groupDN
   mygroupCN="cn=$mygroup"
-  groupDN="$mygroupCN,cn=hbacservicegroups,cn=hbac,dc=$DOMAIN"
+  groupDN="$mygroupCN,cn=hbacservicegroups,cn=hbac,$BASEDN"
   rlLog "Verifying Service Group: $groupDN"
 
   # verify member attribute for group
