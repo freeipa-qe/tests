@@ -39,10 +39,10 @@
 . /dev/shm/ipa-server-shared.sh
 . /dev/shm/env.sh
 
-# Include test case file
-. ./tests.d/t.ipa-delegation-cli-cmd.sh
-. ./tests.d/t.ipa-delegation-cli-user.sh
-. ./tests.d/t.ipa-delegation-cli-bz.sh
+# Include test case files
+for file in $(ls tests.d/t.*.sh); do
+	. ./$file
+done
 
 PACKAGE="ipa-server"
 

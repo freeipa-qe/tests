@@ -29,7 +29,7 @@ export TESTVERSION=1.0
 
 BUILT_FILES=
 
-FILES=$(METADATA) runtest.sh Makefile PURPOSE t.ipa-delegation-cli-cmd.sh t.ipa-delegation-cli-users.sh t.ipa-delegation-cli-bz.sh
+FILES=$(METADATA) runtest.sh Makefile PURPOSE tests.d/t.*.sh
 
 .PHONY: all install download clean
 
@@ -42,6 +42,8 @@ build: $(BUILT_FILES)
 clean:
 	rm -f *~ $(BUILT_FILES)
 
+tests.d/%.sh:
+	chmod a+x $@
 
 include /usr/share/rhts/lib/rhts-make.include
 

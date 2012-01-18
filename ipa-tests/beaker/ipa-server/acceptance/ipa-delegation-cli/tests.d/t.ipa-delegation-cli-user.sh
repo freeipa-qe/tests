@@ -2,7 +2,7 @@
 # vim: dict=/usr/share/beakerlib/dictionary.vim cpt=.,w,b,u,t,i,k
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-#   t.ipa-delegation-cli-users.sh of /CoreOS/ipa-tests/acceptance/ipa-delegation-cli
+#   t.ipa-delegation-cli-user.sh of /CoreOS/ipa-tests/acceptance/ipa-delegation-cli
 #   Description: IPA delegation cli command acceptance tests
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # The following ipa delegation cli user/functional testing needed:
@@ -38,19 +38,19 @@
 ######################################################################
 # test suite
 ######################################################################
-ipa_delegation_cli_users()
+ipa_delegation_cli_user()
 {
-	ipa_delegation_cli_users_envsetup
-	ipa_delegation_cli_users_test
-	ipa_delegation_cli_users_envcleanup
+	ipa_delegation_cli_user_envsetup
+	ipa_delegation_cli_user_test
+	ipa_delegation_cli_user_envcleanup
 }
 
 ######################################################################
 # SETUP
 ######################################################################
-ipa_delegation_cli_users_envsetup()
+ipa_delegation_cli_user_envsetup()
 {
-	rlPhaseStartTest "ipa-delegation-cli-users-envsetup: "
+	rlPhaseStartTest "ipa_delegation_cli_user_envsetup: "
 		KinitAsAdmin
 	rlPhaseEnd
 }
@@ -58,9 +58,9 @@ ipa_delegation_cli_users_envsetup()
 ######################################################################
 # CLEANUP
 ######################################################################
-ipa_delegation_cli_users_envcleanup()
+ipa_delegation_cli_user_envcleanup()
 {
-	rlPhaseStartTest "ipa-delegation-cli-users-envcleanup: "
+	rlPhaseStartTest "ipa_delegation_cli_user_envcleanup: "
 		KinitAsAdmin
 	rlPhaseEnd
 }
@@ -68,9 +68,9 @@ ipa_delegation_cli_users_envcleanup()
 ######################################################################
 # delegation cli tests...
 ######################################################################
-ipa_delegation_cli_users_test()
+ipa_delegation_cli_user_test()
 {
-	rlPhaseStartTest "ipa-delegation-cli-users-test: delegation cli command test"
+	rlPhaseStartTest "ipa_delegation_cli_user_test: delegation cli command test"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		[ -f $tmpout ] && rm $tmpout

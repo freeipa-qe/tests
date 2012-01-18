@@ -2,12 +2,11 @@
 # vim: dict=/usr/share/beakerlib/dictionary.vim cpt=.,w,b,u,t,i,k
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-#   t.ipa-delegation-cli-bz.sh of /CoreOS/ipa-tests/acceptance/ipa-delegation-cli
-#   Description: IPA delegation cli BZ acceptance tests
+#   t.ipa-delegation-cli-mod.sh of /CoreOS/ipa-tests/acceptance/ipa-delegation-cli
+#   Description: IPA delegation cli command acceptance tests
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# The following ipa BZ's need to be tested:
-#  BZ BZID -- delegation cli BZ description...
-#
+# The following ipa delegation cli commands need to be tested:
+#   
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
 #   Author: Scott Poore <spoore@redhat.com>
@@ -37,50 +36,70 @@
 ######################################################################
 
 ######################################################################
-# test suite
+#   delegation-mod [positive]:
 ######################################################################
-ipa_delegation_cli_bz()
+ipa_delegation_cli_cmd_mod_positive()
 {
-	ipa_delegation_cli_bz_envsetup
-	#ipa_delegation_cli_bz_BZID
-	ipa_delegation_cli_bz_envcleanup
+	ipa_delegation_cli_cmd_mod_positive_envsetup
+	ipa_delegation_cli_cmd_mod_positive_1001
+	ipa_delegation_cli_cmd_mod_positive_envcleanup
 }
 
-######################################################################
-# SETUP
-######################################################################
-ipa_delegation_cli_bz_envsetup()
+ipa_delegation_cli_cmd_mod_positive_envsetup()
 {
-	rlPhaseStartTest "ipa-delegation-cli-bz-envsetup: "
+	rlPhaseStartTest "ipa_delegation_cli_cmd_mod_positive_envsetup: "
 		KinitAsAdmin
 	rlPhaseEnd
 }
 
-######################################################################
-# CLEANUP
-######################################################################
-ipa_delegation_cli_bz_envcleanup()
+ipa_delegation_cli_cmd_mod_positive_envcleanup()
 {
-	rlPhaseStartTest "ipa-delegation-cli-bz-envcleanup: "
+	rlPhaseStartTest "ipa_delegation_cli_cmd_mod_positive_envcleanup: "
 		KinitAsAdmin
 	rlPhaseEnd
 }
 
-######################################################################
-# delegation cli BZ description...
-######################################################################
-ipa_delegation_cli_bz_BZID()
+ipa_delegation_cli_cmd_mod_positive_1001()
 {
-	rlPhaseStartTest "ipa-delegation-cli-bz-BZID: delegation cli BZ description..."
+	rlPhaseStartTest "ipa_delegation_cli_cmd_mod_positive_1001: delete existing delegation"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
-		# Need some code to test if a version was from upgrade??? 
-		# Run some check to see if BZ found...
-		if [ $? -eq 0 ]; then
-			rlPass "BZ BZID not found"
-			# cleanup if necessary
-		elif [ $(grep "check output for BZ returned error message" $tmpout|wc -l) -eq 1 ]; then
-			rlFail "BZ BZID found...delegation cli BZ description..."
-		fi	
+#       NAME1
+		[ -f $tmpout ] && rm $tmpout
+	rlPhaseEnd
+}
+
+######################################################################
+#   delegation-mod [negative]:
+######################################################################
+ipa_delegation_cli_cmd_mod_negative()
+{
+	ipa_delegation_cli_cmd_mod_negative_envsetup
+	ipa_delegation_cli_cmd_mod_negative_1001
+	ipa_delegation_cli_cmd_mod_negative_envcleanup
+}
+
+
+ipa_delegation_cli_cmd_mod_negative_envsetup()
+{
+	rlPhaseStartTest "ipa_delegation_cli_cmd_mod_negative_envsetup: "
+		KinitAsAdmin
+	rlPhaseEnd
+}
+
+ipa_delegation_cli_cmd_mod_negative_envcleanup()
+{
+	rlPhaseStartTest "ipa_delegation_cli_cmd_mod_negative_envcleanup: "
+		KinitAsAdmin
+	rlPhaseEnd
+}
+
+ipa_delegation_cli_cmd_mod_negative_1001()
+{
+	rlPhaseStartTest "ipa_delegation_cli_cmd_mod_negative_1001: fail to delete non-existent delegation"
+		KinitAsAdmin
+		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
+#       badname
+		[ -f $tmpout ] && rm $tmpout
 	rlPhaseEnd
 }
