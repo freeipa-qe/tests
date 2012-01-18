@@ -29,7 +29,7 @@ export TESTVERSION=1.0
 
 BUILT_FILES=
 
-FILES=$(METADATA) runtest.sh Makefile PURPOSE tests.d/t.*.sh
+FILES=$(METADATA) runtest.sh Makefile PURPOSE tests.d tests.d/t.*.sh
 
 .PHONY: all install download clean
 
@@ -41,6 +41,9 @@ build: $(BUILT_FILES)
 
 clean:
 	rm -f *~ $(BUILT_FILES)
+
+tests.d:
+	chmod 755 $@
 
 tests.d/%.sh:
 	chmod a+x $@
