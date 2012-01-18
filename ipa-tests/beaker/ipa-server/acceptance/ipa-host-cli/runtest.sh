@@ -170,7 +170,7 @@ rlJournalStart
 
     rlPhaseStartTest "ipa-host-cli-12: Negative - add duplicate host"
 	command="ipa host-add $host1 --force"
-	expmsg="ipa: ERROR: host with name nightcrawler.testrelm already exists"
+	expmsg="ipa: ERROR: host with name nightcrawler.$DOMAIN already exists"
 	rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
     rlPhaseEnd
 
@@ -207,7 +207,7 @@ rlJournalStart
 
     rlPhaseStartTest "ipa-host-cli-17: Negative - setattr and addattr on serverHostName"
         command="ipa host-mod --setattr serverHostName=$host2 $host1"
-        expmsg="ipa: ERROR: Insufficient access: Insufficient 'write' privilege to the 'serverHostName' attribute of entry 'fqdn=$host1,cn=computers,cn=accounts,dc=$DOMAIN'."
+        expmsg="ipa: ERROR: Insufficient access: Insufficient 'write' privilege to the 'serverHostName' attribute of entry 'fqdn=$host1,cn=computers,cn=accounts,$BASEDN'."
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
         command="ipa host-mod --addattr serverHostName=$host2 $host1"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
@@ -246,7 +246,7 @@ rlJournalStart
 
     rlPhaseStartTest "ipa-host-cli-21:  Negative - setattr and addattr on enrolledBy"
         command="ipa host-mod --setattr enrolledBy=\"uid=user,cn=users,cn=accounts,dc=bos,dc=redhat,dc=com\" $host1"
-        expmsg="ipa: ERROR: Insufficient access: Insufficient 'write' privilege to the 'enrolledBy' attribute of entry 'fqdn=$host1,cn=computers,cn=accounts,dc=$DOMAIN'."
+        expmsg="ipa: ERROR: Insufficient access: Insufficient 'write' privilege to the 'enrolledBy' attribute of entry 'fqdn=$host1,cn=computers,cn=accounts,$BASEDN'."
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
         command="ipa host-mod --addattr enrolledBy=\"uid=user,cn=users,cn=accounts,dc=bos,dc=redhat,dc=com\" $host1"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
@@ -254,7 +254,7 @@ rlJournalStart
 
     rlPhaseStartTest "ipa-host-cli-22:  Negative - setattr and addattr on enrolledBy - invalid syntax"
         command="ipa host-mod --setattr enrolledBy=me $host1"
-        expmsg="ipa: ERROR: Insufficient access: Insufficient 'write' privilege to the 'enrolledBy' attribute of entry 'fqdn=$host1,cn=computers,cn=accounts,dc=$DOMAIN'."
+        expmsg="ipa: ERROR: Insufficient access: Insufficient 'write' privilege to the 'enrolledBy' attribute of entry 'fqdn=$host1,cn=computers,cn=accounts,$BASEDN'."
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
         command="ipa host-mod --addattr enrolledBy=you $host1"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
