@@ -174,6 +174,13 @@ installCA()
 	rlRun "mv /etc/hosts /tmp/"
 	rlRun "mv /var/tmp/hosts /etc/hosts" 0 " Restoring /etc/hosts"
 
+        echo "ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg" > /dev/shm/replica-install.bash
+        chmod 755 /dev/shm/replica-install.bash
+        rlLog "EXECUTING: ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg"
+        rlRun "/bin/bash /dev/shm/replica-install.bash" 0 "Replica installation"
+        rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
+
+
 	rlLog "Executing: ipa-ca-install -p $ADMINPW -w $ADMINPW --skip-conncheck --unattended /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg"
 	echo "ipa-ca-install -p $ADMINPW -w $ADMINPW --skip-conncheck --unattended /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg" > /dev/shm/replica-ca-install.bash
 	chmod 755 /dev/shm/replica-ca-install.bash
