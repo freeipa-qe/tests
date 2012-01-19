@@ -37,7 +37,7 @@ ipaclientinstall()
    ipaclientinstall_invalidrealm 
 
 #   --hostname The hostname of this server (FQDN). By default of nodename from uname(2) is used. 
-   ipaclientinstall_hostname 
+#   ipaclientinstall_hostname 
 
 
 
