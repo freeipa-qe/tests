@@ -1,4 +1,4 @@
-Owner:           Yi Zhang <yzhang@redhat.com>
+Owner:           Scott Poore <spoore@redhat.com>
 Name:            /CoreOS/ipa-server/acceptance/ipa-selfservice
 TestVersion:     1.0
 Path:            /mnt/tests/CoreOS/ipa-server/acceptance/ipa-selfservice

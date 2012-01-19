@@ -11,6 +11,11 @@
 #
 #   Author: Yi Zhang <yzhang@redhat.com>
 #   Date  : Sept 10, 2010
+# 
+#   Author: Scott Poore <spoore@redhat.com>
+#   Date  : Jan 16, 2012
+#   Update: Filled in test parameters for cli tests and added user
+#           and BZ tests
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
 #   Copyright (c) 2010 Red Hat, Inc. All rights reserved.
