@@ -110,8 +110,10 @@ public class GroupTests extends SahiTestScript{
 	@Test (groups={"modifyGroup_enrolluser"}, description="enroll single user as member", dataProvider="1st_User", dependsOnGroups="addGroup" )
 	public void modifyGroup_enrollSingleUser(String testScenario, String groupName, String userName){ 
 		browser.link(groupName).click();
-		GroupTasks.modifyGroup_enroll_single(browser, groupName, userName); 
+		GroupTasks.modifyGroup_enroll_user_single(browser, groupName, userName); 
 		Assert.assertTrue(browser.link(userName).exists(), "verify membership info: user:" + userName + " should be member of group:" + groupName); 
+		GroupTasks.modifyGroup_remove_user_single(browser, groupName, userName); 
+		Assert.assertFalse(browser.link(userName).exists(), "verify membership info: user:" + userName + " should NOT be member of group:" + groupName); 
 		browser.link("User Groups").in(browser.span("back-link")).click();
 	}
 	
@@ -119,9 +121,13 @@ public class GroupTests extends SahiTestScript{
 	public void modifyGroup_enrollMultiUsers(String testScenario, String groupName, String userName){
 		String [] users = userName.split(" ");
 		browser.link(groupName).click();
-		GroupTasks.modifyGroup_enroll_multipul(browser, groupName, users);
+		GroupTasks.modifyGroup_enroll_user_multipul(browser, groupName, users);
 		for (String user:users){
 			Assert.assertTrue(browser.link(user).exists(), "verify membership info: user:[" + user + "] should be member of group:" + groupName); 
+		}
+		GroupTasks.modifyGroup_remove_user_multipul(browser, groupName, users);
+		for (String user:users){
+			Assert.assertFalse(browser.link(user).exists(), "verify membership info: user:[" + user + "] should NOT be member of group:" + groupName); 
 		}
 		browser.link("User Groups").in(browser.span("back-link")).click();
 	}
@@ -129,7 +135,7 @@ public class GroupTests extends SahiTestScript{
 	@Test (groups={"modifyGroup_enrolluser"}, description="enroll users by use search filter", dataProvider="5th_User", dependsOnGroups="addGroup" )
 	public void modifyGroup_enrollViaSearch(String testScenario, String groupName, String userName){
  		browser.link(groupName).click();
-		GroupTasks.modifyGroup_enroll_via_search(browser, groupName, userName); 
+		GroupTasks.modifyGroup_enroll_user_viasearch(browser, groupName, userName); 
 		Assert.assertTrue(browser.link(userName).exists(), "verify membership info: user:" + userName + " should be member of group:" + groupName); 
 		browser.link("User Groups").in(browser.span("back-link")).click();
 	}
@@ -137,16 +143,25 @@ public class GroupTests extends SahiTestScript{
 	@Test (groups={"modifyGroup_enrolluser"}, description="enroll: cancel enrollment, ensure user not member of group", dataProvider="6th_User", dependsOnGroups="addGroup" )
 	public void modifyGroup_enrollCancel(String testScenario, String groupName, String userName){
  		browser.link(groupName).click();
-		GroupTasks.modifyGroup_enroll_cancel(browser, groupName, userName); 
+		GroupTasks.modifyGroup_enroll_user_cancel(browser, groupName, userName); 
 		Assert.assertFalse(browser.link(userName).exists(), "verify membership info: user:" + userName + " should be member of group:" + groupName); 
 		browser.link("User Groups").in(browser.span("back-link")).click();
 	}
 
+	@Test (groups={"modifyGroup_enrolluser_negative"}, description="negative test case for user enrollment", dataProvider="enrolluser_negative", dependsOnGroups="addGroup")
+	public void modifyGroup_member_group_negative(String testScenario, String groupName, String negData){
+		browser.link(groupName).click();
+		//GroupTasks.modifyGroup_enroll_member_negative(groupName,  negData);
+		browser.link("User Groups").in(browser.span("back-link")).click();
+	}
+	
 	@Test (groups={"modifyGroup_enrollgroup"}, description = "add other (single) user groups as member, create nested group", dataProvider="childGroup_single_member")
 	public void modifyGroup_member_group_single(String testScenario, String groupName, String childGroup){
 		browser.link(groupName).click();
 		GroupTasks.modifyGroup_enroll_member_group_single(browser, groupName, childGroup);
 		Assert.assertTrue(browser.link(childGroup).exists(), "verify membership info: group ("+childGroup+") should be member of group: ("+groupName+")");
+		GroupTasks.modifyGroup_remove_member_group_single(browser, groupName, childGroup);
+		Assert.assertFalse(browser.link(childGroup).exists(), "verify membership info: group ("+childGroup+") should NOT be member of group: ("+groupName+")");
 		browser.link("User Groups").in(browser.span("back-link")).click();
 	}
 	
@@ -157,6 +172,9 @@ public class GroupTests extends SahiTestScript{
 		GroupTasks.modifyGroup_enroll_member_group_multiple(browser, groupName, group);
 		for (String childGroup: group)
 			Assert.assertTrue(browser.link(childGroup).exists(), "verify membership info: group ("+childGroup+") should be member of group: ("+groupName+")");
+		GroupTasks.modifyGroup_remove_member_group_multiple(browser, groupName, group);
+		for (String childGroup: group)
+			Assert.assertFalse(browser.link(childGroup).exists(), "verify membership info: group ("+childGroup+") should NOT be member of group: ("+groupName+")");
 		browser.link("User Groups").in(browser.span("back-link")).click();
 	}
 	

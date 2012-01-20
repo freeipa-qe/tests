@@ -315,14 +315,20 @@ public class GroupTasks {
 		sahiTasks.link("User Groups").in(sahiTasks.div("content")).click();
 	}
 
-	public static void modifyGroup_enroll_single(SahiTasks browser, String groupName, String userName) {
+	public static void modifyGroup_enroll_user_single(SahiTasks browser, String groupName, String userName) {
         browser.link("Add").click();
         browser.checkbox(userName).check();
         browser.span(">>").click();
         browser.button("Add").click(); 
 	}
 
-	public static void modifyGroup_enroll_multipul(SahiTasks browser, String groupName, String[] users) {
+	public static void modifyGroup_remove_user_single(SahiTasks browser, String groupName, String userName) {
+        browser.checkbox(userName).check();
+        browser.span("Delete").click();
+        browser.button("Delete").click(); 
+	}
+	
+	public static void modifyGroup_enroll_user_multipul(SahiTasks browser, String groupName, String[] users) {
         browser.link("Add").click();
         for (String userName:users)
         	browser.checkbox(userName).check();
@@ -330,7 +336,14 @@ public class GroupTasks {
         browser.button("Add").click();  
 	}
 
-	public static void modifyGroup_enroll_via_search(SahiTasks browser,String groupName, String userName) {
+	public static void  modifyGroup_remove_user_multipul(SahiTasks browser, String groupName, String[] users) {
+        for (String userName:users)
+        	browser.checkbox(userName).check();
+        browser.span("Delete").click();
+        browser.button("Delete").click(); 
+	}
+	
+	public static void modifyGroup_enroll_user_viasearch(SahiTasks browser,String groupName, String userName) {
         browser.link("Add").click();
         browser.textbox("filter").setValue(userName); 
         browser.span("Find").click();
@@ -339,7 +352,7 @@ public class GroupTasks {
         browser.button("Add").click();  
 	}
 
-	public static void modifyGroup_enroll_cancel(SahiTasks browser,String groupName, String userName) {
+	public static void modifyGroup_enroll_user_cancel(SahiTasks browser,String groupName, String userName) {
         browser.link("Add").click();
         browser.checkbox(userName).check();
         browser.span(">>").click();
@@ -354,6 +367,13 @@ public class GroupTasks {
         browser.button("Add").click();  
 	}
 
+	public static void modifyGroup_remove_member_group_single(SahiTasks browser,String groupName, String childGroup) {
+		browser.link("member_group").click(); 
+        browser.checkbox(childGroup).check();
+        browser.span("Delete").click();
+        browser.button("Delete").click();  
+	}
+	
 	public static void modifyGroup_enroll_member_group_multiple(SahiTasks browser,String groupName, String[] childGroups) {
 		browser.link("member_group").click();
         browser.link("Add").click(); 
@@ -363,6 +383,14 @@ public class GroupTasks {
         browser.button("Add").click();  
 	}
 
+	public static void modifyGroup_remove_member_group_multiple(SahiTasks browser,String groupName, String[] childGroups) {
+		browser.link("member_group").click(); 
+        for (String childGroup:childGroups)
+        	browser.checkbox(childGroup).check();
+        browser.span("Delete").click();
+        browser.button("Delete").click();  
+	}
+	
 	public static void modifyGroup_enroll_member_group_viasearch(SahiTasks browser,String groupName, String childGroup) {
 		browser.link("member_group").click();
         browser.link("Add").click();
@@ -381,6 +409,13 @@ public class GroupTasks {
         browser.button("Add").click();  
 	}
 
+	public static void modifyGroup_remove_memberof_group_single(SahiTasks browser,String groupName, String childGroup) {
+		browser.link("memberof_group").click(); 
+        browser.checkbox(childGroup).check();
+        browser.span("Delete").click();
+        browser.button("Delete").click();  
+	}
+	
 	public static void modifyGroup_enroll_memberof_group_multiple(SahiTasks browser,String groupName, String[] childGroups) {
 		browser.link("memberof_group").click();
         browser.link("Add").click(); 
@@ -389,7 +424,14 @@ public class GroupTasks {
         browser.span(">>").click();
         browser.button("Add").click();  
 	}
-
+	
+	public static void modifyGroup_remove_memberof_group_multiple(SahiTasks browser,String groupName, String[] childGroups) {
+		browser.link("memberof_group").click(); 
+        for (String childGroup:childGroups)
+        	browser.checkbox(childGroup).check();
+        browser.span("Delete").click();
+        browser.button("Delete").click();  
+	}
 	public static void modifyGroup_enroll_memberof_group_viasearch(SahiTasks browser,String groupName, String childGroup) {
 		browser.link("memberof_group").click();
         browser.link("Add").click();
@@ -405,6 +447,13 @@ public class GroupTasks {
 		browser.textarea("description").setValue(description);
 		browser.textbox("gidnumber").setValue(gid);
 		browser.span("Update").click();
+	}
+
+	public static void modifyGroup_enroll_member_negative(SahiTasks browser, String groupName,	String negData) {
+		browser.link("member_group").click();
+		// add user to group twice : not possible in current ui implementation 1/20/2012
+		
+		
 	}
 	
 }//class Group Tasks
