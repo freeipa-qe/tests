@@ -8,10 +8,12 @@
 			    <run>
 			        <include name="setup" />
 			        <include name="init" />
-			        <include name="addGroup" />
+			        <include name="addGroup" /> 
 			        <include name="addGroup_negative" />
 			        <include name="modifyGroup_enrolluser" />
-			        <include name="deleteGroup" />
+			        <include name="modifyGroup_enrollgroup" />
+			        <include name="modifyGrooup_settings" /> 
+			        <include name="deleteGroup" /> 
 			    </run>
 			</groups>
 			<classes>

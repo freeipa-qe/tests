@@ -652,6 +652,98 @@ public class GroupTasks {
             sahiTasks.link("Delete[1]").click();
             //sahiTasks.button("Delete").click(); 
     }// smokeTest
+
+	public static void modifyGroup_enroll_single(SahiTasks browser, String groupName, String userName) {
+        browser.link("Add").click();
+        browser.checkbox(userName).check();
+        browser.span(">>").click();
+        browser.button("Add").click(); 
+	}
+
+	public static void modifyGroup_enroll_multipul(SahiTasks browser, String groupName, String[] users) {
+        browser.link("Add").click();
+        for (String userName:users)
+        	browser.checkbox(userName).check();
+        browser.span(">>").click();
+        browser.button("Add").click();  
+	}
+
+	public static void modifyGroup_enroll_via_search(SahiTasks browser,String groupName, String userName) {
+        browser.link("Add").click();
+        browser.textbox("filter").setValue(userName); 
+        browser.span("Find").click();
+        browser.checkbox(userName).check();
+        browser.span(">>").click();
+        browser.button("Add").click();  
+	}
+
+	public static void modifyGroup_enroll_cancel(SahiTasks browser,String groupName, String userName) {
+        browser.link("Add").click();
+        browser.checkbox(userName).check();
+        browser.span(">>").click();
+        browser.button("Cancel").click(); 
+	}
+
+	public static void modifyGroup_enroll_member_group_single(SahiTasks browser,String groupName, String childGroup) {
+		browser.link("member_group").click();
+        browser.link("Add").click(); 
+        browser.checkbox(childGroup).check();
+        browser.span(">>").click();
+        browser.button("Add").click();  
+	}
+
+	public static void modifyGroup_enroll_member_group_multiple(SahiTasks browser,String groupName, String[] childGroups) {
+		browser.link("member_group").click();
+        browser.link("Add").click(); 
+        for (String childGroup:childGroups)
+        	browser.checkbox(childGroup).check();
+        browser.span(">>").click();
+        browser.button("Add").click();  
+	}
+
+	public static void modifyGroup_enroll_member_group_viasearch(SahiTasks browser,String groupName, String childGroup) {
+		browser.link("member_group").click();
+        browser.link("Add").click();
+        browser.textbox("filter").setValue(childGroup); 
+        browser.span("Find").click();
+        browser.checkbox(childGroup).check();
+        browser.span(">>").click();
+        browser.button("Add").click();  
+	}
     
+	public static void modifyGroup_enroll_memberof_group_single(SahiTasks browser,String groupName, String childGroup) {
+		browser.link("memberof_group").click();
+        browser.link("Add").click(); 
+        browser.checkbox(childGroup).check();
+        browser.span(">>").click();
+        browser.button("Add").click();  
+	}
+
+	public static void modifyGroup_enroll_memberof_group_multiple(SahiTasks browser,String groupName, String[] childGroups) {
+		browser.link("memberof_group").click();
+        browser.link("Add").click(); 
+        for (String childGroup:childGroups)
+        	browser.checkbox(childGroup).check();
+        browser.span(">>").click();
+        browser.button("Add").click();  
+	}
+
+	public static void modifyGroup_enroll_memberof_group_viasearch(SahiTasks browser,String groupName, String childGroup) {
+		browser.link("memberof_group").click();
+        browser.link("Add").click();
+        browser.textbox("filter").setValue(childGroup); 
+        browser.span("Find").click();
+        browser.checkbox(childGroup).check();
+        browser.span(">>").click();
+        browser.button("Add").click();  
+	}
+
+	public static void modifyGroup_settings(SahiTasks browser,String description, String gid) {
+		browser.link("Settings").click();
+		browser.textarea("description").setValue(description);
+		browser.textbox("gidnumber").setValue(gid);
+		browser.span("Update").click();
+	}
+	
 }//class Group Tasks
 
