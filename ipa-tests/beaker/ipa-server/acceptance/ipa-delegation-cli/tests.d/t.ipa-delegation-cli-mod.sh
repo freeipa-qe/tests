@@ -38,30 +38,30 @@
 ######################################################################
 #   delegation-mod [positive]:
 ######################################################################
-ipa_delegation_cli_cmd_mod_positive()
+delegation_mod_positive()
 {
-	ipa_delegation_cli_cmd_mod_positive_envsetup
-	ipa_delegation_cli_cmd_mod_positive_1001
-	ipa_delegation_cli_cmd_mod_positive_envcleanup
+	delegation_mod_positive_envsetup
+	delegation_mod_positive_1001
+	delegation_mod_positive_envcleanup
 }
 
-ipa_delegation_cli_cmd_mod_positive_envsetup()
+delegation_mod_positive_envsetup()
 {
-	rlPhaseStartTest "ipa_delegation_cli_cmd_mod_positive_envsetup: "
+	rlPhaseStartTest "delegation_mod_positive_envsetup: "
 		KinitAsAdmin
 	rlPhaseEnd
 }
 
-ipa_delegation_cli_cmd_mod_positive_envcleanup()
+delegation_mod_positive_envcleanup()
 {
-	rlPhaseStartTest "ipa_delegation_cli_cmd_mod_positive_envcleanup: "
+	rlPhaseStartTest "delegation_mod_positive_envcleanup: "
 		KinitAsAdmin
 	rlPhaseEnd
 }
 
-ipa_delegation_cli_cmd_mod_positive_1001()
+delegation_mod_positive_1001()
 {
-	rlPhaseStartTest "ipa_delegation_cli_cmd_mod_positive_1001: delete existing delegation"
+	rlPhaseStartTest "delegation_mod_positive_1001: delete existing delegation"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 #       NAME1
@@ -72,31 +72,31 @@ ipa_delegation_cli_cmd_mod_positive_1001()
 ######################################################################
 #   delegation-mod [negative]:
 ######################################################################
-ipa_delegation_cli_cmd_mod_negative()
+delegation_mod_negative()
 {
-	ipa_delegation_cli_cmd_mod_negative_envsetup
-	ipa_delegation_cli_cmd_mod_negative_1001
-	ipa_delegation_cli_cmd_mod_negative_envcleanup
+	delegation_mod_negative_envsetup
+	delegation_mod_negative_1001
+	delegation_mod_negative_envcleanup
 }
 
 
-ipa_delegation_cli_cmd_mod_negative_envsetup()
+delegation_mod_negative_envsetup()
 {
-	rlPhaseStartTest "ipa_delegation_cli_cmd_mod_negative_envsetup: "
+	rlPhaseStartTest "delegation_mod_negative_envsetup: "
 		KinitAsAdmin
 	rlPhaseEnd
 }
 
-ipa_delegation_cli_cmd_mod_negative_envcleanup()
+delegation_mod_negative_envcleanup()
 {
-	rlPhaseStartTest "ipa_delegation_cli_cmd_mod_negative_envcleanup: "
+	rlPhaseStartTest "delegation_mod_negative_envcleanup: "
 		KinitAsAdmin
 	rlPhaseEnd
 }
 
-ipa_delegation_cli_cmd_mod_negative_1001()
+delegation_mod_negative_1001()
 {
-	rlPhaseStartTest "ipa_delegation_cli_cmd_mod_negative_1001: fail to delete non-existent delegation"
+	rlPhaseStartTest "delegation_mod_negative_1001: fail to delete non-existent delegation"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 #       badname

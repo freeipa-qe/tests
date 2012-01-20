@@ -38,33 +38,35 @@
 ######################################################################
 #   delegation-del [positive]:
 ######################################################################
-ipa_delegation_cli_cmd_del_positive()
+delegation_del_positive()
 {
-	ipa_delegation_cli_cmd_del_positive_envsetup
-	ipa_delegation_cli_cmd_del_positive_1001
-	ipa_delegation_cli_cmd_del_positive_envcleanup
+	delegation_del_positive_envsetup
+	delegation_del_positive_1001
+	delegation_del_positive_envcleanup
 }
 
-ipa_delegation_cli_cmd_del_positive_envsetup()
+delegation_del_positive_envsetup()
 {
-	rlPhaseStartTest "ipa_delegation_cli_cmd_del_positive_envsetup: "
+	rlPhaseStartTest "delegation_del_positive_envsetup: "
+		KinitAsAdmin
+		rlRun "ipa delegation-add delegation_del_positive_1001 --membergroup=admins --group=ipausers --attrs=mobile"
+	rlPhaseEnd
+}
+
+delegation_del_positive_envcleanup()
+{
+	rlPhaseStartTest "delegation_del_positive_envcleanup: "
 		KinitAsAdmin
 	rlPhaseEnd
 }
 
-ipa_delegation_cli_cmd_del_positive_envcleanup()
+delegation_del_positive_1001()
 {
-	rlPhaseStartTest "ipa_delegation_cli_cmd_del_positive_envcleanup: "
-		KinitAsAdmin
-	rlPhaseEnd
-}
-
-ipa_delegation_cli_cmd_del_positive_1001()
-{
-	rlPhaseStartTest "ipa_delegation_cli_cmd_del_positive_1001: delete existing delegation"
+	rlPhaseStartTest "delegation_del_positive_1001: delete existing delegation"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 #       NAME1
+		rlRun "ipa delegation-del $FUNCNAME" 
 		[ -f $tmpout ] && rm $tmpout
 	rlPhaseEnd
 }
@@ -72,34 +74,36 @@ ipa_delegation_cli_cmd_del_positive_1001()
 ######################################################################
 #   delegation-del [negative]:
 ######################################################################
-ipa_delegation_cli_cmd_del_negative()
+delegation_del_negative()
 {
-	ipa_delegation_cli_cmd_del_negative_envsetup
-	ipa_delegation_cli_cmd_del_negative_1001
-	ipa_delegation_cli_cmd_del_negative_envcleanup
+	delegation_del_negative_envsetup
+	delegation_del_negative_1001
+	delegation_del_negative_envcleanup
 }
 
 
-ipa_delegation_cli_cmd_del_negative_envsetup()
+delegation_del_negative_envsetup()
 {
-	rlPhaseStartTest "ipa_delegation_cli_cmd_del_negative_envsetup: "
+	rlPhaseStartTest "delegation_del_negative_envsetup: "
 		KinitAsAdmin
 	rlPhaseEnd
 }
 
-ipa_delegation_cli_cmd_del_negative_envcleanup()
+delegation_del_negative_envcleanup()
 {
-	rlPhaseStartTest "ipa_delegation_cli_cmd_del_negative_envcleanup: "
+	rlPhaseStartTest "delegation_del_negative_envcleanup: "
 		KinitAsAdmin
 	rlPhaseEnd
 }
 
-ipa_delegation_cli_cmd_del_negative_1001()
+delegation_del_negative_1001()
 {
-	rlPhaseStartTest "ipa_delegation_cli_cmd_del_negative_1001: fail to delete non-existent delegation"
+	rlPhaseStartTest "delegation_del_negative_1001: fail to delete non-existent delegation"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 #       badname
+		rlRun "ipa delegation-del badname > $tmpout 2>&1" 2
+		rlAssertGrep "ipa: ERROR: ACI with name \"badname\" not found" $tmpout
 		[ -f $tmpout ] && rm $tmpout
 	rlPhaseEnd
 }

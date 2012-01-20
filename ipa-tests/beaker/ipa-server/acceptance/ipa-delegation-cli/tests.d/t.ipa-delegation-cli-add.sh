@@ -53,7 +53,7 @@ delegation_add_positive_envsetup()
 {
 	rlPhaseStartTest "delegation_add_positive_envsetup: "
 		KinitAsAdmin
-		for i in $(seq 1001 1002); do
+		for i in $(seq 1001 1005); do
 			rlRun "ipa group-add mg$i --desc=mg$i"
 			rlRun "ipa group-add gr$i --desc=gr$i"
 		done
@@ -64,7 +64,7 @@ delegation_add_positive_envcleanup()
 {
 	rlPhaseStartTest "delegation_add_positive_envcleanup: Cleanup add positive test settings"
 		KinitAsAdmin
-		for i in $(seq 1001 1002); do
+		for i in $(seq 1001 1005); do
 			rlRun "ipa group-del mg$i"
 			rlRun "ipa group-del gr$i"
 			rlRun "ipa delegation-del delegation_add_positive_$i"
@@ -171,6 +171,13 @@ delegation_add_negative_envcleanup()
 {
 	rlPhaseStartTest "delegation_add_negative_envcleanup: Cleanup add negative test settings"
 		KinitAsAdmin
+		for i in $(seq 1001 1019); do
+			rlRun "ipa group-del mg$i"
+			rlRun "ipa group-del gr$i"
+		done
+		for i in $(ipa delegation-find|grep delegation_add_negative_ |awk '{print $3}'); do
+			rlRun "ipa delegation-del $i"
+		done
 	rlPhaseEnd
 }
 
@@ -238,14 +245,18 @@ delegation_add_negative_1005()
 	rlPhaseEnd
 }
 
-delegation_add_negative_1006()
+delegation_add_negative_1006() #BZ 783307 -- ipa delegation-add is not failing when membergroup does not exist
 {
 	rlPhaseStartTest "delegation_add_negative_1006: add with missing membergroup"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 #       NAME1 --membergroup=badgroup --group=GROUP12 --attrs=ATTRS
 		rlRun "ipa delegation-add $FUNCNAME --membergroup=badgroup --group=gr1006 --attrs=mobile > $tmpout 2>&1" 1
-		rlAssertGrep "ERROR" $tmpout
+		rlAssertGrep "NEEDERROR" $tmpout
+		if [ $(egrep "Added delegation \"$FUNCNAME\"|badgroup" $tmpout|wc -l) -eq 2 ]; then	
+			rlFail "BZ 783307 -- ipa delegation-add is not failing when membergroup does not exist"
+			cat $tmpout
+		fi
 		[ -f $tmpout ] && rm $tmpout
 	rlPhaseEnd
 }
@@ -258,7 +269,7 @@ delegation_add_negative_1007()
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 #       NAME1 --membergroup=GROUP11 --group="" --attrs=ATTRS
 		rlRun "ipa delegation-add $FUNCNAME --membergroup=mg1007 --group=\"\" --attrs=mobile > $tmpout 2>&1" 1
-		rlAssertGrep "ERROR" $tmpout
+		rlAssertGrep "ipa: ERROR: 'group' is required" $tmpout
 		[ -f $tmpout ] && rm $tmpout
 	rlPhaseEnd
 }
@@ -270,7 +281,7 @@ delegation_add_negative_1008()
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 #       NAME1 --membergroup=GROUP11 --group=" " --attrs=ATTRS
 		rlRun "ipa delegation-add $FUNCNAME --membergroup=mg1008 --group=\" \" --attrs=mobile > $tmpout 2>&1" 1
-		rlAssertGrep "ERROR" $tmpout
+		rlAssertGrep "ipa: ERROR: invalid 'group': Leading and trailing spaces are not allowed" $tmpout
 		[ -f $tmpout ] && rm $tmpout
 	rlPhaseEnd
 }
@@ -281,8 +292,8 @@ delegation_add_negative_1009()
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 #       NAME1 --membergroup=GROUP11 --group=badgroup --attrs=ATTRS
-		rlRun "ipa delegation-add $FUNCNAME --membergroup=mg1009 --group=badgroup --attrs=mobile > $tmpout 2>&1" 1
-		rlAssertGrep "ERROR" $tmpout
+		rlRun "ipa delegation-add $FUNCNAME --membergroup=mg1009 --group=badgroup --attrs=mobile > $tmpout 2>&1" 2
+		rlAssertGrep "ipa: ERROR: Group 'badgroup' does not exist" $tmpout
 		[ -f $tmpout ] && rm $tmpout
 	rlPhaseEnd
 }
@@ -295,7 +306,7 @@ delegation_add_negative_1010()
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 #       NAME1 --membergroup=GROUP11 --group=GROUP12 --attrs=""
 		rlRun "ipa delegation-add $FUNCNAME --membergroup=mg1010 --group=gr1010 --attrs=\"\" > $tmpout 2>&1" 1
-		rlAssertGrep "ERROR" $tmpout
+		rlAssertGrep "ipa: ERROR: 'attrs' is required" $tmpout
 		[ -f $tmpout ] && rm $tmpout
 	rlPhaseEnd
 }
@@ -307,7 +318,7 @@ delegation_add_negative_1011()
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 #       NAME1 --membergroup=GROUP11 --group=GROUP12 --attrs=" "
 		rlRun "ipa delegation-add $FUNCNAME --membergroup=mg1011 --group=gr1011 --attrs=\" \" > $tmpout 2>&1" 1
-		rlAssertGrep "ERROR" $tmpout
+		rlAssertGrep "ipa: ERROR: 'attrs' is required" $tmpout
 		[ -f $tmpout ] && rm $tmpout
 	rlPhaseEnd
 }
@@ -319,7 +330,7 @@ delegation_add_negative_1012()
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 #       NAME1 --membergroup=GROUP11 --group=GROUP12 --attrs=" ,"
 		rlRun "ipa delegation-add $FUNCNAME --membergroup=mg1012 --group=gr1012 --attrs=\" ,\" > $tmpout 2>&1" 1
-		rlAssertGrep "ERROR" $tmpout
+		rlAssertGrep "ipa: ERROR: 'attrs' is required" $tmpout
 		[ -f $tmpout ] && rm $tmpout
 	rlPhaseEnd
 }
@@ -331,7 +342,7 @@ delegation_add_negative_1013()
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 #       NAME1 --membergroup=GROUP11 --group=GROUP12 --attrs=badattr
 		rlRun "ipa delegation-add $FUNCNAME --membergroup=mg1013 --group=gr1013 --attrs=badattr > $tmpout 2>&1" 1
-		rlAssertGrep "ERROR" $tmpout
+		rlAssertGrep "ipa: ERROR: targetattr \"badattr\" does not exist in schema." $tmpout
 		[ -f $tmpout ] && rm $tmpout
 	rlPhaseEnd
 }
@@ -342,8 +353,8 @@ delegation_add_negative_1014()
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 #       NAME1 --membergroup=GROUP11 --group=GROUP12 --attrs=badattr,ATTRS
-		rlRun "ipa delegation-add $FUNCNAME --membergroup=mg1014 --group=gr1014 --attrs=badattrs,mobile > $tmpout 2>&1" 1
-		rlAssertGrep "ERROR" $tmpout
+		rlRun "ipa delegation-add $FUNCNAME --membergroup=mg1014 --group=gr1014 --attrs=badattr,mobile > $tmpout 2>&1" 1
+		rlAssertGrep "ipa: ERROR: targetattr \"badattr\" does not exist in schema." $tmpout
 		[ -f $tmpout ] && rm $tmpout
 	rlPhaseEnd
 }
@@ -356,7 +367,7 @@ delegation_add_negative_1015()
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 #       NAME1 --membergroup=GROUP11 --group=GROUP12 --attrs=ATTRS --permissions=""
 		rlRun "ipa delegation-add $FUNCNAME --membergroup=mg1015 --group=gr1015 --attrs=mobile --permissions=\"\" > $tmpout 2>&1" 1
-		rlAssertGrep "ERROR" $tmpout
+		rlAssertGrep "ipa: ERROR: 'permissions' is required" $tmpout
 		[ -f $tmpout ] && rm $tmpout
 	rlPhaseEnd
 }
@@ -368,19 +379,19 @@ delegation_add_negative_1016()
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 #       NAME1 --membergroup=GROUP11 --group=GROUP12 --attrs=ATTRS --permissions=" "
 		rlRun "ipa delegation-add $FUNCNAME --membergroup=mg1016 --group=gr1016 --attrs=mobile --permissions=\" \" > $tmpout 2>&1" 1
-		rlAssertGrep "ERROR" $tmpout
+		rlAssertGrep "ipa: ERROR: 'permissions' is required" $tmpout
 		[ -f $tmpout ] && rm $tmpout
 	rlPhaseEnd
 }
 
 delegation_add_negative_1017()
 {
-	rlPhaseStartTest "delegation_add_negative_1017: add with space for permissions"
+	rlPhaseStartTest "delegation_add_negative_1017: add with space comma for permissions"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 #       NAME1 --membergroup=GROUP11 --group=GROUP12 --attrs=ATTRS --permissions=" ,"
 		rlRun "ipa delegation-add $FUNCNAME --membergroup=mg1017 --group=gr1017 --attrs=mobile --permissions=\" ,\" > $tmpout 2>&1" 1
-		rlAssertGrep "ERROR" $tmpout
+		rlAssertGrep "ipa: ERROR: 'permissions' is required" $tmpout
 		[ -f $tmpout ] && rm $tmpout
 	rlPhaseEnd
 }
@@ -392,7 +403,7 @@ delegation_add_negative_1018()
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 #       NAME1 --membergroup=GROUP11 --group=GROUP12 --attrs=ATTRS --permissions=badperm
 		rlRun "ipa delegation-add $FUNCNAME --membergroup=mg1018 --group=gr1018 --attrs=mobile --permissions=badperm > $tmpout 2>&1" 1
-		rlAssertGrep "ERROR" $tmpout
+		rlAssertGrep "ipa: ERROR: invalid 'permissions': \"badperm\" is not a valid permission" $tmpout
 		[ -f $tmpout ] && rm $tmpout
 	rlPhaseEnd
 }
@@ -404,7 +415,7 @@ delegation_add_negative_1019()
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 #       NAME1 --membergroup=GROUP11 --group=GROUP12 --attrs=ATTRS --permissions=badperm,write
 		rlRun "ipa delegation-add $FUNCNAME --membergroup=mg1019 --group=gr1019 --attrs=mobile --permissions=badperm,write > $tmpout 2>&1" 1
-		rlAssertGrep "ERROR" $tmpout
+		rlAssertGrep "ipa: ERROR: invalid 'permissions': \"badperm\" is not a valid permission" $tmpout
 		[ -f $tmpout ] && rm $tmpout
 	rlPhaseEnd
 }

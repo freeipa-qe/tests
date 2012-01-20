@@ -61,8 +61,8 @@ rlJournalStart
 
     # r2d2_test_starts
 	ipa_delegation_cli_cmd
-	ipa_delegation_cli_user
-	ipa_delegation_cli_bz
+#	ipa_delegation_cli_user
+#	ipa_delegation_cli_bz
     # r2d2_test_ends
 
     rlPhaseStartCleanup "ipa-delegation-cli cleanup"

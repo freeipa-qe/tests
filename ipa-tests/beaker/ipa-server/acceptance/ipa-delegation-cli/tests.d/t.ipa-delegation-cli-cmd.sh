@@ -40,18 +40,18 @@
 ######################################################################
 ipa_delegation_cli_cmd()
 {
-	ipa_delegation_cli_cmd_add_positive
-	ipa_delegation_cli_cmd_add_negative
+#	delegation_add_positive
+#	delegation_add_negative
 
-	ipa_delegation_cli_cmd_del_positive
-	ipa_delegation_cli_cmd_del_negative
+#	delegation_del_positive
+#	delegation_del_negative
 
-	ipa_delegation_cli_cmd_find_positive
-	ipa_delegation_cli_cmd_find_negative
+	delegation_find_positive
+#	delegation_find_negative
 
-	ipa_delegation_cli_cmd_mod_positive
-	ipa_delegation_cli_cmd_mod_negative
+#	delegation_mod_positive
+#	delegation_mod_negative
 
-	ipa_delegation_cli_cmd_show_positive
-	ipa_delegation_cli_cmd_show_negative
+#	delegation_show_positive
+#	delegation_show_negative
 }
