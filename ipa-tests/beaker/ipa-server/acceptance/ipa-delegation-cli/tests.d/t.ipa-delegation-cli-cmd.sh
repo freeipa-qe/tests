@@ -40,18 +40,18 @@
 ######################################################################
 ipa_delegation_cli_cmd()
 {
-#	delegation_add_positive
-#	delegation_add_negative
+	delegation_add_positive
+	delegation_add_negative
 
-#	delegation_del_positive
-#	delegation_del_negative
+	delegation_del_positive
+	delegation_del_negative
 
 	delegation_find_positive
-#	delegation_find_negative
+	delegation_find_negative
 
-#	delegation_mod_positive
-#	delegation_mod_negative
+	delegation_mod_positive
+	delegation_mod_negative
 
-#	delegation_show_positive
-#	delegation_show_negative
+	delegation_show_positive
+	delegation_show_negative
 }

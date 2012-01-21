@@ -42,6 +42,9 @@ delegation_show_positive()
 {
 	delegation_show_positive_envsetup
 	delegation_show_positive_1001
+	delegation_show_positive_1002
+	delegation_show_positive_1003
+	delegation_show_positive_1004
 	delegation_show_positive_envcleanup
 }
 
@@ -49,6 +52,9 @@ delegation_show_positive_envsetup()
 {
 	rlPhaseStartTest "delegation_show_positive_envsetup: "
 		KinitAsAdmin
+		ipa group-add mg1000 --desc=mg1000
+		ipa group-add gr1000 --desc=gr1000
+		ipa delegation-add delegation_show_positive_1000 --membergroup=mg1000 --group=gr1000 --attrs=mobile 
 	rlPhaseEnd
 }
 
@@ -56,15 +62,52 @@ delegation_show_positive_envcleanup()
 {
 	rlPhaseStartTest "delegation_show_positive_envcleanup: "
 		KinitAsAdmin
+		ipa delegation-del delegation_show_positive_1000
+		ipa group-del mg1000
+		ipa group-del gr1000
 	rlPhaseEnd
 }
 
 delegation_show_positive_1001()
 {
-	rlPhaseStartTest "delegation_show_positive_1001: delete existing delegation"
+	rlPhaseStartTest "delegation_show_positive_1001: show by name"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
-#       NAME1
+		rlRun "ipa delegation-show delegation_show_positive_1000 > $tmpout 2>&1" 
+		rlAssertGrep "Delegation name: delegation_show_positive_1000" $tmpout
+		[ -f $tmpout ] && rm $tmpout
+	rlPhaseEnd
+}
+
+delegation_show_positive_1002()
+{
+	rlPhaseStartTest "delegation_show_positive_1002: show by name with --all"
+		KinitAsAdmin
+		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
+		rlRun "ipa delegation-show delegation_show_positive_1000 --all > $tmpout 2>&1" 
+		rlAssertGrep "Delegation name: delegation_show_positive_1000" $tmpout
+		[ -f $tmpout ] && rm $tmpout
+	rlPhaseEnd
+}
+
+delegation_show_positive_1003()
+{
+	rlPhaseStartTest "delegation_show_positive_1003: show by name with --raw"
+		KinitAsAdmin
+		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
+		rlRun "ipa delegation-show delegation_show_positive_1000 --raw > $tmpout 2>&1" 
+		rlAssertGrep "aciname: delegation_show_positive_1000" $tmpout
+		[ -f $tmpout ] && rm $tmpout
+	rlPhaseEnd
+}
+
+delegation_show_positive_1004()
+{
+	rlPhaseStartTest "delegation_show_positive_1004: show by name with --all --raw"
+		KinitAsAdmin
+		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
+		rlRun "ipa delegation-show delegation_show_positive_1000 --all --raw > $tmpout 2>&1" 
+		rlAssertGrep "aciname: delegation_show_positive_1000" $tmpout
 		[ -f $tmpout ] && rm $tmpout
 	rlPhaseEnd
 }
@@ -76,9 +119,11 @@ delegation_show_negative()
 {
 	delegation_show_negative_envsetup
 	delegation_show_negative_1001
+	delegation_show_negative_1002
+	delegation_show_negative_1003
+	delegation_show_negative_1004
 	delegation_show_negative_envcleanup
 }
-
 
 delegation_show_negative_envsetup()
 {
@@ -96,10 +141,45 @@ delegation_show_negative_envcleanup()
 
 delegation_show_negative_1001()
 {
-	rlPhaseStartTest "delegation_show_negative_1001: fail to delete non-existent delegation"
+	rlPhaseStartTest "delegation_show_negative_1001: show by name"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
-#       badname
+		rlRun "ipa delegation-show baddelegation > $tmpout 2>&1" 2
+		rlAssertGrep "ipa: ERROR: ACI with name \"baddelegation\" not found" $tmpout
 		[ -f $tmpout ] && rm $tmpout
 	rlPhaseEnd
 }
+
+delegation_show_negative_1002()
+{
+	rlPhaseStartTest "delegation_show_negative_1002: show by name with --all"
+		KinitAsAdmin
+		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
+		rlRun "ipa delegation-show baddelegation --all > $tmpout 2>&1" 2
+		rlAssertGrep "ipa: ERROR: ACI with name \"baddelegation\" not found" $tmpout
+		[ -f $tmpout ] && rm $tmpout
+	rlPhaseEnd
+}
+
+delegation_show_negative_1003()
+{
+	rlPhaseStartTest "delegation_show_negative_1003: show by name with --raw"
+		KinitAsAdmin
+		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
+		rlRun "ipa delegation-show baddelegation --raw > $tmpout 2>&1" 2
+		rlAssertGrep "ipa: ERROR: ACI with name \"baddelegation\" not found" $tmpout
+		[ -f $tmpout ] && rm $tmpout
+	rlPhaseEnd
+}
+
+delegation_show_negative_1004()
+{
+	rlPhaseStartTest "delegation_show_negative_1004: show by name with --all --raw"
+		KinitAsAdmin
+		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
+		rlRun "ipa delegation-show baddelegation --all --raw > $tmpout 2>&1" 2
+		rlAssertGrep "ipa: ERROR: ACI with name \"baddelegation\" not found" $tmpout
+		[ -f $tmpout ] && rm $tmpout
+	rlPhaseEnd
+}
+
