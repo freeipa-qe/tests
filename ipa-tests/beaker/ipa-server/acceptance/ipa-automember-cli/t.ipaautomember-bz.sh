@@ -44,6 +44,7 @@ ipaautomember_bz()
 {
 	ipaautomember_bz_envsetup
 	ipaautomember_bz_746589
+	ipaautomember_bz_772659
 	ipaautomember_bz_envcleanup
 }
 
@@ -78,3 +79,14 @@ ipaautomember_bz_746589()
 
 #  BZ 772659 -- Typo in example description for automember-default-group-remove
 #  $(ipa help automember|grep "Set the default target group:" | wc -l) -gt 1 ] && rlFail
+ipaautomember_bz_772659()
+{
+	rlPhaseStartTest "ipaautomember_bz_772659: Typo in example description for automember-default-group-remove"
+		KinitAsAdmin
+		if [ $(ipa help automember|grep "Set the default target group:" | wc -l) -gt 1 ]; then
+			rlFail "BZ 772659 found...Typo in example description for automember-default-group-remove"
+		else
+			rlPass "BZ 772659 not found"
+		fi
+	rlPhaseEnd
+}
