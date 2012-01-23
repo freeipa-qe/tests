@@ -6,6 +6,18 @@
 #   Description: IPA delegation cli command acceptance tests
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # The following ipa delegation cli user/functional testing needed:
+# create_ipauser man0001 Manager 0001 passw0rd1
+# create_ipauser man0002 Manager 0002 passw0rd2
+# create_ipauser emp0001 Employee 0001 passw0rd1
+# create_ipauser emp0002 Employee 0002 passw0rd2
+# ipa group-add --desc=managers managers
+# ipa group-add --desc=employees employees
+# ipa group-add-member managers --users=man0001,man0002
+# ipa group-add-member employees --users=emp0001,emp0002
+# ipa delegation-add managers_change_employees_address --membergroup=managers --group=employees --attrs=street,l,st,postalcode
+# ipa delegation-add employees_change_managers_phone --membergroup=employees --group=managers --attrs=telephonenumber,mobile,pager,facsimiletelephonenumber
+#
+# 
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #

@@ -75,6 +75,7 @@ ipa_delegation_cli_bz_783307()
 			rlPass "BZ 783307 not found"
 		fi
 		ipa group-del gr1000 > /dev/null 2>&1
+		[ -f $tmpout ] && rm $tmpout
 	rlPhaseEnd
 }
 
@@ -92,6 +93,7 @@ ipa_delegation_cli_bz_783473()
 		else
 			rlPass "BZ 783473 not found"
 		fi	
+		[ -f $tmpout ] && rm $tmpout
 	rlPhaseEnd
 }
 
@@ -109,6 +111,7 @@ ipa_delegation_cli_bz_783475()
 		else
 			rlPass "BZ 783475 not found"
 		fi	
+		[ -f $tmpout ] && rm $tmpout
 	rlPhaseEnd
 }
 
@@ -128,17 +131,18 @@ ipa_delegation_cli_bz_783489()
 			rlPass "BZ 783489 not found"
 		fi	
 
-		ipa delegation-find --permissions=\"\" > $tmpout 2>&1
+		ipa delegation-find --permissions="" > $tmpout 2>&1
 		if [ $(grep "ipa: ERROR: an internal error has occurred" $tmpout|wc -l) -gt 0 ]; then
 			rlFail "BZ 783489 found...ipa delegation-find --permissions= returns internal error...also affects --permissions=\"\""
 		fi
 
-		ipa delegation-find --permissions=\" \" > $tmpout 2>&1
+		ipa delegation-find --permissions=" " > $tmpout 2>&1
 		if [ $(grep "ipa: ERROR: an internal error has occurred" $tmpout|wc -l) -gt 0 ]; then
 			rlFail "BZ 783489 found...ipa delegation-find --permissions= returns internal error...also affects --permissions=\" \""
 		fi
 
-		ipa delegation-del $FUNCNAME
+		ipa delegation-del $FUNCNAME > /dev/null 2>&1
+		[ -f $tmpout ] && rm $tmpout
 	rlPhaseEnd
 }
 
@@ -158,17 +162,18 @@ ipa_delegation_cli_bz_783501()
 			rlPass "BZ 783501 not found"
 		fi	
 
-		ipa delegation-find --attrs=\"\" > $tmpout 2>&1
+		ipa delegation-find --attrs="" > $tmpout 2>&1
 		if [ $(grep "ipa: ERROR: an internal error has occurred" $tmpout|wc -l) -gt 0 ]; then
 			rlFail "BZ 783501 found...ipa delegation-find --attrs= returns internal error...also affects --attrs=\"\""
 		fi
 
-		ipa delegation-find --attrs=\" \" > $tmpout 2>&1
+		ipa delegation-find --attrs=" " > $tmpout 2>&1
 		if [ $(grep "ipa: ERROR: an internal error has occurred" $tmpout|wc -l) -gt 0 ]; then
 			rlFail "BZ 783501 found...ipa delegation-find --attrs= returns internal error...also affects --attrs=\"\""
 		fi
 		
 		ipa delegation-del $FUNCNAME > /dev/null 2>&1
+		[ -f $tmpout ] && rm $tmpout
 	rlPhaseEnd
 }
 
@@ -188,12 +193,13 @@ ipa_delegation_cli_bz_783543()
 			rlPass "BZ 783543 not found"
 		fi	
 
-		ipa delegation-mod $FUNCNAME --membergroup=\"\" > $tmpout 2>&1
+		ipa delegation-mod $FUNCNAME --membergroup="" > $tmpout 2>&1
 		if [ $(grep "ipa: ERROR: an internal error has occurred" $tmpout|wc -l) -gt 0 ]; then
 			rlFail "BZ 783543 found...ipa delegation-mod --membergroup= returns internal error...also affects --membergroup=\"\""
 		fi
 
 		ipa delegation-del $FUNCNAME > /dev/null 2>&1
+		[ -f $tmpout ] && rm $tmpout
 	rlPhaseEnd
 }
 
@@ -214,6 +220,7 @@ ipa_delegation_cli_bz_783548()
 		fi	
 
 		ipa delegation-del $FUNCNAME > /dev/null 2>&1
+		[ -f $tmpout ] && rm $tmpout
 	rlPhaseEnd
 }
 
@@ -234,17 +241,18 @@ ipa_delegation_cli_bz_783554()
 		fi	
 		
 		ipa delegation-mod $FUNCNAME --attrs=l > /dev/null 2>&1
-		ipa delegation-mod $FUNCNAME --attrs=\"\" > $tmpout 2>&1
+		ipa delegation-mod $FUNCNAME --attrs="" > $tmpout 2>&1
 		if [ $(grep "Modified delegation \"$FUNCNAME\"" $tmpout|wc -l) -gt 0 ]; then
 			rlFail "BZ 783554 found...ipa delegation-mod --attrs= removes Attributes from delegation instead of failing also affects --attrs=\"\" with empty value"
 		fi
 
-		ipa delegation-mod $FUNCNAME --attrs=st
-		ipa delegation-mod $FUNCNAME --attrs=\" \" > $tmpout 2>&1
+		ipa delegation-mod $FUNCNAME --attrs=st > /dev/null 2>&1
+		ipa delegation-mod $FUNCNAME --attrs=" " > $tmpout 2>&1
 		if [ $(grep "Modified delegation \"$FUNCNAME\"" $tmpout|wc -l) -gt 0 ]; then
 			rlFail "BZ 783554 found...ipa delegation-mod --attrs= removes Attributes from delegation instead of failing also affects --attrs=\" \" with space value"
 		fi
 
 		ipa delegation-del $FUNCNAME > /dev/null 2>&1
+		[ -f $tmpout ] && rm $tmpout
 	rlPhaseEnd
 }
