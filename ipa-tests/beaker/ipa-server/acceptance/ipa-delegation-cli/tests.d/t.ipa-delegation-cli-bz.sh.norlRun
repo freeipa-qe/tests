@@ -138,7 +138,7 @@ ipa_delegation_cli_bz_783489()
 			rlFail "BZ 783489 found...ipa delegation-find --permissions= returns internal error...also affects --permissions=\" \""
 		fi
 
-		ipa delegation-del $FUNCNAME
+		ipa delegation-del $FUNCNAME > /dev/null 2>&1
 	rlPhaseEnd
 }
 
