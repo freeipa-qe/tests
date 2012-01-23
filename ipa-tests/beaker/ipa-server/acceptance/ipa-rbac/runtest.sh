@@ -1,0 +1,77 @@
+#!/bin/bash
+# vim: dict=/usr/share/beakerlib/dictionary.vim cpt=.,w,b,u,t,i,k
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#
+#   runtest.sh of /CoreOS/ipa-tests/acceptance/ipa-permission
+#   Description: IPA permission CLI acceptance tests
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# The following ipa cli commands  will be tested:
+#  permission-add	   Add a new permission. 
+#  permission-del	   Delete a permission. 
+#  permission-find         Search for permissions. 
+#  permission-mod	   Modify a permission. 
+#  permission-show	   Display information about a permission. 
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#
+#   Author: Namita Krishnan <nsoman@redhat.com>
+#
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#
+#   Copyright (c) 2010 Red Hat, Inc. All rights reserved.
+#
+#   This copyrighted material is made available to anyone wishing
+#   to use, modify, copy, or redistribute it subject to the terms
+#   and conditions of the GNU General Public License version 2.
+#
+#   This program is distributed in the hope that it will be
+#   useful, but WITHOUT ANY WARRANTY; without even the implied
+#   warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#   PURPOSE. See the GNU General Public License for more details.
+#
+#   You should have received a copy of the GNU General Public
+#   License along with this program; if not, write to the Free
+#   Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+#   Boston, MA 02110-1301, USA.
+#
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+# Include data-driven test data file:
+
+# Include rhts environment
+. /usr/bin/rhts-environment.sh
+. /usr/share/beakerlib/beakerlib.sh
+. /dev/shm/ipa-server-shared.sh
+. /dev/shm/ipa-group-cli-lib.sh
+. /dev/shm/env.sh
+. //home/test/beaker/ipa-server/shared/ipa-rbac-cli-lib.sh
+
+# Include test case file
+. ./lib.iparbac.sh
+. ./t.ipapermission.sh
+
+PACKAGE="ipa-server"
+
+##########################################
+#   test main 
+#########################################
+
+rlJournalStart
+    rlPhaseStartSetup "ipapermission startup: Check for ipa-server package"
+# NAMITA:         rlAssertRpm $PACKAGE
+        rlRun "TmpDir=\`mktemp -d\`" 0 "Creating tmp directory"
+        rlRun "pushd $TmpDir"
+    rlPhaseEnd
+
+    ipapermissionTests
+    #ipaprivilegeTests
+    #iparolesTests
+    #ipaRBACFunctionalTests
+
+    makereport
+    rlPhaseStartCleanup "ipapermission cleanup"
+        rlRun "popd"
+# NAMITA:        rlRun "rm -r $TmpDir" 0 "Removing tmp directory"
+    rlPhaseEnd
+
+rlJournalEnd
+
