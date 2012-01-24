@@ -59,9 +59,9 @@ rlJournalStart
         rlRun "pushd $TmpDir"
     rlPhaseEnd
 
-#	ipa_delegation_cli_cmd
-#	ipa_delegation_cli_user
-	ipa_delegation_cli_bz
+	delegation_cmd
+	delegation_user
+	delegation_bz
 
     rlPhaseStartCleanup "ipa-delegation-cli cleanup"
         rlRun "popd"

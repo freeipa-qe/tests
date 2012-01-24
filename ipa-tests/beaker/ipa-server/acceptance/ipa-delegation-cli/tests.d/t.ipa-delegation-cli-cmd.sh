@@ -38,7 +38,7 @@
 ######################################################################
 # test suite
 ######################################################################
-ipa_delegation_cli_cmd()
+delegation_cmd()
 {
 	delegation_add_positive
 	delegation_add_negative

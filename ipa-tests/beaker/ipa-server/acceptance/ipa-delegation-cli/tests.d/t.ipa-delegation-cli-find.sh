@@ -363,7 +363,7 @@ delegation_find_negative_1006()
 
 delegation_find_negative_1007() # BZ 783473 -- ipa delegation-find --membergroup= with no value returns internal error
 {
-	rlPhaseStartTest "delegation_find_negative_1007: fail to find with no value for membergroup"
+	rlPhaseStartTest "delegation_find_negative_1007: fail to find with no value for membergroup (BZ 783473)"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-find --membergroup= > $tmpout 2>&1 " 1
@@ -377,7 +377,7 @@ delegation_find_negative_1007() # BZ 783473 -- ipa delegation-find --membergroup
 
 delegation_find_negative_1008() # BZ 783475 -- ipa delegation-find --membergroup="" returns internal error
 {
-	rlPhaseStartTest "delegation_find_negative_1008: fail to find with empty membergroup"
+	rlPhaseStartTest "delegation_find_negative_1008: fail to find with empty membergroup (BZ 783475)"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-find --membergroup=\"\" > $tmpout 2>&1 " 1
@@ -460,7 +460,7 @@ delegation_find_negative_1014()
 
 delegation_find_negative_1015() # BZ 783489 -- ipa delegation-find --permissions= returns internal error
 {
-	rlPhaseStartTest "delegation_find_negative_1015: fail to find with no value for permissions"
+	rlPhaseStartTest "delegation_find_negative_1015: fail to find with no value for permissions (BZ 783489)"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-find --permissions= > $tmpout 2>&1 " 1
@@ -474,7 +474,7 @@ delegation_find_negative_1015() # BZ 783489 -- ipa delegation-find --permissions
 
 delegation_find_negative_1016() # BZ 783489 -- ipa delegation-find --permissions= returns internal error
 {
-	rlPhaseStartTest "delegation_find_negative_1016: fail to find with empty permissions"
+	rlPhaseStartTest "delegation_find_negative_1016: fail to find with empty permissions (BZ 783489)"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-find --permissions=\"\" > $tmpout 2>&1 " 1
@@ -488,7 +488,7 @@ delegation_find_negative_1016() # BZ 783489 -- ipa delegation-find --permissions
 
 delegation_find_negative_1017() # BZ 783489 -- ipa delegation-find --permissions= returns internal error
 {
-	rlPhaseStartTest "delegation_find_negative_1017: fail to find with space for permissions"
+	rlPhaseStartTest "delegation_find_negative_1017: fail to find with space for permissions (BZ 783489)"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-find --permissions=\" \" > $tmpout 2>&1 " 1
@@ -525,7 +525,7 @@ delegation_find_negative_1019()
 
 delegation_find_negative_1020() # BZ 783501 -- ipa delegation-find --attrs= returns internal error
 {
-	rlPhaseStartTest "delegation_find_negative_1020: fail to find with no value for attrs"
+	rlPhaseStartTest "delegation_find_negative_1020: fail to find with no value for attrs (BZ 783501)"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-find --attrs= > $tmpout 2>&1 " 1
@@ -539,7 +539,7 @@ delegation_find_negative_1020() # BZ 783501 -- ipa delegation-find --attrs= retu
 
 delegation_find_negative_1021() # BZ 783501 -- ipa delegation-find --attrs= returns internal error
 {
-	rlPhaseStartTest "delegation_find_negative_1021: fail to find with empty for attrs"
+	rlPhaseStartTest "delegation_find_negative_1021: fail to find with empty for attrs (BZ 783501)"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-find --attrs=\"\" > $tmpout 2>&1 " 1
@@ -553,7 +553,7 @@ delegation_find_negative_1021() # BZ 783501 -- ipa delegation-find --attrs= retu
 
 delegation_find_negative_1022() # BZ 783501 -- ipa delegation-find --attrs= returns internal error
 {
-	rlPhaseStartTest "delegation_find_negative_1022: fail to find with space for attrs"
+	rlPhaseStartTest "delegation_find_negative_1022: fail to find with space for attrs (BZ 783501)"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-find --attrs=\" \" > $tmpout 2>&1 " 1

@@ -46,24 +46,24 @@
 ######################################################################
 # test suite
 ######################################################################
-ipa_delegation_cli_bz()
+delegation_bz()
 {
-	ipa_delegation_cli_bz_783307
-	ipa_delegation_cli_bz_783473
-	ipa_delegation_cli_bz_783475
-	ipa_delegation_cli_bz_783489
-	ipa_delegation_cli_bz_783501
-	ipa_delegation_cli_bz_783543
-	ipa_delegation_cli_bz_783548
-	ipa_delegation_cli_bz_783554
+	delegation_bz_783307
+	delegation_bz_783473
+	delegation_bz_783475
+	delegation_bz_783489
+	delegation_bz_783501
+	delegation_bz_783543
+	delegation_bz_783548
+	delegation_bz_783554
 }
 
 ######################################################################
 # BZ 783307 -- ipa delegation-add is not failing when membergroup does not exist
 ######################################################################
-ipa_delegation_cli_bz_783307()
+delegation_bz_783307()
 {
-	rlPhaseStartTest "ipa_delegation_cli_bz_783307: ipa delegation-add is not failing when membergroup does not exist"
+	rlPhaseStartTest "delegation_bz_783307: ipa delegation-add is not failing when membergroup does not exist"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		ipa group-add --desc=gr1000 gr1000 > /dev/null 2>&1
@@ -75,15 +75,16 @@ ipa_delegation_cli_bz_783307()
 			rlPass "BZ 783307 not found"
 		fi
 		ipa group-del gr1000 > /dev/null 2>&1
+		[ -f $tmpout ] && rm $tmpout
 	rlPhaseEnd
 }
 
 ######################################################################
 # BZ 783473 -- ipa delegation-find --membergroup= with no value returns internal error
 ######################################################################
-ipa_delegation_cli_bz_783473()
+delegation_bz_783473()
 {
-	rlPhaseStartTest "ipa_delegation_cli_bz_783473: ipa delegation-find --membergroup= with no value returns internal error"
+	rlPhaseStartTest "delegation_bz_783473: ipa delegation-find --membergroup= with no value returns internal error"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		ipa delegation-find --membergroup= > $tmpout 2>&1
@@ -92,15 +93,16 @@ ipa_delegation_cli_bz_783473()
 		else
 			rlPass "BZ 783473 not found"
 		fi	
+		[ -f $tmpout ] && rm $tmpout
 	rlPhaseEnd
 }
 
 ######################################################################
 # BZ 783475 -- ipa delegation-find --membergroup="" with no value returns internal error
 ######################################################################
-ipa_delegation_cli_bz_783475()
+delegation_bz_783475()
 {
-	rlPhaseStartTest "ipa_delegation_cli_bz_783475: ipa delegation-find --membergroup=\"\" with no value returns internal error"
+	rlPhaseStartTest "delegation_bz_783475: ipa delegation-find --membergroup=\"\" with no value returns internal error"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		ipa delegation-find --membergroup= > $tmpout 2>&1
@@ -109,15 +111,16 @@ ipa_delegation_cli_bz_783475()
 		else
 			rlPass "BZ 783475 not found"
 		fi	
+		[ -f $tmpout ] && rm $tmpout
 	rlPhaseEnd
 }
 
 ######################################################################
 # BZ 783489 -- ipa delegation-find --permissions= returns internal error
 ######################################################################
-ipa_delegation_cli_bz_783489()
+delegation_bz_783489()
 {
-	rlPhaseStartTest "ipa_delegation_cli_bz_783489: ipa delegation-find --permissions= returns internal error"
+	rlPhaseStartTest "delegation_bz_783489: ipa delegation-find --permissions= returns internal error"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		ipa delegation-add $FUNCNAME --membergroup=admins --group=ipausers --attrs=mobile > /dev/null 2>&1
@@ -139,15 +142,16 @@ ipa_delegation_cli_bz_783489()
 		fi
 
 		ipa delegation-del $FUNCNAME > /dev/null 2>&1
+		[ -f $tmpout ] && rm $tmpout
 	rlPhaseEnd
 }
 
 ######################################################################
 # BZ 783501 -- ipa delegation-find --attrs= returns internal error
 ######################################################################
-ipa_delegation_cli_bz_783501()
+delegation_bz_783501()
 {
-	rlPhaseStartTest "ipa_delegation_cli_bz_783501: ipa delegation-find --attrs= returns internal error"
+	rlPhaseStartTest "delegation_bz_783501: ipa delegation-find --attrs= returns internal error"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		ipa delegation-add $FUNCNAME --membergroup=admins --group=ipausers --attrs=mobile > /dev/null 2>&1
@@ -169,15 +173,16 @@ ipa_delegation_cli_bz_783501()
 		fi
 		
 		ipa delegation-del $FUNCNAME > /dev/null 2>&1
+		[ -f $tmpout ] && rm $tmpout
 	rlPhaseEnd
 }
 
 ######################################################################
 # BZ 783543 -- ipa delegation-mod --membergroup= returns internal error
 ######################################################################
-ipa_delegation_cli_bz_783543()
+delegation_bz_783543()
 {
-	rlPhaseStartTest "ipa_delegation_cli_bz_783543: ipa delegation-mod --membergroup= returns internal error"
+	rlPhaseStartTest "delegation_bz_783543: ipa delegation-mod --membergroup= returns internal error"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		ipa delegation-add $FUNCNAME --membergroup=admins --group=ipausers --attrs=mobile > /dev/null 2>&1
@@ -194,15 +199,16 @@ ipa_delegation_cli_bz_783543()
 		fi
 
 		ipa delegation-del $FUNCNAME > /dev/null 2>&1
+		[ -f $tmpout ] && rm $tmpout
 	rlPhaseEnd
 }
 
 ######################################################################
 # BZ 783548 -- ipa delegation-mod is not failing when membergroup does not exist
 ######################################################################
-ipa_delegation_cli_bz_783548()
+delegation_bz_783548()
 {
-	rlPhaseStartTest "ipa_delegation_cli_bz_783548: ipa delegation-mod is not failing when membergroup does not exist"
+	rlPhaseStartTest "delegation_bz_783548: ipa delegation-mod is not failing when membergroup does not exist"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out > /dev/null 2>&1
 		ipa delegation-add $FUNCNAME --membergroup=admins --group=ipausers --attrs=mobile > /dev/null 2>&1
@@ -214,15 +220,16 @@ ipa_delegation_cli_bz_783548()
 		fi	
 
 		ipa delegation-del $FUNCNAME > /dev/null 2>&1
+		[ -f $tmpout ] && rm $tmpout
 	rlPhaseEnd
 }
 
 ######################################################################
 # BZ 783554 -- ipa delegation-mod --attrs= removes Attributes from delegation instead of failing
 ######################################################################
-ipa_delegation_cli_bz_783554()
+delegation_bz_783554()
 {
-	rlPhaseStartTest "ipa_delegation_cli_bz_783554: ipa delegation-mod --attrs= removes Attributes from delegation instead of failing"
+	rlPhaseStartTest "delegation_bz_783554: ipa delegation-mod --attrs= removes Attributes from delegation instead of failing"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		ipa delegation-add $FUNCNAME --membergroup=admins --group=ipausers --attrs=mobile > /dev/null 2>&1
@@ -246,5 +253,6 @@ ipa_delegation_cli_bz_783554()
 		fi
 
 		ipa delegation-del $FUNCNAME > /dev/null 2>&1
+		[ -f $tmpout ] && rm $tmpout
 	rlPhaseEnd
 }

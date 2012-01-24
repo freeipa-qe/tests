@@ -252,7 +252,7 @@ delegation_mod_negative_envcleanup()
 # BZ 783543 -- ipa delegation-mod --membergroup= returns internal error
 delegation_mod_negative_1001()
 {
-	rlPhaseStartTest "delegation_mod_negative_1001: fail to modify with no value for membergroup"
+	rlPhaseStartTest "delegation_mod_negative_1001: fail to modify with no value for membergroup (BZ 783543)"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-mod delegation_mod_negative_1000 --membergroup= > $tmpout 2>&1" 1
@@ -268,7 +268,7 @@ delegation_mod_negative_1001()
 # BZ 783543 -- ipa delegation-mod --membergroup= returns internal error
 delegation_mod_negative_1002()
 {
-	rlPhaseStartTest "delegation_mod_negative_1002: fail to modify with empty membergroup"
+	rlPhaseStartTest "delegation_mod_negative_1002: fail to modify with empty membergroup (BZ 783543)"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-mod delegation_mod_negative_1000 --membergroup=\"\" > $tmpout 2>&1" 1
@@ -294,7 +294,7 @@ delegation_mod_negative_1003()
 # BZ 783548 -- ipa delegation-mod is not failing when membergroup does not exist
 delegation_mod_negative_1004()
 {
-	rlPhaseStartTest "delegation_mod_negative_1004: fail to modify with non-existent membergroup"
+	rlPhaseStartTest "delegation_mod_negative_1004: fail to modify with non-existent membergroup (BZ 783548)"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-mod delegation_mod_negative_1000 --membergroup=badmemembergroup > $tmpout 2>&1" 1
@@ -354,7 +354,7 @@ delegation_mod_negative_1008()
 # BZ 783554 -- ipa delegation-mod --attrs= removes Attributes from delegation instead of failing
 delegation_mod_negative_1009()
 {
-	rlPhaseStartTest "delegation_mod_negative_1009: fail to modify with no value for attrs"
+	rlPhaseStartTest "delegation_mod_negative_1009: fail to modify with no value for attrs (BZ 783554)"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-mod delegation_mod_negative_1000 --attrs= > $tmpout 2>&1" 1
@@ -370,7 +370,7 @@ delegation_mod_negative_1009()
 # BZ 783554 -- ipa delegation-mod --attrs= removes Attributes from delegation instead of failing
 delegation_mod_negative_1010()
 {
-	rlPhaseStartTest "delegation_mod_negative_1010: fail to modify with empty attrs"
+	rlPhaseStartTest "delegation_mod_negative_1010: fail to modify with empty attrs (BZ 783554)"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-mod delegation_mod_negative_1000 --attrs=\"\" > $tmpout 2>&1" 1
@@ -386,7 +386,7 @@ delegation_mod_negative_1010()
 # BZ 783554 -- ipa delegation-mod --attrs= removes Attributes from delegation instead of failing
 delegation_mod_negative_1011()
 {
-	rlPhaseStartTest "delegation_mod_negative_1011: fail to modify with space for attrs"
+	rlPhaseStartTest "delegation_mod_negative_1011: fail to modify with space for attrs (BZ 783554)"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-mod delegation_mod_negative_1000 --attrs=\" \" > $tmpout 2>&1" 1
@@ -460,7 +460,7 @@ delegation_mod_negative_1016()
 # BZ 783548 -- ipa delegation-mod is not failing when membergroup does not exist
 delegation_mod_negative_1017()
 {
-	rlPhaseStartTest "delegation_mod_negative_1017: fail to modify with non-existent membergroup and existing group"
+	rlPhaseStartTest "delegation_mod_negative_1017: fail to modify with non-existent membergroup and existing group (BZ 783548)"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-mod delegation_mod_negative_1000 --membergroup=badmemembergroup1017 --group=gr1001 > $tmpout 2>&1" 1
@@ -487,7 +487,7 @@ delegation_mod_negative_1018()
 # BZ 783548 -- ipa delegation-mod is not failing when membergroup does not exist
 delegation_mod_negative_1019()
 {
-	rlPhaseStartTest "delegation_mod_negative_1019: fail to modify with non-existent membergroup, existing group, and valid attrs"
+	rlPhaseStartTest "delegation_mod_negative_1019: fail to modify with non-existent membergroup, existing group, and valid attrs (BZ 783548)"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-mod delegation_mod_negative_1000 --membergroup=badmemembergroup1019 --group=gr1001 --attrs=l > $tmpout 2>&1" 1
@@ -525,7 +525,7 @@ delegation_mod_negative_1021()
 # BZ 783548 -- ipa delegation-mod is not failing when membergroup does not exist
 delegation_mod_negative_1022()
 {
-	rlPhaseStartTest "delegation_mod_negative_1022: fail to modify with non-existent membergroup, existing group, valid attrs, and valid permissions"
+	rlPhaseStartTest "delegation_mod_negative_1022: fail to modify with non-existent membergroup, existing group, valid attrs, and valid permissions (BZ 783548)"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-mod delegation_mod_negative_1000 --membergroup=badmemembergroup1022 --group=gr1001 --attrs=l --permissions=read > $tmpout 2>&1" 1
