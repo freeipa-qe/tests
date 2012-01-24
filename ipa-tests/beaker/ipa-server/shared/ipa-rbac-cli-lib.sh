@@ -23,7 +23,9 @@
 
 #######################################################################
 # addPermission Usage:
-#       addPermission <permissionName> <permissionRights> <permissionTarget> <permissionAttr>
+#       addPermission <permissionName> <permissionRights> <permissionTarget> --attr=<permissionAttrMemberOf>
+#       addPermission <permissionName> <permissionRights> <permissionTarget> --attr=<permissionAttrMemberOf> <permissionAddSetAttr>
+#       addPermission <permissionName> <permissionRights> <permissionTarget> --memberof=<permissionAttrMemberOf>
 ######################################################################
 
 addPermission()
@@ -78,7 +80,7 @@ deletePermission()
 
 ######################################################################
 # verifyPermissionAttr Usage:
-# 	verifyPermissionAttr <type> <name> <attribute> <value>
+# 	verifyPermissionAttr <name> <type> <attribute> <value>
 ######################################################################
 verifyPermissionAttr()
 {
@@ -86,7 +88,7 @@ verifyPermissionAttr()
         permissionName=$1
         allOrRaw=$2
 	attribute="$3:"
-        if [ "$attribute" == "dn:" -o "$attribute" == "Subtree" ] ; then
+        if [ "$attribute" == "dn:" -o "$attribute" == "Subtree:" ] ; then
            value=$4
         else
            value=`echo $4 | sed 's/,/, /g'`
