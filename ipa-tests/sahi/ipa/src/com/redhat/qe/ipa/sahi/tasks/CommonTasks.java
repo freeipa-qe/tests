@@ -23,7 +23,6 @@ public class CommonTasks {
 	public static String serverUrl = System.getProperty("ipa.server.url");
 	
 	public String userPage = serverUrl + "/ipa/ui/#identity=user&navigation=identity";	
-//	public String groupPage = serverUrl +  "/ipa/ui/#nagivation=identity&identity=group";
 	public String groupPage = serverUrl + "/ipa/ui/#identity=group&navigation=identity";
 	public String hostPage =  serverUrl + "/ipa/ui/#identity=host&navigation=identity";
 	public String hostgroupPage =  serverUrl + "/ipa/ui/#identity=hostgroup&navigation=identity";
