@@ -5,14 +5,16 @@
 			    <package name="com.redhat.qe.ipa.sahi.*" />
 			</packages>
 			<groups>
+			     
 			    <run>
 			        <include name="setup" />
 			        <include name="init" />
-			        <include name="addGroup" /> 
-			        <include name="addGroup_negative" />
-			        <include name="modifyGroup_enrolluser" />
-			        <include name="modifyGroup_enrollgroup" />
-			        <include name="modifyGrooup_settings" /> 
+              <include name="addGroup" />  
+              <include name="addGroup_negative" />
+              <include name="modifyGroup_enrolluser" />
+              <include name="modifyGroup_enrollgroup" />
+              <include name="modifyGroup_settings" />  
+              <include name="modifyGroup_settings_negative" /> 
 			        <include name="deleteGroup" /> 
 			    </run>
 			</groups>
