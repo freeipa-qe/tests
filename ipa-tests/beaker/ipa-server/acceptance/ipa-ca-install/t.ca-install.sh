@@ -172,6 +172,9 @@ installCA()
 	rlRun "ipa-server-install --uninstall -U"
 	sleep 5
 
+	rlRun "expect -c \"spawn ssh -l root $MASTER ipa-replica-manage del $SLAVE; expect *assword: ; send Secret123/\n; expect eof\""
+	rlRun "expect -c \"spawn ssh -l root $MASTER ipa host-del $SLAVE; expect *assword: ; send Secret123/\n; expect eof\""
+
 	rlRun "mv /etc/hosts /tmp/"
 	rlRun "mv /var/tmp/hosts /etc/hosts" 0 " Restoring /etc/hosts"
 
@@ -180,10 +183,6 @@ installCA()
         rlLog "EXECUTING: ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg"
         rlRun "/bin/bash /dev/shm/replica-install.bash" 0 "Replica installation"
         rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
-
-	rlRun "expect -c \"spawn ssh -l root $MASTER ip-replica-manage del $SLAVE; expect *assword: ; send Secret123/\n; expect eof\""
-	rlRun "expect -c \"spawn ssh -l root $MASTER ipa host-del $SLAVE; expect *assword: ; send Secret123/\n; expect eof\""
-
 
 	rlLog "Executing: ipa-ca-install -p $ADMINPW -w $ADMINPW --skip-conncheck --unattended /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg"
 	echo "ipa-ca-install -p $ADMINPW -w $ADMINPW --skip-conncheck --unattended /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg" > /dev/shm/replica-ca-install.bash
