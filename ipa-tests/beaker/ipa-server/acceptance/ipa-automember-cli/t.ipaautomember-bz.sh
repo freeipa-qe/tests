@@ -42,20 +42,8 @@
 ######################################################################
 ipaautomember_bz()
 {
-	ipaautomember_bz_envsetup
 	ipaautomember_bz_746589
 	ipaautomember_bz_772659
-	ipaautomember_bz_envcleanup
-}
-
-######################################################################
-# SETUP
-######################################################################
-ipaautomember_bz_envsetup()
-{
-	rlPhaseStartTest "ipa-automember-bz-envsetup: "
-		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as $ADMINID user"
-	rlPhaseEnd
 }
 
 ######################################################################
@@ -67,13 +55,21 @@ ipaautomember_bz_746589()
 		KinitAsAdmin
 		local tmpout=$TmpDir/automember_bz_746589.$RANDOM.out
 		# Need some code to test if a version was from upgrade??? 
-		ipa automember-add --type=group ipa-automember-bz-746589  > $tmpout 2>&1
-		if [ $? -eq 0 ]; then
-			rlPass "BZ 746589 not found"
+		rlLog "checking if upgrade"
+		isUpgrade=$(yum history package  ipa-server|grep Update|wc -l)
+		if [ $isUpgrade -eq 0 ]; then
+			rlPass "IPA not an upgrade...skipping test"
+		else
+			ipa group-add --desc=ipa-automember-bz-746589 ipa-automember-bz-746589 > /dev/null
+			ipa automember-add --type=group ipa-automember-bz-746589  > $tmpout 2>&1
+			if [ $? -eq 0 ]; then
+				rlPass "BZ 746589 not found"
+			elif [ $(grep "ipa: ERROR: Auto Membership is not configured" $tmpout|wc -l) -eq 1 ]; then
+				rlFail "BZ 746589 found...automember functionality not available for upgraded IPA server"
+			fi	
 			ipa automember-del --type=group ipa-automember-bz-746589 > /dev/null
-		elif [ $(grep "ipa: ERROR: Auto Membership is not configured" $tmpout|wc -l) -eq 1 ]; then
-			rlFail "BZ 746589 found...automember functionality not available for upgraded IPA server"
-		fi	
+			ipa group-del ipa-automember-bz-746589 > /dev/null
+		fi
 	rlPhaseEnd
 }
 

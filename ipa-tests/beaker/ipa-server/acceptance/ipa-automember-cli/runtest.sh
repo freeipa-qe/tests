@@ -67,6 +67,7 @@
 
 # Include test case file
 . ./t.ipaautomember.sh
+. ./t.ipaautomember-bz.sh
 
 
 PACKAGE="ipa-admintools"
@@ -86,6 +87,7 @@ rlJournalStart
 
 	# run the tests
 	ipaautomember
+	ipaautomember_bz
 
 	rlJournalPrintText
 	report=$TmpDir/rhts.export.$RANDOM.txt
