@@ -91,4 +91,27 @@ rlPhaseEnd
 
 }
 
+bug741604() {
+
+rlPhaseStartTest "bug741604: misleading error when adding duplicate external members to sudo rule"
+
+	rlLog "Verifies https://bugzilla.redhat.com/show_bug.cgi?id=741604"
+
+	rlRun "ipa sudorule-add 741604rule"
+	rlRun "ipa sudorule-add-user --users=user1,unknown 741604rule > $TmpDir/bug741604.txt 2>&1"
+	rlRun "cat $TmpDir/bug764604.txt"
+
+	rlRun "ipa sudorule-add-user --users=user1,unknown 741604rule > $TmpDir/bug741604.txt 2>&1"
+	rlAssertGrep "member user: user1: This entry is already a member" "$TmpDir/bug741604.txt"
+	rlAssertGrep "member user: unknown: This entry is already a member" "$TmpDir/bug741604.txt"
+	rlAssertNotGrep "member user: unknown: no such entry" "$TmpDir/bug741604.txt"
+
+	rlRun "cat $TmpDir/bug741604.txt"
+
+	# clean up
+	rlRun "ipa sudorule-del 741604rule"
+
+rlPhaseEnd
+
+}
 
