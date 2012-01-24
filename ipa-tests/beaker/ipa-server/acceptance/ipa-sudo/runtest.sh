@@ -43,6 +43,9 @@
 . ./t.ipa-sudo.sh
 . ./t.ipa-sudo-func.sh
 
+# Bugzilla regression automation
+. ./bz-regression.sh
+
 PACKAGE="ipa-server"
 
 ##########################################
@@ -277,6 +280,19 @@ bugs
                 rlRun "func_cleanup"
                 rlRun "echo func_cleanup"
     rlPhaseEnd
+
+    rlPhaseStartSetup "ipa-sudo-bz-regression-startup: bugzilla regression tests"
+                rlRun "echo bugzilla regression starts ... "
+    rlPhaseEnd
+
+        # tests start...
+bug769491
+        # tests end.
+
+    rlPhaseStartCleanup "ipa-sudo-bz-regression-cleanup: bugzilla regression tests."
+                rlRun "echo bugzilla regression ends."
+    rlPhaseEnd
+
 
 
 rlJournalPrintText

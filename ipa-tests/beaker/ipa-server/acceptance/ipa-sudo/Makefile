@@ -29,7 +29,7 @@ export TESTVERSION=1.0
 
 BUILT_FILES=
 
-FILES=$(METADATA) runtest.sh Makefile PURPOSE t.ipa-sudo.sh t.ipa-sudo-func.sh
+FILES=$(METADATA) runtest.sh Makefile PURPOSE t.ipa-sudo.sh t.ipa-sudo-func.sh bz-regression.sh
 
 .PHONY: all install download clean
 
