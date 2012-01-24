@@ -449,11 +449,29 @@ public class GroupTasks {
 		browser.span("Update").click();
 	}
 
-	public static void modifyGroup_enroll_member_negative(SahiTasks browser, String groupName,	String negData) {
-		browser.link("member_group").click();
-		// add user to group twice : not possible in current ui implementation 1/20/2012
-		
-		
+	public static void modifyGroup_settings_button_reset(SahiTasks browser,	String description, String gid) {
+		browser.link("Settings").click();
+		browser.textarea("description").setValue("for test only, this test should not be accept since we will click 'undo'"); 
+		browser.textbox("gidnumber").setValue("for test only, it will go away");
+		browser.span("Reset").click(); 
+	}
+	
+	public static void modifyGroup_settings_button_undo(SahiTasks browser,	String description, String gid) {
+		browser.link("Settings").click();
+		browser.textarea("description").setValue("for test only, this test should not be accept since we will click 'undo'");
+		browser.span("undo").click();
+		browser.textbox("gidnumber").setValue("for test only, it will go away");
+		browser.span("undo").click(); 
+	}
+	
+	public static void modifyGroup_settings_negative_gid(SahiTasks browser,	String gid) {
+		browser.link("Settings").click(); 
+		browser.textbox("gidnumber").setValue(gid); 
+	}
+	
+	public static void modifyGroup_settings_negative_desc(SahiTasks browser, String desc){
+		browser.link("Settings").click();
+		browser.textarea("description").setValue(desc);
 	}
 	
 }//class Group Tasks
