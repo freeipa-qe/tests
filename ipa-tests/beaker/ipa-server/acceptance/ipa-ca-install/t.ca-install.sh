@@ -172,8 +172,29 @@ installCA()
 	rlRun "ipa-server-install --uninstall -U"
 	sleep 5
 
-	rlRun "expect -c \"spawn ssh -l root $MASTER ipa-replica-manage del $SLAVE; expect *assword: ; send Secret123/\n; expect eof\""
-	rlRun "expect -c \"spawn ssh -l root $MASTER ipa host-del $SLAVE; expect *assword: ; send Secret123/\n; expect eof\""
+expfile=/tmp/remote_exec.exp
+expout=/tmp/remote_exec.out
+
+rm -rf $expfile $expout
+
+echo 'set timeout 30
+set send_slow {1 .1}' > $expfile
+echo "spawn ssh -l root $MASTER" >> $expfile
+echo 'match_max 100000' >> $expfile
+echo 'expect "*: "' >> $expfile
+echo 'sleep .5' >> $expfile
+echo 'send -- redhat' >> $expfile
+echo 'send -s -- "\r"' >> $expfile
+echo 'expect "*# "' >> $expfile
+echo 'send -- ipa-replica-manage del $SLAVE' >> $expfile
+echo 'send -s -- "\r"' >> $expfile
+echo 'send -- ipa host-del $SLAVE' >> $expfile
+echo 'send -s -- "\r"' >> $expfile
+echo 'expect eof ' >> $expfile
+
+	rlRun "/usr/bin/expect $expfile >> $expout 2>&1"
+	rlRun "cat $expfile"
+	rlRun "cat $expout"
 
 	rlRun "mv /etc/hosts /tmp/"
 	rlRun "mv /var/tmp/hosts /etc/hosts" 0 " Restoring /etc/hosts"
