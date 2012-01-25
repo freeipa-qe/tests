@@ -247,3 +247,21 @@ delegation_bz_783554()
 		rlRun "ipa delegation-del $FUNCNAME" 0 "Delete delegation used in test"
 	rlPhaseEnd
 }
+
+######################################################################
+# BZ 784468 -- ipa help delegation example has group and membergroup backwards
+######################################################################
+delegation_bz_784468()
+{
+    rlPhaseStartTest "delegation_bz_784468: ipa help delegation example has group and membergroup backwards?"
+        KinitAsAdmin
+        local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
+        rlRun "ipa help delegation > $tmpout 2>&1"
+        if [ $(grep "Add a delegation rule to allow managers to edit employee's addresses:" $tmpout|wc -l) -gt 0 -a $(grep "ipa delegation-add --attrs=street --membergroup=managers --group=employees" $tmpout|wc -l) -gt 0 ]; then
+            rlFail "BZ 784468 found...ipa help delegation example has group and membergroup backwards"
+        else
+            rlPass "BZ 784468 not found"
+        fi
+    rlPhaseEnd
+}
+
