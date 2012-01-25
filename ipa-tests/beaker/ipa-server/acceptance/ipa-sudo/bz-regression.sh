@@ -115,3 +115,43 @@ rlPhaseEnd
 
 }
 
+
+bug782976() {
+
+rlPhaseStartTest "bug782976: SUDO: --users and --groups should detect values such as \"ALL\" and error appropriately"
+
+	rlLog "verifies https://bugzilla.redhat.com/show_bug.cgi?id=782976"
+
+	rlRun "ipa sudorule-add bug782976 --usercat=all > $TmpDir/bug782976.txt 2>&1"
+	rlAssertGrep "User category: all" "$TmpDir/bug782976.txt"
+	rlRun "cat $TmpDir/bug782976.txt"
+
+	rlRun "ipa sudorule-add-user bug782976 --users=shanks > $TmpDir/bug782976.txt 2>&1"
+	rlAssertGrep "ipa: ERROR: users cannot be added when user category='all'" "$TmpDir/bug782976.txt"
+	rlRun "cat $TmpDir/bug782976.txt"
+
+	rlRun "ipa group-add group1 --desc=group1"
+        rlRun "ipa sudorule-add-user bug782976 --groups=group1 > $TmpDir/bug782976.txt 2>&1"
+	rlAssertGrep "ipa: ERROR: users cannot be added when user category='all'" "$TmpDir/bug782976.txt"
+	rlRun "cat $TmpDir/bug782976.txt"
+
+	rlRun "ipa sudorule-del bug782976"
+
+	rlRun "ipa sudorule-add bug782976"
+	rlRun "ipa sudorule-add-user bug782976 --users=user1"
+	rlRun "ipa sudorule-mod bug782976 --usercat=all > $TmpDir/bug782976.txt 2>&1"
+	rlAssertGrep "ipa: ERROR: user category cannot be set to 'all' while there are users" "$TmpDir/bug782976.txt"
+
+	rlRun "ipa sudorule-del bug782976"
+
+	rlRun "ipa sudorule-add bug782976"
+        rlRun "ipa sudorule-add-user bug782976 --groups=group1"
+        rlRun "ipa sudorule-mod bug782976 --usercat=all > $TmpDir/bug782976.txt 2>&1"
+        rlAssertGrep "ipa: ERROR: user category cannot be set to 'all' while there are users" "$TmpDir/bug782976.txt"
+
+	# clean up
+	rlRun "ipa group-del group1"
+	rlRun "ipa sudorule-del bug782976"
+
+rlPhaseEnd
+}

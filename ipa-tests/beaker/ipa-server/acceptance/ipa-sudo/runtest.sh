@@ -288,6 +288,7 @@ bugs
         # tests start...
 bug769491
 bug741604
+bug782976
         # tests end.
 
     rlPhaseStartCleanup "ipa-sudo-bz-regression-cleanup: bugzilla regression tests."
