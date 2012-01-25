@@ -156,7 +156,7 @@ public class GroupTests extends SahiTestScript{
 	
 	@Test (groups={"modifyGroup_enrolluser"}, description="enroll multipul users as member at once", dataProvider="2nd_4th_Users", dependsOnGroups="addGroup" )
 	public void modifyGroup_enrollMultiUsers(String testScenario, String groupName, String userName){
-		String [] users = userName.split(" ");
+		String [] users = userName.split(",");
 		browser.link(groupName).click();
 		GroupTasks.modifyGroup_enroll_user_multiple(browser, groupName, users);
 		for (String user:users){
@@ -198,7 +198,7 @@ public class GroupTests extends SahiTestScript{
 	@Test (groups={"modifyGroup_enrollgroup"}, description = "add other (multiple) user groups as member, create nested group", dataProvider="childGroup_multi_member",dependsOnGroups="addGroup")
 	public void modifyGroup_member_group_multiple(String testScenario, String groupName, String childGroups){
 		browser.link(groupName).click();
-		String[] group = childGroups.split(" ");
+		String[] group = childGroups.split(",");
 		GroupTasks.modifyGroup_enroll_member_group_multiple(browser, groupName, group);
 		for (String childGroup: group)
 			Assert.assertTrue(browser.link(childGroup).exists(), "verify membership info: group ("+childGroup+") should be member of group: ("+groupName+")");
@@ -227,7 +227,7 @@ public class GroupTests extends SahiTestScript{
 	@Test (groups={"modifyGroup_enrollgroup"}, description = "add other (multiple) user groups as member, create nested group", dataProvider="childGroup_multi_memberof",dependsOnGroups="addGroup")
 	public void modifyGroup_memberof_group_multiple(String testScenario, String groupName, String childGroups){
 		browser.link(groupName).click();
-		String[] children = childGroups.split(" ");
+		String[] children = childGroups.split(",");
 		GroupTasks.modifyGroup_enroll_memberof_group_multiple(browser, groupName, children);
 		for (String child: children)
 			Assert.assertTrue(browser.link(child).exists(), "verify memberof membership info: group ("+child+") should be member of group: ("+groupName+")");
@@ -311,11 +311,11 @@ public class GroupTests extends SahiTestScript{
 			description = "prepare data for netgroup test")
 	public void modifyGroup_netgroup_prepareTestData(String netGroupName){
 		browser.navigateTo(commonTasks.netgroupPage);
-		String[] allNetGroupNames = netGroupName.split(" ");
+		String[] allNetGroupNames = netGroupName.split(",");
 		for (String name: allNetGroupNames)
 		{
 			String desc = "test netgroup for usergroup testing : ["+name+"]";
-			CommonHelper.createNetGroup(browser, name, desc); 
+			CommonHelper.addNetGroup(browser, name, desc); 
 			Assert.assertTrue(browser.link(name).exists(), "create netgroup:[" + name + "] for testing");
 		} 
 	}
@@ -329,11 +329,11 @@ public class GroupTests extends SahiTestScript{
 		browser.link("User Groups").in(browser.span("back-link")).click();
 	}
 	
-	@Test (groups={"modifyGroup_netgroup_add"},dependsOnGroups="modifyGroup_netgroup_prepare", dataProvider="netGroupsAddMulti", 
+	@Test (groups={"modifyGroup_netgroup_add"},dependsOnGroups="modifyGroup_netgroup_prepare", dataProvider="netGroupsAddMultiple", 
 			description = "add multiple netgroups under group")
 	public void modifyGroup_netgroup_addMultiple( String userGroupName,  String multiNetGroupName){ 
 		browser.link(userGroupName).click(); 
-		String[] netGroupNames = multiNetGroupName.split(" ");
+		String[] netGroupNames = multiNetGroupName.split(",");
 		GroupTasks.addNetGroup_Multiple(browser, netGroupNames);
 		for (String name:netGroupNames) 
 			Assert.assertTrue(browser.link(name).exists(), "after add, check name exist in the list");
@@ -341,7 +341,7 @@ public class GroupTests extends SahiTestScript{
 	}
 	
 	@Test (groups={"modifyGroup_netgroup_add"},dependsOnGroups="modifyGroup_netgroup_prepare", dataProvider="netGroupsAddViaSearch", 
-			description = "add multiple netgroups by using search(filting) function")
+			description = "add multiple netgroups by using search(filtering) function")
 	public void modifyGroup_netgroup_addViaSearch( String userGroupName, String netGroupName){ 
 		browser.link(userGroupName).click(); 
 		GroupTasks.addNetGroup_ViaSearch(browser, netGroupName, netGroupName);
@@ -362,7 +362,7 @@ public class GroupTests extends SahiTestScript{
 			description = "delete multiple netgroups under group")
 	public void modifyGroup_netgroup_DeleteMultiple(String userGroupName, String netGroupName){ 
 		browser.link(userGroupName).click();
-		String[] names = netGroupName.split(" "); 
+		String[] names = netGroupName.split(","); 
 		GroupTasks.deleteNetGroup_Multiple(browser, names);
 		for (String name:names)
 			Assert.assertFalse(browser.link(name).exists(), "netgroup does NOT exist after delete");
@@ -404,7 +404,7 @@ public class GroupTests extends SahiTestScript{
 	}
 	
 	@Test (groups={"modifyGroup_role_add"},dependsOnGroups="addGroup", dataProvider="roleAddViaSearch", 
-			description = "add multiple netgroups by using search(filting) function")
+			description = "add multiple netgroups by using search(filtering) function")
 	public void modifyGroup_role_addViaSearch(String userGroupName, String role){ 
 		browser.link(userGroupName).click(); 
 		GroupTasks.addRole_ViaSearch(browser, role, role);
@@ -433,16 +433,84 @@ public class GroupTests extends SahiTestScript{
 	}
 	
 	@Test (groups={"modifyGroup_role_negative"}, dependsOnGroups="modifyGroup_role_add", dataProvider="roleNegative", 
-			description = "negative test formodify netgroup relation" )
+			description = "negative test formodify role" )
 	public void modifyGroup_role_negative(String testScenario, String groupName, String role){
 		//I can not thing of any negative test case for now (yi 1/25/2012)
 	}
 	
 	/////////////////////////////////// HBAC rules test //////////////////////////////////	
-	@Test (groups={"modifyGroup_notReady"}, description = "modify HBAC rules", dataProvider="HBAC rules")
-	public void modifyGroup_HBACrules(String testDescription, String HBACruels){
-		//need work
+	@Test (groups={"modifyGroup_hbac_prepare"},dependsOnGroups="addGroup", dataProvider="hbacPrepare", 
+			description = "prepare data for HBAC test")
+	public void modifyGroup_hbac_prepareTestData(String hbacRules){
+		browser.navigateTo(commonTasks.hbacPage);
+		String[] rules = hbacRules.split(",");
+		CommonHelper.addHBACrule(browser, rules); 
+		for (String rule: rules)
+			Assert.assertTrue(browser.link(rule).exists(), "create HBAC rule:[" + rule + "] for testing success");
 	}
+	
+	@Test (groups={"modifyGroup_hbac_add"},dependsOnGroups="modifyGroup_hbac_prepare", dataProvider="hbacAddSingle", 
+			description = "add single hbac rule under group")
+	public void modifyGroup_hbac_addSingle( String userGroupName, String hbacRule){ 
+		browser.link(userGroupName).click(); 
+		GroupTasks.addHBAC_Single(browser, hbacRule); 
+		Assert.assertTrue(browser.link(hbacRule).exists(), "expecte user group:["+userGroupName +"] has bhac rule:["+hbacRule+"]");
+		browser.link("User Groups").in(browser.span("back-link")).click();
+	}
+	
+	@Test (groups={"modifyGroup_hbac_add"},dependsOnGroups="modifyGroup_hbac_prepare", dataProvider="hbacAddMultiple", 
+			description = "add multiple hbac rules under group")
+	public void modifyGroup_hbac_addMultiple( String userGroupName,  String multiHBACrules){ 
+		browser.link(userGroupName).click(); 
+		String[] hbacRules= multiHBACrules.split(",");
+		GroupTasks.addHBAC_Multiple(browser, hbacRules);
+		for (String rule:hbacRules) 
+			Assert.assertTrue(browser.link(rule).exists(), "after add, check name exist in the list");
+		browser.link("User Groups").in(browser.span("back-link")).click();
+	}
+	
+	@Test (groups={"modifyGroup_hbac_add"},dependsOnGroups="modifyGroup_hbac_prepare", dataProvider="hbacAddViaSearch", 
+			description = "add multiple hbac rules by using search(filtering) function")
+	public void modifyGroup_hbac_addViaSearch( String userGroupName, String hbacRule){ 
+		browser.link(userGroupName).click(); 
+		GroupTasks.addHBAC_ViaSearch(browser, hbacRule, hbacRule);
+		Assert.assertTrue(browser.link(hbacRule).exists(), "after add, check name exist in the list");
+		browser.link("User Groups").in(browser.span("back-link")).click();
+	}
+	
+	@Test (groups={"modifyGroup_hbac_delete"},dependsOnGroups="modifyGroup_hbac_add", dataProvider="hbacDeleteSingle", 
+			description = "delete single hbac rule under group")
+	public void modifyGroup_hbac_deleteSingle(String userGroupName, String hbacRule){ 
+		browser.link(userGroupName).click();  
+		GroupTasks.deleteHBAC_Single(browser, hbacRule);
+		Assert.assertFalse(browser.link(hbacRule).exists(), "hbac name should not in the list after deleted");
+		browser.link("User Groups").in(browser.span("back-link")).click();
+	}
+	
+	@Test (groups={"modifyGroup_hbac_delete"},dependsOnGroups="modifyGroup_hbac_add", dataProvider="hbacDeleteMultiple", 
+			description = "delete multiple hbac rules under group")
+	public void modifyGroup_hbac_DeleteMultiple(String userGroupName, String hbacRules){ 
+		browser.link(userGroupName).click();
+		String[] names = hbacRules.split(","); 
+		GroupTasks.deleteHBAC_Multiple(browser, names);
+		for (String name:names)
+			Assert.assertFalse(browser.link(name).exists(), "hbac rule does NOT exist after delete");
+		browser.link("User Groups").in(browser.span("back-link")).click();
+	}
+	
+	@Test (groups={"modifyGroup_hbac_negative"}, dependsOnGroups="modifyGroup_hbac_prepare", dataProvider="hbacNegative", 
+			description = "negative test formodify hbac rule " )
+	public void modifyGroup_hbac_negative(String testScenario, String groupName, String hbacRule){
+		//I can not thing of any negative test case for now (yi 1/25/2012)
+	}
+	
+	@Test (groups={"modifyGroup_hbac_cleanup"}, dependsOnGroups="modifyGroup_hbac_delete", dataProvider="hbacCleanup", 
+				description = "clean up test data for hbac testing")
+	public void modifyGroup_hbac_cleanup( String hbacRules){ 
+		browser.navigateTo(commonTasks.hbacPage); 
+		String[] rules = hbacRules.split(",");
+		CommonHelper.deleteHBACrules(browser, rules); 
+	 }
 	
 	/////////////////////////////////// sudo rules test //////////////////////////////////	
 	@Test (groups={"modifyGroup_notReady"}, description = "modify sudo rules", dataProvider="sudo rules")
@@ -456,16 +524,16 @@ public class GroupTests extends SahiTestScript{
 		//need work
 	}
 	
-	@Test (groups={"deleteGroup"}, description="delete group test", dataProvider="firstUserGroupData", dependsOnGroups="modifyGroup_role_delete")
+	@Test (groups={"deleteGroup"}, description="delete group test", dataProvider="firstUserGroupData", dependsOnGroups="modifyGroup_hbac_cleanup")
 	public void deleteGroup_single(String testScenario, String groupName){
 		Assert.assertTrue(browser.link(groupName).exists(),"before 'Delete', group should exists");
 		GroupTasks.deleteGroup(browser, groupName);
 		Assert.assertFalse(browser.link(groupName).exists(),"after 'Delete', group should disappear");
 	}
 	
-	@Test (groups={"deleteGroup"}, description="delete group test", dataProvider="remainingUserGroupData", dependsOnGroups="modifyGroup_role_delete")
+	@Test (groups={"deleteGroup"}, description="delete group test", dataProvider="remainingUserGroupData", dependsOnGroups="modifyGroup_hbac_cleanup")
 	public void deleteGroup_multiple(String testScenario, String groupNames){
-		String[] groups = groupNames.split(" ");
+		String[] groups = groupNames.split(",");
 		for (String groupName:groups){
 			Assert.assertTrue(browser.link(groupName).exists(),"before 'Delete', group should exists");
 		}
@@ -491,8 +559,9 @@ public class GroupTests extends SahiTestScript{
 	
 	private static String[] testNetGroups = {"netgrp000", "netgrp001", "netgrp002", "netgrp003","netgrp004","netgrp005"};
 
-    private static String[] roles = {"helpdesk", "IT Security Specialist", "IT Specialist", "Security Architect", "User Administrator"};
-    	
+	private static String[] roles = {"helpdesk", "IT Security Specialist", "IT Specialist", "Security Architect", "User Administrator"};
+	private static String[] hbacRules= {"habc000", "habc001","habc002","habc003","habc004","habc005","habc006","habc007"};
+		
 	@DataProvider (name="1st_3rd_UserGroupsData")
 	public Object[][] get_1st_3rd_UserGroupsData(){
 		String[][] groups={//scenario, user group name, description, posix or not info
@@ -562,7 +631,7 @@ public class GroupTests extends SahiTestScript{
 	public Object[][] getMultipulGroups(){
 		StringBuffer buffer = new StringBuffer();
 		for(int i=1;i<GroupTests.testUserGroups.length;i++){
-			buffer.append(GroupTests.testUserGroups[i] + " ");
+			buffer.append(GroupTests.testUserGroups[i] + ",");
 		}
 		String[][] multipulGroups = {{"multipul groups", buffer.toString()}};
 		return multipulGroups;
@@ -579,7 +648,7 @@ public class GroupTests extends SahiTestScript{
 		String testuser1 = GroupTests.testUsers[1];
 		String testuser2 = GroupTests.testUsers[2];
 		String testuser3 = GroupTests.testUsers[3];
-		String allTestUsers = testuser1 + " " + testuser2 + " " + testuser3;
+		String allTestUsers = testuser1 + "," + testuser2 + "," + testuser3;
 		String[][] users={ {"user: tuser001, add to 2nd group",GroupTests.testUserGroups[1], allTestUsers }};
 		return users;
 	}
@@ -619,7 +688,7 @@ public class GroupTests extends SahiTestScript{
 	@DataProvider (name="childGroup_multi_member")
 	public Object[][] get_childGroup_multi_member(){
 		String[][] childOfGroup = { //test scenario ; group ; child group
-									{"add group003 and group004 s member of group002", GroupTests.testUserGroups[2], GroupTests.testUserGroups[3] + " " +GroupTests.testUserGroups[4]}
+									{"add group003 and group004 s member of group002", GroupTests.testUserGroups[2], GroupTests.testUserGroups[3] + "," +GroupTests.testUserGroups[4]}
 									};
 		return childOfGroup;
 	}
@@ -643,7 +712,7 @@ public class GroupTests extends SahiTestScript{
 	@DataProvider (name="childGroup_multi_memberof")
 	public Object[][] get_childGroup_multi_memberof(){
 		String[][] childOfGroup = { //test scenario ; group ; child group
-									{"add group010 and group011,as member of group009",GroupTests.testUserGroups[9], GroupTests.testUserGroups[10] + " " + GroupTests.testUserGroups[11]}
+									{"add group010 and group011,as member of group009",GroupTests.testUserGroups[9], GroupTests.testUserGroups[10] + "," + GroupTests.testUserGroups[11]}
 									};
 		return childOfGroup;
 	}
@@ -699,15 +768,16 @@ public class GroupTests extends SahiTestScript{
 		return childOfGroup;
 	}
 	
+	//////////////////////////////// netgroup data providers ///////////////////////////
 	@DataProvider(name="netGroupsPrepare")
 	public Object[][] getNetGroupsPrepare()
 	{
 		String[][] netGroups = { //net group name
-											{GroupTests.testNetGroups[0] + " " 
-											+ GroupTests.testNetGroups[1] +" "
-											+ GroupTests.testNetGroups[2] + " "
-											+ GroupTests.testNetGroups[3] + " "
-											+ GroupTests.testNetGroups[4] + " "
+											{GroupTests.testNetGroups[0] + "," 
+											+ GroupTests.testNetGroups[1] + ","
+											+ GroupTests.testNetGroups[2] + ","
+											+ GroupTests.testNetGroups[3] + ","
+											+ GroupTests.testNetGroups[4] + ","
 											+ GroupTests.testNetGroups[5]
 											} 
 									};
@@ -728,12 +798,12 @@ public class GroupTests extends SahiTestScript{
 		return netGroups;
 	}
 
-	@DataProvider(name="netGroupsAddMulti")
+	@DataProvider(name="netGroupsAddMultiple")
 	public Object[][] getNetGroupsaddMultiple()
 	{
 		String[][] netGroups = { //user group name; net group name (s)
-									{GroupTests.testUserGroups[0], GroupTests.testNetGroups[1] + " " + GroupTests.testNetGroups[2]},
-									{GroupTests.testUserGroups[1], GroupTests.testNetGroups[2] + " " + GroupTests.testNetGroups[3] + " " + GroupTests.testNetGroups[4]}
+									{GroupTests.testUserGroups[0], GroupTests.testNetGroups[1] + "," + GroupTests.testNetGroups[2]},
+									{GroupTests.testUserGroups[1], GroupTests.testNetGroups[2] + "," + GroupTests.testNetGroups[3] + "," + GroupTests.testNetGroups[4]}
 							};
 		return netGroups;
 	}
@@ -779,6 +849,7 @@ public class GroupTests extends SahiTestScript{
 		return getNetGroupsPrepare();
 	}
 
+	//////////////////////////////// role data providers ///////////////////////////
 	@DataProvider(name="roleAddSingle")
 	public Object[][] getRoleAddSingle()
 	{
@@ -815,7 +886,7 @@ public class GroupTests extends SahiTestScript{
 	@DataProvider(name="roleDeleteSingle")
 	public Object[][] getRoleDeleteSingle()
 	{
-        return getRoleAddSingle();
+		return getRoleAddSingle();
 	}
 
 	@DataProvider(name="roleDeleteMultiple")
@@ -824,6 +895,73 @@ public class GroupTests extends SahiTestScript{
 		return getRoleAddMultiple();
 	}
 
+	//////////////////////////////// hbac data providers ///////////////////////////
+	@DataProvider(name="hbacPrepare")
+	public Object[][] getHBACPrepare()
+	{
+		String[][] hbac ={
+							{GroupTests.hbacRules[0] + ","
+							+ GroupTests.hbacRules[1] + ","
+							+ GroupTests.hbacRules[2] + ","
+							+ GroupTests.hbacRules[3] + ","
+							+ GroupTests.hbacRules[4] + ","
+							+ GroupTests.hbacRules[5] + ","
+							+ GroupTests.hbacRules[6] + ","
+							+ GroupTests.hbacRules[7] }
+						};
+		return hbac;
+	}
+
+	@DataProvider(name="hbacAddSingle")
+	public Object[][] getHBACAddSingle()
+	{
+		String[][] hbac = {
+							{GroupTests.testUserGroups[0], GroupTests.hbacRules[0]},
+							{GroupTests.testUserGroups[0], GroupTests.hbacRules[1]},
+							{GroupTests.testUserGroups[0], GroupTests.hbacRules[2]},
+							{GroupTests.testUserGroups[0], GroupTests.hbacRules[3]},
+							{GroupTests.testUserGroups[0], GroupTests.hbacRules[4]},
+						};
+		return hbac;
+	}
+
+	@DataProvider(name="hbacAddMultiple")
+	public Object[][] getHBACAddMultiple()
+	{
+		String[][] hbac = {
+							{GroupTests.testUserGroups[1], GroupTests.hbacRules[0] + "," + GroupTests.hbacRules[1]},
+							{GroupTests.testUserGroups[1], GroupTests.hbacRules[2] + "," + GroupTests.hbacRules[3] + "," + GroupTests.hbacRules[4]}
+						};
+		return hbac;
+	}
+
+	@DataProvider(name="hbacAddViaSearch")
+	public Object[][] getHBACAddViaSearch()
+	{
+		String[][] hbac = { 
+							{GroupTests.testUserGroups[2], GroupTests.hbacRules[0]},
+							{GroupTests.testUserGroups[3], GroupTests.hbacRules[1]}
+						};
+		return hbac;
+	}
+
+	@DataProvider(name="hbacDeleteSingle")
+	public Object[][] getHBACDeleteSingle()
+	{
+		return getHBACAddSingle();
+	}
+
+	@DataProvider(name="hbacDeleteMultiple")
+	public Object[][] getHBACDeleteMultiple()
+	{
+		return getHBACAddMultiple();
+	}
+
+	@DataProvider(name="hbacCleanup")
+	public Object[][] getHBACCleanup()
+	{
+		return getHBACPrepare();
+	}
 
 	public Object[][] getNetGroups()
 	{
