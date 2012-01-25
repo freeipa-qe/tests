@@ -48,6 +48,12 @@ public class GroupTests extends SahiTestScript{
 	
 	@AfterMethod (alwaysRun=true)
 	public void checkUnsavedChanges(){
+		
+		if (browser.link("User Groups").in(browser.span("back-link")).exists())
+		{
+			log.info("detected link 'User Groups', this might be caused by some unclean exit or exception throw (when test case faile), not an error, just try to go back to normal test ui flow");
+			browser.link("User Groups").in(browser.span("back-link")).click();
+		}
 		log.info("Check error dialogs...");
 		// sometimes there are unexpected error that cause the dialog "Unsaved Changes" dialog hanging, click it away
 		if (browser.span("Unsaved Changes").exists() || browser.span("Unsaved Changes[1]").exists() ){
@@ -377,9 +383,59 @@ public class GroupTests extends SahiTestScript{
 	 }
 	
 	/////////////////////////////////// role test //////////////////////////////////	
-	@Test (groups={"modifyGroup_role"}, description = "modify role relation", dataProvider="roles")
-	public void modifyGroup_role(String testScenario, String groupName, String roles) {
-		//need work
+	@Test (groups={"modifyGroup_role_add"},dependsOnGroups="addGroup", dataProvider="roleAddSingle", 
+			description = "add single role under group")
+	public void modifyGroup_role_addSingle( String userGroupName, String role){ 
+		browser.link(userGroupName).click(); 
+		GroupTasks.addRole_Single(browser, role); 
+		Assert.assertTrue(browser.link(role.toLowerCase()).exists(), "expecte user group:["+userGroupName +"] under role:["+role+"]");
+		browser.link("User Groups").in(browser.span("back-link")).click();
+	}
+	
+	@Test (groups={"modifyGroup_role_add"},dependsOnGroups="addGroup", dataProvider="roleAddMultiple", 
+			description = "add multiple roles under group")
+	public void modifyGroup_role_addMultiple( String userGroupName,  String multiRoles){ 
+		browser.link(userGroupName).click(); 
+		String[] roles = multiRoles.split(",");
+		GroupTasks.addRole_Multiple(browser, roles);
+		for (String role:roles) 
+			Assert.assertTrue(browser.link(role.toLowerCase()).exists(), "after add, check name exist in the list");
+		browser.link("User Groups").in(browser.span("back-link")).click();
+	}
+	
+	@Test (groups={"modifyGroup_role_add"},dependsOnGroups="addGroup", dataProvider="roleAddViaSearch", 
+			description = "add multiple netgroups by using search(filting) function")
+	public void modifyGroup_role_addViaSearch(String userGroupName, String role){ 
+		browser.link(userGroupName).click(); 
+		GroupTasks.addRole_ViaSearch(browser, role, role);
+		Assert.assertTrue(browser.link(role.toLowerCase()).exists(), "after add, check name exist in the list");
+		browser.link("User Groups").in(browser.span("back-link")).click();
+	}
+	
+	@Test (groups={"modifyGroup_role_delete"},dependsOnGroups="modifyGroup_role_add", dataProvider="roleDeleteSingle", 
+			description = "delete single role under group")
+	public void modifyGroup_role_deleteSingle(String userGroupName, String role){ 
+		browser.link(userGroupName).click();  
+		GroupTasks.deleteRole_Single(browser, role);
+		Assert.assertFalse(browser.link(role.toLowerCase()).exists(), "role name should not in the list after deleted");
+		browser.link("User Groups").in(browser.span("back-link")).click();
+	}
+	
+	@Test (groups={"modifyGroup_role_delete"},dependsOnGroups="modifyGroup_role_add", dataProvider="roleDeleteMultiple", 
+			description = "delete multiple role under group")
+	public void modifyGroup_role_DeleteMultiple(String userGroupName, String roles){ 
+		browser.link(userGroupName).click();
+		String[] names = roles.split(","); 
+		GroupTasks.deleteRole_Multiple(browser, names);
+		for (String role:names)
+			Assert.assertFalse(browser.link(role.toLowerCase()).exists(), "role does NOT exist after delete");
+		browser.link("User Groups").in(browser.span("back-link")).click();
+	}
+	
+	@Test (groups={"modifyGroup_role_negative"}, dependsOnGroups="modifyGroup_role_add", dataProvider="roleNegative", 
+			description = "negative test formodify netgroup relation" )
+	public void modifyGroup_role_negative(String testScenario, String groupName, String role){
+		//I can not thing of any negative test case for now (yi 1/25/2012)
 	}
 	
 	/////////////////////////////////// HBAC rules test //////////////////////////////////	
@@ -400,14 +456,14 @@ public class GroupTests extends SahiTestScript{
 		//need work
 	}
 	
-	@Test (groups={"deleteGroup"}, description="delete group test", dataProvider="firstUserGroupData", dependsOnGroups="modifyGroup_netgroup_cleanup")
+	@Test (groups={"deleteGroup"}, description="delete group test", dataProvider="firstUserGroupData", dependsOnGroups="modifyGroup_role_delete")
 	public void deleteGroup_single(String testScenario, String groupName){
 		Assert.assertTrue(browser.link(groupName).exists(),"before 'Delete', group should exists");
 		GroupTasks.deleteGroup(browser, groupName);
 		Assert.assertFalse(browser.link(groupName).exists(),"after 'Delete', group should disappear");
 	}
 	
-	@Test (groups={"deleteGroup"}, description="delete group test", dataProvider="remainingUserGroupData", dependsOnGroups="modifyGroup_netgroup_cleanup")
+	@Test (groups={"deleteGroup"}, description="delete group test", dataProvider="remainingUserGroupData", dependsOnGroups="modifyGroup_role_delete")
 	public void deleteGroup_multiple(String testScenario, String groupNames){
 		String[] groups = groupNames.split(" ");
 		for (String groupName:groups){
@@ -434,7 +490,9 @@ public class GroupTests extends SahiTestScript{
 										"user008", "user009", "user010", "user011"};
 	
 	private static String[] testNetGroups = {"netgrp000", "netgrp001", "netgrp002", "netgrp003","netgrp004","netgrp005"};
-	
+
+    private static String[] roles = {"helpdesk", "IT Security Specialist", "IT Specialist", "Security Architect", "User Administrator"};
+    	
 	@DataProvider (name="1st_3rd_UserGroupsData")
 	public Object[][] get_1st_3rd_UserGroupsData(){
 		String[][] groups={//scenario, user group name, description, posix or not info
@@ -719,6 +777,51 @@ public class GroupTests extends SahiTestScript{
 	public Object[][] getNetGroupsCleanup()
 	{
 		return getNetGroupsPrepare();
+	}
+
+	@DataProvider(name="roleAddSingle")
+	public Object[][] getRoleAddSingle()
+	{
+		String[][] selectedDefaultRoles= { //defaults from ipa ui
+									{GroupTests.testUserGroups[0], GroupTests.roles[0]},
+									{GroupTests.testUserGroups[0], GroupTests.roles[1]},
+									{GroupTests.testUserGroups[0], GroupTests.roles[2]},
+									{GroupTests.testUserGroups[0], GroupTests.roles[3]},
+									{GroupTests.testUserGroups[0], GroupTests.roles[4]},
+							};
+		return selectedDefaultRoles;
+	}
+
+	@DataProvider(name="roleAddMultiple")
+	public Object[][] getRoleAddMultiple()
+	{
+		String[][] selectedDefaultRoles= { //defaults from ipa ui
+									{GroupTests.testUserGroups[1], GroupTests.roles[0] + "," + GroupTests.roles[1]},
+									{GroupTests.testUserGroups[1], GroupTests.roles[2] + "," + GroupTests.roles[3] + "," + GroupTests.roles[4]}
+							};
+		return selectedDefaultRoles;
+	}
+
+	@DataProvider(name="roleAddViaSearch")
+	public Object[][] getRoleDefault()
+	{
+		String[][] selectedDefaultRoles= { //defaults from ipa ui
+									{GroupTests.testUserGroups[2], GroupTests.roles[0]},
+									{GroupTests.testUserGroups[3], GroupTests.roles[1]}
+							};
+		return selectedDefaultRoles;
+	}
+
+	@DataProvider(name="roleDeleteSingle")
+	public Object[][] getRoleDeleteSingle()
+	{
+        return getRoleAddSingle();
+	}
+
+	@DataProvider(name="roleDeleteMultiple")
+	public Object[][] getRoleDeleteMultiple()
+	{
+		return getRoleAddMultiple();
 	}
 
 

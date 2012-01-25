@@ -558,5 +558,41 @@ public class GroupTasks {
 			Assert.assertTrue(browser.link(name).exists(), "netgroup exist before delete");
 		deleteMultiple(browser, netGroupNames);
 	}
+
+	public static void addRole_Single(SahiTasks browser, String role) {
+		browser.link("memberof_role").click();
+		addSingle(browser, role);
+	}
+
+
+	public static void addRole_Multiple(SahiTasks browser,String[] roles) {
+		browser.link("memberof_role").click();
+		addMultiple(browser, roles);
+	}
+
+	public static void addRole_ViaSearch(SahiTasks browser,	String filter, String role) {
+		browser.link("memberof_role").click();
+		addViaSearch(browser, filter, role);
+	}
+
+	public static void deleteRole_Single(SahiTasks browser,String role) {
+		browser.link("memberof_role").click();
+		Assert.assertTrue(browser.link(role.toLowerCase()).exists(), "role should in the list before deleted");
+		deleteSingle(browser, role.toLowerCase());
+	}
+	
+	public static void deleteRole_Multiple(SahiTasks browser,String[] roles) {
+		browser.link("memberof_role").click(); 
+		String[] lowerCaseRoles = new String[roles.length];
+		int i=0;
+		for (String name:roles)
+		{
+			String lowerCaseRoleName = name.toLowerCase();
+			lowerCaseRoles[i] = lowerCaseRoleName;
+			i++;
+			Assert.assertTrue(browser.link(lowerCaseRoleName).exists(), "roles exist before delete");
+		}
+		deleteMultiple(browser, lowerCaseRoles);
+	}
 }//class Group Tasks
 
