@@ -72,7 +72,8 @@ install_fornexttest()
        if [ ! -f $DEFAULT  ] ; then
            rlLog "Install for next test"
            # an existing install is required to begin this test.
-           rlRun "ipa-client-install --domain=$DOMAIN --realm=$RELM --ntp-server=$NTPSERVER -p $ADMINID -w $ADMINPW -U --server=$MASTER" 0 "Installing ipa client for next test"
+           rlLog "Executing: ipa-client-install -p $ADMINID -w $ADMINPW -U" 
+           rlRun "ipa-client-install -p $ADMINID -w $ADMINPW -U" 0 "Installing ipa client for next test"
        fi
 }
 
