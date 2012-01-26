@@ -29,7 +29,7 @@ ipaclientinstall()
 #   --server=SERVER Set the IPA server to connect to
    ipaclientinstall_server_nodomain 
    ipaclientinstall_server_invalidserver
-   ipaclientinstall_server_unreachableserver
+#   ipaclientinstall_server_unreachableserver
 
 
 #   --realm=REALM_NAME Set the IPA realm name to REALM_NAME 
@@ -37,7 +37,7 @@ ipaclientinstall()
    ipaclientinstall_invalidrealm 
 
 #   --hostname The hostname of this server (FQDN). By default of nodename from uname(2) is used. 
-#   ipaclientinstall_hostname 
+   ipaclientinstall_hostname 
 
 
 
