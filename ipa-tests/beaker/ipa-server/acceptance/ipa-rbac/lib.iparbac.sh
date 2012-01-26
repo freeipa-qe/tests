@@ -10,13 +10,15 @@
 # verifyPermissionTypeAttr Usage:
 #       verifyPermissionTypeAttr <permissionName> <permissionRights> <permissionType> <permissionAttr> <objectclass>
 ######################################################################
-verifyPermissionTypeAttr()
+verifyPermissionTargetAttr()
 {
     permissionName=$1
     permissionRights=$2
-    permissionType=$3
-    permissionAttr=$4
-    objectclass=$5
+    target=$3
+    permissionTarget=$4
+    permissionAttr=$5
+    objectclass=$6
+    permissionMemberOf=$7 
 
 
 
@@ -24,8 +26,13 @@ verifyPermissionTypeAttr()
      rlRun "verifyPermissionAttr $permissionName all \"Permission name\" $permissionName" 0 "Verify Permission Name"
      rlRun "verifyPermissionAttr $permissionName all \"Permissions\" $permissionRights" 0 "Verify Permissions"
      rlRun "verifyPermissionAttr $permissionName all \"Attributes\" $permissionAttr" 0 "Verify Attributes"
-     rlRun "verifyPermissionAttr $permissionName all \"Type\" $permissionType" 0 "Verify Type"
+     rlRun "verifyPermissionAttr $permissionName all $target $permissionTarget" 0 "Verify Target"
      rlRun "verifyPermissionAttr $permissionName all \"objectclass\" $objectclass" 0 "Verify objectclass"
+     if [ -z $permissionMemberOf ] ; then
+       rlLog "Not verifying memberOf"
+     else
+       rlRun "verifyPermissionAttr $permissionName all \"Member of group\" $permissionMemberOf" 0 "Verify Member of group"
+     fi
 }
 
 
@@ -67,54 +74,3 @@ verifyPermissionRawTypeAttr()
         rlRun "verifyPermissionAttr $permissionName raw \"objectclass\" $oc" 0 "Verify objectclass"
      done
 }
-
-
-######################################################################
-# Verify permission that have name, rights, filter and objectclass assigned
-# when using --all to show these.
-#
-# verifyPermissionFilter Usage:
-#       verifyPermissionFilter <permissionName> <permissionRights> <permissionFilter> <objectclass>
-######################################################################
-verifyPermissionFilter()
-{
-    permissionName=$1
-    permissionRights=$2
-    permissionFilter=$3
-    objectclass=$4
-
-
-
-     rlRun "verifyPermissionAttr $permissionName all \"dn\" \"cn=`echo $permissionName | tr '[A-Z]' '[a-z]'`,cn=permissions,cn=pbac,dc=testrelm\" " 0 "Verify dn"
-     rlRun "verifyPermissionAttr $permissionName all \"Permission name\" $permissionName" 0 "Verify Permission Name"
-     rlRun "verifyPermissionAttr $permissionName all \"Permissions\" $permissionRights" 0 "Verify Permissions"
-     rlRun "verifyPermissionAttr $permissionName all \"Filter\" $permissionFilter" 0 "Verify Filter"
-     rlRun "verifyPermissionAttr $permissionName all \"objectclass\" $objectclass" 0 "Verify objectclass"
-}
-
-
-######################################################################
-# Verify permission that have name, rights, subtree, memberof and objectclass assigned
-# when using --all to show these.
-#
-# verifyPermissionSubtree Usage:
-#       verifyPermissionSubtree <permissionName> <permissionRights> <permissionSubtree> <permissionMemberOf> <objectclass>
-######################################################################
-verifyPermissionSubtree()
-{
-    permissionName=$1
-    permissionRights=$2
-    permissionSubtree=$3
-    permissionMemberOf=$4 
-    objectclass=$5
-
-
-
-     rlRun "verifyPermissionAttr $permissionName all \"dn\" \"cn=`echo $permissionName | tr '[A-Z]' '[a-z]'`,cn=permissions,cn=pbac,dc=testrelm\" " 0 "Verify dn"
-     rlRun "verifyPermissionAttr $permissionName all \"Permission name\" $permissionName" 0 "Verify Permission Name"
-     rlRun "verifyPermissionAttr $permissionName all \"Permissions\" $permissionRights" 0 "Verify Permissions"
-     rlRun "verifyPermissionAttr $permissionName all \"Subtree\" ldap:\/\/\/$permissionSubtree" 0 "Verify Subtree"
-     rlRun "verifyPermissionAttr $permissionName all \"Member of group\" $permissionMemberOf" 0 "Verify Member of group"
-     rlRun "verifyPermissionAttr $permissionName all \"objectclass\" $objectclass" 0 "Verify objectclass"
-}
-

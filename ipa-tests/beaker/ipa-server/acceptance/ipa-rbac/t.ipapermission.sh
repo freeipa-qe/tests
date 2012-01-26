@@ -6,7 +6,7 @@
 ########################
 ipapermissionTests() {
     setup
-    cleanup
+#    cleanup
     ipapermission_add
 #    ipapermission_del
 #    ipapermission_find
@@ -36,8 +36,11 @@ cleanup()
     permissionName1="ManageUser1"
     permissionName2="ManageUser2"
     permissionName3="ManageUser3"
-    permissionName4="ManageGroup1"
-    permissionName5="ManageHost1"
+    permissionName4="ManageUser4"
+    permissionName5="ManageUser5"
+    permissionName6="ManageGroup1"
+    permissionName7="ManageGroup2"
+    permissionName8="ManageHost1"
     permissionNameBUG="ManageUser"
     rlPhaseStartTest "Cleanup - delete permissions added for this test suite"
      rlRun "deletePermission $permissionName1" 0 "Deleting $permissionName1"
@@ -45,6 +48,9 @@ cleanup()
      rlRun "deletePermission $permissionName3" 0 "Deleting $permissionName3"
      rlRun "deletePermission $permissionName4" 0 "Deleting $permissionName4"
      rlRun "deletePermission $permissionName5" 0 "Deleting $permissionName5"
+     rlRun "deletePermission $permissionName6" 0 "Deleting $permissionName6"
+     rlRun "deletePermission $permissionName7" 0 "Deleting $permissionName7"
+     rlRun "deletePermission $permissionName8" 0 "Deleting $permissionName8"
      #TODO: This permission shouldn't be added, and so will not be available 
      # for deleting, after bug 783502 is fixed.
      rlRun "deletePermission $permissionNameBUG" 0 "Deleting $permissionNameBUG"
@@ -70,9 +76,9 @@ ipapermission_add()
 ipapermission_add_positive()
 {
    ipapermission_params_user_type
-   ipapermission_params_group_filter
-   ipapermission_params_host_subtree
-#  ipapermission_params_service_targetgroup
+#   ipapermission_params_group_filter
+#   ipapermission_params_host_subtree
+#   ipapermission_params_targetgroup
 #  ipapermission_params_hostgroup_type
 #  ipapermission_params_netgroup_filter
 #  ipapermission_params_dnsrecord_subtree
@@ -83,34 +89,54 @@ ipapermission_add_positive()
 ################################################
 ipapermission_params_user_type()
 {
-    permissionRights="read"
-    permissionTarget="--type=user"
-    permissionTargetToVerify=`echo $permissionTarget | sed 's/--type=//'`
+    permissionRights="write"
+    permissionLocalTarget="--type=user"
+    permissionLocalTargetToVerify=`echo $permissionLocalTarget | sed 's/--type=//'`
 
     permissionName="ManageUser1"
-    permissionAttr="carlicense,description"
+    permissionLocalAttr="carlicense,description"
     objectclass="groupofnames,ipapermission,top"
 
    rlPhaseStartTest "ipa-permission-cli-1001: add permission for type user, with multiple attr"
-     rlRun "addPermission $permissionName $permissionRights $permissionTarget --attr=$permissionAttr" 0 "Adding $permissionName"
-     verifyPermissionTypeAttr $permissionName $permissionRights $permissionTargetToVerify $permissionAttr   $objectclass
+     rlRun "addPermission $permissionName $permissionRights $permissionLocalTarget $permissionLocalAttr" 0 "Adding $permissionName"
+     verifyPermissionTargetAttr $permissionName $permissionRights "Type" $permissionLocalTargetToVerify $permissionLocalAttr   $objectclass
    rlPhaseEnd
 
    permissionName="ManageUser2"
    permissionRights="read,write"
    rlPhaseStartTest "ipa-permission-cli-1002: add permission for type user, with multiple attr, and multiple permissions"
-     rlRun "addPermission $permissionName $permissionRights $permissionTarget --attr=$permissionAttr" 0 "Adding $permissionName"
-     verifyPermissionTypeAttr $permissionName $permissionRights $permissionTargetToVerify $permissionAttr $objectclass
+     rlRun "addPermission $permissionName $permissionRights $permissionLocalTarget $permissionLocalAttr" 0 "Adding $permissionName"
+     verifyPermissionTargetAttr $permissionName $permissionRights "Type" $permissionLocalTargetToVerify $permissionLocalAttr $objectclass
    rlPhaseEnd
 
    permissionName="ManageUser3"
-   permissionAddAttr="--addattr\ attrs=audio"
-   rlPhaseStartTest "ipa-permission-cli-1003: add permission for type user, with multiple attr, multiple permissions, and add an attribute (bug 782861)"
-     rlRun "addPermission $permissionName $permissionRights $permissionTarget --attr=$permissionAttr $permissionAddAttr" 0 "Adding $permissionName"
-     verifyPermissionTypeAttr $permissionName $permissionRights $permissionTargetToVerify $permissionAttr $objectclass
-     verifyPermissionRawTypeAttr $permissionName $permissionRights $permissionTargetToVerify $permissionAttr,audio $objectclass
+   permissionAddAttr="--addattr=\"description=test\""
+   rlPhaseStartTest "ipa-permission-cli-1003: add permission for type user, with multiple attr, multiple permissions, and add an attribute"
+     rlRun "addPermission $permissionName $permissionRights $permissionLocalTarget $permissionLocalAttr $permissionAddAttr" 0 "Adding $permissionName"
+     verifyPermissionTargetAttr $permissionName $permissionRights "Type" $permissionLocalTargetToVerify $permissionLocalAttr $objectclass
+     verifyPermissionRawTypeAttr $permissionName $permissionRights $permissionLocalTargetToVerify $permissionLocalAttr $objectclass
+     rlRun "verifyPermissionAttr $permissionName raw \"description\" \"test\"" 0 "Verify Added Attr"
    rlPhaseEnd
 
+
+   permissionName="ManageUser4"
+   permissionAddAttr="--setattr=\"owner=cn=test\""
+   rlPhaseStartTest "ipa-permission-cli-1003: add permission for type user, with multiple attr, multiple permissions, and set an attribute"
+     rlRun "addPermission $permissionName $permissionRights $permissionLocalTarget $permissionLocalAttr $permissionAddAttr" 0 "Adding $permissionName"
+     verifyPermissionTargetAttr $permissionName $permissionRights "Type" $permissionLocalTargetToVerify $permissionLocalAttr $objectclass
+     verifyPermissionRawTypeAttr $permissionName $permissionRights $permissionLocalTargetToVerify $permissionLocalAttr $objectclass
+     rlRun "verifyPermissionAttr $permissionName raw \"owner\" \"cn=test\"" 0 "Verify Set Attr"
+   rlPhaseEnd
+
+   permissionName="ManageUser5"
+   permissionAddAttr="--setattr=\"owner=cn=test\"\ --addattr=\"owner=cn=test2\""
+   rlPhaseStartTest "ipa-permission-cli-1003: add permission for type user, with multiple attr, multiple permissions, and add and set multivalued attributes"
+     rlRun "addPermission $permissionName $permissionRights $permissionLocalTarget $permissionLocalAttr $permissionAddAttr" 0 "Adding $permissionName"
+     verifyPermissionTargetAttr $permissionName $permissionRights "Type" $permissionLocalTargetToVerify $permissionLocalAttr $objectclass
+     verifyPermissionRawTypeAttr $permissionName $permissionRights $permissionLocalTargetToVerify $permissionLocalAttr $objectclass
+     rlRun "verifyPermissionAttr $permissionName raw \"owner\" \"cn=test\"" 0 "Verify Set Attr"
+     rlRun "verifyPermissionAttr $permissionName raw \"owner\" \"cn=test2\"" 0 "Verify Set Attr"
+   rlPhaseEnd
 
    #TODO: Add with type and memberof
 }
@@ -122,15 +148,15 @@ ipapermission_params_user_type()
 ipapermission_params_group_filter()
 {
     permissionRights="write"
-    permissionTarget="--filter=\(\&\(!\(objectclass=posixgroup\)\)\(objectclass=ipausergroup\)\)"
-    permissionTargetToVerify=`echo $permissionTarget | sed 's/--filter=//'`
-
+    permissionLocalTarget="--filter=\(\&\(!\(objectclass=posixgroup\)\)\(objectclass=ipausergroup\)\)"
+    permissionLocalTargetToVerify=`echo $permissionLocalTarget | sed 's/--filter=//'`
+    permissionLocalAttr="member"
     permissionName="ManageGroup1"
     objectclass="groupofnames,ipapermission,top"
 
    rlPhaseStartTest "ipa-permission-cli-1004: add permission using filter for groups"
-     rlRun "addPermission $permissionName $permissionRights $permissionTarget" 0 "Adding $permissionName"
-     verifyPermissionFilter $permissionName $permissionRights $permissionTargetToVerify $objectclass
+     rlRun "addPermission $permissionName $permissionRights $permissionLocalTarget $permissionLocalAttr" 0 "Adding $permissionName"
+     verifyPermissionTargetAttr $permissionName $permissionRights "Filter" $permissionLocalTargetToVerify $permissionLocalAttr $objectclass
    rlPhaseEnd
 
 }
@@ -144,18 +170,41 @@ ipapermission_params_host_subtree()
 {
 
     permissionRights="write"
-    permissionTarget="--subtree=cn=computers,cn=accounts,dc=testrelm,dc=com"
-    permissionTargetToVerify=`echo $permissionTarget | sed 's/--subtree=//'`
-    permissionMemberOf="groupone"
+    permissionLocalTarget="--subtree=cn=computers,cn=accounts,dc=testrelm,dc=com"
+    permissionLocalTargetToVerify="ldap:\/\/\/`echo $permissionLocalTarget | sed 's/--subtree=//'`"
+    permissionLocalMemberOf="groupone"
     permissionName="ManageHost1"
+    permissionLocalAttr="nshostlocation"
     objectclass="groupofnames,ipapermission,top"
 
    rlPhaseStartTest "ipa-permission-cli-1005: add permission using subtree for hosts"
-     rlRun "addPermission $permissionName $permissionRights $permissionTarget --memberof=$permissionMemberOf" 0 "Adding $permissionName"
-     verifyPermissionSubtree $permissionName $permissionRights $permissionTargetToVerify $permissionMemberOf $objectclass
+     rlRun "addPermission $permissionName $permissionRights $permissionLocalTarget  $permissionLocalAttr --memberof=$permissionLocalMemberOf" 0 "Adding $permissionName"
+     verifyPermissionTargetAttr $permissionName $permissionRights "Subtree" $permissionLocalTargetToVerify $permissionLocalAttr $objectclass $permissionLocalMemberOf 
    rlPhaseEnd
 
 }
+
+
+##################################################
+#  test: ipapermission-add: Positive: Targetgroup 
+##################################################
+ipapermission_params_targetgroup()
+{
+
+    permissionRights="write"
+    permissionLocalTarget="--targetgroup=groupone"
+    permissionLocalAttr="description"
+    permissionLocalTargetToVerify=`echo $permissionLocalTarget | sed 's/--targetgroup=//'`
+    permissionName="ManageGroup2"
+    objectclass="groupofnames,ipapermission,top"
+
+   rlPhaseStartTest "ipa-permission-cli-1005: add permission using targetgroup"
+     rlRun "addPermission $permissionName $permissionRights $permissionLocalTarget $permissionLocalAttr" 0 "Adding $permissionName"
+     verifyPermissionTargetAttr $permissionName $permissionRights "Target\ group" $permissionLocalTargetToVerify $permissionLocalAttr $objectclass
+   rlPhaseEnd
+
+}
+
 
 
 
@@ -168,13 +217,16 @@ ipapermission_add_negative()
 #   ipapermission_add_invalidattr
 #   ipapermission_add_invalidtype
 #   ipapermission_add_multipletarget
-   ipapermission_add_invalidmemberof
+#   ipapermission_add_missingtarget
+#   ipapermission_add_invalidmemberof
+#   ipapermission_add_invalidtype
 #   ipapermission_add_invalidfilter
 #   ipapermission_add_invalidsubtree
 #   ipapermission_add_invalidtargetgroup 
+#   ipapermission_add_missingaddsetattr
 #   ipapermission_add_invalidaddattr
 #   ipapermission_add_invalidsetattr
-#   ipapermission_add_duplicateperm
+   ipapermission_add_duplicateperm
 }
 
 ###################################################
@@ -184,17 +236,26 @@ ipapermission_add_invalidright()
 {
 
     permissionRights="reads"
-    permissionTarget="--type=user"
+    permissionLocalTarget="--type=user"
 
     permissionName="ManageUser"
-    permissionAttr="carlicense,description"
+    permissionLocalAttr="carlicense,description"
 
    rlPhaseStartTest "ipa-permission-cli-1005: add permission with invalid right" 
-     command="addPermission $permissionName $permissionRights $permissionTarget --attr=$permissionAttr" 
+     command="addPermission $permissionName $permissionRights $permissionLocalTarget $permissionLocalAttr" 
      expmsg="ipa: ERROR: invalid 'permissions': \"$permissionRights\" is not a valid permission"
-     rlRun "$command > /tmp/ipapermission_invalidright.log 2>&1" 1 "Verify error message for $permissionRights"
-     rlAssertGrep "$expmsg" "/tmp/ipapermission_invalidright.log"
+     rlRun "$command > /tmp/ipapermission_invalidright1.log 2>&1" 1 "Verify error message for $permissionRights"
+     rlAssertGrep "$expmsg" "/tmp/ipapermission_invalidright1.log"
    rlPhaseEnd
+
+   permissionRights="\ "
+   rlPhaseStartTest "ipa-permission-cli-1005: add permission with missing right" 
+     command="addPermission $permissionName $permissionRights $permissionLocalTarget $permissionLocalAttr" 
+     expmsg="ipa: ERROR: 'permissions' is required"
+     rlRun "$command > /tmp/ipapermission_invalidright2.log 2>&1" 1 "Verify error message for missing right" 
+     rlAssertGrep "$expmsg" "/tmp/ipapermission_invalidright2.log"
+   rlPhaseEnd
+
 }
 
 
@@ -204,24 +265,24 @@ ipapermission_add_invalidright()
 ipapermission_add_invalidattr()
 {
     permissionRights="read"
-    permissionTarget="--type=user"
+    permissionLocalTarget="--type=user"
 
     permissionName="ManageUser"
-    permissionAttr="invalidattr"
+    permissionLocalAttr="invalidattr"
 
    rlPhaseStartTest "ipa-permission-cli-1006: add permission with invalid attr" 
-     command="addPermission $permissionName $permissionRights $permissionTarget --attr=$permissionAttr" 
-     expmsg="ipa: ERROR: targetattr \"$permissionAttr\" does not exist in schema. Please add attributeTypes \"$permissionAttr\" to schema if necessary." 
-     rlRun "$command > /tmp/ipapermission_invalidattr1.log 2>&1" 1 "Verify error message for $permissionAttr"
+     command="addPermission $permissionName $permissionRights $permissionLocalTarget $permissionLocalAttr" 
+     expmsg="ipa: ERROR: targetattr \"$permissionLocalAttr\" does not exist in schema. Please add attributeTypes \"$permissionLocalAttr\" to schema if necessary." 
+     rlRun "$command > /tmp/ipapermission_invalidattr1.log 2>&1" 1 "Verify error message for $permissionLocalAttr"
      rlAssertGrep "$expmsg" "/tmp/ipapermission_invalidattr1.log"
    rlPhaseEnd
 
-   permissionAttr="ipaclientversion"
+   permissionLocalAttr="ipaclientversion"
 
    rlPhaseStartTest "ipa-permission-cli-1007: add permission with invalid attr for the type being added (bug 783502)" 
-     command="addPermission $permissionName $permissionRights $permissionTarget --attr=$permissionAttr" 
-     expmsg="ipa: ERROR: attribute \"$permissionAttr\" not allowed"
-     rlRun "$command > /tmp/ipapermission_invalidattr2.log 2>&1" 1 "Verify error message for $permissionAttr"
+     command="addPermission $permissionName $permissionRights $permissionLocalTarget $permissionLocalAttr" 
+     expmsg="ipa: ERROR: attribute \"$permissionLocalAttr\" not allowed"
+     rlRun "$command > /tmp/ipapermission_invalidattr2.log 2>&1" 1 "Verify error message for $permissionLocalAttr"
      rlAssertGrep "$expmsg" "/tmp/ipapermission_invalidattr2.log"
    rlPhaseEnd
 
@@ -233,28 +294,85 @@ ipapermission_add_invalidattr()
 ipapermission_add_multipletarget()
 {
     permissionRights="read"
-    permissionTarget1="--type=user"
-    permissionTarget2="\ --subtree=cn=users,cn=accounts,dc=testrelm,dc=com"   
-    permissionTarget3="\ --filter=\(givenname=xyz\)"
+    permissionLocalTarget1="--type=user"
+    permissionLocalTarget2="\ --subtree=cn=users,cn=accounts,dc=testrelm,dc=com"   
+    permissionLocalTarget3="\ --filter=\(givenname=xyz\)"
 
     permissionName="ManageUser"
-    permissionAttr="carlicense"
+    permissionLocalAttr="carlicense"
 
    rlPhaseStartTest "ipa-permission-cli-1008: add permission with multiple targets - type & subtree" 
-     command="addPermission $permissionName $permissionRights $permissionTarget1$permissionTarget2 --attr=$permissionAttr" 
+     command="addPermission $permissionName $permissionRights $permissionLocalTarget1$permissionLocalTarget2 $permissionLocalAttr" 
      expmsg="ipa: ERROR: invalid 'target': type, filter, subtree and targetgroup are mutually exclusive"
-     rlRun "$command > /tmp/ipapermission_multipletargets1.log 2>&1" 1 "Verify error message for $permissionAttr"
+     rlRun "$command > /tmp/ipapermission_multipletargets1.log 2>&1" 1 "Verify error message for $permissionLocalAttr"
      rlAssertGrep "$expmsg" "/tmp/ipapermission_multipletargets1.log"
    rlPhaseEnd
 
    rlPhaseStartTest "ipa-permission-cli-1009: add permission with multiple targets - type & filter" 
-     command="addPermission $permissionName $permissionRights $permissionTarget1$permissionTarget3 --attr=$permissionAttr" 
+     command="addPermission $permissionName $permissionRights $permissionLocalTarget1$permissionLocalTarget3 $permissionLocalAttr" 
      expmsg="ipa: ERROR: invalid 'target': type, filter, subtree and targetgroup are mutually exclusive"
-     rlRun "$command > /tmp/ipapermission_multipletargets2.log 2>&1" 1 "Verify error message for $permissionAttr"
+     rlRun "$command > /tmp/ipapermission_multipletargets2.log 2>&1" 1 "Verify error message for $permissionLocalAttr"
      rlAssertGrep "$expmsg" "/tmp/ipapermission_multipletargets2.log"
    rlPhaseEnd
 
 }
+
+
+######################################################
+#  test: ipapermission-add: Negative: Missing Target 
+######################################################
+ipapermission_add_missingtarget()
+{
+
+    permissionName="TestPermission"
+    permissionLocalRights="write"
+    permissionLocalTarget="--type"
+
+   rlPhaseStartTest "ipa-permission-cli-1008: add permission with missing target for type" 
+     command="addPermission $permissionName $permissionLocalRights $permissionLocalTarget" 
+     expmsg="ipa: error: --type option requires an argument"
+     rlRun "$command > /tmp/ipapermission_missingtargets1.log 2>&1" 2 "Verify error message for missing target for Type"
+     rlAssertGrep "$expmsg" "/tmp/ipapermission_missingtargets1.log"
+   rlPhaseEnd
+   rlPhaseStartTest "ipa-permission-cli-1008: add permission with missing target for type (bug 783475)" 
+     command="addPermission $permissionName $permissionLocalRights $permissionLocalTarget=" 
+     expmsg="ipa: error: --type option requires an argument"
+     rlRun "$command > /tmp/ipapermission_missingtargets2.log 2>&1" 1 "Verify error message for missing target for Type"
+     rlAssertGrep "$expmsg" "/tmp/ipapermission_missingtargets2.log"
+   rlPhaseEnd
+
+   permissionLocalTarget="--subtree"
+   rlPhaseStartTest "ipa-permission-cli-1008: add permission with missing target for subtree" 
+     command="addPermission $permissionName $permissionLocalRights $permissionLocalTarget" 
+     expmsg="ipa: error: --subtree option requires an argument"
+     rlRun "$command > /tmp/ipapermission_missingtargets3.log 2>&1" 2 "Verify error message for missing target for subtree"
+     rlAssertGrep "$expmsg" "/tmp/ipapermission_missingtargets3.log"
+   rlPhaseEnd
+   rlPhaseStartTest "ipa-permission-cli-1008: add permission with missing target for subtree (bug 783475)" 
+     command="addPermission $permissionName $permissionLocalRights $permissionLocalTarget=" 
+     expmsg="ipa: error: --subtree option requires an argument"
+     rlRun "$command > /tmp/ipapermission_missingtargets4.log 2>&1" 1 "Verify error message for missing target for subtree"
+     rlAssertGrep "$expmsg" "/tmp/ipapermission_missingtargets4.log"
+   rlPhaseEnd
+
+   permissionLocalTarget="--filter"
+   rlPhaseStartTest "ipa-permission-cli-1008: add permission with missing target for filter" 
+     command="addPermission $permissionName $permissionLocalRights $permissionLocalTarget" 
+     expmsg="ipa: error: --filter option requires an argument"
+     rlRun "$command > /tmp/ipapermission_missingtargets5.log 2>&1" 2 "Verify error message for missing target for filter"
+     rlAssertGrep "$expmsg" "/tmp/ipapermission_missingtargets5.log"
+   rlPhaseEnd
+   rlPhaseStartTest "ipa-permission-cli-1008: add permission with missing target for filter (bug 783475)" 
+     command="addPermission $permissionName $permissionLocalRights $permissionLocalTarget=" 
+     expmsg="ipa: error: --filter option requires an argument"
+     rlRun "$command > /tmp/ipapermission_missingtargets6.log 2>&1" 1 "Verify error message for missing target for filter"
+     rlAssertGrep "$expmsg" "/tmp/ipapermission_missingtargets6.log"
+   rlPhaseEnd
+
+
+}
+
+
 
 
 ######################################################
@@ -264,13 +382,14 @@ ipapermission_add_invalidmemberof()
 {
 
     permissionRights="write"
-    permissionTarget="--subtree=cn=computers,cn=accounts,dc=testrelm,dc=com"
+    permissionLocalTarget="--subtree=cn=computers,cn=accounts,dc=testrelm,dc=com"
     permissionMemberOf="nonexistentgroup"
     permissionName="ManageHost"
+    permissionLocalAttr="nshostlocation"
     objectclass="groupofnames,ipapermission,top"
 
    rlPhaseStartTest "ipa-permission-cli-1005: add permission using nonexistent memberof group (bug 784329)"
-     command="addPermission $permissionName $permissionRights $permissionTarget --memberof=$permissionMemberOf"
+     command="addPermission $permissionName $permissionRights $permissionLocalTarget $permissionLocalAttr --memberof=$permissionMemberOf"
      expmsg="ipa: ERROR: "
      rlRun "$command > /tmp/ipapermission_invalidmemberof1.log 2>&1" 1 "Verify error message for $permissionMemberOf"
      rlAssertGrep "$expmsg" "/tmp/ipapermission_invalidmemberof1.log"
@@ -279,7 +398,7 @@ ipapermission_add_invalidmemberof()
    rlPhaseEnd
 
    rlPhaseStartTest "ipa-permission-cli-1005: add permission using missing memberof group"
-     command="addPermission $permissionName $permissionRights $permissionTarget --memberof"
+     command="addPermission $permissionName $permissionRights $permissionLocalTarget  $permissionLocalAttr --memberof"
      expmsg="ipa: error: --memberof option requires an argument"
      rlRun "$command > /tmp/ipapermission_invalidmemberof2.log 2>&1" 2 "Verify error message for $permissionMemberOf"
      rlAssertGrep "$expmsg" "/tmp/ipapermission_invalidmemberof2.log"
@@ -287,7 +406,7 @@ ipapermission_add_invalidmemberof()
 
 
    rlPhaseStartTest "ipa-permission-cli-1005: add permission using blank memberof group (bug 783475)"
-     command="addPermission $permissionName $permissionRights $permissionTarget --memberof=\"\""
+     command="addPermission $permissionName $permissionRights $permissionLocalTarget $permissionLocalAttr --memberof=\"\""
      expmsg="ipa: error: Better error message than an internal error has occurred " 
      rlRun "$command > /tmp/ipapermission_invalidmemberof3.log 2>&1" 1 "Verify error message for $permissionMemberOf"
      rlAssertGrep "$expmsg" "/tmp/ipapermission_invalidmemberof3.log"
@@ -299,17 +418,36 @@ ipapermission_add_invalidmemberof()
 
 
 ######################################################
+#  test: ipapermission-add: Negative: Invalid Type 
+######################################################
+ipapermission_add_invalidtype()
+{
+    permissionName="TestPermission"
+    permissionLocalRights="write"
+    permissionLocalTarget="--type=xyz"
+
+   rlPhaseStartTest "ipa-permission-cli-1010: add permission using invalid type" 
+     command="addPermission $permissionName $permissionLocalRights $permissionLocalTarget"
+     expmsg="ipa: ERROR: invalid 'type': must be one of (u'user', u'group', u'host', u'service', u'hostgroup', u'netgroup', u'dnsrecord')"
+     rlRun "$command > /tmp/ipapermission_invalidtype.log 2>&1" 1 "Verify error message for invalid type"
+     rlAssertGrep "$expmsg" "/tmp/ipapermission_invalidtype.log"
+   rlPhaseEnd
+
+}
+
+
+######################################################
 #  test: ipapermission-add: Negative: Invalid Filter
 ######################################################
 ipapermission_add_invalidfilter()
 {
     permissionRights="write"
-    permissionTarget="--filter=\(\&\(!\(objectclass\)\)\(objectclass=ipausergroup\)\)"
-
+    permissionLocalTarget="--filter=\(\&\(!\(objectclass\)\)\(objectclass=ipausergroup\)\)"
+    permissionLocalAttr="description"
     permissionName="ManageGroup"
 
    rlPhaseStartTest "ipa-permission-cli-1010: add permission using invalid filter for groups"
-     command="addPermission $permissionName $permissionRights $permissionTarget"
+     command="addPermission $permissionName $permissionRights $permissionLocalTarget $permissionLocalAttr "
      expmsg="ipa: ERROR: Bad search filter"
      rlRun "$command > /tmp/ipapermission_invalidfilter.log 2>&1" 1 "Verify error message for $filter"
      rlAssertGrep "$expmsg" "/tmp/ipapermission_invalidfilter.log"
@@ -319,21 +457,131 @@ ipapermission_add_invalidfilter()
 }
 
 
-#ipapermission_params_user()
-#{
-#
-#}
-#
-#ipapermission_params_group()
-#{
-#
-#}
-#
-#ipapermission_params_host()
-#{
-#
-#}
-#
+######################################################
+#  test: ipapermission-add: Negative: Invalid Subtree 
+######################################################
+ipapermission_add_invalidsubtree()
+{
+    permissionLocalRights="write"
+    permissionLocalTarget="--subtree=xyz"
+    permissionName="TestPermission"
+
+   rlPhaseStartTest "ipa-permission-cli-1010: add permission using invalid subtree"
+     command="addPermission $permissionName $permissionLocalRights $permissionLocalTarget"
+     expmsg="ipa: ERROR: ACL Invalid Target Error"
+     rlRun "$command > /tmp/ipapermission_invalidsubtree.log 2>&1" 1 "Verify error message for invalid subtree"
+     rlAssertGrep "$expmsg" "/tmp/ipapermission_invalidsubtree.log"
+   rlPhaseEnd
+
+}
+
+
+######################################################
+#  test: ipapermission-add: Negative: Missing Add/Set Attr 
+######################################################
+ipapermission_add_missingaddsetattr()
+{
+
+    permissionName="TestPermission"
+    permissionLocalRights="write"
+    permissionLocalTarget="--type=hostgroup"
+    permissionLocalAttr="carlicense"
+    permissionAddAttr="--addattr"
+
+   rlPhaseStartTest "ipa-permission-cli-1008: add permission with missing addattr value" 
+     command="addPermission $permissionName $permissionLocalRights $permissionLocalTarget $permissionLocalAttr $permissionAddAttr" 
+     expmsg="ipa: error: --addattr option requires an argument"
+     rlRun "$command > /tmp/ipapermission_missingaddattr1.log 2>&1" 2 "Verify error message for missing addattr" 
+     rlAssertGrep "$expmsg" "/tmp/ipapermission_missingaddattr1.log"
+   rlPhaseEnd
+   rlPhaseStartTest "ipa-permission-cli-1008: add permission with missing addattr value (bug 783475)" 
+     command="addPermission $permissionName $permissionLocalRights $permissionLocalTarget $permissionLocalAttr $permissionAddAttr=" 
+     expmsg="ipa: error: --addattr option requires an argument"
+     rlRun "$command > /tmp/ipapermission_missingaddattr2.log 2>&1" 2 "Verify error message for missing  addattr"
+     rlAssertGrep "$expmsg" "/tmp/ipapermission_missingaddattr2.log"
+   rlPhaseEnd
+
+   permissionSetAttr="--setattr"
+
+   rlPhaseStartTest "ipa-permission-cli-1008: add permission with missing setattr value" 
+     command="addPermission $permissionName $permissionLocalRights $permissionLocalTarget $permissionLocalAttr $permissionSetAttr" 
+     expmsg="ipa: error: --setattr option requires an argument"
+     rlRun "$command > /tmp/ipapermission_missingsetattr1.log 2>&1" 2 "Verify error message for missing setattr" 
+     rlAssertGrep "$expmsg" "/tmp/ipapermission_missingsetattr1.log"
+   rlPhaseEnd
+   rlPhaseStartTest "ipa-permission-cli-1008: add permission with missing addattr value (bug 783475)" 
+     command="addPermission $permissionName $permissionLocalRights $permissionLocalTarget $permissionLocalAttr $permissionAddAttr=" 
+     expmsg="ipa: error: --setattr option requires an argument"
+     rlRun "$command > /tmp/ipapermission_missingsetattr2.log 2>&1" 2 "Verify error message for missing setattr"
+     rlAssertGrep "$expmsg" "/tmp/ipapermission_missingsetattr2.log"
+   rlPhaseEnd
+}
+
+
+
+
+######################################################
+#  test: ipapermission-add: Negative: Invalid Add Attr 
+######################################################
+ipapermission_add_invalidaddattr()
+{
+   permissionName="TestPermission"
+   permissionLocalTarget="--type=user"
+   permissionLocalAttr="carlicense"
+   permissionAddAttr="--addattr=\"xyz=test\""
+   permissionLocalRights="write"
+
+   rlPhaseStartTest "ipa-permission-cli-1003: add permission using invalid add attribute"
+     command="addPermission $permissionName $permissionLocalRights $permissionLocalTarget $permissionLocalAttr $permissionAddAttr"
+     expmsg="ipa: ERROR: attribute \"xyz\" not allowed"
+     rlRun "$command > /tmp/ipapermission_invalidaddattr.log 2>&1" 1 "Verify error message for invalid addattr"
+     rlAssertGrep "$expmsg" "/tmp/ipapermission_invalidaddattr.log"
+   rlPhaseEnd
+}
+
+
+######################################################
+#  test: ipapermission-add: Negative: Invalid Set Attr 
+######################################################
+ipapermission_add_invalidsetattr()
+{
+   permissionName="TestPermission"
+   permissionLocalTarget="--type=user"
+   permissionLocalAttr="carlicense"
+   permissionLocalRights="write"
+   permissionAddAttr="--setattr=\"owner=test\""
+
+   rlPhaseStartTest "ipa-permission-cli-1003: add permission using invalid setattr"
+     command="addPermission $permissionName $permissionRights $permissionLocalTarget $permissionLocalAttr $permissionAddAttr"
+     expmsg="ipa: ERROR: owner: value #0 invalid per syntax: Invalid syntax."
+     rlRun "$command > /tmp/ipapermission_invalidsetattr.log 2>&1" 1 "Verify error message for invalid setattr"
+     rlAssertGrep "$expmsg" "/tmp/ipapermission_invalidsetattr.log"
+   rlPhaseEnd
+}
+
+
+######################################################
+#  test: ipapermission-add: Negative: Duplicate permission 
+######################################################
+ipapermission_add_duplicateperm()
+{
+   permissionName="TestPermission"
+   permissionLocalTarget="--type=dnsrecord"
+   permissionLocalAttr="arecord"
+   permissionLocalRights="write"
+
+   rlPhaseStartTest "ipa-permission-cli-1003: add permission - duplicate"
+     rlRun "addPermission $permissionName $permissionLocalRights $permissionLocalTarget $permissionLocalAttr" 0 "Adding $permissionName"
+     command="addPermission $permissionName $permissionLocalRights $permissionLocalTarget $permissionLocalAttr"
+     expmsg="ipa: ERROR: This entry already exists"
+     rlRun "$command > /tmp/ipapermission_duplicateperm.log 2>&1" 1 "Verify error message for duplicate permission"
+     rlAssertGrep "$expmsg" "/tmp/ipapermission_duplicateperm.log"
+   rlPhaseEnd
+}
+
+
+
+
 #ipapermission_params_service()
 #{
 #

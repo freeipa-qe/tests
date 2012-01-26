@@ -65,3 +65,9 @@ test03()
 #   objectclass: groupofnames, ipapermission, top
 }
 
+test04()
+{
+# ipa permission-add AAA --permissions=write --targetgroup=groupone --attrs=description
+# user with thi sperm can only update groupone's desc, and to
+#  add members to this group, nor update desc for group two
+}
