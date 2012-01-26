@@ -14,6 +14,7 @@
 #  BZ 783543 -- ipa delegation-mod --membergroup= returns internal error
 #  BZ 783548 -- ipa delegation-mod is not failing when membergroup does not exist
 #  BZ 783554 -- ipa delegation-mod --attrs= removes Attributes from delegation instead of failing
+#  BZ 784468 -- ipa help delegation example has group and membergroup backwards
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
