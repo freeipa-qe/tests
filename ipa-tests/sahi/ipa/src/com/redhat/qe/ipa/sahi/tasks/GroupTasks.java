@@ -597,8 +597,8 @@ public class GroupTasks {
 		for (String role:lowerCaseRoles)
 			Assert.assertTrue(browser.link(role).exists(), "roles does NOT exist after delete");
 	}
-
-	///////////////////// hbac tasks //////////////////////////////
+        
+        ///////////////////// hbac tasks //////////////////////////////
 	public static void addHBAC_Single(SahiTasks browser, String hbacRule) {
 		browser.link("memberof_hbacrule").click();
 		addSingle(browser, hbacRule);
@@ -626,6 +626,38 @@ public class GroupTasks {
 			Assert.assertTrue(browser.link(rule).exists(), "rule exist before delete");
 		deleteMultiple(browser, hbacRules);
 		for (String rule:hbacRules)
+			Assert.assertFalse(browser.link(rule).exists(), "rule does NOT exist after delete");
+	}
+
+
+	///////////////////// sudo tasks //////////////////////////////
+	public static void addSUDO_Single(SahiTasks browser, String sudoRule) {
+		browser.link("memberof_sudorule").click();
+		addSingle(browser, sudoRule);
+	}
+
+	public static void addSUDO_Multiple(SahiTasks browser,String[] sudoRules) {
+		browser.link("memberof_sudorule").click();
+		addMultiple(browser, sudoRules);
+	}
+
+	public static void addSUDO_ViaSearch(SahiTasks browser,	String filter, String sudoRule) {
+		browser.link("memberof_sudorule").click();
+		addViaSearch(browser, filter, sudoRule);
+	}
+
+	public static void deleteSUDO_Single(SahiTasks browser,String sudoRule) {
+		browser.link("memberof_sudorule").click();
+		Assert.assertTrue(browser.link(sudoRule).exists(), "hbac rule should in the list before deleted");
+		deleteSingle(browser, sudoRule );
+	}
+	
+	public static void deleteSUDO_Multiple(SahiTasks browser,String[] sudoRules) {
+		browser.link("memberof_sudorule").click(); 
+		for (String rule:sudoRules)
+			Assert.assertTrue(browser.link(rule).exists(), "rule exist before delete");
+		deleteMultiple(browser, sudoRules);
+		for (String rule:sudoRules)
 			Assert.assertFalse(browser.link(rule).exists(), "rule does NOT exist after delete");
 	}
 

@@ -513,25 +513,94 @@ public class GroupTests extends SahiTestScript{
 	 }
 	
 	/////////////////////////////////// sudo rules test //////////////////////////////////	
-	@Test (groups={"modifyGroup_notReady"}, description = "modify sudo rules", dataProvider="sudo rules")
-	public void modifyGroup_SUDOrules(String testDescription, String sudoRules){
-		//need work
+	@Test (groups={"modifyGroup_sudo_prepare"},dependsOnGroups="addGroup", dataProvider="sudoPrepare", 
+			description = "prepare data for SUDO test")
+	public void modifyGroup_sudo_prepareTestData(String sudoRules){
+		browser.navigateTo(commonTasks.sudoPage);
+		String[] rules = sudoRules.split(",");
+		CommonHelper.addSUDOrule(browser, rules); 
+		for (String rule: rules)
+			Assert.assertTrue(browser.link(rule).exists(), "create SUDO rule:[" + rule + "] for testing success");
 	}
 	
+	@Test (groups={"modifyGroup_sudo_add"},dependsOnGroups="modifyGroup_sudo_prepare", dataProvider="sudoAddSingle", 
+			description = "add single sudo rule under group")
+	public void modifyGroup_sudo_addSingle( String userGroupName, String sudoRule){ 
+		browser.link(userGroupName).click(); 
+		GroupTasks.addSUDO_Single(browser, sudoRule); 
+		Assert.assertTrue(browser.link(sudoRule).exists(), "expecte user group:["+userGroupName +"] has bhac rule:["+sudoRule+"]");
+		browser.link("User Groups").in(browser.span("back-link")).click();
+	}
+	
+	@Test (groups={"modifyGroup_sudo_add"},dependsOnGroups="modifyGroup_sudo_prepare", dataProvider="sudoAddMultiple", 
+			description = "add multiple sudo rules under group")
+	public void modifyGroup_sudo_addMultiple( String userGroupName,  String multiSUDOrules){ 
+		browser.link(userGroupName).click(); 
+		String[] sudoRules= multiSUDOrules.split(",");
+		GroupTasks.addSUDO_Multiple(browser, sudoRules);
+		for (String rule:sudoRules) 
+			Assert.assertTrue(browser.link(rule).exists(), "after add, check name exist in the list");
+		browser.link("User Groups").in(browser.span("back-link")).click();
+	}
+	
+	@Test (groups={"modifyGroup_sudo_add"},dependsOnGroups="modifyGroup_sudo_prepare", dataProvider="sudoAddViaSearch", 
+			description = "add multiple sudo rules by using search(filtering) function")
+	public void modifyGroup_sudo_addViaSearch( String userGroupName, String sudoRule){ 
+		browser.link(userGroupName).click(); 
+		GroupTasks.addSUDO_ViaSearch(browser, sudoRule, sudoRule);
+		Assert.assertTrue(browser.link(sudoRule).exists(), "after add, check name exist in the list");
+		browser.link("User Groups").in(browser.span("back-link")).click();
+	}
+	
+	@Test (groups={"modifyGroup_sudo_delete"},dependsOnGroups="modifyGroup_sudo_add", dataProvider="sudoDeleteSingle", 
+			description = "delete single sudo rule under group")
+	public void modifyGroup_sudo_deleteSingle(String userGroupName, String sudoRule){ 
+		browser.link(userGroupName).click();  
+		GroupTasks.deleteSUDO_Single(browser, sudoRule);
+		Assert.assertFalse(browser.link(sudoRule).exists(), "sudo name should not in the list after deleted");
+		browser.link("User Groups").in(browser.span("back-link")).click();
+	}
+	
+	@Test (groups={"modifyGroup_sudo_delete"},dependsOnGroups="modifyGroup_sudo_add", dataProvider="sudoDeleteMultiple", 
+			description = "delete multiple sudo rules under group")
+	public void modifyGroup_sudo_DeleteMultiple(String userGroupName, String sudoRules){ 
+		browser.link(userGroupName).click();
+		String[] names = sudoRules.split(","); 
+		GroupTasks.deleteSUDO_Multiple(browser, names);
+		for (String name:names)
+			Assert.assertFalse(browser.link(name).exists(), "sudo rule does NOT exist after delete");
+		browser.link("User Groups").in(browser.span("back-link")).click();
+	}
+	
+	@Test (groups={"modifyGroup_sudo_negative"}, dependsOnGroups="modifyGroup_sudo_prepare", dataProvider="sudoNegative", 
+			description = "negative test formodify sudo rule " )
+	public void modifyGroup_sudo_negative(String testScenario, String groupName, String sudoRule){
+		//I can not thing of any negative test case for now (yi 1/25/2012)
+	}
+	
+	@Test (groups={"modifyGroup_sudo_cleanup"}, dependsOnGroups="modifyGroup_sudo_delete", dataProvider="sudoCleanup", 
+				description = "clean up test data for sudo testing")
+	public void modifyGroup_sudo_cleanup( String sudoRules){ 
+		browser.navigateTo(commonTasks.sudoPage); 
+		String[] rules = sudoRules.split(",");
+		CommonHelper.deleteSUDOrules(browser, rules); 
+	 }
+	
+
 	/////////////////////////////////// other group modification negative test //////////////////////////////////
 	@Test (groups={"modifyGroup_Negative"}, description = "negative test for modify groups", dataProvider="modifyGroup_Negative")
 	public void modifyGroup_Negative (String testScenario, String negativeData){
 		//need work
 	}
 	
-	@Test (groups={"deleteGroup"}, description="delete group test", dataProvider="firstUserGroupData", dependsOnGroups="modifyGroup_hbac_cleanup")
+	@Test (groups={"deleteGroup"}, description="delete group test", dataProvider="firstUserGroupData", dependsOnGroups="modifyGroup_sudo_cleanup")
 	public void deleteGroup_single(String testScenario, String groupName){
 		Assert.assertTrue(browser.link(groupName).exists(),"before 'Delete', group should exists");
 		GroupTasks.deleteGroup(browser, groupName);
 		Assert.assertFalse(browser.link(groupName).exists(),"after 'Delete', group should disappear");
 	}
 	
-	@Test (groups={"deleteGroup"}, description="delete group test", dataProvider="remainingUserGroupData", dependsOnGroups="modifyGroup_hbac_cleanup")
+	@Test (groups={"deleteGroup"}, description="delete group test", dataProvider="remainingUserGroupData", dependsOnGroups="modifyGroup_sudo_cleanup")
 	public void deleteGroup_multiple(String testScenario, String groupNames){
 		String[] groups = groupNames.split(",");
 		for (String groupName:groups){
@@ -547,28 +616,29 @@ public class GroupTests extends SahiTestScript{
 	 *				DATA PROVIDERS												 *
 	 *******************************************************/
 	private static String[] testUserGroups = {
-								"usergrp000", "usergrp001", "usergrp002", "usergrp003", 
-								"usergrp004", "usergrp005", "usergrp006", "usergrp007",
-								"usergrp008", "usergrp009", "usergrp010", "usergrp011",
-								"usergrp012", "usergrp013", "usergrp014", "usergrp015"
-								};
+						"usergrp000", "usergrp001", "usergrp002", "usergrp003", 
+						"usergrp004", "usergrp005", "usergrp006", "usergrp007",
+						"usergrp008", "usergrp009", "usergrp010", "usergrp011",
+						"usergrp012", "usergrp013", "usergrp014", "usergrp015"
+						};
 	
 	private static String[] testUsers = { "user000", "user001", "user002", "user003",
-										"user004", "user005", "user006", "user007",
-										"user008", "user009", "user010", "user011"};
+					        "user004", "user005", "user006", "user007",
+						"user008", "user009", "user010", "user011"};
 	
 	private static String[] testNetGroups = {"netgrp000", "netgrp001", "netgrp002", "netgrp003","netgrp004","netgrp005"};
 
 	private static String[] roles = {"helpdesk", "IT Security Specialist", "IT Specialist", "Security Architect", "User Administrator"};
 	private static String[] hbacRules= {"habc000", "habc001","habc002","habc003","habc004","habc005","habc006","habc007"};
+	private static String[] sudoRules= {"sudo000", "sudo001","sudo002","sudo003","sudo004","sudo005","sudo006","sudo007"};
 		
 	@DataProvider (name="1st_3rd_UserGroupsData")
 	public Object[][] get_1st_3rd_UserGroupsData(){
 		String[][] groups={//scenario, user group name, description, posix or not info
-								{"posix group",GroupTests.testUserGroups[0],"posix group, with given gid","1500000001","isPosix"},
-								{"non posix group",GroupTests.testUserGroups[1],"non posix group","","nonPosix"},
-								{"default group: non-posix, assigned gid",GroupTests.testUserGroups[2],	"default group","","default"}
-							};
+				        {"posix group",GroupTests.testUserGroups[0],"posix group, with given gid","1500000001","isPosix"},
+					{"non posix group",GroupTests.testUserGroups[1],"non posix group","","nonPosix"},
+					{"default group: non-posix, assigned gid",GroupTests.testUserGroups[2],	"default group","","default"}
+					};
 		return groups;
 	}
 	
@@ -963,6 +1033,78 @@ public class GroupTests extends SahiTestScript{
 		return getHBACPrepare();
 	}
 
+
+	//////////////////////////////// sudo data providers ///////////////////////////
+	@DataProvider(name="sudoPrepare")
+	public Object[][] getsudoPrepare()
+	{
+		String[][] sudo ={
+							{GroupTests.sudoRules[0] + ","
+							+ GroupTests.sudoRules[1] + ","
+							+ GroupTests.sudoRules[2] + ","
+							+ GroupTests.sudoRules[3] + ","
+							+ GroupTests.sudoRules[4] + ","
+							+ GroupTests.sudoRules[5] + ","
+							+ GroupTests.sudoRules[6] + ","
+							+ GroupTests.sudoRules[7] }
+						};
+		return sudo;
+	}
+
+	@DataProvider(name="sudoAddSingle")
+	public Object[][] getsudoAddSingle()
+	{
+		String[][] sudo = {
+							{GroupTests.testUserGroups[0], GroupTests.sudoRules[0]},
+							{GroupTests.testUserGroups[0], GroupTests.sudoRules[1]},
+							{GroupTests.testUserGroups[0], GroupTests.sudoRules[2]},
+							{GroupTests.testUserGroups[0], GroupTests.sudoRules[3]},
+							{GroupTests.testUserGroups[0], GroupTests.sudoRules[4]},
+						};
+		return sudo;
+	}
+
+	@DataProvider(name="sudoAddMultiple")
+	public Object[][] getsudoAddMultiple()
+	{
+		String[][] sudo = {
+							{GroupTests.testUserGroups[1], GroupTests.sudoRules[0] + "," + GroupTests.sudoRules[1]},
+							{GroupTests.testUserGroups[1], GroupTests.sudoRules[2] + "," + GroupTests.sudoRules[3] + "," + GroupTests.sudoRules[4]}
+						};
+		return sudo;
+	}
+
+	@DataProvider(name="sudoAddViaSearch")
+	public Object[][] getsudoAddViaSearch()
+	{
+		String[][] sudo = { 
+							{GroupTests.testUserGroups[2], GroupTests.sudoRules[0]},
+							{GroupTests.testUserGroups[3], GroupTests.sudoRules[1]}
+						};
+		return sudo;
+	}
+
+	@DataProvider(name="sudoDeleteSingle")
+	public Object[][] getsudoDeleteSingle()
+	{
+		return getsudoAddSingle();
+	}
+
+	@DataProvider(name="sudoDeleteMultiple")
+	public Object[][] getsudoDeleteMultiple()
+	{
+		return getsudoAddMultiple();
+	}
+
+	@DataProvider(name="sudoCleanup")
+	public Object[][] getsudoCleanup()
+	{
+		return getsudoPrepare();
+	}
+
+
+
+        ////////////////////////////////////////////////////////
 	public Object[][] getNetGroups()
 	{
 		String[][] netGroups = { //FIXME: NEED provide correct test data 

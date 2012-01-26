@@ -31,7 +31,23 @@ public class CommonHelper {
 	{
 		genericDelete(browser, ruleNames);
 	}
+		
+	public static void addSUDOrule(SahiTasks browser, String ruleName)
+	{
+		genericAdd(browser, ruleName);
+	}
 	
+	public static void addSUDOrule(SahiTasks browser, String[] ruleNames)
+	{
+		genericAdd(browser, ruleNames);
+	}
+	
+	public static void deleteSUDOrules(SahiTasks browser, String[] ruleNames)
+	{
+		genericDelete(browser, ruleNames);
+	}
+	
+	/////////////////////////// generic function ///////////////////////////////
 	private static void genericAdd(SahiTasks browser, String cnValue)
 	{
 		browser.span("Add").click();
