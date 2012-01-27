@@ -71,3 +71,14 @@ test04()
 # user with thi sperm can only update groupone's desc, and to
 #  add members to this group, nor update desc for group two
 }
+
+
+test05()
+{
+# ipa permission-add AAA --memberof=groupone --permissions=write --attr=carlicense
+# groupone has user one
+# with this permission, user can edit one's carlicense
+# and nothing else
+
+
+}
