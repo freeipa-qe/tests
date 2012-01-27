@@ -14,7 +14,8 @@ public class GroupTests extends SahiTestScript{
 	private static Logger log = Logger.getLogger(GroupTests.class.getName());
 	private static SahiTasks browser=null;
 	
-	@BeforeClass (groups={"init"}, description="Initialize app for this test suite run", alwaysRun=true, dependsOnGroups="setup")
+	@BeforeClass (groups={"init"}, alwaysRun=true, dependsOnGroups="setup",
+			description="Initialize app for this test suite run" )
 	public void initialize() throws CloneNotSupportedException {
 		browser=sahiTasks;
 		browser.setStrictVisibilityCheck(true);
@@ -27,7 +28,8 @@ public class GroupTests extends SahiTestScript{
 		browser.navigateTo(commonTasks.groupPage, true); 
 	}
 	 
-	@AfterClass (groups={"cleanup"}, description="delete test user accounts", alwaysRun=true)
+	@AfterClass (groups={"cleanup"}, alwaysRun=true,
+		description="delete test user accounts")
 	public void cleanup() throws CloneNotSupportedException { 
 		browser.navigateTo(commonTasks.userPage,true);
 		for (String uid: GroupTests.testUsers){ 
@@ -81,14 +83,16 @@ public class GroupTests extends SahiTestScript{
 		log.info("Check error dialogs done");
 	}
 	
-	@Test (groups={"addGroup"}, description="add group test", dataProvider="1st_3rd_UserGroupsData")
+	@Test (groups={"addGroup"}, dataProvider="addGroupMultiple",
+		description="add group test, add multiple user groups") 
 	public void addGroup_add(String testScenario, String groupName, String groupDescription, String gid, String isPosix){
 		Assert.assertFalse(browser.link(groupName).exists(),"before 'Add', group does NOT exists");
 		GroupTasks.add_UserGroup(browser, groupName, groupDescription, gid, isPosix);
 		Assert.assertTrue(browser.link(groupName).exists(),"after 'Add', group exists");
 	}
 	
-	@Test (groups={"addGroup"}, description="add group test", dataProvider="4th_9th_UserGroupsData")
+	@Test (groups={"addGroup"}, dataProvider="addGroupAddAndAddAnother",
+		description="add group test: use 'add and add another' button to create multiple groups at one shot")
 	public void addGroup_add_and_add_another(String testScenario, 
 											String firstGroupName, String firstGroupDescription, String firstGid, String first_isPosix,
 											String secondGroupName, String secondGroupDescription, String secondGid, String second_isPosix){
@@ -103,7 +107,8 @@ public class GroupTests extends SahiTestScript{
 		Assert.assertTrue(browser.link(secondGroupName).exists(),"after 'Add', second group exists");
 	}
 	
-	@Test (groups={"addGroup"}, description="add group test", dataProvider="10th_12th_UserGroupsData")
+	@Test (groups={"addGroup"}, dataProvider="addGroupAddAndEdit",
+		description="add group test: add and switch to edit mode")
 	public void addGroup_add_and_edit(String testScenario, String groupName, String groupDescription, String gid, String isPosix){
 		Assert.assertFalse(browser.link(groupName).exists(),"before 'Add', group does NOT exists");
 		GroupTasks.add_and_edit_UserGroup(browser, groupName, groupDescription, gid, isPosix);
@@ -111,21 +116,24 @@ public class GroupTests extends SahiTestScript{
 		Assert.assertTrue(browser.link(groupName).exists(),"after 'Add', group exists");
 	}
 	
-	@Test (groups={"addGroup"}, description="add group test", dataProvider="13th_UserGroupsData")
+	@Test (groups={"addGroup"}, dataProvider="addGroupAddThenCancel",
+		description="add group test")
 	public void addGroup_add_then_cancel(String testScenario, String groupName, String groupDescription, String gid, String isPosix){
 		Assert.assertFalse(browser.link(groupName).exists(),"before 'Add', group does NOT exists");
 		GroupTasks.add_then_cancel_UserGroup(browser, groupName, groupDescription, gid, isPosix);
 		Assert.assertFalse(browser.link(groupName).exists(),"after 'Add', group should not exists as well");
 	}
 	
-	@Test (groups={"addGroup"}, description="add group test", dataProvider="rest_UserGroupsData")
+	@Test (groups={"addGroup"}, dataProvider="addGroupPrepareData",
+		description="add group test")
 	public void addGroup_prepareData(String testScenario, String groupName, String groupDescription, String gid, String isPosix){
 		Assert.assertFalse(browser.link(groupName).exists(),"before 'Add', group does NOT exists");
 		GroupTasks.add_UserGroup(browser, groupName, groupDescription, gid, isPosix);
 		Assert.assertTrue(browser.link(groupName).exists(),"after 'Add', group exists");
 	}
 	
-	@Test (groups={"addGroup_negative"}, description="negative test for adding groups", dataProvider="addGroup_negativeData", dependsOnGroups="addGroup" )
+	@Test (groups={"addGroup_negative"}, dataProvider="addGroupNegativeData", dependsOnGroups="addGroup", 
+		description="negative test for adding groups")
 	public void addGroup_Negatvie (String testScrenario, String groupName, String groupDescription, String expectedErrorMsg){ 
 		browser.link("Add").click(); 
 		browser.textbox("cn").setValue(groupName);
@@ -144,117 +152,143 @@ public class GroupTests extends SahiTestScript{
 	}
 
 	///////////////////////// modifyGroup test cases (enroll user and groups ) //////////////////////
-	@Test(groups={"modifyGroup"}, description="this is a bridge test group.", dependsOnGroups="addGroup")
+	@Test(groups={"modifyGroup"},  dependsOnGroups="addGroup",
+		description="this is a bridge test group.")
 	public void modifyGroupBridge()
 	{
 		log.info("bridge method: after addGroups, before all modifyGroup_xxx testcases");
 	}
 	
-	@Test (groups={"modifyGroup_enrolluser"}, description="enroll single user as member", dataProvider="1st_User", dependsOnGroups="modifyGroup" )
-	public void modifyGroup_enrollSingleUser(String testScenario, String groupName, String userName){ 
+	@Test (groups={"modifyGroup_enrolluser"}, dataProvider="enrollUserSingle", dependsOnGroups="modifyGroup",
+		description="enroll single user as member")
+	public void modifyGroup_enrollUserSingle(String testScenario, String groupName, String userName){ 
 		browser.link(groupName).click();
 		GroupTasks.modifyGroup_enroll_user_single(browser, groupName, userName); 
-		Assert.assertTrue(browser.link(userName).exists(), "verify membership info: user:" + userName + " should be member of group:" + groupName); 
+		Assert.assertTrue(browser.link(userName).exists(), 
+				"verify membership info: user:" + userName + " should be member of group:" + groupName); 
 		GroupTasks.modifyGroup_remove_user_single(browser, groupName, userName); 
-		Assert.assertFalse(browser.link(userName).exists(), "verify membership info: user:" + userName + " should NOT be member of group:" + groupName); 
+		Assert.assertFalse(browser.link(userName).exists(), 
+				"verify membership info: user:" + userName + " should NOT be member of group:" + groupName); 
 		browser.link("User Groups").in(browser.span("back-link")).click();
 	}
 	
-	@Test (groups={"modifyGroup_enrolluser"}, description="enroll multipul users as member at once", dataProvider="2nd_4th_Users", dependsOnGroups="modifyGroup" )
+	@Test (groups={"modifyGroup_enrolluser"}, dataProvider="enrollUserMultiple", dependsOnGroups="modifyGroup",
+		description="enroll multipul users as member at once") 
 	public void modifyGroup_enrollMultiUsers(String testScenario, String groupName, String userName){
 		String [] users = userName.split(",");
 		browser.link(groupName).click();
 		GroupTasks.modifyGroup_enroll_user_multiple(browser, groupName, users);
 		for (String user:users)
-			Assert.assertTrue(browser.link(user).exists(), "verify membership info: user:[" + user + "] should be member of group:" + groupName); 
+			Assert.assertTrue(browser.link(user).exists(), 
+					"verify membership info: user:[" + user + "] should be member of group:" + groupName); 
 		GroupTasks.modifyGroup_remove_user_multiple(browser, groupName, users);
 		for (String user:users)
-			Assert.assertFalse(browser.link(user).exists(), "verify membership info: user:[" + user + "] should NOT be member of group:" + groupName); 
+			Assert.assertFalse(browser.link(user).exists(), 
+					"verify membership info: user:[" + user + "] should NOT be member of group:" + groupName); 
 		browser.link("User Groups").in(browser.span("back-link")).click();
 	}
 	
-	@Test (groups={"modifyGroup_enrolluser"}, description="enroll users by use search filter", dataProvider="5th_User", dependsOnGroups="modifyGroup" )
+	@Test (groups={"modifyGroup_enrolluser"}, dataProvider="enrollUserViaSearch", dependsOnGroups="modifyGroup",
+		description="enroll users by use search filter")
 	public void modifyGroup_enrollViaSearch(String testScenario, String groupName, String userName){
 		 browser.link(groupName).click();
 		GroupTasks.modifyGroup_enroll_user_viasearch(browser, groupName, userName); 
-		Assert.assertTrue(browser.link(userName).exists(), "verify membership info: user:" + userName + " should be member of group:" + groupName); 
+		Assert.assertTrue(browser.link(userName).exists(), 
+				"verify membership info: user:" + userName + " should be member of group:" + groupName); 
 		browser.link("User Groups").in(browser.span("back-link")).click();
 	}
 	
-	@Test (groups={"modifyGroup_enrolluser"}, description="enroll: cancel enrollment, ensure user not member of group", dataProvider="6th_User", dependsOnGroups="modifyGroup" )
+	@Test (groups={"modifyGroup_enrolluser"}, dataProvider="enrollUserCancel", dependsOnGroups="modifyGroup",
+		description="enroll: cancel enrollment, ensure user not member of group")
 	public void modifyGroup_enrollCancel(String testScenario, String groupName, String userName){
-		 browser.link(groupName).click();
+		browser.link(groupName).click();
 		GroupTasks.modifyGroup_enroll_user_cancel(browser, groupName, userName); 
-		Assert.assertFalse(browser.link(userName).exists(), "verify membership info: user:" + userName + " should be member of group:" + groupName); 
+		Assert.assertFalse(browser.link(userName).exists(), 
+				"verify membership info: user:" + userName + " should be member of group:" + groupName); 
 		browser.link("User Groups").in(browser.span("back-link")).click();
 	}
 	
-	@Test (groups={"modifyGroup_enrollgroup"}, description = "add other (single) user groups as member, create nested group", dataProvider="childGroup_single_member" ,dependsOnGroups="modifyGroup")
+	@Test (groups={"modifyGroup_enrollgroup"}, dataProvider="enrollGroupSingle" ,dependsOnGroups="modifyGroup",
+		description = "add other (single) user groups as member, create nested group")
 	public void modifyGroup_member_group_single(String testScenario, String groupName, String childGroup){
 		browser.link(groupName).click();
 		GroupTasks.modifyGroup_enroll_member_group_single(browser, groupName, childGroup);
-		Assert.assertTrue(browser.link(childGroup).exists(), "verify membership info: group ("+childGroup+") should be member of group: ("+groupName+")");
+		Assert.assertTrue(browser.link(childGroup).exists(), 
+				"verify membership info: group ("+childGroup+") should be member of group: ("+groupName+")");
 		GroupTasks.modifyGroup_remove_member_group_single(browser, groupName, childGroup);
-		Assert.assertFalse(browser.link(childGroup).exists(), "verify membership info: group ("+childGroup+") should NOT be member of group: ("+groupName+")");
+		Assert.assertFalse(browser.link(childGroup).exists(), 
+				"verify membership info: group ("+childGroup+") should NOT be member of group: ("+groupName+")");
 		browser.link("User Groups").in(browser.span("back-link")).click();
 	}
 	
-	@Test (groups={"modifyGroup_enrollgroup"}, description = "add other (multiple) user groups as member, create nested group", dataProvider="childGroup_multi_member",dependsOnGroups="modifyGroup")
+	@Test (groups={"modifyGroup_enrollgroup"}, dataProvider="enrollGroupMultiple",dependsOnGroups="modifyGroup",
+		description = "add other (multiple) user groups as member, create nested group")
 	public void modifyGroup_member_group_multiple(String testScenario, String groupName, String childGroups){
 		browser.link(groupName).click();
 		String[] group = childGroups.split(",");
 		GroupTasks.modifyGroup_enroll_member_group_multiple(browser, groupName, group);
 		for (String childGroup: group)
-			Assert.assertTrue(browser.link(childGroup).exists(), "verify membership info: group ("+childGroup+") should be member of group: ("+groupName+")");
+			Assert.assertTrue(browser.link(childGroup).exists(), 
+					"verify membership info: group ("+childGroup+") should be member of group: ("+groupName+")");
 		GroupTasks.modifyGroup_remove_member_group_multiple(browser, groupName, group);
 		for (String childGroup: group)
-			Assert.assertFalse(browser.link(childGroup).exists(), "verify membership info: group ("+childGroup+") should NOT be member of group: ("+groupName+")");
+			Assert.assertFalse(browser.link(childGroup).exists(), 
+					"verify membership info: group ("+childGroup+") should NOT be member of group: ("+groupName+")");
 		browser.link("User Groups").in(browser.span("back-link")).click();
 	}
 	
-	@Test (groups={"modifyGroup_enrollgroup"}, description = "add other (multiple) user groups as member by using filter/search function, create nested group", dataProvider="childGroup_search_member",dependsOnGroups="modifyGroup")
+	@Test (groups={"modifyGroup_enrollgroup"}, dataProvider="enrollGroupViaSearch",dependsOnGroups="modifyGroup",
+		description = "add other (multiple) user groups as member by using filter/search function, create nested group")
 	public void modifyGroup_member_group_viasearch(String testScenario, String groupName, String childGroup){
 		browser.link(groupName).click();
 		GroupTasks.modifyGroup_enroll_member_group_viasearch(browser, groupName, childGroup); 
-		Assert.assertTrue(browser.link(childGroup).exists(), "verify membership info: group ("+childGroup+") should be member of group: ("+groupName+")");
+		Assert.assertTrue(browser.link(childGroup).exists(), 
+				"verify membership info: group ("+childGroup+") should be member of group: ("+groupName+")");
 		browser.link("User Groups").in(browser.span("back-link")).click();
 	}
 	
-	@Test (groups={"modifyGroup_enrollgroup"}, description = "add other (single) user groups as member, create nested group", dataProvider="childGroup_single_memberof")
+	@Test (groups={"modifyGroup_enrollgroup"}, dataProvider="enrollMemberofGroupSingle",
+		description = "add other (single) user groups as member, create nested group")
 	public void modifyGroup_memberof_group_single(String testScenario, String groupName, String childGroup){
 		browser.link(groupName).click();
 		GroupTasks.modifyGroup_enroll_memberof_group_single(browser, groupName, childGroup);
-		Assert.assertTrue(browser.link(childGroup).exists(), "verify memberof membership info: group ("+childGroup+") should be member of group: ("+groupName+")");
+		Assert.assertTrue(browser.link(childGroup).exists(), 
+				"verify memberof membership info: group ("+childGroup+") should be member of group: ("+groupName+")");
 		browser.link("User Groups").in(browser.span("back-link")).click();
 	}
 	
-	@Test (groups={"modifyGroup_enrollgroup"}, description = "add other (multiple) user groups as member, create nested group", dataProvider="childGroup_multi_memberof",dependsOnGroups="modifyGroup")
+	@Test (groups={"modifyGroup_enrollgroup"}, dataProvider="enrollMemberofGroupMultiple",dependsOnGroups="modifyGroup",
+		description = "add other (multiple) user groups as member, create nested group")
 	public void modifyGroup_memberof_group_multiple(String testScenario, String groupName, String childGroups){
 		browser.link(groupName).click();
 		String[] children = childGroups.split(",");
 		GroupTasks.modifyGroup_enroll_memberof_group_multiple(browser, groupName, children);
 		for (String child: children)
-			Assert.assertTrue(browser.link(child).exists(), "verify memberof membership info: group ("+child+") should be member of group: ("+groupName+")");
+			Assert.assertTrue(browser.link(child).exists(), 
+					"verify memberof membership info: group ("+child+") should be member of group: ("+groupName+")");
 		browser.link("User Groups").in(browser.span("back-link")).click();
 	}
 	
-	@Test (groups={"modifyGroup_enrollgroup"}, description = "add other (multiple) user groups as member by using filter/search function, create nested group", dataProvider="childGroup_search_memberof",dependsOnGroups="modifyGroup")
+	@Test (groups={"modifyGroup_enrollgroup"}, dataProvider="enrollMemberofGroupViaSearch",dependsOnGroups="modifyGroup",
+		description = "add other (multiple) user groups as member by using filter/search function, create nested group")
 	public void modifyGroup_memberof_group_viasearch(String testScenario, String groupName, String childGroup){
 		browser.link(groupName).click();
 		GroupTasks.modifyGroup_enroll_memberof_group_viasearch(browser, groupName, childGroup); 
-		Assert.assertTrue(browser.link(childGroup).exists(), "verify memberof membership info: group ("+childGroup+") should be member of group: ("+groupName+")");
+		Assert.assertTrue(browser.link(childGroup).exists(), 
+				"verify memberof membership info: group ("+childGroup+") should be member of group: ("+groupName+")");
 		browser.link("User Groups").in(browser.span("back-link")).click();
 	}
 
-
 	////////////////////////////// settings test cases ////////////////////////////	
-	@Test(groups={"modifySettings"}, description="this is a bridge test group.", dependsOnGroups="modifyGroup_enrollgroup")
+	@Test(groups={"modifySettings"}, dependsOnGroups="modifyGroup_enrollgroup",
+		description="this is a bridge test group")
 	public void modifySettings()
 	{
 		log.info("bridge method: after modifyGroups, before all modifyGroup_settings testcases");
 	}
  
-	@Test (groups={"modifyGroup_settings"}, description = "modify group detail settings", dataProvider="groupSettings",dependsOnGroups="modifySettings")
+	@Test (groups={"modifyGroup_settings"}, dataProvider="groupSettings",dependsOnGroups="modifySettings",
+		description = "modify group detail settings")
 	public void modifyGroup_settings(String testScenario, String groupName, String description, String gid){
 		browser.link(groupName).click();
 		GroupTasks.modifyGroup_settings(browser,description, gid);
@@ -263,7 +297,8 @@ public class GroupTests extends SahiTestScript{
 		browser.link("User Groups").in(browser.span("back-link")).click();
 	}
 	
-	@Test (groups={"modifyGroup_settings"}, description = "modify group detail settings", dataProvider="groupSettings_undo",dependsOnGroups="modifySettings")
+	@Test (groups={"modifyGroup_settings"}, dataProvider="groupSettings_undo",dependsOnGroups="modifySettings",
+		description = "modify group detail settings")
 	public void modifyGroup_settings_button_undo(String testScenario, String groupName, String description, String gid){
 		browser.link(groupName).click();
 		GroupTasks.modifyGroup_settings_button_undo(browser,description, gid);
@@ -272,7 +307,8 @@ public class GroupTests extends SahiTestScript{
 		browser.link("User Groups").in(browser.span("back-link")).click();
 	}
 	
-	@Test (groups={"modifyGroup_settings"}, description = "modify group detail settings", dataProvider="groupSettings_reset", dependsOnGroups="modifySettings")
+	@Test (groups={"modifyGroup_settings"}, dataProvider="groupSettings_reset", dependsOnGroups="modifySettings",
+		description = "modify group detail settings")
 	public void modifyGroup_settings_button_reset(String testScenario, String groupName, String description, String gid){
 		browser.link(groupName).click();
 		GroupTasks.modifyGroup_settings_button_reset(browser,description, gid);
@@ -281,7 +317,8 @@ public class GroupTests extends SahiTestScript{
 		browser.link("User Groups").in(browser.span("back-link")).click();
 	}
 	
-	@Test (groups={ "modifyGroup_settings_negative"}, description = "modify group detail settings", dataProvider="groupSettings_negative_gid", dependsOnGroups="modifyGroup_settings")
+	@Test (groups={ "modifyGroup_settings_negative"}, dataProvider="groupSettingsNegativeGID", dependsOnGroups="modifyGroup_settings",
+		description = "modify group detail settings")
 	public void modifyGroup_settings_negative_gid(String testScenario, String groupName, String gid, String expectedErrorMsg){
 		browser.link(groupName).click();
 		//GroupTasks.modifyGroup_settings_negative_gid (browser, gid);
@@ -299,7 +336,8 @@ public class GroupTests extends SahiTestScript{
 		} 
 	}
 	
-	@Test (groups={"modifyGroup_settings_negative"}, description = "modify group detail settings", dataProvider="groupSettings_negative_desc",dependsOnGroups="modifyGroup_settings")
+	@Test (groups={"modifyGroup_settings_negative"}, dataProvider="groupSettingsNegativeDESC",dependsOnGroups="modifyGroup_settings",
+		description = "modify group detail settings")
 	public void modifyGroup_settings_negative_desc(String testScenario, String groupName, String description, String expectedErrorMsg){
 		browser.link(groupName).click();
 		//GroupTasks.modifyGroup_settings_negative_desc (browser, description);
@@ -317,10 +355,10 @@ public class GroupTests extends SahiTestScript{
 			Assert.fail("Expected error-dialog does not show");
 		} 
 	}
-
 	
 	/////////////////////////////////// netgroup test //////////////////////////////////	
-	@Test(groups={"netgroup"}, description="this is a bridge test group.", dependsOnGroups="modifyGroup_settings_negative")
+	@Test(groups={"netgroup"}, dependsOnGroups="modifyGroup_settings_negative",
+		description="this is a bridge test group")
 	public void modifyNetGroupBridge()
 	{
 		log.info("bridge method: after modifySettings test cases");
@@ -344,7 +382,8 @@ public class GroupTests extends SahiTestScript{
 	public void modifyGroup_netgroup_addSingle( String userGroupName, String netGroupName){ 
 		browser.link(userGroupName).click(); 
 		GroupTasks.addNetGroup_Single(browser, netGroupName); 
-		Assert.assertTrue(browser.link(netGroupName).exists(), "expecte user group:["+userGroupName +"] under netgroup:["+netGroupName+"]");
+		Assert.assertTrue(browser.link(netGroupName).exists(), 
+				"expecte user group:["+userGroupName +"] under netgroup:["+netGroupName+"]");
 		browser.link("User Groups").in(browser.span("back-link")).click();
 	}
 	
@@ -373,7 +412,8 @@ public class GroupTests extends SahiTestScript{
 	public void modifyGroup_netgroup_deleteSingle(String userGroupName, String netGroupName){ 
 		browser.link(userGroupName).click();  
 		GroupTasks.deleteNetGroup_Single(browser, netGroupName);
-		Assert.assertFalse(browser.link(netGroupName).exists(), "netgroup name should not in the list after deleted");
+		Assert.assertFalse(browser.link(netGroupName).exists(), 
+				"netgroup name should not in the list after deleted");
 		browser.link("User Groups").in(browser.span("back-link")).click();
 	}
 	
@@ -413,7 +453,8 @@ public class GroupTests extends SahiTestScript{
 	public void modifyGroup_role_addSingle( String userGroupName, String role){ 
 		browser.link(userGroupName).click(); 
 		GroupTasks.addRole_Single(browser, role); 
-		Assert.assertTrue(browser.link(role.toLowerCase()).exists(), "expecte user group:["+userGroupName +"] under role:["+role+"]");
+		Assert.assertTrue(browser.link(role.toLowerCase()).exists(), 
+				"expecte user group:["+userGroupName +"] under role:["+role+"]");
 		browser.link("User Groups").in(browser.span("back-link")).click();
 	}
 	
@@ -486,7 +527,8 @@ public class GroupTests extends SahiTestScript{
 	public void modifyGroup_hbac_addSingle( String userGroupName, String hbacRule){ 
 		browser.link(userGroupName).click(); 
 		GroupTasks.addHBAC_Single(browser, hbacRule); 
-		Assert.assertTrue(browser.link(hbacRule).exists(), "expecte user group:["+userGroupName +"] has bhac rule:["+hbacRule+"]");
+		Assert.assertTrue(browser.link(hbacRule).exists(), 
+				"expecte user group:["+userGroupName +"] has bhac rule:["+hbacRule+"]");
 		browser.link("User Groups").in(browser.span("back-link")).click();
 	}
 	
@@ -567,7 +609,8 @@ public class GroupTests extends SahiTestScript{
 	public void modifyGroup_sudo_addSingle( String userGroupName, String sudoRule){ 
 		browser.link(userGroupName).click(); 
 		GroupTasks.addSUDO_Single(browser, sudoRule); 
-		Assert.assertTrue(browser.link(sudoRule).exists(), "expecte user group:["+userGroupName +"] has sudo rule:["+sudoRule+"]");
+		Assert.assertTrue(browser.link(sudoRule).exists(), 
+				"expecte user group:["+userGroupName +"] has sudo rule:["+sudoRule+"]");
 		browser.link("User Groups").in(browser.span("back-link")).click();
 	}
 	
@@ -625,7 +668,6 @@ public class GroupTests extends SahiTestScript{
 		CommonHelper.deleteSUDOrules(browser, rules); 
 	 }
 	
-
 	/////////////////////////////////// other group modification negative test //////////////////////////////////
 	@Test (groups={"modifyGroup_Negative"}, description = "negative test for modify groups", dataProvider="modifyGroup_Negative")
 	public void modifyGroup_Negative (String testScenario, String negativeData){
@@ -658,8 +700,7 @@ public class GroupTests extends SahiTestScript{
 						"usergrp000", "usergrp001", "usergrp002", "usergrp003", 
 						"usergrp004", "usergrp005", "usergrp006", "usergrp007",
 						"usergrp008", "usergrp009", "usergrp010", "usergrp011",
-						"usergrp012", "usergrp013", "usergrp014", "usergrp015"
-						};
+						"usergrp012", "usergrp013", "usergrp014", "usergrp015"};
 	private static String[] testUsers = { "user000", "user001", "user002", "user003",
 											"user004", "user005", "user006", "user007",
 											"user008", "user009", "user010", "user011"};
@@ -668,18 +709,17 @@ public class GroupTests extends SahiTestScript{
 	private static String[] hbacRules= {"habc000", "habc001","habc002","habc003","habc004","habc005","habc006","habc007"};
 	private static String[] sudoRules= {"sudo000", "sudo001","sudo002","sudo003","sudo004","sudo005","sudo006","sudo007"};
 		
-	@DataProvider (name="1st_3rd_UserGroupsData")
-	public Object[][] get_1st_3rd_UserGroupsData(){
+	@DataProvider (name="addGroupMultiple")
+	public Object[][] get_addGroupMultiple(){
 		String[][] groups={//scenario, user group name, description, posix or not info
 						{"posix group",GroupTests.testUserGroups[0],"posix group, with given gid","1500000001","isPosix"},
-					{"non posix group",GroupTests.testUserGroups[1],"non posix group","","nonPosix"},
-					{"default group: non-posix, assigned gid",GroupTests.testUserGroups[2],	"default group","","default"}
-					};
+						{"non posix group",GroupTests.testUserGroups[1],"non posix group","","nonPosix"},
+						{"default group: non-posix, assigned gid",GroupTests.testUserGroups[2],	"default group","","default"}	};
 		return groups;
 	}
 	
-	@DataProvider (name="4th_9th_UserGroupsData")
-	public Object[][] get_4th_3rd_UserGroupsData(){
+	@DataProvider (name="addGroupAddAndAddAnother")
+	public Object[][] get_addGroupAddAndAddAnother(){
 		String[][] groups={//scenario, user group name, description, posix or not info
 						{"2 posix groups",	
 								GroupTests.testUserGroups[3], "posix, given gid","1500000003","isPosix",
@@ -689,41 +729,37 @@ public class GroupTests extends SahiTestScript{
 								GroupTests.testUserGroups[6], "non posix","","nonPosix"},
 						{"mixed groups: posix and non posix",
 								GroupTests.testUserGroups[7], "non posix","","default",
-								GroupTests.testUserGroups[8], "posix, assigned gid", "","isPosix"}
-					};
+								GroupTests.testUserGroups[8], "posix, assigned gid", "","isPosix"}	};
 		return groups;
 	}
 	
 	
-	@DataProvider (name="10th_12th_UserGroupsData")
-	public Object[][] get_10th_12th_UserGroupsData(){
+	@DataProvider (name="addGroupAddAndEdit")
+	public Object[][] get_addGroupAddAndEdit(){
 		String[][] groups={//scenario, user group name, description, posix or not info
 						{"posix group",	
 								GroupTests.testUserGroups[9],"posix group, with given gid","1500000009","isPosix"},
 						{"non posix group",	
 								GroupTests.testUserGroups[10],"non posix group","","nonPosix"},
 						{"default group: non-posix, assigned gid",
-								GroupTests.testUserGroups[11],	"default group","","default"}
-					};
+								GroupTests.testUserGroups[11],	"default group","","default"}};
 		return groups;
 	}
 	
-	@DataProvider (name="13th_UserGroupsData")
-	public Object[][] get_13th_UserGroupsData(){
+	@DataProvider (name="addGroupAddThenCancel")
+	public Object[][] get_addGroupAddThenCancel(){
 		String[][] groups={//scenario, user group name, description, posix or not info
-							{"posix group","usergrp013","posix group, with given gid",GroupTests.testUserGroups[11],"isPosix"}
-						};
+						{"posix group","usergrp013","posix group, with given gid",GroupTests.testUserGroups[11],"isPosix"}};
 		return groups;
 	}
 	
-	@DataProvider (name="rest_UserGroupsData")
-	public Object[][] get_rest_UserGroupsData(){
+	@DataProvider (name="addGroupPrepareData")
+	public Object[][] get_addGroupPrepareData(){
 		String[][] groups={//scenario, user group name, description, posix or not info 
 				{"non posix group",GroupTests.testUserGroups[12],"non posix group","","nonPosix"},
 				{"default group: non-posix, assigned gid",GroupTests.testUserGroups[13],	"default group","","default"},
 				{"posix group",	GroupTests.testUserGroups[14],"posix group, with given gid","1500000014","isPosix"},
-				{"non posix group",GroupTests.testUserGroups[15],"non posix group","","nonPosix"}
-				}; 
+				{"non posix group",GroupTests.testUserGroups[15],"non posix group","","nonPosix"}	}; 
 		return groups;
 	}
 	
@@ -743,14 +779,14 @@ public class GroupTests extends SahiTestScript{
 		return multipulGroups;
 	}
 	
-	@DataProvider (name="1st_User")
-	public Object[][] get_1st_User(){
+	@DataProvider (name="enrollUserSingle")
+	public Object[][] get_enrollUserSingle(){
 		String[][] user = { {"first user under first group", GroupTests.testUserGroups[0], GroupTests.testUsers[0]} };
 		return user;
 	}
 	
-	@DataProvider (name="2nd_4th_Users")
-	public Object[][] get_2nd_4th_Users(){
+	@DataProvider (name="enrollUserMultiple")
+	public Object[][] get_enrollUserMultiple(){
 		String testuser1 = GroupTests.testUsers[1];
 		String testuser2 = GroupTests.testUsers[2];
 		String testuser3 = GroupTests.testUsers[3];
@@ -759,118 +795,96 @@ public class GroupTests extends SahiTestScript{
 		return users;
 	}
 	
-	@DataProvider (name="5th_User")
-	public Object[][] get_5th_User(){
+	@DataProvider (name="enrollUserViaSearch")
+	public Object[][] get_enrollUserViaSearch(){
 		String [][] user = { {"user: tuser004, add to 4nd group", GroupTests.testUserGroups[4], GroupTests.testUsers[4]} };
 		return user;
 	}
 	
-	@DataProvider (name="6th_User")
-	public Object[][] get_6th_User(){
+	@DataProvider (name="enrollUserCancel")
+	public Object[][] get_enrollUserCancel(){
 		String [][] user = { {"user: tuser006, add to 6th group, but canceled", GroupTests.testUserGroups[6], GroupTests.testUsers[6]} };
 		return user;
 	}
 	
-	@DataProvider (name="addGroup_negativeData")
-	public Object[][] getAddGroup_negativeData(){
+	@DataProvider (name="addGroupNegativeData")
+	public Object[][] getAddGroupNegativeData(){
 		String[][] negativeData = 
 						{
 							{"group name is required", "","group name is not provided", "Required field"},
 							{"group description is required", "testgroupname","","Required field"},
 							{"group name: invalid text", "----", "group name is invalid", "may only include letters, numbers, _, -, . and $"},
-							{"uniqueness check for group name","editors", "duplicated group name", "group with name \"editors\" already exists"}
-						};
+							{"uniqueness check for group name","editors", "duplicated group name", "group with name \"editors\" already exists"}};
 		return negativeData;
 	}
 	
-	@DataProvider (name="childGroup_single_member")
-	public Object[][] get_childGroup_single_member(){
-		String[][] childOfGroup = { //test scenario ; group ; child group
-									{"add group001 as member of group000", GroupTests.testUserGroups[0], GroupTests.testUserGroups[1] }
-									};
+	@DataProvider (name="enrollGroupSingle")
+	public Object[][] get_enrollGroupSingle(){
+		String[][] childOfGroup = {{"add group001 as member of group000", GroupTests.testUserGroups[0], GroupTests.testUserGroups[1] }};
 		return childOfGroup;
 	}
 		
-	@DataProvider (name="childGroup_multi_member")
-	public Object[][] get_childGroup_multi_member(){
-		String[][] childOfGroup = { //test scenario ; group ; child group
-									{"add group003 and group004 s member of group002", GroupTests.testUserGroups[2], GroupTests.testUserGroups[3] + "," +GroupTests.testUserGroups[4]}
-									};
+	@DataProvider (name="enrollGroupMultiple")
+	public Object[][] get_enrollGroupMultiple(){
+		String[][] childOfGroup = {{"add group003 and group004 s member of group002", GroupTests.testUserGroups[2], GroupTests.testUserGroups[3] + "," +GroupTests.testUserGroups[4]}};
 		return childOfGroup;
 	}
 
-	@DataProvider (name="childGroup_search_member")
-	public Object[][] get_childGroup_search_member(){
-		String[][] childOfGroup = { //test scenario ; group ; child group
-									{"add group006 as member of group005", GroupTests.testUserGroups[5], GroupTests.testUserGroups[6] }
-									};
+	@DataProvider (name="enrollGroupViaSearch")
+	public Object[][] get_enrollGroupViaSearch(){
+		String[][] childOfGroup = { {"add group006 as member of group005", GroupTests.testUserGroups[5], GroupTests.testUserGroups[6] }};
 		return childOfGroup;
 	}
 
-	@DataProvider (name="childGroup_single_memberof")
-	public Object[][] get_childGroup_single_memberof(){
-		String[][] childOfGroup = { //test scenario ; group ; child group
-									{"add group008 as member of group007",	GroupTests.testUserGroups[7], GroupTests.testUserGroups[8] }
-									};
+	@DataProvider (name="enrollMemberofGroupSingle")
+	public Object[][] get_enrollMemberofGroupSingle(){
+		String[][] childOfGroup = {{"add group008 as member of group007",	GroupTests.testUserGroups[7], GroupTests.testUserGroups[8] }};
 		return childOfGroup;
 	}
 	
-	@DataProvider (name="childGroup_multi_memberof")
-	public Object[][] get_childGroup_multi_memberof(){
-		String[][] childOfGroup = { //test scenario ; group ; child group
-									{"add group010 and group011,as member of group009",GroupTests.testUserGroups[9], GroupTests.testUserGroups[10] + "," + GroupTests.testUserGroups[11]}
-									};
+	@DataProvider (name="enrollMemberofGroupMultiple")
+	public Object[][] get_enrollMemberofGroupMultiple(){
+		String[][] childOfGroup = {{"add group010 and group011,as member of group009",GroupTests.testUserGroups[9], GroupTests.testUserGroups[10] + "," + GroupTests.testUserGroups[11]}};
 		return childOfGroup;
 	}
 	
-	@DataProvider (name="childGroup_search_memberof")
-	public Object[][] get_childGroup_search_memberof(){
-		String[][] childOfGroup = { //test scenario ; group ; child group
-									{"addgroup012 as member of group013",GroupTests.testUserGroups[12], GroupTests.testUserGroups[13] }
-									};
+	@DataProvider (name="enrollMemberofGroupViaSearch")
+	public Object[][] get_enrollMemberofGroupViaSearch(){
+		String[][] childOfGroup = {{"addgroup012 as member of group013",GroupTests.testUserGroups[12], GroupTests.testUserGroups[13] }};
 		return childOfGroup;
 	}
 
 	@DataProvider (name="groupSettings")
 	public Object[][] get_groupSettings(){
-		String[][] childOfGroup = { //test scenario ; group name; group description ; gid number
-									{"change setting for group usergrp000 ", GroupTests.testUserGroups[0], "modified setting for group: usergrouop000", "2000000001"}
-									};
+		String[][] childOfGroup = {{"change setting for group usergrp000 ", GroupTests.testUserGroups[0], "modified setting for group: usergrouop000", "2000000001"}};
 		return childOfGroup;
 	}
 
 	@DataProvider (name="groupSettings_undo")
 	public Object[][] get_groupSettings_undo(){
-		String[][] childOfGroup = { //test scenario ; group name; group description ; gid number
-									{"change setting for group usergrp000 ", GroupTests.testUserGroups[0], "msg for 'undo'usergrouop000", "test 'undo'"}
-									};
+		String[][] childOfGroup = {{"change setting for group usergrp000 ", GroupTests.testUserGroups[0], "msg for 'undo'usergrouop000", "test 'undo'"}};
 		return childOfGroup;
 	}
 	
 	@DataProvider (name="groupSettings_reset")
 	public Object[][] get_groupSettings_reset(){
-		String[][] childOfGroup = { //test scenario ; group name; group description ; gid number
-									{"change setting for group usergrp000 ", GroupTests.testUserGroups[0], "msg for 'reset' for group: usergrouop000", "test 'reset'"}
-									};
+		String[][] childOfGroup = {{"change setting for group usergrp000 ", GroupTests.testUserGroups[0], "msg for 'reset' for group: usergrouop000", "test 'reset'"}};
 		return childOfGroup;
 	}
 	
-	@DataProvider (name="groupSettings_negative_gid")
-	public Object[][] get_groupSettings_neg_gid(){
+	@DataProvider (name="groupSettingsNegativeGID")
+	public Object[][] get_groupSettingsNegativeGID(){
 		String[][] childOfGroup = { //test scenario ; group name; group description ; gid number
 									{"change setting for group usergrp000 ", GroupTests.testUserGroups[0], "string should not be here", "Must be an integer"},
 									{"change setting for group usergrp000 ", GroupTests.testUserGroups[0], "2147483648", "Maximum value is 2147483647"},
 									{"change setting for group usergrp000 ", GroupTests.testUserGroups[0], "0", "not sure what would be error msg"},
-									{"change setting for group usergrp000 ", GroupTests.testUserGroups[0], "-1", "not sure what would be error msg"}
-									};
+									{"change setting for group usergrp000 ", GroupTests.testUserGroups[0], "-1", "not sure what would be error msg"}	};
 		return childOfGroup;
 	}
 	
-	@DataProvider (name="groupSettings_negative_desc")
-	public Object[][] get_groupSettings_neg_desc(){
-		String[][] childOfGroup = { //test scenario ; group name; group description ; expected dialog box 
-									{"change setting for group usergrp000 ", GroupTests.testUserGroups[0], "", "Validation error "}
-									};
+	@DataProvider (name="groupSettingsNegativeDESC")
+	public Object[][] get_groupSettingsNegativeDESC(){
+		String[][] childOfGroup = {{"change setting for group usergrp000 ", GroupTests.testUserGroups[0], "", "Validation error "}};
 		return childOfGroup;
 	}
 	
@@ -884,8 +898,7 @@ public class GroupTests extends SahiTestScript{
 							+ GroupTests.testNetGroups[2] + ","
 							+ GroupTests.testNetGroups[3] + ","
 							+ GroupTests.testNetGroups[4] + ","
-							+ GroupTests.testNetGroups[5] } 
-							};
+							+ GroupTests.testNetGroups[5] } };
 		return netGroups;
 	}
 
@@ -898,8 +911,7 @@ public class GroupTests extends SahiTestScript{
 						{GroupTests.testUserGroups[2], GroupTests.testNetGroups[2]},
 						{GroupTests.testUserGroups[3], GroupTests.testNetGroups[3]},
 						{GroupTests.testUserGroups[4], GroupTests.testNetGroups[4]},
-						{GroupTests.testUserGroups[5], GroupTests.testNetGroups[5]}
-						};
+						{GroupTests.testUserGroups[5], GroupTests.testNetGroups[5]}	};
 		return netGroups;
 	}
 
@@ -908,17 +920,14 @@ public class GroupTests extends SahiTestScript{
 	{
 		String[][] netGroups = { //user group name; net group name (s)
 							{GroupTests.testUserGroups[0], GroupTests.testNetGroups[1] + "," + GroupTests.testNetGroups[2]},
-							{GroupTests.testUserGroups[1], GroupTests.testNetGroups[2] + "," + GroupTests.testNetGroups[3] + "," + GroupTests.testNetGroups[4]}
-							};
+							{GroupTests.testUserGroups[1], GroupTests.testNetGroups[2] + "," + GroupTests.testNetGroups[3] + "," + GroupTests.testNetGroups[4]}};
 		return netGroups;
 	}
 
 	@DataProvider(name="netGroupsAddViaSearch")
 	public Object[][] getNetGroupsAddViaSearch()
 	{
-		String[][] netGroups = { //user group name; net group name 
-									{GroupTests.testUserGroups[2], GroupTests.testNetGroups[3]}
-								};
+		String[][] netGroups = { {GroupTests.testUserGroups[2], GroupTests.testNetGroups[3]}};
 		return netGroups;
 	}
 
@@ -937,14 +946,12 @@ public class GroupTests extends SahiTestScript{
 	@DataProvider(name="netGroupsNegative")
 	public Object[][] getNetGroupsNegative()
 	{
-		String[][] netGroups = { //net group name 
-									{GroupTests.testNetGroups[0]},
+		String[][] netGroups = { {GroupTests.testNetGroups[0]},
 									{GroupTests.testNetGroups[1]},
 									{GroupTests.testNetGroups[2]},
 									{GroupTests.testNetGroups[3]},
 									{GroupTests.testNetGroups[4]},
-									{GroupTests.testNetGroups[5]}
-							};
+									{GroupTests.testNetGroups[5]}};
 		return netGroups;
 	}
 
@@ -963,8 +970,7 @@ public class GroupTests extends SahiTestScript{
 									{GroupTests.testUserGroups[0], GroupTests.roles[1]},
 									{GroupTests.testUserGroups[0], GroupTests.roles[2]},
 									{GroupTests.testUserGroups[0], GroupTests.roles[3]},
-									{GroupTests.testUserGroups[0], GroupTests.roles[4]},
-							};
+									{GroupTests.testUserGroups[0], GroupTests.roles[4]}};
 		return selectedDefaultRoles;
 	}
 
@@ -973,18 +979,15 @@ public class GroupTests extends SahiTestScript{
 	{
 		String[][] selectedDefaultRoles= { //defaults from ipa ui
 									{GroupTests.testUserGroups[1], GroupTests.roles[0] + "," + GroupTests.roles[1]},
-									{GroupTests.testUserGroups[1], GroupTests.roles[2] + "," + GroupTests.roles[3] + "," + GroupTests.roles[4]}
-							};
+									{GroupTests.testUserGroups[1], GroupTests.roles[2] + "," + GroupTests.roles[3] + "," + GroupTests.roles[4]}};
 		return selectedDefaultRoles;
 	}
 
 	@DataProvider(name="roleAddViaSearch")
 	public Object[][] getRoleDefault()
 	{
-		String[][] selectedDefaultRoles= { //defaults from ipa ui
-									{GroupTests.testUserGroups[2], GroupTests.roles[0]},
-									{GroupTests.testUserGroups[3], GroupTests.roles[1]}
-							};
+		String[][] selectedDefaultRoles= { {GroupTests.testUserGroups[2], GroupTests.roles[0]},
+											   {GroupTests.testUserGroups[3], GroupTests.roles[1]}};
 		return selectedDefaultRoles;
 	}
 
@@ -1004,49 +1007,41 @@ public class GroupTests extends SahiTestScript{
 	@DataProvider(name="hbacPrepare")
 	public Object[][] getHBACPrepare()
 	{
-		String[][] hbac ={
-							{GroupTests.hbacRules[0] + ","
+		String[][] hbac ={{GroupTests.hbacRules[0] + ","
 							+ GroupTests.hbacRules[1] + ","
 							+ GroupTests.hbacRules[2] + ","
 							+ GroupTests.hbacRules[3] + ","
 							+ GroupTests.hbacRules[4] + ","
 							+ GroupTests.hbacRules[5] + ","
 							+ GroupTests.hbacRules[6] + ","
-							+ GroupTests.hbacRules[7] }
-						};
+							+ GroupTests.hbacRules[7] }	};
 		return hbac;
 	}
 
 	@DataProvider(name="hbacAddSingle")
 	public Object[][] getHBACAddSingle()
 	{
-		String[][] hbac = {
-							{GroupTests.testUserGroups[0], GroupTests.hbacRules[0]},
+		String[][] hbac = {{GroupTests.testUserGroups[0], GroupTests.hbacRules[0]},
 							{GroupTests.testUserGroups[0], GroupTests.hbacRules[1]},
 							{GroupTests.testUserGroups[0], GroupTests.hbacRules[2]},
 							{GroupTests.testUserGroups[0], GroupTests.hbacRules[3]},
-							{GroupTests.testUserGroups[0], GroupTests.hbacRules[4]},
-						};
+							{GroupTests.testUserGroups[0], GroupTests.hbacRules[4]}	};
 		return hbac;
 	}
 
 	@DataProvider(name="hbacAddMultiple")
 	public Object[][] getHBACAddMultiple()
 	{
-		String[][] hbac = {
-							{GroupTests.testUserGroups[1], GroupTests.hbacRules[0] + "," + GroupTests.hbacRules[1]},
-							{GroupTests.testUserGroups[1], GroupTests.hbacRules[2] + "," + GroupTests.hbacRules[3] + "," + GroupTests.hbacRules[4]}
-						};
+		String[][] hbac = {{GroupTests.testUserGroups[1], GroupTests.hbacRules[0] + "," + GroupTests.hbacRules[1]},
+							{GroupTests.testUserGroups[1], GroupTests.hbacRules[2] + "," + GroupTests.hbacRules[3] + "," + GroupTests.hbacRules[4]}	};
 		return hbac;
 	}
 
 	@DataProvider(name="hbacAddViaSearch")
 	public Object[][] getHBACAddViaSearch()
 	{
-		String[][] hbac = { 
-							{GroupTests.testUserGroups[2], GroupTests.hbacRules[0]},
-							{GroupTests.testUserGroups[3], GroupTests.hbacRules[1]}
-						};
+		String[][] hbac = {{GroupTests.testUserGroups[2], GroupTests.hbacRules[0]},
+							{GroupTests.testUserGroups[3], GroupTests.hbacRules[1]}	};
 		return hbac;
 	}
 
@@ -1073,49 +1068,41 @@ public class GroupTests extends SahiTestScript{
 	@DataProvider(name="sudoPrepare")
 	public Object[][] getsudoPrepare()
 	{
-		String[][] sudo ={
-							{GroupTests.sudoRules[0] + ","
+		String[][] sudo ={{GroupTests.sudoRules[0] + ","
 							+ GroupTests.sudoRules[1] + ","
 							+ GroupTests.sudoRules[2] + ","
 							+ GroupTests.sudoRules[3] + ","
 							+ GroupTests.sudoRules[4] + ","
 							+ GroupTests.sudoRules[5] + ","
 							+ GroupTests.sudoRules[6] + ","
-							+ GroupTests.sudoRules[7] }
-						};
+							+ GroupTests.sudoRules[7] }	};
 		return sudo;
 	}
 
 	@DataProvider(name="sudoAddSingle")
 	public Object[][] getsudoAddSingle()
 	{
-		String[][] sudo = {
-							{GroupTests.testUserGroups[0], GroupTests.sudoRules[0]},
+		String[][] sudo = {{GroupTests.testUserGroups[0], GroupTests.sudoRules[0]},
 							{GroupTests.testUserGroups[0], GroupTests.sudoRules[1]},
 							{GroupTests.testUserGroups[0], GroupTests.sudoRules[2]},
 							{GroupTests.testUserGroups[0], GroupTests.sudoRules[3]},
-							{GroupTests.testUserGroups[0], GroupTests.sudoRules[4]},
-						};
+							{GroupTests.testUserGroups[0], GroupTests.sudoRules[4]}	};
 		return sudo;
 	}
 
 	@DataProvider(name="sudoAddMultiple")
 	public Object[][] getsudoAddMultiple()
 	{
-		String[][] sudo = {
-							{GroupTests.testUserGroups[1], GroupTests.sudoRules[0] + "," + GroupTests.sudoRules[1]},
-							{GroupTests.testUserGroups[1], GroupTests.sudoRules[2] + "," + GroupTests.sudoRules[3] + "," + GroupTests.sudoRules[4]}
-						};
+		String[][] sudo = {{GroupTests.testUserGroups[1], GroupTests.sudoRules[0] + "," + GroupTests.sudoRules[1]},
+							{GroupTests.testUserGroups[1], GroupTests.sudoRules[2] + "," + GroupTests.sudoRules[3] + "," + GroupTests.sudoRules[4]}};
 		return sudo;
 	}
 
 	@DataProvider(name="sudoAddViaSearch")
 	public Object[][] getsudoAddViaSearch()
 	{
-		String[][] sudo = { 
-							{GroupTests.testUserGroups[2], GroupTests.sudoRules[0]},
-							{GroupTests.testUserGroups[3], GroupTests.sudoRules[1]}
-						};
+		String[][] sudo = {{GroupTests.testUserGroups[2], GroupTests.sudoRules[0]},
+							{GroupTests.testUserGroups[3], GroupTests.sudoRules[1]}	};
 		return sudo;
 	}
 
