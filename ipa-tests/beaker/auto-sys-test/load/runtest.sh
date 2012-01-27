@@ -2,7 +2,7 @@
 # vim: dict=/usr/share/beakerlib/dictionary.vim cpt=.,w,b,u,t,i,k
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-#   runtest.sh of /CoreOS/tests/automation-and-system-test/load/postfix-setup
+#   runtest.sh of /CoreOS/automation-and-system-test/load/postfix-setup
 #   Description: IPA nis-cli acceptance tests
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # The following ipa will be tested:
@@ -37,6 +37,7 @@
 . /usr/bin/rhts-environment.sh
 . /usr/share/beakerlib/beakerlib.sh
 . /dev/shm/env.sh
+. /dev/shm/ipa-server-shared.sh
 
 # Include test case file
 . ./t.postfix-setup.sh
@@ -50,6 +51,11 @@ rlJournalStart
         rlLog "SLAVE: $SLAVE"
         rlLog "CLIENT: $CLIENT"
 
+	rlPhaseStartTest "make sure files exist"
+		rlRun "ls /dev/shm/ipa-server-shared.sh" 0 "Checking to make sure /CoreOS/ipa-server/shared package is installed"
+		rlRun "ls /dev/shm/main.cf" 0 "Checking to make sure that /CoreOS/automation-and-system-test/shared is installed"
+	rlPhaseEnd
+	
         #####################################################################
         #               IS THIS MACHINE A MASTER?                           #
         #####################################################################

@@ -1,6 +1,6 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-#   Makefile of /CoreOS/tests/automation-and-system-test/load/postfix-setup
+#   Makefile of /CoreOS/automation-and-system-test/load/postfix-setup
 #   Description: Tests setup and exercise of nis integrated ipa tasks
 #   Author: Michael Gregg <mgregg@redhat.com>
 #
@@ -24,7 +24,7 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-export TEST=/CoreOS/tests/automation-and-system-test/load/postfix-setup
+export TEST=/CoreOS/automation-and-system-test/load/postfix-setup
 export TESTVERSION=1.0
 
 BUILT_FILES=
