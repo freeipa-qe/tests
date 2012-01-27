@@ -1,0 +1,49 @@
+#!/bin/bash
+
+yum -y install ypbind portmap ypserv yp-tools nscd
+
+if [ -z "$NISDOMAIN" ]; then
+	echo "NISDOMAIN env var not set"
+	exit 1
+fi
+
+cp /etc/sysconfig/network /etc/sysconfig/network.orig
+echo "NISDOMAIN=$NISDOMAIN" >> /etc/sysconfig/network
+
+cp /etc/yp.conf /etc/yp.conf.orig
+echo "domain $NISDOMAIN server 127.0.0.1" >> /etc/yp.conf
+
+cp /etc/nsswitch.conf /etc/nsswitch.conf.orig
+sed -i 's/^passwd:.*$/passwd: files nis/' /etc/nsswitch.conf
+sed -i 's/^shadow:.*$/shadow: files nis/' /etc/nsswitch.conf
+sed -i 's/^group:.*$/group:  files nis/' /etc/nsswitch.conf
+
+cp /etc/ypserv.conf /etc/ypserv.conf.orig
+cat <<EOF > /etc/ypserv.conf
+dns: no
+files: 30
+slp: no
+slp_timeout: 3600
+xfr_check_port: yes
+* : * : shadow.byname : port
+* : * : passwd.adjunct.byname : port 
+EOF
+
+cp /var/yp/securenets /var/yp/securenets.orig
+cat <<EOF > /var/yp/securenets
+255.0.0.0	127.0.0.1
+0.0.0.0		0.0.0.0
+EOF
+
+nisdomainname $NISDOMAIN
+service portmap restart
+service yppasswdd start
+service ypserv start
+/usr/lib64/yp/ypinit -m <<EOF
+$HOSTNAME
+
+y
+EOF
+
+make -C /var/yp
+service ypbind start
