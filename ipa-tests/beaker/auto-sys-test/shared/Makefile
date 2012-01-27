@@ -28,7 +28,7 @@ export TESTVERSION=1.0
 
 BUILT_FILES=
 
-FILES=$(METADATA) runtest.sh auto-sys-test-hostgroup-cli-lib.sh auto-sys-test-service-cli-lib.sh Makefile PURPOSE set-root-pw.exp id_rsa.pub id_rsa id_dsa.pub id_dsa auto-env.sh id_rsa_global.pub id_rsa_global
+FILES=$(METADATA) runtest.sh auto-sys-test-hostgroup-cli-lib.sh auto-sys-test-service-cli-lib.sh Makefile PURPOSE set-root-pw.exp id_rsa.pub id_rsa id_dsa.pub id_dsa auto-env.sh id_rsa_global.pub id_rsa_global main.cf ldap-users.cf ldap-gid.cf ldap-uid.cf ldap-aliases.cf 
 
 .PHONY: all install download clean
 
@@ -46,6 +46,10 @@ run: $(FILES) build
 	cp ./set-root-pw.exp /dev/shm/.
 	rm -f /dev/shm/id_rsa*
 	cp ./id_rsa* /dev/shm/.
+	rm -f /dev/shm/main.cf
+	cp ./main.cf /dev/shm/.
+	rm -f /dev/shm/ldap*.cf
+	cp ./ldap* /dev/shm/.
 	mkdir -p /root/.ssh
 	cp ./id_rsa* /root/.ssh/.
 	rm -f /dev/shm/id_dsa*

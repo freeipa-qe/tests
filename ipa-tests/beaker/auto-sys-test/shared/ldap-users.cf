@@ -1,0 +1,6 @@
+server_host = localhost
+search_base = cn=users,cn=accounts,dc=testrelm,dc=com
+version = 3
+scope = sub
+query_filter = (mail=%s)
+result_attribute = mail
