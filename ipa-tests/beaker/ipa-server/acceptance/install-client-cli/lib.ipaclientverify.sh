@@ -476,10 +476,6 @@ updateResolv()
 	echo "nameserver $fakeip" >> /etc/resolv.conf
 }
 
-restoreResolv()
-{
-   mv /dev/shm/ipa-resolv.conf-backup-clienttest /etc/resolv.conf
-}
 
 
 verify_time()

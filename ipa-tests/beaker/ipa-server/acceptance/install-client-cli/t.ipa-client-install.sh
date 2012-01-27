@@ -29,7 +29,7 @@ ipaclientinstall()
 #   --server=SERVER Set the IPA server to connect to
    ipaclientinstall_server_nodomain 
    ipaclientinstall_server_invalidserver
-#   ipaclientinstall_server_unreachableserver
+   ipaclientinstall_server_unreachableserver
 
 
 #   --realm=REALM_NAME Set the IPA realm name to REALM_NAME 
@@ -275,7 +275,7 @@ IPA client is not configured on this system."
        qaRun "$command" "$tmpout" 1 $expmsg "Verify expected error message for IPA Install with unreachable server" 
 
        # restore /etc/resolv.conf for the rest of the tests
-       restoreResolv
+       rlRun "restorecon -Rv /etc" 0 "Restore resolv.conf"
     rlPhaseEnd
 }
 
