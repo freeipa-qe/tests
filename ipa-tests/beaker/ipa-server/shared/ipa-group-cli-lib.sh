@@ -321,11 +321,11 @@ verifyGroupMember()
   # construct memberDN
   if [[ $membertype == "user" ]] ; then
         member="uid=$member"
-        memberDN="$member,cn=users,cn=accounts,dc=$BASEDN"
+        memberDN="$member,cn=users,cn=accounts,$BASEDN"
         rlLog "Verifying User Member: $memberDN"
   elif [[ $membertype == "group" ]] ; then
         member="cn=$member"
-        memberDN="$member,cn=groups,cn=accounts,dc=$BASEDN"
+        memberDN="$member,cn=groups,cn=accounts,$BASEDN"
         rlLog "Verifying Group Member: $memberDN"
   else
         rlLog "ERROR: unknown membertype: $membertype"
@@ -335,7 +335,7 @@ verifyGroupMember()
 
   # construct groupDN
   mygroup="cn=$mygroup"
-  groupDN="$mygroup,cn=groups,cn=accounts,dc=$BASEDN"
+  groupDN="$mygroup,cn=groups,cn=accounts,$BASEDN"
 
   rlLog "Member DN: $memberDN"
   rlLog "Group DN: $groupDN"
