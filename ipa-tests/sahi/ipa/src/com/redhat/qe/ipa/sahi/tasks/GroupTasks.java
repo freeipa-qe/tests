@@ -375,7 +375,7 @@ public class GroupTasks {
 	}
 	
 	public static void modifyGroup_enroll_user_multiple(SahiTasks browser, String groupName, String[] users) {
-		browser.link("Add").click();
+		//browser.link("Add").click();
 		addMultiple(browser, users);
 		//for (String userName:users)
 		//	browser.checkbox(userName).check();
