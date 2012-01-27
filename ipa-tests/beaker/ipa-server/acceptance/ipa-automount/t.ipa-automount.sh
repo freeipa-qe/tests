@@ -105,8 +105,10 @@ rlPhaseEnd
 automount_001() {
 
 rlPhaseStartTest "automount_001: Schema file check."
-
-	rlRun "rlAssertExists /etc/dirsrv/slapd-$RELM/schema/60autofs.ldif"
+	INSTANCE=`echo $RELM | sed 's/\./-/g'`
+	SCHEMAFILE="/etc/dirsrv/slapd-$INSTANCE/schema/60autofs.ldif"
+	rlLog "Schema file :: $SCHEMAFILE"
+	rlRun "rlAssertExists $SCHEMAFILE"
 
 rlPhaseEnd
 }
