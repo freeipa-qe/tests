@@ -275,7 +275,7 @@ IPA client is not configured on this system."
        qaRun "$command" "$tmpout" 1 $expmsg "Verify expected error message for IPA Install with unreachable server" 
 
        # restore /etc/resolv.conf for the rest of the tests
-       rlRun "restorecon -Rv /etc" 0 "Restore resolv.conf"
+       restoreResolv
     rlPhaseEnd
 }
 

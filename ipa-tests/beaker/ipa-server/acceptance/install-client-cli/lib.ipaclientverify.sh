@@ -470,13 +470,17 @@ verify_hostname()
 updateResolv()
 {
         fakeip=99.99.99.999
-	rm -f /dev/shm/ipa-resolv.conf-backup-clienttest
-	cat /etc/resolv.conf > /dev/shm/ipa-resolv.conf-backup-clienttest
 	sed -i s/^nameserver/#nameserver/g /etc/resolv.conf
 	echo "nameserver $fakeip" >> /etc/resolv.conf
 }
 
 
+restoreResolv()
+{
+        fakeip=99.99.99.999
+	sed -i s/^#nameserver/nameserver/g /etc/resolv.conf
+	sed -i s/^nameserver $fakeip//g /etc/resolv.conf
+}
 
 verify_time()
 {
