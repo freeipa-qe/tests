@@ -95,41 +95,63 @@ ipadefault_pwpolicy_all_logic()
     # accept parameters: NONE
     # test logic starts
         local out=$TmpDir/defaultvalues.$RANDOM.txt
-        kinitAs $admin $adminpassword
+	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
         rlRun "ipa pwpolicy-show > $out" 0 "read global password policy"
         maxlife=`grep "Max lifetime" $out | cut -d":" -f2 | xargs echo` # unit is in day
         minlife=`grep "Min lifetime" $out | cut -d":" -f2 | xargs echo` # unit is in hour
         history=`grep "History size" $out | cut -d":" -f2 | xargs echo`
         classes=`grep "Character classes" $out | cut -d":" -f2 | xargs echo`
         length=`grep "Min length" $out | cut -d":" -f2 | xargs echo`
+	maxfail=`grep "Max failures" $out | cut -d":" -f2 | xargs echo`
+	resetint=`grep "Failure reset interval" $out | cut -d":" -f2 | xargs echo`
+	locktime=`grep "Lockout duration" $out | cut -d":" -f2 | xargs echo`
+
         if [ $maxlife = $default_pw_maxlife ];then
-            rlPass "password policy maxlife maches [$maxlife]"
+            rlPass "password policy maxlife matches [$maxlife]"
         else
             rlFail "password policy maxlife does not match, expect [$default_pw_maxlife], actual [$maxlife]"
         fi
 
         if [ $minlife = $default_pw_minlife ];then
-            rlPass "password policy minlife maches [$minlife]"
+            rlPass "password policy minlife matches [$minlife]"
         else
             rlFail "password policy minlife does not match, expect [$default_pw_minlife], actual [$minlife]"
         fi
 
         if [ $history = $default_pw_history ];then
-            rlPass "password policy history maches [$history]"
+            rlPass "password policy history matches [$history]"
         else
             rlFail "password policy history does not match, expect [$default_pw_history], actual [$history]"
         fi
 
         if [ $classes = $default_pw_classes ];then
-            rlPass "password policy min classes maches [$classes]"
+            rlPass "password policy min classes matches [$classes]"
         else
             rlFail "password policy min classes does not match, expect [$default_pw_classes], actual [$classes]"
         fi
 
         if [ $length = $default_pw_length ];then
-            rlPass "password policy min length maches [$length]"
+            rlPass "password policy min length matches [$length]"
         else
             rlFail "password policy min length does not match, expect [$default_pw_length], actual [$length]"
+        fi
+
+        if [ $maxfail = $default_max_fail ];then
+            rlPass "password policy max failures matches [$maxfail]"
+        else
+            rlFail "password policy max failures does not match, expect [$default_max_fail], actual [$maxfail]"
+        fi
+
+        if [ $resetint = $default_reset_interval ];then
+            rlPass "password policy failure reset interval matches [$resetint]"
+        else
+            rlFail "password policy failure reset interval does not match, expect [$default_reset_interval], actual [$resetint]"
+        fi
+
+        if [ $locktime = $default_lockout_time ];then
+            rlPass "password policy lockout duration matches [$locktime]"
+        else
+            rlFail "password policy lockout does not match, expect [$default_lockout_time], actual [$locktime]"
         fi
 
         rm $out
@@ -169,10 +191,10 @@ ipadefault_config_all_logic()
     # accept parameters: NONE
     # test logic starts
         local out=$TmpDir/defaultvalues.$RANDOM.txt
-        kinitAs $admin $adminpassword
+	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
         rlRun "ipa config-show > $out" 0 "store config-show in [$out]"
-        usernamelength=`grep "Max username length" $out | cut -d":" -f2| xargs echo`
-        ipacompare "default user name length" "$default_config_usernamelength" "$usernamelength"
+        usernamelength=`grep "Maximum username length" $out | cut -d":" -f2| xargs echo`
+        ipacompare "default maximum user name length" "$default_config_usernamelength" "$usernamelength"
 
         homebase=`grep "Home directory base" $out | cut -d":" -f2| xargs echo`
         ipacompare "default home base" "$default_config_homebase" "$homebase"
@@ -195,7 +217,7 @@ ipadefault_config_all_logic()
         groupsearchfields=`grep "Group search fields" $out | cut -d":" -f2| xargs echo`
         ipacompare "group search fields" "$default_config_groupsearchfields" "$groupsearchfields"
 
-        migrationmode=`grep "Migration mode"  $out | cut -d":" -f2| xargs echo`
+        migrationmode=`grep "Enable migration mode"  $out | cut -d":" -f2| xargs echo`
         ipacompare "migration mode" "$default_config_migrationmode" "$migrationmode"
 
         certsubjectbase=`grep "Certificate Subject base" $out | cut -d":" -f2| xargs echo`
@@ -240,7 +262,7 @@ ipadefault_krbt_all_logic()
     # accept parameters: NONE
     # test logic starts
         local out=$TmpDir/defaultvalues.$RANDOM.txt
-        kinitAs $admin $adminpassword
+	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
         rlRun "ipa krbtpolicy-show > $out" 0 "store krbtpolicy-show in [$out]"
 
         maxlife=`grep "Max life" $out | cut -d":" -f2| xargs echo`
