@@ -41,17 +41,18 @@
 
 
 PACKAGE="ipa-server"
+INSTANCE=`echo $RELM | sed 's/\./-/g'`
 
 ##########################################
 getServicePIDs()
 {
 
-   for item in named ipa_kpasswd ; do
+   for item in named krb5kdc kadmind ; do
    	ps -e | grep $item | awk '{print $1}'> /tmp/$item.out
    done
 
    ps -ef | grep slapd | grep PKI | awk '{print $2}' > /tmp/slapd_PKI.out
-   ps -ef | grep slapd | grep -i $RELM | awk '{print $2}' > /tmp/slapd_$RELM.out
+   ps -ef | grep slapd | grep -i $INSTANCE | awk '{print $2}' > /tmp/slapd_$INSTANCE.out
    ps -ef | grep pki-ca | grep tomcat | awk '{print $2}' > /tmp/pki-ca.out
 
    return 0
@@ -86,16 +87,27 @@ rlJournalStart
 		rlRun "ps xa | grep -v grep |grep httpd" 1 "Checking to ensure that ipactl stop stopped httpd"
 	rlPhaseEnd
 
-	rlPhaseStartTest "ipa-ctl-04: ensure that ipactl stop stopped ipa_kpasswd"
-		rlRun "ps xa | grep -v grep |grep ipa_kpasswd" 1 "Checking to ensure that ipactl stop stopped ipa_kpasswd"
-		PID=`cat /tmp/ipa_kpasswd.out`
-		ps -e | grep $PID
-		if [ $? -eq 0 ] ; then
-			rlFail "Process id found - ipa_kpasswd PID $PID is still running"
-		else
-			rlPass "ipa_kpasswd pid $PID not found"
-		fi
-	rlPhaseEnd
+	rlPhaseStartTest "ipa-ctl-04A: ensure that ipactl stop stopped krb5kdc"
+                rlRun "ps xa | grep -v grep |grep krb5kdc" 1 "Checking to ensure that ipactl stop stopped krb5kdc"
+                PID=`cat /tmp/krb5kdc.out`
+                ps -e | grep $PID
+                if [ $? -eq 0 ] ; then
+                        rlFail "Process id found - krb5kdc PID $PID is still running"
+                else
+                        rlPass "krb5kdc pid $PID not found"
+                fi
+        rlPhaseEnd
+
+	rlPhaseStartTest "ipa-ctl-04B: ensure that ipactl stop stopped kadmind"
+                rlRun "ps xa | grep -v grep |grep kadmind" 1 "Checking to ensure that ipactl stop stopped kadmind"
+                PID=`cat /tmp/kadmind.out`
+                ps -e | grep $PID
+                if [ $? -eq 0 ] ; then
+                        rlFail "Process id found - kadmind PID $PID is still running"
+                else
+                        rlPass "kadmind pid $PID not found"
+                fi
+        rlPhaseEnd
 
 	rlPhaseStartTest "ipa-ctl-05: ensure that ipactl stop stopped named"
 		rlRun "ps xa | grep -v grep |grep named" 1 "Checking to ensure that ipactl stop stopped named"
@@ -119,15 +131,15 @@ rlJournalStart
 		fi
 	rlPhaseEnd
 
-	rlPhaseStartTest "ipa-ctl-07: ensure that ipactl stop stopped the $RELM instance of dirsrv"
-		rlRun "ps xa | grep -v grep |grep dirsrv| grep -i $RELM" 1 "Checking to ensure that ipactl stop stopped $RELM DS instance"
-		tmpfile=/tmp/slapd_$RELM.out
+	rlPhaseStartTest "ipa-ctl-07: ensure that ipactl stop stopped the $INSTANCE instance of dirsrv"
+		rlRun "ps xa | grep -v grep |grep dirsrv| grep -i $INSTANCE" 1 "Checking to ensure that ipactl stop stopped $INSTANCE DS instance"
+		tmpfile=/tmp/slapd_$INSTANCE.out
                 PID=`cat $tmpfile`
                 ps -e | grep $PID
                 if [ $? -eq 0 ] ; then
-                	rlFail "Process id found - dirsrv instance $RELM PID $PID is still running"
+                	rlFail "Process id found - dirsrv instance $INSTANCE PID $PID is still running"
                 else
-			rlPass "dirsrv $RELM instance pid $PID not found"
+			rlPass "dirsrv $INSTANCE instance pid $PID not found"
 		fi 
 	rlPhaseEnd
 
@@ -150,18 +162,31 @@ rlJournalStart
 		rlRun "ps xa | grep -v grep |grep httpd" 0 "Checking to ensure that ipactl start started httpd"
 	rlPhaseEnd
 
-	rlPhaseStartTest "ipa-ctl-11: ensure that ipactl start started kpasswd"
-		rlRun "ps xa | grep -v grep |grep ipa_kpasswd" 0 "Checking to ensure that ipactl start started ipa_kpasswd"
-                newPID=`ps -e | grep ipa_kpasswd | awk '{print $1}'`
-                rlLog "New ipa_kpasswd pid is $newPID"
-                oldPID=`cat /tmp/ipa_kpasswd.out | awk '{print $1}'`
-                rlLog "Old ipa_kpasswd pid is $oldPID"
+        rlPhaseStartTest "ipa-ctl-11A: ensure that ipactl start started krb5kdc"
+                rlRun "ps xa | grep -v grep |grep krb5kdc" 0 "Checking to ensure that ipactl start started krb5kdc"
+                newPID=`ps -e | grep krb5kdc | awk '{print $1}'`
+                rlLog "New krb5kdc pid is $newPID"
+                oldPID=`cat /tmp/krb5kdc.out | awk '{print $1}'`
+                rlLog "Old krb5kdc pid is $oldPID"
                 if [ $newPID -eq $oldPID ] ; then
-                        rlFail "ipa_kpasswd did not restart"
+                        rlFail "krb5kdc did not restart"
                 else
-                        rlPass "ipa_kpasswd was restarted"
+                        rlPass "krb5kdc was restarted"
                 fi
-	rlPhaseEnd
+        rlPhaseEnd
+
+        rlPhaseStartTest "ipa-ctl-11B: ensure that ipactl start started kadmind"
+                rlRun "ps xa | grep -v grep |grep kadmind" 0 "Checking to ensure that ipactl start started kadmind"
+                newPID=`ps -e | grep kadmind | awk '{print $1}'`
+                rlLog "New kadmind pid is $newPID"
+                oldPID=`cat /tmp/kadmind.out | awk '{print $1}'`
+                rlLog "Old kadmind pid is $oldPID"
+                if [ $newPID -eq $oldPID ] ; then
+                        rlFail "kadmind did not restart"
+                else
+                        rlPass "kadmind was restarted"
+                fi
+        rlPhaseEnd
 
 	rlPhaseStartTest "ipa-ctl-12: ensure that ipactl start started named"
 		rlRun "ps xa | grep -v grep |grep named" 0 "Checking to ensure that ipactl start started named"
@@ -176,17 +201,17 @@ rlJournalStart
                 fi
 	rlPhaseEnd
 
-	rlPhaseStartTest "ipa-ctl-13: ensure that ipactl start started the $RELM instance of dirsrv"
-		rlRun "ps xa | grep -v grep |grep dirsrv| grep -i $RELM" 0 "Checking to ensure that ipactl start started $RELM DS instance"
-		tmpfile=/tmp/slapd_$RELM.out
-		newPID=`ps -ef | grep slapd | grep -i $RELM | awk '{print $2}'`
-                rlLog "New $RELM DS instance pid is $newPID"
+	rlPhaseStartTest "ipa-ctl-13: ensure that ipactl start started the $INSTANCE instance of dirsrv"
+		rlRun "ps xa | grep -v grep |grep dirsrv| grep -i $INSTANCE" 0 "Checking to ensure that ipactl start started $INSTANCE DS instance"
+		tmpfile=/tmp/slapd_$INSTANCE.out
+		newPID=`ps -ef | grep slapd | grep -i $INSTANCE | awk '{print $2}'`
+                rlLog "New $INSTANCE DS instance pid is $newPID"
                 oldPID=`cat $tmpfile | awk '{print $1}'`
-                rlLog "Old $RELM DS instance pid is $oldPID"
+                rlLog "Old $INSTANCE DS instance pid is $oldPID"
                 if [ $newPID -eq $oldPID ] ; then
-                        rlFail "$RELM DS instance did not restart"
+                        rlFail "$INSTANCE DS instance did not restart"
                 else
-                        rlPass "$RELM DS instance was restarted"
+                        rlPass "$INSTANCE DS instance was restarted"
                 fi
 	rlPhaseEnd
 
@@ -225,18 +250,31 @@ rlJournalStart
 		rlRun "ps xa | grep -v grep |grep httpd" 0 "Checking to ensure that ipactl start restarted httpd"
 	rlPhaseEnd
 
-	rlPhaseStartTest "ipa-ctl-18: ensure that ipactl restart started kpasswd"
-		rlRun "ps xa | grep -v grep |grep ipa_kpasswd" 0 "Checking to ensure that ipactl restart started ipa_kpasswd"
-                newPID=`ps -e | grep ipa_kpasswd | awk '{print $1}'`
-                rlLog "New ipa_kpasswd pid is $newPID"
-                oldPID=`cat /tmp/ipa_kpasswd.out | awk '{print $1}'`
-                rlLog "Old ipa_kpasswd pid is $oldPID"
+        rlPhaseStartTest "ipa-ctl-18A: ensure that ipactl restart started krb5kdcd"
+                rlRun "ps xa | grep -v grep |grep krb5kdc" 0 "Checking to ensure that ipactl start restarted krb5kdc"
+                newPID=`ps -ef | grep krb5kdc | awk '{print $2}'`
+                rlLog "New krb5kdc pid is $newPID"
+                oldPID=`cat /tmp/krb5kdc.out | awk '{print $1}'`
+                rlLog "Old krb5kdc pid is $oldPID"
                 if [ $newPID -eq $oldPID ] ; then
-                        rlFail "ipa_kpasswd did not restart"
+                        rlFail "krb5kdc did not restart"
                 else
-                        rlPass "ipa_kpasswd was restarted"
+                        rlPass "krb5kdc was restarted"
                 fi
-	rlPhaseEnd
+        rlPhaseEnd
+
+        rlPhaseStartTest "ipa-ctl-18B: ensure that ipactl restart started kadmind"
+                rlRun "ps xa | grep -v grep |grep kadmind" 0 "Checking to ensure that ipactl start restarted kadmind"
+                newPID=`ps -ef | grep kadmind | awk '{print $2}'`
+                rlLog "New kadmind pid is $newPID"
+                oldPID=`cat /tmp/kadmind.out | awk '{print $1}'`
+                rlLog "Old kadmind pid is $oldPID"
+                if [ $newPID -eq $oldPID ] ; then
+                        rlFail "kadmind did not restart"
+                else
+                        rlPass "kadmind was restarted"
+                fi
+        rlPhaseEnd
 
 	rlPhaseStartTest "ipa-ctl-19: ensure that ipactl restart started named"
 		rlRun "ps xa | grep -v grep |grep named" 0 "Checking to ensure that ipactl start restarted named"
@@ -251,17 +289,17 @@ rlJournalStart
                 fi
 	rlPhaseEnd
 
-	rlPhaseStartTest "ipa-ctl-20: ensure that ipactl restart started the $RELM instance of dirsrv"
-		rlRun "ps xa | grep -v grep |grep dirsrv| grep -i $RELM" 0 "Checking to ensure that ipactl restart started $RELM DS instance"
-                tmpfile=/tmp/slapd_$RELM.out
-                newPID=`ps -ef | grep slapd | grep -i $RELM | awk '{print $2}'`
-                rlLog "New $RELM DS instance pid is $newPID"
+	rlPhaseStartTest "ipa-ctl-20: ensure that ipactl restart started the $INSTANCE instance of dirsrv"
+		rlRun "ps xa | grep -v grep |grep dirsrv| grep -i $INSTANCE" 0 "Checking to ensure that ipactl restart started $INSTANCE DS instance"
+                tmpfile=/tmp/slapd_$INSTANCE.out
+                newPID=`ps -ef | grep slapd | grep -i $INSTANCE | awk '{print $2}'`
+                rlLog "New $INSTANCE DS instance pid is $newPID"
                 oldPID=`cat $tmpfile | awk '{print $1}'`
-                rlLog "Old $RELM DS instance pid is $oldPID"
+                rlLog "Old $INSTANCE DS instance pid is $oldPID"
                 if [ $newPID -eq $oldPID ] ; then
-                        rlFail "$RELM DS instance did not restart"
+                        rlFail "$INSTANCE DS instance did not restart"
                 else
-                        rlPass "$RELM DS instance was restarted"
+                        rlPass "$INSTANCE DS instance was restarted"
                 fi
 	rlPhaseEnd
 
@@ -295,8 +333,8 @@ rlJournalStart
 		rlRun "su testuserqa -c 'ipactl stop'" 4 "Insufficient rights, starting service as nonprivileged user"
 		rlRun "ps xa | grep -v grep |grep httpd" 0 "Checking to ensure that httpd is still running"
 		rlRun "ps xa | grep -v grep |grep named" 0 "Checking to ensure that named is still running"
-		rlRun "ps xa | grep -v grep |grep ipa_kpasswd" 0 "Checking to ensure that is still running"
-		rlRun "ps xa | grep -v grep |grep dirsrv| grep -i $RELM" 0 "Checking to ensure that $RELM DS instance is still running"
+		#rlRun "ps xa | grep -v grep |grep ipa_kpasswd" 0 "Checking to ensure that is still running"
+		rlRun "ps xa | grep -v grep |grep dirsrv| grep -i $INSTANCE" 0 "Checking to ensure that $INSTANCE DS instance is still running"
 		rlRun "ps xa | grep -v grep |grep dirsrv| grep -i PKI" 0 "Checking to ensure that PKI DS instance is still running"
 		rlRun "ps xa | grep -v grep |grep pki-ca" 0 "Checking to ensure that pki-cad is still running"	
         rlPhaseEnd
@@ -306,8 +344,8 @@ rlJournalStart
                 rlRun "su testuserqa -c 'ipactl start'" 4 "Insufficient rights, starting service as nonprivileged user"
                 rlRun "ps xa | grep -v grep |grep httpd" 1 "Checking to ensure that httpd is NOT running"
                 rlRun "ps xa | grep -v grep |grep named" 1 "Checking to ensure that named is NOT running"
-                rlRun "ps xa | grep -v grep |grep ipa_kpasswd" 1 "Checking to ensure that is NOT running"
-                rlRun "ps xa | grep -v grep |grep dirsrv| grep -i $RELM" 1 "Checking to ensure that $RELM DS instance is NOT running"
+                #rlRun "ps xa | grep -v grep |grep ipa_kpasswd" 1 "Checking to ensure that is NOT running"
+                rlRun "ps xa | grep -v grep |grep dirsrv| grep -i $INSTANCE" 1 "Checking to ensure that $INSTANCE DS instance is NOT running"
                 rlRun "ps xa | grep -v grep |grep dirsrv| grep -i PKI" 1 "Checking to ensure that PKI DS instance is NOT running"
                 rlRun "ps xa | grep -v grep |grep pki-ca" 1 "Checking to ensure that pki-cad is NOT running"
         rlPhaseEnd
@@ -316,15 +354,26 @@ rlPhaseStartTest "ipa-ctl-25: restart services as non-root user"
                 rlRun "ipactl start" 0 "Start services as root first"
 		getServicePIDs
                 rlRun "su testuserqa -c 'ipactl restart'" 4 "Insufficient rights, starting service as nonprivileged user"
-		# verify kpasswd was not restarted
-		newPID=`ps -e | grep ipa_kpasswd | awk '{print $1}'`
-                rlLog "previous ipa_kpasswd pid is $newPID"
-                oldPID=`cat /tmp/ipa_kpasswd.out | awk '{print $1}'`
-                rlLog "current ipa_kpasswd pid is $oldPID"
+		
+		#verify krb5kdc was not restarted
+                newPID=`ps -e | grep krb5kdc | awk '{print $1}'`
+                rlLog "previous krb5kdc pid is $newPID"
+                oldPID=`cat /tmp/krb5kdc.out | awk '{print $1}'`
+                rlLog "current krb5kdc pid is $oldPID"
                 if [ $newPID -eq $oldPID ] ; then
-                        rlPass "ipa_kpasswd did not restart"
+                        rlPass "krb5kdc did not restart"
                 else
-                        rlFail "ipa_kpasswd was restarted"
+                        rlFail "kdrb5kdc was restarted"
+                fi
+		#verify kadmind was not restarted
+                newPID=`ps -e | grep kadmind | awk '{print $1}'`
+                rlLog "previous kadmind pid is $newPID"
+                oldPID=`cat /tmp/kadmind.out | awk '{print $1}'`
+                rlLog "current kadmind pid is $oldPID"
+                if [ $newPID -eq $oldPID ] ; then
+                        rlPass "kadmind did not restart"
+                else
+                        rlFail "kadmind was restarted"
                 fi
 		# verify named was not restart
 		newPID=`ps -ef | grep pki-ca | grep tomcat | awk '{print $2}'`
@@ -336,16 +385,16 @@ rlPhaseStartTest "ipa-ctl-25: restart services as non-root user"
                 else
                         rlFail "pki-cad was restarted"
                 fi
-		# verify RELM DS instance was not restarted
-		tmpfile=/tmp/slapd_$RELM.out
-                newPID=`ps -ef | grep slapd | grep -i $RELM | awk '{print $2}'`
-                rlLog "previous $RELM DS instance pid is $newPID"
+		# verify INSTANCE DS instance was not restarted
+		tmpfile=/tmp/slapd_$INSTANCE.out
+                newPID=`ps -ef | grep slapd | grep -i $INSTANCE | awk '{print $2}'`
+                rlLog "previous $INSTANCE DS instance pid is $newPID"
                 oldPID=`cat $tmpfile | awk '{print $1}'`
-                rlLog "current $RELM DS instance pid is $oldPID"
+                rlLog "current $INSTANCE DS instance pid is $oldPID"
                 if [ $newPID -eq $oldPID ] ; then
-                        rlPass "$RELM DS instance did not restart"
+                        rlPass "$INSTANCE DS instance did not restart"
                 else
-                        rlFail "$RELM DS instance was restarted"
+                        rlFail "$INSTANCE DS instance was restarted"
                 fi
 		# verify PKI DS instance was not restarted
                 newPID=`ps -ef | grep slapd | grep PKI | awk '{print $2}'`
@@ -367,17 +416,6 @@ rlPhaseStartTest "ipa-ctl-25: restart services as non-root user"
                 else
                         rlFail "pki-ca was restarted"
                 fi
-
-		# work around for DS bug
-		getServicePIDs
-		RELMPID=`cat /tmp/slapd_$RELM.out`
-		PKIPID=`cat /tmp/slapd_PKI.out`
-		rlLog "$RELM PID: $RELMPID  PKI PID: $PKIPID"
-		kill -9 $RELMPIK $PKIPID
-		service dirsrv start
-		service dirsrv stop
-		ipactl start
-
         rlPhaseEnd
 
         rlPhaseStartTest "ipa-ctl-26: verify status when directory server pki instance not running"
@@ -393,17 +431,52 @@ rlPhaseStartTest "ipa-ctl-25: restart services as non-root user"
         rlPhaseEnd
 
         rlPhaseStartTest "ipa-ctl-27: verify ipactl status non zero return code on error"
-		rlRun "service dirsrv stop $RELM" 0 "stop the $RELM directory server instance"
-		rlRun "ipactl status" 3 "Get the status of ipactl service and verify non zero return code"
-		rlRun "service dirsrv start $RELM" 0 "restart the $RELM directory server instance"
+		rlRun "service dirsrv stop $INSTANCE" 0 "stop the $INSTANCE directory server instance"
+		rlRun "ipactl status" 1 "Get the status of ipactl service and verify non zero return code"
+		rlRun "service dirsrv start $INSTANCE" 0 "restart the $INSTANCE directory server instance"
+		rlRun "ipactl status" 0 "check after instance restart"
+        rlPhaseEnd
+
+        rlPhaseStartTest "ipa-ctl-28: verify bz785791 :: depricated KPASSWD service in ipactl output"
+		output="/tmp/services.out"
+		
+		ipactl status > $output
+		cat $output | grep "KPASSWD"
+		if [ $? -eq 0 ] ; then
+			rlFail "KPASSWD is still in output for ipactl status"
+		else
+			rlPass "KPASSWD no longer in output for ipactl status"
+		fi
+
+                ipactl stop > $output
+                cat $output | grep "KPASSWD"
+                if [ $? -eq 0 ] ; then
+                        rlFail "KPASSWD is still in output for ipactl stop"
+                else
+                        rlPass "KPASSWD no longer in output for ipactl stop"
+                fi
+
+                ipactl start > $output
+                cat $output | grep "KPASSWD"
+                if [ $? -eq 0 ] ; then
+                        rlFail "KPASSWD is still in output for ipactl start"
+                else
+                        rlPass "KPASSWD no longer in output for ipactl start"
+                fi
+
+                ipactl restart > $output
+                cat $output | grep "KPASSWD"
+                if [ $? -eq 0 ] ; then
+                        rlFail "KPASSWD is still in output for ipactl restart"
+                else
+                        rlPass "KPASSWD no longer in output for ipactl restart"
+                fi
+
         rlPhaseEnd
 
     rlPhaseStartCleanup "ipa-ctl cleanup"
 	rlRun "userdel -fr testuserqa" 0 "Remove test user"
-	PID=`ps -ef | grep slapd | grep -i $RELM | awk '{print $2}'`
-	kill -9 $PID
-	service dirsrv restart
-	ipactl start
+	ipactl restart
     rlPhaseEnd
 
   rlJournalPrintText
