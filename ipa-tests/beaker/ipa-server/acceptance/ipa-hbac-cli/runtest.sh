@@ -200,12 +200,12 @@ rlJournalStart
 
     rlPhaseStartTest "ipa-hbacrule-cli-014: Negative - setattr and addattr accessRuleType"
         command="ipa hbacrule-mod --setattr accessruletype=bad test"
-        expmsg="ipa: ERROR: invalid 'type': must be one of (u'allow', u'deny')"
+        expmsg="ipa: ERROR: invalid 'accessruletype':  must be one of (u'allow', u'deny')"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
         command="ipa hbacrule-mod --addattr accessruletype=bad test"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
 	command="ipa hbacrule-mod --addattr accessruletype=allow test"
-	expmsg="ipa: ERROR: accessruletype: Only one value allowed."
+	expmsg="ipa: ERROR: no modifications to be performed"
 	 rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
     rlPhaseEnd
 
