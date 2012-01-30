@@ -321,7 +321,7 @@ delegation_find_negative_1003()
 	rlPhaseStartTest "delegation_find_negative_1003: fail to find with no value for name"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
-		rlRun "ipa delegation-find --name= > $tmpout 2>&1 " 1
+		rlRun "ipa delegation-find '--name=' > $tmpout 2>&1 " 1
 		rlAssertGrep "^0 delegations matched" $tmpout
 		ipa delegation-find --name= 
 		echo "ERRORCODE RETURNED: $?"
