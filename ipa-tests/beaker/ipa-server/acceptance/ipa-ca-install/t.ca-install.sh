@@ -186,7 +186,7 @@ echo 'sleep .5' >> $expfile
 echo 'send -- redhat' >> $expfile
 echo 'send -s -- "\r"' >> $expfile
 echo 'expect "*# "' >> $expfile
-echo "send -- \"ipa-replica-manage del $SLAVE --force\"" >> $expfile
+echo "send -- \"ipa-replica-manage del $HOSTNAME --force\"" >> $expfile
 echo 'send -s -- "\r"' >> $expfile
 echo 'expect eof ' >> $expfile
 
