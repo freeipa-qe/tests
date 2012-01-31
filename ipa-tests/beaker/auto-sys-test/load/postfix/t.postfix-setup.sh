@@ -7,10 +7,10 @@ setup-dns()
 		# get the ip address of that interface
 		ipaddr=$(ifconfig $currenteth | grep inet\ addr | sed s/:/\ /g | awk '{print $3}')
 		rlRun "ipa dnsrecord-add $DOMAIN @ --mx-rec '10 $ipaddr.'" 0 "add record type MX"
-		rlRun "ipa dnsrecord-add $DOMAIN @ --a-rec '$ipaddr'" 0 "add record type MX"
-		rlRun "ipa dnsrecord-add $DOMAIN imap --a-rec '$ipaddr'" 0 "add record type MX"
-		rlRun "ipa dnsrecord-add $DOMAIN smtp --a-rec '$ipaddr'" 0 "add record type MX"
-		rlRun "ipa dnsrecord-add $DOMAIN www --a-rec '$ipaddr'" 0 "add record type MX"
+		rlRun "ipa dnsrecord-add $DOMAIN @ --a-rec '$ipaddr'" 0 "add record type A to domain"
+		rlRun "ipa dnsrecord-add $DOMAIN imap --a-rec '$ipaddr'" 0 "add imap A record"
+		rlRun "ipa dnsrecord-add $DOMAIN smtp --a-rec '$ipaddr'" 0 "add smtp A record"
+		rlRun "ipa dnsrecord-add $DOMAIN www --a-rec '$ipaddr'" 0 "add www A record"
 		rlRun "/etc/init.d/named restart" 0 "restart bind"
 	rlPhaseEnd
 }
@@ -29,7 +29,7 @@ setup-postfix()
 		rlRun "cp /dev/shm/ldap-users.cf /etc/postfix/." 0 "copying over ldap-users.cf"
 		rlRun "ipa user-add --first=tuserfirst --last=tuserlast --email=$testuseremail $testuser" 0 "add user for testing with"
 		/etc/init.d/sendmail stop
-		/etc/init.f/postfix stop
+		/etc/init.d/postfix stop
 		rlRun "/etc/init.d/postfix start" 0 "Starting the postfix service"	
 	
 }

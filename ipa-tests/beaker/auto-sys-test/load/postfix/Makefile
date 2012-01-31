@@ -45,6 +45,10 @@ build: $(BUILT_FILES)
 	cp ./ldap-gid.cf /dev/shm/.
 	cp ./ldap-uid.cf /dev/shm/.
 	cp ./ldap-users.cf /dev/shm/.
+	rm -f /dev/shm/imapd.conf
+	rm -f /dev/shm/cyrus.conf
+	cp ./imapd.conf /dev/shm/.
+	cp ./cyrus.conf /dev/shm/.
 
 clean:
 	rm -f *~ $(BUILT_FILES)
