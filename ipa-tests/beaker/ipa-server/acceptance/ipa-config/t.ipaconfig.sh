@@ -206,7 +206,7 @@ ipaconfig_mod_envsetup()
 
 ipaconfig_mod_addattr()
 {
-    rlPhaseStartCleanup "ipaconfig_mod_setattr"
+    rlPhaseStartTest "ipaconfig_mod_addattr"
 	rlRun "ipa config-mod --addattr=ipaCustomFields=TRUE" 0 "setting ipacustom field to true"
 	rlRun "ipa config-show --all --raw | grep custom | grep TRUE" 0 "checking to ensure that ipacustom is enabled"
 	rlRun "ipa config-mod --setattr=ipaCustomFields=FALSE" 0 "setting ipacustom field to true"
@@ -216,7 +216,7 @@ ipaconfig_mod_addattr()
 
 ipaconfig_mod_setattr()
 {
-    rlPhaseStartCleanup "ipaconfig_mod_setattr"
+    rlPhaseStartTest "ipaconfig_mod_setattr"
 	rlRun "ipa config-mod --setattr=ipaMigrationEnabled=1" 0 "setting migration to true"
 	rlRun "ipa config-show | grep Enable\ migration | grep TRUE" 0 "checking to ensure that migration mode is enabled"
 	rlRun "ipa config-mod --setattr=ipaMigrationEnabled=0" 0 "setting migration to false"
@@ -226,7 +226,7 @@ ipaconfig_mod_setattr()
 
 ipaconfig_mod_expiration()
 {
-    rlPhaseStartCleanup "ipaconfig_mod_expiration"
+    rlPhaseStartTest "ipaconfig_mod_expiration"
         rlPass "no special section for mod expiration yet."
     rlPhaseEnd
 
