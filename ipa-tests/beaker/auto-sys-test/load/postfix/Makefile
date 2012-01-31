@@ -29,7 +29,7 @@ export TESTVERSION=1.0
 
 BUILT_FILES=
 
-FILES=$(METADATA) runtest.sh t.postfix-setup.sh Makefile PURPOSE
+FILES=$(METADATA) runtest.sh t.postfix-setup.sh Makefile PURPOSE main.cf imapd.conf cyrus.conf ldap-aliases.cf ldap-gid.cf ldap-uid.cf ldap-users.cf
 
 .PHONY: all install download clean
 
@@ -38,6 +38,10 @@ run: $(FILES) build
 
 build: $(BUILT_FILES)
 	chmod a+x runtest.sh
+	rm -f /dev/shm/main.cf
+	cp ./main.cf /dev/shm/.
+	rm -f /dev/shm/ldap*.cf
+	cp ./ldap*.cf /defv/shm/.
 
 clean:
 	rm -f *~ $(BUILT_FILES)

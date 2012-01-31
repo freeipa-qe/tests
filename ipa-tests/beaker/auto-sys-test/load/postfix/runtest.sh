@@ -65,12 +65,14 @@ rlJournalStart
         if [ $rc -eq 0 ] ; then
 		pwdfile=/dev/shm/password.txt
 		echo $ADMINPW > $pwdfile
-		yum -y install postfix cyrus-imapd-utils cyrus-imapd
+		yum -y install postfix cyrus-imapd-utils cyrus-imapd cyrus-sasl-ldap
 		/etc/init.d/sendmail stop
 		/sbin/chkconfig --levels 2345 sendmail off
 		/sbin/chkconfig --levels 2345 postfix on
+		/sbin/chkconfig --levels 2345 cyrus-imapd on
 		setup-dns
 		setup-postfix
+		setup-cyrus
         	cleanup
         else
                 rlLog "Machine in recipe is not the MASTER - not running setup"
