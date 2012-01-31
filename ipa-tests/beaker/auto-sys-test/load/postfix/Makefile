@@ -41,7 +41,10 @@ build: $(BUILT_FILES)
 	rm -f /dev/shm/main.cf
 	cp ./main.cf /dev/shm/.
 	rm -f /dev/shm/ldap*.cf
-	cp ./ldap*.cf /def/shm/.
+	cp ./ldap-aliases.cf /def/shm/.
+	cp ./ldap-gid.cf /def/shm/.
+	cp ./ldap-uid.cf /def/shm/.
+	cp ./ldap-users.cf /def/shm/.
 
 clean:
 	rm -f *~ $(BUILT_FILES)
