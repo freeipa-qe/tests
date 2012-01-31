@@ -372,7 +372,7 @@ public class GroupTests extends SahiTestScript{
 		for (String name: allNetGroupNames)
 		{
 			String desc = "test netgroup for usergroup testing : ["+name+"]";
-			CommonHelper.addNetGroup(browser, name, desc); 
+			CommonHelper.addNewEntry(browser, name, desc); 
 			Assert.assertTrue(browser.link(name).exists(), "create netgroup:[" + name + "] for testing");
 		} 
 	}
@@ -436,9 +436,10 @@ public class GroupTests extends SahiTestScript{
 	
 	@Test (groups={"modifyGroup_netgroup_cleanup"}, dependsOnGroups="modifyGroup_netgroup_delete", dataProvider="netGroupsCleanup", 
 				description = "clean up test data for netgroup testing")
-	public void modifyGroup_netgroup_cleanup( String netGroupName){ 
+	public void modifyGroup_netgroup_cleanup( String netGroupNames){ 
 		browser.navigateTo(commonTasks.netgroupPage); 
-		CommonHelper.deleteNetGroup(browser, netGroupName); 
+		String[] netGroups = netGroupNames.split(",");
+		CommonHelper.deleteEntry(browser, netGroups); 
 	 }
 	
 	/////////////////////////////////// role test //////////////////////////////////	
@@ -517,7 +518,7 @@ public class GroupTests extends SahiTestScript{
 	public void modifyGroup_hbac_prepareTestData(String hbacRules){
 		browser.navigateTo(commonTasks.hbacPage);
 		String[] rules = hbacRules.split(",");
-		CommonHelper.addHBACrule(browser, rules); 
+		CommonHelper.addNewEntry(browser, rules); 
 		for (String rule: rules)
 			Assert.assertTrue(browser.link(rule).exists(), "create HBAC rule:[" + rule + "] for testing success");
 	}
@@ -583,7 +584,7 @@ public class GroupTests extends SahiTestScript{
 	public void modifyGroup_hbac_cleanup( String hbacRules){ 
 		browser.navigateTo(commonTasks.hbacPage); 
 		String[] rules = hbacRules.split(",");
-		CommonHelper.deleteHBACrules(browser, rules); 
+		CommonHelper.deleteEntry(browser, rules); 
 	 }
 
 	/////////////////////////////////// sudo rules test //////////////////////////////////	
@@ -599,7 +600,7 @@ public class GroupTests extends SahiTestScript{
 	public void modifyGroup_sudo_prepareTestData(String sudoRules){
 		browser.navigateTo(commonTasks.sudoPage);
 		String[] rules = sudoRules.split(",");
-		CommonHelper.addSUDOrule(browser, rules); 
+		CommonHelper.addNewEntry(browser, rules); 
 		for (String rule: rules)
 			Assert.assertTrue(browser.link(rule).exists(), "create SUDO rule:[" + rule + "] for testing success");
 	}
@@ -665,7 +666,7 @@ public class GroupTests extends SahiTestScript{
 	public void modifyGroup_sudo_cleanup( String sudoRules){ 
 		browser.navigateTo(commonTasks.sudoPage); 
 		String[] rules = sudoRules.split(",");
-		CommonHelper.deleteSUDOrules(browser, rules); 
+		CommonHelper.deleteEntry(browser, rules); 
 	 }
 	
 	/////////////////////////////////// other group modification negative test //////////////////////////////////
@@ -732,7 +733,6 @@ public class GroupTests extends SahiTestScript{
 								GroupTests.testUserGroups[8], "posix, assigned gid", "","isPosix"}	};
 		return groups;
 	}
-	
 	
 	@DataProvider (name="addGroupAddAndEdit")
 	public Object[][] get_addGroupAddAndEdit(){
