@@ -662,12 +662,53 @@ public class GroupTests extends SahiTestScript{
 	}
 	
 	@Test (groups={"modifyGroup_sudo_cleanup"}, dependsOnGroups="modifyGroup_sudo_delete", dataProvider="sudoCleanup", 
-				description = "clean up test data for sudo testing")
+			description = "clean up test data for sudo testing")
 	public void modifyGroup_sudo_cleanup( String sudoRules){ 
 		browser.navigateTo(commonTasks.sudoPage); 
 		String[] rules = sudoRules.split(",");
 		CommonHelper.deleteEntry(browser, rules); 
 	 }
+	
+	@Test (groups={"bugverification"}, dependsOnGroups="addGroup", 
+			description="bugzilla: https://bugzilla.redhat.com/show_bug.cgi?id=745790" )
+	public void verifybug745790(){
+		String gid="3000000";
+		String groupName = "bug745790";
+		String groupDescription = "test case for bug# 745790";
+		browser.span("Add").click();
+		browser.textbox("cn").setValue(groupName);
+		browser.textarea("description").setValue(groupDescription); 
+		//ensure the default is "isPosix" on
+		if (browser.checkbox("nonposix").checked()){
+			log.info("check default behave: isPosix box is check by default, good, test continue");
+			browser.textbox("gidnumber").setValue(gid);
+			String readFromUI = browser.textbox("gidnumber").getValue();
+			if (readFromUI.equals(gid)){
+				log.info("when isPosix is checked, we expect GID filed is editable, test pass, continue");
+			}else{
+				log.info("when isPosix is checked, we expect GID field is editable, test failed, report error ");
+				log.info("bugzilla: https://bugzilla.redhat.com/show_bug.cgi?id=745790 verification result: failed");
+				Assert.assertTrue(false);
+			}
+			// now, uncheck the isPosix box, test if field gidnumber is editable, it should be greyed out
+			browser.checkbox("nonposix").uncheck();
+			browser.textbox("gidnumber").setValue(gid);
+			readFromUI = browser.textbox("gidnumber").getValue();
+			if (readFromUI.equals(gid)){
+				log.info("when isPosix is unchecked, we expect GID field is NOT editable, test failed, report error ");
+				Assert.assertTrue(false);
+			}else{ 
+				log.info("when isPosix is checked, we expect GID filed is NOT editable, test pass, all finished");
+				log.info("bugzilla: https://bugzilla.redhat.com/show_bug.cgi?id=745790 verification result: verified");
+			}
+			browser.button("Cancel").click();
+		}
+		else{
+			log.info("check default behave: isPosix box is unchecked by default, this is not expected, makr it fail");
+			browser.button("Cancel").click();
+			Assert.assertTrue(false, "default behave check failed: isPosix box is not checked by default");
+		} 
+	}
 	
 	/////////////////////////////////// other group modification negative test //////////////////////////////////
 	@Test (groups={"modifyGroup_Negative"}, description = "negative test for modify groups", dataProvider="modifyGroup_Negative")
@@ -675,14 +716,16 @@ public class GroupTests extends SahiTestScript{
 		//need work
 	}
 	
-	@Test (groups={"deleteGroup"}, description="delete group test", dataProvider="firstUserGroupData", dependsOnGroups="modifyGroup_sudo_cleanup")
+	//@Test (groups={"deleteGroup"}, description="delete group test", dataProvider="firstUserGroupData", dependsOnGroups="modifyGroup_sudo_cleanup")
+	@Test (groups={"deleteGroup"}, description="delete group test", dataProvider="firstUserGroupData", dependsOnGroups="bugverification")
 	public void deleteGroup_single(String testScenario, String groupName){
 		Assert.assertTrue(browser.link(groupName).exists(),"before 'Delete', group should exists");
 		GroupTasks.deleteGroup(browser, groupName);
 		Assert.assertFalse(browser.link(groupName).exists(),"after 'Delete', group should disappear");
 	}
 	
-	@Test (groups={"deleteGroup"}, description="delete group test", dataProvider="remainingUserGroupData", dependsOnGroups="modifyGroup_sudo_cleanup")
+	//@Test (groups={"deleteGroup"}, description="delete group test", dataProvider="remainingUserGroupData", dependsOnGroups="modifyGroup_sudo_cleanup")
+	@Test (groups={"deleteGroup"}, description="delete group test", dataProvider="remainingUserGroupData", dependsOnGroups="bugverification")
 	public void deleteGroup_multiple(String testScenario, String groupNames){
 		String[] groups = groupNames.split(",");
 		for (String groupName:groups){

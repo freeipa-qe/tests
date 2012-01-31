@@ -10,6 +10,7 @@
                 <include name="init" />
                 <include name="addGroup" />  
                 <include name="addGroup_negative" />
+                <!-- 
                 <include name="modifyGroup" />
                 <include name="modifyGroup_enrolluser" />
                 <include name="modifyGroup_enrollgroup" />
@@ -34,6 +35,8 @@
 	           <include name="modifyGroup_sudo_add" />
 	           <include name="modifyGroup_sudo_delete" />
 	           <include name="modifyGroup_sudo_cleanup" /> 
+	           -->
+	           <include name="bugverification" />
                 <include name="deleteGroup" />
             </run>
         </groups>
