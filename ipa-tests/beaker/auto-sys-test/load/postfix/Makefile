@@ -41,7 +41,7 @@ build: $(BUILT_FILES)
 	rm -f /dev/shm/main.cf
 	cp ./main.cf /dev/shm/.
 	rm -f /dev/shm/ldap*.cf
-	cp ./ldap*.cf /defv/shm/.
+	cp ./ldap*.cf /def/shm/.
 
 clean:
 	rm -f *~ $(BUILT_FILES)
