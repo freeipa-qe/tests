@@ -17,8 +17,8 @@ setup-dns()
 
 setup-postfix()
 {
-	testuser=tuserone
-	testuseremail="tuserone@$DOMAIN"
+	testuser=uone
+	testuseremail="tone@$DOMAIN"
 	rlPhaseStartTest "Setting up core postfix files"
 		seconds=$(date +%s)
 		rlRun "mv /etc/postfix/main.cf /etc/postfix/main.cf-backup-$seconds" 0 "backing up main.cf"
@@ -27,7 +27,13 @@ setup-postfix()
 		rlRun "cp /dev/shm/ldap-uid.cf /etc/postfix/." 0 "copying over ldap-uid.cf"
 		rlRun "cp /dev/shm/ldap-gid.cf /etc/postfix/." 0 "copying over ldap-gid.cf"
 		rlRun "cp /dev/shm/ldap-users.cf /etc/postfix/." 0 "copying over ldap-users.cf"
-		rlRun "ipa user-add --first=tuserfirst --last=tuserlast --email=$testuseremail $testuser" 0 "add user for testing with"
+		rlRun "ipa user-add --first=tuserfirst --last=tuserlast --email=$testuseremail $testuser" 0 "add first user for testing with"
+		testuser=utwo
+		testuseremail="two@$DOMAIN"
+		rlRun "ipa user-add --first=tuserfirst --last=tuserlast --email=$testuseremail $testuser" 0 "add second user for testing with"
+		testuser=uthree
+		testuseremail="three@$DOMAIN"
+		rlRun "ipa user-add --first=tuserfirst --last=tuserlast --email=$testuseremail $testuser" 0 "add third user for testing with"
 		/etc/init.d/sendmail stop
 		/etc/init.d/postfix stop
 		rlRun "/etc/init.d/postfix start" 0 "Starting the postfix service"	
@@ -50,7 +56,7 @@ setup-cyrus()
 		# create script to create mailboxes
 		echo 'cm testrelm.com!user.uone
 cm testrelm.com!user.utwo
-cm testrelm.com!user.utwo
+cm testrelm.com!user.uthree
 cm testrelm.com!user.cyrus' > /dev/shm/create-users.txt
 		rlRun "cyradm --user cyrus --auth login --pass $ADMINPW localhost < /dev/shm/create-users.txt" 0 "creating mailboxes for test users"
 		echo 'mail from:mgregg@redhat.com
