@@ -182,12 +182,12 @@ set send_slow {1 .1}' > $expfile
 echo "spawn ssh -l root $MASTER" >> $expfile
 echo 'match_max 100000' >> $expfile
 echo 'sleep .5' >> $expfile
-echo "send -- \"ipa-replica-manage del $HOSTNAME --force\"" >> $expfile
-echo 'send -s -- "\r"' >> $expfile
+echo "send \"ipa-replica-manage del $HOSTNAME --force\"" >> $expfile
+echo 'send "\r"' >> $expfile
 echo 'expect "*: "' >> $expfile
 echo 'sleep .5' >> $expfile
-echo "send -s -- \"$ADMINPW\"" >> $expfile
-echo 'send -s -- "\r"' >> $expfile
+echo "send \"$ADMINPW\"" >> $expfile
+echo 'send "\r"' >> $expfile
 echo 'expect eof ' >> $expfile
 
 	rlRun "/usr/bin/expect $expfile >> $expout 2>&1"
