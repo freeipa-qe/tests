@@ -6,52 +6,9 @@ import com.redhat.qe.auto.testng.Assert;
 import com.redhat.qe.ipa.sahi.tasks.SahiTasks; 
 import com.redhat.qe.ipa.sahi.tests.group.GroupTests;
 
-
 public class GroupTasks {
 	private static Logger log = Logger.getLogger(GroupTasks.class.getName());
-	 
-	///////////////////////////////// generic actions //////////////////////////////
-	private static void addSingle(SahiTasks browser, String nameToCheck)
-	{
-		browser.link("Add").click(); 
-		browser.checkbox(nameToCheck).check();
-		browser.span(">>").click();
-		browser.button("Add").click();  
-	}
-	
-	private static void addMultiple(SahiTasks browser, String[] namesToCheck)
-	{
-		browser.link("Add").click(); 
-		for (String name:namesToCheck)
-			browser.checkbox(name).check();
-		browser.span(">>").click();
-		browser.button("Add").click();
-	}
-	
-	private static void addViaSearch(SahiTasks browser,String filter, String name) {
-		browser.link("Add").click();
-		browser.textbox("filter").setValue(filter); 
-		browser.span("Find").click();
-		browser.checkbox(name).check();
-		browser.span(">>").click();
-		browser.button("Add").click();  
-	}
 
-	private static void deleteSingle(SahiTasks browser, String nameToCheck)
-	{
-		browser.checkbox(nameToCheck).check();
-		browser.span("Delete").click();
-		browser.button("Delete").click(); 
-	}
-	
-	private static void deleteMultiple(SahiTasks browser, String[] namesToCheck)
-	{
-		for (String name:namesToCheck)
-			browser.checkbox(name).check();
-		browser.span("Delete").click();
-		browser.button("Delete").click();  
-	}
-	///////////////////////////////////////////////////////////////
 	public static void addGroup(SahiTasks sahiTasks, String groupName, String groupDescription) {
 		sahiTasks.span("Add").click();
 		sahiTasks.textbox("cn").setValue(groupName);
@@ -73,24 +30,12 @@ public class GroupTasks {
 		sahiTasks.button("Delete").click();
 	}
 	
-	/*
-	 * Create a Group, the purpose of this is to provide a public interface to other test suite to create a new group.
-	 * @param sahiTasks 
-	 * @param groupName - user group name
-	 * @param groupDescription - group description
-	 */
 	public static void createGroupService(SahiTasks sahiTasks, String groupName, String groupDescription, String originalURL) {
-	// negative to group creation page, but there might be a bug here	
-		//TODO: yi: navigate in tests before starting task
-		//sahiTasks.navigateTo(GroupTests.groupPage, true);
 		sahiTasks.span("Add").click();
 		sahiTasks.textbox("cn").setValue(groupName);
 		sahiTasks.textbox("description").setValue(groupDescription);
 		sahiTasks.button("Add").click();
-
-	// go back to caller url
 		sahiTasks.navigateTo(originalURL, true);
-
 	}//createGroupService
 	
 	/*
@@ -109,15 +54,11 @@ public class GroupTasks {
 		}
 		if (membertype == "usergroup"){
 			sahiTasks.link("member_group").click();
-		}	
-
-		if (exists == "YES"){
-			com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(name).exists(), membertype + " " + name + " is a member of user group " + groupName);
 		}
-		else {
-			com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(name).exists(), membertype + " " + name + " is NOT member of user group " + groupName);
-		}
-
+		if (exists == "YES")
+			Assert.assertTrue(sahiTasks.link(name).exists(), membertype + " " + name + " is a member of user group " + groupName);
+		else
+			Assert.assertFalse(sahiTasks.link(name).exists(), membertype + " " + name + " is NOT member of user group " + groupName);
 		sahiTasks.link("User Groups").in(sahiTasks.div("content")).click();
 	}
 	
@@ -140,10 +81,10 @@ public class GroupTasks {
 		}	
 		for (String name : names) {
 			if (exists == "YES"){
-				com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(name).exists(), membertype + " " + name + " is a member of user group " + groupName);
+				Assert.assertTrue(sahiTasks.link(name).exists(), membertype + " " + name + " is a member of user group " + groupName);
 			}
 			else {
-				com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(name).exists(), membertype + " " + name + " is NOT member of user group " + groupName);
+				Assert.assertFalse(sahiTasks.link(name).exists(), membertype + " " + name + " is NOT member of user group " + groupName);
 			}
 		}
 		sahiTasks.link("User Groups").in(sahiTasks.div("content")).click();
@@ -178,12 +119,10 @@ public class GroupTasks {
 		sahiTasks.radio(type).click();
 		
 		for (String grprulename : grprulenames) {
-			if (exists == "YES"){
-				com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(grprulename).exists(), "User group " + groupName + " is a memberof " + memberoftype + ": " + grprulename);
-			}
-			else {
-				com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(grprulename).exists(), "User group " + groupName + " is NOT a memberof " + memberoftype + ": " + grprulename);
-			}
+			if (exists == "YES")
+				Assert.assertTrue(sahiTasks.link(grprulename).exists(), "User group " + groupName + " is a memberof " + memberoftype + ": " + grprulename);
+			else 
+				Assert.assertFalse(sahiTasks.link(grprulename).exists(), "User group " + groupName + " is NOT a memberof " + memberoftype + ": " + grprulename);
 		}
 		sahiTasks.link("User Groups").in(sahiTasks.div("content")).click();
 	}
@@ -218,29 +157,23 @@ public class GroupTasks {
 		}
 		sahiTasks.radio(type).click();
 		
-		if (exists == "YES"){
-			com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(grprulename).exists(), "User group " + groupName + " is a memberof " + memberoftype + ": " + grprulename);
-		}
-		else {
-			com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(grprulename).exists(), "User group " + groupName + " is NOT a memberof " + memberoftype + ": " + grprulename);
-		}
-
+		if (exists == "YES")
+			Assert.assertTrue(sahiTasks.link(grprulename).exists(), "User group " + groupName + " is a memberof " + memberoftype + ": " + grprulename);
+		else 
+			Assert.assertFalse(sahiTasks.link(grprulename).exists(), "User group " + groupName + " is NOT a memberof " + memberoftype + ": " + grprulename);
+		
 		if (!onPage) 
 			sahiTasks.link("User Groups").in(sahiTasks.div("content")).click();
-		
 	}
 
 	public static void add_UserGroup(SahiTasks browser, String groupName, String groupDescription, String gid, String isPosix){
-		//browser.link("Add").click();
 		browser.span("Add").click();
 		browser.textbox("cn").setValue(groupName);
 		browser.textarea("description").setValue(groupDescription); 
 		if (! gid.equals(""))
 			browser.textbox("gidnumber").setValue(gid);
-		
-		if (isPosix.equals("nonPosix")){
+		if (isPosix.equals("nonPosix"))
 			browser.checkbox("nonposix").click();
-		}
 		browser.button("Add").click();
 	}
 	
@@ -249,7 +182,6 @@ public class GroupTasks {
 							String firstGroupName, String firstGroupDescription, String firstGid, String first_isPosix,
 							String secondGroupName, String secondGroupDescription, String secondGid, String second_isPosix){
 		
-		//browser.link("Add").click();
 		browser.span("Add").click();
 		browser.textbox("cn").setValue(firstGroupName);
 		browser.textarea("description").setValue(firstGroupDescription);
@@ -269,7 +201,6 @@ public class GroupTasks {
 		if (second_isPosix.equals("nonPosix")){
 			browser.checkbox("nonposix").click();
 		}
-		
 		// finally cancel to go back to main user group page
 		browser.button("Add and Add Another").click();
 		browser.button("Cancel").click();
@@ -290,9 +221,6 @@ public class GroupTasks {
 		browser.link("Settings").click();
 		browser.textarea("description").setValue("verify get into edit mode: " + groupDescription);
 		browser.link("Update").click();
-		
-		// go back to use group list page
-		//browser.link("User Groups").in(browser.div("content")).click();
 	}
 	
 	public static void add_then_cancel_UserGroup(SahiTasks browser, String groupName, String groupDescription, String gid, String isPosix){
@@ -323,17 +251,13 @@ public class GroupTasks {
 		if (membertype == "usergroup"){
 			sahiTasks.link("memberof_group").click();
 		}
-		
 		sahiTasks.radio("direct").click();
 		sahiTasks.link("Enroll").click();
-		
 		sahiTasks.checkbox(name).click();
-		
 		sahiTasks.span(">>").click();
 		sahiTasks.button(button).click();
 		sahiTasks.link("User Groups").in(sahiTasks.div("content")).click();
 	 }
-	
 	
 	/*
 	 * Remove user members
@@ -350,55 +274,31 @@ public class GroupTasks {
 		if (membertype == "usergroup"){
 			sahiTasks.link("member_group").click();
 		}
-		
 		sahiTasks.radio("direct").click();
 		sahiTasks.checkbox(name).click();
-
 		sahiTasks.span("Delete").click();
 		sahiTasks.button(button).click();
 		sahiTasks.link("User Groups").in(sahiTasks.div("content")).click();
 	}
 
 	public static void modifyGroup_enroll_user_single(SahiTasks browser, String groupName, String userName) {
-		addSingle(browser, userName);
-		//browser.link("Add").click();
-		//browser.checkbox(userName).check();
-		//browser.span(">>").click();
-		//browser.button("Add").click(); 
+		CommonHelper.addEntry(browser, userName);
 	}
 
 	public static void modifyGroup_remove_user_single(SahiTasks browser, String groupName, String userName) {
-		deleteSingle(browser, userName);
-		//browser.checkbox(userName).check();
-		//browser.span("Delete").click();
-		//browser.button("Delete").click(); 
+		CommonHelper.deleteEntry(browser, userName);
 	}
 	
 	public static void modifyGroup_enroll_user_multiple(SahiTasks browser, String groupName, String[] users) {
-		//browser.link("Add").click();
-		addMultiple(browser, users);
-		//for (String userName:users)
-		//	browser.checkbox(userName).check();
-		//browser.span(">>").click();
-		//browser.button("Add").click();  
+		CommonHelper.addEntry(browser, users);
 	}
 
 	public static void  modifyGroup_remove_user_multiple(SahiTasks browser, String groupName, String[] users) {
-		deleteMultiple(browser, users);
-		//for (String userName:users)
-		//	browser.checkbox(userName).check();
-		//browser.span("Delete").click();
-		//browser.button("Delete").click(); 
+		CommonHelper.deleteEntry(browser, users);
 	}
 	
 	public static void modifyGroup_enroll_user_viasearch(SahiTasks browser,String groupName, String userName) {
-		addViaSearch(browser, userName, userName);
-		//browser.link("Add").click();
-		//browser.textbox("filter").setValue(userName); 
-		//browser.span("Find").click();
-		//browser.checkbox(userName).check();
-		//browser.span(">>").click();
-		//browser.button("Add").click();  
+		CommonHelper.addViaSearch(browser, userName, userName);
 	}
 
 	public static void modifyGroup_enroll_user_cancel(SahiTasks browser,String groupName, String userName) {
@@ -410,19 +310,12 @@ public class GroupTasks {
 
 	public static void modifyGroup_enroll_member_group_single(SahiTasks browser,String groupName, String childGroup) {
 		browser.link("member_group").click();
-		addSingle(browser, childGroup);
-		//browser.link("Add").click(); 
-		//browser.checkbox(childGroup).check();
-		//browser.span(">>").click();
-		//browser.button("Add").click();  
+		CommonHelper.addEntry(browser, childGroup);
 	}
 
 	public static void modifyGroup_remove_member_group_single(SahiTasks browser,String groupName, String childGroup) {
 		browser.link("member_group").click(); 
-		deleteSingle(browser, childGroup);
-		//browser.checkbox(childGroup).check();
-		//browser.span("Delete").click();
-		//browser.button("Delete").click();  
+		CommonHelper.deleteEntry(browser, childGroup);
 	}
 	
 	public static void modifyGroup_enroll_member_group_multiple(SahiTasks browser,String groupName, String[] childGroups) {
@@ -436,22 +329,12 @@ public class GroupTasks {
 
 	public static void modifyGroup_remove_member_group_multiple(SahiTasks browser,String groupName, String[] childGroups) {
 		browser.link("member_group").click(); 
-		deleteMultiple(browser, childGroups);
-		//for (String childGroup:childGroups)
-		//	browser.checkbox(childGroup).check();
-		//browser.span("Delete").click();
-		//browser.button("Delete").click();  
+		CommonHelper.deleteEntry(browser, childGroups);
 	}
 	
 	public static void modifyGroup_enroll_member_group_viasearch(SahiTasks browser,String groupName, String childGroup) {
 		browser.link("member_group").click();
-		addViaSearch(browser, childGroup, childGroup);
-		//browser.link("Add").click();
-		//browser.textbox("filter").setValue(childGroup); 
-		//browser.span("Find").click();
-		//browser.checkbox(childGroup).check();
-		//browser.span(">>").click();
-		//browser.button("Add").click();  
+		CommonHelper.addViaSearch(browser, childGroup, childGroup);
 	}
 	
 	public static void modifyGroup_enroll_memberof_group_single(SahiTasks browser,String groupName, String childGroup) {
@@ -464,10 +347,7 @@ public class GroupTasks {
 
 	public static void modifyGroup_remove_memberof_group_single(SahiTasks browser,String groupName, String childGroup) {
 		browser.link("memberof_group").click(); 
-		deleteSingle(browser, childGroup);
-		//browser.checkbox(childGroup).check();
-		//browser.span("Delete").click();
-		//browser.button("Delete").click();  
+		CommonHelper.deleteEntry(browser, childGroup);
 	}
 	
 	public static void modifyGroup_enroll_memberof_group_multiple(SahiTasks browser,String groupName, String[] childGroups) {
@@ -481,21 +361,11 @@ public class GroupTasks {
 	
 	public static void modifyGroup_remove_memberof_group_multiple(SahiTasks browser,String groupName, String[] childGroups) {
 		browser.link("memberof_group").click(); 
-		deleteMultiple(browser, childGroups);
-		//for (String childGroup:childGroups)
-		//	browser.checkbox(childGroup).check();
-		//browser.span("Delete").click();
-		//browser.button("Delete").click();  
+		CommonHelper.deleteEntry(browser, childGroups);
 	}
 	public static void modifyGroup_enroll_memberof_group_viasearch(SahiTasks browser,String groupName, String childGroup) {
 		browser.link("memberof_group").click();
-		addViaSearch(browser, childGroup, childGroup);
-		//browser.link("Add").click();
-		//browser.textbox("filter").setValue(childGroup); 
-		//browser.span("Find").click();
-		//browser.checkbox(childGroup).check();
-		//browser.span(">>").click();
-		//browser.button("Add").click();  
+		CommonHelper.addViaSearch(browser, childGroup, childGroup);
 	}
 
 	public static void modifyGroup_settings(SahiTasks browser,String description, String gid) {
@@ -533,53 +403,53 @@ public class GroupTasks {
 	///////////////////// neggroup tasks //////////////////////////////
 	public static void addNetGroup_Single(SahiTasks browser, String netGroupName) {
 		browser.link("memberof_netgroup").click();
-		addSingle(browser, netGroupName);
+		CommonHelper.addEntry(browser, netGroupName);
 	}
 
 	public static void addNetGroup_Multiple(SahiTasks browser,String[] netGroupNames) {
 		browser.link("memberof_netgroup").click();
-		addMultiple(browser, netGroupNames);
+		CommonHelper.addEntry(browser, netGroupNames);
 	}
 
 	public static void addNetGroup_ViaSearch(SahiTasks browser,	String filter, String groupNames) {
 		browser.link("memberof_netgroup").click();
-		addViaSearch(browser, filter, groupNames);
+		CommonHelper.addViaSearch(browser, filter, groupNames);
 	}
 
 	public static void deleteNetGroup_Single(SahiTasks browser,String netGroupName) {
 		browser.link("memberof_netgroup").click();
 		Assert.assertTrue(browser.link(netGroupName).exists(), "netgroup name should in the list before deleted");
-		deleteSingle(browser, netGroupName);
+		CommonHelper.deleteEntry(browser, netGroupName);
 	}
 	
 	public static void deleteNetGroup_Multiple(SahiTasks browser,String[] netGroupNames) {
 		browser.link("memberof_netgroup").click();
 		for (String name:netGroupNames)
 			Assert.assertTrue(browser.link(name).exists(), "netgroup exist before delete");
-		deleteMultiple(browser, netGroupNames);
+		CommonHelper.deleteEntry(browser, netGroupNames);
 	}
 
 	///////////////////// role tasks //////////////////////////////
 	public static void addRole_Single(SahiTasks browser, String role) {
 		browser.link("memberof_role").click();
-		addSingle(browser, role);
+		CommonHelper.addEntry(browser, role);
 	}
 
 
 	public static void addRole_Multiple(SahiTasks browser,String[] roles) {
 		browser.link("memberof_role").click();
-		addMultiple(browser, roles);
+		CommonHelper.addEntry(browser, roles);
 	}
 
 	public static void addRole_ViaSearch(SahiTasks browser,	String filter, String role) {
 		browser.link("memberof_role").click();
-		addViaSearch(browser, filter, role);
+		CommonHelper.addViaSearch(browser, filter, role);
 	}
 
 	public static void deleteRole_Single(SahiTasks browser,String role) {
 		browser.link("memberof_role").click();
 		Assert.assertTrue(browser.link(role.toLowerCase()).exists(), "role should in the list before deleted");
-		deleteSingle(browser, role.toLowerCase());
+		CommonHelper.deleteEntry(browser, role.toLowerCase());
 	}
 	
 	public static void deleteRole_Multiple(SahiTasks browser,String[] roles) {
@@ -593,74 +463,71 @@ public class GroupTasks {
 			i++;
 			Assert.assertTrue(browser.link(lowerCaseRoleName).exists(), "roles exist before delete");
 		}
-		deleteMultiple(browser, lowerCaseRoles);
+		CommonHelper.deleteEntry(browser, lowerCaseRoles);
 		for (String role:lowerCaseRoles)
-			Assert.assertTrue(browser.link(role).exists(), "roles does NOT exist after delete");
+			Assert.assertFalse(browser.link(role).exists(), "roles does NOT exist after delete");
 	}
         
         ///////////////////// hbac tasks //////////////////////////////
 	public static void addHBAC_Single(SahiTasks browser, String hbacRule) {
 		browser.link("memberof_hbacrule").click();
-		addSingle(browser, hbacRule);
+		CommonHelper.addEntry(browser, hbacRule);
 	}
 
 	public static void addHBAC_Multiple(SahiTasks browser,String[] hbacRules) {
 		browser.link("memberof_hbacrule").click();
-		addMultiple(browser, hbacRules);
+		CommonHelper.addEntry(browser, hbacRules);
 	}
 
 	public static void addHBAC_ViaSearch(SahiTasks browser,	String filter, String hbacRule) {
 		browser.link("memberof_hbacrule").click();
-		addViaSearch(browser, filter, hbacRule);
+		CommonHelper.addViaSearch(browser, filter, hbacRule);
 	}
 
 	public static void deleteHBAC_Single(SahiTasks browser,String hbacRule) {
 		browser.link("memberof_hbacrule").click();
 		Assert.assertTrue(browser.link(hbacRule).exists(), "hbac rule should in the list before deleted");
-		deleteSingle(browser, hbacRule );
+		CommonHelper.deleteEntry(browser, hbacRule );
 	}
 	
 	public static void deleteHBAC_Multiple(SahiTasks browser,String[] hbacRules) {
 		browser.link("memberof_hbacrule").click(); 
 		for (String rule:hbacRules)
 			Assert.assertTrue(browser.link(rule).exists(), "rule exist before delete");
-		deleteMultiple(browser, hbacRules);
+		CommonHelper.deleteEntry(browser, hbacRules);
 		for (String rule:hbacRules)
 			Assert.assertFalse(browser.link(rule).exists(), "rule does NOT exist after delete");
 	}
 
-
 	///////////////////// sudo tasks //////////////////////////////
 	public static void addSUDO_Single(SahiTasks browser, String sudoRule) {
 		browser.link("memberof_sudorule").click();
-		addSingle(browser, sudoRule);
+		CommonHelper.addEntry(browser, sudoRule);
 	}
 
 	public static void addSUDO_Multiple(SahiTasks browser,String[] sudoRules) {
 		browser.link("memberof_sudorule").click();
-		addMultiple(browser, sudoRules);
+		CommonHelper.addEntry(browser, sudoRules);
 	}
 
 	public static void addSUDO_ViaSearch(SahiTasks browser,	String filter, String sudoRule) {
 		browser.link("memberof_sudorule").click();
-		addViaSearch(browser, filter, sudoRule);
+		CommonHelper.addViaSearch(browser, filter, sudoRule);
 	}
 
 	public static void deleteSUDO_Single(SahiTasks browser,String sudoRule) {
 		browser.link("memberof_sudorule").click();
 		Assert.assertTrue(browser.link(sudoRule).exists(), "hbac rule should in the list before deleted");
-		deleteSingle(browser, sudoRule );
+		CommonHelper.deleteEntry(browser, sudoRule );
 	}
 	
 	public static void deleteSUDO_Multiple(SahiTasks browser,String[] sudoRules) {
 		browser.link("memberof_sudorule").click(); 
 		for (String rule:sudoRules)
 			Assert.assertTrue(browser.link(rule).exists(), "rule exist before delete");
-		deleteMultiple(browser, sudoRules);
+		CommonHelper.deleteEntry(browser, sudoRules);
 		for (String rule:sudoRules)
 			Assert.assertFalse(browser.link(rule).exists(), "rule does NOT exist after delete");
 	}
-
-
 }//class Group Tasks
 

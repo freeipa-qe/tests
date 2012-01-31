@@ -4,61 +4,43 @@ import com.redhat.qe.ipa.sahi.tasks.*;
 
 public class CommonHelper {
 
-	public static void addNetGroup(SahiTasks browser, String netGroupName, String netGroupDescription)
-	{  
-		genericAdd(browser, netGroupName, netGroupDescription);
-	}
-
-	public static void deleteNetGroup(SahiTasks browser, String netGroupName) { 
-		genericDelete(browser, netGroupName);
+	public static void addEntry(SahiTasks browser, String existingEntry)
+	{
+		browser.link("Add").click(); 
+		browser.checkbox(existingEntry).check();
+		browser.span(">>").click();
+		browser.button("Add").click();  
 	}
 	
-	public static void deleteNetGroup(SahiTasks browser, String[] netGroupNames) { 
-		genericDelete(browser, netGroupNames);
-	}
-	
-	public static void addHBACrule(SahiTasks browser, String ruleName)
+	public static void addEntry(SahiTasks browser, String[] existingEntry)
 	{
-		genericAdd(browser, ruleName);
-	}
-	
-	public static void addHBACrule(SahiTasks browser, String[] ruleNames)
-	{
-		genericAdd(browser, ruleNames);
-	}
-	
-	public static void deleteHBACrules(SahiTasks browser, String[] ruleNames)
-	{
-		genericDelete(browser, ruleNames);
-	}
-		
-	public static void addSUDOrule(SahiTasks browser, String ruleName)
-	{
-		genericAdd(browser, ruleName);
-	}
-	
-	public static void addSUDOrule(SahiTasks browser, String[] ruleNames)
-	{
-		genericAdd(browser, ruleNames);
-	}
-	
-	public static void deleteSUDOrules(SahiTasks browser, String[] ruleNames)
-	{
-		genericDelete(browser, ruleNames);
-	}
-	
-	/////////////////////////// generic function ///////////////////////////////
-	private static void genericAdd(SahiTasks browser, String cnValue)
-	{
-		browser.span("Add").click();
-		browser.textbox("cn").setValue(cnValue); 
+		browser.link("Add").click(); 
+		for (String name:existingEntry)
+			browser.checkbox(name).check();
+		browser.span(">>").click();
 		browser.button("Add").click();
 	}
 	
-	private static void genericAdd(SahiTasks browser, String[] cnValues)
+	public static void addViaSearch(SahiTasks browser,String filter, String cnValue) {
+		browser.link("Add").click();
+		browser.textbox("filter").setValue(filter); 
+		browser.span("Find").click();
+		browser.checkbox(cnValue).check();
+		browser.span(">>").click();
+		browser.button("Add").click();  
+	}
+
+	public static void addNewEntry(SahiTasks browser, String newEntryCNValue)
 	{
 		browser.span("Add").click();
-		for(String cn:cnValues)
+		browser.textbox("cn").setValue(newEntryCNValue); 
+		browser.button("Add").click();
+	}
+	
+	public static void addNewEntry(SahiTasks browser, String[] newEntryCNValues)
+	{
+		browser.span("Add").click();
+		for(String cn:newEntryCNValues)
 		{
 			browser.textbox("cn").setValue(cn); 
 			browser.button("Add and Add Another").click();
@@ -66,22 +48,22 @@ public class CommonHelper {
 		browser.button("Cancel").click();
 	}
 	
-	private static void genericAdd(SahiTasks browser, String cnValue, String descValue)
+	public static void addNewEntry(SahiTasks browser, String newEntryCNValue, String newEntryDescValue)
 	{
 		browser.span("Add").click();
-		browser.textbox("cn").setValue(cnValue);
-		browser.textarea("description").setValue(descValue);
+		browser.textbox("cn").setValue(newEntryCNValue);
+		browser.textarea("description").setValue(newEntryDescValue);
 		browser.button("Add").click();
 	}
 	
-	private static void genericDelete(SahiTasks browser, String cnValue)
+	public static void deleteEntry(SahiTasks browser, String cnValue)
 	{
 		browser.checkbox(cnValue).click(); 
 		browser.span("Delete").click(); 
 		browser.button("Delete").click();
 	}
 	
-	private static void genericDelete(SahiTasks browser, String[] cnValues)
+	public static void deleteEntry(SahiTasks browser, String[] cnValues)
 	{
 		for (String cn: cnValues) 
 			browser.checkbox(cn).click(); 
