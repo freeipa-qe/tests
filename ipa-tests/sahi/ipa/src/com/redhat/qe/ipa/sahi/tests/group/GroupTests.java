@@ -669,7 +669,7 @@ public class GroupTests extends SahiTestScript{
 		CommonHelper.deleteEntry(browser, rules); 
 	 }
 	
-	@Test (groups={"bugverification"}, dependsOnGroups="addGroup", 
+	@Test (groups={"bugverification"}, dependsOnGroups="modifyGroup_sudo_cleanup", 
 			description="bugzilla: https://bugzilla.redhat.com/show_bug.cgi?id=745790" )
 	public void verifybug745790(){
 		String gid="3000000";
