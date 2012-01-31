@@ -49,6 +49,7 @@ ipaconfig_mod()
     ipaconfig_mod_defaultgroup_negative
     ipaconfig_mod_emaildomain_default
     ipaconfig_mod_emaildomain_negative
+    ipaconfig_mod_expiration
     ipaconfig_mod_envcleanup
 } #ipaconfig_mod
 
@@ -200,6 +201,16 @@ ipaconfig_mod_envsetup()
         #environment setup ends   here
     rlPhaseEnd
 } #ipaconfig_mod_envsetup
+
+ipaconfig_mod_expiration()
+{
+    rlPhaseStartCleanup "ipaconfig_mod_expiration"
+        #environment cleanup starts here
+        rlPass "no special section for mod expiration yet."
+        #environment cleanup ends   here
+    rlPhaseEnd
+
+}
 
 ipaconfig_mod_envcleanup()
 {

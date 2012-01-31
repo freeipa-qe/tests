@@ -103,6 +103,34 @@ clear_kticket()
     kdestroy 2>&1 >/dev/null
 } #clear_kticket
 
+set_systime()
+{
+#set system time with given string
+# expected input: + 86400 <== set system time to one day later
+#                 - 86400 <== set system time to one day before
+    local offset=$1
+    local before=`date`
+    local now
+    local desiredtime
+    local after
+    now=`date "+%s"`
+    desiredtime=`echo "$now $offset" | bc`
+    date "+%a %b %e %H:%M:%S %Y" -s "`perl -le "print scalar localtime $desiredtime"`"
+    after=`date`
+    echo "[set system time] before set systime [$before]"
+    echo "[set system time] after  set systime [$after]"
+    echo "[set system time] offset [$offset] seconds"
+} # set_systime
+
+restore_systime()
+{
+#restore system time by sync with ntp server
+#    rlRun "service ntpd stop" 0 "Stopping local ntpd service to sync with external source"
+    ntpdate $NTPSERVER
+#    rlRun "service ntpd start" 0 "Starting local ntpd service again"
+} # restore_systime
+
+
 restore_ipaconfig()
 {
     KinitAsAdmin
