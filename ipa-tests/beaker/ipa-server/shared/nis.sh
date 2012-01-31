@@ -16,55 +16,121 @@ NISUSER1PASSWD2="asdf55634gk"
 NISUSER2PASSWD2="asdfg2234123412k"
 NISUSER3PASSWD2="lllllllasdfxk"
 NISUSER4PASSWD2="asdfjosoeorktk"
+NISSERVICE1="my-ftp"
+NISSERVICE2="my-web"
+NISSERVICE3="my-ssh"
+NIS_SERVER_PACKAGES="ypbind ypserv yp-tools rpcbind"
 
 export NISUSER1 NISUSER2 NISUSER3 NISUSER4 NISUSER1PASSWD NISUSER2PASSWD NISUSER3PASSWD NISUSER4PASSWD
 export NISUSER1PASSWD2 NISUSER2PASSWD2 NISUSER3PASSWD2 NISUSER4PASSWD2
+export NIS_SERVER_PACKAGES
 
 setup-nis-server()
 {
+	# Install RPMs
+	yum -y install $NIS_SERVER_PACKAGES
+
+	# Exit if NISDOMAIN variable not set.  Should come from /dev/shm/env.sh
+	if [ -z "$NISDOMAIN" ]; then
+		echo "NISDOMAIN env var not set"
+		exit 1
+	fi
+
+	# Set libdir since paths vary based on arch
 	if [ -d /usr/lib64 ]; then 
 		LIBDIR=/usr/lib64
 	else
 		LIBDIR=/usr/lib
 	fi
+
+	# Disable selinux enforcing
 	setenforce 0 # This seems to mak ehe installs work faster
+	
+	# Set NIS Domain Name
 	/bin/domainname $NISDOMAIN 
 	/bin/ypdomainname $NISDOMAIN 
+
+	# Setup as a NIS Master 
+	service ypserv start
+	cp /etc/ypserv.conf /etc/ypserv.conf.orig.setup-nis-server
 	echo "$MYHOSTNAME" | $LIBDIR/yp/ypinit -m	
 	echo "domain $NISDOMAIN server $MYHOSTNAME"
 	service ypserv restart
+
+	# Create securenets file for NIS Master
+	cp /var/yp/securenets /var/yp/securenets.orig.setup-nis-server
+	cat <<-EOF > /var/yp/securenets
+	255.0.0.0   127.0.0.1
+	0.0.0.0     0.0.0.0
+	EOF
+
+	# Set NISDOMAIN in /etc/sysconfig/network for NIS Client
+	cp /etc/sysconfig/network /etc/sysconfig/network.orig.setup-nis-server
 	sed -i s/^NISDOMAIN/#NISDOMAIN/g /etc/sysconfig/network
 	echo "NISDOMAIN=\"$NISDOMAIN\"" >>  /etc/sysconfig/network
+
+	# Setup yp.conf for NIS Client
+	cp /etc/yp.conf /etc/yp.conf.orig.setup-nis-server
 	sed -i s/^domain/#domain/g /etc/yp.conf
 	echo "domain $NISDOMAIN server $MYHOSTNAME" >> /etc/yp.conf
-	# Create securenets file
-	echo '255.0.0.0       127.0.0.0
-# This line gives access to everybody. 
-0.0.0.0         0.0.0.0' > /var/yp/securenets
+
+	# Setup nsswitch.conf for NIS Client\
+	cp /etc/nsswitch.conf /etc/nsswitch.conf.orig.setup-nis-server
+	sed -i 's/^passwd:.*$/passwd: files nis/' /etc/nsswitch.conf
+	sed -i 's/^shadow:.*$/shadow: files nis/' /etc/nsswitch.conf
+	sed -i 's/^group:.*$/group:  files nis/' /etc/nsswitch.conf
+
 	adduser --password $NISUSER1PASSWD $NISUSER1
 	adduser --password $NISUSER2PASSWD $NISUSER2
 	adduser --password $NISUSER3PASSWD $NISUSER3
 	adduser --password $NISUSER4PASSWD $NISUSER4
+	
 	echo "$MYHOSTNAME" | $LIBDIR/yp/ypinit -m	
 	service yppasswdd start
 	service ypxfrd start
+	chkconfig rpcbind on
 	chkconfig ypserv on
 	chkconfig ypbind on
 	chkconfig yppasswdd on
 	chkconfig ypxfrd on
 	service ypserv restart
 	service ypbind restart
-	service ypserv restart
-	service ypbind restart
 
 	# configuring netgroups
-	echo "convertpeople (-,$NISUSER1,$NISDOMAIN) (-,$NISUSER2,$NISDOMAIN) (-,$NISUSER3,$NISDOMAIN) (-,$NISUSER4,$NISDOMAIN)" > /etc/netgroup
-	# Enable netgroups in the yp makefile
+	cat <<-EOF >>/etc/netgroup
+	convertpeople (-,$NISUSER1,$NISDOMAIN) (-,$NISUSER2,$NISDOMAIN) (-,$NISUSER3,$NISDOMAIN) (-,$NISUSER4,$NISDOMAIN)" 
+	EOF
+
+	# Enable netgroups, auto.master, and auto.home in the yp makefile
 	sedin='^all:\ \ passwd\ group\ hosts\ rpc\ services\ netid\ protocols\ mail'
-	sedout='all:\ \ passwd\ group\ hosts\ rpc\ services\ netid\ protocols\ netgrp\ mail'
-	cat /var/yp/Makefile > /var/yp/backup-Makefile
+	sedout='all:\ \ passwd\ group\ hosts\ rpc\ services\ netid\ protocols\ netgrp\ auto.master\ auto.home\ mail'
+	mv /var/yp/Makefile /var/yp/backup-Makefile
+	cp /var/yp/backup-Makefile /var/yp/Makefile
 	sed -i s/"$sedin"/"$sedout"/g /var/yp/Makefile
 
+	# Add custom service 
+	cp /etc/services /etc/services.orig.setup-nis-server
+	cat <<-EOF >> /etc/services
+	my-ftp 488821/tcp # my custom NIS ftp service entry
+	my-ftp 488821/udp # my custom NIS ftp service entry
+	my-ssh 488822/tcp # my custom NIS ssh service entry
+	my-ssh 488822/udp # my custom NIS ssh service entry
+	my-web 488880/tcp # my custom NIS web service entry
+	my-web 488880/udp # my custom NIS web service entry
+	EOF
+
+	# Create auto.master
+	cat <<-EOF >/etc/auto.master
+	/nfshome +auto.home
+	/nfsapps +auto.apps
+	EOF
+
+	# Create auto.home
+	cat <<-EOF >/etc/auto.home
+	* -rw,rsize=65536,wsize=65536,hard,intr,actimeo=3600,timeo=3600 $MYHOSTNAME:/home/&
+	EOF
+
+	# Re-run ypinit to pickup new changes and map info
 	echo "$MYHOSTNAME" | $LIBDIR/yp/ypinit -m 
 	service ypserv restart
 	service ypbind restart
@@ -78,8 +144,32 @@ setup-nis-server()
 	rlRun "/usr/bin/ypcat -d $NISDOMAIN -h $MYHOSTNAME netgroup | grep $NISUSER2" 0 "Checking to ensure that nis user 2 was added to the netgroup" 
 	rlRun "/usr/bin/ypcat -d $NISDOMAIN -h $MYHOSTNAME netgroup | grep $NISUSER3" 0 "Checking to ensure that nis user 3 was added to the netgroup" 
 	rlRun "/usr/bin/ypcat -d $NISDOMAIN -h $MYHOSTNAME netgroup | grep $NISUSER4" 0 "Checking to ensure that nis user 4 was added to the netgroup" 
-	setenforce 1
-	service ypserv restart
-	service ypbind restart
+	rlRun "/usr/bin/ypcat -d $NISDOMAIN -h $MYHOSTNAME services | grep $NISSERVICE1" 0 "Checking to ensure that nis service 1 was added to service" 
+	rlRun "/usr/bin/ypcat -d $NISDOMAIN -h $MYHOSTNAME services | grep $NISSERVICE2" 0 "Checking to ensure that nis service 2 was added to service" 
+	rlRun "/usr/bin/ypcat -d $NISDOMAIN -h $MYHOSTNAME services | grep $NISSERVICE3" 0 "Checking to ensure that nis service 3 was added to service" 
 
+	# Re-enable selinux enforcing
+	setenforce 1
+
+	# Check ypserv/ypbind restarts
+	rlRun "service ypserv restart" 0 "Checking a ypserv restart"
+	rlRun "service ypbind restart" 0 "Checking a ypbind restart"
+}
+
+uninstall-nis-server()
+{
+	rlLog "UnInstalling NIS Server"
+	/bin/mv /var/yp/backup-Makefile /var/yp/Makefile	
+	yum -y remove ypbind ypserv yp-tools
+	/bin/rm /etc/ypserv.conf*
+	/bin/rm /etc/yp.conf*
+	/bin/rm /etc/auto.master
+	/bin/rm /etc/auto.home
+	/bin/rm /etc/netgroup
+	/bin/mv /etc/services.orig.setup-nis-server /etc/services
+	/bin/mv /etc/sysconfig/network.orig.setup-nis-server /etc/sysconfig/network
+	/bin/mv /etc/nsswitch.conf.orig.setup-nis-server /etc/nsswitch.conf
+	if [ -d /var/yp ]; then
+		/bin/rm -rf /var/yp
+	fi
 }
