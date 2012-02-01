@@ -81,7 +81,7 @@ createReplica1()
                         hostname_s=$(echo $s | cut -d. -f1)
 
 			# Preparing replica without --ip-address option
-			rlRun "ipa dnsrecord-add $DOMAIN --a-rec=$ipofs2"
+			rlRun "ipa dnsrecord-add $DOMAIN $hostname_s --a-rec=$ipofs"
                         rlLog "Running: ipa-replica-prepare -p $ADMINPW $hostname_s.$DOMAIN"
 			rlRun "ipa-replica-prepare -p $ADMINPW $hostname_s.$DOMAIN"
                         rlRun "service named restart" 0 "Restarting named as work around when adding new reverse zone"
@@ -105,7 +105,7 @@ createReplica2()
 
 			# Preparing replica with --ip-address option
                         rlLog "IP of server $s is resolving as $ipofs, using short hostname of $hostname_s"
-                        rlLog "Running: ipa-replica-prepare -p $ADMINPW --ip-address=$ipofs2 $hostname_s.$DOMAIN"
+                        rlLog "Running: ipa-replica-prepare -p $ADMINPW --ip-address=$ipofs $hostname_s.$DOMAIN"
                         rlRun "ipa-replica-prepare -p $ADMINPW --ip-address=$ipofs $hostname_s.$DOMAIN" 0 "Creating replica package"
                         rlRun "service named restart" 0 "Restarting named as work around when adding new reverse zone"
 
