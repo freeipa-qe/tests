@@ -31,15 +31,6 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-# Include data-driven test data file:
-
-# Include rhts environment
-. /usr/bin/rhts-environment.sh
-. /usr/share/beakerlib/beakerlib.sh
-. /dev/shm/ipa-server-shared.sh
-. /dev/shm/env.sh
-. ./install-lib.sh
-
 installMaster()
 {
    rlPhaseStartTest "Install IPA MASTER Server"
@@ -53,7 +44,6 @@ installMaster()
         ipofs=$(dig +noquestion $SLAVE  | grep $SLAVE | grep IN | grep A | awk '{print $5}')
 	rlLog "IP address of SLAVE: $SLAVE is $ipofs"
 
-	rlRun "yum install -y ipa-server bind-dyndb-ldap bind"
 	echo "ipa-server-install --setup-dns --forwarder=$DNSFORWARD --hostname=$hostname_s.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U" > /dev/shm/installipa.bash
 
 	rlLog "EXECUTING: ipa-server-install --setup-dns --forwarder=$DNSFORWARD --hostname=$hostname_s.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U"
@@ -78,7 +68,7 @@ installMaster()
                         hostname_s=$(echo $s | cut -d. -f1)
 
                         rlLog "IP of server $s is resolving as $ipofs, using short hostname of $hostname_s"
-                        rlLog "Running: ipa-replica-prepare -p $ADMINPW --ip-address=$ipofs2 $hostname_s.$DOMAIN"
+                        rlLog "Running: ipa-replica-prepare -p $ADMINPW --ip-address=$ipofs $hostname_s.$DOMAIN"
                         rlRun "ipa-replica-prepare -p $ADMINPW --ip-address=$ipofs $hostname_s.$DOMAIN" 0 "Creating replica package"
                         rlRun "service named restart" 0 "Restarting named as work around when adding new reverse zone"
 

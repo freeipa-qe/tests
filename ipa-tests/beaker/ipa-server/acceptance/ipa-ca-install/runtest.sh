@@ -42,6 +42,13 @@
 # Include tests file
 . ./t.ca-install.sh
 
+COMMON_SERVER_PACKAGES="bind expect krb5-workstation bind-dyndb-ldap krb5-pkinit-openssl"
+RHELIPA_SERVER_PACKAGES="ipa-server"
+COMMON_CLIENT_PACKAGES="httpd curl mod_nss mod_auth_kerb 389-ds-base expect ntpdate"
+RHELIPA_CLIENT_PACKAGES="ipa-admintools ipa-client"
+FREEIPA_SERVER_PACKAGES="freeipa-server"
+FREEIPA_CLIENTi_PACKAGES="freeipa-admintools freeipa-client"
+
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ########################################################################
 # Test Suite Globals
@@ -76,6 +83,28 @@ rlJournalStart
 	echo "Hostname of this machine is $HOSTNAME"
 	echo "Hostname of master is $MASTER"
 
+	myhostname=`hostname`
+	rlLog "hostname command: $myhostname"
+        rlLog "HOSTNAME: $HOSTNAME"
+        rlLog "MASTER: $MASTER"
+        rlLog "SLAVE: $SLAVE"
+        rlLog "CLIENT: $CLIENT"
+        rlLog "CLIENT2: $CLIENT2"
+
+        echo "export BEAKERMASTER=$MASTER" >> /dev/shm/env.sh
+        echo "export BEAKERSLAVE=$SLAVE" >> /dev/shm/env.sh
+        echo "export BEAKERCLIENT=$CLIENT" >> /dev/shm/env.sh
+        echo "export BEAKERCLIENT2=$CLIENT2" >> /dev/shm/env.sh
+
+        cat /etc/redhat-release | grep "Fedora"
+        if [ $? -eq 0 ] ; then
+                FLAVOR="Fedora"
+                rlLog "Automation is running against Fedora"
+        else
+                FLAVOR="RedHat"
+                rlLog "Automation is running against RedHat"
+        fi
+
         echo $MASTER | grep $HOSTNAME
         if [ $? -eq 0 ] ; then
                 rlLog "Machine in recipe is MASTER"
@@ -90,6 +119,35 @@ rlJournalStart
 	rlPhaseEnd
 
 	rlPhaseStartTest "MASTER tests start"
+
+                if [ "$FLAVOR" == "Fedora" ] ; then
+                        yum -y install $FREEIPA_SERVER_PACKAGES
+                        yum -y update
+
+                        for item in $FREEIPA_SERVER_PACKAGES ; do
+                                rpm -qa | grep $item
+                                if [ $? -eq 0 ] ; then
+                                        rlLog "$item package is installed"
+                                else
+                                        rlLog "ERROR: $item package is NOT installed"
+                                        rc=1
+                                fi
+                        done
+                else
+                        yum -y install $RHELIPA_SERVER_PACKAGES
+                        yum -y update
+
+                        for item in $RHELIPA_SERVER_PACKAGES ; do
+                                rpm -qa | grep $item
+                                if [ $? -eq 0 ] ; then
+                                        rlLog "$item package is installed"
+                                else
+                                        rlLog "ERROR: $item package is NOT installed"
+                                        rc=1
+                                fi
+                        done
+                fi
+
 		installMaster
 
                 rhts-sync-set -s READY $MASTER
@@ -117,6 +175,36 @@ rlJournalStart
         echo $SLAVE | grep $HOSTNAME
         if [ $? -eq 0 ] ; then
                 yum clean all
+                yum -y install $COMMON_SERVER_PACKAGES
+
+                if [ "$FLAVOR" == "Fedora" ] ; then
+                        yum -y install $FREEIPA_SERVER_PACKAGES
+                        yum -y update
+
+                        for item in $FREEIPA_SERVER_PACKAGES ; do
+                                rpm -qa | grep $item
+                                if [ $? -eq 0 ] ; then
+                                        rlLog "$item package is installed"
+                                else
+                                        rlLog "ERROR: $item package is NOT installed"
+                                        rc=1
+                                fi
+                        done
+                else
+                        yum -y install $RHELIPA_SERVER_PACKAGES
+                        yum -y update
+
+                        for item in $RHELIPA_SERVER_PACKAGES ; do
+                                rpm -qa | grep $item
+                                if [ $? -eq 0 ] ; then
+                                        rlLog "$item package is installed"
+                                else
+                                        rlLog "ERROR: $item package is NOT installed"
+                                        rc=1
+                                fi
+                        done
+                fi
+
 
                 if [ $rc -eq 0 ] ; then
                         rhts-sync-block -s READY $MASTER
