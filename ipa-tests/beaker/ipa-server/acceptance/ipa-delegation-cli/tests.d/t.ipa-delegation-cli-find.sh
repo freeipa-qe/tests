@@ -52,6 +52,11 @@ delegation_find_positive()
 	delegation_find_positive_1009
 	delegation_find_positive_1010
 	delegation_find_positive_1011
+	delegation_find_positive_1012
+	delegation_find_positive_1013
+	delegation_find_positive_1014
+	delegation_find_positive_1015
+	delegation_find_positive_1016
 	delegation_find_positive_envcleanup
 }
 
@@ -229,6 +234,53 @@ delegation_find_positive_1014()
 	rlPhaseEnd
 }
 
+# added on 2/1/2012.  function of empty arg changed earlier
+delegation_find_positive_1015()
+{
+	rlPhaseStartTest "delegation_find_positive_1015: find with no value for name"
+		KinitAsAdmin
+		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
+		rlRun "ipa delegation-find --name= > $tmpout 2>&1 " 0
+		rlAssertGrep "^1 delegation matched" $tmpout
+		[ -f $tmpout ] && rm $tmpout
+	rlPhaseEnd
+}
+
+# added on 2/1/2012.  function of empty arg changed earlier
+delegation_find_positive_1016()
+{
+	rlPhaseStartTest "delegation_find_positive_1016: find with empty name"
+		KinitAsAdmin
+		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
+		rlRun "ipa delegation-find --name=\"\" > $tmpout 2>&1 " 0
+		rlAssertGrep "^1 delegation matched" $tmpout 
+		[ -f $tmpout ] && rm $tmpout
+	rlPhaseEnd
+}
+
+# added on 2/1/2012.  function of empty arg changed earlier
+delegation_find_positive_1017()
+{
+	rlPhaseStartTest "delegation_find_positive_1017: find with no value for group"
+		KinitAsAdmin
+		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
+		rlRun "ipa delegation-find --group= > $tmpout 2>&1 " 0
+		rlAssertGrep "^1 delegation matched" $tmpout
+		[ -f $tmpout ] && rm $tmpout
+	rlPhaseEnd
+}
+
+# added on 2/1/2012.  function of empty arg changed earlier
+delegation_find_positive_1018()
+{
+	rlPhaseStartTest "delegation_find_positive_1018: find with empty group"
+		KinitAsAdmin
+		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
+		rlRun "ipa delegation-find --group=\"\" > $tmpout 2>&1 " 0
+		rlAssertGrep "^1 delegation matched" $tmpout
+		[ -f $tmpout ] && rm $tmpout
+	rlPhaseEnd
+}
 
 ######################################################################
 #   delegation-find [negative]:
@@ -238,16 +290,16 @@ delegation_find_negative()
 	delegation_find_negative_envsetup
 	delegation_find_negative_1001
 	delegation_find_negative_1002
-	delegation_find_negative_1003
-	delegation_find_negative_1004
+	# delegation_find_negative_1003 # removed on 2/1/2012.  function of empty arg changed earlier
+	# delegation_find_negative_1004 # removed on 2/1/2012.  function of empty arg changed earlier
 	delegation_find_negative_1005
 	delegation_find_negative_1006
 	delegation_find_negative_1007
 	delegation_find_negative_1008
 	delegation_find_negative_1009
 	delegation_find_negative_1010
-	delegation_find_negative_1011
-	delegation_find_negative_1012
+	# delegation_find_negative_1011 # removed on 2/1/2012.  function of empty arg changed earlier
+	# delegation_find_negative_1012 # removed on 2/1/2012.  function of empty arg changed earlier
 	delegation_find_negative_1013
 	delegation_find_negative_1014
 	delegation_find_negative_1015
@@ -315,32 +367,33 @@ delegation_find_negative_1002()
 	rlPhaseEnd
 }
 
+# removed on 2/1/2012.  function of empty arg changed earlier
+#delegation_find_negative_1003()
+#{
+#	rlPhaseStartTest "delegation_find_negative_1003: fail to find with no value for name"
+#		KinitAsAdmin
+#		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
+#		rlRun "ipa delegation-find '--name=' > $tmpout 2>&1 " 1
+#		rlAssertGrep "^0 delegations matched" $tmpout
+#		ipa delegation-find --name= 
+#		echo "ERRORCODE RETURNED: $?"
+#		[ -f $tmpout ] && rm $tmpout
+#	rlPhaseEnd
+#}
 
-delegation_find_negative_1003()
-{
-	rlPhaseStartTest "delegation_find_negative_1003: fail to find with no value for name"
-		KinitAsAdmin
-		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
-		rlRun "ipa delegation-find '--name=' > $tmpout 2>&1 " 1
-		rlAssertGrep "^0 delegations matched" $tmpout
-		ipa delegation-find --name= 
-		echo "ERRORCODE RETURNED: $?"
-		[ -f $tmpout ] && rm $tmpout
-	rlPhaseEnd
-}
-
-delegation_find_negative_1004()
-{
-	rlPhaseStartTest "delegation_find_negative_1004: fail to find with empty name"
-		KinitAsAdmin
-		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
-		rlRun "ipa delegation-find --name=\"\" > $tmpout 2>&1 " 1
-		rlAssertGrep "^0 delegations matched" $tmpout 
-		ipa delegation-find --name="" 
-		echo "ERRORCODE RETURNED: $?"
-		[ -f $tmpout ] && rm $tmpout
-	rlPhaseEnd
-}
+# removed on 2/1/2012.  function of empty arg changed earlier
+#delegation_find_negative_1004()
+#{
+#	rlPhaseStartTest "delegation_find_negative_1004: fail to find with empty name"
+#		KinitAsAdmin
+#		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
+#		rlRun "ipa delegation-find --name=\"\" > $tmpout 2>&1 " 1
+#		rlAssertGrep "^0 delegations matched" $tmpout 
+#		ipa delegation-find --name="" 
+#		echo "ERRORCODE RETURNED: $?"
+#		[ -f $tmpout ] && rm $tmpout
+#	rlPhaseEnd
+#}
 
 delegation_find_negative_1005()
 {
@@ -417,27 +470,30 @@ delegation_find_negative_1010()
 }
 
 
-delegation_find_negative_1011()
-{
-	rlPhaseStartTest "delegation_find_negative_1011: fail to find with no value for group"
-		KinitAsAdmin
-		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
-		rlRun "ipa delegation-find --group= > $tmpout 2>&1 " 1
-		rlAssertGrep "^0 delegations matched" $tmpout
-		[ -f $tmpout ] && rm $tmpout
-	rlPhaseEnd
-}
 
-delegation_find_negative_1012()
-{
-	rlPhaseStartTest "delegation_find_negative_1012: fail to find with empty group"
-		KinitAsAdmin
-		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
-		rlRun "ipa delegation-find --group=\"\" > $tmpout 2>&1 " 1
-		rlAssertGrep "^0 delegations matched" $tmpout
-		[ -f $tmpout ] && rm $tmpout
-	rlPhaseEnd
-}
+# removed on 2/1/2012.  function of empty arg changed earlier
+#delegation_find_negative_1011()
+#{
+#	rlPhaseStartTest "delegation_find_negative_1011: fail to find with no value for group"
+#		KinitAsAdmin
+#		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
+#		rlRun "ipa delegation-find --group= > $tmpout 2>&1 " 1
+#		rlAssertGrep "^0 delegations matched" $tmpout
+#		[ -f $tmpout ] && rm $tmpout
+#	rlPhaseEnd
+#}
+
+# removed on 2/1/2012.  function of empty arg changed earlier
+#delegation_find_negative_1012()
+#{
+#	rlPhaseStartTest "delegation_find_negative_1012: fail to find with empty group"
+#		KinitAsAdmin
+#		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
+#		rlRun "ipa delegation-find --group=\"\" > $tmpout 2>&1 " 1
+#		rlAssertGrep "^0 delegations matched" $tmpout
+#		[ -f $tmpout ] && rm $tmpout
+#	rlPhaseEnd
+#}
 
 delegation_find_negative_1013()
 {
