@@ -472,14 +472,16 @@ updateResolv()
         fakeip=99.99.99.999
 	sed -i s/^nameserver/#nameserver/g /etc/resolv.conf
 	echo "nameserver $fakeip" >> /etc/resolv.conf
+        rlLog "Updated contents are: `cat /etc/resolv.conf`"
 }
 
 
 restoreResolv()
 {
-        fakeip=99.99.99.999
+        fakeip="99.99.99.999"
 	sed -i s/^#nameserver/nameserver/g /etc/resolv.conf
-	sed -i s/^nameserver $fakeip//g /etc/resolv.conf
+        sed -i /"nameserver $fakeip"/d /etc/resolv.conf
+        rlLog "Restored contents are: `cat /etc/resolv.conf`"
 }
 
 verify_time()
