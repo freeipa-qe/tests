@@ -479,7 +479,7 @@ updateResolv()
 restoreResolv()
 {
         fakeip="99.99.99.999"
-	sed -i s/^#nameserver/nameserver/g /etc/resolv.conf
+	sed -i s/"^#nameserver $MASTERIP"/"nameserver $MASTERIP"/g /etc/resolv.conf
         sed -i /"nameserver $fakeip"/d /etc/resolv.conf
         rlLog "Restored contents are: `cat /etc/resolv.conf`"
 }
