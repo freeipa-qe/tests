@@ -83,6 +83,7 @@ createReplica1()
                         hostname_s=$(echo $s | cut -d. -f1)
 
 			# Preparing replica without --ip-address option
+			rlRun "cat /etc/hosts"
 			rlRun "ipa dnsrecord-add $DOMAIN $hostname_s --a-rec=$ipofs"
                         rlLog "Running: ipa-replica-prepare -p $ADMINPW $hostname_s.$DOMAIN"
 			rlRun "ipa-replica-prepare -p $ADMINPW $hostname_s.$DOMAIN"
