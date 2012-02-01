@@ -77,6 +77,8 @@ createReplica1()
         for s in $SLAVE; do
                 if [ "$s" != "" ]; then
 
+			rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
+
                         # put the short form of the hostname for server $s into s_short
                         hostname_s=$(echo $s | cut -d. -f1)
 
@@ -103,6 +105,8 @@ createReplica2()
         for s in $SLAVE; do
                 if [ "$s" != "" ]; then
 
+			rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
+
 			# Preparing replica with --ip-address option
                         rlLog "IP of server $s is resolving as $ipofs, using short hostname of $hostname_s"
                         rlLog "Running: ipa-replica-prepare -p $ADMINPW --ip-address=$ipofs $hostname_s.$DOMAIN"
@@ -125,6 +129,7 @@ createReplica3()
         for s in $SLAVE; do
                 if [ "$s" != "" ]; then
 
+			rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
 			# Preparing replica with pkcs#12 options
 
 			http_nss_cert_db_pin=`cat /etc/httpd/alias/pwdfile.txt`
