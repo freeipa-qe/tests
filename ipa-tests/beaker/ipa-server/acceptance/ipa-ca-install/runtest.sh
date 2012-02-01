@@ -53,17 +53,6 @@ FREEIPA_CLIENTi_PACKAGES="freeipa-admintools freeipa-client"
 ########################################################################
 # Test Suite Globals
 ########################################################################
-
-REALM=`os_getdomainname | tr "[a-z]" "[A-Z]"`
-DOMAIN=`os_getdomainname`
-
-
-########################################################################
-
-# Checking hostnames of all hosts
-echo "The hostname of IPA Server is $MASTER"
-echo "The beaker hostname of IPA Server is $BEAKERMASTER"
-
 cat /dev/shm/env.sh
 ########################################################################
 
