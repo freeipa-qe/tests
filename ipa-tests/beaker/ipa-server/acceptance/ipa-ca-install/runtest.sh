@@ -124,7 +124,7 @@ rlJournalStart
                         yum -y install $FREEIPA_SERVER_PACKAGES
                         yum -y update
 
-                        for item in $FREEIPA_SERVER_PACKAGES ; do
+                        for item in $FREEIPA_SERVER_PACKAGES $COMMON_SERVER_PACKAGES ; do
                                 rpm -qa | grep $item
                                 if [ $? -eq 0 ] ; then
                                         rlLog "$item package is installed"
@@ -134,7 +134,7 @@ rlJournalStart
                                 fi
                         done
                 else
-                        yum -y install $RHELIPA_SERVER_PACKAGES
+                        yum -y install $RHELIPA_SERVER_PACKAGES $COMMON_SERVER_PACKAGES
                         yum -y update
 
                         for item in $RHELIPA_SERVER_PACKAGES ; do
