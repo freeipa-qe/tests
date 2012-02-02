@@ -102,6 +102,7 @@ installSlave()
         # stop the firewall
         service iptables stop
         service ip6tables stop
+	. /dev/shm/env.sh
         rlRun "ntpdate $NTPSERVER" 0 "Synchronzing clock with valid time server"
 	rlRun "SetUpKnownHosts" 0 "Setting up known hosts"
         cd /dev/shm/
