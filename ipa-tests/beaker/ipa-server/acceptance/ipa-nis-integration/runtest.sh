@@ -54,22 +54,25 @@ satrtEpoch=`date "+%s"`
 
 rlJournalStart
 	rlPhaseStartSetup "ipa-nis-integration startup: Check for ipa-server package"
-		rlAssertRpm $PACKAGE
+		#rlAssertRpm $PACKAGE
 		rlRun "TmpDir=\`mktemp -d\`" 0 "Creating tmp directory"
 		rlRun "pushd $TmpDir"
-		HOSTNAME=$(hostname -s)
+		HOSTNAME=$(hostname)
 		myhostname=`hostname`
 		rlLog "hostname command: $myhostname"
 		rlLog "HOSTNAME: $HOSTNAME"
 		rlLog "MASTER: $MASTER"
 		rlLog "NISMASTER: $NISMASTER"
 		rlLog "NISCLIENT: $NISCLIENT"
+		rlLog "BEAKERMASTER: $BEAKERMASTER"
+		rlLog "BEAKERNISMASTER: $BEAKERNISMASTER"
+		rlLog "BEAKERNISCLIENT: $BEAKERNISCLIENT"
 	rlPhaseEnd
 
 	case $HOSTNAME in
-	$MASTER)      nisint_ipamaster ;; 
-	$NISMASTER)   nisint_nismaster ;; 
-	$NISCLIENT)   nisint_nisclient ;;
+	$MASTER)      echo "Match MASTER"; nisint_ipamaster ;; 
+	$NISMASTER)   echo "Match NISMASTER"; nisint_nismaster ;; 
+	$NISCLIENT)   echo "Match NISCLIENT"; nisint_nisclient ;;
 	esac
 
 	rlPhaseStartCleanup "ipa-nis-integration cleanup"
