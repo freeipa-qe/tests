@@ -1,0 +1,25 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+<suite name="IPASelfservicepermissionTestSuite">	
+    <test name="IPASelfservicepermission Tests" preserve-order="true">
+            	<packages>
+            	    <package name="com.redhat.qe.ipa.sahi.*" />
+            	</packages>
+            	<groups>
+            	    <run>
+            	        <include name="setup" />
+            	        <include name="init" />   
+            	        <include name="modifyPolicy_PositiveTest" />
+            	        <include name="modifyPolicy_NegativeTest" />
+            	         <include name="restoreDefault" />
+            	    </run>
+            	</groups>
+            	<classes>
+            	    <class name="com.redhat.qe.ipa.sahi.tests.selfservicepermission.SelfservicepermissionTests" />
+            	</classes>
+    </test>
+	
+    <listeners>        
+  	             <listener class-name="com.redhat.qe.auto.testng.TestNGListener" />	
+    </listeners>
+	
+</suite>
