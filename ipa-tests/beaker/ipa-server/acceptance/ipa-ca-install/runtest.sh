@@ -139,8 +139,8 @@ rlJournalStart
 
 		installMaster
 
-                rhts-sync-set -s READY $MASTER
-		rhts-sync-block -s DONE $SLAVE
+                rhts-sync-set -s READY $BEAKERMASTER
+		rhts-sync-block -s DONE $BEAKERSLAVE
 
 	rlPhaseEnd
 
@@ -196,10 +196,10 @@ rlJournalStart
 
 
                 if [ $rc -eq 0 ] ; then
-                        rhts-sync-block -s READY $MASTER
+                        rhts-sync-block -s READY $BEAKERMASTER
                         installSlave
 			installCA
-                        rhts-sync-set -s DONE $SLAVE
+                        rhts-sync-set -s DONE $BEAKERSLAVE
                         rlLog "Setting up Authorized keys"
                         SetUpAuthKeys
                         rlLog "Setting up known hosts file"
