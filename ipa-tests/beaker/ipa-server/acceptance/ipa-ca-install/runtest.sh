@@ -84,6 +84,13 @@ rlJournalStart
         echo "export BEAKERSLAVE=$SLAVE" >> /dev/shm/env.sh
         echo "export BEAKERCLIENT=$CLIENT" >> /dev/shm/env.sh
         echo "export BEAKERCLIENT2=$CLIENT2" >> /dev/shm/env.sh
+	MASTER_S=`echo $MASTER | cut -d . -f 1`
+	echo "export MASTER=$MASTER_S.$DOMAIN" >> /dev/shm/env.sh
+	SLAVE_S=`echo $SLAVE | cut -d . -f 1`
+	echo "export SLAVE=$SLAVE_S.$DOMAIN" >> /dev/shm/env.sh
+
+	. /dev/shm/env.sh
+	cat /dev/shm/env.sh
 
         cat /etc/redhat-release | grep "Fedora"
         if [ $? -eq 0 ] ; then
