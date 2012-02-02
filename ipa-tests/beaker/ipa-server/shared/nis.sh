@@ -20,6 +20,7 @@ NISSERVICE1="my-ftp"
 NISSERVICE2="my-web"
 NISSERVICE3="my-ssh"
 NIS_SERVER_PACKAGES="ypbind ypserv yp-tools rpcbind"
+NIS_CLIENT_PACKAGES="ypbind yp-tools rpcbind nscd"
 
 export NISUSER1 NISUSER2 NISUSER3 NISUSER4 NISUSER1PASSWD NISUSER2PASSWD NISUSER3PASSWD NISUSER4PASSWD
 export NISUSER1PASSWD2 NISUSER2PASSWD2 NISUSER3PASSWD2 NISUSER4PASSWD2
@@ -173,3 +174,45 @@ uninstall-nis-server()
 		/bin/rm -rf /var/yp
 	fi
 }
+
+setup-nis-client()
+{
+	# Install NIS Client RPMs
+	yum -y install $NIS_CLIENT_PACKAGES
+	
+	if [ -z "$NISDOMAIN" ]; then
+		echo "NISDOMAIN env var not set"
+		exit 1
+	fi
+
+	# Set NISDOMAIN in /etc/sysconfig/network
+	cp /etc/sysconfig/network /etc/sysconfig/network.orig.setup-nis-client
+	echo "NISDOMAIN=$NISDOMAIN" >> /etc/sysconfig/network
+
+	# Setup yp.conf
+	cp /etc/yp.conf /etc/yp.conf.orig.setup-nis-client
+	echo "domain $NISDOMAIN server $NISMASTER" >> /etc/yp.conf
+
+	# Setup nsswitch.conf for NIS
+	cp /etc/nsswitch.conf /etc/nsswitch.conf.orig.setup-nis-client
+	sed -i 's/^passwd:.*$/passwd: files nis/' /etc/nsswitch.conf
+	sed -i 's/^shadow:.*$/shadow: files nis/' /etc/nsswitch.conf
+	sed -i 's/^group:.*$/group:  files nis/' /etc/nsswitch.conf
+
+	# Set NIS Domain Name
+	nisdomainname $NISDOMAIN
+
+	# Start/restart services
+	service rpcbind restart
+	service ypbind start
+	service nscd start
+}
+
+uninstall-nis-client()
+{
+	yum -y remove ypbind yp-tools
+	/bin/mv /etc/sysconfig/network.orig.setup-nis-client /etc/sysconfig/network
+	/bin/mv /etc/nsswitch.conf.orig.setup-nis-client /etc/nsswitch.conf
+	/bin/rm /etc/yp.conf*
+	/bin/rm -rf /var/yp
+}	
