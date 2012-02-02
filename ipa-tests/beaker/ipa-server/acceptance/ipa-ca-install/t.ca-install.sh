@@ -104,6 +104,8 @@ installSlave()
         service ip6tables stop
 	. /dev/shm/env.sh
         rlRun "ntpdate $NTPSERVER" 0 "Synchronzing clock with valid time server"
+        rlRun "fixHostFile" 0 "Set up /etc/hosts"
+	rlRun "fixhostname" 0 "Fix hostname"
 	rlRun "SetUpKnownHosts" 0 "Setting up known hosts"
         cd /dev/shm/
         hostname_s=$(hostname -s)
