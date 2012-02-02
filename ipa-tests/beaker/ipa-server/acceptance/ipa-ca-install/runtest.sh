@@ -101,7 +101,7 @@ rlJournalStart
                 rlLog "Automation is running against RedHat"
         fi
 
-        echo $MASTER | grep $HOSTNAME
+        echo $BEAKERMASTER | grep $HOSTNAME
         if [ $? -eq 0 ] ; then
                 rlLog "Machine in recipe is MASTER"
 
@@ -168,7 +168,7 @@ rlJournalStart
         #               IS THIS MACHINE A SLAVE?                            #
         #####################################################################
         rc=0
-        echo $SLAVE | grep $HOSTNAME
+        echo $BEAKERSLAVE | grep $HOSTNAME
         if [ $? -eq 0 ] ; then
                 yum clean all
                 yum -y install $COMMON_SERVER_PACKAGES
