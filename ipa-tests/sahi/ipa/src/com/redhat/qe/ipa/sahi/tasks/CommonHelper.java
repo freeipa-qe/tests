@@ -1,9 +1,11 @@
 package com.redhat.qe.ipa.sahi.tasks;
 
+import java.util.Random;
+
 import com.redhat.qe.ipa.sahi.tasks.*;
 
-public class CommonHelper {
-
+public class CommonHelper { 
+	////////////////////////////////// generic add & delete operation ///////////////////
 	public static void addEntry(SahiTasks browser, String existingEntry)
 	{
 		browser.link("Add").click(); 
@@ -70,5 +72,47 @@ public class CommonHelper {
 		browser.span("Delete").click(); 
 		browser.button("Delete").click();
 	}
+
+	//////// self service permission specific add, delete functions ////////
+	public static void addSelfservicePermission(SahiTasks browser, String permissionName,	String[] attrs) {
+		browser.span("Add").click();
+		browser.textbox("aciname").setValue(permissionName);
+		for (String attribute:attrs)
+			browser.checkbox(attribute).check();
+		browser.button("Add").click();
+	}
 	
+	/////////////////////////// get single random element from an array ///////////////////////////
+	public static String getSingle(Random random, String[] data)
+	{
+		int size = data.length; 
+		int randomIndex = Math.abs(random.nextInt()) % (size-1);
+		String single =  data[randomIndex];
+		return single;
+	}
+	
+	public static String getMultiple(Random random, int maxPick, String[] data)
+	{ 
+		int size = data.length;
+		if (maxPick > size-1)
+			maxPick = size -1;
+		StringBuffer sb = new StringBuffer(); 
+		for (int i=0;i<maxPick;i++)
+		{
+			int randomIndex = Math.abs(random.nextInt()) % (size-1);
+			String pick = data[randomIndex];
+			sb.append(pick + ",");
+		}
+		String ret = sb.substring(0,sb.length() -1);
+		return ret;
+	}
+	
+	public static String getAll(String[] data)
+	{
+		StringBuffer sb = new StringBuffer();
+		for (String item:data)
+			sb.append(item + ",");
+		String ret = sb.substring(0,sb.length() -1);
+		return ret;
+	}
 }
