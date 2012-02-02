@@ -52,6 +52,8 @@ ipaconfig_mod()
     ipaconfig_mod_expiration
     ipaconfig_mod_addattr
     ipaconfig_mod_setattr
+    ipaconfig_mod_delattr
+    ipaconfig_mod_delattr_neg
     ipaconfig_mod_envcleanup
 } #ipaconfig_mod
 
@@ -223,6 +225,22 @@ ipaconfig_mod_setattr()
 	rlRun "ipa config-show | grep Enable\ migration | grep FALSE" 0 "checking to ensure that migration mode is disabled"
     rlPhaseEnd
 }
+
+ipaconfig_mod_delattr()
+{
+    rlPhaseStartTest "ipaconfig_mod_delattr"
+	rlRun "ipa config-mod --delattr=ipaCustomFields=FALSE" 0 "deleting custom fields config entry"
+	rlRun "ipa config-show --all --raw | grep custom | grep FALSE" 1 "checking to ensure that ipacustom does not exist"
+    rlPhaseEnd
+}
+
+ipaconfig_mod_delattr_neg()
+{
+    rlPhaseStartTest "ipaconfig_mod_delattr negitive test"
+	rlRun "ipa config-mod --delattr=ipaCustomFields=FALSE" 1 "making sure that you cannot delete a nonexistant entry."
+    rlPhaseEnd
+}
+
 
 ipaconfig_mod_expiration()
 {
