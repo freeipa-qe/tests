@@ -61,7 +61,7 @@ installMaster()
    rlPhaseEnd
 
    rlPhaseStartTest "Create Replica Package(s)"
-        for s in $SLAVE; do
+        for s in $BEAKERSLAVE; do
                 if [ "$s" != "" ]; then
 
                         # put the short form of the hostname for server $s into s_short
