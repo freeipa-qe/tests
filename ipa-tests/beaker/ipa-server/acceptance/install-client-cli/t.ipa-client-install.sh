@@ -79,20 +79,22 @@ ipaclientinstall()
 #  --no-krb5-offline-passwords Configure SSSD not to store user password when the server is offline
       ipaclientinstall_nokrb5offlinepasswords
 
-#  --preserve-sssd     Preserve old SSSD configuration if possible
-      ipaclientinstall_preservesssd
-
-# Bug 736617 - ipa-client-install mishandles ntp service configuration
-       ipaclientinstall_ntpservice     
-
-#Bug 736684 - ipa-client-install should sync time before kinit 
-       ipaclientinstall_synctime
-
 # Bug 698219 - Uninstalling ipa-client fails, if it joined replica when being installed
       ipaclientinstall_joinreplica
 
 
       ipaclientinstall_withmasterdown
+
+# Bug 736684 - ipa-client-install should sync time before kinit 
+       ipaclientinstall_synctime
+
+
+# Bug 736617 - ipa-client-install mishandles ntp service configuration
+       ipaclientinstall_ntpservice     
+
+#  --preserve-sssd     Preserve old SSSD configuration if possible
+      ipaclientinstall_preservesssd
+
 
 }
 
@@ -603,34 +605,33 @@ ipaclientinstall_preservesssd()
         # create a sssd.conf
           writesssdconf
         # update /etc/nsswitch.conf, and vim /etc/pam.d/system-auth to use sssd
-          rlRun "authconfig --enablesssd --enablesssdauth --updateall"
+          rlLog "Executing: authconfig --enablesssd --enablesssdauth --updateall"
+          rlRun "authconfig --enablesssd --enablesssdauth --updateall" 0 "Authconfig"
         # restart sssd service
-          rlServiceStop "sssd"
-          rlServiceStart "sssd"
+          rc=rlServiceStop "sssd"
+          if [ $rc != 0 ]; then
+             rlLog "Failed to stop sssd service"
+          fi
+          rc=rlServiceStart "sssd"
+          if [ $rc != 0 ]; then
+             rlLog "Failed to start sssd service"
+          fi
         # edit /etc/krb5.conf
-          rlRun "perl -pi -e 's/EXAMPLE.COM/TESTRELM/g' $KRB5"
-          rlRun "perl -pi -e 's/kerberos.example.com/$MASTER/g' $KRB5"
-        # verify kinit
-          verify_kinit true 
+          rlLog "Executing: perl -pi -e 's/EXAMPLE.COM/TESTRELM/g' $KRB5"
+          rlRun "perl -pi -e 's/EXAMPLE.COM/TESTRELM/g' $KRB5" 0 "Updating $KRB5"
+          rlLog "Executing: perl -pi -e 's/kerberos.example.com/$MASTER/g' $KRB5"
+          rlRun "perl -pi -e 's/kerberos.example.com/$MASTER/g' $KRB5" 0 "Updating $KRB5"
 
         #install ipa-client with --preserve-sssd
        rlLog "EXECUTING: ipa-client-install --domain=$DOMAIN --realm=$RELM  -p $ADMINID -w $ADMINPW -U --server=$MASTER --preserve-sssd"
        rlRun "ipa-client-install --domain=$DOMAIN --realm=$RELM  -p $ADMINID -w $ADMINPW -U --server=$MASTER --preserve-sssd" 0 "Installing ipa client with preserve-sssd"
 
-        # be able ot kinit
+        # be able to kinit
           verify_kinit true 
 
         # verify sssd contents were preserved
         verify_sssd true preserve 
     rlPhaseEnd
-
-
-    #rlPhaseStartTest "ipa-client-install-32- [Negative] Install with preserve-sssd, using invalid sssd.conf"
-        # create a sssd.conf
-        # install with --preserve-sssd
-       # verify error
-       
-    #rlPhaseEnd
 }
 
 #######################################################
