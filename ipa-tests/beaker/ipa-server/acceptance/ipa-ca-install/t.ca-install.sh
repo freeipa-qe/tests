@@ -41,6 +41,7 @@ installMaster()
         # Determine the IP of the slave to be used when creating the replica file.
         ipofs=$(dig +noquestion $BEAKERSLAVE  | grep $BEAKERSLAVE | grep IN | grep A | awk '{print $5}')
 	rlLog "IP address of SLAVE: $BEAKERSLAVE is $ipofs"
+	echo "$ipofs > /tmp/ipofs"
 
         rlRun "fixHostFile" 0 "Set up /etc/hosts"
 	rlRun "fixhostname" 0 "Fix hostname"
@@ -69,10 +70,10 @@ installMaster()
 
                         # put the short form of the hostname for server $s into s_short
                         hostname_s=$(echo $s | cut -d. -f1)
-
-                        rlLog "IP of server $s is resolving as $ipofs, using short hostname of $hostname_s"
-                        rlLog "Running: ipa-replica-prepare -p $ADMINPW --ip-address=$ipofs $hostname_s.$DOMAIN"
-                        rlRun "ipa-replica-prepare -p $ADMINPW --ip-address=$ipofs $hostname_s.$DOMAIN" 0 "Creating replica package"
+			SLAVEIP=`cat /tmp/ipofs`
+                        rlLog "IP of server $s is resolving as $SLAVEIP, using short hostname of $hostname_s"
+                        rlLog "Running: ipa-replica-prepare -p $ADMINPW --ip-address=$SLAVEIP $hostname_s.$DOMAIN"
+                        rlRun "ipa-replica-prepare -p $ADMINPW --ip-address=$SLAVEIP $hostname_s.$DOMAIN" 0 "Creating replica package"
                         rlRun "service named restart" 0 "Restarting named as work around when adding new reverse zone"
 
                 else
