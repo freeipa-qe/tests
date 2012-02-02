@@ -103,6 +103,7 @@ installSlave()
         service iptables stop
         service ip6tables stop
         rlRun "ntpdate $NTPSERVER" 0 "Synchronzing clock with valid time server"
+	rlRun "SetUpKnownHosts" 0 "Setting up known hosts"
         cd /dev/shm/
         hostname_s=$(hostname -s)
         rlRun "sftp root@$MASTER:/var/lib/ipa/replica-info-$hostname_s.$DOMAIN.gpg" 0 "Get replica package"
