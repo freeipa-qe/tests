@@ -85,6 +85,10 @@ createReplica1()
 			# Preparing replica without --ip-address option
 			rlRun "cat /etc/hosts"
 			rlRun "ipa dnsrecord-add $DOMAIN $hostname_s --a-rec=$ipofs"
+			REVERSE_ZONE=`ipa dnszone-find | grep -i "zone name" | grep -i "arpa" | cut -d ":" -f 2`
+			LAST_OCTET=`echo $ipofs | cut -d . -f 4`
+			rlRun "ipa dnsrecord-add $REVERSE_ZONE $LAST_OCTET --ptr-rec=$hostname_s.$DOMAIN"
+
                         rlLog "Running: ipa-replica-prepare -p $ADMINPW $hostname_s.$DOMAIN"
 			rlRun "ipa-replica-prepare -p $ADMINPW $hostname_s.$DOMAIN"
                         rlRun "service named restart" 0 "Restarting named as work around when adding new reverse zone"
