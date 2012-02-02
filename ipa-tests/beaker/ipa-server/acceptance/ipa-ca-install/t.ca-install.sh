@@ -37,12 +37,15 @@ installMaster()
 
         rlRun "/etc/init.d/ntpd stop" 0 "Stopping the ntp server"
         rlRun "ntpdate $NTPSERVER" 0 "Synchronzing clock with valid time server"
+
+        # Determine the IP of the slave to be used when creating the replica file.
+        ipofs=$(dig +noquestion $BEAKERSLAVE  | grep $BEAKERSLAVE | grep IN | grep A | awk '{print $5}')
+	rlLog "IP address of SLAVE: $BEAKERSLAVE is $ipofs"
+
         rlRun "fixHostFile" 0 "Set up /etc/hosts"
 	rlRun "fixhostname" 0 "Fix hostname"
 
-        # Determine the IP of the slave to be used when creating the replica file.
         ipofs=$(dig +noquestion $SLAVE  | grep $SLAVE | grep IN | grep A | awk '{print $5}')
-	rlLog "IP address of SLAVE: $SLAVE is $ipofs"
 
 	echo "ipa-server-install --setup-dns --forwarder=$DNSFORWARD --hostname=$hostname_s.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U" > /dev/shm/installipa.bash
 
