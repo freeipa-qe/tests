@@ -41,7 +41,7 @@ installMaster()
         # Determine the IP of the slave to be used when creating the replica file.
         ipofs=$(dig +noquestion $BEAKERSLAVE  | grep $BEAKERSLAVE | grep IN | grep A | awk '{print $5}')
 	rlLog "IP address of SLAVE: $BEAKERSLAVE is $ipofs"
-	echo "$ipofs > /tmp/ipofs"
+	echo $ipofs > /tmp/ipofs
 
         rlRun "fixHostFile" 0 "Set up /etc/hosts"
 	rlRun "fixhostname" 0 "Fix hostname"
