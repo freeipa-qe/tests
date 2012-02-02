@@ -39,6 +39,7 @@ installMaster()
         rlRun "ntpdate $NTPSERVER" 0 "Synchronzing clock with valid time server"
         rlRun "fixHostFile" 0 "Set up /etc/hosts"
 	rlRun "fixhostname" 0 "Fix hostname"
+	rlRun "SetUpKnownHosts" 0 "Setting up known hosts"
 
         # Determine the IP of the slave to be used when creating the replica file.
         ipofs=$(dig +noquestion $SLAVE  | grep $SLAVE | grep IN | grep A | awk '{print $5}')
@@ -102,7 +103,6 @@ installSlave()
         service iptables stop
         service ip6tables stop
         rlRun "ntpdate $NTPSERVER" 0 "Synchronzing clock with valid time server"
-        rlRun "AddToKnownHosts $MASTER" 0 "Adding master to known hosts"
         cd /dev/shm/
         hostname_s=$(hostname -s)
         rlRun "sftp root@$MASTER:/var/lib/ipa/replica-info-$hostname_s.$DOMAIN.gpg" 0 "Get replica package"
@@ -116,9 +116,10 @@ installSlave()
                 rlRun "ntpdate $NTPSERVER" 0 "Synchronzing clock with valid time server"
                 rlLog "SKIPINSTALL: $SKIPINSTALL"       
                 rlRun "fixResolv" 0 "fixing the reoslv.conf to contain the correct nameserver lines"
-                rlRun "fixHostFile" 0 "Set up /etc/hosts"
-
                 rlRun "fixhostname" 0 "Fix hostname"
+                rlRun "fixHostFile" 0 "Set up /etc/hosts"
+        	rlRun "AddToKnownHosts $MASTER" 0 "Adding master to known hosts"
+
                 echo "ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg" > /dev/shm/replica-install.bash
                 chmod 755 /dev/shm/replica-install.bash
                 rlLog "EXECUTING: ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg"
