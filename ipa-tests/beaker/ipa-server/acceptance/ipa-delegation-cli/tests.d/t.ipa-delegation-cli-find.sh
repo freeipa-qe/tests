@@ -57,6 +57,8 @@ delegation_find_positive()
 	delegation_find_positive_1014
 	delegation_find_positive_1015
 	delegation_find_positive_1016
+	delegation_find_positive_1017
+	delegation_find_positive_1018
 	delegation_find_positive_envcleanup
 }
 
