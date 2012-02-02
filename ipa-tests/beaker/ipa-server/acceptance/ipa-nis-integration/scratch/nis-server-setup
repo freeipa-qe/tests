@@ -1,0 +1,159 @@
+#!/bin/bash
+
+yum -y install ypbind portmap ypserv yp-tools nscd
+
+if [ -z "$NISDOMAIN" ]; then
+	echo "NISDOMAIN env var not set"
+	exit 1
+fi
+
+cp /etc/sysconfig/network /etc/sysconfig/network.orig
+echo "NISDOMAIN=$NISDOMAIN" >> /etc/sysconfig/network
+
+cp /etc/yp.conf /etc/yp.conf.orig
+echo "domain $NISDOMAIN server 127.0.0.1" >> /etc/yp.conf
+
+cp /etc/nsswitch.conf /etc/nsswitch.conf.orig
+sed -i 's/^passwd:.*$/passwd: files nis/' /etc/nsswitch.conf
+sed -i 's/^shadow:.*$/shadow: files nis/' /etc/nsswitch.conf
+sed -i 's/^group:.*$/group:  files nis/' /etc/nsswitch.conf
+
+cp /etc/ypserv.conf /etc/ypserv.conf.orig
+cat <<EOF > /etc/ypserv.conf
+dns: no
+files: 30
+slp: no
+slp_timeout: 3600
+xfr_check_port: yes
+* : * : shadow.byname : port
+* : * : passwd.adjunct.byname : port 
+EOF
+
+cp /var/yp/securenets /var/yp/securenets.orig
+cat <<-EOF > /var/yp/securenets
+255.0.0.0	127.0.0.1
+0.0.0.0		0.0.0.0
+EOF
+
+nisdomainname $NISDOMAIN
+service rpcbind restart
+service yppasswdd start
+service ypserv start
+/usr/lib64/yp/ypinit -m <<EOF
+$HOSTNAME
+
+y
+EOF
+
+make -C /var/yp
+service ypbind start
+
+# add users
+useradd -m nisgooduser1
+useradd -m nisgooduser2
+useradd -m nisgooduser3
+useradd -m nisgooduser4
+useradd -m nisbaduser1
+useradd -m nisbaduser2
+useradd -m nisbaduser3
+useradd -m nisbaduser4
+
+# create netgroup
+cat <<EOF > /etc/netgroup
+ngh_nisservers ng_nisservers1 ng_nisservers2
+ngh_nisservers1 ($NISMASTER,,) ($NISMASTER.$DOMAIN,,)
+ngh_nisservers2 (nisslave,,) (nisslave.$DOMAIN,,)
+EOF
+
+COUNT=0
+NISCLIENTSNG="ngh_nisclients"
+for NISCLIENT in $NISCLIENTS; do
+	COUNT=$((COUNT+1))
+	echo $COUNT
+	cat <<-EOF >>/etc/netgroup
+	ngh_nisclients_$COUNT ($NISCLIENT,,) ($NISCLIENT.$DOMAIN,,)
+	ngh_nisclients_nouser_$COUNT ($NISCLIENT,-,) ($NISCLIENT.$DOMAIN,-,)
+	ngh_nisclients_nisdom_$COUNT ($NISCLIENT,,$NISDOMAIN) ($NISCLIENT.$DOMAIN,,$NISDOMAIN)
+	EOF
+	NISCLIENTSNG="$NISCLIENTSNG ngh_nisclients_$COUNT ngh_nisclients_nouser_$COUNT ngh_nisclients_nisdom_$COUNT"
+done
+
+echo "$NISCLIENTSNG" >> /etc/netgroup
+
+cat <<EOF >> /etc/netgroup
+ngh_evilservers (cracker1,,) (cracker1.cracker.org,,) (cracker2,,) (cracker2.cracker.org,,)
+
+ngu_nisgoodusers ng_nisgoodusers1 ng_nisgoodusers2 ng_nisgoodusers3 ng_nisgoodusers4
+ngu_nisgoodusers1 (,nisgoodusers1,)
+ngu_nisgoodusers2 (,nisgoodusers2,$NISDOMAIN)
+ngu_nisgoodusers3 (-,nisgoodusers3,)
+ngu_nisgoodusers4 (-,nisgoodusers4,$NISDOMAIN)
+
+ngu_nisbadusers ng_nisbadusers1 ng_nisbadusers2 ng_nisbadusers3 ng_nisbadusers4
+ngu_nisbadusers1 (,nisbadusers1,)
+ngu_nisbadusers2 (,nisbadusers2,$NISDOMAIN)
+ngu_nisbadusers3 (-,nisbadusers3,)
+ngu_nisbadusers4 (-,nisbadusers4,$NISDOMAIN)
+EOF
+
+# add services
+cat <<EOF >>/etc/services
+my-nis-svc-ftp 488821/tcp # my custom NIS ftp service entry
+my-nis-svc-ftp 488821/udp # my custom NIS ftp service entry
+my-nis-svc-ssh 488822/tcp # my custom NIS ssh service entry
+my-nis-svc-ssh 488822/udp # my custom NIS ssh service entry
+my-nis-svc-web 488880/tcp # my custom NIS web service entry
+my-nis-svc-web 488880/udp # my custom NIS web service entry
+EOF
+
+# add automount entries
+cat <<EOF >/etc/auto.master
+/nfshome +auto.home
+/nfsapps +auto.apps
+EOF
+
+cat <<EOF >/etc/auto.home
+* -rw,rsize=65536,wsize=65536,hard,intr,actimeo=3600,timeo=3600 $NISMASTER:/home/&
+EOF
+
+cat <<EOF >/etc/auto.apps
+App1 -ro,hard,intr $NISMASTER:/exports/nfsapps/App1
+App2 -ro,hard,intr $NISMASTER:/exports/nfsapps/App2
+App3 -ro,hard,intr $NISMASTER:/exports/nfsapps/App3
+App4 -ro,hard,intr $NISMASTER:/exports/nfsapps/App4
+EOF
+
+sed -i 's!^\(AUTO_LOCAL  = .*\)$!\1\nAUTO_APPS   = \$(YPSRCDIR)/auto.apps!' /var/yp/Makefile
+
+sed -i 's!^\(all:.*\)$!\1\n\tnetgrp auto.master auto.home auto.apps \\!' /var/yp/Makefile
+
+cat <<-EOF >> /var/yp/Makefile
+
+auto.apps: \$(AUTO_APPS) \$(YPDIR)/Makefile
+		@echo "Updating \$@..."
+		-@sed -e "/^#/d" -e s/#.*\$\$// \$(AUTO_APPS) | \$(DBLOAD) \\
+		-i \$(AUTO_APPS) -o \$(YPMAPDIR)/\$@ - \$@
+		-@\$(NOPUSH) || \$(YPPUSH) -d \$(DOMAIN) \$@
+EOF
+
+mkdir -p /exports/nfsapps/App{1,2,3,4}
+cp /usr/bin/a* /exports/nfsapps/App1
+cp /usr/bin/b* /exports/nfsapps/App2
+cp /usr/bin/c* /exports/nfsapps/App3
+cp /usr/bin/d* /exports/nfsapps/App4
+
+cat <<EOF >> /etc/exports
+/home                   @ngh_nisclients(rw,no_root_squash)
+/exports/nfsapps/App1    @ngh_nisservers(rw,no_root_squash)
+/exports/nfsapps/App2    @ngh_nisclients(rw,no_root_squash)
+/exports/nfsapps/App3    @ngh_nisclients1(rw,no_root_squash)
+/exports/nfsapps/App4    @ngh_evilservers(ro)
+EOF
+
+setsebool -P nfs_export_all_rw 1
+setsebool -P nfs_export_all_ro 1
+service rpcbind restart
+service nfs restart
+service nfslock restart
+
+exportfs -a

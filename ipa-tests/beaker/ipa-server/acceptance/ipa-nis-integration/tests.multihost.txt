@@ -1,0 +1,80 @@
+IPAMASTER                           NISMASTER                           NISCLIENT
+---------------------------         ---------------------------         ---------------------------
+quickinstall						
+ipa-netgroup-cli
+ipa-automount-cli
+ipa-services
+ipa-nis-integration                 ipa-nis-integration                 ipa-nis-integration
+---------------------------         ---------------------------         ---------------------------
+### nismaster_setup
+rhts-sync-set NISMASTER
+                                    rhts-sync-block IPAMASTER
+                                    nisint_nismaster_envsetup
+                                    -setup-nis-server
+									rhts-sync-set IPAMASTER
+rhts-sync-block NISMASTER
+
+### nisclient_setup
+rhts-sync-set NISCLIENT
+                                                                        rhts-sync-block IPAMASTER
+                                                                        nisint_nisclient_envsetup
+                                                                        -setup-nis-client
+                                                                        nisint_nisclient_check_nis_master
+                                                                        rhts-sync-set IPAMASTER
+rhts-sync-block NISCLIENT
+
+### ipamaster_nisintegration
+nisint_ipamaster_envsetup
+nisint_ipamaster_add_positive
+nisint_ipamaster_add_negative
+nisint_ipamaster_del_positive
+nisint_ipamaster_del_negative
+nisint_ipamaster_add_ldif_positive
+nisint_ipamaster_add_ldif_negative
+nisint_ipamaster_setup_nis_listener	 
+nisint_ipamaster_check_ipa_nis_positive
+nisint_ipamaster_check_ipa_nis_negative
+
+### nisclient_nisintegration
+rhts-sync-set NISCLIENT
+                                                                        rhts-sync-block IPAMASTER
+                                                                        nisint_nisclient_check_ipa_nis_positive
+                                                                        nisint_nisclient_check_ipa_nis_negative
+                                                                        nisint_nisclient_change_to_ipa_nismaster
+                                                                        nisint_nisclient_check_ipa_nis_positive
+                                                                        nisint_nisclient_check_ipa_nis_negative
+                                                                        nisint_nisclient_netgroup_use_tests
+                                                                        nisint_nisclient_automount_use_tests
+                                                                        nisint_nisclient_services_use_tests
+                                                                        rhts-sync-set IPAMASTER
+rhts-sync-block NISCLIENT
+
+### ipamaster_bzs
+nisint_ipamaster_netgroup_bzs
+nisint_ipamaster_automount_bzs
+nisint_ipamaster_service_bzs
+nisint_ipamaster_other_bzs
+
+### nisclient_bzs
+rhts-sync-set NISCLIENT
+                                                                        rhts-sync-block IPAMASTER
+                                                                        nisint_nisclient_netgroup_bzs
+                                                                        nisint_nisclient_automount_bzs
+                                                                        nisint_nisclient_services_bzs
+                                                                        nisint_nisclient_other_bzs
+																		rhts-sync-set IPAMASTER
+rhts-sync-block NISCLIENT
+
+### nisclient_migration
+rhts-sync-set NISCLIENT
+                                                                        rhts-sync-block IPAMASTER
+                                                                        nisint_nisclient_migrate_to_ipa
+rhts-sync-block NISCLIENT
+
+### nismaster_bzs
+rhts-sync-set NISMASTER
+									rhts-sync-block IPAMASTER
+									nisint_nismaster_bzs
+                                    rhts-sync-set IPAMASTER
+rhts-sync-block NISMASTER
+
