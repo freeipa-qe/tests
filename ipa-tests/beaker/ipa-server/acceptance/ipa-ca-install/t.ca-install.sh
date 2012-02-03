@@ -105,7 +105,7 @@ installSlave()
         cd /dev/shm/
         hostname_s=$(hostname -s)
 
-	AddToKnownHosts $MASTER
+	AddToKnownHosts $MASTERIP
 
         rlRun "sftp root@$MASTERIP:/var/lib/ipa/replica-info-$hostname_s.$DOMAIN.gpg" 0 "Get replica package"
         rlLog "sftp root@$MASTERIP:/var/lib/ipa/replica-info-$hostname_s.$DOMAIN.gpg"
