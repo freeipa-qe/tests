@@ -43,14 +43,14 @@ nisint_ipamaster()
 	##################################################################
 	# nismaster_setup: signal NISMASTER Setup
 	##################################################################
-	rhts-sync-set -s "nismaster_setup_start" -m $BEAKERMASTER
-	rhts-sync-block -s "nismaster_setup_end" $BEAKERNISMASTER
+	rhts-sync-set -s "nismaster_setup_start" -m $MASTER
+	rhts-sync-block -s "nismaster_setup_end" $NISMASTER
 	
 	##################################################################
 	# nisclient_setup: signal NISCLIENT Setup
 	##################################################################
-	rhts-sync-set -s "nisclient_setup_start" -m $BEAKERMASTER
-	rhts-sync-block -s "nisclient_setup_end" $BEAKERNISCLIENT
+	rhts-sync-set -s "nisclient_setup_start" -m $MASTER
+	rhts-sync-block -s "nisclient_setup_end" $NISCLIENT
 
 	##################################################################
 	# ipamaster_nisintegration: Run IPAMASTER NIS Integration Tests
@@ -65,8 +65,8 @@ nisint_ipamaster()
 	##################################################################
 	# nisclient_nisintegration: signal NISCLIENT NIS Integration tests
 	##################################################################
-	rhts-sync-set -s "nisclient_nisintegration_start" -m $BEAKERMASTER
-	rhts-sync-block -s "nisclient_nisintegration_end" $BEAKERNISCLIENT
+	rhts-sync-set -s "nisclient_nisintegration_start" -m $MASTER
+	rhts-sync-block -s "nisclient_nisintegration_end" $NISCLIENT
 
 	##################################################################
 	# ipamaster_bzs: Run IPAMASTER related BZ checks
@@ -79,20 +79,20 @@ nisint_ipamaster()
 	##################################################################
 	# nisclient_bzs: signal NISCLIENT related BZ checks
 	##################################################################
-	rhts-sync-set -s "nisclient_bzs_start" -m $BEAKERMASTER
-	rhts-sync-block -s "nisclient_bzs_end" $BEAKERNISCLIENT
+	rhts-sync-set -s "nisclient_bzs_start" -m $MASTER
+	rhts-sync-block -s "nisclient_bzs_end" $NISCLIENT
 
 	##################################################################
 	# nisclient_migration: signal NISCLIENT Migration tests
 	##################################################################
-	rhts-sync-set -s "nisclient_migration_start" -m $BEAKERMASTER
-	rhts-sync-block -s "nisclient_migration_end" $BEAKERNISCLIENT
+	rhts-sync-set -s "nisclient_migration_start" -m $MASTER
+	rhts-sync-block -s "nisclient_migration_end" $NISCLIENT
 
 	##################################################################
 	# nismaster_bzs: signal NISMASTER related BZ checks
 	##################################################################
-	rhts-sync-set -s "nismaster_bzs_start" -m $BEAKERMASTER
-	rhts-sync-block -s "nismaster_bzs_end" $BEAKERNISMASTER
+	rhts-sync-set -s "nismaster_bzs_start" -m $MASTER
+	rhts-sync-block -s "nismaster_bzs_end" $NISMASTER
 
 	nisint_nisclient_envcleanup
 }

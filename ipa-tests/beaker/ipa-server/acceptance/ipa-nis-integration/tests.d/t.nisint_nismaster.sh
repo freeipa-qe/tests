@@ -43,20 +43,20 @@ nisint_nismaster()
 	##################################################################
 	# nismaster_setup: run NISMASTER Setup
 	##################################################################
-	rhts-sync-block -s "nismaster_setup_start" $BEAKERMASTER
+	rhts-sync-block -s "nismaster_setup_start" $MASTER
 	echo $FUNCNAME nismaster_setup_start
 	nisint_nismaster_envsetup
 	nisint_nismaster_setmaps
-	rhts-sync-set -s "nismaster_setup_end" -m $BEAKERNISMASTER
+	rhts-sync-set -s "nismaster_setup_end" -m $NISMASTER
 	echo $FUNCNAME nismaster_setup_end
 
 	##################################################################
 	# nismaster_bzs: run NISMASTER related BZ checks
 	##################################################################
-	rhts-sync-block -s "nismaster_bzs_start" $BEAKERMASTER
+	rhts-sync-block -s "nismaster_bzs_start" $MASTER
 	echo $FUNCNAME nismaster_bzs_start
 	nisint_nismaster_bzs
 	nisint_nismaster_envcleanup
-	rhts-sync-set -s "nismaster_bzs_end" -m $BEAKERNISMASTER
+	rhts-sync-set -s "nismaster_bzs_end" -m $NISMASTER
 	echo $FUNCNAME nismaster_bzs_end
 }
