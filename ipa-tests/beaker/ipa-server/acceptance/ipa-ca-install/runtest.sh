@@ -80,6 +80,11 @@ rlJournalStart
         rlLog "CLIENT: $CLIENT"
         rlLog "CLIENT2: $CLIENT2"
 
+	ipofm=`dig +short $MASTER`
+	ipofs=`dig +short $SLAVE`
+	ipofc=`dig +short $CLIENT`
+	ipofc2=`dig +short $CLIENT2`
+
         echo "export BEAKERMASTER=$MASTER" >> /dev/shm/env.sh
         echo "export BEAKERSLAVE=$SLAVE" >> /dev/shm/env.sh
         echo "export BEAKERCLIENT=$CLIENT" >> /dev/shm/env.sh
@@ -89,16 +94,9 @@ rlJournalStart
 	SLAVE_S=`echo $SLAVE | cut -d . -f 1`
 	echo "export SLAVE=$SLAVE_S.$DOMAIN" >> /dev/shm/env.sh
 
-	ipofm=`$(dig +noquestion $BEAKERMASTER  | grep $BEAKERMASTER | grep IN | grep A | awk '{print $5}')`
 	echo "export MASTERIP=$ipofm" >> /dev/shm/env.sh
-
-	ipofs=`$(dig +noquestion $BEAKERSLAVE  | grep $BEAKERSLAVE | grep IN | grep A | awk '{print $5}')`
 	echo "export SLAVEIP=$ipofs" >> /dev/shm/env.sh
-
-	ipofc=`$(dig +noquestion $BEAKERCLIENT  | grep $BEAKERCLIENT | grep IN | grep A | awk '{print $5}')`
 	echo "export CLIENTIP=$ipofc" >> /dev/shm/env.sh
-
-	ipofc2=`$(dig +noquestion $BEAKERCLIENT2  | grep $BEAKERCLIENT2 | grep IN | grep A | awk '{print $5}')`
 	echo "export CLIENT2IP=$ipofc2" >> /dev/shm/env.sh
 
 	. /dev/shm/env.sh
