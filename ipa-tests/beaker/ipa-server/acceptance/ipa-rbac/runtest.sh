@@ -43,7 +43,7 @@
 . /dev/shm/ipa-server-shared.sh
 . /dev/shm/ipa-group-cli-lib.sh
 . /dev/shm/env.sh
-. //home/test/beaker/ipa-server/shared/ipa-rbac-cli-lib.sh
+. /dev/shm/ipa-rbac-cli-lib.sh
 
 # Include test case file
 . ./lib.iparbac.sh
