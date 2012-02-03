@@ -89,7 +89,7 @@
 # Test Suite Globals
 ########################################################################
 
-RELM=`echo $RELM | tr "[a-z]" "[A-Z]"`
+INSTANCE=`echo $RELM | sed 's/\./-/g'`
 
 ########################################################################
 user1="user1"
@@ -190,15 +190,15 @@ send -- "\r"
 expect eof
 EOF
 
-	rlFileBackup /var/log/dirsrv/slapd-$RELM/errors
-	rlRun "> /var/log/dirsrv/slapd-$RELM/errors"
+	rlFileBackup /var/log/dirsrv/slapd-$INSTANCE/errors
+	rlRun "> /var/log/dirsrv/slapd-$INSTANCE/errors"
 
 	rlRun "chmod 755 $TmpDir/bindchpwd.exp"
 	rlRun "$TmpDir/bindchpwd.exp" 0 "Setting sudo binddn password"
 
 	rlLog "Verifying bug https://bugzilla.redhat.com/show_bug.cgi?id=712109"
-	rlAssertNotGrep "Entry \"uid=sudo,cn=sysaccounts,cn=etc,$basedn\" -- attribute \"krbExtraData\" not allowed" "/var/log/dirsrv/slapd-$RELM/errors"
-	rlFileRestore /var/log/dirsrv/slapd-$RELM/errors
+	rlAssertNotGrep "Entry \"uid=sudo,cn=sysaccounts,cn=etc,$basedn\" -- attribute \"krbExtraData\" not allowed" "/var/log/dirsrv/slapd-$INSTANCE/errors"
+	rlFileRestore /var/log/dirsrv/slapd-$INSTANCE/errors
 
 	rlAssertNotGrep "sudoers" "/etc/nsswitch.conf"
 		if [ $? = 0 ]; then
