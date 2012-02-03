@@ -37,16 +37,8 @@ installMaster()
 
         rlRun "/etc/init.d/ntpd stop" 0 "Stopping the ntp server"
         rlRun "ntpdate $NTPSERVER" 0 "Synchronzing clock with valid time server"
-
-        # Determine the IP of the slave to be used when creating the replica file.
-        ipofs=$(dig +noquestion $BEAKERSLAVE  | grep $BEAKERSLAVE | grep IN | grep A | awk '{print $5}')
-	rlLog "IP address of SLAVE: $BEAKERSLAVE is $ipofs"
-	echo $ipofs > /tmp/ipofs
-
         rlRun "fixHostFile" 0 "Set up /etc/hosts"
 	rlRun "fixhostname" 0 "Fix hostname"
-
-        ipofs=$(dig +noquestion $SLAVE  | grep $SLAVE | grep IN | grep A | awk '{print $5}')
 
 	echo "ipa-server-install --setup-dns --forwarder=$DNSFORWARD --hostname=$hostname_s.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U" > /dev/shm/installipa.bash
 
@@ -65,12 +57,12 @@ installMaster()
    rlPhaseEnd
 
    rlPhaseStartTest "Create Replica Package(s)"
-        for s in $BEAKERSLAVE; do
+        for s in $SLAVE; do
                 if [ "$s" != "" ]; then
 
                         # put the short form of the hostname for server $s into s_short
                         hostname_s=$(echo $s | cut -d. -f1)
-			SLAVEIP=`cat /tmp/ipofs`
+
                         rlLog "IP of server $s is resolving as $SLAVEIP, using short hostname of $hostname_s"
                         rlLog "Running: ipa-replica-prepare -p $ADMINPW --ip-address=$SLAVEIP $hostname_s.$DOMAIN"
                         rlRun "ipa-replica-prepare -p $ADMINPW --ip-address=$SLAVEIP $hostname_s.$DOMAIN" 0 "Creating replica package"
@@ -112,8 +104,8 @@ installSlave()
 
         cd /dev/shm/
         hostname_s=$(hostname -s)
-        rlRun "sftp root@$MASTER:/var/lib/ipa/replica-info-$hostname_s.$DOMAIN.gpg" 0 "Get replica package"
-        rlLog "sftp root@$MASTER:/var/lib/ipa/replica-info-$hostname_s.$DOMAIN.gpg"
+        rlRun "sftp root@$MASTERIP:/var/lib/ipa/replica-info-$hostname_s.$DOMAIN.gpg" 0 "Get replica package"
+        rlLog "sftp root@$MASTERIP:/var/lib/ipa/replica-info-$hostname_s.$DOMAIN.gpg"
         rlLog "Checking for existance of replica gpg file"
         ls /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg
         if [ $? -ne 0 ] ; then

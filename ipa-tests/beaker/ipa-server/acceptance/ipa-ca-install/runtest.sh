@@ -89,6 +89,18 @@ rlJournalStart
 	SLAVE_S=`echo $SLAVE | cut -d . -f 1`
 	echo "export SLAVE=$SLAVE_S.$DOMAIN" >> /dev/shm/env.sh
 
+	ipofm=$(dig +noquestion $BEAKERMASTER  | grep $BEAKERMASTER | grep IN | grep A | awk '{print $5}')
+	echo "export MASTERIP=$ipofm" >> /dev/shm/env.sh
+
+	ipofs=$(dig +noquestion $BEAKERSLAVE  | grep $BEAKERSLAVE | grep IN | grep A | awk '{print $5}')
+	echo "export SLAVEIP=$ipofs" >> /dev/shm/env.sh
+
+	ipofc=$(dig +noquestion $BEAKERCLIENT  | grep $BEAKERCLIENT | grep IN | grep A | awk '{print $5}')
+	echo "export CLIENTIP=$ipofc" >> /dev/shm/env.sh
+
+	ipofc2=$(dig +noquestion $BEAKERCLIENT2  | grep $BEAKERCLIENT2 | grep IN | grep A | awk '{print $5}')
+	echo "export CLIENT2IP=$ipofc2" >> /dev/shm/env.sh
+
 	. /dev/shm/env.sh
 	cat /dev/shm/env.sh
 
