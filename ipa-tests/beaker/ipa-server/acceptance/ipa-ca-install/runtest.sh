@@ -80,10 +80,10 @@ rlJournalStart
         rlLog "CLIENT: $CLIENT"
         rlLog "CLIENT2: $CLIENT2"
 
-	ipofm=`dig +short $MASTER`
-	ipofs=`dig +short $SLAVE`
-	ipofc=`dig +short $CLIENT`
-	ipofc2=`dig +short $CLIENT2`
+	ipofm=`nslookup $MASTER | grep Address| tail -n 1 | cut -d " " -f 2`
+	ipofs=`nslookup $SLAVE | grep Address| tail -n 1 | cut -d " " -f 2`
+	ipofc=`nslookup $CLIENT | grep Address| tail -n 1 | cut -d " " -f 2`
+	ipofc2=`nslookup $CLIENT2 | grep Address| tail -n 1 | cut -d " " -f 2`
 
         echo "export BEAKERMASTER=$MASTER" >> /dev/shm/env.sh
         echo "export BEAKERSLAVE=$SLAVE" >> /dev/shm/env.sh
