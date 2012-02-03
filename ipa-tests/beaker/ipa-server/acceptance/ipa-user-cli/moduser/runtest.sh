@@ -370,7 +370,7 @@ rlJournalStart
 
     rlPhaseStartTest "ipa-user-cli-mod-045: uid 0"
         command="ipa user-mod --setattr uidNumber=0 $superuser"
-        expmsg="ipa: ERROR: invalid 'uidnumber':  must be at least 1"
+        expmsg="ipa: ERROR: invalid 'uid':  must be at least 1"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
         command="ipa user-mod --uid=0 $superuser"
 	expmsg="ipa: ERROR: invalid 'uid': must be at least 1"
