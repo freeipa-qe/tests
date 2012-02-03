@@ -93,13 +93,9 @@ rlJournalStart
 
 	ipofm=`dig +short $BEAKERMASTER`
 	ipofs=`dig +short $BEAKERSLAVE`
-	ipofc=`dig +short $BEAKERCLIENT`
-	ipofc2=`dig +short $BEAKERCLIENT2`
 
 	eval "echo \"export MASTERIP=$ipofm\" >> /dev/shm/env.sh"
 	eval "echo \"export SLAVEIP=$ipofs\" >> /dev/shm/env.sh"
-	eval "echo \"export CLIENTIP=$ipofc\" >> /dev/shm/env.sh"
-	eval "echo \"export CLIENT2IP=$ipofc2\" >> /dev/shm/env.sh"
 
 	. /dev/shm/env.sh
 	cat /dev/shm/env.sh
