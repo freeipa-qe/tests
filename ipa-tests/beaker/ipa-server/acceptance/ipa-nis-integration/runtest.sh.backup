@@ -68,37 +68,13 @@ rlJournalStart
 		rlLog "BEAKERNISMASTER: $BEAKERNISMASTER"
 		rlLog "BEAKERNISCLIENT: $BEAKERNISCLIENT"
 	rlPhaseEnd
-	
-	##############################################################
-	# Initial Setup of servers
-	##############################################################
-	nisint_ipamaster_setup
-	nisint_nismaster_setup
-	nisint_nisclient_setup
 
-	##############################################################
-	# NIS Integration 
-	##############################################################
-	#nisint_ipamaster_integration # Import NIS Maps/Data/Configuration...
-	#nisint_nisclient_integration # Switch NIS Config to point to IPA Master
-	#nisint_user_tests
-	#nisint_group_tests
-	#nisint_netgroup_tests
-	#nisint_automount_tests
-	#nisint_services_tests
-	#nisint_client_is_nis_bz_tests
+	case $HOSTNAME in
+	$MASTER)      echo "Match MASTER"; nisint_ipamaster ;; 
+	$NISMASTER)   echo "Match NISMASTER"; nisint_nismaster ;; 
+	$NISCLIENT)   echo "Match NISCLIENT"; nisint_nisclient ;;
+	esac
 
-	##############################################################
-	# NIS Migration
-	##############################################################
-	#nisint_nisclient_migration # Switch NIS Client to use SSSD/IPA
-	#nisint_user_tests
-	#nisint_group_tests
-	#nisint_netgroup_tests
-	#nisint_automount_tests
-	#nisint_services_tests
-	#nisint_client_is_ipa_bz_tests
-		
 	rlPhaseStartCleanup "ipa-nis-integration cleanup"
 		rlRun "popd"
 		rlRun "rm -r $TmpDir" 0 "Removing tmp directory"
