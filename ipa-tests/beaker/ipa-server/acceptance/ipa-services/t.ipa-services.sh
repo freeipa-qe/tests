@@ -305,7 +305,7 @@ service_add_host_005() {
 rlPhaseStartTest "service_add_host_005: ipa service-add-host : add host to manage service with raw and all options"
         rlRun "ipa service-add-host --hosts=$TESTHOST $SERVICE/$HOSTNAME@$RELM --raw --all > $TmpDir/service_add_host_005.out 2>&1"
         rlAssertGrep "krbprincipalname: $SERVICE/$HOSTNAME@$RELM" "$TmpDir/service_add_host_005.out"
-        rlRun "grep -i \"managedby: fqdn=$TESTHOST,cn=computers,cn=accounts,dc=$RELM\" $TmpDir/service_add_host_005.out"
+        rlRun "grep -i \"managedby: fqdn=$TESTHOST,cn=computers,cn=accounts,$BASEDN\" $TmpDir/service_add_host_005.out"
         rlAssertGrep "objectclass: krbticketpolicyaux" "$TmpDir/service_add_host_005.out"
         rlAssertGrep "objectclass: krbprincipalaux" "$TmpDir/service_add_host_005.out"
         rlAssertGrep "objectclass: ipaservice" "$TmpDir/service_add_host_005.out"
@@ -708,7 +708,7 @@ service_mod_006() {
 
 rlPhaseStartTest "service_mod_006: ipa service-mod: modifying the service with --addattr on managedBy"
 	ipa host-add --force $TESTHOST
-	hostmanagedn="fqdn=$TESTHOST,cn=computers,cn=accounts,dc=$DOMAIN"
+	hostmanagedn="fqdn=$TESTHOST,cn=computers,cn=accounts,$BASEDN"
 
 	rlRun "ipa service-add $SERVICE/$HOSTNAME@$RELM"
 	rlRun "ipa service-mod --addattr=managedBy=\"$hostmanagedn\" $SERVICE/$HOSTNAME@$RELM"
@@ -720,7 +720,7 @@ rlPhaseEnd
 
 service_mod_007() {
 rlPhaseStartTest "service_mod_007: ipa service-mod: modifying the service with --setattr on managedBy"
-	selfmanagedn="fqdn=$HOSTNAME,cn=computers,cn=accounts,dc=$DOMAIN"
+	selfmanagedn="fqdn=$HOSTNAME,cn=computers,cn=accounts,$BASEDN"
 	rlRun "ipa service-mod --setattr=managedBy=\"$selfmanagedn\" $SERVICE/$HOSTNAME@$RELM"
 
 	rlRun "ipa service-show --all $SERVICE/$HOSTNAME@$RELM > $TmpDir/service_mod_007.out 2>&1"
@@ -786,7 +786,7 @@ rlPhaseStartTest "service_remove_host_004: ipa service-remove-host for services 
 
         rlRun "ipa service-remove-host --hosts=test.example.com $SERVICE/$HOSTNAME@$RELM --all --raw > $TmpDir/service_remove_host_004.out 2>&1"
         rlAssertGrep "krbprincipalname: $SERVICE/$HOSTNAME@$RELM" "$TmpDir/service_remove_host_004.out"
-        rlAssertGrep "managedby: fqdn=$HOSTNAME,cn=computers,cn=accounts,dc=testrelm" "$TmpDir/service_remove_host_004.out" -i
+        rlAssertGrep "managedby: fqdn=$HOSTNAME,cn=computers,cn=accounts,$BASEDN" "$TmpDir/service_remove_host_004.out" -i
         rlAssertGrep "objectclass: ipaobject" "$TmpDir/service_remove_host_004.out"
         rlAssertGrep "objectclass: top" "$TmpDir/service_remove_host_004.out"
         rlAssertGrep "objectclass: ipaservice" "$TmpDir/service_remove_host_004.out"
