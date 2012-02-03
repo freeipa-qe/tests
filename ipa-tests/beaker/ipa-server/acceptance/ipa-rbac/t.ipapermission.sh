@@ -242,7 +242,6 @@ ipapermission_params_hostgroup_type()
 ##################################################
 ipapermission_params_netgroup_filter()
 {
-
     permissionRights="all"
     permissionLocalTarget="--filter=\"(objectclass=nisNetgroup)\""
     permissionLocalTargetToVerify=`echo $permissionLocalTarget | sed 's/--filter=//'`
@@ -255,9 +254,6 @@ ipapermission_params_netgroup_filter()
      rlRun "addPermission $permissionName $permissionRights $permissionLocalTarget $permissionLocalAttr" 0 "Adding $permissionName"
      verifyPermissionTargetAttr $permissionName $permissionRights "Filter" $permissionLocalTargetToVerify $permissionLocalAttr $objectclass
    rlPhaseEnd
-
-
-
 }
 
 
@@ -280,9 +276,6 @@ ipapermission_params_dnsrecord_subtree()
      rlRun "addPermission $permissionName $permissionRights $permissionLocalTarget $permissionLocalAttr" 0 "Adding $permissionName"
      verifyPermissionTargetAttr $permissionName $permissionRights "Subtree" $permissionLocalTargetToVerify $permissionLocalAttr $objectclass
    rlPhaseEnd
-
-
-
 }
 
 
@@ -677,7 +670,7 @@ ipapermission_show_rights()
 
 
 #############################################
-#  test: ipapermission-del 
+#  test: ipapermission-del : continue
 #############################################
 ipapermission_del_continue()
 {
@@ -715,40 +708,44 @@ ipapermission_find()
 }
 
 
+##################################################
+#  test: ipapermission-find: Positive: name
+##################################################
 ipapermission_find_name()
 {
     option="name"
     value="ManageUser1"
     permissions="ManageUser1"
 
-    rlPhaseStartTest "ipa-permission-cli-1039: find permission using --$option (bug 785251)"
+    rlPhaseStartTest "ipa-permission-cli-1039: find permission using --name (bug 785251)"
       rlRun "findPermissionByOption $option $value \"all\" $permissions" 0 "Verify permissions are found for --$option=$value"
     rlPhaseEnd
 
     value="\ "
-    rlPhaseStartTest "ipa-permission-cli-1039: find permission using invalid --$option (bug 785251)"
+    rlPhaseStartTest "ipa-permission-cli-1040: find permission using invalid --name (bug 785251)"
       command="findPermissionByOption $option $value \"all\" $permissions"
       expmsg="ipa: ERROR"
       rlRun "$command > /tmp/ipapermission_invalidname.log 2>&1" 1 "Verify error message for invalid $option"
       rlAssertGrep "$expmsg" "/tmp/ipapermission_invalidname.log"
     rlPhaseEnd
-
-    #TODO: Add tests for a nonexistent name, and name=""
 }
 
 
+##################################################
+#  test: ipapermission-find: Positive: permissions
+##################################################
 ipapermission_find_permissions()
 {
     option="permissions"
     value="all"
     permissions="ManageNetgroup1"
 
-    rlPhaseStartTest "ipa-permission-cli-1039: find permission - --$option"
+    rlPhaseStartTest "ipa-permission-cli-1041: find permission - --permissions"
       rlRun "findPermissionByOption $option $value \"all\" $permissions" 0 "Verify permissions are found for --$option=$value"
     rlPhaseEnd
 
     value="xyz"
-    rlPhaseStartTest "ipa-permission-cli-1039: find permission using invalid --$option"
+    rlPhaseStartTest "ipa-permission-cli-1042: find permission using invalid --permissions"
       command="findPermissionByOption $option $value \"all\" $permissions"
       expmsg="ipa: ERROR"
       rlRun "$command > /tmp/ipapermission_invalidpermission.log 2>&1" 1 "Verify error message for invalid $option"
@@ -758,6 +755,9 @@ ipapermission_find_permissions()
 
 
 
+##################################################
+#  test: ipapermission-find: Positive: attrs
+##################################################
 ipapermission_find_attrs()
 {
     option="attrs"
@@ -765,12 +765,15 @@ ipapermission_find_attrs()
     permissions1="\"Manage host keytab\""
     permissions2="\"Manage service keytab\""
 
-    rlPhaseStartTest "ipa-permission-cli-1039: find permission - --$option"
+    rlPhaseStartTest "ipa-permission-cli-1043: find permission - --attrs"
       rlRun "findPermissionByOption $option $value \"all\" $permissions1 $permissions2" 0 "Verify permissions are found for --$option=$value"
     rlPhaseEnd
 }
 
 
+##################################################
+#  test: ipapermission-find: Positive: type 
+##################################################
 ipapermission_find_type()
 {
     option="type"
@@ -780,61 +783,76 @@ ipapermission_find_type()
     permissions3="\"update dns entries\""
     permissions4="\"TestPermission\""
 
-    rlPhaseStartTest "ipa-permission-cli-1039: find permission - --$option"
+    rlPhaseStartTest "ipa-permission-cli-1044: find permission - --type"
       rlRun "findPermissionByOption $option $value \"all\" $permissions1 $permissions2 $permissions3 $permissions4" 0 "Verify permissions are found for --$option=$value"
     rlPhaseEnd
 }
 
 
 
+##################################################
+#  test: ipapermission-find: Positive: memberof 
+##################################################
 ipapermission_find_memberof()
 {
     option="memberof"
     value="groupone"
     permissions="ManageHost1"
 
-    rlPhaseStartTest "ipa-permission-cli-1039: find permission - --$option"
+    rlPhaseStartTest "ipa-permission-cli-1045: find permission - --memberof"
       rlRun "findPermissionByOption $option $value \"all\" $permissions" 0 "Verify permissions are found for --$option=$value"
     rlPhaseEnd
 }
 
+##################################################
+#  test: ipapermission-find: Positive: filter 
+##################################################
 ipapermission_find_filter()
 {
     option="filter"
     value="\(\&\(!\(objectclass=posixgroup\)\)\(objectclass=ipausergroup\)\)"
     permissions="ManageGroup1"
 
-    rlPhaseStartTest "ipa-permission-cli-1039: find permission - --$option"
+    rlPhaseStartTest "ipa-permission-cli-1046: find permission - --filter"
       rlRun "findPermissionByOption $option $value \"all\" $permissions" 0 "Verify permissions are found for --$option=$value"
     rlPhaseEnd
 }
 
 
 
+##################################################
+#  test: ipapermission-find: Positive: subtree 
+##################################################
 ipapermission_find_subtree()
 {
     option="subtree"
     value="cn=computers,cn=accounts,dc=testrelm,dc=com"
     permissions="ManageHost1"
 
-    rlPhaseStartTest "ipa-permission-cli-1039: find permission - --$option (bug 785254)"
+    rlPhaseStartTest "ipa-permission-cli-1047: find permission - --subtree (bug 785254)"
       rlRun "findPermissionByOption $option $value \"all\" $permissions" 0 "Verify permissions are found for --$option=$value"
     rlPhaseEnd
 }
 
+##################################################
+#  test: ipapermission-find: Positive: targetgroup 
+##################################################
 ipapermission_find_targetgroup()
 {
     option="targetgroup"
     value="ipausers"
     permissions="\"Add user to default group\""
 
-    rlPhaseStartTest "ipa-permission-cli-1039: find permission - --$option"
+    rlPhaseStartTest "ipa-permission-cli-1048: find permission - --targetgroup"
       rlRun "findPermissionByOption $option $value \"all\" $permissions" 0 "Verify permissions are found for --$option=$value"
     rlPhaseEnd
 }
 
 
 
+##################################################
+#  test: ipapermission-find: Positive: Multiple Filters 
+##################################################
 ipapermission_find_multiplefilters()
 {
 
@@ -852,7 +870,7 @@ ipapermission_find_multiplefilters()
     permissions5="ManageUser5"
     permissions6="\"Modify Users\""
 
-    rlPhaseStartTest "ipa-permission-cli-1039: find permission - --$option"
+    rlPhaseStartTest "ipa-permission-cli-1049: find permission - --attrs --permissions --type"
       rlRun "findPermissionByMultipleOptions $numberOfOptions $option1 $value1 $option2 $value2 $option3 $value3 $permissions1 $permissions2 $permissions3 $permissions4 $permissions5 $permissions6" 0 "Verify permissions are found"
     rlPhaseEnd
 
@@ -860,11 +878,15 @@ ipapermission_find_multiplefilters()
     numberOfOptions="4"
     option4="sizelimit"
     value4="3"
-    rlPhaseStartTest "ipa-permission-cli-1039: find permission - --$option4 (bug 785257)"
+    rlPhaseStartTest "ipa-permission-cli-1050: find permission - --attrs --permissions --type --sizelimit (bug 785257)"
       rlRun "findPermissionByMultipleOptions $numberOfOptions $option1 $value1 $option2 $value2 $option3 $value3 $option4 $value4" 0 "Verify permissions are found"
     rlPhaseEnd
 }
 
+
+##################################################
+#  test: ipapermission-find: Positive: all/raw 
+##################################################
 ipapermission_find_all_raw()
 {
     option="memberof"
@@ -876,36 +898,16 @@ ipapermission_find_all_raw()
     permissionLocalMemberOf="groupone"
     permissionLocalAttr="nshostlocation"
 
-   rlPhaseStartTest "ipa-permission-cli-1001: verify permission attrs after a find --all"
+   rlPhaseStartTest "ipa-permission-cli-1051: verify permission attrs after a find --all"
       rlRun "findPermissionByOption $option $value \"all\" $permissions" 0 "Verify permissions are found for $permissions"
       verifyPermissionFindOptions $permissions $permissionRights "Subtree" $permissionLocalTargetToVerify $permissionLocalAttr $permissionLocalMemberOf 
    rlPhaseEnd
 
-   rlPhaseStartTest "ipa-permission-cli-1001: verify permission attrs after a find --raw (bug 785259)"
+   rlPhaseStartTest "ipa-permission-cli-1052: verify permission attrs after a find --raw (bug 785259)"
       rlRun "findPermissionByOption $option $value \"raw\" $permissions" 0 "Verify permissions are found for $permissions"
       verifyPermissionFindOptions $permissions $permissionRights "Subtree" $permissionLocalTargetToVerify $permissionLocalAttr $permissionLocalMemberOf 
    rlPhaseEnd
 }
-
-
-ipapermission_find_negative()
-{
-   ipapermission_find_invalid_name
-   ipapermission_find_invalid_permissions
-   ipapermission_find_invalid_attrs
-   ipapermission_find_invalid_type
-   ipapermission_find_invalid_memberof
-   ipapermission_find_invalid_filter
-   ipapermission_find_invalid_subtree
-   ipapermission_find_invalid_targetgroup
-   ipapermission_find_invalid_timelimit
-   ipapermission_find_invalid_sizelimit
-   ipapermission_find_invalid_all
-   ipapermission_find_invalid_raw
-}
-
-
-
 
 
 ##############################################
