@@ -80,24 +80,26 @@ rlJournalStart
         rlLog "CLIENT: $CLIENT"
         rlLog "CLIENT2: $CLIENT2"
 
-	ipofm=`nslookup $MASTER | grep Address| tail -n 1 | cut -d " " -f 2`
-	ipofs=`nslookup $SLAVE | grep Address| tail -n 1 | cut -d " " -f 2`
-	ipofc=`nslookup $CLIENT | grep Address| tail -n 1 | cut -d " " -f 2`
-	ipofc2=`nslookup $CLIENT2 | grep Address| tail -n 1 | cut -d " " -f 2`
-
-        echo "export BEAKERMASTER=$MASTER" >> /dev/shm/env.sh
-        echo "export BEAKERSLAVE=$SLAVE" >> /dev/shm/env.sh
-        echo "export BEAKERCLIENT=$CLIENT" >> /dev/shm/env.sh
-        echo "export BEAKERCLIENT2=$CLIENT2" >> /dev/shm/env.sh
+        eval "echo \"export BEAKERMASTER=$MASTER\" >> /dev/shm/env.sh"
+        eval "echo \"export BEAKERSLAVE=$SLAVE\" >> /dev/shm/env.sh"
+        eval "echo \"export BEAKERCLIENT=$CLIENT\" >> /dev/shm/env.sh"
+        eval "echo \"export BEAKERCLIENT2=$CLIENT2\" >> /dev/shm/env.sh"
 	MASTER_S=`echo $MASTER | cut -d . -f 1`
-	echo "export MASTER=$MASTER_S.$DOMAIN" >> /dev/shm/env.sh
+	eval "echo \"export MASTER=$MASTER_S.$DOMAIN\" >> /dev/shm/env.sh"
 	SLAVE_S=`echo $SLAVE | cut -d . -f 1`
-	echo "export SLAVE=$SLAVE_S.$DOMAIN" >> /dev/shm/env.sh
+	eval "echo \"export SLAVE=$SLAVE_S.$DOMAIN\" >> /dev/shm/env.sh"
 
-	echo "export MASTERIP=$ipofm" >> /dev/shm/env.sh
-	echo "export SLAVEIP=$ipofs" >> /dev/shm/env.sh
-	echo "export CLIENTIP=$ipofc" >> /dev/shm/env.sh
-	echo "export CLIENT2IP=$ipofc2" >> /dev/shm/env.sh
+	. /dev/shm/env.sh
+
+	ipofm=`dig +short $BEAKERMASTER`
+	ipofs=`dig +short $BEAKERSLAVE`
+	ipofc=`dig +short $BEAKERCLIENT`
+	ipofc2=`dig +short $BEAKERCLIENT2`
+
+	eval "echo \"export MASTERIP=$ipofm\" >> /dev/shm/env.sh"
+	eval "echo \"export SLAVEIP=$ipofs\" >> /dev/shm/env.sh"
+	eval "echo \"export CLIENTIP=$ipofc\" >> /dev/shm/env.sh"
+	eval "echo \"export CLIENT2IP=$ipofc2\" >> /dev/shm/env.sh"
 
 	. /dev/shm/env.sh
 	cat /dev/shm/env.sh
