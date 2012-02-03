@@ -73,15 +73,6 @@ public class CommonHelper {
 		browser.button("Delete").click();
 	}
 
-	//////// self service permission specific add, delete functions ////////
-	public static void addSelfservicePermission(SahiTasks browser, String permissionName,	String[] attrs) {
-		browser.span("Add").click();
-		browser.textbox("aciname").setValue(permissionName);
-		for (String attribute:attrs)
-			browser.checkbox(attribute).check();
-		browser.button("Add").click();
-	}
-	
 	/////////////////////////// get single random element from an array ///////////////////////////
 	public static String getSingle(Random random, String[] data)
 	{
