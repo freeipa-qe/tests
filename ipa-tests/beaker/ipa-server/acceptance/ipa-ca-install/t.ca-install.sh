@@ -177,7 +177,7 @@ echo "spawn ssh -l root $MASTER" >> $expfile
 echo 'match_max 100000' >> $expfile
 echo 'sleep 2' >> $expfile
 echo 'expect "#: "' >> $expfile
-echo "send \"ipa-replica-manage del $HOSTNAME --force\"" >> $expfile
+echo "send \"ipa-replica-manage del $SLAVE --force\"" >> $expfile
 echo 'send "\r"' >> $expfile
 echo 'sleep 3' >> $expfile
 echo 'expect "*: "' >> $expfile
