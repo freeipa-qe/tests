@@ -38,7 +38,7 @@
 ######################################################################
 # test suite
 ######################################################################
-template_function()
+nisint_ipamaster_setup()
 {
 	rlLog "$FUNCNAME"
 
@@ -56,5 +56,4 @@ template_function()
 		rlLog "Machine in recipe is not a known ROLE"
 		;;
 	esac
-
 }

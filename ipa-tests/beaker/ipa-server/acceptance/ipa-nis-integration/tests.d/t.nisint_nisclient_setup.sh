@@ -38,23 +38,42 @@
 ######################################################################
 # test suite
 ######################################################################
-template_function()
+nisint_nisclient_setup()
 {
 	rlLog "$FUNCNAME"
 
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
+		rlRun "rhts-sync-set   -s 'nisint_nisclient_setup_start' -m $MASTER"
+		rlRun "rhts-sync-block -s 'nisint_nisclient_setup_ended' $NISCLIENT"
+		rlPass "$FUNCNAME complete for IPAMASTER ($HOSTNAME)"
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
 		;;
 	"$NISCLIENT")
-		rlLog "Machine in recipe is NISCLIENT"
+		rlLog "Machine in recipe is NISMASTER"
+		rlRun "rhts-sync-block -s 'nisint_nisclient_setup_start' $MASTER"
+
+		nisint_nisclient_envsetup
+
+		rlRun "rhts-sync-set   -s 'nisint_nisclient_setup_ended' -m $NISCLIENT"
+		rlPass "$FUNCNAME complete for NISCLIENT ($HOSTNAME)"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE"
 		;;
 	esac
 
+}
+
+nisint_nisclient_envsetup()
+{
+	rlPhaseStartTest "nisint_nisclient_envsetup: "
+		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
+		rlRun "setup-nis-client > $tmpout 2>&1" 0 "Running NIS Client setup"
+		rlRun "ps -ef|grep [y]pbind" 0 "Check that NIS Client (ypbind) is running"
+		[ -f $tmpout ] && rm -f $tmpout
+	rlPhaseEnd
 }
