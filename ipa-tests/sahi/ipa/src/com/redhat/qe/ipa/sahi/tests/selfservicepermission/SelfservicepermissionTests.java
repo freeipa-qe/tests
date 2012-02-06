@@ -94,13 +94,40 @@ public class SelfservicepermissionTests extends SahiTestScript{
 		Assert.assertFalse(browser.link(permissionName).exists(), "after add, permission should NOT exist in list as well");
 	}
 
-	@Test (groups={"addPermission_negative"}, dataProvider="addPermissionNegative",
-		description = "negative test for add self service permission")
-	public void addPermission_negative() throws Exception {
-		// check required fields: permission name, at least one attribute
-		// check illegal permission names 
+	@Test (groups={"addPermission_negative"},
+		description = "negative test for add self service permission: test for required fileds: name and attribute")
+	public void addPermission_negative_requiredFields() throws Exception {
+		browser.navigateTo(commonTasks.selfservicepermissionPage);  
+		browser.span("Add").click();
+		
+		// Test case 1: without give any input, click 'Add' , try to create an empty permission
+		browser.button("Add").click();
+		if (browser.span("Required field").exists()) 
+			log.info("error fields: 'Required field' appears as expected, test continue"); // report success
+		else
+			Assert.assertFalse(false, "error fields 'Required field' does NOT appear as expected, test failed");
+		
+		// Test case 2: give one input : permission name and try to create a permission without any attribute attache to it, this should fail
+		browser.textbox("aciname").setValue("PermissionWithoutAttribute"); 
+		browser.button("Add").click();
+		if (browser.span("Required field").exists())
+			log.info("error fields: 'Required field' appears as expected, test continue"); // report success
+		else
+			Assert.assertFalse(false, "error fields 'Required field' does NOT appear as expected, test failed");
+		
+		// Test case 3: give one input : attributes and try to create a permission without name (but has attributes), this should fail
+		browser.textbox("aciname").setValue(""); 
+		browser.checkbox("cn").check();
+		browser.button("Add").click();
+		if (browser.span("Required field").exists())
+			log.info("error fields: 'Required field' appears as expected, test continue"); // report success
+		else
+			Assert.assertFalse(false, "error fields 'Required field' does NOT appear as expected, test failed");
+		
+		// if we reach this far, all test are done, click 'Cancel' to click away the dialog box
+		browser.button("Cancel").click(); 
 	}
-  
+
 	/////////// modify permission /////////////////////////
 	@Test (groups={"modifyPermission"}, dataProvider="modifyPermission", dependsOnGroups="addPermission",
 		description="modify self service permission")
@@ -134,6 +161,15 @@ public class SelfservicepermissionTests extends SahiTestScript{
 		for(String name:names)
 			Assert.assertFalse(browser.link(name).exists(), "after delete, permission should disappear");
 	}
+	
+	@Test (groups={"deletePermission"}, dataProvider="leftOverPermissions", dependsOnGroups="addPermission",
+			description="delete self service permission")
+		public void deleteLeftOverPermission(String scenario, String permissionName) throws Exception {
+			browser.navigateTo(commonTasks.selfservicepermissionPage);
+			Assert.assertTrue(browser.link(permissionName).exists(), "before delete, permission should in the list");
+			SelfservicepermissionTasks.deletePermission(browser, permissionName);
+			Assert.assertFalse(browser.link(permissionName).exists(), "after delete, permission should disappear");
+		}
 	
 	/***************************************************************************** 
 	 *             Data providers                                                * 
@@ -202,4 +238,10 @@ public class SelfservicepermissionTests extends SahiTestScript{
 		return getAddPermission_addandaddanother();
 	}
 
+	@DataProvider(name="leftOverPermissions")
+	public Object[][] getLeftOverPermissions()
+	{
+		String[][] permissions = {{"addThanEdit"}};
+		return permissions;
+	}
 }//class SelfservicepermissionTests
