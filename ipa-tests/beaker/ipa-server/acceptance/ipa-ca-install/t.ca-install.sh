@@ -161,6 +161,12 @@ installCA()
         rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
         rlRun "/bin/bash /dev/shm/replica-ca-install.bash" 0 "CA Replica installation with --no-host-dns"
 
+        rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
+        REV_ZONE=`ipa dnszone-find | grep -i "zone name" | grep arpa | cut -d : -f 2`
+	export $REV_ZONE
+
+	PTR_NAME=`echo $SLAVEIP | cut -d . -f 4`
+
 	sleep 5
 	rlRun "service ipa status"
 	rlRun "ipa-server-install --uninstall -U"
@@ -183,6 +189,9 @@ echo 'sleep 3' >> $expfile
 echo 'expect "*: "' >> $expfile
 echo "send \"$ADMINPW\"" >> $expfile
 echo 'send "\r"' >> $expfile
+echo 'expect "#: "' >> $expfile
+echo "send \"ipa dnsrecord-add $REV_ZONE $PTR_NAME --ptr-hostname=$SLAVE\"" >> $expfile
+echo 'send "\r"' >> $expfile
 echo 'expect eof ' >> $expfile
 
 	rlRun "/usr/bin/expect $expfile >> $expout 2>&1"
@@ -191,6 +200,8 @@ echo 'expect eof ' >> $expfile
 
 	rlRun "mv /etc/hosts /tmp/"
 	rlRun "mv /var/tmp/hosts /etc/hosts" 0 " Restoring /etc/hosts"
+	rlRun "cat /etc/hosts"
+	rlRun "cat /etc/resolv.conf"
 
         echo "ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg" > /dev/shm/replica-install.bash
         chmod 755 /dev/shm/replica-install.bash
