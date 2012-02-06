@@ -167,6 +167,7 @@ echo 'match_max 100000' >> $expfile
 echo 'sleep 2' >> $expfile
 echo 'expect "#: "' >> $expfile
 echo "send \"kinit $ADMINID\"" >> $expfile
+echo 'send "\r"' >> $expfile
 echo 'expect "*d: "' >> $expfile
 echo "send \"$ADMINPW\"" >> $expfile
 echo 'send "\r"' >> $expfile
