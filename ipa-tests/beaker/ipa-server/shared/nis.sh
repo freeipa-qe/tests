@@ -34,7 +34,7 @@ setup-nis-server()
 	# Exit if NISDOMAIN variable not set.  Should come from /dev/shm/env.sh
 	if [ -z "$NISDOMAIN" ]; then
 		echo "NISDOMAIN env var not set"
-		exit 1
+		return 1
 	fi
 
 	# Set libdir since paths vary based on arch
@@ -182,7 +182,7 @@ setup-nis-client()
 	
 	if [ -z "$NISDOMAIN" ]; then
 		echo "NISDOMAIN env var not set"
-		exit 1
+		return 1
 	fi
 
 	# Set NISDOMAIN in /etc/sysconfig/network
