@@ -95,6 +95,27 @@ public class SelfservicepermissionTests extends SahiTestScript{
 	}
 
 	@Test (groups={"addPermission_negative"},
+		description = "create duplicate self service permission" )
+	public void addPermisiono_negative_duplicatePermissiion() throws Exception{
+		browser.navigateTo(commonTasks.selfservicepermissionPage);  
+		for (String name:existingPermissions)
+		{
+			browser.span("Add").click();
+			browser.textbox("aciname").setValue(name); 
+			browser.checkbox("cn").check();
+			browser.button("Add").click();
+			if (browser.div("This entry already exists").exists())
+			{
+				log.info("duplicate self service permission name: " + name +" is forbidden, good, test continue");
+				browser.button("Cancel").click();
+				browser.button("Cancel").click();
+			}
+			else
+				Assert.assertTrue(false, "duplicate self service permission name is allowed : name="+name+", bad, test failed");
+		}
+	}
+	
+	@Test (groups={"addPermission_negative"},
 		description = "negative test for add self service permission: test for required fileds: name and attribute")
 	public void addPermission_negative_requiredFields() throws Exception {
 		browser.navigateTo(commonTasks.selfservicepermissionPage);  
@@ -105,7 +126,7 @@ public class SelfservicepermissionTests extends SahiTestScript{
 		if (browser.span("Required field").exists()) 
 			log.info("error fields: 'Required field' appears as expected, test continue"); // report success
 		else
-			Assert.assertFalse(false, "error fields 'Required field' does NOT appear as expected, test failed");
+			Assert.assertTrue(false, "error fields 'Required field' does NOT appear as expected, test failed");
 		
 		// Test case 2: give one input : permission name and try to create a permission without any attribute attache to it, this should fail
 		browser.textbox("aciname").setValue("PermissionWithoutAttribute"); 
@@ -113,7 +134,7 @@ public class SelfservicepermissionTests extends SahiTestScript{
 		if (browser.span("Required field").exists())
 			log.info("error fields: 'Required field' appears as expected, test continue"); // report success
 		else
-			Assert.assertFalse(false, "error fields 'Required field' does NOT appear as expected, test failed");
+			Assert.assertTrue(false, "error fields 'Required field' does NOT appear as expected, test failed");
 		
 		// Test case 3: give one input : attributes and try to create a permission without name (but has attributes), this should fail
 		browser.textbox("aciname").setValue(""); 
@@ -122,7 +143,7 @@ public class SelfservicepermissionTests extends SahiTestScript{
 		if (browser.span("Required field").exists())
 			log.info("error fields: 'Required field' appears as expected, test continue"); // report success
 		else
-			Assert.assertFalse(false, "error fields 'Required field' does NOT appear as expected, test failed");
+			Assert.assertTrue(false, "error fields 'Required field' does NOT appear as expected, test failed");
 		
 		// if we reach this far, all test are done, click 'Cancel' to click away the dialog box
 		browser.button("Cancel").click(); 
@@ -174,6 +195,8 @@ public class SelfservicepermissionTests extends SahiTestScript{
 	/***************************************************************************** 
 	 *             Data providers                                                * 
 	 *****************************************************************************/
+	private static String[] existingPermissions = { "User Self service", "Self can write own password"};
+	
 	private static String[] defaults = {"audio","businesscategory","carlicense","cn","departmentnumber",
 											"description","destinationindicator","displayname","employeenumber",
 											"employeetype","employeetype","gecos","gidnumber","givenname","homedirectory",
