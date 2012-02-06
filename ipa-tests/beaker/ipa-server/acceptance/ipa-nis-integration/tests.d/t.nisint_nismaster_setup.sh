@@ -182,7 +182,6 @@ nisint_nismaster_setup_nfs_exports()
 	
 		rlRun "setsebool -P nfs_export_all_rw 1" 0 "set nfs_export_all_rw Boolean for SELinux"
 		rlRun "setsebool -P nfs_export_all_ro 1" 0 "set nfs_export_all_ro Boolean for SELinux"
-		rlRun "service rpcbind restart" 0 "restart rpcbind (new portmap) service"
 		rlRun "service nfs restart" 0 "restart nfs services"
 		rlRun "service nfslock restart" 0 "restart nfslock service"
 		rlRun "exportfs -av" 0 "Export /nisint dirs for NIS Integration testing"
@@ -230,7 +229,7 @@ nisint_nismaster_setup_hosts()
 		192.168.4.4	goodhost4
 		EOF
 		rlRun "make -C /var/yp" 0 "Update NIS hosts map"
-		rlRun "ypcat -d $NISDOMAIN -h $NISMASTER group|grep goodhost" 0 "Check that new hosts are in the map"
+		rlRun "ypcat -d $NISDOMAIN -h $NISMASTER hosts|grep goodhost" 0 "Check that new hosts are in the map"
 		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd
 }
