@@ -214,7 +214,7 @@ rm -rf $expfile $expout
 
 echo 'set timeout 30
 set send_slow {1 .1}' > $expfile
-echo "spawn ssh -l root $MASTER" >> $expfile
+echo "spawn ssh -l root $MASTERIP" >> $expfile
 echo 'match_max 100000' >> $expfile
 echo 'sleep 2' >> $expfile
 echo 'expect "#: "' >> $expfile
