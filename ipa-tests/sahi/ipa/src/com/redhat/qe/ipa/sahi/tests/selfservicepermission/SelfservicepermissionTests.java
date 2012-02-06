@@ -150,16 +150,57 @@ public class SelfservicepermissionTests extends SahiTestScript{
 	}
 
 	/////////// modify permission /////////////////////////
-	@Test (groups={"modifyPermission"}, dataProvider="modifyPermission", dependsOnGroups="addPermission",
-		description="modify self service permission")
-	public void modifyPermission(String testDescription, String textboxName, String invalidData, String expectedErrorMsg) throws Exception {
-		 
+	@Test (groups={"modifyPermission"}, dataProvider="modifyPermission_AddSingleAttributes", dependsOnGroups="addPermission",
+		description="modify self service permission: add single attributes ")
+	public void modifyPermission_addSingleAttritube(String permissionName, String attribute) throws Exception {
+	// add attribute: single and multiple
+	// delete attributes: single and multiple
 	}
+
+	@Test (groups={"modifyPermission"}, dataProvider="modifyPermission_AddMultipleAttributes", dependsOnGroups="addPermission",
+		description="modify self service permission: add single attributes ")
+	public void modifyPermission_addMultipleAttritubes(String permissionName, String attribute) throws Exception {
+	// add attribute: single and multiple
+	// delete attributes: single and multiple
+	}
+
+	@Test (groups={"modifyPermission"}, dataProvider="modifyPermission_deleteSingleAttributes", dependsOnGroups="addPermission",
+		description="modify self service permission: add single attributes ")
+	public void modifyPermission_deleteSingleAttritube(String permissionName, String attribute) throws Exception {
+	// add attribute: single and multiple
+	// delete attributes: single and multiple
+	}
+
+	@Test (groups={"modifyPermission"}, dataProvider="modifyPermission_deleteMultipleAttributes", dependsOnGroups="addPermission",
+		description="modify self service permission: add single attributes ")
+	public void modifyPermission_deleteMultipleAttritube(String permissionName, String attributes) throws Exception {
+	// add attribute: single and multiple
+	// delete attributes: single and multiple
+	}
+
+	@Test (groups={"modifyPermission"}, dataProvider="modifyPermission_undo", dependsOnGroups="addPermission",
+		description="modify self service permission: add single attributes ")
+	public void modifyPermission_undo(String permissionName, String attribute) throws Exception {
+	//  test cases for : undo, reset, update
+	}
+
+	@Test (groups={"modifyPermission"}, dataProvider="modifyPermission_reset", dependsOnGroups="addPermission",
+		description="modify self service permission: add single attributes ")
+	public void modifyPermission_reset(String permissionName, String attribute) throws Exception {
+	//  test cases for : undo, reset, update
+	}
+
+	@Test (groups={"modifyPermission"}, dataProvider="modifyPermission_update", dependsOnGroups="addPermission",
+		description="modify self service permission: add single attributes ")
+	public void modifyPermission_update(String permissionName, String attribute) throws Exception {
+	//  test cases for : undo, reset, update
+	}
+
 
 	@Test (groups={"modifyPermission_negative"}, dataProvider="undecided", dependsOnGroups="addPermission",
 		description="negative test case for self service permission modification")
 	public void modifyPermission_negative(String testDescription, String textboxName, String invalidData, String expectedErrorMsg) throws Exception {
-		 
+		 // remove all attributes from permission
 	}
 	/////////// delete permission /////////////////////////
 	@Test (groups={"deletePermission"}, dataProvider="deletePermissionSingle", dependsOnGroups="addPermission",
@@ -217,28 +258,30 @@ public class SelfservicepermissionTests extends SahiTestScript{
 	private static String singlePermission = CommonHelper.getSingle(random, defaults);
 	private static String multiplePermissions = CommonHelper.getMultiple(random,  pick, defaults);
 	private static String allPermissions = CommonHelper.getAll(defaults);
+	private static String[] testPermissions = {"permission000", "permission001", "permission002", "permission003", "permission004",
+													"permission005", "permission006", "permission007", "permission008", "permission009"};
 	
 	@DataProvider(name="addPermission")
 	public Object[][] getAddPermission()
 	{
 		String[][] permissions = 
-						{{"scenario: single attribute","singleAttribute", singlePermission},
-						{"scenario: multiple attributes","multipleAttribute", multiplePermissions},
-						{"scenario: all attributes","allAttritubes", allPermissions}};
+						{{"scenario: single attribute", testPermissions[0], singlePermission},
+						{"scenario: multiple attributes", testPermissions[1], multiplePermissions},
+						{"scenario: all attributes", testPermissions[2], allPermissions}};
 		return permissions;
 	}
 
 	@DataProvider(name="addPermission_addandaddanother")
 	public Object[][] getAddPermission_addandaddanother()
 	{
-		String[][] permissions = {{"addAnother001,addAnother002,addAnother003","postofficebox,seealso,photo"}};
+		String[][] permissions = {{testPermissions[3] + "," + testPermissions[4] + "," + testPermissions[5] ,multiplePermissions}};
 		return permissions;
 	}
 
 	@DataProvider(name="addPermission_addthenedit")
 	public Object[][] getAddPermission_addthenedit()
 	{
-		String[][] permissions = {{"addThanEdit",multiplePermissions}};
+		String[][] permissions = {{testPermissions[6] ,multiplePermissions}};
 		return permissions;
 	}
 
@@ -264,7 +307,7 @@ public class SelfservicepermissionTests extends SahiTestScript{
 	@DataProvider(name="leftOverPermissions")
 	public Object[][] getLeftOverPermissions()
 	{
-		String[][] permissions = {{"addThanEdit"}};
+		String[][] permissions = {{testPermissions[6]}};
 		return permissions;
 	}
 }//class SelfservicepermissionTests
