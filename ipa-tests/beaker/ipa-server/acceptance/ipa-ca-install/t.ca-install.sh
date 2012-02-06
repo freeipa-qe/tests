@@ -180,12 +180,14 @@ echo 'expect eof ' >> $expfile
         rlRun "cat $expout"
 
 
+        rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
+	rlRun "ipa dnsrecord-del $FORWARD_ZONE `hostname -s` --a-rec=$SLAVEIP"
 	rlRun "nslookup $MASTER"
 	rlRun "nslookup $SLAVE"
-	rlLog "Executing: ipa-ca-install -p $ADMINPW -w $ADMINPW --skip-conncheck --unattended --no-host-dns /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg"
+	rlLog "Executing: ipa-ca-install -d -p $ADMINPW -w $ADMINPW --skip-conncheck --unattended --no-host-dns /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg"
 
 	rlLog "Verifying bug https://bugzilla.redhat.com/show_bug.cgi?id=757681"
-	echo "ipa-ca-install -p $ADMINPW -w $ADMINPW --skip-conncheck --unattended --no-host-dns /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg" > /dev/shm/replica-ca-install.bash
+	echo "ipa-ca-install -d -p $ADMINPW -w $ADMINPW --skip-conncheck --unattended --no-host-dns /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg" > /dev/shm/replica-ca-install.bash
         chmod 755 /dev/shm/replica-ca-install.bash
         rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
         rlRun "/bin/bash /dev/shm/replica-ca-install.bash" 0 "CA Replica installation with --no-host-dns"
