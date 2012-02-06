@@ -114,7 +114,7 @@ nisint_nismaster_setup_netgroups()
 		$GOODSERVERNG
 		EOF
 		
-		rlRun "make -C /var/yp netgrp" 0 "updating NIS netgroup map"
+		rlRun "make -C /var/yp" 0 "updating NIS netgroup map"
 		rlRun "ypcat -d $NISDOMAIN -h $NISMASTER netgroup|grep nisint_" 0 "Check that new netgroups are in the map"
 		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd
@@ -134,7 +134,7 @@ nisint_nismaster_setup_services()
 		nisint_web	490080/udp
 		EOF
 	
-		rlRun "make -C /var/yp services" 0 "updating NIS services map"
+		rlRun "make -C /var/yp" 0 "updating NIS services map"
 		rlRun "ypcat -d $NISDOMAIN -h $NISMASTER services|grep nisint_" 0 "Check that new services are in the map"
 		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd
@@ -163,7 +163,7 @@ nisint_nismaster_setup_automountmaps()
 		echo -e "\t\t-i \$(AUTO_NISINT) -o \$(YPMAPDIR)/\$@ - \$@" >> /var/yp/Makefile
 		echo -e "\t-@\$(NOPUSH) || \$(YPPUSH) -d \$(DOMAIN) \$@"  >> /var/yp/Makefile
 
-		rlRun "make -C /var/yp auto.master auto.nisint" 0 "updating NIS services map"
+		rlRun "make -C /var/yp" 0 "updating NIS services map"
 		rlRun "ypcat -d $NISDOMAIN -h $NISMASTER services|grep nisint_" 0 "Check that new services are in the map"
 		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd
@@ -199,7 +199,7 @@ nisint_nismaster_setup_users()
 		useradd --password aiqlepdb gooduser2
 		useradd --password aiqlepdb gooduser3
 		useradd --password aiqlepdb gooduser4
-		rlRun "make -C /var/yp passwd shadow" 0 "Update NIS passwd/shadow maps"
+		rlRun "make -C /var/yp" 0 "Update NIS passwd/shadow maps"
 		rlRun "ypcat -d $NISDOMAIN -h $NISMASTER passwd|grep gooduser" 0 "Check that new users are in the map"
 		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd
@@ -213,7 +213,7 @@ nisint_nismaster_setup_groups()
 		groupadd goodgroup2
 		groupadd goodgroup3
 		groupadd goodgroup4
-		rlRun "make -C /var/yp group" 0 "Update NIS group map"
+		rlRun "make -C /var/yp" 0 "Update NIS group map"
 		rlRun "ypcat -d $NISDOMAIN -h $NISMASTER group|grep goodgroup" 0 "Check that new groups are in the map"
 		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd
@@ -229,7 +229,7 @@ nisint_nismaster_setup_hosts()
 		192.168.4.3	goodhost3
 		192.168.4.4	goodhost4
 		EOF
-		rlRun "make -C /var/yp hosts" 0 "Update NIS hosts map"
+		rlRun "make -C /var/yp" 0 "Update NIS hosts map"
 		rlRun "ypcat -d $NISDOMAIN -h $NISMASTER group|grep goodhost" 0 "Check that new hosts are in the map"
 		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd

@@ -39,6 +39,8 @@
 . /dev/shm/ipa-server-shared.sh
 . /dev/shm/env.sh
 
+. /dev/shm/nis.sh
+
 # Include test case files
 for file in $(ls tests.d/t.*.sh); do
 	. ./$file
