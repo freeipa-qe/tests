@@ -151,6 +151,30 @@ installCA()
 	rlRun "mv /etc/hosts /var/tmp/"
 	echo "127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4" > /etc/hosts
 
+        FORWARD_ZONE=`ipa dnszone-find | grep -i "zone name" | grep com | cut -d : -f 2`
+	export $FORWARD_ZONE
+
+
+expfile=/tmp/remote_exec.exp
+expout=/tmp/remote_exec.out
+
+rm -rf $expfile $expout
+
+echo 'set timeout 30
+set send_slow {1 .1}' > $expfile
+echo "spawn ssh -l root $MASTER" >> $expfile
+echo 'match_max 100000' >> $expfile
+echo 'sleep 2' >> $expfile
+echo 'expect "#: "' >> $expfile
+echo "send \"ipa dnsrecord-del $FORWARD_ZONE `hostname -s` --a-rec=$SLAVEIP\"" >> $expfile
+echo 'send "\r"' >> $expfile
+echo 'expect eof ' >> $expfile
+
+        rlRun "/usr/bin/expect $expfile >> $expout 2>&1"
+        rlRun "cat $expfile"
+        rlRun "cat $expout"
+
+
 	rlRun "nslookup $MASTER"
 	rlRun "nslookup $SLAVE"
 	rlLog "Executing: ipa-ca-install -p $ADMINPW -w $ADMINPW --skip-conncheck --unattended --no-host-dns /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg"
