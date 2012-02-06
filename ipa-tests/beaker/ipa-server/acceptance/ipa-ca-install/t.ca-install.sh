@@ -179,9 +179,10 @@ echo 'expect eof ' >> $expfile
         rlRun "cat $expfile"
         rlRun "cat $expout"
 
+	rlRun "cat /etc/resolv.conf"
+	echo "nameserver	$MASTERIP" > /etc/resolv.conf
+	rlRun "cat /etc/resolv.conf"
 
-        rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
-	rlRun "ipa dnsrecord-del $FORWARD_ZONE `hostname -s` --a-rec=$SLAVEIP"
 	rlRun "nslookup $MASTER"
 	rlRun "nslookup $SLAVE"
 	rlLog "Executing: ipa-ca-install -d -p $ADMINPW -w $ADMINPW --skip-conncheck --unattended --no-host-dns /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg"
