@@ -100,6 +100,8 @@ rlJournalStart
 	#nisint_automount_tests
 	#nisint_services_tests
 	#nisint_client_is_ipa_bz_tests
+
+	nisint_end
 		
 	rlPhaseStartCleanup "ipa-nis-integration cleanup"
 		rlRun "popd"
