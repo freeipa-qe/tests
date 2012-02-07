@@ -88,7 +88,7 @@ installMaster()
 	
 installSlave()
 {
-   rlPhaseStartSetup "Install IPA REPLICA Server"
+   rlPhaseStartTest "Install IPA REPLICA Server"
 	
 	yum install -y openssh-clients
 	yum install -y ipa-server bind-dyndb-ldap bind
@@ -146,7 +146,7 @@ installSlave()
 installCA()
 {
 
-   rlPhaseStartSetup "Installing CA Replica"
+   rlPhaseStartTest "Installing CA Replica"
 
 	rlRun "mv /etc/hosts /var/tmp/"
 	echo "127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4" > /etc/hosts
@@ -259,4 +259,5 @@ echo 'expect eof ' >> $expfile
 		rhts-submit-log -l /var/log/ipareplica-ca-install.log
 	fi
 
+rlPhaseEnd
 }
