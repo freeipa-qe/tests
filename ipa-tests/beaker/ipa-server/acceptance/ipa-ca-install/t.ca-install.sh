@@ -146,14 +146,17 @@ installSlave()
 installCA()
 {
 
-   rlPhaseStartTest "Installing CA Replica"
+   rlPhaseStartTest "Installing CA Replica with --no-host-dns option"
 
 	rlRun "mv /etc/hosts /var/tmp/"
 	echo "127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4" > /etc/hosts
 
         FORWARD_ZONE=`ipa dnszone-find | grep -i "zone name" | grep com | cut -d : -f 2`
+        REV_ZONE=`ipa dnszone-find | grep -i "zone name" | grep arpa | cut -d : -f 2`
+	PTR_NAME=`echo $SLAVEIP | cut -d . -f 4`
+	export $REV_ZONE
 	export $FORWARD_ZONE
-
+	export $PTR_NAME
 
 expfile=/tmp/remote_exec.exp
 expout=/tmp/remote_exec.out
@@ -197,17 +200,17 @@ echo 'expect eof ' >> $expfile
         rlRun "/bin/bash /dev/shm/replica-ca-install.bash" 0 "CA Replica installation with --no-host-dns"
 
         rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
-	FORWARD_ZONE=`ipa dnszone-find | grep -i "zone name" | grep com | cut -d : -f 2`
-        REV_ZONE=`ipa dnszone-find | grep -i "zone name" | grep arpa | cut -d : -f 2`
-	export $REV_ZONE
-	export $FORWARD_ZONE
 
-	PTR_NAME=`echo $SLAVEIP | cut -d . -f 4`
 
 	sleep 5
 	rlRun "service ipa status"
 	rlRun "ipa-server-install --uninstall -U"
 	sleep 5
+
+rlPhaseEnd
+
+
+rlPhaseStartTest "Installing CA Replica without --no-host-dns option"
 
 expfile=/tmp/remote_exec.exp
 expout=/tmp/remote_exec.out
