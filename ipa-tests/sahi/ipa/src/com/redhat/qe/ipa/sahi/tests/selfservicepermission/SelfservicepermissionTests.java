@@ -63,10 +63,10 @@ public class SelfservicepermissionTests extends SahiTestScript{
 		String[] names = permissionNames.split(",");
 		String[] attrs = attributes.split(",");
 		for (String name:names)
-			Assert.assertFalse(browser.link(name).exists(), "before add, permission (" + permissionName + ") should NOT exist in list");
+			Assert.assertFalse(browser.link(name).exists(), "before add, permission (" + name + ") should NOT exist in list");
 		SelfservicepermissionTasks.addSelfservicePermissionAddAndAddAnother(browser, names, attrs);  
 		for (String name:names)
-			Assert.assertTrue(browser.link(name).exists(), "after add, permission (" + permissionName + ") should exist in list");
+			Assert.assertTrue(browser.link(name).exists(), "after add, permission (" + name + ") should exist in list");
 	}
 	
 	@Test (groups={"addPermission"}, dataProvider="addPermission_addthenedit",
