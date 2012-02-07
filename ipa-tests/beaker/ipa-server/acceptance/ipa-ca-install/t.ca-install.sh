@@ -210,7 +210,7 @@ echo 'expect eof ' >> $expfile
 rlPhaseEnd
 
 
-rlPhaseStartTest "Installing CA Replica without --no-host-dns option"
+	rlPhaseStartTest "Installing CA Replica without --no-host-dns option"
 
 expfile=/tmp/remote_exec.exp
 expout=/tmp/remote_exec.out
