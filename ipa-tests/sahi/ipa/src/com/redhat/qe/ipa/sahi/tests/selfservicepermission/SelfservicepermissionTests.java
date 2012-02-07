@@ -152,30 +152,50 @@ public class SelfservicepermissionTests extends SahiTestScript{
 	/////////// modify permission /////////////////////////
 	@Test (groups={"modifyPermission"}, dataProvider="modifyPermission_AddSingleAttributes", dependsOnGroups="addPermission",
 		description="modify self service permission: add single attributes ")
-	public void modifyPermission_addSingleAttritube(String permissionName, String attribute) throws Exception {
-	// add attribute: single and multiple
-	// delete attributes: single and multiple
+	public void modifyPermission_addSingleAttritube(String permissionName, String attributeToAdd) throws Exception {
+		browser.navigateTo(commonTasks.selfservicepermissionPage); 
+		browser.link(permissionName).click();
+		browser.checkbox(attributeToAdd).check();
+		browser.span("Update").click();
+		browser.link("Self Service Permissions").in(browser.span("back-link")).click(); 
+		//FIXME: need a solution to verify test case result
 	}
 
 	@Test (groups={"modifyPermission"}, dataProvider="modifyPermission_AddMultipleAttributes", dependsOnGroups="addPermission",
 		description="modify self service permission: add single attributes ")
-	public void modifyPermission_addMultipleAttritubes(String permissionName, String attribute) throws Exception {
-	// add attribute: single and multiple
-	// delete attributes: single and multiple
+	public void modifyPermission_addMultipleAttritubes(String permissionName, String attributesToAdd) throws Exception {
+		browser.navigateTo(commonTasks.selfservicepermissionPage); 
+		browser.link(permissionName).click();
+		String[] attributes = attributesToAdd.split(",");
+		for (String attr:attributes)
+			browser.checkbox(attr).check();
+		browser.span("Update").click();
+		browser.link("Self Service Permissions").in(browser.span("back-link")).click(); 
+		//FIXME: need a solution to verify test case result
 	}
 
 	@Test (groups={"modifyPermission"}, dataProvider="modifyPermission_deleteSingleAttributes", dependsOnGroups="addPermission",
 		description="modify self service permission: add single attributes ")
-	public void modifyPermission_deleteSingleAttritube(String permissionName, String attribute) throws Exception {
-	// add attribute: single and multiple
-	// delete attributes: single and multiple
+	public void modifyPermission_deleteSingleAttritube(String permissionName, String attributeToDelete) throws Exception {
+		browser.navigateTo(commonTasks.selfservicepermissionPage); 
+		browser.link(permissionName).click();
+		browser.checkbox(attributeToDelete).uncheck();
+		browser.span("Update").click();
+		browser.link("Self Service Permissions").in(browser.span("back-link")).click(); 
+		//FIXME: need a solution to verify test case result
 	}
 
 	@Test (groups={"modifyPermission"}, dataProvider="modifyPermission_deleteMultipleAttributes", dependsOnGroups="addPermission",
 		description="modify self service permission: add single attributes ")
-	public void modifyPermission_deleteMultipleAttritube(String permissionName, String attributes) throws Exception {
-	// add attribute: single and multiple
-	// delete attributes: single and multiple
+	public void modifyPermission_deleteMultipleAttritube(String permissionName, String attributesToDelete) throws Exception {
+		browser.navigateTo(commonTasks.selfservicepermissionPage); 
+		browser.link(permissionName).click();
+		String[] attributes = attributesToDelete.split(",");
+		for (String attr:attributes)
+			browser.checkbox(attr).uncheck();
+		browser.span("Update").click();
+		browser.link("Self Service Permissions").in(browser.span("back-link")).click(); 
+		//FIXME: need a solution to verify test case result
 	}
 
 	@Test (groups={"modifyPermission"}, dataProvider="modifyPermission_undo", dependsOnGroups="addPermission",
@@ -203,7 +223,7 @@ public class SelfservicepermissionTests extends SahiTestScript{
 		 // remove all attributes from permission
 	}
 	/////////// delete permission /////////////////////////
-	@Test (groups={"deletePermission"}, dataProvider="deletePermissionSingle", dependsOnGroups="addPermission",
+	@Test (groups={"deletePermission"}, dataProvider="deletePermissionSingle", dependsOnGroups="modifyPermission",
 		description="delete self service permission")
 	public void deletePermissionSingle(String scenario, String permissionName, String attributes) throws Exception {
 		browser.navigateTo(commonTasks.selfservicepermissionPage);
@@ -212,7 +232,7 @@ public class SelfservicepermissionTests extends SahiTestScript{
 		Assert.assertFalse(browser.link(permissionName).exists(), "after delete, permission should disappear");
 	}
 	
-	@Test (groups={"deletePermission"}, dataProvider="deletePermissionMultiple", dependsOnGroups="addPermission",
+	@Test (groups={"deletePermission"}, dataProvider="deletePermissionMultiple", dependsOnGroups="modifyPermission",
 		description="delete multiple self service permissions at once")
 	public void deletePermissionMultiple(String permissionNames, String attributes) throws Exception {
 		browser.navigateTo(commonTasks.selfservicepermissionPage);
@@ -224,7 +244,7 @@ public class SelfservicepermissionTests extends SahiTestScript{
 			Assert.assertFalse(browser.link(name).exists(), "after delete, permission should disappear");
 	}
 	
-	@Test (groups={"deletePermission"}, dataProvider="leftOverPermissions", dependsOnGroups="addPermission",
+	@Test (groups={"deletePermission"}, dataProvider="leftOverPermissions", dependsOnGroups="modifyPermission",
 			description="delete self service permission")
 		public void deleteLeftOverPermission(String scenario, String permissionName) throws Exception {
 			browser.navigateTo(commonTasks.selfservicepermissionPage);
@@ -289,6 +309,34 @@ public class SelfservicepermissionTests extends SahiTestScript{
 	public Object[][] getAddPermission_addthencancel()
 	{
 		String[][] permissions = {{"addThanCancel",multiplePermissions}};
+		return permissions;
+	}
+
+	@DataProvider(name="modifyPermission_AddSingleAttributes")
+	public Object[][] getAddPermission_AddSingleAttributes()
+	{
+		String[][] permissions = {{testPermissions[1],singlePermission}};
+		return permissions;
+	}
+
+	@DataProvider(name="modifyPermission_AddMultipleAttributes")
+	public Object[][] getAddPermission_AddMultipleAttributes()
+	{
+		String[][] permissions = {{testPermissions[0],multiplePermissions}};
+		return permissions;
+	}
+
+	@DataProvider(name="modifyPermission_deleteSingleAttributes")
+	public Object[][] getAddPermission_deleteSingleAttributes()
+	{
+		String[][] permissions = {{testPermissions[1],singlePermission}};
+		return permissions;
+	}
+
+	@DataProvider(name="modifyPermission_deleteMultipleAttributes")
+	public Object[][] getAddPermission_deleteMultipleAttributes()
+	{
+		String[][] permissions = {{testPermissions[0],multiplePermissions}};
 		return permissions;
 	}
 

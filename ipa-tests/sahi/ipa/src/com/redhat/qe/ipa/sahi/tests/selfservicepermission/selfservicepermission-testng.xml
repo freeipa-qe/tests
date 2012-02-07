@@ -7,13 +7,11 @@
             	<groups>
             	    <run>
             	        <include name="setup" />
-            	        <include name="init" />   
-            	        <include name="addPermission_negative" />
-            	        <!--
+            	        <include name="init" />    
             	        <include name="addPermission" />
+            	         <include name="addPermission_negative" />
             	        <include name="modifyPermission" /> 
-            	         <include name="deletePermission" />
-            	          -->
+            	         <include name="deletePermission" /> 
             	    </run>
             	</groups>
             	<classes>
