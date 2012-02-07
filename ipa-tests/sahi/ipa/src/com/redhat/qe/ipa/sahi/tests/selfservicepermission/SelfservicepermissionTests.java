@@ -4,8 +4,7 @@ import java.util.*;
 import java.util.logging.Logger;
 import org.testng.annotations.*;
 
-import com.redhat.qe.auto.testng.Assert;
-import com.redhat.qe.auto.testng.TestNGUtils;
+import com.redhat.qe.auto.testng.Assert; 
 import com.redhat.qe.ipa.sahi.base.SahiTestScript;
 import com.redhat.qe.ipa.sahi.tasks.CommonHelper;
 import com.redhat.qe.ipa.sahi.tasks.CommonTasks;
@@ -51,53 +50,48 @@ public class SelfservicepermissionTests extends SahiTestScript{
 	/////////// add permission /////////////////////////
 	@Test (groups={"addPermission"}, dataProvider="addPermission",
 		description = "add new self service permission via 'Add' button")
-	public void addPermission_add(String scenario, String permissionName, String attributes) throws Exception {
-		browser.navigateTo(commonTasks.selfservicepermissionPage); 
+	public void addPermission_add(String scenario, String permissionName, String attributes) throws Exception { 
 		String[] attrs = attributes.split(",");
-		Assert.assertFalse(browser.link(permissionName).exists(), "before add, permission should NOT exist in list");
+		Assert.assertFalse(browser.link(permissionName).exists(), "before add, permission (" + permissionName + ")should NOT exist in list");
 		SelfservicepermissionTasks.addSelfservicePermission(browser, permissionName, attrs);  
-		Assert.assertTrue(browser.link(permissionName).exists(), "after add, permission should exist in list");
+		Assert.assertTrue(browser.link(permissionName).exists(), "after add, permission (" + permissionName + ") should exist in list");
 	}
 
 	@Test (groups={"addPermission"}, dataProvider="addPermission_addandaddanother",
 		description = "add new self service permission via 'Add and Add Another' button, expect user can stay at same dialogue to continue add new permission")
-	public void addPermission_addandaddanother(String permissionNames, String attributes) throws Exception {
-		browser.navigateTo(commonTasks.selfservicepermissionPage); 
+	public void addPermission_addandaddanother(String permissionNames, String attributes) throws Exception { 
 		String[] names = permissionNames.split(",");
 		String[] attrs = attributes.split(",");
 		for (String name:names)
-			Assert.assertFalse(browser.link(name).exists(), "before add, permission should NOT exist in list");
+			Assert.assertFalse(browser.link(name).exists(), "before add, permission (" + permissionName + ") should NOT exist in list");
 		SelfservicepermissionTasks.addSelfservicePermissionAddAndAddAnother(browser, names, attrs);  
 		for (String name:names)
-			Assert.assertTrue(browser.link(name).exists(), "after add, permission should exist in list");
+			Assert.assertTrue(browser.link(name).exists(), "after add, permission (" + permissionName + ") should exist in list");
 	}
 	
 	@Test (groups={"addPermission"}, dataProvider="addPermission_addthenedit",
 		description = "add new self service permission via 'Add and Edit' button, expect to get into editting mode after add")
-	public void addPermission_addthenedit(String permissionName, String attributes) throws Exception {
-		browser.navigateTo(commonTasks.selfservicepermissionPage); 
+	public void addPermission_addthenedit(String permissionName, String attributes) throws Exception { 
 		String[] attrs = attributes.split(",");
-		Assert.assertFalse(browser.link(permissionName).exists(), "before add, permission should NOT exist in list");
+		Assert.assertFalse(browser.link(permissionName).exists(), "before add, permission (" + permissionName + ") should NOT exist in list");
 		SelfservicepermissionTasks.addSelfservicePermissionAddThenEdit(browser, permissionName, attrs); 
 		for (String attr:attrs)
-			Assert.assertTrue(browser.checkbox(attr).checked(), "in editing mode, attr should exist and also being already checked");
+			Assert.assertTrue(browser.checkbox(attr).checked(), "in editing mode, attr (" + attr + ") should exist and also being already checked");
 		browser.link("Self Service Permissions").in(browser.span("back-link")).click(); 
 	}
 	
 	@Test (groups={"addPermission"}, dataProvider="addPermission_addthencancel",
 		description = "add new self service permission then click 'Cancel' button, expect no new permission being created")
-	public void addPermission_addthencancel(String permissionName, String attributes) throws Exception {
-		browser.navigateTo(commonTasks.selfservicepermissionPage); 
+	public void addPermission_addthencancel(String permissionName, String attributes) throws Exception { 
 		String[] attrs = attributes.split(",");
-		Assert.assertFalse(browser.link(permissionName).exists(), "before add, permission should NOT exist in list");
+		Assert.assertFalse(browser.link(permissionName).exists(), "before add, permission (" + permissionName + ")  should NOT exist in list");
 		SelfservicepermissionTasks.addSelfservicePermissionAddThenCancel(browser, permissionName, attrs);  
-		Assert.assertFalse(browser.link(permissionName).exists(), "after add, permission should NOT exist in list as well");
+		Assert.assertFalse(browser.link(permissionName).exists(), "after add, permission (" + permissionName + ")  should NOT exist in list as well");
 	}
 
 	@Test (groups={"addPermission_negative"},
 		description = "create duplicate self service permission" )
-	public void addPermisiono_negative_duplicatePermissiion() throws Exception{
-		browser.navigateTo(commonTasks.selfservicepermissionPage);  
+	public void addPermisiono_negative_duplicatePermissiion() throws Exception{ 
 		for (String name:existingPermissions)
 		{
 			browser.span("Add").click();
@@ -117,8 +111,7 @@ public class SelfservicepermissionTests extends SahiTestScript{
 	
 	@Test (groups={"addPermission_negative"},
 		description = "negative test for add self service permission: test for required fileds: name and attribute")
-	public void addPermission_negative_requiredFields() throws Exception {
-		browser.navigateTo(commonTasks.selfservicepermissionPage);  
+	public void addPermission_negative_requiredFields() throws Exception { 
 		browser.span("Add").click();
 		
 		// Test case 1: without give any input, click 'Add' , try to create an empty permission
@@ -152,8 +145,7 @@ public class SelfservicepermissionTests extends SahiTestScript{
 	/////////// modify permission /////////////////////////
 	@Test (groups={"modifyPermission"}, dataProvider="modifyPermission_AddSingleAttributes", dependsOnGroups="addPermission",
 		description="modify self service permission: add single attributes ")
-	public void modifyPermission_addSingleAttritube(String permissionName, String attributeToAdd) throws Exception {
-		browser.navigateTo(commonTasks.selfservicepermissionPage); 
+	public void modifyPermission_addSingleAttritube(String permissionName, String attributeToAdd) throws Exception { 
 		browser.link(permissionName).click();
 		browser.checkbox(attributeToAdd).check();
 		browser.span("Update").click();
@@ -163,8 +155,7 @@ public class SelfservicepermissionTests extends SahiTestScript{
 
 	@Test (groups={"modifyPermission"}, dataProvider="modifyPermission_AddMultipleAttributes", dependsOnGroups="addPermission",
 		description="modify self service permission: add single attributes ")
-	public void modifyPermission_addMultipleAttritubes(String permissionName, String attributesToAdd) throws Exception {
-		browser.navigateTo(commonTasks.selfservicepermissionPage); 
+	public void modifyPermission_addMultipleAttritubes(String permissionName, String attributesToAdd) throws Exception { 
 		browser.link(permissionName).click();
 		String[] attributes = attributesToAdd.split(",");
 		for (String attr:attributes)
@@ -176,8 +167,7 @@ public class SelfservicepermissionTests extends SahiTestScript{
 
 	@Test (groups={"modifyPermission"}, dataProvider="modifyPermission_deleteSingleAttributes", dependsOnGroups="addPermission",
 		description="modify self service permission: add single attributes ")
-	public void modifyPermission_deleteSingleAttritube(String permissionName, String attributeToDelete) throws Exception {
-		browser.navigateTo(commonTasks.selfservicepermissionPage); 
+	public void modifyPermission_deleteSingleAttritube(String permissionName, String attributeToDelete) throws Exception { 
 		browser.link(permissionName).click();
 		browser.checkbox(attributeToDelete).uncheck();
 		browser.span("Update").click();
@@ -187,8 +177,7 @@ public class SelfservicepermissionTests extends SahiTestScript{
 
 	@Test (groups={"modifyPermission"}, dataProvider="modifyPermission_deleteMultipleAttributes", dependsOnGroups="addPermission",
 		description="modify self service permission: add single attributes ")
-	public void modifyPermission_deleteMultipleAttritube(String permissionName, String attributesToDelete) throws Exception {
-		browser.navigateTo(commonTasks.selfservicepermissionPage); 
+	public void modifyPermission_deleteMultipleAttritube(String permissionName, String attributesToDelete) throws Exception { 
 		browser.link(permissionName).click();
 		String[] attributes = attributesToDelete.split(",");
 		for (String attr:attributes)
@@ -201,32 +190,93 @@ public class SelfservicepermissionTests extends SahiTestScript{
 	@Test (groups={"modifyPermission"}, dataProvider="modifyPermission_undo", dependsOnGroups="addPermission",
 		description="modify self service permission: add single attributes ")
 	public void modifyPermission_undo(String permissionName, String attribute) throws Exception {
-	//  test cases for : undo, reset, update
+		browser.link(permissionName).click();
+		browser.checkbox(attribute).uncheck();
+		if (browser.span("undo").exists())
+		{
+			log.info("after changes made into permission, link 'undo' appears, good, test continue");
+			browser.span("undo").click();
+			if (browser.checkbox(attribute).checked())
+			{
+				log.info("'undo' will make the same attribute checked, good, test continue");
+			}else{
+				log.info("click 'undo' does not make the same attribute checked, test failed");
+				Assert.assertTrue(false, "unexpected behave for 'undo': click 'undo' does not restore settings");
+			}
+		}else{
+			log.info("after changes made into permission, link 'undo' does NOT appear, test failed ");
+			Assert.assertTrue(false, "unexpected behave: link 'undo' does not show up as expected");
+		}
+		browser.span("Reset").click();
+		browser.link("Self Service Permissions").in(browser.span("back-link")).click(); 
 	}
 
 	@Test (groups={"modifyPermission"}, dataProvider="modifyPermission_reset", dependsOnGroups="addPermission",
 		description="modify self service permission: add single attributes ")
-	public void modifyPermission_reset(String permissionName, String attribute) throws Exception {
-	//  test cases for : undo, reset, update
+	public void modifyPermission_reset(String permissionName, String attributesToUncheck) throws Exception {
+		browser.link(permissionName).click();
+		String[] attributes = attributesToUncheck.split(",");
+		for (String attr:attributes)
+			browser.checkbox(attr).uncheck();
+		browser.span("Reset").click();
+		for (String attr:attributes)
+		{
+			if (browser.checkbox(attr).checked())
+			{
+				log.info("reset will make attribute change to checked status again, good, test continue");
+			}else{
+				log.info("click 'reset' does not make the attribute change to checked, test failed");
+				Assert.assertTrue(false, "unexpected behave for 'reset': click 'reset' does not restore settings");
+			}
+		}
+		browser.link("Self Service Permissions").in(browser.span("back-link")).click(); 
 	}
 
 	@Test (groups={"modifyPermission"}, dataProvider="modifyPermission_update", dependsOnGroups="addPermission",
 		description="modify self service permission: add single attributes ")
-	public void modifyPermission_update(String permissionName, String attribute) throws Exception {
-	//  test cases for : undo, reset, update
+	public void modifyPermission_update(String permissionName, String attributesToUncheck) throws Exception {
+		browser.link(permissionName).click();
+		String[] attributes = attributesToUncheck.split(",");
+		for (String attr:attributes)
+			browser.checkbox(attr).uncheck();
+		browser.span("Update").click();
+		for (String attr:attributes)
+		{
+			if (browser.checkbox(attr).checked())
+			{
+				log.info("click 'Update' does not make the attribute change to unchecked, test failed");
+				Assert.assertTrue(false, "unexpected behave for 'Update': click 'Update' does not restore settings");
+			}else{
+				log.info("Update will save the change to attributes , test success");
+			}
+		}
+		browser.link("Self Service Permissions").in(browser.span("back-link")).click(); 
 	}
 
-
-	@Test (groups={"modifyPermission_negative"}, dataProvider="undecided", dependsOnGroups="addPermission",
+	@Test (groups={"modifyPermission_negative"}, dataProvider="modifyPermission_negative", dependsOnGroups="addPermission",
 		description="negative test case for self service permission modification")
-	public void modifyPermission_negative(String testDescription, String textboxName, String invalidData, String expectedErrorMsg) throws Exception {
-		 // remove all attributes from permission
+	public void modifyPermission_negative(String permissionName, String attributesToUncheck) throws Exception {
+		browser.link(permissionName).click();
+		String[] attributes = attributesToUncheck.split(",");
+		for (String attr:attributes)
+			browser.checkbox(attr).uncheck();
+		browser.span("Update").click();
+		if(browser.div("Input form contains invalid or missing values.").exists())
+		{
+			log.info("remove all attributes from current self service permission is disallow, good, test success");
+			browser.button("OK").click();
+		}else{
+			log.info("remove all attributes from current self service permission does NOT trigger error dialog as expected, test failed");
+			Assert.assertTrue(false, "unexpected behave, no error dialog shows up. test failed");
+		}
+		browser.span("Reset").click();	
+		browser.link("Self Service Permissions").in(browser.span("back-link")).click(); 
 	}
+
 	/////////// delete permission /////////////////////////
 	@Test (groups={"deletePermission"}, dataProvider="deletePermissionSingle", dependsOnGroups="modifyPermission",
 		description="delete self service permission")
-	public void deletePermissionSingle(String scenario, String permissionName, String attributes) throws Exception {
-		browser.navigateTo(commonTasks.selfservicepermissionPage);
+	public void deletePermissionSingle(String scenario, String permissionName, String attributes) throws Exception { 
 		Assert.assertTrue(browser.link(permissionName).exists(), "before delete, permission should in the list");
 		SelfservicepermissionTasks.deletePermission(browser, permissionName);
 		Assert.assertFalse(browser.link(permissionName).exists(), "after delete, permission should disappear");
@@ -234,8 +284,7 @@ public class SelfservicepermissionTests extends SahiTestScript{
 	
 	@Test (groups={"deletePermission"}, dataProvider="deletePermissionMultiple", dependsOnGroups="modifyPermission",
 		description="delete multiple self service permissions at once")
-	public void deletePermissionMultiple(String permissionNames, String attributes) throws Exception {
-		browser.navigateTo(commonTasks.selfservicepermissionPage);
+	public void deletePermissionMultiple(String permissionNames, String attributes) throws Exception { 
 		String[] names = permissionNames.split(",");
 		for(String name:names)
 			Assert.assertTrue(browser.link(name).exists(), "before delete, permission should in the list"); 
@@ -246,8 +295,7 @@ public class SelfservicepermissionTests extends SahiTestScript{
 	
 	@Test (groups={"deletePermission"}, dataProvider="leftOverPermissions", dependsOnGroups="modifyPermission",
 			description="delete self service permission")
-		public void deleteLeftOverPermission(String scenario, String permissionName) throws Exception {
-			browser.navigateTo(commonTasks.selfservicepermissionPage);
+		public void deleteLeftOverPermission(String permissionName) throws Exception { 
 			Assert.assertTrue(browser.link(permissionName).exists(), "before delete, permission should in the list");
 			SelfservicepermissionTasks.deletePermission(browser, permissionName);
 			Assert.assertFalse(browser.link(permissionName).exists(), "after delete, permission should disappear");
@@ -256,7 +304,7 @@ public class SelfservicepermissionTests extends SahiTestScript{
 	/***************************************************************************** 
 	 *             Data providers                                                * 
 	 *****************************************************************************/
-	private static String[] existingPermissions = { "User Self service", "Self can write own password"};
+	private static String[] existingPermissions = {"User Self service", "Self can write own password"};
 	
 	private static String[] defaults = {"audio","businesscategory","carlicense","cn","departmentnumber",
 											"description","destinationindicator","displayname","employeenumber",
@@ -278,8 +326,7 @@ public class SelfservicepermissionTests extends SahiTestScript{
 	private static String singlePermission = CommonHelper.getSingle(random, defaults);
 	private static String multiplePermissions = CommonHelper.getMultiple(random,  pick, defaults);
 	private static String allPermissions = CommonHelper.getAll(defaults);
-	private static String[] testPermissions = {"permission000", "permission001", "permission002", "permission003", "permission004",
-													"permission005", "permission006", "permission007", "permission008", "permission009"};
+	private static String[] testPermissions = {"permission000","permission001","permission002","permission003","permission004","permission005","permission006"};
 	
 	@DataProvider(name="addPermission")
 	public Object[][] getAddPermission()
@@ -337,6 +384,34 @@ public class SelfservicepermissionTests extends SahiTestScript{
 	public Object[][] getAddPermission_deleteMultipleAttributes()
 	{
 		String[][] permissions = {{testPermissions[0],multiplePermissions}};
+		return permissions;
+	}
+
+	@DataProvider(name="modifyPermission_undo")
+	public Object[][] getAddPermission_undo()
+	{
+		String[][] permissions = {{testPermissions[0],singlePermission}};
+		return permissions;
+	}
+
+	@DataProvider(name="modifyPermission_reset")
+	public Object[][] getAddPermission_reset()
+	{
+		String[][] permissions = {{testPermissions[1],multiplePermissions}};
+		return permissions;
+	}
+
+	@DataProvider(name="modifyPermission_update")
+	public Object[][] getAddPermission_update()
+	{
+		String[][] permissions = {{testPermissions[2],multiplePermissions}};
+		return permissions;
+	}
+
+	@DataProvider(name="modifyPermission_negative")
+	public Object[][] getAddPermission_negative()
+	{
+		String[][] permissions = {{testPermissions[1],multiplePermissions}};
 		return permissions;
 	}
 

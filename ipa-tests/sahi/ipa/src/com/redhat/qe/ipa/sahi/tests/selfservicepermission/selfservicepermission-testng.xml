@@ -11,6 +11,7 @@
             	        <include name="addPermission" />
             	         <include name="addPermission_negative" />
             	        <include name="modifyPermission" /> 
+            	        <include name="modifyPermission_negative" />
             	         <include name="deletePermission" /> 
             	    </run>
             	</groups>
