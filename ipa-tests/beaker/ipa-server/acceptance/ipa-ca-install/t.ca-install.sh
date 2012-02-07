@@ -197,8 +197,10 @@ echo 'expect eof ' >> $expfile
         rlRun "/bin/bash /dev/shm/replica-ca-install.bash" 0 "CA Replica installation with --no-host-dns"
 
         rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
+	FORWARD_ZONE=`ipa dnszone-find | grep -i "zone name" | grep com | cut -d : -f 2`
         REV_ZONE=`ipa dnszone-find | grep -i "zone name" | grep arpa | cut -d : -f 2`
 	export $REV_ZONE
+	export $FORWARD_ZONE
 
 	PTR_NAME=`echo $SLAVEIP | cut -d . -f 4`
 
@@ -223,6 +225,9 @@ echo 'send "\r"' >> $expfile
 echo 'sleep 3' >> $expfile
 echo 'expect "*: "' >> $expfile
 echo "send \"$ADMINPW\"" >> $expfile
+echo 'send "\r"' >> $expfile
+echo 'expect "#: "' >> $expfile
+echo "send \"ipa dnsrecord-add $FORWARD_ZONE `hostname -s` --a-record=$SLAVEIP\"" >> $expfile
 echo 'send "\r"' >> $expfile
 echo 'expect "#: "' >> $expfile
 echo "send \"ipa dnsrecord-add $REV_ZONE $PTR_NAME --ptr-hostname=$SLAVE\"" >> $expfile
