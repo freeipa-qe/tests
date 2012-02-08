@@ -139,9 +139,19 @@ rlJournalStart
         rc=0
         echo $SLAVE | grep $HOSTNAME
         if [ $? -eq 0 ] ; then
-                yum clean all
 
-                if [ $rc -eq 0 ] ; then
+        rlPhaseStartSetup "ipa slave install: ipa-server slave installation"
+
+                rlRun "service iptables stop" 0 "Stop the firewall on the MASTER"
+                rlRun "service ip6tables stop" 0 "Stop the ipv6 firewall on the MASTER"
+                rlRun "cat /dev/shm/env.sh"
+                rlRun "TmpDir=\`mktemp -d\`" 0 "Creating tmp directory"
+                rlRun "pushd $TmpDir"
+
+        rlPhaseEnd
+
+        rlPhaseStartTest "SLAVE tests start"
+
                         rhts-sync-block -s READY $BEAKERMASTER
                         installSlave
 			installCA
@@ -150,7 +160,13 @@ rlJournalStart
                         SetUpAuthKeys
                         rlLog "Setting up known hosts file"
                         SetUpKnownHosts
-                fi
+	rlPhaseEnd
+
+        rlPhaseStartCleanup "ipa-ca-install: ipa-server clean up."
+                # dummy section
+                rlLog "dummy section"
+        rlPhaseEnd
+
         else
                 rlLog "Machine in recipe in not a SLAVE"
 	fi

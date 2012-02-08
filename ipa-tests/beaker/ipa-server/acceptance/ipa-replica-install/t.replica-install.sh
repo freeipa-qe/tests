@@ -231,15 +231,18 @@ installSlave()
 {
    rlPhaseStartSetup "Install IPA REPLICA Server"
 	
-	yum install -y openssh-clients
-	yum install -y ipa-server bind-dyndb-ldap bind
+	rlRun "yum install -y openssh-clients"
+	rlRun "yum install -y ipa-server bind-dyndb-ldap bind"
         
 	rlRun "/etc/init.d/ntpd stop" 0 "Stopping the ntp server"
+
         # stop the firewall
         service iptables stop
         service ip6tables stop
+
         rlRun "ntpdate $NTPSERVER" 0 "Synchronzing clock with valid time server"
         rlRun "AddToKnownHosts $MASTER" 0 "Adding master to known hosts"
+
         cd /dev/shm/
         hostname_s=$(hostname -s)
         rlRun "sftp root@$MASTER:/var/lib/ipa/replica-info-$hostname_s.$DOMAIN.gpg" 0 "Get replica package"
@@ -279,7 +282,7 @@ installSlave()
 installCA()
 {
 
-   rlPhaseStartSetup "Installing CA Replica"
+   rlPhaseStartTest "Installing CA Replica"
 
 	rlLog "Executing: ipa-ca-install -p $ADMINPW -w $ADMINPW --skip-conncheck --unattended /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg"
 	echo "ipa-ca-install -p $ADMINPW -w $ADMINPW --skip-conncheck --unattended /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg" > /dev/shm/replica-ca-install.bash
@@ -290,5 +293,5 @@ installCA()
 	if [ -f /var/log/ipareplica-ca-install.log ]; then
 		rhts-submit-log -l /var/log/ipareplica-ca-install.log
 	fi
-
+   rlPhaseEnd
 }
