@@ -50,8 +50,8 @@ PACKAGELIST="ipa-admintools ipa-client httpd mod_nss mod_auth_kerb 389-ds-base e
 #########################################
 rlJournalStart
 
-	ipa-managedbyfunctionaltestssetup
-	ipa-managedbyfunctionaltests
+	ipa-managedentryfunctionaltestssetup
+	ipa-managedentryfunctionaltests
     
 	rlJournalPrintText
 	report=/tmp/rhts.report.$RANDOM.txt
