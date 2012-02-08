@@ -1,6 +1,6 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-#   Makefile of /CoreOS/ipa-server/acceptance/managedby
+#   Makefile of /CoreOS/ipa-server/acceptance/managed-entry
 #   
 #   Description: IPA managed by tests
 #   Author: Michael Gregg <mgregg@redhat.com>
@@ -25,12 +25,12 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-export TEST=/CoreOS/ipa-server/acceptance/ipa-functional-services
+export TEST=/CoreOS/ipa-server/acceptance/managed-entry
 export TESTVERSION=1.0
 
 BUILT_FILES=
 
-FILES=$(METADATA) runtest.sh Makefile PURPOSE t.ipamanagedbyfunctionaltests.sh
+FILES=$(METADATA) runtest.sh Makefile PURPOSE t.ipamanagedentryfunctionaltests.sh
 
 .PHONY: all install download clean
 
@@ -51,7 +51,7 @@ $(METADATA): Makefile
 	@echo "Name:            $(TEST)" >> $(METADATA)
 	@echo "TestVersion:     $(TESTVERSION)" >> $(METADATA)
 	@echo "Path:            $(TEST_DIR)" >> $(METADATA)
-	@echo "Description:     IPA Services Functional tests" >> $(METADATA)
+	@echo "Description:     IPA Managed Entry " >> $(METADATA)
 	@echo "Type:            Regression" >> $(METADATA)
 	@echo "TestTime:        90m" >> $(METADATA)
 	@echo "RunFor:          ipa-client" >> $(METADATA)

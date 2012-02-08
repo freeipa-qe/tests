@@ -2,15 +2,15 @@
 # vim: dict=/usr/share/beakerlib/dictionary.vim cpt=.,w,b,u,t,i,k
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-#   runtest.sh of /CoreOS/ipa-server/acceptance/ipa-functional-services
+#   runtest.sh of /CoreOS/ipa-server/acceptance/managed-entry
 #   Description: IPA Services Functional tests
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #   HTTP and HTTPS will be the services used to test the functionality
 #   of kerberizing a service and testing access
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-#   Author: Jenny Galipeau <jgalipea@redhat.com>
-#   Date  : February 9, 2011
+#   Author: Jenny Galipeau <mgregg@redhat.com>
+#   Date  : February 7, 2012
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
 #   Copyright (c) 2010 Red Hat, Inc. All rights reserved.
@@ -40,7 +40,7 @@
 . /dev/shm/env.sh
 
 # Include test case file
-. ./t.ipamanagedbyfunctionaltests.sh
+. ./t.ipamanagedentryfunctionaltests.sh
 
 PACKAGELIST="ipa-admintools ipa-client httpd mod_nss mod_auth_kerb 389-ds-base expect"
 
@@ -49,49 +49,12 @@ PACKAGELIST="ipa-admintools ipa-client httpd mod_nss mod_auth_kerb 389-ds-base e
 #   test main 
 #########################################
 rlJournalStart
-  rlPhaseStartTest "Machine environment check"
 
-	#####################################################################
-	# 		IS THIS MACHINE A MASTER?                           #
-	#####################################################################
-	rc=0
-	echo $MASTER | grep $HOSTNAME
-	if [ $? -eq 0 ] ; then
-		ipa-managedbyfunctionaltestssetup
-		ipa-managedbyfunctionaltests
-			rhts-sync-set -s DONE
-		rlPass
-	else
-		rlLog "Machine in recipe in not a MASTER"
-	fi
-
-        #####################################################################
-        #               IS THIS MACHINE A CLIENT?                           #
-        #####################################################################
-        rc=0
-        echo $CLIENT | grep $HOSTNAME
-        if [ $? -eq 0 ] ; then
-                if [ $rc -eq 0 ] ; then
-               		for item in $PACKAGELIST ; do
-                        	rpm -qa | grep $item
-                        	if [ $? -eq 0 ] ; then
-                                	rlPass "$item package is installed"
-                        	else
-                                	rlFail "$item package NOT found!"
-                        	fi
-                	done
-                	rlRun "service iptables stop" 0 "Stop the firewall on the client"
-			rhts-sync-block -s DONE $BEAKERSERVER
-			ipa-managedbyfunctionaltests
-                fi
-        else
-                rlLog "Machine in recipe in not a CLIENT"
-        fi
-
-   rlPhaseEnd
+	ipa-managedbyfunctionaltestssetup
+	ipa-managedbyfunctionaltests
     
-   rlJournalPrintText
-   report=/tmp/rhts.report.$RANDOM.txt
-   makereport $report
-   rhts-submit-log -l $report
+	rlJournalPrintText
+	report=/tmp/rhts.report.$RANDOM.txt
+	makereport $report
+	rhts-submit-log -l $report
 rlJournalEnd
