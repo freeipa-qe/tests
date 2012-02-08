@@ -198,6 +198,10 @@ nisint_nismaster_setup_users()
 		useradd --password aiqlepdb gooduser2
 		useradd --password aiqlepdb gooduser3
 		useradd --password aiqlepdb gooduser4
+		useradd --password aiqlepdb baduser1 --shell /sbin/nologin
+		useradd --password aiqlepdb baduser2 --shell /sbin/nologin
+		useradd --password aiqlepdb baduser3 --shell /sbin/nologin
+		useradd --password aiqlepdb baduser4 --shell /sbin/nologin
 		rlRun "make -C /var/yp" 0 "Update NIS passwd/shadow maps"
 		rlRun "ypcat -d $NISDOMAIN -h $NISMASTER passwd|grep gooduser" 0 "Check that new users are in the map"
 		[ -f $tmpout ] && rm -f $tmpout
@@ -212,6 +216,10 @@ nisint_nismaster_setup_groups()
 		groupadd goodgroup2
 		groupadd goodgroup3
 		groupadd goodgroup4
+		groupadd badgroup1
+		groupadd badgroup2
+		groupadd badgroup3
+		groupadd badgroup4
 		rlRun "make -C /var/yp" 0 "Update NIS group map"
 		rlRun "ypcat -d $NISDOMAIN -h $NISMASTER group|grep goodgroup" 0 "Check that new groups are in the map"
 		[ -f $tmpout ] && rm -f $tmpout

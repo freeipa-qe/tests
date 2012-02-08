@@ -66,9 +66,7 @@ rlJournalStart
 		rlLog "MASTER: $MASTER"
 		rlLog "NISMASTER: $NISMASTER"
 		rlLog "NISCLIENT: $NISCLIENT"
-		rlLog "BEAKERMASTER: $BEAKERMASTER"
-		rlLog "BEAKERNISMASTER: $BEAKERNISMASTER"
-		rlLog "BEAKERNISCLIENT: $BEAKERNISCLIENT"
+		rlLog "NISDOMAIN: $NISDOMAIN"
 	rlPhaseEnd
 	
 	##############################################################
@@ -81,7 +79,7 @@ rlJournalStart
 	##############################################################
 	# NIS Integration 
 	##############################################################
-	#nisint_ipamaster_integration # Import NIS Maps/Data/Configuration...
+	nisint_ipamaster_integration # Import NIS Maps/Data/Configuration...
 	#nisint_nisclient_integration # Switch NIS Config to point to IPA Master
 	#nisint_user_tests
 	#nisint_group_tests
