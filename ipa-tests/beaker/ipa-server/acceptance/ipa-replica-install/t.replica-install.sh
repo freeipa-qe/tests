@@ -87,7 +87,7 @@ createReplica1()
 			rlRun "ipa dnsrecord-add $DOMAIN $hostname_s --a-rec=$ipofs"
 			REVERSE_ZONE=`ipa dnszone-find | grep -i "zone name" | grep -i "arpa" | cut -d ":" -f 2`
 			LAST_OCTET=`echo $ipofs | cut -d . -f 4`
-			rlRun "ipa dnsrecord-add $REVERSE_ZONE $LAST_OCTET --ptr-rec=$hostname_s.$DOMAIN"
+			rlRun "ipa dnsrecord-add $REVERSE_ZONE $LAST_OCTET --ptr-rec=$hostname_s.$DOMAIN."
 
                         rlLog "Running: ipa-replica-prepare -p $ADMINPW $hostname_s.$DOMAIN"
 			rlRun "ipa-replica-prepare -p $ADMINPW $hostname_s.$DOMAIN"
@@ -221,9 +221,6 @@ echo 'expect eof ' >> $expfile
 
         rlRun "appendEnv" 0 "Append the machine information to the env.sh with the information for the machines in the recipe set"
 
-        # stop the firewall
-        service iptables stop
-        service ip6tables stop
 
    rlPhaseEnd
 

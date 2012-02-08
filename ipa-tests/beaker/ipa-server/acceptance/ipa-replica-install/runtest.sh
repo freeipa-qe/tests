@@ -65,16 +65,44 @@ rlJournalStart
         #####################################################################
         rc=0
 
-	echo "Hostname of this machine is $HOSTNAME"
-	echo "Hostname of master is $MASTER"
+        echo "Hostname of this machine is $HOSTNAME"
+        echo "Hostname of master is $MASTER"
+
+        myhostname=`hostname`
+        rlLog "hostname command: $myhostname"
+        rlLog "HOSTNAME: $HOSTNAME"
+        rlLog "MASTER: $MASTER"
+        rlLog "SLAVE: $SLAVE"
+        rlLog "CLIENT: $CLIENT"
+        rlLog "CLIENT2: $CLIENT2"
+
+        eval "echo \"export BEAKERMASTER=$MASTER\" >> /dev/shm/env.sh"
+        eval "echo \"export BEAKERSLAVE=$SLAVE\" >> /dev/shm/env.sh"
+        eval "echo \"export BEAKERCLIENT=$CLIENT\" >> /dev/shm/env.sh"
+        eval "echo \"export BEAKERCLIENT2=$CLIENT2\" >> /dev/shm/env.sh"
+        MASTER_S=`echo $MASTER | cut -d . -f 1`
+        eval "echo \"export MASTER=$MASTER_S.$DOMAIN\" >> /dev/shm/env.sh"
+        SLAVE_S=`echo $SLAVE | cut -d . -f 1`
+        eval "echo \"export SLAVE=$SLAVE_S.$DOMAIN\" >> /dev/shm/env.sh"
+
+        . /dev/shm/env.sh
+
+        ipofm=`dig +short $BEAKERMASTER`
+        ipofs=`dig +short $BEAKERSLAVE`
+
+        eval "echo \"export MASTERIP=$ipofm\" >> /dev/shm/env.sh"
+        eval "echo \"export SLAVEIP=$ipofs\" >> /dev/shm/env.sh"
+
+
 
         echo $MASTER | grep $HOSTNAME
         if [ $? -eq 0 ] ; then
                 rlLog "Machine in recipe is MASTER"
 
-	rlPhaseStartSetup "ipa-ca-install: ipa-server installation"
+	rlPhaseStartSetup "ipa-install: ipa-server installation"
 
-                rlRun "service iptables stop" 0 "Stop the firewall on the client"
+                rlRun "service iptables stop" 0 "Stop the firewall on the MASTER"
+                rlRun "service ip6tables stop" 0 "Stop the ipv6 firewall on the MASTER"
         	rlRun "cat /dev/shm/env.sh"
 	        rlRun "TmpDir=\`mktemp -d\`" 0 "Creating tmp directory"
         	rlRun "pushd $TmpDir"
@@ -87,8 +115,8 @@ rlJournalStart
 		createReplica2
 		createReplica3
 
-                rhts-sync-set -s READY $MASTER
-		rhts-sync-block -s DONE $SLAVE
+                rhts-sync-set -s READY $BEAKERMASTER
+		rhts-sync-block -s DONE $BEAKERSLAVE
 
 	rlPhaseEnd
 
@@ -114,10 +142,10 @@ rlJournalStart
                 yum clean all
 
                 if [ $rc -eq 0 ] ; then
-                        rhts-sync-block -s READY $MASTER
+                        rhts-sync-block -s READY $BEAKERMASTER
                         installSlave
 			installCA
-                        rhts-sync-set -s DONE $SLAVE
+                        rhts-sync-set -s DONE $BEAKERSLAVE
                         rlLog "Setting up Authorized keys"
                         SetUpAuthKeys
                         rlLog "Setting up known hosts file"
