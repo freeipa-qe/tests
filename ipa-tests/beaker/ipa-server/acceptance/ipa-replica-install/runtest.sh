@@ -85,17 +85,16 @@ rlJournalStart
         SLAVE_S=`echo $SLAVE | cut -d . -f 1`
         eval "echo \"export SLAVE=$SLAVE_S.$DOMAIN\" >> /dev/shm/env.sh"
 
-        . /dev/shm/env.sh
-
         ipofm=`dig +short $BEAKERMASTER`
         ipofs=`dig +short $BEAKERSLAVE`
 
         eval "echo \"export MASTERIP=$ipofm\" >> /dev/shm/env.sh"
         eval "echo \"export SLAVEIP=$ipofs\" >> /dev/shm/env.sh"
 
+        . /dev/shm/env.sh
+	cat /dev/shm/env.sh
 
-
-        echo $MASTER | grep $HOSTNAME
+        echo $BEAKERMASTER | grep $HOSTNAME
         if [ $? -eq 0 ] ; then
                 rlLog "Machine in recipe is MASTER"
 
@@ -137,7 +136,7 @@ rlJournalStart
         #               IS THIS MACHINE A SLAVE?                            #
         #####################################################################
         rc=0
-        echo $SLAVE | grep $HOSTNAME
+        echo $BEAKERSLAVE | grep $HOSTNAME
         if [ $? -eq 0 ] ; then
 
         rlPhaseStartSetup "ipa slave install: ipa-server slave installation"
