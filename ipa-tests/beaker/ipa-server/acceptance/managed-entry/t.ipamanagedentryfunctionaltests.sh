@@ -95,7 +95,7 @@ cn: notuser19" > $MODUSERLDIF3
 
 }
 
-managedentry_server_tests()
+managedby_server_tests()
 {
 	# Add new user
 	rlPhaseStartTest "Managed-01 - Create user that needs to have a managed entry"
