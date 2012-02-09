@@ -24,7 +24,7 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-export TEST=/CoreOS/ipa-server/acceptance/ipa-permission
+export TEST=/CoreOS/ipa-server/acceptance/ipa-rbac
 export TESTVERSION=1.0
 
 BUILT_FILES=
