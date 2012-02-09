@@ -12,12 +12,18 @@ FAKEHOSTREALNAME="managedby-fakehost.idm.lab.bos.redhat.com"
 FAKEHOSTNAMEIP="10.16.98.239"
 FAKEHOSTKEYTABFILE="/dev/shm/$FAKEHOSTNAME.host.keytab"
 CLIENTKEYTABFILE="/dev/shm/$CLIENT.host.keytab"
-NEWUSERA="uid=nusr19,cn=users,cn=accounts,dc=testrelm,dc=com"
-NEWUSERAGROUP="cn=nusr19,cn=groups,cn=accounts,dc=testrelm,dc=com"
+USERA="nusr19"
+USERB="altnur19"
+NEWUSERA="uid=$USERA,cn=users,cn=accounts,dc=testrelm,dc=com"
+NEWUSERAGROUP="cn=$USERA,cn=groups,cn=accounts,dc=testrelm,dc=com"
+NEWUSERB="uid=$USERB,cn=users,cn=accounts,dc=testrelm,dc=com"
+NEWUSERBGROUP="cn=$USERB,cn=groups,cn=accounts,dc=testrelm,dc=com"
 NEWUSERALDIF=/dev/shm/managedentrynewuser.ldif
+RNUSERLDIF=/dev/shm/modrdnB.ldif
 MODUSERLDIF=/dev/shm/modgroupentry.ldif
 MODUSERLDIF2=/dev/shm/modgroupentry2.ldif
 MODUSERLDIF3=/dev/shm/modgroupentry3.ldif
+MODUSERLDIF4=/dev/shm/modgroupentry4.ldif
 
 echo " HTTP configuration directory:  $HTTPCFGDIR"
 echo " HTTP certificate directory:  $HTTPCERTDIR"
@@ -91,7 +97,17 @@ description: 75f9f900-51f3-11e1-93e0-021016980186" > $MODUSERLDIF2
 	echo "dn: $NEWUSERAGROUP
 changetype: modify
 replace: cn
-cn: notuser19" > $MODUSERLDIF3
+cn: notusr19" > $MODUSERLDIF3
+
+
+echo "dn: $NEWUSERAGROUP
+changetype: modify
+replace: mepManagedBy
+mepManagedBy: $NEWUSERA" > $MODUSERLDIF4
+
+	# Create a LDIF containing the modrdn info
+	echo "$NEWUSERA
+uid=$USERB" > $RNUSERLDIF 
 
 }
 
@@ -113,34 +129,62 @@ managedby_server_tests()
 	rlPhaseEnd
 
 	# Try to modify a entry that we should not have access to
-	rlPhaseStartTest "Managed-04 - Try to modify a entry we shouldn't have access to (gidNumber)"
+	rlPhaseStartTest "Managed-04 - Try to modify a entry we should not have access to (gidNumber)"
 		rlRun "/usr/bin/ldapmodify -a -x -D '$ROOTDN' -w $ROOTDNPWD -f $MODUSERLDIF" 53 "Making sure that we cannot modify a entry that should be locked out(gidNumber)"
 	rlPhaseEnd
 
-	rlPhaseStartTest "Managed-05 - Try to modify a entry we shouldn't have access to (description)"
+	rlPhaseStartTest "Managed-05 - Try to modify a entry we should not have access to (description)"
 		rlRun "/usr/bin/ldapmodify -a -x -D '$ROOTDN' -w $ROOTDNPWD -f $MODUSERLDIF2" 53 "Making sure that we cannot modify a entry that should be locked out(description)"
 	rlPhaseEnd
 
-	rlPhaseStartTest "Managed-06 - Try to modify a entry we shouldn't have access to (cn)"
+	rlPhaseStartTest "Managed-06 - Try to modify a entry we should not have access to (cn)"
 		rlRun "/usr/bin/ldapmodify -a -x -D '$ROOTDN' -w $ROOTDNPWD -f $MODUSERLDIF3" 53 "Making sure that we cannot modify a entry that should be locked out(cn)"
 	rlPhaseEnd
 
-	rlPhaseStartTest "Managed-07 - Deleting user that created the test group in order to delete that group"
+	rlPhaseStartTest "Managed-07 - Try to modify a entry we should have access to (mepManagedBy)"
+		rlRun "/usr/bin/ldapmodify -a -x -D '$ROOTDN' -w $ROOTDNPWD -f $MODUSERLDIF4" 0 "Making sure that we can modify a entry in the linked group that should be able to(mepManagedBy)"
+	rlPhaseEnd
+
+
+	rlPhaseStartTest "Managed-08 - Deleting user that created the test group in order to delete that group"
 		rlRun "ldapdelete -x -D '$ROOTDN' -w $ROOTDNPWD  '$NEWUSERA'" 0 "Deleting $NEWUSERA in order to remove $NEWUSERAGROUP"
 	rlPhaseEnd
 	
 	# Sleeping for some time in order to let the managedby plugin to work
-	sleep 30
-	rlPhaseStartTest "Managed-08 - checking to make sure that the associated group was deleted"
+	sleep 15
+	rlPhaseStartTest "Managed-09 - checking to make sure that the associated group was deleted"
 		rlRun "/usr/bin/ldapsearch -x -D '$ROOTDN' -w $ROOTDNPWD -b '$NEWUSERAGROUP'" 32 "ensure that $NEWUSERAGROUP does not exist"
 	rlPhaseEnd
 
-#	rlPhaseStartTest "Negitive test case to try binding as the CLIENTs principal"
-#		kdestroy
-#		rlRun "kinit -kt /etc/krb5.keytab host/$CLIENT" 1 "Bind as the host principal for CLIENT, this should return 1"
-#		rlRun "klist | grep host/$CLIENT" 1 "make sure we are not bound as the CLIENT host principal"
-#	rlPhaseEnd
+	# re-Add new user
+	rlPhaseStartTest "Managed-10 - recreate user that needs to have a managed entry"
+		rlRun "/usr/bin/ldapmodify -a -x -D '$ROOTDN' -w $ROOTDNPWD -f $NEWUSERALDIF" 0 "re-adding new user to ldap server"
+	rlPhaseEnd
 
+	# Rename the user to check that the group gets renamed
+	rlPhaseStartTest "Manages-11 - rename the new user"
+		rlRun "/usr/bin/ldapmodrdn -x -D '$ROOTDN' -w $ROOTDNPWD -f $RNUSERLDIF" 0 "Rename user $USERA to $USERB"
+	rlPhaseEnd
+
+	# ensure that new user's group was renamed
+	rlPhaseStartTest "Managed-12 - ensure that the assoiated groups entry was renamed."
+		rlRun "/usr/bin/ldapsearch -x -D '$ROOTDN' -w $ROOTDNPWD -b '$NEWUSERBGROUP'" 0 "ensure that $NEWUSERAGROUP was renamed to $NEWUSERBGROUP"
+	rlPhaseEnd
+
+	# Try to delete the renamed entry that we should not be able to
+	rlPhaseStartTest "Managed-13 - try to delete the renamed group when we should not be allowed"
+		rlRun "ldapdelete -x -D '$ROOTDN' -w $ROOTDNPWD  '$NEWUSERBGROUP'" 53 "Making sure we cannot delete a group that is a linked managed entry"
+	rlPhaseEnd
+
+	rlPhaseStartTest "Managed-14 - Deleting the renamed user that created the test group in order to delete that group"
+		rlRun "ldapdelete -x -D '$ROOTDN' -w $ROOTDNPWD  '$NEWUSERB'" 0 "Deleting $NEWUSERB in order to remove $NEWUSERBGROUP"
+	rlPhaseEnd
+	
+	# Sleeping for some time in order to let the managedby plugin to work
+	sleep 15
+	rlPhaseStartTest "Managed-15 - checking to make sure that the associated group was deleted"
+		rlRun "/usr/bin/ldapsearch -x -D '$ROOTDN' -w $ROOTDNPWD -b '$NEWUSERBGROUP'" 32 "ensure that $NEWUSERBGROUP does not exist"
+	rlPhaseEnd
 
 }
 
