@@ -60,7 +60,8 @@ public class CommonHelper {
 	
 	public static void deleteEntry(SahiTasks browser, String cnValue)
 	{
-		browser.checkbox(cnValue).click(); 
+		if (browser.checkbox(cnValue).exists() )
+			browser.checkbox(cnValue).click(); 
 		browser.span("Delete").click(); 
 		browser.button("Delete").click();
 	}
@@ -68,7 +69,8 @@ public class CommonHelper {
 	public static void deleteEntry(SahiTasks browser, String[] cnValues)
 	{
 		for (String cn: cnValues) 
-			browser.checkbox(cn).click(); 
+			if (browser.checkbox(cn).exists())
+				browser.checkbox(cn).click(); 
 		browser.span("Delete").click(); 
 		browser.button("Delete").click();
 	}
@@ -102,8 +104,22 @@ public class CommonHelper {
 	{
 		StringBuffer sb = new StringBuffer();
 		for (String item:data)
-			sb.append(item + ",");
+			sb.append(item.trim() + ",");
 		String ret = sb.substring(0,sb.length() -1);
 		return ret;
+	}
+
+	public static String[] stringToArray(String dataStr)
+	{
+		String[] array = dataStr.split(",");
+		String[] dataArray = new String[array.length];
+		int i=0;
+		for (String data:array)
+		{
+			String trimmed = data.trim();
+			dataArray[i] = trimmed;
+			i++;
+		}
+		return dataArray;
 	}
 }

@@ -8,13 +8,13 @@
             	    <run>
             	        <include name="setup" />
             	        <include name="init" />    
-            	        <include name="addAutomount" />
+            	        <include name="addAutomountLocation" />
             	        <!-- 
             	         <include name="add_negative" />
             	        <include name="modify" /> 
             	        <include name="modify_negative" />
             	        -->
-            	         <include name="deleteAutomount" /> 
+            	         <include name="deleteAutomountLocation" /> 
             	    </run>
             	</groups>
             	<classes>
