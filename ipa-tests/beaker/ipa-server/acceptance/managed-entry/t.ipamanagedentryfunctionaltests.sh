@@ -165,10 +165,11 @@ managedby_server_tests()
 	rlPhaseStartTest "Manages-11 - rename the new user"
 		rlRun "/usr/bin/ldapmodrdn -x -D '$ROOTDN' -w $ROOTDNPWD -f $RNUSERLDIF" 0 "Rename user $USERA to $USERB"
 	rlPhaseEnd
+	sleep 15
 
 	# ensure that new user's group was renamed
 	rlPhaseStartTest "Managed-12 - ensure that the assoiated groups managedby entry was renamed."
-		rlRun "/usr/bin/ldapsearch -x -D '$ROOTDN' -w $ROOTDNPWD -b '$NEWUSERAGROUP' | grep mepManagedBy | grep $NEWUSERBGROUP" 0 "ensure that the managedby for $NEWUSERAGROUP was modified to $NEWUSERBGROUP"
+		rlRun "/usr/bin/ldapsearch -x -D '$ROOTDN' -w $ROOTDNPWD -b '$NEWUSERAGROUP' | grep mepManagedBy | grep $NEWUSERB" 0 "ensure that the managedby for $NEWUSERAGROUP was modified to $NEWUSERB"
 	rlPhaseEnd
 
 	# Try to delete the renamed entry that we should not be able to
@@ -182,58 +183,58 @@ managedby_server_tests()
 	
 	# Sleeping for some time in order to let the managedby plugin to work
 	sleep 15
-	rlPhaseStartTest "Managed-15 - checking to make sure that the associated group was deleted"
+	rlPhaseStartTest "Managed-15 - Checking to make sure that the associated group was deleted"
 		rlRun "/usr/bin/ldapsearch -x -D '$ROOTDN' -w $ROOTDNPWD -b '$NEWUSERBGROUP'" 32 "ensure that $NEWUSERBGROUP does not exist"
 	rlPhaseEnd
 
 	# Makeing a user via IPA tools to ensure that it's group is created.
-	rlPhaseStartTest "Creating user from ipa tools"
+	rlPhaseStartTest "Managed-16 - Creating user from ipa tools"
 		rlRun "/usr/bin/ipa user-add --first=nuserfirst --last=nuserlast $USERA" 0 "Creating the new user via the IPA tools"
 	rlPhaseEnd
 
 	# ensure that new user's group was created
-	rlPhaseStartTest "Managed-02 - ensure that the assoiated groups entry was created."
+	rlPhaseStartTest "Managed-17 - ensure that the assoiated groups entry was created."
 		rlRun "/usr/bin/ldapsearch -x -D '$ROOTDN' -w $ROOTDNPWD -b '$NEWUSERAGROUP'" 0 "ensure that $NEWUSERAGROUP was created"
 	rlPhaseEnd
 
 	# Try to delete a entry that we should not be able to
-	rlPhaseStartTest "Managed-03 - try to delete the group when we should not be allowed"
+	rlPhaseStartTest "Managed-18 - try to delete the group when we should not be allowed"
 		rlRun "/usr/bin/ldapdelete -x -D '$ROOTDN' -w $ROOTDNPWD  '$NEWUSERAGROUP'" 53 "Making sure we cannot delete a group that is a linked managed entry"
 	rlPhaseEnd
 
 	# Try to modify a entry that we should not have access to
-	rlPhaseStartTest "Managed-04 - Try to modify a entry we should not have access to (gidNumber)"
+	rlPhaseStartTest "Managed-19 - Try to modify a entry we should not have access to (gidNumber)"
 		rlRun "/usr/bin/ldapmodify -a -x -D '$ROOTDN' -w $ROOTDNPWD -f $MODUSERLDIF" 53 "Making sure that we cannot modify a entry that should be locked out(gidNumber)"
 	rlPhaseEnd
 
-	rlPhaseStartTest "Managed-05 - Try to modify a entry we should not have access to (description)"
+	rlPhaseStartTest "Managed-20 - Try to modify a entry we should not have access to (description)"
 		rlRun "/usr/bin/ldapmodify -a -x -D '$ROOTDN' -w $ROOTDNPWD -f $MODUSERLDIF2" 53 "Making sure that we cannot modify a entry that should be locked out(description)"
 	rlPhaseEnd
 
-	rlPhaseStartTest "Managed-06 - Try to modify a entry we should not have access to (cn)"
+	rlPhaseStartTest "Managed-21 - Try to modify a entry we should not have access to (cn)"
 		rlRun "/usr/bin/ldapmodify -a -x -D '$ROOTDN' -w $ROOTDNPWD -f $MODUSERLDIF3" 53 "Making sure that we cannot modify a entry that should be locked out(cn)"
 	rlPhaseEnd
 
-	rlPhaseStartTest "Managed-07 - Try to modify a entry we should have access to (mepManagedBy)"
+	rlPhaseStartTest "Managed-22 - Try to modify a entry we should have access to (mepManagedBy)"
 		rlRun "/usr/bin/ldapmodify -a -x -D '$ROOTDN' -w $ROOTDNPWD -f $MODUSERLDIF4" 0 "Making sure that we can modify a entry in the linked group that should be able to(mepManagedBy)"
 	rlPhaseEnd
 
 	NEWGIDNUMBER=22345233
 
-	rlPhaseStartTest "Managed- - Modify the gid number of the user."
-		rlRun "/usr/bin/ipa user-mod --gidnumber=$NEWGIDNUMBER $USERA" 0 "changing the GID on the managed entry user"
+	rlPhaseStartTest "Managed-23 - Modify the gid number of the user."
+		rlRun "/usr/bin/ipa user-mod --uidnumber=$NEWGIDNUMBER $USERA" 0 "changing the GID on the managed entry user"
 	rlPhaseEnd
 
-	rlPhaseStartTest "Managed- - Make sure the gid number on the assoiated group changed"
+	rlPhaseStartTest "Managed-24 - Make sure the gid number on the assoiated group changed"
 		rlRun "/usr/bin/ldapsearch -x -D '$ROOTDN' -w $ROOTDNPWD -b '$NEWUSERAGROUP' objectclass=* | grep $NEWGIDNUMBER" 0 "Make sure that the GID number changed on the created user"
 	rlPhaseEnd
 
-	rlPhaseStartTest "Managed- - Delete the new user via the ipa tools"
+	rlPhaseStartTest "Managed-25 - Delete the new user via the ipa tools"
 		rlRun "/usr/bin/ipa user-del $USERA" 0 "Deleting the test user from the IPA tools"
 	rlPhaseEnd
 	sleep 15
 
-	rlPhaseStartTest "Managed- - make sure that the users group was deleted"
+	rlPhaseStartTest "Managed-26 - make sure that the users group was deleted"
 		rlRun "/usr/bin/ldapsearch -x -D '$ROOTDN' -w $ROOTDNPWD -b '$NEWUSERAGROUP'" 32 "ensure that $NEWUSERAGROUP does not exist"
 	rlPhaseEnd
 
