@@ -60,6 +60,8 @@ run: $(FILES) build
 	cp ./ipa-service-cli-lib.sh /dev/shm/.
 	rm -f /dev/shm/nis.sh
 	cp ./nis.sh /dev/shm/.
+	rm -f /dev/shm/ipa-rbac-cli-lib.sh
+	cp ./ipa-rbac-cli-lib.sh /dev/shm/.
 	rm -f /dev/shm/set-root-pw.exp
 	cp ./set-root-pw.exp /dev/shm/.
 	rm -f /dev/shm/id_rsa*
