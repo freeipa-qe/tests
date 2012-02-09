@@ -208,8 +208,8 @@ echo 'expect eof ' >> $expfile
 
 
 			rlLog "IP of server $s is resolving as $ipofs, using short hostname of $hostname_s"
-			rlLog "Executing: ipa-replica-prepare -p $ADMINPW --ip-address=$ipofs $hostname_s.$DOMAIN --dirsrv_pkcs12=dirsrv_pkcs.p12 --dirsrv_pin=Secret123 --http_pkcs12=http_pkcs.p12 --http_pin=Secret123"
-			rlRun "ipa-replica-prepare -p $ADMINPW --ip-address=$ipofs $hostname_s.$DOMAIN --dirsrv_pkcs12=dirsrv_pkcs.p12 --dirsrv_pin=Secret123 --http_pkcs12=http_pkcs.p12 --http_pin=Secret123"
+			rlLog "Executing: ipa-replica-prepare -p $ADMINPW --ip-address=$SLAVEIP $hostname_s.$DOMAIN --dirsrv_pkcs12=dirsrv_pkcs.p12 --dirsrv_pin=Secret123 --http_pkcs12=http_pkcs.p12 --http_pin=Secret123"
+			rlRun "ipa-replica-prepare -p $ADMINPW --ip-address=$SLAVEIP $hostname_s.$DOMAIN --dirsrv_pkcs12=dirsrv_pkcs.p12 --dirsrv_pin=Secret123 --http_pkcs12=http_pkcs.p12 --http_pin=Secret123"
                         rlRun "service named restart" 0 "Restarting named as work around when adding new reverse zone"
 
                 else
@@ -245,8 +245,8 @@ installSlave()
 
         cd /dev/shm/
         hostname_s=$(hostname -s)
-        rlRun "sftp root@$MASTER:/var/lib/ipa/replica-info-$hostname_s.$DOMAIN.gpg" 0 "Get replica package"
-        rlLog "sftp root@$MASTER:/var/lib/ipa/replica-info-$hostname_s.$DOMAIN.gpg"
+        rlRun "sftp root@$MASTERIP:/var/lib/ipa/replica-info-$hostname_s.$DOMAIN.gpg" 0 "Get replica package"
+        rlLog "sftp root@$MASTERIP:/var/lib/ipa/replica-info-$hostname_s.$DOMAIN.gpg"
         rlLog "Checking for existance of replica gpg file"
         ls /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg
         if [ $? -ne 0 ] ; then
