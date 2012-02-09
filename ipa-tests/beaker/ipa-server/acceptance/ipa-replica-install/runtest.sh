@@ -85,6 +85,8 @@ rlJournalStart
         SLAVE_S=`echo $SLAVE | cut -d . -f 1`
         eval "echo \"export SLAVE=$SLAVE_S.$DOMAIN\" >> /dev/shm/env.sh"
 
+        . /dev/shm/env.sh
+
         ipofm=`dig +short $BEAKERMASTER`
         ipofs=`dig +short $BEAKERSLAVE`
 
