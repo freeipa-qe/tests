@@ -167,13 +167,13 @@ managedby_server_tests()
 	rlPhaseEnd
 
 	# ensure that new user's group was renamed
-	rlPhaseStartTest "Managed-12 - ensure that the assoiated groups entry was renamed."
-		rlRun "/usr/bin/ldapsearch -x -D '$ROOTDN' -w $ROOTDNPWD -b '$NEWUSERBGROUP'" 0 "ensure that $NEWUSERAGROUP was renamed to $NEWUSERBGROUP"
+	rlPhaseStartTest "Managed-12 - ensure that the assoiated groups managedby entry was renamed."
+		rlRun "/usr/bin/ldapsearch -x -D '$ROOTDN' -w $ROOTDNPWD -b '$NEWUSERAGROUP' | grep mepManagedBy | grep $NEWUSERBGROUP" 0 "ensure that the managedby for $NEWUSERAGROUP was modified to $NEWUSERBGROUP"
 	rlPhaseEnd
 
 	# Try to delete the renamed entry that we should not be able to
 	rlPhaseStartTest "Managed-13 - try to delete the renamed group when we should not be allowed"
-		rlRun "/usr/bin/ldapdelete -x -D '$ROOTDN' -w $ROOTDNPWD  '$NEWUSERBGROUP'" 53 "Making sure we cannot delete a group that is a linked managed entry"
+		rlRun "/usr/bin/ldapdelete -x -D '$ROOTDN' -w $ROOTDNPWD  '$NEWUSERAGROUP'" 53 "Making sure we cannot delete a group that is a linked managed entry"
 	rlPhaseEnd
 
 	rlPhaseStartTest "Managed-14 - Deleting the renamed user that created the test group in order to delete that group"
@@ -224,15 +224,16 @@ managedby_server_tests()
 		rlRun "/usr/bin/ipa user-mod --gidnumber=$NEWGIDNUMBER $USERA" 0 "changing the GID on the managed entry user"
 	rlPhaseEnd
 
-	rlPhaseStarttest "Managed- - Make sure the gid number on the assoiated group changed"
+	rlPhaseStartTest "Managed- - Make sure the gid number on the assoiated group changed"
 		rlRun "/usr/bin/ldapsearch -x -D '$ROOTDN' -w $ROOTDNPWD -b '$NEWUSERAGROUP' objectclass=* | grep $NEWGIDNUMBER" 0 "Make sure that the GID number changed on the created user"
 	rlPhaseEnd
 
-	rlPhaseStarttest "Managed- - Delete the new user via the ipa tools"
+	rlPhaseStartTest "Managed- - Delete the new user via the ipa tools"
 		rlRun "/usr/bin/ipa user-del $USERA" 0 "Deleting the test user from the IPA tools"
 	rlPhaseEnd
+	sleep 15
 
-	rlPhaseStarttest "Managed- - make sure that the users group was deleted"
+	rlPhaseStartTest "Managed- - make sure that the users group was deleted"
 		rlRun "/usr/bin/ldapsearch -x -D '$ROOTDN' -w $ROOTDNPWD -b '$NEWUSERAGROUP'" 32 "ensure that $NEWUSERAGROUP does not exist"
 	rlPhaseEnd
 
