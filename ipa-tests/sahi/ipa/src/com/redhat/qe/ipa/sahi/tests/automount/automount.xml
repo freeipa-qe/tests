@@ -1,0 +1,29 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+<suite name="IPAAutomountTestSuite">	
+    <test name="IPAAutomount Tests" preserve-order="true">
+            	<packages>
+            	    <package name="com.redhat.qe.ipa.sahi.*" />
+            	</packages>
+            	<groups>
+            	    <run>
+            	        <include name="setup" />
+            	        <include name="init" />    
+            	        <include name="addAutomount" />
+            	        <!-- 
+            	         <include name="add_negative" />
+            	        <include name="modify" /> 
+            	        <include name="modify_negative" />
+            	        -->
+            	         <include name="deleteAutomount" /> 
+            	    </run>
+            	</groups>
+            	<classes>
+            	    <class name="com.redhat.qe.ipa.sahi.tests.automount.AutomountTests" />
+            	</classes>
+    </test>
+	
+    <listeners>        
+  	             <listener class-name="com.redhat.qe.auto.testng.TestNGListener" />	
+    </listeners>
+	
+</suite>

@@ -39,9 +39,9 @@ public class CommonTasks {
 	public String sudoRulePage =  serverUrl + "/ipa/ui/#sudo=sudorule&policy=sudo&navigation=policy";
 	public String sudoPage=sudoRulePage;
 	public String sudoCommandPage =  serverUrl + "/ipa/ui/#sudo=sudocmd&policy=sudo&navigation=policy";
-	public String sudoCommandGroupPage =  serverUrl + "/ipa/ui/#sudo=sudocmdgroup&policy=sudo&navigation=policy";
-
+	public String sudoCommandGroupPage =  serverUrl + "/ipa/ui/#sudo=sudocmdgroup&policy=sudo&navigation=policy"; 
 	public String configurationPage = serverUrl + "/ipa/ui/#ipaserver=config&navigation=ipaserver"; 
+	public String automountPage = serverUrl + "/ipa/ui/#automount=automountlocation&policy=automount&navigation=policy"; 
 	
 	public static String ipadomain = "";
 	public static String ipafqdn= "";
