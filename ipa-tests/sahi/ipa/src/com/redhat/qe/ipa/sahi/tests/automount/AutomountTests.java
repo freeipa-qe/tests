@@ -96,14 +96,34 @@ public class AutomountTests extends SahiTestScript{
 
 	@Test (groups={"addAutomountLocation_negative"},
 		description = "no duplicated automount location is allowed")
-	public void addAutomount_negative_duplicate_location(String automountLocation) throws Exception {  
-// code goes here
+	public void addAutomount_negative_duplicate_location() throws Exception {  
+		for (String location:existingAutomountLocations)
+		{
+			browser.span("Add").click();
+			browser.textbox("cn").setValue(location); 
+			browser.button("Add").click();
+			if (browser.div("automount location with name \"" + location + "\" already exists").exists())
+			{
+				log.info("duplicate automount location: " + location +" is forbidden, good, test continue");
+				browser.button("Cancel").click();
+				browser.button("Cancel").click();
+			}
+			else
+				Assert.assertTrue(false, "duplicate automount location is allowed : name="+location+", bad, test failed");
+		}
 	}
 
 	@Test (groups={"addAutomountLocation_negative"},
 		description = "required filed: automation location name is required")
-	public void addAutomount_negative_required_field(String automountLocation) throws Exception {  
-// code goes here
+	public void addAutomount_negative_required_field() throws Exception {  
+		browser.span("Add").click();
+		// without enter location name, just click Add
+		browser.button("Add").click();
+		if (browser.span("Required field").exists())
+			log.info("error fields: 'Required field' appears as expected, test success"); // report success
+		else
+			Assert.assertTrue(false, "error fields 'Required field' does NOT appear as expected, test failed");
+	
 	}
 
 	@Test (groups={"addAutomount_negative"},
@@ -180,7 +200,7 @@ public class AutomountTests extends SahiTestScript{
 	/***************************************************************************** 
 	 *             Data providers                                                * 
 	 *****************************************************************************/
-	private static String[] existingPermissions = {"User Self service", "Self can write own password"}; 
+	private static String[] existingAutomountLocations = {"default"}; 
 	private static String[] testAutomountLocation = {"automountlocation000","automountlocation001","automountlocation002","automountlocation003","automountlocation004","automountlocation005"};
 	
 	@DataProvider(name="addAutomountLocation")

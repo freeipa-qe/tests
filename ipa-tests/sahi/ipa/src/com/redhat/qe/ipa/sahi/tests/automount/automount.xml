@@ -9,6 +9,7 @@
             	        <include name="setup" />
             	        <include name="init" />    
             	        <include name="addAutomountLocation" />
+            	        <include name="addAutomountLocation_negative" />
             	        <!-- 
             	         <include name="add_negative" />
             	        <include name="modify" /> 
