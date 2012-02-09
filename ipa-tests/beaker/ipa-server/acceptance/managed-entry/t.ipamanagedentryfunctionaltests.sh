@@ -131,7 +131,7 @@ managedby_server_tests()
 	
 	# Sleeping for some time in order to let the managedby plugin to work
 	sleep 30
-	rlPhaseStartTest "Managed-08 - checking to make sure that the assoiated group was deleted"
+	rlPhaseStartTest "Managed-08 - checking to make sure that the associated group was deleted"
 		rlRun "/usr/bin/ldapsearch -x -D '$ROOTDN' -w $ROOTDNPWD -b '$NEWUSERAGROUP'" 32 "ensure that $NEWUSERAGROUP does not exist"
 	rlPhaseEnd
 
