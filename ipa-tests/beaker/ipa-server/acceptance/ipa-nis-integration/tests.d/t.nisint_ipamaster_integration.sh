@@ -110,7 +110,8 @@ nisint_ipamaster_integration_add_nis_data_passwd()
 			shell=$(echo $line|cut -f7 -d:)
 			
 			# Now create this entry
-			rlRun "echo "ChangeM3" | ipa user-add $username --first=NIS --last=USER --gidnumber=$gid --uid=$uid --gecos=$gecos --homedir=$homedir --shell=$shell --password"
+			rlRun "create_ipauser $username NIS USER passw0rd1"
+			rlRun "ipa user-mod $username --gidnumber=$gid --uid=$uid --gecos=$gecos --homedir=$homedir --shell=$shell"
 			rlRun "ipa user-show $username"
 		done
 		
