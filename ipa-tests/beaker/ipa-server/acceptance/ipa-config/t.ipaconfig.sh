@@ -74,6 +74,7 @@ ipaconfig_searchfields()
     ipaconfig_searchfields_userfields_negative
     ipaconfig_searchfields_groupfields_default
     ipaconfig_searchfields_groupfields_negative
+    ipaconfig_ticket_2159
     ipaconfig_searchfields_envcleanup
 } #ipaconfig_searchfields
 
@@ -775,6 +776,15 @@ ipaconfig_searchfields_envsetup()
         #environment setup ends   here
     rlPhaseEnd
 } #ipaconfig_searchfields_envsetup
+
+ipaconfig_ticket_2159()
+{
+	# Testcase covering https://fedorahosted.org/freeipa/ticket/2159
+	rlPhaseStartTest "Testcase covering ticket 2159"
+		ipa config-mod --groupsearch= &> /dev/shm/2159out.txt
+		rlRun "grep Traceback  /dev/shm/2159out.txt" 1 "Making sure that running a empty groupsearch did not return a exception"
+	rlPhaseEnd
+}
 
 ipaconfig_searchfields_envcleanup()
 {
