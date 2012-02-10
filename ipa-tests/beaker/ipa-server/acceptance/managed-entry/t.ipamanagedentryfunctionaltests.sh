@@ -47,11 +47,9 @@ ipa-managedentryfunctionaltests()
 ipa-managedentryfunctionaltestssetup()
 {
 	kdestroy
-	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials"
 
-	rlPhaseStartTest "Make some keytabs for later testing"
-		rlPass
-	rlPhaseEnd
+	rlPhaseStartTest "Make some ldif files for later testing"
+	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials"
 
 	# Create new user ldif
 	echo "dn: $NEWUSERA
@@ -108,7 +106,8 @@ mepManagedBy: $NEWUSERA" > $MODUSERLDIF4
 	# Create a LDIF containing the modrdn info
 	echo "$NEWUSERA
 uid=$USERB" > $RNUSERLDIF 
-
+		rlPass
+	rlPhaseEnd
 }
 
 managedby_server_tests()
@@ -188,7 +187,7 @@ managedby_server_tests()
 	rlPhaseEnd
 
 	# Makeing a user via IPA tools to ensure that it's group is created.
-	rlPhaseStartTest "Managed-16 - Creating user from ipa tools"
+	rlPhaseStartTest "Managed-16 - Creating user using ipa tools"
 		rlRun "/usr/bin/ipa user-add --first=nuserfirst --last=nuserlast $USERA" 0 "Creating the new user via the IPA tools"
 	rlPhaseEnd
 
@@ -222,7 +221,7 @@ managedby_server_tests()
 	NEWGIDNUMBER=22345233
 
 	rlPhaseStartTest "Managed-23 - Modify the gid number of the user."
-		rlRun "/usr/bin/ipa user-mod --uidnumber=$NEWGIDNUMBER $USERA" 0 "changing the GID on the managed entry user"
+		rlRun "/usr/bin/ipa user-mod --uid=$NEWGIDNUMBER $USERA" 0 "changing the GID on the managed entry user"
 	rlPhaseEnd
 
 	rlPhaseStartTest "Managed-24 - Make sure the gid number on the assoiated group changed"
@@ -232,7 +231,7 @@ managedby_server_tests()
 	rlPhaseStartTest "Managed-25 - Delete the new user via the ipa tools"
 		rlRun "/usr/bin/ipa user-del $USERA" 0 "Deleting the test user from the IPA tools"
 	rlPhaseEnd
-	sleep 15
+	sleep 30
 
 	rlPhaseStartTest "Managed-26 - make sure that the users group was deleted"
 		rlRun "/usr/bin/ldapsearch -x -D '$ROOTDN' -w $ROOTDNPWD -b '$NEWUSERAGROUP'" 32 "ensure that $NEWUSERAGROUP does not exist"
