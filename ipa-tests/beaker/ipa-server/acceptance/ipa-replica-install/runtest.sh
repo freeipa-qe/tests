@@ -113,8 +113,8 @@ rlJournalStart
 	rlPhaseStartTest "MASTER tests start"
 		installMaster
 		createReplica1
-		createReplica2
 		createReplica3
+		createReplica2
 
                 rhts-sync-set -s READY $BEAKERMASTER
 		rhts-sync-block -s DONE $BEAKERSLAVE

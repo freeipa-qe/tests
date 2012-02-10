@@ -93,6 +93,8 @@ createReplica1()
 			rlRun "ipa-replica-prepare -p $ADMINPW $hostname_s.$DOMAIN"
                         rlRun "service named restart" 0 "Restarting named as work around when adding new reverse zone"
 
+			rlRun "rm -fr /var/lib/ipa/replica-info-*"
+
                 else
 
                         rlLog "No SLAVES in current recipe set."
@@ -212,6 +214,8 @@ echo 'expect eof ' >> $expfile
 			rlRun "ipa-replica-prepare -p $ADMINPW --ip-address=$SLAVEIP $hostname_s.$DOMAIN --dirsrv_pkcs12=dirsrv_pkcs.p12 --dirsrv_pin=Secret123 --http_pkcs12=http_pkcs.p12 --http_pin=Secret123"
                         rlRun "service named restart" 0 "Restarting named as work around when adding new reverse zone"
 
+
+			rlRun "rm -fr /var/lib/ipa/replica-info-*"
                 else
 
                         rlLog "No SLAVES in current recipe set."
