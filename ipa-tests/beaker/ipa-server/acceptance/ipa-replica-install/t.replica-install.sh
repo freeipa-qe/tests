@@ -256,7 +256,8 @@ installSlave()
                 rlRun "/etc/init.d/ntpd stop" 0 "Stopping the ntp server"
                 rlRun "ntpdate $NTPSERVER" 0 "Synchronzing clock with valid time server"
                 rlLog "SKIPINSTALL: $SKIPINSTALL"       
-                rlRun "fixResolv" 0 "fixing the reoslv.conf to contain the correct nameserver lines"
+                rlRun "echo \"nameserver $MASTERIP\" > /etc/resolv.conf" 0 "fixing the reoslv.conf to contain the correct nameserver lines"
+		rlRun "cat /etc/resolv.conf"
                 rlRun "fixHostFile" 0 "Set up /etc/hosts"
 
                 rlRun "fixhostname" 0 "Fix hostname"
