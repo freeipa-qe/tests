@@ -88,9 +88,8 @@ rlJournalStart
 	nisint_nisclient_integration # Switch NIS Config to point to IPA Master
 	nisint_user_tests
 	nisint_group_tests
-	#nisint_netgroup_tests
+	nisint_netgroup_tests
 	#nisint_automount_tests
-	#nisint_services_tests
 	#nisint_client_is_nis_bz_tests
 
 	##############################################################
@@ -101,7 +100,6 @@ rlJournalStart
 	#nisint_group_tests
 	#nisint_netgroup_tests
 	#nisint_automount_tests
-	#nisint_services_tests
 	#nisint_client_is_ipa_bz_tests
 
 	nisint_end

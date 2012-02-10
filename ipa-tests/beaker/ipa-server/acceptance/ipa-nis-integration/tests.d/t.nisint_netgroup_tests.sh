@@ -57,7 +57,7 @@ nisint_netgroup_test_envsetup()
 		rlRun "ipa netgroup-add testnetgroup1 --desc=testnetgroup1"
 		rlRun "ipa netgroup-add testnetgroup2 --desc=testnetgroup2"
 		rlRun "ipa netgroup-add-member testnetgroup1 --users=testuser1 --hosts=$MASTER"
-		rlRun "ipa netgroup-add-member testnetgroup2 --users=testuser2 --hosts=$MASTER"
+		rlRun "ipa netgroup-add-member testnetgroup2 --users=testuser2 --hosts=$NISCLIENT"
 		rhts-sync-set -s "$FUNCNAME" -m $MASTER
 		;;
 	"$NISMASTER")
@@ -332,7 +332,70 @@ nisint_netgroup_test_1006()
 }
 
 # nfs mount positive
+nisint_netgroup_test_1007()
+{
+	rlPhaseStartTest "nisint_netgroup_test_1007: nfs mount positive test"
+	case "$HOSTNAME" in
+	"$MASTER")
+		rlLog "Machine in recipe is IPAMASTER"
+		rhts-sync-block -s "$FUNCNAME.0" $NISCLIENT
+		rlRun "mkdir /nctmp" 0 "Create temp mount point."
+		rlRun "mount $NISCLIENT:/tmp /nctmp" 0 "NFS Mount with netgroup access"
+		rlRun "umount /nctmp" 0 "Unmount NFS export"
+		rlRun "rmdir /nctmp" 0 "Remove temp mount point."
+		rhts-sync-set -s "$FUNCNAME.1" -m $MASTER
+		;;
+	"$NISMASTER")
+		rlLog "Machine in recipe is NISMASTER"
+		rhts-sync-block -s "$FUNCNAME.0" $NISCLIENT
+		rhts-sync-block -s "$FUNCNAME.1" $MASTER
+		;;
+	"$NISCLIENT")
+		rlLog "Machine in recipe is NISCLIENT"
+		rlRun "service rpcbind restart"
+		rlRun "service nfs restart"
+		rlRun "service nfslock restart"
+		rlRun "exportfs @testnetgroup1:/tmp"
+		rhts-sync-set -s "$FUNCNAME.0" -m $NISCLIENT
+		rhts-sync-block -s "$FUNCNAME.1" $MASTER
+		;;
+	*)
+		rlLog "Machine in recipe is not a known ROLE"
+		;;
+	esac
+	rlPhaseEnd
+}
 
 # nfs mount negative
-
-
+nisint_netgroup_test_1008()
+{
+	rlPhaseStartTest "nisint_netgroup_test_1008: nfs mount negative test"
+	case "$HOSTNAME" in
+	"$MASTER")
+		rlLog "Machine in recipe is IPAMASTER"
+		rhts-sync-block -s "$FUNCNAME.0" $NISCLIENT
+		rhts-sync-block -s "$FUNCNAME.1" $NISMASTER
+		;;
+	"$NISMASTER")
+		rlLog "Machine in recipe is NISMASTER"
+		rhts-sync-block -s "$FUNCNAME.0" $NISCLIENT
+		rlRun "mkdir /nctmp"
+		rlRun "mount $NISCLIENT:/tmp /nctmp" 32 "Fail to NFS Mount with no netgroup access"
+		rlRun "rmdir /nctmp" 0 "Remove temp mount point."
+		rhts-sync-set -s "$FUNCNAME.1" $NISMASTER
+		;;
+	"$NISCLIENT")
+		rlLog "Machine in recipe is NISCLIENT"
+		rlRun "service rpcbind restart"
+		rlRun "service nfs restart"
+		rlRun "service nfslock restart"
+		rlRun "exportfs @testnetgroup1:/tmp"
+		rhts-sync-set -s "$FUNCNAME.0" -m $NISCLIENT
+		rhts-sync-block -s "$FUNCNAME.1" $NISMASTER
+		;;
+	*)
+		rlLog "Machine in recipe is not a known ROLE"
+		;;
+	esac
+	rlPhaseEnd
+}

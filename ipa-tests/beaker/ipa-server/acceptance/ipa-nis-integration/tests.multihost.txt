@@ -3,7 +3,6 @@ IPAMASTER                           NISMASTER                           NISCLIEN
 quickinstall						
 ipa-netgroup-cli
 ipa-automount-cli
-ipa-services
 ipa-nis-integration                 ipa-nis-integration                 ipa-nis-integration
 ---------------------------         ---------------------------         ---------------------------
 ### nismaster_setup
