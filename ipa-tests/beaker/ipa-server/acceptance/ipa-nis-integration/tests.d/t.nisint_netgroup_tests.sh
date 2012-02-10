@@ -41,6 +41,16 @@
 nisint_netgroup_tests()
 {
 
+	nisint_netgroup_test_envsetup
+	nisint_netgroup_test_1001
+	nisint_netgroup_test_1002
+	nisint_netgroup_test_1003
+	nisint_netgroup_test_1004
+	nisint_netgroup_test_1005
+	nisint_netgroup_test_1006
+	nisint_netgroup_test_1007
+	nisint_netgroup_test_1008
+	nisint_netgroup_test_envcleanup
 }
 
 nisint_netgroup_test_envsetup()

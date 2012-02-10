@@ -89,7 +89,7 @@ rlJournalStart
 	nisint_user_tests
 	nisint_group_tests
 	nisint_netgroup_tests
-	#nisint_automount_tests
+	nisint_automount_tests
 	#nisint_client_is_nis_bz_tests
 
 	##############################################################
