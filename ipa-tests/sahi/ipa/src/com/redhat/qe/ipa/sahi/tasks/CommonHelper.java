@@ -100,7 +100,7 @@ public class CommonHelper {
 		return ret;
 	}
 	
-	public static String getAll(String[] data)
+	public static String arrayToString(String[] data)
 	{
 		StringBuffer sb = new StringBuffer();
 		for (String item:data)

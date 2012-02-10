@@ -325,7 +325,7 @@ public class SelfservicepermissionTests extends SahiTestScript{
 	private static int pick=5;
 	private static String singlePermission = CommonHelper.getSingle(random, defaults);
 	private static String multiplePermissions = CommonHelper.getMultiple(random,  pick, defaults);
-	private static String allPermissions = CommonHelper.getAll(defaults);
+	private static String allPermissions = CommonHelper.arrayToString(defaults);
 	private static String[] testPermissions = {"permission000","permission001","permission002","permission003","permission004","permission005","permission006"};
 	
 	@DataProvider(name="addPermission")
