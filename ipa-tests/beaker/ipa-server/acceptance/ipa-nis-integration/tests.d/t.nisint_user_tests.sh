@@ -536,6 +536,7 @@ nisint_user_test_1014()
 
 		rlRun "ssh_auth_success testuser1 passw0rd1 localhost" 
 
+		yum -y remove krb5-workstation
 		mv /etc/krb5.conf.orig.nisint /etc/krb5.conf
 		rlRun "authconfig --disablekrb5 --update"
 		rm /etc/krb5.keytab
