@@ -76,8 +76,9 @@ nisint_nisclient_integration_master_envsetup()
 {
 	rlPhaseStartTest "nisint_nisclient_integration_master_envsetup: Run setup on MASTER to prep for Client Integration"
 		rlLog "prep for Kerberos setup for auth on the client"
+		rlRun "ipa host-add $NISCLIENT --ip-address=$NISCLIENT_IP"
 		rlRun "ipa-getkeytab -s $MASTER -p host/$NISCLIENT@$RELM -k /tmp/krb5.keytab.$NISCLIENT"
-		rlRun "scp -q -o StrictHostKeyChecking=no /tmp/krb5.keytab.$NISCLIENT root@$NISCLIENT:/etc/krb5.keytab"
+		rlRun "scp /tmp/krb5.keytab.$NISCLIENT root@$NISCLIENT:/etc/krb5.keytab"
 	rlPhaseEnd
 }
 
@@ -104,8 +105,6 @@ nisint_nisclient_integration_change_to_ipa_nismaster()
 		rlRun "sed -i 's/$NISMASTER/$MASTER/g' /etc/yp.conf"
 		rlRun "cp /etc/sysconfig/network /etc/sysconfig/network.orig.$NISDOMAIN"
 		rlRun "sed -i 's/$NISDOMAIN/$DOMAIN/g' /etc/sysconfig/network"
-		rlRun "nisdomainname $DOMAIN"
-		rlRun "service rpcbind restart"
 		rlRun "service ypbind restart"
 		rlRun "service nscd restart"
 		[ -f $tmpout ] && rm -f $tmpout
@@ -117,15 +116,10 @@ nisint_nisclient_integration_setup_kerberos_for_auth()
 {
 	rlPhaseStartTest "nisint_nisclient_integration_setup_kerberos_for_auth: Setup Kerberos for NIS Client"
 		rlRun "yum -y install krb5-workstation" 0 "Install krb5-workstation"
-		rlRun "service ntpd stop"
-		rlRun "service ntpdate start"
-		rlRun "service ntpd start"
-		rlRun "chkconfig ntpd on"
-		rlRun "touch /etc/krb5.keytab"
-		rlRun "cp /etc/krb5.conf /etc/krb5.conf.orig.nisint"
-		rlRun "sed -i \"s/kerberos.example.com/$MASTER/g\" /etc/krb5.conf"
-		rlRun "sed -i \"s/EXAMPLE.COM/$RELM/g\" /etc/krb5.conf"
-		rlRun "sed -i \"s/example.com/$DOMAIN/g\" /etc/krb5.conf"
+		cp /etc/krb5.conf /etc/krb5.conf.orig.nisint
+		sed -i "s/kerberos.example.com/$MASTER/g" /etc/krb5.conf
+		sed -i "s/EXAMPLE.COM/$RELM/g" /etc/krb5.conf
+		sed -i "s/example.com/$DOMAIN/g" /etc/krb5.conf
 		rlRun "authconfig --enablekrb5 --update"
 	rlPhaseEnd
 }

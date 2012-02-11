@@ -221,6 +221,10 @@ nisint_netgroup_test_1005()
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
+        #rlRun "ipa-getkeytab -s $MASTER -p host/$NISCLIENT@$RELM -k /tmp/krb5.keytab.$NISCLIENT"
+        #rlRun "scp /tmp/krb5.keytab.$NISCLIENT root@$NISCLIENT:/etc/krb5.keytab"
+		#
+		#rhts-sync-set -s "$FUNCNAME.0" -m $MASTER
 		rhts-sync-block -s "$FUNCNAME.1" $NISCLIENT
 
 		ssh_auth_success testuser1 passw0rd1 $NISCLIENT
@@ -230,12 +234,23 @@ nisint_netgroup_test_1005()
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
+		#rhts-sync-block -s "$FUNCNAME.0" $MASTER
 		rhts-sync-block -s "$FUNCNAME.1" $NISCLIENT
 		rhts-sync-block -s "$FUNCNAME.2" $MASTER
 		rhts-sync-block -s "$FUNCNAME.3" $NISCLIENT
 		;;
 	"$NISCLIENT")
 		rlLog "Machine in recipe is NISCLIENT"
+		rhts-sync-block -s "$FUNCNAME.0" $MASTER
+
+		# setup krb5 for authentication
+		#yum -y install krb5-workstation
+		#cp /etc/krb5.conf /etc/krb5.conf.orig.nisint
+		#sed -i "s/kerberos.example.com/$MASTER/g" /etc/krb5.conf
+		#sed -i "s/EXAMPLE.COM/$RELM/g" /etc/krb5.conf
+		#sed -i "s/example.com/$DOMAIN/g" /etc/krb5.conf
+		#rlRun "authconfig --enablekrb5 --update"
+
 		# setup hosts.allow/hosts.deny files using netgroups
 		cp /etc/hosts.allow /etc/hosts.allow.orig.nisint
 		cp /etc/hosts.deny /etc/hosts.deny.orig.nisint
@@ -245,9 +260,13 @@ nisint_netgroup_test_1005()
 		rhts-sync-set -s "$FUNCNAME.1" -m $NISCLIENT
 		rhts-sync-block -s "$FUNCNAME.2" $MASTER
 
-		# cleanup/undo hosts.allow/host.deny files
+		# cleanup/undo krb5 setup
+		yum -y remove krb5-workstation
+		mv -f /etc/krb5.conf.orig.nisint /etc/krb5.conf
 		mv -f /etc/hosts.allow.orig.nisint /etc/hosts.allow
 		mv -f /etc/hosts.deny.orig.nisint /etc/hosts.deny
+		rm -f /etc/krb5.keytab
+		rlRun "authconfig --disablekrb5 --update"
 
 		rhts-sync-set -s "$FUNCNAME.3" -m $NISCLIENT
 		;;

@@ -90,27 +90,29 @@ nisint_nismaster_setup_netgroups()
 	rlPhaseStartTest "nisint_nismaster_setup_netgroups: Adding Netgroups to NIS map for Integration testing"
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 
-cat <<-EOF >> /etc/netgroup
-nisint_goodusers nisint_goodusers1 nisint_goodusers2 nisint_goodusers3 nisint_goodusers4
-nisint_goodusers1 (,gooduser1,)
-nisint_goodusers2 (,gooduser2,$NISDOMAIN)
-nisint_goodusers3 (-,gooduser3,)
-nisint_goodusers4 (-,gooduser4,$NISDOMAIN)
-nisint_badusers ng_badusers1 ng_badusers2 ng_badusers3 ng_badusers4
-nisint_badusers1 (,baduser1,)
-nisint_badusers2 (,baduser2,$NISDOMAIN)
-nisint_badusers3 (-,baduser3,)
-nisint_badusers4 (-,baduser4,$NISDOMAIN)
-nisint_evilservers (cracker1,,) (cracker1.cracker.org,,) (cracker2,,) (cracker2.cracker.org,,)
-EOF
+		cat <<-EOF >> /etc/netgroup
+		nisint_goodusers nisint_goodusers1 nisint_goodusers2 nisint_goodusers3 nisint_goodusers4
+		nisint_goodusers1 (,goodusers1,)
+		nisint_goodusers2 (,goodusers2,$NISDOMAIN)
+		nisint_goodusers3 (-,goodusers3,)
+		nisint_goodusers4 (-,goodusers4,$NISDOMAIN)
+		
+		nisint_nisbadusers ng_nisbadusers1 ng_nisbadusers2 ng_nisbadusers3 ng_nisbadusers4
+		nisint_nisbadusers1 (,nisbadusers1,)
+		nisint_nisbadusers2 (,nisbadusers2,$NISDOMAIN)
+		nisint_nisbadusers3 (-,nisbadusers3,)
+		nisint_nisbadusers4 (-,nisbadusers4,$NISDOMAIN)
+		
+		nisint_evilservers (cracker1,,) (cracker1.cracker.org,,) (cracker2,,) (cracker2.cracker.org,,)
+		EOF
 	
 		GOODSERVERNG="nisint_goodservers"
 		for server in $MASTER $NISMASTER $NISCLIENT; do
 			GOODSERVERNG="$GOODSERVERNG ($server,,)"
 		done
-cat <<-EOF >> /etc/netgroup
-$GOODSERVERNG
-EOF
+		cat <<-EOF >> /etc/netgroup
+		$GOODSERVERNG
+		EOF
 		
 		rlRun "make -C /var/yp" 0 "updating NIS netgroup map"
 		rlRun "ypcat -d $NISDOMAIN -h $NISMASTER netgroup|grep nisint_" 0 "Check that new netgroups are in the map"
@@ -143,18 +145,13 @@ nisint_nismaster_setup_automountmaps()
 	rlPhaseStartTest "nisint_nismaster_setup_automountmaps: Adding Automount maps to NIS for Integration testing"
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 
-		cat <<-EOF > /etc/auto.master
-		/nfshome auto.home
-		/nisint auto.nisint
+		cat <<-EOF >> /etc/auto.master
+		/nisint +auto.nisint
 		EOF
 	
-		cat <<-EOF > /etc/auto.nisint
+		cat <<-EOF >> /etc/auto.nisint
 		app1 -rw,rsize=65536,wsize=65536,hard,intr,actimeo=3600,timeo=3600 $NISMASTER:/nisint/app1
 		app2 -rw,rsize=65536,wsize=65536,hard,intr,actimeo=3600,timeo=3600 $NISMASTER:/nisint/app2
-		EOF
-
-		cat <<-EOF > /etc/auto.home
-		* -rw,rsize=65536,wsize=65536,hard,intr,actimeo=3600,timeo=3600 $NISMASTER:/home/&
 		EOF
 
 		sed -i 's!^\(AUTO_LOCAL  = .*\)$!\1\nAUTO_NISINT   = \$(YPSRCDIR)/auto.nisint!' /var/yp/Makefile
@@ -178,12 +175,13 @@ nisint_nismaster_setup_nfs_exports()
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 
 		rlRun "mkdir -p /nisint/app{1,2}" 0 "Create NFS export directories"	
-		cat <<-EOF > /etc/exports
-		/home	*(rw,fsid=0,insecure,no_root_squash,sync,anonuid=65534,anongid=65534)
+		cat <<-EOF >> /etc/exports
 		/nisint/app1 @nisint_goodservers(rw,no_root_squash)
 		/nisint/app2 @nisint_evilservers(ro)
 		EOF
 	
+		rlRun "setsebool -P nfs_export_all_rw 1" 0 "set nfs_export_all_rw Boolean for SELinux"
+		rlRun "setsebool -P nfs_export_all_ro 1" 0 "set nfs_export_all_ro Boolean for SELinux"
 		rlRun "service nfs restart" 0 "restart nfs services"
 		rlRun "service nfslock restart" 0 "restart nfslock service"
 		rlRun "exportfs -av" 0 "Export /nisint dirs for NIS Integration testing"
@@ -237,12 +235,11 @@ nisint_nismaster_setup_hosts()
 		192.168.4.2	goodhost2
 		192.168.4.3	goodhost3
 		192.168.4.4	goodhost4
-		$NISMASTER_IP $NISMASTER
-		$NISCLIENT_IP $NISCLIENT
 		EOF
 		rlRun "make -C /var/yp" 0 "Update NIS hosts map"
 		rlRun "ypcat -d $NISDOMAIN -h $NISMASTER hosts|grep goodhost" 0 "Check that new hosts are in the map"
 		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd
 }
+
 

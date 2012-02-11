@@ -111,7 +111,6 @@ nisint_ipamaster_integration_add_nis_data_passwd()
 			
 			# Now create this entry
 			rlRun "create_ipauser $username NIS USER passw0rd1"
-			KinitAsAdmin
 			rlRun "ipa user-mod $username --gidnumber=$gid --uid=$uid --gecos=$gecos --homedir=$homedir --shell=$shell"
 			rlRun "ipa user-show $username"
 		done
@@ -256,17 +255,16 @@ nisint_ipamaster_integration_add_nis_data_automount()
 			rlRun "ypcat -k -d $NISDOMAIN -h $NISMASTER $MAP > /dev/shm/nis-map.$MAP 2>&1"				
 			rlRun "ipa automountmap-add nis $MAP"
 
-			cat <<-EOF > /tmp/amap.ldif
+			ldapadd -x -h $MASTER -D "cn=Directory Manager" -w $ADMINPW <<-EOF
 			dn: nis-domain=testrelm.com+nis-map=$MAP,cn=NIS Server,cn=plugins,cn=config
 			objectClass: extensibleObject
-			nis-domain: $DOMAIN
+			nis-domain: testrelm.com
 			nis-map: $MAP
-			nis-base: automountmapname=$MAP,cn=nis,cn=automount,$BASEDN
+			nis-base: automountmapname=$MAP,cn=nis,cn=automount,dc=testrelm,dc=com
 			nis-filter: (objectclass=*)
 			nis-key-format: %{automountKey}
 			nis-value-format: %{automountInformation}	
 			EOF
-			rlRun "ldapadd -x -h $MASTER -D '$ROOTDN' -w $ADMINPW -f /tmp/amap.ldif"
 
 			IFS="
 "
@@ -298,8 +296,8 @@ nisint_ipamaster_integration_setup_nis_listener()
 	rlPhaseStartTest "nisint_ipamaster_integration_setup_nis_listener: Enable the IPA NIS Listener"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
-		rlRun "echo $ADMINPW|ipa-compat-manage enable" 0,2
-		rlRun "echo $ADMINPW|ipa-nis-manage enable" 0,2
+		rlRun "echo $ADMINPW|ipa-compat-manage enable"
+		rlRun "echo $ADMINPW|ipa-nis-manage enable"
 		rlRun "service rpcbind restart"
 		rlRun "service dirsrv restart"
 		[ -f $tmpout ] && rm -f $tmpout	
