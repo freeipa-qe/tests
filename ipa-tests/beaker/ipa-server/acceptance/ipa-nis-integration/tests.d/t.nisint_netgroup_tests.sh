@@ -40,7 +40,6 @@
 ######################################################################
 nisint_netgroup_tests()
 {
-
 	nisint_netgroup_test_envsetup
 	nisint_netgroup_test_1001
 	nisint_netgroup_test_1002
@@ -50,6 +49,8 @@ nisint_netgroup_tests()
 	nisint_netgroup_test_1006
 	nisint_netgroup_test_1007
 	nisint_netgroup_test_1008
+	nisint_netgroup_test_1009
+	nisint_netgroup_test_1010
 	nisint_netgroup_test_envcleanup
 }
 
@@ -62,8 +63,6 @@ nisint_netgroup_test_envsetup()
 		rlRun "create_ipauser testuser1 test user passw0rd1"
 		rlRun "create_ipauser testuser2 test user passw0rd1"
 		KinitAsAdmin
-		rlRun "ipa host-add $NISCLIENT --ip-address=$NISCLIENT_IP"
-		rlRun "ipa host-add $NISMASTER --ip-address=$NISMASTER_IP"
 		rlRun "ipa netgroup-add testnetgroup1 --desc=testnetgroup1"
 		rlRun "ipa netgroup-add testnetgroup2 --desc=testnetgroup2"
 		rlRun "ipa netgroup-add-member testnetgroup1 --users=testuser1 --hosts=$MASTER"
@@ -94,8 +93,6 @@ nisint_netgroup_test_envcleanup()
 		KinitAsAdmin
 		rlRun "ipa user-del testuser1"
 		rlRun "ipa user-del testuser2"
-		rlRun "ipa host-del --updatedns $NISCLIENT"
-		rlRun "ipa host-del --updatedns $NISMASTER"
 		rlRun "ipa netgroup-del testnetgroup1"
 		rlRun "ipa netgroup-del testnetgroup2"
 		rhts-sync-set -s "$FUNCNAME" -m $MASTER
@@ -114,10 +111,17 @@ nisint_netgroup_test_envcleanup()
 	esac
 	rlPhaseEnd
 }
+
 # ypcat positive
 nisint_netgroup_test_1001()
 {
 	rlPhaseStartTest "nisint_netgroup_test_1001: ypcat positive test"
+	if [ $(ps -ef|grep [y]pbind|wc -l) -eq 0 ]; then
+		rlPass "ypbind not running...skipping test"
+		rlPhaseEnd
+		return 0
+	fi
+
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
@@ -143,6 +147,12 @@ nisint_netgroup_test_1001()
 nisint_netgroup_test_1002()
 {
 	rlPhaseStartTest "nisint_netgroup_test_1002: ypcat negative test"
+	if [ $(ps -ef|grep [y]pbind|wc -l) -eq 0 ]; then
+		rlPass "ypbind not running...skipping test"
+		rlPhaseEnd
+		return 0
+	fi
+
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
@@ -164,10 +174,72 @@ nisint_netgroup_test_1002()
 	rlPhaseEnd
 }
 
-# getent positive
+# ipa positive
 nisint_netgroup_test_1003()
 {
-	rlPhaseStartTest "nisint_netgroup_test_1003: getent positive test"
+	rlPhaseStartTest "nisint_netgroup_test_1003: ipa positive test"
+	if [ ! -f /usr/bin/ipa ]; then
+		rlPass "ipa not found...skipping"
+		rlPhaseEnd
+		return 0
+	fi
+
+	case "$HOSTNAME" in
+	"$MASTER")
+		rlLog "Machine in recipe is IPAMASTER"
+		rhts-sync-block -s "$FUNCNAME" $NISCLIENT
+		;;
+	"$NISMASTER")
+		rlLog "Machine in recipe is NISMASTER"
+		rhts-sync-block -s "$FUNCNAME" $NISCLIENT
+		;;
+	"$NISCLIENT")
+		rlLog "Machine in recipe is NISCLIENT"
+		rlRun "ipa netgroup-find|grep testnetgroup1" 0 "ipa search for existing netgroup"
+		rhts-sync-set -s "$FUNCNAME" -m $NISCLIENT
+		;;
+	*)
+		rlLog "Machine in recipe is not a known ROLE"
+		;;
+	esac
+	rlPhaseEnd
+}
+
+# ipa negative
+nisint_netgroup_test_1004()
+{
+	rlPhaseStartTest "nisint_netgroup_test_1004: ipa negative test"
+	if [ ! -f /usr/bin/ipa ]; then
+		rlPass "ipa not found...skipping"
+		rlPhaseEnd
+		return 0
+	fi
+
+	case "$HOSTNAME" in
+	"$MASTER")
+		rlLog "Machine in recipe is IPAMASTER"
+		rhts-sync-block -s "$FUNCNAME" $NISCLIENT
+		;;
+	"$NISMASTER")
+		rlLog "Machine in recipe is NISMASTER"
+		rhts-sync-block -s "$FUNCNAME" $NISCLIENT
+		;;
+	"$NISCLIENT")
+		rlLog "Machine in recipe is NISCLIENT"
+		rlRun "ipa netgroup-find|grep notanetgroup" 1 "fail to ipa search for non-existent netgroup"
+		rhts-sync-set -s "$FUNCNAME" -m $NISCLIENT
+		;;
+	*)
+		rlLog "Machine in recipe is not a known ROLE"
+		;;
+	esac
+	rlPhaseEnd
+}
+
+# getent positive
+nisint_netgroup_test_1005()
+{
+	rlPhaseStartTest "nisint_netgroup_test_1005: getent positive test"
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
@@ -190,9 +262,9 @@ nisint_netgroup_test_1003()
 }
 
 # getent negative
-nisint_netgroup_test_1004()
+nisint_netgroup_test_1006()
 {
-	rlPhaseStartTest "nisint_netgroup_test_1004: getent negative test"
+	rlPhaseStartTest "nisint_netgroup_test_1006: getent negative test"
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
@@ -215,9 +287,9 @@ nisint_netgroup_test_1004()
 }
 
 # ssh positive
-nisint_netgroup_test_1005()
+nisint_netgroup_test_1007()
 {
-	rlPhaseStartTest "nisint_netgroup_test_1005: ssh positive test"
+	rlPhaseStartTest "nisint_netgroup_test_1007: ssh positive test"
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
@@ -259,41 +331,27 @@ nisint_netgroup_test_1005()
 }
 
 # ssh negative
-nisint_netgroup_test_1006()
+nisint_netgroup_test_1008()
 {
-	rlPhaseStartTest "nisint_netgroup_test_1006: ssh negative test"
+	rlPhaseStartTest "nisint_netgroup_test_1008: ssh negative test"
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
-        rlRun "ipa-getkeytab -s $MASTER -p host/$NISCLIENT@$RELM -k /tmp/krb5.keytab.$NISCLIENT"
-        rlRun "scp /tmp/krb5.keytab.$NISCLIENT root@$NISCLIENT:/etc/krb5.keytab"
-
-		rhts-sync-set -s "$FUNCNAME.0" -m $MASTER
 		rhts-sync-block -s "$FUNCNAME.1" $NISCLIENT
 
-		ssh_auth_success testuser1 passw0rd1 $NISCLIENT
+		ssh_auth_failure testuser1 passw0rd1 $NISCLIENT
 
 		rhts-sync-set -s "$FUNCNAME.2" -m $MASTER
-		rhts-sync-block -s "$FUNCNAME.3" $NISCLIENT	
+		rhts-sync-block -s "$FUNCNAME.3" $NISCLIENT
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
-		rhts-sync-block -s "$FUNCNAME.0" $MASTER
 		rhts-sync-block -s "$FUNCNAME.1" $NISCLIENT
 		rhts-sync-block -s "$FUNCNAME.2" $MASTER
 		rhts-sync-block -s "$FUNCNAME.3" $NISCLIENT
 		;;
 	"$NISCLIENT")
 		rlLog "Machine in recipe is NISCLIENT"
-		rhts-sync-block -s "$FUNCNAME.0" $MASTER
-
-		# setup krb5 for authentication
-		yum -y install krb5-workstation
-		cp /etc/krb5.conf /etc/krb5.conf.orig.nisint
-		sed -i "s/kerberos.example.com/$MASTER/g" /etc/krb5.conf
-		sed -i "s/EXAMPLE.COM/$RELM/g" /etc/krb5.conf
-		sed -i "s/example.com/$DOMAIN/g" /etc/krb5.conf
-		rlRun "authconfig --enablekrb5 --update"
 
 		# setup hosts.allow/hosts.deny files using netgroups
 		cp /etc/hosts.allow /etc/hosts.allow.orig.nisint
@@ -303,17 +361,11 @@ nisint_netgroup_test_1006()
 
 		rhts-sync-set -s "$FUNCNAME.1" -m $NISCLIENT
 		rhts-sync-block -s "$FUNCNAME.2" $MASTER
-
-		# cleanup/undo krb5 setup
-		yum -y remove krb5-workstation
-		mv -f /etc/krb5.conf.orig.nisint /etc/krb5.conf
+		
 		mv -f /etc/hosts.allow.orig.nisint /etc/hosts.allow
-		mv -f /etc/hosts.deny.orig.nisint /etc/hosts.deny
-		rm -f /etc/krb5.keytab
-		rlRun "authconfig --disablekrb5 --update"
+        mv -f /etc/hosts.deny.orig.nisint /etc/hosts.deny
 
 		rhts-sync-set -s "$FUNCNAME.3" -m $NISCLIENT
-
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE"
@@ -323,9 +375,9 @@ nisint_netgroup_test_1006()
 }
 
 # nfs mount positive
-nisint_netgroup_test_1007()
+nisint_netgroup_test_1009()
 {
-	rlPhaseStartTest "nisint_netgroup_test_1007: nfs mount positive test"
+	rlPhaseStartTest "nisint_netgroup_test_1009: nfs mount positive test"
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
@@ -358,9 +410,9 @@ nisint_netgroup_test_1007()
 }
 
 # nfs mount negative
-nisint_netgroup_test_1008()
+nisint_netgroup_test_1010()
 {
-	rlPhaseStartTest "nisint_netgroup_test_1008: nfs mount negative test"
+	rlPhaseStartTest "nisint_netgroup_test_1010: nfs mount negative test"
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"

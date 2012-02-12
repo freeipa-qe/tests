@@ -53,6 +53,8 @@ nisint_group_tests()
 	nisint_group_test_1010
 	nisint_group_test_1011
 	nisint_group_test_1012
+	nisint_group_test_1013
+	nisint_group_test_1014
 	nisint_group_test_envcleanup
 }
 
@@ -121,6 +123,12 @@ nisint_group_test_envcleanup()
 nisint_group_test_1001()
 {
 	rlPhaseStartTest "nisint_group_test_1001: ypcat positive test"
+	if [ $(ps -ef|grep [y]pbind|wc -l) -eq 0 ]; then
+		rlPass "ypbind not running...skipping test"
+		rlPhaseEnd
+		return 0
+	fi
+
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
@@ -148,6 +156,12 @@ nisint_group_test_1001()
 nisint_group_test_1002()
 {
 	rlPhaseStartTest "nisint_group_test_1002: ypcat negative test"
+	if [ $(ps -ef|grep [y]pbind|wc -l) -eq 0 ]; then
+		rlPass "ypbind not running...skipping test"
+		rlPhaseEnd
+		return 0
+	fi
+
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
@@ -171,10 +185,76 @@ nisint_group_test_1002()
 	rlPhaseEnd
 }
 
-# getent positive
+# ipa positive
 nisint_group_test_1003()
 {
-	rlPhaseStartTest "nisint_group_test_1003: getent positive test"
+	rlPhaseStartTest "nisint_group_test_1003: ipa positive test"
+	if [ ! -f /usr/bin/ipa ]; then
+		rlPass "ipa not found...skipping"
+		rlPhaseEnd
+		return 0
+	fi
+
+	case "$HOSTNAME" in
+	"$MASTER")
+		rlLog "Machine in recipe is IPAMASTER"
+		rhts-sync-block -s "$FUNCNAME" $NISCLIENT
+		;;
+	"$NISMASTER")
+		rlLog "Machine in recipe is NISMASTER"
+		rhts-sync-block -s "$FUNCNAME" $NISCLIENT
+		;;
+	"$NISCLIENT")
+		rlLog "Machine in recipe is NISCLIENT"
+		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
+		rlRun "ipa group-find|grep testgroup1" 0 "ipa search for existing group"
+		rhts-sync-block -s "$FUNCNAME" -m $NISCLIENT
+		[ -f $tmpout ] && rm -f $tmpout
+		;;
+	*)
+		rlLog "Machine in recipe is not a known ROLE"
+		;;
+	esac
+	rlPhaseEnd
+}
+
+# ipa negative
+nisint_group_test_1004()
+{
+	rlPhaseStartTest "nisint_group_test_1004: ipa negative test"
+	if [ ! -f /usr/bin/ipa ]; then
+		rlPass "ipa not found...skipping"
+		rlPhaseEnd
+		return 0
+	fi
+
+	case "$HOSTNAME" in
+	"$MASTER")
+		rlLog "Machine in recipe is IPAMASTER"
+		rhts-sync-block -s "$FUNCNAME" $NISCLIENT
+		;;
+	"$NISMASTER")
+		rlLog "Machine in recipe is NISMASTER"
+		rhts-sync-block -s "$FUNCNAME" $NISCLIENT
+		;;
+	"$NISCLIENT")
+		rlLog "Machine in recipe is NISCLIENT"
+		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
+		rlRun "ipa group-find|grep notagroup" 1 "failed to ipa search for non-existent group"
+		rhts-sync-block -s "$FUNCNAME" -m $NISCLIENT
+		[ -f $tmpout ] && rm -f $tmpout
+		;;
+	*)
+		rlLog "Machine in recipe is not a known ROLE"
+		;;
+	esac
+	rlPhaseEnd
+}
+
+# getent positive
+nisint_group_test_1005()
+{
+	rlPhaseStartTest "nisint_group_test_1005: getent positive test"
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
@@ -199,9 +279,9 @@ nisint_group_test_1003()
 }
 
 # getent negative
-nisint_group_test_1004()
+nisint_group_test_1006()
 {
-	rlPhaseStartTest "nisint_group_test_1004: getent negative test"
+	rlPhaseStartTest "nisint_group_test_1006: getent negative test"
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
@@ -226,9 +306,9 @@ nisint_group_test_1004()
 }
 
 # chown positive
-nisint_group_test_1005()
+nisint_group_test_1007()
 {
-	rlPhaseStartTest "nisint_group_test_1005: chown positive test"
+	rlPhaseStartTest "nisint_group_test_1007: chown positive test"
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
@@ -256,9 +336,9 @@ nisint_group_test_1005()
 }
 
 # chown negative
-nisint_group_test_1006()
+nisint_group_test_1008()
 {
-	rlPhaseStartTest "nisint_group_test_1006: chown negative test"
+	rlPhaseStartTest "nisint_group_test_1008: chown negative test"
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
@@ -286,9 +366,9 @@ nisint_group_test_1006()
 }
 
 # chgrp positive
-nisint_group_test_1007()
+nisint_group_test_1009()
 {
-	rlPhaseStartTest "nisint_group_test_1007: chgrp positive test"
+	rlPhaseStartTest "nisint_group_test_1009: chgrp positive test"
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
@@ -316,9 +396,9 @@ nisint_group_test_1007()
 }
 
 # chgrp negative
-nisint_group_test_1008()
+nisint_group_test_1010()
 {
-	rlPhaseStartTest "nisint_group_test_1008: chgrp negative test"
+	rlPhaseStartTest "nisint_group_test_1010: chgrp negative test"
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
@@ -346,9 +426,9 @@ nisint_group_test_1008()
 }
 
 # write positive
-nisint_group_test_1009()
+nisint_group_test_1011()
 {
-	rlPhaseStartTest "nisint_group_test_1009: write positive test"
+	rlPhaseStartTest "nisint_group_test_1011: write positive test"
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
@@ -378,9 +458,9 @@ nisint_group_test_1009()
 }
 
 # write negative
-nisint_group_test_1010()
+nisint_group_test_1012()
 {
-	rlPhaseStartTest "nisint_group_test_1010: write negative test"
+	rlPhaseStartTest "nisint_group_test_1012: write negative test"
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
@@ -410,9 +490,9 @@ nisint_group_test_1010()
 }
 
 # read positive
-nisint_group_test_1011()
+nisint_group_test_1013()
 {
-	rlPhaseStartTest "nisint_group_test_1011: read positive test"
+	rlPhaseStartTest "nisint_group_test_1013: read positive test"
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
@@ -440,9 +520,9 @@ nisint_group_test_1011()
 }
 
 # read negative 
-nisint_group_test_1012()
+nisint_group_test_1014()
 {
-	rlPhaseStartTest "nisint_group_test_1012: read negative test"
+	rlPhaseStartTest "nisint_group_test_1014: read negative test"
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"

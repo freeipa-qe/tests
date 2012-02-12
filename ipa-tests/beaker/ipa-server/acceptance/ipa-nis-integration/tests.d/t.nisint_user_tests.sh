@@ -49,12 +49,15 @@ nisint_user_tests()
 	nisint_user_test_1006
 	nisint_user_test_1007
 	nisint_user_test_1008
-	nisint_user_test_1000
+	nisint_user_test_1009
 	nisint_user_test_1010
 	nisint_user_test_1011
 	nisint_user_test_1012
 	nisint_user_test_1013
 	nisint_user_test_1014
+	nisint_user_test_1015
+	nisint_user_test_1016
+	nisint_user_test_1017
 	nisint_user_test_envcleanup
 }
 
@@ -68,7 +71,7 @@ nisint_user_test_envsetup()
 		rlRun "create_ipauser testuser1 NIS USER passw0rd1"
 		rlRun "create_ipauser testuser2 NIS USER passw0rd1"
 		rhts-sync-set -s "$FUNCNAME" -m $MASTER
-		[ -f $tmpout ] && rm $tmpout
+		[ -f $tmpout ] && rm -f $tmpout
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
@@ -96,7 +99,7 @@ nisint_user_test_envcleanup()
 		rlRun "ipa user-del testuser1"
 		rlRun "ipa user-del testuser2"
 		rhts-sync-set -s "$FUNCNAME" -m $MASTER
-		[ -f $tmpout ] && rm $tmpout
+		[ -f $tmpout ] && rm -f $tmpout
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
@@ -119,6 +122,12 @@ nisint_user_test_envcleanup()
 nisint_user_test_1001()
 {
 	PhaseStartTest "nisint_user_test_1001: ypcat positive test"
+	if [ $(ps -ef|grep [y]pbind|wc -l) -eq 0 ]; then
+		rlPass "ypbind not running...skipping test"
+		rlPhaseEnd
+		return 0
+	fi
+
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
@@ -133,7 +142,7 @@ nisint_user_test_1001()
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ypcat passwd|grep testuser1" 0 "ypcat search for existing user"
 		rhts-sync-set -s "$FUNCNAME" -m $NISCLIENT
-		[ -f $tmpout ] && rm $tmpout
+		[ -f $tmpout ] && rm -f $tmpout
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE"
@@ -146,6 +155,11 @@ nisint_user_test_1001()
 nisint_user_test_1002()
 {
 	PhaseStartTest "nisint_user_test_1002: ypcat negative test"
+	if [ $(ps -ef|grep [y]pbind|wc -l) -eq 0 ]; then
+		rlPass "ypbind not running...skipping test"
+		rlPhaseEnd
+		return 0
+	fi
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
@@ -158,9 +172,74 @@ nisint_user_test_1002()
 	"$NISCLIENT")
 		rlLog "Machine in recipe is NISCLIENT"
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
-		rlRun "ypcat passwd|grep notauser" 1 "ypcat search for non-existent user"
+		rlRun "ypcat passwd|grep notauser" 1 "Fail to ypcat search for non-existent user"
 		rhts-sync-set -s "$FUNCNAME" -m $NISCLIENT
-		[ -f $tmpout ] && rm $tmpout
+		[ -f $tmpout ] && rm -f $tmpout
+		;;
+	*)
+		rlLog "Machine in recipe is not a known ROLE"
+		;;
+	esac
+	rlPhaseEnd
+}
+
+# ipa positive
+nisint_user_test_1003()
+{
+	PhaseStartTest "nisint_user_test_1003: ipa positive test"
+	if [ ! -f /usr/bin/ipa ]; then
+		rlPass "ipa not found...skipping"
+		rlPhaseEnd
+		return 0
+	fi
+
+	case "$HOSTNAME" in
+	"$MASTER")
+		rlLog "Machine in recipe is IPAMASTER"
+		rhts-sync-block -s "$FUNCNAME" $NISCLIENT
+		;;
+	"$NISMASTER")
+		rlLog "Machine in recipe is NISMASTER"
+		rhts-sync-block -s "$FUNCNAME" $NISCLIENT
+		;;
+	"$NISCLIENT")
+		rlLog "Machine in recipe is NISCLIENT"
+		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
+		rlRun "ipa user-find|grep testuser1" 0 "ipa search for existing user"
+		rhts-sync-set -s "$FUNCNAME" -m $NISCLIENT
+		[ -f $tmpout ] && rm -f $tmpout
+		;;
+	*)
+		rlLog "Machine in recipe is not a known ROLE"
+		;;
+	esac
+	rlPhaseEnd
+}
+
+# ipa negative
+nisint_user_test_1004()
+{
+	PhaseStartTest "nisint_user_test_1004: ipa negative test"
+	if [ ! -f /usr/bin/ipa ]; then
+		rlPass "ipa not found...skipping"
+		rlPhaseEnd
+		return 0
+	fi
+
+	"$MASTER")
+		rlLog "Machine in recipe is IPAMASTER"
+		rhts-sync-block -s "$FUNCNAME" $NISCLIENT
+		;;
+	"$NISMASTER")
+		rlLog "Machine in recipe is NISMASTER"
+		rhts-sync-block -s "$FUNCNAME" $NISCLIENT
+		;;
+	"$NISCLIENT")
+		rlLog "Machine in recipe is NISCLIENT"
+		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
+		rlRun "ipa user-find|grep notauser" 1 "Fail to ipa search for non-existent user"
+		rhts-sync-set -s "$FUNCNAME" -m $NISCLIENT
+		[ -f $tmpout ] && rm -f $tmpout
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE"
@@ -170,9 +249,9 @@ nisint_user_test_1002()
 }
 
 # getent positive
-nisint_user_test_1003()
+nisint_user_test_1005()
 {
-	PhaseStartTest "nisint_user_test_1003: getent positive test"
+	PhaseStartTest "nisint_user_test_1005: getent positive test"
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
@@ -187,7 +266,7 @@ nisint_user_test_1003()
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "getent passwd testuser2" 0 "getent search for existing user"
 		rhts-sync-set -s "$FUNCNAME" -m $NISCLIENT
-		[ -f $tmpout ] && rm $tmpout
+		[ -f $tmpout ] && rm -f $tmpout
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE"
@@ -197,9 +276,9 @@ nisint_user_test_1003()
 }
 
 # getent negative
-nisint_user_test_1004()
+nisint_user_test_1006()
 {
-	PhaseStartTest "nisint_user_test_1004: getent negative test"
+	PhaseStartTest "nisint_user_test_1006: getent negative test"
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
@@ -214,7 +293,7 @@ nisint_user_test_1004()
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "getent passwd notauser" 2 "attempt to getent search for non-existent user"
 		rhts-sync-set -s "$FUNCNAME" -m $NISCLIENT
-		[ -f $tmpout ] && rm $tmpout
+		[ -f $tmpout ] && rm -f $tmpout
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE"
@@ -224,9 +303,9 @@ nisint_user_test_1004()
 }
 
 # id positive
-nisint_user_test_1005()
+nisint_user_test_1007()
 {
-	PhaseStartTest "nisint_user_test_1005: id positive test"
+	PhaseStartTest "nisint_user_test_1007: id positive test"
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
@@ -241,7 +320,7 @@ nisint_user_test_1005()
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "id testuser1" 0 "id search for existing user"
 		rhts-sync-set -s "$FUNCNAME" -m $NISCLIENT
-		[ -f $tmpout ] && rm $tmpout
+		[ -f $tmpout ] && rm -f $tmpout
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE"
@@ -251,9 +330,9 @@ nisint_user_test_1005()
 }
 
 # id negative
-nisint_user_test_1006()
+nisint_user_test_1008()
 {
-	PhaseStartTest "nisint_user_test_1006: id negative test"
+	PhaseStartTest "nisint_user_test_1008: id negative test"
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
@@ -268,7 +347,7 @@ nisint_user_test_1006()
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "id notauser" 1 "id search for existing user"
 		rhts-sync-set -s "$FUNCNAME" -m $NISCLIENT
-		[ -f $tmpout ] && rm $tmpout
+		[ -f $tmpout ] && rm -f $tmpout
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE"
@@ -278,9 +357,9 @@ nisint_user_test_1006()
 }
 
 # touch positive
-nisint_user_test_1007()
+nisint_user_test_1009()
 {
-	PhaseStartTest "nisint_user_test_1007: su touch positive test"
+	PhaseStartTest "nisint_user_test_1009: su touch positive test"
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
@@ -295,7 +374,7 @@ nisint_user_test_1007()
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "su - testuser1 -c 'touch /tmp/mytestfile.user1'" 0 "touch new file as exisiting user"
 		rhts-sync-set -s "$FUNCNAME" -m $NISCLIENT
-		[ -f $tmpout ] && rm $tmpout
+		[ -f $tmpout ] && rm -f $tmpout
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE"
@@ -305,9 +384,9 @@ nisint_user_test_1007()
 }
 
 # touch negative
-nisint_user_test_1008()
+nisint_user_test_1010()
 {
-	PhaseStartTest "nisint_user_test_1008: su touch negative test"
+	PhaseStartTest "nisint_user_test_1010: su touch negative test"
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
@@ -323,7 +402,7 @@ nisint_user_test_1008()
 		rlRun "su - testuser2 -c 'touch /tmp/mytestfile.user1'" 1 "attempt to touch existing file fail without permissions"
 		rlRun "su - notauser -c 'touch /tmp/mytestfile.user1'" 125 "su fail as non-existent user"
 		rhts-sync-set -s "$FUNCNAME" -m $NISCLIENT
-		[ -f $tmpout ] && rm $tmpout
+		[ -f $tmpout ] && rm -f $tmpout
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE"
@@ -333,9 +412,9 @@ nisint_user_test_1008()
 }
 
 # rm negative
-nisint_user_test_1009()
+nisint_user_test_1011()
 {
-	PhaseStartTest "nisint_user_test_1009: su rm negative test"
+	PhaseStartTest "nisint_user_test_1011: su rm negative test"
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
@@ -350,7 +429,7 @@ nisint_user_test_1009()
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "su - testuser2 -c 'rm -f /tmp/mytestfile.user1'" 1 "attempt to rm existing file fail without permissions"
 		rhts-sync-set -s "$FUNCNAME" -m $NISCLIENT
-		[ -f $tmpout ] && rm $tmpout
+		[ -f $tmpout ] && rm -f $tmpout
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE"
@@ -360,9 +439,9 @@ nisint_user_test_1009()
 }
 
 # rm positive
-nisint_user_test_1010()
+nisint_user_test_1012()
 {
-	PhaseStartTest "nisint_user_test_1010: su rm positive test"
+	PhaseStartTest "nisint_user_test_1012: su rm positive test"
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
@@ -377,7 +456,7 @@ nisint_user_test_1010()
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "su - testuser1 -c 'rm -f /tmp/mytestfile.user1'" 0 "rm existing file"
 		rhts-sync-set -s "$FUNCNAME" -m $NISCLIENT
-		[ -f $tmpout ] && rm $tmpout
+		[ -f $tmpout ] && rm -f $tmpout
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE"
@@ -387,9 +466,9 @@ nisint_user_test_1010()
 }
 
 # mkdir positive
-nisint_user_test_1011()
+nisint_user_test_1013()
 {
-	PhaseStartTest "nisint_user_test_1011: su mkdir positive test"
+	PhaseStartTest "nisint_user_test_1013: su mkdir positive test"
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
@@ -404,7 +483,7 @@ nisint_user_test_1011()
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "su - testuser1 -c 'mkdir /tmp/mytmpdir.user1'" 0 "su mkdir new directory"
 		rhts-sync-set -s "$FUNCNAME" -m $NISCLIENT
-		[ -f $tmpout ] && rm $tmpout
+		[ -f $tmpout ] && rm -f $tmpout
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE"
@@ -414,9 +493,9 @@ nisint_user_test_1011()
 }
 
 # mkdir negative
-nisint_user_test_1011()
+nisint_user_test_1014()
 {
-	PhaseStartTest "nisint_user_test_1011: su mkdir negative test"
+	PhaseStartTest "nisint_user_test_1014: su mkdir negative test"
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
@@ -431,7 +510,7 @@ nisint_user_test_1011()
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "su - testuser2 -c 'mkdir /tmp/mytmpdir.user1/mytmpdir.user2'" 1 "attempt to mkdir new directory in dir without permissions"
 		rhts-sync-set -s "$FUNCNAME" -m $NISCLIENT
-		[ -f $tmpout ] && rm $tmpout
+		[ -f $tmpout ] && rm -f $tmpout
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE"
@@ -441,9 +520,9 @@ nisint_user_test_1011()
 }
 
 # rmdir negative
-nisint_user_test_1012()
+nisint_user_test_1015()
 {
-	PhaseStartTest "nisint_user_test_1012: su rmdir negative test"
+	PhaseStartTest "nisint_user_test_1015: su rmdir negative test"
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
@@ -458,7 +537,7 @@ nisint_user_test_1012()
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "su - testuser2 -c 'rmdir /tmp/mytmpdir.user1'" 1 "attempt to rmdir directory without permissions"
 		rhts-sync-set -s "$FUNCNAME" -m $NISCLIENT
-		[ -f $tmpout ] && rm $tmpout
+		[ -f $tmpout ] && rm -f $tmpout
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE"
@@ -468,9 +547,9 @@ nisint_user_test_1012()
 }
 
 # rmdir positive
-nisint_user_test_1013()
+nisint_user_test_1016()
 {
-	PhaseStartTest "nisint_user_test_1013: su rmdir positive test"
+	PhaseStartTest "nisint_user_test_1016: su rmdir positive test"
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
@@ -485,7 +564,7 @@ nisint_user_test_1013()
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "su - testuser1 -c 'rmdir /tmp/mytmpdir.user1'" 0 "rmdir directory"
 		rhts-sync-set -s "$FUNCNAME" -m $NISCLIENT
-		[ -f $tmpout ] && rm $tmpout
+		[ -f $tmpout ] && rm -f $tmpout
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE"
@@ -496,46 +575,24 @@ nisint_user_test_1013()
 
 # ssh as user to localhost # may need to wait on this one till migration...
 
-nisint_user_test_1014()
+nisint_user_test_1017()
 {
 	PhaseStartTest "nisint_user_test_1014: ssh positive test"
 	case "$HOSTNAME" in
 	"$MASTER")
 		KinitAsAdmin
 		rlLog "Machine in recipe is IPAMASTER"
-		#rlRun "ipa host-add $NISCLIENT --ip-address=$NISCLIENT_IP"
-		#rlRun "ipa-getkeytab -s $MASTER -p host/$NISCLIENT@$RELM -k /tmp/krb5.keytab.$NISCLIENT"
-		#rlRun "scp /tmp/krb5.keytab.$NISCLIENT root@$NISCLIENT:/etc/krb5.keytab"
-		#rhts-sync-set -s "$RUNCNAME.0" -m $MASTER
 		rhts-sync-block -s "$FUNCNAME.1" $NISCLIENT
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
-		#rhts-sync-block -s "$FUNCNAME.0" $MASTER
 		rhts-sync-block -s "$FUNCNAME.1" $NISCLIENT
 		;;
 	"$NISCLIENT")
 		rlLog "Machine in recipe is NISCLIENT"
-		#rhts-sync-block -s "$FUNCNAME.0" $MASTER
-
-		#rlRun "yum -y install krb5-workstation" 0 "Install krb5-workstation"
-		#cp /etc/krb5.conf /etc/krb5.conf.orig.nisint
-		#sed -i "s/kerberos.example.com/$MASTER/g" /etc/krb5.conf
-		#sed -i "s/EXAMPLE.COM/$RELM/g" /etc/krb5.conf
-		#sed -i "s/example.com/$DOMAIN/g" /etc/krb5.conf
-		#rlRun "authconfig --enablekrb5 --update"
-
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
-
 		rlRun "ssh_auth_success testuser1 passw0rd1 localhost" 
-
-		#yum -y remove krb5-workstation
-		#mv /etc/krb5.conf.orig.nisint /etc/krb5.conf
-		#rlRun "authconfig --disablekrb5 --update"
-		#rm /etc/krb5.keytab
-
-		[ -f $tmpout ] && rm $tmpout
-
+		[ -f $tmpout ] && rm -f $tmpout
 		rhts-sync-set -s "$FUNCNAME.1" -m $NISCLIENT
 		;;
 	*)
@@ -545,5 +602,4 @@ nisint_user_test_1014()
 	rlPhaseEnd
 }
 
-
-
+# ssh negative test

@@ -90,17 +90,17 @@ rlJournalStart
 	nisint_group_tests
 	nisint_netgroup_tests
 	nisint_automount_tests
-	#nisint_client_is_nis_bz_tests
+	nisint_client_is_nis_bz_tests
 
 	##############################################################
 	# NIS Migration
 	##############################################################
-	#nisint_nisclient_migration # Switch NIS Client to use SSSD/IPA
-	#nisint_user_tests
-	#nisint_group_tests
-	#nisint_netgroup_tests
-	#nisint_automount_tests
-	#nisint_client_is_ipa_bz_tests
+	nisint_nisclient_migration # Switch NIS Client to use SSSD/IPA
+	nisint_user_tests
+	nisint_group_tests
+	nisint_netgroup_tests
+	nisint_automount_tests
+	nisint_client_is_ipa_bz_tests
 
 	nisint_end
 		
