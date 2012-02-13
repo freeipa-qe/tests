@@ -116,12 +116,6 @@ nisint_netgroup_test_envcleanup()
 nisint_netgroup_test_1001()
 {
 	rlPhaseStartTest "nisint_netgroup_test_1001: ypcat positive test"
-	if [ $(ps -ef|grep [y]pbind|wc -l) -eq 0 ]; then
-		rlPass "ypbind not running...skipping test"
-		rlPhaseEnd
-		return 0
-	fi
-
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
@@ -133,7 +127,11 @@ nisint_netgroup_test_1001()
 		;;
 	"$CLIENT")
 		rlLog "Machine in recipe is CLIENT"
-		rlRun "ypcat -k netgroup|grep testnetgroup1" 0 "ypcat search for existing netgroup"
+		if [ $(ps -ef|grep [y]pbind|wc -l) -eq 0 ]; then
+			rlPass "ypbind not running...skipping test"
+		else
+			rlRun "ypcat -k netgroup|grep testnetgroup1" 0 "ypcat search for existing netgroup"
+		fi
 		rhts-sync-set -s "$FUNCNAME" -m $CLIENT
 		;;
 	*)
@@ -147,12 +145,6 @@ nisint_netgroup_test_1001()
 nisint_netgroup_test_1002()
 {
 	rlPhaseStartTest "nisint_netgroup_test_1002: ypcat negative test"
-	if [ $(ps -ef|grep [y]pbind|wc -l) -eq 0 ]; then
-		rlPass "ypbind not running...skipping test"
-		rlPhaseEnd
-		return 0
-	fi
-
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
@@ -164,7 +156,11 @@ nisint_netgroup_test_1002()
 		;;
 	"$CLIENT")
 		rlLog "Machine in recipe is CLIENT"
-		rlRun "ypcat -k netgroup|grep notanetgroup" 1 "attempt to ypcat search for non-existent netgroup"
+		if [ $(ps -ef|grep [y]pbind|wc -l) -eq 0 ]; then
+			rlPass "ypbind not running...skipping test"
+		else
+			rlRun "ypcat -k netgroup|grep notanetgroup" 1 "attempt to ypcat search for non-existent netgroup"
+		fi
 		rhts-sync-set -s "$FUNCNAME" -m $CLIENT
 		;;
 	*)
@@ -178,12 +174,6 @@ nisint_netgroup_test_1002()
 nisint_netgroup_test_1003()
 {
 	rlPhaseStartTest "nisint_netgroup_test_1003: ipa positive test"
-	if [ ! -f /usr/bin/ipa ]; then
-		rlPass "ipa not found...skipping"
-		rlPhaseEnd
-		return 0
-	fi
-
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
@@ -195,7 +185,11 @@ nisint_netgroup_test_1003()
 		;;
 	"$CLIENT")
 		rlLog "Machine in recipe is CLIENT"
-		rlRun "ipa netgroup-find|grep testnetgroup1" 0 "ipa search for existing netgroup"
+		if [ ! -f /usr/bin/ipa ]; then
+			rlPass "ipa not found...skipping"
+		else
+			rlRun "ipa netgroup-find|grep testnetgroup1" 0 "ipa search for existing netgroup"
+		fi
 		rhts-sync-set -s "$FUNCNAME" -m $CLIENT
 		;;
 	*)
@@ -209,12 +203,6 @@ nisint_netgroup_test_1003()
 nisint_netgroup_test_1004()
 {
 	rlPhaseStartTest "nisint_netgroup_test_1004: ipa negative test"
-	if [ ! -f /usr/bin/ipa ]; then
-		rlPass "ipa not found...skipping"
-		rlPhaseEnd
-		return 0
-	fi
-
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
@@ -226,7 +214,11 @@ nisint_netgroup_test_1004()
 		;;
 	"$CLIENT")
 		rlLog "Machine in recipe is CLIENT"
-		rlRun "ipa netgroup-find|grep notanetgroup" 1 "fail to ipa search for non-existent netgroup"
+		if [ ! -f /usr/bin/ipa ]; then
+			rlPass "ipa not found...skipping"
+		else
+			rlRun "ipa netgroup-find|grep notanetgroup" 1 "fail to ipa search for non-existent netgroup"
+		fi
 		rhts-sync-set -s "$FUNCNAME" -m $CLIENT
 		;;
 	*)
