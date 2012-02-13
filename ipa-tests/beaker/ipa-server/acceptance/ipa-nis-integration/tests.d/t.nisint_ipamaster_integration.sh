@@ -53,15 +53,15 @@ nisint_ipamaster_integration()
 		nisint_ipamaster_integration_setup_nis_listener
 		nisint_ipamaster_integration_check_ipa_nis_data
 
-		rlRun "rhts-sync-set -s 'nisint_ipamaster_integration_end' -m $MASTER"	
+		rhts-sync-set -s 'nisint_ipamaster_integration_end' -m $MASTER
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
-		rlRun "rhts-sync-block -s 'nisint_ipamaster_integration_end' $MASTER"
+		rhts-sync-block -s 'nisint_ipamaster_integration_end' $MASTER
 		;;
 	"$CLIENT")
 		rlLog "Machine in recipe is CLIENT"
-		rlRun "rhts-sync-block -s 'nisint_ipamaster_integration_end' $MASTER"
+		rhts-sync-block -s 'nisint_ipamaster_integration_end' $MASTER
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE"
@@ -155,7 +155,7 @@ nisint_ipamaster_integration_add_nis_data_hosts()
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 
-		rlRun "ypcat -d $NISDOMAIN -h $NISMASTER hosts |grep -v localhost > /dev/shm/nis-map.hosts 2>&1"
+		rlRun "ypcat -d $NISDOMAIN -h $NISMASTER hosts |sort -u|grep -v localhost > /dev/shm/nis-map.hosts 2>&1"
 		ORIGIFS="$IFS"
 		IFS="
 "
@@ -169,7 +169,12 @@ nisint_ipamaster_integration_add_nis_data_hosts()
 			if [ $ptrzonefound -eq 0 ]; then
 				rlRun "ipa dnszone-add $ptrzone --name-server=$MASTER --admin-email=ipaqar.redhat.com"
 			fi
-			rlRun "ipa host-add $firsthostname.$DOMAIN --ip-address=$ip" 
+			if [ $(ipa host-show x$MASTER 2>&1 | grep "x$MASTER: host not found" | wc -l) -gt 0 ]; then
+				rlRun "ipa host-add $firsthostname.$DOMAIN --ip-address=$ip" 
+			else 
+				rlPass "Host entry already exists."
+			fi
+			rlRun "ipa host-show $firsthostname.$DOMAIN"
 		done
 
 		[ -f $tmpout ] && rm -f $tmpout
@@ -266,7 +271,6 @@ nisint_ipamaster_integration_add_nis_data_automount()
 			nis-key-format: %{automountKey}
 			nis-value-format: %{automountInformation}	
 			EOF
-			rlRun "ldapadd -x -h $MASTER -D '$ROOTDN' -w $ADMINPW -f /tmp/amap.ldif"
 
 			IFS="
 "
@@ -277,6 +281,7 @@ nisint_ipamaster_integration_add_nis_data_automount()
 				info=$(echo "$line" | sed -e "s#^$key[ \t]*##")
 				rlRun "ipa automountkey-add nis $MAP --key=\"$key\" --info=\"$info\""
 			done
+			rlRun "ldapadd -x -h $MASTER -D '$ROOTDN' -w $ADMINPW -f /tmp/amap.ldif"
 		done
 
 		[ -f $tmpout ] && rm -f $tmpout

@@ -121,7 +121,7 @@ nisint_user_test_envcleanup()
 # ypcat positive
 nisint_user_test_1001()
 {
-	PhaseStartTest "nisint_user_test_1001: ypcat positive test"
+	rlPhaseStartTest "nisint_user_test_1001: ypcat positive test"
 	if [ $(ps -ef|grep [y]pbind|wc -l) -eq 0 ]; then
 		rlPass "ypbind not running...skipping test"
 		rlPhaseEnd
@@ -154,7 +154,7 @@ nisint_user_test_1001()
 # ypcat negative
 nisint_user_test_1002()
 {
-	PhaseStartTest "nisint_user_test_1002: ypcat negative test"
+	rlPhaseStartTest "nisint_user_test_1002: ypcat negative test"
 	if [ $(ps -ef|grep [y]pbind|wc -l) -eq 0 ]; then
 		rlPass "ypbind not running...skipping test"
 		rlPhaseEnd
@@ -186,7 +186,7 @@ nisint_user_test_1002()
 # ipa positive
 nisint_user_test_1003()
 {
-	PhaseStartTest "nisint_user_test_1003: ipa positive test"
+	rlPhaseStartTest "nisint_user_test_1003: ipa positive test"
 	if [ ! -f /usr/bin/ipa ]; then
 		rlPass "ipa not found...skipping"
 		rlPhaseEnd
@@ -219,13 +219,14 @@ nisint_user_test_1003()
 # ipa negative
 nisint_user_test_1004()
 {
-	PhaseStartTest "nisint_user_test_1004: ipa negative test"
+	rlPhaseStartTest "nisint_user_test_1004: ipa negative test"
 	if [ ! -f /usr/bin/ipa ]; then
 		rlPass "ipa not found...skipping"
 		rlPhaseEnd
 		return 0
 	fi
 
+	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
 		rhts-sync-block -s "$FUNCNAME" $CLIENT
@@ -251,7 +252,7 @@ nisint_user_test_1004()
 # getent positive
 nisint_user_test_1005()
 {
-	PhaseStartTest "nisint_user_test_1005: getent positive test"
+	rlPhaseStartTest "nisint_user_test_1005: getent positive test"
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
@@ -278,7 +279,7 @@ nisint_user_test_1005()
 # getent negative
 nisint_user_test_1006()
 {
-	PhaseStartTest "nisint_user_test_1006: getent negative test"
+	rlPhaseStartTest "nisint_user_test_1006: getent negative test"
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
@@ -305,7 +306,7 @@ nisint_user_test_1006()
 # id positive
 nisint_user_test_1007()
 {
-	PhaseStartTest "nisint_user_test_1007: id positive test"
+	rlPhaseStartTest "nisint_user_test_1007: id positive test"
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
@@ -332,7 +333,7 @@ nisint_user_test_1007()
 # id negative
 nisint_user_test_1008()
 {
-	PhaseStartTest "nisint_user_test_1008: id negative test"
+	rlPhaseStartTest "nisint_user_test_1008: id negative test"
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
@@ -359,7 +360,7 @@ nisint_user_test_1008()
 # touch positive
 nisint_user_test_1009()
 {
-	PhaseStartTest "nisint_user_test_1009: su touch positive test"
+	rlPhaseStartTest "nisint_user_test_1009: su touch positive test"
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
@@ -386,7 +387,7 @@ nisint_user_test_1009()
 # touch negative
 nisint_user_test_1010()
 {
-	PhaseStartTest "nisint_user_test_1010: su touch negative test"
+	rlPhaseStartTest "nisint_user_test_1010: su touch negative test"
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
@@ -414,7 +415,7 @@ nisint_user_test_1010()
 # rm negative
 nisint_user_test_1011()
 {
-	PhaseStartTest "nisint_user_test_1011: su rm negative test"
+	rlPhaseStartTest "nisint_user_test_1011: su rm negative test"
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
@@ -441,7 +442,7 @@ nisint_user_test_1011()
 # rm positive
 nisint_user_test_1012()
 {
-	PhaseStartTest "nisint_user_test_1012: su rm positive test"
+	rlPhaseStartTest "nisint_user_test_1012: su rm positive test"
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
@@ -468,7 +469,7 @@ nisint_user_test_1012()
 # mkdir positive
 nisint_user_test_1013()
 {
-	PhaseStartTest "nisint_user_test_1013: su mkdir positive test"
+	rlPhaseStartTest "nisint_user_test_1013: su mkdir positive test"
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
@@ -495,7 +496,7 @@ nisint_user_test_1013()
 # mkdir negative
 nisint_user_test_1014()
 {
-	PhaseStartTest "nisint_user_test_1014: su mkdir negative test"
+	rlPhaseStartTest "nisint_user_test_1014: su mkdir negative test"
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
@@ -522,7 +523,7 @@ nisint_user_test_1014()
 # rmdir negative
 nisint_user_test_1015()
 {
-	PhaseStartTest "nisint_user_test_1015: su rmdir negative test"
+	rlPhaseStartTest "nisint_user_test_1015: su rmdir negative test"
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
@@ -549,7 +550,7 @@ nisint_user_test_1015()
 # rmdir positive
 nisint_user_test_1016()
 {
-	PhaseStartTest "nisint_user_test_1016: su rmdir positive test"
+	rlPhaseStartTest "nisint_user_test_1016: su rmdir positive test"
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
@@ -574,10 +575,9 @@ nisint_user_test_1016()
 }
 
 # ssh as user to localhost # may need to wait on this one till migration...
-
 nisint_user_test_1017()
 {
-	PhaseStartTest "nisint_user_test_1014: ssh positive test"
+	rlPhaseStartTest "nisint_user_test_1014: ssh positive test"
 	case "$HOSTNAME" in
 	"$MASTER")
 		KinitAsAdmin

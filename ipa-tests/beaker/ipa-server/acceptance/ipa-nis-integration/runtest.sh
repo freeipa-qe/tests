@@ -51,9 +51,9 @@ PACKAGE="ipa-server"
 startDate=`date "+%F %r"`
 satrtEpoch=`date "+%s"`
 
-export MASTER_IP=$(host $MASTER|grep -v 'not found:'|awk '{print $4}')
-export NISMASTER_IP=$(host $NISMASTER|grep -v 'not found:'|awk '{print $4}')
-export CLIENT_IP=$(host $CLIENT|grep -v 'not found:'|awk '{print $4}')
+#export MASTER_IP=$(host $MASTER|grep -v 'not found:'|awk '{print $4}')
+#export NISMASTER_IP=$(host $NISMASTER|grep -v 'not found:'|awk '{print $4}')
+#export CLIENT_IP=$(host $CLIENT|grep -v 'not found:'|awk '{print $4}')
 
 ##########################################
 #   test main 

@@ -46,23 +46,23 @@ nisint_end()
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
-		rlRun "rhts-sync-set -s 'nisint_end_nisclient' -m $MASTER"
-		rlRun "rhts-sync-set -s 'nisint_end_nismaster' -m $MASTER"
-		rlRun "rhts-sync-block -s 'nisint_end' $NISMASTER $CLIENT"
+		rhts-sync-set -s 'nisint_end_nisclient' -m $MASTER
+		rhts-sync-set -s 'nisint_end_nismaster' -m $MASTER
+		rhts-sync-block -s 'nisint_end' $NISMASTER $CLIENT
 		rlLog "Ending IPA MASTER tests."
 		rlLog "Ending NIS Integration and Migration tests."
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
-		rlRun "rhts-sync-block -s 'nisint_end_nisserver' $MASTER"
+		rhts-sync-block -s 'nisint_end_nisserver' $MASTER
 		rlLog "Ending NISMASTER tests."
-		rlRun "rhts-sync-set -s 'nisint_end' -m $NISMASTER"
+		rhts-sync-set -s 'nisint_end' -m $NISMASTER
 		;;
 	"$CLIENT")
 		rlLog "Machine in recipe is CLIENT"
-		rlRun "rhts-sync-block -s 'nisint_end_nisclient' $MASTER"
+		rhts-sync-block -s 'nisint_end_nisclient' $MASTER
 		rlLog "Ending CLIENT tests."
-		rlRun "rhts-sync-set -s 'nisint_end' -m $CLIENT"
+		rhts-sync-set -s 'nisint_end' -m $CLIENT
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE"

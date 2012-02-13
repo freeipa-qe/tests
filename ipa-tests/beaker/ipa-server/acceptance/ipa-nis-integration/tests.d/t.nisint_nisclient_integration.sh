@@ -46,24 +46,24 @@ nisint_nisclient_integration()
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
 		nisint_nisclient_integration_master_envsetup
-		rlRun "rhts-sync-set -s 'nisint_nisclient_integration_start' -m $MASTER"
-		rlRun "rhts-sync-block -s 'nisint_nisclient_integration_end' $CLIENT"
+		rhts-sync-set -s 'nisint_nisclient_integration_start' -m $MASTER
+		rhts-sync-block -s 'nisint_nisclient_integration_end' $CLIENT
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
-		rlRun "rhts-sync-block -s 'nisint_nisclient_integration_start $MASTER"
-		rlRun "rhts-sync-block -s 'nisint_nisclient_integration_end' $CLIENT"
+		rhts-sync-block -s 'nisint_nisclient_integration_start' $MASTER
+		rhts-sync-block -s 'nisint_nisclient_integration_end' $CLIENT
 		;;
 	"$CLIENT")
 		rlLog "Machine in recipe is CLIENT"
-		rlRun "rhts-sync-block -s 'nisint_nisclient_integration_start $MASTER"
+		rhts-sync-block -s 'nisint_nisclient_integration_start' $MASTER
 
 		nisint_nisclient_integration_check_ipa_nis_data_remotely
 		nisint_nisclient_integration_change_to_ipa_nismaster
 		nisint_nisclient_integration_setup_kerberos_for_auth
 		nisint_nisclient_integration_check_ipa_nis_data_locally
 
-		rlRun "rhts-sync-set -s "nisint_nisclient_integration_end" -m $CLIENT"
+		rhts-sync-set -s 'nisint_nisclient_integration_end' -m $CLIENT
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE"
