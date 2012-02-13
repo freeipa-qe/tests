@@ -196,45 +196,57 @@ managedby_server_tests()
 		rlRun "/usr/bin/ldapsearch -x -D '$ROOTDN' -w $ROOTDNPWD -b '$NEWUSERAGROUP'" 0 "ensure that $NEWUSERAGROUP was created"
 	rlPhaseEnd
 
+	rlPhaseStartTest "Managed-18 - ensure that the assoiated groups entry was created using ipa group-find."
+		rlRun "/usr/bin/ipa group-find --private --all $USERA | grep $NEWUSERA" 0 "ensure that $NEWUSERAGROUP was created using ipa group-find"
+	rlPhaseEnd
+
 	# Try to delete a entry that we should not be able to
-	rlPhaseStartTest "Managed-18 - try to delete the group when we should not be allowed"
+	rlPhaseStartTest "Managed-19 - try to delete the group when we should not be allowed"
 		rlRun "/usr/bin/ldapdelete -x -D '$ROOTDN' -w $ROOTDNPWD  '$NEWUSERAGROUP'" 53 "Making sure we cannot delete a group that is a linked managed entry"
 	rlPhaseEnd
 
 	# Try to modify a entry that we should not have access to
-	rlPhaseStartTest "Managed-19 - Try to modify a entry we should not have access to (gidNumber)"
+	rlPhaseStartTest "Managed-20 - Try to modify a entry we should not have access to (gidNumber)"
 		rlRun "/usr/bin/ldapmodify -a -x -D '$ROOTDN' -w $ROOTDNPWD -f $MODUSERLDIF" 53 "Making sure that we cannot modify a entry that should be locked out(gidNumber)"
 	rlPhaseEnd
 
-	rlPhaseStartTest "Managed-20 - Try to modify a entry we should not have access to (description)"
+	rlPhaseStartTest "Managed-21 - Try to modify a entry we should not have access to (description)"
 		rlRun "/usr/bin/ldapmodify -a -x -D '$ROOTDN' -w $ROOTDNPWD -f $MODUSERLDIF2" 53 "Making sure that we cannot modify a entry that should be locked out(description)"
 	rlPhaseEnd
 
-	rlPhaseStartTest "Managed-21 - Try to modify a entry we should not have access to (cn)"
+	rlPhaseStartTest "Managed-22 - Try to modify a entry we should not have access to (cn)"
 		rlRun "/usr/bin/ldapmodify -a -x -D '$ROOTDN' -w $ROOTDNPWD -f $MODUSERLDIF3" 53 "Making sure that we cannot modify a entry that should be locked out(cn)"
 	rlPhaseEnd
 
-	rlPhaseStartTest "Managed-22 - Try to modify a entry we should have access to (mepManagedBy)"
+	rlPhaseStartTest "Managed-23 - Try to modify a entry we should have access to (mepManagedBy)"
 		rlRun "/usr/bin/ldapmodify -a -x -D '$ROOTDN' -w $ROOTDNPWD -f $MODUSERLDIF4" 0 "Making sure that we can modify a entry in the linked group that should be able to(mepManagedBy)"
 	rlPhaseEnd
 
 	NEWGIDNUMBER=22345233
 
-	rlPhaseStartTest "Managed-23 - Modify the gid number of the user."
+	rlPhaseStartTest "Managed-24 - Modify the gid number of the user."
 		rlRun "/usr/bin/ipa user-mod --uid=$NEWGIDNUMBER $USERA" 0 "changing the GID on the managed entry user"
 	rlPhaseEnd
 
-	rlPhaseStartTest "Managed-24 - Make sure the gid number on the assoiated group changed"
+	rlPhaseStartTest "Managed-25 - Make sure the gid number on the assoiated group changed"
 		rlRun "/usr/bin/ldapsearch -x -D '$ROOTDN' -w $ROOTDNPWD -b '$NEWUSERAGROUP' objectclass=* | grep $NEWGIDNUMBER" 0 "Make sure that the GID number changed on the created user"
 	rlPhaseEnd
 
-	rlPhaseStartTest "Managed-25 - Delete the new user via the ipa tools"
+	rlPhaseStartTest "Managed-26 - Make sure the gid number on the assoiated group changed using ipa group-find"
+		rlRun "/usr/bin/ipa group-find --private --all $USERA | grep $NEWGIDNUMBER" 0 "Make sure that the GID number changed on the created user using ipa group-find"
+	rlPhaseEnd
+
+	rlPhaseStartTest "Managed-27 - Delete the new user via the ipa tools"
 		rlRun "/usr/bin/ipa user-del $USERA" 0 "Deleting the test user from the IPA tools"
 	rlPhaseEnd
 	sleep 30
 
-	rlPhaseStartTest "Managed-26 - make sure that the users group was deleted"
+	rlPhaseStartTest "Managed-28 - make sure that the users group was deleted"
 		rlRun "/usr/bin/ldapsearch -x -D '$ROOTDN' -w $ROOTDNPWD -b '$NEWUSERAGROUP'" 32 "ensure that $NEWUSERAGROUP does not exist"
+	rlPhaseEnd
+
+	rlPhaseStartTest "Managed-29 - make sure that the users group was deleted using ipa group-find"
+		rlRun "/usr/bin/ipa group-find --private --all $USERA" 1 "ensure that $NEWUSERAGROUP does not exist using ipa group-find"
 	rlPhaseEnd
 
 }
