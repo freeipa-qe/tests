@@ -41,7 +41,7 @@ RHELIPA_SERVER_PACKAGES="ipa-server"
 COMMON_CLIENT_PACKAGES="httpd curl mod_nss mod_auth_kerb 389-ds-base expect ntpdate"
 RHELIPA_CLIENT_PACKAGES="ipa-admintools ipa-client"
 FREEIPA_SERVER_PACKAGES="freeipa-server"
-FREEIPA_CLIENTi_PACKAGES="freeipa-admintools freeipa-client"
+FREEIPA_CLIENT_PACKAGES="freeipa-admintools freeipa-client"
 
 rlJournalStart
         myhostname=`hostname`
