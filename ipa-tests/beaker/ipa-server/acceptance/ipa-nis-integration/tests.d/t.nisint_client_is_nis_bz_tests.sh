@@ -40,26 +40,41 @@
 ######################################################################
 nisint_client_is_nis_bz_tests()
 {
-	echo $FUNCNAME
+	nisint_client_is_nis_bz_788625	
 }
 
-template_function()
+nisint_client_is_nis_bz_788625()
 {
-	rlLog "$FUNCNAME"
-
+	rlPhaseStartTest "netgroup_bz_788625: IPA nested netgroups not seen from ypcat"
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
+		KinitAsAdmin
+		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
+		rlRun "ipa netgroup-add netgroup_bz_788625_test1 --desc=netgroup_bz_788625_test1"
+		rlRun "ipa netgroup-add-member netgroup_bz_788625_test1 --users=admin"
+		rlRun "ipa netgroup-add netgroup_bz_788625_test --desc=netgroup_bz_788625_test"
+		rlRun "ipa netgroup-add-member netgroup_bz_788625_test --netgroups=netgroup_bz_788625_test1"
+		if [ $(ypcat -d $DOMAIN -h localhost -k netgroup|grep "^netgroup_bz_788625_test $"|wc -l) -gt 0 ]; then
+			rlFail "BZ 788625 found ...IPA nested netgroups not seen from ypcat"
+		else
+			rlPass "BZ 788625 not found"
+		fi		
+		rlRun "ipa netgroup-del netgroup_bz_788625_test1"
+		rlRun "ipa netgroup-del netgroup_bz_788625_test"
+		rhts-sync-set -s "$FUNCNAME" -m $MASTER
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
+		rhts-sync-block -s "$FUNCNAME" $MASTER
 		;;
 	"$NISCLIENT")
 		rlLog "Machine in recipe is NISCLIENT"
+		rhts-sync-block -s "$FUNCNAME" $MASTER
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE"
 		;;
 	esac
-
+	rlPhaseEnd
 }

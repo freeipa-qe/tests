@@ -33,6 +33,7 @@ netgroups()
 	attr_netgroups
 	del_netgroups
 	manage_netgroups
+	netgroup_bzs
 	cleanup
 }
 
@@ -628,3 +629,87 @@ manage_netgroups_negative()
 		fi
 	rlPhaseEnd
 }
+
+netgroup_bzs()
+{
+	netgroup_bz_772043
+	netgroup_bz_788625
+	netgroup_bz_772297
+}
+
+netgroup_bz_772043()
+{
+	rlPhaseStartTest "netgroup_bz772043: Adding a netgroup with a + in the name that overlaps hostgroup causes crash"	
+		KinitAsAdmin
+		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
+		rlRun "ipa netgroup-add +badtestnetgroup --desc=netgroup_with_plus_kills_dirsrv" 
+		rlRun "ipactl status > $tmpout 2>&1"
+		if [ $(grep "Directory Service: STOPPED" $tmpout|wc -l) -gt 0 ]; then
+			rlFail "BZ 772043 found...Adding a netgroup with a + in the name that overlaps hostgroup causes crash"
+		else
+			rlPass "BZ 772043 not found"
+		fi
+
+		rlLog "Now fixing DB and restarting IPA Server"
+		rlRun "ns-slapd db2ldif -s '$BASEDN' -a /tmp/testrelm.ldif -D /etc/dirsrv/slapd-TESTRELM-COM/"
+		rlRun "sed s/+badtestnetgroup/badtestnetgroup/g /tmp/testrelm.ldif > /tmp/testrelm.ldif.fixed"
+		rlRun "ns-slapd ldif2db -D /etc/dirsrv/slapd-TESTRELM-COM/ -s "$BASEDN" -i /tmp/testrelm.ldif.fixed" 
+		rlRun "ipactl restart"
+		rlRun "ipa netgroup-del badtestgroup"
+		[ -f $tmpout ] && rm -f $tmpout
+	rlPhaseEnd
+}
+
+netgroup_bz_788625()
+{
+	rlPhaseStartTest "netgroup_bz_788625: IPA nested netgroups not seen from ypcat"
+		KinitAsAdmin
+		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
+		rlRun "ipa netgroup-add netgroup_bz_788625_test1 --desc=netgroup_bz_788625_test1"
+		rlRun "ipa netgroup-add-member netgroup_bz_788625_test1 --users=admin"
+		rlRun "ipa netgroup-add netgroup_bz_788625_test --desc=netgroup_bz_788625_test"
+		rlRun "ipa netgroup-add-member netgroup_bz_788625_test --netgroups=netgroup_bz_788625_test1"
+		rlRun "ipa-compat-manage enable" 0,2
+		rlRun "ipa-nis-manage enable" 0,2
+		rlRun "service rpcbind restart"
+		rlRun "service dirsrv restart"
+		rlRun "yum install yp-tools"
+		if [ $(ypcat -d $DOMAIN -h localhost -k netgroup|grep "^netgroup_bz_788625_test $"|wc -l) -gt 0 ]; then
+			rlFail "BZ 788625 found ...IPA nested netgroups not seen from ypcat"
+		else
+			rlPass "BZ 788625 not found"
+		fi		
+		rlRun "ipa netgroup-del netgroup_bz_788625_test1"
+		rlRun "ipa netgroup-del netgroup_bz_788625_test"
+		[ -f $tmpout ] && rm -f $tmpout
+	rlPhaseEnd
+}
+
+netgroup_bz_772297()
+{
+	rlPhaseStartTest "netgroup_bz_772297: Fails to update if all nisNetgroupTriple or memberNisNetgroup entries are deleted from a netgroup"
+		KinitAdmin
+		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
+
+		rlRun "ipa user-add user1 --first=TEST --last=USER"
+		rlRun "ipa user-add user2 --first=TEST --last=USER"
+		rlRun "ipa user-add user3 --first=TEST --last=USER"
+		rlRun "ipa netgroup-add users --desc=users"
+		rlRun "ipa netgroup-add-member users --users=user1,user2,user3"
+		rlRun "ipa netgroup-find --users=user1,user2,user3"
+		rlRun "ldapsearch -x -LLL -b "dc=testrelm,dc=com" cn=users"
+		rlRun "getent -s sss netgroup users"
+		rlRun "ipa netgroup-remove-member users --users=user1,user2,user3"
+		rlRun "sleep 120"
+		if [ $(getent -s sss netgroup users|grep "^users.*user1.*user2.*user3"|wc -l) -gt 0 ]; then
+			rlFail "BZ 772297 found...Fails to update if all nisNetgroupTriple or memberNisNetgroup entries are deleted from a netgroup"
+		else
+			rlPass "BZ 772297 not found."
+		fi
+			
+		rlRun "ldapsearch -x -LLL -b "dc=testrelm,dc=com" cn=users"
+		[ -f $tmpout ] && rm -f $tmpout
+	rlPhaseEnd
+}
+
+

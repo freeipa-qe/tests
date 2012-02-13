@@ -2,9 +2,8 @@
 # vim: dict=/usr/share/beakerlib/dictionary.vim cpt=.,w,b,u,t,i,k
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-#   t.nisint_nisclient_bzs.sh of:
-#      /CoreOS/ipa-tests/acceptance/ipa-nis-integration
-#   Description: IPA NIS Integration and Migration IPA Master acceptance tests
+#   t.nisint_client_is_ipa_bz_tests.sh of /CoreOS/ipa-tests/acceptance/ipa-nis-integration
+#   Description: IPA NIS Integration and Migration Client IPA BZ tests
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # The following needs to be tested:
 #   
@@ -33,33 +32,34 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ######################################################################
-# nisint_nisclient_netgroup_bzs related functions
+# variables
 ######################################################################
-nisint_nisclient_netgroup_bzs()
+
+######################################################################
+# test suite
+######################################################################
+nisint_client_is_nis_bz_tests()
 {
 	echo $FUNCNAME
 }
 
-######################################################################
-# nisint_nisclient_automount_bzs related functions
-######################################################################
-nisint_nisclient_automount_bzs()
+template_function()
 {
-	echo $FUNCNAME
-}
+	rlLog "$FUNCNAME"
 
-######################################################################
-# nisint_nisclient_services_bzs related functions
-######################################################################
-nisint_nisclient_services_bzs()
-{
-	echo $FUNCNAME
-}
+	case "$HOSTNAME" in
+	"$MASTER")
+		rlLog "Machine in recipe is IPAMASTER"
+		;;
+	"$NISMASTER")
+		rlLog "Machine in recipe is NISMASTER"
+		;;
+	"$NISCLIENT")
+		rlLog "Machine in recipe is NISCLIENT"
+		;;
+	*)
+		rlLog "Machine in recipe is not a known ROLE"
+		;;
+	esac
 
-######################################################################
-# nisint_nisclient_other_bzs related functions
-######################################################################
-nisint_nisclient_other_bzs()
-{
-	echo $FUNCNAME
 }
