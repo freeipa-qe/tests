@@ -577,18 +577,18 @@ nisint_user_test_1017()
 	"$MASTER")
 		KinitAsAdmin
 		rlLog "Machine in recipe is IPAMASTER"
-		rhts-sync-block -s "$FUNCNAME.1" $CLIENT
+		rhts-sync-block -s "$FUNCNAME" $CLIENT
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
-		rhts-sync-block -s "$FUNCNAME.1" $CLIENT
+		rhts-sync-block -s "$FUNCNAME" $CLIENT
 		;;
 	"$CLIENT")
 		rlLog "Machine in recipe is CLIENT"
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ssh_auth_success testuser1 passw0rd1 localhost" 
 		[ -f $tmpout ] && rm -f $tmpout
-		rhts-sync-set -s "$FUNCNAME.1" -m $CLIENT
+		rhts-sync-set -s "$FUNCNAME" -m $CLIENT
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE"

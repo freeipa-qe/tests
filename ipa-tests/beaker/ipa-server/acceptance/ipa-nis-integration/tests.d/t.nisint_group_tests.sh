@@ -123,12 +123,6 @@ nisint_group_test_envcleanup()
 nisint_group_test_1001()
 {
 	rlPhaseStartTest "nisint_group_test_1001: ypcat positive test"
-	if [ $(ps -ef|grep [y]pbind|wc -l) -eq 0 ]; then
-		rlPass "ypbind not running...skipping test"
-		rlPhaseEnd
-		return 0
-	fi
-
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
@@ -141,7 +135,11 @@ nisint_group_test_1001()
 	"$CLIENT")
 		rlLog "Machine in recipe is CLIENT"
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
-		rlRun "ypcat group|grep testgroup1" 0 "ypcat search for existing group"
+		if [ $(ps -ef|grep [y]pbind|wc -l) -eq 0 ]; then
+			rlPass "ypbind not running...skipping test"
+		else
+			rlRun "ypcat group|grep testgroup1" 0 "ypcat search for existing group"
+		fi
 		rhts-sync-block -s "$FUNCNAME" -m $CLIENT
 		[ -f $tmpout ] && rm -f $tmpout
 		;;
@@ -156,12 +154,6 @@ nisint_group_test_1001()
 nisint_group_test_1002()
 {
 	rlPhaseStartTest "nisint_group_test_1002: ypcat negative test"
-	if [ $(ps -ef|grep [y]pbind|wc -l) -eq 0 ]; then
-		rlPass "ypbind not running...skipping test"
-		rlPhaseEnd
-		return 0
-	fi
-
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
@@ -174,7 +166,11 @@ nisint_group_test_1002()
 	"$CLIENT")
 		rlLog "Machine in recipe is CLIENT"
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
-		rlRun "ypcat group|grep notagroup" 1 "ypcat search for non-existent group"
+		if [ $(ps -ef|grep [y]pbind|wc -l) -eq 0 ]; then
+			rlPass "ypbind not running...skipping test"
+		else
+			rlRun "ypcat group|grep notagroup" 1 "ypcat search for non-existent group"
+		fi
 		rhts-sync-block -s "$FUNCNAME" -m $CLIENT
 		[ -f $tmpout ] && rm -f $tmpout
 		;;
@@ -189,12 +185,6 @@ nisint_group_test_1002()
 nisint_group_test_1003()
 {
 	rlPhaseStartTest "nisint_group_test_1003: ipa positive test"
-	if [ ! -f /usr/bin/ipa ]; then
-		rlPass "ipa not found...skipping"
-		rlPhaseEnd
-		return 0
-	fi
-
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
@@ -207,7 +197,11 @@ nisint_group_test_1003()
 	"$CLIENT")
 		rlLog "Machine in recipe is CLIENT"
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
-		rlRun "ipa group-find|grep testgroup1" 0 "ipa search for existing group"
+		if [ ! -f /usr/bin/ipa ]; then
+			rlPass "ipa not found...skipping"
+		else
+			rlRun "ipa group-find|grep testgroup1" 0 "ipa search for existing group"
+		fi
 		rhts-sync-block -s "$FUNCNAME" -m $CLIENT
 		[ -f $tmpout ] && rm -f $tmpout
 		;;
@@ -222,12 +216,6 @@ nisint_group_test_1003()
 nisint_group_test_1004()
 {
 	rlPhaseStartTest "nisint_group_test_1004: ipa negative test"
-	if [ ! -f /usr/bin/ipa ]; then
-		rlPass "ipa not found...skipping"
-		rlPhaseEnd
-		return 0
-	fi
-
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
@@ -240,7 +228,11 @@ nisint_group_test_1004()
 	"$CLIENT")
 		rlLog "Machine in recipe is CLIENT"
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
-		rlRun "ipa group-find|grep notagroup" 1 "failed to ipa search for non-existent group"
+		if [ ! -f /usr/bin/ipa ]; then
+			rlPass "ipa not found...skipping"
+		else
+			rlRun "ipa group-find|grep notagroup" 1 "failed to ipa search for non-existent group"
+		fi
 		rhts-sync-block -s "$FUNCNAME" -m $CLIENT
 		[ -f $tmpout ] && rm -f $tmpout
 		;;
