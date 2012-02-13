@@ -70,6 +70,7 @@ nisint_user_test_envsetup()
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "create_ipauser testuser1 NIS USER passw0rd1"
 		rlRun "create_ipauser testuser2 NIS USER passw0rd1"
+		KinitAsAdmin
 		rhts-sync-set -s "$FUNCNAME" -m $MASTER
 		[ -f $tmpout ] && rm -f $tmpout
 		;;
@@ -94,6 +95,7 @@ nisint_user_test_envcleanup()
 	rlPhaseStartTest "nisint_user_test_envcleanup: Delete users and cleanup"
 	case "$HOSTNAME" in
 	"$MASTER")
+		KinitAsAdmin
 		rlLog "Machine in recipe is IPAMASTER"
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa user-del testuser1"
@@ -122,12 +124,6 @@ nisint_user_test_envcleanup()
 nisint_user_test_1001()
 {
 	rlPhaseStartTest "nisint_user_test_1001: ypcat positive test"
-	if [ $(ps -ef|grep [y]pbind|wc -l) -eq 0 ]; then
-		rlPass "ypbind not running...skipping test"
-		rlPhaseEnd
-		return 0
-	fi
-
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
@@ -140,7 +136,11 @@ nisint_user_test_1001()
 	"$CLIENT")
 		rlLog "Machine in recipe is CLIENT"
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
-		rlRun "ypcat passwd|grep testuser1" 0 "ypcat search for existing user"
+		if [ $(ps -ef|grep [y]pbind|wc -l) -eq 0 ]; then
+			rlPass "ypbind not running...skipping test"
+		else
+			rlRun "ypcat passwd|grep testuser1" 0 "ypcat search for existing user"
+		fi
 		rhts-sync-set -s "$FUNCNAME" -m $CLIENT
 		[ -f $tmpout ] && rm -f $tmpout
 		;;
@@ -155,11 +155,6 @@ nisint_user_test_1001()
 nisint_user_test_1002()
 {
 	rlPhaseStartTest "nisint_user_test_1002: ypcat negative test"
-	if [ $(ps -ef|grep [y]pbind|wc -l) -eq 0 ]; then
-		rlPass "ypbind not running...skipping test"
-		rlPhaseEnd
-		return 0
-	fi
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
@@ -172,7 +167,11 @@ nisint_user_test_1002()
 	"$CLIENT")
 		rlLog "Machine in recipe is CLIENT"
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
-		rlRun "ypcat passwd|grep notauser" 1 "Fail to ypcat search for non-existent user"
+		if [ $(ps -ef|grep [y]pbind|wc -l) -eq 0 ]; then
+			rlPass "ypbind not running...skipping test"
+		else
+			rlRun "ypcat passwd|grep notauser" 1 "Fail to ypcat search for non-existent user"
+		fi
 		rhts-sync-set -s "$FUNCNAME" -m $CLIENT
 		[ -f $tmpout ] && rm -f $tmpout
 		;;
@@ -187,12 +186,6 @@ nisint_user_test_1002()
 nisint_user_test_1003()
 {
 	rlPhaseStartTest "nisint_user_test_1003: ipa positive test"
-	if [ ! -f /usr/bin/ipa ]; then
-		rlPass "ipa not found...skipping"
-		rlPhaseEnd
-		return 0
-	fi
-
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
@@ -205,7 +198,11 @@ nisint_user_test_1003()
 	"$CLIENT")
 		rlLog "Machine in recipe is CLIENT"
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
-		rlRun "ipa user-find|grep testuser1" 0 "ipa search for existing user"
+		if [ ! -f /usr/bin/ipa ]; then
+			rlPass "ipa not found...skipping"
+		else
+			rlRun "ipa user-find|grep testuser1" 0 "ipa search for existing user"
+		fi
 		rhts-sync-set -s "$FUNCNAME" -m $CLIENT
 		[ -f $tmpout ] && rm -f $tmpout
 		;;
@@ -220,12 +217,6 @@ nisint_user_test_1003()
 nisint_user_test_1004()
 {
 	rlPhaseStartTest "nisint_user_test_1004: ipa negative test"
-	if [ ! -f /usr/bin/ipa ]; then
-		rlPass "ipa not found...skipping"
-		rlPhaseEnd
-		return 0
-	fi
-
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
@@ -238,7 +229,11 @@ nisint_user_test_1004()
 	"$CLIENT")
 		rlLog "Machine in recipe is CLIENT"
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
-		rlRun "ipa user-find|grep notauser" 1 "Fail to ipa search for non-existent user"
+		if [ ! -f /usr/bin/ipa ]; then
+			rlPass "ipa not found...skipping"
+		else
+			rlRun "ipa user-find|grep notauser" 1 "Fail to ipa search for non-existent user"
+		fi
 		rhts-sync-set -s "$FUNCNAME" -m $CLIENT
 		[ -f $tmpout ] && rm -f $tmpout
 		;;
