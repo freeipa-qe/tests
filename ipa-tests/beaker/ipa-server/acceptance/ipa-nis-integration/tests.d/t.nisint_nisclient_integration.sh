@@ -47,15 +47,15 @@ nisint_nisclient_integration()
 		rlLog "Machine in recipe is IPAMASTER"
 		nisint_nisclient_integration_master_envsetup
 		rlRun "rhts-sync-set -s 'nisint_nisclient_integration_start' -m $MASTER"
-		rlRun "rhts-sync-block -s 'nisint_nisclient_integration_end' $NISCLIENT"
+		rlRun "rhts-sync-block -s 'nisint_nisclient_integration_end' $CLIENT"
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
 		rlRun "rhts-sync-block -s 'nisint_nisclient_integration_start $MASTER"
-		rlRun "rhts-sync-block -s 'nisint_nisclient_integration_end' $NISCLIENT"
+		rlRun "rhts-sync-block -s 'nisint_nisclient_integration_end' $CLIENT"
 		;;
-	"$NISCLIENT")
-		rlLog "Machine in recipe is NISCLIENT"
+	"$CLIENT")
+		rlLog "Machine in recipe is CLIENT"
 		rlRun "rhts-sync-block -s 'nisint_nisclient_integration_start $MASTER"
 
 		nisint_nisclient_integration_check_ipa_nis_data_remotely
@@ -63,7 +63,7 @@ nisint_nisclient_integration()
 		nisint_nisclient_integration_setup_kerberos_for_auth
 		nisint_nisclient_integration_check_ipa_nis_data_locally
 
-		rlRun "rhts-sync-set -s "nisint_nisclient_integration_end" -m $NISCLIENT"
+		rlRun "rhts-sync-set -s "nisint_nisclient_integration_end" -m $CLIENT"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE"
@@ -76,8 +76,8 @@ nisint_nisclient_integration_master_envsetup()
 {
 	rlPhaseStartTest "nisint_nisclient_integration_master_envsetup: Run setup on MASTER to prep for Client Integration"
 		rlLog "prep for Kerberos setup for auth on the client"
-		rlRun "ipa-getkeytab -s $MASTER -p host/$NISCLIENT@$RELM -k /tmp/krb5.keytab.$NISCLIENT"
-		rlRun "scp -q -o StrictHostKeyChecking=no /tmp/krb5.keytab.$NISCLIENT root@$NISCLIENT:/etc/krb5.keytab"
+		rlRun "ipa-getkeytab -s $MASTER -p host/$CLIENT@$RELM -k /tmp/krb5.keytab.$CLIENT"
+		rlRun "scp -q -o StrictHostKeyChecking=no /tmp/krb5.keytab.$CLIENT root@$CLIENT:/etc/krb5.keytab"
 	rlPhaseEnd
 }
 

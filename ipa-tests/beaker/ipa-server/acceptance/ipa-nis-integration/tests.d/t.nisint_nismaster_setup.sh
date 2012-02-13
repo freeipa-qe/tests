@@ -65,8 +65,8 @@ nisint_nismaster_setup()
 		rlRun "rhts-sync-set   -s 'nisint_nismaster_setup_ended' $NISMASTER"
 		rlPass "$FUNCNAME complete for NISMASTER ($HOSTNAME)"
 		;;
-	"$NISCLIENT")
-		rlLog "Machine in recipe is NISCLIENT"
+	"$CLIENT")
+		rlLog "Machine in recipe is CLIENT"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE"
@@ -105,7 +105,7 @@ nisint_evilservers (cracker1,,) (cracker1.cracker.org,,) (cracker2,,) (cracker2.
 EOF
 	
 		GOODSERVERNG="nisint_goodservers"
-		for server in $MASTER $NISMASTER $NISCLIENT; do
+		for server in $MASTER $NISMASTER $CLIENT; do
 			GOODSERVERNG="$GOODSERVERNG ($server,,)"
 		done
 cat <<-EOF >> /etc/netgroup
@@ -238,7 +238,7 @@ nisint_nismaster_setup_hosts()
 		192.168.4.3	goodhost3
 		192.168.4.4	goodhost4
 		$NISMASTER_IP $NISMASTER
-		$NISCLIENT_IP $NISCLIENT
+		$CLIENT_IP $CLIENT
 		EOF
 		rlRun "make -C /var/yp" 0 "Update NIS hosts map"
 		rlRun "ypcat -d $NISDOMAIN -h $NISMASTER hosts|grep goodhost" 0 "Check that new hosts are in the map"

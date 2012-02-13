@@ -50,28 +50,28 @@ nisint_nisclient_migration_envsetup()
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
-		rlRun "ipa host-del $NISCLIENT --updatedns"
+		rlRun "ipa host-del $CLIENT --updatedns"
 		rhts-sync-set -s "$FUNCTION.0" -m $MASTER
-		rhts-sync-block -s "$FUNCTION.1" $NISCLIENT
+		rhts-sync-block -s "$FUNCTION.1" $CLIENT
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
 		rhts-sync-block -s "$FUNCTION.0" $MASTER
-		rhts-sync-block -s "$FUNCTION.1" $NISCLIENT
+		rhts-sync-block -s "$FUNCTION.1" $CLIENT
 		;;
-	"$NISCLIENT")
-		rlLog "Machine in recipe is NISCLIENT"
+	"$CLIENT")
+		rlLog "Machine in recipe is CLIENT"
 		rhts-sync-block -s "$FUNCTION.0" $MASTER
 		HOSTNAME_S=$(hostname -s)
 		rlRun "yum -y install *ipa-admintools *ipa-client"
-		rlRun "sed -i s/^$NISCLIENT_IP.*$HOSTNAME_S.*$// /etc/hosts"
-		rlRun "echo '$NISCLIENT_IP $HOSTNAME_S.$DOMAIN $HOSTNAME_S' >> /etc/hosts"
+		rlRun "sed -i s/^$CLIENT_IP.*$HOSTNAME_S.*$// /etc/hosts"
+		rlRun "echo '$CLIENT_IP $HOSTNAME_S.$DOMAIN $HOSTNAME_S' >> /etc/hosts"
 		rlRun "sed -i s/^nameserver/#nameserver/g /etc/resolv.conf"
 		rlRun "echo 'nameserver $MASTER_IP' >> /etc/resolv.conf"
 		rlRun "authconfig --disablenis --update"
 		rlRun "ipa-client-install --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW -U --server=$MASTER"
         rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
-		rhts-sync-set -s "$FUNCTION.1" -m $NISCLIENT
+		rhts-sync-set -s "$FUNCTION.1" -m $CLIENT
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE"

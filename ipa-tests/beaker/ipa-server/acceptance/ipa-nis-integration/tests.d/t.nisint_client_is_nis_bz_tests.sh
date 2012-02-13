@@ -68,8 +68,8 @@ nisint_client_is_nis_bz_788625()
 		rlLog "Machine in recipe is NISMASTER"
 		rhts-sync-block -s "$FUNCNAME" $MASTER
 		;;
-	"$NISCLIENT")
-		rlLog "Machine in recipe is NISCLIENT"
+	"$CLIENT")
+		rlLog "Machine in recipe is CLIENT"
 		rhts-sync-block -s "$FUNCNAME" $MASTER
 		;;
 	*)
