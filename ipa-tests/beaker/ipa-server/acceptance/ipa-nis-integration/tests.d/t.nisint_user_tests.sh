@@ -71,6 +71,8 @@ nisint_user_test_envsetup()
 		rlRun "create_ipauser testuser1 NIS USER passw0rd1"
 		rlRun "create_ipauser testuser2 NIS USER passw0rd1"
 		KinitAsAdmin
+		rlRun "ipa user-mod testuser1 --uid=56678 --gidnumber=56678"
+		rlRun "ipa user-mod testuser2 --uid=56679 --gidnumber=56679"
 		rhts-sync-set -s "$FUNCNAME" -m $MASTER
 		[ -f $tmpout ] && rm -f $tmpout
 		;;
@@ -572,7 +574,7 @@ nisint_user_test_1016()
 # ssh as user to localhost # may need to wait on this one till migration...
 nisint_user_test_1017()
 {
-	rlPhaseStartTest "nisint_user_test_1014: ssh positive test"
+	rlPhaseStartTest "nisint_user_test_1017: ssh positive test"
 	case "$HOSTNAME" in
 	"$MASTER")
 		KinitAsAdmin

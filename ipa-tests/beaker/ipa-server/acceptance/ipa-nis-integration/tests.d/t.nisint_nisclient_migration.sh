@@ -50,7 +50,7 @@ nisint_nisclient_migration_envsetup()
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
-		rlRun "ipa host-del $CLIENT --updatedns"
+		rlRun "ipa host-del $CLIENT"
 		rhts-sync-set -s "$FUNCTION.0" -m $MASTER
 		rhts-sync-block -s "$FUNCTION.1" $CLIENT
 		;;
@@ -68,7 +68,11 @@ nisint_nisclient_migration_envsetup()
 		rlRun "echo '$CLIENT_IP $HOSTNAME_S.$DOMAIN $HOSTNAME_S' >> /etc/hosts"
 		rlRun "sed -i s/^nameserver/#nameserver/g /etc/resolv.conf"
 		rlRun "echo 'nameserver $MASTER_IP' >> /etc/resolv.conf"
+		rlRun "authconfig --disablekrb5 --update"
 		rlRun "authconfig --disablenis --update"
+		rlRun "mv -f /etc/krb5.conf /etc/krb5.conf.nismig"
+		rlRun "mv -f /etc/krb5.keytab /etc/krb5.keytab.nismig"
+		rlRun "service ntpd stop"
 		rlRun "ipa-client-install --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW -U --server=$MASTER"
         rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
 		rhts-sync-set -s "$FUNCTION.1" -m $CLIENT

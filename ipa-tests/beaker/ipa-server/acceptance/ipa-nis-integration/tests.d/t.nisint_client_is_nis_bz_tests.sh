@@ -40,11 +40,13 @@
 ######################################################################
 nisint_client_is_nis_bz_tests()
 {
-	nisint_client_is_nis_bz_788625	
+	echo "$FUNCNAME"
 }
 
-nisint_client_is_nis_bz_788625()
+example_bz_788625()
 {
+	rlLog "This is just an EXAMPLE!!!"
+	rlLog "This test is actually run from ipa-netgroup-cli"
 	rlPhaseStartTest "netgroup_bz_788625: IPA nested netgroups not seen from ypcat"
 	case "$HOSTNAME" in
 	"$MASTER")

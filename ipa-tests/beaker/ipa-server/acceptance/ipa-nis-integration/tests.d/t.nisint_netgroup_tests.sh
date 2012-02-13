@@ -63,6 +63,8 @@ nisint_netgroup_test_envsetup()
 		rlRun "create_ipauser testuser1 test user passw0rd1"
 		rlRun "create_ipauser testuser2 test user passw0rd1"
 		KinitAsAdmin
+		rlRun "ipa user-mod testuser1 --uid=56678 --gidnumber=56678"
+		rlRun "ipa user-mod testuser2 --uid=56679 --gidnumber=56679"
 		rlRun "ipa netgroup-add testnetgroup1 --desc=testnetgroup1"
 		rlRun "ipa netgroup-add testnetgroup2 --desc=testnetgroup2"
 		rlRun "ipa netgroup-add-member testnetgroup1 --users=testuser1 --hosts=$MASTER"

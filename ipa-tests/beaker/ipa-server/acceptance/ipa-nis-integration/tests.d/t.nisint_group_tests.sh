@@ -68,8 +68,10 @@ nisint_group_test_envsetup()
 		rlRun "create_ipauser testuser1 NIS USER passw0rd1"
 		rlRun "create_ipauser testuser2 NIS USER passw0rd1"
 		KinitAsAdmin
-		rlRun "ipa group-add testgroup1 --desc=NIS_GROUP_testgroup1"
-		rlRun "ipa group-add testgroup2 --desc=NIS_GROUP_testgroup2"
+		rlRun "ipa user-mod testuser1 --uid=56678 --gidnumber=56678"
+		rlRun "ipa user-mod testuser2 --uid=56679 --gidnumber=56679"
+		rlRun "ipa group-add testgroup1 --gid=90001 --desc=NIS_GROUP_testgroup1"
+		rlRun "ipa group-add testgroup2 --gid=90002 --desc=NIS_GROUP_testgroup2"
 		rlRun "ipa group-add-member testgroup1 --users=testuser1"
 		rlRun "ipa group-add-member testgroup2 --users=testuser2"
 		rhts-sync-set -s "$FUNCNAME" -m $MASTER
