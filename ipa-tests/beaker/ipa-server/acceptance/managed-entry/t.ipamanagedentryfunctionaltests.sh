@@ -150,7 +150,7 @@ managedby_server_tests()
 	rlPhaseEnd
 	
 	# Sleeping for some time in order to let the managedby plugin to work
-	sleep 15
+	sleep 30
 	rlPhaseStartTest "Managed-09 - checking to make sure that the associated group was deleted"
 		rlRun "/usr/bin/ldapsearch -x -D '$ROOTDN' -w $ROOTDNPWD -b '$NEWUSERAGROUP'" 32 "ensure that $NEWUSERAGROUP does not exist"
 	rlPhaseEnd
@@ -164,7 +164,7 @@ managedby_server_tests()
 	rlPhaseStartTest "Manages-11 - rename the new user"
 		rlRun "/usr/bin/ldapmodrdn -x -D '$ROOTDN' -w $ROOTDNPWD -f $RNUSERLDIF" 0 "Rename user $USERA to $USERB"
 	rlPhaseEnd
-	sleep 15
+	sleep 30
 
 	# ensure that new user's group was renamed
 	rlPhaseStartTest "Managed-12 - ensure that the assoiated groups managedby entry was renamed."
@@ -181,7 +181,7 @@ managedby_server_tests()
 	rlPhaseEnd
 	
 	# Sleeping for some time in order to let the managedby plugin to work
-	sleep 15
+	sleep 30
 	rlPhaseStartTest "Managed-15 - Checking to make sure that the associated group was deleted"
 		rlRun "/usr/bin/ldapsearch -x -D '$ROOTDN' -w $ROOTDNPWD -b '$NEWUSERBGROUP'" 32 "ensure that $NEWUSERBGROUP does not exist"
 	rlPhaseEnd
