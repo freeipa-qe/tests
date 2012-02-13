@@ -118,7 +118,7 @@ managedby_server_tests()
 	rlPhaseEnd
 
 	# ensure that new user's group was created
-	rlPhaseStartTest "Managed-02 - ensure that the assoiated groups entry was created."
+	rlPhaseStartTest "Managed-02 - ensure that the associated groups entry was created."
 		rlRun "/usr/bin/ldapsearch -x -D '$ROOTDN' -w $ROOTDNPWD -b '$NEWUSERAGROUP'" 0 "ensure that $NEWUSERAGROUP was created"
 	rlPhaseEnd
 
@@ -167,7 +167,7 @@ managedby_server_tests()
 	sleep 30
 
 	# ensure that new user's group was renamed
-	rlPhaseStartTest "Managed-12 - ensure that the assoiated groups managedby entry was renamed."
+	rlPhaseStartTest "Managed-12 - ensure that the associated groups managedby entry was renamed."
 		rlRun "/usr/bin/ldapsearch -x -D '$ROOTDN' -w $ROOTDNPWD -b '$NEWUSERAGROUP' | grep mepManagedBy | grep $NEWUSERB" 0 "ensure that the managedby for $NEWUSERAGROUP was modified to $NEWUSERB"
 	rlPhaseEnd
 
@@ -192,11 +192,11 @@ managedby_server_tests()
 	rlPhaseEnd
 
 	# ensure that new user's group was created
-	rlPhaseStartTest "Managed-17 - ensure that the assoiated groups entry was created."
+	rlPhaseStartTest "Managed-17 - ensure that the associated groups entry was created."
 		rlRun "/usr/bin/ldapsearch -x -D '$ROOTDN' -w $ROOTDNPWD -b '$NEWUSERAGROUP'" 0 "ensure that $NEWUSERAGROUP was created"
 	rlPhaseEnd
 
-	rlPhaseStartTest "Managed-18 - ensure that the assoiated groups entry was created using ipa group-find."
+	rlPhaseStartTest "Managed-18 - ensure that the associated groups entry was created using ipa group-find."
 		rlRun "/usr/bin/ipa group-find --private --all $USERA | grep $NEWUSERA" 0 "ensure that $NEWUSERAGROUP was created using ipa group-find"
 	rlPhaseEnd
 
@@ -228,11 +228,11 @@ managedby_server_tests()
 		rlRun "/usr/bin/ipa user-mod --uid=$NEWGIDNUMBER $USERA" 0 "changing the GID on the managed entry user"
 	rlPhaseEnd
 
-	rlPhaseStartTest "Managed-25 - Make sure the gid number on the assoiated group changed"
+	rlPhaseStartTest "Managed-25 - Make sure the gid number on the associated group changed"
 		rlRun "/usr/bin/ldapsearch -x -D '$ROOTDN' -w $ROOTDNPWD -b '$NEWUSERAGROUP' objectclass=* | grep $NEWGIDNUMBER" 0 "Make sure that the GID number changed on the created user"
 	rlPhaseEnd
 
-	rlPhaseStartTest "Managed-26 - Make sure the gid number on the assoiated group changed using ipa group-find"
+	rlPhaseStartTest "Managed-26 - Make sure the gid number on the associated group changed using ipa group-find"
 		rlRun "/usr/bin/ipa group-find --private --all $USERA | grep $NEWGIDNUMBER" 0 "Make sure that the GID number changed on the created user using ipa group-find"
 	rlPhaseEnd
 
