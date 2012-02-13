@@ -41,12 +41,14 @@
 nisint_nisclient_migration()
 {
 	nisint_nisclient_migration_envsetup
+	nisint_nisclient_migration_ipa_client_install
+	nisint_nisclient_migration_autofs_setup
 
 }
 
 nisint_nisclient_migration_envsetup()
 {
-	rlPhaseStartTest "nisint_nisclient_migration_envsetup: Install/configure IPA Client"
+	rlPhaseStartTest "nisint_nisclient_migration_envsetup: Prep for migration to IPA"
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
@@ -73,8 +75,103 @@ nisint_nisclient_migration_envsetup()
 		rlRun "mv -f /etc/krb5.conf /etc/krb5.conf.nismig"
 		rlRun "mv -f /etc/krb5.keytab /etc/krb5.keytab.nismig"
 		rlRun "service ntpd stop"
+		rhts-sync-set -s "$FUNCTION.1" -m $CLIENT
+		;;
+	*)
+		rlLog "Machine in recipe is not a known ROLE"
+		;;
+	esac
+	rlPhaseEnd
+
+}
+
+nisint_nisclient_migration_ipa_client_install()
+{
+	rlPhaseStartTest "nisint_nisclient_migration_ipa_client_install: Install/configure IPA Client"
+	case "$HOSTNAME" in
+	"$MASTER")
+		rlLog "Machine in recipe is IPAMASTER"
+		rlRun "ipa host-del $CLIENT"
+		rhts-sync-set -s "$FUNCTION.0" -m $MASTER
+		rhts-sync-block -s "$FUNCTION.1" $CLIENT
+		;;
+	"$NISMASTER")
+		rlLog "Machine in recipe is NISMASTER"
+		rhts-sync-block -s "$FUNCTION.0" $MASTER
+		rhts-sync-block -s "$FUNCTION.1" $CLIENT
+		;;
+	"$CLIENT")
+		rlLog "Machine in recipe is CLIENT"
+		rhts-sync-block -s "$FUNCTION.0" $MASTER
+		HOSTNAME_S=$(hostname -s)
 		rlRun "ipa-client-install --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW -U --server=$MASTER"
         rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
+		rhts-sync-set -s "$FUNCTION.1" -m $CLIENT
+		;;
+	*)
+		rlLog "Machine in recipe is not a known ROLE"
+		;;
+	esac
+	rlPhaseEnd
+
+}
+
+nisint_nisclient_migration_ipa_autofs_setup()
+{
+	rlPhaseStartTest "nisint_nisclient_migration_ipa_autofs_setup: Configure Autofs to use IPA"
+	case "$HOSTNAME" in
+	"$MASTER")
+		rlLog "Machine in recipe is IPAMASTER"
+		rlRun "ipa host-del $CLIENT"
+		rhts-sync-set -s "$FUNCTION.0" -m $MASTER
+		rhts-sync-block -s "$FUNCTION.1" $CLIENT
+		;;
+	"$NISMASTER")
+		rlLog "Machine in recipe is NISMASTER"
+		rhts-sync-block -s "$FUNCTION.0" $MASTER
+		rhts-sync-block -s "$FUNCTION.1" $CLIENT
+		;;
+	"$CLIENT")
+		rlLog "Machine in recipe is CLIENT"
+		rhts-sync-block -s "$FUNCTION.0" $MASTER
+		HOSTNAME_S=$(hostname -s)
+        rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
+		cat > /etc/autofs_ldap_auth.conf <<-EOF
+		<?xml version="1.0" ?>
+		<!--
+		This files contains a single entry with multiple attributes tied to it.
+		See autofs_ldap_auth.conf(5) for more information.
+		-->
+
+		<autofs_ldap_sasl_conf
+				usetls="no"
+				tlsrequired="no"
+				authrequired="yes"
+				authtype="GSSAPI"
+				clientprinc="host/$CLIENT@$RELM"
+		/>
+		EOF
+
+        rlRun "cat /etc/autofs_ldap_auth.conf"
+
+		cat > /etc/sysconfig/autofs <<-EOF
+		TIMEOUT=60
+		BROWSE_MODE="no"
+		MOUNT_NFS_DEFAULT_PROTOCOL=4
+		LOGGING="debug"
+		LDAP_URI="ldap://$MASTER"
+		SEARCH_BASE="cn=nis,cn=automount,$BASEDN"
+		MAP_OBJECT_CLASS="automountMap"
+		ENTRY_OBJECT_CLASS="automount"
+		MAP_ATTRIBUTE="automountMapName"
+		ENTRY_ATTRIBUTE="automountKey"
+		VALUE_ATTRIBUTE="automountInformation"
+		AUTH_CONF_FILE="/etc/autofs_ldap_auth.conf"
+		EOF
+
+		rlRun "sed -i 's/automount.*$/automount:  files ldap/' /etc/nsswitch.conf"
+        rlRun "cat /etc/sysconfig/autofs"
+		rlRun "service autofs restart"
 		rhts-sync-set -s "$FUNCTION.1" -m $CLIENT
 		;;
 	*)
