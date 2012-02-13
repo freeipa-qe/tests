@@ -301,17 +301,17 @@ nisint_netgroup_test_1007()
 	"$CLIENT")
 		rlLog "Machine in recipe is CLIENT"
 		# setup hosts.allow/hosts.deny files using netgroups
-		cp /etc/hosts.allow /etc/hosts.allow.orig.nisint
-		cp /etc/hosts.deny /etc/hosts.deny.orig.nisint
-		echo "ALL: @testnetgroup1" > /etc/hosts.allow
-		echo "ALL: ALL" > /etc/hosts.deny
+		rlRun "cp /etc/hosts.allow /etc/hosts.allow.orig.nisint"
+		rlRun "cp /etc/hosts.deny /etc/hosts.deny.orig.nisint"
+		rlRun "echo 'ALL: @testnetgroup1' > /etc/hosts.allow"
+		rlRun "echo 'ALL: ALL' > /etc/hosts.deny"
 
 		rhts-sync-set -s "$FUNCNAME.1" -m $CLIENT
 		rhts-sync-block -s "$FUNCNAME.2" $MASTER
 
 		# cleanup/undo hosts.allow/host.deny files
-		mv -f /etc/hosts.allow.orig.nisint /etc/hosts.allow
-		mv -f /etc/hosts.deny.orig.nisint /etc/hosts.deny
+		rlRun "mv -f /etc/hosts.allow.orig.nisint /etc/hosts.allow"
+		rlRun "mv -f /etc/hosts.deny.orig.nisint /etc/hosts.deny"
 
 		rhts-sync-set -s "$FUNCNAME.3" -m $CLIENT
 		;;
@@ -346,16 +346,16 @@ nisint_netgroup_test_1008()
 		rlLog "Machine in recipe is CLIENT"
 
 		# setup hosts.allow/hosts.deny files using netgroups
-		cp /etc/hosts.allow /etc/hosts.allow.orig.nisint
-		cp /etc/hosts.deny /etc/hosts.deny.orig.nisint
-		echo "ALL: @testnetgroup1" > /etc/hosts.deny
-		echo "#ALL: ALL" > /etc/hosts.allow
+		rlRun "cp /etc/hosts.allow /etc/hosts.allow.orig.nisint"
+		rlRun "cp /etc/hosts.deny /etc/hosts.deny.orig.nisint"
+		rlRun "echo 'ALL: @testnetgroup1' > /etc/hosts.deny"
+		rlRun "echo '#ALL: ALL' > /etc/hosts.allow"
 
 		rhts-sync-set -s "$FUNCNAME.1" -m $CLIENT
 		rhts-sync-block -s "$FUNCNAME.2" $MASTER
 		
-		mv -f /etc/hosts.allow.orig.nisint /etc/hosts.allow
-        mv -f /etc/hosts.deny.orig.nisint /etc/hosts.deny
+		rlRun "mv -f /etc/hosts.allow.orig.nisint /etc/hosts.allow"
+        rlRun "mv -f /etc/hosts.deny.orig.nisint /etc/hosts.deny"
 
 		rhts-sync-set -s "$FUNCNAME.3" -m $CLIENT
 		;;

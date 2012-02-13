@@ -88,12 +88,6 @@ nisint_automount_test_envsetup()
 nisint_automount_test_1001()
 {
 	rlPhaseStartTest "nisint_automount_test_1001: ypcat positive test"
-	if [ $(ps -ef|grep [y]pbind|wc -l) -eq 0 ]; then
-		rlPass "ypbind not running...skipping test"
-		rlPhaseEnd
-		return 0
-	fi
-
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
@@ -105,9 +99,13 @@ nisint_automount_test_1001()
 		;;
 	"$CLIENT")
 		rlLog "Machine in recipe is CLIENT"
-		rlRun "ypcat -k auto.master |grep nisint" 0 "ypcat search for existing auto.master entry"
-		rlRun "ypcat -k auto.home   |grep home" 0 "ypcat search for existing auto.home entry"
-		rlRun "ypcat -k auto.nisint |grep app1" 0 "ypcat search for existing auto.nisint entry"
+		if [ $(ps -ef|grep [y]pbind|wc -l) -eq 0 ]; then
+			rlPass "ypbind not running...skipping test"
+		else
+			rlRun "ypcat -k auto.master |grep nisint" 0 "ypcat search for existing auto.master entry"
+			rlRun "ypcat -k auto.home   |grep home" 0 "ypcat search for existing auto.home entry"
+			rlRun "ypcat -k auto.nisint |grep app1" 0 "ypcat search for existing auto.nisint entry"
+		fi
 		rhts-sync-set -s "$FUNCNAME" $CLIENT
 		;;
 	*)
@@ -121,12 +119,6 @@ nisint_automount_test_1001()
 nisint_automount_test_1002()
 {
 	rlPhaseStartTest "nisint_automount_test_1002: ypcat negative test"
-	if [ $(ps -ef|grep [y]pbind|wc -l) -eq 0 ]; then
-		rlPass "ypbind not running...skipping test"
-		rlPhaseEnd
-		return 0
-	fi
-
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
@@ -138,7 +130,11 @@ nisint_automount_test_1002()
 		;;
 	"$CLIENT")
 		rlLog "Machine in recipe is CLIENT"
-		rlRun "ypcat -k auto.master |grep notamap" 1 "Fail to ypcat search for non-existent auto.master entry"
+		if [ $(ps -ef|grep [y]pbind|wc -l) -eq 0 ]; then
+			rlPass "ypbind not running...skipping test"
+		else
+			rlRun "ypcat -k auto.master |grep notamap" 1 "Fail to ypcat search for non-existent auto.master entry"
+		fi
 		rhts-sync-set -s "$FUNCNAME" $CLIENT
 		;;
 	*)
@@ -152,12 +148,6 @@ nisint_automount_test_1002()
 nisint_automount_test_1003()
 {
 	rlPhaseStartTest "nisint_automount_test_1003: ipa positive test"
-	if [ ! -f /usr/bin/ipa ]; then
-		rlPass "ipa not found...skipping"
-		rlPhaseEnd
-		return 0
-	fi
-
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
@@ -169,10 +159,14 @@ nisint_automount_test_1003()
 		;;
 	"$CLIENT")
 		rlLog "Machine in recipe is CLIENT"
-		KinitAsAdmin
-		rlRun "ipa automountkey-find nis auto.master|grep nisint" 0 "ipa search for existing auto.master entry"
-		rlRun "ipa automountkey-find nis auto.home  |grep home" 0 "ipa search for existing auto.home entry"
-		rlRun "ipa automountkey-find nis auto.nisint|grep app1" 0 "ipa search for existing auto.nisint entry"
+		if [ ! -f /usr/bin/ipa ]; then
+			rlPass "ipa not found...skipping"
+		else
+			KinitAsAdmin
+			rlRun "ipa automountkey-find nis auto.master|grep nisint" 0 "ipa search for existing auto.master entry"
+			rlRun "ipa automountkey-find nis auto.home  |grep home" 0 "ipa search for existing auto.home entry"
+			rlRun "ipa automountkey-find nis auto.nisint|grep app1" 0 "ipa search for existing auto.nisint entry"
+		fi
 		rhts-sync-set -s "$FUNCNAME" $CLIENT
 		;;
 	*)
@@ -186,12 +180,6 @@ nisint_automount_test_1003()
 nisint_automount_test_1004()
 {
 	rlPhaseStartTest "nisint_automount_test_1004: ipa negative test"
-	if [ ! -f /usr/bin/ipa ]; then
-		rlPass "ipa not found...skipping"
-		rlPhaseEnd
-		return 0
-	fi
-
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
@@ -203,8 +191,12 @@ nisint_automount_test_1004()
 		;;
 	"$CLIENT")
 		rlLog "Machine in recipe is CLIENT"
-		KinitAsAdmin
-		rlRun "ipa automountkey-find nis auto.master|grep notamap" 1 "fail to ipa search for non-existent auto.master entry"
+		if [ ! -f /usr/bin/ipa ]; then
+			rlPass "ipa not found...skipping"
+		else
+			KinitAsAdmin
+			rlRun "ipa automountkey-find nis auto.master|grep notamap" 1 "fail to ipa search for non-existent auto.master entry"
+		fi
 		rhts-sync-set -s "$FUNCNAME" $CLIENT
 		;;
 	*)
