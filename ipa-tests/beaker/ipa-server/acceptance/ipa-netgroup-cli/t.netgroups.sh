@@ -572,7 +572,7 @@ manage_netgroups_positive()
 		echo $CLIENT | grep $HOSTNAME
         	if [ $? -eq 0 ] ; then
                 	rlLog "This is a CLIENT"
-                	ssh root@$MASTER "echo $ADMINPW | ipa-managed-entries \"${ENTR}Y\" enable" 
+                	ssh root@$MASTER "echo $ADMINPW | ipa-managed-entries \"${ENTRY}\" enable" 
                 	ssh root@$MASTER "echo $ADMINPW | ipa-managed-entries \"${ENTRY}\" status" > /tmp/plugin.out
                 	cat /tmp/plugin.out | grep "Plugin Enabled"
                 	if [ $? -eq 0 ] ; then
