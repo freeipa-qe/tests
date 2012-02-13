@@ -279,7 +279,7 @@ public class AutomountTests extends SahiTestScript{
 	}
 
 	@Test (groups={"modifyAutomountMap"}, dataProvider="modifyAutomountMap", dependsOnGroups="addAutomountMap",
-		description="modify self service permission: add single attributes ")
+		description="modify automount map : test for reset button")
 	public void modifyAutomountMap_reset(String automountLocation, String automountMapName) throws Exception 
 	{
 		browser.link(automountLocation).click();
@@ -301,7 +301,7 @@ public class AutomountTests extends SahiTestScript{
 	}
 
 	@Test (groups={"modifyAutomountMap"}, dataProvider="modifyAutomountMap", dependsOnGroups="addAutomountMap",
-		description="modify self service permission: add single attributes ")
+		description="modify automount map : test for update button")
 	public void modifyAutomountMap_update(String automountLocation,String automountMapName) throws Exception
 	{
 		browser.link(automountLocation).click();
@@ -353,10 +353,219 @@ public class AutomountTests extends SahiTestScript{
 			Assert.assertFalse(browser.link(map).exists(), "after delete, automount map (" + map + ") should NOT exist in list");
 	}
 
+	/////////// add indirect automount map /////////////////////////
+	@Test (groups={"addIndirectAutomountMap"}, dataProvider="addIndirectAutomountMap", dependsOnGroups="addAutomountLocation",
+		description = "add new indirect automount map via 'Add' button")
+	public void addIndirectAutomountMap_add(String automountLocation, String indirectAutomountMap, String mountPoint, String parentMap) throws Exception {  
+		browser.link(automountLocation).click();
+		Assert.assertFalse(browser.link(indirectAutomountMap).exists(), "before add, indirect automount map (" + indirectAutomountMap + ")should NOT exist in list");
+		AutomountTasks.addIndirectAutomountMap(browser, indirectAutomountMap, mountPoint, parentMap);  
+		Assert.assertTrue(browser.link(indirectAutomountMap).exists(), "after add, indirect automount map (" + indirectAutomountMap + ") should exist in list");
+	}
+
+	@Test (groups={"addIndirectAutomountMap"}, dataProvider="addIndirectAutomountMap_addandaddanother",dependsOnGroups="addAutomountLocation",
+		description = "add new automount via 'Add and Add Another' button")
+	public void addIndirectAutomountMap_addandaddanother(String automountLocation, String indirectAutomountMaps, String mountPoint, String parentMap) throws Exception {  
+		browser.link(automountLocation).click();
+		String[] maps = CommonHelper.stringToArray(indirectAutomountMaps);
+		String[] points = CommonHelper.stringToArray(mountPoint);
+		String[] parents = CommonHelper.stringToArray(parentMap);
+		for (String map:maps)
+			Assert.assertFalse(browser.link(map).exists(), "before add, location ["+map+"] does not exist");
+		AutomountTasks.addIndirectAutomountMapAddAndAddAnother(browser, maps, points, parents);
+		for (String map:maps)
+			Assert.assertTrue(browser.link(map).exists(), "after add, location ["+map+"] does exist");
+	}
+
+	@Test (groups={"addIndirectAutomountMap"}, dataProvider="addIndirectAutomountMap_addthenedit", dependsOnGroups="addAutomountLocation",
+		description = "add new indirect automount map via 'Add and Edit' button")
+	public void addIndirectAutomountMap_addthenedit(String automountLocation, String indirectAutomountMap, String mountPoint, String parentMap) throws Exception {  
+		browser.link(automountLocation).click();
+		Assert.assertFalse(browser.link(indirectAutomountMap).exists(), "before add, indirect automount map (" + indirectAutomountMap + ") should NOT exist in list");
+		browser.span("Add").click();
+		browser.textbox("automountmapname").setValue(indirectAutomountMap);
+		browser.textarea("description").setValue(indirectAutomountMap + ": auto description");
+		browser.button("Add and Edit").click();
+		if (browser.link("details").exists() && browser.link("Automount Keys").exists())
+		{
+			log.info("in edit mode, test success, now go back to automount ");
+			browser.link(automountLocation).in(browser.span("path")).click(); 
+		}
+		else{
+			log.info("not in edit mode, test failed");
+			Assert.assertTrue(false, "after click 'Add and Edit' we are not in edit mode, test failed");
+		}
+		Assert.assertTrue(browser.link(indirectAutomountMap).exists(), "after add, indirect automount map (" + indirectAutomountMap + ") should exist in list");
+	}
+
+	@Test (groups={"addIndirectAutomountMap"},  dataProvider="addIndirectAutomountMap_addthencancel",dependsOnGroups="addAutomountLocation",
+		description = "add new automount via 'Add' then click 'Cancel', expect no new indirect automount map being added")
+	public void addIndirectAutomountMap_addthencancel(String automountLocation, String mountPoint, String parentMap) throws Exception {  
+		browser.link(automountLocation).click(); 
+		String indirectAutomountMap = "IwillBeCanceled";
+		Assert.assertFalse(browser.link(indirectAutomountMap).exists(), "before add, indirect automount map (" + indirectAutomountMap + ")should NOT exist in list");
+		AutomountTasks.addIndirectAutomountMapAddThenCancel(browser,indirectAutomountMap, mountPoint, parentMap);
+		Assert.assertFalse(browser.link(indirectAutomountMap).exists(), "after add, indirect automount map (" + indirectAutomountMap + ") should NOT exist in list as well");
+	}
+
+	@Test (groups={"addIndirectAutomountMap_negative"}, dependsOnGroups="addAutomountLocation",
+		description = "no duplicated indirect automount map is allowed")
+	public void addIndirectAutomountMap_negative_duplicate_location(String automountLocation) throws Exception {  
+		browser.link(automountLocation).click();  
+		for (String map:existingIndirectAutomountMaps)
+		{
+			String description = map + " duplicated indirect automount map is not allowed";
+			browser.textbox("automountmapname").setValue(map);
+			browser.textarea("description").setValue(description);
+			browser.button("Add").click();
+			if (browser.div("indirect automount map with name \"" + map + "\" already exists").exists())
+			{
+				log.info("duplicate indirect automount map: " + map +" is forbidden, good, test continue");
+				browser.button("Cancel").click();
+				browser.button("Cancel").click();
+			}
+			else
+				Assert.assertTrue(false, "duplicate indirect automount map is allowed : name="+map+", bad, test failed");
+		}
+	}
+
+	@Test (groups={"addIndirectAutomountMap_negative"}, dependsOnGroups="addAutomountLocation",
+		description = "required filed: automation map name is required")
+	public void addIndirectAutomountMap_negative_required_field_mapname(String automountLocation) throws Exception {  
+		browser.link(automountLocation).click();  
+		browser.span("Add").click();
+		// without enter map name, just click Add
+		browser.button("Add").click();
+		if (browser.span("Required field").exists())
+			log.info("error fields: 'Required field' appears as expected, test success"); // report success
+		else
+			Assert.assertTrue(false, "error fields 'Required field' does NOT appear as expected, test failed"); 
+	}
+
+	@Test (groups={"addIndirectAutomountMap_negative"}, dependsOnGroups="addAutomountLocation",
+		description = "required filed: mount point is required")
+	public void addIndirectAutomountMap_negative_required_field_mountpoint(String automountLocation) throws Exception {  
+		// need work here
+	}
+
+	@Test (groups={"addIndirectAutomountMap_negative"}, dependsOnGroups="addAutomountLocation",
+		description = "required filed: parent map has to exist when it is being specified")
+	public void addIndirectAutomountMap_negative_required_field_parentmap(String automountLocation) throws Exception {  
+		// need work here
+	}
+
+	/////////// modify indirect automount map settings/////////////////////////
+	@Test (groups={"modifyIndirectAutomountMap"}, dataProvider="modifyIndirectAutomountMap", dependsOnGroups="addIndirectAutomountMap",
+		description="modify indirect automount map: check undo button ")
+	public void modifyIndirectAutomountMap_undo(String automountLocation, String indirectAutomountMapName) throws Exception 
+	{
+		browser.link(automountLocation).click();
+		browser.link(indirectAutomountMapName).click();
+		browser.link("details").click();
+		String originalDescription = browser.textarea("description").getText();
+		browser.textarea("description").setValue("I am not suppose to be here: test for undo");
+		if (browser.span("undo").exists())
+		{
+			log.info("after changes made into description, link 'undo' appears, good, test continue");
+			browser.span("undo").click();
+			String afterUndo = browser.textarea("description").getText();
+			if (originalDescription.equals(afterUndo)) 
+			{
+				log.info("'undo' will restored the original description value, good, test passed");
+			}else{
+				log.info("click 'undo' does not restore original description value, test failed");
+				Assert.assertTrue(false, "unexpected behave for 'undo': click 'undo' does not restore settings");
+			}
+			browser.link(automountLocation).in(browser.span("path")).click(); 
+		}else{
+			log.info("after changes made into permission, link 'undo' does NOT appear, test failed ");
+			browser.span("Reset").click();
+			browser.link(automountLocation).in(browser.span("path")).click(); 
+			Assert.assertTrue(false, "unexpected behave: link 'undo' does not show up as expected");
+		} 
+	}
+
+	@Test (groups={"modifyIndirectAutomountMap"}, dataProvider="modifyIndirectAutomountMap", dependsOnGroups="addIndirectAutomountMap",
+		description="modify indirect automount map: test for reset button")
+	public void modifyIndirectAutomountMap_reset(String automountLocation, String indirectAutomountMapName) throws Exception 
+	{
+		browser.link(automountLocation).click();
+		browser.link(indirectAutomountMapName).click();
+		browser.link("details").click();
+		String originalDescription = browser.textarea("description").getText();
+		browser.textarea("description").setValue("I am not suppose to be here: test for reset");
+		browser.span("Reset").click();  
+		String afterReset = browser.textarea("description").getText();
+		if (originalDescription.equals(afterReset)) 
+		{
+			log.info("'reset' will restored the original description value, good, test passed");
+			browser.link(automountLocation).in(browser.span("path")).click(); 
+		}else{
+			log.info("click 'reset' does not restore original description value, test failed");
+			browser.link(automountLocation).in(browser.span("path")).click(); 
+			Assert.assertTrue(false, "unexpected behave for 'reset': click 'Reset' does not original description");
+		} 
+	}
+
+	@Test (groups={"modifyIndirectAutomountMap"}, dataProvider="modifyIndirectAutomountMap", dependsOnGroups="addIndirectAutomountMap",
+		description="modify indirect automount: test for update button")
+	public void modifyIndirectAutomountMap_update(String automountLocation,String indirectAutomountMapName) throws Exception
+	{
+		browser.link(automountLocation).click();
+		browser.link(indirectAutomountMapName).click(); 
+		browser.link("details").click();
+		String description = automountLocation + "->" + indirectAutomountMapName + ": description modified, in test 'Update'";
+		browser.textarea("description").setValue(description);
+		browser.span("Update").click();
+		String afterUpdate = browser.textarea("description").getText();
+		if (description.equals(afterUpdate)) 
+		{
+			log.info("'Update' sets new value for description as expected, test passed");
+			browser.link(automountLocation).in(browser.span("path")).click(); 
+		}else{
+			log.info("click 'Update' does not set newl description value, test failed");
+			browser.link(automountLocation).in(browser.span("path")).click();  
+			Assert.assertTrue(false, "unexpected behave for 'Update': click 'Update' does not set new value for 'description'");
+		}  
+	}
+
+	@Test (groups={"modifyIndirectAutomountMap_negative"}, dataProvider="modifyIndirectAutomountMap_negative", dependsOnGroups="addIndirectAutomountMap",
+		description="negative test case for self service permission modification")
+	public void modifyIndirectAutomountMap_negative(String automountLocation, String indirectAutomountMapName, String description) throws Exception {
+		browser.link(automountLocation).click();
+		browser.link(indirectAutomountMapName).click(); 
+		browser.link("details").click();
+		browser.link(automountLocation).in(browser.span("path")).click(); 
+	}
+
+	/////////// delete indirect automount map /////////////////////////
+	@Test (groups={"deleteIndirectAutomountMap"}, dataProvider="deleteIndirectAutomountMapSingle", dependsOnGroups="modifyIndirectAutomountMap",
+			description="delete single indirect automount map")
+	public void deleteIndirectAutomountMapSingle(String automountLocation,String indirectAutomountMap) throws Exception { 
+		browser.link(automountLocation).click();
+		Assert.assertTrue(browser.link(indirectAutomountMap).exists(), "before delete, autoumount location (" + indirectAutomountMap + ")should exist in list");
+		CommonHelper.deleteEntry(browser, indirectAutomountMap);  
+		Assert.assertFalse(browser.link(indirectAutomountMap).exists(), "after delete, indirect automount map (" + indirectAutomountMap + ") should NOT exist in list");
+	}
+
+	@Test (groups={"deleteIndirectAutomountMap"}, dataProvider="deleteIndirectAutomountMapMultiple", dependsOnGroups="modifyIndirectAutomountMap",
+			description="delete multiple indirect automount map")
+	public void deleteIndirectAutomountMapMultiple(String automountLocation,String indirectAutomountMaps) throws Exception { 
+		browser.link(automountLocation).click();
+		String[] maps = CommonHelper.stringToArray(indirectAutomountMaps);
+		for (String map:maps)
+			Assert.assertTrue(browser.link(map).exists(), "before delete, autoumount location (" + map + ")should exist in list");
+		CommonHelper.deleteEntry(browser, maps);  
+		for (String map:maps)
+			Assert.assertFalse(browser.link(map).exists(), "after delete, indirect automount map (" + map + ") should NOT exist in list");
+	}
+
+
 	/***************************************************************************** 
 	 *             Data providers                                                * 
 	 *****************************************************************************/
 	private static String[] existingAutomountLocations = {"default"}; 
+	private static String[] existingIndirectAutomountMaps = {"auto.direct", "aut.master"};
 	private static String[] existingAutomountMaps = {"auto.direct","auto.master"}; 
 	private static String[] testAutomountLocation = {"automountlocation000","automountlocation001","automountlocation002","automountlocation003","automountlocation004","automountlocation005"};
 	private static String[] testAutomountMap = {"automountmap000","automountmap001","automountmap002","automountmap003","automountmap004","automountmap005"};
