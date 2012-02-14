@@ -106,7 +106,7 @@ nisint_automount_test_1001()
 			rlRun "ypcat -k auto.home   |grep home" 0 "ypcat search for existing auto.home entry"
 			rlRun "ypcat -k auto.nisint |grep app1" 0 "ypcat search for existing auto.nisint entry"
 		fi
-		rhts-sync-set -s "$FUNCNAME" $CLIENT
+		rhts-sync-set -s "$FUNCNAME" -m $CLIENT
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE"
@@ -135,7 +135,7 @@ nisint_automount_test_1002()
 		else
 			rlRun "ypcat -k auto.master |grep notamap" 1 "Fail to ypcat search for non-existent auto.master entry"
 		fi
-		rhts-sync-set -s "$FUNCNAME" $CLIENT
+		rhts-sync-set -s "$FUNCNAME" -m $CLIENT
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE"
@@ -167,7 +167,7 @@ nisint_automount_test_1003()
 			rlRun "ipa automountkey-find nis auto.home  |grep home" 0 "ipa search for existing auto.home entry"
 			rlRun "ipa automountkey-find nis auto.nisint|grep app1" 0 "ipa search for existing auto.nisint entry"
 		fi
-		rhts-sync-set -s "$FUNCNAME" $CLIENT
+		rhts-sync-set -s "$FUNCNAME" -m $CLIENT
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE"
@@ -197,7 +197,7 @@ nisint_automount_test_1004()
 			KinitAsAdmin
 			rlRun "ipa automountkey-find nis auto.master|grep notamap" 1 "fail to ipa search for non-existent auto.master entry"
 		fi
-		rhts-sync-set -s "$FUNCNAME" $CLIENT
+		rhts-sync-set -s "$FUNCNAME" -m $CLIENT
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE"
@@ -248,7 +248,7 @@ nisint_automount_test_1006()
 	"$CLIENT")
 		rlLog "Machine in recipe is CLIENT"
 		rlRun "touch /nfshome/notauser/testfile" 1 "Fail to touch a file in dir not in automount map and nfs export"
-		rhts-sync-set -s "$FUNCNAME" $CLIENT
+		rhts-sync-set -s "$FUNCNAME" -m $CLIENT
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE"

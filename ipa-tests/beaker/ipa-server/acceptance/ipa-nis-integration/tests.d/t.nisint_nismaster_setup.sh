@@ -60,7 +60,7 @@ nisint_nismaster_setup()
 		nisint_nismaster_setup_groups
 		nisint_nismaster_setup_hosts
 
-		rhts-sync-set   -s 'nisint_nismaster_setup_ended' $NISMASTER
+		rhts-sync-set   -s 'nisint_nismaster_setup_ended' -m $NISMASTER
 		rlPass "$FUNCNAME complete for NISMASTER ($HOSTNAME)"
 		;;
 	"$CLIENT")
