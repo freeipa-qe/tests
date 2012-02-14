@@ -137,6 +137,14 @@ createReplica3()
                 if [ "$s" != "" ]; then
 
 			rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
+
+			# Verifying the cert
+			rlRun "certutil -L -d /etc/httpd/alias/ -n \"Server-Cert\" -a > /var/tmp/httpdcacert.asc"
+			rlRun "openssl x509 -text -in /var/tmp/httpdcacert.asc" 
+
+			rlRun "certutil -L -d /etc/dirsrv/slapd-PKI-IPA/ -n \"Server-Cert\" -a > /var/tmp/dirsrvcacert.asc"
+			rlRun "openssl x509 -text -in /var/tmp/dirsrvcacert.asc"
+
 			# Preparing replica with pkcs#12 options
 
 			http_nss_cert_db_pin=`cat /etc/httpd/alias/pwdfile.txt`
@@ -270,6 +278,8 @@ installSlave()
                 rlLog "EXECUTING: ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg"
                 rlRun "/bin/bash /dev/shm/replica-install.bash" 0 "Replica installation"
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
+		rlAssertGrep "forwarders" "/etc/named.conf"
+		rlAssertGrep "$DNSFORWARD" "/etc/named.conf"
 
                 rlRun "appendEnv" 0 "Append the machine information to the env.sh with the information for the machines in the recipe set"
         fi
@@ -282,6 +292,101 @@ installSlave()
         service ip6tables stop
    rlPhaseEnd
  
+}
+
+
+installSlave_nf()
+{
+
+   rlPhaseStartTest "Installing replica with --no-forwarders option"
+
+        ls /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg
+        if [ $? -ne 0 ] ; then
+                rlFail "ERROR: Replica Package not found"
+        else
+
+                rlRun "cat /etc/resolv.conf"
+
+                echo "ipa-replica-install -U --setup-dns --no-forwarders -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg" > /dev/shm/replica-install.bash
+                chmod 755 /dev/shm/replica-install.bash
+                rlLog "EXECUTING: ipa-replica-install -U --setup-dns --no-forwarders -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg"
+                rlRun "/bin/bash /dev/shm/replica-install.bash" 0 "Replica installation"
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
+                rlAssertNotGrep "forwarders" "/etc/named.conf"
+                rlAssertNotGrep "$DNSFORWARD" "/etc/named.conf"
+
+                rlRun "appendEnv" 0 "Append the machine information to the env.sh with the information for the machines in the recipe set"
+        fi
+
+        if [ -f /var/log/ipareplica-install.log ]; then
+                rhts-submit-log -l /var/log/ipareplica-install.log
+        fi
+
+   rlPhaseEnd
+}
+
+installSlave_nr()
+{
+
+   rlPhaseStartTest "Installing replica with --no-reverse option"
+
+        ls /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg
+        if [ $? -ne 0 ] ; then
+                rlFail "ERROR: Replica Package not found"
+        else
+
+                rlRun "cat /etc/resolv.conf"
+
+                echo "ipa-replica-install -U --setup-dns --no-forwarders --no-reverse -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg" > /dev/shm/replica-install.bash
+                chmod 755 /dev/shm/replica-install.bash
+                rlLog "EXECUTING: ipa-replica-install -U --setup-dns --no-forwarders --no-reverse -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg"
+                rlRun "/bin/bash /dev/shm/replica-install.bash" 0 "Replica installation"
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
+                rlAssertNotGrep "forwarders" "/etc/named.conf"
+                rlAssertNotGrep "$DNSFORWARD" "/etc/named.conf"
+
+		rlRun "ipa dnszone-find | grep in-addr.arpa." 1
+
+                rlRun "appendEnv" 0 "Append the machine information to the env.sh with the information for the machines in the recipe set"
+        fi
+
+        if [ -f /var/log/ipareplica-install.log ]; then
+                rhts-submit-log -l /var/log/ipareplica-install.log
+        fi
+
+   rlPhaseEnd
+}
+
+installSlave_ca()
+{
+
+   rlPhaseStartTest "Installing replica with --setup-ca option"
+
+        ls /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg
+        if [ $? -ne 0 ] ; then
+                rlFail "ERROR: Replica Package not found"
+        else
+
+                rlRun "cat /etc/resolv.conf"
+
+                echo "ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD --setup-ca -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg" > /dev/shm/replica-install.bash
+                chmod 755 /dev/shm/replica-install.bash
+                rlLog "EXECUTING: ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD --setup-ca -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg"
+                rlRun "/bin/bash /dev/shm/replica-install.bash" 0 "Replica installation"
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
+                rlAssertGrep "forwarders" "/etc/named.conf"
+                rlAssertGrep "$DNSFORWARD" "/etc/named.conf"
+
+                rlRun "ipa dnszone-find | grep in-addr.arpa."
+
+                rlRun "appendEnv" 0 "Append the machine information to the env.sh with the information for the machines in the recipe set"
+        fi
+
+        if [ -f /var/log/ipareplica-install.log ]; then
+                rhts-submit-log -l /var/log/ipareplica-install.log
+        fi
+
+   rlPhaseEnd
 }
 
 
@@ -301,3 +406,15 @@ installCA()
 	fi
    rlPhaseEnd
 }
+
+uninstall()
+{
+
+   rlPhaseStartTest "Uninstalling replica"
+
+
+	rlLog "Executing: ipa-server-install --uninstall -U"
+	rlRun "ipa-server-install --uninstall -U"
+
+}
+

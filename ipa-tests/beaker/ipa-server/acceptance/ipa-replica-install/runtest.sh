@@ -113,11 +113,19 @@ rlJournalStart
 	rlPhaseStartTest "MASTER tests start"
 		installMaster
 		createReplica1
+
+                rhts-sync-set -s READY_REPLICA1 $BEAKERMASTER
+		rhts-sync-block -s DONE_REPLICA1 $BEAKERSLAVE
+
 		createReplica3
+
+                rhts-sync-set -s READY_REPLICA3 $BEAKERMASTER
+		rhts-sync-block -s DONE_REPLICA3 $BEAKERSLAVE
+
 		createReplica2
 
-                rhts-sync-set -s READY $BEAKERMASTER
-		rhts-sync-block -s DONE $BEAKERSLAVE
+                rhts-sync-set -s READY_REPLICA2 $BEAKERMASTER
+		rhts-sync-block -s DONE_REPLICA2 $BEAKERSLAVE
 
 	rlPhaseEnd
 
@@ -153,14 +161,32 @@ rlJournalStart
 
         rlPhaseStartTest "SLAVE tests start"
 
-                        rhts-sync-block -s READY $BEAKERMASTER
+                        rlLog "Setting up Authorized keys"
+                        rlLog "Setting up known hosts file"
+                        SetUpAuthKeys
+                        SetUpKnownHosts
+
+                        rhts-sync-block -s READY_REPLICA1 $BEAKERMASTER
                         installSlave
 			installCA
-                        rhts-sync-set -s DONE $BEAKERSLAVE
-                        rlLog "Setting up Authorized keys"
-                        SetUpAuthKeys
-                        rlLog "Setting up known hosts file"
-                        SetUpKnownHosts
+			uninstall
+                        rhts-sync-set -s DONE_REPLICA1 $BEAKERSLAVE
+
+			# Installing slave with --no-forwarders
+                        rhts-sync-block -s READY_REPLICA3 $BEAKERMASTER
+			installSlave_nf
+			uninstall
+                        rhts-sync-set -s DONE_REPLICA3 $BEAKERSLAVE
+
+			# Installing slave with --no-reverse
+                        rhts-sync-block -s READY_REPLICA2 $BEAKERMASTER
+			installSlave_nr
+			uninstall
+
+			# Installing slave with --setup-ca
+			installSlave_ca
+			
+                        rhts-sync-set -s DONE_REPLICA2 $BEAKERSLAVE
 	rlPhaseEnd
 
         rlPhaseStartCleanup "ipa-ca-install: ipa-server clean up."
