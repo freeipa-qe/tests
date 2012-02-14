@@ -93,8 +93,6 @@ createReplica1()
 			rlRun "ipa-replica-prepare -p $ADMINPW $hostname_s.$DOMAIN"
                         rlRun "service named restart" 0 "Restarting named as work around when adding new reverse zone"
 
-			rlRun "rm -fr /var/lib/ipa/replica-info-*"
-
                 else
 
                         rlLog "No SLAVES in current recipe set."
@@ -113,6 +111,7 @@ createReplica2()
                 if [ "$s" != "" ]; then
 
 			rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
+			rlRun "rm -fr /var/lib/ipa/replica-info-*"
 
 			# Preparing replica with --ip-address option
                         rlLog "IP of server $s is resolving as $SLAVEIP, using short hostname of $hostname_s"
@@ -137,6 +136,7 @@ createReplica3()
                 if [ "$s" != "" ]; then
 
 			rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
+			rlRun "rm -fr /var/lib/ipa/replica-info-*"
 
 			# Verifying the cert
 			rlRun "certutil -L -d /etc/httpd/alias/ -n \"Server-Cert\" -a > /var/tmp/httpdcacert.asc"
@@ -223,7 +223,6 @@ echo 'expect eof ' >> $expfile
                         rlRun "service named restart" 0 "Restarting named as work around when adding new reverse zone"
 
 
-			rlRun "rm -fr /var/lib/ipa/replica-info-*"
                 else
 
                         rlLog "No SLAVES in current recipe set."
@@ -258,7 +257,7 @@ installSlave()
         cd /dev/shm/
         hostname_s=$(hostname -s)
 	AddToKnownHosts $MASTERIP
-        rlRun "sftp root@$MASTERIP:/var/lib/ipa/replica-info-$hostname_s.$DOMAIN.gpg" 0 "Get replica package"
+        rlRun "sftp root@$MASTERIP:/var/lib/ipa/replica-info-$hostname_s.$DOMAIN.gpg"
         rlLog "sftp root@$MASTERIP:/var/lib/ipa/replica-info-$hostname_s.$DOMAIN.gpg"
         rlLog "Checking for existance of replica gpg file"
         ls /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg
