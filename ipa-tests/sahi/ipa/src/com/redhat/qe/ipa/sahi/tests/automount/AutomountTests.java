@@ -133,7 +133,7 @@ public class AutomountTests extends SahiTestScript{
 	}
 
 	/////////// delete automount location /////////////////////////
-	@Test (groups={"deleteAutomountLocation"}, dataProvider="deleteAutomountLocationSingle", dependsOnGroups="deleteAutomountMap",
+	@Test (groups={"deleteAutomountLocation"}, dataProvider="deleteAutomountLocationSingle", dependsOnGroups="deleteIndirectAutomountMap",
 			description="delete single automount location")
 	public void deleteAutomountLocationSingle(String automountLocation) throws Exception { 
 		Assert.assertTrue(browser.link(automountLocation).exists(), "before delete, autoumount location (" + automountLocation + ")should exist in list");
@@ -141,7 +141,7 @@ public class AutomountTests extends SahiTestScript{
 		Assert.assertFalse(browser.link(automountLocation).exists(), "after delete, automount location (" + automountLocation + ") should NOT exist in list");
 	}
 
-	@Test (groups={"deleteAutomountLocation"}, dataProvider="deleteAutomountLocationMultiple", dependsOnGroups="deleteAutomountMap",
+	@Test (groups={"deleteAutomountLocation"}, dataProvider="deleteAutomountLocationMultiple", dependsOnGroups="deleteIndirectAutomountMap",
 			description="delete multiple automount location")
 	public void deleteAutomountLocationMultiple(String automountLocations) throws Exception { 
 		String[] locations = automountLocations.split(",");
@@ -152,7 +152,7 @@ public class AutomountTests extends SahiTestScript{
 			Assert.assertFalse(browser.link(location).exists(), "after delete, automount location (" + location + ") should NOT exist in list");
 	}
 	
-	@Test (groups={"deleteAutomountLocation"}, dataProvider="leftOverAutomountLocations", dependsOnGroups="deleteAutomountMap",
+	@Test (groups={"deleteAutomountLocation"}, dataProvider="leftOverAutomountLocations", dependsOnGroups="deleteIndirectAutomountMap",
 			description="delete automount")
 	public void deleteLeftOverPermission(String automountLocations) throws Exception 
 	{ 
@@ -383,42 +383,55 @@ public class AutomountTests extends SahiTestScript{
 		browser.link(automountLocation).click();
 		Assert.assertFalse(browser.link(indirectAutomountMap).exists(), "before add, indirect automount map (" + indirectAutomountMap + ") should NOT exist in list");
 		browser.span("Add").click();
+		browser.radio("add_indirect").click();
 		browser.textbox("automountmapname").setValue(indirectAutomountMap);
 		browser.textarea("description").setValue(indirectAutomountMap + ": auto description");
+		browser.textbox("key").setValue(mountPoint);
+		browser.textbox("parentmap").setValue(parentMap.trim());
 		browser.button("Add and Edit").click();
 		if (browser.link("details").exists() && browser.link("Automount Keys").exists())
 		{
 			log.info("in edit mode, test success, now go back to automount ");
 			browser.link(automountLocation).in(browser.span("path")).click(); 
+			Assert.assertTrue(browser.link(indirectAutomountMap).exists(), "after add, indirect automount map (" + indirectAutomountMap + ") should exist in list");
 		}
 		else{
 			log.info("not in edit mode, test failed");
+			Assert.assertTrue(browser.link(indirectAutomountMap).exists(), "after add, indirect automount map (" + indirectAutomountMap + ") should exist in list");
 			Assert.assertTrue(false, "after click 'Add and Edit' we are not in edit mode, test failed");
 		}
-		Assert.assertTrue(browser.link(indirectAutomountMap).exists(), "after add, indirect automount map (" + indirectAutomountMap + ") should exist in list");
 	}
 
 	@Test (groups={"addIndirectAutomountMap"},  dataProvider="addIndirectAutomountMap_addthencancel",dependsOnGroups="addAutomountLocation",
 		description = "add new automount via 'Add' then click 'Cancel', expect no new indirect automount map being added")
-	public void addIndirectAutomountMap_addthencancel(String automountLocation, String mountPoint, String parentMap) throws Exception {  
+	public void addIndirectAutomountMap_addthencancel(String automountLocation) throws Exception {  
 		browser.link(automountLocation).click(); 
 		String indirectAutomountMap = "IwillBeCanceled";
+		String mountPoint = "IamUseless";
+		String parentMap = "does not matter";
 		Assert.assertFalse(browser.link(indirectAutomountMap).exists(), "before add, indirect automount map (" + indirectAutomountMap + ")should NOT exist in list");
 		AutomountTasks.addIndirectAutomountMapAddThenCancel(browser,indirectAutomountMap, mountPoint, parentMap);
 		Assert.assertFalse(browser.link(indirectAutomountMap).exists(), "after add, indirect automount map (" + indirectAutomountMap + ") should NOT exist in list as well");
 	}
 
-	@Test (groups={"addIndirectAutomountMap_negative"}, dependsOnGroups="addAutomountLocation",
+	@Test (groups={"addIndirectAutomountMap_negative"}, dataProvider="addIndirectAutomountMap_duplicate_map", dependsOnGroups="addAutomountLocation",
 		description = "no duplicated indirect automount map is allowed")
-	public void addIndirectAutomountMap_negative_duplicate_location(String automountLocation) throws Exception {  
+	public void addIndirectAutomountMap_negative_duplicate_indirectmap(String automountLocation) throws Exception {  
+		String indirectAutomountMap = "IwillBeCanceled";
+		String mountPoint = "IamUseless";
+		String parentMap = "does not matter";
 		browser.link(automountLocation).click();  
 		for (String map:existingIndirectAutomountMaps)
 		{
 			String description = map + " duplicated indirect automount map is not allowed";
-			browser.textbox("automountmapname").setValue(map);
+			browser.span("Add").click();
+			browser.radio("add_indirect").click();
+			browser.textbox("automountmapname").setValue(indirectAutomountMap);
 			browser.textarea("description").setValue(description);
+			browser.textbox("key").setValue(mountPoint);
+			browser.textbox("parentmap").setValue(parentMap);
 			browser.button("Add").click();
-			if (browser.div("indirect automount map with name \"" + map + "\" already exists").exists())
+			if (browser.div(automountLocation + ": automount map not found").exists())
 			{
 				log.info("duplicate indirect automount map: " + map +" is forbidden, good, test continue");
 				browser.button("Cancel").click();
@@ -429,11 +442,37 @@ public class AutomountTests extends SahiTestScript{
 		}
 	}
 
-	@Test (groups={"addIndirectAutomountMap_negative"}, dependsOnGroups="addAutomountLocation",
+
+	@Test (groups={"addIndirectAutomountMap_negative"}, dataProvider="addIndirectAutomountMap_addthenedit", dependsOnGroups="addAutomountLocation",
+		description = "no duplicated indirect automount map is allowed")
+	public void addIndirectAutomountMap_negative_duplicate_mountpoint(String automountLocation, String indirectAutomountMap, String mountPoint, String parentMap )throws Exception {  
+		// notes: this test case will use same data provider as addIndirectAutomountMap_addthenedit, but change the automountmapname to avoid the problem as test case addIndirectAutomountMap_negative_duplicate_indirectmap
+		String indirectMapName = "negative_" + indirectAutomountMap;
+		String description = mountPoint + " :duplicated mount point is not allowed";
+		browser.link(automountLocation).click();  
+		browser.span("Add").click();
+		browser.radio("add_indirect").click();
+		browser.textbox("automountmapname").setValue(indirectMapName);
+		browser.textarea("description").setValue(description);
+		browser.textbox("key").setValue(mountPoint);
+		browser.textbox("parentmap").setValue(parentMap.trim());
+		browser.button("Add").click();
+		if (browser.div("key named " + mountPoint + " already exists").exists())
+		{
+			log.info("duplicate mount point: " + mountPoint +" is forbidden, good, test passed");
+			browser.button("Cancel").click();
+			browser.button("Cancel").click();
+		}
+		else
+			Assert.assertTrue(false, "duplicate mount point (also called key) is allowed : name="+ mountPoint + ", test failed");
+	}
+
+	@Test (groups={"addIndirectAutomountMap_negative"},dataProvider="addIndirectAutomountMapRequiredField", dependsOnGroups="addAutomountLocation",
 		description = "required filed: automation map name is required")
 	public void addIndirectAutomountMap_negative_required_field_mapname(String automountLocation) throws Exception {  
 		browser.link(automountLocation).click();  
 		browser.span("Add").click();
+		browser.radio("add_indirect").click();
 		// without enter map name, just click Add
 		browser.button("Add").click();
 		if (browser.span("Required field").exists())
@@ -442,16 +481,19 @@ public class AutomountTests extends SahiTestScript{
 			Assert.assertTrue(false, "error fields 'Required field' does NOT appear as expected, test failed"); 
 	}
 
-	@Test (groups={"addIndirectAutomountMap_negative"}, dependsOnGroups="addAutomountLocation",
-		description = "required filed: mount point is required")
-	public void addIndirectAutomountMap_negative_required_field_mountpoint(String automountLocation) throws Exception {  
-		// need work here
-	}
-
-	@Test (groups={"addIndirectAutomountMap_negative"}, dependsOnGroups="addAutomountLocation",
+	@Test (groups={"addIndirectAutomountMap_negative"}, dataProvider="addIndirectAutomountMapRequiredField", dependsOnGroups="addAutomountLocation",
 		description = "required filed: parent map has to exist when it is being specified")
-	public void addIndirectAutomountMap_negative_required_field_parentmap(String automountLocation) throws Exception {  
-		// need work here
+	public void addIndirectAutomountMap_negative_required_field_mountpoint(String automountLocation) throws Exception {  
+		browser.link(automountLocation).click();  
+		browser.span("Add").click();
+		browser.radio("add_indirect").click();
+		browser.textbox("automountmapname").setValue("testValue");
+		// without enter mount point value, just click Add
+		browser.button("Add").click();
+		if (browser.span("Required field").exists())
+			log.info("error fields: 'Required field' appears as expected, test success"); // report success
+		else
+			Assert.assertTrue(false, "error fields 'Required field' does NOT appear as expected, test failed"); 
 	}
 
 	/////////// modify indirect automount map settings/////////////////////////
@@ -541,7 +583,8 @@ public class AutomountTests extends SahiTestScript{
 	/////////// delete indirect automount map /////////////////////////
 	@Test (groups={"deleteIndirectAutomountMap"}, dataProvider="deleteIndirectAutomountMapSingle", dependsOnGroups="modifyIndirectAutomountMap",
 			description="delete single indirect automount map")
-	public void deleteIndirectAutomountMapSingle(String automountLocation,String indirectAutomountMap) throws Exception { 
+	public void deleteIndirectAutomountMapSingle(String automountLocation,String indirectAutomountMap, String mountPoint, String parentMap) throws Exception { 
+		// the value : mountPoint and parentMap is not used intentionally 
 		browser.link(automountLocation).click();
 		Assert.assertTrue(browser.link(indirectAutomountMap).exists(), "before delete, autoumount location (" + indirectAutomountMap + ")should exist in list");
 		CommonHelper.deleteEntry(browser, indirectAutomountMap);  
@@ -550,7 +593,8 @@ public class AutomountTests extends SahiTestScript{
 
 	@Test (groups={"deleteIndirectAutomountMap"}, dataProvider="deleteIndirectAutomountMapMultiple", dependsOnGroups="modifyIndirectAutomountMap",
 			description="delete multiple indirect automount map")
-	public void deleteIndirectAutomountMapMultiple(String automountLocation,String indirectAutomountMaps) throws Exception { 
+	public void deleteIndirectAutomountMapMultiple(String automountLocation,String indirectAutomountMaps, String mountPoint, String parentMap) throws Exception { 
+		// the value : mountPoint and parentMap is not used intentionally 
 		browser.link(automountLocation).click();
 		String[] maps = CommonHelper.stringToArray(indirectAutomountMaps);
 		for (String map:maps)
@@ -565,10 +609,15 @@ public class AutomountTests extends SahiTestScript{
 	 *             Data providers                                                * 
 	 *****************************************************************************/
 	private static String[] existingAutomountLocations = {"default"}; 
-	private static String[] existingIndirectAutomountMaps = {"auto.direct", "aut.master"};
+	private static String[] existingIndirectAutomountMaps = {"auto.direct", "auto.master"};
 	private static String[] existingAutomountMaps = {"auto.direct","auto.master"}; 
+
 	private static String[] testAutomountLocation = {"automountlocation000","automountlocation001","automountlocation002","automountlocation003","automountlocation004","automountlocation005"};
 	private static String[] testAutomountMap = {"automountmap000","automountmap001","automountmap002","automountmap003","automountmap004","automountmap005"};
+	private static String[] testIndirectindirectMap = {"indirectmap000","indirectmap001","indirectmap002","indirectmap003","indirectmap004","indirectmap005"};
+	private static String[] testAutomountKeys= {"automountkey000","automountkey001","automountkey002","automountkey003","automountkey004","automountkey005"};
+	private static String[] testMountPoint = testAutomountKeys;
+	private static String[] testParentMap = {existingIndirectAutomountMaps[0], existingIndirectAutomountMaps[1]," "," "," "," "};
 
 	/// test data for automount location ///	
 	@DataProvider(name="addAutomountLocation")
@@ -673,6 +722,83 @@ public class AutomountTests extends SahiTestScript{
 		String all = CommonHelper.arrayToString(testAutomountMap);
 		String[][] automountmaps = {{testAutomountLocation[0], all}}; 
 		return automountmaps;
+	}
+
+	/// test data for indirect automount map ///	
+	@DataProvider(name="addIndirectAutomountMap")
+	public Object[][] getaddIndirectAutomountMap()
+	{
+		String[][] indirectAutomountmaps = {
+			{testAutomountLocation[0], testIndirectindirectMap[0], testMountPoint[0], testParentMap[0]},  
+			{testAutomountLocation[0], testIndirectindirectMap[1], testMountPoint[1], testParentMap[1]} }; 
+		return indirectAutomountmaps;
+	}
+
+	@DataProvider(name="addIndirectAutomountMap_addandaddanother")
+	public Object[][] getAddIndirectAutomountMap_addandaddanother()
+	{
+		String[][] indirectAutomountmaps = {{
+			testAutomountLocation[0], 
+			testIndirectindirectMap[2] + "," + testIndirectindirectMap[3] + "," + testIndirectindirectMap[4],
+			testMountPoint[2] + "," + testMountPoint[3] + "," + testMountPoint[4],
+			testParentMap[0]  + "," + testParentMap[1]  + "," + testParentMap[2]
+			 } }; 
+		return indirectAutomountmaps;
+	}
+
+	@DataProvider(name="addIndirectAutomountMap_addthenedit")
+	public Object[][] getAddIndirectAutomountMap_addthenedit()
+	{
+		String[][] indirectAutomountmaps = {{testAutomountLocation[0], testIndirectindirectMap[5], testMountPoint[5], testParentMap[5]}}; 
+		return indirectAutomountmaps;
+	}
+
+	@DataProvider(name="addIndirectAutomountMap_addthencancel")
+	public Object[][] getAddIndirectAutomountMap_addthencancel()
+	{
+		String[][] indirectAutomountmaps = {{testAutomountLocation[0]}}; 
+		return indirectAutomountmaps;
+	}
+
+	@DataProvider(name="addIndirectAutomountMapRequiredField")
+	public Object[][] getAddIndirectAutomountMap_RequiredField()
+	{
+		String[][] indirectAutomountmaps = {{testAutomountLocation[0]}};
+		return indirectAutomountmaps;
+	}
+
+	@DataProvider(name="modifyIndirectAutomountMap")
+	public Object[][] getAddIndirectAutomountMap_reset()
+	{
+		String[][] indirectAutomountmaps = {{testAutomountLocation[0], testIndirectindirectMap[0]}}; 
+		return indirectAutomountmaps;
+	}
+
+	@DataProvider(name="addIndirectAutomountMap_duplicate_map")
+	public Object[][] getIndirectAutomountMapDuplicateMap()
+	{
+		String[][] indirectAutomountmaps = {{testAutomountLocation[0]}}; 
+		return indirectAutomountmaps;
+	}
+
+	@DataProvider(name="deleteIndirectAutomountMapSingle")
+	public Object[][] getDeleteIndirectindirectAutomountmapsingle()
+	{
+		return getaddIndirectAutomountMap();
+	}
+
+	@DataProvider(name="deleteIndirectAutomountMapMultiple")
+	public Object[][] getDeleteIndirectAutomountMapMultiple()
+	{
+		return getAddIndirectAutomountMap_addandaddanother();
+	}
+
+	@DataProvider(name="leftOverIndirectindirectAutomountmaps")
+	public Object[][] leftOverIndirectindirectAutomountmaps()
+	{
+		String all = CommonHelper.arrayToString(testIndirectindirectMap);
+		String[][] indirectAutomountmaps = {{testAutomountLocation[0], all}}; 
+		return indirectAutomountmaps;
 	}
 
 }//class AutomountTests

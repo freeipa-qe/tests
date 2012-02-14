@@ -57,7 +57,7 @@ public class AutomountTasks {
 		browser.radio("add_indirect").click();
 		browser.textbox("automountmapname").setValue(indirectAutomountMap);
 		browser.textarea("description").setValue(indirectAutomountMap + " : auto description");
-		browser.textbox("kep").setValue(mountPoint);
+		browser.textbox("key").setValue(mountPoint);
 		browser.textbox("parentmap").setValue(parentMap);
 		browser.button("Add").click();
 	}
@@ -73,7 +73,7 @@ public class AutomountTasks {
 			browser.radio("add_indirect").click();
 			browser.textbox("automountmapname").setValue(map);
 			browser.textarea("description").setValue(map  + " : auto description for indirect automount name");
-			browser.textbox("kep").setValue(mountPoint);
+			browser.textbox("key").setValue(mountPoint);
 			browser.textbox("parentmap").setValue(parentMap);
 			browser.button("Add and Add Another").click();
 		}
@@ -85,7 +85,7 @@ public class AutomountTasks {
 		browser.radio("add_indirect").click();
 		browser.textbox("automountmapname").setValue(indirectAutomountMap);
 		browser.textarea("description").setValue(indirectAutomountMap + " : auto description for indirect automount name");
-		browser.textbox("kep").setValue(mountPoint);
+		browser.textbox("key").setValue(mountPoint);
 		browser.textbox("parentmap").setValue(parentMap);
 		browser.button("Cancel").click();
 	}
