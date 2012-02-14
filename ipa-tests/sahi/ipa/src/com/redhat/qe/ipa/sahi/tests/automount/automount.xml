@@ -8,13 +8,13 @@
             	    <run>
             	        <include name="setup" />
             	        <include name="init" />    
-            	        <include name="addAutomountLocation" />
-            	        <!-- 
+            	        <include name="addAutomountLocation" /> 
             	        <include name="addAutomountLocation_negative" />
+            	        
             	        <include name="addAutomountMap" />
             	        <include name="modifyAutomountMap" />
-            	        <include name="deleteAutomountMap" /> 
-            	        -->
+            	        <include name="deleteAutomountMap" />  
+            	        
             	        <include name="addIndirectAutomountMap" />
             	        <include name="addIndirectAutomountMap_negative" />
             	        <include name="modifyIndirectAutomountMap" />
