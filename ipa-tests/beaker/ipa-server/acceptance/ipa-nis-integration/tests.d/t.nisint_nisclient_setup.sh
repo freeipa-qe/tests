@@ -71,7 +71,7 @@ nisint_nisclient_envsetup()
 {
 	rlPhaseStartTest "nisint_nisclient_envsetup: "
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
-		rlRun "setup-nis-client > $tmpout 2>&1" 0 "Running NIS Client setup"
+		rlRun "setup-nis-client" 0 "Running NIS Client setup"
 		rlRun "ps -ef|grep [y]pbind" 0 "Check that NIS Client (ypbind) is running"
 		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd

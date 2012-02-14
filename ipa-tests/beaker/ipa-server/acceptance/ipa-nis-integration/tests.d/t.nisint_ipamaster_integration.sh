@@ -47,10 +47,10 @@ nisint_ipamaster_integration()
 		rlLog "Machine in recipe is IPAMASTER"
 		
 		nisint_ipamaster_integration_envsetup
+		nisint_ipamaster_integration_setup_nis_listener
 		nisint_ipamaster_integration_add_nis_data
 		nisint_ipamaster_integration_del_nis_data
 		nisint_ipamaster_integration_add_nis_data_ldif
-		nisint_ipamaster_integration_setup_nis_listener
 		nisint_ipamaster_integration_check_ipa_nis_data
 
 		rhts-sync-set -s 'nisint_ipamaster_integration_end' -m $MASTER
@@ -164,7 +164,7 @@ nisint_ipamaster_integration_add_nis_data_hosts()
 			ip=$(echo $line|awk '{print $1}')
 			ptrzone=$(echo $ip|awk -F. '{print $3 "." $2 "." $1 ".in-addr.arpa."}')
 			hostnames=$(echo $line | sed "s/$ip//")
-			firsthostname=$(echo $hostnames|tr '[:space:]' '\n'|cut -f1 -d.|head -1)
+			firsthostname=$(echo $hostnames|awk '{print $1}'|cut -f1 -d.|head -1)
 			ptrzonefound=$(ipa dnszone-show $ptrzone 2>/dev/null |wc -l)
 			if [ $ptrzonefound -eq 0 ]; then
 				rlRun "ipa dnszone-add $ptrzone --name-server=$MASTER --admin-email=ipaqar.redhat.com"

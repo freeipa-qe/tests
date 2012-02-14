@@ -104,6 +104,8 @@ nisint_nisclient_integration_change_to_ipa_nismaster()
 		rlRun "sed -i 's/$NISMASTER/$MASTER/g' /etc/yp.conf"
 		rlRun "cp /etc/sysconfig/network /etc/sysconfig/network.orig.$NISDOMAIN"
 		rlRun "sed -i 's/$NISDOMAIN/$DOMAIN/g' /etc/sysconfig/network"
+        rlRun "sed -i s/^nameserver/#nameserver/g /etc/resolv.conf"
+        rlRun "echo 'nameserver $MASTER_IP' >> /etc/resolv.conf"
 		rlRun "nisdomainname $DOMAIN"
 		rlRun "service rpcbind restart"
 		rlRun "service ypbind restart"

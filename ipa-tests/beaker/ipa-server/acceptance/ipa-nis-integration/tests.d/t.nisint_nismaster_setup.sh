@@ -78,7 +78,7 @@ nisint_nismaster_envsetup()
 {
 	rlPhaseStartTest "nisint_nismaster_envsetup: "
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
-		rlRun "setup-nis-server > $tmpout 2>&1" 0 "Running NIS Master Server setup"
+		rlRun "setup-nis-server" 0 "Running NIS Master Server setup"
 		rlRun "ps -ef|grep [y]pserv" 0 "Check that NIS Server (ypserv) is running"
 		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd

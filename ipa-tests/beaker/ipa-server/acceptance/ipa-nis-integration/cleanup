@@ -7,7 +7,7 @@ for group in $(ipa group-find|grep "Group name:"|awk '{print $3}'|egrep -v "ipau
 done
 
 for host in $(ipa host-find|grep "Host name:"|awk '{print $3}'|egrep -v "$MASTER"); do
-	ipa host-del $host
+	ipa host-del $host --updatedns
 done
 
 for netgroup in $(ipa netgroup-find|grep "Netgroup name:"|awk '{print $3}'); do
