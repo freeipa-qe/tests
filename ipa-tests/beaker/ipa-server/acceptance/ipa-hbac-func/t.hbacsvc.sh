@@ -2546,3 +2546,49 @@ hbacsvc_client2_bug736314() {
 
 }
 
+
+hbacsvc_master_bug782927() {
+
+                # kinit as admin and creating users
+                kinitAs $ADMINID $ADMINPW
+                create_ipauser user782927 user782927 user782927 $userpw
+                sleep 5
+                export user782927=user782927
+
+        rlPhaseStartTest "ipa-hbacsvc-782927: Test --sizelimit option to hbactest"
+
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                rlRun "ssh_auth_success $user782927 testpw123@ipa.com $MASTER"
+
+		rlRun "for i in {1000..1010}; do ipa hbacrule-add rule$i; done"
+		rlRun "ipa config-show"
+		rlRun "ipa config-mod --searchrecordslimit=5"
+		rlRun "ipa config-show"
+
+                rlRun "ipa hbacrule-disable allow_all"
+
+                rlRun "ipa hbacrule-add 782927"
+     		rlRun "ipa hbacrule-find"
+
+                rlRun "ipa hbacrule-add-user 782927 --users=$user782927"
+                rlRun "ipa hbacrule-add-host 782927 --hosts=$MASTER"
+                rlRun "ipa hbacrule-add-sourcehost 782927 --hosts=$CLIENT"
+                rlRun "ipa hbacrule-add-service 782927 --hbacsvcs=sshd"
+                rlRun "ipa hbacrule-show 782927 --all"
+
+        # ipa hbactest:
+
+                rlRun "ipa hbactest --user=$user782927 --srchost=$CLIENT --host=$MASTER --service=sshd | grep -Ex '(Access granted: True|  matched: 782927)'" 1
+		rlLog "verifies bug https://bugzilla.redhat.com/show_bug.cgi?id=782927"
+                rlRun "ipa hbactest --user=$user782927 --srchost=$CLIENT --host=$MASTER --service=sshd --sizelimit=15 | grep -Ex '(Access granted: True|  matched: 782927)'" 
+                rlRun "ipa hbactest --user=$user782927 --srchost=$CLIENT --host=$MASTER --service=sshd --rule=782927 | grep -Ex '(Access granted: True|  matched: 782927)'" 
+
+
+	# restoring ipa config
+		rlRun "ipa config-mod --searchrecordslimit=100"
+		rlRun "ipa config-show"
+	
+        rlPhaseEnd
+}
+
+
