@@ -91,22 +91,18 @@ nisint_nisclient_migration_ipa_client_install()
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
-		rlRun "ipa host-del $CLIENT"
-		rhts-sync-set -s "$FUNCTION.0" -m $MASTER
-		rhts-sync-block -s "$FUNCTION.1" $CLIENT
+		rhts-sync-block -s "$FUNCTION" $CLIENT
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
-		rhts-sync-block -s "$FUNCTION.0" $MASTER
-		rhts-sync-block -s "$FUNCTION.1" $CLIENT
+		rhts-sync-block -s "$FUNCTION" $CLIENT
 		;;
 	"$CLIENT")
 		rlLog "Machine in recipe is CLIENT"
-		rhts-sync-block -s "$FUNCTION.0" $MASTER
 		HOSTNAME_S=$(hostname -s)
 		rlRun "ipa-client-install --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW -U --server=$MASTER"
         rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
-		rhts-sync-set -s "$FUNCTION.1" -m $CLIENT
+		rhts-sync-set -s "$FUNCTION" -m $CLIENT
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE"
@@ -122,18 +118,14 @@ nisint_nisclient_migration_ipa_autofs_setup()
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
-		rlRun "ipa host-del $CLIENT"
-		rhts-sync-set -s "$FUNCTION.0" -m $MASTER
-		rhts-sync-block -s "$FUNCTION.1" $CLIENT
+		rhts-sync-block -s "$FUNCTION" $CLIENT
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
-		rhts-sync-block -s "$FUNCTION.0" $MASTER
-		rhts-sync-block -s "$FUNCTION.1" $CLIENT
+		rhts-sync-block -s "$FUNCTION" $CLIENT
 		;;
 	"$CLIENT")
 		rlLog "Machine in recipe is CLIENT"
-		rhts-sync-block -s "$FUNCTION.0" $MASTER
 		HOSTNAME_S=$(hostname -s)
         rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
 		cat > /etc/autofs_ldap_auth.conf <<-EOF
@@ -172,7 +164,7 @@ nisint_nisclient_migration_ipa_autofs_setup()
 		rlRun "sed -i 's/automount.*$/automount:  files ldap/' /etc/nsswitch.conf"
         rlRun "cat /etc/sysconfig/autofs"
 		rlRun "service autofs restart"
-		rhts-sync-set -s "$FUNCTION.1" -m $CLIENT
+		rhts-sync-set -s "$FUNCTION" -m $CLIENT
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE"
