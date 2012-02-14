@@ -51,9 +51,9 @@ PACKAGE="ipa-server"
 startDate=`date "+%F %r"`
 satrtEpoch=`date "+%s"`
 
-#export MASTER_IP=$(host $MASTER|grep -v 'not found:'|awk '{print $4}')
-#export NISMASTER_IP=$(host $NISMASTER|grep -v 'not found:'|awk '{print $4}')
-#export CLIENT_IP=$(host $CLIENT|grep -v 'not found:'|awk '{print $4}')
+export MASTER_IP=$(host $MASTER|grep -v 'not found:'|awk '{print $4}')
+export NISMASTER_IP=$(host $NISMASTER|grep -v 'not found:'|awk '{print $4}')
+export NISCLIENT_IP=$(host $NISCLIENT|grep -v 'not found:'|awk '{print $4}')
 
 ##########################################
 #   test main 
@@ -70,7 +70,7 @@ rlJournalStart
 		rlLog "HOSTNAME: $HOSTNAME"
 		rlLog "MASTER: $MASTER"
 		rlLog "NISMASTER: $NISMASTER"
-		rlLog "CLIENT: $CLIENT"
+		rlLog "NISCLIENT: $NISCLIENT"
 		rlLog "NISDOMAIN: $NISDOMAIN"
 	rlPhaseEnd
 	

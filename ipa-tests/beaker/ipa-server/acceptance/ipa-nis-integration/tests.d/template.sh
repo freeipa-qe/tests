@@ -49,8 +49,8 @@ template_function()
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
 		;;
-	"$CLIENT")
-		rlLog "Machine in recipe is CLIENT"
+	"$NISCLIENT")
+		rlLog "Machine in recipe is NISCLIENT"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE"

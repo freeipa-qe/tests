@@ -70,8 +70,8 @@ example_bz_788625()
 		rlLog "Machine in recipe is NISMASTER"
 		rlRun "rhts-sync-block -s '$FUNCNAME' $MASTER"
 		;;
-	"$CLIENT")
-		rlLog "Machine in recipe is CLIENT"
+	"$NISCLIENT")
+		rlLog "Machine in recipe is NISCLIENT"
 		rlRun "rhts-sync-block -s '$FUNCNAME' $MASTER"
 		;;
 	*)

@@ -45,20 +45,20 @@ nisint_nisclient_setup()
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
-		rlRun "rhts-sync-block -s 'nisint_nisclient_setup_ended' $CLIENT"
+		rlRun "rhts-sync-block -s 'nisint_nisclient_setup_ended' $NISCLIENT"
 		rlPass "$FUNCNAME complete for IPAMASTER ($HOSTNAME)"
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
-		rlRun "rhts-sync-block -s 'nisint_nisclient_setup_ended' $CLIENT"
+		rlRun "rhts-sync-block -s 'nisint_nisclient_setup_ended' $NISCLIENT"
 		;;
-	"$CLIENT")
+	"$NISCLIENT")
 		rlLog "Machine in recipe is NISMASTER"
 
 		nisint_nisclient_envsetup
 
-		rlRun "rhts-sync-set   -s 'nisint_nisclient_setup_ended' -m $CLIENT"
-		rlPass "$FUNCNAME complete for CLIENT ($HOSTNAME)"
+		rlRun "rhts-sync-set   -s 'nisint_nisclient_setup_ended' -m $NISCLIENT"
+		rlPass "$FUNCNAME complete for NISCLIENT ($HOSTNAME)"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE"
