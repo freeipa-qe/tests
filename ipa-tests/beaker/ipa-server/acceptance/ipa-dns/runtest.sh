@@ -11,6 +11,10 @@
 #
 #   Author: Michael Gregg <mgregg@redhat.com>
 #   Date  : Jan 21, 2011
+#
+#   Author: Gowrishankar Rajaiyan <grajaiya@redhat.com>
+#   Date  : Feb 14, 2012
+#
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
 #   Copyright (c) 2010 Red Hat, Inc. All rights reserved.
@@ -73,9 +77,9 @@ if [ $master -eq 1 ]; then
 	setenforce 0
 fi
 
-	
 	# Determine my IP address
 	currenteth=$(route | grep ^default | awk '{print $8}')
+
 	# get the ip address of that interface
 	ipaddr=$(ifconfig $currenteth | grep inet\ addr | sed s/:/\ /g | awk '{print $3}')
 	echo "Ip address is $ipaddr"
@@ -83,6 +87,7 @@ fi
 	ipoc2=$(echo $ipaddr | cut -d\. -f2) 
 	ipoc3=$(echo $ipaddr | cut -d\. -f3) 
 	ipoc4=$(echo $ipaddr | cut -d\. -f4) 
+
 	# Get the default routers ip, use that for the new ip for the fakehost
 	newfakehostip=`route -n | grep ^0 | awk '{print $2'}`
 	echo "IP is $ipoc1 . $ipoc2 . $ipoc3 . $ipoc4"
@@ -228,12 +233,14 @@ fi
 
 
 	a="1.2.3.4"
+	ahost="1.testrelm.com"	#format must be specified as "PREFERENCE EXCHANGER" (see RFC 2230 for details)
 	a2="1.2.3.4,2.3.4.5"
 	aaaa="fec0:0:a10:6000:10:16ff:fe98:193"
 	aaaabad1="bada:aaaa:real:ly:bad:dude:extr:a"
 	aaaabad2="aaaa:bbbb:cccc:dddd:eeee:fffff"
 	afsdb="green.femto.edu."
 	certa="PGP 0 0"
+	certb="1 1 1"	# format must be specified as "TYPE KEY_TAG ALGORITHM CERTIFICATE_OR_CRL" (see RFC 4398 for details)
 	cert="F835EDA21E94B565716F"
 	cname="m.l.k."
 	dname="bar.$zone."
@@ -695,7 +702,7 @@ fi
 
 	# Type cert
 	rlPhaseStartTest "ipa-dns-125: add record of type cert"
-		rlRun "ipa dnsrecord-add $zone cert --cert-rec='$certa $cert'" 0 "add record type cert"
+		rlRun "ipa dnsrecord-add $zone cert --cert-rec=\"$certb $cert\"" 0 "add record type cert"
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-126: make sure that IPA saved record type cert"
@@ -707,7 +714,7 @@ fi
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-128: delete record of type cert"
-		rlRun "ipa dnsrecord-del $zone cert --cert-rec='$certa $cert'" 0 "delete record type cert"
+		rlRun "ipa dnsrecord-del $zone cert --cert-rec=\"$certb $cert\"" 0 "delete record type cert"
 	rlPhaseEnd
 
 	/etc/init.d/named restart
@@ -758,13 +765,13 @@ fi
 
 	# Type kx
 	rlPhaseStartTest "ipa-dns-131: add record of type kx"
-		rlRun "ipa dnsrecord-add $zone @ --kx-rec '$kxpref1 $a'" 0 "add record type kx"
+		rlRun "ipa dnsrecord-add $zone @ --kx-rec \"$kxpref1 $ahost\"" 0 "add record type kx"
 	rlPhaseEnd
 
 	/etc/init.d/named restart
 
 	rlPhaseStartTest "ipa-dns-132: make sure that IPA saved record type kx"
-		rlRun "ipa dnsrecord-find $zone @ | grep $kxpref1" 0 "make sure ipa recieved record type kx"
+		rlRun "ipa dnsrecord-show $zone @ | grep $kxpref1" 0 "make sure ipa recieved record type kx"
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-133: make sure that dig can find the record type kx"
@@ -772,7 +779,7 @@ fi
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-134: delete record of type kx"
-		rlRun "ipa dnsrecord-del $zone @ --kx-rec '$kxpref1 $a'" 0 "delete record type kx"
+		rlRun "ipa dnsrecord-del $zone @ --kx-rec \"$kxpref1 $ahost\"" 0 "delete record type kx"
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-135: make sure that IPA deleted record type kx"
