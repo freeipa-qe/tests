@@ -53,15 +53,15 @@ nisint_ipamaster_integration()
 		nisint_ipamaster_integration_add_nis_data_ldif
 		nisint_ipamaster_integration_check_ipa_nis_data
 
-		rhts-sync-set -s 'nisint_ipamaster_integration_end' -m $MASTER
+		rlRun "rhts-sync-set -s 'nisint_ipamaster_integration_end' -m $MASTER"
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
-		rhts-sync-block -s 'nisint_ipamaster_integration_end' $MASTER
+		rlRun "rhts-sync-block -s 'nisint_ipamaster_integration_end' $MASTER"
 		;;
 	"$CLIENT")
 		rlLog "Machine in recipe is CLIENT"
-		rhts-sync-block -s 'nisint_ipamaster_integration_end' $MASTER
+		rlRun "rhts-sync-block -s 'nisint_ipamaster_integration_end' $MASTER"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE"

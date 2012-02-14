@@ -45,12 +45,15 @@ nisint_ipamaster_setup()
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
+		rlRun "rhts-sync-set -s '$FUNCNAME' -m $MASTER"
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
+		rlRun "rhts-sync-block -s '$FUNCNAME' $MASTER"
 		;;
 	"$CLIENT")
 		rlLog "Machine in recipe is CLIENT"
+		rlRun "rhts-sync-block -s '$FUNCNAME' $MASTER"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE"

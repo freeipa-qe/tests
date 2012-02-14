@@ -69,15 +69,15 @@ nisint_netgroup_test_envsetup()
 		rlRun "ipa netgroup-add testnetgroup2 --desc=testnetgroup2"
 		rlRun "ipa netgroup-add-member testnetgroup1 --users=testuser1 --hosts=$MASTER"
 		rlRun "ipa netgroup-add-member testnetgroup2 --users=testuser2 --hosts=$CLIENT"
-		rhts-sync-set -s "$FUNCNAME" -m $MASTER
+		rlRun "rhts-sync-set -s '$FUNCNAME' -m $MASTER"
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
-		rhts-sync-block -s "$FUNCNAME" $MASTER
+		rlRun "rhts-sync-block -s '$FUNCNAME' $MASTER"
 		;;
 	"$CLIENT")
 		rlLog "Machine in recipe is CLIENT"
-		rhts-sync-block -s "$FUNCNAME" $MASTER
+		rlRun "rhts-sync-block -s '$FUNCNAME' $MASTER"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE"
@@ -97,15 +97,15 @@ nisint_netgroup_test_envcleanup()
 		rlRun "ipa user-del testuser2"
 		rlRun "ipa netgroup-del testnetgroup1"
 		rlRun "ipa netgroup-del testnetgroup2"
-		rhts-sync-set -s "$FUNCNAME" -m $MASTER
+		rlRun "rhts-sync-set -s '$FUNCNAME' -m $MASTER"
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
-		rhts-sync-block -s "$FUNCNAME" $MASTER
+		rlRun "rhts-sync-block -s '$FUNCNAME' $MASTER"
 		;;
 	"$CLIENT")
 		rlLog "Machine in recipe is CLIENT"
-		rhts-sync-block -s "$FUNCNAME" $MASTER
+		rlRun "rhts-sync-block -s '$FUNCNAME' $MASTER"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE"
@@ -121,11 +121,11 @@ nisint_netgroup_test_1001()
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
-		rhts-sync-block -s "$FUNCNAME" $CLIENT
+		rlRun "rhts-sync-block -s '$FUNCNAME' $CLIENT"
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
-		rhts-sync-block -s "$FUNCNAME" $CLIENT
+		rlRun "rhts-sync-block -s '$FUNCNAME' $CLIENT"
 		;;
 	"$CLIENT")
 		rlLog "Machine in recipe is CLIENT"
@@ -134,7 +134,7 @@ nisint_netgroup_test_1001()
 		else
 			rlRun "ypcat -k netgroup|grep testnetgroup1" 0 "ypcat search for existing netgroup"
 		fi
-		rhts-sync-set -s "$FUNCNAME" -m $CLIENT
+		rlRun "rhts-sync-set -s '$FUNCNAME' -m $CLIENT"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE"
@@ -150,11 +150,11 @@ nisint_netgroup_test_1002()
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
-		rhts-sync-block -s "$FUNCNAME" $CLIENT
+		rlRun "rhts-sync-block -s '$FUNCNAME' $CLIENT"
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
-		rhts-sync-block -s "$FUNCNAME" $CLIENT
+		rlRun "rhts-sync-block -s '$FUNCNAME' $CLIENT"
 		;;
 	"$CLIENT")
 		rlLog "Machine in recipe is CLIENT"
@@ -163,7 +163,7 @@ nisint_netgroup_test_1002()
 		else
 			rlRun "ypcat -k netgroup|grep notanetgroup" 1 "attempt to ypcat search for non-existent netgroup"
 		fi
-		rhts-sync-set -s "$FUNCNAME" -m $CLIENT
+		rlRun "rhts-sync-set -s '$FUNCNAME' -m $CLIENT"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE"
@@ -179,11 +179,11 @@ nisint_netgroup_test_1003()
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
-		rhts-sync-block -s "$FUNCNAME" $CLIENT
+		rlRun "rhts-sync-block -s '$FUNCNAME' $CLIENT"
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
-		rhts-sync-block -s "$FUNCNAME" $CLIENT
+		rlRun "rhts-sync-block -s '$FUNCNAME' $CLIENT"
 		;;
 	"$CLIENT")
 		rlLog "Machine in recipe is CLIENT"
@@ -192,7 +192,7 @@ nisint_netgroup_test_1003()
 		else
 			rlRun "ipa netgroup-find|grep testnetgroup1" 0 "ipa search for existing netgroup"
 		fi
-		rhts-sync-set -s "$FUNCNAME" -m $CLIENT
+		rlRun "rhts-sync-set -s '$FUNCNAME' -m $CLIENT"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE"
@@ -208,11 +208,11 @@ nisint_netgroup_test_1004()
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
-		rhts-sync-block -s "$FUNCNAME" $CLIENT
+		rlRun "rhts-sync-block -s '$FUNCNAME' $CLIENT"
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
-		rhts-sync-block -s "$FUNCNAME" $CLIENT
+		rlRun "rhts-sync-block -s '$FUNCNAME' $CLIENT"
 		;;
 	"$CLIENT")
 		rlLog "Machine in recipe is CLIENT"
@@ -221,7 +221,7 @@ nisint_netgroup_test_1004()
 		else
 			rlRun "ipa netgroup-find|grep notanetgroup" 1 "fail to ipa search for non-existent netgroup"
 		fi
-		rhts-sync-set -s "$FUNCNAME" -m $CLIENT
+		rlRun "rhts-sync-set -s '$FUNCNAME' -m $CLIENT"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE"
@@ -237,16 +237,16 @@ nisint_netgroup_test_1005()
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
-		rhts-sync-block -s "$FUNCNAME" $CLIENT
+		rlRun "rhts-sync-block -s '$FUNCNAME' $CLIENT"
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
-		rhts-sync-block -s "$FUNCNAME" $CLIENT
+		rlRun "rhts-sync-block -s '$FUNCNAME' $CLIENT"
 		;;
 	"$CLIENT")
 		rlLog "Machine in recipe is CLIENT"
 		rlRun "getent netgroup testnetgroup1" 0 "getent search for existing netgroup"
-		rhts-sync-set -s "$FUNCNAME" -m $CLIENT
+		rlRun "rhts-sync-set -s '$FUNCNAME' -m $CLIENT"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE"
@@ -262,16 +262,16 @@ nisint_netgroup_test_1006()
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
-		rhts-sync-block -s "$FUNCNAME" $CLIENT
+		rlRun "rhts-sync-block -s '$FUNCNAME' $CLIENT"
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
-		rhts-sync-block -s "$FUNCNAME" $CLIENT
+		rlRun "rhts-sync-block -s '$FUNCNAME' $CLIENT"
 		;;
 	"$CLIENT")
 		rlLog "Machine in recipe is CLIENT"
 		rlRun "getent netgroup|grep notanetgroup" 1 "attempt to getent search for non-existent netgroup"
-		rhts-sync-set -s "$FUNCNAME" -m $CLIENT
+		rlRun "rhts-sync-set -s '$FUNCNAME' -m $CLIENT"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE"
@@ -287,18 +287,18 @@ nisint_netgroup_test_1007()
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
-		rhts-sync-block -s "$FUNCNAME.1" $CLIENT
+		rlRun "rhts-sync-block -s '$FUNCNAME.1' $CLIENT"
 
 		ssh_auth_success testuser1 passw0rd1 $CLIENT
 
-		rhts-sync-set -s "$FUNCNAME.2" -m $MASTER
-		rhts-sync-block -s "$FUNCNAME.3" $CLIENT	
+		rlRun "rhts-sync-set -s '$FUNCNAME.2' -m $MASTER"
+		rlRun "rhts-sync-block -s '$FUNCNAME.3' $CLIENT	"
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
-		rhts-sync-block -s "$FUNCNAME.1" $CLIENT
-		rhts-sync-block -s "$FUNCNAME.2" $MASTER
-		rhts-sync-block -s "$FUNCNAME.3" $CLIENT
+		rlRun "rhts-sync-block -s '$FUNCNAME.1' $CLIENT"
+		rlRun "rhts-sync-block -s '$FUNCNAME.2' $MASTER"
+		rlRun "rhts-sync-block -s '$FUNCNAME.3' $CLIENT"
 		;;
 	"$CLIENT")
 		rlLog "Machine in recipe is CLIENT"
@@ -308,14 +308,14 @@ nisint_netgroup_test_1007()
 		rlRun "echo 'ALL: @testnetgroup1' > /etc/hosts.allow"
 		rlRun "echo 'ALL: ALL' > /etc/hosts.deny"
 
-		rhts-sync-set -s "$FUNCNAME.1" -m $CLIENT
-		rhts-sync-block -s "$FUNCNAME.2" $MASTER
+		rlRun "rhts-sync-set -s '$FUNCNAME.1' -m $CLIENT"
+		rlRun "rhts-sync-block -s '$FUNCNAME.2' $MASTER"
 
 		# cleanup/undo hosts.allow/host.deny files
 		rlRun "mv -f /etc/hosts.allow.orig.nisint /etc/hosts.allow"
 		rlRun "mv -f /etc/hosts.deny.orig.nisint /etc/hosts.deny"
 
-		rhts-sync-set -s "$FUNCNAME.3" -m $CLIENT
+		rlRun "rhts-sync-set -s '$FUNCNAME.3' -m $CLIENT"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE"
@@ -331,18 +331,18 @@ nisint_netgroup_test_1008()
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
-		rhts-sync-block -s "$FUNCNAME.1" $CLIENT
+		rlRun "rhts-sync-block -s '$FUNCNAME.1' $CLIENT"
 
 		ssh_auth_failure testuser1 passw0rd1 $CLIENT
 
-		rhts-sync-set -s "$FUNCNAME.2" -m $MASTER
-		rhts-sync-block -s "$FUNCNAME.3" $CLIENT
+		rlRun "rhts-sync-set -s '$FUNCNAME.2' -m $MASTER"
+		rlRun "rhts-sync-block -s '$FUNCNAME.3' $CLIENT"
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
-		rhts-sync-block -s "$FUNCNAME.1" $CLIENT
-		rhts-sync-block -s "$FUNCNAME.2" $MASTER
-		rhts-sync-block -s "$FUNCNAME.3" $CLIENT
+		rlRun "rhts-sync-block -s '$FUNCNAME.1' $CLIENT"
+		rlRun "rhts-sync-block -s '$FUNCNAME.2' $MASTER"
+		rlRun "rhts-sync-block -s '$FUNCNAME.3' $CLIENT"
 		;;
 	"$CLIENT")
 		rlLog "Machine in recipe is CLIENT"
@@ -353,13 +353,13 @@ nisint_netgroup_test_1008()
 		rlRun "echo 'ALL: @testnetgroup1' > /etc/hosts.deny"
 		rlRun "echo '#ALL: ALL' > /etc/hosts.allow"
 
-		rhts-sync-set -s "$FUNCNAME.1" -m $CLIENT
-		rhts-sync-block -s "$FUNCNAME.2" $MASTER
+		rlRun "rhts-sync-set -s '$FUNCNAME.1' -m $CLIENT"
+		rlRun "rhts-sync-block -s '$FUNCNAME.2' $MASTER"
 		
 		rlRun "mv -f /etc/hosts.allow.orig.nisint /etc/hosts.allow"
         rlRun "mv -f /etc/hosts.deny.orig.nisint /etc/hosts.deny"
 
-		rhts-sync-set -s "$FUNCNAME.3" -m $CLIENT
+		rlRun "rhts-sync-set -s '$FUNCNAME.3' -m $CLIENT"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE"
@@ -375,17 +375,17 @@ nisint_netgroup_test_1009()
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
-		rhts-sync-block -s "$FUNCNAME.0" $CLIENT
+		rlRun "rhts-sync-block -s '$FUNCNAME.0' $CLIENT"
 		rlRun "mkdir /nctmp" 0 "Create temp mount point."
 		rlRun "mount $CLIENT:/tmp /nctmp" 0 "NFS Mount with netgroup access"
 		rlRun "umount /nctmp" 0 "Unmount NFS export"
 		rlRun "rmdir /nctmp" 0 "Remove temp mount point."
-		rhts-sync-set -s "$FUNCNAME.1" -m $MASTER
+		rlRun "rhts-sync-set -s '$FUNCNAME.1' -m $MASTER"
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
-		rhts-sync-block -s "$FUNCNAME.0" $CLIENT
-		rhts-sync-block -s "$FUNCNAME.1" $MASTER
+		rlRun "rhts-sync-block -s '$FUNCNAME.0' $CLIENT"
+		rlRun "rhts-sync-block -s '$FUNCNAME.1' $MASTER"
 		;;
 	"$CLIENT")
 		rlLog "Machine in recipe is CLIENT"
@@ -393,8 +393,8 @@ nisint_netgroup_test_1009()
 		rlRun "service nfs restart"
 		rlRun "service nfslock restart"
 		rlRun "exportfs @testnetgroup1:/tmp"
-		rhts-sync-set -s "$FUNCNAME.0" -m $CLIENT
-		rhts-sync-block -s "$FUNCNAME.1" $MASTER
+		rlRun "rhts-sync-set -s '$FUNCNAME.0' -m $CLIENT"
+		rlRun "rhts-sync-block -s '$FUNCNAME.1' $MASTER"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE"
@@ -410,16 +410,16 @@ nisint_netgroup_test_1010()
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
-		rhts-sync-block -s "$FUNCNAME.0" $CLIENT
-		rhts-sync-block -s "$FUNCNAME.1" $NISMASTER
+		rlRun "rhts-sync-block -s '$FUNCNAME.0' $CLIENT"
+		rlRun "rhts-sync-block -s '$FUNCNAME.1' $NISMASTER"
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
-		rhts-sync-block -s "$FUNCNAME.0" $CLIENT
+		rlRun "rhts-sync-block -s '$FUNCNAME.0' $CLIENT"
 		rlRun "mkdir /nctmp"
 		rlRun "mount $CLIENT:/tmp /nctmp" 32 "Fail to NFS Mount with no netgroup access"
 		rlRun "rmdir /nctmp" 0 "Remove temp mount point."
-		rhts-sync-set -s "$FUNCNAME.1" -m $NISMASTER
+		rlRun "rhts-sync-set -s '$FUNCNAME.1' -m $NISMASTER"
 		;;
 	"$CLIENT")
 		rlLog "Machine in recipe is CLIENT"
@@ -427,8 +427,8 @@ nisint_netgroup_test_1010()
 		rlRun "service nfs restart"
 		rlRun "service nfslock restart"
 		rlRun "exportfs @testnetgroup1:/tmp"
-		rhts-sync-set -s "$FUNCNAME.0" -m $CLIENT
-		rhts-sync-block -s "$FUNCNAME.1" $NISMASTER
+		rlRun "rhts-sync-set -s '$FUNCNAME.0' -m $CLIENT"
+		rlRun "rhts-sync-block -s '$FUNCNAME.1' $NISMASTER"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE"

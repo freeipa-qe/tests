@@ -45,19 +45,19 @@ nisint_nisclient_setup()
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
-		rhts-sync-block -s 'nisint_nisclient_setup_ended' $CLIENT
+		rlRun "rhts-sync-block -s 'nisint_nisclient_setup_ended' $CLIENT"
 		rlPass "$FUNCNAME complete for IPAMASTER ($HOSTNAME)"
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
-		rhts-sync-block -s 'nisint_nisclient_setup_ended' $CLIENT
+		rlRun "rhts-sync-block -s 'nisint_nisclient_setup_ended' $CLIENT"
 		;;
 	"$CLIENT")
 		rlLog "Machine in recipe is NISMASTER"
 
 		nisint_nisclient_envsetup
 
-		rhts-sync-set   -s 'nisint_nisclient_setup_ended' -m $CLIENT
+		rlRun "rhts-sync-set   -s 'nisint_nisclient_setup_ended' -m $CLIENT"
 		rlPass "$FUNCNAME complete for CLIENT ($HOSTNAME)"
 		;;
 	*)

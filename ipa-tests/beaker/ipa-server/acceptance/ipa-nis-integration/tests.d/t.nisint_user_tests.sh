@@ -73,16 +73,16 @@ nisint_user_test_envsetup()
 		KinitAsAdmin
 		rlRun "ipa user-mod testuser1 --uid=56678 --gidnumber=56678"
 		rlRun "ipa user-mod testuser2 --uid=56679 --gidnumber=56679"
-		rhts-sync-set -s "$FUNCNAME" -m $MASTER
+		rlRun "rhts-sync-set -s '$FUNCNAME' -m $MASTER"
 		[ -f $tmpout ] && rm -f $tmpout
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
-		rhts-sync-block -s "$FUNCNAME" $MASTER
+		rlRun "rhts-sync-block -s '$FUNCNAME' $MASTER"
 		;;
 	"$CLIENT")
 		rlLog "Machine in recipe is CLIENT"
-		rhts-sync-block -s "$FUNCNAME" $MASTER
+		rlRun "rhts-sync-block -s '$FUNCNAME' $MASTER"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE"
@@ -102,16 +102,16 @@ nisint_user_test_envcleanup()
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa user-del testuser1"
 		rlRun "ipa user-del testuser2"
-		rhts-sync-set -s "$FUNCNAME" -m $MASTER
+		rlRun "rhts-sync-set -s '$FUNCNAME' -m $MASTER"
 		[ -f $tmpout ] && rm -f $tmpout
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
-		rhts-sync-block -s "$FUNCNAME" $MASTER
+		rlRun "rhts-sync-block -s '$FUNCNAME' $MASTER"
 		;;
 	"$CLIENT")
 		rlLog "Machine in recipe is CLIENT"
-		rhts-sync-block -s "$FUNCNAME" $MASTER
+		rlRun "rhts-sync-block -s '$FUNCNAME' $MASTER"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE"
@@ -129,11 +129,11 @@ nisint_user_test_1001()
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
-		rhts-sync-block -s "$FUNCNAME" $CLIENT
+		rlRun "rhts-sync-block -s '$FUNCNAME' $CLIENT"
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
-		rhts-sync-block -s "$FUNCNAME" $CLIENT
+		rlRun "rhts-sync-block -s '$FUNCNAME' $CLIENT"
 		;;
 	"$CLIENT")
 		rlLog "Machine in recipe is CLIENT"
@@ -143,7 +143,7 @@ nisint_user_test_1001()
 		else
 			rlRun "ypcat passwd|grep testuser1" 0 "ypcat search for existing user"
 		fi
-		rhts-sync-set -s "$FUNCNAME" -m $CLIENT
+		rlRun "rhts-sync-set -s '$FUNCNAME' -m $CLIENT"
 		[ -f $tmpout ] && rm -f $tmpout
 		;;
 	*)
@@ -160,11 +160,11 @@ nisint_user_test_1002()
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
-		rhts-sync-block -s "$FUNCNAME" $CLIENT
+		rlRun "rhts-sync-block -s '$FUNCNAME' $CLIENT"
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
-		rhts-sync-block -s "$FUNCNAME" $CLIENT
+		rlRun "rhts-sync-block -s '$FUNCNAME' $CLIENT"
 		;;
 	"$CLIENT")
 		rlLog "Machine in recipe is CLIENT"
@@ -174,7 +174,7 @@ nisint_user_test_1002()
 		else
 			rlRun "ypcat passwd|grep notauser" 1 "Fail to ypcat search for non-existent user"
 		fi
-		rhts-sync-set -s "$FUNCNAME" -m $CLIENT
+		rlRun "rhts-sync-set -s '$FUNCNAME' -m $CLIENT"
 		[ -f $tmpout ] && rm -f $tmpout
 		;;
 	*)
@@ -191,11 +191,11 @@ nisint_user_test_1003()
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
-		rhts-sync-block -s "$FUNCNAME" $CLIENT
+		rlRun "rhts-sync-block -s '$FUNCNAME' $CLIENT"
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
-		rhts-sync-block -s "$FUNCNAME" $CLIENT
+		rlRun "rhts-sync-block -s '$FUNCNAME' $CLIENT"
 		;;
 	"$CLIENT")
 		rlLog "Machine in recipe is CLIENT"
@@ -205,7 +205,7 @@ nisint_user_test_1003()
 		else
 			rlRun "ipa user-find|grep testuser1" 0 "ipa search for existing user"
 		fi
-		rhts-sync-set -s "$FUNCNAME" -m $CLIENT
+		rlRun "rhts-sync-set -s '$FUNCNAME' -m $CLIENT"
 		[ -f $tmpout ] && rm -f $tmpout
 		;;
 	*)
@@ -222,11 +222,11 @@ nisint_user_test_1004()
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
-		rhts-sync-block -s "$FUNCNAME" $CLIENT
+		rlRun "rhts-sync-block -s '$FUNCNAME' $CLIENT"
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
-		rhts-sync-block -s "$FUNCNAME" $CLIENT
+		rlRun "rhts-sync-block -s '$FUNCNAME' $CLIENT"
 		;;
 	"$CLIENT")
 		rlLog "Machine in recipe is CLIENT"
@@ -236,7 +236,7 @@ nisint_user_test_1004()
 		else
 			rlRun "ipa user-find|grep notauser" 1 "Fail to ipa search for non-existent user"
 		fi
-		rhts-sync-set -s "$FUNCNAME" -m $CLIENT
+		rlRun "rhts-sync-set -s '$FUNCNAME' -m $CLIENT"
 		[ -f $tmpout ] && rm -f $tmpout
 		;;
 	*)
@@ -253,17 +253,17 @@ nisint_user_test_1005()
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
-		rhts-sync-block -s "$FUNCNAME" $CLIENT
+		rlRun "rhts-sync-block -s '$FUNCNAME' $CLIENT"
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
-		rhts-sync-block -s "$FUNCNAME" $CLIENT
+		rlRun "rhts-sync-block -s '$FUNCNAME' $CLIENT"
 		;;
 	"$CLIENT")
 		rlLog "Machine in recipe is CLIENT"
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "getent passwd testuser2" 0 "getent search for existing user"
-		rhts-sync-set -s "$FUNCNAME" -m $CLIENT
+		rlRun "rhts-sync-set -s '$FUNCNAME' -m $CLIENT"
 		[ -f $tmpout ] && rm -f $tmpout
 		;;
 	*)
@@ -280,17 +280,17 @@ nisint_user_test_1006()
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
-		rhts-sync-block -s "$FUNCNAME" $CLIENT
+		rlRun "rhts-sync-block -s '$FUNCNAME' $CLIENT"
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
-		rhts-sync-block -s "$FUNCNAME" $CLIENT
+		rlRun "rhts-sync-block -s '$FUNCNAME' $CLIENT"
 		;;
 	"$CLIENT")
 		rlLog "Machine in recipe is CLIENT"
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "getent passwd notauser" 2 "attempt to getent search for non-existent user"
-		rhts-sync-set -s "$FUNCNAME" -m $CLIENT
+		rlRun "rhts-sync-set -s '$FUNCNAME' -m $CLIENT"
 		[ -f $tmpout ] && rm -f $tmpout
 		;;
 	*)
@@ -307,17 +307,17 @@ nisint_user_test_1007()
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
-		rhts-sync-block -s "$FUNCNAME" $CLIENT
+		rlRun "rhts-sync-block -s '$FUNCNAME' $CLIENT"
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
-		rhts-sync-block -s "$FUNCNAME" $CLIENT
+		rlRun "rhts-sync-block -s '$FUNCNAME' $CLIENT"
 		;;
 	"$CLIENT")
 		rlLog "Machine in recipe is CLIENT"
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "id testuser1" 0 "id search for existing user"
-		rhts-sync-set -s "$FUNCNAME" -m $CLIENT
+		rlRun "rhts-sync-set -s '$FUNCNAME' -m $CLIENT"
 		[ -f $tmpout ] && rm -f $tmpout
 		;;
 	*)
@@ -334,17 +334,17 @@ nisint_user_test_1008()
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
-		rhts-sync-block -s "$FUNCNAME" $CLIENT
+		rlRun "rhts-sync-block -s '$FUNCNAME' $CLIENT"
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
-		rhts-sync-block -s "$FUNCNAME" $CLIENT
+		rlRun "rhts-sync-block -s '$FUNCNAME' $CLIENT"
 		;;
 	"$CLIENT")
 		rlLog "Machine in recipe is CLIENT"
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "id notauser" 1 "id search for existing user"
-		rhts-sync-set -s "$FUNCNAME" -m $CLIENT
+		rlRun "rhts-sync-set -s '$FUNCNAME' -m $CLIENT"
 		[ -f $tmpout ] && rm -f $tmpout
 		;;
 	*)
@@ -361,17 +361,17 @@ nisint_user_test_1009()
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
-		rhts-sync-block -s "$FUNCNAME" $CLIENT
+		rlRun "rhts-sync-block -s '$FUNCNAME' $CLIENT"
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
-		rhts-sync-block -s "$FUNCNAME" $CLIENT
+		rlRun "rhts-sync-block -s '$FUNCNAME' $CLIENT"
 		;;
 	"$CLIENT")
 		rlLog "Machine in recipe is CLIENT"
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "su - testuser1 -c 'touch /tmp/mytestfile.user1'" 0 "touch new file as exisiting user"
-		rhts-sync-set -s "$FUNCNAME" -m $CLIENT
+		rlRun "rhts-sync-set -s '$FUNCNAME' -m $CLIENT"
 		[ -f $tmpout ] && rm -f $tmpout
 		;;
 	*)
@@ -388,18 +388,18 @@ nisint_user_test_1010()
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
-		rhts-sync-block -s "$FUNCNAME" $CLIENT
+		rlRun "rhts-sync-block -s '$FUNCNAME' $CLIENT"
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
-		rhts-sync-block -s "$FUNCNAME" $CLIENT
+		rlRun "rhts-sync-block -s '$FUNCNAME' $CLIENT"
 		;;
 	"$CLIENT")
 		rlLog "Machine in recipe is CLIENT"
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "su - testuser2 -c 'touch /tmp/mytestfile.user1'" 1 "attempt to touch existing file fail without permissions"
 		rlRun "su - notauser -c 'touch /tmp/mytestfile.user1'" 125 "su fail as non-existent user"
-		rhts-sync-set -s "$FUNCNAME" -m $CLIENT
+		rlRun "rhts-sync-set -s '$FUNCNAME' -m $CLIENT"
 		[ -f $tmpout ] && rm -f $tmpout
 		;;
 	*)
@@ -416,17 +416,17 @@ nisint_user_test_1011()
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
-		rhts-sync-block -s "$FUNCNAME" $CLIENT
+		rlRun "rhts-sync-block -s '$FUNCNAME' $CLIENT"
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
-		rhts-sync-block -s "$FUNCNAME" $CLIENT
+		rlRun "rhts-sync-block -s '$FUNCNAME' $CLIENT"
 		;;
 	"$CLIENT")
 		rlLog "Machine in recipe is CLIENT"
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "su - testuser2 -c 'rm -f /tmp/mytestfile.user1'" 1 "attempt to rm existing file fail without permissions"
-		rhts-sync-set -s "$FUNCNAME" -m $CLIENT
+		rlRun "rhts-sync-set -s '$FUNCNAME' -m $CLIENT"
 		[ -f $tmpout ] && rm -f $tmpout
 		;;
 	*)
@@ -443,17 +443,17 @@ nisint_user_test_1012()
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
-		rhts-sync-block -s "$FUNCNAME" $CLIENT
+		rlRun "rhts-sync-block -s '$FUNCNAME' $CLIENT"
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
-		rhts-sync-block -s "$FUNCNAME" $CLIENT
+		rlRun "rhts-sync-block -s '$FUNCNAME' $CLIENT"
 		;;
 	"$CLIENT")
 		rlLog "Machine in recipe is CLIENT"
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "su - testuser1 -c 'rm -f /tmp/mytestfile.user1'" 0 "rm existing file"
-		rhts-sync-set -s "$FUNCNAME" -m $CLIENT
+		rlRun "rhts-sync-set -s '$FUNCNAME' -m $CLIENT"
 		[ -f $tmpout ] && rm -f $tmpout
 		;;
 	*)
@@ -470,17 +470,17 @@ nisint_user_test_1013()
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
-		rhts-sync-block -s "$FUNCNAME" $CLIENT
+		rlRun "rhts-sync-block -s '$FUNCNAME' $CLIENT"
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
-		rhts-sync-block -s "$FUNCNAME" $CLIENT
+		rlRun "rhts-sync-block -s '$FUNCNAME' $CLIENT"
 		;;
 	"$CLIENT")
 		rlLog "Machine in recipe is CLIENT"
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "su - testuser1 -c 'mkdir /tmp/mytmpdir.user1'" 0 "su mkdir new directory"
-		rhts-sync-set -s "$FUNCNAME" -m $CLIENT
+		rlRun "rhts-sync-set -s '$FUNCNAME' -m $CLIENT"
 		[ -f $tmpout ] && rm -f $tmpout
 		;;
 	*)
@@ -497,17 +497,17 @@ nisint_user_test_1014()
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
-		rhts-sync-block -s "$FUNCNAME" $CLIENT
+		rlRun "rhts-sync-block -s '$FUNCNAME' $CLIENT"
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
-		rhts-sync-block -s "$FUNCNAME" $CLIENT
+		rlRun "rhts-sync-block -s '$FUNCNAME' $CLIENT"
 		;;
 	"$CLIENT")
 		rlLog "Machine in recipe is CLIENT"
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "su - testuser2 -c 'mkdir /tmp/mytmpdir.user1/mytmpdir.user2'" 1 "attempt to mkdir new directory in dir without permissions"
-		rhts-sync-set -s "$FUNCNAME" -m $CLIENT
+		rlRun "rhts-sync-set -s '$FUNCNAME' -m $CLIENT"
 		[ -f $tmpout ] && rm -f $tmpout
 		;;
 	*)
@@ -524,17 +524,17 @@ nisint_user_test_1015()
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
-		rhts-sync-block -s "$FUNCNAME" $CLIENT
+		rlRun "rhts-sync-block -s '$FUNCNAME' $CLIENT"
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
-		rhts-sync-block -s "$FUNCNAME" $CLIENT
+		rlRun "rhts-sync-block -s '$FUNCNAME' $CLIENT"
 		;;
 	"$CLIENT")
 		rlLog "Machine in recipe is CLIENT"
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "su - testuser2 -c 'rmdir /tmp/mytmpdir.user1'" 1 "attempt to rmdir directory without permissions"
-		rhts-sync-set -s "$FUNCNAME" -m $CLIENT
+		rlRun "rhts-sync-set -s '$FUNCNAME' -m $CLIENT"
 		[ -f $tmpout ] && rm -f $tmpout
 		;;
 	*)
@@ -551,17 +551,17 @@ nisint_user_test_1016()
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
-		rhts-sync-block -s "$FUNCNAME" $CLIENT
+		rlRun "rhts-sync-block -s '$FUNCNAME' $CLIENT"
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
-		rhts-sync-block -s "$FUNCNAME" $CLIENT
+		rlRun "rhts-sync-block -s '$FUNCNAME' $CLIENT"
 		;;
 	"$CLIENT")
 		rlLog "Machine in recipe is CLIENT"
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "su - testuser1 -c 'rmdir /tmp/mytmpdir.user1'" 0 "rmdir directory"
-		rhts-sync-set -s "$FUNCNAME" -m $CLIENT
+		rlRun "rhts-sync-set -s '$FUNCNAME' -m $CLIENT"
 		[ -f $tmpout ] && rm -f $tmpout
 		;;
 	*)
@@ -579,18 +579,18 @@ nisint_user_test_1017()
 	"$MASTER")
 		KinitAsAdmin
 		rlLog "Machine in recipe is IPAMASTER"
-		rhts-sync-block -s "$FUNCNAME" $CLIENT
+		rlRun "rhts-sync-block -s '$FUNCNAME' $CLIENT"
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
-		rhts-sync-block -s "$FUNCNAME" $CLIENT
+		rlRun "rhts-sync-block -s '$FUNCNAME' $CLIENT"
 		;;
 	"$CLIENT")
 		rlLog "Machine in recipe is CLIENT"
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ssh_auth_success testuser1 passw0rd1 localhost" 
 		[ -f $tmpout ] && rm -f $tmpout
-		rhts-sync-set -s "$FUNCNAME" -m $CLIENT
+		rlRun "rhts-sync-set -s '$FUNCNAME' -m $CLIENT"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE"

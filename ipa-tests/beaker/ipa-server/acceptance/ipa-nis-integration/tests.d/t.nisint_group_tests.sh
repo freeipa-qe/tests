@@ -74,16 +74,16 @@ nisint_group_test_envsetup()
 		rlRun "ipa group-add testgroup2 --gid=90002 --desc=NIS_GROUP_testgroup2"
 		rlRun "ipa group-add-member testgroup1 --users=testuser1"
 		rlRun "ipa group-add-member testgroup2 --users=testuser2"
-		rhts-sync-set -s "$FUNCNAME" -m $MASTER
+		rlRun "rhts-sync-set -s '$FUNCNAME' -m $MASTER"
 		[ -f $tmpout ] && rm -f $tmpout
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
-		rhts-sync-block -s "$FUNCNAME" $MASTER
+		rlRun "rhts-sync-block -s '$FUNCNAME' $MASTER"
 		;;
 	"$CLIENT")
 		rlLog "Machine in recipe is CLIENT"
-		rhts-sync-block -s "$FUNCNAME" $MASTER
+		rlRun "rhts-sync-block -s '$FUNCNAME' $MASTER"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE"
@@ -104,16 +104,16 @@ nisint_group_test_envcleanup()
 		rlRun "ipa user-del testuser2"
 		rlRun "ipa group-del testgroup1"
 		rlRun "ipa group-del testgroup2"
-		rhts-sync-set -s "$FUNCNAME" -m $MASTER
+		rlRun "rhts-sync-set -s '$FUNCNAME' -m $MASTER"
 		[ -f $tmpout ] && rm -f $tmpout
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
-		rhts-sync-block -s "$FUNCNAME" $MASTER
+		rlRun "rhts-sync-block -s '$FUNCNAME' $MASTER"
 		;;
 	"$CLIENT")
 		rlLog "Machine in recipe is CLIENT"
-		rhts-sync-block -s "$FUNCNAME" $MASTER
+		rlRun "rhts-sync-block -s '$FUNCNAME' $MASTER"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE"
@@ -128,11 +128,11 @@ nisint_group_test_1001()
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
-		rhts-sync-block -s "$FUNCNAME" $CLIENT
+		rlRun "rhts-sync-block -s '$FUNCNAME' $CLIENT"
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
-		rhts-sync-block -s "$FUNCNAME" $CLIENT
+		rlRun "rhts-sync-block -s '$FUNCNAME' $CLIENT"
 		;;
 	"$CLIENT")
 		rlLog "Machine in recipe is CLIENT"
@@ -142,7 +142,7 @@ nisint_group_test_1001()
 		else
 			rlRun "ypcat group|grep testgroup1" 0 "ypcat search for existing group"
 		fi
-		rhts-sync-set -s "$FUNCNAME" -m $CLIENT
+		rlRun "rhts-sync-set -s '$FUNCNAME' -m $CLIENT"
 		[ -f $tmpout ] && rm -f $tmpout
 		;;
 	*)
@@ -159,11 +159,11 @@ nisint_group_test_1002()
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
-		rhts-sync-block -s "$FUNCNAME" $CLIENT
+		rlRun "rhts-sync-block -s '$FUNCNAME' $CLIENT"
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
-		rhts-sync-block -s "$FUNCNAME" $CLIENT
+		rlRun "rhts-sync-block -s '$FUNCNAME' $CLIENT"
 		;;
 	"$CLIENT")
 		rlLog "Machine in recipe is CLIENT"
@@ -173,7 +173,7 @@ nisint_group_test_1002()
 		else
 			rlRun "ypcat group|grep notagroup" 1 "ypcat search for non-existent group"
 		fi
-		rhts-sync-set -s "$FUNCNAME" -m $CLIENT
+		rlRun "rhts-sync-set -s '$FUNCNAME' -m $CLIENT"
 		[ -f $tmpout ] && rm -f $tmpout
 		;;
 	*)
@@ -190,11 +190,11 @@ nisint_group_test_1003()
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
-		rhts-sync-block -s "$FUNCNAME" $CLIENT
+		rlRun "rhts-sync-block -s '$FUNCNAME' $CLIENT"
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
-		rhts-sync-block -s "$FUNCNAME" $CLIENT
+		rlRun "rhts-sync-block -s '$FUNCNAME' $CLIENT"
 		;;
 	"$CLIENT")
 		rlLog "Machine in recipe is CLIENT"
@@ -204,7 +204,7 @@ nisint_group_test_1003()
 		else
 			rlRun "ipa group-find|grep testgroup1" 0 "ipa search for existing group"
 		fi
-		rhts-sync-set -s "$FUNCNAME" -m $CLIENT
+		rlRun "rhts-sync-set -s '$FUNCNAME' -m $CLIENT"
 		[ -f $tmpout ] && rm -f $tmpout
 		;;
 	*)
@@ -221,11 +221,11 @@ nisint_group_test_1004()
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
-		rhts-sync-block -s "$FUNCNAME" $CLIENT
+		rlRun "rhts-sync-block -s '$FUNCNAME' $CLIENT"
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
-		rhts-sync-block -s "$FUNCNAME" $CLIENT
+		rlRun "rhts-sync-block -s '$FUNCNAME' $CLIENT"
 		;;
 	"$CLIENT")
 		rlLog "Machine in recipe is CLIENT"
@@ -235,7 +235,7 @@ nisint_group_test_1004()
 		else
 			rlRun "ipa group-find|grep notagroup" 1 "failed to ipa search for non-existent group"
 		fi
-		rhts-sync-set -s "$FUNCNAME" -m $CLIENT
+		rlRun "rhts-sync-set -s '$FUNCNAME' -m $CLIENT"
 		[ -f $tmpout ] && rm -f $tmpout
 		;;
 	*)
@@ -252,17 +252,17 @@ nisint_group_test_1005()
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
-		rhts-sync-block -s "$FUNCNAME" $CLIENT
+		rlRun "rhts-sync-block -s '$FUNCNAME' $CLIENT"
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
-		rhts-sync-block -s "$FUNCNAME" $CLIENT
+		rlRun "rhts-sync-block -s '$FUNCNAME' $CLIENT"
 		;;
 	"$CLIENT")
 		rlLog "Machine in recipe is CLIENT"
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "getent group testgroup2" 0 "getent search for existing group"
-		rhts-sync-set -s "$FUNCNAME" -m $CLIENT
+		rlRun "rhts-sync-set -s '$FUNCNAME' -m $CLIENT"
 		[ -f $tmpout ] && rm -f $tmpout
 		;;
 	*)
@@ -279,17 +279,17 @@ nisint_group_test_1006()
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
-		rhts-sync-block -s "$FUNCNAME" $CLIENT
+		rlRun "rhts-sync-block -s '$FUNCNAME' $CLIENT"
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
-		rhts-sync-block -s "$FUNCNAME" $CLIENT
+		rlRun "rhts-sync-block -s '$FUNCNAME' $CLIENT"
 		;;
 	"$CLIENT")
 		rlLog "Machine in recipe is CLIENT"
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "getent group notagroup" 2 "attempt to getent search for non-existent group"
-		rhts-sync-set -s "$FUNCNAME" -m $CLIENT
+		rlRun "rhts-sync-set -s '$FUNCNAME' -m $CLIENT"
 		[ -f $tmpout ] && rm -f $tmpout
 		;;
 	*)
@@ -306,11 +306,11 @@ nisint_group_test_1007()
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
-		rhts-sync-block -s "$FUNCNAME" $CLIENT
+		rlRun "rhts-sync-block -s '$FUNCNAME' $CLIENT"
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
-		rhts-sync-block -s "$FUNCNAME" $CLIENT
+		rlRun "rhts-sync-block -s '$FUNCNAME' $CLIENT"
 		;;
 	"$CLIENT")
 		rlLog "Machine in recipe is CLIENT"
@@ -319,7 +319,7 @@ nisint_group_test_1007()
 		rlRun "chown testuser1:testuser1 /tmp/mytestfile.user1" 0 "chown file to another group"
 		rlRun "su - testuser1 -c 'chown testuser1:testgroup1 /tmp/mytestfile.user1'" 0 "chown file to another group"
 		rlRun "rm -f /tmp/mytestfile.user1" 0 "cleanup/remove file"
-		rhts-sync-set -s "$FUNCNAME" -m $CLIENT
+		rlRun "rhts-sync-set -s '$FUNCNAME' -m $CLIENT"
 		[ -f $tmpout ] && rm -f $tmpout
 		;;
 	*)
@@ -336,11 +336,11 @@ nisint_group_test_1008()
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
-		rhts-sync-block -s "$FUNCNAME" $CLIENT
+		rlRun "rhts-sync-block -s '$FUNCNAME' $CLIENT"
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
-		rhts-sync-block -s "$FUNCNAME" $CLIENT
+		rlRun "rhts-sync-block -s '$FUNCNAME' $CLIENT"
 		;;
 	"$CLIENT")
 		rlLog "Machine in recipe is CLIENT"
@@ -349,7 +349,7 @@ nisint_group_test_1008()
 		rlRun "chown testuser1:testuser1 /tmp/mytestfile.user1" 0 "chown file to another group"
 		rlRun "su - testuser1 -c 'chown testuser1:testgroup2 /tmp/mytestfile.user1'" 1 "attempt to chown file as invalid group"
 		rlRun "rm -f /tmp/mytestfile.user1" 0 "cleanup/remove file"
-		rhts-sync-set -s "$FUNCNAME" -m $CLIENT
+		rlRun "rhts-sync-set -s '$FUNCNAME' -m $CLIENT"
 		[ -f $tmpout ] && rm -f $tmpout
 		;;
 	*)
@@ -366,11 +366,11 @@ nisint_group_test_1009()
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
-		rhts-sync-block -s "$FUNCNAME" $CLIENT
+		rlRun "rhts-sync-block -s '$FUNCNAME' $CLIENT"
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
-		rhts-sync-block -s "$FUNCNAME" $CLIENT
+		rlRun "rhts-sync-block -s '$FUNCNAME' $CLIENT"
 		;;
 	"$CLIENT")
 		rlLog "Machine in recipe is CLIENT"
@@ -379,7 +379,7 @@ nisint_group_test_1009()
 		rlRun "chown testuser1:testuser1 /tmp/mytestfile.user1" 0 "chown file to another group"
 		rlRun "su - testuser1 -c 'chgrp testgroup1 /tmp/mytestfile.user1'" 0 "chgrp file to another group"
 		rlRun "rm -f /tmp/mytestfile.user1" 0 "cleanup/remove file"
-		rhts-sync-set -s "$FUNCNAME" -m $CLIENT
+		rlRun "rhts-sync-set -s '$FUNCNAME' -m $CLIENT"
 		[ -f $tmpout ] && rm -f $tmpout
 		;;
 	*)
@@ -396,11 +396,11 @@ nisint_group_test_1010()
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
-		rhts-sync-block -s "$FUNCNAME" $CLIENT
+		rlRun "rhts-sync-block -s '$FUNCNAME' $CLIENT"
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
-		rhts-sync-block -s "$FUNCNAME" $CLIENT
+		rlRun "rhts-sync-block -s '$FUNCNAME' $CLIENT"
 		;;
 	"$CLIENT")
 		rlLog "Machine in recipe is CLIENT"
@@ -409,7 +409,7 @@ nisint_group_test_1010()
 		rlRun "chown testuser1:testgroup1 /tmp/mytestfile.user1" 0 "chown file to another group"
 		rlRun "su - testuser1 -c 'chgrp testgroup2 /tmp/mytestfile.user1'" 1 "attempt to chgrp file as invalid group"
 		rlRun "rm -f /tmp/mytestfile.user1" 0 "cleanup/remove file"
-		rhts-sync-set -s "$FUNCNAME" -m $CLIENT
+		rlRun "rhts-sync-set -s '$FUNCNAME' -m $CLIENT"
 		[ -f $tmpout ] && rm -f $tmpout
 		;;
 	*)
@@ -426,11 +426,11 @@ nisint_group_test_1011()
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
-		rhts-sync-block -s "$FUNCNAME" $CLIENT
+		rlRun "rhts-sync-block -s '$FUNCNAME' $CLIENT"
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
-		rhts-sync-block -s "$FUNCNAME" $CLIENT
+		rlRun "rhts-sync-block -s '$FUNCNAME' $CLIENT"
 		;;
 	"$CLIENT")
 		rlLog "Machine in recipe is CLIENT"
@@ -441,7 +441,7 @@ nisint_group_test_1011()
 		rlRun "su - testuser1 -c 'echo my_test_$FUNCNAME > /tmp/mytestfile.user1'" 0 "write some data to test file"
 		rlAssertGrep "my_test_$FUNCNAME" /tmp/mytestfile.user1
 		rlRun "rm -f /tmp/mytestfile.user1" 0 "cleanup/remove file"
-		rhts-sync-set -s "$FUNCNAME" -m $CLIENT
+		rlRun "rhts-sync-set -s '$FUNCNAME' -m $CLIENT"
 		[ -f $tmpout ] && rm -f $tmpout
 		;;
 	*)
@@ -458,11 +458,11 @@ nisint_group_test_1012()
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
-		rhts-sync-block -s "$FUNCNAME" $CLIENT
+		rlRun "rhts-sync-block -s '$FUNCNAME' $CLIENT"
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
-		rhts-sync-block -s "$FUNCNAME" $CLIENT
+		rlRun "rhts-sync-block -s '$FUNCNAME' $CLIENT"
 		;;
 	"$CLIENT")
 		rlLog "Machine in recipe is CLIENT"
@@ -473,7 +473,7 @@ nisint_group_test_1012()
 		rlRun "su - testuser2 -c 'echo my_test_$FUNCNAME > /tmp/mytestfile.user1'" 1 "attempt to write some data to test file with invalid group permissions"
 		rlAssertNotGrep "my_test_$FUNCNAME" /tmp/mytestfile.user1
 		rlRun "rm -f /tmp/mytestfile.user1" 0 "cleanup/remove file"
-		rhts-sync-set -s "$FUNCNAME" -m $CLIENT
+		rlRun "rhts-sync-set -s '$FUNCNAME' -m $CLIENT"
 		[ -f $tmpout ] && rm -f $tmpout
 		;;
 	*)
@@ -490,11 +490,11 @@ nisint_group_test_1013()
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
-		rhts-sync-block -s "$FUNCNAME" $CLIENT
+		rlRun "rhts-sync-block -s '$FUNCNAME' $CLIENT"
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
-		rhts-sync-block -s "$FUNCNAME" $CLIENT
+		rlRun "rhts-sync-block -s '$FUNCNAME' $CLIENT"
 		;;
 	"$CLIENT")
 		rlLog "Machine in recipe is CLIENT"
@@ -503,7 +503,7 @@ nisint_group_test_1013()
 		rlRun "chown root:testgroup1 /tmp/mytestfile.user1" 0 "chown file to another group"
 		rlRun "su - testuser1 -c 'grep my_test_$FUNCNAME /tmp/mytestfile.user1'" 0 "read file"
 		rlRun "rm -f /tmp/mytestfile.user1" 0 "cleanup/remove file"
-		rhts-sync-set -s "$FUNCNAME" -m $CLIENT
+		rlRun "rhts-sync-set -s '$FUNCNAME' -m $CLIENT"
 		[ -f $tmpout ] && rm -f $tmpout
 		;;
 	*)
@@ -520,11 +520,11 @@ nisint_group_test_1014()
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
-		rhts-sync-block -s "$FUNCNAME" $CLIENT
+		rlRun "rhts-sync-block -s '$FUNCNAME' $CLIENT"
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
-		rhts-sync-block -s "$FUNCNAME" $CLIENT
+		rlRun "rhts-sync-block -s '$FUNCNAME' $CLIENT"
 		;;
 	"$CLIENT")
 		rlLog "Machine in recipe is CLIENT"
@@ -533,7 +533,7 @@ nisint_group_test_1014()
 		rlRun "chown root:testgroup1 /tmp/mytestfile.user1" 0 "chown file to another group"
 		rlRun "su - testuser2 -c 'grep my_test_$FUNCNAME /tmp/mytestfile.user1'" 0 "attempt to read file with invalid group permissions"
 		rlRun "rm -f /tmp/mytestfile.user1" 0 "cleanup/remove file"
-		rhts-sync-set -s "$FUNCNAME" -m $CLIENT
+		rlRun "rhts-sync-set -s '$FUNCNAME' -m $CLIENT"
 		[ -f $tmpout ] && rm -f $tmpout
 		;;
 	*)

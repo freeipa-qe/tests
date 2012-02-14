@@ -40,7 +40,7 @@
 ######################################################################
 nisint_client_is_nis_bz_tests()
 {
-	echo "$FUNCNAME"
+	echo '$FUNCNAME'
 }
 
 example_bz_788625()
@@ -64,15 +64,15 @@ example_bz_788625()
 		fi		
 		rlRun "ipa netgroup-del netgroup_bz_788625_test1"
 		rlRun "ipa netgroup-del netgroup_bz_788625_test"
-		rhts-sync-set -s "$FUNCNAME" -m $MASTER
+		rlRun "rhts-sync-set -s '$FUNCNAME' -m $MASTER"
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
-		rhts-sync-block -s "$FUNCNAME" $MASTER
+		rlRun "rhts-sync-block -s '$FUNCNAME' $MASTER"
 		;;
 	"$CLIENT")
 		rlLog "Machine in recipe is CLIENT"
-		rhts-sync-block -s "$FUNCNAME" $MASTER
+		rlRun "rhts-sync-block -s '$FUNCNAME' $MASTER"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE"
