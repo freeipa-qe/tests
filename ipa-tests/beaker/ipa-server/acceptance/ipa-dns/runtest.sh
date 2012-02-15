@@ -73,9 +73,10 @@ rlJournalStart
 		yum -y install wget rpcbind
 	rlPhaseEnd
 
-if [ $master -eq 1 ]; then
-	setenforce 0
-fi
+# all testing should be with selinux enforcing!
+#if [ $master -eq 1 ]; then
+#	setenforce 0
+#fi
 
 	# Determine my IP address
 	currenteth=$(route | grep ^default | awk '{print $8}')
@@ -865,6 +866,7 @@ fi
 	# Tests for bug https://bugzilla.redhat.com/show_bug.cgi?id=750947
 	aaaa="fec0:0:a10:6000:11:16ff:fe98:122"
 	rlPhaseStartTest "ipa-dns-151: add record of type AAAA to test bug 750947"
+		rlRun "ipa dnszone-add $zone"
 		rlRun "ipa dnsrecord-add $zone aaaa --aaaa-rec=\"$aaaa\""
 	rlPhaseEnd
 
@@ -883,6 +885,11 @@ fi
 
 	rlPhaseStartTest "ipa-dns-155: delete record of type AAAA"
 		rlRun "ipa dnsrecord-del $zone aaaa --aaaa-rec $aaaa" 0 "delete record type AAAA"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-156: 789919 :: IP address with just 3 octets are accepted as valid addresses in --a-rec option"
+		rlLog "verifies https://bugzilla.redhat.com/show_bug.cgi?id=789919"
+		verifyErrorMsg "ipa dnsrecord-add $zone arec --a-rec=1.1.1" "ipa: ERROR: invalid 'ip_address': invalid IP address format"
 	rlPhaseEnd
 
 
