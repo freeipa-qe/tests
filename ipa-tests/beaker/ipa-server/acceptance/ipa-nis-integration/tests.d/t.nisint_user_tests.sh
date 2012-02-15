@@ -200,8 +200,10 @@ nisint_user_test_1003()
 	"$NISCLIENT")
 		rlLog "Machine in recipe is NISCLIENT"
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
-		if [ ! -f /usr/bin/ipa ]; then
-			rlPass "ipa not found...skipping"
+		rlRun "ls -ld /usr/bin/ipa"
+		rlRun "rpm -qf /usr/bin/ipa"
+		if [ $(/usr/sbin/ipa-client-install 2>&1 | grep "IPA client is already configured on this system." | wc -l) -eq 0 ]; then
+			rlPass "ipa not found/configured...skipping"
 		else
 			rlRun "ipa user-find|grep testuser1" 0 "ipa search for existing user"
 		fi
