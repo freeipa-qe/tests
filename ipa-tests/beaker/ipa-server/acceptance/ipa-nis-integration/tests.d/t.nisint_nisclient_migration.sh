@@ -65,11 +65,23 @@ nisint_nisclient_migration_envsetup()
 		rlLog "Machine in recipe is NISCLIENT"
 		rhts-sync-block -s "$FUNCTION.0" $MASTER
 		HOSTNAME_S=$(hostname -s)
+		MASTER_S=3(echo $MASTER|cut -f1 -d.)
 		rlRun "yum -y install *ipa-admintools *ipa-client"
+
 		rlRun "sed -i s/^$NISCLIENT_IP.*$HOSTNAME_S.*$// /etc/hosts"
 		rlRun "echo '$NISCLIENT_IP $HOSTNAME_S.$DOMAIN $HOSTNAME_S' >> /etc/hosts"
+
+		rlRun "sed -i s/^$MASTER_IP.*$MASTER_S.*$// /etc/hosts" 
+		rlRun "echo '$MASTER_IP $MASTER_S.$DOMAIN $MASTER_S' >> /etc/hosts"
+
 		rlRun "sed -i s/^nameserver/#nameserver/g /etc/resolv.conf"
 		rlRun "echo 'nameserver $MASTER_IP' >> /etc/resolv.conf"
+
+		rlRun "grep -v 'HOSTNAME=$HOSTNAME_S' /etc/sysconfig/network > /etc/sysconfig/network.$FUNCNAME"
+		rlRun "echo 'HOSTNAME=$HOSTNAME_S.$DOMAIN' >> /etc/sysconfig/network.$FUNCNAME"
+		rlRun "mv /etc/sysconfig/network.$FUNCNAME /etc/sysconfig/network"
+		rlRun "hostname $HOSTNAME_S.$DOMAIN"
+
 		rlRun "authconfig --disablekrb5 --update"
 		rlRun "authconfig --disablenis --update"
 		rlRun "mv -f /etc/krb5.conf /etc/krb5.conf.nismig"
