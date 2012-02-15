@@ -11,7 +11,7 @@ LDIFIN=./10.entries.example.dc.com.ldif
 LDIFOUT=/dev/shm/import-278.ldif
 NEWPORT=29719
 # number of users to add to server for replication
-maxusers=100
+maxusers=1000
 
 if [ ! -f /dev/shm/env.sh ]; then
 	echo 'ERROR - Sorry, this script needs to be run on a IPA provisioned master from beaker'
@@ -163,4 +163,13 @@ if [ $? -ne 0 ]; then echo "ERROR - Migration step failed."; fi
 
 ipa-replica-manage del $SLAVE
 if [ $? -ne 0 ]; then echo "ERROR - Unable to remove $SLAVE from replicated server list."; fi
+
+# repairing DNS for slave after it was removed
+ipa dnsrecord-add $DOMAIN $SLAVE --a-rec=$SLAVEIP
+# Determine reverse ip info
+ipoc1=$(echo $SLAVEIP | cut -d\. -f1)
+ipoc2=$(echo $SLAVEIP | cut -d\. -f2)
+ipoc3=$(echo $SLAVEIP | cut -d\. -f3)
+ipoc4=$(echo $SLAVEIP | cut -d\. -f4)
+ipa dnsrecord-add $ipoc3.$ipoc2.$ipoc1.in-addr.arpa. $ipoc4 --ptr-rec=$SLAVE.
 

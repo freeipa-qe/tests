@@ -14,3 +14,11 @@ hostnames=$(hostname -s)
 
 remove-ds.pl -f -i slapd-$hostnames
 
+
+ipa group-del group0
+ipa group-del group1
+
+thisuser=1;
+while [ $thisuser -lt $maxusers ]; do 
+	ipa user-del $thisuser;
+done

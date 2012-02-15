@@ -9,6 +9,7 @@
 hostnames=$(hostname -s)
 REPLICAFILE="/dev/shm/replica-info-$hostnames.$DOMAIN.gpg"
 NEWPORT=29719
+maxusers=1000
 
 if [ ! -f /dev/shm/env.sh ]; then
 	echo 'ERROR - Sorry, this script needs to be run on a IPA provisioned slave from beaker'
@@ -33,4 +34,5 @@ if [ $? -ne 0 ]; then echo "ERROR - Unable to uninstall server.";exit; fi
 
 ipa-replica-install --password=$ROOTDNPWD -w $ADMINPW $REPLICAFILE
 if [ $? -ne 0 ]; then echo "ERROR - Replication setup did not complete.";exit; fi
+
 
