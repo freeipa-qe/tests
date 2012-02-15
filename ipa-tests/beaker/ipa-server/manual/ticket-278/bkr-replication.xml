@@ -1,6 +1,6 @@
 <job>
 	<whiteboard>
-		ipa-server RHEL6 multihost(master, slave) replication test x86_64 
+		ipa-server RHEL6 multihost(master, slave) ticket 278 test
 	</whiteboard>
 	<recipeSet>
 		<recipe kernel_options="" kernel_options_post="" ks_meta="" role="MASTER" whiteboard="IPA MASTER">
@@ -8,9 +8,7 @@
 			<watchdog panic="None"/>
 			<packages/>
 			<ks_appends/>
-			<repos>
-				<repo name="ipa-noarch" url="http://download.lab.bos.redhat.com/rel-eng/RHEL6.2-Snapshot-5.0/6.2/Server/x86_64/os"/>
-			</repos>
+			<repos/>
 			<distroRequires>
 				<and>
 					<distro_variant op="=" value="Server"/>
@@ -39,9 +37,6 @@
 			<task name="/CoreOS/ipa-server/acceptance/quickinstall" role="MASTER">
 				<params/>
 			</task>
-			<task name="/CoreOS/ipa-server/acceptance/replication" role="MASTER">
-				<params/>
-			</task>
 			<task name="/distribution/reservesys" role="STANDALONE">
 				<params>
 					<param name="RESERVETIME" value="86400"/>
@@ -53,9 +48,7 @@
 			<watchdog panic="None"/>
 			<packages/>
 			<ks_appends/>
-			<repos>
-				<repo name="ipa-noarch" url="http://download.lab.bos.redhat.com/rel-eng/RHEL6.2-Snapshot-5.0/6.2/Server/x86_64/os"/>
-			</repos>
+			<repos/>
 			<distroRequires>
 				<and>
 					<distro_variant op="=" value="Server"/>
@@ -82,9 +75,6 @@
 				<params/>
 			</task>
 			<task name="/CoreOS/ipa-server/acceptance/quickinstall" role="SLAVE">
-				<params/>
-			</task>
-			<task name="/CoreOS/ipa-server/acceptance/replication" role="SLAVE">
 				<params/>
 			</task>
 			<task name="/distribution/reservesys" role="STANDALONE">
