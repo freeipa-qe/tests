@@ -876,7 +876,12 @@ fi
 		rlRun "dig aaaa.$zone AAAA | grep $aaaa" 0 "make sure dig can find the AAAA record"
 	rlPhaseEnd
 
-	rlPhaseStartTest "ipa-dns-154: delete record of type AAAA"
+	# Test for bug https://bugzilla.redhat.com/show_bug.cgi?id=789987
+	rlPhaseStartTest "ipa-dns-154: Correction in error message while deleting a invalid record."
+		verifyErrorMsg "ipa dnsrecord-del $zone aaaa --aaaa-rec=2620:52:0:41c9:5054:ff:fe62:65" "ipa: ERROR: aaaa record does not contain '2620:52:0:41c9:5054:ff:fe62:65'"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-155: delete record of type AAAA"
 		rlRun "ipa dnsrecord-del $zone aaaa --aaaa-rec $aaaa" 0 "delete record type AAAA"
 	rlPhaseEnd
 
