@@ -93,9 +93,6 @@ createReplica1()
 			rlRun "ipa-replica-prepare -p $ADMINPW $hostname_s.$DOMAIN"
                         rlRun "service named restart" 0 "Restarting named as work around when adding new reverse zone"
 
-			rlRun "ipa-replica-manage list"
-			rlRun "ipa-replica-manage del $SLAVE"
-	
                 else
 
                         rlLog "No SLAVES in current recipe set."
@@ -225,9 +222,6 @@ echo 'expect eof ' >> $expfile
 			rlRun "ipa-replica-prepare -p $ADMINPW --ip-address=$SLAVEIP $hostname_s.$DOMAIN --dirsrv_pkcs12=dirsrv_pkcs.p12 --dirsrv_pin=Secret123 --http_pkcs12=http_pkcs.p12 --http_pin=Secret123"
                         rlRun "service named restart" 0 "Restarting named as work around when adding new reverse zone"
 
-
-			rlRun "ipa-replica-manage list"
-			rlRun "ipa-replica-manage del $SLAVE"
 
                 else
 
@@ -417,6 +411,9 @@ uninstall()
 
    rlPhaseStartTest "Uninstalling replica"
 
+
+	rlRun "ipa-replica-manage list"
+	rlRun "ipa-replica-manage del $SLAVE"
 
 	rlLog "Executing: ipa-server-install --uninstall -U"
 	rlRun "ipa-server-install --uninstall -U"
