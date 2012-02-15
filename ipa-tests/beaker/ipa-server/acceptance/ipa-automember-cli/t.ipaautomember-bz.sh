@@ -8,6 +8,7 @@
 # The following ipa BZ's need to be tested:
 #  BZ 746589 -- automember functionality not available for upgraded IPA server
 #  BZ 772659 -- Typo in example description for automember-default-group-remove
+#  BZ 782460 -- Clone of 772659 --Typo in example description for automember-default-group-remove
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
@@ -84,5 +85,13 @@ ipaautomember_bz_772659()
 		else
 			rlPass "BZ 772659 not found"
 		fi
+	rlPhaseEnd
+}
+
+#  BZ 782460 -- Clone of 772659 --Typo in example description for automember-default-group-remove
+ipaautomember_bz_782460()
+{
+	rlPhaseStartTest "ipaautomember_bz_782460: Clone of 772659 --Typo in example description for automember-default-group-remove"
+		ipaautomember_bz_772659
 	rlPhaseEnd
 }
