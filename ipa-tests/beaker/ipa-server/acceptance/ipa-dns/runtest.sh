@@ -892,6 +892,11 @@ rlJournalStart
 		verifyErrorMsg "ipa dnsrecord-add $zone arec --a-rec=1.1.1" "ipa: ERROR: invalid 'ip_address': invalid IP address format"
 	rlPhaseEnd
 
+        rlPhaseStartTest "ipa-dns-157: Bug 790318 - dnsrecord-add does not validate the record names with space in between."
+		rlLog "verifies https://bugzilla.redhat.com/show_bug.cgi?id=790318"
+		verifyErrorMsg "ipa dnsrecord-add $zone \"record name\"  --a-rec=1.1.1.1" "ipa: ERROR: invalid 'name': Spaces are not allowed"
+        rlPhaseEnd
+
 
 	rlJournalPrintText
 	report=/tmp/rhts.report.$RANDOM.txt
