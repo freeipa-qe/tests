@@ -138,15 +138,17 @@ fi
 echo "kinit as admin"
 KinitAsAdmin
 
-ipa-nis-manage disable
+echo $ROOTDNPW | ipa-nis-manage disable
 
-ipa-compat-manage disable
+echo $ROOTDNPW | ipa-compat-manage disable
 
 chmod 777 /var/run/dirsrv
 
 /sbin/service dirsrv restart
 
-ipa config-mod --enable-migration=TRUE
+KinitAsAdmin
+
+echo $ROOTDNPW | ipa config-mod --enable-migration=TRUE
 
 echo $ROOTDNPW | ipa -d migrate-ds --user-container=ou=people ldap://$hostnames:$NEWPORT
 
