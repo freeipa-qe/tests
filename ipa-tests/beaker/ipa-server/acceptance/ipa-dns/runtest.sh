@@ -786,6 +786,7 @@ fi
 		rlRun "ipa dnsrecord-find $zone kx" 1 "make sure ipa deleted record type kx"
 	rlPhaseEnd
 
+	service named restart
 	sleep 5
 	rlPhaseStartTest "ipa-dns-136: make sure that dig can not find the record type kx"
 		rlRun "dig $zone kx | grep $kxpref1" 1 "make sure dig can not find the kx record"
@@ -800,7 +801,7 @@ fi
 	/etc/init.d/named restart
 
 	rlPhaseStartTest "ipa-dns-138: make sure that IPA saved record type kx"
-		rlRun "ipa dnsrecord-find $zone @ | grep $kxbadpref1" 1 "make sure ipa recieved record type kx"
+		rlRun "ipa dnsrecord-find $zone @ | grep \"\\$kxbadpref1\"" 1 "make sure ipa recieved record type kx"
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-139: add record of type bad kx"
@@ -864,7 +865,7 @@ fi
 	# Tests for bug https://bugzilla.redhat.com/show_bug.cgi?id=750947
 	aaaa="fec0:0:a10:6000:11:16ff:fe98:122"
 	rlPhaseStartTest "ipa-dns-151: add record of type AAAA to test bug 750947"
-		rlRun "ipa dnsrecord-add $zone aaaa --aaaa-rec='$aaaa'" 0 "add record type AAAA"
+		rlRun "ipa dnsrecord-add $zone aaaa --aaaa-rec=\"$aaaa\""
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-152: make sure that IPA saved record type AAAA"
