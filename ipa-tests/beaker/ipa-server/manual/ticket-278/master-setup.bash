@@ -11,7 +11,7 @@ LDIFIN=./10.entries.example.dc.com.ldif
 LDIFOUT=/dev/shm/import-278.ldif
 NEWPORT=29719
 # number of users to add to server for replication
-maxusers=1000
+maxusers=100
 
 if [ ! -f /dev/shm/env.sh ]; then
 	echo 'ERROR - Sorry, this script needs to be run on a IPA provisioned master from beaker'

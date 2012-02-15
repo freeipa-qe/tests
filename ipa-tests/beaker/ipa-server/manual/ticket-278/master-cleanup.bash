@@ -12,13 +12,18 @@ NEWPORT=29719
 maxusers=100
 hostnames=$(hostname -s)
 
-remove-ds.pl -f -i slapd-$hostnames
+echo "kinit as admin"
+KinitAsAdmin
 
+echo "Removing slapd-$hostnames. This may take some time"
+remove-ds.pl -f -i slapd-$hostnames
 
 ipa group-del group0
 ipa group-del group1
 
 thisuser=1;
 while [ $thisuser -lt $maxusers ]; do 
-	ipa user-del $thisuser;
+	echo "Removing user guest$thisuser"
+	ipa user-del guest$thisuser;
+	let thisuser=$thisuser+1;
 done

@@ -29,9 +29,11 @@ if [ ! -f $REPLICAFILE ]; then
         exit
 fi
 
+echo "uninstalling ipa server replica."
 /usr/sbin/ipa-server-install --uninstall -U
 if [ $? -ne 0 ]; then echo "ERROR - Unable to uninstall server.";exit; fi
 
+echo "re-installing ipa server replica for testing"
 ipa-replica-install --password=$ROOTDNPWD -w $ADMINPW $REPLICAFILE
 if [ $? -ne 0 ]; then echo "ERROR - Replication setup did not complete.";exit; fi
 
