@@ -635,6 +635,7 @@ netgroup_bzs()
 	netgroup_bz_772043
 	netgroup_bz_788625
 	netgroup_bz_772297
+	netgroup_bz_766141
 }
 
 netgroup_bz_772043()
@@ -688,7 +689,7 @@ netgroup_bz_788625()
 netgroup_bz_772297()
 {
 	rlPhaseStartTest "netgroup_bz_772297: Fails to update if all nisNetgroupTriple or memberNisNetgroup entries are deleted from a netgroup"
-		KinitAdmin
+		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 
 		rlRun "ipa user-add user1 --first=TEST --last=USER"
@@ -707,9 +708,74 @@ netgroup_bz_772297()
 			rlPass "BZ 772297 not found."
 		fi
 			
-		rlRun "ldapsearch -x -LLL -b "dc=testrelm,dc=com" cn=users"
+		rlRun "ldapsearch -x -LLL -b \"dc=testrelm,dc=com\" cn=users"
 		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd
 }
 
+netgroup_bz_766141()
+{
+	rlPhaseStartTest "netgroup_bz_766141: SSSD should support FreeIPA's internal netgroup representation"
+		KinitAsAdmin
+		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
+		rlRun "ipa netgroup-add $FUNCNAME --desk=$FUNCNAME"
+		rlRun "ipa netgroup-add-member $FUNCNAME --users=admin"
+		rlRun "cp /etc/sssd/sssd.conf /etc/sssd/sssd.conf.$FUNCNAME.backup"
+		sed -i 's/\(\[domain.*\]\)$/\1\ndebug_level = 6/' /etc/sssd/sssd.conf
+		rlRun "cat /etc/sssd/sssd.conf"
+		rlRun "service sssd restart"
+		rlRun "getent -s sss netgroup $FUNCNAME"
+		
+		# New/Native search filter uses this:  cn=ng,cn=alt,dc=testrelm,dc=com
+		# OLD search filter users compat like this:  cn=ng,cn=compat,dc=testrelm,dc=com
+		if [ $(grep -i "calling ldap_search_ext with.*NisNetgroup.*compat" /var/log/sssd/sssd_$DOMAIN.log|wc -l) -gt 0 ]; then
+			rlFail "BZ 766141 found...SSSD should support FreeIPA's internal netgroup representation"
+		else
+			rlPass "BZ 766141 not found"
+		fi	
+		
+		rlRun "mv /etc/sssd/sssd.conf.$FUNCNAME.backup /etc/sssd/sssd.conf"
+		rlRun "chmod 0600 /etc/sssd/sssd.conf"
+		rlRun "service sssd restart"
+		rlRun "ipa netgroup-del $FUNCNAME"
+		[ -f $tmpout ] && rm -f $tmpout
+	rlPhaseEnd
+}
+ 
+netgroup_bz_767372()
+{
+	rlPhaseStartTest "netgroup_bz_767372: Netgroups compat plugin not reporting users correctly"
+		KinitAsAdmin
+		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
+		rlRun "echo $ADMINPW | ipa-compat-manage enable"
+		rlRun "echo $ADMINPW | ipa-nis-manage enable"
+		rlRun "service rpcbind restart"
+		rlRun "service dirsrv restart"
+		rlRun "ipa user-add bzuser1 --first=First --last=Last"
+		rlRun "ipa user-add bzuser2 --first=First --last=Last"
+		rlRun "ipa user-add bzuser3 --first=First --last=Last"
+		rlRun "ipa netgroup-add $FUNCNAME --hostcat=all --desc=$FUNCNAME"
+		rlRun "ipa netgroup-add-member $FUNCNAME --users=bzuser1,bzuser2,bzuser3"
 
+		if [ $(ldapsearch -x -h $MASTER -p 389 -D "$ROOTDN" -w $ADMINPW -b "cn=test2,cn=ng,cn=compat,$BASEDN" | grep Triple|grep "(-," | wc -l) -gt 0 ]; then
+			rlFail "BZ 767372 found...Netgroups compat plugin not reporting users correctly"
+		else
+			rlPass "BZ 767372 not found."
+		fi
+
+		rlRun "ipa netgroup-del $FUNCNAME"
+		rlRun "ipa user-del bzuser1"
+		rlRun "ipa user-del bzuser2"
+		rlRun "ipa user-del bzuser3"
+		[ -f $tmpout ] && rm -f $tmpout
+	rlPhaseEnd
+}
+
+netgroup_bz_772163()
+{
+	rlPhaseStartTest "netgroup_bz_772163: Iterator loop reuse cases a tight loop in the native IPA netgroups code"
+		KinitAsAdmin
+		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
+		
+	rlPhaseEnd
+}
