@@ -20,6 +20,12 @@
             	        <include name="modifyIndirectAutomountMap" />
             	        <include name="deleteIndirectAutomountMap" />
             	        
+            	        <include name="addAutomountKey" />
+            	        <include name="addAutomountKey_negative" />
+            	        <include name="modifyAutomountKey" />
+            	        <include name="modifyAutomountKey_negative" />
+            	        <include name="deleteAutomountKey" />
+            	        
             	         <include name="deleteAutomountLocation" /> 
             	    </run>
             	</groups>

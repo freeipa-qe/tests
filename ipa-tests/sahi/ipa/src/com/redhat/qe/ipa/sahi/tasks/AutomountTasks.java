@@ -90,4 +90,30 @@ public class AutomountTasks {
 		browser.button("Cancel").click();
 	}
 
+	///// task method for direct automount key ///////////
+	public static void addAutomountKey(SahiTasks browser, String automountKey) {
+		browser.span("Add").click();
+		browser.textbox("automountkey").setValue(automountKey);
+		browser.textbox("automountinformation").setValue(automountKey + " : auto information");
+		browser.button("Add").click();
+	}
+
+	public static void addAutomountKeyAddAndAddAnother(SahiTasks browser,String[] automountKeys) {
+		browser.span("Add").click();
+		for (int i=0; i< automountKeys.length; i++)
+		{
+			String key = automountKeys[i]; 
+			browser.textbox("automountkey").setValue(key);
+			browser.textbox("automountinformation").setValue(key + " : auto information");
+			browser.button("Add and Add Another").click();
+		}
+		browser.button("Cancel").click();
+	}
+
+	public static void addAutomountKeyAddThenCancel(SahiTasks browser,String automountKey) {
+		browser.span("Add").click();
+		browser.textbox("automountkey").setValue(automountKey);
+		browser.textbox("automountinformation").setValue(automountKey + " : auto information");
+		browser.button("Cancel").click();
+	}
 }

@@ -133,7 +133,7 @@ public class AutomountTests extends SahiTestScript{
 	}
 
 	/////////// delete automount location /////////////////////////
-	@Test (groups={"deleteAutomountLocation"}, dataProvider="deleteAutomountLocationSingle", dependsOnGroups="deleteIndirectAutomountMap",
+	@Test (groups={"deleteAutomountLocation"}, dataProvider="deleteAutomountLocationSingle", dependsOnGroups="deleteAutomountMap",
 			description="delete single automount location")
 	public void deleteAutomountLocationSingle(String automountLocation) throws Exception { 
 		Assert.assertTrue(browser.link(automountLocation).exists(), "before delete, autoumount location (" + automountLocation + ")should exist in list");
@@ -141,7 +141,7 @@ public class AutomountTests extends SahiTestScript{
 		Assert.assertFalse(browser.link(automountLocation).exists(), "after delete, automount location (" + automountLocation + ") should NOT exist in list");
 	}
 
-	@Test (groups={"deleteAutomountLocation"}, dataProvider="deleteAutomountLocationMultiple", dependsOnGroups="deleteIndirectAutomountMap",
+	@Test (groups={"deleteAutomountLocation"}, dataProvider="deleteAutomountLocationMultiple", dependsOnGroups="deleteAutomountMap",
 			description="delete multiple automount location")
 	public void deleteAutomountLocationMultiple(String automountLocations) throws Exception { 
 		String[] locations = automountLocations.split(",");
@@ -152,7 +152,7 @@ public class AutomountTests extends SahiTestScript{
 			Assert.assertFalse(browser.link(location).exists(), "after delete, automount location (" + location + ") should NOT exist in list");
 	}
 	
-	@Test (groups={"deleteAutomountLocation"}, dataProvider="leftOverAutomountLocations", dependsOnGroups="deleteIndirectAutomountMap",
+	@Test (groups={"deleteAutomountLocation"}, dataProvider="leftOverAutomountLocations", dependsOnGroups="deleteAutomountMap",
 			description="delete automount")
 	public void deleteLeftOverPermission(String automountLocations) throws Exception 
 	{ 
@@ -332,7 +332,7 @@ public class AutomountTests extends SahiTestScript{
 	}
 
 	/////////// delete automount map /////////////////////////
-	@Test (groups={"deleteAutomountMap"}, dataProvider="deleteAutomountMapSingle", dependsOnGroups="modifyAutomountMap",
+	@Test (groups={"deleteAutomountMap"}, dataProvider="deleteAutomountMapSingle", dependsOnGroups="deleteAutomountKey",
 			description="delete single automount map")
 	public void deleteAutomountMapSingle(String automountLocation,String automountMap) throws Exception { 
 		browser.link(automountLocation).click();
@@ -341,7 +341,7 @@ public class AutomountTests extends SahiTestScript{
 		Assert.assertFalse(browser.link(automountMap).exists(), "after delete, automount map (" + automountMap + ") should NOT exist in list");
 	}
 
-	@Test (groups={"deleteAutomountMap"}, dataProvider="deleteAutomountMapMultiple", dependsOnGroups="modifyAutomountMap",
+	@Test (groups={"deleteAutomountMap"}, dataProvider="deleteAutomountMapMultiple", dependsOnGroups="deleteAutomountKey",
 			description="delete multiple automount map")
 	public void deleteAutomountMapMultiple(String automountLocation,String automountMaps) throws Exception { 
 		browser.link(automountLocation).click();
@@ -440,8 +440,7 @@ public class AutomountTests extends SahiTestScript{
 			else
 				Assert.assertTrue(false, "duplicate indirect automount map is allowed : name="+map+", bad, test failed");
 		}
-	}
-
+	} 
 
 	@Test (groups={"addIndirectAutomountMap_negative"}, dataProvider="addIndirectAutomountMap_addthenedit", dependsOnGroups="addAutomountLocation",
 		description = "no duplicated indirect automount map is allowed")
@@ -604,6 +603,242 @@ public class AutomountTests extends SahiTestScript{
 			Assert.assertFalse(browser.link(map).exists(), "after delete, indirect automount map (" + map + ") should NOT exist in list");
 	}
 
+	/////////// add automount key /////////////////////////
+	@Test (groups={"addAutomountKey"}, dataProvider="addAutomountKey", dependsOnGroups="modifyAutomountMap",
+		description = "add new automount key via 'Add' button")
+	public void addAutomountKey_add(String automountLocation, String automountMap, String automountKey) throws Exception 
+	{
+		browser.link(automountLocation).click();
+		browser.link(automountMap).click();
+		Assert.assertFalse(browser.link(automountKey).exists(), "before add, automount key (" + automountKey + ")should NOT exist in list");
+		AutomountTasks.addAutomountKey(browser, automountKey);  
+		Assert.assertTrue(browser.link(automountKey).exists(), "after add, automount key (" + automountKey + ") should exist in list");
+		browser.link("Automount Locations").in(browser.span("back-link")).click(); 
+	}
+
+	@Test (groups={"addAutomountKey"}, dataProvider="addAutomountKey_addandaddanother", dependsOnGroups="modifyAutomountMap",
+		description = "add new automount via 'Add and Add Another' button")
+	public void addAutomountKey_addandaddanother(String automountLocation, String automountMap, String automountKeys) throws Exception {  
+		browser.link(automountLocation).click();
+		browser.link(automountMap).click();
+		String[] keys = CommonHelper.stringToArray(automountKeys);
+		for (String key:keys)
+			Assert.assertFalse(browser.link(key).exists(), "before add, key ["+key+"] does not exist");
+		AutomountTasks.addAutomountKeyAddAndAddAnother(browser, keys);
+		for (String key:keys)
+			Assert.assertTrue(browser.link(key).exists(), "after add, key ["+key+"] does exist");
+		browser.link("Automount Locations").in(browser.span("back-link")).click(); 
+	}
+
+	@Test (groups={"addAutomountKey"}, dataProvider="addAutomountKey_addthenedit", dependsOnGroups="modifyAutomountMap",
+		description = "add new automount via 'Add and Edit' button")
+	public void addAutomountKey_addthenedit(String automountLocation, String automountMap, String automountKey) throws Exception {  
+		browser.link(automountLocation).click();
+		browser.link(automountMap).click();
+		Assert.assertFalse(browser.link(automountKey).exists(), "before add, automount key (" + automountKey + ") should NOT exist in list");
+		browser.textbox("automountkey").setValue(automountKey); 
+		browser.textbox("automountinformation").setValue(automountKey + " : auto information");
+		browser.button("Add and Edit").click();
+		if (browser.textbox("automountinformation").exists())
+		{
+			String verifyString = "just to check";
+			browser.textbox("automountinformation").setValue(verifyString);
+			if (browser.span("undo").exists())
+			{
+				log.info("in edit mode, test success, now go back to automount ");
+				browser.link("automount keys").in(browser.span("back-link")).click(); 
+				//browser.link(automountKey).in(browser.span("path")).click(); 
+				browser.link("Automount Locations").in(browser.span("back-link")).click(); 
+			}else{
+				log.info("somehow, we are not in edit mode, test failed");
+				//browser.link(automountKey).in(browser.span("path")).click(); 
+				browser.link("Automount Locations").in(browser.span("back-link")).click(); 
+				Assert.assertTrue(false, "expect in edit page, but not, test failed");
+			}
+		}
+		else{
+			log.info("not in edit mode, test failed");
+			Assert.assertTrue(false, "after click 'Add and Edit' we are not in edit mode, test failed");
+		}
+		Assert.assertTrue(browser.link(automountKey).exists(), "after add, automount key (" + automountKey + ") should exist in list");
+		browser.link("Automount Locations").in(browser.span("back-link")).click(); 
+	}
+
+	@Test (groups={"addAutomountKey"},  dataProvider="addAutomountKey_addthencancel", dependsOnGroups="modifyAutomountMap",
+		description = "add new automount via 'Add' then click 'Cancel', expect no new automount key being added")
+	public void addAutomountKey_addthencancel(String automountLocation, String automountMap) throws Exception {  
+		browser.link(automountLocation).click();
+		browser.link(automountMap).click();
+		String automountKey = "IshallNotExist";
+		Assert.assertFalse(browser.link(automountKey).exists(), "before add, automount key (" + automountKey + ")should NOT exist in list");
+		AutomountTasks.addAutomountKeyAddThenCancel(browser,automountKey);
+		Assert.assertFalse(browser.link(automountKey).exists(), "after add, automount key (" + automountKey + ") should NOT exist in list as well");
+		browser.link("Automount Locations").in(browser.span("back-link")).click(); 
+	}
+
+	@Test (groups={"addAutomountKey_negative"}, dataProvider="addAutomountKey_negative", dependsOnGroups="modifyAutomountMap",
+		description = "no duplicated automount key is allowed")
+	public void addAutomountKey_negative_duplicate_key(String automountLocation, String automountMap, String automountKey) throws Exception {
+		browser.link(automountLocation).click();
+		browser.link(automountMap).click();
+		browser.span("Add").click();
+		browser.textbox("automountkey").setValue(automountKey);
+		browser.textbox("automountinformation").setValue(automountKey + " : auto information");
+		browser.button("Add").click();
+		if (browser.div("key named " + automountKey + " already exists").exists())
+		{
+			log.info("duplicate automount key: " + automountKey +" is forbidden, good, test continue");
+			browser.button("Cancel").click();
+			browser.button("Cancel").click();
+		}
+		else{
+			browser.link("Automount Locations").in(browser.span("back-link")).click(); 
+			Assert.assertTrue(false, "duplicate automount key is allowed : key name="+automountKey+", bad, test failed");
+		}
+		browser.link("Automount Locations").in(browser.span("back-link")).click(); 
+	}
+
+	@Test (groups={"addAutomountKey_negative"}, dataProvider="addAutomountKey_negative", dependsOnGroups="modifyAutomountMap",
+		description = "required filed: automation location name is required")
+	public void addAutomountKey_negative_required_field_keyname(String automountLocation, String automountMap, String automountKey) throws Exception {  
+		browser.link(automountLocation).click();
+		browser.link(automountMap).click();
+		browser.span("Add").click();
+		// without enter key name, just click Add
+		browser.button("Add").click();
+		if (browser.span("Required field").exists())
+		{
+			log.info("error fields: 'Required field' appears as expected, test success"); // report success
+			browser.link("Automount Locations").in(browser.span("back-link")).click(); 
+		}else{
+			browser.link("Automount Locations").in(browser.span("back-link")).click(); 
+			Assert.assertTrue(false, "error fields 'Required field' does NOT appear as expected, test failed");
+		}
+	}
+
+	@Test (groups={"addAutomountKey_negative"}, dataProvider="addAutomountKey_negative", dependsOnGroups="modifyAutomountMap",
+		description = "required filed: automation location name is required")
+	public void addAutomountKey_negative_required_field_keyinformation(String automountLocation, String automountMap, String automountKey) throws Exception {  
+		browser.link(automountLocation).click();
+		browser.link(automountMap).click();
+		browser.span("Add").click();
+		browser.textbox("automountkey").setValue(automountKey);
+		// without enter key information, just click Add
+		browser.button("Add").click();
+		if (browser.span("Required field").exists()){
+			log.info("error fields: 'Required field' appears as expected, test success"); // report success
+			browser.link("Automount Locations").in(browser.span("back-link")).click(); 
+		}else{
+			browser.link("Automount Locations").in(browser.span("back-link")).click(); 
+			Assert.assertTrue(false, "error fields 'Required field' does NOT appear as expected, test failed");
+		}
+	}
+
+	/////////// modify automount key settings/////////////////////////
+	@Test (groups={"modifyAutomountKey"}, dataProvider="modifyAutomountKey", dependsOnGroups="addAutomountKey",
+		description = "modify automount key: check undo button ")
+	public void modifyAutomountKey_undo(String automountLocation, String automountMap, String automountKey) throws Exception 
+	{
+		browser.link(automountLocation).click();
+		browser.link(automountMap).click();
+		browser.link(automountKey).click();
+		String originalinformation = browser.textbox("automountinformation").getText();
+		browser.textbox("automountinformation").setValue("I am not suppose to be here: test for undo");
+		if (browser.span("undo").exists())
+		{
+			log.info("after changes made into information, link 'undo' appears, good, test continue");
+			browser.span("undo").click();
+			String afterUndo = browser.textbox("automountinformation").getText();
+			if (originalinformation.equals(afterUndo)) 
+			{
+				log.info("'undo' will restored the original information value, good, test passed");
+			}else{
+				log.info("click 'undo' does not restore original information value, test failed");
+				Assert.assertTrue(false, "unexpected behave for 'undo': click 'undo' does not restore settings");
+			}
+			//browser.link(automountKey).in(browser.span("path")).click(); 
+			browser.link("Automount Locations").in(browser.span("back-link")).click(); 
+		}else{
+			log.info("after changes made into permission, link 'undo' does NOT appear, test failed ");
+			browser.span("Reset").click();
+			//browser.link(automountKey).in(browser.span("path")).click();
+			browser.link("Automount Locations").in(browser.span("back-link")).click(); 
+			Assert.assertTrue(false, "unexpected behave: link 'undo' does not show up as expected");
+		} 
+	}
+
+	@Test (groups={"modifyAutomountKey"}, dataProvider="modifyAutomountKey", dependsOnGroups="addAutomountKey",
+		description ="modify automount key : test for reset button")
+	public void modifyAutomountKey_reset(String automountLocation, String automountMap, String automountKey) throws Exception 
+	{
+		browser.link(automountLocation).click();
+		browser.link(automountMap).click();
+		browser.link(automountKey).click();
+		String originalinformation = browser.textbox("automountinformation").getText();
+		browser.textbox("automountinformation").setValue("I am not suppose to be here: test for reset");
+		browser.span("Reset").click();  
+		String afterReset = browser.textbox("automountinformation").getText();
+		if (originalinformation.equals(afterReset)) 
+		{
+			log.info("'reset' will restored the original information value, good, test passed");
+			//browser.link(automountKey).in(browser.span("path")).click(); 
+			browser.link("Automount Locations").in(browser.span("back-link")).click(); 
+		}else{
+			log.info("click 'reset' does not restore original information value, test failed");
+			//browser.link(automountKey).in(browser.span("path")).click(); 
+			browser.link("Automount Locations").in(browser.span("back-link")).click(); 
+			Assert.assertTrue(false, "unexpected behave for 'reset': click 'Reset' does not original information");
+		} 
+	}
+
+	@Test (groups={"modifyAutomountKey"}, dataProvider="modifyAutomountKey", dependsOnGroups="addAutomountKey",
+		description ="modify automount key : test for update button")
+	public void modifyAutomountKey_update(String automountLocation, String automountMap, String automountKey) throws Exception
+	{
+		browser.link(automountLocation).click();
+		browser.link(automountMap).click();
+		browser.link(automountKey).click();
+		String information = automountKey + "->" + automountMap + ": information modified, in test 'Update'";
+		browser.textbox("automountinformation").setValue(information);
+		browser.span("Update").click();
+		String afterUpdate = browser.textbox("automountinformation").getText();
+		if (information.equals(afterUpdate)) 
+		{
+			log.info("'Update' sets new value for information as expected, test passed");
+			//browser.link(automountKey).in(browser.span("path")).click(); 
+			browser.link("Automount Locations").in(browser.span("back-link")).click(); 
+		}else{
+			log.info("click 'Update' does not set newl information value, test failed");
+			//browser.link(automountKey).in(browser.span("path")).click();  
+			browser.link("Automount Locations").in(browser.span("back-link")).click(); 
+			Assert.assertTrue(false, "unexpected behave for 'Update': click 'Update' does not set new value for 'information'");
+		}  
+	}
+
+	/////////// delete automount key /////////////////////////
+	@Test (groups={"deleteAutomountKey"}, dataProvider="deleteAutomountKeySingle", dependsOnGroups="modifyAutomountKey",
+			description = "delete single automount key")
+	public void deleteAutomountKeySingle(String automountLocation, String automountMap, String automountKey) throws Exception { 
+		browser.link(automountLocation).click();
+		browser.link(automountMap).click();
+		Assert.assertTrue(browser.link(automountKey).exists(), "before delete, autoumount location (" + automountKey + ")should exist in list");
+		CommonHelper.deleteEntry(browser, automountKey);  
+		Assert.assertFalse(browser.link(automountKey).exists(), "after delete, automount key (" + automountKey + ") should NOT exist in list");
+	}
+
+	@Test (groups={"deleteAutomountKey"}, dataProvider="deleteAutomountKeyMultiple", dependsOnGroups="modifyAutomountKey",
+			description = "delete multiple automount key")
+	public void deleteAutomountKeyMultiple(String automountLocation, String automountMap,String automountKeys) throws Exception { 
+		browser.link(automountLocation).click();
+		browser.link(automountMap).click();
+		String[] keys = CommonHelper.stringToArray(automountKeys);
+		for (String key:keys)
+			Assert.assertTrue(browser.link(key).exists(), "before delete, autoumount key (" + key + ")should exist in list");
+		CommonHelper.deleteEntry(browser, keys);  
+		for (String key:keys)
+			Assert.assertFalse(browser.link(key).exists(), "after delete, automount key (" + key + ") should NOT exist in list");
+	}
+
 
 	/***************************************************************************** 
 	 *             Data providers                                                * 
@@ -615,8 +850,8 @@ public class AutomountTests extends SahiTestScript{
 	private static String[] testAutomountLocation = {"automountlocation000","automountlocation001","automountlocation002","automountlocation003","automountlocation004","automountlocation005"};
 	private static String[] testAutomountMap = {"automountmap000","automountmap001","automountmap002","automountmap003","automountmap004","automountmap005"};
 	private static String[] testIndirectindirectMap = {"indirectmap000","indirectmap001","indirectmap002","indirectmap003","indirectmap004","indirectmap005"};
-	private static String[] testAutomountKeys= {"automountkey000","automountkey001","automountkey002","automountkey003","automountkey004","automountkey005"};
-	private static String[] testMountPoint = testAutomountKeys;
+	private static String[] testAutomountKey = {"automountkey000","automountkey001","automountkey002","automountkey003","automountkey004","automountkey005"};
+	private static String[] testMountPoint = testAutomountKey;
 	private static String[] testParentMap = {existingIndirectAutomountMaps[0], existingIndirectAutomountMaps[1]," "," "," "," "};
 
 	/// test data for automount location ///	
@@ -800,5 +1035,63 @@ public class AutomountTests extends SahiTestScript{
 		String[][] indirectAutomountmaps = {{testAutomountLocation[0], all}}; 
 		return indirectAutomountmaps;
 	}
+
+	/// test data for automount key ///	
+	@DataProvider(name="addAutomountKey")
+	public Object[][] getaddAutomountKey()
+	{
+		String[][] automountkeys = {
+			{testAutomountLocation[0],testAutomountMap[1],testAutomountKey[0]},
+			{testAutomountLocation[0],testAutomountMap[1],testAutomountKey[1]}};
+		return automountkeys;
+	}
+
+	@DataProvider(name="addAutomountKey_addandaddanother")
+	public Object[][] getAddAutomountKey_addandaddanother()
+	{
+		String[][] automountkeys = {
+			{testAutomountLocation[0],testAutomountMap[1],testAutomountKey[2]+","+testAutomountKey[3]+","+testAutomountKey[4]}}; 
+		return automountkeys;
+	}
+
+	@DataProvider(name="addAutomountKey_addthenedit")
+	public Object[][] getAddAutomountKey_addthenedit()
+	{
+		String[][] automountkeys = {{testAutomountLocation[0],testAutomountMap[1],testAutomountKey[5]}}; 
+		return automountkeys;
+	}
+
+	@DataProvider(name="addAutomountKey_addthencancel")
+	public Object[][] getAddAutomountKey_addthencancel()
+	{
+		String[][] automountkeys = {{testAutomountLocation[0],testAutomountMap[1]}}; 
+		return automountkeys;
+	}
+
+	@DataProvider(name="addAutomountKey_negative")
+	public Object[][] getAddAutomountKey_negative()
+	{
+		return getAddAutomountKey_addthenedit();
+	}
+
+	@DataProvider(name="modifyAutomountKey")
+	public Object[][] getAddAutomountKey_reset()
+	{
+		return getAddAutomountKey_addthenedit();
+	}
+
+
+	@DataProvider(name="deleteAutomountKeySingle")
+	public Object[][] getDeleteAutomountKeySingle()
+	{
+		return getaddAutomountKey();
+	}
+
+	@DataProvider(name="deleteAutomountKeyMultiple")
+	public Object[][] getDeleteAutomountKeyMultiple()
+	{
+		return getAddAutomountKey_addandaddanother();
+	}
+
 
 }//class AutomountTests
