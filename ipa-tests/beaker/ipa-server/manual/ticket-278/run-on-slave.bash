@@ -6,9 +6,8 @@
 . /dev/shm/env.sh
 . /dev/shm/ipa-server-shared.sh
 
-INFFILE=/dev/shm/ticket-278.inf
-LDIFIN=./10.entries.example.dc.com.ldif
-LDIFOUT=/dev/shm/import-278.ldif
+hostnames=$(hostname -s)
+REPLICAFILE="/dev/shm/replica-info-$hostnames.$DOMAIN.gpg"
 NEWPORT=29719
 
 if [ ! -f /dev/shm/env.sh ]; then
@@ -23,4 +22,15 @@ if [ $? -ne 0 ]; then
 	echo "ERROR - this script needs to be run on the beaker slave, sorry."
 	exit
 fi
+
+if [ ! -f $REPLICAFILE ]; then
+        echo "ERROR - file $REPLICAFILE does not exist, unable to continue"
+        exit
+fi
+
+/usr/sbin/ipa-server-install --uninstall -U
+if [ $? -ne 0 ]; then echo "ERROR - Unable to uninstall server.";exit; fi
+
+ipa-replica-install --password=$ROOTDNPWD -w $ADMINPW $REPLICAFILE
+if [ $? -ne 0 ]; then echo "ERROR - Replication setup did not complete.";exit; fi
 

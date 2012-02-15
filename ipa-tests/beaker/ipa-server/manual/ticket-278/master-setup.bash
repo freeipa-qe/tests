@@ -10,9 +10,11 @@ INFFILE=/dev/shm/ticket-278.inf
 LDIFIN=./10.entries.example.dc.com.ldif
 LDIFOUT=/dev/shm/import-278.ldif
 NEWPORT=29719
+# number of users to add to server for replication
+maxusers=100
 
 if [ ! -f /dev/shm/env.sh ]; then
-	echo 'Sorry, this script needs to be run on a IPA provisioned master from beaker'
+	echo 'ERROR - Sorry, this script needs to be run on a IPA provisioned master from beaker'
 	exit
 fi
 
@@ -20,7 +22,12 @@ hostnames=$(hostname -s)
 echo "Hostname is: " 
 echo $BEAKERMASTER | grep $hostnames
 if [ $? -ne 0 ]; then
-	echo "this script needs to be run on the beaker master, sorry."
+	echo "ERROR - this script needs to be run on the beaker master, sorry."
+	exit
+fi
+
+if [ "$SLAVE" == "" ]; then
+	echo "ERROR - This test needs to be run on a master that has one slave replicated to it"
 	exit
 fi
 
@@ -76,7 +83,7 @@ cat $LDIFIN > $LDIFOUT
 
 # Add more users to the ldif file
 x=11;
-while [ $x -lt 100 ]; do
+while [ $x -lt $maxusers ]; do
 	echo "" >> $LDIFOUT
 	echo "dn: uid=guest$x,ou=people,dc=example,dc=com
 userCertificate;binary:: MIICgzCCAeygAwIBAgICA/YwDQYJKoZIhvcNAQEFBQAwKzELMAkG
@@ -149,6 +156,11 @@ chmod 777 /var/run/dirsrv
 KinitAsAdmin
 
 echo $ROOTDNPWD | ipa config-mod --enable-migration=TRUE
+if [ $? -ne 0 ]; then echo "ERROR - enable migration did not seem to work"; fi
 
 echo $ROOTDNPWD | ipa -d migrate-ds --user-container=ou=people ldap://$hostnames:$NEWPORT
+if [ $? -ne 0 ]; then echo "ERROR - Migration step failed."; fi
+
+ipa-replica-manage del $SLAVE
+if [ $? -ne 0 ]; then echo "ERROR - Unable to remove $SLAVE from replicated server list."; fi
 
