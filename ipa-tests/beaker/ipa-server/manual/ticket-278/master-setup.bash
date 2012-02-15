@@ -1,5 +1,10 @@
 #!/bin/bash
+# This script was written to test ticket:
+# https://engineering.redhat.com/trac/ipa-tests/ticket/278, aka:
+# https://bugzilla.redhat.com/show_bug.cgi?id=783606
+# Run the master-setup.bash script on the master, then run the replica-install.bash script on the replica 
 . /dev/shm/env.sh
+. /dev/shm/ipa-server-shared.sh
 
 INFFILE=/dev/shm/ticket-278.inf
 LDIFIN=./10.entries.example.dc.com.ldif
@@ -22,8 +27,8 @@ fi
 echo "[General]
 FullMachineName = $BEAKERMASTER
 ServerRoot = /usr/lib64/dirsrv
-SuiteSpotGroup = nobody
-SuiteSpotUserID = nobody
+SuiteSpotGroup = root
+SuiteSpotUserID = root
 [slapd]
 AddOrgEntries = Yes
 AddSampleEntries = Yes
@@ -53,8 +58,7 @@ schema_dir = /etc/dirsrv/slapd-$hostnames/schema
 sysconfdir = /etc
 tmp_dir = /tmp" > $INFFILE
 
-#/usr/sbin/setup-ds.pl --file=$INFFILE --silent
-ls
+/usr/sbin/setup-ds.pl --file=$INFFILE --silent
 if [ $? -ne 0 ]; then
 	echo "/usr/sbin/setup-ds.pl --file=$INFFILE --silent did not return 0, exiting"
 	exit
@@ -130,4 +134,19 @@ if [ $? -ne 0 ]; then
 	echo "ERROR - ldapadd did not work."
 	echo "ran /usr/bin/ldapadd -x -h $hostnames -p $NEWPORT -D \"$ROOTDN\" -w $ROOTDNPWD -f $LDIFOUT"
 fi
+
+echo "kinit as admin"
+KinitAsAdmin
+
+ipa-nis-manage disable
+
+ipa-compat-manage disable
+
+chmod 777 /var/run/dirsrv
+
+/sbin/service dirsrv restart
+
+ipa config-mod --enable-migration=TRUE
+
+echo $ROOTDNPW | ipa -d migrate-ds --user-container=ou=people ldap://$hostnames:$NEWPORT
 
