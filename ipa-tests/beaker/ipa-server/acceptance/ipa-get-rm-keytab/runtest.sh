@@ -85,3 +85,4 @@ rlJournalStart
  makereport $report
  rhts-submit-log -l $report
 rlJournalEnd
+
