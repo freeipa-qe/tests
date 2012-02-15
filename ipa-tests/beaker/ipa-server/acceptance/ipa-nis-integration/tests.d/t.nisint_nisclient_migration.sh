@@ -65,7 +65,9 @@ nisint_nisclient_migration_envsetup()
 		rlLog "Machine in recipe is NISCLIENT"
 		rhts-sync-block -s "$FUNCTION.0" $MASTER
 		HOSTNAME_S=$(hostname -s)
-		MASTER_S=3(echo $MASTER|cut -f1 -d.)
+		MASTER_S=$(echo $MASTER|cut -f1 -d. )
+		MASTER=$MASTER_S.$DOMAIN
+
 		rlRun "yum -y install *ipa-admintools *ipa-client"
 
 		rlRun "sed -i s/^$NISCLIENT_IP.*$HOSTNAME_S.*$// /etc/hosts"
@@ -87,6 +89,7 @@ nisint_nisclient_migration_envsetup()
 		rlRun "mv -f /etc/krb5.conf /etc/krb5.conf.nismig"
 		rlRun "mv -f /etc/krb5.keytab /etc/krb5.keytab.nismig"
 		rlRun "service ntpd stop"
+
 		rhts-sync-set -s "$FUNCTION.1" -m $NISCLIENT
 		;;
 	*)
