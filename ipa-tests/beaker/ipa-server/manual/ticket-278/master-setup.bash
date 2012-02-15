@@ -2,7 +2,7 @@
 # This script was written to test ticket:
 # https://engineering.redhat.com/trac/ipa-tests/ticket/278, aka:
 # https://bugzilla.redhat.com/show_bug.cgi?id=783606
-# Run the master-setup.bash script on the master, then run the replica-install.bash script on the replica 
+# Run the master-setup.bash script on the master, then run the run-on-slave.bash script on the replica 
 . /dev/shm/env.sh
 . /dev/shm/ipa-server-shared.sh
 
@@ -138,9 +138,9 @@ fi
 echo "kinit as admin"
 KinitAsAdmin
 
-echo $ROOTDNPW | ipa-nis-manage disable
+echo $ROOTDNPWD | ipa-nis-manage disable
 
-echo $ROOTDNPW | ipa-compat-manage disable
+echo $ROOTDNPWD | ipa-compat-manage disable
 
 chmod 777 /var/run/dirsrv
 
@@ -148,7 +148,7 @@ chmod 777 /var/run/dirsrv
 
 KinitAsAdmin
 
-echo $ROOTDNPW | ipa config-mod --enable-migration=TRUE
+echo $ROOTDNPWD | ipa config-mod --enable-migration=TRUE
 
-echo $ROOTDNPW | ipa -d migrate-ds --user-container=ou=people ldap://$hostnames:$NEWPORT
+echo $ROOTDNPWD | ipa -d migrate-ds --user-container=ou=people ldap://$hostnames:$NEWPORT
 
