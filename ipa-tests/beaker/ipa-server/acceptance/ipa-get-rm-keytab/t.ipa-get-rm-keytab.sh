@@ -299,21 +299,22 @@ rlPhaseStartTest "getkeytab_005: Testing the \"-e\" (encryption types) command o
 	rlRun "cat $TmpDir/keytab.out"
         rlAssertNotExists "$TMP_KEYTAB"
 
+	# des is no longer supported or available
 	# Testing for -e=des-cbc-md5 (unsupported)
-        if [ -f "$TMP_KEYTAB" ]; then
-                rlRun "rm -f $TMP_KEYTAB"
-        fi
-        rlRun "ipa-getkeytab -s $MASTER -p $user1 -k $TMP_KEYTAB -e des-cbc-md5 > $TmpDir/keytab.out 2>&1"
-        rlRun "klist -ekt $TMP_KEYTAB > $TmpDir/keytab.out"
-        rlAssertNotGrep "(aes256-cts-hmac-sha1-96)" "$TmpDir/keytab.out"
-        rlAssertNotGrep "(aes128-cts-hmac-sha1-96)" "$TmpDir/keytab.out"
-        rlAssertNotGrep "(des3-cbc-sha1)" "$TmpDir/keytab.out"
-        rlAssertNotGrep "(arcfour-hmac)" "$TmpDir/keytab.out"
-	rlAssertGrep "(des-cbc-md5)" "$TmpDir/keytab.out"
-        rlRun "cat $TmpDir/keytab.out"
-	rlRun "kinit -k -t $TMP_KEYTAB $user1" 1 "Key table entry not found while getting initial credentials"
-	rlRun "kdestroy"
-	rlRun "kinitAs $ADMINID $ADMINPW"
+        #if [ -f "$TMP_KEYTAB" ]; then
+        #        rlRun "rm -f $TMP_KEYTAB"
+        #fi
+        #rlRun "ipa-getkeytab -s $MASTER -p $user1 -k $TMP_KEYTAB -e des-cbc-md5 > $TmpDir/keytab.out 2>&1"
+        #rlRun "klist -ekt $TMP_KEYTAB > $TmpDir/keytab.out"
+        #rlAssertNotGrep "(aes256-cts-hmac-sha1-96)" "$TmpDir/keytab.out"
+        #rlAssertNotGrep "(aes128-cts-hmac-sha1-96)" "$TmpDir/keytab.out"
+        #rlAssertNotGrep "(des3-cbc-sha1)" "$TmpDir/keytab.out"
+        #rlAssertNotGrep "(arcfour-hmac)" "$TmpDir/keytab.out"
+	#rlAssertGrep "(des-cbc-md5)" "$TmpDir/keytab.out"
+        #rlRun "cat $TmpDir/keytab.out"
+	#rlRun "kinit -k -t $TMP_KEYTAB $user1" 1 "Key table entry not found while getting initial credentials"
+	#rlRun "kdestroy"
+	#rlRun "kinitAs $ADMINID $ADMINPW"
 
 rlPhaseEnd
 }
