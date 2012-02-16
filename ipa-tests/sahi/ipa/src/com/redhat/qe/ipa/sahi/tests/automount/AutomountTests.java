@@ -57,7 +57,7 @@ public class AutomountTests extends SahiTestScript{
 	}
 
 	@Test (groups={"addAutomountLocation"}, dataProvider="addAutomountLocation_addandaddanother",
-		description = "add new automount via 'Add and Add Another' button")
+		description = "add new automount location via 'Add and Add Another' button")
 	public void addAutomount_addandaddanother(String automountLocations) throws Exception {  
 		String[] locations = CommonHelper.stringToArray(automountLocations);
 		for (String location:locations)
@@ -68,7 +68,7 @@ public class AutomountTests extends SahiTestScript{
 	}
 
 	@Test (groups={"addAutomountLocation"}, dataProvider="addAutomountLocation_addthenedit",
-		description = "add new automount via 'Add and Edit' button")
+		description = "add new automount location via 'Add and Edit' button")
 	public void addAutomount_addthenedit(String automountLocation) throws Exception {  
 		Assert.assertFalse(browser.link(automountLocation).exists(), "before add, automount location (" + automountLocation + ") should NOT exist in list");
 		browser.span("Add").click();
@@ -87,7 +87,7 @@ public class AutomountTests extends SahiTestScript{
 	}
 
 	@Test (groups={"addAutomountLocation"},  dataProvider="addAutomountLocation_addthencancel",
-		description = "add new automount via 'Add' then click 'Cancel', expect no new automount location being added")
+		description = "add new automount location via 'Add' then click 'Cancel', expect no new automount location being added")
 	public void addAutomount_addthencancel(String automountLocation) throws Exception {  
 		Assert.assertFalse(browser.link(automountLocation).exists(), "before add, automount location (" + automountLocation + ")should NOT exist in list");
 		AutomountTasks.addAutomountLocationAddThenCancel(browser,automountLocation);
@@ -107,9 +107,10 @@ public class AutomountTests extends SahiTestScript{
 				log.info("duplicate automount location: " + location +" is forbidden, good, test continue");
 				browser.button("Cancel").click();
 				browser.button("Cancel").click();
-			}
-			else
+			}else{
+				browser.button("Cancel").click();
 				Assert.assertTrue(false, "duplicate automount location is allowed : name="+location+", bad, test failed");
+			}
 		}
 	}
 
@@ -120,9 +121,13 @@ public class AutomountTests extends SahiTestScript{
 		// without enter location name, just click Add
 		browser.button("Add").click();
 		if (browser.span("Required field").exists())
+		{
 			log.info("error fields: 'Required field' appears as expected, test success"); // report success
-		else
+			browser.button("Cancel").click();
+		}else{
+			browser.button("Cancel").click();
 			Assert.assertTrue(false, "error fields 'Required field' does NOT appear as expected, test failed");
+		}
 	}
 
 	/////////// modify automount location settings/////////////////////////
@@ -134,7 +139,7 @@ public class AutomountTests extends SahiTestScript{
 
 	/////////// delete automount location /////////////////////////
 	@Test (groups={"deleteAutomountLocation"}, dataProvider="deleteAutomountLocationSingle", dependsOnGroups="deleteAutomountMap",
-			description="delete single automount location")
+		description="delete single automount location")
 	public void deleteAutomountLocationSingle(String automountLocation) throws Exception { 
 		Assert.assertTrue(browser.link(automountLocation).exists(), "before delete, autoumount location (" + automountLocation + ")should exist in list");
 		CommonHelper.deleteEntry(browser, automountLocation);  
@@ -142,7 +147,7 @@ public class AutomountTests extends SahiTestScript{
 	}
 
 	@Test (groups={"deleteAutomountLocation"}, dataProvider="deleteAutomountLocationMultiple", dependsOnGroups="deleteAutomountMap",
-			description="delete multiple automount location")
+		description="delete multiple automount location")
 	public void deleteAutomountLocationMultiple(String automountLocations) throws Exception { 
 		String[] locations = automountLocations.split(",");
 		for (String location:locations)
@@ -198,13 +203,14 @@ public class AutomountTests extends SahiTestScript{
 		}
 		else{
 			log.info("not in edit mode, test failed");
+			browser.link(automountLocation).in(browser.span("path")).click(); 
 			Assert.assertTrue(false, "after click 'Add and Edit' we are not in edit mode, test failed");
 		}
 		Assert.assertTrue(browser.link(automountMap).exists(), "after add, automount map (" + automountMap + ") should exist in list");
 	}
 
 	@Test (groups={"addAutomountMap"},  dataProvider="addAutomountMap_addthencancel",dependsOnGroups="addAutomountLocation",
-		description = "add new automount via 'Add' then click 'Cancel', expect no new automount map being added")
+		description = "add new automount map via 'Add' then click 'Cancel', expect no new automount map being added")
 	public void addAutomountMap_addthencancel(String automountLocation) throws Exception {  
 		browser.link(automountLocation).click(); 
 		String automountMap = "IwillBeCanceled";
@@ -242,9 +248,13 @@ public class AutomountTests extends SahiTestScript{
 		// without enter map name, just click Add
 		browser.button("Add").click();
 		if (browser.span("Required field").exists())
+		{
 			log.info("error fields: 'Required field' appears as expected, test success"); // report success
-		else
+			browser.button("Cancel").click();
+		}else{
+			browser.button("Cancel").click();
 			Assert.assertTrue(false, "error fields 'Required field' does NOT appear as expected, test failed"); 
+		}
 	}
 
 	/////////// modify automount map settings/////////////////////////
@@ -323,12 +333,10 @@ public class AutomountTests extends SahiTestScript{
 	}
 
 	@Test (groups={"modifyAutomountMap_negative"}, dataProvider="modifyAutomountMap_negative", dependsOnGroups="addAutomountMap",
-		description="negative test case for self service permission modification")
+		description="negative test case for self automount map modification")
 	public void modifyAutomountMap_negative(String automountLocation, String automountMapName, String description) throws Exception {
-		browser.link(automountLocation).click();
-		browser.link(automountMapName).click(); 
-		browser.link("details").click();
-		browser.link(automountLocation).in(browser.span("path")).click(); 
+		// in fact, there is no negative test case for automount map modification, since there is nothing to be modified.
+		// this method is a place holder to indicate I have been considered this senario.
 	}
 
 	/////////// delete automount map /////////////////////////
@@ -475,9 +483,13 @@ public class AutomountTests extends SahiTestScript{
 		// without enter map name, just click Add
 		browser.button("Add").click();
 		if (browser.span("Required field").exists())
+		{
 			log.info("error fields: 'Required field' appears as expected, test success"); // report success
-		else
+			browser.button("Cancel").click();
+		}else{
+			browser.button("Cancel").click();
 			Assert.assertTrue(false, "error fields 'Required field' does NOT appear as expected, test failed"); 
+		}
 	}
 
 	@Test (groups={"addIndirectAutomountMap_negative"}, dataProvider="addIndirectAutomountMapRequiredField", dependsOnGroups="addAutomountLocation",
@@ -490,9 +502,13 @@ public class AutomountTests extends SahiTestScript{
 		// without enter mount point value, just click Add
 		browser.button("Add").click();
 		if (browser.span("Required field").exists())
+		{
+			browser.button("Cancel").click();
 			log.info("error fields: 'Required field' appears as expected, test success"); // report success
-		else
+		}else{
+			browser.button("Cancel").click();
 			Assert.assertTrue(false, "error fields 'Required field' does NOT appear as expected, test failed"); 
+		}
 	}
 
 	/////////// modify indirect automount map settings/////////////////////////
@@ -573,10 +589,7 @@ public class AutomountTests extends SahiTestScript{
 	@Test (groups={"modifyIndirectAutomountMap_negative"}, dataProvider="modifyIndirectAutomountMap_negative", dependsOnGroups="addIndirectAutomountMap",
 		description="negative test case for self service permission modification")
 	public void modifyIndirectAutomountMap_negative(String automountLocation, String indirectAutomountMapName, String description) throws Exception {
-		browser.link(automountLocation).click();
-		browser.link(indirectAutomountMapName).click(); 
-		browser.link("details").click();
-		browser.link(automountLocation).in(browser.span("path")).click(); 
+		// there is no negative test case for indirected automount map
 	}
 
 	/////////// delete indirect automount map /////////////////////////
@@ -617,7 +630,7 @@ public class AutomountTests extends SahiTestScript{
 	}
 
 	@Test (groups={"addAutomountKey"}, dataProvider="addAutomountKey_addandaddanother", dependsOnGroups="modifyAutomountMap",
-		description = "add new automount via 'Add and Add Another' button")
+		description = "add new automount key via 'Add and Add Another' button")
 	public void addAutomountKey_addandaddanother(String automountLocation, String automountMap, String automountKeys) throws Exception {  
 		browser.link(automountLocation).click();
 		browser.link(automountMap).click();
@@ -631,7 +644,7 @@ public class AutomountTests extends SahiTestScript{
 	}
 
 	@Test (groups={"addAutomountKey"}, dataProvider="addAutomountKey_addthenedit", dependsOnGroups="modifyAutomountMap",
-		description = "add new automount via 'Add and Edit' button")
+		description = "add new automount key via 'Add and Edit' button")
 	public void addAutomountKey_addthenedit(String automountLocation, String automountMap, String automountKey) throws Exception {  
 		browser.link(automountLocation).click();
 		browser.link(automountMap).click();
@@ -665,7 +678,7 @@ public class AutomountTests extends SahiTestScript{
 	}
 
 	@Test (groups={"addAutomountKey"},  dataProvider="addAutomountKey_addthencancel", dependsOnGroups="modifyAutomountMap",
-		description = "add new automount via 'Add' then click 'Cancel', expect no new automount key being added")
+		description = "add new automount key via 'Add' then click 'Cancel', expect no new automount key being added")
 	public void addAutomountKey_addthencancel(String automountLocation, String automountMap) throws Exception {  
 		browser.link(automountLocation).click();
 		browser.link(automountMap).click();
@@ -699,7 +712,7 @@ public class AutomountTests extends SahiTestScript{
 	}
 
 	@Test (groups={"addAutomountKey_negative"}, dataProvider="addAutomountKey_negative", dependsOnGroups="modifyAutomountMap",
-		description = "required filed: automation location name is required")
+		description = "required filed: automation key name is required")
 	public void addAutomountKey_negative_required_field_keyname(String automountLocation, String automountMap, String automountKey) throws Exception {  
 		browser.link(automountLocation).click();
 		browser.link(automountMap).click();

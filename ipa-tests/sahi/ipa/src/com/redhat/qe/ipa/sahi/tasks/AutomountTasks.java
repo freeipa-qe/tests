@@ -51,7 +51,7 @@ public class AutomountTasks {
 		browser.button("Cancel").click();
 	}
 
-	///// task method for indirect map ///////////
+	///// task method for indirect automount map ///////////
 	public static void addIndirectAutomountMap(SahiTasks browser, String indirectAutomountMap, String mountPoint, String parentMap) {
 		browser.span("Add").click();
 		browser.radio("add_indirect").click();
@@ -90,7 +90,7 @@ public class AutomountTasks {
 		browser.button("Cancel").click();
 	}
 
-	///// task method for direct automount key ///////////
+	///// task method for automount key ///////////
 	public static void addAutomountKey(SahiTasks browser, String automountKey) {
 		browser.span("Add").click();
 		browser.textbox("automountkey").setValue(automountKey);
