@@ -40,7 +40,7 @@
 ######################################################################
 nisint_client_is_nis_bz_tests()
 {
-	echo '$FUNCNAME'
+	echo "$FUNCNAME"
 }
 
 example_bz_788625()

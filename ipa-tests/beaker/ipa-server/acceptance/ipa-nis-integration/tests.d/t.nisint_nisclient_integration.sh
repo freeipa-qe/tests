@@ -112,7 +112,10 @@ nisint_nisclient_integration_change_to_ipa_nismaster()
 
 		rlRun "cp /etc/sysconfig/network /etc/sysconfig/network.orig.$NISDOMAIN"
 		rlRun "sed -i 's/$NISDOMAIN/$DOMAIN/g' /etc/sysconfig/network"
+
+		rlRun "cp /etc/resolv.conf /etc/resolv.conf.orig.$NISDOMAIN"
         rlRun "sed -i s/^nameserver/#nameserver/g /etc/resolv.conf"
+        rlRun "echo 'nameserver $MASTER_IP' >> /etc/resolv.conf"
 
 		rlRun "cp /etc/hosts /etc/hosts.orig.$NISDOMAIN"
 		rlRun "sed -i s/^$NISCLIENT_IP.*$HOSTNAME_S.*$// /etc/hosts"
@@ -120,10 +123,9 @@ nisint_nisclient_integration_change_to_ipa_nismaster()
 
 		rlRun "grep -v 'HOSTNAME=$HOSTNAME_S' /etc/sysconfig/network > /etc/sysconfig/network.$FUNCNAME"
 		rlRun "echo 'HOSTNAME=$HOSTNAME_S.$DOMAIN' >> /etc/sysconfig/network.$FUNCNAME"
-		rlRun "mv /etc/sysconfig/network.$FUNCNAME /etc/sysconfig/network"
+		rlRun "mv -f /etc/sysconfig/network.$FUNCNAME /etc/sysconfig/network"
 		rlRun "hostname $HOSTNAME_S.$DOMAIN"
 
-        rlRun "echo 'nameserver $MASTER_IP' >> /etc/resolv.conf"
 		rlRun "nisdomainname $DOMAIN"
 		rlRun "service rpcbind restart"
 		rlRun "service ypbind restart"
@@ -147,6 +149,7 @@ nisint_nisclient_integration_setup_kerberos_for_auth()
 		rlRun "sed -i \"s/EXAMPLE.COM/$RELM/g\" /etc/krb5.conf"
 		rlRun "sed -i \"s/example.com/$DOMAIN/g\" /etc/krb5.conf"
 		rlRun "authconfig --enablekrb5 --update"
+		rlRun "KinitAsAdmin"
 	rlPhaseEnd
 }
 

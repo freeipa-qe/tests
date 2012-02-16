@@ -155,7 +155,7 @@ nisint_ipamaster_integration_add_nis_data_hosts()
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 
-		rlRun "ypcat -d $NISDOMAIN -h $NISMASTER hosts |sort -u|grep -v localhost > /dev/shm/nis-map.hosts 2>&1"
+		rlRun "ypcat -d $NISDOMAIN -h $NISMASTER hosts |sort -u|egrep -v 'localhost|$MASTER|$NISMASTER|$NISCLIENT'  > /dev/shm/nis-map.hosts 2>&1"
 		ORIGIFS="$IFS"
 		IFS="
 "
