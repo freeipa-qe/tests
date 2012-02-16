@@ -363,10 +363,10 @@ rlPhaseStartTest "service_add_host_008: ipa service-add-host : check help"
         rlRun "ipa help service-add-host > $TmpDir/service_add_host_008.out 2>&1"
         rlAssertGrep "Purpose: Add hosts that can manage this service." "$TmpDir/service_add_host_008.out"
         rlAssertGrep "Usage: ipa \[global-options\] service-add-host PRINCIPAL" "$TmpDir/service_add_host_008.out"
-        rlAssertGrep "\-h, \--help    show this help message and exit" "$TmpDir/service_add_host_008.out"
-        rlAssertGrep "\--all         Retrieve and print all attributes from the server." "$TmpDir/service_add_host_008.out"
-        rlAssertGrep "\--raw         Print entries as stored on the server." "$TmpDir/service_add_host_008.out"
-        rlAssertGrep "\--hosts=LIST  comma-separated list of hosts to add" "$TmpDir/service_add_host_008.out"
+        rlAssertGrep "\-h, \--help  show this help message and exit" "$TmpDir/service_add_host_008.out"
+        rlAssertGrep "\--all        Retrieve and print all attributes from the server." "$TmpDir/service_add_host_008.out"
+        rlAssertGrep "\--raw        Print entries as stored on the server." "$TmpDir/service_add_host_008.out"
+        rlAssertGrep "\--hosts=STR  comma-separated list of hosts to add" "$TmpDir/service_add_host_008.out"
         rlRun "cat $TmpDir/service_add_host_008.out"
 rlPhaseEnd
 }
@@ -469,17 +469,19 @@ rlPhaseStartTest "service_find_001: ipa service-find help"
         rlRun "ipa help service-find > $TmpDir/service_find_001.out 2>&1"
         rlAssertGrep "Purpose: Search for IPA services." "$TmpDir/service_find_001.out"
         rlAssertGrep "Usage: ipa \[global-options\] service-find \[CRITERIA\]" "$TmpDir/service_find_001.out"
-        rlAssertGrep "\-h, \--help            show this help message and exit" "$TmpDir/service_find_001.out"
-        rlAssertGrep "\--principal=STR       Service principal" "$TmpDir/service_find_001.out"
+        rlAssertGrep "\-h, \--help          show this help message and exit" "$TmpDir/service_find_001.out"
+        rlAssertGrep "\--principal=STR      Service principal" "$TmpDir/service_find_001.out"
         rlAssertNotGrep "\--certificate=BYTES  Base-64 encoded server certificate" "$TmpDir/service_find_001.out"
 	rlLog "\--certificate option is removed, ref https://bugzilla.redhat.com/show_bug.cgi?id=674736"
-        rlAssertGrep "\--timelimit=INT       Time limit of search in seconds" "$TmpDir/service_find_001.out"
-        rlAssertGrep "\--sizelimit=INT       Maximum number of entries returned" "$TmpDir/service_find_001.out"
-        rlAssertGrep "\--all                 Retrieve and print all attributes from the server." "$TmpDir/service_find_001.out"
-        rlAssertGrep "\--raw                 Print entries as stored on the server." "$TmpDir/service_find_001.out"
-        rlAssertGrep "\--man-by-hosts=LIST   Search for services with these managed by hosts." "$TmpDir/service_find_001.out"
-        rlAssertGrep "\--not-man-by-hosts=LIST" "$TmpDir/service_find_001.out"
+        rlAssertGrep "\--timelimit=INT      Time limit of search in seconds" "$TmpDir/service_find_001.out"
+        rlAssertGrep "\--sizelimit=INT      Maximum number of entries returned" "$TmpDir/service_find_001.out"
+        rlAssertGrep "\--all                Retrieve and print all attributes from the server." "$TmpDir/service_find_001.out"
+        rlAssertGrep "\--raw                Print entries as stored on the server." "$TmpDir/service_find_001.out"
+        rlAssertGrep "\--man-by-hosts=STR   Search for services with these managed by hosts." "$TmpDir/service_find_001.out"
+        rlAssertGrep "\--not-man-by-hosts=STR" "$TmpDir/service_find_001.out"
 	rlAssertGrep "Search for services without these managed by hosts." "$TmpDir/service_find_001.out"
+
+	rlRun "cat $TmpDir/service_find_001.out"
 rlPhaseEnd
 }
 
@@ -715,7 +717,8 @@ rlPhaseStartTest "service_mod_006: ipa service-mod: modifying the service with -
 	rlRun "ipa service-mod --addattr=managedBy=\"$hostmanagedn\" $SERVICE/$HOSTNAME@$RELM"
 
 	rlRun "ipa service-show --all $SERVICE/$HOSTNAME@$RELM > $TmpDir/service_mod_006.out 2>&1"
-        rlAssertGrep "managedby_host: $HOSTNAME, $TESTHOST" "$TmpDir/service_mod_006.out"
+        #rlAssertGrep "managedby_host: $HOSTNAME, $TESTHOST" "$TmpDir/service_mod_006.out"
+        rlAssertGrep "Managed by: $HOSTNAME, $TESTHOST" "$TmpDir/service_mod_006.out"
 rlPhaseEnd
 }
 
@@ -725,7 +728,8 @@ rlPhaseStartTest "service_mod_007: ipa service-mod: modifying the service with -
 	rlRun "ipa service-mod --setattr=managedBy=\"$selfmanagedn\" $SERVICE/$HOSTNAME@$RELM"
 
 	rlRun "ipa service-show --all $SERVICE/$HOSTNAME@$RELM > $TmpDir/service_mod_007.out 2>&1"
-	rlAssertGrep "managedby_host: $HOSTNAME" "$TmpDir/service_mod_007.out"
+	#rlAssertGrep "managedby_host: $HOSTNAME" "$TmpDir/service_mod_007.out"
+	rlAssertGrep "Managed by: $HOSTNAME" "$TmpDir/service_mod_007.out"
 
         rlRun "ipa service-del $SERVICE/$HOSTNAME@$RELM"
 	ipa host-del $TESTHOST
@@ -738,10 +742,12 @@ rlPhaseStartTest "service_remove_host_001: ipa service-remove-host: check help"
         rlRun "ipa help service-remove-host > $TmpDir/service_remove_host_001.out 2>&1"
         rlAssertGrep "Purpose: Remove hosts that can manage this service." "$TmpDir/service_remove_host_001.out"
         rlAssertGrep "Usage: ipa \[global-options\] service-remove-host PRINCIPAL" "$TmpDir/service_remove_host_001.out"
-        rlAssertGrep "\-h, \--help    show this help message and exit" "$TmpDir/service_remove_host_001.out"
-        rlAssertGrep "\--all         Retrieve and print all attributes from the server." "$TmpDir/service_remove_host_001.out"
-        rlAssertGrep "\--raw         Print entries as stored on the server." "$TmpDir/service_remove_host_001.out"
-        rlAssertGrep "\--hosts=LIST  comma-separated list of hosts to remove" "$TmpDir/service_remove_host_001.out"
+        rlAssertGrep "\-h, \--help  show this help message and exit" "$TmpDir/service_remove_host_001.out"
+        rlAssertGrep "\--all        Retrieve and print all attributes from the server." "$TmpDir/service_remove_host_001.out"
+        rlAssertGrep "\--raw        Print entries as stored on the server." "$TmpDir/service_remove_host_001.out"
+        rlAssertGrep "\--hosts=STR  comma-separated list of hosts to remove" "$TmpDir/service_remove_host_001.out"
+
+	rlRun "cat $TmpDir/service_remove_host_001.out"
 rlPhaseEnd
 }
 
@@ -828,8 +834,10 @@ rlPhaseStartTest "service_show_002: ipa service-show with --all option"
         rlAssertGrep "Principal: http/$MASTER@$RELM" "$TmpDir/service_show_002.out" -i 
         rlAssertGrep "Keytab: True" "$TmpDir/service_show_002.out"
         rlAssertGrep "objectclass: ipaobject, top, ipaservice, pkiuser, krbprincipal, krbprincipalaux, krbTicketPolicyAux" "$TmpDir/service_show_002.out"
-        rlAssertGrep "valid_not_after:" "$TmpDir/service_show_002.out"
-        rlAssertGrep "valid_not_before:" "$TmpDir/service_show_002.out"
+        #rlAssertGrep "valid_not_after:" "$TmpDir/service_show_002.out"
+        #rlAssertGrep "valid_not_before:" "$TmpDir/service_show_002.out"
+        rlAssertGrep "Not Before:" "$TmpDir/service_show_002.out"
+        rlAssertGrep "Not After:" "$TmpDir/service_show_002.out"
         rlAssertGrep "Certificate:" "$TmpDir/service_show_002.out"
         rlRun "cat $TmpDir/service_show_002.out"
 rlPhaseEnd
