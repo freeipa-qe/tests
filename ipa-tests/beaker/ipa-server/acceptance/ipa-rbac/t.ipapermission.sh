@@ -484,6 +484,13 @@ ipapermission_add_invalidmemberof()
      rlAssertGrep "$expmsg" "/tmp/ipapermission_invalidmemberof3.log"
    rlPhaseEnd
 
+   rlPhaseStartTest "ipa-permission-cli-1026: add permission using blank memberof group (bug 783543)"
+     command="addPermission $permissionName $permissionRights $permissionLocalTarget $permissionLocalAttr --memberof="
+     expmsg="ipa: error: Better error message than an internal error has occurred " 
+     rlRun "$command > /tmp/ipapermission_invalidmemberof3.log 2>&1" 1 "Verify error message for $permissionMemberOf"
+     rlAssertGrep "$expmsg" "/tmp/ipapermission_invalidmemberof3.log"
+   rlPhaseEnd
+
 }
 
 
