@@ -480,6 +480,7 @@ uninstall()
 
 
 	rlRun "ipa-replica-manage list"
+	rlRun "remoteExec root $MASTERIP redhat \"echo $ADMINPW | kinit admin; klist\""
 	rlRun "remoteExec root $MASTERIP redhat \"ipa-replica-manage del $SLAVE\""
 
 	sleep 10
