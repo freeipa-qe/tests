@@ -856,7 +856,7 @@ rlPhaseStartTest "sudorule-add-allow-command_003: ipa help sudorule-add-allow-co
 	rlRun "ipa help sudorule-add-allow-command > $TmpDir/sudorule-add-allow-command_003.txt 2>&1"
 	rlAssertGrep "Purpose: Add commands and sudo command groups affected by Sudo Rule." "$TmpDir/sudorule-add-allow-command_003.txt"
 	rlAssertGrep "Usage: ipa \[global-options\] sudorule-add-allow-command SUDORULE-NAME \[options\]" "$TmpDir/sudorule-add-allow-command_003.txt"
-	rlAssertGrep "\-h, \--help          show this help message and exit" "$TmpDir/sudorule-add-allow-command_003.txt"
+	rlAssertGrep "\-h, \--help           show this help message and exit" "$TmpDir/sudorule-add-allow-command_003.txt"
 	rlAssertGrep "\--all                Retrieve and print all attributes from the server." "$TmpDir/sudorule-add-allow-command_003.txt"
 	rlAssertGrep "\--raw                Print entries as stored on the server." "$TmpDir/sudorule-add-allow-command_003.txt"
 	rlAssertGrep "\--sudocmds=STR       comma-separated list of sudo commands to add" "$TmpDir/sudorule-add-allow-command_003.txt"

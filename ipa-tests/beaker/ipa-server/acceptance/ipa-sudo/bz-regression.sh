@@ -161,3 +161,49 @@ rlPhaseStartTest "bug782976: SUDO: --users and --groups should detect values suc
 
 rlPhaseEnd
 }
+
+
+bug783286() {
+
+rlPhaseStartTest "bug783286: Setting HBAC/SUDO category to Anyone doesn't remove users/groups"
+
+        rlLog "verifies https://bugzilla.redhat.com/show_bug.cgi?id=783286"
+
+        rlRun "touch $TmpDir/bug783286.txt"
+	rlRun "echo Secret123 | ipa user-add shanks --first=shanks --last=r"
+	rlRun "ipa group-add group1 --desc=group1"
+	rlRun "ipa sudocmd-add /bin/ls"
+	rlRun "ipa sudorule-add-host bug783286 --hosts=$HOSTNAME"
+
+        rlRun "ipa sudorule-add bug783286"
+        rlAssertGrep "User category: all" "$TmpDir/bug783286.txt"
+        rlRun "cat $TmpDir/bug783286.txt"
+
+        rlRun "ipa sudorule-add-user bug783286 --users=shanks > $TmpDir/bug783286.txt 2>&1"
+        rlAssertGrep "ipa: ERROR: users cannot be added when user category='all'" "$TmpDir/bug783286.txt"
+        rlRun "cat $TmpDir/bug783286.txt"
+
+        rlRun "ipa group-add group1 --desc=group1"
+        rlRun "ipa sudorule-add-user bug783286 --groups=group1 > $TmpDir/bug783286.txt 2>&1"
+        rlAssertGrep "ipa: ERROR: users cannot be added when user category='all'" "$TmpDir/bug783286.txt"
+        rlRun "cat $TmpDir/bug783286.txt"
+
+        rlRun "ipa sudorule-del bug783286"
+
+        rlRun "ipa sudorule-add bug783286"
+        rlRun "ipa sudorule-add-user bug783286 --users=user1"
+        rlRun "ipa sudorule-mod bug783286 --usercat=all > $TmpDir/bug783286.txt 2>&1"
+        rlAssertGrep "ipa: ERROR: user category cannot be set to 'all' while there are users" "$TmpDir/bug783286.txt"
+
+        rlRun "ipa sudorule-del bug783286"
+
+        rlRun "ipa sudorule-add bug783286"
+        rlRun "ipa sudorule-add-user bug783286 --groups=group1"
+        rlRun "ipa sudorule-mod bug783286 --usercat=all > $TmpDir/bug783286.txt 2>&1"
+        rlAssertGrep "ipa: ERROR: user category cannot be set to 'all' while there are users" "$TmpDir/bug783286.txt"
+
+        # clean up
+        rlRun "ipa group-del group1"
+        rlRun "ipa sudorule-del bug783286"
+
+}
