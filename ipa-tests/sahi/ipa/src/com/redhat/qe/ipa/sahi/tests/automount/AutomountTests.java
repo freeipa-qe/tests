@@ -636,6 +636,7 @@ public class AutomountTests extends SahiTestScript{
 		browser.link(automountLocation).click();
 		browser.link(automountMap).click();
 		Assert.assertFalse(browser.link(automountKey).exists(), "before add, automount key (" + automountKey + ") should NOT exist in list");
+		browser.span("Add").click();
 		browser.textbox("automountkey").setValue(automountKey); 
 		browser.textbox("automountinformation").setValue(automountKey + " : auto information");
 		browser.button("Add and Edit").click();
@@ -645,14 +646,13 @@ public class AutomountTests extends SahiTestScript{
 			browser.textbox("automountinformation").setValue(verifyString);
 			if (browser.span("undo").exists())
 			{
-				log.info("in edit mode, test success, now go back to automount ");
-				browser.link("automount keys").in(browser.span("back-link")).click(); 
-				//browser.link(automountKey).in(browser.span("path")).click(); 
-				browser.link("Automount Locations").in(browser.span("back-link")).click(); 
+				log.info("in edit mode, test success, now go back to automount "); 
+				browser.span("undo").click();
+				browser.link(automountMap).in(browser.span("path")).click(); 
 			}else{
 				log.info("somehow, we are not in edit mode, test failed");
-				//browser.link(automountKey).in(browser.span("path")).click(); 
-				browser.link("Automount Locations").in(browser.span("back-link")).click(); 
+				browser.span("undo").click();
+				browser.link(automountMap).in(browser.span("path")).click(); 
 				Assert.assertTrue(false, "expect in edit page, but not, test failed");
 			}
 		}
@@ -709,8 +709,11 @@ public class AutomountTests extends SahiTestScript{
 		if (browser.span("Required field").exists())
 		{
 			log.info("error fields: 'Required field' appears as expected, test success"); // report success
+			browser.button("Cancel").click();
 			browser.link("Automount Locations").in(browser.span("back-link")).click(); 
 		}else{
+			browser.link("Automount Locations").in(browser.span("back-link")).click(); 
+			browser.button("Cancel").click();
 			browser.link("Automount Locations").in(browser.span("back-link")).click(); 
 			Assert.assertTrue(false, "error fields 'Required field' does NOT appear as expected, test failed");
 		}
@@ -727,8 +730,10 @@ public class AutomountTests extends SahiTestScript{
 		browser.button("Add").click();
 		if (browser.span("Required field").exists()){
 			log.info("error fields: 'Required field' appears as expected, test success"); // report success
+			browser.button("Cancel").click();
 			browser.link("Automount Locations").in(browser.span("back-link")).click(); 
 		}else{
+			browser.button("Cancel").click();
 			browser.link("Automount Locations").in(browser.span("back-link")).click(); 
 			Assert.assertTrue(false, "error fields 'Required field' does NOT appear as expected, test failed");
 		}
