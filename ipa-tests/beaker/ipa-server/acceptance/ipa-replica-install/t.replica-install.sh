@@ -297,6 +297,8 @@ userpw="Secret123"
         sleep 5
         rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
         rlRun "create_ipauser $user3 $user3 $user3 $userpw"
+	
+	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
 
 	rlRun "ipa user-show $user1"
 	rlRun "ipa user-show $user2"
@@ -334,6 +336,7 @@ installSlave_nf()
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
                 rlAssertNotGrep "forwarders" "/etc/named.conf"
                 rlAssertNotGrep "$DNSFORWARD" "/etc/named.conf"
+		rlRun "cat /etc/named.conf"
 
                 rlRun "appendEnv" 0 "Append the machine information to the env.sh with the information for the machines in the recipe set"
         fi
@@ -394,14 +397,14 @@ installSlave_nhostdns()
 		rlRun "> /etc/resolv.conf"
 
 		rlRun "remoteExec root $MASTERIP redhat \"service named restart\""
-		rlRun "dig $SLAVE"
+		rlRun "dig $SLAVE" 9
 
 		rlRun "cat /etc/hosts"
 
 
-                echo "ipa-replica-install -U --setup-dns --no-forwarders --no-host-dns -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg" > /dev/shm/replica-install.bash
+                echo "ipa-replica-install -U --setup-dns --no-forwarders --no-host-dns --skip-conncheck -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg" > /dev/shm/replica-install.bash
                 chmod 755 /dev/shm/replica-install.bash
-                rlLog "EXECUTING: ipa-replica-install -U --setup-dns --no-forwarders --no-host-dns -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg"
+                rlLog "EXECUTING: ipa-replica-install -U --setup-dns --no-forwarders --no-host-dns --skip-conncheck -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg"
                 rlRun "/bin/bash /dev/shm/replica-install.bash" 0 "Replica installation"
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
                 rlAssertNotGrep "forwarders" "/etc/named.conf"
@@ -411,6 +414,8 @@ installSlave_nhostdns()
 
 
 		rlRun "mv -f /etc/resolv.conf_backup /etc/resolv.conf" 0 "Restoring /etc/resolv.conf"
+		rlRun "remoteExec root $MASTERIP redhat \"service named restart\""
+		rlRun "service named restart"
 
                 rlRun "appendEnv" 0 "Append the machine information to the env.sh with the information for the machines in the recipe set"
         fi
