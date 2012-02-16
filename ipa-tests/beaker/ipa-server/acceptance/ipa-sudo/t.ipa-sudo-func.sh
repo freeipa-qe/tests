@@ -801,14 +801,18 @@ sudorule-add-runasuser_func005() {
 rlPhaseStartTest "Bug 719009: sudorule-add-runasuser does not match valid users when --users=ALL. "
 
 	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+
 	rlRun "ipa sudorule-add-runasuser sudorule1 --users=ALL"
+	verifyErrorMsg "ipa sudorule-add-runasuser sudorule1 --users=ALL" "ipa: ERROR: invalid 'runas-user': RunAsUser does not accept 'ALL' as a user name"
 
-        rlRun "sudorun_withusr user1"
-        rlAssertGrep "sudo: ldap sudoRunAsUser 'all' ... MATCH" "$sudoout"
-        rlAssertNotGrep "is not allowed to execute" "$sudoout"
+# The following comments are result of https://bugzilla.redhat.com/show_bug.cgi?id=782976
+#        rlRun "sudorun_withusr user1"
+#        rlAssertGrep "sudo: ldap sudoRunAsUser 'all' ... MATCH" "$sudoout"
+#        rlAssertNotGrep "is not allowed to execute" "$sudoout"
 
-        rlRun "rm -fr $sudoout"
-	rlRun "cat $sudoout"
+#        rlRun "rm -fr $sudoout"
+#	 rlRun "cat $sudoout"
+
         rlRun "ipa sudorule-remove-runasuser sudorule1 --users=ALL"
 
 rlPhaseEnd
@@ -837,45 +841,49 @@ sudorule-add-runasgroup_func001() {
 
 rlPhaseStartTest "sudorule-add-runasgroup_func001: Adding RunAs group and verifying from sudo client."
 
+# The following comments are result of https://bugzilla.redhat.com/show_bug.cgi?id=782976
+
 	rlLog "Bug 719009: sudorule-add-runasuser does not match valid users when --users=ALL."
         rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-        rlRun "ipa sudorule-add-runasgroup sudorule1 --groups=ALL"
+#        rlRun "ipa sudorule-add-runasgroup sudorule1 --groups=ALL"
 
-sudorun_withgrp() {
-cat > $TmpDir/sudo_list.exp << EOF
-#!/usr/bin/expect -f
+        verifyErrorMsg "ipa sudorule-add-runasgroup sudorule1 --groups=ALL" "ipa: ERROR: invalid 'runas-group': RunAsGroup does not accept 'ALL' as a group name"
 
-set timeout 30
-set send_slow {1 .1}
-match_max 100000
-
-spawn ssh -o StrictHostKeyChecking=no -l $1 $MASTER
-expect "*: "
-send -s "$userpw\r"
-expect "*$ "
-send -s "sudo -l \r"
-expect "$1: "
-send -s "$userpw\r"
-expect "*$ "
-send -s "sudo -u root -g $1 /bin/date > $sudoout 2>&1 \r"
-expect "$1: "
-send -s "$userpw\r"
-expect eof
-EOF
-
-chmod 755 $TmpDir/sudo_list.exp
-cat $TmpDir/sudo_list.exp
-$TmpDir/sudo_list.exp
-cat $sudoout
-}
-
-	rlRun "sudorun_withgrp user1"
-        rlAssertGrep "sudo: ldap sudoRunAsGroup 'all' ... MATCH" "$sudoout"
-	rlAssertNotGrep "is not allowed to execute" "$sudoout"
-
-        rlRun "rm -fr $sudoout"
-	rlRun "cat $sudoout"
-        rlRun "ipa sudorule-remove-runasgroup sudorule1 --groups=ALL"
+#sudorun_withgrp() {
+#cat > $TmpDir/sudo_list.exp << EOF
+##!/usr/bin/expect -f
+#
+#set timeout 30
+#set send_slow {1 .1}
+#match_max 100000
+#
+#spawn ssh -o StrictHostKeyChecking=no -l $1 $MASTER
+#expect "*: "
+#send -s "$userpw\r"
+#expect "*$ "
+#send -s "sudo -l \r"
+#expect "$1: "
+#send -s "$userpw\r"
+#expect "*$ "
+#send -s "sudo -u root -g $1 /bin/date > $sudoout 2>&1 \r"
+#expect "$1: "
+#send -s "$userpw\r"
+#expect eof
+#EOF
+#
+#chmod 755 $TmpDir/sudo_list.exp
+#cat $TmpDir/sudo_list.exp
+#$TmpDir/sudo_list.exp
+#cat $sudoout
+#}
+#
+#	rlRun "sudorun_withgrp user1"
+#        rlAssertGrep "sudo: ldap sudoRunAsGroup 'all' ... MATCH" "$sudoout"
+#	rlAssertNotGrep "is not allowed to execute" "$sudoout"
+#
+#        rlRun "rm -fr $sudoout"
+#	rlRun "cat $sudoout"
+#        rlRun "ipa sudorule-remove-runasgroup sudorule1 --groups=ALL"
 
 rlPhaseEnd
 }
