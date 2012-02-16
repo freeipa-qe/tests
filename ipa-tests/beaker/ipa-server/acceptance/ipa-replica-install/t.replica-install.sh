@@ -413,7 +413,9 @@ uninstall()
 
 
 	rlRun "ipa-replica-manage list"
-	rlRun "ipa-replica-manage del $SLAVE"
+	rlRun "remoteExec root $MASTERIP redhat \"ipa-replica-manage del $SLAVE\""
+
+	sleep 10
 
 	rlLog "Executing: ipa-server-install --uninstall -U"
 	rlRun "ipa-server-install --uninstall -U"
