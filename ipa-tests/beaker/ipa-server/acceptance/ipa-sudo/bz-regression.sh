@@ -53,9 +53,6 @@ PACKAGE1="ipa-admintools"
 PACKAGE2="ipa-client"
 basedn=`getBaseDN`
 
-TmpDir=`mktemp -d`
-pushd $TmpDir
-
 
 bug769491() {
 
@@ -64,8 +61,9 @@ rlPhaseStartTest "bug769491: Unable to add certain sudo commands to groups."
 
 	rlLog "https://bugzilla.redhat.com/show_bug.cgi?id=769491"
         rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+	TmpDir=`mktemp -d`
+	pushd $TmpDir
 
-	rlRun "touch $TmpDir/bug769491.txt"
         rlRun "ipa sudocmd-add \"/bin/chown -R apache:developers /var/www/*/shared/log\" > $TmpDir/bug769491.txt 2>&1"
         rlAssertGrep "Added Sudo Command" "$TmpDir/bug769491.txt"
         rlRun "cat $TmpDir/bug769491.txt"
@@ -101,8 +99,10 @@ rlPhaseStartTest "bug741604: misleading error when adding duplicate external mem
 
 	rlLog "Verifies https://bugzilla.redhat.com/show_bug.cgi?id=741604"
 
-	rlRun "touch $TmpDir/bug741604.txt"
+        TmpDir=`mktemp -d`
+        pushd $TmpDir
 	rlRun "ipa sudorule-add 741604rule"
+
 	rlRun "ipa sudorule-add-user --users=user1,unknown 741604rule > $TmpDir/bug741604.txt 2>&1"
 	rlRun "cat $TmpDir/bug764604.txt"
 
@@ -127,7 +127,9 @@ rlPhaseStartTest "bug782976: SUDO: --users and --groups should detect values suc
 
 	rlLog "verifies https://bugzilla.redhat.com/show_bug.cgi?id=782976"
 
-	rlRun "touch $TmpDir/bug782976.txt"
+        TmpDir=`mktemp -d`
+        pushd $TmpDir
+
 	rlRun "ipa sudorule-add bug782976 --usercat=all > $TmpDir/bug782976.txt 2>&1"
 	rlAssertGrep "User category: all" "$TmpDir/bug782976.txt"
 	rlRun "cat $TmpDir/bug782976.txt"
@@ -169,7 +171,9 @@ rlPhaseStartTest "bug783286: Setting HBAC/SUDO category to Anyone doesn't remove
 
         rlLog "verifies https://bugzilla.redhat.com/show_bug.cgi?id=783286"
 
-        rlRun "touch $TmpDir/bug783286.txt"
+        TmpDir=`mktemp -d`
+        pushd $TmpDir
+
 	rlRun "echo Secret123 | ipa user-add shanks --first=shanks --last=r"
 	rlRun "ipa group-add group1 --desc=group1"
 	rlRun "ipa sudocmd-add /bin/ls"
