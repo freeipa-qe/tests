@@ -65,6 +65,7 @@ rlPhaseStartTest "bug769491: Unable to add certain sudo commands to groups."
 	rlLog "https://bugzilla.redhat.com/show_bug.cgi?id=769491"
         rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 
+	rlRun "touch $TmpDir/bug769491.txt"
         rlRun "ipa sudocmd-add \"/bin/chown -R apache:developers /var/www/*/shared/log\" > $TmpDir/bug769491.txt 2>&1"
         rlAssertGrep "Added Sudo Command" "$TmpDir/bug769491.txt"
         rlRun "cat $TmpDir/bug769491.txt"
@@ -100,6 +101,7 @@ rlPhaseStartTest "bug741604: misleading error when adding duplicate external mem
 
 	rlLog "Verifies https://bugzilla.redhat.com/show_bug.cgi?id=741604"
 
+	rlRun "touch $TmpDir/bug741604.txt"
 	rlRun "ipa sudorule-add 741604rule"
 	rlRun "ipa sudorule-add-user --users=user1,unknown 741604rule > $TmpDir/bug741604.txt 2>&1"
 	rlRun "cat $TmpDir/bug764604.txt"
@@ -125,6 +127,7 @@ rlPhaseStartTest "bug782976: SUDO: --users and --groups should detect values suc
 
 	rlLog "verifies https://bugzilla.redhat.com/show_bug.cgi?id=782976"
 
+	rlRun "touch $TmpDir/bug782976.txt"
 	rlRun "ipa sudorule-add bug782976 --usercat=all > $TmpDir/bug782976.txt 2>&1"
 	rlAssertGrep "User category: all" "$TmpDir/bug782976.txt"
 	rlRun "cat $TmpDir/bug782976.txt"

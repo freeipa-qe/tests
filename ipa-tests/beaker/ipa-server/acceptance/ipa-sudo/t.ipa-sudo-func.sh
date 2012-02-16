@@ -802,7 +802,8 @@ rlPhaseStartTest "Bug 719009: sudorule-add-runasuser does not match valid users 
 
 	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 
-	rlRun "ipa sudorule-add-runasuser sudorule1 --users=ALL"
+# Commenting the next line since we are covering the cli in verifyErrorMsg which follows immediately.
+#	rlRun "ipa sudorule-add-runasuser sudorule1 --users=ALL"
 	verifyErrorMsg "ipa sudorule-add-runasuser sudorule1 --users=ALL" "ipa: ERROR: invalid 'runas-user': RunAsUser does not accept 'ALL' as a user name"
 
 # The following comments are result of https://bugzilla.redhat.com/show_bug.cgi?id=782976
@@ -813,7 +814,7 @@ rlPhaseStartTest "Bug 719009: sudorule-add-runasuser does not match valid users 
 #        rlRun "rm -fr $sudoout"
 #	 rlRun "cat $sudoout"
 
-        rlRun "ipa sudorule-remove-runasuser sudorule1 --users=ALL"
+        rlRun "ipa sudorule-remove-runasuser sudorule1 --users=ALL" 1
 
 rlPhaseEnd
 }
