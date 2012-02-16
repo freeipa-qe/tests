@@ -53,6 +53,9 @@ PACKAGE1="ipa-admintools"
 PACKAGE2="ipa-client"
 basedn=`getBaseDN`
 
+TmpDir=`mktemp -d`
+pushd $TmpDir
+
 
 bug769491() {
 
