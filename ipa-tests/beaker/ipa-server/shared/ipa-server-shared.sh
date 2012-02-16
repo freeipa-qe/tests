@@ -21,6 +21,7 @@
 #	ftp_auth_success
 #	ftp_auth_failure
 #	interactive
+#	remoteExec
 ######################################################################
 KINITEXEC=/usr/bin/kinit
 #######################################################################
@@ -710,3 +711,44 @@ echo 'expect eof ' >> $expfile
 		/bin/cat $expout
 }
 
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# remoteExec
+# Usage: remoteExec user hostname password command
+# 
+# This constructs a expect file which is then executed so as to execute 
+# any remote command on the specified hostname.
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+expfile=/tmp/remote_exec.exp
+expout=/tmp/remote_exec.out
+
+rm -rf $expfile $expout
+
+expfile=/tmp/remote_exec.exp
+expout=/tmp/remote_exec.out
+
+rm -rf $expfile $expout
+
+echo 'set timeout 30
+set send_slow {1 .1}' > $expfile
+	echo "spawn ssh -l $1 $2" >> $expfile
+	echo 'match_max 100000' >> $expfile
+	echo 'sleep 3' >> $expfile
+	echo 'expect "*: "' >> $expfile
+	echo "send \"$3\"" >> $expfile
+	echo 'send "\r"' >> $expfile
+	echo 'sleep 3' >> $expfile
+	echo 'expect "*# "' >> $expfile
+	echo "send \"$4\"" >> $expfile
+	echo 'send "\r"' >> $expfile
+	echo 'expect eof ' >> $expfile
+
+		rlRun "/usr/bin/expect $expfile >> $expout 2>&1"
+
+	# for verbosity
+	rlRun "cat $expfile"
+        rlRun "cat $expout"
+
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
