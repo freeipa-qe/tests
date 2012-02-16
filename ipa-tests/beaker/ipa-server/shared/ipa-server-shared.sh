@@ -720,6 +720,8 @@ echo 'expect eof ' >> $expfile
 # any remote command on the specified hostname.
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+remoteExec() {
+
 expfile=/tmp/remote_exec.exp
 expout=/tmp/remote_exec.out
 
@@ -749,6 +751,6 @@ set send_slow {1 .1}' > $expfile
 	# for verbosity
 	rlRun "cat $expfile"
         rlRun "cat $expout"
-
+}
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
