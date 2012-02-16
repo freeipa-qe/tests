@@ -18,4 +18,13 @@ for dnszone in $(ipa dnszone-find|grep "Zone name:"|awk '{print $3}'|egrep -v "t
 	ipa dnszone-del $dnszone
 done
 
-for 
+cd /etc
+/bin/mv yp.conf.orig.ipatest yp.conf
+/bin/mv hosts.orig.ipatest hosts
+/bin/mv resolv.conf.orig.ipatest resolv.conf
+
+cd /etc/sysconfig
+/bin/mv network.orig.ipatest network
+
+nisdomainname ipatest
+

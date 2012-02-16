@@ -76,6 +76,11 @@ nisint_nisclient_integration_master_envsetup()
 {
 	rlPhaseStartTest "nisint_nisclient_integration_master_envsetup: Run setup on MASTER to prep for Client Integration"
 		rlLog "prep for Kerberos setup for auth on the client"
+		NISCLIENT_S=$(echo $NISCLIENT|cut -f1 -d.)
+		NISCLIENT=$NISCLIENT_S.$DOMAIN
+		if [ $(ipa host-show $NISCLIENT 2>&1|grep -i "host not found"|wc -l) -gt 0 ]; then
+			rlRun "ipa host-add $NISCLIENT --ip-address=$NISCLIENT_IP"
+		fi
 		rlRun "ipa-getkeytab -s $MASTER -p host/$NISCLIENT@$RELM -k /tmp/krb5.keytab.$NISCLIENT"
 		rlRun "scp -q -o StrictHostKeyChecking=no /tmp/krb5.keytab.$NISCLIENT root@$NISCLIENT:/etc/krb5.keytab"
 	rlPhaseEnd
@@ -99,12 +104,25 @@ nisint_nisclient_integration_change_to_ipa_nismaster()
 {
 	rlPhaseStartTest "nisint_nisclient_integration_change_to_ipa_nismaster: Switch NIS config to point to IPA Master"
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
+		MASTER_S=$(echo $MASTER|cut -f1 -d.)
+		MASTER=$MASTER_S.$DOMAIN
 		rlRun "cp /etc/yp.conf /etc/yp.conf.orig.$NISDOMAIN"
 		rlRun "sed -i 's/$NISDOMAIN/$DOMAIN/g' /etc/yp.conf"
 		rlRun "sed -i 's/$NISMASTER/$MASTER/g' /etc/yp.conf"
+
 		rlRun "cp /etc/sysconfig/network /etc/sysconfig/network.orig.$NISDOMAIN"
 		rlRun "sed -i 's/$NISDOMAIN/$DOMAIN/g' /etc/sysconfig/network"
         rlRun "sed -i s/^nameserver/#nameserver/g /etc/resolv.conf"
+
+		rlRun "cp /etc/hosts /etc/hosts.orig.$NISDOMAIN"
+		rlRun "sed -i s/^$NISCLIENT_IP.*$HOSTNAME_S.*$// /etc/hosts"
+		rlRun "echo '$NISCLIENT_IP $HOSTNAME_S.$DOMAIN $HOSTNAME_S' >> /etc/hosts"
+
+		rlRun "grep -v 'HOSTNAME=$HOSTNAME_S' /etc/sysconfig/network > /etc/sysconfig/network.$FUNCNAME"
+		rlRun "echo 'HOSTNAME=$HOSTNAME_S.$DOMAIN' >> /etc/sysconfig/network.$FUNCNAME"
+		rlRun "mv /etc/sysconfig/network.$FUNCNAME /etc/sysconfig/network"
+		rlRun "hostname $HOSTNAME_S.$DOMAIN"
+
         rlRun "echo 'nameserver $MASTER_IP' >> /etc/resolv.conf"
 		rlRun "nisdomainname $DOMAIN"
 		rlRun "service rpcbind restart"

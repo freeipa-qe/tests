@@ -49,11 +49,20 @@ done
 PACKAGE="ipa-server"
 
 startDate=`date "+%F %r"`
-satrtEpoch=`date "+%s"`
+startEpoch=`date "+%s"`
 
 export MASTER_IP=$(host $MASTER|grep -v 'not found:'|awk '{print $4}')
+if [ -z "$MASTER_IP" ]; then
+	export MASTER_IP=$(getent hosts $MASTER|awk '{print $1}')
+fi
 export NISMASTER_IP=$(host $NISMASTER|grep -v 'not found:'|awk '{print $4}')
+if [ -z "$NISMASTER_IP" ]; then
+	export NISMASTER_IP=$(getent hosts $NISMASTER|awk '{print $1}')
+fi
 export NISCLIENT_IP=$(host $NISCLIENT|grep -v 'not found:'|awk '{print $4}')
+if [ -z "$NISCLIENT_IP" ]; then
+	export NISCLIENT_IP=$(getent hosts $NISCLIENT|awk '{print $1}')
+fi
 
 ##########################################
 #   test main 
@@ -66,12 +75,17 @@ rlJournalStart
 		rlRun "pushd $TmpDir"
 		HOSTNAME=$(hostname)
 		myhostname=`hostname`
-		rlLog "hostname command: $myhostname"
-		rlLog "HOSTNAME: $HOSTNAME"
-		rlLog "MASTER: $MASTER"
-		rlLog "NISMASTER: $NISMASTER"
-		rlLog "NISCLIENT: $NISCLIENT"
-		rlLog "NISDOMAIN: $NISDOMAIN"
+		HOSTNAME_S=$(echo $HOSTNAME|cut -f1 -d.)
+		rlLog "hostname command : $myhostname"
+		rlLog "HOSTNAME         : $HOSTNAME"
+		rlLog "HOSTNAME_S       : $HOSTNAME_S"
+		rlLog "MASTER           : $MASTER"
+		rlLog "MASTER_IP        : $MASTER_IP"
+		rlLog "NISMASTER        : $NISMASTER"
+		rlLog "NISMASTER_IP     : $NISMASTER_IP"
+		rlLog "NISCLIENT        : $NISCLIENT"
+		rlLog "NISCLIENT_IP     : $NISCLIENT_IP"
+		rlLog "NISDOMAIN        : $NISDOMAIN"
 	rlPhaseEnd
 	
 	##############################################################

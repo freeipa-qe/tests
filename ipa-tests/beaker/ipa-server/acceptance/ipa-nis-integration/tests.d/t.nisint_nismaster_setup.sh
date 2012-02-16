@@ -236,8 +236,6 @@ nisint_nismaster_setup_hosts()
 		192.168.4.2	goodhost2
 		192.168.4.3	goodhost3
 		192.168.4.4	goodhost4
-		$NISMASTER_IP $NISMASTER
-		$NISCLIENT_IP $NISCLIENT
 		EOF
 		rlRun "make -C /var/yp" 0 "Update NIS hosts map"
 		rlRun "ypcat -d $NISDOMAIN -h $NISMASTER hosts|grep goodhost" 0 "Check that new hosts are in the map"
