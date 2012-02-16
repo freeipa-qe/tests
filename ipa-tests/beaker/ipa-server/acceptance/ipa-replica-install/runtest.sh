@@ -183,6 +183,11 @@ rlJournalStart
 			installSlave_nr
 			uninstall
 
+			# Installing slave with --no-host-dns
+			
+			installSlave_nhostdns
+			uninstall
+
 			# Installing slave with --setup-ca
 			installSlave_ca
 			

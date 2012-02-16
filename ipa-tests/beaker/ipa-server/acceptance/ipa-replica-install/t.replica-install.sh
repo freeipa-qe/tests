@@ -54,9 +54,11 @@ installMaster()
 	rlLog "IP address of SLAVE: $SLAVE is $ipofs"
 
 	rlRun "yum install -y ipa-server bind-dyndb-ldap bind"
-	echo "ipa-server-install --setup-dns --forwarder=$DNSFORWARD --hostname=$hostname_s.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U" > /dev/shm/installipa.bash
 
-	rlLog "EXECUTING: ipa-server-install --setup-dns --forwarder=$DNSFORWARD --hostname=$hostname_s.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U"
+	# Including --idstart=3000 --idmax=50000 to verify bug 782979.
+	echo "ipa-server-install --idstart=3000 --idmax=50000 --setup-dns --forwarder=$DNSFORWARD --hostname=$hostname_s.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U" > /dev/shm/installipa.bash
+
+	rlLog "EXECUTING: ipa-server-install --idstart=3000 --idmax=50000 --setup-dns --forwarder=$DNSFORWARD --hostname=$hostname_s.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U"
 
         rlRun "setenforce 1" 0 "Making sure selinux is enforced"
         rlRun "chmod 755 /dev/shm/installipa.bash" 0 "Making ipa install script executable"
@@ -280,6 +282,25 @@ installSlave()
 		rlAssertGrep "forwarders" "/etc/named.conf"
 		rlAssertGrep "$DNSFORWARD" "/etc/named.conf"
 
+
+	# Verifies: Bug 782979 - Replication Failure: Allocation of a new value for range cn=posix ids.
+
+user1="user1"
+user2="user2"
+user3="user3"
+userpw="Secret123"
+
+        rlRun "create_ipauser $user1 $user1 $user1 $userpw"
+        sleep 5
+        rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+        rlRun "create_ipauser $user2 $user2 $user2 $userpw"
+        sleep 5
+        rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+        rlRun "create_ipauser $user3 $user3 $user3 $userpw"
+
+	rlRun "ipa user-show $user1"
+	rlRun "ipa user-show $user2"
+
                 rlRun "appendEnv" 0 "Append the machine information to the env.sh with the information for the machines in the recipe set"
         fi
 
@@ -344,6 +365,7 @@ installSlave_nr()
                 rlAssertNotGrep "forwarders" "/etc/named.conf"
                 rlAssertNotGrep "$DNSFORWARD" "/etc/named.conf"
 
+		rlLog "verifies https://bugzilla.redhat.com/show_bug.cgi?id=757644"
 		rlRun "ipa dnszone-find | grep in-addr.arpa." 1
 
                 rlRun "appendEnv" 0 "Append the machine information to the env.sh with the information for the machines in the recipe set"
@@ -355,6 +377,51 @@ installSlave_nr()
 
    rlPhaseEnd
 }
+
+installSlave_nhostdns()
+{
+
+   rlPhaseStartTest "Installing replica with --no-host-dns option"
+
+                rlLog "verifies https://bugzilla.redhat.com/show_bug.cgi?id=757681"
+
+        ls /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg
+        if [ $? -ne 0 ] ; then
+                rlFail "ERROR: Replica Package not found"
+        else
+
+                rlRun "cp /etc/resolv.conf /etc/resolv.conf_backup"
+		rlRun "> /etc/resolv.conf"
+
+		rlRun "remoteExec root $MASTERIP redhat \"service named restart\""
+		rlRun "dig $SLAVE"
+
+		rlRun "cat /etc/hosts"
+
+
+                echo "ipa-replica-install -U --setup-dns --no-forwarders --no-host-dns -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg" > /dev/shm/replica-install.bash
+                chmod 755 /dev/shm/replica-install.bash
+                rlLog "EXECUTING: ipa-replica-install -U --setup-dns --no-forwarders --no-host-dns -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg"
+                rlRun "/bin/bash /dev/shm/replica-install.bash" 0 "Replica installation"
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
+                rlAssertNotGrep "forwarders" "/etc/named.conf"
+                rlAssertNotGrep "$DNSFORWARD" "/etc/named.conf"
+
+		rlRun "service ipa status"
+
+
+		rlRun "mv -f /etc/resolv.conf_backup /etc/resolv.conf" 0 "Restoring /etc/resolv.conf"
+
+                rlRun "appendEnv" 0 "Append the machine information to the env.sh with the information for the machines in the recipe set"
+        fi
+
+        if [ -f /var/log/ipareplica-install.log ]; then
+                rhts-submit-log -l /var/log/ipareplica-install.log
+        fi
+
+   rlPhaseEnd
+}
+
 
 installSlave_ca()
 {
