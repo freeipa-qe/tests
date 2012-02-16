@@ -225,7 +225,6 @@ nisint_automount_test_1005()
 		;;
 	"$NISCLIENT")
 		rlLog "Machine in recipe is NISCLIENT"
-		rlRun "automount -m|grep auto.master" 0 "automount -m search for existing auto.master entry"
 		rlRun "automount -m|grep auto.home" 0 "automount -m search for existing auto.home entry"
 		rlRun "automount -m|grep auto.nisint" 0 "automount -m search for existing auto.nisint entry"
 		rlRun "rhts-sync-set -s '$FUNCNAME' -m $NISCLIENT"
