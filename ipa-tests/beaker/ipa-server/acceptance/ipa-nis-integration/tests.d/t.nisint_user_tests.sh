@@ -82,6 +82,7 @@ nisint_user_test_envsetup()
 		;;
 	"$NISCLIENT")
 		rlLog "Machine in recipe is NISCLIENT"
+		rlLog "rhts-sync-block -s '$FUNCNAME' $MASTER"
 		rlRun "rhts-sync-block -s '$FUNCNAME' $MASTER"
 		;;
 	*)

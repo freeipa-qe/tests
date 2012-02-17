@@ -152,7 +152,6 @@ nisint_nisclient_integration_change_to_ipa_nismaster()
 
 		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd
-
 }
 
 nisint_nisclient_integration_setup_kerberos_for_auth()
