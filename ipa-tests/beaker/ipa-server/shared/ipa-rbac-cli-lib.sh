@@ -272,3 +272,189 @@ verifyPermissionAttrFindUsingOptions()
 
    return $rc
 }
+
+modifyPermission()
+{
+
+   permissionName=$1
+   attrToUpdate="--$2"
+   value=$3
+   rc=0
+
+   rlLog "Excecuting: ipa permission-mod $attrToUpdate=$value $permissionName"
+   ipa permission-mod $attrToUpdate=$value $permissionName
+   rc=$?
+   if [ $rc -ne 0 ] ; then
+     rlLog "There was an error modifying $permissionName"
+   else
+     rlLog "Modified permission $permissionName successfully" 
+   fi
+
+   return $rc
+
+}
+
+
+addPrivilege()
+{
+   privilegeName=$1
+   privilegeDesc=$2
+
+   if [ `echo $#` > 3 ] ; then
+     shift
+     shift
+     privilegeAttr=$1   
+   else
+     privilegeAttr=""  
+   fi
+   rc=0
+
+   if [ -z $privilegeAttr ] ; then
+     rlLog "Executing: ipa privilege-add \"$privilegeName\" --desc=\"$privilegeDesc\""
+     ipa privilege-add "$privilegeName" --desc="$privilegeDesc"
+   else 
+     rlLog " Executing: ipa privilege-add \"$privilegeName\" --desc=\"$privilegeDesc\" $privilegeAttr "
+     ipa privilege-add "$privilegeName" --desc="$privilegeDesc" $privilegeAttr 
+   fi
+   rc=$?
+   if [ $rc -ne 0 ] ; then
+     rlLog "There was an error adding $privilegeName"
+   else
+     rlLog "Added new privilege $privilegeName successfully" 
+   fi
+
+   return $rc
+}
+
+deletePrivilege()
+{
+    rlLog "Entering deletePrivilege with $1"
+       privilegeName=$1
+        rc=0
+
+        rlLog "Executing: ipa privilege-del $privilegeName"
+        ipa privilege-del "$privilegeName"
+        rc=$?
+        if [ $rc -ne 0 ]; then
+            rlLog "There was an error deleting $privilegeName"
+        else
+            rlLog "Deleted privilege $privilegeName successfully"
+        fi
+
+        return $rc
+}
+
+addPermissionToPrivilege()
+{
+    rlLog "Entering addPermissionToPrivilege with $2"
+  permissionList="$1"
+  privilegeName="${2}"
+
+  rc=0
+  rlLog "Executing: ipa privilege-add-permission --permissions=\"$permissionList\" \"$privilegeName\""
+  ipa privilege-add-permission --permissions="$permissionList" "$privilegeName"
+
+  if [ $rc -ne 0 ] ; then
+    rlLog "There was an error adding  $permissionList to $privilegeName"
+  else
+    rlLog "Added $permissionList to $privilgeName successfully"
+  fi
+}
+
+
+addRole()
+{
+    rlLog "Entering addRole with $1 $2"
+  roleName=$1
+  roleDesc=$2
+
+  rc=0
+  rlLog "Executing: ipa role-add \"$roleName\" --desc=\"$roleDesc\""
+  ipa role-add "$roleName" --desc="$roleDesc"
+  if [ $rc -ne 0 ] ; then
+    rlLog "There was an error adding $roleName"
+  else
+    rlLog "Added new role $roleName successfully"
+  fi
+ 
+  return $rc
+}
+
+
+addPrivilegeToRole()
+{
+    rlLog "Entering addPrivilegeToRole with $1 $2"
+
+  privilegeList=$1
+  roleName=$2
+
+  rc=0
+  rlLog "Executing: ipa role-add-privilege --privileges=\"$privilegeList\" \"$roleName\""
+  ipa role-add-privilege --privileges="$privilegeList" "$roleName"
+
+  if [ $rc -ne 0 ] ; then
+    rlLog "There was an error adding  $privilegeList to $roleName"
+  else
+    rlLog "Added $privilegeList to $roleName successfully"
+  fi
+
+}
+
+
+addMemberToRole()
+{
+    rlLog "Entering addMemberToRole with $1 $2"
+
+   memberList=$1
+   roleName=$2
+   type="--$3"
+
+   rc=0
+   rlLog "Executing: ipa role-add-member $type=$memberList \"$roleName\""
+   ipa role-add-member $type=$memberList "$roleName"
+
+   if [ $rc -ne 0 ] ; then
+     rlLog "There was an error adding  $memberList to $roleName"
+   else
+     rlLog "Added $memberList to $roleName successfully"
+   fi
+}
+
+
+deleteRole()
+{
+    rlLog "Entering deleteRole with $1"
+       roleName=$1
+        rc=0
+
+        rlLog "Executing: ipa role-del $roleName"
+        ipa role-del "$roleName"
+        rc=$?
+        if [ $rc -ne 0 ]; then
+            rlLog "There was an error deleting $roleName"
+        else
+            rlLog "Deleted role $roleName successfully"
+        fi
+
+        return $rc
+}
+
+modifyRole()
+{
+    rlLog "Entering modifyRole with $1 $2 $3"
+       roleName="$1"
+       attrToUpdate="--$2"
+       value="$3"
+       rc=0
+
+       rlLog "Executing: ipa role-mod $attrToUpdate=$value $roleName"
+       ipa role-mod "$attrToUpdate"="$value" "$roleName"
+       rc=$?
+       if [ $rc -ne 0 ]; then
+           rlLog "There was an error modifying $roleName"
+       else
+           rlLog "Modified role $roleName successfully"
+       fi
+
+       return $rc
+}

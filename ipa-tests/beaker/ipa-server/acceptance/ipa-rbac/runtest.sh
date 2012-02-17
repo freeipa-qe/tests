@@ -44,10 +44,14 @@
 . /dev/shm/ipa-group-cli-lib.sh
 . /dev/shm/env.sh
 . /dev/shm/ipa-rbac-cli-lib.sh
+. /dev/shm/lib.user-cli.sh
+. /dev/shm/ipa-group-cli-lib.sh
 
 # Include test case file
 . ./lib.iparbac.sh
 . ./t.ipapermission.sh
+. ./t.ipaprivilege.sh
+. ./t.ipaRBACFunctionalTests.sh
 
 PACKAGE="ipa-server"
 
@@ -62,10 +66,10 @@ rlJournalStart
         rlRun "pushd $TmpDir"
     rlPhaseEnd
 
-    ipapermissionTests
-    #ipaprivilegeTests
+#    ipapermissionTests
+    ipaprivilegeTests
     #iparolesTests
-    #ipaRBACFunctionalTests
+#    ipaRBACFunctionalTests
 
     makereport
     rlPhaseStartCleanup "ipapermission cleanup"
