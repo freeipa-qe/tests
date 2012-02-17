@@ -42,7 +42,7 @@ nisint_nisclient_migration()
 {
 	nisint_nisclient_migration_envsetup
 	nisint_nisclient_migration_ipa_client_install
-	nisint_nisclient_migration_autofs_setup
+	nisint_nisclient_migration_ipa_autofs_setup
 
 }
 
@@ -52,7 +52,8 @@ nisint_nisclient_migration_envsetup()
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
-		rlRun "ipa host-del $NISCLIENT"
+		TNISCLIENT=$(echo $NISCLIENT|cut -f1 -d.).$DOMAIN
+		rlRun "ipa host-del $TNISCLIENT"
 		rhts-sync-set -s "$FUNCNAME.0" -m $MASTER
 		rhts-sync-block -s "$FUNCNAME.1" $NISCLIENT
 		;;
@@ -83,7 +84,7 @@ nisint_nisclient_migration_envsetup()
 
 		rlRun "grep -v 'HOSTNAME=$HOSTNAME_S' /etc/sysconfig/network > /etc/sysconfig/network.$FUNCNAME"
 		rlRun "echo 'HOSTNAME=$HOSTNAME_S.$DOMAIN' >> /etc/sysconfig/network.$FUNCNAME"
-		rlRun "mv /etc/sysconfig/network.$FUNCNAME /etc/sysconfig/network"
+		rlRun "mv -f /etc/sysconfig/network.$FUNCNAME /etc/sysconfig/network"
 		rlRun "hostname $HOSTNAME_S.$DOMAIN"
 		rlRun "hostname"
 
@@ -158,7 +159,7 @@ nisint_nisclient_migration_ipa_autofs_setup()
 				tlsrequired="no"
 				authrequired="yes"
 				authtype="GSSAPI"
-				clientprinc="host/$NISCLIENT@$RELM"
+				clientprinc="host/$HOSTNAME_S.$DOMAIN@$RELM"
 		/>
 		EOF
 
