@@ -123,13 +123,13 @@ rlPhaseStartTest "getkeytab_002: Testing the --server or the \"-s\" command opti
 # Testing with "--server" & "-s" command options.
 for i in "--server" "-s"; do
 	# getkeytab when $MASTER is invalid
-	rlRun "ipa-getkeytab --server invalid.ipaserver.com --principal $user1 --keytab $TMP_KEYTAB > $TmpDir/getkeytab.out 2>&1" 9
+	rlRun "ipa-getkeytab $i invalid.ipaserver.com --principal $user1 --keytab $TMP_KEYTAB > $TmpDir/getkeytab.out 2>&1" 9
 	MSG="SASL Bind failed"
 	rlAssertGrep "$MSG" "$TmpDir/getkeytab.out"
 	rlRun "cat $TmpDir/getkeytab.out"
 
 	# getkeytab when $MASTER is valid
-	rlRun "ipa-getkeytab --server $MASTER --principal $user1 --keytab $TMP_KEYTAB > $TmpDir/getkeytab.out 2>&1"
+	rlRun "ipa-getkeytab $i $MASTER --principal $user1 --keytab $TMP_KEYTAB > $TmpDir/getkeytab.out 2>&1"
 	MSG="Keytab successfully retrieved and stored in: $TMP_KEYTAB"
         rlAssertGrep "$MSG" "$TmpDir/getkeytab.out"
 	rlRun "cat $TmpDir/getkeytab.out"
