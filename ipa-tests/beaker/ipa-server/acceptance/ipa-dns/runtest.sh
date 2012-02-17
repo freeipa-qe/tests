@@ -897,6 +897,11 @@ rlJournalStart
 		verifyErrorMsg "ipa dnsrecord-add $zone \"record name\"  --a-rec=1.1.1.1" "ipa: ERROR: invalid 'name': Spaces are not allowed"
         rlPhaseEnd
 
+	rlPhaseStartTest "ipa-dns-158: Bug 738788 - ipa dnsrecord-add allows invalid kx records"
+		rlLog "verifies https://bugzilla.redhat.com/show_bug.cgi?id=738788"
+                verifyErrorMsg "ipa dnsrecord-add $zone @ --kx-rec \"-1 1.2.3.4\"" "ipa: ERROR: invalid 'preference': must be at least 0"
+		verifyErrorMsg "ipa dnsrecord-add $zone @ --kx-rec \"333383838383 1.2.3.4\"" "ipa: ERROR: invalid 'preference': can be at most 65535"
+	rlPhaseEnd
 
 	rlJournalPrintText
 	report=/tmp/rhts.report.$RANDOM.txt
