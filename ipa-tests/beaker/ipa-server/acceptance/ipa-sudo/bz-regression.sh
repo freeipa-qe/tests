@@ -104,9 +104,9 @@ rlPhaseStartTest "bug741604: misleading error when adding duplicate external mem
 	rlRun "ipa sudorule-add 741604rule"
 
 	rlRun "ipa sudorule-add-user --users=user1,unknown 741604rule > $TmpDir/bug741604.txt 2>&1"
-	rlRun "cat $TmpDir/bug764604.txt"
+	rlRun "cat $TmpDir/bug741604.txt"
 
-	rlRun "ipa sudorule-add-user --users=user1,unknown 741604rule > $TmpDir/bug741604.txt 2>&1"
+	rlRun "ipa sudorule-add-user --users=user1,unknown 741604rule > $TmpDir/bug741604.txt 2>&1" 1
 	rlAssertGrep "member user: user1: This entry is already a member" "$TmpDir/bug741604.txt"
 	rlAssertGrep "member user: unknown: This entry is already a member" "$TmpDir/bug741604.txt"
 	rlAssertNotGrep "member user: unknown: no such entry" "$TmpDir/bug741604.txt"
@@ -134,12 +134,12 @@ rlPhaseStartTest "bug782976: SUDO: --users and --groups should detect values suc
 	rlAssertGrep "User category: all" "$TmpDir/bug782976.txt"
 	rlRun "cat $TmpDir/bug782976.txt"
 
-	rlRun "ipa sudorule-add-user bug782976 --users=shanks > $TmpDir/bug782976.txt 2>&1"
+	rlRun "ipa sudorule-add-user bug782976 --users=shanks > $TmpDir/bug782976.txt 2>&1" 1 
 	rlAssertGrep "ipa: ERROR: users cannot be added when user category='all'" "$TmpDir/bug782976.txt"
 	rlRun "cat $TmpDir/bug782976.txt"
 
 	rlRun "ipa group-add group1 --desc=group1"
-        rlRun "ipa sudorule-add-user bug782976 --groups=group1 > $TmpDir/bug782976.txt 2>&1"
+        rlRun "ipa sudorule-add-user bug782976 --groups=group1 > $TmpDir/bug782976.txt 2>&1" 1
 	rlAssertGrep "ipa: ERROR: users cannot be added when user category='all'" "$TmpDir/bug782976.txt"
 	rlRun "cat $TmpDir/bug782976.txt"
 
@@ -147,14 +147,14 @@ rlPhaseStartTest "bug782976: SUDO: --users and --groups should detect values suc
 
 	rlRun "ipa sudorule-add bug782976"
 	rlRun "ipa sudorule-add-user bug782976 --users=user1"
-	rlRun "ipa sudorule-mod bug782976 --usercat=all > $TmpDir/bug782976.txt 2>&1"
+	rlRun "ipa sudorule-mod bug782976 --usercat=all > $TmpDir/bug782976.txt 2>&1" 1
 	rlAssertGrep "ipa: ERROR: user category cannot be set to 'all' while there are users" "$TmpDir/bug782976.txt"
 
 	rlRun "ipa sudorule-del bug782976"
 
 	rlRun "ipa sudorule-add bug782976"
         rlRun "ipa sudorule-add-user bug782976 --groups=group1"
-        rlRun "ipa sudorule-mod bug782976 --usercat=all > $TmpDir/bug782976.txt 2>&1"
+        rlRun "ipa sudorule-mod bug782976 --usercat=all > $TmpDir/bug782976.txt 2>&1" 1
         rlAssertGrep "ipa: ERROR: user category cannot be set to 'all' while there are users" "$TmpDir/bug782976.txt"
 
 	# clean up
@@ -183,12 +183,12 @@ rlPhaseStartTest "bug783286: Setting HBAC/SUDO category to Anyone doesn't remove
         rlAssertGrep "User category: all" "$TmpDir/bug783286.txt"
         rlRun "cat $TmpDir/bug783286.txt"
 
-        rlRun "ipa sudorule-add-user bug783286 --users=shanks > $TmpDir/bug783286.txt 2>&1"
+        rlRun "ipa sudorule-add-user bug783286 --users=shanks > $TmpDir/bug783286.txt 2>&1" 1
         rlAssertGrep "ipa: ERROR: users cannot be added when user category='all'" "$TmpDir/bug783286.txt"
         rlRun "cat $TmpDir/bug783286.txt"
 
         rlRun "ipa group-add group1 --desc=group1"
-        rlRun "ipa sudorule-add-user bug783286 --groups=group1 > $TmpDir/bug783286.txt 2>&1"
+        rlRun "ipa sudorule-add-user bug783286 --groups=group1 > $TmpDir/bug783286.txt 2>&1" 1
         rlAssertGrep "ipa: ERROR: users cannot be added when user category='all'" "$TmpDir/bug783286.txt"
         rlRun "cat $TmpDir/bug783286.txt"
 
@@ -196,14 +196,14 @@ rlPhaseStartTest "bug783286: Setting HBAC/SUDO category to Anyone doesn't remove
 
         rlRun "ipa sudorule-add bug783286"
         rlRun "ipa sudorule-add-user bug783286 --users=user1"
-        rlRun "ipa sudorule-mod bug783286 --usercat=all > $TmpDir/bug783286.txt 2>&1"
+        rlRun "ipa sudorule-mod bug783286 --usercat=all > $TmpDir/bug783286.txt 2>&1" 1
         rlAssertGrep "ipa: ERROR: user category cannot be set to 'all' while there are users" "$TmpDir/bug783286.txt"
 
         rlRun "ipa sudorule-del bug783286"
 
         rlRun "ipa sudorule-add bug783286"
         rlRun "ipa sudorule-add-user bug783286 --groups=group1"
-        rlRun "ipa sudorule-mod bug783286 --usercat=all > $TmpDir/bug783286.txt 2>&1"
+        rlRun "ipa sudorule-mod bug783286 --usercat=all > $TmpDir/bug783286.txt 2>&1" 1
         rlAssertGrep "ipa: ERROR: user category cannot be set to 'all' while there are users" "$TmpDir/bug783286.txt"
 
         # clean up
