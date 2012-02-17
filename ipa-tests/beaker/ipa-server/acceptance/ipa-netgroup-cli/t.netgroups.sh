@@ -170,7 +170,7 @@ cleanup()
 # positive tests
 add_netgroups_positive()
 {
-	rlPhaseStartTest "ipa-netgroup-001: add netgroups"
+	rlPhaseStartTest "ipa-netgroup-001-0: add netgroups"
 		echo "Add netgroup $ngroup1"
         	rlRun "addNetgroup $ngroup1 test-group-1" 0 "adding first netgroup"
 		echo "Add netgroup $ngroup2"
@@ -179,6 +179,66 @@ add_netgroups_positive()
 		rlRun "ipa netgroup-find $ngroup1 | grep $ngroup1" 0 "checking to ensure first netgroup was created"
 		rlRun "ipa netgroup-find $ngroup2 | grep $ngroup2" 0 "checking to ensure second netgroup was created"
 	rlPhaseEnd 
+
+	rlPhaseStartTest "ipa-netgroup-001-1: add netgroup positive with nisdomain"
+		rlRun "ipa netgroup-add ng-001-1 --desc=ng-001-1 --nisdomain=testnis.dom"
+		rlRun "ipa netgroup-show ng-001-1"
+		rlRun "ipa netgroup-del ng-001-1"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-netgroup-001-2: add netgroup positive with nisdomain, usercat=all"
+		rlRun "ipa netgroup-add ng-001-2 --desc=ng-001-2 --nisdomain=testnis.dom --usercat=all"
+		rlRun "ipa netgroup-show ng-001-2"
+		rlRun "ipa netgroup-del ng-001-2"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-netgroup-001-3: add netgroup positive with nisdomain, hostcat=all"
+		rlRun "ipa netgroup-add ng-001-3 --desc=ng-001-3 --nisdomain=testnis.dom --hostcat=all"
+		rlRun "ipa netgroup-show ng-001-3"
+		rlRun "ipa netgroup-del ng-001-3"
+	rlPhaseEnd
+		
+	rlPhaseStartTest "ipa-netgroup-001-4: add netgroup positive with nisdomain, usercat=all, hostcat=all"
+		rlRun "ipa netgroup-add ng-001-4 --desc=ng-001-4 --nisdomain=testnis.dom --usercat=all --hostcat=all"
+		rlRun "ipa netgroup-show ng-001-4"
+		rlRun "ipa netgroup-del ng-001-4"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-netgroup-001-5: add netgroup positive with nisdomain, usercat=all, hostcat=all, addattr"
+		rlRun "ipa netgroup-add ng-001-5 --desc=ng-001-5 --nisdomain=testnis.dom --usercat=all --hostcat=all --addattr=externalHost=ipaqatesthost"
+		rlRun "ipa netgroup-find ng-001-5 --desc=ng-001-5 --nisdomain=testnis.dom --usercat=all --hostcat=all | grep 'External host: ipaqatesthost'"
+		rlRun "ipa netgroup-del ng-001-5"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-netgroup-001-6: add netgroup positive with nisdomain, usercat=all, hostcat=all, setattr"
+		rlRun "ipa netgroup-add ng-001-6 --desc=ng-001-5 --nisdomain=testnis.dom --usercat=all --hostcat=all --setattr=externalHost=ipaqatesthost"
+		rlRun "ipa netgroup-find ng-001-6 --desc=ng-001-6 --nisdomain=testnis.dom --usercat=all --hostcat=all | grep 'External host: ipaqatesthost'"
+		rlRun "ipa netgroup-del ng-001-6"
+	rlPhaseEnd
+		
+	rlPhaseStartTest "ipa-netgroup-001-7: add netgroup positive with nisdomain, usercat=all, hostcat=all, addattr, setattr"
+		rlRun "ipa netgroup-add ng-001-7 --desc=ng-001-7 --nisdomain=testnis.dom --usercat=all --hostcat=all --addattr=externalHost=ipaqatesthost1 --setattr=externalHost=ipaqatesthost2"
+		rlRun "ipa netgroup-find ng-001-7 --desc=ng-001-7 --nisdomain=testnis.dom --usercat=all --hostcat=all | grep 'External host: ipaqatesthost[12]'"
+		rlRun "ipa netgroup-del ng-001-7"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-netgroup-001-8: add netgroup positive with nisdomain, usercat=all, hostcat=all, addattr, setattr, all"
+		rlRun "ipa netgroup-add ng-001-8 --desc=ng-001-8 --nisdomain=testnis.dom --usercat=all --hostcat=all --addattr=externalHost=ipaqatesthost1 --setattr=externalHost=ipaqatesthost2 --all"
+		rlRun "ipa netgroup-find ng-001-8 --desc=ng-001-8 --nisdomain=testnis.dom --usercat=all --hostcat=all --all| grep 'External host: ipaqatesthost[12]'"
+		rlRun "ipa netgroup-del ng-001-8"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-netgroup-001-9: add netgroup positive with nisdomain, usercat=all, hostcat=all, addattr, setattr, raw"
+		rlRun "ipa netgroup-add ng-001-9 --desc=ng-001-9 --nisdomain=testnis.dom --usercat=all --hostcat=all --addattr=externalHost=ipaqatesthost1 --setattr=externalHost=ipaqatesthost2 --raw"
+		rlRun "ipa netgroup-find ng-001-9 --desc=ng-001-9 --nisdomain=testnis.dom --usercat=all --hostcat=all --raw| grep 'externalhost: ipaqatesthost[12]'"
+		rlRun "ipa netgroup-del ng-001-9"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-netgroup-001-10: add netgroup positive with nisdomain, usercat=all, hostcat=all, addattr, setattr, all, raw"
+		rlRun "ipa netgroup-add ng-001-10 --desc=ng-001-10 --nisdomain=testnis.dom --usercat=all --hostcat=all --addattr=externalHost=ipaqatesthost1 --setattr=externalHost=ipaqatesthost2 --all --raw"
+		rlRun "ipa netgroup-find ng-001-10 --desc=ng-001-10 --nisdomain=testnis.dom --usercat=all --hostcat=all --all --raw| grep 'externalhost: ipaqatesthost[12]'"
+		rlRun "ipa netgroup-del ng-001-10"
+	rlPhaseEnd
 }
 
 # negative add netgroups tests
