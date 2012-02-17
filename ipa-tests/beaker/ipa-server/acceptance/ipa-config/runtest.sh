@@ -66,6 +66,8 @@
 . ./lib.ipaconfig.sh
 . ./lib.dataGenerator.sh
 . ./t.ipaconfig.sh
+. ./t.ipaconfig2.sh
+. ./t.ipaconfig_bz.sh
 
 PACKAGE="ipa-admintools"
 
@@ -85,9 +87,10 @@ rlJournalStart
         rlRun "pushd $TmpDir"
     rlPhaseEnd
 
-    # r2d2_test_starts
-    ipaconfig
-    # r2d2_test_ends
+    # Run test scripts
+    #ipaconfig
+    ipaconfig2
+    #ipaconfig_bz
 
     rlPhaseStartCleanup "ipaconfig cleanup"
         rlRun "popd"
@@ -99,88 +102,3 @@ rlJournalStart
     makereport $report
     rhts-submit-log -l $report
 rlJournalEnd
-
-
- 
-# manifest:
-# teststuie   : ipaconfig
-    ## testset: _show
-        ### testcase: _default
-            #### comment: this is to test for defult behave
-            #### data-loop:
-            #### data-no-loop:
-        ### testcase: _negative
-            #### comment: this is to test for defult behave
-            #### data-loop:
-            #### data-no-loop:
-
-    ## testset: _mod
-        ### testcase: _maxusername_default
-            #### comment : this is to test for default behave
-            #### data-loop : 
-            #### data-no-loop : 
-        ### testcase: _maxusername_negative
-            #### comment : negative test case for maxusername
-            #### data-loop : 
-            #### data-no-loop : 
-        ### testcase: _homedirectory_default
-            #### comment : this is to test for default behave
-            #### data-loop : 
-            #### data-no-loop : 
-        ### testcase: _homedirectory_negative
-            #### comment : negative test case for homedirectory
-            #### data-loop : 
-            #### data-no-loop : 
-        ### testcase: _defaultshell_default
-            #### comment : this is to test for default behave
-            #### data-loop : 
-            #### data-no-loop : 
-        ### testcase: _defaultshell_negative
-            #### comment : negative test case for defaultshell
-            #### data-loop : 
-            #### data-no-loop : 
-        ### testcase: _defaultgroup_default
-            #### comment : this is to test for default behave
-            #### data-loop : 
-            #### data-no-loop : 
-        ### testcase: _defaultgroup_negative
-            #### comment : negative test case for defaultgroup
-            #### data-loop : 
-            #### data-no-loop : 
-        ### testcase: _emaildomain_default
-            #### comment : this is to test for default behave
-            #### data-loop : 
-            #### data-no-loop : 
-        ### testcase: _emaildomain_negative
-            #### comment : negative test case for emaildomain
-            #### data-loop : 
-            #### data-no-loop : 
-
-    ## testset: _searchtimelimit
-        ### testcase: _timelimie_default
-            #### comment : this is to test for default behave
-            #### data-loop : 
-            #### data-no-loop : 
-        ### testcase: _timelimie_negative
-            #### comment : negative test case
-            #### data-loop : 
-            #### data-no-loop : 
-
-    ## testset: _server
-        ### testcase: _enablemigration
-            #### comment : this is to test for default behave
-            #### data-loop : 
-            #### data-no-loop : 
-        ### testcase: _enablemigration_negative
-            #### comment : negative test case
-            #### data-loop : 
-            #### data-no-loop : 
-        ### testcase: _subject
-            #### comment : this is to test for default behave 
-            #### data-loop : 
-            #### data-no-loop : 
-        ### testcase: _subject_negative
-            #### comment : negative test case
-            #### data-loop : 
-            #### data-no-loop : 
-

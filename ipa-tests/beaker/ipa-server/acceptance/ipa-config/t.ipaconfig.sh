@@ -50,10 +50,6 @@ ipaconfig_mod()
     ipaconfig_mod_emaildomain_default
     ipaconfig_mod_emaildomain_negative
     ipaconfig_mod_expiration
-    ipaconfig_mod_addattr
-    ipaconfig_mod_setattr
-    ipaconfig_mod_delattr
-    ipaconfig_mod_delattr_neg
     ipaconfig_mod_envcleanup
 } #ipaconfig_mod
 
@@ -74,7 +70,6 @@ ipaconfig_searchfields()
     ipaconfig_searchfields_userfields_negative
     ipaconfig_searchfields_groupfields_default
     ipaconfig_searchfields_groupfields_negative
-    ipaconfig_ticket_2159
     ipaconfig_searchfields_envcleanup
 } #ipaconfig_searchfields
 
@@ -206,41 +201,6 @@ ipaconfig_mod_envsetup()
         #environment setup ends   here
     rlPhaseEnd
 } #ipaconfig_mod_envsetup
-
-ipaconfig_mod_addattr()
-{
-    rlPhaseStartTest "ipaconfig_mod_addattr"
-	rlRun "ipa config-mod --addattr=ipaCustomFields=TRUE" 0 "setting ipacustom field to true"
-	rlRun "ipa config-show --all --raw | grep custom | grep TRUE" 0 "checking to ensure that ipacustom is enabled"
-	rlRun "ipa config-mod --setattr=ipaCustomFields=FALSE" 0 "setting ipacustom field to true"
-	rlRun "ipa config-show --all --raw | grep custom | grep FALSE" 0 "checking to ensure that ipacustom is set to FALSE"
-    rlPhaseEnd
-}
-
-ipaconfig_mod_setattr()
-{
-    rlPhaseStartTest "ipaconfig_mod_setattr"
-	rlRun "ipa config-mod --setattr=ipaMigrationEnabled=1" 0 "setting migration to true"
-	rlRun "ipa config-show | grep Enable\ migration | grep TRUE" 0 "checking to ensure that migration mode is enabled"
-	rlRun "ipa config-mod --setattr=ipaMigrationEnabled=0" 0 "setting migration to false"
-	rlRun "ipa config-show | grep Enable\ migration | grep FALSE" 0 "checking to ensure that migration mode is disabled"
-    rlPhaseEnd
-}
-
-ipaconfig_mod_delattr()
-{
-    rlPhaseStartTest "ipaconfig_mod_delattr"
-	rlRun "ipa config-mod --delattr=ipaCustomFields=FALSE" 0 "deleting custom fields config entry"
-	rlRun "ipa config-show --all --raw | grep custom | grep FALSE" 1 "checking to ensure that ipacustom does not exist"
-    rlPhaseEnd
-}
-
-ipaconfig_mod_delattr_neg()
-{
-    rlPhaseStartTest "ipaconfig_mod_delattr negitive test"
-	rlRun "ipa config-mod --delattr=ipaCustomFields=FALSE" 1 "making sure that you cannot delete a nonexistant entry."
-    rlPhaseEnd
-}
 
 
 ipaconfig_mod_expiration()

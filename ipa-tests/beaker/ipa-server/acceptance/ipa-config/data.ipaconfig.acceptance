@@ -8,7 +8,6 @@
 
 admin="admin"
 adminpassword="redhat123"
-realm="SJC.REDHAT.COM"
 initialpw="Initial@123"
 tmpdir="/dev/shm/ipapassword/tmp"
 kdestroy="kdestroy 2>&1 >/dev/null"
@@ -29,4 +28,9 @@ default_config_usersearchfields="uid,givenname,sn,telephonenumber,ou,title"
 default_config_groupsearchfields="cn,description"
 default_config_migrationmode="FALSE"
 default_config_certsubjectbase="O=$RELM"
+default_config_ipaconfigstring="AllowNThash"
+default_config_ipapwdexpadvnotify="4"
+default_config_emaildomain="$DOMAIN"
+default_config_groupobjectclasses="top, groupofnames, nestedgroup, ipausergroup, ipaobject"
+default_config_userobjectclasses="top, person, organizationalperson, inetorgperson, inetuser, posixaccount, krbprincipalaux, krbticketpolicyaux, ipaobject, ipasshuser"
 

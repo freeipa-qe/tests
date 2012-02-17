@@ -143,7 +143,8 @@ restore_ipaconfig()
                           --usersearch=$default_config_usersearchfields \
                           --groupsearch=$default_config_groupsearchfields \
                           --enable-migration=$default_config_migrationmode \
-                          --subject=$default_config_certsubjectbase " \
+			  --emaildomain=$default_config_emaildomain \
+			  --pwdexpnotify=$default_config_ipapwdexpadvnotify " \
             0 "set ipa config back to default"
-    clear_kticket
+    #clear_kticket - annoying!
 } # restore_ipaconfig
