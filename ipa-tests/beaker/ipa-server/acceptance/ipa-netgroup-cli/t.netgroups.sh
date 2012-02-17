@@ -779,3 +779,28 @@ netgroup_bz_772163()
 		
 	rlPhaseEnd
 }
+
+netgroup_bz_750984()
+{
+	rlPhaseStartTest "netgroup_bz_750984: Inconsistency in error message while adding a duplicate netgroup"
+		KinitAsAdmin
+		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
+		rlRun "ipa hostgroup-add netgroup_bz_750984 --desc=netgroup_bz_750984"
+		rlRun "ipa netgroup-add netgroup_bz_750984 --desc=netgroup_bz_750984 > $tmpout 2>&1" 1
+		if [ $(grep "Hostgroups and netgroups share a common namespace" $tmpout|wc -l) -gt 0 ]; then
+			rlPass "BZ 750984 not found."
+		else
+			rlFail "BZ 750984 found...Inconsistency in error message while adding a duplicate netgroup"
+		fi
+		rlRun "ipa hostgroup-del netgroup_bz_750984"
+		rlRun "ipa netgroup-add netgroup_bz_750984 --desc=netgroup_bz_750984" 
+		rlRun "ipa hostgroup-add netgroup_bz_750984 --desc=netgroup_bz_750984 > $tmpout 2>&1" 1
+		if [ $(grep "Hostgroups and netgroups share a common namespace" $tmpout|wc -l) -gt 0 ]; then
+			rlPass "BZ 750984 not found."
+		else
+			rlFail "BZ 750984 found...Inconsistency in error message while adding a duplicate netgroup"
+		fi
+		rlRun "ipa netgroup-del netgroup_bz_750984"
+		[ -f $tmpout ] && rm -f $tmpout
+	rlPhaseEnd
+}
