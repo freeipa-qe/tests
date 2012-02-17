@@ -636,6 +636,9 @@ netgroup_bzs()
 	netgroup_bz_788625
 	netgroup_bz_772297
 	netgroup_bz_766141
+	netgroup_bz_767372
+	netgroup_bz_772163
+	netgroup_bz_750984
 }
 
 netgroup_bz_772043()
