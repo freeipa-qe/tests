@@ -42,6 +42,7 @@ nisint_nisclient_setup()
 {
 	rlLog "$FUNCNAME"
 
+	rlPhaseStartTest "nisint_nisclient_setup: "
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
@@ -53,7 +54,7 @@ nisint_nisclient_setup()
 		rlRun "rhts-sync-block -s 'nisint_nisclient_setup_ended' $NISCLIENT"
 		;;
 	"$NISCLIENT")
-		rlLog "Machine in recipe is NISMASTER"
+		rlLog "Machine in recipe is NISCLIENT"
 
 		nisint_nisclient_envsetup
 
@@ -64,6 +65,7 @@ nisint_nisclient_setup()
 		rlLog "Machine in recipe is not a known ROLE"
 		;;
 	esac
+	rlPhaseEnd
 
 }
 

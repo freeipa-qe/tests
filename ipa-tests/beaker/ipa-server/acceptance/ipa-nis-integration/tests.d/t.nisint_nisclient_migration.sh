@@ -75,14 +75,17 @@ nisint_nisclient_migration_envsetup()
 
 		rlRun "sed -i s/^$MASTER_IP.*$MASTER_S.*$// /etc/hosts" 
 		rlRun "echo '$MASTER_IP $MASTER_S.$DOMAIN $MASTER_S' >> /etc/hosts"
+		rlRun "cat /etc/hosts"
 
 		rlRun "sed -i s/^nameserver/#nameserver/g /etc/resolv.conf"
 		rlRun "echo 'nameserver $MASTER_IP' >> /etc/resolv.conf"
+		rlRun "cat /etc/resolv.conf"
 
 		rlRun "grep -v 'HOSTNAME=$HOSTNAME_S' /etc/sysconfig/network > /etc/sysconfig/network.$FUNCNAME"
 		rlRun "echo 'HOSTNAME=$HOSTNAME_S.$DOMAIN' >> /etc/sysconfig/network.$FUNCNAME"
 		rlRun "mv /etc/sysconfig/network.$FUNCNAME /etc/sysconfig/network"
 		rlRun "hostname $HOSTNAME_S.$DOMAIN"
+		rlRun "hostname"
 
 		rlRun "authconfig --disablekrb5 --update"
 		rlRun "authconfig --disablenis --update"

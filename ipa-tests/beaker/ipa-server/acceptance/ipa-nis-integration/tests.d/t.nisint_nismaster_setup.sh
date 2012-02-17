@@ -42,6 +42,7 @@ nisint_nismaster_setup()
 {
 	rlLog "$FUNCNAME"
 
+	rlPhaseStartTest "nisint_nismaster_setup: "
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER ($HOSTNAME)"
@@ -71,6 +72,7 @@ nisint_nismaster_setup()
 		rlLog "Machine in recipe is not a known ROLE"
 		;;
 	esac
+	rlPhaseEnd
 
 }
 

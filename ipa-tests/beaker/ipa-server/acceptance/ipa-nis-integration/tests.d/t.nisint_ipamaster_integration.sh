@@ -42,6 +42,7 @@ nisint_ipamaster_integration()
 {
 	rlLog "$FUNCNAME"
 
+	rlPhaseStartTest "nisint_ipamaster_integration: "
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
@@ -67,7 +68,7 @@ nisint_ipamaster_integration()
 		rlLog "Machine in recipe is not a known ROLE"
 		;;
 	esac
-
+	rlPhaseEnd
 }
 
 nisint_ipamaster_integration_envsetup()

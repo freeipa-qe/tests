@@ -41,7 +41,7 @@
 nisint_nisclient_integration()
 {
 	rlLog "$FUNCNAME"
-
+	rlPhaseStartTest "nisint_nisclient_integration: "
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
@@ -69,6 +69,7 @@ nisint_nisclient_integration()
 		rlLog "Machine in recipe is not a known ROLE"
 		;;
 	esac
+	rlPhaseEnd
 
 }
 
@@ -115,24 +116,30 @@ nisint_nisclient_integration_change_to_ipa_nismaster()
 		rlRun "cp /etc/yp.conf /etc/yp.conf.orig.$NISDOMAIN"
 		rlRun "sed -i 's/$NISDOMAIN/$DOMAIN/g' /etc/yp.conf"
 		rlRun "sed -i 's/$NISMASTER/$MASTER/g' /etc/yp.conf"
+		rlRun "cat /etc/yp.conf"
 
 		rlRun "cp /etc/sysconfig/network /etc/sysconfig/network.orig.$NISDOMAIN"
 		rlRun "sed -i 's/$NISDOMAIN/$DOMAIN/g' /etc/sysconfig/network"
+		rlRun "grep -v 'HOSTNAME=$HOSTNAME_S' /etc/sysconfig/network > /etc/sysconfig/network.$FUNCNAME"
+		rlRun "echo 'HOSTNAME=$HOSTNAME_S.$DOMAIN' >> /etc/sysconfig/network.$FUNCNAME"
+		rlRun "mv -f /etc/sysconfig/network.$FUNCNAME /etc/sysconfig/network"
+		rlRun "cat /etc/sysconfig/network"
 
 		rlRun "cp /etc/resolv.conf /etc/resolv.conf.orig.$NISDOMAIN"
 		rlRun "sed -i s/^nameserver/#nameserver/g /etc/resolv.conf"
 		rlRun "echo 'nameserver $MASTER_IP' >> /etc/resolv.conf"
+		rlRun "cat /etc/resolv.conf"
 
 		rlRun "cp /etc/hosts /etc/hosts.orig.$NISDOMAIN"
 		rlRun "sed -i s/^$NISCLIENT_IP.*$HOSTNAME_S.*$// /etc/hosts"
 		rlRun "echo '$NISCLIENT_IP $HOSTNAME_S.$DOMAIN $HOSTNAME_S' >> /etc/hosts"
+		rlRun "cat /etc/hosts"
 
-		rlRun "grep -v 'HOSTNAME=$HOSTNAME_S' /etc/sysconfig/network > /etc/sysconfig/network.$FUNCNAME"
-		rlRun "echo 'HOSTNAME=$HOSTNAME_S.$DOMAIN' >> /etc/sysconfig/network.$FUNCNAME"
-		rlRun "mv -f /etc/sysconfig/network.$FUNCNAME /etc/sysconfig/network"
 		rlRun "hostname $HOSTNAME_S.$DOMAIN"
+		rlRun "hostname"
 
 		rlRun "nisdomainname $DOMAIN"
+		rlRun "nisdomainname"
 		rlRun "service rpcbind restart"
 		rlRun "service ypbind restart"
 		rlRun "service nscd restart"
