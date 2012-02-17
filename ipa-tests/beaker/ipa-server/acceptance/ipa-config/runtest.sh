@@ -88,9 +88,9 @@ rlJournalStart
     rlPhaseEnd
 
     # Run test scripts
-    #ipaconfig
+    ipaconfig
     ipaconfig2
-    #ipaconfig_bz
+    ipaconfig_bz
 
     rlPhaseStartCleanup "ipaconfig cleanup"
         rlRun "popd"
