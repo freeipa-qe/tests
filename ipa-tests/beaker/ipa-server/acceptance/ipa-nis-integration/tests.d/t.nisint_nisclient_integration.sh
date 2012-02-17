@@ -110,7 +110,8 @@ nisint_nisclient_integration_change_to_ipa_nismaster()
 	rlPhaseStartTest "nisint_nisclient_integration_change_to_ipa_nismaster: Switch NIS config to point to IPA Master"
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		MASTER_S=$(echo $MASTER|cut -f1 -d.)
-		MASTER=$MASTER_S.$DOMAIN
+		#MASTER=$MASTER_S.$DOMAIN
+		TMASTER=$MASTER_S.$DOMAIN
 		rlRun "cp /etc/yp.conf /etc/yp.conf.orig.$NISDOMAIN"
 		rlRun "sed -i 's/$NISDOMAIN/$DOMAIN/g' /etc/yp.conf"
 		rlRun "sed -i 's/$NISMASTER/$MASTER/g' /etc/yp.conf"
@@ -135,6 +136,20 @@ nisint_nisclient_integration_change_to_ipa_nismaster()
 		rlRun "service rpcbind restart"
 		rlRun "service ypbind restart"
 		rlRun "service nscd restart"
+		
+		myhostname=`hostname`
+		HOSTNAME_S=$(echo $HOSTNAME|cut -f1 -d.)
+		rlLog "hostname command : $myhostname"
+		rlLog "HOSTNAME         : $HOSTNAME"
+		rlLog "HOSTNAME_S       : $HOSTNAME_S"
+		rlLog "MASTER           : $MASTER"
+		rlLog "MASTER_IP        : $MASTER_IP"
+		rlLog "NISMASTER        : $NISMASTER"
+		rlLog "NISMASTER_IP     : $NISMASTER_IP"
+		rlLog "NISCLIENT        : $NISCLIENT"
+		rlLog "NISCLIENT_IP     : $NISCLIENT_IP"
+		rlLog "NISDOMAIN        : $NISDOMAIN"
+
 		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd
 
