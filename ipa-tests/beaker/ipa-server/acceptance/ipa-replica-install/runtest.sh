@@ -185,8 +185,8 @@ rlJournalStart
 
 			# Installing slave with --no-host-dns
 			
-			installSlave_nhostdns
-			uninstall
+			#installSlave_nhostdns        Commenting this for now since this is targeted for RHEL7
+			#uninstall
 
 			# Installing slave with --setup-ca
 			installSlave_ca
