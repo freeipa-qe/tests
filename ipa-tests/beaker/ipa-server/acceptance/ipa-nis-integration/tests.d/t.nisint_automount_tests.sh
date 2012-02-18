@@ -59,11 +59,14 @@ nisint_automount_test_envsetup()
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
+		rlLog "rhts-sync-block -s '$FUNCNAME.0' $NISCLIENT	"
 		rlRun "rhts-sync-block -s '$FUNCNAME.0' $NISCLIENT	"
+		rlLog "rhts-sync-block -s '$FUNCNAME.1' $NISMASTER"
 		rlRun "rhts-sync-block -s '$FUNCNAME.1' $NISMASTER"
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
+		rlLog "rhts-sync-block -s '$FUNCNAME.0' $NISCLIENT"
 		rlRun "rhts-sync-block -s '$FUNCNAME.0' $NISCLIENT"
 		rlRun "sed -i 's/netgroup:   nisplus/netgroup:   nis/' /etc/nsswitch.conf"
 		rlRun "service rpcbind restart"
@@ -80,6 +83,7 @@ nisint_automount_test_envsetup()
 		rlRun "yum -y install autofs" 0 "Install autofs for testing"
 		rlRun "service autofs restart"
 		rlRun "rhts-sync-set -s '$FUNCNAME.0' -m $NISCLIENT"
+		rlLog "rhts-sync-block -s '$FUNCNAME.1' $NISMASTER"
 		rlRun "rhts-sync-block -s '$FUNCNAME.1' $NISMASTER"
 		;;
 	*)
@@ -95,10 +99,12 @@ nisint_automount_test_1001()
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
+		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT	"
 		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT	"
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
+		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		;;
 	"$NISCLIENT")
@@ -126,10 +132,12 @@ nisint_automount_test_1002()
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
-		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT	"
+		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
+		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
+		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		;;
 	"$NISCLIENT")
@@ -155,10 +163,12 @@ nisint_automount_test_1003()
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
-		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT	"
+		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
+		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
+		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		;;
 	"$NISCLIENT")
@@ -187,10 +197,12 @@ nisint_automount_test_1004()
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
-		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT	"
+		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
+		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
+		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		;;
 	"$NISCLIENT")
@@ -217,10 +229,12 @@ nisint_automount_test_1005()
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
+		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT	"
 		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT	"
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
+		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		;;
 	"$NISCLIENT")
@@ -243,10 +257,12 @@ nisint_automount_test_1006()
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
-		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT	"
+		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
+		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
+		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		;;
 	"$NISCLIENT")
@@ -269,10 +285,12 @@ nisint_automount_test_1007()
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
+		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
+		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		;;
 	"$NISCLIENT")
@@ -295,10 +313,12 @@ nisint_automount_test_1008()
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
+		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
+		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		;;
 	"$NISCLIENT")
@@ -320,10 +340,12 @@ nisint_automount_test_1009()
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
+		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
+		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		;;
 	"$NISCLIENT")
@@ -346,10 +368,12 @@ nisint_automount_test_1010()
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
+		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
+		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		;;
 	"$NISCLIENT")

@@ -48,18 +48,21 @@ nisint_end()
 		rlLog "Machine in recipe is IPAMASTER"
 		rlRun "rhts-sync-set -s 'nisint_end_nisclient' -m $MASTER"
 		rlRun "rhts-sync-set -s 'nisint_end_nismaster' -m $MASTER"
+		rlLog "rhts-sync-block -s 'nisint_end' $NISMASTER $NISCLIENT"
 		rlRun "rhts-sync-block -s 'nisint_end' $NISMASTER $NISCLIENT"
 		rlLog "Ending IPA MASTER tests."
 		rlLog "Ending NIS Integration and Migration tests."
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
+		rlLog "rhts-sync-block -s 'nisint_end_nisserver' $MASTER"
 		rlRun "rhts-sync-block -s 'nisint_end_nisserver' $MASTER"
 		rlLog "Ending NISMASTER tests."
 		rlRun "rhts-sync-set -s 'nisint_end' -m $NISMASTER"
 		;;
 	"$NISCLIENT")
 		rlLog "Machine in recipe is NISCLIENT"
+		rlLog "rhts-sync-block -s 'nisint_end_nisclient' $MASTER"
 		rlRun "rhts-sync-block -s 'nisint_end_nisclient' $MASTER"
 		rlLog "Ending NISCLIENT tests."
 		rlRun "rhts-sync-set -s 'nisint_end' -m $NISCLIENT"

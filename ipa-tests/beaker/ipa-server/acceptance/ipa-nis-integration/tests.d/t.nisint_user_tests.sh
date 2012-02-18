@@ -78,6 +78,7 @@ nisint_user_test_envsetup()
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
+		rlLog "rhts-sync-block -s '$FUNCNAME' $MASTER"
 		rlRun "rhts-sync-block -s '$FUNCNAME' $MASTER"
 		;;
 	"$NISCLIENT")
@@ -108,10 +109,12 @@ nisint_user_test_envcleanup()
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
+		rlLog "rhts-sync-block -s '$FUNCNAME' $MASTER"
 		rlRun "rhts-sync-block -s '$FUNCNAME' $MASTER"
 		;;
 	"$NISCLIENT")
 		rlLog "Machine in recipe is NISCLIENT"
+		rlLog "rhts-sync-block -s '$FUNCNAME' $MASTER"
 		rlRun "rhts-sync-block -s '$FUNCNAME' $MASTER"
 		;;
 	*)
@@ -130,10 +133,12 @@ nisint_user_test_1001()
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
+		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
+		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		;;
 	"$NISCLIENT")
@@ -161,10 +166,12 @@ nisint_user_test_1002()
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
+		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
+		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		;;
 	"$NISCLIENT")
@@ -192,10 +199,12 @@ nisint_user_test_1003()
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
+		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
+		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		;;
 	"$NISCLIENT")
@@ -225,10 +234,12 @@ nisint_user_test_1004()
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
+		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
+		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		;;
 	"$NISCLIENT")
@@ -256,10 +267,12 @@ nisint_user_test_1005()
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
+		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
+		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		;;
 	"$NISCLIENT")
@@ -283,10 +296,12 @@ nisint_user_test_1006()
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
+		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
+		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		;;
 	"$NISCLIENT")
@@ -310,10 +325,12 @@ nisint_user_test_1007()
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
+		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
+		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		;;
 	"$NISCLIENT")
@@ -337,10 +354,12 @@ nisint_user_test_1008()
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
+		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
+		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		;;
 	"$NISCLIENT")
@@ -364,10 +383,12 @@ nisint_user_test_1009()
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
+		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
+		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		;;
 	"$NISCLIENT")
@@ -391,10 +412,12 @@ nisint_user_test_1010()
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
+		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
+		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		;;
 	"$NISCLIENT")
@@ -419,10 +442,12 @@ nisint_user_test_1011()
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
+		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
+		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		;;
 	"$NISCLIENT")
@@ -446,10 +471,12 @@ nisint_user_test_1012()
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
+		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
+		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		;;
 	"$NISCLIENT")
@@ -473,10 +500,12 @@ nisint_user_test_1013()
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
+		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
+		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		;;
 	"$NISCLIENT")
@@ -500,10 +529,12 @@ nisint_user_test_1014()
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
+		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
+		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		;;
 	"$NISCLIENT")
@@ -527,10 +558,12 @@ nisint_user_test_1015()
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
+		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
+		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		;;
 	"$NISCLIENT")
@@ -554,10 +587,12 @@ nisint_user_test_1016()
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
+		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
+		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		;;
 	"$NISCLIENT")
@@ -582,10 +617,12 @@ nisint_user_test_1017()
 	"$MASTER")
 		KinitAsAdmin
 		rlLog "Machine in recipe is IPAMASTER"
+		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
+		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		;;
 	"$NISCLIENT")

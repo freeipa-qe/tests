@@ -48,10 +48,12 @@ nisint_ipamaster_setup()
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
+		rlLog "rhts-sync-block -s '$FUNCNAME' $MASTER"
 		rlRun "rhts-sync-block -s '$FUNCNAME' $MASTER"
 		;;
 	"$NISCLIENT")
 		rlLog "Machine in recipe is NISCLIENT"
+		rlLog "rhts-sync-block -s '$FUNCNAME' $MASTER"
 		rlRun "rhts-sync-block -s '$FUNCNAME' $MASTER"
 		;;
 	*)

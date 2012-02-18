@@ -73,10 +73,12 @@ nisint_netgroup_test_envsetup()
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
+		rlLog "rhts-sync-block -s '$FUNCNAME' $MASTER"
 		rlRun "rhts-sync-block -s '$FUNCNAME' $MASTER"
 		;;
 	"$NISCLIENT")
 		rlLog "Machine in recipe is NISCLIENT"
+		rlLog "rhts-sync-block -s '$FUNCNAME' $MASTER"
 		rlRun "rhts-sync-block -s '$FUNCNAME' $MASTER"
 		;;
 	*)
@@ -101,10 +103,12 @@ nisint_netgroup_test_envcleanup()
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
+		rlLog "rhts-sync-block -s '$FUNCNAME' $MASTER"
 		rlRun "rhts-sync-block -s '$FUNCNAME' $MASTER"
 		;;
 	"$NISCLIENT")
 		rlLog "Machine in recipe is NISCLIENT"
+		rlLog "rhts-sync-block -s '$FUNCNAME' $MASTER"
 		rlRun "rhts-sync-block -s '$FUNCNAME' $MASTER"
 		;;
 	*)
@@ -121,10 +125,12 @@ nisint_netgroup_test_1001()
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
+		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
+		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		;;
 	"$NISCLIENT")
@@ -150,10 +156,12 @@ nisint_netgroup_test_1002()
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
+		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
+		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		;;
 	"$NISCLIENT")
@@ -179,10 +187,12 @@ nisint_netgroup_test_1003()
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
+		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
+		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		;;
 	"$NISCLIENT")
@@ -208,10 +218,12 @@ nisint_netgroup_test_1004()
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
+		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
+		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		;;
 	"$NISCLIENT")
@@ -237,10 +249,12 @@ nisint_netgroup_test_1005()
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
+		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
+		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		;;
 	"$NISCLIENT")
@@ -262,10 +276,12 @@ nisint_netgroup_test_1006()
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
+		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
+		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		;;
 	"$NISCLIENT")
@@ -287,17 +303,22 @@ nisint_netgroup_test_1007()
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
+		rlLog "rhts-sync-block -s '$FUNCNAME.1' $NISCLIENT"
 		rlRun "rhts-sync-block -s '$FUNCNAME.1' $NISCLIENT"
 
 		ssh_auth_success testuser1 passw0rd1 $NISCLIENT
 
 		rlRun "rhts-sync-set -s '$FUNCNAME.2' -m $MASTER"
+		rlLog "rhts-sync-block -s '$FUNCNAME.3' $NISCLIENT	"
 		rlRun "rhts-sync-block -s '$FUNCNAME.3' $NISCLIENT	"
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
+		rlLog "rhts-sync-block -s '$FUNCNAME.1' $NISCLIENT"
 		rlRun "rhts-sync-block -s '$FUNCNAME.1' $NISCLIENT"
+		rlLog "rhts-sync-block -s '$FUNCNAME.2' $MASTER"
 		rlRun "rhts-sync-block -s '$FUNCNAME.2' $MASTER"
+		rlLog "rhts-sync-block -s '$FUNCNAME.3' $NISCLIENT"
 		rlRun "rhts-sync-block -s '$FUNCNAME.3' $NISCLIENT"
 		;;
 	"$NISCLIENT")
@@ -309,6 +330,7 @@ nisint_netgroup_test_1007()
 		rlRun "echo 'ALL: ALL' > /etc/hosts.deny"
 
 		rlRun "rhts-sync-set -s '$FUNCNAME.1' -m $NISCLIENT"
+		rlLog "rhts-sync-block -s '$FUNCNAME.2' $MASTER"
 		rlRun "rhts-sync-block -s '$FUNCNAME.2' $MASTER"
 
 		# cleanup/undo hosts.allow/host.deny files
@@ -331,17 +353,22 @@ nisint_netgroup_test_1008()
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
+		rlLog "rhts-sync-block -s '$FUNCNAME.1' $NISCLIENT"
 		rlRun "rhts-sync-block -s '$FUNCNAME.1' $NISCLIENT"
 
 		ssh_auth_failure testuser1 passw0rd1 $NISCLIENT
 
 		rlRun "rhts-sync-set -s '$FUNCNAME.2' -m $MASTER"
+		rlLog "rhts-sync-block -s '$FUNCNAME.3' $NISCLIENT"
 		rlRun "rhts-sync-block -s '$FUNCNAME.3' $NISCLIENT"
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
+		rlLog "rhts-sync-block -s '$FUNCNAME.1' $NISCLIENT"
 		rlRun "rhts-sync-block -s '$FUNCNAME.1' $NISCLIENT"
+		rlLog "rhts-sync-block -s '$FUNCNAME.2' $MASTER"
 		rlRun "rhts-sync-block -s '$FUNCNAME.2' $MASTER"
+		rlLog "rhts-sync-block -s '$FUNCNAME.3' $NISCLIENT"
 		rlRun "rhts-sync-block -s '$FUNCNAME.3' $NISCLIENT"
 		;;
 	"$NISCLIENT")
@@ -354,6 +381,7 @@ nisint_netgroup_test_1008()
 		rlRun "echo '#ALL: ALL' > /etc/hosts.allow"
 
 		rlRun "rhts-sync-set -s '$FUNCNAME.1' -m $NISCLIENT"
+		rlLog "rhts-sync-block -s '$FUNCNAME.2' $MASTER"
 		rlRun "rhts-sync-block -s '$FUNCNAME.2' $MASTER"
 		
 		rlRun "mv -f /etc/hosts.allow.orig.nisint /etc/hosts.allow"
@@ -375,6 +403,7 @@ nisint_netgroup_test_1009()
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
+		rlLog "rhts-sync-block -s '$FUNCNAME.0' $NISCLIENT"
 		rlRun "rhts-sync-block -s '$FUNCNAME.0' $NISCLIENT"
 		rlRun "mkdir /nctmp" 0 "Create temp mount point."
 		rlRun "mount $NISCLIENT:/tmp /nctmp" 0 "NFS Mount with netgroup access"
@@ -384,7 +413,9 @@ nisint_netgroup_test_1009()
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
+		rlLog "rhts-sync-block -s '$FUNCNAME.0' $NISCLIENT"
 		rlRun "rhts-sync-block -s '$FUNCNAME.0' $NISCLIENT"
+		rlLog "rhts-sync-block -s '$FUNCNAME.1' $MASTER"
 		rlRun "rhts-sync-block -s '$FUNCNAME.1' $MASTER"
 		;;
 	"$NISCLIENT")
@@ -394,6 +425,7 @@ nisint_netgroup_test_1009()
 		rlRun "service nfslock restart"
 		rlRun "exportfs @testnetgroup1:/tmp"
 		rlRun "rhts-sync-set -s '$FUNCNAME.0' -m $NISCLIENT"
+		rlLog "rhts-sync-block -s '$FUNCNAME.1' $MASTER"
 		rlRun "rhts-sync-block -s '$FUNCNAME.1' $MASTER"
 		;;
 	*)
@@ -410,11 +442,14 @@ nisint_netgroup_test_1010()
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
+		rlLog "rhts-sync-block -s '$FUNCNAME.0' $NISCLIENT"
 		rlRun "rhts-sync-block -s '$FUNCNAME.0' $NISCLIENT"
+		rlLog "rhts-sync-block -s '$FUNCNAME.1' $NISMASTER"
 		rlRun "rhts-sync-block -s '$FUNCNAME.1' $NISMASTER"
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
+		rlLog "rhts-sync-block -s '$FUNCNAME.0' $NISCLIENT"
 		rlRun "rhts-sync-block -s '$FUNCNAME.0' $NISCLIENT"
 		rlRun "mkdir /nctmp"
 		rlRun "mount $NISCLIENT:/tmp /nctmp" 32 "Fail to NFS Mount with no netgroup access"
@@ -428,6 +463,7 @@ nisint_netgroup_test_1010()
 		rlRun "service nfslock restart"
 		rlRun "exportfs @testnetgroup1:/tmp"
 		rlRun "rhts-sync-set -s '$FUNCNAME.0' -m $NISCLIENT"
+		rlLog "rhts-sync-block -s '$FUNCNAME.1' $NISMASTER"
 		rlRun "rhts-sync-block -s '$FUNCNAME.1' $NISMASTER"
 		;;
 	*)

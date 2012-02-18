@@ -58,10 +58,12 @@ nisint_ipamaster_integration()
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
+		rlLog "rhts-sync-block -s 'nisint_ipamaster_integration_end' $MASTER"
 		rlRun "rhts-sync-block -s 'nisint_ipamaster_integration_end' $MASTER"
 		;;
 	"$NISCLIENT")
 		rlLog "Machine in recipe is NISCLIENT"
+		rlLog "rhts-sync-block -s 'nisint_ipamaster_integration_end' $MASTER"
 		rlRun "rhts-sync-block -s 'nisint_ipamaster_integration_end' $MASTER"
 		;;
 	*)

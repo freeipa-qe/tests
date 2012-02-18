@@ -47,15 +47,19 @@ nisint_nisclient_integration()
 		rlLog "Machine in recipe is IPAMASTER"
 		nisint_nisclient_integration_master_envsetup
 		rlRun "rhts-sync-set -s 'nisint_nisclient_integration_start' -m $MASTER"
+		rlLog "rhts-sync-block -s 'nisint_nisclient_integration_end' $NISCLIENT"
 		rlRun "rhts-sync-block -s 'nisint_nisclient_integration_end' $NISCLIENT"
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
+		rlLog "rhts-sync-block -s 'nisint_nisclient_integration_start' $MASTER"
 		rlRun "rhts-sync-block -s 'nisint_nisclient_integration_start' $MASTER"
+		rlLog "rhts-sync-block -s 'nisint_nisclient_integration_end' $NISCLIENT"
 		rlRun "rhts-sync-block -s 'nisint_nisclient_integration_end' $NISCLIENT"
 		;;
 	"$NISCLIENT")
 		rlLog "Machine in recipe is NISCLIENT"
+		rlLog "rhts-sync-block -s 'nisint_nisclient_integration_start' $MASTER"
 		rlRun "rhts-sync-block -s 'nisint_nisclient_integration_start' $MASTER"
 
 		nisint_nisclient_integration_check_ipa_nis_data_remotely
