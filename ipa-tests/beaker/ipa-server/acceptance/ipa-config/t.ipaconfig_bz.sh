@@ -38,5 +38,10 @@ ipaconfig_bugzillas()
         	rlAssertGrep "\--emaildomain=STR     Default e-mail domain" "/tmp/bz742601.out"
 		rlAssertNotGrep "\--emaildomain=STR     Default e-mail domain for new users" "/tmp/bz742601.out"
 	rlPhaseEnd
+
+	rlPhaseStartTest "bz744205 ipa config-mod user search field blank - an internal error has occurred"
+		rlRun "ipa config-mod --usersearc= > /tmp/bz744205.out > 2>&1"
+		rlAssertNotGroup "ipa: ERROR: an internal error has occurred" "/tmp/bz744205.out"
+ 	rlPhaseEnd
 }
 
