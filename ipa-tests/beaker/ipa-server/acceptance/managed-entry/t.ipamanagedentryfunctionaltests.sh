@@ -249,6 +249,17 @@ managedby_server_tests()
 		rlRun "/usr/bin/ipa group-find --private --all $USERA" 1 "ensure that $NEWUSERAGROUP does not exist using ipa group-find"
 	rlPhaseEnd
 
+	rlPhaseStartTest "Managed-30 - Test the password option of ipa-managed-entry, from https://bugzilla.redhat.com/show_bug.cgi?id=742978"
+		rlRun "ipa-managed-entries --password=$ADMINPW -l | grep UPG\ Definition" 0 "make sure UPG Definition returns while using the --password option"
+		rlRun "ipa-managed-entries -p $ADMINPW -l | grep UPG\ Definition" 0 "make sure UPG Definition returns while using the --password option"
+	rlPhaseEnd
+
+	rlPhaseStartTest "Managed-31 - Negitive case for Managed-30"
+		rlRun "ipa-managed-entries --password=badpw -l | grep UPG\ Definition" 1 "make sure ipa-managed-entries --password does the right thing when given a bad password, with grep"
+		rlRun "ipa-managed-entries -p badpw -l | grep UPG\ Definition" 1 "make sure ipa-managed-entries does the right thing when given a bad password, with grep"
+		rlRun "ipa-managed-entries --password=badpw -l" 1 "make sure ipa-managed-entries does the right thing when given a bad password"
+	rlPhaseEnd
+
 }
 
 cleanup_managedby()
