@@ -421,6 +421,24 @@ rlJournalStart
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message - principal not in IPA server realm."
     rlPhaseEnd
 
+    rlPhaseStartTest "bug748110: Always set a non-zero max ssf"
+	rlLog "Verifies https://bugzilla.redhat.com/show_bug.cgi?id=748110"
+
+	rlRun "cp /etc/openldap/ldap.conf /var/tmp/" 0 "Backup /etc/openldap/ldap.conf"
+	echo "sasl_secprops minssf=0,maxssf=0" >> /etc/openldap/ldap.conf
+
+	rlRun "service httpd restart"
+	rlRun "tcpdump -i lo -w /tmp/snoop &"
+	rlRun "ipa user-show admin"
+	rlRun "tcpdump -i lo -r /tmp/snoop -s 8192 -X > /tmp/bug748110-tcpdump.txt 2>&1"
+
+	rlAssertNotGrep "cn=users" "/tmp/bug748110-tcpdump.txt"
+	rlAssertNotGrep "cn=accounts" "/tmp/bug748110-tcpdump.txt"
+
+	rlRun "mv -f /var/tmp/ldap.conf /etc/openldap/ldap.conf" 0 "Restoring /etc/openldap/ldap.conf" 
+	rlRun "service httpd restart"
+    rlPhaseEnd
+
     rlPhaseStartCleanup "ipa-user-cli-add-cleanup"
 	rlRun "ipa config-mod --searchrecordslimit=100" 0 "set default search records limit back to default"
         rlRun "ipa user-del $superuser " 0 "delete $superuser account"
