@@ -555,10 +555,10 @@ attr_netgroups_negative()
         rlPhaseEnd
 
 	rlPhaseStartTest "ipa-netgroup-038: setattr and addattr on dn"
-        	command="ipa netgroup-mod --setattr dn=\"mynewDN,$NETGRPDN\" $ngroup1"
+        	command="ipa netgroup-mod --setattr dn=\"ipauniqueid=mynewDN,$NETGRPDN\" $ngroup1"
         	expmsg="ipa: ERROR: attribute \"distinguishedName\" not allowed"
         	rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
-        	command="ipa netgroup-mod --addattr dn=\"anothernewDN,$NETGRPDN\" $ngroup1"
+        	command="ipa netgroup-mod --addattr dn=\"ipauniqueid=anothernewDN,$NETGRPDN\" $ngroup1"
         	rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
     	rlPhaseEnd
 
@@ -733,8 +733,8 @@ netgroup_bz_788625()
 		rlRun "ipa netgroup-add-member netgroup_bz_788625_test1 --users=admin"
 		rlRun "ipa netgroup-add netgroup_bz_788625_test --desc=netgroup_bz_788625_test"
 		rlRun "ipa netgroup-add-member netgroup_bz_788625_test --netgroups=netgroup_bz_788625_test1"
-		rlRun "ipa-compat-manage enable" 0,2
-		rlRun "ipa-nis-manage enable" 0,2
+		rlRun "echo $ADMINPW | ipa-compat-manage enable" 0,2
+		rlRun "echo $ADMINPA | ipa-nis-manage enable" 0,2
 		rlRun "service rpcbind restart"
 		rlRun "service dirsrv restart"
 		rlRun "yum install yp-tools"
