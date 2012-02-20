@@ -49,7 +49,7 @@ nisint_automount_tests()
 	nisint_automount_test_1006
 	nisint_automount_test_1007
 	nisint_automount_test_1008
-	nisint_automount_test_1000
+	nisint_automount_test_1009
 	nisint_automount_test_1010
 }
 
@@ -99,8 +99,8 @@ nisint_automount_test_1001()
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
-		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT	"
-		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT	"
+		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
+		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		;;
 	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"

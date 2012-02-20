@@ -66,15 +66,28 @@ fi
 
 rlLog_hostnames()
 {
+	HOSTNAME=$(hostname)
+	myhostname=`hostname`
+	HOSTNAME_S=$(echo $HOSTNAME|cut -f1 -d.)
+	hostmaster=$(host $MASTER 2>&1)
+	hostnismaster=$(host $NISMASTER 2>&1)
+	hostnisclient=$(host $NISCLIENT 2>&1)
 	rlLog "hostname command : $myhostname"
 	rlLog "HOSTNAME         : $HOSTNAME"
 	rlLog "HOSTNAME_S       : $HOSTNAME_S"
+	rlLog "------------------------------"
 	rlLog "MASTER           : $MASTER"
 	rlLog "MASTER_IP        : $MASTER_IP"
+	rlLog "host MASTER      : $hostmaster"
+	rlLog "------------------------------"
 	rlLog "NISMASTER        : $NISMASTER"
 	rlLog "NISMASTER_IP     : $NISMASTER_IP"
+	rlLog "host NISMASTER   : $hostnismaster"
+	rlLog "------------------------------"
 	rlLog "NISCLIENT        : $NISCLIENT"
 	rlLog "NISCLIENT_IP     : $NISCLIENT_IP"
+	rlLog "host NISCLIENT   : $hostnisclient"
+	rlLog "------------------------------"
 	rlLog "NISDOMAIN        : $NISDOMAIN"
 }
 
@@ -87,9 +100,6 @@ rlJournalStart
 		#rlAssertRpm $PACKAGE
 		rlRun "TmpDir=\`mktemp -d\`" 0 "Creating tmp directory"
 		rlRun "pushd $TmpDir"
-		HOSTNAME=$(hostname)
-		myhostname=`hostname`
-		HOSTNAME_S=$(echo $HOSTNAME|cut -f1 -d.)
 		rlLog_hostnames
 	rlPhaseEnd
 	

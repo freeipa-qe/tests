@@ -58,7 +58,7 @@ nisint_nisclient_setup()
 	"$NISCLIENT")
 		rlLog "Machine in recipe is NISCLIENT"
 
-		rlRun "yum -y remove *ipa-client* *ipa-admintools* *ipa-server*"
+		rlRun "yum -y remove *ipa-client *ipa-admintools"
 		nisint_nisclient_envsetup
 
 		rlRun "rhts-sync-set   -s 'nisint_nisclient_setup_ended' -m $NISCLIENT"
