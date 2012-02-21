@@ -860,6 +860,17 @@ rlJournalStart
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message - special characters."
     rlPhaseEnd
 
+    rlPhaseStartTest "ipa-group-cli-72: Setting GID's to 0 and negitive numbers."
+    # Test for: https://fedorahosted.org/freeipa/ticket/2335
+    # https://bugzilla.redhat.com/show_bug.cgi?id=786240
+        rlRun "ipa group-add --desc=j-test jennygn" 0 "Adding Test Group" 
+        rlRun "ipa group-mod --gid=0 jennygn" 1 "Trying to set group gid to 0"
+        rlRun "ipa group-mod --gid=-0 jennygn" 1 "Trying to set group gid to -0"
+        rlRun "ipa group-mod --gid=-100 jennygn" 1 "Trying to set group gid to -100"
+	rlRun "ipa group-find jennygn | grep GID | grep -100" 1 "Making sure that the GID of the test group is not -100"
+        rlRun "ipa group-del jennygn" 0 "Removing Test Group" 
+    rlPhaseEnd 
+
     rlPhaseStartCleanup "ipa-group-cli-cleanup: Delete remaining users and group and Destroying admin credentials"
 	rlRun "ipa config-mod --searchrecordslimit=100" 0 "setting search records limit back to default"
 	rlRun "ipa user-del trex" 0 "Deleting user trex."
