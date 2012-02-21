@@ -82,17 +82,16 @@ nisint_nisclient_integration_master_envsetup()
 	rlPhaseStartTest "nisint_nisclient_integration_master_envsetup: Run setup on MASTER to prep for Client Integration"
 		rlLog "prep for Kerberos setup for auth on the client"
 		NISCLIENT_S=$(echo $NISCLIENT|cut -f1 -d.)
-		#NISCLIENT=$NISCLIENT_S.$DOMAIN
-		TNISCLIENT=$NISCLIENT_S.$DOMAIN
+		NISCLIENT=$NISCLIENT_S.$DOMAIN
 		ptrzone=$(echo $NISCLIENT_IP|awk -F. '{print $3 "." $2 "." $1 ".in-addr.arpa."}')
 		if [ $(ipa dnszone-show $ptrzone 2>/dev/null|wc -l) -eq 0 ]; then 
 			rlRun "ipa dnszone-add $ptrzone --name-server=$MASTER --admin-email=ipaqar.redhat.com"
 		fi
-		if [ $(ipa host-show $TNISCLIENT 2>&1|grep -i "host not found"|wc -l) -gt 0 ]; then
-			rlRun "ipa host-add $TNISCLIENT --ip-address=$NISCLIENT_IP"
+		if [ $(ipa host-show $NISCLIENT 2>&1|grep -i "host not found"|wc -l) -gt 0 ]; then
+			rlRun "ipa host-add $NISCLIENT --ip-address=$NISCLIENT_IP"
 		fi
-		rlRun "ipa-getkeytab -s $MASTER -p host/$TNISCLIENT@$RELM -k /tmp/krb5.keytab.$TNISCLIENT"
-		rlRun "scp -q -o StrictHostKeyChecking=no /tmp/krb5.keytab.$TNISCLIENT root@$TNISCLIENT:/etc/krb5.keytab"
+		rlRun "ipa-getkeytab -s $MASTER -p host/$NISCLIENT@$RELM -k /tmp/krb5.keytab.$NISCLIENT"
+		rlRun "scp -q -o StrictHostKeyChecking=no /tmp/krb5.keytab.$NISCLIENT root@$NISCLIENT:/etc/krb5.keytab"
 	rlPhaseEnd
 }
 
@@ -115,8 +114,9 @@ nisint_nisclient_integration_change_to_ipa_nismaster()
 	rlPhaseStartTest "nisint_nisclient_integration_change_to_ipa_nismaster: Switch NIS config to point to IPA Master"
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		MASTER_S=$(echo $MASTER|cut -f1 -d.)
-		#MASTER=$MASTER_S.$DOMAIN
-		TMASTER=$MASTER_S.$DOMAIN
+		MASTER=$MASTER_S.$DOMAIN
+		NISCLIENT_S=$(echo $NISCLIENT|cut -f1 -d.)
+		NISCLIENT=$NISCLIENT_S.$DOMAIN
 		rlRun "cp /etc/yp.conf /etc/yp.conf.orig.$NISDOMAIN"
 		rlRun "sed -i 's/$NISDOMAIN/$DOMAIN/g' /etc/yp.conf"
 		rlRun "sed -i 's/$NISMASTER/$MASTER/g' /etc/yp.conf"

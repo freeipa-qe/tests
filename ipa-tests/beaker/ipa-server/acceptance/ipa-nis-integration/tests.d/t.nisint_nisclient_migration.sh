@@ -49,11 +49,11 @@ nisint_nisclient_migration()
 nisint_nisclient_migration_envsetup()
 {
 	rlPhaseStartTest "nisint_nisclient_migration_envsetup: Prep for migration to IPA"
+	HOSTNAME=$(hostname)
 	case "$HOSTNAME" in
 	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
-		TNISCLIENT=$(echo $NISCLIENT|cut -f1 -d.).$DOMAIN
-		rlRun "ipa host-del $TNISCLIENT"
+		rlRun "ipa host-del $NISCLIENT"
 		rlRun "rhts-sync-set -s '$FUNCNAME.0' -m $MASTER"
 		rlLog "rhts-sync-block -s '$FUNCNAME.1' $NISCLIENT"
 		rlRun "rhts-sync-block -s '$FUNCNAME.1' $NISCLIENT"
@@ -72,6 +72,8 @@ nisint_nisclient_migration_envsetup()
 		HOSTNAME_S=$(hostname -s)
 		MASTER_S=$(echo $MASTER|cut -f1 -d. )
 		MASTER=$MASTER_S.$DOMAIN
+		NISCLIENT_S=$(echo $NISCLIENT|cut -f1 -d.)
+		NISCLIENT=$NISCLIENT_S.$DOMAIN
 
 		rlRun "yum -y install *ipa-admintools *ipa-client"
 
