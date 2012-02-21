@@ -903,6 +903,27 @@ rlJournalStart
 		verifyErrorMsg "ipa dnsrecord-add $zone @ --kx-rec \"333383838383 1.2.3.4\"" "ipa: ERROR: invalid 'preference': can be at most 65535"
 	rlPhaseEnd
 
+	rlPhaseStartTest "ipa-dns-159: Bug 766075 DNS zone dynamic update is changed to false if --allow-dynupdate not specified"
+		rlLog "verifies https://bugzilla.redhat.com/show_bug.cgi?id=766075"
+
+		verifyErrorMsg "ipa dnszone-add example.com --name-server=$HOSTNAME --admin-email=admin@example.com --allow-dynupdate" "ipa: error: no such option: --allow-dynupdate"
+
+		rlRun "ipa dnszone-add example.com --name-server=$HOSTNAME --admin-email=admin@example.com --dynamic-update"
+		rlRun "ipa dnszone-show example.com | grep \"Dynamic update: TRUE\"" 1
+		rlRun "ipa dnszone-show example.com --all | grep \"Dynamic update: TRUE\""
+		rlRun "ipa dnszone-mod example.com --retry=600 | grep \"Dynamic update: FALSE\"" 1
+
+		rlRun "ipa dnszone-show example.com --all | grep \"Dynamic update: FALSE\"" 1
+		rlRun "ipa dnszone-show example.com --all | grep \"Dynamic update: TRUE\""
+
+		rlRun "ipa dnszone-mod example.com --dynamic-update=false | grep \"Dynamic update: FALSE\""
+		rlRun "ipa dnszone-mod example.com --retry=500"
+		rlRun "ipa dnszone-show example.com --all | grep \"Dynamic update: FALSE\""
+
+		rlRun "ipa dnszone-del example.com"
+
+	rlPhaseEnd
+
 	rlJournalPrintText
 	report=/tmp/rhts.report.$RANDOM.txt
 	makereport $report
