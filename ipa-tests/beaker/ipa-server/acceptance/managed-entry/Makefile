@@ -26,11 +26,11 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 export TEST=/CoreOS/ipa-server/acceptance/managed-entry
-export TESTVERSION=1.2
+export TESTVERSION=1.3
 
 BUILT_FILES=
 
-FILES=$(METADATA) runtest.sh Makefile PURPOSE t.ipamanagedentryfunctionaltests.sh
+FILES=$(METADATA) runtest.sh Makefile PURPOSE t.ipamanagedentry.sh t.ipamanagedentryfunctionaltests.sh
 
 .PHONY: all install download clean
 
@@ -53,7 +53,7 @@ $(METADATA): Makefile
 	@echo "Path:            $(TEST_DIR)" >> $(METADATA)
 	@echo "Description:     IPA Managed Entry " >> $(METADATA)
 	@echo "Type:            Regression" >> $(METADATA)
-	@echo "TestTime:        10m" >> $(METADATA)
+	@echo "TestTime:        20m" >> $(METADATA)
 	@echo "RunFor:          ipa-client" >> $(METADATA)
 	@echo "Requires:        ipa-admintools" >> $(METADATA)
 	@echo "Requires:        expect" >> $(METADATA)
