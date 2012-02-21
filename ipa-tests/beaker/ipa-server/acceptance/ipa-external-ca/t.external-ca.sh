@@ -52,6 +52,7 @@ installMasterExtCA()
 	rlRun "yum install -y ipa-server bind-dyndb-ldap bind"
 	echo "ipa-server-install --external-ca --setup-dns --forwarder=$DNSFORWARD --hostname=$hostname_s.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U" > /dev/shm/installipa.bash
 
+	rlLog "Verifies https://bugzilla.redhat.com/show_bug.cgi?id=750828"
 	rlLog "EXECUTING: ipa-server-install --external-ca --setup-dns --forwarder=$DNSFORWARD --hostname=$hostname_s.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U"
 
         rlRun "setenforce 1" 0 "Making sure selinux is enforced"
