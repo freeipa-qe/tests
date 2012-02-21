@@ -248,7 +248,7 @@ nisint_ipamaster_integration_add_nis_data_netgroup()
 
 nisint_ipamaster_integration_add_nis_data_automount()
 {
-	rlPhaseStartTest "nisint_ipamaster_integration_add_nis_data_006: Import NIS automount maps"
+	rlPhaseStartTest "nisint_ipamaster_integration_add_nis_data_automount: Import NIS automount maps"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 

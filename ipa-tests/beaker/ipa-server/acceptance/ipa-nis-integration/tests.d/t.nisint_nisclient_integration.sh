@@ -67,6 +67,19 @@ nisint_nisclient_integration()
 		nisint_nisclient_integration_setup_kerberos_for_auth
 		nisint_nisclient_integration_check_ipa_nis_data_locally
 
+		myhostname=`hostname`
+		HOSTNAME_S=$(echo $HOSTNAME|cut -f1 -d.)
+		rlLog "hostname command : $myhostname"
+		rlLog "HOSTNAME         : $HOSTNAME"
+		rlLog "HOSTNAME_S       : $HOSTNAME_S"
+		rlLog "MASTER           : $MASTER"
+		rlLog "MASTER_IP        : $MASTER_IP"
+		rlLog "NISMASTER        : $NISMASTER"
+		rlLog "NISMASTER_IP     : $NISMASTER_IP"
+		rlLog "NISCLIENT        : $NISCLIENT"
+		rlLog "NISCLIENT_IP     : $NISCLIENT_IP"
+		rlLog "NISDOMAIN        : $NISDOMAIN"
+
 		rlLog "rhts-sync-set -s 'nisint_nisclient_integration_end' -m $NISCLIENT"
 		rlRun "rhts-sync-set -s 'nisint_nisclient_integration_end' -m $NISCLIENT"
 		;;
