@@ -67,6 +67,7 @@ nisint_nisclient_integration()
 		nisint_nisclient_integration_setup_kerberos_for_auth
 		nisint_nisclient_integration_check_ipa_nis_data_locally
 
+		rlLog "rhts-sync-set -s 'nisint_nisclient_integration_end' -m $NISCLIENT"
 		rlRun "rhts-sync-set -s 'nisint_nisclient_integration_end' -m $NISCLIENT"
 		;;
 	*)
