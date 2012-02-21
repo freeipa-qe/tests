@@ -51,17 +51,19 @@ PACKAGE="ipa-server"
 startDate=`date "+%F %r"`
 startEpoch=`date "+%s"`
 
-export MASTER_IP=$(host $MASTER|grep -v 'not found:'|awk '{print $4}')
+export MASTER_IP=$(nslookup $MASTER | grep Address | grep -v "#" | awk '{print $2}')
 if [ -z "$MASTER_IP" ]; then
-	export MASTER_IP=$(getent hosts $MASTER|awk '{print $1}')
+	export MASTER_IP=$(getent ahostsv4 $MASTER | grep -e "^[0-9.]*[ ]*STREAM" | awk '{print $1}')
 fi
-export NISMASTER_IP=$(host $NISMASTER|grep -v 'not found:'|awk '{print $4}')
+
+export NISMASTER_IP=$(nslookup $NISMASTER | grep Address | grep -v "#" | awk '{print $2}')
 if [ -z "$NISMASTER_IP" ]; then
-	export NISMASTER_IP=$(getent hosts $NISMASTER|awk '{print $1}')
+	export NISMASTER_IP=$(getent ahostsv4 $NISMASTER | grep -e "^[0-9.]*[ ]*STREAM" | awk '{print $1}')
 fi
-export NISCLIENT_IP=$(host $NISCLIENT|grep -v 'not found:'|awk '{print $4}')
+
+export NISCLIENT_IP=$(nslookup $NISCLIENT | grep Address | grep -v "#" | awk '{print $2}')
 if [ -z "$NISCLIENT_IP" ]; then
-	export NISCLIENT_IP=$(getent hosts $NISCLIENT|awk '{print $1}')
+	export NISCLIENT_IP=$(getent ahostsv4 $NISCLIENT | grep -e "^[0-9.]*[ ]*STREAM" | awk '{print $1}')
 fi
 
 case $HOSTNAME in
@@ -70,6 +72,10 @@ case $HOSTNAME in
 "$NISCLIENT") MYROLE="NISCLIENT" ;;
 *)            MYROLE="UNKNOWN"   ;;
 esac
+
+MASTER_REAL=$MASTER
+NISMASTER_REAL=$NISMASTER
+NISCLIENT_REAL=$NISCLIENT
 
 rlLog_hostnames()
 {
