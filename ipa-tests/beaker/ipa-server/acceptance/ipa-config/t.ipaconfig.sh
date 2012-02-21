@@ -49,7 +49,7 @@ ipaconfig_mod()
     ipaconfig_mod_defaultgroup_negative
     ipaconfig_mod_emaildomain_default
     ipaconfig_mod_emaildomain_negative
-    ipaconfig_mod_expiration
+    ipaconfig_mod_pwdexpiration
     ipaconfig_mod_envcleanup
 } #ipaconfig_mod
 
@@ -203,10 +203,29 @@ ipaconfig_mod_envsetup()
 } #ipaconfig_mod_envsetup
 
 
-ipaconfig_mod_expiration()
+ipaconfig_mod_pwdexpiration()
 {
-    rlPhaseStartTest "ipaconfig_mod_expiration"
-        rlPass "no special section for mod expiration yet."
+    rlPhaseStartTest "ipaconfig_mod_pwdexpiration - positive"
+        for item in 3 12 54 0 47 4 ; do
+            KinitAsAdmin
+            rlRun "ipa config-mod --pwdexpnotify=$item" 0 "set password notify option to [$item]"
+            sleep 2
+            value=`ipa config-show | grep "Password Expiration Notification" | cut -d ":" -f 2`
+	    # trim white space
+	    value=`echo $value`
+	    if [ $value -ne $item ] ; then
+		rlFail "Password Exipration Notification not as expected.  GOT: $value  Expected: $item"
+	    else
+		rlPass "Password Exipration Notification as expected: $value"
+	    fi
+        done
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipaconfig_mod_pwdexpiration - negative"
+	expmsg="ipa: ERROR: invalid 'ipapwdexpadvnotify': must be an integer"
+	for item in a * GH blaH ; do
+		rlRun "verifyErrorMsg \"ipa config-mod --pwdexpnotify=$item\" \"$expmsg\"" 0 "Verify expected error message."
+	done
     rlPhaseEnd
 
 }
@@ -439,9 +458,8 @@ ipaconfig_mod_defaultgroup_default()
 	rlRun "ipa group-add --desc=\"$testgroup\" \"$testgroup\"" 0 "Add test group"
         rlRun "ipa config-mod --defaultgroup=\"$testgroup\" " 0 "set defaultgroup=[$testgroup]"
         ipaconfig_mod_defaultgroup_default_logic "$testgroup"
-	rlRun "ipa group-del \"$testgroup\"" 0 "Delete test group"
-
         rlRun "ipa config-mod --defaultgroup=$default_config_usergroup" 0 "set homedirectory=[$default_config_usergroup] - back to default"
+	rlRun "ipa group-del \"$testgroup\"" 0 "Delete test group"
     rlPhaseEnd
 } #ipaconfig_mod_defaultgroup_default
 
