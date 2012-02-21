@@ -140,5 +140,10 @@ set send_slow {1 .1}' > $expfile
 
 	rlRun "service ipa status"
 
+	# As part of verifying bug https://bugzilla.redhat.com/show_bug.cgi?id=750828"
+        rlAssertGrep "forwarders" "/etc/named.conf"
+        rlAssertGrep "$DNSFORWARD" "/etc/named.conf"
+
+
 }
 
