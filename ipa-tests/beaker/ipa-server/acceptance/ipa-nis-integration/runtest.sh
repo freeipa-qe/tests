@@ -64,6 +64,13 @@ if [ -z "$NISCLIENT_IP" ]; then
 	export NISCLIENT_IP=$(getent hosts $NISCLIENT|awk '{print $1}')
 fi
 
+case $HOSTNAME in
+"$MASTER")    MYROLE="MASTER"    ;;
+"$NISMASTER") MYROLE="NISMASTER" ;;
+"$NISCLIENT") MYROLE="NISCLIENT" ;;
+*)            MYROLE="UNKNOWN"   ;;
+esac
+
 rlLog_hostnames()
 {
 	HOSTNAME=$(hostname)

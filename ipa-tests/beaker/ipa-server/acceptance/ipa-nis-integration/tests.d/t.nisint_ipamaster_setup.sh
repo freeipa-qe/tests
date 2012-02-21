@@ -41,20 +41,20 @@
 nisint_ipamaster_setup()
 {
 	rlPhaseStartTest "nisint_ipamaster_setup: "
-	case "$HOSTNAME" in
-	"$MASTER")
+	case "$MYROLE" in
+	"MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
-		rlRun "rhts-sync-set -s '$FUNCNAME' -m $MASTER"
+		rlRun "rhts-sync-set -s '$FUNCNAME' -m $MASTER_IP"
 		;;
-	"$NISMASTER")
+	"NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
-		rlLog "rhts-sync-block -s '$FUNCNAME' $MASTER"
-		rlRun "rhts-sync-block -s '$FUNCNAME' $MASTER"
+		rlLog "rhts-sync-block -s '$FUNCNAME' $MASTER_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME' $MASTER_IP"
 		;;
-	"$NISCLIENT")
+	"NISCLIENT")
 		rlLog "Machine in recipe is NISCLIENT"
-		rlLog "rhts-sync-block -s '$FUNCNAME' $MASTER"
-		rlRun "rhts-sync-block -s '$FUNCNAME' $MASTER"
+		rlLog "rhts-sync-block -s '$FUNCNAME' $MASTER_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME' $MASTER_IP"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE"

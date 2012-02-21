@@ -47,14 +47,14 @@ template_function()
 {
 	rlLog "$FUNCNAME"
 
-	case "$HOSTNAME" in
-	"$MASTER")
+	case "$MYROLE" in
+	"MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
 		;;
-	"$NISMASTER")
+	"NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
 		;;
-	"$NISCLIENT")
+	"NISCLIENT")
 		rlLog "Machine in recipe is NISCLIENT"
 		;;
 	*)

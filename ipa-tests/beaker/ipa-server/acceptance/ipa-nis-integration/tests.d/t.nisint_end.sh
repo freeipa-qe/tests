@@ -43,29 +43,29 @@ nisint_end()
 {
 	rlLog "$FUNCNAME"
 
-	case "$HOSTNAME" in
-	"$MASTER")
+	case "$MYROLE" in
+	"MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
-		rlRun "rhts-sync-set -s 'nisint_end_nisclient' -m $MASTER"
-		rlRun "rhts-sync-set -s 'nisint_end_nismaster' -m $MASTER"
-		rlLog "rhts-sync-block -s 'nisint_end' $NISMASTER $NISCLIENT"
-		rlRun "rhts-sync-block -s 'nisint_end' $NISMASTER $NISCLIENT"
+		rlRun "rhts-sync-set -s 'nisint_end_nisclient' -m $MASTER_IP"
+		rlRun "rhts-sync-set -s 'nisint_end_nismaster' -m $MASTER_IP"
+		rlLog "rhts-sync-block -s 'nisint_end' $NISMASTER_IP $NISCLIENT_IP"
+		rlRun "rhts-sync-block -s 'nisint_end' $NISMASTER_IP $NISCLIENT_IP"
 		rlLog "Ending IPA MASTER tests."
 		rlLog "Ending NIS Integration and Migration tests."
 		;;
-	"$NISMASTER")
+	"NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
-		rlLog "rhts-sync-block -s 'nisint_end_nisserver' $MASTER"
-		rlRun "rhts-sync-block -s 'nisint_end_nisserver' $MASTER"
+		rlLog "rhts-sync-block -s 'nisint_end_nisserver' $MASTER_IP"
+		rlRun "rhts-sync-block -s 'nisint_end_nisserver' $MASTER_IP"
 		rlLog "Ending NISMASTER tests."
-		rlRun "rhts-sync-set -s 'nisint_end' -m $NISMASTER"
+		rlRun "rhts-sync-set -s 'nisint_end' -m $NISMASTER_IP"
 		;;
-	"$NISCLIENT")
+	"NISCLIENT")
 		rlLog "Machine in recipe is NISCLIENT"
-		rlLog "rhts-sync-block -s 'nisint_end_nisclient' $MASTER"
-		rlRun "rhts-sync-block -s 'nisint_end_nisclient' $MASTER"
+		rlLog "rhts-sync-block -s 'nisint_end_nisclient' $MASTER_IP"
+		rlRun "rhts-sync-block -s 'nisint_end_nisclient' $MASTER_IP"
 		rlLog "Ending NISCLIENT tests."
-		rlRun "rhts-sync-set -s 'nisint_end' -m $NISCLIENT"
+		rlRun "rhts-sync-set -s 'nisint_end' -m $NISCLIENT_IP"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE"

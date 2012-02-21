@@ -43,25 +43,25 @@ nisint_nisclient_setup()
 	rlLog "$FUNCNAME"
 
 	rlPhaseStartTest "nisint_nisclient_setup: "
-	case "$HOSTNAME" in
-	"$MASTER")
+	case "$MYROLE" in
+	"MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
-		rlLog "rhts-sync-block -s 'nisint_nisclient_setup_ended' $NISCLIENT"
-		rlRun "rhts-sync-block -s 'nisint_nisclient_setup_ended' $NISCLIENT"
+		rlLog "rhts-sync-block -s 'nisint_nisclient_setup_ended' $NISCLIENT_IP"
+		rlRun "rhts-sync-block -s 'nisint_nisclient_setup_ended' $NISCLIENT_IP"
 		rlPass "$FUNCNAME complete for IPAMASTER ($HOSTNAME)"
 		;;
-	"$NISMASTER")
+	"NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
-		rlLog "rhts-sync-block -s 'nisint_nisclient_setup_ended' $NISCLIENT"
-		rlRun "rhts-sync-block -s 'nisint_nisclient_setup_ended' $NISCLIENT"
+		rlLog "rhts-sync-block -s 'nisint_nisclient_setup_ended' $NISCLIENT_IP"
+		rlRun "rhts-sync-block -s 'nisint_nisclient_setup_ended' $NISCLIENT_IP"
 		;;
-	"$NISCLIENT")
+	"NISCLIENT")
 		rlLog "Machine in recipe is NISCLIENT"
 
 		rlRun "yum -y remove *ipa-client *ipa-admintools"
 		nisint_nisclient_envsetup
 
-		rlRun "rhts-sync-set   -s 'nisint_nisclient_setup_ended' -m $NISCLIENT"
+		rlRun "rhts-sync-set   -s 'nisint_nisclient_setup_ended' -m $NISCLIENT_IP"
 		rlPass "$FUNCNAME complete for NISCLIENT ($HOSTNAME)"
 		;;
 	*)

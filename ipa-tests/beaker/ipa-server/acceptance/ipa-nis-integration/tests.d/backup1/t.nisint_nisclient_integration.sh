@@ -42,25 +42,25 @@ nisint_nisclient_integration()
 {
 	rlLog "$FUNCNAME"
 	rlPhaseStartTest "nisint_nisclient_integration: "
-	case "$MYROLE" in
-	"MASTER")
+	case "$HOSTNAME" in
+	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
 		nisint_nisclient_integration_master_envsetup
-		rlRun "rhts-sync-set -s 'nisint_nisclient_integration_start' -m $MASTER_IP"
-		rlLog "rhts-sync-block -s 'nisint_nisclient_integration_end' $NISCLIENT_IP"
-		rlRun "rhts-sync-block -s 'nisint_nisclient_integration_end' $NISCLIENT_IP"
+		rlRun "rhts-sync-set -s 'nisint_nisclient_integration_start' -m $MASTER"
+		rlLog "rhts-sync-block -s 'nisint_nisclient_integration_end' $NISCLIENT"
+		rlRun "rhts-sync-block -s 'nisint_nisclient_integration_end' $NISCLIENT"
 		;;
-	"NISMASTER")
+	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
-		rlLog "rhts-sync-block -s 'nisint_nisclient_integration_start' $MASTER_IP"
-		rlRun "rhts-sync-block -s 'nisint_nisclient_integration_start' $MASTER_IP"
-		rlLog "rhts-sync-block -s 'nisint_nisclient_integration_end' $NISCLIENT_IP"
-		rlRun "rhts-sync-block -s 'nisint_nisclient_integration_end' $NISCLIENT_IP"
+		rlLog "rhts-sync-block -s 'nisint_nisclient_integration_start' $MASTER"
+		rlRun "rhts-sync-block -s 'nisint_nisclient_integration_start' $MASTER"
+		rlLog "rhts-sync-block -s 'nisint_nisclient_integration_end' $NISCLIENT"
+		rlRun "rhts-sync-block -s 'nisint_nisclient_integration_end' $NISCLIENT"
 		;;
-	"NISCLIENT")
+	"$NISCLIENT")
 		rlLog "Machine in recipe is NISCLIENT"
-		rlLog "rhts-sync-block -s 'nisint_nisclient_integration_start' $MASTER_IP"
-		rlRun "rhts-sync-block -s 'nisint_nisclient_integration_start' $MASTER_IP"
+		rlLog "rhts-sync-block -s 'nisint_nisclient_integration_start' $MASTER"
+		rlRun "rhts-sync-block -s 'nisint_nisclient_integration_start' $MASTER"
 
 		nisint_nisclient_integration_check_ipa_nis_data_remotely
 		nisint_nisclient_integration_change_to_ipa_nismaster
@@ -80,8 +80,8 @@ nisint_nisclient_integration()
 		rlLog "NISCLIENT_IP     : $NISCLIENT_IP"
 		rlLog "NISDOMAIN        : $NISDOMAIN"
 
-		rlLog "rhts-sync-set -s 'nisint_nisclient_integration_end' -m $NISCLIENT_IP"
-		rlRun "rhts-sync-set -s 'nisint_nisclient_integration_end' -m $NISCLIENT_IP"
+		rlLog "rhts-sync-set -s 'nisint_nisclient_integration_end' -m $NISCLIENT"
+		rlRun "rhts-sync-set -s 'nisint_nisclient_integration_end' -m $NISCLIENT"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE"

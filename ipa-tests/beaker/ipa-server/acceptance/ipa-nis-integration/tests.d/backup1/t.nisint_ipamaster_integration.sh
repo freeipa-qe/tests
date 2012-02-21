@@ -43,8 +43,8 @@ nisint_ipamaster_integration()
 	rlLog "$FUNCNAME"
 
 	rlPhaseStartTest "nisint_ipamaster_integration: "
-	case "$MYROLE" in
-	"MASTER")
+	case "$HOSTNAME" in
+	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
 		
 		nisint_ipamaster_integration_envsetup
@@ -54,17 +54,17 @@ nisint_ipamaster_integration()
 		nisint_ipamaster_integration_add_nis_data_ldif
 		nisint_ipamaster_integration_check_ipa_nis_data
 
-		rlRun "rhts-sync-set -s 'nisint_ipamaster_integration_end' -m $MASTER_IP"
+		rlRun "rhts-sync-set -s 'nisint_ipamaster_integration_end' -m $MASTER"
 		;;
-	"NISMASTER")
+	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
-		rlLog "rhts-sync-block -s 'nisint_ipamaster_integration_end' $MASTER_IP"
-		rlRun "rhts-sync-block -s 'nisint_ipamaster_integration_end' $MASTER_IP"
+		rlLog "rhts-sync-block -s 'nisint_ipamaster_integration_end' $MASTER"
+		rlRun "rhts-sync-block -s 'nisint_ipamaster_integration_end' $MASTER"
 		;;
-	"NISCLIENT")
+	"$NISCLIENT")
 		rlLog "Machine in recipe is NISCLIENT"
-		rlLog "rhts-sync-block -s 'nisint_ipamaster_integration_end' $MASTER_IP"
-		rlRun "rhts-sync-block -s 'nisint_ipamaster_integration_end' $MASTER_IP"
+		rlLog "rhts-sync-block -s 'nisint_ipamaster_integration_end' $MASTER"
+		rlRun "rhts-sync-block -s 'nisint_ipamaster_integration_end' $MASTER"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE"

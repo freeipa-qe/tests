@@ -43,14 +43,14 @@ nisint_nismaster_setup()
 	rlLog "$FUNCNAME"
 
 	rlPhaseStartTest "nisint_nismaster_setup: "
-	case "$MYROLE" in
-	"MASTER")
+	case "$HOSTNAME" in
+	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER ($HOSTNAME)"
-		rlLog "rhts-sync-block -s 'nisint_nismaster_setup_ended' $NISMASTER_IP"
-		rlRun "rhts-sync-block -s 'nisint_nismaster_setup_ended' $NISMASTER_IP"
+		rlLog "rhts-sync-block -s 'nisint_nismaster_setup_ended' $NISMASTER"
+		rlRun "rhts-sync-block -s 'nisint_nismaster_setup_ended' $NISMASTER"
 		rlPass "$FUNCNAME complete for IPAMASTER ($HOSTNAME)"
 		;;
-	"NISMASTER")
+	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
 
 		nisint_nismaster_envsetup
@@ -62,13 +62,13 @@ nisint_nismaster_setup()
 		nisint_nismaster_setup_groups
 		nisint_nismaster_setup_hosts
 
-		rlRun "rhts-sync-set   -s 'nisint_nismaster_setup_ended' -m $NISMASTER_IP"
+		rlRun "rhts-sync-set   -s 'nisint_nismaster_setup_ended' -m $NISMASTER"
 		rlPass "$FUNCNAME complete for NISMASTER ($HOSTNAME)"
 		;;
-	"NISCLIENT")
+	"$NISCLIENT")
 		rlLog "Machine in recipe is NISCLIENT"
-		rlLog "rhts-sync-block -s 'nisint_nismaster_setup_ended' $NISMASTER_IP"
-		rlRun "rhts-sync-block -s 'nisint_nismaster_setup_ended' $NISMASTER_IP"
+		rlLog "rhts-sync-block -s 'nisint_nismaster_setup_ended' $NISMASTER"
+		rlRun "rhts-sync-block -s 'nisint_nismaster_setup_ended' $NISMASTER"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE"

@@ -56,18 +56,18 @@ nisint_automount_tests()
 nisint_automount_test_envsetup()
 {
 	rlPhaseStartTest "nisint_automount_test_envsetup: install autofs on client"
-	case "$MYROLE" in
-	"MASTER")
+	case "$HOSTNAME" in
+	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
-		rlLog "rhts-sync-block -s '$FUNCNAME.0' $NISCLIENT_IP	"
-		rlRun "rhts-sync-block -s '$FUNCNAME.0' $NISCLIENT_IP	"
-		rlLog "rhts-sync-block -s '$FUNCNAME.1' $NISMASTER_IP"
-		rlRun "rhts-sync-block -s '$FUNCNAME.1' $NISMASTER_IP"
+		rlLog "rhts-sync-block -s '$FUNCNAME.0' $NISCLIENT	"
+		rlRun "rhts-sync-block -s '$FUNCNAME.0' $NISCLIENT	"
+		rlLog "rhts-sync-block -s '$FUNCNAME.1' $NISMASTER"
+		rlRun "rhts-sync-block -s '$FUNCNAME.1' $NISMASTER"
 		;;
-	"NISMASTER")
+	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
-		rlLog "rhts-sync-block -s '$FUNCNAME.0' $NISCLIENT_IP"
-		rlRun "rhts-sync-block -s '$FUNCNAME.0' $NISCLIENT_IP"
+		rlLog "rhts-sync-block -s '$FUNCNAME.0' $NISCLIENT"
+		rlRun "rhts-sync-block -s '$FUNCNAME.0' $NISCLIENT"
 		rlRun "sed -i 's/netgroup:   nisplus/netgroup:   nis/' /etc/nsswitch.conf"
 		rlRun "service rpcbind restart"
 		rlRun "service ypserv restart"
@@ -75,16 +75,16 @@ nisint_automount_test_envsetup()
 		rlRun "service nfs restart"
 		rlRun "service nfslock restart"
 		rlRun "exportfs -a"
-		rlRun "rhts-sync-set -s '$FUNCNAME.1' -m $NISMASTER_IP"
+		rlRun "rhts-sync-set -s '$FUNCNAME.1' -m $NISMASTER"
 		
 		;;
-	"NISCLIENT")
+	"$NISCLIENT")
 		rlLog "Machine in recipe is NISCLIENT"
 		rlRun "yum -y install autofs" 0 "Install autofs for testing"
 		rlRun "service autofs restart"
-		rlRun "rhts-sync-set -s '$FUNCNAME.0' -m $NISCLIENT_IP"
-		rlLog "rhts-sync-block -s '$FUNCNAME.1' $NISMASTER_IP"
-		rlRun "rhts-sync-block -s '$FUNCNAME.1' $NISMASTER_IP"
+		rlRun "rhts-sync-set -s '$FUNCNAME.0' -m $NISCLIENT"
+		rlLog "rhts-sync-block -s '$FUNCNAME.1' $NISMASTER"
+		rlRun "rhts-sync-block -s '$FUNCNAME.1' $NISMASTER"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE"
@@ -96,18 +96,18 @@ nisint_automount_test_envsetup()
 nisint_automount_test_1001()
 {
 	rlPhaseStartTest "nisint_automount_test_1001: ypcat positive test"
-	case "$MYROLE" in
-	"MASTER")
+	case "$HOSTNAME" in
+	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
-		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
-		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
+		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
+		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		;;
-	"NISMASTER")
+	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
-		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
-		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
+		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
+		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		;;
-	"NISCLIENT")
+	"$NISCLIENT")
 		rlLog "Machine in recipe is NISCLIENT"
 		if [ $(ps -ef|grep [y]pbind|wc -l) -eq 0 ]; then
 			rlPass "ypbind not running...skipping test"
@@ -116,7 +116,7 @@ nisint_automount_test_1001()
 			rlRun "ypcat -k auto.home   |grep home" 0 "ypcat search for existing auto.home entry"
 			rlRun "ypcat -k auto.nisint |grep app1" 0 "ypcat search for existing auto.nisint entry"
 		fi
-		rlRun "rhts-sync-set -s '$FUNCNAME' -m $NISCLIENT_IP"
+		rlRun "rhts-sync-set -s '$FUNCNAME' -m $NISCLIENT"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE"
@@ -129,25 +129,25 @@ nisint_automount_test_1001()
 nisint_automount_test_1002()
 {
 	rlPhaseStartTest "nisint_automount_test_1002: ypcat negative test"
-	case "$MYROLE" in
-	"MASTER")
+	case "$HOSTNAME" in
+	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
-		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
-		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
+		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
+		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		;;
-	"NISMASTER")
+	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
-		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
-		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
+		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
+		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		;;
-	"NISCLIENT")
+	"$NISCLIENT")
 		rlLog "Machine in recipe is NISCLIENT"
 		if [ $(ps -ef|grep [y]pbind|wc -l) -eq 0 ]; then
 			rlPass "ypbind not running...skipping test"
 		else
 			rlRun "ypcat -k auto.master |grep notamap" 1 "Fail to ypcat search for non-existent auto.master entry"
 		fi
-		rlRun "rhts-sync-set -s '$FUNCNAME' -m $NISCLIENT_IP"
+		rlRun "rhts-sync-set -s '$FUNCNAME' -m $NISCLIENT"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE"
@@ -160,18 +160,18 @@ nisint_automount_test_1002()
 nisint_automount_test_1003()
 {
 	rlPhaseStartTest "nisint_automount_test_1003: ipa positive test"
-	case "$MYROLE" in
-	"MASTER")
+	case "$HOSTNAME" in
+	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
-		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
-		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
+		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
+		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		;;
-	"NISMASTER")
+	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
-		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
-		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
+		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
+		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		;;
-	"NISCLIENT")
+	"$NISCLIENT")
 		rlLog "Machine in recipe is NISCLIENT"
 		if [ ! -f /usr/bin/ipa ]; then
 			rlPass "ipa not found...skipping"
@@ -181,7 +181,7 @@ nisint_automount_test_1003()
 			rlRun "ipa automountkey-find nis auto.home  |grep home" 0 "ipa search for existing auto.home entry"
 			rlRun "ipa automountkey-find nis auto.nisint|grep app1" 0 "ipa search for existing auto.nisint entry"
 		fi
-		rlRun "rhts-sync-set -s '$FUNCNAME' -m $NISCLIENT_IP"
+		rlRun "rhts-sync-set -s '$FUNCNAME' -m $NISCLIENT"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE"
@@ -194,18 +194,18 @@ nisint_automount_test_1003()
 nisint_automount_test_1004()
 {
 	rlPhaseStartTest "nisint_automount_test_1004: ipa negative test"
-	case "$MYROLE" in
-	"MASTER")
+	case "$HOSTNAME" in
+	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
-		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
-		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
+		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
+		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		;;
-	"NISMASTER")
+	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
-		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
-		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
+		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
+		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		;;
-	"NISCLIENT")
+	"$NISCLIENT")
 		rlLog "Machine in recipe is NISCLIENT"
 		if [ ! -f /usr/bin/ipa ]; then
 			rlPass "ipa not found...skipping"
@@ -213,7 +213,7 @@ nisint_automount_test_1004()
 			KinitAsAdmin
 			rlRun "ipa automountkey-find nis auto.master|grep notamap" 1 "fail to ipa search for non-existent auto.master entry"
 		fi
-		rlRun "rhts-sync-set -s '$FUNCNAME' -m $NISCLIENT_IP"
+		rlRun "rhts-sync-set -s '$FUNCNAME' -m $NISCLIENT"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE"
@@ -226,22 +226,22 @@ nisint_automount_test_1004()
 nisint_automount_test_1005()
 {
 	rlPhaseStartTest "nisint_automount_test_1005: automount -m positive test"
-	case "$MYROLE" in
-	"MASTER")
+	case "$HOSTNAME" in
+	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
-		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP	"
-		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP	"
+		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT	"
+		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT	"
 		;;
-	"NISMASTER")
+	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
-		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
-		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
+		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
+		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		;;
-	"NISCLIENT")
+	"$NISCLIENT")
 		rlLog "Machine in recipe is NISCLIENT"
 		rlRun "automount -m|grep auto.home" 0 "automount -m search for existing auto.home entry"
 		rlRun "automount -m|grep auto.nisint" 0 "automount -m search for existing auto.nisint entry"
-		rlRun "rhts-sync-set -s '$FUNCNAME' -m $NISCLIENT_IP"
+		rlRun "rhts-sync-set -s '$FUNCNAME' -m $NISCLIENT"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE"
@@ -254,21 +254,21 @@ nisint_automount_test_1005()
 nisint_automount_test_1006()
 {
 	rlPhaseStartTest "nisint_automount_test_1006: automount -m negative test"
-	case "$MYROLE" in
-	"MASTER")
+	case "$HOSTNAME" in
+	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
-		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
-		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
+		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
+		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		;;
-	"NISMASTER")
+	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
-		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
-		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
+		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
+		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		;;
-	"NISCLIENT")
+	"$NISCLIENT")
 		rlLog "Machine in recipe is NISCLIENT"
 		rlRun "automount -m|grep map:.*notamap" 1 "failed automount -m search for non-existent automount map entry"
-		rlRun "rhts-sync-set -s '$FUNCNAME' -m $NISCLIENT_IP"
+		rlRun "rhts-sync-set -s '$FUNCNAME' -m $NISCLIENT"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE"
@@ -282,22 +282,22 @@ nisint_automount_test_1006()
 nisint_automount_test_1007()
 {
 	rlPhaseStartTest "nisint_automount_test_1007: auto.home mount positive test"	
-	case "$MYROLE" in
-	"MASTER")
+	case "$HOSTNAME" in
+	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
-		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
-		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
+		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
+		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		;;
-	"NISMASTER")
+	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
-		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
-		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
+		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
+		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		;;
-	"NISCLIENT")
+	"$NISCLIENT")
 		rlLog "Machine in recipe is NISCLIENT"
 		rlRun "touch /nfshome/gooduser1/testfile" 0 "touch a file in dir mounted via NIS auto.home"
 		rlAssertExists "/nfshome/gooduser1/testfile" 0 "confirm file in NIS auto.home dir exists"
-		rlRun "rhts-sync-set -s '$FUNCNAME' -m $NISCLIENT_IP"
+		rlRun "rhts-sync-set -s '$FUNCNAME' -m $NISCLIENT"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE"
@@ -310,21 +310,21 @@ nisint_automount_test_1007()
 nisint_automount_test_1008()
 {
 	rlPhaseStartTest "nisint_automount_test_1008: auto.home mount negative test"	
-	case "$MYROLE" in
-	"MASTER")
+	case "$HOSTNAME" in
+	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
-		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
-		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
+		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
+		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		;;
-	"NISMASTER")
+	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
-		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
-		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
+		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
+		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		;;
-	"NISCLIENT")
+	"$NISCLIENT")
 		rlLog "Machine in recipe is NISCLIENT"
 		rlRun "touch /nfshome/notauser/testfile" 1 "Fail to touch a file in dir not in automount map and nfs export"
-		rlRun "rhts-sync-set -s '$FUNCNAME' -m $NISCLIENT_IP"
+		rlRun "rhts-sync-set -s '$FUNCNAME' -m $NISCLIENT"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE"
@@ -337,22 +337,22 @@ nisint_automount_test_1008()
 nisint_automount_test_1009()
 {
 	rlPhaseStartTest "nisint_automount_test_1009: auto.nisint netgroup mount positive test"	
-	case "$MYROLE" in
-	"MASTER")
+	case "$HOSTNAME" in
+	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
-		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
-		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
+		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
+		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		;;
-	"NISMASTER")
+	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
-		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
-		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
+		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
+		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		;;
-	"NISCLIENT")
+	"$NISCLIENT")
 		rlLog "Machine in recipe is NISCLIENT"
 		rlRun "touch /nisint/app1/testfile" 0 "touch a file in dir mounted via NIS auto.home"
 		rlAssertExists "/nisint/app1/testfile" 0 "confirm file in NIS auto.home dir exists"
-		rlRun "rhts-sync-set -s '$FUNCNAME' -m $NISCLIENT_IP"
+		rlRun "rhts-sync-set -s '$FUNCNAME' -m $NISCLIENT"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE"
@@ -365,21 +365,21 @@ nisint_automount_test_1009()
 nisint_automount_test_1010()
 {
 	rlPhaseStartTest "nisint_automount_test_1010: auto.nisint netgroup mount negative test"	
-	case "$MYROLE" in
-	"MASTER")
+	case "$HOSTNAME" in
+	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
-		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
-		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
+		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
+		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		;;
-	"NISMASTER")
+	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
-		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
-		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
+		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
+		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		;;
-	"NISCLIENT")
+	"$NISCLIENT")
 		rlLog "Machine in recipe is NISCLIENT"
 		rlRun "touch /nisint/app2/testfile" 1 "Fail to touch a file in dir mounted via NIS auto.home"
-		rlRun "rhts-sync-set -s '$FUNCNAME' -m $NISCLIENT_IP"
+		rlRun "rhts-sync-set -s '$FUNCNAME' -m $NISCLIENT"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE"

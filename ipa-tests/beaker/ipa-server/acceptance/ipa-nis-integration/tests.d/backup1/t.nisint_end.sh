@@ -2,8 +2,9 @@
 # vim: dict=/usr/share/beakerlib/dictionary.vim cpt=.,w,b,u,t,i,k
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-#   t.nisint_client_is_nis_bz_tests.sh of /CoreOS/ipa-tests/acceptance/ipa-nis-integration
-#   Description: IPA NIS Integration and Migration Client NIS BZ tests
+#   t.nisint_end.sh of /CoreOS/ipa-tests/acceptance/ipa-nis-integration
+#   Description: IPA NIS Integration and Migration End script to release 
+#   servers.
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # The following needs to be tested:
 #   
@@ -38,47 +39,37 @@
 ######################################################################
 # test suite
 ######################################################################
-nisint_client_is_nis_bz_tests()
+nisint_end()
 {
-	echo "$FUNCNAME"
-}
+	rlLog "$FUNCNAME"
 
-example_bz_788625()
-{
-	rlLog "This is just an EXAMPLE!!!"
-	rlLog "This test is actually run from ipa-netgroup-cli"
-	rlPhaseStartTest "netgroup_bz_788625: IPA nested netgroups not seen from ypcat"
-	case "$MYROLE" in
-	"MASTER")
+	case "$HOSTNAME" in
+	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
-		KinitAsAdmin
-		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
-		rlRun "ipa netgroup-add netgroup_bz_788625_test1 --desc=netgroup_bz_788625_test1"
-		rlRun "ipa netgroup-add-member netgroup_bz_788625_test1 --users=admin"
-		rlRun "ipa netgroup-add netgroup_bz_788625_test --desc=netgroup_bz_788625_test"
-		rlRun "ipa netgroup-add-member netgroup_bz_788625_test --netgroups=netgroup_bz_788625_test1"
-		if [ $(ypcat -d $DOMAIN -h localhost -k netgroup|grep "^netgroup_bz_788625_test $"|wc -l) -gt 0 ]; then
-			rlFail "BZ 788625 found ...IPA nested netgroups not seen from ypcat"
-		else
-			rlPass "BZ 788625 not found"
-		fi		
-		rlRun "ipa netgroup-del netgroup_bz_788625_test1"
-		rlRun "ipa netgroup-del netgroup_bz_788625_test"
-		rlRun "rhts-sync-set -s '$FUNCNAME' -m $MASTER_IP"
+		rlRun "rhts-sync-set -s 'nisint_end_nisclient' -m $MASTER"
+		rlRun "rhts-sync-set -s 'nisint_end_nismaster' -m $MASTER"
+		rlLog "rhts-sync-block -s 'nisint_end' $NISMASTER $NISCLIENT"
+		rlRun "rhts-sync-block -s 'nisint_end' $NISMASTER $NISCLIENT"
+		rlLog "Ending IPA MASTER tests."
+		rlLog "Ending NIS Integration and Migration tests."
 		;;
-	"NISMASTER")
+	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
-		rlLog "rhts-sync-block -s '$FUNCNAME' $MASTER_IP"
-		rlRun "rhts-sync-block -s '$FUNCNAME' $MASTER_IP"
+		rlLog "rhts-sync-block -s 'nisint_end_nisserver' $MASTER"
+		rlRun "rhts-sync-block -s 'nisint_end_nisserver' $MASTER"
+		rlLog "Ending NISMASTER tests."
+		rlRun "rhts-sync-set -s 'nisint_end' -m $NISMASTER"
 		;;
-	"NISCLIENT")
+	"$NISCLIENT")
 		rlLog "Machine in recipe is NISCLIENT"
-		rlLog "rhts-sync-block -s '$FUNCNAME' $MASTER_IP"
-		rlRun "rhts-sync-block -s '$FUNCNAME' $MASTER_IP"
+		rlLog "rhts-sync-block -s 'nisint_end_nisclient' $MASTER"
+		rlRun "rhts-sync-block -s 'nisint_end_nisclient' $MASTER"
+		rlLog "Ending NISCLIENT tests."
+		rlRun "rhts-sync-set -s 'nisint_end' -m $NISCLIENT"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE"
 		;;
 	esac
-	rlPhaseEnd
+
 }

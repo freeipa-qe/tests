@@ -50,25 +50,25 @@ nisint_nisclient_migration_envsetup()
 {
 	rlPhaseStartTest "nisint_nisclient_migration_envsetup: Prep for migration to IPA"
 	HOSTNAME=$(hostname)
-	case "$MYROLE" in
-	"MASTER")
+	case "$HOSTNAME" in
+	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
 		rlRun "ipa host-del $NISCLIENT"
-		rlRun "rhts-sync-set -s '$FUNCNAME.0' -m $MASTER_IP"
-		rlLog "rhts-sync-block -s '$FUNCNAME.1' $NISCLIENT_IP"
-		rlRun "rhts-sync-block -s '$FUNCNAME.1' $NISCLIENT_IP"
+		rlRun "rhts-sync-set -s '$FUNCNAME.0' -m $MASTER"
+		rlLog "rhts-sync-block -s '$FUNCNAME.1' $NISCLIENT"
+		rlRun "rhts-sync-block -s '$FUNCNAME.1' $NISCLIENT"
 		;;
-	"NISMASTER")
+	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
-		rlLog "rhts-sync-block -s '$FUNCNAME.0' $MASTER_IP"
-		rlRun "rhts-sync-block -s '$FUNCNAME.0' $MASTER_IP"
-		rlLog "rhts-sync-block -s '$FUNCNAME.1' $NISCLIENT_IP"
-		rlRun "rhts-sync-block -s '$FUNCNAME.1' $NISCLIENT_IP"
+		rlLog "rhts-sync-block -s '$FUNCNAME.0' $MASTER"
+		rlRun "rhts-sync-block -s '$FUNCNAME.0' $MASTER"
+		rlLog "rhts-sync-block -s '$FUNCNAME.1' $NISCLIENT"
+		rlRun "rhts-sync-block -s '$FUNCNAME.1' $NISCLIENT"
 		;;
-	"NISCLIENT")
+	"$NISCLIENT")
 		rlLog "Machine in recipe is NISCLIENT"
-		rlLog "rhts-sync-block -s '$FUNCNAME.0' $MASTER_IP"
-		rlRun "rhts-sync-block -s '$FUNCNAME.0' $MASTER_IP"
+		rlLog "rhts-sync-block -s '$FUNCNAME.0' $MASTER"
+		rlRun "rhts-sync-block -s '$FUNCNAME.0' $MASTER"
 		HOSTNAME_S=$(hostname -s)
 		MASTER_S=$(echo $MASTER|cut -f1 -d. )
 		MASTER=$MASTER_S.$DOMAIN
@@ -100,7 +100,7 @@ nisint_nisclient_migration_envsetup()
 		rlRun "mv -f /etc/krb5.keytab /etc/krb5.keytab.nismig"
 		rlRun "service ntpd stop"
 
-		rlRun "rhts-sync-set -s '$FUNCNAME.1' -m $NISCLIENT_IP"
+		rlRun "rhts-sync-set -s '$FUNCNAME.1' -m $NISCLIENT"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE"
@@ -113,23 +113,23 @@ nisint_nisclient_migration_envsetup()
 nisint_nisclient_migration_ipa_client_install()
 {
 	rlPhaseStartTest "nisint_nisclient_migration_ipa_client_install: Install/configure IPA Client"
-	case "$MYROLE" in
-	"MASTER")
+	case "$HOSTNAME" in
+	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
-		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
-		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
+		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
+		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		;;
-	"NISMASTER")
+	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
-		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
-		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
+		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
+		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		;;
-	"NISCLIENT")
+	"$NISCLIENT")
 		rlLog "Machine in recipe is NISCLIENT"
 		HOSTNAME_S=$(hostname -s)
 		rlRun "ipa-client-install --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW -U --server=$MASTER"
         rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
-		rlRun "rhts-sync-set -s '$FUNCNAME' -m $NISCLIENT_IP"
+		rlRun "rhts-sync-set -s '$FUNCNAME' -m $NISCLIENT"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE"
@@ -142,18 +142,18 @@ nisint_nisclient_migration_ipa_client_install()
 nisint_nisclient_migration_ipa_autofs_setup()
 {
 	rlPhaseStartTest "nisint_nisclient_migration_ipa_autofs_setup: Configure Autofs to use IPA"
-	case "$MYROLE" in
-	"MASTER")
+	case "$HOSTNAME" in
+	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
-		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
-		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
+		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
+		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		;;
-	"NISMASTER")
+	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
-		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
-		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
+		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
+		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT"
 		;;
-	"NISCLIENT")
+	"$NISCLIENT")
 		rlLog "Machine in recipe is NISCLIENT"
 		HOSTNAME_S=$(hostname -s)
         rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
@@ -193,7 +193,7 @@ nisint_nisclient_migration_ipa_autofs_setup()
 		rlRun "sed -i 's/automount.*$/automount:  files ldap/' /etc/nsswitch.conf"
         rlRun "cat /etc/sysconfig/autofs"
 		rlRun "service autofs restart"
-		rlRun "rhts-sync-set -s '$FUNCNAME' -m $NISCLIENT_IP"
+		rlRun "rhts-sync-set -s '$FUNCNAME' -m $NISCLIENT"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE"

@@ -48,8 +48,8 @@ example_bz_788625()
 	rlLog "This is just an EXAMPLE!!!"
 	rlLog "This test is actually run from ipa-netgroup-cli"
 	rlPhaseStartTest "netgroup_bz_788625: IPA nested netgroups not seen from ypcat"
-	case "$MYROLE" in
-	"MASTER")
+	case "$HOSTNAME" in
+	"$MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
@@ -64,17 +64,17 @@ example_bz_788625()
 		fi		
 		rlRun "ipa netgroup-del netgroup_bz_788625_test1"
 		rlRun "ipa netgroup-del netgroup_bz_788625_test"
-		rlRun "rhts-sync-set -s '$FUNCNAME' -m $MASTER_IP"
+		rlRun "rhts-sync-set -s '$FUNCNAME' -m $MASTER"
 		;;
-	"NISMASTER")
+	"$NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
-		rlLog "rhts-sync-block -s '$FUNCNAME' $MASTER_IP"
-		rlRun "rhts-sync-block -s '$FUNCNAME' $MASTER_IP"
+		rlLog "rhts-sync-block -s '$FUNCNAME' $MASTER"
+		rlRun "rhts-sync-block -s '$FUNCNAME' $MASTER"
 		;;
-	"NISCLIENT")
+	"$NISCLIENT")
 		rlLog "Machine in recipe is NISCLIENT"
-		rlLog "rhts-sync-block -s '$FUNCNAME' $MASTER_IP"
-		rlRun "rhts-sync-block -s '$FUNCNAME' $MASTER_IP"
+		rlLog "rhts-sync-block -s '$FUNCNAME' $MASTER"
+		rlRun "rhts-sync-block -s '$FUNCNAME' $MASTER"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE"
