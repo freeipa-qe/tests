@@ -141,6 +141,7 @@ nisint_nisclient_integration_change_to_ipa_nismaster()
 
 		rlRun "hostname $HOSTNAME_S.$DOMAIN"
 		rlRun "hostname"
+		HOSTNAME=$(hostname)
 
 		rlRun "nisdomainname $DOMAIN"
 		rlRun "nisdomainname"
