@@ -13,8 +13,9 @@ DOMAIN=testrelm.com
 BASEDN="dc=testrelm,dc=com"
 NISDOMAIN=ipatest
 NTPSERVER=clock.redhat.com
-FIRSTIP=10.14.1.137
-SECONDIP=10.14.1.139
+FIRSTIP=10.14.5.136
+SECONDIP=10.14.5.164
+
 
 ifcount=$(lspci | grep Ethernet | wc -l)
 if [ $ifcount -lt 2 ]; then
@@ -41,8 +42,8 @@ fi
 yum -y install bind expect krb5-workstation bind-dyndb-ldap krb5-pkinit-openssl ipa-server ipa-admintools
 
 
-echo "ipa-server-install --setup-dns --forwarder=$DNSFORWARD --hostname=$(hostname) --ip-address=$FIRSTIP -r $RELM -n $domain -p $ADMINPW -P $ADMINPW -a $ADMINPW -U"
-ipa-server-install --setup-dns --forwarder=$DNSFORWARD --hostname=$(hostname) --ip-address=$FIRSTIP -r $RELM -n $domain -p $ADMINPW -P $ADMINPW -a $ADMINPW -U
+echo "ipa-server-install --setup-dns --forwarder=$DNSFORWARD --hostname=$(hostname) --ip-address=$FIRSTIP -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U"
+ipa-server-install --setup-dns --forwarder=$DNSFORWARD --hostname=$(hostname) --ip-address=$FIRSTIP -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U
 if [ $? -ne 0 ]; then 
 	echo "ERROR - ipa-server-install fialed"
 	exit 
@@ -56,8 +57,8 @@ fi
 echo "Remove IPA server"
 ipa-server-install --uninstall -U
 
-echo "ipa-server-install --setup-dns --forwarder=$DNSFORWARD --hostname=$(hostname) --ip-address=$SECONDIP -r $RELM -n $domain -p $ADMINPW -P $ADMINPW -a $ADMINPW -U"
-ipa-server-install --setup-dns --forwarder=$DNSFORWARD --hostname=$(hostname) --ip-address=$SECONDIP -r $RELM -n $domain -p $ADMINPW -P $ADMINPW -a $ADMINPW -U
+echo "ipa-server-install --setup-dns --forwarder=$DNSFORWARD --hostname=$(hostname) --ip-address=$SECONDIP -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U"
+ipa-server-install --setup-dns --forwarder=$DNSFORWARD --hostname=$(hostname) --ip-address=$SECONDIP -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U
 if [ $? -ne 0 ]; then 
 	echo "ERROR - ipa-server-install fialed"
 	exit 
