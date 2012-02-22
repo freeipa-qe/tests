@@ -44,7 +44,6 @@
 # Include test case file
 . ./t.ds-migration-functional.sh
 . ./installds.sh
-. ./airus.ldif
 
 PACKAGELIST="389-ds-base"
 

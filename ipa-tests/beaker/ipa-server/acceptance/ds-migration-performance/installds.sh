@@ -59,7 +59,7 @@ cat $INSTANCECFG
 ##########################################################################
 # SSL Secure instance 
 ##########################################################################
-
+HERE=`echo $PWD`
 
 rlLog "Creating noise file ....................................................."
 echo "kjasero;uae8905t76V)e6v7q4wy58w4a5;7t90r798bv2[578rbvr7b90w7rbaw0 brwb7yfbz7rv6vawp9" > /tmp/noise.txt
@@ -126,7 +126,7 @@ fi
 
 sleep 3
 
-rlRun "/usr/bin/ldapmodify -a -x -h $HOSTNAME -p 389 -D \"cn=Directory Manager\" -w $ADMINPW -c -f airius.ldif" 0
+rlRun "/usr/bin/ldapmodify -a -x -h $HOSTNAME -p 389 -D \"cn=Directory Manager\" -w $ADMINPW -c -f $HERE/airius10k.ldif" 0
 
 
 }
