@@ -15,7 +15,7 @@ NISDOMAIN=ipatest
 NTPSERVER=clock.redhat.com
 FIRSTIP=10.14.5.136
 SECONDIP=10.14.5.164
-
+error=0
 
 ifcount=$(lspci | grep Ethernet | wc -l)
 if [ $ifcount -lt 2 ]; then
@@ -42,8 +42,8 @@ fi
 yum -y install bind expect krb5-workstation bind-dyndb-ldap krb5-pkinit-openssl ipa-server ipa-admintools
 
 
-echo "ipa-server-install --setup-dns --forwarder=$DNSFORWARD --hostname=$(hostname) --ip-address=$FIRSTIP -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U"
-ipa-server-install --setup-dns --forwarder=$DNSFORWARD --hostname=$(hostname) --ip-address=$FIRSTIP -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U
+echo "ipa-server-install -d --setup-dns --forwarder=$DNSFORWARD --hostname=$(hostname) --ip-address=$FIRSTIP -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U"
+ipa-server-install -d --setup-dns --forwarder=$DNSFORWARD --hostname=$(hostname) --ip-address=$FIRSTIP -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U
 if [ $? -ne 0 ]; then 
 	echo "ERROR - ipa-server-install fialed"
 	exit 
@@ -52,13 +52,14 @@ fi
 echo $ADMINPW | kinit admin
 if [ $? -ne 0 ]; then 
 	echo "kinit failed, please figure out why"
+	exit
 fi
 
 echo "Remove IPA server"
 ipa-server-install --uninstall -U
 
-echo "ipa-server-install --setup-dns --forwarder=$DNSFORWARD --hostname=$(hostname) --ip-address=$SECONDIP -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U"
-ipa-server-install --setup-dns --forwarder=$DNSFORWARD --hostname=$(hostname) --ip-address=$SECONDIP -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U
+echo "ipa-server-install -d --setup-dns --forwarder=$DNSFORWARD --hostname=$(hostname) --ip-address=$SECONDIP -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U"
+ipa-server-install -d --setup-dns --forwarder=$DNSFORWARD --hostname=$(hostname) --ip-address=$SECONDIP -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U
 if [ $? -ne 0 ]; then 
 	echo "ERROR - ipa-server-install fialed"
 	exit 
@@ -67,5 +68,7 @@ fi
 echo $ADMINPW | kinit admin
 if [ $? -ne 0 ]; then 
 	echo "kinit failed, please figure out why"
+	exit
 fi
 
+echo "PASS - all tests passed"
