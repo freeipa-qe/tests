@@ -212,8 +212,9 @@ nisint_user_test_1003()
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ls -ld /usr/bin/ipa" 2
 		rlRun "rpm -qf /usr/bin/ipa" 1
-		if [ $(/usr/sbin/ipa-client-install 2>&1 | grep "IPA client is already configured on this system." | wc -l) -eq 0 ]; then
-			rlPass "ipa not found/configured...skipping"
+		#if [ $(/usr/sbin/ipa-client-install 2>&1 | grep "IPA client is already configured on this system." | wc -l) -eq 0 ]; then
+		if [ $(grep "auth_provider = .*ipa" /etc/sssd/sssd.conf|wc -l) -gt 0 ]; then
+			rlPass "ipa not configured...skipping"
 		else
 			rlRun "ipa user-find|grep testuser1" 0 "ipa search for existing user"
 		fi
@@ -245,8 +246,8 @@ nisint_user_test_1004()
 	"NISCLIENT")
 		rlLog "Machine in recipe is NISCLIENT"
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
-		if [ ! -f /usr/bin/ipa ]; then
-			rlPass "ipa not found...skipping"
+		if [ $(grep "auth_provider = .*ipa" /etc/sssd/sssd.conf|wc -l) -gt 0 ]; then
+			rlPass "ipa not configured...skipping"
 		else
 			rlRun "ipa user-find|grep notauser" 1 "Fail to ipa search for non-existent user"
 		fi

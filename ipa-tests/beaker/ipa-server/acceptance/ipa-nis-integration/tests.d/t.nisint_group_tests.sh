@@ -209,8 +209,8 @@ nisint_group_test_1003()
 	"NISCLIENT")
 		rlLog "Machine in recipe is NISCLIENT"
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
-		if [ ! -f /usr/bin/ipa ]; then
-			rlPass "ipa not found...skipping"
+		if [ $(grep "auth_provider = .*ipa" /etc/sssd/sssd.conf|wc -l) -gt 0 ]; then
+			rlPass "ipa not configured...skipping"
 		else
 			rlRun "ipa group-find|grep testgroup1" 0 "ipa search for existing group"
 		fi
@@ -242,8 +242,8 @@ nisint_group_test_1004()
 	"NISCLIENT")
 		rlLog "Machine in recipe is NISCLIENT"
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
-		if [ ! -f /usr/bin/ipa ]; then
-			rlPass "ipa not found...skipping"
+		if [ $(grep "auth_provider = .*ipa" /etc/sssd/sssd.conf|wc -l) -gt 0 ]; then
+			rlPass "ipa not configured...skipping"
 		else
 			rlRun "ipa group-find|grep notagroup" 1 "failed to ipa search for non-existent group"
 		fi

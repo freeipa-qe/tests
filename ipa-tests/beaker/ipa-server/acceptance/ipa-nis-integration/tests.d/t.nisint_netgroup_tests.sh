@@ -197,8 +197,8 @@ nisint_netgroup_test_1003()
 		;;
 	"NISCLIENT")
 		rlLog "Machine in recipe is NISCLIENT"
-		if [ ! -f /usr/bin/ipa ]; then
-			rlPass "ipa not found...skipping"
+		if [ $(grep "auth_provider = .*ipa" /etc/sssd/sssd.conf|wc -l) -gt 0 ]; then
+			rlPass "ipa not configured...skipping"
 		else
 			rlRun "ipa netgroup-find|grep testnetgroup1" 0 "ipa search for existing netgroup"
 		fi
@@ -228,8 +228,8 @@ nisint_netgroup_test_1004()
 		;;
 	"NISCLIENT")
 		rlLog "Machine in recipe is NISCLIENT"
-		if [ ! -f /usr/bin/ipa ]; then
-			rlPass "ipa not found...skipping"
+		if [ $(grep "auth_provider = .*ipa" /etc/sssd/sssd.conf|wc -l) -gt 0 ]; then
+			rlPass "ipa not configured...skipping"
 		else
 			rlRun "ipa netgroup-find|grep notanetgroup" 1 "fail to ipa search for non-existent netgroup"
 		fi

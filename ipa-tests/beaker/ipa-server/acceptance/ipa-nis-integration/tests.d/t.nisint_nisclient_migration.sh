@@ -98,6 +98,7 @@ nisint_nisclient_migration_envsetup()
 		rlRun "authconfig --disablenis --update"
 		rlRun "mv -f /etc/krb5.conf /etc/krb5.conf.nismig"
 		rlRun "mv -f /etc/krb5.keytab /etc/krb5.keytab.nismig"
+		rlRun "mv -f /etc/sssd/sssd.conf /etc/sssd/sssd.conf.nismig"
 		rlRun "service ntpd stop"
 
 		rlRun "rhts-sync-set -s '$FUNCNAME.1' -m $NISCLIENT_IP"
