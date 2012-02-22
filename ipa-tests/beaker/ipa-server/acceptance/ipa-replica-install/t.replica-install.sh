@@ -483,8 +483,14 @@ uninstall()
 
    rlPhaseStartTest "Uninstalling replica"
 
+	rlLog "verifies https://bugzilla.redhat.com/show_bug.cgi?id=755094"
+	rlRun "ipa-replica-manage list | grep \"$MASTER: master\""
+	rlRun "ipa-replica-manage list | grep \"$SLAVE: master\""
+	rlRun "ipa-replica-manage list -p Secret123 | grep \"$MASTER: master\""
+	rlRun "ipa-replica-manage list -p Secret123 | grep \"$SLAVE: master\""
+	rlRun "ipa-replica-manage list -p Secret123 `hostname` | grep \"$MASTER: master\""
+	rlRun "ipa-replica-manage list -p Secret123 `hostname` | grep \"$SLAVE: master\""
 
-	rlRun "ipa-replica-manage list"
 	rlRun "remoteExec root $MASTERIP redhat \"echo $ADMINPW | kinit admin; klist\""
 	rlRun "remoteExec root $MASTERIP redhat \"ipa-replica-manage del $SLAVE\""
 
