@@ -45,7 +45,7 @@ This machine is now in a reservation state for $RESERVETIME seconds
 A seperate email will be sent once the reservation time has elapsed.
 
 Good luck" > /dev/shm/setup-email.txt
-        sendmail $SUBMITTER < /dev/shm/setup-email.txt
+        sendmail -fbeaker@redhat.com $SUBMITTER < /dev/shm/setup-email.txt
 }
 
 
@@ -58,7 +58,7 @@ This is the machine at $hostname,
 This machine is now being returned to the pool since $RESERVETIME seconds has elapsed
 
 Have a nice day." > /dev/shm/end-email.txt
-        sendmail $SUBMITTER < /dev/shm/end-email.txt
+        sendmail -fbeaker@redhat.com $SUBMITTER < /dev/shm/end-email.txt
 }
 
 rlJournalStart
