@@ -15,7 +15,6 @@ NISDOMAIN=ipatest
 NTPSERVER=clock.redhat.com
 FIRSTIP=10.14.5.136
 SECONDIP=10.14.5.164
-error=0
 
 ifcount=$(lspci | grep Ethernet | wc -l)
 if [ $ifcount -lt 2 ]; then
@@ -70,5 +69,8 @@ if [ $? -ne 0 ]; then
 	echo "kinit failed, please figure out why"
 	exit
 fi
+
+echo "Remove IPA server"
+ipa-server-install --uninstall -U
 
 echo "PASS - all tests passed"
