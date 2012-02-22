@@ -41,8 +41,7 @@
 ######################################################################
 nisint_end()
 {
-	rlLog "$FUNCNAME"
-
+	rlPhaseStartTest "nisint_end: Final function to block for previous failures"
 	case "$MYROLE" in
 	"MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
@@ -71,5 +70,5 @@ nisint_end()
 		rlLog "Machine in recipe is not a known ROLE"
 		;;
 	esac
-
+	rlPhaseEnd
 }
