@@ -206,9 +206,6 @@ nisint_user_test_1003()
 		;;
 	"NISCLIENT")
 		rlLog "Machine in recipe is NISCLIENT"
-		rlRun "ls -ld /usr/bin/ipa" 2
-		rlRun "rpm -qf /usr/bin/ipa" 1
-		#if [ $(/usr/sbin/ipa-client-install 2>&1 | grep "IPA client is already configured on this system." | wc -l) -eq 0 ]; then
 		if [ $(grep "auth_provider = .*ipa" /etc/sssd/sssd.conf 2>/dev/null|wc -l) -eq 0 ]; then
 			rlPass "ipa not configured...skipping"
 		else

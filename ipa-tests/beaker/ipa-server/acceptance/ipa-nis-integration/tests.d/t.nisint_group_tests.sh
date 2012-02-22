@@ -207,8 +207,8 @@ nisint_group_test_1003()
 		rlLog "Machine in recipe is NISCLIENT"
 		if [ $(grep "auth_provider = .*ipa" /etc/sssd/sssd.conf 2>/dev/null|wc -l) -eq 0 ]; then
 			rlPass "ipa not configured...skipping"
-		eupls3
-			rlRun "ipa group-find|grep testgroup1" 0 "ipa search for existing gro"
+		else
+			rlRun "ipa group-find|grep testgroup1" 0 "ipa search for existing group"
 		fi
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $NISCLIENT_IP"
 		;;
