@@ -211,7 +211,7 @@ add_netgroups_positive()
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-netgroup-001-6: add netgroup positive with nisdomain, usercat=all, hostcat=all, setattr"
-		rlRun "ipa netgroup-add ng-001-6 --desc=ng-001-5 --nisdomain=testnis.dom --usercat=all --hostcat=all --setattr=externalHost=ipaqatesthost"
+		rlRun "ipa netgroup-add ng-001-6 --desc=ng-001-6 --nisdomain=testnis.dom --usercat=all --hostcat=all --setattr=externalHost=ipaqatesthost"
 		rlRun "ipa netgroup-find ng-001-6 --desc=ng-001-6 --nisdomain=testnis.dom --usercat=all --hostcat=all | grep 'External host: ipaqatesthost'"
 		rlRun "ipa netgroup-del ng-001-6"
 	rlPhaseEnd
@@ -244,11 +244,103 @@ add_netgroups_positive()
 # negative add netgroups tests
 add_netgroups_negative()
 {
-   	rlPhaseStartTest "ipa-netgroup-002: Add duplicate netgroup"
-        	command="addNetgroup $ngroup1 test-group-1"
-        	expmsg="ipa: ERROR: netgroup with name $ngroup1 already exists"
-       		rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
-    	rlPhaseEnd
+	tmpout=/tmp/errormsg.out
+
+	rlPhaseStartTest "ipa-netgroup-002-0: Add duplicate netgroup"
+		command="addNetgroup $ngroup1 test-group-1"
+		expmsg="ipa: ERROR: netgroup with name $ngroup1 already exists"
+		rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-netgroup-002-1: Verify fail on netgroup-add with empty desc" 
+		rlRun "ipa netgroup-add testng-002 --desc=\"\" > $tmpout 2>&1" 1
+		rlAssertGrep "ipa: ERROR: 'desc' is required" $tmpout
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-netgroup-002-2: Verify fail on netgroup-add with space for desc"
+		rlRun "ipa netgroup-add testng-002 --desc=\" \" > $tmpout 2>&1" 1
+                rlAssertGrep "ipa: ERROR: invalid 'desc': Leading and trailing spaces are not allowed" $tmpout
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-netgroup-002-3: Verify fail on netgroup-add with space for nisdomain"
+		rlRun "ipa netgroup-add testng-002 --desc=testng-002 --nisdomain=\" \" > $tmpout 2>&1" 1
+		rlAssertGrep "ipa: ERROR: invalid 'nisdomain': Leading and trailing spaces are not allowed" $tmpout
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-netgroup-002-4: Verify fail on netgroup-add with invalid usercat"
+		rlRun "ipa netgroup-add testng-002 --desc=testng-002 --nisdomain=mynisdom --usercat=badcat > $tmpout 2>&1" 1
+		rlAssertGrep "ipa: ERROR: invalid 'usercat': must be one of (u'all',)" $tmpout
+	rlPhaseEnd
+	
+	rlPhaseStartTest "ipa-netgroup-002-5: Verify fail on netgroup-add with space for usercat"
+		rlRun "ipa netgroup-add testng-002 --desc=testng-002 --nisdomain=mynisdom --usercat=\" \" > $tmpout 2>&1" 1
+		rlAssertGrep "ipa: ERROR: invalid 'usercat': must be one of (u'all',)" $tmpout
+	rlPhaseEnd
+	
+	rlPhaseStartTest "ipa-netgroup-002-6: Verify fail on netgroup-add with invalid hostcat"
+		rlRun "ipa netgroup-add testng-002 --desc=testng-002 --nisdomain=mynisdom --hostcat=badcat > $tmpout 2>&1" 1
+		rlAssertGrep "ipa: ERROR: invalid 'hostcat': must be one of (u'all',)" $tmpout
+	rlPhaseEnd
+	
+	rlPhaseStartTest "ipa-netgroup-002-7: Verify fail on netgroup-add with space for hostcat"
+		rlRun "ipa netgroup-add testng-002 --desc=testng-002 --nisdomain=mynisdom --hostcat=\" \" > $tmpout 2>&1" 1
+		rlAssertGrep "ipa: ERROR: invalid 'hostcat': must be one of (u'all',)" $tmpout
+	rlPhaseEnd
+	
+	rlPhaseStartTest "ipa-netgroup-002-8: Verify fail on netgroup-add with invalid usercat and valid hostcat"
+		rlRun "ipa netgroup-add testng-002 --desc=testng-002 --nisdomain=mynisdom --usercat=badcat --hostcat=all > $tmpout 2>&1" 1
+		rlAssertGrep "ipa: ERROR: invalid 'usercat': must be one of (u'all',)" $tmpout
+	rlPhaseEnd
+	
+	rlPhaseStartTest "ipa-netgroup-002-9: Verify fail on netgroup-add with invalid setattr value"
+		rlRun "ipa netgroup-add testng-002 --desc=testng-002 --nisdomain=mynisdom --setattr=memberHost=badvalue > $tmpout 2>&1" 1
+		rlAssertGrep "ipa: ERROR: memberHost: value #0 invalid per syntax: Invalid syntax." $tmpout
+	rlPhaseEnd
+	
+	rlPhaseStartTest "ipa-netgroup-002-10: Verify fail on netgroup-add with invalid setattr attr"
+		rlRun "ipa netgroup-add testng-002 --desc=testng-002 --nisdomain=mynisdom --setattr=badattr=fqdn=hostname.$DOMAIN > $tmpout 2>&1" 1
+		rlAssertGrep "ipa: ERROR: attribute \"badattr\" not allowed" $tmpout
+	rlPhaseEnd
+	
+	rlPhaseStartTest "ipa-netgroup-002-11: Verify fail on netgroup-add with invalid addattr value"
+		rlRun "ipa netgroup-add testng-002 --desc=testng-002 --nisdomain=mynisdom --addattr=memberHost=badvalue > $tmpout 2>&1" 1
+		rlAssertGrep "ipa: ERROR: memberHost: value #0 invalid per syntax: Invalid syntax." $tmpout
+	rlPhaseEnd
+	
+	rlPhaseStartTest "ipa-netgroup-002-12: Verify fail on netgroup-add with invalid addattr attr"
+		rlRun "ipa netgroup-add testng-002 --desc=testng-002 --nisdomain=mynisdom --addattr=badattr=fqdn=hostname.$DOMAIN > $tmpout 2>&1" 1
+		rlAssertGrep "ipa: ERROR: attribute \"badattr\" not allowed" $tmpout
+	rlPhaseEnd
+	
+	## NEED A BZ HERE 
+	rlPhaseStartTest "ipa-netgroup-002-13: Verify fail on netgroup-add with both desc and --addattr desription (BZ 796390)"
+		rlRun "ipa netgroup-add testng-002 --desc=testng-002 --nisdomain=mynisdom --addattr=description=DESCRIPTION > $tmpout 2>&1" 1
+		rlAssertGrep "ipa: ERROR: description: Only one value allowed." $tmpout
+		if [ $(grep "ipa: ERROR: an internal error has occurred" $tmpout|wc -l) -gt 0 ]; then
+			rlFail "BZ 796390 found...ipa netgroup-add with both --desc and --addattr=description returns internal error"
+		fi
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-netgroup-002-14: Verify fail on netgroup-add with setattr desc and invalid aaddattr attr"
+		rlRun "ipa netgroup-add testng-002 --desc=testng-002 --nisdomain=mynisdom --setattr=description=desc2 --addattr=badattr=fqdn=hostname.$DOMAIN > $tmpout 2>&1" 1
+		rlAssertGrep "ipa: ERROR: attribute \"badattr\" not allowed" $tmpout
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-netgroup-002-15: Verify fail on netgroup-add with setattr invalid value, valid addattr and all"
+		rlRun "ipa netgroup-add testng-002 --desc=testng-002 --nisdomain=mynisdom --setattr=memberHost=badvalue --addattr=memberHost=fqdn=hostname.$DOMAIN --all > $tmpout 2>&1" 1
+		rlAssertGrep "ipa: ERROR: memberHost: value #0 invalid per syntax: Invalid syntax." $tmpout
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-netgroup-002-16: Verify fail on netgroup-add with valid setattr, invalid addattr value, and raw"
+		rlRun "ipa netgroup-add testng-002 --desc=testng-002 --nisdomain=mynisdom --setattr=memberHost=fqdn=hostname.$DOMAIN --addattr=memberHost=badvalue --raw > $tmpout 2>&1" 1
+		rlAssertGrep "ipa: ERROR: memberHost: value #1 invalid per syntax: Invalid syntax." $tmpout
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-netgroup-002-17: Verify fail on netgroup-add with valid setattr, invalid addat
+tr value, all and raw"
+		rlRun "ipa netgroup-add testng-002 --desc=testng-002 --nisdomain=mynisdom --setattr=memberHost=fqdn=hostname.$DOMAIN --addattr=memberHost=badvalue --all --raw > $tmpout 2>&1" 1
+		rlAssertGrep "ipa: ERROR: memberHost: value #1 invalid per syntax: Invalid syntax." $tmpout
+	rlPhaseEnd
 }
 
 ##########################################################################
@@ -699,6 +791,7 @@ netgroup_bzs()
 	netgroup_bz_767372
 	netgroup_bz_772163
 	netgroup_bz_750984
+	netgroup_bz_796390
 }
 
 netgroup_bz_772043()
@@ -734,7 +827,7 @@ netgroup_bz_788625()
 		rlRun "ipa netgroup-add netgroup_bz_788625_test --desc=netgroup_bz_788625_test"
 		rlRun "ipa netgroup-add-member netgroup_bz_788625_test --netgroups=netgroup_bz_788625_test1"
 		rlRun "echo $ADMINPW | ipa-compat-manage enable" 0,2
-		rlRun "echo $ADMINPA | ipa-nis-manage enable" 0,2
+		rlRun "echo $ADMINPW | ipa-nis-manage enable" 0,2
 		rlRun "service rpcbind restart"
 		rlRun "service dirsrv restart"
 		rlRun "yum install yp-tools"
@@ -864,6 +957,21 @@ netgroup_bz_750984()
 			rlFail "BZ 750984 found...Inconsistency in error message while adding a duplicate netgroup"
 		fi
 		rlRun "ipa netgroup-del netgroup_bz_750984"
+		[ -f $tmpout ] && rm -f $tmpout
+	rlPhaseEnd
+}
+	
+netgroup_bz_796390()
+{
+	rlPhaseStartTest "netgroup_bz_796390: ipa netgroup-add with both --desc and --addattr=description returns internal error"
+		KinitAsAdmin
+		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
+		rlRun "ipa netgroup-add netgroup_bz_796390 --desc=desc1 --addattr=description=desc2 > $tmpout 2>&1"
+		if [ $(grep "ipa: ERROR: an internal error has occurred" $tmpout|wc -l) -gt 0 ]; then
+			rlFail "BZ 796390 found...ipa netgroup-add with both --desc and --addattr=description returns internal error"
+		else
+			rlPass "BZ 796390 not found."
+		fi
 		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd
 }
