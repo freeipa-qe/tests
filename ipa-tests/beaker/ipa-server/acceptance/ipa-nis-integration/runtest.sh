@@ -119,48 +119,31 @@ rlJournalStart
 	##############################################################
 	# Initial Setup of servers
 	##############################################################
-	rlLog_hostnames
 	nisint_ipamaster_setup
-	rlLog_hostnames
 	nisint_nismaster_setup
-	rlLog_hostnames
 	nisint_nisclient_setup
 
 	##############################################################
 	# NIS Integration 
 	##############################################################
-	rlLog_hostnames
 	nisint_ipamaster_integration # Import NIS Maps/Data/Configuration...
-	rlLog_hostnames
 	nisint_nisclient_integration # Switch NIS Config to point to IPA Master
-	rlLog_hostnames
 	nisint_user_tests
-	rlLog_hostnames
 	nisint_group_tests
-	rlLog_hostnames
 	nisint_netgroup_tests
-	rlLog_hostnames
 	nisint_automount_tests
-	rlLog_hostnames
 	nisint_client_is_nis_bz_tests
 
 	##############################################################
 	# NIS Migration
 	##############################################################
-	rlLog_hostnames
 	nisint_nisclient_migration # Switch NIS Client to use SSSD/IPA
-	rlLog_hostnames
 	nisint_user_tests
-	rlLog_hostnames
 	nisint_group_tests
-	rlLog_hostnames
 	nisint_netgroup_tests
-	rlLog_hostnames
 	nisint_automount_tests
-	rlLog_hostnames
 	nisint_client_is_ipa_bz_tests
 
-	rlLog_hostnames
 	nisint_end
 		
 	rlPhaseStartCleanup "ipa-nis-integration cleanup"
