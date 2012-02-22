@@ -63,28 +63,27 @@ nisint_user_tests()
 
 nisint_user_test_envsetup()
 {
+	TESTORDER=$(( TESTORDER += 1 ))
 	rlPhaseStartTest "nisint_user_test_envsetup: Create Users and Prep environment for tests"
 	case "$MYROLE" in
 	"MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
-		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "create_ipauser testuser1 NIS USER passw0rd1"
 		rlRun "create_ipauser testuser2 NIS USER passw0rd1"
 		KinitAsAdmin
 		rlRun "ipa user-mod testuser1 --uid=56678 --gidnumber=56678"
 		rlRun "ipa user-mod testuser2 --uid=56679 --gidnumber=56679"
-		rlRun "rhts-sync-set -s '$FUNCNAME' -m $MASTER_IP"
-		[ -f $tmpout ] && rm -f $tmpout
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $MASTER_IP"
 		;;
 	"NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
-		rlLog "rhts-sync-block -s '$FUNCNAME' $MASTER_IP"
-		rlRun "rhts-sync-block -s '$FUNCNAME' $MASTER_IP"
+		rlLog "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER_IP"
 		;;
 	"NISCLIENT")
 		rlLog "Machine in recipe is NISCLIENT"
-		rlLog "rhts-sync-block -s '$FUNCNAME' $MASTER_IP"
-		rlRun "rhts-sync-block -s '$FUNCNAME' $MASTER_IP"
+		rlLog "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER_IP"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE"
@@ -96,26 +95,25 @@ nisint_user_test_envsetup()
 
 nisint_user_test_envcleanup()
 {
+	TESTORDER=$(( TESTORDER += 1 ))
 	rlPhaseStartTest "nisint_user_test_envcleanup: Delete users and cleanup"
 	case "$MYROLE" in
 	"MASTER")
 		KinitAsAdmin
 		rlLog "Machine in recipe is IPAMASTER"
-		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa user-del testuser1"
 		rlRun "ipa user-del testuser2"
-		rlRun "rhts-sync-set -s '$FUNCNAME' -m $MASTER_IP"
-		[ -f $tmpout ] && rm -f $tmpout
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $MASTER_IP"
 		;;
 	"NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
-		rlLog "rhts-sync-block -s '$FUNCNAME' $MASTER_IP"
-		rlRun "rhts-sync-block -s '$FUNCNAME' $MASTER_IP"
+		rlLog "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER_IP"
 		;;
 	"NISCLIENT")
 		rlLog "Machine in recipe is NISCLIENT"
-		rlLog "rhts-sync-block -s '$FUNCNAME' $MASTER_IP"
-		rlRun "rhts-sync-block -s '$FUNCNAME' $MASTER_IP"
+		rlLog "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER_IP"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE"
@@ -129,28 +127,27 @@ nisint_user_test_envcleanup()
 # ypcat positive
 nisint_user_test_1001()
 {
+	TESTORDER=$(( TESTORDER += 1 ))
 	rlPhaseStartTest "nisint_user_test_1001: ypcat positive test"
 	case "$MYROLE" in
 	"MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
-		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
-		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
+		rlLog "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $NISCLIENT_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $NISCLIENT_IP"
 		;;
 	"NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
-		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
-		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
+		rlLog "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $NISCLIENT_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $NISCLIENT_IP"
 		;;
 	"NISCLIENT")
 		rlLog "Machine in recipe is NISCLIENT"
-		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		if [ $(ps -ef|grep [y]pbind|wc -l) -eq 0 ]; then
 			rlPass "ypbind not running...skipping test"
 		else
 			rlRun "ypcat passwd|grep testuser1" 0 "ypcat search for existing user"
 		fi
-		rlRun "rhts-sync-set -s '$FUNCNAME' -m $NISCLIENT_IP"
-		[ -f $tmpout ] && rm -f $tmpout
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $NISCLIENT_IP"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE"
@@ -162,28 +159,27 @@ nisint_user_test_1001()
 # ypcat negative
 nisint_user_test_1002()
 {
+	TESTORDER=$(( TESTORDER += 1 ))
 	rlPhaseStartTest "nisint_user_test_1002: ypcat negative test"
 	case "$MYROLE" in
 	"MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
-		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
-		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
+		rlLog "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $NISCLIENT_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $NISCLIENT_IP"
 		;;
 	"NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
-		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
-		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
+		rlLog "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $NISCLIENT_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $NISCLIENT_IP"
 		;;
 	"NISCLIENT")
 		rlLog "Machine in recipe is NISCLIENT"
-		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		if [ $(ps -ef|grep [y]pbind|wc -l) -eq 0 ]; then
 			rlPass "ypbind not running...skipping test"
 		else
 			rlRun "ypcat passwd|grep notauser" 1 "Fail to ypcat search for non-existent user"
 		fi
-		rlRun "rhts-sync-set -s '$FUNCNAME' -m $NISCLIENT_IP"
-		[ -f $tmpout ] && rm -f $tmpout
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $NISCLIENT_IP"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE"
@@ -195,31 +191,30 @@ nisint_user_test_1002()
 # ipa positive
 nisint_user_test_1003()
 {
+	TESTORDER=$(( TESTORDER += 1 ))
 	rlPhaseStartTest "nisint_user_test_1003: ipa positive test"
 	case "$MYROLE" in
 	"MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
-		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
-		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
+		rlLog "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $NISCLIENT_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $NISCLIENT_IP"
 		;;
 	"NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
-		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
-		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
+		rlLog "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $NISCLIENT_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $NISCLIENT_IP"
 		;;
 	"NISCLIENT")
 		rlLog "Machine in recipe is NISCLIENT"
-		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ls -ld /usr/bin/ipa" 2
 		rlRun "rpm -qf /usr/bin/ipa" 1
 		#if [ $(/usr/sbin/ipa-client-install 2>&1 | grep "IPA client is already configured on this system." | wc -l) -eq 0 ]; then
-		if [ $(grep "auth_provider = .*ipa" /etc/sssd/sssd.conf|wc -l) -gt 0 ]; then
+		if [ $(grep "auth_provider = .*ipa" /etc/sssd/sssd.conf 2>/dev/null|wc -l) -eq 0 ]; then
 			rlPass "ipa not configured...skipping"
 		else
 			rlRun "ipa user-find|grep testuser1" 0 "ipa search for existing user"
 		fi
-		rlRun "rhts-sync-set -s '$FUNCNAME' -m $NISCLIENT_IP"
-		[ -f $tmpout ] && rm -f $tmpout
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $NISCLIENT_IP"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE"
@@ -231,28 +226,27 @@ nisint_user_test_1003()
 # ipa negative
 nisint_user_test_1004()
 {
+	TESTORDER=$(( TESTORDER += 1 ))
 	rlPhaseStartTest "nisint_user_test_1004: ipa negative test"
 	case "$MYROLE" in
 	"MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
-		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
-		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
+		rlLog "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $NISCLIENT_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $NISCLIENT_IP"
 		;;
 	"NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
-		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
-		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
+		rlLog "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $NISCLIENT_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $NISCLIENT_IP"
 		;;
 	"NISCLIENT")
 		rlLog "Machine in recipe is NISCLIENT"
-		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
-		if [ $(grep "auth_provider = .*ipa" /etc/sssd/sssd.conf|wc -l) -gt 0 ]; then
+		if [ $(grep "auth_provider = .*ipa" /etc/sssd/sssd.conf 2>/dev/null|wc -l) -eq 0 ]; then
 			rlPass "ipa not configured...skipping"
 		else
-			rlRun "ipa user-find|grep notauser" 1 "Fail to ipa search for non-existent user"
+			rlRun "ipa user-find|grep testuser1" 0 "ipa search for existing user"
 		fi
-		rlRun "rhts-sync-set -s '$FUNCNAME' -m $NISCLIENT_IP"
-		[ -f $tmpout ] && rm -f $tmpout
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $NISCLIENT_IP"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE"
@@ -264,24 +258,23 @@ nisint_user_test_1004()
 # getent positive
 nisint_user_test_1005()
 {
+	TESTORDER=$(( TESTORDER += 1 ))
 	rlPhaseStartTest "nisint_user_test_1005: getent positive test"
 	case "$MYROLE" in
 	"MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
-		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
-		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
+		rlLog "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $NISCLIENT_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $NISCLIENT_IP"
 		;;
 	"NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
-		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
-		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
+		rlLog "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $NISCLIENT_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $NISCLIENT_IP"
 		;;
 	"NISCLIENT")
 		rlLog "Machine in recipe is NISCLIENT"
-		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "getent passwd testuser2" 0 "getent search for existing user"
-		rlRun "rhts-sync-set -s '$FUNCNAME' -m $NISCLIENT_IP"
-		[ -f $tmpout ] && rm -f $tmpout
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $NISCLIENT_IP"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE"
@@ -293,24 +286,23 @@ nisint_user_test_1005()
 # getent negative
 nisint_user_test_1006()
 {
+	TESTORDER=$(( TESTORDER += 1 ))
 	rlPhaseStartTest "nisint_user_test_1006: getent negative test"
 	case "$MYROLE" in
 	"MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
-		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
-		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
+		rlLog "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $NISCLIENT_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $NISCLIENT_IP"
 		;;
 	"NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
-		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
-		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
+		rlLog "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $NISCLIENT_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $NISCLIENT_IP"
 		;;
 	"NISCLIENT")
 		rlLog "Machine in recipe is NISCLIENT"
-		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "getent passwd notauser" 2 "attempt to getent search for non-existent user"
-		rlRun "rhts-sync-set -s '$FUNCNAME' -m $NISCLIENT_IP"
-		[ -f $tmpout ] && rm -f $tmpout
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $NISCLIENT_IP"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE"
@@ -322,24 +314,23 @@ nisint_user_test_1006()
 # id positive
 nisint_user_test_1007()
 {
+	TESTORDER=$(( TESTORDER += 1 ))
 	rlPhaseStartTest "nisint_user_test_1007: id positive test"
 	case "$MYROLE" in
 	"MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
-		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
-		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
+		rlLog "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $NISCLIENT_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $NISCLIENT_IP"
 		;;
 	"NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
-		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
-		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
+		rlLog "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $NISCLIENT_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $NISCLIENT_IP"
 		;;
 	"NISCLIENT")
 		rlLog "Machine in recipe is NISCLIENT"
-		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "id testuser1" 0 "id search for existing user"
-		rlRun "rhts-sync-set -s '$FUNCNAME' -m $NISCLIENT_IP"
-		[ -f $tmpout ] && rm -f $tmpout
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $NISCLIENT_IP"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE"
@@ -351,24 +342,23 @@ nisint_user_test_1007()
 # id negative
 nisint_user_test_1008()
 {
+	TESTORDER=$(( TESTORDER += 1 ))
 	rlPhaseStartTest "nisint_user_test_1008: id negative test"
 	case "$MYROLE" in
 	"MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
-		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
-		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
+		rlLog "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $NISCLIENT_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $NISCLIENT_IP"
 		;;
 	"NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
-		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
-		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
+		rlLog "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $NISCLIENT_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $NISCLIENT_IP"
 		;;
 	"NISCLIENT")
 		rlLog "Machine in recipe is NISCLIENT"
-		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
-		rlRun "id notauser" 1 "id search for existing user"
-		rlRun "rhts-sync-set -s '$FUNCNAME' -m $NISCLIENT_IP"
-		[ -f $tmpout ] && rm -f $tmpout
+		rlRun "id notauser" 1 "id search for non-existent user"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $NISCLIENT_IP"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE"
@@ -380,24 +370,23 @@ nisint_user_test_1008()
 # touch positive
 nisint_user_test_1009()
 {
+	TESTORDER=$(( TESTORDER += 1 ))
 	rlPhaseStartTest "nisint_user_test_1009: su touch positive test"
 	case "$MYROLE" in
 	"MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
-		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
-		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
+		rlLog "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $NISCLIENT_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $NISCLIENT_IP"
 		;;
 	"NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
-		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
-		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
+		rlLog "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $NISCLIENT_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $NISCLIENT_IP"
 		;;
 	"NISCLIENT")
 		rlLog "Machine in recipe is NISCLIENT"
-		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "su - testuser1 -c 'touch /tmp/mytestfile.user1'" 0 "touch new file as exisiting user"
-		rlRun "rhts-sync-set -s '$FUNCNAME' -m $NISCLIENT_IP"
-		[ -f $tmpout ] && rm -f $tmpout
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $NISCLIENT_IP"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE"
@@ -409,25 +398,24 @@ nisint_user_test_1009()
 # touch negative
 nisint_user_test_1010()
 {
+	TESTORDER=$(( TESTORDER += 1 ))
 	rlPhaseStartTest "nisint_user_test_1010: su touch negative test"
 	case "$MYROLE" in
 	"MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
-		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
-		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
+		rlLog "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $NISCLIENT_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $NISCLIENT_IP"
 		;;
 	"NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
-		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
-		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
+		rlLog "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $NISCLIENT_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $NISCLIENT_IP"
 		;;
 	"NISCLIENT")
 		rlLog "Machine in recipe is NISCLIENT"
-		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "su - testuser2 -c 'touch /tmp/mytestfile.user1'" 1 "attempt to touch existing file fail without permissions"
 		rlRun "su - notauser -c 'touch /tmp/mytestfile.user1'" 125 "su fail as non-existent user"
-		rlRun "rhts-sync-set -s '$FUNCNAME' -m $NISCLIENT_IP"
-		[ -f $tmpout ] && rm -f $tmpout
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $NISCLIENT_IP"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE"
@@ -439,24 +427,23 @@ nisint_user_test_1010()
 # rm negative
 nisint_user_test_1011()
 {
+	TESTORDER=$(( TESTORDER += 1 ))
 	rlPhaseStartTest "nisint_user_test_1011: su rm negative test"
 	case "$MYROLE" in
 	"MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
-		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
-		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
+		rlLog "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $NISCLIENT_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $NISCLIENT_IP"
 		;;
 	"NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
-		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
-		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
+		rlLog "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $NISCLIENT_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $NISCLIENT_IP"
 		;;
 	"NISCLIENT")
 		rlLog "Machine in recipe is NISCLIENT"
-		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "su - testuser2 -c 'rm -f /tmp/mytestfile.user1'" 1 "attempt to rm existing file fail without permissions"
-		rlRun "rhts-sync-set -s '$FUNCNAME' -m $NISCLIENT_IP"
-		[ -f $tmpout ] && rm -f $tmpout
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $NISCLIENT_IP"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE"
@@ -468,24 +455,23 @@ nisint_user_test_1011()
 # rm positive
 nisint_user_test_1012()
 {
+	TESTORDER=$(( TESTORDER += 1 ))
 	rlPhaseStartTest "nisint_user_test_1012: su rm positive test"
 	case "$MYROLE" in
 	"MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
-		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
-		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
+		rlLog "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $NISCLIENT_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $NISCLIENT_IP"
 		;;
 	"NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
-		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
-		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
+		rlLog "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $NISCLIENT_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $NISCLIENT_IP"
 		;;
 	"NISCLIENT")
 		rlLog "Machine in recipe is NISCLIENT"
-		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "su - testuser1 -c 'rm -f /tmp/mytestfile.user1'" 0 "rm existing file"
-		rlRun "rhts-sync-set -s '$FUNCNAME' -m $NISCLIENT_IP"
-		[ -f $tmpout ] && rm -f $tmpout
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $NISCLIENT_IP"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE"
@@ -497,24 +483,23 @@ nisint_user_test_1012()
 # mkdir positive
 nisint_user_test_1013()
 {
+	TESTORDER=$(( TESTORDER += 1 ))
 	rlPhaseStartTest "nisint_user_test_1013: su mkdir positive test"
 	case "$MYROLE" in
 	"MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
-		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
-		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
+		rlLog "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $NISCLIENT_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $NISCLIENT_IP"
 		;;
 	"NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
-		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
-		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
+		rlLog "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $NISCLIENT_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $NISCLIENT_IP"
 		;;
 	"NISCLIENT")
 		rlLog "Machine in recipe is NISCLIENT"
-		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "su - testuser1 -c 'mkdir /tmp/mytmpdir.user1'" 0 "su mkdir new directory"
-		rlRun "rhts-sync-set -s '$FUNCNAME' -m $NISCLIENT_IP"
-		[ -f $tmpout ] && rm -f $tmpout
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $NISCLIENT_IP"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE"
@@ -526,24 +511,23 @@ nisint_user_test_1013()
 # mkdir negative
 nisint_user_test_1014()
 {
+	TESTORDER=$(( TESTORDER += 1 ))
 	rlPhaseStartTest "nisint_user_test_1014: su mkdir negative test"
 	case "$MYROLE" in
 	"MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
-		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
-		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
+		rlLog "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $NISCLIENT_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $NISCLIENT_IP"
 		;;
 	"NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
-		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
-		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
+		rlLog "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $NISCLIENT_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $NISCLIENT_IP"
 		;;
 	"NISCLIENT")
 		rlLog "Machine in recipe is NISCLIENT"
-		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "su - testuser2 -c 'mkdir /tmp/mytmpdir.user1/mytmpdir.user2'" 1 "attempt to mkdir new directory in dir without permissions"
-		rlRun "rhts-sync-set -s '$FUNCNAME' -m $NISCLIENT_IP"
-		[ -f $tmpout ] && rm -f $tmpout
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $NISCLIENT_IP"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE"
@@ -555,24 +539,23 @@ nisint_user_test_1014()
 # rmdir negative
 nisint_user_test_1015()
 {
+	TESTORDER=$(( TESTORDER += 1 ))
 	rlPhaseStartTest "nisint_user_test_1015: su rmdir negative test"
 	case "$MYROLE" in
 	"MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
-		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
-		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
+		rlLog "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $NISCLIENT_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $NISCLIENT_IP"
 		;;
 	"NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
-		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
-		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
+		rlLog "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $NISCLIENT_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $NISCLIENT_IP"
 		;;
 	"NISCLIENT")
 		rlLog "Machine in recipe is NISCLIENT"
-		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "su - testuser2 -c 'rmdir /tmp/mytmpdir.user1'" 1 "attempt to rmdir directory without permissions"
-		rlRun "rhts-sync-set -s '$FUNCNAME' -m $NISCLIENT_IP"
-		[ -f $tmpout ] && rm -f $tmpout
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $NISCLIENT_IP"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE"
@@ -584,24 +567,23 @@ nisint_user_test_1015()
 # rmdir positive
 nisint_user_test_1016()
 {
+	TESTORDER=$(( TESTORDER += 1 ))
 	rlPhaseStartTest "nisint_user_test_1016: su rmdir positive test"
 	case "$MYROLE" in
 	"MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
-		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
-		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
+		rlLog "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $NISCLIENT_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $NISCLIENT_IP"
 		;;
 	"NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
-		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
-		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
+		rlLog "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $NISCLIENT_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $NISCLIENT_IP"
 		;;
 	"NISCLIENT")
 		rlLog "Machine in recipe is NISCLIENT"
-		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "su - testuser1 -c 'rmdir /tmp/mytmpdir.user1'" 0 "rmdir directory"
-		rlRun "rhts-sync-set -s '$FUNCNAME' -m $NISCLIENT_IP"
-		[ -f $tmpout ] && rm -f $tmpout
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $NISCLIENT_IP"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE"
@@ -613,25 +595,24 @@ nisint_user_test_1016()
 # ssh as user to localhost # may need to wait on this one till migration...
 nisint_user_test_1017()
 {
+	TESTORDER=$(( TESTORDER += 1 ))
 	rlPhaseStartTest "nisint_user_test_1017: ssh positive test"
 	case "$MYROLE" in
 	"MASTER")
 		KinitAsAdmin
 		rlLog "Machine in recipe is IPAMASTER"
-		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
-		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
+		rlLog "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $NISCLIENT_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $NISCLIENT_IP"
 		;;
 	"NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
-		rlLog "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
-		rlRun "rhts-sync-block -s '$FUNCNAME' $NISCLIENT_IP"
+		rlLog "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $NISCLIENT_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $NISCLIENT_IP"
 		;;
 	"NISCLIENT")
 		rlLog "Machine in recipe is NISCLIENT"
-		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ssh_auth_success testuser1 passw0rd1 localhost" 
-		[ -f $tmpout ] && rm -f $tmpout
-		rlRun "rhts-sync-set -s '$FUNCNAME' -m $NISCLIENT_IP"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $NISCLIENT_IP"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE"
