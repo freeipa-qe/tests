@@ -589,7 +589,7 @@ rlPhaseStartTest "ipa-host-cli-38: find more hosts than exist"
         rlRun "removeHostManagedBy $myhost2 $myhost1" 0 "Removing Managed By Host"
         rlRun "verifyHostAttr $myhost1 \"Managed by\" $myhost1"
 	ipa host-find --man-by-hosts=$myhost2 > /tmp/manbyhosts_removed.out
-	rlAssertGrep "Number of entries returned 1" "/tmp/manbyhosts_find.out"
+	rlAssertGrep "Number of entries returned 1" "/tmp/manbyhosts_removed.out"
 	rlAssertNotGrep "Host name: $myhost1" "/tmp/manbyhosts_find.out"
     rlPhaseEnd
 
