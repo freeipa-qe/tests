@@ -15,6 +15,7 @@
 #
 #   Author: Jenny Galipeau <jgalipea@redhat.com>
 #
+#   Additional tests by <aakkiang@redhat.com>
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
 #   Copyright (c) 2010 Red Hat, Inc. All rights reserved.
@@ -570,6 +571,108 @@ rlPhaseStartTest "ipa-host-cli-38: find more hosts than exist"
         expmsg="ipa: ERROR: invalid 'hostname': may only include letters, numbers, and -"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
     rlPhaseEnd
+
+    rlPhaseStartTest "ipa-host-cli-56: search with man-by-hosts when Managed By a Host"
+        myhost1=mytesthost1.$DOMAIN
+        myhost2=mytesthost2.$DOMAIN
+        addHost $myhost1
+        addHost $myhost2
+        rlRun "addHostManagedBy $myhost2 $myhost1" 0 "Adding Managed By Host"
+        rlRun "verifyHostAttr $myhost1 \"Managed by\" \"$myhost1, $myhost2\""
+	ipa host-find --man-by-hosts=$myhost2 > /tmp/manbyhosts_find.out
+	rlAssertGrep "Number of entries returned 2" "/tmp/manbyhosts_find.out"
+	rlAssertGrep "Host name: $myhost2" "/tmp/manbyhosts_find.out"
+	rlAssertGrep "Host name: $myhost1" "/tmp/manbyhosts_find.out"
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-host-cli-57: search a host when removed Managed By Host"
+        rlRun "removeHostManagedBy $myhost2 $myhost1" 0 "Removing Managed By Host"
+        rlRun "verifyHostAttr $myhost1 \"Managed by\" $myhost1"
+	ipa host-find --man-by-hosts=$myhost2 > /tmp/manbyhosts_removed.out
+	rlAssertGrep "Number of entries returned 1" "/tmp/manbyhosts_find.out"
+	rlAssertNotGrep "Host name: $myhost1" "/tmp/manbyhosts_find.out"
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-host-cli-58: search a host when Managed by multiple Hosts"
+        myhost1=mytesthost1.$DOMAIN
+        myhost2=mytesthost2.$DOMAIN
+        myhost3=mytesthost3.$DOMAIN
+        myhost4=mytesthost4.$DOMAIN
+        addHost $myhost3
+        addHost $myhost4
+        rlRun "addHostManagedBy \"$myhost2, $myhost3, $myhost4\" $myhost1" 0 "Adding Managed By Hosts"
+        rlRun "verifyHostAttr $myhost1 \"Managed by\" \"$myhost1, $myhost2, $myhost3, $myhost4\""
+	ipa host-find --man-by-hosts=$myhost2 > /tmp/manbyhosts_$myhost2.out
+	rlAssertGrep "Number of entries returned 2" "/tmp/manbyhosts_$myhost2.out"
+	rlAssertGrep "Host name: $myhost2" "/tmp/manbyhosts_$myhost2.out"
+	rlAssertGrep "Host name: $myhost1" "/tmp/manbyhosts_$myhost2.out"
+
+	ipa host-find --man-by-hosts=$myhost3 > /tmp/manbyhosts_$myhost3.out
+	rlAssertGrep "Number of entries returned 2" "/tmp/manbyhosts_$myhost3.out"
+	rlAssertGrep "Host name: $myhost3" "/tmp/manbyhosts_$myhost3.out"
+	rlAssertGrep "Host name: $myhost1" "/tmp/manbyhosts_$myhost3.out"
+
+	ipa host-find --man-by-hosts=$myhost4 > /tmp/manbyhosts_$myhost4.out
+	rlAssertGrep "Number of entries returned 2" "/tmp/manbyhosts_$myhost4.out"
+	rlAssertGrep "Host name: $myhost4" "/tmp/manbyhosts_$myhost4.out"
+	rlAssertGrep "Host name: $myhost1" "/tmp/manbyhosts_$myhost4.out"
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-host-cli-59: search a host when Multiple Managed By Hosts removed"
+        myhost1=mytesthost1.$DOMAIN
+        myhost2=mytesthost2.$DOMAIN
+        myhost3=mytesthost3.$DOMAIN
+        rlRun "removeHostManagedBy \"$myhost2, $myhost3, $myhost4\" $myhost1" 0 "Removing Managed By Hosts"
+        rlRun "verifyHostAttr $myhost1 \"Managed by\" $myhost1"
+	ipa host-find --man-by-hosts=$myhost2 > /tmp/manbyhosts_$myhost2.out
+	rlAssertGrep "Number of entries returned 1" "/tmp/manbyhosts_$myhost2.out"
+	rlAssertNotGrep "Host name: $myhost1" "/tmp/manbyhosts_$myhost2.out"
+
+        ipa host-find --man-by-hosts=$myhost3 > /tmp/manbyhosts_$myhost3.out
+	rlAssertGrep "Number of entries returned 2" "/tmp/manbyhosts_$myhost3.out"
+	rlAssertNotGrep "Host name: $myhost1" "/tmp/manbyhosts_$myhost3.out"
+
+        ipa host-find --man-by-hosts=$myhost4 > /tmp/manbyhosts_$myhost4.out
+	rlAssertGrep "Number of entries returned 2" "/tmp/manbyhosts_$myhost4.out"
+	rlAssertNotGrep "Host name: $myhost1" "/tmp/manbyhosts_$myhost4.out"
+        deleteHost $myhost1
+        deleteHost $myhost2
+        deleteHost $myhost3
+        deleteHost $myhost4
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-host-cli-60: search a host when Manages multiple Hosts"
+        myhost1=mytesthost1.$DOMAIN
+        myhost2=mytesthost2.$DOMAIN
+        myhost3=mytesthost3.$DOMAIN
+        myhost4=mytesthost4.$DOMAIN
+        addHost $myhost1
+        addHost $myhost2
+        addHost $myhost3
+        addHost $myhost4
+        rlRun "addHostManagedBy \"$myhost2\" $myhost1" 0 "Adding Managed By Hosts"
+        rlRun "addHostManagedBy \"$myhost2\" $myhost3" 0 "Adding Managed By Hosts"
+        rlRun "addHostManagedBy \"$myhost2\" $myhost4" 0 "Adding Managed By Hosts"
+        rlRun "verifyHostAttr $myhost1 \"Managed by\" \"$myhost1, $myhost2\""
+        rlRun "verifyHostAttr $myhost3 \"Managed by\" \"$myhost3, $myhost2\""
+        rlRun "verifyHostAttr $myhost4 \"Managed by\" \"$myhost4, $myhost2\""
+        ipa host-find --man-by-hosts=$myhost2 > /tmp/manbyhosts_multi.out
+	rlAssertGrep "Number of entries returned 4" "/tmp/manbyhosts_multi.out"
+	rlAssertGrep "Host name: $myhost4" "/tmp/manbyhosts_multi.out"
+	rlAssertGrep "Host name: $myhost3" "/tmp/manbyhosts_multi.out"
+	rlAssertGrep "Host name: $myhost2" "/tmp/manbyhosts_multi.out"
+	rlAssertGrep "Host name: $myhost1" "/tmp/manbyhosts_multi.out"
+	deleteHost $myhost1
+        deleteHost $myhost2
+        deleteHost $myhost3
+        deleteHost $myhost4
+    rlPhaseEnd
+	
+    rlPhaseStartTest "ipa-host-cli-61: Negative - search man-by-hosts host when host does not exist"
+        myhost1=mytesthost1.$DOMAIN
+	ipa host-find --man-by-hosts=$myhost1 > /tmp/manbyhosts_notahost.out
+	rlAssertGrep "Number of entries returned 0" "/tmp/manbyhosts_notahost.out"
+   rlPhaseEnd
 
     rlPhaseStartCleanup "ipa-host-cli-cleanup: Destroying admin credentials."
 	rlRun "ipa config-mod --searchrecordslimit=100" 0 "set search records limit back to default"
