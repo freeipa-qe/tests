@@ -1,0 +1,220 @@
+#!/bin/bash
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+#######################################################################
+# VARIABLES
+#######################################################################
+ngroup1=testg1
+ngroup2=testgaga2
+ngroup3=mynewng3
+user1=usrjjk1r
+user2=userl33t
+user3=usern00b
+user4=lopcr4k
+group1=grpddee
+group2=grplloo
+group3=grpmmpp
+group4=grpeeww
+hgroup1=hg144335566
+hgroup2=hg2
+hgroup3=hg3afdsk
+
+NETGRPDN="cn=ng,cn=alt,$BASEDN"
+ENTRY="NGP Definition"
+
+#########################################################################
+# TEST SECTIONS TO RUN
+#########################################################################
+netgroup_bugs()
+{
+	netgroup_bz_772043
+	netgroup_bz_788625
+	netgroup_bz_772297
+	netgroup_bz_766141
+	netgroup_bz_767372
+	netgroup_bz_772163
+	netgroup_bz_750984
+	netgroup_bz_796390
+}
+
+netgroup_bz_772043()
+{
+	rlPhaseStartTest "netgroup_bz772043: Adding a netgroup with a + in the name that overlaps hostgroup causes crash"	
+		KinitAsAdmin
+		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
+		rlRun "ipa netgroup-add +badtestnetgroup --desc=netgroup_with_plus_kills_dirsrv" 
+		rlRun "ipactl status > $tmpout 2>&1"
+		if [ $(grep "Directory Service: STOPPED" $tmpout|wc -l) -gt 0 ]; then
+			rlFail "BZ 772043 found...Adding a netgroup with a + in the name that overlaps hostgroup causes crash"
+		else
+			rlPass "BZ 772043 not found"
+		fi
+
+		rlLog "Now fixing DB and restarting IPA Server"
+		rlRun "ns-slapd db2ldif -s '$BASEDN' -a /tmp/testrelm.ldif -D /etc/dirsrv/slapd-TESTRELM-COM/"
+		rlRun "sed s/+badtestnetgroup/badtestnetgroup/g /tmp/testrelm.ldif > /tmp/testrelm.ldif.fixed"
+		rlRun "ns-slapd ldif2db -D /etc/dirsrv/slapd-TESTRELM-COM/ -s "$BASEDN" -i /tmp/testrelm.ldif.fixed" 
+		rlRun "ipactl restart"
+		rlRun "ipa netgroup-del badtestgroup"
+		[ -f $tmpout ] && rm -f $tmpout
+	rlPhaseEnd
+}
+
+netgroup_bz_788625()
+{
+	rlPhaseStartTest "netgroup_bz_788625: IPA nested netgroups not seen from ypcat"
+		KinitAsAdmin
+		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
+		rlRun "ipa netgroup-add netgroup_bz_788625_test1 --desc=netgroup_bz_788625_test1"
+		rlRun "ipa netgroup-add-member netgroup_bz_788625_test1 --users=admin"
+		rlRun "ipa netgroup-add netgroup_bz_788625_test --desc=netgroup_bz_788625_test"
+		rlRun "ipa netgroup-add-member netgroup_bz_788625_test --netgroups=netgroup_bz_788625_test1"
+		rlRun "echo $ADMINPW | ipa-compat-manage enable" 0,2
+		rlRun "echo $ADMINPW | ipa-nis-manage enable" 0,2
+		rlRun "service rpcbind restart"
+		rlRun "service dirsrv restart"
+		rlRun "yum install yp-tools"
+		if [ $(ypcat -d $DOMAIN -h localhost -k netgroup|grep "^netgroup_bz_788625_test $"|wc -l) -gt 0 ]; then
+			rlFail "BZ 788625 found ...IPA nested netgroups not seen from ypcat"
+		else
+			rlPass "BZ 788625 not found"
+		fi		
+		rlRun "ipa netgroup-del netgroup_bz_788625_test1"
+		rlRun "ipa netgroup-del netgroup_bz_788625_test"
+		[ -f $tmpout ] && rm -f $tmpout
+	rlPhaseEnd
+}
+
+netgroup_bz_772297()
+{
+	rlPhaseStartTest "netgroup_bz_772297: Fails to update if all nisNetgroupTriple or memberNisNetgroup entries are deleted from a netgroup"
+		KinitAsAdmin
+		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
+
+		rlRun "ipa user-add user1 --first=TEST --last=USER"
+		rlRun "ipa user-add user2 --first=TEST --last=USER"
+		rlRun "ipa user-add user3 --first=TEST --last=USER"
+		rlRun "ipa netgroup-add users --desc=users"
+		rlRun "ipa netgroup-add-member users --users=user1,user2,user3"
+		rlRun "ipa netgroup-find --users=user1,user2,user3"
+		rlRun "ldapsearch -x -LLL -b "dc=testrelm,dc=com" cn=users"
+		rlRun "getent -s sss netgroup users"
+		rlRun "ipa netgroup-remove-member users --users=user1,user2,user3"
+		rlRun "sleep 120"
+		if [ $(getent -s sss netgroup users|grep "^users.*user1.*user2.*user3"|wc -l) -gt 0 ]; then
+			rlFail "BZ 772297 found...Fails to update if all nisNetgroupTriple or memberNisNetgroup entries are deleted from a netgroup"
+		else
+			rlPass "BZ 772297 not found."
+		fi
+			
+		rlRun "ldapsearch -x -LLL -b \"dc=testrelm,dc=com\" cn=users"
+		[ -f $tmpout ] && rm -f $tmpout
+	rlPhaseEnd
+}
+
+netgroup_bz_766141()
+{
+	rlPhaseStartTest "netgroup_bz_766141: SSSD should support FreeIPA's internal netgroup representation"
+		KinitAsAdmin
+		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
+		rlRun "ipa netgroup-add $FUNCNAME --desk=$FUNCNAME"
+		rlRun "ipa netgroup-add-member $FUNCNAME --users=admin"
+		rlRun "cp /etc/sssd/sssd.conf /etc/sssd/sssd.conf.$FUNCNAME.backup"
+		sed -i 's/\(\[domain.*\]\)$/\1\ndebug_level = 6/' /etc/sssd/sssd.conf
+		rlRun "cat /etc/sssd/sssd.conf"
+		rlRun "service sssd restart"
+		rlRun "getent -s sss netgroup $FUNCNAME"
+		
+		# New/Native search filter uses this:  cn=ng,cn=alt,dc=testrelm,dc=com
+		# OLD search filter users compat like this:  cn=ng,cn=compat,dc=testrelm,dc=com
+		if [ $(grep -i "calling ldap_search_ext with.*NisNetgroup.*compat" /var/log/sssd/sssd_$DOMAIN.log|wc -l) -gt 0 ]; then
+			rlFail "BZ 766141 found...SSSD should support FreeIPA's internal netgroup representation"
+		else
+			rlPass "BZ 766141 not found"
+		fi	
+		
+		rlRun "mv /etc/sssd/sssd.conf.$FUNCNAME.backup /etc/sssd/sssd.conf"
+		rlRun "chmod 0600 /etc/sssd/sssd.conf"
+		rlRun "service sssd restart"
+		rlRun "ipa netgroup-del $FUNCNAME"
+		[ -f $tmpout ] && rm -f $tmpout
+	rlPhaseEnd
+}
+ 
+netgroup_bz_767372()
+{
+	rlPhaseStartTest "netgroup_bz_767372: Netgroups compat plugin not reporting users correctly"
+		KinitAsAdmin
+		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
+		rlRun "echo $ADMINPW | ipa-compat-manage enable"
+		rlRun "echo $ADMINPW | ipa-nis-manage enable"
+		rlRun "service rpcbind restart"
+		rlRun "service dirsrv restart"
+		rlRun "ipa user-add bzuser1 --first=First --last=Last"
+		rlRun "ipa user-add bzuser2 --first=First --last=Last"
+		rlRun "ipa user-add bzuser3 --first=First --last=Last"
+		rlRun "ipa netgroup-add $FUNCNAME --hostcat=all --desc=$FUNCNAME"
+		rlRun "ipa netgroup-add-member $FUNCNAME --users=bzuser1,bzuser2,bzuser3"
+
+		if [ $(ldapsearch -x -h $MASTER -p 389 -D "$ROOTDN" -w $ADMINPW -b "cn=test2,cn=ng,cn=compat,$BASEDN" | grep Triple|grep "(-," | wc -l) -gt 0 ]; then
+			rlFail "BZ 767372 found...Netgroups compat plugin not reporting users correctly"
+		else
+			rlPass "BZ 767372 not found."
+		fi
+
+		rlRun "ipa netgroup-del $FUNCNAME"
+		rlRun "ipa user-del bzuser1"
+		rlRun "ipa user-del bzuser2"
+		rlRun "ipa user-del bzuser3"
+		[ -f $tmpout ] && rm -f $tmpout
+	rlPhaseEnd
+}
+
+netgroup_bz_772163()
+{
+	rlPhaseStartTest "netgroup_bz_772163: Iterator loop reuse cases a tight loop in the native IPA netgroups code"
+		KinitAsAdmin
+		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
+		
+	rlPhaseEnd
+}
+
+netgroup_bz_750984()
+{
+	rlPhaseStartTest "netgroup_bz_750984: Inconsistency in error message while adding a duplicate netgroup"
+		KinitAsAdmin
+		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
+		rlRun "ipa hostgroup-add netgroup_bz_750984 --desc=netgroup_bz_750984"
+		rlRun "ipa netgroup-add netgroup_bz_750984 --desc=netgroup_bz_750984 > $tmpout 2>&1" 1
+		if [ $(grep "Hostgroups and netgroups share a common namespace" $tmpout|wc -l) -gt 0 ]; then
+			rlPass "BZ 750984 not found."
+		else
+			rlFail "BZ 750984 found...Inconsistency in error message while adding a duplicate netgroup"
+		fi
+		rlRun "ipa hostgroup-del netgroup_bz_750984"
+		rlRun "ipa netgroup-add netgroup_bz_750984 --desc=netgroup_bz_750984" 
+		rlRun "ipa hostgroup-add netgroup_bz_750984 --desc=netgroup_bz_750984 > $tmpout 2>&1" 1
+		if [ $(grep "Hostgroups and netgroups share a common namespace" $tmpout|wc -l) -gt 0 ]; then
+			rlPass "BZ 750984 not found."
+		else
+			rlFail "BZ 750984 found...Inconsistency in error message while adding a duplicate netgroup"
+		fi
+		rlRun "ipa netgroup-del netgroup_bz_750984"
+		[ -f $tmpout ] && rm -f $tmpout
+	rlPhaseEnd
+}
+
+netgroup_bz_796390()
+{
+	rlPhaseStartTest "netgroup_bz_796390: ipa netgroup-add with both --desc and --addattr=description returns internal error"
+		KinitAsAdmin
+		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
+		rlRun "ipa netgroup-add netgroup_bz_796390 --desc=desc1 --addattr=description=desc2 > $tmpout 2>&1" 1
+		if [ $(grep "ipa: ERROR: an internal error has occurred" $tmpout|wc -l) -gt 0 ]; then
+			rlFail "BZ 796390 found...ipa netgroup-add with both --desc and --addattr=description returns internal error"
+		else
+			rlPass "BZ 796390 not found."
+		fi
+		[ -f $tmpout ] && rm -f $tmpout
+	rlPhaseEnd
+}

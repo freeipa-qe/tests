@@ -42,6 +42,7 @@
 
 # Include test case file
 . ./t.netgroups.sh
+. ./t.netgroups.bug.sh
 
 PACKAGE="ipa-admintools"
 
@@ -56,6 +57,8 @@ rlJournalStart
 
   # run tests
    netgroups
+   netgroup_bugs
+
 
   report=/tmp/rhts.report.$RANDOM.txt
   makereport $report
