@@ -2560,7 +2560,7 @@ hbacsvc_master_bug782927() {
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 rlRun "ssh_auth_success $user782927 testpw123@ipa.com $MASTER"
 
-		rlRun "for i in {1000..1010}; do ipa hbacrule-add rule$i; done"
+		rlRun "for i in {1000..1010}; do ipa hbacrule-add $i; done"
 		rlRun "ipa config-show"
 		rlRun "ipa config-mod --searchrecordslimit=5"
 		rlRun "ipa config-show"
