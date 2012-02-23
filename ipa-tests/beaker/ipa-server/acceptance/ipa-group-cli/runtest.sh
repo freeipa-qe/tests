@@ -989,6 +989,20 @@ rlJournalStart
 	rlRun "ipa group-find --all --raw $grp | grep $var | grep $val2" 1 "Making sure $var does not contain $val2 in $grp"
     rlPhaseEnd
 
+    # Details for the next test
+    #1) add a group
+    #2) add a user to the group
+    #3) attempt to --delattr on the user's memberOf attribute (this should NOT be allowed)
+    #4) attempt to --delattr on the group's member attribute (this should be allowed)
+    #5) then verify that the user's memberOf attribute no longer exists.
+    rlPhaseStartTest "ipa-group-cli-89: delattr test of member attributes"
+	rlRun "ipa group-add-member --users=trex $grp" 0 "adding trex to group"
+	rlRun "ipa user-find --all --raw trex | grep memberof | grep $grp" 0 "making sure that the memberof entry was added to user trex"
+	rlRun "ipa user-mod --delattr=memberof='cn=$grp,cn=groups,cn=accounts,dc=testrelm,dc=com' trex" 1 "trying to delete memberof entry from $usr, this should fail"
+	rlRun "ipa user-find --all --raw trex | grep memberof | grep $grp" 0 "making sure that the memberof entry is still in user trex"
+	rlRun "ipa group-mod --delattr=member='uid=trex,cn=users,cn=accounts,dc=testrelm,dc=com' $grp" 0 "Removing the member entry from the group"
+	rlRun "ipa user-find --all --raw trex | grep memberof | grep $grp" 1 "making sure that the memberof entry was removed from user trex"
+    rlPhaseEnd
 
     rlPhaseStartCleanup "ipa-group-cli-cleanup: Delete remaining users and group and Destroying admin credentials"
 	rlRun "ipa config-mod --searchrecordslimit=100" 0 "setting search records limit back to default"
