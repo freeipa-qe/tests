@@ -6,6 +6,7 @@
 #######################################################################
 ngroup1=testg1
 ngroup2=testgaga2
+ngroup3=mynewng3
 user1=usrjjk1r
 user2=userl33t
 user3=usern00b
@@ -43,58 +44,61 @@ netgroups()
 # Test suite sections
 setup()
 {
-    rlPhaseStartSetup "ipa-netgroup setup: Add users, groups, hosts and hostgroups for testing"
-        rlRun "kinitAs $ADMINID $ADMINPW" 0 "kiniting as admin"
-        # Adding users for use later
-        ipa user-add --first=aa --last=bb $user1
-        ipa user-add --first=aa --last=bb $user2
-        ipa user-add --first=aa --last=bb $user3
-        ipa user-add --first=aa --last=bb $user4
-        ipa group-add --desc=testtest $group1
-        ipa group-add --desc=testtest $group2
-        ipa group-add --desc=testtest $group3
-        ipa group-add --desc=testtest $group4
-        ipa hostgroup-add --desc=$hgroup1 $hgroup1
-        ipa hostgroup-add --desc=$hgroup2 $hgroup2
-        ipa hostgroup-add --desc=$hgroup3 $hgroup3
+	rlPhaseStartSetup "ipa-netgroup setup: Add users, groups, hosts and hostgroups for testing"
+		rlRun "kinitAs $ADMINID $ADMINPW" 0 "kiniting as admin"
+		# Adding users for use later
+		ipa user-add --first=aa --last=bb $user1
+		ipa user-add --first=aa --last=bb $user2
+		ipa user-add --first=aa --last=bb $user3
+		ipa user-add --first=aa --last=bb $user4
+		ipa group-add --desc=testtest $group1
+		ipa group-add --desc=testtest $group2
+		ipa group-add --desc=testtest $group3
+		ipa group-add --desc=testtest $group4
+		ipa hostgroup-add --desc=$hgroup1 $hgroup1
+		ipa hostgroup-add --desc=$hgroup2 $hgroup2
+		ipa hostgroup-add --desc=$hgroup3 $hgroup3
 
-	# let's make sure ipa-host-net-manage is disable for the first serious of tests
-	echo $CLIENT | grep $HOSTNAME
-	if [ $? -eq 0 ] ; then
-		rlLog "This is a CLIENT"
-		ssh root@$MASTER "echo $ADMINPW | ipa-managed-entries --entry=\"$ENTRY\" disable" 
-		ssh root@$MASTER "echo $ADMINPW | ipa-managed-entries --entry=\"$ENTRY\" status" > /tmp/plugin.out
-		cat /tmp/plugin.out | grep "Plugin Disabled"
+		# let's make sure ipa-host-net-manage is disable for the first serious of tests
+		echo $CLIENT | grep $HOSTNAME
 		if [ $? -eq 0 ] ; then
-			rlPass "Host Net Manager Plugin is disabled"
+			rlLog "This is a CLIENT"
+			ssh root@$MASTER "echo $ADMINPW | ipa-managed-entries --entry=\"$ENTRY\" disable" 
+			ssh root@$MASTER "echo $ADMINPW | ipa-managed-entries --entry=\"$ENTRY\" status" > /tmp/plugin.out
+			cat /tmp/plugin.out | grep "Plugin Disabled"
+			if [ $? -eq 0 ] ; then
+				rlPass "Host Net Manager Plugin is disabled"
+			else
+				rlFail "Host Net Manage Plugin is NOT disabled, this may cause test failures."
+			fi
+
 		else
-			rlFail "Host Net Manage Plugin is NOT disabled, this may cause test failures."
+			rlLog "This is an IPA server"
+			execManageNGPPlugin disable
+			status=`execManageNGPPlugin status`
+			echo $status | grep "Plugin Disabled"
+			if [ $? -eq 0 ] ; then
+				rlPass "Host Net Manage Plugin is disabled"
+			else
+				rlFail "Host Net Manage Plugin is NOT disabled, this may cause test failures."
+			fi
 		fi
-			
-	else
-		rlLog "This is an IPA server"
-		execManageNGPPlugin disable
-		status=`execManageNGPPlugin status`
-		echo $status | grep "Plugin Disabled"
-		if [ $? -eq 0 ] ; then
-			rlPass "Host Net Manage Plugin is disabled"
-		else
-			rlFail "Host Net Manage Plugin is NOT disabled, this may cause test failures."
-		fi
-	fi
-    rlPhaseEnd
+	rlPhaseEnd
 }
 
 add_netgroups()
 {
-	add_netgroups_positive
-	add_netgroups_negative
+	netgroup_add_positive
+	netgroup_add_negative
 }
 
 member_netgroups()
 {
-        member_netgroups_positive
-        member_netgroups_negative
+	netgroup_add_member_positive
+	netgroup_remove_member_positive
+
+	netgroup_add_member_negative
+	netgroup_remove_member_negative
 }
 
 mod_netgroups()
@@ -123,52 +127,52 @@ manage_netgroups()
 
 cleanup()
 {
-    rlPhaseStartCleanup "ipa-netgroup cleanup"
-        # Cleaning up users
-        ipa user-del $user1
-        ipa user-del $user2
-        ipa user-del $user3
-        ipa user-del $user4
-        ipa group-del $group1
-        ipa group-del $group2
-        ipa group-del $group3
-        ipa group-del $group4
-        ipa hostgroup-del $hgroup1
-        ipa hostgroup-del $hgroup2
-	ipa hostgroup-del $hgroup3
+	rlPhaseStartCleanup "ipa-netgroup cleanup"
+		# Cleaning up users
+		ipa user-del $user1
+		ipa user-del $user2
+		ipa user-del $user3
+		ipa user-del $user4
+		ipa group-del $group1
+		ipa group-del $group2
+		ipa group-del $group3
+		ipa group-del $group4
+		ipa hostgroup-del $hgroup1
+		ipa hostgroup-del $hgroup2
+		ipa hostgroup-del $hgroup3
 
-	# disable the plugin
-	echo $CLIENT | grep $HOSTNAME
-        if [ $? -eq 0 ] ; then
-                rlLog "This is a CLIENT"
-                ssh root@$MASTER "echo $ADMINPW | ipa-managed-entries --entry=\"${ENTRY}\" disable" 
-                ssh root@$MASTER "echo $ADMINPW | ipa-managed-entries --entry=\"${ENTRY}\" status" > /tmp/plugin.out
-                cat /tmp/plugin.out | grep "Plugin Disabled"
-                if [ $? -eq 0 ] ; then
-                        rlPass "Host Net Manager Plugin is disabled"
-                else
-                        rlFail "Host Net Manage Plugin is NOT disabled, this may cause test failures."
-                fi
-                        
-        else
-                rlLog "This is an IPA server"
-                execManageNGPPlugin disable
-                status=`execManageNGPPlugin status`
-                echo $status | grep "Plugin Disabled"
-                if [ $? -eq 0 ] ; then
-                        rlPass "Host Net Manage Plugin is disabled"
-                else
-                        rlFail "Host Net Manage Plugin is NOT disabled, this may cause test failures."
-                fi
-        fi
-    rlPhaseEnd
+		# disable the plugin
+		echo $CLIENT | grep $HOSTNAME
+		if [ $? -eq 0 ] ; then
+			rlLog "This is a CLIENT"
+			ssh root@$MASTER "echo $ADMINPW | ipa-managed-entries --entry=\"${ENTRY}\" disable" 
+			ssh root@$MASTER "echo $ADMINPW | ipa-managed-entries --entry=\"${ENTRY}\" status" > /tmp/plugin.out
+			cat /tmp/plugin.out | grep "Plugin Disabled"
+			if [ $? -eq 0 ] ; then
+				rlPass "Host Net Manager Plugin is disabled"
+			else
+				rlFail "Host Net Manage Plugin is NOT disabled, this may cause test failures."
+			fi
+
+		else
+			rlLog "This is an IPA server"
+			execManageNGPPlugin disable
+			status=`execManageNGPPlugin status`
+			echo $status | grep "Plugin Disabled"
+			if [ $? -eq 0 ] ; then
+				rlPass "Host Net Manage Plugin is disabled"
+			else
+				rlFail "Host Net Manage Plugin is NOT disabled, this may cause test failures."
+			fi
+		fi
+	rlPhaseEnd
 }
 
 ##########################################################################
 #  ADD NETGROUPS
 #########################################################################
 # positive tests
-add_netgroups_positive()
+netgroup_add_positive()
 {
 	rlPhaseStartTest "ipa-netgroup-001-0: add netgroups"
 		echo "Add netgroup $ngroup1"
@@ -211,7 +215,7 @@ add_netgroups_positive()
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-netgroup-001-6: add netgroup positive with nisdomain, usercat=all, hostcat=all, setattr"
-		rlRun "ipa netgroup-add ng-001-6 --desc=ng-001-6 --nisdomain=testnis.dom --usercat=all --hostcat=all --setattr=externalHost=ipaqatesthost"
+		rlRun "ipa netgroup-add ng-001-6 --desc=ng-001-5 --nisdomain=testnis.dom --usercat=all --hostcat=all --setattr=externalHost=ipaqatesthost"
 		rlRun "ipa netgroup-find ng-001-6 --desc=ng-001-6 --nisdomain=testnis.dom --usercat=all --hostcat=all | grep 'External host: ipaqatesthost'"
 		rlRun "ipa netgroup-del ng-001-6"
 	rlPhaseEnd
@@ -242,10 +246,9 @@ add_netgroups_positive()
 }
 
 # negative add netgroups tests
-add_netgroups_negative()
+netgroup_add_negative()
 {
-	tmpout=/tmp/errormsg.out
-
+	local tmpout=/tmp/errormsg.out
 	rlPhaseStartTest "ipa-netgroup-002-0: Add duplicate netgroup"
 		command="addNetgroup $ngroup1 test-group-1"
 		expmsg="ipa: ERROR: netgroup with name $ngroup1 already exists"
@@ -254,12 +257,12 @@ add_netgroups_negative()
 
 	rlPhaseStartTest "ipa-netgroup-002-1: Verify fail on netgroup-add with empty desc" 
 		rlRun "ipa netgroup-add testng-002 --desc=\"\" > $tmpout 2>&1" 1
-		rlAssertGrep "ipa: ERROR: 'desc' is required" $tmpout
+		rlAssertGrep "ipa: ERROR: 'desc' is required"  $tmpout
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-netgroup-002-2: Verify fail on netgroup-add with space for desc"
 		rlRun "ipa netgroup-add testng-002 --desc=\" \" > $tmpout 2>&1" 1
-                rlAssertGrep "ipa: ERROR: invalid 'desc': Leading and trailing spaces are not allowed" $tmpout
+		rlAssertGrep "ipa: ERROR: invalid 'desc': Leading and trailing spaces are not allowed" $tmpout
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-netgroup-002-3: Verify fail on netgroup-add with space for nisdomain"
@@ -316,9 +319,6 @@ add_netgroups_negative()
 	rlPhaseStartTest "ipa-netgroup-002-13: Verify fail on netgroup-add with both desc and --addattr desription (BZ 796390)"
 		rlRun "ipa netgroup-add testng-002 --desc=testng-002 --nisdomain=mynisdom --addattr=description=DESCRIPTION > $tmpout 2>&1" 1
 		rlAssertGrep "ipa: ERROR: description: Only one value allowed." $tmpout
-		if [ $(grep "ipa: ERROR: an internal error has occurred" $tmpout|wc -l) -gt 0 ]; then
-			rlFail "BZ 796390 found...ipa netgroup-add with both --desc and --addattr=description returns internal error"
-		fi
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-netgroup-002-14: Verify fail on netgroup-add with setattr desc and invalid aaddattr attr"
@@ -341,140 +341,176 @@ tr value, all and raw"
 		rlRun "ipa netgroup-add testng-002 --desc=testng-002 --nisdomain=mynisdom --setattr=memberHost=fqdn=hostname.$DOMAIN --addattr=memberHost=badvalue --all --raw > $tmpout 2>&1" 1
 		rlAssertGrep "ipa: ERROR: memberHost: value #1 invalid per syntax: Invalid syntax." $tmpout
 	rlPhaseEnd
+	[ -f $tmpout ] && rm -f $tmpout
 }
 
 ##########################################################################
 # NETGROUP MEMBERS
 ##########################################################################
 # positive member netgroups tests
-member_netgroups_positive()
+
+netgroup_add_member_positive()
 {
-        rlPhaseStartTest  "ipa-netgroup-003: Add users to netgroup"
-                # Adding users to group1
-                rlRun "ipa netgroup-add-member --users=$user1,$user2 $ngroup1" 0 "Adding $user1 and $user2 to $ngroup1"
-                rlRun "ipa netgroup-add-member --users=$user3 $ngroup1" 0 "Adding $user3 to $ngroup1"
-                # Checking to ensure that it happened.
-                rlRun "ipa netgroup-show --all $ngroup1|grep $user1" 0 "Verifying that $user1 is in $ngroup1"
-                rlRun "ipa netgroup-show --all $ngroup1|grep $user2" 0 "Verifying that $user2 is in $ngroup1"
-                rlRun "ipa netgroup-show --all $ngroup1|grep $user3" 0 "Verifying that $user3 is in $ngroup1"
+	rlPhaseStartTest  "ipa-netgroup-003: Add users to netgroup"
+		# Adding users to group1
+		rlRun "ipa netgroup-add-member --users=$user1,$user2 $ngroup1" 0 "Adding $user1 and $user2 to $ngroup1"
+		rlRun "ipa netgroup-add-member --users=$user3 $ngroup1" 0 "Adding $user3 to $ngroup1"
+		# Checking to ensure that it happened.
+		rlRun "ipa netgroup-show --all $ngroup1|grep $user1" 0 "Verifying that $user1 is in $ngroup1"
+		rlRun "ipa netgroup-show --all $ngroup1|grep $user2" 0 "Verifying that $user2 is in $ngroup1"
+		rlRun "ipa netgroup-show --all $ngroup1|grep $user3" 0 "Verifying that $user3 is in $ngroup1"
 		rlRun "ipa user-show $user1 | grep netgroup | grep $ngroup1" 0 "Verify that netgroup enrollment with user-show for $user1"
 		rlRun "ipa user-show $user2 | grep netgroup | grep $ngroup1" 0 "Verify that netgroup enrollment with user-show for $user2"
 		rlRun "ipa user-show $user3 | grep netgroup | grep $ngroup1" 0 "Verify that netgroup enrollment with user-show for $user3"
-        rlPhaseEnd
+	rlPhaseEnd
 
-        rlPhaseStartTest  "ipa-netgroup-004: Add groups to netgroup"
-                # Adding users to group1
-                rlRun "ipa netgroup-add-member --groups=$group1,$group2 $ngroup1" 0 "Adding $group1 and $group2 to $ngroup1"
-                rlRun "ipa netgroup-add-member --groups=$group3 $ngroup1" 0 "Adding $group3 to $ngroup1"
-                # Checking to ensure that it happened.
-                rlRun "ipa netgroup-show --all $ngroup1|grep $group1" 0 "Verifying that $group1 is in $ngroup1"
-                rlRun "ipa netgroup-show --all $ngroup1|grep $group2" 0 "Verifying that $group2 is in $ngroup1"
-                rlRun "ipa netgroup-show --all $ngroup1|grep $group3" 0 "Verifying that $group3 is in $ngroup1"
-        rlPhaseEnd
+	rlPhaseStartTest  "ipa-netgroup-004: Add groups to netgroup"
+		# Adding users to group1
+		rlRun "ipa netgroup-add-member --groups=$group1,$group2 $ngroup1" 0 "Adding $group1 and $group2 to $ngroup1"
+		rlRun "ipa netgroup-add-member --groups=$group3 $ngroup1" 0 "Adding $group3 to $ngroup1"
+		# Checking to ensure that it happened.
+		rlRun "ipa netgroup-show --all $ngroup1|grep $group1" 0 "Verifying that $group1 is in $ngroup1"
+		rlRun "ipa netgroup-show --all $ngroup1|grep $group2" 0 "Verifying that $group2 is in $ngroup1"
+		rlRun "ipa netgroup-show --all $ngroup1|grep $group3" 0 "Verifying that $group3 is in $ngroup1"
+	rlPhaseEnd
 
-        rlPhaseStartTest  "ipa-netgroup-005: Add hosts to netgroup"
-                # Checking to ensure that addign a host to a netgroup works
-                rlRun "ipa netgroup-add-member --hosts=$HOSTNAME $ngroup1" 0 "Adding local $HOSTNAME to $ngroup1"
-                # Checking to ensure that it happened.
-                rlRun "ipa netgroup-show --all $ngroup1 | grep Host | grep $HOSTNAME" 0 "Verifying that $HOSTNAME is in $ngroup1"
-        rlPhaseEnd
+	rlPhaseStartTest  "ipa-netgroup-005: Add hosts to netgroup"
+		# Checking to ensure that addign a host to a netgroup works
+		rlRun "ipa netgroup-add-member --hosts=$HOSTNAME $ngroup1" 0 "Adding local $HOSTNAME to $ngroup1"
+		# Checking to ensure that it happened.
+		rlRun "ipa netgroup-show --all $ngroup1 | grep Host | grep $HOSTNAME" 0 "Verifying that $HOSTNAME is in $ngroup1"
+	rlPhaseEnd
 
-        rlPhaseStartTest  "ipa-netgroup-006: Add hostgroups to netgroup"
-                # Adding a hostgroup to a netgroup
-                rlRun "ipa netgroup-add-member --hostgroups=$hgroup1,$hgroup2 $ngroup1" 0 "adding $hgroup1 and $hgroup2 to $ngroup1"
-                rlRun "ipa netgroup-add-member --hostgroups=$hgroup3 $ngroup1" 0 "adding $hgroup3 to $ngroup1"
-                # Checking to ensure that it happened.
-                rlRun "ipa netgroup-show --all $ngroup1 | grep $hgroup1" 0 "Verifying that $hgroup1 is in $ngroup1"
-                rlRun "ipa netgroup-show --all $ngroup1 | grep $hgroup2" 0 "Verifying that $hgroup2 is in $ngroup1"
-                rlRun "ipa netgroup-show --all $ngroup1 | grep $hgroup3" 0 "Verifying that $hgroup1 is in $ngroup1"
-        rlPhaseEnd
+	rlPhaseStartTest  "ipa-netgroup-006: Add hostgroups to netgroup"
+		# Adding a hostgroup to a netgroup
+		rlRun "ipa netgroup-add-member --hostgroups=$hgroup1,$hgroup2 $ngroup1" 0 "adding $hgroup1 and $hgroup2 to $ngroup1"
+		rlRun "ipa netgroup-add-member --hostgroups=$hgroup3 $ngroup1" 0 "adding $hgroup3 to $ngroup1"
+		# Checking to ensure that it happened.
+		rlRun "ipa netgroup-show --all $ngroup1 | grep $hgroup1" 0 "Verifying that $hgroup1 is in $ngroup1"
+		rlRun "ipa netgroup-show --all $ngroup1 | grep $hgroup2" 0 "Verifying that $hgroup2 is in $ngroup1"
+		rlRun "ipa netgroup-show --all $ngroup1 | grep $hgroup3" 0 "Verifying that $hgroup1 is in $ngroup1"
+	rlPhaseEnd
 
-        rlPhaseStartTest  "ipa-netgroup-007: Remove users from netgroup"
-                # Removing users from ngroup1
-                rlRun "ipa netgroup-remove-member --users=$user1,$user2 $ngroup1" 0 "Removing $user1 and $user2 from $ngroup1"
-                rlRun "ipa netgroup-remove-member --users=$user3 $ngroup1" 0 "Removing $user3 from $ngroup1"
-                # Checking to ensure that it happened.
-                rlRun "ipa netgroup-show --all $ngroup1 | grep $user1" 1 "Verifying that $user1 is not in $ngroup1"
-                rlRun "ipa netgroup-show --all $ngroup1 | grep $user2" 1 "Verifying that $user2 is not in $ngroup1"
-                rlRun "ipa netgroup-show --all $ngroup1 | grep $user3" 1 "Verifying that $user3 is not in $ngroup1"
-        rlPhaseEnd
+	rlPhaseStartTest  "ipa-netgroup-006-2: Add netgroups to netgroup"
+		# Adding a netgroup to a netgroup
+		rlRun "ipa netgroup-add $ngroup3 --desc=$ngroup3" 0 "adding $ngroup3 netgroup for test"
+		rlRun "ipa netgroup-add-member --netgroups=$ngroup1,$ngroup2 $ngroup3" 0 "adding $ngroup1 and $ngroup2 to $ngroup3"
+		rlRun "ipa netgroup-add-member --netgroups=$ngroup3 $ngroup1" 0 "adding $ngroup3 to $ngroup1"
+		# Checking to ensure that it happened.
+		rlRun "ipa netgroup-show --all $ngroup3 | grep $ngroup1" 0 "Verifying that $ngroup1 is in $ngroup3"
+		rlRun "ipa netgroup-show --all $ngroup3 | grep $ngroup2" 0 "Verifying that $ngroup2 is in $ngroup3"
+		rlRun "ipa netgroup-show --all $ngroup1 | grep $ngroup3" 0 "Verifying that $hgroup1 is in $ngroup1"
+	rlPhaseEnd
 
-        rlPhaseStartTest  "ipa-netgroup-008: Remove groups from netgroup"
-                # Removing groups from ngroup1
-                rlRun "ipa netgroup-remove-member --groups=$group1,$group2 $ngroup1" 0 "Removing $group1 and $group2 from $ngroup1"
-                rlRun "ipa netgroup-remove-member --groups=$group3 $ngroup1" 0 "Removing $group3 from $ngroup1"
-                # Checking to ensure that it happened.
-                rlRun "ipa netgroup-show --all $ngroup1 | grep $group1" 1 "Verifying that $group1 is not in $ngroup1"
-                rlRun "ipa netgroup-show --all $ngroup1 | grep $group2" 1 "Verifying that $group2 is not in $ngroup1"
-                rlRun "ipa netgroup-show --all $ngroup1 | grep $group3" 1 "Verifying that $group3 is not in $ngroup1"
-        rlPhaseEnd
+	rlPhaseStartTest  "ipa-netgroup-007: Add external host to netgroup"
+		# Add an external host to ngroup1
+		rlRun "ipa netgroup-add-member --hosts=dummy.myrelm $ngroup1" 0 "Add external host dummy.myrelm to $ngroup1"
+		# Checking to ensure that it happened.
+		rlRun "ipa netgroup-show --all $ngroup1 | grep \"External host\" | grep dummy.myrelm" 0 "Verifying that dummy.myrelm is an External host $ngroup1"
+	rlPhaseEnd
+}
 
-        rlPhaseStartTest  "ipa-netgroup-009: Remove hostgroups from netgroup"
-                # Removing hostgroups from ngroup1
-                rlRun "ipa netgroup-remove-member --hostgroups=$hgroup1,$hgroup2 $ngroup1" 0 "Removing $hgroup1 and $hgroup2 from $ngroup1"
-                rlRun "ipa netgroup-remove-member --hostgroups=$hgroup3 $ngroup1" 0 "Removing $hgroup3 from $ngroup1"
-                # Checking to ensure that it happened.
-                rlRun "ipa netgroup-show --all $ngroup1 | grep $hgroup1" 1 "Verifying that $hgroup1 is not in $ngroup1"
-                rlRun "ipa netgroup-show --all $ngroup1 | grep $hgroup2" 1 "Verifying that $hgroup2 is not in $ngroup1"
-                rlRun "ipa netgroup-show --all $ngroup1 | grep $hgroup3" 1 "Verifying that $hgroup3 is not in $ngroup1"
-        rlPhaseEnd
+netgroup_remove_member_positive()
+{
+	rlPhaseStartTest  "ipa-netgroup-008: Remove users from netgroup"
+		# Removing users from ngroup1
+		rlRun "ipa netgroup-remove-member --users=$user1,$user2 $ngroup1" 0 "Removing $user1 and $user2 from $ngroup1"
+		rlRun "ipa netgroup-remove-member --users=$user3 $ngroup1" 0 "Removing $user3 from $ngroup1"
+		# Checking to ensure that it happened.
+		rlRun "ipa netgroup-show --all $ngroup1 | grep $user1" 1 "Verifying that $user1 is not in $ngroup1"
+		rlRun "ipa netgroup-show --all $ngroup1 | grep $user2" 1 "Verifying that $user2 is not in $ngroup1"
+		rlRun "ipa netgroup-show --all $ngroup1 | grep $user3" 1 "Verifying that $user3 is not in $ngroup1"
+	rlPhaseEnd
 
-        rlPhaseStartTest  "ipa-netgroup-010: Remove host from netgroup"
-                # Removing a host from ngroup1
-                rlRun "ipa netgroup-remove-member --hosts=$HOSTNAME $ngroup1" 0 "Removing $HOSTNAME from $ngroup1"
-                # Checking to ensure that it happened.
-                rlRun "ipa netgroup-show --all $ngroup1 | grep Host | grep $HOSTNAME" 1 "Verifying that $HOSTNAME is not in $ngroup1"
-        rlPhaseEnd
+	rlPhaseStartTest  "ipa-netgroup-009: Remove groups from netgroup"
+		# Removing groups from ngroup1
+		rlRun "ipa netgroup-remove-member --groups=$group1,$group2 $ngroup1" 0 "Removing $group1 and $group2 from $ngroup1"
+		rlRun "ipa netgroup-remove-member --groups=$group3 $ngroup1" 0 "Removing $group3 from $ngroup1"
+		# Checking to ensure that it happened.
+		rlRun "ipa netgroup-show --all $ngroup1 | grep $group1" 1 "Verifying that $group1 is not in $ngroup1"
+		rlRun "ipa netgroup-show --all $ngroup1 | grep $group2" 1 "Verifying that $group2 is not in $ngroup1"
+		rlRun "ipa netgroup-show --all $ngroup1 | grep $group3" 1 "Verifying that $group3 is not in $ngroup1"
+	rlPhaseEnd
 
-	rlPhaseStartTest  "ipa-netgroup-011: Add external host to netgroup"
-                # Add an external host to ngroup1
-                rlRun "ipa netgroup-add-member --hosts=dummy.myrelm $ngroup1" 0 "Add external host dummy.myrelm to $ngroup1"
-                # Checking to ensure that it happened.
-                rlRun "ipa netgroup-show --all $ngroup1 | grep \"External host\" | grep dummy.myrelm" 0 "Verifying that dummy.myrelm is an External host $ngroup1"
-        rlPhaseEnd
+	rlPhaseStartTest  "ipa-netgroup-010: Remove hostgroups from netgroup"
+		# Removing hostgroups from ngroup1
+		rlRun "ipa netgroup-remove-member --hostgroups=$hgroup1,$hgroup2 $ngroup1" 0 "Removing $hgroup1 and $hgroup2 from $ngroup1"
+		rlRun "ipa netgroup-remove-member --hostgroups=$hgroup3 $ngroup1" 0 "Removing $hgroup3 from $ngroup1"
+		# Checking to ensure that it happened.
+		rlRun "ipa netgroup-show --all $ngroup1 | grep $hgroup1" 1 "Verifying that $hgroup1 is not in $ngroup1"
+		rlRun "ipa netgroup-show --all $ngroup1 | grep $hgroup2" 1 "Verifying that $hgroup2 is not in $ngroup1"
+		rlRun "ipa netgroup-show --all $ngroup1 | grep $hgroup3" 1 "Verifying that $hgroup3 is not in $ngroup1"
+	rlPhaseEnd
+
+	rlPhaseStartTest  "ipa-netgroup-010-2: Remove netgroups from netgroup"
+		# Removing netgroups from ngroup3
+		rlRun "ipa netgroup-remove-member --netgroups=$ngroup1,$ngroup2 $ngroup3" 0 "Removing $ngroup1 and $ngroup2 from $ngroup3"
+		rlRun "ipa netgroup-remove-member --netgroups=$ngroup3 $ngroup1" 0 "Removing $ngroup3 from $ngroup1"
+		# Checking to ensure that it happened.
+		rlRun "ipa netgroup-show --all $ngroup3 | grep $ngroup1" 1 "Verifying that $ngroup1 is not in $ngroup3"
+		rlRun "ipa netgroup-show --all $ngroup3 | grep $ngroup2" 1 "Verifying that $ngroup2 is not in $ngroup3"
+		rlRun "ipa netgroup-show --all $ngroup1 | grep $ngroup3" 1 "Verifying that $ngroup3 is not in $ngroup1"
+	rlPhaseEnd
+
+	rlPhaseStartTest  "ipa-netgroup-011: Remove host from netgroup"
+		# Removing a host from ngroup1
+		rlRun "ipa netgroup-remove-member --hosts=$HOSTNAME $ngroup1" 0 "Removing $HOSTNAME from $ngroup1"
+		# Checking to ensure that it happened.
+		rlRun "ipa netgroup-show --all $ngroup1 | grep Host | grep $HOSTNAME" 1 "Verifying that $HOSTNAME is not in $ngroup1"
+	rlPhaseEnd
 
 	rlPhaseStartTest  "ipa-netgroup-012: Remove externalhost from netgroup"
-                # Removing an external host from ngroup1
-                rlRun "ipa netgroup-remove-member --hosts=dummy.myrelm $ngroup1" 0 "Removing external host dummy.myrelm from $ngroup1"
-                # Checking to ensure that it happened.
-                rlRun "ipa netgroup-show --all $ngroup1 | grep dummy.myrelm" 1 "Verifying that external host dummy.myrelm is not in $ngroup1"
-        rlPhaseEnd
+		# Removing an external host from ngroup1
+		rlRun "ipa netgroup-remove-member --hosts=dummy.myrelm $ngroup1" 0 "Removing external host dummy.myrelm from $ngroup1"
+		# Checking to ensure that it happened.
+		rlRun "ipa netgroup-show --all $ngroup1 | grep dummy.myrelm" 1 "Verifying that external host dummy.myrelm is not in $ngroup1"
+	rlPhaseEnd
+
 }
 
 # negative member netgroups tests
-member_netgroups_negative()
+netgroup_add_member_negative()
 {
-        rlPhaseStartTest "ipa-netgroup-013: Add user member that doesn't exist"
-                rlRun "ipa netgroup-add-member --users=dummy $ngroup1 > /tmp/members.out" 1 "Add user member that doesn't exist"
-                cat /tmp/members.out | grep "dummy: no such entry"
+	rlPhaseStartTest "ipa-netgroup-013-0: Add user to non-existent netgroup"
+		rlRun "ipa netgroup-add-member nonetgroup --users=$user1 > $tmpout 2>&1" 2
+		rlAssertGrep "ipa: ERROR: nonetgroup: netgroup not found" $tmpout
+	rlPhaseEnd
+		
+	rlPhaseStartTest "ipa-netgroup-013-1: Add user member that doesn't exist"
+		rlRun "ipa netgroup-add-member --users=dummy $ngroup1 > /tmp/members.out" 1 "Add user member that doesn't exist"
+		cat /tmp/members.out | grep "dummy: no such entry"
 		if [ $? -eq 0 ] ; then
 			rlPass "Message returned as expected."
 		else
 			rlFail "ERROR: Message returned NOT as expected."
 		fi
-        rlPhaseEnd
+	rlPhaseEnd
 
-        rlPhaseStartTest "ipa-netgroup-014: Add group member that doesn't exist"
+	rlPhaseStartTest "ipa-netgroup-014: Add group member that doesn't exist"
 		rlRun "ipa netgroup-add-member --groups=dummy $ngroup1 > /tmp/members.out" 1 "Add group member that doesn't exist"
-                cat /tmp/members.out | grep "dummy: no such entry"
-                if [ $? -eq 0 ] ; then
-                        rlPass "Message returned as expected."
-                else
-                        rlFail "ERROR: Message returned NOT as expected."
-                fi
-        rlPhaseEnd
+		cat /tmp/members.out | grep "dummy: no such entry"
+		if [ $? -eq 0 ] ; then
+			rlPass "Message returned as expected."
+		else
+			rlFail "ERROR: Message returned NOT as expected."
+		fi
+	rlPhaseEnd
 
-        rlPhaseStartTest "ipa-netgroup-015: Add hostgroup member that doesn't exist"
+	rlPhaseStartTest "ipa-netgroup-015: Add hostgroup member that doesn't exist"
 		rlRun "ipa netgroup-add-member --hostgroups=dummy $ngroup1 > /tmp/members.out" 1 "Add host group member that doesn't exist"
-                cat /tmp/members.out | grep "dummy: no such entry"
-                if [ $? -eq 0 ] ; then
-                        rlPass "Message returned as expected."
-                else
-                        rlFail "ERROR: Message returned NOT as expected."
-                fi
-        rlPhaseEnd
+		cat /tmp/members.out | grep "dummy: no such entry"
+		if [ $? -eq 0 ] ; then
+			rlPass "Message returned as expected."
+		else
+			rlFail "ERROR: Message returned NOT as expected."
+		fi
+	rlPhaseEnd
 }
 
+netgroup_remove_member_negative()
+{
+	echo $FUNCNAME
+}
 
 ##########################################################################
 # MODIFY NETGROUPS
@@ -960,13 +996,13 @@ netgroup_bz_750984()
 		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd
 }
-	
+
 netgroup_bz_796390()
 {
 	rlPhaseStartTest "netgroup_bz_796390: ipa netgroup-add with both --desc and --addattr=description returns internal error"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
-		rlRun "ipa netgroup-add netgroup_bz_796390 --desc=desc1 --addattr=description=desc2 > $tmpout 2>&1"
+		rlRun "ipa netgroup-add netgroup_bz_796390 --desc=desc1 --addattr=description=desc2 > $tmpout 2>&1" 1
 		if [ $(grep "ipa: ERROR: an internal error has occurred" $tmpout|wc -l) -gt 0 ]; then
 			rlFail "BZ 796390 found...ipa netgroup-add with both --desc and --addattr=description returns internal error"
 		else
