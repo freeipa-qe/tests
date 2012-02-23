@@ -868,13 +868,54 @@ rlJournalStart
         rlRun "ipa group-mod --gid=-0 jennygn" 1 "Trying to set group gid to -0"
         rlRun "ipa group-mod --gid=-100 jennygn" 1 "Trying to set group gid to -100"
 	rlRun "ipa group-find jennygn | grep GID | grep -100" 1 "Making sure that the GID of the test group is not -100"
-        rlRun "ipa group-del jennygn" 0 "Removing Test Group" 
     rlPhaseEnd 
+
+    grp=gmodtest
+    rlPhaseStartTest "ipa-group-cli-73: group-mod --delattr positive test case."
+        rlRun "ipa group-add --desc=j-test $grp" 0 "Adding Test Group $grp" 
+        rlRun "ipa group-mod --addattr memberUid=2234 $grp" 0 "Adding memberuid to $grp"
+	rlRun "ipa group-find --all $grp | grep 22344" 0 "Making sure new uid is in $grp"
+    rlPhaseEnd
+	
+    rlPhaseStartTest "ipa-group-cli-74: test deleting the attribute that was added in the last test"
+	rlRun "ipa groupmod --delattr memberUid=22344 $grp" 0 "Deleting new memberUid"
+	rlRun "ipa group-find --all $grp | grep 22344" 1 "Making sure new uid is no longer in $grp"
+    rlPhaseEnd
+
+    var=Description
+    rlPhaseStartTest "ipa-group-cli-75: group-mod --delattr negitive test case for Description."
+	val=$(ipa group-find --all testg | grep $var | cut -d: -f2 | sed s/\ //g)
+	rlRun "ipa groupmod --delattr $var=$val $grp" 1 "trying to delete $var"
+	rlRun "ipa group-find --all $grp | grep $var | grep $val" 0 "Making sure $var still exists as $val in $grp"
+    rlPhaseEnd
+
+    var=cn
+    rlPhaseStartTest "ipa-group-cli-76: group-mod --delattr negitive test case for cn."
+	val=$(ipa group-find --all --raw testg | grep $var | cut -d: -f2 | sed s/\ //g)
+	rlRun "ipa groupmod --delattr $var=$val $grp" 1 "trying to delete $var"
+	rlRun "ipa group-find --all --raw $grp | grep $var | grep $val" 0 "Making sure $var still exists as $val in $grp"
+    rlPhaseEnd
+
+    var=gidnumber
+    rlPhaseStartTest "ipa-group-cli-77: group-mod --delattr negitive test case for gidnumber."
+	val=$(ipa group-find --all --raw testg | grep $var | cut -d: -f2 | sed s/\ //g)
+	rlRun "ipa groupmod --delattr $var=$val $grp" 1 "trying to delete $var"
+	rlRun "ipa group-find --all --raw $grp | grep $var | grep $val" 0 "Making sure $var still exists as $val in $grp"
+    rlPhaseEnd
+
+    var=ipauniqueid
+    rlPhaseStartTest "ipa-group-cli-78: group-mod --delattr negitive test case for ipauniqueid."
+	val=$(ipa group-find --all --raw testg | grep $var | cut -d: -f2 | sed s/\ //g)
+	rlRun "ipa groupmod --delattr $var=$val $grp" 1 "trying to delete $var"
+	rlRun "ipa group-find --all --raw $grp | grep $var | grep $val" 0 "Making sure $var still exists as $val in $grp"
+    rlPhaseEnd
 
     rlPhaseStartCleanup "ipa-group-cli-cleanup: Delete remaining users and group and Destroying admin credentials"
 	rlRun "ipa config-mod --searchrecordslimit=100" 0 "setting search records limit back to default"
 	rlRun "ipa user-del trex" 0 "Deleting user trex."
 	rlRun "ipa user-del mdolphin" 0 "Deleting user mdolphin."
+        rlRun "ipa group-del jennygn" 0 "Removing Test Group" 
+        rlRun "ipa group-del $grp" 0 "Removing Test Group" 
         i=1
         while [ $i -le 10 ] ; do
                 deleteGroup Group$i
