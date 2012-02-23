@@ -910,6 +910,41 @@ rlJournalStart
 	rlRun "ipa group-find --all --raw $grp | grep $var | grep $val" 0 "Making sure $var still exists as $val in $grp"
     rlPhaseEnd
 
+    var=memberUid
+    rlPhaseStartTest "ipa-group-cli-79: group-mod --delattr + --addattr null op for non existant var memberUid."
+	val=928374
+	rlRun "ipa groupmod --addattr $var=$val --delattr $var=$val $grp" 1 "Testing a multi-value maniuplation for $val"
+	rlRun "ipa group-find --all $grp | grep $var | grep $val" 1 "Making sure $var still does not exist in $grp"
+    rlPhaseEnd
+
+    var=Description
+    rlPhaseStartTest "ipa-group-cli-80: group-mod --delattr + --addattr null op for Description."
+	val=$(ipa group-find --all testg | grep $var | cut -d: -f2 | sed s/\ //g)
+	rlRun "ipa groupmod --addattr $var=$val --delattr $var=$val $grp" 1 "Testing a multi-value maniuplation for $val"
+	rlRun "ipa group-find --all $grp | grep $var | grep $val" 0 "Making sure $var still exists as $val in $grp"
+    rlPhaseEnd
+
+    var=cn
+    rlPhaseStartTest "ipa-group-cli-81: group-mod --delattr + --addattr null op for cn."
+	val=$(ipa group-find --all -raw testg | grep $var | cut -d: -f2 | sed s/\ //g)
+	rlRun "ipa groupmod --addattr $var=$val --delattr $var=$val $grp" 1 "Testing a multi-value maniuplation for $val"
+	rlRun "ipa group-find --all -raw $grp | grep $var | grep $val" 0 "Making sure $var still exists as $val in $grp"
+    rlPhaseEnd
+
+    var=gidnumber
+    rlPhaseStartTest "ipa-group-cli-82: group-mod --delattr + --addattr null op for gidnumber."
+	val=$(ipa group-find --all -raw testg | grep $var | cut -d: -f2 | sed s/\ //g)
+	rlRun "ipa groupmod --addattr $var=$val --delattr $var=$val $grp" 1 "Testing a multi-value maniuplation for $val"
+	rlRun "ipa group-find --all -raw $grp | grep $var | grep $val" 0 "Making sure $var still exists as $val in $grp"
+    rlPhaseEnd
+
+    var=ipauniqueid
+    rlPhaseStartTest "ipa-group-cli-83: group-mod --delattr + --addattr null op for gidnumber."
+	val=$(ipa group-find --all -raw testg | grep $var | cut -d: -f2 | sed s/\ //g)
+	rlRun "ipa groupmod --addattr $var=$val --delattr $var=$val $grp" 1 "Testing a multi-value maniuplation for $val"
+	rlRun "ipa group-find --all -raw $grp | grep $var | grep $val" 0 "Making sure $var still exists as $val in $grp"
+    rlPhaseEnd
+
     rlPhaseStartCleanup "ipa-group-cli-cleanup: Delete remaining users and group and Destroying admin credentials"
 	rlRun "ipa config-mod --searchrecordslimit=100" 0 "setting search records limit back to default"
 	rlRun "ipa user-del trex" 0 "Deleting user trex."
