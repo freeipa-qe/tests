@@ -924,12 +924,41 @@ rlJournalStart
 
 	rlPhaseEnd
 
+	rlPhaseStartTest "ipa-dns-160: Bug 751776 - Skip invalid record in a zone instead of refusing to load entire zone"
+
+		rlRun "ipa dnszone-add example.com --name-server=$HOSTNAME --admin-email=admin@example.com"
+		rlRun "ipa dnsrecord-add example.com foo --a-rec=10.0.0.1"
+		sleep 5
+		rlRun "dig +short -t A foo.example.com | grep 10.0.0.1"
+
+		rlRun "ipa dnsrecord-add example.com @ --kx-rec=\"1 foo.example.com\""
+		rlRun "ldapsearch -LLL -h localhost -Y GSSAPI -b idnsname=example.com,cn=dns,dc=testrelm,dc=com"
+
+ldapmodify -h localhost -Y GSSAPI << EOF
+dn: idnsname=example.com,cn=dns,dc=lab,dc=eng,dc=pnq,dc=redhat,dc=com
+changetype: modify
+replace: kXRecord
+kXRecord: foo.example.com
+EOF
+		rlRun "ldapsearch -LLL -h localhost -Y GSSAPI -b idnsname=example.com,cn=dns,dc=testrelm,dc=com"
+
+		sleep 5
+		rlRun "dig +short -t A foo.example.com | grep 10.0.0.1"
+		rlRun "service named restart"
+		rlRun "dig +short -t A foo.example.com | grep 10.0.0.1"
+
+		rlLog "verifies https://bugzilla.redhat.com/show_bug.cgi?id=751776"
+
+		rlRun "ipa dnszone-del example.com"
+		rlRun "service named restart"
+
+	rlPhaseEnd
+
+
 	rlJournalPrintText
 	report=/tmp/rhts.report.$RANDOM.txt
 	makereport $report
 	rhts-submit-log -l $report
 
 rlJournalEnd
-
-
 
