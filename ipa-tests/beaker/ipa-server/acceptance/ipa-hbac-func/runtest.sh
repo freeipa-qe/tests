@@ -829,6 +829,8 @@ rlJournalStart
 	# hbacsvc_master_bug782927
 		hbacsvc_master_782927
 
+	# hbacsvc_master_bug772852
+		hbacsvc_master_bug772852
 
 	rlPhaseEnd
 

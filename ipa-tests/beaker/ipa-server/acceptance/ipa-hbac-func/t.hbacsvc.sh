@@ -2591,4 +2591,45 @@ hbacsvc_master_bug782927() {
         rlPhaseEnd
 }
 
+hbacsvc_master_bug772852() {
+
+		# kinit as admin and creating users
+                kinitAs $ADMINID $ADMINPW
+                create_ipauser user772852 user772852 user772852 $userpw
+		sleep 5
+		export user772852=user772852
+
+        rlPhaseStartTest "ipa-hbacsvc-772852: \"Unresolved rules in --rules\" error message is displayed even if the hbacrule is specified using the --rules option."
+
+		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                rlRun "ssh_auth_success $user772852 testpw123@ipa.com $MASTER"
+
+                rlRun "for i in {1000..1010}; do ipa hbacrule-add $i; done"
+                rlRun "ipa config-show"
+                rlRun "ipa config-mod --searchrecordslimit=5"
+                rlRun "ipa config-show"
+
+                rlRun "ipa hbacrule-disable allow_all"
+
+                rlRun "ipa hbacrule-add 772852"
+                rlRun "ipa hbacrule-find"
+
+		rlRun "ipa hbacrule-add-user 772852 --users=$user772852"
+		rlRun "ipa hbacrule-add-host 772852 --hosts=$MASTER"
+                rlRun "ipa hbacrule-add-sourcehost 772852 --hosts=$CLIENT"
+                rlRun "ipa hbacrule-add-service 772852  --hbacsvcs=sshd"
+                rlRun "ipa hbacrule-show 772852 --all"
+
+        # ipa hbactest:
+
+		rlRun "ipa hbactest --user=$user772852 --srchost=$CLIENT --host=$MASTER --service=sshd --rules=772852 | grep -Ex '(Access granted: True|  matched: 772852)'"
+		rlLog "Verifies bug https://bugzilla.redhat.com/show_bug.cgi?id=772852"
+		rlRun "ipa hbactest --user=$user772852 --srchost=$CLIENT --host=$MASTER --service=sshd --rules=772852 | grep \"Unresolved rules\"" 1
+
+        # restoring ipa config
+                rlRun "ipa config-mod --searchrecordslimit=100"
+                rlRun "ipa config-show"
+
+        rlPhaseEnd
+}
 
