@@ -860,7 +860,7 @@ rlJournalStart
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message - special characters."
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-cli-72: Setting GID's to 0 and negitive numbers."
+    rlPhaseStartTest "ipa-group-cli-72: Setting GID's to 0 and negative numbers."
     # Test for: https://fedorahosted.org/freeipa/ticket/2335
     # https://bugzilla.redhat.com/show_bug.cgi?id=786240
         rlRun "ipa group-add --desc=j-test jennygn" 0 "Adding Test Group" 
@@ -883,28 +883,28 @@ rlJournalStart
     rlPhaseEnd
 
     var=Description
-    rlPhaseStartTest "ipa-group-cli-75: group-mod --delattr negitive test case for Description."
+    rlPhaseStartTest "ipa-group-cli-75: group-mod --delattr negative test case for Description."
 	val=$(ipa group-find --all testg | grep $var | cut -d: -f2 | sed s/\ //g)
 	rlRun "ipa groupmod --delattr $var=$val $grp" 1 "trying to delete $var"
 	rlRun "ipa group-find --all $grp | grep $var | grep $val" 0 "Making sure $var still exists as $val in $grp"
     rlPhaseEnd
 
     var=cn
-    rlPhaseStartTest "ipa-group-cli-76: group-mod --delattr negitive test case for cn."
+    rlPhaseStartTest "ipa-group-cli-76: group-mod --delattr negative test case for cn."
 	val=$(ipa group-find --all --raw testg | grep $var | cut -d: -f2 | sed s/\ //g)
 	rlRun "ipa groupmod --delattr $var=$val $grp" 1 "trying to delete $var"
 	rlRun "ipa group-find --all --raw $grp | grep $var | grep $val" 0 "Making sure $var still exists as $val in $grp"
     rlPhaseEnd
 
     var=gidnumber
-    rlPhaseStartTest "ipa-group-cli-77: group-mod --delattr negitive test case for gidnumber."
+    rlPhaseStartTest "ipa-group-cli-77: group-mod --delattr negative test case for gidnumber."
 	val=$(ipa group-find --all --raw testg | grep $var | cut -d: -f2 | sed s/\ //g)
 	rlRun "ipa groupmod --delattr $var=$val $grp" 1 "trying to delete $var"
 	rlRun "ipa group-find --all --raw $grp | grep $var | grep $val" 0 "Making sure $var still exists as $val in $grp"
     rlPhaseEnd
 
     var=ipauniqueid
-    rlPhaseStartTest "ipa-group-cli-78: group-mod --delattr negitive test case for ipauniqueid."
+    rlPhaseStartTest "ipa-group-cli-78: group-mod --delattr negative test case for ipauniqueid."
 	val=$(ipa group-find --all --raw testg | grep $var | cut -d: -f2 | sed s/\ //g)
 	rlRun "ipa groupmod --delattr $var=$val $grp" 1 "trying to delete $var"
 	rlRun "ipa group-find --all --raw $grp | grep $var | grep $val" 0 "Making sure $var still exists as $val in $grp"
@@ -917,33 +917,78 @@ rlJournalStart
 	rlRun "ipa group-find --all $grp | grep $var | grep $val" 1 "Making sure $var still does not exist in $grp"
     rlPhaseEnd
 
+    rlPhaseStartTest "ipa-group-cli-80: group-mod --setattr + --addattr null op for field in memberUid."
+	val="928374"
+	val2="abcde"
+	rlRun "ipa groupmod --addattr $var=$val --setattr $var=$val2 $grp" 1 "Testing a multi-value maniuplation for $val"
+	rlRun "ipa group-find --all $grp | grep $var | grep $val" 0 "Making sure $var exists as $val in $grp"
+	rlRun "ipa group-find --all $grp | grep $var | grep $val2" 0 "Making sure $var exists as $val2 in $grp"
+    rlPhaseEnd
+
     var=Description
-    rlPhaseStartTest "ipa-group-cli-80: group-mod --delattr + --addattr null op for Description."
+    rlPhaseStartTest "ipa-group-cli-81: group-mod --delattr + --addattr null op for Description."
 	val=$(ipa group-find --all testg | grep $var | cut -d: -f2 | sed s/\ //g)
 	rlRun "ipa groupmod --addattr $var=$val --delattr $var=$val $grp" 1 "Testing a multi-value maniuplation for $val"
 	rlRun "ipa group-find --all $grp | grep $var | grep $val" 0 "Making sure $var still exists as $val in $grp"
     rlPhaseEnd
 
     var=cn
-    rlPhaseStartTest "ipa-group-cli-81: group-mod --delattr + --addattr null op for cn."
+    rlPhaseStartTest "ipa-group-cli-82: group-mod --delattr + --addattr null op for cn."
 	val=$(ipa group-find --all -raw testg | grep $var | cut -d: -f2 | sed s/\ //g)
 	rlRun "ipa groupmod --addattr $var=$val --delattr $var=$val $grp" 1 "Testing a multi-value maniuplation for $val"
 	rlRun "ipa group-find --all -raw $grp | grep $var | grep $val" 0 "Making sure $var still exists as $val in $grp"
     rlPhaseEnd
 
     var=gidnumber
-    rlPhaseStartTest "ipa-group-cli-82: group-mod --delattr + --addattr null op for gidnumber."
+    rlPhaseStartTest "ipa-group-cli-83: group-mod --delattr + --addattr null op for gidnumber."
 	val=$(ipa group-find --all -raw testg | grep $var | cut -d: -f2 | sed s/\ //g)
 	rlRun "ipa groupmod --addattr $var=$val --delattr $var=$val $grp" 1 "Testing a multi-value maniuplation for $val"
 	rlRun "ipa group-find --all -raw $grp | grep $var | grep $val" 0 "Making sure $var still exists as $val in $grp"
     rlPhaseEnd
 
     var=ipauniqueid
-    rlPhaseStartTest "ipa-group-cli-83: group-mod --delattr + --addattr null op for gidnumber."
+    rlPhaseStartTest "ipa-group-cli-84: group-mod --delattr + --addattr null op for ipauniqueid."
 	val=$(ipa group-find --all -raw testg | grep $var | cut -d: -f2 | sed s/\ //g)
 	rlRun "ipa groupmod --addattr $var=$val --delattr $var=$val $grp" 1 "Testing a multi-value maniuplation for $val"
 	rlRun "ipa group-find --all -raw $grp | grep $var | grep $val" 0 "Making sure $var still exists as $val in $grp"
     rlPhaseEnd
+
+    var=Description
+    rlPhaseStartTest "ipa-group-cli-85: group-mod --setattr + --addattr null op for Description."
+	val=$(ipa group-find --all testg | grep $var | cut -d: -f2 | sed s/\ //g)
+	val2="alt-description"
+	rlRun "ipa groupmod --addattr $var='$val' --setattr $var='$val2' $grp" 1 "ensuring that we are unable to write multiple definitions of $val"
+	rlRun "ipa group-find --all $grp | grep $var | grep $val" 0 "Making sure $var still exists as $val in $grp"
+	rlRun "ipa group-find --all $grp | grep $var | grep $val2" 1 "Making sure $var does not contain $val2 in $grp"
+    rlPhaseEnd
+
+    var=cn
+    rlPhaseStartTest "ipa-group-cli-86: group-mod --setattr + --addattr null op for cn."
+	val=$(ipa group-find --all testg | grep $var | cut -d: -f2 | sed s/\ //g)
+	val2="cn2"
+	rlRun "ipa groupmod --addattr $var='$val' --setattr $var='$val2' $grp" 1 "ensuring that we are unable to write multiple definitions of $val"
+	rlRun "ipa group-find --all $grp | grep $var | grep $val" 0 "Making sure $var still exists as $val in $grp"
+	rlRun "ipa group-find --all $grp | grep $var | grep $val2" 1 "Making sure $var does not contain $val2 in $grp"
+    rlPhaseEnd
+
+    var=gidnumber
+    rlPhaseStartTest "ipa-group-cli-87: group-mod --setattr + --addattr null op for gidnumber."
+	val=$(ipa group-find --all testg | grep $var | cut -d: -f2 | sed s/\ //g)
+	val2="23456"
+	rlRun "ipa groupmod --addattr $var='$val' --setattr $var='$val2' $grp" 1 "ensuring that we are unable to write multiple definitions of $val"
+	rlRun "ipa group-find --all $grp | grep $var | grep $val" 0 "Making sure $var still exists as $val in $grp"
+	rlRun "ipa group-find --all $grp | grep $var | grep $val2" 1 "Making sure $var does not contain $val2 in $grp"
+    rlPhaseEnd
+
+    var=ipauniqueid
+    rlPhaseStartTest "ipa-group-cli-88: group-mod --setattr + --addattr null op for ipauniqueid."
+	val=$(ipa group-find --all testg | grep $var | cut -d: -f2 | sed s/\ //g)
+	val2="b77627fc-5dae-11e1-a45f-111111111111"
+	rlRun "ipa groupmod --addattr $var='$val' --setattr $var='$val2' $grp" 1 "ensuring that we are unable to write multiple definitions of $val"
+	rlRun "ipa group-find --all $grp | grep $var | grep $val" 0 "Making sure $var still exists as $val in $grp"
+	rlRun "ipa group-find --all $grp | grep $var | grep $val2" 1 "Making sure $var does not contain $val2 in $grp"
+    rlPhaseEnd
+
 
     rlPhaseStartCleanup "ipa-group-cli-cleanup: Delete remaining users and group and Destroying admin credentials"
 	rlRun "ipa config-mod --searchrecordslimit=100" 0 "setting search records limit back to default"
