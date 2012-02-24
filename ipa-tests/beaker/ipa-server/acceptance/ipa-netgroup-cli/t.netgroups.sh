@@ -112,7 +112,7 @@ mod_netgroups()
 
 attr_netgroups()
 {
-	attr_netgroups_positive
+	#attr_netgroups_positive
 	attr_netgroups_negative
 }
 
@@ -322,6 +322,11 @@ netgroup_add_negative()
 	rlPhaseStartTest "ipa-netgroup-002-13: Verify fail on netgroup-add with both desc and --addattr desription (BZ 796390)"
 		rlRun "ipa netgroup-add testng-002 --desc=testng-002 --nisdomain=mynisdom --addattr=description=DESCRIPTION > $tmpout 2>&1" 1
 		rlAssertGrep "ipa: ERROR: description: Only one value allowed." $tmpout
+		if [ $(grep "ipa: ERROR: an internal error has occurred" $tmpout|wc -l) -gt 0 ]; then
+			rlFail "BZ 796390 found...ipa netgroup-add with both --desc and --addattr=description returns internal error"
+		else
+			rlPass "BZ 796390 not found."
+		fi
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-netgroup-002-14: Verify fail on netgroup-add with setattr desc and invalid aaddattr attr"
@@ -587,31 +592,26 @@ netgroup_mod_positive()
 {
 	rlPhaseStartTest  "ipa-netgroup-016: Modify description of netgroup"
 		rlRun "ipa netgroup-mod --desc=testdesc11 $ngroup1" 0 "modify description for $ngroup1"
-		# Verify
 		rlRun "ipa netgroup-show --all $ngroup1 | grep testdesc11" 0 "Verifying description for $ngroup1"
 	rlPhaseEnd
 
 	rlPhaseStartTest  "ipa-netgroup-017: Modify user catagory of netgroup"
 		rlRun "ipa netgroup-mod --usercat=all $ngroup1" 0 "modify user catagory on $ngroup1"
-		# Verify
 		rlRun "ipa netgroup-show --all $ngroup1 | grep \"User category\" | grep all" 0 "Verifying user catagory for $ngroup1"
 	rlPhaseEnd
 
 	rlPhaseStartTest  "ipa-netgroup-018: Modify host catagory of netgroup"
 		rlRun "ipa netgroup-mod --hostcat=all $ngroup1" 0 "modify host catagory on $ngroup1"
-		# Verify
 		rlRun "ipa netgroup-show --all $ngroup1 | grep \"Host category\" | grep all" 0 "Verifying host catagory for $ngroup1"
 	rlPhaseEnd
 
 	rlPhaseStartTest  "ipa-netgroup-019: Modify remove user catagory of netgroup"
 		rlRun "ipa netgroup-mod --usercat="" $ngroup1" 0 "remove user catagory on $ngroup1"
-		# Verify
 		rlRun "ipa netgroup-show --all $ngroup1 | grep \"User category\"" 1 "Verifying user catagory was removed for $ngroup1"
 	rlPhaseEnd
 
 	rlPhaseStartTest  "ipa-netgroup-020-0: Modify remove host catagory of netgroup"
 		rlRun "ipa netgroup-mod --hostcat="" $ngroup1" 0 "remove host catagory on $ngroup1"
-		# Verify
 		rlRun "ipa netgroup-show --all $ngroup1 | grep \"Host category\"" 1 "Verifying host catagory was removed for $ngroup1"
 	rlPhaseEnd
 
@@ -624,53 +624,136 @@ netgroup_mod_positive()
 		rlRun "ipa netgroup-mod $ngroup1 --desc=rightstest --rights --all | grep 'attributelevelrights:'" 0 "Display rights during description change"
 	rlPhaseEnd
 
-	rlPhaseStartTest "ipa-netgroup-020-3: Modify netgroup description with setattr"
-		rlRun "ipa netgroup-mod $ngroup1 --setattr=description=setattrd1" 0 "Change netgroup description for $ngroup1"
-		rlRun "ipa netgroup-show $ngroup1|grep setattrd1" 0 "Verify netgroup description changed"
+#### externalhost attr
+	rlPhaseStartTest  "ipa-netgroup-023: Add externalHost attribute to netgroup"
+		rlRun "ipa netgroup-mod --addattr=externalHost=ipaqatesthost $ngroup1" 0 "add externalHost attribute on $ngroup1"
+		rlRun "ipa netgroup-show --all $ngroup1 | grep \"External host\" | grep ipaqatesthost" 0 "Verifying the externalHost added to $ngroup1"
 	rlPhaseEnd
 
-	rlPhaseStartTest "ipa-netgroup-020-4: Modify netgroup nisdomainname with setattr"
-		rlRun "ipa netgroup-mod $ngroup1 --setattr=nisdomainname=setattrnisdom" 0 "Change netgroup nisdomainname for $ngroup1"
-		rlRun "ipa netgroup-show $ngroup1|grep setattrnisdom" 0 "Verify netgroup nisdomainame changed"
+	rlPhaseStartTest  "ipa-netgroup-024: Set externalHost attribute on netgroup"
+		rlRun "ipa netgroup-mod --setattr=externalHost=althost $ngroup1" 0 "setting externalHost attribute on $ngroup1"
+		rlRun "ipa netgroup-show --all $ngroup1 | grep \"External host\" | grep althost" 0 "Verifying the externalHost changed on $ngroup1"
 	rlPhaseEnd
-	
+
+	rlPhaseStartTest  "ipa-netgroup-025: Add additional externalHost attribute on netgroup"
+		rlRun "ipa netgroup-mod --addattr=externalHost=ipaqatesthost $ngroup1" 0 "setting additional externalHost attribute on $ngroup1"
+		rlRun "ipa netgroup-show --all $ngroup1 | grep \"External host\" | grep \"althost, ipaqatesthost\"" 0 "Verifying the additional externalHost was added on $ngroup1"
+	rlPhaseEnd
+
+	rlPhaseStartTest  "ipa-netgroup-026: Remove externalHost attributes with setattr on netgroup"
+		rlRun "ipa netgroup-mod --setattr=externalHost=\"\" $ngroup1" 0 "removing externalHost attribute on $ngroup1"
+		rlRun "ipa netgroup-show --all $ngroup1 | grep \"External host\"" 1 "Verifying setattr removed all externalHosts on $ngroup1"
+	rlPhaseEnd
+
+#### description attr
+	rlPhaseStartTest "ipa-netgroup-027: setattr on description"
+		rlRun "setAttribute netgroup description newdescription $ngroup1" 0 "Setting description attribute to value of newdescription."
+		rlRun "ipa netgroup-show --all $ngroup1 | grep Description | grep newdescription" 0 "Verifying netgroup Description was modified."
+	rlPhaseEnd
+
+#### nisdomainname attr
+	rlPhaseStartTest "ipa-netgroup-028: setattr on nisDomainName"
+		rlRun "setAttribute netgroup nisDomainName newNisDomain $ngroup1" 0 "Setting nisDomainName attribute to value of newNisDomain."
+		rlRun "ipa netgroup-show --all $ngroup1 | grep \"NIS domain name\" | grep newNisDomain" 0 "Verifying netgroup nisDomainName was modified."
+	rlPhaseEnd
+
+#### memberuser attr
+	rlPhaseStartTest  "ipa-netgroup-029: Set memberUser attribute on netgroup"
+		member1="uid=$user1,cn=users,cn=accounts,$BASEDN"
+		rlLog "Settting first memberUser attribute to \"$member1\""
+		rlRun "ipa netgroup-mod --setattr=memberUser=\"$member1\" $ngroup1" 0 "setting memberUser attribute on $ngroup1"
+		rlRun "ipa netgroup-show --all $ngroup1 | grep \"Member User\" | grep $user1" 0 "Verifying the memberuser attribute changed on $ngroup1"
+	rlPhaseEnd
+
+	rlPhaseStartTest  "ipa-netgroup-030: Add additional memberUser attribute on netgroup"
+		member2="uid=$user2,cn=users,cn=accounts,$BASEDN"
+		rlLog "Settting second memberUser attribute to \"$member2\""
+		rlRun "ipa netgroup-mod --addattr=memberUser=\"$member2\" $ngroup1" 0 "setting additional memberUser attribute on $ngroup1"
+		rlRun "ipa netgroup-show --all $ngroup1 | grep \"Member User\" | grep \"$user1, $user2\"" 0 "Verifying the additional memberUser was added on $ngroup1"
+	rlPhaseEnd
+
+	rlPhaseStartTest  "ipa-netgroup-031: Remove memberUser attributes with setattr on netgroup"
+		rlRun "ipa netgroup-mod --setattr=memberUser=\"\" $ngroup1" 0 "removing memberUser attribute on $ngroup1"
+		rlRun "ipa netgroup-show --all $ngroup1 | grep \"Member User\"" 1 "Verifying setattr removed all member users on $ngroup1"
+	rlPhaseEnd
+
+#### memberhost attr
+	rlPhaseStartTest  "ipa-netgroup-032: Set memberHost attribute on netgroup"
+		host1="host1.testrelm"
+		member1="fqdn=$host1,cn=computers,cn=accounts,$BASEDN"
+		rlLog "Setting first memberHost attribute to \"$member1\""
+		rlRun "ipa netgroup-mod --setattr=memberHost=\"$member1\" $ngroup1" 0 "setting memberHost attribute on $ngroup1"
+		rlRun "ipa netgroup-show --all $ngroup1 | grep \"Member Host\" | grep $host1" 0 "Verifying the membergroup attribute changed on $ngroup1"
+	rlPhaseEnd
+
+	rlPhaseStartTest  "ipa-netgroup-033: Add additional memberHost attribute on netgroup"
+		host1="host1.testrelm"
+		host2="host2.testrelm"
+		member2="fqdn=$host2,cn=computers,cn=accounts,$BASEDN"
+		rlRun "ipa netgroup-mod --addattr=memberHost=\"$member2\" $ngroup1" 0 "setting additional memberHost attribute on $ngroup1"
+		rlRun "ipa netgroup-show --all $ngroup1 | grep \"Member Host\" | grep \"$host1, $host2\"" 0 "Verifying the additional memberHost was added on $ngroup1"
+	rlPhaseEnd
+
+	rlPhaseStartTest  "ipa-netgroup-034: Remove memberHost attributes with setattr on netgroup"
+		rlRun "ipa netgroup-mod --setattr=memberHost=\"\" $ngroup1" 0 "removing memberHost attribute on $ngroup1"
+		rlRun "ipa netgroup-show --all $ngroup1 | grep \"Member Host\"" 1 "Verifying setattr removed all member hosts on $ngroup1"
+	rlPhaseEnd
+
+#### usercat attr
 	rlPhaseStartTest "ipa-netgroup-020-5: Modify netgroup user category with setattr"
 		rlRun "ipa netgroup-mod $ngroup1 --setattr=usercategory=all" 0 "Change netgroup user category for $ngroup1"
 		rlRun "ipa netgroup-show $ngroup1|grep 'User category: all'" 0 "Verify netgroup user category changed"
 	rlPhaseEnd
-	
+
+	rlPhaseStartTest "ipa-netgroup-020-5-1: Modify netgroup to clear user category with setattr"
+		rlRun "ipa netgroup-mod $ngroup1 --setattr=usercategory=\"\"" 0 "Change netgroup user category for $ngroup1"
+		rlRun "ipa netgroup-show $ngroup1|grep -v 'User category:'" 0 "Verify netgroup user category changed"
+	rlPhaseEnd
+
+#### hostcat attr
 	rlPhaseStartTest "ipa-netgroup-020-6: Modify netgroup host category with setattr"
 		rlRun "ipa netgroup-mod $ngroup1 --setattr=hostcategory=all" 0 "Change netgroup host category for $ngroup1"
 		rlRun "ipa netgroup-show $ngroup1|grep 'Host category: all'" 0 "Verify netgroup host category changed"
 	rlPhaseEnd
-	
-	rlPhaseStartTest "ipa-netgroup-020-7: Modify netgroup to set initial user with setattr"
-		rlRun "ipa netgroup-mod $ngroup1 --setattr=memberuser=uid=$user3,cn=users,cn=accounts,$BASEDN" 0 "Set initial user to $ngroup1"
-		rlRun "ipa netgroup-show $ngroup1|grep \"Member User: $user3\"" 0 "Verify user added"
+
+	rlPhaseStartTest "ipa-netgroup-020-6-1: Modify netgroup to clear host category with setattr"
+		rlRun "ipa netgroup-mod $ngroup1 --setattr=hostcategory=\"\"" 0 "Change netgroup host category for $ngroup1"
+		rlRun "ipa netgroup-show $ngroup1|grep -v 'Host category:'" 0 "Verify netgroup host category changed"
 	rlPhaseEnd
 
-	rlPhaseStartTest "ipa-netgroup-020-8: Modify netgroup to set initial host with setattr"
-		rlRun "ipa host-add $host1 --force" 0 "Add host for memberhost test"
-		rlRun "ipa netgroup-mod $ngroup1 --setattr=memberhost=fqdn=$host1,cn=computers,cn=accounts,$BASEDN" 0 "Set initial memberhost for $ngroup1"
-		rlRun "ipa netgroup-show $ngroup1|grep \"Member Host: $host1\"" 0 "Verify memberhost added to netgroup"
-	rlPhaseEnd
-
-	rlPhaseStartTest "ipa-netgroup-020-9: Modify netgroup to set initial external host with setattr"
-		rlRun "ipa netgroup-mod $ngroup1 --setattr=externalhost=$ehost1" 0 "Set initial external host for $ngroup1"
-		rlRun "ipa netgroup-show $ngroup1|grep \"External host: $ehost1\"" 0 "Verify external host set for netgroup"
-	rlPhaseEnd
-	
+#### hostgroup attr
 	rlPhaseStartTest "ipa-netgroup-020-10: Modify netgroup to set initial member hostgroup"
 		rlRun "ipa netgroup-mod $ngroup1 --setattr=memberhost=cn=$hgroup1,cn=hostgroups,cn=accounts,$BASEDN" 0 "Set initial memberhost to hostgroup for $ngroup1"
 		rlRun "ipa netgroup-show $ngroup1|grep \"Member Hostgroup: $hgroup1\"" 0 "Verify hostgroup set for initial member host"
 	rlPhaseEnd
 
-	rlPhaseStartTest "ipa-netgroup-020-11: Modify netgroup to set netgroup for initial member"
+	rlPhaseStartTest "ipa-netgroup-020-10-1: Modify netgroup to add another member hostgroup"
+		rlRun "ipa netgroup-mod $ngroup1 --addattr=memberhost=cn=$hgroup2,cn=hostgroups,cn=accounts,$BASEDN" 0 "Set initial memberhost to hostgroup for $ngroup1"
+		rlRun "ipa netgroup-show $ngroup1|grep \"Member Hostgroup: $hgroup1, $hgroup2\"" 0 "Verify hostgroup set for initial member host"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-netgroup-020-10-2: Modify netgroup to clear member hostgroup"
+		rlRun "ipa netgroup-mod $ngroup1 --setattr=memberhost=\"\"" 0 "Set initial memberhost to hostgroup for $ngroup1"
+		rlRun "ipa netgroup-show $ngroup1|grep -v \"Member Hostgroup:\"" 0 "Verify hostgroup set for initial member host"
+	rlPhaseEnd
+
+#### netgroup attr
+	rlPhaseStartTest "ipa-netgroup-020-11: Modify netgroup to set initial member netgroup"
 		ngroup3id=$(ipa netgroup-show $ngroup3 --all --raw|grep ipauniqueid:|awk '{print $2}')
 		rlRun "ipa netgroup-mod $ngroup1 --setattr=member=ipauniqueid=$ngroup3id,cn=ng,cn=alt,$BASEDN" 0 "Modify netgroup to set initial member to netgroup"
 		rlRun "ipa netgroup-show $ngroup1|grep \"Member netgroups: $ngroup3\"" 0 "Verify netgroup set for initial member host"
 	rlPhaseEnd
-		
+
+	rlPhaseStartTest "ipa-netgroup-020-11-1: Modify netgroup to add another member netgroup"
+		ngroup2id=$(ipa netgroup-show $ngroup2 --all --raw|grep ipauniqueid:|awk '{print $2}')
+		rlRun "ipa netgroup-mod $ngroup1 --addattr=member=ipauniqueid=$ngroup2id,cn=ng,cn=alt,$BASEDN" 0 "Modify netgroup to set initial member to netgroup"
+		rlRun "ipa netgroup-show $ngroup1|grep \"Member netgroups: $ngroup3, $ngroup2\"" 0 "Verify netgroup set for initial member host"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-netgroup-020-11-2: Modify netgroup to clear member netgroup"
+		rlRun "ipa netgroup-mod $ngroup1 --setattr=member=\"\"" 0 "Modify netgroup to set initial member to netgroup"
+		rlRun "ipa netgroup-show $ngroup1|grep -v \"Member netgroups:\"" 0 "Verify netgroup set for initial member host"
+	rlPhaseEnd
 }
 
 # negative modify netgroups tests
@@ -686,98 +769,6 @@ mod_netgroups_negative()
                 command="ipa netgroup-mod --hostcat=dummy $ngroup1"
                 expmsg="ipa: ERROR: invalid 'hostcat': must be one of (u'all',)"
                 rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
-        rlPhaseEnd
-}
-
-
-##########################################################################
-# SETATTR AND ADDATTR NETGROUP
-##########################################################################
-# positive attr netgroups tests
-attr_netgroups_positive()
-{
-        rlPhaseStartTest  "ipa-netgroup-023: Add externalHost attribute to netgroup"
-                # checking setaddr hostgroup-mod
-               rlRun "ipa netgroup-mod --addattr=externalHost=ipaqatesthost $ngroup1" 0 "add externalHost attribute on $ngroup1"
-                # Verify
-                rlRun "ipa netgroup-show --all $ngroup1 | grep \"External host\" | grep ipaqatesthost" 0 "Verifying the externalHost added to $ngroup1"
-        rlPhaseEnd
-
-        rlPhaseStartTest  "ipa-netgroup-024: Set externalHost attribute on netgroup"
-                # checking setaddr hostgroup-mod --setattr
-                rlRun "ipa netgroup-mod --setattr=externalHost=althost $ngroup1" 0 "setting externalHost attribute on $ngroup1"
-                # Verify
-                rlRun "ipa netgroup-show --all $ngroup1 | grep \"External host\" | grep althost" 0 "Verifying the externalHost changed on $ngroup1"
-        rlPhaseEnd
-
-        rlPhaseStartTest  "ipa-netgroup-025: Add additional externalHost attribute on netgroup"
-                # checking setaddr hostgroup-mod --setattr
-                rlRun "ipa netgroup-mod --addattr=externalHost=ipaqatesthost $ngroup1" 0 "setting additional externalHost attribute on $ngroup1"
-                # Verify
-                rlRun "ipa netgroup-show --all $ngroup1 | grep \"External host\" | grep \"althost, ipaqatesthost\"" 0 "Verifying the additional externalHost was added on $ngroup1"
-        rlPhaseEnd
-
-	rlPhaseStartTest  "ipa-netgroup-026: Remove externalHost attributes with setattr on netgroup"
-                # checking setaddr hostgroup-mod --setattr
-                rlRun "ipa netgroup-mod --setattr=externalHost=\"\" $ngroup1" 0 "removing externalHost attribute on $ngroup1"
-                # Verify
-                rlRun "ipa netgroup-show --all $ngroup1 | grep \"External host\"" 1 "Verifying setattr removed all externalHosts on $ngroup1"
-        rlPhaseEnd
-
-   	rlPhaseStartTest "ipa-netgroup-027: setattr on description"
-        	rlRun "setAttribute netgroup description newdescription $ngroup1" 0 "Setting description attribute to value of newdescription."
-        	rlRun "ipa netgroup-show --all $ngroup1 | grep Description | grep newdescription" 0 "Verifying netgroup Description was modified."
-    	rlPhaseEnd
-
-        rlPhaseStartTest "ipa-netgroup-028: setattr on nisDomainName"
-                rlRun "setAttribute netgroup nisDomainName newNisDomain $ngroup1" 0 "Setting nisDomainName attribute to value of newNisDomain."
-                rlRun "ipa netgroup-show --all $ngroup1 | grep \"NIS domain name\" | grep newNisDomain" 0 "Verifying netgroup nisDomainName was modified."
-        rlPhaseEnd
-
-	rlPhaseStartTest  "ipa-netgroup-029: Set memberUser attribute on netgroup"
-		member1="uid=$user1,cn=users,cn=accounts,$BASEDN"
-		rlLog "Settting first memberUser attribute to \"$member1\""
-                rlRun "ipa netgroup-mod --setattr=memberUser=\"$member1\" $ngroup1" 0 "setting memberUser attribute on $ngroup1"
-                # Verify
-                rlRun "ipa netgroup-show --all $ngroup1 | grep \"Member User\" | grep $user1" 0 "Verifying the memberuser attribute changed on $ngroup1"
-        rlPhaseEnd
-
-        rlPhaseStartTest  "ipa-netgroup-030: Add additional memberUser attribute on netgroup"
-		member2="uid=$user2,cn=users,cn=accounts,$BASEDN"
-                rlLog "Settting second memberUser attribute to \"$member2\""
-                rlRun "ipa netgroup-mod --addattr=memberUser=\"$member2\" $ngroup1" 0 "setting additional memberUser attribute on $ngroup1"
-                # Verify
-                rlRun "ipa netgroup-show --all $ngroup1 | grep \"Member User\" | grep \"$user1, $user2\"" 0 "Verifying the additional memberUser was added on $ngroup1"
-        rlPhaseEnd
-
-        rlPhaseStartTest  "ipa-netgroup-031: Remove memberUser attributes with setattr on netgroup"
-                rlRun "ipa netgroup-mod --setattr=memberUser=\"\" $ngroup1" 0 "removing memberUser attribute on $ngroup1"
-                # Verify
-                rlRun "ipa netgroup-show --all $ngroup1 | grep \"Member User\"" 1 "Verifying setattr removed all member users on $ngroup1"
-        rlPhaseEnd
-
-	rlPhaseStartTest  "ipa-netgroup-032: Set memberHost attribute on netgroup"
-		host1="host1.testrelm"
-                member1="fqdn=$host1,cn=computers,cn=accounts,$BASEDN"
-                rlLog "Settting first memberHost attribute to \"$member1\""
-                rlRun "ipa netgroup-mod --setattr=memberHost=\"$member1\" $ngroup1" 0 "setting memberHost attribute on $ngroup1"
-                # Verify
-                rlRun "ipa netgroup-show --all $ngroup1 | grep \"Member Host\" | grep $host1" 0 "Verifying the membergroup attribute changed on $ngroup1"
-        rlPhaseEnd
-                
-        rlPhaseStartTest  "ipa-netgroup-033: Add additional memberHost attribute on netgroup"
-		host1="host1.testrelm"
-		host2="host2.testrelm"
-                member2="fqdn=$host2,cn=computers,cn=accounts,$BASEDN"
-                rlRun "ipa netgroup-mod --addattr=memberHost=\"$member2\" $ngroup1" 0 "setting additional memberHost attribute on $ngroup1"
-                # Verify
-                rlRun "ipa netgroup-show --all $ngroup1 | grep \"Member Host\" | grep \"$host1, $host2\"" 0 "Verifying the additional memberHost was added on $ngroup1"
-        rlPhaseEnd
-
-        rlPhaseStartTest  "ipa-netgroup-034: Remove memberHost attributes with setattr on netgroup"
-                rlRun "ipa netgroup-mod --setattr=memberHost=\"\" $ngroup1" 0 "removing memberHost attribute on $ngroup1"
-                # Verify
-                rlRun "ipa netgroup-show --all $ngroup1 | grep \"Member Host\"" 1 "Verifying setattr removed all member hosts on $ngroup1"
         rlPhaseEnd
 }
 
