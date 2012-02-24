@@ -29,7 +29,7 @@ export TESTVERSION=1.0
 
 BUILT_FILES=
 
-FILES=$(METADATA) runtest.sh Makefile PURPOSE t.ds-migration-performance.sh installds.sh airius10k.ldif
+FILES=$(METADATA) runtest.sh Makefile PURPOSE t.ds-migration-performance.sh installds.sh setup.ldif
 
 .PHONY: all install download clean
 
