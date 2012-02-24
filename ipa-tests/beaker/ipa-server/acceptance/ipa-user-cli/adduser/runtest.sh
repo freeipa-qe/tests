@@ -421,6 +421,17 @@ rlJournalStart
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message - principal not in IPA server realm."
     rlPhaseEnd
 
+     rlPhaseStartTest "ipa-user-cli-add-036: test of random password generation with user-add"
+	lusr="36user"
+	newpassword=$(ipa user-add --first fnaml --last lastn --random $lusr | grep Random\ password | cut -d: -f2 | sed s/\ //g)	
+        if [ $? -ne 0 ]; then
+            rlFail "ERROR - kinit failed "
+        else
+            rlPass "Success - kinit at first time with password [$newpassword] success"
+        fi
+	ipa user-del $lusr&
+    rlPhaseEnd
+
     rlPhaseStartTest "bug748110: Always set a non-zero max ssf"
 	rlLog "Verifies https://bugzilla.redhat.com/show_bug.cgi?id=748110"
 
