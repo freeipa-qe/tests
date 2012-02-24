@@ -780,7 +780,7 @@ rlPhaseStartTest "ipa-host-cli-38: find more hosts than exist"
         deleteHost $myhost4
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-host-cli-66: search with no when Manages multiple Hosts"
+    rlPhaseStartTest "ipa-host-cli-66: search with not-man-by-hosts when Manages multiple Hosts"
         myhost1=mytesthost1.$DOMAIN
         myhost2=mytesthost2.$DOMAIN
         myhost3=mytesthost3.$DOMAIN
