@@ -1,4 +1,4 @@
-#!/bin/bash
+#/bin/bash
 # vim: dict=/usr/share/beakerlib/dictionary.vim cpt=.,w,b,u,t,i,k
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
@@ -622,6 +622,7 @@ rlPhaseStartTest "ipa-host-cli-38: find more hosts than exist"
         myhost1=mytesthost1.$DOMAIN
         myhost2=mytesthost2.$DOMAIN
         myhost3=mytesthost3.$DOMAIN
+        myhost4=mytesthost4.$DOMAIN
         rlRun "removeHostManagedBy \"$myhost2, $myhost3, $myhost4\" $myhost1" 0 "Removing Managed By Hosts"
         rlRun "verifyHostAttr $myhost1 \"Managed by\" $myhost1"
 	ipa host-find --man-by-hosts=$myhost2 > /tmp/manbyhosts_$myhost2.out
@@ -666,12 +667,154 @@ rlPhaseStartTest "ipa-host-cli-38: find more hosts than exist"
         deleteHost $myhost2
         deleteHost $myhost3
         deleteHost $myhost4
-    rlPhaseEnd
+   rlPhaseEnd
 	
-    rlPhaseStartTest "ipa-host-cli-61: Negative - search man-by-hosts host when host does not exist"
+   rlPhaseStartTest "ipa-host-cli-61: Negative - search with man-by-hosts when host does not exist"
         myhost1=mytesthost1.$DOMAIN
 	ipa host-find --man-by-hosts=$myhost1 > /tmp/manbyhosts_notahost.out
 	rlAssertGrep "Number of entries returned 0" "/tmp/manbyhosts_notahost.out"
+   rlPhaseEnd
+
+   rlPhaseStartTest "ipa-host-cli-62: search with not-man-by-hosts when Managed By a Host"
+        myhost1=mytesthost1.$DOMAIN
+        myhost2=mytesthost2.$DOMAIN
+        myhost3=mytesthost3.$DOMAIN
+        addHost $myhost1
+        addHost $myhost2
+        addHost $myhost3
+        rlRun "addHostManagedBy $myhost2 $myhost1" 0 "Adding Managed By Host"
+        rlRun "verifyHostAttr $myhost1 \"Managed by\" \"$myhost1, $myhost2\""
+        ipa host-find --not-man-by-hosts=$myhost2 > /tmp/notmabynhosts_find.out
+	result=`cat /tmp/notmanbyhosts_find.out | grep "Number of entries returned"`
+	number=`echo $result | cut -d " " -f 5`
+        rlAssertGreaterOrEqual "Number of entries returned is >= 0" "$number" 0
+        rlAssertNotGrep "Host name: $myhost2" "/tmp/notmanbyhosts_find.out"
+        rlAssertNotGrep "Host name: $myhost1" "/tmp/notmanbyhosts_find.out"
+        rlAssertGrep "Host name: $myhost3" "/tmp/notmanbyhosts_find.out"
+    rlPhaseEnd
+ 
+    rlPhaseStartTest "ipa-host-cli-63: search a host when Managed By Host is removed"
+        rlRun "removeHostManagedBy $myhost2 $myhost1" 0 "Removing Managed By Host"
+        rlRun "verifyHostAttr $myhost1 \"Managed by\" $myhost1"
+        ipa host-find --not-man-by-hosts=$myhost2 > /tmp/notmanbyhosts_removed.out
+	result=`cat /tmp/notmanbyhosts_removed.out | grep "Number of entries returned"`
+	number=`echo $result | cut -d " " -f 5`
+        rlAssertGreaterOrEqual "Number of entries returned is >= 1" "$number" 1
+        rlAssertGrep "Host name: $myhost1" "/tmp/notmanbyhosts_removed.out"
+        rlAssertGrep "Host name: $myhost3" "/tmp/notmanbyhosts_removed.out"
+        rlAssertNotGrep "Host name: $myhost2" "/tmp/notmanbyhosts_removed.out"
+    rlPhaseEnd
+ 
+    rlPhaseStartTest "ipa-host-cli-64: search with not-man-by-hosts when host is Managed by multiple Hosts"
+        myhost1=mytesthost1.$DOMAIN
+        myhost2=mytesthost2.$DOMAIN
+        myhost3=mytesthost3.$DOMAIN
+        myhost4=mytesthost4.$DOMAIN
+        addHost $myhost4
+        rlRun "addHostManagedBy \"$myhost2, $myhost3, $myhost4\" $myhost1" 0 "Adding Managed By Hosts"
+        rlRun "verifyHostAttr $myhost1 \"Managed by\" \"$myhost1, $myhost2, $myhost3, $myhost4\""
+        ipa host-find --not-man-by-hosts=$myhost2 > /tmp/notmanbyhosts_$myhost2.out
+	result=`cat /tmp/notmanbyhosts_$myhost2.out | grep "Number of entries returned"`
+	number=`echo $result | cut -d " " -f 5`
+        rlAssertGreaterOrEqual "Number of entries returned is >= 2" "$number" 2
+        rlAssertNotGrep "Host name: $myhost2" "/tmp/notmanbyhosts_$myhost2.out"
+        rlAssertNotGrep "Host name: $myhost1" "/tmp/notmanbyhosts_$myhost2.out"
+        rlAssertGrep "Host name: $myhost3" "/tmp/notmanbyhosts_$myhost2.out"
+        rlAssertGrep "Host name: $myhost4" "/tmp/notmanbyhosts_$myhost2.out"
+
+        ipa host-find --not-man-by-hosts=$myhost3 > /tmp/notmanbyhosts_$myhost3.out
+	result=`cat /tmp/notmanbyhosts_$myhost3.out | grep "Number of entries returned"`
+	number=`echo $result | cut -d " " -f 5`
+        rlAssertGreaterOrEqual "Number of entries returned is >= 2" "$number" 2
+        rlAssertNotGrep "Host name: $myhost3" "/tmp/notmanbyhosts_$myhost3.out"
+        rlAssertNotGrep "Host name: $myhost1" "/tmp/notmanbyhosts_$myhost3.out"
+        rlAssertGrep "Host name: $myhost2" "/tmp/notmanbyhosts_$myhost3.out"
+        rlAssertGrep "Host name: $myhost4" "/tmp/notmanbyhosts_$myhost3.out"
+
+        ipa host-find --not-man-by-hosts=$myhost4 > /tmp/notmanbyhosts_$myhost4.out
+	result=`cat /tmp/notmanbyhosts_$myhost4.out | grep "Number of entries returned"`
+	number=`echo $result | cut -d " " -f 5`
+        rlAssertGreaterOrEqual "Number of entries returned is >= 2" "$number" 2
+        rlAssertNotGrep "Host name: $myhost4" "/tmp/notmanbyhosts_$myhost4.out"
+        rlAssertNotGrep "Host name: $myhost1" "/tmp/notmanbyhosts_$myhost4.out"
+        rlAssertGrep "Host name: $myhost2" "/tmp/notmanbyhosts_$myhost4.out"
+        rlAssertGrep "Host name: $myhost3" "/tmp/notmanbyhosts_$myhost4.out"
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-host-cli-65: search with not-man-by-host when Multiple Managed By Hosts removed"
+        myhost1=mytesthost1.$DOMAIN
+        myhost2=mytesthost2.$DOMAIN
+        myhost3=mytesthost3.$DOMAIN
+        myhost4=mytesthost4.$DOMAIN
+        rlRun "removeHostManagedBy \"$myhost2, $myhost3, $myhost4\" $myhost1" 0 "Removing Managed By Hosts"
+        rlRun "verifyHostAttr $myhost1 \"Managed by\" $myhost1"
+        ipa host-find --not-man-by-hosts=$myhost2 > /tmp/notmanbyhosts_$myhost2.out
+	result=`cat /tmp/notmanbyhosts_$myhost2.out | grep "Number of entries returned"`
+	number=`echo $result | cut -d " " -f 5`
+        rlAssertGreaterOrEqual "Number of entries returned is >= 3" "$number" 3
+        rlAssertNotGrep "Host name: $myhost2" "/tmp/notmanbyhosts_$myhost2.out"
+        rlAssertGrep "Host name: $myhost4" "/tmp/notmanbyhosts_$myhost2.out"
+        rlAssertGrep "Host name: $myhost3" "/tmp/notmanbyhosts_$myhost2.out"
+        rlAssertGrep "Host name: $myhost1" "/tmp/notmanbyhosts_$myhost2.out"
+
+        ipa host-find --not-man-by-hosts=$myhost3 > /tmp/notmanbyhosts_$myhost3.out
+	result=`cat /tmp/notmanbyhosts_$myhost3.out | grep "Number of entries returned"`
+        number=`echo $result | cut -d " " -f 5`
+        rlAssertGreaterOrEqual "Number of entries returned is >= 3" "$number" 3
+        rlAssertNotGrep "Host name: $myhost3" "/tmp/notmanbyhosts_$myhost3.out"
+        rlAssertGrep "Host name: $myhost4" "/tmp/notmanbyhosts_$myhost3.out"
+        rlAssertGrep "Host name: $myhost2" "/tmp/notmanbyhosts_$myhost3.out"
+        rlAssertGrep "Host name: $myhost1" "/tmp/notmanbyhosts_$myhost3.out"
+
+        ipa host-find --not-man-by-hosts=$myhost4 > /tmp/notmanbyhosts_$myhost4.out
+	result=`cat /tmp/notmanbyhosts_$myhost4.out | grep "Number of entries returned"`
+        number=`echo $result | cut -d " " -f 5`
+        rlAssertGreaterOrEqual "Number of entries returned is >= 3" "$number" 3
+        rlAssertNotGrep "Host name: $myhost4" "/tmp/notmanbyhosts_$myhost4.out"
+        rlAssertGrep "Host name: $myhost3" "/tmp/notmanbyhosts_$myhost4.out"
+        rlAssertGrep "Host name: $myhost2" "/tmp/notmanbyhosts_$myhost4.out"
+        rlAssertGrep "Host name: $myhost1" "/tmp/notmanbyhosts_$myhost4.out"
+        deleteHost $myhost1
+        deleteHost $myhost2
+        deleteHost $myhost3
+        deleteHost $myhost4
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-host-cli-66: search with no when Manages multiple Hosts"
+        myhost1=mytesthost1.$DOMAIN
+        myhost2=mytesthost2.$DOMAIN
+        myhost3=mytesthost3.$DOMAIN
+        myhost4=mytesthost4.$DOMAIN
+        addHost $myhost1
+        addHost $myhost2
+        addHost $myhost3
+        addHost $myhost4
+        rlRun "addHostManagedBy \"$myhost2\" $myhost1" 0 "Adding Managed By Hosts"
+        rlRun "addHostManagedBy \"$myhost2\" $myhost3" 0 "Adding Managed By Hosts"
+        rlRun "addHostManagedBy \"$myhost2\" $myhost4" 0 "Adding Managed By Hosts"
+        rlRun "verifyHostAttr $myhost1 \"Managed by\" \"$myhost1, $myhost2\""
+        rlRun "verifyHostAttr $myhost3 \"Managed by\" \"$myhost3, $myhost2\""
+        rlRun "verifyHostAttr $myhost4 \"Managed by\" \"$myhost4, $myhost2\""
+        ipa host-find --not-man-by-hosts=$myhost2 > /tmp/notmanbyhosts_multi.out
+	result=`cat /tmp/notmanbyhosts_multi.out | grep "Number of entries returned"`
+        number=`echo $result | cut -d " " -f 5`
+        rlAssertGreaterOrEqual "Number of entries returned is >= 0" "$number" 0
+        rlAssertNotGrep "Host name: $myhost4" "/tmp/notmanbyhosts_multi.out"
+        rlAssertNotGrep "Host name: $myhost3" "/tmp/notmanbyhosts_multi.out"
+        rlAssertNotGrep "Host name: $myhost2" "/tmp/notmanbyhosts_multi.out"
+        rlAssertNotGrep "Host name: $myhost1" "/tmp/notmanbyhosts_multi.out"
+        deleteHost $myhost1
+        deleteHost $myhost2
+        deleteHost $myhost3
+        deleteHost $myhost4
+   rlPhaseEnd
+
+   rlPhaseStartTest "ipa-host-cli-67: Negative - search with not-man-by-hosts when host does not exist"
+        myhost1=mytesthost1.$DOMAIN
+        ipa host-find --not-man-by-hosts=notahost > /tmp/notmanbyhosts_notahost.out
+	result=`cat /tmp/notmanbyhosts_notahost.out | grep "Number of entries returned"`
+        number=`echo $result | cut -d " " -f 5`
+        rlAssertGreaterOrEqual "Number of entries returned is >= 0" "$number" 0
    rlPhaseEnd
 
     rlPhaseStartCleanup "ipa-host-cli-cleanup: Destroying admin credentials."
