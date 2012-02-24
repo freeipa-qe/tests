@@ -810,7 +810,6 @@ rlPhaseStartTest "ipa-host-cli-38: find more hosts than exist"
    rlPhaseEnd
 
    rlPhaseStartTest "ipa-host-cli-67: Negative - search with not-man-by-hosts when host does not exist"
-        myhost1=mytesthost1.$DOMAIN
         ipa host-find --not-man-by-hosts=notahost > /tmp/notmanbyhosts_notahost.out
 	result=`cat /tmp/notmanbyhosts_notahost.out | grep "Number of entries returned"`
         number=`echo $result | cut -d " " -f 5`
