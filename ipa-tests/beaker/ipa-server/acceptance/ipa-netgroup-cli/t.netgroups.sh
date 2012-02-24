@@ -15,6 +15,10 @@ group1=grpddee
 group2=grplloo
 group3=grpmmpp
 group4=grpeeww
+host1=memberhost1.$DOMAIN
+host2=memberhost2.$DOMAIN
+ehost1=externalhost1.$DOMAIN
+ehost2=externalhost2.$DOMAIN
 hgroup1=hg144335566
 hgroup2=hg2
 hgroup3=hg3afdsk
@@ -102,7 +106,7 @@ member_netgroups()
 
 mod_netgroups()
 {
-	mod_netgroups_positive
+	netgroup_mod_positive
 	mod_netgroups_negative
 }
 
@@ -579,37 +583,94 @@ netgroup_remove_member_negative()
 # MODIFY NETGROUPS
 ##########################################################################
 # positive modify netgroups tests
-mod_netgroups_positive()
+netgroup_mod_positive()
 {
-        rlPhaseStartTest  "ipa-netgroup-016: Modify description of netgroup"
-                rlRun "ipa netgroup-mod --desc=testdesc11 $ngroup1" 0 "modify description for $ngroup1"
-                # Verify
-                rlRun "ipa netgroup-show --all $ngroup1 | grep testdesc11" 0 "Verifying description for $ngroup1"
-        rlPhaseEnd
+	rlPhaseStartTest  "ipa-netgroup-016: Modify description of netgroup"
+		rlRun "ipa netgroup-mod --desc=testdesc11 $ngroup1" 0 "modify description for $ngroup1"
+		# Verify
+		rlRun "ipa netgroup-show --all $ngroup1 | grep testdesc11" 0 "Verifying description for $ngroup1"
+	rlPhaseEnd
 
 	rlPhaseStartTest  "ipa-netgroup-017: Modify user catagory of netgroup"
-                rlRun "ipa netgroup-mod --usercat=all $ngroup1" 0 "modify user catagory on $ngroup1"
-                # Verify
-                rlRun "ipa netgroup-show --all $ngroup1 | grep \"User category\" | grep all" 0 "Verifying user catagory for $ngroup1"
-        rlPhaseEnd
+		rlRun "ipa netgroup-mod --usercat=all $ngroup1" 0 "modify user catagory on $ngroup1"
+		# Verify
+		rlRun "ipa netgroup-show --all $ngroup1 | grep \"User category\" | grep all" 0 "Verifying user catagory for $ngroup1"
+	rlPhaseEnd
 
-        rlPhaseStartTest  "ipa-netgroup-018: Modify host catagory of netgroup"
-                rlRun "ipa netgroup-mod --hostcat=all $ngroup1" 0 "modify host catagory on $ngroup1"
-                # Verify
-                rlRun "ipa netgroup-show --all $ngroup1 | grep \"Host category\" | grep all" 0 "Verifying host catagory for $ngroup1"
-        rlPhaseEnd
+	rlPhaseStartTest  "ipa-netgroup-018: Modify host catagory of netgroup"
+		rlRun "ipa netgroup-mod --hostcat=all $ngroup1" 0 "modify host catagory on $ngroup1"
+		# Verify
+		rlRun "ipa netgroup-show --all $ngroup1 | grep \"Host category\" | grep all" 0 "Verifying host catagory for $ngroup1"
+	rlPhaseEnd
 
-        rlPhaseStartTest  "ipa-netgroup-019: Modify remove user catagory of netgroup"
-                rlRun "ipa netgroup-mod --usercat="" $ngroup1" 0 "remove user catagory on $ngroup1"
-                # Verify
-                rlRun "ipa netgroup-show --all $ngroup1 | grep \"User category\"" 1 "Verifying user catagory was removed for $ngroup1"
-        rlPhaseEnd
+	rlPhaseStartTest  "ipa-netgroup-019: Modify remove user catagory of netgroup"
+		rlRun "ipa netgroup-mod --usercat="" $ngroup1" 0 "remove user catagory on $ngroup1"
+		# Verify
+		rlRun "ipa netgroup-show --all $ngroup1 | grep \"User category\"" 1 "Verifying user catagory was removed for $ngroup1"
+	rlPhaseEnd
 
-        rlPhaseStartTest  "ipa-netgroup-020: Modify remove host catagory of netgroup"
-                rlRun "ipa netgroup-mod --hostcat="" $ngroup1" 0 "remove host catagory on $ngroup1"
-                # Verify
-                rlRun "ipa netgroup-show --all $ngroup1 | grep \"Host category\"" 1 "Verifying host catagory was removed for $ngroup1"
-        rlPhaseEnd
+	rlPhaseStartTest  "ipa-netgroup-020-0: Modify remove host catagory of netgroup"
+		rlRun "ipa netgroup-mod --hostcat="" $ngroup1" 0 "remove host catagory on $ngroup1"
+		# Verify
+		rlRun "ipa netgroup-show --all $ngroup1 | grep \"Host category\"" 1 "Verifying host catagory was removed for $ngroup1"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-netgroup-020-1: Modify nisdomain of netgroup"
+		rlRun "ipa netgroup-mod $ngroup1 --nisdomain=newnisdom1" 0 "Modify nidomain for $ngroup1"
+		rlRun "ipa netgroup-show --all $ngroup1|grep 'NIS domain name: newnisdom'" 0 "Verifying NIS Domain changed"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-netgroup-020-2: Display rights of netgroup during description change"
+		rlRun "ipa netgroup-mod $ngroup1 --desc=rightstest --rights --all | grep 'attributelevelrights:'" 0 "Display rights during description change"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-netgroup-020-3: Modify netgroup description with setattr"
+		rlRun "ipa netgroup-mod $ngroup1 --setattr=description=setattrd1" 0 "Change netgroup description for $ngroup1"
+		rlRun "ipa netgroup-show $ngroup1|grep setattrd1" 0 "Verify netgroup description changed"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-netgroup-020-4: Modify netgroup nisdomainname with setattr"
+		rlRun "ipa netgroup-mod $ngroup1 --setattr=nisdomainname=setattrnisdom" 0 "Change netgroup nisdomainname for $ngroup1"
+		rlRun "ipa netgroup-show $ngroup1|grep setattrnisdom" 0 "Verify netgroup nisdomainame changed"
+	rlPhaseEnd
+	
+	rlPhaseStartTest "ipa-netgroup-020-5: Modify netgroup user category with setattr"
+		rlRun "ipa netgroup-mod $ngroup1 --setattr=usercategory=all" 0 "Change netgroup user category for $ngroup1"
+		rlRun "ipa netgroup-show $ngroup1|grep 'User category: all'" 0 "Verify netgroup user category changed"
+	rlPhaseEnd
+	
+	rlPhaseStartTest "ipa-netgroup-020-6: Modify netgroup host category with setattr"
+		rlRun "ipa netgroup-mod $ngroup1 --setattr=hostcategory=all" 0 "Change netgroup host category for $ngroup1"
+		rlRun "ipa netgroup-show $ngroup1|grep 'Host category: all'" 0 "Verify netgroup host category changed"
+	rlPhaseEnd
+	
+	rlPhaseStartTest "ipa-netgroup-020-7: Modify netgroup to set initial user with setattr"
+		rlRun "ipa netgroup-mod $ngroup1 --setattr=memberuser=uid=$user3,cn=users,cn=accounts,$BASEDN" 0 "Set initial user to $ngroup1"
+		rlRun "ipa netgroup-show $ngroup1|grep \"Member User: $user3\"" 0 "Verify user added"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-netgroup-020-8: Modify netgroup to set initial host with setattr"
+		rlRun "ipa host-add $host1 --force" 0 "Add host for memberhost test"
+		rlRun "ipa netgroup-mod $ngroup1 --setattr=memberhost=fqdn=$host1,cn=computers,cn=accounts,$BASEDN" 0 "Set initial memberhost for $ngroup1"
+		rlRun "ipa netgroup-show $ngroup1|grep \"Member Host: $host1\"" 0 "Verify memberhost added to netgroup"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-netgroup-020-9: Modify netgroup to set initial external host with setattr"
+		rlRun "ipa netgroup-mod $ngroup1 --setattr=externalhost=$ehost1" 0 "Set initial external host for $ngroup1"
+		rlRun "ipa netgroup-show $ngroup1|grep \"External host: $ehost1\"" 0 "Verify external host set for netgroup"
+	rlPhaseEnd
+	
+	rlPhaseStartTest "ipa-netgroup-020-10: Modify netgroup to set initial member hostgroup"
+		rlRun "ipa netgroup-mod $ngroup1 --setattr=memberhost=cn=$hgroup1,cn=hostgroups,cn=accounts,$BASEDN" 0 "Set initial memberhost to hostgroup for $ngroup1"
+		rlRun "ipa netgroup-show $ngroup1|grep \"Member Hostgroup: $hgroup1\"" 0 "Verify hostgroup set for initial member host"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-netgroup-020-11: Modify netgroup to set netgroup for initial member"
+		ngroup3id=$(ipa netgroup-show $ngroup3 --all --raw|grep ipauniqueid:|awk '{print $2}')
+		rlRun "ipa netgroup-mod $ngroup1 --setattr=member=ipauniqueid=$ngroup3id,cn=ng,cn=alt,$BASEDN" 0 "Modify netgroup to set initial member to netgroup"
+		rlRun "ipa netgroup-show $ngroup1|grep \"Member netgroups: $ngroup3\"" 0 "Verify netgroup set for initial member host"
+	rlPhaseEnd
+		
 }
 
 # negative modify netgroups tests
