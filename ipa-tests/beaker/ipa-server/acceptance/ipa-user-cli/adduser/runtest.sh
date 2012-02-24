@@ -422,14 +422,16 @@ rlJournalStart
     rlPhaseEnd
 
      rlPhaseStartTest "ipa-user-cli-add-036: test of random password generation with user-add"
-	lusr="36user"
-	newpassword=$(ipa user-add --first fnaml --last lastn --random $lusr | grep Random\ password | cut -d: -f2 | sed s/\ //g)	
+	rusr="36user"
+	newpassword=$(ipa user-add --first fnaml --last lastn --random $rusr | grep Random\ password | cut -d: -f2 | sed s/\ //g)	
+	FirstKinitAs $rusr $newpassword fo0m4nchU
         if [ $? -ne 0 ]; then
-            rlFail "ERROR - kinit failed "
+            rlFail "ERROR - kinit failed to kinit as $rusr using password $newpassword"
         else
             rlPass "Success - kinit at first time with password [$newpassword] success"
         fi
-	ipa user-del $lusr&
+        kinitAs $ADMINID $ADMINPW
+	ipa user-del $rusr&
     rlPhaseEnd
 
     rlPhaseStartTest "bug748110: Always set a non-zero max ssf"

@@ -421,6 +421,21 @@ rlJournalStart
         rlRun "verifyUserAttr $superuser \"Car License\" \"012 ABC\"" 0 "Verify user's car license"
     rlPhaseEnd
 
+     rlPhaseStartTest "ipa-user-cli-mod-054: test of random password generation with user-add"
+	rusr="36user"
+        kinitAs $ADMINID $ADMINPW
+	ipa user-add --first fnaml --last lastn --random $rusr 
+	newpassword=$(ipa user-mod --random $rusr | grep Random\ password | cut -d: -f2 | sed s/\ //g)	
+	FirstKinitAs $rusr $newpassword fo0m4nchU
+        if [ $? -ne 0 ]; then
+            rlFail "ERROR - kinit failed to kinit as $rusr using password [$newpassword]"
+        else
+            rlPass "Success - kinit at first time with password [$newpassword] success"
+        fi
+        kinitAs $ADMINID $ADMINPW
+	ipa user-del $rusr&
+    rlPhaseEnd
+
     rlPhaseStartCleanup "ipa-user-cli-mod-cleanup"
         rlRun "ipa user-del $superuser" 0 "delete $superuser account"
     rlPhaseEnd
