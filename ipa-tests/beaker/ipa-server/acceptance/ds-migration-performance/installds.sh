@@ -126,7 +126,7 @@ fi
 
 sleep 3
 
-rlRun "/usr/bin/ldapmodify -a -x -h $HOSTNAME -p 389 -D \"cn=Directory Manager\" -w $ADMINPW -c -f $HERE/airius10k.ldif" 0
+rlRun "/usr/bin/ldapmodify -a -x -h $HOSTNAME -p 389 -D \"cn=Directory Manager\" -w $ADMINPW -c -f $HERE/setup.ldif" 0
 
 
 }
