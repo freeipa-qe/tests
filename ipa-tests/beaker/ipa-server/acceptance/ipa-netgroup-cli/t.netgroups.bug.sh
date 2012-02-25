@@ -32,14 +32,16 @@ netgroup_bugs()
 	netgroup_bz_772297
 	netgroup_bz_766141
 	netgroup_bz_767372
-	netgroup_bz_772163
+	# netgroup_bz_772163 # Must be tested manually right now
 	netgroup_bz_750984
 	netgroup_bz_796390
+	netgroup_bz_797237
+	netgroup_bz_797256
 }
 
 netgroup_bz_772043()
 {
-	rlPhaseStartTest "netgroup_bz772043: Adding a netgroup with a + in the name that overlaps hostgroup causes crash"	
+	rlPhaseStartTest "netgroup_bz_772043: Adding a netgroup with a + in the name that overlaps hostgroup causes crash"	
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa netgroup-add +badtestnetgroup --desc=netgroup_with_plus_kills_dirsrv" 
@@ -55,7 +57,7 @@ netgroup_bz_772043()
 		rlRun "sed s/+badtestnetgroup/badtestnetgroup/g /tmp/testrelm.ldif > /tmp/testrelm.ldif.fixed"
 		rlRun "ns-slapd ldif2db -D /etc/dirsrv/slapd-TESTRELM-COM/ -s "$BASEDN" -i /tmp/testrelm.ldif.fixed" 
 		rlRun "ipactl restart"
-		rlRun "ipa netgroup-del badtestgroup"
+		rlRun "ipa netgroup-del badtestnetgroup"
 		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd
 }
@@ -117,7 +119,7 @@ netgroup_bz_766141()
 	rlPhaseStartTest "netgroup_bz_766141: SSSD should support FreeIPA's internal netgroup representation"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
-		rlRun "ipa netgroup-add $FUNCNAME --desk=$FUNCNAME"
+		rlRun "ipa netgroup-add $FUNCNAME --desc=$FUNCNAME"
 		rlRun "ipa netgroup-add-member $FUNCNAME --users=admin"
 		rlRun "cp /etc/sssd/sssd.conf /etc/sssd/sssd.conf.$FUNCNAME.backup"
 		sed -i 's/\(\[domain.*\]\)$/\1\ndebug_level = 6/' /etc/sssd/sssd.conf
@@ -146,8 +148,8 @@ netgroup_bz_767372()
 	rlPhaseStartTest "netgroup_bz_767372: Netgroups compat plugin not reporting users correctly"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
-		rlRun "echo $ADMINPW | ipa-compat-manage enable"
-		rlRun "echo $ADMINPW | ipa-nis-manage enable"
+		rlRun "echo $ADMINPW | ipa-compat-manage enable" 0,2
+		rlRun "echo $ADMINPW | ipa-nis-manage enable" 0,2
 		rlRun "service rpcbind restart"
 		rlRun "service dirsrv restart"
 		rlRun "ipa user-add bzuser1 --first=First --last=Last"
@@ -170,20 +172,19 @@ netgroup_bz_767372()
 	rlPhaseEnd
 }
 
-netgroup_bz_772163()
-{
-	rlPhaseStartTest "netgroup_bz_772163: Iterator loop reuse cases a tight loop in the native IPA netgroups code"
-		KinitAsAdmin
-		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
-		
-	rlPhaseEnd
-}
+#netgroup_bz_772163()
+#{
+#	rlPhaseStartTest "netgroup_bz_772163: Iterator loop reuse cases a tight loop in the native IPA netgroups code"
+#		rlLog "This is not yet automated.  Please test manually?"	
+#	rlPhaseEnd
+#}
 
 netgroup_bz_750984()
 {
 	rlPhaseStartTest "netgroup_bz_750984: Inconsistency in error message while adding a duplicate netgroup"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
+		#### test1
 		rlRun "ipa hostgroup-add netgroup_bz_750984 --desc=netgroup_bz_750984"
 		rlRun "ipa netgroup-add netgroup_bz_750984 --desc=netgroup_bz_750984 > $tmpout 2>&1" 1
 		if [ $(grep "Hostgroups and netgroups share a common namespace" $tmpout|wc -l) -gt 0 ]; then
@@ -192,6 +193,8 @@ netgroup_bz_750984()
 			rlFail "BZ 750984 found...Inconsistency in error message while adding a duplicate netgroup"
 		fi
 		rlRun "ipa hostgroup-del netgroup_bz_750984"
+		
+		#### test2
 		rlRun "ipa netgroup-add netgroup_bz_750984 --desc=netgroup_bz_750984" 
 		rlRun "ipa hostgroup-add netgroup_bz_750984 --desc=netgroup_bz_750984 > $tmpout 2>&1" 1
 		if [ $(grep "Hostgroups and netgroups share a common namespace" $tmpout|wc -l) -gt 0 ]; then
@@ -215,6 +218,114 @@ netgroup_bz_796390()
 		else
 			rlPass "BZ 796390 not found."
 		fi
+		[ -f $tmpout ] && rm -f $tmpout
+	rlPhaseEnd
+}
+
+netgroup_bz_797237()
+{
+	rlPhaseStartTest "netgroup_bz_797237: ipa netgroup-add and netgroup-mod --nisdomain should not allow commas"
+		local tmpout=/tmp/errormsg.out
+		KinitAsAdmin
+		#### test1
+		rlRun "ipa netgroup-add netgroup_bz_797237_1 --desc=desc1 --nisdomain=test1,test2 > $tmpout 2>&1" 1
+		if [ $(grep "test1,test2" $tmpout|wc -l) -gt 0 ]; then
+			rlFail "BZ 797237 found...ipa netgroup-add and netgroup-mod --nisdomain should not allow commas"
+		else
+			rlPass "BZ 797237 not found for netgroup-add with comma"
+		fi
+		rlRun "ipa netgroup-del netgroup_bz_797237_1"
+
+		#### test2
+		rlRun "ipa netgroup-add netgroup_bz_797237_2 --desc=desc2 --nisdomain=test^\|\!\@\#\$\%\&\*\\)\\( > $tmpout 2>&1" 1      
+		if [ $(grep "test^\|\!\@\#\$\%\&\*\\\)\\\(" $tmpout | wc -l) -gt 0 ]; then
+			rlFail "BZ 797237 found...ipa netgroup-add and netgroup-mod --nisdomain should not allow commas"
+			rlFail "This BZ also covers other invalid characters"
+		else
+			rlPass "BZ 797237 not found for netgroup-add --nisdomain with other invalid chars"
+		fi
+		rlRun "ipa netgroup-del netgroup_bz_797237_1"
+
+		#### test3
+		rlRun "ipa netgroup-add netgroup_bz_797237_3 --desc=desc3"
+		rlRun "ipa netgroup-mod netgroup_bz_797237_3 --nisdomain=test3,test4 > $tmpout 2>&1" 1
+		if [ $(grep "test3,test4" $tmpout|wc -l) -gt 0 ]; then
+			rlFail "BZ 797237 found...ipa netgroup-add and netgroup-mod --nisdomain should not allow commas"
+		else
+			rlPass "BZ 797237 not found for netgroup-mod --nisdomain with comma."
+		fi
+		rlRun "ipa netgroup-del netgroup_bz_797237_1"
+		
+		
+		#### test4
+		rlRun "ipa netgroup-add netgroup_bz_797237_4 --desc=desc4"
+		rlRun "ipa netgroup-mod netgroup_bz_797237_4 --setattr=nisdomainname=test5,test6 > $tmpout 2>&1" 1
+		if [ $(grep "test5,test6" $tmpout|wc -l) -gt 0 ]; then
+			rlFail "BZ 797237 found...ipa netgroup-add and netgroup-mod --nisdomain should not allow commas"
+		else
+			rlPass "BZ 797237 not found for netgroup-mod --setattr=nisdomainname with comma."
+		fi
+		rlRun "ipa netgroup-del netgroup_bz_797237_1"
+		[ -f $tmpout ] && rm -f $tmpout
+
+		#### test5 
+		rlRun "ipa netgroup-add netgroup_bz_797237_5 --desc=desc5"
+		rlRun "ipa netgroup-mod netgroup_bz_797237_5 --setattr=nisdomain=test^\|\!\@\#\$\%\&\*\\)\\( > $tmpout 2>&1" 1
+		if [ $(grep "test^\|\!\@\#\$\%\&\*\\\)\\\(" $tmpout | wc -l) -gt 0 ]; then
+			rlFail "BZ 797237 found...ipa netgroup-add and netgroup-mod --nisdomain should not allow commas"
+			rlFail "This BZ also covers other invalid characters"
+		else
+			rlPass "BZ 797237 not found for netgroup-add --nisdomain with other invalid chars"
+		fi
+		rlRun "ipa netgroup-del netgroup_bz_797237_5"
+		[ -f $tmpout ] && rm -f $tmpout
+	rlPhaseEnd
+}
+
+netgroup_bz_797256()
+{
+	rlPhaseStartTest "netgroup_bz_797256: ipa netgroup-add-member --hosts should not allow invalid characters"
+		local tmpout=/tmp/errormsg.out
+		KinitAsAdmin
+		#### test1
+		rlRun "ipa netgroup-add netgroup_bz_797256_1 --desc=desc1"
+		rlRun "ipa netgroup-add-member netgroup_bz_797256_1 --hosts=badhost? > $tmpout 2>&1" 1
+		if [ $(grep "badhost\?" $tmpout|wc -l) -gt 0 ]; then
+			rlFail "BZ 797256 Found...ipa netgroup-add-member --hosts should not allow invalid characters"
+		else
+			rlPass "BZ 797256 not found for ipa netgroup-add-member --hosts with ?"
+		fi
+		rlRun "ipa netgroup-del netgroup_bz_797256_1"
+
+		#### test2
+		rlRun "ipa netgroup-add netgroup_bz_797256_2 --desc=desc2"
+		rlRun "ipa netgroup-add-member netgroup_bz_797256_2 --hosts=badhost\!\@\#\$\%\^\&\*\\(\\) > $tmpout 2>&1" 1
+		if [ $(grep "badhost\!\@\#\$\%\^\&\*\\(\\)" $tmpout|wc -l) -gt 0 ]; then
+			rlFail "BZ 797256 Found...ipa netgroup-add-member --hosts should not allow invalid characters"
+		else
+			rlPass "BZ 797256 not found for ipa netgroup-add-member --hosts with other invalid characters"
+		fi
+		rlRun "ipa netgroup-del netgroup_bz_797256_2"
+
+		#### test3	
+		rlRun "ipa netgroup-add netgroup_bz_797256_3 --desc=desc3"
+		rlRun "ipa netgroup-mod netgroup_bz_797256_3 --setattr=externalhost=anotherbadhost? > $tmpout 2>&1"
+		if [ $(grep "anotherbadhost\?" $tmpout|wc -l) -gt 0 ]; then
+			rlFail "BZ 797256 Found...ipa netgroup-add-member --hosts should not allow invalid characters"
+		else
+			rlPass "BZ 797256 not found for ipa netgroup-add-member --hosts with ?"
+		fi
+		rlRun "ipa netgroup-del netgroup_bz_797256_3"
+		
+		#### test4
+		rlRun "ipa netgroup-add netgroup_bz_797256_4 --desc=desc4"
+		rlRun "ipa netgroup-mod netgroup_bz_797256_4 --addattr=externalhost=anotherbadhost\!\@\#\$\%\^\&\*\\(\\) > $tmpout 2>&1" 1
+		if [ $(grep "anotherbadhost\!\@\#\$\%\^\&\*\\(\\)" $tmpout|wc -l) -gt 0 ]; then
+			rlFail "BZ 797256 Found...ipa netgroup-add-member --hosts should not allow invalid characters"
+		else
+			rlPass "BZ 797256 not found for ipa netgroup-add-member --hosts with other invalid characters"
+		fi
+		rlRun "ipa netgroup-del netgroup_bz_797256_4"
 		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd
 }
