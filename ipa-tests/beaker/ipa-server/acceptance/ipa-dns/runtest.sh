@@ -954,6 +954,26 @@ EOF
 
 	rlPhaseEnd
 
+	rlPhaseStartTest "ipa-dns-161: Bug 797561 - Bool attributes used in setattr/addattr/delattr options are not encoded properly"
+
+		rlLog "Verifies https://bugzilla.redhat.com/show_bug.cgi?id=797561"
+
+		rlRun "ipa dnszone-add example.com --name-server=$HOSTNAME --admin-email=admin@example.com"
+                rlRun "ipa dnszone-show example.com --all --raw | grep -i \"idnsallowdynupdate: FALSE\""
+		rlRun "ipa dnszone-mod example.com --delattr=idnsAllowDynUpdate=FALSE"
+
+		rlRun "ipa dnszone-show example.com --all --raw | grep -i idnsallowdynupdate" 1
+
+		rlRun "ipa dnszone-mod example.com --addattr=idnsAllowDynUpdate=true"
+		rlRun "ipa dnszone-show example.com --all --raw | grep -i \"idnsallowdynupdate: TRUE\""
+
+		rlRun "ipa dnszone-mod example.com --setattr=idnsAllowDynUpdate=false"
+		rlRun "ipa dnszone-show example.com --all --raw | grep -i \"idnsallowdynupdate: FALSE\""
+
+		rlRun "ipa dnszone-del example.com"
+                rlRun "service named restart"
+
+	rlPhaseEnd
 
 	rlJournalPrintText
 	report=/tmp/rhts.report.$RANDOM.txt
