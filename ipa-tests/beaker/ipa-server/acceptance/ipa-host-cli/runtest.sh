@@ -679,9 +679,9 @@ rlPhaseStartTest "ipa-host-cli-38: find more hosts than exist"
    rlPhaseEnd
 
    rlPhaseStartTest "ipa-host-cli-62: search with not-man-by-hosts when Managed By a Host"
-        myhost1=mytesthost1.$DOMAIN
-        myhost2=mytesthost2.$DOMAIN
-        myhost3=mytesthost3.$DOMAIN
+        myhost1=nmanbyhost1.$DOMAIN
+        myhost2=nmanbyhost2.$DOMAIN
+        myhost3=nmanbyhost3.$DOMAIN
         addHost $myhost1
         addHost $myhost2
         addHost $myhost3
@@ -709,10 +709,10 @@ rlPhaseStartTest "ipa-host-cli-38: find more hosts than exist"
     rlPhaseEnd
  
     rlPhaseStartTest "ipa-host-cli-64: search with not-man-by-hosts when host is Managed by multiple Hosts"
-        myhost1=mytesthost1.$DOMAIN
-        myhost2=mytesthost2.$DOMAIN
-        myhost3=mytesthost3.$DOMAIN
-        myhost4=mytesthost4.$DOMAIN
+        myhost1=nmanbyhost1.$DOMAIN
+        myhost2=nmanbyhost2.$DOMAIN
+        myhost3=nmanbyhost3.$DOMAIN
+        myhost4=nmanbyhost4.$DOMAIN
         addHost $myhost4
         rlRun "addHostManagedBy \"$myhost2, $myhost3, $myhost4\" $myhost1" 0 "Adding Managed By Hosts"
         rlRun "verifyHostAttr $myhost1 \"Managed by\" \"$myhost1, $myhost2, $myhost3, $myhost4\""
@@ -745,10 +745,10 @@ rlPhaseStartTest "ipa-host-cli-38: find more hosts than exist"
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-host-cli-65: search with not-man-by-host when Multiple Managed By Hosts removed"
-        myhost1=mytesthost1.$DOMAIN
-        myhost2=mytesthost2.$DOMAIN
-        myhost3=mytesthost3.$DOMAIN
-        myhost4=mytesthost4.$DOMAIN
+        myhost1=nmanbyhost1.$DOMAIN
+        myhost2=nmanbyhost2.$DOMAIN
+        myhost3=nmanbyhost3.$DOMAIN
+        myhost4=nmanbyhost4.$DOMAIN
         rlRun "removeHostManagedBy \"$myhost2, $myhost3, $myhost4\" $myhost1" 0 "Removing Managed By Hosts"
         rlRun "verifyHostAttr $myhost1 \"Managed by\" $myhost1"
         ipa host-find --not-man-by-hosts=$myhost2 > /tmp/notmanbyhosts_$myhost2.out
@@ -784,10 +784,10 @@ rlPhaseStartTest "ipa-host-cli-38: find more hosts than exist"
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-host-cli-66: search with not-man-by-hosts when Manages multiple Hosts"
-        myhost1=mytesthost1.$DOMAIN
-        myhost2=mytesthost2.$DOMAIN
-        myhost3=mytesthost3.$DOMAIN
-        myhost4=mytesthost4.$DOMAIN
+        myhost1=nmanbyhost1.$DOMAIN
+        myhost2=nmanbyhost2.$DOMAIN
+        myhost3=nmanbyhost3.$DOMAIN
+        myhost4=nmanbyhost4.$DOMAIN
         addHost $myhost1
         addHost $myhost2
         addHost $myhost3
