@@ -684,7 +684,7 @@ rlPhaseStartTest "ipa-host-cli-38: find more hosts than exist"
         addHost $myhost3
         rlRun "addHostManagedBy $myhost2 $myhost1" 0 "Adding Managed By Host"
         rlRun "verifyHostAttr $myhost1 \"Managed by\" \"$myhost1, $myhost2\""
-        ipa host-find --not-man-by-hosts=$myhost2 > /tmp/notmabynhosts_find.out
+        ipa host-find --not-man-by-hosts=$myhost2 > /tmp/notmanbyhosts_find.out
 	result=`cat /tmp/notmanbyhosts_find.out | grep "Number of entries returned"`
 	number=`echo $result | cut -d " " -f 5`
         rlAssertGreaterOrEqual "Number of entries returned is >= 0" "$number" "0"
