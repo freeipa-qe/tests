@@ -585,7 +585,7 @@ rlPhaseStartTest "ipa-host-cli-38: find more hosts than exist"
 	rlAssertGrep "Host name: $myhost1" "/tmp/manbyhosts_find.out"
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-host-cli-57: search a host when removed Managed By Host"
+    rlPhaseStartTest "ipa-host-cli-57: search a host when Managed By Host is removed"
         rlRun "removeHostManagedBy $myhost2 $myhost1" 0 "Removing Managed By Host"
         rlRun "verifyHostAttr $myhost1 \"Managed by\" $myhost1"
 	ipa host-find --man-by-hosts=$myhost2 > /tmp/manbyhosts_removed.out
@@ -663,6 +663,9 @@ rlPhaseStartTest "ipa-host-cli-38: find more hosts than exist"
 	rlAssertGrep "Host name: $myhost3" "/tmp/manbyhosts_multi.out"
 	rlAssertGrep "Host name: $myhost2" "/tmp/manbyhosts_multi.out"
 	rlAssertGrep "Host name: $myhost1" "/tmp/manbyhosts_multi.out"
+        rlRun "removeHostManagedBy $myhost2 $myhost1" 0 "Removing Managed By Host"
+        rlRun "removeHostManagedBy $myhost2 $myhost3" 0 "Removing Managed By Host"
+        rlRun "removeHostManagedBy $myhost2 $myhost4" 0 "Removing Managed By Host"
 	deleteHost $myhost1
         deleteHost $myhost2
         deleteHost $myhost3
@@ -803,6 +806,9 @@ rlPhaseStartTest "ipa-host-cli-38: find more hosts than exist"
         rlAssertNotGrep "Host name: $myhost3" "/tmp/notmanbyhosts_multi.out"
         rlAssertNotGrep "Host name: $myhost2" "/tmp/notmanbyhosts_multi.out"
         rlAssertNotGrep "Host name: $myhost1" "/tmp/notmanbyhosts_multi.out"
+        rlRun "removeHostManagedBy $myhost2 $myhost1" 0 "Removing Managed By Host"
+        rlRun "removeHostManagedBy $myhost2 $myhost3" 0 "Removing Managed By Host"
+        rlRun "removeHostManagedBy $myhost2 $myhost4" 0 "Removing Managed By Host"
         deleteHost $myhost1
         deleteHost $myhost2
         deleteHost $myhost3
