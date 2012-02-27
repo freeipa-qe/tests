@@ -5,8 +5,10 @@
 installMaster()
 {
    rlPhaseStartTest "Install IPA MASTER Server"
-	rlRun "service ntpd stop" 0 "Stopping the ntp server"
-	rlRun "ntpdate $NTPSERVER" 0 "Synchronzing clock with valid time server"
+	rlLog "Stopping ntpd service"
+	service ntpd stop
+	rlLog "Synchronizing time to $NTPSERVER"
+	ntpdate $NTPSERVER
 	if [[ "$IPv6SETUP" != "TRUE" ]] ; then
 		rlRun "fixHostFile" 0 "Set up /etc/hosts"
 		rlRun "fixhostname" 0 "Fix hostname"
@@ -74,11 +76,13 @@ fi
 installSlave()
 {
    rlPhaseStartSetup "Install IPA REPLICA Server"
-	rlRun "service ntpd stop" 0 "Stopping the ntp server"
+        rlLog "Stopping ntpd service"
+        service ntpd stop
+        rlLog "Synchronizing time to $NTPSERVER"
+        ntpdate $NTPSERVER
 	# stop the firewall
         service iptables stop
 	service ip6tables stop
-	rlRun "ntpdate $NTPSERVER" 0 "Synchronzing clock with valid time server"
         rlRun "AddToKnownHosts $MASTER" 0 "Adding master to known hosts"
         cd /dev/shm/
         hostname_s=$(hostname -s)
@@ -128,8 +132,10 @@ installSlave()
 installClient()
 {
    rlPhaseStartSetup "Install IPA Client"
-	rlRun "service ntpd stop" 0 "Stopping the ntp server"
-	rlRun "ntpdate $NTPSERVER" 0 "Synchronzing clock with corp time server"
+        rlLog "Stopping ntpd service"
+        service ntpd stop
+        rlLog "Synchronizing time to $NTPSERVER"
+        ntpdate $NTPSERVER
 	rlLog "SKIPINSTALL: $SKIPINSTALL"
 	if [[ "$SKIPINSTALL" != "TRUE" ]] ; then
 		if [[ "$IPv6SETUP" != "TRUE" ]] ; then
