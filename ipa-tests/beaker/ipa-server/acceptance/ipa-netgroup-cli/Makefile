@@ -29,7 +29,7 @@ export TESTVERSION=1.0
 
 BUILT_FILES=
 
-FILES=$(METADATA) runtest.sh Makefile PURPOSE t.netgroups.sh
+FILES=$(METADATA) runtest.sh Makefile PURPOSE t.netgroups.sh t.netgroups.bug.sh
 
 .PHONY: all install download clean
 
