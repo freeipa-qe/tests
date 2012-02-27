@@ -766,7 +766,7 @@ netgroup_mod_positive()
 	rlPhaseStartTest "ipa-netgroup-033-1: Delete one memberHost from netgroup"
 		host2="host2.$DOMAIN"
 		member2="fqdn=$host2,cn=computers,cn=accounts,$BASEDN"
-		rlRun "ipa netgroup-mod $ngroup1 --delattr=memberHost=\"$member2\" $ngroup1" 0 "deleting one memberhost from $ngroup1"
+		rlRun "ipa netgroup-mod $ngroup1 --delattr=memberHost=\"$member2\"" 0 "deleting one memberhost from $ngroup1"
 		rlRun "ipa netgroup-show $ngroup1 | grep \"Member Host\" | grep -v \"$host2\"" 0 "Verify memberHost was deleted"
 	rlPhaseEnd
 
@@ -1037,7 +1037,7 @@ netgroup_mod_negative()
 	rlPhaseEnd
 
 #### memberof
-	rlPhaseStartTest "ipa-netgroup-042-4: addattr and setattr on memberof - Insufficient access"
+	rlPhaseStartTest "ipa-netgroup-042-4: Invalid addattr and setattr on memberof - Insufficient access"
 		#### test1 
 		ngroup2id=$(ipa netgroup-show $ngroup2 --all --raw|grep ipauniqueid:|awk '{print $2}')
 		rlRun "ipa netgroup-mod $ngroup1 --setattr=memberof=ipauniqueid=$ngroup2id,cn=ng,cn=alt,$BASEDN > $tmpout 2>&1" 1
@@ -1049,10 +1049,30 @@ netgroup_mod_negative()
 	rlPhaseEnd
 	
 #### externalhost
-	rlPhaseStartTest "ipa-netgroup-042-5: addattr for externalhost already in netgroup"
+	rlPhaseStartTest "ipa-netgroup-042-5: Invalid addattr for externalhost already in netgroup"
 		rlRun "ipa netgroup-mod $ngroup1 --setattr=externalhost=$host1"
 		rlRun "ipa netgroup-mod $ngroup1 --addattr=externalhost=$host1 > $tmpout 2>&1" 1
 		rlAssertGrep "ipa: ERROR: no modifications to be performed" $tmpout
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-netgroup-042-6: Invalid setattr and addattr for externalhost with invalid characters (BZ 797256)"
+		rlRun "ipa netgroup-mod $ngroup1 --setattr=externalhost=badhost? > $tmpout 2>&1" 1
+		rlRun "cat $tmpout"
+		rlAssertGrep "NEED Error message here...should not work" $tmpout
+		if [ $(grep "badhost\?" $tmpout|wc -l) -gt 0 ]; then
+			rlFail "BZ 797256 Found...ipa netgroup-add-member --hosts should not allow invalid characters"
+			rlLog  "deleting invalid entry"
+			rlRun  "ipa netgroup-remove-member $ngroup1 --hosts=badhost?"
+		fi
+
+		rlRun "ipa netgroup-mod $ngroup1 --addattr=externalhost=anotherbadhost\!\@\#\$\%\^\&\*\\(\\) > $tmpout 2>&1" 1
+		rlRun "cat $tmpout"
+		rlAssertGrep "NEED Error message here...should not work" $tmpout
+		if [ $(grep "anotherbadhost\!\@\#\$\%\^\&\*\\(\\)" $tmpout|wc -l) -gt 0 ]; then
+			rlFail "BZ 797256 Found...ipa netgroup-add-member --hosts should not allow invalid characters"
+			rlLog  "deleting invalid entry"
+			rlRun  "ipa netgroup-remove-member $ngroup1 --hosts=anotherbadhost\!\@\#\$\%\^\&\*\\(\\)"
+		fi
 	rlPhaseEnd
 		
 }
@@ -1063,14 +1083,14 @@ netgroup_mod_negative()
 # positive show netgroups tests
 del_netgroups_positive()
 {
-        rlPhaseStartTest  "ipa-netgroup-043: Delete Netgroups"
-                # verifying hostgroup-del
+	rlPhaseStartTest  "ipa-netgroup-043: Delete Netgroups"
+		# verifying hostgroup-del
 		for item in $ngroup1 $ngroup2 ; do
-                	rlRun "ipa netgroup-del $item" 0 "Deleting $item"
-                	# Verify
-                	rlRun "ipa netgroup-show $item" 2 "Verifying that $item doesn't deleted"
+			rlRun "ipa netgroup-del $item" 0 "Deleting $item"
+			# Verify
+			rlRun "ipa netgroup-show $item" 2 "Verifying that $item doesn't deleted"
 		done
-        rlPhaseEnd
+	rlPhaseEnd
 }
 
 # negative show netgroups tests

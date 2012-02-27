@@ -76,7 +76,7 @@ netgroup_bz_788625()
 		rlRun "echo $ADMINPW | ipa-nis-manage enable" 0,2
 		rlRun "service rpcbind restart"
 		rlRun "service dirsrv restart"
-		rlRun "yum install yp-tools"
+		rlRun "yum -y install yp-tools"
 		if [ $(ypcat -d $DOMAIN -h localhost -k netgroup|grep "^netgroup_bz_788625_test $"|wc -l) -gt 0 ]; then
 			rlFail "BZ 788625 found ...IPA nested netgroups not seen from ypcat"
 		else
