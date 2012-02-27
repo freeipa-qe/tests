@@ -684,6 +684,7 @@ rlPhaseStartTest "ipa-host-cli-38: find more hosts than exist"
         myhost3=nmanbyhost3.$DOMAIN
         addHost $myhost1
         addHost $myhost2
+        addHost $myhost3
         ipa host-find --not-man-by-hosts=$myhost2 > /tmp/notmanbyhosts_test1.out
         rlRun "addHostManagedBy $myhost2 $myhost1" 0 "Adding Managed By Host"
         rlRun "verifyHostAttr $myhost1 \"Managed by\" \"$myhost1, $myhost2\""
