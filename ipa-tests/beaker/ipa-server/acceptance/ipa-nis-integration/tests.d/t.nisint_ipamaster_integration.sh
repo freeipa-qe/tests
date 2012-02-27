@@ -79,6 +79,7 @@ nisint_ipamaster_integration_envsetup()
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "yum -y install yp-tools" 0 "Installing yp-tools for ypcat command"
+		rlRun "echo '$NISMASTER_IP $NISMASTER' >> /etc/hosts"
 		[ -f $tmpout ] && rm $tmpout
 	rlPhaseEnd
 }
