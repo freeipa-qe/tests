@@ -691,6 +691,7 @@ rlPhaseStartTest "ipa-host-cli-38: find more hosts than exist"
 	result=`cat /tmp/notmanbyhosts_find.out | grep "Number of entries returned"`
 	number=`echo $result | cut -d " " -f 5`
         rlAssertGreaterOrEqual "Number of entries returned is >= 0" "$number" "0"
+	rlLog `cat /tmp/notmanbyhosts_find.out`
 	result2=`cat /tmp/notmanbyhosts_find.out | grep "Host name: $myhost2"`
         rlAssertNotEquals "Host name: $myhost2" "$result2" "Host name: $myhost2"
 	result3=`cat /tmp/notmanbyhosts_find.out | grep "Host name: $myhost1"`
@@ -706,6 +707,7 @@ rlPhaseStartTest "ipa-host-cli-38: find more hosts than exist"
 	result=`cat /tmp/notmanbyhosts_removed.out | grep "Number of entries returned"`
 	number=`echo $result | cut -d " " -f 5`
         rlAssertGreaterOrEqual "Number of entries returned is >= 1" "$number" "1"
+	rlLog `cat /tmp/notmanbyhosts_removed.out`
 	result2=`cat /tmp/notmanbyhosts_removed.out | grep "Host name: $myhost1"`
         rlAssertEquals "Host name: $myhost1" "$result2" "Host name: $myhost1"
 	result3=`cat /tmp/notmanbyhosts_removed.out | grep "Host name: $myhost3"`
@@ -726,28 +728,31 @@ rlPhaseStartTest "ipa-host-cli-38: find more hosts than exist"
 	result=`cat /tmp/notmanbyhosts_$myhost2.out | grep "Number of entries returned"`
 	number=`echo $result | cut -d " " -f 5`
         rlAssertGreaterOrEqual "Number of entries returned is >= 2" "$number" "2"
-        rlAssertNotGrep "Host name: $myhost2" "/tmp/notmanbyhosts_$myhost2.out"
-        rlAssertNotGrep "Host name: $myhost1" "/tmp/notmanbyhosts_$myhost2.out"
-        rlAssertGrep "Host name: $myhost3" "/tmp/notmanbyhosts_$myhost2.out"
-        rlAssertGrep "Host name: $myhost4" "/tmp/notmanbyhosts_$myhost2.out"
+	rlLog `cat /tmp/notmanbyhosts_$myhost2.out`
+        rlAssertNotGrep "Host name: $myhost2" "/tmp/notmanbyhosts_$myhost2.out" -i
+        rlAssertNotGrep "Host name: $myhost1" "/tmp/notmanbyhosts_$myhost2.out" -i
+        rlAssertGrep "Host name: $myhost3" "/tmp/notmanbyhosts_$myhost2.out" -i
+        rlAssertGrep "Host name: $myhost4" "/tmp/notmanbyhosts_$myhost2.out" -i
 
         ipa host-find --not-man-by-hosts=$myhost3 > /tmp/notmanbyhosts_$myhost3.out
 	result=`cat /tmp/notmanbyhosts_$myhost3.out | grep "Number of entries returned"`
 	number=`echo $result | cut -d " " -f 5`
         rlAssertGreaterOrEqual "Number of entries returned is >= 2" "$number" "2"
-        rlAssertNotGrep "Host name: $myhost3" "/tmp/notmanbyhosts_$myhost3.out"
-        rlAssertNotGrep "Host name: $myhost1" "/tmp/notmanbyhosts_$myhost3.out"
-        rlAssertGrep "Host name: $myhost2" "/tmp/notmanbyhosts_$myhost3.out"
-        rlAssertGrep "Host name: $myhost4" "/tmp/notmanbyhosts_$myhost3.out"
+	rlLog `cat /tmp/notmanbyhosts_$myhost3.out`
+        rlAssertNotGrep "Host name: $myhost3" "/tmp/notmanbyhosts_$myhost3.out" -i
+        rlAssertNotGrep "Host name: $myhost1" "/tmp/notmanbyhosts_$myhost3.out" -i
+        rlAssertGrep "Host name: $myhost2" "/tmp/notmanbyhosts_$myhost3.out" -i
+        rlAssertGrep "Host name: $myhost4" "/tmp/notmanbyhosts_$myhost3.out" -i
 
         ipa host-find --not-man-by-hosts=$myhost4 > /tmp/notmanbyhosts_$myhost4.out
 	result=`cat /tmp/notmanbyhosts_$myhost4.out | grep "Number of entries returned"`
 	number=`echo $result | cut -d " " -f 5`
         rlAssertGreaterOrEqual "Number of entries returned is >= 2" "$number" "2"
-        rlAssertNotGrep "Host name: $myhost4" "/tmp/notmanbyhosts_$myhost4.out"
-        rlAssertNotGrep "Host name: $myhost1" "/tmp/notmanbyhosts_$myhost4.out"
-        rlAssertGrep "Host name: $myhost2" "/tmp/notmanbyhosts_$myhost4.out"
-        rlAssertGrep "Host name: $myhost3" "/tmp/notmanbyhosts_$myhost4.out"
+	rlLog `cat /tmp/notmanbyhosts_$myhost4.out`
+        rlAssertNotGrep "Host name: $myhost4" "/tmp/notmanbyhosts_$myhost4.out" -i
+        rlAssertNotGrep "Host name: $myhost1" "/tmp/notmanbyhosts_$myhost4.out" -i
+        rlAssertGrep "Host name: $myhost2" "/tmp/notmanbyhosts_$myhost4.out" -i
+        rlAssertGrep "Host name: $myhost3" "/tmp/notmanbyhosts_$myhost4.out" -i
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-host-cli-65: search with not-man-by-host when Multiple Managed By Hosts removed"
@@ -761,28 +766,28 @@ rlPhaseStartTest "ipa-host-cli-38: find more hosts than exist"
 	result=`cat /tmp/notmanbyhosts_$myhost2.out | grep "Number of entries returned"`
 	number=`echo $result | cut -d " " -f 5`
         rlAssertGreaterOrEqual "Number of entries returned is >= 3" "$number" "3"
-        rlAssertNotGrep "Host name: $myhost2" "/tmp/notmanbyhosts_$myhost2.out"
-        rlAssertGrep "Host name: $myhost4" "/tmp/notmanbyhosts_$myhost2.out"
-        rlAssertGrep "Host name: $myhost3" "/tmp/notmanbyhosts_$myhost2.out"
-        rlAssertGrep "Host name: $myhost1" "/tmp/notmanbyhosts_$myhost2.out"
+        rlAssertNotGrep "Host name: $myhost2" "/tmp/notmanbyhosts_$myhost2.out" -i
+        rlAssertGrep "Host name: $myhost4" "/tmp/notmanbyhosts_$myhost2.out" -i
+        rlAssertGrep "Host name: $myhost3" "/tmp/notmanbyhosts_$myhost2.out" -i
+        rlAssertGrep "Host name: $myhost1" "/tmp/notmanbyhosts_$myhost2.out" -i
 
         ipa host-find --not-man-by-hosts=$myhost3 > /tmp/notmanbyhosts_$myhost3.out
 	result=`cat /tmp/notmanbyhosts_$myhost3.out | grep "Number of entries returned"`
         number=`echo $result | cut -d " " -f 5`
         rlAssertGreaterOrEqual "Number of entries returned is >= 3" "$number" "3"
-        rlAssertNotGrep "Host name: $myhost3" "/tmp/notmanbyhosts_$myhost3.out"
-        rlAssertGrep "Host name: $myhost4" "/tmp/notmanbyhosts_$myhost3.out"
-        rlAssertGrep "Host name: $myhost2" "/tmp/notmanbyhosts_$myhost3.out"
-        rlAssertGrep "Host name: $myhost1" "/tmp/notmanbyhosts_$myhost3.out"
+        rlAssertNotGrep "Host name: $myhost3" "/tmp/notmanbyhosts_$myhost3.out" -i
+        rlAssertGrep "Host name: $myhost4" "/tmp/notmanbyhosts_$myhost3.out" -i
+        rlAssertGrep "Host name: $myhost2" "/tmp/notmanbyhosts_$myhost3.out" -i
+        rlAssertGrep "Host name: $myhost1" "/tmp/notmanbyhosts_$myhost3.out" -i
 
         ipa host-find --not-man-by-hosts=$myhost4 > /tmp/notmanbyhosts_$myhost4.out
 	result=`cat /tmp/notmanbyhosts_$myhost4.out | grep "Number of entries returned"`
         number=`echo $result | cut -d " " -f 5`
         rlAssertGreaterOrEqual "Number of entries returned is >= 3" "$number" "3"
-        rlAssertNotGrep "Host name: $myhost4" "/tmp/notmanbyhosts_$myhost4.out"
-        rlAssertGrep "Host name: $myhost3" "/tmp/notmanbyhosts_$myhost4.out"
-        rlAssertGrep "Host name: $myhost2" "/tmp/notmanbyhosts_$myhost4.out"
-        rlAssertGrep "Host name: $myhost1" "/tmp/notmanbyhosts_$myhost4.out"
+        rlAssertNotGrep "Host name: $myhost4" "/tmp/notmanbyhosts_$myhost4.out" -i
+        rlAssertGrep "Host name: $myhost3" "/tmp/notmanbyhosts_$myhost4.out" -i
+        rlAssertGrep "Host name: $myhost2" "/tmp/notmanbyhosts_$myhost4.out" -i
+        rlAssertGrep "Host name: $myhost1" "/tmp/notmanbyhosts_$myhost4.out" -i
         deleteHost $myhost1
         deleteHost $myhost2
         deleteHost $myhost3
