@@ -684,9 +684,10 @@ rlPhaseStartTest "ipa-host-cli-38: find more hosts than exist"
         myhost3=nmanbyhost3.$DOMAIN
         addHost $myhost1
         addHost $myhost2
-        addHost $myhost3
+        ipa host-find --not-man-by-hosts=$myhost2 > /tmp/notmanbyhosts_test1.out
         rlRun "addHostManagedBy $myhost2 $myhost1" 0 "Adding Managed By Host"
         rlRun "verifyHostAttr $myhost1 \"Managed by\" \"$myhost1, $myhost2\""
+	sleep 4
         ipa host-find --not-man-by-hosts=$myhost2 > /tmp/notmanbyhosts_find.out
 	result=`cat /tmp/notmanbyhosts_find.out | grep "Number of entries returned"`
 	number=`echo $result | cut -d " " -f 5`
@@ -702,6 +703,7 @@ rlPhaseStartTest "ipa-host-cli-38: find more hosts than exist"
  
     rlPhaseStartTest "ipa-host-cli-63: search a host when Managed By Host is removed"
         rlRun "removeHostManagedBy $myhost2 $myhost1" 0 "Removing Managed By Host"
+	sleep 4
         rlRun "verifyHostAttr $myhost1 \"Managed by\" $myhost1"
         ipa host-find --not-man-by-hosts=$myhost2 > /tmp/notmanbyhosts_removed.out
 	result=`cat /tmp/notmanbyhosts_removed.out | grep "Number of entries returned"`
@@ -724,6 +726,7 @@ rlPhaseStartTest "ipa-host-cli-38: find more hosts than exist"
         addHost $myhost4
         rlRun "addHostManagedBy \"$myhost2, $myhost3, $myhost4\" $myhost1" 0 "Adding Managed By Hosts"
         rlRun "verifyHostAttr $myhost1 \"Managed by\" \"$myhost1, $myhost2, $myhost3, $myhost4\""
+	sleep 4
         ipa host-find --not-man-by-hosts=$myhost2 > /tmp/notmanbyhosts_$myhost2.out
 	result=`cat /tmp/notmanbyhosts_$myhost2.out | grep "Number of entries returned"`
 	number=`echo $result | cut -d " " -f 5`
