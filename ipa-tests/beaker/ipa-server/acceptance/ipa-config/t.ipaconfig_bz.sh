@@ -34,13 +34,13 @@ ipaconfig_bugzillas()
 	rlPhaseEnd
 
 	rlPhaseStartTest "bz742601 ipa config-mod: update description for --emaildomain"
-		rlRun "ipa help config-mod > /tmp/bz742601.out 2>&1"
+		rlRun "ipa help config-mod > /tmp/bz742601.out 2>&1" 0
         	rlAssertGrep "\--emaildomain=STR     Default e-mail domain" "/tmp/bz742601.out"
 		rlAssertNotGrep "\--emaildomain=STR     Default e-mail domain for new users" "/tmp/bz742601.out"
 	rlPhaseEnd
 
 	rlPhaseStartTest "bz744205 ipa config-mod user search field blank - an internal error has occurred"
-		rlRun "ipa config-mod --usersearc= > /tmp/bz744205.out > 2>&1"
+		rlRun "ipa config-mod --usersearch= > /tmp/bz744205.out 2>&1" 0
 		rlAssertNotGroup "ipa: ERROR: an internal error has occurred" "/tmp/bz744205.out"
  	rlPhaseEnd
 }
