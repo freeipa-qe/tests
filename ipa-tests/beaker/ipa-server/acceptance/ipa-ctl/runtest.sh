@@ -54,6 +54,7 @@ getServicePIDs()
    ps -ef | grep slapd | grep PKI | awk '{print $2}' > /tmp/slapd_PKI.out
    ps -ef | grep slapd | grep -i $INSTANCE | awk '{print $2}' > /tmp/slapd_$INSTANCE.out
    ps -ef | grep pki-ca | grep tomcat | awk '{print $2}' > /tmp/pki-ca.out
+   ps -e | grep memcached | awk '{print $1}' > /tmp/memcached.out
 
    return 0
 }
@@ -106,6 +107,17 @@ rlJournalStart
                         rlFail "Process id found - kadmind PID $PID is still running"
                 else
                         rlPass "kadmind pid $PID not found"
+                fi
+        rlPhaseEnd
+
+	rlPhaseStartTest "ipa-ctl-04C: ensure that ipactl stop stopped memcached"
+                rlRun "ps xa | grep -v grep |grep memcached" 1 "Checking to ensure that ipactl stop stopped memcached"
+                PID=`cat /tmp/memcached.out`
+                ps -e | grep $PID
+                if [ $? -eq 0 ] ; then
+                        rlFail "Process id found - memcached PID $PID is still running"
+                else
+                        rlPass "memcached pid $PID not found"
                 fi
         rlPhaseEnd
 
@@ -188,6 +200,20 @@ rlJournalStart
                 fi
         rlPhaseEnd
 
+        rlPhaseStartTest "ipa-ctl-11C: ensure that ipactl start started memcached"
+                rlRun "ps xa | grep -v grep |grep memcached" 0 "Checking to ensure that ipactl start started memcached"
+                newPID=`ps -e | grep memcached | awk '{print $1}'`
+                rlLog "New memcached pid is $newPID"
+                oldPID=`cat /tmp/memcached.out | awk '{print $1}'`
+                rlLog "Old memcached pid is $oldPID"
+                if [ $newPID -eq $oldPID ] ; then
+                        rlFail "memcached did not restart"
+                else
+                        rlPass "memcached was restarted"
+                fi
+        rlPhaseEnd
+
+
 	rlPhaseStartTest "ipa-ctl-12: ensure that ipactl start started named"
 		rlRun "ps xa | grep -v grep |grep named" 0 "Checking to ensure that ipactl start started named"
 		newPID=`ps -e | grep named | awk '{print $1}'`
@@ -252,7 +278,7 @@ rlJournalStart
 
         rlPhaseStartTest "ipa-ctl-18A: ensure that ipactl restart started krb5kdcd"
                 rlRun "ps xa | grep -v grep |grep krb5kdc" 0 "Checking to ensure that ipactl start restarted krb5kdc"
-                newPID=`ps -ef | grep krb5kdc | awk '{print $2}'`
+                newPID=`ps -e | grep krb5kdc | awk '{print $1}'`
                 rlLog "New krb5kdc pid is $newPID"
                 oldPID=`cat /tmp/krb5kdc.out | awk '{print $1}'`
                 rlLog "Old krb5kdc pid is $oldPID"
@@ -265,7 +291,7 @@ rlJournalStart
 
         rlPhaseStartTest "ipa-ctl-18B: ensure that ipactl restart started kadmind"
                 rlRun "ps xa | grep -v grep |grep kadmind" 0 "Checking to ensure that ipactl start restarted kadmind"
-                newPID=`ps -ef | grep kadmind | awk '{print $2}'`
+                newPID=`ps -e | grep kadmind | awk '{print $1}'`
                 rlLog "New kadmind pid is $newPID"
                 oldPID=`cat /tmp/kadmind.out | awk '{print $1}'`
                 rlLog "Old kadmind pid is $oldPID"
@@ -273,6 +299,19 @@ rlJournalStart
                         rlFail "kadmind did not restart"
                 else
                         rlPass "kadmind was restarted"
+                fi
+        rlPhaseEnd
+
+        rlPhaseStartTest "ipa-ctl-18C: ensure that ipactl restart started memcached"
+                rlRun "ps xa | grep -v grep |grep memcached" 0 "Checking to ensure that ipactl start restarted memcached"
+                newPID=`ps -e | grep memcached | awk '{print $1}'`
+                rlLog "New memcached pid is $newPID"
+                oldPID=`cat /tmp/memcached.out | awk '{print $1}'`
+                rlLog "Old memcached pid is $oldPID"
+                if [ $newPID -eq $oldPID ] ; then
+                        rlFail "memcached did not restart"
+                else
+                        rlPass "memcached was restarted"
                 fi
         rlPhaseEnd
 
@@ -330,9 +369,13 @@ rlJournalStart
         rlPhaseEnd
 
 	rlPhaseStartTest "ipa-ctl-23: stop services as non-root user"
-		rlRun "su testuserqa -c 'ipactl stop'" 4 "Insufficient rights, starting service as nonprivileged user"
+		rlRun "su testuserqa -c 'ipactl stop' > /tmp/stopnonroot.out 2>&1" 0 "Insufficient rights, starting service as nonprivileged user"
+		rlAssertGrep "You must be root to run ipactl." "/tmp/stopnonroot.out"
 		rlRun "ps xa | grep -v grep |grep httpd" 0 "Checking to ensure that httpd is still running"
 		rlRun "ps xa | grep -v grep |grep named" 0 "Checking to ensure that named is still running"
+		rlRun "ps xa | grep -v grep |grep krb5kdc" 0 "Checking to ensure that krb5kdc is still running"
+		rlRun "ps xa | grep -v grep |grep kadmind" 0 "Checking to ensure that kadmind is still running"
+		rlRun "ps xa | grep -v grep |grep memcached" 0 "Checking to ensure that memcached is still running"
 		#rlRun "ps xa | grep -v grep |grep ipa_kpasswd" 0 "Checking to ensure that is still running"
 		rlRun "ps xa | grep -v grep |grep dirsrv| grep -i $INSTANCE" 0 "Checking to ensure that $INSTANCE DS instance is still running"
 		rlRun "ps xa | grep -v grep |grep dirsrv| grep -i PKI" 0 "Checking to ensure that PKI DS instance is still running"
@@ -341,9 +384,13 @@ rlJournalStart
 
         rlPhaseStartTest "ipa-ctl-24: start services as non-root user"
 		rlRun "ipactl stop" 0 "Stop services as root first"
-                rlRun "su testuserqa -c 'ipactl start'" 4 "Insufficient rights, starting service as nonprivileged user"
+                rlRun "su testuserqa -c 'ipactl start' > /tmp/startnonroot.out 2>&1" 0 "Insufficient rights, starting service as nonprivileged user"
+		rlAssertGrep "You must be root to run ipactl." "/tmp/startnonroot.out"
                 rlRun "ps xa | grep -v grep |grep httpd" 1 "Checking to ensure that httpd is NOT running"
                 rlRun "ps xa | grep -v grep |grep named" 1 "Checking to ensure that named is NOT running"
+		rlRun "ps xa | grep -v grep |grep krb5kdc" 1 "Checking to ensure that krb5kdc is NOT running"
+		rlRun "ps xa | grep -v grep |grep kadmind" 1 "Checking to ensure that kadmind is NOT running"
+		rlRun "ps xa | grep -v grep |grep memcached" 1 "Checking to ensure that memcached is NOT running"
                 #rlRun "ps xa | grep -v grep |grep ipa_kpasswd" 1 "Checking to ensure that is NOT running"
                 rlRun "ps xa | grep -v grep |grep dirsrv| grep -i $INSTANCE" 1 "Checking to ensure that $INSTANCE DS instance is NOT running"
                 rlRun "ps xa | grep -v grep |grep dirsrv| grep -i PKI" 1 "Checking to ensure that PKI DS instance is NOT running"
@@ -353,7 +400,8 @@ rlJournalStart
 rlPhaseStartTest "ipa-ctl-25: restart services as non-root user"
                 rlRun "ipactl start" 0 "Start services as root first"
 		getServicePIDs
-                rlRun "su testuserqa -c 'ipactl restart'" 4 "Insufficient rights, starting service as nonprivileged user"
+                rlRun "su testuserqa -c 'ipactl restart' > /tmp/restartnonroot.out 2>&1" 0 "Insufficient rights, starting service as nonprivileged user"
+		rlAssertGrep "You must be root to run ipactl." "/tmp/restartnonroot.out"
 		
 		#verify krb5kdc was not restarted
                 newPID=`ps -e | grep krb5kdc | awk '{print $1}'`
@@ -375,6 +423,16 @@ rlPhaseStartTest "ipa-ctl-25: restart services as non-root user"
                 else
                         rlFail "kadmind was restarted"
                 fi
+		#verify memcached was not restarted
+                 newPID=`ps -e | grep memcached | awk '{print $1}'`
+                 rlLog "previous memcached pid is $newPID"
+                 oldPID=`cat /tmp/memcached.out | awk '{print $1}'`
+                 rlLog "current memcached pid is $oldPID"
+                 if [ $newPID -eq $oldPID ] ; then
+                         rlPass "memcached did not restart"
+                 else
+                         rlFail "memcached was restarted"
+                 fi
 		# verify named was not restart
 		newPID=`ps -ef | grep pki-ca | grep tomcat | awk '{print $2}'`
                 rlLog "previous pki-cad pid is $newPID"
