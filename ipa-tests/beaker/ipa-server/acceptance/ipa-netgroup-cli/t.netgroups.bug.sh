@@ -37,6 +37,7 @@ netgroup_bugs()
 	netgroup_bz_796390
 	netgroup_bz_797237
 	netgroup_bz_797256
+	netgroup_bz_794882
 }
 
 netgroup_bz_772043()
@@ -326,6 +327,33 @@ netgroup_bz_797256()
 			rlPass "BZ 797256 not found for ipa netgroup-add-member --hosts with other invalid characters"
 		fi
 		rlRun "ipa netgroup-del netgroup_bz_797256_4"
+		[ -f $tmpout ] && rm -f $tmpout
+	rlPhaseEnd
+}
+
+netgroup_bz_794882()
+{
+	rlPhaseStartTest "netgroup_bz_794882: ipa netgroup-find --hosts=<hostname> not working (for external hosts)"
+		local tmpout=/tmp/errormsg.out
+		KinitAsAdmin
+		rlRun "ipa host-add ipahost.testrelm.com --force"
+		rlRun "ipa netgroup-add netgroup_bz_794882 --desc=desc1"
+		rlRun "ipa netgroup-add-member netgroup_bz_794882 --hosts=externalhost.external.com"
+		rlRun "ipa netgroup-find --hosts=externalhost.external.com > $tmpout 2>&1"
+		if [ $(grep "^0 netgroups matched$" $tmpout|wc -l) -gt 0 ]; then
+			rlFail "BZ 794882 found...ipa netgroup-find --hosts=<hostname> not working (for external hosts)"
+		else
+			rlPass "BZ 794882 not found"
+		fi
+		rlRun "ipa netgroup-add-member netgroup_bz_794882 --hosts=ipahost.testrelm.com"
+		rlRun "ipa netgroup-find --hosts=ipahost.testrelm.com > $tmpout 2>&1"
+		if [ $(grep "Host: ipahost.testrelm.com" $tmpout |wc -l) -gt 0 ]; then
+			rlPass "Member Host found.  Tech note for BZ 794882 valid"
+		else
+			rlFail "Member Host not found.  Tech note for BZ 794882 not valid"
+		fi
+		rlRun "ipa netgroup-del netgroup_bz_794882"
+		rlRun "ipa host-del ipahost.testrelm.com"
 		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd
 }
