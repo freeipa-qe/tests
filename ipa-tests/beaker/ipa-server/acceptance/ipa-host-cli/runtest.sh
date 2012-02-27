@@ -697,7 +697,7 @@ rlPhaseStartTest "ipa-host-cli-38: find more hosts than exist"
 	result3=`cat /tmp/notmanbyhosts_find.out | grep "Host name: $myhost1"`
         rlAssertNotEquals "Host name: $myhost1" "$result3" "Host name: $myhost1"
 	result4=`cat /tmp/notmanbyhosts_find.out | grep "Host name: $myhost3"`
-        rlAssertEquals "Host name: $myhost3" "$result4" "Host name: $myhost4"
+        rlAssertEquals "Host name: $myhost3" "$result4" "Host name: $myhost3"
     rlPhaseEnd
  
     rlPhaseStartTest "ipa-host-cli-63: search a host when Managed By Host is removed"
