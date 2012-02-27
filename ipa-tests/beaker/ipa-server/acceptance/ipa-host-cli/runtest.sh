@@ -691,9 +691,12 @@ rlPhaseStartTest "ipa-host-cli-38: find more hosts than exist"
 	result=`cat /tmp/notmanbyhosts_find.out | grep "Number of entries returned"`
 	number=`echo $result | cut -d " " -f 5`
         rlAssertGreaterOrEqual "Number of entries returned is >= 0" "$number" "0"
-        rlAssertNotGrep "Host name: $myhost2" "/tmp/notmanbyhosts_find.out"
-        rlAssertNotGrep "Host name: $myhost1" "/tmp/notmanbyhosts_find.out"
-        rlAssertGrep "Host name: $myhost3" "/tmp/notmanbyhosts_find.out"
+	result2=`cat /tmp/notmanbyhosts_find.out | grep "Host name: $myhost2"`
+        rlAssertNotEquals "Host name: $myhost2" "$result2" "Host name: $myhost2"
+	result3=`cat /tmp/notmanbyhosts_find.out | grep "Host name: $myhost1"`
+        rlAssertNotEquals "Host name: $myhost1" "$result3" "Host name: $myhost1"
+	result4=`cat /tmp/notmanbyhosts_find.out | grep "Host name: $myhost3"`
+        rlAssertEquals "Host name: $myhost3" "$result4" "Host name: $myhost4"
     rlPhaseEnd
  
     rlPhaseStartTest "ipa-host-cli-63: search a host when Managed By Host is removed"
@@ -703,9 +706,12 @@ rlPhaseStartTest "ipa-host-cli-38: find more hosts than exist"
 	result=`cat /tmp/notmanbyhosts_removed.out | grep "Number of entries returned"`
 	number=`echo $result | cut -d " " -f 5`
         rlAssertGreaterOrEqual "Number of entries returned is >= 1" "$number" "1"
-        rlAssertGrep "Host name: $myhost1" "/tmp/notmanbyhosts_removed.out"
-        rlAssertGrep "Host name: $myhost3" "/tmp/notmanbyhosts_removed.out"
-        rlAssertNotGrep "Host name: $myhost2" "/tmp/notmanbyhosts_removed.out"
+	result2=`cat /tmp/notmanbyhosts_removed.out | grep "Host name: $myhost1"`
+        rlAssertEquals "Host name: $myhost1" "$result2" "Host name: $myhost1"
+	result3=`cat /tmp/notmanbyhosts_removed.out | grep "Host name: $myhost3"`
+        rlAssertEquals "Host name: $myhost3" "$result3" "Host name: $myhost3"
+	result4=`cat /tmp/notmanbyhosts_removed.out | grep "Host name: $myhost2"`
+        rlAssertNotEquals "Host name: $myhost2" "$result4" "Host name: $myhost2"
     rlPhaseEnd
  
     rlPhaseStartTest "ipa-host-cli-64: search with not-man-by-hosts when host is Managed by multiple Hosts"
