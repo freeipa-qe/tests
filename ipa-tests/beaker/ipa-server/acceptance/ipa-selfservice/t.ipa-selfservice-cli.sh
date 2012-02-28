@@ -269,6 +269,7 @@ selfservice_find()
 	selfservice_find_1010  #test_scenario (negative test): [--permissions;negative;LIST]
 	selfservice_find_1011  #test_scenario (positive test): [--permissions;positive;LIST]
 	selfservice_find_1012  #test_scenario (positive test): [--raw]
+	selfservice_find_1013  #test_scenario (positive test): --pkey-only 
 	selfservice_find_envcleanup
 } #selfservice-find
 
@@ -496,6 +497,23 @@ selfservice_find_1012() # BZ 747693 -- ipa selfservice-find --raw returns "inter
 		[ -f $tmpout ] && rm $tmpout
 	rlPhaseEnd
 } #selfservice_find_1012
+
+selfservice_find_1013()
+{
+	rlPhaseStartTest "selfservice_find_1013 --pkey-only [positive test]"
+		KinitAsAdmin
+		attrs_TestValue="telephonenumber,mobile,pager,facsimiletelephonenumber" #attrs;positive;LIST
+		ipa_command_to_test="selfservice"
+		pkey_addstringa="--attrs=$attrs_TestValue"
+		pkey_addstringb="--attrs=$attrs_TestValue"
+		pkeyobja="selfservice_find_1013"
+		pkeyobjb="selfservice_find_1013b"
+		grep_string='Self-service\ name'
+		general_search_string=$pkeyobja
+		rlRun "pkey_return_check" 0 "running checks of --pkey-only in group-find"
+		Kcleanup
+	rlPhaseEnd
+} #selfservice_find_1013
 
 #END OF TEST CASE for [selfservice-find]
 

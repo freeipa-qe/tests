@@ -1004,6 +1004,17 @@ rlJournalStart
 	rlRun "ipa user-find --all --raw trex | grep memberof | grep $grp" 1 "making sure that the memberof entry was removed from user trex"
     rlPhaseEnd
 
+    rlPhaseStartTest "ipa-group-cli-90: check of --pkey-only"
+	ipa_command_to_test="group"
+	pkey_addstringa="--desc=junk-desc"
+	pkey_addstringb="--desc=junk-desc"
+	pkeyobja="39user"
+	pkeyobjb="39userb"
+	grep_string='Group\ name'
+	general_search_string=$pkeyobja
+	rlRun "pkey_return_check" 0 "running checks of --pkey-only in group-find"
+    rlPhaseEnd
+
     rlPhaseStartCleanup "ipa-group-cli-cleanup: Delete remaining users and group and Destroying admin credentials"
 	rlRun "ipa config-mod --searchrecordslimit=100" 0 "setting search records limit back to default"
 	rlRun "ipa user-del trex" 0 "Deleting user trex."

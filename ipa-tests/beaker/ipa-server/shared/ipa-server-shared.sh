@@ -22,6 +22,7 @@
 #	ftp_auth_failure
 #	interactive
 #	remoteExec
+#	pkey_return_check
 ######################################################################
 KINITEXEC=/usr/bin/kinit
 #######################################################################
@@ -754,3 +755,44 @@ set send_slow {1 .1}' > $expfile
 }
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# pkey_return_check
+	# Check that the pkey-only option seems to function of the ipa *-find cli option
+	# Required inputs are:
+	# ipa_command_to_test: This is the command we are testing, (user, group, service)
+	# pkey_addstringa: will be used as ipa $ipa_command_to_test-add $addstring $pkeyobja
+	# pkey_addstringb: will be used as ipa $ipa_command_to_test-add $addstring $pkeyobja
+	# pkeyobja - This is the username/groupname/object to create. this object must come up in 
+	#      the resuts when a find search string is run against "general-find-string".
+	#      This user/object must not exist on the system
+	# pkeyobjb - This is a second username/groupname/object to create. This object must also 
+	#      come up in the resuts when a find search string is run against "general-find-string"
+	#      This user/object must not exist on the system
+	# grep_string - This is the specific string that denotes the line to look for in the 
+	#      "ipa *-find --pkey-only" output
+	# general_search_string - This string will be used as "ipa *-find --pkey-only $general_search_string"
+	#      Searching this way must return both pkeyobja and pkeyobjb.
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+pkey_return_check()
+{
+	creturn=0
+	rlLog "executing ipa $ipa_command_to_test-add $pkey_addstringa $pkeyobja"
+	rlRun "ipa $ipa_command_to_test-add $pkey_addstringa $pkeyobja" 0 "executing add string for pkey-only test"
+	let creturn=$creturn+$?
+	rlRun "ipa $ipa_command_to_test-add $pkey_addstringb $pkeyobjb" 0 "executing second add string for pkey-only test"
+	let creturn=$creturn+$?
+	rlLog "executing ipa $ipa_command_to_test-find --pkey-only $pkeyobja | grep $grep_string | grep $pkeyobja"
+	rlRun "ipa $ipa_command_to_test-find --pkey-only $pkeyobja | grep $grep_string | grep $pkeyobja" 0 "make sure the $ipa_command_to_test is returned when the --pkey-only option is specified"
+	let creturn=$creturn+$?
+	rlRun "ipa $ipa_command_to_test-find --pkey-only $general_search_string | grep $grep_string | grep $pkeyobja" 0 "make sure the $ipa_command_to_test is returned when the --pkey-only option is specified"
+	let creturn=$creturn+$?
+	rlRun "ipa $ipa_command_to_test-find --pkey-only $general_search_string | grep $grep_string | grep $pkeyobjb" 0 "make sure the $ipa_command_to_test is returned when the --pkey-only option is specified"
+	let creturn=$creturn+$?
+	rlRun "ipa $ipa_command_to_test-del $pkeyobja" 0 "deleting the first object from this test ($pkeyobja)"
+	let creturn=$creturn+$?
+	rlRun "ipa $ipa_command_to_test-del $pkeyobjb" 0 "deleting the first object from this test ($pkeyobjb)"
+	let creturn=$creturn+$?
+	return $creturn
+}
+

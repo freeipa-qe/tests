@@ -189,6 +189,7 @@ PACKAGE="ipa-server"
 		"sudorule-find_011"
 		#"sudorule-find_012"
 		"sudorule-find_013"
+		"sudorule-find_014"
 		
 		"sudorule_del_001"
 		"sudorule_del_002"

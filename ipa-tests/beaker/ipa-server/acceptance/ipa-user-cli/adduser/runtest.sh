@@ -434,6 +434,18 @@ rlJournalStart
 	ipa user-del $rusr&
     rlPhaseEnd
 
+
+rlPhaseStartTest "ipa-user-cli-add-037: check of --pkey-only in user add"
+	ipa_command_to_test="user"
+	pkey_addstringa="--first fnamla --last lastna"
+	pkey_addstringb="--first fnamlb --last lastnb"
+	pkeyobja="39user"
+	pkeyobjb="39userb"
+	grep_string='User\ login'
+	general_search_string=$pkeyobja
+	rlRun "pkey_return_check" 0 "running checks of --pkey-only in group-find"
+    rlPhaseEnd
+
     rlPhaseStartTest "bug748110: Always set a non-zero max ssf"
 	rlLog "Verifies https://bugzilla.redhat.com/show_bug.cgi?id=748110"
 

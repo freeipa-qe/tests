@@ -2367,7 +2367,19 @@ rlPhaseStartTest "sudorule-find_013: ipa sudorule-find --sizelimit"
 rlPhaseEnd
 }
 
+sudorule-find_014() {
+rlPhaseStartTest "sudorule-find_014: --pkey-only test of sudorule"
+	ipa_command_to_test="sudorule"
+	pkey_addstringa=""
+	pkey_addstringb=""
+	pkeyobja="sudorule1"
+	pkeyobjb="sudorule2"
+	grep_string='Rule\ name'
+	general_search_string=sudorule
+	rlRun "pkey_return_check" 0 "running checks of --pkey-only in sudorule-find"
+    rlPhaseEnd
 
+}
 sudorule_del_001() {
 
 rlPhaseStartTest "sudorule_del_001: ipa help sudodel"

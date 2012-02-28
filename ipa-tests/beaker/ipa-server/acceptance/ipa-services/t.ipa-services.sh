@@ -476,6 +476,7 @@ rlPhaseStartTest "service_find_001: ipa service-find help"
         rlAssertGrep "\--timelimit=INT       Time limit of search in seconds" "$TmpDir/service_find_001.out"
         rlAssertGrep "\--sizelimit=INT       Maximum number of entries returned" "$TmpDir/service_find_001.out"
         rlAssertGrep "\--all                 Retrieve and print all attributes from the server." "$TmpDir/service_find_001.out"
+        rlAssertGrep "\--pkey-only           Results should contain primary key attribute only" "$TmpDir/service_find_001.out"
         rlAssertGrep "\--raw                 Print entries as stored on the server." "$TmpDir/service_find_001.out"
         rlAssertGrep "\--man-by-hosts=STR    Search for services with these managed by hosts." "$TmpDir/service_find_001.out"
         rlAssertGrep "\--not-man-by-hosts=STR" "$TmpDir/service_find_001.out"
@@ -583,6 +584,21 @@ rlPhaseStartTest "service_find_008: ipa service-find with --timelimit option wit
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message - alpha characters."
         command="ipa service-find --timelimit=#*"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message - special characters."
+
+rlPhaseEnd
+}
+
+service_find_009() {
+
+rlPhaseStartTest "service_find_009: --pkey-only test of service"
+	ipa_command_to_test="service"
+	pkey_addstringa=""
+	pkey_addstringb=""
+	pkeyobja="tservice1/$HOSTNAME@$RELM"
+	pkeyobjb="tservice2/$HOSTNAME@$RELM"
+	grep_string='Principal:'
+	general_search_string=tservice
+	rlRun "pkey_return_check" 0 "running checks of --pkey-only in service-find"
 
 	#Cleaning up for service-find test cases
 	rlRun "ipa service-del $SERVICE/$HOSTNAME@$RELM"
