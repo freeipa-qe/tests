@@ -131,6 +131,11 @@ nisint_nisclient_integration_change_to_ipa_nismaster()
 		MASTER=$MASTER_S.$DOMAIN
 		NISCLIENT_S=$(echo $NISCLIENT|cut -f1 -d.)
 		NISCLIENT=$NISCLIENT_S.$DOMAIN
+
+		rlRun "service nscd stop"
+		rlRun "service ypbind stop"
+		rlRun "service rpcbind stop"
+
 		rlRun "cp /etc/yp.conf /etc/yp.conf.orig.$NISDOMAIN"
 		rlRun "sed -i 's/$NISDOMAIN/$DOMAIN/g' /etc/yp.conf"
 		rlRun "sed -i 's/$NISMASTER/$MASTER/g' /etc/yp.conf"
@@ -150,7 +155,9 @@ nisint_nisclient_integration_change_to_ipa_nismaster()
 
 		rlRun "cp /etc/hosts /etc/hosts.orig.$NISDOMAIN"
 		rlRun "sed -i s/^$NISCLIENT_IP.*$HOSTNAME_S.*$// /etc/hosts"
+		rlRun "sed -i s/^$MASTER_IP.*$MASTER_S.*$// /etc/hosts"
 		rlRun "echo '$NISCLIENT_IP $HOSTNAME_S.$DOMAIN $HOSTNAME_S' >> /etc/hosts"
+		rlRun "echo '$MASTER_IP $MASTER $MASTER_S' >> /etc/hosts"
 		rlRun "cat /etc/hosts"
 
 		rlRun "hostname $HOSTNAME_S.$DOMAIN"
@@ -159,9 +166,10 @@ nisint_nisclient_integration_change_to_ipa_nismaster()
 
 		rlRun "nisdomainname $DOMAIN"
 		rlRun "nisdomainname"
-		rlRun "service rpcbind restart"
-		rlRun "service ypbind restart"
-		rlRun "service nscd restart"
+		rlRun "host $MASTER"
+		rlRun "service rpcbind start"
+		rlRun "service ypbind start"
+		rlRun "service nscd start"
 		
 		myhostname=`hostname`
 		HOSTNAME_S=$(echo $HOSTNAME|cut -f1 -d.)
