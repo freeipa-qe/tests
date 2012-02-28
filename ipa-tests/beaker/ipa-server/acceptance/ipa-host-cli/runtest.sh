@@ -617,13 +617,13 @@ rlPhaseStartTest "ipa-host-cli-38: find more hosts than exist"
 	rlAssertGrep "Host name: $myhost4" "/tmp/manbyhosts_$myhost4.out"
 	rlAssertGrep "Host name: $myhost1" "/tmp/manbyhosts_$myhost4.out"
 	
-	rlRun "ipa host-find --man-by-hosts="$myhost2, $myhost3" > /tmp/manbyhosts_myhost23.out"
+	rlRun "ipa host-find --man-by-hosts=$myhost2, $myhost3 > /tmp/manbyhosts_myhost23.out"
         rlAssertGrep "Number of entries returned 3" "/tmp/manbyhosts_myhost23.out"
         rlAssertGrep "Host name: $myhost3" "/tmp/manbyhosts_myhost23.out"
         rlAssertGrep "Host name: $myhost2" "/tmp/manbyhosts_myhost23.out"
         rlAssertGrep "Host name: $myhost1" "/tmp/manbyhosts_myhost23.out"
 
-	rlRun "ipa host-find --man-by-hosts="$myhost2, $myhost3, $myhost4" > /tmp/manbyhosts_myhost234.out"
+	rlRun "ipa host-find --man-by-hosts=$myhost2, $myhost3, $myhost4 > /tmp/manbyhosts_myhost234.out"
         rlAssertGrep "Number of entries returned 4" "/tmp/manbyhosts_myhost234.out"
         rlAssertGrep "Host name: $myhost4" "/tmp/manbyhosts_myhost234.out"
         rlAssertGrep "Host name: $myhost3" "/tmp/manbyhosts_myhost234.out"
@@ -761,7 +761,7 @@ rlPhaseStartTest "ipa-host-cli-38: find more hosts than exist"
         rlAssertGrep "Host name: $myhost2" "/tmp/notmanbyhosts_$myhost4.out"
         rlAssertGrep "Host name: $myhost3" "/tmp/notmanbyhosts_$myhost4.out"
 
-        rlRun "ipa host-find --not-man-by-hosts="$myhost2, $myhost3" > /tmp/notmanbyhosts_myhost23.out"
+        rlRun "ipa host-find --not-man-by-hosts=$myhost2, $myhost3 > /tmp/notmanbyhosts_myhost23.out"
 	result=`cat /tmp/notmanbyhosts_myhost23.out | grep "Number of entries returned"`
 	number=`echo $result | cut -d " " -f 5`
         rlAssertGreaterOrEqual "Number of entries returned is >= 1" "$number" "1"
@@ -770,7 +770,7 @@ rlPhaseStartTest "ipa-host-cli-38: find more hosts than exist"
         rlAssertNotGrep "Host name: $myhost2" "/tmp/notmanbyhosts_myhost23.out" 
         rlAssertGrep "Host name: $myhost4" "/tmp/notmanbyhosts_myhost23.out" 
 
-        rlRun "ipa host-find --not-man-by-hosts="$myhost2, $myhost3, $myhost4" > /tmp/notmanbyhosts_myhost234.out"
+        rlRun "ipa host-find --not-man-by-hosts=$myhost2, $myhost3, $myhost4 > /tmp/notmanbyhosts_myhost234.out"
 	result=`cat /tmp/notmanbyhosts_myhost234.out | grep "Number of entries returned"`
 	number=`echo $result | cut -d " " -f 5`
         rlAssertGreaterOrEqual "Number of entries returned is >= 0" "$number" "0"
