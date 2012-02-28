@@ -99,7 +99,7 @@ nisint_goodusers1 (,gooduser1,)
 nisint_goodusers2 (,gooduser2,$NISDOMAIN)
 nisint_goodusers3 (-,gooduser3,)
 nisint_goodusers4 (-,gooduser4,$NISDOMAIN)
-nisint_badusers ng_badusers1 ng_badusers2 ng_badusers3 ng_badusers4
+nisint_badusers nisint_badusers1 nisint_badusers2 nisint_badusers3 nisint_badusers4
 nisint_badusers1 (,baduser1,)
 nisint_badusers2 (,baduser2,$NISDOMAIN)
 nisint_badusers3 (-,baduser3,)
