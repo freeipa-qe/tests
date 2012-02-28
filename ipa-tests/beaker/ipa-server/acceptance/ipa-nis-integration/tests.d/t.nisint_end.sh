@@ -54,8 +54,8 @@ nisint_end()
 		;;
 	"NISMASTER")
 		rlLog "Machine in recipe is NISMASTER"
-		rlLog "rhts-sync-block -s 'nisint_end_nisserver' $MASTER_IP"
-		rlRun "rhts-sync-block -s 'nisint_end_nisserver' $MASTER_IP"
+		rlLog "rhts-sync-block -s 'nisint_end_nismaster' $MASTER_IP"
+		rlRun "rhts-sync-block -s 'nisint_end_nismaster' $MASTER_IP"
 		rlLog "Ending NISMASTER tests."
 		rlRun "rhts-sync-set -s 'nisint_end' -m $NISMASTER_IP"
 		;;
