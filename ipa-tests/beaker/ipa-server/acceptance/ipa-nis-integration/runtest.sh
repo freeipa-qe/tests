@@ -127,7 +127,7 @@ rlJournalStart
 	# NIS Integration 
 	##############################################################
 	nisint_ipamaster_integration # Import NIS Maps/Data/Configuration...
-	#nisint_nisclient_integration # Switch NIS Config to point to IPA Master
+	nisint_nisclient_integration # Switch NIS Config to point to IPA Master
 	#nisint_user_tests
 	#nisint_group_tests
 	#nisint_netgroup_tests
