@@ -93,8 +93,8 @@ test01()
       newPwd="Secret456"
       command="echo $newPwd | ipa passwd $adminLogin"
       expmsg="ipa: ERROR: Insufficient access: Insufficient access rights"
-      rlRun "$command > /tmp/ipaRBAC_test01_1.log 2>&1" 1 "Verify error message when $login updates $adminLogin's password (bug 773759)"  
-     rlAssertGrep "$expmsg" "/tmp/ipaRBAC_test01_1.log"
+      rlRun "$command > $TmpDir/ipaRBAC_test01_1.log 2>&1" 1 "Verify error message when $login updates $adminLogin's password (bug 773759)"  
+     rlAssertGrep "$expmsg" "$TmpDir/ipaRBAC_test01_1.log"
    rlPhaseEnd
 
     # HelpDesk - can modify group memberships, modify users, reset password
@@ -107,8 +107,8 @@ test01()
       newInitPwd="two"
       command="ipa user-add --first=$newFirstName --last=$newLastName $newLogin"
       expmsg="ipa: ERROR: Insufficient access: Insufficient 'add' privilege to add the entry 'uid=two,cn=users,cn=accounts,dc=testrelm,dc=com'."
-      rlRun "$command > /tmp/ipaRBAC_test01_2.log 2>&1" 1 "Verify error message when $login adds a new user"
-     rlAssertGrep "$expmsg" "/tmp/ipaRBAC_test01_2.log"
+      rlRun "$command > $TmpDir/ipaRBAC_test01_2.log 2>&1" 1 "Verify error message when $login adds a new user"
+     rlAssertGrep "$expmsg" "$TmpDir/ipaRBAC_test01_2.log"
    rlPhaseEnd
 
       # update a lastname - can
@@ -270,8 +270,8 @@ test06()
       newLastName="oneone"
       command="modifyUser $newLogin $attrToUpdate $newLastName"
       expmsg="ipa: ERROR: Insufficient access: Insufficient 'write' privilege to the 'sn' attribute of entry 'uid=one,cn=users,cn=accounts,dc=testrelm,dc=com'"
-      rlRun "$command > /tmp/ipaRBAC_test06_1.log 2>&1" 1 "Verify error message when $login updates $newLogin's lastname" 
-     rlAssertGrep "$expmsg" "/tmp/ipaRBAC_test06_1.log"
+      rlRun "$command > $TmpDir/ipaRBAC_test06_1.log 2>&1" 1 "Verify error message when $login updates $newLogin's lastname" 
+     rlAssertGrep "$expmsg" "$TmpDir/ipaRBAC_test06_1.log"
    rlPhaseEnd
 
    rlPhaseStartTest "ipa-rbac-1001 - Set up role for user to allow only adding a user - Cannot reset user password"
@@ -279,7 +279,7 @@ test06()
       newPwd="oneone"
       command="echo $newPwd | ipa passwd $newLogin"
       expmsg="ipa: ERROR: Insufficient access: Insufficient access rights"
-      rlRun "$command > /tmp/ipaRBAC_test06_2.log 2>&1" 1 "Verify error message when $login updates $newLogin's password" 
-     rlAssertGrep "$expmsg" "/tmp/ipaRBAC_test06_2.log"
+      rlRun "$command > $TmpDir/ipaRBAC_test06_2.log 2>&1" 1 "Verify error message when $login updates $newLogin's password" 
+     rlAssertGrep "$expmsg" "$TmpDir/ipaRBAC_test06_2.log"
    rlPhaseEnd
 }

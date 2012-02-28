@@ -309,7 +309,7 @@ addPrivilege()
    fi
    rc=0
 
-   if [ -z $privilegeAttr ] ; then
+   if [ -z "$privilegeAttr" ] ; then
      rlLog "Executing: ipa privilege-add \"$privilegeName\" --desc=\"$privilegeDesc\""
      ipa privilege-add "$privilegeName" --desc="$privilegeDesc"
    else 
@@ -346,7 +346,7 @@ deletePrivilege()
 
 addPermissionToPrivilege()
 {
-    rlLog "Entering addPermissionToPrivilege with $2"
+  rlLog "Entering addPermissionToPrivilege with $2"
   permissionList="$1"
   privilegeName="${2}"
 
@@ -357,9 +357,91 @@ addPermissionToPrivilege()
   if [ $rc -ne 0 ] ; then
     rlLog "There was an error adding  $permissionList to $privilegeName"
   else
-    rlLog "Added $permissionList to $privilgeName successfully"
+    rlLog "Added $permissionList to $privilegeName successfully"
   fi
 }
+
+removePermissionFromPrivilege()
+{
+  rlLog "Entering removePermissionFromPrivilege with $2"
+  permissionList="$1"
+  privilegeName="${2}"
+
+  rc=0
+  rlLog "Executing: ipa privilege-remove-permission --permissions=\"$permissionList\" \"$privilegeName\""
+  ipa privilege-remove-permission --permissions="$permissionList" "$privilegeName"
+
+  if [ $rc -ne 0 ] ; then
+    rlLog "There was an error removing  $permissionList from $privilegeName"
+  else
+    rlLog "Removed $permissionList from $privilegeName successfully"
+  fi
+}
+
+verifyPrivilegeAttr()
+{
+
+   privilegeName=$1
+   attribute="$2:"
+   value=$3
+   tmpfile=/tmp/privilegeshow.out
+   rc=0
+
+   rlLog "NAMITA: value is $value"
+
+   rlLog "Executing: ipa privilege-show --all \"$privilegeName\""
+   ipa privilege-show --all "$privilegeName" > $tmpfile
+   rc=$?
+   if [ $rc -ne 0 ]; then
+      rlLog "WARNING: ipa privilege-show command failed."
+      return $rc
+   fi
+	
+   cat $tmpfile | grep -i "$attribute $value"
+   rc=$?
+   if [ $rc -ne 0 ]; then
+      rlLog "ERROR: ipa privilege \"$privilegeName\" verification failed:  Value of \"$attribute\" != \"$value\""
+      rlLog "ERROR: ipa privilege \"$privilegeName\" verification failed:  it is `cat $tmpfile | grep \"$attribute\"`"
+   else
+      rlLog "ipa privilege \"$privilegeName\" Verification successful: Value of \"$attribute\" = \"$value\""
+   fi
+
+   return $rc
+}
+
+
+## TODO: Unable to modify to a value containing space
+modifyPrivilege()
+{
+
+   privilegeName=$1
+   shift
+   cmd="" 
+   while [ "$#" -gt "0" ]
+   do
+     attrToUpdate=" --$1"
+     value=$2
+     cmd=$cmd$attrToUpdate=$value
+     shift
+     shift
+     rlLog "cmd: $cmd"
+   done
+
+   rc=0
+   
+   rlLog "Executing: ipa privilege-mod $cmd \"$privilegeName\" --all"
+   ipa privilege-mod $cmd "$privilegeName" --all
+   rc=$?
+   if [ $rc -ne 0 ] ; then
+     rlLog "There was an error modifying $privilegeName"
+   else
+     rlLog "Modified privilege $privilegeName successfully" 
+   fi
+
+   return $rc
+
+}
+
 
 
 addRole()

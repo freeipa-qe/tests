@@ -22,15 +22,13 @@ verifyPermissionTargetAttr()
     showOrFind=$8
 
 
-     rlRun "verifyPermissionAttr $permissionName all \"dn\" \"cn=`echo $permissionName | tr '[A-Z]' '[a-z]'`,cn=permissions,cn=pbac,dc=testrelm\" $showOrFind" 0 "Verify dn"
+     rlRun "verifyPermissionAttr $permissionName all \"dn\" \"cn=`echo $permissionName | tr '[A-Z]' '[a-z]'`,cn=permissions,cn=pbac,dc=testrelm,dc=com\" $showOrFind" 0 "Verify dn"
      rlRun "verifyPermissionAttr $permissionName all \"Permission name\" $permissionName $showOrFind" 0 "Verify Permission Name"
      rlRun "verifyPermissionAttr $permissionName all \"Permissions\" $permissionRights $showOrFind" 0 "Verify Permissions"
      rlRun "verifyPermissionAttr $permissionName all \"Attributes\" $permissionAttr $showOrFind" 0 "Verify Attributes"
      rlRun "verifyPermissionAttr $permissionName all $target $permissionTarget $showOrFind" 0 "Verify Target"
      rlRun "verifyPermissionAttr $permissionName all \"objectclass\" $objectclass $showOrFind" 0 "Verify objectclass"
-     if [ -z $permissionMemberOf ] ; then
-       rlLog "Not verifying memberOf"
-     else
+     if [ ! -z $permissionMemberOf ] ; then
        rlRun "verifyPermissionAttr $permissionName all \"Member of group\" $permissionMemberOf $showOrFind" 0 "Verify Member of group"
      fi
 }
@@ -58,7 +56,7 @@ verifyPermissionRawTypeAttr()
     objectclassArray=$(echo $objectclass | tr "," "\n")
 
 
-     rlRun "verifyPermissionAttr $permissionName raw \"dn\" \"cn=`echo $permissionName | tr '[A-Z]' '[a-z]'`,cn=permissions,cn=pbac,dc=testrelm\" $showOrFind " 0 "Verify dn"
+     rlRun "verifyPermissionAttr $permissionName raw \"dn\" \"cn=`echo $permissionName | tr '[A-Z]' '[a-z]'`,cn=permissions,cn=pbac,dc=testrelm,dc=com\" $showOrFind " 0 "Verify dn"
      rlRun "verifyPermissionAttr $permissionName raw \"cn\" $permissionName $showOrFind" 0 "Verify Permission Name"
      rlRun "verifyPermissionAttr $permissionName raw \"type\" $permissionType $showOrFind" 0 "Verify Type"
 
@@ -88,7 +86,7 @@ verifyPermissionFindOptions()
     permissionMemberOf=$7 
 
 
-     rlRun "verifyPermissionAttrFindUsingOptions \"dn\" \"cn=`echo $permissionName | tr '[A-Z]' '[a-z]'`,cn=permissions,cn=pbac,dc=testrelm\" " 0 "Verify dn"
+     rlRun "verifyPermissionAttrFindUsingOptions \"dn\" \"cn=`echo $permissionName | tr '[A-Z]' '[a-z]'`,cn=permissions,cn=pbac,dc=testrelm,dc=com\" " 0 "Verify dn"
      rlRun "verifyPermissionAttrFindUsingOptions \"Permission name\" $permissionName " 0 "Verify Permission Name"
      rlRun "verifyPermissionAttrFindUsingOptions \"Permissions\" $permissionRights " 0 "Verify Permissions"
      rlRun "verifyPermissionAttrFindUsingOptions \"Attributes\" $permissionAttr " 0 "Verify Attributes"

@@ -316,16 +316,16 @@ ipapermission_add_invalidright()
    rlPhaseStartTest "ipa-permission-cli-1012: add permission with invalid right" 
      command="addPermission $permissionName $permissionRights $permissionLocalTarget $permissionLocalAttr" 
      expmsg="ipa: ERROR: invalid 'permissions': \"$permissionRights\" is not a valid permission"
-     rlRun "$command > /tmp/ipapermission_invalidright1.log 2>&1" 1 "Verify error message for $permissionRights"
-     rlAssertGrep "$expmsg" "/tmp/ipapermission_invalidright1.log"
+     rlRun "$command > $TmpDir/ipapermission_invalidright1.log 2>&1" 1 "Verify error message for $permissionRights"
+     rlAssertGrep "$expmsg" "$TmpDir/ipapermission_invalidright1.log"
    rlPhaseEnd
 
    permissionRights="\ "
    rlPhaseStartTest "ipa-permission-cli-1013: add permission with missing right" 
      command="addPermission $permissionName $permissionRights $permissionLocalTarget $permissionLocalAttr" 
      expmsg="ipa: ERROR: 'permissions' is required"
-     rlRun "$command > /tmp/ipapermission_invalidright2.log 2>&1" 1 "Verify error message for missing right" 
-     rlAssertGrep "$expmsg" "/tmp/ipapermission_invalidright2.log"
+     rlRun "$command > $TmpDir/ipapermission_invalidright2.log 2>&1" 1 "Verify error message for missing right" 
+     rlAssertGrep "$expmsg" "$TmpDir/ipapermission_invalidright2.log"
    rlPhaseEnd
 
 }
@@ -345,8 +345,8 @@ ipapermission_add_invalidattr()
    rlPhaseStartTest "ipa-permission-cli-1014: add permission with invalid attr" 
      command="addPermission $permissionName $permissionRights $permissionLocalTarget $permissionLocalAttr" 
      expmsg="ipa: ERROR: targetattr \"$permissionLocalAttr\" does not exist in schema. Please add attributeTypes \"$permissionLocalAttr\" to schema if necessary." 
-     rlRun "$command > /tmp/ipapermission_invalidattr1.log 2>&1" 1 "Verify error message for $permissionLocalAttr"
-     rlAssertGrep "$expmsg" "/tmp/ipapermission_invalidattr1.log"
+     rlRun "$command > $TmpDir/ipapermission_invalidattr1.log 2>&1" 1 "Verify error message for $permissionLocalAttr"
+     rlAssertGrep "$expmsg" "$TmpDir/ipapermission_invalidattr1.log"
    rlPhaseEnd
 
    permissionLocalAttr="ipaclientversion"
@@ -354,8 +354,8 @@ ipapermission_add_invalidattr()
    rlPhaseStartTest "ipa-permission-cli-1015: add permission with invalid attr for the type being added (bug 783502)" 
      command="addPermission $permissionName $permissionRights $permissionLocalTarget $permissionLocalAttr" 
      expmsg="ipa: ERROR: attribute \"$permissionLocalAttr\" not allowed"
-     rlRun "$command > /tmp/ipapermission_invalidattr2.log 2>&1" 1 "Verify error message for $permissionLocalAttr"
-     rlAssertGrep "$expmsg" "/tmp/ipapermission_invalidattr2.log"
+     rlRun "$command > $TmpDir/ipapermission_invalidattr2.log 2>&1" 1 "Verify error message for $permissionLocalAttr"
+     rlAssertGrep "$expmsg" "$TmpDir/ipapermission_invalidattr2.log"
    rlPhaseEnd
 
 }
@@ -376,15 +376,15 @@ ipapermission_add_multipletarget()
    rlPhaseStartTest "ipa-permission-cli-1016: add permission with multiple targets - type & subtree" 
      command="addPermission $permissionName $permissionRights $permissionLocalTarget1$permissionLocalTarget2 $permissionLocalAttr" 
      expmsg="ipa: ERROR: invalid 'target': type, filter, subtree and targetgroup are mutually exclusive"
-     rlRun "$command > /tmp/ipapermission_multipletargets1.log 2>&1" 1 "Verify error message for $permissionLocalAttr"
-     rlAssertGrep "$expmsg" "/tmp/ipapermission_multipletargets1.log"
+     rlRun "$command > $TmpDir/ipapermission_multipletargets1.log 2>&1" 1 "Verify error message for $permissionLocalAttr"
+     rlAssertGrep "$expmsg" "$TmpDir/ipapermission_multipletargets1.log"
    rlPhaseEnd
 
    rlPhaseStartTest "ipa-permission-cli-1017: add permission with multiple targets - type & filter" 
      command="addPermission $permissionName $permissionRights $permissionLocalTarget1$permissionLocalTarget3 $permissionLocalAttr" 
      expmsg="ipa: ERROR: invalid 'target': type, filter, subtree and targetgroup are mutually exclusive"
-     rlRun "$command > /tmp/ipapermission_multipletargets2.log 2>&1" 1 "Verify error message for $permissionLocalAttr"
-     rlAssertGrep "$expmsg" "/tmp/ipapermission_multipletargets2.log"
+     rlRun "$command > $TmpDir/ipapermission_multipletargets2.log 2>&1" 1 "Verify error message for $permissionLocalAttr"
+     rlAssertGrep "$expmsg" "$TmpDir/ipapermission_multipletargets2.log"
    rlPhaseEnd
 
 }
@@ -403,42 +403,42 @@ ipapermission_add_missingtarget()
    rlPhaseStartTest "ipa-permission-cli-1018: add permission with missing target for type" 
      command="addPermission $permissionName $permissionLocalRights $permissionLocalTarget" 
      expmsg="ipa: error: --type option requires an argument"
-     rlRun "$command > /tmp/ipapermission_missingtargets1.log 2>&1" 2 "Verify error message for missing target for Type"
-     rlAssertGrep "$expmsg" "/tmp/ipapermission_missingtargets1.log"
+     rlRun "$command > $TmpDir/ipapermission_missingtargets1.log 2>&1" 2 "Verify error message for missing target for Type"
+     rlAssertGrep "$expmsg" "$TmpDir/ipapermission_missingtargets1.log"
    rlPhaseEnd
    rlPhaseStartTest "ipa-permission-cli-1019: add permission with missing target for type (bug 783475)" 
      command="addPermission $permissionName $permissionLocalRights $permissionLocalTarget=" 
      expmsg="ipa: error: --type option requires an argument"
-     rlRun "$command > /tmp/ipapermission_missingtargets2.log 2>&1" 1 "Verify error message for missing target for Type"
-     rlAssertGrep "$expmsg" "/tmp/ipapermission_missingtargets2.log"
+     rlRun "$command > $TmpDir/ipapermission_missingtargets2.log 2>&1" 1 "Verify error message for missing target for Type"
+     rlAssertGrep "$expmsg" "$TmpDir/ipapermission_missingtargets2.log"
    rlPhaseEnd
 
    permissionLocalTarget="--subtree"
    rlPhaseStartTest "ipa-permission-cli-1020: add permission with missing target for subtree" 
      command="addPermission $permissionName $permissionLocalRights $permissionLocalTarget" 
      expmsg="ipa: error: --subtree option requires an argument"
-     rlRun "$command > /tmp/ipapermission_missingtargets3.log 2>&1" 2 "Verify error message for missing target for subtree"
-     rlAssertGrep "$expmsg" "/tmp/ipapermission_missingtargets3.log"
+     rlRun "$command > $TmpDir/ipapermission_missingtargets3.log 2>&1" 2 "Verify error message for missing target for subtree"
+     rlAssertGrep "$expmsg" "$TmpDir/ipapermission_missingtargets3.log"
    rlPhaseEnd
    rlPhaseStartTest "ipa-permission-cli-1021: add permission with missing target for subtree (bug 783475)" 
      command="addPermission $permissionName $permissionLocalRights $permissionLocalTarget=" 
      expmsg="ipa: error: --subtree option requires an argument"
-     rlRun "$command > /tmp/ipapermission_missingtargets4.log 2>&1" 1 "Verify error message for missing target for subtree"
-     rlAssertGrep "$expmsg" "/tmp/ipapermission_missingtargets4.log"
+     rlRun "$command > $TmpDir/ipapermission_missingtargets4.log 2>&1" 1 "Verify error message for missing target for subtree"
+     rlAssertGrep "$expmsg" "$TmpDir/ipapermission_missingtargets4.log"
    rlPhaseEnd
 
    permissionLocalTarget="--filter"
    rlPhaseStartTest "ipa-permission-cli-1022: add permission with missing target for filter" 
      command="addPermission $permissionName $permissionLocalRights $permissionLocalTarget" 
      expmsg="ipa: error: --filter option requires an argument"
-     rlRun "$command > /tmp/ipapermission_missingtargets5.log 2>&1" 2 "Verify error message for missing target for filter"
-     rlAssertGrep "$expmsg" "/tmp/ipapermission_missingtargets5.log"
+     rlRun "$command > $TmpDir/ipapermission_missingtargets5.log 2>&1" 2 "Verify error message for missing target for filter"
+     rlAssertGrep "$expmsg" "$TmpDir/ipapermission_missingtargets5.log"
    rlPhaseEnd
    rlPhaseStartTest "ipa-permission-cli-1023: add permission with missing target for filter (bug 783475)" 
      command="addPermission $permissionName $permissionLocalRights $permissionLocalTarget=" 
      expmsg="ipa: error: --filter option requires an argument"
-     rlRun "$command > /tmp/ipapermission_missingtargets6.log 2>&1" 1 "Verify error message for missing target for filter"
-     rlAssertGrep "$expmsg" "/tmp/ipapermission_missingtargets6.log"
+     rlRun "$command > $TmpDir/ipapermission_missingtargets6.log 2>&1" 1 "Verify error message for missing target for filter"
+     rlAssertGrep "$expmsg" "$TmpDir/ipapermission_missingtargets6.log"
    rlPhaseEnd
 
 
@@ -463,8 +463,8 @@ ipapermission_add_invalidmemberof()
    rlPhaseStartTest "ipa-permission-cli-1024: add permission using nonexistent memberof group (bug 784329)"
      command="addPermission $permissionName $permissionRights $permissionLocalTarget $permissionLocalAttr --memberof=$permissionMemberOf"
      expmsg="ipa: ERROR: "
-     rlRun "$command > /tmp/ipapermission_invalidmemberof1.log 2>&1" 1 "Verify error message for $permissionMemberOf"
-     rlAssertGrep "$expmsg" "/tmp/ipapermission_invalidmemberof1.log"
+     rlRun "$command > $TmpDir/ipapermission_invalidmemberof1.log 2>&1" 1 "Verify error message for $permissionMemberOf"
+     rlAssertGrep "$expmsg" "$TmpDir/ipapermission_invalidmemberof1.log"
      #TODO: When bug fixed...do not have to delete
      rlRun "deletePermission $permissionName" 0 "Deleting $permissionName"
    rlPhaseEnd
@@ -472,23 +472,23 @@ ipapermission_add_invalidmemberof()
    rlPhaseStartTest "ipa-permission-cli-1025: add permission using missing memberof group"
      command="addPermission $permissionName $permissionRights $permissionLocalTarget  $permissionLocalAttr --memberof"
      expmsg="ipa: error: --memberof option requires an argument"
-     rlRun "$command > /tmp/ipapermission_invalidmemberof2.log 2>&1" 2 "Verify error message for $permissionMemberOf"
-     rlAssertGrep "$expmsg" "/tmp/ipapermission_invalidmemberof2.log"
+     rlRun "$command > $TmpDir/ipapermission_invalidmemberof2.log 2>&1" 2 "Verify error message for $permissionMemberOf"
+     rlAssertGrep "$expmsg" "$TmpDir/ipapermission_invalidmemberof2.log"
    rlPhaseEnd
 
 
    rlPhaseStartTest "ipa-permission-cli-1026: add permission using blank memberof group (bug 783475)"
      command="addPermission $permissionName $permissionRights $permissionLocalTarget $permissionLocalAttr --memberof=\"\""
      expmsg="ipa: error: Better error message than an internal error has occurred " 
-     rlRun "$command > /tmp/ipapermission_invalidmemberof3.log 2>&1" 1 "Verify error message for $permissionMemberOf"
-     rlAssertGrep "$expmsg" "/tmp/ipapermission_invalidmemberof3.log"
+     rlRun "$command > $TmpDir/ipapermission_invalidmemberof3.log 2>&1" 1 "Verify error message for $permissionMemberOf"
+     rlAssertGrep "$expmsg" "$TmpDir/ipapermission_invalidmemberof3.log"
    rlPhaseEnd
 
    rlPhaseStartTest "ipa-permission-cli-1026: add permission using blank memberof group (bug 783543)"
      command="addPermission $permissionName $permissionRights $permissionLocalTarget $permissionLocalAttr --memberof="
      expmsg="ipa: error: Better error message than an internal error has occurred " 
-     rlRun "$command > /tmp/ipapermission_invalidmemberof3.log 2>&1" 1 "Verify error message for $permissionMemberOf"
-     rlAssertGrep "$expmsg" "/tmp/ipapermission_invalidmemberof3.log"
+     rlRun "$command > $TmpDir/ipapermission_invalidmemberof3.log 2>&1" 1 "Verify error message for $permissionMemberOf"
+     rlAssertGrep "$expmsg" "$TmpDir/ipapermission_invalidmemberof3.log"
    rlPhaseEnd
 
 }
@@ -508,8 +508,8 @@ ipapermission_add_invalidtype()
    rlPhaseStartTest "ipa-permission-cli-1027: add permission using invalid type" 
      command="addPermission $permissionName $permissionLocalRights $permissionLocalTarget"
      expmsg="ipa: ERROR: invalid 'type': must be one of (u'user', u'group', u'host', u'service', u'hostgroup', u'netgroup', u'dnsrecord')"
-     rlRun "$command > /tmp/ipapermission_invalidtype.log 2>&1" 1 "Verify error message for invalid type"
-     rlAssertGrep "$expmsg" "/tmp/ipapermission_invalidtype.log"
+     rlRun "$command > $TmpDir/ipapermission_invalidtype.log 2>&1" 1 "Verify error message for invalid type"
+     rlAssertGrep "$expmsg" "$TmpDir/ipapermission_invalidtype.log"
    rlPhaseEnd
 
 }
@@ -528,8 +528,8 @@ ipapermission_add_invalidfilter()
    rlPhaseStartTest "ipa-permission-cli-1028: add permission using invalid filter for groups"
      command="addPermission $permissionName $permissionRights $permissionLocalTarget $permissionLocalAttr "
      expmsg="ipa: ERROR: Bad search filter"
-     rlRun "$command > /tmp/ipapermission_invalidfilter.log 2>&1" 1 "Verify error message for $filter"
-     rlAssertGrep "$expmsg" "/tmp/ipapermission_invalidfilter.log"
+     rlRun "$command > $TmpDir/ipapermission_invalidfilter.log 2>&1" 1 "Verify error message for $filter"
+     rlAssertGrep "$expmsg" "$TmpDir/ipapermission_invalidfilter.log"
    rlPhaseEnd
 
 
@@ -548,8 +548,8 @@ ipapermission_add_invalidsubtree()
    rlPhaseStartTest "ipa-permission-cli-1029: add permission using invalid subtree"
      command="addPermission $permissionName $permissionLocalRights $permissionLocalTarget"
      expmsg="ipa: ERROR: ACL Invalid Target Error"
-     rlRun "$command > /tmp/ipapermission_invalidsubtree.log 2>&1" 1 "Verify error message for invalid subtree"
-     rlAssertGrep "$expmsg" "/tmp/ipapermission_invalidsubtree.log"
+     rlRun "$command > $TmpDir/ipapermission_invalidsubtree.log 2>&1" 1 "Verify error message for invalid subtree"
+     rlAssertGrep "$expmsg" "$TmpDir/ipapermission_invalidsubtree.log"
    rlPhaseEnd
 
 }
@@ -570,14 +570,14 @@ ipapermission_add_missingaddsetattr()
    rlPhaseStartTest "ipa-permission-cli-1030: add permission with missing addattr value" 
      command="addPermission $permissionName $permissionLocalRights $permissionLocalTarget $permissionLocalAttr $permissionAddAttr" 
      expmsg="ipa: error: --addattr option requires an argument"
-     rlRun "$command > /tmp/ipapermission_missingaddattr1.log 2>&1" 2 "Verify error message for missing addattr" 
-     rlAssertGrep "$expmsg" "/tmp/ipapermission_missingaddattr1.log"
+     rlRun "$command > $TmpDir/ipapermission_missingaddattr1.log 2>&1" 2 "Verify error message for missing addattr" 
+     rlAssertGrep "$expmsg" "$TmpDir/ipapermission_missingaddattr1.log"
    rlPhaseEnd
    rlPhaseStartTest "ipa-permission-cli-1031: add permission with missing addattr value (bug 783475)" 
      command="addPermission $permissionName $permissionLocalRights $permissionLocalTarget $permissionLocalAttr $permissionAddAttr=" 
      expmsg="ipa: error: --addattr option requires an argument"
-     rlRun "$command > /tmp/ipapermission_missingaddattr2.log 2>&1" 2 "Verify error message for missing  addattr"
-     rlAssertGrep "$expmsg" "/tmp/ipapermission_missingaddattr2.log"
+     rlRun "$command > $TmpDir/ipapermission_missingaddattr2.log 2>&1" 2 "Verify error message for missing  addattr"
+     rlAssertGrep "$expmsg" "$TmpDir/ipapermission_missingaddattr2.log"
    rlPhaseEnd
 
    permissionSetAttr="--setattr"
@@ -585,14 +585,14 @@ ipapermission_add_missingaddsetattr()
    rlPhaseStartTest "ipa-permission-cli-1032: add permission with missing setattr value" 
      command="addPermission $permissionName $permissionLocalRights $permissionLocalTarget $permissionLocalAttr $permissionSetAttr" 
      expmsg="ipa: error: --setattr option requires an argument"
-     rlRun "$command > /tmp/ipapermission_missingsetattr1.log 2>&1" 2 "Verify error message for missing setattr" 
-     rlAssertGrep "$expmsg" "/tmp/ipapermission_missingsetattr1.log"
+     rlRun "$command > $TmpDir/ipapermission_missingsetattr1.log 2>&1" 2 "Verify error message for missing setattr" 
+     rlAssertGrep "$expmsg" "$TmpDir/ipapermission_missingsetattr1.log"
    rlPhaseEnd
    rlPhaseStartTest "ipa-permission-cli-1033: add permission with missing addattr value (bug 783475)" 
      command="addPermission $permissionName $permissionLocalRights $permissionLocalTarget $permissionLocalAttr $permissionAddAttr=" 
      expmsg="ipa: error: --setattr option requires an argument"
-     rlRun "$command > /tmp/ipapermission_missingsetattr2.log 2>&1" 2 "Verify error message for missing setattr"
-     rlAssertGrep "$expmsg" "/tmp/ipapermission_missingsetattr2.log"
+     rlRun "$command > $TmpDir/ipapermission_missingsetattr2.log 2>&1" 2 "Verify error message for missing setattr"
+     rlAssertGrep "$expmsg" "$TmpDir/ipapermission_missingsetattr2.log"
    rlPhaseEnd
 }
 
@@ -613,8 +613,8 @@ ipapermission_add_invalidaddattr()
    rlPhaseStartTest "ipa-permission-cli-1034: add permission using invalid add attribute"
      command="addPermission $permissionName $permissionLocalRights $permissionLocalTarget $permissionLocalAttr $permissionAddAttr"
      expmsg="ipa: ERROR: attribute \"xyz\" not allowed"
-     rlRun "$command > /tmp/ipapermission_invalidaddattr.log 2>&1" 1 "Verify error message for invalid addattr"
-     rlAssertGrep "$expmsg" "/tmp/ipapermission_invalidaddattr.log"
+     rlRun "$command > $TmpDir/ipapermission_invalidaddattr.log 2>&1" 1 "Verify error message for invalid addattr"
+     rlAssertGrep "$expmsg" "$TmpDir/ipapermission_invalidaddattr.log"
    rlPhaseEnd
 }
 
@@ -633,8 +633,8 @@ ipapermission_add_invalidsetattr()
    rlPhaseStartTest "ipa-permission-cli-1035: add permission using invalid setattr"
      command="addPermission $permissionName $permissionRights $permissionLocalTarget $permissionLocalAttr $permissionAddAttr"
      expmsg="ipa: ERROR: owner: value #0 invalid per syntax: Invalid syntax."
-     rlRun "$command > /tmp/ipapermission_invalidsetattr.log 2>&1" 1 "Verify error message for invalid setattr"
-     rlAssertGrep "$expmsg" "/tmp/ipapermission_invalidsetattr.log"
+     rlRun "$command > $TmpDir/ipapermission_invalidsetattr.log 2>&1" 1 "Verify error message for invalid setattr"
+     rlAssertGrep "$expmsg" "$TmpDir/ipapermission_invalidsetattr.log"
    rlPhaseEnd
 }
 
@@ -653,8 +653,8 @@ ipapermission_add_duplicateperm()
      rlRun "addPermission $permissionName $permissionLocalRights $permissionLocalTarget $permissionLocalAttr" 0 "Adding $permissionName"
      command="addPermission $permissionName $permissionLocalRights $permissionLocalTarget $permissionLocalAttr"
      expmsg="ipa: ERROR: This entry already exists"
-     rlRun "$command > /tmp/ipapermission_duplicateperm.log 2>&1" 1 "Verify error message for duplicate permission"
-     rlAssertGrep "$expmsg" "/tmp/ipapermission_duplicateperm.log"
+     rlRun "$command > $TmpDir/ipapermission_duplicateperm.log 2>&1" 1 "Verify error message for duplicate permission"
+     rlAssertGrep "$expmsg" "$TmpDir/ipapermission_duplicateperm.log"
    rlPhaseEnd
 }
 
@@ -686,8 +686,8 @@ ipapermission_del_continue()
     rlPhaseStartTest "ipa-permission-cli-1038: delete permission - continue"
      command="ipa permission-del $permissionName --continue"
      expmsg="Failed to remove: $permissionName"
-     rlRun "$command > /tmp/ipapermission_delete.log 2>&1" 0 "Verify error message when deleting in continue mode" 
-     rlAssertGrep "$expmsg" "/tmp/ipapermission_delete.log"
+     rlRun "$command > $TmpDir/ipapermission_delete.log 2>&1" 0 "Verify error message when deleting in continue mode" 
+     rlAssertGrep "$expmsg" "$TmpDir/ipapermission_delete.log"
     rlPhaseEnd
 
 }
@@ -732,8 +732,8 @@ ipapermission_find_name()
     rlPhaseStartTest "ipa-permission-cli-1040: find permission using invalid --name (bug 785251)"
       command="findPermissionByOption $option $value \"all\" $permissions"
       expmsg="ipa: ERROR"
-      rlRun "$command > /tmp/ipapermission_invalidname.log 2>&1" 1 "Verify error message for invalid $option"
-      rlAssertGrep "$expmsg" "/tmp/ipapermission_invalidname.log"
+      rlRun "$command > $TmpDir/ipapermission_invalidname.log 2>&1" 1 "Verify error message for invalid $option"
+      rlAssertGrep "$expmsg" "$TmpDir/ipapermission_invalidname.log"
     rlPhaseEnd
 }
 
@@ -755,8 +755,8 @@ ipapermission_find_permissions()
     rlPhaseStartTest "ipa-permission-cli-1042: find permission using invalid --permissions"
       command="findPermissionByOption $option $value \"all\" $permissions"
       expmsg="ipa: ERROR"
-      rlRun "$command > /tmp/ipapermission_invalidpermission.log 2>&1" 1 "Verify error message for invalid $option"
-      rlAssertGrep "$expmsg" "/tmp/ipapermission_invalidpermission.log"
+      rlRun "$command > $TmpDir/ipapermission_invalidpermission.log 2>&1" 1 "Verify error message for invalid $option"
+      rlAssertGrep "$expmsg" "$TmpDir/ipapermission_invalidpermission.log"
     rlPhaseEnd
 }
 

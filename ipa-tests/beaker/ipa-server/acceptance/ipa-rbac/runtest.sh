@@ -49,8 +49,10 @@
 
 # Include test case file
 . ./lib.iparbac.sh
+. ./lib.privilege.sh
 . ./t.ipapermission.sh
 . ./t.ipaprivilege.sh
+. ./t.iparole.sh
 . ./t.ipaRBACFunctionalTests.sh
 
 PACKAGE="ipa-server"
@@ -66,10 +68,10 @@ rlJournalStart
         rlRun "pushd $TmpDir"
     rlPhaseEnd
 
-#    ipapermissionTests
+    ipapermissionTests
     ipaprivilegeTests
-    #iparolesTests
-#    ipaRBACFunctionalTests
+    iparoleTests
+    ipaRBACFunctionalTests
 
     makereport
     rlPhaseStartCleanup "ipapermission cleanup"
