@@ -91,9 +91,10 @@ createReplica1()
 			LAST_OCTET=`echo $SLAVEIP | cut -d . -f 4`
 			rlRun "ipa dnsrecord-add $REVERSE_ZONE $LAST_OCTET --ptr-rec=$hostname_s.$DOMAIN."
 
+                        rlRun "service named restart" 0 "Restarting named as work around when adding new reverse zone"
+
                         rlLog "Running: ipa-replica-prepare -p $ADMINPW $hostname_s.$DOMAIN"
 			rlRun "ipa-replica-prepare -p $ADMINPW $hostname_s.$DOMAIN"
-                        rlRun "service named restart" 0 "Restarting named as work around when adding new reverse zone"
 
                 else
 
