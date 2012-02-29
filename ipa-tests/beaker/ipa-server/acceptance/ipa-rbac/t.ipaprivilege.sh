@@ -2,7 +2,6 @@
 #  this will cover privilege
 
 ipaprivilegeTests() {
-    cleanupPrivilegesTest
     setupPrivilegesTest
     ipaprivilege_check
     ipaprivilege_add
@@ -14,6 +13,7 @@ ipaprivilegeTests() {
     ipaprivilege_show
  
 #    cleanup
+    cleanupPrivilegesTest
 }
 
 setupPrivilegesTest()

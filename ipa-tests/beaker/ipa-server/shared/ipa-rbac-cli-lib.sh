@@ -109,7 +109,7 @@ verifyPermissionAttr()
         fi
 
 
-	tmpfile=/tmp/permissionshow.out.??
+	tmpfile=$TmpDir/permissionshow.out
 	rc=0
 	
        if [ "$allOrRaw" == "all" ] ; then
@@ -155,7 +155,7 @@ findPermissionByOption()
    rc=0
 
    flag="--$option"
-   tmpfile=/tmp/findpermissionbyoption.txt
+   tmpfile=$TmpDir/findpermissionbyoption.txt
    rm -rf $tmpfile
 
    rlLog "Executing: ipa permission-find $flag=$value $allOrRaw"
@@ -203,7 +203,7 @@ findPermissionByMultipleOptions()
      shift
      shift
    done
-   tmpfile=/tmp/findpermissionbyoption.txt
+   tmpfile=$TmpDir/findpermissionbyoption.txt
    rm -rf $tmpfile
 
    rlLog "Executing: ipa permissionrule-find $partOfCommand" 
@@ -260,7 +260,7 @@ verifyPermissionAttrFindUsingOptions()
      value=`echo $2 | sed 's/,/, /g'`
    fi
     
-    tmpfile=/tmp/findpermissionbyoption.txt
+    tmpfile=$TmpDir/findpermissionbyoption.txt
     cat $tmpfile | grep -i "$attribute $value"
     rc=$?
     if [ $rc -ne 0 ]; then
@@ -384,7 +384,7 @@ verifyPrivilegeAttr()
    privilegeName=$1
    attribute="$2:"
    value=$3
-   tmpfile=/tmp/privilegeshow.out
+   tmpfile=$TmpDir/privilegeshow.out
    rc=0
 
    rlLog "NAMITA: value is $value"

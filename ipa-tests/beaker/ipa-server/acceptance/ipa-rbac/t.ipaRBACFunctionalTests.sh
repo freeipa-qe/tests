@@ -2,15 +2,15 @@
 #  this will cover the functional tests 
 
 ipaRBACFunctionalTests() {
-    cleanup
-    setup
+    setupRBACTests
     test01
     test04
 #    test05
     test06
+    cleanupRBACTests
 }
 
-setup()
+setupRBACTests()
 {
     rlPhaseStartTest "Setup - add users and groups"
         rlRun "kinitAs $ADMINID $ADMINPW"
@@ -46,7 +46,7 @@ setup()
 }
 
 
-cleanup()
+cleanupRBACTests()
 {
   rlRun "kinitAs $ADMINID $ADMINPW"
   privilegeName="Add User"

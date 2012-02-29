@@ -45,29 +45,15 @@ verifyPermissionTargetAttr()
 verifyPermissionRawTypeAttr()
 {
     permissionName=$1
-    permissionRights=$2
-    permissionType=$3
-    permissionAttr=$4
-    objectclass=$5
-    showOrFind=$6
+    objectclass=$2
+    showOrFind=$3
     
-    permissionRightsArray=$(echo $permissionRights | tr "," "\n")
-    permissionAttrArray=$(echo $permissionAttr | tr "," "\n")
     objectclassArray=$(echo $objectclass | tr "," "\n")
 
 
      rlRun "verifyPermissionAttr $permissionName raw \"dn\" \"cn=`echo $permissionName | tr '[A-Z]' '[a-z]'`,cn=permissions,cn=pbac,dc=testrelm,dc=com\" $showOrFind " 0 "Verify dn"
      rlRun "verifyPermissionAttr $permissionName raw \"cn\" $permissionName $showOrFind" 0 "Verify Permission Name"
-     rlRun "verifyPermissionAttr $permissionName raw \"type\" $permissionType $showOrFind" 0 "Verify Type"
-
-     for right in $permissionRightsArray
-     do
-         rlRun "verifyPermissionAttr $permissionName raw \"permissions\" $right $showOrFind" 0 "Verify Permissions"
-     done
-     for attr in $permissionAttrArray
-     do
-        rlRun "verifyPermissionAttr $permissionName raw \"attrs\" $attr $showOrFind" 0 "Verify Attributes"
-     done
+     rlRun "verifyPermissionAttr $permissionName raw \"aci\" "" $showOrFind" 0 "Verify aci is listed"
      for oc in $objectclassArray
      do
         rlRun "verifyPermissionAttr $permissionName raw \"objectclass\" $oc $showOrFind" 0 "Verify objectclass"

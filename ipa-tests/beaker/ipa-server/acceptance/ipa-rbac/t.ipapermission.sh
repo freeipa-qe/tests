@@ -5,21 +5,20 @@
 # testsuite
 ########################
 ipapermissionTests() {
-    setup
-    cleanup
+    setupPermissionTests
     ipapermission_add
     ipapermission_show_rights
     ipapermission_del_continue
     ipapermission_find
 #    ipapermission_mod
 
-#    cleanup
+    cleanupPermissionTests
 }
 
 ########################
 # setup
 ########################
-setup()
+setupPermissionTests()
 {
     rlPhaseStartTest "Setup - add users and groups"
        rlRun "kinitAs $ADMINID $ADMINPW"
@@ -31,7 +30,7 @@ setup()
 ########################
 # cleanup
 ########################
-cleanup()
+cleanupPermissionTests()
 {
     permissionName1="ManageUser1"
     permissionName2="ManageUser2"
@@ -122,7 +121,7 @@ ipapermission_params_user_type()
    rlPhaseStartTest "ipa-permission-cli-1003: add permission for type user, with multiple attr, multiple permissions, and add an attribute"
      rlRun "addPermission $permissionName $permissionRights $permissionLocalTarget $permissionLocalAttr $permissionAddAttr" 0 "Adding $permissionName"
      verifyPermissionTargetAttr $permissionName $permissionRights "Type" $permissionLocalTargetToVerify $permissionLocalAttr $objectclass
-     verifyPermissionRawTypeAttr $permissionName $permissionRights $permissionLocalTargetToVerify $permissionLocalAttr $objectclass
+     verifyPermissionRawTypeAttr $permissionName $objectclass
      rlRun "verifyPermissionAttr $permissionName raw \"description\" \"test\"" 0 "Verify Added Attr"
    rlPhaseEnd
 
@@ -132,7 +131,7 @@ ipapermission_params_user_type()
    rlPhaseStartTest "ipa-permission-cli-1004: add permission for type user, with multiple attr, multiple permissions, and set an attribute"
      rlRun "addPermission $permissionName $permissionRights $permissionLocalTarget $permissionLocalAttr $permissionAddAttr" 0 "Adding $permissionName"
      verifyPermissionTargetAttr $permissionName $permissionRights "Type" $permissionLocalTargetToVerify $permissionLocalAttr $objectclass
-     verifyPermissionRawTypeAttr $permissionName $permissionRights $permissionLocalTargetToVerify $permissionLocalAttr $objectclass
+     verifyPermissionRawTypeAttr $permissionName $objectclass
      rlRun "verifyPermissionAttr $permissionName raw \"owner\" \"cn=test\"" 0 "Verify Set Attr"
    rlPhaseEnd
 
@@ -141,7 +140,7 @@ ipapermission_params_user_type()
    rlPhaseStartTest "ipa-permission-cli-1005: add permission for type user, with multiple attr, multiple permissions, and add and set multivalued attributes"
      rlRun "addPermission $permissionName $permissionRights $permissionLocalTarget $permissionLocalAttr $permissionAddAttr" 0 "Adding $permissionName"
      verifyPermissionTargetAttr $permissionName $permissionRights "Type" $permissionLocalTargetToVerify $permissionLocalAttr $objectclass
-     verifyPermissionRawTypeAttr $permissionName $permissionRights $permissionLocalTargetToVerify $permissionLocalAttr $objectclass
+     verifyPermissionRawTypeAttr $permissionName $objectclass
      rlRun "verifyPermissionAttr $permissionName raw \"owner\" \"cn=test\"" 0 "Verify Set Attr"
      rlRun "verifyPermissionAttr $permissionName raw \"owner\" \"cn=test2\"" 0 "Verify Set Attr"
    rlPhaseEnd
@@ -753,7 +752,7 @@ ipapermission_find_permissions()
     rlPhaseEnd
 
     value="xyz"
-    rlPhaseStartTest "ipa-permission-cli-1042: find permission using invalid --permissions"
+    rlPhaseStartTest "ipa-permission-cli-1042: find permission using invalid --permissions (bug 785257)"
       command="findPermissionByOption $option $value \"all\" $permissions"
       expmsg="ipa: ERROR"
       rlRun "$command > $TmpDir/ipapermission_invalidpermission.log 2>&1" 1 "Verify error message for invalid $option"
