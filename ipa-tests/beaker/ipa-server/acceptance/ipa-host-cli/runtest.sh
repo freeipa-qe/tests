@@ -622,7 +622,7 @@ rlPhaseStartTest "ipa-host-cli-38: find more hosts than exist"
 	rlAssertGrep "Number of entries returned 1" "/tmp/manbyhosts_$myhost4.out"
 	rlAssertGrep "Host name: $myhost4" "/tmp/manbyhosts_$myhost4.out"
 
-	host_list=\"$myhost1, $myhost2\"
+	host_list="$myhost1, $myhost2"
         rlRun "ipa host-find --man-hosts=\"$host_list\" > /tmp/manbyhosts_myhost12.out"
         rlAssertGrep "Number of entries returned 1" "/tmp/manbyhosts_myhost12.out"
         rlAssertNotGrep "Host name: $myhost4" "/tmp/manbyhosts_myhost12.out"
