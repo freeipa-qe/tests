@@ -63,21 +63,25 @@ PACKAGE="ipa-server"
 
 rlJournalStart
     rlPhaseStartSetup "ipapermission startup: Check for ipa-server package"
-# NAMITA:         rlAssertRpm $PACKAGE
+        rlAssertRpm $PACKAGE
         rlRun "TmpDir=\`mktemp -d\`" 0 "Creating tmp directory"
         rlRun "pushd $TmpDir"
     rlPhaseEnd
 
-    ipapermissionTests
-    ipaprivilegeTests
-    iparoleTests
-    ipaRBACFunctionalTests
+   ipapermissionTests
+   ipaprivilegeTests
+   iparoleTests
+   ipaRBACFunctionalTests
 
-    makereport
     rlPhaseStartCleanup "ipapermission cleanup"
         rlRun "popd"
-# NAMITA:        rlRun "rm -r $TmpDir" 0 "Removing tmp directory"
+#       rlRun "rm -r $TmpDir" 0 "Removing tmp directory"
     rlPhaseEnd
 
-rlJournalEnd
 
+rlJournalPrintText
+	report=/tmp/rhts.report.$RANDOM.txt
+	makereport $report
+	rhts-submit-log -l $report
+        save_logs
+rlJournalEnd 
