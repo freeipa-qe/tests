@@ -87,6 +87,8 @@ createReplica1()
 			# Preparing replica without --ip-address option
 			rlRun "echo \"$SLAVEIP		$hostname_s.$DOMAIN\" >> /etc/hosts"
 			rlRun "cat /etc/hosts"
+			rlRun "echo \"nameserver $MASTERIP\" > /etc/resolv.conf" 0 "fixing the reoslv.conf to contain the correct nameserver lines"
+			rlRun "cat /etc/resolv.conf"
 			rlRun "ipa dnsrecord-add $DOMAIN $hostname_s --a-rec=$SLAVEIP"
 			REVERSE_ZONE=`ipa dnszone-find | grep -i "zone name" | grep -i "arpa" | cut -d ":" -f 2`
 			LAST_OCTET=`echo $SLAVEIP | cut -d . -f 4`
