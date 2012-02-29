@@ -858,6 +858,17 @@ rlPhaseStartTest "ipa-host-cli-38: find more hosts than exist"
         rlAssertGreaterOrEqual "Number of entries returned is >= 0" "$number" "0"
    rlPhaseEnd
 
+   rlPhaseStartTest "ipa-host-cli-68: --pkey-only test of ipa host-find"
+	ipa_command_to_test="host"
+	pkey_addstringa="--ip-address=10.14.2.3"
+	pkey_addstringb="--ip-address=10.14.2.4"
+	pkeyobja="pkeyhost1.$DOMAIN"
+	pkeyobjb="pkeyhost2.$DOMAIN"
+	grep_string='Host\ name'
+	general_search_string=pkeyhost
+	rlRun "pkey_return_check" 0 "running checks of --pkey-only in sudorule-find"
+    rlPhaseEnd
+
     rlPhaseStartCleanup "ipa-host-cli-cleanup: Destroying admin credentials."
 	rlRun "ipa config-mod --searchrecordslimit=100" 0 "set search records limit back to default"
         i=1

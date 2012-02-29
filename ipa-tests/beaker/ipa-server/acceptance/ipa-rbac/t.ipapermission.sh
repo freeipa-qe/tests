@@ -710,6 +710,7 @@ ipapermission_find()
    ipapermission_find_timelimit # Add manual test - read DS log
    ipapermission_find_all_raw
    ipapermission_find_multiplefilters
+   ipapermission_find_pkey_only
    # No Negative tests. If bad value is passed for the option, no permissions are found.
    # And if it is left blank, internal error is thrown - for which bug 783475 is logged.
 }
@@ -890,6 +891,24 @@ ipapermission_find_multiplefilters()
     rlPhaseEnd
 }
 
+##################################################
+#  test: ipapermission_find_pkey_only
+##################################################
+ipapermission_find_all_raw()
+{
+    rlPhaseStartTest "privilege-find_001: --pkey-only test of ipa privilege"
+	rlRun "kinitAs $ADMINID $ADMINPW"
+	ipa_command_to_test="privilege"
+	pkey_addstringa="--desc=test-priv"
+	pkey_addstringb="--desc=test-priv"
+	pkeyobja="tpriv"
+	pkeyobjb="tprivb"
+	grep_string='Privilege\ name'
+	general_search_string=tpriv
+	rlRun "pkey_return_check" 0 "running checks of --pkey-only in privilege-find"
+    rlPhaseEnd
+
+}
 
 ##################################################
 #  test: ipapermission-find: Positive: all/raw 

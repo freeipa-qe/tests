@@ -778,10 +778,8 @@ pkey_return_check()
 {
 	creturn=0
 	rlLog "executing ipa $ipa_command_to_test-add $pkey_addstringa $pkeyobja"
-	rlRun "ipa $ipa_command_to_test-add $pkey_addstringa $pkeyobja" 0 "executing add string for pkey-only test"
-	let creturn=$creturn+$?
-	rlRun "ipa $ipa_command_to_test-add $pkey_addstringb $pkeyobjb" 0 "executing second add string for pkey-only test"
-	let creturn=$creturn+$?
+	ipa $ipa_command_to_test-add $pkey_addstringa $pkeyobja
+	ipa $ipa_command_to_test-add $pkey_addstringb $pkeyobjb
 	rlLog "executing ipa $ipa_command_to_test-find --pkey-only $pkeyobja | grep $grep_string | grep $pkeyobja"
 	rlRun "ipa $ipa_command_to_test-find --pkey-only $pkeyobja | grep $grep_string | grep $pkeyobja" 0 "make sure the $ipa_command_to_test is returned when the --pkey-only option is specified"
 	let creturn=$creturn+$?

@@ -8,7 +8,7 @@ iparoleTests() {
 #    iparole_add_member
 #    iparole_add_privilege
 #    iparole_del
-#    iparole_find
+    iparole_find
 #    iparole_mod
 #    iparole_remove_member
 #    iparole_remove_privilege
@@ -23,6 +23,20 @@ setupRolesTests()
     rlPhaseEnd
 }
 
+iparole_find()
+{
+    rlPhaseStartTest "role-find_001: --pkey-only test of ipa role"
+	rlRun "kinitAs $ADMINID $ADMINPW"
+	ipa_command_to_test="role"
+	pkey_addstringa="--desc=test-role"
+	pkey_addstringb="--desc=test-role"
+	pkeyobja="trole"
+	pkeyobjb="troleb"
+	grep_string='Role\ name:'
+	general_search_string=trole
+	rlRun "pkey_return_check" 0 "running checks of --pkey-only in sudorule-find"
+    rlPhaseEnd
+}
 
 ##############################################################
 # Verify Roles provided by IPA have privileges assigned 

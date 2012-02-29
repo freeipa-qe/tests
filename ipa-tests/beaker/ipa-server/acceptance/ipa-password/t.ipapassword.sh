@@ -39,6 +39,7 @@ ipapassword_globalpolicy()
     ipapassword_globalpolicy_length_lowerbound
     ipapassword_globalpolicy_length_upperbound
     ipapassword_globalpolicy_length_negative
+    ipapassword_globalpolicy_pkey_only
     ipapassword_globalpolicy_envcleanup
 } #ipapassword_globalpolicy
 
@@ -1183,6 +1184,24 @@ ipapassword_globalpolicy_length_negative()
         done
     rlPhaseEnd
 } #ipapassword_globalpolicy_length_negative
+
+ipapassword_globalpolicy_pkey_only()
+{
+    rlPhaseStartTest "ipapassword_globalpolicy_pkey_only: --pkey-only test of pwpolicy"
+	ipa group-add --desc=kljh pwpolicyg
+	ipa group-add --desc=kljh pwpolicygb
+	ipa_command_to_test="pwpolicy"
+	pkey_addstringa="--priority=2"
+	pkey_addstringb="--priority=2"
+	pkeyobja="pwpolicyg"
+	pkeyobjb="pwpolicygb"
+	grep_string='Group'
+	general_search_string=pwpolicy
+	rlRun "pkey_return_check" 0 "running checks of --pkey-only in pwpolicy-find"
+	ipa group-del pwpolicyg 
+	ipa group-del pwpolicygb 
+    rlPhaseEnd
+}
 
 ipapassword_globalpolicy_length_negative_logic()
 {

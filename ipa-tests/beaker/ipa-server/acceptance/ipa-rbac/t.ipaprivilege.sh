@@ -8,7 +8,7 @@ ipaprivilegeTests() {
     ipaprivilege_add
     ipaprivilege_add_permission
     ipaprivilege_del_continue
-#    ipaprivilege_find
+    ipaprivilege_find
     ipaprivilege_mod
     ipaprivilege_remove_permission
     ipaprivilege_show
@@ -372,7 +372,23 @@ ipaprivilege_del_continue()
 
 }
 
-
+#############################################
+#  test: ipaprivilege-find
+#############################################
+ipaprivilege_find()
+{
+    rlPhaseStartTest "privilege-find_001: --pkey-only test of ipa privilege"
+	rlRun "kinitAs $ADMINID $ADMINPW"
+	ipa_command_to_test="privilege"
+	pkey_addstringa="--desc=test-priv"
+	pkey_addstringb="--desc=test-priv"
+	pkeyobja="tpriv"
+	pkeyobjb="tprivb"
+	grep_string='Privilege\ name'
+	general_search_string=tpriv
+	rlRun "pkey_return_check" 0 "running checks of --pkey-only in privilege-find"
+    rlPhaseEnd
+}
 
 #############################################
 #  test: ipaprivilege-show 
