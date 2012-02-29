@@ -118,8 +118,8 @@ mod_netgroups()
 
 del_netgroups()
 {
-	del_netgroups_positive
-	del_netgroups_negative
+	netgroup_del_positive
+	netgroup_del_negative
 }
 
 manage_netgroups()
@@ -1081,11 +1081,11 @@ netgroup_mod_negative()
 # DELETE NETGROUPS
 ##########################################################################
 # positive show netgroups tests
-del_netgroups_positive()
+netgroup_del_positive()
 {
 	rlPhaseStartTest  "ipa-netgroup-043: Delete Netgroups"
 		# verifying hostgroup-del
-		for item in $ngroup1 $ngroup2 ; do
+		for item in $ngroup1 $ngroup2 $ngroup3; do
 			rlRun "ipa netgroup-del $item" 0 "Deleting $item"
 			# Verify
 			rlRun "ipa netgroup-show $item" 2 "Verifying that $item doesn't deleted"
@@ -1094,7 +1094,7 @@ del_netgroups_positive()
 }
 
 # negative show netgroups tests
-del_netgroups_negative()
+netgroup_del_negative()
 {
         rlPhaseStartTest "ipa-netgroup-044: Delete netgroup that doesn't exist"
                 command="ipa netgroup-del ghost"
@@ -1169,4 +1169,303 @@ manage_netgroups_negative()
 			rlPass "No Traceback returned with incorrect directory manager password."
 		fi
 	rlPhaseEnd
+}
+
+netgroup_find_positive()
+{
+	rlPhaseStartTest "ipa-netgroup-050-0: Setup some default netgroups for find testing"
+		rlRun "ipa user-add tnguser1 --first=first --last=last"
+		rlRun "ipa user-add tnguser2 --first=first --last=last"
+		rlRun "ipa group-add tnggroup1 --desc=tnggroup1"
+		rlRun "ipa group-add tnggroup2 --desc=tnggroup2"
+		rlRun "ipa group-add-member tnggroup1 --users=tnguser1"
+		rlRun "ipa group-add-member tnggroup2 --users=tnguser2"
+		rlRun "ipa host-add tnghost1.$DOMAIN --force"
+		rlRun "ipa host-add tnghost2.$DOMAIN --force"
+		rlRun "ipa hostgroup-add tnghostgroup1 --desc=tnghostgroup1"
+		rlRun "ipa hostgroup-add tnghostgroup2 --desc=tnghostgroup2"
+		rlRun "ipa hostgroup-add-member tnghostgroup1 --hosts=tnghost1.$DOMAIN"
+		rlRun "ipa hostgroup-add-member tnghostgroup2 --hosts=tnghost2.$DOMAIN"
+		rlRun "ipa netgroup-add ngname --desc=desc --nisdomain=domain --usercat=all --hostcat=all"
+		rlRun "ipa netgroup-add tngname1 --desc=tngname1"
+		rlRun "ipa netgroup-add tngname2 --desc=tngname2"
+		rlRun "ipa netgroup-add tngname3 --desc=tngname3"
+		rlRun "ipa netgroup-add tngname4 --desc=tngname4"
+		rlRun "ipa netgroup-add tngname5 --desc=tngname5"
+		rlRun "ipa netgroup-add tngname6 --desc=tngname6"
+		rlRun "ipa netgroup-add-member ngname --users=tnguser1,tnguser2 --groups=tnggroup1,tnggroup2 --hosts=tnghost1.$DOMAIN,tnghost2.$DOMAIN"
+		rlRun "ipa netgroup-add-member tngname1 --users=tnguser1 --hosts=tnghost1.$DOMAIN"
+		rlRun "ipa netgroup-add-member tngname2 --users=tnguser2 --hosts=tnghost2.$DOMAIN"
+		rlRun "ipa netgroup-add-member tngname3 --groups=tnggroup1 --hostgroups=tnghostgroup1"
+		rlRun "ipa netgroup-add-member tngname4 --groups=tnggroup2 --hostgroups=tnghostgroup2"
+		rlRun "ipa netgroup-add-member tngname5 --netgroups=tngname1"
+		rlRun "ipa netgroup-add-member tngname6 --netgroups=tngname2"
+	rlPhaseEnd
+		
+	rlPhaseStartTest "ipa-netgroup-050-1: find all"
+		rlRun "ipa netgroup-find"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-netgroup-050-2: find by criteria name"
+		rlRun "ipa netgroup-find ngname"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-netgroup-050-3: find by criteria partial name"
+		rlRun "ipa netgroup-find ngnam"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-netgroup-050-4: find by name option"
+		rlRun "ipa netgroup-find --name=ngname"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-netgroup-050-5: find desc option"
+		rlRun "ipa netgroup-find --desc=desc"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-netgroup-050-6: find nisdomain"
+		rlRun "ipa netgroup-find --nisdomain=domain"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-netgroup-050-7: find by uuid/ipauniqueid"
+		UUID=$(ipa netgroup-show ngname --all --raw | grep ipauniqueid: | awk '{print $2}')
+		rlRun "ipa netgroup-find --uuid=$UUID"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-netgroup-050-8: find by usercat=all"
+		rlRun "ipa netgroup-find --usercat=all"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-netgroup-050-9: find by hostcat=all"
+		rlRun "ipa netgroup-find --hostcat=all"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-netgroup-050-10: find with timelimit"
+		rlRun "ipa netgroup-find --timelimit=1"
+		# doesn't work?  have to use sizelimit but that overrides timelimit
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-netgroup-050-11: find with sizelimit=0"
+		rlRun "ipa netgroup-find --sizelimit=0"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-netgroup-050-12: find with sizelimit=1"
+		rlRun "ipa netgroup-find --sizelimit=1"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-netgroup-050-13: find with sizelimit=5"
+		rlRun "ipa netgroup-find --sizelimit=5"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-netgroup-050-14: find with sizelimit=5000"
+		rlRun "ipa netgroup-find --sizelimit=5000" 
+		# doesn't work past 2000? 
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-netgroup-050-15: find managed netgroups"
+		rlRun "ipa netgroup-find --managed"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-netgroup-050-16: find by netgroups"
+		rlRun "ipa netgroup-find --netgroups=tngname1"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-netgroup-050-17: find by no-netgroups"
+		rlRun "ipa netgroup-find --no-netgroups=tngname1"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-netgroup-050-18: find by users"
+		rlRun "ipa netgroup-find --users=tnguser1,tnguser2"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-netgroup-050-19: find by no-users"
+		rlRun "ipa netgroup-find --no-users=tngusers1"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-netgroup-050-20: find by groups"
+		rlRun "ipa netgroup-find --groups=tnggroup1,tnggroup2"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-netgroup-050-21: find by no-groups"
+		rlRun "ipa netgroup-find --no-groups=tnggroup1"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-netgroup-050-22: find by hosts"
+		rlRun "ipa netgroup-find --hosts=tnghost1.$DOMAIN"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-netgroup-050-23: find by no-hosts"
+		rlRun "ipa netgroup-find --no-hosts=tnghost1"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-netgroup-050-24: find by hostgroups"
+		rlRun "ipa netgroup-find --hostgroups=tnghostgroup2"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-netgroup-050-25: find by no-hostgroups"
+		rlRun "ipa netgroup-find --no-hostgroups=tnghostgroup1"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-netgroup-050-26: find by in-netgroups"
+		rlRun "ipa netgroup-find --in-netgroups=ngname"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-netgroup-050-27: find by not-in-netgroups"
+		rlRun "ipa netgroup-find --not-in-netgroups=ngname"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-netgroup-050-end: Cleanup after find positive testing"
+		rlRun "ipa netgroup-del tngname1"
+		rlRun "ipa netgroup-del tngname2"
+		rlRun "ipa netgroup-del tngname3"
+		rlRun "ipa netgroup-del tngname4"
+		rlRun "ipa netgroup-del tngname5"
+		rlRun "ipa netgroup-del tngname6"
+		rlRun "ipa netgroup-del ngname"
+		rlRun "ipa hostgroup-del tnghostgroup1"
+		rlRun "ipa hostgroup-del tnghostgroup2"
+		rlRun "ipa host-del tnghost1.$DOMAIN"
+		rlRun "ipa host-del tnghost2.$DOMAIN"
+		rlRun "ipa group-del tnggroup1"
+		rlRun "ipa group-del tnggroup2"
+		rlRun "ipa user-del tnguser1"
+		rlRun "ipa user-del tnguser2"
+	rlPhaseEnd
+}
+
+netgroup_find_negative()
+{
+	local tmpout=/tmp/errormsg.out
+	rlPhaseStartTest "ipa-netgroup-051-setup: Set up pre-reqs for find negative testing"
+		rlLog
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-netgroup-051-N: something"
+		rlRun "ipa netgroup-find badname > $tmpout 2>&1" 1
+		rlAssertGrep "^0 netgroups matched" $tmpout
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-netgroup-051-N: something"
+		rlRun "ipa netgroup-find --name=\" \" > $tmpout 2>&1" 1
+		rlAssertGrep "ipa: ERROR: invalid 'name': Leading and trailing spaces are not allowed"
+	rlPhaseEnd
+	
+	rlPhaseStartTest "ipa-netgroup-051-N: something"
+		rlRun "ipa netgroup-find --name=badname > $tmpout 2>&1" 1
+		rlAssertGrep "^0 netgroups matched" $tmpout
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-netgroup-051-N: something"
+		rlRun "ipa netgroup-find --desc=\" \" > $tmpout 2>&1" 1
+		rlAssertGrep "ipa: ERROR: invalid 'desc': Leading and trailing spaces are not allowed"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-netgroup-051-N: something"
+		rlRun "ipa netgroup-find --desc=baddesc > $tmpout 2>&1" 1
+		rlAssertGrep "^0 netgroups matched" $tmpout
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-netgroup-051-N: something"
+		rlRun "ipa netgroup-find --nisdomain=\" \" > $tmpout 2>&1" 1
+		rlAssertGrep "ipa: ERROR: invalid 'nisdomain': Leading and trailing spaces are not allowed" $tmpout
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-netgroup-051-N: something"
+		rlRun "ipa netgroup-find --nisdomain=baddomain > $tmpout 2>&1" 1
+		rlAssertGrep "^0 netgroups matched" $tmpout
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-netgroup-051-N: something"
+		rlRun "ipa netgroup-find --uuid=\" \" > $tmpout 2>&1" 1
+		rlAssertGrep "ipa: ERROR: invalid 'uuid': Leading and trailing spaces are not allowed" $tmpout
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-netgroup-051-N: something"
+		rlRun "ipa netgroup-find --uuid=00000000-0000-0000-0000-000000000000 > $tmpout 2>&1" 1
+		rlAssertGrep "^0 netgroups matched" $tmpout
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-netgroup-051-N: something"
+		rlRun "ipa netgroup-find --uuid=baduuid > $tmpout 2>&1" 1
+		rlAssertGrep "^0 netgroups matched" $tmpout
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-netgroup-051-N: something"
+		rlRun "ipa netgroup-find --usercat=badcat > $tmpout 2>&1" 1
+		rlAssertGrep "ipa: ERROR: invalid 'usercat': must be one of (u'all',)" $tmpout
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-netgroup-051-N: something"
+		rlRun "ipa netgroup-find --hostcat=badcat > $tmpout 2>&1" 1
+		rlAssertGrep "ipa: ERROR: invalid 'hostcat': must be one of (u'all',)" $tmpout
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-netgroup-051-N: something"
+		rlRun "ipa netgroup-find --timelimit=badtimelimit > $tmpout 2>&1" 1
+		rlAssertGrep "ipa: ERROR: invalid 'timelimit': must be an integer" $tmpout
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-netgroup-051-N: something"
+		rlRun "ipa netgroup-find --sizelimit=badsizelimit > $tmpout 2>&1" 1
+		rlAssertGrep "ipa: ERROR: invalid 'sizelimit': must be an integer" $tmpout
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-netgroup-051-N: something"
+		rlRun "ipa netgroup-find --netgroups=badnetgroups > $tmpout 2>&1" 1
+		rlAssertGrep "^0 netgroups matched" $tmpout
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-netgroup-051-N: something"
+		rlRun "ipa netgroup-find --no-netgroups=badnetgroups > $tmpout 2>&1" 1
+		rlAssertGrep "^0 netgroups matched" $tmpout
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-netgroup-051-N: something"
+		rlRun "ipa netgroup-find --users=badusers > $tmpout 2>&1" 1
+		rlAssertGrep "^0 netgroups matched" $tmpout
+	rlPhaseEnd
+
+#	rlPhaseStartTest "ipa-netgroup-051-N: something"
+#		rlRun "ipa netgroup-find --no-users=badusers > $tmpout 2>&1" 1
+#		rlAssertGrep "^0 netgroups matched" $tmpout
+#	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-netgroup-051-N: something"
+		rlRun "ipa netgroup-find --groups=badgroups > $tmpout 2>&1" 1
+		rlAssertGrep "^0 netgroups matched" $tmpout
+	rlPhaseEnd
+
+#	rlPhaseStartTest "ipa-netgroup-051-N: something"
+#		rlRun "ipa netgroup-find --no-groups=badgroups > $tmpout 2>&1" 1
+#		rlAssertGrep "^0 netgroups matched" $tmpout
+#	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-netgroup-051-N: something"
+		rlRun "ipa netgroup-find --hosts=badhosts > $tmpout 2>&1" 1
+		rlAssertGrep "^0 netgroups matched" $tmpout
+	rlPhaseEnd
+
+#	rlPhaseStartTest "ipa-netgroup-051-N: something"
+#		rlRun "ipa netgroup-find --no-hosts=badhosts > $tmpout 2>&1" 1
+#		rlAssertGrep "^0 netgroups matched" $tmpout
+#	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-netgroup-051-N: something"
+		rlRun "ipa netgroup-find --hostgroups=badhostgroups > $tmpout 2>&1" 1
+		rlAssertGrep "^0 netgroups matched" $tmpout
+	rlPhaseEnd
+
+#	rlPhaseStartTest "ipa-netgroup-051-N: something"
+#		rlRun "ipa netgroup-find --no-hostgroups=badhostgroups > $tmpout 2>&1" 1
+#		rlAssertGrep "^0 netgroups matched" $tmpout
+#	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-netgroup-051-N: something"
+		rlRun "ipa netgroup-find --in-netgroups=badnetgroups > $tmpout 2>&1" 1
+		rlAssertGrep "^0 netgroups matched" $tmpout
+	rlPhaseEnd
+
+#	rlPhaseStartTest "ipa-netgroup-051-N: something"
+#		rlRun "ipa netgroup-find --not-in-netgroups=badnetgroups > $tmpout 2>&1" 1
+#		rlAssertGrep "^0 netgroups matched" $tmpout
+#	rlPhaseEnd
 }
