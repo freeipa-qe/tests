@@ -85,6 +85,7 @@ createReplica1()
                         hostname_s=$(echo $s | cut -d. -f1)
 
 			# Preparing replica without --ip-address option
+			rlRun "echo \"$SLAVEIP		$hostname_s.$DOMAIN\" >> /etc/hosts"
 			rlRun "cat /etc/hosts"
 			rlRun "ipa dnsrecord-add $DOMAIN $hostname_s --a-rec=$SLAVEIP"
 			REVERSE_ZONE=`ipa dnszone-find | grep -i "zone name" | grep -i "arpa" | cut -d ":" -f 2`
