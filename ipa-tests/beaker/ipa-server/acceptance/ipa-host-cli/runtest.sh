@@ -579,7 +579,7 @@ rlPhaseStartTest "ipa-host-cli-38: find more hosts than exist"
         addHost $myhost2
         rlRun "addHostManagedBy $myhost2 $myhost1" 0 "Adding Managed By Host"
         rlRun "verifyHostAttr $myhost1 \"Managed by\" \"$myhost1, $myhost2\""
-	rlRun "ipa host-find --man-hosts=$myhost2 > /tmp/manbyhosts_find.out"
+	rlRun "ipa host-find --man-hosts=$myhost1 > /tmp/manbyhosts_find.out"
 	rlAssertGrep "Number of entries returned 2" "/tmp/manbyhosts_find.out"
 	rlAssertGrep "Host name: $myhost2" "/tmp/manbyhosts_find.out"
 	rlAssertGrep "Host name: $myhost1" "/tmp/manbyhosts_find.out"
@@ -588,9 +588,9 @@ rlPhaseStartTest "ipa-host-cli-38: find more hosts than exist"
     rlPhaseStartTest "ipa-host-cli-57: search a host when Managed By Host is removed"
         rlRun "removeHostManagedBy $myhost2 $myhost1" 0 "Removing Managed By Host"
         rlRun "verifyHostAttr $myhost1 \"Managed by\" $myhost1"
-	rlRun "ipa host-find --man-hosts=$myhost2 > /tmp/manbyhosts_removed.out"
+	rlRun "ipa host-find --man-hosts=$myhost1 > /tmp/manbyhosts_removed.out"
 	rlAssertGrep "Number of entries returned 1" "/tmp/manbyhosts_removed.out"
-	rlAssertNotGrep "Host name: $myhost1" "/tmp/manbyhosts_removed.out"
+	rlAssertNotGrep "Host name: $myhost2" "/tmp/manbyhosts_removed.out"
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-host-cli-58: search a host when Managed by multiple Hosts"
@@ -602,40 +602,97 @@ rlPhaseStartTest "ipa-host-cli-38: find more hosts than exist"
         addHost $myhost4
         rlRun "addHostManagedBy \"$myhost2, $myhost3, $myhost4\" $myhost1" 0 "Adding Managed By Hosts"
         rlRun "verifyHostAttr $myhost1 \"Managed by\" \"$myhost1, $myhost2, $myhost3, $myhost4\""
+	rlRun "ipa host-find --man-hosts=$myhost1 > /tmp/manbyhosts_$myhost1.out"
+	rlAssertGrep "Number of entries returned 4" "/tmp/manbyhosts_$myhost1.out"
+	rlAssertGrep "Host name: $myhost4" "/tmp/manbyhosts_$myhost1.out"
+	rlAssertGrep "Host name: $myhost3" "/tmp/manbyhosts_$myhost1.out"
+	rlAssertGrep "Host name: $myhost2" "/tmp/manbyhosts_$myhost1.out"
+	rlAssertGrep "Host name: $myhost1" "/tmp/manbyhosts_$myhost1.out"
+
 	rlRun "ipa host-find --man-hosts=$myhost2 > /tmp/manbyhosts_$myhost2.out"
-	rlLog `cat  /tmp/manbyhosts_$myhost2.out`
-	rlAssertGrep "Number of entries returned 2" "/tmp/manbyhosts_$myhost2.out"
-	rlAssertGrep "Host name: $myhost2" "/tmp/manbyhosts_$myhost2.out"
-	rlAssertGrep "Host name: $myhost1" "/tmp/manbyhosts_$myhost2.out"
+	rlAssertGrep "Number of entries returned 1" "/tmp/manbyhosts_$myhost2.out"
 
 	rlRun "ipa host-find --man-hosts=$myhost3 > /tmp/manbyhosts_$myhost3.out"
-	rlLog `cat  /tmp/manbyhosts_$myhost3.out`
-	rlAssertGrep "Number of entries returned 2" "/tmp/manbyhosts_$myhost3.out"
+	rlAssertGrep "Number of entries returned 1" "/tmp/manbyhosts_$myhost3.out"
+
 	rlAssertGrep "Host name: $myhost3" "/tmp/manbyhosts_$myhost3.out"
-	rlAssertGrep "Host name: $myhost1" "/tmp/manbyhosts_$myhost3.out"
 
 	rlRun "ipa host-find --man-hosts=$myhost4 > /tmp/manbyhosts_$myhost4.out"
-	rlLog `cat  /tmp/manbyhosts_$myhost4.out`
-	rlAssertGrep "Number of entries returned 2" "/tmp/manbyhosts_$myhost4.out"
+
+	rlAssertGrep "Number of entries returned 1" "/tmp/manbyhosts_$myhost4.out"
 	rlAssertGrep "Host name: $myhost4" "/tmp/manbyhosts_$myhost4.out"
-	rlAssertGrep "Host name: $myhost1" "/tmp/manbyhosts_$myhost4.out"
-	
+
+	host_list="$myhost1, $myhost2"
+        rlRun "ipa host-find --man-hosts=$host_list > /tmp/manbyhosts_myhost12.out"
+        rlAssertGrep "Number of entries returned 1" "/tmp/manbyhosts_myhost12.out"
+        rlAssertNotGrep "Host name: $myhost4" "/tmp/manbyhosts_myhost12.out"
+        rlAssertNotGrep "Host name: $myhost3" "/tmp/manbyhosts_myhost12.out"
+        rlAssertNotGrep "Host name: $myhost1" "/tmp/manbyhosts_myhost12.out"
+        rlAssertGrep "Host name: $myhost2" "/tmp/manbyhosts_myhost12.out"
+
+	host_list="$myhost1, $myhost3"
+        rlRun "ipa host-find --man-hosts=$host_list > /tmp/manbyhosts_myhost13.out"
+        rlAssertGrep "Number of entries returned 1" "/tmp/manbyhosts_myhost13.out"
+        rlAssertNotGrep "Host name: $myhost4" "/tmp/manbyhosts_myhost13.out"
+        rlAssertNotGrep "Host name: $myhost2" "/tmp/manbyhosts_myhost13.out"
+        rlAssertNotGrep "Host name: $myhost1" "/tmp/manbyhosts_myhost13.out"
+        rlAssertGrep "Host name: $myhost3" "/tmp/manbyhosts_myhost13.out"
+
+	host_list="$myhost1, $myhost4"
+        rlRun "ipa host-find --man-hosts=$host_list > /tmp/manbyhosts_myhost14.out"
+        rlAssertGrep "Number of entries returned 1" "/tmp/manbyhosts_myhost14.out"
+        rlAssertNotGrep "Host name: $myhost3" "/tmp/manbyhosts_myhost14.out"
+        rlAssertNotGrep "Host name: $myhost2" "/tmp/manbyhosts_myhost14.out"
+        rlAssertNotGrep "Host name: $myhost1" "/tmp/manbyhosts_myhost14.out"
+        rlAssertGrep "Host name: $myhost4" "/tmp/manbyhosts_myhost14.out"	
+
+	host_list="$myhost1, $myhost2, $myhost3"
+        rlRun "ipa host-find --man-hosts=$host_list > /tmp/manbyhosts_myhost123.out"
+        rlAssertGrep "Number of entries returned 0" "/tmp/manbyhosts_myhost123.out"
+        rlAssertNotGrep "Host name: $myhost4" "/tmp/manbyhosts_myhost123.out"
+        rlAssertNotGrep "Host name: $myhost3" "/tmp/manbyhosts_myhost123.out"
+        rlAssertNotGrep "Host name: $myhost1" "/tmp/manbyhosts_myhost123.out"
+        rlAssertNotGrep "Host name: $myhost2" "/tmp/manbyhosts_myhost123.out"
+
+	host_list="$myhost1, $myhost2, $myhost4"
+        rlRun "ipa host-find --man-hosts=$host_list > /tmp/manbyhosts_myhost124.out"    
+        rlAssertGrep "Number of entries returned 0" "/tmp/manbyhosts_myhost124.out"
+        rlAssertNotGrep "Host name: $myhost4" "/tmp/manbyhosts_myhost124.out"
+        rlAssertNotGrep "Host name: $myhost3" "/tmp/manbyhosts_myhost124.out"
+        rlAssertNotGrep "Host name: $myhost1" "/tmp/manbyhosts_myhost124.out"
+        rlAssertNotGrep "Host name: $myhost2" "/tmp/manbyhosts_myhost124.out"
+
+	host_list="$myhost1, $myhost3, $myhost4"
+        rlRun "ipa host-find --man-hosts=$host_list > /tmp/manbyhosts_myhost134.out"
+        rlAssertGrep "Number of entries returned 0" "/tmp/manbyhosts_myhost134.out"
+        rlAssertNotGrep "Host name: $myhost4" "/tmp/manbyhosts_myhost134.out"
+        rlAssertNotGrep "Host name: $myhost3" "/tmp/manbyhosts_myhost134.out"
+        rlAssertNotGrep "Host name: $myhost1" "/tmp/manbyhosts_myhost134.out"
+        rlAssertNotGrep "Host name: $myhost2" "/tmp/manbyhosts_myhost134.out"
+
 	host_list="$myhost2, $myhost3"
 	rlRun "ipa host-find --man-hosts=$host_list > /tmp/manbyhosts_myhost23.out"
-	rlLog `cat  /tmp/manbyhosts_myhost23.out`
-        rlAssertGrep "Number of entries returned 3" "/tmp/manbyhosts_myhost23.out"
-        rlAssertGrep "Host name: $myhost3" "/tmp/manbyhosts_myhost23.out"
-        rlAssertGrep "Host name: $myhost2" "/tmp/manbyhosts_myhost23.out"
-        rlAssertGrep "Host name: $myhost1" "/tmp/manbyhosts_myhost23.out"
+        rlAssertGrep "Number of entries returned 0" "/tmp/manbyhosts_myhost23.out"
+        rlAssertNotGrep "Host name: $myhost4" "/tmp/manbyhosts_myhost23.out"
+        rlAssertNotGrep "Host name: $myhost3" "/tmp/manbyhosts_myhost23.out"
+        rlAssertNotGrep "Host name: $myhost2" "/tmp/manbyhosts_myhost23.out"
+        rlAssertNotGrep "Host name: $myhost1" "/tmp/manbyhosts_myhost23.out"
 
 	host_list="$myhost2, $myhost3, $myhost4"
 	rlRun "ipa host-find --man-hosts=$host_list > /tmp/manbyhosts_myhost234.out"
-	rlLog `cat  /tmp/manbyhosts_myhost234.out`
-        rlAssertGrep "Number of entries returned 4" "/tmp/manbyhosts_myhost234.out"
-        rlAssertGrep "Host name: $myhost4" "/tmp/manbyhosts_myhost234.out"
-        rlAssertGrep "Host name: $myhost3" "/tmp/manbyhosts_myhost234.out"
-        rlAssertGrep "Host name: $myhost2" "/tmp/manbyhosts_myhost234.out"
-        rlAssertGrep "Host name: $myhost1" "/tmp/manbyhosts_myhost234.out"
+        rlAssertGrep "Number of entries returned 0" "/tmp/manbyhosts_myhost234.out"
+        rlAssertNotGrep "Host name: $myhost4" "/tmp/manbyhosts_myhost234.out"
+        rlAssertNotGrep "Host name: $myhost3" "/tmp/manbyhosts_myhost234.out"
+        rlAssertNotGrep "Host name: $myhost2" "/tmp/manbyhosts_myhost234.out"
+        rlAssertNotGrep "Host name: $myhost1" "/tmp/manbyhosts_myhost234.out"
+
+	host_list="$myhost1, $myhost2, $myhost3, $myhost4"
+        rlRun "ipa host-find --man-hosts=$host_list > /tmp/manbyhosts_myhost1234.out"
+        rlAssertGrep "Number of entries returned 0" "/tmp/manbyhosts_myhost1234.out"
+        rlAssertNotGrep "Host name: $myhost4" "/tmp/manbyhosts_myhost1234.out"
+        rlAssertNotGrep "Host name: $myhost3" "/tmp/manbyhosts_myhost1234.out"
+        rlAssertNotGrep "Host name: $myhost2" "/tmp/manbyhosts_myhost1234.out"
+        rlAssertNotGrep "Host name: $myhost1" "/tmp/manbyhosts_myhost1234.out"
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-host-cli-59: search a host when Multiple Managed By Hosts removed"
@@ -645,17 +702,24 @@ rlPhaseStartTest "ipa-host-cli-38: find more hosts than exist"
         myhost4=mytesthost4.$DOMAIN
         rlRun "removeHostManagedBy \"$myhost2, $myhost3, $myhost4\" $myhost1" 0 "Removing Managed By Hosts"
         rlRun "verifyHostAttr $myhost1 \"Managed by\" $myhost1"
+	rlRun "ipa host-find --man-hosts=$myhost1 > /tmp/manbyhosts_$myhost1.out"
+	rlAssertGrep "Number of entries returned 1" "/tmp/manbyhosts_$myhost1.out"
+	rlAssertGrep "Host name: $myhost1" "/tmp/manbyhosts_$myhost1.out"
+	rlAssertNotGrep "Host name: $myhost2" "/tmp/manbyhosts_$myhost1.out"
+	rlAssertNotGrep "Host name: $myhost3" "/tmp/manbyhosts_$myhost1.out"
+	rlAssertNotGrep "Host name: $myhost4" "/tmp/manbyhosts_$myhost1.out"
+
 	rlRun "ipa host-find --man-hosts=$myhost2 > /tmp/manbyhosts_$myhost2.out"
-	rlAssertGrep "Number of entries returned 1" "/tmp/manbyhosts_$myhost2.out"
-	rlAssertNotGrep "Host name: $myhost1" "/tmp/manbyhosts_$myhost2.out"
+        rlAssertGrep "Number of entries returned 1" "/tmp/manbyhosts_$myhost2.out"
+        rlAssertGrep "Host name: $myhost2" "/tmp/manbyhosts_$myhost2.out"
 
         rlRun "ipa host-find --man-hosts=$myhost3 > /tmp/manbyhosts_$myhost3.out"
 	rlAssertGrep "Number of entries returned 1" "/tmp/manbyhosts_$myhost3.out"
-	rlAssertNotGrep "Host name: $myhost1" "/tmp/manbyhosts_$myhost3.out"
+	rlAssertGrep "Host name: $myhost3" "/tmp/manbyhosts_$myhost3.out"
 
         rlRun "ipa host-find --man-hosts=$myhost4 > /tmp/manbyhosts_$myhost4.out"
 	rlAssertGrep "Number of entries returned 1" "/tmp/manbyhosts_$myhost4.out"
-	rlAssertNotGrep "Host name: $myhost1" "/tmp/manbyhosts_$myhost4.out"
+	rlAssertGrep "Host name: $myhost4" "/tmp/manbyhosts_$myhost4.out"
         deleteHost $myhost1
         deleteHost $myhost2
         deleteHost $myhost3
@@ -677,12 +741,34 @@ rlPhaseStartTest "ipa-host-cli-38: find more hosts than exist"
         rlRun "verifyHostAttr $myhost1 \"Managed by\" \"$myhost1, $myhost2\""
         rlRun "verifyHostAttr $myhost3 \"Managed by\" \"$myhost3, $myhost2\""
         rlRun "verifyHostAttr $myhost4 \"Managed by\" \"$myhost4, $myhost2\""
-        rlRun "ipa host-find --man-hosts=$myhost2 > /tmp/manbyhosts_multi.out"
-	rlAssertGrep "Number of entries returned 4" "/tmp/manbyhosts_multi.out"
-	rlAssertGrep "Host name: $myhost4" "/tmp/manbyhosts_multi.out"
-	rlAssertGrep "Host name: $myhost3" "/tmp/manbyhosts_multi.out"
-	rlAssertGrep "Host name: $myhost2" "/tmp/manbyhosts_multi.out"
-	rlAssertGrep "Host name: $myhost1" "/tmp/manbyhosts_multi.out"
+	rlRun "ipa host-find --man-hosts=$myhost1 > /tmp/manbyhosts_multi_1.out"
+        rlAssertGrep "Number of entries returned 2" "/tmp/manbyhosts_multi_1.out"
+        rlAssertNotGrep "Host name: $myhost4" "/tmp/manbyhosts_multi_1.out"
+        rlAssertNotGrep "Host name: $myhost3" "/tmp/manbyhosts_multi_1.out"
+        rlAssertGrep "Host name: $myhost2" "/tmp/manbyhosts_multi_1.out"
+        rlAssertGrep "Host name: $myhost1" "/tmp/manbyhosts_multi_1.out"
+
+        rlRun "ipa host-find --man-hosts=$myhost2 > /tmp/manbyhosts_multi_2.out"
+	rlAssertGrep "Number of entries returned 1" "/tmp/manbyhosts_multi_2.out"
+	rlAssertNotGrep "Host name: $myhost4" "/tmp/manbyhosts_multi_2.out"
+	rlAssertNotGrep "Host name: $myhost3" "/tmp/manbyhosts_multi_2.out"
+	rlAssertNotGrep "Host name: $myhost1" "/tmp/manbyhosts_multi_2.out"
+	rlAssertGrep "Host name: $myhost2" "/tmp/manbyhosts_multi_2.out"
+
+	rlRun "ipa host-find --man-hosts=$myhost3 > /tmp/manbyhosts_multi_3.out"
+        rlAssertGrep "Number of entries returned 2" "/tmp/manbyhosts_multi_3.out"
+        rlAssertNotGrep "Host name: $myhost4" "/tmp/manbyhosts_multi_3.out"
+        rlAssertGrep "Host name: $myhost3" "/tmp/manbyhosts_multi_3.out"
+        rlAssertGrep "Host name: $myhost2" "/tmp/manbyhosts_multi_3.out"
+        rlAsserNottGrep "Host name: $myhost1" "/tmp/manbyhosts_multi_3.out"
+
+	rlRun "ipa host-find --man-hosts=$myhost4 > /tmp/manbyhosts_multi_4.out"
+        rlAssertGrep "Number of entries returned 2" "/tmp/manbyhosts_multi_4.out"
+        rlAssertGrep "Host name: $myhost4" "/tmp/manbyhosts_multi_4.out"
+        rlAssertNotGrep "Host name: $myhost3" "/tmp/manbyhosts_multi_4.out"
+        rlAssertGrep "Host name: $myhost2" "/tmp/manbyhosts_multi_4.out"
+        rlAsserNottGrep "Host name: $myhost1" "/tmp/manbyhosts_multi_4.out"
+
         rlRun "removeHostManagedBy $myhost2 $myhost1" 0 "Removing Managed By Host"
         rlRun "removeHostManagedBy $myhost2 $myhost3" 0 "Removing Managed By Host"
         rlRun "removeHostManagedBy $myhost2 $myhost4" 0 "Removing Managed By Host"
@@ -694,8 +780,9 @@ rlPhaseStartTest "ipa-host-cli-38: find more hosts than exist"
 	
    rlPhaseStartTest "ipa-host-cli-61: Negative - search with man-hosts when host does not exist"
         myhost1=mytesthost1.$DOMAIN
-	rlRun "ipa host-find --man-hosts=$myhost1 > /tmp/manbyhosts_notahost.out"
-	rlAssertGrep "Number of entries returned 0" "/tmp/manbyhosts_notahost.out"
+	expmsg="ipa: ERROR: $myhost1: host not found"
+        command="ipa host-find --man-hosts=$myhost1"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message - man-hosts when host does not exist."
    rlPhaseEnd
 
    rlPhaseStartTest "ipa-host-cli-62: search with not-man-hosts when Managed By a Host"
@@ -708,28 +795,35 @@ rlPhaseStartTest "ipa-host-cli-38: find more hosts than exist"
         rlRun "verifyHostAttr $myhost1 \"Managed by\" $myhost1"
         rlRun "verifyHostAttr $myhost2 \"Managed by\" $myhost2"
         rlRun "verifyHostAttr $myhost3 \"Managed by\" $myhost3"
-        rlRun "ipa host-find --not-man-hosts=$myhost2 > /tmp/notmanbyhosts_test1.out"
         rlRun "addHostManagedBy $myhost2 $myhost1" 0 "Adding Managed By Host"
         rlRun "verifyHostAttr $myhost1 \"Managed by\" \"$myhost1, $myhost2\""
-        rlRun "ipa host-find --not-man-hosts=$myhost2 > /tmp/notmanbyhosts_find.out"
+        rlRun "ipa host-find --not-man-hosts=$myhost1 > /tmp/notmanbyhosts_find.out"
 	result=`cat /tmp/notmanbyhosts_find.out | grep "Number of entries returned"`
 	number=`echo $result | cut -d " " -f 5`
-        rlAssertGreaterOrEqual "Number of entries returned is >= 0" "$number" "0"
+        rlAssertGreaterOrEqual "Number of entries returned is >= 1" "$number" "1"
 	rlAssertNotGrep "Host name: $myhost2" "/tmp/notmanbyhosts_find.out" 
         rlAssertNotGrep "Host name: $myhost1" "/tmp/notmanbyhosts_find.out" 
         rlAssertGrep "Host name: $myhost3" "/tmp/notmanbyhosts_find.out"
+
+	rlRun "ipa host-find --not-man-hosts=$myhost2 > /tmp/notmanbyhosts_find_2.out"
+        result=`cat /tmp/notmanbyhosts_find.out | grep "Number of entries returned"`
+        number=`echo $result | cut -d " " -f 5`
+        rlAssertGreaterOrEqual "Number of entries returned is >= 2" "$number" "2"
+        rlAssertNotGrep "Host name: $myhost2" "/tmp/notmanbyhosts_find_2.out"
+        rlAssertGrep "Host name: $myhost1" "/tmp/notmanbyhosts_find_2.out"
+        rlAssertGrep "Host name: $myhost3" "/tmp/notmanbyhosts_find_2.out"
     rlPhaseEnd
  
     rlPhaseStartTest "ipa-host-cli-63: search a host when Managed By Host is removed"
         rlRun "removeHostManagedBy $myhost2 $myhost1" 0 "Removing Managed By Host"
         rlRun "verifyHostAttr $myhost1 \"Managed by\" $myhost1"
-        rlRun "ipa host-find --not-man-hosts=$myhost2 > /tmp/notmanbyhosts_removed.out"
+        rlRun "ipa host-find --not-man-hosts=$myhost1 > /tmp/notmanbyhosts_removed.out"
 	result=`cat /tmp/notmanbyhosts_removed.out | grep "Number of entries returned"`
 	number=`echo $result | cut -d " " -f 5`
-        rlAssertGreaterOrEqual "Number of entries returned is >= 1" "$number" "1"
-	rlAssertGrep "Host name: $myhost1" "/tmp/notmanbyhosts_removed.out" 
+        rlAssertGreaterOrEqual "Number of entries returned is >= 2" "$number" "2"
+	rlAssertNotGrep "Host name: $myhost1" "/tmp/notmanbyhosts_removed.out" 
         rlAssertGrep "Host name: $myhost3" "/tmp/notmanbyhosts_removed.out" 
-        rlAssertNotGrep "Host name: $myhost2" "/tmp/notmanbyhosts_removed.out" 
+        rlAssertGrep "Host name: $myhost2" "/tmp/notmanbyhosts_removed.out" 
     rlPhaseEnd
  
     rlPhaseStartTest "ipa-host-cli-64: search with not-man-hosts when host is Managed by multiple Hosts"
@@ -740,53 +834,90 @@ rlPhaseStartTest "ipa-host-cli-38: find more hosts than exist"
         addHost $myhost4
         rlRun "addHostManagedBy \"$myhost2, $myhost3, $myhost4\" $myhost1" 0 "Adding Managed By Hosts"
         rlRun "verifyHostAttr $myhost1 \"Managed by\" \"$myhost1, $myhost2, $myhost3, $myhost4\""
-	rlRun "ipa host-find --not-man-hosts="$myhost2" > /tmp/notmanbyhosts_$myhost2.out"
+	rlRun "ipa host-find --not-man-hosts=\"$myhost1\" > /tmp/notmanbyhosts_$myhost1.out"
+        result=`cat /tmp/notmanbyhosts_$myhost1.out | grep "Number of entries returned"`
+        number=`echo $result | cut -d " " -f 5`
+        rlAssertGreaterOrEqual "Number of entries returned is >= 0" "$number" "0"
+        rlAssertNotGrep "Host name: $myhost1" "/tmp/notmanbyhosts_$myhost1.out"
+        rlAssertNotGrep "Host name: $myhost2" "/tmp/notmanbyhosts_$myhost1.out"
+        rlAssertNotGrep "Host name: $myhost3" "/tmp/notmanbyhosts_$myhost1.out"
+        rlAssertNotGrep "Host name: $myhost4" "/tmp/notmanbyhosts_$myhost1.out"
+
+	rlRun "ipa host-find --not-man-hosts=\"$myhost2\" > /tmp/notmanbyhosts_$myhost2.out"
 	result=`cat /tmp/notmanbyhosts_$myhost2.out | grep "Number of entries returned"`
 	number=`echo $result | cut -d " " -f 5`
-        rlAssertGreaterOrEqual "Number of entries returned is >= 2" "$number" "2"
-	rlLog `cat /tmp/notmanbyhosts_$myhost2.out`
+        rlAssertGreaterOrEqual "Number of entries returned is >= 3" "$number" "3"
         rlAssertNotGrep "Host name: $myhost2" "/tmp/notmanbyhosts_$myhost2.out" 
-        rlAssertNotGrep "Host name: $myhost1" "/tmp/notmanbyhosts_$myhost2.out" 
+        rlAssertGrep "Host name: $myhost1" "/tmp/notmanbyhosts_$myhost2.out" 
         rlAssertGrep "Host name: $myhost3" "/tmp/notmanbyhosts_$myhost2.out" 
         rlAssertGrep "Host name: $myhost4" "/tmp/notmanbyhosts_$myhost2.out" 
 	
 	ipa host-find --not-man-hosts=$myhost3 > /tmp/notmanbyhosts_$myhost3.out
 	result=`cat /tmp/notmanbyhosts_$myhost3.out | grep "Number of entries returned"`
 	number=`echo $result | cut -d " " -f 5`
-        rlAssertGreaterOrEqual "Number of entries returned is >= 2" "$number" "2"
+        rlAssertGreaterOrEqual "Number of entries returned is >= 3" "$number" "3"
         rlAssertNotGrep "Host name: $myhost3" "/tmp/notmanbyhosts_$myhost3.out"
-        rlAssertNotGrep "Host name: $myhost1" "/tmp/notmanbyhosts_$myhost3.out"
+        rlAssertGrep "Host name: $myhost1" "/tmp/notmanbyhosts_$myhost3.out"
         rlAssertGrep "Host name: $myhost2" "/tmp/notmanbyhosts_$myhost3.out"
         rlAssertGrep "Host name: $myhost4" "/tmp/notmanbyhosts_$myhost3.out"
 
         ipa host-find --not-man-hosts=$myhost4 > /tmp/notmanbyhosts_$myhost4.out
 	result=`cat /tmp/notmanbyhosts_$myhost4.out | grep "Number of entries returned"`
 	number=`echo $result | cut -d " " -f 5`
-        rlAssertGreaterOrEqual "Number of entries returned is >= 2" "$number" "2"
+        rlAssertGreaterOrEqual "Number of entries returned is >= 3" "$number" "3"
         rlAssertNotGrep "Host name: $myhost4" "/tmp/notmanbyhosts_$myhost4.out"
-        rlAssertNotGrep "Host name: $myhost1" "/tmp/notmanbyhosts_$myhost4.out"
+        rlAssertGrep "Host name: $myhost1" "/tmp/notmanbyhosts_$myhost4.out"
         rlAssertGrep "Host name: $myhost2" "/tmp/notmanbyhosts_$myhost4.out"
         rlAssertGrep "Host name: $myhost3" "/tmp/notmanbyhosts_$myhost4.out"
 
+	rlRun "ipa host-find --not-man-hosts=\"$myhost1, $myhost2\" > /tmp/notmanbyhosts_myhost12.out"
+        result=`cat /tmp/notmanbyhosts_myhost12.out | grep "Number of entries returned"`
+        number=`echo $result | cut -d " " -f 5`
+        rlAssertGreaterOrEqual "Number of entries returned is >= 0" "$number" "0"
+        rlAssertNotGrep "Host name: $myhost1" "/tmp/notmanbyhosts_myhost12.out"
+        rlAssertNotGrep "Host name: $myhost2" "/tmp/notmanbyhosts_myhost12.out"
+        rlAssertNotGrep "Host name: $myhost3" "/tmp/notmanbyhosts_myhost12.out"
+        rlAssertNotGrep "Host name: $myhost4" "/tmp/notmanbyhosts_myhost12.out"
+	
+	rlRun "ipa host-find --not-man-hosts=\"$myhost1, $myhost3\" > /tmp/notmanbyhosts_myhost13.out"
+        result=`cat /tmp/notmanbyhosts_myhost13.out | grep "Number of entries returned"`
+        number=`echo $result | cut -d " " -f 5`
+        rlAssertGreaterOrEqual "Number of entries returned is >= 0" "$number" "0"
+        rlAssertNotGrep "Host name: $myhost1" "/tmp/notmanbyhosts_myhost13.out"
+        rlAssertNotGrep "Host name: $myhost2" "/tmp/notmanbyhosts_myhost13.out"
+        rlAssertNotGrep "Host name: $myhost3" "/tmp/notmanbyhosts_myhost13.out"
+        rlAssertNotGrep "Host name: $myhost4" "/tmp/notmanbyhosts_myhost13.out"
+	
 	host_list="$myhost2, $myhost3"
         rlRun "ipa host-find --not-man-hosts=$host_list > /tmp/notmanbyhosts_myhost23.out"
 	result=`cat /tmp/notmanbyhosts_myhost23.out | grep "Number of entries returned"`
 	number=`echo $result | cut -d " " -f 5`
-        rlAssertGreaterOrEqual "Number of entries returned is >= 1" "$number" "1"
-        rlAssertNotGrep "Host name: $myhost3" "/tmp/notmanbyhosts_myhost23.out" 
-        rlAssertNotGrep "Host name: $myhost1" "/tmp/notmanbyhosts_myhost23.out" 
+        rlAssertGreaterOrEqual "Number of entries returned is >= 2" "$number" "2"
+        rlAssertGrep "Host name: $myhost1" "/tmp/notmanbyhosts_myhost23.out" 
         rlAssertNotGrep "Host name: $myhost2" "/tmp/notmanbyhosts_myhost23.out" 
+        rlAssertNotGrep "Host name: $myhost3" "/tmp/notmanbyhosts_myhost23.out" 
         rlAssertGrep "Host name: $myhost4" "/tmp/notmanbyhosts_myhost23.out" 
+	
 	
 	host_list="$myhost2, $myhost3, $myhost4"
         rlRun "ipa host-find --not-man-hosts=$host_list > /tmp/notmanbyhosts_myhost234.out"
 	result=`cat /tmp/notmanbyhosts_myhost234.out | grep "Number of entries returned"`
 	number=`echo $result | cut -d " " -f 5`
-        rlAssertGreaterOrEqual "Number of entries returned is >= 0" "$number" "0"
-        rlAssertNotGrep "Host name: $myhost4" "/tmp/notmanbyhosts_myhost234.out" 
-        rlAssertNotGrep "Host name: $myhost1" "/tmp/notmanbyhosts_myhost234.out"
+        rlAssertGreaterOrEqual "Number of entries returned is >= 1" "$number" "1"
+        rlAssertGrep "Host name: $myhost1" "/tmp/notmanbyhosts_myhost234.out"
         rlAssertNotGrep "Host name: $myhost2" "/tmp/notmanbyhosts_myhost234.out"
         rlAssertNotGrep "Host name: $myhost3" "/tmp/notmanbyhosts_myhost234.out"
+        rlAssertNotGrep "Host name: $myhost4" "/tmp/notmanbyhosts_myhost234.out" 
+
+	host_list="$myhost1, $myhost2, $myhost3, $myhost4"
+        rlRun "ipa host-find --not-man-hosts=$host_list > /tmp/notmanbyhosts_myhost1234.out"
+        result=`cat /tmp/notmanbyhosts_myhost1234.out | grep "Number of entries returned"`
+        number=`echo $result | cut -d " " -f 5`
+        rlAssertGreaterOrEqual "Number of entries returned is >= 0" "$number" "0"
+        rlAssertNotGrep "Host name: $myhost1" "/tmp/notmanbyhosts_myhost1234.out"
+        rlAssertNotGrep "Host name: $myhost2" "/tmp/notmanbyhosts_myhost1234.out"
+        rlAssertNotGrep "Host name: $myhost3" "/tmp/notmanbyhosts_myhost1234.out"
+        rlAssertNotGrep "Host name: $myhost4" "/tmp/notmanbyhosts_myhost1234.out"
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-host-cli-65: search with not-man-by-host when Multiple Managed By Hosts removed"
@@ -796,6 +927,15 @@ rlPhaseStartTest "ipa-host-cli-38: find more hosts than exist"
         myhost4=nmanbyhost4.$DOMAIN
         rlRun "removeHostManagedBy \"$myhost2, $myhost3, $myhost4\" $myhost1" 0 "Removing Managed By Hosts"
         rlRun "verifyHostAttr $myhost1 \"Managed by\" $myhost1"
+	rlRun "ipa host-find --not-man-hosts=$myhost1 > /tmp/notmanbyhosts_$myhost1.out"
+        result=`cat /tmp/notmanbyhosts_$myhost1.out | grep "Number of entries returned"`
+        number=`echo $result | cut -d " " -f 5`
+        rlAssertGreaterOrEqual "Number of entries returned is >= 3" "$number" "3"
+        rlAssertNotGrep "Host name: $myhost1" "/tmp/notmanbyhosts_$myhost1.out"
+        rlAssertGrep "Host name: $myhost4" "/tmp/notmanbyhosts_$myhost1.out"
+        rlAssertGrep "Host name: $myhost3" "/tmp/notmanbyhosts_$myhost1.out"
+        rlAssertGrep "Host name: $myhost2" "/tmp/notmanbyhosts_$myhost1.out"
+
         rlRun "ipa host-find --not-man-hosts=$myhost2 > /tmp/notmanbyhosts_$myhost2.out"
 	result=`cat /tmp/notmanbyhosts_$myhost2.out | grep "Number of entries returned"`
 	number=`echo $result | cut -d " " -f 5`
@@ -843,14 +983,33 @@ rlPhaseStartTest "ipa-host-cli-38: find more hosts than exist"
         rlRun "verifyHostAttr $myhost1 \"Managed by\" \"$myhost1, $myhost2\""
         rlRun "verifyHostAttr $myhost3 \"Managed by\" \"$myhost3, $myhost2\""
         rlRun "verifyHostAttr $myhost4 \"Managed by\" \"$myhost4, $myhost2\""
-        rlRun "ipa host-find --not-man-hosts=$myhost2 > /tmp/notmanbyhosts_multi.out"
-	result=`cat /tmp/notmanbyhosts_multi.out | grep "Number of entries returned"`
+	rlRun "ipa host-find --not-man-hosts=$myhost1 > /tmp/notmanbyhosts_multi_1.out"
+        result=`cat /tmp/notmanbyhosts_multi_1.out | grep "Number of entries returned"`
         number=`echo $result | cut -d " " -f 5`
-        rlAssertGreaterOrEqual "Number of entries returned is >= 0" "$number" "0"
-        rlAssertNotGrep "Host name: $myhost4" "/tmp/notmanbyhosts_multi.out"
-        rlAssertNotGrep "Host name: $myhost3" "/tmp/notmanbyhosts_multi.out"
-        rlAssertNotGrep "Host name: $myhost2" "/tmp/notmanbyhosts_multi.out"
-        rlAssertNotGrep "Host name: $myhost1" "/tmp/notmanbyhosts_multi.out"
+        rlAssertGreaterOrEqual "Number of entries returned is >= 2" "$number" "2"
+        rlAssertGrep "Host name: $myhost4" "/tmp/notmanbyhosts_multi_1.out"
+        rlAssertGrep "Host name: $myhost3" "/tmp/notmanbyhosts_multi_1.out"
+        rlAssertNotGrep "Host name: $myhost2" "/tmp/notmanbyhosts_multi_1.out"
+        rlAssertNotGrep "Host name: $myhost1" "/tmp/notmanbyhosts_multi_1.out"
+
+        rlRun "ipa host-find --not-man-hosts=$myhost2 > /tmp/notmanbyhosts_multi_2.out"
+	result=`cat /tmp/notmanbyhosts_multi_2.out | grep "Number of entries returned"`
+        number=`echo $result | cut -d " " -f 5`
+        rlAssertGreaterOrEqual "Number of entries returned is >= 3" "$number" "3"
+        rlAssertGrep "Host name: $myhost4" "/tmp/notmanbyhosts_multi_2.out"
+        rlAssertGrep "Host name: $myhost3" "/tmp/notmanbyhosts_multi_2.out"
+        rlAssertNotGrep "Host name: $myhost2" "/tmp/notmanbyhosts_multi_2.out"
+        rlAssertGrep "Host name: $myhost1" "/tmp/notmanbyhosts_multi_2.out"
+
+	rlRun "ipa host-find --not-man-hosts=$myhost3 > /tmp/notmanbyhosts_multi_3.out"
+        result=`cat /tmp/notmanbyhosts_multi_3.out | grep "Number of entries returned"`
+        number=`echo $result | cut -d " " -f 5`
+        rlAssertGreaterOrEqual "Number of entries returned is >= 2" "$number" "2"
+        rlAssertGrep "Host name: $myhost4" "/tmp/notmanbyhosts_multi_3.out"
+        rlAssertNotGrep "Host name: $myhost3" "/tmp/notmanbyhosts_multi_3.out"
+        rlAssertNotGrep "Host name: $myhost2" "/tmp/notmanbyhosts_multi_3.out"
+        rlAssertGrep "Host name: $myhost1" "/tmp/notmanbyhosts_multi_3.out"
+
         rlRun "removeHostManagedBy $myhost2 $myhost1" 0 "Removing Managed By Host"
         rlRun "removeHostManagedBy $myhost2 $myhost3" 0 "Removing Managed By Host"
         rlRun "removeHostManagedBy $myhost2 $myhost4" 0 "Removing Managed By Host"
@@ -861,10 +1020,10 @@ rlPhaseStartTest "ipa-host-cli-38: find more hosts than exist"
    rlPhaseEnd
 
    rlPhaseStartTest "ipa-host-cli-67: Negative - search with not-man-hosts when host does not exist"
-        rlRun "ipa host-find --not-man-hosts=notahost > /tmp/notmanbyhosts_notahost.out"
-	result=`cat /tmp/notmanbyhosts_notahost.out | grep "Number of entries returned"`
-        number=`echo $result | cut -d " " -f 5`
-        rlAssertGreaterOrEqual "Number of entries returned is >= 0" "$number" "0"
+	myhost1=notahost
+	expmsg="ipa: ERROR: $myhost1: host not found"
+        command="ipa host-find --man-hosts=$myhost1"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message - not-man-hosts when host does not exist."
    rlPhaseEnd
 
    rlPhaseStartTest "ipa-host-cli-68: --pkey-only test of ipa host-find"
