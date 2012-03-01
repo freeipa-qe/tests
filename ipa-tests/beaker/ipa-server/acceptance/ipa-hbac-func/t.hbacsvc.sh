@@ -2683,3 +2683,45 @@ hbacsvc_client2_bug766876() {
 
 }
 
+hbacsvc_client_bug766876_2() {
+
+        rlPhaseStartTest "ipa-hbacsvc-client-bug766876_2: ipa_hbac_support_srchost is set to true - Case 2"
+
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                sleep 5
+		rlRun "sed -i '2iipa_hbac_support_srchost = true' /etc/sssd/sssd.conf"
+		rlRun "service sssd retart"
+		rlLog "Verifies https://bugzilla.redhat.com/show_bug.cgi?id=798317"
+
+                rlRun "getent -s sss passwd user766876"
+                rlRun "ssh_auth_success user766876 testpw123@ipa.com $MASTER"
+
+                # Reverting back - sssd.conf
+                rlRun "sed -i 's/ipa_hbac_support_srchost = true/ipa_hbac_support_srchost = false/g' /etc/sssd/sssd.conf"
+                rlRun "service sssd restart"
+
+
+        rlPhaseEnd
+
+}
+
+hbacsvc_client2_bug766876_2() {
+
+        rlPhaseStartTest "ipa-hbacsvc-client2-bug766876_2: ipa_hbac_support_srchost is set to true - Case 2"
+
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                sleep 5
+		rlRun "sed -i '2iipa_hbac_support_srchost = true' /etc/sssd/sssd.conf"
+		rlRun "service sssd retart"
+
+                rlRun "getent -s sss passwd user766876"
+                rlRun "ssh_auth_failure user766876 testpw123@ipa.com $MASTER"
+
+		# Reverting back - sssd.conf
+		rlRun "sed -i 's/ipa_hbac_support_srchost = true/ipa_hbac_support_srchost = false/g' /etc/sssd/sssd.conf"
+		rlRun "service sssd restart"
+
+        rlPhaseEnd
+
+}
+
