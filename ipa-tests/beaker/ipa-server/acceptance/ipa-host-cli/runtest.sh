@@ -552,6 +552,7 @@ rlPhaseStartTest "ipa-host-cli-38: find more hosts than exist"
 	rlRun "ipa host-find $myhost" 0 "Making sure host is found"
 	rlRun "ipa host-mod --desc=test $myhost" 0 "Modifying host with hostname ending in ."
 	rlRun "ipa host-del $myhost" 0 "Deleting host with hostname ending in ."
+	rlRun "ipa config-mod --searchrecordslimit=100" 0 "set search records limit back to default"
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-host-cli-53: Negative - add host with _"
