@@ -38,6 +38,7 @@ netgroup_bugs()
 	netgroup_bz_797237
 	netgroup_bz_797256
 	netgroup_bz_794882
+	netgroup_bz_798792
 }
 
 netgroup_bz_772043()
@@ -355,5 +356,117 @@ netgroup_bz_794882()
 		rlRun "ipa netgroup-del netgroup_bz_794882"
 		rlRun "ipa host-del ipahost.testrelm.com"
 		[ -f $tmpout ] && rm -f $tmpout
+	rlPhaseEnd
+}
+
+netgroup_bz_798792()
+{
+
+	rlPhaseStartTest "netgroup_bz_798792_1: ipa netgroup-find options set to space return internal errors (netgroups)"
+		rlRun "ipa netgroup-find --netgroups=\" \" > $tmpout 2>&1" 1
+		if [ $(grep "ipa: ERROR: an internal error has occurred" $tmpout|wc -l) -gt 0 ]; then
+			rlFail "BZ 798792 found...ipa netgroup-find options set to space return internal errors"
+		else
+			rlPass "BZ 798792 not found."
+		fi
+	rlPhaseEnd
+
+	rlPhaseStartTest "netgroup_bz_798792_2: ipa netgroup-find options set to space return internal errors (no-netgroups)"
+		rlRun "ipa netgroup-find --no-netgroups=\" \" > $tmpout 2>&1" 1
+		if [ $(grep "ipa: ERROR: an internal error has occurred" $tmpout|wc -l) -gt 0 ]; then
+			rlFail "BZ 798792 found...ipa netgroup-find options set to space return internal errors"
+		else
+			rlPass "BZ 798792 not found."
+		fi
+	rlPhaseEnd
+
+	rlPhaseStartTest "netgroup_bz_798792_3: ipa netgroup-find options set to space return internal errors (users)"
+		rlRun "ipa netgroup-find --users=\" \" > $tmpout 2>&1" 1
+		if [ $(grep "ipa: ERROR: an internal error has occurred" $tmpout|wc -l) -gt 0 ]; then
+			rlFail "BZ 798792 found...ipa netgroup-find options set to space return internal errors"
+		else
+			rlPass "BZ 798792 not found."
+		fi
+	rlPhaseEnd
+
+	rlPhaseStartTest "netgroup_bz_798792_4: ipa netgroup-find options set to space return internal errors (no-users)"
+		rlRun "ipa netgroup-find --no-users=\" \" > $tmpout 2>&1" 1
+		if [ $(grep "ipa: ERROR: an internal error has occurred" $tmpout|wc -l) -gt 0 ]; then
+			rlFail "BZ 798792 found...ipa netgroup-find options set to space return internal errors"
+		else
+			rlPass "BZ 798792 not found."
+		fi
+	rlPhaseEnd
+
+	rlPhaseStartTest "netgroup_bz_798792_5: ipa netgroup-find options set to space return internal errors (groups)"
+		rlRun "ipa netgroup-find --groups=\" \" > $tmpout 2>&1" 1
+		if [ $(grep "ipa: ERROR: an internal error has occurred" $tmpout|wc -l) -gt 0 ]; then
+			rlFail "BZ 798792 found...ipa netgroup-find options set to space return internal errors"
+		else
+			rlPass "BZ 798792 not found."
+		fi
+	rlPhaseEnd
+
+	rlPhaseStartTest "netgroup_bz_798792_6: ipa netgroup-find options set to space return internal errors (no-groups)"
+		rlRun "ipa netgroup-find --no-groups=\" \" > $tmpout 2>&1" 1
+		if [ $(grep "ipa: ERROR: an internal error has occurred" $tmpout|wc -l) -gt 0 ]; then
+			rlFail "BZ 798792 found...ipa netgroup-find options set to space return internal errors"
+		else
+			rlPass "BZ 798792 not found."
+		fi
+	rlPhaseEnd
+
+	rlPhaseStartTest "netgroup_bz_798792_7: ipa netgroup-find options set to space return internal errors (hosts)"
+		rlRun "ipa netgroup-find --hosts=\" \" > $tmpout 2>&1" 1
+		if [ $(grep "ipa: ERROR: an internal error has occurred" $tmpout|wc -l) -gt 0 ]; then
+			rlFail "BZ 798792 found...ipa netgroup-find options set to space return internal errors"
+		else
+			rlPass "BZ 798792 not found."
+		fi
+	rlPhaseEnd
+
+	rlPhaseStartTest "netgroup_bz_798792_8: ipa netgroup-find options set to space return internal errors (no-hosts)"
+		rlRun "ipa netgroup-find --no-hosts=\" \" > $tmpout 2>&1" 1
+		if [ $(grep "ipa: ERROR: an internal error has occurred" $tmpout|wc -l) -gt 0 ]; then
+			rlFail "BZ 798792 found...ipa netgroup-find options set to space return internal errors"
+		else
+			rlPass "BZ 798792 not found."
+		fi
+	rlPhaseEnd
+
+	rlPhaseStartTest "netgroup_bz_798792_9: ipa netgroup-find options set to space return internal errors (hostgroups)"
+		rlRun "ipa netgroup-find --hostgroups=\" \" > $tmpout 2>&1" 1
+		if [ $(grep "ipa: ERROR: an internal error has occurred" $tmpout|wc -l) -gt 0 ]; then
+			rlFail "BZ 798792 found...ipa netgroup-find options set to space return internal errors"
+		else
+			rlPass "BZ 798792 not found."
+		fi
+	rlPhaseEnd
+
+	rlPhaseStartTest "netgroup_bz_798792_10: ipa netgroup-find options set to space return internal errors (no-hostgroups)"
+		rlRun "ipa netgroup-find --no-hostgroups=\" \" > $tmpout 2>&1" 1
+		if [ $(grep "ipa: ERROR: an internal error has occurred" $tmpout|wc -l) -gt 0 ]; then
+			rlFail "BZ 798792 found...ipa netgroup-find options set to space return internal errors"
+		else
+			rlPass "BZ 798792 not found."
+		fi
+	rlPhaseEnd
+
+	rlPhaseStartTest "netgroup_bz_798792_11: ipa netgroup-find options set to space return internal errors (in-netgroups)"
+		rlRun "ipa netgroup-find --in-netgroups=\" \" > $tmpout 2>&1" 1
+		if [ $(grep "ipa: ERROR: an internal error has occurred" $tmpout|wc -l) -gt 0 ]; then
+			rlFail "BZ 798792 found...ipa netgroup-find options set to space return internal errors"
+		else
+			rlPass "BZ 798792 not found."
+		fi
+	rlPhaseEnd
+
+	rlPhaseStartTest "netgroup_bz_798792_12: ipa netgroup-find options set to space return internal errors (not-in-netgroups)"
+		rlRun "ipa netgroup-find --not-in-netgroups=\" \" > $tmpout 2>&1" 1
+		if [ $(grep "ipa: ERROR: an internal error has occurred" $tmpout|wc -l) -gt 0 ]; then
+			rlFail "BZ 798792 found...ipa netgroup-find options set to space return internal errors"
+		else
+			rlPass "BZ 798792 not found."
+		fi
 	rlPhaseEnd
 }
