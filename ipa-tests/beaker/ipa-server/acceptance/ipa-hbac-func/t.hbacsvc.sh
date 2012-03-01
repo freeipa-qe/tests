@@ -2633,3 +2633,53 @@ hbacsvc_master_bug772852() {
         rlPhaseEnd
 }
 
+
+hbacsvc_master_bug766876() {
+
+        rlPhaseStartTest "ipa-hbacsvc-bug766876: [RFE] Make HBAC srchost processing optional - Case 1"
+	
+		rlRun "Verifies bug https://bugzilla.redhat.com/show_bug.cgi?id=766876"
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                user766876="user766876"
+                rlRun "create_ipauser $user766876 $user766876 $user766876 $userpw"
+                sleep 5
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+
+                rlRun "ipa hbacrule-disable allow_all"
+
+                rlRun "ipa hbacrule-add rule766876"
+                rlRun "ipa hbacrule-add-user rule766876 --users=$user766876"
+                rlRun "ipa hbacrule-add-host rule766876 --hosts=$MASTER"
+                rlRun "ipa hbacrule-add-sourcehost rule766876 --hosts=$CLIENT"
+                rlRun "ipa hbacrule-add-service rule766876 --hbacsvcs=sshd"
+                rlRun "ipa hbacrule-show rule766876 --all"
+
+        rlPhaseEnd
+}
+
+hbacsvc_client_bug766876() {
+
+        rlPhaseStartTest "ipa-hbacsvc-client-bug766876: ipa_hbac_support_srchost is set to false - Case 1"
+
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                sleep 5
+                rlRun "getent -s sss passwd user766876"
+                rlRun "ssh_auth_success user766876 testpw123@ipa.com $MASTER"
+
+        rlPhaseEnd
+
+}
+
+hbacsvc_client2_bug766876() {
+
+        rlPhaseStartTest "ipa-hbacsvc-client2-bug766876: ipa_hbac_support_srchost is set to false - Case 1"
+
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                sleep 5
+                rlRun "getent -s sss passwd user766876"
+                rlRun "ssh_auth_success user766876 testpw123@ipa.com $MASTER"
+
+        rlPhaseEnd
+
+}
+
