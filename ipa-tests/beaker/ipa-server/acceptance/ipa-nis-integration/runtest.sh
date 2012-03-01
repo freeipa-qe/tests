@@ -51,17 +51,17 @@ PACKAGE="ipa-server"
 startDate=`date "+%F %r"`
 startEpoch=`date "+%s"`
 
-export MASTER_IP=$(nslookup $MASTER | grep Address | grep -v "#" | awk '{print $2}')
+export MASTER_IP=$(dig +short $MASTER)
 if [ -z "$MASTER_IP" ]; then
 	export MASTER_IP=$(getent ahostsv4 $MASTER | grep -e "^[0-9.]*[ ]*STREAM" | awk '{print $1}')
 fi
 
-export NISMASTER_IP=$(nslookup $NISMASTER | grep Address | grep -v "#" | awk '{print $2}')
+export NISMASTER_IP=$(dig +short $NISMASTER)
 if [ -z "$NISMASTER_IP" ]; then
 	export NISMASTER_IP=$(getent ahostsv4 $NISMASTER | grep -e "^[0-9.]*[ ]*STREAM" | awk '{print $1}')
 fi
 
-export NISCLIENT_IP=$(nslookup $NISCLIENT | grep Address | grep -v "#" | awk '{print $2}')
+export NISCLIENT_IP=$(dig +short $NISCLIENT)
 if [ -z "$NISCLIENT_IP" ]; then
 	export NISCLIENT_IP=$(getent ahostsv4 $NISCLIENT | grep -e "^[0-9.]*[ ]*STREAM" | awk '{print $1}')
 fi
