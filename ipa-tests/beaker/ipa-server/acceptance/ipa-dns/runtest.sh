@@ -93,6 +93,62 @@ rlJournalStart
 	newfakehostip=`route -n | grep ^0 | awk '{print $2'}`
 	echo "IP is $ipoc1 . $ipoc2 . $ipoc3 . $ipoc4"
 
+	ipaddr=`hostname`	
+	zone=newzone
+	email="ipaqar.redhat.com"
+	serial=2010010701
+	refresh=303
+	retry=101
+	expire=1202
+	minimum=33
+	ttl=55
+	badnum=12345678901234
+	loclat="121"
+	loclong="59"
+	loc="37 23 30.900 N $loclat $loclong 19.000 W 7.00m 100.00m 100.00m 2.00m"
+	naptr='100 10 U E2U+msg !^.*$!mailto:info@example.com! .'
+	naptrfind="info@example.com"
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# pkey_return_check_dns
+	# Check that the pkey-only option seems to function of the ipa *-find cli option
+	# Required inputs are:
+	# ipa_command_to_test: This is the command we are testing, (user, group, service)
+	# pkey_addstringa: will be used as ipa $ipa_command_to_test-add $addstring $pkeyobja
+	# pkey_addstringb: will be used as ipa $ipa_command_to_test-add $addstring $pkeyobja
+	# pkeyobja - This is the username/groupname/object to create. this object must come up in 
+	#      the resuts when a find search string is run against "general-find-string".
+	#      This user/object must not exist on the system
+	# pkeyobjb - This is a second username/groupname/object to create. This object must also 
+	#      come up in the resuts when a find search string is run against "general-find-string"
+	#      This user/object must not exist on the system
+	# grep_string - This is the specific string that denotes the line to look for in the 
+	#      "ipa *-find --pkey-only" output
+	# general_search_string - This string will be used as "ipa *-find --pkey-only $general_search_string"
+	#      Searching this way must return both pkeyobja and pkeyobjb.
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+pkey_return_check_dns()
+{
+	creturn=0
+	rlLog "executing ipa $ipa_command_to_test-add $pkey_addstringa $pkeyobja"
+	i="ipa $ipa_command_to_test-add $pkey_addstringa $pkeyobja"
+	echo "running $i"
+	$i
+	ipa $ipa_command_to_test-add $pkey_addstringb $pkeyobjb
+	rlLog "executing ipa $ipa_command_to_test-find --pkey-only $zone $pkeyobja | grep $grep_string | grep $pkeyobja"
+	rlRun "ipa $ipa_command_to_test-find --pkey-only $zone $pkeyobja | grep $grep_string | grep $pkeyobja" 0 "make sure the $ipa_command_to_test is returned when the --pkey-only option is specified"
+	let creturn=$creturn+$?
+	rlRun "ipa $ipa_command_to_test-find --pkey-only $zone $general_search_string | grep $grep_string | grep $pkeyobja" 0 "make sure the $ipa_command_to_test is returned when the --pkey-only option is specified"
+	let creturn=$creturn+$?
+	rlRun "ipa $ipa_command_to_test-find --pkey-only $zone $general_search_string | grep $grep_string | grep $pkeyobjb" 0 "make sure the $ipa_command_to_test is returned when the --pkey-only option is specified"
+	let creturn=$creturn+$?
+	rlRun "ipa $ipa_command_to_test-del $pkey_delstringa $pkeyobja" 0 "deleting the first object from this test ($pkeyobja)"
+	let creturn=$creturn+$?
+	rlRun "ipa $ipa_command_to_test-del $pkey_delstringb $pkeyobjb" 0 "deleting the second object from this test ($pkeyobjb)"
+	let creturn=$creturn+$?
+	return $creturn
+}
+
 	rlPhaseStartTest "ipa-dns-01: create a new fake host to test dns add during replica prepare"
 		let newip=$ipoc4+1
 		ipa-replica-prepare -p $ADMINPW --ip-address=$newfakehostip newfakehost$newip.$DOMAIN
@@ -120,22 +176,6 @@ rlJournalStart
 		rlRun "ipa dnsrecord-show $DOMAIN newfakehost$newip" 0 "Checking to ensure that ipa dnsrecord-show gives the reverse for fakehost"
 	rlPhaseEnd
 
-	ipaddr=`hostname`	
-	zone=newzone
-	email="ipaqar.redhat.com"
-	serial=2010010701
-	refresh=303
-	retry=101
-	expire=1202
-	minimum=33
-	ttl=55
-	badnum=12345678901234
-	loclat="121"
-	loclong="59"
-	loc="37 23 30.900 N $loclat $loclong 19.000 W 7.00m 100.00m 100.00m 2.00m"
-	naptr='100 10 U E2U+msg !^.*$!mailto:info@example.com! .'
-	naptrfind="info@example.com"
-	
 	rlPhaseStartTest "ipa-dns-07: create a new zone"
 		rlRun "ipa dnszone-add --name-server=$ipaddr --admin-email=$email --serial=$serial --refresh=$refresh --retry=$retry --expire=$expire --minimum=$minimum --ttl=$ttl $zone" 0 "Checking to ensure that ipa thinks that it can create a zone"
 		rlRun "/usr/sbin/ipactl restart" 0 "Restarting IPA server"
@@ -975,10 +1015,107 @@ EOF
 
 	rlPhaseEnd
 
+	rlPhaseStartTest "ipa-dns-160: create zone to use for tests 161 to "
+		echo "ipa dnszone-add --name-server=$BEAKERMASTER --admin-email=$email --serial=$serial --refresh=$refresh --retry=$retry --expire=$expire --minimum=$minimum --ttl=$ttl $zone"
+		rlRun "ipa dnszone-add --name-server=$BEAKERMASTER --admin-email=$email --serial=$serial --refresh=$refresh --retry=$retry --expire=$expire --minimum=$minimum --ttl=$ttl $zone" 0 "Checking to ensure that ipa thinks that it can create a zone"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-161: --pkey-only test of ipa dnsrecord-find a records"
+		ipa_command_to_test="dnsrecord"
+		rec_string="--a-rec=4.2.2.2"
+		pkey_addstringa="$rec_string $zone"
+		pkey_addstringb="$rec_string $zone"
+		pkey_delstringa="$rec_string $zone"
+		pkey_delstringb="$rec_string $zone"
+		pkeyobja="ahostf"
+		pkeyobjb="ahostfb"
+		grep_string='Record\ name:'
+		general_search_string=ahostf
+		rlRun "pkey_return_check_dns" 0 "running checks of --pkey-only of a records in ipa dnsrecord-find"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-162: --pkey-only test of ipa dnsrecord-find AAAA records"
+		ipa_command_to_test="dnsrecord"
+		rec_string="--aaaa-rec=$aaaa"
+		pkey_addstringa="$rec_string $zone"
+		pkey_addstringb="$rec_string $zone"
+		pkey_delstringa="$rec_string $zone"
+		pkey_delstringb="$rec_string $zone"
+		pkeyobja="ahostf"
+		pkeyobjb="ahostfb"
+		grep_string='Record\ name:'
+		general_search_string=ahostf
+		rlRun "pkey_return_check_dns" 0 "running checks of --pkey-only of AAAA records in ipa dnsrecord-find"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-163: --pkey-only test of ipa dnsrecord-find asfdb records"
+		ipa_command_to_test="dnsrecord"
+		rec_string="--afsdb-rec=0\ $afsdb"
+		pkey_addstringa="$rec_string $zone"
+		pkey_addstringb="$rec_string $zone"
+		pkey_delstringa="$rec_string $zone"
+		pkey_delstringb="$rec_string $zone"
+		pkeyobja="ahostf"
+		pkeyobjb="ahostfb"
+		grep_string='Record\ name:'
+		general_search_string=ahostf
+		ipa $ipa_command_to_test-add --afsdb-rec=0\ $afsdb $zone $pkeyobja
+		ipa $ipa_command_to_test-add --afsdb-rec=0\ $afsdb $zone $pkeyobjb
+		rlRun "pkey_return_check_dns" 0 "running checks of --pkey-only of asfdb records in ipa dnsrecord-find"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-164: --pkey-only test of ipa dnsrecord-find cname records"
+		ipa_command_to_test="dnsrecord"
+		rec_string="--cname-rec=$cname"
+		pkey_addstringa="$rec_string $zone"
+		pkey_addstringb="$rec_string $zone"
+		pkey_delstringa="$rec_string $zone"
+		pkey_delstringb="$rec_string $zone"
+		pkeyobja="ahostf"
+		pkeyobjb="ahostfb"
+		grep_string='Record\ name:'
+		general_search_string=ahostf
+		rlRun "pkey_return_check_dns" 0 "running checks of --pkey-only of cname records in ipa dnsrecord-find"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-165: --pkey-only test of ipa dnsrecord-find txt records"
+		ipa_command_to_test="dnsrecord"
+		rec_string="--txt-rec=$txt"
+		pkey_addstringa="$rec_string $zone"
+		pkey_addstringb="$rec_string $zone"
+		pkey_delstringa="$rec_string $zone"
+		pkey_delstringb="$rec_string $zone"
+		pkeyobja="ahostf"
+		pkeyobjb="ahostfb"
+		grep_string='Record\ name:'
+		general_search_string=ahostf
+		rlRun "pkey_return_check_dns" 0 "running checks of --pkey-only of txt records in ipa dnsrecord-find"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-166: --pkey-only test of ipa dnsrecord-find _srv records"
+		ipa_command_to_test="dnsrecord"
+		rec_string="--srv-rec=$srva\ $srv"
+		pkey_addstringa="$rec_string $zone"
+		pkey_addstringb="$rec_string $zone"
+		pkey_delstringa="$rec_string $zone"
+		pkey_delstringb="$rec_string $zone"
+		pkeyobja="ahostf"
+		pkeyobjb="ahostfb"
+		grep_string='Record\ name:'
+		general_search_string=ahostf
+		ipa $ipa_command_to_test-add --srv-rec=$srva\ $srv $zone $pkeyobja
+		ipa $ipa_command_to_test-add --srv-rec=$srva\ $srv $zone $pkeyobjb
+		rlRun "pkey_return_check_dns" 0 "running checks of --pkey-only of cname records in ipa dnsrecord-find"
+	rlPhaseEnd
+
+#		rlRun "ipa dnsrecord-add $zone @ --mx-rec '10 $mx.'" 0 "add record type MX"
+	rlPhaseStartTest "ipa-dns-167: Delete the created zone"
+		rlRun "ipa dnszone-del $zone" 0 "Delete the zone created for this test"
+	rlPhaseEnd
+
 	rlJournalPrintText
 	report=/tmp/rhts.report.$RANDOM.txt
 	makereport $report
 	rhts-submit-log -l $report
 
 rlJournalEnd
-

@@ -410,6 +410,17 @@ rlJournalStart
         rlAssert0 "$expmsg" $rc
     rlPhaseEnd
 
+    rlPhaseStartTest "ipa-hostgroup-cli-40: check of --pkey-only in hostgroup find"
+	ipa_command_to_test="hostgroup"
+	pkey_addstringa="--desc testng"
+	pkey_addstringb="--desc testng"
+	pkeyobja="testhg"
+	pkeyobjb="testhgb"
+	grep_string='Host-group:'
+	general_search_string=$pkeyobja
+	rlRun "pkey_return_check" 0 "running checks of --pkey-only in hostgroup-find"
+    rlPhaseEnd
+
     rlPhaseStartCleanup "ipa-hostgroup-cli-cleanup: Delete remaining hosts and Destroying admin credentials"
 	rlRun "ipa config-mod --searchrecordslimit=100" 0 "setting search records limit back to default"
         # delete remaining hosts added to test host members

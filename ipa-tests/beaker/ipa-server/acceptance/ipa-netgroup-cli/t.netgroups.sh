@@ -34,6 +34,7 @@ netgroups()
 	setup
 	add_netgroups
 	member_netgroups
+	find_netgroups
 	mod_netgroups
 	attr_netgroups
 	del_netgroups
@@ -94,7 +95,10 @@ add_netgroups()
 	netgroup_add_positive
 	netgroup_add_negative
 }
-
+find_netgroups()
+{
+	netgroup_find_pkey	
+}
 member_netgroups()
 {
 	netgroup_add_member_positive
@@ -1469,3 +1473,18 @@ netgroup_find_negative()
 #		rlAssertGrep "^0 netgroups matched" $tmpout
 #	rlPhaseEnd
 }
+
+netgroup_find_pkey()
+{
+	rlPhaseStartTest "ipa-netgroup-052: check of --pkey-only in netgroup find"
+		ipa_command_to_test="netgroup"
+		pkey_addstringa="--desc testng"
+		pkey_addstringb="--desc testng"
+		pkeyobja="testng"
+		pkeyobjb="testngb"
+		grep_string='Netgroup\ name:'
+		general_search_string=$pkeyobja
+		rlRun "pkey_return_check" 0 "running checks of --pkey-only in netgroup-find"
+	rlPhaseEnd
+}
+
