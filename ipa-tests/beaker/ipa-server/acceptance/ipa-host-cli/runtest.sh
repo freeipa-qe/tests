@@ -1039,7 +1039,6 @@ rlPhaseStartTest "ipa-host-cli-38: find more hosts than exist"
     rlPhaseEnd
 
     rlPhaseStartCleanup "ipa-host-cli-cleanup: Destroying admin credentials."
-	rlRun "ipa config-mod --searchrecordslimit=100" 0 "set search records limit back to default"
         i=1
         while [ $i -le 10 ] ; do
                 deleteHost host$i.$DOMAIN
