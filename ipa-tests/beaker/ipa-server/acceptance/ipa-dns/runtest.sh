@@ -1015,7 +1015,7 @@ EOF
 
 	rlPhaseEnd
 
-	rlPhaseStartTest "ipa-dns-160: create zone to use for tests 161 to "
+	rlPhaseStartTest "ipa-dns-160: create zone to use for tests 161 to 173"
 		echo "ipa dnszone-add --name-server=$BEAKERMASTER --admin-email=$email --serial=$serial --refresh=$refresh --retry=$retry --expire=$expire --minimum=$minimum --ttl=$ttl $zone"
 		rlRun "ipa dnszone-add --name-server=$BEAKERMASTER --admin-email=$email --serial=$serial --refresh=$refresh --retry=$retry --expire=$expire --minimum=$minimum --ttl=$ttl $zone" 0 "Checking to ensure that ipa thinks that it can create a zone"
 	rlPhaseEnd
@@ -1121,11 +1121,6 @@ EOF
 		ipa $ipa_command_to_test-del --mx-rec=20\ $mxb. $zone @
 	rlPhaseEnd
 
-#		rlRun "ipa dnsrecord-add $zone @ --mx-rec '10 $mx.'" 0 "add record type MX"
-	rlPhaseStartTest "ipa-dns-168: Delete the created zone"
-		rlRun "ipa dnszone-del $zone" 0 "Delete the zone created for this test"
-	rlPhaseEnd
-
 	rlPhaseStartTest "ipa-dns-168: Bug 783272 - Confusing error message when adding a record to non-existent zone"
 
 		rlLog "verifies bug https://bugzilla.redhat.com/show_bug.cgi?id=783272"
@@ -1178,7 +1173,22 @@ EOF
 
 	rlPhaseEnd
 
+	rlPhaseStartTest "ipa-dns-172: --pkey-only negative test of ipa dnsrecord-find AAAA records"
+		ipa_command_to_test="dnsrecord"
+		rec_string="--aaaa-rec=$aaaa"
+		pkey_addstringa="$rec_string $zone"
+		pkey_delstringa="$rec_string $zone"
+		pkeyobja="ahostf"
+		i="ipa $ipa_command_to_test-add $pkey_addstringa $pkeyobja"
+		echo "running $i"
+		$i
+		rlRun "ipa $ipa_command_to_test-find --pkey-only $zone $pkeyobja | grep AAAA\ record" 0 "make sure the $ipa_command_to_test does not return 'AAAA record' returned when the --pkey-only option is specified"
+		rlRun "ipa $ipa_command_to_test-del $pkey_delstringa $pkeyobja" 0 "deleting the first object from this test ($pkeyobja)"
+	rlPhaseEnd
 
+	rlPhaseStartTest "ipa-dns-173: Delete the zone created for tests 161 to 172"
+		rlRun "ipa dnszone-del $zone" 0 "Delete the zone created for tests 161 to 172"
+	rlPhaseEnd
 
 	rlJournalPrintText
 	report=/tmp/rhts.report.$RANDOM.txt
