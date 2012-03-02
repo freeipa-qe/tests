@@ -413,6 +413,7 @@ rlPhaseStartTest "ipa-host-cli-38: find more hosts than exist"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message - alpha characters."
         command="ipa host-find --sizelimit=#*"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message - special characters."
+	rlRun "ipa config-mod --searchrecordslimit=100" 0 "set search records limit back to default"
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-host-cli-40: find hosts - time limit 0"
@@ -480,6 +481,7 @@ rlPhaseStartTest "ipa-host-cli-38: find more hosts than exist"
 		oct3=`echo $oct | cut -d "." -f 1`
 		ipaddr=$oct1.$oct2.$oct3.99
 		export ipaddr
+		rlLog "EXECUTING: ipa host-add --ip-address=$ipaddr $myhost"
 		rlRun "ipa host-add --ip-address=$ipaddr $myhost" 0 "Adding host with IP Address $ipaddr"
 		rlRun "findHost $myhost" 0 "Verifying host was added with IP Address."
 		rlRun "ipa dnsrecord-find $DOMAIN $short" 0 "Checking for forward DNS entry"
@@ -500,6 +502,7 @@ rlPhaseStartTest "ipa-host-cli-38: find more hosts than exist"
     rlPhaseStartTest "ipa-host-cli-48: Add host without force option - DNS Record Exists"
 	short=myhost
         myhost=$short.$DOMAIN
+	rlLog "EXECUTING: ipa host-add $myhost"
 	rlRun "ipa host-add $myhost" 0 "Add host DNS entries exist"
 	rlRun "findHost $myhost" 0 "Verifying host was added when DNS records exist."
 	rlRun "ipa dnsrecord-find $DOMAIN $short" 0 "Checking for forward DNS entry"
@@ -548,14 +551,16 @@ rlPhaseStartTest "ipa-host-cli-38: find more hosts than exist"
 
     rlPhaseStartTest "ipa-host-cli-52: host name ending in . "
 	myhost="myhost.$DOMAIN"
-	ipa host-add --force $myhost.
+	rlLog "EXECUTING : ipa host-add --force $myhost."
+	rlRun "ipa host-add --force $myhost." 0 "Add host with trailing . - dot should be ignored"
+	rlRun "ipa host-show $myhost > /tmp/host52.out 2>&1" 0 
+	cat /tmp/host52.out | grep "Host name" | grep "$myhost."
 	if [ $? -eq 0 ] ; then
 		rlFail "https://bugzilla.redhat.com/show_bug.cgi?id=797562"
-		ipa host-del $myhost.
 	else
-		rlPass "Host with trailing dot not added"
+		rlPass "Host with trailing dot added and dot was ignored"
 	fi
-	rlRun "ipa config-mod --searchrecordslimit=100" 0 "set search records limit back to default"
+	rlRun "ipa host-del $myhost" 0 "Cleanup delete test host"
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-host-cli-53: Negative - add host with _"
@@ -764,14 +769,14 @@ rlPhaseStartTest "ipa-host-cli-38: find more hosts than exist"
         rlAssertNotGrep "Host name: $myhost4" "/tmp/manbyhosts_multi_3.out"
         rlAssertGrep "Host name: $myhost3" "/tmp/manbyhosts_multi_3.out"
         rlAssertGrep "Host name: $myhost2" "/tmp/manbyhosts_multi_3.out"
-        rlAsserNottGrep "Host name: $myhost1" "/tmp/manbyhosts_multi_3.out"
+        rlAsserNotGrep "Host name: $myhost1" "/tmp/manbyhosts_multi_3.out"
 
 	rlRun "ipa host-find --man-hosts=$myhost4 > /tmp/manbyhosts_multi_4.out"
         rlAssertGrep "Number of entries returned 2" "/tmp/manbyhosts_multi_4.out"
         rlAssertGrep "Host name: $myhost4" "/tmp/manbyhosts_multi_4.out"
         rlAssertNotGrep "Host name: $myhost3" "/tmp/manbyhosts_multi_4.out"
         rlAssertGrep "Host name: $myhost2" "/tmp/manbyhosts_multi_4.out"
-        rlAsserNottGrep "Host name: $myhost1" "/tmp/manbyhosts_multi_4.out"
+        rlAsserNotGrep "Host name: $myhost1" "/tmp/manbyhosts_multi_4.out"
 
         rlRun "removeHostManagedBy $myhost2 $myhost1" 0 "Removing Managed By Host"
         rlRun "removeHostManagedBy $myhost2 $myhost3" 0 "Removing Managed By Host"
@@ -1039,6 +1044,11 @@ rlPhaseStartTest "ipa-host-cli-38: find more hosts than exist"
 	grep_string='Host\ name'
 	general_search_string=pkeyhost
 	rlRun "pkey_return_check" 0 "running checks of --pkey-only in sudorule-find"
+	# deleting of the hosts is not cleaning up the dns records that got added, easiest to just add them back and delete with --updatedns
+	ipa host-add $pkeyobja --force
+	ipa host-add $pkeyobja --force
+	ipa host-del $pkeyobja --updatedns
+	ipa host-del $pkeyobjb --updatedns
     rlPhaseEnd
 
     rlPhaseStartCleanup "ipa-host-cli-cleanup: Destroying admin credentials."
