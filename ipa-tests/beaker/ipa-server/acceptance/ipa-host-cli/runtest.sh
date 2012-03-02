@@ -280,7 +280,7 @@ rlJournalStart
 
     rlPhaseStartTest "ipa-host-cli-25:  Negative - add host not fully qualified DN"
         command="ipa host-add myhost --force"
-        expmsg="ipa: ERROR: invalid 'hostname': Fully-qualified hostname required"
+        expmsg="ipa: ERROR: invalid 'hostname': invalid domain-name: not fully qualified"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
     rlPhaseEnd
 
@@ -546,30 +546,33 @@ rlPhaseStartTest "ipa-host-cli-38: find more hosts than exist"
         fi
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-host-cli-52: host name ending in . - trac ticket 797"
-	myhost="myhost.$DOMAIN."
-	rlRun "ipa host-add --force $myhost" 0 "Adding host with hostname ending in .: $myhost"
-	rlRun "ipa host-find $myhost" 0 "Making sure host is found"
-	rlRun "ipa host-mod --desc=test $myhost" 0 "Modifying host with hostname ending in ."
-	rlRun "ipa host-del $myhost" 0 "Deleting host with hostname ending in ."
+    rlPhaseStartTest "ipa-host-cli-52: host name ending in . "
+	myhost="myhost.$DOMAIN"
+	ipa host-add --force $myhost.
+	if [ $? -eq 0 ] ; then
+		rlFail "https://bugzilla.redhat.com/show_bug.cgi?id=797562"
+		ipa host-del $myhost.
+	else
+		rlPass "Host with trailing dot not added"
+	fi
 	rlRun "ipa config-mod --searchrecordslimit=100" 0 "set search records limit back to default"
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-host-cli-53: Negative - add host with _"
         command="ipa host-add host_underscore.$RELM --force"
-        expmsg="ipa: ERROR: invalid 'hostname': may only include letters, numbers, and -"
+        expmsg="ipa: ERROR: invalid 'hostname': invalid domain-name: only letters, numbers, and - are allowed. - must not be the DNS label character"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-host-cli-54: Negative - add host with ~"
         command="ipa host-add host~tilda.$RELM --force"
-        expmsg="ipa: ERROR: invalid 'hostname': may only include letters, numbers, and -"
+        expmsg="ipa: ERROR: invalid 'hostname': invalid domain-name: only letters, numbers, and - are allowed. - must not be the DNS label character"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-host-cli-55: Negative - add host with +"
         command="ipa host-add host+plus.$RELM --force"
-        expmsg="ipa: ERROR: invalid 'hostname': may only include letters, numbers, and -"
+        expmsg="ipa: ERROR: invalid 'hostname': invalid domain-name: only letters, numbers, and - are allowed. - must not be the DNS label character"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
     rlPhaseEnd
 
