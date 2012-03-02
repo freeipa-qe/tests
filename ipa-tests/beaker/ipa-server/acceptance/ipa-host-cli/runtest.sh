@@ -551,7 +551,6 @@ rlPhaseStartTest "ipa-host-cli-38: find more hosts than exist"
 
     rlPhaseStartTest "ipa-host-cli-52: host name ending in . "
 	myhost="myhost.$DOMAIN"
-	myhost="myhost.$DOMAIN"
 	rlLog "EXECUTING : ipa host-add --force $myhost."
 	rlRun "ipa host-add --force $myhost." 0 "Add host with trailing . - dot should be ignored"
 	rlRun "ipa host-show $myhost > /tmp/host52.out 2>&1" 0 
@@ -1057,11 +1056,11 @@ rlPhaseStartTest "ipa-host-cli-38: find more hosts than exist"
 	ipa host-del $pkeyobjb --updatedns
     rlPhaseEnd
 	
-    rlPhaseStartTest "ipa-host-cli-69: host name ending in . - a host without trailing . already exist"
+    rlPhaseStartTest "ipa-host-cli-69: Negative - host name ending in . - a host without trailing . already exist"
         myhost="myhost.$DOMAIN"
 	expmsg="ipa: ERROR: host with name $myhost already exists"
         command="ipa host-add --force $myhost."
-        rlLog "EXECUTING : ipa host-add --force $myhost"
+        rlLog "EXECUTING : ipa host-add --force $myhost. when a host without trailing . already exist"
         rlRun "ipa host-add --force $myhost" 0 "Add host without a trailing ."
 	rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message - add a host when a host without trailing . exist."
         rlRun "ipa host-show $myhost > /tmp/host69.out 2>&1" 0
@@ -1071,6 +1070,24 @@ rlPhaseStartTest "ipa-host-cli-38: find more hosts than exist"
         else
                rlFail "Existing host without a . has been removed."
         fi
+        rlRun "ipa host-del $myhost" 0 "Cleanup delete test host"
+    rlPhaseEnd
+
+	
+    rlPhaseStartTest "ipa-host-cli-70: delete a host name ending in . "
+        myhost="myhost.$DOMAIN"
+	expmsg="ipa: ERROR: $myhost. host not found"
+        command="ipa host-del $myhost."
+        rlLog "EXECUTING : ipa host-del $myhost."
+        rlRun "ipa host-add --force $myhost." 0 "Add host with trailing . - dot should be ignored"
+        rlRun "ipa host-show $myhost > /tmp/host70.out 2>&1" 0
+        cat /tmp/host70.out | grep "Host name" | grep "$myhost"
+        if [ $? -eq 0 ] ; then
+            rlPass "Host with trailing dot added and dot was ignored"
+        else
+            rlFail "Host with trailing dot was not added."
+        fi
+	rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message - delete a host with a ending . when a host with a ending . is added"
         rlRun "ipa host-del $myhost" 0 "Cleanup delete test host"
     rlPhaseEnd
 
