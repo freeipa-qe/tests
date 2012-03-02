@@ -59,6 +59,7 @@ delegation_find_positive()
 	delegation_find_positive_1016
 	delegation_find_positive_1017
 	delegation_find_positive_1018
+	delegation_find_positive_1019
 	delegation_find_positive_envcleanup
 }
 
@@ -284,6 +285,15 @@ delegation_find_positive_1018()
 	rlPhaseEnd
 }
 
+# added on 3/1/2012.  function to test ipa delegation-find --pkey-only
+delegation_find_positive_1019()
+{
+	rlPhaseStartTest "delegation_find_positive_1019: find with pkey-only specified"
+		KinitAsAdmin
+		rlRun "ipa delegation-find --membergroup=mg1000 --group=gr1000 --attrs=mobile --permissions=write --pkey-only | grep Delegation\ name | grep delegation_find_positive_1000" 0 "Making sure that Delegation name is returned with --pkey-only specified"
+	rlPhaseEnd
+}
+
 ######################################################################
 #   delegation-find [negative]:
 ######################################################################
@@ -323,9 +333,12 @@ delegation_find_negative()
 	delegation_find_negative_1031
 	delegation_find_negative_1032
 	delegation_find_negative_1033
+	delegation_find_negative_1034
+	delegation_find_negative_1035
+	delegation_find_negative_1036
+	delegation_find_negative_1037
 	delegation_find_negative_envcleanup
 }
-
 
 delegation_find_negative_envsetup()
 {
@@ -751,3 +764,43 @@ delegation_find_negative_1033()
 		[ -f $tmpout ] && rm $tmpout
 	rlPhaseEnd
 }
+
+# added on 3/1/2012.  function to test ipa delegation-find --pkey-only
+delegation_find_negative_1034()
+{
+	rlPhaseStartTest "delegation_find_negative_1034: find with pkey-only specified, make sure Permissions does not return"
+		KinitAsAdmin
+		rlRun "ipa delegation-find --membergroup=mg1000 --group=gr1000 --attrs=mobile --permissions=write --pkey-only | grep Permissions" 1 "Making sure that Permissions is not returned with --pkey-only specified"
+	rlPhaseEnd
+}
+
+# added on 3/1/2012.  function to test ipa delegation-find --pkey-only
+delegation_find_negative_1035()
+{
+	rlPhaseStartTest "delegation_find_negative_1035: find with pkey-only specified, make sure Attributes does not return"
+		KinitAsAdmin
+		rlRun "ipa delegation-find --membergroup=mg1000 --group=gr1000 --attrs=mobile --permissions=write --pkey-only | grep Attributes" 1 "Making sure that Attributes is not returned with --pkey-only specified"
+	rlPhaseEnd
+}
+
+# added on 3/1/2012.  function to test ipa delegation-find --pkey-only
+delegation_find_negative_1036()
+{
+	rlPhaseStartTest "delegation_find_negative_1035: find with pkey-only specified, make sure Member user group does not return"
+		KinitAsAdmin
+		rlRun "ipa delegation-find --membergroup=mg1000 --group=gr1000 --attrs=mobile --permissions=write --pkey-only | grep Member\ user\ group" 1 "Making sure that Member user group is not returned with --pkey-only specified"
+	rlPhaseEnd
+}
+
+# added on 3/1/2012.  function to test ipa delegation-find --pkey-only
+delegation_find_negative_1037()
+{
+	rlPhaseStartTest "delegation_find_negative_1035: find with pkey-only specified, make sure User group does not return"
+		KinitAsAdmin
+		rlRun "ipa delegation-find --membergroup=mg1000 --group=gr1000 --attrs=mobile --permissions=write --pkey-only | grep User\ group" 1 "Making sure that User group is not returned with --pkey-only specified"
+	rlPhaseEnd
+}
+
+
+
+
