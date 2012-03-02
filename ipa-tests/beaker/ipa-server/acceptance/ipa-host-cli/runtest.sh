@@ -413,7 +413,6 @@ rlPhaseStartTest "ipa-host-cli-38: find more hosts than exist"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message - alpha characters."
         command="ipa host-find --sizelimit=#*"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message - special characters."
-	rlRun "ipa config-mod --searchrecordslimit=100" 0 "set search records limit back to default"
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-host-cli-40: find hosts - time limit 0"
@@ -425,6 +424,7 @@ rlPhaseStartTest "ipa-host-cli-38: find more hosts than exist"
         else
                 rlFail "Number of hosts returned is not as expected.  GOT: $number EXP: 5"
         fi
+	rlRun "ipa config-mod --searchrecordslimit=100" 0 "set search records limit back to default"
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-host-cli-41: find hosts - time limit not an integer"
@@ -1089,6 +1089,102 @@ rlPhaseStartTest "ipa-host-cli-38: find more hosts than exist"
 	rlRun "findHost $myhost" 1 "Verifying host $myhost was deleted."
     rlPhaseEnd
 
+  rlPhaseStartTest "ipa-host-cli-71: host-show when the name ending in . "
+        myhost="myhost.$DOMAIN"
+        rlLog "EXECUTING : ipa host-show $myhost."
+        rlRun "ipa host-add --force $myhost." 0 "Add host with trailing . - dot should be ignored"
+        rlRun "ipa host-show $myhost. > /tmp/host71.out 2>&1" 0
+        cat /tmp/host71.out | grep "Host name" | grep "$myhost"
+        if [ $? -eq 0 ] ; then
+             rlPass "host-show ignores the ending . in the hostname"
+        else
+             rlFail "host-show does not ignore the ending . in the hostname"
+        fi
+        rlRun "ipa host-del $myhost" 0 "Cleanup delete test host"
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-host-cli-72: host-add-managedby when the name ending in . "
+	myhost1=mytesthost1.$DOMAIN
+        myhost2=mytesthost2.$DOMAIN
+        rlLog "EXECUTING : ipa host-add-managedby --hosts=\"$myhost2\" \"$myhost1.\""
+        addHost $myhost1
+        addHost $myhost2
+        rlRun "ipa host-add-managedby --hosts=\"$myhost2\" \"$myhost1.\"" 0 "Add mangedby host with trailing . - dot should be ignored" 
+        rlRun "ipa host-show \"$myhost1.\" > /tmp/host72.out 2>&1" 0
+        cat /tmp/host72.out | grep "Host name" | grep "$myhost1"
+        if [ $? -eq 0 ] ; then
+		myval=`cat /tmp/host72.out | grep -i "Managed by: $myhost1, $myhost2" | xargs echo`
+		cat /tmp/host72.out | grep -i "Managed by: $myhost1, $myhost2"
+   		if [ $? -ne 0 ] ; then
+        		rlFail "$myhost1 verification failed: Value of \"Managed by\" - GOT: $myval EXPECTED: \"$myhost1, $myhost2\""
+   		else
+			rlPass "Value of \"Managed by\" for $myhost1 is as expected - $myval"
+   		fi
+	else
+		rlFail "$myhost1 is not added."	
+	fi
+        rlRun "ipa host-del $myhost1" 0 "Cleanup delete test host 1"
+        rlRun "ipa host-del $myhost2" 0 "Cleanup delete test host 2"
+    rlPhaseEnd
+ 
+    rlPhaseStartTest "ipa-host-cli-73: host-remove-managedby when the name ending in . "
+        myhost1=mytesthost1.$DOMAIN
+        myhost2=mytesthost2.$DOMAIN
+        rlLog "EXECUTING : ipa host-remove-managedby --hosts=\"$myhost2\" \"$myhost1.\""
+        addHost $myhost1
+        addHost $myhost2
+        rlRun "ipa host-add-managedby --hosts=\"$myhost2\" \"$myhost1.\"" 0 "Add mangedby host with trailing ." 
+        rlRun "ipa host-show \"$myhost1.\" > /tmp/host73.out 2>&1" 0
+        myval=`cat /tmp/host73.out | grep -i "Managed by: $myhost1, $myhost2" | xargs echo`
+        cat /tmp/host73.out | grep -i "Managed by: $myhost1, $myhost2"
+        if [ $? -ne 0 ] ; then
+             rlFail "$myhost1 verification failed: Value of \"Managed by\" - GOT: $myval EXPECTED: \"$myhost1, $myhost2\""
+        else
+             rlPass "Value of \"Managed by\" for $myhost1 is as expected - $myval"
+        fi
+	rlRun "ipa host-remove-managedby --hosts=\"$myhost2\" \"$myhost1.\"" 0 "Remove mangedby host with trailing . - dot should be ignored"
+	rlRun "verifyHostAttr $myhost1 \"Managed by\" $myhost1"
+        rlRun "ipa host-del $myhost1" 0 "Cleanup delete test host 1"
+        rlRun "ipa host-del $myhost2" 0 "Cleanup delete test host 2"
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-host-cli-74: host-mod when the name ending in . "
+        myhost1=mytesthost1.$DOMAIN
+        addHost $myhost1
+	attrToModify="desc"
+        attrToVerify1="Description"
+        value="this is a brand new description"
+        rlLog "EXECUTING : ipa host-mod --$attrToModify=\"$value\"  \"$myhost1.\""
+	rlRun "ipa host-mod --$attrToModify=\"$value\" \"$myhost1.\"" 0 "Modify a host with trailing ."
+        rlRun "verifyHostAttr $myhost1 $attrToVerify1 \"$value\"" 0 "Verifying host $attrToVerify1 was modified."
+        rlRun "ipa host-del $myhost1" 0 "Cleanup delete test host"
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-host-cli-75: host-find when the name ending in . "
+        myhost=mytesthost.$DOMAIN
+        rlLog "EXECUTING : ipa host-find $myhost."
+	rlRun "ipa host-add --force $myhost." 0 "Add host with trailing . - dot should be ignored"
+        rlRun "ipa host-show $myhost > /tmp/host75.out 2>&1" 0
+        cat /tmp/host75.out | grep "Host name" | grep "$myhost"
+        if [ $? -eq 0 ] ; then
+            rlPass "Host with trailing dot added and dot was ignored"
+        else
+            rlFail "Host with trailing dot was not added."
+        fi
+        rlRun "ipa host-find \"$myhost.\" > /tmp/host75_2.out 2>&1" 1 
+        cat /tmp/host75_2.out | grep "Host name" | grep "$myhost"
+        if [ $? -eq 0 ] ; then
+		rlFail "host-find ignored the trailing dot."
+	else
+		cat /tmp/host75_2.out | grep "Number of entries returned 0" 
+		if [ $? -eq 0 ] ; then
+			rlPass "host-find with a trailing dot in the name - dot was not ignored"
+		else
+			rlFail "host-find with a trailing dot in the name - ending dot is ignored, EXP: ending dot should not be ignored."
+		fi
+	fi
+        rlRun "ipa host-del $myhost" 0 "Cleanup delete test host"
+    rlPhaseEnd
 
     rlPhaseStartCleanup "ipa-host-cli-cleanup: Destroying admin credentials."
         i=1
