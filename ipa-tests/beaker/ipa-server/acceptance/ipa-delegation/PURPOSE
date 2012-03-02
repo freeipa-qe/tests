@@ -1,3 +1,0 @@
-PURPOSE of /CoreOS/tests/Regression/ipadelegation
-Description: IPA delegation test, including 3 CLI sets: role, permission and privilege
-Author: Yi Zhang <yzhang@redhat.com>
