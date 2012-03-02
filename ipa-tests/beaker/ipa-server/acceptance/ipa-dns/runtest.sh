@@ -1133,6 +1133,18 @@ EOF
 
 	rlPhaseEnd
 
+        rlPhaseStartTest "ipa-dns-169: Bug 750806 - dnszone-mod and dnszone-add does not format administrator's email properly"
+
+		rlLog "verifies bug https://bugzilla.redhat.com/show_bug.cgi?id=750806"
+                rlRun "ipa dnszone-add example.com --name-server=$HOSTNAME --admin-email=admin@example.com"
+		rlRun "ipa dnszone-mod example.com --admin-email=foo.bar@example.com"
+
+		rlRun "ipa dnszone-show example.com | grep \"Administrator e-mail address: foo\\\.bar.example.com.\""
+
+		rlRun "ipa dnszone-del example.com"
+
+	rlPhaseEnd
+
 	rlJournalPrintText
 	report=/tmp/rhts.report.$RANDOM.txt
 	makereport $report
