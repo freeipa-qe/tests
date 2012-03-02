@@ -1161,6 +1161,23 @@ EOF
 
         rlPhaseEnd
 
+        rlPhaseStartTest "ipa-dns-171: Bug 767492 - The plugin doesn't delete zone when it is deleted in LDAP and zone_refresh is set"
+
+		rlLog "verifies https://bugzilla.redhat.com/show_bug.cgi?id=767492"
+
+		rlRun "ipa dnszone-add unknownexample.com --name-server=$HOSTNAME --admin-email=admin@unknownexample.com"
+		rlRun "ipa dnszone-mod unknownexample.com --refresh=30"
+		rlRun "ipa dnsrecord-add unknownexample.com foo --a-rec=10.0.2.2"
+		sleep 35
+		rlRun "dig +short -t A foo.unknownexample.com | grep 10.0.2.2"
+
+		rlRun "ipa dnszone-del unknownexample.com"
+		rlRun "ipa dnszone-find unknownexample.com" 1
+		sleep 35
+		rlRun "dig +short -t A foo.unknownexample.com | grep 10.0.2.2" 1
+
+	rlPhaseEnd
+
 
 
 	rlJournalPrintText
