@@ -446,7 +446,7 @@ rlPhaseStartTest "ipa-user-cli-add-037: check of --pkey-only in user add"
 	rlRun "pkey_return_check" 0 "running checks of --pkey-only in group-find"
     rlPhaseEnd
 
-    rlPhaseStartTest "bug748110: Always set a non-zero max ssf"
+    rlPhaseStartTest "bug748110: At times setting password fails with Confidentiality required: Operation requires a secure connection. errro"
 	rlLog "Verifies https://bugzilla.redhat.com/show_bug.cgi?id=748110"
 
 	rlRun "cp /etc/openldap/ldap.conf /var/tmp/" 0 "Backup /etc/openldap/ldap.conf"
