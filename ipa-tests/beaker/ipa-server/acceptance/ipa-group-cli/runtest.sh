@@ -863,11 +863,12 @@ rlJournalStart
     rlPhaseStartTest "ipa-group-cli-72: Setting GID's to 0 and negative numbers."
     # Test for: https://fedorahosted.org/freeipa/ticket/2335
     # https://bugzilla.redhat.com/show_bug.cgi?id=786240
-        rlRun "ipa group-add --desc=j-test jennygn" 0 "Adding Test Group" 
-        rlRun "ipa group-mod --gid=0 jennygn" 1 "Trying to set group gid to 0"
-        rlRun "ipa group-mod --gid=-0 jennygn" 1 "Trying to set group gid to -0"
-        rlRun "ipa group-mod --gid=-100 jennygn" 1 "Trying to set group gid to -100"
-	rlRun "ipa group-find jennygn | grep GID | grep -100" 1 "Making sure that the GID of the test group is not -100"
+	rlRun "ipa group-add --desc=j-test jennygn" 0 "Adding Test Group"
+	expmsg="ipa: ERROR: invalid 'gid': must be at least 1"
+	for value in 0 -0 -100 ; do
+        	command="ipa group-mod --gid=$value jennygn"
+        	rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
+	done
     rlPhaseEnd 
 
     grp=gmodtest
