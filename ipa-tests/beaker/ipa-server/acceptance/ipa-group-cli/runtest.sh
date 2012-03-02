@@ -1016,6 +1016,10 @@ rlJournalStart
 	rlRun "pkey_return_check" 0 "running checks of --pkey-only in group-find"
     rlPhaseEnd
 
+    rlPhaseStartTest "ipa-group-cli-91: bz773488 - Make ipausers a non-posix group on new installs"
+        rlRun "verifyGroupClasses ipausers ipa" 0 "Verify ipauser group objectclasses."
+    rlPhaseEnd
+
     rlPhaseStartCleanup "ipa-group-cli-cleanup: Delete remaining users and group and Destroying admin credentials"
 	rlRun "ipa config-mod --searchrecordslimit=100" 0 "setting search records limit back to default"
 	rlRun "ipa user-del trex" 0 "Deleting user trex."
