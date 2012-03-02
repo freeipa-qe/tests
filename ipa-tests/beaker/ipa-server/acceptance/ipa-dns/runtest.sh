@@ -1126,6 +1126,13 @@ EOF
 		rlRun "ipa dnszone-del $zone" 0 "Delete the zone created for this test"
 	rlPhaseEnd
 
+	rlPhaseStartTest "ipa-dns-168: Bug 783272 - Confusing error message when adding a record to non-existent zone"
+
+		rlLog "verifies bug https://bugzilla.redhat.com/show_bug.cgi?id=783272"
+		verifyErrorMsg "ipa dnsrecord-add unknowndomain.com \"record name\"  --loc-rec=\"49 11 42.4 N 16 36 29.6 E 227.64m\"" "ipa: ERROR: unknowndomain.com: DNS zone not found"
+
+	rlPhaseEnd
+
 	rlJournalPrintText
 	report=/tmp/rhts.report.$RANDOM.txt
 	makereport $report
