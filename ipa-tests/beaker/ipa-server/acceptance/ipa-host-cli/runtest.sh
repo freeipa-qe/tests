@@ -563,7 +563,7 @@ rlPhaseStartTest "ipa-host-cli-38: find more hosts than exist"
 		if [ $? -eq 0 ] ; then
 			rlPass "Host with trailing dot added and dot was ignored"
 		else
-			rlFail "Host with trailing dot was not added.
+			rlFail "Host with trailing dot was not added."
 		fi
 	fi
 	rlRun "ipa host-del $myhost" 0 "Cleanup delete test host"
