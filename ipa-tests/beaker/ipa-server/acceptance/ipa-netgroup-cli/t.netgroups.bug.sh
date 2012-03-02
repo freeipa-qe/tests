@@ -362,6 +362,7 @@ netgroup_bz_794882()
 netgroup_bz_798792()
 {
 
+	local tmpout=/tmp/errormsg.out
 	rlPhaseStartTest "netgroup_bz_798792_1: ipa netgroup-find options set to space return internal errors (netgroups)"
 		rlRun "ipa netgroup-find --netgroups=\" \" > $tmpout 2>&1" 1
 		if [ $(grep "ipa: ERROR: an internal error has occurred" $tmpout|wc -l) -gt 0 ]; then
@@ -469,4 +470,5 @@ netgroup_bz_798792()
 			rlPass "BZ 798792 not found."
 		fi
 	rlPhaseEnd
+	[ -f $tmpout ] && rm -f $tmpout
 }
