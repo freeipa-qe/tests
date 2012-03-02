@@ -1095,21 +1095,34 @@ EOF
 	rlPhaseStartTest "ipa-dns-166: --pkey-only test of ipa dnsrecord-find _srv records"
 		ipa_command_to_test="dnsrecord"
 		rec_string="--srv-rec=$srva\ $srv"
-		pkey_addstringa="$rec_string $zone"
-		pkey_addstringb="$rec_string $zone"
-		pkey_delstringa="$rec_string $zone"
-		pkey_delstringb="$rec_string $zone"
 		pkeyobja="ahostf"
 		pkeyobjb="ahostfb"
 		grep_string='Record\ name:'
 		general_search_string=ahostf
-		ipa $ipa_command_to_test-add --srv-rec=$srva\ $srv $zone $pkeyobja
-		ipa $ipa_command_to_test-add --srv-rec=$srva\ $srv $zone $pkeyobjb
-		rlRun "pkey_return_check_dns" 0 "running checks of --pkey-only of cname records in ipa dnsrecord-find"
+		ipa $ipa_command_to_test-add --srv-rec=0\ 100\ 389\ why.go.here.com $zone $pkeyobja
+		ipa $ipa_command_to_test-add --srv-rec=0\ 100\ 389\ why.go.here.com $zone $pkeyobjb
+		rlRun "ipa $ipa_command_to_test-find --pkey-only $zone $general_search_string | grep $grep_string | grep $pkeyobja" 0 "make sure the $ipa_command_to_test is returned when the --pkey-only option is specified"
+		rlRun "ipa $ipa_command_to_test-find --pkey-only $zone $general_search_string | grep $grep_string | grep $pkeyobjb" 0 "make sure the $ipa_command_to_test is returned when the --pkey-only option is specified"
+		ipa $ipa_command_to_test-del --srv-rec=0\ 100\ 389\ why.go.here.com $zone $pkeyobja
+		ipa $ipa_command_to_test-del --srv-rec=0\ 100\ 389\ why.go.here.com $zone $pkeyobjb
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-167: --pkey-only test of ipa dnsrecord-find @ records"
+		ipa_command_to_test="dnsrecord"
+		pkeyobja="ahostf"
+		pkeyobjb="ahostfb"
+		grep_string='MX\ record:'
+		mxa=8.7.6.5
+		mxb=1.9.8.7
+		ipa $ipa_command_to_test-add --mx-rec=10\ $mxa. $zone @
+		ipa $ipa_command_to_test-add --mx-rec=20\ $mxb. $zone @
+		rlRun "ipa $ipa_command_to_test-find --pkey-only $zone | grep Record\ name: | grep @" 0 "make sure the $ipa_command_to_test is returned when the --pkey-only option is specified"
+		ipa $ipa_command_to_test-del --mx-rec=10\ $mxa. $zone @
+		ipa $ipa_command_to_test-del --mx-rec=20\ $mxb. $zone @
 	rlPhaseEnd
 
 #		rlRun "ipa dnsrecord-add $zone @ --mx-rec '10 $mx.'" 0 "add record type MX"
-	rlPhaseStartTest "ipa-dns-167: Delete the created zone"
+	rlPhaseStartTest "ipa-dns-168: Delete the created zone"
 		rlRun "ipa dnszone-del $zone" 0 "Delete the zone created for this test"
 	rlPhaseEnd
 
