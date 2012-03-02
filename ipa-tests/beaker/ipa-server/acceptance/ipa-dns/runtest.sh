@@ -1145,6 +1145,24 @@ EOF
 
 	rlPhaseEnd
 
+	rlPhaseStartTest "ipa-dns-170: Bug 733371 - DNS zones are not loaded when idnsAllowQuery/idnsAllowTransfer is filled"
+
+		rlLog "verifies https://bugzilla.redhat.com/show_bug.cgi?id=733371"
+
+		rlRun "ipa dnszone-add example.com --name-server=$HOSTNAME --admin-email=admin@example.com"
+                rlRun "ipa dnsrecord-add example.com foo --a-rec=10.0.1.1"
+		rlRun "ipa dnszone-mod --allow-query=127.0.0.1"
+
+		rlRun "service named reload"
+		sleep 5
+                rlRun "dig +short -t A foo.example.com | grep 10.0.1.1"
+
+                rlRun "ipa dnszone-del example.com"
+
+        rlPhaseEnd
+
+
+
 	rlJournalPrintText
 	report=/tmp/rhts.report.$RANDOM.txt
 	makereport $report
