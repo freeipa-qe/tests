@@ -65,7 +65,7 @@ host4="shadowfall.$DOMAIN"
 host5="qe-blade-23.$DOMAIN"
 
 group1="hostgrp1"
-group2="host group 2"
+group2="host.group.2"
 group3="host-group_3"
 group4="parent"
 group5="child"
@@ -403,22 +403,24 @@ rlJournalStart
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-hostgroup-cli-39: add host group as member to itself - bugzilla 501377"
-	expmsg="A group may not be added as a member of itself"
-        rlrun "ipa hostgroup-add-member --hosts="$group1" $group1 > /tmp/error.out" 1
-        cat /tmp/error.out | grep "$expmsg"
-        rc=$?
-        rlAssert0 "$expmsg" $rc
+	rlRun "ipa hostgroup-add --desc=test testgrp" 0 "Adding test host group"
+        rlRun "ipa hostgroup-add-member --hostgroups=testgrp testgrp > /tmp/hostgroup39.out 2>&1" 1 
+	rlAssertGrep "    member host group: testgrp: A group may not be added as a member of itself" "/tmp/hostgroup39.out"
+	rlRun "ipa hostgroup-del testgrp" 0 "Delete test group"
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-hostgroup-cli-40: check of --pkey-only in hostgroup find"
-	ipa_command_to_test="hostgroup"
-	pkey_addstringa="--desc testng"
-	pkey_addstringb="--desc testng"
-	pkeyobja="testhg"
-	pkeyobjb="testhgb"
-	grep_string='Host-group:'
-	general_search_string=$pkeyobja
-	rlRun "pkey_return_check" 0 "running checks of --pkey-only in hostgroup-find"
+    rlPhaseStartTest "ipa-hostgroup-cli-40: invalid characters for hostgroup names"
+	expmsg="ipa: ERROR: invalid 'hostgroup_name': may only include letters, numbers, _, -, and ."
+	for value in my*group my:group ; do
+		command="ipa hostgroup-add --desc=test \"$value\""
+		rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message - invalid character: $value"
+	done
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-hostgroup-cli-41: invalid spaces in hostgroup names"
+        expmsg="ipa: ERROR: invalid 'hostgroup_name': may only include letters, numbers, _, -, and ."
+        ipa hostgroup-add --desc=test "my group" > /tmp/hostgroup41.out 2<&1
+	rlAssertGrep "$expmsg" "/tmp/hostgroup41.out"
     rlPhaseEnd
 
     rlPhaseStartCleanup "ipa-hostgroup-cli-cleanup: Delete remaining hosts and Destroying admin credentials"
