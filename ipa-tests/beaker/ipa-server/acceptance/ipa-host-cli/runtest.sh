@@ -1086,13 +1086,7 @@ rlPhaseStartTest "ipa-host-cli-38: find more hosts than exist"
             rlFail "Host with trailing dot was not added."
         fi
         rlRun "ipa host-del $myhost." 0 "Delete a host with trailing . - dot should be ignored"
-	rlRun "ipa host-show $myhost > /tmp/host70_2.out 2>&1" 0
-        cat /tmp/host70_2.out | grep "Host name" | grep "$myhost"
-        if [ $? -eq 0 ] ; then
-            rlFail "Host with trailing dot was not deleted."
-        else
-            rlPass "Host with trailing dot is deleted and the dot was ignored"
-        fi
+	rlRun "findHost $myhost" 1 "Verifying host $myhost was deleted."
     rlPhaseEnd
 
 
