@@ -495,6 +495,7 @@ uninstall()
 	rlRun "ipa-replica-manage list -p Secret123 `hostname` | grep \"$MASTER: master\""
 	rlRun "ipa-replica-manage list -p Secret123 `hostname` | grep \"$SLAVE: master\""
 
+	rlLog "verifies https://bugzilla.redhat.com/show_bug.cgi?id=754524"
 	rlRun "remoteExec root $MASTERIP redhat \"echo $ADMINPW | kinit admin; klist\""
 	rlRun "remoteExec root $MASTERIP redhat \"ipa-replica-manage del $SLAVE\""
 	rlRun "egrep \"Deleted replication agreement from '$MASTER' to '$SLAVE'\" /tmp/remote_exec.out"
