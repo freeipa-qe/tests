@@ -1020,6 +1020,29 @@ rlJournalStart
         rlRun "verifyGroupClasses ipausers ipa" 0 "Verify ipauser group objectclasses."
     rlPhaseEnd
 
+    rlPhaseStartTest "ipa-group-cli-92: Negative  Test of --in-groups in group-find"
+	ipa group-add --desc=desc1 uuu
+	ipa group-add --desc=desc1 ggg
+	rlRun "ipa group-find --in-groups=ggg | grep Group\ name: | grep uuu" 1 "Making sure that group uuu does not come back when searching --in-groups=ggg"
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-group-cli-93: Positive Test of --in-groups in group-find"
+	ipa group-add-member --groups=uuu ggg
+	rlRun "ipa group-find --in-groups=ggg | grep Group\ name: | grep uuu" 0 "Making sure that group uuu comes back when searching --in-groups=ggg"
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-group-cli-94: Negative Test of --not-in-groups in group-find"
+	ipa group-add --desc=desc1 tusera
+	rlRun "ipa group-find --not-in-groups=ggg | grep Group\ name: | grep uuu" 1 "Making sure that group ggg does not come back when searching --not-in-groups=ggg"
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-group-cli-95: Positive test of --not-in-groups in group-find"
+	rlRun "ipa group-find --not-in-groups=ggg | grep Group\ name: | grep tusera" 0 "Making sure that group tusera comes back when searching --not-in-groups=ggg"
+	ipa group-del ggg
+	ipa group-del uuu
+	ipa group-del tusera
+    rlPhaseEnd
+
     rlPhaseStartCleanup "ipa-group-cli-cleanup: Delete remaining users and group and Destroying admin credentials"
 	rlRun "ipa config-mod --searchrecordslimit=100" 0 "setting search records limit back to default"
 	rlRun "ipa user-del trex" 0 "Deleting user trex."

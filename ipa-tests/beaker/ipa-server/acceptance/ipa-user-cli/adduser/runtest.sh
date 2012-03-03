@@ -434,8 +434,7 @@ rlJournalStart
 	ipa user-del $rusr&
     rlPhaseEnd
 
-
-rlPhaseStartTest "ipa-user-cli-add-037: check of --pkey-only in user add"
+    rlPhaseStartTest "ipa-user-cli-add-037: check of --pkey-only in user add"
 	ipa_command_to_test="user"
 	pkey_addstringa="--first fnamla --last lastna"
 	pkey_addstringb="--first fnamlb --last lastnb"
@@ -462,6 +461,29 @@ rlPhaseStartTest "ipa-user-cli-add-037: check of --pkey-only in user add"
 
 	rlRun "mv -f /var/tmp/ldap.conf /etc/openldap/ldap.conf" 0 "Restoring /etc/openldap/ldap.conf" 
 	rlRun "service httpd restart"
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-user-cli-add-038: Negative  Test of --in-groups in user-find"
+	ipa user-add --first=fname --last=lname uuu
+	ipa group-add --desc=desc1 ggg
+	rlRun "ipa user-find --in-groups=ggg | grep User\ login: | grep uuu" 1 "Making sure that user uuu does not come back when searching --in-groups=ggg"
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-user-cli-add-039: Positive Test of --in-groups in user-find"
+	ipa group-add-member --users=uuu ggg
+	rlRun "ipa user-find --in-groups=ggg | grep User\ login: | grep uuu" 0 "Making sure that user uuu comes back when searching --in-groups=ggg"
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-user-cli-add-040: Negative Test of --not-in-groups in user-find"
+	ipa user-add --first=fname --last=lname tusera
+	rlRun "ipa user-find --not-in-groups=ggg | grep User\ login: | grep ggg" 1 "Making sure that user ggg does not come back when searching --not-in-groups=ggg"
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-user-cli-add-041: Positive test of --not-in-groups in user-find"
+	rlRun "ipa user-find --not-in-groups=ggg | grep User\ login: | grep tusera" 0 "Making sure that user tusera comes back when searching --not-in-groups=ggg"
+	ipa group-del ggg
+	ipa user-del uuu
+	ipa user-del tusera
     rlPhaseEnd
 
     rlPhaseStartCleanup "ipa-user-cli-add-cleanup"
