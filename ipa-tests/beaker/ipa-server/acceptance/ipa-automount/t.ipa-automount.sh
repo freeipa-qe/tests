@@ -324,6 +324,7 @@ rlPhaseStartTest "automount_010: ipa help automountlocation-find"
 	rlAssertGrep "\--sizelimit=INT  Maximum number of entries returned" "$TmpDir/automount_010.out"
 	rlAssertGrep "\--all            Retrieve and print all attributes from the server." "$TmpDir/automount_010.out"
 	rlAssertGrep "\--raw            Print entries as stored on the server." "$TmpDir/automount_010.out"
+	rlAssertGrep "\--pkey-only      Results should contain primary key attribute only" "$TmpDir/automount_010.out"
 
 	rlRun "cat $TmpDir/automount_010.out"
 
@@ -652,6 +653,22 @@ rlPhaseStartTest "automount_location_find_005: ipa automountlocation-find --loca
 rlPhaseEnd
 }
 
+automount_location_find_006() {
+
+rlPhaseStartTest "automount_location_find_006: ipa automountlocation-find --pkey-only positive test"
+
+        rlRun "ipa automountlocation-add pune"
+
+        rlRun "ipa automountlocation-find --location=pune --pkey-only > $TmpDir/automount_location_find_006.out 2>&1"
+        rlAssertGrep "Location:" "$TmpDir/automount_location_find_006.out"
+        rlAssertGrep "Number of entries returned 1" "$TmpDir/automount_location_find_006.out"
+
+	rlRun "cat $TmpDir/automount_location_find_006.out"
+        rlRun "ipa automountlocation-del pune"
+
+rlPhaseEnd
+}
+
 automount_location_show_001() {
 
 rlPhaseStartTest "automount_location_show_001: ipa automountlocation-show LOCATION"
@@ -866,7 +883,7 @@ rlPhaseEnd
 
 automountmap_find_001() {
 
-rlPhaseStartTest "automountmap_find_001: ipa automountmap-del AUTOMOUNTLOCATION"
+rlPhaseStartTest "automountmap_find_001: ipa automountmap-find AUTOMOUNTLOCATION"
 
 	# Setup for automountmap-find.
 	rlRun "ipa automountlocation-add pune"
@@ -890,7 +907,7 @@ rlPhaseEnd
 
 automountmap_find_002() {
 
-rlPhaseStartTest "automountmap_find_002: ipa automountmap-del AUTOMOUNTLOCATION MAP"
+rlPhaseStartTest "automountmap_find_002: ipa automountmap-find AUTOMOUNTLOCATION MAP"
 
 	rlRun "ipa automountmap-find pune --map=pune.map > $TmpDir/automountmap_find_002.out 2>&1"
 	rlAssertGrep "1 automount map matched" "$TmpDir/automountmap_find_002.out"
@@ -904,7 +921,7 @@ rlPhaseEnd
 
 automountmap_find_003() {
 
-rlPhaseStartTest "automountmap_find_003: ipa automountmap-del AUTOMOUNTLOCATION MAP --all"
+rlPhaseStartTest "automountmap_find_003: ipa automountmap-find AUTOMOUNTLOCATION MAP --all"
 
         rlRun "ipa automountmap-find pune --map=pune.map --all > $TmpDir/automountmap_find_003.out 2>&1"
         rlAssertGrep "1 automount map matched" "$TmpDir/automountmap_find_003.out"
@@ -920,7 +937,7 @@ rlPhaseEnd
 
 automountmap_find_004() {
 
-rlPhaseStartTest "automountmap_find_004: ipa automountmap-del AUTOMOUNTLOCATION MAP --all --raw"
+rlPhaseStartTest "automountmap_find_004: ipa automountmap-find AUTOMOUNTLOCATION MAP --all --raw"
 
 	rlRun "ipa automountmap-find pune --map=pune.map --all --raw > $TmpDir/automountmap_find_004.out 2>&1"
         rlAssertGrep "1 automount map matched" "$TmpDir/automountmap_find_004.out"
@@ -935,10 +952,9 @@ rlPhaseStartTest "automountmap_find_004: ipa automountmap-del AUTOMOUNTLOCATION 
 rlPhaseEnd
 }
 
-
 automountmap_find_005() {
 
-rlPhaseStartTest "automountmap_find_005: ipa automountmap-del AUTOMOUNTLOCATION MAP --all --raw --sizelimit"
+rlPhaseStartTest "automountmap_find_005: ipa automountmap-find AUTOMOUNTLOCATION MAP --all --raw --sizelimit"
 
 	rlRun "ipa automountmap-find pune --all --raw --sizelimit=2 > $TmpDir/automountmap_find_005.out 2>&1"
 
@@ -973,6 +989,21 @@ rlPhaseStartTest "automountmap_find_005: ipa automountmap-del AUTOMOUNTLOCATION 
 	rlAssertGrep "Number of entries returned 3" "$TmpDir/automountmap_find_005.out"
 
 	rlRun "cat $TmpDir/automountmap_find_005.out"
+
+rlPhaseEnd
+}
+
+automountmap_find_006() {
+
+rlPhaseStartTest "automountmap_find_006: ipa automountmap-find AUTOMOUNTLOCATION MAP --pkey-only positive test."
+
+	rlRun "ipa automountmap-find pune --map=pune.map --pkey-only > $TmpDir/automountmap_find_006.out 2>&1"
+        rlAssertGrep "1 automount map matched" "$TmpDir/automountmap_find_006.out"
+        rlAssertGrep "Map: auto.direct" "$TmpDir/automountmap_find_006.out"
+        rlAssertGrep "Map: auto.master" "$TmpDir/automountmap_find_006.out"
+        rlAssertGrep "Map: pune.map" "$TmpDir/automountmap_find_006.out"
+
+        rlRun "cat $TmpDir/automountmap_find_006.out"
 
         rlRun "ipa automountlocation-del pune"
 

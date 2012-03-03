@@ -1182,7 +1182,7 @@ EOF
 		i="ipa $ipa_command_to_test-add $pkey_addstringa $pkeyobja"
 		echo "running $i"
 		$i
-		rlRun "ipa $ipa_command_to_test-find --pkey-only $zone $pkeyobja | grep AAAA\ record" 0 "make sure the $ipa_command_to_test does not return 'AAAA record' returned when the --pkey-only option is specified"
+		rlRun "ipa $ipa_command_to_test-find --pkey-only $zone $pkeyobja | grep AAAA\ record" 1 "make sure the $ipa_command_to_test does not return 'AAAA record' returned when the --pkey-only option is specified"
 		rlRun "ipa $ipa_command_to_test-del $pkey_delstringa $pkeyobja" 0 "deleting the first object from this test ($pkeyobja)"
 	rlPhaseEnd
 
