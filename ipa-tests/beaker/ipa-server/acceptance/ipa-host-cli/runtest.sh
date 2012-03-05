@@ -1186,6 +1186,33 @@ rlPhaseStartTest "ipa-host-cli-38: find more hosts than exist"
         rlRun "ipa host-del $myhost" 0 "Cleanup delete test host"
     rlPhaseEnd
 
+rlPhaseStartTest "ipa-host-cli-76: host-disable when the name ending in . "
+        myhost=mytesthost.$DOMAIN
+        rlLog "EXECUTING : ipa host-disable $myhost."
+        rlRun "ipa host-add --force $myhost." 0 "Add host with trailing . - dot should be ignored"
+        rlRun "ipa host-show $myhost > /tmp/host76.out 2>&1" 0
+        cat /tmp/host76.out | grep "Host name" | grep "$myhost"
+        if [ $? -eq 0 ] ; then
+            rlPass "Host with trailing dot added and dot was ignored"
+        else
+            rlFail "Host with trailing dot was not added."
+        fi
+	rlRun "ipa-getkeytab -s `hostname` -p host/$myhost -k /tmp/host.$myhost.keytab"
+	rlRun "verifyHostAttr $myhost Keytab True" 0 "Check if keytab exists"
+        rlRun "ipa host-disable \"$myhost.\" > /tmp/host76_2.out 2>&1" 0
+        if [ $? -ne 0 ] ; then
+                rlFail "host-disable with a trailing dot in the name - did not ignore the trailing dot."
+        else
+		cat /tmp/host76_2.out | grep "Disabled host \"$myhost\"" 
+		if [ $? -eq 0 ] ; then
+                	rlPass "host-disable with a trailing dot in the name - dot is ignored."
+        	else
+            		rlFail "Host with trailing dot . is not disabled."
+        	fi
+        fi
+        rlRun "ipa host-del $myhost" 0 "Cleanup delete test host"
+    rlPhaseEnd
+
     rlPhaseStartCleanup "ipa-host-cli-cleanup: Destroying admin credentials."
         i=1
         while [ $i -le 10 ] ; do
