@@ -202,6 +202,7 @@ nisint_ipamaster_integration_add_nis_data_netgroup()
 			if [ $(echo $line|grep "(,"|wc -l) -gt 0 ]; then
 				hostcat=all
 			fi
+
 			if [ $(echo $line|grep ",,"|wc -l) -gt 0 ]; then
 				usercat=all
 			fi
@@ -295,11 +296,436 @@ nisint_ipamaster_integration_add_nis_data_automount()
 nisint_ipamaster_integration_del_nis_data()
 {
 	echo $FUNCNAME
+	nisint_ipamaster_integration_del_nis_data_passwd
+	nisint_ipamaster_integration_del_nis_data_group
+	nisint_ipamaster_integration_del_nis_data_hosts
+	nisint_ipamaster_integration_del_nis_data_netgroup
+	nisint_ipamaster_integration_del_nis_data_automount
+}
+
+nisint_ipamaster_integration_del_nis_data_passwd()
+{
+	rlPhaseStartTest "nisint_ipamaster_integration_del_nis_data_passwd: Delete users from passwd map"
+		rlRun "ypcat -d $NISDOMAIN -h $NISMASTER passwd  > /dev/shm/nis-map.passwd 2>&1"
+		for user in $(cut -f1 -d: /dev/shm/nis-map.passwd); do
+			if [ $(ipa user-show $user 2>/dev/null | wc -l) -gt 0 ]; then
+				rlRun "ipa user-del $user"
+			else
+				rlPass "No user, $user, found...continuing"
+			fi
+		done
+	rlPhaseEnd
+}
+
+nisint_ipamaster_integration_del_nis_data_group()
+{
+	rlPhaseStartTest "nisint_ipamaster_integration_del_nis_data_group: Delete groups grom group map"
+		rlRun "ypcat -d $NISDOMAIN -h $NISMASTER group  > /dev/shm/nis-map.group 2>&1"
+		for group in $(cut -f1 -d: /dev/shm/nis-map.group); do
+			if [ $(ipa group-show $group 2>/dev/null | wc -l) -gt 0 ]; then
+				rlRun "ipa group-del $group"
+			else
+				rlPass "No group, $group, found...continuing" 
+			fi
+		done
+	rlPhaseEnd
+}
+
+nisint_ipamaster_integration_del_nis_data_hosts()
+{
+	MASTER_S=$(echo $MASTER|cut -f1 -d.)
+	NISMASTER_S=$(echo $NISMASTER|cut -f1 -d.)
+	NISCLIENT_S=$(echo $NISMASTER|cut -f1 -d.)
+	rlPhaseStartTest "nisint_ipamaster_integration_del_nis_data_hosts: Delete hostsf from host map"
+		rlRun "ypcat -d $NISDOMAIN -h $NISMASTER hosts  > /dev/shm/nis-map.hosts 2>&1"
+		for host in $(awk '{print $2 }' /dev/shm/nis-map.hosts|cut -f1 -d.|egrep -v "$MASTER_S|$NISMASTER_S|$NISCLIENT_S" | sed "s/$/.$DOMAIN/g"); do
+			if [ $(ipa host-show $host 2>/dev/null|wc -l) -gt 0 ]; then
+				rlRun "ipa host-del $host --updatedns"
+			else
+				rlPass "No host, $host, found...continuing"
+			fi
+		done
+	rlPhaseEnd
+}
+
+nisint_ipamaster_integration_del_nis_data_netgroup()
+{
+	rlPhaseStartTest "nisint_ipamaster_integration_del_nis_data_netgroup: Delete netgroups from map"
+		rlRun "ypcat -k -d $NISDOMAIN -h $NISMASTER netgroup  > /dev/shm/nis-map.netgroup 2>&1"
+		for netgroup in $(awk '{print $1}' /dev/shm/nis-map.netgroup); do
+			if [ $(ipa netgroup-show $netgroup 2>/dev/null | wc -l) -gt 0 ]; then
+				rlRun "ipa netgroup-del $netgroup"
+			else
+				rlPass "No netgroup, $netgroup, found...continuing"
+			fi
+		done
+	rlPhaseEnd
+}
+
+nisint_ipamaster_integration_del_nis_data_automount()
+{
+	rlPhaseStartTest "nisint_ipamaster_integration_del_nis_data_automount: Delete automount from map"
+		rlRun "ipa automountlocation-del nis"
+		rlRun "ldapdelete -x -D \"$ROOTDN\" -w \"$ROOTDNPWD\" \"nis-domain=testrelm.com+nis-map=auto.nisint,cn=NIS Server,cn=plugins,cn=config\""
+		rlRun "ldapdelete -x -D \"$ROOTDN\" -w \"$ROOTDNPWD\" \"nis-domain=testrelm.com+nis-map=auto.home,cn=NIS Server,cn=plugins,cn=config\""
+		rlRun "ldapdelete -x -D \"$ROOTDN\" -w \"$ROOTDNPWD\" \"nis-domain=testrelm.com+nis-map=auto.master,cn=NIS Server,cn=plugins,cn=config\""
+	rlPhaseEnd	
 }
 
 nisint_ipamaster_integration_add_nis_data_ldif()
 {
 	echo $FUNCNAME
+	nisint_ipamaster_integration_add_nis_data_ldif_passwd
+	nisint_ipamaster_integration_add_nis_data_ldif_group
+	nisint_ipamaster_integration_add_nis_data_ldif_hosts
+	nisint_ipamaster_integration_add_nis_data_ldif_netgroup
+	nisint_ipamaster_integration_add_nis_data_ldif_automount
+}
+
+nisint_ipamaster_integration_add_nis_data_ldif_passwd()
+{
+	rlPhaseStartTest "nisint_ipamaster_integration_add_nis_data_ldif_passwd: Add NIS passwd via ldif"
+		ORIGFS="$IFS"
+		IFS="
+"
+		rlRun "ypcat -d $NISDOMAIN -h $NISMASTER passwd  > /dev/shm/nis-map.passwd 2>&1"
+		cat /dev/null > /tmp/nis-map.passwd.ldif
+		for line in $(cat /dev/shm/nis-map.passwd); do
+			IFS="$ORIGIFS"
+			USERNAME=$(echo $line|cut -f1 -d:|tr '[:upper:]' '[:lower:]')
+			UIDNUM=$(echo $line|cut -f3 -d:)
+			GIDNUM=$(echo $line|cut -f4 -d:)
+			GECOS=$(echo $line|cut -f5 -d:)
+			HOMEDIR=$(echo $line|cut -f6 -d:)
+			SHELL=$(echo $line|cut -f7 -d:)
+
+			echo "ipa-ldif-user-add: $USERNAME $UIDNNUM $GIDNUM $GECOS $HOMEDIR $SHELL"
+
+			cat >> /tmp/nis-map.passwd.ldif <<-EOF
+			dn: uid=$USERNAME,cn=users,cn=accounts,$BASEDN
+			displayName: NIS USER
+			cn: NIS USER
+			objectClass: top
+			objectClass: person
+			objectClass: organizationalperson
+			objectClass: inetorgperson
+			objectClass: inetuser
+			objectClass: posixaccount
+			objectClass: krbprincipalaux
+			objectClass: krbticketpolicyaux
+			objectClass: ipaobject
+			objectClass: ipasshuser
+			objectClass: ipaSshGroupOfPubKeys
+			objectClass: mepOriginEntry
+			givenName: NIS
+			sn: USER
+			initials: NU
+			uid: $USERNAME
+			uidNumber: $UIDNUM
+			gidNumber: $GIDNUM
+			loginShell: $SHELL
+			homeDirectory: $HOMEDIR
+			krbPwdPolicyReference: cn=global_policy,cn=$RELM,cn=kerberos,$BASEDN
+			krbPrincipalName: $USERNAME@$RELM
+			mepManagedEntry: cn=$USERNAME,cn=groups,cn=accounts,$BASEDN
+			EOF
+
+			if [ -n "$GECOS" ]; then
+				echo "gecos: $GECOS" >> /tmp/nis-map.passwd.ldif
+			fi
+		
+			echo "" >> /tmp/nis-map.passwd.ldif 
+		done
+
+		rlRun "ldapadd -av -x -D \"$ROOTDN\" -w \"$ROOTDNPWD\" -f /tmp/nis-map.passwd.ldif"
+
+		for USERNAME in $(cut -f1 -d: /dev/shm/nis-map.passwd); do
+			rlRun "echo \"dummy123@ipa.com\"| ipa passwd $USERNAME"
+			FirstKinitAs $USERNAME dummy123@ipa.com passw0rd1
+			KinitAsAdmin
+		done
+	rlPhaseEnd
+}
+
+nisint_ipamaster_integration_add_nis_data_ldif_group()
+{
+	rlPhaseStartTest "nisint_ipamaster_integration_add_nis_data_ldif_group: add NIS group via ldif"
+		ORIGFS="$IFS"
+		IFS="
+"
+		rlRun "ypcat -d $NISDOMAIN -h $NISMASTER group  > /dev/shm/nis-map.group 2>&1"
+		cat /dev/null > /tmp/nis-map.group.ldif
+		for line in $(cat /dev/shm/nis-map.group); do
+			GROUPNAME=$(echo $line|cut -f1 -d:|tr '[:upper:]' '[:lower:]')
+			GIDNUM=$(echo $line|cut -f3 -d:)
+			USERS=$(echo $line|cut -f4 -d:|tr '[:upper:]' '[:lower:]')
+			if [ $(ipa group-show $GROUPNAME 2>/dev/null | wc -l) -gt 0 ]; then
+				rlLog "Group, $GROUPNAME, already exists...continuing"
+				continue
+			fi
+			
+			cat >> /tmp/nis-map.group.ldif <<-EOF
+			dn: cn=$GROUPNAME,cn=groups,cn=accounts,$BASEDN
+			objectClass: top
+			objectClass: groupofnames
+			objectClass: nestedgroup
+			objectClass: ipausergroup
+			objectClass: ipaobject
+			objectClass: posixgroup
+			gidNumber: $GIDNUM
+			cn: $GROUPNAME
+			description: NIS_GROUP_$GROUPNAME
+			EOF
+
+			for USER in $(echo $USERS|sed 's/,/ /g'); do
+				echo "member: uid=$USER,cn=users,cn=accounts,$BASEDN" >> /tmp/nis-map.group.ldif
+			done
+			echo "" >> /tmp/nis-map.group.ldif
+		done
+
+		rlRun "ldapadd -av -x -D \"$ROOTDN\" -w \"$ROOTDNPWD\" -f /tmp/nis-map.group.ldif"
+	rlPhaseEnd
+}
+
+nisint_ipamaster_integration_add_nis_data_ldif_hosts()
+{
+	rlPhaseStartTest "nisint_ipamaster_integration_add_nis_data_ldif_hosts: Add NIS hosts via ldif"
+		tmphosts=/tmp/nis-map.hosts.ldif
+		ORIGFS="$IFS"
+		IFS="
+"
+		rlRun "ypcat -d $NISDOMAIN -h $NISMASTER hosts|sort -u|egrep -v 'localhost|$MASTER|$NISMASTER|$NISCLIENT'  > /dev/shm/nis-map.hosts 2>&1"
+		cat /dev/null > $tmphosts
+		for line in $(cat /dev/shm/nis-map.hosts); do
+			IFS="$ORIGIFS"
+			date=$(date +%Y%m%d)
+			ip=$(echo $line|awk '{print $1}')
+			ptrzone=$(echo $ip|awk -F. '{print $3 "." $2 "." $1 ".in-addr.arpa."}')
+			iplastoctet=$(echo $ip|awk -F. '{print $4}')
+			hostnames=$(echo $line | sed "s/$ip//")
+			firsthostname=$(echo $hostnames|awk '{print $1}'|cut -f1 -d.|head -1)
+			ptrzonefound=$(ipa dnszone-show $ptrzone 2>/dev/null |wc -l)
+			ptrzonewritten=$(grep "dn: idnsname=$ptrzone,cn=dns,$BASEDN" $tmphosts|wc -l)
+
+			if [ $ptrzonefound -eq 0 -a $ptrzonewritten -eq 0 ]; then
+				# Add PTR Zone:
+				cat >> $tmphosts <<-EOF
+				dn: idnsname=$ptrzone,cn=dns,$BASEDN
+				idnsZoneActive: TRUE
+				idnsSOAexpire: 1209600
+				nSRecord: ${MASTER}.
+				idnsSOAserial: ${date}01
+				idnsSOAretry: 900
+				idnsSOAminimum: 3600
+				idnsSOArefresh: 3600
+				objectClass: top
+				objectClass: idnsrecord
+				objectClass: idnszone
+				idnsName: $ptrzone
+				idnsAllowDynUpdate: FALSE
+				idnsSOArName: ipaqar.redhat.com.
+				idnsSOAmName: ${MASTER}.
+				EOF
+				echo "" >> $tmphosts
+			fi
+
+	
+			if [ $(ipa host-show $firsthostname.$DOMAIN 2>/dev/null | wc -l) -eq 0 ]; then
+				cat >> $tmphosts <<-EOF
+				dn: fqdn=$firsthostname.$DOMAIN,cn=computers,cn=accounts,$BASEDN
+				cn: $firsthostname.$DOMAIN
+				objectClass: ipaobject
+				objectClass: nshost
+				objectClass: ipahost
+				objectClass: pkiuser
+				objectClass: ipaservice
+				objectClass: krbprincipalaux
+				objectClass: krbprincipal
+				objectClass: ieee802device
+				objectClass: ipasshhost
+				objectClass: top
+				objectClass: ipaSshGroupOfPubKeys
+				fqdn: $firsthostname.$DOMAIN
+				managedBy: fqdn=$firsthostname.$DOMAIN,cn=computers,cn=accounts,$BASEDN
+				krbPrincipalName: host/$firsthostname.$DOMAIN@$RELM
+				serverHostName: $firsthostname
+				EOF
+				echo "" >> $tmphosts
+
+				cat >> $tmphosts <<-EOF
+				dn: idnsname=$firsthostname,idnsname=$DOMAIN,cn=dns,$BASEDN
+				objectClass: top
+				objectClass: idnsrecord
+				aRecord: $ip
+				idnsName: $firsthostname
+				EOF
+				echo "" >> $tmphosts
+
+				cat >> $tmphosts <<-EOF
+				dn: idnsname=$iplastoctet,idnsname=$ptrzone,cn=dns,$BASEDN
+				objectClass: top
+				objectClass: idnsrecord
+				pTRRecord: $firsthostname.$DOMAIN.
+				idnsName: $iplastoctet
+				EOF
+				echo "" >> $tmphosts
+			fi
+		done
+
+		rlRun "ldapadd -av -x -D \"$ROOTDN\" -w \"$ROOTDNPWD\" -f $tmphosts"
+	rlPhaseEnd	
+	
+}
+
+nisint_ipamaster_integration_add_nis_data_ldif_netgroup()
+{
+
+	rlPhaseStartTest "nisint_ipamaster_integration_add_nis_data_ldif_netgroup: Add netgroups via ldif"
+		tmpldif=/tmp/nis-map.netgroup.ldif
+		ORIGFS="$IFS"
+		IFS="
+"
+		rlRun "ypcat -k -d $NISDOMAIN -h $NISMASTER netgroup > /dev/shm/nis-map.netgroup 2>&1"
+		cat /dev/null > $tmpldif
+		for line in $(cat /dev/shm/nis-map.netgroup); do
+			IFS="$ORIGIFS"
+			NGNAME=$(echo $line|awk '{print $1}')
+			USERCAT=0
+			HOSTCAT=0
+
+cat >> $tmpldif <<-EOF
+dn: cn=$NGNAME,cn=ng,cn=alt,$BASEDN
+objectClass: ipaobject
+objectClass: ipaassociation
+objectClass: ipanisnetgroup
+cn: $NGNAME
+description: NIS_NG_$NGNAME
+nisDomainName: $DOMAIN
+EOF
+
+			triples=$(echo $line|sed -e "s/^$NGNAME //" -e "s/, /,/g")
+
+			for triple in $triples; do
+				# no parens means it's a netgroup
+				if [ $(echo $triple|grep -v "("|wc -l) -gt 0 ]; then
+					NETGROUP=$triple
+					echo "member: cn=$NETGROUP,cn=ng,cn=alt,$BASEDN" >> $tmpldif
+					continue
+				fi
+
+				# else split up the triple
+				thost=$(echo $triple|sed -e 's/(//' -e 's/)//'|cut -f1 -d,)
+				tuser=$(echo $triple|sed -e 's/(//' -e 's/)//'|cut -f2 -d,)
+				tdom=$(echo $triple |sed -e 's/(//' -e 's/)//'|cut -f3 -d,)
+
+				# process the host part first
+				if [ -z "$thost" ]; then
+					HOSTCAT=1
+				elif [ $(ipa host-show $thost 2>/dev/null|wc -l) -gt 0 ]; then
+					echo "memberHost: fqdn=$thost,cn=computers,cn=accounts,$BASEDN" >> $tmpldif
+				elif [ "X$thost" != "X-" ]; then
+					echo "externalHost: $thost" >> $tmpldif
+				fi
+
+				# process the user part next
+				if [ -z "$tuser" ]; then
+					USERCAT=1
+				elif [ $(ipa user-show $tuser 2>/dev/null|wc -l) -gt 0 ]; then
+					echo "memberUser: uid=$tuser,cn=users,cn=accounts,$BASEDN" >> $tmpldif
+				elif [ $(ipa group-show $tuser 2>/dev/null|wc -l) -gt 0 ]; then
+					echo "memberUser: cn=GROUP,cn=groups,cn=accounts,dc=testrelm,dc=com" >> $tmpldif
+				else
+					echo "Unknown user part found: $tuser not an IPA user or group so cannot be added"
+				fi
+
+				# process the domain part last
+				if [ -n "$tdom" ]; then
+					NGNISDOM=$tdom
+				fi
+			done
+
+			if [ $USERCAT -gt 0 ]; then
+				echo "userCategory: all" >> $tmpldif
+			fi
+			if [ $HOSTCAT -gt 0 ]; then
+				echo "hostCategory: all" >> $tmpldif
+			fi
+			if [ -n "$NGNISDOM" ]; then
+				echo "nisDomainName: $NGNISDOM" >> $tmpldif
+			fi
+
+			echo "" >> $tmpldif
+		done
+
+		rlRun "ldapadd -x -D '$ROOTDN' -w '$ROOTDNPWD' -f $tmpldif"
+		rm -f $tmpldif
+	rlPhaseEnd
+}
+
+nisint_ipamaster_integration_add_nis_data_ldif_automount()
+{
+	rlPhaseStartTest "nisint_ipamaster_integration_add_nis_data_ldif_automount: Add automount via ldif"
+		tmpldif=/tmp/nis-map.automount.ldif
+		cat /dev/null > $tmpldif
+
+		cat > $tmpldif <<-EOF
+		dn: cn=nis,cn=automount,$BASEDN
+		objectClass: nscontainer
+		objectClass: top
+		cn: nis
+		EOF
+
+		echo "" >> $tmpldif
+
+		ORIGFS="$IFS"
+		rlRun "ypcat -k -d $NISDOMAIN -h $NISMASTER auto.master > /dev/shm/nis-map.auto.master 2>&1"
+		
+		MAPS=$(echo auto.master ; awk '{print $2}' /dev/shm/nis-map.auto.master)
+		for MAP in $MAPS; do
+
+			cat >> $tmpldif <<-EOF
+			dn: automountmapname=$MAP,cn=nis,cn=automount,$BASEDN
+			objectClass: automountmap
+			objectClass: top
+			automountMapName: $MAP
+			EOF
+
+			rlRun "ypcat -k -d $NISDOMAIN -h $NISMASTER $MAP > /dev/shm/nis-map.$MAP 2>&1"
+			echo "" >> $tmpldif
+			IFS="
+"
+
+			for line in $(cat /dev/shm/nis-map.$MAP); do
+				IFS="$ORIGIFS"
+				KEY=$(echo "$line" | awk '{print $1}')
+				INFO=$(echo "$line" | sed -e "s#^$KEY[ \t]*##")
+
+				cat >> $tmpldif <<-EOF
+				dn: description=$KEY,automountmapname=$MAP,cn=nis,cn=automount,$BASEDN
+				objectClass: automount
+				objectClass: top
+				automountKey: $KEY
+				automountInformation: $INFO
+				description: $KEY
+				EOF
+
+				echo "" >> $tmpldif
+			done
+			
+			cat >> $tmpldif <<-EOF
+			dn: nis-domain=$DOMAIN+nis-map=$MAP,cn=NIS Server,cn=plugins,cn=config
+			objectClass: extensibleObject
+			nis-domain: $DOMAIN
+			nis-map: $MAP
+			nis-base: automountmapname=$MAP,cn=nis,cn=automount,$BASEDN
+			nis-filter: (objectclass=*)
+			nis-key-format: %{automountKey}
+			nis-value-format: %{automountInformation}  
+			EOF
+
+			echo "" >> $tmpldif
+		done
+	rlPhaseEnd
 }
 
 nisint_ipamaster_integration_setup_nis_listener()
