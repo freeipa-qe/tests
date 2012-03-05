@@ -1206,6 +1206,7 @@ rlPhaseStartTest "ipa-host-cli-76: host-disable when the name ending in . "
 		cat /tmp/host76_2.out | grep "Disabled host \"$myhost\"" 
 		if [ $? -eq 0 ] ; then
                 	rlPass "host-disable with a trailing dot in the name - dot is ignored."
+			rlRun "verifyHostAttr $myhost Keytab False" 0 "Check if keytab was removed."
         	else
             		rlFail "Host with trailing dot . is not disabled."
         	fi
