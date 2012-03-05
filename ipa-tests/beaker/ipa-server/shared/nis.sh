@@ -99,7 +99,7 @@ setup-nis-server()
 
 	# configuring netgroups
 	cat <<-EOF >>/etc/netgroup
-	convertpeople (-,$NISUSER1,$NISDOMAIN) (-,$NISUSER2,$NISDOMAIN) (-,$NISUSER3,$NISDOMAIN) (-,$NISUSER4,$NISDOMAIN)" 
+	convertpeople (-,$NISUSER1,$NISDOMAIN) (-,$NISUSER2,$NISDOMAIN) (-,$NISUSER3,$NISDOMAIN) (-,$NISUSER4,$NISDOMAIN)
 	EOF
 
 	# Enable netgroups, auto.master, and auto.home in the yp makefile
