@@ -1186,7 +1186,7 @@ rlPhaseStartTest "ipa-host-cli-38: find more hosts than exist"
         rlRun "ipa host-del $myhost" 0 "Cleanup delete test host"
     rlPhaseEnd
 
-rlPhaseStartTest "ipa-host-cli-76: host-disable when the name ending in . "
+    rlPhaseStartTest "ipa-host-cli-76: host-disable when the name ending in . "
         myhost=mytesthost.$DOMAIN
         rlLog "EXECUTING : ipa host-disable $myhost."
         rlRun "ipa host-add --force $myhost." 0 "Add host with trailing . - dot should be ignored"
