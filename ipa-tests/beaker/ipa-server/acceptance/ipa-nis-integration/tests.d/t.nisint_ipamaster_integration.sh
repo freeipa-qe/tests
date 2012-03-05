@@ -385,11 +385,12 @@ nisint_ipamaster_integration_add_nis_data_ldif()
 nisint_ipamaster_integration_add_nis_data_ldif_passwd()
 {
 	rlPhaseStartTest "nisint_ipamaster_integration_add_nis_data_ldif_passwd: Add NIS passwd via ldif"
+		tmpldif=/tmp/nis-map.passwd.ldif
 		ORIGFS="$IFS"
 		IFS="
 "
 		rlRun "ypcat -d $NISDOMAIN -h $NISMASTER passwd  > /dev/shm/nis-map.passwd 2>&1"
-		cat /dev/null > /tmp/nis-map.passwd.ldif
+		cat /dev/null > $tmpldif
 		for line in $(cat /dev/shm/nis-map.passwd); do
 			IFS="$ORIGIFS"
 			USERNAME=$(echo $line|cut -f1 -d:|tr '[:upper:]' '[:lower:]')
@@ -401,7 +402,7 @@ nisint_ipamaster_integration_add_nis_data_ldif_passwd()
 
 			echo "ipa-ldif-user-add: $USERNAME $UIDNNUM $GIDNUM $GECOS $HOMEDIR $SHELL"
 
-			cat >> /tmp/nis-map.passwd.ldif <<-EOF
+			cat >> $tmpldif <<-EOF
 			dn: uid=$USERNAME,cn=users,cn=accounts,$BASEDN
 			displayName: NIS USER
 			cn: NIS USER
@@ -431,13 +432,13 @@ nisint_ipamaster_integration_add_nis_data_ldif_passwd()
 			EOF
 
 			if [ -n "$GECOS" ]; then
-				echo "gecos: $GECOS" >> /tmp/nis-map.passwd.ldif
+				echo "gecos: $GECOS" >> $tmpldif
 			fi
 		
-			echo "" >> /tmp/nis-map.passwd.ldif 
+			echo "" >> $tmpldif 
 		done
 
-		rlRun "ldapadd -av -x -D \"$ROOTDN\" -w \"$ROOTDNPWD\" -f /tmp/nis-map.passwd.ldif"
+		rlRun "ldapadd -av -x -D \"$ROOTDN\" -w \"$ROOTDNPWD\" -f $tmpldif"
 
 		for USERNAME in $(cut -f1 -d: /dev/shm/nis-map.passwd); do
 			rlRun "echo \"dummy123@ipa.com\"| ipa passwd $USERNAME"
@@ -450,11 +451,12 @@ nisint_ipamaster_integration_add_nis_data_ldif_passwd()
 nisint_ipamaster_integration_add_nis_data_ldif_group()
 {
 	rlPhaseStartTest "nisint_ipamaster_integration_add_nis_data_ldif_group: add NIS group via ldif"
+		tmpldif=/tmp/nis-map.group.ldif
 		ORIGFS="$IFS"
 		IFS="
 "
 		rlRun "ypcat -d $NISDOMAIN -h $NISMASTER group  > /dev/shm/nis-map.group 2>&1"
-		cat /dev/null > /tmp/nis-map.group.ldif
+		cat /dev/null > $tmpldif
 		for line in $(cat /dev/shm/nis-map.group); do
 			GROUPNAME=$(echo $line|cut -f1 -d:|tr '[:upper:]' '[:lower:]')
 			GIDNUM=$(echo $line|cut -f3 -d:)
@@ -464,7 +466,7 @@ nisint_ipamaster_integration_add_nis_data_ldif_group()
 				continue
 			fi
 			
-			cat >> /tmp/nis-map.group.ldif <<-EOF
+			cat >> $tmpldif <<-EOF
 			dn: cn=$GROUPNAME,cn=groups,cn=accounts,$BASEDN
 			objectClass: top
 			objectClass: groupofnames
@@ -478,24 +480,24 @@ nisint_ipamaster_integration_add_nis_data_ldif_group()
 			EOF
 
 			for USER in $(echo $USERS|sed 's/,/ /g'); do
-				echo "member: uid=$USER,cn=users,cn=accounts,$BASEDN" >> /tmp/nis-map.group.ldif
+				echo "member: uid=$USER,cn=users,cn=accounts,$BASEDN" >> $tmpldif
 			done
-			echo "" >> /tmp/nis-map.group.ldif
+			echo "" >> $tmpldif
 		done
 
-		rlRun "ldapadd -av -x -D \"$ROOTDN\" -w \"$ROOTDNPWD\" -f /tmp/nis-map.group.ldif"
+		rlRun "ldapadd -av -x -D \"$ROOTDN\" -w \"$ROOTDNPWD\" -f $tmpldif"
 	rlPhaseEnd
 }
 
 nisint_ipamaster_integration_add_nis_data_ldif_hosts()
 {
 	rlPhaseStartTest "nisint_ipamaster_integration_add_nis_data_ldif_hosts: Add NIS hosts via ldif"
-		tmphosts=/tmp/nis-map.hosts.ldif
+		tmpldif=/tmp/nis-map.hosts.ldif
 		ORIGFS="$IFS"
 		IFS="
 "
 		rlRun "ypcat -d $NISDOMAIN -h $NISMASTER hosts|sort -u|egrep -v 'localhost|$MASTER|$NISMASTER|$NISCLIENT'  > /dev/shm/nis-map.hosts 2>&1"
-		cat /dev/null > $tmphosts
+		cat /dev/null > $tmpldif
 		for line in $(cat /dev/shm/nis-map.hosts); do
 			IFS="$ORIGIFS"
 			date=$(date +%Y%m%d)
@@ -505,11 +507,11 @@ nisint_ipamaster_integration_add_nis_data_ldif_hosts()
 			hostnames=$(echo $line | sed "s/$ip//")
 			firsthostname=$(echo $hostnames|awk '{print $1}'|cut -f1 -d.|head -1)
 			ptrzonefound=$(ipa dnszone-show $ptrzone 2>/dev/null |wc -l)
-			ptrzonewritten=$(grep "dn: idnsname=$ptrzone,cn=dns,$BASEDN" $tmphosts|wc -l)
+			ptrzonewritten=$(grep "dn: idnsname=$ptrzone,cn=dns,$BASEDN" $tmpldif|wc -l)
 
 			if [ $ptrzonefound -eq 0 -a $ptrzonewritten -eq 0 ]; then
 				# Add PTR Zone:
-				cat >> $tmphosts <<-EOF
+				cat >> $tmpldif <<-EOF
 				dn: idnsname=$ptrzone,cn=dns,$BASEDN
 				idnsZoneActive: TRUE
 				idnsSOAexpire: 1209600
@@ -526,12 +528,12 @@ nisint_ipamaster_integration_add_nis_data_ldif_hosts()
 				idnsSOArName: ipaqar.redhat.com.
 				idnsSOAmName: ${MASTER}.
 				EOF
-				echo "" >> $tmphosts
+				echo "" >> $tmpldif
 			fi
 
 	
 			if [ $(ipa host-show $firsthostname.$DOMAIN 2>/dev/null | wc -l) -eq 0 ]; then
-				cat >> $tmphosts <<-EOF
+				cat >> $tmpldif <<-EOF
 				dn: fqdn=$firsthostname.$DOMAIN,cn=computers,cn=accounts,$BASEDN
 				cn: $firsthostname.$DOMAIN
 				objectClass: ipaobject
@@ -550,29 +552,29 @@ nisint_ipamaster_integration_add_nis_data_ldif_hosts()
 				krbPrincipalName: host/$firsthostname.$DOMAIN@$RELM
 				serverHostName: $firsthostname
 				EOF
-				echo "" >> $tmphosts
+				echo "" >> $tmpldif
 
-				cat >> $tmphosts <<-EOF
+				cat >> $tmpldif <<-EOF
 				dn: idnsname=$firsthostname,idnsname=$DOMAIN,cn=dns,$BASEDN
 				objectClass: top
 				objectClass: idnsrecord
 				aRecord: $ip
 				idnsName: $firsthostname
 				EOF
-				echo "" >> $tmphosts
+				echo "" >> $tmpldif
 
-				cat >> $tmphosts <<-EOF
+				cat >> $tmpldif <<-EOF
 				dn: idnsname=$iplastoctet,idnsname=$ptrzone,cn=dns,$BASEDN
 				objectClass: top
 				objectClass: idnsrecord
 				pTRRecord: $firsthostname.$DOMAIN.
 				idnsName: $iplastoctet
 				EOF
-				echo "" >> $tmphosts
+				echo "" >> $tmpldif
 			fi
 		done
 
-		rlRun "ldapadd -av -x -D \"$ROOTDN\" -w \"$ROOTDNPWD\" -f $tmphosts"
+		rlRun "ldapadd -av -x -D \"$ROOTDN\" -w \"$ROOTDNPWD\" -f $tmpldif"
 	rlPhaseEnd	
 	
 }
@@ -593,15 +595,15 @@ nisint_ipamaster_integration_add_nis_data_ldif_netgroup()
 			USERCAT=0
 			HOSTCAT=0
 
-cat >> $tmpldif <<-EOF
-dn: cn=$NGNAME,cn=ng,cn=alt,$BASEDN
-objectClass: ipaobject
-objectClass: ipaassociation
-objectClass: ipanisnetgroup
-cn: $NGNAME
-description: NIS_NG_$NGNAME
-nisDomainName: $DOMAIN
-EOF
+			cat >> $tmpldif <<-EOF
+			dn: cn=$NGNAME,cn=ng,cn=alt,$BASEDN
+			objectClass: ipaobject
+			objectClass: ipaassociation
+			objectClass: ipanisnetgroup
+			cn: $NGNAME
+			description: NIS_NG_$NGNAME
+			nisDomainName: $DOMAIN
+			EOF
 
 			triples=$(echo $line|sed -e "s/^$NGNAME //" -e "s/, /,/g")
 
@@ -657,7 +659,7 @@ EOF
 			echo "" >> $tmpldif
 		done
 
-		rlRun "ldapadd -x -D '$ROOTDN' -w '$ROOTDNPWD' -f $tmpldif"
+		rlRun "ldapadd -x -D \"$ROOTDN\" -w \"$ROOTDNPWD\" -f $tmpldif"
 		rm -f $tmpldif
 	rlPhaseEnd
 }
@@ -725,6 +727,8 @@ nisint_ipamaster_integration_add_nis_data_ldif_automount()
 
 			echo "" >> $tmpldif
 		done
+
+		rlRun "ldapadd -x -D \"$ROOTDN\" -w \"$ROOTDNPWD\" -f $tmpldif"
 	rlPhaseEnd
 }
 
