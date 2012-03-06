@@ -109,12 +109,12 @@ service_add_003() {
 rlPhaseStartTest "service_add_003: ipa service-add : add service for $SERVICE with cert bytes"
 
 	rlRun "ipa service-add $SERVICE/$HOSTNAME@$RELM --certificate=wrong > $TmpDir/service_add_003A.out 2>&1" 1
-	rlAssertGrep "ipa: ERROR: Certificate format error: improperly formatted DER-encoded certificate" "$TmpDir/service_add_003A.out"
+	rlAssertGrep "ipa: ERROR: invalid 'usercertificate': must be binary data" "$TmpDir/service_add_003A.out"
 	rlRun "cat $TmpDir/service_add_003A.out"
 
 	rlRun "ipa service-add $SERVICE/$HOSTNAME@$RELM --certificate=MIIC9jCCAd6gAwIBAgIBCTANBgkqhkiG9w0BAQ0FADA5MRIwEAYDVQQKEwlzaWxlbnRkb20xIzAhBgNVBAMTGkNlcnRpZmljYXRlIEF1dGhvcml0eWNhLXQxMB4XDTExMDExOTEyMjc1M1oXDTEzMDEwODEyMjc1M1owJjERMA8GA1UEAxMIYWNjb3VudHMxETAPBgNVBAMTCHNlcnZpY2VzMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDbcRxo0/tfpoJEzCLmfTDy9AYQIyubgwo2ErV+6unEKY2OW3YHIBW6Th6xg62tMzqQatIqqJKse9AnVoObWAiqhpjPdr2FuL6LiyRb1Aez9E5MVndfbsto0F7OYSs6y1yICSBAfA1CFAdRm+WOnBDI1e3hcg3UHXUukifKg4XaLQIDAQABo4GfMIGcMB8GA1UdIwQYMBaAFEoAQIQqOuqP8Ilyez9pzQCblEmWMEoGCCsGAQUFBwEBBD4wPDA6BggrBgEFBQcwAYYuaHR0cDovL2JldGEuZHNkZXYuc2pjLnJlZGhhdC5jb206NDgxODAvY2Evb2NzcDAOBgNVHQ8BAf8EBAMCBPAwHQYDVR0lBBYwFAYIKwYBBQUHAwEGCCsGAQUFBwMCMA0GCSqGSIb3DQEBDQUAA4IBAQCWk7YuyH6NTqILzmGK3qjIkreCpXnbNE99yrc7UQka9btrq2FWoFSxteU2JFD3+EGG8tXuDyDuWlgs8F3X/CBB4N+ZV4fAzHpIp2aIRQMapLKvu/mEiGPjFWFYJqk/HiNSQk8qefI6XqLvWIVY4LxMn4m1ZsQ/XXBzNbWsf9W3jnwCY0cLygJIgZZt2uQH/KxoQ3/oE0gp1wYITeKAKvaQrwUc4YgshlxMZAN4z5FuXdtDQqAIrJYcg9q+j6zYHNtXTcLuCFO0CcFto8CaUGXUJ0B5IrV2xsnRegHRxBy+C+3lfYiW2DelWI3exiYgdlU5wJSlkX37HQxA9cP+/kIib > $TmpDir/service_add_003B.out 2>&1" 1
 
-	rlAssertGrep "ipa: ERROR: Certificate format error: improperly formatted DER-encoded certificate" "$TmpDir/service_add_003B.out"
+	rlAssertGrep "ipa: ERROR: invalid 'usercertificate': must be binary data" "$TmpDir/service_add_003B.out"
 	rlRun "cat $TmpDir/service_add_003B.out"
 
 	ipa service-del $SERVICE/$HOSTNAME@$RELM > /tmp/certerr.out 2>&1
@@ -136,7 +136,7 @@ service_add_004() {
 rlPhaseStartTest "service_add_004: ipa service-add : add service for $SERVICE with cert bytes and --force option"
 	rlRun "ipa host-add --force $TESTHOST" 0 "Adding dummy host with no DNS records"
         rlRun "ipa service-add $SERVICE/$TESTHOST@$RELM --force --certificate=wrong > $TmpDir/service_add_004A.out 2>&1" 1
-        rlAssertGrep "ipa: ERROR: Certificate format error: improperly formatted DER-encoded certificate" "$TmpDir/service_add_004A.out"
+        rlAssertGrep "ipa: ERROR: invalid 'usercertificate': must be binary data" "$TmpDir/service_add_004A.out"
         rlRun "cat $TmpDir/service_add_004A.out"
         rlRun "ipa service-add $SERVICE/$TESTHOST@$RELM --force --certificate=MIIC9jCCAd6gAwIBAgIBCTANBgkqhkiG9w0BAQ0FADA5MRIwEAYDVQQKEwlzaWxlbnRkb20xIzAhBgNVBAMTGkNlcnRpZmljYXRlIEF1dGhvcml0eWNhLXQxMB4XDTExMDExOTEyMjc1M1oXDTEzMDEwODEyMjc1M1owJjERMA8GA1UEAxMIYWNjb3VudHMxETAPBgNVBAMTCHNlcnZpY2VzMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDbcRxo0/tfpoJEzCLmfTDy9AYQIyubgwo2ErV+6unEKY2OW3YHIBW6Th6xg62tMzqQatIqqJKse9AnVoObWAiqhpjPdr2FuL6LiyRb1Aez9E5MVndfbsto0F7OYSs6y1yICSBAfA1CFAdRm+WOnBDI1e3hcg3UHXUukifKg4XaLQIDAQABo4GfMIGcMB8GA1UdIwQYMBaAFEoAQIQqOuqP8Ilyez9pzQCblEmWMEoGCCsGAQUFBwEBBD4wPDA6BggrBgEFBQcwAYYuaHR0cDovL2JldGEuZHNkZXYuc2pjLnJlZGhhdC5jb206NDgxODAvY2Evb2NzcDAOBgNVHQ8BAf8EBAMCBPAwHQYDVR0lBBYwFAYIKwYBBQUHAwEGCCsGAQUFBwMCMA0GCSqGSIb3DQEBDQUAA4IBAQCWk7YuyH6NTqILzmGK3qjIkreCpXnbNE99yrc7UQka9btrq2FWoFSxteU2JFD3+EGG8tXuDyDuWlgs8F3X/CBB4N+ZV4fAzHpIp2aIRQMapLKvu/mEiGPjFWFYJqk/HiNSQk8qefI6XqLvWIVY4LxMn4m1ZsQ/XXBzNbWsf9W3jnwCY0cLygJIgZZt2uQH/KxoQ3/oE0gp1wYITeKAKvaQrwUc4YgshlxMZAN4z5FuXdtDQqAIrJYcg9q+j6zYHNtXTcLuCFO0CcFto8CaUGXUJ0B5IrV2xsnRegHRxBy+C+3lfYiW2DelWI3exiYgdlU5wJSlkX37HQxA9cP+/kIb > $TmpDir/service_add_004B.out 2>&1" 1
 
@@ -679,7 +679,7 @@ service_mod_004() {
 rlPhaseStartTest "service_mod_004: ipa service-mod: updating service with a non-standard certificate format."
 	rlRun "ipa service-mod $SERVICE/$HOSTNAME@$RELM --certificate=MIICdzCCAeCgAwIBAgICA+4wDQYJKoZIhvcNAQEFBQAwKTEnMCUGA1UEAxMeVEVTVFJFTE0gQ2VydGlmaWNhdGUgQXV0aG9yaXR5MB4XDTExMDIwOTA5MzE1M1oXDTIxMDIwOTA5MzE1M1owMTERMA8GA1UEChMIVEVTVFJFTE0xHDAaBgNVBAMTE2dzcmYxNGlwYXMudGVzdHJlbG0wggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDiHg3uWywDB1BWm7dy005eQGPecuOcpjp1ZX7Bc7FHxarF03IIsBT4DWvZlp1TbCDuHESBgTWExvr > $TmpDir/service_mod_004.out 2>&1" 1
 	rlRun "cat $TmpDir/service_mod_004.out"
-	rlAssertGrep "ipa: ERROR: Certificate format error: improperly formatted DER-encoded certificate" "$TmpDir/service_mod_004.out"
+	rlAssertGrep "ipa: ERROR: invalid 'usercertificate': must be binary data" "$TmpDir/service_mod_004.out"
 
         #deleting for the added service for the next test case
         ipa service-del $SERVICE/$HOSTNAME@$RELM > /tmp/certerr.out 2>&1
