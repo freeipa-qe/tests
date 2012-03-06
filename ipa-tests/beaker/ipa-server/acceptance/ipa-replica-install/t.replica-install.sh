@@ -283,7 +283,8 @@ installSlave()
                 rlLog "EXECUTING: ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg"
                 rlRun "/bin/bash /dev/shm/replica-install.bash" 0 "Replica installation"
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
-		rlAssertGrep "forwarders" "/etc/named.conf"
+		# Disabling the following since empty forwarders exist in named.conf
+		# rlAssertGrep "forwarders" "/etc/named.conf"
 		rlAssertGrep "$DNSFORWARD" "/etc/named.conf"
 
                 rlRun "appendEnv" 0 "Append the machine information to the env.sh with the information for the machines in the recipe set"
@@ -317,7 +318,8 @@ installSlave_nf()
                 rlLog "EXECUTING: ipa-replica-install -U --setup-dns --no-forwarders -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg"
                 rlRun "/bin/bash /dev/shm/replica-install.bash" 0 "Replica installation"
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
-                rlAssertNotGrep "forwarders" "/etc/named.conf"
+		# Disabling the following since empty forwarders exist in named.conf
+                # rlAssertNotGrep "forwarders" "/etc/named.conf"
                 rlAssertNotGrep "$DNSFORWARD" "/etc/named.conf"
 		rlRun "cat /etc/named.conf"
 
@@ -348,7 +350,9 @@ installSlave_nr()
                 rlLog "EXECUTING: ipa-replica-install -U --setup-dns --no-forwarders --no-reverse -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg"
                 rlRun "/bin/bash /dev/shm/replica-install.bash" 0 "Replica installation"
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
-                rlAssertNotGrep "forwarders" "/etc/named.conf"
+
+		# Disabling the following since empty forwarders exist in named.conf
+                # rlAssertNotGrep "forwarders" "/etc/named.conf"
                 rlAssertNotGrep "$DNSFORWARD" "/etc/named.conf"
 
 		rlLog "verifies https://bugzilla.redhat.com/show_bug.cgi?id=757644"
@@ -390,7 +394,9 @@ installSlave_nhostdns()
                 rlLog "EXECUTING: ipa-replica-install -U --setup-dns --no-forwarders --no-host-dns --skip-conncheck -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg"
                 rlRun "/bin/bash /dev/shm/replica-install.bash" 0 "Replica installation"
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
-                rlAssertNotGrep "forwarders" "/etc/named.conf"
+
+		# Disabling the following since empty forwarders exist in named.conf
+                # rlAssertNotGrep "forwarders" "/etc/named.conf"
                 rlAssertNotGrep "$DNSFORWARD" "/etc/named.conf"
 
 		rlRun "service ipa status"
@@ -428,7 +434,9 @@ installSlave_ca()
                 rlLog "EXECUTING: ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD --setup-ca -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg"
                 rlRun "/bin/bash /dev/shm/replica-install.bash" 0 "Replica installation"
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
-                rlAssertGrep "forwarders" "/etc/named.conf"
+
+		# Disabling the following since empty forwarders exist in named.conf
+                # rlAssertGrep "forwarders" "/etc/named.conf"
                 rlAssertGrep "$DNSFORWARD" "/etc/named.conf"
 
                 rlRun "ipa dnszone-find | grep in-addr.arpa."
@@ -500,12 +508,12 @@ uninstall()
 	rlRun "remoteExec root $MASTERIP redhat \"ipa-replica-manage del $SLAVE\""
 	rlRun "egrep \"Deleted replication agreement from '$MASTER' to '$SLAVE'\" /tmp/remote_exec.out"
 
-	rlRun "remoteExec root $MASTERIP redhat \"ipa-replica-manage del $SLAVE\"" 1
-	rlRun "egrep '$MASTER' has no replication agreement for '$SLAVE' /tmp/remote_exec.out"
+	rlRun "remoteExec root $MASTERIP redhat \"ipa-replica-manage del $SLAVE\"" 
+	rlRun "egrep \"'$MASTER' has no replication agreement for '$SLAVE'\" /tmp/remote_exec.out"
 
 	rlLog "verifies bug https://bugzilla.redhat.com/show_bug.cgi?id=750524"
-	rlRun "remoteExec root $MASTERIP redhat \"ipa-csreplica-manage del $SLAVE -p $ADMINPW\"" 1
-	rlRun "egrep '$MASTER' has no replication agreement for '$SLAVE' /tmp/remote_exec.out"
+	rlRun "remoteExec root $MASTERIP redhat \"ipa-csreplica-manage del $SLAVE -p $ADMINPW\"" 
+	rlRun "egrep \"'$MASTER' has no replication agreement for '$SLAVE'\" /tmp/remote_exec.out"
 
 	sleep 10
 
