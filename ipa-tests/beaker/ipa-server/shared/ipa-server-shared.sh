@@ -185,10 +185,10 @@ verifyErrorMsg()
 	sed 's/"//g' /tmp/errormsg.out > /tmp/errormsg_clean.out
         actual=`cat /tmp/errormsg_clean.out`
         if [[ "$actual" = "$expmsg" ]] ; then
-                rlLog "Error message as expected: $actual"
+                rlPass "Error message as expected: $actual"
 		return 0
         else
-                rlLog "ERROR: Message not as expected. GOT: $actual  EXP: $expmsg"
+                rlFail "ERROR: Message not as expected. GOT: $actual  EXP: $expmsg"
                 return 1
         fi
   fi
