@@ -906,7 +906,7 @@ pkey_return_check_dns()
 	# Tests for bug https://bugzilla.redhat.com/show_bug.cgi?id=750947
 	aaaa="fec0:0:a10:6000:11:16ff:fe98:122"
 	rlPhaseStartTest "ipa-dns-151: add record of type AAAA to test bug 750947"
-		rlRun "ipa dnszone-add $zone"
+		rlRun "ipa dnszone-add $zone --name-server=$HOSTNAME --admin-email=$email"
 		rlRun "ipa dnsrecord-add $zone aaaa --aaaa-rec=\"$aaaa\""
 	rlPhaseEnd
 
