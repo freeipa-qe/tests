@@ -915,6 +915,7 @@ pkey_return_check_dns()
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-153: make sure that dig can find the record type AAAA"
+		rlRun "service named restart"
 		rlRun "dig aaaa.$zone AAAA | grep $aaaa" 0 "make sure dig can find the AAAA record"
 	rlPhaseEnd
 
