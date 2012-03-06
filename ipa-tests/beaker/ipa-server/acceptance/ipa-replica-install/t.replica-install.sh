@@ -286,27 +286,6 @@ installSlave()
 		rlAssertGrep "forwarders" "/etc/named.conf"
 		rlAssertGrep "$DNSFORWARD" "/etc/named.conf"
 
-
-	# Verifies: Bug 782979 - Replication Failure: Allocation of a new value for range cn=posix ids.
-
-user1="user1"
-user2="user2"
-user3="user3"
-userpw="Secret123"
-
-        rlRun "create_ipauser $user1 $user1 $user1 $userpw"
-        sleep 5
-        rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-        rlRun "create_ipauser $user2 $user2 $user2 $userpw"
-        sleep 5
-        rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-        rlRun "create_ipauser $user3 $user3 $user3 $userpw"
-	
-	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
-
-	rlRun "ipa user-show $user1"
-	rlRun "ipa user-show $user2"
-
                 rlRun "appendEnv" 0 "Append the machine information to the env.sh with the information for the machines in the recipe set"
         fi
 
@@ -453,6 +432,27 @@ installSlave_ca()
                 rlAssertGrep "$DNSFORWARD" "/etc/named.conf"
 
                 rlRun "ipa dnszone-find | grep in-addr.arpa."
+
+
+	        # Verifies: Bug 782979 - Replication Failure: Allocation of a new value for range cn=posix ids.
+		rlLog "verifies https://bugzilla.redhat.com/show_bug.cgi?id=782979"
+user1="user1"
+user2="user2"
+user3="user3"
+userpw="Secret123"
+
+        rlRun "create_ipauser $user1 $user1 $user1 $userpw"
+        sleep 5
+        rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+        rlRun "create_ipauser $user2 $user2 $user2 $userpw"
+        sleep 5
+        rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+        rlRun "create_ipauser $user3 $user3 $user3 $userpw"
+
+        rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
+
+        rlRun "ipa user-show $user1"
+        rlRun "ipa user-show $user2"
 
                 rlRun "appendEnv" 0 "Append the machine information to the env.sh with the information for the machines in the recipe set"
         fi
