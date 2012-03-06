@@ -454,7 +454,7 @@ rlJournalStart
 	rlRun "service httpd restart"
 	rlRun "tcpdump -i lo -w /tmp/snoop &"
 	rlRun "ipa user-show admin"
-	rlRun "tcpdump -i lo -r /tmp/snoop -s 8192 -X > /tmp/bug748110-tcpdump.txt 2>&1"
+	rlRun "tcpdump -i lo -r /tmp/snoop -s 8192 -X > /tmp/bug748110-tcpdump.txt 2>&1" 1
 
 	rlAssertNotGrep "cn=users" "/tmp/bug748110-tcpdump.txt"
 	rlAssertNotGrep "cn=accounts" "/tmp/bug748110-tcpdump.txt"
