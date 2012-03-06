@@ -1135,7 +1135,7 @@ EOF
                 rlRun "ipa dnszone-add example.com --name-server=$HOSTNAME --admin-email=admin@example.com"
 		rlRun "ipa dnszone-mod example.com --admin-email=foo.bar@example.com"
 
-		rlRun "ipa dnszone-show example.com | grep \"Administrator e-mail address: foo\\\.bar.example.com.\""
+		rlRun "ipa dnszone-show example.com | grep \"Administrator e-mail address: foo\\\\\.bar.example.com.\""
 
 		rlRun "ipa dnszone-del example.com"
 
@@ -1147,11 +1147,16 @@ EOF
 
 		rlRun "ipa dnszone-add example.com --name-server=$HOSTNAME --admin-email=admin@example.com"
                 rlRun "ipa dnsrecord-add example.com foo --a-rec=10.0.1.1"
-		rlRun "ipa dnszone-mod --allow-query=127.0.0.1"
+		rlRun "ipa dnszone-mod example.com --allow-query=$ipaddr"
 
 		rlRun "service named reload"
 		sleep 5
                 rlRun "dig +short -t A foo.example.com | grep 10.0.1.1"
+
+		rlRun "ipa dnszone-mod example.com --allow-query=10.0.1.1"
+		rlRun "service named reload"
+                sleep 5
+                rlRun "nslookup foo.example.com | grep \"server can't find foo.example.com\""
 
                 rlRun "ipa dnszone-del example.com"
 
