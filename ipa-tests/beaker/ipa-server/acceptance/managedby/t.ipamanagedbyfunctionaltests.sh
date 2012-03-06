@@ -2,7 +2,7 @@
 #  GLOBALS	    #
 #####################
 HTTPCFGDIR="/etc/httpd/conf"
-HTTPCERTDIR="$HTTPCFGDIR/alias"
+HTTPCERTDIR="/etc/httpd/alias"
 HTTPPRINC="HTTP/$HOSTNAME"
 HTTPKEYTAB="$HTTPCFGDIR/$HOSTNAME.keytab"
 HTTPKRBCFG="/etc/httpd/conf.d/krb.conf"
@@ -226,12 +226,12 @@ cleanup_http()
 {
 	rlPhaseStartTest "CLEANUP: HTTP Server"
 		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials"
-		cd /etc/httpd/alias/
+		cd HTTPCERTDIR
 		# remove cert files
 		rm -rf $HOSTNAME.csr ca.crt $HOSTNAME.crt
 
 		# remove the certificates from the web server's database
-		cd /etc/httpd/alias/
+		cd HTTPCERTDIR
 		rlRun "certutil -d . -D -n $HOSTNAME" 0 "Remove $HOSTNAME certificate from web server certificate database."
 		rlRun "certutil -d . -D -n \"IPA CA\"" 0 "Remove IPA CA certificate from web server certificate database."	
 
