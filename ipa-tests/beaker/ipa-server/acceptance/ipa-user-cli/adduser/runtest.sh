@@ -6,13 +6,17 @@
 #   Description: IPA user cli acceptance tests
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # The following ipa cli commands needs to be tested:
-#   user-add     Add a new user.
-#   user-del     Delete a user.
-#   user-find    Search for users.
-#   user-lock    Lock a user account.
-#   user-mod     Modify a user.
-#   user-show    Display information about a user.
-#   user-unlock  Unlock a user account.
+#   user-add           Add a new user.
+#   user-del           Delete a user.
+#   user-find          Search for users.
+#   user-lock          Lock a user account.
+#   user-mod           Modify a user.
+#   user-show          Display information about a user.
+#   user-unlock        Unlock a user account.
+#   --in-groups        search users using --in-groups option
+#   --not-in-groups    search users using --not-in-groups option
+#   --in-netgroups     search users using --in-netgroups option
+#   --not-in-netgroups search users using --not-in-netgroups option
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
 #   Author: Yi Zhang <yzhang@redhat.com>
@@ -463,27 +467,50 @@ rlJournalStart
 	rlRun "service httpd restart"
     rlPhaseEnd
 
+    ua=uuu
+    ub=usera
+    ga=ggg
     rlPhaseStartTest "ipa-user-cli-add-038: Negative  Test of --in-groups in user-find"
-	ipa user-add --first=fname --last=lname uuu
-	ipa group-add --desc=desc1 ggg
-	rlRun "ipa user-find --in-groups=ggg | grep User\ login: | grep uuu" 1 "Making sure that user uuu does not come back when searching --in-groups=ggg"
+	ipa user-add --first=fname --last=lname $ua
+	ipa group-add --desc=desc1 $ga
+	rlRun "ipa user-find --in-groups=$ga | grep User\ login: | grep $ua" 1 "Making sure that user uuu does not come back when searching --in-groups=ggg"
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-user-cli-add-039: Positive Test of --in-groups in user-find"
-	ipa group-add-member --users=uuu ggg
-	rlRun "ipa user-find --in-groups=ggg | grep User\ login: | grep uuu" 0 "Making sure that user uuu comes back when searching --in-groups=ggg"
+	ipa group-add-member --users=$ua $ga
+	rlRun "ipa user-find --in-groups=$ga | grep User\ login: | grep $ua" 0 "Making sure that user uuu comes back when searching --in-groups=ggg"
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-user-cli-add-040: Negative Test of --not-in-groups in user-find"
-	ipa user-add --first=fname --last=lname tusera
-	rlRun "ipa user-find --not-in-groups=ggg | grep User\ login: | grep ggg" 1 "Making sure that user ggg does not come back when searching --not-in-groups=ggg"
+	ipa user-add --first=fname --last=lname $ub
+	rlRun "ipa user-find --not-in-groups=$ga | grep User\ login: | grep $ga" 1 "Making sure that user ggg does not come back when searching --not-in-groups=ggg"
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-user-cli-add-041: Positive test of --not-in-groups in user-find"
-	rlRun "ipa user-find --not-in-groups=ggg | grep User\ login: | grep tusera" 0 "Making sure that user tusera comes back when searching --not-in-groups=ggg"
-	ipa group-del ggg
-	ipa user-del uuu
-	ipa user-del tusera
+	rlRun "ipa user-find --not-in-groups=$ga | grep User\ login: | grep $ub" 0 "Making sure that user tusera comes back when searching --not-in-groups=ggg"
+    rlPhaseEnd
+
+    hb=hbacru
+    rlPhaseStart "ipa-user-add-042: Positive test of search of users using --in-hbacrules"
+	rlRun "ipa hbacrule-add $hb" 0 "Adding hbac rule for testing with user-find"
+	rlRun "ipa hbacrule-add-user --users=$ua $hb" 0 "adding user $ua to hostgroup $hb"
+	rlRun "ipa user-find --in-hbacrules=$hb | grep $ua" 0 "Making sure that $ua returns when constraining search to hbac rule $hb"
+    rlPhaseEnd
+
+    rlPhaseStart "ipa-user-add-043: Negative test of search of users using --in-hbacrules"
+	rlRun "ipa user-find --in-hbacrules=$hb | grep $ub" 1 "Making sure that $ub does not return when constraining search to hbac rule $hb"
+    rlPhaseEnd
+
+    rlPhaseStart "ipa-user-add-044: Positive test of search of users using --not-in-hbacrules"
+	rlRun "ipa user-find --not-in-hbacrules=$hb | grep $ub" 0 "Making sure that $ub returns when constraining search to eliminate hbac rule $hb"
+    rlPhaseEnd
+
+    rlPhaseStart "ipa-user-add-045: Negative test of search of users using --not-in-hbacrules"
+	rlRun "ipa user-find --not-in-hbacrules=$hb | grep $ua" 1 "Making sure that $ua does not return when constraining search to eliminate hbac rule $hb"
+	ipa group-del $ga
+	ipa user-del $ua
+	ipa user-del $ub
+	ipa hbacrule-del $hb
     rlPhaseEnd
 
     rlPhaseStartCleanup "ipa-user-cli-add-cleanup"

@@ -11,6 +11,9 @@
 #  host-find                 Search the hosts.
 #  host-mod                  Edit an existing host.
 #  host-show                 Examine an existing host.
+#  host-fine  using --pkey-only
+#  host-find  using --in-hbacrules
+#  host-find  using --not-in-hbacrules
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
 #   Author: Jenny Galipeau <jgalipea@redhat.com>
@@ -1212,6 +1215,32 @@ rlPhaseStartTest "ipa-host-cli-38: find more hosts than exist"
         	fi
         fi
         rlRun "ipa host-del $myhost" 0 "Cleanup delete test host"
+    rlPhaseEnd
+
+    hb=hbruleh
+    rlPhaseStartTest "ipa-host-cli-77: Positive host-find test using --in-hbacrules"
+	myhost1=mytesthost1.$DOMAIN
+        myhost2=mytesthost2.$DOMAIN
+        addHost $myhost1
+        addHost $myhost2
+	rlRun "ipa hbacrule-add $hb" 0 "Adding hbac rule for testing with user-find"
+	rlRun "ipa hbacrule-add-host --hosts=$myhost1 $hb" 0 "adding host $myhost1 to hostgroup $hb"
+	rlRun "ipa host-find --in-hbacrules=$hb | grep $myhost1" 0 "making sure host1 is returned when searching hosts using --in-hbacrules"
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-host-cli-78: Negative host-find test using --in-hbacrules"
+	rlRun "ipa host-find --in-hbacrules=$hb | grep $myhost2" 1 "making sure host2 is not returned when searching hosts using --in-hbacrules"
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-host-cli-79: Positive host-find test using --not-in-hbacrules"
+	rlRun "ipa host-find --not-in-hbacrules=$hb | grep $myhost2" 0 "making sure host2 is returned when searching hosts using --not-in-hbacrules"
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-host-cli-80: Negative host-find test using --not-in-hbacrules"
+	rlRun "ipa host-find --not-in-hbacrules=$hb | grep $myhost1" 1 "making sure host1 is not returned when searching hosts using --not-in-hbacrules"
+	rlRun "ipa hbacrule-del $hb" 0 "Deleting hbac rule use in previous tests"
+        deleteHost $myhost1
+        deleteHost $myhost2
     rlPhaseEnd
 
     rlPhaseStartCleanup "ipa-host-cli-cleanup: Destroying admin credentials."

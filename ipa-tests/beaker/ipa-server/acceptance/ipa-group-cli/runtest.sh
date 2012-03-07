@@ -14,6 +14,12 @@
 #  group-mod            Modify a group.
 #  group-remove-member  Remove members from a group.
 #  group-show           Display information about a named group.
+#  --pkey-only          search groups using --pkey-only option
+#  --in-groups          search groups using --in-groups option
+#  --not-in-groups      search groups using --not-in-groups option
+#  --in-netgroups       search groups using --in-netgroups option
+#  --not-in-netgroups   search groups using --not-in-netgroups option
+
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
 #   Author: Jenny Galipeau <jgalipea@redhat.com>
@@ -1038,9 +1044,31 @@ rlJournalStart
 
     rlPhaseStartTest "ipa-group-cli-95: Positive test of --not-in-groups in group-find"
 	rlRun "ipa group-find --not-in-groups=ggg | grep Group\ name: | grep tusera" 0 "Making sure that group tusera comes back when searching --not-in-groups=ggg"
+
+    hb="hbrut"
+    gb="grpbt"
+    rlPhaseStartTest "ipa-group-cli-96: Positive test of --in-hbacrules in group-find"
+	ipa group-add --desc=groupb $gb
+	rlRun "ipa hbacrule-add $hb" 0 "Adding hbac rule for testing with group-find"
+	rlRun "ipa hbacrule-add-user --groups=ggg $hb" 0 "adding user $ua to hostgroup $hb"
+	rlRun "ipa group-find --in-hbacrules=$hb | grep ggg" 0 "make sure that ggg returns in a search constrained to $hb"
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-group-cli-97: Negative test of --in-hbacrules in group-find"
+	rlRun "ipa group-find --in-hbacrules=$hb | grep $gb" 1 "make sure that $gb does not return in a search constrained to $hb"
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-group-cli-98: Positive test of --not-in-hbacrules in group-find"
+	rlRun "ipa group-find --not-in-hbacrules=$hb | grep $gb" 0 "make sure that $gb returns in a search excluding hbacrule $hb"
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-group-cli-99: Negative test of --not-in-hbacrules in group-find"
+	rlRun "ipa group-find --not-in-hbacrules=$hb | grep ggg" 1 "make sure that ggg does not return in a search excluding hbacrule $hb"
+	ipa group-del $gb
 	ipa group-del ggg
 	ipa group-del uuu
 	ipa group-del tusera
+	ipa hbacrule-del $hb
     rlPhaseEnd
 
     rlPhaseStartCleanup "ipa-group-cli-cleanup: Delete remaining users and group and Destroying admin credentials"
