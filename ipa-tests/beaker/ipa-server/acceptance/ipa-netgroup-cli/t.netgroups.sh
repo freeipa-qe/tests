@@ -1697,6 +1697,7 @@ netgroup_find_negative()
 			rlPass "BZ 798792 not found."
 		fi
 	rlPhaseEnd
+
 	ng=netgpa
 	ngb=netgpb
 	ngc=netgpc
@@ -1747,7 +1748,7 @@ netgroup_find_negative()
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-netgroup-051-45: Negative not-in-netgroup netgroup test."
-		rlRun "ipa netgroup-find --not-in-netgroups=$ng | grep $ngc" 1 "Make sure that a netgroup is not returned in a search that it should not be in"
+		rlRun "ipa netgroup-find --not-in-netgroups=$ng | grep \"Netgroup name: $ngc\"" 1 "Make sure that a netgroup is not returned in a search that it should not be in"
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-netgroup-051-46: Negative not-in-netgroup user test."
