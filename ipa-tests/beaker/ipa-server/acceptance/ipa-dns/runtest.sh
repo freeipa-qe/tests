@@ -1205,15 +1205,18 @@ EOF
 		rlLog "verifies https://bugzilla.redhat.com/show_bug.cgi?id=767494"
 
 		# for IPv4 +ve
-		rlRun "ipa dnszone-add $DOMAIN --name-server=$HOSTNAME --admin-email=$email"
+		# rlRun "ipa dnszone-add $DOMAIN --name-server=$HOSTNAME --admin-email=$email" # $DOMAIN zone already exists, hence commenting.
 		rlRun "ipa dnszone-add $a174rev --name-server=$HOSTNAME --admin-email=$email"
 
 		rlRun "ipa dnsrecord-add $DOMAIN foo --a-rec=$a174 --a-create-reverse"
 		rlRun "ipa dnsrecord-show $a174rev 10 | grep \"PTR record: foo.$DOMAIN\""
-		rlRun "nslookup $a174 | grep foo.$DOMAIN"
+		rlRun "service named restart"
+		sleep 5
+		rlRun "dig -x $a174 | grep foo.$DOMAIN"
 
 		# for IPv4 -ve
 		verifyErrorMsg "ipa dnsrecord-add $DOMAIN foo --a-rec=$a174 --a-create-reverse" "ipa: ERROR: Reverse record for IP address $a174 already exists in reverse zone $a174rev."
+		rlRun "ipa dnsrecord-del $DOMAIN foo --a-rec=$a174"
 		verifyErrorMsg "ipa dnsrecord-add $DOMAIN foo2 --a-rec=10.1.2.10 --a-create-reverse" "ipa: ERROR: Cannot create reverse record for \"10.1.2.10\": DNS reverse zone for IP address 10.1.2.10 not found"
 
 		# record clean-up
@@ -1223,10 +1226,13 @@ EOF
 		rlRun "ipa dnszone-add $aaaa174rev --name-server=$HOSTNAME --admin-email=$email"
 		rlRun "ipa dnsrecord-add $DOMAIN bar --aaaa-rec=$aaaa174 --aaaa-create-reverse"
 		rlRun "ipa dnsrecord-show $aaaa174rev 4.b.6.1.6.8.e.f.f.f.e.5.1.2.2.0 | grep \"PTR record: bar.$DOMAIN\""
-		rlRun "nslookup $aaaa174 | grep bar.$DOMAIN"
+		rlRun "service named restart"
+		sleep 5
+		rlRun "dig -x $aaaa174 | grep bar.$DOMAIN"
 
 		# for IPv6 -ve
 		verifyErrorMsg "ipa dnsrecord-add $DOMAIN bar --aaaa-rec=$aaaa174 --aaaa-create-reverse" "ipa: ERROR: Reverse record for IP address $aaaa174 already exists in reverse zone $aaaa174rev."
+		rlRun "ipa dnsrecord-del $DOMAIN bar --aaaa-rec=$aaaa174"
 		verifyErrorMsg "ipa dnsrecord-add $DOMAIN bar --aaaa-rec=2621:52:0:2247:221:5eff:fe86:26b4 --aaaa-create-reverse" "ipa: ERROR: Cannot create reverse record for \"2621:52:0:2247:221:5eff:fe86:26b4\": DNS reverse zone for IP address 2621:52:0:2247:221:5eff:fe86:26b4 not found"
 
 		# record clean-up
