@@ -64,6 +64,10 @@ installMaster()
         rlRun "chmod 755 /dev/shm/installipa.bash" 0 "Making ipa install script executable"
         rlRun "/bin/bash /dev/shm/installipa.bash" 0 "Installing IPA Server"
 
+        rlLog "verifies https://bugzilla.redhat.com/show_bug.cgi?id=797563"
+        verifyErrorMsg "ipa host-del $MASTER" "ipa: ERROR: invalid 'hostname': An IPA master host cannot be deleted"
+
+
         if [ -f /var/log/ipaserver-install.log ]; then
                 rhts-submit-log -l /var/log/ipaserver-install.log
         fi
@@ -494,6 +498,10 @@ uninstall()
 {
 
    rlPhaseStartTest "Uninstalling replica"
+
+        rlLog "verifies https://bugzilla.redhat.com/show_bug.cgi?id=797563"
+        verifyErrorMsg "ipa host-del $MASTER" "ipa: ERROR: invalid 'hostname': An IPA master host cannot be deleted"
+        verifyErrorMsg "ipa host-del $SLAVE" "ipa: ERROR: invalid 'hostname': An IPA master host cannot be deleted"
 
 	rlLog "verifies https://bugzilla.redhat.com/show_bug.cgi?id=755094"
 	rlRun "ipa-replica-manage list | grep \"$MASTER: master\""
