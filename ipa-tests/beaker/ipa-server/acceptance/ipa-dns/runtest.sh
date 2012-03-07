@@ -1196,6 +1196,44 @@ EOF
 		rlRun "ipa dnszone-del $zone" 0 "Delete the zone created for tests 161 to 172"
 	rlPhaseEnd
 
+	rlPhaseStartTest "ipa-dns-174: Bug 767494 - Automatically update corresponding PTR record when A/AAAA record is updated"
+		aaaa174="2620:52:0:2247:221:5eff:fe86:16b4"
+		aaaa174rev="7.4.2.2.0.0.0.0.2.5.0.0.0.2.6.2.ip6.arpa."
+		a174="10.1.1.10"
+		a174rev="1.1.10.in-addr.arpa."
+
+		rlLog "verifies https://bugzilla.redhat.com/show_bug.cgi?id=767494"
+
+		# for IPv4 +ve
+		rlRun "ipa dnszone-add $DOMAIN --name-server=$HOSTNAME --admin-email=$email"
+		rlRun "ipa dnszone-add $a174rev --name-server=$HOSTNAME --admin-email=$email"
+
+		rlRun "ipa dnsrecord-add $DOMAIN foo --a-rec=$a174 --a-create-reverse"
+		rlRun "ipa dnsrecord-show $a174rev 10 | grep \"PTR record: foo.$DOMAIN\""
+		rlRun "nslookup $a174 | grep foo.$DOMAIN"
+
+		# for IPv4 -ve
+		verifyErrorMsg "ipa dnsrecord-add $DOMAIN foo --a-rec=$a174 --a-create-reverse" "ipa: ERROR: Reverse record for IP address $a174 already exists in reverse zone $a174rev."
+		verifyErrorMsg "ipa dnsrecord-add $DOMAIN foo2 --a-rec=10.1.2.10 --a-create-reverse" "ipa: ERROR: Cannot create reverse record for \"10.1.2.10\": DNS reverse zone for IP address 10.1.2.10 not found"
+
+		# record clean-up
+		rlRun "ipa dnsrecord-del $a174rev 10 --del-all"
+
+		# for IPv6 +ve
+		rlRun "ipa dnszone-add $aaaa174rev --name-server=$HOSTNAME --admin-email=$email"
+		rlRun "ipa dnsrecord-add $DOMAIN bar --aaaa-rec=$aaaa174 --aaaa-create-reverse"
+		rlRun "ipa dnsrecord-show $aaaa174rev 4.b.6.1.6.8.e.f.f.f.e.5.1.2.2.0 | grep \"PTR record: bar.$DOMAIN\""
+		rlRun "nslookup $aaaa174 | grep bar.$DOMAIN"
+
+		# for IPv6 -ve
+		verifyErrorMsg "ipa dnsrecord-add $DOMAIN bar --aaaa-rec=$aaaa174 --aaaa-create-reverse" "ipa: ERROR: Reverse record for IP address $aaaa174 already exists in reverse zone $aaaa174rev."
+		verifyErrorMsg "ipa dnsrecord-add $DOMAIN bar --aaaa-rec=2621:52:0:2247:221:5eff:fe86:26b4 --aaaa-create-reverse" "ipa: ERROR: Cannot create reverse record for \"2621:52:0:2247:221:5eff:fe86:26b4\": DNS reverse zone for IP address 2621:52:0:2247:221:5eff:fe86:26b4 not found"
+
+		# record clean-up
+		rlRun "ipa dnsrecord-del $aaaa174rev 10 --del-all"
+
+	rlPhaseEnd
+
 	rlJournalPrintText
 	report=/tmp/rhts.report.$RANDOM.txt
 	makereport $report
