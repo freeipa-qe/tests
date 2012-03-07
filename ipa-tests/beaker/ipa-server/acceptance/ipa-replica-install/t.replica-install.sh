@@ -65,6 +65,7 @@ installMaster()
         rlRun "/bin/bash /dev/shm/installipa.bash" 0 "Installing IPA Server"
 
         rlLog "verifies https://bugzilla.redhat.com/show_bug.cgi?id=797563"
+	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
         verifyErrorMsg "ipa host-del $MASTER" "ipa: ERROR: invalid 'hostname': An IPA master host cannot be deleted"
 
 
@@ -99,6 +100,7 @@ createReplica1()
 			rlRun "ipa dnsrecord-add $REVERSE_ZONE $LAST_OCTET --ptr-rec=$hostname_s.$DOMAIN."
 
                         rlRun "service named restart" 0 "Restarting named as work around when adding new reverse zone"
+			sleep 10
 
                         rlLog "Running: ipa-replica-prepare -p $ADMINPW $hostname_s.$DOMAIN"
 			rlRun "ipa-replica-prepare -p $ADMINPW $hostname_s.$DOMAIN"
@@ -124,10 +126,10 @@ createReplica2()
 			rlRun "rm -fr /var/lib/ipa/replica-info-*"
 
 			# Preparing replica with --ip-address option
+                        rlRun "service named restart"
                         rlLog "IP of server $s is resolving as $SLAVEIP, using short hostname of $hostname_s"
                         rlLog "Running: ipa-replica-prepare -p $ADMINPW --ip-address=$SLAVEIP $hostname_s.$DOMAIN"
                         rlRun "ipa-replica-prepare -p $ADMINPW --ip-address=$SLAVEIP $hostname_s.$DOMAIN" 0 "Creating replica package"
-                        rlRun "service named restart" 0 "Restarting named as work around when adding new reverse zone"
 
                 else
 
@@ -230,8 +232,6 @@ echo 'expect eof ' >> $expfile
 			rlLog "IP of server $s is resolving as $ipofs, using short hostname of $hostname_s"
 			rlLog "Executing: ipa-replica-prepare -p $ADMINPW --ip-address=$SLAVEIP $hostname_s.$DOMAIN --dirsrv_pkcs12=dirsrv_pkcs.p12 --dirsrv_pin=Secret123 --http_pkcs12=http_pkcs.p12 --http_pin=Secret123"
 			rlRun "ipa-replica-prepare -p $ADMINPW --ip-address=$SLAVEIP $hostname_s.$DOMAIN --dirsrv_pkcs12=dirsrv_pkcs.p12 --dirsrv_pin=Secret123 --http_pkcs12=http_pkcs.p12 --http_pin=Secret123"
-                        rlRun "service named restart" 0 "Restarting named as work around when adding new reverse zone"
-
 
                 else
 
