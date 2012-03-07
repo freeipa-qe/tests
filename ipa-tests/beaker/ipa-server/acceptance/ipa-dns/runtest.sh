@@ -1230,7 +1230,7 @@ EOF
 		verifyErrorMsg "ipa dnsrecord-add $DOMAIN bar --aaaa-rec=2621:52:0:2247:221:5eff:fe86:26b4 --aaaa-create-reverse" "ipa: ERROR: Cannot create reverse record for \"2621:52:0:2247:221:5eff:fe86:26b4\": DNS reverse zone for IP address 2621:52:0:2247:221:5eff:fe86:26b4 not found"
 
 		# record clean-up
-		rlRun "ipa dnsrecord-del $aaaa174rev 10 --del-all"
+		rlRun "ipa dnsrecord-del $aaaa174rev 4.b.6.1.6.8.e.f.f.f.e.5.1.2.2.0 --del-all"
 
 	rlPhaseEnd
 
