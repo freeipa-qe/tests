@@ -211,3 +211,33 @@ rlPhaseStartTest "bug783286: Setting HBAC/SUDO category to Anyone doesn't remove
         rlRun "ipa sudorule-del bug783286"
 
 }
+
+bug800537() {
+
+rlPhaseStartTest "bug800537: Sudo commands with special characters cannot be removed from command groups"
+
+        rlLog "verifies https://bugzilla.redhat.com/show_bug.cgi?id=800537"
+
+        TmpDir=`mktemp -d`
+        pushd $TmpDir
+
+        rlRun "ipa sudocmd-add \"/bin/ls /lost+found\""
+        rlRun "ipa sudocmdgroup-add a-group --desc=g1"
+        rlRun "ipa sudocmdgroup-add-member a-group --sudocmds=\"/bin/ls /lost+found\""
+        rlRun "ipa sudocmdgroup-remove-member a-group --sudocmds=\"/bin/ls /lost+found\""
+        rlRun "ipa sudocmdgroup-del a-group"
+
+        rlRun "ipa sudocmd-add \"/bin/ls /tmp/test\ dir\""
+        rlRun "ipa sudocmdgroup-add b-group --desc=g2"
+        rlRun "ipa sudocmdgroup-add-member a-group --sudocmds=\"/bin/ls /tmp/test\ dir\""
+        rlRun "ipa sudocmdgroup-remove-member a-group --sudocmds=\"/bin/ls /tmp/test\ dir\""
+        rlRun "ipa sudocmdgroup-del b-group"
+
+        rlRun "ipa sudocmd-add \"/bin/ls, /bin/cp\""
+        rlRun "ipa sudocmdgroup-add c-group --desc=g3"
+	rlRun "ipa sudocmdgroup-add-member a-group --sudocmds=\"/bin/ls, /bin/cp\""
+	rlRun "ipa sudocmdgroup-remove-member a-group --sudocmds=\"/bin/ls, /bin/cp\""
+	rlRun "ipa sudocmdgroup-del c-group"
+	
+rlPhaseEnd
+}

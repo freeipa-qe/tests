@@ -280,6 +280,7 @@ bug769491
 bug741604
 bug782976
 bug783286
+bug800537
         # tests end.
 
     rlPhaseStartCleanup "ipa-sudo-func-cleanup: Destroying admin credentials & and disabling nis."
