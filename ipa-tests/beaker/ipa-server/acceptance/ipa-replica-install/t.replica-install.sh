@@ -94,10 +94,11 @@ createReplica1()
 			rlRun "cat /etc/hosts"
 			rlRun "echo \"nameserver $MASTERIP\" > /etc/resolv.conf" 0 "fixing the reoslv.conf to contain the correct nameserver lines"
 			rlRun "cat /etc/resolv.conf"
-			rlRun "ipa dnsrecord-add $DOMAIN $hostname_s --a-rec=$SLAVEIP"
-			REVERSE_ZONE=`ipa dnszone-find | grep -i "zone name" | grep -i "arpa" | cut -d ":" -f 2`
-			LAST_OCTET=`echo $SLAVEIP | cut -d . -f 4`
-			rlRun "ipa dnsrecord-add $REVERSE_ZONE $LAST_OCTET --ptr-rec=$hostname_s.$DOMAIN."
+			rlRun "ipa dnsrecord-add $DOMAIN $hostname_s --a-rec=$SLAVEIP --a-create-reverse"
+			# Making use of --a-create-reverse ... hence comenting the following :-)
+			# REVERSE_ZONE=`ipa dnszone-find | grep -i "zone name" | grep -i "arpa" | cut -d ":" -f 2`
+			# LAST_OCTET=`echo $SLAVEIP | cut -d . -f 4`
+			# rlRun "ipa dnsrecord-add $REVERSE_ZONE $LAST_OCTET --ptr-rec=$hostname_s.$DOMAIN."
 
                         rlRun "service named restart" 0 "Restarting named as work around when adding new reverse zone"
 			sleep 10
