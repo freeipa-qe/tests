@@ -921,7 +921,7 @@ pkey_return_check_dns()
 
 	# Test for bug https://bugzilla.redhat.com/show_bug.cgi?id=789987
 	rlPhaseStartTest "ipa-dns-154: Correction in error message while deleting a invalid record."
-		verifyErrorMsg "ipa dnsrecord-del $zone aaaa --aaaa-rec=2620:52:0:41c9:5054:ff:fe62:65" "ipa: ERROR: aaaa record does not contain '2620:52:0:41c9:5054:ff:fe62:65'"
+		verifyErrorMsg "ipa dnsrecord-del $zone aaaa --aaaa-rec=2620:52:0:41c9:5054:ff:fe62:65" "ipa: ERROR: AAAA record does not contain '2620:52:0:41c9:5054:ff:fe62:65'"
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-155: delete record of type AAAA"
@@ -935,19 +935,19 @@ pkey_return_check_dns()
 
         rlPhaseStartTest "ipa-dns-157: Bug 790318 - dnsrecord-add does not validate the record names with space in between."
 		rlLog "verifies https://bugzilla.redhat.com/show_bug.cgi?id=790318"
-		verifyErrorMsg "ipa dnsrecord-add $zone \"record name\"  --a-rec=1.1.1.1" "ipa: ERROR: invalid 'name': Spaces are not allowed"
+		rlRun "ipa dnsrecord-add $zone \"record name\"  --a-rec=1.1.1.1 | grep \"ipa: ERROR: invalid 'name': only letters, numbers, _, and - are allowed. - must not be the DNS label character\""
         rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-158: Bug 738788 - ipa dnsrecord-add allows invalid kx records"
 		rlLog "verifies https://bugzilla.redhat.com/show_bug.cgi?id=738788"
-                verifyErrorMsg "ipa dnsrecord-add $zone @ --kx-rec \"-1 1.2.3.4\"" "ipa: ERROR: invalid 'preference': must be at least 0"
-		verifyErrorMsg "ipa dnsrecord-add $zone @ --kx-rec \"333383838383 1.2.3.4\"" "ipa: ERROR: invalid 'preference': can be at most 65535"
+                rlRun "ipa dnsrecord-add $zone @ --kx-rec \"-1 1.2.3.4\" | grep \"ipa: ERROR: invalid 'preference': must be at least 0\""
+		rlRun "ipa dnsrecord-add $zone @ --kx-rec \"333383838383 1.2.3.4\" | grep \"ipa: ERROR: invalid 'preference': can be at most 65535\""
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-159: Bug 766075 DNS zone dynamic update is changed to false if --allow-dynupdate not specified"
 		rlLog "verifies https://bugzilla.redhat.com/show_bug.cgi?id=766075"
 
-		verifyErrorMsg "ipa dnszone-add example.com --name-server=$HOSTNAME --admin-email=admin@example.com --allow-dynupdate" "ipa: error: no such option: --allow-dynupdate"
+		rlRun "ipa dnszone-add example.com --name-server=$HOSTNAME --admin-email=admin@example.com --allow-dynupdate | grep \"ipa: error: no such option: --allow-dynupdate\""
 
 		rlRun "ipa dnszone-add example.com --name-server=$HOSTNAME --admin-email=admin@example.com --dynamic-update"
 		rlRun "ipa dnszone-show example.com | grep \"Dynamic update: TRUE\"" 1
@@ -1125,7 +1125,7 @@ EOF
 	rlPhaseStartTest "ipa-dns-168: Bug 783272 - Confusing error message when adding a record to non-existent zone"
 
 		rlLog "verifies bug https://bugzilla.redhat.com/show_bug.cgi?id=783272"
-		verifyErrorMsg "ipa dnsrecord-add unknowndomain.com \"record name\"  --loc-rec=\"49 11 42.4 N 16 36 29.6 E 227.64m\"" "ipa: ERROR: unknowndomain.com: DNS zone not found"
+		rlRun "ipa dnsrecord-add unknowndomain.com recordname  --loc-rec=\"49 11 42.4 N 16 36 29.6 E 227.64m\" | grep \"ipa: ERROR: unknowndomain.com: DNS zone not found\""
 
 	rlPhaseEnd
 
@@ -1143,11 +1143,12 @@ EOF
 
 	rlPhaseStartTest "ipa-dns-170: Bug 733371 - DNS zones are not loaded when idnsAllowQuery/idnsAllowTransfer is filled"
 
+		MASTERIP=`dig +short $HOSTNAME`
 		rlLog "verifies https://bugzilla.redhat.com/show_bug.cgi?id=733371"
 
 		rlRun "ipa dnszone-add example.com --name-server=$HOSTNAME --admin-email=admin@example.com"
                 rlRun "ipa dnsrecord-add example.com foo --a-rec=10.0.1.1"
-		rlRun "ipa dnszone-mod example.com --allow-query=$ipaddr"
+		rlRun "ipa dnszone-mod example.com --allow-query=$MASTERIP"
 
 		rlRun "service named reload"
 		sleep 5
