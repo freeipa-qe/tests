@@ -935,19 +935,19 @@ pkey_return_check_dns()
 
         rlPhaseStartTest "ipa-dns-157: Bug 790318 - dnsrecord-add does not validate the record names with space in between."
 		rlLog "verifies https://bugzilla.redhat.com/show_bug.cgi?id=790318"
-		rlRun "ipa dnsrecord-add $zone \"record name\"  --a-rec=1.1.1.1 | grep \"ipa: ERROR: invalid 'name': only letters, numbers, _, and - are allowed. - must not be the DNS label character\""
+		rlRun "ipa dnsrecord-add $zone \"record name\"  --a-rec=1.1.1.1 | grep \"ipa: ERROR: invalid 'name': only letters, numbers, _, and - are allowed.\"" 1
         rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-158: Bug 738788 - ipa dnsrecord-add allows invalid kx records"
 		rlLog "verifies https://bugzilla.redhat.com/show_bug.cgi?id=738788"
-                rlRun "ipa dnsrecord-add $zone @ --kx-rec \"-1 1.2.3.4\" | grep \"ipa: ERROR: invalid 'preference': must be at least 0\""
-		rlRun "ipa dnsrecord-add $zone @ --kx-rec \"333383838383 1.2.3.4\" | grep \"ipa: ERROR: invalid 'preference': can be at most 65535\""
+                rlRun "ipa dnsrecord-add $zone @ --kx-rec \"-1 1.2.3.4\" | grep \"ipa: ERROR: invalid 'preference': must be at least 0\"" 1
+		rlRun "ipa dnsrecord-add $zone @ --kx-rec \"333383838383 1.2.3.4\" | grep \"ipa: ERROR: invalid 'preference': can be at most 65535\"" 1
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-159: Bug 766075 DNS zone dynamic update is changed to false if --allow-dynupdate not specified"
 		rlLog "verifies https://bugzilla.redhat.com/show_bug.cgi?id=766075"
 
-		rlRun "ipa dnszone-add example.com --name-server=$HOSTNAME --admin-email=admin@example.com --allow-dynupdate | grep \"ipa: error: no such option: --allow-dynupdate\""
+		rlRun "ipa dnszone-add example.com --name-server=$HOSTNAME --admin-email=admin@example.com --allow-dynupdate | grep \"ipa: error: no such option: --allow-dynupdate\"" 1
 
 		rlRun "ipa dnszone-add example.com --name-server=$HOSTNAME --admin-email=admin@example.com --dynamic-update"
 		rlRun "ipa dnszone-show example.com | grep \"Dynamic update: TRUE\"" 1
@@ -976,7 +976,7 @@ pkey_return_check_dns()
 		rlRun "ldapsearch -LLL -h localhost -Y GSSAPI -b idnsname=example.com,cn=dns,dc=testrelm,dc=com"
 
 ldapmodify -h localhost -Y GSSAPI << EOF
-dn: idnsname=example.com,cn=dns,dc=lab,dc=eng,dc=pnq,dc=redhat,dc=com
+dn: idnsname=example.com,cn=dns,dc=testrelm,dc=com
 changetype: modify
 replace: kXRecord
 kXRecord: foo.example.com
@@ -1125,7 +1125,7 @@ EOF
 	rlPhaseStartTest "ipa-dns-168: Bug 783272 - Confusing error message when adding a record to non-existent zone"
 
 		rlLog "verifies bug https://bugzilla.redhat.com/show_bug.cgi?id=783272"
-		rlRun "ipa dnsrecord-add unknowndomain.com recordname  --loc-rec=\"49 11 42.4 N 16 36 29.6 E 227.64m\" | grep \"ipa: ERROR: unknowndomain.com: DNS zone not found\""
+		rlRun "ipa dnsrecord-add unknowndomain.com recordname  --loc-rec=\"49 11 42.4 N 16 36 29.6 E 227.64m\" | grep \"ipa: ERROR: unknowndomain.com: DNS zone not found\"" 1
 
 	rlPhaseEnd
 
@@ -1217,7 +1217,7 @@ EOF
 
 		# for IPv4 -ve
 		verifyErrorMsg "ipa dnsrecord-add $DOMAIN foo --a-rec=$a174 --a-create-reverse" "ipa: ERROR: Reverse record for IP address $a174 already exists in reverse zone $a174rev."
-		rlRun "ipa dnsrecord-del $DOMAIN foo --a-rec=$a174"
+		rlRun "ipa dnsrecord-del $DOMAIN foo2 --a-rec=$a174"
 		verifyErrorMsg "ipa dnsrecord-add $DOMAIN foo2 --a-rec=10.1.2.10 --a-create-reverse" "ipa: ERROR: Cannot create reverse record for \"10.1.2.10\": DNS reverse zone for IP address 10.1.2.10 not found"
 
 		# record clean-up
@@ -1233,7 +1233,7 @@ EOF
 
 		# for IPv6 -ve
 		verifyErrorMsg "ipa dnsrecord-add $DOMAIN bar --aaaa-rec=$aaaa174 --aaaa-create-reverse" "ipa: ERROR: Reverse record for IP address $aaaa174 already exists in reverse zone $aaaa174rev."
-		rlRun "ipa dnsrecord-del $DOMAIN bar --aaaa-rec=$aaaa174"
+		rlRun "ipa dnsrecord-del $DOMAIN bar --aaaa-rec=2621:52:0:2247:221:5eff:fe86:26b4"
 		verifyErrorMsg "ipa dnsrecord-add $DOMAIN bar --aaaa-rec=2621:52:0:2247:221:5eff:fe86:26b4 --aaaa-create-reverse" "ipa: ERROR: Cannot create reverse record for \"2621:52:0:2247:221:5eff:fe86:26b4\": DNS reverse zone for IP address 2621:52:0:2247:221:5eff:fe86:26b4 not found"
 
 		# record clean-up
