@@ -160,7 +160,7 @@ netgroup_bz_767372()
 		rlRun "ipa netgroup-add $FUNCNAME --hostcat=all --desc=$FUNCNAME"
 		rlRun "ipa netgroup-add-member $FUNCNAME --users=bzuser1,bzuser2,bzuser3"
 
-		if [ $(ldapsearch -x -h $MASTER -p 389 -D "$ROOTDN" -w $ADMINPW -b "cn=test2,cn=ng,cn=compat,$BASEDN" | grep Triple|grep "(-," | wc -l) -gt 0 ]; then
+		if [ $(ldapsearch -x -h $MASTER -p 389 -D "$ROOTDN" -w $ADMINPW -b "cn=$FUNCNAME,cn=ng,cn=compat,$BASEDN" | grep Triple|grep "(-," | wc -l) -gt 0 ]; then
 			rlFail "BZ 767372 found...Netgroups compat plugin not reporting users correctly"
 		else
 			rlPass "BZ 767372 not found."
