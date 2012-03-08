@@ -508,9 +508,29 @@ rlJournalStart
     rlPhaseStart "ipa-user-add-045: Negative test of search of users using --not-in-hbacrules"
 	rlRun "ipa user-find --not-in-hbacrules=$hb | grep $ua" 1 "Making sure that $ua does not return when constraining search to eliminate hbac rule $hb"
 	ipa group-del $ga
+	ipa hbacrule-del $hb
+    rlPhaseEnd
+
+    sru=sruleta
+    rlPhaseStart "ipa-user-add-046: Positive test of search of users in a sudorules"
+	rlRun "ipa sudorule-add $sru" 0 "Adding sudorule to test with"
+	rlRun "ipa sudorule-add-user --users=$ua $sru" 0 "adding user ua to sudorule sru"
+	rlRun "ipa user-find --in-sudorule=$sru | grep $ua" 0 "ensuring that user ua is returned when searching for users in a given sudorule"
+    rlPhaseEnd
+
+    rlPhaseStart "ipa-user-add-047: Negative test of search of users in a sudorule"
+	rlRun "ipa user-find --in-sudorule=$sru | grep $ub" 1 "ensuring that user ub is notreturned when searching for users in a given sudorule"
+    rlPhaseEnd
+
+    rlPhaseStart "ipa-user-add-048: Positive test of search of users not in a sudorule"
+	rlRun "ipa user-find --not-in-sudorule=$sru | grep $ub" 0 "ensuring that user ub is returned when searching for users not in a given sudorule"
+    rlPhaseEnd
+
+    rlPhaseStart "ipa-user-add-049: Negative test of search of users not in a sudorule"
+	rlRun "ipa user-find --not-in-sudorule=$sru | grep $ua" 1 "ensuring that user ua is notreturned when searching for users not in a given sudorule"
+	rlRun "ipa sudorule-del $sru" 0 "Removing sudorule that we tested with."
 	ipa user-del $ua
 	ipa user-del $ub
-	ipa hbacrule-del $hb
     rlPhaseEnd
 
     rlPhaseStartCleanup "ipa-user-cli-add-cleanup"

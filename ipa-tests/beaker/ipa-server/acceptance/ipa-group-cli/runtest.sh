@@ -1064,11 +1064,27 @@ rlJournalStart
 
     rlPhaseStartTest "ipa-group-cli-99: Negative test of --not-in-hbacrules in group-find"
 	rlRun "ipa group-find --not-in-hbacrules=$hb | grep ggg" 1 "make sure that ggg does not return in a search excluding hbacrule $hb"
-	ipa group-del $gb
-	ipa group-del ggg
-	ipa group-del uuu
-	ipa group-del tusera
-	ipa hbacrule-del $hb
+    rlPhaseEnd
+
+    sru=sruleta
+    ua=ggg
+    ub=tusera
+    rlPhaseStartTest "ipa-group-add-100: Positive test of search of groups in a sudorules"
+	rlRun "ipa sudorule-add $sru" 0 "Adding sudorule to test with"
+	rlRun "ipa sudorule-add-user --groups=$ua $sru" 0 "adding group ua to sudorule sru"
+	rlRun "ipa group-find --in-sudorule=$sru | grep $ua" 0 "ensuring that group ua is returned when searching for groups in a given sudorule"
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-group-add-101: Negative test of search of groups in a sudorule"
+	rlRun "ipa group-find --in-sudorule=$sru | grep $ub" 1 "ensuring that group ub is notreturned when searching for groups in a given sudorule"
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-group-add-102: Positive test of search of groups not in a sudorule"
+	rlRun "ipa group-find --not-in-sudorule=$sru | grep $ub" 0 "ensuring that group ub is returned when searching for groups not in a given sudorule"
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-group-add-103: Negative test of search of groups not in a sudorule"
+	rlRun "ipa group-find --not-in-sudorule=$sru | grep $ua" 1 "ensuring that group ua is notreturned when searching for groups not in a given sudorule"
     rlPhaseEnd
 
     rlPhaseStartCleanup "ipa-group-cli-cleanup: Delete remaining users and group and Destroying admin credentials"
@@ -1077,6 +1093,13 @@ rlJournalStart
 	rlRun "ipa user-del mdolphin" 0 "Deleting user mdolphin."
         rlRun "ipa group-del jennygn" 0 "Removing Test Group" 
         rlRun "ipa group-del $grp" 0 "Removing Test Group" 
+	rlRun "ipa sudorule-del $sru" 0 "Removing sudorule for cleanup"
+	ipa group-del $gb
+	ipa group-del ggg
+	ipa group-del uuu
+	ipa group-del tusera
+	ipa hbacrule-del $hb
+
         i=1
         while [ $i -le 10 ] ; do
                 deleteGroup Group$i
