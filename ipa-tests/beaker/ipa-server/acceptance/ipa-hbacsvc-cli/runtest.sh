@@ -248,11 +248,35 @@ rlJournalStart
         rlRun "verifyHBACService https memberof \"cn=$servicegroup2,cn=hbacservicegroups,cn=accounts,$BASEDN\"" 1 "Verifying service exists but membership was removed."
     rlPhaseEnd
 
+    # The following test will nor pass until https://bugzilla.redhat.com/show_bug.cgi?id=801235 is resolved
+    hbacrule="svhbac"
+    rlPhaseStartTest "ipa-hbacsvc-cli-023: Positive test of hbacsvc-find using --in-hbacrule"
+	rlRun "ipa hbacrule-add $hbacrule" 0 "Adding hbac rule for testing with user-find"
+	rlRun "ipa hbacrule-add-service --hbacsvcs=$service1 $hbacrule" 0 "Adding service service1 to hbacrule"
+	rlRun "ipa hbacsvc-find --in-hbacrule=$hbacrule | grep $service1" 0 "making sure that service 1 is returned when searching for services in the hbacrule"
+    rlPhaseEnd
+
+    # The following test will nor pass until https://bugzilla.redhat.com/show_bug.cgi?id=801235 is resolved
+    rlPhaseStartTest "ipa-hbacsvc-cli-024: Negative test of hbacsvc-find using --in-hbacrule"
+	rlRun "ipa hbacsvc-find --in-hbacrule=$hbacrule | grep $service2" 1 "making sure that service 2 is not returned when searching for services in the hbacrule"
+    rlPhaseEnd
+
+    # The following test will nor pass until https://bugzilla.redhat.com/show_bug.cgi?id=801235 is resolved
+    rlPhaseStartTest "ipa-hbacsvc-cli-025: Positive test of hbacsvc-find using --not-in-hbacrule"
+	rlRun "ipa hbacsvc-find --not-in-hbacrule=$hbacrule | grep $service2" 0 "making sure that service 2 is returned when searching for services not in the hbacrule"
+    rlPhaseEnd
+
+    # The following test will nor pass until https://bugzilla.redhat.com/show_bug.cgi?id=801235 is resolved
+    rlPhaseStartTest "ipa-hbacsvc-cli-026: Positive test of hbacsvc-find using --not-in-hbacrule"
+	rlRun "ipa hbacsvc-find --not-in-hbacrule=$hbacrule | grep $service1" 1 "making sure that service 1 is not returned when searching for services not in the hbacrule"
+    rlPhaseEnd
+
     rlPhaseStartCleanup "ipa-hbacsvc-cli-cleanup: Destroying admin credentials."
 	# delete service groups
 	rlRun "deleteHBACService $service1" 0 "CLEANUP: Deleting service $service1"
 	rlRun "deleteHBACService $service2" 0 "CLEANUP: Deleting service $service2"
 	rlRun "deleteHBACServiceGroup \"$servicegroup1\"" 0 "CLEANUP: Deleting service group $servicegroup1"
+	rlRun "ipa hbacrule-del $hbacrule" 0 "cleaning up the hbac rule used in tests 23 through 26"
 	rlRun "kdestroy" 0 "Destroying admin credentials."
 	rhts-submit-log -l /var/log/httpd/error_log
     rlPhaseEnd

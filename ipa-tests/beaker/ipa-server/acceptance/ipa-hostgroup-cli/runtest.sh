@@ -13,6 +13,8 @@
 #  hostgroup-mod            Modify a group.
 #  hostgroup-remove-member  Remove members from a group.
 #  hostgroup-show           Display information about a named group.
+#  hostgroup-find           using --in-hbacrules
+#  hostgroup-find           using --not-in-hbacrules
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
 #   Author: Jenny Galipeau <jgalipea@redhat.com>
@@ -73,7 +75,6 @@ group5="child"
 ########################################################################
 
 PACKAGE="ipa-admintools"
-
 rlJournalStart
     rlPhaseStartSetup "ipa-hostgroup-cli-startup: Check for admintools package, Kinit and hosts and user groups"
 	rpm -qa | grep $PACKAGE
@@ -421,6 +422,32 @@ rlJournalStart
         expmsg="ipa: ERROR: invalid 'hostgroup_name': may only include letters, numbers, _, -, and ."
         ipa hostgroup-add --desc=test "my group" > /tmp/hostgroup41.out 2<&1
 	rlAssertGrep "$expmsg" "/tmp/hostgroup41.out"
+    rlPhaseEnd
+
+    hb=hbruleh
+    group1=hbgta
+    group2=hbgtb
+    rlPhaseStartTest "ipa-hostgroup-cli-42: Positive hostgroup-find test using --in-hbacrules"
+	rlRun "addHostGroup \"$group1\" \"$group1\"" 0 "Adding host group \"$group1\""
+	rlRun "addHostGroup \"$group2\" \"$group2\"" 0 "Adding host group \"$group2\""
+	rlRun "ipa hbacrule-add $hb" 0 "Adding hbac rule for testing with user-find"
+	rlRun "ipa hbacrule-add-host --hostgroups=$group1 $hb" 0 "adding hostgroup $group2 to hbacrule $hb"
+	rlRun "ipa host-find --in-hbacrules=$hb | grep $group1" 0 "making sure group1 is returned when searching hostgroups using --in-hbacrules"
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-hostgroup-cli-43: Negative host-find test using --in-hbacrules"
+	rlRun "ipa host-find --in-hbacrules=$hb | grep $group2" 1 "making sure group2 is not returned when searching hostgroups using --in-hbacrules"
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-hostgroup-cli-44: Positive host-find test using --not-in-hbacrules"
+	rlRun "ipa host-find --not-in-hbacrules=$hb | grep $group2" 0 "making sure group2 is returned when searching hostgroups using --not-in-hbacrules"
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-hostgroup-cli-45: Negative host-find test using --not-in-hbacrules"
+	rlRun "ipa host-find --not-in-hbacrules=$hb | grep $group1" 1 "making sure group1 is not returned when searching hostgroups using --not-in-hbacrules"
+	rlRun "ipa hbacrule-del $hb" 0 "Deleting hbac rule use in previous tests"
+	ipa hostgroup-del $group1
+	ipa hostgroup-del $group2
     rlPhaseEnd
 
     rlPhaseStartCleanup "ipa-hostgroup-cli-cleanup: Delete remaining hosts and Destroying admin credentials"
