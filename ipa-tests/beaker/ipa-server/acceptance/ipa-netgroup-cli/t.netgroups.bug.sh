@@ -28,6 +28,7 @@ ENTRY="NGP Definition"
 netgroup_bugs()
 {
 	netgroup_bz_772043
+	netgroup_bz_800625
 	netgroup_bz_788625
 	netgroup_bz_772297
 	netgroup_bz_766141
@@ -46,20 +47,87 @@ netgroup_bz_772043()
 	rlPhaseStartTest "netgroup_bz_772043: Adding a netgroup with a + in the name that overlaps hostgroup causes crash"	
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
-		rlRun "ipa netgroup-add +badtestnetgroup --desc=netgroup_with_plus_kills_dirsrv" 
+		local compatenabled=$(echo "$ADMINPW"| ipa-compat-manage status|grep "Plugin.*Enabled"|wc -l)
+
+		if [ $compatenabled -eq 0 ]; then
+			rlRun "echo \"$ADMINPW\"|ipa-compat-manage enable" 0 "enabling compat plugin for test"
+			rlRun "service dirsrv restart"
+		fi
+
+		rlRun "ipa netgroup-add +badtestnetgroup --desc=netgroup_with_plus_kills_dirsrv > $tmpout 2>&1" 1
+		if [ $(grep "ipa: ERROR: invalid 'name': may only include letters, numbers, _, -, and ." $tmpout|wc -l) -gt 0 ]; then
+			rlPass "BZ 772043 not found...fix is in place for ipa command"
+		fi
+			
+		# now check if the directory server crashed
 		rlRun "ipactl status > $tmpout 2>&1"
 		if [ $(grep "Directory Service: STOPPED" $tmpout|wc -l) -gt 0 ]; then
 			rlFail "BZ 772043 found...Adding a netgroup with a + in the name that overlaps hostgroup causes crash"
-		else
-			rlPass "BZ 772043 not found"
+
+			rlLog "Now fixing DB and restarting IPA Server"
+			INSTANCE=$(echo $RELM | sed 's/\./-/g')
+			rlRun "ns-slapd db2ldif -s '$BASEDN' -a /tmp/export.ldif -D /etc/dirsrv/slapd-$INSTANCE/"
+			rlRun "sed s/+badtestnetgroup/badtestnetgroup/g /tmp/export.ldif > /tmp/export.ldif.fixed"
+			rlRun "ns-slapd ldif2db -D /etc/dirsrv/slapd-$INSTANCE/ -s "$BASEDN" -i /tmp/export.ldif.fixed" 
+			rlRun "ipactl restart"
+			rlRun "ipa netgroup-del badtestnetgroup"
 		fi
 
-		rlLog "Now fixing DB and restarting IPA Server"
-		rlRun "ns-slapd db2ldif -s '$BASEDN' -a /tmp/testrelm.ldif -D /etc/dirsrv/slapd-TESTRELM-COM/"
-		rlRun "sed s/+badtestnetgroup/badtestnetgroup/g /tmp/testrelm.ldif > /tmp/testrelm.ldif.fixed"
-		rlRun "ns-slapd ldif2db -D /etc/dirsrv/slapd-TESTRELM-COM/ -s "$BASEDN" -i /tmp/testrelm.ldif.fixed" 
-		rlRun "ipactl restart"
-		rlRun "ipa netgroup-del badtestnetgroup"
+		if [ $compatenabled -eq 0 ]; then
+			rlRun "echo \"$ADMINPW\"|ipa-compat-manage disable" 0 "disable compat plugin since it was disabled before test"
+			rlRun "service dirsrv restart"
+		fi
+
+		[ -f $tmpout ] && rm -f $tmpout
+	rlPhaseEnd
+}
+
+netgroup_bz_800625()
+{
+	rlPhaseStartTest "netgroup_bz_800625: Bad netgroup name causes ns-slapd to segfault"
+		KinitAsAdmin
+		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
+		local compatenabled=$(echo "$ADMINPW"| ipa-compat-manage status|grep "Plugin.*Enabled"|wc -l)
+		if [ $compatenabled -eq 0 ]; then
+			rlRun "echo \"$ADMINPW\"|ipa-compat-manage enable" 0 "enabling compat plugin for test"
+			rlRun "service dirsrv restart"
+		fi
+
+		# remember that heredocs have to be intented with tabs
+		cat > /tmp/netgroup_crash.ldif <<-EOF
+		dn: ipaUniqueID=170df1b8-688b-11e1-9cfb-5254000ea1b4,cn=ng,cn=alt,$BASEDN
+		objectClass: ipaobject
+		objectClass: ipaassociation
+		objectClass: ipanisnetgroup
+		cn: +badtestnetgroup
+		description: netgroup_with_plus_kills_dirsrv
+		nisDomainName: testrelm.com
+		ipaUniqueID: 170df1b8-688b-11e1-9cfb-5254000ea1b4
+		EOF
+
+		rlRun "ldapmodify -a -x -D \"$ROOTDN\" -w \"$ROOTDNPWD\" -f /tmp/netgroup_crash.ldif"
+
+		# now check if the directory server crashed
+		rlRun "ipactl status > $tmpout 2>&1"
+		if [ $(grep "Directory Service: STOPPED" $tmpout|wc -l) -eq 0 ]; then
+			rlPass "BZ 800625 not found..."
+		else
+			rlFail "BZ 800625 found...Bad netgroup name causes ns-slapd to segfault"
+
+			rlLog "Now fixing DB and restarting IPA Server"
+			INSTANCE=$(echo $RELM | sed 's/\./-/g')
+			rlRun "ns-slapd db2ldif -s '$BASEDN' -a /tmp/export.ldif -D /etc/dirsrv/slapd-$INSTANCE/"
+			rlRun "sed s/+badtestnetgroup/badtestnetgroup/g /tmp/export.ldif > /tmp/export.ldif.fixed"
+			rlRun "ns-slapd ldif2db -D /etc/dirsrv/slapd-$INSTANCE/ -s "$BASEDN" -i /tmp/export.ldif.fixed" 
+			rlRun "ipactl restart"
+			rlRun "ipa netgroup-del badtestnetgroup"
+		fi
+
+		if [ $compatenabled -eq 0 ]; then
+			rlRun "echo \"$ADMINPW\"|ipa-compat-manage disable" 0 "disable compat plugin since it was disabled before test"
+			rlRun "service dirsrv restart"
+		fi
+
 		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd
 }
