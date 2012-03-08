@@ -1,2 +1,0 @@
-server_host = ipaqa64vme.testrelm.com
-search_base = cn=users cn=accounts dc=testrelm dc=com
