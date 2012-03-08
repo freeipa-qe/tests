@@ -1217,8 +1217,7 @@ EOF
 
 		# for IPv4 -ve
 		verifyErrorMsg "ipa dnsrecord-add $DOMAIN foo --a-rec=$a174 --a-create-reverse" "ipa: ERROR: Reverse record for IP address $a174 already exists in reverse zone $a174rev."
-		rlRun "ipa dnsrecord-del $DOMAIN foo2 --a-rec=$a174"
-		verifyErrorMsg "ipa dnsrecord-add $DOMAIN foo2 --a-rec=10.1.2.10 --a-create-reverse" "ipa: ERROR: Cannot create reverse record for \"10.1.2.10\": DNS reverse zone for IP address 10.1.2.10 not found"
+		rlRun "ipa dnsrecord-add $DOMAIN foo2 --a-rec=10.1.2.10 --a-create-reverse | grep \"ipa: ERROR: Cannot create reverse record for \"10.1.2.10\": DNS reverse zone for IP address 10.1.2.10 not found\"" 1
 
 		# record clean-up
 		rlRun "ipa dnsrecord-del $a174rev 10 --del-all"
@@ -1233,8 +1232,7 @@ EOF
 
 		# for IPv6 -ve
 		verifyErrorMsg "ipa dnsrecord-add $DOMAIN bar --aaaa-rec=$aaaa174 --aaaa-create-reverse" "ipa: ERROR: Reverse record for IP address $aaaa174 already exists in reverse zone $aaaa174rev."
-		rlRun "ipa dnsrecord-del $DOMAIN bar --aaaa-rec=2621:52:0:2247:221:5eff:fe86:26b4"
-		verifyErrorMsg "ipa dnsrecord-add $DOMAIN bar --aaaa-rec=2621:52:0:2247:221:5eff:fe86:26b4 --aaaa-create-reverse" "ipa: ERROR: Cannot create reverse record for \"2621:52:0:2247:221:5eff:fe86:26b4\": DNS reverse zone for IP address 2621:52:0:2247:221:5eff:fe86:26b4 not found"
+		rlRun "ipa dnsrecord-add $DOMAIN bar --aaaa-rec=2621:52:0:2247:221:5eff:fe86:26b4 --aaaa-create-reverse | grep \"ipa: ERROR: Cannot create reverse record for \"2621:52:0:2247:221:5eff:fe86:26b4\": DNS reverse zone for IP address 2621:52:0:2247:221:5eff:fe86:26b4 not found\"" 1
 
 		# record clean-up
 		rlRun "ipa dnsrecord-del $aaaa174rev 4.b.6.1.6.8.e.f.f.f.e.5.1.2.2.0 --del-all"
