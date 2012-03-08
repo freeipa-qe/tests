@@ -42,6 +42,7 @@
 # Include test case file
 . ./lib.ipa-getcert.sh
 . ./t.ipa-getcert.sh
+. ./t.ipa-getcert-extended.sh  ####Test cases added by kaleem for missing functionality of ipa-getcert
 
 PACKAGE="ipa-client"
 
@@ -61,6 +62,7 @@ rlJournalStart
     # r2d2_test_starts
 echo "yidebug: start"
     ipagetcert
+    ipagetcert_extended
     # r2d2_test_ends
 
     rlPhaseStartCleanup "ipa-getcert cleanup"
