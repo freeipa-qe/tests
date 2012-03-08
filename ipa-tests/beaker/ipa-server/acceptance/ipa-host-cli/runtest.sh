@@ -1254,6 +1254,9 @@ rlPhaseStartTest "ipa-host-cli-38: find more hosts than exist"
 	rhts-submit-log -l /var/log/httpd/error_log
     rlPhaseEnd
 
+# Include test case file
+. ./ipa-host-cli-ipv6.sh
+
 rlJournalPrintText
 report=/tmp/rhts.report.$RANDOM.txt
 makereport $report
