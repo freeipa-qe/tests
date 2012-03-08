@@ -52,7 +52,7 @@ rlJournalStart
   if [ $? -eq 0 ] ; then
   	rlLog "ipa-admintools package is installed"
   else
-        rlLog "ERROR: ipa-admintools package NOT found!"
+        rlLog "ERROR: ipa-admintools package NOT found"
   fi
 
   # run tests

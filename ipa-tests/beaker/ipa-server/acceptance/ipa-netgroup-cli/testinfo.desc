@@ -4,7 +4,7 @@ TestVersion:     1.0
 Path:            /mnt/tests/CoreOS/ipa-server/acceptance/ipa-netgroup-cli
 Description:     IPA netgroup test
 Type:            Regression
-TestTime:        15m
+TestTime:        60m
 RunFor:          ipa-server
 Requires:        ipa-admintools
 Requires:        expect
