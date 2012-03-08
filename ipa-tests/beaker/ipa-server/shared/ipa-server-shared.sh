@@ -23,6 +23,7 @@
 #	interactive
 #	remoteExec
 #	pkey_return_check
+#       getReverseZone_IPv6
 ######################################################################
 KINITEXEC=/usr/bin/kinit
 #######################################################################
@@ -793,4 +794,42 @@ pkey_return_check()
 	let creturn=$creturn+$?
 	return $creturn
 }
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# getReverseZone_IPv6
+# Usage: getReverseZone_IPv6 IPv6-address
+#
+# This constructs a reverse zone value for an IPv6 address
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+getReverseZone_IPv6()
+{
+        local ipv6addr=$1
+        rc=0
+        rlLog "IPv6 address is $ipv6addr"
+        if [ ipv6addr ] ; then
+          octet_1=$(echo $ipv6addr | awk -F : '{print $1}')
+          octet_2=$(echo $ipv6addr | awk -F : '{print $2}')
+          octet_3=$(echo $ipv6addr | awk -F : '{print $3}')
+          octet_4=$(echo $ipv6addr | awk -F : '{print $4}')
+          rzonedn_ipv6=""
+          for item in $octet_4 $octet_3 $octet_2 $octet_1 ; do
+                while [ ${#item} -lt 4 ]
+                do
+                     item="0"$item
+                done
+                for (( i=4; $i >= 1; i-- ))
+                do
+                        digit=$(echo $item | cut -c $i)
+                        rzonedn_ipv6=$rzonedn_ipv6$digit"."
+                done
+          done
+          rzonedn_ipv6=$rzonedn_ipv6"ip6.arpa."
+          rlLog "Reverse zone: $rzonedn_ipv6"
+        else
+          rlLog "WARNING: No IPv6 address found, Reverse DNS zone is not calculated."
+          rc=1
+        fi
+        echo "$rzonedn_ipv6"
+        return $rc
+} #getReverseZone_IPv6
 
