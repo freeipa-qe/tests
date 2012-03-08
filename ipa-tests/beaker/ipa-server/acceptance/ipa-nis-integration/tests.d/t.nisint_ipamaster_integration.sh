@@ -417,7 +417,6 @@ nisint_ipamaster_integration_add_nis_data_ldif_passwd()
 			objectClass: ipaobject
 			objectClass: ipasshuser
 			objectClass: ipaSshGroupOfPubKeys
-			objectClass: mepOriginEntry
 			givenName: NIS
 			sn: USER
 			initials: NU
@@ -742,7 +741,7 @@ nisint_ipamaster_integration_setup_nis_listener()
 		rlRun "service rpcbind restart"
 		rlRun "service dirsrv restart"
 		rlRun "ipactl status"
-		rlRun "ipactl restart"
+		#rlRun "ipactl restart"
 		[ -f $tmpout ] && rm -f $tmpout	
 	rlPhaseEnd
 }

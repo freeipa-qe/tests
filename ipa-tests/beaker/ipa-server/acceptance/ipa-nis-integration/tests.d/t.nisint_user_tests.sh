@@ -209,7 +209,7 @@ nisint_user_test_1003()
 		if [ $(grep "auth_provider = .*ipa" /etc/sssd/sssd.conf 2>/dev/null|wc -l) -eq 0 ]; then
 			rlPass "ipa not configured...skipping"
 		else
-			rlRun "ipa user-find|grep testuser1" 0 "ipa search for existing user"
+			rlRun "ipa user-show testuser1" 0 "ipa search for existing user"
 		fi
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $NISCLIENT_IP"
 		;;
@@ -241,7 +241,7 @@ nisint_user_test_1004()
 		if [ $(grep "auth_provider = .*ipa" /etc/sssd/sssd.conf 2>/dev/null|wc -l) -eq 0 ]; then
 			rlPass "ipa not configured...skipping"
 		else
-			rlRun "ipa user-find|grep testuser1" 0 "ipa search for existing user"
+			rlRun "ipa user-show testuser1" 0 "ipa search for existing user"
 		fi
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $NISCLIENT_IP"
 		;;
