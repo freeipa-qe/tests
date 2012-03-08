@@ -99,9 +99,10 @@ add_netgroups()
 
 find_netgroups()
 {
-	netgroup_find_pkey      
 	netgroup_find_positive
 	netgroup_find_negative
+	netgroup_find_positive_other
+	netgroup_find_negative_other
 }
 
 member_netgroups()
@@ -1336,94 +1337,6 @@ netgroup_find_positive()
 		rlRun "ipa netgroup-find --not-in-netgroups=ngname"
 	rlPhaseEnd
 
-	ng=netgpa
-	ngb=netgpb
-	ngc=netgpc
-	ua=useruu
-	ub=userub
-	grpa=ngroupt
-	grpb=ngroupb
-	hosta=thosta
-	hostb=thostb
-	hgrpa=hostga
-	hgrpb=hostgb
-	tmpout=/dev/shm/netgroup-tempout.txt
-
-	rlPhaseStartTest "ipa-netgroup-050-28: Positive in-netgroup find user test."
-		rlRun "ipa netgroup-add --desc=desc1 $ng" 0 "add netgroup for testing --in-netgroup with"
-		rlRun "ipa user-add --first=ufirst --last=ulast $ua" 0 "adding user to test --in-netgroup with"
-		rlRun "ipa user-add --first=ufirst --last=ulast $ub" 0 "adding user to test --in-netgroup with"
-		rlRun "ipa netgroup-add-member --users=$ua,$ub $ng" 0 "adding user to netgroup $ng"
-		rlRun "ipa user-find --in-netgroups=$ng > $tmpout 2>&1" 0
-		rlAssertGrep "User login: $ua" $tmpout
-		rlAssertGrep "User login: $ub" $tmpout
-	rlPhaseEnd
-
-	rlPhaseStartTest "ipa-netgroup-050-29: Positive in-netgroup find netgroup test."
-		rlRun "ipa netgroup-add --desc=desc1 $ngb" 0 "add alternate netgroup for testing --in-netgroup with"
-		rlRun "ipa netgroup-add --desc=desc1 $ngc" 0 "add alternate netgroup for testing --in-netgroup with"
-		rlRun "ipa netgroup-add-member --netgroups=$ngb,$ngc $ng" 0 "adding netgroup to netgroup $ng"
-		rlRun "ipa netgroup-find --in-netgroups=$ng > $tmpout 2>&1" 0
-		rlAssertGrep "Netgroup name: $ngb" $tmpout
-		rlAssertGrep "Netgroup name: $ngc" $tmpout
-	rlPhaseEnd
-
-	rlPhaseStartTest "ipa-netgroup-050-30: Positive in-netgroup find group test."
-		rlRun "ipa group-add --desc=desc1 $grpa" 0 "add group for testing --in-netgroup with"
-		rlRun "ipa group-add --desc=desc1 $grpb" 0 "add group for testing --in-netgroup with"
-		rlRun "ipa netgroup-add-member --groups=$grpa,$grpb $ng" 0 "adding groups to netgroup $ng"
-		rlRun "ipa group-find --in-netgroups=$ng > $tmpout 2>&1" 0
-		rlAssertGrep "Group name: $grpa" $tmpout
-		rlAssertGrep "Group name: $grpb" $tmpout
-	rlPhaseEnd
-
-	rlPhaseStartTest "ipa-netgroup-050-31: Positive in-netgroup find host test."
-		# add hosts for testing
-		ipa host-add --ip-address=4.2.2.2 $hosta.$DOMAIN
-		ipa host-add --ip-address=4.2.2.2 $hostb.$DOMAIN
-		rlRun "ipa netgroup-add-member --hosts=$hosta.$DOMAIN,$hostb.$DOMAIN $ng" 0 "adding hosts to netgroup $ng"
-		rlRun "ipa host-find --in-netgroups=$ng > $tmpout 2>&1" 0
-		rlAssertGrep "Host name: $hosta.$DOMAIN" $tmpout
-		rlAssertGrep "Host name: $hostb.$DOMAIN" $tmpout
-	rlPhaseEnd
-
-	rlPhaseStartTest "ipa-netgroup-050-32: Positive in-netgroup findhostgroup test."
-		rlRun "ipa hostgroup-add --desc=desc1 $hgrpa" 0 "add group for testing --in-netgroup with"
-		rlRun "ipa hostgroup-add --desc=desc1 $hgrpb" 0 "add group for testing --in-netgroup with"
-		rlRun "ipa netgroup-add-member --hostgroups=$hgrpa,$hgrpb $ng" 0 "adding hostgroups to netgroup $ng"
-		rlRun "ipa hostgroup-find --in-netgroups=$ng > $tmpout 2>&1" 0
-		rlAssertGrep "Host-group: $hgrpa" $tmpout
-		rlAssertGrep "Host-group: $hgrpb" $tmpout
-	rlPhaseEnd
-
-	rlPhaseStartTest "ipa-netgroup-050-next-prep: Remove some things from the hostgroup tp get ready for the next tests"
-		rlRun "ipa netgroup-remove-member --hostgroups=$hgrpb $ng" 0 "Remove hostgroupb from netgroup $ng"
-		rlRun "ipa netgroup-remove-member --hosts=$hostb.$DOMAIN $ng" 0 "Remove hostb from netgroup $ng"
-		rlRun "ipa netgroup-remove-member --groups=$grpb $ng" 0 "Remove groupb from netgroup $ng"
-		rlRun "ipa netgroup-remove-member --netgroups=$ngc $ng" 0 "Remove netgroupb from netgroup $ng"
-		rlRun "ipa netgroup-remove-member --users=$ub $ng" 0 "Remove user from netgroup $ng"
-	rlPhaseEnd
-
-	rlPhaseStartTest "ipa-netgroup-050-33: Positive not-in-netgroup hostgroup test."
-		rlRun "ipa hostgroup-find --not-in-netgroups=$ng | grep $hgrpb" 0 "Make sure that a hostgroup is returned in a search that it should be in"
-	rlPhaseEnd
-
-	rlPhaseStartTest "ipa-netgroup-050-34: Positive not-in-netgroup host test."
-		rlRun "ipa host-find --not-in-netgroups=$ng | grep $hostb" 0 "Make sure that a host is returned in a search that it should be in"
-	rlPhaseEnd
-
-	rlPhaseStartTest "ipa-netgroup-050-35: Positive not-in-netgroup group test."
-		rlRun "ipa group-find --not-in-netgroups=$ng | grep $grpb" 0 "Make sure that a group is returned in a search that it should be in"
-	rlPhaseEnd
-
-	rlPhaseStartTest "ipa-netgroup-050-36: Positive not-in-netgroup netgroup test."
-		rlRun "ipa netgroup-find --not-in-netgroups=$ng | grep $ngc" 0 "Make sure that a netgroup is returned in a search that it should be in"
-	rlPhaseEnd
-
-	rlPhaseStartTest "ipa-netgroup-050-37: Positive not-in-netgroup user test."
-		rlRun "ipa user-find --not-in-netgroups=$ng | grep $ub" 0 "Make sure that a user is returned in a search that it should be in"
-	rlPhaseEnd
-
 	rlPhaseStartTest "netgroup_find_positive_028: Cleanup after find positive testing"
 		rlRun "ipa netgroup-del tngname1"
 		rlRun "ipa netgroup-del tngname2"
@@ -1440,6 +1353,104 @@ netgroup_find_positive()
 		rlRun "ipa group-del tnggroup2"
 		rlRun "ipa user-del tnguser1"
 		rlRun "ipa user-del tnguser2"
+	rlPhaseEnd
+
+
+}
+
+netgroup_find_positive_other()
+{
+	ng=netgpa
+	ngb=netgpb
+	ngc=netgpc
+	ua=useruu
+	ub=userub
+	grpa=ngroupt
+	grpb=ngroupb
+	hosta=thosta
+	hostb=thostb
+	hgrpa=hostga
+	hgrpb=hostgb
+	tmpout=/dev/shm/netgroup-tempout.txt
+
+	rlPhaseStartTest "ipa_netgroup_find_positive_other_01: Positive in-netgroup find user test."
+		rlRun "ipa netgroup-add --desc=desc1 $ng" 0 "add netgroup for testing --in-netgroup with"
+		rlRun "ipa user-add --first=ufirst --last=ulast $ua" 0 "adding user to test --in-netgroup with"
+		rlRun "ipa user-add --first=ufirst --last=ulast $ub" 0 "adding user to test --in-netgroup with"
+		rlRun "ipa netgroup-add-member --users=$ua,$ub $ng" 0 "adding user to netgroup $ng"
+		rlRun "ipa user-find --in-netgroups=$ng > $tmpout 2>&1" 0
+		rlAssertGrep "User login: $ua" $tmpout
+		rlAssertGrep "User login: $ub" $tmpout
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa_netgroup_find_positive_other_02: Positive in-netgroup find netgroup test."
+		rlRun "ipa netgroup-add --desc=desc1 $ngb" 0 "add alternate netgroup for testing --in-netgroup with"
+		rlRun "ipa netgroup-add --desc=desc1 $ngc" 0 "add alternate netgroup for testing --in-netgroup with"
+		rlRun "ipa netgroup-add-member --netgroups=$ngb,$ngc $ng" 0 "adding netgroup to netgroup $ng"
+		rlRun "ipa netgroup-find --in-netgroups=$ng > $tmpout 2>&1" 0
+		rlAssertGrep "Netgroup name: $ngb" $tmpout
+		rlAssertGrep "Netgroup name: $ngc" $tmpout
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa_netgroup_find_positive_other_03: Positive in-netgroup find group test."
+		rlRun "ipa group-add --desc=desc1 $grpa" 0 "add group for testing --in-netgroup with"
+		rlRun "ipa group-add --desc=desc1 $grpb" 0 "add group for testing --in-netgroup with"
+		rlRun "ipa netgroup-add-member --groups=$grpa,$grpb $ng" 0 "adding groups to netgroup $ng"
+		rlRun "ipa group-find --in-netgroups=$ng > $tmpout 2>&1" 0
+		rlAssertGrep "Group name: $grpa" $tmpout
+		rlAssertGrep "Group name: $grpb" $tmpout
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa_netgroup_find_positive_other_04: Positive in-netgroup find host test."
+		# add hosts for testing
+		ipa host-add --ip-address=4.2.2.2 $hosta.$DOMAIN
+		ipa host-add --ip-address=4.2.2.2 $hostb.$DOMAIN
+		rlRun "ipa netgroup-add-member --hosts=$hosta.$DOMAIN,$hostb.$DOMAIN $ng" 0 "adding hosts to netgroup $ng"
+		rlRun "ipa host-find --in-netgroups=$ng > $tmpout 2>&1" 0
+		rlAssertGrep "Host name: $hosta.$DOMAIN" $tmpout
+		rlAssertGrep "Host name: $hostb.$DOMAIN" $tmpout
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa_netgroup_find_positive_other_05: Positive in-netgroup findhostgroup test."
+		rlRun "ipa hostgroup-add --desc=desc1 $hgrpa" 0 "add group for testing --in-netgroup with"
+		rlRun "ipa hostgroup-add --desc=desc1 $hgrpb" 0 "add group for testing --in-netgroup with"
+		rlRun "ipa netgroup-add-member --hostgroups=$hgrpa,$hgrpb $ng" 0 "adding hostgroups to netgroup $ng"
+		rlRun "ipa hostgroup-find --in-netgroups=$ng > $tmpout 2>&1" 0
+		rlAssertGrep "Host-group: $hgrpa" $tmpout
+		rlAssertGrep "Host-group: $hgrpb" $tmpout
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa_netgroup_find_positive_other_06-prep: Remove some things from the hostgroup tp get ready for the next tests"
+		rlRun "ipa netgroup-remove-member --hostgroups=$hgrpb $ng" 0 "Remove hostgroupb from netgroup $ng"
+		rlRun "ipa netgroup-remove-member --hosts=$hostb.$DOMAIN $ng" 0 "Remove hostb from netgroup $ng"
+		rlRun "ipa netgroup-remove-member --groups=$grpb $ng" 0 "Remove groupb from netgroup $ng"
+		rlRun "ipa netgroup-remove-member --netgroups=$ngc $ng" 0 "Remove netgroupb from netgroup $ng"
+		rlRun "ipa netgroup-remove-member --users=$ub $ng" 0 "Remove user from netgroup $ng"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa_netgroup_find_positive_other_06: Positive not-in-netgroup hostgroup test."
+		rlRun "ipa hostgroup-find --not-in-netgroups=$ng | grep $hgrpb" 0 "Make sure that a hostgroup is returned in a search that it should be in"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa_netgroup_find_positive_other_07: Positive not-in-netgroup host test."
+		rlRun "ipa host-find --not-in-netgroups=$ng | grep $hostb" 0 "Make sure that a host is returned in a search that it should be in"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa_netgroup_find_positive_other_08: Positive not-in-netgroup group test."
+		rlRun "ipa group-find --not-in-netgroups=$ng | grep $grpb" 0 "Make sure that a group is returned in a search that it should be in"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa_netgroup_find_positive_other_09: Positive not-in-netgroup netgroup test."
+		rlRun "ipa netgroup-find --not-in-netgroups=$ng | grep $ngc" 0 "Make sure that a netgroup is returned in a search that it should be in"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa_netgroup_find_positive_other_10: Positive not-in-netgroup user test."
+		rlRun "ipa user-find --not-in-netgroups=$ng | grep $ub" 0 "Make sure that a user is returned in a search that it should be in"
+	rlPhaseEnd
+
+	netgroup_find_pkey      
+
+	rlPhaseStartTest "ipa_netgroup_find_positive_other_cleanup: Cleanup after find positive testing"
 		# Reset the netgroups state for the upcoming Negative tests
 		rlRun "ipa netgroup-add-member --hostgroups=$hgrpb $ng" 
 		rlRun "ipa netgroup-add-member --hosts=$hostb.$DOMAIN $ng" 
@@ -1447,8 +1458,6 @@ netgroup_find_positive()
 		rlRun "ipa netgroup-add-member --netgroups=$ngc $ng" 
 		rlRun "ipa netgroup-add-member --users=$ub $ng" 
 	rlPhaseEnd
-
-
 }
 
 netgroup_find_negative()
@@ -1697,7 +1706,10 @@ netgroup_find_negative()
 			rlPass "BZ 798792 not found."
 		fi
 	rlPhaseEnd
+}
 
+netgroup_find_negative_other()
+{
 	ng=netgpa
 	ngb=netgpb
 	ngc=netgpc
@@ -1710,63 +1722,64 @@ netgroup_find_negative()
 	hgrpa=hostga
 	hgrpb=hostgb
 
-	rlPhaseStartTest "ipa-netgroup-051-37: Negative in-netgroup hostgroup test."
+	rlPhaseStartTest "ipa_netgroup_find_negative_other_01: Negative in-netgroup hostgroup test."
 		rlRun "ipa netgroup-remove-member --hostgroups=$hgrpb $ng" 0 "Remove hostgroupb from netgroup $ng"
 		rlRun "ipa hostgroup-find --in-netgroups=$ng | grep $hgrpb" 1 "Make sure that a hostgroup is not returned in a search that it should not be in"
 	rlPhaseEnd
 
-	rlPhaseStartTest "ipa-netgroup-051-38: Negative in-netgroup host test."
+	rlPhaseStartTest "ipa_netgroup_find_negative_other_02: Negative in-netgroup host test."
 		rlRun "ipa netgroup-remove-member --hosts=$hostb.$DOMAIN $ng" 0 "Remove hostb from netgroup $ng"
 		rlRun "ipa host-find --in-netgroups=$ng | grep $hostb" 1 "Make sure that a host is not returned in a search that it should not be in"
 	rlPhaseEnd
 
-	rlPhaseStartTest "ipa-netgroup-051-39: Negative in-netgroup group test."
+	rlPhaseStartTest "ipa_netgroup_find_negative_other_03: Negative in-netgroup group test."
 		rlRun "ipa netgroup-remove-member --groups=$grpb $ng" 0 "Remove groupb from netgroup $ng"
 		rlRun "ipa group-find --in-netgroups=$ng | grep $grpb" 1 "Make sure that a group is not returned in a search that it should not be in"
 	rlPhaseEnd
 
-	rlPhaseStartTest "ipa-netgroup-051-40: Negative in-netgroup netgroup test."
+	rlPhaseStartTest "ipa_netgroup_find_negative_other_04: Negative in-netgroup netgroup test."
 		rlRun "ipa netgroup-remove-member --netgroups=$ngc $ng" 0 "Remove netgroupb from netgroup $ng"
 		rlRun "ipa netgroup-find --in-netgroups=$ng | grep $ngc" 1 "Make sure that a netgroup is not returned in a search that it should not be in"
 	rlPhaseEnd
 
-	rlPhaseStartTest "ipa-netgroup-051-41: Negative in-netgroup user test."
+	rlPhaseStartTest "ipa_netgroup_find_negative_other_05: Negative in-netgroup user test."
 		rlRun "ipa netgroup-remove-member --users=$ub $ng" 0 "Remove user from netgroup $ng"
 		rlRun "ipa user-find --in-netgroups=$ng | grep $ub" 1 "Make sure that a user is not returned in a search that it should not be in"
 	rlPhaseEnd
 
-	rlPhaseStartTest "ipa-netgroup-051-42: Negative not-in-netgroup hostgroup test."
+	rlPhaseStartTest "ipa_netgroup_find_negative_other_06: Negative not-in-netgroup hostgroup test."
 		rlRun "ipa hostgroup-find --not-in-netgroups=$ng | grep $hgrpa" 1 "Make sure that a hostgroup is not returned in a search that it should not be in"
 	rlPhaseEnd
 
-	rlPhaseStartTest "ipa-netgroup-051-43: Negative not-in-netgroup host test."
+	rlPhaseStartTest "ipa_netgroup_find_negative_other_07: Negative not-in-netgroup host test."
 		rlRun "ipa host-find --not-in-netgroups=$ng | grep $hosta" 1 "Make sure that a host is not returned in a search that it should not be in"
 	rlPhaseEnd
 
-	rlPhaseStartTest "ipa-netgroup-051-44: Negative not-in-netgroup group test."
+	rlPhaseStartTest "ipa_netgroup_find_negative_other_08: Negative not-in-netgroup group test."
 		rlRun "ipa group-find --not-in-netgroups=$ng | grep $grpa" 1 "Make sure that a group is not returned in a search that it should not be in"
 	rlPhaseEnd
 
-	rlPhaseStartTest "ipa-netgroup-051-45: Negative not-in-netgroup netgroup test."
-		rlRun "ipa netgroup-find --not-in-netgroups=$ng | grep \"Netgroup name: $ngc\"" 1 "Make sure that a netgroup is not returned in a search that it should not be in"
+	rlPhaseStartTest "ipa_netgroup_find_negative_other_09: Negative not-in-netgroup netgroup test."
+		rlRun "ipa netgroup-find --not-in-netgroups=$ng | grep \"Netgroup name: $ngb\"" 1 "Make sure that a netgroup is not returned in a search that it should not be in"
 	rlPhaseEnd
 
-	rlPhaseStartTest "ipa-netgroup-051-46: Negative not-in-netgroup user test."
+	rlPhaseStartTest "ipa_netgroup_find_negative_other_10: Negative not-in-netgroup user test."
 		rlRun "ipa user-find --not-in-netgroups=$ng | grep $ua" 1 "Make sure that a user is not returned in a search that it should not be in"
 	rlPhaseEnd
 
-	# Cleanup for tests ipa-netgroup-051-37 to ipa-netgroup-051-46
-	ipa hostgroup-del $hgrpa
-	ipa hostgroup-del $hgrpb
-	ipa host-del $hosta
-	ipa host-del $hostb
-	ipa group-del $grpa
-	ipa group-del $grpb
-	ipa user-del $ua	
-	ipa user-del $ub	
-	ipa netgroup-del $ng
-	ipa netgroup-del $ngb
-	ipa netgroup-del $ngc
+	rlPhaseStartTest "ipa_netgroup_find_negative_other_cleanup: Cleanup for negative and positive find other tests."
+		ipa hostgroup-del $hgrpa
+		ipa hostgroup-del $hgrpb
+		ipa host-del $hosta
+		ipa host-del $hostb
+		ipa group-del $grpa
+		ipa group-del $grpb
+		ipa user-del $ua	
+		ipa user-del $ub	
+		ipa netgroup-del $ng
+		ipa netgroup-del $ngb
+		ipa netgroup-del $ngc
+	rlPhaseEnd
 }
 
 netgroup_find_pkey()
