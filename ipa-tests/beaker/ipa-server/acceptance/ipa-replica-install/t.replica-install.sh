@@ -516,16 +516,19 @@ uninstall()
 	rlRun "remoteExec root $MASTERIP redhat \"echo $ADMINPW | kinit admin; klist\""
 	rlRun "remoteExec root $MASTERIP \"ipa-replica-manage del $SLAVE\" yes"
 	rlRun "egrep \"Deleted replication agreement from '$MASTER' to '$SLAVE'\" /tmp/remote_exec.out"
-	rlRun "cat /tmp/remote_exec.out"
+	cat /tmp/remote_exec.out
 
 	rlRun "remoteExec root $MASTERIP redhat \"ipa-replica-manage del $SLAVE\"" 
 	rlRun "egrep \"'$MASTER' has no replication agreement for '$SLAVE'\" /tmp/remote_exec.out"
-	rlRun "cat /tmp/remote_exec.out"
+	cat /tmp/remote_exec.out
 
 	rlLog "verifies bug https://bugzilla.redhat.com/show_bug.cgi?id=750524"
 	rlRun "remoteExec root $MASTERIP redhat \"ipa-csreplica-manage del $SLAVE -p $ADMINPW\""
+	rlRun "egrep \"Deleted replication agreement from '$MASTER' to '$SLAVE.com' /tmp/remote_exec.out"
+	cat /tmp/remote_exec.out
+	rlRun "remoteExec root $MASTERIP redhat \"ipa-csreplica-manage del $SLAVE -p $ADMINPW\""
 	rlRun "egrep \"'$MASTER' has no replication agreement for '$SLAVE'\" /tmp/remote_exec.out"
-	rlRun "cat /tmp/remote_exec.out"
+	cat /tmp/remote_exec.out
 
 	sleep 10
 
