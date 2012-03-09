@@ -1258,6 +1258,15 @@ rlPhaseStartTest "ipa-host-cli-38: find more hosts than exist"
 
     rlPhaseStartTest "ipa-host-cli-84: Negative test of search of hosts not in a sudorule"
 	rlRun "ipa host-find --not-in-sudorule=$sru | grep $myhost1" 1 "ensuring that host myhost1 is notreturned when searching for hosts not in a given sudorule"
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-host-cli-85: Positive test of search of host after it has been removed from the sudorule"
+	rlRun "ipa sudorule-remove-host --hosts=$myhost1 $sru" 0 "Remove $myhost1 from sudorule $sru"
+	rlRun "ipa host-find --not-in-sudorule=$sru | grep $myhost1" 0 "ensure that $myhost1 comes back from a search excluding sudorule $sru"
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-host-cli-86: Negative test of search of host after it has been removed from the sudorule"
+	rlRun "ipa host-find --in-sudorule=$sru | grep $myhost1" 1 "ensure that $myhost1 does not come back from a search in sudorule $sru"
         deleteHost $myhost1
         deleteHost $myhost2
 	rlRun "ipa sudorule-del $sru" 0 "cleaning up the sudorule used in these tests"
