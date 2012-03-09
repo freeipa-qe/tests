@@ -1239,8 +1239,28 @@ rlPhaseStartTest "ipa-host-cli-38: find more hosts than exist"
     rlPhaseStartTest "ipa-host-cli-80: Negative host-find test using --not-in-hbacrules"
 	rlRun "ipa host-find --not-in-hbacrules=$hb | grep $myhost1" 1 "making sure host1 is not returned when searching hosts using --not-in-hbacrules"
 	rlRun "ipa hbacrule-del $hb" 0 "Deleting hbac rule use in previous tests"
+    rlPhaseEnd
+
+    sru=sruleta
+    rlPhaseStartTest "ipa-host-cli-81: Positive test of search of hosts in a sudorules"
+	rlRun "ipa sudorule-add $sru" 0 "Adding sudorule to test with"
+	rlRun "ipa sudorule-add-host --hosts=$myhost1 $sru" 0 "adding host myhost1 to sudorule sru"
+	rlRun "ipa host-find --in-sudorule=$sru | grep $myhost1" 0 "ensuring that host myhost1 is returned when searching for hosts in a given sudorule"
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-host-cli-82: Negative test of search of hosts in a sudorule"
+	rlRun "ipa host-find --in-sudorule=$sru | grep $myhost2" 1 "ensuring that host myhost2 is notreturned when searching for hosts in a given sudorule"
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-host-cli-83: Positive test of search of hosts not in a sudorule"
+	rlRun "ipa host-find --not-in-sudorule=$sru | grep $myhost2" 0 "ensuring that host mtyhost2 is returned when searching for hosts not in a given sudorule"
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-host-cli-84: Negative test of search of hosts not in a sudorule"
+	rlRun "ipa host-find --not-in-sudorule=$sru | grep $myhost1" 1 "ensuring that host myhost1 is notreturned when searching for hosts not in a given sudorule"
         deleteHost $myhost1
         deleteHost $myhost2
+	rlRun "ipa sudorule-del $sru" 0 "cleaning up the sudorule used in these tests"
     rlPhaseEnd
 
     rlPhaseStartCleanup "ipa-host-cli-cleanup: Destroying admin credentials."
