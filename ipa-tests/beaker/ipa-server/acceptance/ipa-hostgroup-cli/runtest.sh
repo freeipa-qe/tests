@@ -446,8 +446,37 @@ rlJournalStart
     rlPhaseStartTest "ipa-hostgroup-cli-45: Negative host-find test using --not-in-hbacrules"
 	rlRun "ipa host-find --not-in-hbacrules=$hb | grep $group1" 1 "making sure group1 is not returned when searching hostgroups using --not-in-hbacrules"
 	rlRun "ipa hbacrule-del $hb" 0 "Deleting hbac rule use in previous tests"
+    rlPhaseEnd
+
+    sru=sruleta
+    rlPhaseStartTest "ipa-hostgroup-cli-46: Positive test of search of hostgroup in a sudorules"
+	rlRun "ipa sudorule-add $sru" 0 "Adding sudorule to test with"
+	rlRun "ipa sudorule-add-host --hostgroups=$group1 $sru" 0 "adding testtype $group1 to sudorule sru"
+	rlRun "ipa hostgroup-find --in-sudorule=$sru | grep $group1" 0 "ensuring that hostgroup $group1 is returned when searching for hostgroup in a given sudorule"
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-hostgroup-cli-47: Negative test of search of hostgroup in a sudorule"
+	rlRun "ipa hostgroup-find --in-sudorule=$sru | grep $group2" 1 "ensuring that hostgroup $group2 is notreturned when searching for hostgroup in a given sudorule"
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-hostgroup-cli-48: Positive test of search of hostgroup not in a sudorule"
+	rlRun "ipa hostgroup-find --not-in-sudorule=$sru | grep $group2" 0 "ensuring that hostgroup $group2 is returned when searching for hostgroup not in a given sudorule"
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-hostgroup-cli-49: Negative test of search of hostgroup not in a sudorule"
+	rlRun "ipa hostgroup-find --not-in-sudorule=$sru | grep $group1" 1 "ensuring that hostgroup $group1 is notreturned when searching for hostgroup not in a given sudorule"
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-hostgroup-cli-50: Positive test of search of hostgroup after it has been removed from the sudorule"
+	rlRun "ipa sudorule-remove-host --hostgroups=$group1 $sru" 0 "Remove $group1 from sudorule $sru"
+	rlRun "ipa hostgroup-find --not-in-sudorule=$sru | grep $group1" 0 "ensure that $group1 comes back from a search excluding sudorule $sru"
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-hostgroup-cli-51: Negative test of search of hostgroup after it has been removed from the sudorule"
+	rlRun "ipa hostgroup-find --in-sudorule=$sru | grep $group1" 1 "ensure that $group1 does not come back from a search in sudorule $sru"
 	ipa hostgroup-del $group1
 	ipa hostgroup-del $group2
+	rlRun "ipa sudorule-del $sru" 0 "cleaning up the sudorule used in these tests"
     rlPhaseEnd
 
     rlPhaseStartCleanup "ipa-hostgroup-cli-cleanup: Delete remaining hosts and Destroying admin credentials"
