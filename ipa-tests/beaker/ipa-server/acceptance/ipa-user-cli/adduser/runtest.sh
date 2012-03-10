@@ -528,9 +528,18 @@ rlJournalStart
 
     rlPhaseStart "ipa-user-add-049: Negative test of search of users not in a sudorule"
 	rlRun "ipa user-find --not-in-sudorule=$sru | grep $ua" 1 "ensuring that user ua is notreturned when searching for users not in a given sudorule"
-	rlRun "ipa sudorule-del $sru" 0 "Removing sudorule that we tested with."
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-user-add-050: Positive test of search of user after it has been removed from the sudorule"
+	rlRun "ipa sudorule-remove-user --users=$ua $sru" 0 "Remove ua from sudorule $sru"
+	rlRun "ipa user-find --not-in-sudorule=$sru | grep $ua" 0 "ensure that $ua comes back from a search excluding sudorule $sru"
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-user-add-051: Negative test of search of user after it has been removed from the sudorule"
+	rlRun "ipa user-find --in-sudorule=$sru | grep $ua" 1 "ensure that ua does not come back from a search in sudorule $sru"
 	ipa user-del $ua
 	ipa user-del $ub
+	rlRun "ipa sudorule-del $sru" 0 "cleaning up the sudorule used in these tests"
     rlPhaseEnd
 
     rlPhaseStartCleanup "ipa-user-cli-add-cleanup"
