@@ -72,12 +72,10 @@ rlPhaseStartTest "ipa-host-cli-81: Add host with IPv6 address DNS Record --no-re
         rlLog "IPv6 address = $ipv6addr"
         ipv6_addr=$oct1":"$oct2":"$oct3":"$oct4":"$new_oct5":"$oct6":"$oct7":"$oct8
         rlLog "New IPv6 address = $ipv6_addr"
-        export ipv6_addr
         rlLog "ipa host-add --ip-address=$ipv6_addr --no-reverse $myhost" 
         rlRun "ipa host-add --ip-address=$ipv6_addr --no-reverse $myhost" 0 "Adding host with IPv6 Address $ipv6_addr and no reverse entry"
         rlRun "findHost $myhost" 0 "Verifying host was added with IPv6 Address."
         rlRun "ipa dnsrecord-find $DOMAIN $short" 0 "Checking for forward DNS entry"
-        #rlRun "ipa dnsrecord-find $rzone 99" 1 "Checking for reverse DNS entry"
         rlRun "ipa host-del --updatedns $myhost" 0 "cleanup - delete $myhost"
     rlPhaseEnd
 
@@ -120,8 +118,6 @@ rlPhaseStartTest "ipa-host-cli-81: Add host with IPv6 address DNS Record --no-re
         else
                 rlFail "Reverse DNS zone not found."
         fi
-       # rlRun "ipa host-del --updatedns $myhost" 0 "cleanup - delete $myhost"
-       # rlRun "ipa dnszone-del $rzone_IPv6" 0 "cleanup - delete dnszone"
     rlPhaseEnd
 
    rlPhaseStartTest "ipa-host-cli-83: Delete host without deleting DNS Record"
