@@ -1402,8 +1402,9 @@ netgroup_find_positive_other()
 
 	rlPhaseStartTest "ipa_netgroup_find_positive_other_04: Positive in-netgroup find host test."
 		# add hosts for testing
-		ipa host-add --ip-address=4.2.2.2 $hosta.$DOMAIN
-		ipa host-add --ip-address=4.2.2.2 $hostb.$DOMAIN
+		ipa dnszone-add 2.2.4.in-addr.arpa. --name-server=$MASTER --admin-email=ipaqar.redhat.com
+		ipa host-add --force --ip-address=4.2.2.2 $hosta.$DOMAIN
+		ipa host-add --force --ip-address=4.2.2.3 $hostb.$DOMAIN
 		rlRun "ipa netgroup-add-member --hosts=$hosta.$DOMAIN,$hostb.$DOMAIN $ng" 0 "adding hosts to netgroup $ng"
 		rlRun "ipa host-find --in-netgroups=$ng > $tmpout 2>&1" 0
 		rlAssertGrep "Host name: $hosta.$DOMAIN" $tmpout
@@ -1790,6 +1791,7 @@ netgroup_find_negative_other()
 		ipa hostgroup-del $hgrpb
 		ipa host-del $hosta
 		ipa host-del $hostb
+		ipa dnszone-del 2.2.4.in-addr.arpa.
 		ipa group-del $grpa
 		ipa group-del $grpb
 		ipa user-del $ua	
