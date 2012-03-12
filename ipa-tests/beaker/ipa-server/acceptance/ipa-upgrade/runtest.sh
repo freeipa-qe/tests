@@ -32,6 +32,7 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 # Include data-driven test data file:
+. ./ipa-upgrade.data
 
 # Include rhts environment
 . /usr/bin/rhts-environment.sh
@@ -51,7 +52,7 @@ satrtEpoch=`date "+%s"`
 [ -n "$SLAVE" ]  && export SLAVE_IP=$(dig +short $SLAVE)
 [ -n "$CLIENT" ] && export CLIENT_IP=$(dig +short $CLIENT)
 
-case $HOSTNAME in
+case $(hostname) in
 "$MASTER")  MYROLE="MASTER"    ;;
 "$SLAVE")   MYROLE="SLAVE"     ;;
 "$CLIENT")  MYROLE="CLIENT"    ;;
@@ -68,9 +69,10 @@ rlJournalStart
         rlRun "pushd $TmpDir"
     rlPhaseEnd
 	
-	load_test_data
+	upgrade_data_add
 	upgrade_master
-	check_test_data
+	upgrade_data_check
+	upgrade_data_del
 
 	#upgrade_slave
 	#upgrade_client

@@ -2,7 +2,7 @@
 # vim: dict=/usr/share/beakerlib/dictionary.vim cpt=.,w,b,u,t,i,k
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-#   t.load_test_data.sh of /CoreOS/ipa-tests/acceptance/ipa-upgrade
+#   t.upgrade_data_del.sh of /CoreOS/ipa-tests/acceptance/ipa-upgrade
 #   Description: IPA Upgade pre-load test data script
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # The following needs to be tested:
@@ -57,60 +57,54 @@
 ### manually or in runtest.sh
 ######################################################################
 
-# Users
-user[1]=jack
-user[2]=jill
-passwd[1]=passw0rd1
-passwd[2]=passw0rd2
-
-# Groups
-group[1]=managers
-group[2]=managers
-
-# DNS
-dnsptr[1]=2.2.4.in-addr.arpa.
-dnsptr[2]=2.3.4.in-addr.arpa.
-
-# Hosts
-host[1]=web.$DOMAIN
-host[2]=ftp.$DOMAIN
-ipv4[1]=4.2.2.100
-ipv4[2]=4.3.2.101
-
-
 ######################################################################
 # test suite
 ######################################################################
-load_test_data()
+upgrade_data_del()
 {
-	rlPhaseStartTest "load_test_data: add test data to IPA"
+	TESTORDER=$(( TESTORDER += 1 ))
+	rlPhaseStartTest "upgrade_data_del: delete the test data to cleanup"
 	case "$MYROLE" in
 	"MASTER")
 		rlLog "Machine in recipe is MASTER"
 		KinitAsAdmin
 		
-		# Add users
-		rlRun "echo ${passwd[1]}|ipa user-add ${user[1]} --first=First --last=Last --password"
-		rlRun "echo ${passwd[2]}|ipa user-add ${user[2]} --first=First --last=Last --password"
+		# delete  automount
+		rlRun "ipa automountlocation-del testloc"
 
-		# Add groups
-		rlRun "ipa group-add ${group[1]} --desc=GROUP_${group[1]}"
-		rlRun "ipa group-add ${group[2]} --desc=GROUP_${group[2]}"
+		# delete  netgroups
+		rlRun "ipa netgroup-del ${netgroup[1]}"
+		rlRun "ipa netgroup-del ${netgroup[2]}"
+		
+		# check  hostgroups
+		rlRun "ipa hostgroup-del ${hostgroup[1]}"
+		rlRun "ipa hostgroup-del ${hostgroup[2]}"
 
-		# Add DNS Records (PTR)
-		rlRun "ipa dnszone-add ${dnsptr[1]} --name-server=${MASTER} --admin-email=ipaqar.redhat.com"
-		rlRun "ipa dnszone-add ${dnsptr[2]} --name-server=${MASTER} --admin-email=ipaqar.redhat.com"
+		# check  hosts
+		rlRun "ipa host-del ${host[1]} --updatedns"
+		rlRun "ipa host-del ${host[2]} --updatedns"
 
-		# Add hosts
-		rlRun "ipa host-add ${host[1]} --ip-address=${ipv4[1]}"
-		rlRun "ipa host-add ${host[2]} --ip-address=${ipv4[2]}"
+		# check  DNS Records (PTR)
+		rlRun "ipa dnszone-del ${dnsptr[1]}"
+		rlRun "ipa dnszone-del ${dnsptr[2]}"
 
+		# check  groups
+		rlRun "ipa group-del ${group[1]}"
+		rlRun "ipa group-del ${group[2]}"
+
+		# check  users
+		rlRun "ipa user-del ${user[1]}" 
+		rlRun "ipa user-del ${user[2]}" 
+
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $MASTER_IP"
 		;;
 	"SLAVE")
 		rlLog "Machine in recipe is SLAVE"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER_IP"
 		;;
 	"CLIENT")
 		rlLog "Machine in recipe is CLIENT"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER_IP"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"

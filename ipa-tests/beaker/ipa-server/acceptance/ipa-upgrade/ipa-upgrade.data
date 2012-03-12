@@ -1,0 +1,38 @@
+# Users
+export user[1]=jack
+export user[2]=jill
+export passwd[1]=passw0rd1
+export passwd[2]=passw0rd2
+
+# Groups
+export group[1]=managers
+export group[2]=engineers
+
+# DNS
+export dnsptr[1]=2.2.4.in-addr.arpa.
+export dnsptr[2]=2.3.4.in-addr.arpa.
+
+# Hosts
+export host[1]=web.$DOMAIN
+export host[2]=ftp.$DOMAIN
+export ipv4[1]=4.2.2.100
+export ipv4[2]=4.3.2.101
+
+# Hostgroups
+export hostgroup[1]=devhostgroup
+export hostgroup[2]=enghostgroup
+
+# Netgroups
+export netgroup[1]=devnetgroup
+export netgroup[2]=engnetgroup
+
+# Automount
+export automountmap[1]=auto.master
+export automountmap[2]=auto.home
+export automountmap[3]=auto.app
+export automountkey[1]='/home auto.home'
+export automountkey[2]='* $MASTER:/home/&'
+export automountkey[3]='
+app1 $MASTER:/opt/app1
+app2 $MASTER:/opt/app2
+'
