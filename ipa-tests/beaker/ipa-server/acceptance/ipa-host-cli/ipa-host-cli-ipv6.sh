@@ -94,21 +94,17 @@ rlPhaseStartTest "ipa-host-cli-81: Add host with IPv6 address DNS Record --no-re
                 rlRun "ipa dnsrecord-find $DOMAIN $short" 0 "Checking for forward DNS entry"
                 recordname_ipv6=""
                 for item in $oct8 $oct7 $oct6 $new_oct5 ; do
-                        for (( i=4; $i >= 1; i-- ))
+			while [ ${#item} -lt 4 ]
                         do
-				while [ ${#item} -lt 4 ]
-                        	do
                                 	item="0"$item
-                        	done
-                                digit=`echo $item | cut -c $i`
-                                recordname_ipv6=$recordname_ipv6$digit
-                                if [ "$item" == "$new_oct5" ] && [ "$i" -eq 1 ] ; then
+                       	done
+                        digit=`echo $item | cut -c $i`
+                        recordname_ipv6=$recordname_ipv6$digit
+                        if [ "$item" == "$new_oct5" ] && [ "$i" -eq 1 ] ; then
                                         rlLog "Final digit."
-                                else
+                        else
                                         recordname_ipv6=$recordname_ipv6"."
-                                fi
-                        done
-
+                        fi
                 done
                 rlLog "ipa dnsrecord-find $rzone_IPv6 $recordname_ipv6"
                 rlRun "ipa dnsrecord-find $rzone_IPv6 $recordname_ipv6" 0 "Checking for reverse DNS entry"
@@ -128,20 +124,17 @@ rlPhaseStartTest "ipa-host-cli-81: Add host with IPv6 address DNS Record --no-re
         rlRun "ipa dnsrecord-find $DOMAIN $short" 0 "Checking for forward DNS entry"
 	recordname_ipv6=""
         for item in $oct8 $oct7 $oct6 $new_oct5 ; do
-        	for (( i=4; $i >= 1; i-- ))
+		while [ ${#item} -lt 4 ]
                 do
-			while [ ${#item} -lt 4 ]
-                        do
-                               	item="0"$item
-                        done
-                        digit=`echo $item | cut -c $i`
-                        recordname_ipv6=$recordname_ipv6$digit
-                        if [ "$item" == "$new_oct5" ] && [ "$i" -eq 1 ] ; then
-                        	rlLog "Final digit."
-                        else
-                        	recordname_ipv6=$recordname_ipv6"."
-                        fi
+                       	item="0"$item
                 done
+                digit=`echo $item | cut -c $i`
+                recordname_ipv6=$recordname_ipv6$digit
+                if [ "$item" == "$new_oct5" ] && [ "$i" -eq 1 ] ; then
+                    	rlLog "Final digit."
+                else
+                     	recordname_ipv6=$recordname_ipv6"."
+                fi
          done
     	 rlRun "ipa dnsrecord-find $rzone_IPv6 $recordname_ipv6" 0 "Checking for reverse DNS entry"
     rlPhaseEnd
@@ -157,20 +150,17 @@ rlPhaseStartTest "ipa-host-cli-81: Add host with IPv6 address DNS Record --no-re
         rlRun "ipa dnsrecord-find $DOMAIN $short" 0 "Checking for forward DNS entry"
 	recordname_ipv6=""
         for item in $oct8 $oct7 $oct6 $new_oct5 ; do
-                for (( i=4; $i >= 1; i-- ))
+ 		while [ ${#item} -lt 4 ]
                 do
- 			while [ ${#item} -lt 4 ]
-                        do
-                                item="0"$item
-                        done
-                        digit=`echo $item | cut -c $i`
-                        recordname_ipv6=$recordname_ipv6$digit
-                        if [ "$item" == "$new_oct5" ] && [ "$i" -eq 1 ] ; then
-                                rlLog "Final digit."
-                        else
-                                recordname_ipv6=$recordname_ipv6"."
-                        fi
+                     item="0"$item
                 done
+                digit=`echo $item | cut -c $i`
+                recordname_ipv6=$recordname_ipv6$digit
+                if [ "$item" == "$new_oct5" ] && [ "$i" -eq 1 ] ; then
+                       rlLog "Final digit."
+                else
+                       recordname_ipv6=$recordname_ipv6"."
+                fi
         done
         rlRun "ipa dnsrecord-find $rzone_IPv6 $recordname_ipv6" 0 "Checking for reverse DNS entry"
     rlPhaseEnd
@@ -185,20 +175,17 @@ rlPhaseStartTest "ipa-host-cli-81: Add host with IPv6 address DNS Record --no-re
         rlRun "ipa dnsrecord-show $DOMAIN $ipv6_addr" 2 "Checking for forward DNS entry"
 	recordname_ipv6=""
         for item in $oct8 $oct7 $oct6 $new_oct5 ; do
-                for (( i=4; $i >= 1; i-- ))
-                do
-			while [ ${#item} -lt 4 ] 
-			do
-				item="0"$item
-			done
-                        digit=`echo $item | cut -c $i`
-                        recordname_ipv6=$recordname_ipv6$digit
-                        if [ "$item" == "$new_oct5" ] && [ "$i" -eq 1 ] ; then
-                                rlLog "Final digit."
-                        else
-                                recordname_ipv6=$recordname_ipv6"."
-                        fi
-                done
+		while [ ${#item} -lt 4 ] 
+		do
+			item="0"$item
+		done
+                digit=`echo $item | cut -c $i`
+                recordname_ipv6=$recordname_ipv6$digit
+                if [ "$item" == "$new_oct5" ] && [ "$i" -eq 1 ] ; then
+                        rlLog "Final digit."
+                else
+                        recordname_ipv6=$recordname_ipv6"."
+                fi
         done
         rlRun "ipa dnsrecord-show $rzone_IPv6 $recordname_ipv6" 2 "Checking for reverse DNS entry"
 	rlRun "ipa dnszone-del $rzone_IPv6" 0 "cleanup - delete dnszone"
