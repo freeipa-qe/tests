@@ -55,12 +55,13 @@ oct6=$(echo $ipv6addr | awk -F : '{print $6}')
 oct7=$(echo $ipv6addr | awk -F : '{print $7}')
 oct8=$(echo $ipv6addr | awk -F : '{print $8}')
 
-	
+########################################################################
+
     rlPhaseStartSetup "ipa-host-cli-startup: Kinit as admin user"
         rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
     rlPhaseEnd
 
-rlPhaseStartTest "ipa-host-cli-87: Add host with IPv6 address DNS Record --no-reverse"
+    rlPhaseStartTest "ipa-host-cli-87: Add host with IPv6 address DNS Record --no-reverse"
         short=mytestIPv6host
         myhost=$short.$DOMAIN
        	new_oct5="ffff"
