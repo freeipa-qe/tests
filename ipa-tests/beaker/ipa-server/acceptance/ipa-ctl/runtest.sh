@@ -495,42 +495,46 @@ rlPhaseStartTest "ipa-ctl-25: restart services as non-root user"
 		rlRun "ipactl status" 0 "check after instance restart"
         rlPhaseEnd
 
-        rlPhaseStartTest "ipa-ctl-28: verify bz785791 :: depricated KPASSWD service in ipactl output"
-		output="/tmp/services.out"
-		
-		ipactl status > $output
-		cat $output | grep "KPASSWD"
-		if [ $? -eq 0 ] ; then
-			rlFail "KPASSWD is still in output for ipactl status"
-		else
-			rlPass "KPASSWD no longer in output for ipactl status"
-		fi
-
-                ipactl stop > $output
-                cat $output | grep "KPASSWD"
-                if [ $? -eq 0 ] ; then
-                        rlFail "KPASSWD is still in output for ipactl stop"
-                else
-                        rlPass "KPASSWD no longer in output for ipactl stop"
-                fi
-
-                ipactl start > $output
-                cat $output | grep "KPASSWD"
-                if [ $? -eq 0 ] ; then
-                        rlFail "KPASSWD is still in output for ipactl start"
-                else
-                        rlPass "KPASSWD no longer in output for ipactl start"
-                fi
-
-                ipactl restart > $output
-                cat $output | grep "KPASSWD"
-                if [ $? -eq 0 ] ; then
-                        rlFail "KPASSWD is still in output for ipactl restart"
-                else
-                        rlPass "KPASSWD no longer in output for ipactl restart"
-                fi
-
-        rlPhaseEnd
+##############################################################################################################
+#  Disabling test development unwilling to remove KPASSWD from output
+###############################################################################################################
+#        rlPhaseStartTest "ipa-ctl-28: verify bz785791 :: depricated KPASSWD service in ipactl output"
+#
+#		output="/tmp/services.out"
+#		
+#		ipactl status > $output
+#		cat $output | grep "KPASSWD"
+#		if [ $? -eq 0 ] ; then
+#			rlFail "KPASSWD is still in output for ipactl status"
+#		else
+#			rlPass "KPASSWD no longer in output for ipactl status"
+#		fi
+#
+#                ipactl stop > $output
+#                cat $output | grep "KPASSWD"
+#                if [ $? -eq 0 ] ; then
+#                        rlFail "KPASSWD is still in output for ipactl stop"
+#                else
+#                        rlPass "KPASSWD no longer in output for ipactl stop"
+#                fi
+#
+#                ipactl start > $output
+#                cat $output | grep "KPASSWD"
+#                if [ $? -eq 0 ] ; then
+#                        rlFail "KPASSWD is still in output for ipactl start"
+#                else
+#                       rlPass "KPASSWD no longer in output for ipactl start"
+#                fi
+#
+#                ipactl restart > $output
+#                cat $output | grep "KPASSWD"
+#                if [ $? -eq 0 ] ; then
+#                        rlFail "KPASSWD is still in output for ipactl restart"
+#                else
+#                        rlPass "KPASSWD no longer in output for ipactl restart"
+#                fi
+#
+#        rlPhaseEnd
 
     rlPhaseStartCleanup "ipa-ctl cleanup"
 	rlRun "userdel -fr testuserqa" 0 "Remove test user"
