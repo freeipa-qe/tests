@@ -29,8 +29,13 @@ ipaconfig_bugzillas()
 {
 	# Testcase covering https://fedorahosted.org/freeipa/ticket/2159 - bugzilla 782974
 	rlPhaseStartTest "bz782974 Trace back with empty groupsearch config-mod"
-		ipa config-mod --groupsearch= &> /dev/shm/2159out.txt
-		rlRun "grep Traceback  /dev/shm/2159out.txt" 1 "Making sure that running a empty groupsearch did not return a exception"
+		ipa config-mod --groupsearch= > /tmp/bz782974.txt 2>&1
+		cat /tmp/bz782974.txt | grep "ipa: ERROR: an internal error has occurred"
+		if [ $? -eq 0 ] ; then
+			rlFail "https://bugzilla.redhat.com/show_bug.cgi?id=782974"
+		else
+			rlPass "Internal Error and tracebact bz782974 fixed."
+		fi
 	rlPhaseEnd
 
 	rlPhaseStartTest "bz742601 ipa config-mod: update description for --emaildomain"
