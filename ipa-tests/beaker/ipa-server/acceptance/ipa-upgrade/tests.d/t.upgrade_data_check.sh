@@ -124,4 +124,5 @@ upgrade_data_check()
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
 		;;
 	esac
+	rlPhaseEnd
 }

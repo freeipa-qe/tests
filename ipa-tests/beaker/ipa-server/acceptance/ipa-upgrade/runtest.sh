@@ -70,7 +70,7 @@ rlJournalStart
     rlPhaseEnd
 	
 	upgrade_data_add
-	upgrade_master
+	#upgrade_master
 	upgrade_data_check
 	upgrade_data_del
 
