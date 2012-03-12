@@ -2,15 +2,10 @@
 # vim: dict=/usr/share/beakerlib/dictionary.vim cpt=.,w,b,u,t,i,k
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-#   runtest.sh of /CoreOS/ipa-tests/acceptance/ipa-host-cli
+#   ipa-host-cli-ipv6.sh of /CoreOS/ipa-tests/acceptance/ipa-host-cli
 #   Description: IPA host CLI acceptance tests
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# The following ipa cli commands needs to be tested:
-#  host-add                  Add a new host.
-#  host-del                  Delete an existing host.
-#  host-find                 Search the hosts.
-#  host-mod                  Edit an existing host.
-#  host-show                 Examine an existing host.
+#  Tests to add hosts with IPv6 address
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
 #   Author: Asha Akkiangady <aakkiang@redhat.com>
@@ -65,7 +60,7 @@ oct8=$(echo $ipv6addr | awk -F : '{print $8}')
         rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
     rlPhaseEnd
 
-rlPhaseStartTest "ipa-host-cli-81: Add host with IPv6 address DNS Record --no-reverse"
+rlPhaseStartTest "ipa-host-cli-87: Add host with IPv6 address DNS Record --no-reverse"
         short=mytestIPv6host
         myhost=$short.$DOMAIN
        	new_oct5="ffff"
@@ -79,7 +74,7 @@ rlPhaseStartTest "ipa-host-cli-81: Add host with IPv6 address DNS Record --no-re
         rlRun "ipa host-del --updatedns $myhost" 0 "cleanup - delete $myhost"
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-host-cli-82: Add host with IPv6 address and DNS Record"
+    rlPhaseStartTest "ipa-host-cli-88: Add host with IPv6 address and DNS Record"
        short=mytestIPv6host
        myhost=$short.$DOMAIN
        new_oct5="ffff"
@@ -120,7 +115,7 @@ rlPhaseStartTest "ipa-host-cli-81: Add host with IPv6 address DNS Record --no-re
         fi
     rlPhaseEnd
 
-   rlPhaseStartTest "ipa-host-cli-83: Delete host without deleting DNS Record"
+   rlPhaseStartTest "ipa-host-cli-89: Delete host without deleting DNS Record"
         short=mytestIPv6host
         myhost=$short.$DOMAIN
         new_oct5="ffff"
@@ -147,7 +142,7 @@ rlPhaseStartTest "ipa-host-cli-81: Add host with IPv6 address DNS Record --no-re
     	 rlRun "ipa dnsrecord-find $rzone_IPv6 $recordname_ipv6" 0 "Checking for reverse DNS entry"
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-host-cli-84: Add host without force option - DNS Record Exists"
+    rlPhaseStartTest "ipa-host-cli-90: Add host without force option - DNS Record Exists"
         short=mytestIPv6host
         myhost=$short.$DOMAIN
         new_oct5="ffff"
@@ -176,7 +171,7 @@ rlPhaseStartTest "ipa-host-cli-81: Add host with IPv6 address DNS Record --no-re
         rlRun "ipa dnsrecord-find $rzone_IPv6 $recordname_ipv6" 0 "Checking for reverse DNS entry"
     rlPhaseEnd
  
-    rlPhaseStartTest "ipa-host-cli-85: Delete Host and Update DNS"
+    rlPhaseStartTest "ipa-host-cli-91: Delete Host and Update DNS"
         short=mytestIPv6host
         myhost=$short.$DOMAIN
 	rzone_IPv6=`getReverseZone_IPv6 $ipv6addr`
