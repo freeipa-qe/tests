@@ -1087,6 +1087,15 @@ rlJournalStart
 	rlRun "ipa group-find --not-in-sudorule=$sru | grep $ua" 1 "ensuring that group ua is notreturned when searching for groups not in a given sudorule"
     rlPhaseEnd
 
+    rlPhaseStartTest "ipa-group-add-104: Positive test of search of groups not in a sudorule"
+	rlRun "ipa sudorule-remove-user --groups=$ua $sru" 0 "removing group ua from sudorule sru"
+	rlRun "ipa group-find --not-in-sudorule=$sru | grep $ua" 0 "ensuring that group ub is returned when searching for groups not in a given sudorule"
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-group-add-105: Negative test of search of groups not in a sudorule after user is removed from group"
+	rlRun "ipa group-find --in-sudorule=$sru | grep $ua" 1 "ensuring that group ua is notreturned when searching for groups not in a given sudorule"
+    rlPhaseEnd
+
     rlPhaseStartCleanup "ipa-group-cli-cleanup: Delete remaining users and group and Destroying admin credentials"
 	rlRun "ipa config-mod --searchrecordslimit=100" 0 "setting search records limit back to default"
 	rlRun "ipa user-del trex" 0 "Deleting user trex."
@@ -1099,7 +1108,6 @@ rlJournalStart
 	ipa group-del uuu
 	ipa group-del tusera
 	ipa hbacrule-del $hb
-
         i=1
         while [ $i -le 10 ] ; do
                 deleteGroup Group$i
