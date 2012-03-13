@@ -76,7 +76,7 @@ rlLog "MASTER: $MASTER"
 PACKAGE="ipa-admintools"
 
 rlJournalStart
-    rlPhaseStartSetup "ipa-group-cli-startup: Check for admintools package and Kinit"
+    lPhaseStartSetup "ipa-group-cli-startup: Check for admintools package and Kinit"
         rpm -qa | grep $PACKAGE
         if [ $? -eq 0 ] ; then
                 rlPass "ipa-admintools package is installed"
@@ -1034,7 +1034,7 @@ rlJournalStart
 
     rlPhaseStartTest "ipa-group-cli-93: Positive Test of --in-groups in group-find"
 	ipa group-add-member --groups=uuu ggg
-	rlRun "ipa group-find --in-groups=ggg | grep Group\ name: | grep uuu" 0 "Making sure that group uuu comes back when searching --in-groups=ggg"
+	rlRun "ipa group-find --in-groups=ggg | grep uuu" 0 "Making sure that group uuu comes back when searching --in-groups=ggg"
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-group-cli-94: Negative Test of --not-in-groups in group-find"
@@ -1094,6 +1094,40 @@ rlJournalStart
 
     rlPhaseStartTest "ipa-group-add-105: Negative test of search of groups not in a sudorule after user is removed from group"
 	rlRun "ipa group-find --in-sudorule=$sru | grep $ua" 1 "ensuring that group ua is notreturned when searching for groups not in a given sudorule"
+    rlPhaseEnd
+
+    ua=trex
+    gb=$ub
+    ub=mdolphin
+    ga=ggg
+    rlPhaseStartTest "ipa-group-add-106: Positive search of group when filtering by user in group."
+	rlRun "ipa group-add-member --users=$ua $ga" 0 "adding user ua to group ga"
+	rlRun "ipa group-find --users=$ua | grep $ga" 0 "Positive search of group when filtering by user in group."
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-group-add-107: Negative search of group when filtering by user in group."
+	rlRun "ipa group-find --users=$ub | grep $ga" 1 "Negative search of group when filtering by user in group."
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-group-add-108: Positive search of group when filtering by user not in group."
+	rlRun "ipa group-find --no-users=$ua | grep $gb" 0 "Positive search of group when filtering by user not in group."
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-group-add-109: Negative search of group when filtering by user not in group."
+	rlRun "ipa group-find --no-users=$ua | grep 'Group name: $ga'" 1 "Negative search of group when filtering by user not in group."
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-group-add-110: Positive search of group when filtering by user in group for removed user."
+	rlRun "ipa group-remove-member --users=$ua $ga" 0 "removing user ua from group ga"
+	rlRun "ipa group-find --no-users=$ua | grep $ga" 0 "Positive search of group when filtering by user not in group for removed user."
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-group-add-111: Negative search of group when filtering by user in group for removed user."
+	rlRun "ipa group-find --users=$ua | grep 'Group name: $ga'" 1 "Negative search of group when filtering by user in group for removed user."
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-group-add-112: positive search of group when filtering by user not in group for removed user."
+	rlRun "ipa group-find --no-users=$ub | grep $ga" 0 "Positivesearch of group when filtering by user not in group."
     rlPhaseEnd
 
     rlPhaseStartCleanup "ipa-group-cli-cleanup: Delete remaining users and group and Destroying admin credentials"
