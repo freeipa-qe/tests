@@ -10,7 +10,8 @@
             	        <include name="init" />    
             	        <include name="addAutomountLocation" /> 
             	        <include name="addAutomountLocation_negative" />
-            	        
+            	       <include name="deleteAutomountLocation" />
+            	       
             	        <include name="addAutomountMap" />
             	        <include name="modifyAutomountMap" />
             	        <include name="deleteAutomountMap" />  
@@ -24,9 +25,7 @@
             	        <include name="addAutomountKey_negative" />
             	        <include name="modifyAutomountKey" />
             	        <include name="modifyAutomountKey_negative" />
-            	        <include name="deleteAutomountKey" />
-            	        
-            	         <include name="deleteAutomountLocation" /> 
+            	        <include name="deleteAutomountKey" /> 
             	    </run>
             	</groups>
             	<classes>

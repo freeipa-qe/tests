@@ -22,31 +22,32 @@ public class CommonTasks {
 	//public static String serverUrl = System.getProperty("ipa.server.url");
 	public static String serverUrl = System.getProperty("ipa.server.url");
 	
-	public String userPage = serverUrl + "/ipa/ui/#identity=user&navigation=identity";	
-	public String groupPage = serverUrl + "/ipa/ui/#identity=group&navigation=identity";
-	public String hostPage =  serverUrl + "/ipa/ui/#identity=host&navigation=identity";
-	public String hostgroupPage =  serverUrl + "/ipa/ui/#identity=hostgroup&navigation=identity";
-	public String netgroupPage =  serverUrl + "/ipa/ui/#identity=netgroup&navigation=identity";
-	public String dnsPage =  serverUrl + "/ipa/ui/#dns=dnszone&identity=dns&navigation=identity";
-	public String alternateDNSpage = dnsPage + "&dnszone-facet=search";
-	public String passwordPolicyPage =  serverUrl + "/ipa/ui/#policy=pwpolicy&navigation=policy";
-	public String kerberosTicketPolicyPage =  serverUrl + "/ipa/ui/#policy=krbtpolicy&navigation=policy";
-	public String servicePage =  serverUrl + "/ipa/ui/#identity=service&navigation=identity";
-	public String selfservicepermissionPage = serverUrl + "/ipa/ui/#ipaserver=selfservice&navigation=ipaserver";
-	public String hbacPage =  serverUrl + "/ipa/ui/#hbac=hbacrule&policy=hbac&navigation=policy";	
-	public String hbacServicePage =  serverUrl + "/ipa/ui/#hbac=hbacsvc&policy=hbac&navigation=policy";
-	public String hbacServiceGroupPage =  serverUrl + "/ipa/ui/#hbac=hbacsvcgroup&policy=hbac&navigation=policy";
-	public String sudoRulePage =  serverUrl + "/ipa/ui/#sudo=sudorule&policy=sudo&navigation=policy";
-	public String sudoPage=sudoRulePage;
-	public String sudoCommandPage =  serverUrl + "/ipa/ui/#sudo=sudocmd&policy=sudo&navigation=policy";
-	public String sudoCommandGroupPage =  serverUrl + "/ipa/ui/#sudo=sudocmdgroup&policy=sudo&navigation=policy"; 
-	public String configurationPage = serverUrl + "/ipa/ui/#ipaserver=config&navigation=ipaserver"; 
-	public String automountPage = serverUrl + "/ipa/ui/#automount=automountlocation&policy=automount&navigation=policy"; 
+	public static String userPage = serverUrl + "/ipa/ui/#identity=user&navigation=identity";	
+	public static String groupPage = serverUrl + "/ipa/ui/#identity=group&navigation=identity";
+	public static String hostPage =  serverUrl + "/ipa/ui/#identity=host&navigation=identity";
+	public static String hostgroupPage =  serverUrl + "/ipa/ui/#identity=hostgroup&navigation=identity";
+	public static String netgroupPage =  serverUrl + "/ipa/ui/#identity=netgroup&navigation=identity";
+	public static String dnsPage =  serverUrl + "/ipa/ui/#dns=dnszone&identity=dns&navigation=identity";
+	public static String alternateDNSpage = dnsPage + "&dnszone-facet=search";
+	public static String passwordPolicyPage =  serverUrl + "/ipa/ui/#policy=pwpolicy&navigation=policy";
+	public static String kerberosTicketPolicyPage =  serverUrl + "/ipa/ui/#policy=krbtpolicy&navigation=policy";
+	public static String servicePage =  serverUrl + "/ipa/ui/#identity=service&navigation=identity";
+	public static String selfservicepermissionPage = serverUrl + "/ipa/ui/#ipaserver=selfservice&navigation=ipaserver";
+	public static String hbacPage =  serverUrl + "/ipa/ui/#hbac=hbacrule&policy=hbac&navigation=policy";	
+	public static String hbacServicePage =  serverUrl + "/ipa/ui/#hbac=hbacsvc&policy=hbac&navigation=policy";
+	public static String hbacServiceGroupPage =  serverUrl + "/ipa/ui/#hbac=hbacsvcgroup&policy=hbac&navigation=policy";
+	public static String sudoRulePage =  serverUrl + "/ipa/ui/#sudo=sudorule&policy=sudo&navigation=policy";
+	public static String sudoPage=sudoRulePage;
+	public static String sudoCommandPage =  serverUrl + "/ipa/ui/#sudo=sudocmd&policy=sudo&navigation=policy";
+	public static String sudoCommandGroupPage =  serverUrl + "/ipa/ui/#sudo=sudocmdgroup&policy=sudo&navigation=policy"; 
+	public static String configurationPage = serverUrl + "/ipa/ui/#ipaserver=config&navigation=ipaserver"; 
+	public static String automountPage = serverUrl + "/ipa/ui/#automount=automountlocation&policy=automount&navigation=policy";  
+	public static String hbacRulesPolicyPage = serverUrl + "/ipa/ui/#hbac=hbacrule&policy=hbac&navigation=policy";
 	
 	public static String ipadomain = "";
 	public static String ipafqdn= "";
 	public static String reversezone = "";
-	
+	public static String realm="";
 	
 	public CommonTasks() {
 		setErrorFlag(false);
@@ -54,10 +55,14 @@ public class CommonTasks {
 		setIpadomain(System.getProperty("ipa.server.domain"));
 		setIpafqdn(System.getProperty("ipa.server.fqdn"));
 		setReversezone(System.getProperty("ipa.server.reversezone"));
+		setIPARealm(System.getProperty("ipa.server.realm"));
 	}
-	
+
+
 	// to check if unexpected error was thrown in a test
 	public static boolean errorFlag = false;
+
+	
 	
     public static boolean isErrorFlag() {
 		return errorFlag;
@@ -89,6 +94,11 @@ public class CommonTasks {
 	
 	public static void setReversezone(String reversezone) {
 		CommonTasks.reversezone = reversezone;
+	}
+	
+	
+	private void setIPARealm(String realm) {
+		CommonTasks.realm = realm;
 	}
 	
 	public static boolean kinitAsAdmin() {    	
