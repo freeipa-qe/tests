@@ -518,6 +518,11 @@ uninstall()
 	rlRun "egrep \"Deleted replication agreement from '$MASTER' to '$SLAVE'\" /tmp/remote_exec.out"
 	cat /tmp/remote_exec.out
 
+	rlLog "verifies https://bugzilla.redhat.com/show_bug.cgi?id=801380"
+	rlRun "remoteExec root $MASTERIP redhat \"ipa dnszone-find\""
+	rlRun "egrep 10.in-addr.arpa. /tmp/remote_exec.out"
+	cat /tmp/remote_exec.out
+
 	rlRun "remoteExec root $MASTERIP redhat \"ipa-replica-manage del $SLAVE\"" 
 	rlRun "egrep \"'$MASTER' has no replication agreement for '$SLAVE'\" /tmp/remote_exec.out"
 	cat /tmp/remote_exec.out
