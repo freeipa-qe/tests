@@ -76,7 +76,7 @@ rlLog "MASTER: $MASTER"
 PACKAGE="ipa-admintools"
 
 rlJournalStart
-    lPhaseStartSetup "ipa-group-cli-startup: Check for admintools package and Kinit"
+    rlPhaseStartSetup "ipa-group-cli-startup: Check for admintools package and Kinit"
         rpm -qa | grep $PACKAGE
         if [ $? -eq 0 ] ; then
                 rlPass "ipa-admintools package is installed"
