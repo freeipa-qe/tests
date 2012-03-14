@@ -31,9 +31,6 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-# Include data-driven test data file:
-. ./ipa-upgrade.data
-
 # Include rhts environment
 . /usr/bin/rhts-environment.sh
 . /usr/share/beakerlib/beakerlib.sh
@@ -45,6 +42,10 @@ for file in $(ls tests.d/t.*.sh); do
 	. ./$file
 done
 
+# Include data-driven test data file:
+. ./ipa-upgrade.data
+
+# other variables 
 startDate=`date "+%F %r"`
 satrtEpoch=`date "+%s"`
 

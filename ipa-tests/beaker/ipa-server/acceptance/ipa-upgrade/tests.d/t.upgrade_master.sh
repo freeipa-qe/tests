@@ -42,13 +42,30 @@
 ######################################################################
 # test suite
 ######################################################################
-template_function()
+upgrade_master()
 {
 	TESTORDER=$(( TESTORDER += 1 ))
-	rlPhaseStartTest "template_function: template function start phase"
+	rlPhaseStartTest "upgrade_master: template function start phase"
 	case "$MYROLE" in
 	"MASTER")
 		rlLog "Machine in recipe is MASTER"
+
+		# Setup new yum repos from ipa-upgrade.data datafile
+		for url in ${repo[@]}; do
+			i=$(( i += 1 ))
+cat > /etc/yum.repos.d/mytestrepo$i.repo <<-EOF
+[mytestrepo$i]
+name=mytestrepo$i
+baseurl=$url
+enabled=1
+gpgcheck=0
+skip_if_unavailable=1
+EOF
+		done
+
+		rlRun "yum -y update ipa*"	
+		rlRun "ipactl restart" ### IS THIS REALLY NEEDED?  BZ 766687?
+
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $MASTER_IP"
 		;;
 	"SLAVE")
