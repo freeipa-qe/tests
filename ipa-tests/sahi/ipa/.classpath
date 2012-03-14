@@ -5,6 +5,6 @@
 	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/webui-framework"/>
 	<classpathentry kind="lib" path="/webui-framework/lib/sahi.jar"/>
 	<classpathentry kind="lib" path="/webui-framework/lib/testng-5.9-jdk15.jar" sourcepath="/testng5.9/src"/>
-	<classpathentry kind="lib" path="/home/ipawebui/sahi/ipa/lib/javax.mail.jar"/>
+	<classpathentry kind="lib" path="lib/javax.mail.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
