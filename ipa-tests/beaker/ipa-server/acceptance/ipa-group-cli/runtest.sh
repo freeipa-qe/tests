@@ -1044,6 +1044,8 @@ rlJournalStart
 
     rlPhaseStartTest "ipa-group-cli-95: Positive test of --not-in-groups in group-find"
 	rlRun "ipa group-find --not-in-groups=ggg | grep Group\ name: | grep tusera" 0 "Making sure that group tusera comes back when searching --not-in-groups=ggg"
+    rlPhaseEnd
+    # these -in-group tests are continued at test number 120
 
     hb="hbrut"
     gb="grpbt"
@@ -1158,6 +1160,20 @@ rlJournalStart
 
     rlPhaseStartTest "ipa-group-add-119: positive search of group when filtering by groups not in group for removed group."
 	rlRun "ipa group-find --no-groups=$gb | grep 'Group name: $ga'" 0 "Positive search of group when filtering by groups not in group."
+    rlPhaseEnd
+
+    # continuing from test 95  
+    rlPhaseStartTest "ipa-group-cli-120: Negative Test of --not-in-groups in group-find after group removal"
+	rlRun "ipa group-remove-member --groups=uuu ggg" 0 "remove group uuu from group ggg"
+	rlRun "ipa group-find --in-groups=ggg | grep Group\ name: | grep uuu" 1 "Making sure that group ggg does not come back when searching --in-groups=ggg"
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-group-cli-121: Positive test of --not-in-groups in group-find after group removal"
+	rlRun "ipa group-find --not-in-groups=ggg | grep Group\ name: | grep tusera" 0 "Making sure that group tusera comes back when searching --not-in-groups=ggg"
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-group-cli-122: Negative test of --not-in-groups in group-find after group removal"
+	rlRun "ipa group-find --in-groups=ggg | grep Group\ name: | grep tusera" 1 "Making sure that group tusera does not comes back when searching --in-groups=ggg"
     rlPhaseEnd
 
     rlPhaseStartCleanup "ipa-group-cli-cleanup: Delete remaining users and group and Destroying admin credentials"
