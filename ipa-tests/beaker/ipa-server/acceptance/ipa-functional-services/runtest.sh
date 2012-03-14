@@ -67,7 +67,8 @@ rlJournalStart
                         	fi
                 	done
                 	rlRun "service iptables stop" 0 "Stop the firewall on the client"
-                	ipamangedservices_http
+			t.ipafunctionalservices_http.sh
+			t.ipafunctionalservices_ldap.sh
 			rhts-sync-set -s DONE
                 fi
         else
