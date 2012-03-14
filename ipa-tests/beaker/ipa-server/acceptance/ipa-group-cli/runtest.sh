@@ -1127,7 +1127,37 @@ rlJournalStart
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-group-add-112: positive search of group when filtering by user not in group for removed user."
-	rlRun "ipa group-find --no-users=$ub | grep $ga" 0 "Positivesearch of group when filtering by user not in group."
+	rlRun "ipa group-find --no-users=$ub | grep $ga" 0 "Positive search of group when filtering by user not in group."
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-group-add-113: Positive search of group when filtering by group in group."
+	rlRun "ipa group-add-member --groups=$gb $ga" 0 "adding group gb to group ga"
+	rlRun "ipa group-find --groups=$gb | grep 'Group name: $ga'" 0 "Positive search of group when filtering by groups in group."
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-group-add-114: Negative search of group when filtering by group in group."
+	rlRun "ipa group-find --groups=$ga | grep 'Group name: $gb'" 1 "Negative search of group when filtering by groups in group."
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-group-add-115: Positive search of group when filtering by group not in group."
+	rlRun "ipa group-find --no-groups=$ga | grep 'Group name: $gb'" 0 "Positive search of group when filtering by groups not in group."
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-group-add-116: Negative search of group when filtering by groups not in group."
+	rlRun "ipa group-find --no-groups=$gb | grep 'Group name: $ga'" 1 "Negative search of group when filtering by groups not in group."
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-group-add-117: Positive search of group when filtering by groups in group for removed group."
+	rlRun "ipa group-remove-member --groups=$gb $ga" 0 "removing group gb from group ga"
+	rlRun "ipa group-find --no-groups=$gb | grep 'Group name: $ga'" 0 "Positive search of group when filtering by group not in group for removed group."
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-group-add-118: Negative search of group when filtering by groups in group for removed group."
+	rlRun "ipa group-find --groups=$gb | grep 'Group name: $ga'" 1 "Negative search of group when filtering by groups in group for removed group."
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-group-add-119: positive search of group when filtering by groups not in group for removed group."
+	rlRun "ipa group-find --no-groups=$gb | grep 'Group name: $ga'" 0 "Positive search of group when filtering by groups not in group."
     rlPhaseEnd
 
     rlPhaseStartCleanup "ipa-group-cli-cleanup: Delete remaining users and group and Destroying admin credentials"
