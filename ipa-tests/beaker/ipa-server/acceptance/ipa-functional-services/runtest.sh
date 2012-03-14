@@ -40,7 +40,8 @@
 . /dev/shm/env.sh
 
 # Include test case file
-. ./t.ipamanagedby_http.sh
+. ./t.ipafunctionalservices_http.sh
+. ./t.ipafunctionalservices_ldap.sh
 
 PACKAGELIST="ipa-admintools ipa-client httpd mod_nss mod_auth_kerb 389-ds-base expect"
 
