@@ -241,3 +241,27 @@ rlPhaseStartTest "bug800537: Sudo commands with special characters cannot be rem
 	
 rlPhaseEnd
 }
+
+bug800544() {
+
+rlPhaseStartTest "Bug 800544 - Sudo commands are case-insensitive"
+
+	rlLog "verifies https://bugzilla.redhat.com/show_bug.cgi?id=800544"
+
+	rlRun "ipa sudocmd-add /usr/bin/X"
+	rlRun "ipa sudocmd-add /usr/bin/x"
+
+	rlRun "ipa sudocmdgroup-add group800544 --desc=blabla"
+	rlRun "ipa sudocmdgroup-add-member group800544 --sudocmds=/usr/bin/X"
+	rlRun "ipa sudocmdgroup-add-member group800544 --sudocmds=/usr/bin/x"
+
+	rlRun "ipa sudocmdgroup-remove-member group800544 --sudocmds=/usr/bin/X"
+	rlRun "ipa sudocmdgroup-remove-member group800544 --sudocmds=/usr/bin/x"
+
+	rlRun "ipa sudocmd-del /usr/bin/x"
+	rlRun "ipa sudocmd-del /usr/bin/X"
+
+	rlRun "ipa sudocmdgroup-del group800544"
+
+rlPhaseEnd
+}
