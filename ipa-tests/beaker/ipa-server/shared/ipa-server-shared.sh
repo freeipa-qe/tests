@@ -763,7 +763,7 @@ set send_slow {1 .1}' > $expfile
 	# Required inputs are:
 	# ipa_command_to_test: This is the command we are testing, (user, group, service)
 	# pkey_addstringa: will be used as ipa $ipa_command_to_test-add $addstring $pkeyobja
-	# pkey_addstringb: will be used as ipa $ipa_command_to_test-add $addstring $pkeyobja
+	# pkey_addstringb: will be used as ipa $ipa_command_to_test-add $addstring $pkeyobjb
 	# pkeyobja - This is the username/groupname/object to create. this object must come up in 
 	#      the resuts when a find search string is run against "general-find-string".
 	#      This user/object must not exist on the system
@@ -791,6 +791,90 @@ pkey_return_check()
 	rlRun "ipa $ipa_command_to_test-del $pkeyobja" 0 "deleting the first object from this test ($pkeyobja)"
 	let creturn=$creturn+$?
 	rlRun "ipa $ipa_command_to_test-del $pkeyobjb" 0 "deleting the first object from this test ($pkeyobjb)"
+	let creturn=$creturn+$?
+	return $creturn
+}
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# in_roles_return_check
+	# Check that the in-role and not-in-role option seems to function in the ipa *-find cli option
+	# Required inputs are:
+	# ipa_command_to_test: This is the command we are testing, (user, group, service)
+	# role_addstringa: will be used as ipa $ipa_command_to_test-add $addstring $pkeyobja
+	# role_addstringb: will be used as ipa $ipa_command_to_test-add $addstring $pkeyobjb
+	# role_addstringc: will be used as ipa $ipa_command_to_test-add $addstring $pkeyobjc
+	# roleobja - This is the username/groupname/object to create. this object must come up in 
+	#      the resuts when a find search string is run against "general-find-string".
+	#      This user/object must not exist on the system
+	# roleobjb - This is a second username/groupname/object to create. This object must also 
+	#      come up in the resuts when a find search string is run against "general-find-string"
+	#      This user/object must not exist on the system
+	# roleobjc - This is a second username/groupname/object to create. This object must also 
+	#      come up in the resuts when a find search string is run against "general-find-string"
+	#      This user/object must not exist on the system
+	# grep_string - This is the specific string that denotes the line to look for in the 
+	#      "ipa *-find --pkey-only" output
+	# general_search_string - This string will be used as "ipa *-find --pkey-only $general_search_string"
+	#      Searching this way must return both pkeyobja and pkeyobjb.
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+in_roles_return_check()
+{
+	creturn=0
+	role1=trolea
+	role2=troleb
+	rlLog "executing ipa $ipa_command_to_test-add $role_addstringa $roleobja"
+	membertype=$(echo "$ipa_command_to_test"s)
+	ipa $ipa_command_to_test-add $role_addstringa $roleobja
+	ipa $ipa_command_to_test-add $role_addstringb $roleobjb
+	ipa $ipa_command_to_test-add $role_addstringb $roleobjc
+	rlRun "ipa role-add --desc=desc1 $role1" 0 "adding $role1"
+	rlRun "ipa role-add --desc=desc1 $role2" 0 "adding $role2"
+	rlRun "ipa role-add-member --$membertype=$roleobja $role1" 0 "adding $roleobja to role $role1"
+	rlRun "ipa role-add-member --$membertype=$roleobjc $role1" 0 "adding $roleobjc to role $role1"
+
+	rlLog "executing ipa $ipa_command_to_test-find --in-roles $role1 | grep $grep_string | grep $roleobja"
+	rlRun "ipa $ipa_command_to_test-find --in-roles $role1 | grep $grep_string | grep $roleobja" 0 "make sure roleobja is returned when the --in-roles option is specifing searching in role1"
+	let creturn=$creturn+$?
+	rlRun "ipa $ipa_command_to_test-find --in-roles $role1 | grep $grep_string | grep $roleobjc" 0 "make sure roleobjc is returned when the --in-roles option is specifing searching in role1"
+	let creturn=$creturn+$?
+	rlRun "ipa $ipa_command_to_test-find --in-roles $role1 | grep $grep_string | grep $roleobjb" 1 "make sure roleobjb is not returned when the --in-roles option is specifing searching in role1"
+	rlRun "ipa $ipa_command_to_test-find --not-in-roles $role1 | grep $grep_string | grep $roleobjb" 0 "make sure roleobjb is returned when the --not-in-roles option is specifing searching in role1"
+	let creturn=$creturn+$?
+echo "ipa $ipa_command_to_test-find --not-in-roles $role1 | grep $grep_string | grep $roleobja"
+	rlRun "ipa $ipa_command_to_test-find --not-in-roles $role1 | grep $grep_string | grep $roleobja" 1 "make sure roleobja is not returned when the --not-in-roles option is specifing searching in role1"
+	rlRun "ipa $ipa_command_to_test-find --not-in-roles $role1 | grep $grep_string | grep $roleobjc" 1 "make sure roleobjc is not returned when the --not-in-roles option is specifing searching in role1"
+	rlRun "ipa $ipa_command_to_test-find --not-in-roles $role2 | grep $grep_string | grep $roleobja" 0 "make sure roleobja is returned when the --not-in-roles option is specifing searching in role2 after roleobjc was removed from role"
+	let creturn=$creturn+$?
+	rlRun "ipa $ipa_command_to_test-find --not-in-roles $role2 | grep $grep_string | grep $roleobjb" 0 "make sure roleobjb is returned when the --not-in-roles option is specifing searching in role2 after roleobjc was removed from role"
+	let creturn=$creturn+$?
+	rlRun "ipa $ipa_command_to_test-find --not-in-roles $role2 | grep $grep_string | grep $roleobjc" 0 "make sure roleobjc is returned when the --not-in-roles option is specifing searching in role2 after roleobjc was removed from role"
+	let creturn=$creturn+$?
+	rlRun "ipa $ipa_command_to_test-find --in-roles $role2 | grep $grep_string | grep $roleobja" 1 "make sure roleobja is not returned when the --in-roles option is specifing searching in role2 after roleobjc was removed from role"
+	rlRun "ipa $ipa_command_to_test-find --in-roles $role2 | grep $grep_string | grep $roleobjb" 1 "make sure roleobjb is not returned when the --in-roles option is specifing searching in role2 after roleobjc was removed from role"
+	rlRun "ipa $ipa_command_to_test-find --in-roles $role2 | grep $grep_string | grep $roleobjc" 1 "make sure roleobjc is not returned when the --in-roles option is specifing searching in role2 after roleobjc was removed from role"
+	rlRun "ipa role-remove-member --$membertype=$roleobjc $role1" 0 "removing roleobjc from role1"
+	let creturn=$creturn+$?
+	rlRun "ipa $ipa_command_to_test-find --not-in-roles $role1 | grep $grep_string | grep $roleobja" 1 "make sure roleobja is not returned when the --not-in-roles option is specifing searching in role1 after roleobjc was removed from role"
+	rlRun "ipa $ipa_command_to_test-find --not-in-roles $role1 | grep $grep_string | grep $roleobjc" 0 "make sure roleobjc is returned when the --not-in-roles option is specifing searching in role1 after roleobjc was removed from role"
+	let creturn=$creturn+$?
+	rlRun "ipa $ipa_command_to_test-find --not-in-roles $role1 | grep $grep_string | grep $roleobjb" 0 "make sure roleobjb is returned when the --not-in-roles option is specifing searching in role1 after roleobjc was removed from role"
+	let creturn=$creturn+$?
+	rlRun "ipa $ipa_command_to_test-find --not-in-roles $role2 | grep $grep_string | grep $roleobja" 0 "make sure roleobja is returned when the --not-in-roles option is specifing searching in role2 after roleobjc was removed from role"
+	let creturn=$creturn+$?
+	rlRun "ipa $ipa_command_to_test-find --not-in-roles $role2 | grep $grep_string | grep $roleobjb" 0 "make sure roleobjb is returned when the --not-in-roles option is specifing searching in role2 after roleobjc was removed from role"
+	let creturn=$creturn+$?
+	rlRun "ipa $ipa_command_to_test-find --not-in-roles $role2 | grep $grep_string | grep $roleobjc" 0 "make sure roleobjc is returned when the --not-in-roles option is specifing searching in role2 after roleobjc was removed from role"
+	let creturn=$creturn+$?
+	rlRun "ipa $ipa_command_to_test-find --in-roles $role2 | grep $grep_string | grep $roleobja" 1 "make sure roleobja is not returned when the --in-roles option is specifing searching in role2 after roleobjc was removed from role"
+	rlRun "ipa $ipa_command_to_test-find --in-roles $role2 | grep $grep_string | grep $roleobjb" 1 "make sure roleobjb is not returned when the --in-roles option is specifing searching in role2 after roleobjc was removed from role"
+	rlRun "ipa $ipa_command_to_test-find --in-roles $role2 | grep $grep_string | grep $roleobjc" 1 "make sure roleobjc is not returned when the --in-roles option is specifing searching in role2 after roleobjc was removed from role"
+	rlRun "ipa role-del $role1" 0 "Removing role 1"
+	rlRun "ipa role-del $role2" 0 "Removing role 2"
+	rlRun "ipa $ipa_command_to_test-del $roleobja" 0 "deleting the first object from this test ($roleobja)"
+	let creturn=$creturn+$?
+	rlRun "ipa $ipa_command_to_test-del $roleobjb" 0 "deleting the first object from this test ($roleobjb)"
+	let creturn=$creturn+$?
+	rlRun "ipa $ipa_command_to_test-del $roleobjc" 0 "deleting the first object from this test ($roleobjc)"
 	let creturn=$creturn+$?
 	return $creturn
 }

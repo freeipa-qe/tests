@@ -1176,6 +1176,17 @@ rlJournalStart
 	rlRun "ipa group-find --in-groups=ggg | grep Group\ name: | grep tusera" 1 "Making sure that group tusera does not comes back when searching --in-groups=ggg"
     rlPhaseEnd
 
+    rlPhaseStartTest "ipa-group-cli-123: check of filtering by group in roles"
+	ipa_command_to_test="group"
+	role_addstringa="--desc=junk-desc"
+	role_addstringb="--desc=junk-desc"
+	roleobja="39usera"
+	roleobjb="39userb"
+	roleobjc="39userc"
+	grep_string='Group\ name'
+	rlRun "in_roles_return_check" 0 "running checks of --in-roles and --not-in-roles in group-find"
+    rlPhaseEnd
+
     rlPhaseStartCleanup "ipa-group-cli-cleanup: Delete remaining users and group and Destroying admin credentials"
 	rlRun "ipa config-mod --searchrecordslimit=100" 0 "setting search records limit back to default"
 	rlRun "ipa user-del trex" 0 "Deleting user trex."
