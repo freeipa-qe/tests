@@ -15,6 +15,7 @@
 #  BZ 783548 -- ipa delegation-mod is not failing when membergroup does not exist
 #  BZ 783554 -- ipa delegation-mod --attrs= removes Attributes from delegation instead of failing
 #  BZ 784468 -- ipa help delegation example has group and membergroup backwards
+# BZ 782974 -- 783554 is a duplicate of this bug. -- Exception why removing all values in config plugin
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
@@ -57,6 +58,7 @@ delegation_bz()
 	delegation_bz_783543
 	delegation_bz_783548
 	delegation_bz_783554
+	delegation_bz_782974
 }
 
 ######################################################################
@@ -215,6 +217,18 @@ delegation_bz_783548()
 
 		rlRun "ipa delegation-del $FUNCNAME" 0 "Delete required delegation used in test"
 	rlPhaseEnd
+}
+
+######################################################################
+# BZ 782974 -- Exception why removing all values in config plugin
+######################################################################
+delegation_bz_782974()
+{
+	rlPhaseStartTest "delegation_bz_782974: Exception why removing all values in config plugin"
+		rlLog "delegation_bz_783554 is a duplicate of this bug."
+		rlLog "Executing delegation_bz_783554 to test"
+	rlPhaseEnd
+	delegation_bz_783554
 }
 
 ######################################################################
