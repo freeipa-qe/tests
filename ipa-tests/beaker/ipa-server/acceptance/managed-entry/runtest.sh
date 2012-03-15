@@ -50,9 +50,18 @@ PACKAGELIST="ipa-admintools ipa-client httpd mod_nss mod_auth_kerb 389-ds-base e
 #   test main 
 #########################################
 rlJournalStart
-	ipa-managedentrycli
-	ipa-managedentryfunctionaltestssetup
-	ipa-managedentryfunctionaltests
+
+	rlPhaseStartTest "Environment check"
+		echo $MASTER | grep $HOSTNAME
+        	if [ $? -eq 0 ] ; then
+			ipa-managedentrycli
+			ipa-managedentryfunctionaltestssetup
+			ipa-managedentryfunctionaltests
+			rlPass "Executed tests on MASTER"
+		else
+			rlPass "Machine is not a MASTER"
+		fi 
+	rlPhaseEnd
     
 	rlJournalPrintText
 	report=/tmp/rhts.report.$RANDOM.txt
