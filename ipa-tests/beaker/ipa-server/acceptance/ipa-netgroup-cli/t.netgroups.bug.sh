@@ -299,7 +299,7 @@ netgroup_bz_797237()
 		KinitAsAdmin
 		#### test1
 		rlRun "ipa netgroup-add netgroup_bz_797237_1 --desc=desc1 --nisdomain=test1,test2 > $tmpout 2>&1" 1
-		if [ $(grep "test1,test2" $tmpout|wc -l) -gt 0 ]; then
+		if [ $(grep "NIS domain.*name:.*test1,test2" $tmpout|wc -l) -gt 0 ]; then
 			rlFail "BZ 797237 found...ipa netgroup-add and netgroup-mod --nisdomain should not allow commas"
 		else
 			rlPass "BZ 797237 not found for netgroup-add with comma"
@@ -308,7 +308,7 @@ netgroup_bz_797237()
 
 		#### test2
 		rlRun "ipa netgroup-add netgroup_bz_797237_2 --desc=desc2 --nisdomain=test^\|\!\@\#\$\%\&\*\\)\\( > $tmpout 2>&1" 1      
-		if [ $(grep "test^\|\!\@\#\$\%\&\*\\\)\\\(" $tmpout | wc -l) -gt 0 ]; then
+		if [ $(grep "NIS domain.*name:.*test^\|\!\@\#\$\%\&\*\\\)\\\(" $tmpout | wc -l) -gt 0 ]; then
 			rlFail "BZ 797237 found...ipa netgroup-add and netgroup-mod --nisdomain should not allow commas"
 			rlFail "This BZ also covers other invalid characters"
 		else
@@ -319,7 +319,7 @@ netgroup_bz_797237()
 		#### test3
 		rlRun "ipa netgroup-add netgroup_bz_797237_3 --desc=desc3"
 		rlRun "ipa netgroup-mod netgroup_bz_797237_3 --nisdomain=test3,test4 > $tmpout 2>&1" 1
-		if [ $(grep "test3,test4" $tmpout|wc -l) -gt 0 ]; then
+		if [ $(grep "NIS domain.*name:.*test3,test4" $tmpout|wc -l) -gt 0 ]; then
 			rlFail "BZ 797237 found...ipa netgroup-add and netgroup-mod --nisdomain should not allow commas"
 		else
 			rlPass "BZ 797237 not found for netgroup-mod --nisdomain with comma."
@@ -330,7 +330,7 @@ netgroup_bz_797237()
 		#### test4
 		rlRun "ipa netgroup-add netgroup_bz_797237_4 --desc=desc4"
 		rlRun "ipa netgroup-mod netgroup_bz_797237_4 --setattr=nisdomainname=test5,test6 > $tmpout 2>&1" 1
-		if [ $(grep "test5,test6" $tmpout|wc -l) -gt 0 ]; then
+		if [ $(grep "NIS domain.*name:.*test5,test6" $tmpout|wc -l) -gt 0 ]; then
 			rlFail "BZ 797237 found...ipa netgroup-add and netgroup-mod --nisdomain should not allow commas"
 		else
 			rlPass "BZ 797237 not found for netgroup-mod --setattr=nisdomainname with comma."
@@ -341,7 +341,7 @@ netgroup_bz_797237()
 		#### test5 
 		rlRun "ipa netgroup-add netgroup_bz_797237_5 --desc=desc5"
 		rlRun "ipa netgroup-mod netgroup_bz_797237_5 --setattr=nisdomain=test^\|\!\@\#\$\%\&\*\\)\\( > $tmpout 2>&1" 1
-		if [ $(grep "test^\|\!\@\#\$\%\&\*\\\)\\\(" $tmpout | wc -l) -gt 0 ]; then
+		if [ $(grep "NIS domain.*name:.*test^\|\!\@\#\$\%\&\*\\\)\\\(" $tmpout | wc -l) -gt 0 ]; then
 			rlFail "BZ 797237 found...ipa netgroup-add and netgroup-mod --nisdomain should not allow commas"
 			rlFail "This BZ also covers other invalid characters"
 		else
