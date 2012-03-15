@@ -1284,7 +1284,8 @@ rlPhaseStartTest "ipa-host-cli-38: find more hosts than exist"
     rlPhaseEnd
 
 # Include test case file
-. ./ipa-host-cli-ipv6.sh
+# Following host-add with IPv6 addr tests are commented since beaker does not support IPv6 address. Uncomment to run on a IPv6 compatible host.
+#. ./ipa-host-cli-ipv6.sh
 
 rlJournalPrintText
 report=/tmp/rhts.report.$RANDOM.txt
