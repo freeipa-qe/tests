@@ -53,15 +53,48 @@ rlJournalStart
         rlLog "Creating tmp directory"
         TmpDir=`mktemp -d`
         pushd $TmpDir
+
+        #####################################################################
+        #               IS THIS MACHINE A CLIENT?                           #
+        #####################################################################
+
 	echo "$CLIENT" | grep "$HOSTNAME"
 	if [ $? -eq 0 ]; then
            # This machine is a client
 	   rlLog "I am a client"
            ipaclientinstall
+	   rhts-sync-set -s DONE
 	else
 	   rlLog "Not a client, CLIENT is $CLIENT - not running tests"
 	fi
+
+        #####################################################################
+        #               IS THIS MACHINE A MASTER?                           #
+        #####################################################################
+        rc=0
+        echo $MASTER | grep $HOSTNAME
+        if [ $? -eq 0 ] ; then
+                rhts-sync-block -s DONE $BEAKERCLIENT
+                rlPass
+        else
+                rlLog "Machine in recipe in not a MASTER"
+        fi
+
+        #####################################################################
+        #               IS THIS MACHINE A SLAVE?                            #
+        #####################################################################
+        rc=0
+        echo $SLAVE | grep $HOSTNAME
+        if [ $? -eq 0 ] ; then
+                rhts-sync-block -s DONE $BEAKERCLIENT
+                rlPass
+        else
+                rlLog "Machine in recipe in not a SLAVE"
+        fi
+
+
    rlPhaseEnd
+
 
 rlPhaseStartCleanup "install-client-cli cleanup"
      rlRun "popd"
