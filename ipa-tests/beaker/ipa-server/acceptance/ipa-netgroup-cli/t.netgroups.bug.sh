@@ -191,10 +191,12 @@ netgroup_bz_766141()
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa netgroup-add $FUNCNAME --desc=$FUNCNAME"
 		rlRun "ipa netgroup-add-member $FUNCNAME --users=admin"
-		rlRun "cp /etc/sssd/sssd.conf /etc/sssd/sssd.conf.$FUNCNAME.backup"
+		rlRun "cp -f /etc/sssd/sssd.conf /etc/sssd/sssd.conf.$FUNCNAME.backup"
+		rlLog "Running: sed -i 's/\(\[domain.*\]\)$/\1\ndebug_level = 6/' /etc/sssd/sssd.conf"
 		sed -i 's/\(\[domain.*\]\)$/\1\ndebug_level = 6/' /etc/sssd/sssd.conf
 		rlRun "cat /etc/sssd/sssd.conf"
 		rlRun "service sssd restart"
+		rlRun "sleep 5"
 		rlRun "getent -s sss netgroup $FUNCNAME"
 		
 		# New/Native search filter uses this:  cn=ng,cn=alt,dc=testrelm,dc=com
@@ -205,7 +207,7 @@ netgroup_bz_766141()
 			rlPass "BZ 766141 not found"
 		fi	
 		
-		rlRun "mv /etc/sssd/sssd.conf.$FUNCNAME.backup /etc/sssd/sssd.conf"
+		rlRun "mv -f /etc/sssd/sssd.conf.$FUNCNAME.backup /etc/sssd/sssd.conf"
 		rlRun "chmod 0600 /etc/sssd/sssd.conf"
 		rlRun "service sssd restart"
 		rlRun "ipa netgroup-del $FUNCNAME"
