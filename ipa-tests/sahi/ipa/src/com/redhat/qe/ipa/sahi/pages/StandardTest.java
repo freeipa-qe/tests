@@ -3,9 +3,9 @@ package com.redhat.qe.ipa.sahi.pages;
 public interface StandardTest {
 	
 	// whenever the test case name changes, the following string array should change accordingly 
-	public static final String[] addTestCases = {"addSingle", "addAndAddAnother", "addThenEdit", "addThenCancel" ,"addNegativeDuplicate", "addNegativeRequiredFields"};
-	public static final String[] modTestCases = {"modify", "modifyNegative"}; ;
-	public static final String[] delTestCases = {"deleteSingle", "deleteMultiple"};
+	public static final String[] standardAddTestCases = {"addSingle", "addAndAddAnother", "addThenEdit", "addThenCancel" ,"addNegativeDuplicate", "addNegativeRequiredFields"};
+	public static final String[] standardModTestCases = {"modify", "modifyNegative"}; ;
+	public static final String[] standardDelTestCases = {"deleteSingle", "deleteMultiple"};
 	
 	public IPAWebTestMonitor addSingle(IPAWebTestMonitor result);
 	public IPAWebTestMonitor addAndAddAnother(IPAWebTestMonitor result);

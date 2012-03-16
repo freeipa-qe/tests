@@ -34,19 +34,19 @@ public class IPAWebAutomationReporter {
 		report.append("==================== Test Result Summary ========================");
 		report.append("\nTotal finished test cases:" + finishedQueue.size());
 		report.append("\nTotal PASS[" + passed.size() + "]  FAIL[" + failed.size() + "]  EMPTY[" + empty.size() +"]");
-		report.append("\n+--------------------------------------------------------------+");
+		report.append("\n*--------------------------------------------------------------*");
 		report.append("\n|                         PASSED                               |");
-		report.append("\n+--------------------------------------------------------------+");
+		report.append("\n*--------------------------------------------------------------*");
 		report.append(getReport(passed));
 		
-		report.append("\n+--------------------------------------------------------------+");
+		report.append("\n*--------------------------------------------------------------*");
 		report.append("\n|                         FAILED                               |");
-		report.append("\n+--------------------------------------------------------------+");
+		report.append("\n*--------------------------------------------------------------*");
 		report.append(getReport(failed)); 
 		
-		report.append("\n+--------------------------------------------------------------+");
+		report.append("\n*--------------------------------------------------------------*");
 		report.append("\n|                         EMPTY                                |");
-		report.append("\n+--------------------------------------------------------------+");
+		report.append("\n*--------------------------------------------------------------*");
 		report.append(getReport(empty));
 		
 		report.append("\n===================================================================");

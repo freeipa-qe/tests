@@ -7,7 +7,7 @@ import java.util.logging.Logger;
 import com.redhat.qe.ipa.sahi.tasks.CommonTasks;
 import com.redhat.qe.ipa.sahi.tasks.SahiTasks;
 
-public class IPAWebPage {
+public class IPAWebPage implements StandardTest{
 
 	protected SahiTasks browser;
 	protected String url;
@@ -15,6 +15,11 @@ public class IPAWebPage {
 	protected String backLink;
 	protected String duplicateErrorMsgStartsWith;
 	protected String duplicateErrorMsgEndsWith ="already exists";
+	
+	protected String addPage;
+	protected String duplicatePage;
+	protected String modifyPage;
+	protected String delPage;
 	
 	private TestDataFactory factory;
 	private static Logger log = Logger.getLogger(IPAWebPage.class.getName());
@@ -44,6 +49,13 @@ public class IPAWebPage {
 		return queue;
 	} 
 	
+	protected void registerStandardTestCases()
+	{
+		this.registerTestCases("add", standardAddTestCases);
+		this.registerTestCases("modify", standardModTestCases);
+		this.registerTestCases("delete", standardDelTestCases);
+	}
+	
 	protected void registerTestCases(String queueName, String[] testCases)
 	{
 		for (String testcase: testCases) 
@@ -63,6 +75,133 @@ public class IPAWebPage {
 			testQueues.put(queueName, queue);
 		}
 	}
+	
+	////////////////////////////////// standard test cases   //////////////////////////////
+
+	@Override
+	public IPAWebTestMonitor addSingle(IPAWebTestMonitor monitor){
+		try {
+			addSingleNewEntry(monitor, addPage);
+			monitor.pass();
+		} catch (IPAWebAutomationException e) { 
+			e.printStackTrace();
+			monitor.fail(e);
+		}
+		return monitor;
+	}
+
+	@Override
+	public IPAWebTestMonitor addAndAddAnother(IPAWebTestMonitor monitor){
+		int numOfEntries = 3;
+		try {
+			addMultipleNewEntries(monitor, addPage, numOfEntries);
+			monitor.pass();
+		} catch (IPAWebAutomationException e) { 
+			e.printStackTrace();
+			monitor.fail(e);
+		} catch (Exception e){
+			e.printStackTrace();
+			monitor.fail(e);
+		}
+		return monitor;
+	}
+
+	@Override
+	public IPAWebTestMonitor addThenEdit(IPAWebTestMonitor monitor){  
+		try {
+			addNewEntryThenEdit(monitor,addPage);
+			monitor.pass();
+		} catch (IPAWebAutomationException e) {
+			e.printStackTrace();
+			monitor.fail(e);
+		}
+		return monitor;
+	}
+
+	@Override
+	public IPAWebTestMonitor addThenCancel(IPAWebTestMonitor monitor){
+		try {
+			addNewEntryThenCancelOperation(monitor, addPage);
+			monitor.pass();
+		} catch (IPAWebAutomationException e) {
+			e.printStackTrace();
+			monitor.fail(e);
+		}
+		return monitor;
+	}
+
+	@Override
+	public IPAWebTestMonitor addNegativeDuplicate(IPAWebTestMonitor monitor) {
+		try {
+			addSingleNewEntry(monitor, duplicatePage);
+			addSingleNewEntry(monitor, duplicatePage);
+			
+			// check error dialog box
+			if (browser.div("error_dialog").exists()){
+				String errorMsg = browser.div("error_dialog").getText();
+				if (errorMsg.startsWith(duplicateErrorMsgStartsWith) && errorMsg.endsWith(duplicateErrorMsgEndsWith))
+					monitor.pass();
+				else
+					monitor.fail("Error dialog triggered, but no desired error msg found");
+				closePopUpDialog();
+			}else
+				monitor.fail("No error dialog triggered");
+			return monitor;
+		} catch (IPAWebAutomationException e) {
+			monitor.fail(e); 
+			return monitor;
+		}
+	}
+
+	@Override
+	public IPAWebTestMonitor addNegativeRequiredFields(IPAWebTestMonitor monitor) {
+		browser.span("Add").click();
+		browser.button("Add").click(); 
+		if (browser.span("Required field").exists())
+			monitor.pass();
+		else
+			monitor.fail("No 'Required field' lable appears");
+		closePopUpDialog();
+		return monitor;
+	}
+	
+	@Override
+	public IPAWebTestMonitor modify(IPAWebTestMonitor monitor) {
+		return monitor;
+	}
+	
+	@Override
+	public IPAWebTestMonitor modifyNegative(IPAWebTestMonitor monitor) {
+		return monitor;
+	}
+	
+	@Override
+	public IPAWebTestMonitor deleteSingle(IPAWebTestMonitor monitor){ 
+		try {
+			deleteSingleEntry(monitor, delPage);
+			monitor.pass();
+		} catch (IPAWebAutomationException e) { 
+			e.printStackTrace();
+			monitor.fail(e);
+		} 
+		return monitor;
+	}
+	
+	@Override
+	public IPAWebTestMonitor deleteMultiple(IPAWebTestMonitor monitor){
+		int numOfEntries = 5;
+		try {
+			deleteMultipleEntry(monitor, delPage, numOfEntries);
+			monitor.pass();
+		} catch (IPAWebAutomationException e) { 
+			e.printStackTrace();
+			monitor.fail(e);
+		} catch (Exception e){
+			monitor.fail(e);
+		}
+		return monitor;
+	}
+	 
 	
 	////////////////////////////////// generic UI operation  /////////////////////////////
 	
@@ -85,6 +224,7 @@ public class IPAWebPage {
 	protected boolean verifyInEditingMode()
 	{
 		boolean verified=false;
+		boolean stringCompareRequired = true;
 		String editModeVerifyString = "Verify In editing mode 28dkrj3290mjz.IR4AGKJ";
 		String originalValue = null, currentValue = null;
 		if (browser.textarea("description").exists())
@@ -122,12 +262,15 @@ public class IPAWebPage {
 			// not sure about: self service permission, delegations, ... use loose check as below
 			if (browser.span("Refresh").exists())
 				verified = true;
+			stringCompareRequired = false; // there is no string to compare if we fall in here
 		}
-		
-		if (! originalValue.equals(currentValue) & editModeVerifyString.equals(currentValue))
+		if (stringCompareRequired)
 		{
-			verified = true;
-			browser.span("undo").click();
+			if (! originalValue.equals(currentValue) & editModeVerifyString.equals(currentValue))
+			{
+				verified = true;
+				browser.span("undo").click();
+			}
 		}
 		return verified;
 	}
@@ -219,8 +362,12 @@ public class IPAWebPage {
 	private void fillDataInElement(IPAWebTestMonitor monitor,String pageName,String tag, String id, String value) throws IPAWebAutomationActionNotDefinedException 
 	{ 
 		monitor.setCurrentTestData(pageName + ":" + tag + ":" + id + ":" + value);
-		if (tag.equals("textbox"))
-			browser.textbox(id).setValue(value);
+		if (tag.equals("textbox")){
+			if (browser.textbox(id).under(browser.table("section-table")).exists()) // for Add permission in IPA Server tab
+				browser.textbox(id).under(browser.table("section-table")).setValue(value);
+			else
+				browser.textbox(id).setValue(value);
+		}
 		else if (tag.equals("textarea"))
 			browser.textarea(id).setValue(value);
 		else if (tag.equals("checkbox")){

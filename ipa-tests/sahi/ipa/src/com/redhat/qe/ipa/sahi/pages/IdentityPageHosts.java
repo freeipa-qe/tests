@@ -6,42 +6,22 @@ import java.util.logging.Logger;
 import com.redhat.qe.ipa.sahi.tasks.CommonTasks;
 import com.redhat.qe.ipa.sahi.tasks.SahiTasks; 
 
-public class IdentityPageHosts extends IPAWebPage implements StandardTest {
+public class IdentityPageHosts extends IPAWebPage {
 
 	private static Logger log = Logger.getLogger(IdentityPageHosts.class.getName());
-	private static String url = CommonTasks.hostPage; 
-	private String addPage = "Add Host";
-	private String duplicatePage = "Add Duplicate Host";
-	private String modifyPage = "Modify Host";
-	private String delPage = "Delete Host";
+	private static String url = CommonTasks.hostPage;  
 	
 	public IdentityPageHosts (SahiTasks browser, String testPropertyFile)
 	{
 		super(browser, url, testPropertyFile); 
-		registerStandardTestCases();
-		System.out.println("New instance of IdentityPageHost is ready"); 
 		duplicateErrorMsgStartsWith = "host with name";
 		backLink = "Hosts";
-	}
- 
-	private void registerStandardTestCases()
-	{
-		this.registerTestCases("add", addTestCases);
-		//this.registerTestCases("modify", modTestCases);
-		this.registerTestCases("delete", delTestCases);
-	}
-
-	@Override
-	public IPAWebTestMonitor addSingle(IPAWebTestMonitor monitor){
-		try {
-			addSingleNewEntry(monitor, addPage);
-			closePopUpDialog();
-			monitor.pass();
-		} catch (IPAWebAutomationException e) { 
-			e.printStackTrace();
-			monitor.fail(e);
-		}
-		return monitor;
+		addPage = "Add Host";
+		duplicatePage = "Add Duplicate Host";
+		modifyPage = "Modify Host";
+		delPage = "Delete Host";
+		registerStandardTestCases();
+		System.out.println("New instance of " + IdentityPageHosts.class.getName() + " is ready"); 
 	}
 
 	@Override
@@ -88,18 +68,6 @@ public class IdentityPageHosts extends IPAWebPage implements StandardTest {
 	}
 
 	@Override
-	public IPAWebTestMonitor addThenCancel(IPAWebTestMonitor monitor){
-		try {
-			addNewEntryThenCancelOperation(monitor, addPage);
-			monitor.pass();
-		} catch (IPAWebAutomationException e) {
-			e.printStackTrace();
-			monitor.fail(e);
-		}
-		return monitor;
-	}
-
-	@Override
 	public IPAWebTestMonitor addNegativeDuplicate(IPAWebTestMonitor monitor) {
 		
 		// enter the data first time
@@ -107,7 +75,6 @@ public class IdentityPageHosts extends IPAWebPage implements StandardTest {
 			addSingleNewEntry(monitor, duplicatePage);
 			closePopUpDialog();
 			addSingleNewEntry(monitor, duplicatePage);
-			
 			
 			// check error dialog box
 			if (browser.div("error_dialog").exists()){
@@ -125,71 +92,4 @@ public class IdentityPageHosts extends IPAWebPage implements StandardTest {
 			return monitor;
 		}
 	}
-
-	@Override
-	public IPAWebTestMonitor addNegativeRequiredFields(IPAWebTestMonitor monitor) {
-		browser.span("Add").click();
-		browser.button("Add").click(); 
-		if (browser.span("Required field").exists())
-			monitor.pass();
-		else
-			monitor.fail("No 'Required field' lable appears");
-		closePopUpDialog();
-		return monitor;
-	}
-	
-	@Override
-	public IPAWebTestMonitor modify(IPAWebTestMonitor monitor) {
-		browser.link("user001").click();
-		try {
-			fillDataIntoPage(monitor,modifyPage);
-			browser.span("Update").click();
-			if (browser.div("error_dialog").exists())
-			{
-				monitor.fail("error dialog appears");
-				closePopUpDialog();
-				browser.span("Reset").click();
-			}
-			else
-				monitor.pass();
-		} catch (IPAWebAutomationActionNotDefinedException e) {
-			monitor.fail(e);
-			e.printStackTrace();
-		}
-		browser.link("User").in(browser.span("back-link")).click();
-		return monitor;
-	}
-	
-	@Override
-	public IPAWebTestMonitor modifyNegative(IPAWebTestMonitor monitor) {
-		return monitor;
-	}
-	
-	@Override
-	public IPAWebTestMonitor deleteSingle(IPAWebTestMonitor monitor){ 
-		try {
-			deleteSingleEntry(monitor, delPage);
-			monitor.pass();
-		} catch (IPAWebAutomationException e) { 
-			e.printStackTrace();
-			monitor.fail(e);
-		} 
-		return monitor;
-	}
-	
-	@Override
-	public IPAWebTestMonitor deleteMultiple(IPAWebTestMonitor monitor){
-		int numOfEntries = 5;
-		try {
-			deleteMultipleEntry(monitor, delPage, numOfEntries);
-			monitor.pass();
-		} catch (IPAWebAutomationException e) { 
-			e.printStackTrace();
-			monitor.fail(e);
-		} catch (Exception e){
-			monitor.fail(e);
-		}
-		return monitor;
-	}
-	 
 }

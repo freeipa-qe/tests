@@ -95,7 +95,7 @@ public class GlobalizationWebAutomation extends IPAWebAutomation {
 				Method ensureURL = c.getMethod("ensureUrl");
 				ensureURL.invoke(page); 
 				
-				// prepre the test case execution monitor 
+				// prepare the test case execution monitor 
 				Method m = c.getMethod(testcase, IPAWebTestMonitor.class );
 				String methodName = m.getName();
 				String queueKey = testPage + ":" + methodName; 
@@ -124,7 +124,6 @@ public class GlobalizationWebAutomation extends IPAWebAutomation {
 		}
 	}
 	
-	
 	/***************************************************************************** 
 	 *             Data providers                                                * 
 	 *****************************************************************************/
@@ -137,14 +136,33 @@ public class GlobalizationWebAutomation extends IPAWebAutomation {
 	private String[] IdentityPageNetgroups = {"simple add and delete", "IdentityPageNetgroups", globalizationAcceptanceTestDataFile};
 	private String[] IdentityPageServices = {"simple add and delete", "IdentityPageServices", globalizationAcceptanceTestDataFile};
 
-	private String[] PolicyPageHBACRules = {"simple add and delete","HBACRulesPolicyPage", globalizationAcceptanceTestDataFile};
-//	private String[][] testdataAdd    = {IdentityPageUsers,IdentityPageUserGroups,PolicyPageHBACRules,IdentityPageHosts,IdentityPageHostGroups,IdentityPageNetgroups,IdentityPageServices};
-//	private String[][] testdataModify = {IdentityPageUsers,IdentityPageUserGroups,PolicyPageHBACRules,IdentityPageHosts,IdentityPageHostGroups,IdentityPageNetgroups,IdentityPageServices};
-//	private String[][] testdataDelete =	{IdentityPageUsers,IdentityPageUserGroups,PolicyPageHBACRules,IdentityPageHosts,IdentityPageHostGroups,IdentityPageNetgroups,IdentityPageServices};
+	private String[] PolicyPageHBACRules = {"simple add and delete","PolicyPageHBACRules", globalizationAcceptanceTestDataFile};
+	private String[] PolicyPageHBACServices = {"simple add and delete", "PolicyPageHBACServices",globalizationAcceptanceTestDataFile};
+	private String[] PolicyPageHBACServiceGroups = {"simple add and delete", "PolicyPageHBACServiceGroups",globalizationAcceptanceTestDataFile};
+
+	private String[] PolicyPageSudoCommands = {"simple add and delete", "PolicyPageSudoCommand",globalizationAcceptanceTestDataFile};
+	private String[] PolicyPageSudoCommandGroups = {"simple add and delete", "PolicyPageSudoCommandGroups",globalizationAcceptanceTestDataFile};
+	private String[] PolicyPageAutomountLocations = {"simple add and delete", "PolicyPageAutomountLocation",globalizationAcceptanceTestDataFile};
 	
-	private String[][] testdataAdd    = {IdentityPageServices};
-	private String[][] testdataModify = {IdentityPageServices};
-	private String[][] testdataDelete =	{IdentityPageServices};
+	private String[] IPAServerPageRoles = {"simple add and delete", "IPAServerPageRoles",globalizationAcceptanceTestDataFile};
+	private String[] IPAServerPagePrivileges = {"simple add and delete", "IPAServerPagePrivileges",globalizationAcceptanceTestDataFile};
+	private String[] IPAServerPagePermissions = {"simple add and delete", "IPAServerPagePermissions",globalizationAcceptanceTestDataFile};
+	private String[] IPAServerPageSelfServicePermissions = {"simple add and delete", "IPAServerPageSelfServicePermissions",globalizationAcceptanceTestDataFile};
+	private String[] IPAServerPageDelegations = {"simple add and delete", "IPAServerPageDelegation",globalizationAcceptanceTestDataFile};
+
+/*
+ * 
+	private String[][] allTestdataAdd = {IdentityPageUsers,IdentityPageUserGroups,IdentityPageHosts,IdentityPageHostGroups,IdentityPageNetgroups,IdentityPageServices,
+									PolicyPageHBACRules,PolicyPageHBACServices, PolicyPageHBACServiceGroups,
+									PolicyPageSudoRules,PolicyPageSudoCommands,PolicyPageAutomountLocations,
+									IPAServerPageRoles, IPAServerPagePrivileges, IPAServerPagePermissions,IPAServerPageSelfServicePermissions,
+									IPAServerPageDelegation};
+	private String[][] allTestdataModify = testdataAdd;
+	private String[][] allTestdataDelete =	testdataAdd;
+*/	
+	private String[][] testdataAdd    = {IPAServerPageDelegations};
+	private String[][] testdataModify = {IPAServerPageDelegations};
+	private String[][] testdataDelete =	{IPAServerPageDelegations};
 	
 	@DataProvider(name="addData")
 	public Object[][] getAddData(){return testdataAdd; }

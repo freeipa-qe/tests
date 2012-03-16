@@ -43,6 +43,10 @@ public class CommonTasks {
 	public static String configurationPage = serverUrl + "/ipa/ui/#ipaserver=config&navigation=ipaserver"; 
 	public static String automountPage = serverUrl + "/ipa/ui/#automount=automountlocation&policy=automount&navigation=policy";  
 	public static String hbacRulesPolicyPage = serverUrl + "/ipa/ui/#hbac=hbacrule&policy=hbac&navigation=policy";
+	public static String rolePage = serverUrl + "/ipa/ui/#rolebased=role&ipaserver=rolebased&navigation=ipaserver";
+	public static String privilegePage = serverUrl + "/ipa/ui/#rolebased=privilege&ipaserver=rolebased&navigation=ipaserver";
+	public static String permissionPage = serverUrl + "/ipa/ui/#rolebased=permission&ipaserver=rolebased&navigation=ipaserver";
+	public static String delegationPage = serverUrl + "/ipa/ui/#ipaserver=delegation&navigation=ipaserver";
 	
 	public static String ipadomain = "";
 	public static String ipafqdn= "";
