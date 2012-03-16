@@ -70,7 +70,7 @@ delegation_bz_783307()
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa group-add --desc=gr1000 gr1000 > /dev/null 2>&1" 0 "Add group required for test"
-		rlRun "ipa delegation-add $FUNCNAME --membergroup=badgroup --group=gr1000 --attrs=mobile > $tmpout 2>&1" 1  "Add delegation with non-existent membergroup"
+		rlRun "ipa delegation-add $FUNCNAME --membergroup=badgroup --group=gr1000 --attrs=mobile > $tmpout 2>&1" 2  "Add delegation with non-existent membergroup"
 		if [ $(egrep "Added delegation \"$FUNCNAME\"|badgroup" $tmpout|wc -l) -eq 2 ]; then     
 			rlFail "BZ 783307 found...ipa delegation-add is not failing when membergroup does not exist"
 			rlRun "ipa delegation-del $FUNCNAME" 0 "Delete incorrectly added delegation $FUNCNAME"
