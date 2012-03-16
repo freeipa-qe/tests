@@ -203,9 +203,9 @@ oct8=$(echo $ipv6addr | awk -F : '{print $8}')
         rlLog "EXECUTING: ipa host-add $myhost --force"
         rlRun "ipa host-add $myhost --force" 0 "Add host DNS entries exist"
         rlRun "findHost $myhost" 0 "Verifying host was added when DNS records exist."
-        rlRun "ipa dnsrecord-find $DOMAIN $short > $tmpDir/forward_dns_4.out" 0 "Checking for forward DNS entry"
+        rlRun "ipa dnsrecord-find $DOMAIN $short > $tmpDir/forward_dns_5.out" 0 "Checking for forward DNS entry"
         MSG="AAAA record: $ipv6_addr"
-        rlAssertGrep "$MSG" "$tmpDir/forward_dns_4.out"
+        rlAssertGrep "$MSG" "$tmpDir/forward_dns_5.out"
         recordname_ipv6=""
         for item in $oct8 $oct7 $oct6 $new_oct5 ; do
                 while [ ${#item} -lt 4 ]
@@ -235,9 +235,9 @@ oct8=$(echo $ipv6addr | awk -F : '{print $8}')
         rlRun "ipa host-del --updatedns $myhost" 0 "Delete host and update DNS"
         rlRun "findHost $myhost" 1 "Verifying host was deleted."
         rlRun "ipa dnsrecord-show $DOMAIN $ipv6_addr" 2 "Checking for forward DNS entry"
-	rlRun "ipa dnsrecord-find $DOMAIN $short > $tmpDir/forward_dns_5.out" 1
+	rlRun "ipa dnsrecord-find $DOMAIN $short > $tmpDir/forward_dns_6.out" 1
         MSG="AAAA record: $ipv6_addr"
-        rlAssertNotGrep "$MSG" "$tmpDir/forward_dns_5.out"
+        rlAssertNotGrep "$MSG" "$tmpDir/forward_dns_6.out"
 
 	recordname_ipv6=""
         for item in $oct8 $oct7 $oct6 $new_oct5 ; do
