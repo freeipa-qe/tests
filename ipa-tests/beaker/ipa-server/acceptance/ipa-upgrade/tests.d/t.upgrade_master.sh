@@ -52,10 +52,10 @@ upgrade_master()
 
 		# Setup new yum repos from ipa-upgrade.data datafile
 		for url in ${repo[@]}; do
-			i=$(( i += 1 ))
-cat > /etc/yum.repos.d/mytestrepo$i.repo <<-EOF
-[mytestrepo$i]
-name=mytestrepo$i
+			repoi=$(( repoi += 1 ))
+cat > /etc/yum.repos.d/mytestrepo$repoi.repo <<-EOF
+[mytestrepo$repoi]
+name=mytestrepo$repoi
 baseurl=$url
 enabled=1
 gpgcheck=0
