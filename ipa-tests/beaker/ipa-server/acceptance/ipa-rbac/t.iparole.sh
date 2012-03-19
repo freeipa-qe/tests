@@ -759,15 +759,12 @@ iparole_find_positive()
 	rlRun "pkey_return_check" 0 "running checks of --pkey-only in sudorule-find"
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-role-cli-1043 - role find --name"
-     roleName="helpdesk"
-    rlPhaseEnd
 }
 
 
 iparole_find_negative()
 {
-
+rlLog "ipa role-find - negative"
 }
 
 #############################################
