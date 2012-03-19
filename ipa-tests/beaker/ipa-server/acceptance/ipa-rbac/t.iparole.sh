@@ -6,15 +6,15 @@
 ########################
 iparoleTests() {
     cleanupRolesTests
-#    iparole_check
-#    iparole_add
-#    iparole_add_member
-#    iparole_remove_member
-#    iparole_add_privilege
-#    iparole_remove_privilege
-#    iparole_del
-#    iparole_show
-#    iparole_find
+    iparole_check
+    iparole_add
+    iparole_add_member
+    iparole_remove_member
+    iparole_add_privilege
+    iparole_remove_privilege
+    iparole_del
+    iparole_show
+    iparole_find
     iparole_mod
 #    cleanupRolesTests
 }
@@ -799,7 +799,7 @@ iparole_find()
 #############################################
 iparole_mod()
 {
-   iparole_mod_positive
+#   iparole_mod_positive
    iparole_mod_negative
 }
 
@@ -856,17 +856,58 @@ iparole_mod_positive()
     rlAssertGrep "$expAttr" "$TmpDir/iparole_modifyroledelattr.log"
     rlAssertGrep "attributelevelrights:" "$TmpDir/iparole_modifyroledelattr.log"
   rlPhaseEnd
-
-
-  
-
 }
 
 
 iparole_mod_negative()
 {
   kinitAs $ADMINID $ADMINPW
-  rlLog "Negative"
+    roleName="helpdesk"
+
+  rlPhaseStartTest "ipa-role-cli-1031 - mod role to addattr multiple attr when only one one value is allowed"
+    attr="addattr"
+    addDescription="description=AnotherDescriptionNotAllowed"
+    command="modifyRole $roleName $attr $addDescription"
+    expmsg="ipa: ERROR: description: Only one value allowed."
+    rlRun "$command > $TmpDir/iparole_addmultipleattr.log 2>&1" 1 "Verify error message for $roleName"
+    rlAssertGrep "$expmsg" "$TmpDir/iparole_addmultipleattr.log"
+  rlPhaseEnd
+
+  rlPhaseStartTest "ipa-role-cli-1032 - mod role to addattr with invalid syntax"
+    attr="addattr"
+    addOwner="owner=xyz"
+    command="modifyRole $roleName $attr $addOwner"
+    expmsg="ipa: ERROR: owner: value #0 invalid per syntax: Invalid syntax."
+    rlRun "$command > $TmpDir/iparole_invalidsyntax.log 2>&1" 1 "Verify error message for $roleName"
+    rlAssertGrep "$expmsg" "$TmpDir/iparole_invalidsyntax.log"
+  rlPhaseEnd
+
+
+  rlPhaseStartTest "ipa-role-cli-1033 - mod role to use blank desc"
+    attr="desc"
+    command="modifyRole $roleName $attr"
+    expmsg="ipa: ERROR: 'desc' is required"
+    rlRun "$command > $TmpDir/iparole_blankdesc.log 2>&1" 1 "Verify error message for $roleName"
+    rlAssertGrep "$expmsg" "$TmpDir/iparole_blankdesc.log"
+  rlPhaseEnd
+
+  rlPhaseStartTest "ipa-role-cli-1034 - mod role to use blank rename"
+    attr="rename"
+    command="modifyRole $roleName $attr"
+    expmsg="ipa: ERROR: invalid 'rename': can't be empty"
+    rlRun "$command > $TmpDir/iparole_blankrename.log 2>&1" 1 "Verify error message for $roleName"
+    rlAssertGrep "$expmsg" "$TmpDir/iparole_blankrename.log"
+  rlPhaseEnd
+
+  rlPhaseStartTest "ipa-role-cli-1035 - mod role to delattr required description"
+    attr="delattr"
+    roleDesc="description=Helpdesk Updated"
+    command="modifyRole $roleName $attr $roleDesc"
+    expmsg="ipa: ERROR: 'description' is required"
+    rlRun "$command > $TmpDir/iparole_deldesc.log 2>&1" 1 "Verify error message for $roleName"
+    rlAssertGrep "$expmsg" "$TmpDir/iparole_deldesc.log"
+  rlPhaseEnd
+
 }
 
 
