@@ -6,12 +6,12 @@ ipaprivilegeTests() {
     ipaprivilege_check
     ipaprivilege_add
     ipaprivilege_add_permission
-    ipaprivilege_del_continue
-    ipaprivilege_find
-    ipaprivilege_mod
     ipaprivilege_remove_permission
+    ipaprivilege_del_continue
     ipaprivilege_show
-    cleanupPrivilegesTest
+    ipaprivilege_mod
+    ipaprivilege_find
+#    cleanupPrivilegesTest
 }
 
 setupPrivilegesTest()
@@ -368,23 +368,6 @@ ipaprivilege_del_continue()
 
 }
 
-#############################################
-#  test: ipaprivilege-find
-#############################################
-ipaprivilege_find()
-{
-    rlPhaseStartTest "privilege-find_001 - --pkey-only test of ipa privilege"
-	rlRun "kinitAs $ADMINID $ADMINPW"
-	ipa_command_to_test="privilege"
-	pkey_addstringa="--desc=test-priv"
-	pkey_addstringb="--desc=test-priv"
-	pkeyobja="tpriv"
-	pkeyobjb="tprivb"
-	grep_string='Privilege\ name'
-	general_search_string=tpriv
-	rlRun "pkey_return_check" 0 "running checks of --pkey-only in privilege-find"
-    rlPhaseEnd
-}
 
 #############################################
 #  test: ipaprivilege-show 
@@ -416,6 +399,9 @@ ipaprivilege_show()
 }
 
 
+#############################################
+#  test: ipaprivilege-mod
+#############################################
 ipaprivilege_mod()
 {
    ipaprivilege_mod_positive
@@ -423,6 +409,9 @@ ipaprivilege_mod()
 }
 
 
+#############################################
+#  test: ipaprivilege-mod: Positive
+#############################################
 ipaprivilege_mod_positive()
 {
    privilegeName="Netgroups Administrators"
@@ -464,6 +453,9 @@ ipaprivilege_mod_positive()
     rlRun "modifyPrivilege \"$privilegeName\" $attr1 $privilegeDesc $attr2 $delOwner1 $attr2 $delOwner2" 0 "Change back modifications"
 }
 
+#############################################
+#  test: ipaprivilege-mod: Negative
+#############################################
 ipaprivilege_mod_negative()
 {
   privilegeName="NetgroupsAdmin"
@@ -518,3 +510,62 @@ ipaprivilege_mod_negative()
 
 
 
+#############################################
+#  test: ipaprivilege-find
+#############################################
+ipaprivilege_find()
+{
+    rlPhaseStartTest "ipa-privilege-cli-1036 - --pkey-only test of ipa privilege"
+	rlRun "kinitAs $ADMINID $ADMINPW"
+	ipa_command_to_test="privilege"
+	pkey_addstringa="--desc=test-priv"
+	pkey_addstringb="--desc=test-priv"
+	pkeyobja="tpriv"
+	pkeyobjb="tprivb"
+	grep_string='Privilege\ name'
+	general_search_string=tpriv
+	rlRun "pkey_return_check" 0 "running checks of --pkey-only in privilege-find"
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-privilege-cli-1037 - privilege find --name"
+     criteria="--name=Automount Administrators"
+     attribute="Privilege name"
+     value="Automount Administrators"
+     resultMsg="Number of entries returned 1"
+     rlRun "findPrivilege \"$criteria\" \"$attribute\" \"$value\" \"$resultMsg\" all" 0 "find privilege using \"$criteria\""
+    rlPhaseEnd
+
+   
+    rlPhaseStartTest "ipa-privilege-cli-1038 - privilege find --desc (--raw)"
+     criteria="--desc=Automount Administrators"
+     attribute="description"
+     value="Automount Administrators"
+     resultMsg="Number of entries returned 1"
+     rlRun "findPrivilege \"$criteria\" \"$attribute\" \"$value\" \"$resultMsg\" raw" 0 "find privilege using \"$criteria\""
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-privilege-cli-1039 - privilege find --sizelimit"
+     criteria="--sizelimit=2"
+     resultMsg="Number of entries returned 2"
+     rlRun "findPrivilege \"$criteria\" \"$resultMsg\"" 0 "find privilege using \"$criteria\""
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-privilege-cli-1040 - privilege find  - missing name"
+     criteria="--name="
+     attribute="Privilege name"
+     value="Automount Administrators"
+     resultMsg="Number of entries returned 0"
+     command="findPrivilege \"$criteria\" \"$attribute\" \"$value\" \"$resultMsg\" all"
+     rlRun "$command > $TmpDir/iparole_findprivilegename.log 2>&1"  0 "find privilege using \"$criteria\""
+     rlAssertNotGrep "$resultMsg" "$TmpDir/iparole_findrolename.log"
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-privilege-cli-1041 - privilege find - blank desc"
+     criteria="--desc=\"\""
+     attribute="description"
+     value="Automount Administrators"
+     resultMsg="Number of entries returned 0"
+     command="findPrivilege \"$criteria\" \"$attribute\" \"$value\" \"$resultMsg\" all"
+     rlAssertNotGrep "$resultMsg" "$TmpDir/iparole_findprivilegename.log" 0 "find privilege using \"$criteria\""
+    rlPhaseEnd
+}

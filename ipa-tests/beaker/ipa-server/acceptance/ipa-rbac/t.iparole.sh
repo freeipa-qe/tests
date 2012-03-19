@@ -730,7 +730,7 @@ iparole_show()
 
    rlPhaseStartTest "ipa-role-cli-1044: show role - rights"
     command="ipa role-show \"$roleName\" --all --rights"
-    rlRun "$command > $TmpDir/iparole_showrights.log" 0 "Verify Role show with raw"
+    rlRun "$command > $TmpDir/iparole_showrights.log" 0 "Verify Role show with rights"
     rlAssertGrep "attributelevelrights:" "$TmpDir/iparole_showrights.log"
    rlPhaseEnd
 }
@@ -799,7 +799,7 @@ iparole_find()
 #############################################
 iparole_mod()
 {
-#   iparole_mod_positive
+   iparole_mod_positive
    iparole_mod_negative
 }
 
@@ -846,7 +846,7 @@ iparole_mod_positive()
     rlRun "verifyRoleAttr \"$roleName\" \"seealso\" \"cn=HostCLI\" raw" 0 "Verify Role seeAlso"
   rlPhaseEnd
 
-  rlPhaseStartTest "ipa-role-cli-1052 - modify role's seeAlso using delattr (--rights)" 
+  rlPhaseStartTest "ipa-role-cli-1054 - modify role's seeAlso using delattr (--rights)" 
     roleName="helpdesk"
     attr="delattr"
     value="\"seeAlso=cn=HostCLI\""
@@ -864,7 +864,7 @@ iparole_mod_negative()
   kinitAs $ADMINID $ADMINPW
     roleName="helpdesk"
 
-  rlPhaseStartTest "ipa-role-cli-1031 - mod role to addattr multiple attr when only one one value is allowed"
+  rlPhaseStartTest "ipa-role-cli-1055 - mod role to addattr multiple attr when only one one value is allowed"
     attr="addattr"
     addDescription="description=AnotherDescriptionNotAllowed"
     command="modifyRole $roleName $attr $addDescription"
@@ -873,7 +873,7 @@ iparole_mod_negative()
     rlAssertGrep "$expmsg" "$TmpDir/iparole_addmultipleattr.log"
   rlPhaseEnd
 
-  rlPhaseStartTest "ipa-role-cli-1032 - mod role to addattr with invalid syntax"
+  rlPhaseStartTest "ipa-role-cli-1056 - mod role to addattr with invalid syntax"
     attr="addattr"
     addOwner="owner=xyz"
     command="modifyRole $roleName $attr $addOwner"
@@ -883,7 +883,7 @@ iparole_mod_negative()
   rlPhaseEnd
 
 
-  rlPhaseStartTest "ipa-role-cli-1033 - mod role to use blank desc"
+  rlPhaseStartTest "ipa-role-cli-1057 - mod role to use blank desc"
     attr="desc"
     command="modifyRole $roleName $attr"
     expmsg="ipa: ERROR: 'desc' is required"
@@ -891,7 +891,7 @@ iparole_mod_negative()
     rlAssertGrep "$expmsg" "$TmpDir/iparole_blankdesc.log"
   rlPhaseEnd
 
-  rlPhaseStartTest "ipa-role-cli-1034 - mod role to use blank rename"
+  rlPhaseStartTest "ipa-role-cli-1058 - mod role to use blank rename"
     attr="rename"
     command="modifyRole $roleName $attr"
     expmsg="ipa: ERROR: invalid 'rename': can't be empty"
@@ -899,7 +899,7 @@ iparole_mod_negative()
     rlAssertGrep "$expmsg" "$TmpDir/iparole_blankrename.log"
   rlPhaseEnd
 
-  rlPhaseStartTest "ipa-role-cli-1035 - mod role to delattr required description"
+  rlPhaseStartTest "ipa-role-cli-1059 - mod role to delattr required description"
     attr="delattr"
     roleDesc="description=Helpdesk Updated"
     command="modifyRole $roleName $attr $roleDesc"

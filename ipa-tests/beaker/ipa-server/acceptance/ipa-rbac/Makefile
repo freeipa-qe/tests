@@ -52,7 +52,7 @@ $(METADATA): Makefile
 	@echo "Path:            $(TEST_DIR)" >> $(METADATA)
 	@echo "Description:     CLI Tests for ipa permission" >> $(METADATA)
 	@echo "Type:            Regression" >> $(METADATA)
-	@echo "TestTime:        30m" >> $(METADATA)
+	@echo "TestTime:        45m" >> $(METADATA)
 	@echo "RunFor:          ipa-server" >> $(METADATA)
 	@echo "Requires:        ipa-admintools" >> $(METADATA)
 	@echo "Requires:        expect" >> $(METADATA)

@@ -4,16 +4,31 @@
 #  PERMISSION, PRIVILEGE, ROLE CLI SHARED LIBRARY
 #######################################################################
 # Includes:
-#       addPermission
-#       findPermission
-#       modPermission
-#       verifyPermissionAttr
-#       verifyPermissionClasses
-#       addPermissionManagedBy
-#       removePermissionManagedBy
-#       disablePermission
-#       deletePermission
-#       getNumberOfPermissions
+#      addPermission
+#      deletePermission
+#      verifyPermissionAttr
+#      findPermissionByOption
+#      findPermissionByMultipleOptions
+#      verifyPermissionAttrFindUsingOptions
+#      modifyPermission
+#
+#      addPrivilege
+#      deletePrivilege
+#      addPermissionToPrivilege
+#      removePermissionFromPrivilege
+#      verifyPrivilegeAttr
+#      modifyPrivilege
+#
+#      addRole
+#      addPrivilegeToRole
+#      removePrivilegeFromRole
+#      addMemberToRole
+#      removeMemberFromRole
+#      deleteRole
+#      modifyRole
+#      verifyRoleAttr
+#      findRole
+
 ######################################################################
 # Assumes:
 #       For successful command exectution, administrative credentials
@@ -141,7 +156,7 @@ verifyPermissionAttr()
 
 #######################################################################
 # findPermissionByOption Usage:
-#       findPermissionByOption <option> <value> <space_delimited_list_of_expected_rules>
+#       findPermissionByOption <option> <value> <space_delimited_list_of_expected_perms>
 ######################################################################
 
 findPermissionByOption()
@@ -189,6 +204,10 @@ findPermissionByOption()
 }
 
 
+#######################################################################################################
+# findPermissionByMultipleOptions Usage:
+#       findPermissionByMultipleOptions <numberOfOptions> <option1> <value1> <option2> <value2> .....
+######################################################################################################
 findPermissionByMultipleOptions()
 {
    numberOfOptions=$1
@@ -245,6 +264,11 @@ findPermissionByMultipleOptions()
 }
 
 
+#######################################################################
+# After finding permission, verify the attributes found.
+# verifyPermissionAttrFindUsingOptions Usage:
+#       verifyPermissionAttrFindUsingOptions <attribute> <value>
+#######################################################################
 
 verifyPermissionAttrFindUsingOptions()
 {
@@ -273,6 +297,10 @@ verifyPermissionAttrFindUsingOptions()
    return $rc
 }
 
+#######################################################################
+# modifyPermission Usage:
+#       modifyPermission <permissionName> <attrToUpdate> <value>
+#######################################################################
 modifyPermission()
 {
 
@@ -295,6 +323,10 @@ modifyPermission()
 }
 
 
+############################################################
+# addPrivilege Usage:
+#       addPrivilege <privilegeName> <privilegeDesc> <attr>
+############################################################
 addPrivilege()
 {
    privilegeName=$1
@@ -326,9 +358,12 @@ addPrivilege()
    return $rc
 }
 
+############################################################
+# deletePrivilege Usage:
+#       deletePrivilege <privilegeName> 
+############################################################
 deletePrivilege()
 {
-    rlLog "Entering deletePrivilege with $1"
        privilegeName=$1
         rc=0
 
@@ -344,9 +379,12 @@ deletePrivilege()
         return $rc
 }
 
+############################################################
+# addPermissionToPrivilege Usage:
+#       addPermissionToPrivilege <permission list> <privilegeName> 
+############################################################
 addPermissionToPrivilege()
 {
-  rlLog "Entering addPermissionToPrivilege with $2"
   permissionList="$1"
   privilegeName="${2}"
 
@@ -361,9 +399,12 @@ addPermissionToPrivilege()
   fi
 }
 
+############################################################
+# removePermissionFromPrivilege Usage:
+#       removePermissionFromPrivilege <permission list> <privilegeName> 
+############################################################
 removePermissionFromPrivilege()
 {
-  rlLog "Entering removePermissionFromPrivilege with $2"
   permissionList="$1"
   privilegeName="${2}"
 
@@ -378,6 +419,10 @@ removePermissionFromPrivilege()
   fi
 }
 
+##############################################################################
+# verifyPrivilegeAttr Usage:
+#       verifyPrivilegeAttr <privilegeName> <attr to verify> <expected value>  
+##############################################################################
 verifyPrivilegeAttr()
 {
 
@@ -408,6 +453,10 @@ verifyPrivilegeAttr()
 }
 
 
+#######################################################################################################
+# modifyPrivilege Usage:
+#       modifyPrivilege <privilegeName> <attr to modify> <new value>  <attr to modify> <new value> .... 
+#######################################################################################################
 ## TODO: Unable to modify to a value containing space
 modifyPrivilege()
 {
@@ -440,11 +489,86 @@ modifyPrivilege()
 
 }
 
+################################################################################
+# findPrivilege Usage:
+#       findPrivilege <criteria> <attr to validate> <expected value> <expected result msg> 
+#       findPrivilege <criteria> <expected result msg> 
+#       findPrivilege <criteria> <attr to validate> <expected value> <expected result msg> <all or raw>
+################################################################################
+findPrivilege()
+{
+
+   criteria="$1"
+   if [ `echo $#` = 5 ] ; then 
+      attribute="$2:"
+      value=$3
+      resultMsg=$4
+   else
+      attribute=""
+      value=""
+      resultMsg=$2
+   fi
+   if [ `echo $#` = 5 ] ; then
+     if [ "$5" == "raw" ] ; then
+       allOrRaw="--all --$5"
+     else
+       allOrRaw="--$5"
+     fi
+   else
+     allOrRaw="--all"
+   fi
+
+   tmpfile=$TmpDir/privilegefind.out
+   rc=0
+
+   rlLog "Executing: ipa privilege-find $allOrRaw \"$criteria\" > $tmpfile"
+   ipa privilege-find $allOrRaw "$criteria" > $tmpfile
+   rc=$?
+
+   if [ $rc -ne 0 ]; then
+      rlLog "WARNING: ipa privilege-find command failed."
+      return $rc
+   fi
+
+   if [ -n "$attribute" ] ; then
+     cat $tmpfile | grep -i "$attribute $value"
+     rc=$?
+     if [ $rc -ne 0 ]; then
+        rlLog "ERROR: ipa privilege verification failed:  Value of \"$attribute\" != \"$value\""
+        rlLog "ERROR: ipa privilege verification failed:  it is `cat $tmpfile | grep \"$attribute\"`"
+     else
+        rlLog "ipa privilege Verification successful: Value of \"$attribute\" = \"$value\""
+        if [ -n "$resultMsg" ] ; then
+          cat $tmpfile | grep -i "$resultMsg"
+          rc=$?
+          if [ $rc -ne 0 ]; then
+             rlLog "ERROR: ipa privilege verification failed:  \"$resultMsg not found"
+          else
+            rlLog "ipa privilege Verification successful: \"$resultMsg found" 
+          fi
+        fi
+     fi
+   else
+        cat $tmpfile | grep -i "$resultMsg"
+        rc=$?
+        if [ $rc -ne 0 ]; then
+           rlLog "ERROR: ipa privilege verification failed:  \"$resultMsg not found"
+        else
+           rlLog "ipa privilege Verification successful: \"$resultMsg found" 
+        fi
+   fi
+   return $rc
+
+}
 
 
+##############################################
+# addRole Usage:
+#       addRole <roleName> <roleDesc>
+#       addRole <roleName> <roleDesc> <attr>
+##############################################
 addRole()
 {
-    rlLog "Entering addRole with $1 $2"
   roleName=$1
   roleDesc=$2
   attr=""
@@ -471,10 +595,13 @@ addRole()
 }
 
 
+##################################################################
+# addPrivilegeToRole Usage:
+#       addPrivilegeToRole <privilegeList> <roleName>
+#       addPrivilegeToRole <privilegeList> <roleName> <all or raw>
+##################################################################
 addPrivilegeToRole()
 {
-    rlLog "Entering addPrivilegeToRole with $1 $2"
-
   privilegeList=$1
   roleName=$2
    if [ `echo $#` = 3 ] ; then
@@ -499,6 +626,11 @@ addPrivilegeToRole()
 
 }
 
+##################################################################
+# removePrivilegeFromRole Usage:
+#       removePrivilegeFromRole <privilegeList> <roleName>
+#       removePrivilegeFromRole <privilegeList> <roleName> <all or raw>
+##################################################################
 removePrivilegeFromRole()
 {
    privilegeList=$1
@@ -526,10 +658,14 @@ removePrivilegeFromRole()
 
 }
 
+##########################################################################################
+# addMemberToRole Usage:
+#       addMemberToRole <roleName> <type> <memberList>
+#       addMemberToRole <roleName> <type> <memberList> <all or raw>
+#       addMemberToRole <roleName> <type> <memberList> <all or raw> <type <memberlist>
+##########################################################################################
 addMemberToRole()
 {
-   rlLog "Entering addMemberToRole with $1 $2"
-
    roleName=$1
    type="--$2"
    memberList=$3
@@ -558,10 +694,13 @@ addMemberToRole()
    fi
 }
 
+##########################################################################################
+# removeMemberFromRole Usage:
+#       removeMemberFromRole <memberList> <roleName> <type>
+#       removeMemberFromRole <memberList> <roleName> <type> <all or raw>
+##########################################################################################
 removeMemberFromRole()
 {
-    rlLog "Entering removeMemberFromRole with $1 $2"
-
    memberList=$1
    roleName=$2
    type="--$3"
@@ -587,9 +726,12 @@ removeMemberFromRole()
 }
 
 
+################################
+# deleteRole Usage:
+#       deleteRole <roleName>
+###############################
 deleteRole()
 {
-    rlLog "Entering deleteRole with $1"
        roleName=$1
         rc=0
 
@@ -605,9 +747,13 @@ deleteRole()
         return $rc
 }
 
+########################################################################
+# modifyRole Usage:
+#       modifyRole <roleName> <attr to modify> <new value>
+#       modifyRole <roleName> <attr to modify> <new value> <all or raw>
+#######################################################################
 modifyRole()
 {
-    rlLog "Entering modifyRole with $1 $2 $3 $4"
        roleName="$1"
        attrToUpdate="--$2"
        value="$3"
@@ -635,6 +781,11 @@ modifyRole()
        return $rc
 }
 
+################################################################################
+# verifyRoleAttr Usage:
+#       verifyRoleAttr <roleName> <attr to verify> <expected value>
+#       verifyRoleAttr <roleName> <attr to verify> <expected value> <all or raw>
+################################################################################
 verifyRoleAttr()
 {
 
@@ -673,6 +824,12 @@ verifyRoleAttr()
    return $rc
 }
 
+################################################################################
+# findRole Usage:
+#       findRole <criteria> <attr to validate> <expected value> <expected result msg> 
+#       findRole <criteria> <expected result msg> 
+#       findRole <criteria> <attr to validate> <expected value> <expected result msg> <all or raw>
+################################################################################
 findRole()
 {
 
