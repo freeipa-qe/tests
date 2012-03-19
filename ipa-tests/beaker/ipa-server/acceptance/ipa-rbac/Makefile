@@ -29,7 +29,7 @@ export TESTVERSION=1.0
 
 BUILT_FILES=
 
-FILES=$(METADATA) runtest.sh Makefile PURPOSE t.ipapermission.sh lib.iparbac.sh lib.privilege.sh t.ipaprivilege.sh t.iparole.sh t.ipaRBACFunctionalTests.sh
+FILES=$(METADATA) runtest.sh Makefile PURPOSE t.ipapermission.sh lib.iparbac.sh lib.privilege.sh lib.role.sh t.ipaprivilege.sh t.iparole.sh t.ipaRBACFunctionalTests.sh
 
 .PHONY: all install download clean
 
