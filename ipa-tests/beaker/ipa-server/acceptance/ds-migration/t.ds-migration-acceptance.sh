@@ -18,7 +18,7 @@ ds-migration-acceptance()
     setup
     migrationconfig
     migratecmd
-    cleartxtpwdmigration
+    #cleartxtpwdmigration
     cleanup
 }
 
@@ -30,6 +30,10 @@ setup()
 {
         rlPhaseStartTest "SETUP MIGRATION ACCEPTANCE"
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials"
+		# turn off compat plugin and restart directory server
+		rlLog "EXECUTING: echo $ADMINPW | ipa-compat-manage disable"
+		rlRun "echo $ADMINPW | ipa-compat-manage disable" 0
+		rlRun "service dirsrv restart" 0 "Restarting directory server"
         rlPhaseEnd
 }
 
@@ -243,6 +247,8 @@ migratecmd()
         rlPhaseEnd
 
 	rlPhaseStartTest "ds-migration-cmd-016 Existing User is skipped"
+		# adding a bit of a wait in case the managed entry plugin is not done getting rid of the UPG
+		sleep 10
 		rlRun "ipa user-add --first=posix --last=user $USER1" 0 "Add user that will be migrated"
 		# get the ipa user id
 		preipauserid=`ipa user-show $USER1 | grep UID | cut -d ":" -f 2`
@@ -295,10 +301,35 @@ migratecmd()
                 ipa group-del $GROUP1
                 ipa group-del $GROUP2
         rlPhaseEnd
+
+        rlPhaseStartTest "bz783270 Warn if compat plugin is enabled"
+                rlLog "EXECUTING: echo $ADMINPW | ipa-compat-manage enable"
+                rlRun "echo $ADMINPW | ipa-compat-manage enable" 0
+                rlRun "service dirsrv restart" 0 "Restarting directory server"
+                rlLog "EXECUTING : echo $ADMINPW | ipa migrate-ds ldap://$CLIENT:389"
+                rlRun "echo $ADMINPW | ipa migrate-ds ldap://$CLIENT:389 > /tmp/compatenabled.out 2>&1" 1
+                rlAssertGrep "The compat plug-in is enabled." "/tmp/compatenabled.out"
+        rlPhaseEnd
+
+        rlPhaseStartTest "bz783270 Migrate with compat plugin enabled"
+                rlLog "EXECUTING: echo $ADMINPW | ipa migrate-ds --with-compat ldap://$CLIENT:389"
+		rlRun "echo $ADMINPW | ipa migrate-ds --with-compat ldap://$CLIENT:389" 0 "Migrating with compat plugin enabled"
+                rlRun "ipa user-show $USER1" 0 "Verifying $USER1 was migrated"
+                rlRun "ipa user-show $USER2" 0 "Verifying user '$USER2' was migrated"
+                rlRun "ipa group-show $GROUP1" 0 "Verifying group '$GROUP1' was migrated"
+                rlRun "ipa group-show $GROUP2" 0 "Verifying group '$GROUP2' was migrated"
+                rlLog "Cleaning up migrated users"
+                ipa user-del $USER1
+                ipa user-del $USER2
+                ipa group-del $GROUP1
+                ipa group-del $GROUP2
+        rlPhaseEnd
 }
 
 cleartxtpwdmigration()
 {
+
+	# disabling clear text password migration as it is not supported
 	rlPhaseStartTest "ds-migration-cleartxt-pwd-001 Clear Text Password Migration"
                 rlLog "EXECUTING: ipa migrate-ds --user-container=\"$USERCONTAINER\" --group-container=\"$GROUPCONTAINER\" ldap://$CLIENT:389"
                 rlRun "echo $ADMINPW | ipa migrate-ds --user-container=\"$USERCONTAINER\" --group-container=\"$GROUPCONTAINER\" ldap://$CLIENT:389" 0
