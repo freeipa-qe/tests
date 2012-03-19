@@ -5,26 +5,18 @@
 # testsuite
 ########################
 iparoleTests() {
-    setupRolesTests
-    iparole_check
-    iparole_add
-    iparole_add_member
-    iparole_remove_member
-    iparole_add_privilege
-    iparole_remove_privilege
-    iparole_del
-    iparole_show
-    iparole_find
-    iparole_mod
     cleanupRolesTests
-}
-
-########################
-# setup
-########################
-setupRolesTests()
-{
-  rlRun "kinitAs $ADMINID $ADMINPW"
+#    iparole_check
+#    iparole_add
+#    iparole_add_member
+#    iparole_remove_member
+#    iparole_add_privilege
+#    iparole_remove_privilege
+#    iparole_del
+#    iparole_show
+#    iparole_find
+    iparole_mod
+#    cleanupRolesTests
 }
 
 ########################
@@ -32,7 +24,7 @@ setupRolesTests()
 ########################
 cleanupRolesTests()
 {
-    rlRun "kinitAs $ADMINID $ADMINPW"
+    kinitAs $ADMINID $ADMINPW
     roleName="Host Admin"
     rlRun "deleteRole \"$roleName\"" 0 "Deleting $roleName"
      roleName="Hostgroup Admin"
@@ -53,7 +45,9 @@ cleanupRolesTests()
     rlRun "deletePrivilege \"$privilegeName3\""
      privilegeName="modify group membership"
     rlRun "addPrivilegeToRole \"$privilegeName\" \"$roleName\"" 
-    roleName="Helpdesk Updated"
+    roleName="helpdesk"
+    rlRun "modifyRole \"$roleName\" \"desc\" \"helpdesk\"" 0 "Modify $roleName to original desc"
+    rlRun "modifyRole \"$roleName\" \"delattr\" \"seeAlso=cn=HostgroupCLI\"" 0 "Modify $roleName to delete seeAlso attr"
 }
 
 
@@ -734,6 +728,11 @@ iparole_show()
     rlRun "verifyRoleAttr \"$roleName\" \"memberofindirect\" \"cn=change a user password,cn=permissions,cn=pbac,dc=testrelm,dc=com\" raw" 0 "Verify privilege"
    rlPhaseEnd
 
+   rlPhaseStartTest "ipa-role-cli-1044: show role - rights"
+    command="ipa role-show \"$roleName\" --all --rights"
+    rlRun "$command > $TmpDir/iparole_showrights.log" 0 "Verify Role show with raw"
+    rlAssertGrep "attributelevelrights:" "$TmpDir/iparole_showrights.log"
+   rlPhaseEnd
 }
 
 
@@ -807,7 +806,7 @@ iparole_mod()
 
 iparole_mod_positive()
 {
-  rlRun "kinitAs $ADMINID $ADMINPW"
+  kinitAs $ADMINID $ADMINPW
 
   rlPhaseStartTest "ipa-role-cli-1050 - modify role's desc" 
     roleName="helpdesk"
@@ -840,16 +839,33 @@ iparole_mod_positive()
     attr="addattr"
     value="\"seeAlso=cn=HostgroupCLI\""
     rlRun "modifyRole \"$roleName\" $attr \"$value\"" 0 "Modify $roleName to have seeAlso attr"
-    rlRun "verifyRoleAttr \"$roleName\" \"seeAlso\" \"cn=HostgroupCLI\" " 0 "Verify Role seeAlso"
+    rlRun "verifyRoleAttr \"$roleName\" \"seealso\" \"cn=HostgroupCLI\" raw " 0 "Verify Role seeAlso"
+    attr="addattr"
+    value="\"seeAlso=cn=HostCLI\""
+    rlRun "modifyRole \"$roleName\" $attr \"$value\"" 0 "Modify $roleName to have seeAlso attr"
+    rlRun "verifyRoleAttr \"$roleName\" \"seealso\" \"cn=HostCLI\" raw" 0 "Verify Role seeAlso"
   rlPhaseEnd
 
+  rlPhaseStartTest "ipa-role-cli-1052 - modify role's seeAlso using delattr (--rights)" 
+    roleName="helpdesk"
+    attr="delattr"
+    value="\"seeAlso=cn=HostCLI\""
+    command="modifyRole \"$roleName\" $attr \"$value\" rights"
+    expAttr="seealso: cn=HostgroupCLI"
+    rlRun "$command > $TmpDir/iparole_modifyroledelattr.log 2>&1"  0 "Modify $roleName to delete seeAlso attr"
+    rlAssertGrep "$expAttr" "$TmpDir/iparole_modifyroledelattr.log"
+    rlAssertGrep "attributelevelrights:" "$TmpDir/iparole_modifyroledelattr.log"
+  rlPhaseEnd
+
+
+  
 
 }
 
 
 iparole_mod_negative()
 {
-  rlRun "kinitAs $ADMINID $ADMINPW"
+  kinitAs $ADMINID $ADMINPW
   rlLog "Negative"
 }
 

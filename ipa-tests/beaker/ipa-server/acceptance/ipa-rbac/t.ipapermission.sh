@@ -20,6 +20,9 @@ ipapermissionTests() {
 setupPermissionTests()
 {
    rlRun "kinitAs $ADMINID $ADMINPW"
+   groupName="groupone"
+   groupDesc="groupone"
+   rlRun "addGroup $groupName $groupDesc"
 }
 
 
@@ -57,7 +60,7 @@ cleanupPermissionTests()
      #TODO: This permission shouldn't be added, and so will not be available 
      # for deleting, after bug 783502 is fixed.
      rlRun "deletePermission $permissionNameBUG" 0 "Deleting $permissionNameBUG"
-#     rlRun "deleteGroup groupone" 0 "Deleting groupone"
+     rlRun "deleteGroup groupone" 0 "Deleting groupone"
     rlPhaseEnd
 
 }

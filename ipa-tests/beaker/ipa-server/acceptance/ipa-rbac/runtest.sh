@@ -65,7 +65,7 @@ PACKAGE="ipa-server"
 #########################################
 
 rlJournalStart
-    rlPhaseStartSetup "ipapermission startup: Check for ipa-server package"
+    rlPhaseStartSetup "ipa rbac startup: Check for ipa-server package"
         rlAssertRpm $PACKAGE
         rlRun "TmpDir=\`mktemp -d\`" 0 "Creating tmp directory"
         rlRun "pushd $TmpDir"

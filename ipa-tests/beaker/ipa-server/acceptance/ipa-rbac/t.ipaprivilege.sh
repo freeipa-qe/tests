@@ -490,7 +490,7 @@ ipaprivilege_mod_negative()
   rlPhaseStartTest "ipa-privilege-cli-1033: mod privilege to use blank desc"
     attr="desc"
     command="modifyPrivilege $privilegeName $attr"
-    expmsg="ipa: ERROR: 'description' is required"
+    expmsg="ipa: ERROR: 'desc' is required"
     rlRun "$command > $TmpDir/ipaprivilege_blankdesc.log 2>&1" 1 "Verify error message for $privilegeName"
     rlAssertGrep "$expmsg" "$TmpDir/ipaprivilege_blankdesc.log"
   rlPhaseEnd

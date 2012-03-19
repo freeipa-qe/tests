@@ -607,12 +607,12 @@ deleteRole()
 
 modifyRole()
 {
-    rlLog "Entering modifyRole with $1 $2 $3"
+    rlLog "Entering modifyRole with $1 $2 $3 $4"
        roleName="$1"
        attrToUpdate="--$2"
        value="$3"
     if [ `echo $#` = 4 ] ; then
-     if [ "$4" == "raw" ] ; then
+     if [ "$4" == "raw" -o "$4" == "rights" ] ; then
        allOrRaw="--all --$4"
      else
        allOrRaw="--$4"
