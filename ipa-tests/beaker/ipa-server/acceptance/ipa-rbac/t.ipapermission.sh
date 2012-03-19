@@ -11,7 +11,6 @@ ipapermissionTests() {
     ipapermission_del_continue
     ipapermission_find
 #    ipapermission_mod
-
     cleanupPermissionTests
 }
 
@@ -20,10 +19,7 @@ ipapermissionTests() {
 ########################
 setupPermissionTests()
 {
-    rlPhaseStartTest "Setup - add users and groups"
-       rlRun "kinitAs $ADMINID $ADMINPW"
-       rlRun "addGroup testgroup groupone" 0 "adding test group"
-    rlPhaseEnd
+   rlRun "kinitAs $ADMINID $ADMINPW"
 }
 
 

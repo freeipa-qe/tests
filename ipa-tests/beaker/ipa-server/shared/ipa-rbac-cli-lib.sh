@@ -611,10 +611,20 @@ modifyRole()
        roleName="$1"
        attrToUpdate="--$2"
        value="$3"
+    if [ `echo $#` = 4 ] ; then
+     if [ "$4" == "raw" ] ; then
+       allOrRaw="--all --$4"
+     else
+       allOrRaw="--$4"
+     fi
+    else
+     allOrRaw="--all"
+    fi
+
        rc=0
 
-       rlLog "Executing: ipa role-mod $attrToUpdate=$value $roleName"
-       ipa role-mod "$attrToUpdate"="$value" "$roleName"
+       rlLog "Executing: ipa role-mod $attrToUpdate=$value $roleName $allOrRaw"
+       ipa role-mod "$attrToUpdate"="$value" "$roleName" $allOrRaw
        rc=$?
        if [ $rc -ne 0 ]; then
            rlLog "There was an error modifying $roleName"
@@ -663,3 +673,68 @@ verifyRoleAttr()
    return $rc
 }
 
+findRole()
+{
+
+   criteria="$1"
+   if [ `echo $#` = 5 ] ; then 
+      attribute="$2:"
+      value=$3
+      resultMsg=$4
+   else
+      attribute=""
+      value=""
+      resultMsg=$2
+   fi
+   if [ `echo $#` = 5 ] ; then
+     if [ "$5" == "raw" ] ; then
+       allOrRaw="--all --$5"
+     else
+       allOrRaw="--$5"
+     fi
+   else
+     allOrRaw="--all"
+   fi
+
+   tmpfile=$TmpDir/rolefind.out
+   rc=0
+
+   rlLog "Executing: ipa role-find $allOrRaw \"$criteria\" > $tmpfile"
+   ipa role-find $allOrRaw "$criteria" > $tmpfile
+   rc=$?
+
+   if [ $rc -ne 0 ]; then
+      rlLog "WARNING: ipa role-find command failed."
+      return $rc
+   fi
+
+   if [ -n "$attribute" ] ; then
+     cat $tmpfile | grep -i "$attribute $value"
+     rc=$?
+     if [ $rc -ne 0 ]; then
+        rlLog "ERROR: ipa role verification failed:  Value of \"$attribute\" != \"$value\""
+        rlLog "ERROR: ipa role verification failed:  it is `cat $tmpfile | grep \"$attribute\"`"
+     else
+        rlLog "ipa role Verification successful: Value of \"$attribute\" = \"$value\""
+        if [ -n "$resultMsg" ] ; then
+          cat $tmpfile | grep -i "$resultMsg"
+          rc=$?
+          if [ $rc -ne 0 ]; then
+             rlLog "ERROR: ipa role verification failed:  \"$resultMsg not found"
+          else
+            rlLog "ipa role Verification successful: \"$resultMsg found" 
+          fi
+        fi
+     fi
+   else
+        cat $tmpfile | grep -i "$resultMsg"
+        rc=$?
+        if [ $rc -ne 0 ]; then
+           rlLog "ERROR: ipa role verification failed:  \"$resultMsg not found"
+        else
+           rlLog "ipa role Verification successful: \"$resultMsg found" 
+        fi
+   fi
+   return $rc
+
+}

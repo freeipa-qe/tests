@@ -11,16 +11,12 @@ ipaprivilegeTests() {
     ipaprivilege_mod
     ipaprivilege_remove_permission
     ipaprivilege_show
- 
-#    cleanup
     cleanupPrivilegesTest
 }
 
 setupPrivilegesTest()
 {
-    rlPhaseStartTest "Setup - add users and groups"
-       rlRun "kinitAs $ADMINID $ADMINPW"
-    rlPhaseEnd
+   rlRun "kinitAs $ADMINID $ADMINPW"
 }
 
 

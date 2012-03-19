@@ -6,7 +6,6 @@
 ########################
 iparoleTests() {
     setupRolesTests
-    cleanupRolesTests
     iparole_check
     iparole_add
     iparole_add_member
@@ -16,8 +15,8 @@ iparoleTests() {
     iparole_del
     iparole_show
     iparole_find
-#    iparole_mod
-#    cleanup
+    iparole_mod
+    cleanupRolesTests
 }
 
 ########################
@@ -54,6 +53,7 @@ cleanupRolesTests()
     rlRun "deletePrivilege \"$privilegeName3\""
      privilegeName="modify group membership"
     rlRun "addPrivilegeToRole \"$privilegeName\" \"$roleName\"" 
+    roleName="Helpdesk Updated"
 }
 
 
@@ -709,6 +709,7 @@ iparole_remove_privilege()
 #############################################
 iparole_del()
 {
+  rlRun "kinitAs $ADMINID $ADMINPW"
     roleName="nonexistentrole"
 
     rlPhaseStartTest "ipa-role-cli-1042 - delete role - continue"
@@ -726,6 +727,7 @@ iparole_del()
 #############################################
 iparole_show()
 {
+  rlRun "kinitAs $ADMINID $ADMINPW"
   rlPhaseStartTest "ipa-role-cli-1043 - role show --raw"
      roleName="helpdesk"
     rlRun "verifyRoleAttr \"$roleName\" \"memberof\" \"cn=modify users and reset passwords,cn=privileges,cn=pbac,dc=testrelm,dc=com\" raw" 0 "Verify privilege"
@@ -740,37 +742,115 @@ iparole_show()
 #############################################
 iparole_find()
 {
-  iparole_find_positive
-  iparole_find_negative
-}
-
-iparole_find_positive()
-{
-
-    rlPhaseStartTest "role-find_1044 - --pkey-only test of ipa role"
-	rlRun "kinitAs $ADMINID $ADMINPW"
-	ipa_command_to_test="role"
-	pkey_addstringa="--desc=test-role"
-	pkey_addstringb="--desc=test-role"
-	pkeyobja="trole"
-	pkeyobjb="troleb"
-	grep_string='Role\ name:'
-	general_search_string=trole
-	rlRun "pkey_return_check" 0 "running checks of --pkey-only in sudorule-find"
+  rlRun "kinitAs $ADMINID $ADMINPW"
+  rlPhaseStartTest "role-find_1044 - --pkey-only test of ipa role"
+        rlRun "kinitAs $ADMINID $ADMINPW"
+        ipa_command_to_test="role"
+        pkey_addstringa="--desc=test-role"
+        pkey_addstringb="--desc=test-role"
+        pkeyobja="trole"
+        pkeyobjb="troleb"
+        grep_string='Role\ name:'
+        general_search_string=trole
+        rlRun "pkey_return_check" 0 "running checks of --pkey-only in sudorule-find"
     rlPhaseEnd
 
+    rlPhaseStartTest "ipa-role-cli-1045 - role find --name"
+     criteria="--name=helpdesk"
+     attribute="Role name"
+     value="helpdesk"
+     resultMsg="Number of entries returned 1"
+     rlRun "findRole \"$criteria\" \"$attribute\" \"$value\" \"$resultMsg\" all" 0 "find role using \"$criteria\""
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-role-cli-1046 - role find --sizelimit"
+     criteria="--sizelimit=2"
+     resultMsg="Number of entries returned 2"
+     rlRun "findRole \"$criteria\" \"$resultMsg\"" 0 "find role using \"$criteria\"" 
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-role-cli-1047 - role find --desc (--raw)"
+     criteria="--desc=Helpdesk"
+     attribute="description"
+     value="Helpdesk"
+     resultMsg="Number of entries returned 1"
+     rlRun "findRole \"$criteria\" \"$attribute\" \"$value\" \"$resultMsg\" raw" 0 "find role using \"$criteria\""
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-role-cli-1048 - role find missing name"
+     criteria="--name="
+     resultMsg="Number of entries returned 0"
+     command="ipa role-find \"$criteria\""
+     rlRun "$command > $TmpDir/iparole_findrolename.log 2>&1"  0 "find role using \"$criteria\""
+     rlAssertNotGrep "$resultMsg" "$TmpDir/iparole_findrolename.log"
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-role-cli-1049 - role find blank desc"
+     criteria="--desc=\"\""
+     resultMsg="Number of entries returned 0"
+     command="ipa role-find \"$criteria\""
+     rlRun "$command > $TmpDir/iparole_findroledesc.log 2>&1"  0 "find role using \"$criteria\""
+     rlAssertNotGrep "$resultMsg" "$TmpDir/iparole_findroledesc.log"
+    rlPhaseEnd
 }
 
-
-iparole_find_negative()
-{
-rlLog "ipa role-find - negative"
-}
 
 #############################################
 #  test: iparole-mod 
 #############################################
 iparole_mod()
 {
-rlLog "ipa role-mod"
+   iparole_mod_positive
+   iparole_mod_negative
 }
+
+
+iparole_mod_positive()
+{
+  rlRun "kinitAs $ADMINID $ADMINPW"
+
+  rlPhaseStartTest "ipa-role-cli-1050 - modify role's desc" 
+    roleName="helpdesk"
+    attr="desc"
+    value="Helpdesk Updated"
+    rlRun "modifyRole \"$roleName\" $attr \"$value\"" 0 "Modify $roleName to have updated desc"
+    rlRun "verifyRoleAttr \"$roleName\" \"Description\" \"$value\" " 0 "Verify Role Desc"
+  rlPhaseEnd
+
+  rlPhaseStartTest "ipa-role-cli-1051 - modify role's name using setattr" 
+    roleName="helpdesk"
+    attr="setattr"
+    value="cn=Helpdesk Updated"
+    rlRun "modifyRole \"$roleName\" $attr \"$value\"" 0 "Modify $roleName to have new name"
+    rlRun "verifyRoleAttr \"Helpdesk Updated\" \"Role name\" \"helpdesk updated\" " 0 "Verify Role Name"
+  rlPhaseEnd
+
+  rlPhaseStartTest "ipa-role-cli-1052 - modify role's name using rename" 
+    roleName="helpdesk"
+    attr="rename"
+    value="helpdesk"
+    rlRun "modifyRole \"helpdesk updated\" $attr \"$value\"" 0 "Modify $roleName to have original name back"
+    roleName="helpdesk"
+    rlRun "verifyRoleAttr \"$roleName\" \"Role name\" \"$value\" " 0 "Verify Role Name"
+  rlPhaseEnd
+
+
+  rlPhaseStartTest "ipa-role-cli-1053 - modify role's seeAlso using addattr" 
+    roleName="helpdesk"
+    attr="addattr"
+    value="\"seeAlso=cn=HostgroupCLI\""
+    rlRun "modifyRole \"$roleName\" $attr \"$value\"" 0 "Modify $roleName to have seeAlso attr"
+    rlRun "verifyRoleAttr \"$roleName\" \"seeAlso\" \"cn=HostgroupCLI\" " 0 "Verify Role seeAlso"
+  rlPhaseEnd
+
+
+}
+
+
+iparole_mod_negative()
+{
+  rlRun "kinitAs $ADMINID $ADMINPW"
+  rlLog "Negative"
+}
+
+

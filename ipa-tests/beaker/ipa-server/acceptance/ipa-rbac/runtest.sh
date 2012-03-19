@@ -71,14 +71,12 @@ rlJournalStart
         rlRun "pushd $TmpDir"
     rlPhaseEnd
 
-    rlPhaseStartSetup "RBAC tests"
       ipapermissionTests
       ipaprivilegeTests
       iparoleTests
       ipaRBACFunctionalTests
-    rlPhaseEnd
 
-    rlPhaseStartCleanup "ipapermission cleanup"
+    rlPhaseStartCleanup "ipa rbac cleanup"
         rlRun "popd"
 #       rlRun "rm -r $TmpDir" 0 "Removing tmp directory"
     rlPhaseEnd
@@ -88,5 +86,4 @@ rlJournalPrintText
 	report=/tmp/rhts.report.$RANDOM.txt
 	makereport $report
 	rhts-submit-log -l $report
-        save_logs
 rlJournalEnd 
