@@ -47,7 +47,7 @@ cleanupPrivilegesTest()
 ipaprivilege_check()
 {
 
-   rlPhaseStartTest "ipa-privilege-cli-1001: Check IPA provided Privileges have assigned Permissions (Bug 742327)" 
+   rlPhaseStartTest "ipa-privilege-cli-1001 - Check IPA provided Privileges have assigned Permissions (Bug 742327)" 
      ipa privilege-find | grep "Privilege name" | cut -d ":" -f2 > $TmpDir/ipaprivilege_check.log
      while read privilegeName 
      do
@@ -80,14 +80,14 @@ ipaprivilege_add_positive()
 {
  rlRun "kinitAs $ADMINID $ADMINPW"
 
-   rlPhaseStartTest "ipa-privilege-cli-1002: add privilege" 
+   rlPhaseStartTest "ipa-privilege-cli-1002 - add privilege" 
     privilegeName="Add User"
     privilegeDesc="Add User"
     rlRun "addPrivilege \"$privilegeName\" \"$privilegeDesc\"" 0 "Adding $privilegeName"
     rlRun "verifyPrivilegeTargetAttr \"$privilegeName\" \"$privilegeDesc\" \"\"  "
    rlPhaseEnd
 
-  rlPhaseStartTest "ipa-privilege-cli-1003: add privilege with comma" 
+  rlPhaseStartTest "ipa-privilege-cli-1003 - add privilege with comma" 
     privilegeName="Add User, Group"
     privilegeDesc="Add User, Group"
     rlRun "addPrivilege \"$privilegeName\" \"$privilegeDesc\"" 0 "Adding $privilegeName"
@@ -95,7 +95,7 @@ ipaprivilege_add_positive()
     rlRun "verifyPrivilegeAttr \"$privilegeName\" \"Description\" \"$privilegeDesc\" " 0 "Verify Privilege Desc"
    rlPhaseEnd
 
-   rlPhaseStartTest "ipa-privilege-cli-1004: add privilege with setattr" 
+   rlPhaseStartTest "ipa-privilege-cli-1004 - add privilege with setattr" 
      privilegeName="Add User with owner"
      privilegeDesc="Add User with owner"
      attr="--setattr=\"owner=cn=ABC\""
@@ -104,7 +104,7 @@ ipaprivilege_add_positive()
     rlRun "verifyPrivilegeAttr \"$privilegeName\" \"owner\" \"cn=ABC\" " 
    rlPhaseEnd
 
-   rlPhaseStartTest "ipa-privilege-cli-1005: add privilege with addattr" 
+   rlPhaseStartTest "ipa-privilege-cli-1005 - add privilege with addattr" 
      privilegeName="Add User with multiple owner"
      privilegeDesc="Add User with multiple owner"
      attr="--addattr=\"owner=cn=XYZ\" --addattr=\"owner=cn=ZZZ\""
@@ -113,7 +113,7 @@ ipaprivilege_add_positive()
     rlRun "verifyPrivilegeAttr \"$privilegeName\" \"owner\" \"cn=ZZZ, cn=XYZ\" " 
    rlPhaseEnd
 
-   rlPhaseStartTest "ipa-privilege-cli-1006: add privilege - raw"
+   rlPhaseStartTest "ipa-privilege-cli-1006 - add privilege - raw"
      privilegeName="Modify User"
      privilegeDesc="Modify User"
      command="ipa privilege-add \"$privilegeName\" --desc \"$privilegeDesc\" --all --raw"
@@ -127,7 +127,7 @@ ipaprivilege_add_positive()
      fi
     rlPhaseEnd
 
-   rlPhaseStartTest "ipa-privilege-cli-1007: add privilege - all"
+   rlPhaseStartTest "ipa-privilege-cli-1007 - add privilege - all"
      privilegeName="Modify Group"
      privilegeDesc="Modify Group"
      command="ipa privilege-add \"$privilegeName\" --desc \"$privilegeDesc\" --all"
@@ -151,7 +151,7 @@ ipaprivilege_add_negative()
 {
 
 rlLog "Negative privilege tests"
-   rlPhaseStartTest "ipa-privilege-cli-1008: add privilege with invalid setattr" 
+   rlPhaseStartTest "ipa-privilege-cli-1008 - add privilege with invalid setattr" 
      privilegeName="Add User with invalid attr"
      privilegeDesc="Add User with invalid attr"
      attr="--setattr=\"xyz=XYZ\""
@@ -161,7 +161,7 @@ rlLog "Negative privilege tests"
      rlAssertGrep "$expmsg" "$TmpDir/ipaprivilege_invalidattr1.log"
    rlPhaseEnd
 
-   rlPhaseStartTest "ipa-privilege-cli-1009: add privilege with invalid addattr" 
+   rlPhaseStartTest "ipa-privilege-cli-1009 - add privilege with invalid addattr" 
      privilegeName="Add User with invalid attr"
      privilegeDesc="Add User with invalid attr"
      attr="--addattr=\"xyz=XYZ\""
@@ -171,7 +171,7 @@ rlLog "Negative privilege tests"
      rlAssertGrep "$expmsg" "$TmpDir/ipaprivilege_invalidattr2.log"
    rlPhaseEnd
 
-   rlPhaseStartTest "ipa-privilege-cli-1010: add privilege with blank setattr (bug 783543)" 
+   rlPhaseStartTest "ipa-privilege-cli-1010 - add privilege with blank setattr (bug 783543)" 
      privilegeName="Add User with blank attr"
      privilegeDesc="Add User with blank attr"
      attr="--setattr=\"\""
@@ -181,7 +181,7 @@ rlLog "Negative privilege tests"
      rlAssertGrep "$expmsg" "$TmpDir/ipaprivilege_blankattr.log"
    rlPhaseEnd
 
-   rlPhaseStartTest "ipa-privilege-cli-1011: add privilege with blank desc" 
+   rlPhaseStartTest "ipa-privilege-cli-1011 - add privilege with blank desc" 
      privilegeName="Add User with blank desc"
      privilegeDesc="\"\""
      command="addPrivilege \"$privilegeName\" \"$privilegeDesc\""
@@ -190,7 +190,7 @@ rlLog "Negative privilege tests"
      rlAssertGrep "$expmsg" "$TmpDir/ipaprivilege_blankdesc.log"
    rlPhaseEnd
 
-   rlPhaseStartTest "ipa-privilege-cli-1012: add duplicate privilege" 
+   rlPhaseStartTest "ipa-privilege-cli-1012 - add duplicate privilege" 
     privilegeName="Add User"
     privilegeDesc="Add User"
     command="addPrivilege \"$privilegeName\" \"$privilegeDesc\""
@@ -217,14 +217,14 @@ ipaprivilege_add_permission()
 ipaprivilege_add_permission_positive()
 {
 
-  rlPhaseStartTest "ipa-privilege-cli-1013: add multiple permissions to privilege" 
+  rlPhaseStartTest "ipa-privilege-cli-1013 - add multiple permissions to privilege" 
     privilegeName="Add User"
     permissionList="add hbac rule, delete hbac rule, modify hbac rule"
     rlRun "addPermissionToPrivilege \"$permissionList\" \"$privilegeName\"" 0 "Adding $permissionList to $privilegeName"
     rlRun "verifyPrivilegeAttr \"$privilegeName\" \"Permissions\" \"$permissionList\" " 0 "Verify Permissions for a Privilege"
   rlPhaseEnd
 
-  rlPhaseStartTest "ipa-privilege-cli-1014: add permission to IPA-provided privilege" 
+  rlPhaseStartTest "ipa-privilege-cli-1014 - add permission to IPA-provided privilege" 
     privilegeName="HBAC Administrator"
     permissionList="add groups"
     expectedPermissionList="add groups, add hbac rule, delete hbac rule, modify hbac rule, manage hbac rule membership, add hbac services, delete hbac services, add hbac service groups, delete hbac service groups, manage hbac service group membership"
@@ -242,7 +242,7 @@ ipaprivilege_add_permission_positive()
 ipaprivilege_add_permission_negative()
 {
 
-  rlPhaseStartTest "ipa-privilege-cli-1015: add nonexistent permission to privilege" 
+  rlPhaseStartTest "ipa-privilege-cli-1015 - add nonexistent permission to privilege" 
     privilegeName="Add User"
     permissionList="non-existent permission"
     command="addPermissionToPrivilege \"$permissionList\" \"$privilegeName\""
@@ -252,7 +252,7 @@ ipaprivilege_add_permission_negative()
   rlPhaseEnd
 
 
-  rlPhaseStartTest "ipa-privilege-cli-1016: add duplicate permission to privilege" 
+  rlPhaseStartTest "ipa-privilege-cli-1016 - add duplicate permission to privilege" 
     privilegeName="Add User"
     permissionList="add hbac rule"
     command="addPermissionToPrivilege \"$permissionList\" \"$privilegeName\""
@@ -261,7 +261,7 @@ ipaprivilege_add_permission_negative()
     rlAssertGrep "$expmsg" "$TmpDir/ipaprivilege_nonexistentperm.log"
   rlPhaseEnd
 
-  rlPhaseStartTest "ipa-privilege-cli-1017: add permission to nonexistent privilege" 
+  rlPhaseStartTest "ipa-privilege-cli-1017 - add permission to nonexistent privilege" 
     privilegeName="nonexistent privilege"
     permissionList="add hbac rule"
     command="addPermissionToPrivilege \"$permissionList\" \"$privilegeName\""
@@ -270,7 +270,7 @@ ipaprivilege_add_permission_negative()
     rlAssertGrep "$expmsg" "$TmpDir/ipaprivilege_nonexistentperm.log"
   rlPhaseEnd
 
-  rlPhaseStartTest "ipa-privilege-cli-1018: add blank permission to privilege (bug 783543)" 
+  rlPhaseStartTest "ipa-privilege-cli-1018 - add blank permission to privilege (bug 783543)" 
     privilegeName="Add User"
     permissionList=""
     command="addPermissionToPrivilege \"$permissionList\" \"$privilegeName\""
@@ -294,7 +294,7 @@ ipaprivilege_remove_permission()
 
 ipaprivilege_remove_permission_positive()
 {
-  rlPhaseStartTest "ipa-privilege-cli-1019: remove multiple permissions to privilege" 
+  rlPhaseStartTest "ipa-privilege-cli-1019 - remove multiple permissions to privilege" 
     privilegeName="Add User"
     permissionList="add hbac rule, delete hbac rule"
     expectedPermissionListLeftForPrivilege="modify hbac rule"
@@ -302,7 +302,7 @@ ipaprivilege_remove_permission_positive()
     rlRun "verifyPrivilegeAttr \"$privilegeName\" \"Permissions\" \"$expectedPermissionListLeftForPrivilege\" " 0 "Verify Permissions for a Privilege"
   rlPhaseEnd
 
-  rlPhaseStartTest "ipa-privilege-cli-1020: remove permission from IPA-provided privilege (permission added by user)" 
+  rlPhaseStartTest "ipa-privilege-cli-1020 - remove permission from IPA-provided privilege (permission added by user)" 
     privilegeName="HBAC Administrator"
     permissionList="add groups"
     expectedPermissionListLeftForPrivilege="add hbac rule, delete hbac rule, modify hbac rule, manage hbac rule membership, add hbac services, delete hbac services, add hbac service groups, delete hbac service groups, manage hbac service group membership"
@@ -310,7 +310,7 @@ ipaprivilege_remove_permission_positive()
     rlRun "verifyPrivilegeAttr \"$privilegeName\" \"Permissions\" \"$expectedPermissionListLeftForPrivilege\" " 0 "Verify Permissions for a Privilege"
   rlPhaseEnd
 
-  rlPhaseStartTest "ipa-privilege-cli-1021: remove permission from IPA-provided privilege (bug 797916)" 
+  rlPhaseStartTest "ipa-privilege-cli-1021 - remove permission from IPA-provided privilege (bug 797916)" 
     privilegeName="HBAC Administrator"
     permissionList="add hbac rule"
     expectedPermissionListLeftForPrivilege="delete hbac rule, modify hbac rule, manage hbac rule membership, add hbac services, delete hbac services, add hbac service groups, delete hbac service groups, manage hbac service group membership"
@@ -322,7 +322,7 @@ ipaprivilege_remove_permission_positive()
 
 ipaprivilege_remove_permission_negative()
 {
-  rlPhaseStartTest "ipa-privilege-cli-1022: remove nonexistent permission from privilege" 
+  rlPhaseStartTest "ipa-privilege-cli-1022 - remove nonexistent permission from privilege" 
     privilegeName="Add User"
     permissionList="non-existent permission"
     command="removePermissionFromPrivilege \"$permissionList\" \"$privilegeName\""
@@ -332,7 +332,7 @@ ipaprivilege_remove_permission_negative()
   rlPhaseEnd
 
 
-  rlPhaseStartTest "ipa-privilege-cli-1023: remove permission from nonexistent privilege" 
+  rlPhaseStartTest "ipa-privilege-cli-1023 - remove permission from nonexistent privilege" 
     privilegeName="nonexistent privilege"
     permissionList="add hbac rule"
     command="removePermissionFromPrivilege \"$permissionList\" \"$privilegeName\""
@@ -341,7 +341,7 @@ ipaprivilege_remove_permission_negative()
     rlAssertGrep "$expmsg" "$TmpDir/ipaprivilege_nonexistentperm.log"
   rlPhaseEnd
 
-  rlPhaseStartTest "ipa-privilege-cli-1024: remove blank permission from privilege (bug 783543)" 
+  rlPhaseStartTest "ipa-privilege-cli-1024 - remove blank permission from privilege (bug 783543)" 
     privilegeName="Add User"
     permissionList=""
     command="removePermissionFromPrivilege \"$permissionList\" \"$privilegeName\""
@@ -359,7 +359,7 @@ ipaprivilege_del_continue()
 {
     privilegeName="nonexistent privilege"
 
-    rlPhaseStartTest "ipa-privilege-cli-1025: delete privilege - continue"
+    rlPhaseStartTest "ipa-privilege-cli-1025 - delete privilege - continue"
      command="ipa privilege-del \"$privilegeName\" --continue"
      expmsg="Failed to remove: $privilegeName"
      rlRun "$command > $TmpDir/ipaprivilege_delete.log 2>&1" 0 "Verify error message when deleting in continue mode"
@@ -373,7 +373,7 @@ ipaprivilege_del_continue()
 #############################################
 ipaprivilege_find()
 {
-    rlPhaseStartTest "privilege-find_001: --pkey-only test of ipa privilege"
+    rlPhaseStartTest "privilege-find_001 - --pkey-only test of ipa privilege"
 	rlRun "kinitAs $ADMINID $ADMINPW"
 	ipa_command_to_test="privilege"
 	pkey_addstringa="--desc=test-priv"
@@ -393,7 +393,7 @@ ipaprivilege_show()
 {
    privilegeName="Host Group Administrators"
 
-    rlPhaseStartTest "ipa-privilege-cli-1026: show privilege - raw"
+    rlPhaseStartTest "ipa-privilege-cli-1026 - show privilege - raw"
      command="ipa privilege-show \"$privilegeName\" --all --raw"
      rlRun "$command > $TmpDir/ipaprivilege_showraw.log" 0 "Verify Privilege show with raw"
      memberindirectOccurences=`rlAssertGrep "memberindirect:" "$TmpDir/ipaprivilege_showraw.log" -c | cut -d ":" -f1`
@@ -408,7 +408,7 @@ ipaprivilege_show()
     rlPhaseEnd
 
 
-    rlPhaseStartTest "ipa-privilege-cli-1027: show privilege - rights"
+    rlPhaseStartTest "ipa-privilege-cli-1027 - show privilege - rights"
      command="ipa privilege-show \"$privilegeName\" --all --rights"
      rlRun "$command > $TmpDir/ipaprivilege_showrights.log" 0 "Verify Privilege show with raw"
      rlAssertGrep "attributelevelrights:" "$TmpDir/ipaprivilege_showrights.log"
@@ -427,14 +427,14 @@ ipaprivilege_mod_positive()
 {
    privilegeName="Netgroups Administrators"
 
-  rlPhaseStartTest "ipa-privilege-cli-1028: mod privilege desc" 
+  rlPhaseStartTest "ipa-privilege-cli-1028 - mod privilege desc" 
     newPrivilegeDesc="NetgroupsAdmin"
     attr="desc"
     rlRun "modifyPrivilege \"$privilegeName\" $attr \"$newPrivilegeDesc\""
     rlRun "verifyPrivilegeAttr \"$privilegeName\" \"Description\" \"$newPrivilegeDesc\" " 0 "Verify New Privilege Desc"
   rlPhaseEnd
    
-  rlPhaseStartTest "ipa-privilege-cli-1029: rename privilege" 
+  rlPhaseStartTest "ipa-privilege-cli-1029 - rename privilege" 
     newPrivilegeName="NetgroupsAdmin"
     attr="rename"
     rlRun "modifyPrivilege \"$privilegeName\" $attr \"$newPrivilegeName\""
@@ -443,7 +443,7 @@ ipaprivilege_mod_positive()
 
 
   privilegeName="NetgroupsAdmin"
-  rlPhaseStartTest "ipa-privilege-cli-1030: mod privilege to use addattr" 
+  rlPhaseStartTest "ipa-privilege-cli-1030 - mod privilege to use addattr" 
     attr1="addattr"
     addOwner1="owner=cn=abc"
     attr2="addattr"
@@ -468,7 +468,7 @@ ipaprivilege_mod_negative()
 {
   privilegeName="NetgroupsAdmin"
 
-  rlPhaseStartTest "ipa-privilege-cli-1031: mod privilege to addattr multiple attr when only one one value is allowed" 
+  rlPhaseStartTest "ipa-privilege-cli-1031 - mod privilege to addattr multiple attr when only one one value is allowed" 
     attr="addattr"
     addDescription="description=AnotherDescriptionNotAllowed"
     command="modifyPrivilege $privilegeName $attr $addDescription"
@@ -477,7 +477,7 @@ ipaprivilege_mod_negative()
     rlAssertGrep "$expmsg" "$TmpDir/ipaprivilege_addmultipleattr.log"
   rlPhaseEnd
 
-  rlPhaseStartTest "ipa-privilege-cli-1032: mod privilege to addattr with invalid syntax" 
+  rlPhaseStartTest "ipa-privilege-cli-1032 - mod privilege to addattr with invalid syntax" 
     attr="addattr"
     addOwner="owner=xyz"
     command="modifyPrivilege $privilegeName $attr $addOwner"
@@ -487,7 +487,7 @@ ipaprivilege_mod_negative()
   rlPhaseEnd
 
 
-  rlPhaseStartTest "ipa-privilege-cli-1033: mod privilege to use blank desc"
+  rlPhaseStartTest "ipa-privilege-cli-1033 - mod privilege to use blank desc"
     attr="desc"
     command="modifyPrivilege $privilegeName $attr"
     expmsg="ipa: ERROR: 'desc' is required"
@@ -495,7 +495,7 @@ ipaprivilege_mod_negative()
     rlAssertGrep "$expmsg" "$TmpDir/ipaprivilege_blankdesc.log"
   rlPhaseEnd
 
-  rlPhaseStartTest "ipa-privilege-cli-1034: mod privilege to use blank rename"
+  rlPhaseStartTest "ipa-privilege-cli-1034 - mod privilege to use blank rename"
     attr="rename"
     command="modifyPrivilege $privilegeName $attr"
     expmsg="ipa: ERROR: invalid 'rename': can't be empty"
@@ -503,7 +503,7 @@ ipaprivilege_mod_negative()
     rlAssertGrep "$expmsg" "$TmpDir/ipaprivilege_blankrename.log"
   rlPhaseEnd
 
-  rlPhaseStartTest "ipa-privilege-cli-1035: mod privilege to delattr required description"
+  rlPhaseStartTest "ipa-privilege-cli-1035 - mod privilege to delattr required description"
     attr="delattr"
     privilegeDesc="description=NetgroupsAdministrators"
     command="modifyPrivilege $privilegeName $attr $privilegeDesc"
