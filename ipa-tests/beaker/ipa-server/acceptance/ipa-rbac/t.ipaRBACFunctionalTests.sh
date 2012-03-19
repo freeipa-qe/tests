@@ -12,7 +12,6 @@ ipaRBACFunctionalTests() {
 
 setupRBACTests()
 {
-    rlPhaseStartTest "Setup - add users and groups"
         rlRun "kinitAs $ADMINID $ADMINPW"
        # user for test01
        login="testuserhelpdesk"
@@ -42,7 +41,6 @@ setupRBACTests()
        password="Secret123"
        rlRun "create_ipauser $login $firstname $lastname $password"
        
-    rlPhaseEnd
 }
 
 
@@ -85,7 +83,7 @@ test01()
       password="Secret123"
       roleName="helpdesk"
       type="users"
-      rlRun "addMemberToRole $login \"$roleName\" $type" 0 "Adding member to role $roleName"
+      rlRun "addMemberToRole \"$roleName\" $type $login all" 0 "Adding member to role $roleName"
       # kinit as testuserhelpdesk
       rlRun "kinitAs $login $password" 0 "kinit as $login"
       # change admin password - cannot
@@ -99,7 +97,7 @@ test01()
 
     # HelpDesk - can modify group memberships, modify users, reset password
     # this user should be allowed to modify a user's lastname, reset password, but cannot add or delete this user
-   rlPhaseStartTest "ipa-rbac-1001 - Set up user with HelpDesk Role - Cannot add new user" 
+   rlPhaseStartTest "ipa-rbac-1002 - Set up user with HelpDesk Role - Cannot add new user" 
       # add a user - cannot
       newLogin="two"
       newFirstName="two"
@@ -112,7 +110,7 @@ test01()
    rlPhaseEnd
 
       # update a lastname - can
-   rlPhaseStartTest "ipa-rbac-1001 - Set up user with HelpDesk Role - Can update user attr" 
+   rlPhaseStartTest "ipa-rbac-1003 - Set up user with HelpDesk Role - Can update user attr" 
       testLogin="test"
       attrToUpdate="last"
       newLastName="testtest"
@@ -120,7 +118,7 @@ test01()
    rlPhaseEnd
 
       # change user password - can
-   rlPhaseStartTest "ipa-rbac-1001 - Set up user with HelpDesk Role - Can reset a user's password (bug 773759)" 
+   rlPhaseStartTest "ipa-rbac-1004 - Set up user with HelpDesk Role - Can reset a user's password (bug 773759)" 
       newPwd="testtest"
       rlRun "echo $newPwd | ipa passwd $testLogin" 0 "Verify $login can reset $testlogin's password"
    rlPhaseEnd
@@ -168,7 +166,7 @@ test01()
 
 test04()
 {
-   rlPhaseStartTest "ipa-rbac-1001 - Set up role for user to allow updating groupone's desc"
+   rlPhaseStartTest "ipa-rbac-1005 - Set up role for user to allow updating groupone's desc"
       rlRun "kinitAs $ADMINID $ADMINPW"
       permissionRights="write"
       permissionLocalTarget="--targetgroup=groupone"
@@ -187,7 +185,7 @@ test04()
       login="testgroupdescadmin"
       password="Secret123"
       type="users"
-      rlRun "addMemberToRole $login \"$roleName\" $type" 0 "Adding member to role"
+      rlRun "addMemberToRole \"$roleName\" $type $login all" 0 "Adding member to role"
       rlRun "kinitAs $login $password" 0 "kinit as $login"
       # group-mod the desc for groupone
       attr="desc"
@@ -197,7 +195,7 @@ test04()
   rlPhaseEnd
 #  add members to this group, nor update desc for group two
 
-   rlPhaseStartTest "ipa-rbac-1001 - Modify role to allow adding members to groupone"
+   rlPhaseStartTest "ipa-rbac-1006 - Modify role to allow adding members to groupone"
       rlRun "kinitAs $ADMINID $ADMINPW"
       attr="attrs"
       value="description,member"
@@ -246,13 +244,13 @@ test06()
   login="testuseraddadmin"
   password="Secret123"
 
-   rlPhaseStartTest "ipa-rbac-1001 - Set up role for user to allow only adding a user - Can add a user"
+   rlPhaseStartTest "ipa-rbac-1007 - Set up role for user to allow only adding a user - Can add a user"
       rlRun "kinitAs $ADMINID $ADMINPW"
       rlRun "addPrivilege \"$privilegeName\" \"$privilegeDesc\"" 0 "Adding privilege: $privilegeName"
       rlRun "addPermissionToPrivilege \"$permissionList\" \"$privilegeName\"" 0 "Add permission to privilege"
       rlRun "addRole \"$roleName\" \"$roleDesc\"" 0 "Adding role: $roleName"
       rlRun "addPrivilegeToRole \"$privilegeName\" \"$roleName\"" 0 "Adding privilege to role"
-      rlRun "addMemberToRole $login \"$roleName\" $type" 0 "Adding member to role"
+      rlRun "addMemberToRole \"$roleName\" $type $login all" 0 "Adding member to role"
 
       # kinit as testuseraddadmin
       rlRun "kinitAs $login $password" 0 "kinit as $login"
@@ -265,7 +263,7 @@ test06()
    rlPhaseEnd
 
       # update a username - cannot
-   rlPhaseStartTest "ipa-rbac-1001 - Set up role for user to allow only adding a user - Cannot update user attr"
+   rlPhaseStartTest "ipa-rbac-1008 - Set up role for user to allow only adding a user - Cannot update user attr"
       attrToUpdate="last"
       newLastName="oneone"
       command="modifyUser $newLogin $attrToUpdate $newLastName"
@@ -274,7 +272,7 @@ test06()
      rlAssertGrep "$expmsg" "$TmpDir/ipaRBAC_test06_1.log"
    rlPhaseEnd
 
-   rlPhaseStartTest "ipa-rbac-1001 - Set up role for user to allow only adding a user - Cannot reset user password"
+   rlPhaseStartTest "ipa-rbac-1009 - Set up role for user to allow only adding a user - Cannot reset user password"
       # change user password - cannot
       newPwd="oneone"
       command="echo $newPwd | ipa passwd $newLogin"

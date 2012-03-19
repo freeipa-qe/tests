@@ -46,10 +46,13 @@
 . /dev/shm/ipa-rbac-cli-lib.sh
 . /dev/shm/lib.user-cli.sh
 . /dev/shm/ipa-group-cli-lib.sh
+. /dev/shm/ipa-host-cli-lib.sh
+. /dev/shm/ipa-hostgroup-cli-lib.sh
 
 # Include test case file
 . ./lib.iparbac.sh
 . ./lib.privilege.sh
+. ./lib.role.sh
 . ./t.ipapermission.sh
 . ./t.ipaprivilege.sh
 . ./t.iparole.sh
@@ -68,10 +71,12 @@ rlJournalStart
         rlRun "pushd $TmpDir"
     rlPhaseEnd
 
-   ipapermissionTests
-   ipaprivilegeTests
-   iparoleTests
-   ipaRBACFunctionalTests
+    rlPhaseStartSetup "RBAC tests"
+      ipapermissionTests
+      ipaprivilegeTests
+      iparoleTests
+      ipaRBACFunctionalTests
+    rlPhaseEnd
 
     rlPhaseStartCleanup "ipapermission cleanup"
         rlRun "popd"

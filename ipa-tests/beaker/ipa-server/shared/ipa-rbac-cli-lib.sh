@@ -387,8 +387,6 @@ verifyPrivilegeAttr()
    tmpfile=$TmpDir/privilegeshow.out
    rc=0
 
-   rlLog "NAMITA: value is $value"
-
    rlLog "Executing: ipa privilege-show --all \"$privilegeName\""
    ipa privilege-show --all "$privilegeName" > $tmpfile
    rc=$?
@@ -449,10 +447,20 @@ addRole()
     rlLog "Entering addRole with $1 $2"
   roleName=$1
   roleDesc=$2
+  attr=""
+  if [ `echo $#` > 3 ] ; then
+    attr=$3   
+  fi
 
-  rc=0
-  rlLog "Executing: ipa role-add \"$roleName\" --desc=\"$roleDesc\""
-  ipa role-add "$roleName" --desc="$roleDesc"
+   rc=0
+
+   if [ -z "$attr" ] ; then
+     rlLog "Executing: ipa role-add \"$roleName\" --desc=\"$roleDesc\""
+     ipa role-add "$roleName" --desc="$roleDesc"
+   else 
+     rlLog " Executing: ipa role-add \"$roleName\" --desc=\"$roleDesc\" $attr "
+     ipa role-add "$roleName" --desc="$roleDesc" $attr
+   fi
   if [ $rc -ne 0 ] ; then
     rlLog "There was an error adding $roleName"
   else
@@ -469,10 +477,19 @@ addPrivilegeToRole()
 
   privilegeList=$1
   roleName=$2
+   if [ `echo $#` = 3 ] ; then
+     if [ "$3" == "raw" ] ; then
+       allOrRaw="--all --$3"
+     else
+       allOrRaw="--$3"
+     fi
+   else
+     allOrRaw=""
+   fi
 
   rc=0
-  rlLog "Executing: ipa role-add-privilege --privileges=\"$privilegeList\" \"$roleName\""
-  ipa role-add-privilege --privileges="$privilegeList" "$roleName"
+  rlLog "Executing: ipa role-add-privilege --privileges=\"$privilegeList\" \"$roleName\" $allOrRaw"
+  ipa role-add-privilege --privileges="$privilegeList" "$roleName" $allOrRaw
 
   if [ $rc -ne 0 ] ; then
     rlLog "There was an error adding  $privilegeList to $roleName"
@@ -482,23 +499,90 @@ addPrivilegeToRole()
 
 }
 
+removePrivilegeFromRole()
+{
+   privilegeList=$1
+   roleName=$2
+   if [ `echo $#` = 3 ] ; then
+     if [ "$3" == "raw" ] ; then
+       allOrRaw="--all --$3"
+     else
+       allOrRaw="--$3"
+     fi
+   else
+     allOrRaw=""
+   fi
+ 
+   rc=0
+   rlLog "Executing: ipa role-remove-member --privileges=\"$privilegeList\" \"$roleName\" $allOrRaw"
+   ipa role-remove-privilege --privileges="$privilegeList" "$roleName" $allOrRaw
+ 
+   if [ $rc -ne 0 ] ; then
+     rlLog "There was an error removing  $privilegeList from $roleName"
+   else
+     rlLog "Removed $privilegeList from $roleName successfully"
+   fi
+
+
+}
 
 addMemberToRole()
 {
-    rlLog "Entering addMemberToRole with $1 $2"
+   rlLog "Entering addMemberToRole with $1 $2"
 
-   memberList=$1
-   roleName=$2
-   type="--$3"
+   roleName=$1
+   type="--$2"
+   memberList=$3
+   allOrRaw="--$4"
+   if [ `echo $#` -gt 4 ] ; then
+    type2="--$5"
+    memberList2=$6
+  else
+    type2=""
+    memberList2=""
+  fi
 
    rc=0
-   rlLog "Executing: ipa role-add-member $type=$memberList \"$roleName\""
-   ipa role-add-member $type=$memberList "$roleName"
+   if [ -z "$type2" ] ; then
+     rlLog "Executing: ipa role-add-member $type=$memberList \"$roleName\" $allOrRaw"
+     ipa role-add-member $type=$memberList "$roleName" $allOrRaw
+   else
+     rlLog "Executing: ipa role-add-member $type=$memberList \"$roleName\" $allOrRaw $type2=$memberList2"
+     ipa role-add-member $type=$memberList "$roleName" $allOrRaw $type2=$memberList2
+   fi
 
    if [ $rc -ne 0 ] ; then
      rlLog "There was an error adding  $memberList to $roleName"
    else
      rlLog "Added $memberList to $roleName successfully"
+   fi
+}
+
+removeMemberFromRole()
+{
+    rlLog "Entering removeMemberFromRole with $1 $2"
+
+   memberList=$1
+   roleName=$2
+   type="--$3"
+   if [ `echo $#` = 4 ] ; then
+     if [ "$4" == "raw" ] ; then
+       allOrRaw="--all --$4"
+     else
+       allOrRaw="--$4"
+     fi
+   else
+     allOrRaw=""
+   fi
+
+   rc=0
+   rlLog "Executing: ipa role-remove-member $type=\"$memberList\" \"$roleName\" $allOrRaw"
+   ipa role-remove-member $type="$memberList" "$roleName" $allOrRaw
+
+   if [ $rc -ne 0 ] ; then
+     rlLog "There was an error removing  $memberList from $roleName"
+   else
+     rlLog "Removed $memberList from $roleName successfully"
    fi
 }
 
@@ -509,7 +593,7 @@ deleteRole()
        roleName=$1
         rc=0
 
-        rlLog "Executing: ipa role-del $roleName"
+        rlLog "Executing: ipa role-del \"$roleName\""
         ipa role-del "$roleName"
         rc=$?
         if [ $rc -ne 0 ]; then
@@ -540,3 +624,42 @@ modifyRole()
 
        return $rc
 }
+
+verifyRoleAttr()
+{
+
+   roleName=$1
+   attribute="$2:"
+   value=$3
+    if [ `echo $#` = 4 ] ; then
+     if [ "$4" == "raw" ] ; then
+       allOrRaw="--all --$4"
+     else
+       allOrRaw="--$4"
+     fi
+   else
+     allOrRaw="--all"
+   fi
+   tmpfile=$TmpDir/roleshow.out
+   rc=0
+
+   rlLog "Executing: ipa role-show $allOrRaw \"$roleName\""
+   ipa role-show $allOrRaw "$roleName" > $tmpfile
+   rc=$?
+   if [ $rc -ne 0 ]; then
+      rlLog "WARNING: ipa role-show command failed."
+      return $rc
+   fi
+	
+   cat $tmpfile | grep -i "$attribute $value"
+   rc=$?
+   if [ $rc -ne 0 ]; then
+      rlLog "ERROR: ipa role \"$roleName\" verification failed:  Value of \"$attribute\" != \"$value\""
+      rlLog "ERROR: ipa role \"$roleName\" verification failed:  it is `cat $tmpfile | grep \"$attribute\"`"
+   else
+      rlLog "ipa role \"$roleName\" Verification successful: Value of \"$attribute\" = \"$value\""
+   fi
+
+   return $rc
+}
+
