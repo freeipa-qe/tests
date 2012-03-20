@@ -143,11 +143,25 @@ sleep 3
 
 version: 1
 
+dn: ou=Boston,dc=example,dc=com
+objectClass: top
+objectClass: organizationalUnit
+ou: Boston
+
+dn: ou=BostonUsers,ou=Boston,dc=example,dc=com
+objectClass: top
+objectClass: organizationalUnit
+ou: BostonUsers
+
+dn: ou=BostonGroups,ou=Boston,dc=example,dc=com
+objectClass: top
+objectClass: organizationalUnit
+ou: BostonGroups
+
 # entry-id: 10
 dn: uid=puser1,ou=People,dc=example,dc=com
 passwordGraceUserTime: 0
 modifiersName: cn=directory manager
-userPassword: Secret123
 uidNumber: 1001
 gidNumber: 1001
 objectClass: top
@@ -180,6 +194,24 @@ creatorsName: uid=admin,ou=administrators,ou=topologymanagement,o=netscaperoot
 modifiersName: uid=admin,ou=administrators,ou=topologymanagement,o=netscaperoot
 nsUniqueId: 42598c8b-1dd211b2-8f88fe1c-fcc30000
 
+# entry-id: 10
+dn: uid=bosusr,ou=BostonUsers,ou=Boston,dc=example,dc=com
+passwordGraceUserTime: 0
+modifiersName: cn=directory manager
+uidNumber: 1003
+gidNumber: 1003
+objectClass: top
+objectClass: person
+objectClass: posixAccount
+uid: bosusr
+cn: Boston User
+sn: User
+homeDirectory: /home/bosusr
+loginshell: /bin/bash
+userPassword: fo0m4nchU
+creatorsName: uid=admin,ou=administrators,ou=topologymanagement,o=netscaperoot
+nsUniqueId: 42598c8a-1dd211b2-8f88fe1c-fcc30001
+
 # entry-id: 12
 dn: cn=Group1,ou=groups,dc=example,dc=com
 gidNumber: 1001
@@ -200,7 +232,18 @@ objectClass: posixGroup
 cn: Group2
 creatorsName: uid=admin,ou=administrators,ou=topologymanagement,o=netscaperoot
 modifiersName: uid=admin,ou=administrators,ou=topologymanagement,o=netscaperoot
-nsUniqueId: 42598c8d-1dd211b2-8f88fe1c-fcc30000
+nsUniqueId: 42598c8d-1dd211b2-8f88fe1c-fcc30003
+
+# entry-id: 13
+dn: cn=bosgrp,ou=BostonGroups,ou=Boston,dc=example,dc=com
+gidNumber: 1003
+objectClass: top
+objectClass: groupOfNames
+objectClass: posixGroup
+cn: bosgrp
+creatorsName: uid=admin,ou=administrators,ou=topologymanagement,o=netscaperoot
+modifiersName: uid=admin,ou=administrators,ou=topologymanagement,o=netscaperoot
+nsUniqueId: 42598c8d-1dd211b2-8f88fe1c-fcc30005
 instance1.ldif_EOF
 
 rlRun "/usr/bin/ldapmodify -a -x -h $HOSTNAME -p 389 -D \"cn=Directory Manager\" -w $ADMINPW -c -f instance1.ldif" 0
