@@ -5,7 +5,6 @@
 # testsuite
 ########################
 iparoleTests() {
-    cleanupRolesTests
     iparole_check
     iparole_add
     iparole_add_member
@@ -902,7 +901,7 @@ iparole_mod_negative()
   rlPhaseStartTest "ipa-role-cli-1059 - mod role to delattr required description"
     attr="delattr"
     roleDesc="description=Helpdesk Updated"
-    command="modifyRole $roleName $attr $roleDesc"
+    command="modifyRole $roleName $attr \"$roleDesc\""
     expmsg="ipa: ERROR: 'description' is required"
     rlRun "$command > $TmpDir/iparole_deldesc.log 2>&1" 1 "Verify error message for $roleName"
     rlAssertGrep "$expmsg" "$TmpDir/iparole_deldesc.log"

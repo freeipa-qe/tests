@@ -2,7 +2,6 @@
 #  this will cover privilege
 
 ipaprivilegeTests() {
-    setupPrivilegesTest
     ipaprivilege_check
     ipaprivilege_add
     ipaprivilege_add_permission
@@ -13,13 +12,6 @@ ipaprivilegeTests() {
     ipaprivilege_find
 #    cleanupPrivilegesTest
 }
-
-setupPrivilegesTest()
-{
-   rlRun "kinitAs $ADMINID $ADMINPW"
-}
-
-
 
 ########################
 # cleanup
@@ -552,20 +544,17 @@ ipaprivilege_find()
 
     rlPhaseStartTest "ipa-privilege-cli-1040 - privilege find  - missing name"
      criteria="--name="
-     attribute="Privilege name"
-     value="Automount Administrators"
      resultMsg="Number of entries returned 0"
-     command="findPrivilege \"$criteria\" \"$attribute\" \"$value\" \"$resultMsg\" all"
+     command="ipa privilege-find \"$criteria\""
      rlRun "$command > $TmpDir/iparole_findprivilegename.log 2>&1"  0 "find privilege using \"$criteria\""
-     rlAssertNotGrep "$resultMsg" "$TmpDir/iparole_findrolename.log"
+     rlAssertNotGrep "$resultMsg" "$TmpDir/iparole_findprivilegename.log"
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-privilege-cli-1041 - privilege find - blank desc"
      criteria="--desc=\"\""
-     attribute="description"
-     value="Automount Administrators"
      resultMsg="Number of entries returned 0"
-     command="findPrivilege \"$criteria\" \"$attribute\" \"$value\" \"$resultMsg\" all"
-     rlAssertNotGrep "$resultMsg" "$TmpDir/iparole_findprivilegename.log" 0 "find privilege using \"$criteria\""
+     command="ipa privilege-find \"$criteria\""
+     rlRun "$command > $TmpDir/iparole_findprivilegedesc.log 2>&1"  0 "find privilege using \"$criteria\""
+     rlAssertNotGrep "$resultMsg" "$TmpDir/iparole_findprivilegedesc.log" 0 "find privilege using \"$criteria\""
     rlPhaseEnd
 }

@@ -11,7 +11,7 @@ ipapermissionTests() {
     ipapermission_del_continue
     ipapermission_find
 #    ipapermission_mod
-    cleanupPermissionTests
+#    cleanupPermissionTests
 }
 
 ########################
@@ -44,24 +44,22 @@ cleanupPermissionTests()
     permissionName11="ManageDNSRecord1"
     permissionName12="TestPermission"
     permissionNameBUG="ManageUser"
-    rlPhaseStartTest "Cleanup - delete permissions added for this test suite"
-     rlRun "deletePermission $permissionName1" 0 "Deleting $permissionName1"
-     rlRun "deletePermission $permissionName2" 0 "Deleting $permissionName2"
-     rlRun "deletePermission $permissionName3" 0 "Deleting $permissionName3"
-     rlRun "deletePermission $permissionName4" 0 "Deleting $permissionName4"
-     rlRun "deletePermission $permissionName5" 0 "Deleting $permissionName5"
-     rlRun "deletePermission $permissionName6" 0 "Deleting $permissionName6"
-     rlRun "deletePermission $permissionName7" 0 "Deleting $permissionName7"
-     rlRun "deletePermission $permissionName8" 0 "Deleting $permissionName8"
-     rlRun "deletePermission $permissionName9" 0 "Deleting $permissionName6"
-     rlRun "deletePermission $permissionName10" 0 "Deleting $permissionName7"
-     rlRun "deletePermission $permissionName11" 0 "Deleting $permissionName8"
-     rlRun "deletePermission $permissionName12" 0 "Deleting $permissionName8"
-     #TODO: This permission shouldn't be added, and so will not be available 
-     # for deleting, after bug 783502 is fixed.
-     rlRun "deletePermission $permissionNameBUG" 0 "Deleting $permissionNameBUG"
-     rlRun "deleteGroup groupone" 0 "Deleting groupone"
-    rlPhaseEnd
+    rlRun "deletePermission $permissionName1" 0 "Deleting $permissionName1"
+    rlRun "deletePermission $permissionName2" 0 "Deleting $permissionName2"
+    rlRun "deletePermission $permissionName3" 0 "Deleting $permissionName3"
+    rlRun "deletePermission $permissionName4" 0 "Deleting $permissionName4"
+    rlRun "deletePermission $permissionName5" 0 "Deleting $permissionName5"
+    rlRun "deletePermission $permissionName6" 0 "Deleting $permissionName6"
+    rlRun "deletePermission $permissionName7" 0 "Deleting $permissionName7"
+    rlRun "deletePermission $permissionName8" 0 "Deleting $permissionName8"
+    rlRun "deletePermission $permissionName9" 0 "Deleting $permissionName6"
+    rlRun "deletePermission $permissionName10" 0 "Deleting $permissionName7"
+    rlRun "deletePermission $permissionName11" 0 "Deleting $permissionName8"
+    rlRun "deletePermission $permissionName12" 0 "Deleting $permissionName8"
+    #TODO: This permission shouldn't be added, and so will not be available 
+    # for deleting, after bug 783502 is fixed.
+    rlRun "deletePermission $permissionNameBUG" 0 "Deleting $permissionNameBUG"
+    rlRun "deleteGroup groupone" 0 "Deleting groupone"
 
 }
 
@@ -342,7 +340,7 @@ ipapermission_add_invalidattr()
 
    rlPhaseStartTest "ipa-permission-cli-1014 - add permission with invalid attr" 
      command="addPermission $permissionName $permissionRights $permissionLocalTarget $permissionLocalAttr" 
-     expmsg="ipa: ERROR: targetattr \"$permissionLocalAttr\" does not exist in schema. Please add attributeTypes \"$permissionLocalAttr\" to schema if necessary." 
+     expmsg="ipa: ERROR: attribute(s) \"$permissionLocalAttr\" not allowed"
      rlRun "$command > $TmpDir/ipapermission_invalidattr1.log 2>&1" 1 "Verify error message for $permissionLocalAttr"
      rlAssertGrep "$expmsg" "$TmpDir/ipapermission_invalidattr1.log"
    rlPhaseEnd
