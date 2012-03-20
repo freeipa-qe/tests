@@ -194,6 +194,39 @@ creatorsName: uid=admin,ou=administrators,ou=topologymanagement,o=netscaperoot
 modifiersName: uid=admin,ou=administrators,ou=topologymanagement,o=netscaperoot
 nsUniqueId: 42598c8b-1dd211b2-8f88fe1c-fcc30000
 
+dn: cn=Philomena Hazen, ou=People, dc=example,dc=com
+carLicense: PV7JWI8
+cn: Philomena Hazen
+departmentNumber: 5959
+description: This is Philomena Hazen's description
+employeeType: Manager
+facsimileTelephoneNumber: +1 804 471-8791
+givenName: Philomena
+homePhone: +1 408 746-4902
+initials: P. H.
+l: Santa Clara
+mail: Philomena_Hazen@example.com
+manager: cn=Torrie Paluso,ou=People,dc=example,dc=com
+mobile: +1 818 300-2476
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+ou: Human Resources
+pager: +1 206 932-6524
+postalAddress: example.com, Human Resources Dept #204, Room#545
+roomNumber: 5433
+secretary: cn=Tiphany Samieian,ou=People,dc=example,dc=com
+sn: Hazen
+telephoneNumber: +1 206 660-3641
+title: Senior Human Resources Accountant
+uid: Philomena_Hazen
+userPassword: nezaHanemo
+objectclass: posixAccount
+uidNumber: 18795
+gidNumber: 28795
+homeDirectory: /home/Philomena_Hazen
+
 # entry-id: 10
 dn: uid=bosusr,ou=BostonUsers,ou=Boston,dc=example,dc=com
 passwordGraceUserTime: 0
