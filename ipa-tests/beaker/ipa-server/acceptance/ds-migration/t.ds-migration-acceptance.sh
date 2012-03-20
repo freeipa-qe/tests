@@ -95,6 +95,7 @@ migratecmd()
                 rlRun "echo $ADMINPW | ipa migrate-ds --user-container=\"$USERCONTAINER\" --group-container=\"$GROUPCONTAINER\" --user-objectclass=badclass ldap://$CLIENT:389" 2 "Check return code"
                 echo $ADMINPW | ipa migrate-ds --user-container="$USERCONTAINER" --group-container="$GROUPCONTAINER" --user-objectclass=badclass ldap://$CLIENT:389 > /tmp/error.out 2>&1
                 rlAssertGrep "ipa: ERROR: Objectclass for user not found" "/tmp/error.out"
+		rlLog "Related Bugzilla :: https://bugzilla.redhat.com/show_bug.cgi?id=768510"
         rlPhaseEnd
 
         rlPhaseStartTest "ds-migration-cmd-005 Invalid Group Object Class"
@@ -102,6 +103,7 @@ migratecmd()
                 rlRun "echo $ADMINPW | ipa migrate-ds --user-container=\"$USERCONTAINER\" --group-container=\"$GROUPCONTAINER\" --group-objectclass=badclass ldap://$CLIENT:389" 2 "Check return code"
                 echo $ADMINPW | ipa migrate-ds --user-container="$USERCONTAINER" --group-container="$GROUPCONTAINER" --group-objectclass=badclass ldap://$CLIENT:389 > /tmp/error.out 2>&1
                 rlAssertGrep "ipa: ERROR: Objectclass for group not found" "/tmp/error.out"
+		rlLog "Related Bugzilla :: https://bugzilla.redhat.com/show_bug.cgi?id=768510"
         rlPhaseEnd
 
         rlPhaseStartTest "ds-migration-cmd-006 Invalid Schema option"
@@ -301,6 +303,16 @@ migratecmd()
                 ipa group-del $GROUP1
                 ipa group-del $GROUP2
         rlPhaseEnd
+
+	rlPhaseStartTest "bz786185 Allow basedn to be passed into migrate-ds"
+		rlLog "EXECUTING: echo $ADMINPW | ipa migrate-ds --user-container=\"ou=BostonUsers\" --group-container=\"ou=BostonGroups\" --base-dn=\"ou=Boston,dc=example,dc=com\" ldap://$CLIENT:389"
+		rlRun "echo $ADMINPW | ipa migrate-ds --user-container=\"ou=BostonUsers\" --group-container=\"ou=BostonGroups\" --base-dn=\"ou=Boston,dc=example,dc=com\" ldap://$CLIENT:389" 0
+		rlRun "ipa user-show bosusr" 0 "Verifying bosusr was migrated"
+		rlRun "ipa group-show bosgrp" 0 "Verifying bosgrp was migrated"
+		rlLog "Cleaning up migrated user and group"
+		ipa user-del bosusr
+		ipa group-del bosgrp
+	rlPhaseEnd
 
         rlPhaseStartTest "bz783270 Warn if compat plugin is enabled"
                 rlLog "EXECUTING: echo $ADMINPW | ipa-compat-manage enable"
