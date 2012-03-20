@@ -10,7 +10,7 @@ ipapermissionTests() {
     ipapermission_show_rights
     ipapermission_del_continue
     ipapermission_find
-#    ipapermission_mod
+    ipapermission_mod
 #    cleanupPermissionTests
 }
 
@@ -225,7 +225,7 @@ ipapermission_params_hostgroup_type()
     permissionLocalAttr="businessCategory,owner"
     objectclass="groupofnames,ipapermission,top"
 
-   rlPhaseStartTest "ipa-permission-cli-1009 - add permission for type hostgroup, with multiple attr, and multiple permissions"
+   rlPhaseStartTest "ipa-permission-cli-1009 - add permission for type hostgroup, with multiple attr, and multiple permissions (bug 783502 - side effect)"
      rlRun "addPermission $permissionName $permissionRights $permissionLocalTarget $permissionLocalAttr" 0 "Adding $permissionName"
      verifyPermissionTargetAttr $permissionName $permissionRights "Type" $permissionLocalTargetToVerify $permissionLocalAttr $objectclass
    rlPhaseEnd
@@ -728,7 +728,7 @@ ipapermission_find_name()
     value="\ "
     rlPhaseStartTest "ipa-permission-cli-1040 - find permission using invalid --name (bug 785251)"
       command="findPermissionByOption $option $value \"all\" $permissions"
-      expmsg="ipa: ERROR"
+      expmsg="ipa: ERROR : Verify new error"
       rlRun "$command > $TmpDir/ipapermission_invalidname.log 2>&1" 1 "Verify error message for invalid $option"
       rlAssertGrep "$expmsg" "$TmpDir/ipapermission_invalidname.log"
     rlPhaseEnd
@@ -933,12 +933,98 @@ ipapermission_find_all_raw()
 
 
 ##############################################
-#    TODO: Bug 782847 prompts for all attr when running mod
-#    so will come back to these tests.
+#   Bug 782847 prompts for all attr when running mod
 ##  test: ipapermission-mod
 ##############################################
-#ipapermission_mod()
-#{
-#}
-#
-#
+
+ipapermission_mod()
+{
+   ipapermission_mod_positive
+   ipapermission_mod_negative
+}
+
+ipapermission_mod_positive()
+{
+   rlPhaseStartTest "ipa-permission-cli-1052 - modify permission --permissions"
+     permissionName="Add Automount Keys"
+     attr="permissions"
+     value="add,write"
+     restOfRequiredCommand="--attrs="
+     rlRun "modifyPermission \"$permissionName\" $attr $value $restOfRequiredCommand"
+     rlRun "verifyPermissionAttr \"$permissionName\" all \"Permissions\" \"$value\"" 0 "Verify Permissions"
+   rlPhaseEnd 
+
+  rlPhaseStartTest "ipa-permission-cli-1052 - modify permission --attrs (bug 783502 - side effect)"
+     permissionName="Change a user password"
+     attr="attrs"
+     value="userpassword,krbprincipalkey,sambalmpassword,passwordhistory"
+     rlRun "modifyPermission \"$permissionName\" $attr $value"
+     rlRun "verifyPermissionAttr \"$permissionName\" all \"Attributes\" \"$value\"" 0 "Verify Permissions"
+   rlPhaseEnd
+
+  rlPhaseStartTest "ipa-permission-cli-1052 - modify permission --type"
+     permissionName="Remove Netgroups"
+     attr="type"
+     value="dnsrecord"
+     rlRun "modifyPermission \"$permissionName\" $attr $value"
+     rlRun "verifyPermissionAttr \"$permissionName\" all \"Type\" \"$value\"" 0 "Verify Permissions"
+   rlPhaseEnd
+
+
+   #cleanup:
+   ipa permission-mod --permissions=add  "add Automount keys" --attrs= 
+   ipa permission-mod --attrs="userpassword,krbprincipalkey,sambalmpassword,sambantpassword,passwordhistory" --all "Change a user password"
+   ipa permission-mod --type=netgroup "Remove Netgroups"
+
+}
+
+
+ipapermission_mod_negative()
+{
+   rlPhaseStartTest "ipa-permission-cli-1052 - modify permission invalid --permissions"
+     permissionName="Add Automount Keys"
+     attr="permissions"
+     value="xyz"
+     restOfRequiredCommand="--attrs="
+     command="modifyPermission \"$permissionName\" $attr $value $restOfRequiredCommand"
+     expMsg="ipa: ERROR: invalid 'permissions': \"$value\" is not a valid permission"
+     rlRun "$command > $TmpDir/ipapermission_invalidpermission.log 2>&1" 1 "Verify error message for invalid permission"
+     rlAssertGrep "$expMsg" "$TmpDir/ipapermission_invalidpermission.log"
+   rlPhaseEnd 
+
+  rlPhaseStartTest "ipa-permission-cli-1052 - modify permission invalid attrs"
+     permissionName="Change a user password"
+     attr="attrs"
+     value="xyz"
+     command="modifyPermission \"$permissionName\" $attr \"$value\""
+#     command="ipa permission-mod --attrs=\"$value\" \"$permissionName\""
+     expMsg="ipa: ERROR: attribute(s) \"$value\" not allowed"
+     rlRun "$command > $TmpDir/ipapermission_invalidattr.log 2>&1" 1 "Verify error message for invalid attr"
+     rlAssertGrep "$expMsg" "$TmpDir/ipapermission_invalidattr.log"
+   rlPhaseEnd
+
+   rlPhaseStartTest "ipa-permission-cli-1052 - modify permission invalid --type"
+     permissionName="Modify Users"
+     attr="type"
+     value="hostgroup"
+     command="modifyPermission \"$permissionName\" $attr $value"
+#     command="ipa permission-mod --type=\"$value\" \"$permissionName\""
+     expMsg="ipa: ERROR: attribute(s) \"givenname,sn,cn,displayname,title,initials,loginshell,gecos,homephone,mobile,pager,facsimiletelephonenumber,telephonenumber,street,roomnumber,l,st,postalcode,manager,secretary,description,carlicense,labeleduri,inetuserhttpurl,seealso,employeetype,businesscategory,ou,mepmanagedentry,objectclass\" not allowed"
+     rlRun "$command > $TmpDir/ipapermission_invalidtype1.log 2>&1" 1 "Verify error message for invalid type"
+     rlAssertGrep "$expMsg" "$TmpDir/ipapermission_invalidtype1.log"
+   rlPhaseEnd
+
+   rlPhaseStartTest "ipa-permission-cli-1052 - modify permission invalid --type"
+     permissionName="Modify Users"
+     attr="type"
+     value="users"
+     command="modifyPermission \"$permissionName\" $attr $value"
+#     command="ipa permission-mod --type=\"$value\" \"$permissionName\""
+     expMsg="ipa: ERROR: invalid 'type': must be one of (u'user', u'group', u'host', u'service', u'hostgroup', u'netgroup', u'dnsrecord')"
+     rlRun "$command > $TmpDir/ipapermission_invalidtype2.log 2>&1" 1 "Verify error message for invalid type"
+     rlAssertGrep "$expMsg" "$TmpDir/ipapermission_invalidtype2.log"
+   rlPhaseEnd
+
+}
+
+

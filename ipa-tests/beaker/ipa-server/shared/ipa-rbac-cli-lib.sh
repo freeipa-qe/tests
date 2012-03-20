@@ -128,11 +128,11 @@ verifyPermissionAttr()
 	rc=0
 	
        if [ "$allOrRaw" == "all" ] ; then
-	   rlLog "Executing: ipa $command --all $permissionName $showrights"
-   	   ipa $command --all $permissionName  $showrights > $tmpfile
+	   rlLog "Executing: ipa $command --all \"$permissionName\" $showrights > $tmpfile"
+   	   ipa $command --all "$permissionName"  $showrights > $tmpfile
        else
-	   rlLog "Executing: ipa $command --all --raw $permissionName"
-	   ipa $command --all --raw $permissionName > $tmpfile
+	   rlLog "Executing: ipa $command --all --raw \"$permissionName\" > $tmpfile"
+	   ipa $command --all --raw "$permissionName" > $tmpfile
        fi
 	rc=$?
 	if [ $rc -ne 0 ]; then
@@ -304,13 +304,18 @@ verifyPermissionAttrFindUsingOptions()
 modifyPermission()
 {
 
-   permissionName=$1
+   permissionName="$1"
    attrToUpdate="--$2"
-   value=$3
+   value="$3"
+   if [ `echo $#` = 4 ] ; then
+      restOfCommand="$4"
+   else
+      restOfCommand=""
+   fi
    rc=0
 
-   rlLog "Excecuting: ipa permission-mod $attrToUpdate=$value $permissionName"
-   ipa permission-mod $attrToUpdate=$value $permissionName
+   rlLog "Executing: ipa permission-mod $permissionName $attrToUpdate=$value $restOfCommand"
+   ipa permission-mod "$permissionName" $attrToUpdate=$value $restOfCommand
    rc=$?
    if [ $rc -ne 0 ] ; then
      rlLog "There was an error modifying $permissionName"
