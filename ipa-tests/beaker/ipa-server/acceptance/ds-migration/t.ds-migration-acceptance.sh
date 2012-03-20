@@ -7,6 +7,7 @@ USER1=puser1
 USER1PWD="fo0m4nchU"
 USER2PWD="Secret123"
 USER2=puser2
+USER3="philomena_hazen"
 GROUP1=group1
 GROUP2=group2
 
@@ -125,14 +126,16 @@ migratecmd()
                 rlLog "EXECUTING: ipa migrate-ds --user-container=\"$USERCONTAINER\" --group-container=\"$GROUPCONTAINER\" --bind-dn=\"uid=$USER1,$USERCONTAINER,$BASEDN\" ldap://$CLIENT:389"
                 rlRun "echo fo0m4nchU | ipa migrate-ds --user-container=\"$USERCONTAINER\" --group-container=\"$GROUPCONTAINER\" --bind-dn=\"uid=$USER1,$USERCONTAINER,$BASEDN\" ldap://$CLIENT:389" 0
 
-		rlRun "ipa user-show $USER1" 0 "Verifying $USER1 was migrated"
+		rlRun "ipa user-show $USER1" 0 "Verifying '$USER1' was migrated"
 		rlRun "ipa user-show $USER2" 0 "Verifying user '$USER2' was migrated"
+		rlRun "ipa user-show $USER3" 0 "Verifying '$USER3' was migrated"
 		rlRun "ipa group-show $GROUP1" 0 "Verifying group '$GROUP1' was migrated"
 		rlRun "ipa group-show $GROUP2" 0 "Verifying group '$GROUP2' was migrated"
 
 		#cleanup for next migration test
                 ipa user-del $USER1
                 ipa user-del $USER2
+		ipa user-del $USER3
                 ipa group-del $GROUP1
                 ipa group-del $GROUP2
 	rlPhaseEnd
@@ -141,14 +144,16 @@ migratecmd()
                 rlLog "EXECUTING: ipa migrate-ds --user-container=\"$USERCONTAINER\" --group-container=\"$GROUPCONTAINER\" --exclude-users=$USER2 ldap://$CLIENT:389"
                 rlRun "echo $ADMINPW | ipa migrate-ds --user-container=\"$USERCONTAINER\" --group-container=\"$GROUPCONTAINER\" --exclude-users=$USER2 ldap://$CLIENT:389" 0
 
-                rlRun "ipa user-show $USER1" 0 "Verifying $USER1 was migrated"
+                rlRun "ipa user-show $USER1" 0 "Verifying '$USER1' was migrated"
                 rlRun "ipa user-show $USER2" 2 "Verifying user '$USER2' was NOT migrated"
+		rlRun "ipa user-show $USER3" 0 "Verifying '$USER3' was migrated"
                 rlRun "ipa group-show $GROUP1" 0 "Verifying group '$GROUP1' was migrated"
                 rlRun "ipa group-show $GROUP2" 0 "Verifying group '$GROUP2' was migrated"
 
                 #cleanup for next migration test
                 ipa user-del $USER1
                 ipa user-del $USER2
+		ipa user-del $USER3
                 ipa group-del $GROUP1
                 ipa group-del $GROUP2
         rlPhaseEnd
@@ -157,14 +162,16 @@ migratecmd()
                 rlLog "EXECUTING: ipa migrate-ds --user-container=\"$USERCONTAINER\" --group-container=\"$GROUPCONTAINER\" --exclude-groups=$GROUP2 ldap://$CLIENT:389"
                 rlRun "echo $ADMINPW | ipa migrate-ds --user-container=\"$USERCONTAINER\" --group-container=\"$GROUPCONTAINER\" --exclude-groups=$GROUP2 ldap://$CLIENT:389" 0
 
-                rlRun "ipa user-show $USER1" 0 "Verifying $USER1 was migrated"
+                rlRun "ipa user-show $USER1" 0 "Verifying '$USER1' was migrated"
                 rlRun "ipa user-show $USER2" 0 "Verifying user '$USER2' was migrated"
+		rlRun "ipa user-show $USER3" 0 "Verifying '$USER3' was migrated"
                 rlRun "ipa group-show $GROUP1" 0 "Verifying group '$GROUP1' was migrated"
                 rlRun "ipa group-show $GROUP2" 2 "Verifying group '$GROUP2' was NOT migrated"
 
                 #cleanup for next migration test
                 ipa user-del $USER1
                 ipa user-del $USER2
+		ipa user-del $USER3
                 ipa group-del $GROUP1
                 ipa group-del $GROUP2
         rlPhaseEnd
@@ -173,14 +180,16 @@ migratecmd()
                 rlLog "EXECUTING: ipa migrate-ds --user-container=\"$USERCONTAINER\" --group-container=\"$GROUPCONTAINER\" --exclude-users=$USER1,$USER2 ldap://$CLIENT:389"
                 rlRun "echo $ADMINPW | ipa migrate-ds --user-container=\"$USERCONTAINER\" --group-container=\"$GROUPCONTAINER\" --exclude-users=$USER1,$USER2 ldap://$CLIENT:389" 0
 
-                rlRun "ipa user-show $USER1" 2 "Verifying $USER1 was NOT migrated"
+                rlRun "ipa user-show $USER1" 2 "Verifying '$USER1' was NOT migrated"
                 rlRun "ipa user-show $USER2" 2 "Verifying user '$USER2' was NOT migrated"
+		rlRun "ipa user-show $USER3" 0 "Verifying '$USER3' was migrated"
                 rlRun "ipa group-show $GROUP1" 0 "Verifying group '$GROUP1' was migrated"
                 rlRun "ipa group-show $GROUP2" 0 "Verifying group '$GROUP2' was migrated"
 
                 #cleanup for next migration test
                 ipa user-del $USER1
                 ipa user-del $USER2
+		ipa user-del $USER3
                 ipa group-del $GROUP1
                 ipa group-del $GROUP2
         rlPhaseEnd
@@ -189,14 +198,16 @@ migratecmd()
                 rlLog "EXECUTING: ipa migrate-ds --user-container=\"$USERCONTAINER\" --group-container=\"$GROUPCONTAINER\" --exclude-groups=$GROUP1,$GROUP2 ldap://$CLIENT:389"
                 rlRun "echo $ADMINPW | ipa migrate-ds --user-container=\"$USERCONTAINER\" --group-container=\"$GROUPCONTAINER\" --exclude-groups=$GROUP1,$GROUP2 ldap://$CLIENT:389" 0
 
-                rlRun "ipa user-show $USER1" 0 "Verifying $USER1 was migrated"
+                rlRun "ipa user-show $USER1" 0 "Verifying '$USER1' was migrated"
                 rlRun "ipa user-show $USER2" 0 "Verifying user '$USER2' was migrated"
+		rlRun "ipa user-show $USER3" 0 "Verifying '$USER3' was migrated"
                 rlRun "ipa group-show $GROUP1" 2 "Verifying group '$GROUP1' was NOT migrated"
                 rlRun "ipa group-show $GROUP2" 2 "Verifying group '$GROUP2' was NOT migrated"
 
                 #cleanup for next migration test
                 ipa user-del $USER1
                 ipa user-del $USER2
+		ipa user-del $USER3
                 ipa group-del $GROUP1
                 ipa group-del $GROUP2
         rlPhaseEnd
@@ -205,26 +216,29 @@ migratecmd()
                 rlLog "EXECUTING: ipa migrate-ds --user-container=\"$USERCONTAINER\" --group-container=\"$GROUPCONTAINER\" --exclude-users=$USER1,$USER2 --exclude-groups=$GROUP1,$GROUP2 ldap://$CLIENT:389"
                 rlRun "echo $ADMINPW | ipa migrate-ds --user-container=\"$USERCONTAINER\" --group-container=\"$GROUPCONTAINER\" --exclude-users=$USER1,$USER2 --exclude-groups=$GROUP1,$GROUP2 ldap://$CLIENT:389" 0
 
-                rlRun "ipa user-show $USER1" 2 "Verifying $USER1 was NOT migrated"
+                rlRun "ipa user-show $USER1" 2 "Verifying '$USER1' was NOT migrated"
                 rlRun "ipa user-show $USER2" 2 "Verifying user '$USER2' was NOT migrated"
+		rlRun "ipa user-show $USER3" 0 "Verifying '$USER3' was migrated"
                 rlRun "ipa group-show $GROUP1" 2 "Verifying group '$GROUP1' was NOT migrated"
                 rlRun "ipa group-show $GROUP2" 2 "Verifying group '$GROUP2' was NOT migrated"
 
                 #cleanup for next migration test
                 ipa user-del $USER1
                 ipa user-del $USER2
+		ipa user-del $USER3
                 ipa group-del $GROUP1
                 ipa group-del $GROUP2
         rlPhaseEnd
 
 	rlPhaseStartTest "ds-migration-cmd-014 Ignore User Objectclass"
-                rlLog "EXECUTING: ipa migrate-ds --user-container=\"$USERCONTAINER\" --group-container=\"$GROUPCONTAINER\" --user-ignore-objectclass=posixAccount ldap://$CLIENT:389"
-                rlRun "echo $ADMINPW | ipa migrate-ds --user-container=\"$USERCONTAINER\" --group-container=\"$GROUPCONTAINER\" --user-ignore-objectclass=posixAccount ldap://$CLIENT:389" 0
+                rlLog "EXECUTING: ipa migrate-ds --user-container=\"$USERCONTAINER\" --group-container=\"$GROUPCONTAINER\" --user-ignore-objectclass=inetorgperson ldap://$CLIENT:389"
+                rlRun "echo $ADMINPW | ipa migrate-ds --user-container=\"$USERCONTAINER\" --group-container=\"$GROUPCONTAINER\" --user-ignore-objectclass=inetorgperson ldap://$CLIENT:389" 0
 
-                rlRun "ipa user-show $USER1" 2 "Verifying $USER1 was NOT migrated"
-                rlRun "ipa user-show $USER2" 2 "Verifying user '$USER2' was NOT migrated"
+                rlRun "ipa user-show $USER1" 0 "Verifying '$USER1' was migrated"
+                rlRun "ipa user-show $USER2" 0 "Verifying user '$USER2' was migrated"
                 rlRun "ipa group-show $GROUP1" 0 "Verifying group '$GROUP1' was migrated"
                 rlRun "ipa group-show $GROUP2" 0 "Verifying group '$GROUP2' was migrated"
+		rlRun "ipa user-show $USER3" 2 "Verify '$USER3' inetorperson user was NOT migrated"
 
                 #cleanup for next migration test
                 ipa user-del $USER1
@@ -237,14 +251,16 @@ migratecmd()
                 rlLog "EXECUTING: ipa migrate-ds --user-container=\"$USERCONTAINER\" --group-container=\"$GROUPCONTAINER\" --group-ignore-objectclass=posixGroup ldap://$CLIENT:389"
                 rlRun "echo $ADMINPW | ipa migrate-ds --user-container=\"$USERCONTAINER\" --group-container=\"$GROUPCONTAINER\" --group-ignore-objectclass=posixGroup ldap://$CLIENT:389" 0
         
-                rlRun "ipa user-show $USER1" 0 "Verifying $USER1 was migrated"
+                rlRun "ipa user-show $USER1" 0 "Verifying '$USER1' was migrated"
                 rlRun "ipa user-show $USER2" 0 "Verifying user '$USER2' was migrated"
+		rlRun "ipa user-show $USER3" 0 "Verifying '$USER3' was migrated"
                 rlRun "ipa group-show $GROUP1" 2 "Verifying group '$GROUP1' was NOT migrated"
                 rlRun "ipa group-show $GROUP2" 2 "Verifying group '$GROUP2' was NOT migrated"
                 
                 #cleanup for next migration test
                 ipa user-del $USER1
                 ipa user-del $USER2
+		ipa user-del $USER3
                 ipa group-del $GROUP1
                 ipa group-del $GROUP2
         rlPhaseEnd
@@ -274,6 +290,7 @@ migratecmd()
                 #cleanup for next migration test
                 ipa user-del $USER1
                 ipa user-del $USER2
+		ipa user-del $USER3
                 ipa group-del $GROUP1
                 ipa group-del $GROUP2
         rlPhaseEnd
@@ -301,6 +318,7 @@ migratecmd()
                 #cleanup for next migration test
                 ipa user-del $USER1
                 ipa user-del $USER2
+		ipa user-del $USER3
                 ipa group-del $GROUP1
                 ipa group-del $GROUP2
         rlPhaseEnd
@@ -355,15 +373,22 @@ bugzillas()
                 rlLog "EXECUTING: echo $ADMINPW | ipa migrate-ds --with-compat ldap://$CLIENT:389"
 		rlRun "echo $ADMINPW | ipa migrate-ds --with-compat ldap://$CLIENT:389" 0 "Migrating with compat plugin enabled"
                 rlRun "ipa user-show $USER1" 0 "Verifying $USER1 was migrated"
-                rlRun "ipa user-show $USER2" 0 "Verifying user '$USER2' was migrated"
+                rlRun "ipa user-show $USER2" 0 "Verifying '$USER2' was migrated"
+		rlRun "ipa user-show $USER3" 0 "Verifying '$USER3' was migrated"
                 rlRun "ipa group-show $GROUP1" 0 "Verifying group '$GROUP1' was migrated"
                 rlRun "ipa group-show $GROUP2" 0 "Verifying group '$GROUP2' was migrated"
                 rlLog "Cleaning up migrated users"
-                ipa user-del $USER1
+        rlPhaseEnd
+
+	rlPhaseStartTest "bz804609 Internal Server Error - non-posix user-show --all"
+		rlRun "ipa user-show --all $USER3 > /tmp/bz804609.out 2>&1" 0 "Show migrated non-posix user"
+		rlAssertNotGrep "ipa: ERROR: an internal error has occurred" "/tmp/bz804609.out"
+	        ipa user-del $USER1
                 ipa user-del $USER2
+                ipa user-del $USER3
                 ipa group-del $GROUP1
                 ipa group-del $GROUP2
-        rlPhaseEnd
+	rlPhaseEnd
 }
 
 cleartxtpwdmigration()
