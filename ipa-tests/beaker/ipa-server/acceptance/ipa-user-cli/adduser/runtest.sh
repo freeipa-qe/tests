@@ -542,6 +542,22 @@ rlJournalStart
 	rlRun "ipa sudorule-del $sru" 0 "cleaning up the sudorule used in these tests"
     rlPhaseEnd
 
+    rlPhaseStartTest "Bug 801451 - Logging in with ssh pub key should consult authentication authority policies"
+	rlRun "verifies https://bugzilla.redhat.com/show_bug.cgi?id=801451"
+        rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
+	user801451="user801451"
+	rlRun "create_ipauser $user801451 $user801451 $user801451 Secret_123"
+        sleep 5
+	ssh_auth_success $user801451 Secret_123 $MASTER
+	cat /root/.ssh/id_rsa.pub >> /home/user801451/.ssh/authorized_keys
+	rlRun "ssh -l user801451 $MASTER"
+	rlRun "ipa user-disable user801451"
+	rlRun "ssh -l user801451 $MASTER" 255 "User disabled, connection closed."
+	rlRun "tail /var/log/secure | grep pam_sss(sshd:account): Access denied for user shanks: 6 (Permission denied)"
+	rlRun "tail -n 20 /var/log/sssd/sssd_$DOMAIN.log | grep \"Account for user \[user801451\] is locked.\""
+    rlPhaseEnd
+
+
     rlPhaseStartCleanup "ipa-user-cli-add-cleanup"
 	rlRun "ipa config-mod --searchrecordslimit=100" 0 "set default search records limit back to default"
         rlRun "ipa user-del $superuser " 0 "delete $superuser account"
