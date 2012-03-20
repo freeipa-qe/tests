@@ -18,6 +18,7 @@ ds-migration-acceptance()
     setup
     migrationconfig
     migratecmd
+    bugzillas
     #cleartxtpwdmigration
     cleanup
 }
@@ -302,6 +303,33 @@ migratecmd()
                 ipa user-del $USER2
                 ipa group-del $GROUP1
                 ipa group-del $GROUP2
+        rlPhaseEnd
+}
+
+bugzillas()
+{
+        rlPhaseStartTest "bz804807 Internal Server Error specifying invalid RDN for container - User Container"
+                # just in case you are running just bugzillas ... migration will not be enabled
+                ipa config-mod --enable-migration=TRUE
+                rlLog "EXECUTING: echo $ADMINPW | ipa migrate-ds --user-container=\"BostonUsers\" --group-container=\"ou=BostonGroups\" --base-dn=\"ou=Boston,dc=example,dc=com\" ldap://$CLIENT:389"
+                echo $ADMINPW | ipa migrate-ds --user-container="BostonUsers" --group-container="ou=BostonGroups" --base-dn="ou=Boston,dc=example,dc=com" ldap://$CLIENT:389 > /tmp/bz804807.txt 2>&1
+                cat /tmp/bz804807.txt | grep "Internal Server Error"
+                if [ $? -eq 0 ] ; then
+                        rlFail "https://bugzilla.redhat.com/show_bug.cgi?id=804807"
+                else
+                        rlPass "Internal Server Error bz804807 fixed - User Container"
+                fi
+        rlPhaseEnd
+
+        rlPhaseStartTest "bz804807 Internal Server Error specifying invalid RDN for container - Group Container"
+                rlLog "EXECUTING: echo $ADMINPW | ipa migrate-ds --user-container=\"ou=BostonUsers\" --group-container=\"BostonGroups\" --base-dn=\"ou=Boston,dc=example,dc=com\" ldap://$CLIENT:389"
+                echo $ADMINPW | ipa migrate-ds --user-container="ou=BostonUsers" --group-container="BostonGroups" --base-dn="ou=Boston,dc=example,dc=com" ldap://$CLIENT:389 > /tmp/bz804807.txt 2>&1
+                cat /tmp/bz804807.txt | grep "Internal Server Error"
+                if [ $? -eq 0 ] ; then
+                        rlFail "https://bugzilla.redhat.com/show_bug.cgi?id=804807"
+                else
+                        rlPass "Internal Server Error bz804807 fixed - Group Container"
+                fi
         rlPhaseEnd
 
 	rlPhaseStartTest "bz786185 Allow basedn to be passed into migrate-ds"
