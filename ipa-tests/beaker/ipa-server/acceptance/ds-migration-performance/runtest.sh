@@ -42,7 +42,7 @@
 . /dev/shm/env.sh
 
 # Include test case file
-. ./t.ds-migration-functional.sh
+. ./t.ds-migration-performance.sh
 . ./installds.sh
 
 PACKAGELIST="389-ds-base"
