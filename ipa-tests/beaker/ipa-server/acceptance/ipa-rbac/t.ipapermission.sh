@@ -1031,7 +1031,7 @@ ipapermission_mod_negative()
      rlAssertGrep "$expMsg" "$TmpDir/ipapermission_invalidattr.log"
    rlPhaseEnd
 
-   rlPhaseStartTest "ipa-permission-cli-1060 - modify permission invalid --type"
+   rlPhaseStartTest "ipa-permission-cli-1060 - modify permission  --type - for which chosen attr are invalid"
      permissionName="Modify Users"
      attr="type"
      value="hostgroup"
