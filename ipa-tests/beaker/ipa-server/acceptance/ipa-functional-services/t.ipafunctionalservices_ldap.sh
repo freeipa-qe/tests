@@ -298,7 +298,7 @@ ldap_tests()
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials"
 		# revoke the HTTP server's certificate - first need the certificate's serial number
                 ipa service-show --all $LDAPPRINC > /tmp/certout.txt
-                serialno=`cat /tmp/certout.txt | grep "serial_number" | cut -d ":" -f 2 | cut -d ":" -f 2`
+                serialno=`cat /tmp/certout.txt | grep "Serial Number" | cut -d ":" -f 2 | cut -d ":" -f 2`
                 serialno=`echo $serialno`
                 rlLog "$LDAPPRINC certificate serial number: $serialno"
                 rlRun "ipa cert-revoke $serialno" 0 "Revoke LDAP server's certificate"
