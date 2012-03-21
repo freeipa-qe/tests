@@ -1239,6 +1239,27 @@ EOF
 
 	rlPhaseEnd
 
+        rlPhaseStartTest "ipa-dns-175: Bug 804619 - DNS zone serial number is not updated"
+
+		rlLog "verifies https://bugzilla.redhat.com/show_bug.cgi?id=804619"
+		rlLog "closes https://engineering.redhat.com/trac/ipa-tests/ticket/371"
+
+		rlRun "ipa dnszone-show $DOMAIN"
+		serial=`ipa dnszone-show $DOMAIN  --all --raw | grep idnssoaserial | cut -d :  -f 2`
+
+		rlRun "ipa dnsrecord-add $DOMAIN dns175 --a-rec=192.168.0.1"
+		newserial=`ipa dnszone-show $DOMAIN  --all --raw | grep idnssoaserial | cut -d :  -f 2`
+		if [ $serial -eq $newserial ]; then
+			rlFail "idnssoaserial has not changed, not as expected, GOT: $newserial"
+		else
+			rlPass "idnssoaserial has changed as expected, GOT: $newserial"
+		fi
+
+	rlRun "ipa dnsrecord-del $DOMAIN dns175 --a-rec=192.168.0.1"
+
+	rlPhaseEnd
+
+
 	rlJournalPrintText
 	report=/tmp/rhts.report.$RANDOM.txt
 	makereport $report
