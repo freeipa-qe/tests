@@ -559,6 +559,74 @@ rlJournalStart
 	rlRun "tail -n 20 /var/log/sssd/sssd_$DOMAIN.log | grep \"Account for user \[user801451\] is locked.\""
     rlPhaseEnd
 
+    rlPhaseStartTest "ipa-user-add-052: user gidnumber defaults to upg gidnumber which matches user uidnumber"
+	rlRun "ipa user-add --first=test --last=test testusr" 0
+	uidnumber=`ipa user-show testusr | grep "UID" | cut -d ":" -f 2`
+	uidnumber=`echo $uidnumber`
+	gidnumber=`ipa user-show testusr | grep "GID" | cut -d ":" -f 2`
+        gidnumber=`echo $gidnumber`
+	if [ $uidnumber -ne $gidnumber ] ; then
+		rlFail "User gidnumber does NOT match user uidnumber.  uidNumber: $uidnumber  gidNumber: $gidnumber"
+	else
+		rlPass "User gidnumber matches user uidnumber.  uidNumber: $uidnumber  gidNumber: $gidnumber"
+	fi
+	#clean up
+	ipa user-del testusr
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-user-add-053: --noprivate group specified gidnumber exists - default group non-posix"
+	# note gidnumber required if default user's group "ipausers" is non-posix and also group with that gidnumber must exist
+	ipa group-add --desc=test testgrp
+	ggidnumber=`ipa group-find testgrp | grep "GID" | cut -d ":" -f 2`
+	ggidnumber=`echo $ggidnumber`
+	rlRun "ipa user-add --first=test --last=test --noprivate --gidnumber=$ggidnumber testusr" 0
+	rlRun "ipa group-find --private testusr" 1 "Make sure private group not added"
+	ugidnumber=`ipa user-show testusr | grep "GID" | cut -d ":" -f 2`
+	ugidnumber=`echo $ugidnumber`
+	if [ $ggidnumber -ne $ugidnumber ] ; then
+		rlFail "User's gidnumber not as expected.  Expected: ggidnumber  Got: ugidnumber"
+	else
+		rlPass "User's gidnumber as expected."
+	fi
+	#clean up
+	ipa user-del testusr
+	ipa group-del testgrp
+    rlPhaseEnd
+
+    rlPhaseStartTest "bz805546 --noprivate group specified gid number does not exist - default group non-posix"
+        expmsg="ipa: ERROR: 'gidnumber': group not found"
+        command="ipa user-add --first=test --last=test --noprivate --gidnumber=123 testusr"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
+	# just in case
+	ipa user-del testusr
+    rlPhaseEnd
+
+    rlPhaseStartTest "bz805546 --noprivate gidnumber not specifiec - default group posix"
+        ipa group-add --desc=test testgrp
+        ggidnumber=`ipa group-find testgrp | grep "GID" | cut -d ":" -f 2`
+        ggidnumber=`echo $ggidnumber`
+	rlRun "ipa config-mod --defaultgroup=testgrp" 0 "Change default group to testgrp gidnumber: $ggidnumber"
+	rlRun "ipa user-add --first=test --last=test --noprivate testusr" 0
+        rlRun "ipa group-find --private testusr" 1 "Make sure private group not added"
+        ugidnumber=`ipa user-show testusr | grep "GID" | cut -d ":" -f 2`
+        ugidnumber=`echo $ugidnumber`
+        if [ $ggidnumber -ne $ugidnumber ] ; then
+                rlFail "User's gidnumber not as expected.  Expected: $ggidnumber  Got: $ugidnumber"
+        else
+                rlPass "User's gidnumber as expected."
+        fi
+        #clean up
+        ipa user-del testusr
+        ipa group-del testgrp
+    rlPhaseEnd
+
+    rlPhaseStartTest "bz805546 when adding a user with --noprivate option the gidNumber should be required"
+	expmsg="ipa: ERROR: 'gidnumber': is required"
+        command="ipa user-add --first=test --last=test --noprivate testusr"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
+	# just in case
+	ipa user-del testusr
+    rlPhaseEnd
 
     rlPhaseStartCleanup "ipa-user-cli-add-cleanup"
 	rlRun "ipa config-mod --searchrecordslimit=100" 0 "set default search records limit back to default"
