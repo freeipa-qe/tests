@@ -63,7 +63,15 @@ skip_if_unavailable=1
 EOF
 		done
 
-		rlRun "yum -y update ipa*"	
+		rlRun "setenforce Permissive"
+		rlRun "yum -y bind bind-dyndb-ldap"
+		rlRun "ipactl restart"
+		rlRun "service dirsrv stop"
+		rlRun "/bin/rm -f /var/run/slapd-TESTRELM-COM.socket"
+		rlRun "yum -y update '389-ds-base*'"
+		rlRun "setenforce Permissive"
+		rlRun "ipactl restart"
+		rlRun "yum -y update 'ipa*'"	
 		rlRun "ipactl restart" ### IS THIS REALLY NEEDED?  BZ 766687?
 
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $MASTER_IP"
