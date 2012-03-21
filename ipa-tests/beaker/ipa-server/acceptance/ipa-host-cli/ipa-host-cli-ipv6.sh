@@ -41,7 +41,7 @@
 ########################################################################
 
 # get the IPv6 address 
-ipv6addr=$(/usr/bin/dig +short -t aaaa $MASTER)
+ipv6addr=$(/usr/bin/dig +short -t aaaa $BEAKERMASTER)
 
 # Another way to get IPv6 address
 # figure out what my active eth is from the machine's route
@@ -94,8 +94,8 @@ oct8=$(echo $ipv6addr | awk -F : '{print $8}')
        rzone_IPv6=`getReverseZone_IPv6 $ipv6addr`
        rlLog "Reverse Zone: $rzone_IPv6"
        if [ $rzone_IPv6 ] ; then
-                rlLog "echo $MASTER | ipa dnszone-add $rzone_IPv6 --admin-email=admin@example.com"
-                rlRun "echo $MASTER | ipa dnszone-add $rzone_IPv6 --admin-email=admin@example.com" 0 "Reverse zone for ipv6 adress added."
+                rlLog "echo $BEAKERMASTER | ipa dnszone-add $rzone_IPv6 --admin-email=admin@example.com"
+                rlRun "echo $BEAKERMASTER | ipa dnszone-add $rzone_IPv6 --admin-email=admin@example.com" 0 "Reverse zone for ipv6 adress added."
                 export ipv6_addr
                 rlLog "EXECUTING: ipa host-add --ip-address=$ipv6_addr $myhost"
                 rlRun "ipa host-add --ip-address=$ipv6_addr $myhost" 0 "Adding host with IPv6 Address $ipv6_addr"
@@ -260,9 +260,21 @@ oct8=$(echo $ipv6addr | awk -F : '{print $8}')
 	rlRun "ipa dnszone-del $rzone_IPv6" 0 "cleanup - delete dnszone"
     rlPhaseEnd
 
+    rlPhaseStartTest "ipa-host-cli-93: Negative - Add host with invalid IPv6 address"
+       short=mytestIPv6host
+       myhost=$short.$DOMAIN
+       ipv6_addr="some:ipv6addr"
+       rlLog "EXECUTING: ipa host-add --ip-address=$ipv6_addr $myhost"
+       command="ipa host-add --ip-address=$ipv6_addr $myhost"
+       expmsg="ipa: ERROR: invalid 'ip_address': failed to detect a valid IP address from u'$ipv6_addr'"
+       rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
+    rlPhaseEnd
+
+
     rlPhaseStartCleanup "ipa-host-cli-cleanup: Destroying admin credentials."
         rlRun "kdestroy" 0 "Destroying admin credentials."
 	rlRun "popd"
         rlRun "rm -r $tmpDir" 0 "Removing temp directory"
+	rhts-submit-log -l /var/log/httpd/error_log
     rlPhaseEnd
 
