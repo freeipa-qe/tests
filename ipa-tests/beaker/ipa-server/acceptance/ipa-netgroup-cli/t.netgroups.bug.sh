@@ -163,23 +163,37 @@ netgroup_bz_772297()
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 
-		rlRun "ipa user-add user1 --first=TEST --last=USER"
-		rlRun "ipa user-add user2 --first=TEST --last=USER"
-		rlRun "ipa user-add user3 --first=TEST --last=USER"
-		rlRun "ipa netgroup-add users --desc=users"
-		rlRun "ipa netgroup-add-member users --users=user1,user2,user3"
-		rlRun "ipa netgroup-find --users=user1,user2,user3"
-		rlRun "ldapsearch -x -LLL -b "dc=testrelm,dc=com" cn=users"
-		rlRun "getent -s sss netgroup users"
-		rlRun "ipa netgroup-remove-member users --users=user1,user2,user3"
+		rlRun "cp -f /etc/sssd/sssd.conf /etc/sssd/sssd.conf.$FUNCNAME.backup"
+		rlLog "Running: sed -i 's/\(\[domain.*\]\)$/\1\nentry_cache_timeout = 120/' /etc/sssd/sssd.conf"
+		sed -i 's/\(\[domain.*\]\)$/\1\nentry_cache_timeout = 120/' /etc/sssd/sssd.conf
+		rlRun "cat /etc/sssd/sssd.conf"
+		rlRun "service sssd restart"
+		rlRun "ipa user-add nguser1 --first=TEST --last=USER"
+		rlRun "ipa user-add nguser2 --first=TEST --last=USER"
+		rlRun "ipa user-add nguser3 --first=TEST --last=USER"
+		rlRun "ipa netgroup-add usersng --desc=users"
+		rlRun "ipa netgroup-add-member usersng --users=nguser1,nguser2,nguser3"
+		rlRun "ipa netgroup-find --users=nguser1,nguser2,nguser3"
+		rlRun "ldapsearch -x -LLL -b "dc=testrelm,dc=com" cn=usersng"
+		rlRun "getent -s sss netgroup usersng"
+		rlRun "ipa netgroup-remove-member usersng --users=nguser1,nguser2,nguser3"
 		rlRun "sleep 120"
-		if [ $(getent -s sss netgroup users|grep "^users.*user1.*user2.*user3"|wc -l) -gt 0 ]; then
+		if [ $(getent -s sss netgroup usersng|grep "^usersng.*nguser1.*nguser2.*nguser3"|wc -l) -gt 0 ]; then
+			rlRun "getent -s sss netgroup usersng"
 			rlFail "BZ 772297 found...Fails to update if all nisNetgroupTriple or memberNisNetgroup entries are deleted from a netgroup"
 		else
 			rlPass "BZ 772297 not found."
 		fi
 			
-		rlRun "ldapsearch -x -LLL -b \"dc=testrelm,dc=com\" cn=users"
+		rlRun "ldapsearch -x -LLL -b \"dc=testrelm,dc=com\" cn=usersng"
+		rlRun "ipa user-del nguser1"
+		rlRun "ipa user-del nguser2"
+		rlRun "ipa user-del nguser3"
+		rlRun "ipa netgroup-del usersng"
+		rlRun "cp -f /etc/sssd/sssd.conf.$FUNCNAME.backup /etc/sssd/sssd.conf"
+		rlRun "rm /etc/sssd/sssd.conf.$FUNCNAME.backup"
+		rlRun "chmod 0600 /etc/sssd/sssd.conf"
+		rlRun "service sssd restart"
 		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd
 }
@@ -207,7 +221,8 @@ netgroup_bz_766141()
 			rlPass "BZ 766141 not found"
 		fi	
 		
-		rlRun "mv -f /etc/sssd/sssd.conf.$FUNCNAME.backup /etc/sssd/sssd.conf"
+		rlRun "cp -f /etc/sssd/sssd.conf.$FUNCNAME.backup /etc/sssd/sssd.conf"
+		rlRun "rm /etc/sssd/sssd.conf.$FUNCNAME.backup"
 		rlRun "chmod 0600 /etc/sssd/sssd.conf"
 		rlRun "service sssd restart"
 		rlRun "ipa netgroup-del $FUNCNAME"
