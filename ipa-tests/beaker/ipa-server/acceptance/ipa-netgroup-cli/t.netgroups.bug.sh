@@ -163,7 +163,7 @@ netgroup_bz_772297()
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 
-		rlRun "cp -f /etc/sssd/sssd.conf /etc/sssd/sssd.conf.$FUNCNAME.backup"
+		rlRun "/bin/cp -f /etc/sssd/sssd.conf /etc/sssd/sssd.conf.$FUNCNAME.backup"
 		rlLog "Running: sed -i 's/\(\[domain.*\]\)$/\1\nentry_cache_timeout = 120/' /etc/sssd/sssd.conf"
 		sed -i 's/\(\[domain.*\]\)$/\1\nentry_cache_timeout = 120/' /etc/sssd/sssd.conf
 		rlRun "cat /etc/sssd/sssd.conf"
@@ -190,8 +190,8 @@ netgroup_bz_772297()
 		rlRun "ipa user-del nguser2"
 		rlRun "ipa user-del nguser3"
 		rlRun "ipa netgroup-del usersng"
-		rlRun "cp -f /etc/sssd/sssd.conf.$FUNCNAME.backup /etc/sssd/sssd.conf"
-		rlRun "rm /etc/sssd/sssd.conf.$FUNCNAME.backup"
+		rlRun "/bin/cp -f /etc/sssd/sssd.conf.$FUNCNAME.backup /etc/sssd/sssd.conf"
+		rlRun "/bin/rm /etc/sssd/sssd.conf.$FUNCNAME.backup"
 		rlRun "chmod 0600 /etc/sssd/sssd.conf"
 		rlRun "service sssd restart"
 		[ -f $tmpout ] && rm -f $tmpout
