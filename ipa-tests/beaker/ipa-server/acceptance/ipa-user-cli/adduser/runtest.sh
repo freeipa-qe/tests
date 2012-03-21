@@ -543,7 +543,8 @@ rlJournalStart
     rlPhaseEnd
 
     rlPhaseStartTest "Bug 801451 - Logging in with ssh pub key should consult authentication authority policies"
-	rlRun "verifies https://bugzilla.redhat.com/show_bug.cgi?id=801451"
+	rlLog "verifies https://bugzilla.redhat.com/show_bug.cgi?id=801451"
+	rlLog "also verifies https://bugzilla.redhat.com/show_bug.cgi?id=805108"
         rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
 	user801451="user801451"
 	rlRun "create_ipauser $user801451 $user801451 $user801451 Secret_123"
