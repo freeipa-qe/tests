@@ -11,7 +11,7 @@ ipapermissionTests() {
     ipapermission_del_continue
     ipapermission_find
     ipapermission_mod
-#    cleanupPermissionTests
+    cleanupPermissionTests
 }
 
 ########################
@@ -43,6 +43,7 @@ cleanupPermissionTests()
     permissionName10="ManageNetgroup1"
     permissionName11="ManageDNSRecord1"
     permissionName12="TestPermission"
+    permissionName13="APermission"
     permissionNameBUG="ManageUser"
     rlRun "deletePermission $permissionName1" 0 "Deleting $permissionName1"
     rlRun "deletePermission $permissionName2" 0 "Deleting $permissionName2"
@@ -52,15 +53,18 @@ cleanupPermissionTests()
     rlRun "deletePermission $permissionName6" 0 "Deleting $permissionName6"
     rlRun "deletePermission $permissionName7" 0 "Deleting $permissionName7"
     rlRun "deletePermission $permissionName8" 0 "Deleting $permissionName8"
-    rlRun "deletePermission $permissionName9" 0 "Deleting $permissionName6"
-    rlRun "deletePermission $permissionName10" 0 "Deleting $permissionName7"
-    rlRun "deletePermission $permissionName11" 0 "Deleting $permissionName8"
-    rlRun "deletePermission $permissionName12" 0 "Deleting $permissionName8"
+    rlRun "deletePermission $permissionName9" 0 "Deleting $permissionName9"
+    rlRun "deletePermission $permissionName10" 0 "Deleting $permissionName10"
+    rlRun "deletePermission $permissionName11" 0 "Deleting $permissionName11"
+    rlRun "deletePermission $permissionName12" 0 "Deleting $permissionName12"
+    rlRun "deletePermission $permissionName13" 0 "Deleting $permissionName13"
     #TODO: This permission shouldn't be added, and so will not be available 
     # for deleting, after bug 783502 is fixed.
     rlRun "deletePermission $permissionNameBUG" 0 "Deleting $permissionNameBUG"
     rlRun "deleteGroup groupone" 0 "Deleting groupone"
-
+    ipa permission-mod --permissions=add  "add Automount keys" --attrs= 
+    ipa permission-mod --attrs="userpassword,krbprincipalkey,sambalmpassword,sambantpassword,passwordhistory" --all "Change a user password"
+    ipa permission-mod --type=netgroup "Remove Netgroups"
 }
 
 
@@ -945,7 +949,15 @@ ipapermission_mod()
 
 ipapermission_mod_positive()
 {
-   rlPhaseStartTest "ipa-permission-cli-1052 - modify permission --permissions"
+   rlLog "Add a dummy permission to modify"
+   permissionName="APermission"
+   permissionRights="write"
+   permissionTarget="--type=user"
+   permissionAttr="description"
+  rlRun "addPermission $permissionName $permissionRights $permissionTarget $permissionAttr" 0 "Adding $permissionName"
+
+
+   rlPhaseStartTest "ipa-permission-cli-1053 - modify permission --permissions"
      permissionName="Add Automount Keys"
      attr="permissions"
      value="add,write"
@@ -954,7 +966,7 @@ ipapermission_mod_positive()
      rlRun "verifyPermissionAttr \"$permissionName\" all \"Permissions\" \"$value\"" 0 "Verify Permissions"
    rlPhaseEnd 
 
-  rlPhaseStartTest "ipa-permission-cli-1052 - modify permission --attrs (bug 783502 - side effect)"
+  rlPhaseStartTest "ipa-permission-cli-1054 - modify permission --attrs (bug 783502 - side effect)"
      permissionName="Change a user password"
      attr="attrs"
      value="userpassword,krbprincipalkey,sambalmpassword,passwordhistory"
@@ -962,7 +974,7 @@ ipapermission_mod_positive()
      rlRun "verifyPermissionAttr \"$permissionName\" all \"Attributes\" \"$value\"" 0 "Verify Permissions"
    rlPhaseEnd
 
-  rlPhaseStartTest "ipa-permission-cli-1052 - modify permission --type"
+  rlPhaseStartTest "ipa-permission-cli-1055 - modify permission --type"
      permissionName="Remove Netgroups"
      attr="type"
      value="dnsrecord"
@@ -970,18 +982,34 @@ ipapermission_mod_positive()
      rlRun "verifyPermissionAttr \"$permissionName\" all \"Type\" \"$value\"" 0 "Verify Permissions"
    rlPhaseEnd
 
+   #TODO - Combination of bug 783502 & 782861 - is causing issues writing testcase - revisit.
+   rlPhaseStartTest "ipa-permission-cli-1056 - modify permission --setattr (bug 782861)"
+     permissionName="APermission"
+     attr="setattr"
+     value="description=NewDescription"
+     restOfRequiredCommand="--attrs="
+     rlRun "modifyPermission \"$permissionName\" $attr $value $restOfRequiredCommand"
+     rlRun "verifyPermissionAttr \"$permissionName\" all \"Description\" \"NewDescription\"" 0 "Verify Permissions"
+   rlPhaseEnd
 
-   #cleanup:
-   ipa permission-mod --permissions=add  "add Automount keys" --attrs= 
-   ipa permission-mod --attrs="userpassword,krbprincipalkey,sambalmpassword,sambantpassword,passwordhistory" --all "Change a user password"
-   ipa permission-mod --type=netgroup "Remove Netgroups"
+   rlPhaseStartTest "ipa-permission-cli-1057 - modify permission --rename (bug 805478)"
+     permissionName="APermission"
+     attr="rename"
+     value="ABCPermission"
+     restOfRequiredCommand="--attrs="
+     rlRun "modifyPermission \"$permissionName\" $attr $value $restOfRequiredCommand"
+     rlRun "verifyPermissionAttr \"$permissionName\" all \"Permission name\" \"ABCPermission\"" 0 "Verify Permissions"
+   rlPhaseEnd
+
+   #TODO: Bug - Uncomment later   
+   #ipa permission-mod --rename=APermission "ABCPermission"
 
 }
 
 
 ipapermission_mod_negative()
 {
-   rlPhaseStartTest "ipa-permission-cli-1052 - modify permission invalid --permissions"
+   rlPhaseStartTest "ipa-permission-cli-1058 - modify permission invalid --permissions"
      permissionName="Add Automount Keys"
      attr="permissions"
      value="xyz"
@@ -992,7 +1020,7 @@ ipapermission_mod_negative()
      rlAssertGrep "$expMsg" "$TmpDir/ipapermission_invalidpermission.log"
    rlPhaseEnd 
 
-  rlPhaseStartTest "ipa-permission-cli-1052 - modify permission invalid attrs"
+  rlPhaseStartTest "ipa-permission-cli-1059 - modify permission invalid attrs"
      permissionName="Change a user password"
      attr="attrs"
      value="xyz"
@@ -1003,7 +1031,7 @@ ipapermission_mod_negative()
      rlAssertGrep "$expMsg" "$TmpDir/ipapermission_invalidattr.log"
    rlPhaseEnd
 
-   rlPhaseStartTest "ipa-permission-cli-1052 - modify permission invalid --type"
+   rlPhaseStartTest "ipa-permission-cli-1060 - modify permission invalid --type"
      permissionName="Modify Users"
      attr="type"
      value="hostgroup"
@@ -1014,7 +1042,7 @@ ipapermission_mod_negative()
      rlAssertGrep "$expMsg" "$TmpDir/ipapermission_invalidtype1.log"
    rlPhaseEnd
 
-   rlPhaseStartTest "ipa-permission-cli-1052 - modify permission invalid --type"
+   rlPhaseStartTest "ipa-permission-cli-1061 - modify permission invalid --type"
      permissionName="Modify Users"
      attr="type"
      value="users"
@@ -1025,6 +1053,16 @@ ipapermission_mod_negative()
      rlAssertGrep "$expMsg" "$TmpDir/ipapermission_invalidtype2.log"
    rlPhaseEnd
 
+   rlPhaseStartTest "ipa-permission-cli-1062 - modify permission --addattr - to add multivalue to single valued attr - (bug 782861)"
+     permissionName="APermission"
+     attr="addattr"
+     value="description=NewDescriptionAgain"
+     restOfRequiredCommand="--attrs="
+     command="modifyPermission \"$permissionName\" $attr $value $restOfRequiredCommand"
+     expMsg="ipa: ERROR: - not allowed"
+     rlRun "$command > $TmpDir/ipapermission_invalidaddattr.log 2>&1" 1 "Verify error message for invalid addattr"
+     rlAssertGrep "$expMsg" "$TmpDir/ipapermission_invalidaddattr.log"
+   rlPhaseEnd
 }
 
 

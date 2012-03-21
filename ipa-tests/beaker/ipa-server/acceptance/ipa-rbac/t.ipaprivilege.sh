@@ -10,7 +10,7 @@ ipaprivilegeTests() {
     ipaprivilege_show
     ipaprivilege_mod
     ipaprivilege_find
-#    cleanupPrivilegesTest
+    cleanupPrivilegesTest
 }
 
 ########################

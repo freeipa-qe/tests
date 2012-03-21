@@ -77,7 +77,7 @@ rlJournalStart
       ipaRBACFunctionalTests
 
     rlPhaseStartCleanup "ipa rbac cleanup"
-        rlRun "popd"
+       rlRun "popd"
 #       rlRun "rm -r $TmpDir" 0 "Removing tmp directory"
     rlPhaseEnd
 

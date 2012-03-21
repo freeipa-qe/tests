@@ -15,7 +15,7 @@ iparoleTests() {
     iparole_show
     iparole_find
     iparole_mod
-#    cleanupRolesTests
+    cleanupRolesTests
 }
 
 ########################
