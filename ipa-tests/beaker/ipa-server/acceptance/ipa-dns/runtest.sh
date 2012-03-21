@@ -1257,8 +1257,16 @@ EOF
 
 	rlRun "ipa dnsrecord-del $DOMAIN dns175 --a-rec=192.168.0.1"
 
-	rlPhaseEnd
 
+	rlPhaseEnd
+	rlPhaseStartTest "ipa-dns-176: --ns-hostname option does not check A/AAAA record of the provided hostname."
+
+		rlLog "verifies https://bugzilla.redhat.com/show_bug.cgi?id=804562"
+		rlLog "closes https://engineering.redhat.com/trac/ipa-tests/ticket/376"
+
+		verifyErrorMsg "ipa dnsrecord-add $DOMAIN dns176 --ns-hostname=ns1.shanks.$DOMAIN" "ipa: ERROR: Nameserver 'ns1.shanks.$DOMAIN' does not have a corresponding A/AAAA record"
+
+        rlPhaseEnd
 
 	rlJournalPrintText
 	report=/tmp/rhts.report.$RANDOM.txt
