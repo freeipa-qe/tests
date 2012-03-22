@@ -14,10 +14,10 @@ INSTANCE="slapd-instance1"
 ######################
 # test suite         #
 ######################
-ds-migration-performance()
+performance()
 {
     setup
-    performance
+    perftest 
     cleanup
 }
 
@@ -28,23 +28,24 @@ ds-migration-performance()
 setup()
 {
         rlPhaseStartTest "SETUP FUNCTIONAL TESTING"
-		if [ $COMPAT == FALSE ] ; then
+		rlLog "Compat Plugin Enabled Mode :: $COMPAT"
+		echo $COMPAT | grep "FALSE"
+		if [ $? -eq 0 ] ; then
 			rlLog "Test Running with compat plugin Disabled"
 			echo $ADMINPW | ipa-compat-manage status | grep Enabled
-			if [ $? -ne 0 ] ; then
-				rlRun "ipa-compat-manage disable" 0 "Turn off compat plugin"
+			if [ $? -eq 0 ] ; then
+				rlRun "echo $ADMINPW | ipa-compat-manage disable" 0 "Turn off compat plugin"
 				rlRun "service dirsrv restart" 0 "Restart directory server"
 			fi
 		else
 			rlLog "Test Running with compat plugin Enabled"
 			echo $ADMINPW | ipa-compat-manage status | grep Disabled
-			if [ $? -ne 0 ] ; then
-				rlRun "ipa-compat-manage enable" 0 "Turning on compat plugin"
-				rlRun "service dirsrv restart" 0 "Restart directory server"
-			fi
+			rlRun "echo $ADMINPW | ipa-compat-manage enable" 0 "Turning on compat plugin"
+			rlRun "service dirsrv restart" 0 "Restart directory server"
+		fi
 			
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials"
-		rlRun "SetMigrationConfig TRUE" 0 "Set migration mode to TRUE"
+		rlRun "ipa config-mod --enable-migration=TRUE" 0 "Set migration mode to TRUE"
         rlPhaseEnd
 }
 
@@ -52,25 +53,36 @@ setup()
 #  performance		    #
 #############################		
 
-performance()
+perftest()
 {
 	rlPhaseStartTest "Migration 10000 users and 12 groups"
 		# record the current free memory
-		prememfree=`free -p | grep Mem: | cut -d " " -f9`
-		rlLog "Before migration free memory :: $prememfree"
+		prememfree=`free -b | grep Mem: | awk '{print $4}'`
+		rlLog "Before migration free memory : $prememfree"
+                starttime=`date`
+                rlLog "======================= Migration started: $starttime ========================"
 		
 		if [ "$COMPAT" != "FALSE" ] ; then
-			rlLog "EXECUTING: ipa migrate-ds --user-container=\"$USERCONTAINER\" --group-container=\"$GROUPCONTAINER\" --with-compat ldap://$CLIENT:389"
-			time -p echo $ADMINPW | ipa migrate-ds --with-compat ldap://$CLIENT:389 > /tmp/compat.perf > 2>&1
+			rlLog "EXECUTING: time -p echo $ADMINPW | ipa migrate-ds --with-compat ldap://$CLIENT:389"
+			echo $ADMINPW | ipa migrate-ds --with-compat ldap://$CLIENT:389
+			if [ $? -ne 0 ] ; then
+				rlFail "Migration did not complete successfully."
+			else
+				rlPass "Migration completed successfully."
+			fi
 		else
-			rlLog "EXECUTING: ipa migrate-ds --user-container=\"$USERCONTAINER\" --group-container=\"$GROUPCONTAINER\" ldap://$CLIENT:389"
-			time -p echo $ADMINPW | ipa migrate-ds ldap://$CLIENT:389 > /tmp/compat.perf > 2>&1
+			rlLog "EXECUTING: echo $ADMINPW | ipa migrate-ds ldap://$CLIENT:389"
+			echo $ADMINPW | ipa migrate-ds ldap://$CLIENT:389 > /tmp/compat.perf 2>&1
+                        if [ $? -ne 0 ] ; then
+                                rlFail "Migration did not complete successfully."
+                        else
+                                rlPass "Migration completed successfully."
+                        fi
 		fi
-
-		realtime=`cat /tmp/compat.perf | grep real | cut -d " " -f 2`
-		rlLog "Migration time :: $realtime"
-		postmemfree=`free -p | grep Mem: | cut -d " " -f9`
-		rlLog "After migration free memory :: $postmemfree"
+                endtime=`date`
+                rlLog "======================= Migration finished: $endtime ========================"
+		postmemfree=`free -b | grep Mem: | awk '{print $4}'`
+		rlLog "After migration free memory : $postmemfree"
 	rlPhaseEnd
 }
 
@@ -78,6 +90,6 @@ cleanup()
 {
 	rlPhaseStartTest "CLEANUP FUNCTIONAL TESTING"
 		#rlRun "ssh -o StrictHostKeyChecking=no root@$CLIENT /usr/sbin/remove-ds.pl -i $INSTANCE" 0 "Removing directory server instance"
-		rlRun "SetMigrationConfig FALSE" 0 "Set migration mode to FALSE"
+		rlRun "ipa config-mod --enable-migration=FALSE" 0 "Set migration mode to FALSE"
 	rlPhaseEnd
 }
