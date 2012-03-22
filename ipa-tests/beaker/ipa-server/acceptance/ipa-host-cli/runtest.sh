@@ -46,6 +46,10 @@
 . /dev/shm/ipa-server-shared.sh
 . /dev/shm/env.sh
 
+# Include test case file
+. ./ipa-host-cli-ipv6.sh
+. ./ipa-host-cli-macaddress.sh
+
 ########################################################################
 # Test Suite Globals
 ########################################################################
@@ -1283,10 +1287,16 @@ rlPhaseStartTest "ipa-host-cli-38: find more hosts than exist"
 	rhts-submit-log -l /var/log/httpd/error_log
     rlPhaseEnd
 
-# Include test case file
-# Following host-add with IPv6 addr tests are commented since beaker does not support IPv6 address. Uncomment to run on a IPv6 compatible host.
-#. ./ipa-host-cli-ipv6.sh
-. ./ipa-host-cli-macaddress.sh
+# Execute host-add with ipv6 address tests
+# Following 3 lines are commented since ipv6 address tests not run on beaker.
+#  rlRun "host_add_ipv6_setup"
+#  host_add_ipv6address
+#  rlRun "host_add_ipv6_cleanup"
+
+# Execute host-add with macaddress tests
+  rlRun "host_add_macaddress_setup"
+  host_add_macaddress
+  rlRun "host_add_macaddress_cleanup"
 
 rlJournalPrintText
 report=/tmp/rhts.report.$RANDOM.txt
