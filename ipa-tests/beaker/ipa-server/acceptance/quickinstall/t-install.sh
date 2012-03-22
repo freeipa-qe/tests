@@ -19,6 +19,7 @@ installMaster()
 		rlRun "fixForwarderIPv6"
 		rlRun "rmIPv4addr"
 	fi
+	rlRun "/bin/cp /etc/resolv.conf /etc/resolv.conf.ipabackup" 0 "backup resolv.conf before IPA changes it"
 
 	if [[ "$SKIPINSTALL" != "TRUE" ]] ; then
 
