@@ -97,6 +97,7 @@ fixResolv()
    # get the Master's IP address
    ipaddr=$(dig +noquestion $MASTER  | grep $MASTER | grep IN | awk '{print $5}')
    rlLog "MASTER IP address is $ipaddr"
+   cp /etc/resolv.conf /etc/resolv.conf.ipabackup
    sed -i s/^nameserver/#nameserver/g /etc/resolv.conf
    echo "nameserver $ipaddr" >> /etc/resolv.conf
 
@@ -104,6 +105,7 @@ fixResolv()
    if [ "$SLAVE" != "" ]; then
       slaveipaddr=$(dig +noquestion $SLAVE  | grep $SLAVE | grep IN | awk '{print $5}')
       rlLog "SLAVE IP address is $slaveipaddr"
+      cp /etc/resolv.conf /etc/resolv.conf.ipabackup
       echo "nameserver $slaveipaddr" >> /etc/resolv.conf
    fi
 
@@ -125,6 +127,7 @@ fixResolvIPv6()
    # get the Master's IP address
    ipv6addr=$(nslookup -type=AAAA $MASTER | grep "has AAAA" | awk '{print $5}')
    rlLog "MASTER IP address is $ipv6addr"
+   cp /etc/resolv.conf /etc/resolv.conf.ipabackup
    sed -i s/^nameserver/#nameserver/g /etc/resolv.conf
    echo "nameserver $ipv6addr" >> /etc/resolv.conf
 
@@ -132,6 +135,7 @@ fixResolvIPv6()
    if [ "$SLAVE" != "" ]; then
       slaveipv6addr=$(nslookup -type=AAAA $SLAVE | grep "has AAAA" | awk '{print $5}')
       rlLog "SLAVE IPv6 address is $slaveipv6addr"
+      cp /etc/resolv.conf /etc/resolv.conf.ipabackup
       echo "nameserver $slaveipv6addr" >> /etc/resolv.conf
    fi
 
