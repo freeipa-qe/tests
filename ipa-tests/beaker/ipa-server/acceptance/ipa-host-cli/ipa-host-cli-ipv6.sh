@@ -62,7 +62,7 @@ oct8=$(echo $ipv6addr | awk -F : '{print $8}')
 
   host_add_ipv6_setup(){
     rlPhaseStartSetup "ipa-host-cli-startup: Kinit as admin user"
-        rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+     #   rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 	rlRun "tmpDir=\`mktemp -d\`" 0 "Creating temp directory"
         rlRun "pushd $tmpDir"
     rlPhaseEnd
@@ -288,7 +288,7 @@ oct8=$(echo $ipv6addr | awk -F : '{print $8}')
 
   host_add_ipv6_cleanup() {
     rlPhaseStartCleanup "ipa-host-cli-cleanup: Destroying admin credentials."
-        rlRun "kdestroy" 0 "Destroying admin credentials."
+#        rlRun "kdestroy" 0 "Destroying admin credentials."
 	rlRun "popd"
         rlRun "rm -r $tmpDir" 0 "Removing temp directory"
 	rhts-submit-log -l /var/log/httpd/error_log

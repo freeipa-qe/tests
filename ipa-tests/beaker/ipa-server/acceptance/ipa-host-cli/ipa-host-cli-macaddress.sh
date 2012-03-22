@@ -69,7 +69,7 @@ ETHER_PACKAGE="nss-pam-ldapd"
 	rlRun "/sbin/service  nslcd start" 0 "Restart nslcd service"
         rlRun "cat /etc/nssswitch.conf | sed -e 's/ethers:     files/ethers:     ldap/' > /etc/nssswitch.conf.modified" 0 "Set ethers to ldap"
 	rlRun "/bin/mv /etc/nssswitch.conf.modified /etc/nssswitch.conf"
-        rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+#        rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 	rlRun "tmpDir=\`mktemp -d\`" 0 "Creating temp directory"
         rlRun "pushd $tmpDir"
      rlPhaseEnd
@@ -443,7 +443,7 @@ ETHER_PACKAGE="nss-pam-ldapd"
 
   host_add_macaddress_cleanup() {
     rlPhaseStartCleanup "ipa-host-cli-cleanup: Destroying admin credentials."
-        rlRun "kdestroy" 0 "Destroying admin credentials."
+#        rlRun "kdestroy" 0 "Destroying admin credentials."
 	rlRun "cat /etc/nslcd.conf | sed -e 's/base dc=testrelm,dc=com/base dc=example,dc=com/' >/etc/nslcd.conf.modified2" 0 "Set the base back on default value."
 	rlRun "/bin/mv /etc/nslcd.conf.modified2 /etc/nslcd.conf"
 	rlRun "/sbin/service  nslcd restart" 0 "Restart nslcd service"

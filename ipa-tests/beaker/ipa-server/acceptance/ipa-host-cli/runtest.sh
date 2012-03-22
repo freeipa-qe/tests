@@ -1276,17 +1276,6 @@ rlPhaseStartTest "ipa-host-cli-38: find more hosts than exist"
 	rlRun "ipa sudorule-del $sru" 0 "cleaning up the sudorule used in these tests"
     rlPhaseEnd
 
-    rlPhaseStartCleanup "ipa-host-cli-cleanup: Destroying admin credentials."
-        i=1
-        while [ $i -le 10 ] ; do
-                deleteHost host$i.$DOMAIN
-                let i=$i+1
-        done
-
-	rlRun "kdestroy" 0 "Destroying admin credentials."
-	rhts-submit-log -l /var/log/httpd/error_log
-    rlPhaseEnd
-
 # Execute host-add with ipv6 address tests
 # Following 3 lines are commented since ipv6 address tests not run on beaker.
 #  rlRun "host_add_ipv6_setup"
@@ -1297,6 +1286,17 @@ rlPhaseStartTest "ipa-host-cli-38: find more hosts than exist"
   rlRun "host_add_macaddress_setup"
   host_add_macaddress
   rlRun "host_add_macaddress_cleanup"
+
+    rlPhaseStartCleanup "ipa-host-cli-cleanup: Destroying admin credentials."
+        i=1
+        while [ $i -le 10 ] ; do
+                deleteHost host$i.$DOMAIN
+                let i=$i+1
+        done
+
+	rlRun "kdestroy" 0 "Destroying admin credentials."
+	rhts-submit-log -l /var/log/httpd/error_log
+    rlPhaseEnd
 
 rlJournalPrintText
 report=/tmp/rhts.report.$RANDOM.txt
