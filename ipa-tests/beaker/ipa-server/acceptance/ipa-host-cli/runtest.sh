@@ -1278,14 +1278,10 @@ rlPhaseStartTest "ipa-host-cli-38: find more hosts than exist"
 
 # Execute host-add with ipv6 address tests
 # Following 3 lines are commented since ipv6 address tests not run on beaker.
-#  rlRun "host_add_ipv6_setup"
-#  host_add_ipv6address
-#  rlRun "host_add_ipv6_cleanup"
+#  run_host_add_ipv6address_tests
 
 # Execute host-add with macaddress tests
-  rlRun "host_add_macaddress_setup"
-  host_add_macaddress
-  rlRun "host_add_macaddress_cleanup"
+  run_host_add_macaddress_tests
 
     rlPhaseStartCleanup "ipa-host-cli-cleanup: Destroying admin credentials."
         i=1

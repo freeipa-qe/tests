@@ -55,7 +55,7 @@ byte6=$(echo $macaddr | awk -F : '{print $6}')
 ETHER_PACKAGE="nss-pam-ldapd"
 ########################################################################
 
- host_add_macaddress_setup() {	
+ run_host_add_macaddress_tests() {	
       rlPhaseStartTest "ipa-host-cli-startup: Install nss-pam-ldapd package, set ethers to ldap and kinit as admin user"
 	rlRun "yum -y install $ETHER_PACKAGE"
 	rpm -qa | grep $ETHER_PACKAGE
@@ -73,9 +73,7 @@ ETHER_PACKAGE="nss-pam-ldapd"
 	rlRun "tmpDir=\`mktemp -d\`" 0 "Creating temp directory"
         rlRun "pushd $tmpDir"
      rlPhaseEnd
-  }
  
-  host_add_macaddress_001() {
      rlPhaseStartTest "ipa-host-cli-94: add a host with --macaddress --force"
         myhost=mytesthost1.$DOMAIN
 	new_byte6="ff"
@@ -100,18 +98,14 @@ ETHER_PACKAGE="nss-pam-ldapd"
             rlFail "MAC address not found on this host."
         fi
     rlPhaseEnd
-  }
 
-  host_add_macaddress_002() {
     rlPhaseStartTest "ipa-host-cli-95: Delete Host"
 	short=mytesthost1
         myhost=$short.$DOMAIN
 	rlRun "ipa host-del $myhost" 0 "Delete host that was added with --macaddress" 
 	rlRun "findHost $myhost" 1 "Verifying host was deleted."
     rlPhaseEnd
-  }
 
-  host_add_macaddress_003() {
     rlPhaseStartTest "ipa-host-cli-96: Add host with --macaddress and DNS Record"
 	short=mytesthost2
 	myhost=$short.$DOMAIN
@@ -152,10 +146,7 @@ ETHER_PACKAGE="nss-pam-ldapd"
 		rlFail "Reverse DNS zone not found."
 	fi	
     rlPhaseEnd
-  }
   
-  host_add_macaddress_004() {
-
     rlPhaseStartTest "ipa-host-cli-97: Delete host that has --macaddress without deleting DNS Record"
 	short=mytesthost2
         myhost=$short.$DOMAIN
@@ -164,9 +155,7 @@ ETHER_PACKAGE="nss-pam-ldapd"
 	rlRun "ipa dnsrecord-find $DOMAIN $short" 0 "Checking for forward DNS entry"
 	rlRun "ipa dnsrecord-find $rzone 99" 0 "Checking for reverse DNS entry"
     rlPhaseEnd
-  }
 
-  host_add_macaddress_005() {
     rlPhaseStartTest "ipa-host-cli-98: Add host with --macaddress without force option - DNS Record Exists"
 	short=mytesthost2
         myhost=$short.$DOMAIN
@@ -195,9 +184,7 @@ ETHER_PACKAGE="nss-pam-ldapd"
             rlFail "MAC address not found on this host."
         fi
     rlPhaseEnd
-  }
 
-  host_add_macaddress_006() {
     rlPhaseStartTest "ipa-host-cli-99: Delete Host that has -macaddress and Update DNS"
 	short=mytesthost2
         myhost=$short.$DOMAIN
@@ -206,9 +193,7 @@ ETHER_PACKAGE="nss-pam-ldapd"
 	rlRun "ipa dnsrecord-show $DOMAIN $ipaddr" 2 "Checking for forward DNS entry"
         rlRun "ipa dnsrecord-show $rzone 99" 2 "Checking for reverse DNS entry"
     rlPhaseEnd
-  }
  
-  host_add_macaddress_007() {
     rlPhaseStartTest "ipa-host-cli-100: host-mod of a host with --macaddress "
         myhost=mytesthost1.$DOMAIN
 	attrToModify="macaddress"
@@ -238,9 +223,7 @@ ETHER_PACKAGE="nss-pam-ldapd"
             rlFail "MAC address not found on this host."
         fi
     rlPhaseEnd
-  }
 
-  host_add_macaddress_008() {
     rlPhaseStartTest "ipa-host-cli-101: setattr --macaddress"
         myhost=mytesthost1.$DOMAIN
 	attr="macaddress"
@@ -268,9 +251,7 @@ ETHER_PACKAGE="nss-pam-ldapd"
             rlFail "MAC address not found on this host."
         fi
     rlPhaseEnd
-  }
 
-  host_add_macaddress_009() {
     rlPhaseStartTest "ipa-host-cli-102: setattr --macaddress and addattr on macaddress"
         myhost=mytesthost1.$DOMAIN
         attr="macaddress"
@@ -302,9 +283,7 @@ ETHER_PACKAGE="nss-pam-ldapd"
             rlFail "MAC address not found on this host."
         fi
     rlPhaseEnd
-  }
 
-  host_add_macaddress_010() {
     rlPhaseStartTest "ipa-host-cli-103: Modify Host with --macaddress - host doesn't Exist"
 	host1="mytesthost1."$DOMAIN
 	attr="macaddress"
@@ -320,9 +299,7 @@ ETHER_PACKAGE="nss-pam-ldapd"
             rlFail "MAC address not found on this host."
         fi
     rlPhaseEnd
-  }
 
-  host_add_macaddress_011() {
     rlPhaseStartTest "ipa-host-cli-104: addattr --macaddress"
         myhost=mytesthost1.$DOMAIN
         attr="macaddress"
@@ -350,9 +327,7 @@ ETHER_PACKAGE="nss-pam-ldapd"
             rlFail "MAC address not found on this host."
         fi
     rlPhaseEnd
-  }
 
-  host_add_macaddress_012() {
     rlPhaseStartTest "ipa-host-cli-105: delattr --macaddress"
         myhost=mytesthost1.$DOMAIN
         new_byte6="ff"
@@ -391,9 +366,7 @@ ETHER_PACKAGE="nss-pam-ldapd"
             rlFail "MAC address not found on this host."
         fi
     rlPhaseEnd
-  }
 
-  host_add_macaddress_013() {
     rlPhaseStartTest "ipa-host-cli-106: delattr --macaddress with incorrect value"
         myhost=mytesthost1.$DOMAIN
         new_byte6="ff"
@@ -424,9 +397,7 @@ ETHER_PACKAGE="nss-pam-ldapd"
             rlFail "MAC address not found on this host."
         fi
     rlPhaseEnd
-  }
 
-  host_add_macaddress_014() {
     rlPhaseStartTest "ipa-host-cli-107: Negative - add a host with invalid macaddress"
         myhost=mytesthost1.$DOMAIN
         new_byte6="eff"
@@ -439,9 +410,7 @@ ETHER_PACKAGE="nss-pam-ldapd"
         rlLog "EXECUTING: ipa host-add $myhost --macaddress=\"$host_macaddr\" --force" 0 "Adding host with --mac-address=\"$host_macaddr\" and --force"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."	
     rlPhaseEnd
-  }
 
-  host_add_macaddress_cleanup() {
     rlPhaseStartTest "ipa-host-cli-cleanup: Destroying admin credentials."
 #        rlRun "kdestroy" 0 "Destroying admin credentials."
 	rlRun "cat /etc/nslcd.conf | sed -e 's/base dc=testrelm,dc=com/base dc=example,dc=com/' >/etc/nslcd.conf.modified2" 0 "Set the base back on default value."
@@ -453,22 +422,5 @@ ETHER_PACKAGE="nss-pam-ldapd"
 	rlRun "popd"
         rlRun "rm -r $tmpDir" 0 "Removing temp directory"
     rlPhaseEnd
-  }
 
-host_add_macaddress(){
-"host_add_macaddress_001"
-"host_add_macaddress_002"
-"host_add_macaddress_003"
-"host_add_macaddress_004"
-"host_add_macaddress_005"
-"host_add_macaddress_006"
-"host_add_macaddress_007"
-"host_add_macaddress_008"
-"host_add_macaddress_009"
-"host_add_macaddress_010"
-"host_add_macaddress_011"
-"host_add_macaddress_012"
-"host_add_macaddress_013"
-"host_add_macaddress_014"
 }
-

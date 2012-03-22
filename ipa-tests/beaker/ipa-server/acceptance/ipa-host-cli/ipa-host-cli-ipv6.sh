@@ -60,15 +60,13 @@ oct8=$(echo $ipv6addr | awk -F : '{print $8}')
 
 ########################################################################
 
-  host_add_ipv6_setup(){
+ run_host_add_ipv6_tests(){
     rlPhaseStartSetup "ipa-host-cli-startup: Kinit as admin user"
      #   rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 	rlRun "tmpDir=\`mktemp -d\`" 0 "Creating temp directory"
         rlRun "pushd $tmpDir"
     rlPhaseEnd
-  }
 
-  host_add_ipv6_001() {
     rlPhaseStartTest "ipa-host-cli-87: Add host with IPv6 address DNS Record --no-reverse"
         short=mytestIPv6host
         myhost=$short.$DOMAIN
@@ -87,9 +85,7 @@ oct8=$(echo $ipv6addr | awk -F : '{print $8}')
         MSG="AAAA record: $ipv6_addr"
         rlAssertNotGrep "$MSG" "$tmpDir/forward_dns_notexists.out"
     rlPhaseEnd
-  }
 
-  host_add_ipv6_002() {
     rlPhaseStartTest "ipa-host-cli-88: Add host with IPv6 address and DNS Record"
        short=mytestIPv6host
        myhost=$short.$DOMAIN
@@ -132,9 +128,7 @@ oct8=$(echo $ipv6addr | awk -F : '{print $8}')
                 rlFail "Reverse DNS zone not found."
         fi
     rlPhaseEnd
-  }
 
-  host_add_ipv6_003() {
    rlPhaseStartTest "ipa-host-cli-89: Delete host without deleting DNS Record"
         short=mytestIPv6host
         myhost=$short.$DOMAIN
@@ -164,9 +158,7 @@ oct8=$(echo $ipv6addr | awk -F : '{print $8}')
          done
     	 rlRun "ipa dnsrecord-find $rzone_IPv6 $recordname_ipv6" 0 "Checking for reverse DNS entry"
     rlPhaseEnd
-  }
 
-  host_add_ipv6_004() {
     rlPhaseStartTest "ipa-host-cli-90: Add host without force option - DNS Record Exists"
         short=mytestIPv6host
         myhost=$short.$DOMAIN
@@ -202,9 +194,7 @@ oct8=$(echo $ipv6addr | awk -F : '{print $8}')
         MSG="AAAA record: $ipv6_addr"
         rlAssertGrep "$MSG" "$tmpDir/forward_dns_41.out"
     rlPhaseEnd
-  }
 
-  host_add_ipv6_005() {
    rlPhaseStartTest "ipa-host-cli-91: Add host with force option - DNS Record Exists"
         short=mytestIPv6host
         myhost=$short.$DOMAIN
@@ -236,9 +226,7 @@ oct8=$(echo $ipv6addr | awk -F : '{print $8}')
         done
         rlRun "ipa dnsrecord-find $rzone_IPv6 $recordname_ipv6" 0 "Checking for reverse DNS entry"
     rlPhaseEnd
-  }
 
-  host_add_ipv6_006() {
     rlPhaseStartTest "ipa-host-cli-92: Delete Host and Update DNS"
         short=mytestIPv6host
         myhost=$short.$DOMAIN
@@ -272,9 +260,7 @@ oct8=$(echo $ipv6addr | awk -F : '{print $8}')
         rlRun "ipa dnsrecord-show $rzone_IPv6 $recordname_ipv6" 2 "Checking for reverse DNS entry"
 	rlRun "ipa dnszone-del $rzone_IPv6" 0 "cleanup - delete dnszone"
     rlPhaseEnd
-  }
 
-  host_add_ipv6_007() {
     rlPhaseStartTest "ipa-host-cli-93: Negative - Add host with invalid IPv6 address"
        short=mytestIPv6host
        myhost=$short.$DOMAIN
@@ -284,24 +270,11 @@ oct8=$(echo $ipv6addr | awk -F : '{print $8}')
        expmsg="ipa: ERROR: invalid 'ip_address': failed to detect a valid IP address from u'$ipv6_addr'"
        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
     rlPhaseEnd
-  }
 
-  host_add_ipv6_cleanup() {
     rlPhaseStartTest "ipa-host-cli-cleanup: Destroying admin credentials."
 #        rlRun "kdestroy" 0 "Destroying admin credentials."
 	rlRun "popd"
         rlRun "rm -r $tmpDir" 0 "Removing temp directory"
     rlPhaseEnd
-  }
-
- 
-host_add_ipv6address(){
-"host_add_ipv6_001"
-"host_add_ipv6_002"
-"host_add_ipv6_003"
-"host_add_ipv6_004"
-"host_add_ipv6_005"
-"host_add_ipv6_006"
-"host_add_ipv6_007"
 }
 
