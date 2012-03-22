@@ -43,7 +43,7 @@
 # figure out what my active eth is from the machine's route
 currenteth=$(/sbin/ip -6 route show | grep ^default | awk '{print $5}' | head -1)
 
-# get the ip address of that interface
+# get the mac-address of that interface
 macaddr=$(ifconfig $currenteth | grep "Ethernet  HWaddr " | awk '{print $5}')
 byte1=$(echo $macaddr | awk -F : '{print $1}')
 byte2=$(echo $macaddr | awk -F : '{print $2}')
