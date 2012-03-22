@@ -29,7 +29,7 @@ export TESTVERSION=1.0
 
 BUILT_FILES=
 
-FILES=$(METADATA) runtest.sh Makefile PURPOSE
+FILES=$(METADATA) runtest.sh Makefile PURPOSE ipa-host-cli-ipv6.sh ipa-host-cli-macaddress.sh
 
 .PHONY: all install download clean
 
