@@ -24,6 +24,7 @@
 #	remoteExec
 #	pkey_return_check
 #       getReverseZone_IPv6
+#	ipa_quick_uninstall
 ######################################################################
 KINITEXEC=/usr/bin/kinit
 #######################################################################
@@ -917,3 +918,44 @@ getReverseZone_IPv6()
         return $rc
 } #getReverseZone_IPv6
 
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# ipa_quick_uninstall
+#   Usage: ipa_quick_uninstall
+#
+# This will uninstall IPA and related components.  It makes some key 
+# assumptions about filenames for backups and yum repos.
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ipa_quick_uninstall(){
+	
+	# Uninstall/unconfigure IPA
+	rlRun "ipa-server-install --uninstall -U"
+	rlRun "yum -y remove ipa* 389-ds-base* bind expect krb5-workstation bind-dyndb-ldap krb5-pkinit-openssl httpd"
+	rlRun "yum -y remove sssd libipa_hbac krb5-server certmonger slapi-nis sssd-client pki* tomcat6 mod_nss"
+	rlRun "/bin/rm -rf /var/lib/ipa/"
+	rlRun "/bin/rm -rf /usr/share/ipa"
+	rlRun "/bin/rm -rf /var/log/dirsrv/*"
+	rlRun "/bin/rm -f /tmp/krb5cc_0"
+	rlRun "/bin/rm -f /tmp/krb5cc_48"
+	rlRun "/bin/rm -f /etc/ipa/ca.crt"
+
+	rlLog "pushd /etc/yum.repos.d"
+	pushd /etc/yum.repos.d
+	rlRun "mkdir deleted"
+	for repo in $(ls -1 *.repo|egrep -v "^beaker|^cobbler|^redhat.repo|^rhel-source.repo"); do
+		rlRun "/bin/mv -f $repo deleted/"
+	done	
+	rlLog "popd"
+	popd
+
+	rlRun "yum clean all"
+	rlRun "yum -y downgrade krb5-devel krb5-libs bind-libs bind-utils"
+	rlRun "/bin/cp -f /etc/hosts.ipabackup /etc/hosts"
+	rlRun "/bin/rm -f /etc/hosts.ipabackup"
+	rlRun "/bin/cp -f /etc/sysconfig/network-ipabackup /etc/sysconfig/network"
+	rlRun "/bin/rm -f /etc/sysconfig/network-ipabackup"
+	rlRun "/bin/cp -f /etc/resolv.conf.ipabackup /etc/resolv.conf"
+	rlRun "/bin/rm -f /etc/resolv.conf.ipabackup"
+	. /etc/sysconfig/network
+	rlRun "hostname $HOSTNAME"
+
+} #ipa_quick_uninstall 
