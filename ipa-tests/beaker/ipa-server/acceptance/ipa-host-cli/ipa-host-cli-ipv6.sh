@@ -61,7 +61,7 @@ oct8=$(echo $ipv6addr | awk -F : '{print $8}')
 ########################################################################
 
  run_host_add_ipv6_tests(){
-    rlPhaseStartSetup "ipa-host-cli-startup: Kinit as admin user"
+    rlPhaseStartSetup "ipa-host-cli-ipv6-startup: Kinit as admin user"
      #   rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 	rlRun "tmpDir=\`mktemp -d\`" 0 "Creating temp directory"
         rlRun "pushd $tmpDir"
@@ -271,7 +271,7 @@ oct8=$(echo $ipv6addr | awk -F : '{print $8}')
        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-host-cli-cleanup: Destroying admin credentials."
+    rlPhaseStartTest "ipa-host-cli-ipv6-cleanup: Destroying admin credentials."
 #        rlRun "kdestroy" 0 "Destroying admin credentials."
 	rlRun "popd"
         rlRun "rm -r $tmpDir" 0 "Removing temp directory"

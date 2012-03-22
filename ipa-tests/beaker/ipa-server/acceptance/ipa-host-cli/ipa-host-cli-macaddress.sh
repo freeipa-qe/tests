@@ -56,7 +56,7 @@ ETHER_PACKAGE="nss-pam-ldapd"
 ########################################################################
 
  run_host_add_macaddress_tests() {	
-      rlPhaseStartTest "ipa-host-cli-startup: Install nss-pam-ldapd package, set ethers to ldap and kinit as admin user"
+      rlPhaseStartTest "ipa-host-cli-macaddress-startup: Install nss-pam-ldapd package, set ethers to ldap and kinit as admin user"
 	rlRun "yum -y install $ETHER_PACKAGE"
 	rpm -qa | grep $ETHER_PACKAGE
         if [ $? -eq 0 ] ; then
@@ -411,7 +411,7 @@ ETHER_PACKAGE="nss-pam-ldapd"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."	
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-host-cli-cleanup: Destroying admin credentials."
+    rlPhaseStartTest "ipa-host-cli-macaddress-cleanup: Destroying admin credentials."
 #        rlRun "kdestroy" 0 "Destroying admin credentials."
 	rlRun "cat /etc/nslcd.conf | sed -e 's/base dc=testrelm,dc=com/base dc=example,dc=com/' >/etc/nslcd.conf.modified2" 0 "Set the base back on default value."
 	rlRun "/bin/mv /etc/nslcd.conf.modified2 /etc/nslcd.conf"
