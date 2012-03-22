@@ -287,11 +287,10 @@ oct8=$(echo $ipv6addr | awk -F : '{print $8}')
   }
 
   host_add_ipv6_cleanup() {
-    rlPhaseStartCleanup "ipa-host-cli-cleanup: Destroying admin credentials."
+    rlPhaseStartTest "ipa-host-cli-cleanup: Destroying admin credentials."
 #        rlRun "kdestroy" 0 "Destroying admin credentials."
 	rlRun "popd"
         rlRun "rm -r $tmpDir" 0 "Removing temp directory"
-	rhts-submit-log -l /var/log/httpd/error_log
     rlPhaseEnd
   }
 
