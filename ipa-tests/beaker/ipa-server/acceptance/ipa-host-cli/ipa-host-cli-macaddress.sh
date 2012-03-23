@@ -67,8 +67,14 @@ ETHER_PACKAGE="nss-pam-ldapd"
 	rlRun "cat /etc/nslcd.conf | sed -e 's/base dc=example,dc=com/base dc=testrelm,dc=com/' >/etc/nslcd.conf.modified" 0 "Set the base to IPA server"
 	rlRun "/bin/mv /etc/nslcd.conf.modified /etc/nslcd.conf"
 	rlRun "/sbin/service  nslcd start" 0 "Restart nslcd service"
-        rlRun "cat /etc/nssswitch.conf | sed -e 's/ethers:     files/ethers:     ldap/' > /etc/nssswitch.conf.modified" 0 "Set ethers to ldap"
-	rlRun "/bin/mv /etc/nssswitch.conf.modified /etc/nssswitch.conf"
+	nssswitch_conf_file="/etc/nssswitch.conf"
+	if [ -e $nssswitch_conf_file ]; then
+	        rlRun "cat $nssswitch_conf_file | sed -e 's/ethers:     files/ethers:     ldap/' > /etc/nssswitch.conf.modified" 0 "Set ethers to ldap"
+		rlRun "/bin/mv /etc/nssswitch.conf.modified $nssswitch_conf_file"
+	else
+		rlLog "$nssswitch_conf_file does not exist, creating one .."
+		echo "ethers:     ldap" > $nssswitch_conf_file
+	fi
 #        rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 	rlRun "tmpDir=\`mktemp -d\`" 0 "Creating temp directory"
         rlRun "pushd $tmpDir"

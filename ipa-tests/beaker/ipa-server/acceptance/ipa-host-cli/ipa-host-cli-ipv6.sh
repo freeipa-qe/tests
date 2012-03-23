@@ -41,7 +41,7 @@
 ########################################################################
 
 # get the IPv6 address 
-ipv6addr=$(/usr/bin/dig +short -t aaaa $BEAKERMASTER)
+ipv6addr=$(/usr/bin/dig +short -t aaaa `hostname`)
 
 # Another way to get IPv6 address
 # figure out what my active eth is from the machine's route
@@ -95,8 +95,14 @@ oct8=$(echo $ipv6addr | awk -F : '{print $8}')
        rzone_IPv6=`getReverseZone_IPv6 $ipv6addr`
        rlLog "Reverse Zone: $rzone_IPv6"
        if [ $rzone_IPv6 ] ; then
-                rlLog "echo $BEAKERMASTER | ipa dnszone-add $rzone_IPv6 --admin-email=admin@example.com"
-                rlRun "echo $BEAKERMASTER | ipa dnszone-add $rzone_IPv6 --admin-email=admin@example.com" 0 "Reverse zone for ipv6 adress added."
+		#check dnszone already exist
+                ipa dnszone-find $rzone_IPv6 | grep "Zone name: $rzone_IPv6"
+                if [ $? -ne 0 ] ; then
+                        rlLog "echo `hostname` | ipa dnszone-add $rzone_IPv6 --admin-email=admin@example.com"
+                        rlRun "echo `hostname` | ipa dnszone-add $rzone_IPv6 --admin-email=admin@example.com" 0 "Reverse zone for ipv6 adress added."
+                else
+                        rlLog "dnszone $rzone_IPv6 exists."
+                fi
                 export ipv6_addr
                 rlLog "EXECUTING: ipa host-add --ip-address=$ipv6_addr $myhost"
                 rlRun "ipa host-add --ip-address=$ipv6_addr $myhost" 0 "Adding host with IPv6 Address $ipv6_addr"
