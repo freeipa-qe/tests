@@ -79,6 +79,7 @@ rlJournalStart
                 	rlRun "service iptables stop" 0 "Stop the firewall on the client"
                 	installds
 			rhts-sync-set -s DONE
+			rhts-sync-block -s READY $MASTER
                 fi
         else
                 rlLog "Machine in recipe in not a CLIENT"
@@ -93,6 +94,7 @@ rlJournalStart
 	if [ $? -eq 0 ] ; then
 		rhts-sync-block -s DONE $BEAKERCLIENT
 		perftest	
+		rhts-sync-set -s DONE
 	else
 		rlLog "Machine in recipe in not a MASTER"
 	fi
