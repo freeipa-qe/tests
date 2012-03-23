@@ -86,7 +86,7 @@ ipakrblockout_maxfail_negative()
     rlPhaseEnd
 
     rlPhaseStartTest "Max Failures Negative Test - setattr - Negative Numbers"
-        expmsg="ipa: ERROR: invalid '$maxflag': must be at least 0"
+        expmsg="ipa: ERROR: invalid '$maxattr': must be at least 0"
         for value in -3 -25 -93796296
         do
             command="ipa pwpolicy-mod --setattr=$maxattr=$value"
@@ -144,7 +144,7 @@ ipakrblockout_failinterval_negative()
     rlPhaseEnd
 
     rlPhaseStartTest "Failure Interval Negative Test - setattr - Negative Numbers"
-        expmsg="ipa: ERROR: invalid '$intervalflag': must be at least 0"
+        expmsg="ipa: ERROR: invalid '$intervalattr': must be at least 0"
         for value in -333 -6 -937962967347
         do
             command="ipa pwpolicy-mod --setattr=$intervalattr=$value"
@@ -201,7 +201,7 @@ ipakrblockout_lockouttime_negative()
     rlPhaseEnd
 
     rlPhaseStartTest "Lock Out Time Negative Test - setattr - Negative Numbers"
-        expmsg="ipa: ERROR: invalid '$locktimeflag': must be at least 0"
+        expmsg="ipa: ERROR: invalid '$locktimeattr': must be at least 0"
         for value in -33 -7 -379346296734
         do
             command="ipa pwpolicy-mod --setattr=$locktimeattr=$value"
