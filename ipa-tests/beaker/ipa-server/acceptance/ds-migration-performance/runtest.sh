@@ -92,7 +92,7 @@ rlJournalStart
 	echo $MASTER | grep $HOSTNAME
 	if [ $? -eq 0 ] ; then
 		rhts-sync-block -s DONE $BEAKERCLIENT
-		ds-migration-performance
+		perftest	
 	else
 		rlLog "Machine in recipe in not a MASTER"
 	fi
