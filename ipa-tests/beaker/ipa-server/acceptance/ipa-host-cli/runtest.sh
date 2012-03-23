@@ -1278,7 +1278,7 @@ rlPhaseStartTest "ipa-host-cli-38: find more hosts than exist"
 
 # Execute host-add with ipv6 address tests
 # Following  line is commented since ipv6 address tests not to be run on beaker.
-#  run_host_add_ipv6address_tests
+#  run_host_add_ipv6_tests
 
 # Execute host-add with macaddress tests
   run_host_add_macaddress_tests
