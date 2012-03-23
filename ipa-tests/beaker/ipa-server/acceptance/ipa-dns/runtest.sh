@@ -1281,6 +1281,22 @@ EOF
 
 	rlPhaseEnd
 
+	rlPhaseStartTest "ipa-dns-178: Bug 805427 - idnssoaserial does not honour the recommended syntax in rfc1912."
+
+		rlLog "verifies https://bugzilla.redhat.com/show_bug.cgi?id=805427"
+		rlLog "closes https://engineering.redhat.com/trac/ipa-tests/ticket/384"
+
+		zone178="zone178"
+		FORMAT=`date +%Y%m%d`
+		rlRun "ipa dnszone-show $DOMAIN | grep -i serial | cut -d : -f 2 | grep $FORMAT"
+
+                rlRun "ipa dnszone-add $zone178 --name-server=$HOSTNAME --admin-email=$email"
+		rlRun "ipa dnszone-show $zone178 | grep -i serial | cut -d : -f 2 | grep $FORMAT"
+
+		rlRun "ipa dnszone-del $zone178"
+
+	rlPhaseEnd
+
 	rlJournalPrintText
 	report=/tmp/rhts.report.$RANDOM.txt
 	makereport $report
