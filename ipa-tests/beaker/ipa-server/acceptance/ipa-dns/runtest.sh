@@ -1268,6 +1268,19 @@ EOF
 
         rlPhaseEnd
 
+	rlPhaseStartTest "ipa-dns-177: Bug 795414 - Dynamic database plug-in cannot change BIND root zone forwarders while plug-in start"
+
+		rlLog "verifies https://bugzilla.redhat.com/show_bug.cgi?id=795414"
+		rlLog "closes https://engineering.redhat.com/trac/ipa-tests/ticket/313"
+
+		rlAssertGrep "forwarders" "/etc/named.conf"
+		rlRun "ipa dnszone-mod $DOMAIN --forwarder=10.65.202.128,10.65.202.129 --forward-policy=first" 
+		rlRun "service named restart"
+
+		rlRun "ipa dnszone-mod $DOMAIN --forwarder= --forward-policy=" 0 "Removing forwarders and forward-policy"
+
+	rlPhaseEnd
+
 	rlJournalPrintText
 	report=/tmp/rhts.report.$RANDOM.txt
 	makereport $report
