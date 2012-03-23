@@ -68,14 +68,19 @@ public class GlobalizationWebAutomation extends IPAWebAutomation {
 		finish = System.currentTimeMillis();
 		if (reporter != null)
 		{
-			String report=reporter.produceReport();
-			System.out.println(report); 
+			// retire regular report later
+			// FIXME: future feature: i should have different format of report come out, such as html table like format
+//			String report=reporter.produceReport();
+//			System.out.println(report); 
+			
+			String treeReport = reporter.produceTreeReport();
+			System.out.println(treeReport);
 			
 			String emailServer = "smtp.corp.redhat.com";
 			String to="yzhang@redhat.com";
 			String from="ipaqa@redhat.com";
 			String subject="test automation result";
-			EmailTool postman = new EmailTool(emailServer, from, to, subject, report);
+			EmailTool postman = new EmailTool(emailServer, from, to, subject, treeReport);
 			postman.deliver();
 		}else{
 			log.info("report error here");
@@ -160,9 +165,9 @@ public class GlobalizationWebAutomation extends IPAWebAutomation {
 	private String[][] allTestdataModify = testdataAdd;
 	private String[][] allTestdataDelete =	testdataAdd;
 */	
-	private String[][] testdataAdd    = {IPAServerPageDelegations};
-	private String[][] testdataModify = {IPAServerPageDelegations};
-	private String[][] testdataDelete =	{IPAServerPageDelegations};
+	private String[][] testdataAdd    = {IdentityPageUsers};
+	private String[][] testdataModify = {IdentityPageUsers};
+	private String[][] testdataDelete =	{IdentityPageUsers};
 	
 	@DataProvider(name="addData")
 	public Object[][] getAddData(){return testdataAdd; }

@@ -3,21 +3,22 @@ package com.redhat.qe.ipa.sahi.pages;
 public interface StandardTest {
 	
 	// whenever the test case name changes, the following string array should change accordingly 
-	public static final String[] standardAddTestCases = {"addSingle", "addAndAddAnother", "addThenEdit", "addThenCancel" ,"addNegativeDuplicate", "addNegativeRequiredFields"};
+	public static final String[] standardAddTestCases = {"addSingle", "addAndAddAnother", "addThenEdit", "addThenCancel" ,"addNegativeDuplicate", "addNegativeRequiredFields","addNegative"};
 	public static final String[] standardModTestCases = {"modify", "modifyNegative"}; ;
 	public static final String[] standardDelTestCases = {"deleteSingle", "deleteMultiple"};
 	
-	public IPAWebTestMonitor addSingle(IPAWebTestMonitor result);
-	public IPAWebTestMonitor addAndAddAnother(IPAWebTestMonitor result);
-	public IPAWebTestMonitor addThenEdit(IPAWebTestMonitor result);
-	public IPAWebTestMonitor addThenCancel(IPAWebTestMonitor result);
+	public IPAWebTestMonitor addSingle(IPAWebTestMonitor monitor);
+	public IPAWebTestMonitor addAndAddAnother(IPAWebTestMonitor monitor);
+	public IPAWebTestMonitor addThenEdit(IPAWebTestMonitor monitor);
+	public IPAWebTestMonitor addThenCancel(IPAWebTestMonitor monitor);
 	
-	public IPAWebTestMonitor addNegativeDuplicate(IPAWebTestMonitor result);
-	public IPAWebTestMonitor addNegativeRequiredFields(IPAWebTestMonitor result);
+	public IPAWebTestMonitor addNegative(IPAWebTestMonitor monitor);
+	public IPAWebTestMonitor addNegativeDuplicate(IPAWebTestMonitor monitor);
+	public IPAWebTestMonitor addNegativeRequiredFields(IPAWebTestMonitor monitor);
 	
-	public IPAWebTestMonitor modify(IPAWebTestMonitor result);
-	public IPAWebTestMonitor modifyNegative(IPAWebTestMonitor result);
+	public IPAWebTestMonitor modify(IPAWebTestMonitor monitor);
+	public IPAWebTestMonitor modifyNegative(IPAWebTestMonitor monitor);
 	
-	public IPAWebTestMonitor deleteSingle(IPAWebTestMonitor result);
-	public IPAWebTestMonitor deleteMultiple(IPAWebTestMonitor result);
+	public IPAWebTestMonitor deleteSingle(IPAWebTestMonitor monitor);
+	public IPAWebTestMonitor deleteMultiple(IPAWebTestMonitor monitor);
 }

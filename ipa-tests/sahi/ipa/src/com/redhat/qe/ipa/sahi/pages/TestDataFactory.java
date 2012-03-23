@@ -14,17 +14,36 @@ public class TestDataFactory {
 	private static TestDataFactory instance;
 	private int totalParts = 4;
 	private char delimiter = ','; 
+	private String testAccountLabel = "TEST_ACCOUNT"; // special lable used in property file to identify test account 
+	
 	private String testDataPropertyFile;
-	private Hashtable<String, Hashtable<String,ArrayList<String>>> testData;
+	private Hashtable<String, //IPA Web Page Name, such as "HBAC Rules add page"
+	  			Hashtable<String, // HTML Tag Name + element id , such as "textbox:cn", "textarea:description"
+			  				ArrayList<String>> // finally, test data in ArrayList 
+			 			> testData;
+	
+	private Hashtable<String, String> testAccounts; // IPA Web Page Name, such as "HBAC Rules add page" -> test account
 	private Hashtable<String, Integer> testDataPointer;
-
+	private Hashtable<String, Boolean> hasMoreTestData;
 	public static TestDataFactory instance(String propertyFile) 
 	{
 		if (instance == null)
 			instance = new TestDataFactory(propertyFile);
 		return instance;
 	}
-
+	
+	// constructor
+	private TestDataFactory(String propertyFile)
+	{
+		this.testDataPropertyFile = propertyFile;
+		testAccounts = new Hashtable<String,String>();
+		testData = new Hashtable<String, Hashtable<String,ArrayList<String>>>(); 
+		testDataPointer = new Hashtable<String, Integer>();
+		hasMoreTestData = new Hashtable<String, Boolean>();
+		loadTestPropertyFile(testDataPropertyFile);
+		initDataPointer();
+	}
+	
 	public ArrayList<String> getUIELements(String page)
 	{
 		ArrayList<String> uiElements = new ArrayList<String>();
@@ -52,27 +71,21 @@ public class TestDataFactory {
 		//  		throw exception or cycling through beginning 
 		int newPointer = pointer.intValue() + 1;
 		if (newPointer < htmlData.size())
-			testDataPointer.put(dataPointerKey, newPointer);
+			testDataPointer.put(dataPointerKey, new Integer(newPointer));
+		else
+			hasMoreTestData.put(page, new Boolean(false));
 		return value;
 	}
 	
-	public void resetPointer(String page, String tag, String id)
+	public void resetDataPointer(String page, String tag, String id)
 	{ 
 		String htmlDataKey = tag + ":" + id;
 		String dataPointerKey = page + ":" + htmlDataKey;    
 		testDataPointer.put(dataPointerKey, new Integer(0)); 
 	}
-	
-	private TestDataFactory(String propertyFile)
-	{
-		this.testDataPropertyFile = propertyFile;
-		testData = loadTestPropertyFile(testDataPropertyFile);
-		initDataPointer();
-	}
 
 	private void initDataPointer()
 	{
-		testDataPointer = new Hashtable<String, Integer>();
 		String testDataKey=null, page=null,id=null;
 		ArrayList<String> data;
 		Enumeration<String> keys = testData.keys(); 
@@ -97,13 +110,9 @@ public class TestDataFactory {
 		}//while--outter
 	}
 	
-	private Hashtable<String, Hashtable<String,ArrayList<String>>> loadTestPropertyFile(String testPropertyFile)
+	private void loadTestPropertyFile(String testPropertyFile)
 	{ 
-		System.out.print("\nstart parsing test data file:["+testPropertyFile + "] ... "); 
-		Hashtable<String, //IPA Web Page Name, such as "HBAC Rules add page"
-				  Hashtable<String, // HTML Tag Name + element id , such as "textbox:cn", "textarea:description"
-				  			ArrayList<String>> // finally, test data in ArrayList 
-				 > testdata = new Hashtable<String, Hashtable<String,ArrayList<String>>>(); 
+		System.out.print("\nstart parsing test data file:["+testPropertyFile + "] ... ");  
 		try { 
 			FileInputStream fin = new FileInputStream(testPropertyFile);
 			DataInputStream in = new DataInputStream(fin);
@@ -120,21 +129,20 @@ public class TestDataFactory {
 //					System.out.println("["+acutalDataLineCounter+"] current line:" + currentLine);
 //					System.out.println("\tref     line:" + refline);
 					String[] currentData = breakLine(delimiter, currentLine); 
-					parseLine(',', reflineData, currentData, testdata);
+					parseLine(delimiter, reflineData, currentData, testData);
 					refline = currentLine;
 					reflineData = currentData; 
 					acutalDataLineCounter++;
 				}
 			}
-			printTestData(testdata);
+			printTestData(testData);
 			fin.close();
 			System.out.print("reading finished\n");
 		} catch (FileNotFoundException e) { 
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
-		}
-		return testdata;
+		} 
 	}
 
 	private void parseLine(char delimiter, 
@@ -146,7 +154,7 @@ public class TestDataFactory {
 			return;
 		if (refData != null) 
 			for (int i=0;i<dataInCurrentLine.length;i++) 
-				if ( dataInCurrentLine[i].equals("%"))
+				if (  dataInCurrentLine[i] !=null && dataInCurrentLine[i].equals("%"))
 					dataInCurrentLine[i] = refData[i];  
 		
 		// save these four parts into our data structure
@@ -155,6 +163,11 @@ public class TestDataFactory {
 		String ElementID =  dataInCurrentLine[2];
 		String TestData =  dataInCurrentLine[3];
 		
+		if (HTMLTagName.equals(testAccountLabel) && ! ElementID.equals(""))
+		{
+			testAccounts.put(IPAWebPageName, ElementID);
+			return;
+		}
 		String testDataKey = HTMLTagName + ":" + ElementID;
 		ArrayList<String> testDataList = stringTOArrayList(TestData);
 		// Sample line:
@@ -180,6 +193,7 @@ public class TestDataFactory {
 			htmlData.put(testDataKey, testDataList);
 			testdata.put(IPAWebPageName, htmlData);
 			System.out.println("New test data found : \n\tkey=["+testDataKey + "]\n\tvalue=["+TestData +"]");
+			hasMoreTestData.put(IPAWebPageName, new Boolean(true));
 		}
 	}
 	
@@ -196,27 +210,34 @@ public class TestDataFactory {
 		String lineToParse = line;
 		String[] dataInCurrentLine = new String[totalParts];
 		int partIndex = 0;
-		int stringIndex = 0;
-		for (int i=0; i < lineToParse.length(); i++)
+		int delimiterIndex = 0;
+		int stringIndex=0;
+		for (;stringIndex < lineToParse.length(); stringIndex ++)
 		{
-			char c = lineToParse.charAt(i);
+			char c = lineToParse.charAt(stringIndex);
 			if (c == delimiter)
 			{
 				if (partIndex == (totalParts - 2) ) 
 				{
-					String thisPart = line.substring(stringIndex, i).trim();
+					String thisPart = line.substring(delimiterIndex, stringIndex).trim();
 					dataInCurrentLine[partIndex] = thisPart;
-					String lastPart = line.substring(i+1,line.length()).trim();
+					String lastPart = line.substring(stringIndex+1,line.length()).trim();
 					dataInCurrentLine[partIndex+1] = lastPart;
 					break;
 				}else{
-					String thisPart = line.substring(stringIndex, i).trim();
+					String thisPart = line.substring(delimiterIndex, stringIndex).trim();
 					dataInCurrentLine[partIndex] = thisPart;
-					stringIndex = i+1;
+					delimiterIndex = stringIndex+1;
 					partIndex ++;
 				} 
 			}
 		}//for-loop
+		if (partIndex == (totalParts - 2) && stringIndex == lineToParse.length() )
+		{
+			// it means we found only 2 delimiter, let's get the last part
+			String lastPart = line.substring(delimiterIndex + 1, line.length());
+			dataInCurrentLine[partIndex] = lastPart;
+		}
 		return dataInCurrentLine;
 	}
 	
@@ -276,5 +297,44 @@ public class TestDataFactory {
 			i++;
 		}
 		System.out.println("========================================");
+	}
+
+	public String getModifyTestAccount(String pageName) {
+		// sample data: Modify User, TEST_ACCOUNT, user001
+		String modifyTestAccount = testAccounts.get(pageName); 
+		return modifyTestAccount;
+	}
+
+	public String[] extractValues(String combinedString) {
+		// format: homedirectory, +[:变化(value #0 invalid per syntax: Invalid syntax.)]
+		String[] extracted = new String[2]; 
+		int start = -1;
+		int end = -1;
+		for (int i=0; i<combinedString.length(); i++)
+		{
+			char c = combinedString.charAt(i);
+			if (c == '(')
+				start = i;
+			else if (c == ')')
+				end = i; 
+		}
+		if (start == -1 || end == -1){
+			// no () part in "combinedString" found, or format not right
+			extracted[0] = combinedString.trim();
+			extracted[1] = null;
+		}else{
+			String value = combinedString.substring(0,start);
+			String errmsg = combinedString.substring(start+1,end);
+			extracted[0] = value.trim();
+			extracted[1] = errmsg.trim();
+		}
+		return extracted;
+	}
+
+	public boolean hasMoreTestData(String pageName) {
+		boolean thereIsMore = false;
+		if (hasMoreTestData.containsKey(pageName))
+			thereIsMore = hasMoreTestData.get(pageName).booleanValue();
+		return thereIsMore;
 	} 
 }
