@@ -29,6 +29,9 @@ setup()
 {
         rlPhaseStartTest "SETUP FUNCTIONAL TESTING"
 		rlLog "Compat Plugin Enabled Mode :: $COMPAT"
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials"
+                rlRun "ipa config-mod --enable-migration=TRUE" 0 "Set migration mode to TRUE"
+
 		echo $COMPAT | grep "FALSE"
 		if [ $? -eq 0 ] ; then
 			rlLog "Test Running with compat plugin Disabled"
@@ -44,8 +47,6 @@ setup()
 			rlRun "service dirsrv restart" 0 "Restart directory server"
 		fi
 			
-                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials"
-		rlRun "ipa config-mod --enable-migration=TRUE" 0 "Set migration mode to TRUE"
         rlPhaseEnd
 }
 
