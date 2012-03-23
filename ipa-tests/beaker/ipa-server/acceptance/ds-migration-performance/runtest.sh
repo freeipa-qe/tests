@@ -79,7 +79,7 @@ rlJournalStart
                 	rlRun "service iptables stop" 0 "Stop the firewall on the client"
                 	installds
 			rhts-sync-set -s DONE
-			rhts-sync-block -s READY $MASTER
+			rhts-sync-block -s READY $BEAKERMASTER
                 fi
         else
                 rlLog "Machine in recipe in not a CLIENT"
@@ -93,7 +93,7 @@ rlJournalStart
 	echo $MASTER | grep $HOSTNAME
 	if [ $? -eq 0 ] ; then
 		rhts-sync-block -s DONE $BEAKERCLIENT
-		perftest	
+		performance
 		rhts-sync-set -s DONE
 	else
 		rlLog "Machine in recipe in not a MASTER"
@@ -117,4 +117,4 @@ rlJournalStart
    report=/tmp/rhts.report.$RANDOM.txt
    makereport $report
    rhts-submit-log -l $report
-rlJournalEnd
+rlJournalEndB
