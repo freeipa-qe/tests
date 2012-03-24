@@ -62,7 +62,7 @@ esac
 
 ##########################################
 #   test main 
-#########################################
+##########################################
 
 rlJournalStart
     rlPhaseStartSetup "ipa-upgrade startup: Initial upgrade setup and pre-checks"
@@ -70,14 +70,26 @@ rlJournalStart
         rlRun "pushd $TmpDir"
     rlPhaseEnd
 	
-	upgrade_data_add
-	#upgrade_master
-	upgrade_data_check
-	upgrade_data_del
+	install_all
+	data_add
+	upgrade
+	data_check
+	uninstall	
 
-	#upgrade_slave
-	#upgrade_client
-		
+	install_nodns
+	data_add
+	upgrade
+	data_check
+	uninstall
+
+	install_all
+	data_add
+	bz000000_disable_dirsrv
+	upgrade
+	bz000000_check
+	data_check
+	uninstall
+
     rlPhaseStartCleanup "ipa-upgrade cleanup"
         rlRun "popd"
         rlRun "rm -r $TmpDir" 0 "Removing tmp directory"

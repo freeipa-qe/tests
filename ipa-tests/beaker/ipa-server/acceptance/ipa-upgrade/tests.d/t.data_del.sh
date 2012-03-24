@@ -2,10 +2,18 @@
 # vim: dict=/usr/share/beakerlib/dictionary.vim cpt=.,w,b,u,t,i,k
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-#   t.upgrade_data_add.sh of /CoreOS/ipa-tests/acceptance/ipa-upgrade
-#   Description: IPA Upgade pre-load test data script
+#   t.data_del.sh of /CoreOS/ipa-tests/acceptance/ipa-upgrade
+#   Description: IPA Upgade delete test data script
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # The following needs to be tested:
+# user
+# group
+# dns record
+# host
+# 
+# hostgroup
+# netgroup
+# automount
 # 
 # automember
 # selfservice
@@ -52,59 +60,41 @@
 ######################################################################
 # test suite
 ######################################################################
-upgrade_data_add()
+data_del()
 {
 	TESTORDER=$(( TESTORDER += 1 ))
-	rlPhaseStartTest "upgrade_data_add: add test data to IPA"
+	rlPhaseStartTest "upgrade_data_del: delete the test data to cleanup"
 	case "$MYROLE" in
 	"MASTER")
 		rlLog "Machine in recipe is MASTER"
 		KinitAsAdmin
 		
-		# Add users
-		rlRun "echo ${passwd[1]}|ipa user-add ${user[1]} --first=First --last=Last --password"
-		rlRun "echo ${passwd[2]}|ipa user-add ${user[2]} --first=First --last=Last --password"
+		# delete  automount
+		rlRun "ipa automountlocation-del testloc"
 
-		# Add groups
-		rlRun "ipa group-add ${group[1]} --desc=GROUP_${group[1]}"
-		rlRun "ipa group-add ${group[2]} --desc=GROUP_${group[2]}"
-
-		# Add DNS Records (PTR)
-		rlRun "ipa dnszone-add ${dnsptr[1]} --name-server=${MASTER} --admin-email=ipaqar.redhat.com"
-		rlRun "ipa dnszone-add ${dnsptr[2]} --name-server=${MASTER} --admin-email=ipaqar.redhat.com"
-
-		# Add hosts
-		rlRun "ipa host-add ${host[1]} --ip-address=${ipv4[1]}"
-		rlRun "ipa host-add ${host[2]} --ip-address=${ipv4[2]}"
-
-		# Add hostgroups
-		rlRun "ipa hostgroup-add ${hostgroup[1]} --desc=hostgroupdesc"
-		rlRun "ipa hostgroup-add ${hostgroup[2]} --desc=hostgroupdesc"
-		rlRun "ipa hostgroup-add-member ${hostgroup[1]} --hosts=${host[1]}"
-		rlRun "ipa hostgroup-add-member ${hostgroup[2]} --hosts=${host[2]}"
-
-		# Add netgroups
-		rlRun "ipa netgroup-add ${netgroup[1]} --desc=netgroupdesc"
-		rlRun "ipa netgroup-add ${netgroup[2]} --desc=netgroupdesc"
-		rlRun "ipa netgroup-add-member ${netgroup[1]} --hosts=${host[1]} --users=${user[1]}"
-		rlRun "ipa netgroup-add-member ${netgroup[2]} --hosts=${host[2]} --users=${user[2]}"
+		# delete  netgroups
+		rlRun "ipa netgroup-del ${netgroup[1]}"
+		rlRun "ipa netgroup-del ${netgroup[2]}"
 		
-		# Add automount
-		rlRun "ipa automountlocation-add testloc"
-		#rlRun "ipa automountmap-add testloc ${automountmap[1]}" auto.master is a default
-		rlRun "ipa automountmap-add testloc ${automountmap[2]}"
-		rlRun "ipa automountmap-add testloc ${automountmap[3]}"
-		for i in $(seq 1 3); do
-			ORIGIFS="$IFS"
-			IFS="
-"
-			for line in $(echo "${automountkey[$i]}"); do
-				IFS="$ORIGIFS"
-				key=$(echo  "$line" | awk '{print $1}')
-				info=$(echo "$line" | sed -e "s#^$key[ \t]*##")
-				rlRun "ipa automountkey-add testloc ${automountmap[$i]} --key=\"$key\" --info=\"$info\""
-			done
-		done
+		# check  hostgroups
+		rlRun "ipa hostgroup-del ${hostgroup[1]}"
+		rlRun "ipa hostgroup-del ${hostgroup[2]}"
+
+		# check  hosts
+		rlRun "ipa host-del ${host[1]} --updatedns"
+		rlRun "ipa host-del ${host[2]} --updatedns"
+
+		# check  DNS Records (PTR)
+		rlRun "ipa dnszone-del ${dnsptr[1]}"
+		rlRun "ipa dnszone-del ${dnsptr[2]}"
+
+		# check  groups
+		rlRun "ipa group-del ${group[1]}"
+		rlRun "ipa group-del ${group[2]}"
+
+		# check  users
+		rlRun "ipa user-del ${user[1]}" 
+		rlRun "ipa user-del ${user[2]}" 
 
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $MASTER_IP"
 		;;

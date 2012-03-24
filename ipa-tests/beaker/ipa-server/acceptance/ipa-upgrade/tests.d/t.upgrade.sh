@@ -2,28 +2,10 @@
 # vim: dict=/usr/share/beakerlib/dictionary.vim cpt=.,w,b,u,t,i,k
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-#   t.upgrade_data_del.sh of /CoreOS/ipa-tests/acceptance/ipa-upgrade
-#   Description: IPA Upgade pre-load test data script
+#   t.upgrade.sh of /CoreOS/ipa-tests/acceptance/ipa-upgrade
+#   Description: IPA multihost upgrade script
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # The following needs to be tested:
-# user
-# group
-# dns record
-# host
-# 
-# hostgroup
-# netgroup
-# automount
-# 
-# automember
-# selfservice
-# delegation
-# privilege
-# permission
-# 
-# sudo
-# hbac
-# service
 #   
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
@@ -60,41 +42,44 @@
 ######################################################################
 # test suite
 ######################################################################
-upgrade_data_del()
+upgrade()
+{
+	upgrade_master
+	upgrade_slave
+	upgrade_client
+}
+
+upgrade_master()
 {
 	TESTORDER=$(( TESTORDER += 1 ))
-	rlPhaseStartTest "upgrade_data_del: delete the test data to cleanup"
+	rlPhaseStartTest "upgrade_master: template function start phase"
 	case "$MYROLE" in
 	"MASTER")
 		rlLog "Machine in recipe is MASTER"
-		KinitAsAdmin
-		
-		# delete  automount
-		rlRun "ipa automountlocation-del testloc"
 
-		# delete  netgroups
-		rlRun "ipa netgroup-del ${netgroup[1]}"
-		rlRun "ipa netgroup-del ${netgroup[2]}"
-		
-		# check  hostgroups
-		rlRun "ipa hostgroup-del ${hostgroup[1]}"
-		rlRun "ipa hostgroup-del ${hostgroup[2]}"
+		# Setup new yum repos from ipa-upgrade.data datafile
+		for url in ${repo[@]}; do
+			repoi=$(( repoi += 1 ))
+			cat > /etc/yum.repos.d/mytestrepo$repoi.repo <<-EOF
+			[mytestrepo$repoi]
+			name=mytestrepo$repoi
+			baseurl=$url
+			enabled=1
+			gpgcheck=0
+			skip_if_unavailable=1
+			EOF
+		done
 
-		# check  hosts
-		rlRun "ipa host-del ${host[1]} --updatedns"
-		rlRun "ipa host-del ${host[2]} --updatedns"
-
-		# check  DNS Records (PTR)
-		rlRun "ipa dnszone-del ${dnsptr[1]}"
-		rlRun "ipa dnszone-del ${dnsptr[2]}"
-
-		# check  groups
-		rlRun "ipa group-del ${group[1]}"
-		rlRun "ipa group-del ${group[2]}"
-
-		# check  users
-		rlRun "ipa user-del ${user[1]}" 
-		rlRun "ipa user-del ${user[2]}" 
+		rlRun "setenforce Permissive"
+		rlRun "yum -y bind bind-dyndb-ldap"
+		rlRun "ipactl restart"
+		#rlRun "service dirsrv stop"
+		#rlRun "/bin/rm -f /var/run/slapd-TESTRELM-COM.socket"
+		#rlRun "yum -y update '389-ds-base*'"
+		#rlRun "setenforce Permissive"
+		#rlRun "ipactl restart"
+		rlRun "yum -y update 'ipa*'"	
+		rlRun "ipactl restart" ### IS THIS REALLY NEEDED?  BZ 766687?
 
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $MASTER_IP"
 		;;

@@ -2,10 +2,20 @@
 # vim: dict=/usr/share/beakerlib/dictionary.vim cpt=.,w,b,u,t,i,k
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-#   template.sh of /CoreOS/ipa-tests/acceptance/ipa-nis-integration
-#   Description: IPA multihost TEMPLATE_SCRIPT
+#   t.data_add.sh of /CoreOS/ipa-tests/acceptance/ipa-upgrade
+#   Description: IPA Upgade pre-load test data script
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # The following needs to be tested:
+# 
+# automember
+# selfservice
+# delegation
+# privilege
+# permission
+# 
+# sudo
+# hbac
+# service
 #   
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
@@ -42,37 +52,59 @@
 ######################################################################
 # test suite
 ######################################################################
-upgrade_master()
+data_add()
 {
 	TESTORDER=$(( TESTORDER += 1 ))
-	rlPhaseStartTest "upgrade_master: template function start phase"
+	rlPhaseStartTest "upgrade_data_add: add test data to IPA"
 	case "$MYROLE" in
 	"MASTER")
 		rlLog "Machine in recipe is MASTER"
+		KinitAsAdmin
+		
+		# Add users
+		rlRun "echo ${passwd[1]}|ipa user-add ${user[1]} --first=First --last=Last --password"
+		rlRun "echo ${passwd[2]}|ipa user-add ${user[2]} --first=First --last=Last --password"
 
-		# Setup new yum repos from ipa-upgrade.data datafile
-		for url in ${repo[@]}; do
-			repoi=$(( repoi += 1 ))
-cat > /etc/yum.repos.d/mytestrepo$repoi.repo <<-EOF
-[mytestrepo$repoi]
-name=mytestrepo$repoi
-baseurl=$url
-enabled=1
-gpgcheck=0
-skip_if_unavailable=1
-EOF
+		# Add groups
+		rlRun "ipa group-add ${group[1]} --desc=GROUP_${group[1]}"
+		rlRun "ipa group-add ${group[2]} --desc=GROUP_${group[2]}"
+
+		# Add DNS Records (PTR)
+		rlRun "ipa dnszone-add ${dnsptr[1]} --name-server=${MASTER} --admin-email=ipaqar.redhat.com"
+		rlRun "ipa dnszone-add ${dnsptr[2]} --name-server=${MASTER} --admin-email=ipaqar.redhat.com"
+
+		# Add hosts
+		rlRun "ipa host-add ${host[1]} --ip-address=${ipv4[1]}"
+		rlRun "ipa host-add ${host[2]} --ip-address=${ipv4[2]}"
+
+		# Add hostgroups
+		rlRun "ipa hostgroup-add ${hostgroup[1]} --desc=hostgroupdesc"
+		rlRun "ipa hostgroup-add ${hostgroup[2]} --desc=hostgroupdesc"
+		rlRun "ipa hostgroup-add-member ${hostgroup[1]} --hosts=${host[1]}"
+		rlRun "ipa hostgroup-add-member ${hostgroup[2]} --hosts=${host[2]}"
+
+		# Add netgroups
+		rlRun "ipa netgroup-add ${netgroup[1]} --desc=netgroupdesc"
+		rlRun "ipa netgroup-add ${netgroup[2]} --desc=netgroupdesc"
+		rlRun "ipa netgroup-add-member ${netgroup[1]} --hosts=${host[1]} --users=${user[1]}"
+		rlRun "ipa netgroup-add-member ${netgroup[2]} --hosts=${host[2]} --users=${user[2]}"
+		
+		# Add automount
+		rlRun "ipa automountlocation-add testloc"
+		#rlRun "ipa automountmap-add testloc ${automountmap[1]}" auto.master is a default
+		rlRun "ipa automountmap-add testloc ${automountmap[2]}"
+		rlRun "ipa automountmap-add testloc ${automountmap[3]}"
+		for i in $(seq 1 3); do
+			ORIGIFS="$IFS"
+			IFS="
+"
+			for line in $(echo "${automountkey[$i]}"); do
+				IFS="$ORIGIFS"
+				key=$(echo  "$line" | awk '{print $1}')
+				info=$(echo "$line" | sed -e "s#^$key[ \t]*##")
+				rlRun "ipa automountkey-add testloc ${automountmap[$i]} --key=\"$key\" --info=\"$info\""
+			done
 		done
-
-		rlRun "setenforce Permissive"
-		rlRun "yum -y bind bind-dyndb-ldap"
-		rlRun "ipactl restart"
-		rlRun "service dirsrv stop"
-		rlRun "/bin/rm -f /var/run/slapd-TESTRELM-COM.socket"
-		rlRun "yum -y update '389-ds-base*'"
-		rlRun "setenforce Permissive"
-		rlRun "ipactl restart"
-		rlRun "yum -y update 'ipa*'"	
-		rlRun "ipactl restart" ### IS THIS REALLY NEEDED?  BZ 766687?
 
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $MASTER_IP"
 		;;
