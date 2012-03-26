@@ -146,7 +146,7 @@ public class IPAWebPage implements StandardTest{
 					monitor.pass();
 				else
 					monitor.fail("Error dialog triggered, but no desired error msg found");
-				closePopUpDialog();
+				closeDialog();
 			}else
 				monitor.fail("No error dialog triggered");
 			return monitor;
@@ -164,7 +164,7 @@ public class IPAWebPage implements StandardTest{
 			monitor.pass();
 		else
 			monitor.fail("No 'Required field' lable appears");
-		closePopUpDialog();
+		closeDialog();
 		return monitor;
 	}
 
@@ -329,7 +329,7 @@ public class IPAWebPage implements StandardTest{
 	
 	////////////////////////////////// generic UI operation  /////////////////////////////
 	
-	protected void closePopUpDialog()
+	protected void closeDialog()
 	{
 		if (browser.button("OK").exists())
 			browser.button("OK").click();
@@ -478,7 +478,7 @@ public class IPAWebPage implements StandardTest{
 		}else{
 			monitor.fail("error message does NOT match with expected");
 		}
-		closePopUpDialog(); 
+		closeDialog(); 
 	}
 	
 	protected void addMultipleNewEntries(IPAWebTestMonitor monitor, String pageName, int numOfEntries) throws IPAWebAutomationException
@@ -546,7 +546,9 @@ public class IPAWebPage implements StandardTest{
 			browser.textarea(id).setValue(value);
 			after = browser.textarea(id).getValue();
 		}else if (tag.equals("password")){
+			before = browser.password(id).getValue();
 			browser.password(id).setValue(value);
+			after = browser.password(id).getValue();
 		}
 		else if (tag.equals("checkbox")){
 			if (id.equals("fqdn")) 
@@ -599,7 +601,7 @@ public class IPAWebPage implements StandardTest{
 				elementValue = browser.textbox(id).getValue();
 		}
 		else if (tag.equals("password")){
-			browser.password(id).setValue(value);
+			elementValue = browser.password(id).getValue();
 		}
 		else
 			elementValue = "";

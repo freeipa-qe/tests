@@ -34,7 +34,7 @@ public class IdentityPageUserGroups extends IPAWebPage{
 			if (browser.div("error_dialog").exists())
 			{
 				monitor.fail("error dialog appears");
-				closePopUpDialog();
+				closeDialog();
 				browser.span("Reset").click();
 			}
 			else

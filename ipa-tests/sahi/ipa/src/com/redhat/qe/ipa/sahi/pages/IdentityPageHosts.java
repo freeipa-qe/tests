@@ -53,7 +53,7 @@ public class IdentityPageHosts extends IPAWebPage {
 			browser.span("Add").click();
 			fillDataIntoPage(monitor,addPage); 
 			browser.button("Add and Edit").click();
-			closePopUpDialog();
+			closeDialog();
 			boolean inEditingMode = verifyInEditingMode();
 			if (!inEditingMode)
 				monitor.fail("after click 'Add and Edit', we are not in edit mode");
@@ -73,7 +73,7 @@ public class IdentityPageHosts extends IPAWebPage {
 		// enter the data first time
 		try {
 			addSingleNewEntry(monitor, duplicatePage);
-			closePopUpDialog();
+			closeDialog();
 			addSingleNewEntry(monitor, duplicatePage);
 			
 			// check error dialog box
@@ -83,7 +83,7 @@ public class IdentityPageHosts extends IPAWebPage {
 					monitor.pass();
 				else
 					monitor.fail("Error dialog triggered, but no desired error msg found");
-				closePopUpDialog();
+				closeDialog();
 			}else
 				monitor.fail("No error dialog triggered");
 			return monitor;
