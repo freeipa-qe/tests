@@ -67,13 +67,13 @@ ETHER_PACKAGE="nss-pam-ldapd"
 	rlRun "cat /etc/nslcd.conf | sed -e 's/base dc=example,dc=com/base dc=testrelm,dc=com/' >/etc/nslcd.conf.modified" 0 "Set the base to IPA server"
 	rlRun "/bin/mv /etc/nslcd.conf.modified /etc/nslcd.conf"
 	rlRun "/sbin/service  nslcd start" 0 "Restart nslcd service"
-	nssswitch_conf_file="/etc/nssswitch.conf"
-	if [ -e $nssswitch_conf_file ]; then
-	        rlRun "cat $nssswitch_conf_file | sed -e 's/ethers:     files/ethers:     ldap/' > /etc/nssswitch.conf.modified" 0 "Set ethers to ldap"
-		rlRun "/bin/mv /etc/nssswitch.conf.modified $nssswitch_conf_file"
+	nsswitch_conf_file="/etc/nsswitch.conf"
+	if [ -e $nsswitch_conf_file ]; then
+	        rlRun "cat $nsswitch_conf_file | sed -e 's/ethers:     files/ethers:     ldap/' > /etc/nsswitch.conf.modified" 0 "Set ethers to ldap"
+		rlRun "/bin/mv /etc/nsswitch.conf.modified $nsswitch_conf_file"
 	else
-		rlLog "$nssswitch_conf_file does not exist, creating one .."
-		echo "ethers:     ldap" > $nssswitch_conf_file
+		rlLog "$nsswitch_conf_file does not exist, creating one .."
+		echo "ethers:     ldap" > $nsswitch_conf_file
 	fi
 #        rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 	rlRun "tmpDir=\`mktemp -d\`" 0 "Creating temp directory"
@@ -422,8 +422,8 @@ ETHER_PACKAGE="nss-pam-ldapd"
 	rlRun "cat /etc/nslcd.conf | sed -e 's/base dc=testrelm,dc=com/base dc=example,dc=com/' >/etc/nslcd.conf.modified2" 0 "Set the base back on default value."
 	rlRun "/bin/mv /etc/nslcd.conf.modified2 /etc/nslcd.conf"
 	rlRun "/sbin/service  nslcd restart" 0 "Restart nslcd service"
-        rlRun "cat /etc/nssswitch.conf | sed -e 's/ethers:     ldap/ethers:     files/' > /etc/nssswitch.conf.modified2" 0 "Set ethers back on default value files."
-	rlRun "mv /etc/nssswitch.conf.modified2 /etc/nssswitch.conf"
+        rlRun "cat /etc/nsswitch.conf | sed -e 's/ethers:     ldap/ethers:     files/' > /etc/nsswitch.conf.modified2" 0 "Set ethers back on default value files."
+	rlRun "mv /etc/nsswitch.conf.modified2 /etc/nsswitch.conf"
 	rlRun "rpm -ev $ETHER_PACKAGE"
 	rlRun "popd"
         rlRun "rm -r $tmpDir" 0 "Removing temp directory"
