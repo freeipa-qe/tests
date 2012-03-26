@@ -70,7 +70,7 @@ upgrade_master()
 			EOF
 		done
 
-		rlRun "setenforce Permissive"
+		#rlRun "setenforce Permissive"
 		rlRun "yum -y bind bind-dyndb-ldap"
 		rlRun "ipactl restart"
 		#rlRun "service dirsrv stop"

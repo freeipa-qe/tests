@@ -89,6 +89,9 @@ ipa_install_master_prep(){
 		rlRun "sed -i \"/$hostname_s/d\" /etc/sysconfig/network"
 		rlRun "echo \"HOSTNAME=$hostname_s.$DOMAIN\" >> /etc/sysconfig/network"
 
+		# Change MASTER variable to match hostname
+		export MASTER=$(hostname)
+
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $MASTER_IP"
 		;;
 	"SLAVE")
