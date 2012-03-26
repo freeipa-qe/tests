@@ -355,7 +355,7 @@ ipaconfig_setattr_positive()
    rlPhaseEnd
 
    rlPhaseStartTest "ipaconfig-mod_setattr ipacertificatesubjectbase positive"
-        rlRun "ipa config-mod --setattr=ipacertificatesubjectbase=\"OU=Bogus\"" 0 "Set ipapwdexpadvnotify to OU=Bogus"
+        rlRun "ipa config-mod --setattr=ipacertificatesubjectbase=\"OU=Bogus\"" 0 "Set ipacertificatesubjectbase to OU=Bogus"
         ipa config-show --all > /tmp/configshowadd.out
         cat /tmp/configshowadd.out | grep "Certificate Subject base: OU=Bogus"
         if [ $? -eq 0 ] ; then
