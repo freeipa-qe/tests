@@ -61,6 +61,7 @@ oct8=$(echo $ipv6addr | awk -F : '{print $8}')
 ########################################################################
 
  run_host_add_ipv6_tests(){
+
     rlPhaseStartSetup "ipa-host-cli-ipv6-startup: Create temp directory"
 	rlRun "tmpDir=\`mktemp -d\`" 0 "Creating temp directory"
         rlRun "pushd $tmpDir"

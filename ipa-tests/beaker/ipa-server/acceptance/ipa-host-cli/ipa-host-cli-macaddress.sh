@@ -71,8 +71,9 @@ ETHER_PACKAGE="nss-pam-ldapd"
 	if [ -e $nsswitch_conf_file ]; then
 	        rlRun "cat $nsswitch_conf_file | sed -e 's/ethers:     files/ethers:     ldap/' > /etc/nsswitch.conf.modified" 0 "Set ethers to ldap"
 		rlRun "/bin/mv /etc/nsswitch.conf.modified $nsswitch_conf_file"
+		rlPass "$nsswitch_conf_file updated successfully."
 	else
-		rlLog "$nsswitch_conf_file does not exist, distribution installation problem."
+		rlFail "$nsswitch_conf_file does not exist, distribution installation problem."
 	fi
 	rlRun "tmpDir=\`mktemp -d\`" 0 "Creating temp directory"
         rlRun "pushd $tmpDir"
