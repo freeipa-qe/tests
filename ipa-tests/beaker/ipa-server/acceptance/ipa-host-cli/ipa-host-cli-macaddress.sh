@@ -72,10 +72,8 @@ ETHER_PACKAGE="nss-pam-ldapd"
 	        rlRun "cat $nsswitch_conf_file | sed -e 's/ethers:     files/ethers:     ldap/' > /etc/nsswitch.conf.modified" 0 "Set ethers to ldap"
 		rlRun "/bin/mv /etc/nsswitch.conf.modified $nsswitch_conf_file"
 	else
-		rlLog "$nsswitch_conf_file does not exist, creating one .."
-		echo "ethers:     ldap" > $nsswitch_conf_file
+		rlLog "$nsswitch_conf_file does not exist, distribution installation problem."
 	fi
-#        rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 	rlRun "tmpDir=\`mktemp -d\`" 0 "Creating temp directory"
         rlRun "pushd $tmpDir"
      rlPhaseEnd
