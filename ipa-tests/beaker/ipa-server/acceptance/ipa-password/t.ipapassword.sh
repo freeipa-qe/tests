@@ -2760,7 +2760,7 @@ ipapassword_attr_set_krbPwdMinDiffChars_negative()
         local attr=krbPwdMinDiffChars
         local value=`getrandomint 6 50000`
         Local_KinitAsAdmin
-        ipapassword_attr_set_logic $attr $value 1 "ipa: ERROR: invalid 'minclasses': can be at most 5"
+        ipapassword_attr_set_logic $attr $value 1 "ipa: ERROR: invalid 'krbpwdmindiffchars': can be at most 5"
         rlRun "$kdestroy"
     rlPhaseEnd
 
@@ -2808,7 +2808,7 @@ ipapassword_attr_set_krbPwdHistoryLength_negative()
         local attr=krbPwdHistoryLength
         local value=`getrandomint`
         Local_KinitAsAdmin
-        ipapassword_attr_set_logic $attr "-$value" 1 "ipa: ERROR: invalid 'history': must be at least 0"
+        ipapassword_attr_set_logic $attr "-$value" 1 "ipa: ERROR: invalid 'krbpwdhistorylength': must be at least 0"
         rlRun "$kdestroy"
     rlPhaseEnd
 
@@ -2938,7 +2938,7 @@ ipapassword_attr_add_krbPwdMinDiffChars_negative()
         local attr=krbPwdMinDiffChars
         local value=`getrandomint 6 50000`
         Local_KinitAsAdmin
-        ipapassword_attr_add_logic $attr $value 1 "ipa: ERROR: invalid 'minclasses': can be at most 5"
+        ipapassword_attr_add_logic $attr $value 1 "ipa: ERROR: invalid 'krbpwdmindiffchars': can be at most 5"
         rlRun "$kdestroy"
     rlPhaseEnd
 
@@ -2986,7 +2986,7 @@ ipapassword_attr_add_krbPwdHistoryLength_negative()
         local attr=krbPwdHistoryLength
         local value=`getrandomint`
         Local_KinitAsAdmin
-        ipapassword_attr_add_logic $attr "-$value" 1 "ipa: ERROR: invalid 'history': must be at least 0"
+        ipapassword_attr_add_logic $attr "-$value" 1 "ipa: ERROR: invalid 'krbpwdhistorylength': must be at least 0"
         rlRun "$kdestroy"
     rlPhaseEnd
 
