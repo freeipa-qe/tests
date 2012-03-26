@@ -79,7 +79,7 @@ rlJournalStart
                 	rlRun "service iptables stop" 0 "Stop the firewall on the client"
                 	installds
 			rhts-sync-set -s DONE
-			rhts-sync-block -s READY $BEAKERMASTER
+			rhts-sync-block -s DONE $BEAKERMASTER
                 fi
         else
                 rlLog "Machine in recipe in not a CLIENT"
