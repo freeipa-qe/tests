@@ -58,32 +58,34 @@ install_nodns(){
 }
 
 ipa_install_master_prep(){
-	currenteth=$(route | grep ^default | awk '{print $8}')
-	ipaddr=$(ifconfig $currenteth | grep inet\ addr | sed s/:/\ /g | awk '{print $3}')
-	hostname=$(hostname)
-	hostname_s=$(hostname -s)
+	rlPhaseStartTest "ipa_install_master_prep: Install software and pre-req configs for IPA"
+		currenteth=$(route | grep ^default | awk '{print $8}')
+		ipaddr=$(ifconfig $currenteth | grep inet\ addr | sed s/:/\ /g | awk '{print $3}')
+		hostname=$(hostname)
+		hostname_s=$(hostname -s)
 
-	# Install base software
-	yum -y install bind expect krb5-workstation bind-dyndb-ldap krb5-pkinit-openssl
-	yum -y install ipa-server
-	yum -y update
+		# Install base software
+		rlRun "yum -y install bind expect krb5-workstation bind-dyndb-ldap krb5-pkinit-openssl"
+		rlRun "yum -y install ipa-server"
+		rlRun "yum -y update"
 
-	# Set time
-	service ntpd stop
-	service ntpdate start
+		# Set time
+		rlRun "service ntpd stop"
+		rlRun "service ntpdate start"
 
-	# Fix /etc/hosts
-	cp -af /etc/hosts /etc/hosts.ipabackup
-	sed -i /^$ipaddr/d /etc/hosts
-	sed -i s/$hostname//g /etc/hosts
-	sed -i s/$hostname_s//g /etc/hosts
-	echo "$ipaddr $hostname_s.$DOMAIN $hostname_s" >> /etc/hosts
+		# Fix /etc/hosts
+		rlRun "cp -af /etc/hosts /etc/hosts.ipabackup"
+		rlRun "sed -i /^$ipaddr/d /etc/hosts"
+		rlRun "sed -i s/$hostname//g /etc/hosts"
+		rlRun "sed -i s/$hostname_s//g /etc/hosts"
+		rlRun "echo \"$ipaddr $hostname_s.$DOMAIN $hostname_s\" >> /etc/hosts"
 
-	# Fix hostname
-	hostname $hostname_s.$DOMAIN
-	cp /etc/sysconfig/network /etc/sysconfig/network.ipabackup
-	sed -i "/$hostname_s/d" /etc/sysconfig/network
-	echo "HOSTNAME=$hostname_s.$DOMAIN" >> /etc/sysconfig/network
+		# Fix hostname
+		rlRun "hostname $hostname_s.$DOMAIN"
+		rlRun "cp /etc/sysconfig/network /etc/sysconfig/network.ipabackup"
+		rlRun "sed -i \"/$hostname_s/d\" /etc/sysconfig/network"
+		rlRun "echo \"HOSTNAME=$hostname_s.$DOMAIN\" >> /etc/sysconfig/network"
+	rlPhaseEnd
 }
 
 ipa_install_master_all(){
