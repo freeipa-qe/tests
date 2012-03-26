@@ -76,19 +76,19 @@ rlJournalStart
 	data_check
 	uninstall	
 
-	install_nodns
-	data_add
-	upgrade
-	data_check
-	uninstall
+	#install_nodns
+	#data_add
+	#upgrade
+	#data_check
+	#uninstall
 
-	install_all
-	data_add
-	bz000000_disable_dirsrv
-	upgrade
-	bz000000_check
-	data_check
-	uninstall
+	#install_all
+	#data_add
+	#bz000000_disable_dirsrv
+	#upgrade
+	#bz000000_check
+	#data_check
+	#uninstall
 
     rlPhaseStartCleanup "ipa-upgrade cleanup"
         rlRun "popd"

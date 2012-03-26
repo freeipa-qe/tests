@@ -44,18 +44,20 @@
 ######################################################################
 
 install_all(){
+	ipa_install_master_prep
 	ipa_install_master_all
 	#ipa_install_slave
 	#ipa_install_client
 }
 
 install_nodns(){
+	ipa_install_master_prep
 	ipa_install_master_nodns
 	#ipa_install_slave
 	#ipa_install_client
 }
 
-ipa_install_prep(){
+ipa_install_master_prep(){
 	currenteth=$(route | grep ^default | awk '{print $8}')
 	ipaddr=$(ifconfig $currenteth | grep inet\ addr | sed s/:/\ /g | awk '{print $3}')
 	hostname=$(hostname)
@@ -91,9 +93,6 @@ ipa_install_master_all(){
 	"MASTER")
 		rlLog "Machine in recipe is MASTER"
 
-		# Run IPA Install Prerequesites
-		ipa_install_prep
-
 		# Configure IPA Server
 		ipa-server-install --setup-dns --forwarder=$DNSFORWARD --hostname=$hostname_s.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U
 
@@ -120,9 +119,6 @@ ipa_install_master_nodns(){
 	case "$MYROLE" in
 	"MASTER")
 		rlLog "Machine in recipe is MASTER"
-
-		# Run IPA Install Prerequesites
-		ipa_install_prep
 
 		# Configure IPA Server
 		ipa-server-install --hostname=$hostname_s.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U
