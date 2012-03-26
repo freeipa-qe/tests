@@ -38,7 +38,7 @@ setup()
 			echo $ADMINPW | ipa-compat-manage status | grep Enabled
 			if [ $? -eq 0 ] ; then
 				rlRun "echo $ADMINPW | ipa-compat-manage disable" 0 "Turn off compat plugin"
-				rlRun "service dirsrv resttart" 0 "Restart directory server"
+				rlRun "service dirsrv restart" 0 "Restart directory server"
 			fi
 		else
 			rlLog "Test Running with compat plugin Enabled"
