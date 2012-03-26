@@ -85,9 +85,12 @@ ipa_install_master_prep(){
 
 		# Fix hostname
 		rlRun "hostname $hostname_s.$DOMAIN"
-		rlRun "cp /etc/sysconfig/network /etc/sysconfig/network.ipabackup"
+		rlRun "cp /etc/sysconfig/network /etc/sysconfig/network-ipabackup"
 		rlRun "sed -i \"/$hostname_s/d\" /etc/sysconfig/network"
 		rlRun "echo \"HOSTNAME=$hostname_s.$DOMAIN\" >> /etc/sysconfig/network"
+
+		# Backup resolv.conf
+		rlRun "cp /etc/resolv.conf /etc/resolv.conf.ipabackup"
 
 		# Change MASTER variable to match hostname
 		export MASTER=$(hostname)

@@ -71,7 +71,7 @@ upgrade_master()
 		done
 
 		#rlRun "setenforce Permissive"
-		rlRun "yum -y bind bind-dyndb-ldap"
+		rlRun "yum -y update bind bind-dyndb-ldap"
 		rlRun "ipactl restart"
 		#rlRun "service dirsrv stop"
 		#rlRun "/bin/rm -f /var/run/slapd-TESTRELM-COM.socket"
