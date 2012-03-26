@@ -100,8 +100,7 @@ data_check()
 		rlRun "ipa automountmap-show testloc ${automountmap[3]}"
 		for i in $(seq 1 3); do
 			ORIGIFS="$IFS"
-			IFS="
-"
+			IFS=$'\n'
 			for line in $(echo "${automountkey[$i]}"); do
 				IFS="$ORIGIFS"
 				key=$(echo  "$line" | awk '{print $1}')

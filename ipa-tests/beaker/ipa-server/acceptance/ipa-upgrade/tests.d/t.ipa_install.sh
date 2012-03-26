@@ -58,7 +58,10 @@ install_nodns(){
 }
 
 ipa_install_master_prep(){
+	TESTORDER=$(( TESTORDER += 1 ))
 	rlPhaseStartTest "ipa_install_master_prep: Install software and pre-req configs for IPA"
+	case "$MYROLE" in
+	"MASTER")
 		currenteth=$(route | grep ^default | awk '{print $8}')
 		ipaddr=$(ifconfig $currenteth | grep inet\ addr | sed s/:/\ /g | awk '{print $3}')
 		hostname=$(hostname)
@@ -85,6 +88,21 @@ ipa_install_master_prep(){
 		rlRun "cp /etc/sysconfig/network /etc/sysconfig/network.ipabackup"
 		rlRun "sed -i \"/$hostname_s/d\" /etc/sysconfig/network"
 		rlRun "echo \"HOSTNAME=$hostname_s.$DOMAIN\" >> /etc/sysconfig/network"
+
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $MASTER_IP"
+		;;
+	"SLAVE")
+		rlLog "Machine in recipe is SLAVE"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER_IP"
+		;;
+	"CLIENT")
+		rlLog "Machine in recipe is CLIENT"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER_IP"
+		;;
+	*)
+		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
+		;;
+	esac
 	rlPhaseEnd
 }
 
@@ -96,7 +114,7 @@ ipa_install_master_all(){
 		rlLog "Machine in recipe is MASTER"
 
 		# Configure IPA Server
-		ipa-server-install --setup-dns --forwarder=$DNSFORWARD --hostname=$hostname_s.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U
+		rlRun "ipa-server-install --setup-dns --forwarder=$DNSFORWARD --hostname=$hostname_s.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U"
 
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $MASTER_IP"
 		;;
@@ -123,7 +141,7 @@ ipa_install_master_nodns(){
 		rlLog "Machine in recipe is MASTER"
 
 		# Configure IPA Server
-		ipa-server-install --hostname=$hostname_s.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U
+		rlRun "ipa-server-install --hostname=$hostname_s.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U"
 
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $MASTER_IP"
 		;;
