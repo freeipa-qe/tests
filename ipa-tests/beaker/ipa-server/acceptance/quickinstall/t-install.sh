@@ -94,7 +94,8 @@ installSlave()
                 rlFail "ERROR: Replica Package not found"
         else
        		rlRun "service ntpd stop" 0 "Stopping the ntp server"
-        	rlRun "ntpdate $NTPSERVER" 0 "Synchronzing clock with valid time server"
+		rlLog "Synchronizing clock with: $NTPSERVER"
+        	ntpdate $NTPSERVER
 		rlLog "SKIPINSTALL: $SKIPINSTALL"	
 		if [[ "$SKIPINSTALL" != "TRUE" ]] ; then
 			if [[ "$IPv6SETUP" != "TRUE" ]] ; then
