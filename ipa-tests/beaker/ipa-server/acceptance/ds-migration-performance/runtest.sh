@@ -78,7 +78,7 @@ rlJournalStart
                 	done
                 	rlRun "service iptables stop" 0 "Stop the firewall on the client"
                 	installds
-			rhts-sync-set -s DONE
+			rhts-sync-set -s READY
 			rhts-sync-block -s DONE $BEAKERMASTER
                 fi
         else
@@ -92,7 +92,7 @@ rlJournalStart
 	rc=0
 	echo $MASTER | grep $HOSTNAME
 	if [ $? -eq 0 ] ; then
-		rhts-sync-block -s DONE $BEAKERCLIENT
+		rhts-sync-block -s READY $BEAKERCLIENT
 		performance
 		rhts-sync-set -s DONE
 	else
@@ -117,4 +117,4 @@ rlJournalStart
    report=/tmp/rhts.report.$RANDOM.txt
    makereport $report
    rhts-submit-log -l $report
-rlJournalEndB
+rlJournalEnd

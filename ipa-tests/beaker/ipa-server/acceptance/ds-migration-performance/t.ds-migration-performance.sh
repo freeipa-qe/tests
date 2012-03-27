@@ -1,15 +1,5 @@
-USERCONTAINER="ou=People"
-GROUPCONTAINER="ou=groups"
-USEROBJCLASS="posixAccount"
-GROUPOBJCLASS="posixGroup"
-USER1="puser1"
-USER1PWD="fo0m4nchU"
-USER2PWD="Secret123"
-USER2="puser2"
-GROUP1="group1"
-GROUP2="group2"
-CACERT="/etc/ipa/ca.crt"
-INSTANCE="slapd-instance1"
+export IPAINSTANCE=`echo $RELM | sed 's/\./-/g'`
+export DSINSTANCE="slapd-instance1"
 
 ######################
 # test suite         #
@@ -61,7 +51,17 @@ perftest()
 	rlPhaseStartTest "Migration 10000 users and 12 groups"
 		# record the current free memory
 		prememfree=`free -b | grep Mem: | awk '{print $4}'`
+	
+		# get slapd process mem in use
+		slapdpid=`cat /var/run/dirsrv/slapd-$IPAINSTANCE.pid`
+		rlLog "slapd pid : $slapdpid"
+		slapdVmRSS=`cat /proc/$slapdpid/status | grep "VmRSS" | awk '{print $2 $3}'`
+		slapdVmHWM=`cat /proc/$slapdpid/status | grep "VmHWM" | awk '{print $2 $3}'`
+			
 		rlLog "Before migration free memory : $prememfree"
+		rlLog "Before migration slapd VmRSS : $slapdVmRSS"
+		rlLog "Before migration slapd VmHWM : $slapdVmHWM"
+
                 starttime=`date`
                 rlLog "======================= Migration started: $starttime ========================"
 		
@@ -85,14 +85,23 @@ perftest()
                 endtime=`date`
                 rlLog "======================= Migration finished: $endtime ========================"
 		postmemfree=`free -b | grep Mem: | awk '{print $4}'`
-		rlLog "After migration free memory : $postmemfree"
+
+                # get slapd process mem in use
+		slapdpid=`cat /var/run/dirsrv/slapd-$IPAINSTANCE.pid`
+		rlLog "slapd pid : $slapdpid"
+                slapdVmRSS=`cat /proc/$slapdpid/status | grep "VmRSS" | awk '{print $2 $3}'`
+                slapdVmHWM=`cat /proc/$slapdpid/status | grep "VmHWM" | awk '{print $2 $3}'`
+
+                rlLog "After migration free memory : $prememfree"
+                rlLog "After migration slapd VmRSS : $slapdVmRSS"
+                rlLog "After migration slapd VmHWM : $slapdVmHWM"
 	rlPhaseEnd
 }
 
 cleanup()
 {
 	rlPhaseStartTest "CLEANUP FUNCTIONAL TESTING"
-		#rlRun "ssh -o StrictHostKeyChecking=no root@$CLIENT /usr/sbin/remove-ds.pl -i $INSTANCE" 0 "Removing directory server instance"
+		rlRun "ssh -o StrictHostKeyChecking=no root@$CLIENT /usr/sbin/remove-ds.pl -i $DSINSTANCE" 0 "Removing directory server instance"
 		rlRun "ipa config-mod --enable-migration=FALSE" 0 "Set migration mode to FALSE"
 	rlPhaseEnd
 }
