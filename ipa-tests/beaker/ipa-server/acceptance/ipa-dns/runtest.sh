@@ -1297,6 +1297,46 @@ EOF
 
 	rlPhaseEnd
 
+	rlPhaseStartTest "ipa-dns-179: Bug 805871 - Incorrect SOA serial number set for forward zone during ipa-server installation."
+
+		rlLog "verifies https://bugzilla.redhat.com/show_bug.cgi?id=805871"
+		rlLog "closes https://engineering.redhat.com/trac/ipa-tests/ticket/385"
+
+		host_s=`hostname -s`
+		sshfprecord1=`ipa dnsrecord-show $DOMAIN $host_s --all --raw | grep sshfprecord | awk '{print $2,$3,$4;}' | sed -n '1p'`
+		sshfprecord2=`ipa dnsrecord-show $DOMAIN $host_s --all --raw | grep sshfprecord | awk '{print $2,$3,$4;}' | sed -n '2p'`
+
+		cat > /tmp/nsupdate.txt << EOF
+zone $DOMAIN.
+update delete $HOSTNAME. IN SSHFP
+send
+update add $HOSTNAME. 1200 IN SSHFP 1 1 AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+update add $HOSTNAME. 1200 IN SSHFP 2 1 BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB
+send
+EOF
+		rlRun "kinit -k -t /etc/krb5.keytab host/$HOSTNAME"
+		rlRun "nsupdate -g /tmp/nsupdate.txt"
+
+		rlRun "ipa dnszone-show $DOMAIN | grep -i serial | awk '{print $3;}' | wc -m | grep 11"
+		rlRun "ipa dnszone-show $DOMAIN | grep -i expire | awk '{print $3;}' | wc -m | grep 8"
+
+		# revert to original
+                cat > /tmp/nsupdate.txt << EOF
+zone $DOMAIN.
+update delete $HOSTNAME. IN SSHFP
+send
+update add $HOSTNAME. 1200 IN SSHFP $sshfprecord1
+update add $HOSTNAME. 1200 IN SSHFP $sshfprecord2
+send
+EOF
+
+		rlRun "kinit -k -t /etc/krb5.keytab host/$HOSTNAME"
+		rlRun "nsupdate -g /tmp/nsupdate.txt"
+
+		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+
+	rlPhaseEnd
+
 	rlJournalPrintText
 	report=/tmp/rhts.report.$RANDOM.txt
 	makereport $report
