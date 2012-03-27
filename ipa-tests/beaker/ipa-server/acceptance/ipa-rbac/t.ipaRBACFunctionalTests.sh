@@ -120,7 +120,7 @@ test01()
       # change user password - can
    rlPhaseStartTest "ipa-rbac-1004 - Set up user with HelpDesk Role - Can reset a user's password (bug 773759)" 
       newPwd="testtest"
-      rlRun "echo $newPwd | ipa passwd $testLogin" 0 "Verify $login can reset $testlogin's password"
+      rlRun "echo $newPwd | ipa passwd $testLogin" 0 "Verify $login can reset $testLogin's password"
    rlPhaseEnd
 
     # this user can add a user to another group, but cannot add or update a group
