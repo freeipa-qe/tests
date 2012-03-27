@@ -18,7 +18,6 @@ public class UserTasks {
 	 */
 	public static void createUser(SahiTasks sahiTasks, String uid, String givenName, String sn, String buttonToClick) {
 		sahiTasks.link("Add").click();
-		sahiTasks.link("Optional field: click to show").click();
 		sahiTasks.textbox("uid").setValue(uid);
 		sahiTasks.textbox("givenname").setValue(givenName);
 		sahiTasks.textbox("sn").setValue(sn);
@@ -35,7 +34,6 @@ public class UserTasks {
 	 */
 	public static void createInvalidUser(SahiTasks sahiTasks, String uid, String givenName, String sn, String expectedError) {
 		sahiTasks.link("Add").click();
-		sahiTasks.link("Optional field: click to show").click();
 		sahiTasks.textbox("uid").near(sahiTasks.label("User login:")).setValue(uid);
 		sahiTasks.textbox("givenname").near(sahiTasks.label("First name:")).setValue(givenName);
 		sahiTasks.textbox("sn").near(sahiTasks.label("Last name:")).setValue(sn);
@@ -63,7 +61,6 @@ public class UserTasks {
 	 */
 	public static void createInvalidCharUser(SahiTasks sahiTasks, String uid, String givenName, String sn, String expectedError) {
 		sahiTasks.link("Add").click();
-		sahiTasks.link("Optional field: click to show").click();
 		sahiTasks.textbox("uid").near(sahiTasks.label("User login:")).setValue(uid);
 		sahiTasks.textbox("givenname").near(sahiTasks.label("First name:")).setValue(givenName);
 		sahiTasks.textbox("sn").near(sahiTasks.label("Last name:")).setValue(sn);
@@ -463,7 +460,6 @@ public class UserTasks {
 	 */
 	public static void createUserThenEdit(SahiTasks sahiTasks, String uid, String givenName, String sn, String title, String mail) {
 		sahiTasks.span("Add").click();
-		sahiTasks.link("Optional field: click to show").click();
 		sahiTasks.textbox("uid").setValue(uid);
 		sahiTasks.textbox("givenname").setValue(givenName);
 		sahiTasks.textbox("sn").setValue(sn);
