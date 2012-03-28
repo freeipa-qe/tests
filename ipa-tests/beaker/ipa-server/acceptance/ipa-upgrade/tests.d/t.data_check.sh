@@ -60,7 +60,7 @@
 ######################################################################
 # test suite
 ######################################################################
-data_check
+data_check()
 {
 	local tmpout=/tmp/errormsg.out
 	rlPhaseStartTest "data_check_slave: check test data from slave"
