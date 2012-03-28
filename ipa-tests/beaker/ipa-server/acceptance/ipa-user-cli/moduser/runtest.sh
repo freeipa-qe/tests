@@ -510,9 +510,55 @@ rlJournalStart
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for empty string"
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-user-cli-mod-065: Negative - rename user with the same old name"
+    rlPhaseStartTest "ipa-user-cli-mod-065: Rename user with an existing user login."
+     testuser="testuser-065"	
+	 rlRun "ipa user-add --first=$testuser \
+                            --last=$superuserlast \
+                            --gecos=$superusergecos \
+                            --home=$superuserhome \
+                            --principal=$superuserprinc$RELM \
+                            --email=$superuseremail \
+                            --phone="$mphone" \
+                            --mobile="$mmobile" \
+                            --pager="$mpager" \
+                            --fax="$mfax" $testuser" \
+                            0 \
+                            "Adding user"
+        command="ipa user-mod --rename=$testuser $rename_user"
+        expmsg="ipa: ERROR: This entry already exists"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for existing user login"
+	rlRun "ipa user-del $testuser" 0 "Clean-up: delete $testuser account"
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-user-cli-mod-066: Renaming user updates user private group"
+	newname="testuser-066"
+        rlRun "verifyUserAttr $rename_user \"User login\" $rename_user " 0 "Verify user Login attribute for $rename_user."
+	rlRun "ipa group-find --private $rename_user > /tmp/rename_upg0.out" 0 "Verifying private group before rename"
+        rlAssertGrep "Number of entries returned 1" "/tmp/rename_upg0.out"
+        rlAssertGrep "Group name: $rename_user" "/tmp/rename_upg0.out"
+	user_gidNumber=`cat /tmp/rename_upg0.out | grep grep "GID" | cut -d " " -f 4`
+	
+        rlLog "Executing: ipa user-mod --rename=$newname $rename_user" 0 "Renaming user login to $newname"
+        rlRun "ipa user-mod --rename=$newname $rename_user" 0 "Renaming user login to $newname"
+        rlRun "verifyUserAttr $newname \"User login\" $newname " 0 "Verify user Login attribute."
+	rlRun "ipa group-find --private $newname > /tmp/rename_upg1.out" 0 "Verifying --rename updates user private group"
+        rlAssertGrep "Number of entries returned 1" "/tmp/rename_upg1.out"
+        rlAssertGrep "Group name: $newname" "/tmp/rename_upg1.out"
+	rename_gidNumber=`cat /tmp/rename_upg1.out | grep grep "GID" | cut -d " " -f 4`
+	if [ $user_gidNumber -eq $rename_gidNumber] ; then
+		rlPass "Managed entries user's private group GID remains the same after renaming."
+	else
+		rlFail "User's private group GID number of $newname expected to be $user_gidNumber.  GOT: $rename_gidNumber"
+	fi
+	rlRun "ipa group-find --private $rename_user > /tmp/rename_upg2.out" 1 "Verifying after the rename old user is removed from the user private group"
+        rlAssertGrep "Number of entries returned 0" "/tmp/rename_upg2.out"
+        rlRun "ipa user-mod --rename=$rename_user $newname" 0 "Clean-up: rename to $rename_user"
+    rlPhaseEnd
+    
+    rlPhaseStartTest "ipa-user-cli-mod-067: Negative - rename user with the same old name"
         command="ipa user-mod --rename=$rename_user $rename_user"
-        expmsg="ipa: ERROR: no modifications to be performed"
+        rlAssertGrep "Group name: $newname" "/tmp/rename_upg1.out"
+        expmsg="ipa: ERROR: no modifications to be performedl
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for $rename_user"
 	rlRun "ipa user-mod --rename=$superuser $rename_user" 0 "Clean-up: rename to $superuser"
     rlPhaseEnd
