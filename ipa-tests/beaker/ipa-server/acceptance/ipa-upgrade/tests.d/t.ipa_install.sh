@@ -44,72 +44,65 @@
 ######################################################################
 
 install_all(){
-	ipa_install_master_prep
 	ipa_install_master_all
-	#ipa_install_slave
+	ipa_install_slave_all
 	#ipa_install_client
 }
 
 install_nodns(){
-	ipa_install_master_prep
 	ipa_install_master_nodns
-	#ipa_install_slave
+	ipa_install_slave_nodns
 	#ipa_install_client
 }
 
-ipa_install_master_prep(){
-	TESTORDER=$(( TESTORDER += 1 ))
-	rlPhaseStartTest "ipa_install_master_prep: Install software and pre-req configs for IPA"
+ipa_install_server_prep(){
+	currenteth=$(route | grep ^default | awk '{print $8}')
+	ipaddr=$(ifconfig $currenteth | grep inet\ addr | sed s/:/\ /g | awk '{print $3}')
+	hostname=$(hostname)
+	hostname_s=$(hostname -s)
+
+	# Install base software
+	rlRun "yum -y install bind expect krb5-workstation bind-dyndb-ldap krb5-pkinit-openssl"
+	rlRun "yum -y install ipa-server"
+	rlRun "yum -y update"
+
+	# Set time
+	rlRun "service ntpd stop"
+	rlRun "service ntpdate start"
+
+	# Fix /etc/hosts
+	rlRun "cp -af /etc/hosts /etc/hosts.ipabackup"
+	rlRun "sed -i /^$ipaddr/d /etc/hosts"
+	rlRun "sed -i s/$hostname//g /etc/hosts"
+	rlRun "sed -i s/$hostname_s//g /etc/hosts"
+	rlRun "echo \"$ipaddr $hostname_s.$DOMAIN $hostname_s\" >> /etc/hosts"
+
+	# Fix hostname
+	rlRun "hostname $hostname_s.$DOMAIN"
+	rlRun "cp /etc/sysconfig/network /etc/sysconfig/network-ipabackup"
+	rlRun "sed -i \"/$hostname_s/d\" /etc/sysconfig/network"
+	rlRun "echo \"HOSTNAME=$hostname_s.$DOMAIN\" >> /etc/sysconfig/network"
+
+	# Backup resolv.conf
+	rlRun "cp /etc/resolv.conf /etc/resolv.conf.ipabackup"
+
+	# Disable iptables
+	rlRun "service iptables stop"
+	rlRun "service ip6tables stop"
+
 	case "$MYROLE" in
 	"MASTER")
-		currenteth=$(route | grep ^default | awk '{print $8}')
-		ipaddr=$(ifconfig $currenteth | grep inet\ addr | sed s/:/\ /g | awk '{print $3}')
-		hostname=$(hostname)
-		hostname_s=$(hostname -s)
-
-		# Install base software
-		rlRun "yum -y install bind expect krb5-workstation bind-dyndb-ldap krb5-pkinit-openssl"
-		rlRun "yum -y install ipa-server"
-		rlRun "yum -y update"
-
-		# Set time
-		rlRun "service ntpd stop"
-		rlRun "service ntpdate start"
-
-		# Fix /etc/hosts
-		rlRun "cp -af /etc/hosts /etc/hosts.ipabackup"
-		rlRun "sed -i /^$ipaddr/d /etc/hosts"
-		rlRun "sed -i s/$hostname//g /etc/hosts"
-		rlRun "sed -i s/$hostname_s//g /etc/hosts"
-		rlRun "echo \"$ipaddr $hostname_s.$DOMAIN $hostname_s\" >> /etc/hosts"
-
-		# Fix hostname
-		rlRun "hostname $hostname_s.$DOMAIN"
-		rlRun "cp /etc/sysconfig/network /etc/sysconfig/network-ipabackup"
-		rlRun "sed -i \"/$hostname_s/d\" /etc/sysconfig/network"
-		rlRun "echo \"HOSTNAME=$hostname_s.$DOMAIN\" >> /etc/sysconfig/network"
-
-		# Backup resolv.conf
-		rlRun "cp /etc/resolv.conf /etc/resolv.conf.ipabackup"
-
-		# Change MASTER variable to match hostname
+		rlLog "Machine in recipe is SLAVE"
 		export MASTER=$(hostname)
-
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $MASTER_IP"
 		;;
 	"SLAVE")
 		rlLog "Machine in recipe is SLAVE"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER_IP"
-		;;
-	"CLIENT")
-		rlLog "Machine in recipe is CLIENT"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER_IP"
+		export SLAVE=$(hostname)
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
 		;;
 	esac
-	rlPhaseEnd
 }
 
 ipa_install_master_all(){
@@ -120,7 +113,14 @@ ipa_install_master_all(){
 		rlLog "Machine in recipe is MASTER"
 
 		# Configure IPA Server
+		ipa_install_server_prep
 		rlRun "ipa-server-install --setup-dns --forwarder=$DNSFORWARD --hostname=$hostname_s.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U"
+
+		if [ -f /var/log/ipaserver-install.log ]; then
+			DATE=$(date +%Y%m%d-%H%M%S)
+			cp -f /var/log/ipaserver-install.log /var/log/ipaserver-install.log.$DATE
+			rhts-submit-log -l /var/log/ipaserver-install.log.$DATE
+		fi
 
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $MASTER_IP"
 		;;
@@ -147,7 +147,14 @@ ipa_install_master_nodns(){
 		rlLog "Machine in recipe is MASTER"
 
 		# Configure IPA Server
+		ipa_install_server_prep
 		rlRun "ipa-server-install --hostname=$hostname_s.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U"
+
+		if [ -f /var/log/ipaserver-install.log ]; then
+			DATE=$(date +%Y%m%d-%H%M%S)
+			cp -f /var/log/ipaserver-install.log /var/log/ipaserver-install.log.$DATE
+			rhts-submit-log -l /var/log/ipaserver-install.log.$DATE
+		fi
 
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $MASTER_IP"
 		;;
@@ -158,6 +165,95 @@ ipa_install_master_nodns(){
 	"CLIENT")
 		rlLog "Machine in recipe is CLIENT"
 		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER_IP"
+		;;
+	*)
+		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
+		;;
+	esac
+	rlPhaseEnd
+}
+
+ipa_install_slave_all(){
+	TESTORDER=$(( TESTORDER += 1 ))
+	rlPhaseStartTest "ipa_install_slave_all: Install and configure IPA Replica/Slave"
+	case "$MYROLE" in
+	"MASTER")
+		rlLog "Machine in recipe is MASTER"
+		rlRun "ipa-replica-prepare -p $ADMINPW --ip-address=$SLAVE_IP $SLAVE_S.$DOMAIN"
+		rlRun "rhts-sync-set -s '$FUNCNAME.1.$TESTORDER' -m $MASTER_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.2.$TESTORDER' $SLAVE_IP"
+		;;
+	"SLAVE")
+		rlLog "Machine in recipe is SLAVE"
+		rlRun "rhts-sync-block -s '$FUNCNAME.1.$TESTORDER' $MASTER_IP"
+		rlRun "AddToKnownHosts $MASTER"
+		rlLog "cd /dev/shm"
+		cd /dev/shm
+		rlRun "sftp root@$MASTER:/var/lib/ipa/replica-info-$SLAVE_S.$DOMAIN.gpg"
+		if [ -f /dev/shm/replica-info-$SLAVE_S.$DOMAIN.gpg ]; then
+			ipa_install_server_prep
+			rlRun "ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$SLAVE_S.$DOMAIN.gpg"
+		else
+			rlFail "ERROR: Replica Package not found"
+		fi
+
+		if [ -f /var/log/ipareplica-install.log ]; then
+			DATE=$(date +%Y%m%d-%H%M%S)
+			cp -f /var/log/ipareplica-install.log /var/log/ipareplica-install.log.$DATE
+			rhts-submit-log -l /var/log/ipareplica-install.log.$DATE
+		fi
+			
+		rlRun "rhts-sync-set -s '$FUNCNAME.2.$TESTORDER' -m $SLAVE_IP"
+		;;
+	"CLIENT")
+		rlLog "Machine in recipe is CLIENT"
+		rlRun "rhts-sync-block -s '$FUNCNAME.1.$TESTORDER' $MASTER_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.2.$TESTORDER' $SLAVE_IP"
+		;;
+	*)
+		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
+		;;
+	esac
+	rlPhaseEnd
+}
+
+ipa_install_slave_nodns(){
+	TESTORDER=$(( TESTORDER += 1 ))
+	rlPhaseStartTest "ipa_install_slave_nodns: Install and configure IPA Replica/Slave"
+	case "$MYROLE" in
+	"MASTER")
+		rlLog "Machine in recipe is MASTER"
+		rlRun "ipa-replica-prepare -p $ADMINPW --ip-address=$SLAVE_IP $SLAVE_S.$DOMAIN"
+		rlRun "rhts-sync-set -s '$FUNCNAME.1.$TESTORDER' -m $MASTER_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.2.$TESTORDER' $SLAVE_IP"
+		;;
+	"SLAVE")
+		rlLog "Machine in recipe is SLAVE"
+		rlRun "rhts-sync-block -s '$FUNCNAME.1.$TESTORDER' $MASTER_IP"
+		rlRun "AddToKnownHosts $MASTER"
+		rlLog "cd /dev/shm"
+		cd /dev/shm
+		rlRun "sftp root@$MASTER:/var/lib/ipa/replica-info-$SLAVE_S.$DOMAIN.gpg"
+		rlLog "Checking for existance of replica gpg file"
+		if [ -f /dev/shm/replica-info-$SLAVE_S.$DOMAIN.gpg ]; then
+			ipa_install_server_prep
+			rlRun "ipa-replica-install -U -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$SLAVE_S.$DOMAIN.gpg"
+		else
+			rlFail "ERROR: Replica Package not found"
+		fi
+
+		if [ -f /var/log/ipareplica-install.log ]; then
+			DATE=$(date +%Y%m%d-%H%M%S)
+			cp -f /var/log/ipareplica-install.log /var/log/ipareplica-install.log.$DATE
+			rhts-submit-log -l /var/log/ipareplica-install.log.$DATE
+		fi
+			
+		rlRun "rhts-sync-set -s '$FUNCNAME.2.$TESTORDER' -m $SLAVE_IP"
+		;;
+	"CLIENT")
+		rlLog "Machine in recipe is CLIENT"
+		rlRun "rhts-sync-block -s '$FUNCNAME.1.$TESTORDER' $MASTER_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.2.$TESTORDER' $SLAVE_IP"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
