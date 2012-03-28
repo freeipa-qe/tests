@@ -511,8 +511,8 @@ rlJournalStart
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-user-cli-mod-065: Rename user with an existing user login."
-     testuser="testuser-065"	
-	 rlRun "ipa user-add --first=$testuser \
+        testuser="testuser-065"	
+	rlRun "ipa user-add --first=$testuser \
                             --last=$superuserlast \
                             --gecos=$superusergecos \
                             --home=$superuserhome \
