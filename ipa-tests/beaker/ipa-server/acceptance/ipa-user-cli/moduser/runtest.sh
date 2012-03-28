@@ -496,7 +496,7 @@ rlJournalStart
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-user-cli-mod-063: Rename user and setattribute"
-        rlRun "ipa user-mod --rename=$rename_user \"users_brand-new.name$34\" --setattr displayname=cl2" 0 "Renaming user to $rename_user login and setattribute street."
+        rlRun "ipa user-mod --rename=$rename_user \"users_brand-new.name$34\" --setattr displayname=cl2" 0 "Renaming user to $rename_user login and setattribute display name."
         rlRun "verifyUserAttr $rename_user \"User login\" $rename_user" 0 "Verify user Login attribute."
         rlRun "verifyUserAttr $rename_user \"Display name\" cl2 " 0 "Verify user street attribute."
         command="ipa user-show \"users_brand-new.name$34\""
