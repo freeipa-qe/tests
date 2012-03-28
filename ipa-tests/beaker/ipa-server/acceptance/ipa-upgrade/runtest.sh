@@ -49,9 +49,9 @@ done
 startDate=`date "+%F %r"`
 satrtEpoch=`date "+%s"`
 
-[ -n "$MASTER" ] && export MASTER_IP=$(dig +short $MASTER)
-[ -n "$SLAVE" ]  && export SLAVE_IP=$(dig +short $SLAVE)
-[ -n "$CLIENT" ] && export CLIENT_IP=$(dig +short $CLIENT)
+[ -n "$MASTER" ] && export MASTER_IP=$(dig +short $MASTER) MASTER_S=$(echo $MASTER|cut -f1 -d.)
+[ -n "$SLAVE" ]  && export SLAVE_IP=$(dig +short $SLAVE)   SLAVE_S=$(echo  $SLAVE |cut -f1 -d.)
+[ -n "$CLIENT" ] && export CLIENT_IP=$(dig +short $CLIENT) CLIENT_S=$(echo $CLIENT|cut -f1 -d.)
 
 case $(hostname) in
 "$MASTER")  MYROLE="MASTER"    ;;
