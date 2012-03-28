@@ -13,6 +13,9 @@
 #   Author: Yi Zhang <yzhang@redhat.com>
 #   Date  : Sept 10, 2010
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#   Author: Asha Akkiangady <aakkiang@redhat.com>
+#   Date  : Mar 28, 2012
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
 #   Copyright (c) 2010 Red Hat, Inc. All rights reserved.
 #
@@ -434,6 +437,84 @@ rlJournalStart
         fi
         kinitAs $ADMINID $ADMINPW
 	ipa user-del $rusr&
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-user-cli-mod-055: Rename user"
+        rlRun "ipa user-mod --rename=$rename_user $superuser" 0 "Renaming user login to $rename_user"
+        rlRun "verifyUserAttr $rename_user \"User login\" $rename_user " 0 "Verify user Login attribute."
+	command="ipa user-show $superuser"
+        expmsg="ipa: ERROR: $superuser: user not found"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for $superuser"
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-user-cli-mod-056: Rename user with a string of 32 characters (at most allowed)"
+        rlRun "ipa user-mod --rename=$rename_maxlength $rename_user" 0 "Renaming user $rename_user login to $rename_maxlength"
+        rlRun "verifyUserAttr $rename_maxlength \"User login\" $rename_maxlength" 0 "Verify user Login attribute."
+        command="ipa user-show $rename_user"
+        expmsg="ipa: ERROR: $rename_user: user not found"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for $rename_user"
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-user-cli-mod-057: Rename user with a string of 33 characters (more than allowed)"
+        command="ipa user-mod --rename=$rename_exceedmax $rename_maxlength"
+        expmsg="ipa: ERROR: invalid 'rename': can be at most 32 characters"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --rename=$rename_exceedmax"
+	# Remove the below line when bug 807417 is fixed.
+	rlRun "ipa user-mod --rename=$rename_maxlength $rename_exceedmax" 0 "Renaming user to $rename_maxlength"
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-user-cli-mod-058: Rename user with a invalid character - #"
+        command="ipa user-mod --rename=newname# $rename_maxlength"
+        expmsg="ipa: ERROR: invalid 'rename': may only include letters, numbers, _, -, . and $"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --rename=newname#"
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-user-cli-mod-059: Rename user with a invalid character - @"
+        command="ipa user-mod --rename=newname@ $rename_maxlength"
+        expmsg="ipa: ERROR: invalid 'rename': may only include letters, numbers, _, -, . and $"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --rename=newname@"
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-user-cli-mod-060: Rename user with a invalid character - *"
+        command="ipa user-mod --rename=newname* $rename_maxlength"
+        expmsg="ipa: ERROR: invalid 'rename': may only include letters, numbers, _, -, . and $"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --rename=newname*"
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-user-cli-mod-061: Rename user with a invalid character - ?"
+        command="ipa user-mod --rename=newname? $rename_maxlength"
+        expmsg="ipa: ERROR: invalid 'rename': may only include letters, numbers, _, -, . and $"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --rename=newname?"
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-user-cli-mod-062: Rename user with string containing letters, numbers, _, -, . and $"
+	rlRun "ipa user-mod --rename=\"users_brand-new.name$34\" $rename_maxlength" 0 "Renaming user $rename_maxlength login to \"users_brand-new.name$34\""
+        rlRun "verifyUserAttr \"users_brand-new.name$34\" \"User login\" \"users_brand-new.name$34\"" 0 "Verify user Login attribute."
+        command="ipa user-show $rename_maxlength"
+        expmsg="ipa: ERROR: $rename_maxlength: user not found"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for $rename_maxlength"
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-user-cli-mod-063: Rename user and setattribute"
+        rlRun "ipa user-mod --rename=$rename_user \"users_brand-new.name$34\" --setattr displayname=cl2" 0 "Renaming user to $rename_user login and setattribute street."
+        rlRun "verifyUserAttr $rename_user \"User login\" $rename_user" 0 "Verify user Login attribute."
+        rlRun "verifyUserAttr $rename_user \"Display name\" cl2 " 0 "Verify user street attribute."
+        command="ipa user-show \"users_brand-new.name$34\""
+        expmsg="ipa: ERROR: \"users_brand-new.name$34\": user not found"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for \"users_brand-new.name$34\""
+    rlPhaseEnd
+	
+    rlPhaseStartTest "ipa-user-cli-mod-064: Rename user with empty string."
+        command="ipa user-mod --rename= $rename_user"
+        expmsg="ipa: ERROR: invalid 'rename': can't be empty"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for empty string"
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-user-cli-mod-065: Negative - rename user with the same old name"
+        command="ipa user-mod --rename=$rename_user $rename_user"
+        expmsg="ipa: ERROR: no modifications to be performed"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for $rename_user"
+	rlRun "ipa user-mod --rename=$superuser $rename_user" 0 "Clean-up: rename to $superuser"
     rlPhaseEnd
 
     rlPhaseStartCleanup "ipa-user-cli-mod-cleanup"
