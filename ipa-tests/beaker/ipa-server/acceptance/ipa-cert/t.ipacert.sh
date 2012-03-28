@@ -50,8 +50,9 @@ cert_remove_hold_1001()
         local testID="cert_remove_hold_1001"
         local tmpout=$TmpDir/cert_remove_hold_1001.$RANDOM.out
         create_cert
+        echo $certList
         KinitAsAdmin
-        local certid=`tail -n1 $certList | cut -d"=" -f2 | xargs echo`
+        local certid=`tail -n1 $certList | cut -d"=" -f2|cut -d" " -f1 | xargs echo`
         rlRun "ipa cert-revoke $certid --revocation-reason=6" 0 "set revoke reason to 6 -- this is only reason we can remove hold"
         ipa cert-show $certid > $tmpout
         reason=`grep -i "Revocation reason" $tmpout | cut -d":" -f2 | xargs echo`
@@ -88,7 +89,7 @@ cert_remove_hold_1002()
         do
             rlLog "============= [revocation reason = $revokeCode ] ==============="
             create_cert
-            local certid=`tail -n1 $certList | cut -d"=" -f2 | xargs echo`
+            local certid=`tail -n1 $certList | cut -d"=" -f2|cut -d" " -f1 | xargs echo`
             KinitAsAdmin
             rlRun "ipa cert-revoke $certid --revocation-reason=$revokeCode" 0 "set revoke reason to [$revokeCode], cert should not be able to reuse"
             ipa cert-show $certid > $tmpout
@@ -460,8 +461,8 @@ cert_request_1009()
             cat $certfile
             return
         fi
-        oldCert=`cat $certfile | head -n1 | cut -d"=" -f2`
-        newCert=`cat $certfile | tail -n1 | cut -d"=" -f2` 
+        oldCert=`cat $certfile | head -n1 | cut -d"=" -f2 |cut -d" " -f1`
+        newCert=`cat $certfile | tail -n1 | cut -d"=" -f2 |cut -d" " -f1`
         revokeReasonOld=`ipa cert-show $oldCert | grep "Revocation reason" | cut -d":" -f2 | xargs echo`
         if [ "$revokeReasonOld" = "4" ];then
             rlLog "old cert [$oldCert] revoked as reason 4, this is expected, verification continue"
@@ -530,7 +531,7 @@ cert_revoke_1001()
         local expectedErrCode=0
         create_cert
         local validCert=`tail -n1 $certList`
-        local certid=`echo $validCert| cut -d"=" -f2`
+        local certid=`echo $validCert| cut -d"=" -f2 | cut -d" " -f1`
         rlLog "certid=[$certid]";
         echo "================ cert list =============";
         cat  $certList
@@ -561,7 +562,7 @@ cert_revoke_1002()
         do
             create_cert
             local validCert=`tail -n1 $certList`
-            local certid=`echo $validCert| cut -d"=" -f2`
+            local certid=`echo $validCert| cut -d"=" -f2 | cut -d" " -f1`
             rlLog "revoke cert [$certid] with revoke reason [$reason]"
             KinitAsAdmin
             ipa cert-revoke $certid --revocation-reason=$reason
@@ -741,17 +742,24 @@ cert_status_1001()
         KinitAsAdmin
         for cert in `cat $certList`
         do
-            local cert_principal=`echo $cert | cut -d"=" -f1`
-            local certid=`echo $cert | cut -d"=" -f2`
-            ipa cert-status $certid 2>&1 >$tmpout
-            if     grep -i "Request id: $certid" $tmpout \
+            echo $cert
+            local word=service
+            echo "$cert" | grep -q "$word"
+            if [ $? -eq 0 ];then
+             local cert_principal=`echo $cert | cut -d"=" -f1`
+             local certid=`echo $cert | cut -d"=" -f2`
+             ipa cert-status $certid 2>&1 >$tmpout
+             if     grep -i "Request id: $certid" $tmpout \
                 && grep -i "Request status: complete" $tmpout ;then
                 rlPass "status check pass for cert id [$certid]"
-            else
+             else
                 rlFail "status check failed for cert id [$certid]"
                 echo "=========== output ================"
                 cat $tmpout
                 echo "==================================="
+             fi
+            else
+               rlLog "hexadecimal number cannot be used for ipa cert-status"
             fi
         done
         Kcleanup
