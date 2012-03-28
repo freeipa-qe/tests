@@ -60,38 +60,60 @@
 ######################################################################
 # test suite
 ######################################################################
-data_check()
+data_check
 {
-	TESTORDER=$(( TESTORDER += 1 ))
-	rlPhaseStartTest "upgrade_data_check: add test data to IPA"
-	case "$MYROLE" in
-	"MASTER")
-		rlLog "Machine in recipe is MASTER"
+	local tmpout=/tmp/errormsg.out
+	rlPhaseStartTest "data_check_slave: check test data from slave"
+		TESTORDER=$(( TESTORDER += 1 ))
+		currenteth=$(route | grep ^default | awk '{print $8}')
+		ipaddr=$(ifconfig $currenteth | grep inet\ addr | sed s/:/\ /g | awk '{print $3}')
+
+		rlLog "Machine in recipe is $MYROLE ($HOSTNAME)"
 		KinitAsAdmin
 		
 		# check  users
 		rlRun "ipa user-show ${user[1]}" 
 		rlRun "ipa user-show ${user[2]}" 
+		rlRun "id ${user[1]}"
+		rlRun "id ${user[2]}"
 
 		# check  groups
 		rlRun "ipa group-show ${group[1]}"
 		rlRun "ipa group-show ${group[2]}"
+		rlRun "getent group ${group[1]}"
+		rlRun "getent group ${group[2]}"
 
 		# check  DNS Records (PTR)
 		rlRun "ipa dnszone-show ${dnsptr[1]}"
 		rlRun "ipa dnszone-show ${dnsptr[2]}"
+		rlRun "dig +short ${dnsptr[1]} ns > $tmpout 2>&1"
+		rlRun "cat $tmpout"
+		rlAssertGrep "$MASTER_S.$DOMAIN" $tmpout
+		rlRun "dig +short ${dnsptr[2]} ns > $tmpout 2>&1"
+		rlRun "cat $tmpout"
+		rlAssertGrep "$MASTER_S.$DOMAIN" $tmpout
 
 		# check  hosts
 		rlRun "ipa host-show ${host[1]}"
 		rlRun "ipa host-show ${host[2]}"
+		rlRun "dig +short ${host[1]} a > $tmpout 2>&1"
+		rlRun "cat $tmpout"
+		rlAssertGrep "${ipv4[1]}" $tmpout
+		rlRun "dig +short ${host[2]} a > $tmpout 2>&1"
+		rlRun "cat $tmpout"
+		rlAssertGrep "${ipv4[2]}" $tmpout
 
 		# check  hostgroups
 		rlRun "ipa hostgroup-show ${hostgroup[1]}"
 		rlRun "ipa hostgroup-show ${hostgroup[2]}"
+		rlRun "getent -s sss netgroup ${hostgroup[1]}"
+		rlRun "getent -s sss netgroup ${hostgroup[2]}"
 
 		# check  netgroups
 		rlRun "ipa netgroup-show ${netgroup[1]}"
 		rlRun "ipa netgroup-show ${netgroup[2]}"
+		rlRun "getent -s sss netgroup ${netgroup[1]}"
+		rlRun "getent -s sss netgroup ${netgroup[2]}"
 		
 		# check  automount
 		rlRun "ipa automountlocation-show testloc"
@@ -109,19 +131,7 @@ data_check()
 			done
 		done
 
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $MASTER_IP"
-		;;
-	"SLAVE")
-		rlLog "Machine in recipe is SLAVE"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER_IP"
-		;;
-	"CLIENT")
-		rlLog "Machine in recipe is CLIENT"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER_IP"
-		;;
-	*)
-		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
-		;;
-	esac
+		rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $ipaddr
+		rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER_IP $SLAVE_IP $CLIENT_IP
 	rlPhaseEnd
 }
