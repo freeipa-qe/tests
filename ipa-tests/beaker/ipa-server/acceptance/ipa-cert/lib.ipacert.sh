@@ -119,13 +119,16 @@ create_cert_request_file()
 delete_cert()
 {
     rlRun "KinitAsAdmin" 0 "kinit as admin"
+    cat $certList
     for cert in `cat $certList`
     do
         echo "line:[$cert]"
+        if [ "$cert" == service* ];then
         local cert_principal=`echo $cert | cut -d"=" -f1`
         local cert_id=`echo $cert | cut -d"=" -f2`
         rlLog "remove the service and revoke the cert [$cert_principal $cert_id"
-        rlRun "ipa service-del $cert_principal" 0 "remove service $cert_principal"
+        rlRun "ipa service-del $cert_principal" 0 "remove service $cert_principal";
+        fi
     done
     echo "" > $certList #clear up the cert list file
     rlRun "Kcleanup" 0 "clear kerberos tkts"
