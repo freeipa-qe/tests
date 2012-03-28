@@ -152,6 +152,7 @@ rlJournalStart
 				echo "$moreseconds seconds added to this reservation under jobid of $JOBID."
 				export $moreseconds
 				send_extended_email
+				rm -f /tmp/ipa-reservation-extend-seconds.dat
 			fi
 			if [ $timediff -gt $RESERVETIME ]; then
 				rescomplete=0

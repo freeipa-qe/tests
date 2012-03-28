@@ -28,11 +28,14 @@ export TESTVERSION=1.1
 
 BUILT_FILES=
 
-FILES=$(METADATA) Makefile PURPOSE 
+FILES=$(METADATA) Makefile PURPOSE extendreservation.sh 
 
 .PHONY: all install download clean
 
 run: $(FILES) build
+	rm -f /bin/extendreservation.sh
+	cp ./extendreservation.sh /bin/.
+	chmod 755 /bin/extendreservation.sh
 	./runtest.sh
 
 build: $(BUILT_FILES)
