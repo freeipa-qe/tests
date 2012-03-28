@@ -271,17 +271,6 @@ ipa_install_client(){
 	case "$MYROLE" in
 	"MASTER")
 		rlLog "Machine in recipe is MASTER"
-
-		# Configure IPA Server
-		ipa_install_prep
-		rlRun "ipa-client-install --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW -U --server=$MASTER"
-
-		if [ -f /var/log/ipaserver-install.log ]; then
-			DATE=$(date +%Y%m%d-%H%M%S)
-			cp -f /var/log/ipaserver-install.log /var/log/ipaserver-install.log.$DATE
-			rhts-submit-log -l /var/log/ipaserver-install.log.$DATE
-		fi
-
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $MASTER_IP"
 		;;
 	"SLAVE")
@@ -290,6 +279,17 @@ ipa_install_client(){
 		;;
 	"CLIENT")
 		rlLog "Machine in recipe is CLIENT"
+
+		# Configure IPA CLIENT
+		ipa_install_prep
+		rlRun "ipa-client-install --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW -U --server=$MASTER_S.$DOMAIN"
+
+		if [ -f /var/log/ipaclient-install.log ]; then
+			DATE=$(date +%Y%m%d-%H%M%S)
+			cp -f /var/log/ipaclient-install.log /var/log/ipaclient-install.log.$DATE
+			rhts-submit-log -l /var/log/ipaclient-install.log.$DATE
+		fi
+
 		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER_IP"
 		;;
 	*)
