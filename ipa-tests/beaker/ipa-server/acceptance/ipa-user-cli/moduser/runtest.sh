@@ -530,7 +530,7 @@ rlJournalStart
 	rlRun "ipa user-del $testuser" 0 "Clean-up: delete $testuser account"
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-user-cli-mod-066: Renaming user updates user private group"
+    rlPhaseStartTest "ipa-user-cli-mod-066: Renaming a user updates user private group"
 	newname="testuser-066"
         rlRun "verifyUserAttr $rename_user \"User login\" $rename_user " 0 "Verify user Login attribute for $rename_user."
 	rlRun "ipa group-find --private $rename_user > /tmp/rename_upg0.out" 0 "Verifying private group before rename"
