@@ -63,7 +63,7 @@
 data_check()
 {
 	local tmpout=/tmp/errormsg.out
-	rlPhaseStartTest "data_check_slave: check test data from slave"
+	rlPhaseStartTest "data_check: check test data"
 		TESTORDER=$(( TESTORDER += 1 ))
 		currenteth=$(route | grep ^default | awk '{print $8}')
 		ipaddr=$(ifconfig $currenteth | grep inet\ addr | sed s/:/\ /g | awk '{print $3}')
