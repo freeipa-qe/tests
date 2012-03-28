@@ -1337,6 +1337,68 @@ EOF
 
 	rlPhaseEnd
 
+	rlPhaseStartTest "ipa-dns-180: Bug 701677 - Allow specifying query and transfer policy settings for a zone."
+
+		rlLog "verifies https://bugzilla.redhat.com/show_bug.cgi?id=701677"
+		rlLog "closes https://engineering.redhat.com/trac/ipa-tests/ticket/182"
+
+		currenteth=$(/sbin/ip -6 route show | grep ^default | awk '{print $5}' | head -1)
+		MASTERIP=`dig +short $HOSTNAME`
+		MASTERIP6=`ifconfig $currenteth | grep "inet6 " | grep -E 'Scope:Site|Scope:Global' | awk '{print $3}' | awk -F / '{print $1}' | sed -n '1p'`
+
+		rlRun "ipa dnszone-add example.com --name-server=$HOSTNAME --admin-email=$email"
+
+		# Tests allow query '--allow-query'
+		rlRun "echo \"ipa dnszone-mod example.com --allow-query='$MASTERIP;\!$MASTERIP6;'\" > /var/tmp/allow-query.sh"
+		sed -i 's/\\//g' /var/tmp/allow-query.sh
+		chmod +x /var/tmp/allow-query.sh
+		rlRun "/var/tmp/allow-query.sh"
+
+		rlRun "service named restart"
+
+		rlRun "dig @$MASTERIP -t soa example.com | grep -i \"ANSWER SECTION\"" 0 "Allow query from $MASTERIP passed, as expected"
+		rlRun "dig @$MASTERIP6 -t soa example.com | grep -i \"ANSWER SECTION\"" 1 "Allow query from $MASTERIP6 failed, as expected"
+
+                rlRun "echo \"ipa dnszone-mod example.com --allow-query='$MASTERIP6;\!$MASTERIP;'\" > /var/tmp/allow-query.sh"
+                sed -i 's/\\//g' /var/tmp/allow-query.sh
+                chmod +x /var/tmp/allow-query.sh
+                rlRun "/var/tmp/allow-query.sh"
+
+                rlRun "service named restart"
+
+                rlRun "dig @$MASTERIP -t soa example.com | grep -i \"ANSWER SECTION\"" 1 "Allow query from $MASTERIP failed, as expected"
+                rlRun "dig @$MASTERIP6 -t soa example.com | grep -i \"ANSWER SECTION\"" 0 "Allow query from $MASTERIP6 passed, as expected"
+
+		# Resetting to 'any'
+                rlRun "ipa dnszone-mod example.com --allow-query='any;'"
+
+		# Tests transfer policy '--allow-transfer'
+		rlRun "echo \"ipa dnszone-mod example.com --allow-transfer='$MASTERIP;\!$MASTERIP6;'\" > /var/tmp/allow-transfer.sh"
+                sed -i 's/\\//g' /var/tmp/allow-transfer.sh
+                chmod +x /var/tmp/allow-transfer.sh
+                rlRun "/var/tmp/allow-transfer.sh"
+
+                rlRun "service named restart"
+
+                rlRun "dig @$MASTERIP example.com axfr | grep -i \"Transfer failed\"" 1 "Allow zone transfer from $MASTERIP failed, as expected"
+                rlRun "dig @$MASTERIP6 example.com axfr | grep -i \"Transfer failed\"" 0 "Allow zone transfer from $MASTERIP6 passed, as expected"
+        
+                rlRun "echo \"ipa dnszone-mod example.com --allow-transfer='$MASTERIP6;\!$MASTERIP;'\" > /var/tmp/allow-query.sh"
+                sed -i 's/\\//g' /var/tmp/allow-query.sh
+                chmod +x /var/tmp/allow-query.sh
+                rlRun "/var/tmp/allow-query.sh"
+
+                rlRun "service named restart"
+
+                rlRun "dig @$MASTERIP example.com axfr | grep -i \"Transfer failed\"" 0 "Allow zone transfer from $MASTERIP passed, as expected" 
+                rlRun "dig @$MASTERIP6 example.com axfr | grep -i \"Transfer failed\"" 1 "Allow zone transfer from $MASTERIP6 failed, as expected"
+
+		# removing zone
+		rlRun "ipa dnszone-del example.com"
+
+
+	rlPhaseEnd
+
 	rlJournalPrintText
 	report=/tmp/rhts.report.$RANDOM.txt
 	makereport $report
