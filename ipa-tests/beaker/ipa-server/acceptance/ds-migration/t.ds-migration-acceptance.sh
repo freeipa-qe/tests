@@ -389,6 +389,10 @@ bugzillas()
                 ipa group-del $GROUP1
                 ipa group-del $GROUP2
 	rlPhaseEnd
+
+	rlPhaseStartTest "bz753966 unable to delete migrated groups containing spaces"
+		rlRun "ipa group-del \"HR Managers\" \"PD Managers\" \"QA Managers\"" 0 "Delete migrated groups with spaces in the group names"
+	rlPhaseEnd
 }
 
 cleartxtpwdmigration()
