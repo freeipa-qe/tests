@@ -536,19 +536,19 @@ rlJournalStart
 	rlRun "ipa group-find --private $rename_user > /tmp/rename_upg0.out" 0 "Verifying private group before rename"
         rlAssertGrep "Number of entries returned 1" "/tmp/rename_upg0.out"
         rlAssertGrep "Group name: $rename_user" "/tmp/rename_upg0.out"
-	user_gidNumber=`cat /tmp/rename_upg0.out | grep grep "GID" | cut -d " " -f 4`
-	
+	user_gidnumber=`cat /tmp/rename_upg0.out | grep grep "GID" | cut -d " " -f 4`
+ 	rlLog "GID number for $rename_user is $user_gidnumber"
         rlLog "Executing: ipa user-mod --rename=$newname $rename_user" 0 "Renaming user login to $newname"
         rlRun "ipa user-mod --rename=$newname $rename_user" 0 "Renaming user login to $newname"
         rlRun "verifyUserAttr $newname \"User login\" $newname " 0 "Verify user Login attribute."
 	rlRun "ipa group-find --private $newname > /tmp/rename_upg1.out" 0 "Verifying --rename updates user private group"
         rlAssertGrep "Number of entries returned 1" "/tmp/rename_upg1.out"
         rlAssertGrep "Group name: $newname" "/tmp/rename_upg1.out"
-	rename_gidNumber=`cat /tmp/rename_upg1.out | grep grep "GID" | cut -d " " -f 4`
-	if [ $user_gidNumber -eq $rename_gidNumber] ; then
+	rename_gidnumber=`cat /tmp/rename_upg1.out | grep grep "GID" | cut -d " " -f 4`
+	if [ $user_gidnumber -eq $rename_gidnumber] ; then
 		rlPass "Managed entries user's private group GID remains the same after renaming."
 	else
-		rlFail "User's private group GID number of $newname expected to be $user_gidNumber.  GOT: $rename_gidNumber"
+		rlFail "User's private group GID number of $newname expected to be $user_gidnumber.  GOT: $rename_gidnumber"
 	fi
 	rlRun "ipa group-find --private $rename_user > /tmp/rename_upg2.out" 1 "Verifying after the rename old user is removed from the user private group"
         rlAssertGrep "Number of entries returned 0" "/tmp/rename_upg2.out"
