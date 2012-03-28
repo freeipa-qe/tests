@@ -29,8 +29,8 @@ request()
     request_1008	#scenario: [ipa-getcert request -d -n  -t -I -r -N -K -U -D -E]	data: [CertTokenName negative]
     request_1009	#scenario: [ipa-getcert request -d -n  -t -g -R -N -K -U -D -E]	data: [CertTokenName negative]
     request_1010	#scenario: [ipa-getcert request -d -n  -t -g -r -N -K -U -D -E]	data: [CertTokenName negative]
-    request_1011	#scenario: [ipa-getcert request -d -n  -t -I -R -N -K -U -D -E]	data: [CertRequestNickName negative]
-    request_1012	#scenario: [ipa-getcert request -d -n  -t -I -r -N -K -U -D -E]	data: [CertRequestNickName negative]
+    #request_1011	#scenario: [ipa-getcert request -d -n  -t -I -R -N -K -U -D -E]	data: [CertRequestNickName negative]
+    #request_1012	#scenario: [ipa-getcert request -d -n  -t -I -r -N -K -U -D -E]	data: [CertRequestNickName negative]
     request_1013	#scenario: [ipa-getcert request -d -n  -t -I -R -N -K -U -D -E]	data: [CertPrincipalName negative]
     request_1014	#scenario: [ipa-getcert request -d -n  -t -I -R -N -K -U -D -E]	data: [EXTUSAGE negative]
     request_1015	#scenario: [ipa-getcert request -d -n  -t -I -R -N -K -U -D -E]	data: all positive
@@ -64,8 +64,8 @@ request()
     request_1043	#scenario: [ipa-getcert request -k -f  -p -g -R -N -K -U -D -E]	data: [PemCertFile negative]
     request_1044	#scenario: [ipa-getcert request -k -f  -p -g -r -N -K -U -D -E]	data: [PemCertFile negative]
     request_1045	#scenario: [ipa-getcert request -k -f]	data: all positive
-    request_1046	#scenario: [ipa-getcert request -k -f  -P -I -R -N -K -U -D -E]	data: [CertRequestNickName negative]
-    request_1047	#scenario: [ipa-getcert request -k -f  -P -I -r -N -K -U -D -E]	data: [CertRequestNickName negative]
+    #request_1046	#scenario: [ipa-getcert request -k -f  -P -I -R -N -K -U -D -E]	data: [CertRequestNickName negative]
+    #request_1047	#scenario: [ipa-getcert request -k -f  -P -I -r -N -K -U -D -E]	data: [CertRequestNickName negative]
     request_1048	#scenario: [ipa-getcert request -k -f  -P -I -R -N -K -U -D -E]	data: [CertPrincipalName negative]
     request_1049	#scenario: [ipa-getcert request -k -f  -P -I -R -N -K -U -D -E]	data: [EXTUSAGE negative]
     request_1050	#scenario: [ipa-getcert request -k -f  -P -I -R -N -K -U -D -E]	data: all positive
@@ -84,8 +84,8 @@ request()
     request_1063	#scenario: [ipa-getcert request -k -f  -p -I -r -N -K -U -D -E]	data: [PINFILE negative]
     request_1064	#scenario: [ipa-getcert request -k -f  -p -g -R -N -K -U -D -E]	data: [PINFILE negative]
     request_1065	#scenario: [ipa-getcert request -k -f  -p -g -r -N -K -U -D -E]	data: [PINFILE negative]
-    request_1066	#scenario: [ipa-getcert request -k -f  -p -I -R -N -K -U -D -E]	data: [CertRequestNickName negative]
-    request_1067	#scenario: [ipa-getcert request -k -f  -p -I -r -N -K -U -D -E]	data: [CertRequestNickName negative]
+    #request_1066	#scenario: [ipa-getcert request -k -f  -p -I -R -N -K -U -D -E]	data: [CertRequestNickName negative]
+    #request_1067	#scenario: [ipa-getcert request -k -f  -p -I -r -N -K -U -D -E]	data: [CertRequestNickName negative]
     request_1068	#scenario: [ipa-getcert request -k -f  -p -I -R -N -K -U -D -E]	data: [CertPrincipalName negative]
     request_1069	#scenario: [ipa-getcert request -k -f  -p -I -R -N -K -U -D -E]	data: [EXTUSAGE negative]
     request_1070	#scenario: [ipa-getcert request -k -f  -p -I -R -N -K -U -D -E]	data: all positive
@@ -3976,8 +3976,8 @@ start_tracking()
     start_tracking_1005	#scenario: [ipa-getcert start-tracking -d -n -t -I -U -K -D -E -R]	data: [CertTokenName negative]
     start_tracking_1006	#scenario: [ipa-getcert start-tracking -d -n -t -I -U -K -D -E -r]	data: [CertTokenName negative]
     start_tracking_1007	#scenario: [ipa-getcert start-tracking -d -n -t]	data: all positive
-    start_tracking_1008	#scenario: [ipa-getcert start-tracking -d -n -t -I -U -K -D -E -R]	data: [TrackingRequestNickName negative]
-    start_tracking_1009	#scenario: [ipa-getcert start-tracking -d -n -t -I -U -K -D -E -r]	data: [TrackingRequestNickName negative]
+    #start_tracking_1008	#scenario: [ipa-getcert start-tracking -d -n -t -I -U -K -D -E -R]	data: [TrackingRequestNickName negative]
+    #start_tracking_1009	#scenario: [ipa-getcert start-tracking -d -n -t -I -U -K -D -E -r]	data: [TrackingRequestNickName negative]
     start_tracking_1010	#scenario: [ipa-getcert start-tracking -d -n -t -I -U -K -D -E -R]	data: [EXTUSAGE negative]
     start_tracking_1011	#scenario: [ipa-getcert start-tracking -d -n -t -I -U -K -D -E -r]	data: [EXTUSAGE negative]
     start_tracking_1012	#scenario: [ipa-getcert start-tracking -d -n -t -I -U -K -D -E -R]	data: [CertPrincipalName negative]
@@ -3988,8 +3988,8 @@ start_tracking()
     start_tracking_1017	#scenario: [ipa-getcert start-tracking -i -I -U -K -D -E -R]	data: [ExistingTrackingRequestNickName negative]
     start_tracking_1018	#scenario: [ipa-getcert start-tracking -i -I -U -K -D -E -r]	data: [ExistingTrackingRequestNickName negative]
     start_tracking_1019	#scenario: [ipa-getcert start-tracking -i]	data: all positive
-    start_tracking_1020	#scenario: [ipa-getcert start-tracking -i -I -U -K -D -E -R]	data: [TrackingRequestNickName negative]
-    start_tracking_1021	#scenario: [ipa-getcert start-tracking -i -I -U -K -D -E -r]	data: [TrackingRequestNickName negative]
+    #start_tracking_1020	#scenario: [ipa-getcert start-tracking -i -I -U -K -D -E -R]	data: [TrackingRequestNickName negative]
+    #start_tracking_1021	#scenario: [ipa-getcert start-tracking -i -I -U -K -D -E -r]	data: [TrackingRequestNickName negative]
     start_tracking_1022	#scenario: [ipa-getcert start-tracking -i -I -U -K -D -E -R]	data: [EXTUSAGE negative]
     start_tracking_1023	#scenario: [ipa-getcert start-tracking -i -I -U -K -D -E -r]	data: [EXTUSAGE negative]
     start_tracking_1024	#scenario: [ipa-getcert start-tracking -i -I -U -K -D -E -R]	data: [CertPrincipalName negative]
@@ -4015,8 +4015,8 @@ start_tracking()
     start_tracking_1044	#scenario: [ipa-getcert start-tracking -k -f -p -I -U -K -D -E -R]	data: [PemCertFile negative]
     start_tracking_1045	#scenario: [ipa-getcert start-tracking -k -f -p -I -U -K -D -E -r]	data: [PemCertFile negative]
     start_tracking_1046	#scenario: [ipa-getcert start-tracking -k -f]	data: all positive
-    start_tracking_1047	#scenario: [ipa-getcert start-tracking -k -f -I -U -K -D -E -R]	data: [TrackingRequestNickName negative]
-    start_tracking_1048	#scenario: [ipa-getcert start-tracking -k -f -I -U -K -D -E -r]	data: [TrackingRequestNickName negative]
+    #start_tracking_1047	#scenario: [ipa-getcert start-tracking -k -f -I -U -K -D -E -R]	data: [TrackingRequestNickName negative]
+    #start_tracking_1048	#scenario: [ipa-getcert start-tracking -k -f -I -U -K -D -E -r]	data: [TrackingRequestNickName negative]
     start_tracking_1049	#scenario: [ipa-getcert start-tracking -k -f -I -U -K -D -E -R]	data: [EXTUSAGE negative]
     start_tracking_1050	#scenario: [ipa-getcert start-tracking -k -f -I -U -K -D -E -r]	data: [EXTUSAGE negative]
     start_tracking_1051	#scenario: [ipa-getcert start-tracking -k -f -I -U -K -D -E -R]	data: [CertPrincipalName negative]
@@ -4024,8 +4024,8 @@ start_tracking()
     start_tracking_1053	#scenario: [ipa-getcert start-tracking -k -f -I -U -K -D -E -R]	data: all positive
     start_tracking_1054	#scenario: [ipa-getcert start-tracking -k -f -I -U -K -D -E -r]	data: all positive
     start_tracking_1055	#scenario: [ipa-getcert start-tracking -k -f -P]	data: all positive
-    start_tracking_1056	#scenario: [ipa-getcert start-tracking -k -f -P -I -U -K -D -E -R]	data: [TrackingRequestNickName negative]
-    start_tracking_1057	#scenario: [ipa-getcert start-tracking -k -f -P -I -U -K -D -E -r]	data: [TrackingRequestNickName negative]
+    #start_tracking_1056	#scenario: [ipa-getcert start-tracking -k -f -P -I -U -K -D -E -R]	data: [TrackingRequestNickName negative]
+    #start_tracking_1057	#scenario: [ipa-getcert start-tracking -k -f -P -I -U -K -D -E -r]	data: [TrackingRequestNickName negative]
     start_tracking_1058	#scenario: [ipa-getcert start-tracking -k -f -P -I -U -K -D -E -R]	data: [EXTUSAGE negative]
     start_tracking_1059	#scenario: [ipa-getcert start-tracking -k -f -P -I -U -K -D -E -r]	data: [EXTUSAGE negative]
     start_tracking_1060	#scenario: [ipa-getcert start-tracking -k -f -P -I -U -K -D -E -R]	data: [CertPrincipalName negative]
@@ -4036,8 +4036,8 @@ start_tracking()
     start_tracking_1065	#scenario: [ipa-getcert start-tracking -k -f -p -I -U -K -D -E -R]	data: [PINFILE negative]
     start_tracking_1066	#scenario: [ipa-getcert start-tracking -k -f -p -I -U -K -D -E -r]	data: [PINFILE negative]
     start_tracking_1067	#scenario: [ipa-getcert start-tracking -k -f -p]	data: all positive
-    start_tracking_1068	#scenario: [ipa-getcert start-tracking -k -f -p -I -U -K -D -E -R]	data: [TrackingRequestNickName negative]
-    start_tracking_1069	#scenario: [ipa-getcert start-tracking -k -f -p -I -U -K -D -E -r]	data: [TrackingRequestNickName negative]
+    #start_tracking_1068	#scenario: [ipa-getcert start-tracking -k -f -p -I -U -K -D -E -R]	data: [TrackingRequestNickName negative]
+    #start_tracking_1069	#scenario: [ipa-getcert start-tracking -k -f -p -I -U -K -D -E -r]	data: [TrackingRequestNickName negative]
     start_tracking_1070	#scenario: [ipa-getcert start-tracking -k -f -p -I -U -K -D -E -R]	data: [EXTUSAGE negative]
     start_tracking_1071	#scenario: [ipa-getcert start-tracking -k -f -p -I -U -K -D -E -r]	data: [EXTUSAGE negative]
     start_tracking_1072	#scenario: [ipa-getcert start-tracking -k -f -p -I -U -K -D -E -R]	data: [CertPrincipalName negative]
