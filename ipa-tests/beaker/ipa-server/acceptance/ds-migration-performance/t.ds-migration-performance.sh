@@ -20,6 +20,14 @@ setup()
         rlPhaseStartTest "SETUP FUNCTIONAL TESTING"
 		rlLog "Compat Plugin Enabled Mode :: $COMPAT"
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials"
+
+		# turn up the memory cache size
+		service dirsrv stop
+		cp /etc/dirsrv/slapd-$IPAINSTANCE/dse.ldif /tmp/dse.ldif
+		cat /tmp/dse.ldif | sed 's/10485760/20971520/g' > /etc/dirsrv/slapd-$IPAINSTANCE/dse.ldif
+		service dirsrv start
+		cat /etc/dirsrv/slapd-$IPAINSTANCE/dse.ldif | grep 20971520
+
                 rlRun "ipa config-mod --enable-migration=TRUE" 0 "Set migration mode to TRUE"
 
 		echo $COMPAT | grep "FALSE"
@@ -101,7 +109,6 @@ perftest()
 cleanup()
 {
 	rlPhaseStartTest "CLEANUP FUNCTIONAL TESTING"
-		rlRun "ssh -o StrictHostKeyChecking=no root@$CLIENT /usr/sbin/remove-ds.pl -i $DSINSTANCE" 0 "Removing directory server instance"
 		rlRun "ipa config-mod --enable-migration=FALSE" 0 "Set migration mode to FALSE"
 	rlPhaseEnd
 }
