@@ -1,8 +1,7 @@
 # Yum Repos
 repo[1]=http://download.devel.redhat.com/nightly/latest-RHEL6.3/6.3/Server/x86_64/os/
 repo[2]=http://download.devel.redhat.com/nightly/latest-RHEL6.3/6.3/Server/optional/x86_64/os/
-repo[3]=http://cosmos.lab.eng.pnq.redhat.com/ipa-server-2.2.0-5.el6.x86_64/
-repo[4]=http://dhcp-185-138.bos.redhat.com/2.2.0-4/
+repo[3]=http://cosmos.lab.eng.pnq.redhat.com/ipa-server-2.2.0-7.el6.x86_64/
 
 # Users
 user[1]=jack
