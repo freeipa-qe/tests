@@ -42,20 +42,14 @@
 ######################################################################
 # test suite
 ######################################################################
-upgrade()
-{
-	upgrade_master
-	upgrade_slave
-	upgrade_client
-}
-
 upgrade_master()
 {
 	TESTORDER=$(( TESTORDER += 1 ))
-	rlPhaseStartTest "upgrade_master: template function start phase"
+	rlPhaseStartTest "upgrade_master: upgrade ipa master"
 	case "$MYROLE" in
 	"MASTER")
 		rlLog "Machine in recipe is MASTER"
+		rlRun "rpm -q ipa-server 389-ds-base bind bind-dyndb-ldap pki-common sssd"
 
 		# Setup new yum repos from ipa-upgrade.data datafile
 		for url in ${repo[@]}; do
@@ -70,17 +64,9 @@ upgrade_master()
 			EOF
 		done
 
-		#rlRun "setenforce Permissive"
-		rlRun "yum -y update bind bind-dyndb-ldap"
-		rlRun "ipactl restart"
-		#rlRun "service dirsrv stop"
-		#rlRun "/bin/rm -f /var/run/slapd-TESTRELM-COM.socket"
-		#rlRun "yum -y update '389-ds-base*'"
-		#rlRun "setenforce Permissive"
-		#rlRun "ipactl restart"
 		rlRun "yum -y update 'ipa*'"	
-		rlRun "ipactl restart" ### IS THIS REALLY NEEDED?  BZ 766687?
-
+		#rlRun "ipactl restart" ### IS THIS REALLY NEEDED?  BZ 766687?
+		rlRun "rpm -q ipa-server 389-ds-base bind bind-dyndb-ldap pki-common sssd"
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $MASTER_IP"
 		;;
 	"SLAVE")
@@ -90,6 +76,92 @@ upgrade_master()
 	"CLIENT")
 		rlLog "Machine in recipe is CLIENT"
 		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER_IP"
+		;;
+	*)
+		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
+		;;
+	esac
+	rlPhaseEnd
+}
+
+upgrade_slave()
+{
+	TESTORDER=$(( TESTORDER += 1 ))
+	rlPhaseStartTest "upgrade_slave: upgade ipa slave"
+	case "$MYROLE" in
+	"MASTER")
+		rlLog "Machine in recipe is MASTER"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $SLAVE_IP"
+		;;
+	"SLAVE")
+		rlLog "Machine in recipe is SLAVE"
+		rlRun "rpm -q ipa-server 389-ds-base bind bind-dyndb-ldap pki-common sssd"
+
+		# Setup new yum repos from ipa-upgrade.data datafile
+		for url in ${repo[@]}; do
+			repoi=$(( repoi += 1 ))
+			cat > /etc/yum.repos.d/mytestrepo$repoi.repo <<-EOF
+			[mytestrepo$repoi]
+			name=mytestrepo$repoi
+			baseurl=$url
+			enabled=1
+			gpgcheck=0
+			skip_if_unavailable=1
+			EOF
+		done
+
+		rlRun "yum -y update 'ipa*'"	
+		#rlRun "ipactl restart" ### IS THIS REALLY NEEDED?  BZ 766687?
+		rlRun "rpm -q ipa-server 389-ds-base bind bind-dyndb-ldap pki-common sssd"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $SLAVE_IP"
+		;;
+	"CLIENT")
+		rlLog "Machine in recipe is CLIENT"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $SLAVE_IP"
+		;;
+	*)
+		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
+		;;
+	esac
+	rlPhaseEnd
+}
+
+upgrade_client()
+{
+	TESTORDER=$(( TESTORDER += 1 ))
+	rlPhaseStartTest "upgrade_client: upgrade ipa client"
+	case "$MYROLE" in
+	"MASTER")
+		rlLog "Machine in recipe is MASTER"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $CLIENT_IP"
+		;;
+	"SLAVE")
+		rlLog "Machine in recipe is SLAVE"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $CLIENT_IP"
+		;;
+	"CLIENT")
+		rlLog "Machine in recipe is CLIENT"
+
+		rlRun "rpm -q ipa-server 389-ds-base bind bind-dyndb-ldap pki-common sssd"
+
+		# Setup new yum repos from ipa-upgrade.data datafile
+		for url in ${repo[@]}; do
+			repoi=$(( repoi += 1 ))
+			cat > /etc/yum.repos.d/mytestrepo$repoi.repo <<-EOF
+			[mytestrepo$repoi]
+			name=mytestrepo$repoi
+			baseurl=$url
+			enabled=1
+			gpgcheck=0
+			skip_if_unavailable=1
+			EOF
+		done
+
+		rlRun "yum -y update 'ipa*'"	
+		#rlRun "ipactl restart" ### IS THIS REALLY NEEDED?  BZ 766687?
+		rlRun "rpm -q ipa-server 389-ds-base bind bind-dyndb-ldap pki-common sssd"
+
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $CLIENT_IP"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"

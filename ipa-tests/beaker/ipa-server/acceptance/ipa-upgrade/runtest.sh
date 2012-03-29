@@ -70,25 +70,73 @@ rlJournalStart
         rlRun "pushd $TmpDir"
     rlPhaseEnd
 	
+	#################################################################
+	### test full setup for master, then slave, then client	
+	#################################################################
+	# Install and setup environment and add data
 	install_all
 	data_add
-	upgrade
+	# test upgrade with new master, old slave, and old client
+	upgrade_master 
 	data_check
+	# test upgrade with new master, new slave, and old client 
+	upgrade_slave
+	data_check
+	# test upgrade with new master, new slave, and new client
+	upgrade_client
+	data_check
+	# uninstall everything so we can start over
 	uninstall	
-
-	#install_nodns
-	#data_add
-	#upgrade
-	#data_check
-	#uninstall
-
-	#install_all
-	#data_add
-	#bz000000_disable_dirsrv
-	#upgrade
-	#bz000000_check
-	#data_check
-	#uninstall
+	
+#	#################################################################
+#	### test full setup for client, then slave, then master
+#	#################################################################
+#	# Install and setup environment and add data
+#	install_all
+#	data_add
+#	# test upgrade with old master, old slave, and new client
+#	upgrade_client
+#	data_check
+#	# test upgrade with old master, new slave, and new client 
+#	upgrade_slave
+#	data_check
+#	# test upgrade with new master, new slave, and new client
+#	upgrade_master 
+#	data_check
+#	# uninstall everything so we can start over
+#	uninstall	
+#
+#	#################################################################
+#	### Test setup without dns for master, then slave, then client
+#	#################################################################
+#	# Install and setup environment and add data
+#	install_nodns
+#	data_add
+#	# test upgrade with old master, old slave, and old client
+#	upgrade_master
+#	data_check
+#	# test upgrade with new master, new slave, and old client
+#	upgrade_slave
+#	data_check
+#	# test upgrade with new master, new slave, and new client
+#	upgrade_client
+#	data_check
+#	# uninstall everything so we can start over
+#	uninstall
+#
+#	install_all
+#	data_add
+#	bz000000_disable_dirsrv
+#	upgrade
+#	bz000000_check
+#	data_check
+#	uninstall
+#
+#	# Final upgrade to run other beaker test sets against 
+#	install_all
+#	upgrade_master
+#	upgrade_slave
+#	upgade_client
 
     rlPhaseStartCleanup "ipa-upgrade cleanup"
         rlRun "popd"
