@@ -565,7 +565,7 @@ bugzillas()
         rlRun "service httpd restart"
     rlPhaseEnd
 
-    rlPhaseStartTest "Bug 801451 - Logging in with ssh pub key should consult authentication authority policies"
+    rlPhaseStartTest "Bug 801451 - Logging in with GSSAPI should consult authentication authority policies (ssh pub keys tested with sssd)"
 	sssdcfg=/etc/sssd/sssd.conf
         # turn up debug level on sssd log
         sed '/\[domain\/testrelm.com\]/ a\debug_level = 9' $sssdcfg > /tmp/sssd.conf
@@ -574,15 +574,10 @@ bugzillas()
 
         rlLog "verifies https://bugzilla.redhat.com/show_bug.cgi?id=801451"
         rlLog "also verifies https://bugzilla.redhat.com/show_bug.cgi?id=805108"
-        rlAssertGrep "sss_ssh_knownhostsproxy" "/etc/ssh/ssh_config"
         rlRun "kinitAs $ADMINID $ADMINPW" 0 "kinit as admin"
         myuser="user801451"
         rlRun "create_ipauser $myuser $myuser $myuser Secret_123"
         sleep 5
-        mkdir /home/$myuser
-        mkdir /home/$myuser/.ssh
-        cat /root/.ssh/id_rsa.pub >> /home/$myuser/.ssh/authorized_keys
-        chown -R $myuser:$myuser /home/$myuser
         ssh_auth_success $myuser Secret_123 $MASTER
 	rlRun "kinitAs $myuser Secret_123" 0 "kinit as $myuser"
         rlLog "Disabling user via ldapmodify  ............................................."
@@ -596,7 +591,6 @@ disableuser.ldif_EOF
 
 /usr/bin/ldapmodify -x -h $HOSTNAME -p 389 -D "cn=Directory Manager" -w $ADMINPW -c -f ./disableuser.ldif
 	sleep 5
-        #rlRun "ssh_auth_failure $myuser Secret_123 $MASTER" 0 "test auth"
         rlRun "ssh -l $myuser $MASTER" 255 "User disabled, connection closed."
         rlAssertGrep "[The user account is locked on the server]" "/var/log/secure"
         rlAssertGrep "Account for user \[$myuser\] is locked." "/var/log/sssd/sssd_$DOMAIN.log"
@@ -606,7 +600,6 @@ disableuser.ldif_EOF
 	rlRun "service sssd restart"
         rlRun "kinitAs $ADMINID $ADMINPW" 0 "kinit as admin"
         ipa user-del $myuser
-        rm -rf /home/$myuser
     rlPhaseEnd
 
     rlPhaseStartTest "bz805546 --noprivate group specified gid number does not exist - default group non-posix"
