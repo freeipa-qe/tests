@@ -558,14 +558,14 @@ rlJournalStart
     rlPhaseStartTest "ipa-user-cli-mod-067: Negative - rename user with the same old name"
         command="ipa user-mod --rename=$rename_user $rename_user"
         rlAssertGrep "Group name: $newname" "/tmp/rename_upg1.out"
-        expmsg="ipa: ERROR: no modifications to be performedl
+        expmsg="ipa: ERROR: no modifications to be performed"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for $rename_user"
 	rlRun "ipa user-mod --rename=$superuser $rename_user" 0 "Clean-up: rename to $superuser"
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-user-cli-mod-068: Rename a user that does not exist"
         command="ipa user-mod --rename=new_user_name doesntexist"
-        expmsg="ipa: ERROR: doesntexist: user not found
+        expmsg="ipa: ERROR: doesntexist: user not found"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for user doesntexist"
     rlPhaseEnd
 
