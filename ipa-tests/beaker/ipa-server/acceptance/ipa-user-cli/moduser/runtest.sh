@@ -563,6 +563,13 @@ rlJournalStart
 	rlRun "ipa user-mod --rename=$superuser $rename_user" 0 "Clean-up: rename to $superuser"
     rlPhaseEnd
 
+    rlPhaseStartTest "ipa-user-cli-mod-068: Rename a user that does not exist"
+        command="ipa user-mod --rename=new_user_name doesntexist"
+        rlAssertGrep "Group name: $newname" "/tmp/rename_upg1.out"
+        expmsg="ipa: ERROR: doesntexist: user not found
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for $rename_user"
+    rlPhaseEnd
+
     rlPhaseStartCleanup "ipa-user-cli-mod-cleanup"
         rlRun "ipa user-del $superuser" 0 "delete $superuser account"
     rlPhaseEnd
