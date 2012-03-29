@@ -1399,6 +1399,17 @@ EOF
 
 	rlPhaseEnd
 
+        rlPhaseStartTest "ipa-dns-181: Bug 804572 - Irrelevant error message when per-part modification mode is used during dnsrecord-mod operation without specifying the record."
+
+                rlLog "closes https://engineering.redhat.com/trac/ipa-tests/ticket/374"
+                rlLog "verifies https://bugzilla.redhat.com/show_bug.cgi?id=804572"
+
+                verifyErrorMsg "ipa dnsrecord-add lab.eng.pnq.redhat.com bumblebee --cname-hostname=zetaprime.lab.eng.pnq.redhat.com --cname-rec=" "ipa: ERROR: invalid 'cname_hostname': Raw value of a DNS record was already set by cname_rec option"
+                verifyErrorMsg "ipa dnsrecord-mod lab.eng.pnq.redhat.com test5 --a-ip-address=10.65.201.190" "ipa: ERROR: 'arecord' is required"
+
+        rlPhaseEnd
+
+
 	rlJournalPrintText
 	report=/tmp/rhts.report.$RANDOM.txt
 	makereport $report
