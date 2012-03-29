@@ -271,11 +271,11 @@ ipa_install_client(){
 	case "$MYROLE" in
 	"MASTER")
 		rlLog "Machine in recipe is MASTER"
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $MASTER_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $CLIENT_IP"
 		;;
 	"SLAVE")
 		rlLog "Machine in recipe is SLAVE"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $CLIENT_IP"
 		;;
 	"CLIENT")
 		rlLog "Machine in recipe is CLIENT"
@@ -290,7 +290,7 @@ ipa_install_client(){
 			rhts-submit-log -l /var/log/ipaclient-install.log.$DATE
 		fi
 
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER_IP"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $CLIENT_IP"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
