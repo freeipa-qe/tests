@@ -66,10 +66,6 @@ rlJournalStart
 
     rlPhaseEnd
 
-	rlPhaseStartTest "Installing rpcbind yptools"
-		yum -y install wget rpcbind
-	rlPhaseEnd
-
 # all testing should be with selinux enforcing!
 #if [ $master -eq 1 ]; then
 #	setenforce 0
@@ -86,14 +82,56 @@ rlJournalStart
 	ipoc3=$(echo $ipaddr | cut -d\. -f3) 
 	ipoc4=$(echo $ipaddr | cut -d\. -f4) 
 
-	rlPhaseStartTest "forms-cli-01: "
-
-		rlLog "verifies https://bugzilla.redhat.com/show_bug.cgi?id=804562"
-		rlLog "closes https://engineering.redhat.com/trac/ipa-tests/ticket/376"
-
-		verifyErrorMsg "ipa dnsrecord-add $DOMAIN dns176 --ns-hostname=ns1.shanks.$DOMAIN" "ipa: ERROR: Nameserver 'ns1.shanks.$DOMAIN' does not have a corresponding A/AAAA record"
+	rlPhaseStartTest "forms-cli-01: Destroy credentials"
+		rlLog "Destroy kinit."
+		rlRun "kdestroy" 0 "destroy any credentials that may already exist"
+#		verifyErrorMsg "ipa dnsrecord-add $DOMAIN dns176 --ns-hostname=ns1.shanks.$DOMAIN" "ipa: ERROR: Nameserver 'ns1.shanks.$DOMAIN' does not have a corresponding A/AAAA record"
 
         rlPhaseEnd
+	
+	nfuser=tbokl
+	jsonfile=/dev/shm/forms-cli-json.script
+echo "{
+    \"method\":\"user_add\",
+   
+\"params\":[[],{\"givenname\":\"tim\",\"sn\":\"user\",\"krbprincipalname\":\"$nfuser@$DOMAIN\",\"uid\":\"$nfuser\",\"all\":true}
+    ],
+    \"id\":1
+}" > $jsonfile
+
+	rlPhaseStartTest "forms-cli-02: Ensure that json script does not work without a valid session ID"
+		outputf=/dev/shm/forms-tmp-out.txt
+		curl -v -H "Content-Type:application/json" -H "Referer: https://$MASTER/ipa/xml" -H "Accept:application/json"  -H "Accept-Language:en" --cacert /etc/ipa/ca.crt -d  @$jsonfile -X POST -b "ipa_session=0e1fb49d6d46c237e9f3584c96467e1; httponly; Path=/ipa; secure" https://$MASTER/ipa/session/json &> $outputf 
+		rlRun "grep 401\ Unauthorized $outputf" 0 "Make sure that the output of the curl request seems to have failed"
+		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+		rlRun "ipa user-find $nfuser" 1 "Make sure that admin is unable to find the new user $nfsuer"
+		rlRun "kdestroy" 0 "destroy any credentials that may already exist"
+	rlPhaseEnd
+
+	loginfile=/dev/shm/loginfile.txt
+	responsefile=/dev/shm/loginresponsefile.txt
+	rlPhaseStartTest "forms-cli-03: ensure that you cannot get a valid session id with bad credentials."
+		echo "user=admin&password=Badpw168" > $loginfile
+		curl -v --dump-header $responsefile -k -H 'Content-Type: application/x-www-form-urlencoded' "https://$MASTER/ipa/session/login_password" -X POST -d @$loginfile
+		rlRun "grep ipa_session= $responsefile" 1 "Make sure that the response header does not appear to have a session id in it"
+	rlPhaseEnd
+
+	rlPhaseStartTest "forms-cli-04: Get a valid session id with good credentials."
+		echo "user=$ADMINID&password=$ADMINPW" > $loginfile
+		curl -v --dump-header $responsefile -k -H 'Content-Type: application/x-www-form-urlencoded' https://$MASTER/ipa/session/login_password -X POST -d @$loginfile
+		rlRun "grep ipa_session= $responsefile" 0 "Make sure that the response header contains a session id in it"
+		sessionid=$(cat $responsefile | grep ipa_session | cut -d\  -f2 | cut -d\= -f2 | sed s/\;//g)
+		export sessionid
+		rlLog "new admin session ID is $sessionid"
+	rlPhaseEnd
+		
+	rlPhaseStartTest "forms-cli-05: Create a new user with the aquired session id. ie, retry forms-cli-02 with valid credentials."
+		curl -v -H "Content-Type:application/json" -H "Referer: https://$MASTER/ipa/xml" -H "Accept:application/json"  -H "Accept-Language:en" --cacert /etc/ipa/ca.crt -d  @$jsonfile -X POST -b "ipa_session=$sessionid; httponly; Path=/ipa; secure" https://$MASTER/ipa/session/json &> $outputf 
+		rlLog "grep tim\ user $outputf" 0 "make sure that the user's name is in the output of the test command"
+		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+		rlRun "ipa user-find $nfuser" 0 "Make sure that admin is able to find the new user $nfsuer"
+		rlRun "ipa user-del $nfuser" 0 "Delete the test user $nfsuer"
+	rlPhaseEnd
 
 	rlJournalPrintText
 	report=/tmp/rhts.report.$RANDOM.txt
