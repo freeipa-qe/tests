@@ -51,12 +51,12 @@ upgrade_bz_766096()
 	"MASTER")
 		rlLog "Machine in recipe is MASTER"
 
-		ldapsearch -xLLL -D "cn=$ROOTDN" -w "$ROOTDNPWD" -s base -b cn=schema \* attributeTypes objectClasses | perl -p0e 's/\n //g' > $tmpout
-		rlRun "grep memberPrincipal $tmpout" 0 "Checking for memberPrincipal attribute added to schema"
+		rlRun "ldapsearch -xLLL -D '$ROOTDN' -w '$ROOTDNPWD' -s base -b cn=schema '*' attributeTypes objectClasses | perl -p0e 's/\n //g' > $tmpout"
+		rlRun "grep memberPrincipal $tmpout"       0 "Checking for memberPrincipal attribute added to schema"
 		rlRun "grep ipaAllowToImpersonate $tmpout" 0 "Checking for ipaAllowToImpersonate attribute added to schema"
-		rlRun "grep ipaAllowedTarget $tmpout" 0 "Checking for ipaAllowedTarget attribute added to schema"
-		rlRun "grep groupOfPrincipals $tmpout" 0 "Checking for groupOfPrincipals attribute added to schema"
-		rlRun "grep ipaKrb5DelegationACL $tmpout" 0 "Checking for ipaKrb5DelegationACL attribute added to schema"
+		rlRun "grep ipaAllowedTarget $tmpout"      0 "Checking for ipaAllowedTarget attribute added to schema"
+		rlRun "grep groupOfPrincipals $tmpout"     0 "Checking for groupOfPrincipals attribute added to schema"
+		rlRun "grep ipaKrb5DelegationACL $tmpout"  0 "Checking for ipaKrb5DelegationACL attribute added to schema"
 		checkattrs=$(egrep "memberPrincipal|ipaAllowToImpersonate|ipaAllowedTarget|groupOfPrincipals|ipaKrb5DelegationACL" $tmpout|wc -l)
 
 		if [ -f /usr/share/ipa/updates/10-60basev3.update -a $checkattrs -eq 5 ]; then
