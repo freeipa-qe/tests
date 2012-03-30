@@ -100,7 +100,7 @@ perftest()
                 slapdVmRSS=`cat /proc/$slapdpid/status | grep "VmRSS" | awk '{print $2 $3}'`
                 slapdVmHWM=`cat /proc/$slapdpid/status | grep "VmHWM" | awk '{print $2 $3}'`
 
-                rlLog "After migration free memory : $prememfree"
+                rlLog "After migration free memory : $postmemfree"
                 rlLog "After migration slapd VmRSS : $slapdVmRSS"
                 rlLog "After migration slapd VmHWM : $slapdVmHWM"
 	rlPhaseEnd
