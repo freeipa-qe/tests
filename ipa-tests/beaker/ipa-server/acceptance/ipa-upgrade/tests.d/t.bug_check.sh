@@ -98,8 +98,40 @@ upgrade_bz_746589()
 			ipa automember-del --type=group ipa-automember-bz-746589 > /dev/null
 			ipa group-del ipa-automember-bz-746589 > /dev/null
 		fi
-		
 
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $MASTER_IP"
+		;;
+	"SLAVE")
+		rlLog "Machine in recipe is SLAVE"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER_IP"
+		;;
+	"CLIENT")
+		rlLog "Machine in recipe is CLIENT"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER_IP"
+		;;
+	*)
+		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
+		;;
+	esac
+	rlPhaseEnd
+	[ -f $tmpout ] && rm -f $tmpout
+}
+
+upgrade_bz_782918()
+{
+	local tmpout=/tmp/$FUNCNAME.out
+	TESTORDER=$(( TESTORDER += 1 ))
+	rlPhaseStartTest "upgrade_bz_782918: Provide man page for ipa-upgradeconfig"
+	case "$MYROLE" in
+	"MASTER")
+		rlRun "test -f /usr/share/man/man8/ipa-upgradeconfig.8.gz"
+		if [ ! -f /usr/share/man/man8/ipa-upgradeconfig.8.gz ]; then
+			rlLog "No man page for ipa-upgradeconfig found"
+			rlFail "BZ 782918 found...Provide man page for ipa-upgradeconfig"
+		else
+			rlLog "Man page for ipa-upgradeconfig found"
+			rlPass "BZ 782918 not found"
+		fi
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $MASTER_IP"
 		;;
 	"SLAVE")
