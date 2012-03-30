@@ -80,7 +80,7 @@ upgrade_bz_766096()
 		;;
 	esac
 	rlPhaseEnd
-	[ -f $tmpout ] rm -f $tmpout
+	[ -f $tmpout ] && rm -f $tmpout
 }
 
 
