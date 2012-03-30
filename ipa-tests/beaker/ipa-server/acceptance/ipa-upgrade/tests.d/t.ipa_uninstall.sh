@@ -110,7 +110,6 @@ ipa_uninstall_client()
 		;;
 	"SLAVE")
 		rlLog "Machine in recipe is SLAVE"
-		ipa_quick_uninstall
 		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $CLIENT_IP"
 		;;
 	"CLIENT")
