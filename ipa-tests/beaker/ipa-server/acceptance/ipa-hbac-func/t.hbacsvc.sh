@@ -2725,3 +2725,46 @@ hbacsvc_client2_bug766876_2() {
 
 }
 
+hbacsvc_master_bug801769() {
+
+                # kinit as admin and creating users
+                kinitAs $ADMINID $ADMINPW
+                create_ipauser user801769 user801769 user801769 $userpw
+                sleep 5
+                export user801769=user801769
+
+        rlPhaseStartTest "ipa-hbacsvc-801769: Bug 801769 - hbactest returns failure when hostgroups are chained"
+
+		rlLog "Verifies https://bugzilla.redhat.com/show_bug.cgi?id=801769"
+		rlLog "Closes https://engineering.redhat.com/trac/ipa-tests/ticket/394"
+
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+		HOSTGROUP801769="hostgroup801769"
+
+                rlRun "ipa hbacrule-disable allow_all"
+		rlRun "ipa hostgroup-add $HOSTGROUP801769 --desc=\"Master group\""
+		rlRun "ipa hostgroup-add-member $HOSTGROUP801769 --hosts=$MASTER"
+
+                rlRun "ipa hbacrule-add 801769"
+                rlRun "ipa hbacrule-show 801769 --all"
+
+                rlRun "ipa hbacrule-add-user 801769 --users=$user801769"
+                rlRun "ipa hbacrule-add-host 801769 --hostgroups=$HOSTGROUP801769"
+                rlRun "ipa hbacrule-add-service 801769 --hbacsvcs=sshd"
+                rlRun "ipa hbacrule-show 801769 --all"
+
+        # ipa hbactest:
+                rlRun "ipa hbactest --user=$user801769 --host=$MASTER --service=sshd --rules=801769 | grep -Ex '(Access granted: True|  matched: 801769)'" 
+
+                HOSTGROUP801769_2="hostgroup801769_2"
+
+		rlRun "ipa hostgroup-add $HOSTGROUP801769_2 --desc=\"Master group2\""
+                rlRun "ipa hostgroup-add-member $HOSTGROUP801769_2 --hostgroups=$HOSTGROUP801769"
+
+        # ipa hbactest:
+                rlRun "ipa hbactest --user=$user801769 --host=$MASTER --service=sshd --rules=801769 | grep -Ex '(Access granted: True|  matched: 801769)'" 
+
+
+        rlPhaseEnd
+}
+

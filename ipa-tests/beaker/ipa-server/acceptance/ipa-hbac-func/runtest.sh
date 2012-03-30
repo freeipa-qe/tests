@@ -858,6 +858,9 @@ rlJournalStart
                 rlRun "rhts-sync-block -s DONE_hbacsvc_client_bug766876 -s DONE_hbacsvc_client2_bug766876 $BEAKERCLIENT $BEAKERCLIENT2"
                 rlRun "rhts-sync-block -s DONE_hbacsvc_client_bug766876_2 -s DONE_hbacsvc_client2_bug766876_2 $BEAKERCLIENT $BEAKERCLIENT2"
 
+	# hbacsvc_master_bug801769
+		hbacsvc_master_bug801769
+
 	rlPhaseEnd
 
 	rlPhaseStartCleanup "ipa-hbacrule-func-cleanup: Destroying admin credentials."
