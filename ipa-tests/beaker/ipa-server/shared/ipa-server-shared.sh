@@ -928,7 +928,12 @@ getReverseZone_IPv6()
 ipa_quick_uninstall(){
 	
 	# Uninstall/unconfigure IPA
-	rlRun "ipa-server-install --uninstall -U"
+	if [ -f /usr/sbin/ipa-server-install ]; then
+		rlRun "ipa-server-install --uninstall -U" 0
+	fi
+	if [ -f /usr/sbin/ipa-client-install ]; then
+		rlRun "ipa-client-install --uninstall -U" 0,2
+	fi
 	rlRun "yum -y remove ipa* 389-ds-base* bind expect krb5-workstation bind-dyndb-ldap krb5-pkinit-openssl httpd"
 	rlRun "yum -y remove sssd libipa_hbac krb5-server certmonger slapi-nis sssd-client pki* tomcat6 mod_nss"
 	rlRun "/bin/rm -rf /var/lib/ipa/"
