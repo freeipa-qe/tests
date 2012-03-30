@@ -45,13 +45,22 @@
 upgrade_bz_766096()
 {
 	TESTORDER=$(( TESTORDER += 1 ))
+	local tmpout=/tmp/errormsg.out
 	rlPhaseStartTest "upgrade_bz_766096: Handle schema upgrades from IPA v2 to v3"
 	case "$MYROLE" in
 	"MASTER")
 		rlLog "Machine in recipe is MASTER"
 
-		if [ -f /usr/share/ipa/updates/10-60basev3.update ]; then
-			rlPass "BZ 766096 not found."
+		ldapsearch -xLLL -D "cn=$ROOTDN" -w "$ROOTDNPWD" -s base -b cn=schema \* attributeTypes objectClasses | perl -p0e 's/\n //g' > $tmpout
+		rlRun "grep memberPrincipal $tmpout" 0 "Checking for memberPrincipal attribute added to schema"
+		rlRun "grep ipaAllowToImpersonate $tmpout" 0 "Checking for ipaAllowToImpersonate attribute added to schema"
+		rlRun "grep ipaAllowedTarget $tmpout" 0 "Checking for ipaAllowedTarget attribute added to schema"
+		rlRun "grep groupOfPrincipals $tmpout" 0 "Checking for groupOfPrincipals attribute added to schema"
+		rlRun "grep ipaKrb5DelegationACL $tmpout" 0 "Checking for ipaKrb5DelegationACL attribute added to schema"
+		checkattrs=$(egrep "memberPrincipal|ipaAllowToImpersonate|ipaAllowedTarget|groupOfPrincipals|ipaKrb5DelegationACL" $tmpout|wc -l)
+
+		if [ -f /usr/share/ipa/updates/10-60basev3.update -a $checkattrs -eq 5 ]; then
+			rlPass "BZ 766096 not found....all v3 attributes found in schema"
 		else
 			rlFail "BZ 766096 found...Handle schema upgrades from IPA v2 to v3"
 		fi
@@ -71,6 +80,7 @@ upgrade_bz_766096()
 		;;
 	esac
 	rlPhaseEnd
+	[ -f $tmpout ] rm -f $tmpout
 }
 
 
