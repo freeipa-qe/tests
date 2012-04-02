@@ -34,7 +34,7 @@ ipaconfig_bugzillas()
 		if [ $? -eq 0 ] ; then
 			rlFail "https://bugzilla.redhat.com/show_bug.cgi?id=782974"
 		else
-			rlPass "Internal Error and tracebact bz782974 fixed."
+			rlPass "Internal Error and traceback bz782974 fixed."
 		fi
 	rlPhaseEnd
 
@@ -45,8 +45,16 @@ ipaconfig_bugzillas()
 	rlPhaseEnd
 
 	rlPhaseStartTest "bz744205 ipa config-mod user search field blank - an internal error has occurred"
-		rlRun "ipa config-mod --usersearch= > /tmp/bz744205.out 2>&1" 0
-		rlAssertNotGroup "ipa: ERROR: an internal error has occurred" "/tmp/bz744205.out"
+		ipa config-mod --usersearch= > /tmp/bz744205.out 2>&1
+		cat /tmp/bz744205.txt | grep "ipa: ERROR: an internal error has occurred"
+                if [ $? -eq 0 ] ; then
+                        rlFail "https://bugzilla.redhat.com/show_bug.cgi?id=744205"
+                else
+                        rlPass "Internal Error and traceback bz744205 fixed."
+		fi
+        	command="ipa config-mod --usersearch="
+        	expmsg="ipa: ERROR: 'usersearch' is required"
+        	rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
  	rlPhaseEnd
 }
 
