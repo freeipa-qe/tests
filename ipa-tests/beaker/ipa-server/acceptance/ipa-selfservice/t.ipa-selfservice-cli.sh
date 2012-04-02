@@ -109,10 +109,10 @@ selfservice_add_1004() #BZ 772106 -- ipa selfservice-add --raw returns "internal
 		#rlRun "ipa selfservice-add $testID --all  --attrs=$attrs_TestValue  --permissions=$permissions_TestValue --raw " 0 "test options:  [attrs]=[$attrs_TestValue] [permissions]=[$permissions_TestValue]"
 		rlRun "ipa selfservice-add $testID --all  --attrs=$attrs_TestValue  --permissions=$permissions_TestValue --raw > $tmpout 2>&1" 0 
 		if [ $(grep "ipa: ERROR: an internal error has occurred" $tmpout | wc -l) -eq 1 ]; then
-			rlFail "BZ 772106 -- ipa selfservice-add --raw returns \"internal error\" message"
+			rlFail "BZ 772106 found...ipa selfservice-add --raw returns \"internal error\" message"
 		else
-			rlFail "Unknown failure detected...see output below..."
-			cat $tmpout
+			rlPass "BZ 772106 not found."
+			#cat $tmpout
 		fi
 
 		Kcleanup
