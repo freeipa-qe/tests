@@ -286,7 +286,7 @@ netgroup_add_negative()
 
 	rlPhaseStartTest "netgroup_add_negative_004: Verify fail on netgroup-add with space for nisdomain"
 		rlRun "ipa netgroup-add testng-002 --desc=testng-002 --nisdomain=\" \" > $tmpout 2>&1" 1
-		rlAssertGrep "ipa: ERROR: invalid 'nisdomain': Leading and trailing spaces are not allowed" $tmpout
+		rlAssertGrep "ipa: ERROR: invalid 'nisdomain': may only include letters, numbers, _, -, and ." $tmpout
 	rlPhaseEnd
 
 	rlPhaseStartTest "netgroup_add_negative_005: Verify fail on netgroup-add with invalid usercat"
@@ -1188,6 +1188,7 @@ manage_netgroups_negative()
 netgroup_find_positive()
 {
 
+	local tmpout=/tmp/errormsg.out
 	rlPhaseStartTest "netgroup_find_positive_000: Setup some default netgroups for find testing"
 		rlRun "ipa user-add tnguser1 --first=first --last=last"
 		rlRun "ipa user-add tnguser2 --first=first --last=last"
@@ -1336,7 +1337,116 @@ netgroup_find_positive()
 		rlRun "ipa netgroup-find --not-in-netgroups=ngname"
 	rlPhaseEnd
 
-	rlPhaseStartTest "netgroup_find_positive_028: Cleanup after find positive testing"
+	rlPhaseStartTest "netgroup_find_positive_028: find with netgroups equal space (BZ 798792)"
+		rlRun "ipa netgroup-find --netgroups=\" \" > $tmpout 2>&1"
+		if [ $(grep "ipa: ERROR: an internal error has occurred" $tmpout|wc -l) -gt 0 ]; then
+			rlFail "BZ 798792 found...ipa netgroup-find options set to space return internal errors"
+		else
+			rlPass "BZ 798792 not found."
+		fi
+	rlPhaseEnd
+
+	rlPhaseStartTest "netgroup_find_positive_029: find with no-netgroups equal space (BZ 798792)"
+		rlRun "ipa netgroup-find --no-netgroups=\" \" > $tmpout 2>&1"
+		if [ $(grep "ipa: ERROR: an internal error has occurred" $tmpout|wc -l) -gt 0 ]; then
+			rlFail "BZ 798792 found...ipa netgroup-find options set to space return internal errors"
+		else
+			rlPass "BZ 798792 not found."
+		fi
+	rlPhaseEnd
+
+	rlPhaseStartTest "netgroup_find_positive_030: find with users equal space (BZ 798792)"
+		rlRun "ipa netgroup-find --users=\" \" > $tmpout 2>&1"
+		if [ $(grep "ipa: ERROR: an internal error has occurred" $tmpout|wc -l) -gt 0 ]; then
+			rlFail "BZ 798792 found...ipa netgroup-find options set to space return internal errors"
+		else
+			rlPass "BZ 798792 not found."
+		fi
+	rlPhaseEnd
+
+	rlPhaseStartTest "netgroup_find_positive_031: find with no-users equal space (BZ 798792)"
+		rlRun "ipa netgroup-find --no-users=\" \" > $tmpout 2>&1"
+		if [ $(grep "ipa: ERROR: an internal error has occurred" $tmpout|wc -l) -gt 0 ]; then
+			rlFail "BZ 798792 found...ipa netgroup-find options set to space return internal errors"
+		else
+			rlPass "BZ 798792 not found."
+		fi
+	rlPhaseEnd
+
+	rlPhaseStartTest "netgroup_find_positive_032: find with groups equal space (BZ 798792)"
+		rlRun "ipa netgroup-find --groups=\" \" > $tmpout 2>&1"
+		if [ $(grep "ipa: ERROR: an internal error has occurred" $tmpout|wc -l) -gt 0 ]; then
+			rlFail "BZ 798792 found...ipa netgroup-find options set to space return internal errors"
+		else
+			rlPass "BZ 798792 not found."
+		fi
+	rlPhaseEnd
+
+	rlPhaseStartTest "netgroup_find_positive_033: find with no-groups equal space (BZ 798792)"
+		rlRun "ipa netgroup-find --no-groups=\" \" > $tmpout 2>&1"
+		if [ $(grep "ipa: ERROR: an internal error has occurred" $tmpout|wc -l) -gt 0 ]; then
+			rlFail "BZ 798792 found...ipa netgroup-find options set to space return internal errors"
+		else
+			rlPass "BZ 798792 not found."
+		fi
+	rlPhaseEnd
+
+	rlPhaseStartTest "netgroup_find_positive_034: find with hosts equal space (BZ 798792)"
+		rlRun "ipa netgroup-find --hosts=\" \" > $tmpout 2>&1"
+		if [ $(grep "ipa: ERROR: an internal error has occurred" $tmpout|wc -l) -gt 0 ]; then
+			rlFail "BZ 798792 found...ipa netgroup-find options set to space return internal errors"
+		else
+			rlPass "BZ 798792 not found."
+		fi
+	rlPhaseEnd
+
+	rlPhaseStartTest "netgroup_find_positive_035: find with no-hosts equal space (BZ 798792)"
+		rlRun "ipa netgroup-find --no-hosts=\" \" > $tmpout 2>&1"
+		if [ $(grep "ipa: ERROR: an internal error has occurred" $tmpout|wc -l) -gt 0 ]; then
+			rlFail "BZ 798792 found...ipa netgroup-find options set to space return internal errors"
+		else
+			rlPass "BZ 798792 not found."
+		fi
+	rlPhaseEnd
+
+	rlPhaseStartTest "netgroup_find_positive_036: find with hostgroups equal space (BZ 798792)"
+		rlRun "ipa netgroup-find --hostgroups=\" \" > $tmpout 2>&1"
+		if [ $(grep "ipa: ERROR: an internal error has occurred" $tmpout|wc -l) -gt 0 ]; then
+			rlFail "BZ 798792 found...ipa netgroup-find options set to space return internal errors"
+		else
+			rlPass "BZ 798792 not found."
+		fi
+	rlPhaseEnd
+
+	rlPhaseStartTest "netgroup_find_positive_037: find with no-hostgroups equal space (BZ 798792)"
+		rlRun "ipa netgroup-find --no-hostgroups=\" \" > $tmpout 2>&1"
+		if [ $(grep "ipa: ERROR: an internal error has occurred" $tmpout|wc -l) -gt 0 ]; then
+			rlFail "BZ 798792 found...ipa netgroup-find options set to space return internal errors"
+		else
+			rlPass "BZ 798792 not found."
+		fi
+	rlPhaseEnd
+
+	rlPhaseStartTest "netgroup_find_positive_038: find with in-netgroups equal space (BZ 798792)"
+		rlRun "ipa netgroup-find --in-netgroups=\" \" > $tmpout 2>&1"
+		if [ $(grep "ipa: ERROR: an internal error has occurred" $tmpout|wc -l) -gt 0 ]; then
+			rlFail "BZ 798792 found...ipa netgroup-find options set to space return internal errors"
+		else
+			rlPass "BZ 798792 not found."
+		fi
+	rlPhaseEnd
+
+	rlPhaseStartTest "netgroup_find_positive_039: find with not-in-netgroups equal space (BZ 798792)"
+		rlRun "ipa netgroup-find --not-in-netgroups=\" \" > $tmpout 2>&1"
+		if [ $(grep "ipa: ERROR: an internal error has occurred" $tmpout|wc -l) -gt 0 ]; then
+			rlFail "BZ 798792 found...ipa netgroup-find options set to space return internal errors"
+		else
+			rlPass "BZ 798792 not found."
+		fi
+	rlPhaseEnd
+		
+
+	rlPhaseStartTest "netgroup_find_positive_cleanup: Cleanup after find positive testing"
 		rlRun "ipa netgroup-del tngname1"
 		rlRun "ipa netgroup-del tngname2"
 		rlRun "ipa netgroup-del tngname3"
@@ -1353,6 +1463,7 @@ netgroup_find_positive()
 		rlRun "ipa user-del tnguser1"
 		rlRun "ipa user-del tnguser2"
 	rlPhaseEnd
+	[ -f $tmpout ] && rm -f $tmpout
 
 
 }
@@ -1569,162 +1680,174 @@ netgroup_find_negative()
 		rlAssertGrep "^0 netgroups matched" $tmpout
 	rlPhaseEnd
 
-	rlPhaseStartTest "netgroup_find_negative_020: Fail to find with netgroups equal space (BZ 798792)"
-		rlRun "ipa netgroup-find --netgroups=\" \" > $tmpout 2>&1" 1
-		rlAssertGrep "^0 netgroups matched" $tmpout
-		#rlAssertGrep "ipa: ERROR: invalid 'netgroups': Leading and trailing spaces are not allowed" $tmpout
-		if [ $(grep "ipa: ERROR: an internal error has occurred" $tmpout|wc -l) -gt 0 ]; then
-			rlFail "BZ 798792 found...ipa netgroup-find options set to space return internal errors"
-		else
-			rlPass "BZ 798792 not found."
-		fi
-	rlPhaseEnd
+# Now a positive test per 798792 fix
+#	rlPhaseStartTest "netgroup_find_negative_020: Fail to find with netgroups equal space (BZ 798792)"
+#		rlRun "ipa netgroup-find --netgroups=\" \" > $tmpout 2>&1" 1
+#		rlAssertGrep "^0 netgroups matched" $tmpout
+#		#rlAssertGrep "ipa: ERROR: invalid 'netgroups': Leading and trailing spaces are not allowed" $tmpout
+#		if [ $(grep "ipa: ERROR: an internal error has occurred" $tmpout|wc -l) -gt 0 ]; then
+#			rlFail "BZ 798792 found...ipa netgroup-find options set to space return internal errors"
+#		else
+#			rlPass "BZ 798792 not found."
+#		fi
+#	rlPhaseEnd
 
-	rlPhaseStartTest "netgroup_find_negative_021: Fail to find with no-netgroups equal space (BZ 798792)"
-		rlRun "ipa netgroup-find --no-netgroups=\" \" > $tmpout 2>&1" 1
-		rlAssertGrep "^0 netgroups matched" $tmpout
-		#rlAssertGrep "ipa: ERROR: invalid 'no-netgroups': Leading and trailing spaces are not allowed" $tmpout
-		if [ $(grep "ipa: ERROR: an internal error has occurred" $tmpout|wc -l) -gt 0 ]; then
-			rlFail "BZ 798792 found...ipa netgroup-find options set to space return internal errors"
-		else
-			rlPass "BZ 798792 not found."
-		fi
-	rlPhaseEnd
+# Now a positive test per 798792 fix
+#	rlPhaseStartTest "netgroup_find_negative_021: Fail to find with no-netgroups equal space (BZ 798792)"
+#		rlRun "ipa netgroup-find --no-netgroups=\" \" > $tmpout 2>&1" 1
+#		rlAssertGrep "^0 netgroups matched" $tmpout
+#		#rlAssertGrep "ipa: ERROR: invalid 'no-netgroups': Leading and trailing spaces are not allowed" $tmpout
+#		if [ $(grep "ipa: ERROR: an internal error has occurred" $tmpout|wc -l) -gt 0 ]; then
+#			rlFail "BZ 798792 found...ipa netgroup-find options set to space return internal errors"
+#		else
+#			rlPass "BZ 798792 not found."
+#		fi
+#	rlPhaseEnd
 
 	rlPhaseStartTest "netgroup_find_negative_022: Fail to find with non-existent users"
 		rlRun "ipa netgroup-find --users=badusers > $tmpout 2>&1" 1
 		rlAssertGrep "^0 netgroups matched" $tmpout
 	rlPhaseEnd
 
-	rlPhaseStartTest "netgroup_find_negative_023: Fail to find with users equal space (BZ 798792)"
-		rlRun "ipa netgroup-find --users=\" \" > $tmpout 2>&1" 1
-		rlAssertGrep "^0 netgroups matched" $tmpout
-		#rlAssertGrep "ipa: ERROR: invalid 'users': Leading and trailing spaces are not allowed" $tmpout
-		if [ $(grep "ipa: ERROR: an internal error has occurred" $tmpout|wc -l) -gt 0 ]; then
-			rlFail "BZ 798792 found...ipa netgroup-find options set to space return internal errors"
-		else
-			rlPass "BZ 798792 not found."
-		fi
-	rlPhaseEnd
+# Now a positive test per 798792 fix
+#	rlPhaseStartTest "netgroup_find_negative_023: Fail to find with users equal space (BZ 798792)"
+#		rlRun "ipa netgroup-find --users=\" \" > $tmpout 2>&1" 1
+#		rlAssertGrep "^0 netgroups matched" $tmpout
+#		#rlAssertGrep "ipa: ERROR: invalid 'users': Leading and trailing spaces are not allowed" $tmpout
+#		if [ $(grep "ipa: ERROR: an internal error has occurred" $tmpout|wc -l) -gt 0 ]; then
+#			rlFail "BZ 798792 found...ipa netgroup-find options set to space return internal errors"
+#		else
+#			rlPass "BZ 798792 not found."
+#		fi
+#	rlPhaseEnd
 
-	rlPhaseStartTest "netgroup_find_negative_024: Fail to find with no-users equal space (BZ 798792)"
-		rlRun "ipa netgroup-find --no-users=\" \" > $tmpout 2>&1" 1
-		rlAssertGrep "^0 netgroups matched" $tmpout
-		#rlAssertGrep "ipa: ERROR: invalid 'no-users': Leading and trailing spaces are not allowed" $tmpout
-		if [ $(grep "ipa: ERROR: an internal error has occurred" $tmpout|wc -l) -gt 0 ]; then
-			rlFail "BZ 798792 found...ipa netgroup-find options set to space return internal errors"
-		else
-			rlPass "BZ 798792 not found."
-		fi
-	rlPhaseEnd
+# Now a positive test per 798792 fix
+#	rlPhaseStartTest "netgroup_find_negative_024: Fail to find with no-users equal space (BZ 798792)"
+#		rlRun "ipa netgroup-find --no-users=\" \" > $tmpout 2>&1" 1
+#		rlAssertGrep "^0 netgroups matched" $tmpout
+#		#rlAssertGrep "ipa: ERROR: invalid 'no-users': Leading and trailing spaces are not allowed" $tmpout
+#		if [ $(grep "ipa: ERROR: an internal error has occurred" $tmpout|wc -l) -gt 0 ]; then
+#			rlFail "BZ 798792 found...ipa netgroup-find options set to space return internal errors"
+#		else
+#			rlPass "BZ 798792 not found."
+#		fi
+#	rlPhaseEnd
 
 	rlPhaseStartTest "netgroup_find_negative_025: Fail to find with non-existent groups"
 		rlRun "ipa netgroup-find --groups=badgroups > $tmpout 2>&1" 1
 		rlAssertGrep "^0 netgroups matched" $tmpout
 	rlPhaseEnd
 
-	rlPhaseStartTest "netgroup_find_negative_026: Fail to find with groups equal space (BZ 798792)"
-		rlRun "ipa netgroup-find --groups=\" \" > $tmpout 2>&1" 1
-		rlAssertGrep "^0 netgroups matched" $tmpout
-		#rlAssertGrep "ipa: ERROR: invalid 'groups': Leading and trailing spaces are not allowed" $tmpout
-		if [ $(grep "ipa: ERROR: an internal error has occurred" $tmpout|wc -l) -gt 0 ]; then
-			rlFail "BZ 798792 found...ipa netgroup-find options set to space return internal errors"
-		else
-			rlPass "BZ 798792 not found."
-		fi
-	rlPhaseEnd
+# Now a positive test per 798792 fix
+#	rlPhaseStartTest "netgroup_find_negative_026: Fail to find with groups equal space (BZ 798792)"
+#		rlRun "ipa netgroup-find --groups=\" \" > $tmpout 2>&1" 1
+#		rlAssertGrep "^0 netgroups matched" $tmpout
+#		#rlAssertGrep "ipa: ERROR: invalid 'groups': Leading and trailing spaces are not allowed" $tmpout
+#		if [ $(grep "ipa: ERROR: an internal error has occurred" $tmpout|wc -l) -gt 0 ]; then
+#			rlFail "BZ 798792 found...ipa netgroup-find options set to space return internal errors"
+#		else
+#			rlPass "BZ 798792 not found."
+#		fi
+#	rlPhaseEnd
 
-	rlPhaseStartTest "netgroup_find_negative_027: Fail to find with no-groups equal space (BZ 798792)"
-		rlRun "ipa netgroup-find --no-groups=\" \" > $tmpout 2>&1" 1
-		rlAssertGrep "^0 netgroups matched" $tmpout
-		#rlAssertGrep "ipa: ERROR: invalid 'no-groups': Leading and trailing spaces are not allowed" $tmpout
-		if [ $(grep "ipa: ERROR: an internal error has occurred" $tmpout|wc -l) -gt 0 ]; then
-			rlFail "BZ 798792 found...ipa netgroup-find options set to space return internal errors"
-		else
-			rlPass "BZ 798792 not found."
-		fi
-	rlPhaseEnd
+# Now a positive test per 798792 fix
+#	rlPhaseStartTest "netgroup_find_negative_027: Fail to find with no-groups equal space (BZ 798792)"
+#		rlRun "ipa netgroup-find --no-groups=\" \" > $tmpout 2>&1" 1
+#		rlAssertGrep "^0 netgroups matched" $tmpout
+#		#rlAssertGrep "ipa: ERROR: invalid 'no-groups': Leading and trailing spaces are not allowed" $tmpout
+#		if [ $(grep "ipa: ERROR: an internal error has occurred" $tmpout|wc -l) -gt 0 ]; then
+#			rlFail "BZ 798792 found...ipa netgroup-find options set to space return internal errors"
+#		else
+#			rlPass "BZ 798792 not found."
+#		fi
+#	rlPhaseEnd
 
 	rlPhaseStartTest "netgroup_find_negative_028: Fail to find with non-existent hosts"
 		rlRun "ipa netgroup-find --hosts=badhosts > $tmpout 2>&1" 1
 		rlAssertGrep "^0 netgroups matched" $tmpout
 	rlPhaseEnd
 
-	rlPhaseStartTest "netgroup_find_negative_029: Fail to find with hosts equal space (BZ 798792)"
-		rlRun "ipa netgroup-find --hosts=\" \" > $tmpout 2>&1" 1
-		rlAssertGrep "^0 netgroups matched" $tmpout
-		#rlAssertGrep "ipa: ERROR: invalid 'hosts': Leading and trailing spaces are not allowed" $tmpout
-		if [ $(grep "ipa: ERROR: an internal error has occurred" $tmpout|wc -l) -gt 0 ]; then
-			rlFail "BZ 798792 found...ipa netgroup-find options set to space return internal errors"
-		else
-			rlPass "BZ 798792 not found."
-		fi
-	rlPhaseEnd
+# Now a positive test per 798792 fix
+#	rlPhaseStartTest "netgroup_find_negative_029: Fail to find with hosts equal space (BZ 798792)"
+#		rlRun "ipa netgroup-find --hosts=\" \" > $tmpout 2>&1" 1
+#		rlAssertGrep "^0 netgroups matched" $tmpout
+#		#rlAssertGrep "ipa: ERROR: invalid 'hosts': Leading and trailing spaces are not allowed" $tmpout
+#		if [ $(grep "ipa: ERROR: an internal error has occurred" $tmpout|wc -l) -gt 0 ]; then
+#			rlFail "BZ 798792 found...ipa netgroup-find options set to space return internal errors"
+#		else
+#			rlPass "BZ 798792 not found."
+#		fi
+#	rlPhaseEnd
 
-	rlPhaseStartTest "netgroup_find_negative_030: Fail to find with no-hosts equal space (BZ 798792)"
-		rlRun "ipa netgroup-find --no-hosts=\" \" > $tmpout 2>&1" 1
-		rlAssertGrep "^0 netgroups matched" $tmpout
-		#rlAssertGrep "ipa: ERROR: invalid 'no-hosts': Leading and trailing spaces are not allowed" $tmpout
-		if [ $(grep "ipa: ERROR: an internal error has occurred" $tmpout|wc -l) -gt 0 ]; then
-			rlFail "BZ 798792 found...ipa netgroup-find options set to space return internal errors"
-		else
-			rlPass "BZ 798792 not found."
-		fi
-	rlPhaseEnd
+# Now a positive test per 798792 fix
+#	rlPhaseStartTest "netgroup_find_negative_030: Fail to find with no-hosts equal space (BZ 798792)"
+#		rlRun "ipa netgroup-find --no-hosts=\" \" > $tmpout 2>&1" 1
+#		rlAssertGrep "^0 netgroups matched" $tmpout
+#		#rlAssertGrep "ipa: ERROR: invalid 'no-hosts': Leading and trailing spaces are not allowed" $tmpout
+#		if [ $(grep "ipa: ERROR: an internal error has occurred" $tmpout|wc -l) -gt 0 ]; then
+#			rlFail "BZ 798792 found...ipa netgroup-find options set to space return internal errors"
+#		else
+#			rlPass "BZ 798792 not found."
+#		fi
+#	rlPhaseEnd
 
 	rlPhaseStartTest "netgroup_find_negative_031: Fail to find with non-existent hostgroups"
 		rlRun "ipa netgroup-find --hostgroups=badhostgroups > $tmpout 2>&1" 1
 		rlAssertGrep "^0 netgroups matched" $tmpout
 	rlPhaseEnd
 
-	rlPhaseStartTest "netgroup_find_negative_032: Fail to find with hostgroups equal space (BZ 798792)"
-		rlRun "ipa netgroup-find --hostgroups=\" \" > $tmpout 2>&1" 1
-		rlAssertGrep "^0 netgroups matched" $tmpout
-		#rlAssertGrep "ipa: ERROR: invalid 'hostgroups': Leading and trailing spaces are not allowed" $tmpout
-		if [ $(grep "ipa: ERROR: an internal error has occurred" $tmpout|wc -l) -gt 0 ]; then
-			rlFail "BZ 798792 found...ipa netgroup-find options set to space return internal errors"
-		else
-			rlPass "BZ 798792 not found."
-		fi
-	rlPhaseEnd
+# Now a positive test per 798792 fix
+#	rlPhaseStartTest "netgroup_find_negative_032: Fail to find with hostgroups equal space (BZ 798792)"
+#		rlRun "ipa netgroup-find --hostgroups=\" \" > $tmpout 2>&1" 1
+#		rlAssertGrep "^0 netgroups matched" $tmpout
+#		#rlAssertGrep "ipa: ERROR: invalid 'hostgroups': Leading and trailing spaces are not allowed" $tmpout
+#		if [ $(grep "ipa: ERROR: an internal error has occurred" $tmpout|wc -l) -gt 0 ]; then
+#			rlFail "BZ 798792 found...ipa netgroup-find options set to space return internal errors"
+#		else
+#			rlPass "BZ 798792 not found."
+#		fi
+#	rlPhaseEnd
 
-	rlPhaseStartTest "netgroup_find_negative_033: Fail to find with no-hostgroups equal space (BZ 798792)"
-		rlRun "ipa netgroup-find --no-hostgroups=\" \" > $tmpout 2>&1" 1
-		rlAssertGrep "^0 netgroups matched" $tmpout
-		#rlAssertGrep "ipa: ERROR: invalid 'no-hostgroups': Leading and trailing spaces are not allowed" $tmpout
-		if [ $(grep "ipa: ERROR: an internal error has occurred" $tmpout|wc -l) -gt 0 ]; then
-			rlFail "BZ 798792 found...ipa netgroup-find options set to space return internal errors"
-		else
-			rlPass "BZ 798792 not found."
-		fi
-	rlPhaseEnd
+# Now a positive test per 798792 fix
+#	rlPhaseStartTest "netgroup_find_negative_033: Fail to find with no-hostgroups equal space (BZ 798792)"
+#		rlRun "ipa netgroup-find --no-hostgroups=\" \" > $tmpout 2>&1" 1
+#		rlAssertGrep "^0 netgroups matched" $tmpout
+#		#rlAssertGrep "ipa: ERROR: invalid 'no-hostgroups': Leading and trailing spaces are not allowed" $tmpout
+#		if [ $(grep "ipa: ERROR: an internal error has occurred" $tmpout|wc -l) -gt 0 ]; then
+#			rlFail "BZ 798792 found...ipa netgroup-find options set to space return internal errors"
+#		else
+#			rlPass "BZ 798792 not found."
+#		fi
+#	rlPhaseEnd
 
 	rlPhaseStartTest "netgroup_find_negative_034: Fail to find with non-existent netgroup for in-netgroups option"
 		rlRun "ipa netgroup-find --in-netgroups=badnetgroups > $tmpout 2>&1" 1
 		rlAssertGrep "^0 netgroups matched" $tmpout
 	rlPhaseEnd
 
-	rlPhaseStartTest "netgroup_find_negative_035: Fail to find with in-netgroups equal space (BZ 798792)"
-		rlRun "ipa netgroup-find --in-netgroups=\" \" > $tmpout 2>&1" 1
-		rlAssertGrep "^0 netgroups matched" $tmpout
-		#rlAssertGrep "ipa: ERROR: invalid 'in-netgroups': Leading and trailing spaces are not allowed" $tmpout
-		if [ $(grep "ipa: ERROR: an internal error has occurred" $tmpout|wc -l) -gt 0 ]; then
-			rlFail "BZ 798792 found...ipa netgroup-find options set to space return internal errors"
-		else
-			rlPass "BZ 798792 not found."
-		fi
-	rlPhaseEnd
+# Now a positive test per 798792 fix
+#	rlPhaseStartTest "netgroup_find_negative_035: Fail to find with in-netgroups equal space (BZ 798792)"
+#		rlRun "ipa netgroup-find --in-netgroups=\" \" > $tmpout 2>&1" 1
+#		rlAssertGrep "^0 netgroups matched" $tmpout
+#		#rlAssertGrep "ipa: ERROR: invalid 'in-netgroups': Leading and trailing spaces are not allowed" $tmpout
+#		if [ $(grep "ipa: ERROR: an internal error has occurred" $tmpout|wc -l) -gt 0 ]; then
+#			rlFail "BZ 798792 found...ipa netgroup-find options set to space return internal errors"
+#		else
+#			rlPass "BZ 798792 not found."
+#		fi
+#	rlPhaseEnd
 
-	rlPhaseStartTest "netgroup_find_negative_036: Fail to find with not-in-netgroups equal space (BZ 798792)"
-		rlRun "ipa netgroup-find --not-in-netgroups=\" \" > $tmpout 2>&1" 1
-		rlAssertGrep "^0 netgroups matched" $tmpout
-		#rlAssertGrep "ipa: ERROR: invalid 'not-in-netgroups': Leading and trailing spaces are not allowed" $tmpout
-		if [ $(grep "ipa: ERROR: an internal error has occurred" $tmpout|wc -l) -gt 0 ]; then
-			rlFail "BZ 798792 found...ipa netgroup-find options set to space return internal errors"
-		else
-			rlPass "BZ 798792 not found."
-		fi
-	rlPhaseEnd
+# Now a positive test per 798792 fix
+#	rlPhaseStartTest "netgroup_find_negative_036: Fail to find with not-in-netgroups equal space (BZ 798792)"
+#		rlRun "ipa netgroup-find --not-in-netgroups=\" \" > $tmpout 2>&1" 1
+#		rlAssertGrep "^0 netgroups matched" $tmpout
+#		#rlAssertGrep "ipa: ERROR: invalid 'not-in-netgroups': Leading and trailing spaces are not allowed" $tmpout
+#		if [ $(grep "ipa: ERROR: an internal error has occurred" $tmpout|wc -l) -gt 0 ]; then
+#			rlFail "BZ 798792 found...ipa netgroup-find options set to space return internal errors"
+#		else
+#			rlPass "BZ 798792 not found."
+#		fi
+#	rlPhaseEnd
 }
 
 netgroup_find_negative_other()
