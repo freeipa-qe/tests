@@ -159,3 +159,39 @@ upgrade_bz_782918()
 	rlPhaseEnd
 	[ -f $tmpout ] && rm -f $tmpout
 }
+
+upgrade_bz_803054()
+{
+	TESTORDER=$(( TESTORDER += 1 ))
+	local tmpout=/tmp/errormsg.out
+	rlPhaseStartTest "upgrade_bz_803054: ipa commands after upgrade return Insufficient access: KDC returned NOT_ALLOWED_TO_DELEGATE"
+	case "$MYROLE" in
+	"MASTER")
+		rlLog "Machine in recipe is MASTER"
+		rlRun "ipactl restart"
+		rlRun "ipa user-find > $tmpout 2>&1"
+		if [ $(grep "ipa: ERROR: Insufficient access: KDC returned NOT_ALLOWED_TO_DELEGATE" $tmpout|wc -l) -gt 0 ]; then
+			rlRun "echo 'Need SELinux check for BZ799102 fix for this too"
+			rlFail "BZ 803054 found...ipa commands after upgrade return Insufficient access: KDC returned NOT_ALLOWED_TO_DELEGATE"
+		elif [ $(grep "User login: admin" $tmpout | wc -l) -gt 0 ]; then
+			rlPass "BZ 803054 not found...ipa user-find succeeded.  No error returned"
+		else
+			rlFail "Unknown error found.  Manually check upgrade"
+		fi
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $MASTER_IP"
+		;;
+	"SLAVE")
+		rlLog "Machine in recipe is SLAVE"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER_IP"
+		;;
+	"CLIENT")
+		rlLog "Machine in recipe is CLIENT"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER_IP"
+		;;
+	*)
+		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
+		;;
+	esac
+	rlPhaseEnd
+	[ -f $tmpout ] && rm -f $tmpout
+}
