@@ -1986,7 +1986,7 @@ rlPhaseStartTest "sudorule-mod_011: ipa sudorule-mod --setattr"
 	rlRun "ipa sudorule-add-user rule1 --users=test1"
 	#rlRun "ipa sudorule-mod rule1 --setattr=externaluser=test2 > $TmpDir/sudorule-mod_011.txt 2>&1" 1
 
-	verifyErrorMsg "ipa sudorule-mod rule1 --setattr=externaluser=test2" "ipa: ERROR: invalid 'externaluser':  this option has been deprecated."
+	verifyErrorMsg "ipa sudorule-mod rule1 --setattr=externaluser=test2" "ipa: ERROR: invalid 'externaluser': this option has been deprecated."
 
 #	rlAssertGrep "Rule name: rule1" "$TmpDir/sudorule-mod_011.txt"
 #	rlAssertGrep "External User: test2" "$TmpDir/sudorule-mod_011.txt"

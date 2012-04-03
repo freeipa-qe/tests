@@ -71,7 +71,7 @@ rlPhaseStartTest "bug769491: Unable to add certain sudo commands to groups."
 	rlRun "ipa sudocmdgroup-add sudogrp1 --desc=sudogrp1"
 	rlRun "ipa sudocmdgroup-add-member sudogrp1 --sudocmds=\"/bin/chown -R apache:developers /var/www/*/shared/log\" > $TmpDir/bug769491.txt 2>&1"
 	rlAssertGrep "Member Sudo commands: /bin/chown -r apache:developers /var/www/\*/shared/log" "$TmpDir/bug769491.txt"
-	rlAssertGrep "Numer of members added 1" "$TmpDir/bug769491.txt"
+	rlAssertGrep "Number of members added 1" "$TmpDir/bug769491.txt"
         rlRun "cat $TmpDir/bug769491.txt"
 
 	rlRun "ipa sudocmdgroup-show sudogrp1 > $TmpDir/bug769491.txt 2>&1"
@@ -82,7 +82,7 @@ rlPhaseStartTest "bug769491: Unable to add certain sudo commands to groups."
 	rlRun "ipa sudocmdgroup-remove-member sudogrp1 --sudocmds=\"/bin/chown -R apache:developers /var/www/*/shared/log\" > $TmpDir/bug769491.txt 2>&1"
 	rlAssertGrep "Sudo Command Group: sudogrp1" "$TmpDir/bug769491.txt"
         rlAssertNotGrep "Member Sudo commands: /bin/chown -r apache:developers /var/www/\*/shared/log" "$TmpDir/bug769491.txt"
-	rlAssertGrep "Numer of members removed 1" "$TmpDir/bug769491.txt"
+	rlAssertGrep "Number of members removed 1" "$TmpDir/bug769491.txt"
         rlRun "cat $TmpDir/bug769491.txt"
 
 	# clean up
@@ -177,11 +177,11 @@ rlPhaseStartTest "bug783286: Setting HBAC/SUDO category to Anyone doesn't remove
 	rlRun "echo Secret123 | ipa user-add shanks --first=shanks --last=r"
 	rlRun "ipa group-add group1 --desc=group1"
 	rlRun "ipa sudocmd-add /bin/ls"
-	rlRun "ipa sudorule-add-host bug783286 --hosts=$HOSTNAME"
 
         rlRun "ipa sudorule-add bug783286"
         rlAssertGrep "User category: all" "$TmpDir/bug783286.txt"
         rlRun "cat $TmpDir/bug783286.txt"
+	rlRun "ipa sudorule-add-host bug783286 --hosts=$HOSTNAME"
 
         rlRun "ipa sudorule-add-user bug783286 --users=shanks > $TmpDir/bug783286.txt 2>&1" 1
         rlAssertGrep "ipa: ERROR: users cannot be added when user category='all'" "$TmpDir/bug783286.txt"
@@ -229,14 +229,14 @@ rlPhaseStartTest "bug800537: Sudo commands with special characters cannot be rem
 
         rlRun "ipa sudocmd-add \"/bin/ls /tmp/test\ dir\""
         rlRun "ipa sudocmdgroup-add b-group --desc=g2"
-        rlRun "ipa sudocmdgroup-add-member a-group --sudocmds=\"/bin/ls /tmp/test\ dir\""
-        rlRun "ipa sudocmdgroup-remove-member a-group --sudocmds=\"/bin/ls /tmp/test\ dir\""
+        rlRun "ipa sudocmdgroup-add-member b-group --sudocmds=\"/bin/ls /tmp/test\ dir\""
+        rlRun "ipa sudocmdgroup-remove-member b-group --sudocmds=\"/bin/ls /tmp/test\ dir\""
         rlRun "ipa sudocmdgroup-del b-group"
 
         rlRun "ipa sudocmd-add \"/bin/ls, /bin/cp\""
         rlRun "ipa sudocmdgroup-add c-group --desc=g3"
-	rlRun "ipa sudocmdgroup-add-member a-group --sudocmds=\"/bin/ls, /bin/cp\""
-	rlRun "ipa sudocmdgroup-remove-member a-group --sudocmds=\"/bin/ls, /bin/cp\""
+	rlRun "ipa sudocmdgroup-add-member c-group --sudocmds=\"/bin/ls, /bin/cp\""
+	rlRun "ipa sudocmdgroup-remove-member c-group --sudocmds=\"/bin/ls, /bin/cp\""
 	rlRun "ipa sudocmdgroup-del c-group"
 	
 rlPhaseEnd

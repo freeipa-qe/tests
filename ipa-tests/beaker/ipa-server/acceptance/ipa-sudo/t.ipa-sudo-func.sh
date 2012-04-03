@@ -983,7 +983,7 @@ rlPhaseStartTest "Bug 710601: ipa sudorule-add accepts blank spaces as sudorule 
 	rlAssertNotGrep "Added sudo rule \" \"" "$TmpDir/bug710601.txt"
 
 	rlRun "cat $TmpDir/bug710601.txt"
-	rlRun "ipa sudorule-del \" \"" 1
+	rlRun "ipa sudorule-del \" \"" 2
 
 rlPhaseEnd
 }
@@ -997,7 +997,7 @@ rlPhaseStartTest "Bug 710598: ipa sudocmdgroup-add accepts blank spaces as sudoc
         rlAssertNotGrep "Added sudo command group \" \"" "$TmpDir/bug710598.txt"
 
 	rlRun "cat $TmpDir/bug710598.txt"
-	rlRun "ipa sudocmdgroup-del \" \"" 1
+	rlRun "ipa sudocmdgroup-del \" \"" 2
 
 rlPhaseEnd
 }
@@ -1011,7 +1011,7 @@ rlPhaseStartTest "Bug 710592: ipa sudocmd-add accepts blank spaces as sudo comma
 	rlAssertNotGrep "Added sudo command \" \"" "$TmpDir/bug710592.txt"
 
 	rlRun "cat $TmpDir/bug710592.txt"
-	rlRun "ipa sudocmd-del \" \"" 1
+	rlRun "ipa sudocmd-del \" \"" 2
 
 rlPhaseEnd
 }
