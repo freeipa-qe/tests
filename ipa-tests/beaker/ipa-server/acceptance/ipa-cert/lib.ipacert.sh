@@ -64,8 +64,13 @@ create_cert_request_file()
 {
     local requestFile=$1
     local keyFile=$2
+    local keySize=$3
     # command to use:
-    local certCmd="openssl req -out $requestFile -new -newkey rsa:2048 -nodes -keyout $keyFile"
+    if [ -z "$keySize" ];then
+     keySize=2048
+    fi
+    echo $keySize
+    local certCmd="openssl req -out $requestFile -new -newkey rsa:$keySize -nodes -keyout $keyFile"
     local exp=$TmpDir/createCertRequestFile.$RANDOM.exp # beaker test
     #local exp=/tmp/createCertRequestFile.$RANDOM.exp  # local test
 
