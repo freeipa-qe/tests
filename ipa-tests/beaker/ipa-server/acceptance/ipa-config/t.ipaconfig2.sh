@@ -362,7 +362,7 @@ ipaconfig_setattr_positive()
         fi
    rlPhaseEnd
 
-   rlPhaseStartTest "ipaconfig-mod_setattr ipacertificatesubjectbase positive"
+   rlPhaseStartTest "ipaconfig-mod_setattr ipacertificatesubjectbase negative"
         command="ipa config-mod --setattr=ipacertificatesubjectbase=\"OU=Bogus\""
         expmsg="ipa: ERROR: Action not allowed"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
