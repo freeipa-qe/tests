@@ -195,3 +195,59 @@ upgrade_bz_803054()
 	rlPhaseEnd
 	[ -f $tmpout ] && rm -f $tmpout
 }
+
+upgrade_bz_809262()
+{
+	TESTORDER=$(( TESTORDER += 1 ))
+	local tmpout=/tmp/errormsg.out
+	rlPhaseStartTest "upgrade_bz_809262: IPA Upgrade Web UI failure with internal server error"
+	case "$MYROLE" in
+	"MASTER")
+		rlLog "Machine in recipe is MASTER"
+
+		rlLog "Checking SELinux Boolean httpd_manage_ipa"
+		seboolchk=$(getsebool httpd_manage_ipa|grep " on$"|wc -l)
+		if [ $seboolchk -eq 0 ]; then
+			rlFail "SELinux Boolean httpd_manage_ipa needs to be set to on/true for WebUI to work."
+		else
+			rlPass "SELinux Boolean httpd_manage_ipa is enabled"
+		fi	
+		
+		rlLog "Checking Web UI"
+
+		rlLog "Prepare json query in file"
+		jsonfile=/tmp/jsoninput
+		echo '{"method":"user_find","params":[[],{"sizelimit":0,"pkey_only":true}]}' > $jsonfile
+
+		rlLog "Getting Session ID with:  curl -v --negotiate -u: https://$MASTER/ipa/session/login_kerberos --cacert /etc/ipa/ca.crt"
+		sessionid=$(curl -v --negotiate -u: https://$MASTER/ipa/session/login_kerberos --cacert /etc/ipa/ca.crt 2>&1 |grep ipa_session 2>&1|sed 's/^.*ipa_session=\([0-Z]*\).*$/\1/')
+
+		rlRun "curl  -H \"Content-Type:application/json\" -H \"Referer: https://$MASTER/ipa/xml\" -H \"Accept:application/json\"  -H \"Accept-Language:en\" --cacert /etc/ipa/ca.crt -d  @$jsonfile -X POST -b \"ipa_session=$sessionid; httponly; Path=/ipa; secure\" https://$MASTER/ipa/session/json > $tmpout 2>&1" 
+		rlRun "cat $tmpout"
+		rlLog "Checking $tmpout for \"Internal Server Error\""
+		weberrors=$(grep -i "Internal Server Error" $tmpout|wc -l)
+		if [ $weberrors -gt 0 ]; then
+			rlLog "Internal Server Error Found"
+			rlFail "BZ 809262 found...IPA Upgrade Web UI failure with internal server error"
+		else
+			rlLog "Internal Server Error Not Found"
+			rlPass "BZ 809262 not found...WebUI did not return Internal Server Error"
+		fi
+
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $MASTER_IP"
+		;;
+	"SLAVE")
+		rlLog "Machine in recipe is SLAVE"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER_IP"
+		;;
+	"CLIENT")
+		rlLog "Machine in recipe is CLIENT"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER_IP"
+		;;
+	*)
+		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
+		;;
+	esac
+	rlPhaseEnd
+	[ -f $tmpout ] && rm -f $tmpout
+}
