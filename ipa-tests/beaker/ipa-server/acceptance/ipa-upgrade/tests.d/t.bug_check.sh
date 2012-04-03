@@ -171,7 +171,7 @@ upgrade_bz_803054()
 		rlRun "ipactl restart"
 		rlRun "ipa user-find > $tmpout 2>&1"
 		if [ $(grep "ipa: ERROR: Insufficient access: KDC returned NOT_ALLOWED_TO_DELEGATE" $tmpout|wc -l) -gt 0 ]; then
-			rlRun "echo 'Need SELinux check for BZ799102 fix for this too"
+			rlFail "Need SELinux check for BZ799102 fix for this too"
 			rlFail "BZ 803054 found...ipa commands after upgrade return Insufficient access: KDC returned NOT_ALLOWED_TO_DELEGATE"
 		elif [ $(grep "User login: admin" $tmpout | wc -l) -gt 0 ]; then
 			rlPass "BZ 803054 not found...ipa user-find succeeded.  No error returned"
