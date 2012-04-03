@@ -222,7 +222,7 @@ ipaconfig_mod_pwdexpiration()
     rlPhaseEnd
 
     rlPhaseStartTest "ipaconfig_mod_pwdexpiration - negative"
-	expmsg="ipa: ERROR: invalid 'ipapwdexpadvnotify': must be an integer"
+	expmsg="ipa: ERROR: invalid 'pwdexpnotify': must be an integer"
 	for item in a * GH blaH ; do
 		rlRun "verifyErrorMsg \"ipa config-mod --pwdexpnotify=$item\" \"$expmsg\"" 0 "Verify expected error message."
 	done
