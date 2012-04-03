@@ -151,25 +151,21 @@ ipaconfig_addattr_negative()
         command="ipa config-mod --addattr=ipagroupsearchfields=newattr"
         expmsg="ipa: ERROR: ipagroupsearchfields: Only one value allowed."
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
+	rlLog "Verifies bugzilla https://bugzilla.redhat.com/show_bug.cgi?id=794746"
   rlPhaseEnd
 
   rlPhaseStartTest "ipaconfig_addaddtr negative test - ipausersearchfields only one allowed"
         command="ipa config-mod --addattr=ipausersearchfields=newattr"
         expmsg="ipa: ERROR: ipausersearchfields: Only one value allowed."
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
+	rlLog "Verifies bugzilla https://bugzilla.redhat.com/show_bug.cgi?id=794746"
   rlPhaseEnd
 
   rlPhaseStartTest "ipaconfig_addaddtr negative test - ipacertificatesubjectbase only one allowed"
         command="ipa config-mod --addattr=ipacertificatesubjectbase=O=DOMAIN.COM"
         expmsg="ipa: ERROR: ipacertificatesubjectbase: Only one value allowed."
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
-
-	ipa config-show | grep DOMAIN.COM > /tmp/certsubbug.out
-	cat /tmp/certsubbug.out | grep DOMAIN.COM
-	if [ $? -eq 0 ] ; then
-		rlLog "bz794750 is not yet fixed"
-		ipa config-mod --setattr=ipacertificatesubjectbase="O=$RELM"
-	fi
+	rlLog "Verifies bugzilla https://bugzilla.redhat.com/show_bug.cgi?id=807018"
   rlPhaseEnd
 
   rlPhaseStartTest "ipaconfig_addaddtr negative test - ipapwdexpadvnotify - only one allowed"
@@ -204,72 +200,84 @@ ipaconfig_delattr_negative()
 	command="ipa config-mod --delattr=ipaCustomFields=FALSE"
 	expmsg="ipa: ERROR: ipacustomfields does not exist"
 	rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
+	rlLog "Verifies bugzilla https://bugzilla.redhat.com/show_bug.cgi?id=794804"
     rlPhaseEnd
 
     rlPhaseStartTest "ipaconfig_mod_delattr ipahomesrootdir negative test"
 	command="ipa config-mod --delattr=ipahomesrootdir=/home/"
         expmsg="ipa: ERROR: Action not allowed"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
+        rlLog "Verifies bugzilla https://bugzilla.redhat.com/show_bug.cgi?id=794804"
     rlPhaseEnd
 
     rlPhaseStartTest "ipaconfig_mod_delattr ipamaxusernamelength negative test"
         command="ipa config-mod --delattr=ipamaxusernamelength=32"
         expmsg="ipa: ERROR: Action not allowed"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
+        rlLog "Verifies bugzilla https://bugzilla.redhat.com/show_bug.cgi?id=794804"
     rlPhaseEnd
 
     rlPhaseStartTest "ipaconfig_mod_delattr ipadefaultloginshell negative test"
         command="ipa config-mod --delattr=ipadefaultloginshell=/bin/bash"
         expmsg="ipa: ERROR: Action not allowed"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
+        rlLog "Verifies bugzilla https://bugzilla.redhat.com/show_bug.cgi?id=794804"
     rlPhaseEnd
 
     rlPhaseStartTest "ipaconfig_mod_delattr ipadefaultprimarygroup negative test"
         command="ipa config-mod --delattr=ipadefaultprimarygroup=\"cn=ipausers,cn=accounts,cn=$BASEDN\""
         expmsg="ipa: ERROR: Action not allowed"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
+        rlLog "Verifies bugzilla https://bugzilla.redhat.com/show_bug.cgi?id=794804"
     rlPhaseEnd
 
     rlPhaseStartTest "ipaconfig_mod_delattr ipadefaultemaildomain negative test"
         command="ipa config-mod --delattr=ipadefaultemaildomain=$DOMAIN"
         expmsg="ipa: ERROR: Action not allowed"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
+        rlLog "Verifies bugzilla https://bugzilla.redhat.com/show_bug.cgi?id=794804"
     rlPhaseEnd
 
     rlPhaseStartTest "ipaconfig_mod_delattr ipasearchtimelimit negative test"
         command="ipa config-mod --delattr=ipasearchtimelimit=2"
         expmsg="ipa: ERROR: Action not allowed"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
+        rlLog "Verifies bugzilla https://bugzilla.redhat.com/show_bug.cgi?id=794804"
     rlPhaseEnd
 
     rlPhaseStartTest "ipaconfig_mod_delattr ipasearchrecordslimit negative test"
         command="ipa config-mod --delattr=ipasearchrecordslimit=100"
         expmsg="ipa: ERROR: Action not allowed"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
+        rlLog "Verifies bugzilla https://bugzilla.redhat.com/show_bug.cgi?id=794804"
     rlPhaseEnd
 
     rlPhaseStartTest "ipaconfig_mod_delattr ipagroupsearchfields negative test"
         command="ipa config-mod --delattr=ipagroupsearchfields="
         expmsg="ipa: ERROR: Action not allowed"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
+        rlLog "Verifies bugzilla https://bugzilla.redhat.com/show_bug.cgi?id=794804"
     rlPhaseEnd
 
     rlPhaseStartTest "ipaconfig_mod_delattr ipausersearchfields negative test"
         command="ipa config-mod --delattr=ipausersearchfields="
         expmsg="ipa: ERROR: Action not allowed"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
+        rlLog "Verifies bugzilla https://bugzilla.redhat.com/show_bug.cgi?id=794804"
     rlPhaseEnd
 
     rlPhaseStartTest "ipaconfig_mod_delattr ipacertificatesubjectbase negative test"
         command="ipa config-mod --delattr=ipacertificatesubjectbase=O=$RELM"
         expmsg="ipa: ERROR: Action not allowed"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
+        rlLog "Verifies bugzilla https://bugzilla.redhat.com/show_bug.cgi?id=794804"
     rlPhaseEnd
 
     rlPhaseStartTest "ipaconfig_mod_delattr ipapwdexpadvnotify negative test"
         command="ipa config-mod --delattr=ipapwdexpadvnotify=4"
         expmsg="ipa: ERROR: Action not allowed"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
+        rlLog "Verifies bugzilla https://bugzilla.redhat.com/show_bug.cgi?id=794804"
     rlPhaseEnd
 
 }
@@ -355,15 +363,10 @@ ipaconfig_setattr_positive()
    rlPhaseEnd
 
    rlPhaseStartTest "ipaconfig-mod_setattr ipacertificatesubjectbase positive"
-        rlRun "ipa config-mod --setattr=ipacertificatesubjectbase=\"OU=Bogus\"" 0 "Set ipacertificatesubjectbase to OU=Bogus"
-        ipa config-show --all > /tmp/configshowadd.out
-        cat /tmp/configshowadd.out | grep "Certificate Subject base: OU=Bogus"
-        if [ $? -eq 0 ] ; then
-                rlPass "ipacertificatesubjectbase successfully changed."
-        else
-                rlFail "ipacertificatesubjectbase not as expected"
-        fi
-
+        command="ipa config-mod --setattr=ipacertificatesubjectbase=\"OU=Bogus\""
+        expmsg="ipa: ERROR: Action not allowed"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
+        rlLog "Verifies bugzilla https://bugzilla.redhat.com/show_bug.cgi?id=807018"
    rlPhaseEnd
 
    rlPhaseStartTest "ipaconfig-mod_setattr ipapwdexpadvnotify positive"
