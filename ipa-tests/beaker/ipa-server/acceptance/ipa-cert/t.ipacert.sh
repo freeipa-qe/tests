@@ -23,6 +23,7 @@ cert_remove_hold()
     cert_remove_hold_1001  #test_scenario (positive test): when cert revoked as reason 6 cert can remove hold
     cert_remove_hold_1002  #test_scenario (negative test): when cert revoked not as reason 6 cert cannot remove hold
     cert_remove_hold_1003  #test_scenario (negative test): when invalid cert id is given remove-hold should fail
+    cert_remove_hold_1004  #test_scenario (negative test): Revoke a certificate which is not in revoked state 
     cert_remove_hold_envcleanup
 } #cert-remove-hold
 
@@ -43,36 +44,38 @@ cert_remove_hold_envcleanup()
         #environment cleanup ends   here
     rlPhaseEnd
 } #envcleanup
-
 cert_remove_hold_1001()
 { #test_scenario (positive): --certid
     rlPhaseStartTest "cert_remove_hold_1001"
         local testID="cert_remove_hold_1001"
         local tmpout=$TmpDir/cert_remove_hold_1001.$RANDOM.out
         create_cert
-        echo $certList
         KinitAsAdmin
-        local certid=`tail -n1 $certList | cut -d"=" -f2|cut -d" " -f1 | xargs echo`
-        rlRun "ipa cert-revoke $certid --revocation-reason=6" 0 "set revoke reason to 6 -- this is only reason we can remove hold"
-        ipa cert-show $certid > $tmpout
-        reason=`grep -i "Revocation reason" $tmpout | cut -d":" -f2 | xargs echo`
-        if [ "$reason" = "6" ];then
+        for cert in `cat $certList`;do
+        echo $cert
+         local certid=`echo $cert | cut -d"=" -f2`
+         echo $certid
+         rlRun "ipa cert-revoke $certid --revocation-reason=6" 0 "set revoke reason to 6 -- this is only reason we can remove hold"
+         ipa cert-show $certid > $tmpout
+         reason=`grep -i "Revocation reason" $tmpout | cut -d":" -f2 | xargs echo`
+         if [ "$reason" = "6" ];then
             rlLog "revoke reason set to [6] confirmed"
-        else
+         else
             rlFail "revoke reason expected to be [6], actual [$reason], test can not continue"
             return
-        fi
-        rlRun "ipa cert-remove-hold $certid " 0 "test options: remove hold " 
+         fi
+         rlRun "ipa cert-remove-hold $certid " 0 "test options: remove hold "
 
-        #after remove hold, lets check the content again
-        ipa cert-show $certid > $tmpout
-        if grep -i "Revocation reason" $tmpout
-        then
+         #after remove hold, lets check the content again
+         ipa cert-show $certid > $tmpout
+         if grep -i "Revocation reason" $tmpout
+         then
             rlFail "revocation reason still found in cert-show, test failed"
             cat $tmpout
-        else
+         else
             rlPass "revocation reason not found in cert-show, test pass"
-        fi
+         fi
+        done  
         Kcleanup
         rm $tmpout
     rlPhaseEnd
@@ -162,7 +165,30 @@ cert_remove_hold_1003()
         Kcleanup
     rlPhaseEnd
 } #cert_remove_hold_1003
-
+cert_remove_hold_1004()
+{ #test_scenario (Negative): Unrevoke a certificate which is not revoked.
+    rlPhaseStartTest "cert_remove_hold_1004"
+        local testID="cert_remove_hold_1004"
+        local tmpout=$TmpDir/cert_remove_hold_1004.$RANDOM.out
+        create_cert
+        KinitAsAdmin
+        for cert in `cat $certList`;do
+        echo $cert
+         local certid=`echo $cert | cut -d"=" -f2`
+         echo $certid
+         rlRun "ipa cert-remove-hold $certid " > $tmpout
+         if grep -i "Error: One or more certificates could not be unrevoked" $tmpout
+         then
+            rlPass "ipa cert-remove-hold cannot unrevoke a certificate which is not in revoked state"
+            cat $tmpout
+         else
+            rlFail "ipa cert-remove-hold unrevoked a certificate which is not in revoked state"
+         fi
+        done
+        Kcleanup
+        rm $tmpout
+    rlPhaseEnd
+} #cert_remove_hold_1004
 #END OF TEST CASE for [cert-remove-hold]
 
 #############################################
@@ -180,6 +206,14 @@ cert_request()
     cert_request_1007  #test_scenario (negative test): [--principal;positive;STR --request-type;negative;STR]
     cert_request_1008  #test_scenario (positive test): [--principal;positive;STR --request-type;positive;STR]
     cert_request_1009  #test_scenario (negative): use same cert request file and principle twice, the first will be revoked with reason 4
+    cert_request_1010  #test_scenario (negative):csr given only as argument and service principal does not exists #Added by Kaleem
+    cert_request_1011  #test_scenario (Positive):csr given only as argument after service principal added through ipa service-add #Added by Kaleem
+    cert_request_1012  #test_scenario (negative): corrupted csr given as argument after service principal added through ipa service-add #Added by Kaleem
+    cert_request_1013  #test_scenario (Positive):csr given only as argument along with --add option #Added by Kaleem
+    cert_request_1014  #test_scenario (Positive):csr-positive, request-type --positive --add option #Added by Kaleem
+    cert_request_1015  #test_scenario (Negative):csr-positive, request-type -- negative --add option #Added by Kaleem
+    cert_request_1016  #test_scenario (Negative):csr-positive, principal - negative request-type -- negative --add option #Added by Kaleem
+    cert_request_1017  #test_scenario (Negative):csr-positive, principal - negative request-type -- negative --add option #Added by Kaleem
     cert_request_envcleanup
 } #cert-request
 
@@ -490,6 +524,313 @@ cert_request_1009()
     rlPhaseEnd
 } #cert_request_1009
 
+cert_request_1010()
+{ #test_scenario (negative): csr given only as argument and service principal does not exists
+    rlPhaseStartTest "cert_request_1010"
+        local testID="cert_request_1010_$RANDOM"
+        local tmpout=$TmpDir/cert_request_1010.$RANDOM.out
+        local exp=$TmpDir/cert_request_1010.$RANDOM.exp
+        local certRequestFile=$TmpDir/certrequest.$RANDOM.certreq.csr
+        local certPrivateKeyFile=$TmpDir/certrequest.$RANDOM.prikey.txt
+        local principal_TestValue="sevice$testID/$hostname" 
+        create_cert_request_file $certRequestFile $certPrivateKeyFile
+        
+        KinitAsAdmin
+
+        local cmd="ipa cert-request $certRequestFile"
+        echo "set timeout 5" > $exp
+        echo "set force_conservative 0" >> $exp
+        echo "set send_slow {1 .1}" >> $exp
+        echo "spawn $cmd" >> $exp
+        echo 'expect "Principal *"' >> $exp
+        echo "send -s -- \"$principal_TestValue\r\"" >> $exp
+        echo 'expect eof ' >> $exp
+        /usr/bin/expect $exp > $tmpout 2>&1
+    
+        if grep -i "ipa: ERROR: The service principal for this request doesn't exist." $tmpout
+         then
+            rlPass "Certificate not generated because service principal does not exits"
+            cat $tmpout
+        else
+            rlFail "Certificate is generated even without service principal does not exists"
+        fi
+
+        Kcleanup
+        rm $tmpout
+        rm $certRequestFile
+        rm $certPrivateKeyFile
+    rlPhaseEnd
+} #cert_request_1010
+
+cert_request_1011()
+{ #test_scenario (Positive): csr given only as argument after service principal added through ipa service-add
+    rlPhaseStartTest "cert_request_1011"
+        local testID="cert_request_1011_$RANDOM"
+        local tmpout=$TmpDir/cert_request_1011.$RANDOM.out
+        local exp=$TmpDir/cert_request_1011.$RANDOM.exp
+        local certRequestFile=$TmpDir/certrequest.$RANDOM.certreq.csr
+        local certPrivateKeyFile=$TmpDir/certrequest.$RANDOM.prikey.txt
+        local principal_TestValue="sevice$testID/$hostname"
+        create_cert_request_file $certRequestFile $certPrivateKeyFile
+
+        KinitAsAdmin
+        ipa service-add $principal_TestValue
+        local cmd="ipa cert-request $certRequestFile"
+        echo "set timeout 5" > $exp
+        echo "set force_conservative 0" >> $exp
+        echo "set send_slow {1 .1}" >> $exp
+        echo "spawn $cmd" >> $exp
+        echo 'expect "Principal *"' >> $exp
+        echo "send -s -- \"$principal_TestValue\r\"" >> $exp
+        echo 'expect eof ' >> $exp
+        /usr/bin/expect $exp > $tmpout 2>&1
+
+        if grep -i "Serial number" $tmpout
+         then
+            rlPass "Certificate generated for service principal $principal_TestValue"
+            cat $tmpout
+        else
+            rlFail "Certificate not generated for service principal $principal_TestValue"
+        fi
+
+        Kcleanup
+        rm $tmpout
+        rm $certRequestFile
+        rm $certPrivateKeyFile
+    rlPhaseEnd
+} #cert_request_1011
+
+cert_request_1012()
+{ #test_scenario (negative): incorrect csr given as argument after service principal added through ipa service-add
+    rlPhaseStartTest "cert_request_1012"
+        local testID="cert_request_1012_$RANDOM"
+        local tmpout=$TmpDir/cert_request_1012.$RANDOM.out
+        local exp=$TmpDir/cert_request_1012.$RANDOM.exp
+        local certRequestFile=$TmpDir/certrequest.$RANDOM.certreq.csr
+        local certPrivateKeyFile=$TmpDir/certrequest.$RANDOM.prikey.txt
+        local principal_TestValue="sevice$testID/$hostname"
+        create_cert_request_file $certRequestFile $certPrivateKeyFile
+
+        KinitAsAdmin
+        ipa service-add $principal_TestValue
+        echo "jkdsfldsfjldsfds" > $certRequestFile
+        local cmd="ipa cert-request $certRequestFile"
+        echo "set timeout 5" > $exp
+        echo "set force_conservative 0" >> $exp
+        echo "set send_slow {1 .1}" >> $exp
+        echo "spawn $cmd" >> $exp
+        echo 'expect "Principal *"' >> $exp
+        echo "send -s -- \"$principal_TestValue\r\"" >> $exp
+        echo 'expect eof ' >> $exp
+        /usr/bin/expect $exp > $tmpout 2>&1
+
+        if grep -i "ipa: ERROR: Certificate operation cannot be completed: Failure decoding Certificate Signing Request" $tmpout
+         then
+            rlPass "Certificate cannot generated for service principal $principal_TestValue as csr is corrupted"
+            cat $tmpout
+        else
+            rlFail "Certificate generated for service principal $principal_TestValue even for csr is corrupted"
+            cat $tmpout
+        fi
+
+        Kcleanup
+        rm $tmpout
+        rm $certRequestFile
+        rm $certPrivateKeyFile
+    rlPhaseEnd
+} #cert_request_1012
+
+cert_request_1013()
+{ #test_scenario (positive): csr given as argument along with --add option
+    rlPhaseStartTest "cert_request_1013"
+        local testID="cert_request_1013_$RANDOM"
+        local tmpout=$TmpDir/cert_request_1013.$RANDOM.out
+        local exp=$TmpDir/cert_request_1013.$RANDOM.exp
+        local certRequestFile=$TmpDir/certrequest.$RANDOM.certreq.csr
+        local certPrivateKeyFile=$TmpDir/certrequest.$RANDOM.prikey.txt
+        local principal_TestValue="sevice$testID/$hostname"
+        create_cert_request_file $certRequestFile $certPrivateKeyFile
+
+        KinitAsAdmin
+        local cmd="ipa cert-request $certRequestFile --add"
+        echo "set timeout 5" > $exp
+        echo "set force_conservative 0" >> $exp
+        echo "set send_slow {1 .1}" >> $exp
+        echo "spawn $cmd" >> $exp
+        echo 'expect "Principal *"' >> $exp
+        echo "send -s -- \"$principal_TestValue\r\"" >> $exp
+        echo 'expect eof ' >> $exp
+        /usr/bin/expect $exp > $tmpout 2>&1
+
+        if grep -i "Serial number" $tmpout
+         then
+            rlPass "Certificate generated for service principal $principal_TestValue"
+            cat $tmpout
+        else
+            rlFail "Certificate not generated for service principal $principal_TestValue"
+        fi
+
+        Kcleanup
+        rm $tmpout
+        rm $certRequestFile
+        rm $certPrivateKeyFile
+    rlPhaseEnd
+} #cert_request_1013
+ 
+cert_request_1014()
+{ #test_scenario (Positive): csr--positive and request-type --positive as arguments 
+    rlPhaseStartTest "cert_request_1014"
+        local testID="cert_request_1014_$RANDOM"
+        local tmpout=$TmpDir/cert_request_1014.$RANDOM.out
+        local exp=$TmpDir/cert_request_1014.$RANDOM.exp
+        local certRequestFile=$TmpDir/certrequest.$RANDOM.certreq.csr
+        local certPrivateKeyFile=$TmpDir/certrequest.$RANDOM.prikey.txt
+        local principal_TestValue="sevice$testID/$hostname"
+        local request_format="pkcs10"
+        create_cert_request_file $certRequestFile $certPrivateKeyFile 
+
+        KinitAsAdmin
+        local cmd="ipa cert-request $certRequestFile --add --request-type=$request_format"
+        echo "set timeout 5" > $exp
+        echo "set force_conservative 0" >> $exp
+        echo "set send_slow {1 .1}" >> $exp
+        echo "spawn $cmd" >> $exp
+        echo 'expect "Principal *"' >> $exp
+        echo "send -s -- \"$principal_TestValue\r\"" >> $exp
+        echo 'expect eof ' >> $exp
+        /usr/bin/expect $exp > $tmpout 2>&1
+
+        if grep -i "Serial number" $tmpout
+         then
+            rlPass "Certificate generated for service principal $principal_TestValue"
+            cat $tmpout
+        else
+            rlFail "Certificate not generated for service principal $principal_TestValue"
+        fi
+
+        Kcleanup
+        rm $tmpout
+        rm $certRequestFile
+        rm $certPrivateKeyFile
+    rlPhaseEnd
+} #cert_request_1014
+
+cert_request_1015()
+{ #test_scenario (Positive): csr--positive and request-type --negative as arguments 
+    rlPhaseStartTest "cert_request_1015"
+        local testID="cert_request_1015_$RANDOM"
+        local tmpout=$TmpDir/cert_request_1015.$RANDOM.out
+        local exp=$TmpDir/cert_request_1015.$RANDOM.exp
+        local certRequestFile=$TmpDir/certrequest.$RANDOM.certreq.csr
+        local certPrivateKeyFile=$TmpDir/certrequest.$RANDOM.prikey.txt
+        local principal_TestValue="sevice$testID/$hostname"
+        local request_format="invalid"
+        create_cert_request_file $certRequestFile $certPrivateKeyFile
+
+        KinitAsAdmin
+        local cmd="ipa cert-request $certRequestFile --add --request-type=$request_format"
+        echo "set timeout 5" > $exp
+        echo "set force_conservative 0" >> $exp
+        echo "set send_slow {1 .1}" >> $exp
+        echo "spawn $cmd" >> $exp
+        echo 'expect "Principal *"' >> $exp
+        echo "send -s -- \"$principal_TestValue\r\"" >> $exp
+        echo 'expect eof ' >> $exp
+        /usr/bin/expect $exp > $tmpout 2>&1
+
+        if grep -i "FAILURE (Unknown Certificate Request Type invalid)" $tmpout
+         then
+            rlPass "Certificate not generated because request-type is not correct"
+            cat $tmpout
+        else
+            rlFail "Certificate is generated even request-type is not correct"
+        fi
+
+        Kcleanup
+        rm $tmpout
+        rm $certRequestFile
+        rm $certPrivateKeyFile
+    rlPhaseEnd
+} #cert_request_1015
+
+cert_request_1016()
+{ #test_scenario (Negative): csr--positive , --principal -- negative and request-type --negative as arguments 
+    rlPhaseStartTest "cert_request_1016"
+        local testID="cert_request_1016_$RANDOM"
+        local tmpout=$TmpDir/cert_request_1016.$RANDOM.out
+        local exp=$TmpDir/cert_request_1016.$RANDOM.exp
+        local certRequestFile=$TmpDir/certrequest.$RANDOM.certreq.csr
+        local certPrivateKeyFile=$TmpDir/certrequest.$RANDOM.prikey.txt
+        #local principal_TestValue="sevice$testID/$hostname"
+        local principal_TestValue="sevice$testID/"
+        local request_format="invalid"
+        create_cert_request_file $certRequestFile $certPrivateKeyFile
+
+        KinitAsAdmin
+        local cmd="ipa cert-request $certRequestFile --add --principal=$principal_TestValue --request-type=$request_format"
+        echo "set timeout 5" > $exp
+        echo "set force_conservative 0" >> $exp
+        echo "set send_slow {1 .1}" >> $exp
+        echo "spawn $cmd" >> $exp
+        echo 'expect "Principal *"' >> $exp
+        echo "send -s -- \"$principal_TestValue\r\"" >> $exp
+        echo 'expect eof ' >> $exp
+        /usr/bin/expect $exp > $tmpout 2>&1
+
+        if grep -i "Insufficient access: hostname in subject of request 'ipa63server.testrelm.com' does not match principal hostname ''" $tmpout
+         then
+            rlPass "Certificate not generated because principal provided is not correct"
+            cat $tmpout
+        else
+            rlFail "Certificate is generated even principal provided is not correct"
+        fi
+
+        Kcleanup
+        rm $tmpout
+        rm $certRequestFile
+        rm $certPrivateKeyFile
+    rlPhaseEnd
+} #cert_request_1016
+
+cert_request_1017()
+{ #test_scenario (Positive): key-sizes --3072,4096
+    rlPhaseStartTest "cert_request_1017"
+        local testID="cert_request_1017_$RANDOM"
+        local tmpout=$TmpDir/cert_request_1017.$RANDOM.out
+        local exp=$TmpDir/cert_request_1017.$RANDOM.exp
+        local certRequestFile=$TmpDir/certrequest.$RANDOM.certreq.csr
+        local certPrivateKeyFile=$TmpDir/certrequest.$RANDOM.prikey.txt
+        local principal_TestValue="sevice$testID/$hostname"
+        local request_format="pkcs10"
+        for keysize in 3072 4096;do
+        create_cert_request_file $certRequestFile $certPrivateKeyFile $keysize
+
+        KinitAsAdmin
+        local cmd="ipa cert-request $certRequestFile --add --request-type=$request_format"
+        echo "set timeout 5" > $exp
+        echo "set force_conservative 0" >> $exp
+        echo "set send_slow {1 .1}" >> $exp
+        echo "spawn $cmd" >> $exp
+        echo 'expect "Principal *"' >> $exp
+        echo "send -s -- \"$principal_TestValue\r\"" >> $exp
+        echo 'expect eof ' >> $exp
+        /usr/bin/expect $exp > $tmpout 2>&1
+
+        if grep -i "Serial number" $tmpout
+         then
+            rlPass "Certificate generated for keysize [$keysize]"
+            cat $tmpout
+        else
+            rlFail "Certificate not generated for [$keysize]"
+        fi
+        done
+        Kcleanup
+        rm $tmpout
+        rm $certRequestFile
+        rm $certPrivateKeyFile
+    rlPhaseEnd
+} #cert_request_1017
+
 #END OF TEST CASE for [cert-request]
 
 #############################################
@@ -501,6 +842,11 @@ cert_revoke()
     cert_revoke_1001  #test_scenario (negative test): [--revocation-reason;negative;-1,11]
     cert_revoke_1002  #test_scenario (positive test): [--revocation-reason;positive;0,1,2,3,4,5,6,7,8,9,10]
     cert_revoke_1003  #test_scenario (negative): revoke an non-exist cert
+    cert_revoke_1004  #test_scenario (positive test): [ valid id in decimal --revocation-reason;positive;0,1,2,3,4,5,6,7,8,9,10] #Added by Kaleem
+    cert_revoke_1005  #test_scenario (positive test): [ without revocation reason] #Added by Kaleem
+    cert_revoke_1006  #test_scenario (negative test): [ Revoking a revoked certificate again] #Added by Kaleem
+    cert_revoke_1007  #test_scenario (positive test): [ Revocation reason 7 not supported] #Added by Kaleem
+    cert_revoke_1008  #test_scenario (positive test): [ no cert id provided and given on prompt] #Added by Kaleem
     cert_revoke_envcleanup
 } #cert-revoke
 
@@ -554,7 +900,7 @@ cert_revoke_1001()
 } #cert_revoke_1001
 
 cert_revoke_1002()
-{ #test_scenario (positive): valid cert id + --revocation-reason;positive;0,1,2,3,4,5,6,7,8,9,10
+{ #test_scenario (positive): valid cert id (in decimal) + --revocation-reason;positive;0,1,2,3,4,5,6,8,9,10
     rlPhaseStartTest "cert_revoke_1002"
         local testID="cert_revoke_1002"
         local tmpout=$TmpDir/certrevoke1002.$RANDOM.out
@@ -572,7 +918,7 @@ cert_revoke_1002()
                 rlLog "revocation success, now check the revocation code"
                 local actual=`grep -i "Revocation reason" $tmpout | cut -d":" -f2 | xargs echo`
                 if [ "$reason" = "$actual" ];then
-                    rlPass "revocation code matches with expected [$acutal], pass"
+                    rlPass "revocation code matches with expected [$actual], pass"
                 else
                     rlFail "revocation code doesnot match with expected: expected [$reason], actual [$actual] "
                     ipa cert-show $certid 
@@ -601,6 +947,164 @@ cert_revoke_1003()
     rlPhaseEnd
 } #cert_revoke_1002
 
+cert_revoke_1004()
+{ #test_scenario (positive): valid cert id (in decimal) + --revocation-reason;positive;0,1,2,3,4,5,6,8,9,10
+    rlPhaseStartTest "cert_revoke_1004"
+        local testID="cert_revoke_1004"
+        local tmpout=$TmpDir/certrevoke1004.$RANDOM.out
+        for reason in 0 1 2 3 4 5 6 8 9 10
+        do
+            create_cert
+            local validCert=`tail -n1 $certList`
+            local certid=`echo $validCert| cut -d"=" -f2 | cut -d" " -f2`
+            echo $certid
+            rlLog "revoke cert [$certid] with revoke reason [$reason]"
+            KinitAsAdmin
+            ipa cert-revoke $certid --revocation-reason=$reason
+            local ret=$?
+            if [ "$ret" = "0" ];then
+                ipa cert-show $certid > $tmpout
+                rlLog "revocation success, now check the revocation code"
+                local actual=`grep -i "Revocation reason" $tmpout | cut -d":" -f2 | xargs echo`
+                if [ "$reason" = "$actual" ];then
+                    rlPass "revocation code matches with expected [$actual], pass"
+                else
+                    rlFail "revocation code doesnot match with expected: expected [$reason], actual [$actual] "
+                    ipa cert-show $certid
+                fi
+            else
+                rlFail "revocation failed, cert show:"
+                ipa cert-show $certid
+            fi
+            Kcleanup
+            delete_cert
+        done
+        rm $tmpout
+    rlPhaseEnd
+} #cert_revoke_1004
+
+cert_revoke_1005()
+{ #test_scenario (positive): without revocation-reason provided
+    rlPhaseStartTest "cert_revoke_1005"
+        loca ltestID="cert_revoke_1005"
+        local tmpout=$TmpDir/certrevoke1005.$RANDOM.out
+          create_cert
+            local validCert=`tail -n1 $certList`
+            local certid=`echo $validCert| cut -d"=" -f2 | cut -d" " -f2`
+            echo $certid
+            rlLog "revoke cert [$certid] with default revoke reason [0] "
+            KinitAsAdmin
+            ipa cert-revoke $certid
+            local ret=$?
+            if [ "$ret" = "0" ];then
+                ipa cert-show $certid > $tmpout
+                rlLog "revocation success, now check the revocation code"
+                local actual=`grep -i "Revocation reason" $tmpout | cut -d":" -f2 | xargs echo`
+                if [ "$actual" -eq 0 ];then
+                    rlPass "revocation code is [$actual] which is default revocation code [0]"
+                else
+                    rlFail "revocation code is [$actual] which is not default revocation code"
+                    ipa cert-show $certid
+                fi
+            else
+                rlFail "revocation failed, cert show:"
+                ipa cert-show $certid
+            fi
+            Kcleanup
+            delete_cert
+        rm $tmpout
+    rlPhaseEnd
+} #cert_revoke_1005
+
+cert_revoke_1006()
+{ #test_scenario (positive): revoking a revoked certificate 
+    rlPhaseStartTest "cert_revoke_1006"
+        local testID="cert_revoke_1006"
+        local tmpout=$TmpDir/certrevoke1006.$RANDOM.out
+          create_cert
+            local validCert=`tail -n1 $certList`
+            local certid=`echo $validCert| cut -d"=" -f2 | cut -d" " -f2`
+            echo $certid
+            rlLog "revoke cert [$certid] with default revoke reason [0] "
+            KinitAsAdmin
+            ipa cert-revoke $certid
+            ipa cert-revoke $certid > $tmpout
+                
+                local actual=`grep -i "ERROR (Attempt to revoke non-existent certificate(s).)" $tmpout`
+                if [ $? -eq 0 ];then
+                    rlPass "Revoked certificate cannot be revoked again"
+                else
+                    rlFail "Revoked certificate can be revoked again"
+                fi
+            Kcleanup
+            delete_cert
+        rm $tmpout
+    rlPhaseEnd
+} #cert_revoke_1006
+
+cert_revoke_1007()
+{ #test_scenario (positive): valid cert id + --revocation-reason is 7
+    rlPhaseStartTest "cert_revoke_1007"
+        local testID="cert_revoke_1007"
+        local tmpout=$TmpDir/cert_revoke_1007.$RANDOM.out
+        local expectedErrMsg="7 is not a valid revocation reason"
+        local expectedErrCode=0
+        local invalid_revoke_reason=7
+        create_cert
+        KinitAsAdmin
+        for cert in `cat $certList`;do
+          echo $cert
+          local certid=`echo $cert | cut -d"=" -f2`
+          echo $certid
+          ipa cert-revoke $certid --revocation-reason=$invalid_revoke_reason > $tmpout 2>&1 
+          cat $tmpout
+           local actual=`grep -i "7 is not a valid revocation reason" $tmpout`
+            if [ $? -eq 0 ];then
+              rlPass "Revoked reason 7 not supported"
+            else
+              rlFail "Revoked reason 7 is supported"
+            fi
+        done
+        delete_cert
+        rm $tmpout
+    rlPhaseEnd
+} #cert_revoke_1007
+
+cert_revoke_1008()
+{ #test_scenario (positive): no cert id provided 
+    rlPhaseStartTest "cert_revoke_1008"
+        local testID="cert_revoke_1008"
+        local tmpout=$TmpDir/cert_revoke_1008.$RANDOM.out
+        local exp=$TmpDir/createCertRequestFile.$RANDOM.exp # beaker test
+        create_cert
+        KinitAsAdmin
+        for cert in `cat $certList`;do
+          echo $cert
+          local certid=`echo $cert | cut -d"=" -f2`
+          echo $certid
+          local cmd="ipa cert-revoke --revocation-reason=6"
+          echo "set timeout 5" > $exp
+          echo "set force_conservative 0" >> $exp
+          echo "set send_slow {1 .1}" >> $exp
+          echo "spawn $cmd" >> $exp
+          echo 'expect "Serial number *"' >> $exp
+          echo "send -s -- \"$certid\r\"" >> $exp
+          echo 'expect eof ' >> $exp
+          /usr/bin/expect $exp
+          ipa cert-show $certid > $tmpout 2>&1 
+           local actual=`grep -i "Revocation reason: 6" $tmpout`
+            if [ $? -eq 0 ];then
+              rlPass "Certificate is revoked successfully with --revocation reason 6"
+            else
+              rlFail "Certificate is not revoked with --revocation reason 6"
+            fi
+         ipa cert-remove_hold $certid
+        done
+        delete_cert
+        rm $tmpout
+    rlPhaseEnd
+} #cert_revoke_1008
+
 
 #END OF TEST CASE for [cert-revoke]
 
@@ -613,6 +1117,9 @@ cert_show()
     cert_show_1001  #test_scenario (negative test): give negative cert id 
     cert_show_1002  #test_scenario (positive test): [--out;positive;CertOutFile]
     cert_show_1003  #test_scenario (negative test): valid cert id + --out;negative;CertOutFile]
+    cert_show_1004  #test_scenario (negative test): invalid cert id + --out--positive] #Added by Kaleem
+    cert_show_1005  #test_scenario (positive test): revoked certificate is shown with ipa-cert-show] #Added by kaleem
+    cert_show_1006  #test_scenario (negative test): invalid cert request id other than decimal or hexadecimal] #Added by kaleem
     cert_show_envcleanup
 } #cert-show
 
@@ -666,6 +1173,7 @@ cert_show_1002()
             local outfile=$TmpDir/certshow1002.$RANDOM.out.file
             local output=$TmpDir/certshow1002.$RANDOM.output
             local valid_certid=`echo $cert | cut -d"=" -f2`
+            echo $valid_certid
             rlRun "ipa cert-show $valid_certid --out=$outfile" 0 "output [$valid_certid] to file: [$outfile]"
             if [ -f $outfile ];then
                 if     grep "BEGIN CERTIFICATE" $outfile 2>&1 >/dev/null \
@@ -702,6 +1210,72 @@ cert_show_1003()
     rlPhaseEnd
 } #cert_show_1003
 
+cert_show_1004()
+{ #test_scenario (negative): serial no--negative ; out--positive
+    rlPhaseStartTest "cert_show_1004"
+        local testID="cert_show_1004"
+        local tmpout=$TmpDir/cert_show_1004.$RANDOM.out
+        KinitAsAdmin
+            local expectedErrMsg="not found"
+            local expectedErrCode=0
+            local outfile=$TmpDir/certshow1004.$RANDOM.out.file
+            for invalidCertID in 1000 2000 ;do
+              qaRun "ipa cert-show $invalidCertID --out=$outfile" "$tmpout" $expectedErrCode "$expectedErrMsg" "test options: $invalidCertID"
+             done
+            local expectedErrMsg="Certificate operation cannot be completed"
+            local expectedErrCode=0
+            for invalidCertID in abc b0a;do
+               qaRun "ipa cert-show $invalidCertID --out=$outfile" "$tmpout" $expectedErrCode "$expectedErrMsg" "test options: $invalidCertID"
+            done
+        Kcleanup
+        rm $tmpout
+    rlPhaseEnd
+} #cert_show_1004
+cert_show_1005()
+{ #test_scenario (positive): revoked certificate is also shown with status revoked.
+    rlPhaseStartTest "cert_show_1005"
+        local testID="cert_show_1005"
+        local tmpout=$TmpDir/certshow1005.$RANDOM.out
+         for cert in `cat $certList`;do
+            local certid=`echo $cert| cut -d"=" -f2`
+            rlLog "revoke cert [$certid] with revoke reason 6 "
+            KinitAsAdmin
+            ipa cert-revoke $certid --revocation-reason=6
+            local ret=$?
+            if [ "$ret" = "0" ];then
+                ipa cert-show $certid > $tmpout
+                rlLog "revocation success, now check the revocation code"
+                local actual=`grep -i "Revocation reason" $tmpout | cut -d":" -f2 | xargs echo`
+                if [ "$actual" -eq 6 ];then
+                    rlPass "Revoked certificate is also shown with ipa cert-show"
+                else
+                    rlPass "Revoked certificate is shown but revocation reason is other than 6"
+                    ipa cert-show $certid
+                fi
+            else
+                rlFail "Revoked certificate is not shown with ipa cert-show"
+                ipa cert-show $certid
+            fi
+            ipa cert-remove-hold $certid 
+          done
+          Kcleanup
+        rm $tmpout
+    rlPhaseEnd
+} #cert_show_1005
+cert_show_1006()
+{ #test_scenario (negative): given invalid cert request id other than decimal or hexadecimal
+    rlPhaseStartTest "cert_show_1006"
+        local testID="cert_show_1006"
+        local tmpout=$TmpDir/cert_show_1006.$RANDOM.out
+        KinitAsAdmin
+        local expectedErrMsg="Decimal or hexadecimal number is required for serial number"
+        local expectedErrCode=0
+        invalidCertID=A@
+            qaRun "ipa cert-show $invalidCertID" "$tmpout" $expectedErrCode "$expectedErrMsg" "test options: $invalidCertID"
+        Kcleanup
+        rm $tmpout
+    rlPhaseEnd
+} #cert_show_1006
 #END OF TEST CASE for [cert-show]
 
 #############################################
