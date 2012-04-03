@@ -456,6 +456,7 @@ ipakrblockout_failinterval_positive()
         	rlPass "User's failed counter is as expected: [$count]"
         else
         	rlFail "User's failed counter is NOT as expected.  Got: [$count] Expected: [$value]"
+		rlLog "May be regression bug :: https://bugzilla.redhat.com/show_bug.cgi?id=804096"
         fi
 
     rlPhaseEnd
@@ -506,6 +507,7 @@ ipakrblockout_failinterval_positive()
                 rlPass "User's failed counter is as expected: [$count]"
         else
                 rlFail "User's failed counter is NOT as expected.  Got: [$count] Expected: [$value]"
+		rlLog "May be regression bug :: https://bugzilla.redhat.com/show_bug.cgi?id=804096"
         fi
 
     rlPhaseEnd
@@ -656,6 +658,7 @@ ipakrblockout_grouppolicy()
         	rlPass "User's failed counter is as expected: [$count]"
         else
         	rlFail "User's failed counter is NOT as expected.  Got: [$count] Expected: [$value]"
+		rlLog "May be regression bug :: https://bugzilla.redhat.com/show_bug.cgi?id=804096"
         fi
 
     rlPhaseEnd
