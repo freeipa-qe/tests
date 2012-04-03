@@ -222,6 +222,7 @@ rlPhaseStartTest "bug800537: Sudo commands with special characters cannot be rem
         pushd $TmpDir
 
         rlRun "ipa sudocmd-add \"/bin/ls /lost+found\""
+        rlRun "ipa sudocmd-add \"/bin/cp\""
         rlRun "ipa sudocmdgroup-add a-group --desc=g1"
         rlRun "ipa sudocmdgroup-add-member a-group --sudocmds=\"/bin/ls /lost+found\""
         rlRun "ipa sudocmdgroup-remove-member a-group --sudocmds=\"/bin/ls /lost+found\""
