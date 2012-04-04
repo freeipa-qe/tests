@@ -33,7 +33,7 @@ netgroup_bugs()
 	netgroup_bz_772297
 	netgroup_bz_766141
 	netgroup_bz_767372
-	# netgroup_bz_772163 # Must be tested manually right now
+	netgroup_bz_772163
 	netgroup_bz_750984
 	netgroup_bz_796390
 	netgroup_bz_797237
@@ -259,12 +259,82 @@ netgroup_bz_767372()
 	rlPhaseEnd
 }
 
-#netgroup_bz_772163()
-#{
-#	rlPhaseStartTest "netgroup_bz_772163: Iterator loop reuse cases a tight loop in the native IPA netgroups code"
-#		rlLog "This is not yet automated.  Please test manually?"	
-#	rlPhaseEnd
-#}
+netgroup_bz_772163()
+{
+	rlPhaseStartTest "netgroup_bz_772163: Iterator loop reuse cases a tight loop in the native IPA netgroups code"
+		# Variables
+		local tmpout=/tmp/errormsg.out
+		local timeout=/tmp/timer.$FUNCNAME
+		local ngname=testnetgroup1000
+		local userpre=testuser1000
+
+		# Pre-work
+		rlLog "Adding necessary users and netgroup for test"
+		rlRun "ipa user-add ${userpre}0 --first=first --last=last"
+		rlRun "ipa user-add ${userpre}1 --first=first --last=last"
+		rlRun "ipa user-add ${userpre}2 --first=first --last=last"
+		rlRun "ipa netgroup-add ${ngname} --desc=test"
+		rlRun "ipa netgroup-add-member ${ngname} --users=${userpre}0"
+
+		# change sssd params
+		rlLog "Setting SSSD cache timeout low to test"
+		rlRun "sed -i 's/\(\[domain.*\]\)$/\1\nentry_cache_timeout = 1/' /etc/sssd/sssd.conf"
+		rlRun "service sssd restart"
+
+		# Test that you can see the initial netgroup
+		rlLog "Waiting for 5 seconds for SSSD to completely start up"
+		rlRun "sleep 5"
+		rlRun "time getent netgroup ${ngname}"
+
+		# Check new user entries added to netgroup
+		rlLog "Add another member to netgroup and check if it shows up from getent"
+		rlRun "date"
+		rlRun "ipa netgroup-add-member ${ngname} --users=${userpre}1"
+		rlRun "date"
+		rlRun "(time getent netgroup ${ngname} > $tmpout 2>&1) 2>&1 | tee $timeout"
+		rlRun "cat $tmpout"
+		if [ $(grep ", ${userpre}1," $tmpout|wc -l) -gt 0 ]; then
+			rlPass "BZ 772163 not found...added user seen in netgroup"
+		else
+			rlFail "New user not found in netgroup.  Appears that SSSD used cached entry."
+			if [ $(grep real $timeout|sed 's/^.*m\([0-9]*\)\..*$/\1/') -gt 2 ]; then
+				rlFail "Took longer than 2 seconds to run getent for SSSD netgroup lookup"
+			fi	
+			rlFail "BZ 772163 found...Iterator loop reuse cases a tight loop in the native IPA netgroups code"
+		fi
+		
+		# Checking one more time to be safe
+		rlLog "Add another member to netgroup and check if it shows up from getent"
+		rlRun "date"
+		rlRun "ipa netgroup-add-member ${ngname} --users=${userpre}2"
+		rlRun "date"
+		rlRun "(time getent netgroup ${ngname} > $tmpout 2>&1) 2>&1 | tee $timeout"
+		rlRun "cat $tmpout"
+		if [ $(grep ", ${userpre}2," $tmpout|wc -l) -gt 0 ]; then
+			rlPass "BZ 772163 not found...added user seen in netgroup"
+		else
+			rlFail "New user not found in netgroup.  Appears that SSSD used cached entry."
+			if [ $(grep real $timeout|sed 's/^.*m\([0-9]*\)\..*$/\1/') -gt 2 ]; then
+				rlFail "Took longer than 2 seconds to run getent for SSSD netgroup lookup"
+			fi	
+			rlFail "BZ 772163 found...Iterator loop reuse cases a tight loop in the native IPA netgroups code"
+		fi
+
+		# cleanup
+		rlLog "Cleaning up after $FUNCNAME test"
+		rlRun "ipa netgroup-del ${ngname}"
+		for i in 0 1 2; do
+			rlLog "Deleting user ${userpre}${i}"
+			rlRun "ipa user-del ${userpre}${i}"
+		done
+		rlLog "Resetting SSSD to default cache timeout"
+		rlRun "sed -i '/entry_cache_timeout = 1/d' /etc/sssd/sssd.conf"
+		rlRun "service sssd restart"
+
+		[ -f $tmpout ] && rm -f $tmpout
+		[ -f $timeout ] && rm -f $timeout
+	rlPhaseEnd
+}
 
 netgroup_bz_750984()
 {

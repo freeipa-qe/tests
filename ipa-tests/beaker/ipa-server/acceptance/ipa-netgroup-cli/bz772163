@@ -1,7 +1,7 @@
 # Variables
 
-ngname=testuser200
-userpre=testuser20
+ngname=testuser300
+userpre=testuser30
 
 # Pre-work
 ipa user-add ${userpre}0 --first=first --last=last
@@ -10,7 +10,6 @@ ipa user-add ${userpre}2 --first=first --last=last
 ipa user-add ${userpre}3 --first=first --last=last
 ipa user-add ${userpre}4 --first=first --last=last
 ipa user-add ${userpre}5 --first=first --last=last
-ipa user-add ${userpre}6 --first=first --last=last
 ipa netgroup-add ${ngname} --desc=test
 ipa netgroup-add-member ${ngname} --users=${userpre}0
 
@@ -20,11 +19,7 @@ service sssd restart
 
 # Test that you can see the initial netgroup
 date
-sleep 2
-time getent netgroup ${ngname}
-sleep 2
-time getent netgroup ${ngname}
-sleep 2
+sleep 5
 time getent netgroup ${ngname}
 
 # Check new user entries added to netgroup
@@ -48,10 +43,6 @@ date
 time ipa netgroup-add-member ${ngname} --users=${userpre}5
 date
 time getent netgroup ${ngname}
-date
-time ipa netgroup-add-member ${ngname} --users=${userpre}6
-date
-time getent netgroup ${ngname} 
 
 # cleanup
 ipa netgroup-del ${ngname}
