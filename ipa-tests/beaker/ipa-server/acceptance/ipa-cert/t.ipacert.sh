@@ -777,7 +777,7 @@ cert_request_1016()
         echo 'expect eof ' >> $exp
         /usr/bin/expect $exp > $tmpout 2>&1
 
-        if grep -i "Insufficient access: hostname in subject of request 'ipa63server.testrelm.com' does not match principal hostname ''" $tmpout
+        if grep -i "Insufficient access: hostname in subject of request '`hostname`' does not match principal hostname ''" $tmpout
          then
             rlPass "Certificate not generated because principal provided is not correct"
             cat $tmpout
