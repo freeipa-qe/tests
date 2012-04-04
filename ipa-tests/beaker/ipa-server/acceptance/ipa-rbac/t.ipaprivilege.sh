@@ -123,8 +123,8 @@ ipaprivilege_add_positive()
      privilegeName="Modify Group"
      privilegeDesc="Modify Group"
      command="ipa privilege-add \"$privilegeName\" --desc \"$privilegeDesc\" --all"
-     rlRun "$command > $TmpDir/ipaprivilege_addraw.log" 0 "Verify Privilege add with raw"
-     objectclassOccurences=`rlAssertGrep "objectclass:" "$TmpDir/ipaprivilege_addraw.log" -c | cut -d ":" -f1`
+     rlRun "$command > $TmpDir/ipaprivilege_addall.log" 0 "Verify Privilege add with all"
+     objectclassOccurences=`rlAssertGrep "objectclass:" "$TmpDir/ipaprivilege_addall.log" -c | cut -d ":" -f1`
 
      if [ "$objectclassOccurences" = 1 ]; then
         rlPass "Found expected objectclass for $privilegeName"
@@ -487,7 +487,18 @@ ipaprivilege_mod_negative()
     rlAssertGrep "$expmsg" "$TmpDir/ipaprivilege_blankrename.log"
   rlPhaseEnd
 
-  rlPhaseStartTest "ipa-privilege-cli-1035 - mod privilege to delattr required description"
+
+  rlPhaseStartTest "ipa-privilege-cli-1035 - mod privilege to rename to same name"
+    attr="rename"
+    command="modifyPrivilege $privilegeName $attr $privilegeName"
+    expmsg="ipa: ERROR: no modifications to be performed"
+    rlRun "$command > $TmpDir/ipaprivilege_samerename.log 2>&1" 1 "Verify error message for $privilegeName"
+    rlAssertGrep "$expmsg" "$TmpDir/ipaprivilege_samerename.log"
+  rlPhaseEnd
+
+
+
+  rlPhaseStartTest "ipa-privilege-cli-1036 - mod privilege to delattr required description"
     attr="delattr"
     privilegeDesc="description=NetgroupsAdministrators"
     command="modifyPrivilege $privilegeName $attr $privilegeDesc"
@@ -507,7 +518,7 @@ ipaprivilege_mod_negative()
 #############################################
 ipaprivilege_find()
 {
-    rlPhaseStartTest "ipa-privilege-cli-1036 - --pkey-only test of ipa privilege"
+    rlPhaseStartTest "ipa-privilege-cli-1037 - --pkey-only test of ipa privilege"
 	rlRun "kinitAs $ADMINID $ADMINPW"
 	ipa_command_to_test="privilege"
 	pkey_addstringa="--desc=test-priv"
@@ -519,7 +530,7 @@ ipaprivilege_find()
 	rlRun "pkey_return_check" 0 "running checks of --pkey-only in privilege-find"
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-privilege-cli-1037 - privilege find --name"
+    rlPhaseStartTest "ipa-privilege-cli-1038 - privilege find --name"
      criteria="--name=Automount Administrators"
      attribute="Privilege name"
      value="Automount Administrators"
@@ -528,7 +539,7 @@ ipaprivilege_find()
     rlPhaseEnd
 
    
-    rlPhaseStartTest "ipa-privilege-cli-1038 - privilege find --desc (--raw)"
+    rlPhaseStartTest "ipa-privilege-cli-1039 - privilege find --desc (--raw)"
      criteria="--desc=Automount Administrators"
      attribute="description"
      value="Automount Administrators"
@@ -536,13 +547,13 @@ ipaprivilege_find()
      rlRun "findPrivilege \"$criteria\" \"$attribute\" \"$value\" \"$resultMsg\" raw" 0 "find privilege using \"$criteria\""
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-privilege-cli-1039 - privilege find --sizelimit"
+    rlPhaseStartTest "ipa-privilege-cli-1040 - privilege find --sizelimit"
      criteria="--sizelimit=2"
      resultMsg="Number of entries returned 2"
      rlRun "findPrivilege \"$criteria\" \"$resultMsg\"" 0 "find privilege using \"$criteria\""
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-privilege-cli-1040 - privilege find  - missing name"
+    rlPhaseStartTest "ipa-privilege-cli-1041 - privilege find  - missing name"
      criteria="--name="
      resultMsg="Number of entries returned 0"
      command="ipa privilege-find \"$criteria\""
@@ -550,7 +561,7 @@ ipaprivilege_find()
      rlAssertNotGrep "$resultMsg" "$TmpDir/iparole_findprivilegename.log"
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-privilege-cli-1041 - privilege find - blank desc"
+    rlPhaseStartTest "ipa-privilege-cli-1042 - privilege find - blank desc"
      criteria="--desc=\"\""
      resultMsg="Number of entries returned 0"
      command="ipa privilege-find \"$criteria\""

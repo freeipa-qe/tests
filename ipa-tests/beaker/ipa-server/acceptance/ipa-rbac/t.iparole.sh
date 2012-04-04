@@ -115,8 +115,8 @@ iparole_add_positive()
      roleName="Netgroup Admin"
      roleDesc="Netgroup Admin"
      command="ipa role-add \"$roleName\" --desc \"$roleDesc\" --all"
-     rlRun "$command > $TmpDir/iparole_addraw.log" 0 "Verify Role add with raw"
-     objectclassOccurences=`rlAssertGrep "objectclass:" "$TmpDir/iparole_addraw.log" -c | cut -d ":" -f1`
+     rlRun "$command > $TmpDir/iparole_addall.log" 0 "Verify Role add with all"
+     objectclassOccurences=`rlAssertGrep "objectclass:" "$TmpDir/iparole_addall.log" -c | cut -d ":" -f1`
 
      if [ "$objectclassOccurences" = 1 ]; then
         rlPass "Found expected objectclass for $roleName"
@@ -898,7 +898,15 @@ iparole_mod_negative()
     rlAssertGrep "$expmsg" "$TmpDir/iparole_blankrename.log"
   rlPhaseEnd
 
-  rlPhaseStartTest "ipa-role-cli-1059 - mod role to delattr required description"
+  rlPhaseStartTest "ipa-role-cli-1059 - mod role to rename to same name"
+    attr="rename"
+    command="modifyRole $roleName $attr $roleName"
+    expmsg="ipa: ERROR: no modifications to be performed"
+    rlRun "$command > $TmpDir/iparole_samerename.log 2>&1" 1 "Verify error message for $roleName"
+    rlAssertGrep "$expmsg" "$TmpDir/iparole_samerename.log"
+  rlPhaseEnd
+
+  rlPhaseStartTest "ipa-role-cli-1060 - mod role to delattr required description"
     attr="delattr"
     roleDesc="description=Helpdesk Updated"
     command="modifyRole $roleName $attr \"$roleDesc\""
