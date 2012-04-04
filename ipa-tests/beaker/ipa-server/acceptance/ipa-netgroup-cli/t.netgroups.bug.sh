@@ -391,7 +391,7 @@ netgroup_bz_797237()
 		else
 			rlPass "BZ 797237 not found for netgroup-add with comma"
 		fi
-		rlRun "ipa netgroup-del netgroup_bz_797237_1"
+		rlRun "ipa netgroup-del netgroup_bz_797237_1" 2
 
 		#### test2
 		rlRun "ipa netgroup-add netgroup_bz_797237_2 --desc=desc2 --nisdomain=test^\|\!\@\#\$\%\&\*\\)\\( > $tmpout 2>&1" 1      
@@ -401,7 +401,7 @@ netgroup_bz_797237()
 		else
 			rlPass "BZ 797237 not found for netgroup-add --nisdomain with other invalid chars"
 		fi
-		rlRun "ipa netgroup-del netgroup_bz_797237_1"
+		rlRun "ipa netgroup-del netgroup_bz_797237_2" 2
 
 		#### test3
 		rlRun "ipa netgroup-add netgroup_bz_797237_3 --desc=desc3"
@@ -411,7 +411,7 @@ netgroup_bz_797237()
 		else
 			rlPass "BZ 797237 not found for netgroup-mod --nisdomain with comma."
 		fi
-		rlRun "ipa netgroup-del netgroup_bz_797237_1"
+		rlRun "ipa netgroup-del netgroup_bz_797237_3"
 		
 		
 		#### test4
@@ -422,7 +422,7 @@ netgroup_bz_797237()
 		else
 			rlPass "BZ 797237 not found for netgroup-mod --setattr=nisdomainname with comma."
 		fi
-		rlRun "ipa netgroup-del netgroup_bz_797237_1"
+		rlRun "ipa netgroup-del netgroup_bz_797237_4" 
 		[ -f $tmpout ] && rm -f $tmpout
 
 		#### test5 
