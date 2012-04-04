@@ -304,6 +304,30 @@ public class PermissionTests extends SahiTestScript {
 			CommonTasks.clearSearch(sahiTasks);
 		}
 		
+		
+		/*
+		 * Add permission - Type - Bug 783500
+		 * [ipa webui] Permission has checkbox selected against no attribute
+		 */
+		@Test (groups={"permissionBug783500Tests"}, description="Verify Bug 783500 - [ipa webui] Permission has checkbox selected against no attribute", 
+				dataProvider="permissionBug783500TestObjects")	
+		public void testPermissionBug783500(String testName, String cn, String right, String type) throws Exception {		
+			//verify permission doesn't exist
+			Assert.assertFalse(sahiTasks.link(cn).exists(), "Verify permission " + cn + " doesn't already exist");			
+			
+			String attributes[] = {""};
+			String rights[] = {right};
+			PermissionTasks.createPermissionWithType(sahiTasks, cn, rights, type, attributes, "Add");
+			
+			//verify permission was added successfully
+			CommonTasks.search(sahiTasks, cn);
+			Assert.assertTrue(sahiTasks.link(cn).exists(), "Added permission " + cn + "  successfully");
+			PermissionTasks.verifyPermissionBug783500(sahiTasks, cn);
+			CommonTasks.clearSearch(sahiTasks);
+		}
+		
+		
+		
 		/*
 		 * Add Permissions - check required fields - for negative tests
 		 */
@@ -407,6 +431,7 @@ public class PermissionTests extends SahiTestScript {
 					"Bug 807755_Hostgroup",
 					"Bug 807755_Netgroup",
 					"Bug 807755_DNSRecord",
+					"Bug 783500_Netgroup",
 					"Manage Group3",
 					"Manage Service1",
 					"Manage Service2",
@@ -565,6 +590,18 @@ public class PermissionTests extends SahiTestScript {
 			{ "add_permission_type_bug807755_Hostgroup","Bug 807755_Hostgroup",	"write",	"Host Group"   },
 			{ "add_permission_type_bug807755_Netgroup",	"Bug 807755_Netgroup",	"write",	"Netgroup"    },
 			{ "add_permission_type_bug807755_DNSRecord","Bug 807755_DNSRecord",	"write",	"DNS Resource Record"        } };
+			
+			return permissions;	
+		}
+		
+		/*
+		 * Data to be used when adding permissions - Type - Bug 807755
+		 */
+		@DataProvider(name="permissionBug783500TestObjects")
+		public Object[][] getpermissionBug783500TestObjects() {
+			String[][] permissions={
+			//	testname									cn  					right		Type		 			
+			{ "add_permission_type_bug783500_Netgroup",		"Bug 783500_Netgroup",	"write",	"Netgroup"        } };
 			
 			return permissions;	
 		}

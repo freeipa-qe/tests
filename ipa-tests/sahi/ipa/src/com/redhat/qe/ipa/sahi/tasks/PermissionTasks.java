@@ -233,7 +233,6 @@ public class PermissionTasks {
 	}
 	
 	public static void verifyPermissionType(SahiTasks sahiTasks, String cn, String[] rights, String type, String[] attributes) {
-//		CommonTasks.search(sahiTasks, cn);
 		if (sahiTasks.link(cn).exists()) {
 			sahiTasks.link(cn).click();
 			for (String right : rights) {
@@ -249,11 +248,9 @@ public class PermissionTasks {
 			}
 			sahiTasks.link("Permissions").in(sahiTasks.div("content")).click();
 		}
-//		CommonTasks.clearSearch(sahiTasks);
 	}
 	
 	public static void verifyPermissionFilter(SahiTasks sahiTasks, String cn, String[] rights, String filter, String[] attributes) {
-//		CommonTasks.search(sahiTasks, cn);
 		if (sahiTasks.link(cn).exists()) {
 			sahiTasks.link(cn).click();
 			for (String right : rights) {
@@ -271,7 +268,6 @@ public class PermissionTasks {
 			}
 			sahiTasks.link("Permissions").in(sahiTasks.div("content")).click();
 		}
-//		CommonTasks.clearSearch(sahiTasks);
 	}
 
 	public static void addPermissionWithFilterUndoAttribute(SahiTasks sahiTasks, String cn, String right, String filter,
@@ -363,5 +359,26 @@ public class PermissionTasks {
         
 		sahiTasks.link("Permissions").in(sahiTasks.div("content")).click();
 	}
+
+	public static void verifyPermissionBug783500(SahiTasks sahiTasks, String cn) {
+		if (sahiTasks.link(cn).exists()) {
+			sahiTasks.link(cn).click();
+			
+			Assert.assertFalse(sahiTasks.checkbox("attrs").checked(), "Verified "+ sahiTasks.checkbox("attrs").text());
+			int i=1;
+			while  (sahiTasks.checkbox("attrs["+i+"]").exists()) {
+				if (sahiTasks.checkbox("attrs["+i+"]").checked()) {
+					Assert.fail("Found attribute selected " + sahiTasks.checkbox("attrs["+i+"]").text());
+				} else {
+					System.out.println("NAMITA: Verified attr: " + sahiTasks.checkbox("attrs["+i+"]").text());
+				}				
+				i++;
+			}
+			sahiTasks.link("Permissions").in(sahiTasks.div("content")).click();
+		}
+		
+	}
+
+	
 
 }

@@ -13,8 +13,9 @@
 			    <include name="permissionAddTargetgroupTests" /> 
 			    <include name="permissionInvalidAddTypeTests" /> 
 			    <include name="permissionBug807755Tests" /> 
+			    <include name="permissionBug783500Tests" />
 			    <include name="permissionRequiredFieldAddTests" />  
-			    <include name="permissionMemberOfAddTests" /> 
+			    <include name="permissionMemberOfAddTests" />
 			    <!-- TODO <include name="permissionMissingMemberOfAddTests" /> -->			    
 			    <include name="permissionMultipleDeleteTests" /> 
 			    <include name="permissionAddAndAddAnotherTypeTests" />
@@ -22,7 +23,7 @@
 			    <include name="permissionAddCancelFilterTests" /> 
 			    <include name="permissionAddFilterUndoAttributeTests" /> 
 			    <include name="permissionExpandCollapseTests" /> 
-			    <include name="permissionModifyTests" />
+			    <include name="permissionModifyTests" /> 
 			</run>
 		</groups>
 		<classes>
