@@ -1,0 +1,62 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+<suite name="IPARBACTestSuite">	
+	<test name="Permission Tests">
+		<packages>
+		     <package name="com.redhat.qe.ipa.sahi.*" />
+		</packages>
+		<groups>
+			<run>
+			    <include name="setup" />
+			    <include name="permissionAddTypeTests" /> 
+			    <include name="permissionAddFilterTests" />  
+			    <include name="permissionAddSubtreeTests" /> 
+			    <include name="permissionAddTargetgroupTests" /> 
+			    <include name="permissionInvalidAddTypeTests" /> 
+			    <include name="permissionBug807755Tests" /> 
+			    <include name="permissionRequiredFieldAddTests" />  
+			    <include name="permissionMemberOfAddTests" /> 
+			    <!-- TODO <include name="permissionMissingMemberOfAddTests" /> -->			    
+			    <include name="permissionMultipleDeleteTests" /> 
+			    <include name="permissionAddAndAddAnotherTypeTests" />
+			    <include name="permissionAddAndEditTypeTests" /> 
+			    <include name="permissionAddCancelFilterTests" /> 
+			    <include name="permissionAddFilterUndoAttributeTests" /> 
+			    <include name="permissionExpandCollapseTests" /> 
+			    <include name="permissionModifyTests" />
+			</run>
+		</groups>
+		<classes>
+		    <class name="com.redhat.qe.ipa.sahi.tests.rbac.PermissionTests" />
+		</classes>
+	</test>
+
+<!--	
+	<test name="Privilege Tests">
+		<groups>
+			<run>	
+			    <include name="xxx" />
+			</run>
+		</groups>
+		<classes>
+		    <class name="com.redhat.qe.ipa.sahi.tests.sudo.SudoCommandTests" />
+		</classes>
+	</test>
+
+
+	<test name="Role Tests">
+		<groups>
+			<run>	
+				<include name="yyy" />
+			</run>
+		</groups>
+		<classes>
+		    <class name="com.redhat.qe.ipa.sahi.tests.sudo.SudoCommandGroupTests" />
+		</classes>
+	</test>
+-->	
+
+	<listeners>        
+  		<listener class-name="com.redhat.qe.auto.testng.TestNGListener" />	
+	</listeners>
+	
+</suite>
