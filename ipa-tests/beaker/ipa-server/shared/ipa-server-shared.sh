@@ -955,7 +955,6 @@ ipa_quick_uninstall(){
 	popd
 
 	rlRun "yum clean all"
-	rlRun "yum -y downgrade krb5-devel krb5-libs bind-libs bind-utils"
 	rlRun "/bin/cp -f /etc/hosts.ipabackup /etc/hosts"
 	rlRun "/bin/rm -f /etc/hosts.ipabackup"
 	rlRun "/bin/cp -f /etc/sysconfig/network-ipabackup /etc/sysconfig/network"
@@ -964,5 +963,6 @@ ipa_quick_uninstall(){
 	rlRun "/bin/rm -f /etc/resolv.conf.ipabackup"
 	. /etc/sysconfig/network
 	rlRun "hostname $HOSTNAME"
+	rlRun "yum -y downgrade krb5-devel krb5-libs bind-libs bind-utils"
 
 } #ipa_quick_uninstall 
