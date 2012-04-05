@@ -402,17 +402,20 @@ rlPhaseStartTest "ipa-ctl-25: restart services as non-root user"
 		getServicePIDs
                 rlRun "su testuserqa -c 'ipactl restart' > /tmp/restartnonroot.out 2>&1" 0 "Insufficient rights, starting service as nonprivileged user"
 		rlAssertGrep "You must be root to run ipactl." "/tmp/restartnonroot.out"
-		
-		#verify krb5kdc was not restarted
+
+                #verify krb5kdc was not restarted
                 newPID=`ps -e | grep krb5kdc | awk '{print $1}'`
+                newPID=`echo $newPID | cut -d " " -f 1`
                 rlLog "previous krb5kdc pid is $newPID"
                 oldPID=`cat /tmp/krb5kdc.out | awk '{print $1}'`
+                oldPID=`echo $oldPID | cut -d " " -f 1`
                 rlLog "current krb5kdc pid is $oldPID"
                 if [ $newPID -eq $oldPID ] ; then
                         rlPass "krb5kdc did not restart"
                 else
                         rlFail "kdrb5kdc was restarted"
                 fi
+
 		#verify kadmind was not restarted
                 newPID=`ps -e | grep kadmind | awk '{print $1}'`
                 rlLog "previous kadmind pid is $newPID"
