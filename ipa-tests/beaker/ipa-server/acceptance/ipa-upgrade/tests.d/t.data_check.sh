@@ -131,7 +131,7 @@ data_check()
 			done
 		done
 
-		rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $ipaddr
-		rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER_IP $SLAVE_IP $CLIENT_IP
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $ipaddr"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER_IP $SLAVE_IP $CLIENT_IP"
 	rlPhaseEnd
 }
