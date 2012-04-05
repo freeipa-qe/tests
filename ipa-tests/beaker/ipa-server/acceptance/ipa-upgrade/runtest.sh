@@ -65,10 +65,10 @@ esac
 ##########################################
 
 rlJournalStart
-    rlPhaseStartSetup "ipa-upgrade startup: Initial upgrade setup and pre-checks"
-        rlRun "TmpDir=\`mktemp -d\`" 0 "Creating tmp directory"
-        rlRun "pushd $TmpDir"
-    rlPhaseEnd
+	rlPhaseStartSetup "ipa-upgrade startup: Initial upgrade setup and pre-checks"
+		rlRun "TmpDir=\`mktemp -d\`" 0 "Creating tmp directory"
+		rlRun "pushd $TmpDir"
+	rlPhaseEnd
 	
 	#################################################################
 	### test full setup for master, then slave, then client	

@@ -44,9 +44,9 @@
 ######################################################################
 uninstall()
 {
-	ipa_uninstall_master
-	ipa_uninstall_slave
 	ipa_uninstall_client
+	ipa_uninstall_slave
+	ipa_uninstall_master
 }
 
 ipa_uninstall_master()
