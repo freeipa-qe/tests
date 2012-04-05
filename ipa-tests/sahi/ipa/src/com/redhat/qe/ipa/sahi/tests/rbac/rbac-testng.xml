@@ -16,7 +16,7 @@
 			    <include name="permissionBug783500Tests" />
 			    <include name="permissionRequiredFieldAddTests" />  
 			    <include name="permissionMemberOfAddTests" />
-			    <!-- TODO <include name="permissionMissingMemberOfAddTests" /> -->			    
+			    <!-- TODO <include name="permissionMissingMemberOfAddTests" /> 	-->		    
 			    <include name="permissionMultipleDeleteTests" /> 
 			    <include name="permissionAddAndAddAnotherTypeTests" />
 			    <include name="permissionAddAndEditTypeTests" /> 
@@ -31,19 +31,27 @@
 		</classes>
 	</test>
 
-<!--	
+	
 	<test name="Privilege Tests">
 		<groups>
 			<run>	
-			    <include name="xxx" />
+			     <include name="privilegeAddTests" /> 
+			     <include name="privilegeAddAndAddAnotherTests" /> 
+			     <include name="privilegeAddAndEditTests" />
+			     <include name="privilegeAddCancelTests" /> 
+			     <include name="privilegeInvalidAddTests" />
+			     <include name="privilegeRequiredFieldAddTests" /> 
+			     <include name="privilegeMultipleDeleteTests" />
+			     <include name="privilegeExpandCollapseTests" /> 
+			     <include name="privilegeModifyTests" />
 			</run>
 		</groups>
 		<classes>
-		    <class name="com.redhat.qe.ipa.sahi.tests.sudo.SudoCommandTests" />
+		    <class name="com.redhat.qe.ipa.sahi.tests.rbac.PrivilegeTests" />
 		</classes>
 	</test>
 
-
+<!--
 	<test name="Role Tests">
 		<groups>
 			<run>	

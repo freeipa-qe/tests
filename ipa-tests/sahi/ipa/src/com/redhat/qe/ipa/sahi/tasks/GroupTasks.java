@@ -12,7 +12,7 @@ public class GroupTasks {
 	public static void addGroup(SahiTasks sahiTasks, String groupName, String groupDescription) {
 		sahiTasks.span("Add").click();
 		sahiTasks.textbox("cn").setValue(groupName);
-		sahiTasks.textbox("description").setValue(groupDescription);
+		sahiTasks.textarea("description").setValue(groupDescription);
 		sahiTasks.button("Add").click();
 	}
 	
@@ -33,7 +33,7 @@ public class GroupTasks {
 	public static void createGroupService(SahiTasks sahiTasks, String groupName, String groupDescription, String originalURL) {
 		sahiTasks.span("Add").click();
 		sahiTasks.textbox("cn").setValue(groupName);
-		sahiTasks.textbox("description").setValue(groupDescription);
+		sahiTasks.textarea("description").setValue(groupDescription);
 		sahiTasks.button("Add").click();
 		sahiTasks.navigateTo(originalURL, true);
 	}//createGroupService

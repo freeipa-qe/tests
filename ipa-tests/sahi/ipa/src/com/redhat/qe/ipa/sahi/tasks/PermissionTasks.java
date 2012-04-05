@@ -148,7 +148,7 @@ public class PermissionTasks {
 		sahiTasks.button("Add").click();
 	}
 
-	public static void createRuleWithRequiredField(SahiTasks sahiTasks, String type, String expectedError) {
+	public static void createPermissionWithRequiredField(SahiTasks sahiTasks, String type, String expectedError) {
 		sahiTasks.span("Add").click();
 		sahiTasks.select("target").choose(type);
 		sahiTasks.button("Add").click();

@@ -335,7 +335,7 @@ public class PermissionTests extends SahiTestScript {
 				dataProvider="permissionRequiredFieldAddTestObjects")	
 		public void testPermissionRequiredFieldAdd(String testName,  String type, String expectedError) throws Exception {
 		
-			PermissionTasks.createRuleWithRequiredField(sahiTasks, type, expectedError);		
+			PermissionTasks.createPermissionWithRequiredField(sahiTasks, type, expectedError);		
 		}
 		
 		/*
@@ -353,14 +353,14 @@ public class PermissionTests extends SahiTestScript {
 		/*
 		 * Edit the Settings for the Permission
 		 */
-		@Test (groups={"permissionModifyTests"}, description="Edit General Section for Sudo Rule",
+		@Test (groups={"permissionModifyTests"}, description="Edit Settings for Permission",
 				dataProvider="permissionModifyTestObjects")
 		public void testPermissionModify(String testName, String cn, String right, String memberOfGroup, String type, String attribute) throws Exception {		
-			//verify rule to be edited exists
+			//verify permission to be edited exists
 			CommonTasks.search(sahiTasks, cn);
 			Assert.assertTrue(sahiTasks.link(cn).exists(), "Verify Permission " + cn + " to be edited exists");
 			
-			//modify this rule
+			//modify this permission
 			PermissionTasks.modifyPermission(sahiTasks, cn, right, memberOfGroup, attribute);
 			
 			//verify changes
@@ -607,7 +607,7 @@ public class PermissionTests extends SahiTestScript {
 		}
 	
 		/*
-		 * Check for Required fileds when adding permissions
+		 * Check for Required fields when adding permissions
 		 */
 		@DataProvider(name="permissionRequiredFieldAddTestObjects")
 		public Object[][] getpermissionRequiredFieldAddTestObjects() {
