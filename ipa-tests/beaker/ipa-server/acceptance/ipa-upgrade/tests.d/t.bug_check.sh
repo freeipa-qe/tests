@@ -251,3 +251,46 @@ upgrade_bz_809262()
 	rlPhaseEnd
 	[ -f $tmpout ] && rm -f $tmpout
 }
+
+upgrade_bz_808201()
+{
+	TESTORDER=$(( TESTORDER += 1 ))
+	local tmpout=/tmp/errormsg.out
+	rlPhaseStartTest "upgrade_bz_808201: IPA Master Upgrade failed with argument of type 'NoneType' is not iterable"
+	case "$MYROLE" in
+	"MASTER")
+		rlLog "Machine in recipe is MASTER"
+		rlLog "Restarting IPA services"
+		rlRun "ipactl restart"
+
+		rlLog "Check for Kerberos error from ipa user-find command"
+		rlRun "ipa user-find > $tmpout 2>&1"
+		if [ $(grep "ipa: ERROR: Kerberos error: did not receive Kerberos credentials/" $tmpout|wc -l) -gt 0 ]; then
+			rlFail "ipa command returns kerberos error"
+		fi
+
+		rlLog "check for NoneType is not iterable error in /var/log/ipaupgrade"
+		if [ $(grep "ERROR Upgrade failed with argument of type 'NoneType' is not iterable" /var/log/ipaupgrade.log |wc -l) -gt 0 ]; then
+			rlFail "Upgrade NoneType not iterable error found in /var/log/ipaupgrade"
+			rlFail "BZ 808201 found...IPA Master Upgrade failed with argument of type 'NoneType' is not iterable"
+		else
+			rlPass "BZ 808201 not found...ipa user-find after upgrade succeeded.  No error returned."
+		fi
+
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $MASTER_IP"
+		;;
+	"SLAVE")
+		rlLog "Machine in recipe is SLAVE"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER_IP"
+		;;
+	"CLIENT")
+		rlLog "Machine in recipe is CLIENT"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER_IP"
+		;;
+	*)
+		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
+		;;
+	esac
+	rlPhaseEnd
+	[ -f $tmpout ] && rm -f $tmpout
+}
