@@ -110,7 +110,7 @@ ipa_install_prep(){
 
 ipa_install_master_all(){
 	TESTORDER=$(( TESTORDER += 1 ))
-	rlPhaseStartTest "template_function: template function start phase"
+	rlPhaseStartTest "ipa_install_master_all: Install and configure IPA Master with all services"
 	case "$MYROLE" in
 	"MASTER")
 		rlLog "Machine in recipe is MASTER"
@@ -144,7 +144,7 @@ ipa_install_master_all(){
 
 ipa_install_master_nodns(){
 	TESTORDER=$(( TESTORDER += 1 ))
-	rlPhaseStartTest "template_function: template function start phase"
+	rlPhaseStartTest "ipa_install_master_nodns: Install and configure IPA Master with no DNS service"
 	case "$MYROLE" in
 	"MASTER")
 		rlLog "Machine in recipe is MASTER"

@@ -52,7 +52,7 @@ uninstall()
 ipa_uninstall_master()
 {
 	TESTORDER=$(( TESTORDER += 1 ))
-	rlPhaseStartTest "template_function: template function start phase"
+	rlPhaseStartTest "ipa_uninstall_master: Uninstall IPA Master software"
 	case "$MYROLE" in
 	"MASTER")
 		rlLog "Machine in recipe is MASTER"
@@ -77,7 +77,7 @@ ipa_uninstall_master()
 ipa_uninstall_slave()
 {
 	TESTORDER=$(( TESTORDER += 1 ))
-	rlPhaseStartTest "template_function: template function start phase"
+	rlPhaseStartTest "ipa_uninstall_slave: Uninstall IPA Replica/Slave Software"
 	case "$MYROLE" in
 	"MASTER")
 		rlLog "Machine in recipe is MASTER"
@@ -102,7 +102,7 @@ ipa_uninstall_slave()
 ipa_uninstall_client()
 {
 	TESTORDER=$(( TESTORDER += 1 ))
-	rlPhaseStartTest "template_function: template function start phase"
+	rlPhaseStartTest "ipa_uninstall_client: Uninstall IPA Client Software"
 	case "$MYROLE" in
 	"MASTER")
 		rlLog "Machine in recipe is MASTER"
