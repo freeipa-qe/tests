@@ -190,8 +190,8 @@ ipa_install_slave_all(){
 		rlLog "Machine in recipe is SLAVE"
 		rlRun "rhts-sync-block -s '$FUNCNAME.1.$TESTORDER' $MASTER_IP"
 		rlRun "AddToKnownHosts $MASTER"
-		rlLog "cd /dev/shm"
-		cd /dev/shm
+		rlLog "pushd /dev/shm"
+		pushd /dev/shm
 		rlRun "sftp root@$MASTER:/var/lib/ipa/replica-info-$SLAVE_S.$DOMAIN.gpg"
 		if [ -f /dev/shm/replica-info-$SLAVE_S.$DOMAIN.gpg ]; then
 			ipa_install_prep
@@ -205,7 +205,8 @@ ipa_install_slave_all(){
 			cp -f /var/log/ipareplica-install.log /var/log/ipareplica-install.log.$DATE
 			rhts-submit-log -l /var/log/ipareplica-install.log.$DATE
 		fi
-			
+		rlLog "popd"
+		popd	
 		rlRun "rhts-sync-set -s '$FUNCNAME.2.$TESTORDER' -m $SLAVE_IP"
 		;;
 	"CLIENT")
@@ -234,8 +235,8 @@ ipa_install_slave_nodns(){
 		rlLog "Machine in recipe is SLAVE"
 		rlRun "rhts-sync-block -s '$FUNCNAME.1.$TESTORDER' $MASTER_IP"
 		rlRun "AddToKnownHosts $MASTER"
-		rlLog "cd /dev/shm"
-		cd /dev/shm
+		rlLog "pushd /dev/shm"
+		pushd /dev/shm
 		rlRun "sftp root@$MASTER:/var/lib/ipa/replica-info-$SLAVE_S.$DOMAIN.gpg"
 		rlLog "Checking for existance of replica gpg file"
 		if [ -f /dev/shm/replica-info-$SLAVE_S.$DOMAIN.gpg ]; then
@@ -251,6 +252,8 @@ ipa_install_slave_nodns(){
 			rhts-submit-log -l /var/log/ipareplica-install.log.$DATE
 		fi
 			
+		rlLog popd
+		popd
 		rlRun "rhts-sync-set -s '$FUNCNAME.2.$TESTORDER' -m $SLAVE_IP"
 		;;
 	"CLIENT")
