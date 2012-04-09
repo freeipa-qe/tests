@@ -125,7 +125,7 @@ ipaconfig_addattr_negative()
 
   rlPhaseStartTest "ipaconfig_addaddtr negative test - ipadefaultprimarygroup - only one allowed"
         command="ipa config-mod --addattr=ipadefaultprimarygroup=\"cn=mygroup,cn=groups,cn=accounts,$BASEDN\""
-        expmsg="ipa: ERROR: invalid 'cn': Only one value is allowed"
+        expmsg="ipa: ERROR: ipadefaultprimarygroup: Only one value allowed."
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
   rlPhaseEnd
 
