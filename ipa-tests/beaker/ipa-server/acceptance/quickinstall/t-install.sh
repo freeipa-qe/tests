@@ -47,7 +47,9 @@ installMaster()
                	if [ "$s" != "" ]; then
 		        if [[ "$IPv6SETUP" != "TRUE" ]] ; then
                        		# Determine the IP of the slave to be used when creating the replica file.
-	                        ipofs=$(dig +noquestion $s  | grep $s | grep IN | awk '{print $5}')
+				# the following does not return ip address is CNAME is alias
+	                        #ipofs=$(dig +noquestion $s  | grep $s | grep IN | awk '{print $5}')
+				ipofs=$(host -i $s | awk '{ field = $NF }; END{ print field }')
 			else
 				ipofs=$(nslookup -type=AAAA $s | grep "has AAAA" | awk '{print $5}')
 			fi
