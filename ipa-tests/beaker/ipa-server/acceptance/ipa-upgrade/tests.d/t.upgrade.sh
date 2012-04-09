@@ -44,6 +44,7 @@
 ######################################################################
 upgrade_master()
 {
+	local repoi=0
 	TESTORDER=$(( TESTORDER += 1 ))
 	rlPhaseStartTest "upgrade_master: upgrade ipa master"
 	case "$MYROLE" in
@@ -86,6 +87,7 @@ upgrade_master()
 
 upgrade_slave()
 {
+	local repoi=0
 	TESTORDER=$(( TESTORDER += 1 ))
 	rlPhaseStartTest "upgrade_slave: upgade ipa slave"
 	case "$MYROLE" in
@@ -128,6 +130,7 @@ upgrade_slave()
 
 upgrade_client()
 {
+	local repoi=0
 	TESTORDER=$(( TESTORDER += 1 ))
 	rlPhaseStartTest "upgrade_client: upgrade ipa client"
 	case "$MYROLE" in
