@@ -52,23 +52,7 @@ servicegroup="remote_access"
 
 ########################################################################
 
-PACKAGE="ipa-admintools"
-
-rlJournalStart
-    rlPhaseStartSetup "ipa-hbacrule-cli-startup: Check for admintools package and Kinit"
-        rpm -qa | grep $PACKAGE
-        if [ $? -eq 0 ] ; then
-                rlPass "ipa-admintools package is installed"
-        else
-                rlFail "ipa-admintools package NOT found!"
-        fi
-        rlRun "TmpDir=\`mktemp -d\`" 0 "Creating tmp directory"
-        rlRun "pushd $TmpDir"
-	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-
-    rlPhaseEnd
-
-
+bug783286() {
     rlPhaseStartTest "ipa bug 783286 - Setting HBAC/SUDO category to Anyone doesn't remove users/groups"
 
         rlRun "echo Secret123 | ipa user-add $user1 --first=$user1 --last=r --password"
@@ -109,14 +93,5 @@ rlJournalStart
         rlRun "ipa user-del $user1"
 
     rlPhaseEnd
+}
 
-
-	rlRun "kdestroy" 0 "Destroying admin credentials."
-	rhts-submit-log -l /var/log/httpd/error_log
-    rlPhaseEnd
-
-rlJournalPrintText
-report=$TmpDir/rhts.report.$RANDOM.txt
-makereport $report
-rhts-submit-log -l $report
-rlJournalEnd
