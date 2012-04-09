@@ -514,7 +514,7 @@ uninstall()
 
 	rlLog "verifies https://bugzilla.redhat.com/show_bug.cgi?id=754524"
 	rlRun "remoteExec root $MASTERIP redhat \"echo $ADMINPW | kinit admin; klist\""
-	rlRun "remoteExec root $MASTERIP \"ipa-replica-manage del $SLAVE\" yes"
+	rlRun "remoteExec root $MASTERIP \"ipa-replica-manage del $SLAVE\""
 	rlRun "egrep \"Deleted replication agreement from '$MASTER' to '$SLAVE'\" /tmp/remote_exec.out"
 	cat /tmp/remote_exec.out
 
