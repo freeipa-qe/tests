@@ -202,16 +202,16 @@ rlJournalStart
         command="ipa hbacrule-mod --setattr accessruletype=bad test"
         expmsg="ipa: ERROR: invalid 'accessruletype': must be one of (u'allow', u'deny')"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
+	expmsg="ipa: ERROR: accessruletype: Only one value allowed."
         command="ipa hbacrule-mod --addattr accessruletype=bad test"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
 	command="ipa hbacrule-mod --addattr accessruletype=allow test"
-	expmsg="ipa: ERROR: no modifications to be performed"
-	 rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
+	rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-hbacrule-cli-015: Negative - setattr and addattr on ipaEnabledFlag"
         command="ipa hbacrule-mod --setattr ipaenabledflag=test test"
-        expmsg="ipa: ERROR: ipaEnabledFlag: value #0 invalid per syntax: Invalid syntax."
+        expmsg="ipa: ERROR: invalid 'ipaenabledflag': must be True or False"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr on ipaEnabledFlag."
         rlRun "ipa hbacrule-mod --setattr ipaenabledflag=FALSE test" 0 "Disable rule using setattr modification."
         # verify disabled
