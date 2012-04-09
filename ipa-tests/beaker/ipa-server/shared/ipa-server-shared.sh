@@ -938,6 +938,7 @@ ipa_quick_uninstall(){
 	rlRun "yum -y remove sssd libipa_hbac krb5-server certmonger slapi-nis sssd-client pki* tomcat6 mod_nss"
 	rlRun "yum -y remove memcached python-memcached"
 	rlRun "/bin/rm -rf /var/lib/ipa/"
+	rlRun "/bin/rm -rf /var/lib/sss/"
 	rlRun "/bin/rm -rf /usr/share/ipa"
 	rlRun "/bin/rm -rf /var/log/dirsrv/*"
 	rlRun "/bin/rm -f /tmp/krb5cc_0"
