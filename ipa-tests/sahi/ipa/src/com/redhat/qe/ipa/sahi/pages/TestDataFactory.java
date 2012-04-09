@@ -14,14 +14,14 @@ public class TestDataFactory {
 	private static TestDataFactory instance;
 	private int totalParts = 4;
 	private char delimiter = ','; 
-	private String testAccountLabel = "TEST_ACCOUNT"; // special lable used in property file to identify test account 
+	private String testAccountLabel = "TEST_ACCOUNT"; // special label used in property file to identify test account 
 	
 	private String testDataPropertyFile;
 	private Hashtable<String, //IPA Web Page Name, such as "HBAC Rules add page"
 	  			Hashtable<String, // HTML Tag Name + element id , such as "textbox:cn", "textarea:description"
 			  				ArrayList<String>> // finally, test data in ArrayList 
 			 			> testData;
-	
+	private Hashtable<String,ArrayList<String>> UIOrder;
 	private Hashtable<String, String> testAccounts; // IPA Web Page Name, such as "HBAC Rules add page" -> test account
 	private Hashtable<String, Integer> testDataPointer;
 	private Hashtable<String, Boolean> hasMoreTestData;
@@ -38,6 +38,7 @@ public class TestDataFactory {
 		this.testDataPropertyFile = propertyFile;
 		testAccounts = new Hashtable<String,String>();
 		testData = new Hashtable<String, Hashtable<String,ArrayList<String>>>(); 
+		UIOrder = new Hashtable<String,ArrayList<String>>();
 		testDataPointer = new Hashtable<String, Integer>();
 		hasMoreTestData = new Hashtable<String, Boolean>();
 		loadTestPropertyFile(testDataPropertyFile);
@@ -46,6 +47,12 @@ public class TestDataFactory {
 	
 	public ArrayList<String> getUIELements(String page)
 	{
+		ArrayList<String> uiElements;
+		if (UIOrder.containsKey(page))
+			uiElements = UIOrder.get(page);
+		else
+			uiElements = null; // this indicates error
+		/**
 		ArrayList<String> uiElements = new ArrayList<String>();
 		Hashtable<String, ArrayList<String>> pageData = testData.get(page);
 		Enumeration<String> keys = pageData.keys(); 
@@ -54,7 +61,8 @@ public class TestDataFactory {
 			String uiElement = keys.nextElement();
 			uiElements.add(uiElement);
 		}
-		return uiElements;
+		*/
+		return uiElements; 
 	}
 	
 	public String getValue(String page, String tag, String id)
@@ -195,6 +203,15 @@ public class TestDataFactory {
 			System.out.println("New test data found : \n\tkey=["+testDataKey + "]\n\tvalue=["+TestData +"]");
 			hasMoreTestData.put(IPAWebPageName, new Boolean(true));
 		}
+		
+		// save into UIOrder hashtable
+		ArrayList<String> order;
+		if (UIOrder.containsKey(IPAWebPageName)) 
+			order = UIOrder.get(IPAWebPageName);			
+		else
+			order = new ArrayList<String>();
+		order.add(testDataKey);
+		UIOrder.put(IPAWebPageName, order);
 	}
 	
 	private String[] breakLine(char delimiter, String line)
@@ -274,25 +291,32 @@ public class TestDataFactory {
 	private void printTestData(Hashtable<String, Hashtable<String,ArrayList<String>>> testdata)
 	{
 		System.out.println("========== test data loaded ==============");
-		String page=null,id=null;
+		String page=null, id=null;
 		ArrayList<String> data;
 		Enumeration<String> keys = testdata.keys();
 		int i=0;
 		while (keys.hasMoreElements())
 		{
 			page = keys.nextElement();
+			ArrayList<String> uiElements;
+			if (UIOrder.containsKey(page))
+				uiElements = UIOrder.get(page);
+			else
+				continue; // this indicates error, skip to next one
+			
 			Hashtable<String,ArrayList<String>> htmlData = testdata.get(page);
-			Enumeration<String> htmlIDs = htmlData.keys();
 			System.out.println("["+i+"]" + page );
-			while(htmlIDs.hasMoreElements())
+			
+			// print test data in order
+			for (int j=0; j<uiElements.size(); j++)
 			{
-				id = htmlIDs.nextElement();
+				id = uiElements.get(j);
 				data = htmlData.get(id);
-				System.out.print("\t{" + id + "\t==\t{");
+				System.out.print("\t[" + j + "]{" + id + "\t==\t{");
 				for (String d:data)
 					System.out.print("[" + d + "]");
 				System.out.print("}\n");
-			} 
+			}
 			System.out.println("");
 			i++;
 		}
@@ -301,6 +325,8 @@ public class TestDataFactory {
 
 	public String getModifyTestAccount(String pageName) {
 		// sample data: Modify User, TEST_ACCOUNT, user001
+		if (pageName == null)
+			return null;
 		String modifyTestAccount = testAccounts.get(pageName); 
 		return modifyTestAccount;
 	}
@@ -333,6 +359,8 @@ public class TestDataFactory {
 
 	public boolean hasMoreTestData(String pageName) {
 		boolean thereIsMore = false;
+		if (pageName == null)
+			return false;
 		if (hasMoreTestData.containsKey(pageName))
 			thereIsMore = hasMoreTestData.get(pageName).booleanValue();
 		return thereIsMore;

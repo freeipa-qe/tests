@@ -23,7 +23,7 @@ public class IPAWebPage implements StandardTest{
 	protected String modifyNegativePage;
 	protected String delPage;
 	
-	private TestDataFactory factory;
+	protected TestDataFactory factory;
 	private static Logger log = Logger.getLogger(IPAWebPage.class.getName());
 	
 	IPAWebPage(SahiTasks browser, String url, String testPropertyFile)
@@ -83,8 +83,11 @@ public class IPAWebPage implements StandardTest{
 
 	@Override
 	public IPAWebTestMonitor addSingle(IPAWebTestMonitor monitor){
+		String pageName = addPage;
+		if (pageName == null)
+			return monitor;
 		try {
-			addSingleNewEntry(monitor, addPage);
+			addSingleNewEntry(monitor, pageName);
 			monitor.pass();
 		} catch (IPAWebAutomationException e) { 
 			e.printStackTrace();
@@ -95,9 +98,12 @@ public class IPAWebPage implements StandardTest{
 	
 	@Override
 	public IPAWebTestMonitor addAndAddAnother(IPAWebTestMonitor monitor){
+		String pageName = addPage;
+		if (pageName == null)
+			return monitor;
 		int numOfEntries = 3;
 		try {
-			addMultipleNewEntries(monitor, addPage, numOfEntries);
+			addMultipleNewEntries(monitor, pageName, numOfEntries);
 			monitor.pass();
 		} catch (IPAWebAutomationException e) { 
 			e.printStackTrace();
@@ -110,9 +116,12 @@ public class IPAWebPage implements StandardTest{
 	}
 
 	@Override
-	public IPAWebTestMonitor addThenEdit(IPAWebTestMonitor monitor){  
+	public IPAWebTestMonitor addThenEdit(IPAWebTestMonitor monitor){ 
+		String pageName = addPage;
+		if (pageName == null)
+			return monitor;
 		try {
-			addNewEntryThenEdit(monitor,addPage);
+			addNewEntryThenEdit(monitor,pageName);
 			monitor.pass();
 		} catch (IPAWebAutomationException e) {
 			e.printStackTrace();
@@ -123,8 +132,11 @@ public class IPAWebPage implements StandardTest{
 
 	@Override
 	public IPAWebTestMonitor addThenCancel(IPAWebTestMonitor monitor){
+		String pageName = addPage;
+		if (pageName == null)
+			return monitor;
 		try {
-			addNewEntryThenCancelOperation(monitor, addPage);
+			addNewEntryThenCancelOperation(monitor, pageName);
 			monitor.pass();
 		} catch (IPAWebAutomationException e) {
 			e.printStackTrace();
@@ -135,9 +147,13 @@ public class IPAWebPage implements StandardTest{
 
 	@Override
 	public IPAWebTestMonitor addNegativeDuplicate(IPAWebTestMonitor monitor) {
+		String pageName = duplicatePage;
+		if (pageName == null)
+			return monitor;
+		
 		try {
-			addSingleNewEntry(monitor, duplicatePage);
-			addSingleNewEntry(monitor, duplicatePage);
+			addSingleNewEntry(monitor, pageName);
+			addSingleNewEntry(monitor, pageName);
 			
 			// check error dialog box
 			if (browser.div("error_dialog").exists()){
@@ -171,6 +187,9 @@ public class IPAWebPage implements StandardTest{
 	@Override
 	public IPAWebTestMonitor addNegative(IPAWebTestMonitor monitor){
 		String pageName = addNegativePage;
+		if (pageName == null)
+			return monitor;
+		
 		while (factory.hasMoreTestData(pageName))
 			addNegativeSingle(monitor, pageName); 
 		return monitor;
@@ -188,68 +207,78 @@ public class IPAWebPage implements StandardTest{
 
 	@Override
 	public IPAWebTestMonitor modify(IPAWebTestMonitor monitor) {
-		// get into editing mode
 		String pageName = modifyPage;
+		if (pageName == null){
+			monitor.fail("modify test page not defined:");
+			return monitor;
+		}
+		
 		String testAccount = factory.getModifyTestAccount(pageName);
 		if (testAccount != null && browser.link(testAccount).exists())
 		{
 			browser.link(testAccount).click();
-			//test undo, reset and update
-			ArrayList<String> uiElements = factory.getUIELements(pageName); 
-			for (String uiElement:uiElements)
-			{
-				String[] elementID = uiElement.split(":"); 
-				String tag = elementID[0];
-				String id = elementID[1]; 
-				String value = factory.getValue(pageName, tag, id); 
-				
-				// test 'undo' 
-				String original = readElementValue(monitor, pageName,tag,id,value);
-				setElementValue(monitor, pageName,tag,id,value);
-				monitor.setCurrentTestData(pageName, "{" + tag + ":" + id + ":" + value + " 'undo'}");
-				browser.span("undo").click();
-				String afterUndo = readElementValue(monitor, pageName,tag,id,value);
-				if (original.equals(afterUndo))
-					monitor.pass("after undo, value being reset to original, test pass");
-				else
-					monitor.fail("after undo, value not being reset, test failed");
-				
-				// test 'Reset'
-				setElementValue(monitor, pageName,tag,id,value);
-				monitor.setCurrentTestData(pageName,  "{" + tag + ":" + id + ":" + value + " 'Reset'}");
-				browser.span("Reset").click();
-				String afterReset = readElementValue(monitor, pageName,tag,id,value);
-				if (original.equals(afterReset))
-					monitor.pass("after 'Reset', value being reset to original, test pass");
-				else
-					monitor.fail("after 'Reset', value not being reset, test failed");
-				
-				// test 'Update'
-				setElementValue(monitor, pageName,tag,id,value);
-				monitor.setCurrentTestData(pageName,  "{" + tag + ":" + id + ":" + value + " 'Update'}");
-				browser.span("Update").click();
-				String afterUpdate = setElementValue(monitor, pageName,tag,id,value);
-				if (browser.div("error_dialog").exists())
-				{
-					String errorMessage = browser.div("error_dialog").getText();
-					monitor.fail("error on 'Update', error dialog appears, dialog says:(" + errorMessage + ")");
-					browser.button("Cancel").click();
-					browser.span("undo").click();
-				}else{ 
-					if (afterUpdate.equals(value)) 
-						monitor.pass("after 'Update', new value being set, test pass");
-					else
-						monitor.fail("after 'Update', new value not assigned to element, test failed");
-				}
-			} 
-			browser.link(backLink).click();
-			if (browser.span("Unsaved Changes").exists())
-			{
-				monitor.fail("there is 'Unsaved Changes', it is not suppose to happen, need find out why");
-				browser.button("Reset").click();
-			}
+			return executeModify(monitor, pageName);
 		}else{
 			monitor.fail("test account for page ["+ pageName + "] not defined or link does not exist");
+			return monitor;
+		}  
+	}
+	 
+	protected IPAWebTestMonitor executeModify(IPAWebTestMonitor monitor, String pageName) { 
+			
+		//test undo, reset and update
+		ArrayList<String> uiElements = factory.getUIELements(pageName); 
+		for (String uiElement:uiElements)
+		{
+			String[] elementID = uiElement.split(":"); 
+			String tag = elementID[0];
+			String id = elementID[1]; 
+			String value = factory.getValue(pageName, tag, id); 
+			
+			// test 'undo' 
+			String original = readElementValue(monitor, pageName,tag,id,value);
+			setElementValue(monitor, pageName,tag,id,value);
+			monitor.setCurrentTestData(pageName, "{" + tag + ":" + id + ":" + value + " 'undo'}");
+			browser.span("undo").click();
+			String afterUndo = readElementValue(monitor, pageName,tag,id,value);
+			if (original.equals(afterUndo))
+				monitor.pass("after undo, value being reset to original, test pass");
+			else
+				monitor.fail("after undo, value not being reset, test failed");
+			
+			// test 'Reset'
+			setElementValue(monitor, pageName,tag,id,value);
+			monitor.setCurrentTestData(pageName,  "{" + tag + ":" + id + ":" + value + " 'Reset'}");
+			browser.span("Reset").click();
+			String afterReset = readElementValue(monitor, pageName,tag,id,value);
+			if (original.equals(afterReset))
+				monitor.pass("after 'Reset', value being reset to original, test pass");
+			else
+				monitor.fail("after 'Reset', value not being reset, test failed");
+			
+			// test 'Update'
+			setElementValue(monitor, pageName,tag,id,value);
+			monitor.setCurrentTestData(pageName,  "{" + tag + ":" + id + ":" + value + " 'Update'}");
+			browser.span("Update").click();
+			String afterUpdate = setElementValue(monitor, pageName,tag,id,value);
+			if (browser.div("error_dialog").exists())
+			{
+				String errorMessage = browser.div("error_dialog").getText();
+				monitor.fail("error on 'Update', error dialog appears, dialog says:(" + errorMessage + ")");
+				browser.button("Cancel").click();
+				browser.span("undo").click();
+			}else{ 
+				if (afterUpdate.equals(value)) 
+					monitor.pass("after 'Update', new value being set, test pass");
+				else
+					monitor.fail("after 'Update', new value not assigned to element, test failed");
+			}
+		} 
+		browser.link(backLink).click();
+		if (browser.span("Unsaved Changes").exists())
+		{
+			monitor.fail("there is 'Unsaved Changes', it is not suppose to happen, need find out why");
+			browser.button("Reset").click();
 		} 
 		return monitor;
 	}
@@ -258,52 +287,67 @@ public class IPAWebPage implements StandardTest{
 	public IPAWebTestMonitor modifyNegative(IPAWebTestMonitor monitor) {
 		// get into editing mode
 		String pageName = modifyNegativePage;
+		if (pageName == null){
+			monitor.fail("modifyNegativePage is not defined");
+			return monitor;
+		}
+		
 		String testAccount = factory.getModifyTestAccount(pageName);
 		if (testAccount != null && browser.link(testAccount).exists())
 		{
 			browser.link(testAccount).click();
-			//test undo, reset and update
-			ArrayList<String> uiElements = factory.getUIELements(pageName); 
-			for (String uiElement:uiElements)
-			{
-				String[] elementID = uiElement.split(":"); 
-				String tag = elementID[0];
-				String id = elementID[1]; 
-				String valueAndExpectedErrorMsg = factory.getValue(pageName, tag, id);
-				String[] combined = factory.extractValues(valueAndExpectedErrorMsg); 
-				String value = combined[0];
-				String expectedErrorMsg = combined[1];
-				
-				// 'Update' with negative data and expect error dialog/message
-				setElementValue(monitor, pageName,tag,id,value);
-				monitor.setCurrentTestData(pageName,  "{" + tag + ":" + id + ":" + value + " 'Update'}");
-				browser.span("Update").click();
-				if (browser.div("error_dialog").exists())
-				{
-					String errorMessage = browser.div("error_dialog").getText();
-					if (errorMessage.equals(expectedErrorMsg) || errorMessage.endsWith(expectedErrorMsg) || errorMessage.startsWith(expectedErrorMsg))
-						monitor.pass("error dialog appears as expected, error message mathces: expect[" + expectedErrorMsg + "] actual ["+ errorMessage + "]");
-					else
-						monitor.fail("error dialog appears as expected, error message does NOT match. expect[" + expectedErrorMsg + "] actual ["+ errorMessage + "]");
-					browser.button("Cancel").click();
-					browser.span("undo").click();
-				}else{ 
-					monitor.fail("error dialog does not appear, expect[" + expectedErrorMsg + "]");
-				}
-			} 
-			browser.link(backLink).in(browser.span("back-link")).click();
-			if (browser.span("Unsaved Changes").exists()) 
-				browser.button("Reset").click();
+			return executeModifyNegative(monitor, pageName);
 		}else{
 			monitor.fail("test account for page ["+ pageName + "] not defined or link does not exist");
+			return monitor;
 		} 
+	}
+	
+	protected IPAWebTestMonitor executeModifyNegative(IPAWebTestMonitor monitor, String pageName) {
+		
+		//test undo, reset and update
+		ArrayList<String> uiElements = factory.getUIELements(pageName); 
+		for (String uiElement:uiElements)
+		{
+			String[] elementID = uiElement.split(":"); 
+			String tag = elementID[0];
+			String id = elementID[1]; 
+			String valueAndExpectedErrorMsg = factory.getValue(pageName, tag, id);
+			String[] combined = factory.extractValues(valueAndExpectedErrorMsg); 
+			String value = combined[0];
+			String expectedErrorMsg = combined[1];
+			
+			// 'Update' with negative data and expect error dialog/message
+			setElementValue(monitor, pageName,tag,id,value);
+			monitor.setCurrentTestData(pageName,  "{" + tag + ":" + id + ":" + value + " 'Update'}");
+			browser.span("Update").click();
+			if (browser.div("error_dialog").exists())
+			{
+				String errorMessage = browser.div("error_dialog").getText();
+				if (errorMessage.equals(expectedErrorMsg) || errorMessage.endsWith(expectedErrorMsg) || errorMessage.startsWith(expectedErrorMsg))
+					monitor.pass("error dialog appears as expected, error message mathces: expect[" + expectedErrorMsg + "] actual ["+ errorMessage + "]");
+				else
+					monitor.fail("error dialog appears as expected, error message does NOT match. expect[" + expectedErrorMsg + "] actual ["+ errorMessage + "]");
+				browser.button("Cancel").click();
+				browser.span("undo").click();
+			}else{ 
+				monitor.fail("error dialog does not appear, expect[" + expectedErrorMsg + "]");
+			}
+		} 
+		browser.link(backLink).in(browser.span("back-link")).click();
+		if (browser.span("Unsaved Changes").exists()) 
+			browser.button("Reset").click();
+		
 		return monitor; 
 	}
 	
 	@Override
 	public IPAWebTestMonitor deleteSingle(IPAWebTestMonitor monitor){ 
+		String pageName = delPage;
+		if (pageName == null)
+			return monitor;
 		try {
-			deleteSingleEntry(monitor, delPage);
+			deleteSingleEntry(monitor, pageName);
 			monitor.pass();
 		} catch (IPAWebAutomationException e) { 
 			e.printStackTrace();
@@ -314,9 +358,13 @@ public class IPAWebPage implements StandardTest{
 	
 	@Override
 	public IPAWebTestMonitor deleteMultiple(IPAWebTestMonitor monitor){
+		String pageName = delPage;
+		if (pageName == null)
+			return monitor;
+		
 		int numOfEntries = 5;
 		try {
-			deleteMultipleEntry(monitor, delPage, numOfEntries);
+			deleteMultipleEntry(monitor, pageName, numOfEntries);
 			monitor.pass();
 		} catch (IPAWebAutomationException e) { 
 			e.printStackTrace();
@@ -565,10 +613,15 @@ public class IPAWebPage implements StandardTest{
 			}else
 				browser.checkbox(value).check(); // default behave
 		}
-		else if (tag.equals("radio") && value.equals("check"))
-			browser.radio(id).check();
-		else if (tag.equals("radio") && value.equals("uncheck"))
-			browser.radio(id).uncheck();
+		else if (tag.equals("radio") && value.equals("check")){
+			//browser.radio(id).check(); //FIXME: do we have "check" for radio button?
+			browser.radio(id).click();
+			after = "check";
+		}
+		else if (tag.equals("radio") && value.equals("uncheck")){
+			browser.radio(id).uncheck(); //FIXME: not sure if we have "uncheck" for radio button
+			after = "unchedk";
+		}
 		else if (tag.equals("select"))
 		{
 			if (browser.textbox(id).exists()){
@@ -603,6 +656,12 @@ public class IPAWebPage implements StandardTest{
 		else if (tag.equals("password")){
 			elementValue = browser.password(id).getValue();
 		}
+		else if (tag.equals("radio")){
+			if (browser.radio(id).checked())
+				elementValue = "check";
+			else
+				elementValue = "uncheck";
+		}
 		else
 			elementValue = "";
 		
@@ -611,32 +670,11 @@ public class IPAWebPage implements StandardTest{
 	
 	private String setElementValue(IPAWebTestMonitor monitor,String pageName,String tag, String id, String value) 
 	{ 
-		String after = null;
-		if (tag.equals("textbox")){
-			if (browser.textbox(id).under(browser.table("section-table")).exists()) // for Add permission in IPA Server tab
-			{	
-				browser.textbox(id).under(browser.table("section-table")).setValue(value);
-				after = browser.textbox(id).under(browser.table("section-table")).getValue();
-			}else{
-				browser.textbox(id).setValue(value);
-				after = browser.textbox(id).getValue();
-			}
-		}else if (tag.equals("textarea")){
-			browser.textarea(id).setValue(value);
-			after = browser.textarea(id).getValue();
-		}else if (tag.equals("select")){
-			if (browser.textbox(id).exists()){
-				browser.textbox(id).click();
-				browser.select("list").choose(value);
-				after = browser.textbox(id).getValue();
-			}
-		}else if (tag.equals("password")){
-			browser.password(id).setValue(value);
-			after = browser.password(id).getValue();
-		}
-		else{
-			after = "";
-		}
+		String after=null;
+		try{
+			String[] beforeAndAfter = fillDataInElement(monitor, pageName,tag,id,value);
+			after = beforeAndAfter[1];
+		}catch (Exception e){}
 		return after;
 	}
 }
