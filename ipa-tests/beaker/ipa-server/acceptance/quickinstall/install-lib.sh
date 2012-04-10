@@ -164,7 +164,7 @@ appendEnv()
 	slave_short=`echo $SLAVE | cut -d "." -f1`
   	SLAVE=$slave_short.$DOMAIN
         #slaveipaddr=$(dig +noquestion $SLAVE  | grep A | grep $SLAVE | grep IN | awk '{print $5}')
-	slaveipaddr=ipofs=$(host -i $SLAVE | awk '{ field = $NF }; END{ print field }')
+	slaveipaddr=$(host -i $SLAVE | awk '{ field = $NF }; END{ print field }')
 	echo "export SLAVE=$SLAVE" >> /dev/shm/env.sh
         echo "export SLAVEIP=$slaveipaddr" >> /dev/shm/env.sh
   fi
