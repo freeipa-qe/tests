@@ -25,6 +25,7 @@
 #	pkey_return_check
 #       getReverseZone_IPv6
 #	ipa_quick_uninstall
+#	check_coredump
 ######################################################################
 KINITEXEC=/usr/bin/kinit
 #######################################################################
@@ -968,3 +969,47 @@ ipa_quick_uninstall(){
 	rlRun "yum -y downgrade krb5-devel krb5-libs bind-libs bind-utils"
 
 } #ipa_quick_uninstall 
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# check_coredump
+#   Usage: check_coredump
+#
+# This will check for any coredump messages in abrt output and try to 
+# generate backtrace.
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+check_coredump(){
+
+hostname_s=`hostname -s`
+for rpm in abrt-tui abrt-addon-ccpp libreport-plugin-mailx; do
+        rlCheckRpm "$rpm"
+                if [ $? -ne 0 ]; then
+                        rlRun "yum install -y abrt-tui"
+                fi
+
+cat > /etc/libreport/plugins/mailx.conf << EOF
+Subject=CRASH ALERT: Crash detected in automation.
+EmailFrom=root@$hostname_s
+EmailTo=seceng-idm-qe-list@redhat.com
+SendBinaryData=no
+EOF
+
+        done
+
+        /usr/bin/abrt-cli list | grep Directory |  awk '{print $2}'
+                crashes=`/usr/bin/abrt-cli list | grep Directory |  awk '{print $2}' | wc -l`
+                if [ $crashes -ne 0 ]; then
+                        echo "Crash detected."
+                        for dir in `/usr/bin/abrt-cli list | grep Directory |  awk '{print $2}'`; do
+                                cd $dir
+                                /usr/bin/abrt-action-install-debuginfo -v;
+                                /usr/bin/abrt-action-generate-backtrace -v;
+                                /usr/bin/rhts-submit-log -l bactrace
+                                /usr/bin/reporter-mailx -v
+                        done
+                else
+                        echo "No crash detected."
+                fi
+
+
+} #check_coredump
+
