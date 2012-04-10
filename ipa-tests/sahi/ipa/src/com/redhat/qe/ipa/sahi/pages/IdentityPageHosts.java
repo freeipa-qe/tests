@@ -18,7 +18,7 @@ public class IdentityPageHosts extends IPAWebPage {
 		backLink = "Hosts";
 		addPage = "Add Host";
 		duplicatePage = "Add Duplicate Host";
-		modifyPage = "Modify Host";
+		modifySettingsPage = "Modify Host";
 		delPage = "Delete Host";
 		registerStandardTestCases();
 		System.out.println("New instance of " + IdentityPageHosts.class.getName() + " is ready"); 

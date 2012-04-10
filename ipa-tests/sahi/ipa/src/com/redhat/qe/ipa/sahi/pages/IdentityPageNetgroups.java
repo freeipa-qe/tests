@@ -18,7 +18,7 @@ public class IdentityPageNetgroups extends IPAWebPage{
 		backLink = "Netgroups";
 		addPage = "Add Netgroup";
 		duplicatePage = "Add Duplicate Netgroup";
-		modifyPage = "Modify Netgroup";
+		modifySettingsPage = "Modify Netgroup";
 		delPage = "Delete Netgroup";
 		registerStandardTestCases();
 		System.out.println("New instance of " + IdentityPageNetgroups.class.getName() + " is ready"); 

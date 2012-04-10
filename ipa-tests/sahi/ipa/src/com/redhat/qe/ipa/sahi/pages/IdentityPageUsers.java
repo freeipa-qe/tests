@@ -19,7 +19,7 @@ public class IdentityPageUsers extends IPAWebPage{
 		addPage = "Add User";
 		addNegativePage = "Add User Negative";
 		duplicatePage = "Add Duplicate User";
-		modifyPage = "Modify User";
+		modifySettingsPage = "Modify User";
 		modifyNegativePage = "Modify User Negative";
 		delPage = "Delete User";
 

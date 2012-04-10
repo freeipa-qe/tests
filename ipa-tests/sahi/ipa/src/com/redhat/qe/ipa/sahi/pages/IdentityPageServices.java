@@ -16,7 +16,7 @@ public class IdentityPageServices extends IPAWebPage{
 		super(browser, url, testPropertyFile); 
 		addPage = "Add Service";
 		duplicatePage = "Add Duplicate Service";
-		modifyPage = "Modify Service";
+		modifySettingsPage = "Modify Service";
 		delPage = "Delete Service";
 		duplicateErrorMsgStartsWith = "service with name";
 		backLink = "Services";

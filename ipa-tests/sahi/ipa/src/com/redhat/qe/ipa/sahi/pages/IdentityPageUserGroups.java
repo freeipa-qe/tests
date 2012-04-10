@@ -18,7 +18,7 @@ public class IdentityPageUserGroups extends IPAWebPage{
 		backLink="User Groups";
 		addPage = "Add User Group";
 		duplicatePage = "Add Duplicate User Group";
-		modifyPage = "Modify User Group";
+		modifySettingsPage = "Modify User Group";
 		delPage = "Delete User Group"; 
 		
 		registerStandardTestCases();
@@ -29,7 +29,7 @@ public class IdentityPageUserGroups extends IPAWebPage{
 	public IPAWebTestMonitor modify(IPAWebTestMonitor monitor) {
 		browser.link("user001").click();
 		try {
-			fillDataIntoPage(monitor,modifyPage);
+			fillDataIntoPage(monitor,modifySettingsPage);
 			browser.span("Update").click();
 			if (browser.div("error_dialog").exists())
 			{

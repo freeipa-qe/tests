@@ -18,7 +18,7 @@ public class IdentityPageHostGroups extends IPAWebPage{
 		backLink = "Host Groups";
 		addPage = "Add Host Group";
 		duplicatePage = "Add Duplicate Host Group";
-		modifyPage = "Modify Host Group";
+		modifySettingsPage = "Modify Host Group";
 		delPage = "Delete Host Group";
 
 		registerStandardTestCases();

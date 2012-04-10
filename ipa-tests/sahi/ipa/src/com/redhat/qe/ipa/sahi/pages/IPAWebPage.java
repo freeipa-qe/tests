@@ -19,7 +19,7 @@ public class IPAWebPage implements StandardTest{
 	protected String addPage;
 	protected String addNegativePage;
 	protected String duplicatePage;
-	protected String modifyPage;
+	protected String modifySettingsPage;
 	protected String modifyNegativePage;
 	protected String delPage;
 	
@@ -207,7 +207,7 @@ public class IPAWebPage implements StandardTest{
 
 	@Override
 	public IPAWebTestMonitor modify(IPAWebTestMonitor monitor) {
-		String pageName = modifyPage;
+		String pageName = modifySettingsPage;
 		if (pageName == null){
 			monitor.fail("modify test page not defined:");
 			return monitor;
@@ -260,7 +260,7 @@ public class IPAWebPage implements StandardTest{
 			setElementValue(monitor, pageName,tag,id,value);
 			monitor.setCurrentTestData(pageName,  "{" + tag + ":" + id + ":" + value + " 'Update'}");
 			browser.span("Update").click();
-			String afterUpdate = setElementValue(monitor, pageName,tag,id,value);
+			String afterUpdate = readElementValue(monitor, pageName,tag,id,value); // reread to confirm the update result
 			if (browser.div("error_dialog").exists())
 			{
 				String errorMessage = browser.div("error_dialog").getText();
@@ -268,7 +268,7 @@ public class IPAWebPage implements StandardTest{
 				browser.button("Cancel").click();
 				browser.span("undo").click();
 			}else{ 
-				if (afterUpdate.equals(value)) 
+				if (afterUpdate !=null && afterUpdate.equals(value)) 
 					monitor.pass("after 'Update', new value being set, test pass");
 				else
 					monitor.fail("after 'Update', new value not assigned to element, test failed");
@@ -599,6 +599,7 @@ public class IPAWebPage implements StandardTest{
 			after = browser.password(id).getValue();
 		}
 		else if (tag.equals("checkbox")){
+			//FIXME: not sure what value to set for checkbox
 			if (id.equals("fqdn")) 
 				value = value + "."+ CommonTasks.ipadomain; 
 			if (id.equals("krbprincipalname"))
@@ -606,20 +607,40 @@ public class IPAWebPage implements StandardTest{
 			
 			if (value.equals("check")){
 				if (! browser.checkbox(id).checked())
+				{
+					before="uncheck";
 					browser.checkbox(id).check();
+					after = "check";
+				}else{
+					before="check";
+					after="check";
+				}
 			}else if (value.equals("uncheck")){
 				if (browser.checkbox(id).checked())
+				{
+					before = "check";
 					browser.checkbox(id).uncheck();
+					after="uncheck";
+				}else
+				{
+					before="uncheck";
+					after="uncheck";
+				}
 			}else
+			{
 				browser.checkbox(value).check(); // default behave
+				after = value; //FIXME: not sure what would be correct value for check box, set it to value for now
+								// this setting make DNS page -> settings -> forward policy work
+			}
 		}
 		else if (tag.equals("radio") && value.equals("check")){
-			//browser.radio(id).check(); //FIXME: do we have "check" for radio button?
+			browser.radio(id).check(); //FIXME: do we have "check" for radio button? but it works
 			browser.radio(id).click();
-			after = "check";
+			after = "check"; // FIXME: I don't know why IPA is so special, the click does not work, but check is
 		}
 		else if (tag.equals("radio") && value.equals("uncheck")){
 			browser.radio(id).uncheck(); //FIXME: not sure if we have "uncheck" for radio button
+			browser.radio(id).click();;
 			after = "unchedk";
 		}
 		else if (tag.equals("select"))
