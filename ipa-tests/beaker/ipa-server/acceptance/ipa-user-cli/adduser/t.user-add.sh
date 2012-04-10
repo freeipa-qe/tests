@@ -638,6 +638,49 @@ disableuser.ldif_EOF
         ipa user-del testusr
     rlPhaseEnd
 
+    rlPhaseStartTest "ipa bug 721289 - Process /usr/libexec/sssd/sssd_be was killed by signal 11 during auth when password for the user is not set."
+
+        TmpDir=`mktemp -d`
+        pushd $TmpDir
+        user1="user721289"
+        domain_log="/var/log/sssd/sssd_`hostname -d`.log"
+	sed -i '/id_provider = ipa/ a debug_level = 6' /etc/sssd/sssd.conf
+
+        rlLog "verifies https://bugzilla.redhat.com/show_bug.cgi?id=721289"
+        rlRun "ipa user-add $user1 --first=$user1 --last=$user1"
+
+	# Case where migration is enabled.
+        rlRun "ipa config-mod --enable-migration=True"
+        rlRun "ipa config-show --all --raw | grep \"ipamigrationenabled: TRUE\""
+        rlRun "> $domain_log"
+        sleep 5
+        rlRun "expect -c \"spawn ssh -o StrictHostKeyChecking=no $user1@$HOSTNAME; expect *assword: ; send redhat\n; expect eof\""
+        sleep 10
+        cat $domain_log
+        rlAssertGrep "\[ipa_migration_flag_connect_done\] (0x0400): Assuming Kerberos password is missing, starting password migration." "$domain_log"
+        rlAssertGrep "\[simple_bind_done\] (0x0080): Bind result: Inappropriate authentication(48), no errmsg set" "$domain_log"
+
+	# Case where migration is disabled.
+        rlRun "ipa config-mod --enable-migration=False"
+        rlRun "ipa config-show --all --raw | grep \"ipamigrationenabled: FALSE\""
+        rlRun "mv /etc/ipa/ca.crt /var/tmp/" 0 "Moving ca.crt to a non-default location"
+        rlRun "> $domain_log"
+        id $user1
+        rlRun "expect -c \"spawn ssh -o StrictHostKeyChecking=no $user1@$HOSTNAME; expect *assword: ; send redhat\n; expect eof\""
+        sleep 5
+        cat $domain_log
+        rlAssertGrep "\[ipa_get_migration_flag_done\] (0x0100): Password migration is not enabled." "$domain_log"
+
+	# Checking for any coredumps.
+        rlAssertNotGrep "coredump" "/var/log/messages"
+
+        # clean up
+        rlRun "mv -f /var/tmp/ca.crt /etc/ipa/ca.crt"
+        rlRun "ipa user-del $user1"
+
+    rlPhaseEnd
+
+
 }
 
 cleanup()
