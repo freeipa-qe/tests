@@ -142,18 +142,46 @@ public class PrivilegeTests extends SahiTestScript{
 	
 
 	/*
+	 * Edit - but do not save the Settings for the Privilege
+	 */
+	@Test (groups={"privilegeModifyNotSavedTests"}, description="Edit - But do not save Settings for Privilege",
+			dataProvider="privilegeModifyNotSavedTestObjects")
+	public void testprivilegeModifyNotSaved(String testName, String name, String description, String newDescription, String buttonToClick) throws Exception {		
+		//verify privilege to be edited exists
+		CommonTasks.search(sahiTasks, name);
+		Assert.assertTrue(sahiTasks.link(name).exists(), "Verify Privilege " + name + " to be edited exists");
+				
+		PrivilegeTasks.modifyPrivilegeButNotSave(sahiTasks, name, description, newDescription, buttonToClick);
+		
+		CommonTasks.clearSearch(sahiTasks);
+	}
+	
+	/*
 	 * Add Privilege - Negative tests
 	 */
 	@Test (groups={"privilegeInvalidAddTests"}, description="Add Invalid Privilege", 
 			dataProvider="privilegeInvalidAddTestObjects",
 			dependsOnGroups="privilegeAddTests")	
 	public void testPrivilegeInvalidAddTests(String testName, String name, String description, String expectedError) throws Exception {		
-		
-		
+				
 		//new privilege should not be added
 		PrivilegeTasks.addInvalidPrivilege(sahiTasks, name, description, expectedError);
 	}
 	
+	
+	/*
+	 * Modify Privilege - Negative tests
+	 */
+	@Test (groups={"privilegeInvalidModifyTests"}, description="Modify Privilege with Invalid data", 
+			dataProvider="privilegeInvalidModifyTestObjects")	
+	public void testPrivilegeInvalidModifyTests(String testName, String name, String description, String expectedError) throws Exception {		
+		CommonTasks.search(sahiTasks, name);
+		Assert.assertTrue(sahiTasks.link(name).exists(), "Verify Privilege " + name + " to be edited exists");
+		
+		//new privilege should not be added
+		PrivilegeTasks.modifyInvalidPrivilege(sahiTasks, name, description, expectedError);
+		CommonTasks.clearSearch(sahiTasks);
+	}
 
 	/*
 	 * Add Privilege - check required fields - for negative tests
@@ -176,6 +204,55 @@ public class PrivilegeTests extends SahiTestScript{
 		PrivilegeTasks.expandCollapsePermission(sahiTasks, name);		
 		
 	}
+	
+	/*
+	 * And a privilege, add or cancel to add permissions
+	 */
+	@Test (groups={"privilegeAddAndAddPermissionTests"}, description="Add Privilege and Add Permissions to it", 
+			dataProvider="privilegeAddAndAddPermissionTestObjects")	
+	public void testprivilegeAddAndAddPermission(String testName, String name, String description, String searchString, 
+			String permission1, String permission2, String buttonToClick) throws Exception {		
+		//verify privilege doesn't exist
+		Assert.assertFalse(sahiTasks.link(name).exists(), "Verify privilege " + name + " doesn't already exist");
+				
+		//new privilege can be added now
+		PrivilegeTasks.addPrivilegeAddPermissions(sahiTasks, name, description, searchString, permission1, permission2, buttonToClick);
+		
+		//verify privilege was added successfully
+		CommonTasks.search(sahiTasks, name);
+		Assert.assertTrue(sahiTasks.link(name).exists(), "Added privilege " + name + "  successfully");
+		String permissions[] = {permission1.toLowerCase(), permission2.toLowerCase()};
+		if (buttonToClick.equals("Add")) {
+			PrivilegeTasks.verifyPrivilegeMembership(sahiTasks, name, "Permissions", permissions, true);
+			PrivilegeTasks.verifyPrivilegeMembershipInPermission(sahiTasks, name, permissions);
+		}
+		else
+			PrivilegeTasks.verifyPrivilegeMembership(sahiTasks, name, "Permissions", permissions, false);
+	}
+	
+	/*
+	 * And a privilege, select/deselect then add permissions
+	 */
+	@Test (groups={"privilegeAddAndSelectDeselectPermissionTests"}, description="Add Privilege and Select/Deselect to Add Permissions to it", 
+			dataProvider="privilegeAddAndSelectDeselectPermissionTestObjects")	
+	public void testprivilegeAddAndSelectDeselectPermission(String testName, String name, String description, String permission1, 
+			String permission2) throws Exception {		
+		//verify privilege doesn't exist
+		Assert.assertFalse(sahiTasks.link(name).exists(), "Verify privilege " + name + " doesn't already exist");
+				
+		//new privilege can be added now
+		PrivilegeTasks.addPrivilegeSelectDeselectPermissionsToAdd(sahiTasks, name, description, permission1, permission2);
+		
+		//verify privilege was added successfully
+		CommonTasks.search(sahiTasks, name);
+		Assert.assertTrue(sahiTasks.link(name).exists(), "Added privilege " + name + "  successfully");
+		String permissions[] = {permission1.toLowerCase()};		
+		PrivilegeTasks.verifyPrivilegeMembership(sahiTasks, name, "Permissions", permissions, true);		
+	}
+	
+	
+	
+	
 	
 	/*
 	 * Delete Multiple Privileges
@@ -204,13 +281,17 @@ public class PrivilegeTests extends SahiTestScript{
 	@AfterClass (groups={"cleanup"}, description="Delete objects created for this test suite", alwaysRun=true)
 	public void cleanup() throws CloneNotSupportedException {
 		sahiTasks.navigateTo(commonTasks.privilegePage, true);
-		String[] privilegeTestObjects = {"Add User",
-				"Add User, Group",
+		String[] privilegeTestObjects = {"User TestAdmin",
+				"User, Group TestAdmin",
 				"abcdefghijklmnopqrstuvwxyz123456789ANDAGAINabcdefghijklmnopqrstuvwxyz123456789ANDAGAINabcdefghijklmnopqrstuvwxyz123456789",
 				"A~d`d! U@s#e$r%,^ G&r*o(u)p- T_e+s=t a{n[d]m}o'r:e? a/n<d.a>g|a\\in",
-				"Add Group1",
-				"Add Group2",
-				"Add Host",
+				"Group1 TestAdmin",
+				"Group2 TestAdmin",
+				"Host TestAdmin",
+				"Hostgroup TestAdmin",
+				"Group3 TestAdmin",
+				"HBAC TestAdmin",
+				"Sudo TestAdmin"
 		};
 		
 		for (String privilegeTestObject : privilegeTestObjects) {
@@ -231,8 +312,8 @@ public class PrivilegeTests extends SahiTestScript{
 	public Object[][] getPrivilegeAddTestObjects() {
 		String[][] privileges={
         //	testname							Name			Description   			
-		{ "add_privilege",						"Add User",			"Add User"	},
-		{ "add_privilege_with_comma_in_name",	"Add User, Group",	"Add User, Group"	},
+		{ "add_privilege",						"User TestAdmin",			"User TestAdmin"	},
+		{ "add_privilege_with_comma_in_name",	"User, Group TestAdmin",	"User, Group TestAdmin"	},
 		{ "add_privilege_with_long_name",		"abcdefghijklmnopqrstuvwxyz123456789ANDAGAINabcdefghijklmnopqrstuvwxyz123456789ANDAGAINabcdefghijklmnopqrstuvwxyz123456789",	"Long Name"	},
 		{ "add_privilege_with_specialchar",		"A~d`d! U@s#e$r%,^ G&r*o(u)p- T_e+s=t a{n[d]m}o'r:e? a/n<d.a>g|a\\in",	"Special Char!"	}
 		};
@@ -246,8 +327,8 @@ public class PrivilegeTests extends SahiTestScript{
 	@DataProvider(name="privilegeAddAndAddAnotherTestObjects")
 	public Object[][] getPrivilegeAddAndAddAnotherTestObjects() {
 		String[][] privileges={
-        //	testname							Name1			Description1		Name2			Description2  			
-		{ "add_and_add_another_privilege",		"Add Group1",	"Add Group1",		"Add Group2",	"Add Group2"	} };
+        //	testname							Name1				Description1			Name2				Description2  			
+		{ "add_and_add_another_privilege",		"Group1 TestAdmin",	"Group1 TestAdmin",		"Group2 TestAdmin",	"Group2 TestAdmin"	} };
         
 		return privileges;	
 	}	
@@ -256,10 +337,10 @@ public class PrivilegeTests extends SahiTestScript{
 	 * Data to be used when adding and then editing privilege
 	 */		
 	@DataProvider(name="privilegeAddAndEditTestObjects")
-	public Object[][] getPprivilegeAddAndEditTestObjects() {
+	public Object[][] getPrivilegeAddAndEditTestObjects() {
 		String[][] privileges={
-        //	testname					Name			Description			New Description  			
-		{ "add_and_edit_privilege",		"Add Host",		"Add Host",			"Add Host in Add And Edit test" 	} };
+        //	testname					Name				Description			New Description  			
+		{ "add_and_edit_privilege",		"Host TestAdmin",	"Host TestAdmin",	"Add Host in Add And Edit test" 	} };
         
 		return privileges;	
 	}	
@@ -271,7 +352,7 @@ public class PrivilegeTests extends SahiTestScript{
 	public Object[][] getPrivilegeAddCancelTestObjects() {
 		String[][] privileges={
         //	testname					Name				Description			  			
-		{ "add_and_edit_privilege",		"Add Hostgroup",	"Add Hostgroup" 	} };
+		{ "add_and_edit_privilege",		"Hostgroup TestAdmin",	"Hostgroup TestAdmin" 	} };
         
 		return privileges;	
 	}
@@ -282,8 +363,26 @@ public class PrivilegeTests extends SahiTestScript{
 	@DataProvider(name="privilegeInvalidAddTestObjects")
 	public Object[][] getPrivilegeInvalidAddTestObjects() {
 		String[][] privileges={
-        //	testname							Name			Description  	Expected Error 			
-		{ "add_duplicate_privilege",			"Add User",		"Add User",		"privilege with name \"Add User\" already exists"	} };
+        //	testname								Name			Description  	Expected Error 			
+		{ "add_duplicate_privilege",				"User TestAdmin",		"User TestAdmin",		"privilege with name \"User TestAdmin\" already exists"	},
+		{ "add_privilege_with_leading_space_name",	" Automount TestAdmin",	"Automount TestAdmin",		"invalid 'name': Leading and trailing spaces are not allowed"	},
+		{ "add_privilege_with_trailing_space_name",	"Automount TestAdmin ",	"Automount TestAdmin",		"invalid 'name': Leading and trailing spaces are not allowed"	},
+		{ "add_privilege_with_leading_space_desc",	"Automount TestAdmin",		" Automount TestAdmin",	"invalid 'desc': Leading and trailing spaces are not allowed"	},
+		{ "add_privilege_with_trailing_space_desc",	"Automount TestAdmin",		"Automount TestAdmin ",	"invalid 'desc': Leading and trailing spaces are not allowed"	} };
+        
+		return privileges;	
+	}
+	
+	/*
+	 * Data to be used when modifying privilege with invalid data
+	 */		
+	@DataProvider(name="privilegeInvalidModifyTestObjects")
+	public Object[][] getPrivilegeInvalidModifyTestObjects() {
+		String[][] privileges={
+        //	testname									Name							Description  					Expected Error 			
+		{ "modify_blank_privilege",						"Replication Administrators",	"",								"Input form contains invalid or missing values."	},
+		{ "modify_privilege_with_leading_space_desc",	"Automount Administrators",		" Automount Administrators",	"invalid 'desc': Leading and trailing spaces are not allowed"	},
+		{ "modify_privilege_with_trailing_space_desc",	"Automount Administrators",		"Automount Administrators ",	"invalid 'desc': Leading and trailing spaces are not allowed"	} };
         
 		return privileges;	
 	}
@@ -294,9 +393,9 @@ public class PrivilegeTests extends SahiTestScript{
 	@DataProvider(name="privilegeRequiredFieldAddTestObjects")
 	public Object[][] getprivilegeRequiredFieldAddTestObjects() {
 		String[][] privileges={
-        //	testname							Name			Description  		Expected Error 			
-		{ "add_privilege_missing_name",			"",				"Add Netgroup", 	"Required field"	},
-		{ "add_privilege_missing_description",	"Add Netgroup",	"",					"Required field"	}};
+        //	testname							Name				Description  		Expected Error 			
+		{ "add_privilege_missing_name",			"",					"Netgroup TestAdmin", 	"Required field"	},
+		{ "add_privilege_missing_description",	"Netgroup TestAdmin",	"",					"Required field"	}};
         
 		return privileges;	
 	}
@@ -307,8 +406,8 @@ public class PrivilegeTests extends SahiTestScript{
 	@DataProvider(name="privilegeMultipleDeleteTestObjects")
 	public Object[][] getprivilegeMultipleDeleteTestObjects() {
 		String[][] privileges={
-        //	testname							Search String	Name1		Name2			Name3			  				
-		{ "delete_multiple_privilege",			"Add",			"Add User", "Add Group1",	"Add Group2"	} };
+        //	testname							Search String	Name1				Name2				Name3			  				
+		{ "delete_multiple_privilege",			"TestAdmin",	"User TestAdmin", 	"Group1 TestAdmin",	"Group2 TestAdmin"	} };
         
 		return privileges;	
 	}
@@ -339,6 +438,45 @@ public class PrivilegeTests extends SahiTestScript{
 		return privileges;	
 	}
 	
+	/*
+	 * Data to be used when modifying, but not saving privilege 
+	 */		
+	@DataProvider(name="privilegeModifyNotSavedTestObjects")
+	public Object[][] getprivilegeModifyNotSavedTestObjects() {
+		String[][] privileges={
+        //	testname					Name								Existing description				New Description								Button To Click			  				
+		{ "modify_privilege_update",	"Service Administrators",			"Service Administrators",			"Service Administrators Updated",			"Update"	},
+		{ "modify_privilege_reset",		"Sudo Administrator",				"Sudo Administrator",				"Sudo Administrator Updated",				"Reset"	},
+		{ "modify_privilege_cancel",	"Password Policy Administrator",	"Password Policy Administrator",	"Password Policy Administrator Updated",	"Cancel"	} };
+        
+		return privileges;	
+	}
+	
+	
+	/*
+	 * Data to be used when adding and then editing privilege
+	 */		
+	@DataProvider(name="privilegeAddAndAddPermissionTestObjects")
+	public Object[][] getPrivilegeAddAndAddPermissionTestObjects() {
+		String[][] privileges={
+        //	testname								Name					Description			SearchString	Permission1					Permission2			Button		  			
+		{ "add_privilege_add_permission",			"Group3 TestAdmin",		"Group3 TestAdmin",	"group",		"Modify Group membership",	"Add Groups",		"Add" 	} ,
+		{ "add_privilege_add_permission_cancel",	"HBAC TestAdmin",		"HBAC TestAdmin",	"HBAC",			"Add HBAC rule",			"Modify HBAC rule",	"Cancel" } };
+        
+		return privileges;	
+	}	
+	
+	/*
+	 * Data to be used when adding privilege, then selecting/deselcting permissions
+	 */		
+	@DataProvider(name="privilegeAddAndSelectDeselectPermissionTestObjects")
+	public Object[][] getPrivilegeAddAndSelectDeselectPermissionTestObjects() {
+		String[][] privileges={
+        //	testname									Name					Description			Permission1				Permission2					  			
+		{ "add_privilege_select_deselect_permission",	"Sudo TestAdmin",		"Sudo TestAdmin",	"Add Sudo command",		"Modify Sudo command"	} };
+        
+		return privileges;	
+	}	
 	
 	}
 	

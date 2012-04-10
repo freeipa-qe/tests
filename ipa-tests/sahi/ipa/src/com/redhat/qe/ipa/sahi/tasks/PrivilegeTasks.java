@@ -41,7 +41,7 @@ public class PrivilegeTasks {
 		sahiTasks.link(name).click();
 		sahiTasks.link("Settings").click();
 		Assert.assertEquals(newDescription, sahiTasks.textarea("description").value());	
-		sahiTasks.link("Privileges").click();
+		sahiTasks.link("Privileges").in(sahiTasks.div("content")).click();
 	}
 
 	public static void deletePrivilege(SahiTasks sahiTasks,	String name, String buttonToClick) {		
@@ -126,6 +126,118 @@ public class PrivilegeTasks {
 		}
 		sahiTasks.link("Privileges").in(sahiTasks.div("content")).click();
 	}
+
+	public static void modifyPrivilegeButNotSave(SahiTasks sahiTasks, String name, String description, String newDescription,
+			String buttonToClick) {
+		sahiTasks.link(name).click();
+		sahiTasks.link("Settings").click();
+		sahiTasks.textarea("description").setValue(newDescription);
+		sahiTasks.link("Privileges").in(sahiTasks.div("content")).click();
+		sahiTasks.button(buttonToClick).click();
+		
+		if (!buttonToClick.equals("Cancel")) {
+			CommonTasks.search(sahiTasks, name);
+			if (buttonToClick.equals("Update"))
+				verifyPrivilege(sahiTasks, name, newDescription);
+			else
+				verifyPrivilege(sahiTasks, name, description);
+			CommonTasks.clearSearch(sahiTasks);
+		} else {
+			Assert.assertEquals(newDescription, sahiTasks.textarea("description").value());	
+			sahiTasks.span("Reset").click();
+			sahiTasks.link("Privileges").in(sahiTasks.div("content")).click();
+		}
+	}
+
+	public static void modifyInvalidPrivilege(SahiTasks sahiTasks, String name, String newDescription, String expectedError) {
+		sahiTasks.link(name).click();
+		sahiTasks.link("Settings").click();
+		if (newDescription.isEmpty()) {
+			sahiTasks.textarea("description").setValue(" ");
+		}
+		sahiTasks.textarea("description").setValue(newDescription);
+		sahiTasks.span("Update").click();
+		Assert.assertTrue(sahiTasks.div("ui-dialog-content ui-widget-content").text().contains(expectedError), " Verified expected error");
+		if (sahiTasks.button("OK").exists()) 
+			sahiTasks.button("OK").click();
+		else
+			sahiTasks.button("Cancel").click();
+		sahiTasks.span("Reset").click();
+		sahiTasks.link("Privileges").in(sahiTasks.div("content")).click();
+	}
+	
+	public static void addPrivilegeAddPermissions(SahiTasks sahiTasks, String name, String description, String searchString, String permission1, String permission2, String buttonToClick) {
+		sahiTasks.span("Add").click();
+		sahiTasks.textbox("cn").setValue(name);
+		sahiTasks.textarea("description").setValue(description);
+		sahiTasks.button("Add and Edit").click();
+		sahiTasks.span("Add").click();
+		sahiTasks.textbox("filter").setValue(searchString);
+		sahiTasks.span("Find").click();
+		sahiTasks.checkbox(permission1).click();
+		sahiTasks.checkbox(permission2).click();
+		sahiTasks.span(">>").click();
+		sahiTasks.button(buttonToClick).click();
+		sahiTasks.link("Privileges").in(sahiTasks.div("content")).click();
+	}
 	
 
+	public static void addPrivilegeSelectDeselectPermissionsToAdd(SahiTasks sahiTasks, String name, String description, String permission1, String permission2) {
+		sahiTasks.span("Add").click();
+		sahiTasks.textbox("cn").setValue(name);
+		sahiTasks.textarea("description").setValue(description);
+		sahiTasks.button("Add and Edit").click();
+		sahiTasks.span("Add").click();
+		sahiTasks.textbox("filter").setValue(permission1);
+		sahiTasks.span("Find").click();
+		sahiTasks.checkbox(permission1).click();
+		sahiTasks.span(">>").click();
+		sahiTasks.textbox("filter").setValue(permission2);
+		sahiTasks.span("Find").click();
+		sahiTasks.checkbox(permission2).click();
+		sahiTasks.span(">>").click();
+		sahiTasks.checkbox(permission1).click(); // to unselect permission1
+		sahiTasks.span("<<").click(); //take off permisison2 from list
+		sahiTasks.button("Add").click();
+		sahiTasks.link("Privileges").in(sahiTasks.div("content")).click();
+	}
+	
+	
+
+	public static void verifyPrivilegeMembership(SahiTasks sahiTasks, String name, String membershipToCheckfor, String[] permissions, boolean exists) {
+		sahiTasks.link(name).click();
+		if (membershipToCheckfor.equals("Permissions"))
+			sahiTasks.link("memberof_permission").click();
+		else
+			sahiTasks.link("member_role").click();
+		for (String permission : permissions) {
+			if (!permission.isEmpty()) {
+				if (exists){
+					Assert.assertTrue(sahiTasks.link(permission).exists(), "Verified permission " + permission + " is listed for " + name );
+				}	
+				else {
+					Assert.assertFalse(sahiTasks.link(permission).exists(), "Verified permission " + permission + " is not listed for " + name );
+				}
+			}
+		}	
+		sahiTasks.link("Privileges").in(sahiTasks.div("content")).click();
+	}
+	
+	public static void verifyPrivilegeMembershipInPermission(SahiTasks sahiTasks, String name, String[] permissions) {
+		sahiTasks.link(name).click();
+		sahiTasks.link("memberof_permission").click();
+		for (String permission : permissions) {
+			if (!permission.isEmpty()) {
+				sahiTasks.link(permission).click();
+				sahiTasks.link("member_privilege").click();
+				Assert.assertTrue(sahiTasks.link(name.toLowerCase()).exists(), "Verified Privilege " + name + " is listed for " + permission );
+				sahiTasks.link(name.toLowerCase()).click();
+			}
+		}	
+		
+		sahiTasks.link("Privileges").in(sahiTasks.div("content")).click();
+	}
+	
+	
+		
 }

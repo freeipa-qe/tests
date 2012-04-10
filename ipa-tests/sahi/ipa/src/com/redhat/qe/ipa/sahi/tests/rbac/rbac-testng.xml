@@ -16,7 +16,7 @@
 			    <include name="permissionBug783500Tests" />
 			    <include name="permissionRequiredFieldAddTests" />  
 			    <include name="permissionMemberOfAddTests" />
-			    <!-- TODO <include name="permissionMissingMemberOfAddTests" /> 	-->		    
+			   <!-- TODO <include name="permissionMissingMemberOfAddTests" /> --> 		
 			    <include name="permissionMultipleDeleteTests" /> 
 			    <include name="permissionAddAndAddAnotherTypeTests" />
 			    <include name="permissionAddAndEditTypeTests" /> 
@@ -35,6 +35,7 @@
 	<test name="Privilege Tests">
 		<groups>
 			<run>	
+			     <include name="setup" />
 			     <include name="privilegeAddTests" /> 
 			     <include name="privilegeAddAndAddAnotherTests" /> 
 			     <include name="privilegeAddAndEditTests" />
@@ -44,6 +45,10 @@
 			     <include name="privilegeMultipleDeleteTests" />
 			     <include name="privilegeExpandCollapseTests" /> 
 			     <include name="privilegeModifyTests" />
+			     <include name="privilegeModifyNotSavedTests" /> 
+			     <include name="privilegeInvalidModifyTests" />
+			     <include name="privilegeAddAndAddPermissionTests" /> 
+			     <include name="privilegeAddAndSelectDeselectPermissionTests" />  
 			</run>
 		</groups>
 		<classes>
@@ -55,17 +60,18 @@
 	<test name="Role Tests">
 		<groups>
 			<run>	
-				<include name="yyy" />
+			    <include name="setup" />
+				<include name="roleAddTests" />
 			</run>
 		</groups>
 		<classes>
-		    <class name="com.redhat.qe.ipa.sahi.tests.sudo.SudoCommandGroupTests" />
+		    <class name="com.redhat.qe.ipa.sahi.tests.rbac.RoleTests" />
 		</classes>
 	</test>
--->	
+
 
 	<listeners>        
   		<listener class-name="com.redhat.qe.auto.testng.TestNGListener" />	
 	</listeners>
-	
+-->		
 </suite>
