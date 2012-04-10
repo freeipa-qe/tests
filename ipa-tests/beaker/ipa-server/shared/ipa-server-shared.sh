@@ -310,6 +310,8 @@ addAttribute()
 
 makereport()
 {
+
+	check_coredump
 	local report=$1
 # some modification here: make report work even the TmpDir removed
 		if [ -n "$report" ];then
@@ -335,6 +337,7 @@ makereport()
 					echo "   Passed: [$pass] "   >> $report
 					echo "   Failed: [$fail] "   >> $report
 					echo "   Abort : [$abort]"   >> $report
+					echo "   Crash : [$crashes]"   >> $report
 					echo "---------------------------------------------------------" >> $report
 					rlJournalPrintText | grep "RESULT" | grep "\[   PASS   \]"| sed -e 's/:/ /g' -e 's/RESULT//g' >> $report
 					echo "" >> $report
