@@ -362,14 +362,16 @@ ipakrblockout_maxfail_positive()
 
    rlPhaseStartTest "Max Failures reached and users credentials revoked"
 	rlRun "kinitAs $ADMINID $ADMINPW"
-        value=3
-        rlRun "ipa pwpolicy-mod --$maxflag=$value" 0 "Setting $maxflag to value of [$value]"
+        mvalue=3
+        rlRun "ipa pwpolicy-mod --$maxflag=$mvalue" 0 "Setting $maxflag to value of [$mvalue]"
+	ivalue=120
+	rlRun "ipa pwpolicy-mod --$intervalflag=$ivalue" 0 "Setting $intervalflag to value of [$ivalue]"
         actual=`ipa pwpolicy-show | grep "$maxlabel" | cut -d ':' -f 2`
         actual=`echo $actual`
-        if [ $actual -eq $value ] ; then
+        if [ $actual -eq $mvalue ] ; then
                 rlPass "Max failures correct [$actual]"
         else
-                rlFail "Max failures not as expected.  Got: [$actual] Expected: [$value]"
+                rlFail "Max failures not as expected.  Got: [$actual] Expected: [$mvalue]"
         fi
 
 	for value in 1 2 3
@@ -581,6 +583,7 @@ ipakrblockout_lockoutduration_positive()
         else
                 rlFail "User's failed counter is NOT as expected.  Got: [$count] Expected: [$value]"
         fi
+    rlPhaseEnd
 }
 
 ################################
@@ -593,12 +596,12 @@ ipakrblockout_grouppolicy()
 	# reset global policy
 	ipa pwpolicy-mod --$maxflag=6 --$locktimeflag=600  --$intervalflag=60
 	# add group policy
-	rlRun "ipa pwpolicy-add --$maxflag=3 --$locktimeflag=30 --$intervalflag=10 --priority=1 mygroup" 0 "Adding group policy"
+	rlRun "ipa pwpolicy-add --$maxflag=3 --$locktimeflag=120 --$intervalflag=30 --priority=1 mygroup" 0 "Adding group policy"
 	# verify member users effective policy
 	ipa pwpolicy-show --user=grpuser  > /tmp/effectivegrppolicy.txt 2>&1
 	rlAssertGrep "$maxlabel: 3" "/tmp/effectivegrppolicy.txt"
-	rlAssertGrep "$locktimelabel: 30" "/tmp/effectivegrppolicy.txt"
-	rlAssertGrep "$intervallabel: 10" "/tmp/effectivegrppolicy.txt"
+	rlAssertGrep "$locktimelabel: 120" "/tmp/effectivegrppolicy.txt"
+	rlAssertGrep "$intervallabel: 30" "/tmp/effectivegrppolicy.txt"
 	# verify the user not in a group's effective policy
 	ipa pwpolicy-show --user=user1  > /tmp/effectivegblpolicy.txt 2>&1
         rlAssertGrep "$maxlabel: 6" "/tmp/effectivegblpolicy.txt"
@@ -625,7 +628,7 @@ ipakrblockout_grouppolicy()
         rlAssertGrep "$revokedmsg" "/tmp/kinitrevoked.txt"
 
 	rlLog "Sleep for lock out duration"
-	sleep 30
+	sleep 120
 
 	# account should be successful
 	rlRun "kinitAs grpuser Secret123" 0 "Lock out period over - kinit should be successful"
@@ -646,7 +649,7 @@ ipakrblockout_grouppolicy()
         done
 
         rlLog "Sleep for interval duration"
-        sleep 10
+        sleep 30
 
 	rlRun "kinitAs grpuser BADPWD" 1 "Kinit as group policy user with invalid password"
 
