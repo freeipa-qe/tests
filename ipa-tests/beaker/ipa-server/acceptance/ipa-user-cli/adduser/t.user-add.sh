@@ -12,14 +12,14 @@ ga=ggg
 addusertests()
 {
     setup
-    adduser
-    lockuser
-    negative
-    finduser1
-    deleteuser
-    pkey
-    finduser2
-    noprivate
+    #adduser
+    #lockuser
+    #negative
+    #finduser1
+    #deleteuser
+    #pkey
+    #finduser2
+    #noprivate
     bugzillas
     cleanup
 }
@@ -568,8 +568,7 @@ bugzillas()
     rlPhaseStartTest "Bug 801451 - Logging in with GSSAPI should consult authentication authority policies (ssh pub keys tested with sssd)"
 	sssdcfg=/etc/sssd/sssd.conf
         # turn up debug level on sssd log
-        sed '/\[domain\/testrelm.com\]/ a\debug_level = 9' $sssdcfg > /tmp/sssd.conf
-        cat /tmp/sssd.conf > $sssdcfg
+        sed -i '/\[domain\/testrelm.com\]/ a\debug_level = 9' $sssdcfg
         rlRun "service sssd restart"
 
         rlLog "verifies https://bugzilla.redhat.com/show_bug.cgi?id=801451"
@@ -595,19 +594,30 @@ disableuser.ldif_EOF
         rlAssertGrep "[The user account is locked on the server]" "/var/log/secure"
         rlAssertGrep "Account for user \[$myuser\] is locked." "/var/log/sssd/sssd_$DOMAIN.log"
         #clean up 
-	sed 's/debug_level \= 9//g' $sssdcfg > /tmp/sssd.conf
-	cat /tmp/sssd.conf > $sssdcfg
+	sed -i 's/debug_level \= 9//g' $sssdcfg
+	sed -i '/cache_credentials/,$ b; /^$/d;' $sssdcfg
 	rlRun "service sssd restart"
         rlRun "kinitAs $ADMINID $ADMINPW" 0 "kinit as admin"
         ipa user-del $myuser
     rlPhaseEnd
 
     rlPhaseStartTest "bz805546 --noprivate group specified gid number does not exist - default group non-posix"
-        expmsg="ipa: ERROR: 'gidnumber': group not found"
-        command="ipa user-add --first=test --last=test --noprivate --gidnumber=123 testusr"
-        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
-        # just in case
-        ipa user-del testusr
+        #expmsg="ipa: ERROR: 'gidnumber': group not found"
+        #command="ipa user-add --first=test --last=test --noprivate --gidnumber=123 testusr"
+        #rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
+	ggidnumber="123"
+        rlRun "ipa user-add --first=test --last=test --noprivate --gidnumber=$ggidnumber testusr" 0
+        rlRun "ipa group-find --private testusr" 1 "Make sure private group not added"
+        ugidnumber=`ipa user-show testusr | grep "GID" | cut -d ":" -f 2`
+        ugidnumber=`echo $ugidnumber`
+        if [ $ggidnumber -ne $ugidnumber ] ; then
+                rlFail "User's gidnumber not as expected.  Expected: $ggidnumber  Got: $ugidnumber"
+        else
+                rlPass "User's gidnumber as expected."
+        fi
+
+        # clean up
+        rlRun "ipa user-del testusr" 0
     rlPhaseEnd
 
     rlPhaseStartTest "bz805546 --noprivate gidnumber not specifiec - default group posix"
@@ -631,7 +641,7 @@ disableuser.ldif_EOF
     rlPhaseEnd
 
     rlPhaseStartTest "bz805546 when adding a user with --noprivate option the gidNumber should be required"
-        expmsg="ipa: ERROR: 'gidnumber': is required"
+        expmsg="ipa: ERROR: Default group for new users is not POSIX"
         command="ipa user-add --first=test --last=test --noprivate testusr"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
         # just in case
@@ -643,8 +653,10 @@ disableuser.ldif_EOF
         TmpDir=`mktemp -d`
         pushd $TmpDir
         user1="user721289"
+	sssdcfg=/etc/sssd/sssd.conf
         domain_log="/var/log/sssd/sssd_`hostname -d`.log"
-	sed -i '/id_provider = ipa/ a debug_level = 6' /etc/sssd/sssd.conf
+	sed -i '/\[domain\/testrelm.com\]/ a\debug_level = 6' $sssdcfg
+	service sssd restart
 
         rlLog "verifies https://bugzilla.redhat.com/show_bug.cgi?id=721289"
         rlRun "ipa user-add $user1 --first=$user1 --last=$user1"
@@ -677,6 +689,11 @@ disableuser.ldif_EOF
         # clean up
         rlRun "mv -f /var/tmp/ca.crt /etc/ipa/ca.crt"
         rlRun "ipa user-del $user1"
+
+        #clean up 
+        sed -i 's/debug_level \= 6//g' $sssdcfg
+        sed -i '/cache_credentials/,$ b; /^$/d;' $sssdcfg
+        rlRun "service sssd restart"
 
     rlPhaseEnd
 
