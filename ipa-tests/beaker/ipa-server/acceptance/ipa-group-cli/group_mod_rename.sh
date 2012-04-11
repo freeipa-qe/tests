@@ -432,7 +432,7 @@ run_group_rename_tests(){
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-cli-rename-33: Delete renamed Groups"
+    rlPhaseStartTest "ipa-group-cli-rename-32: Delete renamed Groups"
         # lets clean up
         for item in waltdisneyworld animalkingdompark epcot japan germany dinasaurs fish specialgroup2; do
                 rlRun "deleteGroup $item" 0 "Deleting group $item"
