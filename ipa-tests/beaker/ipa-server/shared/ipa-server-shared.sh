@@ -982,22 +982,6 @@ ipa_quick_uninstall(){
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 check_coredump(){
 
-hostname_s=`hostname -s`
-for rpm in abrt-tui abrt-addon-ccpp libreport-plugin-mailx; do
-        rlCheckRpm "$rpm"
-                if [ $? -ne 0 ]; then
-                        rlRun "yum install -y abrt-tui"
-                fi
-
-cat > /etc/libreport/plugins/mailx.conf << EOF
-Subject=CRASH ALERT: Crash detected in automation.
-EmailFrom=root@$hostname_s
-EmailTo=seceng-idm-qe-list@redhat.com
-SendBinaryData=no
-EOF
-
-        done
-
         /usr/bin/abrt-cli list | grep Directory |  awk '{print $2}'
                 crashes=`/usr/bin/abrt-cli list | grep Directory |  awk '{print $2}' | wc -l`
                 if [ $crashes -ne 0 ]; then
