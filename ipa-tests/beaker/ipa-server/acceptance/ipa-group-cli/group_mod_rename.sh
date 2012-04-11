@@ -444,7 +444,7 @@ run_group_rename_tests(){
     rlPhaseEnd
 
  
-    rlPhaseStartCleanup "ipa-group-cli-rename-cleanup: Delete remaining users and group and Destroying admin credentials"
+    rlPhaseStartCleanup "ipa-group-cli-rename-cleanup: Destroying admin credentials"
 	rlRun "kdestroy" 0 "Destroying admin credentials."
     rlPhaseEnd
 
