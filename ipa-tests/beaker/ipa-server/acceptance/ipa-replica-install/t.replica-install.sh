@@ -477,6 +477,98 @@ userpw="Secret123"
    rlPhaseEnd
 }
 
+installSlave_sshtrustdns() {
+
+   rlPhaseStartTest "Installing replica with --ssh-trust-dns option"
+
+        ls /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg
+        if [ $? -ne 0 ] ; then
+                rlFail "ERROR: Replica Package not found"
+        else
+
+                rlRun "cat /etc/hosts"
+
+                echo "ipa-replica-install -U --setup-dns --no-forwarders --ssh-trust-dns --skip-conncheck -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg" > /dev/shm/replica-install.bash
+                chmod 755 /dev/shm/replica-install.bash
+                rlLog "EXECUTING: ipa-replica-install -U --setup-dns --no-forwarders --ssh-trust-dns --skip-conncheck -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg"
+                rlRun "/bin/bash /dev/shm/replica-install.bash" 0 "Replica installation"
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
+
+                rlRun "service ipa status"
+        	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+
+		rlRun "cat /etc/ssh/ssh_config | grep -i \"VerifyHostKeyDNS yes\""
+
+        fi
+
+        if [ -f /var/log/ipareplica-install.log ]; then
+                rhts-submit-log -l /var/log/ipareplica-install.log
+        fi
+} #installSlave_sshtrustdns
+
+installSlave_nosshd() {
+
+   rlPhaseStartTest "Installing replica with --no-sshd option"
+        ls /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg
+        if [ $? -ne 0 ] ; then
+                rlFail "ERROR: Replica Package not found"
+        else
+
+                rlRun "cat /etc/hosts"
+
+                echo "ipa-replica-install -U --setup-dns --no-forwarders --no-sshd --skip-conncheck -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg" > /dev/shm/replica-install.bash
+                chmod 755 /dev/shm/replica-install.bash
+                rlLog "EXECUTING: ipa-replica-install -U --setup-dns --no-forwarders --no-sshd --skip-conncheck -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg"
+                rlRun "/bin/bash /dev/shm/replica-install.bash" 0 "Replica installation"
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
+
+                rlRun "service ipa status"
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+
+		rlRun "cat sshd_config | grep -i \"KerberosAuthentication yes\"" 1 "sshd_config should not have KerberosAuthentication yes"
+		rlRun "cat sshd_config | grep -i \"GSSAPIAuthentication yes\"" 1 "sshd_config should not have GSSAPIAuthentication yes"
+		rlRun "cat sshd_config | grep -i \"AuthorizedKeysCommand /usr/bin/sss_ssh_authorizedkeys\"" 1 "sshd_config should not have AuthorizedKeysCommand /usr/bin/sss_ssh_authorizedkeys"
+
+		# Checking if sshfp record gets created by default
+		rlRun "ipa dnsrecord-find $DOMAIN $hostname_s | grep -i \"sshfp record\""
+
+        fi
+
+        if [ -f /var/log/ipareplica-install.log ]; then
+                rhts-submit-log -l /var/log/ipareplica-install.log
+        fi
+} #installSlave_nosshd
+
+
+installSlave_nodnssshfp() {
+
+   rlPhaseStartTest "Installing replica with --no-dns-sshfp option"
+
+        ls /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg
+        if [ $? -ne 0 ] ; then
+                rlFail "ERROR: Replica Package not found"
+        else
+
+                rlRun "cat /etc/hosts"
+
+                echo "ipa-replica-install -U --setup-dns --no-forwarders --no-dns-sshfp --skip-conncheck -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg" > /dev/shm/replica-install.bash
+                chmod 755 /dev/shm/replica-install.bash
+                rlLog "EXECUTING: ipa-replica-install -U --setup-dns --no-forwarders --no-dns-sshfp --skip-conncheck -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg"
+                rlRun "/bin/bash /dev/shm/replica-install.bash" 0 "Replica installation"
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
+
+                rlRun "service ipa status"
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+
+		rlRun "ipa dnsrecord-find $DOMAIN $hostname_s | grep -i \"sshfp record\"" 1 "SSHFP record should not be created"
+
+        fi
+
+        if [ -f /var/log/ipareplica-install.log ]; then
+                rhts-submit-log -l /var/log/ipareplica-install.log
+        fi
+} #installSlave_nodnssshfp
+
 
 installCA()
 {

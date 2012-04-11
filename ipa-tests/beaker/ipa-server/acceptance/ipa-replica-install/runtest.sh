@@ -183,8 +183,19 @@ rlJournalStart
 			installSlave_nr
 			uninstall
 
+			# Installing with --ssh-trust-dns
+			installSlave_sshtrustdns
+			uninstall
+
+			# Installing with --no-sshd
+			installSlave_nosshd
+			uninstall
+
+			# Installing with --no-dns-sshfp
+			installSlave_nodnssshfp
+			uninstall
+
 			# Installing slave with --no-host-dns
-			
 			installSlave_nhostdns
 			uninstall
 
