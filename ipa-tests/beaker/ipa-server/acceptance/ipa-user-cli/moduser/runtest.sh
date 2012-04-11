@@ -315,7 +315,7 @@ rlJournalStart
 
     rlPhaseStartTest "ipa-user-cli-mod-038: setattr and addattr nsAccountLock Invalid Value"
         command="ipa user-mod --setattr nsAccountLock=test $superuser"
-        expmsg="ipa: ERROR: invalid 'nsaccountlock': must be TRUE or FALSE"
+        expmsg="ipa: ERROR: invalid 'nsaccountlock': must be True or False"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
 	command="ipa user-mod --addattr nsAccountLock=test $superuser"
 	expmsg="ipa: ERROR: nsaccountlock: Only one value allowed."
