@@ -95,7 +95,8 @@ fixResolv()
    rlLog "Fixing resolv.con to point to master"
 
    # get the Master's IP address
-   ipaddr=$(dig +noquestion $MASTER  | grep $MASTER | grep IN | awk '{print $5}')
+   #ipaddr=$(dig +noquestion $MASTER  | grep $MASTER | grep IN | awk '{print $5}')
+   ipaddr=$(host -i $MASTER | awk '{ field = $NF }; END{ print field }')
    rlLog "MASTER IP address is $ipaddr"
    cp /etc/resolv.conf /etc/resolv.conf.ipabackup
    sed -i s/^nameserver/#nameserver/g /etc/resolv.conf
@@ -103,7 +104,8 @@ fixResolv()
 
    # get the Slave's IP address
    if [ "$SLAVE" != "" ]; then
-      slaveipaddr=$(dig +noquestion $SLAVE  | grep $SLAVE | grep IN | awk '{print $5}')
+      #slaveipaddr=$(dig +noquestion $SLAVE  | grep $SLAVE | grep IN | awk '{print $5}')
+      slaveipaddr=$(host -i $SLAVE | awk '{ field = $NF }; END{ print field }')
       rlLog "SLAVE IP address is $slaveipaddr"
       cp /etc/resolv.conf /etc/resolv.conf.ipabackup
       echo "nameserver $slaveipaddr" >> /etc/resolv.conf
