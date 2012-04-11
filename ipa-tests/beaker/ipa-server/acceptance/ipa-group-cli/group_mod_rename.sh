@@ -184,14 +184,6 @@ run_group_rename_tests(){
         rlRun "deleteGroup test" 0 "Cleanup - Deleting the group"
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-cli-rename-13: Negative - Rename a group with the same old name"
-        rlRun "addGroup test test" 0 "Setup - Adding a group"
-        command="ipa group-mod --rename=test test"
-        expmsg="ipa: ERROR: no modifications to be performed"
-        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
-        rlRun "deleteGroup test" 0 "Cleanup - Deleting the group"
-    rlPhaseEnd
-
     rlPhaseStartTest "ipa-group-cli-rename-14: Rename a Parent group when groups are Nested"
         # add the groups
         rlRun "addGroup \"Florida Resort\" disneyworld" 0 "Adding Parent group"
@@ -435,12 +427,6 @@ run_group_rename_tests(){
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-group-cli-rename-31: Rename group with Not Allowed special characters ="
-        command="ipa group-mod --rename=\"test=\" specialgroup2"
-        expmsg="ipa: ERROR: invalid 'rename': may only include letters, numbers, _, -, . and $"
-        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
-    rlPhaseEnd
-
-    rlPhaseStartTest "ipa-group-cli-rename-32: Negative - Rename group with the same old name"
         command="ipa group-mod --rename=\"test=\" specialgroup2"
         expmsg="ipa: ERROR: invalid 'rename': may only include letters, numbers, _, -, . and $"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
