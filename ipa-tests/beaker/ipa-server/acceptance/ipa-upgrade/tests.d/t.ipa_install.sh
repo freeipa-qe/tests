@@ -63,7 +63,7 @@ ipa_install_prep(){
 
 	# Install base software
 	if [ "$MYROLE" = "CLIENT" ]; then
-		rlRun "yum -y install httpd curl mod_nss mod_auth_kerb 389-ds-base expect ntpdate"
+		rlRun "yum -y install nscd httpd curl mod_nss mod_auth_kerb 389-ds-base expect ntpdate"
 		rlRun "yum -y install ipa-admintools ipa-client"
 	else
 		rlRun "yum -y install bind expect krb5-workstation bind-dyndb-ldap krb5-pkinit-openssl"

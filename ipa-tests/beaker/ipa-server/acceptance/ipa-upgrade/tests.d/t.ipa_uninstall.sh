@@ -57,6 +57,12 @@ ipa_uninstall_master()
 	"MASTER")
 		rlLog "Machine in recipe is MASTER"
 		ipa_quick_uninstall
+
+		if [ -f /var/log/ipaserver-uninstall.log ]; then
+			DATE=$(date +%Y%m%d-%H%M%S)
+			cp -f /var/log/ipaserver-uninstall.log /var/log/ipaserver-uninstall.log.$DATE
+			rhts-submit-log -l /var/log/ipaserver-uninstall.log.$DATE
+		fi
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $MASTER_IP"
 		;;
 	"SLAVE")
@@ -86,6 +92,12 @@ ipa_uninstall_slave()
 	"SLAVE")
 		rlLog "Machine in recipe is SLAVE"
 		ipa_quick_uninstall
+
+		if [ -f /var/log/ipaserver-uninstall.log ]; then
+			DATE=$(date +%Y%m%d-%H%M%S)
+			cp -f /var/log/ipaserver-uninstall.log /var/log/ipaserver-uninstall.log.$DATE
+			rhts-submit-log -l /var/log/ipaserver-uninstall.log.$DATE
+		fi
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $SLAVE_IP"
 		;;
 	"CLIENT")
