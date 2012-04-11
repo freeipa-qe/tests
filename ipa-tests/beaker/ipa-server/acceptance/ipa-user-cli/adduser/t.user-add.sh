@@ -11,22 +11,22 @@ ga=ggg
 
 addusertests()
 {
-    setup
-    #adduser
-    #lockuser
-    #negative
-    #finduser1
-    #deleteuser
-    #pkey
-    #finduser2
-    #noprivate
+    addsetup
+    adduser
+    lockuser
+    negative
+    finduser1
+    deleteuser
+    pkey
+    finduser2
+    noprivate
     bugzillas
-    cleanup
+    addcleanup
 }
 
-setup()
+addsetup()
 {
-    rlPhaseStartSetup "ipa-user-cli-add-setup: kinit as admin"
+    rlPhaseStartTest "ipa-user-cli-add-setup: kinit as admin"
         rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as administrator"
     rlPhaseEnd
 }
@@ -700,9 +700,9 @@ disableuser.ldif_EOF
 
 }
 
-cleanup()
+addcleanup()
 {
-    rlPhaseStartCleanup "ipa-user-cli-add-cleanup"
+    rlPhaseStartTest "ipa-user-cli-add-cleanup"
         rlRun "ipa config-mod --searchrecordslimit=100" 0 "set default search records limit back to default"
         rlRun "ipa user-del $superuser " 0 "delete $superuser account"
     rlPhaseEnd
