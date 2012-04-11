@@ -57,10 +57,21 @@ userprivategroups()
 	rlAssertGrep "Plugin Disabled" "/tmp/upgstatus.out"
    rlPhaseEnd
 
-   rlPhaseStartTest "Add user with User Private Group Plugin Disabled"
+   rlPhaseStartTest "Add user with User Private Group Plugin Disabled - Default Group Non-Posix"
         command="ipa user-add --first=disabled --last=disabled disabled"
         expmsg="ipa: ERROR: Default group for new users is not POSIX"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
+   rlPhaseEnd
+
+   rlPhaseStartTest "Add user with User Private Group Plugin Disabled - Default Group Posix"
+	rlRun "ipa group-add --desc=posix posix" 0 "Add a new posix group"
+	rlRun "ipa config-mod --defaultgroup=posix" 0 "Change default group to the posix group"
+	rlRun "ipa user-add --first=disabled --last=disabled disabled" 0 "Add posix user"
+
+	# cleanup
+	rlRun "ipa config-mod --defaultgroup=ipausers" 0 "Change default group back to default 'ipausers'"
+	rlRun "ipa user-del disabled" 0 "Delete the posix user added"
+	rlRun "ipa group-del posix" 0 "Delete the posix group added"
    rlPhaseEnd
 
    rlPhaseStartTest "Re-Enable User Private Groups Plugin"
