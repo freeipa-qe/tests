@@ -156,7 +156,7 @@ run_group_rename_tests(){
         rlRun "ipa user-del supercr1" 0 "Cleanup - Delete the test user."
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-cli-rename-11: Negative - Rename a Poxix group to a name that's user private group"
+    rlPhaseStartTest "ipa-group-cli-rename-11: Negative - Rename a Posix group to a name that's user private group"
         rlRun "ipa user-add --first superuser --last crazylonglastname supercr1 " 0 "Adding Test User"
         rlRun "verifyGroupClasses \"supercr1\" upg" 0 "Verifying user private group."
         rlRun "addNonPosixGroup \"My IPA Group\" regular" 0 "Adding regular IPA Group"
