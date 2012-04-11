@@ -51,6 +51,9 @@
 . /dev/shm/ipa-server-shared.sh
 . /dev/shm/env.sh
 
+# Include test case file
+. ./group_mod_rename.sh
+
 ########################################################################
 # Test Suite Globals
 ########################################################################
@@ -1206,6 +1209,9 @@ rlJournalStart
         done
 	rlRun "kdestroy" 0 "Destroying admin credentials."
     rlPhaseEnd
+
+#Execute group rename tests
+run_group_rename_tests
 
 rlJournalPrintText
 report=$TmpDir/rhts.report.$RANDOM.txt
