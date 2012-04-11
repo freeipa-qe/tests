@@ -58,9 +58,9 @@ userprivategroups()
    rlPhaseEnd
 
    rlPhaseStartTest "Add user with User Private Group Plugin Disabled"
-	rlRun "ipa user-add --first=disabled --last=disabled disabled" 0 "Add user with plugin disabled"
-	rlRun "ipa group-find --private disabled" 1 "Make sure user private group was not added"
-	rlRun "ipa user-del disabled" 0 "Delete the test user added"
+        command="ipa user-add --first=disabled --last=disabled disabled"
+        expmsg="ipa: ERROR: Default group for new users is not POSIX"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
    rlPhaseEnd
 
    rlPhaseStartTest "Re-Enable User Private Groups Plugin"
