@@ -131,7 +131,7 @@ run_group_rename_tests(){
         rlRun "deleteGroup testgroup2" 0 "Cleaning up the test group 2"
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-cli-rename-09: Negative - Rename a Posix group to a name that already posix"
+    rlPhaseStartTest "ipa-group-cli-rename-09: Negative - Rename a non Posix group to a name that already posix"
         rlRun "addNonPosixGroup test testgroup1" 0 "Adding a non posix test group 1"
         rlRun "ipa group-mod --posix testgroup1" 0 "Modify group to be Posix"
         command="ipa group-mod --posix testgroup1"
