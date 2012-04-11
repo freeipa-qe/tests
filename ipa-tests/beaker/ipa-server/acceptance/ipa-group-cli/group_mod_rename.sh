@@ -203,14 +203,14 @@ run_group_rename_tests(){
         rlLog "Executing: ipa group-mod --rename=disneyworldFlorida disneyworld"
         rlRun "ipa group-mod --rename=waltdisneyworld disneyworld" 0 "Renaming disneyworld to waltdisneyworld"
         rlRun "findGroup waltdisneyworld" 0 " Renamed group should now be returned by group-find command."
-        ipa group-find waltdisneyworld > /tmp/rename_findgroup.out
-        groups=`cat /tmp/rename_findgroup.out | grep "Member groups:"`
+        ipa group-find waltdisneyworld > $TmpDir/rename_findgroup.out
+        groups=`cat $TmpDir/rename_findgroup.out | grep "Member groups:"`
         for item in epcot animalkingdom ; do
                 echo $groups | grep $item
                 rc=$?
                 rlAssert0 "Checking if group $item is a direct member of renamed group waltdisneyworld - group-find" $rc
         done
-        groups=`cat /tmp/rename_findgroup.out | grep "Indirect Member groups:"`
+        groups=`cat $TmpDir/rename_findgroup.out | grep "Indirect Member groups:"`
         for item in dinasaurs fish germany japan ; do
                 echo $groups | grep $item
                 rc=$?
@@ -223,21 +223,21 @@ run_group_rename_tests(){
         rlLog "Executing: ipa group-mod --rename=animalkingdompark animalkingdom"
         rlRun "ipa group-mod --rename=animalkingdompark animalkingdom" 0 "Renaming animalkingdom to animalkingdompark"
         rlRun "findGroup animalkingdompark" 0 " Renamed group should now be returned by group-find command."
-        ipa group-find waltdisneyworld > /tmp/rename_findgroup.out
-        groups=`cat /tmp/rename_findgroup.out | grep "Member groups:"`
+        ipa group-find waltdisneyworld > $TmpDir/rename_findgroup.out
+        groups=`cat $TmpDir/rename_findgroup.out | grep "Member groups:"`
         for item in epcot animalkingdompark ; do
                 echo $groups | grep $item
                 rc=$?
                 rlAssert0 "Checking if group $item is a direct member of renamed group waltdisneyworld - group-find" $rc
         done
-        groups=`cat /tmp/rename_findgroup.out | grep "Indirect Member groups:"`
+        groups=`cat $TmpDir/rename_findgroup.out | grep "Indirect Member groups:"`
         for item in dinasaurs fish germany japan ; do
                 echo $groups | grep $item
                 rc=$?
                 rlAssert0 "Checking if group $item is an indirect member of renamed group waltdisneyworld - group-show" $rc
         done
-	ipa group-find animalkingdompark > /tmp/rename_findgroup2.out
-        groups=`cat /tmp/rename_findgroup2.out | grep "Member groups:"`
+	ipa group-find animalkingdompark > $TmpDir/rename_findgroup2.out
+        groups=`cat $TmpDir/rename_findgroup2.out | grep "Member groups:"`
         for item in fish dinasaurs ; do
                 echo $groups | grep $item
                 rc=$?
@@ -272,20 +272,20 @@ run_group_rename_tests(){
         rlRun "verifyUserAttr weliasdisney \"User login\" weliasdisney " 0 "Verify user Login attribute."
 
 	#Verify user membership
-        ipa group-find waltdisneyworld > /tmp/rename_findgroup3.out
-        groups=`cat /tmp/rename_findgroup3.out | grep "Member groups:"`
+        ipa group-find waltdisneyworld > $TmpDir/rename_findgroup3.out
+        groups=`cat $TmpDir/rename_findgroup3.out | grep "Member groups:"`
         for item in epcot animalkingdompark ; do
                 echo $groups | grep $item
                 rc=$?
                 rlAssert0 "Checking if group $item is a direct member of renamed group waltdisneyworld - group-find" $rc
         done
-        users=`cat /tmp/rename_findgroup3.out | grep "Member users:"`
+        users=`cat $TmpDir/rename_findgroup3.out | grep "Member users:"`
         for item in weliasdisney ; do
                 echo $users | grep $item
                 rc=$?
                 rlAssert0 "Checking if user $item is a directory member of group waltdisneyworld - group-show" $rc
         done	
-	users=`cat /tmp/rename_findgroup3.out | grep "Indirect Member users:"`
+	users=`cat $TmpDir/rename_findgroup3.out | grep "Indirect Member users:"`
         for item in euser1 euser2 guser1 guser2 juser1 juser2 trainer1 trainer2 ; do
                 echo $users | grep $item
                 rc=$?
@@ -299,27 +299,27 @@ run_group_rename_tests(){
         rlRun "verifyUserAttr newjuser2 \"User login\" newjuser2 " 0 "Verify user Login attribute."
 	
 	#Verify user membership
-        ipa group-find waltdisneyworld > /tmp/rename_findgroup4.out
-        groups=`cat /tmp/rename_findgroup4.out | grep "Member groups:"`
+        ipa group-find waltdisneyworld > $TmpDir/rename_findgroup4.out
+        groups=`cat $TmpDir/rename_findgroup4.out | grep "Member groups:"`
         for item in epcot animalkingdompark ; do
                 echo $groups | grep $item
                 rc=$?
                 rlAssert0 "Checking if group $item is a direct member of renamed group waltdisneyworld - group-find" $rc
         done
-        users=`cat /tmp/rename_findgroup4.out | grep "Member users:"`
+        users=`cat $TmpDir/rename_findgroup4.out | grep "Member users:"`
         for item in weliasdisney ; do
                 echo $users | grep $item
                 rc=$?
                 rlAssert0 "Checking if user $item is a directory member of group waltdisneyworld - group-show" $rc
         done
-        users=`cat /tmp/rename_findgroup4.out | grep "Indirect Member users:"`
+        users=`cat $TmpDir/rename_findgroup4.out | grep "Indirect Member users:"`
         for item in euser1 euser2 guser1 guser2 juser1 newjuser2 trainer1 trainer2 ; do
                 echo $users | grep $item
                 rc=$?
                 rlAssert0 "Checking if user $item is an indirect member of group waltdisneyworld - group-show" $rc
         done
-	ipa group-show japan > /tmp/rename_showgroup5.out
-        users=`cat /tmp/rename_showgroup5.out | grep "Member users:"`
+	ipa group-show japan > $TmpDir/rename_showgroup5.out
+        users=`cat $TmpDir/rename_showgroup5.out | grep "Member users:"`
         for item in juser1 newjuser2 ; do
                 echo $users | grep $item
                 rc=$?
@@ -354,14 +354,14 @@ run_group_rename_tests(){
 
     rlPhaseStartTest "ipa-group-cli-rename-22: Rename a User that is a member of two Groups"
 	rlRun "ipa user-mod --rename=newjuser1 juser1" 0 "Renaming user that is member of two groups"
-        ipa group-find fish > /tmp/rename_findgroup5.out
-        users=`cat /tmp/rename_findgroup5.out | grep "Member users:"`
+        ipa group-find fish > $TmpDir/rename_findgroup5.out
+        users=`cat $TmpDir/rename_findgroup5.out | grep "Member users:"`
         echo $users | grep newjuser1
         rc=$?
 	rlAssert0 "Checking if user newjuser1 is a member of group fish - group-show" $rc
  
-        ipa group-find japan > /tmp/rename_findgroup6.out
-        users=`cat /tmp/rename_findgroup6.out | grep "Member users:"`
+        ipa group-find japan > $TmpDir/rename_findgroup6.out
+        users=`cat $TmpDir/rename_findgroup6.out | grep "Member users:"`
         echo $users | grep newjuser1
         rc=$?
 	rlAssert0 "Checking if user newjuser1 is a member of group japan - group-show" $rc
@@ -446,6 +446,7 @@ run_group_rename_tests(){
  
     rlPhaseStartCleanup "ipa-group-cli-rename-cleanup: Destroying admin credentials"
 	rlRun "kdestroy" 0 "Destroying admin credentials."
+	rlRun "rm -r $TmpDir" 0 "Removing temp directory"
     rlPhaseEnd
 
 }
