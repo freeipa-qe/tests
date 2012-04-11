@@ -131,9 +131,8 @@ run_group_rename_tests(){
         rlRun "deleteGroup testgroup2" 0 "Cleaning up the test group 2"
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-cli-rename-09: Negative - Rename a non Posix group to a name that already posix"
+    rlPhaseStartTest "ipa-group-cli-rename-09: Negative - Rename a Posix group to a name that's non posix"
         rlRun "addNonPosixGroup test testgroup1" 0 "Adding a non posix test group 1"
-        rlRun "ipa group-mod --posix testgroup1" 0 "Modify group to be Posix"
         command="ipa group-mod --posix testgroup1"
         rlRun "addNonPosixGroup test testgroup2" 0 "Adding a non posix test group 2"
         rlRun "ipa group-mod --posix testgroup2" 0 "Modify group to be Posix"
@@ -144,7 +143,7 @@ run_group_rename_tests(){
         rlRun "deleteGroup testgroup2" 0 "Cleaning up the test group 2"
     rlPhaseEnd
 
-     rlPhaseStartTest "ipa-group-cli-rename-10: Negative - Rename a non Poxix group to a name that's user private group"
+     rlPhaseStartTest "ipa-group-cli-rename-10: Negative - Rename a non Posix group to a name that's user private group"
         rlRun "ipa user-add --first superuser --last crazylonglastname supercr1 " 0 "Adding Test User"
         rlRun "verifyGroupClasses \"supercr1\" upg" 0 "Verifying user private group."
         rlRun "addNonPosixGroup test testgroup1" 0 "Adding a non posix test group 1"
