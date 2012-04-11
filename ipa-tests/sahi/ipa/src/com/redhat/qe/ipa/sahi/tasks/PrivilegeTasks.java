@@ -91,7 +91,7 @@ public class PrivilegeTasks {
 		CommonTasks.clearSearch(sahiTasks);		
 	}
 
-	public static void expandCollapsePermission(SahiTasks sahiTasks, String name) {
+	public static void expandCollapsePrivilege(SahiTasks sahiTasks, String name) {
 		CommonTasks.search(sahiTasks, name);
 		if (sahiTasks.link(name).exists()) {
 			sahiTasks.link(name).click();

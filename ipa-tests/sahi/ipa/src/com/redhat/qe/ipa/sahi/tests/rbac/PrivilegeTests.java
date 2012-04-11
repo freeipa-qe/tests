@@ -201,7 +201,7 @@ public class PrivilegeTests extends SahiTestScript{
 			dataProvider="privilegeExpandCollapseTestObjects")
 	public void testprivilegeExpandCollapse(String testName, String name) throws Exception {
 		
-		PrivilegeTasks.expandCollapsePermission(sahiTasks, name);		
+		PrivilegeTasks.expandCollapsePrivilege(sahiTasks, name);		
 		
 	}
 	

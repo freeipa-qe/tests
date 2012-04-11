@@ -16,7 +16,7 @@
 			    <include name="permissionBug783500Tests" />
 			    <include name="permissionRequiredFieldAddTests" />  
 			    <include name="permissionMemberOfAddTests" />
-			   <!-- TODO <include name="permissionMissingMemberOfAddTests" /> --> 		
+			    <!-- TODO <include name="permissionMissingMemberOfAddTests" /> -->  		
 			    <include name="permissionMultipleDeleteTests" /> 
 			    <include name="permissionAddAndAddAnotherTypeTests" />
 			    <include name="permissionAddAndEditTypeTests" /> 
@@ -35,7 +35,6 @@
 	<test name="Privilege Tests">
 		<groups>
 			<run>	
-			     <include name="setup" />
 			     <include name="privilegeAddTests" /> 
 			     <include name="privilegeAddAndAddAnotherTests" /> 
 			     <include name="privilegeAddAndEditTests" />
@@ -56,12 +55,22 @@
 		</classes>
 	</test>
 
-<!--
+
 	<test name="Role Tests">
 		<groups>
 			<run>	
-			    <include name="setup" />
 				<include name="roleAddTests" />
+				<include name="roleAddAndAddAnotherTests" /> 
+			    <include name="roleAddAndEditTests" />
+			    <include name="roleAddCancelTests" /> 
+			    <include name="roleInvalidAddTests" />
+			    <include name="roleModifyTests" />
+			    <include name="roleModifyNotSavedTests" /> 
+			    <include name="roleInvalidModifyTests" /> 
+			    <include name="roleExpandCollapseTests" /> 
+			    <include name="roleRequiredFieldAddTests" /> 
+			    <include name="roleMultipleDeleteTests" /> 
+			    <include name="roleAddAndAddPrivilegeTests" />
 			</run>
 		</groups>
 		<classes>
@@ -73,5 +82,5 @@
 	<listeners>        
   		<listener class-name="com.redhat.qe.auto.testng.TestNGListener" />	
 	</listeners>
--->		
+		
 </suite>
