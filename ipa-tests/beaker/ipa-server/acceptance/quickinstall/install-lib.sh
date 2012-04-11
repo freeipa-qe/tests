@@ -318,4 +318,33 @@ SetUpKnownHosts()
    rlLog "$knownhosts"
 }
 
+#####################
+# config abrt
+#####################
+configAbrt()
+{
+hostname_s=`hostname -s`
+for rpm in abrt-tui abrt-addon-ccpp libreport-plugin-mailx; do
+        rlCheckRpm "$rpm"
+                if [ $? -ne 0 ]; then
+                        rlRun "yum install -y $rpm"
+                fi
+        done
 
+cat > /etc/abrt/abrt-action-save-package-data.conf << EOF
+OpenGPGCheck = no
+BlackList = nspluginwrapper, valgrind, strace, mono-core
+ProcessUnpackaged = yes
+BlackListedPaths = /usr/share/doc/*, */example*, /usr/bin/nspluginviewer, /usr/lib/xulrunner-*/plugin-container
+EOF
+
+cat > /etc/libreport/plugins/mailx.conf << EOF
+Subject=CRASH ALERT: Crash detected in ipa automation.
+EmailFrom=root@$hostname_s
+EmailTo=seceng-idm-qe-list@redhat.com
+SendBinaryData=no
+EOF
+
+rlRun "service abrtd restart"
+
+}

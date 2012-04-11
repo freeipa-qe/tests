@@ -9,6 +9,7 @@ installMaster()
 	service ntpd stop
 	rlLog "Synchronizing time to $NTPSERVER"
 	ntpdate $NTPSERVER
+	rlRun "configAbrt"
 	if [[ "$IPv6SETUP" != "TRUE" ]] ; then
 		rlRun "fixHostFile" 0 "Set up /etc/hosts"
 		rlRun "fixhostname" 0 "Fix hostname"
@@ -87,6 +88,7 @@ installSlave()
         service iptables stop
 	service ip6tables stop
         rlRun "AddToKnownHosts $MASTER" 0 "Adding master to known hosts"
+	rlRun "configAbrt"
         cd /dev/shm/
         hostname_s=$(hostname -s)
         rlRun "sftp root@$MASTER:/var/lib/ipa/replica-info-$hostname_s.$DOMAIN.gpg" 0 "Get replica package"
@@ -140,6 +142,7 @@ installClient()
         service ntpd stop
         rlLog "Synchronizing time to $NTPSERVER"
         ntpdate $NTPSERVER
+	rlRun "configAbrt"
 	rlLog "SKIPINSTALL: $SKIPINSTALL"
 	if [[ "$SKIPINSTALL" != "TRUE" ]] ; then
 		if [[ "$IPv6SETUP" != "TRUE" ]] ; then
