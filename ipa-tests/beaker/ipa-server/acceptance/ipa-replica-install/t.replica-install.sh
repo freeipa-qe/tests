@@ -663,7 +663,7 @@ uninstall()
 	cat /tmp/remote_exec.out
 
 	rlLog "verifies bug https://bugzilla.redhat.com/show_bug.cgi?id=754539"
-	rlRun "remoteExec root $MASTERIP redhat \"ipa-replica-manage del $SLAVE\""
+	rlRun "remoteExec root $MASTERIP redhat \"ipa-replica-manage connect $SLAVE\""
 	rlRun "egrep \You cannot connect to a previously deleted master\" /tmp/remote_exec.out"
 
 	sleep 10
