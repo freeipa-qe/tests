@@ -452,6 +452,7 @@ public class PermissionTests extends SahiTestScript {
 		 ************      DATA PROVIDERS     ******************
 		 *******************************************************/
 		/*
+		 * TODO: Add test for paging
 		 * Data to be used when going through pages
 		 */
 		@DataProvider(name="permissionPageTestObjects")
@@ -558,7 +559,7 @@ public class PermissionTests extends SahiTestScript {
 		public Object[][] getpermissionAddFilterUndoAttributeTestObjects() {
 			String[][] permissions={
 	        //	testname									cn  				right1		Filter															AttributeUndo		Attribute			
-			{ "add_permission_filter_cancel",			"Manage Group4",		"write",	"(&(!(objectclass=posixgroup))(objectclass=ipausergroup))",		"memberof", 		"member"			} };
+			{ "add_permission_filter_undo_attr",			"Manage Group4",		"write",	"(&(!(objectclass=posixgroup))(objectclass=ipausergroup))",		"memberof", 		"member"			} };
 			
 			return permissions;	
 		}

@@ -352,7 +352,7 @@ public class PrivilegeTests extends SahiTestScript{
 	public Object[][] getPrivilegeAddCancelTestObjects() {
 		String[][] privileges={
         //	testname					Name				Description			  			
-		{ "add_and_edit_privilege",		"Hostgroup TestAdmin",	"Hostgroup TestAdmin" 	} };
+		{ "add_and_cancel_privilege",	"Hostgroup TestAdmin",	"Hostgroup TestAdmin" 	} };
         
 		return privileges;	
 	}

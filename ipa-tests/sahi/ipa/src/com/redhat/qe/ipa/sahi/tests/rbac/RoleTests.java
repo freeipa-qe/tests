@@ -452,7 +452,7 @@ public class RoleTests extends SahiTestScript {
 	public Object[][] getRoleAddCancelTestObjects() {
 		String[][] roles={
         //	testname					Name				Description			  			
-		{ "add_and_edit_role",		"Hostgroup TestRole",	"Hostgroup TestRole" 	} };
+		{ "add_and_cancel_role",		"Hostgroup TestRole",	"Hostgroup TestRole" 	} };
         
 		return roles;	
 	}
@@ -477,10 +477,10 @@ public class RoleTests extends SahiTestScript {
 	@DataProvider(name="roleModifyNotSavedTestObjects")
 	public Object[][] getroleModifyNotSavedTestObjects() {
 		String[][] roles={
-        //	testname					Name					Existing description							New Description							Button To Click			  				
-		{ "modify_role_update",		"User Administrator",		"Responsible for creating Users and Groups",	"User Administrators Updated",			"Update"	},
-		{ "modify_role_reset",		"helpdesk",					"Helpdesk",										"helpdesk Updated",						"Reset"		},
-		{ "modify_role_cancel",		"IT Security Specialist",	"IT Security Specialist",						"IT Security Specialist Updated",		"Cancel"	} };
+        //	testname						Name						Existing description							New Description							Button To Click			  				
+		{ "modify_role_notsaved_update",	"User Administrator",		"Responsible for creating Users and Groups",	"User Administrators Updated",			"Update"	},
+		{ "modify_role_notsaved_reset",		"helpdesk",					"Helpdesk",										"helpdesk Updated",						"Reset"		},
+		{ "modify_role_notsaved_cancel",	"IT Security Specialist",	"IT Security Specialist",						"IT Security Specialist Updated",		"Cancel"	} };
         
 		return roles;	
 	}
