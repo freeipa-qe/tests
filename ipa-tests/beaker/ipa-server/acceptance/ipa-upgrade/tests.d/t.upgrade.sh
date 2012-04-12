@@ -65,6 +65,7 @@ upgrade_master()
 			EOF
 		done
 
+		rlRun "yum clean all"
 		rlRun "yum -y update 'ipa*'"	
 		#rlRun "ipactl restart" ### IS THIS REALLY NEEDED?  BZ 766687?
 		rlRun "rpm -q ipa-server 389-ds-base bind bind-dyndb-ldap pki-common sssd"
@@ -112,6 +113,7 @@ upgrade_slave()
 			EOF
 		done
 
+		rlRun "yum clean all"
 		rlRun "yum -y update 'ipa*'"	
 		#rlRun "ipactl restart" ### IS THIS REALLY NEEDED?  BZ 766687?
 		rlRun "rpm -q ipa-server 389-ds-base bind bind-dyndb-ldap pki-common sssd"
@@ -160,6 +162,7 @@ upgrade_client()
 			EOF
 		done
 
+		rlRun "yum clean all"
 		rlRun "yum -y update 'ipa*'"	
 		#rlRun "ipactl restart" ### IS THIS REALLY NEEDED?  BZ 766687?
 		rlRun "rpm -q ipa-client sssd"
