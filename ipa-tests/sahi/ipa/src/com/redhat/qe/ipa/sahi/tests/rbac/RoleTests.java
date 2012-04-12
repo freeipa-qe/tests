@@ -11,8 +11,12 @@ import org.testng.annotations.Test;
 import com.redhat.qe.auto.testng.Assert;
 import com.redhat.qe.ipa.sahi.base.SahiTestScript;
 import com.redhat.qe.ipa.sahi.tasks.CommonTasks;
+import com.redhat.qe.ipa.sahi.tasks.GroupTasks;
+import com.redhat.qe.ipa.sahi.tasks.HostTasks;
+import com.redhat.qe.ipa.sahi.tasks.HostgroupTasks;
 import com.redhat.qe.ipa.sahi.tasks.PrivilegeTasks;
 import com.redhat.qe.ipa.sahi.tasks.RoleTasks;
+import com.redhat.qe.ipa.sahi.tasks.UserTasks;
 
 public class RoleTests extends SahiTestScript {
 	private static Logger log = Logger.getLogger(RoleTasks.class.getName());
@@ -21,12 +25,57 @@ public class RoleTests extends SahiTestScript {
 	 * PreRequisite - 
 	 */
 	
+	//User used in this testsuite
+	private String uid = "roleusr";
+	private String givenName = "RoleUser";
+	private String sn = "Test";
+	
+	//Group used in this testsuite
+	private String groupName = "rolegrp";
+	private String groupDescription = "Group to be used for Role tests";
+	
+	//Host  used in this testsuite
+	private String domain = System.getProperty("ipa.server.domain");
+	private String hostname = "rolehost";
+	private String fqdn = hostname + "." + domain;
+	private String ipadr = "";
+	
+	//Hostgroup used in this testsuite
+	private String hostgroupName = "rolehostgroup";
+	private String description = "Hostgroup to be used for Role tests";
+	
+	
+	
 	private String currentPage = "";
 	private String alternateCurrentPage = "";
 
 	@BeforeClass (groups={"init"}, description="Initialize app for this test suite run", alwaysRun=true, dependsOnGroups="setup")
 	public void initialize() throws CloneNotSupportedException {
 		sahiTasks.setStrictVisibilityCheck(true);
+		
+		//add new user, user group, host, host group
+		System.out.println("Check CurrentPage: " + commonTasks.userPage);
+		sahiTasks.navigateTo(commonTasks.userPage, true);
+		if (!sahiTasks.link(uid).exists())
+			UserTasks.createUser(sahiTasks, uid, givenName, sn, "Add");
+
+		System.out.println("Check CurrentPage: " + commonTasks.groupPage);
+		sahiTasks.navigateTo(commonTasks.groupPage, true);
+		if (!sahiTasks.link(groupName).exists())
+			GroupTasks.createGroupService(sahiTasks, groupName, groupDescription, commonTasks.groupPage);
+		
+		System.out.println("Check CurrentPage: " + commonTasks.hostPage);
+		sahiTasks.navigateTo(commonTasks.hostPage, true);
+		if (!sahiTasks.link(fqdn.toLowerCase()).exists())
+			HostTasks.addHost(sahiTasks, hostname, commonTasks.getIpadomain(), ipadr);
+		
+		System.out.println("Check CurrentPage: " + commonTasks.hostgroupPage);
+		sahiTasks.navigateTo(commonTasks.hostgroupPage, true);
+		if (!sahiTasks.link(hostgroupName).exists()) {
+			HostgroupTasks.addHostGroup(sahiTasks, hostgroupName, description, "Add");
+		} 
+		
+		
 		sahiTasks.navigateTo(commonTasks.rolePage, true);
 		currentPage = sahiTasks.fetch("top.location.href");
 		alternateCurrentPage = sahiTasks.fetch("top.location.href") + "&role-facet=search" ;		
@@ -223,13 +272,53 @@ public class RoleTests extends SahiTestScript {
 		Assert.assertTrue(sahiTasks.link(name).exists(), "Added role " + name + "  successfully");
 		String privileges[] = {privilege1.toLowerCase(), privilege2.toLowerCase()};
 		if (buttonToClick.equals("Add")) {
-			RoleTasks.verifyRoleMembership(sahiTasks, name, "Privileges", privileges, true);
+			RoleTasks.verifyRoleMemberOfPrivilege(sahiTasks, name, "Privileges", privileges, true);
 			RoleTasks.verifyRoleMembershipInPrivilege(sahiTasks, name, privileges);
 		}
 		else
-			RoleTasks.verifyRoleMembership(sahiTasks, name, "Privileges", privileges, false);
+			RoleTasks.verifyRoleMemberOfPrivilege(sahiTasks, name, "Privileges", privileges, false);
 	}
 	
+	
+	/*
+	 * And a role, select/deselect then add privileges
+	 */
+	@Test (groups={"roleAddAndSelectDeselectPrivilegeTests"}, description="Add Role and Select/Deselect to Add Privilege to it", 
+			dataProvider="roleAddAndSelectDeselectPrivilegeTestObjects")	
+	public void testRoleAddAndSelectDeselectPrivilege(String testName, String name, String description, String privilege1, 
+			String privilege2) throws Exception {		
+		//verify role doesn't exist
+		Assert.assertFalse(sahiTasks.link(name).exists(), "Verify role " + name + " doesn't already exist");
+				
+		//new role can be added now
+		RoleTasks.addRoleSelectDeselectPrivilegesToAdd(sahiTasks, name, description, privilege1, privilege2);
+		
+		//verify privilege was added successfully
+		CommonTasks.search(sahiTasks, name);
+		Assert.assertTrue(sahiTasks.link(name).exists(), "Added privilege " + name + "  successfully");
+		String privileges[] = {privilege1.toLowerCase()};		
+		RoleTasks.verifyRoleMemberOfPrivilege(sahiTasks, name, "Privileges", privileges, true);		
+	}
+	
+	
+	
+	/*
+	 * And a role, add user/group/host/hostgroup members
+	 */
+	@Test (groups={"roleAddAndAddMembersTests"}, description="Add Role and Add Members to it", 
+			dataProvider="roleAddAndAddMembersTestObjects")	
+	public void testRoleAddAndAddMembers(String testName, String name, String description, String type, String member) throws Exception {		
+		//verify role doesn't exist
+		Assert.assertFalse(sahiTasks.link(name).exists(), "Verify role " + name + " doesn't already exist");
+				
+		//new role can be added now
+		RoleTasks.addRoleAddMember(sahiTasks, name, description, type, member);
+		
+		//verify role was added successfully
+		CommonTasks.search(sahiTasks, name);
+		Assert.assertTrue(sahiTasks.link(name).exists(), "Added role " + name + "  successfully");
+		RoleTasks.verifyMembership(sahiTasks, name, type, member);
+	}
 	
 	/*
 	 * Delete Multiple Roles
@@ -257,6 +346,36 @@ public class RoleTests extends SahiTestScript {
 	 */
 	@AfterClass (groups={"cleanup"}, description="Delete objects created for this test suite", alwaysRun=true)
 	public void cleanup() throws CloneNotSupportedException {
+		//delete user, user group, host, host group added for this suite
+		sahiTasks.navigateTo(commonTasks.userPage, true);
+		//Since memberships were checked previously, may not be in the front page for User
+		if (sahiTasks.link("Users").in(sahiTasks.div("content")).exists())
+			sahiTasks.link("Users").in(sahiTasks.div("content")).click();
+		if (sahiTasks.link(uid).exists())
+			UserTasks.deleteUser(sahiTasks, uid);
+
+		sahiTasks.navigateTo(commonTasks.groupPage, true);
+		//Since memberships were checked previously, may not be in the front page for User Group
+		if (sahiTasks.link("User Groups").in(sahiTasks.div("content")).exists())
+			sahiTasks.link("User Groups").in(sahiTasks.div("content")).click();
+		if (sahiTasks.link(groupName).exists())
+			GroupTasks.deleteGroup(sahiTasks, groupName);
+		
+		sahiTasks.navigateTo(commonTasks.hostPage, true);
+		//Since memberships were checked previously, may not be in the front page for Hosts
+		if (sahiTasks.link("Hosts").in(sahiTasks.div("content")).exists())
+			sahiTasks.link("Hosts").in(sahiTasks.div("content")).click();
+		if (sahiTasks.link(fqdn.toLowerCase()).exists())
+			HostTasks.deleteHost(sahiTasks, fqdn);
+		
+		sahiTasks.navigateTo(commonTasks.hostgroupPage, true);
+		//Since memberships were checked previously, may not be in the front page for Host Groups
+		if (sahiTasks.link("Host Groups").in(sahiTasks.div("content")).exists())
+			sahiTasks.link("Host Groups").in(sahiTasks.div("content")).click();
+		if (sahiTasks.link(hostgroupName).exists())
+			HostgroupTasks.deleteHostgroup(sahiTasks, hostgroupName, "Delete");
+		
+		
 		sahiTasks.navigateTo(commonTasks.rolePage, true);
 		String[] roleTestObjects = {"User TestRole",
 									"User, Group TestRole",
@@ -267,7 +386,12 @@ public class RoleTests extends SahiTestScript {
 									"Host TestRole",
 									"Hostgroup TestRole",	
 									"Group3 TestRole",
-									"Host1 TestRole"
+									"Host1 TestRole",
+									"HBAC TestRole",
+									"TestRole1",
+									"TestRole2",
+									"TestRole3",
+									"TestRole4"
 		};
 		
 		for (String roleTestObject : roleTestObjects) {
@@ -442,4 +566,32 @@ public class RoleTests extends SahiTestScript {
         
 		return roles;	
 	}	
+	
+	/*
+	 * Data to be used when adding role, then selecting/deselcting privileges
+	 */		
+	@DataProvider(name="roleAddAndSelectDeselectPrivilegeTestObjects")
+	public Object[][] getRoleAddAndSelectDeselectPrivilegeTestObjects() {
+		String[][] roles={
+        //	testname								Name				Description			Privilege1				Privilege2					  			
+		{ "add_role_select_deselect_privilege",		"HBAC TestRole",	"HBAC TestRole",	"HBAC Administrator",	"Delegation Administrator"	} };
+        
+		return roles;	
+	}	
+	
+	/*
+	 * Data to be used when adding role, adding members
+	 */		
+	@DataProvider(name="roleAddAndAddMembersTestObjects")
+	public Object[][] getRoleAddAndAddMembersTestObjects() {
+		String[][] roles={
+        //	testname				Name			Description		Type			Member					  			
+		{ "add_role_add_user",		"TestRole1",	"TestRole1",	"Users",		"roleusr"	} ,
+		{ "add_role_add_group",		"TestRole2",	"TestRole2",	"Groups",		"rolegrp"	},
+		{ "add_role_add_host",		"TestRole3",	"TestRole3",	"Hosts",		fqdn.toLowerCase()	},
+		{ "add_role_add_hostgroup",	"TestRole4",	"TestRole4",	"HostGroups",	"rolehostgroup"	} };
+        
+		return roles;	
+	}	
+	
 }

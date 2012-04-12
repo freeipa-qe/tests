@@ -16,7 +16,7 @@
 			    <include name="permissionBug783500Tests" />
 			    <include name="permissionRequiredFieldAddTests" />  
 			    <include name="permissionMemberOfAddTests" />
-			    <!-- TODO <include name="permissionMissingMemberOfAddTests" /> -->  		
+			    <!-- TODO <include name="permissionMissingMemberOfAddTests" /> -->   		
 			    <include name="permissionMultipleDeleteTests" /> 
 			    <include name="permissionAddAndAddAnotherTypeTests" />
 			    <include name="permissionAddAndEditTypeTests" /> 
@@ -58,7 +58,7 @@
 
 	<test name="Role Tests">
 		<groups>
-			<run>	
+			<run>
 				<include name="roleAddTests" />
 				<include name="roleAddAndAddAnotherTests" /> 
 			    <include name="roleAddAndEditTests" />
@@ -70,7 +70,9 @@
 			    <include name="roleExpandCollapseTests" /> 
 			    <include name="roleRequiredFieldAddTests" /> 
 			    <include name="roleMultipleDeleteTests" /> 
-			    <include name="roleAddAndAddPrivilegeTests" />
+			    <include name="roleAddAndAddPrivilegeTests" /> 
+			    <include name="roleAddAndSelectDeselectPrivilegeTests" /> 
+			    <include name="roleAddAndAddMembersTests" />
 			</run>
 		</groups>
 		<classes>
@@ -79,8 +81,5 @@
 	</test>
 
 
-	<listeners>        
-  		<listener class-name="com.redhat.qe.auto.testng.TestNGListener" />	
-	</listeners>
 		
 </suite>

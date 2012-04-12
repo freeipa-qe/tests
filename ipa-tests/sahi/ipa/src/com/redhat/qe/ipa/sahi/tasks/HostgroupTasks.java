@@ -19,7 +19,7 @@ public class HostgroupTasks {
 	public static void addHostGroup(SahiTasks sahiTasks, String groupName, String description, String button) {
 		sahiTasks.span("Add").click();
 		sahiTasks.textbox("cn").setValue(groupName);
-		sahiTasks.textbox("description").setValue(description);
+		sahiTasks.textarea("description").setValue(description);
 		sahiTasks.button(button).click();
 	}
 	

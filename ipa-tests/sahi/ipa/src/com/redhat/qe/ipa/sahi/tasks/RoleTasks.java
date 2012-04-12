@@ -188,13 +188,33 @@ public class RoleTasks {
 		sahiTasks.link("Roles").in(sahiTasks.div("content")).click();
 	}
 	
+	public static void addRoleAddMember(SahiTasks sahiTasks, String name, String description, String type, String member) {
+		sahiTasks.span("Add").click();
+		sahiTasks.textbox("cn").setValue(name);
+		sahiTasks.textarea("description").setValue(description);
+		sahiTasks.button("Add and Edit").click();
+		if (type.equals("Users")) 
+			sahiTasks.link("member_user").click();
+		if (type.equals("Groups")) 
+			sahiTasks.link("member_group").click();
+		if (type.equals("Hosts")) 
+			sahiTasks.link("member_host").click();
+		if (type.equals("HostGroups")) 
+			sahiTasks.link("member_hostgroup").click();
+		sahiTasks.span("Add").click();
+		sahiTasks.checkbox(member).click();
+		sahiTasks.span(">>").click();
+		sahiTasks.button("Add").click();
+		sahiTasks.link("Roles").in(sahiTasks.div("content")).click();
+	}
+	
 
-	public static void verifyRoleMembership(SahiTasks sahiTasks, String name, String membershipToCheckfor, String[] privileges, boolean exists) {
+
+	public static void verifyRoleMemberOfPrivilege(SahiTasks sahiTasks, String name, String membershipToCheckfor, String[] privileges, boolean exists) {
 		sahiTasks.link(name).click();
 		if (membershipToCheckfor.equals("Privileges"))
 			sahiTasks.link("memberof_privilege").click();
-		else
-			sahiTasks.link("member_role").click();
+		
 		for (String privilege : privileges) {
 			if (!privilege.isEmpty()) {
 				if (exists){
@@ -205,6 +225,26 @@ public class RoleTasks {
 				}
 			}
 		}	
+		sahiTasks.link("Roles").in(sahiTasks.div("content")).click();
+	}
+	
+	public static void verifyMembership(SahiTasks sahiTasks, String name, String type, String member) {
+		sahiTasks.link(name).click();
+		
+		if (type.equals("Users")) 
+			sahiTasks.link("member_user").click();
+		if (type.equals("Groups")) 
+			sahiTasks.link("member_group").click();
+		if (type.equals("Hosts")) 
+			sahiTasks.link("member_host").click();
+		if (type.equals("HostGroups")) 
+			sahiTasks.link("member_hostgroup").click();
+		
+		Assert.assertTrue(sahiTasks.link(member).exists(), "Verified " + member + " is listed for " + name );
+		sahiTasks.link(member).click();		
+		sahiTasks.link("memberof_role").click();
+		Assert.assertTrue(sahiTasks.link(name.toLowerCase()).exists(), "Verified " + name + " is listed for " + member );
+		sahiTasks.link(name.toLowerCase()).click();
 		sahiTasks.link("Roles").in(sahiTasks.div("content")).click();
 	}
 	
@@ -223,6 +263,88 @@ public class RoleTasks {
 		sahiTasks.link("Roles").in(sahiTasks.div("content")).click();
 	}
 	
+	public static void addRoleSelectDeselectPrivilegesToAdd(SahiTasks sahiTasks, String name, String description, String privilege1, String privilege2) {
+		sahiTasks.span("Add").click();
+		sahiTasks.textbox("cn").setValue(name);
+		sahiTasks.textarea("description").setValue(description);
+		sahiTasks.button("Add and Edit").click();
+		sahiTasks.link("memberof_privilege").click();
+		sahiTasks.span("Add").click();
+		sahiTasks.textbox("filter").setValue(privilege1);
+		sahiTasks.span("Find").click();
+		sahiTasks.checkbox(privilege1).click();
+		sahiTasks.span(">>").click();
+		sahiTasks.textbox("filter").setValue(privilege2);
+		sahiTasks.span("Find").click();
+		sahiTasks.checkbox(privilege2).click();
+		sahiTasks.span(">>").click();
+		sahiTasks.checkbox(privilege1).click(); // to unselect privilege1
+		sahiTasks.span("<<").click(); //take off permisison2 from list
+		sahiTasks.button("Add").click();
+		sahiTasks.link("Roles").in(sahiTasks.div("content")).click();
+	}
 	
+	/*
+	 *     
+
+
+browser.span("Add[2]").click();
+browser.textbox("cn[2]").setValue("Automount TestRole");
+browser.textarea("description[1]").setValue("Automount TestRole");
+browser.button("Add and Edit").click();
+browser.link("Users[3]").click();
+browser.span("Add[3]").click();
+browser.checkbox("available[1]").click();
+browser.span(">>").click();
+browser.button("Add").click();
+browser.link("Roles[1]").click();
+
+
+browser.link("Automount TestRole").click();
+browser.div("Automount TestRole members:").click();
+browser.link("Users (1)").click();
+browser.link("a[1]").click();
+browser.link("Roles (1)").click();
+browser.link("hbac testrole").click();
+browser.link("Roles[1]").click();
+browser.link("Automount TestRole").click();
+browser.link("User Groups[1]").click();
+browser.span("Add[4]").click();
+browser.checkbox("available[4]").click();
+browser.span(">>").click();
+browser.button("Add").click();
+browser.link("Roles[2]").click();
+browser.link("Automount TestRole").click();
+browser.link("User Groups[1]").click();
+browser.link("permissiontestgroup").click();
+browser.link("Roles (1)[2]").click();
+browser.link("automount testrole").click();
+browser.link("Roles[1]").click();
+browser.link("Automount TestRole").click();
+browser.link("Hosts[1]").click();
+browser.span("Add[5]").click();
+browser.checkbox("available[1]").click();
+browser.span(">>").click();
+browser.button("Add").click();
+browser.link("Roles[3]").click();
+browser.link("Automount TestRole").click();
+browser.link("Hosts[1]").click();
+browser.link("rhel63-server.testrelm.com").click();
+browser.link("Roles (1)[4]").click();
+browser.link("automount testrole[1]").click();
+browser.link("Roles[1]").click();
+browser.link("Automount TestRole").click();
+browser.link("Host Groups[1]").click();
+browser.span("Add[6]").click();
+browser.checkbox("available[1]").click();
+browser.span(">>").click();
+browser.button("Add").click();
+browser.link("Roles[4]").click();
+browser.link("Automount TestRole").click();
+browser.link("Host Groups[1]").click();
+browser.link("aaa").click();
+
+	 */
+	 
 	
 }
