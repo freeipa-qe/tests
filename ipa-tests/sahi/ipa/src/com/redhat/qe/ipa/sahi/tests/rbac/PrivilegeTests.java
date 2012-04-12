@@ -215,19 +215,20 @@ public class PrivilegeTests extends SahiTestScript{
 		//verify privilege doesn't exist
 		Assert.assertFalse(sahiTasks.link(name).exists(), "Verify privilege " + name + " doesn't already exist");
 				
+		String permissions[] = {permission1, permission2};
 		//new privilege can be added now
-		PrivilegeTasks.addPrivilegeAddPermissions(sahiTasks, name, description, searchString, permission1, permission2, buttonToClick);
+		PrivilegeTasks.addPrivilegeAddPermissions(sahiTasks, name, description, searchString, permissions, buttonToClick);
 		
 		//verify privilege was added successfully
 		CommonTasks.search(sahiTasks, name);
 		Assert.assertTrue(sahiTasks.link(name).exists(), "Added privilege " + name + "  successfully");
-		String permissions[] = {permission1.toLowerCase(), permission2.toLowerCase()};
+		String permissionsToVerify[] = {permission1.toLowerCase(), permission2.toLowerCase()};
 		if (buttonToClick.equals("Add")) {
-			PrivilegeTasks.verifyPrivilegeMembership(sahiTasks, name, "Permissions", permissions, true);
-			PrivilegeTasks.verifyPrivilegeMembershipInPermission(sahiTasks, name, permissions);
+			PrivilegeTasks.verifyPrivilegeMembership(sahiTasks, name, "Permissions", permissionsToVerify, true);
+			PrivilegeTasks.verifyPrivilegeMembershipInPermission(sahiTasks, name, permissionsToVerify);
 		}
 		else
-			PrivilegeTasks.verifyPrivilegeMembership(sahiTasks, name, "Permissions", permissions, false);
+			PrivilegeTasks.verifyPrivilegeMembership(sahiTasks, name, "Permissions", permissionsToVerify, false);
 	}
 	
 	/*

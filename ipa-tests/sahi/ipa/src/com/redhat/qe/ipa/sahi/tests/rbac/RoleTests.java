@@ -264,19 +264,20 @@ public class RoleTests extends SahiTestScript {
 		//verify role doesn't exist
 		Assert.assertFalse(sahiTasks.link(name).exists(), "Verify role " + name + " doesn't already exist");
 				
+		String privileges[]={privilege1, privilege2};
 		//new role can be added now
-		RoleTasks.addRoleAddPrivileges(sahiTasks, name, description, searchString, privilege1, privilege2, buttonToClick);
+		RoleTasks.addRoleAddPrivileges(sahiTasks, name, description, searchString, privileges, buttonToClick);
 		
 		//verify role was added successfully
 		CommonTasks.search(sahiTasks, name);
 		Assert.assertTrue(sahiTasks.link(name).exists(), "Added role " + name + "  successfully");
-		String privileges[] = {privilege1.toLowerCase(), privilege2.toLowerCase()};
+		String privilegesToVerify[] = {privilege1.toLowerCase(), privilege2.toLowerCase()};
 		if (buttonToClick.equals("Add")) {
-			RoleTasks.verifyRoleMemberOfPrivilege(sahiTasks, name, "Privileges", privileges, true);
-			RoleTasks.verifyRoleMembershipInPrivilege(sahiTasks, name, privileges);
+			RoleTasks.verifyRoleMemberOfPrivilege(sahiTasks, name, "Privileges", privilegesToVerify, true);
+			RoleTasks.verifyRoleMembershipInPrivilege(sahiTasks, name, privilegesToVerify);
 		}
 		else
-			RoleTasks.verifyRoleMemberOfPrivilege(sahiTasks, name, "Privileges", privileges, false);
+			RoleTasks.verifyRoleMemberOfPrivilege(sahiTasks, name, "Privileges", privilegesToVerify, false);
 	}
 	
 	

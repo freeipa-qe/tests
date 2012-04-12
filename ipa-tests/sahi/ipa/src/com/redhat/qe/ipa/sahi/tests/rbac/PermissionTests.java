@@ -422,7 +422,7 @@ public class PermissionTests extends SahiTestScript {
 					"Manage Group1",
 					"Manage NetGroup1",
 					"Manage Host1",	
-					"Manage DNSRecord1",
+					//"Manage DNSRecord1",
 					"Manage Group2",
 					"Bug 807755_User1",
 					"Bug 807755_Host",

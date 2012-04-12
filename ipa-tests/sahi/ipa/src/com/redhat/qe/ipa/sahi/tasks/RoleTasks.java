@@ -172,7 +172,7 @@ public class RoleTasks {
 	}
 	
 	
-	public static void addRoleAddPrivileges(SahiTasks sahiTasks, String name, String description, String searchString, String privilege1, String privilege2, String buttonToClick) {
+	public static void addRoleAddPrivileges(SahiTasks sahiTasks, String name, String description, String searchString, String[] privileges, String buttonToClick) {
 		sahiTasks.span("Add").click();
 		sahiTasks.textbox("cn").setValue(name);
 		sahiTasks.textarea("description").setValue(description);
@@ -181,18 +181,31 @@ public class RoleTasks {
 		sahiTasks.span("Add").click();
 		sahiTasks.textbox("filter").setValue(searchString);
 		sahiTasks.span("Find").click();
-		sahiTasks.checkbox(privilege1).click();
-		sahiTasks.checkbox(privilege2).click();
+		for (String privilege : privileges) {
+			if (!privilege.isEmpty()) {
+				sahiTasks.checkbox(privilege).click();
+			}
+		}
 		sahiTasks.span(">>").click();
 		sahiTasks.button(buttonToClick).click();
 		sahiTasks.link("Roles").in(sahiTasks.div("content")).click();
 	}
 	
+	
+	public static void addMemberToRole(SahiTasks sahiTasks, String name, String type, String member) {
+		addRoleAddMember(sahiTasks, name, "", type, member);
+	}
+	
 	public static void addRoleAddMember(SahiTasks sahiTasks, String name, String description, String type, String member) {
-		sahiTasks.span("Add").click();
-		sahiTasks.textbox("cn").setValue(name);
-		sahiTasks.textarea("description").setValue(description);
-		sahiTasks.button("Add and Edit").click();
+		if (!description.isEmpty()) {
+			sahiTasks.span("Add").click();
+			sahiTasks.textbox("cn").setValue(name);
+			sahiTasks.textarea("description").setValue(description);
+			sahiTasks.button("Add and Edit").click();
+		} else {
+			sahiTasks.link(name).click();
+		}
+		
 		if (type.equals("Users")) 
 			sahiTasks.link("member_user").click();
 		if (type.equals("Groups")) 
@@ -208,8 +221,7 @@ public class RoleTasks {
 		sahiTasks.link("Roles").in(sahiTasks.div("content")).click();
 	}
 	
-
-
+	
 	public static void verifyRoleMemberOfPrivilege(SahiTasks sahiTasks, String name, String membershipToCheckfor, String[] privileges, boolean exists) {
 		sahiTasks.link(name).click();
 		if (membershipToCheckfor.equals("Privileges"))

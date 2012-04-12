@@ -166,7 +166,7 @@ public class PrivilegeTasks {
 		sahiTasks.link("Privileges").in(sahiTasks.div("content")).click();
 	}
 	
-	public static void addPrivilegeAddPermissions(SahiTasks sahiTasks, String name, String description, String searchString, String permission1, String permission2, String buttonToClick) {
+	public static void addPrivilegeAddPermissions(SahiTasks sahiTasks, String name, String description, String searchString, String[] permissions, String buttonToClick) {
 		sahiTasks.span("Add").click();
 		sahiTasks.textbox("cn").setValue(name);
 		sahiTasks.textarea("description").setValue(description);
@@ -174,8 +174,11 @@ public class PrivilegeTasks {
 		sahiTasks.span("Add").click();
 		sahiTasks.textbox("filter").setValue(searchString);
 		sahiTasks.span("Find").click();
-		sahiTasks.checkbox(permission1).click();
-		sahiTasks.checkbox(permission2).click();
+		for (String permission : permissions) {
+			if (!permission.isEmpty()) {
+				sahiTasks.checkbox(permission).click();
+			}
+		}
 		sahiTasks.span(">>").click();
 		sahiTasks.button(buttonToClick).click();
 		sahiTasks.link("Privileges").in(sahiTasks.div("content")).click();
