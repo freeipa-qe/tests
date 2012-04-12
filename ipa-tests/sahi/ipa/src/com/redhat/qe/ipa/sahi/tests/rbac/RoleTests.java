@@ -586,11 +586,11 @@ public class RoleTests extends SahiTestScript {
 	@DataProvider(name="roleAddAndAddMembersTestObjects")
 	public Object[][] getRoleAddAndAddMembersTestObjects() {
 		String[][] roles={
-        //	testname				Name			Description		Type			Member					  			
-		{ "add_role_add_user",		"TestRole1",	"TestRole1",	"Users",		"roleusr"	} ,
-		{ "add_role_add_group",		"TestRole2",	"TestRole2",	"Groups",		"rolegrp"	},
-		{ "add_role_add_host",		"TestRole3",	"TestRole3",	"Hosts",		fqdn.toLowerCase()	},
-		{ "add_role_add_hostgroup",	"TestRole4",	"TestRole4",	"HostGroups",	"rolehostgroup"	} };
+        //	testname							Name			Description		Type			Member					  			
+		{ "add_role_add_user",					"TestRole1",	"TestRole1",	"Users",		"roleusr"	} ,
+		{ "add_role_add_group",					"TestRole2",	"TestRole2",	"Groups",		"rolegrp"	},
+		{ "add_role_add_host",					"TestRole3",	"TestRole3",	"Hosts",		fqdn.toLowerCase()	},
+		{ "add_role_add_hostgroup_bug812109",	"TestRole4",	"TestRole4",	"HostGroups",	"rolehostgroup"	} };
         
 		return roles;	
 	}	
