@@ -199,6 +199,10 @@ rlJournalStart
 			installSlave_nhostdns
 			uninstall
 
+			# Installing slave with --no-ui-redirect
+			installSlave_nouiredirect
+                        uninstall
+
 			# Installing slave with --setup-ca
 			installSlave_ca
 			

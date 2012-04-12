@@ -570,6 +570,41 @@ installSlave_nodnssshfp() {
 } #installSlave_nodnssshfp
 
 
+installSlave_nouiredirect() {
+
+   rlPhaseStartTest "Installing replica with --no-ui-redirect"
+
+        ls /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg
+        if [ $? -ne 0 ] ; then
+                rlFail "ERROR: Replica Package not found"
+        else   
+
+                rlRun "cat /etc/hosts"
+
+                echo "ipa-replica-install -U --setup-dns --no-forwarders --no-ui-redirect --skip-conncheck -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg" > /dev/shm/replica-install.bash
+                chmod 755 /dev/shm/replica-install.bash
+                rlLog "EXECUTING: ipa-replica-install -U --setup-dns --no-forwarders --no-ui-redirect --skip-conncheck -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg"
+                rlRun "/bin/bash /dev/shm/replica-install.bash" 0 "Replica installation"
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
+
+                rlRun "service ipa status"
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+
+                rlRun "ipa dnsrecord-find $DOMAIN $hostname_s | grep -i \"sshfp record\"" 1 "SSHFP record should not be created"
+
+		rlRun "curl http://$HOSTNAME > /tmp/curl.out 2>&1"
+		rlAssertGrep "Test Page for the Apache HTTP" "/tmp/curl.out"
+		rlAssertNotGrep "301 Moved Permanently" "/tmp/curl.out"
+		rlAssertNotGrep "ipa/ui" "/tmp/curl.out"
+
+        fi
+
+        if [ -f /var/log/ipareplica-install.log ]; then
+                rhts-submit-log -l /var/log/ipareplica-install.log
+        fi
+} #installSlave_nouiredirect
+
+
 installCA()
 {
 
@@ -626,6 +661,10 @@ uninstall()
 	rlRun "remoteExec root $MASTERIP \"ipa-csreplica-manage del $SLAVE -p $ADMINPW\""
 	rlRun "egrep \"'$MASTER' has no replication agreement for '$SLAVE'\" /tmp/remote_exec.out"
 	cat /tmp/remote_exec.out
+
+	rlLog "verifies bug https://bugzilla.redhat.com/show_bug.cgi?id=754539"
+	rlRun "remoteExec root $MASTERIP redhat \"ipa-replica-manage del $SLAVE\""
+	rlRun "egrep \You cannot connect to a previously deleted master\" /tmp/remote_exec.out"
 
 	sleep 10
 
