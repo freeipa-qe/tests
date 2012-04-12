@@ -66,7 +66,7 @@ installMaster()
 
         rlLog "verifies https://bugzilla.redhat.com/show_bug.cgi?id=797563"
 	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
-        verifyErrorMsg "ipa host-del $MASTER" "ipa: ERROR: invalid 'hostname': An IPA master host cannot be deleted"
+        verifyErrorMsg "ipa host-del $MASTER" "ipa: ERROR: invalid 'hostname': An IPA master host cannot be deleted or disabled"
 
 
         if [ -f /var/log/ipaserver-install.log ]; then
@@ -94,6 +94,7 @@ createReplica1()
 			rlRun "cat /etc/hosts"
 			rlRun "echo \"nameserver $MASTERIP\" > /etc/resolv.conf" 0 "fixing the reoslv.conf to contain the correct nameserver lines"
 			rlRun "cat /etc/resolv.conf"
+			rlRun "ipa dnszone-find"
 			rlRun "ipa dnsrecord-add $DOMAIN $hostname_s --a-rec=$SLAVEIP --a-create-reverse"
 			# Making use of --a-create-reverse ... hence comenting the following :-)
 			# REVERSE_ZONE=`ipa dnszone-find | grep -i "zone name" | grep -i "arpa" | cut -d ":" -f 2`
