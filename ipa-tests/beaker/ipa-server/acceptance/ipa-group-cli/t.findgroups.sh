@@ -32,7 +32,7 @@ admrole="adminrole"
 
 groupfindsetup()
 {
-    rlPhaseStartSetup "ipa-group-find-startup Kinit as Admin"
+    rlPhaseStartTest "ipa-group-find-startup Kinit as Admin"
 	rlRun "kinitAs $ADMINID $ADMINPWD" 0 "Kinit as admin user"
         i=1
         while [ $i -le 10 ] ; do
@@ -322,6 +322,7 @@ groupfindcleanup()
 	rlRun "ipa user-del $user1 $user2" 0 "Deleting test users"
 	rlRun "ipa sudorule-del $srule" 0 "Deleting test sudo rule"
  	rlRun "ipa hbacrule-del $hrule" 0 "Deleting test hbac rule"
+	rlRun "ipa role-del $admrole" 0 "Deleting test admin role"
 	rlRun "kdestroy" 0 "Destroying admin credentials."
     rlPhaseEnd
 }

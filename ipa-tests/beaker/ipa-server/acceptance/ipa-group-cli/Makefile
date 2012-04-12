@@ -29,7 +29,7 @@ export TESTVERSION=1.0
 
 BUILT_FILES=
 
-FILES=$(METADATA) runtest.sh Makefile PURPOSE group_mod_rename.sh
+FILES=$(METADATA) runtest.sh Makefile PURPOSE t.addmodify.sh t.findgroups.sh t.groupbugs.sh t.members.sh t.renamegroup.sh t.setadddelattr.sh
 
 .PHONY: all install download clean
 

@@ -40,7 +40,7 @@
 . /dev/shm/env.sh
 
 ########################################################################
-run_group_rename_tests(){
+renamegroup(){
     rlPhaseStartSetup "ipa-group-cli-rename-startup: Create temp dir and Kinit"
         rlRun "tempDir=\`mktemp -d\`" 0 "Creating tmp directory"
         rlRun "pushd $tempDir"
