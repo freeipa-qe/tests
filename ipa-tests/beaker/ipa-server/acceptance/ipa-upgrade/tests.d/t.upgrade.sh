@@ -53,7 +53,7 @@ upgrade_master()
 		rlRun "rpm -q ipa-server 389-ds-base bind bind-dyndb-ldap pki-common sssd"
 
 		# Setup new yum repos from ipa-upgrade.data datafile
-		for url in ${repo[@]}; do
+		for url in ${myrepo[@]}; do
 			repoi=$(( repoi += 1 ))
 			cat > /etc/yum.repos.d/mytestrepo$repoi.repo <<-EOF
 			[mytestrepo$repoi]
@@ -101,7 +101,7 @@ upgrade_slave()
 		rlRun "rpm -q ipa-server 389-ds-base bind bind-dyndb-ldap pki-common sssd"
 
 		# Setup new yum repos from ipa-upgrade.data datafile
-		for url in ${repo[@]}; do
+		for url in ${myrepo[@]}; do
 			repoi=$(( repoi += 1 ))
 			cat > /etc/yum.repos.d/mytestrepo$repoi.repo <<-EOF
 			[mytestrepo$repoi]
@@ -150,7 +150,7 @@ upgrade_client()
 		rlRun "rpm -q ipa-client sssd"
 
 		# Setup new yum repos from ipa-upgrade.data datafile
-		for url in ${repo[@]}; do
+		for url in ${myrepo[@]}; do
 			repoi=$(( repoi += 1 ))
 			cat > /etc/yum.repos.d/mytestrepo$repoi.repo <<-EOF
 			[mytestrepo$repoi]
