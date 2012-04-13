@@ -90,7 +90,10 @@ rlJournalStart
         rlPhaseEnd
 	
 	nfuser=tbokl
+	nfgroup=lookgt
 	jsonfile=/dev/shm/forms-cli-json.script
+	jsonfilegrp=/dev/shm/forms-cli-json-grp.script
+	jsonfilegrpdel=/dev/shm/forms-cli-json-grp-del.script
 echo "{
     \"method\":\"user_add\",
    
@@ -98,6 +101,20 @@ echo "{
     ],
     \"id\":1
 }" > $jsonfile
+
+echo "{
+    \"method\":\"group_add\",
+\"params\":[[],{\"cn\":\"$nfgroup\",\"givenname\":\"newgg\",\"sn\":\"group\",\"krbprincipalname\":\"$nfgroup@$DOMAIN\",\"gid\":\"7765\",\"description\":\"test-desc\",\"all\":true}
+    ],
+    \"id\":1}" >$jsonfilegrp
+
+echo "{
+    \"method\":\"group_del\",
+\"params\":[[],{\"cn\":\"$nfgroup\",\"all\":true}
+    ],
+    \"id\":1}" >$jsonfilegrpdel
+
+
 
 	rlPhaseStartTest "forms-cli-02: Ensure that json script does not work without a valid session ID"
 		outputf=/dev/shm/forms-tmp-out.txt
@@ -116,8 +133,17 @@ echo "{
 		rlRun "grep ipa_session= $responsefile" 1 "Make sure that the response header does not appear to have a session id in it"
 	rlPhaseEnd
 
-	rlPhaseStartTest "forms-cli-04: Get a valid session id with good credentials."
+	rlPhaseStartTest "forms-cli-04: attempt to create a new group with bad credentials."
+		kdestroy
+		curl -v -H "Content-Type:application/json" -H "Referer: https://$MASTER/ipa/xml" -H "Accept:application/json"  -H "Accept-Language:en" --cacert /etc/ipa/ca.crt -d  @$jsonfilegrp -X POST -b "ipa_session=1234567890; httponly; Path=/ipa; secure" https://$MASTER/ipa/session/json &> $outputf 
+		rlLog "cat $outputf | grep Added\ group | grep $nfgroup" 1 "make sure that the groups name is not in the output of the test command"
+		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+		rlRun "ipa group-find $nfgroup" 1 "Make sure that admin is not able to find the new group $nfgroup"
+	rlPhaseEnd
+
+	rlPhaseStartTest "forms-cli-05: Get a valid session id with good credentials."
 		echo "user=$ADMINID&password=$ADMINPW" > $loginfile
+		echo "curl -v --dump-header $responsefile -k -H 'Content-Type: application/x-www-form-urlencoded' https://$MASTER/ipa/session/login_password -X POST -d @$loginfile"
 		curl -v --dump-header $responsefile -k -H 'Content-Type: application/x-www-form-urlencoded' https://$MASTER/ipa/session/login_password -X POST -d @$loginfile
 		rlRun "grep ipa_session= $responsefile" 0 "Make sure that the response header contains a session id in it"
 		sessionid=$(cat $responsefile | grep ipa_session | cut -d\  -f2 | cut -d\= -f2 | sed s/\;//g)
@@ -125,12 +151,29 @@ echo "{
 		rlLog "new admin session ID is $sessionid"
 	rlPhaseEnd
 		
-	rlPhaseStartTest "forms-cli-05: Create a new user with the aquired session id. ie, retry forms-cli-02 with valid credentials."
+	rlPhaseStartTest "forms-cli-06: Create a new user with the aquired session id. ie, retry forms-cli-02 with valid credentials."
+		echo "url -v -H \"Content-Type:application/json\" -H \"Referer: https://$MASTER/ipa/xml\" -H \"Accept:application/json\"  -H \"Accept-Language:en\" --cacert /etc/ipa/ca.crt -d  @$jsonfile -X POST -b \"ipa_session=$sessionid; httponly; Path=/ipa; secure\" https://$MASTER/ipa/session/json"
 		curl -v -H "Content-Type:application/json" -H "Referer: https://$MASTER/ipa/xml" -H "Accept:application/json"  -H "Accept-Language:en" --cacert /etc/ipa/ca.crt -d  @$jsonfile -X POST -b "ipa_session=$sessionid; httponly; Path=/ipa; secure" https://$MASTER/ipa/session/json &> $outputf 
-		rlLog "grep tim\ user $outputf" 0 "make sure that the user's name is in the output of the test command"
+		rlLog "grep tim\ user $outputf" 0 "make sure that the users name is in the output of the test command"
 		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 		rlRun "ipa user-find $nfuser" 0 "Make sure that admin is able to find the new user $nfsuer"
 		rlRun "ipa user-del $nfuser" 0 "Delete the test user $nfsuer"
+	rlPhaseEnd
+
+	rlPhaseStartTest "forms-cli-07: Create a new group with the aquired session id. ie, retry forms-cli-03 with valid credentials."
+		kdestroy
+		curl -v -H "Content-Type:application/json" -H "Referer: https://$MASTER/ipa/xml" -H "Accept:application/json"  -H "Accept-Language:en" --cacert /etc/ipa/ca.crt -d  @$jsonfilegrp -X POST -b "ipa_session=$sessionid; httponly; Path=/ipa; secure" https://$MASTER/ipa/session/json &> $outputf 
+		rlLog "cat $outputf | grep Added\ group | grep $nfgroup" 0 "make sure that the groups name is in the output of the test command"
+		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+		rlRun "ipa group-find $nfgroup" 0 "Make sure that admin is able to find the new group $nfgroup"
+	rlPhaseEnd
+
+	rlPhaseStartTest "forms-cli-08: Delete the group created in the last step using valid credentials in a form."
+		kdestroy
+		curl -v -H "Content-Type:application/json" -H "Referer: https://$MASTER/ipa/xml" -H "Accept:application/json"  -H "Accept-Language:en" --cacert /etc/ipa/ca.crt -d  @$jsonfilegrpdel -X POST -b "ipa_session=$sessionid; httponly; Path=/ipa; secure" https://$MASTER/ipa/session/json &> $outputf 
+		rlLog "cat $outputf | grep Deleted group | grep $nfgroup" 0 "make sure that the groups name is listed as deleted in the output of the test command"
+		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+		rlRun "ipa group-find $nfgroup" 1 "Make sure that admin is not able to find the new group $nfgroup"
 	rlPhaseEnd
 
 	rlJournalPrintText

@@ -1,9 +1,9 @@
 <job>
 	<whiteboard>
-		ipa-server dns tests
+		ipa-server forms auth test
 	</whiteboard>
 	<recipeSet>
-		<recipe whiteboard="ipa dns tests - x86_64" ks_meta="selinux=disabled partitions=yes">
+		<recipe whiteboard="ipa forms auth test - x86_64" ks_meta="partitions=yes">
 			<distroRequires>
 				<and>
 					<distro_variant op="=" value="Server"/>
@@ -14,9 +14,7 @@
 				</and>
 			</distroRequires>
 			<hostRequires/>
-			<repos>
-				<repo name="ipa-noarch" url="http://epsilon.dsdev.sjc.redhat.com/tet/up.repo"/>
-			</repos>
+			<repos/>
 			<task name="/distribution/install" role="STANDALONE">
 				<params/>
 			</task>
@@ -31,10 +29,10 @@
 			<task name="/CoreOS/ipa-server/acceptance/quickinstall" role="MASTER">
 				<params/>
 			</task>
-			<task name="/CoreOS/ipa-server/acceptance/ipa-dns" role="MASTER">
+			<task name="/CoreOS/ipa-server/acceptance/forms-cli" role="MASTER">
 				<params/>
 			</task>
-			<task name="/distribution/reservesys" role="STANDALONE">
+			<task name="/CoreOS/ipa-server/IpaReserveSys" role="STANDALONE">
 				<params>
 					<param name="RESERVETIME" value="86400"/>
 				</params>
