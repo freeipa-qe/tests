@@ -294,3 +294,57 @@ upgrade_bz_808201()
 	rlPhaseEnd
 	[ -f $tmpout ] && rm -f $tmpout
 }
+
+upgrade_bz_803930()
+{
+	TESTORDER=$(( TESTORDER += 1 ))
+	local tmpout=/tmp/errormsg.out
+	local failcount=0
+	rlPhaseStartTest "upgrade_bz_803930: ipa not starting after upgade because of missing data"
+	case "$MYROLE" in
+	"MASTER")
+		rlLog "Machine in recipe is MASTER"
+
+		rlLog "Restarting IPA services and checking for list of services error"
+		rlRun "ipactl restart > $tmpout 2>&1"
+		rlRun "cat $tmpout"
+		if [ $(grep "Failed to read data from Directory Service: Failed to get list of services to probe status" $tmpout | wc -l) -gt 0 ]; then
+			rlFail "BZ 803930 ipactl restart error found"
+		else
+			rlPass "BZ 803930 ipactl restart error not found.  IPA restarted cleanly"   
+		fi
+		
+		rlLog "Checking for NoneType error in upgrade log"
+		if [ $(grep "ERROR Add failure 'NoneType' object is not callable" /var/log/ipaupgrade.log | wc -l) -gt 0 ]; then
+			rlFail "BZ 803930 NoneType errors found in ipaupgrade.log"
+		else
+			rlPass "BZ 803930 NoneType errors not found in ipaupgrade.log"
+		fi
+
+		rlLog "Checking for errors in dirsrv log"
+		INSTANCE=$(echo $RELM|sed 's/\./-/g')
+		if [ $(grep _get_and_add /var/log/dirsrv/slapd-$INSTANCE/errors|wc -l) -gt 0 ]; then
+			rlFail "BZ 803930 dirsrv _get_and_add errors found"
+			rlFail "BZ 803930 found...ipa not starting after upgade because of missing data"
+		else
+			rlPass "BZ 803930 _get_and_add errors not found in dirsrv log"
+			rlPass "BZ 803930 not found."
+		fi
+
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $MASTER_IP"
+		;;
+	"SLAVE")
+		rlLog "Machine in recipe is SLAVE"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER_IP"
+		;;
+	"CLIENT")
+		rlLog "Machine in recipe is CLIENT"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER_IP"
+		;;
+	*)
+		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
+		;;
+	esac
+	rlPhaseEnd
+	[ -f $tmpout ] && rm -f $tmpout
+}
