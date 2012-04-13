@@ -92,37 +92,37 @@ rlJournalStart
 #	### test full setup for client, then slave, then master
 #	#################################################################
 #	# Install and setup environment and add data
-#	install_all
-#	data_add
+	install_all
+	data_add
 #	# test upgrade with old master, old slave, and new client
-#	upgrade_client
-#	data_check
+	upgrade_client
+	data_check
 #	# test upgrade with old master, new slave, and new client 
-#	upgrade_slave
-#	data_check
+	upgrade_slave
+	data_check
 #	# test upgrade with new master, new slave, and new client
-#	upgrade_master 
-#	data_check
+	upgrade_master 
+	data_check
 #	# uninstall everything so we can start over
-#	uninstall	
+	uninstall	
 #
 #	#################################################################
 #	### Test setup without dns for master, then slave, then client
 #	#################################################################
 #	# Install and setup environment and add data
-#	install_nodns
-#	data_add
+	install_nodns
+	data_add
 #	# test upgrade with old master, old slave, and old client
-#	upgrade_master
-#	data_check
+	upgrade_master
+	data_check
 #	# test upgrade with new master, new slave, and old client
-#	upgrade_slave
-#	data_check
+	upgrade_slave
+	data_check
 #	# test upgrade with new master, new slave, and new client
-#	upgrade_client
-#	data_check
+	upgrade_client
+	data_check
 #	# uninstall everything so we can start over
-#	uninstall
+	uninstall
 #
 #	install_all
 #	data_add
