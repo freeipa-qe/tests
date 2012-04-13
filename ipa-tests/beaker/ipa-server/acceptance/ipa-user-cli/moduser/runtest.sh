@@ -459,8 +459,6 @@ rlJournalStart
         command="ipa user-mod --rename=$rename_exceedmax $rename_maxlength"
         expmsg="ipa: ERROR: invalid 'login': can be at most 32 characters"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --rename=$rename_exceedmax"
-	# Remove the below line when bug 807417 is fixed.
-	rlRun "ipa user-mod --rename=$rename_maxlength $rename_exceedmax" 0 "Renaming user to $rename_maxlength"
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-user-cli-mod-058: Rename user with a invalid character - #"
