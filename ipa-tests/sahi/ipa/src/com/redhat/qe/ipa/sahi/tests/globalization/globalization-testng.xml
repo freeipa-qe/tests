@@ -1,9 +1,6 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
 <suite name="IPAGlobalizationTestSuite">	
 	<test name="Globalization Tests">
-		<packages>
-			<package name="com.redhat.qe.ipa.sahi.*" />
-		</packages>
 		<groups>
 			<run> 
 				<include name="init" />

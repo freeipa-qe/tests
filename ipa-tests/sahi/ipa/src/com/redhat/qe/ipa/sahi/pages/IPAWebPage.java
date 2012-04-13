@@ -412,7 +412,7 @@ public class IPAWebPage implements StandardTest{
 			currentValue = browser.textbox("cn").getValue();
 			
 		}else if (browser.textbox("krbmaxpwdlife").exists())
-		{// pasword policy
+		{// Password policy
 			originalValue = browser.textbox("krbmaxpwdlife").getValue();
 			browser.textbox("krbmaxpwdlife").setValue(editModeVerifyString);
 			currentValue = browser.textbox("krbmaxpwdlife").getValue();
@@ -571,7 +571,7 @@ public class IPAWebPage implements StandardTest{
 		monitor.setCurrentTestData(pageName,"{" + testData.substring(0,testData.length()-3) + "}");
 	}
 	
-	private String[] fillDataInElement(IPAWebTestMonitor monitor,String pageName,String tag, String id, String value) throws IPAWebAutomationActionNotDefinedException 
+	protected String[] fillDataInElement(IPAWebTestMonitor monitor,String pageName,String tag, String id, String value) throws IPAWebAutomationActionNotDefinedException 
 	{
 		String before = null;
 		String after = null; 
@@ -659,7 +659,7 @@ public class IPAWebPage implements StandardTest{
 		return new String[] {before, after};
 	}
 	
-	private String readElementValue(IPAWebTestMonitor monitor,String pageName,String tag, String id, String value)
+	protected String readElementValue(IPAWebTestMonitor monitor,String pageName,String tag, String id, String value)
 	{ 
 		String elementValue = null;
 		if (tag.equals("textbox")){
@@ -689,7 +689,7 @@ public class IPAWebPage implements StandardTest{
 		return elementValue;
 	}
 	
-	private String setElementValue(IPAWebTestMonitor monitor,String pageName,String tag, String id, String value) 
+	protected String setElementValue(IPAWebTestMonitor monitor,String pageName,String tag, String id, String value) 
 	{ 
 		String after=null;
 		try{
