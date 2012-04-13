@@ -16,7 +16,7 @@
 			    <include name="permissionBug783500Tests" />
 			    <include name="permissionRequiredFieldAddTests" />  
 			    <include name="permissionMemberOfAddTests" />
-			    <!-- TODO <include name="permissionMissingMemberOfAddTests" /> -->   		
+			    <!--  TODO <include name="permissionMissingMemberOfAddTests" /> --> 		
 			    <include name="permissionMultipleDeleteTests" /> 
 			    <include name="permissionAddAndAddAnotherTypeTests" />
 			    <include name="permissionAddAndEditTypeTests" /> 
@@ -80,6 +80,21 @@
 		</classes>
 	</test>
 
-
+	<test name="RBAC Functional Tests">
+		<groups>
+			<run>
+				<include name="setup" />
+			   <!--  <include name="hostAddsUser" /> --> 							
+				<!-- <include name="permissionAddSubtreeTests" /> --> 
+				<include name="dnsUpdateAdmin" /> 
+				<include name="dnsListZone" /> 
+			</run>
+		</groups>
+		<classes>
+		    <class name="com.redhat.qe.ipa.sahi.tests.rbac.PermissionTests" />
+		    <class name="com.redhat.qe.ipa.sahi.tests.rbac.RBACFunctional" />
+		</classes>
+	</test>
+	
 		
 </suite>

@@ -166,11 +166,21 @@ public class PrivilegeTasks {
 		sahiTasks.link("Privileges").in(sahiTasks.div("content")).click();
 	}
 	
+	
+	public static void addPermissionsToPrivilege(SahiTasks sahiTasks, String name, String searchString, String[] permissions, String buttonToClick) {
+		addPrivilegeAddPermissions(sahiTasks, name, "", searchString, permissions, buttonToClick);
+	}
+	
+	
 	public static void addPrivilegeAddPermissions(SahiTasks sahiTasks, String name, String description, String searchString, String[] permissions, String buttonToClick) {
-		sahiTasks.span("Add").click();
-		sahiTasks.textbox("cn").setValue(name);
-		sahiTasks.textarea("description").setValue(description);
-		sahiTasks.button("Add and Edit").click();
+		if (!description.isEmpty()) {
+			sahiTasks.span("Add").click();
+			sahiTasks.textbox("cn").setValue(name);
+			sahiTasks.textarea("description").setValue(description);
+			sahiTasks.button("Add and Edit").click();
+		} else {
+			sahiTasks.link(name).click();
+		}
 		sahiTasks.span("Add").click();
 		sahiTasks.textbox("filter").setValue(searchString);
 		sahiTasks.span("Find").click();

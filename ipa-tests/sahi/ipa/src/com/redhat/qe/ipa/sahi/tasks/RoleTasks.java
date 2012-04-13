@@ -171,12 +171,18 @@ public class RoleTasks {
 		CommonTasks.clearSearch(sahiTasks);		
 	}
 	
-	
+	public static void addPrivilegesToRole(SahiTasks sahiTasks, String name, String searchString, String[] privileges, String buttonToClick) {
+		addRoleAddPrivileges(sahiTasks, name, "", searchString, privileges, buttonToClick);
+	}
 	public static void addRoleAddPrivileges(SahiTasks sahiTasks, String name, String description, String searchString, String[] privileges, String buttonToClick) {
-		sahiTasks.span("Add").click();
-		sahiTasks.textbox("cn").setValue(name);
-		sahiTasks.textarea("description").setValue(description);
-		sahiTasks.button("Add and Edit").click();
+		if (!description.isEmpty()) {
+			sahiTasks.span("Add").click();
+			sahiTasks.textbox("cn").setValue(name);
+			sahiTasks.textarea("description").setValue(description);
+			sahiTasks.button("Add and Edit").click();
+		} else {
+			sahiTasks.link(name).click();
+		}		
 		sahiTasks.link("memberof_privilege").click();
 		sahiTasks.span("Add").click();
 		sahiTasks.textbox("filter").setValue(searchString);
