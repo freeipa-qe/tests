@@ -912,6 +912,12 @@ rlPhaseStartTest "sudorule-disable_func001: Disabling sudorule and verifying fro
 
 	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 
+	rlRun "rm -fr /var/lib/sss/db/cache_*"
+        rlRun "service sssd restart"
+	sleep 5
+
+	rlRun "ipa sudorule-find"
+	rlRun "ipa sudorule-show sudorule1"
         rlRun "ipa sudorule-disable sudorule1"
         rlRun "sudo_list user1"
         rlAssertGrep "user1 is not in the sudoers file.  This incident will be reported." "$sudoout"
