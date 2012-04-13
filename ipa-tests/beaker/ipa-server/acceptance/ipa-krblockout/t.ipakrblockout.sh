@@ -481,7 +481,7 @@ ipakrblockout_failinterval_positive()
 	for value in 1 2
 	do
 		# attempt log in with correct password before interval expiration
-        	rlRun "kinitAs user1 BADPWD" 1 "Kinit as user with valid password. Max failures reached - interval not expired. Attempt [$value]"
+        	rlRun "kinitAs user1 BADPWD" 1 "Kinit as user with valid password. Max failures reached - lockout duration not expired. Attempt [$value]"
 
         	# now expect failure counter to be 1 since interval expired
         	rlRun "kinitAs $ADMINID $ADMINPW" 0
@@ -494,11 +494,11 @@ ipakrblockout_failinterval_positive()
         	fi
 	done
 
-	rlLog "Sleeping for 30 seconds"
-	sleep 30
+	rlLog "Sleeping for 45 seconds"
+	sleep 45
 
         # attempt log in with correct password after interval expiration - duration not met for lockout
-        rlRun "kinitAs user1 BADPWD" 1 "Kinit as user with valid password. Max failures reached - interval expired"
+        rlRun "kinitAs user1 BADPWD" 1 "Kinit as user with valid password. Max failures reached - lockout duration met"
 
         # now expect failure counter to be 1 since interval expired
         rlRun "kinitAs $ADMINID $ADMINPW"
