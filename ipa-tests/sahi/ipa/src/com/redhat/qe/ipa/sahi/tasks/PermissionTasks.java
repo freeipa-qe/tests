@@ -88,8 +88,14 @@ public class PermissionTasks {
 		sahiTasks.select("list").choose(memberOfGroup);
 		sahiTasks.textarea("subtree").setValue(subtree);
 		
-		//TODO: Bug:
-		// Select attributes when fixed.
+		int i=0;
+		for (String attribute : attributes) {
+			if (!attribute.isEmpty()) {
+				sahiTasks.link("Add[1]").click();
+				sahiTasks.textbox("attrs_multi-" + i).setValue(attribute);
+				i++;
+			}
+		}
 		
 		sahiTasks.button(buttonToClick).click();
 	}
