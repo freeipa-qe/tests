@@ -629,8 +629,8 @@ uninstall()
    rlPhaseStartTest "Uninstalling replica"
 
         rlLog "verifies https://bugzilla.redhat.com/show_bug.cgi?id=797563"
-        verifyErrorMsg "ipa host-del $MASTER" "ipa: ERROR: invalid 'hostname': An IPA master host cannot be deleted"
-        verifyErrorMsg "ipa host-del $SLAVE" "ipa: ERROR: invalid 'hostname': An IPA master host cannot be deleted"
+        "ipa host-del $MASTER | grep -i \"ipa: ERROR: invalid 'hostname': An IPA master host cannot be deleted\""
+        "ipa host-del $SLAVE | grep -i \"ipa: ERROR: invalid 'hostname': An IPA master host cannot be deleted\""
 
 	rlLog "verifies https://bugzilla.redhat.com/show_bug.cgi?id=755094"
 	rlRun "ipa-replica-manage list | grep \"$MASTER: master\""
@@ -644,14 +644,14 @@ uninstall()
 	rlRun "remoteExec root $MASTERIP redhat \"echo $ADMINPW | kinit admin; klist\""
 	rlRun "replicaDel root $MASTERIP \"ipa-replica-manage del $SLAVE\" yes"
 	rlRun "egrep \"Deleted replication agreement from '$MASTER' to '$SLAVE'\" /tmp/remote_exec.out"
-	cat /tmp/remote_exec.out
+	rlRun "cat /tmp/remote_exec.out"
 
 	rlLog "verifies https://bugzilla.redhat.com/show_bug.cgi?id=801380"
 	rlRun "remoteExec root $MASTERIP redhat \"ipa dnszone-find\""
 	rlRun "egrep 10.in-addr.arpa. /tmp/remote_exec.out"
 	cat /tmp/remote_exec.out
 
-	rlRun "replicaDel root $MASTERIP  \"ipa-replica-manage del $SLAVE\" yes" 
+	rlRun "replicaDel root $MASTERIP  \"ipa-replica-manage del $SLAVE\"" 
 	rlRun "egrep \"'$MASTER' has no replication agreement for '$SLAVE'\" /tmp/remote_exec.out"
 	cat /tmp/remote_exec.out
 
