@@ -334,6 +334,9 @@ ipakrblockout_maxfail_positive()
         	rlFail "Max failures not as expected.  Got: [$actual] Expected: [$value]"
         fi
 
+	# increasing reset interval in case attempts take longer than 60 secs
+	rlRun "ipa pwpolicy-mod --$intervalflag=120" 0 "Setting $intervalflag to value of [120]"
+
 	# verify counter iteration
         for value in 1 2 3 4 5 6 7 8 9 10
         do
@@ -358,6 +361,9 @@ ipakrblockout_maxfail_positive()
         else
                 rlFail "User's failed counter is NOT as expected.  Got: [$count] Expected: [0]"
         fi
+
+	# set reset value back to default
+	rlRun "ipa pwpolicy-mod --$intervalflag=60" 0 "Setting $intervalflag to value of [60"
    rlPhaseEnd
 
    rlPhaseStartTest "Max Failures reached and users credentials revoked"
