@@ -151,12 +151,9 @@ installCA()
 	rlRun "mv /etc/hosts /var/tmp/"
 	echo "127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4" > /etc/hosts
 
-        FORWARD_ZONE=`ipa dnszone-find | grep -i "zone name" | grep com | cut -d : -f 2`
-        REV_ZONE=`ipa dnszone-find | grep -i "zone name" | grep arpa | cut -d : -f 2`
-	PTR_NAME=`echo $SLAVEIP | cut -d . -f 4`
-	export $REV_ZONE
-	export $FORWARD_ZONE
-	export $PTR_NAME
+        export FORWARD_ZONE=`ipa dnszone-find | grep -i "zone name" | grep com | cut -d : -f 2`
+        export REV_ZONE=`ipa dnszone-find | grep -i "zone name" | grep arpa | cut -d : -f 2`
+	export PTR_NAME=`echo $SLAVEIP | cut -d . -f 4`
 
 expfile=/tmp/remote_exec.exp
 expout=/tmp/remote_exec.out
@@ -188,6 +185,10 @@ echo 'expect eof ' >> $expfile
 	rlRun "cat /etc/resolv.conf"
 	echo "nameserver	$MASTERIP" > /etc/resolv.conf
 	rlRun "cat /etc/resolv.conf"
+
+	echo "$MASTERIP		$MASTER" >> /etc/hosts
+	echo "$SLAVEIP		$SLAVE" >> /etc/hosts
+	rlRun "cat /etc/hosts"
 
 	rlRun "nslookup $MASTER"
 	rlRun "nslookup $SLAVE"
