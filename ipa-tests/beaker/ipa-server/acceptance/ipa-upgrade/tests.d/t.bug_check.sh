@@ -348,3 +348,91 @@ upgrade_bz_803930()
 	rlPhaseEnd
 	[ -f $tmpout ] && rm -f $tmpout
 }
+
+upgrade_bz_772359_start()
+{
+	TESTORDER=$(( TESTORDER += 1 ))
+	local tmpout=/tmp/errormsg.out
+	rlPhaseStartTest "upgrade_bz_772359_start: Need tool to update exclusive list in replication agreements"
+	case "$MYROLE" in
+	"MASTER")
+		rlLog "Machine in recipe is MASTER"
+		
+		rlLog "capture LDAP mapping tree data before upgrade from MASTER ($MASTER)"
+		rlRun "ldapsearch -x -D '$ROOTDN' -w '$ROOTDNPWD' -b 'cn=mapping tree,cn=config' > /tmp/ldap_mapping_tree.out"
+		
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.1' -m $MASTER_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $SLAVE_IP"
+		;;
+	"SLAVE")
+		rlLog "Machine in recipe is SLAVE"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $MASTER_IP"
+
+		rlLog "capture LDAP mapping tree data before upgrade from SLAVE ($SLAVE)"
+		rlRun "ldapsearch -x -D '$ROOTDN' -w '$ROOTDNPWD' -b 'cn=mapping tree,cn=config' > /tmp/ldap_mapping_tree.out"
+
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.2' -m $SLAVE_IP"
+		;;
+	"CLIENT")
+		rlLog "Machine in recipe is CLIENT"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $MASTER_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $SLAVE_IP"
+		;;
+	*)
+		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
+		;;
+	esac
+	rlPhaseEnd
+	[ -f $tmpout ] && rm -f $tmpout
+}
+
+upgrade_bz_772359_finish()
+{
+	TESTORDER=$(( TESTORDER += 1 ))
+	local tmpout=/tmp/errormsg.out
+	rlPhaseStartTest "upgrade_bz_772359_finish: Need tool to update exclusive list in replication agreements"
+	case "$MYROLE" in
+	"MASTER")
+		rlLog "Machine in recipe is MASTER"
+		
+		rlLog "capture LDAP mapping tree data before upgrade from MASTER ($MASTER)"
+		rlRun "ldapsearch -x -D '$ROOTDN' -w '$ROOTDNPWD' -b 'cn=mapping tree,cn=config' > /tmp/ldap_mapping_tree_after_upgrade.out"
+		if [ $(grep "nsDS5ReplicatedAttributeList:.*EXCLUDE.*memberof" /tmp/ldap_mapping_tree_after_upgrade.out | wc -l) -gt 0 ]; then
+			rlPass "memberof found in Replication Agreement EXCLUDE list"
+			rlPass "BZ 772359 not found."
+		else
+			rlFail "memberof not found in Replication Agreement EXCLUDE list"
+			rlFail "BZ 772359 found."
+		fi
+		
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.1' -m $MASTER_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $SLAVE_IP"
+		;;
+	"SLAVE")
+		rlLog "Machine in recipe is SLAVE"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $MASTER_IP"
+
+		rlLog "capture LDAP mapping tree data after upgrade from SLAVE ($SLAVE)"
+		rlRun "ldapsearch -x -D '$ROOTDN' -w '$ROOTDNPWD' -b 'cn=mapping tree,cn=config' > /tmp/ldap_mapping_tree_after_upgrade.out"
+		if [ $(grep "nsDS5ReplicatedAttributeList:.*EXCLUDE.*memberof" /tmp/ldap_mapping_tree_after_upgrade.out | wc -l) -gt 0 ]; then
+			rlPass "memberof found in Replication Agreement EXCLUDE list"
+			rlPass "BZ 772359 not found."
+		else
+			rlFail "memberof not found in Replication Agreement EXCLUDE list"
+			rlFail "BZ 772359 found."
+		fi
+
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.2' -m $SLAVE_IP"
+		;;
+	"CLIENT")
+		rlLog "Machine in recipe is CLIENT"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $MASTER_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $SLAVE_IP"
+		;;
+	*)
+		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
+		;;
+	esac
+	rlPhaseEnd
+	[ -f $tmpout ] && rm -f $tmpout
+}
