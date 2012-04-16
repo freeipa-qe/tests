@@ -436,3 +436,47 @@ upgrade_bz_772359_finish()
 	rlPhaseEnd
 	[ -f $tmpout ] && rm -f $tmpout
 }
+
+upgrade_bz_812391()
+{
+	TESTORDER=$(( TESTORDER += 1 ))
+	local tmpout=/tmp/errormsg.out
+	local failcount=0
+	rlPhaseStartTest "upgrade_bz_812391: IPA uninstall after upgrade returns some sysrestore.state errors"
+	case "$MYROLE" in
+	"MASTER")
+		rlLog "Machine in recipe is MASTER"
+	
+		rlLog "Checking ipaserver-uninstall.log on MASTER ($MASTER) for BZ 812391 Errors"
+		if [ $(grep "ERROR Some installation state for dirsrv has not been restored" /var/log/ipaserver-uninstall.log | wc -l) -gt 0 ]; then
+			rlFail "Found installation state not restored errors in ipaserver-uninstall.log"
+			rlFail "BZ 812391 found...IPA uninstall after upgrade returns some sysrestore.state errors"
+		fi
+
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.1' -m $MASTER_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $SLAVE_IP"
+		;;
+	"SLAVE")
+		rlLog "Machine in recipe is SLAVE"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $MASTER_IP"
+
+		rlLog "Checking ipaserver-uninstall.log on MASTER ($MASTER) for BZ 812391 Errors"
+		if [ $(grep "ERROR Some installation state for dirsrv has not been restored" /var/log/ipaserver-uninstall.log | wc -l) -gt 0 ]; then
+			rlFail "Found installation state not restored errors in ipaserver-uninstall.log"
+			rlFail "BZ 812391 found...IPA uninstall after upgrade returns some sysrestore.state errors"
+		fi
+
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.2' -m $SLAVE_IP"
+		;;
+	"CLIENT")
+		rlLog "Machine in recipe is CLIENT"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $MASTER_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $SLAVE_IP"
+		;;
+	*)
+		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
+		;;
+	esac
+	rlPhaseEnd
+	[ -f $tmpout ] && rm -f $tmpout
+}
