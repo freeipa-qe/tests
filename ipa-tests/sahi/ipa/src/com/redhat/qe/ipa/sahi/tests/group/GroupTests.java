@@ -920,8 +920,8 @@ public class GroupTests extends SahiTestScript{
 		String[][] childOfGroup = { //test scenario ; group name; group description ; gid number
 									{"change setting for group usergrp000 ", GroupTests.testUserGroups[0], "string should not be here", "Must be an integer"},
 									{"change setting for group usergrp000 ", GroupTests.testUserGroups[0], "2147483648", "Maximum value is 2147483647"},
-									{"change setting for group usergrp000 ", GroupTests.testUserGroups[0], "0", "not sure what would be error msg"},
-									{"change setting for group usergrp000 ", GroupTests.testUserGroups[0], "-1", "not sure what would be error msg"}	};
+									{"change setting for group usergrp000 ", GroupTests.testUserGroups[0], "0", "Minimum value is 1"},
+									{"change setting for group usergrp000 ", GroupTests.testUserGroups[0], "-1", "Minimum value is 1"}	};
 		return childOfGroup;
 	}
 	
