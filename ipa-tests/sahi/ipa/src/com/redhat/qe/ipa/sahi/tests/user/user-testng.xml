@@ -7,29 +7,31 @@
 		<groups>
 			<run>
 			    <include name="setup" />
-				<include name="userAddTests" />
-				<include name="userCancelAddTests" />
+			    <include name="userAddTests" /> 
+			    <include name="userMismatchingPasswordNegativeTests" />
+	            <include name="userCancelAddTests" /> 
 				<include name="invalidUserAddTests" />
-				<include name="invalidCharUserAddTests" />
-				<include name="userEditTests" />
-				<include name="userSetPasswordTests" />
-				<include name="userCancelDeactivateTests" />
+			    <include name="invalidCharUserAddTests" />	
+				<include name="userEditTests" /> 
+		        <include name="userSetPasswordTests" /> 		
+			    <include name="userCancelDeactivateTests" />	
 				<include name="userDeactivateTests" />
-				<include name="userCancelReactivateTests" />
-				<include name="userReactivateTests" />
-				<include name="userSearchTests" />
+		        <include name="userCancelReactivateTests" />        
+				<include name="userReactivateTests" /> 
+				<include name="userSearchTests" />		
 				<include name="userMultipleDataTests" />
-				<include name="userAddDeleteUndoResetTests" />
-				<include name="userExpandCollapseTests" />
-				<include name="userEditIdentitySettingsTests" />
+				<include name="userAddDeleteUndoResetTests" />  
+				<include name="userExpandCollapseTests" /> 
+			    <include name="userEditIdentitySettingsTests" />
 				<include name="userEditIdentitySettingsNegativeTests" />
-				<include name="userEditAccountSettingsTests" />
-				<include name="userEditMailingAddressTests" />
+			    <include name="userEditAccountSettingsTests" /> 
+			    <include name="userVerifyKerberosTicketPolicyTests" />
+			    <include name="userEditMailingAddressTests" />
 				<include name="userEditEmpMiscInfoTests" />
 				<include name="userAddAndAddAnotherTests" />
-				<include name="userAddAndEditTests" />
-				<include name="userDeleteTests" />
-				<include name="userMultipleDeleteTests" />
+			    <include name="userAddAndEditTests" /> 
+				<include name="userDeleteTests" />   
+		        <include name="userMultipleDeleteTests" />	
 			</run>
 		</groups>
 		<classes>
