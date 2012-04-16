@@ -392,6 +392,7 @@ installSlave_nhostdns()
 		rlRun "remoteExec root $MASTERIP redhat \"service named restart\""
 		rlRun "dig $SLAVE" 9
 
+		rlRun "echo \"$MASTERIP		$MASTER\" >> /etc/hosts"
 		rlRun "cat /etc/hosts"
 
 
@@ -629,8 +630,8 @@ uninstall()
    rlPhaseStartTest "Uninstalling replica"
 
         rlLog "verifies https://bugzilla.redhat.com/show_bug.cgi?id=797563"
-        "ipa host-del $MASTER | grep -i \"ipa: ERROR: invalid 'hostname': An IPA master host cannot be deleted\""
-        "ipa host-del $SLAVE | grep -i \"ipa: ERROR: invalid 'hostname': An IPA master host cannot be deleted\""
+	rlRun "ipa host-del $MASTER | grep -i \"ipa: ERROR: invalid 'hostname': An IPA master host cannot be deleted\""
+        rlRun "ipa host-del $SLAVE | grep -i \"ipa: ERROR: invalid 'hostname': An IPA master host cannot be deleted\""
 
 	rlLog "verifies https://bugzilla.redhat.com/show_bug.cgi?id=755094"
 	rlRun "ipa-replica-manage list | grep \"$MASTER: master\""
@@ -649,23 +650,23 @@ uninstall()
 	rlLog "verifies https://bugzilla.redhat.com/show_bug.cgi?id=801380"
 	rlRun "remoteExec root $MASTERIP redhat \"ipa dnszone-find\""
 	rlRun "egrep 10.in-addr.arpa. /tmp/remote_exec.out"
-	cat /tmp/remote_exec.out
+	rlRun "cat /tmp/remote_exec.out"
 
 	rlRun "replicaDel root $MASTERIP  \"ipa-replica-manage del $SLAVE\"" 
 	rlRun "egrep \"'$MASTER' has no replication agreement for '$SLAVE'\" /tmp/remote_exec.out"
-	cat /tmp/remote_exec.out
+	rlRun "cat /tmp/remote_exec.out"
 
 	rlLog "verifies bug https://bugzilla.redhat.com/show_bug.cgi?id=750524"
 	rlRun "remoteExec root $MASTERIP \"ipa-csreplica-manage del $SLAVE -p $ADMINPW\""
 	rlRun "egrep \"Deleted replication agreement from '$MASTER' to '$SLAVE.com'\" /tmp/remote_exec.out"
-	cat /tmp/remote_exec.out
+	rlRun "cat /tmp/remote_exec.out"
 	rlRun "remoteExec root $MASTERIP \"ipa-csreplica-manage del $SLAVE -p $ADMINPW\""
 	rlRun "egrep \"'$MASTER' has no replication agreement for '$SLAVE'\" /tmp/remote_exec.out"
-	cat /tmp/remote_exec.out
+	rlRun "cat /tmp/remote_exec.out"
 
 	rlLog "verifies bug https://bugzilla.redhat.com/show_bug.cgi?id=754539"
-	rlRun "remoteExec root $MASTERIP redhat \"ipa-replica-manage connect $SLAVE\""
-	rlRun "egrep \You cannot connect to a previously deleted master\" /tmp/remote_exec.out"
+	rlRun "remoteExec root $MASTERIP \"ipa-replica-manage connect $SLAVE\""
+	rlRun "egrep \"You cannot connect to a previously deleted master\" /tmp/remote_exec.out"
 
 	sleep 10
 
