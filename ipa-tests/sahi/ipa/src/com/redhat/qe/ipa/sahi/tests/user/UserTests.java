@@ -84,12 +84,11 @@ public class UserTests extends SahiTestScript{
 		}		
 	}
 
-	/*
-	 * Add users - for positive tests
-	 */
+	
+	// Add user with password - for positive test
 	@Test (groups={"userAddTests"}, description="Add valid users",
 			dataProvider="getUserTestObjects")	
-	public void testUseradd(String testName, String uid, String givenname, String sn) throws Exception {
+	public void testUseradd(String testName, String uid, String givenname, String sn, String newPassword, String verifyPassword) throws Exception {
 		String expectedUID=uid;
 		if (uid.length() == 0) {
 			expectedUID=(givenname.substring(0,1)+sn).toLowerCase();
@@ -100,14 +99,36 @@ public class UserTests extends SahiTestScript{
 		Assert.assertFalse(sahiTasks.link(expectedUID).exists(), "Verify user " + expectedUID + " doesn't already exist");
 		
 		//new test user can be added now
-		UserTasks.createUser(sahiTasks, uid, givenname, sn, "Add");		
+		UserTasks.createUser(sahiTasks, uid, givenname, sn, newPassword, verifyPassword, "Add");		
 		
-		//verify user was added successfully
+		//verify user was added successfully 
 		Assert.assertTrue(sahiTasks.link(expectedUID).exists(), "Added user " + expectedUID + "  successfully");
 	}
 	
 	/*
-	 * Add users - for positive tests
+	 *Add user with password not accept - for negative tests 
+	 */
+	@Test (groups={"userMismatchingPasswordNegativeTests"}, description="Add a user with mismatching passwords negative tests",
+		dataProvider="getMismatchingPasswordNegativeTestsObjects")
+		public void testPasswordMismatch(String testName, String uid, String givenname, String sn, String newPassword, String verifyPassword, String expectedError)throws Exception {
+			String expectedUID=uid;
+			if (uid.length() == 0) {
+				expectedUID=(givenname.substring(0,1)+sn).toLowerCase();
+				log.fine("ExpectedUID: " + expectedUID);
+		}
+			//verify user doesn't exist
+			Assert.assertFalse(sahiTasks.link(expectedUID).exists(), "Verify user " + expectedUID + " doesn't already exist");
+			
+			//new testuser with unmatching passwords added now
+			UserTasks.createUserForNegativePassword(sahiTasks, uid, givenname, sn, newPassword, verifyPassword, "Add", expectedError);	
+			
+			//verify user was not added successfully 
+			Assert.assertFalse(sahiTasks.link(uid).exists(), "Verify user " + uid + "  was not added");
+	}
+	
+	
+	/*
+	 * Add users - for positive tests 
 	 */
 	@Test (groups={"userCancelAddTests"}, description="Cancel adding a user",
 			dataProvider="getCancelAddUserTestObjects")	
@@ -117,6 +138,7 @@ public class UserTests extends SahiTestScript{
 		
 		//new test user can be added now
 		UserTasks.createUser(sahiTasks, uid, givenname, sn, "Cancel");		
+		
 		
 		//verify user was added successfully
 		Assert.assertFalse(sahiTasks.link(uid).exists(), "Verify user " + uid + "  was not added");
@@ -180,7 +202,7 @@ public class UserTests extends SahiTestScript{
 	@Test (groups={"userAddDeleteUndoResetTests"}, description="Add/Delete/Undo/Reset contact data",
 			dataProvider="getUserAddDeleteUndoResetTestObjects", 
 			dependsOnGroups={"userAddTests", "userEditTests", "userMultipleDataTests"})	
-	public void testUserAddDeleteUndoReset(String testName, String uid, String mail1, String mail2, String	mail3, 
+	public void testUserAddDeleteUndoReset (String testName, String uid, String mail1, String mail2, String	mail3, 
 			String phone1, String phone2, String pager1, String pager2, String mobile1, String mobile2, 
 			String fax1, String fax2) throws Exception {		
 		//verify user to be edited exists
@@ -190,7 +212,7 @@ public class UserTests extends SahiTestScript{
 		UserTasks.addDeleteUndoResetContactData(sahiTasks, uid, mail1, phone1);
 		
 		//verify nothing changed	
-		UserTasks.verifyUserContactData(sahiTasks, uid, mail3, mail2, mail1, phone1, phone2, pager1, pager2, mobile1, mobile2, fax1, fax2);
+		UserTasks.verifyUserContactData(sahiTasks, uid, mail1, mail3, mail2, phone1, phone2, pager1, pager2, mobile1, mobile2, fax1, fax2);
 	}
 	
 	/*
@@ -239,6 +261,21 @@ public class UserTests extends SahiTestScript{
 		
 		//verify changes	
 		UserTasks.verifyUserAccountSettings(sahiTasks, uid, uidnumber, gidnumber, loginshell, homedirectory);
+	}
+	
+	/*
+	 * Verify Kerberos Ticket Policy.
+	 */
+	@Test (groups={"userVerifyKerberosTicketPolicyTests"}, dataProvider="getKerberosTicketPolicyObjects", dependsOnGroups={"userAddTests"})	
+	public void testUserVerifyKerberosTicketPolicy(String testName, String uid, String maxrenew, String maxlife) throws Exception {		
+		//verify user is exists
+		Assert.assertTrue(sahiTasks.link(uid).exists(), "Verify user " + uid + " is exists");
+		
+		//Verify Kerberos Ticket Policy Data
+		UserTasks.verifyUserKerberosTicketPolicyData(sahiTasks, uid, maxrenew, maxlife);
+		
+		
+	
 	}
 
 	/*
@@ -329,7 +366,7 @@ public class UserTests extends SahiTestScript{
 		UserTasks.verifyUserStatus(sahiTasks, uid, true);
 		
 		//modify this user
-		UserTasks.modifyUserStatus(sahiTasks, uid, false, "Deactivate");
+		UserTasks.modifyUserStatus(sahiTasks, uid, false, "Disable");
 		
 		//verify changes to status	
 		UserTasks.verifyUserStatus(sahiTasks, uid, false);
@@ -373,7 +410,7 @@ public class UserTests extends SahiTestScript{
 		UserTasks.verifyUserStatus(sahiTasks, uid, false);
 		
 		//modify this user
-		UserTasks.modifyUserStatus(sahiTasks, uid, true, "Activate");
+		UserTasks.modifyUserStatus(sahiTasks, uid, true, "Enable");
 		
 		//verify changes to status	
 		UserTasks.verifyUserStatus(sahiTasks, uid, true);
@@ -390,7 +427,9 @@ public class UserTests extends SahiTestScript{
 	 */
 	@Test (groups={"userDeleteTests"}, dataProvider="getUserDeleteTestObjects", 
 			dependsOnGroups={"userAddTests", "userEditTests", "userSetPasswordTests", "userDeactivateTests", 
-			"userReactivateTests", "invalidUserAddTests", "userSearchTests", "userMultipleDataTests", "userAddDeleteUndoResetTests"})	
+ "userReactivateTests",
+			"invalidUserAddTests", "userSearchTests", "userMultipleDataTests",
+			"userAddDeleteUndoResetTests"})	
 	public void testUserDelete(String testName, String uid) throws Exception {
 		//verify user to be deleted exists
 		Assert.assertTrue(sahiTasks.link(uid).exists(), "Verify user " + uid + "  to be deleted exists");
@@ -409,7 +448,7 @@ public class UserTests extends SahiTestScript{
 	 * Delete multiple users - for positive tests
 	 */
 	@Test (groups={"userMultipleDeleteTests"}, dataProvider="getMultipleUserDeleteTestObjects", dependsOnGroups={"userAddTests", "invalidUserAddTests", "userAddAndEditTests", "userAddAndAddAnotherTests",
-			"userEditIdentitySettingsTests", "userEditAccountSettingsTests", "userEditMailingAddressTests", "userEditEmpMiscInfoTests", "userSearchTests" })
+ "userEditIdentitySettingsTests", "userEditAccountSettingsTests", "userEditMailingAddressTests", "userEditEmpMiscInfoTests", "userSearchTests" })
 	public void testMultipleUserDelete(String testName, String uid1, String uid2, String uid3, String uid4) throws Exception {		
 		String uids[] = {uid1, uid2, uid3, uid4};
 		
@@ -505,7 +544,8 @@ public class UserTests extends SahiTestScript{
 				"1spe.cial_us-er$",	
 				"user9",
 				"tuser7",
-				"tuser8"
+				"tuser8",
+				"kuser"
 				} ;
 
 		//verify users were found
@@ -538,6 +578,9 @@ public class UserTests extends SahiTestScript{
 		return ll;	
 	}
 	
+	
+	// Data to be used when adding users with password
+	
 	@DataProvider(name="getUserTestObjects")
 	public Object[][] getUserTestObjects() {
 		return TestNGUtils.convertListOfListsTo2dArray(createUserTestObjects());
@@ -545,15 +588,31 @@ public class UserTests extends SahiTestScript{
 	protected List<List<Object>> createUserTestObjects() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-        //										testname			uid              			givenname			sn   
-		ll.add(Arrays.asList(new Object[]{ "add_good",				"testuser", 				"Test",				"User"      } ));
-		ll.add(Arrays.asList(new Object[]{ "add_optional_login",	"", 						"Test",				"User"      } ));
-		ll.add(Arrays.asList(new Object[]{ "add_testuser",			"user2", 			    	"Test2",			"User2"     } ));
-		ll.add(Arrays.asList(new Object[]{ "add_special_char",		"1spe.cial_us-er$", 		"S$p|e>c--i_a%l_",	"%U&s?e+r(" } ));
-		      
+        //										testname			uid              			givenname			sn   		newpassword 		verifypassword
+		ll.add(Arrays.asList(new Object[]{ "add_good",				"testuser", 				"Test",				"User",      "testuser",		 "testuser"  } ));
+		ll.add(Arrays.asList(new Object[]{ "add_optional_login_password", "", 					"Test",				"User",      "",					 "" 	 } ));
+		ll.add(Arrays.asList(new Object[]{ "add_testuser",			"user2", 			    	"Test2",			"User2",	 "user2",	      	 "user2"	 } ));
+		ll.add(Arrays.asList(new Object[]{ "add_special_char",		"1spe.cial_us-er$", 		"S$p|e>c--i_a%l_",	"%U&s?e+r(", "!@#$",			 "!@#$"	     } ));
+		ll.add(Arrays.asList(new Object[]{ "add_kuser",				"kuser",					"Kerberos",			"User",		 "",					""       } ));	     
 		return ll;	
 	}
 	
+	//Data to be used when adding users with Mismatching password
+	@DataProvider(name="getMismatchingPasswordNegativeTestsObjects")
+	public Object[][] getMismatchingPasswordNegativeTestsObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createUserMismatchingPasswordObjects());
+	}
+	protected List<List<Object>> createUserMismatchingPasswordObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname						uid             		givenname		    	 sn   		newpassword 		verifypassword		ExpectedError
+		ll.add(Arrays.asList(new Object[]{ "add_mispassword",			     "tuser2",	 				  "Test",				"User1",       "testuser",		   "test",  	    "Passwords must match"  } ));
+		ll.add(Arrays.asList(new Object[]{ "add_Leadind_Space_password",	"testuser1", 				  "Test",				"User1",      " testuser",		 " testuser",		"invalid 'password': Leading and trailing spaces are not allowed"  } ));
+		ll.add(Arrays.asList(new Object[]{ "add_Trailing_Space_password",     "tuser1", 				  "Test",				"User1",       "testuser ",		 "testuser ",  	    "invalid 'password': Leading and trailing spaces are not allowed"  } ));
+		
+		return ll;
+		
+	}
 	/*
 	 * Data to be used when adding users - for negative cases
 	 */
@@ -880,6 +939,23 @@ public class UserTests extends SahiTestScript{
 		  
 		return ll;	
 	}
+	
+	/*
+	 * Data to be used when verify kerberos ticket policy
+	 */
+	@DataProvider(name="getKerberosTicketPolicyObjects")
+	public Object[][] getKerberosTicketPolicyObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(kerberosTicketPolicyObject());
+	}
+	protected List<List<Object>> kerberosTicketPolicyObject() {			
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname					uid    		Maxrenew		maxlife		  			       		
+		ll.add(Arrays.asList(new Object[]{ "kerberos_ticket_policy",		"kuser",	"604800",   	"86400"	} ));
+		  
+		return ll;	
+	}
+	
 	
 	/*
 	 * Data to be used when updating Mailing Address for users
