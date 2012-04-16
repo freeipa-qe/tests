@@ -9,6 +9,7 @@ import com.redhat.qe.ipa.sahi.tasks.SahiTasks;
 public class UserTasks {
 	private static Logger log = Logger.getLogger(UserTasks.class.getName());
 	
+	
 	/*
 	 * Create a new user. Check if user already exists before calling this.
 	 * @param sahiTasks 
@@ -23,6 +24,54 @@ public class UserTasks {
 		sahiTasks.textbox("sn").setValue(sn);
 		sahiTasks.button(buttonToClick).click();
 	}
+	
+	
+	
+	/*
+	 * Create a new user. Check if user already exists before calling this.
+	 * @param sahiTasks 
+	 * @param uid - uid for the new user
+	 * @param givenName - first name for the new user
+	 * @param sn - last name for the new user
+	 * @param newpassword - password for the user
+	 * @param verifypassword - verifying password field
+	 */
+	public static void createUser(SahiTasks sahiTasks, String uid, String givenName, String sn, String newPassword, String verifyPassword, String buttonToClick) {
+		sahiTasks.link("Add").click();
+		sahiTasks.textbox("uid").setValue(uid);
+		sahiTasks.textbox("givenname").setValue(givenName);
+		sahiTasks.textbox("sn").setValue(sn);
+		sahiTasks.password("userpassword").setValue(newPassword);
+		sahiTasks.password("userpassword2").setValue(verifyPassword);
+		sahiTasks.button(buttonToClick).click();
+	}
+	
+	/*
+	 * Create a testuser with unmatching passwords.
+	 * @param sahiTasks 
+	 * @param uid - uid for the new user
+	 * @param givenName - first name for the new user
+	 * @param sn - last name for the new user
+	 * @param newpassword - password for the user
+	 * @param verifypassword - verifying password field 
+	 * @param expectedError - the error thrown when passwords do not match 
+	 */
+	
+	public static void createUserForNegativePassword(SahiTasks sahiTasks, String uid, String givenName, String sn, String newPassword, String verifyPassword, String buttonToClick, String expectedError){
+		sahiTasks.link("Add").click();
+		sahiTasks.textbox("uid").setValue(uid);
+		sahiTasks.textbox("givenname").setValue(givenName);
+		sahiTasks.textbox("sn").setValue(sn);
+		sahiTasks.password("userpassword").setValue(newPassword);
+		sahiTasks.password("userpassword2").setValue(verifyPassword);
+		sahiTasks.button(buttonToClick).click();
+		log.fine("error check");
+		Assert.assertTrue(sahiTasks.div(expectedError).exists(), " " + uid);
+		log.fine("cancel");
+		sahiTasks.button("Cancel").near(sahiTasks.button("Add and Edit")).click();
+	}
+	
+	
 	
 	/*
 	 * Create a new invalid user.
@@ -83,9 +132,10 @@ public class UserTasks {
 		sahiTasks.textbox("title").setValue(title);
 		
 		//add a mail address for user
-		sahiTasks.link("Add").click();
-		sahiTasks.textbox("mail").setValue(mail);
+		sahiTasks.link("Add[1]").click();
+		sahiTasks.textbox("mail-0").setValue(mail);
 		
+			
 		//Update and go back to user list
 		sahiTasks.link("Update").click();
 		sahiTasks.link("Users").in(sahiTasks.div("content")).click();
@@ -176,32 +226,32 @@ public class UserTasks {
 		sahiTasks.link(uid).click();
 		
 		
-		sahiTasks.link("Add").click();
-		sahiTasks.textbox("mail").setValue(mail1);
-		sahiTasks.link("Add").click();
-		sahiTasks.textbox("mail[1]").setValue(mail2);
-		sahiTasks.link("Add").click();
-		sahiTasks.textbox("mail[2]").setValue(mail3);
-		
 		sahiTasks.link("Add[1]").click();
-		sahiTasks.textbox("telephonenumber").setValue(phone1);
+		sahiTasks.textbox("mail-0").setValue(mail1);
 		sahiTasks.link("Add[1]").click();
-		sahiTasks.textbox("telephonenumber[1]").setValue(phone2);
+		sahiTasks.textbox("mail-1").setValue(mail2);
+		sahiTasks.link("Add[1]").click();
+		sahiTasks.textbox("mail-2").setValue(mail3);
 		
 		sahiTasks.link("Add[2]").click();
-		sahiTasks.textbox("pager").setValue(pager1);
+		sahiTasks.textbox("telephonenumber-0").setValue(phone1);
 		sahiTasks.link("Add[2]").click();
-		sahiTasks.textbox("pager[1]").setValue(pager2);
+		sahiTasks.textbox("telephonenumber-1").setValue(phone2);
 		
 		sahiTasks.link("Add[3]").click();
-		sahiTasks.textbox("mobile").setValue(mobile1);
+		sahiTasks.textbox("pager-0").setValue(pager1);
 		sahiTasks.link("Add[3]").click();
-		sahiTasks.textbox("mobile[1]").setValue(mobile2);
+		sahiTasks.textbox("pager-1").setValue(pager2);
 		
 		sahiTasks.link("Add[4]").click();
-		sahiTasks.textbox("facsimiletelephonenumber").setValue(fax1);
+		sahiTasks.textbox("mobile-0").setValue(mobile1);
 		sahiTasks.link("Add[4]").click();
-		sahiTasks.textbox("facsimiletelephonenumber[1]").setValue(fax2);
+		sahiTasks.textbox("mobile-1").setValue(mobile2);
+		
+		sahiTasks.link("Add[5]").click();
+		sahiTasks.textbox("facsimiletelephonenumber-0").setValue(fax1);
+		sahiTasks.link("Add[5]").click();
+		sahiTasks.textbox("facsimiletelephonenumber-1").setValue(fax2);
 		
 		//Update and go back to user list
 		sahiTasks.link("Update").click();
@@ -215,27 +265,27 @@ public class UserTasks {
 	 * @param title - title string being edited for this user
 	 * @param mail - mail string being edited for this user
 	 */
-	public static void verifyUserContactData(SahiTasks sahiTasks, String uid, String mail1, String mail2, String	mail3, 
+	public static void verifyUserContactData(SahiTasks sahiTasks, String uid, String mail1, String mail2, String mail3, 
 			String phone1, String phone2, String pager1, String pager2, String mobile1, String mobile2, String fax1, String fax2) {
 		//click on user to edit
 		sahiTasks.link(uid).click();
 		
 		//verify mail address for user
-		Assert.assertEquals(sahiTasks.textbox("mail").value(), mail1, "Verified mail for user " + uid + ": " + mail1);
-		Assert.assertEquals(sahiTasks.textbox("mail[1]").value(), mail2, "Verified mail for user " + uid + ": " + mail2);
-		Assert.assertEquals(sahiTasks.textbox("mail[2]").value(), mail3, "Verified mail for user " + uid + ": " + mail3);
+		Assert.assertEquals(sahiTasks.textbox("mail-0").value(), mail1, "Verified mail for user " + uid + ": " + mail1);
+		Assert.assertEquals(sahiTasks.textbox("mail-1").value(), mail2, "Verified mail for user " + uid + ": " + mail2);
+		Assert.assertEquals(sahiTasks.textbox("mail-2").value(), mail3, "Verified mail for user " + uid + ": " + mail3);
 		
-		Assert.assertEquals(sahiTasks.textbox("telephonenumber").value(), phone1, "Verified phone for user " + uid + ": " + phone1);
-		Assert.assertEquals(sahiTasks.textbox("telephonenumber[1]").value(), phone2, "Verified phone for user " + uid + ": " + phone2);
+		Assert.assertEquals(sahiTasks.textbox("telephonenumber-0").value(), phone1, "Verified phone for user " + uid + ": " + phone1);
+		Assert.assertEquals(sahiTasks.textbox("telephonenumber-1").value(), phone2, "Verified phone for user " + uid + ": " + phone2);
 		
-		Assert.assertEquals(sahiTasks.textbox("pager").value(), pager1, "Verified pager for user " + uid + ": " + pager1);
-		Assert.assertEquals(sahiTasks.textbox("pager[1]").value(), pager2, "Verified pager for user " + uid + ": " + pager2);
+		Assert.assertEquals(sahiTasks.textbox("pager-0").value(), pager1, "Verified pager for user " + uid + ": " + pager1);
+		Assert.assertEquals(sahiTasks.textbox("pager-1").value(), pager2, "Verified pager for user " + uid + ": " + pager2);
 	
-		Assert.assertEquals(sahiTasks.textbox("mobile").value(), mobile1, "Verified mobile for user " + uid  + ": " + mobile1);
-		Assert.assertEquals(sahiTasks.textbox("mobile[1]").value(), mobile2, "Verified mobile for user " + uid + ": " + mobile2);
+		Assert.assertEquals(sahiTasks.textbox("mobile-0").value(), mobile1, "Verified mobile for user " + uid  + ": " + mobile1);
+		Assert.assertEquals(sahiTasks.textbox("mobile-1").value(), mobile2, "Verified mobile for user " + uid + ": " + mobile2);
 	
-		Assert.assertEquals(sahiTasks.textbox("facsimiletelephonenumber").value(), fax1, "Verified fax for user " + uid  + ": " + fax1);
-		Assert.assertEquals(sahiTasks.textbox("facsimiletelephonenumber[1]").value(), fax2, "Verified fax for user " + uid + ": " + fax2);
+		Assert.assertEquals(sahiTasks.textbox("facsimiletelephonenumber-0").value(), fax1, "Verified fax for user " + uid  + ": " + fax1);
+		Assert.assertEquals(sahiTasks.textbox("facsimiletelephonenumber-1").value(), fax2, "Verified fax for user " + uid + ": " + fax2);
 	
 		sahiTasks.link("Users").in(sahiTasks.div("content")).click();
 	}
@@ -246,27 +296,27 @@ public class UserTasks {
 		sahiTasks.link(uid).click();
 		
 		//Add but Reset		
-		sahiTasks.link("Add").click();
+		sahiTasks.link("Add[1]").click();
 		sahiTasks.span("Reset").click();
 		
 		//Delete but Reset
-		sahiTasks.link("Delete").click();
+		sahiTasks.link("Delete[0]").click();
 		sahiTasks.span("Reset").click();
 		
 		//Edit - then Reset
-		sahiTasks.textbox("mail").setValue(mail+mail);
+		sahiTasks.textbox("mail-0").setValue(mail+mail);
 		sahiTasks.span("Reset").click();
 		
 		//Add - then undo
-		sahiTasks.link("Add").click();
+		sahiTasks.link("Add[1]").click();
 		sahiTasks.span("undo").click();
 		
 		//Delete - then undo
-		sahiTasks.link("Delete").click();
+		sahiTasks.link("Delete[1]").click();
 		sahiTasks.span("undo").click();
 		
 		//Edit - then undo
-		sahiTasks.textbox("telephonenumber").setValue(phone+phone);
+		sahiTasks.textbox("telephonenumber-0").setValue(phone+phone);
 		sahiTasks.span("undo").click();
 		
 		
@@ -281,7 +331,7 @@ public class UserTasks {
 		Assert.assertEquals(sahiTasks.textbox("title").value(), title, "Verified updated title for user " + uid);
 		
 		//verify mail address for user
-		Assert.assertEquals(sahiTasks.textbox("mail").value(), mail, "Verified updated mail for user " + uid);
+		Assert.assertEquals(sahiTasks.textbox("mail-0").value(), mail, "Verified updated mail for user " + uid);
 		
 		sahiTasks.link("Users").in(sahiTasks.div("content")).click();
 	}
@@ -318,6 +368,15 @@ public class UserTasks {
 		sahiTasks.link("Users").in(sahiTasks.div("content")).click();
 	}
 	
+	public static void verifyUserKerberosTicketPolicyData(SahiTasks sahiTasks, String uid, String maxrenew, String maxlife){
+		
+		//click on user to verify
+		sahiTasks.link(uid).click();
+		//verify user's kerberos ticket policy data.
+		Assert.assertTrue(sahiTasks.label(maxrenew).text().contains(maxrenew), "Verified MaxRenew for the user " + uid);
+		Assert.assertTrue(sahiTasks.label(maxlife).text().contains(maxlife), "Verified Maxlife for the user " + uid);
+		
+	}
 	
 	public static void verifyUserMailingAddress(SahiTasks sahiTasks, String uid, String street, String city, String state, String zip) {
 		//click on user to edit
@@ -355,9 +414,9 @@ public class UserTasks {
 		
 		//verify user's status
 		if (status)
-			Assert.assertTrue(sahiTasks.link("Click to Deactivate").exists(), "Verified Active status for user " + uid);
+			Assert.assertTrue(sahiTasks.link("Click to Disable").exists(), "Verified Active status for user " + uid);
 		else
-			Assert.assertTrue(sahiTasks.link("Click to Activate").exists(), "Verified Inactive status for user " + uid);
+			Assert.assertTrue(sahiTasks.link("Click to Enable").exists(), "Verified Inactive status for user " + uid);
 	
 		sahiTasks.link("Users").in(sahiTasks.div("content")).click();
 	}
@@ -372,9 +431,9 @@ public class UserTasks {
 		
 		//edit user's job title
 		if (newStatus)
-			sahiTasks.link("Click to Activate").click();
+			sahiTasks.link("Click to Enable").click();
 		else
-			sahiTasks.link("Click to Deactivate").click();
+			sahiTasks.link("Click to Disable").click();
 		sahiTasks.button(buttonToClick).click();
 		//go back to user list
 		sahiTasks.link("Users").in(sahiTasks.div("content")).click();
@@ -465,8 +524,8 @@ public class UserTasks {
 		sahiTasks.textbox("sn").setValue(sn);
 		sahiTasks.button("Add and Edit").click();
 		sahiTasks.textbox("title").setValue(title);
-		sahiTasks.link("Add").click();
-		sahiTasks.textbox("mail").setValue(mail);
+		sahiTasks.link("Add[1]").click();
+		sahiTasks.textbox("mail-0").setValue(mail);
 		sahiTasks.span("Update").click();
 		sahiTasks.link("Users").in(sahiTasks.div("content")).click();
 	}
