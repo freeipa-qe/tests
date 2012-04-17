@@ -846,7 +846,8 @@ cert_revoke()
     cert_revoke_1005  #test_scenario (positive test): [ without revocation reason] #Added by Kaleem
     cert_revoke_1006  #test_scenario (negative test): [ Revoking a revoked certificate again] #Added by Kaleem
     cert_revoke_1007  #test_scenario (positive test): [ Revocation reason 7 not supported] #Added by Kaleem
-    cert_revoke_1008  #test_scenario (positive test): [ no cert id provided and given on prompt] #Added by Kaleem
+    cert_revoke_1008  #test_scenario (negative test): [ no cert id provided and given on prompt] #Added by Kaleem
+    cert_revoke_1009  #test_scenario (negative test): [ empty --revocation-reason provided] #Added by Kaleem
     cert_revoke_envcleanup
 } #cert-revoke
 
@@ -1071,7 +1072,7 @@ cert_revoke_1007()
 } #cert_revoke_1007
 
 cert_revoke_1008()
-{ #test_scenario (positive): no cert id provided 
+{ #test_scenario (negative): no cert id provided 
     rlPhaseStartTest "cert_revoke_1008"
         local testID="cert_revoke_1008"
         local tmpout=$TmpDir/cert_revoke_1008.$RANDOM.out
@@ -1105,6 +1106,30 @@ cert_revoke_1008()
     rlPhaseEnd
 } #cert_revoke_1008
 
+cert_revoke_1009()
+{ #test_scenario (negative): empty --revocation-reason provided
+    rlPhaseStartTest "cert_revoke_1009"
+    #    local testID="cert_revoke_1009"
+        local tmpout=$TmpDir/cert_revoke_1009.$RANDOM.out
+        create_cert
+        KinitAsAdmin
+        for cert in `cat $certList`;do
+          echo $cert
+          local certid=`echo $cert | cut -d"=" -f2`
+          echo $certid
+          ipa cert-revoke $certid --revocation-reason= > $tmpout 2>&1
+          cat $tmpout
+           local actual=`grep -i "ipa: ERROR: 'revocation_reason' is required" $tmpout`
+            if [ $? -eq 0 ];then
+              rlPass "revocation_reason argument can not be empty"
+            else
+              rlFail "revocation_reason argument can be empty"
+            fi
+        done
+        delete_cert
+        rm $tmpout
+    rlPhaseEnd
+} #cert_revoke_1009
 
 #END OF TEST CASE for [cert-revoke]
 
