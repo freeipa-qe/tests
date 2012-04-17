@@ -464,25 +464,35 @@ netgroup_bz_797256()
 		fi
 		rlRun "ipa netgroup-del netgroup_bz_797256_2"
 
-		#### test3	
-		rlRun "ipa netgroup-add netgroup_bz_797256_3 --desc=desc3"
-		rlRun "ipa netgroup-mod netgroup_bz_797256_3 --setattr=externalhost=anotherbadhost? > $tmpout 2>&1"
+		[ -f $tmpout ] && rm -f $tmpout
+	rlPhaseEnd
+}
+
+netgroup_bz_813325()
+{
+	rlPhaseStartTest "netgroup_bz_813325: ipa netgroup-mod addattr and setattr allow invalid characters for externalHost"
+		local tmpout=/tmp/errormsg.out
+		KinitAsAdmin
+		#### test1	
+		rlRun "ipa netgroup-add netgroup_bz_813325_1 --desc=desc1"
+		rlRun "ipa netgroup-mod netgroup_bz_813325_1 --setattr=externalhost=anotherbadhost? > $tmpout 2>&1"
 		if [ $(grep "anotherbadhost\?" $tmpout|wc -l) -gt 0 ]; then
-			rlFail "BZ 797256 Found...ipa netgroup-add-member --hosts should not allow invalid characters"
+			rlFail "BZ 813325 Found...ipa netgroup-add-member --hosts should not allow invalid characters"
 		else
-			rlPass "BZ 797256 not found for ipa netgroup-add-member --hosts with ?"
+			rlPass "BZ 813325 not found for ipa netgroup-add-member --hosts with ?"
 		fi
-		rlRun "ipa netgroup-del netgroup_bz_797256_3"
+		rlRun "ipa netgroup-del netgroup_bz_813325_1"
 		
-		#### test4
-		rlRun "ipa netgroup-add netgroup_bz_797256_4 --desc=desc4"
-		rlRun "ipa netgroup-mod netgroup_bz_797256_4 --addattr=externalhost=anotherbadhost\!\@\#\$\%\^\&\*\\(\\) > $tmpout 2>&1" 1
+		#### test2
+		rlRun "ipa netgroup-add netgroup_bz_813325_2 --desc=desc2"
+		rlRun "ipa netgroup-mod netgroup_bz_813325_2 --addattr=externalhost=anotherbadhost\!\@\#\$\%\^\&\*\\(\\) > $tmpout 2>&1" 1
 		if [ $(grep "anotherbadhost\!\@\#\$\%\^\&\*\\(\\)" $tmpout|wc -l) -gt 0 ]; then
-			rlFail "BZ 797256 Found...ipa netgroup-add-member --hosts should not allow invalid characters"
+			rlFail "BZ 813325 Found...ipa netgroup-add-member --hosts should not allow invalid characters"
 		else
-			rlPass "BZ 797256 not found for ipa netgroup-add-member --hosts with other invalid characters"
+			rlPass "BZ 813325 not found for ipa netgroup-add-member --hosts with other invalid characters"
 		fi
-		rlRun "ipa netgroup-del netgroup_bz_797256_4"
+		rlRun "ipa netgroup-del netgroup_bz_813325_2"
+
 		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd
 }
