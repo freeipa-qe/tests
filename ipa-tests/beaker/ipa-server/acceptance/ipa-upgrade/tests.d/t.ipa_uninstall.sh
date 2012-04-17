@@ -88,12 +88,13 @@ ipa_uninstall_slave()
 	case "$MYROLE" in
 	"MASTER")
 		rlLog "Machine in recipe is MASTER"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $SLAVE_IP"
-		rlRun "ipa host-del $SLAVE_S.$DOMAIN --updatedns"
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.2' -m $MASTER_IP"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.1' -m $MASTER_IP"
+		rlRun "ipa-replica-manage del $SLAVE_S.$DOMAIN -f"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $SLAVE_IP"
 		;;
 	"SLAVE")
 		rlLog "Machine in recipe is SLAVE"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $MASTER_IP"
 		ipa_quick_uninstall
 		[ -n $SLAVE_IP ] && SLAVE=$(dig +short -x $SLAVE_IP|sed 's/\.$//g')
 
@@ -102,13 +103,12 @@ ipa_uninstall_slave()
 			cp -f /var/log/ipaserver-uninstall.log /var/log/ipaserver-uninstall.log.$DATE
 			rhts-submit-log -l /var/log/ipaserver-uninstall.log.$DATE
 		fi
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.1' -m $SLAVE_IP"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $MASTER_IP"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.2' -m $SLAVE_IP"
 		;;
 	"CLIENT")
 		rlLog "Machine in recipe is CLIENT"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $SLAVE_IP"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $MASTER_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $MASTER_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $SLAVE_IP"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
