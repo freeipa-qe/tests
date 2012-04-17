@@ -446,10 +446,11 @@ upgrade_bz_812391()
 	case "$MYROLE" in
 	"MASTER")
 		rlLog "Machine in recipe is MASTER"
-	
+			
 		rlLog "Checking ipaserver-uninstall.log on MASTER ($MASTER) for BZ 812391 Errors"
 		if [ $(grep "ERROR Some installation state for dirsrv has not been restored" /var/log/ipaserver-uninstall.log | wc -l) -gt 0 ]; then
 			rlFail "Found installation state not restored errors in ipaserver-uninstall.log"
+			grep "ERROR Some installation state for dirsrv has not been restored" /var/log/ipaserver-uninstall.log
 			rlFail "BZ 812391 found...IPA uninstall after upgrade returns some sysrestore.state errors"
 		fi
 
@@ -463,6 +464,7 @@ upgrade_bz_812391()
 		rlLog "Checking ipaserver-uninstall.log on MASTER ($MASTER) for BZ 812391 Errors"
 		if [ $(grep "ERROR Some installation state for dirsrv has not been restored" /var/log/ipaserver-uninstall.log | wc -l) -gt 0 ]; then
 			rlFail "Found installation state not restored errors in ipaserver-uninstall.log"
+			grep "ERROR Some installation state for dirsrv has not been restored" /var/log/ipaserver-uninstall.log
 			rlFail "BZ 812391 found...IPA uninstall after upgrade returns some sysrestore.state errors"
 		fi
 
