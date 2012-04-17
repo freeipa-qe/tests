@@ -3,10 +3,11 @@ package com.redhat.qe.ipa.sahi.pages;
 import javax.mail.*;
 import javax.mail.internet.*;
 import java.util.*;
-	
+import java.io.*;
+
 public class EmailTool {
  
-	public static void main(String[] args)
+	public static void main(String[] args) 
 	{
 		String emailServer = "smtp.corp.redhat.com";
 		String to="yzhang@redhat.com";
@@ -14,7 +15,8 @@ public class EmailTool {
 		String subject="test automation result";
 		String report= "==================== Test Result Summary ========================";
 		EmailTool postman = new EmailTool(emailServer, from, to, subject, report);
-		postman.deliver();
+		//postman.deliver();
+		postman.send();
 	}
 	
 	private String emailServer, from, to, subject, report;
@@ -26,6 +28,25 @@ public class EmailTool {
 		this.to = to;
 		this.subject = subject;
 		this.report = report;
+	}
+	
+	public boolean send()
+	{
+		boolean send=false;
+	    try {
+	    	long time = System.currentTimeMillis();
+	    	String command = "mail -s '" + subject + "' " + to; 
+	        Process p = Runtime.getRuntime().exec(command); 
+	        BufferedWriter writer = new BufferedWriter (new OutputStreamWriter(p.getOutputStream())); 
+	        writer.write(report);
+	        writer.close();
+	        p.waitFor();
+	        send=true;
+	      }
+	      catch (Exception err) {
+	        err.printStackTrace();
+	      }
+		return send;
 	}
 	
 	public boolean deliver()
