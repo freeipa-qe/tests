@@ -76,12 +76,12 @@ rlJournalStart
 	upgrade_test_master_slave_client_nodns
 	upgrade_test_master_slave_client_dirsrv_off
 
-    rlPhaseStartCleanup "ipa-upgrade cleanup"
-        rlRun "popd"
-        rlRun "rm -r $TmpDir" 0 "Removing tmp directory"
-    rlPhaseEnd
+	rlPhaseStartCleanup "ipa-upgrade cleanup"
+		rlRun "popd"
+		rlRun "rm -r $TmpDir" 0 "Removing tmp directory"
+	rlPhaseEnd
 
-    makereport
+	makereport
 rlJournalEnd
 
 # manifest:
