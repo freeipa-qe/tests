@@ -62,12 +62,21 @@
 ######################################################################
 data_check()
 {
+	local TARGET_IP=$1
 	local tmpout=/tmp/errormsg.out
-	rlPhaseStartTest "data_check: check test data"
-		TESTORDER=$(( TESTORDER += 1 ))
-		currenteth=$(route | grep ^default | awk '{print $8}')
-		ipaddr=$(ifconfig $currenteth | grep inet\ addr | sed s/:/\ /g | awk '{print $3}')
+	local currenteth=$(route | grep ^default | awk '{print $8}')
+	local ipaddr=$(ifconfig $currenteth | grep inet\ addr | sed s/:/\ /g | awk '{print $3}')
+	TESTORDER=$(( TESTORDER += 1 ))
+	if [ "$TARGET_IP" != "$ipaddr" ]; then
+		rlPhaseStartTest "data_check_other: checking test data on another server right now"
+			rlLog "Machine in recipe is $MYROLE ($HOSTNAME)"
+			rlLog "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $TARGET_IP"
+			rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $TARGET_IP"
+		rlPhaseEnd
+		return 0
+	fi
 
+	rlPhaseStartTest "data_check: check test data"
 		rlLog "Machine in recipe is $MYROLE ($HOSTNAME)"
 		KinitAsAdmin
 		
@@ -131,7 +140,6 @@ data_check()
 			done
 		done
 
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $ipaddr"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER_IP $SLAVE_IP $CLIENT_IP"
-	rlPhaseEnd
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.1' -m $TARGET_IP"
+	rlPhaseEnd	
 }

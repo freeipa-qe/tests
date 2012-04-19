@@ -43,15 +43,15 @@ upgrade_test_master_slave_client_all()
 
 		# test upgrade with new master, old slave, and old client
 		upgrade_master 
-		data_check
+		data_check $MASTER_IP
 
 		# test upgrade with new master, new slave, and old client 
 		upgrade_slave
-		data_check
+		data_check $SLAVE_IP
 
 		# test upgrade with new master, new slave, and new client
 		upgrade_client
-		data_check
+		data_check $CLIENT_IP
 
 		# uninstall everything so we can start over
 		uninstall	
@@ -69,15 +69,16 @@ upgrade_test_client_slave_master_all()
 
 		# test upgrade with old master, old slave, and new client
 		upgrade_client
-		data_check
+		data_check $CLIENT_IP
 
 		# test upgrade with old master, new slave, and new client 
 		upgrade_slave
-		data_check
+		data_check $SLAVE_IP
 
 		# test upgrade with new master, new slave, and new client
 		upgrade_master 
-		data_check
+		data_check $MASTER_IP
+
 		# uninstall everything so we can start over
 		uninstall	
 	rlPhaseEnd
@@ -94,15 +95,15 @@ upgrade_test_master_slave_client_nodns()
 
 		# test upgrade with old master, old slave, and old client
 		upgrade_master
-		data_check
+		data_check $MASTER_IP
 
 		# test upgrade with new master, new slave, and old client
 		upgrade_slave
-		data_check
+		data_check $SLAVE_IP
 
 		# test upgrade with new master, new slave, and new client
 		upgrade_client
-		data_check
+		data_check $CLIENT_IP
 
 		# uninstall everything so we can start over
 		uninstall
@@ -125,7 +126,7 @@ upgrade_test_master_slave_client_dirsrv_off()
 			rlRun "service dirsrv stop"
 		fi
 		upgrade_master
-		data_check
+		data_check $MASTER_IP
 		
 		# test slave upgrade with dirsrv down
 		if [ "$MYROLE" = "SLAVE" ]; then
@@ -133,11 +134,11 @@ upgrade_test_master_slave_client_dirsrv_off()
 			rlRun "service dirsrv stop"
 		fi
 		upgrade_slave
-		data_check
+		data_check $SLAVE_IP
 
 		# test client upgrade after master and slave upgrades with dirsrv down
 		upgrade_client
-		data_check
+		data_check $CLIENT_IP
 
 		# uninstall everything so we can start over
 		uninstall
