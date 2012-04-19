@@ -397,6 +397,7 @@ upgrade_bz_772359_finish()
 		
 		rlLog "capture LDAP mapping tree data before upgrade from MASTER ($MASTER)"
 		rlRun "ldapsearch -x -D '$ROOTDN' -w '$ROOTDNPWD' -b 'cn=mapping tree,cn=config' > /tmp/ldap_mapping_tree_after_upgrade.out"
+		rlRun "diff /tmp/ldap_mapping_tree.out /tmp/ldap_mapping_tree_after_upgrade.out"
 		if [ $(grep "nsDS5ReplicatedAttributeList:.*EXCLUDE.*memberof" /tmp/ldap_mapping_tree_after_upgrade.out | wc -l) -gt 0 ]; then
 			rlPass "memberof found in Replication Agreement EXCLUDE list"
 			rlPass "BZ 772359 not found."

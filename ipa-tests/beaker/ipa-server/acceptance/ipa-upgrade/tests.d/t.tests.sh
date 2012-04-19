@@ -36,22 +36,20 @@ upgrade_test_master_slave_client_all()
 {	
 	rlPhaseStartTest "upgrade_test_msc_all: test full setup for master, then slave, then client"
 		# Install and setup environment and add data
-		ipa_install_master_all
-		ipa_install_slave_all
-		ipa_install_client
+		install_all
 		data_add
 
 		# test upgrade with new master, old slave, and old client
 		upgrade_master 
-		data_check $MASTER_IP
+		data_check_all
 
 		# test upgrade with new master, new slave, and old client 
 		upgrade_slave
-		data_check $SLAVE_IP
+		data_check_all
 
 		# test upgrade with new master, new slave, and new client
 		upgrade_client
-		data_check $CLIENT_IP
+		data_check_all
 
 		# uninstall everything so we can start over
 		uninstall	
@@ -60,16 +58,22 @@ upgrade_test_master_slave_client_all()
 	
 upgrade_test_client_slave_master_all()
 {
+	local tmpout=/tmp/errormsg.out
 	rlPhaseStartTest "upgrade_test_client_slave_master_all: test full setup for client, then slave, then master"
 		# Install and setup environment and add data
-		ipa_install_master_all
-		ipa_install_slave_all
-		ipa_install_client
+		install_all
 		data_add
 
 		# test upgrade with old master, old slave, and new client
 		upgrade_client
-		data_check $CLIENT_IP
+		# No data_check here because it will fail...need negative checks for ipa commands
+		# can't upgrade client first or ipa commands won't work.  native ones do but, ipa ones don't.
+		KinitAsAdmin 
+		rlRun "ipa user-find > $tmpout 2>&1" 
+		if [ $(grep -i "version" $tmpout| wc -l) -gt 0 ]; then
+			rlPass "Expected failure seen running ipa commands after upgrading client first"
+		fi
+		rlRun "cat $tmpout"
 
 		# test upgrade with old master, new slave, and new client 
 		upgrade_slave
@@ -78,6 +82,9 @@ upgrade_test_client_slave_master_all()
 		# test upgrade with new master, new slave, and new client
 		upgrade_master 
 		data_check $MASTER_IP
+		
+		# check data from client again to make sure things look good now
+		data_check $CLIENT_IP
 
 		# uninstall everything so we can start over
 		uninstall	
@@ -88,9 +95,7 @@ upgrade_test_master_slave_client_nodns()
 {
 	rlPhaseStartTest "upgrade_test_master_slave_client_nodns: Test setup without dns for master, then slave, then client"
 		# Install and setup environment and add data
-		ipa_install_master_nodns
-		ipa_install_slave_nodns
-		ipa_install_client
+		install_nodns
 		data_add
 
 		# test upgrade with old master, old slave, and old client
@@ -115,9 +120,7 @@ upgrade_test_master_slave_client_dirsrv_off()
 {
 	rlPhaseStartTest "upgrade_test_master_slave_client_dirsrv_off: Test upgrade with dirsrv down before upgrade"
 		# Install and setup environment and add data
-		ipa_install_master_all
-		ipa_install_slave_all
-		ipa_install_client
+		install_all
 		data_add
 
 		# test master upgrade with dirsrv down
@@ -146,16 +149,42 @@ upgrade_test_master_slave_client_dirsrv_off()
 	rlPhaseEnd
 }
 
-#	install_all
-#	data_add
-#	bz000000_disable_dirsrv
-#	upgrade
-#	bz000000_check
-#	data_check
-#	uninstall
-#
-#	# Final upgrade to run other beaker test sets against 
-#	install_all
-#	upgrade_master
-#	upgrade_slave
-#	upgade_client
+upgrade_test_master_bz_tests()
+{
+	rlPhaseStartTest "upgrade_test_master_bz_tests: execute bug tests against a master upgrade"
+		# Install and setup master for bug checks
+		ipa_install_master_all
+
+		# Running start function for 772359 to capture info before upgrade
+		upgrade_bz_772359_start
+
+		# upgrade master and check data
+		upgrade_master
+		
+		# Now execute bug checks
+		upgrade_bz_772359_finish
+		upgrade_bz_766096
+		upgrade_bz_746589
+		upgrade_bz_782918
+		upgrade_bz_803054
+		upgrade_bz_809262
+		upgrade_bz_808201
+		upgrade_bz_803930
+		upgrade_bz_812391
+
+		# uninstall everything so we can start over
+		ipa_uninstall_master
+			
+	rlPhaseEnd
+}
+
+
+upgrade_test_master_slave_client_all_final()
+{	
+	rlPhaseStartTest "upgrade_test_master_slave_client_all_final: Install and upgrade to leave in a state for other testing"
+		install_all
+		upgrade_master 
+		upgrade_slave
+		upgrade_client
+	rlPhaseEnd
+}

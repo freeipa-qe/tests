@@ -60,6 +60,13 @@
 ######################################################################
 # test suite
 ######################################################################
+data_check_all()
+{
+	data_check $MASTER_IP
+	data_check $SLAVE_IP
+	data_check $CLIENT_IP
+}
+
 data_check()
 {
 	local TARGET_IP=$1
