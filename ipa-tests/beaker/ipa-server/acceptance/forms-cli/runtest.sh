@@ -91,9 +91,18 @@ rlJournalStart
 	
 	nfuser=tbokl
 	nfgroup=lookgt
+	dnsrecname=formtnamedns
+	ipaddressa="33.44.55.66"
+	ipaddressb="99.88.77.66"
+	badipaddressa="333.111.222.444"
 	jsonfile=/dev/shm/forms-cli-json.script
 	jsonfilegrp=/dev/shm/forms-cli-json-grp.script
 	jsonfilegrpdel=/dev/shm/forms-cli-json-grp-del.script
+	jsondnsadda=/dev/shm/forms-cli-add-dnsa.script
+	jsondnsaddb=/dev/shm/forms-cli-add-dnsb.script
+	badjsondnsadda=/dev/shm/forms-cli-add-badjsondnsadda.script
+	jsondnsdela=/dev/shm/forms-cli-del-dnsa.script
+
 echo "{
     \"method\":\"user_add\",
    
@@ -114,6 +123,29 @@ echo "{
     ],
     \"id\":1}" >$jsonfilegrpdel
 
+echo "{
+    \"method\":\"dnsrecord_add\",
+\"params\":[[],{\"dnszoneidnsname\":\"$DOMAIN\",\"idnsname\":\"$dnsrecname\",\"arecord\":\"$ipaddressa\"}
+    ],
+    \"id\":1}" > $jsondnsadda
+
+echo "{
+    \"method\":\"dnsrecord_del\",
+\"params\":[[],{\"dnszoneidnsname\":\"$DOMAIN\",\"idnsname\":\"$dnsrecname\",\"arecord\":\"$ipaddressa\"}
+    ],
+    \"id\":1}" > $jsondnsdela
+
+echo "{
+    \"method\":\"dnsrecord_add\",
+\"params\":[[],{\"dnszoneidnsname\":\"$DOMAIN\",\"idnsname\":\"$dnsrecname\",\"arecord\":\"$ipaddressb\"}
+    ],
+    \"id\":1}" > $jsondnsaddb
+
+echo "{
+    \"method\":\"dnsrecord_add\",
+\"params\":[[],{\"dnszoneidnsname\":\"$DOMAIN\",\"idnsname\":\"$dnsrecname\",\"arecord\":\"$badipaddressa\"}
+    ],
+    \"id\":1}" > $badjsondnsadda
 
 
 	rlPhaseStartTest "forms-cli-02: Ensure that json script does not work without a valid session ID"
@@ -150,7 +182,7 @@ echo "{
 		export sessionid
 		rlLog "new admin session ID is $sessionid"
 	rlPhaseEnd
-		
+
 	rlPhaseStartTest "forms-cli-06: Create a new user with the aquired session id. ie, retry forms-cli-02 with valid credentials."
 		echo "url -v -H \"Content-Type:application/json\" -H \"Referer: https://$MASTER/ipa/xml\" -H \"Accept:application/json\"  -H \"Accept-Language:en\" --cacert /etc/ipa/ca.crt -d  @$jsonfile -X POST -b \"ipa_session=$sessionid; httponly; Path=/ipa; secure\" https://$MASTER/ipa/session/json"
 		curl -v -H "Content-Type:application/json" -H "Referer: https://$MASTER/ipa/xml" -H "Accept:application/json"  -H "Accept-Language:en" --cacert /etc/ipa/ca.crt -d  @$jsonfile -X POST -b "ipa_session=$sessionid; httponly; Path=/ipa; secure" https://$MASTER/ipa/session/json &> $outputf 
@@ -174,6 +206,49 @@ echo "{
 		rlLog "cat $outputf | grep Deleted group | grep $nfgroup" 0 "make sure that the groups name is listed as deleted in the output of the test command"
 		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 		rlRun "ipa group-find $nfgroup" 1 "Make sure that admin is not able to find the new group $nfgroup"
+	rlPhaseEnd
+
+	rlPhaseStartTest "forms-cli-09: Add a good A record with forms based authentication."
+		kdestroy
+		curl -v -H "Content-Type:application/json" -H "Referer: https://$MASTER/ipa/xml" -H "Accept:application/json"  -H "Accept-Language:en" --cacert /etc/ipa/ca.crt -d  @$jsondnsadda -X POST -b "ipa_session=$sessionid; httponly; Path=/ipa; secure" https://$MASTER/ipa/session/json &> $outputf 
+		rlLog "cat $outputf | grep idnsname | grep $dnsrecname" 0 "make sure that the new dns name seems to be in the add output"
+		rlLog "cat $outputf | grep $ipaddressa" 0 "make sure that the new ipaddress seems to be in the add output"
+		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+ipa dnsrecord-find $DOMAIN $dnsrecname
+		rlRun "ipa dnsrecord-find $DOMAIN $dnsrecname | grep $ipaddressa" 0 "Make sure that the new ipa address seems to be in the server"
+	rlPhaseEnd
+
+	rlPhaseStartTest "forms-cli-10: Add a second good A record with forms based authentication."
+		kdestroy
+		echo "curl -v -H \"Content-Type:application/json\" -H \"Referer: https://$MASTER/ipa/xml\" -H \"Accept:application/json\" -H \"Accept-Language:en\" --cacert /etc/ipa/ca.crt -d  @$jsondnsaddb -X POST -b \"ipa_session=$sessionid; httponly; Path=/ipa; secure\" https://$MASTER/ipa/session/json"
+		curl -v -H "Content-Type:application/json" -H "Referer: https://$MASTER/ipa/xml" -H "Accept:application/json"  -H "Accept-Language:en" --cacert /etc/ipa/ca.crt -d  @$jsondnsaddb -X POST -b "ipa_session=$sessionid; httponly; Path=/ipa; secure" https://$MASTER/ipa/session/json &> $outputf 
+		rlLog "cat $outputf | grep idnsname | grep $dnsrecname" 0 "make sure that the new dns name seems to be in the add output"
+		rlLog "cat $outputf | grep $ipaddressa" 0 "make sure that the original ipaddress seems to be in the add output"
+		rlLog "cat $outputf | grep $ipaddressb" 0 "make sure that the new ipaddress seems to be in the add output"
+		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+		rlRun "ipa dnsrecord-find $DOMAIN $dnsrecname | grep $ipaddressa" 0 "Make sure that the original ip address seems to be in the server"
+		rlRun "ipa dnsrecord-find $DOMAIN $dnsrecname | grep $ipaddressb" 0 "Make sure that the new ip address seems to be in the server"
+	rlPhaseEnd
+
+	rlPhaseStartTest "forms-cli-11: Try to add a bad ip a record with forma based auth."
+		kdestroy
+		curl -v -H "Content-Type:application/json" -H "Referer: https://$MASTER/ipa/xml" -H "Accept:application/json"  -H "Accept-Language:en" --cacert /etc/ipa/ca.crt -d  @$badjsondnsadda -X POST -b "ipa_session=$sessionid; httponly; Path=/ipa; secure" https://$MASTER/ipa/session/json &> $outputf 
+		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+		rlRun "ipa dnsrecord-find $DOMAIN $dnsrecname | grep $ipaddressa" 0 "Make sure that the first original ip address seems to be in the server"
+		rlRun "ipa dnsrecord-find $DOMAIN $dnsrecname | grep $ipaddressb" 0 "Make sure that the second original ip address seems to be in the server"
+		rlRun "ipa dnsrecord-find $DOMAIN $dnsrecname | grep $badipaddressa" 1 "Make sure that the bad ip address isn't on the server"
+	rlPhaseEnd
+
+	rlPhaseStartTest "forms-cli-12: Delete A record with forms based authentication."
+		kdestroy
+		curl -v -H "Content-Type:application/json" -H "Referer: https://$MASTER/ipa/xml" -H "Accept:application/json"  -H "Accept-Language:en" --cacert /etc/ipa/ca.crt -d  @$jsondnsdela -X POST -b "ipa_session=$sessionid; httponly; Path=/ipa; secure" https://$MASTER/ipa/session/json &> $outputf 
+		rlLog "cat $outputf | grep $ipaddressa" 0 "make sure that the first original ipaddress seems to be in the add output"
+		rlLog "cat $outputf | grep $ipaddressb" 0 "make sure that the second original ipaddress seems to be in the add output"
+		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+		rlRun "ipa dnsrecord-find $DOMAIN $dnsrecname | grep $ipaddressa" 1 "Make sure that the original ip address has been removed the server"
+		rlRun "ipa dnsrecord-find $DOMAIN $dnsrecname | grep $ipaddressb" 0 "Make sure that the new ip address seems to be in the server"
+		rlRun "ipa dnsrecord-find $DOMAIN $dnsrecname | grep $badipaddressa" 1 "Make sure that the bad ip address isn't on the server"
+		rlRun "ipa dnsrecord-del $DOMAIN $dnsrecname --a-rec=$ipaddressb" 0 "cleanup the second added a record."
 	rlPhaseEnd
 
 	rlJournalPrintText
