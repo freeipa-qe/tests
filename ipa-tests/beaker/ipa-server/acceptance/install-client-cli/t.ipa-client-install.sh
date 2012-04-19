@@ -95,6 +95,8 @@ ipaclientinstall()
 #  --preserve-sssd     Preserve old SSSD configuration if possible
       ipaclientinstall_preservesssd
 
+# Bug 753526  - ipa-client-install rejects machines with hostname as localhost or localhost.localdomain #Added by Kaleem
+      ipaclientinstall_client_hostname_localhost
 
 }
 
@@ -721,6 +723,23 @@ ipaclientinstall_withmasterdown()
     rlPhaseEnd
 }
 
+ipaclientinstall_client_hostname_localhost() #Added by Kaleem
+{
+    rlPhaseStartTest "ipa-client-install-38 (Negative) hostname=localhost or localhost.localdomain - BZ 753526"
+        uninstall_fornexttest
+        rlRun "hostname localhost.localdomain"
+        rlLog "EXECUTING: ipa-client-install --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW --unattended --server=$MASTER"
+        rlRun "ipa-client-install --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW --unattended --server=$MASTER > $TmpDir/temp.out 2>&1" 1 "Installing ipa client where client's hostname is localhost.localdomain"
+        rlRun "cat $TmpDir/temp.out"
+        rlAssertGrep "Invalid hostname, 'localhost.localdomain' must not be used" "$TmpDir/temp.out"
+
+        rlRun "hostname localhost"
+        rlLog "EXECUTING: ipa-client-install --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW --unattended --server=$MASTER"
+        rlRun "ipa-client-install --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW --unattended --server=$MASTER > $TmpDir/temp.out 2>&1" 1 "Installing ipa client where client's hostname is localhost"
+        rlRun "cat $TmpDir/temp.out"
+        rlAssertGrep "Invalid hostname, 'localhost.localdomain' must not be used" "$TmpDir/temp.out"
+    rlPhaseEnd
+}
 
 ##############################################################
 # Verify files updated during install and unistall
