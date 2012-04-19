@@ -29,7 +29,7 @@ export TESTVERSION=1.0
 
 BUILT_FILES=
 
-FILES=$(METADATA) runtest.sh Makefile PURPOSE t.ipa-services.sh 
+FILES=$(METADATA) runtest.sh Makefile PURPOSE t.ipa-services.sh t.ipa-services_bz.sh
 
 .PHONY: all install download clean
 

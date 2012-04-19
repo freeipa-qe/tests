@@ -41,6 +41,7 @@
 
 # Include test case file
 . ./t.ipa-services.sh
+. ./t.ipa-services_bz.sh
 
 PACKAGELIST="ipa-admintools"
 
@@ -158,6 +159,7 @@ rlJournalStart
         service-mod          # Modify an existing IPA service.
         service-remove-host  # Remove hosts that can manage this service.
         service-show         # Display information about an IPA service.
+	service_bugs
   else
                 rlLog "Environment not correct - not running tests"
   fi 
