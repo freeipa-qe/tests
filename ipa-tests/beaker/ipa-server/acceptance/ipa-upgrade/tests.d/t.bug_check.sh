@@ -453,6 +453,8 @@ upgrade_bz_812391()
 			rlFail "Found installation state not restored errors in ipaserver-uninstall.log"
 			grep "ERROR Some installation state for dirsrv has not been restored" /var/log/ipaserver-uninstall.log
 			rlFail "BZ 812391 found...IPA uninstall after upgrade returns some sysrestore.state errors"
+		else
+			rlPass "BZ 812391 not found...installation state errors not found in ipaserver-uninstall.log"
 		fi
 
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.1' -m $MASTER_IP"
@@ -467,6 +469,8 @@ upgrade_bz_812391()
 			rlFail "Found installation state not restored errors in ipaserver-uninstall.log"
 			grep "ERROR Some installation state for dirsrv has not been restored" /var/log/ipaserver-uninstall.log
 			rlFail "BZ 812391 found...IPA uninstall after upgrade returns some sysrestore.state errors"
+		else
+			rlPass "BZ 812391 not found...installation state errors not found in ipaserver-uninstall.log"
 		fi
 
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.2' -m $SLAVE_IP"
