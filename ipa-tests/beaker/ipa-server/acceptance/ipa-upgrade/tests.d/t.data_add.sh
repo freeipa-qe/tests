@@ -55,7 +55,7 @@
 data_add()
 {
 	TESTORDER=$(( TESTORDER += 1 ))
-	rlPhaseStartTest "upgrade_data_add: add test data to IPA"
+	rlPhaseStartTest "data_add: add test data to IPA"
 	case "$MYROLE" in
 	"MASTER")
 		rlLog "Machine in recipe is MASTER"
@@ -69,9 +69,11 @@ data_add()
 		rlRun "ipa group-add ${group[1]} --desc=GROUP_${group[1]}"
 		rlRun "ipa group-add ${group[2]} --desc=GROUP_${group[2]}"
 
-		# Add DNS Records (PTR)
-		rlRun "ipa dnszone-add ${dnsptr[1]} --name-server=${MASTER} --admin-email=ipaqar.redhat.com"
-		rlRun "ipa dnszone-add ${dnsptr[2]} --name-server=${MASTER} --admin-email=ipaqar.redhat.com"
+		if [ "x$USEDNS" = "xyes" ]; then
+			# Add DNS Records (PTR)
+			rlRun "ipa dnszone-add ${dnsptr[1]} --name-server=${MASTER} --admin-email=ipaqar.redhat.com"
+			rlRun "ipa dnszone-add ${dnsptr[2]} --name-server=${MASTER} --admin-email=ipaqar.redhat.com"
+		fi
 
 		# Add hosts
 		rlRun "ipa host-add ${host[1]} --ip-address=${ipv4[1]}"

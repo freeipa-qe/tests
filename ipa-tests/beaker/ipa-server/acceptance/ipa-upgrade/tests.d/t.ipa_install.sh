@@ -109,6 +109,7 @@ ipa_install_prep(){
 }
 
 ipa_install_master_all(){
+	USEDNS="yes"
 	TESTORDER=$(( TESTORDER += 1 ))
 	rlPhaseStartTest "ipa_install_master_all: Install and configure IPA Master with all services"
 	case "$MYROLE" in
@@ -143,6 +144,7 @@ ipa_install_master_all(){
 }
 
 ipa_install_master_nodns(){
+	USEDNS="no"
 	TESTORDER=$(( TESTORDER += 1 ))
 	rlPhaseStartTest "ipa_install_master_nodns: Install and configure IPA Master with no DNS service"
 	case "$MYROLE" in
@@ -177,12 +179,17 @@ ipa_install_master_nodns(){
 }
 
 ipa_install_slave_all(){
+	USEDNS="yes"
 	TESTORDER=$(( TESTORDER += 1 ))
 	rlPhaseStartTest "ipa_install_slave_all: Install and configure IPA Replica/Slave"
 	case "$MYROLE" in
 	"MASTER")
 		rlLog "Machine in recipe is MASTER"
-		rlRun "ipa-replica-prepare -p $ADMINPW --ip-address=$SLAVE_IP $SLAVE_S.$DOMAIN"
+		if [ "x$USEDNS" = "xyes" ]; then
+			rlRun "ipa-replica-prepare -p $ADMINPW --ip-address=$SLAVE_IP $SLAVE_S.$DOMAIN"
+		else
+			rlRun "ipa-replica-prepare -p $ADMINPW $SLAVE_S.$DOMAIN"
+		fi
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.1' -m $MASTER_IP"
 		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $SLAVE_IP"
 		;;
@@ -222,12 +229,17 @@ ipa_install_slave_all(){
 }
 
 ipa_install_slave_nodns(){
+	USEDNS="no"
 	TESTORDER=$(( TESTORDER += 1 ))
 	rlPhaseStartTest "ipa_install_slave_nodns: Install and configure IPA Replica/Slave"
 	case "$MYROLE" in
 	"MASTER")
 		rlLog "Machine in recipe is MASTER"
-		rlRun "ipa-replica-prepare -p $ADMINPW --ip-address=$SLAVE_IP $SLAVE_S.$DOMAIN"
+		if [ "x$USEDNS" = "xyes" ]; then
+			rlRun "ipa-replica-prepare -p $ADMINPW --ip-address=$SLAVE_IP $SLAVE_S.$DOMAIN"
+		else
+			rlRun "ipa-replica-prepare -p $ADMINPW $SLAVE_S.$DOMAIN"
+		fi
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.1' -m $MASTER_IP"
 		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $SLAVE_IP"
 		;;

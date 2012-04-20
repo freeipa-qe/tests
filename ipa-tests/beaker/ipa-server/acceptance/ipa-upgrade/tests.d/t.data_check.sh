@@ -100,24 +100,28 @@ data_check()
 		rlRun "getent group ${group[2]}"
 
 		# check  DNS Records (PTR)
-		rlRun "ipa dnszone-show ${dnsptr[1]}"
-		rlRun "ipa dnszone-show ${dnsptr[2]}"
-		rlRun "dig +short ${dnsptr[1]} ns > $tmpout 2>&1"
-		rlRun "cat $tmpout"
-		rlAssertGrep "$MASTER_S.$DOMAIN" $tmpout
-		rlRun "dig +short ${dnsptr[2]} ns > $tmpout 2>&1"
-		rlRun "cat $tmpout"
-		rlAssertGrep "$MASTER_S.$DOMAIN" $tmpout
+		if [ "x$USEDNS" = "xyes" ]; then
+			rlRun "ipa dnszone-show ${dnsptr[1]}"
+			rlRun "ipa dnszone-show ${dnsptr[2]}"
+			rlRun "dig +short ${dnsptr[1]} ns > $tmpout 2>&1"
+			rlRun "cat $tmpout"
+			rlAssertGrep "$MASTER_S.$DOMAIN" $tmpout
+			rlRun "dig +short ${dnsptr[2]} ns > $tmpout 2>&1"
+			rlRun "cat $tmpout"
+			rlAssertGrep "$MASTER_S.$DOMAIN" $tmpout
+		fi
 
 		# check  hosts
 		rlRun "ipa host-show ${host[1]}"
 		rlRun "ipa host-show ${host[2]}"
-		rlRun "dig +short ${host[1]} a > $tmpout 2>&1"
-		rlRun "cat $tmpout"
-		rlAssertGrep "${ipv4[1]}" $tmpout
-		rlRun "dig +short ${host[2]} a > $tmpout 2>&1"
-		rlRun "cat $tmpout"
-		rlAssertGrep "${ipv4[2]}" $tmpout
+		if [ "x$USEDNS" = "xyes" ]; then
+			rlRun "dig +short ${host[1]} a > $tmpout 2>&1"
+			rlRun "cat $tmpout"
+			rlAssertGrep "${ipv4[1]}" $tmpout
+			rlRun "dig +short ${host[2]} a > $tmpout 2>&1"
+			rlRun "cat $tmpout"
+			rlAssertGrep "${ipv4[2]}" $tmpout
+		fi
 
 		# check  hostgroups
 		rlRun "ipa hostgroup-show ${hostgroup[1]}"
