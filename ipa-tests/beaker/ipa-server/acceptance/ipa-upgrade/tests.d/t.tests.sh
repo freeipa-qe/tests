@@ -154,12 +154,14 @@ upgrade_test_master_bz_tests()
 	rlPhaseStartTest "upgrade_test_master_bz_tests: execute bug tests against a master upgrade"
 		# Install and setup master for bug checks
 		ipa_install_master_all
+		ipa_install_slave_all
 
 		# Running start function for 772359 to capture info before upgrade
 		upgrade_bz_772359_start
 
 		# upgrade master and check data
 		upgrade_master
+		upgrade_slave
 		
 		# Now execute bug checks
 		upgrade_bz_772359_finish
