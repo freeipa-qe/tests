@@ -125,7 +125,12 @@ ipa_uninstall_client()
 	"MASTER")
 		rlLog "Machine in recipe is MASTER"
 		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $CLIENT_IP"
-		rlRun "ipa host-del $CLIENT_S.$DOMAIN --updatedns"
+		if [ "x$USEDNS" = "xyes" ]; then
+			rlRun "ipa host-del $CLIENT_S.$DOMAIN --updatedns"
+		else
+			rlRun "ipa host-del $CLIENT_S.$DOMAIN"
+		fi
+			
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.2' -m $MASTER_IP"
 		;;
 	"SLAVE")
