@@ -68,13 +68,15 @@ upgrade_test_client_slave_master_all()
 		upgrade_client
 		# No data_check here because it will fail...need negative checks for ipa commands
 		# can't upgrade client first or ipa commands won't work.  native ones do but, ipa ones don't.
-		KinitAsAdmin 
-		rlLog "Running negative test for ipa commands failing when client upgraded first"
-		rlRun "ipa --delegate user-find > $tmpout 2>&1" 1
-		if [ $(grep "ERROR.*client incompatible with.*server" $tmpout| wc -l) -gt 0 ]; then
-			rlPass "Expected failure seen running ipa commands after upgrading client first"
+		if [ "$MYROLE" = "CLIENT" ]; then
+			KinitAsAdmin 
+			rlLog "Running negative test for ipa commands failing when client upgraded first"
+			rlRun "ipa --delegate user-find > $tmpout 2>&1" 1
+			if [ $(grep "ERROR.*client incompatible with.*server" $tmpout| wc -l) -gt 0 ]; then
+				rlPass "Expected failure seen running ipa commands after upgrading client first"
+			fi
+			rlRun "cat $tmpout"
 		fi
-		rlRun "cat $tmpout"
 
 		# test upgrade with old master, new slave, and new client 
 		upgrade_slave
