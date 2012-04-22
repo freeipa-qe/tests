@@ -149,11 +149,11 @@ ingroups()
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-group-find-011 Negative Test of --not-in-groups in group-find"
-	rlRun "ipa group-find --not-in-groups=$group1 | grep Group\ name: | grep $group3" 0 "Making sure that group $group2 does not come back when searching --not-in-groups=$group1"
+	rlRun "ipa group-find --not-in-groups=$group1 | grep Group\ name: | grep $group2" 1 "Making sure that group $group2 does not come back when searching --not-in-groups=$group1"
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-group-find-012 Positive test of --not-in-groups in group-find"
-	rlRun "ipa group-find --not-in-groups=$group1 | grep Group\ name: | grep $group2" 1 "Making sure that group $group3 comes back when searching --not-in-groups=$group1"
+	rlRun "ipa group-find --not-in-groups=$group1 | grep Group\ name: | grep $group3" 0 "Making sure that group $group3 comes back when searching --not-in-groups=$group1"
     rlPhaseEnd
 }
 
