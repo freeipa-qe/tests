@@ -173,7 +173,7 @@ negative()
     rlPhaseStartTest "ipa-group-negative-009 Not Allowed special characters *"
         command="ipa group-add --desc=\"test*\" \"test*\""
         expmsg="ipa: ERROR: invalid 'group_name': may only include letters, numbers, _, -, . and $"
-        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
+        rlRun "verifyErrorMsg '$command' \"$expmsg\"" 0 "Verify expected error message."
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-group-negative-010 Not Allowed special characters +"
