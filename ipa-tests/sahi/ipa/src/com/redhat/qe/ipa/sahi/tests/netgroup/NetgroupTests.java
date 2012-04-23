@@ -18,6 +18,8 @@ import com.redhat.qe.ipa.sahi.tasks.GroupTasks;
 import com.redhat.qe.ipa.sahi.tasks.HostTasks;
 import com.redhat.qe.ipa.sahi.tasks.HostgroupTasks;
 import com.redhat.qe.ipa.sahi.tasks.NetgroupTasks;
+import com.redhat.qe.ipa.sahi.tasks.PrivilegeTasks;
+import com.redhat.qe.ipa.sahi.tasks.SudoTasks;
 import com.redhat.qe.ipa.sahi.tasks.UserTasks;
 
 public class NetgroupTests extends SahiTestScript{
@@ -103,7 +105,7 @@ public class NetgroupTests extends SahiTestScript{
 		sahiTasks.navigateTo(commonTasks.userPage, true);
 		for (String username : users){
 			UserTasks.createUser(sahiTasks, username, username, username, "Add");
-		}
+		} 
 		
 		//add net groups
 		sahiTasks.navigateTo(commonTasks.netgroupPage, true);
@@ -111,6 +113,7 @@ public class NetgroupTests extends SahiTestScript{
 			String description = netgroup + " group";
 			NetgroupTasks.addNetGroup(sahiTasks, netgroup, description, "Add");
 		}
+		sahiTasks.navigateTo(commonTasks.netgroupPage, true);
 	}
 	
 	@AfterClass (groups={"cleanup"}, description="Delete objects added for the tests", alwaysRun=true)
@@ -258,165 +261,63 @@ public class NetgroupTests extends SahiTestScript{
 	}
 	
 	/*
-	 * Host Members tests
+	 * Unsaved changes tests
 	 */
-	@Test (groups={"netGroupHostMembersTests"}, dataProvider="getNetGroupHostMembersTestObjects")
-	public void testNetGroupHostMembers(String testName) throws Exception {
-		// cancel enroll
-		NetgroupTasks.addMembers(sahiTasks, enggroup, "host", enghosts, "Cancel");
-		NetgroupTasks.verifyMembers(sahiTasks, enggroup, "host", enghosts, "NO");
+	@Test (groups={"netGroupUnsavedChangesTests"}, dataProvider="getNetGroupUnsavedChangesTestObjects")
+	public void testnetGroupUnsavedChanges(String testName, String cn, String description, String action) throws Exception {
 		
-		// add the host members
-		NetgroupTasks.addMembers(sahiTasks, devgroup, "host", devhosts, "Enroll");
-		NetgroupTasks.addMembers(sahiTasks, qegroup, "host", qehosts, "Enroll");
-		NetgroupTasks.addMembers(sahiTasks, enggroup, "host", enghosts, "Enroll");
-		
-		//verify the host members
-		NetgroupTasks.verifyMembers(sahiTasks, devgroup, "host", devhosts, "YES");
-		NetgroupTasks.verifyMembers(sahiTasks, qegroup, "host", qehosts, "YES");
-		NetgroupTasks.verifyMembers(sahiTasks, enggroup, "host", enghosts, "YES");
-		
-		//nest the host groups
-		NetgroupTasks.addMembers(sahiTasks, enggroup, "netgroup", nestedmembers, "Enroll");
-		
-		//verify member of for hosts
-		sahiTasks.navigateTo(commonTasks.hostPage, true);
-		HostTasks.verifyHostMemberOf(sahiTasks, devwebserver + "." + domain, "Netgroups", devgroup, "direct", "YES", false);
-		HostTasks.verifyHostMemberOf(sahiTasks, devwebserver + "." + domain, "Netgroups", enggroup, "indirect", "YES", false);
-		HostTasks.verifyHostMemberOf(sahiTasks, qewebserver + "." + domain, "Netgroups", qegroup, "direct", "YES", false);
-		HostTasks.verifyHostMemberOf(sahiTasks, qewebserver + "." + domain, "Netgroups", enggroup, "indirect", "YES", false);
-		HostTasks.verifyHostMemberOf(sahiTasks, engwebserver + "." + domain, "Netgroups", enggroup, "direct", "YES", false);
-		
-		//cancel remove members
-		sahiTasks.navigateTo(commonTasks.netgroupPage, true);
-		NetgroupTasks.removeMember(sahiTasks, enggroup, "host", enghosts, "Cancel");
-		NetgroupTasks.verifyMembers(sahiTasks, enggroup, "host", enghosts, "YES");
-		
-		// add the host members
-		NetgroupTasks.removeMember(sahiTasks, devgroup, "host", devhosts, "Delete");
-		NetgroupTasks.removeMember(sahiTasks, qegroup, "host", qehosts, "Delete");
-		NetgroupTasks.removeMember(sahiTasks, enggroup, "host", enghosts, "Delete");
-		
-		//verify the host members
-		NetgroupTasks.verifyMembers(sahiTasks, devgroup, "host", devhosts, "NO");
-		NetgroupTasks.verifyMembers(sahiTasks, qegroup, "host", qehosts, "NO");
-		NetgroupTasks.verifyMembers(sahiTasks, enggroup, "host", enghosts, "NO");
-		
-		sahiTasks.navigateTo(commonTasks.netgroupPage, true);
+		NetgroupTasks.unsavedChangesNetgroup(sahiTasks, cn, description, action);
+		if (action.equals("Update")) {
+			NetgroupTasks.modifyNetgroupDescription(sahiTasks, cn, description);
+		}
 	}
+		
+	
+		
 	
 	/*
-	 * Host Group Members tests
+	 * Members tests
 	 */
-	@Test (groups={"netGroupHostGroupMembersTests"}, dataProvider="getNetGroupHostGroupMembersTestObjects")
-	public void testNetGroupHostGroupMembers(String testName) throws Exception {
-		//cancel add host group member
-		NetgroupTasks.addMembers(sahiTasks, devgroup, "hostgroup", grp1members, "Cancel");
-		NetgroupTasks.verifyMembers(sahiTasks, devgroup, "hostgroup", grp1members, "NO");
+	@Test (groups={"netGroupMembersUndoRefreshResetUpdateTests"}, dataProvider="getNetGroupUndoRefreshResetUpdateTestObjects")
+	public void testnetGroupMembersUndoRefreshResetUpdate(String testName, String cn, String category, String action) throws Exception {
 		
-		// add the host group members
-		NetgroupTasks.addMembers(sahiTasks, devgroup, "hostgroup", grp1members, "Enroll");
-		NetgroupTasks.addMembers(sahiTasks, qegroup, "hostgroup", grp2members, "Enroll");
-		
-		//verify the host group members
-		NetgroupTasks.verifyMembers(sahiTasks, devgroup, "hostgroup", grp1members, "YES");
-		NetgroupTasks.verifyMembers(sahiTasks, qegroup, "hostgroup", grp2members, "YES");
-		
-		//TODO enable this check when bug 727921 is fixed
-		//verify member of host groups
-		//sahiTasks.navigateTo(hostgroupPage, true);
-		//HostgroupTasks.verifyMemberOf(sahiTasks, hostgroup1A, "netgroups", devgroup, "direct", "YES");
-		//HostgroupTasks.verifyMemberOf(sahiTasks, hostgroup1B, "netgroups", devgroup, "direct", "YES");
-		//HostgroupTasks.verifyMemberOf(sahiTasks, hostgroup2, "netgroups", qegroup, "direct", "YES");
-		
-		//cancel remove member
+		NetgroupTasks.undoResetUpdateNetgroup(sahiTasks, cn, category, action);
 		sahiTasks.navigateTo(commonTasks.netgroupPage, true);
-		NetgroupTasks.removeMember(sahiTasks, devgroup, "hostgroup", grp1members, "Cancel");
-		NetgroupTasks.verifyMembers(sahiTasks, devgroup, "hostgroup", grp1members, "YES");
-		
-		//remove members
-		NetgroupTasks.removeMember(sahiTasks, devgroup, "hostgroup", grp1members, "Delete");
-		NetgroupTasks.removeMember(sahiTasks, qegroup, "hostgroup", grp2members, "Delete");
-		
-		//verify the host group members
-		NetgroupTasks.verifyMembers(sahiTasks, devgroup, "hostgroup", grp1members, "NO");
-		NetgroupTasks.verifyMembers(sahiTasks, qegroup, "hostgroup", grp2members, "NO");
-
+		if (action.equals("Update")) {
+			NetgroupTasks.modifyNetgroupMembership(sahiTasks, cn, category);
+		}
 	}
+		
 	
 	/*
-	 * User Group Members tests
+	 * Expand/Collapse details of a Netgroup
 	 */
-	@Test (groups={"netGroupUserGroupMembersTests"}, dataProvider="getNetGroupUserGroupMembersTestObjects")
-	public void testNetGroupUserGroupMembers(String testName) throws Exception {
-		// cancel add user group member
-		NetgroupTasks.addMembers(sahiTasks, devgroup, "usergroup", ugroup1members, "Cancel");
-		NetgroupTasks.verifyMembers(sahiTasks, devgroup, "usergroup", ugroup1members, "NO");
+	@Test (groups={"netgroupExpandCollapseTests"}, description="Expand and Collapse details of a Netgroup", 
+			dataProvider="getNetgroupExpandCollapseTestObjects")
+	public void testNetgroupExpandCollapse(String testName, String cn) throws Exception {
 		
-		// add the user group members
-		NetgroupTasks.addMembers(sahiTasks, devgroup, "usergroup", ugroup1members, "Enroll");
-		NetgroupTasks.addMembers(sahiTasks, qegroup, "usergroup", ugroup2members, "Enroll");
+		NetgroupTasks.expandCollapseNetgroup(sahiTasks, cn);		
 		
-		//verify the host group members
-		NetgroupTasks.verifyMembers(sahiTasks, devgroup, "usergroup", ugroup1members, "YES");
-		NetgroupTasks.verifyMembers(sahiTasks, qegroup, "usergroup", ugroup2members, "YES");
-		
-		//verify user group member of net group
-		sahiTasks.navigateTo(commonTasks.groupPage, true);
-		GroupTasks.verifyMemberOf(sahiTasks, usergroup1A, "netgroups", devgroup, "direct", "YES", false);
-		GroupTasks.verifyMemberOf(sahiTasks, usergroup1B, "netgroups", devgroup, "direct", "YES", false);
-		GroupTasks.verifyMemberOf(sahiTasks, usergroup2, "netgroups", qegroup, "direct", "YES", false);
-		
-		//cancel remove member
-		sahiTasks.navigateTo(commonTasks.netgroupPage, true);
-		NetgroupTasks.removeMember(sahiTasks, devgroup, "usergroup", ugroup1members, "Cancel");
-		NetgroupTasks.verifyMembers(sahiTasks, devgroup, "usergroup", ugroup1members, "YES");
-		
-		//remove members
-		NetgroupTasks.removeMember(sahiTasks, devgroup, "usergroup", ugroup1members, "Delete");
-		NetgroupTasks.removeMember(sahiTasks, qegroup, "usergroup", ugroup2members, "Delete");
-		
-		//verify the user group members
-		NetgroupTasks.verifyMembers(sahiTasks, devgroup, "usergroup", ugroup1members, "NO");
-		NetgroupTasks.verifyMembers(sahiTasks, qegroup, "usergroup", ugroup2members, "NO");
 	}
 	
+	
 	/*
-	 * User Members tests
+	 * Add user member details of a Netgroup
 	 */
-	@Test (groups={"netGroupUserMembersTests"}, dataProvider="getNetGroupUserMembersTestObjects")
-	public void testNetGroupUserMembers(String testName) throws Exception {
-		// cancel add user member
-		NetgroupTasks.addMembers(sahiTasks, devgroup, "user", devusers, "Cancel");
-		NetgroupTasks.verifyMembers(sahiTasks, devgroup, "user", devusers, "NO");
-		
-		// add the user members
-		NetgroupTasks.addMembers(sahiTasks, devgroup, "user", devusers, "Enroll");
-		NetgroupTasks.addMembers(sahiTasks, qegroup, "user", qeusers, "Enroll");
-		
-		//verify the user members
-		NetgroupTasks.verifyMembers(sahiTasks, devgroup, "user", devusers, "YES");
-		NetgroupTasks.verifyMembers(sahiTasks, qegroup, "user", qeusers, "YES");
-		
-		//verify user member of net group
-		sahiTasks.navigateTo(commonTasks.userPage, true);
-		UserTasks.verifyUserMemberOf(sahiTasks, user1, "Netgroups", devgroup, "direct", "YES", false);
-		UserTasks.verifyUserMemberOf(sahiTasks, user2, "Netgroups", devgroup, "direct", "YES", false);
-		UserTasks.verifyUserMemberOf(sahiTasks, user3, "Netgroups", qegroup, "direct", "YES", false);
-		
-		//cancel remove member
-		sahiTasks.navigateTo(commonTasks.netgroupPage, true);
-		NetgroupTasks.removeMember(sahiTasks, devgroup, "user", devusers, "Cancel");
-		NetgroupTasks.verifyMembers(sahiTasks, devgroup, "user", devusers, "YES");
-		
-		//remove members
-		NetgroupTasks.removeMember(sahiTasks, devgroup, "user", devusers, "Delete");
-		NetgroupTasks.removeMember(sahiTasks, qegroup, "user", qeusers, "Delete");
-		
-		//verify the user group members
-		NetgroupTasks.verifyMembers(sahiTasks, devgroup, "user", devusers, "NO");
-		NetgroupTasks.verifyMembers(sahiTasks, qegroup, "user", qeusers, "NO");
+	@Test (groups={"netgroupMemberTests"}, description="Add a member to a Netgroup", 
+			dataProvider="getNetgroupMemberTestObjects")
+	public void testNetgroupMember(String testName, String cn, String section, String type, String name1, String name2, String button, String action) throws Exception {
+		String names[] = {name1, name2};
+		NetgroupTasks.addMembers(sahiTasks, cn, section, type, names, button, action);	
+		//verify
+		NetgroupTasks.verifyMembers(sahiTasks, cn, section, type, names, button, action);
+		//undo the changes for next test
+		if (button.equals("All"))
+			NetgroupTasks.modifyNetgroupMembership(sahiTasks, cn, section.toLowerCase()+"category");
+		if (button.equals("Add") && action.equals("Add")) 
+			NetgroupTasks.deleteUserMembers(sahiTasks, cn, section, type, names, "Delete");
 	}
+		
 	
 
 /*******************************************************
@@ -437,7 +338,8 @@ public class NetgroupTests extends SahiTestScript{
 		ll.add(Arrays.asList(new Object[]{ 		"addnetgroup_cancel",			"newnetgroup",		"this is a new netgroup",	 "Cancel" } ));
 		ll.add(Arrays.asList(new Object[]{ 		"addnetgroup_mixedcase",		"NewNetGroup",		"this is a new netgroup",	 "Add" } ));  
 		ll.add(Arrays.asList(new Object[]{ 		"addnetgroup_longname",			"thisisanetgroupwithaveryveryveryveryveryveryveryveryverylongname",		"Net group with long name",	 "Add" } ));
-		ll.add(Arrays.asList(new Object[]{ 		"addnetgroup_longdesc",			"long description",		"thisisanetgroupwithaveryveryveryveryveryveryveryveryveryveryveryveryveryverylongdescription",	 "Add" } ));
+		ll.add(Arrays.asList(new Object[]{ 		"addnetgroup_longdesc",			"longdescription",		"thisisanetgroupwithaveryveryveryveryveryveryveryveryveryveryveryveryveryverylongdescription",	 "Add" } ));
+		ll.add(Arrays.asList(new Object[]{ 		"addnetgroup_bz815481",			"a",				"this is a new netgroup with one letter name",	 "Add" } ));  
 		return ll;	
 	}
 	
@@ -455,7 +357,7 @@ public class NetgroupTests extends SahiTestScript{
 		ll.add(Arrays.asList(new Object[]{ 		"delete_netgroup_cancel",			"NewNetGroup",															"Cancel" } ));  
 		ll.add(Arrays.asList(new Object[]{ 		"delete_netgroup_cancel",			"NewNetGroup",															"Delete" } ));
 		ll.add(Arrays.asList(new Object[]{ 		"delete_netgroup_longname",			"thisisanetgroupwithaveryveryveryveryveryveryveryveryverylongname", 	"Delete" } ));
-		ll.add(Arrays.asList(new Object[]{ 		"delete_netgroup_longdesc",			"long description",			 											"Delete" } ));
+		ll.add(Arrays.asList(new Object[]{ 		"delete_netgroup_longdesc",			"longdescription",		 											"Delete" } ));
 		return ll;	
 	}
 	
@@ -470,7 +372,7 @@ public class NetgroupTests extends SahiTestScript{
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 	
 		//										testname									groupanme1					groupname2			groupname3
-		ll.add(Arrays.asList(new Object[]{ 		"add_and_add_another_then_del_multiple",	"this is group one",		"marketing",	 	"sales" } ));
+		ll.add(Arrays.asList(new Object[]{ 		"add_and_add_another_then_del_multiple",	"thisisgroupone",		"marketing",	 	"sales" } ));
 		return ll;	
 	}
 	
@@ -490,62 +392,87 @@ public class NetgroupTests extends SahiTestScript{
 	}
 	
 	/*
-	 * Data to be used when adding host members
+	 * Data to be used when updating members
 	 */
-	@DataProvider(name="getNetGroupHostMembersTestObjects")
-	public Object[][] getNetGroupHostMembersTestObjects() {
-		return TestNGUtils.convertListOfListsTo2dArray(createNetGroupHostMembersTestObjects());
+	@DataProvider(name="getNetGroupUndoRefreshResetUpdateTestObjects")
+	public Object[][] getNetGroupUndoRefreshResetUpdateTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createNetGroupUndoRefreshResetUpdateTestObjects());
 	}
-	protected List<List<Object>> createNetGroupHostMembersTestObjects() {		
+	protected List<List<Object>> createNetGroupUndoRefreshResetUpdateTestObjects() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 	
-		//										testname					
-		ll.add(Arrays.asList(new Object[]{ 		"host_memberships" } ));
+		//										testname					netgroup		category			Action	
+		ll.add(Arrays.asList(new Object[]{ 		"host_memberships_undo",	"engineering",	"hostcategory",		"undo"	 } ));
+		ll.add(Arrays.asList(new Object[]{ 		"host_memberships_reset",	"engineering",	"hostcategory",		"Reset"	 } ));	
+		ll.add(Arrays.asList(new Object[]{ 		"host_memberships_reset",	"engineering",	"hostcategory",		"Refresh"	 } ));
+		ll.add(Arrays.asList(new Object[]{ 		"host_memberships_update",	"engineering",	"hostcategory",		"Update" }	));
+		ll.add(Arrays.asList(new Object[]{ 		"user_memberships_undo",	"engineering",	"usercategory",		"undo"	 } ));
+		ll.add(Arrays.asList(new Object[]{ 		"user_memberships_reset",	"engineering",	"usercategory",		"Reset"	 } ));	
+		ll.add(Arrays.asList(new Object[]{ 		"user_memberships_reset",	"engineering",	"usercategory",		"Refresh"	 } ));
+		ll.add(Arrays.asList(new Object[]{ 		"user_memberships_update",	"engineering",	"usercategory",		"Update" }	));
 		return ll;	
 	}
 	
 	/*
-	 * Data to be used when adding host members
+	 * Data to be used when not saving changes
 	 */
-	@DataProvider(name="getNetGroupHostGroupMembersTestObjects")
-	public Object[][] getNetGroupHostGroupMembersTestObjects() {
-		return TestNGUtils.convertListOfListsTo2dArray(createNetGroupHostGroupMembersTestObjects());
+	@DataProvider(name="getNetGroupUnsavedChangesTestObjects")
+	public Object[][] getNetGroupUnsavedChangesTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createNetGroupUnsavedChangesTestObjects());
 	}
-	protected List<List<Object>> createNetGroupHostGroupMembersTestObjects() {		
+	protected List<List<Object>> createNetGroupUnsavedChangesTestObjects() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 	
-		//										testname					
-		ll.add(Arrays.asList(new Object[]{ 		"hostgroup_memberships" } ));
+		//										testname						netgroup		description			Action	
+		ll.add(Arrays.asList(new Object[]{ 		"description_Cancel",			"engineering",	"engineering group",		"Cancel"	 } ));
+		ll.add(Arrays.asList(new Object[]{ 		"description_Reset",			"engineering",	"engineering group",		"Reset"	 } ));	
+		ll.add(Arrays.asList(new Object[]{ 		"description_Update_bz814785",	"engineering",	"engineering group",		"Update"	 } ));
 		return ll;	
 	}
 	
-	/*
-	 * Data to be used when adding user group members
-	 */
-	@DataProvider(name="getNetGroupUserGroupMembersTestObjects")
-	public Object[][] getNetGroupUserGroupMembersTestObjects() {
-		return TestNGUtils.convertListOfListsTo2dArray(createNetGroupUserGroupMembersTestObjects());
-	}
-	protected List<List<Object>> createNetGroupUserGroupMembersTestObjects() {		
-		List<List<Object>> ll = new ArrayList<List<Object>>();
-	
-		//										testname					
-		ll.add(Arrays.asList(new Object[]{ 		"usergroup_memberships" } ));
-		return ll;	
-	}
 	
 	/*
 	 * Data to be used when adding user members
 	 */
-	@DataProvider(name="getNetGroupUserMembersTestObjects")
-	public Object[][] getNetGroupUserMembersTestObjects() {
-		return TestNGUtils.convertListOfListsTo2dArray(createNetGroupUserMembersTestObjects());
+	@DataProvider(name="getNetgroupMemberTestObjects")
+	public Object[][] getNetgroupMemberTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createNetgroupMemberTestObjects());
 	}
-	protected List<List<Object>> createNetGroupUserMembersTestObjects() {		
+	protected List<List<Object>> createNetgroupMemberTestObjects() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 	
-		//										testname					
-		ll.add(Arrays.asList(new Object[]{ 		"user_memberships" } ));
+		// 									testName						 cn		 		section		type			name1							name2						button		action	
+		ll.add(Arrays.asList(new Object[]{ 	"add_user_netgroup",			"engineering",	"User",		"Users",		"devuser1", 					"devuser2",					"Add",		"Add"		 } ));
+		ll.add(Arrays.asList(new Object[]{ 	"add_user_netgroup_cancel",		"engineering",	"User",		"Users",		"qeuser",						"",							"Add",		"Cancel"	 } ));	
+		ll.add(Arrays.asList(new Object[]{ 	"add_user_netgroup_all",		"engineering",	"User",		"Users",		"",								"",							"All", 		"Update"	 } ));
+		ll.add(Arrays.asList(new Object[]{ 	"add_usergroup_netgroup",		"engineering",	"User",		"User Groups",	"group1a", 						"group1b",					"Add",		"Add"		 } ));
+		ll.add(Arrays.asList(new Object[]{ 	"add_usergroup_netgroup_cancel","engineering",	"User",		"User Groups",	"group2",						"",							"Add",		"Cancel"	 } ));	
+		ll.add(Arrays.asList(new Object[]{ 	"add_usergroup_netgroup_all",	"engineering",	"User",		"User Groups",	"",								"",							"All", 		"Update"	 } ));
+		ll.add(Arrays.asList(new Object[]{ 	"add_host_netgroup",			"engineering",	"Host",		"Hosts",		"laptop-dev.testrelm.com", 		"laptop-qa.testrelm.com",	"Add",		"Add"		 } ));
+		ll.add(Arrays.asList(new Object[]{ 	"add_host_netgroup_cancel",		"engineering",	"Host",		"Hosts",		"webserver-dev.testrelm.com",	"",							"Add",		"Cancel"	 } ));	
+		ll.add(Arrays.asList(new Object[]{ 	"add_host_netgroup_all",		"engineering",	"Host",		"Hosts",		"",								"",							"All", 		"Update"	 } ));
+		ll.add(Arrays.asList(new Object[]{ 	"add_hostgroup_netgroup",		"engineering",	"Host",		"Host Groups",	"hostgroup1a", 					"hostgroup1b",				"Add",		"Add"		 } ));
+		ll.add(Arrays.asList(new Object[]{ 	"add_hostgroup_netgroup_cancel","engineering",	"Host",		"Host Groups",	"hostgroup2",					"",							"Add",		"Cancel"	 } ));	
+		ll.add(Arrays.asList(new Object[]{ 	"add_hostgroup_netgroup_all",	"engineering",	"Host",		"Host Groups",	"",								"",							"All", 		"Update"	 } ));
+	
+		return ll;	
+	}
+	
+	
+	
+	
+	/*
+	 * Data to be used when expanding/collapsing Netgroup details
+	 */
+	@DataProvider(name="getNetgroupExpandCollapseTestObjects")
+	public Object[][] getNetgroupExpandCollapseTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createNetgroupExpandCollapseTestObjects());
+	}
+	protected List<List<Object>> createNetgroupExpandCollapseTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+	
+		//										testname					netgroup		
+		ll.add(Arrays.asList(new Object[]{ 		"netgroup_expand_collapse",	"engineering" } ));
 		return ll;	
 	}
 	

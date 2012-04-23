@@ -8,14 +8,14 @@
 			<run>
 			    <include name="setup" />
 			    <include name="addNetGroupTests" />
-			    <include name="deleteNetGroupTests" />
+			    <include name="deleteNetGroupTests" /> 
 			    <include name="addAndAddAnotherNetGroupTests" />
-			    <include name="deleteMultipleNetGroupTests" />
-			    <include name="addAndEditNetGroupSettingsTest" />
-			    <include name="netGroupHostMembersTests" />
-			    <include name="netGroupHostGroupMembersTests" />
-			    <include name="netGroupUserGroupMembersTests" />
-			    <include name="netGroupUserMembersTests" />
+			    <include name="deleteMultipleNetGroupTests" /> 
+			    <include name="addAndEditNetGroupSettingsTest" />  
+			    <include name="netGroupMembersUndoRefreshResetUpdateTests" /> 
+			    <include name="netGroupUnsavedChangesTests" /> 
+			    <include name="netgroupExpandCollapseTests" /> 
+			    <include name="netgroupUserMemberTests" /> 
 			</run>
 		</groups>
 	</test>

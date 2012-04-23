@@ -20,7 +20,7 @@ public class NetgroupTasks {
 	public static void addNetGroup(SahiTasks sahiTasks, String groupName, String description, String button) {
 		sahiTasks.span("Add").click();
 		sahiTasks.textbox("cn").setValue(groupName);
-		sahiTasks.textbox("description").setValue(description);
+		sahiTasks.textarea("description").setValue(description);
 		sahiTasks.button(button).click();
 	}
 	
@@ -35,17 +35,17 @@ public class NetgroupTasks {
 		String description1 = groupName1 + " description";
 		sahiTasks.span("Add").click();
 		sahiTasks.textbox("cn").setValue(groupName1);
-		sahiTasks.textbox("description").setValue(description1);
+		sahiTasks.textarea("description").setValue(description1);
 		sahiTasks.button("Add and Add Another").click();
 		
 		String description2 = groupName2 + " description";
 		sahiTasks.textbox("cn").setValue(groupName2);
-		sahiTasks.textbox("description").setValue(description2);
+		sahiTasks.textarea("description").setValue(description2);
 		sahiTasks.button("Add and Add Another").click();
 		
 		String description3 = groupName3 + " description";
 		sahiTasks.textbox("cn").setValue(groupName3);
-		sahiTasks.textbox("description").setValue(description3);
+		sahiTasks.textarea("description").setValue(description3);
 		sahiTasks.button("Add").click();
 	}
 	
@@ -60,10 +60,10 @@ public class NetgroupTasks {
 	public static void addAndEditNetGroup(SahiTasks sahiTasks, String groupName, String description1, String description2, String nisdomain) {
 		sahiTasks.span("Add").click();
 		sahiTasks.textbox("cn").setValue(groupName);
-		sahiTasks.textbox("description").setValue(description1);
+		sahiTasks.textarea("description").setValue(description1);
 		sahiTasks.button("Add and Edit").click();
 		sahiTasks.link("Settings").click();
-		sahiTasks.textbox("description").setValue(description2);
+		sahiTasks.textarea("description").setValue(description2);
 		sahiTasks.textbox("nisdomainname").setValue(nisdomain);
 		sahiTasks.span("Update").click();
 		sahiTasks.link("Netgroups").in(sahiTasks.div("content")).click();
@@ -79,7 +79,7 @@ public class NetgroupTasks {
 	public static void verifyNetGroupSettings(SahiTasks sahiTasks, String groupName, String description, String nisdomain) {
 		sahiTasks.link(groupName).click();
 		sahiTasks.link("Settings").click();
-		Assert.assertEquals(sahiTasks.textbox("description").value(), description, "Verified existing description for net group: " + groupName);
+		Assert.assertEquals(sahiTasks.textarea("description").value(), description, "Verified existing description for net group: " + groupName);
 		Assert.assertEquals(sahiTasks.textbox("nisdomainname").value(), nisdomain, "Verified existing nis domain for net group: " + groupName);
 		sahiTasks.link("Netgroups").in(sahiTasks.div("content")).click();
 		
@@ -108,219 +108,219 @@ public class NetgroupTasks {
 	 */
 	public static void deleteNetgroup(SahiTasks sahiTasks, String [] groupnames) {
 		for (String groupname : groupnames) {
-			sahiTasks.checkbox(groupname).click();
+			if (sahiTasks.checkbox(groupname).exists())
+				sahiTasks.checkbox(groupname).click();
 		}
 		sahiTasks.link("Delete").click();
 		sahiTasks.button("Delete").click();
 	}
 	
-	/*
-	 * Add members
-	 * @param sahiTasks
-	 * @param groupname - name of net group
-	 * @param membertype - host hostgroup user usergroup netgroup
-	 * @param names - array of names to add as members
-	 * @param button - Enroll or Cancel
-	 */
-	public static void addMembers(SahiTasks sahiTasks, String groupName, String membertype, String [] names, String button) {
-		sahiTasks.link(groupName).click();
-		if (membertype == "host"){
-			sahiTasks.link("memberhost_host").click();
-		}
-		if (membertype == "hostgroup"){
-			sahiTasks.link("memberhost_hostgroup").click();
-		}
-		if (membertype == "user"){
-			sahiTasks.link("memberuser_user").click();
-		}
-		if (membertype == "usergroup"){
-			sahiTasks.link("memberuser_group").click();
-		}
-		if (membertype == "netgroup"){
-			sahiTasks.link("member_netgroup").click();
-		}
-		sahiTasks.link("Enroll").click();
-		
-		for (String name : names) {
-			sahiTasks.checkbox(name).click();
-		}
-		sahiTasks.span(">>").click();
-		sahiTasks.button(button).click();
-		sahiTasks.link("Netgroups").in(sahiTasks.div("content")).click();
-	}
-	
-	/*
-	 * hide already enrolled
-	 * @param sahiTasks
-	 * @param groupname - name of net group
-	 * @param membertype - host hostgroup user usergroup netgroup
-	 * @param enrolled - name of already enrolled
-	 * @param hide - whether or not to hide the enrolled - YES or NO
-	 * @param searchstr - string to filter the search on
-	 */
-	public static void hideAlreadyEnrolled(SahiTasks sahiTasks, String groupName, String membertype, String enrolled, String hide, String searchstr) {
-		sahiTasks.link(groupName).click();
-		if (membertype == "host"){
-			sahiTasks.link("memberhost_host").click();
-		}
-		if (membertype == "hostgroup"){
-			sahiTasks.link("memberhost_hostgroup").click();
-		}
-		if (membertype == "user"){
-			sahiTasks.link("memberuser_user").click();
-		}
-		if (membertype == "usergroup"){
-			sahiTasks.link("memberuser_group").click();
-		}
-		if (membertype == "netgroup"){
-			sahiTasks.link("member_netgroup").click();
-		}
-		
-		sahiTasks.link("Enroll").click();
-		if( hide == "YES" ){
-			sahiTasks.checkbox("hidememb").check();
-			sahiTasks.textbox("filter").setValue(searchstr);
-			sahiTasks.span("Find").click();
-			Assert.assertFalse(sahiTasks.link(enrolled).exists(), "enrolled "+ membertype + " " + enrolled + " is hidden");
-		}
-		else {
-			sahiTasks.checkbox("hidememb").uncheck();
-			sahiTasks.textbox("filter").setValue(searchstr);
-			Assert.assertTrue(sahiTasks.link(enrolled).exists(), "enrolled "+ membertype + " " + enrolled + " is NOT hidden");
-		}
-		
-		sahiTasks.button("Cancel").click();
-		sahiTasks.link("Netgroups").in(sahiTasks.div("content")).click();
-	}
-	
-	/*
-	 * verify members
-	 * @param sahiTasks
-	 * @param groupname - name of net group
-	 * @param membertype - host hostgroup user usergroup netgroup
-	 * @param names - array of names to verify
-	 * @param type - direct or indirect
-	 * @param exists - whether or not they should be members YES if they should be
-	 */
-	public static void verifyMembers(SahiTasks sahiTasks, String groupName, String membertype, String [] names, String exists) {
-		sahiTasks.link(groupName).click();
-		if (membertype == "host"){
-			sahiTasks.link("memberhost_host").click();
-		}
-		if (membertype == "hostgroup"){
-			sahiTasks.link("memberhost_hostgroup").click();
-		}
-		if (membertype == "user"){
-			sahiTasks.link("memberuser_user").click();
-		}
-		if (membertype == "usergroup"){
-			sahiTasks.link("memberuser_group").click();
-		}
-		if (membertype == "netgroup"){
-			sahiTasks.link("member_netgroup").click();
-		}
-		
-		for (String name : names) {
-			if (exists == "YES"){
-				Assert.assertTrue(sahiTasks.link(name).exists(), membertype + " " + name + " is a member of host group " + groupName);
-			}
-			else {
-				Assert.assertFalse(sahiTasks.link(name).exists(), membertype + " " + name + " is NOT member of host group " + groupName);
-			}
-		}
-		sahiTasks.link("Netgroups").in(sahiTasks.div("content")).click();
-	}
-	
-	/*
-	 * verify member of
-	 * @param sahiTasks
-	 * @param groupname - name of net group
-	 * @param names - array of names to verify
-	 * @param type - direct or indirect
-	 * @param exists - whether or not they should be members of the enroll type - YES if they should be
-	 */
-	public static void verifyMemberOf(SahiTasks sahiTasks, String groupName, String [] names, String type, String exists) {
-		sahiTasks.link(groupName).click();
-		sahiTasks.link("memberof_netgroup").click();
-		sahiTasks.radio(type).click();
-		
-		for (String name : names) {
-			if (exists == "YES"){
-				Assert.assertTrue(sahiTasks.link(name).exists(), "Net group " + groupName + " is a memberof net group : " + name);
-			}
-			else {
-				Assert.assertFalse(sahiTasks.link(name).exists(), "Net group " + groupName + " is NOT a memberof net group: " + name);
-			}
-		}
-		sahiTasks.link("Netgroups").in(sahiTasks.div("content")).click();
-	}
-	
-	/*
-	 * Remove net group members
-	 * @param sahiTasks
-	 * @param groupname - name of host group
-	 * @param membertype - host hostgroup user usergroup netgroup
-	 * @param name - names of member to remove
-	 * @param button - Delete or Cancel
-	 */
-	public static void removeMember(SahiTasks sahiTasks, String groupName, String membertype, String name, String button) {
-		sahiTasks.link(groupName).click();
-		if (membertype == "host"){
-			sahiTasks.link("memberhost_host").click();
-		}
-		if (membertype == "hostgroup"){
-			sahiTasks.link("memberhost_hostgroup").click();
-		}
-		if (membertype == "user"){
-			sahiTasks.link("memberuser_user").click();
-		}
-		if (membertype == "usergroup"){
-			sahiTasks.link("memberuser_group").click();
-		}
-		if (membertype == "netgroup"){
-			sahiTasks.link("member_netgroup").click();
-		}
-		
-		sahiTasks.checkbox(name).click();
 
-		sahiTasks.span("Delete").click();
-		sahiTasks.button(button).click();
+	
+	public static void addMembers(SahiTasks sahiTasks, String groupName, String section, String type, String [] names, 
+			String button, String action) {
+		sahiTasks.link(groupName).click();
+		if (button.equals("All")) {
+			String categoryToChoose="";
+			if (section.equals("User"))
+				categoryToChoose = "usercategory" + "-1";
+			else
+				categoryToChoose = "hostcategory" +"-2";
+			sahiTasks.radio(categoryToChoose+"-0").click();
+			sahiTasks.span(action).click();
+		}
+				
+		if (button.equals("Add")) {
+			sahiTasks.span("Add").under(sahiTasks.heading2(section)).near(sahiTasks.div(type)).click();
+			for (String name : names) {
+				sahiTasks.textbox("filter").near(sahiTasks.span("Find")).setValue(name);
+				sahiTasks.span("Find").click();
+				sahiTasks.checkbox(name).click();
+				sahiTasks.link(">>").click();
+			}			
+			sahiTasks.button(action).click();
+		}
+		
+		
+		sahiTasks.link("Netgroups").in(sahiTasks.div("content")).click();
+	}
+	
+	
+	public static void verifyMembers(SahiTasks sahiTasks, String groupName, String section, String type, String [] names, 
+			String button, String action) {
+		sahiTasks.link(groupName).click();
+		if (button.equals("All")) {
+			String categoryToVerify = "";
+			String memberToVerify = "";
+			if (section.equals("User")) {
+				categoryToVerify = "usercategory" + "-1";
+				if (type.equals("Users"))
+					memberToVerify = "memberuser_user";
+				else	
+					memberToVerify = "memberuser_group";
+			}
+			else {
+				categoryToVerify = "hostcategory" +"-2";
+				if (type.equals("Hosts"))
+					memberToVerify = "memberhost_host";
+				else	
+					memberToVerify = "memberhost_hostgroup";
+			}
+			Assert.assertTrue(sahiTasks.radio(categoryToVerify + "-0").checked(), "Verified " + section + " set to All after choosing to " + action);
+			Assert.assertFalse(sahiTasks.checkbox(memberToVerify + "[1]").exists(), "Verified no members are listed in " + section);
+		}
+		
+		if (button.equals("Add")) {			
+			for (String name : names) {
+				if (!name.isEmpty()){
+					if (action.equals("Cancel"))
+						Assert.assertFalse(sahiTasks.checkbox(name).exists(), "Verified " + name + " is not listed under " + section);
+					else
+						Assert.assertTrue(sahiTasks.checkbox(name).exists(), "Verified " + name + " is listed under " + section);
+				}				
+			}		
+		}
+		
 		sahiTasks.link("Netgroups").in(sahiTasks.div("content")).click();
 	}
 	
 	/*
-	 * Remove net group members
-	 * @param sahiTasks
-	 * @param groupname - name of host group
-	 * @param membertype - host hostgroup user usergroup netgroup
-	 * @param names - array of names to remove as members
-	 * @param button - Delete or Cancel
+	 * button = All -> delete all members
+	 * button = Delete -> delete names passed in
 	 */
-	public static void removeMember(SahiTasks sahiTasks, String groupName, String membertype, String [] names, String button) {
+	
+	public static void deleteUserMembers(SahiTasks sahiTasks, String groupName, String section, String type, String [] names, String button) {
 		sahiTasks.link(groupName).click();
-		if (membertype == "host"){
-			sahiTasks.link("memberhost_host").click();
+		if (button.equals("All")) {
+			String memberToVerify = "";
+			if (section.equals("User")) {
+				if (type.equals("Users"))
+					memberToVerify = "memberuser_user";
+				else	
+					memberToVerify = "memberuser_group";
+			}
+			else {
+				if (type.equals("Hosts"))
+					memberToVerify = "memberhost_host";
+				else	
+					memberToVerify = "memberhost_hostgroup";
+			}
+			sahiTasks.checkbox(memberToVerify).check();
 		}
-		if (membertype == "hostgroup"){
-			sahiTasks.link("memberhost_hostgroup").click();
+		if (button.equals("Delete")) {
+			for (String name : names) {
+				if (!name.isEmpty()){
+					sahiTasks.checkbox(name).check();
+				}
+			}			
 		}
-		if (membertype == "user"){
-			sahiTasks.link("memberuser_user").click();
-		}
-		if (membertype == "usergroup"){
-			sahiTasks.link("memberuser_group").click();
-		}
-		if (membertype == "netgroup"){
-			sahiTasks.link("member_netgroup").click();
-		}
-		
-		for (String name : names) {
-			sahiTasks.checkbox(name).click();
-		}
-		sahiTasks.span("Delete").click();
-		sahiTasks.button(button).click();
+		sahiTasks.span("Delete").under(sahiTasks.heading2(section)).near(sahiTasks.div(type)).click();
+		sahiTasks.button("Delete").click();
 		sahiTasks.link("Netgroups").in(sahiTasks.div("content")).click();
 	}
+	
+	
+	/**
+	 * @param sahiTasks
+	 * @param cn
+	 * @param category - usercategory/hostcategory
+	 * @param action - undo/Reset/Update
+	 */
+	public static void undoResetUpdateNetgroup(SahiTasks sahiTasks, String groupName, String category, String action) {
+		sahiTasks.link(groupName).click();
+		String categoryToChoose="";
+		if (category.equals("usercategory"))
+			categoryToChoose = category + "-1";
+		else
+			categoryToChoose = category +"-2";
+		sahiTasks.radio(categoryToChoose+"-0").click();
+		sahiTasks.span(action).click();
+		if (action.equals("Update"))  
+			Assert.assertTrue(sahiTasks.radio(categoryToChoose + "-0").checked(), "Verified " + category + " set after choosing to " + action);		
+		else
+			Assert.assertTrue(sahiTasks.radio(categoryToChoose + "-1").checked(), "Verified " + category + " set after choosing to " + action);
+		
+		//TODO: Verify that when radio button for Anyone or Any Host is chosen, this disables the 
+		// links to Add, and Delete
+	/*	if (action.equals("Update")) {
+			Assert.assertEquals("true", sahiTasks.span("Add[2]").fetch("disabled"));
+	//		Assert.assertEquals("true", sahiTasks.span("Add").under(sahiTasks.heading2("Host")).near(sahiTasks.div("Hosts")).fetch("disabled"));
+		//	Assert.assertEquals("true", sahiTasks.span("Delete").under(sahiTasks.heading2("Host")).near(sahiTasks.div("Hosts")).fetch("disabled"));
+	//		Assert.assertEquals("true", sahiTasks.span("Add").under(sahiTasks.heading2("Host Groups")).near(sahiTasks.div("Hosts")).fetch("disabled"));
+	//		Assert.assertEquals("true", sahiTasks.span("Delete").under(sahiTasks.heading2("Host Groups")).near(sahiTasks.div("Hosts")).fetch("disabled"));
+		}*/
+		
+		sahiTasks.link("Netgroups").in(sahiTasks.div("content")).click();	
+	}	
+	
+	public static void modifyNetgroupMembership(SahiTasks sahiTasks, String groupName, String category) {
+		sahiTasks.link(groupName).click();
+		String categoryToChoose="";
+		if (category.equals("usercategory"))
+			categoryToChoose = category + "-1";
+		else
+			categoryToChoose = category +"-2";
+		sahiTasks.radio(categoryToChoose+"-1").click();
+		sahiTasks.span("Update").click();		
+		sahiTasks.link("Netgroups").in(sahiTasks.div("content")).click();	
+	}
+	
+	public static void unsavedChangesNetgroup(SahiTasks sahiTasks, String groupName, String description, String action) {
+		sahiTasks.link(groupName).click();
+        String newDescription = description + " Updated";
+		sahiTasks.textarea("description").setValue(newDescription);
+		sahiTasks.link("Netgroups").in(sahiTasks.div("content")).click();
+		sahiTasks.button(action).click();
+		
+		if (action.equals("Cancel")) {
+			sahiTasks.span("undo").click();
+			sahiTasks.link("Netgroups").in(sahiTasks.div("content")).click();
+		} 
+		
+		
+		sahiTasks.link(groupName).click();
+		if (action.equals("Update")) {
+			Assert.assertEquals(newDescription, sahiTasks.textarea("description").value(), "Verified description is as expected: " + newDescription);
+		} else {
+			Assert.assertEquals(description, sahiTasks.textarea("description").value(), "Verified description is as expected: " + description);
+		}
+	
+		sahiTasks.link("Netgroups").in(sahiTasks.div("content")).click();	
+	}
+	
+	public static void expandCollapseNetgroup(SahiTasks sahiTasks, String groupName) {
+		
+			sahiTasks.link(groupName).click();
+			sahiTasks.span("Collapse All").click();
+			sahiTasks.waitFor(1000);
+			
+			//Verify no data is visible
+			Assert.assertFalse(sahiTasks.textarea("description").exists(), "No description is visible");
+			
+			sahiTasks.heading2("User").click();
+			Assert.assertTrue(sahiTasks.div("User category the rule applies to: AnyoneSpecified Users and Groups undo").exists(), "When User section is clicked, can see its contents");
+			
+			
+			sahiTasks.span("Expand All").click();
+			sahiTasks.waitFor(1000);
+			//Verify data is visible
+			Assert.assertTrue(sahiTasks.textarea("description").exists(), "Now description is visible");
+			
+			sahiTasks.link("Netgroups").in(sahiTasks.div("content")).click();
+		
+		
+	}
+	
+	
+	public static void modifyNetgroupDescription(SahiTasks sahiTasks, String groupName, String description) {
+		sahiTasks.link(groupName).click();
+		sahiTasks.textarea("description").setValue(description);
+		sahiTasks.span("Update").click();
+		sahiTasks.link("Netgroups").in(sahiTasks.div("content")).click();
+	}
+	
+
+	
 	
 	/*
 	 * add invalid net group
@@ -332,7 +332,7 @@ public class NetgroupTasks {
 	public static void addInvalidNetGroup(SahiTasks sahiTasks, String groupname, String description, String expectedError) {
 		sahiTasks.span("Add").click();
 		sahiTasks.textbox("cn").setValue(groupname);
-		sahiTasks.textbox("description").setValue(description);
+		sahiTasks.textarea("description").setValue(description);
 	
 		sahiTasks.button("Add").click();
 		//Check for expected error
@@ -356,7 +356,7 @@ public class NetgroupTasks {
 		
 		sahiTasks.span("Add").click();
 		sahiTasks.textbox("cn").setValue(groupname);
-		sahiTasks.textbox("description").setValue(description);
+		sahiTasks.textarea("description").setValue(description);
 	
 		sahiTasks.button("Add").click();
 		//Check for expected error
