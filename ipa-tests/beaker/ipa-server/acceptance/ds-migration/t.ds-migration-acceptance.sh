@@ -2,7 +2,7 @@ USERCONTAINER="ou=People"
 GROUPCONTAINER="ou=groups"
 USEROBJCLASS="posixAccount"
 GROUPOBJCLASS="posixGroup"
-BASEDN="dc=example,dc=com"
+MYBASEDN="dc=example,dc=com"
 USER1=puser1
 USER1PWD="fo0m4nchU"
 USER2PWD="Secret123"
@@ -123,8 +123,8 @@ migratecmd()
         rlPhaseEnd
 
 	rlPhaseStartTest "ds-migration-cmd-008 Non directory manager bind-dn - binding as $USER1"
-                rlLog "EXECUTING: ipa migrate-ds --user-container=\"$USERCONTAINER\" --group-container=\"$GROUPCONTAINER\" --bind-dn=\"uid=$USER1,$USERCONTAINER,$BASEDN\" ldap://$CLIENT:389"
-                rlRun "echo fo0m4nchU | ipa migrate-ds --user-container=\"$USERCONTAINER\" --group-container=\"$GROUPCONTAINER\" --bind-dn=\"uid=$USER1,$USERCONTAINER,$BASEDN\" ldap://$CLIENT:389" 0
+                rlLog "EXECUTING: ipa migrate-ds --user-container=\"$USERCONTAINER\" --group-container=\"$GROUPCONTAINER\" --bind-dn=\"uid=$USER1,$USERCONTAINER,$MYBASEDN\" ldap://$CLIENT:389"
+                rlRun "echo fo0m4nchU | ipa migrate-ds --user-container=\"$USERCONTAINER\" --group-container=\"$GROUPCONTAINER\" --bind-dn=\"uid=$USER1,$USERCONTAINER,$MYBASEDN\" ldap://$CLIENT:389" 0
 
 		rlRun "ipa user-show $USER1" 0 "Verifying '$USER1' was migrated"
 		rlRun "ipa user-show $USER2" 0 "Verifying user '$USER2' was migrated"
@@ -141,7 +141,7 @@ migratecmd()
 	rlPhaseEnd
 
 	rlPhaseStartTest "ds-migration-cmd-009 Exclude User"
-                rlLog "EXECUTING: ipa migrate-ds --user-container=\"$USERCONTAINER\" --group-container=\"$GROUPCONTAINER\" --exclude-users=$USER2 ldap://$CLIENT:389"
+                rlLog "EXECUTING: ipa migrate-ds --user-container=\"ou=people,\" --group-container=\"$GROUPCONTAINER\" --exclude-users=$USER2 ldap://$CLIENT:389"
                 rlRun "echo $ADMINPW | ipa migrate-ds --user-container=\"$USERCONTAINER\" --group-container=\"$GROUPCONTAINER\" --exclude-users=$USER2 ldap://$CLIENT:389" 0
 
                 rlRun "ipa user-show $USER1" 0 "Verifying '$USER1' was migrated"
@@ -377,7 +377,6 @@ bugzillas()
 		rlRun "ipa user-show $USER3" 0 "Verifying '$USER3' was migrated"
                 rlRun "ipa group-show $GROUP1" 0 "Verifying group '$GROUP1' was migrated"
                 rlRun "ipa group-show $GROUP2" 0 "Verifying group '$GROUP2' was migrated"
-                rlLog "Cleaning up migrated users"
         rlPhaseEnd
 
 	rlPhaseStartTest "bz804609 Internal Server Error - non-posix user-show --all"
@@ -393,38 +392,54 @@ bugzillas()
 		for myuser in $USER1 $USER2 $USER3 ; do
 			rlRun "ipa group-find --private $myuser" 1 "Verify user '$myuser' does not have a private group"
 		done
+		rlLog "Cleaning up migrated users"
                 ipa user-del $USER1
                 ipa user-del $USER2
                 ipa user-del $USER3
                 ipa group-del $GROUP1
                 ipa group-del $GROUP2
 	rlPhaseEnd
-}
 
-cleartxtpwdmigration()
-{
+        rlPhaseStartTest "bz807371 migration: don't append basedn to container if it is included"
+		rlLog "EXECUTING: ipa migrate-ds --with-compat --user-container=\"$USERCONTAINER,$MYBASEDN\" --group-container=\"$GROUPCONTAINER,$MYBASEDN\" ldap://$CLIENT:389"
+                rlRun "echo $ADMINPW | ipa migrate-ds --with-compat --user-container=\"$USERCONTAINER,$MYBASEDN\" --group-container=\"$GROUPCONTAINER,$MYBASEDN\" ldap://$CLIENT:389" 0
+                rlRun "ipa user-show $USER1" 0 "Verifying $USER1 was migrated"
+                rlRun "ipa user-show $USER2" 0 "Verifying '$USER2' was migrated"
+                rlRun "ipa user-show $USER3" 0 "Verifying '$USER3' was migrated"
+                rlRun "ipa group-show $GROUP1" 0 "Verifying group '$GROUP1' was migrated"
+                rlRun "ipa group-show $GROUP2" 0 "Verifying group '$GROUP2' was migrated"
 
-	# disabling clear text password migration as it is not supported
-	rlPhaseStartTest "ds-migration-cleartxt-pwd-001 Clear Text Password Migration"
-                rlLog "EXECUTING: ipa migrate-ds --user-container=\"$USERCONTAINER\" --group-container=\"$GROUPCONTAINER\" ldap://$CLIENT:389"
-                rlRun "echo $ADMINPW | ipa migrate-ds --user-container=\"$USERCONTAINER\" --group-container=\"$GROUPCONTAINER\" ldap://$CLIENT:389" 0
-
-                rlRun "ssh_auth_success $USER1 $USER1PWD $HOSTNAME"
-		rlRun "ssh_auth_success $USER2 $USER2PWD $HOSTNAME"
+                rlLog "Cleaning up migrated users"
+                ipa user-del $USER1 $USER2 $USER3
+		ipa group-del $GROUP1 $GROUP2 "HR Managers" "PD Managers" "QA Managers" "Accounting Managers"
         rlPhaseEnd
 
-        rlPhaseStartTest "ds-migration-cleartxt-pwd-002 Cleanup migration"
-                ipa user-del $USER1
-                ipa user-del $USER2
-                ipa group-del $GROUP1
-                ipa group-del $GROUP2
-
-		rlRun "ipa user-show $USER1" 2 "Make sure $USER1 was deleted"
-		rlRun "ipa user-show $USER2" 2 "Make sure $USER2 was deleted"
-		rlRun "ipa group-show $GROUP1" 2 "Make sure $GROUP1 was deleted"
-		rlRun "ipa group-show $GROUP1" 2 "Make sure $GROUP1 was deleted"
-        rlPhaseEnd
 }
+
+#cleartxtpwdmigration()
+#{
+#
+#	# disabling clear text password migration as it is not supported
+#	rlPhaseStartTest "ds-migration-cleartxt-pwd-001 Clear Text Password Migration"
+#                rlLog "EXECUTING: ipa migrate-ds --user-container=\"$USERCONTAINER\" --group-container=\"$GROUPCONTAINER\" ldap://$CLIENT:389"
+#                rlRun "echo $ADMINPW | ipa migrate-ds --user-container=\"$USERCONTAINER\" --group-container=\"$GROUPCONTAINER\" ldap://$CLIENT:389" 0
+#
+#                rlRun "ssh_auth_success $USER1 $USER1PWD $HOSTNAME"
+#		rlRun "ssh_auth_success $USER2 $USER2PWD $HOSTNAME"
+#        rlPhaseEnd
+#
+#        rlPhaseStartTest "ds-migration-cleartxt-pwd-002 Cleanup migration"
+#                ipa user-del $USER1
+#                ipa user-del $USER2
+#                ipa group-del $GROUP1
+#                ipa group-del $GROUP2
+#
+#		rlRun "ipa user-show $USER1" 2 "Make sure $USER1 was deleted"
+#		rlRun "ipa user-show $USER2" 2 "Make sure $USER2 was deleted"
+#		rlRun "ipa group-show $GROUP1" 2 "Make sure $GROUP1 was deleted"
+#		rlRun "ipa group-show $GROUP1" 2 "Make sure $GROUP1 was deleted"
+#        rlPhaseEnd
+#}
 
 cleanup()
 {
