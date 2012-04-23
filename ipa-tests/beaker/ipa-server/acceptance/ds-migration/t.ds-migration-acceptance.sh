@@ -383,15 +383,21 @@ bugzillas()
 	rlPhaseStartTest "bz804609 Internal Server Error - non-posix user-show --all"
 		rlRun "ipa user-show --all $USER3 > /tmp/bz804609.out 2>&1" 0 "Show migrated non-posix user"
 		rlAssertNotGrep "ipa: ERROR: an internal error has occurred" "/tmp/bz804609.out"
-	        ipa user-del $USER1
-                ipa user-del $USER2
-                ipa user-del $USER3
-                ipa group-del $GROUP1
-                ipa group-del $GROUP2
 	rlPhaseEnd
 
 	rlPhaseStartTest "bz753966 unable to delete migrated groups containing spaces"
-		rlRun "ipa group-del \"HR Managers\" \"PD Managers\" \"QA Managers\"" 0 "Delete migrated groups with spaces in the group names"
+		rlRun "ipa group-del \"HR Managers\" \"PD Managers\" \"QA Managers\" \"Accounting Managers\"" 0 "Delete migrated groups with spaces in the group names"
+	rlPhaseEnd
+
+	rlPhaseStartTest "bz809560 Do not create private groups for migrated users"
+		for myuser in $USER1 $USER2 $USER3 ; do
+			rlRun "ipa group-find --private $myuser" 1 "Verify user '$myuser' does not have a private group"
+		done
+                #ipa user-del $USER1
+                #ipa user-del $USER2
+                #ipa user-del $USER3
+                #ipa group-del $GROUP1
+                #ipa group-del $GROUP2
 	rlPhaseEnd
 }
 
@@ -424,7 +430,7 @@ cleanup()
 {
         rlPhaseStartTest "CLEANUP MIGRATION ACCEPTANCE"
 		SetMigrationConfig FALSE
-		rlRun "ssh -o StrictHostKeyChecking=no root@$CLIENT /usr/sbin/remove-ds.pl -i $INSTANCE" 0 "Removing directory server instance"
+		#rlRun "ssh -o StrictHostKeyChecking=no root@$CLIENT /usr/sbin/remove-ds.pl -i $INSTANCE" 0 "Removing directory server instance"
         rlPhaseEnd
 }
 
