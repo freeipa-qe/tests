@@ -1070,12 +1070,12 @@ netgroup_mod_negative()
 		rlAssertGrep "ipa: ERROR: no modifications to be performed" $tmpout
 	rlPhaseEnd
 
-	rlPhaseStartTest "netgroup_mod_negative_025: Invalid setattr and addattr for externalhost with invalid characters (BZ 797256)"
+	rlPhaseStartTest "netgroup_mod_negative_025: Invalid setattr and addattr for externalhost with invalid characters (BZ 813325)"
 		rlRun "ipa netgroup-mod $ngroup1 --setattr=externalhost=badhost? > $tmpout 2>&1" 1
 		rlRun "cat $tmpout"
 		rlAssertGrep "NEED Error message here...should not work" $tmpout
 		if [ $(grep "badhost\?" $tmpout|wc -l) -gt 0 ]; then
-			rlFail "BZ 797256 Found...ipa netgroup-add-member --hosts should not allow invalid characters"
+			rlFail "BZ 813325 Found...ipa netgroup-mod addattr and setattr allow invalid characters for externalHost"
 			rlLog  "deleting invalid entry"
 			rlRun  "ipa netgroup-remove-member $ngroup1 --hosts=badhost?"
 		fi
@@ -1084,7 +1084,7 @@ netgroup_mod_negative()
 		rlRun "cat $tmpout"
 		rlAssertGrep "NEED Error message here...should not work" $tmpout
 		if [ $(grep "anotherbadhost\!\@\#\$\%\^\&\*\\(\\)" $tmpout|wc -l) -gt 0 ]; then
-			rlFail "BZ 797256 Found...ipa netgroup-add-member --hosts should not allow invalid characters"
+			rlFail "BZ 813325 Found...ipa netgroup-mod addattr and setattr allow invalid characters for externalHost"
 			rlLog  "deleting invalid entry"
 			rlRun  "ipa netgroup-remove-member $ngroup1 --hosts=anotherbadhost\!\@\#\$\%\^\&\*\\(\\)"
 		fi
