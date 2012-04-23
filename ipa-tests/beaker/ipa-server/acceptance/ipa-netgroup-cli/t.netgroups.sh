@@ -906,6 +906,7 @@ netgroup_mod_negative()
 		rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
 
 		command="ipa netgroup-mod --addattr ipauniqueid=another-new-unique-id $ngroup1"
+		expmsg="ipa: ERROR: ipauniqueid: Only one value allowed."
 		rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
 	rlPhaseEnd
 
@@ -930,7 +931,7 @@ netgroup_mod_negative()
 
 	rlPhaseStartTest "netgroup_mod_negative_010: Invalid modify with setattr for multiple nisdomains (BZ 797237)"
 		rlRun "ipa netgroup-mod $ngroup1 --setattr=nisdomainname=test1,test2 > $tmpout 2>&1" 1
-		rlAssertGrep "NEED Error message here...this one should not work" $tmpout
+		rlAssertGrep "ipa: ERROR: invalid 'nisdomainname': may only include letters, numbers, _, -, and ." $tmpout
 		rlAssertNotGrep "test1,test2" $tmpout
 		if [ $(grep "test1,test2" $tmpout|wc -l) -gt 0 ]; then
 			rlFail "BZ 797237 found...ipa netgroup-add and netgroup-mod --nisdomain should not allow commas"
