@@ -538,7 +538,7 @@ netgroup_add_member_negative()
 	rlPhaseStartTest "netgroup_add_member_negative_006: Add host with invalid characters (BZ 797256)"
 		rlRun "ipa netgroup-add-member $ngroup1 --hosts=badhost? > $tmpout 2>&1" 1
 		rlRun "cat $tmpout"
-		rlAssertGrep "NEED Error message here...should not work" $tmpout
+		rlAssertGrep "ipa: ERROR: invalid 'host': only letters, numbers, _, and - are allowed. - must not be the DNS label character" $tmpout
 		if [ $(grep "badhost\?" $tmpout|wc -l) -gt 0 ]; then
 			rlFail "BZ 797256 Found...ipa netgroup-add-member --hosts should not allow invalid characters"
 			rlLog  "deleting invalid entry"
@@ -547,7 +547,7 @@ netgroup_add_member_negative()
 
 		rlRun "ipa netgroup-add-member $ngroup1 --hosts=anotherbadhost\!\@\#\$\%\^\&\*\\(\\) > $tmpout 2>&1" 1
 		rlRun "cat $tmpout"
-		rlAssertGrep "NEED Error message here...should not work" $tmpout
+		rlAssertGrep "ipa: ERROR: invalid 'host': only letters, numbers, _, and - are allowed. - must not be the DNS label character" $tmpout
 		if [ $(grep "anotherbadhost\!\@\#\$\%\^\&\*\\(\\)" $tmpout|wc -l) -gt 0 ]; then
 			rlFail "BZ 797256 Found...ipa netgroup-add-member --hosts should not allow invalid characters"
 			rlLog  "deleting invalid entry"
