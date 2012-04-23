@@ -942,7 +942,7 @@ netgroup_mod_negative()
 
 	rlPhaseStartTest "netgroup_mod_negative_011: Invalid modify with nisdomain containing invalid characters (BZ 797237)"
 		rlRun "ipa netgroup-mod $ngroup1 --nisdomain=test^\|\!\@\#\$\%\&\*\\)\\( > $tmpout 2>&1" 1
-		rlAssertGrep "NEED Error message here...this one should not work" $tmpout
+		rlAssertGrep "ipa: ERROR: invalid 'nisdomain': may only include letters, numbers, _, -, and ." $tmpout
 		rlAssertNotGrep "test^\|\!\@\#\$\%\&\*\\\)\\\(" $tmpout
 		if [ $(grep "test^\|\!\@\#\$\%\&\*\\\)\\\(" $tmpout | wc -l) -gt 0 ]; then
 			rlFail "BZ 797237 found...ipa netgroup-add and netgroup-mod --nisdomain should not allow commas"
