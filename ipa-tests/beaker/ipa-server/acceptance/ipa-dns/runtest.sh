@@ -151,23 +151,28 @@ pkey_return_check_dns()
 
 	rlPhaseStartTest "ipa-dns-01: create a new fake host to test dns add during replica prepare"
 		let newip=$ipoc4+1
-		ipa-replica-prepare -p $ADMINPW --ip-address=$newfakehostip newfakehost$newip.$DOMAIN
+		rlLog "EXECUTING: ipa-replica-prepare -p $ADMINPW --ip-address=$newfakehostip newfakehost$newip.$DOMAIN"
+		rlRun "ipa-replica-prepare -p $ADMINPW --ip-address=$newfakehostip newfakehost$newip.$DOMAIN" 0
 	rlPhaseEnd
 
 
 	rlPhaseStartTest "ipa-dns-02: ensure that the forward ip of the new fakehost was created in dns correctly with ping"
+		rlLog "EXECUTING: ping -c 1 newfakehost$newip.$DOMAIN"
 		rlRun "ping -c 1 newfakehost$newip.$DOMAIN" 0 "Checking to ensure that the forward for the new fake host was created in dns"
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-03: ensure that the forward ip of the new fakehost was created in dns correctly with dig"
+		rlLog "EXECUTING: dig newfakehost$newip.$DOMAIN | grep $newfakehostip"
 		rlRun "dig newfakehost$newip.$DOMAIN | grep $newfakehostip" 0 "Checking to ensure that dig returns the correct ip address"
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-04: ensure that the reverse entry of the new fakehost was created in dns correctly with dig"
+		rlLog "EXECUTING: dig -x $newfakehostip | grep newfakehost$newip.$DOMAIN"
 		rlRun "dig -x $newfakehostip | grep newfakehost$newip.$DOMAIN" 0 "Checking to ensure that reverse of newfakehost$newip.$DOMAIN is set up correctly"
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-05: ensure that the forward ip of the new fakehost is resolvable by dnsrecord-show"
+		rlLog "EXECUTING: ipa dnsrecord-show $DOMAIN newfakehost$newip"
 		rlRun "ipa dnsrecord-show $DOMAIN newfakehost$newip" 0 "Checking to ensure that ipa dnsrecord-show seems to think that the entry exists"
 	rlPhaseEnd
 
