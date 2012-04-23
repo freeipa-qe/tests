@@ -393,11 +393,11 @@ bugzillas()
 		for myuser in $USER1 $USER2 $USER3 ; do
 			rlRun "ipa group-find --private $myuser" 1 "Verify user '$myuser' does not have a private group"
 		done
-                #ipa user-del $USER1
-                #ipa user-del $USER2
-                #ipa user-del $USER3
-                #ipa group-del $GROUP1
-                #ipa group-del $GROUP2
+                ipa user-del $USER1
+                ipa user-del $USER2
+                ipa user-del $USER3
+                ipa group-del $GROUP1
+                ipa group-del $GROUP2
 	rlPhaseEnd
 }
 
@@ -430,7 +430,7 @@ cleanup()
 {
         rlPhaseStartTest "CLEANUP MIGRATION ACCEPTANCE"
 		SetMigrationConfig FALSE
-		#rlRun "ssh -o StrictHostKeyChecking=no root@$CLIENT /usr/sbin/remove-ds.pl -i $INSTANCE" 0 "Removing directory server instance"
+		rlRun "ssh -o StrictHostKeyChecking=no root@$CLIENT /usr/sbin/remove-ds.pl -i $INSTANCE" 0 "Removing directory server instance"
         rlPhaseEnd
 }
 
