@@ -1021,12 +1021,13 @@ EOF
 
 	rlPhaseEnd
 
-	rlPhaseStartTest "ipa-dns-160 create zone to use for tests 161 to 173"
+	rlPhaseStartTest "ipa-dns-161 create zone to use for tests 161 to 174"
+		ipa dnszone-del $zone
 		echo "ipa dnszone-add --name-server=$BEAKERMASTER --admin-email=$email --serial=$serial --refresh=$refresh --retry=$retry --expire=$expire --minimum=$minimum --ttl=$ttl $zone"
 		rlRun "ipa dnszone-add --name-server=$BEAKERMASTER --admin-email=$email --serial=$serial --refresh=$refresh --retry=$retry --expire=$expire --minimum=$minimum --ttl=$ttl $zone" 0 "Checking to ensure that ipa thinks that it can create a zone"
 	rlPhaseEnd
 
-	rlPhaseStartTest "ipa-dns-161 --pkey-only test of ipa dnsrecord-find a records"
+	rlPhaseStartTest "ipa-dns-162 --pkey-only test of ipa dnsrecord-find a records"
 		ipa_command_to_test="dnsrecord"
 		rec_string="--a-rec=4.2.2.2"
 		pkey_addstringa="$rec_string $zone"
@@ -1040,7 +1041,7 @@ EOF
 		rlRun "pkey_return_check_dns" 0 "running checks of --pkey-only of a records in ipa dnsrecord-find"
 	rlPhaseEnd
 
-	rlPhaseStartTest "ipa-dns-162 --pkey-only test of ipa dnsrecord-find AAAA records"
+	rlPhaseStartTest "ipa-dns-163 --pkey-only test of ipa dnsrecord-find AAAA records"
 		ipa_command_to_test="dnsrecord"
 		rec_string="--aaaa-rec=$aaaa"
 		pkey_addstringa="$rec_string $zone"
@@ -1054,7 +1055,7 @@ EOF
 		rlRun "pkey_return_check_dns" 0 "running checks of --pkey-only of AAAA records in ipa dnsrecord-find"
 	rlPhaseEnd
 
-	rlPhaseStartTest "ipa-dns-163 --pkey-only test of ipa dnsrecord-find asfdb records"
+	rlPhaseStartTest "ipa-dns-164 --pkey-only test of ipa dnsrecord-find asfdb records"
 		ipa_command_to_test="dnsrecord"
 		rec_string="--afsdb-rec=0\ $afsdb"
 		pkey_addstringa="$rec_string $zone"
@@ -1070,7 +1071,7 @@ EOF
 		rlRun "pkey_return_check_dns" 0 "running checks of --pkey-only of asfdb records in ipa dnsrecord-find"
 	rlPhaseEnd
 
-	rlPhaseStartTest "ipa-dns-164 --pkey-only test of ipa dnsrecord-find cname records"
+	rlPhaseStartTest "ipa-dns-165 --pkey-only test of ipa dnsrecord-find cname records"
 		ipa_command_to_test="dnsrecord"
 		rec_string="--cname-rec=$cname"
 		pkey_addstringa="$rec_string $zone"
@@ -1084,7 +1085,7 @@ EOF
 		rlRun "pkey_return_check_dns" 0 "running checks of --pkey-only of cname records in ipa dnsrecord-find"
 	rlPhaseEnd
 
-	rlPhaseStartTest "ipa-dns-165 --pkey-only test of ipa dnsrecord-find txt records"
+	rlPhaseStartTest "ipa-dns-166 --pkey-only test of ipa dnsrecord-find txt records"
 		ipa_command_to_test="dnsrecord"
 		rec_string="--txt-rec=$txt"
 		pkey_addstringa="$rec_string $zone"
@@ -1098,7 +1099,7 @@ EOF
 		rlRun "pkey_return_check_dns" 0 "running checks of --pkey-only of txt records in ipa dnsrecord-find"
 	rlPhaseEnd
 
-	rlPhaseStartTest "ipa-dns-166 --pkey-only test of ipa dnsrecord-find _srv records"
+	rlPhaseStartTest "ipa-dns-167 --pkey-only test of ipa dnsrecord-find _srv records"
 		ipa_command_to_test="dnsrecord"
 		rec_string="--srv-rec=$srva\ $srv"
 		pkeyobja="ahostf"
@@ -1113,7 +1114,7 @@ EOF
 		ipa $ipa_command_to_test-del --srv-rec=0\ 100\ 389\ why.go.here.com $zone $pkeyobjb
 	rlPhaseEnd
 
-	rlPhaseStartTest "ipa-dns-167 --pkey-only test of ipa dnsrecord-find @ records"
+	rlPhaseStartTest "ipa-dns-168 --pkey-only test of ipa dnsrecord-find @ records"
 		ipa_command_to_test="dnsrecord"
 		pkeyobja="ahostf"
 		pkeyobjb="ahostfb"
@@ -1127,14 +1128,14 @@ EOF
 		ipa $ipa_command_to_test-del --mx-rec=20\ $mxb. $zone @
 	rlPhaseEnd
 
-	rlPhaseStartTest "ipa-dns-168 Bug 783272 - Confusing error message when adding a record to non-existent zone"
+	rlPhaseStartTest "ipa-dns-169 Bug 783272 - Confusing error message when adding a record to non-existent zone"
 
 		rlLog "verifies bug https://bugzilla.redhat.com/show_bug.cgi?id=783272"
 		rlRun "ipa dnsrecord-add unknowndomain.com recordname  --loc-rec=\"49 11 42.4 N 16 36 29.6 E 227.64m\" | grep \"ipa: ERROR: unknowndomain.com: DNS zone not found\"" 1
 
 	rlPhaseEnd
 
-        rlPhaseStartTest "ipa-dns-169 Bug 750806 - dnszone-mod and dnszone-add does not format administrator's email properly"
+        rlPhaseStartTest "ipa-dns-170 Bug 750806 - dnszone-mod and dnszone-add does not format administrator's email properly"
 
 		rlLog "verifies bug https://bugzilla.redhat.com/show_bug.cgi?id=750806"
                 rlRun "ipa dnszone-add example.com --name-server=$HOSTNAME --admin-email=admin@example.com"
@@ -1146,7 +1147,7 @@ EOF
 
 	rlPhaseEnd
 
-	rlPhaseStartTest "ipa-dns-170 Bug 733371 - DNS zones are not loaded when idnsAllowQuery/idnsAllowTransfer is filled"
+	rlPhaseStartTest "ipa-dns-171 Bug 733371 - DNS zones are not loaded when idnsAllowQuery/idnsAllowTransfer is filled"
 
 		MASTERIP=`dig +short $HOSTNAME`
 		rlLog "verifies https://bugzilla.redhat.com/show_bug.cgi?id=733371"
@@ -1168,7 +1169,7 @@ EOF
 
         rlPhaseEnd
 
-        rlPhaseStartTest "ipa-dns-171 Bug 767492 - The plugin doesn't delete zone when it is deleted in LDAP and zone_refresh is set"
+        rlPhaseStartTest "ipa-dns-172 Bug 767492 - The plugin doesn't delete zone when it is deleted in LDAP and zone_refresh is set"
 
 		rlLog "verifies https://bugzilla.redhat.com/show_bug.cgi?id=767492"
 
@@ -1185,7 +1186,7 @@ EOF
 
 	rlPhaseEnd
 
-	rlPhaseStartTest "ipa-dns-172 --pkey-only negative test of ipa dnsrecord-find AAAA records"
+	rlPhaseStartTest "ipa-dns-173 --pkey-only negative test of ipa dnsrecord-find AAAA records"
 		ipa_command_to_test="dnsrecord"
 		rec_string="--aaaa-rec=$aaaa"
 		pkey_addstringa="$rec_string $zone"
@@ -1198,11 +1199,11 @@ EOF
 		rlRun "ipa $ipa_command_to_test-del $pkey_delstringa $pkeyobja" 0 "deleting the first object from this test ($pkeyobja)"
 	rlPhaseEnd
 
-	rlPhaseStartTest "ipa-dns-173 Delete the zone created for tests 161 to 172"
+	rlPhaseStartTest "ipa-dns-174 Delete the zone created for tests 161 to 172"
 		rlRun "ipa dnszone-del $zone" 0 "Delete the zone created for tests 161 to 172"
 	rlPhaseEnd
 
-	rlPhaseStartTest "ipa-dns-174 Bug 767494 - Automatically update corresponding PTR record when A/AAAA record is updated"
+	rlPhaseStartTest "ipa-dns-175 Bug 767494 - Automatically update corresponding PTR record when A/AAAA record is updated"
 		aaaa174="2620:52:0:2247:221:5eff:fe86:16b4"
 		aaaa174rev="7.4.2.2.0.0.0.0.2.5.0.0.0.2.6.2.ip6.arpa."
 		a174="10.1.1.10"
@@ -1244,7 +1245,7 @@ EOF
 
 	rlPhaseEnd
 
-        rlPhaseStartTest "ipa-dns-175 Bug 804619 - DNS zone serial number is not updated"
+        rlPhaseStartTest "ipa-dns-176 Bug 804619 - DNS zone serial number is not updated"
 
 		rlLog "verifies https://bugzilla.redhat.com/show_bug.cgi?id=804619"
 		rlLog "closes https://engineering.redhat.com/trac/ipa-tests/ticket/371"
@@ -1264,7 +1265,7 @@ EOF
 
 
 	rlPhaseEnd
-	rlPhaseStartTest "ipa-dns-176 --ns-hostname option does not check A/AAAA record of the provided hostname."
+	rlPhaseStartTest "ipa-dns-177 --ns-hostname option does not check A/AAAA record of the provided hostname."
 
 		rlLog "verifies https://bugzilla.redhat.com/show_bug.cgi?id=804562"
 		rlLog "closes https://engineering.redhat.com/trac/ipa-tests/ticket/376"
@@ -1273,7 +1274,7 @@ EOF
 
         rlPhaseEnd
 
-	rlPhaseStartTest "ipa-dns-177 Bug 795414 - Dynamic database plug-in cannot change BIND root zone forwarders while plug-in start"
+	rlPhaseStartTest "ipa-dns-178 Bug 795414 - Dynamic database plug-in cannot change BIND root zone forwarders while plug-in start"
 
 		rlLog "verifies https://bugzilla.redhat.com/show_bug.cgi?id=795414"
 		rlLog "closes https://engineering.redhat.com/trac/ipa-tests/ticket/313"
@@ -1286,7 +1287,7 @@ EOF
 
 	rlPhaseEnd
 
-	rlPhaseStartTest "ipa-dns-178 Bug 805427 - idnssoaserial does not honour the recommended syntax in rfc1912."
+	rlPhaseStartTest "ipa-dns-179 Bug 805427 - idnssoaserial does not honour the recommended syntax in rfc1912."
 
 		rlLog "verifies https://bugzilla.redhat.com/show_bug.cgi?id=805427"
 		rlLog "closes https://engineering.redhat.com/trac/ipa-tests/ticket/384"
@@ -1302,7 +1303,7 @@ EOF
 
 	rlPhaseEnd
 
-	rlPhaseStartTest "ipa-dns-179 Bug 805871 - Incorrect SOA serial number set for forward zone during ipa-server installation."
+	rlPhaseStartTest "ipa-dns-180 Bug 805871 - Incorrect SOA serial number set for forward zone during ipa-server installation."
 
 		rlLog "verifies https://bugzilla.redhat.com/show_bug.cgi?id=805871"
 		rlLog "closes https://engineering.redhat.com/trac/ipa-tests/ticket/385"
@@ -1342,7 +1343,7 @@ EOF
 
 	rlPhaseEnd
 
-	rlPhaseStartTest "ipa-dns-180 Bug 701677 - Allow specifying query and transfer policy settings for a zone."
+	rlPhaseStartTest "ipa-dns-181 Bug 701677 - Allow specifying query and transfer policy settings for a zone."
 
 		rlLog "verifies https://bugzilla.redhat.com/show_bug.cgi?id=701677"
 		rlLog "closes https://engineering.redhat.com/trac/ipa-tests/ticket/182"
@@ -1404,7 +1405,7 @@ EOF
 
 	rlPhaseEnd
 
-        rlPhaseStartTest "ipa-dns-181 Bug 804572 - Irrelevant error message when per-part modification mode is used during dnsrecord-mod operation without specifying the record."
+        rlPhaseStartTest "ipa-dns-182 Bug 804572 - Irrelevant error message when per-part modification mode is used during dnsrecord-mod operation without specifying the record."
 
                 rlLog "closes https://engineering.redhat.com/trac/ipa-tests/ticket/374"
                 rlLog "verifies https://bugzilla.redhat.com/show_bug.cgi?id=804572"
