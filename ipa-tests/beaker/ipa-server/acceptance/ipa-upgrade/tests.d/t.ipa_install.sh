@@ -196,6 +196,8 @@ ipa_install_slave_all(){
 	"SLAVE")
 		rlLog "Machine in recipe is SLAVE"
 		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $MASTER_IP"
+		rlRun "sed -i /$MASTER_S/d ~/.ssh/known_hosts"
+		rlRun "sed -i /$MASTER_IP/d ~/.ssh/known_hosts"
 		rlRun "AddToKnownHosts $MASTER"
 		rlLog "pushd /dev/shm"
 		pushd /dev/shm
