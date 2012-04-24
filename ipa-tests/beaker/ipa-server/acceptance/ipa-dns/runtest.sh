@@ -1291,14 +1291,14 @@ EOF
 		rlLog "verifies https://bugzilla.redhat.com/show_bug.cgi?id=805427"
 		rlLog "closes https://engineering.redhat.com/trac/ipa-tests/ticket/384"
 
-		zone178="zone178"
+		myzone="bugzone"
 		FORMAT=`date +%Y%m%d`
 		rlRun "ipa dnszone-show $DOMAIN | grep -i serial | cut -d : -f 2 | grep $FORMAT"
 
-                rlRun "ipa dnszone-add $zone178 --name-server=$HOSTNAME --admin-email=$email"
-		rlRun "ipa dnszone-show $zone178 | grep -i serial | cut -d : -f 2 | grep $FORMAT"
+                rlRun "ipa dnszone-add $myzone --name-server=$HOSTNAME --admin-email=$email"
+		rlRun "ipa dnszone-show $myzone | grep -i serial | cut -d : -f 2 | grep $FORMAT"
 
-		rlRun "ipa dnszone-del $zone178"
+		rlRun "ipa dnszone-del $myzone"
 
 	rlPhaseEnd
 
