@@ -18,7 +18,7 @@ selfservice_usertest()
 
 selfservice_usertest_envsetup()
 {
-	rlPhaseStartTest "selfservice-usertest-envsetup: Setup users for tests"
+	rlPhaseStartTest "selfservice-usertest-envsetup Setup users for tests"
 		KinitAsAdmin
 		create_ipauser user0001 Test User0001 passw0rd1
 		rlRun "mkdir /home/user0001"
@@ -38,7 +38,7 @@ selfservice_usertest_envsetup()
 selfservice_usertest_envcleanup()
 {
 
-	rlPhaseStartTest "selfservice-usertest-envcleanup: Cleanup users and rules created by tests"
+	rlPhaseStartTest "selfservice-usertest-envcleanup Cleanup users and rules created by tests"
 		delete_ipauser user0001
 		delete_ipauser user0002
 		delete_ipauser good_manager
@@ -55,7 +55,7 @@ selfservice_usertest_envcleanup()
 
 selfservice_usertest_1001() 
 {
-	rlPhaseStartTest "selfservice-usertest-1001: Set all parameters allowed by default"
+	rlPhaseStartTest "selfservice-usertest-1001 Set all parameters allowed by default"
 		KinitAsUser user0001 passw0rd1	
 		rlRun "ipa user-mod user0001  --first=Good"
 		rlRun "ipa user-mod user0001  --last=User"
@@ -81,7 +81,7 @@ selfservice_usertest_1001()
 
 selfservice_usertest_1002()
 {
-	rlPhaseStartTest "selfservice-usertest-1002: Test that default disallowed are rejected"
+	rlPhaseStartTest "selfservice-usertest-1002 Test that default disallowed are rejected"
 		KinitAsUser user0001 passw0rd1
 		rlRun "ipa user-mod user0001  --uid=9999"                1 "By default a user should not be able to user-mod --uid"
 		rlRun "ipa user-mod user0001  --gidnumber=9999"          1 "By default a user should not be able to user-mod --gidnumber"
@@ -92,7 +92,7 @@ selfservice_usertest_1002()
 
 selfservice_usertest_1003()
 {
-	rlPhaseStartTest "selfservice-usertest-1003: Delete default rule User Self service and test params can no longer be set"
+	rlPhaseStartTest "selfservice-usertest-1003 Delete default rule User Self service and test params can no longer be set"
 		KinitAsAdmin
 		rlRun "ipa selfservice-del \"User Self service\"" 0 "Delete the default rule User Self service"
 
@@ -121,7 +121,7 @@ selfservice_usertest_1003()
 
 selfservice_usertest_1004()
 {
-	rlPhaseStartTest "selfservice-usertest-1004: create new rule and test write access"
+	rlPhaseStartTest "selfservice-usertest-1004 create new rule and test write access"
 		KinitAsAdmin
 		rlRun "ipa selfservice-add rule0001 --attrs=\"mobile, pager, facsimiletelephonenumber, telephonenumber\"" 
 
@@ -135,7 +135,7 @@ selfservice_usertest_1004()
 
 selfservice_usertest_1005()
 {
-	rlPhaseStartTest "selfservice-usertest-1005: check the user's attribute settings"
+	rlPhaseStartTest "selfservice-usertest-1005 check the user's attribute settings"
 		tmpout=$TmpDir/selfservice_usertest.out
 		KinitAsUser user0001 passw0rd1
 		rlRun "ipa user-find user0001  --first=Good"
@@ -167,7 +167,7 @@ selfservice_usertest_1005()
 		
 selfservice_usertest_1006()
 {
-	rlPhaseStartTest "selfservice-usertest-1006: su to user and change allowed settings"
+	rlPhaseStartTest "selfservice-usertest-1006 su to user and change allowed settings"
 		rlRun "su - user0001 -c \"echo passw0rd1|kinit user0001; ipa user-mod user0001 --mobile=888-888-8888\"" \
 			0 "Su to user, kinit, and run user-map against allowed attribute"
 	rlPhaseEnd
@@ -175,7 +175,7 @@ selfservice_usertest_1006()
 
 selfservice_usertest_1007()
 {
-	rlPhaseStartTest "selfservice-usertest-1007: su to user and test that disallowed params cannot be set"
+	rlPhaseStartTest "selfservice-usertest-1007 su to user and test that disallowed params cannot be set"
 		tmpout=$TmpDir/selfservice_usertest.out
 		rlRun "su - user0001 -c \"echo passw0rd1|kinit user0001; ipa user-mod user0001 --title=Dr\" > $tmpout 2>&1" \
 			1 "Su to user, kinit, and confirm user-map against disallowed attribute fails"
@@ -186,7 +186,7 @@ selfservice_usertest_1007()
 
 selfservice_usertest_1008()
 {
-	rlPhaseStartTest "selfservice-usertest-1008: confirm user-mod fails with one of multiple params is disallowed"
+	rlPhaseStartTest "selfservice-usertest-1008 confirm user-mod fails with one of multiple params is disallowed"
 		tmpout=$TmpDir/selfservice_usertest.out
 		KinitAsUser user0001 passw0rd1
 		rlRun "ipa user-mod user0001 --title=notgonnawork --phone=999-999-9990 > $tmpout 2>&1" \
@@ -199,7 +199,7 @@ selfservice_usertest_1008()
 
 selfservice_usertest_1009()
 {
-	rlPhaseStartTest "selfservice-usertest-1009: confirm user can change their password"
+	rlPhaseStartTest "selfservice-usertest-1009 confirm user can change their password"
 		KinitAsAdmin
 		local minLifeOrig=$(ipa pwpolicy-show|grep "Min lifetime (hours):"|awk '{print $4}')
 		rlRun "ipa pwpolicy-mod --minlife=0" 0 "Set Minimum (in hrs) time between password changes to zero (0)"
@@ -215,7 +215,7 @@ selfservice_usertest_1009()
 
 selfservice_usertest_1010()
 {
-	rlPhaseStartTest "selfservice-usertest-1010: confirm user cannot change another user's attributes"
+	rlPhaseStartTest "selfservice-usertest-1010 confirm user cannot change another user's attributes"
 		tmpout=$TmpDir/selfservice_usertest.out
 		KinitAsUser user0002 passw0rd2
 		rlRun "ipa user-mod user0001 --mobile=867-5309 > $tmpout 2>&1" 1 "Confirm user cannot change another user's attributes"
