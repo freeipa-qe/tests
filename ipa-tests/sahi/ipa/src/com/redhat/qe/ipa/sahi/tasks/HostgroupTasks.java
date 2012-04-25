@@ -34,17 +34,17 @@ public class HostgroupTasks {
 		String description1 = groupName1 + " description";
 		sahiTasks.span("Add").click();
 		sahiTasks.textbox("cn").setValue(groupName1);
-		sahiTasks.textbox("description").setValue(description1);
+		sahiTasks.textarea("description").setValue(description1);
 		sahiTasks.button("Add and Add Another").click();
 		
 		String description2 = groupName2 + " description";
 		sahiTasks.textbox("cn").setValue(groupName2);
-		sahiTasks.textbox("description").setValue(description2);
+		sahiTasks.textarea("description").setValue(description2);
 		sahiTasks.button("Add and Add Another").click();
 		
 		String description3 = groupName3 + " description";
 		sahiTasks.textbox("cn").setValue(groupName3);
-		sahiTasks.textbox("description").setValue(description3);
+		sahiTasks.textarea("description").setValue(description3);
 		sahiTasks.button("Add").click();
 	}
 	
@@ -59,10 +59,10 @@ public class HostgroupTasks {
 	public static void addAndEditHostGroup(SahiTasks sahiTasks, String groupName, String description1, String description2) {
 		sahiTasks.span("Add").click();
 		sahiTasks.textbox("cn").setValue(groupName);
-		sahiTasks.textbox("description").setValue(description1);
+		sahiTasks.textarea("description").setValue(description1);
 		sahiTasks.button("Add and Edit").click();
 		sahiTasks.link("Settings").click();
-		sahiTasks.textbox("description").setValue(description2);
+		sahiTasks.textarea("description").setValue(description2);
 		sahiTasks.span("Update").click();
 		sahiTasks.link("Host Groups").in(sahiTasks.div("content")).click();
 	}
@@ -76,7 +76,7 @@ public class HostgroupTasks {
 	public static void verifyHostGroupSettings(SahiTasks sahiTasks, String groupName, String description) {
 		sahiTasks.link(groupName).click();
 		sahiTasks.link("Settings").click();
-		Assert.assertEquals(sahiTasks.textbox("description").value(), description, "Verified existing description for host group: " + groupName);
+		Assert.assertEquals(sahiTasks.textarea("description").value(), description, "Verified existing description for host group: " + groupName);
 		sahiTasks.link("Host Groups").in(sahiTasks.div("content")).click();
 		
 	}
@@ -106,6 +106,7 @@ public class HostgroupTasks {
 		for (String groupname : groupnames) {
 			sahiTasks.checkbox(groupname).click();
 		}
+		
 		sahiTasks.link("Delete").click();
 		sahiTasks.button("Delete").click();
 	}
@@ -128,7 +129,7 @@ public class HostgroupTasks {
 		}
 		
 		sahiTasks.radio("direct").click();
-		sahiTasks.link("Enroll").click();
+		sahiTasks.link("Add").click();
 		
 		sahiTasks.checkbox(name).click();
 		
@@ -155,7 +156,7 @@ public class HostgroupTasks {
 		}
 		
 		sahiTasks.radio("direct").click();
-		sahiTasks.link("Enroll").click();
+		sahiTasks.link("Add").click();
 		
 		for (String name : names) {
 			sahiTasks.checkbox(name).click();
@@ -182,7 +183,7 @@ public class HostgroupTasks {
 			sahiTasks.link("member_hostgroup").click();
 		}
 		sahiTasks.radio("direct").click();
-		sahiTasks.link("Enroll").click();
+		sahiTasks.link("Add").click();
 		if( hide == "YES" ){
 			sahiTasks.checkbox("hidememb").check();
 			sahiTasks.textbox("filter").setValue(searchstr);
@@ -388,7 +389,7 @@ public class HostgroupTasks {
 	public static void addInvalidHostGroup(SahiTasks sahiTasks, String groupname, String description, String expectedError) {
 		sahiTasks.span("Add").click();
 		sahiTasks.textbox("cn").setValue(groupname);
-		sahiTasks.textbox("description").setValue(description);
+		sahiTasks.textarea("description").setValue(description);
 	
 		sahiTasks.button("Add").click();
 		//Check for expected error
@@ -396,9 +397,8 @@ public class HostgroupTasks {
 		Assert.assertTrue(sahiTasks.div(expectedError).exists(), "Verified expected error when adding invalid host group :: " + expectedError);
 	
 		log.fine("cancel(near retry)");
-		sahiTasks.button("Cancel").near(sahiTasks.button("Retry")).click();
-		log.fine("cancel");
-		sahiTasks.button("Cancel").near(sahiTasks.button("Add and Edit")).click();
+		sahiTasks.button("Cancel").click();
+		
 	}
 	
 	/*
@@ -412,7 +412,7 @@ public class HostgroupTasks {
 		
 		sahiTasks.span("Add").click();
 		sahiTasks.textbox("cn").setValue(groupname);
-		sahiTasks.textbox("description").setValue(description);
+		sahiTasks.textarea("description").setValue(description);
 	
 		sahiTasks.button("Add").click();
 		//Check for expected error
@@ -434,8 +434,8 @@ public class HostgroupTasks {
 		
 		sahiTasks.link(groupname).click();
 		sahiTasks.link("Settings").click();
-		sahiTasks.textbox("description").setValue(" ");
-		sahiTasks.textbox("description").setValue(description);
+		sahiTasks.textarea("description").setValue(" ");
+		sahiTasks.textarea("description").setValue(description);
 		sahiTasks.span("Update").click();
 
 		//Check for expected error
@@ -462,7 +462,7 @@ public class HostgroupTasks {
 		
 		sahiTasks.link(groupname).click();
 		sahiTasks.link("Settings").click();
-		sahiTasks.textbox("description").setValue(description);
+		sahiTasks.textarea("description").setValue(description);
 		sahiTasks.span("Update").click();
 
 		//Check for expected error
