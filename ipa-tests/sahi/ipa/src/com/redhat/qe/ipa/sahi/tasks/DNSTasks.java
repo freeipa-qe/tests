@@ -310,19 +310,25 @@ public class DNSTasks {
 	 * @param hostname - hostname
 	 * @param ipadr -  ipaddress
 	 */
-	public static void verifyRecord(SahiTasks sahiTasks, String zone, String name, String type, String data, String exists) {
-		sahiTasks.link(zone).click();
-		if (exists == "YES"){
-			com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(name).exists(), "Verify record " + name + " of type " + type + " exists");
-			sahiTasks.link(name).click();
-			com.redhat.qe.auto.testng.Assert.assertEquals(sahiTasks.textbox(type).value(), data, "Verify record " + name + " has record type " + type + " with a value of " + data);
-			sahiTasks.link("dnszone").in(sahiTasks.div("content")).click();
-		}
-		else {
-			com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(name).exists(), "Verify record " + name + " of type " + type + " does NOT exists");
-		}		
-		sahiTasks.link("DNS Zones").in(sahiTasks.div("content")).click();
-	}
+	// mvarun : updated verifyRecord task because it is used in Hosts tests(hostAddDNSTest)
+	
+	
+	public static void verifyRecord(SahiTasks sahiTasks, String zone, String name, String recordtype, String data, String exists) {
+        sahiTasks.link(zone).click();
+        if (exists == "YES")
+        {
+            com.redhat.qe.auto.testng.Assert.assertTrue(sahiTasks.link(name).exists(), "Verify record " + name + " of type " + recordtype + " exists");
+            sahiTasks.link(name).click();
+            Assert.assertTrue(sahiTasks.checkbox(data).near(sahiTasks.label(recordtype + ":")).exists(),  "Verify record " + name + " has record type " + recordtype + " with a value of " + data);
+        }
+        else
+        {
+            com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(name).exists(), "Verify record " + name + " of type " + recordtype + " does NOT exists");
+        }       
+        sahiTasks.link("DNS Zones").in(sahiTasks.div("content")).click();
+    }
+	
+	
 	
 	/*
 	 * Delete DNS reverse address for a host
