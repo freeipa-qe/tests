@@ -67,7 +67,7 @@ delegation_bz()
 ######################################################################
 delegation_bz_783307()
 {
-	rlPhaseStartTest "delegation_bz_783307: ipa delegation-add is not failing when membergroup does not exist"
+	rlPhaseStartTest "delegation_bz_783307 ipa delegation-add is not failing when membergroup does not exist"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa group-add --desc=gr1000 gr1000 > /dev/null 2>&1" 0 "Add group required for test"
@@ -87,7 +87,7 @@ delegation_bz_783307()
 ######################################################################
 delegation_bz_783473()
 {
-	rlPhaseStartTest "delegation_bz_783473: ipa delegation-find --membergroup= with no value returns internal error"
+	rlPhaseStartTest "delegation_bz_783473 ipa delegation-find --membergroup= with no value returns internal error"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-find --membergroup= > $tmpout 2>&1" 1 "Find with --membergroup= with no value"
@@ -104,7 +104,7 @@ delegation_bz_783473()
 ######################################################################
 delegation_bz_783475()
 {
-	rlPhaseStartTest "delegation_bz_783475: ipa delegation-find --membergroup=\"\" with no value returns internal error"
+	rlPhaseStartTest "delegation_bz_783475 ipa delegation-find --membergroup=\"\" with no value returns internal error"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-find --membergroup= > $tmpout 2>&1" 1 "Find  with --membergroup=\"\" with empty value"
@@ -121,7 +121,7 @@ delegation_bz_783475()
 ######################################################################
 delegation_bz_783489()
 {
-	rlPhaseStartTest "delegation_bz_783489: ipa delegation-find --permissions= returns internal error"
+	rlPhaseStartTest "delegation_bz_783489 ipa delegation-find --permissions= returns internal error"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-add $FUNCNAME --membergroup=admins --group=ipausers --attrs=mobile" 0 "Add delegation required for test"
@@ -154,7 +154,7 @@ delegation_bz_783489()
 ######################################################################
 delegation_bz_783501()
 {
-	rlPhaseStartTest "delegation_bz_783501: ipa delegation-find --attrs= returns internal error"
+	rlPhaseStartTest "delegation_bz_783501 ipa delegation-find --attrs= returns internal error"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-add $FUNCNAME --membergroup=admins --group=ipausers --attrs=mobile" 0 "Add delegation required for test"
@@ -187,7 +187,7 @@ delegation_bz_783501()
 ######################################################################
 delegation_bz_783543()
 {
-	rlPhaseStartTest "delegation_bz_783543: ipa delegation-mod --membergroup= returns internal error"
+	rlPhaseStartTest "delegation_bz_783543 ipa delegation-mod --membergroup= returns internal error"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-add $FUNCNAME --membergroup=admins --group=ipausers --attrs=mobile" 0 "Add delegation required for test"
@@ -211,7 +211,7 @@ delegation_bz_783543()
 ######################################################################
 delegation_bz_783548()
 {
-	rlPhaseStartTest "delegation_bz_783548: ipa delegation-mod is not failing when membergroup does not exist"
+	rlPhaseStartTest "delegation_bz_783548 ipa delegation-mod is not failing when membergroup does not exist"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-add $FUNCNAME --membergroup=admins --group=ipausers --attrs=mobile" 0 "Add delegation required for test"
@@ -231,7 +231,7 @@ delegation_bz_783548()
 ######################################################################
 delegation_bz_782974()
 {
-	rlPhaseStartTest "delegation_bz_782974: Exception why removing all values in config plugin"
+	rlPhaseStartTest "delegation_bz_782974 Exception why removing all values in config plugin"
 		rlLog "delegation_bz_783554 is a duplicate of this bug."
 		rlLog "Executing delegation_bz_783554 to test"
 	rlPhaseEnd
@@ -243,7 +243,7 @@ delegation_bz_782974()
 ######################################################################
 delegation_bz_783554()
 {
-	rlPhaseStartTest "delegation_bz_783554: ipa delegation-mod --attrs= removes Attributes from delegation instead of failing"
+	rlPhaseStartTest "delegation_bz_783554 ipa delegation-mod --attrs= removes Attributes from delegation instead of failing"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-add $FUNCNAME --membergroup=admins --group=ipausers --attrs=mobile" 0 "Add delegation required for test"
@@ -275,7 +275,7 @@ delegation_bz_783554()
 ######################################################################
 delegation_bz_784468()
 {
-    rlPhaseStartTest "delegation_bz_784468: ipa help delegation example has group and membergroup backwards?"
+    rlPhaseStartTest "delegation_bz_784468 ipa help delegation example has group and membergroup backwards?"
         KinitAsAdmin
         local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
         rlRun "ipa help delegation > $tmpout 2>&1"
