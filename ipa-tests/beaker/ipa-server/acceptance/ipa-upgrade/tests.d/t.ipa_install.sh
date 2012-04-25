@@ -241,7 +241,7 @@ ipa_install_slave_nodns(){
 			rlRun "ipa-replica-prepare -p $ADMINPW --ip-address=$SLAVE_IP $SLAVE_S.$DOMAIN"
 		else
 			rlRun "sed -i '/$SLAVE_S/d' /etc/hosts"
-			rlRun "echo '$SLAVE_IP $SLAVE_S.$DOMAIN $SLAVE_S >> /etc/hosts"
+			rlRun "echo '$SLAVE_IP $SLAVE_S.$DOMAIN $SLAVE_S' >> /etc/hosts"
 			rlRun "ipa-replica-prepare -p $ADMINPW $SLAVE_S.$DOMAIN"
 		fi
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.1' -m $MASTER_IP"
