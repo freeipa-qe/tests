@@ -12,22 +12,7 @@ public class HostTasks {
 	 * Create a host without dns records defined.
 	 * @param sahiTasks 
 	 * @param hostname - hostname
-	 * @param ipadr -  ipaddress
-	 */
-	/*public static void addHost(SahiTasks sahiTasks, String hostname, String domain, String ipadr) {
-		sahiTasks.span("Add").click();
-		sahiTasks.textbox("hostname").setValue(hostname);
-		sahiTasks.textbox("dnszone").setValue(domain);
-		sahiTasks.checkbox("force").click();
-		sahiTasks.textbox("ip_address").setValue(ipadr);
-		sahiTasks.button("Add").click();
-	}*/
-	
-	/*
-	 * Create a host without dns records defined.
-	 * @param sahiTasks 
-	 * @param hostname - hostname
-	 * @param domain - dns domain
+	 * @param hostdomain - dns domain
 	 * @param ipadr -  ipaddress
 	 */
 	public static void addHost(SahiTasks sahiTasks, String hostname, String hostdomain, String ipadr) {
@@ -41,10 +26,32 @@ public class HostTasks {
 		if (ipadr != ""){
 			sahiTasks.textbox("ip_address").setValue(ipadr);
 		}
-		//sahiTasks.checkbox("force").click();
+		
 		sahiTasks.button("Add").click();
 	}
 	
+	/*
+	 * Create a host to select dns zone from drop down without dns records defined.
+	 * @param sahiTasks 
+	 * @param hostname - hostname
+	 * @param hostdomain - dns domain
+	 * @param ipadr -  ipaddress
+	 */
+	public static void addHostBz751529(SahiTasks sahiTasks, String hostname,String hostdomain, String ipadr) {
+		sahiTasks.span("Add").click();
+		sahiTasks.textbox("hostname").setValue(hostname);
+		sahiTasks.span("icon combobox-icon").click();
+		sahiTasks.select("list").choose(hostdomain);
+			
+		if(ipadr == ""){ 
+			sahiTasks.checkbox("force").click();
+		}
+		if (ipadr != ""){
+			sahiTasks.textbox("ip_address").setValue(ipadr);
+		}
+		
+		sahiTasks.button("Add").click();
+	}
 	/*
 	 * Add and Edit a host
 	 * @param sahiTasks 
@@ -67,7 +74,7 @@ public class HostTasks {
 			sahiTasks.textbox("ip_address").setValue(ipadr);
 		}
 		sahiTasks.button("Add and Edit").click();
-		sahiTasks.textbox("description").setValue(description);
+		sahiTasks.textarea("description").setValue(description);
 		sahiTasks.textbox("l").setValue(local);
 		sahiTasks.textbox("nshostlocation").setValue(location);
 		sahiTasks.textbox("nshardwareplatform").setValue(platform);
@@ -114,7 +121,7 @@ public class HostTasks {
 	 */
 	public static void verifyHostSettings(SahiTasks sahiTasks, String hostname, String description, String local, String location, String platform, String os) {
 		sahiTasks.link(hostname).click(); 
-		Assert.assertEquals(sahiTasks.textbox("description").value(), description, "Verified description for host: " + description);
+		Assert.assertEquals(sahiTasks.textarea("description").value(), description, "Verified description for host: " + description);
 		Assert.assertEquals(sahiTasks.textbox("l").value(), local, "Verified local for host: " + local);
 		Assert.assertEquals(sahiTasks.textbox("nshostlocation").value(), location, "Verified location for host: " + location);
 		Assert.assertEquals(sahiTasks.textbox("nshardwareplatform").value(), platform, "Verified platform for host: " + platform);
@@ -142,7 +149,7 @@ public class HostTasks {
 		//Check for expected error
 		log.fine("error check");
 		if (requiredFieldTest)
-			Assert.assertTrue(sahiTasks.span(expectedError).exists(), "Verified expected error when adding invalid host " );
+			Assert.assertTrue(sahiTasks.span(expectedError).exists(), "Verified expected error when adding invalid host" );
 		else {
 			Assert.assertTrue(sahiTasks.div(expectedError).exists(), "Verified expected error when adding invalid host");
 			log.fine("cancel(near retry)");
@@ -151,10 +158,7 @@ public class HostTasks {
 		log.fine("cancel");
 		sahiTasks.button("Cancel").near(sahiTasks.button("Add and Edit")).click();
 	}
-	
-
-
-	
+		
 	/*
 	 * Modify a host
 	 * @param sahiTasks
@@ -164,7 +168,7 @@ public class HostTasks {
 		sahiTasks.link(hostname).click();
 
 		if (field == "description"){
-			sahiTasks.textbox("description").setValue(value);
+			sahiTasks.textarea("description").setValue(value);
 		}
 		if (field == "local"){
 			sahiTasks.textbox("l").setValue(value);
@@ -191,7 +195,7 @@ public class HostTasks {
 	public static void undoModifyHost(SahiTasks sahiTasks, String hostname, String newdesc, String newlocal, String newlocation, String newplatform, String newos) {
 		sahiTasks.link(hostname).click();
 
-		sahiTasks.textbox("description").setValue(newdesc);
+		sahiTasks.textarea("description").setValue(newdesc);
 		sahiTasks.span("undo").click();
 		
 		sahiTasks.textbox("l").setValue(newlocal);
@@ -259,7 +263,7 @@ public class HostTasks {
 	public static void verifyHostField(SahiTasks sahiTasks, String hostname, String field, String value) {
 		sahiTasks.link(hostname).click();
 		if (field == "description"){
-			Assert.assertEquals(sahiTasks.textbox("description").value(), value, "Verified description for host: " + value);
+			Assert.assertEquals(sahiTasks.textarea("description").value(), value, "Verified description for host: " + value);
 		}
 		if (field == "local"){
 			Assert.assertEquals(sahiTasks.textbox("l").value(), value, "Verified local for host: " + value);
@@ -291,7 +295,7 @@ public class HostTasks {
 		//String checkbox = managedby+"[1]";
 		sahiTasks.link(managed).click();
 		sahiTasks.link("managedby_host").click();
-		sahiTasks.span("Enroll").click();
+		sahiTasks.span("Add").click();
 		sahiTasks.checkbox(managedby).click();
 		sahiTasks.span(">>").click();
 		sahiTasks.button(button).click();
@@ -312,6 +316,12 @@ public class HostTasks {
 		sahiTasks.checkbox(managedby).click();
 		sahiTasks.span("Delete").click();
 		sahiTasks.button(button).click();
+		//sahiTasks.checkbox("fqdn").click();
+		//sahiTasks.checkbox("fqdn").click();
+		if (button == "Cancel"){
+			sahiTasks.checkbox(managedby).click();
+		}
+		
 		sahiTasks.link("Hosts").in(sahiTasks.div("content")).click();
 
 	}
@@ -402,7 +412,7 @@ public class HostTasks {
 	public static void addHostCertificate(SahiTasks sahiTasks, String hostname, String csr) {
 		sahiTasks.link(hostname).click();
 		sahiTasks.span("New Certificate").click();
-		sahiTasks.textarea(0).setValue(csr);
+		sahiTasks.textarea(1).setValue(csr);
 		sahiTasks.button("Issue").click();
 		sahiTasks.link("Hosts").in(sahiTasks.div("content")).click();
 	}
@@ -488,7 +498,7 @@ public class HostTasks {
 	public static void newHostCertificate(SahiTasks sahiTasks, String hostname, String csr, String button) {
 		sahiTasks.link(hostname).click();
 		sahiTasks.span("New Certificate").click();
-		sahiTasks.textarea(0).setValue(csr);
+		sahiTasks.textarea(1).setValue(csr);
 		sahiTasks.button(button).click();
 		sahiTasks.link("Hosts").in(sahiTasks.div("content")).click();
 	}
@@ -501,7 +511,7 @@ public class HostTasks {
 	public static void invalidHostCSR(SahiTasks sahiTasks, String hostname, String csr, String expectedError) {
 		sahiTasks.link(hostname).click();
 		sahiTasks.span("New Certificate").click();
-		sahiTasks.textarea(0).setValue(csr);
+		sahiTasks.textarea("certificate").setValue(csr);
 		sahiTasks.button("Issue").click();
 		
 		Assert.assertTrue(sahiTasks.div(expectedError).exists(), "Verified expected error with invalid csr.");
@@ -600,6 +610,7 @@ public class HostTasks {
 	 */
 	public static void verifyHostKeytab(SahiTasks sahiTasks, String hostname, boolean provisioned ) {
 		sahiTasks.link(hostname).click();
+	    sahiTasks.span("Refresh").click();
 		if (provisioned == false){
 			Assert.assertTrue(sahiTasks.span("Kerberos Key Not Present").exists(), "Host " + hostname + " does not have a keytab provisioned");
 		}
@@ -617,6 +628,7 @@ public class HostTasks {
 	 */
 	public static void deleteHostKeytab(SahiTasks sahiTasks, String hostname, String button ) {
 		sahiTasks.link(hostname).click();
+		sahiTasks.span("Refresh").click();
 		sahiTasks.span("Delete Key, Unprovision").click();
 		sahiTasks.button(button).click();
 		sahiTasks.link("Hosts").in(sahiTasks.div("content")).click();
