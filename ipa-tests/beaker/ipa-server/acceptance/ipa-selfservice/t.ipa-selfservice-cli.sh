@@ -108,6 +108,7 @@ selfservice_add_1004() #BZ 772106 -- ipa selfservice-add --raw returns "internal
 		local permissions_TestValue="write" #permissions;positive;LIST 
 		#rlRun "ipa selfservice-add $testID --all  --attrs=$attrs_TestValue  --permissions=$permissions_TestValue --raw " 0 "test options:  [attrs]=[$attrs_TestValue] [permissions]=[$permissions_TestValue]"
 		rlRun "ipa selfservice-add $testID --all  --attrs=$attrs_TestValue  --permissions=$permissions_TestValue --raw > $tmpout 2>&1" 0 
+		rlAssertGrep "selfservice:selfservice_add_1004" $tmpout
 		if [ $(grep "ipa: ERROR: an internal error has occurred" $tmpout | wc -l) -eq 1 ]; then
 			rlFail "BZ 772106 found...ipa selfservice-add --raw returns \"internal error\" message"
 		else
@@ -379,7 +380,7 @@ selfservice_find_1005() # BZ 747693 -- ipa selfservice-find --raw returns "inter
 		local permissions_TestValue="write" #permissions;positive;LIST 
 		#rlRun "ipa selfservice-find $testID --all  --attrs=$attrs_TestValue  --name=$name_TestValue  --permissions=$permissions_TestValue --raw " 0 "test options:  (with --raw) [attrs]=[$attrs_TestValue] [name]=[$name_TestValue] [permissions]=[$permissions_TestValue]" 
 		#rlRun "ipa selfservice-find $testID --all  --attrs=$attrs_TestValue  --name=$name_TestValue  --permissions=$permissions_TestValue " 0 "test options:  (without --raw) [attrs]=[$attrs_TestValue] [name]=[$name_TestValue] [permissions]=[$permissions_TestValue]" 
-		local expectedErrMsg="aciname: $testID"
+		local expectedErrMsg="selfservice:$testID"
 		local expectedErrCode=0
 		qaRun "ipa selfservice-find $testID --all  --attrs=$attrs_TestValue  --name=$name_TestValue  --permissions=$permissions_TestValue --raw " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  (without --raw) [attrs]=[$attrs_TestValue] [name]=[$name_TestValue] [permissions]=[$permissions_TestValue]"
 		if [ $(grep "ipa: ERROR: an internal error has occurred" $tmpout | wc -l) -eq 1 ]; then
@@ -487,7 +488,7 @@ selfservice_find_1012() # BZ 747693 -- ipa selfservice-find --raw returns "inter
 		local tmpout=$TmpDir/selfservice_find_1012.$RANDOM.out
 		KinitAsAdmin
 		#rlRun "ipa selfservice-find $testID --raw " 0 "test options: " 
-		local expectedErrMsg="aciname: $testID"
+		local expectedErrMsg="selfservice:$testID"
 		local expectedErrCode=0
 		qaRun "ipa selfservice-find $testID --raw " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options: "
 		if [ $(grep "ipa: ERROR: an internal error has occurred" $tmpout | wc -l) -eq 1 ]; then
@@ -619,7 +620,7 @@ selfservice_mod_1004() # BZ 772675 -- ipa selfservice-mod --raw returns "interna
 		local attrs_TestValue="mobile" #attrs;positive;LIST 
 		local permissions_TestValue="write" #permissions;positive;LIST 
 		#rlRun "ipa selfservice-mod $testID --all  --attrs=$attrs_TestValue  --permissions=$permissions_TestValue --raw " 0 "test options:  (change attr, with --raw) [attrs]=[$attrs_TestValue] [permissions]=[$permissions_TestValue]" 
-		local expectedErrMsg="aciname: $testID"
+		local expectedErrMsg="selfservice:$testID"
 		local expectedErrCode=0
 		qaRun "ipa selfservice-mod $testID --all  --attrs=$attrs_TestValue  --permissions=$permissions_TestValue --raw" "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [attrs]=[$attrs_TestValue] [permissions]=[$permissions_TestValue]"
 		if [ $(grep "ipa: ERROR: an internal error has occurred" $tmpout | wc -l) -eq 1 ]; then
