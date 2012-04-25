@@ -75,7 +75,7 @@ delegation_show_positive_1001()
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-show delegation_show_positive_1000 > $tmpout 2>&1" 
 		rlAssertGrep "Delegation name: delegation_show_positive_1000" $tmpout
-		[ -f $tmpout ] && rm $tmpout
+		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd
 }
 
@@ -86,7 +86,7 @@ delegation_show_positive_1002()
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-show delegation_show_positive_1000 --all > $tmpout 2>&1" 
 		rlAssertGrep "Delegation name: delegation_show_positive_1000" $tmpout
-		[ -f $tmpout ] && rm $tmpout
+		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd
 }
 
@@ -96,8 +96,8 @@ delegation_show_positive_1003()
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-show delegation_show_positive_1000 --raw > $tmpout 2>&1" 
-		rlAssertGrep "aciname: delegation_show_positive_1000" $tmpout
-		[ -f $tmpout ] && rm $tmpout
+		rlAssertGrep "delegation:delegation_show_positive_1000" $tmpout
+		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd
 }
 
@@ -107,8 +107,8 @@ delegation_show_positive_1004()
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-show delegation_show_positive_1000 --all --raw > $tmpout 2>&1" 
-		rlAssertGrep "aciname: delegation_show_positive_1000" $tmpout
-		[ -f $tmpout ] && rm $tmpout
+		rlAssertGrep "delegation:delegation_show_positive_1000" $tmpout
+		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd
 }
 
@@ -146,7 +146,7 @@ delegation_show_negative_1001()
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-show baddelegation > $tmpout 2>&1" 2
 		rlAssertGrep "ipa: ERROR: ACI with name \"baddelegation\" not found" $tmpout
-		[ -f $tmpout ] && rm $tmpout
+		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd
 }
 
@@ -157,7 +157,7 @@ delegation_show_negative_1002()
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-show baddelegation --all > $tmpout 2>&1" 2
 		rlAssertGrep "ipa: ERROR: ACI with name \"baddelegation\" not found" $tmpout
-		[ -f $tmpout ] && rm $tmpout
+		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd
 }
 
@@ -168,7 +168,7 @@ delegation_show_negative_1003()
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-show baddelegation --raw > $tmpout 2>&1" 2
 		rlAssertGrep "ipa: ERROR: ACI with name \"baddelegation\" not found" $tmpout
-		[ -f $tmpout ] && rm $tmpout
+		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd
 }
 
@@ -179,7 +179,7 @@ delegation_show_negative_1004()
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-show baddelegation --all --raw > $tmpout 2>&1" 2
 		rlAssertGrep "ipa: ERROR: ACI with name \"baddelegation\" not found" $tmpout
-		[ -f $tmpout ] && rm $tmpout
+		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd
 }
 
