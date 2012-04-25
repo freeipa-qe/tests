@@ -64,6 +64,7 @@ public class HostTests extends SahiTestScript{
 		HostTasks.addHostAndEdit(sahiTasks, domain, undotesthost, "", olddescription, oldlocal, oldlocation, oldplatform, oldos);
 		HostTasks.addHost(sahiTasks, managed, domain, "");
 		HostTasks.addHost(sahiTasks,managedby, domain, "");
+		
 	}
 	
 	@AfterClass (groups={"cleanup"}, description="Delete objects added for the tests", alwaysRun=true)
@@ -78,7 +79,6 @@ public class HostTests extends SahiTestScript{
 	    String currentPageNow = sahiTasks.fetch("top.location.href");
 	    CommonTasks.checkError(sahiTasks);
 		if (!currentPageNow.equals(currentPage) && !currentPageNow.equals(alternateCurrentPage)) {
-			//CommonTasks.checkError(sahiTasks);
 			System.out.println("Not on expected Page....navigating back from : " + currentPageNow);
 			sahiTasks.navigateTo(commonTasks.hostPage, true);
 		}		
@@ -102,11 +102,34 @@ public class HostTests extends SahiTestScript{
 		Assert.assertTrue(sahiTasks.link(lowerdn).exists(), "Added host " + fqdn + "  successfully");
 	}
 	
+	
+	/*
+	 * Add hosts to select dns zone from drop down- for positive tests
+	 */
+	@Test (groups={"addHostBz751529Tests"}, dataProvider="getAddHostTestObjects")	
+	public void testAddHostForceAdd(String testName, String hostname, String ipadr) throws Exception {
+		String fqdn = hostname + domain;
+		String lowerdn = fqdn.toLowerCase();
+		   
+		    //verify host doesn't exist
+			Assert.assertFalse(sahiTasks.link(lowerdn).exists(), "Verify host " + fqdn + " doesn't already exist");
+			
+			//add new host
+			HostTasks.addHostBz751529(sahiTasks, hostname, domain, ipadr);
+
+			//verify host was added
+			Assert.assertTrue(sahiTasks.link(lowerdn).exists(), "Added host " + fqdn + "  successfully");
+		}
+		
+		
+	
+	
 	/*
 	 * delete hosts
 	 */
-	@Test (groups={"deleteHostTests"}, dataProvider="getHostDeleteTestObjects",  dependsOnGroups="addHostTests")	
+	@Test (groups={"deleteHostTests"}, dataProvider="getHostDeleteTestObjects",  dependsOnGroups={"addHostTests", "addHostBz751529Tests"})	
 	public void testHostDelete(String testName, String fqdn) throws Exception {
+		
 		//verify host exists
 		Assert.assertTrue(sahiTasks.link(fqdn).exists(), "Verify host " + fqdn + " already exist");
 		
@@ -322,7 +345,7 @@ public class HostTests extends SahiTestScript{
 	@Test (groups={"invalidhostAddTests"}, dataProvider="getInvalidHostTestObjects")	
 	public void testInvalidHostadd(String testName, String hostname, String hostdomain, String ipadr, String expectedError) throws Exception {
 		boolean requiredFieldTest=false;
-		if (testName.startsWith("missing")) 
+		if (testName.startsWith("missing")|| testName.startsWith("Invalid")) 
 			requiredFieldTest=true;
 		HostTasks.addInvalidHost(sahiTasks, hostname, hostdomain, ipadr, expectedError, requiredFieldTest);
 
@@ -333,44 +356,47 @@ public class HostTests extends SahiTestScript{
 	/*
 	 * Host Add DNS tests
 	 */
-	@Test (groups={"hostAddDNSTests"}, dataProvider="getHostAddDNSTestObjects")	
-	public void testHostAddDNS(String testName, String hostname, String ipend, String updatedns ) throws Exception {
-		String [] dcs = reversezone.split("\\.");
-		String ipprefix = dcs[2] + "." + dcs[1] + "." + dcs[0] + ".";
-		String ipaddr = ipprefix + ipend;
-		String fqdn = hostname + "." + domain;
-		
-		// add host
-		HostTasks.addHost(sahiTasks, hostname, domain, ipaddr);
-		
-		// verify host was added
-		Assert.assertTrue(sahiTasks.link(fqdn).exists(), "Added host " + fqdn + "  successfully");
-		
-		// verify host link to dns and dns records
-		HostTasks.verifyHostDNSLink(sahiTasks, fqdn, "YES");
-		sahiTasks.navigateTo(commonTasks.dnsPage, true);
-		DNSTasks.verifyRecord(sahiTasks, domain, hostname, "arecord", ipaddr, "YES");
-		DNSTasks.verifyRecord(sahiTasks, reversezone, ipend, "ptrrecord", fqdn + ".", "YES");
-		
-		// deleted host
-		sahiTasks.navigateTo(commonTasks.hostPage, true);
-		HostTasks.deleteHost(sahiTasks, fqdn, updatedns);
-		
-		sahiTasks.navigateTo(commonTasks.dnsPage, true);
-		if( updatedns == "YES"){
-			DNSTasks.verifyRecord(sahiTasks, domain, hostname, "arecord", ipaddr, "NO");
-			DNSTasks.verifyRecord(sahiTasks, reversezone, ipend, "ptrrecord", fqdn + ".", "NO");
-		}
-		else{
-			DNSTasks.verifyRecord(sahiTasks, domain, hostname, "arecord", ipaddr, "YES");
-			DNSTasks.verifyRecord(sahiTasks, reversezone, ipend, "ptrrecord", fqdn + ".", "YES");
-			DNSTasks.deleteRecord(sahiTasks, domain, hostname);
-			DNSTasks.deleteRecord(sahiTasks, reversezone, ipend);
-			
-		}
-		
-		sahiTasks.navigateTo(commonTasks.hostPage, true);
-	}
+	
+	@Test (groups={"hostAddDNSTests"}, dataProvider="getHostAddDNSTestObjects")   
+    public void testHostAddDNS(String testName, String hostname, String ipend, String updatedns ) throws Exception {
+        String [] dcs = reversezone.split("\\.");
+        String ipprefix = dcs[2] + "." + dcs[1] + "." + dcs[0] + ".";
+        String ipaddr = ipprefix + ipend;
+        String fqdn = hostname + "." + domain;
+       
+        // add host
+        HostTasks.addHost(sahiTasks, hostname, domain, ipaddr);
+       
+        // verify host was added
+        Assert.assertTrue(sahiTasks.link(fqdn).exists(), "Added host " + fqdn + "  successfully");
+       
+        // verify host link to dns and dns records
+        HostTasks.verifyHostDNSLink(sahiTasks, fqdn, "YES");
+        sahiTasks.navigateTo(commonTasks.dnsPage, true);
+        DNSTasks.verifyRecord(sahiTasks, domain, hostname, "A", ipaddr, "YES");
+        DNSTasks.verifyRecord(sahiTasks, reversezone, ipend, "PTR", fqdn + ".", "YES");
+       
+        // deleted host
+        sahiTasks.navigateTo(commonTasks.hostPage, true);
+        HostTasks.deleteHost(sahiTasks, fqdn, updatedns);
+       
+        sahiTasks.navigateTo(commonTasks.dnsPage, true);
+        if( updatedns == "YES"){
+            DNSTasks.verifyRecord(sahiTasks, domain, hostname, "A", ipaddr, "NO");
+            DNSTasks.verifyRecord(sahiTasks, reversezone, ipend, "PTR", fqdn + ".", "NO");
+        }
+        else{
+            DNSTasks.verifyRecord(sahiTasks, domain, hostname, "A", ipaddr, "YES");
+            DNSTasks.verifyRecord(sahiTasks, reversezone, ipend, "PTR", fqdn + ".", "YES");
+            DNSTasks.deleteRecord(sahiTasks, domain, hostname);
+            DNSTasks.deleteRecord(sahiTasks, reversezone, ipend);
+           
+        }
+       
+        sahiTasks.navigateTo(commonTasks.hostPage, true);
+    }
+	
+	
 	
 	/*
 	 * host get keytab tests
@@ -419,11 +445,33 @@ public class HostTests extends SahiTestScript{
         //										testname				hostname		ipadr
 		ll.add(Arrays.asList(new Object[]{ "add_host_lowercase",		"myhost1",		"" } ));
 		ll.add(Arrays.asList(new Object[]{ "add_host_uppercase",		"MYHOST2",		"" } ));
-		ll.add(Arrays.asList(new Object[]{ "add_host_mixedcase",		"MyHost3", 		"" } ));		
-		ll.add(Arrays.asList(new Object[]{ "add_host_dash",				"test-", 		"" } ));
+		ll.add(Arrays.asList(new Object[]{ "add_host_mixedcase",		"MyHost3", 		"" } ));
+		//ll.add(Arrays.asList(new Object[]{ "add_host_bz751529",         "myhost4.",     "" } ));
+	
 		        
 		return ll;	
 	}
+	
+	
+	
+	/*
+	 * Data to be used when adding hosts to select dns zone from drop down- for positive cases
+	 */
+	@DataProvider(name="getAddHostTestObjects")
+	public Object[][] getAddHostFQDNTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createAddHostTestObjects());
+	}
+	protected List<List<Object>> createAddHostTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname				hostname		ipadr
+		
+		ll.add(Arrays.asList(new Object[]{ "add_host_bz751529",         "myhost4.",     "" } ));
+	
+		        
+		return ll;	
+	}
+	
 	
 	/*
 	 * Data to be used when deleting hosts - for positive cases
@@ -437,9 +485,10 @@ public class HostTests extends SahiTestScript{
 		
         //										testname				fqdn		
 		ll.add(Arrays.asList(new Object[]{ "delete_host_lowercase",		"myhost1."+domain 	} ));
-		ll.add(Arrays.asList(new Object[]{ "delete_host_uppercase",		"myhost2."+domain 	} ));
+	    ll.add(Arrays.asList(new Object[]{ "delete_host_uppercase",		"myhost2."+domain 	} ));
 		ll.add(Arrays.asList(new Object[]{ "delete_host_mixedcase",		"myhost3."+domain 	} ));
-		ll.add(Arrays.asList(new Object[]{ "delete_host_dash",			"test-."+domain		} ));
+		ll.add(Arrays.asList(new Object[]{ "add_host_bz751529",		    "myhost4."+domain 	} ));
+		
 		        
 		return ll;	
 	}
@@ -503,16 +552,17 @@ public class HostTests extends SahiTestScript{
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
         //										testname					hostname     hostdomain    	ipadr   			expectedError
+		ll.add(Arrays.asList(new Object[]{ "add_host_dash",				    "test-", 	  domain,    	"",					"invalid 'hostname': invalid domain-name: only letters, numbers, and - are allowed. - must not be the DNS label character" } ));
 		ll.add(Arrays.asList(new Object[]{ "missing_hostname",				"", 	 	 domain,		"",					"Required field"} ));
 	    ll.add(Arrays.asList(new Object[]{ "missing_domainname",			"mytest.", 	 "",			"",					"Required field"} ));
-		ll.add(Arrays.asList(new Object[]{ "invalidipadr_alpha_chars",		"test",		 domain, 		"null",				"invalid 'ip_address': invalid IP address"	} ));
-		ll.add(Arrays.asList(new Object[]{ "invalidipadr_too_many_octets",	"test",		 domain, 		"10.10.10.10.10",	"invalid 'ip_address': invalid IP address"	} ));	
-		ll.add(Arrays.asList(new Object[]{ "invalidipadr_bad_octects",		"test",		 domain, 		"999.999.999.999",	"invalid 'ip_address': invalid IP address"	} ));
-		ll.add(Arrays.asList(new Object[]{ "invalidipadr_special_chars",	"test",		 domain, 		"~.&.#.^",			"invalid 'ip_address': invalid IP address"	} ));
-		ll.add(Arrays.asList(new Object[]{ "duplicate_hostname",			testhost,	 domain, 		"",					"host with name \""+ testhost + "." + domain + "\" already exists"	} ));
-		ll.add(Arrays.asList(new Object[]{ "begining_space_hostname",		" " + "testing",  domain,		"",				"invalid 'hostname': may only include letters, numbers, and -"} ));
-		ll.add(Arrays.asList(new Object[]{ "ending_space_hostname",			"testing" + " ",  domain,		"",				"invalid 'hostname': may only include letters, numbers, and -"} ));
-		ll.add(Arrays.asList(new Object[]{ "invalid_host_tilde",			"test~", 	 domain,		"",					"invalid 'hostname': may only include letters, numbers, and -"		 } ));
+		ll.add(Arrays.asList(new Object[]{ "Invalid_ipadr_alpha_chars",		"test",		 domain, 		"null",				"Not a valid IP address"	} ));
+		ll.add(Arrays.asList(new Object[]{ "Invalid_ipadr_too_many_octets",	"test",		 domain, 		"10.10.10.10.10",	"Not a valid IP address"	} ));	
+		ll.add(Arrays.asList(new Object[]{ "Invalid_ipadr_bad_octects",		"test",		 domain, 		"999.999.999.999",	"Not a valid IP address"	} ));
+		ll.add(Arrays.asList(new Object[]{ "Invalid_ipadr_special_chars",   "test",		 domain, 		"~.&.#.^",			"Not a valid IP address"	} ));
+		ll.add(Arrays.asList(new Object[]{ "duplicate_hostname",			testhost,	     domain, 		"",					"host with name \""+ testhost + "." + domain + "\" already exists"	} ));
+		ll.add(Arrays.asList(new Object[]{ "begining_space_hostname",		" " + "testing",  domain,		"",				"invalid 'hostname': Leading and trailing spaces are not allowed"} ));
+		ll.add(Arrays.asList(new Object[]{ "ending_space_hostname",			"testing" + " ",  domain,		"",				"invalid 'hostname': invalid domain-name: only letters, numbers, and - are allowed. - must not be the DNS label character"} ));
+		ll.add(Arrays.asList(new Object[]{ "add_host_tilde",	       		"test~", 	     domain,		"",					"invalid 'hostname': invalid domain-name: only letters, numbers, and - are allowed. - must not be the DNS label character"} ));
 		return ll;	
 	}
 	
@@ -585,7 +635,7 @@ public class HostTests extends SahiTestScript{
 		
         //										testname				exists	button
 		ll.add(Arrays.asList(new Object[]{ "set_managedby_cancel",		"No",	"Cancel" } ));
-		ll.add(Arrays.asList(new Object[]{ "set_managedby_enroll",		"Yes",	"Enroll" } ));
+		ll.add(Arrays.asList(new Object[]{ "set_managedby_enroll",		"Yes",	"Add" } ));
 		        
 		return ll;	
 	}
