@@ -44,9 +44,9 @@ public class HostgroupTests extends SahiTestScript{
 	
 	//host groups and host group arrays
 	private String myhostgroup = "myhostgroup";
-	private String devgroup = "development hosts";
-	private String qegroup = "quality hosts";
-	private String enggroup = "engineering hosts";
+	private String devgroup = "development_hosts";
+	private String qegroup = "quality_hosts";
+	private String enggroup = "engineering_hosts";
 	
 	private String [] enggroups = {devgroup, qegroup};
 	
@@ -210,9 +210,9 @@ public class HostgroupTests extends SahiTestScript{
 	public void testAddHostMembers(String testName) throws Exception {
 
 		// add the host members
-		HostgroupTasks.addMembers(sahiTasks, devgroup, "host", devhosts, "Enroll");
-		HostgroupTasks.addMembers(sahiTasks, qegroup, "host", qehosts, "Enroll");
-		HostgroupTasks.addMembers(sahiTasks, enggroup, "host", enghosts, "Enroll");
+		HostgroupTasks.addMembers(sahiTasks, devgroup, "host", devhosts, "Add");
+		HostgroupTasks.addMembers(sahiTasks, qegroup, "host", qehosts, "Add");
+		HostgroupTasks.addMembers(sahiTasks, enggroup, "host", enghosts, "Add");
 		
 		//verify the host members
 		HostgroupTasks.verifyMembers(sahiTasks, devgroup, "host", devhosts, "direct", "YES");
@@ -220,7 +220,7 @@ public class HostgroupTests extends SahiTestScript{
 		HostgroupTasks.verifyMembers(sahiTasks, enggroup, "host", enghosts, "direct", "YES");
 		
 		//Now let's nest the groups and verify direct host group members and indirect host members
-		HostgroupTasks.addMembers(sahiTasks, enggroup, "hostgroup", enggroups, "Enroll");
+		HostgroupTasks.addMembers(sahiTasks, enggroup, "hostgroup", enggroups, "Add");
 		HostgroupTasks.verifyMembers(sahiTasks, enggroup, "hostgroup", enggroups, "direct", "YES");
 		HostgroupTasks.verifyMembers(sahiTasks, enggroup, "host", qehosts, "indirect", "YES");
 		HostgroupTasks.verifyMembers(sahiTasks, enggroup, "host", devhosts, "indirect", "YES");
@@ -355,7 +355,7 @@ public class HostgroupTests extends SahiTestScript{
 		ll.add(Arrays.asList(new Object[]{ 		"addhostgroup_cancel",			"newhostgroup",		"this is a new hostgroup",	 "Cancel" } ));
 		ll.add(Arrays.asList(new Object[]{ 		"addhostgroup_mixedcase",		"NewHostGroup",		"this is a new hostgroup",	 "Add" } ));  
 		ll.add(Arrays.asList(new Object[]{ 		"addhostgroup_longname",		"thisisahostgroupwithaveryveryveryveryveryveryveryveryverylongname",		"Host group with long name",	 "Add" } ));
-		ll.add(Arrays.asList(new Object[]{ 		"addhostgroup_longdesc",		"long description",		"thisisahostgroupwithaveryveryveryveryveryveryveryveryveryveryveryveryveryverylongdescription",	 "Add" } ));
+		ll.add(Arrays.asList(new Object[]{ 		"addhostgroup_longdesc",		"long_description",		"thisisahostgroupwithaveryveryveryveryveryveryveryveryveryveryveryveryveryverylongdescription",	 "Add" } ));
 		return ll;	
 	}
 	
@@ -373,7 +373,7 @@ public class HostgroupTests extends SahiTestScript{
 		ll.add(Arrays.asList(new Object[]{ 		"delete_hostgroup_cancel",			"NewHostGroup",															"Cancel" } ));  
 		ll.add(Arrays.asList(new Object[]{ 		"delete_hostgroup_cancel",			"NewHostGroup",															"Delete" } ));
 		ll.add(Arrays.asList(new Object[]{ 		"delete_hostgroup_longname",		"thisisahostgroupwithaveryveryveryveryveryveryveryveryverylongname", 	"Delete" } ));
-		ll.add(Arrays.asList(new Object[]{ 		"delete_hostgroup_longdesc",		"long description",			 											"Delete" } ));
+		ll.add(Arrays.asList(new Object[]{ 		"delete_hostgroup_longdesc",		"long_description",			 											"Delete" } ));
 		return ll;	
 	}
 	
@@ -388,7 +388,7 @@ public class HostgroupTests extends SahiTestScript{
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 	
 		//										testname									groupanme1					groupname2			groupname3
-		ll.add(Arrays.asList(new Object[]{ 		"add_and_add_another_then_del_multiple",	"this is group one",		"engineering",	 	"sales" } ));
+		ll.add(Arrays.asList(new Object[]{ 		"add_and_add_another_then_del_multiple",	"this_is_group_one",		"engineering",	 	"sales" } ));
 		return ll;	
 	}
 	
@@ -528,10 +528,11 @@ public class HostgroupTests extends SahiTestScript{
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 	
 		//										testname							groupanme			description				expectedError
+		ll.add(Arrays.asList(new Object[]{ 		"addinvalid_name_with_space",	    "my group",			"my description",	 	"may only include letters, numbers, _, -, and ." } ));
 		ll.add(Arrays.asList(new Object[]{ 		"duplicate_hostgroup",				myhostgroup,		"my description",	 	"host group with name \"" + myhostgroup + "\" already exists" } ));
-		ll.add(Arrays.asList(new Object[]{ 		"addinvalid_name_space",			" ",				"my description",	 	"invalid 'hostgroup_name': Leading and trailing spaces are not allowed" } ));
-		ll.add(Arrays.asList(new Object[]{ 		"addinvalid_name_leading_space",	" newgroup",		"my description",	 	"invalid 'hostgroup_name': Leading and trailing spaces are not allowed" } ));
-		ll.add(Arrays.asList(new Object[]{ 		"addinvalid_name_trailing_space",	"newgroup ",		"my description",	 	"invalid 'hostgroup_name': Leading and trailing spaces are not allowed" } ));
+		ll.add(Arrays.asList(new Object[]{ 		"addinvalid_name_space",			" ",				"my description",	 	"may only include letters, numbers, _, -, and ." } ));
+		ll.add(Arrays.asList(new Object[]{ 		"addinvalid_name_leading_space",	" newgroup",		"my description",	 	"may only include letters, numbers, _, -, and ." } ));
+		ll.add(Arrays.asList(new Object[]{ 		"addinvalid_name_trailing_space",	"newgroup ",		"my description",	 	"may only include letters, numbers, _, -, and ." } ));
 		ll.add(Arrays.asList(new Object[]{ 		"addinvalid_desc_space",			"newgroup",			" ",	 				"invalid 'desc': Leading and trailing spaces are not allowed" } ));
 		ll.add(Arrays.asList(new Object[]{ 		"addinvalid_desc_leading_space",	"newgroup",			" my description",	 	"invalid 'desc': Leading and trailing spaces are not allowed" } ));
 		ll.add(Arrays.asList(new Object[]{ 		"addinvalid_name_trailing_space",	"newgroup",			"my description ",	 	"invalid 'desc': Leading and trailing spaces are not allowed" } ));
@@ -549,6 +550,7 @@ public class HostgroupTests extends SahiTestScript{
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 	
 		//										testname							groupanme			description						expectedError
+		
 		ll.add(Arrays.asList(new Object[]{ 		"addinvalid_no_name_or_description",	"",					"",	 						"Required field" } ));
 		ll.add(Arrays.asList(new Object[]{ 		"addinvalid_no_name",					"",					"my description",	 		"Required field" } ));  
 		ll.add(Arrays.asList(new Object[]{ 		"addinvalid_no_description",			"asdfjaskl",		"",							"Required field" } ));
