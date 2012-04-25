@@ -29,7 +29,7 @@ export TESTVERSION=1.0
 
 BUILT_FILES=
 
-FILES=$(METADATA) runtest.sh Makefile PURPOSE 
+FILES=$(METADATA) runtest.sh Makefile PURPOSE t.dns_bz.sh t.dns_pkey.sh t.dns.sh
 
 .PHONY: all install download clean
 
