@@ -239,8 +239,8 @@ delegation_add_negative_1006() #BZ 783307 -- ipa delegation-add is not failing w
 	rlPhaseStartTest "delegation_add_negative_1006: add with missing membergroup (BZ 783307)"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
-		rlRun "ipa delegation-add $FUNCNAME --membergroup=badgroup --group=gr1006 --attrs=mobile > $tmpout 2>&1" 1
-		rlAssertGrep "NEEDERROR" $tmpout
+		rlRun "ipa delegation-add $FUNCNAME --membergroup=badgroup --group=gr1006 --attrs=mobile > $tmpout 2>&1" 2
+		rlAssertGrep "ipa: ERROR: badgroup: group not found" $tmpout
 		if [ $(egrep "Added delegation \"$FUNCNAME\"|badgroup" $tmpout|wc -l) -eq 2 ]; then	
 			rlFail "BZ 783307 -- ipa delegation-add is not failing when membergroup does not exist"
 			cat $tmpout
