@@ -85,7 +85,7 @@ delegation_mod_positive_1001()
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-mod delegation_mod_positive_1000 --membergroup=mg1001 > $tmpout 2>&1"
 		rlAssertGrep "Modified delegation \"delegation_mod_positive_1000\"" $tmpout
-		[ -f $tmpout ] && rm $tmpout
+		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd
 }
 
@@ -96,7 +96,7 @@ delegation_mod_positive_1002()
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-mod delegation_mod_positive_1000 --group=gr1001 > $tmpout 2>&1"
 		rlAssertGrep "Modified delegation \"delegation_mod_positive_1000\"" $tmpout
-		[ -f $tmpout ] && rm $tmpout
+		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd
 }
 
@@ -107,7 +107,7 @@ delegation_mod_positive_1003()
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-mod delegation_mod_positive_1000 --attrs=l > $tmpout 2>&1"
 		rlAssertGrep "Modified delegation \"delegation_mod_positive_1000\"" $tmpout
-		[ -f $tmpout ] && rm $tmpout
+		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd
 }
 
@@ -118,7 +118,7 @@ delegation_mod_positive_1004()
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-mod delegation_mod_positive_1000 --permissions=read > $tmpout 2>&1"
 		rlAssertGrep "Modified delegation \"delegation_mod_positive_1000\"" $tmpout
-		[ -f $tmpout ] && rm $tmpout
+		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd
 }
 
@@ -129,7 +129,7 @@ delegation_mod_positive_1005()
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-mod delegation_mod_positive_1000 --membergroup=mg1000 --group=gr1000 > $tmpout 2>&1"
 		rlAssertGrep "Modified delegation \"delegation_mod_positive_1000\"" $tmpout
-		[ -f $tmpout ] && rm $tmpout
+		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd
 }
 
@@ -140,7 +140,7 @@ delegation_mod_positive_1006()
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-mod delegation_mod_positive_1000 --membergroup=mg1001 --group=gr1001 --attrs=mobile  > $tmpout 2>&1"
 		rlAssertGrep "Modified delegation \"delegation_mod_positive_1000\"" $tmpout
-		[ -f $tmpout ] && rm $tmpout
+		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd
 }
 
@@ -151,7 +151,7 @@ delegation_mod_positive_1007()
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-mod delegation_mod_positive_1000 --membergroup=mg1000 --group=gr1000 --attrs=l --permission=write > $tmpout 2>&1"
 		rlAssertGrep "Modified delegation \"delegation_mod_positive_1000\"" $tmpout
-		[ -f $tmpout ] && rm $tmpout
+		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd
 }
 
@@ -162,7 +162,7 @@ delegation_mod_positive_1008()
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-mod delegation_mod_positive_1000 --attrs=mobile --all > $tmpout 2>&1"
 		rlAssertGrep "Modified delegation \"delegation_mod_positive_1000\"" $tmpout
-		[ -f $tmpout ] && rm $tmpout
+		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd
 }
 
@@ -173,7 +173,7 @@ delegation_mod_positive_1009()
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-mod delegation_mod_positive_1000 --attrs=l --raw > $tmpout 2>&1"
 		rlAssertGrep "Modified delegation \"delegation_mod_positive_1000\"" $tmpout
-		[ -f $tmpout ] && rm $tmpout
+		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd
 }
 
@@ -184,7 +184,7 @@ delegation_mod_positive_1010()
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-mod delegation_mod_positive_1000 --attrs=mobile --all --raw > $tmpout 2>&1"
 		rlAssertGrep "Modified delegation \"delegation_mod_positive_1000\"" $tmpout
-		[ -f $tmpout ] && rm $tmpout
+		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd
 }
 
@@ -256,12 +256,12 @@ delegation_mod_negative_1001()
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-mod delegation_mod_negative_1000 --membergroup= > $tmpout 2>&1" 1
-		rlAssertGrep "NEEDERROR" $tmpout
+		rlAssertGrep "ipa: ERROR: 'membergroup' is required" $tmpout
 		if [ $(egrep "ipa: ERROR: an internal error has occurred" $tmpout|wc -l) -gt 0 ]; then
 			rlFail "BZ 783543 -- ipa delegation-mod --membergroup= returns internal error"
 		fi
 
-		[ -f $tmpout ] && rm $tmpout
+		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd
 }
 
@@ -272,11 +272,11 @@ delegation_mod_negative_1002()
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-mod delegation_mod_negative_1000 --membergroup=\"\" > $tmpout 2>&1" 1
-		rlAssertGrep "NEEDERROR" $tmpout
+		rlAssertGrep "ipa: ERROR: 'membergroup' is required" $tmpout
 		if [ $(egrep "ipa: ERROR: an internal error has occurred" $tmpout|wc -l) -gt 0 ]; then
 			rlFail "BZ 783543 -- ipa delegation-mod --membergroup= returns internal error"
 		fi
-		[ -f $tmpout ] && rm $tmpout
+		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd
 }
 
@@ -287,7 +287,7 @@ delegation_mod_negative_1003()
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-mod delegation_mod_negative_1000 --membergroup=\" \" > $tmpout 2>&1" 1
 		rlAssertGrep "ipa: ERROR: invalid 'membergroup': Leading and trailing spaces are not allowed" $tmpout
-		[ -f $tmpout ] && rm $tmpout
+		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd
 }
 
@@ -297,12 +297,12 @@ delegation_mod_negative_1004()
 	rlPhaseStartTest "delegation_mod_negative_1004: fail to modify with non-existent membergroup (BZ 783548)"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
-		rlRun "ipa delegation-mod delegation_mod_negative_1000 --membergroup=badmemembergroup > $tmpout 2>&1" 1
-		rlAssertGrep "NEEDERROR" $tmpout
+		rlRun "ipa delegation-mod delegation_mod_negative_1000 --membergroup=badmemembergroup > $tmpout 2>&1" 2
+		rlAssertGrep "ipa: ERROR: badmemembergroup: group not found" $tmpout
 		if [ $(egrep "Modified delegation \"delegation_mod_negative_1000\"" $tmpout|wc -l) -gt 0 ]; then
 			rlFail "BZ 783548 -- ipa delegation-mod is not failing when membergroup does not exist"
 		fi
-		[ -f $tmpout ] && rm $tmpout
+		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd
 }
 
@@ -313,8 +313,8 @@ delegation_mod_negative_1005()
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-mod delegation_mod_negative_1000 --group= > $tmpout 2>&1" 1
-		rlAssertGrep "ipa: ERROR: 'cn' is required" $tmpout
-		[ -f $tmpout ] && rm $tmpout
+		rlAssertGrep "ipa: ERROR: 'group' is required" $tmpout
+		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd
 }
 
@@ -324,8 +324,8 @@ delegation_mod_negative_1006()
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-mod delegation_mod_negative_1000 --group=\"\" > $tmpout 2>&1" 1
-		rlAssertGrep "ipa: ERROR: 'cn' is required" $tmpout
-		[ -f $tmpout ] && rm $tmpout
+		rlAssertGrep "ipa: ERROR: 'group' is required" $tmpout
+		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd
 }
 
@@ -336,7 +336,7 @@ delegation_mod_negative_1007()
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-mod delegation_mod_negative_1000 --group=\" \" > $tmpout 2>&1" 1
 		rlAssertGrep "ipa: ERROR: invalid 'group': Leading and trailing spaces are not allowed" $tmpout
-		[ -f $tmpout ] && rm $tmpout
+		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd
 }
 
@@ -347,7 +347,7 @@ delegation_mod_negative_1008()
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-mod delegation_mod_negative_1000 --group=badgroup > $tmpout 2>&1" 2
 		rlAssertGrep "ipa: ERROR: Group 'badgroup' does not exist" $tmpout
-		[ -f $tmpout ] && rm $tmpout
+		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd
 }
 
@@ -358,12 +358,12 @@ delegation_mod_negative_1009()
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-mod delegation_mod_negative_1000 --attrs= > $tmpout 2>&1" 1
-		rlAssertGrep "NEEDERROR" $tmpout
+		rlAssertGrep "ipa: ERROR: 'attrs' is required" $tmpout
 		if [ $(egrep "Modified delegation \"delegation_mod_negative_1000\"" $tmpout|wc -l) -gt 0 ]; then
 			rlFail "BZ 783554 -- ipa delegation-mod --attrs= removes Attributes from delegation instead of failing"
 			rlRun "ipa delegation-mod delegation_mod_negative_1000 --attrs=mobile" 0 "putting attrs back after BZ failure"
 		fi
-		[ -f $tmpout ] && rm $tmpout
+		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd
 }
 
@@ -374,12 +374,12 @@ delegation_mod_negative_1010()
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-mod delegation_mod_negative_1000 --attrs=\"\" > $tmpout 2>&1" 1
-		rlAssertGrep "NEEDERROR" $tmpout
+		rlAssertGrep "ipa: ERROR: 'attrs' is required" $tmpout
 		if [ $(egrep "Modified delegation \"delegation_mod_negative_1000\"" $tmpout|wc -l) -gt 0 ]; then
 			rlFail "BZ 783554 -- ipa delegation-mod --attrs= removes Attributes from delegation instead of failing"
 			rlRun "ipa delegation-mod delegation_mod_negative_1000 --attrs=mobile" 0 "putting attrs back after BZ failure"
 		fi
-		[ -f $tmpout ] && rm $tmpout
+		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd
 }
 
@@ -390,12 +390,12 @@ delegation_mod_negative_1011()
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-mod delegation_mod_negative_1000 --attrs=\" \" > $tmpout 2>&1" 1
-		rlAssertGrep "NEEDERROR" $tmpout
+		rlAssertGrep "ipa: ERROR: 'attrs' is required" $tmpout
 		if [ $(egrep "Modified delegation \"delegation_mod_negative_1000\"" $tmpout|wc -l) -gt 0 ]; then
 			rlFail "BZ 783554 -- ipa delegation-mod --attrs= removes Attributes from delegation instead of failing"
 			rlRun "ipa delegation-mod delegation_mod_negative_1000 --attrs=mobile" 0 "putting attrs back after BZ failure"
 		fi
-		[ -f $tmpout ] && rm $tmpout
+		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd
 }
 
@@ -406,7 +406,7 @@ delegation_mod_negative_1012()
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-mod delegation_mod_negative_1000 --attrs=badattr > $tmpout 2>&1" 1
 		rlAssertGrep "ipa: ERROR: targetattr \"badattr\" does not exist in schema." $tmpout
-		[ -f $tmpout ] && rm $tmpout
+		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd
 }
 
@@ -418,7 +418,7 @@ delegation_mod_negative_1013()
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-mod delegation_mod_negative_1000 --permissions= > $tmpout 2>&1" 1
 		rlAssertGrep "ipa: ERROR: 'permissions' is required" $tmpout
-		[ -f $tmpout ] && rm $tmpout
+		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd
 }
 
@@ -429,7 +429,7 @@ delegation_mod_negative_1014()
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-mod delegation_mod_negative_1000 --permissions=\"\" > $tmpout 2>&1" 1
 		rlAssertGrep "ipa: ERROR: 'permissions' is required" $tmpout
-		[ -f $tmpout ] && rm $tmpout
+		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd
 }
 
@@ -440,7 +440,7 @@ delegation_mod_negative_1015()
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-mod delegation_mod_negative_1000 --permissions=\" \" > $tmpout 2>&1" 1
 		rlAssertGrep "ipa: ERROR: 'permissions' is required" $tmpout
-		[ -f $tmpout ] && rm $tmpout
+		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd
 }
 
@@ -451,7 +451,7 @@ delegation_mod_negative_1016()
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-mod delegation_mod_negative_1000 --permissions=badperm > $tmpout 2>&1" 1
 		rlAssertGrep "ipa: ERROR: invalid 'permissions': \"badperm\" is not a valid permission" $tmpout
-		[ -f $tmpout ] && rm $tmpout
+		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd
 }
 
@@ -463,12 +463,12 @@ delegation_mod_negative_1017()
 	rlPhaseStartTest "delegation_mod_negative_1017: fail to modify with non-existent membergroup and existing group (BZ 783548)"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
-		rlRun "ipa delegation-mod delegation_mod_negative_1000 --membergroup=badmemembergroup1017 --group=gr1001 > $tmpout 2>&1" 1
-		rlAssertGrep "NEEDERROR" $tmpout
+		rlRun "ipa delegation-mod delegation_mod_negative_1000 --membergroup=badmemembergroup1017 --group=gr1001 > $tmpout 2>&1" 2
+		rlAssertGrep "ipa: ERROR: badmemembergroup1017: group not found" $tmpout
 		if [ $(egrep "Modified delegation \"delegation_mod_negative_1000\"" $tmpout|wc -l) -gt 0 ]; then
 			rlFail "BZ 783548 -- ipa delegation-mod is not failing when membergroup does not exist"
 		fi
-		[ -f $tmpout ] && rm $tmpout
+		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd
 }
 
@@ -479,7 +479,7 @@ delegation_mod_negative_1018()
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-mod delegation_mod_negative_1000 --membergroup=mg1001 --group=badgroup > $tmpout 2>&1" 2
 		rlAssertGrep "ipa: ERROR: Group 'badgroup' does not exist" $tmpout
-		[ -f $tmpout ] && rm $tmpout
+		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd
 }
 
@@ -490,12 +490,12 @@ delegation_mod_negative_1019()
 	rlPhaseStartTest "delegation_mod_negative_1019: fail to modify with non-existent membergroup, existing group, and valid attrs (BZ 783548)"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
-		rlRun "ipa delegation-mod delegation_mod_negative_1000 --membergroup=badmemembergroup1019 --group=gr1001 --attrs=l > $tmpout 2>&1" 1
-		rlAssertGrep "NEEDERROR" $tmpout
+		rlRun "ipa delegation-mod delegation_mod_negative_1000 --membergroup=badmemembergroup1019 --group=gr1001 --attrs=l > $tmpout 2>&1" 2
+		rlAssertGrep "ipa: ERROR: badmemembergroup1019: group not found" $tmpout
 		if [ $(egrep "Modified delegation \"delegation_mod_negative_1000\"" $tmpout|wc -l) -gt 0 ]; then
 			rlFail "BZ 783548 -- ipa delegation-mod is not failing when membergroup does not exist"
 		fi
-		[ -f $tmpout ] && rm $tmpout
+		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd
 }
 
@@ -506,7 +506,7 @@ delegation_mod_negative_1020()
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-mod delegation_mod_negative_1000 --membergroup=mg1001 --group=badgroup --attrs=l > $tmpout 2>&1" 2
 		rlAssertGrep "ipa: ERROR: Group 'badgroup' does not exist" $tmpout
-		[ -f $tmpout ] && rm $tmpout
+		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd
 }
 
@@ -517,7 +517,7 @@ delegation_mod_negative_1021()
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-mod delegation_mod_negative_1000 --membergroup=mg1001 --group=gr1001 --attrs=badattr > $tmpout 2>&1" 1
 		rlAssertGrep "ipa: ERROR: targetattr \"badattr\" does not exist in schema." $tmpout
-		[ -f $tmpout ] && rm $tmpout
+		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd
 }
 
@@ -528,12 +528,12 @@ delegation_mod_negative_1022()
 	rlPhaseStartTest "delegation_mod_negative_1022: fail to modify with non-existent membergroup, existing group, valid attrs, and valid permissions (BZ 783548)"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
-		rlRun "ipa delegation-mod delegation_mod_negative_1000 --membergroup=badmemembergroup1022 --group=gr1001 --attrs=l --permissions=read > $tmpout 2>&1" 1
-		rlAssertGrep "NEEDERROR" $tmpout
+		rlRun "ipa delegation-mod delegation_mod_negative_1000 --membergroup=badmemembergroup1022 --group=gr1001 --attrs=l --permissions=read > $tmpout 2>&1" 2
+		rlAssertGrep "ipa: ERROR: badmemembergroup1022: group not found" $tmpout
 		if [ $(egrep "Modified delegation \"delegation_mod_negative_1000\"" $tmpout|wc -l) -gt 0 ]; then
 			rlFail "BZ 783548 -- ipa delegation-mod is not failing when membergroup does not exist"
 		fi
-		[ -f $tmpout ] && rm $tmpout
+		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd
 }
 
@@ -544,7 +544,7 @@ delegation_mod_negative_1023()
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-mod delegation_mod_negative_1000 --membergroup=mg1001 --group=badgroup --attrs=l --permissions=read > $tmpout 2>&1" 2
 		rlAssertGrep "ipa: ERROR: Group 'badgroup' does not exist" $tmpout
-		[ -f $tmpout ] && rm $tmpout
+		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd
 }
 
@@ -555,7 +555,7 @@ delegation_mod_negative_1024()
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-mod delegation_mod_negative_1000 --membergroup=mg1001 --group=gr1001 --attrs=badattr --permissions=read > $tmpout 2>&1" 1
 		rlAssertGrep "ipa: ERROR: targetattr \"badattr\" does not exist in schema." $tmpout
-		[ -f $tmpout ] && rm $tmpout
+		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd
 }
 
@@ -566,7 +566,7 @@ delegation_mod_negative_1025()
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-mod delegation_mod_negative_1000 --membergroup=mg1001 --group=gr1001 --attrs=l --permissions=badperm > $tmpout 2>&1" 1
 		rlAssertGrep "ipa: ERROR: invalid 'permissions': \"badperm\" is not a valid permission" $tmpout
-		[ -f $tmpout ] && rm $tmpout
+		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd
 }
 
