@@ -125,19 +125,22 @@ delegation_bz_783489()
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-add $FUNCNAME --membergroup=admins --group=ipausers --attrs=mobile" 0 "Add delegation required for test"
-		rlRun "ipa delegation-find --permissions= > $tmpout 2>&1 " 1 "Find with --permissions= with no value"
+		rlRun "ipa delegation-find --permissions= > $tmpout 2>&1 " 0 "Find with --permissions= with no value"
+		rlAssertGrep "^1 delegation matched" $tmpout
 		if [ $(grep "ipa: ERROR: an internal error has occurred" $tmpout|wc -l) -gt 0 ]; then
 			rlFail "BZ 783489 found...ipa delegation-find --permissions= returns internal error"
 		else
 			rlPass "BZ 783489 not found"
 		fi	
 
-		rlRun "ipa delegation-find --permissions=\"\" > $tmpout 2>&1 " 1 "Find with --permissions=\"\" with no value"
+		rlRun "ipa delegation-find --permissions=\"\" > $tmpout 2>&1 " 0 "Find with --permissions=\"\" with no value"
+		rlAssertGrep "^1 delegation matched" $tmpout
 		if [ $(grep "ipa: ERROR: an internal error has occurred" $tmpout|wc -l) -gt 0 ]; then
 			rlFail "BZ 783489 found...ipa delegation-find --permissions= returns internal error...also affects --permissions=\"\""
 		fi
 
-		rlRun "ipa delegation-find --permissions=\" \" > $tmpout 2>&1 " 1 "Find with --permissions=\" \" with no value"
+		rlRun "ipa delegation-find --permissions=\" \" > $tmpout 2>&1 " 0 "Find with --permissions=\" \" with no value"
+		rlAssertGrep "^1 delegation matched" $tmpout
 		if [ $(grep "ipa: ERROR: an internal error has occurred" $tmpout|wc -l) -gt 0 ]; then
 			rlFail "BZ 783489 found...ipa delegation-find --permissions= returns internal error...also affects --permissions=\" \""
 		fi
@@ -155,19 +158,22 @@ delegation_bz_783501()
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-add $FUNCNAME --membergroup=admins --group=ipausers --attrs=mobile" 0 "Add delegation required for test"
-		rlRun "ipa delegation-find --attrs= > $tmpout 2>&1 " 1 "Find with --attrs= with no value"
+		rlRun "ipa delegation-find --attrs= > $tmpout 2>&1 " 0 "Find with --attrs= with no value"
+		rlAssertGrep "^1 delegation matched" $tmpout
 		if [ $(grep "ipa: ERROR: an internal error has occurred" $tmpout|wc -l) -gt 0 ]; then
 			rlFail "BZ 783501 found...ipa delegation-find --attrs= returns internal error"
 		else
 			rlPass "BZ 783501 not found"
 		fi	
 
-		rlRun "ipa delegation-find --attrs=\"\" > $tmpout 2>&1 " 1 "Find with --attrs=\"\" with no value"
+		rlRun "ipa delegation-find --attrs=\"\" > $tmpout 2>&1 " 0 "Find with --attrs=\"\" with no value"
+		rlAssertGrep "^1 delegation matched" $tmpout
 		if [ $(grep "ipa: ERROR: an internal error has occurred" $tmpout|wc -l) -gt 0 ]; then
 			rlFail "BZ 783501 found...ipa delegation-find --attrs= returns internal error...also affects --attrs=\"\""
 		fi
 
-		rlRun "ipa delegation-find --attrs=\"\" > $tmpout 2>&1 " 1 "Find with --attrs=\"\" with no value"
+		rlRun "ipa delegation-find --attrs=\"\" > $tmpout 2>&1 " 0 "Find with --attrs=\"\" with no value"
+		rlAssertGrep "^1 delegation matched" $tmpout
 		if [ $(grep "ipa: ERROR: an internal error has occurred" $tmpout|wc -l) -gt 0 ]; then
 			rlFail "BZ 783501 found...ipa delegation-find --attrs= returns internal error...also affects --attrs=\"\""
 		fi
