@@ -60,6 +60,14 @@ delegation_find_positive()
 	delegation_find_positive_1017
 	delegation_find_positive_1018
 	delegation_find_positive_1019
+	delegation_find_positive_1020
+	delegation_find_positive_1021
+	delegation_find_positive_1022
+	delegation_find_positive_1023
+	delegation_find_positive_1024
+	delegation_find_positive_1025
+	delegation_find_positive_1026
+	delegation_find_positive_1027
 	delegation_find_positive_envcleanup
 }
 
@@ -90,7 +98,7 @@ delegation_find_positive_1001()
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-find > $tmpout 2>&1"
 		rlAssertGrep "Delegation name:" $tmpout
-		[ -f $tmpout ] && rm $tmpout
+		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd
 }
 
@@ -101,7 +109,7 @@ delegation_find_positive_1002()
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-find delegation_find_positive_1000 > $tmpout 2>&1"
 		rlAssertGrep "Delegation name:" $tmpout
-		[ -f $tmpout ] && rm $tmpout
+		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd
 }
 
@@ -112,7 +120,7 @@ delegation_find_positive_1003()
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-find delegation_find > $tmpout 2>&1"
 		rlAssertGrep "Delegation name:" $tmpout
-		[ -f $tmpout ] && rm $tmpout
+		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd
 }
 
@@ -123,7 +131,7 @@ delegation_find_positive_1004()
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-find --name=delegation_find_positive_1000 > $tmpout 2>&1"
 		rlAssertGrep "Delegation name:" $tmpout
-		[ -f $tmpout ] && rm $tmpout
+		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd
 }
 
@@ -134,7 +142,7 @@ delegation_find_positive_1005()
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-find --membergroup=mg1000 > $tmpout 2>&1"
 		rlAssertGrep "Delegation name:" $tmpout
-		[ -f $tmpout ] && rm $tmpout
+		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd
 }
 
@@ -145,7 +153,7 @@ delegation_find_positive_1006()
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-find --group=gr1000 > $tmpout 2>&1"
 		rlAssertGrep "Delegation name:" $tmpout
-		[ -f $tmpout ] && rm $tmpout
+		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd
 }
 
@@ -156,7 +164,7 @@ delegation_find_positive_1007()
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-find --permissions=write > $tmpout 2>&1"
 		rlAssertGrep "Delegation name:" $tmpout
-		[ -f $tmpout ] && rm $tmpout
+		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd
 }
 
@@ -167,7 +175,7 @@ delegation_find_positive_1008()
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-find --attrs=mobile > $tmpout 2>&1"
 		rlAssertGrep "Delegation name:" $tmpout
-		[ -f $tmpout ] && rm $tmpout
+		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd
 }
 
@@ -178,7 +186,7 @@ delegation_find_positive_1009()
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-find --membergroup=mg1000 --group=gr1000  > $tmpout 2>&1"
 		rlAssertGrep "Delegation name:" $tmpout
-		[ -f $tmpout ] && rm $tmpout
+		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd
 }
 
@@ -189,7 +197,7 @@ delegation_find_positive_1010()
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-find --membergroup=mg1000 --group=gr1000 --attrs=mobile  > $tmpout 2>&1"
 		rlAssertGrep "Delegation name:" $tmpout
-		[ -f $tmpout ] && rm $tmpout
+		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd
 }
 
@@ -200,7 +208,7 @@ delegation_find_positive_1011()
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-find --membergroup=mg1000 --group=gr1000 --attrs=mobile --permissions=write > $tmpout 2>&1"
 		rlAssertGrep "Delegation name:" $tmpout
-		[ -f $tmpout ] && rm $tmpout
+		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd
 }
 
@@ -211,7 +219,7 @@ delegation_find_positive_1012()
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-find --all > $tmpout 2>&1"
 		rlAssertGrep "Delegation name:" $tmpout
-		[ -f $tmpout ] && rm $tmpout
+		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd
 }
 
@@ -222,7 +230,7 @@ delegation_find_positive_1013()
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-find --raw > $tmpout 2>&1"
 		rlAssertGrep "^1 delegation matched" $tmpout
-		[ -f $tmpout ] && rm $tmpout
+		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd
 }
 
@@ -233,7 +241,7 @@ delegation_find_positive_1014()
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-find --all --raw > $tmpout 2>&1"
 		rlAssertGrep "aci.*delegation:delegation_find_positive_1000.*ldap" $tmpout
-		[ -f $tmpout ] && rm $tmpout
+		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd
 }
 
@@ -245,7 +253,7 @@ delegation_find_positive_1015()
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-find --name= > $tmpout 2>&1 " 0
 		rlAssertGrep "^1 delegation matched" $tmpout
-		[ -f $tmpout ] && rm $tmpout
+		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd
 }
 
@@ -257,7 +265,7 @@ delegation_find_positive_1016()
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-find --name=\"\" > $tmpout 2>&1 " 0
 		rlAssertGrep "^1 delegation matched" $tmpout 
-		[ -f $tmpout ] && rm $tmpout
+		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd
 }
 
@@ -269,7 +277,7 @@ delegation_find_positive_1017()
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-find --group= > $tmpout 2>&1 " 0
 		rlAssertGrep "^1 delegation matched" $tmpout
-		[ -f $tmpout ] && rm $tmpout
+		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd
 }
 
@@ -281,7 +289,7 @@ delegation_find_positive_1018()
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-find --group=\"\" > $tmpout 2>&1 " 0
 		rlAssertGrep "^1 delegation matched" $tmpout
-		[ -f $tmpout ] && rm $tmpout
+		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd
 }
 
@@ -291,6 +299,126 @@ delegation_find_positive_1019()
 	rlPhaseStartTest "delegation_find_positive_1019: find with pkey-only specified"
 		KinitAsAdmin
 		rlRun "ipa delegation-find --membergroup=mg1000 --group=gr1000 --attrs=mobile --permissions=write --pkey-only | grep Delegation\ name | grep delegation_find_positive_1000" 0 "Making sure that Delegation name is returned with --pkey-only specified"
+	rlPhaseEnd
+}
+
+# added on 4/25/2012.  function of empty arg changed earlier
+delegation_find_positive_1020()
+{
+	rlPhaseStartTest "delegation_find_positive_1020: find with no value for membergroup (BZ 783473)"
+		KinitAsAdmin
+		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
+		rlRun "ipa delegation-find --membergroup= > $tmpout 2>&1 " 0
+		rlAssertGrep "^1 delegation matched" $tmpout
+		if [ $(egrep "ipa: ERROR: an internal error has occurred" $tmpout|wc -l) -gt 0 ]; then
+			rlFail "BZ 783473 -- ipa delegation-find --membergroup= with no value returns internal error"
+		fi
+		[ -f $tmpout ] && rm -f $tmpout
+	rlPhaseEnd
+}
+
+# added on 4/25/2012.  function of empty arg changed earlier
+delegation_find_positive_1021()
+{
+	rlPhaseStartTest "delegation_find_positive_1021: find with empty membergroup (BZ 783475)"
+		KinitAsAdmin
+		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
+		rlRun "ipa delegation-find --membergroup=\"\" > $tmpout 2>&1 " 0
+		rlAssertGrep "^1 delegation matched" $tmpout
+		if [ $(egrep "ipa: ERROR: an internal error has occurred" $tmpout|wc -l) -gt 0 ]; then
+			rlFail "BZ 783475 -- ipa delegation-find --membergroup=\"\" returns internal error"
+		fi
+		[ -f $tmpout ] && rm -f $tmpout
+	rlPhaseEnd
+}
+
+# added on 4/25/2012.  function of empty arg changed earlier
+delegation_find_positive_1022()
+{
+	rlPhaseStartTest "delegation_find_positive_1022: find with no value for permissions (BZ 783489)"
+		KinitAsAdmin
+		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
+		rlRun "ipa delegation-find --permissions= > $tmpout 2>&1 " 0
+		rlAssertGrep "^1 delegation matched" $tmpout
+		if [ $(egrep "ipa: ERROR: an internal error has occurred" $tmpout|wc -l) -gt 0 ]; then
+			rlFail "BZ 783489 -- ipa delegation-find --permissions= returns internal error"
+		fi
+		[ -f $tmpout ] && rm -f $tmpout
+	rlPhaseEnd
+}
+
+# added on 4/25/2012.  function of empty arg changed earlier
+delegation_find_positive_1023()
+{
+	rlPhaseStartTest "delegation_find_positive_1023: find with empty permissions (BZ 783489)"
+		KinitAsAdmin
+		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
+		rlRun "ipa delegation-find --permissions=\"\" > $tmpout 2>&1 " 0
+		rlAssertGrep "^1 delegation matched" $tmpout
+		if [ $(egrep "ipa: ERROR: an internal error has occurred" $tmpout|wc -l) -gt 0 ]; then
+			rlFail "BZ 783489 -- ipa delegation-find --permissions= returns internal error"
+		fi
+		[ -f $tmpout ] && rm -f $tmpout
+	rlPhaseEnd
+}
+
+# added on 4/25/2012.  function of empty arg changed earlier
+delegation_find_positive_1024()
+{
+	rlPhaseStartTest "delegation_find_positive_1024: find with space for permissions (BZ 783489)"
+		KinitAsAdmin
+		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
+		rlRun "ipa delegation-find --permissions=\" \" > $tmpout 2>&1 " 0
+		rlAssertGrep "^1 delegation matched" $tmpout
+		if [ $(egrep "ipa: ERROR: an internal error has occurred" $tmpout|wc -l) -gt 0 ]; then
+			rlFail "BZ 783489 -- ipa delegation-find --permissions= returns internal error"
+		fi
+		[ -f $tmpout ] && rm -f $tmpout
+	rlPhaseEnd
+}
+
+# added on 4/25/2012.  function of empty arg changed earlier
+delegation_find_positive_1025()
+{
+	rlPhaseStartTest "delegation_find_positive_1025: find with no value for attrs (BZ 783501)"
+		KinitAsAdmin
+		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
+		rlRun "ipa delegation-find --attrs= > $tmpout 2>&1 " 0
+		rlAssertGrep "^1 delegation matched" $tmpout
+		if [ $(egrep "ipa: ERROR: an internal error has occurred" $tmpout|wc -l) -gt 0 ]; then
+			rlFail "BZ 783501 -- ipa delegation-find --attrs= returns internal error"
+		fi
+		[ -f $tmpout ] && rm -f $tmpout
+	rlPhaseEnd
+}
+
+# added on 4/25/2012.  function of empty arg changed earlier
+delegation_find_positive_1026()
+{
+	rlPhaseStartTest "delegation_find_positive_1026: find with empty for attrs (BZ 783501)"
+		KinitAsAdmin
+		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
+		rlRun "ipa delegation-find --attrs=\"\" > $tmpout 2>&1 " 0
+		rlAssertGrep "^1 delegation matched" $tmpout
+		if [ $(egrep "ipa: ERROR: an internal error has occurred" $tmpout|wc -l) -gt 0 ]; then
+			rlFail "BZ 783501 -- ipa delegation-find --attrs= returns internal error"
+		fi
+		[ -f $tmpout ] && rm -f $tmpout
+	rlPhaseEnd
+}
+
+# added on 4/25/2012.  function of empty arg changed earlier
+delegation_find_positive_1027()
+{
+	rlPhaseStartTest "delegation_find_positive_1027: find with space for attrs (BZ 783501)"
+		KinitAsAdmin
+		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
+		rlRun "ipa delegation-find --attrs=\" \" > $tmpout 2>&1 " 0
+		rlAssertGrep "^1 delegation matched" $tmpout
+		if [ $(egrep "ipa: ERROR: an internal error has occurred" $tmpout|wc -l) -gt 0 ]; then
+			rlFail "BZ 783501 -- ipa delegation-find --attrs= returns internal error"
+		fi
+		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd
 }
 
@@ -306,22 +434,22 @@ delegation_find_negative()
 	# delegation_find_negative_1004 # removed on 2/1/2012.  function of empty arg changed earlier
 	delegation_find_negative_1005
 	delegation_find_negative_1006
-	delegation_find_negative_1007
-	delegation_find_negative_1008
+	# delegation_find_negative_1007 # removed on 4/25/2012.  function of empty arg changed earlier
+	# delegation_find_negative_1008 # removed on 4/25/2012.  function of empty arg changed earlier
 	delegation_find_negative_1009
 	delegation_find_negative_1010
 	# delegation_find_negative_1011 # removed on 2/1/2012.  function of empty arg changed earlier
 	# delegation_find_negative_1012 # removed on 2/1/2012.  function of empty arg changed earlier
 	delegation_find_negative_1013
 	delegation_find_negative_1014
-	delegation_find_negative_1015
-	delegation_find_negative_1016
-	delegation_find_negative_1017
+	# delegation_find_negative_1015 # removed on 4/25/2012.  function of empty arg changed earlier
+	# delegation_find_negative_1016 # removed on 4/25/2012.  function of empty arg changed earlier
+	# delegation_find_negative_1017 # removed on 4/25/2012.  function of empty arg changed earlier
 	delegation_find_negative_1018
 	delegation_find_negative_1019
-	delegation_find_negative_1020
-	delegation_find_negative_1021
-	delegation_find_negative_1022
+	# delegation_find_negative_1020 # removed on 4/25/2012.  function of empty arg changed earlier
+	# delegation_find_negative_1021 # removed on 4/25/2012.  function of empty arg changed earlier
+	# delegation_find_negative_1022 # removed on 4/25/2012.  function of empty arg changed earlier
 	delegation_find_negative_1023
 	delegation_find_negative_1024
 	delegation_find_negative_1025
@@ -367,7 +495,7 @@ delegation_find_negative_1001()
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-find \" \" > $tmpout 2>&1 " 1
 		rlAssertGrep "ipa: ERROR: invalid 'criteria': Leading and trailing spaces are not allowed" $tmpout
-		[ -f $tmpout ] && rm $tmpout
+		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd
 }
 
@@ -378,7 +506,7 @@ delegation_find_negative_1002()
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-find badname > $tmpout 2>&1 " 1
 		rlAssertGrep "^0 delegations matched" $tmpout
-		[ -f $tmpout ] && rm $tmpout
+		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd
 }
 
@@ -392,7 +520,7 @@ delegation_find_negative_1002()
 #		rlAssertGrep "^0 delegations matched" $tmpout
 #		ipa delegation-find --name= 
 #		echo "ERRORCODE RETURNED: $?"
-#		[ -f $tmpout ] && rm $tmpout
+#		[ -f $tmpout ] && rm -f $tmpout
 #	rlPhaseEnd
 #}
 
@@ -406,18 +534,20 @@ delegation_find_negative_1002()
 #		rlAssertGrep "^0 delegations matched" $tmpout 
 #		ipa delegation-find --name="" 
 #		echo "ERRORCODE RETURNED: $?"
-#		[ -f $tmpout ] && rm $tmpout
+#		[ -f $tmpout ] && rm -f $tmpout
 #	rlPhaseEnd
 #}
 
 delegation_find_negative_1005()
 {
 	rlPhaseStartTest "delegation_find_negative_1005: fail to find with space for name"
+	# This one is now equivalent to a litteral search for a delegation named with a single space
+	# This one should fail with 0 delegations matched.
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-find --name=\" \" > $tmpout 2>&1 " 1
-		rlAssertGrep "ipa: ERROR: invalid 'name': Leading and trailing spaces are not allowed" $tmpout
-		[ -f $tmpout ] && rm $tmpout
+		rlAssertGrep "^0 delegations matched" $tmpout
+		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd
 }
 
@@ -428,38 +558,40 @@ delegation_find_negative_1006()
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-find --name=badname > $tmpout 2>&1 " 1
 		rlAssertGrep "^0 delegations matched" $tmpout
-		[ -f $tmpout ] && rm $tmpout 
+		[ -f $tmpout ] && rm -f $tmpout 
 	rlPhaseEnd
 }
 
 
-delegation_find_negative_1007() # BZ 783473 -- ipa delegation-find --membergroup= with no value returns internal error
-{
-	rlPhaseStartTest "delegation_find_negative_1007: fail to find with no value for membergroup (BZ 783473)"
-		KinitAsAdmin
-		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
-		rlRun "ipa delegation-find --membergroup= > $tmpout 2>&1 " 1
-		rlAssertGrep "NEEDERROR" $tmpout
-		if [ $(egrep "ipa: ERROR: an internal error has occurred" $tmpout|wc -l) -gt 0 ]; then
-			rlFail "BZ 783473 -- ipa delegation-find --membergroup= with no value returns internal error"
-		fi
-		[ -f $tmpout ] && rm $tmpout
-	rlPhaseEnd
-}
+# removed on 4/25/2012.  function of empty arg changed earlier
+#delegation_find_negative_1007() # BZ 783473 -- ipa delegation-find --membergroup= with no value returns internal error
+#{
+#	rlPhaseStartTest "delegation_find_negative_1007: fail to find with no value for membergroup (BZ 783473)"
+#		KinitAsAdmin
+#		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
+#		rlRun "ipa delegation-find --membergroup= > $tmpout 2>&1 " 1
+#		rlAssertGrep "NEEDERROR" $tmpout
+#		if [ $(egrep "ipa: ERROR: an internal error has occurred" $tmpout|wc -l) -gt 0 ]; then
+#			rlFail "BZ 783473 -- ipa delegation-find --membergroup= with no value returns internal error"
+#		fi
+#		[ -f $tmpout ] && rm -f $tmpout
+#	rlPhaseEnd
+#}
 
-delegation_find_negative_1008() # BZ 783475 -- ipa delegation-find --membergroup="" returns internal error
-{
-	rlPhaseStartTest "delegation_find_negative_1008: fail to find with empty membergroup (BZ 783475)"
-		KinitAsAdmin
-		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
-		rlRun "ipa delegation-find --membergroup=\"\" > $tmpout 2>&1 " 1
-		rlAssertGrep "NEEDERROR" $tmpout
-		if [ $(egrep "ipa: ERROR: an internal error has occurred" $tmpout|wc -l) -gt 0 ]; then
-			rlFail "BZ 783475 -- ipa delegation-find --membergroup=\"\" returns internal error"
-		fi
-		[ -f $tmpout ] && rm $tmpout
-	rlPhaseEnd
-}
+# removed on 4/25/2012.  function of empty arg changed earlier
+#delegation_find_negative_1008() # BZ 783475 -- ipa delegation-find --membergroup="" returns internal error
+#{
+#	rlPhaseStartTest "delegation_find_negative_1008: fail to find with empty membergroup (BZ 783475)"
+#		KinitAsAdmin
+#		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
+#		rlRun "ipa delegation-find --membergroup=\"\" > $tmpout 2>&1 " 1
+#		rlAssertGrep "NEEDERROR" $tmpout
+#		if [ $(egrep "ipa: ERROR: an internal error has occurred" $tmpout|wc -l) -gt 0 ]; then
+#			rlFail "BZ 783475 -- ipa delegation-find --membergroup=\"\" returns internal error"
+#		fi
+#		[ -f $tmpout ] && rm -f $tmpout
+#	rlPhaseEnd
+#}
 
 delegation_find_negative_1009()
 {
@@ -467,8 +599,8 @@ delegation_find_negative_1009()
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-find --membergroup=\" \" > $tmpout 2>&1 " 1
-		rlAssertGrep "ipa: ERROR: invalid 'membergroup': Leading and trailing spaces are not allowed" $tmpout
-		[ -f $tmpout ] && rm $tmpout
+		rlAssertGrep "^0 delegations matched" $tmpout
+		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd
 }
 
@@ -480,7 +612,7 @@ delegation_find_negative_1010()
 		# COMMAND TO TEST
 		rlRun "ipa delegation-find --membergroup=badmembergroup > $tmpout 2>&1 " 1
 		rlAssertGrep "^0 delegations matched" $tmpout
-		[ -f $tmpout ] && rm $tmpout
+		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd
 }
 
@@ -494,7 +626,7 @@ delegation_find_negative_1010()
 #		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 #		rlRun "ipa delegation-find --group= > $tmpout 2>&1 " 1
 #		rlAssertGrep "^0 delegations matched" $tmpout
-#		[ -f $tmpout ] && rm $tmpout
+#		[ -f $tmpout ] && rm -f $tmpout
 #	rlPhaseEnd
 #}
 
@@ -506,18 +638,20 @@ delegation_find_negative_1010()
 #		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 #		rlRun "ipa delegation-find --group=\"\" > $tmpout 2>&1 " 1
 #		rlAssertGrep "^0 delegations matched" $tmpout
-#		[ -f $tmpout ] && rm $tmpout
+#		[ -f $tmpout ] && rm -f $tmpout
 #	rlPhaseEnd
 #}
 
 delegation_find_negative_1013()
 {
 	rlPhaseStartTest "delegation_find_negative_1013: fail to find with space for group"
+	# This one is now equivalent to a litteral search for a delegation access group with a single space
+	# This one should fail with 0 delegations matched.
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-find --group=\" \" > $tmpout 2>&1 " 1
-		rlAssertGrep "ipa: ERROR: invalid 'group': Leading and trailing spaces are not allowed" $tmpout
-		[ -f $tmpout ] && rm $tmpout
+		rlAssertGrep "^0 delegations matched" $tmpout
+		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd
 }
 
@@ -528,52 +662,54 @@ delegation_find_negative_1014()
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-find --group=badgroup > $tmpout 2>&1 " 1
 		rlAssertGrep "^0 delegations matched" $tmpout
-		[ -f $tmpout ] && rm $tmpout
+		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd
 }
 
+# removed on 4/25/2012.  function of empty arg changed earlier
+#delegation_find_negative_1015() # BZ 783489 -- ipa delegation-find --permissions= returns internal error
+#{
+#	rlPhaseStartTest "delegation_find_negative_1015: fail to find with no value for permissions (BZ 783489)"
+#		KinitAsAdmin
+#		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
+#		rlRun "ipa delegation-find --permissions= > $tmpout 2>&1 " 1
+#		rlAssertGrep "NEEDERROR" $tmpout
+#		if [ $(egrep "ipa: ERROR: an internal error has occurred" $tmpout|wc -l) -gt 0 ]; then
+#			rlFail "BZ 783489 -- ipa delegation-find --permissions= returns internal error"
+#		fi
+#		[ -f $tmpout ] && rm -f $tmpout
+#	rlPhaseEnd
+#}
 
-delegation_find_negative_1015() # BZ 783489 -- ipa delegation-find --permissions= returns internal error
-{
-	rlPhaseStartTest "delegation_find_negative_1015: fail to find with no value for permissions (BZ 783489)"
-		KinitAsAdmin
-		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
-		rlRun "ipa delegation-find --permissions= > $tmpout 2>&1 " 1
-		rlAssertGrep "NEEDERROR" $tmpout
-		if [ $(egrep "ipa: ERROR: an internal error has occurred" $tmpout|wc -l) -gt 0 ]; then
-			rlFail "BZ 783489 -- ipa delegation-find --permissions= returns internal error"
-		fi
-		[ -f $tmpout ] && rm $tmpout
-	rlPhaseEnd
-}
+# removed on 4/25/2012.  function of empty arg changed earlier
+#delegation_find_negative_1016() # BZ 783489 -- ipa delegation-find --permissions= returns internal error
+#{
+#	rlPhaseStartTest "delegation_find_negative_1016: fail to find with empty permissions (BZ 783489)"
+#		KinitAsAdmin
+#		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
+#		rlRun "ipa delegation-find --permissions=\"\" > $tmpout 2>&1 " 1
+#		rlAssertGrep "NEEDERROR" $tmpout
+#		if [ $(egrep "ipa: ERROR: an internal error has occurred" $tmpout|wc -l) -gt 0 ]; then
+#			rlFail "BZ 783489 -- ipa delegation-find --permissions= returns internal error"
+#		fi
+#		[ -f $tmpout ] && rm -f $tmpout
+#	rlPhaseEnd
+#}
 
-delegation_find_negative_1016() # BZ 783489 -- ipa delegation-find --permissions= returns internal error
-{
-	rlPhaseStartTest "delegation_find_negative_1016: fail to find with empty permissions (BZ 783489)"
-		KinitAsAdmin
-		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
-		rlRun "ipa delegation-find --permissions=\"\" > $tmpout 2>&1 " 1
-		rlAssertGrep "NEEDERROR" $tmpout
-		if [ $(egrep "ipa: ERROR: an internal error has occurred" $tmpout|wc -l) -gt 0 ]; then
-			rlFail "BZ 783489 -- ipa delegation-find --permissions= returns internal error"
-		fi
-		[ -f $tmpout ] && rm $tmpout
-	rlPhaseEnd
-}
-
-delegation_find_negative_1017() # BZ 783489 -- ipa delegation-find --permissions= returns internal error
-{
-	rlPhaseStartTest "delegation_find_negative_1017: fail to find with space for permissions (BZ 783489)"
-		KinitAsAdmin
-		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
-		rlRun "ipa delegation-find --permissions=\" \" > $tmpout 2>&1 " 1
-		rlAssertGrep "NEEDERROR" $tmpout
-		if [ $(egrep "ipa: ERROR: an internal error has occurred" $tmpout|wc -l) -gt 0 ]; then
-			rlFail "BZ 783489 -- ipa delegation-find --permissions= returns internal error"
-		fi
-		[ -f $tmpout ] && rm $tmpout
-	rlPhaseEnd
-}
+# removed on 4/25/2012.  function of empty arg changed earlier
+#delegation_find_negative_1017() # BZ 783489 -- ipa delegation-find --permissions= returns internal error
+#{
+#	rlPhaseStartTest "delegation_find_negative_1017: fail to find with space for permissions (BZ 783489)"
+#		KinitAsAdmin
+#		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
+#		rlRun "ipa delegation-find --permissions=\" \" > $tmpout 2>&1 " 1
+#		rlAssertGrep "NEEDERROR" $tmpout
+#		if [ $(egrep "ipa: ERROR: an internal error has occurred" $tmpout|wc -l) -gt 0 ]; then
+#			rlFail "BZ 783489 -- ipa delegation-find --permissions= returns internal error"
+#		fi
+#		[ -f $tmpout ] && rm -f $tmpout
+#	rlPhaseEnd
+#}
 
 delegation_find_negative_1018()
 {
@@ -582,7 +718,7 @@ delegation_find_negative_1018()
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-find --permissions=badperm > $tmpout 2>&1 " 1
 		rlAssertGrep "^0 delegations matched" $tmpout
-		[ -f $tmpout ] && rm $tmpout
+		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd
 }
 
@@ -593,52 +729,55 @@ delegation_find_negative_1019()
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-find --permissions=badperm,write > $tmpout 2>&1 " 1
 		rlAssertGrep "^0 delegations matched" $tmpout
-		[ -f $tmpout ] && rm $tmpout
+		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd
 }
 
 
-delegation_find_negative_1020() # BZ 783501 -- ipa delegation-find --attrs= returns internal error
-{
-	rlPhaseStartTest "delegation_find_negative_1020: fail to find with no value for attrs (BZ 783501)"
-		KinitAsAdmin
-		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
-		rlRun "ipa delegation-find --attrs= > $tmpout 2>&1 " 1
-		rlAssertGrep "NEEDERROR" $tmpout
-		if [ $(egrep "ipa: ERROR: an internal error has occurred" $tmpout|wc -l) -gt 0 ]; then
-			rlFail "BZ 783501 -- ipa delegation-find --attrs= returns internal error"
-		fi
-		[ -f $tmpout ] && rm $tmpout
-	rlPhaseEnd
-}
+# removed on 4/25/2012.  function of empty arg changed earlier
+#delegation_find_negative_1020() # BZ 783501 -- ipa delegation-find --attrs= returns internal error
+#{
+#	rlPhaseStartTest "delegation_find_negative_1020: fail to find with no value for attrs (BZ 783501)"
+#		KinitAsAdmin
+#		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
+#		rlRun "ipa delegation-find --attrs= > $tmpout 2>&1 " 1
+#		rlAssertGrep "NEEDERROR" $tmpout
+#		if [ $(egrep "ipa: ERROR: an internal error has occurred" $tmpout|wc -l) -gt 0 ]; then
+#			rlFail "BZ 783501 -- ipa delegation-find --attrs= returns internal error"
+#		fi
+#		[ -f $tmpout ] && rm -f $tmpout
+#	rlPhaseEnd
+#}
 
-delegation_find_negative_1021() # BZ 783501 -- ipa delegation-find --attrs= returns internal error
-{
-	rlPhaseStartTest "delegation_find_negative_1021: fail to find with empty for attrs (BZ 783501)"
-		KinitAsAdmin
-		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
-		rlRun "ipa delegation-find --attrs=\"\" > $tmpout 2>&1 " 1
-		rlAssertGrep "NEEDERROR" $tmpout
-		if [ $(egrep "ipa: ERROR: an internal error has occurred" $tmpout|wc -l) -gt 0 ]; then
-			rlFail "BZ 783501 -- ipa delegation-find --attrs= returns internal error"
-		fi
-		[ -f $tmpout ] && rm $tmpout
-	rlPhaseEnd
-}
+# removed on 4/25/2012.  function of empty arg changed earlier
+#delegation_find_negative_1021() # BZ 783501 -- ipa delegation-find --attrs= returns internal error
+#{
+#	rlPhaseStartTest "delegation_find_negative_1021: fail to find with empty for attrs (BZ 783501)"
+#		KinitAsAdmin
+#		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
+#		rlRun "ipa delegation-find --attrs=\"\" > $tmpout 2>&1 " 1
+#		rlAssertGrep "NEEDERROR" $tmpout
+#		if [ $(egrep "ipa: ERROR: an internal error has occurred" $tmpout|wc -l) -gt 0 ]; then
+#			rlFail "BZ 783501 -- ipa delegation-find --attrs= returns internal error"
+#		fi
+#		[ -f $tmpout ] && rm -f $tmpout
+#	rlPhaseEnd
+#}
 
-delegation_find_negative_1022() # BZ 783501 -- ipa delegation-find --attrs= returns internal error
-{
-	rlPhaseStartTest "delegation_find_negative_1022: fail to find with space for attrs (BZ 783501)"
-		KinitAsAdmin
-		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
-		rlRun "ipa delegation-find --attrs=\" \" > $tmpout 2>&1 " 1
-		rlAssertGrep "NEEDERROR" $tmpout
-		if [ $(egrep "ipa: ERROR: an internal error has occurred" $tmpout|wc -l) -gt 0 ]; then
-			rlFail "BZ 783501 -- ipa delegation-find --attrs= returns internal error"
-		fi
-		[ -f $tmpout ] && rm $tmpout
-	rlPhaseEnd
-}
+# removed on 4/25/2012.  function of empty arg changed earlier
+#delegation_find_negative_1022() # BZ 783501 -- ipa delegation-find --attrs= returns internal error
+#{
+#	rlPhaseStartTest "delegation_find_negative_1022: fail to find with space for attrs (BZ 783501)"
+#		KinitAsAdmin
+#		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
+#		rlRun "ipa delegation-find --attrs=\" \" > $tmpout 2>&1 " 1
+#		rlAssertGrep "NEEDERROR" $tmpout
+#		if [ $(egrep "ipa: ERROR: an internal error has occurred" $tmpout|wc -l) -gt 0 ]; then
+#			rlFail "BZ 783501 -- ipa delegation-find --attrs= returns internal error"
+#		fi
+#		[ -f $tmpout ] && rm -f $tmpout
+#	rlPhaseEnd
+#}
 
 delegation_find_negative_1023()
 {
@@ -647,7 +786,7 @@ delegation_find_negative_1023()
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-find --attrs=badattr > $tmpout 2>&1 " 1
 		rlAssertGrep "^0 delegations matched" $tmpout
-		[ -f $tmpout ] && rm $tmpout
+		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd
 }
 
@@ -658,7 +797,7 @@ delegation_find_negative_1024()
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-find --attrs=badattr,mobile > $tmpout 2>&1 " 1
 		rlAssertGrep "^0 delegations matched" $tmpout
-		[ -f $tmpout ] && rm $tmpout
+		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd
 }
 
@@ -670,7 +809,7 @@ delegation_find_negative_1025()
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-find --membergroup=badmg --group=gr1000  > $tmpout 2>&1 " 1
 		rlAssertGrep "^0 delegations matched" $tmpout
-		[ -f $tmpout ] && rm $tmpout
+		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd
 }
 
@@ -681,7 +820,7 @@ delegation_find_negative_1026()
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-find --membergroup=mg1000 --group=badgr  > $tmpout 2>&1 " 1
 		rlAssertGrep "^0 delegations matched" $tmpout
-		[ -f $tmpout ] && rm $tmpout
+		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd
 }
 
@@ -693,7 +832,7 @@ delegation_find_negative_1027()
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-find --membergroup=badmg --group=gr1000 --attrs=mobile  > $tmpout 2>&1 " 1
 		rlAssertGrep "^0 delegations matched" $tmpout
-		[ -f $tmpout ] && rm $tmpout
+		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd
 }
 
@@ -704,7 +843,7 @@ delegation_find_negative_1028()
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-find --membergroup=mg1000 --group=badgr --attrs=mobile  > $tmpout 2>&1 " 1
 		rlAssertGrep "^0 delegations matched" $tmpout
-		[ -f $tmpout ] && rm $tmpout
+		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd
 }
 
@@ -715,7 +854,7 @@ delegation_find_negative_1029()
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-find --membergroup=mg1000 --group=gr1000 --attrs=badattr  > $tmpout 2>&1 " 1
 		rlAssertGrep "^0 delegations matched" $tmpout
-		[ -f $tmpout ] && rm $tmpout
+		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd
 }
 
@@ -727,7 +866,7 @@ delegation_find_negative_1030()
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-find --membergroup=badmg --group=gr1000 --attrs=mobile --permissions=write > $tmpout 2>&1 " 1
 		rlAssertGrep "^0 delegations matched" $tmpout
-		[ -f $tmpout ] && rm $tmpout
+		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd
 }
 
@@ -738,7 +877,7 @@ delegation_find_negative_1031()
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-find --membergroup=mg1000 --group=badgr --attrs=mobile --permissions=write > $tmpout 2>&1 " 1
 		rlAssertGrep "^0 delegations matched" $tmpout
-		[ -f $tmpout ] && rm $tmpout
+		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd
 }
 
@@ -749,7 +888,7 @@ delegation_find_negative_1032()
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-find --membergroup=mg1000 --group=gr1000 --attrs=badattr --permissions=write > $tmpout 2>&1 " 1
 		rlAssertGrep "^0 delegations matched" $tmpout
-		[ -f $tmpout ] && rm $tmpout
+		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd
 }
 
@@ -761,7 +900,7 @@ delegation_find_negative_1033()
 		# COMMAND TO TEST
 		rlRun "ipa delegation-find --membergroup=mg1000 --group=gr1000 --attrs=mobile --permissions=badperm > $tmpout 2>&1 " 1
 		rlAssertGrep "^0 delegations matched" $tmpout
-		[ -f $tmpout ] && rm $tmpout
+		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd
 }
 
