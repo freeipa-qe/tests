@@ -95,7 +95,7 @@ ipa_install_prep(){
 	[ "$MYROLE" = "CLIENT" ] && CLIENT=$(hostname)
 
 	# Backup resolv.conf
-	if [ "x$USEDNS" = "xno" ]; then
+	if [ "x$USEDNS" = "xyes" ]; then
 		rlRun "cp /etc/resolv.conf /etc/resolv.conf.ipabackup"
 		if [ "$MYROLE" = "SLAVE" -o "$MYROLE" = "CLIENT" ]; then
 			rlRun "sed -i s/^nameserver/#nameserver/g /etc/resolv.conf"
