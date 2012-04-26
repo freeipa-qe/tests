@@ -38,6 +38,7 @@ netgroup_bugs()
 	netgroup_bz_796390
 	netgroup_bz_797237
 	netgroup_bz_797256
+	netgroup_bz_813325
 	netgroup_bz_794882
 	netgroup_bz_798792
 }
