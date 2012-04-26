@@ -95,12 +95,14 @@ ipa_install_prep(){
 	[ "$MYROLE" = "CLIENT" ] && CLIENT=$(hostname)
 
 	# Backup resolv.conf
-	rlRun "cp /etc/resolv.conf /etc/resolv.conf.ipabackup"
-	if [ "$MYROLE" = "SLAVE" -o "$MYROLE" = "CLIENT" ]; then
-		rlRun "sed -i s/^nameserver/#nameserver/g /etc/resolv.conf"
-		rlRun "echo \"nameserver $MASTER_IP\" >> /etc/resolv.conf"
-		rlRun "echo \"nameserver $SLAVE_IP\" >> /etc/resolv.conf"
-		rlRun "cat /etc/resolv.conf"
+	if [ "x$USEDNS" = "xno" ]; then
+		rlRun "cp /etc/resolv.conf /etc/resolv.conf.ipabackup"
+		if [ "$MYROLE" = "SLAVE" -o "$MYROLE" = "CLIENT" ]; then
+			rlRun "sed -i s/^nameserver/#nameserver/g /etc/resolv.conf"
+			rlRun "echo \"nameserver $MASTER_IP\" >> /etc/resolv.conf"
+			rlRun "echo \"nameserver $SLAVE_IP\" >> /etc/resolv.conf"
+			rlRun "cat /etc/resolv.conf"
+		fi
 	fi
 
 	# Disable iptables
@@ -111,6 +113,7 @@ ipa_install_prep(){
 ipa_install_master_all(){
 	USEDNS="yes"
 	TESTORDER=$(( TESTORDER += 1 ))
+	DOMAIN=$(grep ^DOMAIN= /dev/shm/env.sh|cut -f2- -d=)
 	rlPhaseStartTest "ipa_install_master_all: Install and configure IPA Master with all services"
 	case "$MYROLE" in
 	"MASTER")
@@ -146,6 +149,7 @@ ipa_install_master_all(){
 ipa_install_master_nodns(){
 	USEDNS="no"
 	TESTORDER=$(( TESTORDER += 1 ))
+	DOMAIN=$(dnsdomainname)
 	rlPhaseStartTest "ipa_install_master_nodns: Install and configure IPA Master with no DNS service"
 	case "$MYROLE" in
 	"MASTER")
@@ -153,7 +157,7 @@ ipa_install_master_nodns(){
 
 		# Configure IPA Server
 		ipa_install_prep
-		rlRun "ipa-server-install --hostname=$hostname_s.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U"
+		rlRun "ipa-server-install --hostname=$hostname_s.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW --ip-address=$MASTER_IP -U"
 
 		if [ -f /var/log/ipaserver-install.log ]; then
 			DATE=$(date +%Y%m%d-%H%M%S)
@@ -181,6 +185,7 @@ ipa_install_master_nodns(){
 ipa_install_slave_all(){
 	USEDNS="yes"
 	TESTORDER=$(( TESTORDER += 1 ))
+	DOMAIN=$(grep ^DOMAIN= /dev/shm/env.sh|cut -f2- -d=)
 	rlPhaseStartTest "ipa_install_slave_all: Install and configure IPA Replica/Slave"
 	case "$MYROLE" in
 	"MASTER")
@@ -233,6 +238,7 @@ ipa_install_slave_all(){
 ipa_install_slave_nodns(){
 	USEDNS="no"
 	TESTORDER=$(( TESTORDER += 1 ))
+	DOMAIN=$(dnsdomainname)
 	rlPhaseStartTest "ipa_install_slave_nodns: Install and configure IPA Replica/Slave"
 	case "$MYROLE" in
 	"MASTER")
@@ -298,6 +304,11 @@ ipa_install_client(){
 		;;
 	"CLIENT")
 		rlLog "Machine in recipe is CLIENT"
+		if [ "x$USEDNS" = "yes" ]; then
+			DOMAIN=$(grep ^DOMAIN= /dev/shm/env.sh|cut -f2- -d=)
+		else
+			DOMAIN=$(dnsdomainname)
+		fi
 
 		# Configure IPA CLIENT
 		ipa_install_prep
