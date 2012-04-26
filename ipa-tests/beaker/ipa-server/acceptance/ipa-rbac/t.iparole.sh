@@ -171,7 +171,7 @@ rlLog "Role - add - negative"
    rlPhaseEnd
 
 
-   rlPhaseStartTest "ipa-role-cli-1009 - add role with blank setattr (bug 783543)" 
+   rlPhaseStartTest "ipa-role-cli-1009 - add role with blank setattr (bug 816574)" 
      roleName="Hostgroup Admin with blank seeAlso"
      roleDesc="Hostgroup Admin with blank seeAlso"
      attr="--setattr=\"\""
@@ -599,7 +599,7 @@ iparole_add_privilege_positive()
   rlPhaseStartTest "ipa-role-cli-1035 - add privilege with comma in name to role (bug 797565)" 
      privilegeName="u,r stuff"
      privilegeDesc="privilege with comma in name"
-     rlRun "addPrivilege \"$privilegeName\" \"$privilegeDesc\"" 0 "Adding privilege: $privilegeName"
+     rlRun "addPrivilege '\"$privilegeName\"' \"$privilegeDesc\"" 0 "Adding privilege: $privilegeName"
      command="addPrivilegeToRole \"$privilegeName\" \"$roleName\" raw"
      expPriv="memberof_privilege: u,r stuff"
      rlRun "$command > $TmpDir/iparole_privilegewithcommaTorole.log 2>&1"  0 "Adding privilege to role"

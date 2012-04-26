@@ -163,7 +163,7 @@ rlLog "Negative privilege tests"
      rlAssertGrep "$expmsg" "$TmpDir/ipaprivilege_invalidattr2.log"
    rlPhaseEnd
 
-   rlPhaseStartTest "ipa-privilege-cli-1010 - add privilege with blank setattr (bug 783543)" 
+   rlPhaseStartTest "ipa-privilege-cli-1010 - add privilege with blank setattr (bug 816574)" 
      privilegeName="Add User with blank attr"
      privilegeDesc="Add User with blank attr"
      attr="--setattr=\"\""
@@ -262,7 +262,7 @@ ipaprivilege_add_permission_negative()
     rlAssertGrep "$expmsg" "$TmpDir/ipaprivilege_nonexistentperm.log"
   rlPhaseEnd
 
-  rlPhaseStartTest "ipa-privilege-cli-1018 - add blank permission to privilege (bug 783543)" 
+  rlPhaseStartTest "ipa-privilege-cli-1018 - add blank permission to privilege (bug 816624)" 
     privilegeName="Add User"
     permissionList=""
     command="addPermissionToPrivilege \"$permissionList\" \"$privilegeName\""
@@ -333,7 +333,7 @@ ipaprivilege_remove_permission_negative()
     rlAssertGrep "$expmsg" "$TmpDir/ipaprivilege_nonexistentperm.log"
   rlPhaseEnd
 
-  rlPhaseStartTest "ipa-privilege-cli-1024 - remove blank permission from privilege (bug 783543)" 
+  rlPhaseStartTest "ipa-privilege-cli-1024 - remove blank permission from privilege (bug 81662)" 
     privilegeName="Add User"
     permissionList=""
     command="removePermissionFromPrivilege \"$permissionList\" \"$privilegeName\""

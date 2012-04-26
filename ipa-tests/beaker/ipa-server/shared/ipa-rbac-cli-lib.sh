@@ -165,7 +165,11 @@ findPermissionByOption()
    shift
    value=$1
    shift
-   allOrRaw="--$1"
+   if [ "$1" == "raw" ] ; then
+     allOrRaw="--all --$1"
+   else
+     allOrRaw="--$1"
+   fi
    shift
    rc=0
 
