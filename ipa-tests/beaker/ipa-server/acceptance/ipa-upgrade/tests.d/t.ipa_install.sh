@@ -312,7 +312,12 @@ ipa_install_client(){
 
 		# Configure IPA CLIENT
 		ipa_install_prep
-		rlRun "ipa-client-install --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW -U --server=$MASTER_S.$DOMAIN"
+		if [ "x$USEDNS" = "xyes" ]; then
+			rlRun "ipa-client-install --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW -U --server=$MASTER_S.$DOMAIN"
+		else
+			rlRun "ipa-client-install --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW -U --server=$MASTER"
+		fi
+			
 
 		if [ -f /var/log/ipaclient-install.log ]; then
 			DATE=$(date +%Y%m%d-%H%M%S)
