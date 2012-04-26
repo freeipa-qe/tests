@@ -314,7 +314,7 @@ ipa_install_client(){
 		;;
 	"CLIENT")
 		rlLog "Machine in recipe is CLIENT"
-		if [ "x$USEDNS" = "yes" ]; then
+		if [ "x$USEDNS" = "xyes" ]; then
 			DOMAIN=$(grep ^DOMAIN= /dev/shm/env.sh|cut -f2- -d=)
 		else
 			DOMAIN=$(dnsdomainname)
