@@ -193,7 +193,7 @@ ipa_install_slave_all(){
 		if [ "x$USEDNS" = "xyes" ]; then
 			rlRun "ipa-replica-prepare -p $ADMINPW --ip-address=$SLAVE_IP $SLAVE_S.$DOMAIN"
 		else
-			rlRun "ipa-replica-prepare -p $ADMINPW $SLAVE_S.$DOMAIN"
+			rlRun "ipa-replica-prepare -p $ADMINPW $SLAVE"
 		fi
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.1' -m $MASTER_IP"
 		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $SLAVE_IP"
@@ -206,10 +206,15 @@ ipa_install_slave_all(){
 		rlRun "AddToKnownHosts $MASTER"
 		rlLog "pushd /dev/shm"
 		pushd /dev/shm
-		rlRun "sftp root@$MASTER:/var/lib/ipa/replica-info-$SLAVE_S.$DOMAIN.gpg"
-		if [ -f /dev/shm/replica-info-$SLAVE_S.$DOMAIN.gpg ]; then
+		if [ "x$USEDNS" = "xyes" ]; then
+			SLAVEFQDN=$SLAVE_S.$DOMAIN
+		else
+			SLAVEFQDN=$SLAVE
+		fi
+		rlRun "sftp root@$MASTER:/var/lib/ipa/replica-info-$SLAVEFQDN.gpg"
+		if [ -f /dev/shm/replica-info-$SLAVEFQDN.gpg ]; then
 			ipa_install_prep
-			rlRun "ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$SLAVE_S.$DOMAIN.gpg"
+			rlRun "ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$SLAVEFQDN.gpg"
 		else
 			rlFail "ERROR: Replica Package not found"
 		fi
@@ -247,8 +252,8 @@ ipa_install_slave_nodns(){
 			rlRun "ipa-replica-prepare -p $ADMINPW --ip-address=$SLAVE_IP $SLAVE_S.$DOMAIN"
 		else
 			rlRun "sed -i '/$SLAVE_S/d' /etc/hosts"
-			rlRun "echo '$SLAVE_IP $SLAVE_S.$DOMAIN $SLAVE_S' >> /etc/hosts"
-			rlRun "ipa-replica-prepare -p $ADMINPW $SLAVE_S.$DOMAIN"
+			rlRun "echo '$SLAVE_IP $SLAVE $SLAVE_S' >> /etc/hosts"
+			rlRun "ipa-replica-prepare -p $ADMINPW $SLAVE"
 		fi
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.1' -m $MASTER_IP"
 		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $SLAVE_IP"
@@ -259,11 +264,16 @@ ipa_install_slave_nodns(){
 		rlRun "AddToKnownHosts $MASTER"
 		rlLog "pushd /dev/shm"
 		pushd /dev/shm
-		rlRun "sftp root@$MASTER:/var/lib/ipa/replica-info-$SLAVE_S.$DOMAIN.gpg"
+		if [ "x$USEDNS" = "xyes" ]; then
+			SLAVEFQDN=$SLAVE_S.$DOMAIN
+		else
+			SLAVEFQDN=$SLAVE
+		fi
+		rlRun "sftp root@$MASTER:/var/lib/ipa/replica-info-$SLAVEFQDN.gpg"
 		rlLog "Checking for existance of replica gpg file"
-		if [ -f /dev/shm/replica-info-$SLAVE_S.$DOMAIN.gpg ]; then
+		if [ -f /dev/shm/replica-info-$SLAVEFQDN.gpg ]; then
 			ipa_install_prep
-			rlRun "ipa-replica-install -U -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$SLAVE_S.$DOMAIN.gpg"
+			rlRun "ipa-replica-install -U -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$SLAVEFQDN.gpg"
 		else
 			rlFail "ERROR: Replica Package not found"
 		fi
