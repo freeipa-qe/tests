@@ -147,6 +147,22 @@ echo "{
     ],
     \"id\":1}" > $badjsondnsadda
 
+set_systime()
+{
+#set system time with given string
+# expected input: + 86400 <== set system time to one day later
+#                 - 86400 <== set system time to one day before
+    offset=$1
+    before=`date`
+    now=`date "+%s"`
+    desiredtime=`echo "$now+$offset" | bc`
+    date "+%a %b %e %H:%M:%S %Y" -s "`perl -le "print scalar localtime $desiredtime"`"
+    after=`date`
+    echo "[set system time] before set systime [$before]"
+    echo "[set system time] after  set systime [$after]"
+    echo "[set system time] offset [$offset] seconds"
+} # set_systime
+
 
 	rlPhaseStartTest "forms-cli-02: Ensure that json script does not work without a valid session ID"
 		outputf=/dev/shm/forms-tmp-out.txt
@@ -249,6 +265,39 @@ ipa dnsrecord-find $DOMAIN $dnsrecname
 		rlRun "ipa dnsrecord-find $DOMAIN $dnsrecname | grep $ipaddressb" 0 "Make sure that the new ip address seems to be in the server"
 		rlRun "ipa dnsrecord-find $DOMAIN $dnsrecname | grep $badipaddressa" 1 "Make sure that the bad ip address isn't on the server"
 		rlRun "ipa dnsrecord-del $DOMAIN $dnsrecname --a-rec=$ipaddressb" 0 "cleanup the second added a record."
+	rlPhaseEnd
+		
+	rlPhaseStartTest "forms-cli-13. Verify that a password expiration notice comes up in forms based auth."
+		# This is testing https://bugzilla.redhat.com/show_bug.cgi?id=811296
+		# It's a work in progress
+		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+		ipa user-add --first=u1 --last=u1 uu
+		echo passwd | ipa passwd uu
+
+		responsefile=/dev/shm/r1
+		echo "user=uu&password=passwd" > $loginfile
+		echo "curl -v --dump-header $responsefile -k -H 'Content-Type: application/x-www-form-urlencoded' https://$MASTER/ipa/session/login_password -X POST -d @$loginfile"
+		curl -v --dump-header $responsefile -k -H 'Content-Type: application/x-www-form-urlencoded' https://$MASTER/ipa/session/login_password -X POST -d @$loginfile
+		rlRun "grep ipa_session= $responsefile" 0 "Make sure that the response header contains a session id in it"
+		sessionid=$(cat $responsefile | grep ipa_session | cut -d\  -f2 | cut -d\= -f2 | sed s/\;//g)
+		export sessionid
+		rlLog "new session ID is $sessionid"
+date
+		set_systime 89000
+date		
+		responsefile=/dev/shm/r2
+		echo "curl -v --dump-header $responsefile -k -H 'Content-Type: application/x-www-form-urlencoded' https://$MASTER/ipa/session/login_password -X POST -d @$loginfile"
+		curl -v --dump-header $responsefile -k -H 'Content-Type: application/x-www-form-urlencoded' https://$MASTER/ipa/session/login_password -X POST -d @$loginfile
+		rlRun "grep ipa_session= $responsefile" 0 "Make sure that the response header contains a session id in it"
+		sessionid=$(cat $responsefile | grep ipa_session | cut -d\  -f2 | cut -d\= -f2 | sed s/\;//g)
+		export sessionid
+		rlLog "new session ID is $sessionid"
+		
+		/etc/init.d/ntpd stop
+		ntpdate clock.redhat.com
+		/etc/init.d/ntpd start
+		
+	
 	rlPhaseEnd
 
 	rlJournalPrintText
