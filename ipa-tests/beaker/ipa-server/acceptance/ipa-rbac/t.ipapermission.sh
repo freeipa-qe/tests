@@ -1010,17 +1010,18 @@ ipapermission_mod_positive()
      rlRun "verifyPermissionAttr \"$permissionName\" all \"Description\" \"NewDescription\"" 0 "Verify Permissions"
    rlPhaseEnd
 
-   rlPhaseStartTest "ipa-permission-cli-1060 - modify permission --rename (bug 805478)"
+# affected by Bug 782847
+   rlPhaseStartTest "ipa-permission-cli-1060 - modify permission --rename (bug 805478 and Bug 782847)"
      permissionName="APermission"
      attr="rename"
      value="ABCPermission"
      restOfRequiredCommand="--attrs= --permissions=write --type=user"
-     rlRun "modifyPermission \"$permissionName\" $attr $value $restOfRequiredCommand"
+     rlRun "modifyPermission \"$permissionName\" $attr $value \"$restOfRequiredCommand\""
      rlRun "verifyPermissionAttr \"$permissionName\" all \"Permission name\" \"ABCPermission\"" 0 "Verify Permissions"
    rlPhaseEnd
 
-   #TODO: Bug - Uncomment later   
-   ipa permission-mod --rename=APermission "ABCPermission"
+#   #TODO: Bug - Uncomment later   
+#   ipa permission-mod --rename=APermission "ABCPermission"
 
 }
 
