@@ -201,8 +201,10 @@ ipa_install_slave_all(){
 	"SLAVE")
 		rlLog "Machine in recipe is SLAVE"
 		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $MASTER_IP"
-		rlRun "sed -i /$MASTER_S/d ~/.ssh/known_hosts"
-		rlRun "sed -i /$MASTER_IP/d ~/.ssh/known_hosts"
+		if [ -f ~/.ssh/known_hosts ]; then
+			rlRun "sed -i /$MASTER_S/d ~/.ssh/known_hosts"
+			rlRun "sed -i /$MASTER_IP/d ~/.ssh/known_hosts"
+		fi
 		rlRun "AddToKnownHosts $MASTER"
 		rlLog "pushd /dev/shm"
 		pushd /dev/shm
@@ -240,7 +242,8 @@ ipa_install_slave_all(){
 	rlPhaseEnd
 }
 
-ipa_install_slave_nodns(){
+ipa_install_slave_nodns()
+{
 	USEDNS="no"
 	TESTORDER=$(( TESTORDER += 1 ))
 	DOMAIN=$(dnsdomainname)
@@ -261,6 +264,10 @@ ipa_install_slave_nodns(){
 	"SLAVE")
 		rlLog "Machine in recipe is SLAVE"
 		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $MASTER_IP"
+		if [ -f ~/.ssh/known_hosts ]; then
+			rlRun "sed -i /$MASTER_S/d ~/.ssh/known_hosts"
+			rlRun "sed -i /$MASTER_IP/d ~/.ssh/known_hosts"
+		fi
 		rlRun "AddToKnownHosts $MASTER"
 		rlLog "pushd /dev/shm"
 		pushd /dev/shm
