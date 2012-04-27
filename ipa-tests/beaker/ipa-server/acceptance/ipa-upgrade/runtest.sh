@@ -64,7 +64,6 @@ esac
 #   test main 
 ##########################################
 
-### Test upgrades for Master, then Slave, then Client for all services
 rlJournalStart
 	rlPhaseStartSetup "ipa-upgrade startup: Initial upgrade setup and pre-checks"
 		rlRun "TmpDir=\`mktemp -d\`" 0 "Creating tmp directory"
@@ -73,95 +72,10 @@ rlJournalStart
 	
 	# Main test functions in tests.d/t.tests.sh:
 	upgrade_test_master_slave_client_all
-
-	rlPhaseStartCleanup "ipa-upgrade cleanup"
-		rlRun "popd"
-		rlRun "rm -r $TmpDir" 0 "Removing tmp directory"
-	rlPhaseEnd
-
-	makereport
-rlJournalEnd
-
-### Test upgrades for Client (Negative), then Slave, then Master for all services
-rlJournalStart
-	rlPhaseStartSetup "ipa-upgrade startup: Initial upgrade setup and pre-checks"
-		rlRun "TmpDir=\`mktemp -d\`" 0 "Creating tmp directory"
-		rlRun "pushd $TmpDir"
-	rlPhaseEnd
-	
-	# Main test functions in tests.d/t.tests.sh:
 	upgrade_test_client_slave_master_all
-
-	rlPhaseStartCleanup "ipa-upgrade cleanup"
-		rlRun "popd"
-		rlRun "rm -r $TmpDir" 0 "Removing tmp directory"
-	rlPhaseEnd
-
-	makereport
-rlJournalEnd
-
-### Test upgrades for Master, then Slave, then Client with NO DNS service
-rlJournalStart
-	rlPhaseStartSetup "ipa-upgrade startup: Initial upgrade setup and pre-checks"
-		rlRun "TmpDir=\`mktemp -d\`" 0 "Creating tmp directory"
-		rlRun "pushd $TmpDir"
-	rlPhaseEnd
-	
-	# Main test functions in tests.d/t.tests.sh:
 	upgrade_test_master_slave_client_nodns
-
-	rlPhaseStartCleanup "ipa-upgrade cleanup"
-		rlRun "popd"
-		rlRun "rm -r $TmpDir" 0 "Removing tmp directory"
-	rlPhaseEnd
-
-	makereport
-rlJournalEnd
-
-### Test upgrades for Master, then Slave, then Client with dirsrv off on servers
-rlJournalStart
-	rlPhaseStartSetup "ipa-upgrade startup: Initial upgrade setup and pre-checks"
-		rlRun "TmpDir=\`mktemp -d\`" 0 "Creating tmp directory"
-		rlRun "pushd $TmpDir"
-	rlPhaseEnd
-	
-	# Main test functions in tests.d/t.tests.sh:
 	upgrade_test_master_slave_client_dirsrv_off
-
-	rlPhaseStartCleanup "ipa-upgrade cleanup"
-		rlRun "popd"
-		rlRun "rm -r $TmpDir" 0 "Removing tmp directory"
-	rlPhaseEnd
-
-	makereport
-rlJournalEnd
-
-### Test upgrades for Master with bug checks
-rlJournalStart
-	rlPhaseStartSetup "ipa-upgrade startup: Initial upgrade setup and pre-checks"
-		rlRun "TmpDir=\`mktemp -d\`" 0 "Creating tmp directory"
-		rlRun "pushd $TmpDir"
-	rlPhaseEnd
-	
-	# Main test functions in tests.d/t.tests.sh:
 	upgrade_test_master_bz_tests
-
-	rlPhaseStartCleanup "ipa-upgrade cleanup"
-		rlRun "popd"
-		rlRun "rm -r $TmpDir" 0 "Removing tmp directory"
-	rlPhaseEnd
-
-	makereport
-rlJournalEnd
-
-### Run a final upgrade to leave Master/Slave/Client upgraded for outside tests
-rlJournalStart
-	rlPhaseStartSetup "ipa-upgrade startup: Initial upgrade setup and pre-checks"
-		rlRun "TmpDir=\`mktemp -d\`" 0 "Creating tmp directory"
-		rlRun "pushd $TmpDir"
-	rlPhaseEnd
-	
-	# Main test functions in tests.d/t.tests.sh:
 	upgrade_test_master_slave_client_all_final
 
 	rlPhaseStartCleanup "ipa-upgrade cleanup"
