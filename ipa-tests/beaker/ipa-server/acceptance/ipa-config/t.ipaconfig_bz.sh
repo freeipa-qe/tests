@@ -56,5 +56,14 @@ ipaconfig_bugzillas()
         	expmsg="ipa: ERROR: 'usersearch' is required"
         	rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
  	rlPhaseEnd
+
+	rlPhaseStartTest "bz803836 IPA needs to set the nsslapd-minssf-exclude-rootdse option by default"
+		minssfcfg=`ldapsearch -x -D "cn=Directory Manager" -w Secret123 -b "cn=config" | grep minssf-exclude-rootdse | awk '{print $2}'`
+		if [ "$minssfcfg" != "on" ] ; then
+			rlFail "nsslapd-minssf-exclude-rootdse not as expected.  GOT: $minssfcfg EXPECTED: on"
+		else
+			rlPass "nsslapd-minssf-exclude-rootdse as expected '$minssfcfg'"
+		fi
+        rlPhaseEnd
 }
 
