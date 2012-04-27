@@ -58,12 +58,22 @@ ipaconfig_bugzillas()
  	rlPhaseEnd
 
 	rlPhaseStartTest "bz803836 IPA needs to set the nsslapd-minssf-exclude-rootdse option by default"
-		minssfcfg=`ldapsearch -x -D "cn=Directory Manager" -w Secret123 -b "cn=config" | grep minssf-exclude-rootdse | awk '{print $2}'`
+		minssfcfg=`ldapsearch -x -D "cn=Directory Manager" -w $ADMINPW -b "cn=config" | grep minssf-exclude-rootdse | awk '{print $2}'`
 		if [ "$minssfcfg" != "on" ] ; then
 			rlFail "nsslapd-minssf-exclude-rootdse not as expected.  GOT: $minssfcfg EXPECTED: on"
 		else
 			rlPass "nsslapd-minssf-exclude-rootdse as expected '$minssfcfg'"
 		fi
         rlPhaseEnd
-}
 
+	rlPhaseStartTest "bz782921 Add central configuration for size and look through limits"
+                rlRun "ldapsearch -x -D \"cn=Directory Manager\" -w $ADMINPW -b \"cn=anonymous-limits,cn=etc,$BASEDN\"" 0 "Check for centralized look through limits configuration"
+		nslimits=`ldapsearch -x -D "cn=Directory Manager" -w $ADMINPW -b "cn=config,cn=ldbm database,cn=plugins,cn=config" | grep nsslapd-idlistscanlimit | awk '{print $2}'`
+                if [ "$nslimits" -ne 100000 ] ; then
+                        rlFail "nsslapd-idlistscanlimit not as expected.  GOT: $nslimits EXPECTED: 100000"
+                else
+                        rlPass "nsslapd-idlistscanlimit as expected '$nslimits'"
+                fi
+        rlPhaseEnd
+}
+ 
