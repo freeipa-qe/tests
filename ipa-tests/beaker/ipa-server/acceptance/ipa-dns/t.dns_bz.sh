@@ -349,11 +349,22 @@ update add $MASTER. 1200 IN SSHFP 1 1 AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 update add $MASTER. 1200 IN SSHFP 2 1 BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB
 send
 EOF
-		rlRun "kinit -k -t /etc/krb5.keytab host/$MASTER"
-		rlRun "nsupdate -g /tmp/nsupdate.txt"
-
-		rlRun "ipa dnszone-show $DOMAIN | grep -i serial | awk '{print $3;}' | wc -m | grep 11"
-		rlRun "ipa dnszone-show $DOMAIN | grep -i expire | awk '{print $3;}' | wc -m | grep 8"
+		rlRun "kinit -k -t /etc/krb5.keytab host/$MASTER" 0 "Kinit with $MASTER keytab"
+		rlRun "nsupdate -g /tmp/nsupdate.txt" 0 "EXECUTING: nsupdate -g /tmp/nsupdate.txt"
+		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+		rlRun "ipa dnszone-show $DOMAIN > /tmp/dnsshow.out 2>&1"
+		serial=`cat /tmp/dnsshow.out | grep -i serial | awk '{print $3;}' | wc -m`
+		if [ $serial -eq 11 ] ; then
+			rlPass "Serial length as expected: $serial"
+		else
+			rlFail "Serial length not as expected.  GOT: $serial EXPECTED: 11"
+		fi 
+		expire=`cat /tmp/dnsshow.out | grep -i expire | awk '{print $3;}' | wc -m`
+                if [ $expire -eq 8 ] ; then
+                        rlPass "Expiration length as expected: $expire"
+		else
+			rlFail "Expiration length not as expected. GOT: $expire EXPECTED: 8"
+                fi
 
 		# revert to original
                 cat > /tmp/nsupdate.txt << EOF
