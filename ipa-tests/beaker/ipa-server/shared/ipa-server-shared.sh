@@ -941,19 +941,33 @@ ipa_quick_uninstall(){
 	rlRun "yum -y remove ipa* 389-ds-base* bind krb5-workstation bind-dyndb-ldap krb5-pkinit-openssl httpd"
 	rlRun "yum -y remove sssd libipa_hbac krb5-server certmonger slapi-nis sssd-client pki* tomcat6 mod_nss"
 	rlRun "yum -y remove memcached python-memcached"
-	rlRun "/bin/rm -rf /var/lib/ipa/"
-	rlRun "/bin/rm -rf /var/lib/sss/"
-	rlRun "/bin/rm -rf /usr/share/ipa"
-	rlRun "/bin/rm -rf /var/log/dirsrv/*"
-	rlRun "/bin/rm -f /tmp/krb5cc_0"
-	rlRun "/bin/rm -f /tmp/krb5cc_48"
-	rlRun "/bin/rm -f /etc/ipa/ca.crt"
+	if [ -d /var/lib/ipa ]; then
+		rlRun "/bin/rm -rf /var/lib/ipa/"
+	fi
+	if [ -d /var/lib/sss/ ]; then
+		rlRun "/bin/rm -rf /var/lib/sss/"
+	fi
+	if [ -d /var/log/dirsrv/ ]; then
+		rlRun "/bin/rm -rf /usr/share/ipa"
+	fi
+	if [ -d /var/log/dirsrv/ ]; then
+		rlRun "/bin/rm -rf /var/log/dirsrv/*"
+	fi
+	if [ -f /tmp/krb5cc_0 ]; then
+		rlRun "/bin/rm -f /tmp/krb5cc_0"
+	fi
+	if [ -f /tmp/krb5cc_48 ]; then
+		rlRun "/bin/rm -f /tmp/krb5cc_48"
+	fi
+	if [ -f /etc/ipa/ca.crt ]; then
+		rlRun "/bin/rm -f /etc/ipa/ca.crt"
+	fi
 
 	rlLog "pushd /etc/yum.repos.d"
 	pushd /etc/yum.repos.d
 	if [ ! -d /etc/yum.repos.d/deleted ]; then
 		rlRun "mkdir deleted"
-	fi
+	fi	
 	for repo in $(ls -1 *.repo|egrep -v "^beaker|^cobbler|^redhat.repo|^rhel-source.repo"); do
 		rlRun "/bin/mv -f $repo deleted/"
 	done	
@@ -961,12 +975,20 @@ ipa_quick_uninstall(){
 	popd
 
 	rlRun "yum clean all"
-	rlRun "/bin/cp -f /etc/hosts.ipabackup /etc/hosts"
-	rlRun "/bin/rm -f /etc/hosts.ipabackup"
-	rlRun "/bin/cp -f /etc/sysconfig/network-ipabackup /etc/sysconfig/network"
-	rlRun "/bin/rm -f /etc/sysconfig/network-ipabackup"
-	rlRun "/bin/cp -f /etc/resolv.conf.ipabackup /etc/resolv.conf"
-	rlRun "/bin/rm -f /etc/resolv.conf.ipabackup"
+	if [ -f /etc/hosts.ipabackup ]; then
+		rlRun "/bin/cp -f /etc/hosts.ipabackup /etc/hosts"
+	fi
+	if [ -f /etc/hosts.ipabackup ]; then
+		rlRun "/bin/rm -f /etc/hosts.ipabackup"
+	fi
+	if [ -f /etc/sysconfig/network-ipabackup ]; then
+		rlRun "/bin/cp -f /etc/sysconfig/network-ipabackup /etc/sysconfig/network"
+		rlRun "/bin/rm -f /etc/sysconfig/network-ipabackup"
+	fi
+	if [ -f /etc/resolv.conf.ipabackup ]; then
+		rlRun "/bin/cp -f /etc/resolv.conf.ipabackup /etc/resolv.conf"
+		rlRun "/bin/rm -f /etc/resolv.conf.ipabackup"
+	fi
 	. /etc/sysconfig/network
 	rlRun "hostname $HOSTNAME"
 	rlRun "yum -y downgrade krb5-devel krb5-libs bind-libs bind-utils"
