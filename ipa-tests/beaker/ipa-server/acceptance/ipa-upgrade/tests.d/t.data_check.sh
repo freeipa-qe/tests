@@ -162,6 +162,10 @@ data_check()
 			rlRun "getent -s sss group|grep ${amgroup[1]}|grep ${user[1]}"
 			rlRun "getent -s sss netgroup ${amhostgroup[1]}|grep ${host[1]}"
 		fi
+
+		# check delegations
+		rlRun "ipa delegation-show delegation_open_gecos"
+		rlRun "getent -s sss passwd ${user[2]}|grep ${user[1]}"
 			
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.1' -m $TARGET_IP"
 	rlPhaseEnd	
