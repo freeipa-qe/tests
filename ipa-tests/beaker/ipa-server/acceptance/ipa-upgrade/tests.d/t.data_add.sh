@@ -61,6 +61,7 @@ data_add()
 		rlLog "Machine in recipe is MASTER"
 		KinitAsAdmin
 
+		# Add automember rules
 		if [ $(ipa help |grep automember|wc -l) -gt 0 ]; then
 			rlRun "ipa group-add ${amgroup[1]} --desc=desc"
 			rlRun "ipa hostgroup-add ${amhostgroup[1]} --desc=desc"
@@ -68,11 +69,14 @@ data_add()
 			rlRun "ipa automember-add ${amhostgroup[1]} --type=hostgroup"
 			rlRun "ipa automember-add-condition ${amgroup[1]} --type=group --key=sn --inclusive=one"
 			rlRun "ipa automember-add-condition ${amhostgroup[1]} --type=hostgroup --key=fqdn --exclusive-regex=^${host[2]}"
+			rlRun "ipa automember-add-condition ${amhostgroup[1]} --type=hostgroup --key=fqdn --inclusive-regex=^.*\.${DOMAIN}"
 		fi
 		
 		# Add users
-		rlRun "echo ${passwd[1]}|ipa user-add ${user[1]} --first=First --last=one --password"
-		rlRun "echo ${passwd[2]}|ipa user-add ${user[2]} --first=First --last=two --password"
+		rlRun "echo ${passwd[2]}|ipa user-add ${user[1]} --first=First --last=one --password"
+		rlRun "echo ${passwd[1]}|ipa user-add ${user[2]} --first=First --last=two --password"
+		rlRun "echo -e \"${passwd[2]}\n${passwd[1]}\n${passwd[1]}\"|kinit ${user[1]}"
+		rlRun "echo -e \"${passwd[1]}\n${passwd[2]}\n${passwd[2]}\"|kinit ${user[2]}"
 
 		# Add groups
 		rlRun "ipa group-add ${group[1]} --desc=GROUP_${group[1]}"

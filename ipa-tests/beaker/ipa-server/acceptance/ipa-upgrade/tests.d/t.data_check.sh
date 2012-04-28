@@ -155,6 +155,12 @@ data_check()
 		if [ $(ipa help|grep automember|wc -l) -gt 0 ]; then
 			rlRun "ipa automember-show --type=group ${amgroup[1]}"
 			rlRun "ipa automember-show --type=hostgroup ${amhostgroup[1]}"
+			rlRun "ipa group-find ${amgroup[1]} --users=${user[1]}"
+			rlRun "ipa group-find ${amgroup[1]} --users=${user[1]}" 1 
+			rlRun "ipa hostgroup-find ${amhostgroup[1]} --hosts=${host[1]}"
+			rlRun "ipa hostgroup-find ${amhostgroup[1]} --hosts=${host[2]}" 1
+			rlRun "getent -s sss group|grep ${amgroup[1]}|grep ${user[1]}"
+			rlRun "getent -s sss netgroup ${amhostgroup[1]}|grep ${host[1]}"
 		fi
 			
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.1' -m $TARGET_IP"
