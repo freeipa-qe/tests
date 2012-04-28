@@ -178,8 +178,8 @@ upgrade_test_master_bz_tests()
 		upgrade_bz_812391
 
 		# uninstall everything so we can start over
-		ipa_uninstall_master
 		ipa_uninstall_slave
+		ipa_uninstall_master
 			
 	rlPhaseEnd
 }
