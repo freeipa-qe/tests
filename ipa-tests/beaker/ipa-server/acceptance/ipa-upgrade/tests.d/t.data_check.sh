@@ -151,6 +151,12 @@ data_check()
 			done
 		done
 
+		# check automembers
+		if [ $(ipa help|grep automember|wc -l) -gt 0 ]; then
+			rlRun "ipa automember-show --type=group ${amgroup[1]}"
+			rlRun "ipa automember-show --type=hostgroup ${amhostgroup[1]}"
+		fi
+			
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.1' -m $TARGET_IP"
 	rlPhaseEnd	
 }
