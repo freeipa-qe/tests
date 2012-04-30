@@ -76,7 +76,9 @@ data_add()
 		rlRun "echo ${passwd[2]}|ipa user-add ${user[1]} --first=First --last=one --password"
 		rlRun "echo ${passwd[1]}|ipa user-add ${user[2]} --first=First --last=two --password"
 		rlRun "echo -e \"${passwd[2]}\n${passwd[1]}\n${passwd[1]}\"|kinit ${user[1]}"
+		KinitAsAdmin
 		rlRun "echo -e \"${passwd[1]}\n${passwd[2]}\n${passwd[2]}\"|kinit ${user[2]}"
+		KinitAsAdmin
 
 		# Add groups
 		rlRun "ipa group-add ${group[1]} --desc=GROUP_${group[1]}"
