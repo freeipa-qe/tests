@@ -125,7 +125,7 @@ dnsreplicaprepare()
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-replicaprepare-04 check reverse entry of the replica was created in dns correctly with dig"
-		sleep 5
+		sleep 15
 		rlLog "EXECUTING: dig -x $newfakehostip | grep newfakehost$newip.$DOMAIN"
 		rlRun "dig -x $newfakehostip | grep newfakehost$newip.$DOMAIN" 0 "Checking to ensure that reverse of newfakehost$newip.$DOMAIN is set up correctly"
 	rlPhaseEnd
