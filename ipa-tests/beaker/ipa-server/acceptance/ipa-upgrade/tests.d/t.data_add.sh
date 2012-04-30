@@ -61,17 +61,6 @@ data_add()
 		rlLog "Machine in recipe is MASTER"
 		KinitAsAdmin
 
-		# Add automember rules
-		if [ $(ipa help |grep automember|wc -l) -gt 0 ]; then
-			rlRun "ipa group-add ${amgroup[1]} --desc=desc"
-			rlRun "ipa hostgroup-add ${amhostgroup[1]} --desc=desc"
-			rlRun "ipa automember-add ${amgroup[1]} --type=group"
-			rlRun "ipa automember-add ${amhostgroup[1]} --type=hostgroup"
-			rlRun "ipa automember-add-condition ${amgroup[1]} --type=group --key=sn --inclusive=one"
-			rlRun "ipa automember-add-condition ${amhostgroup[1]} --type=hostgroup --key=fqdn --exclusive-regex=^${host[2]}"
-			rlRun "ipa automember-add-condition ${amhostgroup[1]} --type=hostgroup --key=fqdn --inclusive-regex=^.*\.${DOMAIN}"
-		fi
-		
 		# Add users
 		rlRun "echo ${passwd[2]}|ipa user-add ${user[1]} --first=First --last=one --password"
 		rlRun "echo ${passwd[1]}|ipa user-add ${user[2]} --first=First --last=two --password"
@@ -128,6 +117,47 @@ data_add()
 		rlRun "ipa user-mod ${user[2]} --gecos=TEST${user[1]}"
 		KinitAsAdmin
 		
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $MASTER_IP"
+		;;
+	"SLAVE")
+		rlLog "Machine in recipe is SLAVE"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER_IP"
+		;;
+	"CLIENT")
+		rlLog "Machine in recipe is CLIENT"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER_IP"
+		;;
+	*)
+		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
+		;;
+	esac
+	rlPhaseEnd
+}
+
+
+data_add_220()
+{
+	TESTORDER=$(( TESTORDER += 1 ))
+	rlPhaseStartTest "data_add_220: add test data to IPA for version 2.2.0 updates"
+	case "$MYROLE" in
+	"MASTER")
+		rlLog "Machine in recipe is MASTER"
+		KinitAsAdmin
+
+		# Add automember rules
+		rlRun "ipa group-add ${amgroup[1]} --desc=desc"
+		rlRun "ipa hostgroup-add ${amhostgroup[1]} --desc=desc"
+		rlRun "ipa automember-add ${amgroup[1]} --type=group"
+		rlRun "ipa automember-add ${amhostgroup[1]} --type=hostgroup"
+		rlRun "ipa automember-add-condition ${amgroup[1]} --type=group --key=sn --inclusive=one"
+		rlRun "ipa automember-add-condition ${amhostgroup[1]} --type=hostgroup --key=fqdn --exclusive-regex=^${host[2]}"
+		rlRun "ipa automember-add-condition ${amhostgroup[1]} --type=hostgroup --key=fqdn --inclusive-regex=^.*\.${DOMAIN}"
+		rlRun "ipa user-add ${amuser[1]} --first=First --last=one"
+		rlRun "ipa host-add ${amhost[1]} --force"
+		
+		# Add data for ssh?
+		# Add data for selinux?
+
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $MASTER_IP"
 		;;
 	"SLAVE")

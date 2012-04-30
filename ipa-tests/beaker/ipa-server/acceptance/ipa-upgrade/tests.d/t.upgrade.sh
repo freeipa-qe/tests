@@ -84,6 +84,7 @@ upgrade_master()
 		;;
 	esac
 	rlPhaseEnd
+	touch /tmp/ipa.master.is.2.2.0
 }
 
 upgrade_slave()
@@ -128,6 +129,7 @@ upgrade_slave()
 		;;
 	esac
 	rlPhaseEnd
+	touch /tmp/ipa.slave.is.2.2.0
 }
 
 upgrade_client()

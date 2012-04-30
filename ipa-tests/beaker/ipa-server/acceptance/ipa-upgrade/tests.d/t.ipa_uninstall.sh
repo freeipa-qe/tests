@@ -79,6 +79,9 @@ ipa_uninstall_master()
 		;;
 	esac
 	rlPhaseEnd
+	if [ -f /tmp/ipa.master.is.2.2.0 ]; then
+		rm /tmp/ipa.master.is.2.2.0
+	fi
 }
 
 ipa_uninstall_slave()
@@ -115,6 +118,9 @@ ipa_uninstall_slave()
 		;;
 	esac
 	rlPhaseEnd
+	if [ -f /tmp/ipa.slave.is.2.2.0 ]; then
+		rm /tmp/ipa.slave.is.2.2.0
+	fi
 }
 
 ipa_uninstall_client()

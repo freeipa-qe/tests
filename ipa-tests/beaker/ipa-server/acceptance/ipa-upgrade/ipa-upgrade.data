@@ -45,3 +45,7 @@ app2 $MASTER:/opt/app2
 # Automember
 amgroup[1]=finance
 amhostgroup[1]=calchostgroup
+amuser[1]=todd
+amuser[2]=tedd
+amhost[1]=bank.${DOMAIN}
+amhost[2]=postoffice.${domain}
