@@ -154,7 +154,12 @@ data_check()
 		# check delegations
 		rlRun "ipa delegation-show delegation_open_gecos"
 		rlRun "getent -s sss passwd ${user[2]}|grep ${user[1]}"
-			
+
+		# check selfservice
+		rlLog "Check Selfservice"
+		rlRun "ipa selfservice-show selfservice_update_gecos"
+		rlRun "getent -s sss passwd ${user[1]}|grep ${user[1]}"
+
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.1' -m $TARGET_IP"
 	rlPhaseEnd	
 

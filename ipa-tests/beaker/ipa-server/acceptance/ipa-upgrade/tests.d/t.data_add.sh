@@ -117,6 +117,12 @@ data_add()
 		rlRun "ipa user-mod ${user[2]} --gecos=TEST${user[1]}"
 		KinitAsAdmin
 		
+		# Add Selfservice 
+		rlRun "ipa selfservice-add selfservice_update_gecos --attrs=gecos"
+		KinitAsUser ${user[1]} ${passwd[1]}
+		rlRun "ipa user-mod ${user[1]} --gecos=TEST${user[1]}"
+		KinitAsAdmin
+
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $MASTER_IP"
 		;;
 	"SLAVE")
@@ -135,10 +141,10 @@ data_add()
 }
 
 
-data_add_220()
+data_add_2()
 {
 	TESTORDER=$(( TESTORDER += 1 ))
-	rlPhaseStartTest "data_add_220: add test data to IPA for version 2.2.0 updates"
+	rlPhaseStartTest "data_add_2: add test data to IPA for version 2.2.0 updates"
 	case "$MYROLE" in
 	"MASTER")
 		rlLog "Machine in recipe is MASTER"
