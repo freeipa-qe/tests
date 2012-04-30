@@ -30,23 +30,27 @@ public class PermissionTasks {
 	public static void createInvalidPermissionWithType(SahiTasks sahiTasks, String cn, String[] rights, String type, String[] attributes, String expectedError) {
 		sahiTasks.span("Add").click();
 		sahiTasks.textbox("cn").setValue(cn);
-		for (String right : rights) {
-			if (!right.isEmpty()) {
-				sahiTasks.checkbox(right).click();
+		if (cn.contains("^"))
+			Assert.assertTrue(sahiTasks.span(expectedError).near(sahiTasks.textbox("cn")).exists(), "Verified expected error for name " + cn);
+		else{
+			for (String right : rights) {
+				if (!right.isEmpty()) {
+					sahiTasks.checkbox(right).click();
+				}
 			}
-		}
-		sahiTasks.select("target").choose("Type");
-		sahiTasks.select("type").choose(type);
-		for (String attribute : attributes) {
-			if (!attribute.isEmpty()) {
-			   sahiTasks.checkbox(attribute).click();
+			sahiTasks.select("target").choose("Type");
+			sahiTasks.select("type").choose(type);
+			for (String attribute : attributes) {
+				if (!attribute.isEmpty()) {
+				   sahiTasks.checkbox(attribute).click();
+				}
 			}
-		}
-		sahiTasks.button("Add").click();
-		
-		Assert.assertTrue(sahiTasks.div(expectedError).exists(), "Verified expected error when adding invalid rule " + cn);
-		sahiTasks.button("Cancel").near(sahiTasks.button("Retry")).click();
-		sahiTasks.button("Cancel").near(sahiTasks.button("Add and Edit")).click();
+			sahiTasks.button("Add").click();
+			
+			Assert.assertTrue(sahiTasks.div(expectedError).exists(), "Verified expected error when adding invalid rule " + cn);
+			sahiTasks.button("Cancel").near(sahiTasks.button("Retry")).click();
+			sahiTasks.button("Cancel").near(sahiTasks.button("Add and Edit")).click();
+		}		
 	}
 	
 	
@@ -238,7 +242,7 @@ public class PermissionTasks {
 		sahiTasks.span(buttonToClick).click();
 	}
 	
-	public static void verifyPermissionType(SahiTasks sahiTasks, String cn, String[] rights, String type, String[] attributes) {
+	public static void verifyPermissionType(SahiTasks sahiTasks, String cn, String[] rights, String type, String[] attributes, String memberOfGroup) {
 		if (sahiTasks.link(cn).exists()) {
 			sahiTasks.link(cn).click();
 			for (String right : rights) {
@@ -246,12 +250,15 @@ public class PermissionTasks {
 					Assert.assertTrue(sahiTasks.checkbox(right).checked(), "Verified permission " + right + " is checked for " + cn );
 				}
 			}	
-			Assert.assertEquals(type, sahiTasks.select("type").selectedText(), "Verified type " + type + " for " + cn);
+			if (!type.isEmpty())
+				Assert.assertEquals(type, sahiTasks.select("type").selectedText(), "Verified type " + type + " for " + cn);
 			for (String attribute : attributes) {
-				if (!attribute.isEmpty()) {
+				if (!attribute.isEmpty() && (!attribute.equals("none"))) {
 					Assert.assertTrue(sahiTasks.checkbox(attribute).checked(), "Verified attribute " + attribute + " is checked for " + cn );
 				}
 			}
+			if (!memberOfGroup.isEmpty())
+				Assert.assertEquals(memberOfGroup, sahiTasks.textbox("memberof").value());
 			sahiTasks.link("Permissions").in(sahiTasks.div("content")).click();
 		}
 	}
@@ -325,11 +332,36 @@ public class PermissionTasks {
 		sahiTasks.link(cn).click();
 		if (!right.isEmpty()) 
 			sahiTasks.checkbox(right).click();
-		sahiTasks.span("icon combobox-icon").click();
-		sahiTasks.select("list").choose(memberOfGroup);
-		if (!attribute.isEmpty()) 
+		if (!memberOfGroup.isEmpty()) {
+			sahiTasks.span("icon combobox-icon").click();
+			sahiTasks.select("list").choose(memberOfGroup);
+		}
+		if (!attribute.isEmpty() && (!attribute.equals("none")))
 			sahiTasks.checkbox(attribute).click();
+		//deselect all attr
+		if (attribute.equals("none")) {
+			sahiTasks.checkbox("on").click();
+			sahiTasks.checkbox("on").click();
+		}
 		sahiTasks.span("Update").click();	
+		sahiTasks.link("Permissions").in(sahiTasks.div("content")).click();
+	}
+	
+	public static void invalidModifyPermission(SahiTasks sahiTasks, String cn, String right, String type, String expectedError) {
+		sahiTasks.link(cn).click();
+		if (!right.isEmpty()) 
+			sahiTasks.checkbox(right).click();
+		if (!type.isEmpty())
+			sahiTasks.select("type").choose(type);
+	
+		sahiTasks.span("Update").click();	
+		
+		Assert.assertTrue(sahiTasks.div(expectedError).exists(), "Verified expected error for " + cn);
+		if (sahiTasks.button("OK").exists())
+			sahiTasks.button("OK").click();
+		else
+			sahiTasks.button("Cancel").near(sahiTasks.button("Retry")).click();
+		sahiTasks.span("Reset").click();
 		sahiTasks.link("Permissions").in(sahiTasks.div("content")).click();
 	}
 
@@ -385,6 +417,76 @@ public class PermissionTasks {
 		
 	}
 
+	public static void addPermissionAddPrivilege(SahiTasks sahiTasks, String cn, String[] rights, String type,  String[] privileges, String buttonToClick) {
+		if (!type.isEmpty()) {
+			sahiTasks.span("Add").click();
+			sahiTasks.textbox("cn").setValue(cn);
+			for (String right : rights) {
+				if (!right.isEmpty()) {
+					sahiTasks.checkbox(right).click();
+				}
+			}
+			sahiTasks.select("target").choose("Type");
+			sahiTasks.select("type").choose(type);
+			sahiTasks.button("Add and Edit").click();
+		} else {
+			sahiTasks.link(cn).click();
+		}
+		
 	
+		sahiTasks.link("member_privilege").click();
+	
+		sahiTasks.span("Add").click();
+		
+		for (String privilege : privileges) {
+			if (!privilege.isEmpty()) {
+				sahiTasks.textbox("filter").setValue(privilege);
+				sahiTasks.span("Find").click();
+				sahiTasks.checkbox(privilege).click();
+				sahiTasks.span(">>").click();
+			}
+		}
+		
+		sahiTasks.button(buttonToClick).click();
+		sahiTasks.link("Permissions").in(sahiTasks.div("content")).click();
+	}
 
+	
+	public static void verifyPermissionMembership(SahiTasks sahiTasks, String cn, String[] members, boolean exists) {
+		sahiTasks.link(cn).click();
+		sahiTasks.link("member_privilege").click();
+		for (String member : members) {
+			if (!member.isEmpty()) {
+				if (exists){
+					Assert.assertTrue(sahiTasks.link(member).exists(), "Verified " + member + " is listed for " + cn );
+				}	
+				else {
+					Assert.assertFalse(sahiTasks.link(member).exists(), "Verified " + member + " is not listed for " + cn );
+				}
+			}
+		}	
+		sahiTasks.link("Permissions").in(sahiTasks.div("content")).click();
+	}
+	
+	
+	public static void  deleteMemberFromPermission(SahiTasks sahiTasks, String cn, String[] members, 
+			String allOrOne, String buttonToClick) {
+		sahiTasks.link(cn).click();
+		sahiTasks.link("member_privilege").click();
+		if (allOrOne.equals("All")) {
+			sahiTasks.checkbox("cn").check();
+		} else {
+			for (String member : members) {
+				if (!member.isEmpty()) {
+					sahiTasks.checkbox(member).check();
+				}
+			}
+		}
+				
+		sahiTasks.span("Delete").click();
+		sahiTasks.button(buttonToClick).click();
+		sahiTasks.link("Permissions").in(sahiTasks.div("content")).click();		
+	}
+	
+	
 }

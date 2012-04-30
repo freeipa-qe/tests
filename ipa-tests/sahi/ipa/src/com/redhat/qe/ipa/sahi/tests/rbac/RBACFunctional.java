@@ -85,6 +85,7 @@ public class RBACFunctional extends SahiTestScript {
 		Assert.assertFalse(sahiTasks.link(roleName).exists(), "Verify role " + roleName + " doesn't already exist");
 		
 		//new role can be added now
+		sahiTasks.navigateTo(commonTasks.rolePage, true);
 		RoleTasks.addRole(sahiTasks, roleName, roleDescription, "Add");
 		
 		//verify 
@@ -104,7 +105,7 @@ public class RBACFunctional extends SahiTestScript {
 		sahiTasks.navigateTo(commonTasks.privilegePage, true);
 		log.info("Add Privilege");
 		String permissions[] = {permissionName};
-		PrivilegeTasks.addPrivilegeAddPermissions(sahiTasks, privilegeName, privilegeDescription, permissionName, permissions, "Add");
+		PrivilegeTasks.addPrivilegeAddMembers(sahiTasks, privilegeName, privilegeDescription, "Permissions", permissionName, permissions, "Add");
 		
 		//Add Role with privilege
 		sahiTasks.navigateTo(commonTasks.rolePage, true);
@@ -157,7 +158,7 @@ public class RBACFunctional extends SahiTestScript {
 		log.info("Add Permission - read dns entries");	
 		sahiTasks.navigateTo(commonTasks.privilegePage, true);
 		String permissions[] = {permissionName};
-		PrivilegeTasks.addPermissionsToPrivilege(sahiTasks, privilegeName, permissionName, permissions, "Add");
+		PrivilegeTasks.addMembersToPrivilege(sahiTasks, privilegeName, "Permissions", permissionName, permissions, "Add");
 		
 		
 		String password="Secret123";
@@ -256,7 +257,7 @@ public class RBACFunctional extends SahiTestScript {
 	public Object[][] getdnsListZoneTestObjects() {
 		String[][] roles={
 		// testName			permissionName	 		privilegeName	 	 	roleName 			userName
-		{ "dnsUpdateAdmin",	"read dns entries",		"TestPrivilegeDNS",	  	"TestRoleDNS", 		"testuserdns"	}
+		{ "dnsUpdateAdmin",	"Read DNS Entries",		"TestPrivilegeDNS",	  	"TestRoleDNS", 		"testuserdns"	}
 		};
         
 		return roles;	

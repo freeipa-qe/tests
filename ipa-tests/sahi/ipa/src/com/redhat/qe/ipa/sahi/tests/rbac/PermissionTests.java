@@ -1,5 +1,53 @@
 package com.redhat.qe.ipa.sahi.tests.rbac;
 
+/*
+ * Review comments:
+ * Permissions:
+
+2) Possibly more data for different target types in
+add_permission_type_{type}_xxx, add_permission_filter_xxx,
+add_permission_targetgroup_xxx, add_permission_subtree_xxx. Especialy
+test if all offer attrs can be added or if table is missing some (for
+type and targetgroup). Same for editing. Some of it may be covered by
+testing for 807755. 
+// nk: 807755 tests to see if all the attr provided are for the type
+// and if other attr are listed - it will throw error.
+// once bug is fixed - other attr will not be available to choose...so cannot test that
+
+3)  add_permission_type and add_permission_subtree can also have a
+memberof' option (in formlabeled as 'Member of group')
+//nk: permissionModifyTests has test for permission_type; added for subtree
+
+4) add: no required check for rights //nk:it is available at createPermissionWithRequiredField()
+5) no required checks in edit // nk: done
+6) missing test for privileges tab (member_privilege) //nk: done
+
+
+Some general thoughts, not neccessary missing in this test suite:
+I think that they may be nicely covered by Yi's new testing framework.
+
+a) Test if all required attributes in add or details page cause error if
+not entered/cleared (assuming all other required are valid).
+//nk: when doing add - is available at createPermissionWithRequiredField()
+//nk: when doing details - done
+
+b) Check clearing of all non required attrs if previously set. Reason -
+server may have required attributes which may be not marked as required
+in UI, but they may not be required in add because they have default value.
+// nk: attributes are not required
+// if attr is not specified, permission does not allow that attribute to be read/updated/deleted
+// done: Add a test in modify to clear attr and update
+
+c) general tests for member, memberof,... tabs:
+    1) add one, multiple // nk: done
+    2) delete one, multiple // nk: done
+    3) simulate concurrent add/delete and expect error. In details: open
+two windows which don't share session, use forms login, in both window
+open add dialog and select same value, in both windows click add - the
+latter should cause error. Similar for remove. I'm not sure if your
+testing environment can do that. //nk: TODO : will look into it....
+ */
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -16,11 +64,9 @@ import com.redhat.qe.auto.testng.TestNGUtils;
 import com.redhat.qe.ipa.sahi.base.SahiTestScript;
 import com.redhat.qe.ipa.sahi.tasks.CommonTasks;
 import com.redhat.qe.ipa.sahi.tasks.GroupTasks;
-import com.redhat.qe.ipa.sahi.tasks.HBACTasks;
 import com.redhat.qe.ipa.sahi.tasks.PermissionTasks;
+import com.redhat.qe.ipa.sahi.tasks.PrivilegeTasks;
 import com.redhat.qe.ipa.sahi.tasks.SahiTasks;
-import com.redhat.qe.ipa.sahi.tasks.SudoTasks;
-import com.redhat.qe.ipa.sahi.tests.group.GroupTests;
 
 
 public class PermissionTests extends SahiTestScript {
@@ -224,7 +270,7 @@ public class PermissionTests extends SahiTestScript {
 			PermissionTasks.addAndEditPermissionWithType(sahiTasks, cn, right, type, attribute, rightToAdd, "Update");
 			String rights[] = {right, rightToAdd};
 			String attributes[]= {attribute};
-			PermissionTasks.verifyPermissionType(sahiTasks, cn, rights, type, attributes);		
+			PermissionTasks.verifyPermissionType(sahiTasks, cn, rights, type, attributes, "");		
 		}
 		
 		
@@ -366,15 +412,87 @@ public class PermissionTests extends SahiTestScript {
 			//verify changes
 			String rights[] = {right};
 			String attributes[]= {attribute};
-			PermissionTasks.verifyPermissionType(sahiTasks, cn, rights, type, attributes);	
+			PermissionTasks.verifyPermissionType(sahiTasks, cn, rights, type, attributes, memberOfGroup);	
 			
 			PermissionTasks.undoResetUpdatePermission(sahiTasks, cn, "Permissions", right, "undo");
 			PermissionTasks.undoResetUpdatePermission(sahiTasks, cn, "Member of group", memberOfGroup, "Reset");
-			PermissionTasks.undoResetUpdatePermission(sahiTasks, cn, "Attributes", attribute, "Update");
+			if (!attribute.equals("none"))
+				PermissionTasks.undoResetUpdatePermission(sahiTasks, cn, "Attributes", attribute, "Update");
 			
-			//Reset permissions to what was installed
-			PermissionTasks.modifyPermission(sahiTasks, "Modify netgroup membership", "add", "", "");
 			
+			
+			CommonTasks.clearSearch(sahiTasks);
+		}
+		
+		
+		/*
+		 * Edit the Settings for the Permission with Invalid values
+		 */
+		@Test (groups={"permissionInvalidModifyTests"}, description="Edit Settings for Permission with invalid values",
+				dataProvider="permissionInvalidModifyTestObjects")
+		public void testPermissionInvalidModify(String testName, String cn, String right, String type, String expectedError) throws Exception {		
+			//verify permission to be edited exists
+			CommonTasks.search(sahiTasks, cn);
+			Assert.assertTrue(sahiTasks.link(cn).exists(), "Verify Permission " + cn + " to be edited exists");
+			
+			//modify this permission
+			PermissionTasks.invalidModifyPermission(sahiTasks, cn, right, type, expectedError);
+			
+			CommonTasks.clearSearch(sahiTasks);
+		}
+		
+		/*
+		 * Add a permission, add or cancel to add privilege
+		 */
+		@Test (groups={"permissionAddAndAddPrivilegesTests"}, description="Add Permission and Add Privileges to it", 
+				dataProvider="permissionAddAndAddPrivilegesTestObjects")	
+		public void testPermissionAddAndAddPrivileges(String testName, String cn, String right1, String right2, String type,
+				 String privilege1, String privilege2, String buttonToClick) throws Exception {		
+			//verify permission doesn't exist
+			CommonTasks.search(sahiTasks, cn);
+			Assert.assertFalse(sahiTasks.link(cn).exists(), "Verify permission " + cn + " doesn't already exist");
+					
+			String rights[] = {right1, right2};
+			String privileges[] = {privilege1, privilege2};
+			//new permission can be added now
+			PermissionTasks.addPermissionAddPrivilege(sahiTasks, cn, rights, type,  privileges, buttonToClick);
+			
+			//verify privilege was added successfully
+			CommonTasks.search(sahiTasks, cn);
+			Assert.assertTrue(sahiTasks.link(cn).exists(), "Added permission " + cn + "  successfully");
+			String privilegesToVerify[] = {privilege1.toLowerCase(), privilege2.toLowerCase()};
+			if (buttonToClick.equals("Add")) {
+				PermissionTasks.verifyPermissionMembership(sahiTasks, cn, privilegesToVerify, true);
+			}
+			else
+				PermissionTasks.verifyPermissionMembership(sahiTasks, cn, privilegesToVerify, false);
+			CommonTasks.clearSearch(sahiTasks);
+				
+		}
+		
+		
+		/*
+		 * For a permission, delete privilege
+		 */
+		@Test (groups={"permissionDeleteMemberTests"}, description="Delete Member from a Permission", 
+				dataProvider="permissionDeleteMemberTestObjects",
+				dependsOnGroups={"permissionAddAndAddPrivilegesTests"} )	
+		public void testPermissionDeleteMember(String testName, String cn,  String member1,	String member2, 
+				String allOrOne, String buttonToClick) throws Exception {
+			CommonTasks.search(sahiTasks, cn);
+			Assert.assertTrue(sahiTasks.link(cn).exists(), "Permission " + cn + "  exists");			
+			
+			
+			String members[] = {member1.toLowerCase(), member2.toLowerCase()};
+			
+			
+			PermissionTasks.deleteMemberFromPermission(sahiTasks, cn, members, allOrOne, buttonToClick);
+			
+			//verify
+			if (buttonToClick.equals("Cancel"))
+				PermissionTasks.verifyPermissionMembership(sahiTasks, cn, members, true);
+			else
+				PermissionTasks.verifyPermissionMembership(sahiTasks, cn, members, false);
 			CommonTasks.clearSearch(sahiTasks);
 		}
 		
@@ -417,7 +535,7 @@ public class PermissionTests extends SahiTestScript {
 					"Manage User2",	
 					"Manage Hostgroup1",
 					"abcdefghijklmnopqrstuvwxyz123456789ANDAGAINabcdefghijklmnopqrstuvwxyz123456789ANDAGAINabcdefghijklmnopqrstuvwxyz123456789",
-					"M~a@n$a#g$e % U^s&e*r? ] 1 [ {A",
+					"Manage_User-",
 					"Test < Permission > Bug",
 					"Manage Group1",
 					"Manage NetGroup1",
@@ -436,7 +554,10 @@ public class PermissionTests extends SahiTestScript {
 					"Manage Service1",
 					"Manage Service2",
 					"Manage DNSRecord2",
-					"Manage Group4"
+					"Manage Group4",
+					"Manage SELinux",
+					"Manage Sudo",
+					"Manage Automount"
 			};
 			
 			for (String permissionTestObject : permissionTestObjects) {
@@ -444,7 +565,12 @@ public class PermissionTests extends SahiTestScript {
 				PermissionTasks.deletePermission(sahiTasks, permissionTestObject, "Delete");
 			} 
 			
-			
+			//Reset permissions to what was installed
+			CommonTasks.search(sahiTasks, "Modify netgroup membership");
+			PermissionTasks.modifyPermission(sahiTasks, "Modify netgroup membership", "add", "", "description");
+			CommonTasks.search(sahiTasks, "Enroll a host");
+			PermissionTasks.modifyPermission(sahiTasks, "Enroll a host", "write", "", "objectclass");
+			CommonTasks.clearSearch(sahiTasks);
 		}
 		
 		
@@ -476,9 +602,9 @@ public class PermissionTests extends SahiTestScript {
 			{ "add_permission_type_user_with_multiple_attr_right",	"Manage User2",				"write",	"add",		"",			"User",		"description",		"carlicense",	""		},
 		//	{ "add_permission_type_hostgroup_bug783502",			"Manage Hostgroup1",		"write",	"add",		"delete",	"Host Group","businesscategory",	"owner",		""			},
 			{ "add_permission_type_user_long",						"abcdefghijklmnopqrstuvwxyz123456789ANDAGAINabcdefghijklmnopqrstuvwxyz123456789ANDAGAINabcdefghijklmnopqrstuvwxyz123456789",	"write",	"",			"",			"User Group","description",		"",				""			},
-			{ "add_permission_type_user_specialchar",				"M~a@n$a#g$e % U^s&e*r? ] 1 [ {A",		"write",	"",			"",			"User",		"description",		"carlicense",	"photo"		} };
+			{ "add_permission_type_user_dash_underscore",			"Manage_User-",				"write",	"",			"",			"User",				"description",	"carlicense",	"May only contain letters, numbers, -, _, and space"	}
 		//	{ "add_permission_type_user_bug807304",	 				"Test < Permission > Bug",	"write",	"",			"",			"User",		"description",		"carlicense",	"photo"		} };
-	        
+			};	        
 			return permissions;	
 		}	
 		
@@ -572,7 +698,9 @@ public class PermissionTests extends SahiTestScript {
 		public Object[][] getPermissionInvalidAddTypeTestObjects() {
 			String[][] permissions={
 	        //	testname											cn  						right1,		right2,		right3,		Type		Attributes1			Attributes2		Attributes3 	Expected Error			
-			{ "add_permission_type_user_duplicate",					"Manage User1",				"write",	"",			"",			"User",		"description",		"carlicense",	"photo",		"This entry already exists"		} }; 
+			{ "add_permission_type_user_duplicate",					"Manage User1",				"write",	"",			"",			"User",		"description",		"carlicense",	"photo",		"This entry already exists"								},
+			{ "add_permission_type_user_specialchar",				"M~a@n$a#g$e % U^s&e*r? ] 1 [ {A",		"write",	"",			"",			"User",				"description",	"carlicense",	"May only contain letters, numbers, -, _, and space"	} 
+			}; 
 		
 			return permissions;	
 		}
@@ -671,14 +799,62 @@ public class PermissionTests extends SahiTestScript {
 		}
 		
 		/*
-		 * Data to be used when expanding/collapsing permissions
+		 * Data to be used when editing permissions
 		 */
 		@DataProvider(name="permissionModifyTestObjects")
 		public Object[][] getpermissionModifyTestObjects() {
 			String[][] permissions={
-			//	testname				cn								right		Member Of Group			Type		Attribute		
-			{ "edit_permission",		"Modify netgroup membership", 	"add",		"permissiontestgroup",	"Netgroup",	"description"	 } };
+			//	testname					cn								right		Member Of Group			Type		Attribute		
+			{ "edit_permission",			"Modify netgroup membership", 	"add",		"permissiontestgroup",	"Netgroup",	"description"	 },
+			{ "edit_permission_subtree",	"Remove Automount keys", 		"add",		"permissiontestgroup",	"",			""	 },
+			{ "edit_permission_clear_attr",	"Enroll a host", 				"",			"",						"Host",			"none"	 } };
 		
 			return permissions;	
 		}
+		
+		/*
+		 * Data to be used when editing permissions with invalid data
+		 */
+		@DataProvider(name="permissionInvalidModifyTestObjects")
+		public Object[][] getpermissionInvalidModifyTestObjects() {
+			String[][] permissions={
+			//	testname									cn									right		type		Expected Error		
+			{ "edit_permission_with_no_rights",				"Add Services", 					"add",		"",			"Input form contains invalid or missing values."							 },
+			{ "edit_permission_with_invalid_type_bz807755",	"Add krbPrincipalName to a host", 	"",			"Netgroup",	"attribute(s) \"krbprincipalname\" not allowed"								 },
+			{ "edit_permission_with_invalid_type",			"Add krbPrincipalName to a host", 	"",			"Service",	"invalid 'target': type, filter, subtree and targetgroup are mutually exclusive"	 } };
+		
+			return permissions;	
+		}
+		
+		
+		/*
+		 * Data to be used when editing permissions with invalid data
+		 */
+		@DataProvider(name="permissionAddAndAddPrivilegesTestObjects")
+		public Object[][] getpermissionAddAndAddPrivilegesTestObjects() {
+			String[][] permissions={
+			// testName										 cn					right1	 right2		type	 		privilege1							privilege2					buttonToClick		
+			{ "add_permission_add_one_privilege",			"Manage SELinux", 	"add",	 "",		"User",			"SELinux User Map Administrators", 	"", 						"Add" },
+			{ "add_permission_add_multiple_privilege",		"Manage Sudo", 		"add",	 "",		"Service", 		"Sudo Administrator", 				"Service Administrators", 	"Add" },
+			{ "add_permission_add_privilege_cancel",		"Manage Automount",	"write", "",		"User Group", 	"Automount Administrators", 		"", 						"Cancel"},
+			};
+		
+			return permissions;	
+		}
+		
+		
+		/*
+		 * Data to be used when deleting privilege from permission
+		 */		
+		@DataProvider(name="permissionDeleteMemberTestObjects")
+		public Object[][] getpermissionDeleteMemberTestObjects() {
+			String[][] permissions={
+	        // testName  									name 				member1 							member2 					allOrOne 	buttonToClick					  			
+			{ "add_permission_canceldelete_all_privilege",	"Manage Sudo",	 	"Sudo Administrator",				"Service Administrators",	"All",		"Cancel"	},
+			{ "add_permission_delete_all_privilege",		"Manage Sudo",	 	"Sudo Administrator",				"Service Administrators",	"All",		"Delete"	},
+			{ "add_permission_delete_one_privilege",		"Manage SELinux",	"SELinux User Map Administrators",	"",							"One",		"Delete"	},
+			};
+	        
+			return permissions;	
+		}	
 }

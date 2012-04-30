@@ -7,34 +7,40 @@
 		<groups>
 			<run>
 			    <include name="setup" />
-			    <include name="permissionAddTypeTests" /> 
+			    <include name="permissionAddTypeTests" />  
 			    <include name="permissionAddFilterTests" />  
 			    <include name="permissionAddSubtreeTests" /> 
-			    <include name="permissionAddTargetgroupTests" /> 
+			     <include name="permissionAddTargetgroupTests" /> 
 			    <include name="permissionInvalidAddTypeTests" /> 
 			    <include name="permissionBug807755Tests" /> 
 			    <include name="permissionBug783500Tests" />
 			    <include name="permissionRequiredFieldAddTests" />  
 			    <include name="permissionMemberOfAddTests" />
-			    <!--  TODO <include name="permissionMissingMemberOfAddTests" /> --> 		
+			    <!--  TODO <include name="permissionMissingMemberOfAddTests" /> --> 	
 			    <include name="permissionMultipleDeleteTests" /> 
 			    <include name="permissionAddAndAddAnotherTypeTests" />
 			    <include name="permissionAddAndEditTypeTests" /> 
 			    <include name="permissionAddCancelFilterTests" /> 
 			    <include name="permissionAddFilterUndoAttributeTests" /> 
-			    <include name="permissionExpandCollapseTests" /> 
+			    <include name="permissionExpandCollapseTests" /> -->
 			    <include name="permissionModifyTests" /> 
+			    <include name="permissionInvalidModifyTests" /> 
+			    <include name="permissionAddAndAddPrivilegesTests" />
+			    <include name="permissionDeleteMemberTests" /> 
 			</run>
 		</groups>
 		<classes>
 		    <class name="com.redhat.qe.ipa.sahi.tests.rbac.PermissionTests" />
 		</classes>
-	</test>
+	</test> 
+
+
 
 	
 	<test name="Privilege Tests">
 		<groups>
 			<run>	
+			     <include name="setup" />
 			     <include name="privilegeAddTests" /> 
 			     <include name="privilegeAddAndAddAnotherTests" /> 
 			     <include name="privilegeAddAndEditTests" />
@@ -45,9 +51,12 @@
 			     <include name="privilegeExpandCollapseTests" /> 
 			     <include name="privilegeModifyTests" />
 			     <include name="privilegeModifyNotSavedTests" /> 
-			     <include name="privilegeInvalidModifyTests" />
+			     <include name="privilegeInvalidModifyTests" /> 
 			     <include name="privilegeAddAndAddPermissionTests" /> 
-			     <include name="privilegeAddAndSelectDeselectPermissionTests" />  
+			     <include name="privilegeAddAndSelectDeselectPermissionTests" />   
+			     <include name="privilegeAddAndAddRolesTests" /> 
+			     <include name="privilegeAddAndSelectDeselectRolesTests" />
+			     <include name="privilegeDeleteMemberTests" />
 			</run>
 		</groups>
 		<classes>
@@ -84,8 +93,8 @@
 		<groups>
 			<run>
 				<include name="setup" />
-			   <!--  <include name="hostAddsUser" /> --> 							
-				<!-- <include name="permissionAddSubtreeTests" /> --> 
+			    <!-- <include name="hostAddsUser" /> 							
+				 <include name="permissionAddSubtreeTests" /> --> 
 				<include name="dnsUpdateAdmin" /> 
 				<include name="dnsListZone" /> 
 			</run>
@@ -95,6 +104,6 @@
 		    <class name="com.redhat.qe.ipa.sahi.tests.rbac.RBACFunctional" />
 		</classes>
 	</test>
-	
+
 		
 </suite>

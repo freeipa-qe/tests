@@ -1,4 +1,11 @@
 package com.redhat.qe.ipa.sahi.tests.rbac;
+/*
+ * Review Comments:
+ * 
+ * Privileges:
+ * 1) In privilege there are no tests for member_role. //nk: done
+ * 
+ */
 
 import java.util.logging.Logger;
 
@@ -217,20 +224,23 @@ public class PrivilegeTests extends SahiTestScript{
 				
 		String permissions[] = {permission1, permission2};
 		//new privilege can be added now
-		PrivilegeTasks.addPrivilegeAddPermissions(sahiTasks, name, description, searchString, permissions, buttonToClick);
+		PrivilegeTasks.addPrivilegeAddMembers(sahiTasks, name, description, "Permissions", searchString, permissions, buttonToClick);
 		
 		//verify privilege was added successfully
 		CommonTasks.search(sahiTasks, name);
 		Assert.assertTrue(sahiTasks.link(name).exists(), "Added privilege " + name + "  successfully");
-		String permissionsToVerify[] = {permission1.toLowerCase(), permission2.toLowerCase()};
+		// Inconsistent - String permissionsToVerify[] = {permission1.toLowerCase(), permission2.toLowerCase()};
+		String permissionsToVerify[] = {permission1, permission2};
 		if (buttonToClick.equals("Add")) {
 			PrivilegeTasks.verifyPrivilegeMembership(sahiTasks, name, "Permissions", permissionsToVerify, true);
-			PrivilegeTasks.verifyPrivilegeMembershipInPermission(sahiTasks, name, permissionsToVerify);
+			PrivilegeTasks.verifyPrivilegeMembershipInPermissionRole(sahiTasks, name, "Permissions", permissionsToVerify);
 		}
 		else
 			PrivilegeTasks.verifyPrivilegeMembership(sahiTasks, name, "Permissions", permissionsToVerify, false);
+			
 	}
 	
+
 	/*
 	 * And a privilege, select/deselect then add permissions
 	 */
@@ -242,18 +252,94 @@ public class PrivilegeTests extends SahiTestScript{
 		Assert.assertFalse(sahiTasks.link(name).exists(), "Verify privilege " + name + " doesn't already exist");
 				
 		//new privilege can be added now
-		PrivilegeTasks.addPrivilegeSelectDeselectPermissionsToAdd(sahiTasks, name, description, permission1, permission2);
+		PrivilegeTasks.addPrivilegeSelectDeselectMembersToAdd(sahiTasks, name, description, "Permissions", permission1, permission2);
 		
 		//verify privilege was added successfully
 		CommonTasks.search(sahiTasks, name);
 		Assert.assertTrue(sahiTasks.link(name).exists(), "Added privilege " + name + "  successfully");
-		String permissions[] = {permission1.toLowerCase()};		
-		PrivilegeTasks.verifyPrivilegeMembership(sahiTasks, name, "Permissions", permissions, true);		
+		// Inconsistent - String permissions[] = {permission1.toLowerCase()};
+		String permissions[] = {permission1};
+		PrivilegeTasks.verifyPrivilegeMembership(sahiTasks, name, "Permissions", permissions, true);	
+	
+	}
+	
+	/*
+	 * Add a privilege, add or cancel to add roles
+	 */
+	@Test (groups={"privilegeAddAndAddRolesTests"}, description="Add Privilege and Add Roles to it", 
+			dataProvider="privilegeAddAndAddRolesTestObjects")	
+	public void testprivilegeAddAndAddRoles(String testName, String name, String description, String searchString, 
+			String role1, String role2, String buttonToClick) throws Exception {		
+		//verify privilege doesn't exist
+		Assert.assertFalse(sahiTasks.link(name).exists(), "Verify privilege " + name + " doesn't already exist");
+				
+		String roles[] = {role1, role2};
+		//new privilege can be added now
+		PrivilegeTasks.addPrivilegeAddMembers(sahiTasks, name, description, "Roles", searchString, roles, buttonToClick);
+		
+		//verify privilege was added successfully
+		CommonTasks.search(sahiTasks, name);
+		Assert.assertTrue(sahiTasks.link(name).exists(), "Added privilege " + name + "  successfully");
+		String rolesToVerify[] = {role1.toLowerCase(), role2.toLowerCase()};
+		if (buttonToClick.equals("Add")) {
+			PrivilegeTasks.verifyPrivilegeMembership(sahiTasks, name, "Roles", rolesToVerify, true);
+			PrivilegeTasks.verifyPrivilegeMembershipInPermissionRole(sahiTasks, name, "Roles", rolesToVerify);
+		}
+		else
+			PrivilegeTasks.verifyPrivilegeMembership(sahiTasks, name, "Roles", rolesToVerify, false);
+			
+	}
+	
+	/*
+	 * And a privilege, select/deselect then add roles
+	 */
+	@Test (groups={"privilegeAddAndSelectDeselectRolesTests"}, description="Add Privilege and Select/Deselect to Add Roles to it", 
+			dataProvider="privilegeAddAndSelectDeselectRolesTestObjects")	
+	public void testprivilegeAddAndSelectDeselectRole(String testName, String name, String description, String role1, 
+			String role2) throws Exception {		
+		//verify privilege doesn't exist
+		Assert.assertFalse(sahiTasks.link(name).exists(), "Verify privilege " + name + " doesn't already exist");
+				
+		//new privilege can be added now
+		PrivilegeTasks.addPrivilegeSelectDeselectMembersToAdd(sahiTasks, name, description, "Roles", role1, role2);
+		
+		//verify privilege was added successfully
+		CommonTasks.search(sahiTasks, name);
+		Assert.assertTrue(sahiTasks.link(name).exists(), "Added privilege " + name + "  successfully");
+		String roles[] = {role1.toLowerCase()};		
+		PrivilegeTasks.verifyPrivilegeMembership(sahiTasks, name, "Roles", roles, true);
+				
 	}
 	
 	
-	
-	
+	/*
+	 * For a privilege, delete permissions/roles
+	 */
+	@Test (groups={"privilegeDeleteMemberTests"}, description="Delete Member from a Privilege to it", 
+			dataProvider="privilegeDeleteMemberTestObjects",
+			dependsOnGroups={"privilegeAddAndAddPermissionTests", "privilegeAddAndSelectDeselectPermissionTests", "privilegeAddAndAddRolesTests", "privilegeAddAndSelectDeselectRolesTests"} )	
+	public void testprivilegeDeleteMember(String testName, String name, String memberType, String member1, 
+			String member2, String allOrOne, String buttonToClick) throws Exception {
+		CommonTasks.search(sahiTasks, name);
+		Assert.assertTrue(sahiTasks.link(name).exists(), "Privilege " + name + "  exists");
+		
+		
+		
+		String members[] = {member1.toLowerCase(), member2.toLowerCase()};
+		if (memberType.equals("Permissions")) {
+			members[0] = member1;
+			members[1] = member2;
+		}
+		
+		PrivilegeTasks.deleteMemberFromPrivilege(sahiTasks, name, memberType, members, allOrOne, buttonToClick);
+		
+		//verify
+		if (buttonToClick.equals("Cancel"))
+			PrivilegeTasks.verifyPrivilegeMembership(sahiTasks, name, memberType, members, true);
+		else
+			PrivilegeTasks.verifyPrivilegeMembership(sahiTasks, name, memberType, members, false);
+		CommonTasks.clearSearch(sahiTasks);
+	}
 	
 	/*
 	 * Delete Multiple Privileges
@@ -292,7 +378,10 @@ public class PrivilegeTests extends SahiTestScript{
 				"Hostgroup TestAdmin",
 				"Group3 TestAdmin",
 				"HBAC TestAdmin",
-				"Sudo TestAdmin"
+				"Sudo TestAdmin",
+				"IT TestAdmin",
+				"Security TestAdmin",
+				"Help TestAdmin"
 		};
 		
 		for (String privilegeTestObject : privilegeTestObjects) {
@@ -478,6 +567,50 @@ public class PrivilegeTests extends SahiTestScript{
         
 		return privileges;	
 	}	
+	
+	/*
+	 * Data to be used when adding and then editing privilege
+	 */		
+	@DataProvider(name="privilegeAddAndAddRolesTestObjects")
+	public Object[][] getPrivilegeAddAndAddRoleTestObjects() {
+		String[][] privileges={
+        //	testname						Name					Description				SearchString	Role1						Role2					Button		  			
+		{ "add_privilege_add_role",			"IT TestAdmin",			"IT TestAdmin",			"IT",			"IT Security Specialist",	"IT Specialist",		"Add" 	} ,
+		{ "add_privilege_add_role_cancel",	"Security TestAdmin",	"Security TestAdmin",	"Security",		"IT Security Specialist",	"Security Architect",	"Cancel" } };
+        
+		return privileges;	
+	}	
+	
+	/*
+	 * Data to be used when adding privilege, then selecting/deselecting roles
+	 */		
+	@DataProvider(name="privilegeAddAndSelectDeselectRolesTestObjects")
+	public Object[][] getprivilegeAddAndSelectDeselectRolesTestObjects() {
+		String[][] privileges={
+        //	testname								Name					Description			Role1					Role2					  			
+		{ "add_privilege_select_deselect_role",		"Help TestAdmin",		"Help TestAdmin",	"User Administrator",	"helpdesk"	} };
+        
+		return privileges;	
+	}	
+	
+	
+	/*
+	 * Data to be used when adding privilege, then selecting/deselecting roles
+	 */		
+	@DataProvider(name="privilegeDeleteMemberTestObjects")
+	public Object[][] getprivilegeDeleteMemberTestObjects() {
+		String[][] privileges={
+        // testName  								name 				memberType 			member1 					member2 			allOrOne 	buttonToClick					  			
+		{ "add_privilege_canceldelete_all_perm",	"Group3 TestAdmin",	 "Permissions",		"Modify Group membership",	"Add Groups",		"All",		"Cancel"	},
+		{ "add_privilege_delete_all_perm",			"Group3 TestAdmin",	 "Permissions",		"Modify Group membership",	"Add Groups",		"All",		"Delete"	},
+		{ "add_privilege_delete_one_perm",			"Sudo TestAdmin",	 "Permissions",		"Add Sudo command",			"",					"One",		"Delete"	},
+		{ "add_privilege_canceldelete_all_role",	"IT TestAdmin",	 	 "Roles",			"IT Security Specialist",	"IT Specialist",	"All",		"Cancel"	},
+		{ "add_privilege_delete_all_role",			"IT TestAdmin",	 	 "Roles",			"IT Security Specialist",	"IT Specialist",	"All",		"Delete"	} ,
+		{ "add_privilege_delete_one_role",			"Help TestAdmin",	 "Roles",			"User Administrator",		"",					"One",		"Delete"	} };
+        
+		return privileges;	
+	}	
+	
 	
 	}
 	
