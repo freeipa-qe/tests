@@ -125,7 +125,7 @@ data_add()
 		# Add Delegations
 		rlRun "ipa delegation-add delegation_open_gecos --group=ipausers --membergroup=ipausers --attrs=gecos"
 		KinitAsUser ${user[1]} ${passwd[1]}
-		rlRun "ipa user-mod ${user[2]} --attr=gecos=TEST${user[1]}"
+		rlRun "ipa user-mod ${user[2]} --gecos=TEST${user[1]}"
 		KinitAsAdmin
 		
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $MASTER_IP"
