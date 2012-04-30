@@ -162,12 +162,25 @@ data_check()
 
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.1' -m $TARGET_IP"
 	rlPhaseEnd	
-
-	data_check_2
 }
 
 data_check_2() {
-	rlPhaseStartTest "data_check_2: check for IPA version 2.2.0 data entries"
+	local TARGET_IP=$1
+	local tmpout=/tmp/errormsg.out
+	local currenteth=$(route | grep ^default | awk '{print $8}')
+	local ipaddr=$(ifconfig $currenteth | grep inet\ addr | sed s/:/\ /g | awk '{print $3}')
+	TESTORDER=$(( TESTORDER += 1 ))
+
+	if [ "$TARGET_IP" != "$ipaddr" ]; then
+		rlPhaseStartTest "data_check_other: checking test data on another server right now"
+			rlLog "Machine in recipe is $MYROLE ($HOSTNAME)"
+			rlLog "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $TARGET_IP"
+			rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $TARGET_IP"
+		rlPhaseEnd
+		return 0
+	fi
+
+	rlPhaseStartTest "data_check_2: check set 2 for IPA data...automember"
 		# check automembers
 		if [ $(ipa help|grep automember|wc -l) -gt 0 ]; then
 			rlRun "ipa automember-show --type=group ${amgroup[1]}"
