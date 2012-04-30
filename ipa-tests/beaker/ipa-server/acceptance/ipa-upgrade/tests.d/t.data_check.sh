@@ -163,11 +163,11 @@ data_check()
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.1' -m $TARGET_IP"
 	rlPhaseEnd	
 
-	data_check_220	
+	data_check_2
 }
 
-data_check_220() {
-	rlPhaseStart "data_check_220: check for IPA version 2.2.0 data entries"
+data_check_2() {
+	rlPhaseStartTest "data_check_2: check for IPA version 2.2.0 data entries"
 		# check automembers
 		if [ $(ipa help|grep automember|wc -l) -gt 0 ]; then
 			rlRun "ipa automember-show --type=group ${amgroup[1]}"
