@@ -326,7 +326,7 @@ ipapermission_add_invalidname()
     permissionLocalAttr="carlicense,description"
 
    rlPhaseStartTest "ipa-permission-cli-1002 - add permission for type user, where name contains '<' (Bug 807304)"
-    command="addPermission $permissionName $permissionRights $permissionLocalTarget $permissionLocalAttr" 0 "Adding $permissionName"
+     command="addPermission $permissionName $permissionRights $permissionLocalTarget $permissionLocalAttr"
      expmsg="ipa: ERROR: invalid 'name': May only contain letters, numbers, -, _, and space"
      rlRun "$command > $TmpDir/ipapermission_invalidname.log 2>&1" 1 "Verify error message for $permissionRights"
      rlAssertGrep "$expmsg" "$TmpDir/ipapermission_invalidname.log"
@@ -494,9 +494,8 @@ ipapermission_add_invalidmemberof()
 
    rlPhaseStartTest "ipa-permission-cli-1025 - add permission using nonexistent memberof group (bug 784329)"
      command="addPermission $permissionName $permissionRights $permissionLocalTarget $permissionLocalAttr --memberof=$permissionMemberOf"
-     expmsg="ipa: ERROR: "
      expmsg="ipa: ERROR: $permissionMemberOf: group not found"
-     rlRun "$command > $TmpDir/ipapermission_invalidmemberof1.log 2>&1" 1 "Verify error message for $permissionMemberOf"
+     rlRun "$command > $TmpDir/ipapermission_invalidmemberof1.log 2>&1" 2 "Verify error message for $permissionMemberOf"
      rlAssertGrep "$expmsg" "$TmpDir/ipapermission_invalidmemberof1.log"
    rlPhaseEnd
 
@@ -933,8 +932,8 @@ ipapermission_find_pkey_only()
 ##################################################
 ipapermission_find_all_raw()
 {
-    option="memberof"
-    value="groupone"
+    localOption="memberof"
+    localValue="groupone"
     permissions="ManageHost1"
     permissionRights="write"
     permissionLocalTarget="--subtree=cn=computers,cn=accounts,dc=testrelm,dc=com"
@@ -943,12 +942,12 @@ ipapermission_find_all_raw()
     permissionLocalAttr="nshostlocation"
 
    rlPhaseStartTest "ipa-permission-cli-1054 - verify permission attrs after a find --all"
-      rlRun "findPermissionByOption $option $value \"all\" $permissions" 0 "Verify permissions are found for $permissions"
+      rlRun "findPermissionByOption $localOption $localValue \"all\" $permissions" 0 "Verify permissions are found for $permissions"
       verifyPermissionFindOptions $permissions $permissionRights "Subtree" $permissionLocalTargetToVerify $permissionLocalAttr $permissionLocalMemberOf 
    rlPhaseEnd
 
    rlPhaseStartTest "ipa-permission-cli-1055 - verify permission attrs after a find --raw (bug 785259)"
-      rlRun "findPermissionByOption $option $value \"raw\" $permissions" 0 "Verify permissions are found for $permissions"
+      rlRun "findPermissionByOption $localOption $localValue \"raw\" $permissions" 0 "Verify permissions are found for $permissions"
       verifyPermissionFindOptions $permissions $permissionRights "Subtree" $permissionLocalTargetToVerify $permissionLocalAttr $permissionLocalMemberOf 
    rlPhaseEnd
 }
