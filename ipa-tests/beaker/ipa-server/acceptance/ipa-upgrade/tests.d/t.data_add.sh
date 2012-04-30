@@ -159,7 +159,9 @@ data_add_2()
 		rlRun "ipa automember-add-condition ${amhostgroup[1]} --type=hostgroup --key=fqdn --exclusive-regex=^${host[2]}"
 		rlRun "ipa automember-add-condition ${amhostgroup[1]} --type=hostgroup --key=fqdn --inclusive-regex=^.*\.${DOMAIN}"
 		rlRun "ipa user-add ${amuser[1]} --first=First --last=one"
+		rlRun "ipa user-add ${amuser[2]} --first=First --last=two"
 		rlRun "ipa host-add ${amhost[1]} --force"
+		rlRun "ipa host-add ${amhost[2]} --force"
 		
 		# Add data for ssh?
 		# Add data for selinux?
