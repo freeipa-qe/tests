@@ -600,7 +600,7 @@ iparole_add_privilege_positive()
      privilegeName="u,r stuff"
      privilegeDesc="privilege with comma in name"
      rlRun "addPrivilege \"$privilegeName\" \"$privilegeDesc\"" 0 "Adding privilege: $privilegeName"
-     command="addPrivilegeToRole \'\"$privilegeName\"\' \"$roleName\" raw"
+     command="ipa role-add-privilege --privileges='\"$privilegeName\"' helpdesk --raw"
      expPriv="memberof_privilege: u,r stuff"
      rlRun "$command > $TmpDir/iparole_privilegewithcommaTorole.log 2>&1"  0 "Adding privilege to role"
      rlAssertGrep "$expPriv" "$TmpDir/iparole_privilegewithcommaTorole.log"
@@ -639,7 +639,7 @@ iparole_add_privilege_negative()
      rlAssertGrep "$expPriv2" "$TmpDir/iparole_missingprivilegeTorole.log"
   rlPhaseEnd
 
-  rlPhaseStartTest "ipa-role-cli-1038 - add no privilege to role (bug 783475)"
+  rlPhaseStartTest "ipa-role-cli-1038 - add no privilege to role (bug 816624)"
      privilegeName=""
      roleName="helpdesk"
      command="addPrivilegeToRole \"$privilegeName\" \"$roleName\" all"  

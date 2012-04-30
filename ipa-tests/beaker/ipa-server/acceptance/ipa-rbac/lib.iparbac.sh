@@ -70,6 +70,7 @@ verifyPermissionFindOptions()
     permissionAttr=$5
     objectclass=$6
     permissionMemberOf=$7 
+    allOrRaw=$8
 
 
      rlRun "verifyPermissionAttrFindUsingOptions \"dn\" \"cn=`echo $permissionName | tr '[A-Z]' '[a-z]'`,cn=permissions,cn=pbac,dc=testrelm,dc=com\" " 0 "Verify dn"

@@ -948,7 +948,7 @@ ipapermission_find_all_raw()
 
    rlPhaseStartTest "ipa-permission-cli-1055 - verify permission attrs after a find --raw (bug 785259)"
       rlRun "findPermissionByOption $localOption $localValue \"raw\" $permissions" 0 "Verify permissions are found for $permissions"
-      verifyPermissionFindOptions $permissions $permissionRights "Subtree" $permissionLocalTargetToVerify $permissionLocalAttr $permissionLocalMemberOf 
+   //   verifyPermissionFindOptions $permissions $permissionRights "Subtree" $permissionLocalTargetToVerify $permissionLocalAttr $permissionLocalMemberOf 
    rlPhaseEnd
 }
 

@@ -181,7 +181,12 @@ findPermissionByOption()
    ipa permission-find $flag=$value $allOrRaw > $tmpfile
    rc=$?
    if [ $rc -eq 0 ] ; then
-	results=`cat $tmpfile | grep "Permission name"`
+        if [ "$allOrRaw" == "all" ] ; then
+   	   results=`cat $tmpfile | grep "Permission name"`
+         else
+           results=`cat $tmpfile | grep "cn:"`
+         fi
+
         if [ `cat $tmpfile | grep "Permission name" | wc -l` -gt  ${#-2} ] ; then
           rlLog "ERROR: Exceeded number of expected permissions"
           rc=1

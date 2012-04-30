@@ -333,7 +333,7 @@ ipaprivilege_remove_permission_negative()
     rlAssertGrep "$expmsg" "$TmpDir/ipaprivilege_nonexistentperm.log"
   rlPhaseEnd
 
-  rlPhaseStartTest "ipa-privilege-cli-1024 - remove blank permission from privilege (bug 81662)" 
+  rlPhaseStartTest "ipa-privilege-cli-1024 - remove blank permission from privilege (bug 816624)" 
     privilegeName="Add User"
     permissionList=""
     command="removePermissionFromPrivilege \"$permissionList\" \"$privilegeName\""
