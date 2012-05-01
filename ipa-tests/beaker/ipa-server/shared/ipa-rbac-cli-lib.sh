@@ -181,7 +181,7 @@ findPermissionByOption()
    ipa permission-find $flag=$value $allOrRaw > $tmpfile
    rc=$?
    if [ $rc -eq 0 ] ; then
-        if [ "$allOrRaw" == "all" ] ; then
+        if [ "$allOrRaw" == "--all" ] ; then
    	   results=`cat $tmpfile | grep "Permission name"`
          else
            results=`cat $tmpfile | grep "cn:"`

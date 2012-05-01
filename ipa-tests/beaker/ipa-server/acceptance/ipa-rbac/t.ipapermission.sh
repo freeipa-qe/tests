@@ -44,7 +44,8 @@ cleanupPermissionTests()
     permissionName11="ManageDNSRecord1"
     permissionName12="TestPermission"
     permissionName13="APermission"
-    permissionNameBUG="ManageUser"
+    #permissionNameBUG="ManageUser"
+    permissionName783502="ManageUser_783502"
     rlRun "deletePermission $permissionName1" 0 "Deleting $permissionName1"
     rlRun "deletePermission $permissionName2" 0 "Deleting $permissionName2"
     rlRun "deletePermission $permissionName3" 0 "Deleting $permissionName3"
@@ -58,9 +59,7 @@ cleanupPermissionTests()
     rlRun "deletePermission $permissionName11" 0 "Deleting $permissionName11"
     rlRun "deletePermission $permissionName12" 0 "Deleting $permissionName12"
     rlRun "deletePermission $permissionName13" 0 "Deleting $permissionName13"
-    #TODO: This permission shouldn't be added, and so will not be available 
-    # for deleting, after bug 783502 is fixed.
-    rlRun "deletePermission $permissionNameBUG" 0 "Deleting $permissionNameBUG"
+    rlRun "deletePermission $permissionName783502" 0 "Deleting $permissionName783502"
     rlRun "deleteGroup groupone" 0 "Deleting groupone"
     ipa permission-mod --permissions=add  "add Automount keys" --attrs= 
     ipa permission-mod --attrs="userpassword,krbprincipalkey,sambalmpassword,sambantpassword,passwordhistory" --all "Change a user password"
@@ -147,6 +146,14 @@ ipapermission_params_user_type()
    rlPhaseEnd
 
 
+    permissionRights="read"
+    permissionLocalTarget="--type=user"
+    permissionName="ManageUser_783502"
+    permissionLocalAttr="ipaclientversion"
+   rlPhaseStartTest "ipa-permission-cli-1016 - add permission with invalid attr for the type being added (bug 783502)" 
+     rlRun "addPermission $permissionName $permissionRights $permissionLocalTarget $permissionLocalAttr" 0 "Verify bz 783502 for $permissionLocalAttr" 
+     rlRun "verifyPermissionAttr \"$permissionName\" all \"Permissions\" \"$value\"" 0 "Verify Permissions"
+   rlPhaseEnd
    #TODO: Add with type and memberof
 }
 
@@ -376,19 +383,12 @@ ipapermission_add_invalidattr()
 
    rlPhaseStartTest "ipa-permission-cli-1015 - add permission with invalid attr" 
      command="addPermission $permissionName $permissionRights $permissionLocalTarget $permissionLocalAttr" 
-     expmsg="ipa: ERROR: attribute(s) \"$permissionLocalAttr\" not allowed"
+     expmsg="ipa: ERROR: targetattr \"$permissionLocalAttr\" does not exist in schema." 
      rlRun "$command > $TmpDir/ipapermission_invalidattr1.log 2>&1" 1 "Verify error message for $permissionLocalAttr"
      rlAssertGrep "$expmsg" "$TmpDir/ipapermission_invalidattr1.log"
    rlPhaseEnd
 
-   permissionLocalAttr="ipaclientversion"
 
-   rlPhaseStartTest "ipa-permission-cli-1016 - add permission with invalid attr for the type being added (bug 783502)" 
-     command="addPermission $permissionName $permissionRights $permissionLocalTarget $permissionLocalAttr" 
-     expmsg="ipa: ERROR: attribute(s) \"$permissionLocalAttr\" not allowed"
-     rlRun "$command > $TmpDir/ipapermission_invalidattr2.log 2>&1" 1 "Verify error message for $permissionLocalAttr"
-     rlAssertGrep "$expmsg" "$TmpDir/ipapermission_invalidattr2.log"
-   rlPhaseEnd
 
 }
 
@@ -948,7 +948,7 @@ ipapermission_find_all_raw()
 
    rlPhaseStartTest "ipa-permission-cli-1055 - verify permission attrs after a find --raw (bug 785259)"
       rlRun "findPermissionByOption $localOption $localValue \"raw\" $permissions" 0 "Verify permissions are found for $permissions"
-   //   verifyPermissionFindOptions $permissions $permissionRights "Subtree" $permissionLocalTargetToVerify $permissionLocalAttr $permissionLocalMemberOf 
+   #   verifyPermissionFindOptions $permissions $permissionRights "Subtree" $permissionLocalTargetToVerify $permissionLocalAttr $permissionLocalMemberOf 
    rlPhaseEnd
 }
 
