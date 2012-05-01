@@ -451,10 +451,10 @@ installSlave_ca()
 
 	        # Verifies: Bug 782979 - Replication Failure: Allocation of a new value for range cn=posix ids.
 		rlLog "verifies https://bugzilla.redhat.com/show_bug.cgi?id=782979"
-user1="user1"
-user2="user2"
-user3="user3"
-userpw="Secret123"
+		user1="user1"
+		user2="user2"
+		user3="user3"
+		userpw="Secret123"
 
         rlRun "create_ipauser $user1 $user1 $user1 $userpw"
         sleep 5
@@ -470,6 +470,12 @@ userpw="Secret123"
         rlRun "ipa user-show $user2"
 
                 rlRun "appendEnv" 0 "Append the machine information to the env.sh with the information for the machines in the recipe set"
+
+		rlLog "verifies https://bugzilla.redhat.com/show_bug.cgi?id=788726"
+		rlRun "remoteExec root $MASTER_IP \"grep 'NSMMReplicationPlugin.*Schema replication update failed: Invalid syntax' /var/log/dirsrv/slapd-PKI-IPA/errors\""
+		rlRun "grep -v 'Schema replication update failed:' /tmp/remote_exec.out" 0
+		rlRun "cat /tmp/remote_exec.out"
+		
         fi
 
         if [ -f /var/log/ipareplica-install.log ]; then
