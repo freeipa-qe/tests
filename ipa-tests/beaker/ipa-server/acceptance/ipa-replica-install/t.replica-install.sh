@@ -639,9 +639,9 @@ uninstall()
 
    rlPhaseStartTest "Uninstalling replica"
 
-        rlLog "verifies https://bugzilla.redhat.com/show_bug.cgi?id=797563"
+	rlLog "verifies https://bugzilla.redhat.com/show_bug.cgi?id=797563"
 	rlRun "ipa host-del $MASTER 2>&1| grep -i \"ipa: ERROR: invalid 'hostname': An IPA master host cannot be deleted\""
-        rlRun "ipa host-del $SLAVE 2>&1| grep -i \"ipa: ERROR: invalid 'hostname': An IPA master host cannot be deleted\""
+	rlRun "ipa host-del $SLAVE 2>&1| grep -i \"ipa: ERROR: invalid 'hostname': An IPA master host cannot be deleted\""
 
 	rlLog "verifies https://bugzilla.redhat.com/show_bug.cgi?id=755094"
 	rlRun "ipa-replica-manage list | grep \"$MASTER: master\""
