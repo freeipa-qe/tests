@@ -654,8 +654,8 @@ uninstall()
 	rlLog "verifies https://bugzilla.redhat.com/show_bug.cgi?id=754524"
 	rlRun "remoteExec root $MASTERIP redhat \"echo $ADMINPW | kinit admin; klist\""
 	rlRun "replicaDel root $MASTERIP \"ipa-replica-manage del $SLAVE\" yes"
-	rlRun "egrep \"Deleted replication agreement from '$MASTER' to '$SLAVE'\" /tmp/remote_exec.out"
-	rlRun "cat /tmp/remote_exec.out"
+	rlRun "egrep \"Deleted replication agreement from '$MASTER' to '$SLAVE'\" /tmp/replicaDel.out"
+	rlRun "cat /tmp/replicaDel.out"
 
 	rlLog "verifies https://bugzilla.redhat.com/show_bug.cgi?id=801380"
 	rlRun "remoteExec root $MASTERIP redhat \"ipa dnszone-find\""
