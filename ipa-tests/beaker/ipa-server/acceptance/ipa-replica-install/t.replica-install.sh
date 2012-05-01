@@ -657,18 +657,19 @@ uninstall()
 	rlRun "egrep \"Deleted replication agreement from '$MASTER' to '$SLAVE'\" /tmp/replicaDel.out"
 	rlRun "cat /tmp/replicaDel.out"
 
+	MASTERIPOCT1=$(echo $MASTERIP|cut -f1 -d.)
 	rlLog "verifies https://bugzilla.redhat.com/show_bug.cgi?id=801380"
 	rlRun "remoteExec root $MASTERIP redhat \"ipa dnszone-find\""
-	rlRun "egrep 10.in-addr.arpa. /tmp/remote_exec.out"
+	rlRun "egrep $MASTERIPOCT1.in-addr.arpa. /tmp/remote_exec.out"
 	rlRun "cat /tmp/remote_exec.out"
 
 	rlRun "replicaDel root $MASTERIP  \"ipa-replica-manage del $SLAVE\"" 
-	rlRun "egrep \"'$MASTER' has no replication agreement for '$SLAVE'\" /tmp/remote_exec.out"
+	rlRun "egrep \"'$MASTER' has no replication agreement for '$SLAVE'\" /tmp/replicaDel.out"
 	rlRun "cat /tmp/remote_exec.out"
 
 	rlLog "verifies bug https://bugzilla.redhat.com/show_bug.cgi?id=750524"
 	rlRun "remoteExec root $MASTERIP \"ipa-csreplica-manage del $SLAVE -p $ADMINPW\""
-	rlRun "egrep \"Deleted replication agreement from '$MASTER' to '$SLAVE.com'\" /tmp/remote_exec.out"
+	rlRun "egrep \"Deleted replication agreement from '$MASTER' to '$SLAVE'\" /tmp/remote_exec.out"
 	rlRun "cat /tmp/remote_exec.out"
 	rlRun "remoteExec root $MASTERIP \"ipa-csreplica-manage del $SLAVE -p $ADMINPW\""
 	rlRun "egrep \"'$MASTER' has no replication agreement for '$SLAVE'\" /tmp/remote_exec.out"
