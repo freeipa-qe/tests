@@ -41,9 +41,9 @@ upgrade_test_master_slave_client_all()
 
 		# test upgrade with new master, old slave, and old client
 		upgrade_master 
-		data_add_2
+		#data_add_2
 		data_check_all
-		data_check_2 $MASTER_IP
+		#data_check_2 $MASTER_IP
 
 		# test upgrade with new master, new slave, and old client 
 		upgrade_slave
