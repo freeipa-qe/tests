@@ -152,7 +152,7 @@ ipapermission_params_user_type()
     permissionLocalAttr="ipaclientversion"
    rlPhaseStartTest "ipa-permission-cli-1016 - add permission with invalid attr for the type being added (bug 783502)" 
      rlRun "addPermission $permissionName $permissionRights $permissionLocalTarget $permissionLocalAttr" 0 "Verify bz 783502 for $permissionLocalAttr" 
-     rlRun "verifyPermissionAttr \"$permissionName\" all \"Permissions\" \"$value\"" 0 "Verify Permissions"
+     rlRun "verifyPermissionAttr \"$permissionName\" all \"Permission name\" \"$permissionName\"" 0 "Verify Permissions"
    rlPhaseEnd
    #TODO: Add with type and memberof
 }
@@ -1038,7 +1038,7 @@ ipapermission_mod_negative()
      rlAssertGrep "$expMsg" "$TmpDir/ipapermission_invalidpermission.log"
    rlPhaseEnd 
 
-  rlPhaseStartTest "ipa-permission-cli-1062 - modify permission invalid attrs"
+  rlPhaseStartTest "ipa-permission-cli-1062 - modify permission invalid attrs (bug 817909)"
      permissionName="Change a user password"
      attr="attrs"
      value="xyz"

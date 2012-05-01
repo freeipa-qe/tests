@@ -110,7 +110,7 @@ test01()
    rlPhaseEnd
 
       # update a lastname - can
-   rlPhaseStartTest "ipa-rbac-1003 - Set up user with HelpDesk Role - Can update user attr" 
+   rlPhaseStartTest "ipa-rbac-1003 - Set up user with HelpDesk Role - Can update user attr (bug 817915)" 
       testLogin="test"
       attrToUpdate="last"
       newLastName="testtest"
