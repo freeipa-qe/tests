@@ -578,19 +578,25 @@ rlPhaseStartTest "ipa-host-cli-38: find more hosts than exist"
 
     rlPhaseStartTest "ipa-host-cli-53: Negative - add host with _"
         command="ipa host-add host_underscore.$RELM --force"
-        expmsg="ipa: ERROR: invalid 'hostname': invalid domain-name: only letters, numbers, and - are allowed. - must not be the DNS label character"
+		# scott 05/01/2012 - changing expected message since error changed (at least 2.2.0-12):
+        #expmsg="ipa: ERROR: invalid 'hostname': invalid domain-name: only letters, numbers, and - are allowed. - must not be the DNS label character"
+		expmsg="ipa: ERROR: invalid 'hostname': invalid domain-name: only letters, numbers, and - are allowed. DNS label may not start or end with -"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-host-cli-54: Negative - add host with ~"
         command="ipa host-add host~tilda.$RELM --force"
-        expmsg="ipa: ERROR: invalid 'hostname': invalid domain-name: only letters, numbers, and - are allowed. - must not be the DNS label character"
+		# scott 05/01/2012 - changing expected message since error changed (at least 2.2.0-12):
+        #expmsg="ipa: ERROR: invalid 'hostname': invalid domain-name: only letters, numbers, and - are allowed. - must not be the DNS label character"
+		expmsg="ipa: ERROR: invalid 'hostname': invalid domain-name: only letters, numbers, and - are allowed. DNS label may not start or end with -"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-host-cli-55: Negative - add host with +"
         command="ipa host-add host+plus.$RELM --force"
-        expmsg="ipa: ERROR: invalid 'hostname': invalid domain-name: only letters, numbers, and - are allowed. - must not be the DNS label character"
+		# scott 05/01/2012 - changing expected message since error changed (at least 2.2.0-12):
+        #expmsg="ipa: ERROR: invalid 'hostname': invalid domain-name: only letters, numbers, and - are allowed. - must not be the DNS label character"
+		expmsg="ipa: ERROR: invalid 'hostname': invalid domain-name: only letters, numbers, and - are allowed. DNS label may not start or end with -"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
     rlPhaseEnd
 
