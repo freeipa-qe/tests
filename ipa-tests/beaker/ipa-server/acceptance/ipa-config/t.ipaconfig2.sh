@@ -82,6 +82,7 @@ ipaconfig_addattr_positive()
                 rlPass "Additional user objectclass successfully added."
         else
                 rlFail "User object classes not as expected."
+		rlLog "Verifies bugzilla https://bugzilla.redhat.com/show_bug.cgi?id=794746"
         fi
 
  	# remove objectclass added
@@ -96,6 +97,7 @@ ipaconfig_addattr_positive()
                 rlPass "Additional group objectclass successfully added."
         else
                 rlFail "Group objectclasses not as expected."
+		rlLog "Verifies bugzilla https://bugzilla.redhat.com/show_bug.cgi?id=794746"
         fi
 
 	# remove objectclass added
@@ -198,37 +200,36 @@ ipaconfig_delattr_negative()
 
     rlPhaseStartTest "ipaconfig_delattr invalid attribute negative test"
 	command="ipa config-mod --delattr=ipaCustomFields=FALSE"
-	expmsg="ipa: ERROR: ipacustomfields does not exist"
+	expmsg="ipa: ERROR: 'ipacustomfields' does not exist"
 	rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
-	rlLog "Verifies bugzilla https://bugzilla.redhat.com/show_bug.cgi?id=794804"
+	rlLog "Verifies bugzilla https://bugzilla.redhat.com/show_bug.cgi?id=817821"
     rlPhaseEnd
 
     rlPhaseStartTest "ipaconfig_mod_delattr ipahomesrootdir negative test"
 	command="ipa config-mod --delattr=ipahomesrootdir=/home/"
-        expmsg="ipa: ERROR: Action not allowed"
+        expmsg="ipa: ERROR: 'ipahomesrootdir' is required"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
-        rlLog "Verifies bugzilla https://bugzilla.redhat.com/show_bug.cgi?id=794804"
+        rlLog "Verifies bugzilla https://bugzilla.redhat.com/show_bug.cgi?id=817821"
     rlPhaseEnd
 
     rlPhaseStartTest "ipaconfig_mod_delattr ipamaxusernamelength negative test"
         command="ipa config-mod --delattr=ipamaxusernamelength=32"
-        expmsg="ipa: ERROR: Action not allowed"
+        expmsg="ipa: ERROR: 'ipamaxusernamelength' is required"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
-        rlLog "Verifies bugzilla https://bugzilla.redhat.com/show_bug.cgi?id=794804"
     rlPhaseEnd
 
     rlPhaseStartTest "ipaconfig_mod_delattr ipadefaultloginshell negative test"
         command="ipa config-mod --delattr=ipadefaultloginshell=/bin/bash"
         expmsg="ipa: ERROR: Action not allowed"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
-        rlLog "Verifies bugzilla https://bugzilla.redhat.com/show_bug.cgi?id=794804"
+        rlLog "Verifies bugzilla https://bugzilla.redhat.com/show_bug.cgi?id=817821"
     rlPhaseEnd
 
     rlPhaseStartTest "ipaconfig_mod_delattr ipadefaultprimarygroup negative test"
         command="ipa config-mod --delattr=ipadefaultprimarygroup=\"cn=ipausers,cn=accounts,cn=$BASEDN\""
-        expmsg="ipa: ERROR: Action not allowed"
+        expmsg="ipa: ERROR: 'ipadefaultprimarygroup' is required"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
-        rlLog "Verifies bugzilla https://bugzilla.redhat.com/show_bug.cgi?id=794804"
+        rlLog "Verifies bugzilla https://bugzilla.redhat.com/show_bug.cgi?id=817821"
     rlPhaseEnd
 
     rlPhaseStartTest "ipaconfig_mod_delattr ipadefaultemaildomain negative test"
@@ -240,44 +241,45 @@ ipaconfig_delattr_negative()
 
     rlPhaseStartTest "ipaconfig_mod_delattr ipasearchtimelimit negative test"
         command="ipa config-mod --delattr=ipasearchtimelimit=2"
-        expmsg="ipa: ERROR: Action not allowed"
+        expmsg="ipa: ERROR: 'ipasearchtimelimit' is required"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
-        rlLog "Verifies bugzilla https://bugzilla.redhat.com/show_bug.cgi?id=794804"
     rlPhaseEnd
 
     rlPhaseStartTest "ipaconfig_mod_delattr ipasearchrecordslimit negative test"
         command="ipa config-mod --delattr=ipasearchrecordslimit=100"
-        expmsg="ipa: ERROR: Action not allowed"
+        expmsg="ipa: ERROR: 'ipasearchrecordslimit' is required"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
-        rlLog "Verifies bugzilla https://bugzilla.redhat.com/show_bug.cgi?id=794804"
     rlPhaseEnd
 
     rlPhaseStartTest "ipaconfig_mod_delattr ipagroupsearchfields negative test"
-        command="ipa config-mod --delattr=ipagroupsearchfields="
-        expmsg="ipa: ERROR: Action not allowed"
+        ipa config-show --all | grep "Group search fields" > /tmp/groupsearch.out
+        groupsearchfields=`cat /tmp/groupsearch.out | awk '{print $4}'`
+        command="ipa config-mod --delattr=ipagroupsearchfields=\"$groupsearchfields\""
+        expmsg="ipa: ERROR: 'ipagroupsearchfields' is required"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
-        rlLog "Verifies bugzilla https://bugzilla.redhat.com/show_bug.cgi?id=794804"
+        rlLog "Verifies bugzilla https://bugzilla.redhat.com/show_bug.cgi?id=817831"
     rlPhaseEnd
 
     rlPhaseStartTest "ipaconfig_mod_delattr ipausersearchfields negative test"
-        command="ipa config-mod --delattr=ipausersearchfields="
-        expmsg="ipa: ERROR: Action not allowed"
+        ipa config-show --all | grep "User search fields" > /tmp/usersearch.out
+        usersearchfields=`cat /tmp/usersearch.out | awk '{print $4}'`
+        command="ipa config-mod --delattr=ipausersearchfields=\"$usersearchfields\""
+        expmsg="ipa: ERROR: 'ipausersearchfields' is required"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
-        rlLog "Verifies bugzilla https://bugzilla.redhat.com/show_bug.cgi?id=794804"
+        rlLog "Verifies bugzilla https://bugzilla.redhat.com/show_bug.cgi?id=817831"
     rlPhaseEnd
 
     rlPhaseStartTest "ipaconfig_mod_delattr ipacertificatesubjectbase negative test"
         command="ipa config-mod --delattr=ipacertificatesubjectbase=O=$RELM"
-        expmsg="ipa: ERROR: Action not allowed"
+        expmsg="ipa: ERROR: 'ipacertificatesubjectbase' is required"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
-        rlLog "Verifies bugzilla https://bugzilla.redhat.com/show_bug.cgi?id=794804"
+        rlLog "Verifies bugzilla https://bugzilla.redhat.com/show_bug.cgi?id=807018"
     rlPhaseEnd
 
     rlPhaseStartTest "ipaconfig_mod_delattr ipapwdexpadvnotify negative test"
         command="ipa config-mod --delattr=ipapwdexpadvnotify=4"
-        expmsg="ipa: ERROR: Action not allowed"
+        expmsg="ipa: ERROR: 'ipapwdexpadvnotify' is required"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
-        rlLog "Verifies bugzilla https://bugzilla.redhat.com/show_bug.cgi?id=794804"
     rlPhaseEnd
 
 }
