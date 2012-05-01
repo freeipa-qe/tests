@@ -339,7 +339,9 @@ ETHER_PACKAGE="nss-pam-ldapd"
 
     rlPhaseStartTest "ipa-host-cli-105: delattr --macaddress"
         myhost=mytesthost1.$DOMAIN
-        new_byte6="ff"
+		# scott 05/01/2012 - uppercasing FF because delattr here is case sensitive but, the mac from addattr
+		# is being normalized to uppercase.
+        new_byte6="FF"
         tmpfile="$tmpDir/hostether_$myhost_105.out"
 	attr="macaddress"
         if [ $macaddr ] ; then
