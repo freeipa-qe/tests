@@ -19,8 +19,8 @@ ipaconfig2()
 {
    setup
    ipaconfig_mod_addattr 
-   ipaconfig_mod_delattr
-   ipaconfig_setattr
+   #ipaconfig_mod_delattr
+   #ipaconfig_setattr
    cleanup
 } 
 
@@ -82,7 +82,7 @@ ipaconfig_addattr_positive()
                 rlPass "Additional user objectclass successfully added."
         else
                 rlFail "User object classes not as expected."
-		rlLog "Verifies bugzilla https://bugzilla.redhat.com/show_bug.cgi?id=794746"
+		rlLog "Verifies bugzilla https://bugzilla.redhat.com/show_bug.cgi?id=817885"
         fi
 
  	# remove objectclass added
@@ -97,7 +97,7 @@ ipaconfig_addattr_positive()
                 rlPass "Additional group objectclass successfully added."
         else
                 rlFail "Group objectclasses not as expected."
-		rlLog "Verifies bugzilla https://bugzilla.redhat.com/show_bug.cgi?id=794746"
+		rlLog "Verifies bugzilla https://bugzilla.redhat.com/show_bug.cgi?id=817885"
         fi
 
 	# remove objectclass added
@@ -175,7 +175,6 @@ ipaconfig_addattr_negative()
         expmsg="ipa: ERROR: ipapwdexpadvnotify: Only one value allowed."
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
   rlPhaseEnd
-
 }
 
 ipaconfig_delattr_positive()
