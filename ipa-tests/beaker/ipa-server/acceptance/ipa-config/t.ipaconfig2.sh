@@ -19,8 +19,8 @@ ipaconfig2()
 {
    setup
    ipaconfig_mod_addattr 
-   #ipaconfig_mod_delattr
-   #ipaconfig_setattr
+   ipaconfig_mod_delattr
+   ipaconfig_setattr
    cleanup
 } 
 
