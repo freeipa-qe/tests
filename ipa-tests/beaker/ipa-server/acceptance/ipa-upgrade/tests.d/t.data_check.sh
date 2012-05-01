@@ -193,4 +193,6 @@ data_check_2() {
 			rlRun "getent -s sss netgroup ${amhostgroup[1]}|grep ${amhost[1]}"
 		fi
 	rlPhaseEnd
+
+	rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.1' -m $TARGET_IP"
 }
