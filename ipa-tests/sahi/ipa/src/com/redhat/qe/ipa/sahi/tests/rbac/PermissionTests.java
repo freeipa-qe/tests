@@ -416,7 +416,7 @@ public class PermissionTests extends SahiTestScript {
 			
 			PermissionTasks.undoResetUpdatePermission(sahiTasks, cn, "Permissions", right, "undo");
 			PermissionTasks.undoResetUpdatePermission(sahiTasks, cn, "Member of group", memberOfGroup, "Reset");
-			if (!attribute.equals("none"))
+			if (!attribute.equals("none") && (!attribute.isEmpty()))
 				PermissionTasks.undoResetUpdatePermission(sahiTasks, cn, "Attributes", attribute, "Update");
 			
 			
@@ -567,7 +567,7 @@ public class PermissionTests extends SahiTestScript {
 			
 			//Reset permissions to what was installed
 			CommonTasks.search(sahiTasks, "Modify netgroup membership");
-			PermissionTasks.modifyPermission(sahiTasks, "Modify netgroup membership", "add", "", "description");
+			PermissionTasks.modifyPermission(sahiTasks, "Modify netgroup membership", "", "", "description");
 			CommonTasks.search(sahiTasks, "Enroll a host");
 			PermissionTasks.modifyPermission(sahiTasks, "Enroll a host", "write", "", "objectclass");
 			CommonTasks.clearSearch(sahiTasks);
@@ -602,7 +602,7 @@ public class PermissionTests extends SahiTestScript {
 			{ "add_permission_type_user_with_multiple_attr_right",	"Manage User2",				"write",	"add",		"",			"User",		"description",		"carlicense",	""		},
 		//	{ "add_permission_type_hostgroup_bug783502",			"Manage Hostgroup1",		"write",	"add",		"delete",	"Host Group","businesscategory",	"owner",		""			},
 			{ "add_permission_type_user_long",						"abcdefghijklmnopqrstuvwxyz123456789ANDAGAINabcdefghijklmnopqrstuvwxyz123456789ANDAGAINabcdefghijklmnopqrstuvwxyz123456789",	"write",	"",			"",			"User Group","description",		"",				""			},
-			{ "add_permission_type_user_dash_underscore",			"Manage_User-",				"write",	"",			"",			"User",				"description",	"carlicense",	"May only contain letters, numbers, -, _, and space"	}
+			{ "add_permission_type_user_dash_underscore",			"Manage_User-",				"write",	"",			"",			"User",		"description",		"carlicense",	""	}
 		//	{ "add_permission_type_user_bug807304",	 				"Test < Permission > Bug",	"write",	"",			"",			"User",		"description",		"carlicense",	"photo"		} };
 			};	        
 			return permissions;	
@@ -697,9 +697,9 @@ public class PermissionTests extends SahiTestScript {
 		@DataProvider(name="permissionInvalidAddTypeTestObjects")
 		public Object[][] getPermissionInvalidAddTypeTestObjects() {
 			String[][] permissions={
-	        //	testname											cn  						right1,		right2,		right3,		Type		Attributes1			Attributes2		Attributes3 	Expected Error			
-			{ "add_permission_type_user_duplicate",					"Manage User1",				"write",	"",			"",			"User",		"description",		"carlicense",	"photo",		"This entry already exists"								},
-			{ "add_permission_type_user_specialchar",				"M~a@n$a#g$e % U^s&e*r? ] 1 [ {A",		"write",	"",			"",			"User",				"description",	"carlicense",	"May only contain letters, numbers, -, _, and space"	} 
+	        //	testname								cn  								right1,		right2,		right3,		Type		Attributes1			Attributes2		Attributes3 	Expected Error			
+			{ "add_permission_type_user_duplicate",		"Manage User1",						"write",	"",			"",			"User",		"description",		"carlicense",	"photo",		"This entry already exists"								},
+			{ "add_permission_type_user_specialchar",	"M~a@n$a#g$e % U^s&e*r? ] 1 [ {A",	"write",	"",			"",			"User",		"description",		"carlicense",	"",				"May only contain letters, numbers, -, _, and space"	} 
 			}; 
 		
 			return permissions;	
