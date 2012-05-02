@@ -1019,6 +1019,14 @@ ipapermission_mod_positive()
      rlRun "verifyPermissionAttr \"$permissionName\" all \"Permission name\" \"ABCPermission\"" 0 "Verify Permissions"
    rlPhaseEnd
 
+   rlPhaseStartTest "ipa-permission-cli-1063 - modify permission  --type - for which chosen attr are invalid"
+     permissionName="Modify Users"
+     attr="type"
+     value="hostgroup"
+     rlRun "modifyPermission \"$permissionName\" $attr $value" 0 "Modify permission to be of different type, keeping original attributes"
+     rlRun "verifyPermissionAttr \"$permissionName\" all \"Type\" \"$value\"" 0 "Verify Permissions"
+   rlPhaseEnd
+
 #   #TODO: Bug - Uncomment later   
 #   ipa permission-mod --rename=APermission "ABCPermission"
 
@@ -1049,16 +1057,6 @@ ipapermission_mod_negative()
      rlAssertGrep "$expMsg" "$TmpDir/ipapermission_invalidattr.log"
    rlPhaseEnd
 
-   rlPhaseStartTest "ipa-permission-cli-1063 - modify permission  --type - for which chosen attr are invalid"
-     permissionName="Modify Users"
-     attr="type"
-     value="hostgroup"
-     command="modifyPermission \"$permissionName\" $attr $value"
-#     command="ipa permission-mod --type=\"$value\" \"$permissionName\""
-     expMsg="ipa: ERROR: attribute(s) \"givenname,sn,displayname,title,initials,loginshell,gecos,homephone,mobile,pager,facsimiletelephonenumber,telephonenumber,street,roomnumber,l,st,postalcode,manager,secretary,carlicense,labeleduri,inetuserhttpurl,employeetype,mepmanagedentry\" not allowed"
-     rlRun "$command > $TmpDir/ipapermission_invalidtype1.log 2>&1" 1 "Verify error message for invalid type"
-     rlAssertGrep "$expMsg" "$TmpDir/ipapermission_invalidtype1.log"
-   rlPhaseEnd
 
    rlPhaseStartTest "ipa-permission-cli-1064 - modify permission invalid --type"
      permissionName="Modify Users"
