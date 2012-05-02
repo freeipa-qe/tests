@@ -476,7 +476,7 @@ installSlave_ca()
                 rlRun "appendEnv" 0 "Append the machine information to the env.sh with the information for the machines in the recipe set"
 
 		rlLog "verifies https://bugzilla.redhat.com/show_bug.cgi?id=788726"
-		rlRun "remoteExec root $MASTER_IP \"grep 'NSMMReplicationPlugin.*Schema replication update failed: Invalid syntax' /var/log/dirsrv/slapd-PKI-IPA/errors\""
+		rlRun "remoteExec root $MASTERIP \"grep 'NSMMReplicationPlugin.*Schema replication update failed: Invalid syntax' /var/log/dirsrv/slapd-PKI-IPA/errors\""
 		rlRun "grep -v 'Schema replication update failed:' /tmp/remote_exec.out" 0
 		rlRun "cat /tmp/remote_exec.out"
 		
