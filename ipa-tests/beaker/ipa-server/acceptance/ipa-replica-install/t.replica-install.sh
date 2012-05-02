@@ -668,9 +668,11 @@ uninstall()
 	rlRun "cat /tmp/remote_exec.out"
 
 	rlLog "verifies bug https://bugzilla.redhat.com/show_bug.cgi?id=750524"
-	rlRun "remoteExec root $MASTERIP \"ipa-csreplica-manage del $SLAVE -p $ADMINPW\""
-	rlRun "egrep \"Deleted replication agreement from '$MASTER' to '$SLAVE'\" /tmp/remote_exec.out"
-	rlRun "cat /tmp/remote_exec.out"
+	# Check this one manually and not all at once...I think the first check can be removed
+	# Comment out and checking on this to see if it's needed 
+	#rlRun "remoteExec root $MASTERIP \"ipa-csreplica-manage del $SLAVE -p $ADMINPW\""
+	#rlRun "egrep \"Deleted replication agreement from '$MASTER' to '$SLAVE'\" /tmp/remote_exec.out"
+	#rlRun "cat /tmp/remote_exec.out"
 	rlRun "remoteExec root $MASTERIP \"ipa-csreplica-manage del $SLAVE -p $ADMINPW\""
 	rlRun "egrep \"'$MASTER' has no replication agreement for '$SLAVE'\" /tmp/remote_exec.out"
 	rlRun "cat /tmp/remote_exec.out"
