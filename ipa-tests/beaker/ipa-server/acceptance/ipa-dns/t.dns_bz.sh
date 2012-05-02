@@ -32,6 +32,7 @@ dnsbugs()
    bz805871
    bz701677
    bz804572
+   bz772301
    dnsbugcleanup
 }
 
@@ -454,6 +455,47 @@ bz804572()
                 verifyErrorMsg "ipa dnsrecord-mod lab.eng.pnq.redhat.com test5 --a-ip-address=10.65.201.190" "ipa: ERROR: 'arecord' is required"
 
         rlPhaseEnd
+}
+
+bz772301()
+{
+    # Test for bug https://bugzilla.redhat.com/show_bug.cgi?id=772301
+    rlPhaseStartTest "bz772301 Reverse DNS rec not created upon creation of fwd DNS rec"
+        aaaa174="2620:52:0:2247:221:5eff:fe86:16b4"
+        aaaarev="4.b.6.1.6.8.e.f.f.f.e.5.1.2.2.0"
+        aaaa174rev="7.4.2.2.0.0.0.0.2.5.0.0.0.2.6.2.ip6.arpa."
+        a174="10.1.1.10"
+        arev="10"
+        a174rev="1.1.10.in-addr.arpa."
+
+        # add dns record - reverse zone does exist
+	rlLog "EXECUTING: ipa dnszone-add $a174rev --name-server=$MASTER --admin-email=$email"
+        rlRun "ipa dnszone-add $a174rev --name-server=$MASTER --admin-email=$email" 0 "Add ipv4 reverse zone"
+	rlLog "EXECUTING: ipa dnsrecord-add $DOMAIN --a-create-reverse --a-rec=$a174 myhost"
+        rlRun "ipa dnsrecord-add $DOMAIN --a-create-reverse --a-rec=$a174 myhost" 0 "Add ipv4 dns record"
+	sleep 5
+        rlRun "ipa dnsrecord-find $DOMAIN myhost" 0 "Verify ipv4 forward record was added"
+        rlRun "ipa dnsrecord-find $a174rev 10" 0 "Verify ipv4 reverse record was added"
+        rlRun "ipa dnsrecord-del $a174rev $arev --del-all" 0 "Delete reverse record"
+        rlRun "ipa dnszone-del $a174rev" 0 "Cleanup ipv4 reverse zone added"
+        #rlRun "ipa dnsrecord-del $DOMAIN myhost --del-all" 0 "Delete forward record"
+        service named restart
+        sleep 5
+
+        # add dns record - reverse zone does exist - ipv6
+	rlLog "EXECUTING: ipa dnszone-add $aaaa174rev --name-server=$MASTER --admin-email=$email"
+        rlRun "ipa dnszone-add $aaaa174rev --name-server=$MASTER --admin-email=$email" 0 "Add ipv6 reverse zone"
+	rlLog "EXECUTING: ipa dnsrecord-add testrelm.com --aaaa-ip-address=$aaaa174 --aaaa-create-reverse myhost"
+        rlRun "ipa dnsrecord-add testrelm.com --aaaa-ip-address=$aaaa174 --aaaa-create-reverse myhost" 0 "Add ipv6 dns record"
+	sleep 5
+        rlRun "ipa dnsrecord-find $DOMAIN myhost" 0 "Verify ipv6 forward record was added"
+        rlRun "ipa dnsrecord-find $aaaa174rev $aaaarev" 0 "Verify ipv6 reverse record was added"
+        rlRun "ipa dnsrecord-del $aaaa174rev $aaaarev --del-all" 0 "Delete reverse record"
+        rlRun "ipa dnszone-del $aaaa174rev" 0 "Delete reverse zone"
+        rlRun "ipa dnsrecord-del $DOMAIN myhost --del-all" 0 "Delete forward record"
+        service named restart
+        sleep 5
+    rlPhaseEnd
 }
 
 dnsbugcleanup()
