@@ -668,7 +668,6 @@ uninstall()
 	rlRun "cat /tmp/replicaDel.out"
 
 	rlLog "verifies bug https://bugzilla.redhat.com/show_bug.cgi?id=750524"
-	# Check this one manually and not all at once...I think the first check can be removed
 	rlRun "remoteExec root $MASTERIP \"ipa-csreplica-manage del $SLAVE -p $ADMINPW\""
 	rlRun "egrep \"Deleted replication agreement from '$MASTER' to '$SLAVE'\" /tmp/remote_exec.out"
 	rlRun "cat /tmp/remote_exec.out"
