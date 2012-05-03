@@ -87,6 +87,8 @@ data_check()
 		rlLog "Machine in recipe is $MYROLE ($HOSTNAME)"
 		KinitAsAdmin
 		
+		sleep 10 # delay before starting tests...
+
 		# check  users
 		rlRun "ipa user-show ${user[1]}" 
 		rlRun "ipa user-show ${user[2]}" 
