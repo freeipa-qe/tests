@@ -983,7 +983,7 @@ ipapermission_mod_positive()
      rlRun "verifyPermissionAttr \"$permissionName\" all \"Permissions\" \"$value\"" 0 "Verify Permissions"
    rlPhaseEnd 
 
-  rlPhaseStartTest "ipa-permission-cli-1057 - modify permission --attrs (bug 783502 - side effect)"
+  rlPhaseStartTest "ipa-permission-cli-1057 - modify permission --attrs (bug 817909)"
      permissionName="Change a user password"
      attr="attrs"
      value="userpassword,krbprincipalkey,sambalmpassword,passwordhistory"
