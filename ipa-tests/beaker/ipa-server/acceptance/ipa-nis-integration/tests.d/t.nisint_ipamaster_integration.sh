@@ -427,8 +427,10 @@ nisint_ipamaster_integration_add_nis_data_ldif_passwd()
 			homeDirectory: $HOMEDIR
 			krbPwdPolicyReference: cn=global_policy,cn=$RELM,cn=kerberos,$BASEDN
 			krbPrincipalName: $USERNAME@$RELM
-			mepManagedEntry: cn=$USERNAME,cn=groups,cn=accounts,$BASEDN
 			EOF
+
+			### removing this from ldif file:
+			### mepManagedEntry: cn=$USERNAME,cn=groups,cn=accounts,$BASEDN
 
 			if [ -n "$GECOS" ]; then
 				echo "gecos: $GECOS" >> $tmpldif
@@ -441,7 +443,7 @@ nisint_ipamaster_integration_add_nis_data_ldif_passwd()
 
 		for USERNAME in $(cut -f1 -d: /dev/shm/nis-map.passwd); do
 			rlRun "echo \"dummy123@ipa.com\"| ipa passwd $USERNAME"
-			FirstKinitAs $USERNAME dummy123@ipa.com passw0rd1
+			FirstKinitAs $USERNAME "dummy123@ipa.com" passw0rd1
 			KinitAsAdmin
 		done
 	rlPhaseEnd
@@ -659,6 +661,7 @@ nisint_ipamaster_integration_add_nis_data_ldif_netgroup()
 		done
 
 		rlRun "ldapadd -x -D \"$ROOTDN\" -w \"$ROOTDNPWD\" -f $tmpldif"
+		rlRun "cat $tmpldif"
 		rm -f $tmpldif
 	rlPhaseEnd
 }
