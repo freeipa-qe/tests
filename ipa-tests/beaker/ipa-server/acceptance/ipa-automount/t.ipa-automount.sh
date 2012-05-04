@@ -834,7 +834,7 @@ rlPhaseStartTest "automountmap_add_006: ipa automountmap-add-indirect LOCATION M
 	rlRun "ipa automountlocation-add pune"
 	rlRun "ipa automountmap-add pune pune.map"
 
-        rlRun "ipa automountmap-add-indirect pune punechild.map --mount=/usr/share/man --parentmap=pune.map > $TmpDir/automountmap_add_006.out"
+        rlRun "ipa automountmap-add-indirect pune punechild.map --mount=usr/share/man --parentmap=pune.map > $TmpDir/automountmap_add_006.out"
 	rlAssertGrep "Added automount map \"punechild.map\"" "$TmpDir/automountmap_add_006.out"
 	rlAssertGrep "Map: punechild.map" "$TmpDir/automountmap_add_006.out"
 
@@ -851,7 +851,7 @@ rlPhaseStartTest "automountmap_add_007: ipa automountmap-add-indirect LOCATION M
         rlRun "ipa automountlocation-add pune"
         rlRun "ipa automountmap-add pune pune.map"
 
-        rlRun "ipa automountmap-add-indirect pune punechild.map --mount=/usr/share/man --parentmap=pune.map --all > $TmpDir/automountmap_add_007.out"
+        rlRun "ipa automountmap-add-indirect pune punechild.map --mount=usr/share/man --parentmap=pune.map --all > $TmpDir/automountmap_add_007.out"
 	rlAssertGrep "dn: automountmapname=punechild.map,cn=pune,cn=automount,$basedn" "$TmpDir/automountmap_add_007.out"
 	rlAssertGrep "Map: punechild.map" "$TmpDir/automountmap_add_007.out"
 	rlAssertGrep "objectclass: automountmap, top" "$TmpDir/automountmap_add_007.out"
@@ -869,7 +869,7 @@ rlPhaseStartTest "automountmap_add_008: ipa automountmap-add-indirect LOCATION M
 	rlRun "ipa -d automountlocation-add pune"
         rlRun "ipa -d automountmap-add pune pune.map"
 
-        rlRun "ipa -d automountmap-add-indirect pune punechild.map --mount=/usr/share/man --parentmap=pune.map --all --raw > $TmpDir/automountmap_add_008.out"
+        rlRun "ipa -d automountmap-add-indirect pune punechild.map --mount=usr/share/man --parentmap=pune.map --all --raw > $TmpDir/automountmap_add_008.out"
 	rlAssertGrep "dn: automountmapname=punechild.map,cn=pune,cn=automount,$basedn" "$TmpDir/automountmap_add_008.out"
 	rlAssertGrep "automountmapname: punechild.map" "$TmpDir/automountmap_add_008.out"
 	rlAssertGrep "objectclass: automountmap" "$TmpDir/automountmap_add_008.out"
