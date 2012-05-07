@@ -89,7 +89,7 @@ ipaconfig_bugzillas()
 		rlLog "inetorgperson, inetuser, posixaccount, krbprincipalaux, krbticketpolicyaux,"
 		rlLog "ipaobject, ipasshuser, sambasamaccount\""
 		rlRun "chmod 755 /tmp/ipa-config-mod-with-newlines.sh"
-		rlRun "/tmp/ipa-config-mod-with-newlines.sh 2>&1 > $tmpout" 0 "Running script with multiline command"
+		rlRun "/tmp/ipa-config-mod-with-newlines.sh > $tmpout 2>&1" 0 "Running script with multiline command"
 		if [ $(grep "ipa: ERROR: unhandled exception: Error: new-line character seen in unquoted field" $tmpout|wc -l) -gt 0 ]; then
 			rlFail "BZ 797569 found...embedded carriage returns in a CSV not handled"
 			rlFail "ipa config-mod with multiple lines quoted and separated by newline failed"
