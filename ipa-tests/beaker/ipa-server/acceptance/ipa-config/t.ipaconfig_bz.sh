@@ -75,5 +75,31 @@ ipaconfig_bugzillas()
                         rlPass "nsslapd-idlistscanlimit as expected '$nslimits'"
                 fi
         rlPhaseEnd
+
+	rlPhaseStartTest "bz797569 embedded carriage returns in a CSV not handled"
+		tmpout=/tmp/errormsg.out
+		cat > /tmp/ipa-config-mod-with-newlines.sh <<-EOF
+		ipa config-mod --userobjectclasses="top, person, organizationalperson,
+		inetorgperson, inetuser, posixaccount, krbprincipalaux, krbticketpolicyaux,
+		ipaobject, ipasshuser, sambasamaccount"
+		EOF
+
+		rlLog "Running ipa config-mod with quoted multiline entry"
+		rlLog "ipa config-mod --userobjectclasses=\"top, person, organizationalperson,"
+		rlLog "inetorgperson, inetuser, posixaccount, krbprincipalaux, krbticketpolicyaux,"
+		rlLog "ipaobject, ipasshuser, sambasamaccount\""
+		rlRun "/tmp/ipa-config-mod-with-newlines.sh 2>&1 > $tmpout" 0 "Running script with multiline command"
+		if [ $(grep "ipa: ERROR: unhandled exception: Error: new-line character seen in unquoted field" $tmpout|wc -l) -gt 0 ]; then
+			rlFail "BZ 797569 found...embedded carriage returns in a CSV not handled"
+			rlFail "ipa config-mod with multiple lines quoted and separated by newline failed"
+		else
+			rlRun "ipa config-show --all|grep \"top, person, organizationalperson, inetorgperson, inetuser, posixaccount, krbprincipalaux, krbticketpolicyaux, ipaobject, ipasshuser, sambasamaccount\""
+			rlPass "BZ 797569 not found"
+			rlPASS "ipa config-mod with multiple lines quoted and separated by newline passed"
+		fi
+		if [ -f $tmpout ]; then 
+			rm -f $tmpout
+		fi
+	rlPhaseEnd
+
 }
- 
