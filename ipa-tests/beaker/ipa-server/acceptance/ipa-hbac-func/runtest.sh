@@ -613,13 +613,13 @@ rlJournalStart
 		rlLog "REVERSE_ZONE now again is $REVERSE_ZONE"
 
 		# Adding forward and reverse record.
-		rlRun "ipa dnsrecord-add $DOMAIN $BEAKERCLIENT_SH --a-rec=$BEAKERCLIENT_IP"
+		# rlRun "ipa dnsrecord-add $DOMAIN $BEAKERCLIENT_SH --a-rec=$BEAKERCLIENT_IP"
 		rlRun "ipa dnsrecord-add $REVERSE_ZONE $BEAKERCLIENT_PTR --ptr-rec=$CLIENT."
 
 		# Adding forward and reverse record.
-		echo "ipa dnsrecord-add $DOMAIN $BEAKERCLIENT2_SH --a-rec=$BEAKERCLIENT2_IP"
-		echo "ipa dnsrecord-add $REVERSE_ZONE $BEAKERCLIENT2_PTR --ptr-rec=$CLIENT2."
-		rlRun "ipa dnsrecord-add $DOMAIN $BEAKERCLIENT2_SH --a-rec=$BEAKERCLIENT2_IP"
+		# echo "ipa dnsrecord-add $DOMAIN $BEAKERCLIENT2_SH --a-rec=$BEAKERCLIENT2_IP"
+		# echo "ipa dnsrecord-add $REVERSE_ZONE $BEAKERCLIENT2_PTR --ptr-rec=$CLIENT2."
+		# rlRun "ipa dnsrecord-add $DOMAIN $BEAKERCLIENT2_SH --a-rec=$BEAKERCLIENT2_IP"
 		rlRun "ipa dnsrecord-add $REVERSE_ZONE $BEAKERCLIENT2_PTR --ptr-rec=$CLIENT2."
 
 
