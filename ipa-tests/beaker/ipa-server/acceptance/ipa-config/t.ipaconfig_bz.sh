@@ -95,7 +95,7 @@ ipaconfig_bugzillas()
 		else
 			rlRun "ipa config-show --all|grep \"top, person, organizationalperson, inetorgperson, inetuser, posixaccount, krbprincipalaux, krbticketpolicyaux, ipaobject, ipasshuser, sambasamaccount\""
 			rlPass "BZ 797569 not found"
-			rlPaSS "ipa config-mod with multiple lines quoted and separated by newline passed"
+			rlPass "ipa config-mod with multiple lines quoted and separated by newline passed"
 		fi
 		if [ -f $tmpout ]; then 
 			rm -f $tmpout
