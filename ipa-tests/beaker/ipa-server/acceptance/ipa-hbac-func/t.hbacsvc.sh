@@ -147,7 +147,9 @@ hbacsvc_client_002() {
 
 		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 rlRun "getent -s sss passwd $user1"
-		rlRun "ftp_auth_failure $user1 testpw123@ipa.com $MASTER"
+		# Source host validation has been depricated which caused the following test to fail, hence updating accordingly.
+		rlRun "ftp_auth_success $user1 testpw123@ipa.com $MASTER"
+		rlRun "ftp_auth_failure $user2 testpw123@ipa.com $MASTER"
 
 	rlPhaseEnd
 }
@@ -270,7 +272,8 @@ hbacsvc_client_003() {
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 rlRun "getent -s sss passwd $user3"
-                rlRun "ftp_auth_failure $user3 testpw123@ipa.com $MASTER"
+                rlRun "ftp_auth_failure $user2 testpw123@ipa.com $MASTER"
+                rlRun "ftp_auth_success $user3 testpw123@ipa.com $MASTER"
 
         rlPhaseEnd
 }
@@ -347,7 +350,7 @@ hbacsvc_client2_004() {
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 rlRun "getent -s sss passwd user4"
-                rlRun "ssh_auth_failure user4 testpw123@ipa.com $CLIENT2"
+                rlRun "ssh_auth_failure user2 testpw123@ipa.com $CLIENT2"
 
         rlPhaseEnd
 
@@ -581,7 +584,9 @@ hbacsvc_client_007() {
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 rlRun "getent -s sss passwd user7"
-                rlRun "ssh_auth_failure user7 testpw123@ipa.com $CLIENT"
+		# Source host validation has been depricated which caused the following test to fail, hence commenting it out.
+                rlRun "ssh_auth_success user7 testpw123@ipa.com $CLIENT"
+                rlRun "ssh_auth_failure user2 testpw123@ipa.com $CLIENT"
 
         rlPhaseEnd
 }
@@ -708,7 +713,9 @@ hbacsvc_client2_008() {
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 rlRun "getent -s sss passwd user8"
-                rlRun "ssh_auth_failure user8 testpw123@ipa.com $CLIENT2"
+		# Source host validation has been depricated which caused the following test to fail, hence commenting it out.
+                rlRun "ssh_auth_success user8 testpw123@ipa.com $CLIENT2"
+                rlRun "ssh_auth_failure user2 testpw123@ipa.com $CLIENT2"
 
         rlPhaseEnd
 
@@ -825,7 +832,9 @@ hbacsvc_client2_009() {
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 rlRun "getent -s sss passwd user9"
-                rlRun "ssh_auth_failure user9 testpw123@ipa.com $CLIENT2"
+		# Source host validation has been depricated which caused the following test to fail, hence commenting it out.
+                rlRun "ssh_auth_success user9 testpw123@ipa.com $CLIENT2"
+                rlRun "ssh_auth_failure user2 testpw123@ipa.com $CLIENT2"
 
         rlPhaseEnd
 
@@ -877,7 +886,9 @@ hbacsvc_client2_009_1() {
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 rlRun "getent -s sss passwd user9"
-                rlRun "ssh_auth_failure user9 testpw123@ipa.com $CLIENT2"
+		# Source host validation has been depricated which caused the following test to fail, hence commenting it out.
+                rlRun "ssh_auth_success user9 testpw123@ipa.com $CLIENT2"
+                rlRun "ssh_auth_failure user2 testpw123@ipa.com $CLIENT2"
 
         rlPhaseEnd
 
@@ -945,7 +956,9 @@ hbacsvc_client2_010() {
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 rlRun "getent -s sss passwd user10"
-                rlRun "ssh_auth_failure user10 testpw123@ipa.com $CLIENT2"
+		# Source host validation has been depricated which caused the following test to fail, hence commenting it out.
+                rlRun "ssh_auth_success user10 testpw123@ipa.com $CLIENT2"
+                rlRun "ssh_auth_failure user2 testpw123@ipa.com $CLIENT2"
 
         rlPhaseEnd
 
@@ -1011,7 +1024,9 @@ hbacsvc_client2_011() {
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 rlRun "getent -s sss passwd user11"
-                rlRun "ssh_auth_failure user11 testpw123@ipa.com $CLIENT2"
+		# Source host validation has been depricated which caused the following test to fail, hence commenting it out.
+                rlRun "ssh_auth_success user11 testpw123@ipa.com $CLIENT2"
+                rlRun "ssh_auth_failure user2 testpw123@ipa.com $CLIENT2"
 
         rlPhaseEnd
 
@@ -1328,7 +1343,9 @@ hbacsvc_client_015() {
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 rlRun "getent -s sss passwd user15"
-                rlRun "ssh_auth_failure user15 testpw123@ipa.com $CLIENT"
+		# Source host validation has been depricated which caused the following test to fail, hence commenting it out.
+                rlRun "ssh_auth_success user15 testpw123@ipa.com $CLIENT"
+                rlRun "ssh_auth_failure user2 testpw123@ipa.com $CLIENT"
 
         rlPhaseEnd
 }
@@ -1445,7 +1462,9 @@ hbacsvc_client_016() {
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 rlRun "getent -s sss passwd user16"
-                rlRun "ssh_auth_failure user16 testpw123@ipa.com $CLIENT"
+		# Source host validation has been depricated which caused the following test to fail, hence commenting it out.
+                rlRun "ssh_auth_success user16 testpw123@ipa.com $CLIENT"
+                rlRun "ssh_auth_failure user2 testpw123@ipa.com $CLIENT"
 
         rlPhaseEnd
 }
@@ -2139,7 +2158,9 @@ hbacsvc_client_027() {
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 		sleep 5
                 rlRun "getent -s sss passwd user27"
-                rlRun "ssh_auth_failure user27 testpw123@ipa.com $CLIENT"
+		# Source host validation has been depricated which caused the following test to fail, hence commenting it out.
+                rlRun "ssh_auth_success user27 testpw123@ipa.com $CLIENT"
+                rlRun "ssh_auth_failure user2 testpw123@ipa.com $CLIENT"
 
         rlPhaseEnd
 }
@@ -2203,7 +2224,9 @@ hbacsvc_client_028() {
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 		sleep 5
                 rlRun "getent -s sss passwd user28"
-                rlRun "ssh_auth_failure user28 testpw123@ipa.com $CLIENT"
+		# Source host validation has been depricated which caused the following test to fail, hence commenting it out.
+                rlRun "ssh_auth_success user28 testpw123@ipa.com $CLIENT"
+                rlRun "ssh_auth_failure user2 testpw123@ipa.com $CLIENT"
 
         rlPhaseEnd
 }
@@ -2274,7 +2297,9 @@ hbacsvc_client_029() {
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 		sleep 5
                 rlRun "getent -s sss passwd user29"
-                rlRun "ssh_auth_failure user29 testpw123@ipa.com $CLIENT"
+		# Source host validation has been depricated which caused the following test to fail, hence commenting it out.
+                rlRun "ssh_auth_success user29 testpw123@ipa.com $CLIENT"
+                rlRun "ssh_auth_failure user2 testpw123@ipa.com $CLIENT"
 
         rlPhaseEnd
 }
@@ -2350,7 +2375,9 @@ hbacsvc_client_030() {
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 		sleep 5
                 rlRun "getent -s sss passwd user30"
-                rlRun "ssh_auth_failure user30 testpw123@ipa.com $CLIENT"
+		# Source host validation has been depricated which caused the following test to fail, hence updating
+                rlRun "ssh_auth_success user30 testpw123@ipa.com $CLIENT"
+                rlRun "ssh_auth_failure user2 testpw123@ipa.com $CLIENT"
 
         rlPhaseEnd
 }
@@ -2558,7 +2585,8 @@ hbacsvc_client2_bug736314() {
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 		sleep 5
                 rlRun "getent -s sss passwd user736314"
-                rlRun "ssh_auth_failure user736314 testpw123@ipa.com $MASTER"
+                rlRun "ssh_auth_success user736314 testpw123@ipa.com $MASTER"
+                rlRun "ssh_auth_failure user2 testpw123@ipa.com $MASTER"
 
         rlPhaseEnd
 
