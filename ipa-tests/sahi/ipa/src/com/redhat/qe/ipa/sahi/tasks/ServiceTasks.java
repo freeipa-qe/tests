@@ -17,8 +17,10 @@ public class ServiceTasks {
 	 */
 	public static void addService(SahiTasks sahiTasks, String srvtype, String hostname, Boolean force, String button) {
 		sahiTasks.link("Add").click();
-		sahiTasks.select(0).choose(srvtype);
-		sahiTasks.span("icon combobox-icon").click();
+		     sahiTasks.span("icon combobox-icon").click();
+		     sahiTasks.select("list").choose(srvtype);
+		
+		sahiTasks.span("icon combobox-icon[1]").click();
 		sahiTasks.select("list").choose(hostname);
 		if (force == true){
 				sahiTasks.checkbox("force").check();
@@ -36,7 +38,7 @@ public class ServiceTasks {
 	public static void addCustomService(SahiTasks sahiTasks, String customservice, String hostname, Boolean force) {
 		sahiTasks.link("Add").click();
 		sahiTasks.textbox("service").setValue(customservice);
-		sahiTasks.span("icon combobox-icon").click();
+		sahiTasks.span("icon combobox-icon").near(sahiTasks.textbox("host")).click();
 		sahiTasks.select("list").choose(hostname);
 		if (force == true){
 				sahiTasks.checkbox("force").check();
@@ -180,7 +182,7 @@ public class ServiceTasks {
 	public static void addManagedByHost(SahiTasks sahiTasks, String serviceprinc, String hostname, String button) {
 		sahiTasks.link(serviceprinc).click();
 		sahiTasks.link("managedby_host").click();
-		sahiTasks.link("Enroll").click();
+		sahiTasks.link("Add").click();
 		sahiTasks.checkbox(hostname).click();
 		sahiTasks.span(">>").click();
 		sahiTasks.button(button).click();
@@ -199,8 +201,14 @@ public class ServiceTasks {
 		sahiTasks.checkbox(hostname).click();
 		sahiTasks.span("Delete").click();
 		sahiTasks.button(button).click();
+		if(button == "Cancel")
+				{
+					// uncheck if the action was to cancel
+					sahiTasks.checkbox(hostname).click();
+				}
 		sahiTasks.link("Services").in(sahiTasks.div("content")).click();
 	}
+	
 	
 	/*
 	 * Verify managedby host
@@ -229,6 +237,7 @@ public class ServiceTasks {
 	 */
 	public static void verifyServiceKeytab(SahiTasks sahiTasks, String serviceprinc, boolean provisioned ) {
 		sahiTasks.link(serviceprinc).click();
+		sahiTasks.span("Refresh").click();
 		if (provisioned == false){
 			Assert.assertTrue(sahiTasks.bold("Kerberos Key Not Present").exists(), "Service " + serviceprinc + " does not have a keytab provisioned");
 		}
@@ -246,6 +255,7 @@ public class ServiceTasks {
 	 */
 	public static void deleteServiceKeytab(SahiTasks sahiTasks, String serviceprinc, String button ) {
 		sahiTasks.link(serviceprinc).click();
+		sahiTasks.span("Refresh").click();
 		sahiTasks.span("Delete Key, Unprovision").click();
 		sahiTasks.button(button).click();
 		sahiTasks.link("Services").in(sahiTasks.div("content")).click();
@@ -261,7 +271,7 @@ public class ServiceTasks {
 	public static void addInvalidService(SahiTasks sahiTasks, String hostname, String servicename, String expectedError, boolean requiredFieldTest) {
 		sahiTasks.link("Add").click();
 		sahiTasks.textbox("service").setValue(servicename);
-		sahiTasks.span("icon combobox-icon").click();
+		sahiTasks.span("icon combobox-icon").near(sahiTasks.textbox("host")).click();
 		sahiTasks.select("list").choose(hostname);
 		sahiTasks.button("Add").click();
 		//Check for expected error
