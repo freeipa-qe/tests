@@ -335,6 +335,7 @@ rlPhaseEnd
 indirect_mount_functionality_001() {
 
 rlPhaseStartTest "indirect_mount_functionality_001: functionality testing indirect mount."
+	rlRun "kinitAs $ADMINID $ADMINPW" 0
 
         rlRun "ipa automountlocation-add loc1"
 	rlRun "ipa automountmap-add loc1 auto.shanks"
@@ -347,10 +348,12 @@ rlPhaseStartTest "indirect_mount_functionality_001: functionality testing indire
 	rlRun "touch /tmp/shanks.txt"
 	rlRun "ipa user-mod $user1 --homedir=/ipashare/$user1"
 
-	rlRun "touch $TmpDir/sudo_list.exp"
+	rlRun "touch /tmp/sudo_list.exp"
 
 testout=/tmp/testout.txt
-cat > $TmpDir/test_list.exp << EOF
+touch $testout
+chown user1:user1 $testout
+cat > /tmp/test_list.exp << EOF
 #!/usr/bin/expect -f
 
 set timeout 30
@@ -361,13 +364,13 @@ spawn ssh -o StrictHostKeyChecking=no -l $user1 $MASTER
 expect "*: "
 send -s "$userpw\r"
 expect "*$ "
-send -s "ls -l shanks.txt > $testout 2>&1 \r"
+send -s "ls -l /tmp > $testout 2>&1 \r"
 expect eof
 EOF
 
-chmod 755 $TmpDir/test_list.exp
-cat $TmpDir/test_list.exp
-$TmpDir/test_list.exp
+chmod 755 /tmp/test_list.exp
+cat /tmp/test_list.exp
+/tmp/test_list.exp
 cat $testout
 
 	rlAssertGrep "shanks.txt" "$testout"
@@ -380,6 +383,7 @@ cat $testout
 	rlAssertGrep "mounted /ipashare/$user1" "/var/log/messages"
 
 	rlRun "cat /var/log/messages"
+	rlRun "kinitAs $ADMINID $ADMINPW" 0
 	rlRun "ipa automountlocation-del loc1"
 
 rlPhaseEnd
@@ -399,6 +403,9 @@ rlPhaseStartTest "Clean up for automount configuration tests"
         rlRun "rm -fr /tmp/krb5_1*"
 	rlRun "rm -fr /etc/auto.master /etc/auto.direct /etc/auto.loc1"
 	rlRun "> /etc/exports"
+	rlRun "service autofs stop" 
+	rlRun "rm -rf /ipashare /share"
+	rlRun "service autofs start"
 rlPhaseEnd
 }
 
