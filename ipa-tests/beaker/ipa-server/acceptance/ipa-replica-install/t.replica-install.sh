@@ -38,6 +38,7 @@
 . /usr/share/beakerlib/beakerlib.sh
 . /dev/shm/ipa-server-shared.sh
 . ./install-lib.sh
+. ./t.replica-install.bug.sh
 
 
 installMaster()
@@ -298,6 +299,16 @@ installSlave()
 		rlAssertGrep "$DNSFORWARD" "/etc/named.conf"
 
                 rlRun "appendEnv" 0 "Append the machine information to the env.sh with the information for the machines in the recipe set"
+
+				# Verifying bug 784696
+				rlLog "Verifying https://bugzilla.redhat.com/show_bug.cgi?id=784696"
+				rlLog "ldapsearch -x -D '$ROOTDN' -w '$ROOTDNPWD' -b 'cn=config' |grep 'nsDS5ReplicaUpdateSchedule: 0000-2359 0123456'"
+				BZCHECK=$(ldapsearch -x -D '$ROOTDN' -w '$ROOTDNPWD' -b 'cn=config' |grep 'nsDS5ReplicaUpdateSchedule: 0000-2359 0123456'|wc -l)
+				if [ $BZCHECK -gt 0 ]; then
+					rlFail "BZ 784696 found...Dont set nsds5replicaupdateschedule in replication agreements"
+				else
+					rlPass "BZ 784696 not found....nsds5replicaupdateschedule not set"
+				fi
         fi
 
         if [ -f /var/log/ipareplica-install.log ]; then
