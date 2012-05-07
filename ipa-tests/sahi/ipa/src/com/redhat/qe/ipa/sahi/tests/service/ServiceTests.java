@@ -53,7 +53,7 @@ public class ServiceTests extends SahiTestScript {
 		String ipaddr1 = ipprefix + "199";
 		String ipaddr2 = ipprefix + "200";
 		
-		testservice = "SRVC";
+		testservice = "libvirt";
 		mytesthost = "servicehost1" + "." + domain;
 		mytesthost2 = "servicehost2" + "." + domain;
 		nodnshost = "nodns" + "." + domain;
@@ -170,7 +170,7 @@ public class ServiceTests extends SahiTestScript {
 	@Test (groups={"deleteMultipleServiceTests"}, dataProvider="getDeleteMultipleServiceTestObjects",  dependsOnGroups="serviceAddTests")	
 	public void testDeleteMultipleService(String testName) throws Exception {
 		
-		String [] defaultservices = { "cifs" + "/" + mytesthost + "@" + realm, "DNS" + "/" + mytesthost + "@" + realm, "ftp" + "/" + mytesthost + "@" + realm, "HTTP" + "/" + mytesthost + "@" + realm, "imap" + "/" + mytesthost + "@" + realm, "ldap" + "/" + mytesthost + "@" + realm, "libvirt" + "/" + mytesthost + "@" + realm, "nfs" + "/" + mytesthost + "@" + realm, "qpidd" + "/" + mytesthost + "@" + realm, "smtp" + "/" + mytesthost + "@" + realm };
+		String [] defaultservices = { "cifs" + "/" + mytesthost + "@" + realm, "DNS" + "/" + mytesthost + "@" + realm, "ftp" + "/" + mytesthost + "@" + realm, "HTTP" + "/" + mytesthost + "@" + realm, "imap" + "/" + mytesthost + "@" + realm, "ldap" + "/" + mytesthost + "@" + realm, "nfs" + "/" + mytesthost + "@" + realm, "qpidd" + "/" + mytesthost + "@" + realm, "smtp" + "/" + mytesthost + "@" + realm };
 		for (String servicename : defaultservices){
 			//verify service exists
 			Assert.assertTrue(sahiTasks.link(servicename).exists(), "Verify service " + servicename + "  exist.");
@@ -188,7 +188,7 @@ public class ServiceTests extends SahiTestScript {
 	/*
 	 * Add Service Certificate Tests
 	 */
-	@Test (groups={"serviceAddCertificateTests"}, dataProvider="getServiceAddCertificateTestObjects")	
+	@Test (groups={"serviceAddCertificateTests"}, dataProvider="getServiceAddCertificateTestObjects", dependsOnGroups="serviceAddTests")	
 	public void testserviceAddCertificate(String testName, String button, boolean certexists) throws Exception {
 		
 		// add request certificate
@@ -274,7 +274,7 @@ public class ServiceTests extends SahiTestScript {
 		/*
 		 * Remove managed by host
 		 */
-		@Test (groups={"serviceRemoveManagedByHostTests"}, dataProvider="getServiceRemoveManagedByHostTestObjects",  dependsOnGroups="serviceAddManagedByHostTests")	
+		@Test (groups={"serviceRemoveManagedByHostTests"}, dataProvider="getServiceRemoveManagedByHostTestObjects",  dependsOnGroups={"serviceAddManagedByHostTests", "serviceAddTests"})	
 		public void testserviceRemoveManagedByHost(String testName, String button, boolean exists ) throws Exception {
 			
 			//  remove managed by host
@@ -303,7 +303,7 @@ public class ServiceTests extends SahiTestScript {
 		/*
 		 * Service remove keytab tests
 		 */
-		@Test (groups={"serviceRemoveKeytabTests"}, dataProvider="getServiceRemoveKeytabTestObjects", dependsOnGroups="serviceGetKeytabTests" )	
+		@Test (groups={"serviceRemoveKeytabTests"}, dataProvider="getServiceRemoveKeytabTestObjects", dependsOnGroups={"serviceGetKeytabTests", "serviceAddTests"} )	
 		public void testremoveServiceKeytab(String testName ) throws Exception {
 			
 			//  unprovision keytab
@@ -546,7 +546,7 @@ public class ServiceTests extends SahiTestScript {
 		
         //									testname							  button		exists
 		ll.add(Arrays.asList(new Object[]{ 	"cancel_adding_managedby_host",	  	  "Cancel",		 false	} ));
-		ll.add(Arrays.asList(new Object[]{ 	"add_managedby_host",	  			  "Enroll",		 true   } ));
+		ll.add(Arrays.asList(new Object[]{ 	"add_managedby_host",	  			  "Add",		 true   } ));
 		
 		return ll;	
 	}
@@ -580,7 +580,7 @@ public class ServiceTests extends SahiTestScript {
 		
         //									testname					
 		ll.add(Arrays.asList(new Object[]{ 	"provision_service_keytab" } ));
-		//TODO :: Add when bug is fixed
+		//TODO :: Add when bug is fixed - https://bugzilla.redhat.com/show_bug.cgi?id=818665
 		//ll.add(Arrays.asList(new Object[]{ 	"cancel_provision_service_keytab" } ));
 		
 		return ll;	
@@ -598,7 +598,7 @@ public class ServiceTests extends SahiTestScript {
 		
         //									testname					
 		ll.add(Arrays.asList(new Object[]{ 	"unprovision_service_keytab" } ));
-		//TODO :: Add when bug is fixed
+		//TODO :: Add when bug is fixed - https://bugzilla.redhat.com/show_bug.cgi?id=818665
 		//ll.add(Arrays.asList(new Object[]{ 	"cancel_unprovision_service_keytab" } ));
 		return ll;	
 	}
@@ -606,7 +606,7 @@ public class ServiceTests extends SahiTestScript {
 	/*
 	 * Data to be used when adding services - for negative cases
 	 */
-	@DataProvider(name="getInvalidServiceTestObjects")
+	 @DataProvider(name="getInvalidServiceTestObjects")
 	public Object[][] getInvalidServiceTestObjects() {
 		return TestNGUtils.convertListOfListsTo2dArray(createInvalidServiceTestObjects());
 	}
@@ -616,8 +616,7 @@ public class ServiceTests extends SahiTestScript {
         //										testname					hostname     	servicename    expectedError
 		ll.add(Arrays.asList(new Object[]{ "add_service_missing_hostname",	"", 	 		 "HTTP",			"Required field"} ));
 		ll.add(Arrays.asList(new Object[]{ "add_service_no_DNS_for host",	nodnshost, 		 "JUNK",			"Host does not have corresponding DNS A record"} ));
-		//TODO :: enable this test and set the right error message - https://bugzilla.redhat.com/show_bug.cgi?id=739640
-		//ll.add(Arrays.asList(new Object[]{ "add_service_no_service_name",	mytesthost,		 		"",				"Don't know yet"	} ));
+		ll.add(Arrays.asList(new Object[]{ "add_service_missing_service_name",	mytesthost,		 		"",				"Required field"	} ));
 
 		return ll;	
 	}
