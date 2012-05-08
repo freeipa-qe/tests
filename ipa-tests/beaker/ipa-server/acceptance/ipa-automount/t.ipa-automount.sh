@@ -1013,7 +1013,7 @@ rlPhaseEnd
 automountmap_show_001() {
 
 rlPhaseStartTest "automountmap_show_001: ipa automountmap-show LOCATION MAP"
-	ipa automountlocation del pune
+	ipa automountlocation-del pune
 
         # Setup for automountmap-show.
 	rlRun "ipa automountlocation-add pune"
