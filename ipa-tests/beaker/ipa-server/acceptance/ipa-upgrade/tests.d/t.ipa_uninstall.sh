@@ -147,10 +147,12 @@ ipa_uninstall_client()
 		;;
 	"CLIENT")
 		rlLog "Machine in recipe is CLIENT"
+		KinitAsAdmin
+		kdestroy
 		ipa_quick_uninstall
 
-		yum -y downgrade curl nss* openldap* libselinux* nspr* libcurl*
-		yum -y remove http*
+		rlRun "yum -y downgrade curl nss* openldap* libselinux* nspr* libcurl*"
+		rlRun "yum -y remove http*"
 
 		[ -n $CLIENT_IP ] && CLIENT=$(dig +short -x $CLIENT_IP|sed 's/\.$//g')
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.1' -m $CLIENT_IP"
