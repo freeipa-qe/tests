@@ -134,7 +134,8 @@ ipa_uninstall_client()
 		if [ "x$USEDNS" = "xyes" ]; then
 			rlRun "ipa host-del $CLIENT_S.$DOMAIN --updatedns"
 		else
-			rlRun "ipa host-del $CLIENT_S.$DOMAIN"
+			[ -n $CLIENT_IP ] && CLIENT=$(dig +short -x $CLIENT_IP|sed 's/\.$//g')
+			rlRun "ipa host-del $CLIENT"
 		fi
 			
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.2' -m $MASTER_IP"
