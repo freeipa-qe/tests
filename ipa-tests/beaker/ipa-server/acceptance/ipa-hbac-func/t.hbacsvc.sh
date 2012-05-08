@@ -684,7 +684,7 @@ hbacsvc_master_008() {
                 rlRun "ipa hbactest --user=$user8 --srchost=$CLIENT2 --host=$CLIENT --service=sshd | grep -i \"Access granted: False\""
 		# Source host validation has been depricated which caused the following test to fail, hence commenting it out.
                 # rlRun "ipa hbactest --user=$user8 --srchost=$CLIENT --host=$CLIENT --service=sshd | grep -i \"Access granted: False\""
-                rlRun "ipa hbactest --user=$user8 --srchost=$CLIENT2 --host=$CLIENT2 --service=sshd | grep -i \"Access granted: False\""
+                # rlRun "ipa hbactest --user=$user8 --srchost=$CLIENT2 --host=$CLIENT2 --service=sshd | grep -i \"Access granted: False\""
 
                 rlRun "ipa hbactest --user=$user8 --srchost=$CLIENT --host=$CLIENT2 --service=sshd --rule=rule8 | grep -Ex '(Access granted: True|  matched: rule8)'"
                 rlRun "ipa hbactest --user=$user8 --srchost=$CLIENT --host=$MASTER --service=sshd --rule=rule8 | grep -Ex '(Access granted: False|  notmatched: rule8)'"
@@ -1187,7 +1187,7 @@ hbacsvc_master_013() {
 		# Source host validation has been depricated which caused the following test to fail, hence commenting it out.
                 # rlRun "ipa hbactest --user=$user13 --srchost=$CLIENT --host=$CLIENT --service=sshd | grep -i \"Access granted: False\""
                 # rlRun "ipa hbactest --user=$user13 --srchost=$CLIENT2 --host=$CLIENT2 --service=sshd | grep -i \"Access granted: False\""
-                rlRun "ipa hbactest --user=$user13 --srchost=$CLIENT --host=$CLIENT --service=sshd | grep -i \"Access granted: False\""
+                # rlRun "ipa hbactest --user=$user13 --srchost=$CLIENT --host=$CLIENT --service=sshd | grep -i \"Access granted: False\""
 
                 rlRun "ipa hbactest --user=$user13 --srchost=$CLIENT2 --host=$CLIENT --service=sshd --rule=rule13 | grep -Ex '(Access granted: True|  matched: rule13)'"
                 rlRun "ipa hbactest --user=$user13 --srchost=$CLIENT --host=$MASTER --service=sshd --rule=rule13 | grep -Ex '(Access granted: False|  notmatched: rule13)'"
@@ -2648,7 +2648,8 @@ hbacsvc_master_bug772852() {
         rlPhaseStartTest "ipa-hbacsvc-772852: \"Unresolved rules in --rules\" error message is displayed even if the hbacrule is specified using the --rules option."
 
 		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-                rlRun "ssh_auth_success $user772852 testpw123@ipa.com $MASTER"
+		# Auth not required for this case, hence commenting the following line.
+                # rlRun "ssh_auth_success $user772852 testpw123@ipa.com $MASTER"
 
                 for i in {1000..1010}; do ipa hbacrule-add $i; done
                 rlRun "ipa config-show"

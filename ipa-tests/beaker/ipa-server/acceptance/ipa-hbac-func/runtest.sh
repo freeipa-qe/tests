@@ -303,7 +303,6 @@ rlJournalStart
                 rlRun "rhts-sync-set -s DONE_hbacsvc_client_bug766876 -m $BEAKERCLIENT"
 
         # hbacsvc_client_bug766876_2
-                rlRun "rhts-sync-block -s DONE_hbacsvc_master_bug766876_2 $BEAKERMASTER"
                 hbacsvc_client_bug766876_2
                 rlRun "rhts-sync-set -s DONE_hbacsvc_client_bug766876_2 -m $BEAKERCLIENT"
 
@@ -548,7 +547,6 @@ rlJournalStart
 		rlRun "rhts-sync-set -s DONE_hbacsvc_client2_bug766876 -m $BEAKERCLIENT2"
 
         # hbacsvc_client2_bug766876_2
-                rlRun "rhts-sync-block -s DONE_hbacsvc_master_bug766876_2 $BEAKERMASTER"
                 hbacsvc_client2_bug766876_2
                 rlRun "rhts-sync-set -s DONE_hbacsvc_client2_bug766876_2 -m $BEAKERCLIENT2"
 
