@@ -2735,8 +2735,10 @@ hbacsvc_client_bug766876_2() {
         rlPhaseStartTest "ipa-hbacsvc-client-bug766876_2: ipa_hbac_support_srchost is set to true - Case 2"
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+
                 sleep 5
-		rlRun "sed -i '2iipa_hbac_support_srchost = true' /etc/sssd/sssd.conf"
+		sed -i '2iipa_hbac_support_srchost = true' /etc/sssd/sssd.conf
+		rlRun "cat /etc/sssd/sssd.conf"
 		rlRun "service sssd restart"
 		rlLog "Verifies https://bugzilla.redhat.com/show_bug.cgi?id=798317"
 
@@ -2758,7 +2760,8 @@ hbacsvc_client2_bug766876_2() {
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 sleep 5
-		rlRun "sed -i '2iipa_hbac_support_srchost = true' /etc/sssd/sssd.conf"
+		sed -i '2iipa_hbac_support_srchost = true' /etc/sssd/sssd.conf
+		rlRun "cat /etc/sssd/sssd.conf"
 		rlRun "service sssd restart"
 
                 rlRun "getent -s sss passwd user766876"
