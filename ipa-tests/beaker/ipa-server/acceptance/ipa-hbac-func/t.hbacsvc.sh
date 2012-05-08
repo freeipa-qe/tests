@@ -2759,7 +2759,7 @@ hbacsvc_client2_bug766876_2() {
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 sleep 5
 		rlRun "sed -i '2iipa_hbac_support_srchost = true' /etc/sssd/sssd.conf"
-		rlRun "service sssd retart"
+		rlRun "service sssd restart"
 
                 rlRun "getent -s sss passwd user766876"
                 rlRun "ssh_auth_failure user766876 testpw123@ipa.com $MASTER"
