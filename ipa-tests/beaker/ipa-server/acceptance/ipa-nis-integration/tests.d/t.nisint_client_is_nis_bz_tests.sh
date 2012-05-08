@@ -43,6 +43,49 @@ nisint_client_is_nis_bz_tests()
 	echo "$FUNCNAME"
 }
 
+nisint_bz_766320()
+{
+	rlPhaseStartTest "nisint_bz_766320: Hang possible in schema compat when calling in a transaction"
+	case "$MYROLE" in
+	"MASTER")
+		rlLog "Machine in recipe is IPAMASTER"
+		KinitAsAdmin
+		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
+		cat > /tmp/bz766320_hang.ldif <<-EOF
+		dn: cn=MemberOf Plugin,cn=plugins,cn=config
+		changetype: modify
+		replace: nsslapd-plugintype
+		nsslapd-plugintype: betxnpostoperation
+		EOF
+		rlRun "ldapmodify -D \"$ROOTDN\" -w \"$ROOTDNPWD\" -f /tmp/bz766320_hang.ldif"
+
+		rlRun "ipa group-add-member --users=admin editors"
+		if [ $(ipa group-show editors --raw|grep "uid=admin,cn=users,cn=accounts,$BASEDN"|wc -l) -gt 0 ]; then
+			rlRun "ipa group-show editors --raw"
+			rlRun "ipactl status"
+			rlPass "BZ 766320 not found.  apparently the ipa command didnt hang"
+		fi
+
+		[ -f $tmpout ] && rm -f $tmpout
+		rlRun "rhts-sync-set -s '$FUNCNAME' -m $MASTER_IP"
+		;;
+	"NISMASTER")
+		rlLog "Machine in recipe is NISMASTER"
+		rlLog "rhts-sync-block -s '$FUNCNAME' $MASTER_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME' $MASTER_IP"
+		;;
+	"NISCLIENT")
+		rlLog "Machine in recipe is NISCLIENT"
+		rlLog "rhts-sync-block -s '$FUNCNAME' $MASTER_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME' $MASTER_IP"
+		;;
+	*)
+		rlLog "Machine in recipe is not a known ROLE"
+		;;
+	esac
+	rlPhaseEnd
+}
+		
 example_bz_788625()
 {
 	rlLog "This is just an EXAMPLE!!!"
