@@ -2737,7 +2737,7 @@ hbacsvc_client_bug766876_2() {
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 sleep 5
 		rlRun "sed -i '2iipa_hbac_support_srchost = true' /etc/sssd/sssd.conf"
-		rlRun "service sssd retart"
+		rlRun "service sssd restart"
 		rlLog "Verifies https://bugzilla.redhat.com/show_bug.cgi?id=798317"
 
                 rlRun "getent -s sss passwd user766876"
