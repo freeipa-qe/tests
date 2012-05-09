@@ -235,11 +235,16 @@ rlPhaseStartTest "bug800537: Sudo commands with special characters cannot be rem
         rlRun "ipa sudocmdgroup-remove-member b-group --sudocmds=\"/bin/ls /tmp/test\ dir\""
         rlRun "ipa sudocmdgroup-del b-group"
 
-        rlRun "ipa sudocmd-add \"/bin/ls, /bin/cp\""
+        rlRun "ipa sudocmd-add \"/bin/ls\""
         rlRun "ipa sudocmdgroup-add c-group --desc=g3"
 	rlRun "ipa sudocmdgroup-add-member c-group --sudocmds=\"/bin/ls, /bin/cp\""
 	rlRun "ipa sudocmdgroup-remove-member c-group --sudocmds=\"/bin/ls, /bin/cp\""
 	rlRun "ipa sudocmdgroup-del c-group"
+
+	rlRun "ipa sudocmd-del \"/bin/ls\""
+	rlRun "ipa sudocmd-del \"/bin/cp\""
+	rlRun "ipa sudocmd-del \"/bin/ls /tmp/test\ dir\""
+	rlRun "ipa sudocmd-del \"/bin/ls /lost+found\""
 	
 rlPhaseEnd
 }
