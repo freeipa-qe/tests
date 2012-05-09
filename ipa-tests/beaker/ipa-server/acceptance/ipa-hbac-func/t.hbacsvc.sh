@@ -2737,12 +2737,15 @@ hbacsvc_client_bug766876_2() {
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 
                 sleep 5
-		sed -i '2iipa_hbac_support_srchost = true' /etc/sssd/sssd.conf
 		rlRun "cat /etc/sssd/sssd.conf"
+		sed -i '6iipa_hbac_support_srchost = true' /etc/sssd/sssd.conf
+		rlRun "cat /etc/sssd/sssd.conf"
+		rlRun "rm -fr /var/lib/sss/db/cache_*" 0 "Clearing cache"
 		rlRun "service sssd restart"
+		sleep 5
+
 		rlLog "Verifies https://bugzilla.redhat.com/show_bug.cgi?id=798317"
 
-                rlRun "getent -s sss passwd user766876"
                 rlRun "ssh_auth_success user766876 testpw123@ipa.com $MASTER"
 
                 # Reverting back - sssd.conf
@@ -2760,11 +2763,13 @@ hbacsvc_client2_bug766876_2() {
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 sleep 5
-		sed -i '2iipa_hbac_support_srchost = true' /etc/sssd/sssd.conf
 		rlRun "cat /etc/sssd/sssd.conf"
+		sed -i '6iipa_hbac_support_srchost = true' /etc/sssd/sssd.conf
+		rlRun "cat /etc/sssd/sssd.conf"
+		rlRun "rm -fr /var/lib/sss/db/cache_*" 0 "Clearing cache"
 		rlRun "service sssd restart"
+		sleep 5
 
-                rlRun "getent -s sss passwd user766876"
                 rlRun "ssh_auth_failure user766876 testpw123@ipa.com $MASTER"
 
 		# Reverting back - sssd.conf
