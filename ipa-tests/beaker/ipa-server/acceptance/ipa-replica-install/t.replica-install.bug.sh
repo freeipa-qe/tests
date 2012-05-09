@@ -86,3 +86,39 @@ replicaBugCheck_bz784696()
 	rlPhaseEnd
 }
 
+
+replicaBugCheck_bz769545()
+{
+	rlPhaseStartTest "replicaBugCheck_bz769545: ipa-replica-prepare fails when minssf is set to 56 "
+		local tmpout=/tmp/errormsg.out
+		rlLog "needs to be run on MASTER but, might work on REPLICA"
+		rlLog "Adding test hostname to /etc/hosts for prep"
+		rlRun "echo \"2.3.4.5 bz769545.$DOMAIN bz769545\" >> /etc/hosts" 
+		rlLog "Creating ldif file to modify nsslapd-minssf to a value of 56"
+cat > /tmp/bz769545.ldif <<-EOF
+dn: cn=config
+changetype: modify
+replace: nsslapd-minssf
+nsslapd-minssf: 56
+EOF
+		rlRun "ldapmodify -D \"$ROOTDN\" -w \"$ROOTDNPWD\" -f /tmp/bz769545.ldif"
+		rlLog "Executing:  ipa-replica-prepare -p \"$ADMINPW\" bz769545.$DOMAIN"
+		rlRun "ipa-replica-prepare -p \"$ADMINPW\" bz769545.$DOMAIN > $tmpout 2>&1"
+		rlRun "cat $tmpout"
+		if [ $(grep "preparation of replica failed: Server is unwilling to perform: Minimum SSF not met" $tmpout|wc -l) -gt 0 ]; then
+			rlFail "BZ 769545 found...ipa-replica-prepare fails when minssf is set to 56"
+		elif [ -f /var/lib/ipa/replica-info-bz769545.$DOMAIN.gpg ]; then
+			rlPass "BZ 769545 not found...ipa-replica-prepare worked with minssf set to 56"
+		else
+			rlFail "BZ 769545 error message not found but, the replica gpg file not created"
+		fi
+		rlLog "putting minssf back to 0"
+		rlRun "service dirsrv stop"
+		INSTANCE=$(echo $RELM|sed 's/\./-/g')
+		rlRun "sed -i 's/nsslapd-minssf: 56/nsslapd-minssf: 0/' /etc/dirsrv/slapd-$INSTANCE/dse.ldif"
+		rlRun "service dirsrv start"
+		rlLog "removing fake host from /etc/hosts"
+		rlRun "sed -i '/bz769545/d' /etc/hosts"
+	rlPhaseEnd
+}
+

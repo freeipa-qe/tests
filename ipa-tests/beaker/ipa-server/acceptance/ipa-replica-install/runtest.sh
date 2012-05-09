@@ -127,6 +127,8 @@ rlJournalStart
 
 			rhts-sync-set -s READY_REPLICA2 $BEAKERMASTER
 			rhts-sync-block -s DONE_REPLICA2 $BEAKERSLAVE
+	
+			replicaBugCheck_bz769545
 
 		rlPhaseEnd
 
