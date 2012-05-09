@@ -116,6 +116,10 @@ upgrade_slave()
 
 		rlRun "yum clean all"
 		rlRun "yum -y update 'ipa*'"	
+
+		rlLog "Running replica force-sync"
+		rlRun "ipa-replica-manage force-sync --from=$MASTER"
+
 		#rlRun "ipactl restart" ### IS THIS REALLY NEEDED?  BZ 766687?
 		rlRun "rpm -q ipa-server 389-ds-base bind bind-dyndb-ldap pki-common sssd"
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $SLAVE_IP"

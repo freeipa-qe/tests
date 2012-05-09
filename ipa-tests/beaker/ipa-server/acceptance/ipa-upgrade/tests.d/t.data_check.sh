@@ -89,7 +89,13 @@ data_check()
 		
 		sleep 10 # delay before starting tests...
 
+		# check replica update schedule 
+		rlLog "CHECKING: ldapsearch -x -h $MASTER_IP -D \"$ROOTDN\" -w \"$ROOTDNPWD\" -b \"cn=mapping tree,cn=config\"|grep 'nsDS5ReplicaUpdateSchedule'"
+		ldapsearch -x -h $MASTER_IP -D "$ROOTDN" -w "$ROOTDNPWD" -b "cn=mapping tree,cn=config"|grep 'nsDS5ReplicaUpdateSchedule' > /tmp/tmprus.out
+		rlRun "cat /tmp/rus.out"
+
 		# check  users
+		rlRun "ipa user-find"
 		rlRun "ipa user-show ${user[1]}" 
 		rlRun "ipa user-show ${user[2]}" 
 		rlRun "id ${user[1]}"
@@ -161,6 +167,11 @@ data_check()
 		rlLog "Check Selfservice"
 		rlRun "ipa selfservice-show selfservice_update_gecos"
 		rlRun "getent -s sss passwd ${user[1]}|grep ${user[1]}"
+
+		# grab http error log in case it's needed
+		DATE=$(date +%Y%m%d-%H%M%S)
+		cp -f /var/log/ipaserver-uninstall.log /var/log/ipaserver-uninstall.log.$DATE
+		rhts-submit-log -l /var/log/ipaserver-uninstall.log.$DATE
 
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.1' -m $TARGET_IP"
 	rlPhaseEnd	
