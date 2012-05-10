@@ -113,12 +113,14 @@ public class PasswordPolicyTests extends SahiTestScript{
 		Assert.assertTrue(browser.span(biggerThanMax_errorMsg).exists(),"data range check: bigger than max");
 		
 		// Scenario: empty policy name
+		String emptyName_errorMsg="Required field";
 		browser.textbox("cn").click();
 		browser.select("list").choose(""); 
 		browser.textbox("cospriority").setValue("100");
 		browser.button("Add").click();
-		Assert.assertTrue(browser.div("error_dialog").exists(),"select empty string should trigger error dialog box");
-		browser.button("Cancel").click(); // click away the ipa error dialog box
+		Assert.assertTrue(browser.span(emptyName_errorMsg).exists(),"Group name check");
+		//Assert.assertTrue(browser.div("error_dialog").exists(),"select empty string should trigger error dialog box");
+		//browser.button("Cancel").click(); // click away the ipa error dialog box
 		browser.button("Cancel").click(); // click away the add policy dialog box, end of test
 	}//addPolicy_NegativeTest
 
