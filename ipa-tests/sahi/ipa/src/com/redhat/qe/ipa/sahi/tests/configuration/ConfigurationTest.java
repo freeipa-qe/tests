@@ -50,7 +50,7 @@ public class ConfigurationTest extends SahiTestScript{
 		//add users
 		sahiTasks.navigateTo(commonTasks.userPage, true);
 		String testUser="user";
-		for (int i=0; i<20; i++) {
+		for (int i=0; i<15; i++) {
 			if (!sahiTasks.link(testUser+i).exists())
 				UserTasks.createUser(sahiTasks, testUser+i, testUser+i, testUser+i, "Add");
 		}		
@@ -58,7 +58,7 @@ public class ConfigurationTest extends SahiTestScript{
 		//add hbacrules
 		sahiTasks.navigateTo(commonTasks.hbacPage, true);
 	    String testHBACRule="rule";
-	    for (int i=0; i<20; i++) {
+	    for (int i=0; i<15; i++) {
 			if (!sahiTasks.link(testHBACRule+i).exists())
 				HBACTasks.addHBACRule(sahiTasks, testHBACRule+i, "Add");
 	    }
@@ -99,7 +99,7 @@ public class ConfigurationTest extends SahiTestScript{
 	public void testConfigSearchOptionSizeLimitValue(String testName, String value, String expectedRows) throws Exception {
 			ConfigurationTasks.setConfigValue(sahiTasks, "ipasearchrecordslimit", value);
 			ConfigurationTasks.verifyConfigValue(sahiTasks, "ipasearchrecordslimit", value);
-			ConfigurationTasks.verifySearchSizeLimitFunctional(sahiTasks, commonTasks, value, expectedRows);
+		//	ConfigurationTasks.verifySearchSizeLimitFunctional(sahiTasks, commonTasks, value, expectedRows);
 			//set search size limit back to its default
 			ConfigurationTasks.setConfigValue(sahiTasks, "ipasearchrecordslimit", "100");
 	} 
@@ -346,7 +346,7 @@ public class ConfigurationTest extends SahiTestScript{
 		//clean users and rules added
 		sahiTasks.navigateTo(commonTasks.userPage, true);
 		String testUser="user";
-		for (int i=0; i<20; i++) {
+		for (int i=0; i<15; i++) {
 			if (sahiTasks.link(testUser+i).exists())
 				UserTasks.deleteUser(sahiTasks, testUser+i);
 		}	
@@ -356,7 +356,7 @@ public class ConfigurationTest extends SahiTestScript{
 		
 		sahiTasks.navigateTo(commonTasks.hbacPage, true);
 	    String testHBACRule="rule";
-	    for (int i=0; i<20; i++) {
+	    for (int i=0; i<15; i++) {
 			if (sahiTasks.link(testHBACRule+i).exists())
 				HBACTasks.deleteHBAC(sahiTasks, testHBACRule+i, "Delete");
 	    }
@@ -397,9 +397,8 @@ public class ConfigurationTest extends SahiTestScript{
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
         //										testname			cn   		expectedRows				
-		ll.add(Arrays.asList(new Object[]{ "sizelimit_negative",	"-1",		"21"	} ));
-		ll.add(Arrays.asList(new Object[]{ "sizelimit_blank",		"",			"21"      } ));
-		ll.add(Arrays.asList(new Object[]{ "sizelimit_zero",		"0",		"21"      } ));
+		ll.add(Arrays.asList(new Object[]{ "sizelimit_negative",	"-1",		"16"	} ));
+		ll.add(Arrays.asList(new Object[]{ "sizelimit_zero",		"0",		"16"      } ));
 		ll.add(Arrays.asList(new Object[]{ "sizelimit_ten",			"10",		"10"      } ));
 		
 		
@@ -419,7 +418,7 @@ public class ConfigurationTest extends SahiTestScript{
         //										testname					cn   		expectedError1											expectedError2			
 		ll.add(Arrays.asList(new Object[]{ "sizelimit_letter",				"abc",		"Input form contains invalid or missing values.",		"Must be an integer"		} ));
 		ll.add(Arrays.asList(new Object[]{ "sizelimit_space",				" 10",      "Input form contains invalid or missing values.",		"Must be an integer"		} ));
-				
+		ll.add(Arrays.asList(new Object[]{ "sizelimit_blank",	           	"",		    "Input form contains invalid or missing values.",		"Must be an integer"		} ));
 		
 		return ll;	
 	}
@@ -437,7 +436,6 @@ public class ConfigurationTest extends SahiTestScript{
 		
         //										testname			cn   						
 		ll.add(Arrays.asList(new Object[]{ "timelimit_negative",	"-1"	} ));
-		ll.add(Arrays.asList(new Object[]{ "timelimit_blank",		""     	} ));
 		ll.add(Arrays.asList(new Object[]{ "timelimit_ten",			"10"   	} ));
 		
 		
@@ -457,9 +455,11 @@ public class ConfigurationTest extends SahiTestScript{
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
         //										testname					cn   		expectedError1															expectedError2			
-		ll.add(Arrays.asList(new Object[]{ "timelimit_letter",				"abc",		"Input form contains invalid or missing values.",						"Must be an integer"		} ));
-		ll.add(Arrays.asList(new Object[]{ "timelimit_space",				" 10",      "Input form contains invalid or missing values.",						"Must be an integer"		} ));
 		ll.add(Arrays.asList(new Object[]{ "timelimit_zero",				"0",      	"invalid 'ipasearchtimelimit': searchtimelimit must be -1 or > 1.",		""		} ));
+		ll.add(Arrays.asList(new Object[]{ "timelimit_letter",				"abc",		"Input form contains invalid or missing values.",						"Must be an integer"		} ));
+		ll.add(Arrays.asList(new Object[]{ "timelimit_blank",		        "",         "Input form contains invalid or missing values.",						"Must be an integer"		} ));
+		ll.add(Arrays.asList(new Object[]{ "timelimit_space",				" 10",      "Input form contains invalid or missing values.",						"Must be an integer"		} ));
+		
 				
 		
 		return ll;	
@@ -496,7 +496,7 @@ public class ConfigurationTest extends SahiTestScript{
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
         //										testname						cn   		expectedError1				
-		ll.add(Arrays.asList(new Object[]{ "usersearchfield_blank",				"",			"an internal error has occurred"														} ));
+		ll.add(Arrays.asList(new Object[]{ "usersearchfield_blank",				"",			"Input form contains invalid or missing values." } ));
 		ll.add(Arrays.asList(new Object[]{ "usersearchfield_trailing_space",	"uid ",     "invalid 'usersearch': Leading and trailing spaces are not allowed"	} ));
 		ll.add(Arrays.asList(new Object[]{ "usersearchfield_leading_space",		" uid",     "invalid 'usersearch': Leading and trailing spaces are not allowed"	} ));
 		ll.add(Arrays.asList(new Object[]{ "usersearchfield_notallowed",		"abc",     	"invalid 'ipausersearchfields': attribute \"abc\" not allowed"	} ));
@@ -576,7 +576,6 @@ public class ConfigurationTest extends SahiTestScript{
         //										testname					homedir						uid			
 		ll.add(Arrays.asList(new Object[]{ "userhomedir_new",				"/home/users"					} ));
 		ll.add(Arrays.asList(new Object[]{ "userhomedir_specialchar",		"^&/*)(h*o@m%e/!u^s:e~r`s"		} ));		
-		ll.add(Arrays.asList(new Object[]{ "userhomedir_blank",				""							} ));
 		ll.add(Arrays.asList(new Object[]{ "userhomedir_numbers",			"1/home2/3users4"					} ));
 		ll.add(Arrays.asList(new Object[]{ "userhomedir_space_inbetween",	"12 34"						} ));
 		
@@ -599,8 +598,8 @@ public class ConfigurationTest extends SahiTestScript{
         //										testname						homedir   			expectedError																} ));
 		ll.add(Arrays.asList(new Object[]{ "userhomedir_trailing_space",		"/home ",     "invalid 'homedirectory': Leading and trailing spaces are not allowed"	} ));
 		ll.add(Arrays.asList(new Object[]{ "userhomedir_leading_space",			" /home",     "invalid 'homedirectory': Leading and trailing spaces are not allowed"	} ));
-			
-		return ll;	
+		ll.add(Arrays.asList(new Object[]{ "userhomedir_blank",				       "",	      "Input form contains invalid or missing values." } ));
+		return ll;	    
 	}
 	
 	/*
@@ -619,7 +618,8 @@ public class ConfigurationTest extends SahiTestScript{
 		//TODO: nkrishnan: Check the expected length, is set to blank
 		// doc at http://docs.redhat.com/docs/en-US/Red_Hat_Enterprise_Linux/6/html/Enterprise_Identity_Management_Guide/chap-Enterprise_Identity_Management_Guide-Configuring_IPA_Users_and_Groups.html#sect-Enterprise_Identity_Management_Guide-Configuring_IPA_Users-Specifying_Default_User_Settings
 		// indicates default is 8.
-		ll.add(Arrays.asList(new Object[]{ "usernamelength_blank",				"",						"abcdefgh",		"abcdefghi"					} ));
+		//TODO: mvarun: A dialogue box pops up on the browser when expected length, is set to blank. So it has been added to  invalid test.
+		//ll.add(Arrays.asList(new Object[]{ "usernamelength_blank",				"",						"abcdefgh",		"abcdefghi"					} ));
 		
 		
 		return ll;	
@@ -642,7 +642,7 @@ public class ConfigurationTest extends SahiTestScript{
 		ll.add(Arrays.asList(new Object[]{ "usernamelength_letters",			"abc", 				"Input form contains invalid or missing values.", 	"Must be an integer"			} ));
 		ll.add(Arrays.asList(new Object[]{ "usernamelength_space_inbetween",	"1 2", 				"Input form contains invalid or missing values.", 	"Must be an integer"			} ));
 		ll.add(Arrays.asList(new Object[]{ "usernamelength_max",				"2147483648", 		"Input form contains invalid or missing values.", 	"Maximum value is 2147483647"			} ));
-		
+		ll.add(Arrays.asList(new Object[]{ "usernamelength_blank",				"",                 "Input form contains invalid or missing values.",   "Must be an integer" } ));
 		
 		return ll;	
 	}
@@ -661,7 +661,7 @@ public class ConfigurationTest extends SahiTestScript{
 		
         //										testname					pwd exp			
 		ll.add(Arrays.asList(new Object[]{ "userpwdexpnotify_new",			"5"		} ));	
-		ll.add(Arrays.asList(new Object[]{ "userpwdexpnotify_blank",		""		} ));
+		
 		
 		
 		return ll;	
@@ -685,7 +685,7 @@ public class ConfigurationTest extends SahiTestScript{
 		ll.add(Arrays.asList(new Object[]{ "userpwdexpnotify_letters",			"abc", 				"Input form contains invalid or missing values.", 	"Must be an integer"			} ));
 		ll.add(Arrays.asList(new Object[]{ "userpwdexpnotify_space_inbetween",	"1 2", 				"Input form contains invalid or missing values.", 	"Must be an integer"			} ));
 		ll.add(Arrays.asList(new Object[]{ "userpwdexpnotify_max",				"2147483648", 		"Input form contains invalid or missing values.", 	"Maximum value is 2147483647"			} ));
-		
+		ll.add(Arrays.asList(new Object[]{ "userpwdexpnotify_blank",	      	"", 	            "Input form contains invalid or missing values.",   "Must be an integer"} ));
 		
 		return ll;	
 	}
@@ -725,6 +725,7 @@ public class ConfigurationTest extends SahiTestScript{
         //										testname					cn   			searchValue		expectedGroup				
 		ll.add(Arrays.asList(new Object[]{ "groupsearchfield_existing",		"cn",			"group1",		"group1"			} ));
 		//TODO: nkrishnan: what is another group attribute to use for searching??
+		// mvarun: there is no another group attribute to use for searching.
 		//ll.add(Arrays.asList(new Object[]{ "groupsearchfield_new",			"postalcode",	"01234",		"user0"			} ));				
 		
 		return ll;	
@@ -742,7 +743,7 @@ public class ConfigurationTest extends SahiTestScript{
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
         //										testname						cn   		expectedError1				
-		ll.add(Arrays.asList(new Object[]{ "groupsearchfield_blank",			"",			"an internal error has occurred"														} ));
+		ll.add(Arrays.asList(new Object[]{ "groupsearchfield_blank",			"",			"Input form contains invalid or missing values."														} ));
 		ll.add(Arrays.asList(new Object[]{ "groupsearchfield_trailing_space",	"uid ",     "invalid 'groupsearch': Leading and trailing spaces are not allowed"	} ));
 		ll.add(Arrays.asList(new Object[]{ "groupsearchfield_leading_space",	" uid",     "invalid 'groupsearch': Leading and trailing spaces are not allowed"	} ));
 		ll.add(Arrays.asList(new Object[]{ "groupsearchfield_notallowed",		"abc",     	"invalid 'ipagroupsearchfields': attribute \"abc\" not allowed"	} ));
