@@ -920,7 +920,9 @@ rlPhaseStartTest "sudorule-disable_func001: Disabling sudorule and verifying fro
 	rlRun "ipa sudorule-show sudorule1"
         rlRun "ipa sudorule-disable sudorule1"
         rlRun "sudo_list user1"
-        rlAssertGrep "user1 is not in the sudoers file.  This incident will be reported." "$sudoout"
+	rlAssertGrep "User user1 may run the following commands on this host" "$sudoout"
+	rlAssertGrep "(root) /bin/date, /bin/touch, /bin/uname" "$sudoout"
+        #rlAssertGrep "user1 is not in the sudoers file.  This incident will be reported." "$sudoout"
 
         rlRun "rm -fr $sudoout"
 
