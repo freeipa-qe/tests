@@ -2742,7 +2742,7 @@ hbacsvc_client_bug766876_2() {
 		rlRun "cat /etc/sssd/sssd.conf"
 		rlRun "rm -fr /var/lib/sss/db/cache_*" 0 "Clearing cache"
 		rlRun "service sssd restart"
-		sleep 10
+		sleep 20
 
 		rlLog "Verifies https://bugzilla.redhat.com/show_bug.cgi?id=798317"
 
@@ -2768,7 +2768,7 @@ hbacsvc_client2_bug766876_2() {
 		rlRun "cat /etc/sssd/sssd.conf"
 		rlRun "rm -fr /var/lib/sss/db/cache_*" 0 "Clearing cache"
 		rlRun "service sssd restart"
-		sleep 10
+		sleep 20
 
                 rlRun "ssh_auth_failure user766876 testpw123@ipa.com $MASTER"
 
