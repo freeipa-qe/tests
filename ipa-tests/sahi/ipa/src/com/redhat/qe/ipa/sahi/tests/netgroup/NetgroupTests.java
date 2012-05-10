@@ -339,7 +339,7 @@ public class NetgroupTests extends SahiTestScript{
 		ll.add(Arrays.asList(new Object[]{ 		"addnetgroup_mixedcase",		"NewNetGroup",		"this is a new netgroup",	 "Add" } ));  
 		ll.add(Arrays.asList(new Object[]{ 		"addnetgroup_longname",			"thisisanetgroupwithaveryveryveryveryveryveryveryveryverylongname",		"Net group with long name",	 "Add" } ));
 		ll.add(Arrays.asList(new Object[]{ 		"addnetgroup_longdesc",			"longdescription",		"thisisanetgroupwithaveryveryveryveryveryveryveryveryveryveryveryveryveryverylongdescription",	 "Add" } ));
-		ll.add(Arrays.asList(new Object[]{ 		"addnetgroup_bz815481",			"a",				"this is a new netgroup with one letter name",	 "Add" } ));  
+	//	ll.add(Arrays.asList(new Object[]{ 		"addnetgroup_bz815481",			"a",				"this is a new netgroup with one letter name",	 "Add" } ));  
 		return ll;	
 	}
 	
