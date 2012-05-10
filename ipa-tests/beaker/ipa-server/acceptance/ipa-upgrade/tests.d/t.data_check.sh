@@ -91,8 +91,8 @@ data_check()
 
 		# check replica update schedule 
 		rlLog "CHECKING: ldapsearch -x -h $MASTER_IP -D \"$ROOTDN\" -w \"$ROOTDNPWD\" -b \"cn=mapping tree,cn=config\"|grep 'nsDS5ReplicaUpdateSchedule'"
-		ldapsearch -x -h $MASTER_IP -D "$ROOTDN" -w "$ROOTDNPWD" -b "cn=mapping tree,cn=config"|grep 'nsDS5ReplicaUpdateSchedule' > /tmp/tmprus.out
-		rlRun "cat /tmp/rus.out"
+		ldapsearch -x -h $MASTER_IP -D "$ROOTDN" -w "$ROOTDNPWD" -b "cn=mapping tree,cn=config"|grep 'nsDS5ReplicaUpdateSchedule' > /tmp/tmprus.out 2>&1
+		rlRun "cat /tmp/tmprus.out"
 
 		# check  users
 		rlRun "ipa user-find"
