@@ -84,11 +84,12 @@ dm_pw="DSSecret123"
 master_pw="MasterSecret123"
 
 # cert check
-selfsign_cert="type=NSSDB,location=/etc/dirsrv/slapd-$RELM,nickname=Server-Cert,token=NSS Certificate DB type=NSSDB,location=/etc/httpd/alias,nickname=Server-Cert,token=NSS Certificate DB"
-selfsign_issuer="CN=TESTRELM Certificate Authority CN=TESTRELM Certificate Authority"
+RELM_withdash=`echo $RELM | sed 's/\./-/g'`
+selfsign_cert="type=NSSDB,location=/etc/dirsrv/slapd-$RELM_withdash,nickname=Server-Cert,token=NSS Certificate DB type=NSSDB,location=/etc/httpd/alias,nickname=Server-Cert,token=NSS Certificate DB"
+selfsign_issuer="CN=$RELM Certificate Authority CN=$RELM Certificate Authority"
 
 #zonemgr check
-admin_email="root.$HOSTNAME."
+admin_email="hostmaster.$DOMAIN."
 non_default_admin_email="test_admin@$MYHOSTNAME"
 non_default_admin_email_zonemgr="test_admin.$MYHOSTNAME."
 special_char_in_admin_email="TÃªko@redhat.com"

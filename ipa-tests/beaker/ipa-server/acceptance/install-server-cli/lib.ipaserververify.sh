@@ -486,7 +486,7 @@ verify_useradd()
 {
 
    # add users without specifying uid....uids will be assigned within the range used when installed.
-   for x in {1..8}
+   for x in {1..9}
    do
      rlLog "EXECUTING: ipa user-add --first=${testuser}$x --last=${testuser}$x ${testuser}$x"
      rlRun "ipa user-add --first=${testuser}$x --last=${testuser}$x ${testuser}$x" 0 " Added new user within given uid range"
@@ -498,7 +498,7 @@ verify_useradd()
    rlRun "ipa user-add --first=${testuser}$largeuid --last=${testuser}$largeuid ${testuser}$largeuid --uid=$uidBeyondRange" 0 " Added new user outside uid range"
 
    # verify the users were added with expected uids
-   for y in {3..10}
+   for y in {3..9}
    do 
     assigneduid=$((idstart+$((y))))
      rlLog "EXECUTING: ipa user-find --uid=$assigneduid"
@@ -506,10 +506,10 @@ verify_useradd()
    done
   
    # verify the gids were also assigned within the given range
-   for z in {0..2}
+   for z in {3..5}
    do 
     assignedgid=$((idstart+$((z))))
-     rlLog "EXECUTING: ipa group-find --gid=$assignedgid"
+     rlLog "EXECUTING: ipa group-find --private --gid=$assignedgid"
      rlRun "ipa group-find --gid=$assignedgid" 0 "Verifying group with expected gid"
    done
 

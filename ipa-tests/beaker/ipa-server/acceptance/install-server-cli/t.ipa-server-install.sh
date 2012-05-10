@@ -96,7 +96,7 @@ ipaserverinstall()
 	
 
  
-#  --selfsign            Configure a self-signed CA instance rather than a dogtag CA
+  --selfsign            Configure a self-signed CA instance rather than a dogtag CA
     ipaserverinstall_selfsign
 # This should be last test - then run IPA Functional tests against this server
 
@@ -348,7 +348,7 @@ ipaserverinstall_withinvalidzonemgr()
         local tmpout=$TmpDir/ipaserverinstall_invalidzonemgr.out
         command="ipa-server-install --setup-dns --forwarder=$DNSFORWARD  -r $RELM -p $ADMINPW -P $ADMINPW -a $ADMINPW --zonemgr=$special_char_in_admin_email -U"
         expmsg="invalid 'zonemgr': The character"
-        qaRun "$command" "$tmpout" 1 "$expmsg" "Verify expected error message for IPA Install with invalid zonemgr"  debug
+        qaRun "$command" "$tmpout" 2 "$expmsg" "Verify expected error message for IPA Install with invalid zonemgr"  debug
     rlPhaseEnd
 }
 #####################################################
@@ -560,7 +560,9 @@ verify_install()
 {
     verify_kinit $1
     verify_ipactl_status $1 $2 $3 
-    verify_sssd $1 $3
+    if [ "$1" == "true" ] ; then
+      verify_sssd $1 $3
+    fi
     verify_default $1 $3
     verify_ntp $1 $3
     verify_zonemgr $1 $2 $3
