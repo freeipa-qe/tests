@@ -552,7 +552,7 @@ public class HostTests extends SahiTestScript{
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
         //										testname					hostname     hostdomain    	ipadr   			expectedError
-		ll.add(Arrays.asList(new Object[]{ "add_host_dash",				    "test-", 	  domain,    	"",					"invalid 'hostname': invalid domain-name: only letters, numbers, and - are allowed. - must not be the DNS label character" } ));
+		ll.add(Arrays.asList(new Object[]{ "add_host_dash",				    "test-", 	  domain,    	"",					"invalid 'hostname': invalid domain-name: only letters, numbers, and - are allowed. DNS label may not start or end with -" } ));
 		ll.add(Arrays.asList(new Object[]{ "missing_hostname",				"", 	 	 domain,		"",					"Required field"} ));
 	    ll.add(Arrays.asList(new Object[]{ "missing_domainname",			"mytest.", 	 "",			"",					"Required field"} ));
 		ll.add(Arrays.asList(new Object[]{ "Invalid_ipadr_alpha_chars",		"test",		 domain, 		"null",				"Not a valid IP address"	} ));
@@ -561,8 +561,8 @@ public class HostTests extends SahiTestScript{
 		ll.add(Arrays.asList(new Object[]{ "Invalid_ipadr_special_chars",   "test",		 domain, 		"~.&.#.^",			"Not a valid IP address"	} ));
 		ll.add(Arrays.asList(new Object[]{ "duplicate_hostname",			testhost,	     domain, 		"",					"host with name \""+ testhost + "." + domain + "\" already exists"	} ));
 		ll.add(Arrays.asList(new Object[]{ "begining_space_hostname",		" " + "testing",  domain,		"",				"invalid 'hostname': Leading and trailing spaces are not allowed"} ));
-		ll.add(Arrays.asList(new Object[]{ "ending_space_hostname",			"testing" + " ",  domain,		"",				"invalid 'hostname': invalid domain-name: only letters, numbers, and - are allowed. - must not be the DNS label character"} ));
-		ll.add(Arrays.asList(new Object[]{ "add_host_tilde",	       		"test~", 	     domain,		"",					"invalid 'hostname': invalid domain-name: only letters, numbers, and - are allowed. - must not be the DNS label character"} ));
+		ll.add(Arrays.asList(new Object[]{ "ending_space_hostname",			"testing" + " ",  domain,		"",				"invalid 'hostname': invalid domain-name: only letters, numbers, and - are allowed. DNS label may not start or end with -"} ));
+		ll.add(Arrays.asList(new Object[]{ "add_host_tilde",	       		"test~", 	     domain,		"",					"invalid 'hostname': invalid domain-name: only letters, numbers, and - are allowed. DNS label may not start or end with -"} ));
 		return ll;	
 	}
 	
