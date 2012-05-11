@@ -573,6 +573,14 @@ installSlave_nodnssshfp() {
         else
 
                 rlRun "cat /etc/hosts"
+				rlLog "delete sshfp dns records before install to make sure this is clean"
+				ORIGIFS="$IFS"
+				IFS=$'\n'	
+				for SSHFPREC in $(dig +short @$MASTERIP $hostname_s.$DOMAIN sshfp); do
+					IFS="$ORIGIFS"
+					remoteExec root $MASTERIP "ipa dnsrecord-del testrelm.com $hostname_s --sshfp-rec=\\\"$SSHFPREC\\\""
+				done
+
 
                 echo "ipa-replica-install -U --setup-dns --no-forwarders --no-dns-sshfp --skip-conncheck -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg" > /dev/shm/replica-install.bash
                 chmod 755 /dev/shm/replica-install.bash
