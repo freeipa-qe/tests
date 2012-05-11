@@ -49,9 +49,25 @@ done
 startDate=`date "+%F %r"`
 satrtEpoch=`date "+%s"`
 
-[ -n "$MASTER" ] && export MASTER_IP=$(dig +short $MASTER) MASTER_S=$(echo $MASTER|cut -f1 -d.)
-[ -n "$SLAVE" ]  && export SLAVE_IP=$(dig +short $SLAVE)   SLAVE_S=$(echo  $SLAVE |cut -f1 -d.)
-[ -n "$CLIENT" ] && export CLIENT_IP=$(dig +short $CLIENT) CLIENT_S=$(echo $CLIENT|cut -f1 -d.)
+if [ -n "$MASTER" ]; then 
+	echo "export MASTER_IP=$(dig +short $MASTER)" >> /dev/shm/env.sh
+	echo "export MASTER_S=$(echo $MASTER|cut -f1 -d.)" >> /dev/shm/env.sh
+	echo "export BEAKERMASTER=$MASTER" >> /dev/shm/env.sh
+fi
+
+if [ -n "$SLAVE" ]; then
+	echo "export SLAVE_IP=$(dig +short $SLAVE)" >> /dev/shm/env.sh
+	echo "export SLAVE_S=$(echo  $SLAVE |cut -f1 -d.)" >> /dev/shm/env.sh
+	echo "export BEAKERSLAVE=$SLAVE" >> /dev/shm/env.sh
+fi
+
+if [ -n "$CLIENT" ]; then
+	echo "export CLIENT_IP=$(dig +short $CLIENT)" >> /dev/shm/env.sh
+	echo "export CLIENT_S=$(echo $CLIENT|cut -f1 -d.)" >> /dev/shm/env.sh
+	echo "export BEAKERCLIENT=$CLIENT" >> /dev/shm/env.sh
+fi
+
+. /dev/shm/env.sh
 
 case $(hostname) in
 "$MASTER")  MYROLE="MASTER"    ;;

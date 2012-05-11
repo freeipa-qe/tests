@@ -118,7 +118,11 @@ upgrade_slave()
 		rlRun "yum -y update 'ipa*'"	
 
 		rlLog "Running replica force-sync"
-		rlRun "ipa-replica-manage force-sync --from=$MASTER_S.$DOMAIN --password=\"$ROOTDNPWD\""
+		if [ "x$USEDNS" = "xyes" ]; then
+			rlRun "ipa-replica-manage force-sync --from=$MASTER_S.$DOMAIN --password=\"$ROOTDNPWD\""
+		else
+			rlRun "ipa-replica-manage force-sync --from=$MASTER --password=\"$ROOTDNPWD\""
+		fi
 
 		#rlRun "ipactl restart" ### IS THIS REALLY NEEDED?  BZ 766687?
 		rlRun "rpm -q ipa-server 389-ds-base bind bind-dyndb-ldap pki-common sssd"
