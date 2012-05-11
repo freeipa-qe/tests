@@ -377,7 +377,15 @@ installSlave_nr()
                 rlAssertNotGrep "$DNSFORWARD" "/etc/named.conf"
 
 		rlLog "verifies https://bugzilla.redhat.com/show_bug.cgi?id=757644"
-		rlRun "ipa dnszone-find | grep in-addr.arpa." 1
+		MASTERZONE=$(echo $MASTERIP|awk -F . '{print $3 "." $2 "." $1 ".in-addr.arpa."}')
+		SLAVEZONE=$(echo $SLAVEIP|awk -F . '{print $3 "." $2 "." $1 ".in-addr.arpa."}')
+		#rlRun "ipa dnszone-find | grep in-addr.arpa." 1
+		if [ "x$MASTERZONE" != "x$SLAVEZONE" ]; then
+			rlRun "ipa dnszone-find $SLAVEZONE" 1
+		else
+			rlFail "Cannot test --no-reverse here since SLAVE ($SLAVEIP) is in same network as MASTER ($MASTERIP)"
+		fi
+		
 
                 rlRun "appendEnv" 0 "Append the machine information to the env.sh with the information for the machines in the recipe set"
         fi
