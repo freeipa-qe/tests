@@ -54,7 +54,7 @@ upgrade_test_master_slave_client_all()
 		data_check_all
 
 		# uninstall everything so we can start over
-		uninstall	
+		#uninstall	
 	rlPhaseEnd
 }
 	
