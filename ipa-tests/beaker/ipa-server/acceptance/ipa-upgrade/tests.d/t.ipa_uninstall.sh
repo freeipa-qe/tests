@@ -56,6 +56,13 @@ ipa_uninstall_master()
 	case "$MYROLE" in
 	"MASTER")
 		rlLog "Machine in recipe is MASTER"
+		rlLog "backing up MASTER log files before uninstall"
+		logtar=/tmp/master.$(hostname -s).$(date +%Y%m%d).tar.gz
+		rlRun "tar zcvf $logtar /var/log"
+		if [ -f $logtar ]; then
+			rhts-submit-log -l $logtar
+		fi
+
 		ipa_quick_uninstall
 		[ -n $MASTER_IP ] && MASTER=$(dig +short -x $MASTER_IP|sed 's/\.$//g')
 
@@ -102,6 +109,12 @@ ipa_uninstall_slave()
 	"SLAVE")
 		rlLog "Machine in recipe is SLAVE"
 		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $MASTER_IP"
+		rlLog "backing up SLAVE log files before uninstall"
+		logtar=/tmp/replica.$(hostname -s).$(date +%Y%m%d).tar.gz
+		rlRun "tar zcvf $logtar /var/log"
+		if [ -f $logtar ]; then
+			rhts-submit-log -l $logtar
+		fi
 		ipa_quick_uninstall
 		[ -n $SLAVE_IP ] && SLAVE=$(dig +short -x $SLAVE_IP|sed 's/\.$//g')
 
@@ -153,6 +166,12 @@ ipa_uninstall_client()
 		rlLog "Machine in recipe is CLIENT"
 		KinitAsAdmin
 		kdestroy
+		rlLog "backing up CLIENT log files before uninstall"
+		logtar=/tmp/client.$(hostname -s).$(date +%Y%m%d).tar.gz
+		rlRun "tar zcvf $logtar /var/log"
+		if [ -f $logtar ]; then
+			rhts-submit-log -l $logtar
+		fi
 		ipa_quick_uninstall
 
 		rlRun "yum -y downgrade curl nss* openldap* libselinux* nspr* libcurl*"
