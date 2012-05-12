@@ -51,12 +51,6 @@ upgrade_master()
 	"MASTER")
 		rlLog "Machine in recipe is MASTER"
 		rlRun "rpm -q ipa-server 389-ds-base bind bind-dyndb-ldap pki-common sssd"
-		rlLog "backing up MASTER log files before uninstall"
-		logtar=/tmp/master.$(hostname -s).$(date +%Y%m%d).tar.gz
-		rlRun "tar zcvf $logtar /var/log"
-		if [ -f $logtar ]; then
-			rhts-submit-log -l $logtar
-		fi
 
 		# Setup new yum repos from ipa-upgrade.data datafile
 		for url in ${myrepo[@]}; do
@@ -106,12 +100,6 @@ upgrade_slave()
 	"SLAVE")
 		rlLog "Machine in recipe is SLAVE"
 		rlRun "rpm -q ipa-server 389-ds-base bind bind-dyndb-ldap pki-common sssd"
-		rlLog "backing up SLAVE log files before uninstall"
-		logtar=/tmp/slave.$(hostname -s).$(date +%Y%m%d).tar.gz
-		rlRun "tar zcvf $logtar /var/log"
-		if [ -f $logtar ]; then
-			rhts-submit-log -l $logtar
-		fi
 
 		# Setup new yum repos from ipa-upgrade.data datafile
 		for url in ${myrepo[@]}; do
@@ -171,11 +159,6 @@ upgrade_client()
 
 		rlRun "rpm -q ipa-client sssd selinux-policy"
 		rlLog "backing up SLAVE log files before uninstall"
-		logtar=/tmp/client.$(hostname -s).$(date +%Y%m%d).tar.gz
-		rlRun "tar zcvf $logtar /var/log"
-		if [ -f $logtar ]; then
-			rhts-submit-log -l $logtar
-		fi
 
 		# Setup new yum repos from ipa-upgrade.data datafile
 		for url in ${myrepo[@]}; do
