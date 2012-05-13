@@ -179,13 +179,13 @@ rlJournalStart
 			rhts-sync-block -s READY_REPLICA3 $BEAKERMASTER
 			installSlave_nf
 			uninstall
-			rhts-sync-set -s DONE_REPLICA3 $BEAKERSLAVE
 
 			# Installing slave with --no-reverse
-			rhts-sync-block -s READY_REPLICA2 $BEAKERMASTER
 			installSlave_nr
 			uninstall
+			rhts-sync-set -s DONE_REPLICA3 $BEAKERSLAVE
 
+			rhts-sync-block -s READY_REPLICA2 $BEAKERMASTER
 			# Installing with --ssh-trust-dns
 			installSlave_sshtrustdns
 			uninstall
