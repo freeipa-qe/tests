@@ -96,11 +96,12 @@ createReplica1()
 			rlRun "echo \"nameserver $MASTERIP\" > /etc/resolv.conf" 0 "fixing the reoslv.conf to contain the correct nameserver lines"
 			rlRun "cat /etc/resolv.conf"
 			rlRun "ipa dnszone-find"
-			REVERSE_ZONE=$(echo $SLAVEIP|awk -F. '{print $3 "." $2 "." $1 ".in-addr.arpa."}')
-			if [ $(ipa dnszone-show $REVERSE_ZONE 2>/dev/null | wc -l) -eq 0 ]; then
-				rlRun "ipa dnszone-add $REVERSE_ZONE --name-server=$MASTER --admin-email=ipaqar.redhat.com"
-			fi
-			rlRun "ipa dnsrecord-add $DOMAIN $hostname_s --a-rec=$SLAVEIP --a-create-reverse"
+			### Commenting this because it creates the reverse zone which we don't want for no-reverse
+			#REVERSE_ZONE=$(echo $SLAVEIP|awk -F. '{print $3 "." $2 "." $1 ".in-addr.arpa."}')
+			#if [ $(ipa dnszone-show $REVERSE_ZONE 2>/dev/null | wc -l) -eq 0 ]; then
+			#	rlRun "ipa dnszone-add $REVERSE_ZONE --name-server=$MASTER --admin-email=ipaqar.redhat.com"
+			#fi
+			#rlRun "ipa dnsrecord-add $DOMAIN $hostname_s --a-rec=$SLAVEIP --a-create-reverse"
 			# Making use of --a-create-reverse ... hence comenting the following :-)
 			# REVERSE_ZONE=`ipa dnszone-find | grep -i "zone name" | grep -i "arpa" | cut -d ":" -f 2`
 			# LAST_OCTET=`echo $SLAVEIP | cut -d . -f 4`
