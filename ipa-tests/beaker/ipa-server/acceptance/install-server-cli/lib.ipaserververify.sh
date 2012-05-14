@@ -510,7 +510,7 @@ verify_useradd()
    do 
     assignedgid=$((idstart+$((z))))
      rlLog "EXECUTING: ipa group-find --private --gid=$assignedgid"
-     rlRun "ipa group-find --gid=$assignedgid" 0 "Verifying group with expected gid"
+     rlRun "ipa group-find --private --gid=$assignedgid" 0 "Verifying group with expected gid"
    done
 
    # Negative tests:

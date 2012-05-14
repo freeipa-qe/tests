@@ -347,7 +347,7 @@ ipaserverinstall_withinvalidzonemgr()
         uninstall_fornexttest
         local tmpout=$TmpDir/ipaserverinstall_invalidzonemgr.out
         command="ipa-server-install --setup-dns --forwarder=$DNSFORWARD  -r $RELM -p $ADMINPW -P $ADMINPW -a $ADMINPW --zonemgr=$special_char_in_admin_email -U"
-        expmsg="invalid 'zonemgr': The character"
+        expmsg="error: invalid zonemgr: mail account may only include letters, numbers, -, _ and a dot. There may not be consecutive -, _ and . characters. Its parts may not start or end with - or _"
         qaRun "$command" "$tmpout" 2 "$expmsg" "Verify expected error message for IPA Install with invalid zonemgr"  debug
     rlPhaseEnd
 }
