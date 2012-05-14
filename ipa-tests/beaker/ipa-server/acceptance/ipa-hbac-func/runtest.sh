@@ -847,7 +847,7 @@ rlJournalStart
                 rlRun "rhts-sync-block -s DONE_hbacsvc_client_bug736314 -s DONE_hbacsvc_client2_bug736314 $BEAKERCLIENT $BEAKERCLIENT2"
 
 	# hbacsvc_master_bug782927
-		hbacsvc_master_782927
+		hbacsvc_master_bug782927
 
 	# hbacsvc_master_bug772852
 		hbacsvc_master_bug772852
