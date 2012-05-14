@@ -681,7 +681,9 @@ uninstall()
 
 	rlLog "verifies https://bugzilla.redhat.com/show_bug.cgi?id=754524"
 	rlRun "remoteExec root $MASTERIP redhat \"echo $ADMINPW | kinit admin; klist\""
-	rlRun "replicaDel root $MASTERIP \"ipa-replica-manage del $SLAVE\" yes"
+	# comment for debugging...running ipa-replica-manage locally with -H option
+	#rlRun "replicaDel root $MASTERIP \"ipa-replica-manage del $SLAVE\" yes"
+	rlRun "ipa-replica-manage -H $MASTER del $SLAVE -p $ADMINPW -f > /tmp/replicaDel.out 2>&1"
 	rlRun "egrep \"Deleted replication agreement from '$MASTER' to '$SLAVE'\" /tmp/replicaDel.out"
 	rlRun "cat /tmp/replicaDel.out"
 
@@ -691,7 +693,9 @@ uninstall()
 	rlRun "egrep $MASTERIPOCT1.in-addr.arpa. /tmp/remote_exec.out"
 	rlRun "cat /tmp/remote_exec.out"
 
-	rlRun "replicaDel root $MASTERIP  \"ipa-replica-manage del $SLAVE\"" 
+	# comment for debugging...running ipa-replica-manage locally with -H option
+	#rlRun "replicaDel root $MASTERIP  \"ipa-replica-manage del $SLAVE\"" 
+	rlRun "ipa-replica-manage -H $MASTER del $SLAVE -p $ADMINPW -f > /tmp/replicaDel.out 2>&1"
 	rlRun "egrep \"'$MASTER' has no replication agreement for '$SLAVE'\" /tmp/replicaDel.out"
 	rlRun "cat /tmp/replicaDel.out"
 
@@ -700,19 +704,19 @@ uninstall()
 	rlLog "checking if there is a csreplia agreement to delete" 
 	#ipa-csreplica-manage list -p $ADMINPW|grep $SLAVE|grep -v "CA not configured" > /dev/null
 	rlRun "remoteExec root $MASTERIP \"ipa-csreplica-manage list -p $ADMINPW\""
-	rlRun "cat /tmp/remote_exec.out"
+	#rlRun "cat /tmp/remote_exec.out"
 	grep $SLAVE /tmp/remote_exec.out | grep -v "CA not configured"|grep -v "Last login"
 	if [ $? -eq 0 ]; then
 		rlLog "Running initial ipa-csreplica-manage del positive test"
 		rlRun "remoteExec root $MASTERIP \"ipa-csreplica-manage del $SLAVE -p $ADMINPW\""
 		rlRun "egrep \"Deleted replication agreement from '$MASTER' to '$SLAVE'\" /tmp/remote_exec.out"
-		rlRun "cat /tmp/remote_exec.out"
+		#rlRun "cat /tmp/remote_exec.out"
 	fi
 	sleep 10
 	rlLog "Running ipa-csreplica-manage-del negative test"
 	rlRun "remoteExec root $MASTERIP \"ipa-csreplica-manage del $SLAVE -p $ADMINPW\""
 	rlRun "egrep \"'$MASTER' has no replication agreement for '$SLAVE'\" /tmp/remote_exec.out"
-	rlRun "cat /tmp/remote_exec.out"
+	#rlRun "cat /tmp/remote_exec.out"
 
 	rlLog "verifies bug https://bugzilla.redhat.com/show_bug.cgi?id=754539"
 	rlRun "remoteExec root $MASTERIP \"ipa-replica-manage connect $SLAVE\""
