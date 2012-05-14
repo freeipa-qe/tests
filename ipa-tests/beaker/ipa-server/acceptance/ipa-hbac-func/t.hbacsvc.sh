@@ -2730,28 +2730,35 @@ hbacsvc_client2_bug766876() {
 
 }
 
+hbacsvc_master_bug766876_2() {
+
+        rlPhaseStartTest "ipa-hbacsvc-bug766876: [RFE] Make HBAC srchost processing optional - Case 2"
+
+                rlLog "Verifies bug https://bugzilla.redhat.com/show_bug.cgi?id=766876"
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                user766876="user766876"
+                rlRun "create_ipauser $user766876 $user766876 $user766876 $userpw"
+                sleep 5
+
+                rlRun "cat /etc/sssd/sssd.conf"
+                sed -i '6iipa_hbac_support_srchost = true' /etc/sssd/sssd.conf
+                rlRun "cat /etc/sssd/sssd.conf"
+                rlRun "rm -fr /var/lib/sss/db/cache_*" 0 "Clearing cache"
+                rlRun "service sssd restart"
+
+
+        rlPhaseEnd
+}
+
+
 hbacsvc_client_bug766876_2() {
 
         rlPhaseStartTest "ipa-hbacsvc-client-bug766876_2: ipa_hbac_support_srchost is set to true - Case 2"
 
-                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-
-                sleep 5
-		rlRun "cat /etc/sssd/sssd.conf"
-		sed -i '6iipa_hbac_support_srchost = true' /etc/sssd/sssd.conf
-		rlRun "cat /etc/sssd/sssd.conf"
-		rlRun "rm -fr /var/lib/sss/db/cache_*" 0 "Clearing cache"
-		rlRun "service sssd restart"
-		sleep 20
 
 		rlLog "Verifies https://bugzilla.redhat.com/show_bug.cgi?id=798317"
-
+		sleep 10
                 rlRun "ssh_auth_success user766876 testpw123@ipa.com $MASTER"
-
-                # Reverting back - sssd.conf
-                rlRun "sed -i 's/ipa_hbac_support_srchost = true/ipa_hbac_support_srchost = false/g' /etc/sssd/sssd.conf"
-                rlRun "service sssd restart"
-
 
         rlPhaseEnd
 
@@ -2761,20 +2768,8 @@ hbacsvc_client2_bug766876_2() {
 
         rlPhaseStartTest "ipa-hbacsvc-client2-bug766876_2: ipa_hbac_support_srchost is set to true - Case 2"
 
-                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-                sleep 5
-		rlRun "cat /etc/sssd/sssd.conf"
-		sed -i '6iipa_hbac_support_srchost = true' /etc/sssd/sssd.conf
-		rlRun "cat /etc/sssd/sssd.conf"
-		rlRun "rm -fr /var/lib/sss/db/cache_*" 0 "Clearing cache"
-		rlRun "service sssd restart"
-		sleep 20
-
+		sleep 10
                 rlRun "ssh_auth_failure user766876 testpw123@ipa.com $MASTER"
-
-		# Reverting back - sssd.conf
-		rlRun "sed -i 's/ipa_hbac_support_srchost = true/ipa_hbac_support_srchost = false/g' /etc/sssd/sssd.conf"
-		rlRun "service sssd restart"
 
         rlPhaseEnd
 
