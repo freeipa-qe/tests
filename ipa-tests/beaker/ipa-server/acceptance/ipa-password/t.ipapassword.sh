@@ -500,9 +500,12 @@ ipapassword_globalpolicy_history_default_logic()
         rlRun "$kdestroy"
         kinitAs $testac $testacPW
         counter=1 #reset counter
-        while [ $counter -lt $N ]
+		# changing to -le to force all to be added to history since first was missing
+        #while [ $counter -lt $N ]
+        while [ $counter -le $N ]
         do
             next=$((counter+1))
+			[ $next -gt $N ] && next=1 # Start over if beyond end of list
             currentPW=`echo $pws | cut -d" " -f$counter`
             nextPW=`echo $pws |cut -d" " -f$next`
             rlLog "counter=[$counter] currentpw[$currentPW], nextpw[$nextPW]"
