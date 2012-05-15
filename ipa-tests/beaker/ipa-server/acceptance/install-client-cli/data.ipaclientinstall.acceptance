@@ -25,7 +25,7 @@ netgroup_nosssd="files ldap"
 # sssd.conf updates
 cache_credentials="True True"
 ipa_domain=$DOMAIN
-id_provider="ipa ldap"
+id_provider="ipa"
 auth_provider="ipa krb5"
 access_provider="ipa"
 chpass_provider="ipa krb5"
