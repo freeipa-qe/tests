@@ -104,14 +104,14 @@ setup()
 {
     rlPhaseStartSetup "ipa-client-install-Setup "
         # edit hosts file and resolv file before starting tests
-#        rlRun "fixHostFile" 0 "Set up /etc/hosts"
-#        rlRun "fixhostname" 0 "Fix hostname"
-#        rlRun "fixResolv" 0 "fixing the resolv.conf to contain the correct nameserver lines"
-#        rlRun "appendEnv" 0 "Append the machine information to the env.sh with the information for the machines in the recipe set"
-#        rlLog "Setting up Authorized keys"
-        SetUpAuthKeys
-#        rlLog "Setting up known hosts file"
-        SetUpKnownHosts
+        rlRun "fixHostFile" 0 "Set up /etc/hosts"
+        rlRun "fixhostname" 0 "Fix hostname"
+        rlRun "fixResolv" 0 "fixing the resolv.conf to contain the correct nameserver lines"
+        rlRun "appendEnv" 0 "Append the machine information to the env.sh with the information for the machines in the recipe set"
+        rlLog "Setting up Authorized keys"
+#        SetUpAuthKeys
+        rlLog "Setting up known hosts file"
+#        SetUpKnownHosts
 
     
         ## Lines to expect to be changed during the isnatllation process
@@ -331,7 +331,7 @@ ipaclientinstall_hostname()
        command="ipa-client-install --hostname=$CLIENT.nonexistent --server=$MASTER --domain=$DOMAIN -p $ADMINID -w $ADMINPW  -U"
        rlLog "EXECUTING: $command" 
        expmsg1="Warning: Hostname ($CLIENT.nonexistent) not found in DNS"
-       expmsg2="Failed to update DNS A record."
+       expmsg2="Could not update DNS SSHFP records."
        qaExpectedRun "$command" "$tmpout" 0 "Verify expected message for IPA Install with different hostname" "$expmsg1" "$expmsg2" 
 
        verify_install true nonexistent
@@ -738,6 +738,7 @@ ipaclientinstall_client_hostname_localhost() #Added by Kaleem
         rlRun "ipa-client-install --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW --unattended --server=$MASTER > $TmpDir/temp.out 2>&1" 1 "Installing ipa client where client's hostname is localhost"
         rlRun "cat $TmpDir/temp.out"
         rlAssertGrep "Invalid hostname, 'localhost.localdomain' must not be used" "$TmpDir/temp.out"
+        rlRun "hostname $CLIENT" 
     rlPhaseEnd
 }
 
@@ -752,7 +753,9 @@ verify_install()
 {
 # verify files changed during install/uninstall
    verify_nsswitch $1 $2
-   verify_sssd $1 $2 
+   if [ "$1" == "true" ] ; then
+      verify_sssd $1 $2 
+   fi
    verify_authconfig $1 $2
 
    verify_krb5 $1 $2

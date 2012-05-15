@@ -125,7 +125,7 @@ verify_sssd()
        testchpassprovider=`grep "^chpass_provider" $SSSD | cut -d "=" -f2 | xargs echo`
        ipacompare_forinstalluninstall "chpass_provider " "$chpass_provider_nosssd" "$testchpassprovider" "$1" 
        testkrb5realm=`grep "^krb5_realm" $SSSD | cut -d "=" -f2 | xargs echo`
-       ipacompare_forinstalluninstall "krb5_realm " "$krb5_realm" "$testkrb5realm" "$1" 
+       ipacompare_forinstalluninstall "krb5_realm " "$krb5_realm_nosssd" "$testkrb5realm" "$1" 
     else
        rlLog "Verify sssd.conf - with sssd"
        if [ "$2" == "force" ] ; then
