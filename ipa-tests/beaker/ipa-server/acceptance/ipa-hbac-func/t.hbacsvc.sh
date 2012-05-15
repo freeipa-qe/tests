@@ -2604,9 +2604,10 @@ hbacsvc_master_bug782927() {
         rlPhaseStartTest "ipa-hbacsvc-782927: Test --sizelimit option to hbactest"
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-                rlRun "ssh_auth_success $user782927 testpw123@ipa.com $MASTER"
+		# Auth test is not required here, hence commenting.
+                # rlRun "ssh_auth_success $user782927 testpw123@ipa.com $MASTER"
 
-		rlRun "for i in {1000..1010}; do ipa hbacrule-add $i; done"
+		for i in {1000..1010}; do ipa hbacrule-add $i; done
 		rlRun "ipa config-show"
 		rlRun "ipa config-mod --searchrecordslimit=5"
 		rlRun "ipa config-show"
@@ -2626,7 +2627,7 @@ hbacsvc_master_bug782927() {
 
                 rlRun "ipa hbactest --user=$user782927 --srchost=$CLIENT --host=$MASTER --service=sshd | grep -Ex '(Access granted: True|  matched: 782927)'" 1
 		rlLog "verifies bug https://bugzilla.redhat.com/show_bug.cgi?id=782927"
-                rlRun "ipa hbactest --user=$user782927 --srchost=$CLIENT --host=$MASTER --service=sshd --sizelimit=15 | grep -Ex '(Access granted: True|  matched: 782927)'" 
+                rlRun "ipa hbactest --user=$user782927 --srchost=$CLIENT --host=$MASTER --service=sshd --sizelimit=25 | grep -Ex '(Access granted: True|  matched: 782927)'" 
                 rlRun "ipa hbactest --user=$user782927 --srchost=$CLIENT --host=$MASTER --service=sshd --rule=782927 | grep -Ex '(Access granted: True|  matched: 782927)'" 
 
 
@@ -2648,8 +2649,7 @@ hbacsvc_master_bug772852() {
         rlPhaseStartTest "ipa-hbacsvc-772852: \"Unresolved rules in --rules\" error message is displayed even if the hbacrule is specified using the --rules option."
 
 		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-		# Auth not required for this case, hence commenting the following line.
-                # rlRun "ssh_auth_success $user772852 testpw123@ipa.com $MASTER"
+                 rlRun "ssh_auth_success $user772852 testpw123@ipa.com $MASTER"
 
                 for i in {1000..1010}; do ipa hbacrule-add $i; done
                 rlRun "ipa config-show"
