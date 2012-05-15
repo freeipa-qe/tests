@@ -138,7 +138,9 @@ set send_slow {1 .1}' > $expfile
 	rlLog "Executing: /usr/sbin/ipa-server-install --external_cert_file=/root/ipa-ca/ipa.crt --external_ca_file=/root/ipa-ca/ipacacert.asc"
 	rlRun "/usr/bin/expect $expfile"
 
-	rlRun "service ipa status"
+	sleep 10
+
+	rlRun "ipactl -d status"
 
 	# As part of verifying bug https://bugzilla.redhat.com/show_bug.cgi?id=750828"
         rlAssertGrep "forwarders" "/etc/named.conf"
