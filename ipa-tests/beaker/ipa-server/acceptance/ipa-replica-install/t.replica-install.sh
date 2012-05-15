@@ -91,18 +91,18 @@ createReplica1()
                         hostname_s=$(echo $s | cut -d. -f1)
 
 			# Preparing replica without --ip-address option
-			rlRun "sed -i '/$SLAVEIP/d' /etc/hosts"
-			rlRun "echo \"$SLAVEIP		$hostname_s.$DOMAIN\" >> /etc/hosts"
+			rlRun "sed -i /$SLAVEIP/d /etc/hosts"
+			rlRun "echo \"$SLAVEIP $hostname_s.$DOMAIN\" >> /etc/hosts"
 			rlRun "cat /etc/hosts"
 			rlRun "echo \"nameserver $MASTERIP\" > /etc/resolv.conf" 0 "fixing the reoslv.conf to contain the correct nameserver lines"
 			rlRun "cat /etc/resolv.conf"
 			rlRun "ipa dnszone-find"
 			### Commenting this because it creates the reverse zone which we don't want for no-reverse
-			REVERSE_ZONE=$(echo $SLAVEIP|awk -F. '{print $3 "." $2 "." $1 ".in-addr.arpa."}')
-			if [ $(ipa dnszone-show $REVERSE_ZONE 2>/dev/null | wc -l) -eq 0 ]; then
-				rlRun "ipa dnszone-add $REVERSE_ZONE --name-server=$MASTER --admin-email=ipaqar.redhat.com"
-			fi
-			rlRun "ipa dnsrecord-add $DOMAIN $hostname_s --a-rec=$SLAVEIP --a-create-reverse"
+			##REVERSE_ZONE=$(echo $SLAVEIP|awk -F. '{print $3 "." $2 "." $1 ".in-addr.arpa."}')
+			##if [ $(ipa dnszone-show $REVERSE_ZONE 2>/dev/null | wc -l) -eq 0 ]; then
+			##	rlRun "ipa dnszone-add $REVERSE_ZONE --name-server=$MASTER --admin-email=ipaqar.redhat.com"
+			##fi
+			##rlRun "ipa dnsrecord-add $DOMAIN $hostname_s --a-rec=$SLAVEIP --a-create-reverse"
 			# Making use of --a-create-reverse ... hence comenting the following :-)
 			# REVERSE_ZONE=`ipa dnszone-find | grep -i "zone name" | grep -i "arpa" | cut -d ":" -f 2`
 			# LAST_OCTET=`echo $SLAVEIP | cut -d . -f 4`
@@ -696,7 +696,7 @@ uninstall()
 
 	# comment for debugging...running ipa-replica-manage locally with -H option
 	#rlRun "replicaDel root $MASTERIP  \"ipa-replica-manage del $SLAVE\"" 
-	rlRun "ipa-replica-manage -H $MASTER del $SLAVE -p $ADMINPW -f > /tmp/replicaDel.out 2>&1"
+	rlRun "ipa-replica-manage -H $MASTER del $SLAVE -p $ADMINPW -f > /tmp/replicaDel.out 2>&1" 1
 	rlRun "egrep \"'$MASTER' has no replication agreement for '$SLAVE'\" /tmp/replicaDel.out"
 	rlRun "cat /tmp/replicaDel.out"
 
@@ -721,7 +721,7 @@ uninstall()
 	rlLog "Running ipa-csreplica-manage-del negative test"
 	# comment for debugging...running ipa-csreplica-manage with -H option
 	#rlRun "remoteExec root $MASTERIP \"ipa-csreplica-manage del $SLAVE -p $ADMINPW\""
-	rlRun "ipa-csreplica-manage -H $MASTER del $SLAVE -p $ADMINPW -f > /tmp/remote_exec.out 2>&1"
+	rlRun "ipa-csreplica-manage -H $MASTER del $SLAVE -p $ADMINPW -f > /tmp/remote_exec.out 2>&1" 1
 	rlRun "egrep \"'$MASTER' has no replication agreement for '$SLAVE'\" /tmp/remote_exec.out"
 	#rlRun "cat /tmp/remote_exec.out"
 
