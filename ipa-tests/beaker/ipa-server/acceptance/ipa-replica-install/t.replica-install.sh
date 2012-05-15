@@ -256,6 +256,46 @@ echo 'expect eof ' >> $expfile
 
 }
 
+createReplica4() 
+{
+
+	rlPhaseStartTest "Create Replica Package(s) without --ip-address option and with reverse zone deleted"
+		for s in $SLAVE; do
+			if [ "$s" != "" ]; then
+
+				SLAVE_S=$(echo $s|cut -f1 -d.)
+				rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
+				rlRun "rm -fr /var/lib/ipa/replica-info-*"
+				# Cleanup server and network info from DNS
+				MASTERZONE=$(echo $MASTERIP|awk -F . '{print $3 "." $2 "." $1 ".in-addr.arpa."}')
+				SLAVEZONE=$(echo $SLAVEIP|awk -F . '{print $3 "." $2 "." $1 ".in-addr.arpa."}')
+				if [ "x$MASTERZONE" != "x$SLAVEZONE" ]; then
+					rlRun "ipa dnszone-del $SLAVEZONE" 
+				fi
+				rlRun "ipa dnsrecord-del $DOMAIN $SLAVE_S --del-all"
+
+				# Make sure /etc/hosts has correct info
+				rlRun "sed -i /$SLAVEIP/d  /etc/hosts"
+				rlRun "sed -i s/$SLAVE//   /etc/hosts"
+				rlRun "sed -i s/$SLAVE_S// /etc/hosts"
+				rlRun "echo \"$SLAVEIP $SLAVE $SLAVE_S\" >> /etc/hosts"
+				rlRun "cat /etc/hosts"
+				
+				# Preparing replica without --ip-address option for no-reverse test
+				rlRun "service named restart"
+				rlLog "IP of server $s is resolving as $SLAVEIP, using short hostname of $SLAVE_S"
+				rlLog "Running: ipa-replica-prepare -p $ADMINPW $SLAVE_S.$DOMAIN"
+				rlRun "ipa-replica-prepare -p $ADMINPW $SLAVE_S.$DOMAIN" 0 "Creating replica package"
+
+			else
+
+				rlLog "No SLAVES in current recipe set."
+
+			fi
+		done
+
+	rlPhaseEnd
+}
 	
 installSlave()
 {
@@ -359,44 +399,49 @@ installSlave_nf()
 installSlave_nr()
 {
 
-   rlPhaseStartTest "Installing replica with --no-reverse option"
-
-        ls /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg
-        if [ $? -ne 0 ] ; then
-                rlFail "ERROR: Replica Package not found"
-        else
-
-                rlRun "cat /etc/resolv.conf"
-
-                echo "ipa-replica-install -U --setup-dns --no-forwarders --no-reverse -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg" > /dev/shm/replica-install.bash
-                chmod 755 /dev/shm/replica-install.bash
-                rlLog "EXECUTING: ipa-replica-install -U --setup-dns --no-forwarders --no-reverse -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg"
-                rlRun "/bin/bash /dev/shm/replica-install.bash" 0 "Replica installation"
-                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
-
-		# Disabling the following since empty forwarders exist in named.conf
-                # rlAssertNotGrep "forwarders" "/etc/named.conf"
-                rlAssertNotGrep "$DNSFORWARD" "/etc/named.conf"
-
-		rlLog "verifies https://bugzilla.redhat.com/show_bug.cgi?id=757644"
-		MASTERZONE=$(echo $MASTERIP|awk -F . '{print $3 "." $2 "." $1 ".in-addr.arpa."}')
-		SLAVEZONE=$(echo $SLAVEIP|awk -F . '{print $3 "." $2 "." $1 ".in-addr.arpa."}')
-		#rlRun "ipa dnszone-find | grep in-addr.arpa." 1
-		if [ "x$MASTERZONE" != "x$SLAVEZONE" ]; then
-			rlRun "ipa dnszone-find $SLAVEZONE" 1
+	rlPhaseStartTest "Installing replica with --no-reverse option"
+		cd /dev/shm/
+		rlRun "rm -f /dev/shm/replica-info-*"
+		rlRun "sftp root@$MASTERIP:/var/lib/ipa/replica-info-$hostname_s.$DOMAIN.gpg"
+		rlLog "sftp root@$MASTERIP:/var/lib/ipa/replica-info-$hostname_s.$DOMAIN.gpg"
+		ls /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg
+		if [ $? -ne 0 ] ; then
+			rlFail "ERROR: Replica Package not found"
 		else
-			rlFail "Cannot test --no-reverse here since SLAVE ($SLAVEIP) is in same network as MASTER ($MASTERIP)"
+
+			rlRun "cat /etc/resolv.conf"
+			rlRun "sed -i /$MASTERIP/d /etc/hosts"
+			rlRun "echo \"$MASTERIP $MASTER\" >> /etc/hosts"
+			rlRun "cat /etc/hosts"
+
+			echo "ipa-replica-install -U --setup-dns --no-forwarders --no-reverse -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg" > /dev/shm/replica-install.bash
+			chmod 755 /dev/shm/replica-install.bash
+			rlLog "EXECUTING: ipa-replica-install -U --setup-dns --no-forwarders --no-reverse -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg"
+			rlRun "/bin/bash /dev/shm/replica-install.bash" 0 "Replica installation"
+			rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
+
+			# Disabling the following since empty forwarders exist in named.conf
+			# rlAssertNotGrep "forwarders" "/etc/named.conf"
+			rlAssertNotGrep "$DNSFORWARD" "/etc/named.conf"
+
+			rlLog "verifies https://bugzilla.redhat.com/show_bug.cgi?id=757644"
+			MASTERZONE=$(echo $MASTERIP|awk -F . '{print $3 "." $2 "." $1 ".in-addr.arpa."}')
+			SLAVEZONE=$(echo $SLAVEIP|awk -F . '{print $3 "." $2 "." $1 ".in-addr.arpa."}')
+			#rlRun "ipa dnszone-find | grep in-addr.arpa." 1
+			if [ "x$MASTERZONE" != "x$SLAVEZONE" ]; then
+				rlRun "ipa dnszone-find $SLAVEZONE" 1
+			else
+				rlLog "Cannot test --no-reverse here since SLAVE ($SLAVEIP) is in same network as MASTER ($MASTERIP)"
+			fi
+
+			rlRun "appendEnv" 0 "Append the machine information to the env.sh with the information for the machines in the recipe set"
 		fi
-		
 
-                rlRun "appendEnv" 0 "Append the machine information to the env.sh with the information for the machines in the recipe set"
-        fi
+		if [ -f /var/log/ipareplica-install.log ]; then
+			rhts-submit-log -l /var/log/ipareplica-install.log
+		fi
 
-        if [ -f /var/log/ipareplica-install.log ]; then
-                rhts-submit-log -l /var/log/ipareplica-install.log
-        fi
-
-   rlPhaseEnd
+	rlPhaseEnd
 }
 
 installSlave_nhostdns()
@@ -721,6 +766,7 @@ uninstall()
 	rlLog "Running ipa-csreplica-manage-del negative test"
 	# comment for debugging...running ipa-csreplica-manage with -H option
 	#rlRun "remoteExec root $MASTERIP \"ipa-csreplica-manage del $SLAVE -p $ADMINPW\""
+	#rlRun "egrep \"'$MASTER' has no replication agreement for '$SLAVE'\" /tmp/remote_exec.out"
 	rlRun "ipa-csreplica-manage -H $MASTER del $SLAVE -p $ADMINPW -f > /tmp/remote_exec.out 2>&1" 1
 	rlRun "egrep \"'$MASTER' has no replication agreement for '$SLAVE'\" /tmp/remote_exec.out"
 	#rlRun "cat /tmp/remote_exec.out"
