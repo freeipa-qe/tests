@@ -85,6 +85,7 @@ createReplica1()
 		for s in $SLAVE; do
 			if [ "$s" != "" ]; then
 
+				rlRun "rm -fr /var/lib/ipa/replica-info-*"
 				rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
 
 				# put the short form of the hostname for server $s into s_short
@@ -98,18 +99,18 @@ createReplica1()
 				rlRun "cat /etc/resolv.conf"
 				rlRun "ipa dnszone-find"
 				### Commenting this because it creates the reverse zone which we don't want for no-reverse
-				##REVERSE_ZONE=$(echo $SLAVEIP|awk -F. '{print $3 "." $2 "." $1 ".in-addr.arpa."}')
-				##if [ $(ipa dnszone-show $REVERSE_ZONE 2>/dev/null | wc -l) -eq 0 ]; then
-				##	rlRun "ipa dnszone-add $REVERSE_ZONE --name-server=$MASTER --admin-email=ipaqar.redhat.com"
-				##fi
-				##rlRun "ipa dnsrecord-add $DOMAIN $hostname_s --a-rec=$SLAVEIP --a-create-reverse"
+				REVERSE_ZONE=$(echo $SLAVEIP|awk -F. '{print $3 "." $2 "." $1 ".in-addr.arpa."}')
+				if [ $(ipa dnszone-show $REVERSE_ZONE 2>/dev/null | wc -l) -eq 0 ]; then
+					rlRun "ipa dnszone-add $REVERSE_ZONE --name-server=$MASTER --admin-email=ipaqar.redhat.com"
+				fi
+				rlRun "ipa dnsrecord-add $DOMAIN $hostname_s --a-rec=$SLAVEIP --a-create-reverse"
 				# Making use of --a-create-reverse ... hence comenting the following :-)
 				# REVERSE_ZONE=`ipa dnszone-find | grep -i "zone name" | grep -i "arpa" | cut -d ":" -f 2`
 				# LAST_OCTET=`echo $SLAVEIP | cut -d . -f 4`
 				# rlRun "ipa dnsrecord-add $REVERSE_ZONE $LAST_OCTET --ptr-rec=$hostname_s.$DOMAIN."
 
 				rlRun "service named restart" 0 "Restarting named as work around when adding new reverse zone"
-			sleep 10
+				sleep 10
 
 				rlLog "Running: ipa-replica-prepare -p $ADMINPW $hostname_s.$DOMAIN"
 				rlRun "ipa-replica-prepare -p $ADMINPW $hostname_s.$DOMAIN"
