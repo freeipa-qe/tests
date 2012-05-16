@@ -158,7 +158,6 @@ objectClass: top
 objectClass: organizationalUnit
 ou: BostonGroups
 
-# entry-id: 10
 dn: uid=puser1,ou=People,dc=example,dc=com
 passwordGraceUserTime: 0
 modifiersName: cn=directory manager
@@ -176,7 +175,6 @@ userPassword: fo0m4nchU
 creatorsName: uid=admin,ou=administrators,ou=topologymanagement,o=netscaperoot
 nsUniqueId: 42598c8a-1dd211b2-8f88fe1c-fcc30000
 
-# entry-id: 11
 dn: uid=puser2,ou=People,dc=example,dc=com
 passwordGraceUserTime: 0
 uidNumber: 1002
@@ -227,7 +225,6 @@ uidNumber: 18795
 gidNumber: 28795
 homeDirectory: /home/Philomena_Hazen
 
-# entry-id: 10
 dn: uid=bosusr,ou=BostonUsers,ou=Boston,dc=example,dc=com
 passwordGraceUserTime: 0
 modifiersName: cn=directory manager
@@ -245,7 +242,6 @@ userPassword: fo0m4nchU
 creatorsName: uid=admin,ou=administrators,ou=topologymanagement,o=netscaperoot
 nsUniqueId: 42598c8a-1dd211b2-8f88fe1c-fcc30001
 
-# entry-id: 12
 dn: cn=Group1,ou=groups,dc=example,dc=com
 gidNumber: 1001
 objectClass: top
@@ -256,7 +252,6 @@ creatorsName: uid=admin,ou=administrators,ou=topologymanagement,o=netscaperoot
 modifiersName: uid=admin,ou=administrators,ou=topologymanagement,o=netscaperoot
 nsUniqueId: 42598c8c-1dd211b2-8f88fe1c-fcc30000
 
-# entry-id: 13
 dn: cn=Group2,ou=groups,dc=example,dc=com
 gidNumber: 1002
 objectClass: top
@@ -267,7 +262,16 @@ creatorsName: uid=admin,ou=administrators,ou=topologymanagement,o=netscaperoot
 modifiersName: uid=admin,ou=administrators,ou=topologymanagement,o=netscaperoot
 nsUniqueId: 42598c8d-1dd211b2-8f88fe1c-fcc30003
 
-# entry-id: 13
+dn: cn=Group3,ou=groups,dc=example,dc=com
+gidNumber: 1002
+objectClass: top
+objectClass: groupOfNames
+objectClass: posixGroup
+cn: Group3
+creatorsName: uid=admin,ou=administrators,ou=topologymanagement,o=netscaperoot
+modifiersName: uid=admin,ou=administrators,ou=topologymanagement,o=netscaperoot
+nsUniqueId: 42598c8d-1dd211b2-8f88fe1c-fcc30004
+
 dn: cn=bosgrp,ou=BostonGroups,ou=Boston,dc=example,dc=com
 gidNumber: 1003
 objectClass: top
