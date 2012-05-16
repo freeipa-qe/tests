@@ -262,16 +262,6 @@ creatorsName: uid=admin,ou=administrators,ou=topologymanagement,o=netscaperoot
 modifiersName: uid=admin,ou=administrators,ou=topologymanagement,o=netscaperoot
 nsUniqueId: 42598c8d-1dd211b2-8f88fe1c-fcc30003
 
-dn: cn=Group3,ou=groups,dc=example,dc=com
-gidNumber: 1002
-objectClass: top
-objectClass: groupOfNames
-objectClass: posixGroup
-cn: Group3
-creatorsName: uid=admin,ou=administrators,ou=topologymanagement,o=netscaperoot
-modifiersName: uid=admin,ou=administrators,ou=topologymanagement,o=netscaperoot
-nsUniqueId: 42598c8d-1dd211b2-8f88fe1c-fcc30004
-
 dn: cn=bosgrp,ou=BostonGroups,ou=Boston,dc=example,dc=com
 gidNumber: 1003
 objectClass: top
