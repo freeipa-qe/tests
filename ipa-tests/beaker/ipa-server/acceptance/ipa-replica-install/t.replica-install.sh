@@ -136,10 +136,13 @@ createReplica2()
 
 				rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
 				rlRun "rm -fr /var/lib/ipa/replica-info-*"
-				REVERSE_ZONE=$(echo $SLAVEIP|awk -F. '{print $3 "." $2 "." $1 ".in-addr.arpa."}')
-				if [ $(ipa dnszone-show $REVERSE_ZONE 2>/dev/null | wc -l) -gt 0 ]; then
-					rlLog "Deleting ZONE ($REVERSE_ZONE) so ipa-replica-prepare creates it"
-					rlRun "ipa dnszone-del $REVERSE_ZONE"
+				MASTERZONE=$(echo $MASTERIP|awk -F . '{print $3 "." $2 "." $1 ".in-addr.arpa."}')
+				SLAVEZONE=$(echo $SLAVEIP|awk -F . '{print $3 "." $2 "." $1 ".in-addr.arpa."}')
+				ZONECHECK=$(ipa dnszone-show $SLAVEZONE 2>/dev/null | wc -l)
+				if [ "x$MASTERZONE" != "x$SLAVEZONE" -a $ZONECHECK -gt 0 ]; then
+					rlLog "Deleting ZONE ($SLAVEZONE) so ipa-replica-prepare creates it"
+					rlRun "ipa dnszone-del $SLAVEZONE"
+					rlRun "service named restart"
 				fi
 				rlRun "ipa dnszone-find"
 				if [ $(ipa dnsrecord-show $DOMAIN $hostname_s 2>/dev/null | wc -l) -gt 0 ]; then
@@ -285,10 +288,15 @@ createReplica4()
 				# Cleanup server and network info from DNS
 				MASTERZONE=$(echo $MASTERIP|awk -F . '{print $3 "." $2 "." $1 ".in-addr.arpa."}')
 				SLAVEZONE=$(echo $SLAVEIP|awk -F . '{print $3 "." $2 "." $1 ".in-addr.arpa."}')
-				if [ "x$MASTERZONE" != "x$SLAVEZONE" ]; then
-					rlRun "ipa dnszone-del $SLAVEZONE" 
+				ZONECHECK=$(ipa dnszone-show $SLAVEZONE 2>/dev/null | wc -l)
+				if [ "x$MASTERZONE" != "x$SLAVEZONE" -a $ZONECHECK -gt 0 ]; then
+					rlLog "Deleting ZONE ($SLAVEZONE) so ipa-replica-prepare creates it"
+					rlRun "ipa dnszone-del $SLAVEZONE"
+					rlRun "service named restart"
 				fi
-				rlRun "ipa dnsrecord-del $DOMAIN $SLAVE_S --del-all"
+				if [ $(ipa dnsrecord-show $DOMAIN $hostname_s 2>/dev/null | wc -l) -gt 0 ]; then
+					rlRun "ipa dnsrecord-del $DOMAIN $SLAVE_S --del-all"
+				fi
 
 				# Make sure /etc/hosts has correct info
 				rlRun "sed -i /$SLAVEIP/d  /etc/hosts"
@@ -804,3 +812,16 @@ uninstall()
 	rlPhaseEnd
 }
 
+miscDNSCleanup()
+{
+	hostname_s=$(echo $SLAVE|cut -f1 -d.)
+	ipa dnsrecord-del $DOMAIN _kerberos-master._tcp --srv-rec="0 100 88 $hostname_s"
+	ipa dnsrecord-del $DOMAIN _kerberos-master._udp --srv-rec="0 100 88 $hostname_s"
+	ipa dnsrecord-del $DOMAIN _kerberos._tcp --srv-rec="0 100 88 $hostname_s"
+	ipa dnsrecord-del $DOMAIN _kerberos._udp --srv-rec="0 100 88 $hostname_s"
+	ipa dnsrecord-del $DOMAIN _kpasswd._tcp --srv-rec="0 100 464 $hostname_s"
+	ipa dnsrecord-del $DOMAIN _kpasswd._udp --srv-rec="0 100 464 $hostname_s"
+	ipa dnsrecord-del $DOMAIN _ldap._tcp --srv-rec="0 100 389 $hostname_s"
+	ipa dnsrecord-del $DOMAIN _ntp._udp --srv-rec="0 100 123 $hostname_s"
+	ipa dnsrecord-del $DOMAIN "@" --ns-rec=$hostname_s.$DOMAIN
+}
