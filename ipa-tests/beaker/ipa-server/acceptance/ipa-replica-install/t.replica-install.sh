@@ -407,6 +407,7 @@ installSlave_nr()
 
 	rlPhaseStartTest "Installing replica with --no-reverse option"
 		cd /dev/shm/
+		[ -z "$hostname_s" ] && hostname_s=$(echo $SLAVE|cut -f1 -d.)
 		rlRun "rm -f /dev/shm/replica-info-*"
 		rlRun "sftp root@$MASTERIP:/var/lib/ipa/replica-info-$hostname_s.$DOMAIN.gpg"
 		rlLog "sftp root@$MASTERIP:/var/lib/ipa/replica-info-$hostname_s.$DOMAIN.gpg"
