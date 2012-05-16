@@ -128,27 +128,27 @@ createReplica1()
 createReplica2() 
 {
 
-   rlPhaseStartTest "Create Replica Package(s) with --ip-address option"
-        for s in $SLAVE; do
-                if [ "$s" != "" ]; then
+	rlPhaseStartTest "Create Replica Package(s) with --ip-address option"
+		for s in $SLAVE; do
+			if [ "$s" != "" ]; then
 
-			rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
-			rlRun "rm -fr /var/lib/ipa/replica-info-*"
+				rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
+				rlRun "rm -fr /var/lib/ipa/replica-info-*"
 
-			# Preparing replica with --ip-address option
-                        rlRun "service named restart"
-                        rlLog "IP of server $s is resolving as $SLAVEIP, using short hostname of $hostname_s"
-                        rlLog "Running: ipa-replica-prepare -p $ADMINPW --ip-address=$SLAVEIP $hostname_s.$DOMAIN"
-                        rlRun "ipa-replica-prepare -p $ADMINPW --ip-address=$SLAVEIP $hostname_s.$DOMAIN" 0 "Creating replica package"
+				# Preparing replica with --ip-address option
+				rlRun "service named restart"
+				rlLog "IP of server $s is resolving as $SLAVEIP, using short hostname of $hostname_s"
+				rlLog "Running: ipa-replica-prepare -p $ADMINPW --ip-address=$SLAVEIP $hostname_s.$DOMAIN"
+				rlRun "ipa-replica-prepare -p $ADMINPW --ip-address=$SLAVEIP $hostname_s.$DOMAIN" 0 "Creating replica package"
 
-                else
+			else
 
-                        rlLog "No SLAVES in current recipe set."
+				rlLog "No SLAVES in current recipe set."
 
-                fi
-        done
+			fi
+		done
 
-   rlPhaseEnd
+	rlPhaseEnd
 }
 
 createReplica3()
@@ -711,76 +711,80 @@ installCA()
 
 uninstall()
 {
+	rlPhaseStartTest "Uninstalling replica"
 
-   rlPhaseStartTest "Uninstalling replica"
+		rlLog "verifies https://bugzilla.redhat.com/show_bug.cgi?id=797563"
+		rlRun "ipa host-del $MASTER 2>&1| grep -i \"ipa: ERROR: invalid 'hostname': An IPA master host cannot be deleted\""
+		rlRun "ipa host-del $SLAVE 2>&1| grep -i \"ipa: ERROR: invalid 'hostname': An IPA master host cannot be deleted\""
 
-	rlLog "verifies https://bugzilla.redhat.com/show_bug.cgi?id=797563"
-	rlRun "ipa host-del $MASTER 2>&1| grep -i \"ipa: ERROR: invalid 'hostname': An IPA master host cannot be deleted\""
-	rlRun "ipa host-del $SLAVE 2>&1| grep -i \"ipa: ERROR: invalid 'hostname': An IPA master host cannot be deleted\""
+		rlLog "verifies https://bugzilla.redhat.com/show_bug.cgi?id=755094"
+		rlRun "ipa-replica-manage list | grep \"$MASTER: master\""
+		rlRun "ipa-replica-manage list | grep \"$SLAVE: master\""
+		rlRun "ipa-replica-manage list -p Secret123 | grep \"$MASTER: master\""
+		rlRun "ipa-replica-manage list -p Secret123 | grep \"$SLAVE: master\""
+		rlRun "ipa-replica-manage list -p Secret123 $MASTER | grep \"$SLAVE: replica\""
+		rlRun "ipa-replica-manage list -p Secret123 $SLAVE | grep \"$MASTER: replica\""
 
-	rlLog "verifies https://bugzilla.redhat.com/show_bug.cgi?id=755094"
-	rlRun "ipa-replica-manage list | grep \"$MASTER: master\""
-	rlRun "ipa-replica-manage list | grep \"$SLAVE: master\""
-	rlRun "ipa-replica-manage list -p Secret123 | grep \"$MASTER: master\""
-	rlRun "ipa-replica-manage list -p Secret123 | grep \"$SLAVE: master\""
-	rlRun "ipa-replica-manage list -p Secret123 $MASTER | grep \"$SLAVE: replica\""
-	rlRun "ipa-replica-manage list -p Secret123 $SLAVE | grep \"$MASTER: replica\""
+		MASTERIPOCT1=$(echo $MASTERIP|cut -f1 -d.)
+		rlLog "verifies https://bugzilla.redhat.com/show_bug.cgi?id=801380"
+		rlRun "remoteExec root $MASTERIP redhat \"ipa dnszone-find\""
+		rlRun "egrep $MASTERIPOCT1.in-addr.arpa. /tmp/remote_exec.out"
+		rlRun "cat /tmp/remote_exec.out"
 
-	rlLog "verifies https://bugzilla.redhat.com/show_bug.cgi?id=754524"
-	rlRun "remoteExec root $MASTERIP redhat \"echo $ADMINPW | kinit admin; klist\""
-	# comment for debugging...running ipa-replica-manage locally with -H option
-	#rlRun "replicaDel root $MASTERIP \"ipa-replica-manage del $SLAVE\" yes"
-	rlRun "ipa-replica-manage -H $MASTER del $SLAVE -p $ADMINPW -f > /tmp/replicaDel.out 2>&1"
-	rlRun "egrep \"Deleted replication agreement from '$MASTER' to '$SLAVE'\" /tmp/replicaDel.out"
-	rlRun "cat /tmp/replicaDel.out"
+### ipa-csreplica-manage tests
+		if [ -d /var/lib/pki-ca ]; then
+			rlLog "verifies bug https://bugzilla.redhat.com/show_bug.cgi?id=750524"
+			# Adding some logic to check for a csreplica before trying to delete
+			rlLog "checking if there is a csreplia agreement to delete" 
+			# comment for debugging...running ipa-csreplica-manage with -H option
+			#ipa-csreplica-manage list -p $ADMINPW|grep $SLAVE|grep -v "CA not configured" > /dev/null
+			#rlRun "remoteExec root $MASTERIP \"ipa-csreplica-manage list -p $ADMINPW\""
+			rlRun "ipa-csreplica-manage -H $MASTER list -p $ADMINPW -f > /tmp/remote_exec.out 2>&1"	
+			rlRun "cat /tmp/remote_exec.out"
+			grep $SLAVE /tmp/remote_exec.out | grep -v "CA not configured"|grep -v "Last login"
+			if [ $? -eq 0 ]; then
+				rlLog "Running initial ipa-csreplica-manage del positive test"
+				# comment for debugging...running ipa-csreplica-manage with -H option
+				#rlRun "remoteExec root $MASTERIP \"ipa-csreplica-manage del $SLAVE -p $ADMINPW\""
+				rlRun "ipa-csreplica-manage -H $MASTER del $SLAVE -p $ADMINPW -f > /tmp/remote_exec.out 2>&1"
+				rlRun "egrep \"Deleted replication agreement from '$MASTER' to '$SLAVE'\" /tmp/remote_exec.out"
+				rlRun "cat /tmp/remote_exec.out"
+			fi
 
-	MASTERIPOCT1=$(echo $MASTERIP|cut -f1 -d.)
-	rlLog "verifies https://bugzilla.redhat.com/show_bug.cgi?id=801380"
-	rlRun "remoteExec root $MASTERIP redhat \"ipa dnszone-find\""
-	rlRun "egrep $MASTERIPOCT1.in-addr.arpa. /tmp/remote_exec.out"
-	rlRun "cat /tmp/remote_exec.out"
+			rlLog "Running ipa-csreplica-manage-del negative test"
+			# comment for debugging...running ipa-csreplica-manage with -H option
+			#rlRun "remoteExec root $MASTERIP \"ipa-csreplica-manage del $SLAVE -p $ADMINPW\""
+			#rlRun "egrep \"'$MASTER' has no replication agreement for '$SLAVE'\" /tmp/remote_exec.out"
+			rlRun "ipa-csreplica-manage -H $MASTER del $SLAVE -p $ADMINPW -f > /tmp/remote_exec.out 2>&1" 1
+			rlRun "egrep \"'$MASTER' has no replication agreement for '$SLAVE'\" /tmp/remote_exec.out"
+			rlRun "cat /tmp/remote_exec.out"
+		fi
 
-	# comment for debugging...running ipa-replica-manage locally with -H option
-	#rlRun "replicaDel root $MASTERIP  \"ipa-replica-manage del $SLAVE\"" 
-	rlRun "ipa-replica-manage -H $MASTER del $SLAVE -p $ADMINPW -f > /tmp/replicaDel.out 2>&1" 1
-	rlRun "egrep \"'$MASTER' has no replication agreement for '$SLAVE'\" /tmp/replicaDel.out"
-	rlRun "cat /tmp/replicaDel.out"
+### ipa-replica-manage tests
 
-	rlLog "verifies bug https://bugzilla.redhat.com/show_bug.cgi?id=750524"
-	# Adding some logic to check for a csreplica before trying to delete
-	rlLog "checking if there is a csreplia agreement to delete" 
-	# comment for debugging...running ipa-csreplica-manage with -H option
-	#ipa-csreplica-manage list -p $ADMINPW|grep $SLAVE|grep -v "CA not configured" > /dev/null
-	#rlRun "remoteExec root $MASTERIP \"ipa-csreplica-manage list -p $ADMINPW\""
-	rlRun "ipa-csreplica-manage -H $MASTER list -p $ADMINPW -f > /tmp/remote_exec.out 2>&1"	
-	#rlRun "cat /tmp/remote_exec.out"
-	grep $SLAVE /tmp/remote_exec.out | grep -v "CA not configured"|grep -v "Last login"
-	if [ $? -eq 0 ]; then
-		rlLog "Running initial ipa-csreplica-manage del positive test"
-		# comment for debugging...running ipa-csreplica-manage with -H option
-		#rlRun "remoteExec root $MASTERIP \"ipa-csreplica-manage del $SLAVE -p $ADMINPW\""
-		rlRun "ipa-csreplica-manage -H $MASTER del $SLAVE -p $ADMINPW -f > /tmp/remote_exec.out 2>&1"
-		rlRun "egrep \"Deleted replication agreement from '$MASTER' to '$SLAVE'\" /tmp/remote_exec.out"
-		#rlRun "cat /tmp/remote_exec.out"
-	fi
-	sleep 10
-	rlLog "Running ipa-csreplica-manage-del negative test"
-	# comment for debugging...running ipa-csreplica-manage with -H option
-	#rlRun "remoteExec root $MASTERIP \"ipa-csreplica-manage del $SLAVE -p $ADMINPW\""
-	#rlRun "egrep \"'$MASTER' has no replication agreement for '$SLAVE'\" /tmp/remote_exec.out"
-	rlRun "ipa-csreplica-manage -H $MASTER del $SLAVE -p $ADMINPW -f > /tmp/remote_exec.out 2>&1" 1
-	rlRun "egrep \"'$MASTER' has no replication agreement for '$SLAVE'\" /tmp/remote_exec.out"
-	#rlRun "cat /tmp/remote_exec.out"
+		rlLog "verifies https://bugzilla.redhat.com/show_bug.cgi?id=754524"
+		rlRun "remoteExec root $MASTERIP redhat \"echo $ADMINPW | kinit admin; klist\""
+		# comment for debugging...running ipa-replica-manage locally with -H option
+		#rlRun "replicaDel root $MASTERIP \"ipa-replica-manage del $SLAVE\" yes"
+		rlRun "ipa-replica-manage -H $MASTER del $SLAVE -p $ADMINPW -f > /tmp/replicaDel.out 2>&1"
+		rlRun "egrep \"Deleted replication agreement from '$MASTER' to '$SLAVE'\" /tmp/replicaDel.out"
+		rlRun "cat /tmp/replicaDel.out"
 
-	rlLog "verifies bug https://bugzilla.redhat.com/show_bug.cgi?id=754539"
-	rlRun "remoteExec root $MASTERIP \"ipa-replica-manage connect $SLAVE\""
-	rlRun "egrep \"You cannot connect to a previously deleted master\" /tmp/remote_exec.out"
+		# comment for debugging...running ipa-replica-manage locally with -H option
+		#rlRun "replicaDel root $MASTERIP  \"ipa-replica-manage del $SLAVE\"" 
+		rlRun "ipa-replica-manage -H $MASTER del $SLAVE -p $ADMINPW -f > /tmp/replicaDel.out 2>&1" 1
+		rlRun "egrep \"'$MASTER' has no replication agreement for '$SLAVE'\" /tmp/replicaDel.out"
+		rlRun "cat /tmp/replicaDel.out"
 
-	sleep 10
+		rlLog "verifies bug https://bugzilla.redhat.com/show_bug.cgi?id=754539"
+		rlRun "remoteExec root $MASTERIP \"ipa-replica-manage connect $SLAVE\""
+		rlRun "egrep \"You cannot connect to a previously deleted master\" /tmp/remote_exec.out"
 
-	rlLog "Executing: ipa-server-install --uninstall -U"
-	rlRun "ipa-server-install --uninstall -U"
+		sleep 10
 
-   rlPhaseEnd
+		rlLog "Executing: ipa-server-install --uninstall -U"
+		rlRun "ipa-server-install --uninstall -U"
+
+	rlPhaseEnd
 }
 
