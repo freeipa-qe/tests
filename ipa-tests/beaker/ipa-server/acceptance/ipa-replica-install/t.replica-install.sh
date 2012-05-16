@@ -136,9 +136,19 @@ createReplica2()
 
 				rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
 				rlRun "rm -fr /var/lib/ipa/replica-info-*"
+				REVERSE_ZONE=$(echo $SLAVEIP|awk -F. '{print $3 "." $2 "." $1 ".in-addr.arpa."}')
+				if [ $(ipa dnszone-show $REVERSE_ZONE 2>/dev/null | wc -l) -gt 0 ]; then
+					rlLog "Deleting ZONE ($REVERSE_ZONE) so ipa-replica-prepare creates it"
+					rlRun "ipa dnszone-del $REVERSE_ZONE"
+				fi
 				rlRun "ipa dnszone-find"
+				if [ $(ipa dnsrecord-show $DOMAIN $hostname_s 2>/dev/null | wc -l) -gt 0 ]; then
+					rlLog "Deleting $hostname_s.$DOMAIN records so ipa-replica-prepare creates it"
+					rlRun "ipa dnsrecord-del $DOMAIN $hostname_s --del-all"
+				fi
 				rlRun "ipa dnsrecord-find $DOMAIN"
 				rlRun "cat /etc/hosts"
+				
 
 				# Preparing replica with --ip-address option
 				rlRun "service named restart"
