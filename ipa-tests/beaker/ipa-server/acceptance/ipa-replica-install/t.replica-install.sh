@@ -135,7 +135,7 @@ createReplica2()
 				rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
 				rlRun "rm -fr /var/lib/ipa/replica-info-*"
 				rlRun "ipa dnszone-find"
-				rlRun "ipa dnsrecord testrelm"
+				rlRun "ipa dnsrecord-find $DOMAIN"
 				rlRun "cat /etc/hosts"
 
 				# Preparing replica with --ip-address option
