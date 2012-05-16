@@ -192,6 +192,21 @@ ipaconfig_delattr_positive()
         # set back to default
         rlRun "ipa config-mod --setattr=ipaconfigstring=AllowNThash" 0 "Setting back to default value"
    rlPhaseEnd
+
+    rlPhaseStartTest "ipaconfig_mod_delattr ipadefaultemaildomain"
+        rlRun "ipa config-mod --delattr=ipadefaultemaildomain=$DOMAIN" 0 "Delete default email domain."
+        ipa config-show --all > /tmp/configshowdel.out
+        cat /tmp/configshowdel.out | grep " Default e-mail domain:"
+        if [ $? -ne 0 ] ; then
+                rlPass "Config string successfully deleted."
+        else
+                rlFail "Default Email Domain not as expected"
+        fi
+	
+	sleep 2
+	rlRun "ipa config-mod --emaildomain=$DOMAIN" 0 "Set email domain back to default."
+    rlPhaseEnd
+
 }
 
 ipaconfig_delattr_negative()
@@ -229,13 +244,6 @@ ipaconfig_delattr_negative()
         expmsg="ipa: ERROR: 'ipadefaultprimarygroup' is required"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
         rlLog "Verifies bugzilla https://bugzilla.redhat.com/show_bug.cgi?id=817821"
-    rlPhaseEnd
-
-    rlPhaseStartTest "ipaconfig_mod_delattr ipadefaultemaildomain negative test"
-        command="ipa config-mod --delattr=ipadefaultemaildomain=$DOMAIN"
-        expmsg="ipa: ERROR: Action not allowed"
-        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
-        rlLog "Verifies bugzilla https://bugzilla.redhat.com/show_bug.cgi?id=794804"
     rlPhaseEnd
 
     rlPhaseStartTest "ipaconfig_mod_delattr ipasearchtimelimit negative test"
