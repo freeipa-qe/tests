@@ -584,7 +584,11 @@ installSlave_ca()
 installSlave_sshtrustdns() {
 
    rlPhaseStartTest "Installing replica with --ssh-trust-dns option"
-
+		cd /dev/shm/
+		[ -z "$hostname_s" ] && hostname_s=$(echo $SLAVE|cut -f1 -d.)
+		rlRun "rm -f /dev/shm/replica-info-*"
+		rlRun "sftp root@$MASTERIP:/var/lib/ipa/replica-info-$hostname_s.$DOMAIN.gpg"
+		rlLog "sftp root@$MASTERIP:/var/lib/ipa/replica-info-$hostname_s.$DOMAIN.gpg"
         ls /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg
         if [ $? -ne 0 ] ; then
                 rlFail "ERROR: Replica Package not found"
