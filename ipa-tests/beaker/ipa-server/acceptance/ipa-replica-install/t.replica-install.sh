@@ -148,6 +148,7 @@ createReplica2()
 				if [ $(ipa dnsrecord-show $DOMAIN $hostname_s 2>/dev/null | wc -l) -gt 0 ]; then
 					rlLog "Deleting $hostname_s.$DOMAIN records so ipa-replica-prepare creates it"
 					rlRun "ipa dnsrecord-del $DOMAIN $hostname_s --del-all"
+					miscDNSCleanup 
 				fi
 				rlRun "ipa dnsrecord-find $DOMAIN"
 				rlRun "cat /etc/hosts"
@@ -819,13 +820,31 @@ uninstall()
 miscDNSCleanup()
 {
 	hostname_s=$(echo $SLAVE|cut -f1 -d.)
-	ipa dnsrecord-del $DOMAIN _kerberos-master._tcp --srv-rec="0 100 88 $hostname_s"
-	ipa dnsrecord-del $DOMAIN _kerberos-master._udp --srv-rec="0 100 88 $hostname_s"
-	ipa dnsrecord-del $DOMAIN _kerberos._tcp --srv-rec="0 100 88 $hostname_s"
-	ipa dnsrecord-del $DOMAIN _kerberos._udp --srv-rec="0 100 88 $hostname_s"
-	ipa dnsrecord-del $DOMAIN _kpasswd._tcp --srv-rec="0 100 464 $hostname_s"
-	ipa dnsrecord-del $DOMAIN _kpasswd._udp --srv-rec="0 100 464 $hostname_s"
-	ipa dnsrecord-del $DOMAIN _ldap._tcp --srv-rec="0 100 389 $hostname_s"
-	ipa dnsrecord-del $DOMAIN _ntp._udp --srv-rec="0 100 123 $hostname_s"
-	ipa dnsrecord-del $DOMAIN "@" --ns-rec=$hostname_s.$DOMAIN
+	if [ $(ipa dnsrecord-show $DOMAIN _kerberos-master._tcp |grep $hostname_s|wc -l) -gt 0 ]; then
+		rlRun "ipa dnsrecord-del $DOMAIN _kerberos-master._tcp --srv-rec=\"0 100 88 $hostname_s\""
+	fi
+	if [ $(ipa dnsrecord-show $DOMAIN _kerberos-master._udp |grep $hostname_s|wc -l) -gt 0 ]; then
+		rlRun "ipa dnsrecord-del $DOMAIN _kerberos-master._udp --srv-rec=\"0 100 88 $hostname_s\""
+	fi
+	if [ $(ipa dnsrecord-show $DOMAIN _kerberos._tcp |grep $hostname_s|wc -l) -gt 0 ]; then
+		rlRun "ipa dnsrecord-del $DOMAIN _kerberos._tcp --srv-rec=\"0 100 88 $hostname_s\""
+	fi
+	if [ $(ipa dnsrecord-show $DOMAIN _kerberos._udp |grep $hostname_s|wc -l) -gt 0 ]; then
+		rlRun "ipa dnsrecord-del $DOMAIN _kerberos._udp --srv-rec=\"0 100 88 $hostname_s\""
+	fi
+	if [ $(ipa dnsrecord-show $DOMAIN _kpasswd._tcp |grep $hostname_s|wc -l) -gt 0 ]; then
+		rlRun "ipa dnsrecord-del $DOMAIN _kpasswd._tcp --srv-rec=\"0 100 464 $hostname_s\""
+	fi
+	if [ $(ipa dnsrecord-show $DOMAIN _kpasswd._udp |grep $hostname_s|wc -l) -gt 0 ]; then
+		rlRun "ipa dnsrecord-del $DOMAIN _kpasswd._udp --srv-rec=\"0 100 464 $hostname_s\""
+	fi
+	if [ $(ipa dnsrecord-show $DOMAIN _ldap._tcp |grep $hostname_s|wc -l) -gt 0 ]; then
+		rlRun "ipa dnsrecord-del $DOMAIN _ldap._tcp --srv-rec=\"0 100 389 $hostname_s\""
+	fi
+	if [ $(ipa dnsrecord-show $DOMAIN _ntp._udp |grep $hostname_s|wc -l) -gt 0 ]; then
+		rlRun "ipa dnsrecord-del $DOMAIN _ntp._udp --srv-rec=\"0 100 123 $hostname_s\""
+	fi
+	if [ $(ipa dnsrecord-show $DOMAIN _kerberos-master._tcp |grep $hostname_s|wc -l) -gt 0 ]; then
+		rlRun "ipa dnsrecord-del $DOMAIN \"@\" --ns-rec=$hostname_s.$DOMAIN"
+	fi
 }
