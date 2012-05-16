@@ -10,6 +10,7 @@ USER2=puser2
 USER3="philomena_hazen"
 GROUP1=group1
 GROUP2=group2
+GROUP3=group3
 
 ######################
 # test suite         #
@@ -393,9 +394,7 @@ bugzillas()
 			rlRun "ipa group-find --private $myuser" 1 "Verify user '$myuser' does not have a private group"
 		done
 		rlLog "Cleaning up migrated users"
-                ipa user-del $USER1
-                ipa user-del $USER2
-                ipa user-del $USER3
+                ipa user-del $USER1 $USER2 $USER3
                 ipa group-del $GROUP1
                 ipa group-del $GROUP2
 	rlPhaseEnd
@@ -414,32 +413,37 @@ bugzillas()
 		ipa group-del $GROUP1 $GROUP2 "HR Managers" "PD Managers" "QA Managers" "Accounting Managers"
         rlPhaseEnd
 
-}
+	rlPhaseStartTest "bz813389 Improve migration plugin error when 2 groups have identical GID"
+		cat > addgroup.ldif << addgroup.ldif_EOF
 
-#cleartxtpwdmigration()
-#{
-#
-#	# disabling clear text password migration as it is not supported
-#	rlPhaseStartTest "ds-migration-cleartxt-pwd-001 Clear Text Password Migration"
-#                rlLog "EXECUTING: ipa migrate-ds --user-container=\"$USERCONTAINER\" --group-container=\"$GROUPCONTAINER\" ldap://$CLIENT:389"
-#                rlRun "echo $ADMINPW | ipa migrate-ds --user-container=\"$USERCONTAINER\" --group-container=\"$GROUPCONTAINER\" ldap://$CLIENT:389" 0
-#
-#                rlRun "ssh_auth_success $USER1 $USER1PWD $HOSTNAME"
-#		rlRun "ssh_auth_success $USER2 $USER2PWD $HOSTNAME"
-#        rlPhaseEnd
-#
-#        rlPhaseStartTest "ds-migration-cleartxt-pwd-002 Cleanup migration"
-#                ipa user-del $USER1
-#                ipa user-del $USER2
-#                ipa group-del $GROUP1
-#                ipa group-del $GROUP2
-#
-#		rlRun "ipa user-show $USER1" 2 "Make sure $USER1 was deleted"
-#		rlRun "ipa user-show $USER2" 2 "Make sure $USER2 was deleted"
-#		rlRun "ipa group-show $GROUP1" 2 "Make sure $GROUP1 was deleted"
-#		rlRun "ipa group-show $GROUP1" 2 "Make sure $GROUP1 was deleted"
-#        rlPhaseEnd
-#}
+dn: cn=Group3,ou=groups,dc=example,dc=com
+gidNumber: 1002
+objectClass: top
+objectClass: groupOfNames
+objectClass: posixGroup
+cn: Group3
+creatorsName: uid=admin,ou=administrators,ou=topologymanagement,o=netscaperoot
+modifiersName: uid=admin,ou=administrators,ou=topologymanagement,o=netscaperoot
+nsUniqueId: 42598c8d-1dd211b2-8f88fe1c-fcc30004
+addgroup.ldif_EOF
+
+		rlRun "/usr/bin/ldapmodify -a -x -h $CLIENT -p 389 -D \"cn=Directory Manager\" -w $ADMINPW -c -f addgroup.ldif" 0 "Add group with duplicate GID to existing ldap group"
+		rlLog "EXECUTING: ipa migrate-ds --with-compat --user-container=\"$USERCONTAINER,$MYBASEDN\" --group-container=\"$GROUPCONTAINER,$MYBASEDN\" ldap://$CLIENT:389"
+		rlAssertGrep "WARNING: GID number 1002 of migrated user puser2 should match 1 group, but it matched 2 groups" "/var/log/httpd/error_log"
+
+		cat > delgroup.ldif << delgroup.ldif_EOF
+
+dn: cn=Group3,ou=groups,dc=example,dc=com
+changetype: delete
+delgroup.ldif_EOF
+
+		rlRun "/usr/bin/ldapmodify -a -x -h $CLIENT -p 389 -D \"cn=Directory Manager\" -w $ADMINPW -c -f delgroup.ldif" 0 "delete ldap group"
+
+                rlLog "Cleaning up migrated users"
+                ipa user-del $USER1 $USER2 $USER3
+                ipa group-del $GROUP1 $GROUP2 $GROUP3 "HR Managers" "PD Managers" "QA Managers" "Accounting Managers"
+	rlPhaseEnd
+}
 
 cleanup()
 {
