@@ -706,7 +706,8 @@ installSlave_nouiredirect() {
                 rlRun "service ipa status"
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 
-                rlRun "ipa dnsrecord-find $DOMAIN $hostname_s | grep -i \"sshfp record\"" 1 "SSHFP record should not be created"
+				#commenting out since this test is properly handled in installSlave_nodnssshfp
+                #rlRun "ipa dnsrecord-find $DOMAIN $hostname_s | grep -i \"sshfp record\"" 1 "SSHFP record should not be created"
 
 		rlRun "curl http://$HOSTNAME > /tmp/curl.out 2>&1"
 		rlAssertGrep "Test Page for the Apache HTTP" "/tmp/curl.out"
