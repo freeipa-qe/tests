@@ -131,6 +131,8 @@ createReplica2()
 	rlPhaseStartTest "Create Replica Package(s) with --ip-address option"
 		for s in $SLAVE; do
 			if [ "$s" != "" ]; then
+				# put the short form of the hostname for server $s into s_short
+				hostname_s=$(echo $s | cut -d. -f1)
 
 				rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
 				rlRun "rm -fr /var/lib/ipa/replica-info-*"
