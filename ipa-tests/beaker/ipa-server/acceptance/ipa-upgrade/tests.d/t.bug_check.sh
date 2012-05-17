@@ -512,7 +512,7 @@ upgrade_bz_821176()
 		
 		INSTANCE=$(echo $RELM|sed 's/\./-/g')
 		rlLog "Checking /var/log/dirsrv/slapd-$INSTANCE/errors for LDAP error"
-		if [ $(grep "Can't contact LDAP server" /var/log/dirsrv/slapd-$INSTANCE/errors|wc -l) -gt 0 ]; then
+		if [ $(grep "NSMMReplicationPlugin.*Warning: unable to send endReplication extended operation.*Can't contact LDAP server" /var/log/dirsrv/slapd-$INSTANCE/errors|wc -l) -gt 0 ]; then
 			rlFail "BZ 821176 found...found Can't contact LDAP server messages in dirsrv log"
 		else
 			rlPass "BZ 821176 not found...didn't find LDAP error in dirsrv log"
