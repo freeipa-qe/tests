@@ -20,6 +20,7 @@ ipakrblockout()
     ipakrblockout_setup
     ipakrblockout_negative
     ipakrblockout_positive
+    bz822429
     ipakrblockout_cleanup
 } 
 
@@ -670,6 +671,64 @@ ipakrblockout_grouppolicy()
 		rlLog "May be regression bug :: https://bugzilla.redhat.com/show_bug.cgi?id=804096"
         fi
 
+    rlPhaseEnd
+}
+
+##################################################
+#  BUGZILLAS
+##################################################
+bz822429()
+{
+    rlPhaseStartTest "bz822429 Failed login count is stuck at 1"
+	# set policy to max failures of 3
+	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit As Admin"
+	rlRun "ipa pwpolicy-mod --$maxflag=3" 0 "Set max failures to 3"
+
+	# create test user and set password
+	rlRun "create_ipauser user1 user1 user1 Secret123" 0 "Creating a test user1"
+
+	for value in 1 2 3
+           do
+                rlRun "kinitAs user1 BADPWD" 1 "Kinit as user with invalid password - attemp $value"
+                rlRun "kinitAs $ADMINID $ADMINPW"
+                count=`ipa user-show --all user1 | grep $usercountattr | cut -d ':' -f 2`
+                count=`echo $count`
+                if [ $count -eq $value ] ; then
+                        rlPass "User's failed counter is as expected: [$count]"
+                else
+                        rlFail "User's failed counter is NOT as expected.  Got: [$count] Expected: [$value]"
+                fi
+           done
+
+        # attempt log in with correct password - account should be locked
+        rlRun "kinitAs user1 Secret123 > /tmp/kinitrevoked.txt 2>&1" 1 "Kinit as user with valid password. Max failures reached"
+        rlAssertGrep "$revokedmsg" "/tmp/kinitrevoked.txt"
+
+	# admin unlock user
+	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit As Admin"
+	rlRun "ipa user-unlock user1" 0 "Unlock user"
+
+	# try to lock user again
+        for value in 1 2 3
+           do
+                rlRun "kinitAs user1 BADPWD" 1 "Kinit as user with invalid password - attemp $value"
+                rlRun "kinitAs $ADMINID $ADMINPW"
+                count=`ipa user-show --all user1 | grep $usercountattr | cut -d ':' -f 2`
+                count=`echo $count`
+                if [ $count -eq $value ] ; then
+                        rlPass "User's failed counter is as expected: [$count]"
+                else
+                        rlFail "User's failed counter is NOT as expected.  Got: [$count] Expected: [$value]"
+                fi
+           done
+
+        # attempt log in with correct password - account should be locked
+        rlRun "kinitAs user1 Secret123 > /tmp/kinitrevoked.txt 2>&1" 1 "Kinit as user with valid password. Max failures reached"
+        rlAssertGrep "$revokedmsg" "/tmp/kinitrevoked.txt"
+
+        # set policy to max failures of 6 -default
+        rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit As Admin"
+        rlRun "ipa pwpolicy-mod --$maxflag=6" 0 "Set max failures back to default"
     rlPhaseEnd
 }
 
