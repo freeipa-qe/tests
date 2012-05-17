@@ -488,3 +488,55 @@ upgrade_bz_812391()
 	rlPhaseEnd
 	[ -f $tmpout ] && rm -f $tmpout
 }
+
+upgrade_bz_821176()
+{
+	TESTORDER=$(( TESTORDER += 1 ))
+	local tmpout=/tmp/errormsg.out
+	rlPhaseStartTest "upgrade_bz_821176: ns-slapd segfault in libreplication-plugin after IPA upgrade from 2.1.3 to 2.2.0"
+	case "$MYROLE" in
+	"MASTER")
+		rlLog "Machine in recipe is MASTER"
+		rlLog "Restarting IPA services"
+		rlRun "ipactl restart"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.1' -m $MASTER_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $SLAVE_IP"
+		rlLog "Checking /var/log/messages for ns-slapd segfault"
+		if [ $(grep "ns-slapd.*segfault.*at.*error 4 in libreplication-plugin.so" /var/log/messages|wc -l) -gt 0 ]; then
+			rlFail "BZ 821176 found...ns-slapd segfault in libreplication-plugin after IPA upgrade from 2.1.3 to 2.2.0"
+			rlFail "ns-slapd segfault messages found in /var/log/messages"
+			rlRun "grep \"ns-slapd.*segfault.*at.*error 4 in libreplication-plugin.so\" /var/log/messages" 
+		else
+			rlPass "BZ 821176 not found.  No ns-slapd segfault found in /var/log/messages"
+		fi
+		
+		INSTANCE=$(echo $RELM|sed 's/\./-/g')
+		rlLog "Checking /var/log/dirsrv/slapd-$INSTANCE/errors for LDAP error"
+		if [ $(grep "Can't contact LDAP server" /var/log/dirsrv/slapd-$INSTANCE/errors|wc -l) -gt 0 ]; then
+			rlFail "BZ 821176 found...found Can't contact LDAP server messages in dirsrv log"
+		else
+			rlPass "BZ 821176 not found...didn't find LDAP error in dirsrv log"
+		fi
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.3' -m $MASTER_IP"
+		;;
+	"SLAVE")
+		rlLog "Machine in recipe is SLAVE"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $MASTER_IP"
+		rlLog "Running ipa-replica-manage force-sync to make sure that works"
+		rlRun "ipa-replica-manage force-sync --from=$MASTER_S.$DOMAIN --password=$ROOTDNPWD"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.2' -m $SLAVE_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.3' $MASTER_IP"
+		;;
+	"CLIENT")
+		rlLog "Machine in recipe is CLIENT"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $MASTER_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $SLAVE_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.3' $MASTER_IP"
+		;;
+	*)
+		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
+		;;
+	esac
+	rlPhaseEnd
+	[ -f $tmpout ] && rm -f $tmpout
+}
