@@ -257,26 +257,24 @@ sleep 100
 		rhts-sync-set -s MASTERDONE 
 	fi
 #
+#	# kinit user from client to master
+#	rhts-sync-block -s READYFORCLIENT {$MASTER, $SLAVE}
+#	kinit_user
+#	rhts-sync-set -s READY
 #
-###
-###	# kinit user from client to master
-###	rhts-sync-block -s READYFORCLIENT {$MASTER, $SLAVE}
-###	kinit_user
-###	rhts-sync-set -s READY
-###
-###	# check login on replica
-###	check_login
-###
-###	# kinit user from client to replica
-###	kinit_user
-###
-###	# check login on master
-###	check_login
-###
-###	# user changes password from client to master
-###	client_actions
-###
-###	# ....and so on
+#	# check login on replica
+#	check_login
+#
+#	# kinit user from client to replica
+#	kinit_user
+#
+#	# check login on master
+#	check_login
+#
+#	# user changes password from client to master
+#	client_actions
+#
+#	# ....and so on
 
 }
 
@@ -463,7 +461,7 @@ check_updated_slave_objects()
 	check_slave_modifiedhost
 	check_slave_modifiedhostgroup
 	check_slave_modifiednetgroup
-	check_slave_modifiednewservice
+	check_slave_modifiedservice
 	check_slave_modifiedhbacservice
 	check_slave_modifiedservice
 	check_slave_modifiedsudorule

@@ -376,12 +376,15 @@ add_newhostgroup()
 		rlRun "ipa hostgroup-add --desc=$hostgroup_groupMember1  $hostgroup_groupMember1" 0 "Add a hostgroup to be added as member"
 		rlRun "ipa hostgroup-add --desc=$hostgroup_groupMember1_updated  $hostgroup_groupMember1_updated" 0 "Add another hostgroup to be added as member"
 
-		rlRun "ipa hostgroup-add --desc=\"$hostgroup_desc\" \
-		                         --addattr member=\"cn=$hostgroup_groupMember1,cn=hostgroups,cn=accounts,dc=$DOMAIN\" \
-		                         $hostgroup " \
-		                         0 \
-		                         "Add a new hostgroup, with a hostgroup member"
+# Changing command below to use hostgroup-add-member --hostgroups. By using addattr member, the memberof is not working for $hostgroup_groupMember1
+#		rlRun "ipa hostgroup-add --desc=\"$hostgroup_desc\" \
+#		                         --addattr member=\"cn=$hostgroup_groupMember1,cn=hostgroups,cn=accounts,dc=$DOMAIN\" \
+#		                         $hostgroup " \
+#		                         0 \
+#		                         "Add a new hostgroup, with a hostgroup member"
+                rlRun "ipa hostgroup-add --desc=\"$hostgroup_desc\" $hostgroup " 0 "Add a new hostgroup"
 		rlRun "ipa hostgroup-add-member --hosts=$managedByHost $hostgroup" 0 "Add a host member"
+		rlRun "ipa hostgroup-add-member --hostgroups=$hostgroup_groupMember1 $hostgroup" 0 "Add a host member"
 	rlPhaseEnd
 }
 
@@ -1229,8 +1232,9 @@ add_slave_pwpolicy()
 check_pwpolicy()
 {
 	rlPhaseStartTest "Searching for added pwpolicy"
-		rlRun "ipa pwpolicy-find $tg | grep 999" 0 "Searching for added pwpolicy"
-		rlRun "ipa pwpolicy-find $ts | grep 999" 0 "Searching for added pwpolicy"
+            maxlife=`echo "999 * 24 * 60 * 60 " | bc` 
+       	    rlRun "ipa pwpolicy-find $tg | grep $maxlife" 0 "Searching for added pwpolicy $tg with $maxlife"
+	    rlRun "ipa pwpolicy-find $ts | grep $maxlife" 0 "Searching for added pwpolicy $ts with $maxlife"
 	rlPhaseEnd
 }
 modify_pwpolicy()
@@ -1246,13 +1250,15 @@ modify_slave_pwpolicy()
 check_modifiedpwpolicy()
 {
 	rlPhaseStartTest "Searching for modified pwpolicy in tg"
-		rlRun "ipa pwpolicy-find $tg | grep 384" 0 "Searching for modified pwpolicy in tg"
+            maxlife=`echo "384 * 24 * 60 * 60 " | bc` 
+	    rlRun "ipa pwpolicy-find $tg | grep $maxlife" 0 "Searching for modified pwpolicy in tg"
 	rlPhaseEnd
 }
 check_slave_modifiedpwpolicy()
 {
 	rlPhaseStartTest "Searching for modified pwpolicy in the slave for user $ts"
-		rlRun "ipa pwpolicy-find $ts | grep 384" 0 "Searching for modified pwpolicy in ts"
+            maxlife=`echo "384 * 24 * 60 * 60 " | bc` 
+	    rlRun "ipa pwpolicy-find $ts | grep $maxlife" 0 "Searching for modified pwpolicy in ts"
 	rlPhaseEnd
 }
 delete_pwpolicy()

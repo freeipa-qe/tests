@@ -133,14 +133,14 @@ netgroup_groupMember2_updated="eviladmins"
 service=ntpd/$SLAVE@$RELM
 service2=nfs/$SLAVE@$RELM
 keytab=False
-subject="CN=rhel61-server4.testrelm,O=$RELM"
+subject="CN=rhel63-server1.testrelm.com,O=$RELM"
 issuer="CN=Certificate Authority,O=$RELM"
 
 
 ######### attributes for a new service modified from slave
 service_updated=vpn/$MASTER@$RELM
 service2_updated=lsmtp/$MASTER@$RELM
-subject_updated="CN=rhel61-server3.testrelm,O=$RELM"
+subject_updated="CN=rhel63-server2.testrelm.com,O=$RELM"
 service_managedby_attr="fqdn=$managedByHost_updated,cn=computers,cn=accounts,$BASEDN"
 service_managedby_attr2="fqdn=$managedByHost,cn=computers,cn=accounts,$BASEDN"
 
