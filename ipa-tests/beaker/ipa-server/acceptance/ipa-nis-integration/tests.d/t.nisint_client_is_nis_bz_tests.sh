@@ -51,20 +51,37 @@ nisint_bz_766320()
 		rlLog "Machine in recipe is IPAMASTER"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
-		cat > /tmp/bz766320_hang.ldif <<-EOF
-		dn: cn=MemberOf Plugin,cn=plugins,cn=config
-		changetype: modify
-		replace: nsslapd-plugintype
-		nsslapd-plugintype: betxnpostoperation
-		EOF
+		OLDNSSLAPDPLUGINTYPE=$(ldapsearch -xLLL -D "$ROOTDN" -w "$ROOTDNPWD" -b "cn=MemberOf Plugin,cn=plugins,cn=config" |grep -i nsslapd-plugintype)
+
+		rlLog "Changing nsslapd plugin type setting to betxnpostoperation to try to reproduce hang"
+cat > /tmp/bz766320_hang.ldif <<-EOF
+dn: cn=MemberOf Plugin,cn=plugins,cn=config
+changetype: modify
+replace: nsslapd-plugintype
+nsslapd-plugintype: betxnpostoperation
+EOF
 		rlRun "ldapmodify -D \"$ROOTDN\" -w \"$ROOTDNPWD\" -f /tmp/bz766320_hang.ldif"
 
+		rlLog "If job/test hangs after group-add-member, then you have hit BZ 766320"
 		rlRun "ipa group-add-member --users=admin editors"
+
 		if [ $(ipa group-show editors --raw|grep "uid=admin,cn=users,cn=accounts,$BASEDN"|wc -l) -gt 0 ]; then
 			rlRun "ipa group-show editors --raw"
 			rlRun "ipactl status"
 			rlPass "BZ 766320 not found.  apparently the ipa command didnt hang"
 		fi
+
+		rlLog "Returning plugintype setting back to original"
+cat > /tmp/bz766320_fix.ldif <<-EOF
+dn: cn=MemberOf Plugin,cn=plugins,cn=config
+changetype: modify
+replace: nsslapd-plugintype
+$OLDNSSLAPDPLUGINTYPE
+EOF
+		rlRun "ldapmodify -D \"$ROOTDN\" -w \"$ROOTDNPWD\" -f /tmp/bz766320_fix.ldif"
+		
+		rlRun "ipa group-remove-member --users=admin editors"
+		
 
 		[ -f $tmpout ] && rm -f $tmpout
 		rlRun "rhts-sync-set -s '$FUNCNAME' -m $MASTER_IP"
