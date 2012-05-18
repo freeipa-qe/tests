@@ -87,8 +87,8 @@ rlJournalStart
 	rlPhaseEnd
 	
 	# Main test functions in tests.d/t.tests.sh:
-	#upgrade_test_master_slave_client_all
-	#upgrade_test_client_slave_master_all
+	upgrade_test_master_slave_client_all
+	upgrade_test_client_slave_master_all
 	upgrade_test_master_slave_client_nodns
 	#upgrade_test_master_slave_client_dirsrv_off
 	#upgrade_test_master_bz_tests
