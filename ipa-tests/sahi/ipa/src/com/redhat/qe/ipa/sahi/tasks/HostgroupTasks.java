@@ -353,6 +353,8 @@ public class HostgroupTasks {
 		//sahiTasks.span("Delete").click();
 		sahiTasks.link("Delete").near(sahiTasks.div("RefreshDeleteAddShow Results Direct Membership Indirect Membership")).click();
 		sahiTasks.button(button).click();
+		if (button.equals("Cancel"))
+			sahiTasks.checkbox(name).click();
 		sahiTasks.link("Host Groups").in(sahiTasks.div("content")).click();
 	}
 	
