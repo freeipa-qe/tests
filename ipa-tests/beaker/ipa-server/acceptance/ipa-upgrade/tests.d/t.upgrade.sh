@@ -70,6 +70,11 @@ upgrade_master()
 		rlRun "ipactl status"
 		#rlRun "ipactl restart" ### IS THIS REALLY NEEDED?  BZ 766687?
 		rlRun "rpm -q ipa-server 389-ds-base bind bind-dyndb-ldap pki-common sssd"
+		if [ -f /var/log/ipaupgrade.log ]; then
+			DATE=$(date +%Y%m%d-%H%M%S)
+			cp /var/log/ipaupgrade.log /var/log/ipaupgrade.log.$DATE
+			rhts-submit -l /var/log/ipaupgrade.log.$DATE
+		fi
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $MASTER_IP"
 		;;
 	"SLAVE")
@@ -129,6 +134,11 @@ upgrade_slave()
 
 		#rlRun "ipactl restart" ### IS THIS REALLY NEEDED?  BZ 766687?
 		rlRun "rpm -q ipa-server 389-ds-base bind bind-dyndb-ldap pki-common sssd"
+		if [ -f /var/log/ipaupgrade.log ]; then
+			DATE=$(date +%Y%m%d-%H%M%S)
+			cp /var/log/ipaupgrade.log /var/log/ipaupgrade.log.$DATE
+			rhts-submit -l /var/log/ipaupgrade.log.$DATE
+		fi
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $SLAVE_IP"
 		;;
 	"CLIENT")
