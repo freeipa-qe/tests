@@ -333,6 +333,11 @@ ipa_install_client(){
 
 		# Configure IPA CLIENT
 		ipa_install_prep
+		
+		if [ "x$USEDNS" = "xyes" ]; then
+			rlRun "echo \"$MASTER_IP $MASTER_S.$DOMAIN $MASTER_S\" >> /etc/hosts"
+		fi
+
 		if [ "x$USEDNS" = "xyes" ]; then
 			rlRun "ipa-client-install --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW -U --server=$MASTER_S.$DOMAIN"
 		else
