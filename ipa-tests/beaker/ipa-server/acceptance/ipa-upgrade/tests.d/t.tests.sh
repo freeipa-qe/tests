@@ -119,7 +119,7 @@ upgrade_test_master_slave_client_nodns()
 		data_check $CLIENT_IP
 
 		# uninstall everything so we can start over
-		uninstall
+		#uninstall
 	rlPhaseEnd
 }
 
