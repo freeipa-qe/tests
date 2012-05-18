@@ -35,7 +35,7 @@
 upgrade_test_master_slave_client_all()
 {	
 	rlPhaseStartTest "upgrade_test_msc_all: test full setup for master, then slave, then client"
-		rlRun "env"
+		rlRun "env|sort"
 		# Install and setup environment and add data
 		install_all
 		data_add
@@ -63,7 +63,7 @@ upgrade_test_client_slave_master_all()
 {
 	local tmpout=/tmp/errormsg.out
 	rlPhaseStartTest "upgrade_test_client_slave_master_all: test full setup for client, then slave, then master"
-		rlRun "env"
+		rlRun "env|sort"
 		# Install and setup environment and add data
 		install_all
 		data_add
@@ -101,7 +101,7 @@ upgrade_test_client_slave_master_all()
 upgrade_test_master_slave_client_nodns()
 {
 	rlPhaseStartTest "upgrade_test_master_slave_client_nodns: Test setup without dns for master, then slave, then client"
-		rlRun "env"
+		rlRun "env|sort"
 		# Install and setup environment and add data
 		install_nodns
 		data_add
@@ -127,7 +127,7 @@ upgrade_test_master_slave_client_nodns()
 upgrade_test_master_slave_client_dirsrv_off()
 {
 	rlPhaseStartTest "upgrade_test_master_slave_client_dirsrv_off: Test upgrade with dirsrv down before upgrade"
-		rlRun "env"
+		rlRun "env|sort"
 		# Install and setup environment and add data
 		install_all
 		data_add
@@ -161,7 +161,7 @@ upgrade_test_master_slave_client_dirsrv_off()
 upgrade_test_master_bz_tests()
 {
 	rlPhaseStartTest "upgrade_test_master_bz_tests: execute bug tests against a master upgrade"
-		rlRun "env"
+		rlRun "env|sort"
 		# Install and setup master for bug checks
 		ipa_install_master_all
 		ipa_install_slave_all
@@ -195,7 +195,7 @@ upgrade_test_master_bz_tests()
 upgrade_test_master_slave_client_all_final()
 {	
 	rlPhaseStartTest "upgrade_test_master_slave_client_all_final: Install and upgrade to leave in a state for other testing"
-		rlRun "env"
+		rlRun "env|sort"
 		install_all
 		upgrade_master 
 		upgrade_slave

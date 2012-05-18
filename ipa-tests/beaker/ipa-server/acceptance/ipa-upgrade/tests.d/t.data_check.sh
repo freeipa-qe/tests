@@ -85,7 +85,7 @@ data_check()
 
 	rlPhaseStartTest "data_check: check test data"
 		rlLog "Machine in recipe is $MYROLE ($HOSTNAME)"
-		KinitAsAdmin
+		rlRun "KinitAsAdmin"
 		
 		sleep 10 # delay before starting tests...
 

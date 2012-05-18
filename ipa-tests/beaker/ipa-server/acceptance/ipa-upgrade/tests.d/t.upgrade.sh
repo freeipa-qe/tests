@@ -67,6 +67,7 @@ upgrade_master()
 
 		rlRun "yum clean all"
 		rlRun "yum -y update 'ipa*'"	
+		rlRun "ipactl status"
 		#rlRun "ipactl restart" ### IS THIS REALLY NEEDED?  BZ 766687?
 		rlRun "rpm -q ipa-server 389-ds-base bind bind-dyndb-ldap pki-common sssd"
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $MASTER_IP"
@@ -123,6 +124,8 @@ upgrade_slave()
 		#else
 		#	rlRun "ipa-replica-manage force-sync --from=$MASTER --password=\"$ROOTDNPWD\""
 		#fi
+
+		rlRun "ipactl status"
 
 		#rlRun "ipactl restart" ### IS THIS REALLY NEEDED?  BZ 766687?
 		rlRun "rpm -q ipa-server 389-ds-base bind bind-dyndb-ldap pki-common sssd"
