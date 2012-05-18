@@ -313,6 +313,8 @@ ipa_install_client(){
 	case "$MYROLE" in
 	"MASTER")
 		rlLog "Machine in recipe is MASTER"
+		rlRun "cat /etc/hosts"
+		rlRun "nslookup $CLIENT"
 		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $CLIENT_IP"
 		;;
 	"SLAVE")
@@ -326,6 +328,8 @@ ipa_install_client(){
 		else
 			DOMAIN=$(dnsdomainname)
 		fi
+		rlRun "cat /etc/hosts"
+		rlRun "nslookup $CLIENT_S.$DOMAIN"
 
 		# Configure IPA CLIENT
 		ipa_install_prep
