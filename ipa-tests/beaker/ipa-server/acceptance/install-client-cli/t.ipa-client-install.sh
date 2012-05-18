@@ -287,6 +287,7 @@ ipaclientinstall_realm_casesensitive()
 {
     rlPhaseStartTest "ipa-client-install-11- [Negative] Install with incorrect case realmname"
        uninstall_fornexttest
+       rlLog "/etc/resolv.conf contents are: `cat /etc/resolv.conf`"
        relminlowercase=`echo ${RELM,,}`
        rlLog "EXECUTING: ipa-client-install --realm=$relminlowercase"
        command="ipa-client-install --realm=$relminlowercase"
