@@ -441,7 +441,7 @@ nisint_ipamaster_integration_add_nis_data_ldif_passwd()
 
 		rlRun "ldapadd -av -x -D \"$ROOTDN\" -w \"$ROOTDNPWD\" -f $tmpldif"
 
-		for USERNAME in $(cut -f1 -d: /dev/shm/nis-map.passwd); do
+		for USERNAME in $(cut -f1 -d: /dev/shm/nis-map.passwd|tr '[:upper:]' '[:lower:]'); do
 			rlRun "echo \"dummy123@ipa.com\"| ipa passwd $USERNAME"
 			FirstKinitAs $USERNAME "dummy123@ipa.com" passw0rd1
 			KinitAsAdmin
