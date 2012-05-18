@@ -358,6 +358,19 @@ public class CommonTasks {
 	}
 	
 	
+	public static void modifyToInvalidSettingTextarea(SahiTasks sahiTasks, String cn, String fieldNameToUpdate, String description, String expectedError, String buttonToClick) {		
+		sahiTasks.link(cn).click();
+		sahiTasks.link("Settings").click();
+		sahiTasks.textarea(fieldNameToUpdate).setValue(" ");
+		sahiTasks.textarea(fieldNameToUpdate).setValue(description);
+		sahiTasks.span("Update").click();
+		Assert.assertTrue(sahiTasks.div(expectedError).exists(), "Verified expected error  :: " + expectedError);
+		sahiTasks.button(buttonToClick).click();
+		sahiTasks.span("undo").click();
+		//in calling test, make sure to navigate back to page with cn
+	}
+	
+	
 	
 	/*
 	 * To help verify an expected error, when there is an
