@@ -962,6 +962,9 @@ ipa_quick_uninstall(){
 	if [ -f /etc/ipa/ca.crt ]; then
 		rlRun "/bin/rm -f /etc/ipa/ca.crt"
 	fi
+	if [ -f /etc/krb5.keytab ]; then
+		rlRun "/bin/rm -f /etc/krb5.keytab"
+	fi
 
 	rlLog "pushd /etc/yum.repos.d"
 	pushd /etc/yum.repos.d
