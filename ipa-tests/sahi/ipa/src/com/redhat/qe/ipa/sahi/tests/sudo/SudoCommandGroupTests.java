@@ -141,7 +141,8 @@ public class SudoCommandGroupTests extends SahiTestScript{
 	 * Add, and then add another Sudo Rule
 	 */
 	@Test (groups={"sudoCommandGroupAddAndAddAnotherTests"}, description="Add and Add Another Sudo Command Group", 
-			dataProvider="getSudoCommandGroupAddAndAddAnotherTestObjects")	
+			dataProvider="getSudoCommandGroupAddAndAddAnotherTestObjects",
+			dependsOnGroups={"sudoCommandGroupCancelAddTests"})	
 	public void testSudoCommandGroupAddAndAddAnother(String testName, String cn1, String cn2, String desc) throws Exception {		
 		Assert.assertFalse(sahiTasks.link(cn1.toLowerCase()).exists(), "Verify Sudo Command Group " + cn1 + " doesn't already exist");
 		Assert.assertFalse(sahiTasks.link(cn2.toLowerCase()).exists(), "Verify Sudo Command Group " + cn2 + " doesn't already exist");
@@ -205,7 +206,7 @@ public class SudoCommandGroupTests extends SahiTestScript{
 		Assert.assertTrue(sahiTasks.link(commandGroup).exists(), "Verify Command Group " + commandGroup + " exists");
 		
 		// Enroll command
-		SudoTasks.enrollIntoCommandGroup(sahiTasks, vimCommandName, commandGroup, "Enroll");
+		SudoTasks.enrollIntoCommandGroup(sahiTasks, vimCommandName, commandGroup, "Add");
 		
 		// Verify membership
 		SudoTasks.verifySudoCommandGroupMembership(sahiTasks, vimCommandName, commandGroup, true);
@@ -282,7 +283,7 @@ public class SudoCommandGroupTests extends SahiTestScript{
 		//Add the second command group
 		SudoTasks.createSudoCommandGroupAdd(sahiTasks, commandGroup2, description2, "Add");
 		//Add a command into this command group
-		SudoTasks.enrollIntoCommandGroup(sahiTasks, vimCommandName, commandGroup2, "Enroll");
+		SudoTasks.enrollIntoCommandGroup(sahiTasks, vimCommandName, commandGroup2, "Add");
 		
 		//verify from sudo command side - that it is member of 2 groups
 		sahiTasks.navigateTo(commonTasks.sudoCommandPage, true);

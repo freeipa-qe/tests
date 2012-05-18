@@ -201,7 +201,7 @@ public class SudoCommandTests extends SahiTestScript {
 		Assert.assertTrue(sahiTasks.link(command).exists(), "Verify Command " + command + " exists");
 		
 		// Enroll command
-		SudoTasks.enrollCommandInCommandGroup(sahiTasks, command, commandGroup, "Enroll");
+		SudoTasks.enrollCommandInCommandGroup(sahiTasks, command, commandGroup, "Add");
 		
 		// Verify membership
 		SudoTasks.verifySudoCommandMembership(sahiTasks, command, commandGroup, true);
