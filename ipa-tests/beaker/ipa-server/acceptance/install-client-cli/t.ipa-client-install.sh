@@ -103,15 +103,10 @@ ipaclientinstall()
 setup()
 {
     rlPhaseStartSetup "ipa-client-install-Setup "
-        # edit hosts file and resolv file before starting tests
-        rlRun "fixHostFile" 0 "Set up /etc/hosts"
-        rlRun "fixhostname" 0 "Fix hostname"
-        rlRun "fixResolv" 0 "fixing the resolv.conf to contain the correct nameserver lines"
-        rlRun "appendEnv" 0 "Append the machine information to the env.sh with the information for the machines in the recipe set"
         rlLog "Setting up Authorized keys"
-#        SetUpAuthKeys
+        SetUpAuthKeys
         rlLog "Setting up known hosts file"
-#        SetUpKnownHosts
+        SetUpKnownHosts
 
     
         ## Lines to expect to be changed during the isnatllation process
