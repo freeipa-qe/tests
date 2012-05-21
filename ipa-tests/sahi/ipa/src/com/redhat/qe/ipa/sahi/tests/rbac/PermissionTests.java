@@ -566,10 +566,13 @@ public class PermissionTests extends SahiTestScript {
 			} 
 			
 			//Reset permissions to what was installed
+			sahiTasks.navigateTo(commonTasks.permissionPage, true);
 			CommonTasks.search(sahiTasks, "Modify netgroup membership");
 			PermissionTasks.modifyPermission(sahiTasks, "Modify netgroup membership", "", "", "description");
+			sahiTasks.navigateTo(commonTasks.permissionPage, true);
 			CommonTasks.search(sahiTasks, "Enroll a host");
 			PermissionTasks.modifyPermission(sahiTasks, "Enroll a host", "write", "", "objectclass");
+			sahiTasks.navigateTo(commonTasks.permissionPage, true);
 			CommonTasks.clearSearch(sahiTasks);
 		}
 		
