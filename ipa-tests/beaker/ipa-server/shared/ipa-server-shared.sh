@@ -26,6 +26,8 @@
 #       getReverseZone_IPv6
 #	ipa_quick_uninstall
 #	check_coredump
+#   submit_log
+#   submit_logs
 ######################################################################
 KINITEXEC=/usr/bin/kinit
 #######################################################################
@@ -1024,4 +1026,52 @@ check_coredump(){
 
 
 } #check_coredump
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# submit_log
+#   Usage: submit_log <logfilename>
+#
+# This will backup and submit a log file to beaker.  The backup file
+# submitted is named $LOGFILE.$DATE
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+submit_log(){
+	if [ $# -ne 1 ]; then
+		echo "Usage: $FUNCNAME <log filename>"
+		return 1
+	fi
+	
+	if [ ! -d /tmp/logbackups ]; then
+		mkdir /tmp/logbackups
+	fi
+	local DATE=$(date +%Y%m%d-%H%M%S)
+	local LOGFILE=$1
+	local LOGBACK=$(echo $LOGFILE|sed -e 's/\//,/g' -e "s/^/\/tmp\/logbackups\/$(hostname -s)/").$DATE
+	if [ -f $LOGFILE ]; then
+		rlLog "Backing up and submitting $LOGFILE"
+		cp $LOGFILE $LOGBACK
+		rhts-submit-log -l $LOGBACK
+	else
+		rlLog "Cannot file $LOGFILE"	
+	fi
+}	
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# submit_logs
+#   Usage: submit_logs
+#
+# This will rhts-submit various/all IPA related log files to beaker for 
+# debugging, troubleshooting, and/or record keeping
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+submit_logs(){
+	INSTANCE=$(echo $RELM|sed 's/\./-/g')
+	submit_log /var/log/ipaserver-install.log
+	submit_log /var/log/ipareplica-install.log
+	submit_log /var/log/ipaclient-install.log
+	submit_log /var/log/ipaserver-uninstall.log
+	submit_log /var/log/ipaclient-uninstall.log
+	submit_log /var/log/ipaupgrade.log			
+	submit_log /var/log/httpd/error_log
+	submit_log /var/log/dirsrv/slapd-$INSTANCE/errors
+	submit_log /var/log/dirsrv/slapd-PKI-IPA/errors
+}
 
