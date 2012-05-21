@@ -240,7 +240,7 @@ nisint_group_test_1004()
 		if [ $(grep "auth_provider = .*ipa" /etc/sssd/sssd.conf 2>/dev/null|wc -l) -eq 0 ]; then
 			rlPass "ipa not configured...skipping"
 		else
-			rlRun "ipa group-show notagroup" 1 "failed to ipa search for non-existent group"
+			rlRun "ipa group-show notagroup" 2 "failed to ipa search for non-existent group"
 		fi
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $NISCLIENT_IP"
 		;;

@@ -59,6 +59,7 @@ nisint_nisclient_setup()
 		rlLog "Machine in recipe is NISCLIENT"
 
 		#rlRun "yum -y remove *ipa-client *ipa-admintools"
+		rlRun "yum -y install openldap-clients"
 		nisint_nisclient_envsetup
 
 		rlRun "rhts-sync-set   -s 'nisint_nisclient_setup_ended' -m $NISCLIENT_IP"

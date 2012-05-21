@@ -206,7 +206,7 @@ nisint_netgroup_test_1003()
 			rlPass "ipa not configured...skipping"
 		else
 			rlRun "ipa netgroup-show testnetgroup1" 0 "ipa search for existing netgroup"
-			rlRun "ldapsearch -x -D \"$ROOTDN\" -w \"$ROOTDNPWD\" -b cn=testnetgroup1,cn=ng,cn=compat,$BASEDN \"nisNetgroupTriple=*\($MASTER,testuser1,$DOMAIN\)*\""
+			rlRun "ldapsearch -x -h $MASTER_IP -D \"$ROOTDN\" -w \"$ROOTDNPWD\" -b cn=testnetgroup1,cn=ng,cn=compat,$BASEDN \"nisNetgroupTriple=*\($MASTER,testuser1,$DOMAIN\)*\""
 		fi
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $NISCLIENT_IP"
 		;;
@@ -238,7 +238,7 @@ nisint_netgroup_test_1004()
 		if [ $(grep "auth_provider = .*ipa" /etc/sssd/sssd.conf 2>/dev/null|wc -l) -eq 0 ]; then
 			rlPass "ipa not configured...skipping"
 		else
-			rlRun "ipa netgroup-show notanetgroup" 1 "fail to ipa search for non-existent netgroup"
+			rlRun "ipa netgroup-show notanetgroup" 2 "fail to ipa search for non-existent netgroup"
 		fi
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $NISCLIENT_IP"
 		;;
