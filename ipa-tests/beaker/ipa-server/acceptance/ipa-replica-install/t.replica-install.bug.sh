@@ -42,8 +42,11 @@
 replicaBugCheck_bz784696()
 {
 	rlPhaseStartTest "bugCheck_bz784696: Dont set nsds5replicaupdateschedule in replication agreements"
+		rlLog "First run ipa user-find on MASTER"
+		remoteExec root $MASTERIP "ipa user-find"
 		rlLog "Quick checks confirming replication.  Add on Master, Check on Replica"
 		remoteExec root $MASTERIP "ipa user-add test1 --first=First --last=Last"
+		sleep 10
 		rlRun "ipa user-show test1"
 		remoteExec root $MASTERIP "ipa user-add test2 --first=First --last=Last"
 		rlRun "ipa user-show test2"
