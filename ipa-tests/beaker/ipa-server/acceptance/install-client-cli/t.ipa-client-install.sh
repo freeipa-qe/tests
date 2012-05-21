@@ -29,7 +29,7 @@ ipaclientinstall()
 #   --server=SERVER Set the IPA server to connect to
    ipaclientinstall_server_nodomain 
    ipaclientinstall_server_invalidserver
-   ipaclientinstall_server_unreachableserver
+#   ipaclientinstall_server_unreachableserver
 
 
 #   --realm=REALM_NAME Set the IPA realm name to REALM_NAME 
@@ -97,6 +97,9 @@ ipaclientinstall()
 
 # Bug 753526  - ipa-client-install rejects machines with hostname as localhost or localhost.localdomain #Added by Kaleem
       ipaclientinstall_client_hostname_localhost
+
+# Moved it to be last test
+   ipaclientinstall_server_unreachableserver
 
 }
 
