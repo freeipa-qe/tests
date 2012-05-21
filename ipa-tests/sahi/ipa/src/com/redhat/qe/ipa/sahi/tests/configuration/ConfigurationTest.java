@@ -211,6 +211,10 @@ public class ConfigurationTest extends SahiTestScript{
 	@Test (groups={"configUserOptionHomeDirTests"}, description="Verify valid User Home Directory values", 
 			dataProvider="getConfigUserOptionHomeDirTestObjects")	
 	public void testConfigUserOptionHomeDir(String testName, String homedir) throws Exception {
+		 sahiTasks.navigateTo(commonTasks.configurationPage, true);
+		//restore defaults
+		 ConfigurationTasks.restoreDefaults(sahiTasks, commonTasks);
+		 
 		ConfigurationTasks.setConfigValue(sahiTasks, "ipahomesrootdir", homedir);
 		ConfigurationTasks.verifyConfigValue(sahiTasks, "ipahomesrootdir", homedir);
 		String user = "configuser";
