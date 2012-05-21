@@ -212,6 +212,7 @@ private static Logger log = Logger.getLogger(UserTests.class.getName());
 	@Test (groups={"hbacServiceGroupEnrollServiceDeleteGroupTests"}, description="Enroll service, delete group, verify membership of service",
 			dataProvider="getHBACServiceGroupEnrollServiceDeleteGroupTestObjects")	
 	public void testHBACServiceGroupEnrollServiceDeleteGroup(String testName, String service, String svcgrp, String description) throws Exception {
+		
 		Assert.assertFalse(sahiTasks.link(svcgrp).exists(), "Verify HBAC Service Group " + svcgrp + "  to be added does not exist");
 		
 		//add the service group
@@ -253,6 +254,7 @@ private static Logger log = Logger.getLogger(UserTests.class.getName());
 	@Test (groups={"hbacServiceGroupDeleteServiceTests"}, description="Edit an HBAC Service Group to delete a service",
 			dataProvider="getHBACServiceGroupDeleteServiceTestObjects", dependsOnGroups={"hbacServiceGroupAddTests", "hbacServiceGroupEnrollServiceTests", "hbacServiceGroupCancelDeleteServiceTests" })	
 	public void testHBACServiceGroupDeleteService(String testName, String service, String svcgrp) throws Exception {
+		
 		Assert.assertTrue(sahiTasks.link(svcgrp).exists(), "Verify HBAC Service Group " + svcgrp + "  to be edited exists");
 		HBACTasks.verifyServicesInServiceGroup(sahiTasks, service, svcgrp, true);
 		
