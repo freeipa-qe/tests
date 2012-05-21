@@ -63,22 +63,18 @@ ipa_uninstall_master()
 			rhts-submit-log -l $logtar
 		fi
 
-		INSTANCE=$(echo $RELM|sed 's/./-/g')
-		if [ -f /var/log/dirsrv/slapd-$INSTANCE/errors ]; then
-			DATE=$(date +%Y%m%d-%H%M%S)
-			cp -f /var/log/dirsrv/slapd-$INSTANCE/errors /var/log/dirsrv/slapd-$INSTANCE/errors.$DATE
-			rhts-submit-log -l /var/log/dirsrv/slapd-$INSTANCE/errors.$DATE
-		fi
+		submit_logs
 
 		ipa_quick_uninstall
 
 		[ -n $MASTER_IP ] && MASTER=$(dig +short -x $MASTER_IP|sed 's/\.$//g')
 
-		if [ -f /var/log/ipaserver-uninstall.log ]; then
-			DATE=$(date +%Y%m%d-%H%M%S)
-			cp -f /var/log/ipaserver-uninstall.log /var/log/ipaserver-uninstall.log.$DATE
-			rhts-submit-log -l /var/log/ipaserver-uninstall.log.$DATE
-		fi
+		submit_log /var/log/ipaserver-uninstall.log
+		#if [ -f /var/log/ipaserver-uninstall.log ]; then
+		#	DATE=$(date +%Y%m%d-%H%M%S)
+		#	cp -f /var/log/ipaserver-uninstall.log /var/log/ipaserver-uninstall.log.$DATE
+		#	rhts-submit-log -l /var/log/ipaserver-uninstall.log.$DATE
+		#fi
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $MASTER_IP"
 		;;
 	"SLAVE")
@@ -124,21 +120,17 @@ ipa_uninstall_slave()
 			rhts-submit-log -l $logtar
 		fi
 
-		INSTANCE=$(echo $RELM|sed 's/./-/g')
-		if [ -f /var/log/dirsrv/slapd-$INSTANCE/errors ]; then
-			DATE=$(date +%Y%m%d-%H%M%S)
-			cp -f /var/log/dirsrv/slapd-$INSTANCE/errors /var/log/dirsrv/slapd-$INSTANCE/errors.$DATE
-			rhts-submit-log -l /var/log/dirsrv/slapd-$INSTANCE/errors.$DATE
-		fi
+		submit_logs
 
 		ipa_quick_uninstall
 		[ -n $SLAVE_IP ] && SLAVE=$(dig +short -x $SLAVE_IP|sed 's/\.$//g')
 
-		if [ -f /var/log/ipaserver-uninstall.log ]; then
-			DATE=$(date +%Y%m%d-%H%M%S)
-			cp -f /var/log/ipaserver-uninstall.log /var/log/ipaserver-uninstall.log.$DATE
-			rhts-submit-log -l /var/log/ipaserver-uninstall.log.$DATE
-		fi
+		submit_log /var/log/ipaserver-uninstall.log
+		#if [ -f /var/log/ipaserver-uninstall.log ]; then
+		#	DATE=$(date +%Y%m%d-%H%M%S)
+		#	cp -f /var/log/ipaserver-uninstall.log /var/log/ipaserver-uninstall.log.$DATE
+		#	rhts-submit-log -l /var/log/ipaserver-uninstall.log.$DATE
+		#fi
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.2' -m $SLAVE_IP"
 		;;
 	"CLIENT")
@@ -191,7 +183,12 @@ ipa_uninstall_client()
 		if [ -f $logtar ]; then
 			rhts-submit-log -l $logtar
 		fi
+
+		submit_logs
+
 		ipa_quick_uninstall
+
+		submit_log /var/log/ipaclient-uninstall.log
 
 		rlRun "yum -y downgrade curl nss* openldap* libselinux* nspr* libcurl*"
 		rlRun "yum -y remove http*"

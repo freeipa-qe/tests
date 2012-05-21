@@ -123,11 +123,12 @@ ipa_install_master_all(){
 		ipa_install_prep
 		rlRun "ipa-server-install --setup-dns --forwarder=$DNSFORWARD --hostname=$hostname_s.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U"
 
-		if [ -f /var/log/ipaserver-install.log ]; then
-			DATE=$(date +%Y%m%d-%H%M%S)
-			cp -f /var/log/ipaserver-install.log /var/log/ipaserver-install.log.$DATE
-			rhts-submit-log -l /var/log/ipaserver-install.log.$DATE
-		fi
+		submit_log /var/log/ipaserver-install.log
+		#if [ -f /var/log/ipaserver-install.log ]; then
+		#	DATE=$(date +%Y%m%d-%H%M%S)
+		#	cp -f /var/log/ipaserver-install.log /var/log/ipaserver-install.log.$DATE
+		#	rhts-submit-log -l /var/log/ipaserver-install.log.$DATE
+		#fi
 
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $MASTER_IP"
 		;;
@@ -159,11 +160,12 @@ ipa_install_master_nodns(){
 		ipa_install_prep
 		rlRun "ipa-server-install --hostname=$hostname_s.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW --ip-address=$MASTER_IP -U"
 
-		if [ -f /var/log/ipaserver-install.log ]; then
-			DATE=$(date +%Y%m%d-%H%M%S)
-			cp -f /var/log/ipaserver-install.log /var/log/ipaserver-install.log.$DATE
-			rhts-submit-log -l /var/log/ipaserver-install.log.$DATE
-		fi
+		submit_log /var/log/ipaserver-install.log
+		#if [ -f /var/log/ipaserver-install.log ]; then
+		#	DATE=$(date +%Y%m%d-%H%M%S)
+		#	cp -f /var/log/ipaserver-install.log /var/log/ipaserver-install.log.$DATE
+		#	rhts-submit-log -l /var/log/ipaserver-install.log.$DATE
+		#fi
 
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $MASTER_IP"
 		;;
@@ -221,11 +223,12 @@ ipa_install_slave_all(){
 			rlFail "ERROR: Replica Package not found"
 		fi
 
-		if [ -f /var/log/ipareplica-install.log ]; then
-			DATE=$(date +%Y%m%d-%H%M%S)
-			cp -f /var/log/ipareplica-install.log /var/log/ipareplica-install.log.$DATE
-			rhts-submit-log -l /var/log/ipareplica-install.log.$DATE
-		fi
+		submit_log /var/log/ipareplica-install.log
+		#if [ -f /var/log/ipareplica-install.log ]; then
+		#	DATE=$(date +%Y%m%d-%H%M%S)
+		#	cp -f /var/log/ipareplica-install.log /var/log/ipareplica-install.log.$DATE
+		#	rhts-submit-log -l /var/log/ipareplica-install.log.$DATE
+		#fi
 		rlLog "popd"
 		popd	
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.2' -m $SLAVE_IP"
@@ -285,11 +288,12 @@ ipa_install_slave_nodns()
 			rlFail "ERROR: Replica Package not found"
 		fi
 
-		if [ -f /var/log/ipareplica-install.log ]; then
-			DATE=$(date +%Y%m%d-%H%M%S)
-			cp -f /var/log/ipareplica-install.log /var/log/ipareplica-install.log.$DATE
-			rhts-submit-log -l /var/log/ipareplica-install.log.$DATE
-		fi
+		submit_log /var/log/ipareplica-install.log
+		#if [ -f /var/log/ipareplica-install.log ]; then
+		#	DATE=$(date +%Y%m%d-%H%M%S)
+		#	cp -f /var/log/ipareplica-install.log /var/log/ipareplica-install.log.$DATE
+		#	rhts-submit-log -l /var/log/ipareplica-install.log.$DATE
+		#fi
 			
 		rlLog popd
 		popd
@@ -345,11 +349,12 @@ ipa_install_client(){
 		fi
 			
 
-		if [ -f /var/log/ipaclient-install.log ]; then
-			DATE=$(date +%Y%m%d-%H%M%S)
-			cp -f /var/log/ipaclient-install.log /var/log/ipaclient-install.log.$DATE
-			rhts-submit-log -l /var/log/ipaclient-install.log.$DATE
-		fi
+		submit_log /var/log/ipaclient-install.log
+		#if [ -f /var/log/ipaclient-install.log ]; then
+		#	DATE=$(date +%Y%m%d-%H%M%S)
+		#	cp -f /var/log/ipaclient-install.log /var/log/ipaclient-install.log.$DATE
+		#	rhts-submit-log -l /var/log/ipaclient-install.log.$DATE
+		#fi
 
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $CLIENT_IP"
 		;;

@@ -169,11 +169,12 @@ data_check()
 		rlRun "getent -s sss passwd ${user[1]}|grep ${user[1]}"
 
 		# grab http error log in case it's needed
-		if [ -f /var/log/httpd/error_log ]; then
-			DATE=$(date +%Y%m%d-%H%M%S)
-			cp -f /var/log/httpd/error_log /var/log/httpd/error_log.$DATE
-			rhts-submit-log -l /var/log/httpd/error_log.$DATE
-		fi
+		submit_log /var/log/httpd/error_log
+		#if [ -f /var/log/httpd/error_log ]; then
+		#	DATE=$(date +%Y%m%d-%H%M%S)
+		#	cp -f /var/log/httpd/error_log /var/log/httpd/error_log.$DATE
+		#	rhts-submit-log -l /var/log/httpd/error_log.$DATE
+		#fi
 
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.1' -m $TARGET_IP"
 	rlPhaseEnd	
