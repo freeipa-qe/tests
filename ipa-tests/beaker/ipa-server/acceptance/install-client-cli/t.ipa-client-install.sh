@@ -290,7 +290,7 @@ ipaclientinstall_realm_casesensitive()
        rlLog "/etc/resolv.conf contents are: `cat /etc/resolv.conf`"
        relminlowercase=`echo ${RELM,,}`
        rlLog "EXECUTING: ipa-client-install --realm=$relminlowercase"
-       command="ipa-client-install --realm=$relminlowercase"
+       command="ipa-client-install --realm=$relminlowercase -p $ADMINID -w $ADMINPW -U"
        expmsg="ERROR: The provided realm name: [$relminlowercase] does not match with the discovered one: [$RELM]"
        local tmpout=$TmpDir/ipaclientinstall_realm_casesensitive.out
        qaRun "$command" "$tmpout" 1 $expmsg "Verify expected error message for IPA Install with incorrect case realmname" 
