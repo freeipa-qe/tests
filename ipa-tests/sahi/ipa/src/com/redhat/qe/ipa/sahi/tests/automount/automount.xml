@@ -1,6 +1,6 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
 <suite name="IPAAutomountTestSuite">	
-    <test name="IPAAutomount Tests" preserve-order="true">
+    <test name="IPAAutomount Tests">
             	<packages>
             	    <package name="com.redhat.qe.ipa.sahi.*" />
             	</packages>
@@ -8,13 +8,14 @@
             	    <run>
             	        <include name="setup" />
             	        <include name="init" />    
-            	        <include name="addAutomountLocation" /> 
+            	        <include name="addAutomountLocation" />
             	        <include name="addAutomountLocation_negative" />
-            	       <include name="deleteAutomountLocation" />
+            	        <include name="deleteAutomountLocation" />
+            	        <include name="deleteAutomountLocationMultiple" />
             	       
             	        <include name="addAutomountMap" />
             	        <include name="modifyAutomountMap" />
-            	        <include name="deleteAutomountMap" />  
+                        <include name="deleteAutomountMap" /> 
             	        
             	        <include name="addIndirectAutomountMap" />
             	        <include name="addIndirectAutomountMap_negative" />
@@ -25,7 +26,7 @@
             	        <include name="addAutomountKey_negative" />
             	        <include name="modifyAutomountKey" />
             	        <include name="modifyAutomountKey_negative" />
-            	        <include name="deleteAutomountKey" /> 
+            	        <include name="deleteAutomountKey" />
             	    </run>
             	</groups>
             	<classes>
