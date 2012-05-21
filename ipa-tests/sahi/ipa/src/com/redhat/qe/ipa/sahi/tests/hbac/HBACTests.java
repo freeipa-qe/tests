@@ -307,7 +307,7 @@ public class HBACTests extends SahiTestScript {
 		//verify rule to be edited exists
 		Assert.assertTrue(sahiTasks.link(cn).exists(), "Verify Rule " + cn + " to be edited exists");
 		
-		String expectedError = "invalid 'desc': Gettext('Leading and trailing spaces are not allowed', domain='ipa', localedir=None)";
+		String expectedError = "invalid 'desc': Leading and trailing spaces are not allowed";
 		
 		//modify this rule
 		HBACTasks.modifyHBACRuleInvalidGeneralSection(sahiTasks, cn, description, expectedError);
@@ -418,7 +418,7 @@ public class HBACTests extends SahiTestScript {
 		Assert.assertTrue(sahiTasks.link(cn).exists(), "Verify Rule " + cn + " to be edited exists");
 		
 		sahiTasks.navigateTo(commonTasks.hostgroupPage, true);
-		HostgroupTasks.addMembers(sahiTasks, hostgroupName, membertype, names, "Enroll");
+		HostgroupTasks.addMembers(sahiTasks, hostgroupName, membertype, names, "Add");
 		sahiTasks.navigateTo(commonTasks.hbacPage, true);
 		//modify this rule
 		HBACTasks.modifyHBACRuleAccessingSectionMemberList(sahiTasks, cn, fqdn, hostgroupName);
@@ -446,7 +446,7 @@ public class HBACTests extends SahiTestScript {
 		Assert.assertTrue(sahiTasks.link(cn).exists(), "Verify Rule " + cn + " to be edited exists");
 		
 		sahiTasks.navigateTo(commonTasks.groupPage, true);
-		GroupTasks.addMembers(sahiTasks, groupName, membertype, uid, "Enroll");
+		GroupTasks.addMembers(sahiTasks, groupName, membertype, uid, "Add");
 		sahiTasks.navigateTo(commonTasks.hbacPage, true);
 		//modify this rule
 		HBACTasks.modifyHBACRuleWhoSectionMemberList(sahiTasks, cn, uid, groupName);
