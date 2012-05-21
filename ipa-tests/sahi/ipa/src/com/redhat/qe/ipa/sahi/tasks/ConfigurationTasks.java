@@ -39,6 +39,10 @@ public class ConfigurationTasks {
 	}
 	
 	public static void setGroupConfigValue(SahiTasks sahiTasks, CommonTasks commonTasks, String group) {
+		//restore defaults value for Maximum username length
+		sahiTasks.navigateTo(commonTasks.configurationPage);
+		ConfigurationTasks.setConfigValue(sahiTasks, "ipamaxusernamelength", "32");
+		
 		sahiTasks.navigateTo(commonTasks.groupPage, true);
 		if (!sahiTasks.link(group).exists())
 			GroupTasks.addGroup(sahiTasks, group, group);
@@ -161,6 +165,7 @@ public class ConfigurationTasks {
 	public static void verifyUserGroupFunctional(SahiTasks sahiTasks, CommonTasks commonTasks, String group, String user) {
 		sahiTasks.navigateTo(commonTasks.userPage);
 		UserTasks.createUser(sahiTasks, user, user, user, "Add");
+		//System.exit(0);
 		//add an email for this user
 		sahiTasks.link(user).click();		
 		CommonTasks.verifyMemberOf(sahiTasks, user, "User", "User Groups", group, "direct", true);	
@@ -223,6 +228,7 @@ public class ConfigurationTasks {
 			sahiTasks.button("Cancel").near(sahiTasks.button("Retry")).click();
 			log.fine("cancel");
 			sahiTasks.button("Cancel").near(sahiTasks.button("Add and Edit")).click();
+			 
 		}
 		
 		
