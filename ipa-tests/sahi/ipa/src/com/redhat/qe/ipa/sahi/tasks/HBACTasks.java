@@ -50,7 +50,7 @@ public class HBACTasks {
 	 */
 	public static void deleteHBAC(SahiTasks sahiTasks, String cn, String buttonToClick) {
 		sahiTasks.checkbox(cn).click();
-		sahiTasks.link("Delete").click();
+		sahiTasks.span("Delete").click();
 		sahiTasks.button(buttonToClick).click();
 		
 		
@@ -79,28 +79,28 @@ public class HBACTasks {
 			e.printStackTrace();
 		}
 		//Click to Add Users from "Who" section
-		sahiTasks.span("Add").under(sahiTasks.heading2(("Who"))).near(sahiTasks.span("Users")).click();
+		sahiTasks.span("Add").under(sahiTasks.heading2(("Who"))).click();
 		sahiTasks.checkbox(uid).click();
 		sahiTasks.link(">>").click();
-		sahiTasks.button("Enroll").click();
+		sahiTasks.button("Add").click();
 		
 		//Click to add Host groups from "Accessing" section
-		sahiTasks.span("Add").under(sahiTasks.heading2(("Accessing"))).near(sahiTasks.span("Host Groups")).click();
+		sahiTasks.span("Add").under(sahiTasks.heading2(("Accessing"))).near(sahiTasks.tableHeader("Host GroupsDeleteAdd")).click();
 		sahiTasks.checkbox(hostgroupName).click();
 		sahiTasks.span(">>").click();
-		sahiTasks.button("Enroll").click();
+		sahiTasks.button("Add").click();
 		
 		//Click to add HBAC Service from "Via Service" Section
-		sahiTasks.span("Add").under(sahiTasks.heading2(("Via Service"))).near(sahiTasks.span("Services")).click();
+		sahiTasks.span("Add").under(sahiTasks.heading2(("Via Service"))).click();
 		sahiTasks.checkbox(service).click();
 		sahiTasks.span(">>").click();
-		sahiTasks.button("Enroll").click();
+		sahiTasks.button("Add").click();
 		
 		//Click to add HBAC Service from "From" Section
-		sahiTasks.span("Add").under(sahiTasks.heading2(("From"))).near(sahiTasks.span("Source Hosts")).click();
+		sahiTasks.span("Add").under(sahiTasks.heading2(("From"))).click();
 		sahiTasks.checkbox(fqdn).click();
 		sahiTasks.span(">>").click();
-		sahiTasks.button("Enroll").click();
+		sahiTasks.button("Add").click();
 		
 		
 		//Update and go back to HBAC Rules list
@@ -169,7 +169,7 @@ public class HBACTasks {
 		sahiTasks.link(cn).click();
 		
 		sahiTasks.textarea("description").setValue(description);
-		sahiTasks.radio("ipaenabledflag[1]").click();
+		sahiTasks.radio("ipaenabledflag-1-0").click();
 		
 		sahiTasks.span("Update").click();
 		sahiTasks.link("HBAC Rules").in(sahiTasks.div("content")).click();	
@@ -187,7 +187,11 @@ public class HBACTasks {
 		sahiTasks.textarea("description").setValue(description);		
 		sahiTasks.span("Update").click();
 		
-		CommonTasks.checkOperationsError(sahiTasks, expectedError);
+		log.fine("error check");
+		Assert.assertTrue(sahiTasks.div(expectedError).exists(), "Verified Expected Error Details when updating");
+		log.fine("cancel(near retry)");
+		sahiTasks.button("Cancel").near(sahiTasks.button("Retry")).click();
+		
 		
 		sahiTasks.link("HBAC Rules").in(sahiTasks.div("content")).click();	
 		
@@ -202,7 +206,7 @@ public class HBACTasks {
 		sahiTasks.link(cn).click();
 		
 		Assert.assertTrue(sahiTasks.textarea("description").containsText(description), "Verified description is set correctly");
-		Assert.assertTrue(sahiTasks.radio("ipaenabledflag[1]").checked(), "Verified rule is disabled");		
+		Assert.assertTrue(sahiTasks.radio("ipaenabledflag-1-0").checked(), "Verified rule is disabled");		
 		
 		sahiTasks.link("HBAC Rules").in(sahiTasks.div("content")).click();			
 	}
@@ -214,14 +218,13 @@ public class HBACTasks {
 	 */
 	public static void modifyHBACRuleWhoSection(SahiTasks sahiTasks, String cn, String user, String usergroup ) {
 		sahiTasks.link(cn).click();
-		
 		sahiTasks.checkbox(user).click();			
-		sahiTasks.span("Delete").click();
+		sahiTasks.span("Delete").under(sahiTasks.heading2(("Who"))).near(sahiTasks.tableHeader("UsersDeleteAdd")).click();
 		sahiTasks.button("Delete").click();
-		sahiTasks.span("Add").under(sahiTasks.heading2(("Who"))).near(sahiTasks.span("User Groups")).click();
+		sahiTasks.span("Add").under(sahiTasks.heading2(("Who"))).near(sahiTasks.tableHeader("User GroupsDeleteAdd")).click();
 		sahiTasks.checkbox(usergroup).click();
 		sahiTasks.span(">>").click();
-		sahiTasks.button("Enroll").click();
+		sahiTasks.button("Add").click();
 		
 		sahiTasks.link("HBAC Rules").in(sahiTasks.div("content")).click();			
 	}
@@ -249,18 +252,20 @@ public class HBACTasks {
 	public static void modifyHBACRuleAccessingSection(SahiTasks sahiTasks, String cn, String fqdn, String hostgroupname ) {
 		sahiTasks.link(cn).click();
 		
-		sahiTasks.radio("hostcategory").click();
-		sahiTasks.span("undo").click();
-
-		sahiTasks.span("Add").under(sahiTasks.heading2(("Accessing"))).near(sahiTasks.span("Hosts")).click();
 		
-		sahiTasks.checkbox(fqdn).under(sahiTasks.div("Available")).click();
+		sahiTasks.radio("hostcategory-3-0").click();
+		sahiTasks.span("undo").near(sahiTasks.label("Specified Hosts and Groups")).click();
+
+		sahiTasks.span("Add").under(sahiTasks.heading2(("Accessing"))).near(sahiTasks.tableHeader("HostsDeleteAdd")).click();
+		
+		sahiTasks.checkbox(fqdn).in(sahiTasks.table("search-table scrollable")).click();
+		
 		sahiTasks.span(">>").click();
-		sahiTasks.button("Enroll").click();
+		sahiTasks.button("Add").click();
 		
 		sahiTasks.checkbox(hostgroupname).click();
-		sahiTasks.span("Delete").under(sahiTasks.heading2(("Accessing"))).near(sahiTasks.span("Host Groups")).click();
-		sahiTasks.button("Delete").click();
+		sahiTasks.span("Delete").under(sahiTasks.heading2(("Accessing"))).near(sahiTasks.tableHeader("Host GroupsDeleteAdd")).click();
+				sahiTasks.button("Delete").click();
 		
 		sahiTasks.link("HBAC Rules").in(sahiTasks.div("content")).click();			
 		
@@ -276,12 +281,13 @@ public class HBACTasks {
 		sahiTasks.link(cn).click();
 		
 		//Click to add Host groups from "Accessing" section
-		sahiTasks.span("Add").under(sahiTasks.heading2(("Accessing"))).near(sahiTasks.span("Host Groups")).click();
+		sahiTasks.span("Add").under(sahiTasks.heading2(("Accessing"))).near(sahiTasks.tableHeader("Host GroupsDeleteAdd")).click();
 		sahiTasks.checkbox(hostgroupname).click();
 		sahiTasks.span(">>").click();
-		sahiTasks.button("Enroll").click();
+		sahiTasks.button("Add").click();
 
-		sahiTasks.span("Add").under(sahiTasks.heading2(("Accessing"))).near(sahiTasks.span("Hosts")).click();		
+		
+		sahiTasks.span("Add").under(sahiTasks.heading2(("Accessing"))).near(sahiTasks.tableHeader("HostsDeleteAdd")).click();
 		Assert.assertFalse(sahiTasks.checkbox(fqdn).under(sahiTasks.div("Available")).exists(), "Verified host is not " +
 				"listed, since it is memberof and is already included in hostgroup");		
 		sahiTasks.button("Cancel").click();
@@ -300,12 +306,14 @@ public class HBACTasks {
 		sahiTasks.link(cn).click();
 		
 		//Click to add Host groups from "Accessing" section
-		sahiTasks.span("Add").under(sahiTasks.heading2(("Who"))).near(sahiTasks.span("User Groups")).click();
+		
+		sahiTasks.span("Add").under(sahiTasks.heading2(("Who"))).near(sahiTasks.tableHeader("User GroupsDeleteAdd")).click();
 		sahiTasks.checkbox(groupname).under(sahiTasks.div("Available")).click();
 		sahiTasks.span(">>").click();
-		sahiTasks.button("Enroll").click();
+		sahiTasks.button("Add").click();
 
-		sahiTasks.span("Add").under(sahiTasks.heading2(("Who"))).near(sahiTasks.span("Users")).click();		
+		
+	    sahiTasks.span("Add").under(sahiTasks.heading2(("Who"))).near(sahiTasks.tableHeader("UsersDeleteAdd")).click();
 		Assert.assertFalse(sahiTasks.checkbox(uid).under(sahiTasks.div("Available")).exists(), "Verified user is not " +
 				"listed, since it is memberof and is already included in usergroup");		
 		sahiTasks.button("Cancel").click();
@@ -337,10 +345,10 @@ public class HBACTasks {
 	public static void updateCategory(SahiTasks sahiTasks, String cn, String hostgroupName, boolean memberExists) {
 		sahiTasks.link(cn).click();
 		
-		sahiTasks.radio("sourcehostcategory").click();
+		sahiTasks.radio("sourcehostcategory-5-0").click();
 		sahiTasks.span("Update").click();
 		
-		Assert.assertFalse(sahiTasks.checkbox(hostgroupName).under(sahiTasks.heading2(("From"))).near(sahiTasks.span("Source Host Groups")).exists(), "Verified when categorry was switch, entries got deleted");
+		Assert.assertFalse(sahiTasks.checkbox(hostgroupName).under(sahiTasks.heading2(("From"))).near(sahiTasks.tableHeader("Source Host GroupsDeleteAdd")).exists(), "Verified when categorry was switch, entries got deleted");
 		
 		//go back to hbac page - since no errors expected now
 		sahiTasks.link("HBAC Rules").in(sahiTasks.div("content")).click();					
@@ -355,8 +363,8 @@ public class HBACTasks {
 	public static void verifyHBACRuleAccessingSection(SahiTasks sahiTasks, String cn, String fqdn, String hostgroupname) {
 		sahiTasks.link(cn).click();
 		
-		Assert.assertTrue(sahiTasks.checkbox(fqdn).under(sahiTasks.heading2(("Accessing"))).near(sahiTasks.span("Hosts")).exists(), "Verified Host: " + fqdn + " is on list for rule: " + cn);
-		Assert.assertFalse(sahiTasks.checkbox(hostgroupname).under(sahiTasks.heading2(("Accessing"))).near(sahiTasks.span("Host Groups")).exists(), "Verified Host Group: " + hostgroupname + " is not on list for rule: " + cn);
+		Assert.assertTrue(sahiTasks.checkbox(fqdn).under(sahiTasks.heading2(("Accessing"))).near(sahiTasks.tableHeader("HostsDeleteAdd")).exists(), "Verified Host: " + fqdn + " is on list for rule: " + cn);
+		Assert.assertFalse(sahiTasks.checkbox(hostgroupname).under(sahiTasks.heading2(("Accessing"))).near(sahiTasks.tableHeader("Host GroupsDeleteAdd")).exists(), "Verified Host Group: " + hostgroupname + " is not on list for rule: " + cn);
 				
 		sahiTasks.link("HBAC Rules").in(sahiTasks.div("content")).click();			
 	}
@@ -374,17 +382,16 @@ public class HBACTasks {
 		
 		
 		String filterBy = "hbac";
-		
-		sahiTasks.span("Add").under(sahiTasks.heading2(("From"))).near(sahiTasks.span("Source Host Groups")).click();
-		sahiTasks.textbox("filter").setValue(filterBy);
+		sahiTasks.span("Add").under(sahiTasks.heading2(("From"))).near(sahiTasks.tableHeader("Source Host GroupsDeleteAdd")).click();
+		sahiTasks.textbox("filter").near(sahiTasks.span("Find")).setValue(filterBy);
 		sahiTasks.span("Find").click();
 		Assert.assertTrue(sahiTasks.checkbox(hostgroupname).exists(), "Found Host Group - " + hostgroupname);
 		sahiTasks.checkbox(hostgroupname).under(sahiTasks.div("Available")).click();
 		sahiTasks.span(">>").click();
-		sahiTasks.button("Enroll").click();
+		sahiTasks.button("Add").click();
 		
-		sahiTasks.checkbox(fqdn).under(sahiTasks.heading2(("From"))).near(sahiTasks.span("Source Hosts")).click();
-		sahiTasks.span("Delete").under(sahiTasks.heading2(("From"))).near(sahiTasks.span("Source Hosts")).click();
+		sahiTasks.checkbox(fqdn).under(sahiTasks.heading2(("From"))).near(sahiTasks.tableHeader("Source HostsDeleteAdd")).click();
+		sahiTasks.span("Delete").under(sahiTasks.heading2(("From"))).near(sahiTasks.tableHeader("Source HostsDeleteAdd")).click();
 		sahiTasks.button("Delete").click();
 	
 		sahiTasks.link("HBAC Rules").in(sahiTasks.div("content")).click();			
@@ -399,8 +406,8 @@ public class HBACTasks {
 	public static void verifyHBACRuleFromSection(SahiTasks sahiTasks, String cn, String fqdn, String hostgroupname) {
 		sahiTasks.link(cn).click();
 		
-		Assert.assertFalse(sahiTasks.checkbox(fqdn).under(sahiTasks.heading2(("From"))).near(sahiTasks.span("Source Hosts")).exists(), "Verified Host: " + fqdn + " is not on list for rule: " + cn);
-		Assert.assertTrue(sahiTasks.checkbox(hostgroupname).under(sahiTasks.heading2(("From"))).near(sahiTasks.span("Source Host Groups")).exists(), "Verified Host Group: " + hostgroupname + " is on list for rule: " + cn);
+		Assert.assertFalse(sahiTasks.checkbox(fqdn).under(sahiTasks.heading2(("From"))).near(sahiTasks.tableHeader("Source HostsDeleteAdd")).exists(), "Verified Host: " + fqdn + " is not on list for rule: " + cn);
+		Assert.assertTrue(sahiTasks.checkbox(hostgroupname).under(sahiTasks.heading2(("From"))).near(sahiTasks.tableHeader("Source Host GroupsDeleteAdd")).exists(), "Verified Host Group: " + hostgroupname + " is on list for rule: " + cn);
 				
 		sahiTasks.link("HBAC Rules").in(sahiTasks.div("content")).click();			
 	}
@@ -415,8 +422,8 @@ public class HBACTasks {
 	public static void modifyHBACRuleViaServiceSection(SahiTasks sahiTasks, String cn, String searchString, String[] searchResult) {
 		sahiTasks.link(cn).click();
 		
-		sahiTasks.span("Add").under(sahiTasks.heading2(("Via Service"))).near(sahiTasks.span("Services")).click();
-		sahiTasks.textbox("filter").setValue(searchString);
+		sahiTasks.span("Add").under(sahiTasks.heading2(("Via Service"))).near(sahiTasks.tableHeader("ServicesDeleteAdd")).click();
+		sahiTasks.textbox("filter").near(sahiTasks.span("Find")).setValue(searchString);
 		sahiTasks.link("Find").click();
 		
 		for (String result : searchResult) {
@@ -424,12 +431,11 @@ public class HBACTasks {
 			sahiTasks.checkbox(result).click();
 		}		
 		sahiTasks.span(">>").click();
-		sahiTasks.button("Enroll").click();
-		
-		sahiTasks.span("Add").under(sahiTasks.heading2(("Via Service"))).near(sahiTasks.span("Service Groups")).click();
+		sahiTasks.button("Add").click();
+		sahiTasks.span("Add").under(sahiTasks.heading2(("Via Service"))).near(sahiTasks.tableHeader("Service GroupsDeleteAdd")).click();
 		sahiTasks.checkbox("Sudo").click();
 		sahiTasks.link(">>").click();
-		sahiTasks.button("Enroll").click();
+		sahiTasks.button("Add").click();
 		
 		sahiTasks.link("HBAC Rules").in(sahiTasks.div("content")).click();				
 	}
@@ -464,24 +470,24 @@ public class HBACTasks {
 		String originalDescription = sahiTasks.textarea("description").getValue();
 		String newDescription = "This description will be reset";		
 		sahiTasks.textarea("description").setValue(newDescription);		
-		sahiTasks.radio("usercategory").click();
+		sahiTasks.radio("usercategory-2-0").click();
 		
 		// TODO: nkrishnan - how to check Add/Delete are disabled when "all" is selected
 		
 		sahiTasks.span("Reset").click();
 	
 		Assert.assertEquals(sahiTasks.textarea("description").getText(), originalDescription, "Changes to Description are Reset");
-		Assert.assertTrue(sahiTasks.radio("usercategory[1]").checked(), "Changes to UserCategory are Reset");
+		Assert.assertTrue(sahiTasks.radio("usercategory-2-1").checked(), "Changes to UserCategory are Reset");
 		
 		sahiTasks.textarea("description").setValue("will undo this desc from here");
-		sahiTasks.span("undo").click();
+		sahiTasks.span("undo").near(sahiTasks.textarea("description")).click();
 		Assert.assertEquals(sahiTasks.textarea("description").getText(), originalDescription, "Changes to Description are Undone");
 		
-		sahiTasks.radio("hostcategory").click();
-		sahiTasks.span("undo").click();
-		Assert.assertTrue(sahiTasks.radio("hostcategory[1]").checked(), "Changes to HostCategory are Undone");
+		sahiTasks.radio("hostcategory-3-0").click();
+		sahiTasks.span("undo").near(sahiTasks.label("Specified Hosts and Groups")).click();
+		Assert.assertTrue(sahiTasks.radio("hostcategory-3-1").checked(), "Changes to HostCategory are Undone");
 		
-		sahiTasks.radio("servicecategory").click();
+		sahiTasks.radio("servicecategory-4-0").click();
 
 		sahiTasks.link("HBAC Rules").in(sahiTasks.div("content")).click();
 		sahiTasks.button("Reset").click();
@@ -492,21 +498,22 @@ public class HBACTasks {
 		sahiTasks.link(cn).click();
 		
 		sahiTasks.span("Collapse All").click();
-		sahiTasks.waitFor(1000);
+		sahiTasks.waitFor(2000);
 
 		//Verify no data is visible
+		//TODO to fix: Not able to verify data is visible.
 		Assert.assertFalse(sahiTasks.textarea("description").exists(), "No data is visible");
 		
-		
+				
 		sahiTasks.heading2("Who").click();
 		//Verify only data for account settings is displayed
-		Assert.assertTrue(sahiTasks.span("Users").exists(), "Verified data available for Rule " + cn);
-		
-		
+		Assert.assertTrue(sahiTasks.div("Users").exists(), "Verified data available for Rule " + cn);
+			
+				
 		sahiTasks.span("Expand All").click();
 		sahiTasks.waitFor(1000);
 		//Verify data is visible
-		Assert.assertTrue(sahiTasks.span("Add").under(sahiTasks.heading2(("From"))).near(sahiTasks.span("Source Host Groups")).exists(), "Now Data is visible");
+		Assert.assertTrue(sahiTasks.span("Add").under(sahiTasks.heading2(("From"))).near(sahiTasks.tableHeader("Source Host GroupsDeleteAdd")).exists(), "Now Data is visible");
 		
 		sahiTasks.link("HBAC Rules").in(sahiTasks.div("content")).click();
 	}
@@ -523,7 +530,7 @@ public class HBACTasks {
 	public static void addHBACService(SahiTasks sahiTasks, String cn, String description, String buttonToClick) {
 		sahiTasks.span("Add").click();
 		sahiTasks.textbox("cn").setValue(cn);
-		sahiTasks.textbox("description").setValue(description);
+		sahiTasks.textarea("description").setValue(description);
 		sahiTasks.button(buttonToClick).click();
 	}
 	
@@ -531,10 +538,10 @@ public class HBACTasks {
 	public static void addHBACServiceThenAddAnother(SahiTasks sahiTasks, String cn1, String cn2, String description) {
 		sahiTasks.span("Add").click();
 		sahiTasks.textbox("cn").setValue(cn1);
-		sahiTasks.textbox("description").setValue(description);
+		sahiTasks.textarea("description").setValue(description);
 		sahiTasks.button("Add and Add Another").click();
 		sahiTasks.textbox("cn").setValue(cn2);
-		sahiTasks.textbox("description").setValue(description);
+		sahiTasks.textarea("description").setValue(description);
 		sahiTasks.button("Add").click();		
 	}
 
@@ -543,7 +550,7 @@ public class HBACTasks {
 		sahiTasks.span("Add").click();
 		sahiTasks.textbox("cn").setValue(cn);
 		sahiTasks.button("Add and Edit").click();
-		sahiTasks.textbox("description").setValue(description);
+		sahiTasks.textarea("description").setValue(description);
 		
 		sahiTasks.span("Update").click();
 		sahiTasks.link("HBAC Services").in(sahiTasks.div("content")).click();
@@ -553,7 +560,7 @@ public class HBACTasks {
 		sahiTasks.link(cn).click();
 		
 		//verify Service description
-		Assert.assertEquals(sahiTasks.textbox("description").value(), newdescription, "Verified description for service " + cn);
+		Assert.assertEquals(sahiTasks.textarea("description").value(), newdescription, "Verified description for service " + cn);
 
 		sahiTasks.link("HBAC Services").in(sahiTasks.div("content")).click();
 	}
@@ -561,7 +568,7 @@ public class HBACTasks {
 	public static void createInvalidService(SahiTasks sahiTasks, String cn, String description, String expectedError) {
 		sahiTasks.span("Add").click();
 		sahiTasks.textbox("cn").setValue(cn);
-		sahiTasks.textbox("description").setValue(description);
+		sahiTasks.textarea("description").setValue(description);
 		
 		sahiTasks.button("Add").click();
 		Assert.assertTrue(sahiTasks.div(expectedError).exists(), "Verified expected error when adding invalid service group " + cn);
@@ -613,7 +620,7 @@ public class HBACTasks {
 		if (isServiceGroup) {
 			sahiTasks.link("Settings").click();
 		}
-		sahiTasks.textbox("description").setValue(newDescription);
+		sahiTasks.textarea("description").setValue(newDescription);
 		
 		if (isServiceGroup) 
 			sahiTasks.link("HBAC Service Groups").in(sahiTasks.div("content")).click();
@@ -627,8 +634,8 @@ public class HBACTasks {
 		
 
 		if (buttonToClick.equals("Cancel")){
-			sahiTasks.textbox("description").getValue().equals(newDescription);
-			Assert.assertEquals(sahiTasks.textbox("description").value(), newDescription, "Verified description for service " + cn + " after Cancel");
+			sahiTasks.textarea("description").getValue().equals(newDescription);
+			Assert.assertEquals(sahiTasks.textarea("description").value(), newDescription, "Verified description for service " + cn + " after Cancel");
 			
 			if (isServiceGroup) {
 				sahiTasks.link("HBAC Service Groups").in(sahiTasks.div("content")).click();
@@ -644,7 +651,7 @@ public class HBACTasks {
 			if (isServiceGroup) {
 				sahiTasks.link("Settings").click();
 			}
-			Assert.assertEquals(sahiTasks.textbox("description").value(), description, "Verified description for service " + cn + " after Reset");
+			Assert.assertEquals(sahiTasks.textarea("description").value(), description, "Verified description for service " + cn + " after Reset");
 			if (isServiceGroup) 
 				sahiTasks.link("HBAC Service Groups").in(sahiTasks.div("content")).click();
 			else
@@ -655,7 +662,7 @@ public class HBACTasks {
 			if (isServiceGroup) {
 				sahiTasks.link("Settings").click();
 			}
-			Assert.assertEquals(sahiTasks.textbox("description").value(), newDescription, "Verified description for service " + cn + " after Reset");
+			Assert.assertEquals(sahiTasks.textarea("description").value(), newDescription, "Verified description for service " + cn + " after Reset");
 			if (isServiceGroup) 
 				sahiTasks.link("HBAC Service Groups").in(sahiTasks.div("content")).click();
 			else
@@ -667,7 +674,7 @@ public class HBACTasks {
 
 		sahiTasks.link(service).click(); 
 		sahiTasks.link("memberof_hbacsvcgroup").click();
-		sahiTasks.span("Enroll").click();
+		sahiTasks.span("Add").click();
 		sahiTasks.checkbox(serviceGroup).under(sahiTasks.div("Available")).click();
 		sahiTasks.link(">>").click();
 		sahiTasks.button(buttonToClick).click();
@@ -679,7 +686,7 @@ public class HBACTasks {
 		sahiTasks.link(service).click();
 		sahiTasks.link("memberof_hbacsvcgroup").click();
 		sahiTasks.checkbox(serviceGroup).click();
-		sahiTasks.span("Delete").near(sahiTasks.span("Enroll")).click();
+		sahiTasks.span("Delete").near(sahiTasks.span("Add")).click();
 		sahiTasks.button(buttonToClick).click();
 		
 		if (buttonToClick.equals("Cancel")) {
@@ -709,17 +716,17 @@ public class HBACTasks {
 
 		sahiTasks.span("Add").click();
 		sahiTasks.textbox("cn").setValue(cn);
-		sahiTasks.textbox("description").setValue(description);
+		sahiTasks.textarea("description").setValue(description);
 		sahiTasks.button("Add and Edit").click();
 		
-		sahiTasks.span("Enroll").click();
+		sahiTasks.span("Add").click();
 		sahiTasks.checkbox("su").click();
 		sahiTasks.checkbox("su-l").click();
 		sahiTasks.span(">>").click();
-		sahiTasks.button("Enroll").click();
+		sahiTasks.button("Add").click();
 		
 		sahiTasks.link("Settings").click();
-		sahiTasks.textbox("description").setValue(newdescription);
+		sahiTasks.textarea("description").setValue(newdescription);
 		
 		sahiTasks.span("Update").click();
 		sahiTasks.link("HBAC Service Groups").in(sahiTasks.div("content")).click();
@@ -734,7 +741,7 @@ public class HBACTasks {
 		
 		//verify Service Group description
 		sahiTasks.link("Settings").click();
-		Assert.assertEquals(sahiTasks.textbox("description").value(), description, "Verified description for service " + cn);
+		Assert.assertEquals(sahiTasks.textarea("description").value(), description, "Verified description for service " + cn);
 
 		sahiTasks.link("HBAC Service Groups").in(sahiTasks.div("content")).click();
 	}
@@ -742,7 +749,7 @@ public class HBACTasks {
 	public static void verifyHBACServiceGroupNavigation(SahiTasks sahiTasks, String cn) {
 		sahiTasks.link(cn).click();
 		sahiTasks.link("su").click();
-		Assert.assertEquals(sahiTasks.textbox("description").value(), "su", "Verified description for service su");
+		Assert.assertEquals(sahiTasks.textarea("description").value(), "su", "Verified description for service su");
 		sahiTasks.link("memberof_hbacsvcgroup").click();
 		Assert.assertTrue(sahiTasks.link(cn).exists(), "Verified service group for service su");
 		sahiTasks.link(cn ).click();
@@ -752,10 +759,10 @@ public class HBACTasks {
 
 	public static void enrollServiceinServiceGroup(SahiTasks sahiTasks,	String svcgrp, String service) {
 		sahiTasks.link(svcgrp).click();
-		sahiTasks.span("Enroll").click();
+		sahiTasks.span("Add").click();
 		sahiTasks.checkbox(service).near(sahiTasks.div("Available")).click();
 		sahiTasks.link(">>").click();
-		sahiTasks.button("Enroll").click();
+		sahiTasks.button("Add").click();
 
 		sahiTasks.link("HBAC Service Groups").in(sahiTasks.div("content")).click();
 		
@@ -765,9 +772,9 @@ public class HBACTasks {
 		sahiTasks.link(svcgrp).click();
 		
 		if (expectedResult)
-			Assert.assertTrue(sahiTasks.checkbox(service).exists(), "Verified service " + service + " is enrolled in " + svcgrp);
+			Assert.assertTrue(sahiTasks.checkbox(service).exists(), "Verified service " + service + " is added in " + svcgrp);
 		else
-			Assert.assertFalse(sahiTasks.checkbox(service).exists(), "Verified service " + service + " is not enrolled in " + svcgrp);
+			Assert.assertFalse(sahiTasks.checkbox(service).exists(), "Verified service " + service + " is not added in " + svcgrp);
 
 		sahiTasks.link("HBAC Service Groups").in(sahiTasks.div("content")).click();
 		
@@ -776,9 +783,13 @@ public class HBACTasks {
 	public static void deleteFromServiceGroup(SahiTasks sahiTasks, String service, String serviceGroup, String buttonToClick) {
 		sahiTasks.link(serviceGroup).click();
 		sahiTasks.checkbox(service).click();
-		sahiTasks.span("Delete").near(sahiTasks.span("Enroll")).click();
+		sahiTasks.span("Delete").near(sahiTasks.span("Add")).click();
 		sahiTasks.button(buttonToClick).click();
 		
+		if (buttonToClick.equals("Cancel")) 
+		{
+			sahiTasks.checkbox(service).click();
+		}
 		sahiTasks.link("HBAC Service Groups").in(sahiTasks.div("content")).click();
 	}
 
@@ -802,7 +813,7 @@ public class HBACTasks {
 	}
 	
 	public static void modifyHBACServiceGroupWithInvalidSetting(SahiTasks sahiTasks, String cn, String description, String expectedError) {
-		CommonTasks.modifyToInvalidSetting(sahiTasks, cn, "description", description, expectedError, "Cancel");
+		CommonTasks.modifyToInvalidSettingTextarea(sahiTasks, cn, "description", description, expectedError, "Cancel");
 		sahiTasks.link("HBAC Service Groups").in(sahiTasks.div("content")).click();
 	}
 	
