@@ -9,24 +9,24 @@
 			<run>
 			    <include name="setup" />
 			    <include name="hbacRuleAddTests" />
-			    <include name="invalidhbacRuleAddTests" />
+		        <include name="invalidhbacRuleAddTests" />
 			    <include name="hbacRuleRequiredFieldAddTests" />
 			    <include name="hbacRuleCancelAddTests" />
 			    <include name="hbacRuleAddAndEditTests" />
 			    <include name="hbacRuleCancelDeleteTests" />
 			    <include name="hbacRuleAddAndAddAnotherTests" />
 			    <include name="hbacRuleInvalidGeneralSettingsTests" />
-			    <include name="hbacRuleGeneralSettingsTests" />
-			    <include name="hbacRuleWhoSettingsTests" />
-			    <include name="hbacRuleAccessingSettingsTests" />
+			    <include name="hbacRuleGeneralSettingsTests" /> 
+		        <include name="hbacRuleWhoSettingsTests" />
+		        <include name="hbacRuleAccessingSettingsTests" />
 			    <include name="hbacRuleViaServiceSettingsTests" />
-			    <include name="hbacRuleFromSettingsTests" />
-			    <include name="hbacRuleMemberListTests" />
-			    <include name="hbacRuleUserMemberListTests" />
+	   	        <include name="hbacRuleFromSettingsTests" />
+	            <include name="hbacRuleMemberListTests" />
+		        <include name="hbacRuleUserMemberListTests" />
 			    <include name="hbacRuleUpdateCategoryTests" />
 			    <include name="hbacRuleResetUndoSettingsTests" />
-			    <include name="hbacRuleExpandCollapseTests"/>
-			    <include name="hbacRuleSearchTests" />
+	            <include name="hbacRuleExpandCollapseTests"/>
+		        <include name="hbacRuleSearchTests" />
 			    <include name="hbacRuleDeleteTests" />			   
 			    <include name="hbacRuleMultipleDeleteTests" />
 			</run>
@@ -36,23 +36,23 @@
 		</classes>
 	</test>
 
-	
+
 	<test name="HBAC Services Tests">
 		<groups>
 			<run>
 			    <include name="hbacServiceAddTests" />
-			    <include name="hbacServiceAddAndAddAnotherTests" />
-			    <include name="hbacServiceAddAndEditTests" />
-			    <include name="hbacServiceCancelEnrollTests" />
+	            <include name="hbacServiceAddAndAddAnotherTests" />
+		        <include name="hbacServiceAddAndEditTests" />
+	            <include name="hbacServiceCancelEnrollTests" />
 			    <include name="hbacServiceEnrollTests" />
-			    <include name="hbacServiceCancelDeleteEnrolledTests" />
+		        <include name="hbacServiceCancelDeleteEnrolledTests" />
 			    <include name="hbacServiceDeleteEnrolledTests" />
-			    <include name="hbacServiceEditTests" />
+		        <include name="hbacServiceEditTests" />
 			    <include name="hbacServiceCancelAddTests" />
-			    <include name="invalidhbacServiceAddTests" />
-			    <include name="hbacServiceSearchTests" />
-			    <include name="hbacServiceExpandCollapseTests" />
-			    <include name="hbacServiceCancelDeleteTests" />
+		        <include name="invalidhbacServiceAddTests" />
+		        <include name="hbacServiceSearchTests" />
+		        <include name="hbacServiceExpandCollapseTests" />
+	            <include name="hbacServiceCancelDeleteTests" />
 			    <include name="hbacServiceMultipleDeleteTests" />
 			    <include name="hbacServiceDeleteTests" />
 			</run>
@@ -63,23 +63,25 @@
 	</test>
 
 
+
 	<test name="HBAC Service Groups Tests">
 		<groups>
 			<run>
+			    
 			    <include name="hbacServiceGroupAddTests" />
-			    <include name="hbacServiceGroupAddAndAddAnotherTests" />
-			    <include name="hbacServiceGroupAddAndEditTests" />
+		        <include name="hbacServiceGroupAddAndAddAnotherTests" />
+		        <include name="hbacServiceGroupAddAndEditTests" />
 			    <include name="hbacServiceGroupCancelAddTests" />
-			    <include name="hbacServiceGroupNavigateTests" />
+		        <include name="hbacServiceGroupNavigateTests" />
 			    <include name="hbacServiceGroupOneServiceTwoGroupsTests" />
-			    <include name="hbacServiceGroupEnrollServiceDeleteGroupTests"/>
-			    <include name="invalidhbacServiceGroupAddTests" />
+		        <include name="hbacServiceGroupEnrollServiceDeleteGroupTests"/>
+		        <include name="invalidhbacServiceGroupAddTests" />
 			    <include name="invalidhbacServiceGroupModTests" />
-			    <include name="hbacServiceGroupSearchTests" />
-			    <include name="hbacServiceGroupExpandCollapseTests" />
-			    <include name="hbacServiceGroupEditTests" />
-			    <include name="hbacServiceGroupEnrollServiceTests" /> 
-			    <include name="hbacServiceGroupDeleteServiceTests" />
+	            <include name="hbacServiceGroupSearchTests" />
+	            <include name="hbacServiceGroupExpandCollapseTests" />
+		        <include name="hbacServiceGroupEditTests" />
+		        <include name="hbacServiceGroupEnrollServiceTests" /> 
+		        <include name="hbacServiceGroupDeleteServiceTests" />
 			    <include name="hbacServiceGroupCancelDeleteServiceTests"/>
 			    <include name="hbacServiceGroupCancelDeleteTests" />
 			    <include name="hbacServiceGroupDeleteTests" />
