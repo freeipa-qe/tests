@@ -138,7 +138,7 @@ public class AutomountTests extends SahiTestScript{
 	}
 
 	/////////// delete automount location /////////////////////////
-	@Test (groups={"deleteAutomountLocation"}, dataProvider="deleteAutomountLocationSingle", dependsOnGroups="deleteAutomountMap",
+	@Test (groups={"deleteAutomountLocation"}, dataProvider="deleteAutomountLocationSingle", dependsOnGroups={"deleteAutomountMap", "deleteIndirectAutomountMap", "addAutomountKey_negative"},
 		description="delete single automount location")
 	public void deleteAutomountLocationSingle(String automountLocation) throws Exception { 
 		Assert.assertTrue(browser.link(automountLocation).exists(), "before delete, autoumount location (" + automountLocation + ")should exist in list");
@@ -146,7 +146,7 @@ public class AutomountTests extends SahiTestScript{
 		Assert.assertFalse(browser.link(automountLocation).exists(), "after delete, automount location (" + automountLocation + ") should NOT exist in list");
 	}
 
-	@Test (groups={"deleteAutomountLocation"}, dataProvider="deleteAutomountLocationMultiple", dependsOnGroups="deleteAutomountMap",
+	@Test (groups={"deleteAutomountLocationMultiple"}, dataProvider="deleteAutomountLocationMultiple", dependsOnGroups="deleteAutomountMap",
 		description="delete multiple automount location")
 	public void deleteAutomountLocationMultiple(String automountLocations) throws Exception { 
 		String[] locations = automountLocations.split(",");
@@ -157,7 +157,7 @@ public class AutomountTests extends SahiTestScript{
 			Assert.assertFalse(browser.link(location).exists(), "after delete, automount location (" + location + ") should NOT exist in list");
 	}
 	
-	@Test (groups={"deleteAutomountLocation"}, dataProvider="leftOverAutomountLocations", dependsOnGroups="deleteAutomountMap",
+	@Test (groups={"deleteAutomountLocation"}, dataProvider="leftOverAutomountLocations", dependsOnGroups={"deleteAutomountMap","addAutomountKey_negative","addIndirectAutomountMap_negative","deleteAutomountLocationMultiple"},
 			description="delete automount")
 	public void deleteLeftOverPermission(String automountLocations) throws Exception 
 	{ 
@@ -196,7 +196,7 @@ public class AutomountTests extends SahiTestScript{
 		browser.textbox("automountmapname").setValue(automountMap);
 		browser.textarea("description").setValue(automountMap + ": auto description");
 		browser.button("Add and Edit").click();
-		if (browser.link("details").exists() && browser.link("Automount Keys").exists())
+		if (browser.link("details").exists() && browser.link("keys").exists())
 		{
 			log.info("in edit mode, test success, now go back to automount ");
 			browser.link(automountLocation).in(browser.span("path")).click(); 
@@ -340,7 +340,7 @@ public class AutomountTests extends SahiTestScript{
 	}
 
 	/////////// delete automount map /////////////////////////
-	@Test (groups={"deleteAutomountMap"}, dataProvider="deleteAutomountMapSingle", dependsOnGroups="deleteAutomountKey",
+	@Test (groups={"deleteAutomountMap"}, dataProvider="deleteAutomountMapSingle", dependsOnGroups={"deleteAutomountKey", "modifyIndirectAutomountMap","addAutomountKey_negative"},
 			description="delete single automount map")
 	public void deleteAutomountMapSingle(String automountLocation,String automountMap) throws Exception { 
 		browser.link(automountLocation).click();
@@ -349,7 +349,7 @@ public class AutomountTests extends SahiTestScript{
 		Assert.assertFalse(browser.link(automountMap).exists(), "after delete, automount map (" + automountMap + ") should NOT exist in list");
 	}
 
-	@Test (groups={"deleteAutomountMap"}, dataProvider="deleteAutomountMapMultiple", dependsOnGroups="deleteAutomountKey",
+	@Test (groups={"deleteAutomountMap"}, dataProvider="deleteAutomountMapMultiple", dependsOnGroups={"deleteAutomountKey", "modifyIndirectAutomountMap"},
 			description="delete multiple automount map")
 	public void deleteAutomountMapMultiple(String automountLocation,String automountMaps) throws Exception { 
 		browser.link(automountLocation).click();
@@ -397,7 +397,7 @@ public class AutomountTests extends SahiTestScript{
 		browser.textbox("key").setValue(mountPoint);
 		browser.textbox("parentmap").setValue(parentMap.trim());
 		browser.button("Add and Edit").click();
-		if (browser.link("details").exists() && browser.link("Automount Keys").exists())
+		if (browser.link("details").exists() && browser.link("keys").exists())
 		{
 			log.info("in edit mode, test success, now go back to automount ");
 			browser.link(automountLocation).in(browser.span("path")).click(); 
@@ -439,7 +439,7 @@ public class AutomountTests extends SahiTestScript{
 			browser.textbox("key").setValue(mountPoint);
 			browser.textbox("parentmap").setValue(parentMap);
 			browser.button("Add").click();
-			if (browser.div(automountLocation + ": automount map not found").exists())
+			if (browser.div(parentMap + ": automount map not found").exists())
 			{
 				log.info("duplicate indirect automount map: " + map +" is forbidden, good, test continue");
 				browser.button("Cancel").click();
@@ -512,7 +512,7 @@ public class AutomountTests extends SahiTestScript{
 	}
 
 	/////////// modify indirect automount map settings/////////////////////////
-	@Test (groups={"modifyIndirectAutomountMap"}, dataProvider="modifyIndirectAutomountMap", dependsOnGroups="addIndirectAutomountMap",
+	@Test (groups={"modifyIndirectAutomountMap"}, dataProvider="modifyIndirectAutomountMap", dependsOnGroups={"addIndirectAutomountMap", "addAutomountLocation"},
 		description="modify indirect automount map: check undo button ")
 	public void modifyIndirectAutomountMap_undo(String automountLocation, String indirectAutomountMapName) throws Exception 
 	{
@@ -542,7 +542,7 @@ public class AutomountTests extends SahiTestScript{
 		} 
 	}
 
-	@Test (groups={"modifyIndirectAutomountMap"}, dataProvider="modifyIndirectAutomountMap", dependsOnGroups="addIndirectAutomountMap",
+	@Test (groups={"modifyIndirectAutomountMap"}, dataProvider="modifyIndirectAutomountMap", dependsOnGroups={"addIndirectAutomountMap", "addAutomountLocation"},
 		description="modify indirect automount map: test for reset button")
 	public void modifyIndirectAutomountMap_reset(String automountLocation, String indirectAutomountMapName) throws Exception 
 	{
@@ -564,7 +564,7 @@ public class AutomountTests extends SahiTestScript{
 		} 
 	}
 
-	@Test (groups={"modifyIndirectAutomountMap"}, dataProvider="modifyIndirectAutomountMap", dependsOnGroups="addIndirectAutomountMap",
+	@Test (groups={"modifyIndirectAutomountMap"}, dataProvider="modifyIndirectAutomountMap", dependsOnGroups={"addIndirectAutomountMap", "addAutomountLocation"},
 		description="modify indirect automount: test for update button")
 	public void modifyIndirectAutomountMap_update(String automountLocation,String indirectAutomountMapName) throws Exception
 	{
