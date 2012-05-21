@@ -57,13 +57,21 @@ ipa_uninstall_master()
 	"MASTER")
 		rlLog "Machine in recipe is MASTER"
 		rlLog "backing up MASTER log files before uninstall"
-		logtar=/tmp/master.$(hostname -s).$(date +%Y%m%d).tar.gz
+		logtar=/tmp/master.$(hostname -s).$(date +%Y%m%d-%H%M%S).tar.gz
 		rlRun "tar zcvf $logtar /var/log"
 		if [ -f $logtar ]; then
 			rhts-submit-log -l $logtar
 		fi
 
+		INSTANCE=$(echo $RELM|sed 's/./-/g')
+		if [ -f /var/log/dirsrv/slapd-$INSTANCE/errors ]; then
+			DATE=$(date +%Y%m%d-%H%M%S)
+			cp -f /var/log/dirsrv/slapd-$INSTANCE/errors /var/log/dirsrv/slapd-$INSTANCE/errors.$DATE
+			rhts-submit-log -l /var/log/dirsrv/slapd-$INSTANCE/errors.$DATE
+		fi
+
 		ipa_quick_uninstall
+
 		[ -n $MASTER_IP ] && MASTER=$(dig +short -x $MASTER_IP|sed 's/\.$//g')
 
 		if [ -f /var/log/ipaserver-uninstall.log ]; then
@@ -110,11 +118,19 @@ ipa_uninstall_slave()
 		rlLog "Machine in recipe is SLAVE"
 		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $MASTER_IP"
 		rlLog "backing up SLAVE log files before uninstall"
-		logtar=/tmp/replica.$(hostname -s).$(date +%Y%m%d).tar.gz
+		logtar=/tmp/replica.$(hostname -s).$(date +%Y%m%d-%H%M%S).tar.gz
 		rlRun "tar zcvf $logtar /var/log"
 		if [ -f $logtar ]; then
 			rhts-submit-log -l $logtar
 		fi
+
+		INSTANCE=$(echo $RELM|sed 's/./-/g')
+		if [ -f /var/log/dirsrv/slapd-$INSTANCE/errors ]; then
+			DATE=$(date +%Y%m%d-%H%M%S)
+			cp -f /var/log/dirsrv/slapd-$INSTANCE/errors /var/log/dirsrv/slapd-$INSTANCE/errors.$DATE
+			rhts-submit-log -l /var/log/dirsrv/slapd-$INSTANCE/errors.$DATE
+		fi
+
 		ipa_quick_uninstall
 		[ -n $SLAVE_IP ] && SLAVE=$(dig +short -x $SLAVE_IP|sed 's/\.$//g')
 
