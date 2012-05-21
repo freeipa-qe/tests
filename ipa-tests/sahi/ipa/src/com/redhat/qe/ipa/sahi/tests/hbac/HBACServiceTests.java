@@ -180,7 +180,7 @@ public class HBACServiceTests  extends SahiTestScript{
 		Assert.assertTrue(sahiTasks.link(service).exists(), "Verify Service " + service + " exists");
 		
 		// Enroll service
-		HBACTasks.enrollServiceInServiceGroup(sahiTasks, service, serviceGroup, "Enroll");
+		HBACTasks.enrollServiceInServiceGroup(sahiTasks, service, serviceGroup, "Add");
 		
 		// Verify membership
 		HBACTasks.verifyHBACServiceMembership(sahiTasks, service, serviceGroup, true);
