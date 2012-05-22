@@ -1045,7 +1045,8 @@ submit_log(){
 	fi
 	local DATE=$(date +%Y%m%d-%H%M%S)
 	local LOGFILE=$1
-	local LOGBACK=$(echo $LOGFILE|sed -e 's/\//,/g' -e "s/^/\/tmp\/logbackups\/$(hostname -s)/").$DATE
+	#local LOGBACK=$(echo $LOGFILE|sed -e 's/\//,/g' -e "s/^/\/tmp\/logbackups\/$(hostname -s)/").$DATE
+	local LOGBACK=$LOGFILE.$DATE
 	if [ -f $LOGFILE ]; then
 		rlLog "Backing up and submitting $LOGFILE"
 		cp $LOGFILE $LOGBACK
