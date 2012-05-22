@@ -123,7 +123,7 @@ ipa_install_master_all(){
 		ipa_install_prep
 		rlRun "ipa-server-install --setup-dns --forwarder=$DNSFORWARD --hostname=$hostname_s.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U"
 
-		submit_log /var/log/ipaserver-install.log
+		#submit_log /var/log/ipaserver-install.log
 		#if [ -f /var/log/ipaserver-install.log ]; then
 		#	DATE=$(date +%Y%m%d-%H%M%S)
 		#	cp -f /var/log/ipaserver-install.log /var/log/ipaserver-install.log.$DATE
@@ -160,7 +160,7 @@ ipa_install_master_nodns(){
 		ipa_install_prep
 		rlRun "ipa-server-install --hostname=$hostname_s.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW --ip-address=$MASTER_IP -U"
 
-		submit_log /var/log/ipaserver-install.log
+		#submit_log /var/log/ipaserver-install.log
 		#if [ -f /var/log/ipaserver-install.log ]; then
 		#	DATE=$(date +%Y%m%d-%H%M%S)
 		#	cp -f /var/log/ipaserver-install.log /var/log/ipaserver-install.log.$DATE
@@ -223,7 +223,7 @@ ipa_install_slave_all(){
 			rlFail "ERROR: Replica Package not found"
 		fi
 
-		submit_log /var/log/ipareplica-install.log
+		#submit_log /var/log/ipareplica-install.log
 		#if [ -f /var/log/ipareplica-install.log ]; then
 		#	DATE=$(date +%Y%m%d-%H%M%S)
 		#	cp -f /var/log/ipareplica-install.log /var/log/ipareplica-install.log.$DATE
@@ -288,7 +288,7 @@ ipa_install_slave_nodns()
 			rlFail "ERROR: Replica Package not found"
 		fi
 
-		submit_log /var/log/ipareplica-install.log
+		#submit_log /var/log/ipareplica-install.log
 		#if [ -f /var/log/ipareplica-install.log ]; then
 		#	DATE=$(date +%Y%m%d-%H%M%S)
 		#	cp -f /var/log/ipareplica-install.log /var/log/ipareplica-install.log.$DATE
@@ -349,7 +349,7 @@ ipa_install_client(){
 		fi
 			
 
-		submit_log /var/log/ipaclient-install.log
+		#submit_log /var/log/ipaclient-install.log
 		#if [ -f /var/log/ipaclient-install.log ]; then
 		#	DATE=$(date +%Y%m%d-%H%M%S)
 		#	cp -f /var/log/ipaclient-install.log /var/log/ipaclient-install.log.$DATE

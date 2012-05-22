@@ -169,7 +169,7 @@ data_check()
 		rlRun "getent -s sss passwd ${user[1]}|grep ${user[1]}"
 
 		# grab http error log in case it's needed
-		submit_log /var/log/httpd/error_log
+		#submit_log /var/log/httpd/error_log
 		#if [ -f /var/log/httpd/error_log ]; then
 		#	DATE=$(date +%Y%m%d-%H%M%S)
 		#	cp -f /var/log/httpd/error_log /var/log/httpd/error_log.$DATE

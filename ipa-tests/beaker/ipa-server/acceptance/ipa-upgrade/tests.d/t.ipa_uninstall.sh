@@ -63,13 +63,13 @@ ipa_uninstall_master()
 		#	rhts-submit-log -l $logtar
 		#fi
 
-		submit_logs
+		#submit_logs
 
 		ipa_quick_uninstall
 
 		[ -n $MASTER_IP ] && MASTER=$(dig +short -x $MASTER_IP|sed 's/\.$//g')
 
-		submit_log /var/log/ipaserver-uninstall.log
+		#submit_log /var/log/ipaserver-uninstall.log
 		#if [ -f /var/log/ipaserver-uninstall.log ]; then
 		#	DATE=$(date +%Y%m%d-%H%M%S)
 		#	cp -f /var/log/ipaserver-uninstall.log /var/log/ipaserver-uninstall.log.$DATE
@@ -120,12 +120,12 @@ ipa_uninstall_slave()
 		#	rhts-submit-log -l $logtar
 		#fi
 
-		submit_logs
+		#submit_logs
 
 		ipa_quick_uninstall
 		[ -n $SLAVE_IP ] && SLAVE=$(dig +short -x $SLAVE_IP|sed 's/\.$//g')
 
-		submit_log /var/log/ipaserver-uninstall.log
+		#submit_log /var/log/ipaserver-uninstall.log
 		#if [ -f /var/log/ipaserver-uninstall.log ]; then
 		#	DATE=$(date +%Y%m%d-%H%M%S)
 		#	cp -f /var/log/ipaserver-uninstall.log /var/log/ipaserver-uninstall.log.$DATE
@@ -184,11 +184,11 @@ ipa_uninstall_client()
 		#	rhts-submit-log -l $logtar
 		#fi
 
-		submit_logs
+		#submit_logs
 
 		ipa_quick_uninstall
 
-		submit_log /var/log/ipaclient-uninstall.log
+		#submit_log /var/log/ipaclient-uninstall.log
 
 		rlRun "yum -y downgrade curl nss* openldap* libselinux* nspr* libcurl*"
 		rlRun "yum -y remove http*"

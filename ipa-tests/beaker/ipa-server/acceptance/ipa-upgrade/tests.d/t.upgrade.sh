@@ -70,7 +70,7 @@ upgrade_master()
 		rlRun "ipactl status"
 		#rlRun "ipactl restart" ### IS THIS REALLY NEEDED?  BZ 766687?
 		rlRun "rpm -q ipa-server 389-ds-base bind bind-dyndb-ldap pki-common sssd"
-		submit_log /var/log/ipaupgrade.log
+		#submit_log /var/log/ipaupgrade.log
 		#if [ -f /var/log/ipaupgrade.log ]; then
 		#	DATE=$(date +%Y%m%d-%H%M%S)
 		#	cp /var/log/ipaupgrade.log /var/log/ipaupgrade.log.$DATE
@@ -135,7 +135,7 @@ upgrade_slave()
 
 		#rlRun "ipactl restart" ### IS THIS REALLY NEEDED?  BZ 766687?
 		rlRun "rpm -q ipa-server 389-ds-base bind bind-dyndb-ldap pki-common sssd"
-		submit_log /var/log/ipaupgrade.log
+		#submit_log /var/log/ipaupgrade.log
 		#if [ -f /var/log/ipaupgrade.log ]; then
 		#	DATE=$(date +%Y%m%d-%H%M%S)
 		#	cp /var/log/ipaupgrade.log /var/log/ipaupgrade.log.$DATE
