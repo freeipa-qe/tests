@@ -57,11 +57,11 @@ ipa_uninstall_master()
 	"MASTER")
 		rlLog "Machine in recipe is MASTER"
 		rlLog "backing up MASTER log files before uninstall"
-		logtar=/tmp/master.$(hostname -s).$(date +%Y%m%d-%H%M%S).tar.gz
-		rlRun "tar zcvf $logtar /var/log"
-		if [ -f $logtar ]; then
-			rhts-submit-log -l $logtar
-		fi
+		#logtar=/tmp/master.$(hostname -s).$(date +%Y%m%d-%H%M%S).tar.gz
+		#rlRun "tar zcvf $logtar /var/log"
+		#if [ -f $logtar ]; then
+		#	rhts-submit-log -l $logtar
+		#fi
 
 		submit_logs
 
@@ -114,11 +114,11 @@ ipa_uninstall_slave()
 		rlLog "Machine in recipe is SLAVE"
 		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $MASTER_IP"
 		rlLog "backing up SLAVE log files before uninstall"
-		logtar=/tmp/replica.$(hostname -s).$(date +%Y%m%d-%H%M%S).tar.gz
-		rlRun "tar zcvf $logtar /var/log"
-		if [ -f $logtar ]; then
-			rhts-submit-log -l $logtar
-		fi
+		#logtar=/tmp/replica.$(hostname -s).$(date +%Y%m%d-%H%M%S).tar.gz
+		#rlRun "tar zcvf $logtar /var/log"
+		#if [ -f $logtar ]; then
+		#	rhts-submit-log -l $logtar
+		#fi
 
 		submit_logs
 
@@ -178,11 +178,11 @@ ipa_uninstall_client()
 		KinitAsAdmin
 		kdestroy
 		rlLog "backing up CLIENT log files before uninstall"
-		logtar=/tmp/client.$(hostname -s).$(date +%Y%m%d).tar.gz
-		rlRun "tar zcvf $logtar /var/log"
-		if [ -f $logtar ]; then
-			rhts-submit-log -l $logtar
-		fi
+		#logtar=/tmp/client.$(hostname -s).$(date +%Y%m%d).tar.gz
+		#rlRun "tar zcvf $logtar /var/log"
+		#if [ -f $logtar ]; then
+		#	rhts-submit-log -l $logtar
+		#fi
 
 		submit_logs
 
