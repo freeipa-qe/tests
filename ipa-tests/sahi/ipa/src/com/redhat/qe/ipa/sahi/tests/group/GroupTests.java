@@ -717,7 +717,7 @@ public class GroupTests extends SahiTestScript{
 	}
 	
 	//@Test (groups={"deleteGroup"}, description="delete group test", dataProvider="firstUserGroupData", dependsOnGroups="modifyGroup_sudo_cleanup")
-	@Test (groups={"deleteGroup"}, description="delete group test", dataProvider="firstUserGroupData", dependsOnGroups="bugverification")
+	@Test (groups={"deleteGroup"}, description="delete group test", dataProvider="firstUserGroupData", dependsOnGroups={"bugverification", "modifyGroup_settings_negative"})
 	public void deleteGroup_single(String testScenario, String groupName){
 		Assert.assertTrue(browser.link(groupName).exists(),"before 'Delete', group should exists");
 		GroupTasks.deleteGroup(browser, groupName);
@@ -725,7 +725,7 @@ public class GroupTests extends SahiTestScript{
 	}
 	
 	//@Test (groups={"deleteGroup"}, description="delete group test", dataProvider="remainingUserGroupData", dependsOnGroups="modifyGroup_sudo_cleanup")
-	@Test (groups={"deleteGroup"}, description="delete group test", dataProvider="remainingUserGroupData", dependsOnGroups="bugverification")
+	@Test (groups={"deleteGroup"}, description="delete group test", dataProvider="remainingUserGroupData", dependsOnGroups={"bugverification", "modifyGroup_enrollgroup"})
 	public void deleteGroup_multiple(String testScenario, String groupNames){
 		String[] groups = groupNames.split(",");
 		for (String groupName:groups){
