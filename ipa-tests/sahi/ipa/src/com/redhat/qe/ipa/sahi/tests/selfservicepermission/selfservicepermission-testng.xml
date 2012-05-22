@@ -1,6 +1,6 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
 <suite name="IPASelfservicepermissionTestSuite">	
-    <test name="IPASelfservicepermission Tests" preserve-order="true">
+    <test name="IPASelfservicepermission Tests" >
             	<packages>
             	    <package name="com.redhat.qe.ipa.sahi.*" />
             	</packages>
@@ -9,11 +9,13 @@
             	        <include name="setup" />
             	        <include name="init" />    
             	        <include name="addPermission" />
-            	         <include name="addPermission_negative" />
-            	        <include name="modifyPermission" /> 
+            	        <include name="addPermission_negative" />
+            	        <include name="modifyPermission_reset" /> 
+            	        <include name="modifyPermission_undo" /> 
+            	        <include name="modifyPermission_update" /> 
             	        <include name="modifyPermission_negative" />
-            	         <include name="deletePermission" /> 
-            	    </run>
+            	        <include name="deletePermission" /> 
+               	    </run>
             	</groups>
             	<classes>
             	    <class name="com.redhat.qe.ipa.sahi.tests.selfservicepermission.SelfservicepermissionTests" />
