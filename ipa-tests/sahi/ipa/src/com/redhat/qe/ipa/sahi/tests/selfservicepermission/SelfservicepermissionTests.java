@@ -187,7 +187,7 @@ public class SelfservicepermissionTests extends SahiTestScript{
 		//FIXME: need a solution to verify test case result
 	}
 
-	@Test (groups={"modifyPermission"}, dataProvider="modifyPermission_undo", dependsOnGroups="addPermission",
+	@Test (groups={"modifyPermission_undo"}, dataProvider="modifyPermission_undo", dependsOnGroups="addPermission",
 		description="modify self service permission: add single attributes ")
 	public void modifyPermission_undo(String permissionName, String attribute) throws Exception {
 		browser.link(permissionName).click();
@@ -211,7 +211,7 @@ public class SelfservicepermissionTests extends SahiTestScript{
 		browser.link("Self Service Permissions").in(browser.span("back-link")).click(); 
 	}
 
-	@Test (groups={"modifyPermission"}, dataProvider="modifyPermission_reset", dependsOnGroups="addPermission",
+	@Test (groups={"modifyPermission_reset"}, dataProvider="modifyPermission_reset", dependsOnGroups="addPermission",
 		description="modify self service permission: add single attributes ")
 	public void modifyPermission_reset(String permissionName, String attributesToUncheck) throws Exception {
 		browser.link(permissionName).click();
@@ -232,7 +232,7 @@ public class SelfservicepermissionTests extends SahiTestScript{
 		browser.link("Self Service Permissions").in(browser.span("back-link")).click(); 
 	}
 
-	@Test (groups={"modifyPermission"}, dataProvider="modifyPermission_update", dependsOnGroups="addPermission",
+	@Test (groups={"modifyPermission_update"}, dataProvider="modifyPermission_update", dependsOnGroups={"addPermission","modifyPermission_undo","modifyPermission_reset"},
 		description="modify self service permission: add single attributes ")
 	public void modifyPermission_update(String permissionName, String attributesToUncheck) throws Exception {
 		browser.link(permissionName).click();
@@ -274,7 +274,7 @@ public class SelfservicepermissionTests extends SahiTestScript{
 	}
 
 	/////////// delete permission /////////////////////////
-	@Test (groups={"deletePermission"}, dataProvider="deletePermissionSingle", dependsOnGroups="modifyPermission",
+	@Test (groups={"deletePermission"}, dataProvider="deletePermissionSingle", dependsOnGroups="modifyPermission_update",
 		description="delete self service permission")
 	public void deletePermissionSingle(String scenario, String permissionName, String attributes) throws Exception { 
 		Assert.assertTrue(browser.link(permissionName).exists(), "before delete, permission should in the list");
@@ -282,7 +282,7 @@ public class SelfservicepermissionTests extends SahiTestScript{
 		Assert.assertFalse(browser.link(permissionName).exists(), "after delete, permission should disappear");
 	}
 	
-	@Test (groups={"deletePermission"}, dataProvider="deletePermissionMultiple", dependsOnGroups="modifyPermission",
+	@Test (groups={"deletePermission"}, dataProvider="deletePermissionMultiple", dependsOnGroups="modifyPermission_update",
 		description="delete multiple self service permissions at once")
 	public void deletePermissionMultiple(String permissionNames, String attributes) throws Exception { 
 		String[] names = permissionNames.split(",");
@@ -293,7 +293,7 @@ public class SelfservicepermissionTests extends SahiTestScript{
 			Assert.assertFalse(browser.link(name).exists(), "after delete, permission should disappear");
 	}
 	
-	@Test (groups={"deletePermission"}, dataProvider="leftOverPermissions", dependsOnGroups="modifyPermission",
+	@Test (groups={"deletePermission"}, dataProvider="leftOverPermissions", dependsOnGroups="modifyPermission_update",
 			description="delete self service permission")
 		public void deleteLeftOverPermission(String permissionName) throws Exception { 
 			Assert.assertTrue(browser.link(permissionName).exists(), "before delete, permission should in the list");
