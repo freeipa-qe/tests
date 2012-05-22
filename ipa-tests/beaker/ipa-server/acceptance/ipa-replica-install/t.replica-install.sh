@@ -818,6 +818,7 @@ uninstall()
 
 		rlLog "Executing: ipa-server-install --uninstall -U"
 		rlRun "ipa-server-install --uninstall -U"
+
 ### cleanruv to be safe
 		ESCBASEDN=$(echo $BASEDN|sed -e 's/=/\\3D/g' -e 's/,/\\2C/g')
 		for RID in $(ldapsearch -xLLL -h $MASTERIP -D "$ROOTDN" -w "$ROOTDNPWD" -b dc=testrelm,dc=com  '(&(nsuniqueid=ffffffff-ffffffff-ffffffff-ffffffff)(objectclass=nstombstone))'|grep "nsds50ruv:.*$SLAVE"|awk '{print $3}'|sort -n)
@@ -829,6 +830,10 @@ uninstall()
 			nsds5task: CLEANRUV$RID
 			EOF
 		done
+
+### restart ipa on master to clear out old kerberos ticket for replica
+		rlLog "restart ipa on master to clear out old kerberos ticket for replica"
+		rlRun "remoteExec root $MASTERIP \"ipactl restart\""
 
 	rlPhaseEnd
 }
