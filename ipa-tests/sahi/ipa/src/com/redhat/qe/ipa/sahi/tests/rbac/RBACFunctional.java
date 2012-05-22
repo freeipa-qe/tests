@@ -159,7 +159,7 @@ public class RBACFunctional extends SahiTestScript {
 		sahiTasks.navigateTo(commonTasks.privilegePage, true);
 		String permissions[] = {permissionName};
 		PrivilegeTasks.addMembersToPrivilege(sahiTasks, privilegeName, "Permissions", permissionName, permissions, "Add");
-		
+		PrivilegeTasks.verifyPrivilegeMembership(sahiTasks, privilegeName, "Permissions", permissions, true);
 		
 		String password="Secret123";
 		CommonTasks.kinitAsUser(userName, password);

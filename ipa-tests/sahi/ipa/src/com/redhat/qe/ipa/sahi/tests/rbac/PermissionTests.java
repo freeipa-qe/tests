@@ -823,7 +823,7 @@ public class PermissionTests extends SahiTestScript {
 			String[][] permissions={
 			//	testname									cn									right		type		Expected Error		
 			{ "edit_permission_with_no_rights",				"Add Services", 					"add",		"",			"Input form contains invalid or missing values."							 },
-			{ "edit_permission_with_invalid_type_bz807755",	"Add krbPrincipalName to a host", 	"",			"Netgroup",	"attribute(s) \"krbprincipalname\" not allowed"								 },
+			{ "edit_permission_with_invalid_type_bz807755",	"Add krbPrincipalName to a host", 	"",			"Netgroup",	"invalid 'target': type, filter, subtree and targetgroup are mutually exclusive"								 },
 			{ "edit_permission_with_invalid_type",			"Add krbPrincipalName to a host", 	"",			"Service",	"invalid 'target': type, filter, subtree and targetgroup are mutually exclusive"	 } };
 		
 			return permissions;	
