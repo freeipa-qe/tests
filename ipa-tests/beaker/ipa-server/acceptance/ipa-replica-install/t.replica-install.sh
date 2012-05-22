@@ -612,6 +612,7 @@ installSlave_sshtrustdns() {
         if [ -f /var/log/ipareplica-install.log ]; then
                 rhts-submit-log -l /var/log/ipareplica-install.log
         fi
+	rlPhaseEnd
 } #installSlave_sshtrustdns
 
 installSlave_nosshd() {
