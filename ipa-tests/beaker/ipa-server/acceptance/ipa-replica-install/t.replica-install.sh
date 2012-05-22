@@ -832,8 +832,8 @@ uninstall()
 		done
 
 ### restart ipa on master to clear out old kerberos ticket for replica
-		rlLog "restart ipa on master to clear out old kerberos ticket for replica"
-		rlRun "remoteExec root $MASTERIP \"ipactl restart\""
+		rlLog "restart dirsrv on master to clear out old kerberos ticket for replica"
+		rlRun "remoteExec root $MASTERIP \"service dirsrv restart\""
 
 	rlPhaseEnd
 }
