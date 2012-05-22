@@ -177,6 +177,9 @@ rlJournalStart
 			rhts-sync-block -s READY_REPLICA1 $BEAKERMASTER
 			installSlave
 			installCA
+
+			replicaBugCheck_bz784696
+
 			uninstall
 			rhts-sync-set -s DONE_REPLICA1 $BEAKERSLAVE
 
@@ -217,7 +220,6 @@ rlJournalStart
 			installSlave_ca
 				
 			# Test other bugs not covered directly in above tests
-			replicaBugCheck_bz784696
 
 			rhts-sync-set -s DONE_REPLICA2 $BEAKERSLAVE
 		rlPhaseEnd
