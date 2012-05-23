@@ -183,6 +183,7 @@ upgrade_test_master_bz_tests()
 		upgrade_bz_808201
 		upgrade_bz_803930
 		upgrade_bz_812391
+		upgrade_bz_821176
 
 		# uninstall everything so we can start over
 		ipa_uninstall_slave
