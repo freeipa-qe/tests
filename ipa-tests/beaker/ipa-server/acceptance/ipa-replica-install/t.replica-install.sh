@@ -646,6 +646,7 @@ installSlave_nosshd() {
         if [ -f /var/log/ipareplica-install.log ]; then
                 rhts-submit-log -l /var/log/ipareplica-install.log
         fi
+	rlPhaseEnd
 } #installSlave_nosshd
 
 
@@ -684,6 +685,7 @@ installSlave_nodnssshfp() {
         if [ -f /var/log/ipareplica-install.log ]; then
                 rhts-submit-log -l /var/log/ipareplica-install.log
         fi
+	rlPhaseEnd
 } #installSlave_nodnssshfp
 
 
@@ -720,6 +722,7 @@ installSlave_nouiredirect() {
         if [ -f /var/log/ipareplica-install.log ]; then
                 rhts-submit-log -l /var/log/ipareplica-install.log
         fi
+	rlPhaseEnd
 } #installSlave_nouiredirect
 
 
