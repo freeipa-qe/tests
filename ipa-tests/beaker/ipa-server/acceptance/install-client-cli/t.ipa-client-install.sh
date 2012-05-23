@@ -266,8 +266,9 @@ ipaclientinstall_server_unreachableserver()
 {
     rlPhaseStartTest "ipa-client-install-10- [Negative] Install with unreachable server"
        uninstall_fornexttest
-       # update /etc/resolv.conf so that the server is undiscoverable
-       updateResolv
+        ipaddr=$(host -i $CLIENT | awk '{ field = $NF }; END{ print field }')
+        rlRun "ssh  -o StrictHostKeyChecking=no root@$MASTERIP \"iptables -A INPUT -s $ipaddr -j REJECT\"" 0 "Start Firewall on MASTER IPA server"
+        rlRun "ssh  -o StrictHostKeyChecking=no root@$SLAVEIP \"iptables -A INPUT -s $ipaddr -j REJECT\"" 0 "Start Firewall on SLAVE IPA server"
        rlLog "EXECUTING: ipa-client-install -U"
        command="ipa-client-install -p $ADMINID -w $ADMINPW -U"
        expmsg="Unable to discover domain, not provided on command line
@@ -276,8 +277,8 @@ IPA client is not configured on this system."
        local tmpout=$TmpDir/ipaclientinstall_server_unreachableserver.out
        qaRun "$command" "$tmpout" 1 $expmsg "Verify expected error message for IPA Install with unreachable server" 
 
-       # restore /etc/resolv.conf for the rest of the tests
-       restoreResolv
+    #    rlRun "ssh  -o StrictHostKeyChecking=no root@$MASTERIP \"service iptables stop\"" 0 "Stop Firewall on MASTER IPA server"
+    #    rlRun "ssh  -o StrictHostKeyChecking=no root@$SLAVEIP \"service iptables stop\"" 0 "Stop Firewall on SLAVE IPA server"
     rlPhaseEnd
 }
 
@@ -293,7 +294,7 @@ ipaclientinstall_realm_casesensitive()
        rlLog "/etc/resolv.conf contents are: `cat /etc/resolv.conf`"
        relminlowercase=`echo ${RELM,,}`
        rlLog "EXECUTING: ipa-client-install --realm=$relminlowercase"
-       command="ipa-client-install --realm=$relminlowercase -p $ADMINID -w $ADMINPW -U"
+       command="ipa-client-install --realm=$relminlowercase"
        expmsg="ERROR: The provided realm name: [$relminlowercase] does not match with the discovered one: [$RELM]"
        local tmpout=$TmpDir/ipaclientinstall_realm_casesensitive.out
        qaRun "$command" "$tmpout" 1 $expmsg "Verify expected error message for IPA Install with incorrect case realmname" 
@@ -710,13 +711,13 @@ ipaclientinstall_withmasterdown()
         uninstall_fornexttest
        
         # Stop the MASTER 
-        rlRun "ssh root@$MASTER \"ipactl stop\"" 0 "Stop MASTER IPA server"
+        rlRun "ssh -o StrictHostKeyChecking=no  root@$MASTER \"ipactl stop\"" 0 "Stop MASTER IPA server"
 
         rlLog "EXECUTING: ipa-client-install --domain=$DOMAIN --realm=$RELM  -p $ADMINID -w $ADMINPW --unattended "
         rlRun "ipa-client-install --domain=$DOMAIN --realm=$RELM  -p $ADMINID -w $ADMINPW --unattended " 0 "Installing ipa client and configuring - with all params"
 
         # Start the MASTER back
-        rlRun "ssh root@$MASTERIP \"ipactl start\"" 0 "Start MASTER IPA server"
+        rlRun "ssh  -o StrictHostKeyChecking=no root@$MASTERIP \"ipactl start\"" 0 "Start MASTER IPA server"
 
         verify_install true
     rlPhaseEnd
