@@ -341,7 +341,7 @@ EOF
 cat > /etc/libreport/plugins/mailx.conf << EOF
 Subject=CRASH ALERT: Crash detected in ipa automation.
 EmailFrom=root@$hostname_s
-EmailTo=seceng-idm-qe-list@redhat.com
+EmailTo=ipa-and-samba-team-list@redhat.com
 SendBinaryData=no
 EOF
 
