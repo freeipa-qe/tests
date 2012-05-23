@@ -2501,6 +2501,8 @@ hbacsvc_master_032() {
                 rlRun "ipa hbactest --srchost=$CLIENT --host=$CLIENT --service=sshd  --user=$user32 --rule=ÃŒÃŒ --nodetail | grep -i \"Access granted: True\""
                 rlRun "ipa hbactest --srchost=$CLIENT --host=$CLIENT --service=sshd  --user=$user32 --rule=ÃŒÃŒ --nodetail | grep -i \"matched: ÃŒÃŒ\"" 1
 
+	# Cleanup
+		rlRun "ipa hbacrule-del ÃŒÃŒ"
         rlPhaseEnd
 }
 
@@ -2562,6 +2564,9 @@ hbacsvc_master_bug736314() {
                 rlRun "ipa hbactest --user=$user736314 --srchost=externalhost2.randomhost.com --host=$MASTER --service=sshd --rule=rule736314 --nodetail | grep -i \"Access granted: True\""
                 rlRun "ipa hbactest --user=$user736314 --srchost=$CLIENT --host=$MASTER --service=sshd --rule=rule736314 --nodetail | grep -i \"Access granted: True\""
                 rlRun "ipa hbactest --user=$user736314 --srchost=externalhost.randomhost.com --host=$MASTER --service=sshd --rule=rule736314 --nodetail | grep -i \"matched: rule736314\"" 1
+
+	# cleaning up created rules
+		rlRun "ipa hbacrule-del rule736314"
 
         rlPhaseEnd
 }
@@ -2635,6 +2640,9 @@ hbacsvc_master_bug782927() {
 		rlRun "ipa config-mod --searchrecordslimit=100"
 		rlRun "ipa config-show"
 	
+	# cleaning up created rules
+		for i in {1000..1010}; do ipa hbacrule-del $i; done
+		rlRun "ipa hbacrule-del 782927"
         rlPhaseEnd
 }
 
@@ -2676,6 +2684,10 @@ hbacsvc_master_bug772852() {
         # restoring ipa config
                 rlRun "ipa config-mod --searchrecordslimit=100"
                 rlRun "ipa config-show"
+
+	# cleaning up created rules
+		for i in {1000..1010}; do ipa hbacrule-del $i; done
+		rlRun "ipa hbacrule-del 772852"
 
         rlPhaseEnd
 }
