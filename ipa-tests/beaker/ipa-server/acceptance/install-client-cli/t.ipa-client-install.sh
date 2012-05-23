@@ -15,7 +15,7 @@ ipaclientinstall()
 #   --ntp-server=NTP_SERVER Configure ntpd to use this NTP server.
    ipaclientinstall_allparam
 
-#   --uninstall Remove the IPA client software and restore the configuration to the pre-IPA state.
+   --uninstall Remove the IPA client software and restore the configuration to the pre-IPA state.
    ipaclientinstall_uninstall
 
    ipaclientinstall_noparam
@@ -277,8 +277,8 @@ IPA client is not configured on this system."
        local tmpout=$TmpDir/ipaclientinstall_server_unreachableserver.out
        qaRun "$command" "$tmpout" 1 $expmsg "Verify expected error message for IPA Install with unreachable server" 
 
-    #    rlRun "ssh  -o StrictHostKeyChecking=no root@$MASTERIP \"service iptables stop\"" 0 "Stop Firewall on MASTER IPA server"
-    #    rlRun "ssh  -o StrictHostKeyChecking=no root@$SLAVEIP \"service iptables stop\"" 0 "Stop Firewall on SLAVE IPA server"
+#        rlRun "ssh  -o StrictHostKeyChecking=no root@$MASTERIP \"service iptables stop\"" 0 "Stop Firewall on MASTER IPA server"
+#        rlRun "ssh  -o StrictHostKeyChecking=no root@$SLAVEIP \"service iptables stop\"" 0 "Stop Firewall on SLAVE IPA server"
     rlPhaseEnd
 }
 

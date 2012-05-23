@@ -64,9 +64,14 @@ uninstall_fornexttest()
 #       rlRun "ipa host-del $CLIENT --updatedns" 0 "Deleting client record and DNS entry from server"
        # now uninstall
        rlRun "ipa-client-install --uninstall -U " 0 "Uninstalling ipa client for next test"
-        if [ -f $SSSD];then
-           rlRun "mv $SSSD $SSSD.old" 0 "moving $SSSD"
-        fi
+    fi
+    if [ -f $SSSD ] ; then
+       rlLog "renaming last sssd.conf"
+       mv $SSSD $SSSD.old
+    fi
+    if [ -f $DEFAULT ] ; then
+       rlLog "renaming last default.conf"
+       mv $DEFAULT $DEFAULT.old
     fi
 }
 
