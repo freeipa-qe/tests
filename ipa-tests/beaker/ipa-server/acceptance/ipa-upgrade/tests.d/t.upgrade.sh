@@ -189,8 +189,8 @@ upgrade_client()
 		done
 
 		rlRun "yum clean all"
-		rlLog "upgrading selinux-policy and selinux-policy-targeted first"
-		rlRun "yum -y update selinux-policy selinux-policy-targeted"
+		#rlLog "upgrading selinux-policy and selinux-policy-targeted first"
+		#rlRun "yum -y update selinux-policy selinux-policy-targeted"
 		rlRun "yum -y update 'ipa*'"	
 		#rlRun "ipactl restart" ### IS THIS REALLY NEEDED?  BZ 766687?
 		rlRun "rpm -q ipa-client sssd"
