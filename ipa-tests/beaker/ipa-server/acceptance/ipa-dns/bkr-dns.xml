@@ -1,21 +1,19 @@
 <job>
 	<whiteboard>
-		ipa-server dns tests
+		ipa-server dns tests workstation x86_64
 	</whiteboard>
 	<recipeSet>
 		<recipe whiteboard="ipa dns tests - x86_64" ks_meta="selinux=disabled partitions=yes">
 			<distroRequires>
 				<and>
-					<distro_variant op="=" value="Server"/>
-					<distro_arch op="=" value="x86_64"/>
-				        <distro_tag op="=" value="STABLE"/>
-				        <distro_family op="=" value="RedHatEnterpriseLinux6"/>
-				        <distro_method op="=" value="nfs"/>
+					<distro_virt op="=" value=""/>
+					<distro_variant op="=" value="Workstation"/>
+					<distro_arch value="x86_64"/>
 				</and>
 			</distroRequires>
 			<hostRequires/>
 			<repos>
-				<repo name="ipa-noarch" url="http://epsilon.dsdev.sjc.redhat.com/tet/up.repo"/>
+				<repo name="snapshot5" url="http://alpha.dsdev.sjc.redhat.com/export/archives/rhel/6.3/snapshot5/server/x86_64/tree/"/>
 			</repos>
 			<task name="/distribution/install" role="STANDALONE">
 				<params/>
@@ -33,11 +31,6 @@
 			</task>
 			<task name="/CoreOS/ipa-server/acceptance/ipa-dns" role="MASTER">
 				<params/>
-			</task>
-			<task name="/distribution/reservesys" role="STANDALONE">
-				<params>
-					<param name="RESERVETIME" value="86400"/>
-				</params>
 			</task>
 		</recipe>
 	</recipeSet>
