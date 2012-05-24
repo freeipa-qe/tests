@@ -97,9 +97,20 @@ rlJournalStart
                 rlRun "rhts-sync-block -s DONE_master_setup $BEAKERMASTER"
                 rlRun "rhts-sync-set -s DONE_client1_setup -m $BEAKERCLIENT"
 
-                MASTER_IP=`nslookup $MASTER | grep Address | grep -v "#" | awk '{print $2}'`
-                BEAKERCLIENT_IP=`nslookup $BEAKERCLIENT | grep Address | grep -v "#" | awk '{print $2}'`
-                BEAKERCLIENT2_IP=`nslookup $BEAKERCLIENT2 | grep Address | grep -v "#" | awk '{print $2}'`
+		# Adding the next lines because this test will stall forever if $BEAKERCLIENT or $BEAKERCLIENT2 are empty
+		if [ -x $BEAKERCLIENT ]; then
+			echo "ERROR - This test must be run on a config with \$BEAKERCLIENT defined"
+			rlFail "ERROR - This test must be run on a config with \$BEAKERCLIENT defined"
+			exit
+		fi
+		if [ -x $BEAKERCLIENT2 ]; then
+			echo "ERROR - This test must be run on a config with \$BEAKERCLIENT2 defined"
+			rlFail "ERROR - This test must be run on a config with \$BEAKERCLIENT2 defined"
+			exit
+		fi
+		MASTER_IP=`nslookup $MASTER | grep Address | grep -v "#" | awk '{print $2}'`
+		BEAKERCLIENT_IP=`nslookup $BEAKERCLIENT | grep Address | grep -v "#" | awk '{print $2}'`
+		BEAKERCLIENT2_IP=`nslookup $BEAKERCLIENT2 | grep Address | grep -v "#" | awk '{print $2}'`
 
                 echo $MASTER_IP        $MASTER >> /etc/hosts
                 echo $BEAKERCLIENT2_IP  $CLIENT2 >> /etc/hosts
