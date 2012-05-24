@@ -865,7 +865,11 @@ rlJournalStart
 	# hbacsvc_master_bug801769
 		hbacsvc_master_bug801769
 
+	# hbac hbactest --sizemimit tests
+		hbactest_master_sizelimit_1
+		hbactest_master_sizelimit_2
 	rlPhaseEnd
+
 
 	rlPhaseStartCleanup "ipa-hbacrule-func-cleanup: Destroying admin credentials."
         	# delete hbac service 

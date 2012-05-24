@@ -695,6 +695,83 @@ hbacsvc_master_008() {
         rlPhaseEnd
 }
 
+hbactest_master_sizelimit_1() {
+	# Setup 
+		echo "start hbactest_master_1"
+		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+		search_rules=5
+		create_rules=5
+		firstrule=1000
+		let lastrule=$firstrule+$create_rules
+		i=$firstrule
+		while [ $i -lt $lastrule ]; do
+			ipa hbacrule-add t$i; 
+			let i=$i+1
+		done
+		ret_lines=$(ipa hbactest --user=a1a --host=bar --service=sshd | wc -l)
+		let ret_lines=$ret_lines-3   # Removing header from counted lines
+		if [ $ret_lines -lt $search_rules ]; then
+			rlFail "number of returned rules too low. it's $ret_lines when is should be greater than $search_rules"	
+		else 
+			echo "PASS - returned lines is $ret_lines. It needed to be greater than $search_rules"
+		fi
+		
+		ret_lines=$(ipa hbactest --user=a1a --host=bar --service=sshd --sizelimit=$search_rules | wc -l)
+		let ret_lines=$ret_lines-3   # Removing header from counted lines
+		if [ $ret_lines -gt $search_rules ]; then
+			rlFail "number of returned rules too high. it's $ret_lines when is should be equal to than $search_rules"	
+		else
+			echo "PASS - returned lines is $ret_lines. It needed to be around $search_rules"
+		fi
+		
+	# Cleanup
+		i=$firstrule
+		while [ $i -lt $lastrule ]; do
+			ipa hbacrule-del t$i; 
+			let i=$i+1
+		done
+
+}
+
+hbactest_master_sizelimit_2() {
+	# Setup 
+		echo "start hbactest_master_1"
+		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+		search_rules=50
+		create_rules=60
+		firstrule=1000
+		let lastrule=$firstrule+$create_rules
+		i=$firstrule
+		while [ $i -lt $lastrule ]; do
+			ipa hbacrule-add t$i; 
+			let i=$i+1
+		done
+		ret_lines=$(ipa hbactest --user=a1a --host=bar --service=sshd | wc -l)
+		let ret_lines=$ret_lines-3   # Removing header from counted lines
+		if [ $ret_lines -lt $search_rules ]; then
+			rlFail "number of returned rules too low. it's $ret_lines when is should be greater than $search_rules"	
+		else 
+			echo "PASS - returned lines is $ret_lines. It needed to be greater than $search_rules"
+		fi
+		
+		ret_lines=$(ipa hbactest --user=admin --host=$MASTER --service=sshd --sizelimit=$search_rules | wc -l)
+		let ret_lines=$ret_lines-3   # Removing header from counted lines
+		if [ $ret_lines -gt $search_rules ]; then
+			rlFail "number of returned rules too high. it's $ret_lines when is should be equal to than $search_rules"	
+		else
+			echo "PASS - returned lines is $ret_lines. It needed to be around $search_rules"
+		fi
+		
+	# Cleanup
+		i=$firstrule
+		while [ $i -lt $lastrule ]; do
+			ipa hbacrule-del t$i; 
+			let i=$i+1
+		done
+
+}
+
+
 hbacsvc_client_008() {
 
         rlPhaseStartTest "ipa-hbacsvc-client1-008: user8 from grp8 part of rule8 is allowed to access $CLIENT2 from $CLIENT"
@@ -2614,7 +2691,7 @@ hbacsvc_master_bug782927() {
 
 		for i in {1000..1010}; do ipa hbacrule-add $i; done
 		rlRun "ipa config-show"
-		rlRun "ipa config-mod --searchrecordslimit=5"
+		#rlRun "ipa config-mod --searchrecordslimit=5"
 		rlRun "ipa config-show"
 
                 rlRun "ipa hbacrule-disable allow_all"
