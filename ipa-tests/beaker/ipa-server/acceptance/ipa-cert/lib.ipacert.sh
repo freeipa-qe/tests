@@ -39,7 +39,7 @@ create_cert()
     ipa cert-request --principal=$principal $certRequestFile >$tmpout
     local ret=$?
     if [ "$ret" = "0" ];then
-        local certid=`grep "Serial number" $tmpout| cut -d":" -f2 | xargs echo` 
+        local certid=`grep "Serial number" $tmpout | grep -v "hex" | cut -d":" -f2 | xargs echo` 
         echo "$principal=$certid" >> $certList
         rlPass "create cert success, cert id :[$certid], principal [$principal]"
     else
