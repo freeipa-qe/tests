@@ -1,7 +1,7 @@
 # Yum Repos
-myrepo[1]=http://download.devel.redhat.com/nightly/latest-RHEL6.3/6.3/Server/x86_64/os/
-myrepo[2]=http://download.devel.redhat.com/nightly/latest-RHEL6.3/6.3/Server/optional/x86_64/os/
-myrepo[3]=http://cosmos.lab.eng.pnq.redhat.com/ipa-latest/x86_64
+myrepo[1]=http://download.devel.redhat.com/nightly/latest-RHEL6.3/6.3/Server/\$basearch/os/
+myrepo[2]=http://download.devel.redhat.com/nightly/latest-RHEL6.3/6.3/Server/optional/\$basearch/os/
+myrepo[3]=http://cosmos.lab.eng.pnq.redhat.com/ipa-latest/\$basearch
 
 # Users
 user[1]=jack
