@@ -814,6 +814,8 @@ uninstall()
 		rlLog "With PASSWORD on command line"
 		rlRun "remoteExec root $MASTERIP \"ipa-replica-manage connect $SLAVE -p $ADMINPW\""
 		rlRun "egrep \"You cannot connect to a previously deleted master\" /tmp/remote_exec.out"
+
+		rlLog "verifies bug https://bugzilla.redhat.com/show_bug.cgi?id=823657"
 		rlLog "Without PASSWORD on command line...using kerberos creds"
 		rlRun "remoteExec root $MASTERIP \"ipa-replica-manage connect $SLAVE \""
 		rlRun "egrep \"You cannot connect to a previously deleted master\" /tmp/remote_exec.out"
