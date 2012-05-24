@@ -643,6 +643,7 @@ rlJournalStart
 		hbacsvc_master_001
 		rlRun "rhts-sync-set -s DONE_hbacsvc_master_001 -m $BEAKERMASTER"
                 rlRun "rhts-sync-block -s DONE_hbacsvc_client_001 -s DONE_hbacsvc_client2_001 $BEAKERCLIENT $BEAKERCLIENT2"
+		hbacsvc_master_001_cleanup
 
 	# hbacsvc_master_002
 		hbacsvc_master_002
@@ -653,21 +654,25 @@ rlJournalStart
 		hbacsvc_master_002_1
 		rlRun "rhts-sync-set -s DONE_hbacsvc_master_002_1 -m $BEAKERMASTER"
 		rlRun "rhts-sync-block -s DONE_hbacsvc_client_002_1 -s DONE_hbacsvc_client2_002_1 $BEAKERCLIENT $BEAKERCLIENT2"
+		hbacsvc_master_002_cleanup
 
 	# hbacsvc_master_003
 		hbacsvc_master_003
 		rlRun "rhts-sync-set -s DONE_hbacsvc_master_003 -m $BEAKERMASTER"
                 rlRun "rhts-sync-block -s DONE_hbacsvc_client_003 -s DONE_hbacsvc_client2_003 $BEAKERCLIENT $BEAKERCLIENT2"
+		hbacsvc_master_003_cleanup
 
 	# hbacsvc_master_004
 		hbacsvc_master_004
 		rlRun "rhts-sync-set -s DONE_hbacsvc_master_004 -m $BEAKERMASTER"
                 rlRun "rhts-sync-block -s DONE_hbacsvc_client_004 -s DONE_hbacsvc_client2_004 $BEAKERCLIENT $BEAKERCLIENT2"
+		hbacsvc_master_004_cleanup
 
 	# hbacsvc_master_005
 		hbacsvc_master_005
 		rlRun "rhts-sync-set -s DONE_hbacsvc_master_005 -m $BEAKERMASTER"
                 rlRun "rhts-sync-block -s DONE_hbacsvc_client_005 -s DONE_hbacsvc_client2_005 $BEAKERCLIENT $BEAKERCLIENT2"
+		hbacsvc_master_005_cleanup
 
 	# hbacsvc_master_005_1
 		hbacsvc_master_005_1

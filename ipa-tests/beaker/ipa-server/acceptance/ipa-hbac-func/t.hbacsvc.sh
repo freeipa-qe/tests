@@ -44,8 +44,8 @@ hbacsvc_master_001() {
 	rlPhaseStartTest "ipa-hbacsvc-001: $user1 part of rule1 is allowed to access $CLIENT from $CLIENT - SSHD Service"
 
                 # kinit as admin and creating users
+	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
         for i in {1..3}; do
-                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 rlRun "create_ipauser user$i user$i user$i $userpw"
                 sleep 5
                 rlRun "export user$i=user$i"
@@ -81,6 +81,16 @@ hbacsvc_master_001() {
 		rlRun "ipa hbactest --srchost=$CLIENT --host=$CLIENT --service=sshd  --user=$user1 --rule=rule1 --nodetail | grep -i \"matched: rule1\"" 1
 
 	rlPhaseEnd
+}
+
+hbacsvc_master_001_cleanup() {
+        # Cleanup
+	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+	for i in {1..3}; do
+		rlRun "ipa user-del user$i"
+        done
+	rlRun "ipa hbacrule-del rule1"
+	rlRun "ipa hbacrule-del admin_allow_all"
 }
 
 hbacsvc_client_001() {
@@ -139,6 +149,12 @@ hbacsvc_master_002() {
                 rlRun "ipa hbactest --srchost=$CLIENT2 --host=$MASTER --service=vsftpd  --user=$user1 --rule=rule2 --nodetail | grep -i \"matched: rule2\"" 1
 
 	rlPhaseEnd
+}
+
+hbacsvc_master_002_cleanup() {
+	# Cleanup
+	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+		rlRun "ipa hbacrule-del rule2"
 }
 
 hbacsvc_client_002() {
@@ -266,6 +282,13 @@ hbacsvc_master_003() {
         rlPhaseEnd
 }
 
+hbacsvc_master_003_cleanup() {
+	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+	# Cleanup
+		rlRun "ipa hbacrule-del rule3"
+		rlRun "ipa hbacsvc-del vsftpd"
+}
+
 hbacsvc_client_003() {
 
         rlPhaseStartTest "ipa-hbacsvc-client1-003: $user3 accessing $MASTER from $CLIENT2 using default FTP service group"
@@ -332,6 +355,13 @@ hbacsvc_master_004() {
         rlPhaseEnd
 }
 
+hbacsvc_master_004_cleanup() {
+	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+	# Cleanup
+		rlRun "ipa hbacrule-del rule4"
+		rlRun "ipa hostgroup-del hostgrp1"
+}
+
 hbacsvc_client_004() {
 
         rlPhaseStartTest "ipa-hbacsvc-client1-004: user4 accessing hostgroup from $CLIENT2"
@@ -395,6 +425,13 @@ hbacsvc_master_005() {
                 rlRun "ipa hbactest --srchost=$CLIENT --host=$CLIENT --service=sshd  --user=$user5 --rule=rule5 --nodetail | grep -i \"matched: rule5\"" 1
 
         rlPhaseEnd
+}
+
+hbacsvc_master_005_cleanup() {
+	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+	# Cleanup
+		rlRun "ipa hbacrule-del rule5"
+		rlRun "ipa hostgroup-del hostgrp5"
 }
 
 hbacsvc_client_005() {
