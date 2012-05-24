@@ -9,7 +9,6 @@ run_slave_tests()
 	# Disconnect from a slave server
 	server=$MASTER # This should be the servername in the servername.relm format
 	me=$(hostname)
-	echo "Server I am going to disconnect is: $server"
 
 	rlRun "ipa-replica-manage -p $ADMINPW re-initialize --from $server" 0 "reinitilizing server $server."
 
