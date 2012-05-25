@@ -153,8 +153,8 @@ public class AutomountTests extends SahiTestScript{
 		for (String location:locations)
 			Assert.assertTrue(browser.link(location).exists(), "before delete, autoumount location (" + location + ")should exist in list");
 		CommonHelper.deleteEntry(browser, locations);  
-		//for (String location:locations)
-		//	Assert.assertFalse(browser.link(location).exists(), "after delete, automount location (" + location + ") should NOT exist in list");
+		for (String location:locations)
+			Assert.assertFalse(browser.link(location).exists(), "after delete, automount location (" + location + ") should NOT exist in list");
 	}
 	
 	@Test (groups={"deleteAutomountLocation"}, dataProvider="leftOverAutomountLocations", dependsOnGroups={"deleteAutomountMap","addAutomountKey_negative","addIndirectAutomountMap_negative","deleteAutomountLocationMultiple"},
