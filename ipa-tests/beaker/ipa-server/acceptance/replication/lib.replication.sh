@@ -544,9 +544,11 @@ check_deletednetgroup()
 add_newservice()
 {
 	rlPhaseStartTest "add service"
-		rlRun "ipa service-add $service --certificate=$certificate" 0 "Add new service"
+		#rlRun "ipa service-add $service --certificate=$certificate" 0 "Add new service"
+		rlRun "ipa service-add $service" 0 "Add new service"
 		rlRun "ipa service-add-host --hosts=$managedByHost $service" 0 "Add service host"
-		rlRun "ipa service-add $service2 --certificate=$certificate" 0 "Add new service"
+		#rlRun "ipa service-add $service2 --certificate=$certificate" 0 "Add new service"
+		rlRun "ipa service-add $service2" 0 "Add new service"
 		rlRun "ipa service-add-host --hosts=$managedByHost $service2" 0 "Add service host"
 	rlPhaseEnd
 }
@@ -560,16 +562,16 @@ check_newservice()
 {
 	rlPhaseStartTest "check service"
 		rlRun "verifyServiceAttr $service \"Principal\" $service" 0 "Verify service's name"
-		rlRun "verifyServiceAttr $service \"Certificate\" $certificate" 0 "Verify service's certificate"
+		#rlRun "verifyServiceAttr $service \"Certificate\" $certificate" 0 "Verify service's certificate"
 		rlRun "verifyServiceAttr $service \"Keytab\" $keytab" 0 "Verify service's Keytab"
-		rlRun "verifyServiceAttr $service \"Subject\" $subject" 0 "Verify service's Subject"
-		rlRun "verifyServiceAttr $service \"Issuer\" $issuer" 0 "Verify service's Issuer"
+		#rlRun "verifyServiceAttr $service \"Subject\" $subject" 0 "Verify service's Subject"
+		#rlRun "verifyServiceAttr $service \"Issuer\" $issuer" 0 "Verify service's Issuer"
 		rlRun "verifyServiceAttr $service \"Managed by\" $service_managedby" 0 "Verify service's managed hosts"
 		rlRun "verifyServiceAttr $service2 \"Principal\" $service2" 0 "Verify service's name"
-		rlRun "verifyServiceAttr $service2 \"Certificate\" $certificate" 0 "Verify service's certificate"
+		#rlRun "verifyServiceAttr $service2 \"Certificate\" $certificate" 0 "Verify service's certificate"
 		rlRun "verifyServiceAttr $service2 \"Keytab\" $keytab" 0 "Verify service's Keytab"
-		rlRun "verifyServiceAttr $service2 \"Subject\" $subject" 0 "Verify service's Subject"
-		rlRun "verifyServiceAttr $service2 \"Issuer\" $issuer" 0 "Verify service's Issuer"
+		#rlRun "verifyServiceAttr $service2 \"Subject\" $subject" 0 "Verify service's Subject"
+		#rlRun "verifyServiceAttr $service2 \"Issuer\" $issuer" 0 "Verify service's Issuer"
 		rlRun "verifyServiceAttr $service2 \"Managed by\" $service_managedby" 0 "Verify service's managed hosts"
 
 	rlPhaseEnd
@@ -579,7 +581,7 @@ modify_newservice()
 {
 	rlPhaseStartTest "modify service"
 		rlRun "ipa service-disable $service_updated" 0 "Disable service" 
-		rlRun "ipa service-mod $service_updated --certificate=$updatedcertificate " 0 "Modify service's certificate"
+		#rlRun "ipa service-mod $service_updated --certificate=$updatedcertificate " 0 "Modify service's certificate"
 		rlRun "ipa service-mod $service_updated --setattr=managedBy=$service_managedby_attr2" 0 "Set service's managed by"
 		rlRun "ipa service-mod $service_updated --addattr=managedBy=$service_managedby_attr" 0 "Add service's managed by"
 	rlPhaseEnd
@@ -593,8 +595,8 @@ modify_slave_newservice()
 check_modifiedservice()
 {
 	rlPhaseStartTest "check modified service"
-		rlRun "verifyServiceAttr $service_updated \"Certificate\" $updatedcertificate" 0 "Verify service's certificate"
-		rlRun "verifyServiceAttr $service_updated \"Subject\" $subject_updated" 0 "Verify service's Subject"
+		#rlRun "verifyServiceAttr $service_updated \"Certificate\" $updatedcertificate" 0 "Verify service's certificate"
+		#rlRun "verifyServiceAttr $service_updated \"Subject\" $subject_updated" 0 "Verify service's Subject"
 		rlRun "verifyServiceAttr $service_updated \"Managed by\" \"$managedByHost, $managedByHost_updated\"" 0 "Verify service's managed hosts"
 	rlPhaseEnd
 }
