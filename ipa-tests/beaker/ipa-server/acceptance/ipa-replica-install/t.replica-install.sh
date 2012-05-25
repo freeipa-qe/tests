@@ -603,6 +603,7 @@ installSlave_sshtrustdns() {
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
 
                 rlRun "service ipa status"
+				rlRun "service named restart"
         	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 
 		rlRun "cat /etc/ssh/ssh_config | grep -i \"VerifyHostKeyDNS yes\""
