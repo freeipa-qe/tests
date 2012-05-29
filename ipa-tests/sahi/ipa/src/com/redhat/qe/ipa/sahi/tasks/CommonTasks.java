@@ -110,7 +110,30 @@ public class CommonTasks {
         String password=System.getProperty("ipa.server.password");        
         return kinitAsUser(admin, password);    	
 	}
-    
+    // form based auth
+	//kdestroy
+	//recorded actions 
+	public static void formauth(SahiTasks sahiTasks){
+		try{
+			Runtime.getRuntime().exec("kdestroy");
+			//OutputStream stdin = process.getOutputStream ();    
+			
+			
+			sahiTasks.open();
+			sahiTasks.navigateTo(serverUrl, true);
+			sahiTasks.link("form-based authentication").click();
+			sahiTasks.textbox("username").setValue("admin");
+			sahiTasks.password("password").setValue("Secret123");
+			
+			sahiTasks.button("Login").click();
+			com.redhat.qe.auto.testng.Assert.assertTrue(CommonTasks.kinitAsAdmin(), "Logged in successfully as Admin");
+			
+			
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
     public static boolean kinitAsUser(String user, String password) {
     	try {
     		Process process = Runtime.getRuntime().exec("kinit " +  user);
@@ -348,8 +371,8 @@ public class CommonTasks {
 	public static void modifyToInvalidSetting(SahiTasks sahiTasks, String cn, String fieldNameToUpdate, String description, String expectedError, String buttonToClick) {		
 		sahiTasks.link(cn).click();
 		sahiTasks.link("Settings").click();
-		sahiTasks.textbox(fieldNameToUpdate).setValue(" ");
-		sahiTasks.textbox(fieldNameToUpdate).setValue(description);
+		sahiTasks.textarea(fieldNameToUpdate).setValue(" ");
+		sahiTasks.textarea(fieldNameToUpdate).setValue(description);
 		sahiTasks.span("Update").click();
 		Assert.assertTrue(sahiTasks.div(expectedError).exists(), "Verified expected error  :: " + expectedError);
 		sahiTasks.button(buttonToClick).click();

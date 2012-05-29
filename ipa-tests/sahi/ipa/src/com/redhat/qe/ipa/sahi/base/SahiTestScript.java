@@ -41,12 +41,18 @@ public abstract class SahiTestScript extends TestScript {
 	
 	@BeforeSuite(groups={"setup"})
 	public static void openBrowser() {
-		log.finer("kinit as admin");
-		com.redhat.qe.auto.testng.Assert.assertTrue(CommonTasks.kinitAsAdmin(), "Logged in successfully as admin");
+		//log.finer("kinit as admin");
+		// call new method - which will kdestroy and use form based auth
+		
+		//com.redhat.qe.auto.testng.Assert.assertTrue(CommonTasks.kinitAsAdmin(), "Logged in successfully as admin");
+		CommonTasks.formauth(sahiTasks);
+		//sahiTasks.open();
+		
 		log.finer("Opening browser");
-		sahiTasks.open();
-		log.finer("Accessing: IPA Server URL");
-		sahiTasks.navigateTo(System.getProperty("ipa.server.url"), true);
+		
+		
+		
+		
 	}
 
 	
