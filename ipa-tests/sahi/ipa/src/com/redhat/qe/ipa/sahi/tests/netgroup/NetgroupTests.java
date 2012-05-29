@@ -404,11 +404,11 @@ public class NetgroupTests extends SahiTestScript{
 		//										testname					netgroup		category			Action	
 		ll.add(Arrays.asList(new Object[]{ 		"host_memberships_undo",	"engineering",	"hostcategory",		"undo"	 } ));
 		ll.add(Arrays.asList(new Object[]{ 		"host_memberships_reset",	"engineering",	"hostcategory",		"Reset"	 } ));	
-		ll.add(Arrays.asList(new Object[]{ 		"host_memberships_reset",	"engineering",	"hostcategory",		"Refresh"	 } ));
+		ll.add(Arrays.asList(new Object[]{ 		"host_memberships_refresh",	"engineering",	"hostcategory",		"Refresh"	 } ));
 		ll.add(Arrays.asList(new Object[]{ 		"host_memberships_update",	"engineering",	"hostcategory",		"Update" }	));
 		ll.add(Arrays.asList(new Object[]{ 		"user_memberships_undo",	"engineering",	"usercategory",		"undo"	 } ));
 		ll.add(Arrays.asList(new Object[]{ 		"user_memberships_reset",	"engineering",	"usercategory",		"Reset"	 } ));	
-		ll.add(Arrays.asList(new Object[]{ 		"user_memberships_reset",	"engineering",	"usercategory",		"Refresh"	 } ));
+		ll.add(Arrays.asList(new Object[]{ 		"user_memberships_refresh",	"engineering",	"usercategory",		"Refresh"	 } ));
 		ll.add(Arrays.asList(new Object[]{ 		"user_memberships_update",	"engineering",	"usercategory",		"Update" }	));
 		return ll;	
 	}
