@@ -733,8 +733,7 @@ hbacsvc_master_008() {
 }
 
 hbactest_master_sizelimit_1() {
-	# Setup 
-		echo "start hbactest_master_1"
+	rlPhaseStartTest "bz782927 hbactest_master_1"
 		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 		search_rules=5
 		create_rules=5
@@ -750,7 +749,7 @@ hbactest_master_sizelimit_1() {
 		if [ $ret_lines -lt $search_rules ]; then
 			rlFail "number of returned rules too low. it's $ret_lines when is should be greater than $search_rules"	
 		else 
-			echo "PASS - returned lines is $ret_lines. It needed to be greater than $search_rules"
+			rlPass "PASS - returned lines is $ret_lines. It needed to be greater than $search_rules"
 		fi
 		
 		ret_lines=$(ipa hbactest --user=a1a --host=bar --service=sshd --sizelimit=$search_rules | wc -l)
@@ -758,7 +757,7 @@ hbactest_master_sizelimit_1() {
 		if [ $ret_lines -gt $search_rules ]; then
 			rlFail "number of returned rules too high. it's $ret_lines when is should be equal to than $search_rules"	
 		else
-			echo "PASS - returned lines is $ret_lines. It needed to be around $search_rules"
+			rlPass "PASS - returned lines is $ret_lines. It needed to be around $search_rules"
 		fi
 		
 	# Cleanup
@@ -767,12 +766,12 @@ hbactest_master_sizelimit_1() {
 			ipa hbacrule-del t$i; 
 			let i=$i+1
 		done
+	rlPhaseEnd
 
 }
 
 hbactest_master_sizelimit_2() {
-	# Setup 
-		echo "start hbactest_master_1"
+	rlPhaseStartTest "bz782927 hbactest_master_2"
 		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 		search_rules=50
 		create_rules=60
@@ -788,7 +787,7 @@ hbactest_master_sizelimit_2() {
 		if [ $ret_lines -lt $search_rules ]; then
 			rlFail "number of returned rules too low. it's $ret_lines when is should be greater than $search_rules"	
 		else 
-			echo "PASS - returned lines is $ret_lines. It needed to be greater than $search_rules"
+			rlPass "PASS - returned lines is $ret_lines. It needed to be greater than $search_rules"
 		fi
 		
 		ret_lines=$(ipa hbactest --user=admin --host=$MASTER --service=sshd --sizelimit=$search_rules | wc -l)
@@ -796,16 +795,16 @@ hbactest_master_sizelimit_2() {
 		if [ $ret_lines -gt $search_rules ]; then
 			rlFail "number of returned rules too high. it's $ret_lines when is should be equal to than $search_rules"	
 		else
-			echo "PASS - returned lines is $ret_lines. It needed to be around $search_rules"
+			rlPass "PASS - returned lines is $ret_lines. It needed to be around $search_rules"
 		fi
 		
-	# Cleanup
+		# Cleanup
 		i=$firstrule
 		while [ $i -lt $lastrule ]; do
 			ipa hbacrule-del t$i; 
 			let i=$i+1
 		done
-
+	rlPhaseEnd
 }
 
 
