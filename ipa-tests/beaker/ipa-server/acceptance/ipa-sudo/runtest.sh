@@ -52,7 +52,6 @@ PACKAGE="ipa-server"
 #   Sanity Tests
 #########################################
 
-
 	sudocmd() {
 		"sudocmd_001"
 		"sudocmd_002"
