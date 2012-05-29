@@ -580,7 +580,7 @@ check_newservice()
 modify_newservice()
 {
 	rlPhaseStartTest "modify service"
-		rlRun "ipa service-disable $service_updated" 0 "Disable service" 
+		#rlRun "ipa service-disable $service_updated" 0 "Disable service" 
 		#rlRun "ipa service-mod $service_updated --certificate=$updatedcertificate " 0 "Modify service's certificate"
 		rlRun "ipa service-mod $service_updated --setattr=managedBy=$service_managedby_attr2" 0 "Set service's managed by"
 		rlRun "ipa service-mod $service_updated --addattr=managedBy=$service_managedby_attr" 0 "Add service's managed by"
