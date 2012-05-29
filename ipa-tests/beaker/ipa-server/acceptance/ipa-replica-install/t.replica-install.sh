@@ -578,6 +578,8 @@ installSlave_ca()
                 rhts-submit-log -l /var/log/ipareplica-install.log
         fi
 
+		CA2INSTALL=true
+
    rlPhaseEnd
 }
 
@@ -771,25 +773,26 @@ uninstall()
 			rlLog "verifies bug https://bugzilla.redhat.com/show_bug.cgi?id=750524"
 			# Adding some logic to check for a csreplica before trying to delete
 			rlLog "checking if there is a csreplia agreement to delete" 
-			# comment for debugging...running ipa-csreplica-manage with -H option
-			#ipa-csreplica-manage list -p $ADMINPW|grep $SLAVE|grep -v "CA not configured" > /dev/null
-			#rlRun "remoteExec root $MASTERIP \"ipa-csreplica-manage list -p $ADMINPW\""
+			rlRun "remoteExec root $MASTERIP \"ipa-csreplica-manage list -p $ADMINPW\""
+			rlRun "cat /tmp/remote_exec.out"
 			rlRun "ipa-csreplica-manage -H $MASTER list -p $ADMINPW -f > /tmp/remote_exec.out 2>&1"	
 			rlRun "cat /tmp/remote_exec.out"
 			grep $SLAVE /tmp/remote_exec.out | grep -v "CA not configured"|grep -v "Last login"
 			if [ $? -eq 0 ]; then
 				rlLog "Running initial ipa-csreplica-manage del positive test"
-				# comment for debugging...running ipa-csreplica-manage with -H option
-				#rlRun "remoteExec root $MASTERIP \"ipa-csreplica-manage del $SLAVE -p $ADMINPW\""
-				rlRun "ipa-csreplica-manage -H $MASTER del $SLAVE -p $ADMINPW -f > /tmp/remote_exec.out 2>&1"
+				if [ "$CA2INSTALL" = "true" ]; then	
+					rlRun "ipa-csreplica-manage -H $MASTER del $SLAVE -p $ADMINPW -f > /tmp/remote_exec.out 2>&1"
+				else
+					rlRun "remoteExec root $MASTERIP \"ipa-csreplica-manage del $SLAVE -p $ADMINPW\""
+				fi
 				rlRun "egrep \"Deleted replication agreement from '$MASTER' to '$SLAVE'\" /tmp/remote_exec.out"
 				rlRun "cat /tmp/remote_exec.out"
 			fi
 
 			rlLog "Running ipa-csreplica-manage-del negative test"
-			# comment for debugging...running ipa-csreplica-manage with -H option
-			#rlRun "remoteExec root $MASTERIP \"ipa-csreplica-manage del $SLAVE -p $ADMINPW\""
-			#rlRun "egrep \"'$MASTER' has no replication agreement for '$SLAVE'\" /tmp/remote_exec.out"
+			rlRun "remoteExec root $MASTERIP \"ipa-csreplica-manage del $SLAVE -p $ADMINPW\""
+			rlRun "egrep \"'$MASTER' has no replication agreement for '$SLAVE'\" /tmp/remote_exec.out"
+			# Testing again with -H
 			rlRun "ipa-csreplica-manage -H $MASTER del $SLAVE -p $ADMINPW -f > /tmp/remote_exec.out 2>&1" 1
 			rlRun "egrep \"'$MASTER' has no replication agreement for '$SLAVE'\" /tmp/remote_exec.out"
 			rlRun "cat /tmp/remote_exec.out"
@@ -800,13 +803,20 @@ uninstall()
 		rlLog "verifies https://bugzilla.redhat.com/show_bug.cgi?id=754524"
 		rlRun "remoteExec root $MASTERIP redhat \"echo $ADMINPW | kinit admin; klist\""
 		# comment for debugging...running ipa-replica-manage locally with -H option
+		# issues with the remote executed yes hanging jobs if it irm doesn't prompt for confirmation
 		#rlRun "replicaDel root $MASTERIP \"ipa-replica-manage del $SLAVE\" yes"
-		rlRun "ipa-replica-manage -H $MASTER del $SLAVE -p $ADMINPW -f > /tmp/replicaDel.out 2>&1"
+		if [ "$CA2INSTALL" = "true" ]; then	
+			rlRun "ipa-replica-manage -H $MASTER del $SLAVE -p $ADMINPW -f > /tmp/replicaDel.out 2>&1"
+		else
+			rlRun "remoteExec root $MASTERIP \"ipa-replica-manage del $SLAVE -f\""
+		fi
 		rlRun "egrep \"Deleted replication agreement from '$MASTER' to '$SLAVE'\" /tmp/replicaDel.out"
 		rlRun "cat /tmp/replicaDel.out"
 
 		# comment for debugging...running ipa-replica-manage locally with -H option
-		#rlRun "replicaDel root $MASTERIP  \"ipa-replica-manage del $SLAVE\"" 
+		rlRun "replicaDel root $MASTERIP  \"ipa-replica-manage del $SLAVE -f\"" 
+		rlRun "egrep \"'$MASTER' has no replication agreement for '$SLAVE'\" /tmp/replicaDel.out"
+		# running again with -H
 		rlRun "ipa-replica-manage -H $MASTER del $SLAVE -p $ADMINPW -f > /tmp/replicaDel.out 2>&1" 1
 		rlRun "egrep \"'$MASTER' has no replication agreement for '$SLAVE'\" /tmp/replicaDel.out"
 		rlRun "cat /tmp/replicaDel.out"
