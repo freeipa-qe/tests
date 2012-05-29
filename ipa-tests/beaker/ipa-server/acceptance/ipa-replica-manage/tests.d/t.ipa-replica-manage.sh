@@ -51,8 +51,8 @@ irm_envsetup()
 		rlLog "Machine in recipe is MASTER ($MASTER)"
 
 		hostname_s=$(hostname -s)
-		rlRun "Tests to ensure that all of the servers are available"
-		rlRun "ipa-replica-manage --password=$ADMINPW list | grep $hostname -s"
+		rlLog "Tests to ensure that all of the servers are available"
+		rlRun "ipa-replica-manage --password=$ADMINPW list | grep $hostname_s"
 		for slave in $SLAVE; do
 			slave_s=$(echo $slave|cut -f1 -d.)	
 			rlRun "ipa-replica-manage --password=Secret123 list | grep $slave_s"
@@ -65,12 +65,10 @@ irm_envsetup()
 		;;
 	SLAVE*)
 		rlLog "Machine in recipe is SLAVE ($SLAVE)"
-		rlRun "hostname"
 		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER_IP"
 		;;
 	CLIENT)
 		rlLog "Machine in recipe is CLIENT ($CLIENT)"
-		rlRun "hostname"
 		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER_IP"
 		;;
 	*)
@@ -134,6 +132,8 @@ irm_run()
 	irm_del_negative_0002
 	irm_del_negative_0003
 	irm_del_negative_0004
+
+	irm_list_negative_0004 # must run after delete negative tests
 }
 
 irm_envcleanup()
@@ -400,8 +400,8 @@ irm_list_negative_0003()
 	MASTER)
 		rlLog "Machine in recipe is MASTER ($MASTER)"
 		
-		rlRun "ipa-replica-manage -p $ADMINPW list dne.$DOMAIN > $tmpout 2>&1" 1
-		rlAssertNotGrep "Cannot find dne.$DOMAIN in public server list" $tmpout
+		rlRun "ipa-replica-manage -p $ADMINPW list dne.$DOMAIN > $tmpout 2>&1" 
+		rlAssertGrep "Cannot find dne.$DOMAIN in public server list" $tmpout
 
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $MASTER_IP"
 		;;
@@ -412,6 +412,75 @@ irm_list_negative_0003()
 	CLIENT)
 		rlLog "Machine in recipe is CLIENT ($CLIENT)"
 		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER_IP"
+		;;
+	*)
+		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
+		;;
+	esac
+	rlPhaseEnd
+	[ -f $tmpout ] && rm -f $tmpout
+}
+
+irm_list_negative_0004()
+{
+	local tmpout=/tmp/errormsg.out
+	TESTORDER=$(( TESTORDER += 1 ))
+	rlPhaseStartTest "irm_list_negative_0004 - After uninstalling replica - Bug 754739"
+	case "$MYROLE" in
+	MASTER)
+		rlLog "Machine in recipe is MASTER ($MASTER)"
+
+		rlRun "ipa-replica-prepare -p $ADMINPW --ip-address=$SLAVE2_IP $SLAVE2"	
+
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.1' -m $MASTER_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $SLAVE2_IP"
+		
+		rlRun "ipa-replica-manage -p $ADMINPW list $MASTER|grep $SLAVE2"
+		
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.3' -m $MASTER_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.4' $SLAVE2_IP"
+
+		
+		if [ $(ipa-replica-manage -p $ADMINPW list $MASTER|grep $SLAVE2|wc -l) -gt 0 ]; then
+			rlFail "BZ 754739 found...Master Server should not list uninstalled Replicas"
+		else 
+			rlPass "BZ 754739 not found...uninstalled replica not shown in list"
+		fi
+		rlRun "ipa-replica-manage -p $ADMINPW list $MASTER"
+		
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.5' -m $MASTER_IP"
+		;;
+	SLAVE2)
+		rlLog "Machine in recipe is SLAVE2 ($SLAVE2)"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $MASTER_IP"
+
+		hostname_s=$(hostname -s)
+		rlLog "First uninstall replica from $SLAVE2"
+		rlRun "ipa-server-install --uninstall -U"
+
+		rlLog "Next re-install replica on $SLAVE2"
+		pushd /dev/shm
+		rlRun "sftp root@$MASTER:/var/lib/ipa/replica-info-$hostname_s.$DOMAIN.gpg"
+		popd
+		rlRun "ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg"
+
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.2' -m $SLAVE2_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.3' $MASTER_IP"
+
+		rlRun "ipa-server-install --uninstall -U"
+
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.4' -m $SLAVE2_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.5' $MASTER_IP"
+		;;
+	SLAVE*)
+		rlLog "Machine in recipe is SLAVE ($SLAVE)"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $MASTER_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $SLAVE2_IP"
+		;;
+	CLIENT)
+		rlLog "Machine in recipe is CLIENT ($CLIENT)"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $MASTER_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $SLAVE2_IP"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
@@ -459,29 +528,29 @@ irm_connect_positive_0002()
 	case "$MYROLE" in
 	MASTER)
 		rlLog "Machine in recipe is MASTER ($MASTER)"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $SLAVE1_IP"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $SLAVE2_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $SLAVE1_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $SLAVE2_IP"
 		;;
 	SLAVE1)
 		rlLog "Machine in recipe is SLAVE1 ($SLAVE1)"
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $SLAVE1_IP"
 		
 		rlRun "ipa group-add testgroup1 --desc=testgroup1"
 
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $SLAVE2_IP"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.1' -m $SLAVE1_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $SLAVE2_IP"
 		;;
 	SLAVE2)
 		rlLog "Machine in recipe is SLAVE2 ($SLAVE2)"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $SLAVE1_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $SLAVE1_IP"
 		
 		rlRun "ipa group-show testgroup1|grep testgroup1" 
 
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $SLAVE2_IP"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.2' -m $SLAVE2_IP"
 		;;
 	CLIENT)
 		rlLog "Machine in recipe is CLIENT ($CLIENT)"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $SLAVE1_IP"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $SLAVE2_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $SLAVE1_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $SLAVE2_IP"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
@@ -508,7 +577,7 @@ irm_connect_negative_0001()
 			rlRun "ipa-replica-manage -p $ADMINPW connect $SLAVE1 $SLAVE2"
 		fi
 		rlRun "ipa-replica-manage -p $ADMINPW connect $SLAVE1 $SLAVE2 > $tmpout 2>&1" 1
-		rlAssertGrep "NEEDERROR" $tmpout
+		rlAssertGrep "A replication agreement to $SLAVE2 already exists" $tmpout
 		
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $MASTER_IP"
 		;;
@@ -670,7 +739,7 @@ irm_forcesync_negative_0001()
 	MASTER)
 		rlLog "Machine in recipe is MASTER ($MASTER)"
 
-		rlRun "ipa-replica-manage -p $ADMINPW force-sync > $tmpout 2>&1"
+		rlRun "ipa-replica-manage -p $ADMINPW force-sync > $tmpout 2>&1" 1
 		rlAssertGrep "force-sync requires the option --from <host name>" $tmpout
 
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $MASTER_IP"
@@ -701,7 +770,7 @@ irm_forcesync_negative_0002()
 	MASTER)
 		rlLog "Machine in recipe is MASTER ($MASTER)"
 
-		rlRun "ipa-replica-manage -p $ADMINPW force-sync --from=$MASTER > $tmpout 2>&1"
+		rlRun "ipa-replica-manage -p $ADMINPW force-sync --from=$MASTER > $tmpout 2>&1" 1
 		rlAssertGrep "'$MASTER' has no replication agreement for '$MASTER'" $tmpout
 
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $MASTER_IP"
@@ -732,7 +801,7 @@ irm_forcesync_negative_0003()
 	MASTER)
 		rlLog "Machine in recipe is MASTER ($MASTER)"
 
-		rlRun "ipa-replica-manage -p $ADMINPW force-sync --from=dne.$DOMAIN > $tmpout 2>&1"
+		rlRun "ipa-replica-manage -p $ADMINPW force-sync --from=dne.$DOMAIN > $tmpout 2>&1" 1
 		rlAssertGrep "'$MASTER' has no replication agreement for 'dne.$DOMAIN'" $tmpout
 
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $MASTER_IP"
@@ -769,9 +838,9 @@ irm_forcesync_negative_0004()
 		rlLog "Machine in recipe is SLAVE2 ($SLAVE2)"
 
 		rlRun "ipa-replica-manage -p $ADMINPW force-sync --from=$MASTER > $tmpout 2>&1" 1
-		rlAssertGrep "NEEDERROR" $tmpout
+		rlAssertGrep "'$SLAVE2' has no replication agreement for '$MASTER'" $tmpout
 
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' -m $SLAVE2_IP"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $SLAVE2_IP"
 		;;
 	SLAVE*)
 		rlLog "Machine in recipe is SLAVE ($SLAVE)"
@@ -887,7 +956,7 @@ irm_reinitialize_positive_0003()
 irm_reinitialize_positive_0004()
 {
 	TESTORDER=$(( TESTORDER += 1 ))
-	rlPhaseStartTest "irm_reinitialize_positive_0003 - reinitialize Master from Replica1 with -H Host option"
+	rlPhaseStartTest "irm_reinitialize_positive_0004 - reinitialize Master from Replica1 with -H Host option"
 	case "$MYROLE" in
 	MASTER)
 		rlLog "Machine in recipe is MASTER ($MASTER)"
@@ -981,11 +1050,11 @@ irm_reinitialize_negative_0002()
 	[ -f $tmpout ] && rm -f $tmpout
 }
 
-irm_reinitialize_negative_0001()
+irm_reinitialize_negative_0003()
 {
 	local tmpout=/tmp/errormsg.out
 	TESTORDER=$(( TESTORDER += 1 ))
-	rlPhaseStartTest "irm_reinitialize_negative - Reinitialize Master from non-existent Replica"
+	rlPhaseStartTest "irm_reinitialize_negative_0003 - Reinitialize Master from non-existent Replica"
 	case "$MYROLE" in
 	MASTER)
 		rlLog "Machine in recipe is MASTER ($MASTER)"
@@ -1016,7 +1085,7 @@ irm_reinitialize_negative_0004()
 {
 	local tmpout=/tmp/errormsg.out
 	TESTORDER=$(( TESTORDER += 1 ))
-	rlPhaseStartTest "irm_reinitialize_negative - Reinitialize replica with master when there is no agreement"
+	rlPhaseStartTest "irm_reinitialize_negative_0004 - Reinitialize replica with master when there is no agreement"
 	case "$MYROLE" in
 	MASTER)
 		rlLog "Machine in recipe is MASTER ($MASTER)"
@@ -1026,7 +1095,7 @@ irm_reinitialize_negative_0004()
 		rlLog "Machine in recipe is SLAVE ($SLAVE)"
 
 		rlRun "ipa-replica-manage -p $ADMINPW re-initialize --from=$MASTER > $tmpout 2>&1" 1
-		rlAssertGrep "NEEDERROR" $tmpout
+		rlAssertGrep "'$SLAVE2' has no replication agreement for '$MASTER'" $tmpout
 
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $SLAVE2_IP"
 		;;
@@ -1124,21 +1193,24 @@ irm_disconnect_negative_0001()
 	case "$MYROLE" in
 	MASTER)
 		rlLog "Machine in recipe is MASTER ($MASTER)"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $SLAVE1_IP"
+		;;
+	SLAVE1)
+		rlLog "Machine in recipe is SLAVE1 ($SLAVE1)"
 
 		if [ $(ipa-replica-manage -p $ADMINPW list $SLAVE1|grep $SLAVE2|wc -l) -gt 0 ]; then
 			rlLog "found $SLAVE1 - $SLAVE2 replication agreement...disconnecting"
 			rlRun "ipa-replica-manage -p $ADMINPW disconnect $SLAVE1 $SLAVE2"
 		fi
 	
-		rlLog "0006 - disconnect - Disconnect Replica with no agreement ... after was disconnected"
-		rlRun "ipa-replica-manage -p $ADMINPW disconnect $SLAVE1 $SLAVE2 > $tmpout 2>&1" 1
+		rlRun "ipa-replica-manage -p $ADMINPW disconnect $SLAVE1 $SLAVE2 > $tmpout 2>&1" 
 		rlAssertGrep "'$SLAVE1' has no replication agreement for '$SLAVE2'" $tmpout
 
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $MASTER_IP"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $SLAVE1_IP"
 		;;
 	SLAVE*)
-		rlLog "Machine in recipe is SLAVE ($SLAVE)"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER_IP"
+		rlLog "Machine in recipe is SLAVE ($(hostname))"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $SLAVE1_IP"
 		;;
 	CLIENT)
 		rlLog "Machine in recipe is CLIENT ($CLIENT)"
@@ -1191,7 +1263,7 @@ irm_disconnect_negative_0003()
 	MASTER)
 		rlLog "Machine in recipe is MASTER ($MASTER)"
 
-		rlRun "ipa-replica-manage -p $ADMINPW disconnect $MASTER $SLAVE2 > $tmpout 2>&1" 1
+		rlRun "ipa-replica-manage -p $ADMINPW disconnect $MASTER $SLAVE2 > $tmpout 2>&1"
 		rlAssertGrep "Cannot remove the last replication link of '$MASTER'" $tmpout
 		rlAssertGrep "Please use the 'del' command to remove it from the domain" $tmpout
 
@@ -1225,26 +1297,25 @@ irm_disconnect_negative_0004()
 		rlRun "ipa host-del testhost1.$DOMAIN" 
 
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.1' -m $MASTER_IP"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $SLAVE1_IP $SLAVE2_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $SLAVE1_IP"
 		;;
 	SLAVE1)
-		rlLog "Machine in recipe is SLAVE ($SLAVE)"
+		rlLog "Machine in recipe is SLAVE1 ($(hostname))"
 		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $MASTER_IP"
 
-		rlRun "ipa host-show testhost1.$DOMAIN | grep testhost1.$DOMAIN" 1
+		rlRun "ipa host-show testhost1.$DOMAIN | grep testhost1.$DOMAIN" 
 		
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.2' -m $SLAVE1_IP"
 		;;
 	SLAVE*)
-		rlLog "Machine in recipe is SLAVE ($SLAVE)"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' -m $MASTER_IP"
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.2' $(hostname -i)"
+		rlLog "Machine in recipe is SLAVE ($(hostname))"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $MASTER_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $SLAVE1_IP"
 		;;
 	CLIENT)
 		rlLog "Machine in recipe is CLIENT ($CLIENT)"
 		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $MASTER_IP"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $SLAVE1_IP $SLAVE2_IP"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.3' $MASTER_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $SLAVE1_IP"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
@@ -1262,29 +1333,29 @@ irm_disconnect_negative_0005()
 	case "$MYROLE" in
 	MASTER)
 		rlLog "Machine in recipe is MASTER ($MASTER)"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $SLAVE1_IP $SLAVE2_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $SLAVE1_IP"
 
 		rlRun "ipa host-show testhost2.$DOMAIN > $tmpout 2>&1" 2 
-		rlAssertGrep "ipa: ERROR: testhost1.$DOMAIN: host not found" $tmpout
+		rlAssertGrep "ipa: ERROR: testhost2.$DOMAIN: host not found" $tmpout
 		
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.2' -m $MASTER_IP"
 		;;
 	SLAVE1)
 		rlLog "Machine in recipe is SLAVE ($SLAVE)"
 
-		rlRun "ipa host-add testhost2.$DOMAIN"		
+		rlRun "ipa host-add testhost2.$DOMAIN --force"		
 
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.1' -m $SLAVE1_IP"
 		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $MASTER_IP"
 		;;
 	SLAVE*)
 		rlLog "Machine in recipe is SLAVE ($SLAVE)"
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.1' -m $(hostname -i)"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $SLAVE1_IP"
 		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $MASTER_IP"
 		;;
 	CLIENT)
 		rlLog "Machine in recipe is CLIENT ($CLIENT)"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $SLAVE1_IP $SLAVE2_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $SLAVE1_IP"
 		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $MASTER_IP"
 		;;
 	*)
@@ -1308,7 +1379,7 @@ irm_del_positive_0001()
 	MASTER)
 		rlLog "Machine in recipe is MASTER ($MASTER)"
 		
-		rlRun "ipa-replica-manage -p $ADMINPW del $SLAVE2"
+		rlRun "ipa-replica-manage -p $ADMINPW del $SLAVE2 -f"
 		rlRun "ipa-replica-manage -p $ADMINPW list $MASTER | grep -v $SLAVE2"
 		rlRun "ipa host-show $SLAVE2" 2
 
@@ -1349,7 +1420,7 @@ irm_del_negative_0001()
 		fi
 	
 		rlRun "ipa-replica-manage -p $ADMINPW del $SLAVE2 > $tmpout 2>&1" 1
-		rlAssertGrep "NEEDERROR" $tmpout
+		rlAssertGrep "'$MASTER' has no replication agreement for '$SLAVE2'" $tmpout
 
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $MASTER_IP"
 		
@@ -1380,7 +1451,7 @@ irm_del_negative_0002()
 		rlLog "Machine in recipe is MASTER ($MASTER)"
 		
 		rlRun "ipa-replica-manage -p $ADMINPW del dne.$DOMAIN > $tmpout 2>&1" 1
-		rlAssertGrep "NEEDERROR" $tmpout
+		rlAssertGrep "'$MASTER' has no replication agreement for 'dne.$DOMAIN'" $tmpout
 		
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $MASTER_IP"
 		;;
@@ -1412,13 +1483,12 @@ irm_del_negative_0003()
 		rlRun "ipa user-add testuser2 --first=First --last=Last"
 
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.1' -m $MASTER_IP"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $SLAVE1_IP $SLAVE2_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $SLAVE2_IP"
 		;;
 	SLAVE2)
 		rlLog "Machine in recipe is SLAVE2 ($SLAVE2)"
 		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $MASTER_IP"
 		
-		rlLog "0017.1 - del - Added data is not replicated after del (master to replica)"
 		rlRun "ipa user-show testuser2|grep testuser2" 1
 
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.2' -m $SLAVE2_IP"
@@ -1426,12 +1496,12 @@ irm_del_negative_0003()
 	SLAVE*)
 		rlLog "Machine in recipe is SLAVE ($(hostname))"
 		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $MASTER_IP"
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.2' $(hostname -i)"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $SLAVE2_IP"
 		;;
 	CLIENT)
 		rlLog "Machine in recipe is CLIENT ($CLIENT)"
 		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $MASTER_IP"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $SLAVE1_IP $SLAVE2_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $SLAVE2_IP"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
@@ -1449,9 +1519,9 @@ irm_del_negative_0004()
 	case "$MYROLE" in
 	MASTER)
 		rlLog "Machine in recipe is MASTER ($MASTER)"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $SLAVE1_IP $SLAVE2_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $SLAVE2_IP"
 
-		rlRun "ipa user-show testuser1|grep testuser1" 1
+		rlRun "ipa user-show testuser1|grep testuser1" 
 
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.2' -m $MASTER_IP"
 		;;
@@ -1465,12 +1535,12 @@ irm_del_negative_0004()
 		;;
 	SLAVE*)
 		rlLog "Machine in recipe is SLAVE ($(hostname))"
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.1' $(hostname -i)"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $SLAVE2_IP"
 		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $MASTER_IP"
 		;;
 	CLIENT)
 		rlLog "Machine in recipe is CLIENT ($CLIENT)"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $SLAVE1_IP $SLAVE2_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $SLAVE2_IP"
 		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $MASTER_IP"
 		;;
 	*)

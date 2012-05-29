@@ -46,7 +46,7 @@ done
 
 IRMVERSION=2.1.90
 
-PACKAGE="ipa-admin"
+PACKAGE="ipa-admintools"
 
 startDate=`date "+%F %r"`
 satrtEpoch=`date "+%s"`
@@ -55,6 +55,10 @@ satrtEpoch=`date "+%s"`
 # that $SLAVE could be a space delimited list of replicas
 if   [ $(echo "$MASTER" | grep $(hostname -s)|wc -l) -gt 0 ]; then
 	MYROLE=MASTER
+elif [ $(echo "$SLAVE"  | awk '{print $1}' | grep $(hostname -s)|wc -l) -gt 0 ]; then
+	MYROLE=SLAVE1
+elif [ $(echo "$SLAVE"  | awk '{print $2}' | grep $(hostname -s)|wc -l) -gt 0 ]; then
+	MYROLE=SLAVE2
 elif [ $(echo "$SLAVE"  | grep $(hostname -s)|wc -l) -gt 0 ]; then
 	MYROLE=SLAVE
 elif [ $(echo "$CLIENT" | grep $(hostname -s)|wc -l) -gt 0 ]; then
@@ -63,6 +67,7 @@ else
 	MYROLE=UNKNOWN
 fi
 
+MASTER_IP=$(dig +short $MASTER)
 SLAVE1=$(echo "$SLAVE"|awk '{print $1}'|cut -f1 -d.|sed s/$/.$DOMAIN/)
 SLAVE1_IP=$(dig +short $SLAVE1)
 SLAVE2=$(echo "$SLAVE"|awk '{print $2}'|cut -f1 -d.|sed s/$/.$DOMAIN/)
