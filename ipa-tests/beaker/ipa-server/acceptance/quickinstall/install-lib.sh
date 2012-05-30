@@ -104,11 +104,13 @@ fixResolv()
 
    # get the Slave's IP address
    if [ "$SLAVE" != "" ]; then
-      #slaveipaddr=$(dig +noquestion $SLAVE  | grep $SLAVE | grep IN | awk '{print $5}')
-      slaveipaddr=$(host -i $SLAVE | awk '{ field = $NF }; END{ print field }')
-      rlLog "SLAVE IP address is $slaveipaddr"
-      cp /etc/resolv.conf /etc/resolv.conf.ipabackup
-      echo "nameserver $slaveipaddr" >> /etc/resolv.conf
+      #cp /etc/resolv.conf /etc/resolv.conf.ipabackup
+      for s in $SLAVE; do
+         #slaveipaddr=$(dig +noquestion $SLAVE  | grep $SLAVE | grep IN | awk '{print $5}')
+         slaveipaddr=$(host -i $s | awk '{ field = $NF }; END{ print field }')
+         rlLog "SLAVE IP address is $slaveipaddr"
+         echo "nameserver $slaveipaddr" >> /etc/resolv.conf
+      done
    fi
 
    rlLog "/etc/resolv.conf contains:"
