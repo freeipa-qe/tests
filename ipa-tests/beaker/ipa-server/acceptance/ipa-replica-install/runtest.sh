@@ -200,7 +200,7 @@ rlJournalStart
 			installSlave_sshtrustdns
 			uninstall
 
-			# Installing with --no-sshd
+			# Installing with --configure-sshd
 			installSlave_configuresshd
 			uninstall
 

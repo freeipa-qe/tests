@@ -598,9 +598,9 @@ installSlave_sshtrustdns() {
 
                 rlRun "cat /etc/hosts"
 
-                echo "ipa-replica-install -U --setup-dns --no-forwarders --ssh-trust-dns --skip-conncheck -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg" > /dev/shm/replica-install.bash
+                echo "ipa-replica-install -U --setup-dns --no-forwarders --configure-ssh --ssh-trust-dns --skip-conncheck -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg" > /dev/shm/replica-install.bash
                 chmod 755 /dev/shm/replica-install.bash
-                rlLog "EXECUTING: ipa-replica-install -U --setup-dns --no-forwarders --ssh-trust-dns --skip-conncheck -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg"
+                rlLog "EXECUTING: ipa-replica-install -U --setup-dns --no-forwarders --configure-ssh --ssh-trust-dns --skip-conncheck -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg"
                 rlRun "/bin/bash /dev/shm/replica-install.bash" 0 "Replica installation"
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
 
@@ -852,6 +852,8 @@ uninstall()
 ### restart ipa on master to clear out old kerberos ticket for replica
 		rlLog "restart dirsrv on master to clear out old kerberos ticket for replica"
 		rlRun "remoteExec root $MASTERIP \"service dirsrv restart; ipactl status\""
+
+		rlRun "cat /etc/resolv.conf"
 
 		sleep 10
 
