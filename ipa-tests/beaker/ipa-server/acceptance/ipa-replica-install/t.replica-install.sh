@@ -609,6 +609,7 @@ installSlave_sshtrustdns() {
         	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 
 		rlRun "cat /etc/ssh/ssh_config | grep -i \"VerifyHostKeyDNS yes\""
+		rlRun "cat /etc/ssh/ssh_config | grep -i VerifyHostKeyDNS"
 
         fi
 
@@ -618,39 +619,39 @@ installSlave_sshtrustdns() {
 	rlPhaseEnd
 } #installSlave_sshtrustdns
 
-installSlave_nosshd() {
+installSlave_configuresshd() {
 
-   rlPhaseStartTest "Installing replica with --no-sshd option"
-        ls /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg
-        if [ $? -ne 0 ] ; then
-                rlFail "ERROR: Replica Package not found"
-        else
+	rlPhaseStartTest "Installing replica with --configure-sshd option"
+		ls /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg
+		if [ $? -ne 0 ] ; then
+			rlFail "ERROR: Replica Package not found"
+		else
 
-                rlRun "cat /etc/hosts"
+			rlRun "cat /etc/hosts"
 
-                echo "ipa-replica-install -U --setup-dns --no-forwarders --no-sshd --skip-conncheck -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg" > /dev/shm/replica-install.bash
-                chmod 755 /dev/shm/replica-install.bash
-                rlLog "EXECUTING: ipa-replica-install -U --setup-dns --no-forwarders --no-sshd --skip-conncheck -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg"
-                rlRun "/bin/bash /dev/shm/replica-install.bash" 0 "Replica installation"
-                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
+			echo "ipa-replica-install -U --setup-dns --no-forwarders --configure-sshd --skip-conncheck -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg" > /dev/shm/replica-install.bash
+			chmod 755 /dev/shm/replica-install.bash
+			rlLog "EXECUTING: ipa-replica-install -U --setup-dns --no-forwarders --configure-sshd --skip-conncheck -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg"
+			rlRun "/bin/bash /dev/shm/replica-install.bash" 0 "Replica installation"
+			rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
 
-                rlRun "service ipa status"
-                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+			rlRun "service ipa status"
+			rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 
-		rlRun "cat sshd_config | grep -i \"KerberosAuthentication yes\"" 1 "sshd_config should not have KerberosAuthentication yes"
-		rlRun "cat sshd_config | grep -i \"GSSAPIAuthentication yes\"" 1 "sshd_config should not have GSSAPIAuthentication yes"
-		rlRun "cat sshd_config | grep -i \"AuthorizedKeysCommand /usr/bin/sss_ssh_authorizedkeys\"" 1 "sshd_config should not have AuthorizedKeysCommand /usr/bin/sss_ssh_authorizedkeys"
+			rlRun "grep -i \"KerberosAuthentication yes\" /etc/ssh/sshd_config" 0 "sshd_config should have KerberosAuthentication yes"
+			rlRun "grep -i \"GSSAPIAuthentication yes\" /etc/ssh/sshd_config" 0 "sshd_config should have GSSAPIAuthentication yes"
+			rlRun "grep -i \"AuthorizedKeysCommand /usr/bin/sss_ssh_authorizedkeys\" /etc/ssh/sshd_config" 0 "sshd_config should have AuthorizedKeysCommand /usr/bin/sss_ssh_authorizedkeys"
 
-		# Checking if sshfp record gets created by default
-		rlRun "ipa dnsrecord-find $DOMAIN $hostname_s | grep -i \"sshfp record\""
+			# Checking if sshfp record gets created by default
+			rlRun "ipa dnsrecord-find $DOMAIN $hostname_s | grep -i \"sshfp record\""
 
-        fi
+		fi
 
-        if [ -f /var/log/ipareplica-install.log ]; then
-                rhts-submit-log -l /var/log/ipareplica-install.log
-        fi
+		if [ -f /var/log/ipareplica-install.log ]; then
+			rhts-submit-log -l /var/log/ipareplica-install.log
+		fi
 	rlPhaseEnd
-} #installSlave_nosshd
+} #installSlave_configuresshd
 
 
 installSlave_nodnssshfp() {
@@ -806,12 +807,12 @@ uninstall()
 		# issues with the remote executed yes hanging jobs if it irm doesn't prompt for confirmation
 		#rlRun "replicaDel root $MASTERIP \"ipa-replica-manage del $SLAVE\" yes"
 		if [ "$CA2INSTALL" = "true" ]; then	
-			rlRun "ipa-replica-manage -H $MASTER del $SLAVE -p $ADMINPW -f > /tmp/replicaDel.out 2>&1"
+			rlRun "ipa-replica-manage -H $MASTER del $SLAVE -p $ADMINPW -f > /tmp/remove_exec.out 2>&1"
 		else
 			rlRun "remoteExec root $MASTERIP \"ipa-replica-manage del $SLAVE -f\""
 		fi
-		rlRun "egrep \"Deleted replication agreement from '$MASTER' to '$SLAVE'\" /tmp/replicaDel.out"
-		rlRun "cat /tmp/replicaDel.out"
+		rlRun "egrep \"Deleted replication agreement from '$MASTER' to '$SLAVE'\" /tmp/remote_exec.out"
+		rlRun "cat /tmp/remote_exec.out"
 
 		# comment for debugging...running ipa-replica-manage locally with -H option
 		rlRun "replicaDel root $MASTERIP  \"ipa-replica-manage del $SLAVE -f\"" 

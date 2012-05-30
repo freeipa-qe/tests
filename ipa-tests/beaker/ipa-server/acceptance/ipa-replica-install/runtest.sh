@@ -201,7 +201,7 @@ rlJournalStart
 			uninstall
 
 			# Installing with --no-sshd
-			installSlave_nosshd
+			installSlave_configuresshd
 			uninstall
 
 			# Installing with --no-dns-sshfp
