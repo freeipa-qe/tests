@@ -415,7 +415,8 @@ installSlave_nf()
         fi
 
         if [ -f /var/log/ipareplica-install.log ]; then
-                rhts-submit-log -l /var/log/ipareplica-install.log
+				cp /var/log/ipareplica-install.log /var/log/ipareplica-install.log_installSlave_nf
+                rhts-submit-log -l /var/log/ipareplica-install.log_installSlave_nf
         fi
 
    rlPhaseEnd
@@ -464,7 +465,8 @@ installSlave_nr()
 		fi
 
 		if [ -f /var/log/ipareplica-install.log ]; then
-			rhts-submit-log -l /var/log/ipareplica-install.log
+			cp /var/log/ipareplica-install.log /var/log/ipareplica-install.log_installSlave_nr
+			rhts-submit-log -l /var/log/ipareplica-install.log_installSlave_nr
 		fi
 
 	rlPhaseEnd
