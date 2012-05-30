@@ -77,11 +77,11 @@ public abstract class IPAWebAutomation extends TestScript {
 				System.out.println(treeReport);
 				
 				String emailServer = "smtp.corp.redhat.com";
-				String to="yzhang@redhat.com";
+				String to="nsoman@redhat.com";
 				String from="ipaqa@redhat.com";
 				String subject="test automation result";
-				EmailTool postman = new EmailTool(emailServer, from, to, subject, treeReport);
-				postman.deliver();
+				//EmailTool postman = new EmailTool(emailServer, from, to, subject, treeReport);
+				//postman.deliver();
 			}else{
 				log.info("report error here");
 			}

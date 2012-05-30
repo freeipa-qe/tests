@@ -65,7 +65,7 @@ public class GlobalizationWebAutomation extends IPAWebAutomation {
 	 *             Data providers                                                * 
 	 *****************************************************************************/
 	
-	private String globalizationAcceptanceTestDataFile = "./test.properties";
+	private String globalizationAcceptanceTestDataFile = "/home/ipawebui/sahi/test.properties";
 	private String[] IdentityPageUsers = {"simple add and delete","IdentityPageUsers", globalizationAcceptanceTestDataFile};
 	private String[] IdentityPageUserGroups = {"simple add and delete","IdentityPageUserGroups", globalizationAcceptanceTestDataFile};
 	private String[] IdentityPageHosts = {"simple add and delete","IdentityPageHosts", globalizationAcceptanceTestDataFile};
@@ -97,9 +97,18 @@ public class GlobalizationWebAutomation extends IPAWebAutomation {
 	private String[][] allTestdataModify = testdataAdd;
 	private String[][] allTestdataDelete =	testdataAdd;
 */	
-	private String[][] testdataAdd    = {IdentityPageUsers};
-	private String[][] testdataModify = {IdentityPageUsers};
-	private String[][] testdataDelete =	{IdentityPageUsers};
+	private String[][] testdataAdd    = {IdentityPageUsers,IdentityPageUserGroups,IdentityPageHosts,IdentityPageHostGroups,
+			IdentityPageNetgroups,IdentityPageServices,PolicyPageHBACRules,PolicyPageHBACServices, PolicyPageHBACServiceGroups,
+			PolicyPageSudoCommands,PolicyPageAutomountLocations,IPAServerPageRoles, IPAServerPagePrivileges, IPAServerPagePermissions,
+			IPAServerPageSelfServicePermissions};
+	private String[][] testdataModify = {IdentityPageUsers,IdentityPageUserGroups,IdentityPageHosts,IdentityPageHostGroups,
+			IdentityPageNetgroups,IdentityPageServices,PolicyPageHBACRules,PolicyPageHBACServices, PolicyPageHBACServiceGroups,
+			PolicyPageSudoCommands,PolicyPageAutomountLocations,IPAServerPageRoles, IPAServerPagePrivileges, IPAServerPagePermissions,
+			IPAServerPageSelfServicePermissions};
+	private String[][] testdataDelete =	{IdentityPageUsers,IdentityPageUserGroups,IdentityPageHosts,IdentityPageHostGroups,
+			IdentityPageNetgroups,IdentityPageServices,PolicyPageHBACRules,PolicyPageHBACServices, PolicyPageHBACServiceGroups,
+			PolicyPageSudoCommands,PolicyPageAutomountLocations,IPAServerPageRoles, IPAServerPagePrivileges, IPAServerPagePermissions,
+			IPAServerPageSelfServicePermissions};
 	
 	@DataProvider(name="addData")
 	public Object[][] getAddData(){return testdataAdd; }

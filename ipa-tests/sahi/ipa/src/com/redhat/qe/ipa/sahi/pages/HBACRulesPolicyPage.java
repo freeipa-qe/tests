@@ -20,13 +20,14 @@ public class HBACRulesPolicyPage extends IPAWebPage implements StandardTest {
 		registerStandardTestCases();
 		System.out.println("New instance of HBACRulesPolicyPage is ready"); 
 	}
- 
+ /*
 	private void registerStandardTestCases()
 	{
 		this.registerTestCases("add", addTestCases);
 		this.registerTestCases("modify", modTestCases);
 		this.registerTestCases("delete", delTestCases);
 	}
+	*/
 
 	@Override
 	public IPAWebTestMonitor addSingle(IPAWebTestMonitor monitor){
@@ -91,7 +92,7 @@ public class HBACRulesPolicyPage extends IPAWebPage implements StandardTest {
 					monitor.pass();
 				else
 					monitor.fail("Error dialog triggered, but no desired error msg found");
-				closePopUpDialog();
+		//		closePopUpDialog();
 			}else
 				monitor.fail("No error dialog triggered");
 			return monitor;
@@ -120,7 +121,7 @@ public class HBACRulesPolicyPage extends IPAWebPage implements StandardTest {
 			monitor.pass();
 		else
 			monitor.fail("No 'Required field' lable appears");
-		closePopUpDialog();
+		// closePopUpDialog();
 		return monitor;
 	}
 	
