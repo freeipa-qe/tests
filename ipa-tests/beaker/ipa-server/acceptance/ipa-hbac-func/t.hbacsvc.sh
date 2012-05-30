@@ -2662,7 +2662,7 @@ hbacsvc_master_bug782927() {
         	fi
 
 		rlLog "#################  Set size limit to 7 #########################"
-		ipa hbacrule-find --sizerecordslimit=7 > /tmp/rulefind.out
+		ipa hbacrule-find --sizelimit=7 > /tmp/rulefind.out
                 result=`cat /tmp/rulefind.out | grep "Number of entries returned"`
                 number=`echo $result | cut -d " " -f 5`
                 if [ $number -eq 7 ] ; then
