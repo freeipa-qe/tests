@@ -638,7 +638,7 @@ installSlave_configuresshd() {
 			rlRun "service ipa status"
 			rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 
-			rlRun "grep -i \"KerberosAuthentication yes\" /etc/ssh/sshd_config" 0 "sshd_config should have KerberosAuthentication yes"
+			rlRun "grep -i \"KerberosAuthentication no\" /etc/ssh/sshd_config" 0 "sshd_config should have KerberosAuthentication yes"
 			rlRun "grep -i \"GSSAPIAuthentication yes\" /etc/ssh/sshd_config" 0 "sshd_config should have GSSAPIAuthentication yes"
 			rlRun "grep -i \"AuthorizedKeysCommand /usr/bin/sss_ssh_authorizedkeys\" /etc/ssh/sshd_config" 0 "sshd_config should have AuthorizedKeysCommand /usr/bin/sss_ssh_authorizedkeys"
 
