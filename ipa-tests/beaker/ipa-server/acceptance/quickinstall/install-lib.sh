@@ -167,7 +167,7 @@ appendEnv()
   	SLAVE=$slave_short.$DOMAIN
         #slaveipaddr=$(dig +noquestion $SLAVE  | grep A | grep $SLAVE | grep IN | awk '{print $5}')
 	slaveipaddr=$(host -i $SLAVE | awk '{ field = $NF }; END{ print field }')
-	echo "export SLAVE=$SLAVE" >> /dev/shm/env.sh
+	echo "export SLAVE=\"$SLAVE\"" >> /dev/shm/env.sh
         echo "export SLAVEIP=$slaveipaddr" >> /dev/shm/env.sh
   fi
   if [ "$CLIENT" != "" ]; then
@@ -203,7 +203,7 @@ appendEnvIPv6()
         slave_short=`echo $SLAVE | cut -d "." -f1`
         SLAVE=$slave_short.$DOMAIN
         slaveipv6addr=$(nslookup -type=AAAA $SLAVE | grep "has AAAA" | awk '{print $5}')
-        echo "export SLAVE=$SLAVE" >> /dev/shm/env.sh
+        echo "export SLAVE=\"$SLAVE\"" >> /dev/shm/env.sh
         echo "export SLAVEIP=$slaveipv6addr" >> /dev/shm/env.sh
   fi
   if [ "$CLIENT" != "" ]; then

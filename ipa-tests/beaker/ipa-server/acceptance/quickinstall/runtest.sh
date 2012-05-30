@@ -53,7 +53,7 @@ rlJournalStart
         rlLog "CLIENT2: $CLIENT2"
    
         echo "export BEAKERMASTER=$MASTER" >> /dev/shm/env.sh
-        echo "export BEAKERSLAVE=$SLAVE" >> /dev/shm/env.sh
+        echo "export BEAKERSLAVE=\"$SLAVE\"" >> /dev/shm/env.sh
 	echo "export BEAKERCLIENT=$CLIENT" >> /dev/shm/env.sh
 	echo "export BEAKERCLIENT2=$CLIENT2" >> /dev/shm/env.sh
 
