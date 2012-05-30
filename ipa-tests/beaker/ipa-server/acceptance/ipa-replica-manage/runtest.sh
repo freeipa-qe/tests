@@ -73,6 +73,11 @@ SLAVE1_IP=$(dig +short $SLAVE1)
 SLAVE2=$(echo "$SLAVE"|awk '{print $2}'|cut -f1 -d.|sed s/$/.$DOMAIN/)
 SLAVE2_IP=$(dig +short $SLAVE2)
 
+echo "export SLAVE1=$SLAVE1" >> /dev/shm/env.sh
+echo "export SLAVE1_IP=$SLAVE1_IP" >> /dev/shm/env.sh
+echo "export SLAVE2=$SLAVE2" >> /dev/shm/env.sh
+echo "export SLAVE2_IP=$SLAVE2_IP" >> /dev/shm/env.sh
+
 ##########################################
 #   test main 
 #########################################

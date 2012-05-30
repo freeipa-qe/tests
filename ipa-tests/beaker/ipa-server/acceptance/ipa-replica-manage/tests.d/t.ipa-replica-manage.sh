@@ -42,6 +42,58 @@
 ######################################################################
 # test suite
 ######################################################################
+
+reconnect_slave1()
+{
+	local tmpout=/tmp/errormsg.out
+	TESTORDER=$(( TESTORDER += 1 ))
+	rlPhaseStartTest "reconnect_slave1 - Reconnect replica1 to domain"
+	case "$MYROLE" in
+	MASTER)
+		rlLog "Machine in recipe is MASTER ($MASTER)"
+
+		if [ $(ipa-replica-manage -p $ADMINPW list $MASTER|grep $SLAVE1|wc -l) -gt 0 ]; then
+			rlRun "ipa-replica-manage -p $ADMINPW del $SLAVE1 -f"
+		fi
+		if [ $(ipa host-show $SLAVE1|grep $SLAVE1 |grep -v "host not found"|wc -l) -gt 0 ]; then
+			rlRun "ipa host-del $SLAVE1"
+		fi
+		rlRun "ipa-replica-prepare -p $ADMINPW --ip-address=$SLAVE1_IP $SLAVE1"	
+
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.1' -m $MASTER_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $SLAVE1_IP"
+		;;
+	SLAVE1)
+		rlLog "Machine in recipe is SLAVE1 ($SLAVE1)"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $MASTER_IP"
+
+		hostname_s=$(hostname -s)
+		rlRun "ipa-server-install --uninstall -U"
+		pushd /dev/shm
+		rlRun "sftp root@$MASTER:/var/lib/ipa/replica-info-$hostname_s.$DOMAIN.gpg"
+		popd
+		rlRun "ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg"
+
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.2' -m $SLAVE1_IP"
+		;;
+	SLAVE*)
+		rlLog "Machine in recipe is SLAVE ($SLAVE)"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $MASTER_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $SLAVE1_IP"
+		;;
+	CLIENT)
+		rlLog "Machine in recipe is CLIENT ($CLIENT)"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $MASTER_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $SLAVE1_IP"
+		;;
+	*)
+		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
+		;;
+	esac
+	rlPhaseEnd
+	[ -f $tmpout ] && rm -f $tmpout
+}
+
 irm_envsetup()
 {
 	TESTORDER=$(( TESTORDER += 1 ))
@@ -133,7 +185,10 @@ irm_run()
 	irm_del_negative_0003
 	irm_del_negative_0004
 
+	#irm_reconnect_slave2
 	irm_list_negative_0004 # must run after delete negative tests
+	
+	#irm_reconnect_slave1
 }
 
 irm_envcleanup()
