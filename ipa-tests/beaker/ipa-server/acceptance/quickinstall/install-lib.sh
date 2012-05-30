@@ -163,12 +163,17 @@ appendEnv()
   echo "export MASTER=$MASTER" >> /dev/shm/env.sh
   echo "export MASTERIP=$ipaddr" >> /dev/shm/env.sh
   if [ "$SLAVE" != "" ]; then
+    NEWSLAVE=""
+    for s in $SLAVE; do
+      NEWSLAVE="$NEWSLAVE $(echo $s|cut -f1 -d.|sed s/$/.$DOMAIN/)"
+    done
 	slave_short=`echo $SLAVE | cut -d "." -f1`
   	SLAVE=$slave_short.$DOMAIN
-        #slaveipaddr=$(dig +noquestion $SLAVE  | grep A | grep $SLAVE | grep IN | awk '{print $5}')
+    #slaveipaddr=$(dig +noquestion $SLAVE  | grep A | grep $SLAVE | grep IN | awk '{print $5}')
 	slaveipaddr=$(host -i $SLAVE | awk '{ field = $NF }; END{ print field }')
+	SLAVE="$NEWSLAVE"
 	echo "export SLAVE=\"$SLAVE\"" >> /dev/shm/env.sh
-        echo "export SLAVEIP=$slaveipaddr" >> /dev/shm/env.sh
+    echo "export SLAVEIP=$slaveipaddr" >> /dev/shm/env.sh
   fi
   if [ "$CLIENT" != "" ]; then
 	client_short=`echo $CLIENT | cut -d "." -f1`
@@ -200,9 +205,14 @@ appendEnvIPv6()
   echo "export MASTER=$MASTER" >> /dev/shm/env.sh
   echo "export MASTERIP=$ipv6addr" >> /dev/shm/env.sh
   if [ "$SLAVE" != "" ]; then
+        NEWSLAVE=""
+        for s in $SLAVE; do
+            NEWSLAVE="$NEWSLAVE $(echo $s|cut -f1 -d.|sed s/$/.$DOMAIN/)"
+        done
         slave_short=`echo $SLAVE | cut -d "." -f1`
         SLAVE=$slave_short.$DOMAIN
         slaveipv6addr=$(nslookup -type=AAAA $SLAVE | grep "has AAAA" | awk '{print $5}')
+        SLAVE="$NEWSLAVE"
         echo "export SLAVE=\"$SLAVE\"" >> /dev/shm/env.sh
         echo "export SLAVEIP=$slaveipv6addr" >> /dev/shm/env.sh
   fi
