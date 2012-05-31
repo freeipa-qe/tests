@@ -117,7 +117,8 @@ setup()
         ## Moved them here from data.ipaclientinstall.acceptance since MASTER is not set there.
         ipa_server_master="_srv_, $MASTER" # sssd.conf updates
         domain_realm_force_master="$MASTER:88 $MASTER:749 ${RELM,,} $RELM $RELM" # krb5.conf updates
-        ipa_server_slave="_srv_, $SLAVE" # sssd.conf updates
+        slavetoverify=`echo $SLAVE | sed 's/\"//g' | sed 's/^ //g'`
+        ipa_server_slave="_srv_, $slavetoverify" # sssd.conf updates
         domain_realm_force_slave="$SLAVE:88 $MASTER:749 ${RELM,,} $RELM $RELM" # krb5.conf updates
     rlPhaseEnd
 }
