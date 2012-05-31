@@ -67,22 +67,61 @@ oct8=$(echo $ipv6addr | awk -F : '{print $8}')
         rlRun "pushd $tmpDir"
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-host-cli-87: Add host with IPv6 address DNS Record --no-reverse"
+rlPhaseStartTest "ipa-host-cli-87: Add host with IPv6 address DNS Record --no-reverse"
         short=mytestIPv6host
         myhost=$short.$DOMAIN
-       	new_oct5="ffff"
+        new_oct5="ffff"
         rlLog "IPv6 address = $ipv6addr"
-        ipv6_addr=$oct1":"$oct2":"$oct3":"$oct4":"$new_oct5":"$oct6":"$oct7":"$oct8
+        ipv6_addr=$oct1":"aa":"bb":"$oct4":"$new_oct5":"$oct6":"$oct7":"$oct8
         rlLog "New IPv6 address = $ipv6_addr"
-        rlLog "ipa host-add --ip-address=$ipv6_addr --no-reverse $myhost" 
+        rlLog "ipa host-add --ip-address=$ipv6_addr --no-reverse $myhost"
         rlRun "ipa host-add --ip-address=$ipv6_addr --no-reverse $myhost" 0 "Adding host with IPv6 Address $ipv6_addr and no reverse entry"
         rlRun "findHost $myhost" 0 "Verifying host was added."
-	rlRun "ipa dnsrecord-find $DOMAIN $short > $tmpDir/forward_dns.out" 0 "Checking for forward DNS entry"
+        rlRun "ipa dnsrecord-find $DOMAIN $short > $tmpDir/forward_dns.out" 0 "Checking for forward DNS entry"
         MSG="AAAA record: $ipv6_addr"
         rlAssertGrep "$MSG" "$tmpDir/forward_dns.out"
+        rzone_IPv6=`getReverseZone_IPv6 $ipv6_addr`
+        rlLog "Reverse Zone: $rzone_IPv6"
+        if [ $rzone_IPv6 ] ; then
+                #check dnszone exist
+                ipa dnszone-find $rzone_IPv6 | grep "Zone name: $rzone_IPv6"
+                if [ $? -ne 0 ] ; then
+                        rlPass "Reverse zone for ipv6 adress is not created"
+                else
+                        rlFail "Reverse zone for ipv6 adress is created"
+                fi
+        fi
         rlRun "ipa host-del --updatedns $myhost" 0 "cleanup - delete $myhost"
-	rlRun "ipa dnsrecord-find $DOMAIN $short > $tmpDir/forward_dns_notexists.out" 1 "Checking for forward DNS entry"
+        rlRun "ipa dnsrecord-find $DOMAIN $short > $tmpDir/forward_dns_notexists.out" 1 "Checking for forward DNS entry"
         MSG="AAAA record: $ipv6_addr"
+        rlAssertNotGrep "$MSG" "$tmpDir/forward_dns_notexists.out"
+
+        #Test IP Address with ::
+        short=mytestIPv6hostb
+        myhost=$short.$DOMAIN
+        ipv6_addr="2001:0db8:aa:0015::a:ef12"
+        ipv6_addr_no_leading_zeros="2001:db8:aa:15::a:ef12"
+        rlLog "New IPv6 address = $ipv6_addr"
+        rlLog "ipa host-add --ip-address=$ipv6_addr --no-reverse $myhost"
+        rlRun "ipa host-add --ip-address=$ipv6_addr --no-reverse $myhost" 0 "Adding host with IPv6 Address $ipv6_addr and no reverse entry"
+        rlRun "findHost $myhost" 0 "Verifying host was added."
+        rlRun "ipa dnsrecord-find $DOMAIN $short > $tmpDir/forward_dns_2.out" 0 "Checking for forward DNS entry"
+        MSG="AAAA record: $ipv6_addr_no_leading_zeros"
+        rlAssertGrep "$MSG" "$tmpDir/forward_dns_2.out"
+        rzone_IPv6=`getReverseZone_IPv6 $ipv6_addr`
+        rlLog "Reverse Zone: $rzone_IPv6"
+        if [ $rzone_IPv6 ] ; then
+                #check dnszone exist
+                ipa dnszone-find $rzone_IPv6 | grep "Zone name: $rzone_IPv6"
+                if [ $? -ne 0 ] ; then
+                        rlPass "Reverse zone for ipv6 adress is not created"
+                else
+                        rlFail "Reverse zone for ipv6 adress is created"
+                fi
+        fi
+        rlRun "ipa host-del --updatedns $myhost" 0 "cleanup - delete $myhost"
+        rlRun "ipa dnsrecord-find $DOMAIN $short > $tmpDir/forward_dns_notexists.out" 1 "Checking for forward DNS entry"
+        MSG="AAAA record: $ipv6_addr_no_leading_zeros"
         rlAssertNotGrep "$MSG" "$tmpDir/forward_dns_notexists.out"
     rlPhaseEnd
 
@@ -95,7 +134,7 @@ oct8=$(echo $ipv6addr | awk -F : '{print $8}')
        rzone_IPv6=`getReverseZone_IPv6 $ipv6addr`
        rlLog "Reverse Zone: $rzone_IPv6"
        if [ $rzone_IPv6 ] ; then
-		#check dnszone already exist
+                #check dnszone already exist
                 ipa dnszone-find $rzone_IPv6 | grep "Zone name: $rzone_IPv6"
                 if [ $? -ne 0 ] ; then
                         rlLog "echo `hostname` | ipa dnszone-add $rzone_IPv6 --admin-email=admin@example.com"
@@ -107,14 +146,28 @@ oct8=$(echo $ipv6addr | awk -F : '{print $8}')
                 rlLog "EXECUTING: ipa host-add --ip-address=$ipv6_addr $myhost"
                 rlRun "ipa host-add --ip-address=$ipv6_addr $myhost" 0 "Adding host with IPv6 Address $ipv6_addr"
                 rlRun "findHost $myhost" 0 "Verifying host was added with IP Address."
-		rlRun "ipa dnsrecord-find $DOMAIN $short > $tmpDir/forward_dns_2.out" 0 "Checking for forward DNS entry"
+                rlRun "ipa dnsrecord-find $DOMAIN $short > $tmpDir/forward_dns_2.out" 0 "Checking for forward DNS entry"
                 MSG="AAAA record: $ipv6_addr"
                 rlAssertGrep "$MSG" "$tmpDir/forward_dns_2.out"
+
+                 #Verify IP address exist using nslookup
+                rlRun "nslookup $ipv6_addr  > $tmpDir/nslookup_output.out" 0 "Checking nslookup output"
+                myhost_lowercase=$(echo $myhost | tr [A-Z] [a-z])
+                nslookup_msg="name = $myhost_lowercase"
+                rlLog "nslookup_msg=$nslookup_msg"
+                rlRun "cat  $tmpDir/nslookup_output.out"
+                cat  $tmpDir/nslookup_output.out |  grep "$nslookup_msg"
+                if [ $? -eq 0 ] ; then
+                        rlPass "nslookup shows IPAddress exist"
+                else
+                        rlFail "nslookup shows IPAddress does not exist"
+                fi
+
                 recordname_ipv6=""
                 for item in $oct8 $oct7 $oct6 $new_oct5 ; do
-			while [ ${#item} -lt 4 ]
+                        while [ ${#item} -lt 4 ]
                         do
-                               	item="0"$item
+                                item="0"$item
                         done
                         for (( i=4; $i >= 1; i-- ))
                         do
@@ -134,6 +187,7 @@ oct8=$(echo $ipv6addr | awk -F : '{print $8}')
                 rlFail "Reverse DNS zone not found."
         fi
     rlPhaseEnd
+
 
    rlPhaseStartTest "ipa-host-cli-89: Delete host without deleting DNS Record"
         short=mytestIPv6host
@@ -199,6 +253,20 @@ oct8=$(echo $ipv6addr | awk -F : '{print $8}')
 	rlRun "ipa dnsrecord-find $DOMAIN $short > $tmpDir/forward_dns_41.out" 0 "Checking for forward DNS entry"
         MSG="AAAA record: $ipv6_addr"
         rlAssertGrep "$MSG" "$tmpDir/forward_dns_41.out"
+
+        #Verify IP address exist using nslookup
+        rlRun "nslookup $ipv6_addr  > $tmpDir/nslookup_2_output.out" 0 "Checking nslookup output"
+        myhost_lowercase=$(echo $myhost | tr [A-Z] [a-z])
+        nslookup_msg="name = $myhost_lowercase"
+        rlLog "nslookup_msg=$nslookup_msg"
+        rlRun "cat  $tmpDir/nslookup_2_output.out"
+        cat  $tmpDir/nslookup_2_output.out |  grep "$nslookup_msg"
+        if [ $? -eq 0 ] ; then
+              rlPass "nslookup shows IPAddress exist"
+        else
+              rlFail "nslookup shows IPAddress does not exist"
+        fi
+
     rlPhaseEnd
 
    rlPhaseStartTest "ipa-host-cli-91: Add host with force option - DNS Record Exists"
