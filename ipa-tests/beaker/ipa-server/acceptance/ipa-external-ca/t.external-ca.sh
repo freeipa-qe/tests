@@ -146,9 +146,10 @@ set send_slow {1 .1}' > $expfile
 #        rlRun "ipa-server-install --external_cert_file=/root/ipa-ca/ipa.crt --external_ca_file=/root/ipa-ca/ipacacert.asc -p $ADMINPW -a $ADMINPW -r $RELM -P $ADMINPW -U --subject \"O=$RELM\""
 
 
-	sleep 60
-
-	rlRun "ipactl -d status"
+	sleep 30
+	rlRun "ipactl restart"
+	sleep 30
+	rlRun "ipactl status"
 
 	# As part of verifying bug https://bugzilla.redhat.com/show_bug.cgi?id=750828"
         rlAssertGrep "forwarders" "/etc/named.conf"
