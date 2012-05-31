@@ -154,6 +154,5 @@ set send_slow {1 .1}' > $expfile
         rlAssertGrep "forwarders" "/etc/named.conf"
         rlAssertGrep "$DNSFORWARD" "/etc/named.conf"
 
-
 }
 
