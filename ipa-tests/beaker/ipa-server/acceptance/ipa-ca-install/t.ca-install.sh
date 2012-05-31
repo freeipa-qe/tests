@@ -171,7 +171,7 @@ echo 'send "\r"' >> $expfile
 echo 'expect "*d: "' >> $expfile
 echo "send \"$ADMINPW\"" >> $expfile
 echo 'send "\r"' >> $expfile
-echo "send \"ipa dnsrecord-del $FORWARD_ZONE `hostname -s` --a-rec=$SLAVEIP\"" >> $expfile
+echo "send \"ipa dnsrecord-del $FORWARD_ZONE `hostname -s` --del-all\"" >> $expfile
 echo 'send "\r"' >> $expfile
 echo 'expect "#: "' >> $expfile
 echo "send \"service named restart\"" >> $expfile
