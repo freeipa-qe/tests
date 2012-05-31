@@ -48,6 +48,10 @@ installMasterExtCA()
         rlRun "ntpdate $NTPSERVER" 0 "Synchronzing clock with valid time server"
         rlRun "fixHostFile" 0 "Set up /etc/hosts"
 	rlRun "fixhostname" 0 "Fix hostname"
+	rlRun "appendEnv" 0 "Appending env with new hostname"
+
+	. ./dev/shm/env.sh
+	rlRun "cat /dev/shm/env.sh"
 
 	rlRun "yum install -y ipa-server bind-dyndb-ldap bind"
 	echo "ipa-server-install --external-ca --setup-dns --forwarder=$DNSFORWARD --hostname=$hostname_s.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U" > /dev/shm/installipa.bash
@@ -121,24 +125,28 @@ set send_slow {1 .1}' > $expfile
 
 	popd
 
-	rlLog "Executing: ipa-server-install --external_cert_file=/root/ipa-ca/ipa.crt --external_ca_file=/root/ipa-ca/ipacacert.asc"
+#	rlLog "Executing: ipa-server-install --external_cert_file=/root/ipa-ca/ipa.crt --external_ca_file=/root/ipa-ca/ipacacert.asc"
 
-	echo 'set timeout 30
-set force_conservative 0
-set send_slow {1 .1}' > $expfile
-	echo "spawn /usr/sbin/ipa-server-install --external_cert_file=/root/ipa-ca/ipa.crt --external_ca_file=/root/ipa-ca/ipacacert.asc" >> $expfile
-	echo 'match_max 100000' >> $expfile
-	echo 'sleep .5' >> $expfile
-	echo 'expect "*:"' >> $expfile
-	echo "send -s -- "$password"" >> $expfile
-	echo 'send -s -- "\r"' >> $expfile
-	echo 'wait' >> $expfile
-	echo 'expect eof ' >> $expfile
+#	echo 'set timeout 30
+#set force_conservative 0
+#set send_slow {1 .1}' > $expfile
+#	echo "spawn /usr/sbin/ipa-server-install --external_cert_file=/root/ipa-ca/ipa.crt --external_ca_file=/root/ipa-ca/ipacacert.asc" >> $expfile
+#	echo 'match_max 100000' >> $expfile
+#	echo 'sleep .5' >> $expfile
+#	echo 'expect "*:"' >> $expfile
+#	echo "send -s -- "$password"" >> $expfile
+#	echo 'send -s -- "\r"' >> $expfile
+#	echo 'wait' >> $expfile
+#	echo 'expect eof ' >> $expfile
+#
+#	rlLog "Executing: /usr/sbin/ipa-server-install --external_cert_file=/root/ipa-ca/ipa.crt --external_ca_file=/root/ipa-ca/ipacacert.asc"
+#	rlRun "/usr/bin/expect $expfile"
 
-	rlLog "Executing: /usr/sbin/ipa-server-install --external_cert_file=/root/ipa-ca/ipa.crt --external_ca_file=/root/ipa-ca/ipacacert.asc"
-	rlRun "/usr/bin/expect $expfile"
+	rlLog "ipa-server-install --external_cert_file=/root/ipa-ca/ipa.crt --external_ca_file=/root/ipa-ca/ipacacert.asc -p $ADMINPW -a $ADMINPW -r $RELM -P $ADMINPW -U --subject \"O=$RELM\""
+        rlRun "ipa-server-install --external_cert_file=/root/ipa-ca/ipa.crt --external_ca_file=/root/ipa-ca/ipacacert.asc -p $ADMINPW -a $ADMINPW -r $RELM -P $ADMINPW -U --subject \"O=$RELM\""
 
-	sleep 10
+
+	sleep 60
 
 	rlRun "ipactl -d status"
 
