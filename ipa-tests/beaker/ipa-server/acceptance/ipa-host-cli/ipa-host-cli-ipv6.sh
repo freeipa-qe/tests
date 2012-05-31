@@ -151,6 +151,7 @@ rlPhaseStartTest "ipa-host-cli-87: Add host with IPv6 address DNS Record --no-re
                 rlAssertGrep "$MSG" "$tmpDir/forward_dns_2.out"
 
                  #Verify IP address exist using nslookup
+		sleep 10
                 rlRun "nslookup $ipv6_addr  > $tmpDir/nslookup_output.out" 0 "Checking nslookup output"
                 myhost_lowercase=$(echo $myhost | tr [A-Z] [a-z])
                 nslookup_msg="name = $myhost_lowercase"
@@ -255,6 +256,7 @@ rlPhaseStartTest "ipa-host-cli-87: Add host with IPv6 address DNS Record --no-re
         rlAssertGrep "$MSG" "$tmpDir/forward_dns_41.out"
 
         #Verify IP address exist using nslookup
+	sleep 10
         rlRun "nslookup $ipv6_addr  > $tmpDir/nslookup_2_output.out" 0 "Checking nslookup output"
         myhost_lowercase=$(echo $myhost | tr [A-Z] [a-z])
         nslookup_msg="name = $myhost_lowercase"
