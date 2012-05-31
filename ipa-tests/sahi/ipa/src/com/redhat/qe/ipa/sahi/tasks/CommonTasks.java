@@ -371,8 +371,8 @@ public class CommonTasks {
 	public static void modifyToInvalidSetting(SahiTasks sahiTasks, String cn, String fieldNameToUpdate, String description, String expectedError, String buttonToClick) {		
 		sahiTasks.link(cn).click();
 		sahiTasks.link("Settings").click();
-		sahiTasks.textarea(fieldNameToUpdate).setValue(" ");
-		sahiTasks.textarea(fieldNameToUpdate).setValue(description);
+		sahiTasks.textbox(fieldNameToUpdate).setValue(" ");
+		sahiTasks.textbox(fieldNameToUpdate).setValue(description);
 		sahiTasks.span("Update").click();
 		Assert.assertTrue(sahiTasks.div(expectedError).exists(), "Verified expected error  :: " + expectedError);
 		sahiTasks.button(buttonToClick).click();
