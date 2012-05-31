@@ -120,6 +120,13 @@ hbacsvc_master_002() {
 	rlPhaseStartTest "ipa-hbacsvc-002: $user1 part of rule1 is allowed to access $MASTER from $CLIENT2 - FTP Service"
 
         	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+
+        for i in {1..3}; do
+                rlRun "create_ipauser user$i user$i user$i $userpw"
+                sleep 5
+                rlRun "export user$i=user$i"
+        done
+
                 rlRun "ipa hbacrule-disable allow_all"
 
 		rlRun "yum install ftp vsftpd -y"
@@ -154,6 +161,9 @@ hbacsvc_master_002() {
 hbacsvc_master_002_cleanup() {
 	# Cleanup
 	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+	for i in {1..3}; do
+		rlRun "ipa user-del user$i"
+        done
 		rlRun "ipa hbacrule-del rule2"
 }
 
@@ -244,6 +254,12 @@ hbacsvc_master_003() {
 
 		rlLog "Verifies bug https://bugzilla.redhat.com/show_bug.cgi?id=732996"
 
+        for i in {1..3}; do
+                rlRun "create_ipauser user$i user$i user$i $userpw"
+                sleep 5
+                rlRun "export user$i=user$i"
+        done
+
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 rlRun "ipa hbacrule-disable allow_all"
 
@@ -283,8 +299,11 @@ hbacsvc_master_003() {
 }
 
 hbacsvc_master_003_cleanup() {
-	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 	# Cleanup
+        rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+        for i in {1..3}; do
+                rlRun "ipa user-del user$i"
+        done
 		rlRun "ipa hbacrule-del rule3"
 		rlRun "ipa hbacsvc-del vsftpd"
 }
@@ -2463,7 +2482,8 @@ hbacsvc_master_031() {
                 rlRun "ipa hbactest --user=$user31 --srchost=$CLIENT --host=$CLIENT2 --service=sshd | grep -i \"Access granted: False\""
 
                 rlRun "ipa hbactest --user=$user31 --srchost=$CLIENT --host=$CLIENT --service=sshd --rule=ÃŒ | grep -Ex '(Access granted: True|  matched: ÃŒ)'"
-                rlRun "ipa hbactest --user=$user31 --srchost=$CLIENT --host=$CLIENT --service=sshd --rule=rule2 | grep -Ex '(Unresolved rules in --rules|error: rule2)'" 1
+		# output has changed, tested manually. Hence update the following as appropriate.
+                rlRun "ipa hbactest --user=$user31 --srchost=$CLIENT --host=$CLIENT --service=sshd --rule=rule2 | grep -i \"Unresolved rules in --rules\""
                 rlRun "ipa hbactest --user=$user2 --srchost=$CLIENT --host=$CLIENT --service=sshd --rule=ÃŒ | grep -Ex '(Access granted: False|  notmatched: rule1)'"
                 rlRun "ipa hbactest --srchost=$CLIENT --host=$CLIENT --service=sshd  --user=$user31 --rule=ÃŒ --nodetail | grep -i \"Access granted: True\""
                 rlRun "ipa hbactest --srchost=$CLIENT --host=$CLIENT --service=sshd  --user=$user31 --rule=ÃŒ --nodetail | grep -i \"matched: ÃŒ\"" 1
@@ -2691,7 +2711,6 @@ hbacsvc_master_bug772852() {
         rlPhaseStartTest "ipa-hbacsvc-772852: \"Unresolved rules in --rules\" error message is displayed even if the hbacrule is specified using the --rules option."
 
 		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-                 rlRun "ssh_auth_success $user772852 testpw123@ipa.com $MASTER"
 
                 for i in {1000..1010}; do ipa hbacrule-add $i; done
                 rlRun "ipa config-show"

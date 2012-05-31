@@ -683,12 +683,12 @@ rlJournalStart
 		hbacsvc_master_005
 		rlRun "rhts-sync-set -s DONE_hbacsvc_master_005 -m $BEAKERMASTER"
                 rlRun "rhts-sync-block -s DONE_hbacsvc_client_005 -s DONE_hbacsvc_client2_005 $BEAKERCLIENT $BEAKERCLIENT2"
-		hbacsvc_master_005_cleanup
 
 	# hbacsvc_master_005_1
 		hbacsvc_master_005_1
                 rlRun "rhts-sync-set -s DONE_hbacsvc_master_005_1 -m $BEAKERMASTER"
                 rlRun "rhts-sync-block -s DONE_hbacsvc_client_005_1 -s DONE_hbacsvc_client2_005_1 $BEAKERCLIENT $BEAKERCLIENT2"
+		hbacsvc_master_005_cleanup
 
 	# hbacsvc_master_006
 		hbacsvc_master_006
@@ -888,8 +888,10 @@ rlJournalStart
 
 
 	rlPhaseStartCleanup "ipa-hbacrule-func-cleanup: Destroying admin credentials."
+
         	# delete hbac service 
-	        rlRun "ipa hbacrule-del rule1" 0 "CLEANUP: Deleting rule rule1"
+		# rule1 is being deleted as part of hbacsvc_master_001_cleanup, hence commenting the following
+	        # rlRun "ipa hbacrule-del rule1" 0 "CLEANUP: Deleting rule rule1"
 
 	        rlRun "kdestroy" 0 "Destroying admin credentials."
 		rlRun "cat /var/log/secure | grep \"pam_sss(sshd:auth)\""
