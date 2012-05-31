@@ -125,25 +125,25 @@ set send_slow {1 .1}' > $expfile
 
 	popd
 
-#	rlLog "Executing: ipa-server-install --external_cert_file=/root/ipa-ca/ipa.crt --external_ca_file=/root/ipa-ca/ipacacert.asc"
+	rlLog "Executing: ipa-server-install --external_cert_file=/root/ipa-ca/ipa.crt --external_ca_file=/root/ipa-ca/ipacacert.asc"
 
-#	echo 'set timeout 30
-#set force_conservative 0
-#set send_slow {1 .1}' > $expfile
-#	echo "spawn /usr/sbin/ipa-server-install --external_cert_file=/root/ipa-ca/ipa.crt --external_ca_file=/root/ipa-ca/ipacacert.asc" >> $expfile
-#	echo 'match_max 100000' >> $expfile
-#	echo 'sleep .5' >> $expfile
-#	echo 'expect "*:"' >> $expfile
-#	echo "send -s -- "$password"" >> $expfile
-#	echo 'send -s -- "\r"' >> $expfile
-#	echo 'wait' >> $expfile
-#	echo 'expect eof ' >> $expfile
-#
-#	rlLog "Executing: /usr/sbin/ipa-server-install --external_cert_file=/root/ipa-ca/ipa.crt --external_ca_file=/root/ipa-ca/ipacacert.asc"
-#	rlRun "/usr/bin/expect $expfile"
+	echo 'set timeout 30
+set force_conservative 0
+set send_slow {1 .1}' > $expfile
+	echo "spawn /usr/sbin/ipa-server-install --external_cert_file=/root/ipa-ca/ipa.crt --external_ca_file=/root/ipa-ca/ipacacert.asc" >> $expfile
+	echo 'match_max 100000' >> $expfile
+	echo 'sleep .5' >> $expfile
+	echo 'expect "*:"' >> $expfile
+	echo "send -s -- "$password"" >> $expfile
+	echo 'send -s -- "\r"' >> $expfile
+	echo 'wait' >> $expfile
+	echo 'expect eof ' >> $expfile
 
-	rlLog "ipa-server-install --external_cert_file=/root/ipa-ca/ipa.crt --external_ca_file=/root/ipa-ca/ipacacert.asc -p $ADMINPW -a $ADMINPW -r $RELM -P $ADMINPW -U --subject \"O=$RELM\""
-        rlRun "ipa-server-install --external_cert_file=/root/ipa-ca/ipa.crt --external_ca_file=/root/ipa-ca/ipacacert.asc -p $ADMINPW -a $ADMINPW -r $RELM -P $ADMINPW -U --subject \"O=$RELM\""
+	rlLog "Executing: /usr/sbin/ipa-server-install --external_cert_file=/root/ipa-ca/ipa.crt --external_ca_file=/root/ipa-ca/ipacacert.asc"
+	rlRun "/usr/bin/expect $expfile"
+
+#	rlLog "ipa-server-install --external_cert_file=/root/ipa-ca/ipa.crt --external_ca_file=/root/ipa-ca/ipacacert.asc -p $ADMINPW -a $ADMINPW -r $RELM -P $ADMINPW -U --subject \"O=$RELM\""
+#        rlRun "ipa-server-install --external_cert_file=/root/ipa-ca/ipa.crt --external_ca_file=/root/ipa-ca/ipacacert.asc -p $ADMINPW -a $ADMINPW -r $RELM -P $ADMINPW -U --subject \"O=$RELM\""
 
 
 	sleep 60
