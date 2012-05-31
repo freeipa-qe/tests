@@ -63,7 +63,11 @@ uninstall_fornexttest()
 #       rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials after installing"
 #       rlRun "ipa host-del $CLIENT --updatedns" 0 "Deleting client record and DNS entry from server"
        # now uninstall
-       rlRun "ipa-client-install --uninstall -U " 0 "Uninstalling ipa client for next test"
+       rlLog "Uninstalling ipa client for next test"
+       ipa-client-install --uninstall -U 
+       if [ $? -ne 0 ]; then
+          rlLog "Unsuccessful uninstall"
+       fi
     fi
     if [ -f $SSSD ] ; then
        rlLog "renaming last sssd.conf"
