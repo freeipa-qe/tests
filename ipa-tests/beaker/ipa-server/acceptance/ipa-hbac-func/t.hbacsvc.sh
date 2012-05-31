@@ -2622,11 +2622,16 @@ hbacsvc_master_bug736314() {
                 rlRun "ipa hbactest --user=$user736314 --srchost=$CLIENT --host=$MASTER --service=sshd --rule=rule736314 --nodetail | grep -i \"Access granted: True\""
                 rlRun "ipa hbactest --user=$user736314 --srchost=externalhost.randomhost.com --host=$MASTER --service=sshd --rule=rule736314 --nodetail | grep -i \"matched: rule736314\"" 1
 
-	# cleaning up created rules
-		rlRun "ipa hbacrule-del rule736314"
 
         rlPhaseEnd
 }
+
+
+hbacsvc_master_bug736314_cleanup() {
+        # Cleanup
+		rlRun "ipa hbacrule-del rule736314"
+}
+
 
 hbacsvc_client_bug736314() {
 
@@ -2802,8 +2807,9 @@ hbacsvc_master_bug766876_2() {
                 rlLog "Verifies bug https://bugzilla.redhat.com/show_bug.cgi?id=766876"
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 user766876="user766876"
-                rlRun "create_ipauser $user766876 $user766876 $user766876 $userpw"
-                sleep 5
+		# user766876 is already created as part of hbacsvc_master_bug766876
+                # rlRun "create_ipauser $user766876 $user766876 $user766876 $userpw"
+                # sleep 5
 
                 rlRun "cat /etc/sssd/sssd.conf"
                 sed -i '6iipa_hbac_support_srchost = true' /etc/sssd/sssd.conf
@@ -2811,6 +2817,7 @@ hbacsvc_master_bug766876_2() {
                 rlRun "rm -fr /var/lib/sss/db/cache_*" 0 "Clearing cache"
                 rlRun "service sssd restart"
 
+		sleep 10
 
         rlPhaseEnd
 }
