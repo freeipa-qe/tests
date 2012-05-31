@@ -38,9 +38,6 @@
 			<task name="/CoreOS/ipa-server/shared" role="STANDALONE">
 				<params/>
 			</task>
-			<task name="/CoreOS/ipa-server/acceptance/quickinstall" role="MASTER">
-				<params/>
-			</task>
 			<task name="/CoreOS/ipa-server/acceptance/ipa-external-ca" role="MASTER">
 				<params/>
 			</task>
