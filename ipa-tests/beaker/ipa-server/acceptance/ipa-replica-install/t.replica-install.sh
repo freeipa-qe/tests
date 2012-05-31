@@ -394,6 +394,12 @@ installSlave_nf()
 
    rlPhaseStartTest "Installing replica with --no-forwarders option"
 
+        cd /dev/shm/
+        hostname_s=$(hostname -s)
+		AddToKnownHosts $MASTERIP
+        rlRun "sftp root@$MASTERIP:/var/lib/ipa/replica-info-$hostname_s.$DOMAIN.gpg"
+        rlLog "sftp root@$MASTERIP:/var/lib/ipa/replica-info-$hostname_s.$DOMAIN.gpg"
+        rlLog "Checking for existance of replica gpg file"
         ls /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg
         if [ $? -ne 0 ] ; then
                 rlFail "ERROR: Replica Package not found"
