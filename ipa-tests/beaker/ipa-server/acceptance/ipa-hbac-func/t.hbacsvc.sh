@@ -127,12 +127,14 @@ hbacsvc_master_002() {
                 rlRun "export user$i=user$i"
         done
 
+        	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 rlRun "ipa hbacrule-disable allow_all"
 
 		rlRun "yum install ftp vsftpd -y"
 		rlRun "service vsftpd start"
 		rlRun "setsebool -P ftp_home_dir on"
 
+        	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 		rlRun "ipa hbacrule-add rule2"
 		rlRun "ipa hbacrule-add-user rule2 --users=$user1"
 		rlRun "ipa hbacrule-add-host rule2 --hosts=$MASTER"
