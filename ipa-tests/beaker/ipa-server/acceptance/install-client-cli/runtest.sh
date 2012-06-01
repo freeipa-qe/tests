@@ -98,7 +98,7 @@ rlJournalStart
 
 rlPhaseStartCleanup "install-client-cli cleanup"
      rlRun "popd"
-     rlRun "rm -r $TmpDir" 0 "Removing tmp directory"
+#     rlRun "rm -r $TmpDir" 0 "Removing tmp directory"
 rlPhaseEnd
         
 rlJournalPrintText
