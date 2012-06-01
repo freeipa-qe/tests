@@ -607,33 +607,51 @@ ipaclientinstall_preservesssd()
         # To set up an sssd.conf that can be preserved: 
         # create a sssd.conf
           writesssdconf
+          chmod 0600 $SSSD
+          ls -l /etc/sssd
         # update /etc/nsswitch.conf, and vim /etc/pam.d/system-auth to use sssd
           rlLog "Executing: authconfig --enablesssd --enablesssdauth --updateall"
           rlRun "authconfig --enablesssd --enablesssdauth --updateall" 0 "Authconfig"
         # restart sssd service
-          rc=rlServiceStop "sssd"
-          if [ $rc != 0 ]; then
+          rlServiceStop "sssd"
+          if [ $? -ne 0 ]; then
              rlLog "Failed to stop sssd service"
           fi
-          rc=rlServiceStart "sssd"
-          if [ $rc != 0 ]; then
+          rlServiceStart "sssd"
+          if [ $? -ne 0 ]; then
              rlLog "Failed to start sssd service"
           fi
         # edit /etc/krb5.conf
-          rlLog "Executing: perl -pi -e 's/EXAMPLE.COM/TESTRELM/g' $KRB5"
-          rlRun "perl -pi -e 's/EXAMPLE.COM/TESTRELM/g' $KRB5" 0 "Updating $KRB5"
+          rlLog "Executing: perl -pi -e 's/EXAMPLE.COM/TESTRELM.COM/g' $KRB5"
+          rlRun "perl -pi -e 's/EXAMPLE.COM/TESTRELM.COM/g' $KRB5" 0 "Updating $KRB5"
+          rlLog "Executing: perl -pi -e 's/example.com/testrelm.com/g' $KRB5"
+          rlRun "perl -pi -e 's/example.com/testrelm.com/g' $KRB5" 0 "Updating $KRB5"
           rlLog "Executing: perl -pi -e 's/kerberos.example.com/$MASTER/g' $KRB5"
           rlRun "perl -pi -e 's/kerberos.example.com/$MASTER/g' $KRB5" 0 "Updating $KRB5"
 
+        rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials before installing"
+
         #install ipa-client with --preserve-sssd
+       #saving files to compare for troubleshooting later, if needed
+       cp $SSSD $TmpDir
+       mv $TmpDir/sssd.conf $TmpDir/sssd.conf_beforeinstall
+       cp $KRB5 $TmpDir
+       mv $TmpDir/krb5.conf $TmpDir/krb5.conf_beforeinstall
        rlLog "EXECUTING: ipa-client-install --domain=$DOMAIN --realm=$RELM  -p $ADMINID -w $ADMINPW -U --server=$MASTER --preserve-sssd"
        rlRun "ipa-client-install --domain=$DOMAIN --realm=$RELM  -p $ADMINID -w $ADMINPW -U --server=$MASTER --preserve-sssd" 0 "Installing ipa client with preserve-sssd"
+       cp $SSSD $TmpDir
+       mv $TmpDir/sssd.conf $TmpDir/sssd.conf_afterinstall
+       cp $KRB5 $TmpDir
+       mv $TmpDir/krb5.conf $TmpDir/krb5.conf_afterinstall
 
         # be able to kinit
           verify_kinit true 
 
         # verify sssd contents were preserved
         verify_sssd true preserve 
+
+        rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials before uninstalling"
+        uninstall_fornexttest
     rlPhaseEnd
 }
 
