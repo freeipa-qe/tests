@@ -406,6 +406,9 @@ installSlave_nf()
         else
 
                 rlRun "cat /etc/resolv.conf"
+		# "Cannot acquire Kerberos ticket: kinit: Invalid message type while getting initial credentials" 
+		# LDAP replication agreements may have not been removed.
+		rlRun "ipa-replica-manage -H $MASTER del $SLAVE -p $ADMINPW -f"
 
                 echo "ipa-replica-install -U --setup-dns --no-forwarders -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg" > /dev/shm/replica-install.bash
                 chmod 755 /dev/shm/replica-install.bash
