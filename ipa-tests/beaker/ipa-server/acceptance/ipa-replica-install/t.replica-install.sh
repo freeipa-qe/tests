@@ -397,6 +397,7 @@ installSlave_nf()
         cd /dev/shm/
         hostname_s=$(hostname -s)
 		AddToKnownHosts $MASTERIP
+	rlRun "rm -fr /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg"
         rlRun "sftp root@$MASTERIP:/var/lib/ipa/replica-info-$hostname_s.$DOMAIN.gpg"
         rlLog "sftp root@$MASTERIP:/var/lib/ipa/replica-info-$hostname_s.$DOMAIN.gpg"
         rlLog "Checking for existance of replica gpg file"
@@ -405,11 +406,9 @@ installSlave_nf()
                 rlFail "ERROR: Replica Package not found"
         else
 
+		rlRun "host -t srv _kerberos._tcp.$DOMAIN"
                 rlRun "cat /etc/resolv.conf"
-		# "Cannot acquire Kerberos ticket: kinit: Invalid message type while getting initial credentials" 
-		# LDAP replication agreements may have not been removed.
-		rlRun "ipa-replica-manage -H $MASTER del $SLAVE -p $ADMINPW -f"
-
+		sleep 30
                 echo "ipa-replica-install -U --setup-dns --no-forwarders -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg" > /dev/shm/replica-install.bash
                 chmod 755 /dev/shm/replica-install.bash
                 rlLog "EXECUTING: ipa-replica-install -U --setup-dns --no-forwarders -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg"
