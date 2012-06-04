@@ -629,7 +629,7 @@ ipaclientinstall_preservesssd()
           rlLog "Executing: perl -pi -e 's/kerberos.example.com/$MASTER/g' $KRB5"
           rlRun "perl -pi -e 's/kerberos.example.com/$MASTER/g' $KRB5" 0 "Updating $KRB5"
 
-        rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials before installing"
+     #   rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials before installing"
 
         #install ipa-client with --preserve-sssd
        #saving files to compare for troubleshooting later, if needed
