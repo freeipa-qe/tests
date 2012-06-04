@@ -127,10 +127,6 @@ hbacsvc_master_002() {
                 sleep 5
                 rlRun "export user$i=user$i"
         done
-                rlRun "ipa hbacrule-enable allow_all"
-
-		rlRun "ssh_auth_success $user1 testpw123@ipa.com $MASTER"
-		rlRun "ssh_auth_success $user3 testpw123@ipa.com $MASTER"
 
         	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 rlRun "ipa hbacrule-disable allow_all"
