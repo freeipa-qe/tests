@@ -406,6 +406,7 @@ installSlave_nf()
                 rlFail "ERROR: Replica Package not found"
         else
 
+		rlRun "service named restart"
 		rlRun "host -t srv _kerberos._tcp.$DOMAIN"
                 rlRun "cat /etc/resolv.conf"
 		sleep 30
