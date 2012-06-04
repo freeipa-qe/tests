@@ -89,6 +89,7 @@ hbacsvc_master_001_cleanup() {
 	for i in {1..3}; do
 		rlRun "ipa user-del user$i"
         done
+	rlRun "rm -fr /tmp/krb5cc_*_*"
 	rlRun "ipa hbacrule-del rule1"
 	rlRun "ipa hbacrule-del admin_allow_all"
 }
@@ -126,6 +127,10 @@ hbacsvc_master_002() {
                 sleep 5
                 rlRun "export user$i=user$i"
         done
+                rlRun "ipa hbacrule-enable allow_all"
+
+		rlRun "ssh_auth_success $user1 testpw123@ipa.com $MASTER"
+		rlRun "ssh_auth_success $user3 testpw123@ipa.com $MASTER"
 
         	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 rlRun "ipa hbacrule-disable allow_all"
@@ -152,8 +157,8 @@ hbacsvc_master_002() {
                 rlRun "ipa hbactest --user=$user1 --srchost=$CLIENT --host=$CLIENT2 --service=vsftpd | grep -i \"Access granted: False\""
 
                 rlRun "ipa hbactest --user=$user1 --srchost=$CLIENT2 --host=$MASTER --service=vsftpd --rule=rule2 | grep -Ex '(Access granted: True|  matched: rule2)'"
-                rlRun "ipa hbactest --user=$user1 --srchost=$CLIENT --host=$MASTER --service=vsftpd --rule=rule1 | grep -Ex '(Access granted: False|  notmatched: rule1)'"
-                rlRun "ipa hbactest --user=$user2 --srchost=$CLIENT2 --host=$MASTER --service=vsftpd --rule=rule1 | grep -Ex '(Access granted: False|  notmatched: rule1)'"
+                rlRun "ipa hbactest --user=$user1 --srchost=$CLIENT --host=$MASTER --service=vsftpd --rule=rule1 | grep -i \"Non-existent or invalid rules: rule1\""
+                rlRun "ipa hbactest --user=$user2 --srchost=$CLIENT2 --host=$MASTER --service=vsftpd --rule=rule1 | grep -i \"Non-existent or invalid rules: rule1\""
                 rlRun "ipa hbactest --srchost=$CLIENT2 --host=$MASTER --service=vsftpd  --user=$user1 --rule=rule2 --nodetail | grep -i \"Access granted: True\""
                 rlRun "ipa hbactest --srchost=$CLIENT2 --host=$MASTER --service=vsftpd  --user=$user1 --rule=rule2 --nodetail | grep -i \"matched: rule2\"" 1
 
@@ -166,6 +171,7 @@ hbacsvc_master_002_cleanup() {
 	for i in {1..3}; do
 		rlRun "ipa user-del user$i"
         done
+		rlRun "rm -fr /tmp/krb5cc_*_*"
 		rlRun "ipa hbacrule-del rule2"
 }
 
@@ -217,8 +223,8 @@ hbacsvc_master_002_1() {
                 rlRun "ipa hbactest --user=$user1 --srchost=$CLIENT --host=$CLIENT2 --service=vsftpd | grep -i \"Access granted: False\""
 
                 rlRun "ipa hbactest --user=$user1 --srchost=$CLIENT2 --host=$MASTER --service=vsftpd --rule=rule2 | grep -Ex '(Access granted: True|  matched: rule2)'" 
-                rlRun "ipa hbactest --user=$user1 --srchost=$CLIENT --host=$MASTER --service=vsftpd --rule=rule1 | grep -Ex '(Access granted: False|  notmatched: rule1)'"
-                rlRun "ipa hbactest --user=$user2 --srchost=$CLIENT2 --host=$MASTER --service=vsftpd --rule=rule1 | grep -Ex '(Access granted: False|  notmatched: rule1)'"
+                rlRun "ipa hbactest --user=$user1 --srchost=$CLIENT --host=$MASTER --service=vsftpd --rule=rule1 | grep -i \"Non-existent or invalid rules: rule1\""
+                rlRun "ipa hbactest --user=$user2 --srchost=$CLIENT2 --host=$MASTER --service=vsftpd --rule=rule1 | grep -i \"Non-existent or invalid rules: rule1\""
                 rlRun "ipa hbactest --srchost=$CLIENT2 --host=$MASTER --service=vsftpd  --user=$user1 --rule=rule1 --nodetail | grep -i \"Access granted: True\"" 1
                 rlRun "ipa hbactest --srchost=$CLIENT2 --host=$MASTER --service=vsftpd  --user=$user1 --rule=rule1 --nodetail | grep -i \"matched: rule2\"" 1
 
@@ -292,8 +298,8 @@ hbacsvc_master_003() {
                 rlRun "ipa hbactest --user=$user3 --srchost=$CLIENT2 --host=$MASTER --service=vsftpd --rule=rule3 | grep -Ex '(Access granted: True|  matched: rule3)'"
 		# ftp service is a part of ftp service group, hence the following rule should match.
                 rlRun "ipa hbactest --user=$user3 --srchost=$CLIENT2 --host=$MASTER --service=ftp --rule=rule3 | grep -Ex '(Access granted: True|  matched: rule3)'"
-                rlRun "ipa hbactest --user=$user3 --srchost=$CLIENT --host=$MASTER --service=vsftpd --rule=rule2 | grep -Ex '(Access granted: False|  notmatched: rule2)'"
-                rlRun "ipa hbactest --user=$user2 --srchost=$CLIENT2 --host=$MASTER --service=vsftpd --rule=rule2 | grep -Ex '(Access granted: False|  notmatched: rule2)'"
+                rlRun "ipa hbactest --user=$user3 --srchost=$CLIENT --host=$MASTER --service=vsftpd --rule=rule2 | grep -i \"Non-existent or invalid rules: rule2\""
+                rlRun "ipa hbactest --user=$user2 --srchost=$CLIENT2 --host=$MASTER --service=vsftpd --rule=rule2 | grep -i \"Non-existent or invalid rules: rule2\""
                 rlRun "ipa hbactest --srchost=$CLIENT2 --host=$MASTER --service=vsftpd  --user=$user3 --rule=rule3 --nodetail | grep -i \"Access granted: True\""
                 rlRun "ipa hbactest --srchost=$CLIENT2 --host=$MASTER --service=vsftpd  --user=$user3 --rule=rule3 --nodetail | grep -i \"matched: rule3\"" 1
 
@@ -306,6 +312,7 @@ hbacsvc_master_003_cleanup() {
         for i in {1..3}; do
                 rlRun "ipa user-del user$i"
         done
+		rlRun "rm -fr /tmp/krb5cc_*_*"
 		rlRun "ipa hbacrule-del rule3"
 		rlRun "ipa hbacsvc-del vsftpd"
 }
