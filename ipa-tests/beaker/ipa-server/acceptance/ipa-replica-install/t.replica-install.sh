@@ -406,10 +406,10 @@ installSlave_nf()
                 rlFail "ERROR: Replica Package not found"
         else
 
-		rlRun "service named restart"
 		rlRun "host -t srv _kerberos._tcp.$DOMAIN"
+		rlRun "> /var/lib/sss/pubconf/kdcinfo.$RELM"
                 rlRun "cat /etc/resolv.conf"
-		sleep 30
+		sleep 10
                 echo "ipa-replica-install -U --setup-dns --no-forwarders -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg" > /dev/shm/replica-install.bash
                 chmod 755 /dev/shm/replica-install.bash
                 rlLog "EXECUTING: ipa-replica-install -U --setup-dns --no-forwarders -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg"
