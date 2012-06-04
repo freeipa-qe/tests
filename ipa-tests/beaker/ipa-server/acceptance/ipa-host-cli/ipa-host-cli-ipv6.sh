@@ -123,6 +123,45 @@ rlPhaseStartTest "ipa-host-cli-87: Add host with IPv6 address DNS Record --no-re
         rlRun "ipa dnsrecord-find $DOMAIN $short > $tmpDir/forward_dns_notexists.out" 1 "Checking for forward DNS entry"
         MSG="AAAA record: $ipv6_addr_no_leading_zeros"
         rlAssertNotGrep "$MSG" "$tmpDir/forward_dns_notexists.out"
+
+	#Test IP Address with :: where :: is replaced with a zero.
+        short=mytestIPv6hostc
+        myhost=$short.$DOMAIN
+        ipv6_addr="2620:52:0:41c9::ff:fea8:b669"
+        ipv6_addr_normalized_zero_added="2620:52:0:41c9:0:ff:fea8:b669"
+        rlLog "New IPv6 address = $ipv6_addr"
+        rlLog "ipa host-add --ip-address=$ipv6_addr --no-reverse $myhost"
+        rlRun "ipa host-add --ip-address=$ipv6_addr --no-reverse $myhost" 0 "Adding host with IPv6 Address $ipv6_addr and no reverse entry"
+        rlRun "findHost $myhost" 0 "Verifying host was added."
+        rlRun "ipa dnsrecord-find $DOMAIN $short > $tmpDir/forward_dns_3.out" 0 "Checking for forward DNS entry"
+        MSG="AAAA record: $ipv6_addr_normalized_zero_added"
+        rlAssertGrep "$MSG" "$tmpDir/forward_dns_3.out"
+        rzone_IPv6=`getReverseZone_IPv6 $ipv6_addr`
+        rlLog "Reverse Zone: $rzone_IPv6"
+        if [ $rzone_IPv6 ] ; then
+                #check dnszone exist
+                ipa dnszone-find $rzone_IPv6 | grep "Zone name: $rzone_IPv6"
+                if [ $? -ne 0 ] ; then
+                        rlPass "Reverse zone for ipv6 adress is not created"
+                else
+                        rlFail "Reverse zone for ipv6 adress is created"
+                fi
+        fi
+
+        #Verify IP address exist using dig
+        sleep 10
+        host_ipv6addr=$(/usr/bin/dig +short -t aaaa $myhost)
+        rlLog "IPv6 address: $host_ipv6addr"
+        if [ "$host_ipv6addr" == "$ipv6_addr_normalized_zero_added" ] ; then
+               rlPass "dig shows IPv6 Address exist"
+        else
+               rlFail "dig shows IPv6 Address does not exist"
+        fi
+        rlRun "ipa host-del --updatedns $myhost" 0 "cleanup - delete $myhost"
+        rlRun "ipa dnsrecord-find $DOMAIN $short > $tmpDir/forward_dns_notexists.out" 1 "Checking for forward DNS entry"
+        MSG="AAAA record: $ipv6_addr_normalized_zero_added"
+        rlAssertNotGrep "$MSG" "$tmpDir/forward_dns_notexists.out"
+
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-host-cli-88: Add host with IPv6 address and DNS Record"
@@ -151,7 +190,7 @@ rlPhaseStartTest "ipa-host-cli-87: Add host with IPv6 address DNS Record --no-re
                 rlAssertGrep "$MSG" "$tmpDir/forward_dns_2.out"
 
                  #Verify IP address exist using nslookup
-		sleep 10
+		sleep 20
                 rlRun "nslookup $ipv6_addr  > $tmpDir/nslookup_output.out" 0 "Checking nslookup output"
                 myhost_lowercase=$(echo $myhost | tr [A-Z] [a-z])
                 nslookup_msg="name = $myhost_lowercase"
@@ -300,6 +339,17 @@ rlPhaseStartTest "ipa-host-cli-87: Add host with IPv6 address DNS Record --no-re
                         fi
                 done
         done
+	
+	#Verify IP address exist using dig
+        sleep 10
+        host_ipv6addr=$(/usr/bin/dig +short -t aaaa $myhost)
+        rlLog "IPv6 address: $host_ipv6addr"
+        if [ "$host_ipv6addr" == "$ipv6_addr" ] ; then
+               rlPass "dig shows IPv6 Address exist"
+        else
+               rlFail "dig shows IPv6 Address does not exist"
+        fi
+
         rlRun "ipa dnsrecord-find $rzone_IPv6 $recordname_ipv6" 0 "Checking for reverse DNS entry"
     rlPhaseEnd
 
