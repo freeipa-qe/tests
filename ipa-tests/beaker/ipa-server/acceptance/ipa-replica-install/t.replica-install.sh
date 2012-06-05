@@ -424,12 +424,25 @@ installSlave_nf()
 		rlRun "cat /etc/named.conf"
 
                 rlRun "appendEnv" 0 "Append the machine information to the env.sh with the information for the machines in the recipe set"
+				rlRun "dig +short $MASTER"
+				rlRun "dig +short -x $MASTERIP"
+				rlRun "dig +short $SLAVE"
+				rlRun "dig +short -x $SLAVEIP"
         fi
 
         if [ -f /var/log/ipareplica-install.log ]; then
 				cp /var/log/ipareplica-install.log /var/log/ipareplica-install.log_installSlave_nf
                 rhts-submit-log -l /var/log/ipareplica-install.log_installSlave_nf
         fi
+		INSTANCE=$(echo $RELM|sed 's/\./-/g')
+		if [ -f /var/log/dirsrv/slapd-$INSTANCE/errors ]; then
+			cp /var/log/dirsrv/slapd-$INSTANCE/errors /var/log/dirsrv/slapd-$INSTANCE/errors_nf
+			rhts-submit-log -l /var/log/dirsrv/slapd-$INSTANCE/errors.quickinstall
+		fi
+		if [ -f /var/log/dirsrv/slapd-$INSTANCE/access ]; then
+			cp /var/log/dirsrv/slapd-$INSTANCE/access /var/log/dirsrv/slapd-$INSTANCE/access_nf
+			rhts-submit-log -l /var/log/dirsrv/slapd-$INSTANCE/access.quickinstall
+		fi
 
    rlPhaseEnd
 }
