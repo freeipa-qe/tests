@@ -29,7 +29,7 @@ export TESTVERSION=1.0
 
 BUILT_FILES=
 
-FILES=$(METADATA) runtest.sh Makefile PURPOSE t.ipa-getcert.sh lib.ipa-getcert.sh
+FILES=$(METADATA) runtest.sh Makefile PURPOSE t.ipa-getcert.sh lib.ipa-getcert.sh t.ipa-getcert-extended.sh
 
 .PHONY: all install download clean
 
