@@ -262,6 +262,9 @@ echo 'expect eof ' >> $expfile
 			rlLog "Executing: ipa-replica-prepare -p $ADMINPW --ip-address=$SLAVEIP $hostname_s.$DOMAIN --dirsrv_pkcs12=dirsrv_pkcs.p12 --dirsrv_pin=Secret123 --http_pkcs12=http_pkcs.p12 --http_pin=Secret123"
 			rlRun "ipa-replica-prepare -p $ADMINPW --ip-address=$SLAVEIP $hostname_s.$DOMAIN --dirsrv_pkcs12=dirsrv_pkcs.p12 --dirsrv_pin=Secret123 --http_pkcs12=http_pkcs.p12 --http_pin=Secret123"
 
+			rlRun "service named restart"	
+			rlRun "dig +short $hostname_s.$DOMAIN"
+
                 else
 
                         rlLog "No SLAVES in current recipe set."
@@ -862,7 +865,7 @@ uninstall()
 
 ### restart ipa on master to clear out old kerberos ticket for replica
 		rlLog "restart dirsrv on master to clear out old kerberos ticket for replica"
-		rlRun "remoteExec root $MASTERIP \"service dirsrv restart; ipactl status\""
+		rlRun "remoteExec root $MASTERIP \"service dirsrv restart; service named restart; ipactl status\""
 
 		rlRun "cat /etc/resolv.conf"
 
