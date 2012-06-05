@@ -264,6 +264,10 @@ echo 'expect eof ' >> $expfile
 
 			rlRun "service named restart"	
 			rlRun "dig +short $hostname_s.$DOMAIN"
+				rlRun "dig +short $MASTER"
+				rlRun "dig +short -x $MASTERIP"
+				rlRun "dig +short $SLAVE"
+				rlRun "dig +short -x $SLAVEIP"
 
                 else
 
