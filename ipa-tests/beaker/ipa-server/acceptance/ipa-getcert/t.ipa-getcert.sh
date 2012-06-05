@@ -371,7 +371,7 @@ request_1006()   #ipa-getcert request -d [NSSDBDIR positive] -n [CertNickName po
         #no data prepare defined 
 
         # test starts here  
-        rlRun "ipa-getcert request -d $NSSDBDIR_positive -n $CertNickName_positive" 0 "scenario: [ipa-getcert request -d -n]	data: all positive"  
+        rlRun "ipa-getcert request -d $NSSDBDIR_positive -n $CertNickName_positive" 0 "scenario: [ipa-getcert request -d -n]	data: all positive"
         # test ends here 
 
         # test env cleanup 
