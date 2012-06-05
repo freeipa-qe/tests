@@ -39,8 +39,18 @@ installMaster()
 	fi
 
 	if [ -f /var/log/ipaserver-install.log ]; then
-        	rhts-submit-log -l /var/log/ipaserver-install.log
-        fi
+		rhts-submit-log -l /var/log/ipaserver-install.log
+	fi
+	INSTANCE=$(echo $RELM|sed 's/\./-/g')
+	if [ -f /var/log/dirsrv/slapd-$INSTANCE/errors ]; then
+		cp /var/log/dirsrv/slapd-$INSTANCE/errors /var/log/dirsrv/slapd-$INSTANCE/errors.quickinstall
+		rhts-submit-log -l /var/log/dirsrv/slapd-$INSTANCE/errors.quickinstall
+	fi
+	if [ -f /var/log/dirsrv/slapd-$INSTANCE/access ]; then
+		cp /var/log/dirsrv/slapd-$INSTANCE/access /var/log/dirsrv/slapd-$INSTANCE/access.quickinstall
+		rhts-submit-log -l /var/log/dirsrv/slapd-$INSTANCE/access.quickinstall
+	fi
+		
    rlPhaseEnd
 
    rlPhaseStartTest "Create Replica Package(s)"
