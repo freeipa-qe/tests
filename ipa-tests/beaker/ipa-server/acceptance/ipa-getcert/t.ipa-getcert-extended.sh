@@ -110,7 +110,6 @@ list_extended()
        rlRun "cat $TmpDir/temp_test008.out"
        rlAssertGrep "No request found that matched arguments." "$TmpDir/temp_test008.out"
        rlRun "ipa-getcert stop-tracking -i testing"
-       rlRun "rm -rf $TmpDir"
     rlPhaseEnd
 
 }
@@ -794,6 +793,6 @@ stop_tracking_extended()
        rlRun "ipa-getcert stop-tracking -d $TmpDir -n certtest -t non-existent > $TmpDir/temp_test004.out 2>&1" 1
        rlRun "cat $TmpDir/temp_test004.out"
        rlAssertGrep "No request found that matched arguments." "$TmpDir/temp_test004.out"
-       #rlRun "rm -rf $TmpDir"
+       rlRun "rm -rf $TmpDir"
     rlPhaseEnd
 }
