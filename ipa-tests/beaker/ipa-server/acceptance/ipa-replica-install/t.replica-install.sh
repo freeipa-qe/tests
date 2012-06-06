@@ -175,57 +175,18 @@ createReplica3()
 	rlPhaseStartTest "Create Replica Package(s) with pkcs#12 options"
 		for s in $SLAVE; do
 			if [ "$s" != "" ]; then
-				cd /tmp
 				rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
 				rlRun "rm -fr /var/lib/ipa/replica-info-*"
 				rlRun "rm -rf /tmp/httpcert /tmp/ldapcert"
-				rlLog "pre-creating host for pkcs12 manual cert generation.   will be deleted at end"
-				rlRun "ipa host-add $s --ip-address=$SLAVEIP"
 				
-				rlLog "Creating HTTP Cert for Replica"
-				mkdir /tmp/httpcert
-				cd /tmp/httpcert
-				echo "mytestnoisefile: asflasdfjl@#R%W@t4tlkihjhaldkhjetgfag4lk<F4>^W@%lkj" > noise.txt
-				echo "$ADMINPW" > pwdfile.txt
-				certutil -d . -N -f pwdfile.txt
-				certutil -R -s "CN=$s,O=$RELM" -d . -a -z noise.txt -f pwdfile.txt > $s.csr
-				ipa cert-request $s.csr --add --principal=http/$s > ipa-cert-request.out
-				certid=$(grep 'Serial number' ipa-cert-request.out|grep -v 'hex'|cut -d: -f2|xargs echo)
-				echo "http/$s=$certid" > certlist.txt
-				ipa-getkeytab -s $MASTER -k $SLAVE.keytab -p http/$SLAVE
-				wget http://$MASTER/ipa/config/ca.crt
-				certutil -A -d . -n 'IPA CA' -t CT,, -a < ca.crt 
-				ipa service-show http/$s --out=$s.crt
-				certutil -A -n $s -d . -t u,u,u -a < $s.crt
-				certutil -L -d . -n $s -a > httpdcacert.asc
-				rlRun "pk12util -o http_pkcs.p12 -d . -n $s -W $ADMINPW -K $ADMINPW > pk12util.out"
-				rlAssertGrep "pk12util: PKCS12 EXPORT SUCCESSFUL" pk12util.out
-
-				rlLog "Creating LDAP Cert for Replica"
-				mkdir /tmp/ldapcert
-				cd /tmp/ldapcert
-				echo "mytestnoisefile: asflasdfjl@#R%W@t4tlkihjhaldkhjetgfag4lk<F4>^W@%lkj" > noise.txt
-				echo "$ADMINPW" > pwdfile.txt
-				certutil -d . -N -f pwdfile.txt
-				certutil -R -s "CN=$s,O=$RELM" -d . -a -z noise.txt -f pwdfile.txt > $s.csr
-				ipa cert-request $s.csr --add --principal=ldap/$s > ipa-cert-request.out
-				certid=$(grep 'Serial number' ipa-cert-request.out|grep -v 'hex'|cut -d: -f2|xargs echo)
-				echo "http/$s=$certid" > certlist.txt
-				ipa-getkeytab -s $MASTER -k $SLAVE.keytab -p ldap/$SLAVE
-				wget http://$MASTER/ipa/config/ca.crt
-				certutil -A -d . -n 'IPA CA' -t CT,, -a < ca.crt 
-				ipa service-show ldap/$s --out=$s.crt
-				certutil -A -n $s -d . -t u,u,u -a < $s.crt
-				certutil -L -d . -n $s -a > ldapcacert.asc
-				rlRun "pk12util -o ldap_pkcs.p12 -d . -n $s -W $ADMINPW -K $ADMINPW > pk12util.out"
-				rlAssertGrep "pk12util: PKCS12 EXPORT SUCCESSFUL" pk12util.out
-
+				rlRun "cd /var/lib/ipa"
+				rlRun "cp replica-info-$SLAVE.gpg replica-info-$SLAVE.gpg.createReplica3.backup"
+				rlRun "gpg -d replica-info-$SLAVE.gpg | tar xvf -"
+				rlRun "rm -f replica-info-$SLAVE.gpg"
 
 				hostname_s=$(echo $s|cut -f1 -d.)
-				rlRun "ipa-replica-prepare -p $ADMINPW --ip-address=$SLAVEIP $hostname_s.$DOMAIN --dirsrv_pkcs12=/tmp/ldapcert/ldap_pkcs.p12 --dirsrv_pin=$ADMINPW --http_pkcs12=/tmp/httpcert/http_pkcs.p12 --http_pin=$ADMINPW"
-
-				rlLog "now deleting previously added host entry"
-				rlRun "ipa host-del $s"
+				rlRun "ipa-replica-prepare -p $ADMINPW --ip-address=$SLAVEIP $hostname_s.$DOMAIN --dirsrv_pkcs12=realm_info/dscert.p12 --dirsrv_pin='' --http_pkcs12=realm_info/httpcert.p12 --http_pin=''"
+				rlRun "rm -rf realm_info"
 
 				rlRun "service named restart"	
 				rlRun "dig +short $hostname_s.$DOMAIN"
@@ -233,7 +194,6 @@ createReplica3()
 				rlRun "dig +short -x $MASTERIP"
 				rlRun "dig +short $SLAVE"
 				rlRun "dig +short -x $SLAVEIP"
-
 			else
 				rlLog "No SLAVES in current recipe set."
 			fi
