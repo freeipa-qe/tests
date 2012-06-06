@@ -76,7 +76,7 @@ rlJournalStart
 	   	yum -y install $COMMON_SERVER_PACKAGES
 
 	   	if [ "$FLAVOR" == "Fedora" ] ; then
-			yum -y install $FREEIPA_SERVER_PACKAGES
+			yum -y install --disablerepo=updates-testing $FREEIPA_SERVER_PACKAGES
                 	yum -y update
 
 	        	for item in $FREEIPA_SERVER_PACKAGES ; do
@@ -125,7 +125,7 @@ rlJournalStart
            	yum -y install $COMMON_SERVER_PACKAGES
 
            	if [ "$FLAVOR" == "Fedora" ] ; then
-                	yum -y install $FREEIPA_SERVER_PACKAGES
+                	yum -y install --disablerepo=updates-testing $FREEIPA_SERVER_PACKAGES
                 	yum -y update
 
                 	for item in $FREEIPA_SERVER_PACKAGES ; do
@@ -175,7 +175,7 @@ rlJournalStart
            	yum -y install $COMMON_CLIENT_PACKAGES
 
            	if [ "$FLAVOR" == "Fedora" ] ; then
-                	yum -y install $FREEIPA_CLIENT_PACKAGES
+                	yum -y install --disablerepo=updates-testing $FREEIPA_CLIENT_PACKAGES
                 	yum -y update
 
                 	for item in $FREEIPA_CLIENT_PACKAGES ; do
@@ -223,7 +223,7 @@ rlJournalStart
            	yum -y install $COMMON_SERVER_PACKAGES
 
            	if [ "$FLAVOR" == "Fedora" ] ; then
-                	yum -y install $FREEIPA_SERVER_PACKAGES
+                	yum -y install --disablerepo=updates-testing $FREEIPA_SERVER_PACKAGES
                 	yum -y update
 
                 	for item in $FREEIPA_SERVER_PACKAGES ; do
