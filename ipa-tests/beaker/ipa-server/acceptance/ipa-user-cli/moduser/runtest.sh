@@ -562,9 +562,31 @@ rlJournalStart
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-user-cli-mod-068: Rename a user that does not exist"
-        command="ipa user-mod --rename=new_user_name doesntexist"
-        expmsg="ipa: ERROR: doesntexist: user not found"
-        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for user doesntexist"
+	command="ipa user-mod --rename=new_user_name doesntexist"
+	expmsg="ipa: ERROR: doesntexist: user not found"
+ 	rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for user doesntexist"
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-user-cli-mod-069: Bug 759501 user interface does not reflect account inactivation properly."
+	# Reguarding: http://bugzilla.redhat.com/show_bug.cgi?id=759501
+	# Current test plan:
+	# 1. create user1
+	# 2. kinit several times as user1 with valid credentials.
+	# 3. Kinit as admin
+	# 4. ensure that ipa user-status shows no failed logins for user1
+	# 5. kdestroy
+	# 6. kinit as user1 with several bad passwords (max failed logins + 1)
+	# 7. ensure that ipa user-status shows correct number of failed logins for user1.
+	# 8. ensure that user-status shows user1 as disabled.
+	# 9. attempt valid login as user1. It should fail.
+	# 10. kinit as admin
+	# 11. re-enable user1
+	# 12. kdestroy
+	# 13. kinit as user1 twice with bad passwords.
+	# 14. Make sure that user1 can still kinit with good credentials.
+	# 15. kinit as admin
+	# 16. remove user1. 
+	rlPass
     rlPhaseEnd
 
     rlPhaseStartCleanup "ipa-user-cli-mod-cleanup"
