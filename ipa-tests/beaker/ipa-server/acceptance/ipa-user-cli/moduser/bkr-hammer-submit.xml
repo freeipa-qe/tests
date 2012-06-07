@@ -22,7 +22,6 @@
 			</distroRequires>
 			<hostRequires>
 				<and>
-					<hostname op="=" value="blademtv5.lab.sjc.redhat.com"/>
 					<system_type op="=" value="Machine"/>
 				</and>
 			</hostRequires>
