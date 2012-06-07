@@ -117,6 +117,7 @@ irm_envsetup()
 		;;
 	SLAVE*)
 		rlLog "Machine in recipe is SLAVE ($SLAVE)"
+		rlLog "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER_IP"
 		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER_IP"
 		;;
 	CLIENT)
@@ -354,7 +355,7 @@ irm_list_positive_0004()
 {
 	local tmpout=/tmp/errormsg.out
 	TESTORDER=$(( TESTORDER += 1 ))
-	rlPhaseStartTest "irm_list_positive - against remote host using -H option"
+	rlPhaseStartTest "irm_list_positive_0004 - against remote host using -H option"
 	case "$MYROLE" in
 	MASTER)
 		rlLog "Machine in recipe is MASTER ($MASTER)"

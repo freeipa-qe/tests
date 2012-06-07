@@ -78,6 +78,8 @@ echo "export SLAVE1_IP=$SLAVE1_IP" >> /dev/shm/env.sh
 echo "export SLAVE2=$SLAVE2" >> /dev/shm/env.sh
 echo "export SLAVE2_IP=$SLAVE2_IP" >> /dev/shm/env.sh
 
+TESTORDER=0
+
 ##########################################
 #   test main 
 #########################################
