@@ -179,7 +179,7 @@ createReplica3()
 				rlRun "rm -fr /var/lib/ipa/replica-info-*"
 				rlRun "rm -rf /tmp/httpcert /tmp/ldapcert"
 				
-				rlRun "cd /var/lib/ipa"
+				cd /var/lib/ipa
 				rlRun "cp replica-info-$SLAVE.gpg replica-info-$SLAVE.gpg.createReplica3.backup"
 				rlRun "gpg -d replica-info-$SLAVE.gpg | tar xvf -"
 				rlRun "rm -f replica-info-$SLAVE.gpg"
