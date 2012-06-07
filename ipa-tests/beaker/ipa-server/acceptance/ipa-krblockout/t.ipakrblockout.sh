@@ -21,6 +21,7 @@ ipakrblockout()
     ipakrblockout_negative
     ipakrblockout_positive
     bz822429
+    bz759501
     ipakrblockout_cleanup
 } 
 
@@ -730,6 +731,128 @@ bz822429()
         rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit As Admin"
         rlRun "ipa pwpolicy-mod --$maxflag=6" 0 "Set max failures back to default"
     rlPhaseEnd
+}
+
+bz759501()
+{
+    rlPhaseStartTest "Bug 759501 user interface does not reflect account inactivation properly."
+	# Reguarding: http://bugzilla.redhat.com/show_bug.cgi?id=759501
+	# Current test plan:
+	# 1. create user1
+	# 2. kinit several times as user1 with valid credentials.
+	# 3. Kinit as admin
+	# 4. ensure that ipa user-status shows no failed logins for user1
+	# 5. kdestroy
+	# 6. kinit as user1 with several bad passwords (max failed logins + 1)
+	# 7. ensure that ipa user-status shows correct number of failed logins for user1.
+	# 8. ensure that user-status shows user1 as disabled.
+	# 9. attempt valid login as user1. It should fail.
+	# 10. kinit as admin
+	# 11. re-enable user1
+	# 12. kdestroy
+	# 13. kinit as user1 twice with bad passwords.
+	# 14. Make sure that user1 can still kinit with good credentials.
+	# 15. kinit as admin
+	# 16. remove user1. 
+	# Gather lockout duration for use at cleanup
+	lockoutduration=$(ipa pwpolicy-show | grep Lockout\ duration | sed s/\ //g | cut -d: -f2)
+	ipa pwpolicy-mod --lockouttime=60
+	# 1. create user1
+	kdestroy
+	kinitAs $ADMINID $ADMINPW
+	user="759501ur"
+	firstpass="pass1"
+	pass="5ts7x6#nsh"
+        rlRun "ipa user-add --first=firstname --last=nlast $user"
+	echo $firstpass | ipa passwd $user
+	# 2. kinit several times as user1 with valid credentials.
+	FirstKinitAs $user $firstpass $pass
+	kdestroy
+	kinitAs $ADMINID $ADMINPW
+	kdestroy
+	kinitAs $user $pass
+	kdestroy
+	kinitAs $ADMINID $ADMINPW
+	kdestroy
+	kinitAs $user $pass
+	kdestroy
+	# 3. Kinit as admin
+	kinitAs $ADMINID $ADMINPW
+	# 4. ensure that ipa user-status shows no failed logins for user1
+	failed=$(ipa user-status $user | grep Failed\ logins: | cut -d\  -f5)
+	if [ "$failed" != "0" ]; then
+		rlFail "ERROR - ipa user status for user $user shows more than 0 failed logins, it shows $failed"
+	else 
+		rlPass "PASS - ipa user status for user $user shows 0 failed logins"
+	fi
+	# 5. kdestroy
+	kdestroy
+	# 6. kinit as user1 with several bad passwords (max failed logins + 1)
+	kinitAs $ADMINID $ADMINPW
+	AttemptsToMake=$(ipa pwpolicy-show | grep Max\ failures | cut -d\  -f5)
+	let AttemptsToMake=$AttemptsToMake+2
+	kdestroy
+	doneAttempts=0
+	badpass=bpass
+	while [ $doneAttempts -lt $AttemptsToMake ]; do
+		bpass="$doneAttempts$badpass"
+		echo $bpass | kinit $user
+		let doneAttempts=$doneAttempts+1
+	done
+	# 7. ensure that ipa user-status shows correct number of failed logins for user1.
+	kinitAs $ADMINID $ADMINPW
+	AttemptsToMake=$(ipa pwpolicy-show | grep Max\ failures | cut -d\  -f5)
+	failed=$(ipa user-status $user | grep Failed\ logins: | cut -d\  -f5)
+	if [ $failed -ne $AttemptsToMake ]; then
+		rlFail "ERROR - ipa user status for user $user shows incorrect number of Failed logins. $failed shown. It should be $AttemptsToMake"
+	else 
+		rlPass "PASS - ipa user status for user $user shows $AttemptsToMake failed logins"
+	fi
+	# 8. ensure that user-status shows user1 as disabled.
+	userattempts=$(ipa user-show $user --all | grep krbloginfailedcount | sed s/\ //g | cut -d: -f2)
+	if [ $userattepts -ne $AttemptsToMake ]; then
+		rlFail "ERROR - ipa user status for user $user shows incorrect number of Failed logins. $userattempts shown. It should be $AttemptsToMake"
+	else 
+		rlPass "PASS - ipa user status for user $user shows $AttemptsToMake failed logins"
+	fi
+	# 9. attempt valid login as user1. It should fail.
+	kdestroy
+	echo $pass | kinit $user &> /dev/null
+	if [ $? -eq 0 ]; then
+		rlFail "ERROR - login as $user1 failed. The user should be locked"
+	else
+		rlPass "PASS - Could not log in as locked user"
+	fi
+	# 10. kinit as admin
+	kinitAs $ADMINID $ADMINPW
+	# 11. re-enable user1
+	ipa user-unlock ua1
+	# 12. kdestroy
+	kdestroy
+	# 13. kinit as user1 twice with bad passwords.
+	echo bpass1 | kinit $user
+	echo 8t6778g6uyg | kinit $user
+	# 14. Make sure that user1 can still kinit with good credentials.
+	echo "Sleeping for 60 seconds to wait for user to unlock"
+	sleep 60 # Sleep to wait for the acount to activate again
+	echo $pass | kinit $user
+	princ=$(klist | grep Default\ principal | sed s/\ //g | cut -d\  -f2)
+	echo $princ | grep $user@$RELM 
+	if [ $? -ne 0 ]; then
+		rlFail "ERROR - $user@$RELM does not appear to exist in the klist output. The output appears to be $princ"
+		klist
+	else 
+		rlPass "PASS - able to login as user after unlocking the user"
+	fi
+	# 15. kinit as admin
+	kdestroy
+	kinitAs $ADMINID $ADMINPW
+	# 16. remove user1. 
+	ipa user-del $user
+	ipa pwpolicy-mod --lockouttime=$lockoutduration
+	
+    rlPhaseEnd
+
 }
 
 #########################
