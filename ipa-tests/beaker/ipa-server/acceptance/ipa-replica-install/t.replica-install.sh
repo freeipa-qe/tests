@@ -355,10 +355,11 @@ installSlave_nf()
                 rlLog "EXECUTING: ipa-replica-install -U --setup-dns --no-forwarders -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg"
                 rlRun "/bin/bash /dev/shm/replica-install.bash" 0 "Replica installation"
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
-		# Disabling the following since empty forwarders exist in named.conf
+				# Disabling the following since empty forwarders exist in named.conf
                 # rlAssertNotGrep "forwarders" "/etc/named.conf"
                 rlAssertNotGrep "$DNSFORWARD" "/etc/named.conf"
-		rlRun "cat /etc/named.conf"
+				rlRun "cat /etc/named.conf"
+				rlRun "cat /etc/resolv.conf"
 
                 rlRun "appendEnv" 0 "Append the machine information to the env.sh with the information for the machines in the recipe set"
 				rlRun "dig +short $MASTER"
@@ -374,11 +375,11 @@ installSlave_nf()
 		INSTANCE=$(echo $RELM|sed 's/\./-/g')
 		if [ -f /var/log/dirsrv/slapd-$INSTANCE/errors ]; then
 			cp /var/log/dirsrv/slapd-$INSTANCE/errors /var/log/dirsrv/slapd-$INSTANCE/errors_nf
-			rhts-submit-log -l /var/log/dirsrv/slapd-$INSTANCE/errors.quickinstall
+			rhts-submit-log -l /var/log/dirsrv/slapd-$INSTANCE/errors_nf
 		fi
 		if [ -f /var/log/dirsrv/slapd-$INSTANCE/access ]; then
 			cp /var/log/dirsrv/slapd-$INSTANCE/access /var/log/dirsrv/slapd-$INSTANCE/access_nf
-			rhts-submit-log -l /var/log/dirsrv/slapd-$INSTANCE/access.quickinstall
+			rhts-submit-log -l /var/log/dirsrv/slapd-$INSTANCE/access_nf
 		fi
 
    rlPhaseEnd
