@@ -160,6 +160,17 @@ createReplica2()
 				rlLog "Running: ipa-replica-prepare -p $ADMINPW --ip-address=$SLAVEIP $hostname_s.$DOMAIN"
 				rlRun "ipa-replica-prepare -p $ADMINPW --ip-address=$SLAVEIP $hostname_s.$DOMAIN" 0 "Creating replica package"
 
+				# Checking DNS records added for Replica
+				rlRun "ipa dnsrecord-find $SLAVEZONE"
+				rlRun "ipa dnsrecord-find $DOMAIN"
+				rlRun "dig +short $hostname_s.$DOMAIN"
+				rlRun "dig +short -x $SLAVEIP"
+				rlRun "service named restart"
+				rlRun "ipa dnsrecord-find $SLAVEZONE"
+				rlRun "ipa dnsrecord-find $DOMAIN"
+				rlRun "dig +short $hostname_s.$DOMAIN"
+				rlRun "dig +short -x $SLAVEIP"
+
 			else
 
 				rlLog "No SLAVES in current recipe set."
@@ -550,6 +561,7 @@ installSlave_sshtrustdns() {
         else
 
                 rlRun "cat /etc/hosts"
+				rlRun "cat /etc/resolv.conf"
 
                 echo "ipa-replica-install -U --setup-dns --no-forwarders --configure-ssh --ssh-trust-dns --skip-conncheck -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg" > /dev/shm/replica-install.bash
                 chmod 755 /dev/shm/replica-install.bash
