@@ -928,7 +928,9 @@ irm_reinitialize_positive_0001()
 	MASTER)
 		rlLog "Machine in recipe is MASTER ($MASTER)"
 
-		rlRun "ipa-replica-manage -p $ADMINPW re-initialize --from=$SLAVE1"
+		rlRun "ipa-replica-manage -p $ADMINPW re-initialize --from=$SLAVE1 > $tmpout 2>&1"
+		rlRun "cat $tmpout"
+		rlAssertGrep "Update succeeded" $tmpout
 
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $MASTER_IP"
 		;;
@@ -945,6 +947,7 @@ irm_reinitialize_positive_0001()
 		;;
 	esac
 	rlPhaseEnd
+	[ -f $tmpout ] && rm -f $tmpout
 }
 
 irm_reinitialize_positive_0002()
@@ -959,7 +962,9 @@ irm_reinitialize_positive_0002()
 	SLAVE1)
 		rlLog "Machine in recipe is SLAVE ($SLAVE)"
 
-		rlRun "ipa-replica-manage -p $ADMINPW re-initialize --from=$SLAVE2"
+		rlRun "ipa-replica-manage -p $ADMINPW re-initialize --from=$SLAVE2 > $tmpout 2>&1"
+		rlRun "cat $tmpout"
+		rlAssertGrep "Update succeeded" $tmpout
 
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $SLAVE1_IP"
 		;;
@@ -976,6 +981,7 @@ irm_reinitialize_positive_0002()
 		;;
 	esac
 	rlPhaseEnd
+	[ -f $tmpout ] && rm -f $tmpout
 }
 
 irm_reinitialize_positive_0003()
@@ -990,7 +996,9 @@ irm_reinitialize_positive_0003()
 	SLAVE2)
 		rlLog "Machine in recipe is SLAVE ($SLAVE)"
 		
-		rlRun "ipa-replica-manage -p $ADMINPW re-initialize --from=$MASTER"
+		rlRun "ipa-replica-manage -p $ADMINPW re-initialize --from=$MASTER > $tmpout 2>&1"
+		rlRun "cat $tmpout"
+		rlAssertGrep "Update succeeded" $tmpout
 
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $SLAVE2_IP"
 		;;
@@ -1007,6 +1015,7 @@ irm_reinitialize_positive_0003()
 		;;
 	esac
 	rlPhaseEnd
+	[ -f $tmpout ] && rm -f $tmpout
 }
 
 irm_reinitialize_positive_0004()
@@ -1021,7 +1030,9 @@ irm_reinitialize_positive_0004()
 	SLAVE1)
 		rlLog "Machine in recipe is SLAVE1 ($SLAVE1)"
 
-		rlRun "ipa-replica-manage -p $ADMINPW -H $MASTER re-initialize --from=$SLAVE1"
+		rlRun "ipa-replica-manage -p $ADMINPW -H $MASTER re-initialize --from=$SLAVE1 > $tmpout 2>&1"
+		rlRun "cat $tmpout"
+		rlAssertGrep "Update succeeded" $tmpout
 
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $SLAVE1_IP"
 		;;
@@ -1038,6 +1049,7 @@ irm_reinitialize_positive_0004()
 		;;
 	esac
 	rlPhaseEnd
+	[ -f $tmpout ] && rm -f $tmpout
 }
 
 # irm_reinitialize_negative
@@ -1185,7 +1197,9 @@ irm_disconnect_positive_0001()
 	MASTER)
 		rlLog "Machine in recipe is MASTER ($MASTER)"
 
-		rlRun "ipa-replica-manage -p $ADMINPW disconnect $SLAVE1 $SLAVE2"
+		rlRun "ipa-replica-manage -p $ADMINPW disconnect $SLAVE1 $SLAVE2 > $tmpout 2>&1"
+		rlRun "cat $tmpout"
+		rlAssertGrep "Deleted replication agreement from '$SLAVE1' to '$SLAVE2'" $tmpout
 		rlRun "ipa-replica-manage -p $ADMINPW list $SLAVE1 | grep -v $SLAVE2"
 		rlRun "ipa-replica-manage -p $ADMINPW list $SLAVE2 | grep -v $SLAVE1"
 
@@ -1204,6 +1218,7 @@ irm_disconnect_positive_0001()
 		;;
 	esac
 	rlPhaseEnd
+	[ -f $tmpout ] && rm -f $tmpout
 }
 
 irm_disconnect_positive_0002()
@@ -1215,7 +1230,9 @@ irm_disconnect_positive_0002()
 	MASTER)
 		rlLog "Machine in recipe is MASTER ($MASTER)"
 
-		rlRun "ipa-replica-manage -p $ADMINPW disconnect $MASTER $SLAVE1"
+		rlRun "ipa-replica-manage -p $ADMINPW disconnect $MASTER $SLAVE1 > $tmpout 2>&1"
+		rlRun "cat $tmpout"
+		rlAssertGrep "Deleted replication agreement from '$SLAVE1' to '$SLAVE2'" $tmpout
 		rlRun "ipa-replica-manage -p $ADMINPW list $MASTER | grep -v $SLAVE1"
 
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $MASTER_IP"
@@ -1233,6 +1250,7 @@ irm_disconnect_positive_0002()
 		;;
 	esac
 	rlPhaseEnd
+	[ -f $tmpout ] && rm -f $tmpout
 }
 
 
