@@ -347,7 +347,7 @@ installSlave_nf()
         else
 
 		rlRun "host -t srv _kerberos._tcp.$DOMAIN"
-		rlRun "> /var/lib/sss/pubconf/kdcinfo.$RELM"
+		#rlRun "> /var/lib/sss/pubconf/kdcinfo.$RELM"
                 rlRun "cat /etc/resolv.conf"
 		sleep 10
                 echo "ipa-replica-install -U --setup-dns --no-forwarders -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg" > /dev/shm/replica-install.bash
@@ -818,6 +818,12 @@ uninstall()
 ### restart ipa on master to clear out old kerberos ticket for replica
 		rlLog "restart dirsrv on master to clear out old kerberos ticket for replica"
 		rlRun "remoteExec root $MASTERIP \"service dirsrv restart; service named restart; ipactl status\""
+
+### clean up sssd config if left around
+		if [ -f /var/lib/sss/pubconf/kdcinfo.$RELM ]; then
+			rlRun "cat /var/lib/sss/pubconf/kdcinfo.$RELM"
+			rlRun "rm /var/lib/sss/pubconf/kdcinfo.$RELM"
+		fi
 
 		rlRun "cat /etc/resolv.conf"
 
