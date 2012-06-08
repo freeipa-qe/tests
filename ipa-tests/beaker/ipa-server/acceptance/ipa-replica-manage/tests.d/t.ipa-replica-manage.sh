@@ -513,6 +513,9 @@ irm_list_negative_0004()
 		hostname_s=$(hostname -s)
 		rlLog "First uninstall replica from $SLAVE2"
 		rlRun "ipa-server-install --uninstall -U"
+		if [ -f /var/lib/sss/pubconf/kdcinfo.$RELM ]; then
+			rlRun "rm /var/lib/sss/pubconf/kdcinfo.$RELM"
+		fi
 
 		rlLog "Next re-install replica on $SLAVE2"
 		pushd /dev/shm
@@ -524,6 +527,9 @@ irm_list_negative_0004()
 		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.3' $MASTER_IP"
 
 		rlRun "ipa-server-install --uninstall -U"
+		if [ -f /var/lib/sss/pubconf/kdcinfo.$RELM ]; then
+			rlRun "rm /var/lib/sss/pubconf/kdcinfo.$RELM"
+		fi
 
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.4' -m $SLAVE2_IP"
 		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.5' $MASTER_IP"
