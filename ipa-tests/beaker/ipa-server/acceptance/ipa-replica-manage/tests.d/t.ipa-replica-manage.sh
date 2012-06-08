@@ -101,7 +101,8 @@ irm_envsetup()
 	case "$MYROLE" in
 	MASTER)
 		rlLog "Machine in recipe is MASTER ($MASTER)"
-
+		rlLog "rhts-sync-block -s '$FUNCNAME.0' $SLAVE1_IP $SLAVE2_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.0' $SLAVE1_IP $SLAVE2_IP"
 		hostname_s=$(hostname -s)
 		rlLog "Tests to ensure that all of the servers are available"
 		rlRun "ipa-replica-manage --password=$ADMINPW list | grep $hostname_s"
@@ -117,6 +118,7 @@ irm_envsetup()
 		;;
 	SLAVE*)
 		rlLog "Machine in recipe is SLAVE ($SLAVE)"
+		rlRun "rhts-sync-set -s '$FUNCNAME.0' $(hostname -i)"
 		rlLog "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER_IP"
 		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER_IP"
 		;;
