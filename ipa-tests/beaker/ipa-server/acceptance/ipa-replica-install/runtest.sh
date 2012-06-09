@@ -186,38 +186,46 @@ rlJournalStart
 			# Installing slave with --no-forwarders
 			rhts-sync-block -s READY_REPLICA3 $BEAKERMASTER
 			installSlave_nf
+			sleep 100000
 			uninstall
 			rhts-sync-set -s DONE_REPLICA3 $BEAKERSLAVE
 			
 			rhts-sync-block -s READY_REPLICA4 $BEAKERMASTER
 			# Installing slave with --no-reverse
 			installSlave_nr
+			sleep 100000
 			uninstall
 			rhts-sync-set -s DONE_REPLICA4 $BEAKERSLAVE
 
 			rhts-sync-block -s READY_REPLICA2 $BEAKERMASTER
 			# Installing with --ssh-trust-dns
 			installSlave_sshtrustdns
+			sleep 100000
 			uninstall
 
 			# Installing with --configure-sshd
 			installSlave_configuresshd
+			sleep 100000
 			uninstall
 
 			# Installing with --no-dns-sshfp
 			installSlave_nodnssshfp
+			sleep 100000
 			uninstall
 
 			# Installing slave with --no-host-dns
 			installSlave_nhostdns
+			sleep 100000
 			uninstall
 
 			# Installing slave with --no-ui-redirect
 			installSlave_nouiredirect
+			sleep 100000
 			uninstall
 
 			# Installing slave with --setup-ca
 			installSlave_ca
+			sleep 100000
 				
 			# Test other bugs not covered directly in above tests
 
