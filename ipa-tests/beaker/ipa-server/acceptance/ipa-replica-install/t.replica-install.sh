@@ -372,6 +372,10 @@ installSlave_nf()
 				cp /var/log/ipareplica-install.log /var/log/ipareplica-install.log_installSlave_nf
                 rhts-submit-log -l /var/log/ipareplica-install.log_installSlave_nf
         fi
+		if [ -f /var/log/ipareplica-conncheck.log ]; then
+				cp /var/log/ipareplica-conncheck.log /var/log/ipareplica-conncheck.log_nf
+				rhts-submit-log -l /var/log/ipareplica-conncheck.log_nf
+		fi
 		INSTANCE=$(echo $RELM|sed 's/\./-/g')
 		if [ -f /var/log/dirsrv/slapd-$INSTANCE/errors ]; then
 			cp /var/log/dirsrv/slapd-$INSTANCE/errors /var/log/dirsrv/slapd-$INSTANCE/errors_nf
@@ -430,6 +434,10 @@ installSlave_nr()
 		if [ -f /var/log/ipareplica-install.log ]; then
 			cp /var/log/ipareplica-install.log /var/log/ipareplica-install.log_installSlave_nr
 			rhts-submit-log -l /var/log/ipareplica-install.log_installSlave_nr
+		fi
+		if [ -f /var/log/ipareplica-conncheck.log ]; then
+				cp /var/log/ipareplica-conncheck.log /var/log/ipareplica-conncheck.log_nr
+				rhts-submit-log -l /var/log/ipareplica-conncheck.log_nr
 		fi
 
 	rlPhaseEnd
@@ -582,6 +590,7 @@ installSlave_sshtrustdns() {
         if [ -f /var/log/ipareplica-install.log ]; then
                 rhts-submit-log -l /var/log/ipareplica-install.log
         fi
+
 	rlPhaseEnd
 } #installSlave_sshtrustdns
 
