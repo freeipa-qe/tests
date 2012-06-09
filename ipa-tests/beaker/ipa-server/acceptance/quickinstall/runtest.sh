@@ -103,6 +103,11 @@ rlJournalStart
            		done 
 	     	fi	
 
+			if [ -f /usr/share/ipa/bind.named.conf.template ]; then
+				rlLog "Forcing debug logging in named.conf template"
+				sed -i s/severity dynamic/severity debug 10/ /usr/share/ipa/bind.named.conf.template
+			fi
+
 	    	if [ $rc -eq 0 ] ; then
 			installMaster
 			rhts-sync-set -s READY
@@ -151,6 +156,12 @@ rlJournalStart
                         	fi
                 	done
              	fi
+
+			if [ -f /usr/share/ipa/bind.named.conf.template ]; then
+				rlLog "Forcing debug logging in named.conf template"
+				sed -i s/severity dynamic/severity debug 10/ /usr/share/ipa/bind.named.conf.template
+			fi
+
 
 		if [ $rc -eq 0 ] ; then
 			rhts-sync-block -s READY $MASTER
