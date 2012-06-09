@@ -836,7 +836,8 @@ uninstall()
 
 		rlRun "cat /etc/resolv.conf"
 
-		sleep 10
+		rlLog "Waiting for 1 minute for everything to clear..."
+		rlRun "sleep 60"
 
 	rlPhaseEnd
 }
