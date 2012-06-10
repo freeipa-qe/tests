@@ -828,6 +828,14 @@ uninstall()
 		rlLog "restart dirsrv on master to clear out old kerberos ticket for replica"
 		rlRun "remoteExec root $MASTERIP \"service dirsrv restart; service named restart; ipactl status\""
 
+### see if sssd is still running...should be down
+		rlLog "verifying https://bugzilla.redhat.com/show_bug.cgi?id=830598"
+		if [ $(ps -ef|grep '[s]ssd.*testrelm.com'|wc -l) -gt 0 ]; then
+			rlFail "BZ 830598 found...ipa-server-install --uninstall not stopping sssd and seeing ipa-replica-conncheck kinit errors"
+			rlLog "stopping sssd separately"
+			rlRun "service sssd stop"
+		fi
+		
 ### clean up sssd config if left around
 		if [ -f /var/lib/sss/pubconf/kdcinfo.$RELM ]; then
 			rlRun "cat /var/lib/sss/pubconf/kdcinfo.$RELM"
