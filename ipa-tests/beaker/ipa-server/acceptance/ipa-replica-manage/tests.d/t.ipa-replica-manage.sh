@@ -114,13 +114,13 @@ irm_envsetup()
 		rlRun "ipa host-add testhost1.$DOMAIN --force"
 		rlRun "ipa user-add testuser1 --first=First --last=Last"
 
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $MASTER_IP"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $BEAKERMASTER"
 		;;
 	SLAVE*)
 		rlLog "Machine in recipe is SLAVE ($SLAVE)"
 		rlRun "rhts-sync-set -s '$FUNCNAME.0' $(hostname -i)"
-		rlLog "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER_IP"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER_IP"
+		rlLog "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $BEAKERMASTER"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $BEAKERMASTER"
 		;;
 	CLIENT)
 		rlLog "Machine in recipe is CLIENT ($CLIENT)"
