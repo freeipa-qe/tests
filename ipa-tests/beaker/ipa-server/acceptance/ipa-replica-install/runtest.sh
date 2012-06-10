@@ -122,18 +122,18 @@ rlJournalStart
 
 			rhts-sync-set -s READY_REPLICA3 $BEAKERMASTER
 			rhts-sync-block -s DONE_REPLICA3 $BEAKERSLAVE
-
-			createReplica4
-
-			rhts-sync-set -s READY_REPLICA4 $BEAKERMASTER
-			rhts-sync-block -s DONE_REPLICA4 $BEAKERSLAVE
-
-			createReplica2
-
-			rhts-sync-set -s READY_REPLICA2 $BEAKERMASTER
-			rhts-sync-block -s DONE_REPLICA2 $BEAKERSLAVE
-	
-			replicaBugCheck_bz769545
+#
+#			createReplica4
+#
+#			rhts-sync-set -s READY_REPLICA4 $BEAKERMASTER
+#			rhts-sync-block -s DONE_REPLICA4 $BEAKERSLAVE
+#
+#			createReplica2
+#
+#			rhts-sync-set -s READY_REPLICA2 $BEAKERMASTER
+#			rhts-sync-block -s DONE_REPLICA2 $BEAKERSLAVE
+#	
+#			replicaBugCheck_bz769545
 
 		rlPhaseEnd
 
@@ -189,39 +189,39 @@ rlJournalStart
 			uninstall
 			rhts-sync-set -s DONE_REPLICA3 $BEAKERSLAVE
 			
-			rhts-sync-block -s READY_REPLICA4 $BEAKERMASTER
-			# Installing slave with --no-reverse
-			installSlave_nr
-			uninstall
-			rhts-sync-set -s DONE_REPLICA4 $BEAKERSLAVE
-
-			rhts-sync-block -s READY_REPLICA2 $BEAKERMASTER
-			# Installing with --ssh-trust-dns
-			installSlave_sshtrustdns
-			uninstall
-
-			# Installing with --configure-sshd
-			installSlave_configuresshd
-			uninstall
-
-			# Installing with --no-dns-sshfp
-			installSlave_nodnssshfp
-			uninstall
-
-			# Installing slave with --no-host-dns
-			installSlave_nhostdns
-			uninstall
-
-			# Installing slave with --no-ui-redirect
-			installSlave_nouiredirect
-			uninstall
-
-			# Installing slave with --setup-ca
-			installSlave_ca
-				
-			# Test other bugs not covered directly in above tests
-
-			rhts-sync-set -s DONE_REPLICA2 $BEAKERSLAVE
+#			rhts-sync-block -s READY_REPLICA4 $BEAKERMASTER
+#			# Installing slave with --no-reverse
+#			installSlave_nr
+#			uninstall
+#			rhts-sync-set -s DONE_REPLICA4 $BEAKERSLAVE
+#
+#			rhts-sync-block -s READY_REPLICA2 $BEAKERMASTER
+#			# Installing with --ssh-trust-dns
+#			installSlave_sshtrustdns
+#			uninstall
+#
+#			# Installing with --configure-sshd
+#			installSlave_configuresshd
+#			uninstall
+#
+#			# Installing with --no-dns-sshfp
+#			installSlave_nodnssshfp
+#			uninstall
+#
+#			# Installing slave with --no-host-dns
+#			installSlave_nhostdns
+#			uninstall
+#
+#			# Installing slave with --no-ui-redirect
+#			installSlave_nouiredirect
+#			uninstall
+#
+#			# Installing slave with --setup-ca
+#			installSlave_ca
+#				
+#			# Test other bugs not covered directly in above tests
+#
+#			rhts-sync-set -s DONE_REPLICA2 $BEAKERSLAVE
 		rlPhaseEnd
 
 		rlPhaseStartCleanup "ipa-ca-install: ipa-server clean up."
