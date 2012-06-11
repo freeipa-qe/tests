@@ -948,6 +948,7 @@ irm_forcesync_negative_0004()
 
 irm_reinitialize_positive_0001()
 {
+	local tmpout=/tmp/irm_msg.out
 	TESTORDER=$(( TESTORDER += 1 ))
 	rlPhaseStartTest "irm_reinitialize_positive_0001 - reinitialize Master from Replica1"
 	case "$MYROLE" in
@@ -978,6 +979,7 @@ irm_reinitialize_positive_0001()
 
 irm_reinitialize_positive_0002()
 {
+	local tmpout=/tmp/irm_msg.out
 	TESTORDER=$(( TESTORDER += 1 ))
 	rlPhaseStartTest "irm_reinitialize_positive_0002 - reinitialize Replica1 from Replica2"
 	case "$MYROLE" in
@@ -1012,6 +1014,7 @@ irm_reinitialize_positive_0002()
 
 irm_reinitialize_positive_0003()
 {
+	local tmpout=/tmp/irm_msg.out
 	TESTORDER=$(( TESTORDER += 1 ))
 	rlPhaseStartTest "irm_reinitialize_positive_0003 - reinitialize Replica2 from Master"
 	case "$MYROLE" in
@@ -1046,6 +1049,7 @@ irm_reinitialize_positive_0003()
 
 irm_reinitialize_positive_0004()
 {
+	local tmpout=/tmp/irm_msg.out
 	TESTORDER=$(( TESTORDER += 1 ))
 	rlPhaseStartTest "irm_reinitialize_positive_0004 - reinitialize Master from Replica1 with -H Host option"
 	case "$MYROLE" in
