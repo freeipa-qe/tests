@@ -1017,7 +1017,7 @@ check_coredump(){
                                 cd $dir
                                 /usr/bin/abrt-action-install-debuginfo -v;
                                 /usr/bin/abrt-action-generate-backtrace -v;
-                                /usr/bin/rhts-submit-log -l bactrace
+                                /usr/bin/rhts-submit-log -l backtrace
                                 /usr/bin/reporter-mailx -v
                         done
                 else
