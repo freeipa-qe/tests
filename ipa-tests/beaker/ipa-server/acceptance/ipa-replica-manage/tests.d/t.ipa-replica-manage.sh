@@ -60,12 +60,12 @@ reconnect_slave1()
 		fi
 		rlRun "ipa-replica-prepare -p $ADMINPW --ip-address=$SLAVE1_IP $SLAVE1"	
 
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.1' -m $MASTER"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $SLAVE1"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.1' -m $BEAKERMASTER"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $BEAKERSLAVE1"
 		;;
 	SLAVE1)
 		rlLog "Machine in recipe is SLAVE1 ($(hostname))"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $MASTER"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $BEAKERMASTER"
 
 		hostname_s=$(hostname -s)
 		rlRun "ipa-server-install --uninstall -U"
@@ -74,17 +74,17 @@ reconnect_slave1()
 		popd
 		rlRun "ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg"
 
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.2' -m $SLAVE1"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.2' -m $BEAKERSLAVE1"
 		;;
 	SLAVE*)
 		rlLog "Machine in recipe is SLAVE ($(hostname))"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $MASTER"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $SLAVE1"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $BEAKERMASTER"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $BEAKERSLAVE1"
 		;;
 	CLIENT)
 		rlLog "Machine in recipe is CLIENT ($CLIENT)"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $MASTER"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $SLAVE1"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $BEAKERMASTER"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $BEAKERSLAVE1"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
@@ -101,8 +101,8 @@ irm_envsetup()
 	case "$MYROLE" in
 	MASTER)
 		rlLog "Machine in recipe is MASTER ($(hostname))"
-		rlLog "rhts-sync-block -s '$FUNCNAME.0' $SLAVE1 $SLAVE2"
-		rlRun "rhts-sync-block -s '$FUNCNAME.0' $SLAVE1 $SLAVE2"
+		rlLog "rhts-sync-block -s '$FUNCNAME.0' $BEAKERSLAVE1 $BEAKERSLAVE2"
+		rlRun "rhts-sync-block -s '$FUNCNAME.0' $BEAKERSLAVE1 $BEAKERSLAVE2"
 		hostname_s=$(hostname -s)
 		rlLog "Tests to ensure that all of the servers are available"
 		rlRun "ipa-replica-manage --password=$ADMINPW list | grep $hostname_s"
@@ -116,6 +116,18 @@ irm_envsetup()
 
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $BEAKERMASTER"
 		;;
+	SLAVE1)
+		rlLog "Machine in recipe is SLAVE1 ($(hostname))"
+		rlRun "rhts-sync-set -s '$FUNCNAME.0' -m $BEAKERSLAVE1"
+		rlLog "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $BEAKERMASTER"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $BEAKERMASTER"
+		;;
+	SLAVE2)
+		rlLog "Machine in recipe is SLAVE2 ($(hostname))"
+		rlRun "rhts-sync-set -s '$FUNCNAME.0' -m $BEAKERSLAVE2"
+		rlLog "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $BEAKERMASTER"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $BEAKERMASTER"
+		;;
 	SLAVE*)
 		rlLog "Machine in recipe is SLAVE ($(hostname))"
 		rlRun "rhts-sync-set -s '$FUNCNAME.0' -m $(hostname)"
@@ -124,7 +136,7 @@ irm_envsetup()
 		;;
 	CLIENT)
 		rlLog "Machine in recipe is CLIENT ($CLIENT)"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $BEAKERMASTER"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
@@ -201,15 +213,15 @@ irm_envcleanup()
 	case "$MYROLE" in
 	MASTER)
 		rlLog "Machine in recipe is MASTER ($(hostname))"
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $MASTER"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $BEAKERMASTER"
 		;;
 	SLAVE*)
 		rlLog "Machine in recipe is SLAVE ($(hostname))"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $BEAKERMASTER"
 		;;
 	CLIENT)
 		rlLog "Machine in recipe is CLIENT ($CLIENT)"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $BEAKERMASTER"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
@@ -231,15 +243,15 @@ irm_version_0001()
 
 		rlRun "ipa-replica-manage --version | grep $IRMVERSION" 
 
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $MASTER"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $BEAKERMASTER"
 		;;
 	SLAVE*)
 		rlLog "Machine in recipe is SLAVE ($(hostname))"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $BEAKERMASTER"
 		;;
 	CLIENT)
 		rlLog "Machine in recipe is CLIENT ($CLIENT)"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $BEAKERMASTER"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
@@ -267,15 +279,15 @@ irm_list_positive_0001()
 
 		rlRun "ipa-replica-manage -p $ADMINPW list"
 
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $MASTER"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $BEAKERMASTER"
 		;;
 	SLAVE*)
 		rlLog "Machine in recipe is SLAVE ($(hostname))"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $BEAKERMASTER"
 		;;
 	CLIENT)
 		rlLog "Machine in recipe is CLIENT ($(hostname))"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $BEAKERMASTER"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
@@ -300,15 +312,15 @@ irm_list_positive_0002()
 		rlRun "ipa-replica-manage -p $ADMINPW list $SLAVE1|grep $MASTER"
 		rlRun "ipa-replica-manage -p $ADMINPW list $SLAVE2|grep $MASTER"
 
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $MASTER"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $BEAKERMASTER"
 		;;
 	SLAVE*)
 		rlLog "Machine in recipe is SLAVE ($(hostname))"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $BEAKERMASTER"
 		;;
 	CLIENT)
 		rlLog "Machine in recipe is CLIENT ($CLIENT)"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $BEAKERMASTER"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
@@ -335,15 +347,15 @@ irm_list_positive_0003()
 		rlAssertGrep "last update status" $tmpout
 		rlAssertGrep "last update ended" $tmpout
 	
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $MASTER"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $BEAKERMASTER"
 		;;
 	SLAVE*)
 		rlLog "Machine in recipe is SLAVE ($(hostname))"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $BEAKERMASTER"
 		;;
 	CLIENT)
 		rlLog "Machine in recipe is CLIENT ($CLIENT)"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $BEAKERMASTER"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
@@ -365,15 +377,15 @@ irm_list_positive_0004()
 		rlRun "ipa-replica-manage -p $ADMINPW list -H $SLAVE1 $MASTER | grep $SLAVE1"
 		rlRun "ipa-replica-manage -p $ADMINPW list -H $SLAVE2 $MASTER | grep $SLAVE2"
 
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $MASTER"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $BEAKERMASTER"
 		;;
 	SLAVE*)
 		rlLog "Machine in recipe is SLAVE ($(hostname))"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $BEAKERMASTER"
 		;;
 	CLIENT)
 		rlLog "Machine in recipe is CLIENT ($CLIENT)"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $BEAKERMASTER"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
@@ -401,15 +413,15 @@ irm_list_negative_0001()
 		rlRun "ipa-replica-manage -p $ADMINPW list $SLAVE1 > $tmpout 2>&1"
 		rlAssertNotGrep "$SLAVE2" $tmpout
 
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $MASTER"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $BEAKERMASTER"
 		;;
 	SLAVE*)
 		rlLog "Machine in recipe is SLAVE ($(hostname))"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $BEAKERMASTER"
 		;;
 	CLIENT)
 		rlLog "Machine in recipe is CLIENT ($CLIENT)"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $BEAKERMASTER"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
@@ -431,15 +443,15 @@ irm_list_negative_0002()
 		rlRun "ipa-replica-manage -p $ADMINPW list -H $SLAVE1 $SLAVE1 > $tmpout 2>&1"
 		rlAssertNotGrep "$SLAVE2" $tmpout
 
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $MASTER"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $BEAKERMASTER"
 		;;
 	SLAVE*)
 		rlLog "Machine in recipe is SLAVE ($(hostname))"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $BEAKERMASTER"
 		;;
 	CLIENT)
 		rlLog "Machine in recipe is CLIENT ($CLIENT)"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $BEAKERMASTER"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
@@ -461,15 +473,15 @@ irm_list_negative_0003()
 		rlRun "ipa-replica-manage -p $ADMINPW list dne.$DOMAIN > $tmpout 2>&1" 
 		rlAssertGrep "Cannot find dne.$DOMAIN in public server list" $tmpout
 
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $MASTER"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $BEAKERMASTER"
 		;;
 	SLAVE*)
 		rlLog "Machine in recipe is SLAVE ($(hostname))"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $BEAKERMASTER"
 		;;
 	CLIENT)
 		rlLog "Machine in recipe is CLIENT ($CLIENT)"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $BEAKERMASTER"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
@@ -490,13 +502,13 @@ irm_list_negative_0004()
 
 		rlRun "ipa-replica-prepare -p $ADMINPW --ip-address=$SLAVE2_IP $SLAVE2"	
 
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.1' -m $MASTER"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $SLAVE2"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.1' -m $BEAKERMASTER"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $BEAKERSLAVE2"
 		
 		rlRun "ipa-replica-manage -p $ADMINPW list $MASTER|grep $SLAVE2"
 		
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.3' -m $MASTER"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.4' $SLAVE2"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.3' -m $BEAKERMASTER"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.4' $BEAKERSLAVE2"
 
 		
 		if [ $(ipa-replica-manage -p $ADMINPW list $MASTER|grep $SLAVE2|wc -l) -gt 0 ]; then
@@ -506,11 +518,11 @@ irm_list_negative_0004()
 		fi
 		rlRun "ipa-replica-manage -p $ADMINPW list $MASTER"
 		
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.5' -m $MASTER"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.5' -m $BEAKERMASTER"
 		;;
 	SLAVE2)
 		rlLog "Machine in recipe is SLAVE2 ($(hostname))"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $MASTER"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $BEAKERMASTER"
 
 		hostname_s=$(hostname -s)
 		rlLog "First uninstall replica from $SLAVE2"
@@ -525,26 +537,32 @@ irm_list_negative_0004()
 		popd
 		rlRun "ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg"
 
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.2' -m $SLAVE2"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.3' $MASTER"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.2' -m $BEAKERSLAVE2"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.3' $BEAKERMASTER"
 
 		rlRun "ipa-server-install --uninstall -U"
 		if [ -f /var/lib/sss/pubconf/kdcinfo.$RELM ]; then
 			rlRun "rm /var/lib/sss/pubconf/kdcinfo.$RELM"
 		fi
 
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.4' -m $SLAVE2"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.5' $MASTER"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.4' -m $BEAKERSLAVE2"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.5' $BEAKERMASTER"
 		;;
 	SLAVE*)
 		rlLog "Machine in recipe is SLAVE ($(hostname))"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $MASTER"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $SLAVE2"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $BEAKERMASTER"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $BEAKERSLAVE2"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.3' $BEAKERMASTER"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.4' $BEAKERSLAVE2"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.5' $BEAKERMASTER"
 		;;
 	CLIENT)
 		rlLog "Machine in recipe is CLIENT ($CLIENT)"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $MASTER"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $SLAVE2"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $BEAKERMASTER"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $BEAKERSLAVE2"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.3' $BEAKERMASTER"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.4' $BEAKERSLAVE2"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.5' $BEAKERMASTER"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
@@ -568,15 +586,15 @@ irm_connect_positive_0001()
 		
 		rlRun "ipa-replica-manage -p $ADMINPW connect $SLAVE1 $SLAVE2"
 
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $MASTER"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $BEAKERMASTER"
 		;;
 	SLAVE*)
 		rlLog "Machine in recipe is SLAVE ($(hostname))"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $BEAKERMASTER"
 		;;
 	CLIENT)
 		rlLog "Machine in recipe is CLIENT ($CLIENT)"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $BEAKERMASTER"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
@@ -592,29 +610,29 @@ irm_connect_positive_0002()
 	case "$MYROLE" in
 	MASTER)
 		rlLog "Machine in recipe is MASTER ($(hostname))"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $SLAVE1"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $SLAVE2"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $BEAKERSLAVE1"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $BEAKERSLAVE2"
 		;;
 	SLAVE1)
 		rlLog "Machine in recipe is SLAVE1 ($(hostname))"
 		
 		rlRun "ipa group-add testgroup1 --desc=testgroup1"
 
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.1' -m $SLAVE1"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $SLAVE2"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.1' -m $BEAKERSLAVE1"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $BEAKERSLAVE2"
 		;;
 	SLAVE2)
 		rlLog "Machine in recipe is SLAVE2 ($(hostname))"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $SLAVE1"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $BEAKERSLAVE1"
 		
 		rlRun "ipa group-show testgroup1|grep testgroup1" 
 
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.2' -m $SLAVE2"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.2' -m $BEAKERSLAVE2"
 		;;
 	CLIENT)
 		rlLog "Machine in recipe is CLIENT ($CLIENT)"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $SLAVE1"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $SLAVE2"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $BEAKERSLAVE1"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $BEAKERSLAVE2"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
@@ -643,15 +661,15 @@ irm_connect_negative_0001()
 		rlRun "ipa-replica-manage -p $ADMINPW connect $SLAVE1 $SLAVE2 > $tmpout 2>&1" 1
 		rlAssertGrep "A replication agreement to $SLAVE2 already exists" $tmpout
 		
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $MASTER"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $BEAKERMASTER"
 		;;
 	SLAVE*)
 		rlLog "Machine in recipe is SLAVE ($(hostname))"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $BEAKERMASTER"
 		;;
 	CLIENT)
 		rlLog "Machine in recipe is CLIENT ($CLIENT)"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $BEAKERMASTER"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
@@ -673,15 +691,15 @@ irm_connect_negative_0002()
 		rlRun "ipa-replica-manage -p $ADMINPW connect $MASTER dne.$DOMAIN > $tmpout 2>&1" 
 		rlAssertGrep "Can't contact LDAP server" $tmpout
 
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $MASTER"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $BEAKERMASTER"
 		;;
 	SLAVE*)
 		rlLog "Machine in recipe is SLAVE ($(hostname))"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $BEAKERMASTER"
 		;;
 	CLIENT)
 		rlLog "Machine in recipe is CLIENT ($CLIENT)"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $BEAKERMASTER"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
@@ -707,15 +725,15 @@ irm_forcesync_positive_0001()
 
 		rlRun "ipa-replica-manage -p $ADMINPW force-sync --from=$SLAVE1"
 
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $MASTER"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $BEAKERMASTER"
 		;;
 	SLAVE*)
 		rlLog "Machine in recipe is SLAVE ($(hostname))"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $BEAKERMASTER"
 		;;
 	CLIENT)
 		rlLog "Machine in recipe is CLIENT ($CLIENT)"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $BEAKERMASTER"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
@@ -731,22 +749,22 @@ irm_forcesync_positive_0002()
 	case "$MYROLE" in
 	MASTER)
 		rlLog "Machine in recipe is MASTER ($(hostname))"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $SLAVE1"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $BEAKERSLAVE1"
 		;;
 	SLAVE1)
 		rlLog "Machine in recipe is SLAVE ($(hostname))"
 		
 		rlRun "ipa-replica-manage -p $ADMINPW force-sync --from=$SLAVE2"
 		
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $(hostname -i)"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $BEAKERSLAVE1"
 		;;
 	SLAVE*)
 		rlLog "Machine in recipe is SLAVE ($(hostname))"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $SLAVE1"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $BEAKERSLAVE1"
 		;;
 	CLIENT)
 		rlLog "Machine in recipe is CLIENT ($CLIENT)"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $SLAVE1"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $BEAKERSLAVE1"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
@@ -762,22 +780,22 @@ irm_forcesync_positive_0003()
 	case "$MYROLE" in
 	MASTER)
 		rlLog "Machine in recipe is MASTER ($(hostname))"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $SLAVE2"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $BEAKERSLAVE2"
 		;;
 	SLAVE2)
 		rlLog "Machine in recipe is SLAVE2 ($(hostname))"
 
 		rlRun "ipa-replica-manage -p $ADMINPW force-sync --from=$MASTER"
 		
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $(hostname -i)"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $BEAKERSLAVE2"
 		;;
 	SLAVE*)
 		rlLog "Machine in recipe is SLAVE ($(hostname))"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $SLAVE2"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $BEAKERSLAVE2"
 		;;
 	CLIENT)
 		rlLog "Machine in recipe is CLIENT ($CLIENT)"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $SLAVE2"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $BEAKERSLAVE2"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
@@ -806,15 +824,15 @@ irm_forcesync_negative_0001()
 		rlRun "ipa-replica-manage -p $ADMINPW force-sync > $tmpout 2>&1" 1
 		rlAssertGrep "force-sync requires the option --from <host name>" $tmpout
 
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $MASTER"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $BEAKERMASTER"
 		;;
 	SLAVE*)
 		rlLog "Machine in recipe is SLAVE ($(hostname))"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $BEAKERMASTER"
 		;;
 	CLIENT)
 		rlLog "Machine in recipe is CLIENT ($CLIENT)"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $BEAKERMASTER"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
@@ -837,15 +855,15 @@ irm_forcesync_negative_0002()
 		rlRun "ipa-replica-manage -p $ADMINPW force-sync --from=$MASTER > $tmpout 2>&1" 1
 		rlAssertGrep "'$MASTER' has no replication agreement for '$MASTER'" $tmpout
 
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $MASTER"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $BEAKERMASTER"
 		;;
 	SLAVE*)
 		rlLog "Machine in recipe is SLAVE ($(hostname))"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $BEAKERMASTER"
 		;;
 	CLIENT)
 		rlLog "Machine in recipe is CLIENT ($CLIENT)"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $BEAKERMASTER"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
@@ -868,15 +886,15 @@ irm_forcesync_negative_0003()
 		rlRun "ipa-replica-manage -p $ADMINPW force-sync --from=dne.$DOMAIN > $tmpout 2>&1" 1
 		rlAssertGrep "'$MASTER' has no replication agreement for 'dne.$DOMAIN'" $tmpout
 
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $MASTER"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $BEAKERMASTER"
 		;;
 	SLAVE*)
 		rlLog "Machine in recipe is SLAVE ($(hostname))"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $BEAKERMASTER"
 		;;
 	CLIENT)
 		rlLog "Machine in recipe is CLIENT ($CLIENT)"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $BEAKERMASTER"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
@@ -896,7 +914,7 @@ irm_forcesync_negative_0004()
 	case "$MYROLE" in
 	MASTER)
 		rlLog "Machine in recipe is MASTER ($(hostname))"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $SLAVE2"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $BEAKERSLAVE2"
 		;;
 	SLAVE2)
 		rlLog "Machine in recipe is SLAVE2 ($(hostname))"
@@ -904,15 +922,15 @@ irm_forcesync_negative_0004()
 		rlRun "ipa-replica-manage -p $ADMINPW force-sync --from=$MASTER > $tmpout 2>&1" 1
 		rlAssertGrep "'$SLAVE2' has no replication agreement for '$MASTER'" $tmpout
 
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $SLAVE2"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $BEAKERSLAVE2"
 		;;
 	SLAVE*)
 		rlLog "Machine in recipe is SLAVE ($(hostname))"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $SLAVE2"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $BEAKERSLAVE2"
 		;;
 	CLIENT)
 		rlLog "Machine in recipe is CLIENT ($CLIENT)"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $SLAVE2"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $BEAKERSLAVE2"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
@@ -940,15 +958,15 @@ irm_reinitialize_positive_0001()
 		rlRun "cat $tmpout"
 		rlAssertGrep "Update succeeded" $tmpout
 
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $MASTER"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $BEAKERMASTER"
 		;;
 	SLAVE*)
 		rlLog "Machine in recipe is SLAVE ($(hostname))"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $BEAKERMASTER"
 		;;
 	CLIENT)
 		rlLog "Machine in recipe is CLIENT ($CLIENT)"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $BEAKERMASTER"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
@@ -965,7 +983,7 @@ irm_reinitialize_positive_0002()
 	case "$MYROLE" in
 	MASTER)
 		rlLog "Machine in recipe is MASTER ($(hostname))"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $SLAVE1"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $BEAKERSLAVE1"
 		;;
 	SLAVE1)
 		rlLog "Machine in recipe is SLAVE ($(hostname))"
@@ -974,15 +992,15 @@ irm_reinitialize_positive_0002()
 		rlRun "cat $tmpout"
 		rlAssertGrep "Update succeeded" $tmpout
 
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $SLAVE1"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $BEAKERSLAVE1"
 		;;
 	SLAVE*)
 		rlLog "Machine in recipe is SLAVE ($(hostname))"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $SLAVE1"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $BEAKERSLAVE1"
 		;;
 	CLIENT)
 		rlLog "Machine in recipe is CLIENT ($CLIENT)"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $SLAVE1"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $BEAKERSLAVE1"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
@@ -999,7 +1017,7 @@ irm_reinitialize_positive_0003()
 	case "$MYROLE" in
 	MASTER)
 		rlLog "Machine in recipe is MASTER ($(hostname))"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $SLAVE2"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $BEAKERSLAVE2"
 		;;
 	SLAVE2)
 		rlLog "Machine in recipe is SLAVE ($(hostname))"
@@ -1008,15 +1026,15 @@ irm_reinitialize_positive_0003()
 		rlRun "cat $tmpout"
 		rlAssertGrep "Update succeeded" $tmpout
 
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $SLAVE2"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $BEAKERSLAVE2"
 		;;
 	SLAVE*)
 		rlLog "Machine in recipe is SLAVE ($(hostname))"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $SLAVE2"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $BEAKERSLAVE2"
 		;;
 	CLIENT)
 		rlLog "Machine in recipe is CLIENT ($CLIENT)"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $SLAVE2"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $BEAKERSLAVE2"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
@@ -1033,7 +1051,7 @@ irm_reinitialize_positive_0004()
 	case "$MYROLE" in
 	MASTER)
 		rlLog "Machine in recipe is MASTER ($(hostname))"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $SLAVE1"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $BEAKERSLAVE1"
 		;;
 	SLAVE1)
 		rlLog "Machine in recipe is SLAVE1 ($(hostname))"
@@ -1042,15 +1060,15 @@ irm_reinitialize_positive_0004()
 		rlRun "cat $tmpout"
 		rlAssertGrep "Update succeeded" $tmpout
 
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $SLAVE1"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $BEAKERSLAVE1"
 		;;
 	SLAVE*)
 		rlLog "Machine in recipe is SLAVE ($(hostname))"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $SLAVE1"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $BEAKERSLAVE1"
 		;;
 	CLIENT)
 		rlLog "Machine in recipe is CLIENT ($CLIENT)"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $SLAVE1"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $BEAKERSLAVE1"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
@@ -1078,15 +1096,15 @@ irm_reinitialize_negative_0001()
 		rlRun "ipa-replica-manage -p $ADMINPW re-initialize > $tmpout 2>&1" 1
 		rlAssertGrep "re-initialize requires the option --from <host name>" $tmpout
 
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $MASTER"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $BEAKERMASTER"
 		;;
 	SLAVE*)
 		rlLog "Machine in recipe is SLAVE ($(hostname))"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $BEAKERMASTER"
 		;;
 	CLIENT)
 		rlLog "Machine in recipe is CLIENT ($CLIENT)"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $BEAKERMASTER"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
@@ -1108,15 +1126,15 @@ irm_reinitialize_negative_0002()
 		rlRun "ipa-replica-manage -p $ADMINPW re-initialize --from=$MASTER > $tmpout 2>&1" 1
 		rlAssertGrep "'$MASTER' has no replication agreement for '$MASTER'" $tmpout
 
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $MASTER"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $BEAKERMASTER"
 		;;
 	SLAVE*)
 		rlLog "Machine in recipe is SLAVE ($(hostname))"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $BEAKERMASTER"
 		;;
 	CLIENT)
 		rlLog "Machine in recipe is CLIENT ($CLIENT)"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $BEAKERMASTER"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
@@ -1138,15 +1156,15 @@ irm_reinitialize_negative_0003()
 		rlRun "ipa-replica-manage -p $ADMINPW re-initialize --from=dne.$DOMAIN > $tmpout 2>&1" 1
 		rlAssertGrep "'$MASTER' has no replication agreement for 'dne.$DOMAIN'" $tmpout
 
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $MASTER"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $BEAKERMASTER"
 		;;
 	SLAVE*)
 		rlLog "Machine in recipe is SLAVE ($(hostname))"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $BEAKERMASTER"
 		;;
 	CLIENT)
 		rlLog "Machine in recipe is CLIENT ($CLIENT)"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $BEAKERMASTER"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
@@ -1165,7 +1183,7 @@ irm_reinitialize_negative_0004()
 	case "$MYROLE" in
 	MASTER)
 		rlLog "Machine in recipe is MASTER ($(hostname))"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $SLAVE2"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $BEAKERSLAVE2"
 		;;
 	SLAVE2)
 		rlLog "Machine in recipe is SLAVE ($(hostname))"
@@ -1173,15 +1191,15 @@ irm_reinitialize_negative_0004()
 		rlRun "ipa-replica-manage -p $ADMINPW re-initialize --from=$MASTER > $tmpout 2>&1" 1
 		rlAssertGrep "'$SLAVE2' has no replication agreement for '$MASTER'" $tmpout
 
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $SLAVE2"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $BEAKERSLAVE2"
 		;;
 	SLAVE*)
 		rlLog "Machine in recipe is SLAVE ($(hostname))"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $SLAVE2"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $BEAKERSLAVE2"
 		;;
 	CLIENT)
 		rlLog "Machine in recipe is CLIENT ($CLIENT)"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $SLAVE2"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $BEAKERSLAVE2"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
@@ -1211,15 +1229,15 @@ irm_disconnect_positive_0001()
 		rlRun "ipa-replica-manage -p $ADMINPW list $SLAVE1 | grep -v $SLAVE2"
 		rlRun "ipa-replica-manage -p $ADMINPW list $SLAVE2 | grep -v $SLAVE1"
 
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $MASTER"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $BEAKERMASTER"
 		;;
 	SLAVE*)
 		rlLog "Machine in recipe is SLAVE ($(hostname))"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $BEAKERMASTER"
 		;;
 	CLIENT)
 		rlLog "Machine in recipe is CLIENT ($CLIENT)"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $BEAKERMASTER"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
@@ -1243,15 +1261,15 @@ irm_disconnect_positive_0002()
 		rlAssertGrep "Deleted replication agreement from '$SLAVE1' to '$SLAVE2'" $tmpout
 		rlRun "ipa-replica-manage -p $ADMINPW list $MASTER | grep -v $SLAVE1"
 
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $MASTER"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $BEAKERMASTER"
 		;;
 	SLAVE*)
 		rlLog "Machine in recipe is SLAVE ($(hostname))"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $BEAKERMASTER"
 		;;
 	CLIENT)
 		rlLog "Machine in recipe is CLIENT ($CLIENT)"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $BEAKERMASTER"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
@@ -1275,7 +1293,7 @@ irm_disconnect_negative_0001()
 	case "$MYROLE" in
 	MASTER)
 		rlLog "Machine in recipe is MASTER ($(hostname))"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $SLAVE1"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $BEAKERSLAVE1"
 		;;
 	SLAVE1)
 		rlLog "Machine in recipe is SLAVE1 ($(hostname))"
@@ -1288,15 +1306,15 @@ irm_disconnect_negative_0001()
 		rlRun "ipa-replica-manage -p $ADMINPW disconnect $SLAVE1 $SLAVE2 > $tmpout 2>&1" 
 		rlAssertGrep "'$SLAVE1' has no replication agreement for '$SLAVE2'" $tmpout
 
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $SLAVE1"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $BEAKERSLAVE1"
 		;;
 	SLAVE*)
 		rlLog "Machine in recipe is SLAVE ($(hostname))"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $SLAVE1"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $BEAKERSLAVE1"
 		;;
 	CLIENT)
 		rlLog "Machine in recipe is CLIENT ($CLIENT)"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $BEAKERMASTER"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
@@ -1318,15 +1336,15 @@ irm_disconnect_negative_0002()
 		rlRun "ipa-replica-manage -p $ADMINPW disconnect $MASTER dne.$DOMAIN > $tmpout 2>&1" 
 		rlAssertGrep "'$MASTER' has no replication agreement for 'dne.$DOMAIN'" $tmpout
 	
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $MASTER"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $BEAKERMASTER"
 		;;
 	SLAVE*)
 		rlLog "Machine in recipe is SLAVE ($(hostname))"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $BEAKERMASTER"
 		;;
 	CLIENT)
 		rlLog "Machine in recipe is CLIENT ($CLIENT)"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $BEAKERMASTER"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
@@ -1349,15 +1367,15 @@ irm_disconnect_negative_0003()
 		rlAssertGrep "Cannot remove the last replication link of '$MASTER'" $tmpout
 		rlAssertGrep "Please use the 'del' command to remove it from the domain" $tmpout
 
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $MASTER"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $BEAKERMASTER"
 		;;
 	SLAVE*)
 		rlLog "Machine in recipe is SLAVE ($(hostname))"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $BEAKERMASTER"
 		;;
 	CLIENT)
 		rlLog "Machine in recipe is CLIENT ($CLIENT)"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $BEAKERMASTER"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
@@ -1378,26 +1396,26 @@ irm_disconnect_negative_0004()
 
 		rlRun "ipa host-del testhost1.$DOMAIN" 
 
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.1' -m $MASTER"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $SLAVE1"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.1' -m $BEAKERMASTER"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $BEAKERSLAVE1"
 		;;
 	SLAVE1)
 		rlLog "Machine in recipe is SLAVE1 ($(hostname))"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $MASTER"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $BEAKERMASTER"
 
 		rlRun "ipa host-show testhost1.$DOMAIN | grep testhost1.$DOMAIN" 
 		
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.2' -m $SLAVE1"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.2' -m $BEAKERSLAVE1"
 		;;
 	SLAVE*)
 		rlLog "Machine in recipe is SLAVE ($(hostname))"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $MASTER"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $SLAVE1"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $BEAKERMASTER"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $BEAKERSLAVE1"
 		;;
 	CLIENT)
 		rlLog "Machine in recipe is CLIENT ($CLIENT)"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $MASTER"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $SLAVE1"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $BEAKERMASTER"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $BEAKERSLAVE1"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
@@ -1415,30 +1433,30 @@ irm_disconnect_negative_0005()
 	case "$MYROLE" in
 	MASTER)
 		rlLog "Machine in recipe is MASTER ($(hostname))"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $SLAVE1"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $BEAKERSLAVE1"
 
 		rlRun "ipa host-show testhost2.$DOMAIN > $tmpout 2>&1" 2 
 		rlAssertGrep "ipa: ERROR: testhost2.$DOMAIN: host not found" $tmpout
 		
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.2' -m $MASTER"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.2' -m $BEAKERMASTER"
 		;;
 	SLAVE1)
 		rlLog "Machine in recipe is SLAVE ($(hostname))"
 
 		rlRun "ipa host-add testhost2.$DOMAIN --force"		
 
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.1' -m $SLAVE1"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $MASTER"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.1' -m $BEAKERSLAVE1"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $BEAKERMASTER"
 		;;
 	SLAVE*)
 		rlLog "Machine in recipe is SLAVE ($(hostname))"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $SLAVE1"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $MASTER"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $BEAKERSLAVE1"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $BEAKERMASTER"
 		;;
 	CLIENT)
 		rlLog "Machine in recipe is CLIENT ($CLIENT)"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $SLAVE1"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $MASTER"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $BEAKERSLAVE1"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $BEAKERMASTER"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
@@ -1465,15 +1483,15 @@ irm_del_positive_0001()
 		rlRun "ipa-replica-manage -p $ADMINPW list $MASTER | grep -v $SLAVE2"
 		rlRun "ipa host-show $SLAVE2" 2
 
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $MASTER"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $BEAKERMASTER"
 		;;
 	SLAVE*)
 		rlLog "Machine in recipe is SLAVE ($(hostname))"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $BEAKERMASTER"
 		;;
 	CLIENT)
 		rlLog "Machine in recipe is CLIENT ($CLIENT)"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $BEAKERMASTER"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
@@ -1504,16 +1522,16 @@ irm_del_negative_0001()
 		rlRun "ipa-replica-manage -p $ADMINPW del $SLAVE2 > $tmpout 2>&1" 1
 		rlAssertGrep "'$MASTER' has no replication agreement for '$SLAVE2'" $tmpout
 
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $MASTER"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $BEAKERMASTER"
 		
 		;;
 	SLAVE*)
 		rlLog "Machine in recipe is SLAVE ($(hostname))"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $BEAKERMASTER"
 		;;
 	CLIENT)
 		rlLog "Machine in recipe is CLIENT ($CLIENT)"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $BEAKERMASTER"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
@@ -1535,15 +1553,15 @@ irm_del_negative_0002()
 		rlRun "ipa-replica-manage -p $ADMINPW del dne.$DOMAIN > $tmpout 2>&1" 1
 		rlAssertGrep "'$MASTER' has no replication agreement for 'dne.$DOMAIN'" $tmpout
 		
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $MASTER"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $BEAKERMASTER"
 		;;
 	SLAVE*)
 		rlLog "Machine in recipe is SLAVE ($(hostname))"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $BEAKERMASTER"
 		;;
 	CLIENT)
 		rlLog "Machine in recipe is CLIENT ($CLIENT)"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $BEAKERMASTER"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
@@ -1564,26 +1582,26 @@ irm_del_negative_0003()
 		
 		rlRun "ipa user-add testuser2 --first=First --last=Last"
 
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.1' -m $MASTER"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $SLAVE2"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.1' -m $BEAKERMASTER"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $BEAKERSLAVE2"
 		;;
 	SLAVE2)
 		rlLog "Machine in recipe is SLAVE2 ($(hostname))"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $MASTER"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $BEAKERMASTER"
 		
 		rlRun "ipa user-show testuser2|grep testuser2" 1
 
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.2' -m $SLAVE2"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.2' -m $BEAKERSLAVE2"
 		;;
 	SLAVE*)
 		rlLog "Machine in recipe is SLAVE ($(hostname))"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $MASTER"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $SLAVE2"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $BEAKERMASTER"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $BEAKERSLAVE2"
 		;;
 	CLIENT)
 		rlLog "Machine in recipe is CLIENT ($CLIENT)"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $MASTER"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $SLAVE2"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $BEAKERMASTER"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $BEAKERSLAVE2"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
@@ -1601,29 +1619,29 @@ irm_del_negative_0004()
 	case "$MYROLE" in
 	MASTER)
 		rlLog "Machine in recipe is MASTER ($(hostname))"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $SLAVE2"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $BEAKERSLAVE2"
 
 		rlRun "ipa user-show testuser1|grep testuser1" 
 
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.2' -m $MASTER"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.2' -m $BEAKERMASTER"
 		;;
 	SLAVE2)
 		rlLog "Machine in recipe is SLAVE2 ($(hostname))"
 		
 		rlRun "ipa user-del testuser1"	
 		
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.1' -m $SLAVE2"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $MASTER"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.1' -m $BEAKERSLAVE2"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $BEAKERMASTER"
 		;;
 	SLAVE*)
 		rlLog "Machine in recipe is SLAVE ($(hostname))"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $SLAVE2"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $MASTER"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $BEAKERSLAVE2"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $BEAKERMASTER"
 		;;
 	CLIENT)
 		rlLog "Machine in recipe is CLIENT ($CLIENT)"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $SLAVE2"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $MASTER"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $BEAKERSLAVE2"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $BEAKERMASTER"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
