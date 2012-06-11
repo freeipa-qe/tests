@@ -57,6 +57,13 @@ rlJournalStart
 	echo "export BEAKERCLIENT=$CLIENT" >> /dev/shm/env.sh
 	echo "export BEAKERCLIENT2=$CLIENT2" >> /dev/shm/env.sh
 
+	I=0
+	for S in $SLAVE; do
+		I=$(( I += 1 ))
+		echo "export BEAKERSLAVE${I}=$S" >> /dev/shm/env.sh
+		echo "export BEAKERSLAVE${I}IP=$(dig +noquestion +short $S)" >> /dev/shm/env.sh
+	done
+
 	cat /etc/redhat-release | grep "Fedora"
 	if [ $? -eq 0 ] ; then
 		FLAVOR="Fedora"
