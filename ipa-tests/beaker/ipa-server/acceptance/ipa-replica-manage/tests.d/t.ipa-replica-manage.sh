@@ -535,7 +535,7 @@ irm_list_negative_0004()
 			rlRun "rm /var/lib/sss/pubconf/kdcinfo.$RELM"
 		fi
 		rlRun "cp /etc/resolv.conf /etc/resolv.conf.irm_list_negative_0004.backup"
-		rlRun "echo \"nameserver $MASTER_IP\" > /etc/resolv.conf
+		rlRun "echo \"nameserver $MASTER_IP\" > /etc/resolv.conf"
 
 		rlLog "Next re-install replica on $SLAVE2"
 		pushd /dev/shm
