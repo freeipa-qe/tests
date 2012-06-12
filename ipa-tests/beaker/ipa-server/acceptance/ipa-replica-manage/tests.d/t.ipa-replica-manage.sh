@@ -103,6 +103,7 @@ irm_envsetup()
 		rlLog "Machine in recipe is MASTER ($(hostname))"
 		rlLog "rhts-sync-block -s '$FUNCNAME.0' $BEAKERSLAVE1 $BEAKERSLAVE2"
 		rlRun "rhts-sync-block -s '$FUNCNAME.0' $BEAKERSLAVE1 $BEAKERSLAVE2"
+		rlRun "KinitAsAdmin"
 		hostname_s=$(hostname -s)
 		rlLog "Tests to ensure that all of the servers are available"
 		rlRun "ipa-replica-manage --password=$ADMINPW list | grep $hostname_s"
