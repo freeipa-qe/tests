@@ -1263,7 +1263,7 @@ irm_disconnect_positive_0002()
 
 		rlRun "ipa-replica-manage -p $ADMINPW disconnect $MASTER $SLAVE1 > $tmpout 2>&1"
 		rlRun "cat $tmpout"
-		rlAssertGrep "Deleted replication agreement from '$SLAVE1' to '$SLAVE2'" $tmpout
+		rlAssertGrep "Deleted replication agreement from '$MASTER' to '$SLAVE1'" $tmpout
 		rlRun "ipa-replica-manage -p $ADMINPW list $MASTER | grep -v $SLAVE1"
 
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $BEAKERMASTER"
