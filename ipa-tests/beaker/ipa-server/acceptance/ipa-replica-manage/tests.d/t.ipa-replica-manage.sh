@@ -502,6 +502,9 @@ irm_list_negative_0004()
 		rlLog "Machine in recipe is MASTER ($(hostname))"
 
 		rlRun "ipa-replica-prepare -p $ADMINPW --ip-address=$SLAVE2_IP $SLAVE2"	
+		rlRun "service named restart"
+		rlRun "ipa dnsrecord-find $DOMAIN"
+		rlRun "dig +short +noquestion $SLAVE2"
 
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.1' -m $BEAKERMASTER"
 		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $BEAKERSLAVE2"
@@ -531,12 +534,14 @@ irm_list_negative_0004()
 		if [ -f /var/lib/sss/pubconf/kdcinfo.$RELM ]; then
 			rlRun "rm /var/lib/sss/pubconf/kdcinfo.$RELM"
 		fi
+		rlRun "cp /etc/resolv.conf /etc/resolv.conf.irm_list_negative_0004.backup"
+		rlRun "echo \"nameserver $MASTER_IP\" > /etc/resolv.conf
 
 		rlLog "Next re-install replica on $SLAVE2"
 		pushd /dev/shm
 		rlRun "sftp root@$MASTER:/var/lib/ipa/replica-info-$hostname_s.$DOMAIN.gpg"
 		popd
-		rlRun "ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg"
+		rlRun "ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD --ip-address=$SLAVE2_IP -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg"
 
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.2' -m $BEAKERSLAVE2"
 		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.3' $BEAKERMASTER"
@@ -1485,6 +1490,7 @@ irm_del_positive_0001()
 		rlLog "Machine in recipe is MASTER ($(hostname))"
 		
 		rlRun "ipa-replica-manage -p $ADMINPW del $SLAVE2 -f"
+		sleep 10
 		rlRun "ipa-replica-manage -p $ADMINPW list $MASTER | grep -v $SLAVE2"
 		rlRun "ipa host-show $SLAVE2" 2
 
