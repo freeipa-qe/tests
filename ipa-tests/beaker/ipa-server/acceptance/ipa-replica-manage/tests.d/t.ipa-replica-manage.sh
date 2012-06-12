@@ -531,6 +531,10 @@ irm_list_negative_0004()
 		hostname_s=$(hostname -s)
 		rlLog "First uninstall replica from $SLAVE2"
 		rlRun "ipa-server-install --uninstall -U"
+		if [ $(ps -ef|grep "[s]ssd.*$DOMAIN"|wc -l) -gt 0 ]; then
+			rlLog "SSSD not stopped by uninstall...manually stopping"
+			rlRun "service sssd stop"
+		fi
 		if [ -f /var/lib/sss/pubconf/kdcinfo.$RELM ]; then
 			rlRun "rm /var/lib/sss/pubconf/kdcinfo.$RELM"
 		fi
