@@ -32,11 +32,7 @@
 			<task name="/CoreOS/ipa-server/shared" role="STANDALONE">
 				<params/>
 			</task>
-			<task name="/CoreOS/ipa-server/acceptance/ipa-krblockout" role="MASTER">
-				<params/>
-			</task>
-
-		<task name="/distribution/pkginstall" role="STANDALONE">
+			<task name="/distribution/pkginstall" role="STANDALONE">
 				<params>
 					<param name="PKGARGNAME" value="expect krb5-workstation ntpdate"/>
 				</params>
@@ -45,6 +41,10 @@
 			<task name="/CoreOS/ipa-server/acceptance/quickinstall" role="MASTER">
 				<params/>
 			</task>
+			<task name="/CoreOS/ipa-server/acceptance/ipa-krblockout" role="MASTER">
+				<params/>
+			</task>
+
 		</recipe>
 		<recipe kernel_options="" kernel_options_post="" ks_meta="" role="SLAVE" whiteboard="SLAVE for IPA Client Install Tests">
 			<autopick random="false"/>
