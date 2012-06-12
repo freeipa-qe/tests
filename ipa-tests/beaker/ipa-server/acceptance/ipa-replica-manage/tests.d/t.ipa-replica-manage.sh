@@ -630,7 +630,6 @@ irm_connect_positive_0002()
 	SLAVE2)
 		rlLog "Machine in recipe is SLAVE2 ($(hostname))"
 		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $BEAKERSLAVE1"
-		
 		sleep 10
 		rlRun "ipa group-show testgroup1|grep testgroup1" 
 
@@ -1491,8 +1490,15 @@ irm_del_positive_0001()
 		rlLog "Machine in recipe is MASTER ($(hostname))"
 		
 		rlRun "ipa-replica-manage -p $ADMINPW del $SLAVE2 -f"
-		sleep 10
+		rlRun "sleep 10"
 		rlRun "ipa-replica-manage -p $ADMINPW list $MASTER | grep -v $SLAVE2"
+		rlRun "ipa-replica-manage -p $ADMINPW list $MASTER"
+		if [ $(ipa-replica-manage -p $ADMINPW list $MASTER|grep $SLAVE2|wc -l) -gt 0 ]; then
+			rlFail "ipa-replica-manage still listing deleted replica $MASTER to $SLAVE2"
+		else
+			rlPass "ipa-replica-manage reporting that $SLAVE2 no longer a replica of $MASTER"
+		fi
+			
 		rlRun "ipa host-show $SLAVE2" 2
 
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $BEAKERMASTER"
