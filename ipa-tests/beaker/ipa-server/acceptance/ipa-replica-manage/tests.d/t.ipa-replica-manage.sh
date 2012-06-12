@@ -631,6 +631,7 @@ irm_connect_positive_0002()
 		rlLog "Machine in recipe is SLAVE2 ($(hostname))"
 		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $BEAKERSLAVE1"
 		
+		sleep 10
 		rlRun "ipa group-show testgroup1|grep testgroup1" 
 
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.2' -m $BEAKERSLAVE2"
