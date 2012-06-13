@@ -114,7 +114,7 @@ reconnect_slave1()
 {
 	local tmpout=/tmp/errormsg.out
 	TESTORDER=$(( TESTORDER += 1 ))
-	rlPhaseStartTest "irm_list_negative_0004 - After uninstalling replica - Bug 754739"
+	rlPhaseStartTest "reconnect_slave1 - replica prepare, uninstall and re-install to reconnect"
 	case "$MYROLE" in
 	MASTER)
 		rlLog "Machine in recipe is MASTER ($(hostname))"
@@ -184,7 +184,7 @@ reconnect_slave2()
 {
 	local tmpout=/tmp/errormsg.out
 	TESTORDER=$(( TESTORDER += 1 ))
-	rlPhaseStartTest "irm_list_negative_0004 - After uninstalling replica - Bug 754739"
+	rlPhaseStartTest "reconnect_slave2 - replica prepare, uninstall and re-install to reconnect"
 	case "$MYROLE" in
 	MASTER)
 		rlLog "Machine in recipe is MASTER ($(hostname))"
