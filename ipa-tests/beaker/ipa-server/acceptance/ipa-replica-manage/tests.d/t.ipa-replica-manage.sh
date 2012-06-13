@@ -43,48 +43,204 @@
 # test suite
 ######################################################################
 
+irm_run()
+{
+	irm_version_0001
+
+	irm_list_positive_0001
+	irm_list_positive_0002
+	irm_list_positive_0003
+	irm_list_positive_0004
+
+	irm_list_negative_0001
+	irm_list_negative_0002
+	irm_list_negative_0003
+
+	irm_connect_positive_0001
+	irm_connect_positive_0002
+
+	irm_connect_negative_0001
+	irm_connect_negative_0002
+
+	irm_forcesync_positive_0001
+	irm_forcesync_positive_0002
+	irm_forcesync_positive_0003
+
+	irm_forcesync_negative_0001
+	irm_forcesync_negative_0002
+	irm_forcesync_negative_0003
+
+	irm_reinitialize_positive_0001
+	irm_reinitialize_positive_0002
+	irm_reinitialize_positive_0003
+	irm_reinitialize_positive_0004
+
+	irm_reinitialize_negative_0001
+	irm_reinitialize_negative_0002
+	irm_reinitialize_negative_0003
+	
+	irm_del_positive_0001
+	irm_del_positive_0002
+
+	reconnect_slave1
+	reconnect_slave2
+
+	irm_connect_positive_0003
+
+	irm_disconnect_positive_0001
+	irm_disconnect_positive_0002
+
+	irm_disconnect_negative_0001
+	irm_disconnect_negative_0002
+	irm_disconnect_negative_0003
+	irm_disconnect_negative_0004
+	irm_disconnect_negative_0005
+
+	irm_del_positive_0001
+	
+	irm_forcesync_negative_0004 # must run after delete
+	irm_reinitialize_negative_0004 # must run after delete
+
+	irm_del_negative_0001
+	irm_del_negative_0002
+	irm_del_negative_0003
+	irm_del_negative_0004
+
+	reconnect_slave2
+	irm_list_negative_0004 # must run after delete negative tests
+}
+
 reconnect_slave1()
 {
 	local tmpout=/tmp/errormsg.out
 	TESTORDER=$(( TESTORDER += 1 ))
-	rlPhaseStartTest "reconnect_slave1 - Reconnect replica1 to domain"
+	rlPhaseStartTest "irm_list_negative_0004 - After uninstalling replica - Bug 754739"
 	case "$MYROLE" in
 	MASTER)
 		rlLog "Machine in recipe is MASTER ($(hostname))"
 
-		if [ $(ipa-replica-manage -p $ADMINPW list $MASTER|grep $SLAVE1|wc -l) -gt 0 ]; then
-			rlRun "ipa-replica-manage -p $ADMINPW del $SLAVE1 -f"
-		fi
-		if [ $(ipa host-show $SLAVE1|grep $SLAVE1 |grep -v "host not found"|wc -l) -gt 0 ]; then
-			rlRun "ipa host-del $SLAVE1"
-		fi
 		rlRun "ipa-replica-prepare -p $ADMINPW --ip-address=$SLAVE1_IP $SLAVE1"	
+		rlRun "service named restart"
+		rlRun "ipa dnsrecord-find $DOMAIN"
+		rlRun "dig +short +noquestion $SLAVE1"
 
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.1' -m $BEAKERMASTER"
 		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $BEAKERSLAVE1"
+		
+		rlRun "ipactl restart"
+		rlRun "ipa-replica-manage -p $ADMINPW list $MASTER|grep $SLAVE1"
+		
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.3' -m $BEAKERMASTER"
 		;;
 	SLAVE1)
 		rlLog "Machine in recipe is SLAVE1 ($(hostname))"
 		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $BEAKERMASTER"
 
 		hostname_s=$(hostname -s)
+		rlLog "First uninstall replica from $SLAVE1"
 		rlRun "ipa-server-install --uninstall -U"
+		if [ $(ps -ef|grep "[s]ssd.*$DOMAIN"|wc -l) -gt 0 ]; then
+			rlLog "SSSD not stopped by uninstall...manually stopping"
+			rlRun "service sssd stop"
+		fi
+		if [ -f /var/lib/sss/pubconf/kdcinfo.$RELM ]; then
+			rlRun "rm /var/lib/sss/pubconf/kdcinfo.$RELM"
+		fi
+		rlRun "cp /etc/resolv.conf /etc/resolv.conf.$FUNCNAME.$TESTORDER.backup"
+		rlRun "echo \"nameserver $MASTER_IP\" > /etc/resolv.conf"
+
+		rlLog "Next re-install replica on $SLAVE1"
 		pushd /dev/shm
 		rlRun "sftp root@$MASTER:/var/lib/ipa/replica-info-$hostname_s.$DOMAIN.gpg"
 		popd
-		rlRun "ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg"
+		rlRun "ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD --ip-address=$SLAVE1_IP -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg"
+
+		rlRun "KinitAsAdmin"
 
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.2' -m $BEAKERSLAVE1"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.3' $BEAKERMASTER"
 		;;
 	SLAVE*)
 		rlLog "Machine in recipe is SLAVE ($(hostname))"
 		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $BEAKERMASTER"
 		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $BEAKERSLAVE1"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.3' $BEAKERMASTER"
 		;;
 	CLIENT)
 		rlLog "Machine in recipe is CLIENT ($CLIENT)"
 		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $BEAKERMASTER"
 		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $BEAKERSLAVE1"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.3' $BEAKERMASTER"
+		;;
+	*)
+		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
+		;;
+	esac
+	rlPhaseEnd
+	[ -f $tmpout ] && rm -f $tmpout
+}
+
+reconnect_slave2()
+{
+	local tmpout=/tmp/errormsg.out
+	TESTORDER=$(( TESTORDER += 1 ))
+	rlPhaseStartTest "irm_list_negative_0004 - After uninstalling replica - Bug 754739"
+	case "$MYROLE" in
+	MASTER)
+		rlLog "Machine in recipe is MASTER ($(hostname))"
+
+		rlRun "ipa-replica-prepare -p $ADMINPW --ip-address=$SLAVE2_IP $SLAVE2"	
+		rlRun "service named restart"
+		rlRun "ipa dnsrecord-find $DOMAIN"
+		rlRun "dig +short +noquestion $SLAVE2"
+
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.1' -m $BEAKERMASTER"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $BEAKERSLAVE2"
+		
+		rlRun "ipactl restart"
+		rlRun "ipa-replica-manage -p $ADMINPW list $MASTER|grep $SLAVE2"
+		
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.3' -m $BEAKERMASTER"
+		;;
+	SLAVE2)
+		rlLog "Machine in recipe is SLAVE2 ($(hostname))"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $BEAKERMASTER"
+
+		hostname_s=$(hostname -s)
+		rlLog "First uninstall replica from $SLAVE2"
+		rlRun "ipa-server-install --uninstall -U"
+		if [ $(ps -ef|grep "[s]ssd.*$DOMAIN"|wc -l) -gt 0 ]; then
+			rlLog "SSSD not stopped by uninstall...manually stopping"
+			rlRun "service sssd stop"
+		fi
+		if [ -f /var/lib/sss/pubconf/kdcinfo.$RELM ]; then
+			rlRun "rm /var/lib/sss/pubconf/kdcinfo.$RELM"
+		fi
+		rlRun "cp /etc/resolv.conf /etc/resolv.conf.$FUNCNAME.$TESTORDER.backup"
+		rlRun "echo \"nameserver $MASTER_IP\" > /etc/resolv.conf"
+
+		rlLog "Next re-install replica on $SLAVE2"
+		pushd /dev/shm
+		rlRun "sftp root@$MASTER:/var/lib/ipa/replica-info-$hostname_s.$DOMAIN.gpg"
+		popd
+		rlRun "ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD --ip-address=$SLAVE2_IP -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg"
+
+		rlRun "KinitAsAdmin"
+
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.2' -m $BEAKERSLAVE2"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.3' $BEAKERMASTER"
+		;;
+	SLAVE*)
+		rlLog "Machine in recipe is SLAVE ($(hostname))"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $BEAKERMASTER"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $BEAKERSLAVE2"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.3' $BEAKERMASTER"
+		;;
+	CLIENT)
+		rlLog "Machine in recipe is CLIENT ($CLIENT)"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $BEAKERMASTER"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $BEAKERSLAVE2"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.3' $BEAKERMASTER"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
@@ -144,67 +300,6 @@ irm_envsetup()
 		;;
 	esac
 	rlPhaseEnd
-}
-
-irm_run()
-{
-	irm_version_0001
-
-	irm_list_positive_0001
-	irm_list_positive_0002
-	irm_list_positive_0003
-	irm_list_positive_0004
-
-	irm_list_negative_0001
-	irm_list_negative_0002
-	irm_list_negative_0003
-
-	irm_connect_positive_0001
-	irm_connect_positive_0002
-
-	irm_connect_negative_0001
-	irm_connect_negative_0002
-
-	irm_forcesync_positive_0001
-	irm_forcesync_positive_0002
-	irm_forcesync_positive_0003
-
-	irm_forcesync_negative_0001
-	irm_forcesync_negative_0002
-	irm_forcesync_negative_0003
-
-	irm_reinitialize_positive_0001
-	irm_reinitialize_positive_0002
-	irm_reinitialize_positive_0003
-	irm_reinitialize_positive_0004
-
-	irm_reinitialize_negative_0001
-	irm_reinitialize_negative_0002
-	irm_reinitialize_negative_0003
-
-	irm_disconnect_positive_0001
-	irm_disconnect_positive_0002
-
-	irm_disconnect_negative_0001
-	irm_disconnect_negative_0002
-	irm_disconnect_negative_0003
-	irm_disconnect_negative_0004
-	irm_disconnect_negative_0005
-
-	irm_del_positive_0001
-	
-	irm_forcesync_negative_0004 # must run after delete
-	irm_reinitialize_negative_0004 # must run after delete
-
-	irm_del_negative_0001
-	irm_del_negative_0002
-	irm_del_negative_0003
-	irm_del_negative_0004
-
-	#irm_reconnect_slave2
-	irm_list_negative_0004 # must run after delete negative tests
-	
-	#irm_reconnect_slave1
 }
 
 irm_envcleanup()
@@ -492,7 +587,7 @@ irm_list_negative_0003()
 	[ -f $tmpout ] && rm -f $tmpout
 }
 
-irm_list_negative_0004()
+irm_list_negative_0004_full()
 {
 	local tmpout=/tmp/errormsg.out
 	TESTORDER=$(( TESTORDER += 1 ))
@@ -582,6 +677,59 @@ irm_list_negative_0004()
 	[ -f $tmpout ] && rm -f $tmpout
 }
 
+irm_list_negative_0004()
+{
+	local tmpout=/tmp/errormsg.out
+	TESTORDER=$(( TESTORDER += 1 ))
+	rlPhaseStartTest "irm_list_negative_0004 - After uninstalling replica - Bug 754739"
+	case "$MYROLE" in
+	MASTER)
+		rlLog "Machine in recipe is MASTER ($(hostname))"
+
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $BEAKERSLAVE2"
+		
+		if [ $(ipa-replica-manage -p $ADMINPW list $MASTER|grep $SLAVE2|wc -l) -gt 0 ]; then
+			rlFail "BZ 754739 found...Master Server should not list uninstalled Replicas"
+		else 
+			rlPass "BZ 754739 not found...uninstalled replica not shown in list"
+		fi
+		rlRun "ipa-replica-manage -p $ADMINPW list $MASTER"
+		
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.2' -m $BEAKERMASTER"
+		;;
+	SLAVE2)
+		rlLog "Machine in recipe is SLAVE2 ($(hostname))"
+
+		rlRun "ipa-server-install --uninstall -U"
+		if [ $(ps -ef|grep "[s]ssd.*$DOMAIN"|wc -l) -gt 0 ]; then
+			rlLog "SSSD not stopped by uninstall...manually stopping"
+			rlRun "service sssd stop"
+		fi
+		if [ -f /var/lib/sss/pubconf/kdcinfo.$RELM ]; then
+			rlRun "rm /var/lib/sss/pubconf/kdcinfo.$RELM"
+		fi
+
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.1' -m $BEAKERSLAVE2"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $BEAKERMASTER"
+		;;
+	SLAVE*)
+		rlLog "Machine in recipe is SLAVE ($(hostname))"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $BEAKERSLAVE2"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $BEAKERMASTER"
+		;;
+	CLIENT)
+		rlLog "Machine in recipe is CLIENT ($CLIENT)"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $BEAKERSLAVE2"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $BEAKERMASTER"
+		;;
+	*)
+		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
+		;;
+	esac
+	rlPhaseEnd
+	[ -f $tmpout ] && rm -f $tmpout
+}
+
 # irm_connect_positive
 #     connect s1-s2
 # 
@@ -643,6 +791,38 @@ irm_connect_positive_0002()
 		rlLog "Machine in recipe is CLIENT ($CLIENT)"
 		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $BEAKERSLAVE1"
 		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $BEAKERSLAVE2"
+		;;
+	*)
+		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
+		;;
+	esac
+	rlPhaseEnd
+}
+
+irm_connect_positive_0003()
+{
+	TESTORDER=$(( TESTORDER += 1 ))
+	rlPhaseStartTest "irm_connect_positive_0003 - Connect Replica1 to Replica2 with -H to Replica1"
+	case "$MYROLE" in
+	MASTER)
+		rlLog "Machine in recipe is MASTER ($(hostname))"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $BEAKERSLAVE1"
+		;;
+	SLAVE1)
+		rlLog "Machine in recipe is SLAVE1 ($(hostname))"
+		
+		rlRun "ipa-replica-manage -H $MASTER -p $ADMINPW connect $SLAVE1 $SLAVE2"
+		rlRun "ipa-replica-manage -p $ADMINPW list $SLAVE1 | grep $SLAVE2"
+
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $BEAKERSLAVE1"
+		;;
+	SLAVE*)
+		rlLog "Machine in recipe is SLAVE ($(hostname))"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $BEAKERSLAVE1"
+		;;
+	CLIENT)
+		rlLog "Machine in recipe is CLIENT ($CLIENT)"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $BEAKERSLAVE1"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
@@ -1489,7 +1669,7 @@ irm_del_positive_0001()
 {
 	local tmpout=/tmp/irmtest.out
 	TESTORDER=$(( TESTORDER += 1 ))
-	rlPhaseStartTest "irm_del_positive_0001 - Remove all replication agreements and data about Replica"
+	rlPhaseStartTest "irm_del_positive_0001 - Remove all replication agreements and data about Replica2"
 	case "$MYROLE" in
 	MASTER)
 		rlLog "Machine in recipe is MASTER ($(hostname))"
@@ -1506,6 +1686,46 @@ irm_del_positive_0001()
 		fi
 			
 		rlRun "ipa host-show $SLAVE2" 2
+
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $BEAKERMASTER"
+		;;
+	SLAVE*)
+		rlLog "Machine in recipe is SLAVE ($(hostname))"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $BEAKERMASTER"
+		;;
+	CLIENT)
+		rlLog "Machine in recipe is CLIENT ($CLIENT)"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $BEAKERMASTER"
+		;;
+	*)
+		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
+		;;
+	esac
+	rlPhaseEnd
+	[ -f $tmpout ] && rm -f $tmpout
+}
+
+irm_del_positive_0002()
+{
+	local tmpout=/tmp/irmtest.out
+	TESTORDER=$(( TESTORDER += 1 ))
+	rlPhaseStartTest "irm_del_positive_0002 - Remove all replication agreements and data about Replica1"
+	case "$MYROLE" in
+	MASTER)
+		rlLog "Machine in recipe is MASTER ($(hostname))"
+			
+		rlRun "ipa-replica-manage -p $ADMINPW del $SLAVE1 -f"
+		rlRun "sleep 10"
+		rlRun "ipa-replica-manage -p $ADMINPW list $MASTER"
+		rlRun "ipa-replica-manage -p $ADMINPW list $MASTER > $tmpout 2>&1"
+		rlAssertNotGrep "$SLAVE1" $tmpout
+		if [ $(ipa-replica-manage -p $ADMINPW list $MASTER|grep $SLAVE1|wc -l) -gt 0 ]; then
+			rlFail "ipa-replica-manage still listing deleted replica $MASTER to $SLAVE1"
+		else
+			rlPass "ipa-replica-manage reporting that $SLAVE1 no longer a replica of $MASTER"
+		fi
+			
+		rlRun "ipa host-show $SLAVE1" 2
 
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $BEAKERMASTER"
 		;;
@@ -1646,6 +1866,7 @@ irm_del_negative_0004()
 		rlLog "Machine in recipe is MASTER ($(hostname))"
 		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $BEAKERSLAVE2"
 
+		rlRun "KinitAsAdmin"
 		rlRun "ipa user-show testuser1|grep testuser1" 
 
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.2' -m $BEAKERMASTER"
@@ -1653,6 +1874,7 @@ irm_del_negative_0004()
 	SLAVE2)
 		rlLog "Machine in recipe is SLAVE2 ($(hostname))"
 		
+		rlRun "KinitAsAdmin"
 		rlRun "ipa user-del testuser1"	
 		
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.1' -m $BEAKERSLAVE2"
