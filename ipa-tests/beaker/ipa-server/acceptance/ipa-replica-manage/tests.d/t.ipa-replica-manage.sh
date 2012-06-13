@@ -1487,16 +1487,18 @@ irm_disconnect_negative_0005()
 
 irm_del_positive_0001()
 {
+	local tmpout=/tmp/irmtest.out
 	TESTORDER=$(( TESTORDER += 1 ))
 	rlPhaseStartTest "irm_del_positive_0001 - Remove all replication agreements and data about Replica"
 	case "$MYROLE" in
 	MASTER)
 		rlLog "Machine in recipe is MASTER ($(hostname))"
-		
+			
 		rlRun "ipa-replica-manage -p $ADMINPW del $SLAVE2 -f"
 		rlRun "sleep 10"
-		rlRun "ipa-replica-manage -p $ADMINPW list $MASTER | grep -v $SLAVE2"
 		rlRun "ipa-replica-manage -p $ADMINPW list $MASTER"
+		rlRun "ipa-replica-manage -p $ADMINPW list $MASTER > $tmpout 2>&1"
+		rlAssertNotGrep "$SLAVE2" $tmpout
 		if [ $(ipa-replica-manage -p $ADMINPW list $MASTER|grep $SLAVE2|wc -l) -gt 0 ]; then
 			rlFail "ipa-replica-manage still listing deleted replica $MASTER to $SLAVE2"
 		else
@@ -1520,6 +1522,7 @@ irm_del_positive_0001()
 		;;
 	esac
 	rlPhaseEnd
+	[ -f $tmpout ] && rm -f $tmpout
 }
 
 # irm_del_negative
