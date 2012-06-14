@@ -15,7 +15,7 @@ usercountattr="krbloginfailedcount"
 # find some somewhat unique information to be used in this test
 hn=$(hostname)
 thismachine=$(grep $hn /dev/shm/env.sh | sed s/export\ //g | cut -d\= -f1)
-thisip=$(grep $thishost /dev/shm/env.sh  | grep IP | cut -d\= -f2)
+thisip=$(grep $thismachine /dev/shm/env.sh  | grep IP | cut -d\= -f2)
 lastoct=$(echo $thisip | cut -d\. -f4)
 
 ######################
