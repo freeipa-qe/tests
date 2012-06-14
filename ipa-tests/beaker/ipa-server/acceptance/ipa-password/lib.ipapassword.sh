@@ -235,6 +235,16 @@ grppw_exist()
 
 add_test_ac()
 {
+    local password=$1
+    if [ "$password" = "" ]
+    then
+        password=$testacPW
+        echo "[add_test_ac] use default user test account password [$password]"
+    else
+        echo "[add_test_ac] set account password to [$password]"
+    fi
+        
+    echo "[add_test_ac] check existance of user [$testac]"
     user_exist $testac
     if [ $? = 0 ]
     then
@@ -243,15 +253,14 @@ add_test_ac()
     rlRun "$kdestroy"
     Local_KinitAsAdmin
     echo "[add_test_ac] set up test account with inital pw: [$initialpw]"
-    echo $initialpw |\
-           ipa user-add $testac\
-                        --first $testacFirst\
-                        --last  $testacLast\
-                        --password 
-    rc=$?    
+ 
+	ipa user-add $testac\
+    	--first $testacFirst\
+        --last  $testacLast\
     # set test account password 
-    echo "[add_test_ac] change initialpw to [$testacPW], by calling FirstKinitAs"
-    FirstKinitAs $testac $initialpw $testacPW
+    echo "[add_test_ac] set initialpw [$initialpw] then change to [$password], by calling FirstKinitAs"
+    Local_FirstKinitAs $testac $initialpw $password
+    rc=$?    
     rlRun "$kdestroy"
     return $rc
 } # add_test_ac
@@ -262,6 +271,7 @@ del_test_ac()
 #    if [ $? = 0 ]
 #    then
 #        echo "test account found, now delete it"
+        echo "[del_test_ac] delete user: [$testac]"
         Local_KinitAsAdmin
         ipa user-del $testac
 #	rc=$?
@@ -287,11 +297,11 @@ user_exist()
         rlRun "$kdestroy"
         if grep -i "User login: $userlogin$" $out 2>&1 >/dev/null
         then
-            echo "find [$userlogin] in ipa server"
+            echo "[user_exist] check: found [$userlogin]"
             rm $out
             return 0
         else
-            echo "didn't find [$userlogin]"
+            echo "[user_exist] check: not found [$userlogin]"
             rm $out
             return 1
         fi
@@ -466,19 +476,13 @@ kinit_aftermaxlife()
     echo "spawn kinit -V $username" >> $exp
     echo 'match_max 100000' >> $exp
     echo 'expect "*: "' >> $exp
-    #echo 'sleep .5' >> $exp
-    echo "send -s -- \"$pw\"" >> $exp
-    echo 'send -s -- "\r"' >> $exp
-    #echo 'sleep .5' >> $exp
+    echo "send -s -- $pw\r" >> $exp
     echo 'expect "Password expired. You must change it now."' >> $exp
     echo 'expect "Enter new password: "' >> $exp
-    echo "send -s -- \"$newpw\"" >> $exp
-    echo 'send -s -- "\r"' >> $exp
-    #echo 'sleep .5' >> $exp
+    echo "send -s -- $newpw\r" >> $exp
     echo 'expect "Enter it again: "' >> $exp
-    echo "send -s -- \"$newpw\"" >> $exp
-    echo 'send -s -- "\r"' >> $exp
-    echo 'expect eof ' >> $exp
+    echo "send -s -- $newpw\r" >> $exp
+    echo 'expect eof' >> $exp
     rlRun "$kdestroy"
 
     echo "====== [kinit_aftermaxlife] exp file ========="
@@ -549,17 +553,13 @@ Local_KinitAsAdmin()
             echo "set force_conservative 0" >> $exp
             echo "set send_slow {1 .01}" >> $exp
             echo "spawn ipa passwd admin" >> $exp
-            echo 'match_max 100000' >> $exp
             echo 'expect "Current Password: "' >> $exp
-            echo "send -s -- \"$temppw\"" >> $exp
-            echo 'send -s -- "\r"' >> $exp
+            echo "send -s -- $temppw\r" >> $exp
             echo 'expect "New Password: "' >> $exp
-            echo "send -s -- \"$pw\"" >> $exp
-            echo 'send -s -- "\r"' >> $exp
+            echo "send -s -- $pw\r" >> $exp
             echo 'expect "Enter New Password again to verify: "' >> $exp
-            echo "send -s -- \"$pw\"" >> $exp
-            echo 'send -s -- "\r"' >> $exp
-            echo 'expect eof ' >> $exp
+            echo "send -s -- $pw\r" >> $exp
+            echo 'expect eof' >> $exp
             /usr/bin/expect $exp 
             cat $exp
             rm $exp
@@ -593,38 +593,35 @@ change_password()
     local out=$TmpDir/changepassword.$RANDOM.out
     local exp=$TmpDir/changepassword.$RANDOM.exp
     local ret
-    echo "[change_password] change password for [$userlogin] from [$currentpw] to [$newpw]"
+    echo "[change_password] change password for user: [$userlogin] [$currentpw] --> [$newpw]"
     #rlRun "echo \"$currentpw\" | kinit $userlogin" \
     #      0 "current pw [$currentpw] has to work before we continue"
     if klist | grep -i "Default principal: $userlogin" 2>&1 >/dev/null
     then
-        echo "found kerberos for user [$userlogin], test continue"
+        echo "[change_password] found kerberos for user [$userlogin], test continue"
     else
-        rlFail "no kerberos found for [$userlogin], test can not continue"
-        return 1
+        Local_kinit $userlogin $currentpw
+        if klist | grep -i "Default principal: $userlogin" 2>&1 >/dev/null
+        then
+            echo "[change_password] [$userlogin] kinit as current pw [$currentpw] success, test continue"
+        else
+            rlFail "[change_password] no kerberos found for [$userlogin], test can not continue"
+            return 1
+        fi
     fi
-    echo "set timeout 10" > $exp
+    echo "set timeout 5" > $exp
     echo "set force_conservative 0" >> $exp
     echo "set send_slow {1 .01}" >> $exp
     echo "spawn ipa passwd $userlogin" >> $exp
-    echo 'match_max 100000' >> $exp
     echo 'expect "Current Password: "' >> $exp
-    echo "send -s -- \"$currentpw\"" >> $exp
-    echo 'send -s -- "\r"' >> $exp
+    echo "send -s -- $currentpw\r" >> $exp
     echo 'expect "New Password: "' >> $exp
-    echo "send -s -- \"$newpw\"" >> $exp
-    echo 'send -s -- "\r"' >> $exp
+    echo "send -s -- $newpw\r" >> $exp
     echo 'expect "Enter New Password again to verify: "' >> $exp
-    echo "send -s -- \"$newpw\"" >> $exp
-    echo 'send -s -- "\r"' >> $exp
-    echo 'expect eof ' >> $exp
+    echo "send -s -- $newpw\r" >> $exp
+    echo 'expect eof' >> $exp
     /usr/bin/expect $exp  > $out
-#    if grep "Constraint violation:Password Fails to meet minimum strength criteria" $out  2>&1 >/dev/null|| grep "ipa: ERROR" $out 2>&1 >/dev/null
-#    then
-#        ret=1
-#    else
-#        ret=0
-#    fi
+
     if grep "Changed password "  $out  2>&1 >/dev/null
     then
         ret=0
@@ -909,14 +906,25 @@ util_pwpolicy_removeall()
 {
     local out=$TmpDir/uitl.pwpolicy.removeall.out
     local i=0
-    local list
+    local list=""
     Local_KinitAsAdmin
-    ipa pwpolicy-find | grep -i "group" | grep -v -i "GLOBAL" > $out
+    #ipa pwpolicy-find | grep -i "group" | grep -v -i "GLOBAL" > $out <<< might trigger error
+    ipa pwpolicy-find | grep -i "group" | grep -v -i "global_policy" > $out
+    echo "---- debug: output of pwpolicy-find ------"
+    cat $out
+    echo "------ file [$out]----------"
     for line in `cat $out`; do
         pwpolicy=`echo $line | cut -d":" -f2 | xargs echo`
-        if [ ! -z "$pwpolicy" ];then
-            rlLogDebug "remove password policy: [$pwpolicy]"
+        echo "line=[$line], pwpolicy=(($pwpolicy))"
+        if echo $line | grep "1034h"
+        then
+            echo "here it comes line=[$line]"
+            echo "cmd: ((ipa pwpolicy-del $pwpolicy 2>&1 >/dev/null))"
+            #rlRun "ipa pwpolicy-del $pwpolicy 2>&1 >/dev/null" 
+        elif [ "$pwpolicy" != "" ];then
+            rlLog "remove password policy: [$pwpolicy]"
             list="$list $pwpolicy"
+    echo "cmd: ((ipa pwpolicy-del $pwpolicy 2>&1 >/dev/null))"
             rlRun "ipa pwpolicy-del $pwpolicy 2>&1 >/dev/null" 
             i=$((i+1))
         fi
@@ -928,10 +936,7 @@ util_pwpolicy_removeall()
         rlFail "expect [$total] password policy, deleted [$i]"
     fi
     rlRun "$kdestroy"
-    rm $out
-    unset i
-    unset list
-    unset out
+    #rm $out
 } # util_pwpolicy_removeall
 
 getrandomstring()
@@ -1007,4 +1012,102 @@ getrandomint()
     #echo "seed=$seed diff=$diff seed2=$seed2 final = [$final]"
 } #getrandomint
 
+check_log_error(){
+    local serial=$1
+    local logfile=$2
+    local msg=$3
+    echo "****** check log error #$serial **********"
+    #if sudo tail -n3 /var/log/dirsrv/slapd-YZHANG-REDHAT-COM/errors | grep "file ipapwd_common.c" 
+    if sudo tail -n30 $logfile | grep "$msg"
+    then
+        echo "*  logfile: [$logfile]"
+        echo "*  message: [$msg]"
+        echo "[$serial] error found, exit test"
+        exit
+    fi
+}
 
+Local_FirstKinitAs()
+{
+	echo "calling Local_FirstKinitAs"
+    local username=$1
+    local password=$2
+    local newpassword=$3
+    local rc=0
+    local outfile=/tmp/kinitAs.out
+    echo "Local_FirstKinitAs:user [$username], initial pw [$password], setting password [$newpassword]"
+	###### assign initial password #####
+    local expfile=/tmp/kinit${RANDOM}.exp
+    echo "set timeout 5" > $expfile
+    echo "set send_slow {1 .1}" >> $expfile
+	echo "spawn ipa passwd $username" >> $expfile
+	echo "expect \"New Password: \"" >> $expfile
+	echo "send -s -- $password\r">> $expfile
+	echo "expect \"Enter New Password again to verify: \"" >> $expfile
+	echo "send -s -- $password\r" >> $expfile
+	echo "expect eof" >> $expfile
+	Local_KinitAsAdmin
+    echo ""
+	echo "---- assign initial password [$password] to [$username] as admin -------"
+	cat $expfile
+	echo "------------------------------------------------------------------------"
+    /usr/bin/expect $expfile
+    rm $expfile
+	###### kinit as user, use initial password, then change password to desired one
+    expfile=/tmp/kinit${RANDOM}.exp
+    echo "set timeout 10" > $expfile
+    echo "set send_slow {1 .1}" >> $expfile
+    echo "spawn $KINITEXEC $username" >> $expfile
+    echo "expect \"Password for *\"" >> $expfile
+    echo "send -s -- $password\r" >> $expfile
+    echo "expect \"Enter new password: \"" >> $expfile
+    echo "send -s -- $newpassword\r" >> $expfile
+    echo "expect \"Enter it again: \"" >> $expfile
+    echo "send -s -- $newpassword\r" >> $expfile
+    echo "expect eof" >> $expfile
+    echo ""
+	echo "---- kinit as user [$username], then change [$password] to [$newpassword] -------"
+	cat $expfile
+	echo "------------------------------------------------------------------------"
+    kdestroy
+    /usr/bin/expect $expfile
+    rm $expfile
+    # verify credentials
+    klist > $outfile
+    grep $username $outfile
+    if [ $? -ne 0 ] ; then
+        rlLog "ERROR: kinit as $username with new password $newpassword failed."
+        rc=1
+    else
+        rlLog "kinit as $username with new password $newpassword was successful."
+    fi
+    return $rc
+
+} #Local_FirstKinitAs
+
+Local_kinit()
+{
+    local user=$1
+    local password=$2
+    local expfile=/tmp/local_kinit_${RANDOM}.exp
+    local ret=0
+    local msg=""
+    echo "set timeout 3" > $expfile
+    echo "set send_slow {1 .1}" >> $expfile
+    echo "spawn $KINITEXEC $user" >> $expfile
+    echo "expect \"Password for *\"" >> $expfile
+    echo "send -s -- $password\r" >> $expfile
+    echo "expect eof" >> $expfile
+    echo ""   
+    /usr/bin/expect $expfile
+    ret=$?
+    if [ "$ret" = "0" ];then
+        msg="success"
+    else
+        msg="failed"
+    fi
+    echo "------- local kinit [$msg] : user [$user] with password [$password] ---------"
+	cat $expfile
+	echo "------------------------------------------------------------------------"
+    return $ret
+}
