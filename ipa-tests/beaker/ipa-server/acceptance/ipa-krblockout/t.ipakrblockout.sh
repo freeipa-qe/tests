@@ -343,6 +343,7 @@ ipakrblockout_maxfail_positive()
         fi
 
 	# increasing reset interval in case attempts take longer than 60 secs
+	ipa pwpolicy-mod --$intervalflag=60 # Adding this line to ensure that the next test can pass
 	rlRun "ipa pwpolicy-mod --$intervalflag=120" 0 "Setting $intervalflag to value of [120]"
 
 	# verify counter iteration
@@ -689,6 +690,7 @@ bz822429()
     rlPhaseStartTest "bz822429 Failed login count is stuck at 1"
 	# set policy to max failures of 3
 	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit As Admin"
+	ipa pwpolicy-mod --$maxflag=4 # setting max failures to 4 to make sure next step passes
 	rlRun "ipa pwpolicy-mod --$maxflag=3" 0 "Set max failures to 3"
 
 	# create test user and set password
@@ -786,7 +788,7 @@ bz759501()
 	kinitAs $ADMINID $ADMINPW
 	# 4. ensure that ipa user-status shows no failed logins for user1
 	failed=$(ipa user-status $user | grep Failed\ logins: | cut -d\  -f5)
-	if [ "$failed" != "0" ]; then
+	if [ $failed -ne 0 ]; then
 		rlFail "ERROR - ipa user status for user $user shows more than 0 failed logins, it shows $failed"
 	else 
 		rlPass "PASS - ipa user status for user $user shows 0 failed logins"
