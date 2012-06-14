@@ -144,7 +144,8 @@ subject="CN=rhel63-server1.testrelm.com,O=$RELM"
 issuer="CN=Certificate Authority,O=$RELM"
 
 ######### attributes for a new service modified from master
-service_updated=ntpd/$SLAVE@$RELM
+slave_hostname=`echo $SLAVE | sed 's/\"//g' | sed 's/^ //g'`
+service_updated=ntpd/$slave_hostname@$RELM
 service2_updated=lsmtp/$MASTER@$RELM
 subject_updated="CN=rhel63-server2.testrelm.com,O=$RELM"
 service_managedby_attr="fqdn=$managedByHost_updated,cn=computers,cn=accounts,$BASEDN"

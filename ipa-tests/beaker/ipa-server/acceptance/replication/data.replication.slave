@@ -130,8 +130,9 @@ netgroup_groupMember1_updated="mailadmins"
 netgroup_groupMember2_updated="eviladmins"
 
 ######### attributes for new service added from slave
-service=ntpd/$SLAVE@$RELM
-service2=nfs/$SLAVE@$RELM
+slave_hostname=`echo $SLAVE | sed 's/\"//g' | sed 's/^ //g'`
+service=ntpd/$slave_hostname@$RELM
+service2=nfs/$slave_hostname@$RELM
 keytab=False
 subject="CN=rhel63-server1.testrelm.com,O=$RELM"
 issuer="CN=Certificate Authority,O=$RELM"
