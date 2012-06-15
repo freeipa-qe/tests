@@ -30,6 +30,8 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ##########################################################################
+ZONE1=4.2.2.in-addr.arpa.
+ZONE2=3.2.2.in-addr.arpa.
 
 # Include rhts environment
 . /usr/bin/rhts-environment.sh
@@ -53,7 +55,17 @@ echo "The beaker hostname of IPA Server is $BEAKERMASTER"
 cat /dev/shm/env.sh
 ########################################################################
 
-
+# If you change the style of setting MYROLE, remember
+# that $SLAVE could be a space delimited list of replicas
+if   [ $(echo "$MASTER" | grep $(hostname -s)|wc -l) -gt 0 ]; then
+	MYROLE=MASTER
+elif [ $(echo "$SLAVE"  | grep $(hostname -s)|wc -l) -gt 0 ]; then
+	MYROLE=SLAVE
+elif [ $(echo "$CLIENT" | grep $(hostname -s)|wc -l) -gt 0 ]; then
+	MYROLE=CLIENT
+else
+	MYROLE=UNKNOWN
+fi
 
 PACKAGELIST="ipa-admintools ipa-client httpd mod_nss mod_auth_kerb 389-ds-base expect"
 
@@ -177,9 +189,10 @@ rlJournalStart
 			rhts-sync-block -s READY_REPLICA1 $BEAKERMASTER
 			installSlave
 			installCA
-
 			replicaBugCheck_bz784696
+			uninstall
 
+			installSlave_nr1
 			uninstall
 			rhts-sync-set -s DONE_REPLICA1 $BEAKERSLAVE
 
@@ -191,7 +204,10 @@ rlJournalStart
 			
 			rhts-sync-block -s READY_REPLICA4 $BEAKERMASTER
 			# Installing slave with --no-reverse
-			installSlave_nr
+			installSlave_nr2
+			uninstall
+
+			installSlave_nr3
 			uninstall
 			rhts-sync-set -s DONE_REPLICA4 $BEAKERSLAVE
 
@@ -232,7 +248,6 @@ rlJournalStart
 	else
 		rlLog "Machine in recipe in not a SLAVE"
 	fi
-
 
 	rlJournalPrintText
 	report=$TmpDir/rhts.report.$RANDOM.txt

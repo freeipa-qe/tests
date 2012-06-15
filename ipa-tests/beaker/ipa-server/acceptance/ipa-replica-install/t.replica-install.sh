@@ -80,48 +80,44 @@ installMaster()
 
 createReplica1()
 {
-
 	rlPhaseStartTest "Create Replica Package(s) without --ip-address option"
+		if [ -z "$SLAVE" ]; then
+			rlLog "No SLAVES in current recipe set."
+		fi
 		for s in $SLAVE; do
-			if [ "$s" != "" ]; then
+			s_short=$(echo $s | cut -d. -f1)
 
-				rlRun "rm -fr /var/lib/ipa/replica-info-*"
-				rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
+			rlRun "rm -fr /var/lib/ipa/replica-info-*"
+			rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
 
-				# put the short form of the hostname for server $s into s_short
-				hostname_s=$(echo $s | cut -d. -f1)
+			# Preparing replica without --ip-address option
+			rlRun "sed -i /$SLAVEIP/d /etc/hosts"
+			rlRun "echo \"$SLAVEIP $s_short.$DOMAIN\" >> /etc/hosts"
+			rlRun "cat /etc/hosts"
+			rlRun "echo \"nameserver $MASTERIP\" > /etc/resolv.conf" 
+			rlRun "cat /etc/resolv.conf"
 
-				# Preparing replica without --ip-address option
-				rlRun "sed -i /$SLAVEIP/d /etc/hosts"
-				rlRun "echo \"$SLAVEIP $hostname_s.$DOMAIN\" >> /etc/hosts"
-				rlRun "cat /etc/hosts"
-				rlRun "echo \"nameserver $MASTERIP\" > /etc/resolv.conf" 0 "fixing the reoslv.conf to contain the correct nameserver lines"
-				rlRun "cat /etc/resolv.conf"
-				rlRun "ipa dnszone-find"
-				### Commenting this because it creates the reverse zone which we don't want for no-reverse
-				REVERSE_ZONE=$(echo $SLAVEIP|awk -F. '{print $3 "." $2 "." $1 ".in-addr.arpa."}')
-				if [ $(ipa dnszone-show $REVERSE_ZONE 2>/dev/null | wc -l) -eq 0 ]; then
-					rlRun "ipa dnszone-add $REVERSE_ZONE --name-server=$MASTER --admin-email=ipaqar.redhat.com"
-				fi
-				rlRun "ipa dnsrecord-add $DOMAIN $hostname_s --a-rec=$SLAVEIP --a-create-reverse"
-				# Making use of --a-create-reverse ... hence comenting the following :-)
-				# REVERSE_ZONE=`ipa dnszone-find | grep -i "zone name" | grep -i "arpa" | cut -d ":" -f 2`
-				# LAST_OCTET=`echo $SLAVEIP | cut -d . -f 4`
-				# rlRun "ipa dnsrecord-add $REVERSE_ZONE $LAST_OCTET --ptr-rec=$hostname_s.$DOMAIN."
+			rlRun "ipa dnszone-find"
+			REVERSE_ZONE=$(echo $SLAVEIP|awk -F. '{print $3 "." $2 "." $1 ".in-addr.arpa."}')
+			if [ $(ipa dnszone-show $REVERSE_ZONE 2>/dev/null | wc -l) -eq 0 ]; then
+				rlRun "ipa dnszone-add $REVERSE_ZONE --name-server=$MASTER --admin-email=ipaqar.redhat.com"
+			fi
+			rlRun "ipa dnsrecord-add $DOMAIN $s_short --a-rec=$SLAVEIP --a-create-reverse"
 
-				rlRun "service named restart" 0 "Restarting named as work around when adding new reverse zone"
-				sleep 10
+			if [ $(ipa dnszone-find|grep $ZONE1|wc -l) -eq 0 ]; then 
+				rlRun "ipa dnszone-add $ZONE1 --name-server=$MASTER --admin-email=ipaqar.redhat.com"
+			fi
+	
+			rlRun "service named restart" 0 "Restarting named as work around when adding new reverse zone"
+			sleep 10
 
-				rlLog "Running: ipa-replica-prepare -p $ADMINPW $hostname_s.$DOMAIN"
-				rlRun "ipa-replica-prepare -p $ADMINPW $hostname_s.$DOMAIN"
+			rlLog "Running: ipa-replica-prepare -p $ADMINPW $s_short.$DOMAIN"
+			rlRun "ipa-replica-prepare -p $ADMINPW $s_short.$DOMAIN"
 
-			else
-
-				rlLog "No SLAVES in current recipe set."
-
+			if [ $(ipa dnszone-find|grep $ZONE2|wc -l) -eq 0 ]; then 
+				rlRun "ipa dnszone-add $ZONE2 --name-server=$MASTER --admin-email=ipaqar.redhat.com"
 			fi
 		done
-
 	rlPhaseEnd
 }
 
@@ -218,45 +214,40 @@ createReplica3()
 
 createReplica4() 
 {
-
 	rlPhaseStartTest "Create Replica Package(s) without --ip-address option and with reverse zone deleted"
+		if [ -z "$SLAVE" ]; then
+			rlLog "No SLAVES in current recipe set."
+		fi
 		for s in $SLAVE; do
-			if [ "$s" != "" ]; then
-
-				SLAVE_S=$(echo $s|cut -f1 -d.)
-				rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
-				rlRun "rm -fr /var/lib/ipa/replica-info-*"
-				# Cleanup server and network info from DNS
-				MASTERZONE=$(echo $MASTERIP|awk -F . '{print $3 "." $2 "." $1 ".in-addr.arpa."}')
-				SLAVEZONE=$(echo $SLAVEIP|awk -F . '{print $3 "." $2 "." $1 ".in-addr.arpa."}')
-				ZONECHECK=$(ipa dnszone-show $SLAVEZONE 2>/dev/null | wc -l)
-				if [ "x$MASTERZONE" != "x$SLAVEZONE" -a $ZONECHECK -gt 0 ]; then
-					rlLog "Deleting ZONE ($SLAVEZONE) so ipa-replica-prepare creates it"
-					rlRun "ipa dnszone-del $SLAVEZONE"
-					rlRun "service named restart"
-				fi
-				if [ $(ipa dnsrecord-show $DOMAIN $hostname_s 2>/dev/null | wc -l) -gt 0 ]; then
-					rlRun "ipa dnsrecord-del $DOMAIN $SLAVE_S --del-all"
-				fi
-
-				# Make sure /etc/hosts has correct info
-				rlRun "sed -i /$SLAVEIP/d  /etc/hosts"
-				rlRun "sed -i s/$SLAVE//   /etc/hosts"
-				rlRun "sed -i s/$SLAVE_S// /etc/hosts"
-				rlRun "echo \"$SLAVEIP $SLAVE $SLAVE_S\" >> /etc/hosts"
-				rlRun "cat /etc/hosts"
-				
-				# Preparing replica without --ip-address option for no-reverse test
+			SLAVE_S=$(echo $s|cut -f1 -d.)
+			rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
+			rlRun "rm -fr /var/lib/ipa/replica-info-*"
+			# Cleanup server and network info from DNS
+			MASTERZONE=$(echo $MASTERIP|awk -F . '{print $3 "." $2 "." $1 ".in-addr.arpa."}')
+			SLAVEZONE=$(echo $SLAVEIP|awk -F . '{print $3 "." $2 "." $1 ".in-addr.arpa."}')
+			if [ $(ipa dnszone-find|grep $SLAVEZONE|wc -l) -gt 0 ]; then	
+				rlLog "Deleting ZONE ($SLAVEZONE) for no-reverse tests"
+				rlRun "ipa dnszone-del $SLAVEZONE"
 				rlRun "service named restart"
-				rlLog "IP of server $s is resolving as $SLAVEIP, using short hostname of $SLAVE_S"
-				rlLog "Running: ipa-replica-prepare -p $ADMINPW $SLAVE_S.$DOMAIN"
-				rlRun "ipa-replica-prepare -p $ADMINPW $SLAVE_S.$DOMAIN" 0 "Creating replica package"
-
-			else
-
-				rlLog "No SLAVES in current recipe set."
-
 			fi
+			if [ $(ipa dnsrecord-show $DOMAIN $hostname_s 2>/dev/null | wc -l) -gt 0 ]; then
+				rlRun "ipa dnsrecord-del $DOMAIN $SLAVE_S --del-all"
+			fi
+
+			# Make sure /etc/hosts has correct info
+			rlRun "sed -i /$SLAVEIP/d  /etc/hosts"
+			rlRun "sed -i s/$SLAVE//   /etc/hosts"
+			rlRun "sed -i s/$SLAVE_S// /etc/hosts"
+			rlRun "echo \"$SLAVEIP $SLAVE $SLAVE_S\" >> /etc/hosts"
+			rlRun "cat /etc/hosts"
+			
+			# Preparing replica without --ip-address option for no-reverse test
+			rlRun "service named restart"
+			rlLog "IP of server $s is resolving as $SLAVEIP, using short hostname of $SLAVE_S"
+			rlLog "Running: ipa-replica-prepare -p $ADMINPW $SLAVE_S.$DOMAIN"
+			rlRun "ipa-replica-prepare -p $ADMINPW $SLAVE_S.$DOMAIN" 0 "Creating replica package"
+
+			rlRun "ipa dnszone-find"
 		done
 
 	rlPhaseEnd
@@ -264,68 +255,79 @@ createReplica4()
 	
 installSlave()
 {
-   rlPhaseStartSetup "Install IPA REPLICA Server"
-	
-	rlRun "yum install -y openssh-clients"
-	rlRun "yum install -y ipa-server bind-dyndb-ldap bind"
-        
-	rlRun "/etc/init.d/ntpd stop" 0 "Stopping the ntp server"
+	rlPhaseStartSetup "Install IPA REPLICA Server"
 
-        # stop the firewall
-        service iptables stop
-        service ip6tables stop
+		rlRun "yum install -y openssh-clients"
+		rlRun "yum install -y ipa-server bind-dyndb-ldap bind"
 
-        rlRun "ntpdate $NTPSERVER" 0 "Synchronzing clock with valid time server"
-        rlRun "AddToKnownHosts $MASTER" 0 "Adding master to known hosts"
+		rlRun "/etc/init.d/ntpd stop" 0 "Stopping the ntp server"
 
-        cd /dev/shm/
-        hostname_s=$(hostname -s)
-	AddToKnownHosts $MASTERIP
-        rlRun "sftp root@$MASTERIP:/var/lib/ipa/replica-info-$hostname_s.$DOMAIN.gpg"
-        rlLog "sftp root@$MASTERIP:/var/lib/ipa/replica-info-$hostname_s.$DOMAIN.gpg"
-        rlLog "Checking for existance of replica gpg file"
-        ls /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg
-        if [ $? -ne 0 ] ; then
-                rlFail "ERROR: Replica Package not found"
-        else
-                rlRun "/etc/init.d/ntpd stop" 0 "Stopping the ntp server"
-                rlRun "ntpdate $NTPSERVER" 0 "Synchronzing clock with valid time server"
-                rlLog "SKIPINSTALL: $SKIPINSTALL"       
-                rlRun "echo \"nameserver $MASTERIP\" > /etc/resolv.conf" 0 "fixing the reoslv.conf to contain the correct nameserver lines"
-		rlRun "cat /etc/resolv.conf"
-                rlRun "fixHostFile" 0 "Set up /etc/hosts"
+		# stop the firewall
+		service iptables stop
+		service ip6tables stop
 
-                rlRun "fixhostname" 0 "Fix hostname"
-                echo "ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg" > /dev/shm/replica-install.bash
-                chmod 755 /dev/shm/replica-install.bash
-                rlLog "EXECUTING: ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg"
-                rlRun "/bin/bash /dev/shm/replica-install.bash" 0 "Replica installation"
-                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
-		# Disabling the following since empty forwarders exist in named.conf
-		# rlAssertGrep "forwarders" "/etc/named.conf"
-		rlAssertGrep "$DNSFORWARD" "/etc/named.conf"
+		rlRun "ntpdate $NTPSERVER" 0 "Synchronzing clock with valid time server"
+		rlRun "AddToKnownHosts $MASTER" 0 "Adding master to known hosts"
 
-                rlRun "appendEnv" 0 "Append the machine information to the env.sh with the information for the machines in the recipe set"
+		cd /dev/shm/
+		hostname_s=$(hostname -s)
+		AddToKnownHosts $MASTERIP
+		rlRun "sftp root@$MASTERIP:/var/lib/ipa/replica-info-$hostname_s.$DOMAIN.gpg"
+		rlLog "sftp root@$MASTERIP:/var/lib/ipa/replica-info-$hostname_s.$DOMAIN.gpg"
+		rlLog "Checking for existance of replica gpg file"
+		ls /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg
+		if [ $? -ne 0 ] ; then
+			rlFail "ERROR: Replica Package not found"
+		else
+			rlRun "/etc/init.d/ntpd stop" 0 "Stopping the ntp server"
+			rlRun "ntpdate $NTPSERVER" 0 "Synchronzing clock with valid time server"
+			rlLog "SKIPINSTALL: $SKIPINSTALL"       
+			rlRun "echo \"nameserver $MASTERIP\" > /etc/resolv.conf" 0 "fixing the reoslv.conf to contain the correct nameserver lines"
+			rlRun "cat /etc/resolv.conf"
+			rlRun "fixHostFile" 0 "Set up /etc/hosts"
 
-				# Verifying bug 784696
-				rlLog "Verifying https://bugzilla.redhat.com/show_bug.cgi?id=784696"
-				rlLog "ldapsearch -x -D '$ROOTDN' -w '$ROOTDNPWD' -b 'cn=config' |grep 'nsDS5ReplicaUpdateSchedule: 0000-2359 0123456'"
-				BZCHECK=$(ldapsearch -x -D '$ROOTDN' -w '$ROOTDNPWD' -b 'cn=config' |grep 'nsDS5ReplicaUpdateSchedule: 0000-2359 0123456'|wc -l)
-				if [ $BZCHECK -gt 0 ]; then
-					rlFail "BZ 784696 found...Dont set nsds5replicaupdateschedule in replication agreements"
-				else
-					rlPass "BZ 784696 not found....nsds5replicaupdateschedule not set"
-				fi
-        fi
+			rlRun "fixhostname" 0 "Fix hostname"
+			echo "ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg" > /dev/shm/replica-install.bash
+			chmod 755 /dev/shm/replica-install.bash
+			rlLog "EXECUTING: ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg"
+			rlRun "/bin/bash /dev/shm/replica-install.bash" 0 "Replica installation"
+			rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
+			# Disabling the following since empty forwarders exist in named.conf
+			# rlAssertGrep "forwarders" "/etc/named.conf"
+			rlAssertGrep "$DNSFORWARD" "/etc/named.conf"
 
-        if [ -f /var/log/ipareplica-install.log ]; then
-                rhts-submit-log -l /var/log/ipareplica-install.log
-        fi
-        # stop the firewall
-        service iptables stop
-        service ip6tables stop
-   rlPhaseEnd
- 
+			rlRun "appendEnv" 0 "Append the machine information to the env.sh with the information for the machines in the recipe set"
+
+			# Verifying bug 784696
+			rlLog "Verifying https://bugzilla.redhat.com/show_bug.cgi?id=784696"
+			rlLog "ldapsearch -x -D '$ROOTDN' -w '$ROOTDNPWD' -b 'cn=config' |grep 'nsDS5ReplicaUpdateSchedule: 0000-2359 0123456'"
+			BZCHECK=$(ldapsearch -x -D '$ROOTDN' -w '$ROOTDNPWD' -b 'cn=config' |grep 'nsDS5ReplicaUpdateSchedule: 0000-2359 0123456'|wc -l)
+			if [ $BZCHECK -gt 0 ]; then
+				rlFail "BZ 784696 found...Dont set nsds5replicaupdateschedule in replication agreements"
+			else
+				rlPass "BZ 784696 not found....nsds5replicaupdateschedule not set"
+			fi
+
+			rlLog "verifies https://bugzilla.redhat.com/show_bug.cgi?id=757644"
+			rlLog "ipa-replica-install without --no-reverse should create new reverse zone if it does not already exist"
+			MASTERZONE=$(echo $MASTERIP|awk -F . '{print $3 "." $2 "." $1 ".in-addr.arpa."}')
+			SLAVEZONE=$(echo $SLAVEIP|awk -F . '{print $3 "." $2 "." $1 ".in-addr.arpa."}')
+			#rlRun "ipa dnszone-find | grep in-addr.arpa." 1
+			if [ "x$MASTERZONE" != "x$SLAVEZONE" ]; then
+				rlRun "ipa dnszone-find $SLAVEZONE" 
+			else
+				rlLog "Cannot test --no-reverse here since SLAVE ($SLAVEIP) is in same network as MASTER ($MASTERIP)"
+			fi
+		fi
+
+		if [ -f /var/log/ipareplica-install.log ]; then
+			rhts-submit-log -l /var/log/ipareplica-install.log
+		fi
+		# stop the firewall
+		service iptables stop
+		service ip6tables stop
+	rlPhaseEnd
+
 }
 
 
@@ -391,8 +393,7 @@ installSlave_nf()
 
 installSlave_nr()
 {
-
-	rlPhaseStartTest "Installing replica with --no-reverse option"
+	rlPhaseStartTest "installSlave_nr - Installing replica with --no-reverse option"
 		cd /dev/shm/
 		[ -z "$hostname_s" ] && hostname_s=$(echo $SLAVE|cut -f1 -d.)
 		rlRun "rm -f /dev/shm/replica-info-*"
@@ -419,6 +420,7 @@ installSlave_nr()
 			rlAssertNotGrep "$DNSFORWARD" "/etc/named.conf"
 
 			rlLog "verifies https://bugzilla.redhat.com/show_bug.cgi?id=757644"
+			rlLog "ipa-replica-install with --no-reverse should not create new reverse zone if it does not already exist"
 			MASTERZONE=$(echo $MASTERIP|awk -F . '{print $3 "." $2 "." $1 ".in-addr.arpa."}')
 			SLAVEZONE=$(echo $SLAVEIP|awk -F . '{print $3 "." $2 "." $1 ".in-addr.arpa."}')
 			#rlRun "ipa dnszone-find | grep in-addr.arpa." 1
@@ -440,6 +442,109 @@ installSlave_nr()
 				rhts-submit-log -l /var/log/ipareplica-conncheck.log_nr
 		fi
 
+	rlPhaseEnd
+}
+
+installSlave_nr1()
+{
+	rlPhaseStartTest "installSlave_nr1 - Installing replica with --no-reverse WITH reverse zones"
+		SLAVEZONE=$(echo $SLAVEIP|awk -F . '{print $3 "." $2 "." $1 ".in-addr.arpa."}')
+		[ -z "$s_short" ] && s_short=$(echo $SLAVE|cut -f1 -d.)
+		cd /dev/shm/
+		rlRun "rm -f /dev/shm/replica-info-*"
+		rlRun "sftp root@$MASTERIP:/var/lib/ipa/replica-info-$s_short.$DOMAIN.gpg /dev/shm"
+		ls /dev/shm/replica-info-$s_short.$DOMAIN.gpg
+		if [ $? -ne 0 ] ; then
+			rlFail "ERROR: Replica Package not found"
+		else
+			rlRun "echo \"nameserver $MASTERIP\" > /etc/resolv.conf"
+			rlRun "cat /etc/resolv.conf"
+			rlRun "sed -i /$MASTERIP/d /etc/hosts"
+			rlRun "echo \"$MASTERIP $MASTER\" >> /etc/hosts"
+			rlRun "cat /etc/hosts"
+
+			rlRun "ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD --no-reverse -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$s_short.$DOMAIN.gpg" 
+
+			rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
+
+			rlLog "Checking that the SLAVEs zone is created locally"
+			rlRun "ipa dnszone-show $SLAVEZONE"
+			rlLog "Checking that the zone added before ipa-replica-prepare is created locally"
+			rlRun "ipa dnszone-show $ZONE1"
+			rlLog "Checking that the zone added after ipa-replica-prepare is created locally"
+			rlRun "ipa dnszone-show $ZONE2"
+
+			rlRun "appendEnv" 0 "Append the machine information to the env.sh"
+		fi
+	rlPhaseEnd
+}
+
+installSlave_nr2()
+{
+	rlPhaseStartTest "installSlave_nr2 - Installing replica with --no-reverse WITHOUT reverse zones"
+		MASTERZONE=$(echo $MASTERIP|awk -F . '{print $3 "." $2 "." $1 ".in-addr.arpa."}')
+		SLAVEZONE=$(echo $SLAVEIP|awk -F . '{print $3 "." $2 "." $1 ".in-addr.arpa."}')
+		[ -z "$s_short" ] && s_short=$(echo $SLAVE|cut -f1 -d.)
+		cd /dev/shm/
+		rlRun "rm -f /dev/shm/replica-info-*"
+		rlRun "sftp root@$MASTERIP:/var/lib/ipa/replica-info-$s_short.$DOMAIN.gpg /dev/shm"
+		ls /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg
+		if [ $? -ne 0 ] ; then
+			rlFail "ERROR: Replica Package not found"
+		else
+			rlRun "echo \"nameserver $MASTERIP\" > /etc/resolv.conf"
+			rlRun "cat /etc/resolv.conf"
+			rlRun "sed -i /$MASTERIP/d /etc/hosts"
+			rlRun "echo \"$MASTERIP $MASTER\" >> /etc/hosts"
+			rlRun "cat /etc/hosts"
+
+			rlRun "ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD --no-reverse -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$s_short.$DOMAIN.gpg"
+			rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
+
+			rlLog "verifies https://bugzilla.redhat.com/show_bug.cgi?id=757644"
+			rlLog "ipa-replica-install with --no-reverse should not create new reverse zone if it does not already exist"
+			rlLog "Checking that the SLAVEs zone is not created locally"
+			rlRun "ipa dnszone-show $SLAVEZONE" 2
+			rlLog "Checking that the zone added before ipa-replica-prepare is created locally"
+			rlRun "ipa dnszone-show $ZONE1"
+			rlLog "Checking that the zone added after ipa-replica-prepare is created locally"
+			rlRun "ipa dnszone-show $ZONE2"
+			rlRun "appendEnv" 0 "Append the machine information to the env.sh"
+		fi
+	rlPhaseEnd
+}
+
+installSlave_nr3()
+{
+	rlPhaseStartTest "installSlave_nr3 - Installing replica WITHOUT reverse zones"
+		MASTERZONE=$(echo $MASTERIP|awk -F . '{print $3 "." $2 "." $1 ".in-addr.arpa."}')
+		SLAVEZONE=$(echo $SLAVEIP|awk -F . '{print $3 "." $2 "." $1 ".in-addr.arpa."}')
+		[ -z "$s_short" ] && s_short=$(echo $SLAVE|cut -f1 -d.)
+		cd /dev/shm/
+		rlRun "rm -f /dev/shm/replica-info-*"
+		rlRun "sftp root@$MASTERIP:/var/lib/ipa/replica-info-$s_short.$DOMAIN.gpg /dev/shm"
+		ls /dev/shm/replica-info-$s_short.$DOMAIN.gpg
+		if [ $? -ne 0 ] ; then
+			rlFail "ERROR: Replica Package not found"
+		else
+			rlRun "echo \"nameserver $MASTERIP\" > /etc/resolv.conf"
+			rlRun "cat /etc/resolv.conf"
+			rlRun "sed -i /$MASTERIP/d /etc/hosts"
+			rlRun "echo \"$MASTERIP $MASTER\" >> /etc/hosts"
+			rlRun "cat /etc/hosts"
+
+			rlRun "ipa-replica-install -U --setup-dns --no-forwarders -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$s_short.$DOMAIN.gpg"
+			rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
+
+			rlLog "Checking that the SLAVEs zone is created locally"
+			rlRun "ipa dnszone-show $SLAVEZONE"
+			rlLog "Checking that the zone added before ipa-replica-prepare is created locally"
+			rlRun "ipa dnszone-show $ZONE1"
+			rlLog "Checking that the zone added after ipa-replica-prepare is created locally"
+			rlRun "ipa dnszone-show $ZONE2"
+
+			rlRun "appendEnv" 0 "Append the machine information to the env.sh"
+		fi
 	rlPhaseEnd
 }
 
