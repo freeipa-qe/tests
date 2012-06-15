@@ -344,6 +344,10 @@ for rpm in abrt-tui abrt-addon-ccpp libreport-plugin-mailx; do
                 fi
         done
 
+if [ -z "$JOBID" ]; then 
+	eval $(echo $(grep JOBID /etc/motd))
+fi
+
 cat > /etc/abrt/abrt-action-save-package-data.conf << EOF
 OpenGPGCheck = no
 BlackList = nspluginwrapper, valgrind, strace, mono-core
@@ -352,7 +356,7 @@ BlackListedPaths = /usr/share/doc/*, */example*, /usr/bin/nspluginviewer, /usr/l
 EOF
 
 cat > /etc/libreport/plugins/mailx.conf << EOF
-Subject=CRASH ALERT: Crash detected in ipa automation.
+Subject=CRASH ALERT: Crash detected in ipa automation [Beaker Job: $JOBID].
 EmailFrom=root@$hostname_s
 EmailTo=seceng-idm-qe-list@redhat.com
 SendBinaryData=no
