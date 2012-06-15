@@ -66,10 +66,12 @@ sizelimits()
 	ipa group-find --sizelimit=0 > /tmp/groupfind.out
 	result=`cat /tmp/groupfind.out | grep "Number of entries returned"`
 	number=`echo $result | cut -d " " -f 5`
-	if [ $number -eq 13 ] ; then
+	# We now have "Trusts administrators group" hence group-find is 14.
+	#if [ $number -eq 13 ] ; then
+	if [ $number -eq 14 ] ; then
 		rlPass "All groups returned as expected with size limit of 0"
 	else
-		rlFail "Number of groups returned is not as expected.  GOT: $number EXP: 13"
+		rlFail "Number of groups returned is not as expected.  GOT: $number EXP: 14"
 	fi
     rlPhaseEnd
 
@@ -99,10 +101,12 @@ sizelimits()
 	ipa group-find --sizelimit=20 > /tmp/groupfind.out
         result=`cat /tmp/groupfind.out | grep "Number of entries returned"`
         number=`echo $result | cut -d " " -f 5`
-        if [ $number -eq 13 ] ; then
+	# We now have "Trusts administrators group" hence group-find is 14.
+        #if [ $number -eq 13 ] ; then
+        if [ $number -eq 14 ] ; then
                 rlPass "All group returned as expected with size limit of 20"
         else
-                rlFail "Number of groups returned is not as expected.  GOT: $number EXP: 13"
+                rlFail "Number of groups returned is not as expected.  GOT: $number EXP: 14"
         fi
     rlPhaseEnd
 
@@ -153,6 +157,9 @@ ingroups()
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-group-find-012 Positive test of --not-in-groups in group-find"
+	# We have one more group now "Trust admins", and this pushed group3 out of search limit. Hence setting the search
+	# limit to 6 to accomodate this case.
+	rlRun "ipa config-mod --searchrecordslimit=6"
 	rlRun "ipa group-find --not-in-groups=$group1 | grep Group\ name: | grep $group3" 0 "Making sure that group $group3 comes back when searching --not-in-groups=$group1"
     rlPhaseEnd
 }
