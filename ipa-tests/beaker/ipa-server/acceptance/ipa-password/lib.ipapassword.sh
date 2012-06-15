@@ -24,6 +24,8 @@ set_systime()
     echo "[set system time] before set systime [$before]"
     echo "[set system time] after  set systime [$after]"
     echo "[set system time] offset [$offset] seconds"
+	echo "[set system time] sleep 3 seconds"
+	sleep 3
 } # set_systime
 
 restore_systime()
@@ -399,7 +401,8 @@ append_test_member()
     then
         rlPass "user [$testac] is already member of [$testgrp]"
     else
-        rlRun "ipa group-add-member $testgrp --users=$testac" 0 "add user [$testac] to group [$testgrp]"
+        rlLog "add user [$user] as member of grouup [$testgrp]: ipa group-add-member $testgrp --users=$testac"
+        rlRun "ipa group-add-member $testgrp --users=$testac"
     fi
     rlRun "$kdestroy"
     rm $out
@@ -1089,8 +1092,9 @@ Local_kinit()
 {
     local user=$1
     local password=$2
-    local expfile=/tmp/local_kinit_${RANDOM}.exp
-    local ret=0
+    local expfile=$tmpdir/local_kinit.${RANDOM}.exp
+    local out=${expfile}.out
+    local ret=9
     local msg=""
     echo "set timeout 3" > $expfile
     echo "set send_slow {1 .1}" >> $expfile
@@ -1098,16 +1102,22 @@ Local_kinit()
     echo "expect \"Password for *\"" >> $expfile
     echo "send -s -- $password\r" >> $expfile
     echo "expect eof" >> $expfile
-    echo ""   
-    /usr/bin/expect $expfile
-    ret=$?
-    if [ "$ret" = "0" ];then
+    $kdestroy 2>&1 > /dev/null
+    /usr/bin/expect $expfile 2>&1 > $out
+    if klist | grep "Default principal: $user"
+    then
+        ret=$success
         msg="success"
     else
-        msg="failed"
+        ret=$fail
+        msg="fail"
     fi
-    echo "------- local kinit [$msg] : user [$user] with password [$password] ---------"
+    
+    rlLog "[Local kinit: `date`] $msg : user [$user] password [$password]"
+	echo "------exp source file [$expfile]------------"
 	cat $expfile
-	echo "------------------------------------------------------------------------"
+	echo "------exp execution output [$out]------------"
+    cat $out
+    echo "------------------------------------------------------"
     return $ret
 }

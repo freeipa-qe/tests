@@ -1222,7 +1222,7 @@ ipapassword_grouppolicy_maxlifetime_default_logic()
     # test logic starts
         local maxlife_in_second=`echo "$grouppw_maxlife * 24 * 60 * 60 " |bc `
         local minlife_in_second=`echo "$grouppw_minlife * 60 * 60 " |bc`
-        local midpoint_in_second=`echo "($minlife + $maxlife)/2" |bc` 
+        local midpoint_in_second=`echo "($minlife_in_second + $maxlife_in_second)/2" |bc` 
 
         rlLog "reset user password to trigger password policy maxlife constrains"
         set_systime "+ $minlife_in_second"
@@ -2252,17 +2252,9 @@ ipapassword_nestedgrouppw_maxlife_conflict()
         rlRun "$kdestroy"
         change_password $testac $testacPW $testacNEWPW  # trigger the password
         currentPW=$testacNEWPW
-        #rlRun "echo $currentPW | kinit $testac 2>&1 >/dev/null" 0 "verify password: [$testac]:[$currentPW]"
-        if Local_kinit $testac $currentPW
-        then
-            rlLog "before test: verify password success"
-        else
-            rlFail "before test: verify password failed, user [$testac] password:[$currentPW], test can not continue"
-        fi
 
-        rlLog "set system one minute before $below, same password should work withoud password change prompt"
-        set_systime "+ $below * 24 * 60 * 60 - 1 * 60" # set system time BEFORE below
-        #rlRun "echo $currentPW | kinit $testac 2>&1 >/dev/null" 0 "expecting no password change prompt: [$testac]:[$currentPW]"
+        rlLog "set system one minute after $below, same password should work withoud password change prompt"
+        set_systime "+ $below * 24 * 60 * 60 + 1 * 60" #  if group password is effective policy here, then when below < system time < maxlife : no password prompt
         if Local_kinit $testac $currentPW
         then
             rlPass "test before maxlife: no password change prompt"
@@ -2270,22 +2262,18 @@ ipapassword_nestedgrouppw_maxlife_conflict()
             rlFail "test before maxlife: password change prompted is not expected"
         fi
 
-        rlLog "set clock on the below:[$below], if testac follows nestedgrp password policy, system will prompt for password change, test cmd ((echo $currentPW | kinit $testac)) will fail"
-        set_systime "+ 1 * 24 * 60 * 60 "             # set system time AFTER below
-        rlRun "echo $currentPW | kinit $testac 2>&1 >/dev/null" 0 "expecting no password change prompt: [$testac]:[$currentPW]"
-        rlLog "set clock 2 minutes after the maxlife: [$maxlife] days, expect password prompt"
-        set_systime "+ 1 * 24 * 60 * 60 + 2*60"      # set system time AFTER maxlife        
-        #rlRun "echo $currentPW | kinit $testac 2>&1 >/dev/null" 1 "expecting password change prompt: [$testac]:[$currentPW]"
+        rlLog "set clock after maxlife:[$maxlife] system will prompt for password change"
+        set_systime "+ 2 * 24 * 60 * 60 "             # set system time = maxlife + 1 minutes
         if Local_kinit $testac $currentPW
         then
             rlFail "test 2 minutes after maxlife: no password change prompt is NOT expected"
         else
             rlPass "test 2 minutes after maxlife: password change prompted is expected"
         fi
-
-
-        rlLog "test scenario 2: make make nestedgrp [$nestedgrp] has maxlife above [$above] group [$group]'s maxlife:[$maxlife]"
-        rlLOg "                 it will not change the behave, since the effective pwpolicy is group [$group]'s policy"
+        ##################
+        ##################
+        rlLog "test scenario 2: make nestedgrp [$nestedgrp] has maxlife above [$above] group [$testgrp]'s maxlife:[$maxlife]"
+        rlLog "                 behave will not change, since the effective pwpolicy is group [$testgrp]'s policy"
         Local_KinitAsAdmin
         rlRun "ipa pwpolicy-mod $nestedgrp --maxlife=$above" \
               0 "set maxlife for [$nestedgrp] to [$above]"
@@ -2296,17 +2284,9 @@ ipapassword_nestedgrouppw_maxlife_conflict()
         append_test_nested_ac
         change_password $testac $testacPW $testacNEWPW  # trigger the password policy 
         currentPW=$testacNEWPW
-        #rlRun "echo $currentPW | kinit $testac 2>&1 >/dev/null" 0 "ensure current password: [$testac]:[$currentPW]"
-        if Local_kinit $testac $currentPW
-        then
-            rlPass "before test: verify password pass"
-        else
-            rlFail "before test: verify password failed, test can not continue"
-        fi
 
         rlLog "set system one minute before maxlife:[$maxlife], same password should work withoud password change prompt"
         set_systime "+ $maxlife * 24 * 60 * 60 - 1 * 60"
-        #rlRun "echo $currentPW | kinit $testac 2>&1 >/dev/null" 0 "before maxlife, expect no password change prompt: [$testac]:[$currentPW]"
         if Local_kinit $testac $currentPW
         then
             rlPass "before maxlife: password still works, no password change prompt"
@@ -2314,9 +2294,8 @@ ipapassword_nestedgrouppw_maxlife_conflict()
             rlFail "before maxlife: password does not work is NOT expected"
         fi
 
-        rlLog "set system time AFTER maxlife"
+        rlLog "set system time 1 minutes AFTER maxlife"
         set_systime "+ 2*60"
-        #rlRun "echo $currentPW | kinit $testac 2>&1 >/dev/null" 1 "after maxlife, expect password change prompt: [$testac]:[$testacPW]"
         if Local_kinit $testac $currentPW
         then
             rlFail "after maxlife: password still works, no password change prompt, this is NOI expected"
@@ -2896,24 +2875,11 @@ ipapassword_attr_add_krbMaxPwdLife()
 {
 # looped data   : 
 # non-loop data : 
-    rlPhaseStartTest "ipapassword_attr_add"
-        for attr in $pwpolicyattrs; do
-            Local_KinitAsAdmin
-            ipapassword_attr_add_logic $attr
-            rlRun "$kdestroy"
-        done
-    rlPhaseEnd
-} #ipapassword_attr_add_krbMaxPwdLife
-
-ipapassword_attr_add_krbMaxPwdLife()
-{
-# looped data   : 
-# non-loop data : 
     rlPhaseStartTest "ipapassword_attr_add_krbMaxPwdLife"
         local attr=krbMaxPwdLife
         local value=`getrandomint`
         Local_KinitAsAdmin
-        ipapassword_attr_add_logic $attr $value 1 ""
+        ipapassword_attr_add_logic $attr $value $success ""
         rlRun "$kdestroy"
     rlPhaseEnd
 } #ipapassword_attr_add_krbMaxPwdLife
@@ -2924,7 +2890,7 @@ ipapassword_attr_add_krbMaxPwdLife_negative()
         local attr=krbMaxPwdLife
         local value=`getrandomstring`
         Local_KinitAsAdmin
-        ipapassword_attr_add_logic $attr $value 1 ""
+        ipapassword_attr_add_logic $attr $value $fail ""
         rlRun "$kdestroy"
     rlPhaseEnd
 } #ipapassword_attr_add_krbMaxPwdLife_negative
@@ -2938,7 +2904,7 @@ ipapassword_attr_add_krbMinPwdLife()
         maxlife=`ipa pwpolicy-show $testgrp --all | grep -i "max lifetime" | cut -d":" -f2 | xargs echo`
         max=`echo "$maxlife * 24" | bc`
         minvalue=`getrandomint $max `
-        ipapassword_attr_add_logic $attr "$minvalue" 1 ""
+        ipapassword_attr_add_logic $attr "$minvalue" $success ""
         rlRun "$kdestroy"
     rlPhaseEnd
 } #ipapassword_attr_add_krbMinPwdLife
@@ -2949,7 +2915,7 @@ ipapassword_attr_add_krbMinPwdLife_negative()
         local attr=krbMinPwdLife
         local value=`getrandomstring`
         Local_KinitAsAdmin
-        ipapassword_attr_add_logic $attr $value 1 "ipa: ERROR: invalid 'krbminpwdlife': must be an integer"
+        ipapassword_attr_add_logic $attr $value $fail "ipa: ERROR: invalid 'krbminpwdlife': must be an integer"
         rlRun "$kdestroy"
     rlPhaseEnd
 } #ipapassword_attr_add_krbMinPwdLife_negative
@@ -2960,7 +2926,7 @@ ipapassword_attr_add_krbPwdMinDiffChars()
         local attr=krbPwdMinDiffChars
         local value=`getrandomint 1 5`
         Local_KinitAsAdmin
-        ipapassword_attr_add_logic $attr $value 1 ""
+        ipapassword_attr_add_logic $attr $value $success ""
         rlRun "$kdestroy"
     rlPhaseEnd
 
@@ -2972,7 +2938,7 @@ ipapassword_attr_add_krbPwdMinDiffChars_negative()
         local attr=krbPwdMinDiffChars
         local value=`getrandomint 6 50000`
         Local_KinitAsAdmin
-        ipapassword_attr_add_logic $attr $value 1 "ipa: ERROR: invalid 'krbpwdmindiffchars': can be at most 5"
+        ipapassword_attr_add_logic $attr $value $fail "ipa: ERROR: invalid 'krbpwdmindiffchars': can be at most 5"
         rlRun "$kdestroy"
     rlPhaseEnd
 
@@ -2984,7 +2950,7 @@ ipapassword_attr_add_krbPwdMinLength()
         local attr=krbPwdMinLength
         local value=`getrandomint`
         Local_KinitAsAdmin
-        ipapassword_attr_add_logic $attr $value 1 ""
+        ipapassword_attr_add_logic $attr $value $success ""
         rlRun "$kdestroy"
     rlPhaseEnd
 
@@ -2996,7 +2962,7 @@ ipapassword_attr_add_krbPwdMinLength_negative()
         local attr=krbPwdMinLength
         local value=`getrandomstring`
         Local_KinitAsAdmin
-        ipapassword_attr_add_logic $attr "-$value" 1 "ipa: ERROR: invalid 'krbpwdminlength': must be an integer"
+        ipapassword_attr_add_logic $attr "-$value" $fail "ipa: ERROR: invalid 'krbpwdminlength': must be an integer"
         rlRun "$kdestroy"
     rlPhaseEnd
 
@@ -3008,7 +2974,7 @@ ipapassword_attr_add_krbPwdHistoryLength()
         local attr=krbPwdHistoryLength
         local value=`getrandomint`
         Local_KinitAsAdmin
-        ipapassword_attr_add_logic $attr $value 1 ""
+        ipapassword_attr_add_logic $attr $value $success ""
         rlRun "$kdestroy"
     rlPhaseEnd
 
@@ -3020,7 +2986,7 @@ ipapassword_attr_add_krbPwdHistoryLength_negative()
         local attr=krbPwdHistoryLength
         local value=`getrandomint`
         Local_KinitAsAdmin
-        ipapassword_attr_add_logic $attr "-$value" 1 "ipa: ERROR: invalid 'krbpwdhistorylength': must be at least 0"
+        ipapassword_attr_add_logic $attr "-$value" $fail "ipa: ERROR: invalid 'krbpwdhistorylength': must be at least 0"
         rlRun "$kdestroy"
     rlPhaseEnd
 
