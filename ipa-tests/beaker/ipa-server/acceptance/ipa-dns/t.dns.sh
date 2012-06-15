@@ -5,7 +5,8 @@
 currenteth=$(route | grep ^default | awk '{print $8}')
 
 # get the ip address of that interface
-ipaddr=$(ifconfig $currenteth | grep inet\ addr | sed s/:/\ /g | awk '{print $3}')
+#ipaddr=$(ifconfig $currenteth | grep inet\ addr | sed s/:/\ /g | awk '{print $3}')
+ipaddr=$(hostname -i)
 rlLog "Ip address is $ipaddr"
 ipoc1=$(echo $ipaddr | cut -d\. -f1)
 ipoc2=$(echo $ipaddr | cut -d\. -f2)
@@ -111,10 +112,12 @@ dnsreplicaprepare()
 		let newip=$ipoc4+1
 		rlLog "EXECUTING: ipa-replica-prepare -p $ADMINPW --ip-address=$newfakehostip newfakehost$newip.$DOMAIN"
 		rlRun "ipa-replica-prepare -p $ADMINPW --ip-address=$newfakehostip newfakehost$newip.$DOMAIN" 0
+		rlRun "service named restart"
 	rlPhaseEnd
 
 
 	rlPhaseStartTest "ipa-dns-replicaprepare-02 check forward ip of the replica was created in dns correctly with ping"
+		sleep 10
 		rlLog "EXECUTING: ping -c 1 newfakehost$newip.$DOMAIN"
 		rlRun "ping -c 1 newfakehost$newip.$DOMAIN" 0 "Checking to ensure that the forward for the replica was created in dns"
 	rlPhaseEnd
