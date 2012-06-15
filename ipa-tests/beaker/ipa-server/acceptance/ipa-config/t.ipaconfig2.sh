@@ -165,7 +165,8 @@ ipaconfig_addattr_negative()
 
   rlPhaseStartTest "ipaconfig_addaddtr negative test - ipacertificatesubjectbase only one allowed"
         command="ipa config-mod --addattr=ipacertificatesubjectbase=O=DOMAIN.COM"
-        expmsg="ipa: ERROR: ipacertificatesubjectbase: Only one value allowed."
+        #expmsg="ipa: ERROR: ipacertificatesubjectbase: Only one value allowed."
+        expmsg="ipa: ERROR: invalid 'ipacertificatesubjectbase': attribute is not configurable"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
 	rlLog "Verifies bugzilla https://bugzilla.redhat.com/show_bug.cgi?id=807018"
   rlPhaseEnd
@@ -214,14 +215,16 @@ ipaconfig_delattr_negative()
 
     rlPhaseStartTest "ipaconfig_delattr invalid attribute negative test"
 	command="ipa config-mod --delattr=ipaCustomFields=FALSE"
-	expmsg="ipa: ERROR: 'ipacustomfields' does not exist"
+	#expmsg="ipa: ERROR: 'ipacustomfields' does not exist"
+	expmsg="ipa: ERROR: invalid 'ipacustomfields': No such attribute on this entry"
 	rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
 	rlLog "Verifies bugzilla https://bugzilla.redhat.com/show_bug.cgi?id=817821"
     rlPhaseEnd
 
     rlPhaseStartTest "ipaconfig_mod_delattr ipahomesrootdir negative test"
 	command="ipa config-mod --delattr=ipahomesrootdir=/home/"
-        expmsg="ipa: ERROR: 'ipahomesrootdir' is required"
+        #expmsg="ipa: ERROR: 'ipahomesrootdir' is required"
+        expmsg="ipa: ERROR: ipahomesrootdir does not contain '/home/'"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
         rlLog "Verifies bugzilla https://bugzilla.redhat.com/show_bug.cgi?id=817821"
     rlPhaseEnd
@@ -234,14 +237,15 @@ ipaconfig_delattr_negative()
 
     rlPhaseStartTest "ipaconfig_mod_delattr ipadefaultloginshell negative test"
         command="ipa config-mod --delattr=ipadefaultloginshell=/bin/bash"
-        expmsg="ipa: ERROR: Action not allowed"
+        expmsg="ipa: ERROR: ipadefaultloginshell does not contain '/bin/bash'"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
         rlLog "Verifies bugzilla https://bugzilla.redhat.com/show_bug.cgi?id=817821"
     rlPhaseEnd
 
     rlPhaseStartTest "ipaconfig_mod_delattr ipadefaultprimarygroup negative test"
         command="ipa config-mod --delattr=ipadefaultprimarygroup=\"cn=ipausers,cn=accounts,cn=$BASEDN\""
-        expmsg="ipa: ERROR: 'ipadefaultprimarygroup' is required"
+        #expmsg="ipa: ERROR: 'ipadefaultprimarygroup' is required"
+        expmsg="ipa: ERROR: ipadefaultprimarygroup does not contain 'cn=ipausers,cn=accounts,cn=dc=testrelm,dc=com'"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
         rlLog "Verifies bugzilla https://bugzilla.redhat.com/show_bug.cgi?id=817821"
     rlPhaseEnd
@@ -278,7 +282,8 @@ ipaconfig_delattr_negative()
 
     rlPhaseStartTest "ipaconfig_mod_delattr ipacertificatesubjectbase negative test"
         command="ipa config-mod --delattr=ipacertificatesubjectbase=O=$RELM"
-        expmsg="ipa: ERROR: 'ipacertificatesubjectbase' is required"
+        #expmsg="ipa: ERROR: 'ipacertificatesubjectbase' is required"
+        expmsg="ipa: ERROR: invalid 'ipacertificatesubjectbase': attribute is not configurable"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
         rlLog "Verifies bugzilla https://bugzilla.redhat.com/show_bug.cgi?id=807018"
     rlPhaseEnd
@@ -373,7 +378,8 @@ ipaconfig_setattr_positive()
 
    rlPhaseStartTest "ipaconfig-mod_setattr ipacertificatesubjectbase negative"
         command="ipa config-mod --setattr=ipacertificatesubjectbase=\"OU=Bogus\""
-        expmsg="ipa: ERROR: Action not allowed"
+        #expmsg="ipa: ERROR: Action not allowed"
+        expmsg="ipa: ERROR: invalid 'ipacertificatesubjectbase': attribute is not configurable"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
         rlLog "Verifies bugzilla https://bugzilla.redhat.com/show_bug.cgi?id=807018"
    rlPhaseEnd
@@ -394,7 +400,9 @@ ipaconfig_setattr_positive()
 cleanup()
 {
    rlPhaseStartTest "Cleanup"
-	rlRun "ipa config-mod --setattr=ipacertificatesubjectbase=\"O=$RELM\""	
+	# Commenting the following case since ipacertificatesubjectbase is no longer a configurable attribute.
+	# rlRun "ipa config-mod --setattr=ipacertificatesubjectbase=\"O=$RELM\""	
+	rlRun "ipa config-show"
 	rlRun "restore_ipaconfig" 0 "Restore default configuration"
 	rlRun "ipa group-del mygroup"
    rlPhaseEnd
