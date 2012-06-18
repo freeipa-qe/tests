@@ -1,3 +1,3 @@
-PURPOSE of /CoreOS/ipa-server/acceptance/ipa-csreplica-manage
-Description: IPA ipa-csreplica-manage Acceptance Tests
-Author: Kashyap Chamarthy <kchamart@redhat.com>
+PURPOSE of /CoreOS/tests/Regression/ipa-test-template
+Description: IPA ipa-replica-manage Acceptance Tests
+Author: Scott Poore <spoore@redhat.com>
