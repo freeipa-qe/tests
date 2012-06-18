@@ -326,6 +326,8 @@ installSlave()
 		# stop the firewall
 		service iptables stop
 		service ip6tables stop
+
+		miscDNSCheckup
 	rlPhaseEnd
 
 }
@@ -388,6 +390,8 @@ installSlave_nf()
 			rhts-submit-log -l /var/log/dirsrv/slapd-$INSTANCE/access_nf
 		fi
 
+
+		miscDNSCheckup
    rlPhaseEnd
 }
 
@@ -442,6 +446,8 @@ installSlave_nr()
 				rhts-submit-log -l /var/log/ipareplica-conncheck.log_nr
 		fi
 
+
+		miscDNSCheckup
 	rlPhaseEnd
 }
 
@@ -476,6 +482,8 @@ installSlave_nr1()
 
 			rlRun "appendEnv" 0 "Append the machine information to the env.sh"
 		fi
+
+		miscDNSCheckup
 	rlPhaseEnd
 }
 
@@ -511,6 +519,8 @@ installSlave_nr2()
 			rlRun "ipa dnszone-show $ZONE2"
 			rlRun "appendEnv" 0 "Append the machine information to the env.sh"
 		fi
+
+		miscDNSCheckup
 	rlPhaseEnd
 }
 
@@ -545,6 +555,8 @@ installSlave_nr3()
 
 			rlRun "appendEnv" 0 "Append the machine information to the env.sh"
 		fi
+
+		miscDNSCheckup
 	rlPhaseEnd
 }
 
@@ -594,6 +606,8 @@ installSlave_nhostdns()
                 rhts-submit-log -l /var/log/ipareplica-install.log
         fi
 
+
+		miscDNSCheckup
    rlPhaseEnd
 }
 
@@ -658,6 +672,8 @@ installSlave_ca()
 
 		CA2INSTALL=true
 
+
+		miscDNSCheckup
    rlPhaseEnd
 }
 
@@ -696,6 +712,8 @@ installSlave_sshtrustdns() {
                 rhts-submit-log -l /var/log/ipareplica-install.log
         fi
 
+
+		miscDNSCheckup
 	rlPhaseEnd
 } #installSlave_sshtrustdns
 
@@ -730,6 +748,8 @@ installSlave_configuresshd() {
 		if [ -f /var/log/ipareplica-install.log ]; then
 			rhts-submit-log -l /var/log/ipareplica-install.log
 		fi
+
+		miscDNSCheckup
 	rlPhaseEnd
 } #installSlave_configuresshd
 
@@ -769,6 +789,8 @@ installSlave_nodnssshfp() {
         if [ -f /var/log/ipareplica-install.log ]; then
                 rhts-submit-log -l /var/log/ipareplica-install.log
         fi
+
+		miscDNSCheckup
 	rlPhaseEnd
 } #installSlave_nodnssshfp
 
@@ -806,6 +828,8 @@ installSlave_nouiredirect() {
         if [ -f /var/log/ipareplica-install.log ]; then
                 rhts-submit-log -l /var/log/ipareplica-install.log
         fi
+
+		miscDNSCheckup
 	rlPhaseEnd
 } #installSlave_nouiredirect
 
@@ -952,6 +976,8 @@ uninstall()
 		rlLog "Waiting for 1 minute for everything to clear..."
 		rlRun "sleep 60"
 
+
+		miscDNSCheckup
 	rlPhaseEnd
 }
 
@@ -985,4 +1011,32 @@ miscDNSCleanup()
 	if [ $(ipa dnsrecord-show $DOMAIN _kerberos-master._tcp |grep $hostname_s|wc -l) -gt 0 ]; then
 		rlRun "ipa dnsrecord-del $DOMAIN \"@\" --ns-rec=$hostname_s.$DOMAIN"
 	fi
+}
+
+miscDNSCheckup(){
+	s=$(echo $SLAVE)
+	s_short=$(echo $SLAVE|cut -f1 -d.)
+	rlLog "Checking for DNS record _kerberos-master._tcp for $s"
+	rlRun "ipa dnsrecord-show $DOMAIN _kerberos-master._tcp	| grep $s_short"
+
+	rlLog "Checking for DNS record _kerberos._tcp for $s"
+	rlRun "ipa dnsrecord-show $DOMAIN _kerberos._tcp | grep $s_short"
+
+	rlLog "Checking for DNS record _kerberos._udp for $s"
+	rlRun "ipa dnsrecord-show $DOMAIN _kerberos._udp | grep $s_short"
+
+	rlLog "Checking for DNS record _kpasswd._tcp for $s"
+	rlRun "ipa dnsrecord-show $DOMAIN _kpasswd._tcp | grep $s_short"
+
+	rlLog "Checking for DNS record _kpasswd._udp for $s"
+	rlRun "ipa dnsrecord-show $DOMAIN _kpasswd._udp | grep $s_short"
+
+	rlLog "Checking for DNS record _ldap._tcp for $s"
+	rlRun "ipa dnsrecord-show $DOMAIN _ldap._tcp | grep $s_short"
+
+	rlLog "Checking for DNS record _ntp._udp for $s"
+	rlRun "ipa dnsrecord-show $DOMAIN _ntp._udp | grep $s_short"
+
+	rlLog "Checking for DNS record _kerberos-master._tcp for $s"
+	rlRun "ipa dnsrecord-show $DOMAIN _kerberos-master._tcp | grep $s_short"
 }
