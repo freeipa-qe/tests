@@ -36,13 +36,6 @@ uninstall_fornexttest()
     if [ -f $DEFAULT  ] ; then
        rlLog "Uninstall for next test"
        rlRun "ipa-server-install --uninstall -U " 0 "Uninstalling ipa server for next test"
-      #Workaround for bug:
-      rc=`certutil -L -d . -n "IPA CA"`
-      if [ rc = 0 ] ; then
-         rlLog "Move /etc/pki/nss/cert8.db and key3.db"
-         mv /etc/pki/nss/cert8.db /etc/pki/nss/cert8.db.old
-         mv /etc/pki/nss/key3.db /etc/pki/nss/key3.db.old
-      fi
     fi
 }
 
