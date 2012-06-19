@@ -56,6 +56,7 @@ setup() {
 rlPhaseStartTest "Setup for winsync sanity tests"
 
 	# check for packages
+pushd .
 	for item in $PACKAGE1 $PACKAGE2 ; do
         	rpm -qa | grep $item
         	if [ $? -eq 0 ] ; then
@@ -66,18 +67,20 @@ rlPhaseStartTest "Setup for winsync sanity tests"
 	done
 
 	# kinit as admin and creating users
-	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user" 
-	rlRun "create_ipauser $user1 $user1 $user1 $userpw"
-	sleep 5
+#	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user" 
+#	rlRun "create_ipauser $user1 $user1 $user1 $userpw"
+#	sleep 5
 	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-	rlRun "create_ipauser $user2 $user2 $user2 $userpw"
-        rlRun "TmpDir=\`mktemp -d\`" 0 "Creating tmp directory"
-        rlRun "pushd $TmpDir"
+#	rlRun "create_ipauser $user2 $user2 $user2 $userpw"
+#        rlRun "TmpDir=\`mktemp -d\`" 0 "Creating tmp directory"
+#        rlRun "pushd $TmpDir"
 
 	# stopping firewall
 	rlRun "service iptables stop"
 
 	# winsync setup
+popd
+	rlRun "certutil -A -i ADcert.cer -d /etc/dirsrv/slapd-TESTRELM-COM/ -n \"Melman AD cert\" -t \"CT,,C\""
 
 rlPhaseEnd
 }
@@ -86,13 +89,12 @@ winsync_connect_0001() {
 
 rlPhaseStartTest "winsync_connect_0001: "
         rlRun "TmpDir=\`mktemp -d\`" 0 "Creating tmp directory"
-        rlRun "pushd $TmpDir"
-
-	rlRun "echo hi"
+        #rlRun "pushd $TmpDir"
+	rlRun "certutil -L -d /etc/dirsrv/slapd-TESTRELM-COM | grep \"AD 112 cert\"" 0 "Verifying AD cert is imported in db"
 
 	# Test case cleanup
 	rlRun "rm -fr $TmpDir" 
-	rlRun "popd"
+#	rlRun "popd"
 rlPhaseEnd
 }
 
@@ -103,13 +105,13 @@ cleanup() {
 rlPhaseStartTest "Clean up for winsync sanity tests"
 
 	rlRun "kinitAs $ADMINID $ADMINPW" 0
-	rlRun "ipa user-del $user1"
+#	rlRun "ipa user-del $user1"
 	sleep 5
-	rlRun "ipa user-del $user2"
+#	rlRun "ipa user-del $user2"
+	rlRun "certutil -D -n \"AD 112 cert\" -d /etc/dirsrv/slapd-TESTRELM-COM"
 	rlRun "rm -fr /tmp/krb5cc_1*"
 	rlRun "kdestroy" 0 "Destroying admin credentials."
+	
 
 rlPhaseEnd
 }
-
-

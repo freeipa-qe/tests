@@ -2,7 +2,7 @@
 #
 #   Makefile of /CoreOS/tests/acceptance/ipa-winsync
 #   Description: ipa winsync test cases
-#   Author: Steeve Goveas <sgoveas@redhat.com>
+#   Author: Steeve Goveas <stv@redhat.com>
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
@@ -29,7 +29,7 @@ export TESTVERSION=1.0
 
 BUILT_FILES=
 
-FILES=$(METADATA) runtest.sh Makefile PURPOSE t.ipa-winsync.sh
+FILES=$(METADATA) runtest.sh Makefile PURPOSE t.ipa-winsync.sh ADcert.cer README
 
 .PHONY: all install download clean
 

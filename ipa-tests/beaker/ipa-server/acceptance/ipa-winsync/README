@@ -1,0 +1,35 @@
+## Prerequisites to execute ipa-winsync tests. ##
+
+1. Setup AD server if it does not already exist
+
+2. While configuring AD Install DNS and add forward and reverse zones for "testrelm.com" and include the A record of the IPA server. Make sure IPA server is resolvable from AD server.
+
+3. Fill-up the AD details in Config file placed in this directory
+
+4. Copy AD cert in the current directory. Name the cert file "ADcert.cer"
+
+5. Make IPA CA trusted by importing IPA cert in the AD server's database. Follow the steps below.
+ 
+ a. Copy the cert file /etc/ipa/ca.crt to a location in AD server
+
+ b. Download passync from below link on to the AD server
+    https://wiki.idm.lab.bos.redhat.com/share/builds/components/winsync/passsync/20100512.1/release/
+
+ c. Run it and provide the following values
+
+    Hostname: <IPA server name>
+    Port: 636
+    Username: uid=passsync,cn=sysaccounts,cn=etc,dc=testrelm,dc=com
+    Password: password
+    Cert Token: Secret123
+    search base: cn=users,cn=accounts,dc=testrelm,dc=com
+
+ d. Make IPA CA trusted
+    From command prompt
+    > cd C:\Program Files\Red Hat Directory Password Synchronization
+    > certutil -d . -N (this will ask for password. Give "password")
+    > certutil -d . -A -n "IPA CA" -t CT,, -a -i c:\path\to\ipaca.crt
+ 
+ e. Restart AD Server
+
+6. Make sure time is synchronized between both servers
