@@ -48,7 +48,8 @@ fi
 	
 
 # get the mac-address of that interface
-macaddr=$(ifconfig $currenteth | grep "Ethernet  HWaddr " | awk '{print $5}')
+#macaddr=$(ifconfig $currenteth | grep "Ethernet  HWaddr " | awk '{print $5}')
+macaddr=$(cat /sys/class/net/$currenteth/address)
 byte1=$(echo $macaddr | awk -F : '{print $1}')
 byte2=$(echo $macaddr | awk -F : '{print $2}')
 byte3=$(echo $macaddr | awk -F : '{print $3}')
@@ -82,6 +83,11 @@ ETHER_PACKAGE="nss-pam-ldapd"
 	rlRun "tmpDir=\`mktemp -d\`" 0 "Creating temp directory"
         rlRun "pushd $tmpDir"
      rlPhaseEnd
+
+        cat /etc/redhat-release | grep "Fedora"
+        if [ $? -eq 0 ] ; then
+                setenforce 0
+        fi
  
      rlPhaseStartTest "ipa-host-cli-94: add a host with --macaddress --force"
         myhost=mytesthost1.$DOMAIN
@@ -359,7 +365,7 @@ ETHER_PACKAGE="nss-pam-ldapd"
                 done
                 getent_macaddr=$getent_macaddr${new_byte6,,}
                 rlAssertGrep "$getent_macaddr $myhost" "$tmpfile"
-		rlRun "ipa host-mod --delattr $attr=$host_macaddr $myhost" 0 "Delete attribute $attr=$host_macaddr."
+		rlRun "ipa host-mod --delattr $attr=${host_macaddr^^} $myhost" 0 "Delete attribute $attr=$host_macaddr."
 		rlRun "verifyHostAttr $myhost \"MAC address\" $host_macaddr" 1 "Check if MAC address attribute was deleted"
 		rlRun "/usr/bin/getent ethers $myhost > $tmpfile" 2 "Get the ether value associated with the host, should be empty."
                 getent_macaddr=""
@@ -432,5 +438,5 @@ ETHER_PACKAGE="nss-pam-ldapd"
 	rlRun "popd"
         rlRun "rm -r $tmpDir" 0 "Removing temp directory"
     rlPhaseEnd
-
+    setenforce 1
 }
