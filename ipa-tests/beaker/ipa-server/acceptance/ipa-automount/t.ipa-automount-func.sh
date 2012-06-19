@@ -143,7 +143,18 @@ EOF
 
         rlRun "mkdir /share /ipashare"
 	rlRun "perl -pi -e 's/automount:  files/automount:  ldap/g'  /etc/nsswitch.conf"
-        rlRun "service nfs restart"
+
+        cat /etc/redhat-release | grep "Fedora"
+        if [ $? -eq 0 ] ; then
+                FLAVOR="Fedora"
+                rlLog "Automation is running against Fedora"
+		rlRun "service nfs-server restart"
+        else   
+                FLAVOR="RedHat"
+                rlLog "Automation is running against RedHat"
+        	rlRun "service nfs restart"
+        fi
+
         rlRun "service autofs restart"
 	rlRun "showmount -e $MASTER"
 rlPhaseEnd
