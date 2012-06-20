@@ -296,6 +296,8 @@ installSlave()
 			# rlAssertGrep "forwarders" "/etc/named.conf"
 			rlAssertGrep "$DNSFORWARD" "/etc/named.conf"
 
+			replicaBugCheck_bz830314
+
 			rlRun "appendEnv" 0 "Append the machine information to the env.sh with the information for the machines in the recipe set"
 
 			# Verifying bug 784696
@@ -365,6 +367,8 @@ installSlave_nf()
 				rlRun "cat /etc/named.conf"
 				rlRun "cat /etc/resolv.conf"
 
+				replicaBugCheck_bz830314
+ 
                 rlRun "appendEnv" 0 "Append the machine information to the env.sh with the information for the machines in the recipe set"
 				rlRun "dig +short $MASTER"
 				rlRun "dig +short -x $MASTERIP"
@@ -418,6 +422,8 @@ installSlave_nr()
 			rlLog "EXECUTING: ipa-replica-install -U --setup-dns --no-forwarders --no-reverse -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg"
 			rlRun "/bin/bash /dev/shm/replica-install.bash" 0 "Replica installation"
 			rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
+
+			replicaBugCheck_bz830314
 
 			# Disabling the following since empty forwarders exist in named.conf
 			# rlAssertNotGrep "forwarders" "/etc/named.conf"
@@ -473,6 +479,8 @@ installSlave_nr1()
 
 			rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
 
+			replicaBugCheck_bz830314
+
 			rlLog "Checking that the SLAVEs zone is created locally"
 			rlRun "ipa dnszone-show $SLAVEZONE"
 			rlLog "Checking that the zone added before ipa-replica-prepare is created locally"
@@ -508,6 +516,8 @@ installSlave_nr2()
 
 			rlRun "ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD --no-reverse -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$s_short.$DOMAIN.gpg"
 			rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
+
+			replicaBugCheck_bz830314
 
 			rlLog "verifies https://bugzilla.redhat.com/show_bug.cgi?id=757644"
 			rlLog "ipa-replica-install with --no-reverse should not create new reverse zone if it does not already exist"
@@ -545,6 +555,8 @@ installSlave_nr3()
 
 			rlRun "ipa-replica-install -U --setup-dns --no-forwarders -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$s_short.$DOMAIN.gpg"
 			rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
+
+			replicaBugCheck_bz830314
 
 			rlLog "Checking that the SLAVEs zone is created locally"
 			rlRun "ipa dnszone-show $SLAVEZONE"
@@ -588,6 +600,8 @@ installSlave_nhostdns()
                 rlRun "/bin/bash /dev/shm/replica-install.bash" 0 "Replica installation"
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
 
+			replicaBugCheck_bz830314
+
 		# Disabling the following since empty forwarders exist in named.conf
                 # rlAssertNotGrep "forwarders" "/etc/named.conf"
                 rlAssertNotGrep "$DNSFORWARD" "/etc/named.conf"
@@ -629,6 +643,8 @@ installSlave_ca()
                 rlLog "EXECUTING: ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD --setup-ca -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg"
                 rlRun "/bin/bash /dev/shm/replica-install.bash" 0 "Replica installation"
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
+
+			replicaBugCheck_bz830314
 
 		# Disabling the following since empty forwarders exist in named.conf
                 # rlAssertGrep "forwarders" "/etc/named.conf"
@@ -699,6 +715,8 @@ installSlave_sshtrustdns() {
                 rlRun "/bin/bash /dev/shm/replica-install.bash" 0 "Replica installation"
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
 
+			replicaBugCheck_bz830314
+
                 rlRun "service ipa status"
 				rlRun "service named restart"
         	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
@@ -732,6 +750,8 @@ installSlave_configuresshd() {
 			rlLog "EXECUTING: ipa-replica-install -U --setup-dns --no-forwarders --configure-sshd --skip-conncheck -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg"
 			rlRun "/bin/bash /dev/shm/replica-install.bash" 0 "Replica installation"
 			rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
+
+			replicaBugCheck_bz830314
 
 			rlRun "service ipa status"
 			rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
@@ -779,6 +799,8 @@ installSlave_nodnssshfp() {
                 rlRun "/bin/bash /dev/shm/replica-install.bash" 0 "Replica installation"
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
 
+				replicaBugCheck_bz830314
+
                 rlRun "service ipa status"
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 
@@ -811,6 +833,8 @@ installSlave_nouiredirect() {
                 rlLog "EXECUTING: ipa-replica-install -U --setup-dns --no-forwarders --no-ui-redirect --skip-conncheck -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg"
                 rlRun "/bin/bash /dev/shm/replica-install.bash" 0 "Replica installation"
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
+
+				replicaBugCheck_bz830314
 
                 rlRun "service ipa status"
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
@@ -849,6 +873,81 @@ installCA()
 		rhts-submit-log -l /var/log/ipareplica-ca-install.log
 	fi
    rlPhaseEnd
+}
+
+installSlave_negative1()
+{
+	rlPhaseStartTest "installSlave_negative1 - Installing replica fails during conncheck if ports not accessible"
+		[ -z "$s_short" ] && s_short=$(echo $SLAVE|cut -f1 -d.)
+		ls /dev/shm/replica-info-$s_short.$DOMAIN.gpg
+		if [ $? -ne 0 ] ; then
+			rlFail "ERROR: Replica Package not found"
+		else
+			rlRun "echo \"nameserver $MASTERIP\" > /etc/resolv.conf"
+			rlRun "cat /etc/resolv.conf"
+			rlRun "sed -i /$MASTERIP/d /etc/hosts"
+			rlRun "echo \"$MASTERIP $MASTER\" >> /etc/hosts"
+			rlRun "cat /etc/hosts"
+
+			
+			########### HTTP ###############
+			rlLog "Testing HTTP TCP and UDP port access"
+			rlRun "ssh root@$MASTERIP 'iptables -A INPUT -m tcp -p tcp --dport 80  -j REJECT --reject-with icmp-host-prohibited'"
+			rlRun "ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$SLAVE.gpg > $tmpout 2>&1" 1
+			rlAssertGrep "HTTP Server: Unsecure port (80): FAILED" $tmpout
+			rlAssertGrep "Port check failed! Inaccessible port(s): 80 (TCP)" $tmpout
+			rlRun "cat $tmpout"
+			rlRun "ssh root@$MASTERIP 'iptables -D INPUT -m tcp -p tcp --dport 80  -j REJECT --reject-with icmp-host-prohibited'"
+
+			########### HTTPS ##############
+			rlLog "Testing HTTPS TCP port access"
+			rlRun "ssh root@$MASTERIP 'iptables -A INPUT -m tcp -p tcp --dport 443 -j REJECT --reject-with icmp-host-prohibited'"
+			rlRun "ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$SLAVE.gpg > $tmpout 2>&1" 1
+			rlAssertGrep "HTTP Server: Secure port (443): FAILED" $tmpout
+			rlAssertGrep "Port check failed! Inaccessible port(s): 443 (TCP)" $tmpout
+			rlRun "ssh root@$MASTERIP 'iptables -D INPUT -m tcp -p tcp --dport 443 -j REJECT --reject-with icmp-host-prohibited'"
+
+			########### LDAP ##############
+			rlLog "Testing LDAP TCP port access"
+			rlRun "ssh root@$MASTERIP 'iptables -A INPUT -m tcp -p tcp --dport 389 -j REJECT --reject-with icmp-host-prohibited'"
+			rlRun "ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$SLAVE.gpg > $tmpout 2>&1" 1
+			rlAssertGrep "Directory Service: Unsecure port (389): FAILED" $tmpout
+			rlAssertGrep "Port check failed! Inaccessible port(s): 389 (TCP)" $tmpout
+			rlRun "ssh root@$MASTERIP 'iptables -D INPUT -m tcp -p tcp --dport 389 -j REJECT --reject-with icmp-host-prohibited'"
+
+			########### LDAPS ##############
+			rlLog "Testing LDAPS TCP port access"
+			rlRun "ssh root@$MASTERIP 'iptables -A INPUT -m tcp -p tcp --dport 636 -j REJECT --reject-with icmp-host-prohibited'"
+			rlRun "ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$SLAVE.gpg > $tmpout 2>&1" 1
+			rlAssertGrep "Directory Service: Secure port (636): FAILED" $tmpout
+			rlAssertGrep "Port check failed! Inaccessible port(s): 636 (TCP)" $tmpout
+			rlRun "ssh root@$MASTERIP 'iptables -D INPUT -m tcp -p tcp --dport 636 -j REJECT --reject-with icmp-host-prohibited'"
+
+			########### Kerberos KDC TCP ##############
+			rlLog "Testing Kerberos KDC TCP port access"
+			rlRun "ssh root@$MASTERIP 'iptables -A INPUT -m tcp -p tcp --dport 88  -j REJECT --reject-with icmp-host-prohibited'"
+			rlRun "ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$SLAVE.gpg > $tmpout 2>&1" 1
+			rlAssertGrep "Kerberos KDC: TCP (88): FAILED" $tmpout
+			rlAssertGrep "Port check failed! Inaccessible port(s): 88 (TCP)" $tmpout
+			rlRun "ssh root@$MASTERIP 'iptables -D INPUT -m tcp -p tcp --dport 88  -j REJECT --reject-with icmp-host-prohibited'"
+
+			########### Kerberos Kpasswd TCP ##############
+			rlLog "Testing Kerberos Kpasswd TCP port access"
+			rlRun "ssh root@$MASTERIP 'iptables -A INPUT -m tcp -p tcp --dport 464 -j REJECT --reject-with icmp-host-prohibited'"
+			rlRun "ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$SLAVE.gpg > $tmpout 2>&1" 1
+			rlAssertGrep "Kerberos Kpasswd: TCP (464): FAILED" $tmpout
+			rlAssertGrep "Port check failed! Inaccessible port(s): 464 (TCP)" $tmpout
+			rlRun "ssh root@$MASTERIP 'iptables -D INPUT -m tcp -p tcp --dport 464 -j REJECT --reject-with icmp-host-prohibited'"
+
+			########### Finally MAKE SURE it's not installed #############
+			if [ $(ipactl status|grep RUNNING|wc -l) -gt 0 ]; then
+				rlRun "ssh root@$MASTERIP 'ipa-replica-manage -p $ADMINPW del $SLAVE -f'"
+				rlRun "ipa-server-install --uninstall -U"
+				rlRun "service sssd stop"
+				rlRun "rm -f /var/lib/sss/pubconf/kdcinfo.$RELM"
+			fi
+		fi
+	rlPhaseEnd
 }
 
 uninstall()
@@ -1065,3 +1164,4 @@ miscDNSCheckup_negative(){
 	rlLog "Checking for NO DNS SRV record _ntp._udp for $s"
 	rlRun "sed -n '/_ntp._udp/,/^[[:space:]]*$/p' /tmp/remote_exec.out|grep $s_short" 1
 }
+

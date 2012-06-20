@@ -125,3 +125,16 @@ EOF
 	rlPhaseEnd
 }
 
+replicaBugCheck_bz830314()
+{
+	rlPhaseStartTest "replicaBugCheck_bz830314 - ipa-replica-install named failed to start"
+		if [ -f /var/log/ipareplica-install.log ]; then
+			if [ $(grep "Starting named: [FAILED]" /var/log/ipareplica-install.log |wc -l) -gt 0 ]; then
+				rlFail "BZ 830314 found...ipa-replica-install named failed to start"
+				rlRun "sed -n '/restarting named/,/7\/8/p' /var/log/ipareplica-install.log" 
+			fi
+		else
+			rlFail "Cannot find ipareplica-install.log to check BZ 830314"
+		fi
+	rlPhaseEnd
+}
