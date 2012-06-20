@@ -39,11 +39,18 @@
 . /dev/shm/ipa-server-shared.sh
 . /dev/shm/env.sh
 
+# Install samba-common package if not already installed
+rpm="samba-common"
+
+   rlCheckRpm "$rpm"
+	if [ $? -ne 0 ]; then
+           rlRun "yum install -y $rpm"
+        fi
+
 # Include test case file
 . ./t.ipa-winsync.sh
 
 PACKAGE="ipa-server"
-
 ##########################################
 #   Sanity Tests
 #########################################

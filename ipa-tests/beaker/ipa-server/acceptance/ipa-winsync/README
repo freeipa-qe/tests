@@ -1,4 +1,6 @@
 ## Prerequisites to execute ipa-winsync tests. ##
+# Follow these steps before starting the automatic tests
+# For a complete detailed How To please check Setup_Doc file
 
 1. Setup AD server if it does not already exist
 
@@ -33,3 +35,5 @@
  e. Restart AD Server
 
 6. Make sure time is synchronized between both servers
+
+7. The automation script will restart the PassSync service again after winsync agreement is established. No need of any manual intervention from this point onwards.
