@@ -232,6 +232,9 @@ rlJournalStart
 			installSlave_nouiredirect
 			uninstall
 
+			# Install slave with negative tests for blocked ports
+			installSlave_negative1
+
 			# Installing slave with --setup-ca
 			installSlave_ca
 				
