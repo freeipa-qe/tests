@@ -56,7 +56,7 @@ PACKAGE="ipa-server"
 #########################################
 
 	winsync_connect() {
-		"winsync_connect_0001"
+		"winsync_connect_0001_a"
 	}
 
 	#TODO tests
