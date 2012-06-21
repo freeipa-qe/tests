@@ -28,6 +28,7 @@
 #	check_coredump
 #   submit_log
 #   submit_logs
+#	rlDistroDiff
 ######################################################################
 KINITEXEC=/usr/bin/kinit
 #######################################################################
@@ -1076,3 +1077,44 @@ submit_logs(){
 	submit_log /var/log/dirsrv/slapd-PKI-IPA/errors
 }
 
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
+# Usage: rlDistroDiff <case_name>
+#
+# This can be used to exec as per detected distro.
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
+rlDistroDiff() {
+
+        os_fedora() {
+                case "$var" in
+
+                clear_ccdir)
+                        rlRun "rm -fvr `ls -d /run/user/* | grep -v root`";
+                        ;;
+                esac
+                }
+
+        os_rhel() {
+                case "$var" in
+
+                clear_ccdir)
+                        rlRun "rm -fr /tmp/krb5cc_*_*";
+                        ;;
+                esac
+                }
+
+
+        cat /etc/redhat-release | grep "Fedora"
+        if [ $? -eq 0 ] ; then
+                FLAVOR="Fedora"
+                var=$1
+                os_fedora
+        else
+                FLAVOR="RedHat"
+                var=$1
+                os_rhel
+        fi
+
+}
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
