@@ -401,6 +401,7 @@ rlJournalStart
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message - alpha characters."
         command="ipa hostgroup-find --timelimit=#*"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message - special characters."
+	rlRun "ipa config-mod --searchrecordslimit=-1" 0 "re-setting search records limit to unlimited"
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-hostgroup-cli-39: add host group as member to itself - bugzilla 501377"
@@ -432,15 +433,16 @@ rlJournalStart
 	rlRun "addHostGroup \"$group2\" \"$group2\"" 0 "Adding host group \"$group2\""
 	rlRun "ipa hbacrule-add $hb" 0 "Adding hbac rule for testing with user-find"
 	rlRun "ipa hbacrule-add-host --hostgroups=$group1 $hb" 0 "adding hostgroup $group2 to hbacrule $hb"
-	rlRun "ipa host-find --in-hbacrules=$hb | grep $group1" 0 "making sure group1 is returned when searching hostgroups using --in-hbacrules"
+	# should be hostgroup-find instead of host-fin
+	rlRun "ipa hostgroup-find --in-hbacrules=$hb | grep $group1" 0 "making sure group1 is returned when searching hostgroups using --in-hbacrules"
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-hostgroup-cli-43: Negative host-find test using --in-hbacrules"
-	rlRun "ipa host-find --in-hbacrules=$hb | grep $group2" 1 "making sure group2 is not returned when searching hostgroups using --in-hbacrules"
+	rlRun "ipa hostgroup-find --in-hbacrules=$hb | grep $group2" 1 "making sure group2 is not returned when searching hostgroups using --in-hbacrules"
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-hostgroup-cli-44: Positive host-find test using --not-in-hbacrules"
-	rlRun "ipa host-find --not-in-hbacrules=$hb | grep $group2" 0 "making sure group2 is returned when searching hostgroups using --not-in-hbacrules"
+	rlRun "ipa hostgroup-find --not-in-hbacrules=$hb | grep $group2" 0 "making sure group2 is returned when searching hostgroups using --not-in-hbacrules"
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-hostgroup-cli-45: Negative host-find test using --not-in-hbacrules"
