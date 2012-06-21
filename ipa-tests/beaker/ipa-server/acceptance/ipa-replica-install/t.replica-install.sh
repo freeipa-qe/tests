@@ -877,6 +877,7 @@ installCA()
 
 installSlave_negative1()
 {
+	local tmpout=/tmp/error_msg.out
 	rlPhaseStartTest "installSlave_negative1 - Installing replica fails during conncheck if ports not accessible"
 		[ -z "$s_short" ] && s_short=$(echo $SLAVE|cut -f1 -d.)
 		ls /dev/shm/replica-info-$s_short.$DOMAIN.gpg
