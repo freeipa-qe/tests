@@ -1088,7 +1088,7 @@ rlDistroDiff() {
         os_fedora() {
                 case "$var" in
 
-                clear_ccdir)
+                clear_ccdir) # As part of clean-up, removing credential cache dirs
                         rlRun "rm -fvr `ls -d /run/user/* | grep -v root`";
                         ;;
                 esac
@@ -1097,7 +1097,7 @@ rlDistroDiff() {
         os_rhel() {
                 case "$var" in
 
-                clear_ccdir)
+                clear_ccdir) # As part of clean-up, removing credential cache dirs
                         rlRun "rm -fr /tmp/krb5cc_*_*";
                         ;;
                 esac
