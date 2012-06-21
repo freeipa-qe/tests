@@ -427,6 +427,46 @@ ETHER_PACKAGE="nss-pam-ldapd"
         rlLog "EXECUTING: ipa host-add $myhost --macaddress=\"$host_macaddr\" --force" 0 "Adding host with --mac-address=\"$host_macaddr\" and --force"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."	
     rlPhaseEnd
+    
+    rlPhaseStartTest "ipa-host-cli-108: delattr --macaddress with lowercase"
+        myhost=mytesthost1.$DOMAIN
+        new_byte6="EF"
+        tmpfile="$tmpDir/hostether_$myhost_108.out"
+        attr="macaddress"
+        if [ $macaddr ] ; then
+                host_macaddr=$byte1":"$byte2":"$byte3":"$byte4":"$byte5":"$new_byte6
+                rlRun "ipa host-add $myhost --macaddress=$host_macaddr --force" 0 "Adding host with --mac-address and --force"
+                rlRun "verifyHostAttr $myhost \"MAC address\" $host_macaddr" 0 "Check if MAC address was added"
+                rlRun "/usr/bin/getent ethers $myhost > $tmpfile" 0 "Get the ether value associated with the host"
+                getent_macaddr=""
+                for item in $byte1 $byte2 $byte3 $byte4 $byte5 ; do
+                        if [[ ${item:0:1} = "0" ]] ; then
+                                item=${item:1:1}
+                        fi
+                        item=${item,,}
+                        getent_macaddr=$getent_macaddr$item":"
+                done
+                getent_macaddr=$getent_macaddr${new_byte6,,}
+                rlAssertGrep "$getent_macaddr $myhost" "$tmpfile"
+                rlRun "ipa host-mod --delattr $attr=${host_macaddr} $myhost > $tmpfile 2>&1" 1 "Delete attribute $attr=$host_macaddr."
+                rlAssertGrep "ipa: ERROR: macaddress does not contain" "$tmpfile"
+                rlRun "verifyHostAttr $myhost \"MAC address\" $host_macaddr" 0 "Check if MAC address attribute was not deleted"
+                rlRun "/usr/bin/getent ethers $myhost > $tmpfile" 0 "Get the ether value associated with the host, should not be empty."
+                getent_macaddr=""
+                for item in $byte1 $byte2 $byte3 $byte4 $byte5 ; do
+                        if [[ ${item:0:1} = "0" ]] ; then
+                                item=${item:1:1}
+                        fi
+                        item=${item,,}
+                        getent_macaddr=$getent_macaddr$item":"
+                done
+                getent_macaddr=$getent_macaddr${new_byte6,,}
+                rlAssertGrep "$getent_macaddr $myhost" "$tmpfile"
+                rlRun "ipa host-del $myhost" 0 "Cleanup delete test host"
+        else
+            rlFail "MAC address not found on this host."
+        fi
+    rlPhaseEnd
 
     rlPhaseStartTest "ipa-host-cli-macaddress-cleanup: Remove nss-pam-ldapd, nsswitch.conf back on default and remove temp directory."
 	rlRun "cat /etc/nslcd.conf | sed -e 's/base dc=testrelm,dc=com/base dc=example,dc=com/' >/etc/nslcd.conf.modified2" 0 "Set the base back on default value."
@@ -438,5 +478,6 @@ ETHER_PACKAGE="nss-pam-ldapd"
 	rlRun "popd"
         rlRun "rm -r $tmpDir" 0 "Removing temp directory"
     rlPhaseEnd
+
     setenforce 1
 }
