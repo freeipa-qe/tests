@@ -133,6 +133,7 @@ rlPhaseStartTest "Setup for sudo functional tests"
         rlRun "service iptables stop"
 
         # enabling NIS
+	rlRun "nisdomainname `hostname -d`"
 #        rlRun "echo -n Secret123 > $TmpDir/passwd.txt"
 #        rlLog "Verifying bug https://bugzilla.redhat.com/show_bug.cgi?id=707133"
 #        rlRun "ipa-nis-manage -y $TmpDir/passwd.txt enable"
@@ -142,7 +143,7 @@ rlPhaseStartTest "Setup for sudo functional tests"
 	# searches for /etc/nslcd.conf for sudo maps. 
 	# https://bugzilla.redhat.com/show_bug.cgi?id=709235
 
-	if [ $distro_variant = Fedora ]; then
+	if [ $distro_variant = Fedora ] ; then
 		rlLog "Distro variant detected is $distro_variant"
 		rlRun "yum install nss_ldap -y"
 	else
@@ -527,6 +528,7 @@ sudorule-add-hostgrp_func001() {
 rlPhaseStartTest "sudorule-add-hostgrp_func001: Adding hostgroup and verifying from sudo client."
 
 	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+
 	domain=`hostname -d`
 	rlRun "domainname $domain"
 	rlRun "rm -fr /var/lib/sss/db/cache_*"
@@ -1065,6 +1067,7 @@ rlPhaseStartTest "Clean up for sudo functional tests"
         rlRun "ipa user-del $user2"
 	sleep 5
 	rlRun "ipa user-del $user3"
+	rlDistroDiff clear_ccdir
         rlRun "kdestroy" 0 "Destroying admin credentials."
 
         # disabling NIS
@@ -1075,7 +1078,7 @@ rlPhaseStartTest "Clean up for sudo functional tests"
         rlRun "popd"
         rlRun "rm -r $TmpDir" 0 "Removing tmp directory"
 
-	rlRun "rm -f /etc/nss_ldap.conf"
+	rlRun "rm -f $SUDO_LDAP_CONF_PATH"
 	rlFileRestore /etc/nsswitch.conf
 rlPhaseEnd
 }

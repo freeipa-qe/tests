@@ -2435,7 +2435,7 @@ rlPhaseStartTest "Clean up for sudo sanity tests"
 	rlRun "ipa user-del $user1"
 	sleep 5
 	rlRun "ipa user-del $user2"
-	rlRun "rm -fr /tmp/krb5cc_1*"
+	rlRun "rm -fr /tmp/krb5cc_*_*"
 	rlRun "ipa sudocmd-find" 1
 	rlRun "ipa sudocmdgroup-find" 1
 	rlRun "ipa sudorule-find" 1
