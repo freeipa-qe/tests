@@ -40,6 +40,9 @@
 # AD values
 . ./Config
 
+# AD libs
+. ./winlib.sh
+
 ########################################################################
 # Test Suite Globals
 ########################################################################
@@ -67,48 +70,6 @@ named_conf_bkp="/etc/named.conf.winsync"
 error_log="/var/log/dirsrv/slapd-TESTRELM-COM/errors"
 binddn="cn=Administrator,cn=Users,dc=adrelm,dc=com"
 
-create_ldif() {
-# $1 first name # $2 Surname # $3 Username # $4 changetype (add, modify, delete)
-
-cat > ADuser.ldif << EOF
-dn: CN=$1 $2,CN=Users,DC=adrelm,DC=com
-changetype: $4
-objectClass: top
-objectClass: person
-objectClass: organizationalPerson
-objectClass: user
-cn: $1 $2
-sn: $2
-givenName: $1
-distinguishedName: CN=$1 $2,CN=Users,DC=adrelm,DC=com
-name: $1 $2
-sAMAccountName: $3
-displayName: $1 $2
-userPrincipalName: $3@adrelm.com
-EOF
-}
-
-# Microsoft stores a quoted password in little endian UTF16 base64 encoded. Hence to generate the password, use the command:
-#echo -n "\"Secret123\"" | iconv -f UTF8 -t UTF16LE | base64 -w 0
-
-create_passwd_ldif() {
-cat > ADuser_passwd.ldif << EOF
-dn: CN=$1 $2,CN=Users,DC=adrelm,DC=com
-changetype: modify
-replace: unicodePwd
-unicodePwd::IgBTAGUAYwByAGUAdAAxADIAMwAiAA==
-EOF
-}
-
-# Modify userAccountControl
-create_cntrl_ldif() {
-cat > ADuser_cntrl.ldif << EOF
-dn: CN=$1 $2,CN=Users,DC=adrelm,DC=com
-changetype: modify
-replace: userAccountControl
-userAccountControl: $3
-EOF
-}
 
 setup() {
 rlPhaseStartTest "Setup for winsync sanity tests"
@@ -164,24 +125,6 @@ popd
 rlPhaseEnd
 }
 
-syncinterval_ldif() {
-cat > syncinterval.ldif << EOF
-dn: cn=meTo$ADhost,cn=replica,cn=dc\3Dtestrelm\2Cdc\3Dcom,cn=mapping tree,cn=config
-changetype: modify
-add: winSyncInterval
-winSyncInterval: $1
-EOF
-}
-
-errorlog_ldif() {
-cat > errorlog.ldif << EOF
-dn: cn=config
-changetype: modify
-replace: nsslapd-errorlog-level
-nsslapd-errorlog-level: $1
-EOF
-}
-
 winsync_test_0001() {
 
 rlPhaseStartTest "winsync_test_0001: Change Winsync Interval from default 300 seconds"
@@ -210,6 +153,8 @@ rlPhaseStartTest "winsync_test_0001: Change Winsync Interval from default 300 se
 
 rlPhaseEnd
 }
+
+
 winsync_test_0002_a() {
 
 rlPhaseStartTest "winsync_test_0002_a: Create users(numeric/alphanumeric) in AD"
@@ -245,14 +190,7 @@ rlPhaseStartTest "winsync_test_0002: User added in IPA is not replicated on AD"
 rlPhaseEnd
 }
 
-modify_ldif() {
-cat > modify.ldif << EOF
-dn: cn=ipa-winsync,cn=plugins,cn=config
-changetype: modify
-replace: ipawinsyncacctdisable
-ipawinsyncacctdisable: $1
-EOF
-}
+
 winsync_test_0004() {
 
 rlPhaseStartTest "winsync_test_0003: Synchronization behaviour of account lock status"
@@ -264,6 +202,7 @@ rlPhaseStartTest "winsync_test_0003: Synchronization behaviour of account lock s
 	
 rlPhaseEnd
 }
+
 
 cleanup() {
 
