@@ -21,17 +21,15 @@ import javax.mail.internet.MimeMessage;
 import org.testng.annotations.*; 
 
 import com.redhat.qe.auto.testng.Assert;
-import com.redhat.qe.ipa.sahi.base.SahiTestScript;
 import com.redhat.qe.ipa.sahi.pages.EmailTool;
 import com.redhat.qe.ipa.sahi.pages.IPAWebAutomationActionNotDefinedException;
 import com.redhat.qe.ipa.sahi.pages.IPAWebPage; 
 import com.redhat.qe.ipa.sahi.tasks.CommonTasks;
-import com.redhat.qe.ipa.sahi.tasks.GlobalizationWebAutomationTasks;
 import com.redhat.qe.ipa.sahi.tasks.SahiTasks; 
 import com.redhat.qe.ipa.sahi.tests.group.GroupTests; 
 import com.redhat.qe.ipa.sahi.pages.*;
 
-public class GlobalizationWebAutomation extends IPAWebAutomation {
+public class GlobalizationWebAutomation extends IPAWebAutomation { 
 	private static String packageName ="com.redhat.qe.ipa.sahi.pages.";  
 	private static Logger log = Logger.getLogger(GroupTests.class.getName()); 
 	
@@ -49,7 +47,6 @@ public class GlobalizationWebAutomation extends IPAWebAutomation {
 	public void test_add(String scenario, String testPage, String testDataFile) throws Exception { 
 		start = System.currentTimeMillis();
 		executeQueue(testPage, "add", testDataFile);
-		
 	}
 
 	@Test (groups={"modify"}, dataProvider="modifyData", dependsOnGroups = "add",
