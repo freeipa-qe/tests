@@ -298,7 +298,7 @@ bz804562()
 {
 	# Test for bug https://bugzilla.redhat.com/show_bug.cgi?id=804562
 	rlPhaseStartTest "bz804562 --ns-hostname option does not check A/AAAA record of the provided hostname."
-		verifyErrorMsg "ipa dnsrecord-add $DOMAIN dns176 --ns-hostname=ns1.shanks.$DOMAIN" "ipa: ERROR: Nameserver 'ns1.shanks.$DOMAIN' does not have a corresponding A/AAAA record"
+		verifyErrorMsg "ipa dnsrecord-add $DOMAIN dns176 --ns-hostname=ns1.shanks.$DOMAIN." "ipa: ERROR: Nameserver 'ns1.shanks.$DOMAIN.' does not have a corresponding A/AAAA record"
 
         rlPhaseEnd
 }
@@ -368,7 +368,12 @@ EOF
                 fi
 
 		# revert to original
-                cat > /tmp/nsupdate.txt << EOF
+
+		if [ -z "$sshfprecord1" ];then
+
+			rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+		else
+	                cat > /tmp/nsupdate.txt << EOF
 zone $DOMAIN.
 update delete $MASTER. IN SSHFP
 send
@@ -377,11 +382,11 @@ update add $MASTER. 1200 IN SSHFP $sshfprecord2
 send
 EOF
 
-		rlRun "kinit -k -t /etc/krb5.keytab host/$MASTER"
-		rlRun "nsupdate -g /tmp/nsupdate.txt"
+			rlRun "kinit -k -t /etc/krb5.keytab host/$MASTER"
+			rlRun "nsupdate -g /tmp/nsupdate.txt"
 
-		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-
+			rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+		fi
 	rlPhaseEnd
 }
 
@@ -391,7 +396,8 @@ bz701677()
 	rlPhaseStartTest "bz701677 Allow specifying query and transfer policy settings for a zone."
 		currenteth=$(/sbin/ip -6 route show | grep ^default | awk '{print $5}' | head -1)
 		MASTERIP=`dig +short $MASTER`
-		MASTERIP6=`ifconfig $currenteth | grep "inet6 " | grep -E 'Scope:Site|Scope:Global' | awk '{print $3}' | awk -F / '{print $1}' | sed -n '1p'`
+		#MASTERIP6=`ifconfig $currenteth | grep "inet6 " | grep -E 'Scope:Site|Scope:Global' | awk '{print $3}' | awk -F / '{print $1}' | sed -n '1p'`
+		MASTERIP6=`hostname -I | awk '{print $2}'`
 
 		rlRun "ipa dnszone-add example.com --name-server=$MASTER --admin-email=$email"
 

@@ -51,9 +51,6 @@
 . ./t.dns_pkey.sh
 . ./t.dns.sh
 
-PACKAGE="ipa-server"
-
-
 ##########################################
 #   test main 
 #########################################
@@ -62,7 +59,7 @@ PACKAGE="ipa-server"
 rlJournalStart
 
   rlPhaseStartSetup "DNS SETUP"
-        rlAssertRpm $PACKAGE
+        rlDistroDiff ipa_pkg_check
         rlRun "TmpDir=\`mktemp -d\`" 0 "Creating tmp directory"
         rlRun "pushd $TmpDir"
 	yum -y install wget rpcbind
