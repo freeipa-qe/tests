@@ -115,12 +115,25 @@ public class CommonTasks {
 	//recorded actions 
 	public static void formauth(SahiTasks sahiTasks){
 		try{
-			Runtime.getRuntime().exec("kdestroy");
+			
 			//OutputStream stdin = process.getOutputStream ();    
 			
 			
 			sahiTasks.open();
+			Runtime.getRuntime().exec("kdestroy");
 			sahiTasks.navigateTo(serverUrl, true);
+			
+			if(!sahiTasks.link("form-based authentication").exists()){
+				
+				if(sahiTasks.link("Logout").exists()){
+					
+					sahiTasks.link("Logout").click();
+					Runtime.getRuntime().exec("kdestroy");
+					if(sahiTasks.link("Return to main page.").exists()){
+						sahiTasks.link("Return to main page.").click();
+					}
+				}
+			}
 			sahiTasks.link("form-based authentication").click();
 			sahiTasks.textbox("username").setValue("admin");
 			sahiTasks.password("password").setValue("Secret123");
