@@ -60,15 +60,15 @@
 			<xmlfileset dir="src/com/redhat/qe/ipa/sahi/tests/netgroup" includes="netgroup-testng.xml"/>
 			<xmlfileset dir="src/com/redhat/qe/ipa/sahi/tests/service" includes="service-testng.xml"/>
 			<!-- <xmlfileset dir="src/com/redhat/qe/ipa/sahi/tests/dns" includes="dns-testng.xml"/> --> 
-			<xmlfileset dir="src/com/redhat/qe/ipa/sahi/tests/hbac" includes="hbac-testng.xml"/>
+			<!--<xmlfileset dir="src/com/redhat/qe/ipa/sahi/tests/hbac" includes="hbac-testng.xml"/>-->
 			<xmlfileset dir="src/com/redhat/qe/ipa/sahi/tests/sudo" includes="sudo-testng.xml"/>
-			<xmlfileset dir="src/com/redhat/qe/ipa/sahi/tests/passwordpolicy" includes="passwordpolicy-testng.xml"/>
-			<xmlfileset dir="src/com/redhat/qe/ipa/sahi/tests/kerberosticketpolicy" includes="kerberosticketpolicy-testng.xml"/>
-			<xmlfileset dir="src/com/redhat/qe/ipa/sahi/tests/configuration" includes="configuration-testng.xml"/> 
-			<xmlfileset dir="src/com/redhat/qe/ipa/sahi/tests/rbac" includes="rbac-testng.xml"/>
-			<xmlfileset dir="src/com/redhat/qe/ipa/sahi/tests/automount" includes="automount.xml"/>
-			<xmlfileset dir="src/com/redhat/qe/ipa/sahi/tests/selfservicepermission" includes="selfservicepermission-testng.xml"/>
-			<xmlfileset dir="src/com/redhat/qe/ipa/sahi/tests/globalization" includes="globalization-testng.xml"/> 
+			<!--<xmlfileset dir="src/com/redhat/qe/ipa/sahi/tests/passwordpolicy" includes="passwordpolicy-testng.xml"/>-->
+			<!--<xmlfileset dir="src/com/redhat/qe/ipa/sahi/tests/kerberosticketpolicy" includes="kerberosticketpolicy-testng.xml"/>-->
+			<!--<xmlfileset dir="src/com/redhat/qe/ipa/sahi/tests/configuration" includes="configuration-testng.xml"/> -->
+			<!--<xmlfileset dir="src/com/redhat/qe/ipa/sahi/tests/rbac" includes="rbac-testng.xml"/>-->
+			<!--<xmlfileset dir="src/com/redhat/qe/ipa/sahi/tests/automount" includes="automount.xml"/>-->
+			<!--<xmlfileset dir="src/com/redhat/qe/ipa/sahi/tests/selfservicepermission" includes="selfservicepermission-testng.xml"/>-->
+			<!--<xmlfileset dir="src/com/redhat/qe/ipa/sahi/tests/globalization" includes="globalization-testng.xml"/> -->
 		</testng>
 	</target>
 

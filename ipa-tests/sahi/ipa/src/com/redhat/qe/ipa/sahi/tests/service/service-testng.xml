@@ -8,9 +8,9 @@
 			<run>
 			    <include name="setup" />
 			    <include name="serviceAddTests" /> 
-			    <include name="deleteMultipleServiceTests" />
+			    <!--<include name="deleteMultipleServiceTests" />-->
 				<include name="customServiceAddTests" />
-				<include name="deleteSingleServiceTests" />
+				<!--<include name="deleteSingleServiceTests" />
 				<include name="forceServiceAddTests" />
 			    <include name="serviceAddCertificateTests" />
 			    <include name="serviceHoldCertificateTests" />
@@ -21,7 +21,7 @@
 				<include name="serviceGetKeytabTests" />
 				<include name="serviceRemoveKeytabTests" />
 				<include name="invalidserviceAddTests" />
-				<include name="serviceSearchTests" />
+				<include name="serviceSearchTests" />-->
 			</run>
 		</groups>
 		<classes>

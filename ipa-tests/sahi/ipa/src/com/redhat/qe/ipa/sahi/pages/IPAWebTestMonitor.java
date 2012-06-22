@@ -3,6 +3,8 @@ package com.redhat.qe.ipa.sahi.pages;
 import java.util.ArrayList;
 import java.util.Hashtable;
 
+import com.redhat.qe.auto.testng.Assert;
+
 public class IPAWebTestMonitor {
 	private long startTime;
 	private long finishTime; 
@@ -64,6 +66,7 @@ public class IPAWebTestMonitor {
 		testLogMessage.put(key, msg);
 		saveTestResult(key,msg,"pass");
 		System.out.println("[PASS] (" + className + "-" + methodName + ") Test Data:["+ key + "] LOG :[" + msg + "]");
+		Assert.assertTrue(!msg.equals(null), ""+ className + "-" + methodName + ") Test Data:["+ key + "] LOG :[" + msg + "]" );
 	}
 	
 	public void fail(Exception e) {

@@ -7,7 +7,7 @@
 		<groups>
 			<run>
 			    <include name="setup" />
-			    <include name="sudoRuleAddTests" />	
+			   	<include name="sudoRuleAddTests" />	
 			    <include name="sudoRuleAddAndAddAnotherTests" />
 			    <include name="sudoRuleCancelAddTests" />
 			    <include name="sudoRuleAddAndEditTests" />
@@ -17,7 +17,7 @@
 			    <include name="sudoRuleUserCategorySettingsTests" />
 			    <include name="sudoRuleHostCategorySettingsTests" />
 			    <include name="sudoRuleCommandCategorySettingsTests" />
-			    <include name="sudoRuleRunAsUserCategorySettingsTests" />
+			    <include name="sudoRuleRunAsUserCategorySettingsTests" /> 
 			    <include name="sudoRuleRunAsGroupCategorySettingsTests" />
 			    <include name="invalidSudoRuleAddTests" />
 			    <include name="sudoRuleRequiredFieldAddTests" />

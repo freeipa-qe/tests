@@ -5,7 +5,7 @@
 			<run> 
 				<include name="init" />
 				<include name="add" /> 
-				<include name="modify" />
+				<!--<include name="modify" />-->
 				<include name="delete" />
 				<include name="report" />
 			</run>

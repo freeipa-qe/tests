@@ -9,9 +9,9 @@
                 <include name="setup" />
                 <include name="init" />
                 <include name="addGroup" />  
-                <include name="addGroup_negative" /> 
+                <!--<include name="addGroup_negative" />--> 
                 <include name="modifyGroup" />
-                <include name="modifyGroup_enrolluser" />
+                <!--<include name="modifyGroup_enrolluser" />-->
                 <include name="modifyGroup_enrollgroup" />
                 <include name="modifySettings" />
                 <include name="modifyGroup_settings" />
@@ -28,14 +28,14 @@
 	           <include name="modifyGroup_hbac_prepare" />
 	           <include name="modifyGroup_hbac_add" />
 	           <include name="modifyGroup_hbac_delete" />
-	           <include name="modifyGroup_hbac_cleanup" /> 
+	           <include name="modifyGroup_hbac_cleanup" />
 	           <include name="sudo" />
 	           	<include name="modifyGroup_sudo_prepare" />
 	           <include name="modifyGroup_sudo_add" />
-	           <include name="modifyGroup_sudo_delete" />
+	           <!--<include name="modifyGroup_sudo_delete" />
 	           <include name="modifyGroup_sudo_cleanup" />  
 	           <include name="bugverification" />
-                <include name="deleteGroup" />
+                <include name="deleteGroup" />-->
             </run>
         </groups>
         <classes>

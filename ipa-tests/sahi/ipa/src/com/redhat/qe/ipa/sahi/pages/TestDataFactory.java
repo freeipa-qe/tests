@@ -333,9 +333,10 @@ public class TestDataFactory {
 
 	public String[] extractValues(String combinedString) {
 		// format: homedirectory, +[:变化(value #0 invalid per syntax: Invalid syntax.)]
-		String[] extracted = new String[2]; 
+		String[] extracted = new String[3]; 
 		int start = -1;
 		int end = -1;
+		String errortype="";
 		for (int i=0; i<combinedString.length(); i++)
 		{
 			char c = combinedString.charAt(i);
@@ -343,16 +344,21 @@ public class TestDataFactory {
 				start = i;
 			else if (c == ')')
 				end = i; 
+			if(end>-1 && end==i-1 && (c=='l' || c=='t')){
+				errortype=combinedString.substring(i);
+			}
 		}
 		if (start == -1 || end == -1){
 			// no () part in "combinedString" found, or format not right
 			extracted[0] = combinedString.trim();
 			extracted[1] = null;
+			extracted[2]=null;
 		}else{
 			String value = combinedString.substring(0,start);
 			String errmsg = combinedString.substring(start+1,end);
 			extracted[0] = value.trim();
 			extracted[1] = errmsg.trim();
+			extracted[2]=errortype;
 		}
 		return extracted;
 	}

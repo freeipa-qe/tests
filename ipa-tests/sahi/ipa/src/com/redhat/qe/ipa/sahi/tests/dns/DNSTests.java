@@ -110,6 +110,9 @@ public class DNSTests extends SahiTestScript{
 		// get into DNS zone record modification page
 		sahiTasks.link(zoneName).click();
 		// performing the test
+		//"dns record TXT test", 
+		//DNSTests.dnszone,DNSTests.reversezone,DNSTests.dummyHost,"root." + DNSTests.dummyHost, 
+		//"txt_recordtest","MOE     MB      A.ISI.EDU.","TXT"
 		DNSTasks.zoneRecords_add(sahiTasks,record_name,record_data,record_type); 
 		// go back to dns zone list, prepare for next test
 		sahiTasks.link("DNS Zones").click();  

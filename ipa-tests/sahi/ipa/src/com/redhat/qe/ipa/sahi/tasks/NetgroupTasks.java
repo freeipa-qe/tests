@@ -270,15 +270,16 @@ public class NetgroupTasks {
         String newDescription = description + " Updated";
 		sahiTasks.textarea("description").setValue(newDescription);
 		sahiTasks.link("Netgroups").in(sahiTasks.div("content")).click();
-		sahiTasks.button(action).click();
 		
+		sahiTasks.button(action).click();
 		if (action.equals("Cancel")) {
 			sahiTasks.span("undo").click();
 			sahiTasks.link("Netgroups").in(sahiTasks.div("content")).click();
 		} 
 		
 		
-		sahiTasks.link(groupName).click();
+		if(sahiTasks.link(groupName).exists())
+			sahiTasks.link(groupName).click();
 		if (action.equals("Update")) {
 			Assert.assertEquals(newDescription, sahiTasks.textarea("description").value(), "Verified description is as expected: " + newDescription);
 		} else {

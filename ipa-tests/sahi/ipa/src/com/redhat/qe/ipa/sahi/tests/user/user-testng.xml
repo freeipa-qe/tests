@@ -8,7 +8,7 @@
 			<run>
 			    <include name="setup" />
 			    <include name="userAddTests" /> 
-			    <include name="userMismatchingPasswordNegativeTests" />
+			   	<include name="userMismatchingPasswordNegativeTests" />
 	            <include name="userCancelAddTests" /> 
 				<include name="invalidUserAddTests" />
 			    <include name="invalidCharUserAddTests" />	
@@ -31,7 +31,7 @@
 				<include name="userAddAndAddAnotherTests" />
 			    <include name="userAddAndEditTests" /> 
 				<include name="userDeleteTests" />   
-		        <include name="userMultipleDeleteTests" />	
+		        <include name="userMultipleDeleteTests" />
 			</run>
 		</groups>
 		<classes>
