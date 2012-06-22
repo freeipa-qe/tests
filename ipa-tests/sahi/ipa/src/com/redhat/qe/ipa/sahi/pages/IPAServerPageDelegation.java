@@ -18,7 +18,14 @@ public class IPAServerPageDelegation extends IPAWebPage{
 		duplicateErrorMsgStartsWith = "This entry";
 		
 		addPage = "Add Delegation";
+		addSpecialPage="Add Special Delegation";
+		addLongPage="Add Long Delegation";
 		duplicatePage = "Add Duplicate Delegation";
+		addNegativePage="Add Negative Delegation";
+		modifySettingsPage="Modify Delegation Settings";
+		modifyUpdateResetCancelPage="Modify Delegation UpdateResetCancel";
+		//modifyNegativePage="Modify Delegation Negative";
+		searchPage="Search Delegation";
 		delPage = "Delete Delegation"; 
 		registerStandardTestCases();
 		System.out.println("New instance of " + IPAServerPageDelegation.class.getName() + " is ready");
