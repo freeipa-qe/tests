@@ -1091,6 +1091,10 @@ rlDistroDiff() {
                 clear_ccdir) # As part of clean-up, removing credential cache dirs
                         rlRun "rm -fvr `ls -d /run/user/* | grep -v root`";
                         ;;
+
+                ipa_pkg_check)
+                        rlAssertRpm freeipa-server
+                        ;;
                 esac
                 }
 
@@ -1099,6 +1103,10 @@ rlDistroDiff() {
 
                 clear_ccdir) # As part of clean-up, removing credential cache dirs
                         rlRun "rm -fr /tmp/krb5cc_*_*";
+                        ;;
+
+                ipa_pkg_check)
+                        rlAssertRpm ipa-server
                         ;;
                 esac
                 }
