@@ -71,14 +71,14 @@ public class ServiceTests extends SahiTestScript {
 		csr = CommonTasks.generateCSR(mytesthost);
 	}
 	
-	/*@AfterClass (groups={"cleanup"}, description="Delete objects added for the tests", alwaysRun=true)
+	@AfterClass (groups={"cleanup"}, description="Delete objects added for the tests", alwaysRun=true)
 	public void cleanup() throws Exception {	
 		sahiTasks.navigateTo(commonTasks.hostPage, true);
 		HostTasks.deleteHost(sahiTasks, mytesthost, "YES");
 		HostTasks.deleteHost(sahiTasks, mytesthost2, "YES");
 		HostTasks.deleteHost(sahiTasks, nodnshost, "NO");
 		
-	}*/
+	}
 	
 	@BeforeMethod (alwaysRun=true)
 	public void checkCurrentPage() {
