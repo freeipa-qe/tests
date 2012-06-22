@@ -1,0 +1,21 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+<suite name="IPADelegationTestSuite">	
+	<test name="Delegation Tests">
+		<groups>
+			<run> 
+				<include name="init" />
+				<include name="add" /> 
+				<include name="modify" />
+				<include name="search" />
+				<include name="delete" />
+				<!--<include name="report" />-->
+			</run>
+		</groups>
+		<classes>
+			<class name="com.redhat.qe.ipa.sahi.tests.delegation.DelegationTests" />
+		</classes>
+	</test> 
+	<listeners>        
+		<listener class-name="com.redhat.qe.auto.testng.TestNGListener" />	
+	</listeners> 
+</suite>
