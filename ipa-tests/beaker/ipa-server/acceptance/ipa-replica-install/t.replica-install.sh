@@ -528,6 +528,11 @@ installSlave_nr2()
 			rlLog "Checking that the zone added after ipa-replica-prepare is created locally"
 			rlRun "ipa dnszone-show $ZONE2"
 			rlRun "appendEnv" 0 "Append the machine information to the env.sh"
+
+			if [ ! -f /tmp/SKIPMYREVERSEZONECHECK ]; then
+				rlLog "touching file to indicate to uninstall not to check for my reverse zone as it is not there"
+				rlRun "touch /tmp/SKIPMYREVERSEZONECHECK"
+			fi
 		fi
 
 		miscDNSCheckup_positive
@@ -967,11 +972,16 @@ uninstall()
 		rlRun "ipa-replica-manage list -p Secret123 $MASTER | grep \"$SLAVE: replica\""
 		rlRun "ipa-replica-manage list -p Secret123 $SLAVE | grep \"$MASTER: replica\""
 
-		MASTERIPOCT1=$(echo $MASTERIP|cut -f1 -d.)
-		rlLog "verifies https://bugzilla.redhat.com/show_bug.cgi?id=801380"
-		rlRun "remoteExec root $MASTERIP redhat \"ipa dnszone-find\""
-		rlRun "egrep $MASTERIPOCT1.in-addr.arpa. /tmp/remote_exec.out"
-		rlRun "cat /tmp/remote_exec.out"
+		if [ ! -f /tmp/SKIPMYREVERSEZONECHECK ]; then
+			MASTERIPOCT1=$(echo $MASTERIP|cut -f1 -d.)
+			rlLog "verifies https://bugzilla.redhat.com/show_bug.cgi?id=801380"
+			rlRun "remoteExec root $MASTERIP redhat \"ipa dnszone-find\""
+			rlRun "egrep $MASTERIPOCT1.in-addr.arpa. /tmp/remote_exec.out"
+			rlRun "cat /tmp/remote_exec.out"
+		else
+			rlLog "Found file indicating to skip checking for my reverse zone.  Removing file and moving on"
+			rlRun "rm /tmp/SKIPMYREVERSEZONECHECK"
+		fi
 
 ### ipa-csreplica-manage tests
 		if [ -d /var/lib/pki-ca ]; then

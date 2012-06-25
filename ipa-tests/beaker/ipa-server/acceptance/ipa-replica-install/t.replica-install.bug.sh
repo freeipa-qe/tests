@@ -132,9 +132,13 @@ replicaBugCheck_bz830314()
 			if [ $(grep "Starting named: [FAILED]" /var/log/ipareplica-install.log |wc -l) -gt 0 ]; then
 				rlFail "BZ 830314 found...ipa-replica-install named failed to start"
 				rlRun "sed -n '/restarting named/,/7\/8/p' /var/log/ipareplica-install.log" 
+			else
+				rlPass "BZ 830314 not found...named did not seem to fail on ipa install"
 			fi
 		else
 			rlFail "Cannot find ipareplica-install.log to check BZ 830314"
 		fi
+		####### debugging here #################
+		rlRun "grep named /var/log/ipareplica-install.log"
 	rlPhaseEnd
 }
