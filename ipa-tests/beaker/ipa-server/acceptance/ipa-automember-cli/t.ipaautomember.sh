@@ -897,11 +897,12 @@ ipaautomember_removeAutomemberDefaultGroup_negative_badtype()
 ######################################################################
 ipaautomember_removeAutomemberDefaultGroup_negative_nodefault()
 {
+                expmsg="ipa: ERROR: No default (fallback) group set"
+
 	desc="remove default group for no default"
 	rlPhaseStartTest "ipa-automember-cli-4101: remove default group for no default"
 		rlRun "removeAutomemberDefaultGroup group" 2 "Verify return code for $desc"
 		command="ipa automember-default-group-remove --type=group"
-		expmsg="ipa: ERROR: No default group set"
 		rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify error message for $desc"
 	rlPhaseEnd
 
@@ -909,7 +910,6 @@ ipaautomember_removeAutomemberDefaultGroup_negative_nodefault()
 	rlPhaseStartTest "ipa-automember-cli-4102: remove default hostgroup for no default"
 		rlRun "removeAutomemberDefaultGroup hostgroup" 2 "Verify return code for $desc"
 		command="ipa automember-default-group-remove --type=hostgroup"
-		expmsg="ipa: ERROR: No default group set"
 		rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify error message for $desc"
 	rlPhaseEnd
 }	
@@ -919,11 +919,12 @@ ipaautomember_removeAutomemberDefaultGroup_negative_nodefault()
 ######################################################################
 ipaautomember_showAutomemberDefaultGroup_negative_nodefault()
 {
+                expmsg="  Default (fallback) Group: No default (fallback) group set"
+
 	desc="show default group for no default"
 	rlPhaseStartTest "ipa-automember-cli-4201: show default group for no default"
 		rlRun "showAutomemberDefaultGroup group" 0 "Verify return code for $desc"
 		command="ipa automember-default-group-show --type=group"
-		expmsg="  Default Group: No default group set"
 		#rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify error message for $desc"
 		rlRun "$command > /tmp/ipaam_nodefault 2>&1" 0 "Verify error message for $desc"
 		rlAssertGrep "$expmsg" "/tmp/ipaam_nodefault"
@@ -933,7 +934,6 @@ ipaautomember_showAutomemberDefaultGroup_negative_nodefault()
 	rlPhaseStartTest "ipa-automember-cli-4202: show default hostgroup for no default"
 		rlRun "showAutomemberDefaultGroup hostgroup" 0 "Verify return code for $desc"
 		command="ipa automember-default-group-show --type=hostgroup"
-		expmsg="  Default Group: No default group set"
 		#rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify error message for $desc"
 		rlRun "$command > /tmp/ipaam_nodefault 2>&1" 0 "Verify error message for $desc"
 		rlAssertGrep "$expmsg" "/tmp/ipaam_nodefault"
