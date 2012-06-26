@@ -877,7 +877,7 @@ user_status()
 	user4=urwd$lastoct
 	user5=urwe$lastoct
 	
-	# Is this the master, or teh slave?
+	# Is this the master, or the slave?
 	hostname=$(hostname)
 	echo $MASTER | grep $hostname
 	if [ $? -eq 0 ]; then
@@ -1095,7 +1095,7 @@ user_status()
 		fi
 	rlPhaseEnd	
 
-	rlPhaseStartTest "Make sure that the last good login time on teh remot server looks like it's in the correct tiem window"		
+	rlPhaseStartTest "Make sure that the last good login time on the remote server looks like it's in the correct time window"		
 		lastgoodlogin=$(ipa user-status  $user3 --all --raw | grep -A 6 $otherhost | grep lastsuccessful | sed s/\ //g | cut -d\: -f2 | sed s/Z//g)
 		sleep 2
 		later=$(ipa user-status  $user3 --all --raw | grep -A 6 $otherhost | grep now | sed s/\ //g | cut -d\: -f2 | sed s/Z//g)
@@ -1162,7 +1162,7 @@ user_status()
 		fi
 	rlPhaseEnd	
 
-	rlPhaseStartTest "Make sure that the last good login time on teh remot server looks like it's in the correct tiem window"		
+	rlPhaseStartTest "Make sure that the last good login time on the remote server looks like it's in the correct time window"		
 		lastgoodlogin=$(ipa user-status  $user4 --all --raw | grep -A 6 $hostname | grep lastsuccessful | sed s/\ //g | cut -d\: -f2 | sed s/Z//g)
 		sleep 2
 		later=$(ipa user-status  $user4 --all --raw | grep -A 6 $hostname | grep now | sed s/\ //g | cut -d\: -f2 | sed s/Z//g)
