@@ -378,7 +378,7 @@ DelayUntilMasterReady()
 	count=0
 	done=1
 	while [ $count -lt $maxcount ]; do
-		nmap $BEAKERMASTER | grep kerberos-adm
+		/usr/bin/nmap $BEAKERMASTER | /bin/grep kerberos-adm
 		if [ $? -ne 0 ]; then
 			rlLog "Master $BEAKERMASTER does not appear to be up yet, delaying $delayinterval seconds.";
 			sleep $delayinterval;
@@ -386,6 +386,7 @@ DelayUntilMasterReady()
 		else
 			rlPass "Master $BEAKERMASTER is up! Sleeping for $delayinterval, then continuing."
 			sleep $delayinterval;
+			let count=$maxcount+1;
 		fi
 		if [ $count -eq $maxcount ]; then
 			let mcount=$delayinterval*$maxcount
