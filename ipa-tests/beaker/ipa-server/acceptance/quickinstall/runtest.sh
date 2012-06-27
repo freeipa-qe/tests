@@ -36,9 +36,9 @@
 # include tests
 . ./t-install.sh
 
-COMMON_SERVER_PACKAGES="bind expect krb5-workstation bind-dyndb-ldap krb5-pkinit-openssl"
+COMMON_SERVER_PACKAGES="bind expect krb5-workstation bind-dyndb-ldap krb5-pkinit-openssl nmap"
 RHELIPA_SERVER_PACKAGES="ipa-server"
-COMMON_CLIENT_PACKAGES="httpd curl mod_nss mod_auth_kerb 389-ds-base expect ntpdate"
+COMMON_CLIENT_PACKAGES="httpd curl mod_nss mod_auth_kerb 389-ds-base expect ntpdate nmap"
 RHELIPA_CLIENT_PACKAGES="ipa-admintools ipa-client"
 FREEIPA_SERVER_PACKAGES="freeipa-server"
 FREEIPA_CLIENT_PACKAGES="freeipa-admintools freeipa-client"

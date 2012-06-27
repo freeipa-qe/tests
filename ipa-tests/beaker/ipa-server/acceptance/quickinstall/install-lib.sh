@@ -366,3 +366,31 @@ EOF
 rlRun "service abrtd restart"
 
 }
+
+#########################################
+# DelayUntilMasterReady 
+#  This sub delays for upto 14 minuites while it waits for the Master to finish installs.
+#########################################
+DelayUntilMasterReady()
+{
+	delayinterval=120
+	let maxcount=($delayinterval/120)*7
+	count=0
+	done=1
+	while [ $count -lt $maxcount ]; do
+		nmap $BEAKERMASTER | grep kerberos-adm
+		if [ $? -ne 0 ]; then
+			rlLog "Master $BEAKERMASTER does not appear to be up yet, delaying $delayinterval seconds.";
+			sleep $delayinterval;
+			let count=$count+1;
+		else
+			rlPass "Master $BEAKERMASTER is up! Sleeping for $delayinterval, then continuing."
+			sleep $delayinterval;
+		fi
+		if [ $count -eq $maxcount ]; then
+			let mcount=$delayinterval*$maxcount
+			rlFail "FAIL - Master $BEAKERMASTER did not bring up kerberos in $mcount seconds"
+		fi
+	done
+}
+
