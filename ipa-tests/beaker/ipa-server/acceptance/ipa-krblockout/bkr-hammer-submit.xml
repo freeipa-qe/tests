@@ -9,7 +9,7 @@
 			<packages/>
 			<ks_appends/>
 			<repos>
-				<repo name="snapshot5" url="http://alpha.dsdev.sjc.redhat.com/export/archives/rhel/6.3/snapshot5/server/x86_64/tree/"/>
+				<repo name="rc4" url="http://alpha.dsdev.sjc.redhat.com/export/archives/rhel/6.3/RC4/server/x86_64/tree/"/>
 				<repo name="ipa" url="http://mickey.dsdev.sjc.redhat.com/repos/pki/ipa/devel/rhel6/devel_x86_64/x86_64/"/>
 				<repo name="ipa_noarch" url="http://mickey.dsdev.sjc.redhat.com/repos/pki/ipa/devel/rhel6/devel_x86_64/noarch/"/>
 			</repos>
@@ -52,7 +52,7 @@
 			<packages/>
 			<ks_appends/>
 			<repos>
-				<repo name="snapshot5" url="http://alpha.dsdev.sjc.redhat.com/export/archives/rhel/6.3/snapshot5/server/x86_64/tree/"/>
+				<repo name="rc4" url="http://alpha.dsdev.sjc.redhat.com/export/archives/rhel/6.3/RC4/server/x86_64/tree/"/>
 				<repo name="ipa" url="http://mickey.dsdev.sjc.redhat.com/repos/pki/ipa/devel/rhel6/devel_x86_64/x86_64/"/>
 				<repo name="ipa_noarch" url="http://mickey.dsdev.sjc.redhat.com/repos/pki/ipa/devel/rhel6/devel_x86_64/noarch/"/>
 			</repos>

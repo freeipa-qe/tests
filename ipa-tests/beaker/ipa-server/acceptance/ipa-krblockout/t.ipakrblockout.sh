@@ -13,10 +13,13 @@ locktimeflag="lockouttime"
 locktimelabel="Lockout duration"
 usercountattr="krbloginfailedcount"
 # find some somewhat unique information to be used in this test
-hn=$(hostname)
-thismachine=$(grep $hn /dev/shm/env.sh | sed s/export\ //g | cut -d\= -f1)
-thisip=$(grep $thismachine /dev/shm/env.sh  | grep IP | cut -d\= -f2)
-lastoct=$(echo $thisip | cut -d\. -f4)
+#hn=$(hostname)
+#thismachine=$(grep $hn /dev/shm/env.sh | sed s/export\ //g | cut -d\= -f1)
+#thisip=$(grep $thismachine /dev/shm/env.sh  | grep IP | cut -d\= -f2)
+rand=$RANDOM
+if [ $rand -gt 999 ]; then let rand=$rand/100; echo $var2; fi
+#lastoct=$(echo $thisip | cut -d\. -f4)
+lastoct=$rand
 
 ######################
 # test suite         #
