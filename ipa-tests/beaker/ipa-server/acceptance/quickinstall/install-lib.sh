@@ -377,6 +377,7 @@ DelayUntilMasterReady()
 	let maxcount=($delayinterval/120)*7
 	count=0
 	done=1
+	ls /usr/bin/nmap
 	while [ $count -lt $maxcount ]; do
 		/usr/bin/nmap $BEAKERMASTER | /bin/grep kerberos-adm
 		if [ $? -ne 0 ]; then
