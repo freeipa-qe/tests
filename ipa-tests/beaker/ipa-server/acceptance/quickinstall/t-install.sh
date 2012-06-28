@@ -99,7 +99,6 @@ installSlave()
 	service ip6tables stop
         rlRun "AddToKnownHosts $MASTER" 0 "Adding master to known hosts"
 	rlRun "configAbrt"
-	DelayUntilMasterReady
         cd /dev/shm/
         hostname_s=$(hostname -s)
         rlRun "sftp root@$MASTER:/var/lib/ipa/replica-info-$hostname_s.$DOMAIN.gpg" 0 "Get replica package"
@@ -122,6 +121,7 @@ installSlave()
 			fi
 
                 	rlRun "fixhostname" 0 "Fix hostname"
+			DelayUntilMasterReady
 			echo "ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg" > /dev/shm/replica-install.bash
                 	chmod 755 /dev/shm/replica-install.bash
                 	rlLog "EXECUTING: ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg"
@@ -154,7 +154,6 @@ installClient()
         rlLog "Synchronizing time to $NTPSERVER"
         ntpdate $NTPSERVER
 	rlRun "configAbrt"
-	DelayUntilMasterReady
 	rlLog "SKIPINSTALL: $SKIPINSTALL"
 	if [[ "$SKIPINSTALL" != "TRUE" ]] ; then
 		if [[ "$IPv6SETUP" != "TRUE" ]] ; then
@@ -167,6 +166,7 @@ installClient()
         	rlRun "fixhostname" 0 "Fix hostname"
 		master_short=`echo $MASTER | cut -d "." -f1`
   		MASTER=$master_short.$DOMAIN
+		DelayUntilMasterReady
 		rlLog "EXECUTING: ipa-client-install --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW -U --server=$MASTER"
         	rlRun "ipa-client-install --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW -U --server=$MASTER" 0 "Installing ipa client and configuring"
 		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
