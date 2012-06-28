@@ -772,6 +772,7 @@ bz759501()
 	user="759501ur$lastoct"
 	firstpass="pass1"
 	pass="5ts7x6#nsh"
+	hostname=$(hostname)
         rlRun "ipa user-add --first=firstname --last=nlast $user"
 	echo $firstpass | ipa passwd $user
 	# 2. kinit several times as user1 with valid credentials.
@@ -788,7 +789,7 @@ bz759501()
 	# 3. Kinit as admin
 	kinitAs $ADMINID $ADMINPW
 	# 4. ensure that ipa user-status shows no failed logins for user1
-	failed=$(ipa user-status $user | grep Failed\ logins: | cut -d\  -f5)
+	failed=$(ipa user-status $user | grep -A 5 $hostname |grep Failed\ logins: | cut -d\  -f5)
 	if [ $failed -ne 0 ]; then
 		rlFail "ERROR - ipa user status for user $user shows more than 0 failed logins, it shows $failed"
 	else 
@@ -811,18 +812,18 @@ bz759501()
 	# 7. ensure that ipa user-status shows correct number of failed logins for user1.
 	kinitAs $ADMINID $ADMINPW
 	AttemptsToMake=$(ipa pwpolicy-show | grep Max\ failures | cut -d\  -f5)
-	failed=$(ipa user-status $user | grep Failed\ logins: | cut -d\  -f5)
+	failed=`ipa user-status $user | grep -A 5 $hostname | grep Failed\ logins: | cut -d\  -f5`
 	if [ $failed -ne $AttemptsToMake ]; then
 		rlFail "ERROR - ipa user status for user $user shows incorrect number of Failed logins. $failed shown. It should be $AttemptsToMake"
 	else 
 		rlPass "PASS - ipa user status for user $user shows $AttemptsToMake failed logins"
 	fi
-	# 8. ensure that user-status shows user1 as disabled.
+	# 8. ensure that user-show shows user1 as disabled.
 	userattempts=$(ipa user-show $user --all | grep krbloginfailedcount | sed s/\ //g | cut -d: -f2)
-	if [ $userattepts -ne $AttemptsToMake ]; then
+	if [ $userattempts -ne $AttemptsToMake ]; then
 		rlFail "ERROR - ipa user status for user $user shows incorrect number of Failed logins. $userattempts shown. It should be $AttemptsToMake"
 	else 
-		rlPass "PASS - ipa user status for user $user shows $AttemptsToMake failed logins"
+		rlPass "PASS - ipa user status for user $user shows $userattempts failed logins"
 	fi
 	# 9. attempt valid login as user1. It should fail.
 	kdestroy
@@ -896,7 +897,7 @@ user_status()
 		rlRun "create_ipauser $user3 $user3 $user3 Secret123" 0 "Creating a test $user3"
 		rlRun "create_ipauser $user4 $user4 $user4 Secret123" 0 "Creating a test $user4"
 #		rlRun "create_ipauser $user5 $user5 $user5 Secret123" 0 "Creating a test $user5"
-		if [ "$SLAVE" -eq "" ]; then
+		if [ "$SLAVE" == "" ]; then
 			rlFail "ERROR - This test will only pass when run on a host with at least one master and one slave"
 		else
 			rlPass "PASS - This test appears to contain at least one slave server"
@@ -907,35 +908,40 @@ user_status()
 		kinitAs $user1 Secret123
 		kinitAs $user1 Secret123
 		kinitAs $user1 Secret123
+		kinitAs $ADMINID $ADMINPW
 		# Check that it seems to be the correct number of logins
-		failedhere=$(ipa user-status  $user1 | grep -A 6 $hostname | grep Failed\ logins | sed s/\ //g | cut -d\: -f2)
+		failedhere=$(ipa user-status  $user1 | grep -A 5 $hostname | grep Failed\ logins | sed s/\ //g | cut -d\: -f2)
 		if [ $failedhere -ne 0 ]; then
-			rlFail "FAIL - Failed logins here seems incorrect. It is listed as $fialedhere. It should be 0"
+			rlFail "FAIL - Failed logins here seems incorrect. It is listed as $failedhere. It should be 0"
 		else
 			rlPass "PASS - Failed logins on $hostname is correct at 0 failed"
 		fi
 	rlPhaseEnd
 	
 	rlPhaseStartTest "Create sucessful logins on other host in test group."
-		ssh root@$otherhost 'echo Secret123 | kinit $user1'
-		ssh root@$otherhost 'echo Secret123 | kinit $user1'
+		ssh root@$otherhost "echo Secret123 | kinit $user1"
+		ssh root@$otherhost "echo Secret123 | kinit $user1"
+		kinitAs $ADMINID $ADMINPW
 		# Check that it seems to be the correct number of logins
-		failedthere=$(ipa user-status  $user1 | grep -A 6 $otherhost | grep Failed\ logins | sed s/\ //g | cut -d\: -f2)
+		failedthere=$(ipa user-status  $user1 | grep -A 5 $otherhost | grep Failed\ logins | sed s/\ //g | cut -d\: -f2)
 		if [ $failedthere -ne 0 ]; then
-			rlFail "FAIL - Failed logins on $otherhost here seems incorrect. It is listed as $fialedthere. It should be 0"
+			rlFail "FAIL - Failed logins on $otherhost here seems incorrect. It is listed as $failedthere. It should be 0"
 		else
-			rlPass "PASS - Failed logins on $fialedthere is correct at 0 failed"
+			rlPass "PASS - Failed logins on $failedthere is correct at 0 failed"
 		fi
 	rlPhaseEnd
 		
 	rlPhaseStartTest "Make sure that the last login time is in a valid time frame on this server"
-		now=$(ipa user-status  $user1 --all --raw | grep -A 6 $hostname | grep now | sed s/\ //g | cut -d\: -f2 | sed s/Z//g)
+		kinitAs $ADMINID $ADMINPW
+		now=$(ipa user-status  $user1 --all --raw | grep -A 5 $hostname | grep now | sed s/\ //g | cut -d\: -f2 | sed s/Z//g)
 		sleep 1
+		kdestroy
 		kinitAs $user1 Secret123
 		sleep 1
-		lastgoodlogin=$(ipa user-status  $user1 --all --raw | grep -A 6 $hostname | grep lastsuccessful | sed s/\ //g | cut -d\: -f2 | sed s/Z//g)
+		kinitAs $ADMINID $ADMINPW
+		lastgoodlogin=$(ipa user-status  $user1 --all --raw | grep -A 5 $hostname | grep lastsuccessful | sed s/\ //g | cut -d\: -f2 | sed s/Z//g)
 		sleep 1
-		later=$(ipa user-status  $user1 --all --raw | grep -A 6 $hostname | grep now | sed s/\ //g | cut -d\: -f2 | sed s/Z//g)
+		later=$(ipa user-status  $user1 --all --raw | grep -A 5 $hostname | grep now | sed s/\ //g | cut -d\: -f2 | sed s/Z//g)
 		if [ $lastgoodlogin -le $later ] && [ $lastgoodlogin -ge $now ]; then
 			rlPass "PASS - last login time for $user1 on this server is between $now and $later. It is $lastgoodlogin"
 		else
@@ -944,13 +950,15 @@ user_status()
 	rlPhaseEnd
 
 	rlPhaseStartTest "Make sure that the last login time is in a valid time frame on other server"
-		now=$(ipa user-status  $user1 --all --raw | grep -A 6 $otherhost | grep now | sed s/\ //g | cut -d\: -f2 | sed s/Z//g)
+		now=$(ipa user-status  $user1 --all --raw | grep -A 5 $otherhost | grep now | sed s/\ //g | cut -d\: -f2 | sed s/Z//g)
 		sleep 1
-		ssh root@$otherhost 'echo Secret123 | kinit $user1'
+		kdestroy
+		ssh root@$otherhost "echo Secret123 | kinit $user1"
 		sleep 1
-		lastgoodlogin=$(ipa user-status  $user1 --all --raw | grep -A 6 $otherhost | grep lastsuccessful | sed s/\ //g | cut -d\: -f2 | sed s/Z//g)
+		kinitAs $ADMINID $ADMINPW
+		lastgoodlogin=$(ipa user-status  $user1 --all --raw | grep -A 5 $otherhost | grep lastsuccessful | sed s/\ //g | cut -d\: -f2 | sed s/Z//g)
 		sleep 4
-		later=$(ipa user-status  $user1 --all --raw | grep -A 6 $otherhost | grep now | sed s/\ //g | cut -d\: -f2 | sed s/Z//g)
+		later=$(ipa user-status  $user1 --all --raw | grep -A 5 $otherhost | grep now | sed s/\ //g | cut -d\: -f2 | sed s/Z//g)
 		if [ $lastgoodlogin -le $later ] && [ $lastgoodlogin -ge $now ]; then
 			rlPass "PASS - last login time for $user1 on $otherhost is between $now and $later. It is $lastgoodlogin"
 		else
@@ -959,27 +967,30 @@ user_status()
 	rlPhaseEnd
 
 	rlPhaseStartTest "Create failed logins on this host for user1"
+		kdestroy
 		kinitAs $user1 dsfr
 		kinitAs $user1 Secr3
 		kinitAs $user1 blarg
 		# Check that it seems to be the correct number of logins
-		failedhere=$(ipa user-status  $user1 | grep -A 2 $hostname | grep Failed\ logins | sed s/\ //g | cut -d\: -f2)
+		kinitAs $ADMINID $ADMINPW
+		failedhere=$(ipa user-status  $user1 | grep -A 5 $hostname | grep Failed\ logins | sed s/\ //g | cut -d\: -f2)
 		if [ $failedhere -ne 3 ]; then
-			rlFail "FAIL - Failed logins here seems incorrect. It is listed as $fialedhere. It should be 3"
+			rlFail "FAIL - Failed logins here seems incorrect. It is listed as $failedhere. It should be 3"
 		else
 			rlPass "PASS - Failed logins on $hostname is correct at 3 failed"
 		fi
 	rlPhaseEnd
 	
 	rlPhaseStartTest "Create failed logins for user1 on other host in test group."
-		ssh root@$otherhost 'echo Sec | kinit $user1'
-		ssh root@$otherhost 'echo mostblarg | kinit $user1'
+		ssh root@$otherhost "echo Sec | kinit $user1"
+		ssh root@$otherhost "echo mostblarg | kinit $user1"
 		# Check that it seems to be the correct number of logins
-		failedthere=$(ipa user-status  $user1 | grep -A 6 $otherhost | grep Failed\ logins | sed s/\ //g | cut -d\: -f2)
+		kinitAs $ADMINID $ADMINPW
+		failedthere=$(ipa user-status  $user1 | grep -A 5 $otherhost | grep Failed\ logins | sed s/\ //g | cut -d\: -f2)
 		if [ $failedthere -ne 2 ]; then
-			rlFail "FAIL - Failed logins on $otherhost here seems incorrect. It is listed as $fialedthere. It should be 2"
+			rlFail "FAIL - Failed logins on $otherhost here seems incorrect. It is listed as $failedthere. It should be 2"
 		else
-			rlPass "PASS - Failed logins on $fialedthere is correct at 2 failed"
+			rlPass "PASS - Failed logins on $failedthere is correct at 2 failed"
 		fi
 	rlPhaseEnd
 
@@ -988,36 +999,39 @@ user_status()
 		kinitAs $user2 Secr3
 		kinitAs $user2 blarg
 		kinitAs $user2 blarg2
+		kinitAs $ADMINID $ADMINPW
 		# Check that it seems to be the correct number of logins
-		failedhere=$(ipa user-status  $user2 | grep -A 6 $hostname | grep Failed\ logins | sed s/\ //g | cut -d\: -f2)
+		failedhere=$(ipa user-status  $user2 | grep -A 5 $hostname | grep Failed\ logins | sed s/\ //g | cut -d\: -f2)
 		if [ $failedhere -ne 4 ]; then
-			rlFail "FAIL - Failed logins here seems incorrect. It is listed as $fialedhere. It should be 4"
+			rlFail "FAIL - Failed logins here seems incorrect. It is listed as $failedhere. It should be 4"
 		else
 			rlPass "PASS - Failed logins on $hostname is correct at 3 failed"
 		fi
 	rlPhaseEnd
 	
 	rlPhaseStartTest "Create failed logins for user2 on other host in test group."
-		ssh root@$otherhost 'echo Sec | kinit $user2'
-		ssh root@$otherhost 'echo mostblarg | kinit $user2'
-		ssh root@$otherhost 'echo m | kinit $user2'
+		ssh root@$otherhost "echo Sec | kinit $user2"
+		ssh root@$otherhost "echo mostblarg | kinit $user2"
+		ssh root@$otherhost "echo m | kinit $user2"
+		kinitAs $ADMINID $ADMINPW
 		# Check that it seems to be the correct number of logins
-		failedthere=$(ipa user-status  $user2 | grep -A 6 $otherhost | grep Failed\ logins | sed s/\ //g | cut -d\: -f2)
+		failedthere=$(ipa user-status  $user2 | grep -A 5 $otherhost | grep Failed\ logins | sed s/\ //g | cut -d\: -f2)
 		if [ $failedthere -ne 3 ]; then
-			rlFail "FAIL - Failed logins on $otherhost here seems incorrect. It is listed as $fialedthere. It should be 3"
+			rlFail "FAIL - Failed logins on $otherhost here seems incorrect. It is listed as $failedthere. It should be 3"
 		else
-			rlPass "PASS - Failed logins on $fialedthere is correct at 2 failed"
+			rlPass "PASS - Failed logins on $failedthere is correct at 2 failed"
 		fi
 	rlPhaseEnd
 
 	rlPhaseStartTest "Make sure that the last failed login time is in a valid time frame on this server"
-		now=$(ipa user-status  $user1 --all --raw | grep -A 6 $hostname | grep now | sed s/\ //g | cut -d\: -f2 | sed s/Z//g)
+		now=$(ipa user-status  $user1 --all --raw | grep -A 5 $hostname | grep now | sed s/\ //g | cut -d\: -f2 | sed s/Z//g)
 		sleep 1
 		kinitAs $user1 Sec
 		sleep 1
-		lastfailedlogin=$(ipa user-status  $user1 --all --raw | grep -A 6 $hostname | grep lastfailed | sed s/\ //g | cut -d\: -f2 | sed s/Z//g)
+		kinitAs $ADMINID $ADMINPW
+		lastfailedlogin=$(ipa user-status  $user1 --all --raw | grep -A 5 $hostname | grep lastfailed | sed s/\ //g | cut -d\: -f2 | sed s/Z//g)
 		sleep 1
-		later=$(ipa user-status  $user1 --all --raw | grep -A 6 $hostname | grep now | sed s/\ //g | cut -d\: -f2 | sed s/Z//g)
+		later=$(ipa user-status  $user1 --all --raw | grep -A 5 $hostname | grep now | sed s/\ //g | cut -d\: -f2 | sed s/Z//g)
 		if [ $lastfailedlogin -le $later ] && [ $lastfailedlogin -ge $now ]; then
 			rlPass "PASS - last login time for $user1 on this server is between $now and $later. It is $lastfailedlogin"
 		else
@@ -1026,13 +1040,13 @@ user_status()
 	rlPhaseEnd
 
 	rlPhaseStartTest "Make sure that the last failed login time is in a valid time frame on other server"
-		now=$(ipa user-status  $user1 --all --raw | grep -A 6 $otherhost | grep now | sed s/\ //g | cut -d\: -f2 | sed s/Z//g)
+		now=$(ipa user-status  $user1 --all --raw | grep -A 5 $otherhost | grep now | sed s/\ //g | cut -d\: -f2 | sed s/Z//g)
 		sleep 1
-		ssh root@$otherhost 'echo Sec | kinit $user1'
+		ssh root@$otherhost "echo Sec | kinit $user1"
 		sleep 1
-		lastfailedlogin=$(ipa user-status  $user1 --all --raw | grep -A 6 $otherhost | grep lastfailed | sed s/\ //g | cut -d\: -f2 | sed s/Z//g)
+		lastfailedlogin=$(ipa user-status  $user1 --all --raw | grep -A 5 $otherhost | grep lastfailed | sed s/\ //g | cut -d\: -f2 | sed s/Z//g)
 		sleep 1
-		later=$(ipa user-status  $user1 --all --raw | grep -A 6 $otherhost | grep now | sed s/\ //g | cut -d\: -f2 | sed s/Z//g)
+		later=$(ipa user-status  $user1 --all --raw | grep -A 5 $otherhost | grep now | sed s/\ //g | cut -d\: -f2 | sed s/Z//g)
 		if [ $lastfailedlogin -le $later ] && [ $lastfailedlogin -ge $now ]; then
 			rlPass "PASS - last login time for $user1 on $otherhost is between $now and $later. It is $lastfailedlogin"
 		else
@@ -1041,24 +1055,25 @@ user_status()
 	rlPhaseEnd
 
 	rlPhaseStartTest "Create lockout logins for user3 on other host in test group."
-		ssh root@$otherhost 'echo Sec | kinit $user3'
-		ssh root@$otherhost 'echo mostblarg | kinit $user3'
-		ssh root@$otherhost 'echo m | kinit $user3'
-		ssh root@$otherhost 'echo m | kinit $user3'
-		ssh root@$otherhost 'echo m | kinit $user3'
-		ssh root@$otherhost 'echo mostblarg | kinit $user3'
-		ssh root@$otherhost 'echo mostblarg | kinit $user3'
+		ssh root@$otherhost "echo Sec | kinit $user3"
+		ssh root@$otherhost "echo mostblarg | kinit $user3"
+		ssh root@$otherhost "echo m | kinit $user3"
+		ssh root@$otherhost "echo m | kinit $user3"
+		ssh root@$otherhost "echo m | kinit $user3"
+		ssh root@$otherhost "echo mostblarg | kinit $user3"
+		ssh root@$otherhost "echo mostblarg | kinit $user3"
+		kinitAs $ADMINID $ADMINPW
 		# Check that it seems to be the correct number of logins
-		failedthere=$(ipa user-status  $user3 | grep -A 6 $otherhost | grep Failed\ logins | sed s/\ //g | cut -d\: -f2)
+		failedthere=$(ipa user-status  $user3 | grep -A 5 $otherhost | grep Failed\ logins | sed s/\ //g | cut -d\: -f2)
 		if [ $failedthere -ne 6 ]; then
-			rlFail "FAIL - Failed logins on $otherhost here seems incorrect. It is listed as $fialedthere. It should be 6"
+			rlFail "FAIL - Failed logins on $otherhost here seems incorrect. It is listed as $failedthere. It should be 6"
 		else
-			rlPass "PASS - Failed logins on $fialedthere is correct at 2 failed"
+			rlPass "PASS - Failed logins on $failedthere is correct at 2 failed"
 		fi
 	rlPhaseEnd
 
 	rlPhaseStartTest "Ensure that user 3 cannot login to other host. That user should be locked out ATM."
-		ssh root@$otherhost 'echo Secret123 | kinit $user3'
+		ssh root@$otherhost "echo Secret123 | kinit $user3"
 		kinitout=$(ssh root@$otherhost 'klist')
 		echo $kinitout | grep $user3 
 		if [ $? -eq 0 ]; then
@@ -1069,13 +1084,14 @@ user_status()
 	rlPhaseEnd
 	
 	# Gather current time for remote server for a later test
-	now=$(ipa user-status  $user3 --all --raw | grep -A 6 $otherhost | grep now | sed s/\ //g | cut -d\: -f2 | sed s/Z//g)
+	kinitAs $ADMINID $ADMINPW
+	now=$(ipa user-status  $user3 --all --raw | grep -A 5 $otherhost | grep now | sed s/\ //g | cut -d\: -f2 | sed s/Z//g)
 
 	rlPhaseStartTest "make sure that user 3 can login after the lockout interval is expired"
 		# Wait for the needed time to unlock the user
 		echo "Sleeping for 60 seconds"
 		sleep 60
-		ssh root@$otherhost 'echo Secret123 | kinit $user3'
+		ssh root@$otherhost "echo Secret123 | kinit $user3"
 		kinitout=$(ssh root@$otherhost 'klist')
 		echo $kinitout | grep $user3 
 		if [ $? -eq 0 ]; then
@@ -1086,18 +1102,23 @@ user_status()
 	rlPhaseEnd	
 
 	rlPhaseStartTest "Verify that the failed login count on the remote server reverts to 0 after a good login of user3"
-		failedthere=$(ipa user-status  $user3 | grep -A 6 $otherhost | grep Failed\ logins | sed s/\ //g | cut -d\: -f2)
+		kinitAs $ADMINID $ADMINPW
+		failedthere=$(ipa user-status  $user3 | grep -A 5 $otherhost | grep Failed\ logins | sed s/\ //g | cut -d\: -f2)
 		if [ $failedthere -ne 0 ]; then
-			rlFail "FAIL - Failed logins on $otherhost here seems incorrect. It is listed as $fialedthere. It should be 0"
+			rlFail "FAIL - Failed logins on $otherhost here seems incorrect. It is listed as $failedthere. It should be 0"
 		else
-			rlPass "PASS - Failed logins on $fialedthere is correct at 2 failed"
+			rlPass "PASS - Failed logins on $failedthere is correct at 2 failed"
 		fi
 	rlPhaseEnd	
 
+	ssh root@$otherhost "echo Secret123 | kinit $user3"
+	sleep 30
+
 	rlPhaseStartTest "Make sure that the last good login time on the remote server looks like it's in the correct time window"		
-		lastgoodlogin=$(ipa user-status  $user3 --all --raw | grep -A 6 $otherhost | grep lastsuccessful | sed s/\ //g | cut -d\: -f2 | sed s/Z//g)
+		kinitAs $ADMINID $ADMINPW
+		lastgoodlogin=$(ipa user-status  $user3 --all --raw | grep -A 5 $otherhost | grep lastsuccessful | sed s/\ //g | cut -d\: -f2 | sed s/Z//g)
 		sleep 2
-		later=$(ipa user-status  $user3 --all --raw | grep -A 6 $otherhost | grep now | sed s/\ //g | cut -d\: -f2 | sed s/Z//g)
+		later=$(ipa user-status  $user3 --all --raw | grep -A 5 $otherhost | grep now | sed s/\ //g | cut -d\: -f2 | sed s/Z//g)
 		if [ $lastgoodlogin -le $later ] && [ $lastgoodlogin -ge $now ]; then
 			rlPass "PASS - last login time for $user3 on $otherhost is between $now and $later. It is $lastgoodlogin"
 		else
@@ -1106,6 +1127,7 @@ user_status()
 	rlPhaseEnd
 
 	rlPhaseStartTest "Create lockout logins for user4 on this host."
+		kdestroy
 		kinitAs $user4 dsfr
 		kinitAs $user4 dsfuygr
 		kinitAs $user4 dsfrq3452
@@ -1113,12 +1135,14 @@ user_status()
 		kinitAs $user4 dsf254r
 		kinitAs $user4 dsfuhvar
 		kinitAs $user4 really?
+		
+		kinitAs $ADMINID $ADMINPW
 		# Check that it seems to be the correct number of logins
-		failedhere=$(ipa user-status  $user4 | grep -A 6 $hostname | grep Failed\ logins | sed s/\ //g | cut -d\: -f2)
+		failedhere=$(ipa user-status  $user4 | grep -A 5 $hostname | grep Failed\ logins | sed s/\ //g | cut -d\: -f2)
 		if [ $failedhere -ne 6 ]; then
-			rlFail "FAIL - Failed logins on $hostname here seems incorrect. It is listed as $fialedhere. It should be 6"
+			rlFail "FAIL - Failed logins on $hostname here seems incorrect. It is listed as $failedhere. It should be 6"
 		else
-			rlPass "PASS - Failed logins on $fialedhere is correct at 2 failed"
+			rlPass "PASS - Failed logins on $failedhere is correct at 2 failed"
 		fi
 	rlPhaseEnd
 
@@ -1136,35 +1160,38 @@ user_status()
 	rlPhaseEnd
 	
 	# Gather current time for remote server for a later test
-	now=$(ipa user-status  $user4 --all --raw | grep -A 6 $hostname | grep now | sed s/\ //g | cut -d\: -f2 | sed s/Z//g)
+	now=$(ipa user-status  $user4 --all --raw | grep -A 5 $hostname | grep now | sed s/\ //g | cut -d\: -f2 | sed s/Z//g)
 
 	rlPhaseStartTest "make sure that user 4 can login after the lockout interval is expired"
 		# Wait for the needed time to unlock the user
 		echo "Sleeping for 60 seconds"
 		sleep 60
-		ssh root@hostname 'echo Secret123 | kinit $user4'
+		kdestroy
+		echo Secret123 | kinit $user4
 		kinitout=$(klist)
 		echo $kinitout | grep $user4 
 		if [ $? -eq 0 ]; then
-			rlFail "PASS - $user4 seemes to be in the klist info on host $hostname."
+			rlPass "PASS - $user4 seemes to be in the klist info on host $hostname."
 		else
-			rlPass "FAIL - $user4 is not in the klist output on $hostname"
+			rlFail "FAIL - $user4 is not in the klist output on $hostname, it contains $kinitout"
 		fi
 	rlPhaseEnd	
 
 	rlPhaseStartTest "Verify that the failed login count on the remote server reverts to 0 after a good login of user4"
-		failedhere=$(ipa user-status  $user4 | grep -A 6 $hostname | grep Failed\ logins | sed s/\ //g | cut -d\: -f2)
+		echo "Other host is $otherhost"
+		failedhere=$(ipa user-status  $user4 | grep -A 5 $hostname | grep Failed\ logins | sed s/\ //g | cut -d\: -f2)
 		if [ $failedhere -ne 0 ]; then
-			rlFail "FAIL - Failed logins on $hostname here seems incorrect. It is listed as $fialedhere. It should be 0"
+			rlFail "FAIL - Failed logins on $hostname here seems incorrect. It is listed as $failedhere. It should be 0"
 		else
-			rlPass "PASS - Failed logins on $fialedhere is correct at 2 failed"
+			rlPass "PASS - Failed logins on $failedhere is correct at 2 failed"
 		fi
 	rlPhaseEnd	
 
 	rlPhaseStartTest "Make sure that the last good login time on the remote server looks like it's in the correct time window"		
-		lastgoodlogin=$(ipa user-status  $user4 --all --raw | grep -A 6 $hostname | grep lastsuccessful | sed s/\ //g | cut -d\: -f2 | sed s/Z//g)
+		kinitAs $ADMINID $ADMINPW
+		lastgoodlogin=$(ipa user-status  $user4 --all --raw | grep -A 5 $hostname | grep lastsuccessful | sed s/\ //g | cut -d\: -f2 | sed s/Z//g)
 		sleep 2
-		later=$(ipa user-status  $user4 --all --raw | grep -A 6 $hostname | grep now | sed s/\ //g | cut -d\: -f2 | sed s/Z//g)
+		later=$(ipa user-status  $user4 --all --raw | grep -A 5 $hostname | grep now | sed s/\ //g | cut -d\: -f2 | sed s/Z//g)
 		if [ $lastgoodlogin -le $later ] && [ $lastgoodlogin -ge $now ]; then
 			rlPass "PASS - last login time for $user4 on $hostname is between $now and $later. It is $lastgoodlogin"
 		else
