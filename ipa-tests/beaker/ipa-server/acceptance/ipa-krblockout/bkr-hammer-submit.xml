@@ -32,12 +32,6 @@
 			<task name="/CoreOS/ipa-server/shared" role="STANDALONE">
 				<params/>
 			</task>
-			<task name="/distribution/pkginstall" role="STANDALONE">
-				<params>
-					<param name="PKGARGNAME" value="expect krb5-workstation ntpdate"/>
-				</params>
-			</task>
-
 			<task name="/CoreOS/ipa-server/acceptance/quickinstall" role="MASTER">
 				<params/>
 			</task>
@@ -75,12 +69,6 @@
 			<task name="/CoreOS/ipa-server/shared" role="STANDALONE">
 				<params/>
 			</task>
-			<task name="/distribution/pkginstall" role="STANDALONE">
-				<params>
-					<param name="PKGARGNAME" value="expect krb5-workstation ntpdate"/>
-				</params>
-			</task>
-
 			<task name="/CoreOS/ipa-server/acceptance/quickinstall" role="SLAVE">
 				<params/>
 			</task>

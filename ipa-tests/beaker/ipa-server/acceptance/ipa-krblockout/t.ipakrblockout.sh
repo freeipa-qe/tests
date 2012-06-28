@@ -13,12 +13,8 @@ locktimeflag="lockouttime"
 locktimelabel="Lockout duration"
 usercountattr="krbloginfailedcount"
 # find some somewhat unique information to be used in this test
-#hn=$(hostname)
-#thismachine=$(grep $hn /dev/shm/env.sh | sed s/export\ //g | cut -d\= -f1)
-#thisip=$(grep $thismachine /dev/shm/env.sh  | grep IP | cut -d\= -f2)
 rand=$RANDOM
 if [ $rand -gt 999 ]; then let rand=$rand/100; echo $var2; fi
-#lastoct=$(echo $thisip | cut -d\. -f4)
 lastoct=$rand
 
 ######################
@@ -912,7 +908,7 @@ user_status()
 		kinitAs $user1 Secret123
 		kinitAs $user1 Secret123
 		# Check that it seems to be the correct number of logins
-		failedhere=$(ipa user-status  $user1 | grep -A 2 $hostname | grep Failed\ logins | sed s/\ //g | cut -d\: -f2)
+		failedhere=$(ipa user-status  $user1 | grep -A 6 $hostname | grep Failed\ logins | sed s/\ //g | cut -d\: -f2)
 		if [ $failedhere -ne 0 ]; then
 			rlFail "FAIL - Failed logins here seems incorrect. It is listed as $fialedhere. It should be 0"
 		else
@@ -924,7 +920,7 @@ user_status()
 		ssh root@$otherhost 'echo Secret123 | kinit $user1'
 		ssh root@$otherhost 'echo Secret123 | kinit $user1'
 		# Check that it seems to be the correct number of logins
-		failedthere=$(ipa user-status  $user1 | grep -A 2 $otherhost | grep Failed\ logins | sed s/\ //g | cut -d\: -f2)
+		failedthere=$(ipa user-status  $user1 | grep -A 6 $otherhost | grep Failed\ logins | sed s/\ //g | cut -d\: -f2)
 		if [ $failedthere -ne 0 ]; then
 			rlFail "FAIL - Failed logins on $otherhost here seems incorrect. It is listed as $fialedthere. It should be 0"
 		else
@@ -979,7 +975,7 @@ user_status()
 		ssh root@$otherhost 'echo Sec | kinit $user1'
 		ssh root@$otherhost 'echo mostblarg | kinit $user1'
 		# Check that it seems to be the correct number of logins
-		failedthere=$(ipa user-status  $user1 | grep -A 2 $otherhost | grep Failed\ logins | sed s/\ //g | cut -d\: -f2)
+		failedthere=$(ipa user-status  $user1 | grep -A 6 $otherhost | grep Failed\ logins | sed s/\ //g | cut -d\: -f2)
 		if [ $failedthere -ne 2 ]; then
 			rlFail "FAIL - Failed logins on $otherhost here seems incorrect. It is listed as $fialedthere. It should be 2"
 		else
@@ -993,7 +989,7 @@ user_status()
 		kinitAs $user2 blarg
 		kinitAs $user2 blarg2
 		# Check that it seems to be the correct number of logins
-		failedhere=$(ipa user-status  $user2 | grep -A 2 $hostname | grep Failed\ logins | sed s/\ //g | cut -d\: -f2)
+		failedhere=$(ipa user-status  $user2 | grep -A 6 $hostname | grep Failed\ logins | sed s/\ //g | cut -d\: -f2)
 		if [ $failedhere -ne 4 ]; then
 			rlFail "FAIL - Failed logins here seems incorrect. It is listed as $fialedhere. It should be 4"
 		else
@@ -1006,7 +1002,7 @@ user_status()
 		ssh root@$otherhost 'echo mostblarg | kinit $user2'
 		ssh root@$otherhost 'echo m | kinit $user2'
 		# Check that it seems to be the correct number of logins
-		failedthere=$(ipa user-status  $user2 | grep -A 2 $otherhost | grep Failed\ logins | sed s/\ //g | cut -d\: -f2)
+		failedthere=$(ipa user-status  $user2 | grep -A 6 $otherhost | grep Failed\ logins | sed s/\ //g | cut -d\: -f2)
 		if [ $failedthere -ne 3 ]; then
 			rlFail "FAIL - Failed logins on $otherhost here seems incorrect. It is listed as $fialedthere. It should be 3"
 		else
@@ -1053,7 +1049,7 @@ user_status()
 		ssh root@$otherhost 'echo mostblarg | kinit $user3'
 		ssh root@$otherhost 'echo mostblarg | kinit $user3'
 		# Check that it seems to be the correct number of logins
-		failedthere=$(ipa user-status  $user3 | grep -A 2 $otherhost | grep Failed\ logins | sed s/\ //g | cut -d\: -f2)
+		failedthere=$(ipa user-status  $user3 | grep -A 6 $otherhost | grep Failed\ logins | sed s/\ //g | cut -d\: -f2)
 		if [ $failedthere -ne 6 ]; then
 			rlFail "FAIL - Failed logins on $otherhost here seems incorrect. It is listed as $fialedthere. It should be 6"
 		else
@@ -1083,14 +1079,14 @@ user_status()
 		kinitout=$(ssh root@$otherhost 'klist')
 		echo $kinitout | grep $user3 
 		if [ $? -eq 0 ]; then
-			rlFail "PASS - $user3 seemes to be in the klist info on host $otherhost."
+			rlPass "PASS - $user3 seemes to be in the klist info on host $otherhost."
 		else
-			rlPass "FAIL - $user3 is not in the klist output on $otherhost"
+			rlFail "FAIL - $user3 is not in the klist output on $otherhost"
 		fi
 	rlPhaseEnd	
 
 	rlPhaseStartTest "Verify that the failed login count on the remote server reverts to 0 after a good login of user3"
-		failedthere=$(ipa user-status  $user3 | grep -A 2 $otherhost | grep Failed\ logins | sed s/\ //g | cut -d\: -f2)
+		failedthere=$(ipa user-status  $user3 | grep -A 6 $otherhost | grep Failed\ logins | sed s/\ //g | cut -d\: -f2)
 		if [ $failedthere -ne 0 ]; then
 			rlFail "FAIL - Failed logins on $otherhost here seems incorrect. It is listed as $fialedthere. It should be 0"
 		else
@@ -1118,7 +1114,7 @@ user_status()
 		kinitAs $user4 dsfuhvar
 		kinitAs $user4 really?
 		# Check that it seems to be the correct number of logins
-		failedhere=$(ipa user-status  $user4 | grep -A 2 $hostname | grep Failed\ logins | sed s/\ //g | cut -d\: -f2)
+		failedhere=$(ipa user-status  $user4 | grep -A 6 $hostname | grep Failed\ logins | sed s/\ //g | cut -d\: -f2)
 		if [ $failedhere -ne 6 ]; then
 			rlFail "FAIL - Failed logins on $hostname here seems incorrect. It is listed as $fialedhere. It should be 6"
 		else
@@ -1157,7 +1153,7 @@ user_status()
 	rlPhaseEnd	
 
 	rlPhaseStartTest "Verify that the failed login count on the remote server reverts to 0 after a good login of user4"
-		failedhere=$(ipa user-status  $user4 | grep -A 2 $hostname | grep Failed\ logins | sed s/\ //g | cut -d\: -f2)
+		failedhere=$(ipa user-status  $user4 | grep -A 6 $hostname | grep Failed\ logins | sed s/\ //g | cut -d\: -f2)
 		if [ $failedhere -ne 0 ]; then
 			rlFail "FAIL - Failed logins on $hostname here seems incorrect. It is listed as $fialedhere. It should be 0"
 		else
