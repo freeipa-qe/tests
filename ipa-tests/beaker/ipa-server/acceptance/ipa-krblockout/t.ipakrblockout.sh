@@ -1087,19 +1087,26 @@ user_status()
 	kinitAs $ADMINID $ADMINPW
 	now=$(ipa user-status  $user3 --all --raw | grep -A 5 $otherhost | grep now | sed s/\ //g | cut -d\: -f2 | sed s/Z//g)
 
-	rlPhaseStartTest "make sure that user 3 can login after the lockout interval is expired"
-		# Wait for the needed time to unlock the user
-		echo "Sleeping for 60 seconds"
+	# Only run this test if this is not the master
+	echo $MASTER | grep  $(hostname -s) 
+	if [ $? -ne 0 ]; then
+		rlPhaseStartTest "make sure that user 3 can login after the lockout interval is expired"
+			# Wait for the needed time to unlock the user
+			echo "Sleeping for 60 seconds"
+			sleep 60
+			ssh root@$otherhost "echo Secret123 | kinit $user3"
+			kinitout=$(ssh root@$otherhost 'klist')
+			echo $kinitout | grep $user3 
+			if [ $? -eq 0 ]; then
+				rlPass "PASS - $user3 seemes to be in the klist info on host $otherhost."
+			else
+				rlFail "FAIL - $user3 is not in the klist output on $otherhost"
+			fi
+		rlPhaseEnd
+	else	
+		rlLog "Sleeping 60 seconds to stay in sync with slave"
 		sleep 60
-		ssh root@$otherhost "echo Secret123 | kinit $user3"
-		kinitout=$(ssh root@$otherhost 'klist')
-		echo $kinitout | grep $user3 
-		if [ $? -eq 0 ]; then
-			rlPass "PASS - $user3 seemes to be in the klist info on host $otherhost."
-		else
-			rlFail "FAIL - $user3 is not in the klist output on $otherhost"
-		fi
-	rlPhaseEnd	
+	fi
 
 	rlPhaseStartTest "Verify that the failed login count on the remote server reverts to 0 after a good login of user3"
 		kinitAs $ADMINID $ADMINPW
@@ -1109,7 +1116,8 @@ user_status()
 		else
 			rlPass "PASS - Failed logins on $failedthere is correct at 2 failed"
 		fi
-	rlPhaseEnd	
+	
+rlPhaseEnd	
 
 	ssh root@$otherhost "echo Secret123 | kinit $user3"
 	sleep 30
