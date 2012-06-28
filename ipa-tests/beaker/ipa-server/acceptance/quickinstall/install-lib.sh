@@ -381,6 +381,8 @@ DelayUntilMasterReady()
 		/usr/bin/nmap $BEAKERMASTER | /bin/grep kerberos-adm
 		if [ $? -ne 0 ]; then
 			rlLog "Master $BEAKERMASTER does not appear to be up yet, delaying $delayinterval seconds.";
+			rlLog "outputting nmap $BEAKERMASTER"
+			/usr/bin/nmap $BEAKERMASTER
 			sleep $delayinterval;
 			let count=$count+1;
 		else
