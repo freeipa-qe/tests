@@ -379,21 +379,21 @@ DelayUntilMasterReady()
 	done=1
 	ls /usr/bin/nmap
 	while [ $count -lt $maxcount ]; do
-		/usr/bin/nmap $BEAKERMASTER | /bin/grep kerberos-adm
+		/usr/bin/nmap $MASTER | /bin/grep kerberos-adm
 		if [ $? -ne 0 ]; then
-			rlLog "Master $BEAKERMASTER does not appear to be up yet, delaying $delayinterval seconds.";
-			rlLog "outputting nmap $BEAKERMASTER"
-			/usr/bin/nmap $BEAKERMASTER
+			rlLog "Master $MASTER does not appear to be up yet, delaying $delayinterval seconds.";
+			rlLog "outputting nmap $MASTER"
+			/usr/bin/nmap $MASTER
 			sleep $delayinterval;
 			let count=$count+1;
 		else
-			rlPass "Master $BEAKERMASTER is up! Sleeping for $delayinterval, then continuing."
+			rlPass "Master $MASTER is up! Sleeping for $delayinterval, then continuing."
 			sleep $delayinterval;
 			let count=$maxcount+1;
 		fi
 		if [ $count -eq $maxcount ]; then
 			let mcount=$delayinterval*$maxcount
-			rlFail "FAIL - Master $BEAKERMASTER did not bring up kerberos in $mcount seconds"
+			rlFail "FAIL - Master $MASTER did not bring up kerberos in $mcount seconds"
 		fi
 	done
 }
