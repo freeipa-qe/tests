@@ -170,6 +170,7 @@ appendEnv()
     for s in $SLAVE; do
       NEWSLAVE="$NEWSLAVE $(echo $s|cut -f1 -d.|sed s/$/.$DOMAIN/)"
     done
+	NEWSLAVE=$(echo $NEWSLAVE) # strip initial space
 	slave_short=`echo $SLAVE | cut -d "." -f1`
   	SLAVE=$slave_short.$DOMAIN
     #slaveipaddr=$(dig +noquestion $SLAVE  | grep A | grep $SLAVE | grep IN | awk '{print $5}')
