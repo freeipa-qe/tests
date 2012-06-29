@@ -1,6 +1,4 @@
 ADdomain="adrelm.com"
-ADhost="melman.$ADdomain"
-ADip="10.65.201.112"
+ADhost="squab.$ADdomain"
+ADip="10.65.207.213"
 ADpasswd="Secret123"
-#ADRvrs_Zone=201.65.10.in-addr.arpa
-#ADFwd_Zone=adrelm.com

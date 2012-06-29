@@ -10,7 +10,7 @@
 5. Open server manager. Do "Add Roles" and select Active Directory Services.
 6. For making it a domain controller go to Start > Run and type dcpromo and hit return
    Follow the wizard and complete setting up the Server as a domain controller.
-* Enter AD FQDN as "adrealm.com"
+* Enter AD FQDN as "adrelm.com"
 * At "Choose a Deployment Configuration" select "Create a new domain in a new forest"
 * At "Set forest Functional Level" select Windows Server 2008 R2 from the dropdown
 * Uncheck DNS if not required (This is required for automation)
@@ -25,7 +25,23 @@
 
 11. Open that file in notepad and copy the contents exactly as it is to a file IPA server and save it as ADcert.cer.
 
-12. Add DNS records in forward and reverse for IPA server.
+12. If DNS is installed on the AD to be used for name resolution add a conditional forwarder for "testrelm.com". Make sure IPA server is resolvable from AD server.
+
+* Adding a conditional forwarder on the AD side
+
+    Open Start->Administrative Tools->DNS
+    make a right-click on 'Conditional Forwarders' in the left column of the window
+    select 'New Conditional Forwerder...'
+    add the DNS domain name of your IPA domain name "testrelm.com" and the IP adresses of one or more DNS servers i.e. the IPA server IP
+
+To test the new configuration you can try to ping the IPA server again from AD. It might be necessary to call 'ipconfig /flushdns' to removed any cached results.
+
+Alternatively you can use command line utility dnscmd to configure the forwarder:
+
+    Open Start -> Command Prompt
+    Enter: dnscmd 127.0.0.1 /ZoneAdd IPA.Domain /Forwarder IP.AD.DR.ESS
+
+The command should report that zone IPA.Domain was successfully added.
 
 # Setup IPA
 # Only step 4 is required during automation. Steps 1-3 are managed by quickinstall

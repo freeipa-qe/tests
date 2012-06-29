@@ -4,11 +4,27 @@
 
 1. Setup AD server if it does not already exist
 
-2. While configuring AD Install DNS and add forward and reverse zones for "testrelm.com" and include the A record of the IPA server. Make sure IPA server is resolvable from AD server.
+2. While configuring AD Install DNS and add a conditional forwarder for "testrelm.com". Make sure IPA server is resolvable from AD server.
+
+* Adding a conditional forwarder on the AD side
+
+    Open Start->Administrative Tools->DNS
+    make a right-click on 'Conditional Forwarders' in the left column of the window
+    select 'New Conditional Forwerder...'
+    add the DNS domain name of your IPA domain name "testrelm.com" and the IP adresses of one or more DNS servers i.e. the IPA server IP 
+
+To test the new configuration you can try to ping the IPA server again from AD. It might be necessary to call 'ipconfig /flushdns' to removed any cached results.
+
+Alternatively you can use command line utility dnscmd to configure the forwarder:
+
+    Open Start -> Command Prompt
+    Enter: dnscmd 127.0.0.1 /ZoneAdd IPA.Domain /Forwarder IP.AD.DR.ESS 
+
+The command should report that zone IPA.Domain was successfully added. 
 
 3. Fill-up the AD details in Config file placed in this directory
 
-4. Copy AD cert in the current directory. Name the cert file "ADcert.cer"
+4. From AD copy the cert in the current directory. Name the cert file "ADcert.cer"
 
 5. Make IPA CA trusted by importing IPA cert in the AD server's database. Follow the steps below.
  

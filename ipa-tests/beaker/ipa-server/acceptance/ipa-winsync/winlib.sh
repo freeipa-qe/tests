@@ -38,7 +38,7 @@
 
 # Commonly used routines
 
-create_ldif() {
+ADuser_ldif() {
 # $1 first name # $2 Surname # $3 Username # $4 changetype (add, modify, delete)
 
 cat > ADuser.ldif << EOF
@@ -61,18 +61,18 @@ EOF
 
 # Microsoft stores a quoted password in little endian UTF16 base64 encoded. Hence to generate the password, use the command:
 #echo -n "\"Secret123\"" | iconv -f UTF8 -t UTF16LE | base64 -w 0
-
-create_passwd_ldif() {
+ADuser_passwd_ldif() {
+PASSWD=`echo -n "\"$3\"" | iconv -f UTF8 -t UTF16LE | base64 -w 0`
 cat > ADuser_passwd.ldif << EOF
 dn: CN=$1 $2,CN=Users,DC=adrelm,DC=com
 changetype: modify
 replace: unicodePwd
-unicodePwd::IgBTAGUAYwByAGUAdAAxADIAMwAiAA==
+unicodePwd::$PASSWD
 EOF
 }
 
 # Modify userAccountControl
-create_cntrl_ldif() {
+ADuser_cntrl_ldif() {
 cat > ADuser_cntrl.ldif << EOF
 dn: CN=$1 $2,CN=Users,DC=adrelm,DC=com
 changetype: modify
@@ -99,8 +99,8 @@ nsslapd-errorlog-level: $1
 EOF
 }
 
-modify_ldif() {
-cat > modify.ldif << EOF
+acctdisable_ldif() {
+cat > acctdisable.ldif << EOF
 dn: cn=ipa-winsync,cn=plugins,cn=config
 changetype: modify
 replace: ipawinsyncacctdisable
@@ -108,4 +108,46 @@ ipawinsyncacctdisable: $1
 EOF
 }
 
+# Modify telephoneNumber
+telephoneNumber_ldif() {
+cat > telephoneNumber.ldif << EOF
+dn: CN=$1 $2,CN=Users,DC=adrelm,DC=com
+changetype: modify
+replace: telephoneNumber
+telephoneNumber: $3
+EOF
+}
 
+employeetype_ldif() {
+cat > employeetype.ldif << EOF
+dn: cn=ipa-winsync,cn=plugins,cn=config
+changetype: modify
+add: ipaWinSyncUserAttr
+ipaWinSyncUserAttr: employeetype unknown
+EOF
+}
+
+AD_employeetype_ldif() {
+cat > AD_employeetype.ldif << EOF
+dn: CN=$1 $2,CN=Users,DC=adrelm,DC=com
+changetype: modify
+replace: employeetype
+employeetype: $3
+EOF
+}
+
+sshlogin_exp() {
+#!/usr/bin/expect
+
+set username [lrange $argv 0 0]
+set password [lrange $argv 1 1]
+#set newpw    [lindex $argv 2]
+
+set timeout 5
+#set send_slow {1 .1}
+spawn ssh $username@wheeljack.testrelm.com whoami
+expect "*?assword:*"
+send -- "$password\r"
+send -- "\r"
+expect eof
+}

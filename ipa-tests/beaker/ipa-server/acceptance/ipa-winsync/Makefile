@@ -29,7 +29,7 @@ export TESTVERSION=1.0
 
 BUILT_FILES=
 
-FILES=$(METADATA) runtest.sh Makefile PURPOSE t.ipa-winsync.sh ADcert.cer README Setup_Doc winlib.sh
+FILES=$(METADATA) runtest.sh Makefile PURPOSE t.ipa-winsync.sh ADcert.cer invalidAD.cer README Setup_Doc winlib.sh
 
 .PHONY: all install download clean
 
